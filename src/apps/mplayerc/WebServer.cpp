@@ -197,7 +197,7 @@ DWORD CWebServer::ThreadProc()
 	return 0;
 }
 
-static void PutFileContents(LPCTSTR fn, const CStringA& data)
+static void PutFileContents(LPCWSTR fn, const CStringA& data)
 {
 	FILE* f = NULL;
 	if (!_wfopen_s(&f, fn, L"wb")) {

@@ -55,7 +55,7 @@ REFERENCE_TIME g_tSampleStart  = 0;
 
 FRAME_TYPE g_nFrameType = PICT_NONE;
 
-const LPCTSTR DXVAVersion[] = {
+const LPCWSTR DXVAVersion[] = {
 	L"DXVA ",
 	L"DXVA1",
 	L"DXVA2"

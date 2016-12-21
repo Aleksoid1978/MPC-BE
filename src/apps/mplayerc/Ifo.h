@@ -28,8 +28,8 @@ class CIfo
 public:
 	CIfo();
 
-	bool OpenFile (LPCTSTR strFile);
-	bool SaveFile (LPCTSTR strFile);
+	bool OpenFile (LPCWSTR strFile);
+	bool SaveFile (LPCWSTR strFile);
 	bool RemoveUOPs();
 
 	~CIfo(void);

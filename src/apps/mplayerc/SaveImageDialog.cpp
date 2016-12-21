@@ -27,8 +27,8 @@
 IMPLEMENT_DYNAMIC(CSaveImageDialog, CFileDialog)
 CSaveImageDialog::CSaveImageDialog(
 	int quality, int levelPNG,
-	LPCTSTR lpszDefExt, LPCTSTR lpszFileName,
-	LPCTSTR lpszFilter, CWnd* pParentWnd)
+	LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
+	LPCWSTR lpszFilter, CWnd* pParentWnd)
 	: CFileDialog(FALSE, lpszDefExt, lpszFileName,
 				  OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 				  lpszFilter, pParentWnd)
@@ -135,8 +135,8 @@ void CSaveImageDialog::OnTypeChange()
 IMPLEMENT_DYNAMIC(CSaveThumbnailsDialog, CSaveImageDialog)
 CSaveThumbnailsDialog::CSaveThumbnailsDialog(
 	int rows, int cols, int width, int quality, int levelPNG,
-	LPCTSTR lpszDefExt, LPCTSTR lpszFileName,
-	LPCTSTR lpszFilter, CWnd* pParentWnd)
+	LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
+	LPCWSTR lpszFilter, CWnd* pParentWnd)
 	: CSaveImageDialog(quality, levelPNG,
 					   lpszDefExt, lpszFileName,
 					   lpszFilter, pParentWnd)

@@ -44,7 +44,7 @@ CDVDSession::~CDVDSession()
 	EndSession();
 }
 
-bool CDVDSession::Open(LPCTSTR path)
+bool CDVDSession::Open(LPCWSTR path)
 {
 	Close();
 
@@ -332,7 +332,7 @@ bool CLBAFile::IsOpen() const
 	return(m_hFile != hFileNull);
 }
 
-bool CLBAFile::Open(LPCTSTR path)
+bool CLBAFile::Open(LPCWSTR path)
 {
 	Close();
 

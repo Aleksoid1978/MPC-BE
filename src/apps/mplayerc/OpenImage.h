@@ -23,7 +23,7 @@
 #include "DIB.h"
 #include "../../DSUtil/Filehandle.h"
 
-static LPCTSTR extimages[] = { L".bmp", L".jpg", L".jpeg", L".png", L".gif" };
+static LPCWSTR extimages[] = { L".bmp", L".jpg", L".jpeg", L".png", L".gif" };
 
 static const bool OpenImageCheck(CString fn)
 {

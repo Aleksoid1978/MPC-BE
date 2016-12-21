@@ -106,7 +106,7 @@ BOOL COpenDlg::OnInitDialog()
 	if (::IsClipboardFormatAvailable(CF_UNICODETEXT) && ::OpenClipboard(m_hWnd)) {
 		HGLOBAL hglb = ::GetClipboardData(CF_UNICODETEXT);
 		if (hglb) {
-			LPCTSTR pText = (LPCTSTR)::GlobalLock(hglb);
+			LPCWSTR pText = (LPCWSTR)::GlobalLock(hglb);
 			if (pText) {
 				if (AfxIsValidString(pText)) {
 					if (Youtube::CheckURL(pText) || Youtube::CheckPlaylist(pText)) {
@@ -151,7 +151,7 @@ static CString GetFileName(CString str)
 	CPath p = str;
 	p.StripPath();
 
-	return (LPCTSTR)p;
+	return (LPCWSTR)p;
 }
 
 void COpenDlg::OnBnClickedBrowsebutton()
@@ -278,8 +278,8 @@ bool COpenFileDlg::m_fAllowDirSelection = false;
 WNDPROC COpenFileDlg::m_wndProc = NULL;
 
 IMPLEMENT_DYNAMIC(COpenFileDlg, CFileDialog)
-COpenFileDlg::COpenFileDlg(CAtlArray<CString>& mask, bool fAllowDirSelection, LPCTSTR lpszDefExt, LPCTSTR lpszFileName,
-						   DWORD dwFlags, LPCTSTR lpszFilter, CWnd* pParentWnd)
+COpenFileDlg::COpenFileDlg(CAtlArray<CString>& mask, bool fAllowDirSelection, LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
+						   DWORD dwFlags, LPCWSTR lpszFilter, CWnd* pParentWnd)
 	: CFileDialog(TRUE, lpszDefExt, lpszFileName, dwFlags|OFN_NOVALIDATE, lpszFilter, pParentWnd, 0)
 	, m_mask(mask)
 {
