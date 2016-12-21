@@ -75,10 +75,10 @@ CDirectVobSubFilter::CDirectVobSubFilter(LPUNKNOWN punk, HRESULT* phr, const GUI
 		m_hfont = CreateFontIndirect(&lf);
 	}
 
-	theApp.WriteProfileString(ResStr(IDS_R_DEFTEXTPATHES), _T("Hint"), _T("The first three are fixed, but you can add more up to ten entries."));
-	theApp.WriteProfileString(ResStr(IDS_R_DEFTEXTPATHES), _T("Path0"), _T("."));
-	theApp.WriteProfileString(ResStr(IDS_R_DEFTEXTPATHES), _T("Path1"), _T("c:\\subtitles"));
-	theApp.WriteProfileString(ResStr(IDS_R_DEFTEXTPATHES), _T("Path2"), _T(".\\subtitles"));
+	theApp.WriteProfileString(ResStr(IDS_R_DEFTEXTPATHES), L"Hint", L"The first three are fixed, but you can add more up to ten entries.");
+	theApp.WriteProfileString(ResStr(IDS_R_DEFTEXTPATHES), L"Path0", L".");
+	theApp.WriteProfileString(ResStr(IDS_R_DEFTEXTPATHES), L"Path1", L"c:\\subtitles");
+	theApp.WriteProfileString(ResStr(IDS_R_DEFTEXTPATHES), L"Path2", L".\\subtitles");
 
 	m_bLoading = true;
 
@@ -87,7 +87,7 @@ CDirectVobSubFilter::CDirectVobSubFilter(LPUNKNOWN punk, HRESULT* phr, const GUI
 	m_tbid.graph = NULL;
 	m_tbid.dvs = NULL;
 	m_tbid.fRunOnce = false;
-	m_tbid.fShowIcon = (theApp.m_AppName.Find(_T("zplayer"), 0) < 0 || !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_ENABLEZPICON), 0));
+	m_tbid.fShowIcon = (theApp.m_AppName.Find(L"zplayer", 0) < 0 || !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_ENABLEZPICON), 0));
 
 	HRESULT hr = S_OK;
 	m_pTextInput.Add(DNew CTextInputPin(this, m_pLock, &m_csSubLock, &hr));
@@ -1528,7 +1528,7 @@ HRESULT CDirectVobSubFilter2::JoinFilterGraph(IFilterGraph* pGraph, LPCWSTR pNam
 					continue;
 				}
 
-				if (pOutPin && GetFilterName(pBF) == _T("Overlay Mixer")) {
+				if (pOutPin && GetFilterName(pBF) == L"Overlay Mixer") {
 					continue;
 				}
 
@@ -1605,13 +1605,13 @@ HRESULT CDirectVobSubFilter2::CheckInputType(const CMediaType* mtIn)
 
 bool CDirectVobSubFilter2::ShouldWeAutoload(IFilterGraph* pGraph)
 {
-	TCHAR blacklistedapps[][32] = {
-		_T("WM8EUTIL."), // wmp8 encoder's dummy renderer releases the outputted media sample after calling Receive on its input pin (yes, even when dvobsub isn't registered at all)
-		_T("explorer."), // as some users reported thumbnail preview loads dvobsub, I've never experienced this yet...
-		_T("producer."), // this is real's producer
-		_T("GoogleDesktopIndex."), // Google Desktop
-		_T("GoogleDesktopDisplay."), // Google Desktop
-		_T("GoogleDesktopCrawl."), // Google Desktop
+	WCHAR blacklistedapps[][32] = {
+		L"WM8EUTIL.", // wmp8 encoder's dummy renderer releases the outputted media sample after calling Receive on its input pin (yes, even when dvobsub isn't registered at all)
+		L"explorer.", // as some users reported thumbnail preview loads dvobsub, I've never experienced this yet...
+		L"producer.", // this is real's producer
+		L"GoogleDesktopIndex.", // Google Desktop
+		L"GoogleDesktopDisplay.", // Google Desktop
+		L"GoogleDesktopCrawl.", // Google Desktop
 	};
 
 	for (ptrdiff_t i = 0; i < _countof(blacklistedapps); i++) {
@@ -1764,7 +1764,7 @@ bool CDirectVobSubFilter::Open()
 		if (!pSubStream) {
 			CAutoPtr<CSupSubFile> pSSF(DNew CSupSubFile(&m_csSubLock));
 			CPath fn(ret[i].fn);
-			if (pSSF && CString(fn.GetExtension()).MakeLower() == _T(".sup")) {
+			if (pSSF && CString(fn.GetExtension()).MakeLower() == L".sup") {
 				fn.StripPath();
 				CString fname(fn);
 				if (pSSF->Open(ret[i].fn, L"", m_videoFileName)) {
@@ -1777,7 +1777,7 @@ bool CDirectVobSubFilter::Open()
 			CAutoPtr<CVobSubFile> pVSF(DNew CVobSubFile(&m_csSubLock));
 			if (pVSF && pVSF->Open(ret[i].fn) && pVSF->GetStreamCount() > 0) {
 				pSubStream = pVSF.Detach();
-				m_frd.files.AddTail(ret[i].fn.Left(ret[i].fn.GetLength() - 4) + _T(".sub"));
+				m_frd.files.AddTail(ret[i].fn.Left(ret[i].fn.GetLength() - 4) + L".sub");
 			}
 		}
 
@@ -1785,7 +1785,7 @@ bool CDirectVobSubFilter::Open()
 			CAutoPtr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&m_csSubLock));
 			if (pRTS && pRTS->Open(ret[i].fn, DEFAULT_CHARSET, L"", m_videoFileName) && pRTS->GetStreamCount() > 0) {
 				pSubStream = pRTS.Detach();
-				m_frd.files.AddTail(ret[i].fn + _T(".style"));
+				m_frd.files.AddTail(ret[i].fn + L".style");
 			}
 		}
 
@@ -2074,7 +2074,7 @@ DWORD CDirectVobSubFilter::ThreadProc()
 				if (CFileGetStatus(fn, status) && m_frd.mtime[i] != status.m_mtime) {
 					for (j = 0; j < 10; j++) {
 						FILE* f = NULL;
-						if (!_tfopen_s(&f, fn, _T("rb+"))) {
+						if (!_wfopen_s(&f, fn, L"rb+")) {
 							fclose(f);
 							j = 0;
 							break;

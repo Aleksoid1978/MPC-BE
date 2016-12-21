@@ -343,8 +343,8 @@ bool CDVSMainPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 						CFileDialog fd(TRUE, NULL, NULL,
 									   OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST,
-									   _T(".idx .smi .sub .srt .psb .ssa .ass .usf .sup|*.idx;*.smi;*.sub;*.srt;*.psb;*.ssa;*.ass;*.usf;*.sup|")
-									   _T("All files (*.*)|*.*||"),
+									   L".idx .smi .sub .srt .psb .ssa .ass .usf .sup|*.idx;*.smi;*.sub;*.srt;*.psb;*.ssa;*.ass;*.usf;*.sup|"
+									   L"All files (*.*)|*.*||",
 									   CDialog::FromHandle(m_Dlg), 0);
 
 						if (fd.DoModal() == IDOK) {
@@ -355,7 +355,7 @@ bool CDVSMainPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 					} else if (LOWORD(wParam) == IDC_FONT) {
 						AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-						CStyleEditorDialog dlg(_T("Default"), &m_defStyle, CWnd::FromHandle(m_hwnd));
+						CStyleEditorDialog dlg(L"Default", &m_defStyle, CWnd::FromHandle(m_hwnd));
 						if (dlg.DoModal() == IDOK) {
 							BOOL bStyleChanged = FALSE;
 							if (dlg.m_stss != m_defStyle) {
@@ -364,7 +364,7 @@ bool CDVSMainPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 							m_defStyle = dlg.m_stss;
 							CString str = m_defStyle.fontName;
 							if (str.GetLength() > 18) {
-								str = str.Left(16).TrimRight() + _T("...");
+								str = str.Left(16).TrimRight() + L"...";
 							}
 							m_font.SetWindowText(str);
 
@@ -739,7 +739,7 @@ void CDVSTimingPPage::UpdateControlData(bool fSave)
 		CString fpsstr;
 		m_fps.GetWindowText(fpsstr);
 		float fps;
-		if (_stscanf_s(fpsstr, _T("%f"), &fps) == 1) {
+		if (swscanf_s(fpsstr, L"%f", &fps) == 1) {
 			m_MediaFPS = fps;
 		}
 		m_SubtitleDelay = m_subdelay.GetPos32();
@@ -748,7 +748,7 @@ void CDVSTimingPPage::UpdateControlData(bool fSave)
 	} else {
 		m_modfps.SetCheck(m_bMediaFPSEnabled);
 		CString fpsstr;
-		fpsstr.Format(_T("%.4f"), m_MediaFPS);
+		fpsstr.Format(L"%.4f", m_MediaFPS);
 		m_fps.SetWindowText(fpsstr);
 		m_fps.EnableWindow(m_bMediaFPSEnabled);
 		m_subdelay.SetRange32(-180*60*1000, 180*60*1000);
@@ -772,7 +772,7 @@ bool CDVSAboutPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg) {
 		case WM_INITDIALOG: {
-			SetDlgItemText(m_Dlg, IDC_VERSION, _T("DirectVobSub 2.45.") _T(MAKE_STR(MPC_VERSION_REV)) _T(" ") _T(MPC_VERSION_ARCH) _T("\nCopyright 2001-2015 MPC-BE Team"));
+			SetDlgItemText(m_Dlg, IDC_VERSION, L"DirectVobSub 2.45." _T(MAKE_STR(MPC_VERSION_REV)) L" " _T(MPC_VERSION_ARCH) L"\nCopyright 2001-2015 MPC-BE Team");
 		}
 		break;
 		case WM_COMMAND: {
@@ -780,11 +780,11 @@ bool CDVSAboutPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				case BN_CLICKED: {
 					if (LOWORD(wParam) == IDC_HOMEPAGEBTN) {
 						AFX_MANAGE_STATE(AfxGetStaticModuleState());
-						ShellExecute(m_Dlg, _T("open"), ResStr(IDS_URL_HOMEPAGE), NULL, NULL, SW_SHOWNORMAL);
+						ShellExecute(m_Dlg, L"open", ResStr(IDS_URL_HOMEPAGE), NULL, NULL, SW_SHOWNORMAL);
 						return true;
 					} else if (LOWORD(wParam) == IDC_BUGREPORTBTN) {
 						AFX_MANAGE_STATE(AfxGetStaticModuleState());
-						ShellExecute(m_Dlg, _T("open"), ResStr(IDS_URL_EMAIL), NULL, NULL, SW_SHOWNORMAL);
+						ShellExecute(m_Dlg, L"open", ResStr(IDS_URL_EMAIL), NULL, NULL, SW_SHOWNORMAL);
 						return true;
 					}
 				}
@@ -993,7 +993,7 @@ void CDVSColorPPage::UpdateControlData(bool fSave)
 		if (pData) {
 			for (UINT i = 0; i < nSize; i++) {
 				CString guid = GetGUIDString(*VSFilterDefaultFormats[i].subtype);
-				if (!guid.Left(13).CompareNoCase(_T("MEDIASUBTYPE_"))) {
+				if (!guid.Left(13).CompareNoCase(L"MEDIASUBTYPE_")) {
 					guid = guid.Mid(13);
 				}
 
@@ -1054,13 +1054,13 @@ bool CDVSPathsPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				case BN_CLICKED: {
 					switch (LOWORD(wParam)) {
 						case IDC_BROWSE: {
-							TCHAR pathbuff[MAX_PATH];
+							WCHAR pathbuff[MAX_PATH];
 
 							BROWSEINFO bi;
 							bi.hwndOwner = m_Dlg;
 							bi.pidlRoot = NULL;
 							bi.pszDisplayName = pathbuff;
-							bi.lpszTitle = _T("");
+							bi.lpszTitle = L"";
 							bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_EDITBOX | BIF_VALIDATE | BIF_USENEWUI;
 							bi.lpfn = NULL;
 							bi.lParam = 0;
@@ -1115,13 +1115,13 @@ bool CDVSPathsPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 void CDVSPathsPPage::UpdateObjectData(bool fSave)
 {
 	if (fSave) {
-		CString chk(_T("123456789")), path, tmp;
+		CString chk(L"123456789"), path, tmp;
 		int i = 0;
 		do {
 			tmp.Format(ResStr(IDS_RP_PATH), i++);
 			path = theApp.GetProfileString(ResStr(IDS_R_DEFTEXTPATHES), tmp, chk);
 			if (path != chk) {
-				theApp.WriteProfileString(ResStr(IDS_R_DEFTEXTPATHES), tmp, _T(""));
+				theApp.WriteProfileString(ResStr(IDS_R_DEFTEXTPATHES), tmp, L"");
 			}
 		} while (path != chk);
 
@@ -1130,7 +1130,7 @@ void CDVSPathsPPage::UpdateObjectData(bool fSave)
 			theApp.WriteProfileString(ResStr(IDS_R_DEFTEXTPATHES), tmp, m_paths[i]);
 		}
 	} else {
-		CString chk(_T("123456789")), path, tmp;
+		CString chk(L"123456789"), path, tmp;
 		int i = 0;
 		do {
 			if (!path.IsEmpty()) {

@@ -45,7 +45,7 @@ BOOL CVSFilterApp::InitInstance()
 		return FALSE;
 	}
 
-	SetRegistryKey(_T("Gabest"));
+	SetRegistryKey(L"Gabest");
 
 	DllEntryPoint(AfxGetInstanceHandle(), DLL_PROCESS_ATTACH, 0); // "DllMain" of the dshow baseclasses
 
@@ -72,7 +72,7 @@ HINSTANCE CVSFilterApp::LoadAppLangResourceDLL()
 	fn.ReleaseBufferSetLength(::GetModuleFileName(m_hInstance, fn.GetBuffer(MAX_PATH), MAX_PATH));
 	fn = fn.Mid(fn.ReverseFind('\\')+1);
 	fn = fn.Left(fn.ReverseFind('.')+1);
-	fn = fn + _T("lang");
+	fn = fn + L"lang";
 	return ::LoadLibrary(fn);
 }
 
