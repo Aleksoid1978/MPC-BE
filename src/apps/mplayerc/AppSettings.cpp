@@ -876,6 +876,7 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileBinary(IDS_R_UPDATER, IDS_RS_UPDATER_LAST_CHECK, (LPBYTE)&tUpdaterLastCheck, sizeof(time_t));
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_REMAINING_TIME, bOSDRemainingTime);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_PASTECLIPBOARDURL, bPasteClipboardURL);
 
 	if (pApp->m_pszRegistryKey) {
 		// WINBUG: on win2k this would crash WritePrivateProfileString
@@ -1560,6 +1561,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 
 	bOSDRemainingTime		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_REMAINING_TIME, 0);
+	bPasteClipboardURL		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_PASTECLIPBOARDURL, 0);
 
 	if (fLaunchfullscreen && !IsD3DFullscreen()) {
 		nCLSwitches |= CLSW_FULLSCREEN;

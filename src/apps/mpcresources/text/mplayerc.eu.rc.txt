@@ -112,16 +112,17 @@ BEGIN DIALOGEX IDD_NAVIGATION_DLG LINES 10
 7		"Argibideak"
 END
 
-BEGIN DIALOGEX IDD_OPEN_DLG LINES 17
+BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"Ireki"
 7		"Idatzi filma edo audio agiriaren helbidea (Interneten edo zure ordenagailuan) eta irakurgailuak irekiko du zure ordez."
 8		"Ireki:"
-10		"Bilatu..."
-11		"Bikoitza:"
-13		"Bilatu..."
-14		"Ongi"
-15		"Ezeztatu"
-16		"Gehitu irakur-zerrendara ireki gabe"
+9		"Paste URL from clipboard"
+11		"Bilatu..."
+12		"Bikoitza:"
+14		"Bilatu..."
+15		"Ongi"
+16		"Ezeztatu"
+17		"Gehitu irakur-zerrendara ireki gabe"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22

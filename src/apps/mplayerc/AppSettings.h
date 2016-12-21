@@ -496,6 +496,8 @@ public:
 	bool				fStartMainTitle;
 	bool				fNormalStartDVD;
 
+	bool				bPasteClipboardURL;
+
 	CSize sizeFixedWindow;
 	bool HasFixedWindowSize() const { return sizeFixedWindow.cx > 0 || sizeFixedWindow.cy > 0; }
 	//int			iFixedWidth, iFixedHeight;

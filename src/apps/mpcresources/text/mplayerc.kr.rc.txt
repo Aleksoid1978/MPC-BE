@@ -112,16 +112,17 @@ BEGIN DIALOGEX IDD_NAVIGATION_DLG LINES 10
 7		"정보"
 END
 
-BEGIN DIALOGEX IDD_OPEN_DLG LINES 17
+BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"열기"
 7		"재생할 파일의 위치(인터넷 또는 로컬컴퓨터)를 입력하세요."
 8		"열기:"
-10		"찾아보기..."
-11		"더빙:"
-13		"찾아보기..."
-14		"확인"
-15		"취소"
-16		"열지않고 재생목록에만 추가"
+9		"Paste URL from clipboard"
+11		"찾아보기..."
+12		"더빙:"
+14		"찾아보기..."
+15		"확인"
+16		"취소"
+17		"열지않고 재생목록에만 추가"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22

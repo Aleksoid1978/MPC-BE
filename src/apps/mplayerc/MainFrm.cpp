@@ -5070,14 +5070,14 @@ void CMainFrame::OnFileOpenMedia()
 		return;
 	}
 
-	if (!dlg.m_fAppendPlaylist) {
+	if (!dlg.m_bAppendPlaylist) {
 		SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 	}
 
 	ShowWindow(SW_SHOW);
 	SetForegroundWindow();
 
-	if (!dlg.m_fMultipleFiles) {
+	if (!dlg.m_bMultipleFiles) {
 		if (OpenBD(dlg.m_fns.GetHead())) {
 			return;
 		}
@@ -5089,15 +5089,15 @@ void CMainFrame::OnFileOpenMedia()
 	}
 
 	if (AddSimilarFiles(dlg.m_fns)) {
-		dlg.m_fMultipleFiles = true;
+		dlg.m_bMultipleFiles = true;
 	}
 
-	if (dlg.m_fAppendPlaylist) {
-		m_wndPlaylistBar.Append(dlg.m_fns, dlg.m_fMultipleFiles);
+	if (dlg.m_bAppendPlaylist) {
+		m_wndPlaylistBar.Append(dlg.m_fns, dlg.m_bMultipleFiles);
 		return;
 	}
 
-	m_wndPlaylistBar.Open(dlg.m_fns, dlg.m_fMultipleFiles);
+	m_wndPlaylistBar.Open(dlg.m_fns, dlg.m_bMultipleFiles);
 	OpenCurPlaylistItem();
 }
 

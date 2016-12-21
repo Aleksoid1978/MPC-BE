@@ -287,3 +287,5 @@
 
 #define IDS_RS_CONTEXTFILES					L"ShowContextFiles"
 #define IDS_RS_CONTEXTDIR					L"ShowContextDir"
+
+#define IDS_RS_PASTECLIPBOARDURL			L"PasteClipboardURL"

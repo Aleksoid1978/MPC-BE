@@ -112,16 +112,17 @@ BEGIN DIALOGEX IDD_NAVIGATION_DLG LINES 10
 7		"Ինֆո"
 END
 
-BEGIN DIALOGEX IDD_OPEN_DLG LINES 17
+BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"Բացել"
 7		"Գրեք ֆիլմի կամ ձայնային ֆայլի հասցեն\n(Ինտերնետում կամ Ձեր համակարգչում)"
 8		"Բացել."
-10		"Ընտրել..."
-11		"Կրկնօրինակ."
-13		"Ընտրել..."
-14		"ԼԱՎ"
-15		"Մերժել"
-16		"Միայն ավելացնել խաղացանկին"
+9		"Paste URL from clipboard"
+11		"Ընտրել..."
+12		"Կրկնօրինակ."
+14		"Ընտրել..."
+15		"ԼԱՎ"
+16		"Մերժել"
+17		"Միայն ավելացնել խաղացանկին"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22

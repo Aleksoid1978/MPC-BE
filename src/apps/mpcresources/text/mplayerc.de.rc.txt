@@ -112,16 +112,17 @@ BEGIN DIALOGEX IDD_NAVIGATION_DLG LINES 10
 7		"Info"
 END
 
-BEGIN DIALOGEX IDD_OPEN_DLG LINES 17
+BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"Medien öffnen"
 7		"Neben lokalen Mediendateien können auch Inhalte aus dem Internet wiedergegeben werden. Dafür bitte Pfadnamen oder Internetadresse angeben."
 8		"Medien:"
-10		"Öffnen..."
-11		"Audiospur:"
-13		"Öffnen..."
-14		"&OK"
-15		"&Abbrechen"
-16		"Nur zur Wiedergabeliste hinzufügen"
+9		"Paste URL from clipboard"
+11		"Öffnen..."
+12		"Audiospur:"
+14		"Öffnen..."
+15		"&OK"
+16		"&Abbrechen"
+17		"Nur zur Wiedergabeliste hinzufügen"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22

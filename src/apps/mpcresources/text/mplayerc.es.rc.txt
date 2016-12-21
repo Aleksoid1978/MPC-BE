@@ -112,16 +112,17 @@ BEGIN DIALOGEX IDD_NAVIGATION_DLG LINES 10
 7		"Info"
 END
 
-BEGIN DIALOGEX IDD_OPEN_DLG LINES 17
+BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"Abrir"
 7		"Escribe la ruta del archivo multimedia (en Internet o en tu ordenador) y el reproductor lo abrira por ti."
 8		"Abrir:"
-10		"Explorar..."
-11		"Doblaje:"
-13		"Explorar..."
-14		"Aceptar"
-15		"Cancelar"
-16		"Agregar a la lista de reproducción sin abrir"
+9		"Paste URL from clipboard"
+11		"Explorar..."
+12		"Doblaje:"
+14		"Explorar..."
+15		"Aceptar"
+16		"Cancelar"
+17		"Agregar a la lista de reproducción sin abrir"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22

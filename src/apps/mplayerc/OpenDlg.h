@@ -34,16 +34,17 @@ public:
 	COpenDlg(CWnd* pParent = NULL);
 	virtual ~COpenDlg();
 
-	bool m_fMultipleFiles;
+	bool m_bMultipleFiles;
 	CAtlList<CString> m_fns;
 
 	enum { IDD = IDD_OPEN_DLG };
+	BOOL m_bPasteClipboardURL;
 	CComboBox m_mrucombo;
 	CString m_path;
 	CComboBox m_mrucombo2;
 	CString m_path2;
 	CStatic m_label2;
-	BOOL m_fAppendPlaylist;
+	BOOL m_bAppendPlaylist;
 
 	HICON	m_hIcon;
 

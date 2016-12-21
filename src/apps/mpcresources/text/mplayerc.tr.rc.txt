@@ -112,16 +112,17 @@ BEGIN DIALOGEX IDD_NAVIGATION_DLG LINES 10
 7		"Bilgi"
 END
 
-BEGIN DIALOGEX IDD_OPEN_DLG LINES 17
+BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"Aç"
 7		"Bir video veya ses dosyası adresi giriniz (internetteki veya bilgisayarınızdaki). Oynatıcı, dosyayı sizin için yürütecektir..."
 8		"Video:"
-10		"Gözat..."
-11		"Dublaj:"
-13		"Gözat..."
-14		"Tamam"
-15		"İptal"
-16		"Açılışta oynatma listesine de ekle"
+9		"Paste URL from clipboard"
+11		"Gözat..."
+12		"Dublaj:"
+14		"Gözat..."
+15		"Tamam"
+16		"İptal"
+17		"Açılışta oynatma listesine de ekle"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
