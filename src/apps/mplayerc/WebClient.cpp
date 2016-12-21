@@ -111,34 +111,34 @@ void CWebClientSocket::Header()
 	// remember new cookies
 
 	CString value;
-	if (m_hdrlines.Lookup(_T("cookie"), value)) {
+	if (m_hdrlines.Lookup(L"cookie", value)) {
 		CAtlList<CString> sl;
 		Explode(value, sl, L';');
 		POSITION pos = sl.GetHeadPosition();
 		while (pos) {
 			CAtlList<CString> sl2;
 			Explode(sl.GetNext(pos), sl2, L'=', 2);
-			m_cookie[sl2.GetHead()] = sl2.GetCount() == 2 ? sl2.GetTail() : _T("");
+			m_cookie[sl2.GetHead()] = sl2.GetCount() == 2 ? sl2.GetTail() : L"";
 		}
 	}
 
 	// start new session
 
-	if (!m_cookie.Lookup(_T("MPCSESSIONID"), m_sessid)) {
+	if (!m_cookie.Lookup(L"MPCSESSIONID", m_sessid)) {
 		srand((unsigned int)time(NULL));
-		m_sessid.Format(_T("%08x"), rand()*0x12345678);
-		SetCookie(_T("MPCSESSIONID"), m_sessid);
+		m_sessid.Format(L"%08x", rand()*0x12345678);
+		SetCookie(L"MPCSESSIONID", m_sessid);
 	} else {
 		// TODO: load session
 	}
 
 	CStringA reshdr, resbody;
 
-	if (m_cmd == _T("POST")) {
+	if (m_cmd == L"POST") {
 		CString str;
-		if (m_hdrlines.Lookup(_T("content-length"), str)) {
+		if (m_hdrlines.Lookup(L"content-length", str)) {
 
-			int len = _tcstol(str, NULL, 10);
+			int len = wcstol(str, NULL, 10);
 			str.Empty();
 
 			int err = 0;
@@ -163,7 +163,7 @@ void CWebClientSocket::Header()
 							if (sl2.GetCount() == 2) {
 								m_post[sl2.GetHead().MakeLower()] = UTF8To16(UrlDecode(TToA(sl2.GetTail())));
 							} else {
-								m_post[sl2.GetHead().MakeLower()] = _T("");
+								m_post[sl2.GetHead().MakeLower()] = L"";
 							}
 						}
 						str.Empty();
@@ -180,7 +180,7 @@ void CWebClientSocket::Header()
 		}
 	}
 
-	if (m_cmd == _T("GET") || m_cmd == _T("HEAD") || m_cmd == _T("POST")) {
+	if (m_cmd == L"GET" || m_cmd == L"HEAD" || m_cmd == L"POST") {
 		int k = m_path.Find('?');
 		if (k >= 0) {
 			m_query = m_path.Mid(k + 1);
@@ -202,7 +202,7 @@ void CWebClientSocket::Header()
 				if (sl2.GetCount() == 2) {
 					m_get[sl2.GetHead()] = UTF8To16(UrlDecode(TToA(sl2.GetTail())));
 				} else {
-					m_get[sl2.GetHead()] = _T("");
+					m_get[sl2.GetHead()] = L"";
 				}
 			}
 		}
@@ -267,16 +267,16 @@ void CWebClientSocket::Header()
 
 		Send(reshdr, reshdr.GetLength());
 
-		if (m_cmd != _T("HEAD") && reshdr.Find("HTTP/1.1 200 OK") == 0 && !resbody.IsEmpty()) {
+		if (m_cmd != L"HEAD" && reshdr.Find("HTTP/1.1 200 OK") == 0 && !resbody.IsEmpty()) {
 			Send(resbody, resbody.GetLength());
 		}
 
-		CString connection = _T("close");
-		m_hdrlines.Lookup(_T("connection"), connection);
+		CString connection = L"close";
+		m_hdrlines.Lookup(L"connection", connection);
 
 		Clear();
 
-		// if (connection == _T("close"))
+		// if (connection == L"close")
 		OnClose(0);
 	}
 }
@@ -313,8 +313,8 @@ void CWebClientSocket::OnClose(int nErrorCode)
 bool CWebClientSocket::OnCommand(CStringA& hdr, CStringA& body, CStringA& mime)
 {
 	CString arg;
-	if (m_request.Lookup(_T("wm_command"), arg)) {
-		int id = _ttol(arg);
+	if (m_request.Lookup(L"wm_command", arg)) {
+		int id = _wtol(arg);
 
 		if (id > 0) {
 			if (id == ID_FILE_EXIT) {
@@ -323,11 +323,11 @@ bool CWebClientSocket::OnCommand(CStringA& hdr, CStringA& body, CStringA& mime)
 				m_pMainFrame->SendMessage(WM_COMMAND, id);
 			}
 		} else {
-			if (arg == CMD_SETPOS && m_request.Lookup(_T("position"), arg)) {
+			if (arg == CMD_SETPOS && m_request.Lookup(L"position", arg)) {
 				int h, m, s, ms = 0;
-				TCHAR c;
-				if (_stscanf_s(arg, _T("%d%c%d%c%d%c%d"), &h, &c, sizeof(TCHAR),
-							   &m, &c, sizeof(TCHAR), &s, &c, sizeof(TCHAR), &ms) >= 5) {
+				WCHAR c;
+				if (swscanf_s(arg, L"%d%c%d%c%d%c%d", &h, &c, sizeof(WCHAR),
+							   &m, &c, sizeof(WCHAR), &s, &c, sizeof(WCHAR), &ms) >= 5) {
 					REFERENCE_TIME rtPos = 10000i64*(((h*60+m)*60+s)*1000+ms);
 					m_pMainFrame->SeekTo(rtPos);
 					for (int retries = 20; retries-- > 0; Sleep(50)) {
@@ -336,13 +336,13 @@ bool CWebClientSocket::OnCommand(CStringA& hdr, CStringA& body, CStringA& mime)
 						}
 					}
 				}
-			} else if (arg == CMD_SETPOS && m_request.Lookup(_T("percent"), arg)) {
+			} else if (arg == CMD_SETPOS && m_request.Lookup(L"percent", arg)) {
 				float percent = 0;
-				if (_stscanf_s(arg, _T("%f"), &percent) == 1) {
+				if (swscanf_s(arg, L"%f", &percent) == 1) {
 					m_pMainFrame->SeekTo((REFERENCE_TIME)(percent / 100 * m_pMainFrame->GetDur()));
 				}
-			} else if (arg == CMD_SETVOLUME && m_request.Lookup(_T("volume"), arg)) {
-				int volume = _tcstol(arg, NULL, 10);
+			} else if (arg == CMD_SETVOLUME && m_request.Lookup(L"volume", arg)) {
+				int volume = wcstol(arg, NULL, 10);
 				m_pMainFrame->m_wndToolBar.Volume = clamp(volume, 0, 100);
 				m_pMainFrame->OnPlayVolume(0);
 			}
@@ -350,7 +350,7 @@ bool CWebClientSocket::OnCommand(CStringA& hdr, CStringA& body, CStringA& mime)
 	}
 
 	CString ref;
-	if (!m_hdrlines.Lookup(_T("referer"), ref)) {
+	if (!m_hdrlines.Lookup(L"referer", ref)) {
 		return true;
 	}
 
@@ -395,8 +395,8 @@ bool CWebClientSocket::OnInfo(CStringA& hdr, CStringA& body, CStringA& mime)
 	file.StripPath();
 	file.RemoveExtension();
 
-	positionstring.Format(_T("%02d:%02d:%02d"), (pos/3600000), (pos/60000)%60, (pos/1000)%60);
-	durationstring.Format(_T("%02d:%02d:%02d"), (dur/3600000), (dur/60000)%60, (dur/1000)%60);
+	positionstring.Format(L"%02d:%02d:%02d", (pos/3600000), (pos/60000)%60, (pos/1000)%60);
+	durationstring.Format(L"%02d:%02d:%02d", (dur/3600000), (dur/60000)%60, (dur/1000)%60);
 
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind = FindFirstFile(m_pMainFrame->m_wndPlaylistBar.GetCurFileName(), &wfd);
@@ -404,7 +404,7 @@ bool CWebClientSocket::OnInfo(CStringA& hdr, CStringA& body, CStringA& mime)
 		FindClose(hFind);
 		__int64 size = (__int64(wfd.nFileSizeHigh)<<32)|wfd.nFileSizeLow;
 		const int MAX_FILE_SIZE_BUFFER = 65;
-		TCHAR szFileSize[MAX_FILE_SIZE_BUFFER];
+		WCHAR szFileSize[MAX_FILE_SIZE_BUFFER];
 		StrFormatByteSizeW(size, szFileSize, MAX_FILE_SIZE_BUFFER);
 		sizestring.Format(L"%s", szFileSize);
 	}
@@ -422,7 +422,7 @@ bool CWebClientSocket::OnInfo(CStringA& hdr, CStringA& body, CStringA& mime)
 bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 {
 	CAtlList<CStringA> rootdrives;
-	for (TCHAR drive[] = _T("A:"); drive[0] <= 'Z'; drive[0]++)
+	for (WCHAR drive[] = L"A:"; drive[0] <= 'Z'; drive[0]++)
 		if (GetDriveType(drive) != DRIVE_NO_ROOT_DIR) {
 			rootdrives.AddTail(CStringA(drive) + '\\');
 		}
@@ -431,7 +431,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 
 	CString path;
 	CFileStatus fs;
-	if (m_get.Lookup(_T("path"), path)) {
+	if (m_get.Lookup(L"path", path)) {
 
 		if (CFileGetStatus(path, fs) && !(fs.m_attribute&CFile::directory)) {
 
@@ -440,8 +440,8 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 			cmdln.AddTail(path);
 
 			CString focus;
-			if (m_get.Lookup(_T("focus"), focus) && !focus.CompareNoCase(_T("no"))) {
-				cmdln.AddTail(_T("/nofocus"));
+			if (m_get.Lookup(L"focus", focus) && !focus.CompareNoCase(L"no")) {
+				cmdln.AddTail(L"/nofocus");
 			}
 
 			int len = 0;
@@ -449,7 +449,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 			POSITION pos = cmdln.GetHeadPosition();
 			while (pos) {
 				CString& str = cmdln.GetNext(pos);
-				len += (str.GetLength()+1)*sizeof(TCHAR);
+				len += (str.GetLength()+1)*sizeof(WCHAR);
 			}
 
 			CAutoVectorPtr<BYTE> buff;
@@ -461,7 +461,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 				POSITION pos = cmdln.GetHeadPosition();
 				while (pos) {
 					CString& str = cmdln.GetNext(pos);
-					len = (str.GetLength()+1)*sizeof(TCHAR);
+					len = (str.GetLength()+1)*sizeof(WCHAR);
 					memcpy(p, (LPCTSTR)str, len);
 					p += len;
 				}
@@ -487,11 +487,11 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 		}
 	}
 
-	if (path.Find(_T("://")) >= 0) {
+	if (path.Find(L"://") >= 0) {
 		path.Empty();
 	}
 
-	if (CFileGetStatus(path, fs) && (fs.m_attribute&CFile::directory) || path.Find(_T("\\")) == 0) {
+	if (CFileGetStatus(path, fs) && (fs.m_attribute&CFile::directory) || path.Find(L"\\") == 0) {
 		CPath p(path);
 		p.Canonicalize();
 		p.MakePretty();
@@ -550,7 +550,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 					"<td class=\"dirname\"><a href=\"[path]?path=" + UTF8Arg(fullpath) + "\">" + UTF8(fd.cFileName) + "</a></td>"
 					"<td class=\"dirtype\">Directory</td>"
 					"<td class=\"dirsize\">&nbsp;</td>\r\n"
-					"<td class=\"dirdate\"><span class=\"nobr\">" + CStringA(CTime(fd.ftLastWriteTime).Format(_T("%Y.%m.%d %H:%M"))) + "</span></td>";
+					"<td class=\"dirdate\"><span class=\"nobr\">" + CStringA(CTime(fd.ftLastWriteTime).Format(L"%Y.%m.%d %H:%M")) + "</span></td>";
 				files += "</tr>\r\n";
 			} while (FindNextFile(hFind, &fd));
 
@@ -565,7 +565,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 				}
 
 				CString fullpath = path + fd.cFileName;
-				TCHAR *ext = _tcsrchr(fd.cFileName, '.');
+				WCHAR *ext = wcsrchr(fd.cFileName, '.');
 				if (ext != NULL) {
 					ext++;
 				}
@@ -573,7 +573,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 				CStringA size;
 				size.Format("%I64dK", ((UINT64)fd.nFileSizeHigh<<22)|(fd.nFileSizeLow>>10));
 
-				CString type(_T("&nbsp;"));
+				CString type(L"&nbsp;");
 				LoadType(fullpath, type);
 
 				if (ext != NULL) {
@@ -585,7 +585,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 					"<td class=\"filename\"><a href=\"[path]?path=" + UTF8Arg(fullpath) + "\">" + UTF8(fd.cFileName) + "</a></td>"
 					"<td class=\"filetype\"><span class=\"nobr\">" + UTF8(type) + "</span></td>"
 					"<td class=\"filesize\" align=\"right\"><span class=\"nobr\">" + size + "</span></td>\r\n"
-					"<td class=\"filedate\"><span class=\"nobr\">" + CStringA(CTime(fd.ftLastWriteTime).Format(_T("%Y.%m.%d %H:%M"))) + "</span></td>";
+					"<td class=\"filedate\"><span class=\"nobr\">" + CStringA(CTime(fd.ftLastWriteTime).Format(L"%Y.%m.%d %H:%M")) + "</span></td>";
 				files += "</tr>\r\n";
 			} while (FindNextFile(hFind, &fd));
 
@@ -613,7 +613,7 @@ bool CWebClientSocket::OnControls(CStringA& hdr, CStringA& body, CStringA& mime)
 
 	OAFilterState fs = m_pMainFrame->GetMediaState();
 	CString state;
-	state.Format(_T("%d"), fs);
+	state.Format(L"%d", fs);
 	CString statestring;
 	switch (fs) {
 		case State_Stopped:
@@ -626,7 +626,7 @@ bool CWebClientSocket::OnControls(CStringA& hdr, CStringA& body, CStringA& mime)
 			statestring = ResStr(IDS_CONTROLS_PLAYING);
 			break;
 		default:
-			statestring = _T("n/a");
+			statestring = L"n/a";
 			break;
 	}
 
@@ -634,21 +634,21 @@ bool CWebClientSocket::OnControls(CStringA& hdr, CStringA& body, CStringA& mime)
 	int dur = (int)(m_pMainFrame->GetDur()/10000);
 
 	CString position, duration;
-	position.Format(_T("%d"), pos);
-	duration.Format(_T("%d"), dur);
+	position.Format(L"%d", pos);
+	duration.Format(L"%d", dur);
 
 	CString positionstring, durationstring, playbackrate;
-	//positionstring.Format(_T("%02d:%02d:%02d.%03d"), (pos/3600000), (pos/60000)%60, (pos/1000)%60, pos%1000);
-	//durationstring.Format(_T("%02d:%02d:%02d.%03d"), (dur/3600000), (dur/60000)%60, (dur/1000)%60, dur%1000);
-	positionstring.Format(_T("%02d:%02d:%02d"), (pos/3600000), (pos/60000)%60, (pos/1000)%60);
-	durationstring.Format(_T("%02d:%02d:%02d"), (dur/3600000), (dur/60000)%60, (dur/1000)%60);
-	playbackrate = _T("1");
+	//positionstring.Format(L"%02d:%02d:%02d.%03d", (pos/3600000), (pos/60000)%60, (pos/1000)%60, pos%1000);
+	//durationstring.Format(L"%02d:%02d:%02d.%03d", (dur/3600000), (dur/60000)%60, (dur/1000)%60, dur%1000);
+	positionstring.Format(L"%02d:%02d:%02d", (pos/3600000), (pos/60000)%60, (pos/1000)%60);
+	durationstring.Format(L"%02d:%02d:%02d", (dur/3600000), (dur/60000)%60, (dur/1000)%60);
+	playbackrate = L"1";
 
 	CString volumelevel, muted;
-	volumelevel.Format(_T("%d"), m_pMainFrame->m_wndToolBar.m_volctrl.GetPos());
-	muted.Format(_T("%d"), m_pMainFrame->m_wndToolBar.Volume == -10000 ? 1 : 0);
+	volumelevel.Format(L"%d", m_pMainFrame->m_wndToolBar.m_volctrl.GetPos());
+	muted.Format(L"%d", m_pMainFrame->m_wndToolBar.Volume == -10000 ? 1 : 0);
 
-	CString reloadtime(_T("0"));
+	CString reloadtime(L"0");
 
 	m_pWebServer->LoadPage(IDR_HTML_CONTROLS, body, m_path);
 	body.Replace("[filepatharg]", UTF8Arg(path));
@@ -682,7 +682,7 @@ bool CWebClientSocket::OnVariables(CStringA& hdr, CStringA& body, CStringA& mime
 
 	OAFilterState fs = m_pMainFrame->GetMediaState();
 	CString state;
-	state.Format(_T("%d"), fs);
+	state.Format(L"%d", fs);
 	CString statestring;
 	switch (fs) {
 		case State_Stopped:
@@ -695,7 +695,7 @@ bool CWebClientSocket::OnVariables(CStringA& hdr, CStringA& body, CStringA& mime
 			statestring = ResStr(IDS_CONTROLS_PLAYING);
 			break;
 		default:
-			statestring = _T("n/a");
+			statestring = L"n/a";
 			break;
 	}
 
@@ -703,21 +703,21 @@ bool CWebClientSocket::OnVariables(CStringA& hdr, CStringA& body, CStringA& mime
 	int dur = (int)(m_pMainFrame->GetDur()/10000);
 
 	CString position, duration;
-	position.Format(_T("%d"), pos);
-	duration.Format(_T("%d"), dur);
+	position.Format(L"%d", pos);
+	duration.Format(L"%d", dur);
 
 	CString positionstring, durationstring, playbackrate;
-	//positionstring.Format(_T("%02d:%02d:%02d.%03d"), (pos/3600000), (pos/60000)%60, (pos/1000)%60, pos%1000);
-	//durationstring.Format(_T("%02d:%02d:%02d.%03d"), (dur/3600000), (dur/60000)%60, (dur/1000)%60, dur%1000);
-	positionstring.Format(_T("%02d:%02d:%02d"), (pos/3600000), (pos/60000)%60, (pos/1000)%60);
-	durationstring.Format(_T("%02d:%02d:%02d"), (dur/3600000), (dur/60000)%60, (dur/1000)%60);
-	playbackrate = _T("1");
+	//positionstring.Format(L"%02d:%02d:%02d.%03d", (pos/3600000), (pos/60000)%60, (pos/1000)%60, pos%1000);
+	//durationstring.Format(L"%02d:%02d:%02d.%03d", (dur/3600000), (dur/60000)%60, (dur/1000)%60, dur%1000);
+	positionstring.Format(L"%02d:%02d:%02d", (pos/3600000), (pos/60000)%60, (pos/1000)%60);
+	durationstring.Format(L"%02d:%02d:%02d", (dur/3600000), (dur/60000)%60, (dur/1000)%60);
+	playbackrate = L"1";
 
 	CString volumelevel, muted;
-	volumelevel.Format(_T("%d"), m_pMainFrame->m_wndToolBar.m_volctrl.GetPos());
-	muted.Format(_T("%d"), m_pMainFrame->m_wndToolBar.Volume == -10000 ? 1 : 0);
+	volumelevel.Format(L"%d", m_pMainFrame->m_wndToolBar.m_volctrl.GetPos());
+	muted.Format(L"%d", m_pMainFrame->m_wndToolBar.Volume == -10000 ? 1 : 0);
 
-	CString reloadtime(_T("0"));
+	CString reloadtime(L"0");
 
 	m_pWebServer->LoadPage(IDR_HTML_VARIABLES, body, m_path);
 	body.Replace("[filepatharg]", UTF8Arg(path));
@@ -747,12 +747,12 @@ bool CWebClientSocket::OnStatus(CStringA& hdr, CStringA& body, CStringA& mime)
 		p.RemoveFileSpec();
 		dir = (LPCTSTR)p;
 	}
-	path.Replace(_T("'"), _T("\\'"));
-	dir.Replace(_T("'"), _T("\\'"));
+	path.Replace(L"'", L"\\'");
+	dir.Replace(L"'", L"\\'");
 
 	CString volumelevel, muted;
-	volumelevel.Format(_T("%d"), m_pMainFrame->m_wndToolBar.m_volctrl.GetPos());
-	muted.Format(_T("%d"), m_pMainFrame->m_wndToolBar.Volume == -10000 ? 1 : 0);
+	volumelevel.Format(L"%d", m_pMainFrame->m_wndToolBar.m_volctrl.GetPos());
+	muted.Format(L"%d", m_pMainFrame->m_wndToolBar.Volume == -10000 ? 1 : 0);
 	body.Replace("[volumelevel]", UTF8(volumelevel));
 	body.Replace("[muted]", UTF8(muted));
 	*/
@@ -775,7 +775,7 @@ bool CWebClientSocket::OnStatus(CStringA& hdr, CStringA& body, CStringA& mime)
 			status = ResStr(IDS_CONTROLS_PLAYING);
 			break;
 		default:
-			status = _T("n/a");
+			status = L"n/a";
 			break;
 	}
 
@@ -783,11 +783,11 @@ bool CWebClientSocket::OnStatus(CStringA& hdr, CStringA& body, CStringA& mime)
 	int dur = (int)(m_pMainFrame->GetDur()/10000);
 
 	CString posstr, durstr;
-	posstr.Format(_T("%02d:%02d:%02d"), (pos/3600000), (pos/60000)%60, (pos/1000)%60);
-	durstr.Format(_T("%02d:%02d:%02d"), (dur/3600000), (dur/60000)%60, (dur/1000)%60);
+	posstr.Format(L"%02d:%02d:%02d", (pos/3600000), (pos/60000)%60, (pos/1000)%60);
+	durstr.Format(L"%02d:%02d:%02d", (dur/3600000), (dur/60000)%60, (dur/1000)%60);
 
-	title.Replace(_T("'"), _T("\\'"));
-	status.Replace(_T("'"), _T("\\'"));
+	title.Replace(L"'", L"\\'");
+	status.Replace(L"'", L"\\'");
 
 	body.Format("OnStatus('%s', '%s', %d, '%s', %d, '%s', %d, %d, '%s')", // , '%s'
 				UTF8(title), UTF8(status),

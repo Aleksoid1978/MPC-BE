@@ -56,67 +56,67 @@ CWebServer::CWebServer(CMainFrame* pMainFrame, int nPort)
 	, m_nPort(nPort)
 {
 	if (m_internalpages.IsEmpty()) {
-		m_internalpages[_T("/")] = &CWebClientSocket::OnIndex;
-		m_internalpages[_T("/index.html")] = &CWebClientSocket::OnIndex;
-		m_internalpages[_T("/info.html")] = &CWebClientSocket::OnInfo;
-		m_internalpages[_T("/browser.html")] = &CWebClientSocket::OnBrowser;
-		m_internalpages[_T("/controls.html")] = &CWebClientSocket::OnControls;
-		m_internalpages[_T("/command.html")] = &CWebClientSocket::OnCommand;
-		m_internalpages[_T("/status.html")] = &CWebClientSocket::OnStatus;
-		m_internalpages[_T("/player.html")] = &CWebClientSocket::OnPlayer;
-		m_internalpages[_T("/variables.html")] = &CWebClientSocket::OnVariables;
-		m_internalpages[_T("/snapshot.jpg")] = &CWebClientSocket::OnSnapShotJpeg;
-		m_internalpages[_T("/404.html")] = &CWebClientSocket::OnError404;
+		m_internalpages[L"/"] = &CWebClientSocket::OnIndex;
+		m_internalpages[L"/index.html"] = &CWebClientSocket::OnIndex;
+		m_internalpages[L"/info.html"] = &CWebClientSocket::OnInfo;
+		m_internalpages[L"/browser.html"] = &CWebClientSocket::OnBrowser;
+		m_internalpages[L"/controls.html"] = &CWebClientSocket::OnControls;
+		m_internalpages[L"/command.html"] = &CWebClientSocket::OnCommand;
+		m_internalpages[L"/status.html"] = &CWebClientSocket::OnStatus;
+		m_internalpages[L"/player.html"] = &CWebClientSocket::OnPlayer;
+		m_internalpages[L"/variables.html"] = &CWebClientSocket::OnVariables;
+		m_internalpages[L"/snapshot.jpg"] = &CWebClientSocket::OnSnapShotJpeg;
+		m_internalpages[L"/404.html"] = &CWebClientSocket::OnError404;
 	}
 
 	if (m_downloads.IsEmpty()) {
-		m_downloads[_T("/default.css")] = IDF_DEFAULT_CSS;
-		m_downloads[_T("/favicon.png")] = IDF_FAVICON;
-		m_downloads[_T("/vbg.png")] = IDF_VBR_PNG;
-		m_downloads[_T("/vbs.png")] = IDF_VBS_PNG;
-		m_downloads[_T("/sliderbar.gif")] = IDF_SLIDERBAR_GIF;
-		m_downloads[_T("/slidergrip.gif")] = IDF_SLIDERGRIP_GIF;
-		m_downloads[_T("/sliderback.png")] = IDF_SLIDERBACK_PNG;
-		m_downloads[_T("/1pix.gif")] = IDF_1PIX_GIF;
-		m_downloads[_T("/headericon.png")] = IDF_HEADERICON_PNG;
-		m_downloads[_T("/headerback.png")] = IDF_HEADERBACK_PNG;
-		m_downloads[_T("/headerclose.png")] = IDF_HEADERCLOSE_PNG;
-		m_downloads[_T("/leftside.png")] = IDF_LEFTSIDE_PNG;
-		m_downloads[_T("/rightside.png")] = IDF_RIGHTSIDE_PNG;
-		m_downloads[_T("/bottomside.png")] = IDF_BOTTOMSIDE_PNG;
-		m_downloads[_T("/leftbottomside.png")] = IDF_LEFTBOTTOMSIDE_PNG;
-		m_downloads[_T("/rightbottomside.png")] = IDF_RIGHTBOTTOMSIDE_PNG;
-		m_downloads[_T("/seekbarleft.png")] = IDF_SEEKBARLEFT_PNG;
-		m_downloads[_T("/seekbarmid.png")] = IDF_SEEKBARMID_PNG;
-		m_downloads[_T("/seekbarright.png")] = IDF_SEEKBARRIGHT_PNG;
-		m_downloads[_T("/seekbargrip.png")] = IDF_SEEKBARGRIP_PNG;
-		m_downloads[_T("/logo.png")] = IDF_LOGO1;
-		m_downloads[_T("/controlback.png")] = IDF_CONTROLBACK_PNG;
-		m_downloads[_T("/controlbuttonplay.png")] = IDF_CONTROLBUTTONPLAY_PNG;
-		m_downloads[_T("/controlbuttonpause.png")] = IDF_CONTROLBUTTONPAUSE_PNG;
-		m_downloads[_T("/controlbuttonstop.png")] = IDF_CONTROLBUTTONSTOP_PNG;
-		m_downloads[_T("/controlbuttonskipback.png")] = IDF_CONTROLBUTTONSKIPBACK_PNG;
-		m_downloads[_T("/controlbuttondecrate.png")] = IDF_CONTROLBUTTONDECRATE_PNG;
-		m_downloads[_T("/controlbuttonincrate.png")] = IDF_CONTROLBUTTONINCRATE_PNG;
-		m_downloads[_T("/controlbuttonskipforward.png")] = IDF_CONTROLBUTTONSKIPFORWARD_PNG;
-		m_downloads[_T("/controlbuttonstep.png")] = IDF_CONTROLBUTTONSTEP_PNG;
-		m_downloads[_T("/controlvolumeon.png")] = IDF_CONTROLVOLUMEON_PNG;
-		m_downloads[_T("/controlvolumeoff.png")] = IDF_CONTROLVOLUMEOFF_PNG;
-		m_downloads[_T("/controlvolumebar.png")] = IDF_CONTROLVOLUMEBAR_PNG;
-		m_downloads[_T("/controlvolumegrip.png")] = IDF_CONTROLVOLUMEGRIP_PNG;
+		m_downloads[L"/default.css"] = IDF_DEFAULT_CSS;
+		m_downloads[L"/favicon.png"] = IDF_FAVICON;
+		m_downloads[L"/vbg.png"] = IDF_VBR_PNG;
+		m_downloads[L"/vbs.png"] = IDF_VBS_PNG;
+		m_downloads[L"/sliderbar.gif"] = IDF_SLIDERBAR_GIF;
+		m_downloads[L"/slidergrip.gif"] = IDF_SLIDERGRIP_GIF;
+		m_downloads[L"/sliderback.png"] = IDF_SLIDERBACK_PNG;
+		m_downloads[L"/1pix.gif"] = IDF_1PIX_GIF;
+		m_downloads[L"/headericon.png"] = IDF_HEADERICON_PNG;
+		m_downloads[L"/headerback.png"] = IDF_HEADERBACK_PNG;
+		m_downloads[L"/headerclose.png"] = IDF_HEADERCLOSE_PNG;
+		m_downloads[L"/leftside.png"] = IDF_LEFTSIDE_PNG;
+		m_downloads[L"/rightside.png"] = IDF_RIGHTSIDE_PNG;
+		m_downloads[L"/bottomside.png"] = IDF_BOTTOMSIDE_PNG;
+		m_downloads[L"/leftbottomside.png"] = IDF_LEFTBOTTOMSIDE_PNG;
+		m_downloads[L"/rightbottomside.png"] = IDF_RIGHTBOTTOMSIDE_PNG;
+		m_downloads[L"/seekbarleft.png"] = IDF_SEEKBARLEFT_PNG;
+		m_downloads[L"/seekbarmid.png"] = IDF_SEEKBARMID_PNG;
+		m_downloads[L"/seekbarright.png"] = IDF_SEEKBARRIGHT_PNG;
+		m_downloads[L"/seekbargrip.png"] = IDF_SEEKBARGRIP_PNG;
+		m_downloads[L"/logo.png"] = IDF_LOGO1;
+		m_downloads[L"/controlback.png"] = IDF_CONTROLBACK_PNG;
+		m_downloads[L"/controlbuttonplay.png"] = IDF_CONTROLBUTTONPLAY_PNG;
+		m_downloads[L"/controlbuttonpause.png"] = IDF_CONTROLBUTTONPAUSE_PNG;
+		m_downloads[L"/controlbuttonstop.png"] = IDF_CONTROLBUTTONSTOP_PNG;
+		m_downloads[L"/controlbuttonskipback.png"] = IDF_CONTROLBUTTONSKIPBACK_PNG;
+		m_downloads[L"/controlbuttondecrate.png"] = IDF_CONTROLBUTTONDECRATE_PNG;
+		m_downloads[L"/controlbuttonincrate.png"] = IDF_CONTROLBUTTONINCRATE_PNG;
+		m_downloads[L"/controlbuttonskipforward.png"] = IDF_CONTROLBUTTONSKIPFORWARD_PNG;
+		m_downloads[L"/controlbuttonstep.png"] = IDF_CONTROLBUTTONSTEP_PNG;
+		m_downloads[L"/controlvolumeon.png"] = IDF_CONTROLVOLUMEON_PNG;
+		m_downloads[L"/controlvolumeoff.png"] = IDF_CONTROLVOLUMEOFF_PNG;
+		m_downloads[L"/controlvolumebar.png"] = IDF_CONTROLVOLUMEBAR_PNG;
+		m_downloads[L"/controlvolumegrip.png"] = IDF_CONTROLVOLUMEGRIP_PNG;
 	}
 
 	CRegKey key;
-	CString str(_T("MIME\\Database\\Content Type"));
+	CString str(L"MIME\\Database\\Content Type");
 	if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, str, KEY_READ)) {
-		TCHAR buff[256];
+		WCHAR buff[256];
 		DWORD len = _countof(buff);
 		for (int i = 0; ERROR_SUCCESS == key.EnumKey(i, buff, &len); i++, len = _countof(buff)) {
 			CRegKey mime;
-			TCHAR ext[64];
+			WCHAR ext[64];
 			ULONG extlen = _countof(ext);
-			if (ERROR_SUCCESS == mime.Open(HKEY_CLASSES_ROOT, str + _T("\\") + buff, KEY_READ)
-					&& ERROR_SUCCESS == mime.QueryStringValue(_T("Extension"), ext, &extlen)) {
+			if (ERROR_SUCCESS == mime.Open(HKEY_CLASSES_ROOT, str + L"\\" + buff, KEY_READ)
+					&& ERROR_SUCCESS == mime.QueryStringValue(L"Extension", ext, &extlen)) {
 				m_mimes[CStringA(ext).MakeLower()] = CStringA(buff).MakeLower();
 			}
 		}
@@ -137,7 +137,7 @@ CWebServer::CWebServer(CMainFrame* pMainFrame, int nPort)
 	WebRoot.Replace('/', '\\');
 	WebRoot.Trim();
 	CPath p(WebRoot);
-	if (WebRoot.Find(_T(":\\")) < 0 && WebRoot.Find(_T("\\\\")) < 0) {
+	if (WebRoot.Find(L":\\") < 0 && WebRoot.Find(L"\\\\") < 0) {
 		m_webroot.Append(WebRoot);
 	} else {
 		m_webroot = p;
@@ -200,7 +200,7 @@ DWORD CWebServer::ThreadProc()
 static void PutFileContents(LPCTSTR fn, const CStringA& data)
 {
 	FILE* f = NULL;
-	if (!_tfopen_s(&f, fn, _T("wb"))) {
+	if (!_wfopen_s(&f, fn, L"wb")) {
 		fwrite((LPCSTR)data, 1, data.GetLength(), f);
 		fclose(f);
 	}
@@ -210,25 +210,25 @@ void CWebServer::Deploy(CString dir)
 {
 	CStringA data;
 	if (LoadResource(IDR_HTML_INDEX, data, RT_HTML)) {
-		PutFileContents(dir + _T("index.html"), data);
+		PutFileContents(dir + L"index.html", data);
 	}
 	if (LoadResource(IDR_HTML_INFO, data, RT_HTML)) {
-		PutFileContents(dir + _T("info.html"), data);
+		PutFileContents(dir + L"info.html", data);
 	}
 	if (LoadResource(IDR_HTML_BROWSER, data, RT_HTML)) {
-		PutFileContents(dir + _T("browser.html"), data);
+		PutFileContents(dir + L"browser.html", data);
 	}
 	if (LoadResource(IDR_HTML_CONTROLS, data, RT_HTML)) {
-		PutFileContents(dir + _T("controls.html"), data);
+		PutFileContents(dir + L"controls.html", data);
 	}
 	if (LoadResource(IDR_HTML_VARIABLES, data, RT_HTML)) {
-		PutFileContents(dir + _T("variables.html"), data);
+		PutFileContents(dir + L"variables.html", data);
 	}
 	if (LoadResource(IDR_HTML_404, data, RT_HTML)) {
-		PutFileContents(dir + _T("404.html"), data);
+		PutFileContents(dir + L"404.html", data);
 	}
 	if (LoadResource(IDR_HTML_PLAYER, data, RT_HTML)) {
-		PutFileContents(dir + _T("player.html"), data);
+		PutFileContents(dir + L"player.html", data);
 	}
 
 	POSITION pos = m_downloads.GetStartPosition();
@@ -236,7 +236,7 @@ void CWebServer::Deploy(CString dir)
 		CString fn;
 		UINT id;
 		m_downloads.GetNextAssoc(pos, fn, id);
-		if (LoadResource(id, data, _T("FILE"))) {
+		if (LoadResource(id, data, L"FILE")) {
 			PutFileContents(dir + fn, data);
 		}
 	}
@@ -273,7 +273,7 @@ bool CWebServer::ToLocalPath(CString& path, CString& redir)
 			}
 		}
 
-		if (_tcslen(p) > _tcslen(m_webroot) && p.FileExists()) {
+		if (wcslen(p) > wcslen(m_webroot) && p.FileExists()) {
 			path = (LPCTSTR)p;
 			return true;
 		}
@@ -287,7 +287,7 @@ bool CWebServer::LoadPage(UINT resid, CStringA& str, CString path)
 	CString redir;
 	if (ToLocalPath(path, redir)) {
 		FILE* f = NULL;
-		if (!_tfopen_s(&f, path, _T("rb"))) {
+		if (!_wfopen_s(&f, path, L"rb")) {
 			fseek(f, 0, 2);
 			char* buff = str.GetBufferSetLength(ftell(f));
 			fseek(f, 0, 0);
@@ -306,7 +306,7 @@ void CWebServer::OnAccept(CWebServerSocket* pServer)
 	if (pServer->Accept(*p)) {
 		CString name;
 		UINT port;
-		if (AfxGetAppSettings().fWebServerLocalhostOnly && p->GetPeerName(name, port) && name != _T("127.0.0.1")) {
+		if (AfxGetAppSettings().fWebServerLocalhostOnly && p->GetPeerName(name, port) && name != L"127.0.0.1") {
 			p->Close();
 			return;
 		}
@@ -378,8 +378,8 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 		}
 
 		CString redir;
-		if (pClient->m_get.Lookup(_T("redir"), redir)
-				|| pClient->m_post.Lookup(_T("redir"), redir)) {
+		if (pClient->m_get.Lookup(L"redir", redir)
+				|| pClient->m_post.Lookup(L"redir", redir)) {
 			if (redir.IsEmpty()) {
 				redir = '/';
 			}
@@ -398,7 +398,7 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 	}
 
 	UINT resid;
-	if (!fHandled && m_downloads.Lookup(pClient->m_path, resid) && LoadResource(resid, body, _T("FILE"))) {
+	if (!fHandled && m_downloads.Lookup(pClient->m_path, resid) && LoadResource(resid, body, L"FILE")) {
 		if (mime.IsEmpty()) {
 			mime = "application/octet-stream";
 		}
@@ -469,11 +469,11 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 		&& hdr.Find("Content-Encoding:") < 0 && ext != ".png" && ext != ".jpg" && ext != ".gif")
 		do {
 			CString accept_encoding;
-			pClient->m_hdrlines.Lookup(_T("accept-encoding"), accept_encoding);
+			pClient->m_hdrlines.Lookup(L"accept-encoding", accept_encoding);
 			accept_encoding.MakeLower();
 			CAtlList<CString> sl;
 			ExplodeMin(accept_encoding, sl, ',');
-			if (!sl.Find(_T("gzip"))) {
+			if (!sl.Find(L"gzip")) {
 				break;
 			}
 
@@ -588,53 +588,53 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 		CString str;
 
 		CAtlList<CString> env;
-		for (LPTSTR lpszVariable = (LPTSTR)lpvEnv; *lpszVariable; lpszVariable += _tcslen(lpszVariable)+1)
+		for (LPTSTR lpszVariable = (LPTSTR)lpvEnv; *lpszVariable; lpszVariable += wcslen(lpszVariable)+1)
 			if (lpszVariable != (LPTSTR)lpvEnv) {
 				env.AddTail(lpszVariable);
 			}
 
-		env.AddTail(_T("GATEWAY_INTERFACE=CGI/1.1"));
-		env.AddTail(_T("SERVER_SOFTWARE=MPC-BE/6.4.x.y"));
-		env.AddTail(_T("SERVER_PROTOCOL=") + pClient->m_ver);
-		env.AddTail(_T("REQUEST_METHOD=") + pClient->m_cmd);
-		env.AddTail(_T("PATH_INFO=") + redir);
-		env.AddTail(_T("PATH_TRANSLATED=") + path);
-		env.AddTail(_T("SCRIPT_NAME=") + redir);
-		env.AddTail(_T("QUERY_STRING=") + pClient->m_query);
+		env.AddTail(L"GATEWAY_INTERFACE=CGI/1.1");
+		env.AddTail(L"SERVER_SOFTWARE=MPC-BE/6.4.x.y");
+		env.AddTail(L"SERVER_PROTOCOL=" + pClient->m_ver);
+		env.AddTail(L"REQUEST_METHOD=" + pClient->m_cmd);
+		env.AddTail(L"PATH_INFO=" + redir);
+		env.AddTail(L"PATH_TRANSLATED=" + path);
+		env.AddTail(L"SCRIPT_NAME=" + redir);
+		env.AddTail(L"QUERY_STRING=" + pClient->m_query);
 
-		if (pClient->m_hdrlines.Lookup(_T("content-type"), str)) {
-			env.AddTail(_T("CONTENT_TYPE=") + str);
+		if (pClient->m_hdrlines.Lookup(L"content-type", str)) {
+			env.AddTail(L"CONTENT_TYPE=" + str);
 		}
-		if (pClient->m_hdrlines.Lookup(_T("content-length"), str)) {
-			env.AddTail(_T("CONTENT_LENGTH=") + str);
+		if (pClient->m_hdrlines.Lookup(L"content-length", str)) {
+			env.AddTail(L"CONTENT_LENGTH=" + str);
 		}
 
 		POSITION pos = pClient->m_hdrlines.GetStartPosition();
 		while (pos) {
 			CString key = pClient->m_hdrlines.GetKeyAt(pos);
 			CString value = pClient->m_hdrlines.GetNextValue(pos);
-			key.Replace(_T("-"), _T("_"));
+			key.Replace(L"-", L"_");
 			key.MakeUpper();
-			env.AddTail(_T("HTTP_") + key + _T("=") + value);
+			env.AddTail(L"HTTP_" + key + L"=" + value);
 		}
 
 		CString name;
 		UINT port;
 
 		if (pClient->GetPeerName(name, port)) {
-			str.Format(_T("%u"), port);
-			env.AddTail(_T("REMOTE_ADDR=") + name);
-			env.AddTail(_T("REMOTE_HOST=") + name);
-			env.AddTail(_T("REMOTE_PORT=") + str);
+			str.Format(L"%u", port);
+			env.AddTail(L"REMOTE_ADDR=" + name);
+			env.AddTail(L"REMOTE_HOST=" + name);
+			env.AddTail(L"REMOTE_PORT=" + str);
 		}
 
 		if (pClient->GetSockName(name, port)) {
-			str.Format(_T("%u"), port);
-			env.AddTail(_T("SERVER_NAME=") + name);
-			env.AddTail(_T("SERVER_PORT=") + str);
+			str.Format(L"%u", port);
+			env.AddTail(L"SERVER_NAME=" + name);
+			env.AddTail(L"SERVER_PORT=" + str);
 		}
 
-		env.AddTail(_T("\0"));
+		env.AddTail(L"\0");
 
 		str = Implode(env, '\0');
 		envstr = CStringA(str, str.GetLength());
@@ -642,8 +642,8 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 		FreeEnvironmentStrings((LPTSTR)lpvEnv);
 	}
 
-	TCHAR* cmdln = DNew TCHAR[32768];
-	_sntprintf_s(cmdln, 32768, 32768, _T("\"%s\" \"%s\""), cgi, path);
+	WCHAR* cmdln = DNew WCHAR[32768];
+	_snwprintf_s(cmdln, 32768, 32768, L"\"%s\" \"%s\"", cgi, path);
 
 	if (hChildStdinRd && hChildStdoutWr)
 		if (CreateProcess(
@@ -685,7 +685,7 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 			CloseHandle(piProcInfo.hProcess);
 			CloseHandle(piProcInfo.hThread);
 		} else {
-			body = _T("CGI Error");
+			body = L"CGI Error";
 		}
 
 	delete [] cmdln;
