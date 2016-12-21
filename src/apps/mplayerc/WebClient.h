@@ -46,7 +46,7 @@ public:
 	CWebClientSocket(CWebServer* pWebServer, CMainFrame* pMainFrame);
 	virtual ~CWebClientSocket();
 
-	bool SetCookie(CString name, CString value = _T(""), __time64_t expire = -1, CString path = _T("/"), CString domain = _T(""));
+	bool SetCookie(CString name, CString value = L"", __time64_t expire = -1, CString path = L"/", CString domain = L"");
 
 	CString m_sessid;
 	CString m_cmd, m_path, m_query, m_ver;
