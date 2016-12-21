@@ -1370,30 +1370,39 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 	UINT32 height;
 	hr = MFGetAttributeSize(pMediaType, MF_MT_FRAME_SIZE, &width, &height);
 
-	D3DFORMAT Format;
 	if (SUCCEEDED(hr)) {
 		CSize frameSize(width, height);
 		m_bStreamChanged |= m_nativeVideoSize != frameSize;
 		m_nativeVideoSize = frameSize;
+		D3DFORMAT Format;
 		hr = GetMediaTypeFourCC(pMediaType, (DWORD*)&Format);
+	}
+
+	if (!m_bStreamChanged && m_pVideoTextures[0]) {
+		D3DSURFACE_DESC desc;
+		if (SUCCEEDED(m_pVideoTextures[0]->GetLevelDesc(0, &desc))) {
+			if (desc.Width != (UINT)m_nativeVideoSize.cx || desc.Height != (UINT)m_nativeVideoSize.cy) {
+				m_bStreamChanged = TRUE;
+			}
+		}
 	}
 
 	if (m_bStreamChanged && SUCCEEDED(hr)) {
 		DeleteSurfaces();
 		RemoveAllSamples();
 		hr = AllocSurfaces();
-	}
 
-	if (m_bStreamChanged && SUCCEEDED(hr)) {
-		for (unsigned i = 0; i < m_nSurfaces; i++) {
-			CComPtr<IMFSample> pMFSample;
-			hr = pfMFCreateVideoSampleFromSurface(m_pVideoSurfaces[i], &pMFSample);
+		if (SUCCEEDED(hr)) {
+			for (unsigned i = 0; i < m_nSurfaces; i++) {
+				CComPtr<IMFSample> pMFSample;
+				hr = pfMFCreateVideoSampleFromSurface(m_pVideoSurfaces[i], &pMFSample);
 
-			if (SUCCEEDED(hr)) {
-				pMFSample->SetUINT32(GUID_SURFACE_INDEX, i);
-				m_FreeSamples.AddTail(pMFSample);
+				if (SUCCEEDED(hr)) {
+					pMFSample->SetUINT32(GUID_SURFACE_INDEX, i);
+					m_FreeSamples.AddTail(pMFSample);
+				}
+				ASSERT(SUCCEEDED(hr));
 			}
-			ASSERT(SUCCEEDED(hr));
 		}
 	}
 
