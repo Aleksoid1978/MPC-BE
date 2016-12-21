@@ -5773,7 +5773,7 @@ bool CMainFrame::GetDIB(BYTE** ppData, long& size, bool fSilent)
 	return true;
 }
 
-void CMainFrame::SaveDIB(LPCTSTR fn, BYTE* pData, long size)
+void CMainFrame::SaveDIB(LPCWSTR fn, BYTE* pData, long size)
 {
 	CAppSettings& s = AfxGetAppSettings();
 
@@ -5798,10 +5798,10 @@ void CMainFrame::SaveDIB(LPCTSTR fn, BYTE* pData, long size)
 		m_wndStatusBar.ReleaseDC(pDC);
 	}
 
-	SendStatusMessage((LPCTSTR)p, 3000);
+	SendStatusMessage((LPCWSTR)p, 3000);
 }
 
-void CMainFrame::SaveImage(LPCTSTR fn)
+void CMainFrame::SaveImage(LPCWSTR fn)
 {
 	BYTE* pData = NULL;
 	long size = 0;
@@ -5814,7 +5814,7 @@ void CMainFrame::SaveImage(LPCTSTR fn)
 	}
 }
 
-void CMainFrame::SaveThumbnails(LPCTSTR fn)
+void CMainFrame::SaveThumbnails(LPCWSTR fn)
 {
 	if (!m_pMC || !m_pMS || GetPlaybackMode() != PM_FILE /*&& GetPlaybackMode() != PM_DVD*/) {
 		return;
@@ -18919,7 +18919,7 @@ BOOL CMainFrame::AddSimilarFiles(CAtlList<CString>& fns)
 		name.Truncate(n);
 	}
 
-	const LPCTSTR excludeMask =
+	const LPCWSTR excludeMask =
 		L"ATS_\\d{2}_\\d{1}.*|" // DVD Audio
 		L"VTS_\\d{2}_\\d{1}.*|" // DVD Video
 		L"\\d{5}\\.clpi|"       // Blu-ray clip info
@@ -18930,7 +18930,7 @@ BOOL CMainFrame::AddSimilarFiles(CAtlList<CString>& fns)
 		return FALSE;
 	};
 
-	const LPCTSTR excludeWords[][2] = {
+	const LPCWSTR excludeWords[][2] = {
 		{L"720p",  L"<seven_hundred_twenty>"},
 		{L"1080p", L"<thousand_and_eighty>"},
 		{L"1440p", L"<thousand_four_hundred_forty>"},

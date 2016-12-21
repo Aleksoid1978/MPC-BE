@@ -38,8 +38,8 @@ private:
 public:
 	CSaveTextFileDialog(
 		CTextFile::enc e,
-		LPCTSTR lpszDefExt = NULL, LPCTSTR lpszFileName = NULL,
-		LPCTSTR lpszFilter = NULL, CWnd* pParentWnd = NULL,
+		LPCWSTR lpszDefExt = NULL, LPCWSTR lpszFileName = NULL,
+		LPCWSTR lpszFilter = NULL, CWnd* pParentWnd = NULL,
 		BOOL bDisableExternalStyleCheckBox = TRUE, BOOL bSaveExternalStyleFile = FALSE);
 	virtual ~CSaveTextFileDialog();
 

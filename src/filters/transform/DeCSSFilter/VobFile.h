@@ -46,7 +46,7 @@ public:
 	CDVDSession();
 	virtual ~CDVDSession();
 
-	bool Open(LPCTSTR path);
+	bool Open(LPCWSTR path);
 	void Close();
 
 	operator HANDLE() const { return m_hDrive; }
@@ -66,7 +66,7 @@ public:
 
 	bool IsOpen() const;
 
-	bool Open(LPCTSTR path);
+	bool Open(LPCWSTR path);
 	void Close();
 
 	int GetLengthLBA() const;

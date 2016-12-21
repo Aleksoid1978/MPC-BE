@@ -74,7 +74,7 @@ extern "C" {
 #define OPT_REGKEY_VCodecs   L"Software\\MPC-BE Filters\\MPC Video Decoder\\Codecs"
 
 static const struct vcodec_t {
-	const LPCTSTR          opt_name;
+	const LPCWSTR          opt_name;
 	const unsigned __int64 flag;
 }
 vcodecs[] = {

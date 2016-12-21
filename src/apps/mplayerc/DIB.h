@@ -79,7 +79,7 @@ static void GdiplusConvert(Bitmap* bm, CStringW fn, CStringW format, ULONG quali
 	}
 }
 
-static bool BMPDIB(LPCTSTR fn, BYTE* pData, CStringW format, ULONG quality, bool type, BYTE** pBuf, size_t* pSize)
+static bool BMPDIB(LPCWSTR fn, BYTE* pData, CStringW format, ULONG quality, bool type, BYTE** pBuf, size_t* pSize)
 {
 	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
 
@@ -142,7 +142,7 @@ static bool BMPDIB(LPCTSTR fn, BYTE* pData, CStringW format, ULONG quality, bool
 	return 1;
 }
 
-static void PNGDIB(LPCTSTR fn, BYTE* pData, int level)
+static void PNGDIB(LPCWSTR fn, BYTE* pData, int level)
 {
 	FILE* fp;
 	_wfopen_s(&fp, fn, L"wb");

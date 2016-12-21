@@ -30,8 +30,8 @@ class CSaveImageDialog : public CFileDialog
 public:
 	CSaveImageDialog(
 		int quality, int levelPNG,
-		LPCTSTR lpszDefExt = NULL, LPCTSTR lpszFileName = NULL,
-		LPCTSTR lpszFilter = NULL, CWnd* pParentWnd = NULL);
+		LPCWSTR lpszDefExt = NULL, LPCWSTR lpszFileName = NULL,
+		LPCWSTR lpszFilter = NULL, CWnd* pParentWnd = NULL);
 	virtual ~CSaveImageDialog();
 
 protected:
@@ -53,8 +53,8 @@ class CSaveThumbnailsDialog : public CSaveImageDialog
 public:
 	CSaveThumbnailsDialog(
 		int rows, int cols, int width, int quality, int levelPNG,
-		LPCTSTR lpszDefExt = NULL, LPCTSTR lpszFileName = NULL,
-		LPCTSTR lpszFilter = NULL, CWnd* pParentWnd = NULL);
+		LPCWSTR lpszDefExt = NULL, LPCWSTR lpszFileName = NULL,
+		LPCWSTR lpszFilter = NULL, CWnd* pParentWnd = NULL);
 	virtual ~CSaveThumbnailsDialog();
 
 protected:

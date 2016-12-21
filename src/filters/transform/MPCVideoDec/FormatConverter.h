@@ -38,7 +38,7 @@ const MPCPixelFormat YUV444_16[PixFmt_count] = {PixFmt_Y416, PixFmt_Y410, PixFmt
 const MPCPixelFormat RGB_8[PixFmt_count]     = {PixFmt_RGB32, PixFmt_YV24, PixFmt_AYUV, PixFmt_YUY2, PixFmt_YV16, PixFmt_NV12, PixFmt_YV12, PixFmt_Y410, PixFmt_P210, PixFmt_P216, PixFmt_P010, PixFmt_P016, PixFmt_Y416};
 
 struct SW_OUT_FMT {
-	const LPCTSTR				name;
+	const LPCWSTR				name;
 	const DWORD					biCompression;
 	const GUID*					subtype;
 	const int					bpp;

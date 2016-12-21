@@ -168,7 +168,7 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 	memset(&lf, 0, sizeof(lf));
 	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
 
-	LPCTSTR fonts[] = {L"Consolas", L"Lucida Console", L"Courier New", L"" };
+	const LPCWSTR fonts[] = {L"Consolas", L"Lucida Console", L"Courier New", L"" };
 
 	UINT i = 0;
 	BOOL success;

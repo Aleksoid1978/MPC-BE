@@ -156,7 +156,7 @@ bool CIfo::IsVMG()
 	return true;
 }
 
-bool CIfo::OpenFile (LPCTSTR strFile)
+bool CIfo::OpenFile (LPCWSTR strFile)
 {
 	bool	bRet = false;
 	HANDLE	hFile;
@@ -215,7 +215,7 @@ bool CIfo::RemoveUOPs()
 	return true;
 }
 
-bool CIfo::SaveFile (LPCTSTR strFile)
+bool CIfo::SaveFile (LPCWSTR strFile)
 {
 	bool	bRet = false;
 	HANDLE	m_hFile;

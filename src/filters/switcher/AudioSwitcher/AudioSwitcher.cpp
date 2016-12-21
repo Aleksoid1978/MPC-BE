@@ -85,7 +85,7 @@ CFilterApp theApp;
 static struct channel_mode_t {
 	const WORD channels;
 	const DWORD ch_layout;
-	//const LPCTSTR op_value;
+	//const LPCWSTR op_value;
 }
 channel_mode[] = {
 	//n  libavcodec                               ID          Name

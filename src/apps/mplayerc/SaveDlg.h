@@ -61,7 +61,7 @@ private:
 	sockaddr_in m_addr;
 
 public:
-	CSaveDlg(CString in, CString name, CString out, HRESULT& hr);
+	CSaveDlg(LPCWSTR in, LPCWSTR name, LPCWSTR out, HRESULT& hr);
 	virtual ~CSaveDlg();
 
 protected:

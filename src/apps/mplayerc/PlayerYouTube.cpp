@@ -51,9 +51,9 @@
 
 namespace Youtube
 {
-	static const LPCTSTR GOOGLE_API_KEY = L"AIzaSyDggqSjryBducTomr4ttodXqFpl2HGdoyg";
+	static const LPCWSTR GOOGLE_API_KEY = L"AIzaSyDggqSjryBducTomr4ttodXqFpl2HGdoyg";
 
-	static const LPCTSTR videoIdRegExps[] = {
+	static const LPCWSTR videoIdRegExps[] = {
 		L"v=([-a-zA-Z0-9_]+)",
 		L"video_ids=([-a-zA-Z0-9_]+)"
 	};

@@ -38,7 +38,7 @@ enum {
 
 // CThumbsTaskDlg dialog
 
-void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
+void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 {
 	m_iProgress = 0;
 
@@ -289,7 +289,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCTSTR thumbpath)
 
 IMPLEMENT_DYNAMIC(CThumbsTaskDlg, CTaskDialog)
 
-CThumbsTaskDlg::CThumbsTaskDlg(LPCTSTR filename)
+CThumbsTaskDlg::CThumbsTaskDlg(LPCWSTR filename)
 	: CTaskDialog(L"", L"", ResStr(IDS_SAVING_THUMBNAIL),
 		TDCBF_CANCEL_BUTTON,
 		TDF_CALLBACK_TIMER | TDF_SHOW_PROGRESS_BAR | TDF_POSITION_RELATIVE_TO_WINDOW)

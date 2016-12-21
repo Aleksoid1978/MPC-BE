@@ -476,10 +476,10 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	void ShowOptions(int idPage = 0);
 
 	bool GetDIB(BYTE** ppData, long& size, bool fSilent = false);
-	void SaveDIB(LPCTSTR fn, BYTE* pData, long size);
+	void SaveDIB(LPCWSTR fn, BYTE* pData, long size);
 	BOOL IsRendererCompatibleWithSaveImage();
-	void SaveImage(LPCTSTR fn);
-	void SaveThumbnails(LPCTSTR fn);
+	void SaveImage(LPCWSTR fn);
+	void SaveThumbnails(LPCWSTR fn);
 
 	//
 

@@ -41,10 +41,10 @@ private:
 	CString       m_ErrorMsg;
 
 	std::thread   m_Thread;
-	void SaveThumbnails(LPCTSTR filepath);
+	void SaveThumbnails(LPCWSTR filepath);
 
 public:
-	CThumbsTaskDlg(LPCTSTR filename);
+	CThumbsTaskDlg(LPCWSTR filename);
 	virtual ~CThumbsTaskDlg();
 
 	bool m_bSuccessfully;
