@@ -82,7 +82,7 @@ CSRIAPI csri_inst *csri_open_mem(csri_rend *renderer, const void *data, size_t l
 	csri_inst *inst = DNew csri_inst();
 	inst->cs = DNew CCritSec();
 	inst->rts = DNew CRenderedTextSubtitle(inst->cs);
-	if (inst->rts->Open((BYTE*)data, (int)length, DEFAULT_CHARSET, _T("CSRI memory subtitles"))) {
+	if (inst->rts->Open((BYTE*)data, (int)length, DEFAULT_CHARSET, L"CSRI memory subtitles")) {
 		inst->readorder = 0;
 		return inst;
 	} else {

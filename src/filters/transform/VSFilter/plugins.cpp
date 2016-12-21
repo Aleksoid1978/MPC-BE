@@ -170,14 +170,14 @@ namespace Plugin
 	class CVobSubFilter : virtual public CFilter
 	{
 	public:
-		CVobSubFilter(CString fn = _T("")) {
+		CVobSubFilter(CString fn = L"") {
 			if (!fn.IsEmpty()) {
 				Open(fn);
 			}
 		}
 
 		bool Open(CString fn) {
-			SetFileName(_T(""));
+			SetFileName(L"");
 			m_pSubPicProvider = NULL;
 
 			if (CVobSubFile* vsf = DNew CVobSubFile(&m_csSubLock)) {
@@ -198,7 +198,7 @@ namespace Plugin
 		int m_CharSet;
 
 	public:
-		CTextSubFilter(CString fn = _T(""), int CharSet = DEFAULT_CHARSET, float fps = -1)
+		CTextSubFilter(CString fn = L"", int CharSet = DEFAULT_CHARSET, float fps = -1)
 			: m_CharSet(CharSet) {
 			m_fps = fps;
 			if (!fn.IsEmpty()) {
@@ -211,7 +211,7 @@ namespace Plugin
 		}
 
 		bool Open(CString fn, int CharSet = DEFAULT_CHARSET) {
-			SetFileName(_T(""));
+			SetFileName(L"");
 			m_pSubPicProvider = NULL;
 
 			if (!m_pSubPicProvider) {
@@ -274,14 +274,14 @@ namespace Plugin
 		class CVobSubVirtualDubFilter : public CVobSubFilter, public CVirtualDubFilter
 		{
 		public:
-			CVobSubVirtualDubFilter(CString fn = _T(""))
+			CVobSubVirtualDubFilter(CString fn = L"")
 				: CVobSubFilter(fn) {}
 
 			int ConfigProc(FilterActivation* fa, const FilterFunctions* ff, HWND hwnd) {
 				AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 				CFileDialog fd(TRUE, NULL, GetFileName(), OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY,
-							   _T("VobSub files (*.idx;*.sub)|*.idx;*.sub||"), CWnd::FromHandle(hwnd), 0);
+							   L"VobSub files (*.idx;*.sub)|*.idx;*.sub||", CWnd::FromHandle(hwnd), 0);
 
 				if (fd.DoModal() != IDOK) {
 					return 1;
@@ -305,13 +305,13 @@ namespace Plugin
 		class CTextSubVirtualDubFilter : public CTextSubFilter, public CVirtualDubFilter
 		{
 		public:
-			CTextSubVirtualDubFilter(CString fn = _T(""), int CharSet = DEFAULT_CHARSET)
+			CTextSubVirtualDubFilter(CString fn = L"", int CharSet = DEFAULT_CHARSET)
 				: CTextSubFilter(fn, CharSet) {}
 
 			int ConfigProc(FilterActivation* fa, const FilterFunctions* ff, HWND hwnd) {
 				AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-				const TCHAR formats[] = _T("TextSub files (*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt)|*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt||");
+				const WCHAR formats[] = L"TextSub files (*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt)|*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt||";
 				CFileDialog fd(TRUE, NULL, GetFileName(), OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ENABLETEMPLATE|OFN_ENABLEHOOK,
 							   formats, CWnd::FromHandle(hwnd), sizeof(OPENFILENAME));
 				UINT_PTR CALLBACK OpenHookProc(HWND hDlg, UINT uiMsg, WPARAM wParam, LPARAM lParam);
@@ -546,14 +546,14 @@ namespace Plugin
 		class CVobSubVirtualDubFilter : public CVobSubFilter, public CVirtualDubFilter
 		{
 		public:
-			CVobSubVirtualDubFilter(CString fn = _T(""))
+			CVobSubVirtualDubFilter(CString fn = L"")
 				: CVobSubFilter(fn) {}
 
 			int ConfigProc(VDXFilterActivation* fa, const VDXFilterFunctions* ff, VDXHWND hwnd) {
 				AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 				CFileDialog fd(TRUE, NULL, GetFileName(), OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY,
-							   _T("VobSub files (*.idx;*.sub)|*.idx;*.sub||"), CWnd::FromHandle((HWND)hwnd), 0);
+							   L"VobSub files (*.idx;*.sub)|*.idx;*.sub||", CWnd::FromHandle((HWND)hwnd), 0);
 
 				if (fd.DoModal() != IDOK) {
 					return 1;
@@ -577,7 +577,7 @@ namespace Plugin
 		class CTextSubVirtualDubFilter : public CTextSubFilter, public CVirtualDubFilter
 		{
 		public:
-			CTextSubVirtualDubFilter(CString fn = _T(""), int CharSet = DEFAULT_CHARSET)
+			CTextSubVirtualDubFilter(CString fn = L"", int CharSet = DEFAULT_CHARSET)
 				: CTextSubFilter(fn, CharSet) {}
 
 			int ConfigProc(VDXFilterActivation* fa, const VDXFilterFunctions* ff, VDXHWND hwnd) {
@@ -585,7 +585,7 @@ namespace Plugin
 
 				/* off encoding changing */
 #ifndef _DEBUG
-				const TCHAR formats[] = _T("TextSub files (*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt)|*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt||");
+				const WCHAR formats[] = L"TextSub files (*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt)|*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt||";
 				CFileDialog fd(TRUE, NULL, GetFileName(), OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ENABLETEMPLATE|OFN_ENABLEHOOK,
 							   formats, CWnd::FromHandle((HWND)hwnd), sizeof(OPENFILENAME));
 				UINT_PTR CALLBACK OpenHookProc(HWND hDlg, UINT uiMsg, WPARAM wParam, LPARAM lParam);
@@ -595,7 +595,7 @@ namespace Plugin
 				fd.m_pOFN->lpfnHook = (LPOFNHOOKPROC)OpenHookProc;
 				fd.m_pOFN->lCustData = (LPARAM)DEFAULT_CHARSET;
 #else
-				const TCHAR formats[] = _T("TextSub files (*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt)|*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt||");
+				const WCHAR formats[] = L"TextSub files (*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt)|*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt||";
 				CFileDialog fd(TRUE, NULL, GetFileName(), OFN_ENABLESIZING|OFN_HIDEREADONLY,
 							   formats, CWnd::FromHandle((HWND)hwnd), sizeof(OPENFILENAME));
 #endif
@@ -1063,7 +1063,7 @@ UINT_PTR CALLBACK OpenHookProc(HWND hDlg, UINT uiMsg, WPARAM wParam, LPARAM lPar
 
 			for (ptrdiff_t i = 0; i < CharSetLen; i++) {
 				CString s;
-				s.Format(_T("%s (%d)"), CharSetNames[i], CharSetList[i]);
+				s.Format(L"%s (%d)", CharSetNames[i], CharSetList[i]);
 				SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_ADDSTRING, 0, (LONG)(LPCTSTR)s);
 				if (CharSetList[i] == (int)((OPENFILENAME*)lParam)->lCustData) {
 					SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_SETCURSEL, i, 0);

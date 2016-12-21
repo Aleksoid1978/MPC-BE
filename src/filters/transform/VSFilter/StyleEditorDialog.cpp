@@ -130,7 +130,7 @@ void CStyleEditorDialog::UpdateControlData(bool fSave)
 		m_iCharset = -1;
 		for (int i = 0; i < CharSetLen; i++) {
 			CString str;
-			str.Format(_T("%s (%d)"), CharSetNames[i], CharSetList[i]);
+			str.Format(L"%s (%d)", CharSetNames[i], CharSetList[i]);
 			AddStringData(m_charset, str, CharSetList[i]);
 			if (m_stss.charSet == CharSetList[i]) {
 				m_iCharset = i;
@@ -200,7 +200,7 @@ BOOL CStyleEditorDialog::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	SetWindowText(_T("Style Editor - \"") + m_title + _T("\""));
+	SetWindowText(L"Style Editor - \"" + m_title + L"\"");
 
 	UpdateControlData(false);
 
@@ -224,7 +224,7 @@ void CStyleEditorDialog::OnBnClickedButton1()
 	if (dlg.DoModal() == IDOK) {
 		CString str(lf.lfFaceName);
 		if (str.GetLength() > 16) {
-			str = str.Left(14) + _T("...");
+			str = str.Left(14) + L"...";
 		}
 		m_font.SetWindowText(str);
 
