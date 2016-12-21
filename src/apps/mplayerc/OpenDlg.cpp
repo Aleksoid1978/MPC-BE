@@ -33,8 +33,8 @@
 
 COpenDlg::COpenDlg(CWnd* pParent /*=NULL*/)
 	: CResizableDialog(COpenDlg::IDD, pParent)
-	, m_fMultipleFiles(false)
-	, m_fAppendPlaylist(FALSE)
+	, m_bMultipleFiles(false)
+	, m_bAppendPlaylist(FALSE)
 {
 	m_hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 }
@@ -50,12 +50,13 @@ void COpenDlg::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
+	DDX_Check(pDX, IDC_CHECK2, m_bPasteClipboardURL);
 	DDX_Control(pDX, IDC_COMBO1, m_mrucombo);
 	DDX_CBString(pDX, IDC_COMBO1, m_path);
 	DDX_Control(pDX, IDC_COMBO2, m_mrucombo2);
 	DDX_CBString(pDX, IDC_COMBO2, m_path2);
 	DDX_Control(pDX, IDC_STATIC1, m_label2);
-	DDX_Check(pDX, IDC_CHECK1, m_fAppendPlaylist);
+	DDX_Check(pDX, IDC_CHECK1, m_bAppendPlaylist);
 }
 
 BEGIN_MESSAGE_MAP(COpenDlg, CResizableDialog)
@@ -76,6 +77,8 @@ BOOL COpenDlg::OnInitDialog()
 	__super::OnInitDialog();
 
 	CAppSettings& s = AfxGetAppSettings();
+
+	m_bPasteClipboardURL = s.bPasteClipboardURL;
 
 	CRecentFileList& MRU = s.MRU;
 	MRU.ReadList();
@@ -103,15 +106,13 @@ BOOL COpenDlg::OnInitDialog()
 		m_mrucombo.SetCurSel(0);
 	}
 
-	if (::IsClipboardFormatAvailable(CF_UNICODETEXT) && ::OpenClipboard(m_hWnd)) {
+	if (m_bPasteClipboardURL && ::IsClipboardFormatAvailable(CF_UNICODETEXT) && ::OpenClipboard(m_hWnd)) {
 		HGLOBAL hglb = ::GetClipboardData(CF_UNICODETEXT);
 		if (hglb) {
 			LPCWSTR pText = (LPCWSTR)::GlobalLock(hglb);
 			if (pText) {
-				if (AfxIsValidString(pText)) {
-					if (Youtube::CheckURL(pText) || Youtube::CheckPlaylist(pText)) {
-						m_mrucombo.SetWindowTextW(pText);
-					}
+				if (AfxIsValidString(pText) && ::PathIsURL(pText)) {
+					m_mrucombo.SetWindowTextW(pText);
 				}
 				GlobalUnlock(hglb);
 			}
@@ -122,8 +123,8 @@ BOOL COpenDlg::OnInitDialog()
 	m_fns.RemoveAll();
 	m_path.Empty();
 	m_path2.Empty();
-	m_fMultipleFiles = false;
-	m_fAppendPlaylist = FALSE;
+	m_bMultipleFiles = false;
+	m_bAppendPlaylist = FALSE;
 
 	AddAnchor(m_mrucombo, TOP_LEFT, TOP_RIGHT);
 	AddAnchor(m_mrucombo2, TOP_LEFT, TOP_RIGHT);
@@ -195,7 +196,7 @@ void COpenDlg::OnBnClickedBrowsebutton()
 			|| m_fns.GetCount() == 1
 			&& (m_fns.GetHead()[m_fns.GetHead().GetLength()-1] == '\\'
 				|| m_fns.GetHead()[m_fns.GetHead().GetLength()-1] == '*')) {
-		m_fMultipleFiles = true;
+		m_bMultipleFiles = true;
 		EndDialog(IDOK);
 		return;
 	}
@@ -243,7 +244,9 @@ void COpenDlg::OnBnClickedOk()
 		}
 	}
 
-	m_fMultipleFiles = false;
+	m_bMultipleFiles = false;
+
+	AfxGetAppSettings().bPasteClipboardURL = !!m_bPasteClipboardURL;
 
 	OnOK();
 }

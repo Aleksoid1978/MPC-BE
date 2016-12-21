@@ -112,16 +112,17 @@ BEGIN DIALOGEX IDD_NAVIGATION_DLG LINES 10
 7		"情報"
 END
 
-BEGIN DIALOGEX IDD_OPEN_DLG LINES 17
+BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"開く"
 7		"インターネットやコンピューターにある再生したい動画や音声ファイルのアドレスを入力してください。"
 8		"開く:"
-10		"参照..."
-11		"副音声:"
-13		"参照..."
-14		"OK"
-15		"キャンセル"
-16		"開かずにプレイリストに追加"
+9		"Paste URL from clipboard"
+11		"参照..."
+12		"副音声:"
+14		"参照..."
+15		"OK"
+16		"キャンセル"
+17		"開かずにプレイリストに追加"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22

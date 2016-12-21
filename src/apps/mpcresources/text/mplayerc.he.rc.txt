@@ -112,16 +112,17 @@ BEGIN DIALOGEX IDD_NAVIGATION_DLG LINES 10
 7		"מידע"
 END
 
-BEGIN DIALOGEX IDD_OPEN_DLG LINES 17
+BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"פתח"
 7		"רשום כתובת של סרט או קובץ שמע (באינטרנט או במחשבך) והנגן יפתח אותו עבורך."
 8		"פתח:"
-10		"עיון..."
-11		"דיבוב:"
-13		"עיון..."
-14		"אישור"
-15		"ביטול"
-16		"הוסף לרשימת השמעה בלי לפתוח"
+9		"Paste URL from clipboard"
+11		"עיון..."
+12		"דיבוב:"
+14		"עיון..."
+15		"אישור"
+16		"ביטול"
+17		"הוסף לרשימת השמעה בלי לפתוח"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22

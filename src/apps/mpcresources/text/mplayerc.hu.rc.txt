@@ -112,16 +112,17 @@ BEGIN DIALOGEX IDD_NAVIGATION_DLG LINES 10
 7		"Info"
 END
 
-BEGIN DIALOGEX IDD_OPEN_DLG LINES 17
+BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"Megnyitás"
 7		"Írja be a mozgókép vagy audiófájl címét (mely lehet Internet-cím, vagy a számítógépen belüli elérési út), és a lejátszó megnyitja a fájlt."
 8		"Megnyitás:"
-10		"Tallózás..."
-11		"Szinkron:"
-13		"Tallózás..."
-14		"OK"
-15		"Mégse"
-16		"Hozzáadás a lejátszási listához megnyitás nélkül"
+9		"Paste URL from clipboard"
+11		"Tallózás..."
+12		"Szinkron:"
+14		"Tallózás..."
+15		"OK"
+16		"Mégse"
+17		"Hozzáadás a lejátszási listához megnyitás nélkül"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22

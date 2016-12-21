@@ -112,16 +112,17 @@ BEGIN DIALOGEX IDD_NAVIGATION_DLG LINES 10
 7		"信息"
 END
 
-BEGIN DIALOGEX IDD_OPEN_DLG LINES 17
+BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"打开"
 7		"请先输入视频或音频文件的地址( Internet 链接或本地电脑文件路径)随后播放器将会为您打开它。"
 8		"打开"
-10		"浏览..."
-11		"音轨"
-13		"浏览..."
-14		"确定"
-15		"取消"
-16		"添加到播放列表但不要立即播放"
+9		"Paste URL from clipboard"
+11		"浏览..."
+12		"音轨"
+14		"浏览..."
+15		"确定"
+16		"取消"
+17		"添加到播放列表但不要立即播放"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22

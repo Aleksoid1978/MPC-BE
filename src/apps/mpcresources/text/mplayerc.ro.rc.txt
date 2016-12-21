@@ -112,16 +112,17 @@ BEGIN DIALOGEX IDD_NAVIGATION_DLG LINES 10
 7		"Informații"
 END
 
-BEGIN DIALOGEX IDD_OPEN_DLG LINES 17
+BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"Deschide"
 7		"Introduceți adresa unui fișier video sau audio (de pe Internet sau din calculatorul dumneavoastră) și playerul îl va deschide pentru dumneavoastră."
 8		"Deschide:"
-10		"Răsfoire..."
-11		"Dublaj:"
-13		"Răsfoire..."
-14		"OK"
-15		"Renunță"
-16		"Adaugă la lista de redare fără a deschide"
+9		"Paste URL from clipboard"
+11		"Răsfoire..."
+12		"Dublaj:"
+14		"Răsfoire..."
+15		"OK"
+16		"Renunță"
+17		"Adaugă la lista de redare fără a deschide"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22

@@ -112,16 +112,17 @@ BEGIN DIALOGEX IDD_NAVIGATION_DLG LINES 10
 7		"Info"
 END
 
-BEGIN DIALOGEX IDD_OPEN_DLG LINES 17
+BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"Openen"
 7		"Typ het adres van een film- of geluidsbestand (op het internet of op uw computer), zodat de speler dit voor u kan openen."
 8		"Openen:"
-10		"Bladeren..."
-11		"Audio:"
-13		"Bladeren..."
-14		"OK"
-15		"Annuleren"
-16		"Aan afspeellijst toevoegen zonder te openen"
+9		"Paste URL from clipboard"
+11		"Bladeren..."
+12		"Audio:"
+14		"Bladeren..."
+15		"OK"
+16		"Annuleren"
+17		"Aan afspeellijst toevoegen zonder te openen"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
