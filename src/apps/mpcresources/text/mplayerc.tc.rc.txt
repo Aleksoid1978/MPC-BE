@@ -116,13 +116,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"開啟"
 7		"輸入影片或聲音檔的位址（網路位置或本機文件），播放程式會將其開啟。"
 8		"開啟："
-9		"Paste URL from clipboard"
-11		"瀏覽..."
-12		"配音："
-14		"瀏覽..."
-15		"確認"
-16		"取消"
-17		"加入播放清單而不開啟"
+10		"瀏覽..."
+11		"配音："
+13		"瀏覽..."
+14		"確認"
+15		"取消"
+16		"加入播放清單而不開啟"
+17		"Paste URL from clipboard"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22

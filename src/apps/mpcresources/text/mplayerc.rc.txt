@@ -116,13 +116,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"Open"
 7		"Type the address of a movie or audio file (on the Internet or your computer) and the player will open it for you."
 8		"Open:"
-9		"Paste URL from clipboard"
-11		"Browse..."
-12		"Dub:"
-14		"Browse..."
-15		"OK"
-16		"Cancel"
-17		"Add to playlist without opening"
+10		"Browse..."
+11		"Dub:"
+13		"Browse..."
+14		"OK"
+15		"Cancel"
+16		"Add to playlist without opening"
+17		"Paste URL from clipboard"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22

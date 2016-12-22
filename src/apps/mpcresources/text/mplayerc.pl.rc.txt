@@ -116,13 +116,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"Otwieranie"
 7		"Proszę wprowadzić adres pliku znajdującego się na komputerze lokalnym bądź zdalnym:"
 8		"Plik:"
-9		"Paste URL from clipboard"
-11		"Przeglądaj..."
-12		"Audio:"
-14		"Przeglądaj..."
-15		"OK"
-16		"Anuluj"
-17		"Dodanie do listy odtwarzania"
+10		"Przeglądaj..."
+11		"Audio:"
+13		"Przeglądaj..."
+14		"OK"
+15		"Anuluj"
+16		"Dodanie do listy odtwarzania"
+17		"Paste URL from clipboard"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22

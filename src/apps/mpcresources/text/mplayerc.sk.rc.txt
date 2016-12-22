@@ -116,13 +116,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"Otvoriť"
 7		"Zadajte adresu umiestnenia filmu alebo zvuk. súboru (na internete alebo vo Vašom počítači) a prehrávač ich otvorí."
 8		"Otvoriť:"
-9		"Paste URL from clipboard"
-11		"Prehľadávať"
-12		"Zvuková stopa:"
-14		"Prehľadávať"
-15		"OK"
-16		"Storno"
-17		"Pridať do playlistu ale neotvárať ihneď"
+10		"Prehľadávať"
+11		"Zvuková stopa:"
+13		"Prehľadávať"
+14		"OK"
+15		"Storno"
+16		"Pridať do playlistu ale neotvárať ihneď"
+17		"Paste URL from clipboard"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22

@@ -116,13 +116,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"Apri"
 7		"Inserisci l'indirizzo di un file audio o video (su Internet o sul tuo PC) e il lettore lo aprirà."
 8		"Apri:"
-9		"Paste URL from clipboard"
-11		"Sfoglia..."
-12		"Audio:"
-14		"Sfoglia..."
-15		"OK"
-16		"Annulla"
-17		"Aggiungilo alla playlist senza aprirlo"
+10		"Sfoglia..."
+11		"Audio:"
+13		"Sfoglia..."
+14		"OK"
+15		"Annulla"
+16		"Aggiungilo alla playlist senza aprirlo"
+17		"Paste URL from clipboard"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
