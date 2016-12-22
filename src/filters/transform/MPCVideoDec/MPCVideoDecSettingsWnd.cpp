@@ -435,7 +435,7 @@ void CMPCVideoDecCodecWnd::OnDisconnect()
 
 static const struct {
 	ULONGLONG	CodecId;
-	LPCTSTR		CodeName;
+	LPCWSTR		CodeName;
 } mpc_codecs[] = {
 	{CODEC_H264_DXVA,	L"H.264/AVC (DXVA)"},
 	{CODEC_HEVC_DXVA,	L"HEVC (DXVA)"},

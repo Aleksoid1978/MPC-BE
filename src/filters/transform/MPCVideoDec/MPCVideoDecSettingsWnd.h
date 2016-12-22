@@ -104,7 +104,7 @@ public:
 	void OnDeactivate();
 	bool OnApply();
 
-	static LPCTSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_FILTER_SETTINGS_CAPTION); }
+	static LPCWSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_FILTER_SETTINGS_CAPTION); }
 	static CSize GetWindowSize() { return CSize(645, 260); }
 
 	DECLARE_MESSAGE_MAP()
@@ -134,7 +134,7 @@ public:
 	void OnDeactivate();
 	bool OnApply();
 
-	static LPCTSTR GetWindowTitle() { return L"Codecs";    }
+	static LPCWSTR GetWindowTitle() { return L"Codecs";    }
 	static CSize GetWindowSize()    { return CSize(340, 290); }
 
 	DECLARE_MESSAGE_MAP()
