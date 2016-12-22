@@ -80,7 +80,7 @@ class CInternalPropertyPage
 
 protected:
 	virtual CInternalPropertyPageWnd* GetWindow() PURE;
-	virtual LPCTSTR GetWindowTitle() PURE;
+	virtual LPCWSTR GetWindowTitle() PURE;
 	virtual CSize GetWindowSize() PURE;
 
 public:
@@ -109,7 +109,7 @@ template<class WndClass>
 class CInternalPropertyPageTempl : public CInternalPropertyPage
 {
 	virtual CInternalPropertyPageWnd* GetWindow() { return DNew WndClass(); }
-	virtual LPCTSTR GetWindowTitle() { return WndClass::GetWindowTitle(); }
+	virtual LPCWSTR GetWindowTitle() { return WndClass::GetWindowTitle(); }
 	virtual CSize GetWindowSize() { return WndClass::GetWindowSize(); }
 
 public:
@@ -144,7 +144,7 @@ public:
 	void OnDeactivate();
 	bool OnApply();
 
-	static LPCTSTR GetWindowTitle() { return L"Pin Info"; }
+	static LPCWSTR GetWindowTitle() { return L"Pin Info"; }
 	static CSize GetWindowSize() { return CSize(0, 0); }
 
 	DECLARE_MESSAGE_MAP()

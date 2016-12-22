@@ -41,7 +41,7 @@ public:
 	void OnDeactivate();
 	bool OnApply();
 
-	static LPCTSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_FILTER_SETTINGS_CAPTION); }
+	static LPCWSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_FILTER_SETTINGS_CAPTION); }
 	static CSize GetWindowSize() { return CSize(320, 250); }
 
 	DECLARE_MESSAGE_MAP()
