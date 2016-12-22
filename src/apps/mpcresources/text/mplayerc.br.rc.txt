@@ -116,13 +116,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"Abrir"
 7		"Digite o endereço do filme ou arquivo de áudio (na internet ou no computador) e o tocador abrirá para você."
 8		"Abrir:"
-9		"Paste URL from clipboard"
-11		"Procurar..."
-12		"Dub:"
-14		"Procurar..."
-15		"Aceitar"
-16		"Cancelar"
-17		"Adicionar a lista de reprodução sem abrir"
+10		"Procurar..."
+11		"Dub:"
+13		"Procurar..."
+14		"Aceitar"
+15		"Cancelar"
+16		"Adicionar a lista de reprodução sem abrir"
+17		"Paste URL from clipboard"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22

@@ -116,13 +116,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"Öppna"
 7		"Skriv in adressen till en film eller ljudfil (på Internet eller på din dator) och spelaren kommer att öppna den för dig."
 8		"Öppna:"
-9		"Paste URL from clipboard"
-11		"Bläddra..."
-12		"Dub:"
-14		"Bläddra..."
-15		"OK"
-16		"Avbryt"
-17		"Lägg till i spellistan utan att öppna"
+10		"Bläddra..."
+11		"Dub:"
+13		"Bläddra..."
+14		"OK"
+15		"Avbryt"
+16		"Lägg till i spellistan utan att öppna"
+17		"Paste URL from clipboard"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22

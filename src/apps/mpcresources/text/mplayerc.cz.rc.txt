@@ -116,13 +116,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"Otevřít soubor"
 7		"Zadejte umístění video nebo zvukového souboru (ve vašem počítači, nebo na Internetu), který chcete otevřít."
 8		"Otevřít:"
-9		"Paste URL from clipboard"
-11		"Procházet..."
-12		"Zvuková stopa:"
-14		"Procházet..."
-15		"OK"
-16		"Storno"
-17		"Pouze přidat do playlistu (neotevírat)"
+10		"Procházet..."
+11		"Zvuková stopa:"
+13		"Procházet..."
+14		"OK"
+15		"Storno"
+16		"Pouze přidat do playlistu (neotevírat)"
+17		"Paste URL from clipboard"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22

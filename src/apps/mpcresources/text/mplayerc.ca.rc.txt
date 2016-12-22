@@ -116,13 +116,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 3		"Obrir"
 7		"Escriu la ruta del arxiu multimitja ( a Internet o al teu ordinador) y el reproductor l'obrirà per tu."
 8		"Obrir:"
-9		"Paste URL from clipboard"
-11		"Explorar..."
-12		"Doblatge:"
-14		"Explorar..."
-15		"Acceptar"
-16		"Cancelar"
-17		"Afegir a la Llista de reproducció sense obrir"
+10		"Explorar..."
+11		"Doblatge:"
+13		"Explorar..."
+14		"Acceptar"
+15		"Cancelar"
+16		"Afegir a la Llista de reproducció sense obrir"
+17		"Paste URL from clipboard"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
