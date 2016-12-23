@@ -79,6 +79,7 @@ BOOL COpenDlg::OnInitDialog()
 	CAppSettings& s = AfxGetAppSettings();
 
 	m_bPasteClipboardURL = s.bPasteClipboardURL;
+	UpdateData(FALSE);
 
 	CRecentFileList& MRU = s.MRU;
 	MRU.ReadList();
