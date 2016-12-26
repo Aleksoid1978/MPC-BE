@@ -633,7 +633,7 @@ void ExtractMediaTypes(IPin* pPin, CAtlArray<GUID>& types)
 	BeginEnumMediaTypes(pPin, pEM, pmt) {
 		bool fFound = false;
 
-		for (ptrdiff_t i = 0; !fFound && i < (int)types.GetCount(); i += 2) {
+		for (size_t i = 0; !fFound && i < types.GetCount(); i += 2) {
 			if (types[i] == pmt->majortype && types[i+1] == pmt->subtype) {
 				fFound = true;
 			}
@@ -2188,15 +2188,16 @@ CString ISO6391ToLanguage(LPCSTR code)
 	strncpy_s(tmp, code, 2);
 	tmp[2] = 0;
 	_strlwr_s(tmp);
-	for (ptrdiff_t i = 0, j = _countof(s_isolangs); i < j; i++)
+	for (size_t i = 0; i < _countof(s_isolangs); i++) {
 		if (!strcmp(s_isolangs[i].iso6391, tmp)) {
 			CStringA ret(s_isolangs[i].name);
-			int i = ret.Find(';');
-			if (i > 0) {
-				ret = ret.Left(i);
+			int k = ret.Find(';');
+			if (k > 0) {
+				ret = ret.Left(k);
 			}
 			return CString(ret);
 		}
+	}
 	return L"";
 }
 
@@ -2206,12 +2207,12 @@ CString ISO6392ToLanguage(LPCSTR code)
 	strncpy_s(tmp, code, 3);
 	tmp[3] = 0;
 	_strlwr_s(tmp);
-	for (ptrdiff_t i = 0, j = _countof(s_isolangs); i < j; i++) {
+	for (size_t i = 0; i < _countof(s_isolangs); i++) {
 		if (!strcmp(s_isolangs[i].iso6392, tmp)) {
 			CStringA ret(s_isolangs[i].name);
-			int i = ret.Find(';');
-			if (i > 0) {
-				ret = ret.Left(i);
+			int k = ret.Find(';');
+			if (k > 0) {
+				ret = ret.Left(k);
 			}
 			return CString(ret);
 		}
@@ -2242,9 +2243,9 @@ bool IsISO639Language(LPCSTR code)
 
 CString ISO639XToLanguage(LPCSTR code, bool bCheckForFullLangName /*= false*/)
 {
-    CString lang;
+	CString lang;
 
-    switch (size_t nLen = strlen(code)) {
+	switch (size_t nLen = strlen(code)) {
 		case 2:
 			lang = ISO6391ToLanguage(code);
 			break;
@@ -2260,9 +2261,9 @@ CString ISO639XToLanguage(LPCSTR code, bool bCheckForFullLangName /*= false*/)
 					&& IsISO639Language(code)) {
 				lang = code;
 			}
-    }
+	}
 
-    return lang;
+	return lang;
 }
 
 LCID ISO6391ToLcid(LPCSTR code)
@@ -2271,7 +2272,7 @@ LCID ISO6391ToLcid(LPCSTR code)
 	strncpy_s(tmp, code, 3);
 	tmp[3] = 0;
 	_strlwr_s(tmp);
-	for (ptrdiff_t i = 0, j = _countof(s_isolangs); i < j; i++) {
+	for (size_t i = 0; i < _countof(s_isolangs); i++) {
 		if (!strcmp(s_isolangs[i].iso6391, code)) {
 			return s_isolangs[i].lcid;
 		}
@@ -2285,7 +2286,7 @@ LCID ISO6392ToLcid(LPCSTR code)
 	strncpy_s(tmp, code, 3);
 	tmp[3] = 0;
 	_strlwr_s(tmp);
-	for (ptrdiff_t i = 0, j = _countof(s_isolangs); i < j; i++) {
+	for (size_t i = 0; i < _countof(s_isolangs); i++) {
 		if (!strcmp(s_isolangs[i].iso6392, tmp)) {
 			return s_isolangs[i].lcid;
 		}
@@ -2299,10 +2300,11 @@ CString ISO6391To6392(LPCSTR code)
 	strncpy_s(tmp, code, 2);
 	tmp[2] = 0;
 	_strlwr_s(tmp);
-	for (ptrdiff_t i = 0, j = _countof(s_isolangs); i < j; i++)
+	for (size_t i = 0; i < _countof(s_isolangs); i++) {
 		if (!strcmp(s_isolangs[i].iso6391, tmp)) {
 			return CString(s_isolangs[i].iso6392);
 		}
+	}
 	return L"";
 }
 
@@ -2312,10 +2314,11 @@ CString ISO6392To6391(LPCSTR code)
 	strncpy_s(tmp, code, 3);
 	tmp[3] = 0;
 	_strlwr_s(tmp);
-	for (ptrdiff_t i = 0, j = _countof(s_isolangs); i < j; i++)
+	for (size_t i = 0; i < _countof(s_isolangs); i++) {
 		if (!strcmp(s_isolangs[i].iso6392, tmp)) {
 			return CString(s_isolangs[i].iso6391);
 		}
+	}
 	return L"";
 }
 
@@ -2323,7 +2326,7 @@ CString LanguageToISO6392(LPCTSTR lang)
 {
 	CString str = lang;
 	str.MakeLower();
-	for (ptrdiff_t i = 0, j = _countof(s_isolangs); i < j; i++) {
+	for (size_t i = 0; i < _countof(s_isolangs); i++) {
 		CAtlList<CString> sl;
 		Explode(CString(s_isolangs[i].name), sl, L';');
 		POSITION pos = sl.GetHeadPosition();

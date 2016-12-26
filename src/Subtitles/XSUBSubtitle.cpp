@@ -221,10 +221,8 @@ HRESULT CXSUBSubtitle::ParseSample(BYTE* pData, long nLen)
 		return E_FAIL;
 	}
 
-	REFERENCE_TIME rtStart = INVALID_TIME, rtStop = INVALID_TIME;
-	CString tmp((char*)pData, 26);
-	rtStart	= StringToReftime(tmp.Mid(1, 12));
-	rtStop	= StringToReftime(tmp.Mid(14, 12));
+	REFERENCE_TIME rtStart	= StringToReftime(CString((char*)pData + 1, 12));
+	REFERENCE_TIME rtStop	= StringToReftime(CString((char*)pData + 14, 12));
 
 	if (rtStop <= rtStart) {
 		return E_FAIL;
