@@ -81,30 +81,32 @@ BOOL COpenDlg::OnInitDialog()
 	m_bPasteClipboardURL = s.bPasteClipboardURL;
 	UpdateData(FALSE);
 
-	CRecentFileList& MRU = s.MRU;
-	MRU.ReadList();
-	m_mrucombo.ResetContent();
+	if (s.fKeepHistory) {
+		CRecentFileList& MRU = s.MRU;
+		MRU.ReadList();
+		m_mrucombo.ResetContent();
 
-	for (int i = 0; i < MRU.GetSize(); i++)
-		if (!MRU[i].IsEmpty()) {
-			m_mrucombo.AddString(MRU[i]);
+		for (int i = 0; i < MRU.GetSize(); i++)
+			if (!MRU[i].IsEmpty()) {
+				m_mrucombo.AddString(MRU[i]);
+			}
+
+		CorrectComboListWidth(m_mrucombo);
+
+		CRecentFileList& MRUDub = s.MRUDub;
+		MRUDub.ReadList();
+		m_mrucombo2.ResetContent();
+
+		for (int i = 0; i < MRUDub.GetSize(); i++)
+			if (!MRUDub[i].IsEmpty()) {
+				m_mrucombo2.AddString(MRUDub[i]);
+			}
+
+		CorrectComboListWidth(m_mrucombo2);
+
+		if (m_mrucombo.GetCount() > 0) {
+			m_mrucombo.SetCurSel(0);
 		}
-
-	CorrectComboListWidth(m_mrucombo);
-
-	CRecentFileList& MRUDub = s.MRUDub;
-	MRUDub.ReadList();
-	m_mrucombo2.ResetContent();
-
-	for (int i = 0; i < MRUDub.GetSize(); i++)
-		if (!MRUDub[i].IsEmpty()) {
-			m_mrucombo2.AddString(MRUDub[i]);
-		}
-
-	CorrectComboListWidth(m_mrucombo2);
-
-	if (m_mrucombo.GetCount() > 0) {
-		m_mrucombo.SetCurSel(0);
 	}
 
 	if (m_bPasteClipboardURL && ::IsClipboardFormatAvailable(CF_UNICODETEXT) && ::OpenClipboard(m_hWnd)) {
