@@ -924,14 +924,14 @@ int CDirectVobSubFilter::FindPreferedLanguage(bool fHideToo)
 		return(0);
 	}
 
-	for (ptrdiff_t i = 0; i < MAXPREFLANGS; i++) {
+	for (int i = 0; i < MAXPREFLANGS; i++) {
 		CString tmp;
 		tmp.Format(IDS_RL_LANG, i);
 
 		CString lang = theApp.GetProfileString(ResStr(IDS_R_PREFLANGS), tmp);
 
 		if (!lang.IsEmpty()) {
-			for (ptrdiff_t ret = 0; ret < nLangs; ret++) {
+			for (int ret = 0; ret < nLangs; ret++) {
 				CString l;
 				WCHAR* pName = NULL;
 				get_LanguageName(ret, &pName);
@@ -1614,7 +1614,7 @@ bool CDirectVobSubFilter2::ShouldWeAutoload(IFilterGraph* pGraph)
 		L"GoogleDesktopCrawl.", // Google Desktop
 	};
 
-	for (ptrdiff_t i = 0; i < _countof(blacklistedapps); i++) {
+	for (size_t i = 0; i < _countof(blacklistedapps); i++) {
 		if (theApp.m_AppName.Find(blacklistedapps[i]) >= 0) {
 			return false;
 		}
@@ -1742,7 +1742,7 @@ bool CDirectVobSubFilter::Open()
 
 	CAtlArray<CString> paths;
 
-	for (ptrdiff_t i = 0; i < 10; i++) {
+	for (int i = 0; i < 10; i++) {
 		CString tmp;
 		tmp.Format(IDS_RP_PATH, i);
 		CString path = theApp.GetProfileString(ResStr(IDS_R_DEFTEXTPATHES), tmp);
@@ -2006,7 +2006,7 @@ void CDirectVobSubFilter::SetupFRD(CStringArray& paths, CAtlArray<HANDLE>& handl
 	m_frd.mtime.SetCount(m_frd.files.GetCount());
 
 	POSITION pos = m_frd.files.GetHeadPosition();
-	for (ptrdiff_t i = 0; pos; i++) {
+	for (size_t i = 0; pos; i++) {
 		CString fn = m_frd.files.GetNext(pos);
 
 		CFileStatus status;
@@ -2019,7 +2019,7 @@ void CDirectVobSubFilter::SetupFRD(CStringArray& paths, CAtlArray<HANDLE>& handl
 
 		bool fFound = false;
 
-		for (ptrdiff_t j = 0; !fFound && j < paths.GetCount(); j++) {
+		for (INT_PTR j = 0; !fFound && j < paths.GetCount(); j++) {
 			if (paths[j] == fn) {
 				fFound = true;
 			}
@@ -2067,7 +2067,7 @@ DWORD CDirectVobSubFilter::ThreadProc()
 			int j = 0;
 
 			POSITION pos = m_frd.files.GetHeadPosition();
-			for (ptrdiff_t i = 0; pos && j == 0; i++) {
+			for (size_t i = 0; pos && j == 0; i++) {
 				CString fn = m_frd.files.GetNext(pos);
 
 				CFileStatus status;
@@ -2092,7 +2092,7 @@ DWORD CDirectVobSubFilter::ThreadProc()
 				Sleep(500);
 
 				POSITION pos = m_frd.files.GetHeadPosition();
-				for (ptrdiff_t i = 0; pos; i++) {
+				for (size_t i = 0; pos; i++) {
 					CFileStatus status;
 					if (CFileGetStatus(m_frd.files.GetNext(pos), status)
 							&& m_frd.mtime[i] != status.m_mtime) {

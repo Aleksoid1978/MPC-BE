@@ -122,7 +122,7 @@ void CStyleEditorDialog::UpdateControlData(bool fSave)
 		m_stss.scrAlignment = m_screenalignment+1;
 		m_stss.marginRect = m_margin;
 
-		for (ptrdiff_t i = 0; i < 4; i++) {
+		for (unsigned i = 0; i < 4; i++) {
 			m_stss.alpha[i] = 255-m_alpha[i];
 		}
 	} else {
@@ -162,7 +162,7 @@ void CStyleEditorDialog::UpdateControlData(bool fSave)
 		m_margintopspin.SetRange32(-10000, 10000);
 		m_marginbottomspin.SetRange32(-10000, 10000);
 
-		for (ptrdiff_t i = 0; i < 4; i++) {
+		for (unsigned i = 0; i < 4; i++) {
 			m_color[i].SetColorPtr(&m_stss.colors[i]);
 			m_alpha[i] = 255-m_stss.alpha[i];
 			m_alphasliders[i].SetRange(0, 255);
@@ -259,11 +259,11 @@ void CStyleEditorDialog::OnBnClickedCheck1()
 	UpdateData();
 
 	int avg = 0;
-	for (ptrdiff_t i = 0; i < 4; i++) {
+	for (unsigned i = 0; i < 4; i++) {
 		avg += m_alphasliders[i].GetPos();
 	}
 	avg /= 4;
-	for (ptrdiff_t i = 0; i < 4; i++) {
+	for (unsigned i = 0; i < 4; i++) {
 		m_alphasliders[i].SetPos(avg);
 	}
 }
@@ -272,7 +272,7 @@ void CStyleEditorDialog::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollB
 {
 	if (m_linkalphasliders && pScrollBar) {
 		int pos = ((CSliderCtrl*)pScrollBar)->GetPos();
-		for (ptrdiff_t i = 0; i < 4; i++) {
+		for (unsigned i = 0; i < 4; i++) {
 			m_alphasliders[i].SetPos(pos);
 		}
 	}

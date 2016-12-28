@@ -317,7 +317,7 @@ CDVSMainPPage::~CDVSMainPPage()
 void CDVSMainPPage::FreeLangs()
 {
 	if (m_nLangs > 0 && m_ppLangs) {
-		for (ptrdiff_t i = 0; i < m_nLangs; i++) {
+		for (int i = 0; i < m_nLangs; i++) {
 			CoTaskMemFree(m_ppLangs[i]);
 		}
 		CoTaskMemFree(m_ppLangs);
@@ -400,7 +400,7 @@ void CDVSMainPPage::UpdateObjectData(bool fSave)
 			int nLangs;
 			m_pDirectVobSub->get_LanguageCount(&nLangs);
 			AllocLangs(nLangs);
-			for (ptrdiff_t i = 0; i < m_nLangs; i++) {
+			for (int i = 0; i < m_nLangs; i++) {
 				m_pDirectVobSub->get_LanguageName(i, &m_ppLangs[i]);
 			}
 			m_pDirectVobSub->get_SelectedLanguage(&m_iSelectedLanguage);
@@ -416,7 +416,7 @@ void CDVSMainPPage::UpdateObjectData(bool fSave)
 		int nLangs;
 		m_pDirectVobSub->get_LanguageCount(&nLangs);
 		AllocLangs(nLangs);
-		for (ptrdiff_t i = 0; i < m_nLangs; i++) {
+		for (int i = 0; i < m_nLangs; i++) {
 			m_pDirectVobSub->get_LanguageName(i, &m_ppLangs[i]);
 		}
 		m_pDirectVobSub->get_SelectedLanguage(&m_iSelectedLanguage);
@@ -457,7 +457,7 @@ void CDVSMainPPage::UpdateControlData(bool fSave)
 		m_forcedsubs.SetCheck(m_bOnlyShowForcedVobSubs);
 		m_langs.ResetContent();
 		m_langs.EnableWindow(m_nLangs > 0);
-		for (ptrdiff_t i = 0; i < m_nLangs; i++) {
+		for (int i = 0; i < m_nLangs; i++) {
 			m_langs.AddString(CString(m_ppLangs[i]));
 		}
 		m_langs.SetCurSel(m_iSelectedLanguage);
@@ -958,7 +958,7 @@ void CDVSColorPPage::UpdateControlData(bool fSave)
 		if ((UINT)m_preflist.GetCount() == nCountFmts) {
 			BYTE* pData = DNew BYTE[nCountFmts];
 
-			for (ptrdiff_t i = 0; i < m_preflist.GetCount(); i++) {
+			for (int i = 0; i < m_preflist.GetCount(); i++) {
 				pData[i] = (BYTE)m_preflist.GetItemData(i);
 			}
 
@@ -1146,14 +1146,14 @@ void CDVSPathsPPage::UpdateControlData(bool fSave)
 {
 	if (fSave) {
 		m_paths.RemoveAll();
-		for (ptrdiff_t i = 0; i < m_pathlist.GetCount(); i++) {
+		for (int i = 0; i < m_pathlist.GetCount(); i++) {
 			CString path;
 			m_pathlist.GetText(i, path);
 			m_paths.Add(path);
 		}
 	} else {
 		m_pathlist.ResetContent();
-		for (ptrdiff_t i = 0; i < m_paths.GetSize(); i++) {
+		for (INT_PTR i = 0; i < m_paths.GetSize(); i++) {
 			m_pathlist.AddString(m_paths[i]);
 		}
 
