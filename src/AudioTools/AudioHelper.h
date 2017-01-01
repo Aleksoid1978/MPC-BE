@@ -56,11 +56,12 @@ static const double D32MAX = double(INT32_MAX) / INT32_PEAK;
 #define SAMPLE_float_to_float(sample)  (sample)
 #define SAMPLE_double_to_float(sample) ((float)(sample))
 
+#define SAMPLE_uint8_to_double(sample) ((double)(int8_t((sample) ^ 0x80)) / INT8_PEAK)
+#define SAMPLE_int16_to_double(sample) ((double)(sample) / INT16_PEAK)
+#define SAMPLE_int32_to_double(sample) ((double)(sample) / INT32_PEAK)
 #define SAMPLE_float_to_double(sample) ((double)(sample))
 
-//#define SAMPLE_int24_to_int32(p) (int32_t((uint32_t)(*p++) << 8 | (uint32_t)(*p++) << 16 | (uint32_t)(*p++) << 24))
-//#define SAMPLE_int24_to_float(p) SAMPLE_int32_to_float(SAMPLE_int24_to_int32(p))
-
+#define SAMPLE_int24_to_int32(p)       (int32_t((uint32_t)*(p) << 8 | (uint32_t)*(p+1) << 16 | (uint32_t)*(p+2) << 24))
 
 #define SAMPLECONVERTFUNCT(in, out) \
 inline void convert_##in##_to_##out## (##out##_t* output, ##in##_t* input, size_t allsamples) \
@@ -101,12 +102,7 @@ HRESULT convert_to_planar_float(const SampleFormat sfmt, const WORD nChannels, c
 
 HRESULT convert_float_to(const SampleFormat sfmt, const WORD nChannels, const DWORD nSamples, float* pIn, BYTE* pOut);
 
-#define int24_to_int32(pIn)  \
-    (uint32_t)pIn[0] <<  8 | \
-    (uint32_t)pIn[1] << 16 | \
-    (uint32_t)pIn[2] << 24   \
-
-#define int32_to_int24(i32, pOut) \
+#define INT32_TO_INT24(i32, pOut) \
     *pOut++ = (BYTE)(i32 >>  8);  \
     *pOut++ = (BYTE)(i32 >> 16);  \
     *pOut++ = (BYTE)(i32 >> 24);  \
@@ -114,21 +110,21 @@ HRESULT convert_float_to(const SampleFormat sfmt, const WORD nChannels, const DW
 inline void convert_int24_to_int32(int32_t* pOut, BYTE* pIn, size_t allsamples)
 {
     for (size_t i = 0; i < allsamples; i++) {
-        pOut[i] = int24_to_int32((pIn + 3 * i));
+        pOut[i] = SAMPLE_int24_to_int32(pIn + 3 * i);
     }
 }
 
 inline void convert_int32_to_int24(BYTE* pOut, int32_t* pIn, size_t allsamples)
 {
     for (size_t i = 0; i < allsamples; i++) {
-        int32_to_int24(pIn[i], pOut);
+        INT32_TO_INT24(pIn[i], pOut);
     }
 }
 
 inline void convert_int24_to_float(float* pOut, BYTE* pIn, size_t allsamples)
 {
     for (size_t i = 0; i < allsamples; i++) {
-        int32_t i32 = int24_to_int32((pIn + 3 * i));
+        int32_t i32 = SAMPLE_int24_to_int32(pIn + 3 * i);
         pOut[i] = SAMPLE_int32_to_float(i32);
     }
 }
@@ -137,6 +133,6 @@ inline void convert_float_to_int24(BYTE* pOut, float* pIn, size_t allsamples)
 {
     for (size_t i = 0; i < allsamples; i++) {
         int32_t i32 = SAMPLE_float_to_int32(pIn[i]);
-        int32_to_int24(i32, pOut);
+        INT32_TO_INT24(i32, pOut);
     }
 }
