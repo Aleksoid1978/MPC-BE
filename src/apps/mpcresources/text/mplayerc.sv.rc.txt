@@ -1,7 +1,7 @@
 BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"Om"
 7		"MPC-BE"
-8		"Upphovsrätt © 2002-2016 se Authors.txt fil"
+8		"Upphovsrätt © 2002-2017 se Authors.txt fil"
 10		"Version :"
 11		"SVN Build :"
 12		"MPC-BE Kompilator :"
