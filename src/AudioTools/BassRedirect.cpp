@@ -78,14 +78,14 @@ LOWPASSPROCESS(double)
 void CBassRedirect::Process_int24(BYTE* p, const int samples)
 {
 	for (int i = 0; i < samples; i++) {
-		int32_t L = (uint32_t)p[0] << 8 |(uint32_t)p[1] << 16 | p[2] << 24;
+		int32_t L = (uint32_t)p[0] << 8 | (uint32_t)p[1] << 16 | p[2] << 24;
 		int32_t R = (uint32_t)p[3] << 8 | (uint32_t)p[4] << 16 | p[5] << 24;
 
 		float sample = 0.5 * (SAMPLE_int32_to_float(L) + SAMPLE_int32_to_float(R));
 		m_sample = sample * A + m_sample * B;
 
 		int32_t LFE = SAMPLE_float_to_int32(m_sample);
-		BYTE* pLFE = (BYTE*)LFE;
+		BYTE* pLFE = (BYTE*)&LFE;
 		p[3*m_lfepos] = pLFE[1];
 		p[3*m_lfepos + 1] = pLFE[2];
 		p[3*m_lfepos + 2] = pLFE[3];
