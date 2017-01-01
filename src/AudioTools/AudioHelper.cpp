@@ -96,7 +96,7 @@ inline static void convert_float_to_int24_sse2(BYTE* pOut, float* pIn, const siz
 
 	for (; k < allsamples; k++) {
 		int32_t i32 = SAMPLE_float_to_int32(pIn[k]);
-		int32_to_int24(i32, pOut);
+		INT32_TO_INT24(i32, pOut);
 	}
 }
 
@@ -118,8 +118,8 @@ inline static void convert_int24_to_float_sse2(float* pOut, BYTE* pIn, const siz
 	}
 
 	for (; k < allsamples; k++) {
-		int32_t i32 = int24_to_int32((pIn + 3 * k));
-        pOut[k] = SAMPLE_int32_to_float(i32);
+		int32_t i32 = SAMPLE_int24_to_int32(pIn + 3 * k);
+		pOut[k] = SAMPLE_int32_to_float(i32);
 	}
 }
 
@@ -326,7 +326,7 @@ HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DW
 				double d = (double)(*(float*)pIn);
 				limit(-1, d, D32MAX);
 				uint32_t u32 = (uint32_t)(int32_t)round_d(d * INT32_PEAK);
-				int32_to_int24(u32, pOut);
+				INT32_TO_INT24(u32, pOut);
 				pIn += sizeof(float);
 			}
 			break;
@@ -335,7 +335,7 @@ HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DW
 				double d = *(double*)pIn;
 				limit(-1, d, D32MAX);
 				uint32_t u32 = (uint32_t)(int32_t)round_d(d * INT32_PEAK);
-				int32_to_int24(u32, pOut);
+				INT32_TO_INT24(u32, pOut);
 				pIn += sizeof(double);
 			}
 			break;
@@ -363,7 +363,7 @@ HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DW
 			for (size_t i = 0; i < nSamples; ++i) {
 				for (int ch = 0; ch < nChannels; ++ch) {
 					uint32_t u32 = ((uint32_t*)pIn)[nSamples * ch + i];
-					int32_to_int24(u32, pOut);
+					INT32_TO_INT24(u32, pOut);
 				}
 			}
 			break;
@@ -373,7 +373,7 @@ HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DW
 					double d = (double)((float*)pIn)[nSamples * ch + i];
 					limit(-1, d, D32MAX);
 					uint32_t u32 = (uint32_t)(int32_t)round_d(d * INT32_PEAK);
-					int32_to_int24(u32, pOut);
+					INT32_TO_INT24(u32, pOut);
 				}
 			}
 			break;
@@ -383,7 +383,7 @@ HRESULT convert_to_int24(const SampleFormat sfmt, const WORD nChannels, const DW
 					double d = ((double*)pIn)[nSamples * ch + i];
 					limit(-1, d, D32MAX);
 					uint32_t u32 = (uint32_t)(int32_t)round_d(d * INT32_PEAK);
-					int32_to_int24(u32, pOut);
+					INT32_TO_INT24(u32, pOut);
 				}
 			}
 			break;
