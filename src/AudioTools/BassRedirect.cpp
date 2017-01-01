@@ -90,7 +90,7 @@ void CBassRedirect::Process_int24(BYTE* p, const int samples)
 		p[3*m_lfepos + 1] = pLFE[2];
 		p[3*m_lfepos + 2] = pLFE[3];
 
-		p += m_chanels;
+		p += m_chanels * 3;
 	}
 }
 
