@@ -103,7 +103,7 @@ bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList, CString& T
 			if (track_no == -1) {
 				Performer = performer;
 			}
-		} else if (cmd == _T("INDEX")) {
+		} else if (cmd == _T("INDEX") && cueLine.Left(2) == _T("01")) { // "INDEX 01" is required and denotes the start of the track) {
 			int idx, mm, ss, ff;
 			swscanf_s(cueLine, _T("%d %d:%d:%d"), &idx, &mm, &ss, &ff);
 
