@@ -148,9 +148,10 @@ static bool ParseCUESheetFile(CString fn, CAtlList<CUETrack> &CUETrackList, CStr
 			} else {
 				sFileName2 = cueLine;
 			}
-		} else if (cmd == L"INDEX" && cueLine.Left(3) == L"01 ") { // "INDEX 01" is required and denotes the start of the track
-			int idx, mm, ss, ff;
-			if (4 == swscanf_s(cueLine, L"%d %d:%d:%d", &idx, &mm, &ss, &ff) && fAudioTrack) {
+		} else if (cmd == L"INDEX") {
+			int mm, ss, ff;
+			if (3 == swscanf_s(cueLine, L"01 %d:%d:%d", &mm, &ss, &ff) && fAudioTrack) {
+				// "INDEX 01" is required and denotes the start of the track
 				rt = MILLISECONDS_TO_100NS_UNITS((mm * 60 + ss) * 1000);
 			}
 		}
