@@ -103,14 +103,14 @@ bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList, CString& T
 			if (track_no == -1) {
 				Performer = performer;
 			}
-		} else if (cmd == _T("INDEX") && cueLine.Left(3) == _T("01 ")) { // "INDEX 01" is required and denotes the start of the track) {
-			int idx, mm, ss, ff;
-			swscanf_s(cueLine, _T("%d %d:%d:%d"), &idx, &mm, &ss, &ff);
-
-			if (fAudioTrack) {
-				index_cnt++;
-
-				rt = MILLISECONDS_TO_100NS_UNITS((mm * 60 + ss) * 1000);
+		} else if (cmd == _T("INDEX")) {
+			int mm, ss, ff;
+			if (3 == swscanf_s(cueLine, _T("01 %d:%d:%d"), &mm, &ss, &ff)) {
+				// "INDEX 01" is required and denotes the start of the track
+				if (fAudioTrack) {
+					index_cnt++;
+					rt = MILLISECONDS_TO_100NS_UNITS((mm * 60 + ss) * 1000);
+				}
 			}
 		}
 	}
