@@ -949,7 +949,7 @@ static bool SearchFiles(CString mask, CAtlList<CString>& sl)
 					for (size_t i = 0; i < mf.GetCount(); i++) {
 						CMediaFormatCategory& mfc = mf.GetAt(i);
 						/* playlist files are skipped when playing the contents of an entire directory */
-						if ((mfc.FindExt(ext)) && (mf[i].GetLabel().CompareNoCase(L"pls") != 0)) {
+						if (mfc.FindExt(ext) && mf[i].GetFileType() != TPlaylist) {
 							sl.AddTail(path);
 							break;
 						}
