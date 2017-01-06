@@ -403,11 +403,12 @@ COPY /Y /V "..\docs\Changelog.Rus.txt"       "%PCKG_NAME%" >NUL
 COPY /Y /V "..\docs\Readme.txt"              "%PCKG_NAME%" >NUL
 
 IF /I "%NAME%" == "MPC-BE" (
-TITLE Creating archive %PCKG_NAME%.zip...
-START "7z" /B /WAIT "%SEVENZIP%" a -tzip "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%-installer.zip" "%PCKG_NAME%.exe"^
- -mx9)
-IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Unable to create %PCKG_NAME%-installer.zip!"
-CALL :SubMsg "INFO" "%PCKG_NAME%-installer.zip successfully created"
+  IF /I "%INSTALLER%" == "True" (
+    TITLE Creating archive %PCKG_NAME%.zip...
+    START "7z" /B /WAIT "%SEVENZIP%" a -tzip "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%-installer.zip" "%PCKG_NAME%.exe" -mx9
+    IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Unable to create %PCKG_NAME%-installer.zip!"
+    CALL :SubMsg "INFO" "%PCKG_NAME%-installer.zip successfully created"
+  )
 )
 
 TITLE Creating archive %PCKG_NAME%.7z...
