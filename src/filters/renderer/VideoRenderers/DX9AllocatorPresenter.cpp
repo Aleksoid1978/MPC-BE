@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -943,10 +943,10 @@ void CDX9AllocatorPresenter::CalculateJitter(LONGLONG PerfCounter)
 		int JitterSum = 0;
 		int OneSecSum = 0;
 		int OneSecCount = 0;
-		for (int i = 0; i < NB_JITTER; i++) {
+		for (unsigned i = 0; i < NB_JITTER; i++) {
 			JitterSum += m_pJitter[i];
 			if (OneSecSum < 10000000) {
-				int index = (NB_JITTER + m_nNextJitter - i) % NB_JITTER;
+				unsigned index = (NB_JITTER + m_nNextJitter - i) % NB_JITTER;
 				OneSecSum += m_pJitter[index];
 				OneSecCount++;
 			}
@@ -2118,7 +2118,7 @@ void CDX9AllocatorPresenter::DrawStats()
 		m_pLine->Begin();
 
 		// draw grid lines
-		for (int i = 1; i < 24; ++i) {
+		for (unsigned i = 1; i < 24; ++i) {
 			Points[0].x = StartX;
 			Points[0].y = StartY + i * StepY;
 			Points[1].y = Points[0].y;
@@ -2137,8 +2137,8 @@ void CDX9AllocatorPresenter::DrawStats()
 
 		// draw jitter curve
 		if (m_rtTimePerFrame) {
-			for (int i = 0; i < NB_JITTER; i++) {
-				int index = (m_nNextJitter + 1 + i) % NB_JITTER;
+			for (unsigned i = 0; i < NB_JITTER; i++) {
+				unsigned index = (m_nNextJitter + 1 + i) % NB_JITTER;
 				float jitter = float(m_pJitter[index] - m_iJitterMean);
 
 				Points[i].x = StartX + i * StepX;
@@ -2148,8 +2148,8 @@ void CDX9AllocatorPresenter::DrawStats()
 
 			if (m_bSyncStatsAvailable) {
 				// draw sync offset
-				for (int i = 0; i < NB_JITTER; i++) {
-					int index = (m_nNextSyncOffset + 1 + i) % NB_JITTER;
+				for (unsigned i = 0; i < NB_JITTER; i++) {
+					unsigned index = (m_nNextSyncOffset + 1 + i) % NB_JITTER;
 					Points[i].x = StartX + i * StepX;
 					Points[i].y = StartY + (m_pllSyncOffset[index] * ScaleY / 5000.0f + DrawHeight / 2.0f);
 				}

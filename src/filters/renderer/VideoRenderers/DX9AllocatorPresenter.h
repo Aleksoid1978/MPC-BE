@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -193,8 +193,8 @@ namespace DSObjects
 		LONGLONG				m_MinJitter;
 		LONGLONG				m_MaxSyncOffset;
 		LONGLONG				m_MinSyncOffset;
-		int						m_nNextJitter;
-		int						m_nNextSyncOffset;
+		unsigned				m_nNextJitter;
+		unsigned				m_nNextSyncOffset;
 		REFERENCE_TIME			m_rtTimePerFrame;
 		double					m_DetectedFrameRate;
 		double					m_DetectedFrameTime;
