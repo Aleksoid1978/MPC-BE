@@ -367,7 +367,7 @@ IF NOT EXIST "%PackagesOut%\%MPCBE_VER%" MD "%PackagesOut%\%MPCBE_VER%"
 
 SET "PCKG_NAME=%NAME%.%MPCBE_VER%.%ARCH%"
 
-IF EXIST "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.(%BUILD%).7z"     DEL "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.(%BUILD%).7z"
+IF EXIST "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.7z"     DEL "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.7z"
 IF EXIST "%PCKG_NAME%"        RD /Q /S "%PCKG_NAME%"
 
 TITLE Copying %PCKG_NAME%...
@@ -404,14 +404,14 @@ COPY /Y /V "..\docs\Readme.txt"              "%PCKG_NAME%" >NUL
 
 IF /I "%NAME%" == "MPC-BE" (
 TITLE Creating archive %PCKG_NAME%.zip...
-START "7z" /B /WAIT "%SEVENZIP%" a -tzip "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%-installer.(%BUILD%).zip" "%PCKG_NAME%.exe"^
+START "7z" /B /WAIT "%SEVENZIP%" a -tzip "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%-installer.zip" "%PCKG_NAME%.exe"^
  -mx9)
 IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Unable to create %PCKG_NAME%-installer.zip!"
 CALL :SubMsg "INFO" "%PCKG_NAME%-installer.zip successfully created"
 )
 
 TITLE Creating archive %PCKG_NAME%.7z...
-START "7z" /B /WAIT "%SEVENZIP%" a -t7z "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.(%BUILD%).7z" "%PCKG_NAME%"^
+START "7z" /B /WAIT "%SEVENZIP%" a -t7z "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.7z" "%PCKG_NAME%"^
  -m0=lzma -mx9 -mmt -ms=on
 IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Unable to create %PCKG_NAME%.7z!"
 CALL :SubMsg "INFO" "%PCKG_NAME%.7z successfully created"
