@@ -418,6 +418,15 @@ CALL :SubMsg "INFO" "%PCKG_NAME%.7z successfully created"
 
 IF EXIST "%PCKG_NAME%" RD /Q /S "%PCKG_NAME%"
 
+TITLE Creating archive %PCKG_NAME%.pdb.7z...
+  IF /I "%ARCH%" == "x64" (
+    START "7z" /B /WAIT "%SEVENZIP%" a -t7z "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.pdb.7z" "%~1_%ARCH%\mpc-be64.pdb"^
+ -m0=lzma -mx9 -mmt -ms=on
+  ) ELSE (
+    START "7z" /B /WAIT "%SEVENZIP%" a -t7z "%PackagesOut%\%MPCBE_VER%\%PCKG_NAME%.pdb.7z" "%~1_%ARCH%\mpc-be.pdb"^
+ -m0=lzma -mx9 -mmt -ms=on
+  )
+
 POPD
 EXIT /B
 
