@@ -1721,7 +1721,9 @@ UINT CMPlayerCApp::GetVKFromAppCommand(UINT nAppCommand)
 
 int CMPlayerCApp::ExitInstance()
 {
-	m_s.SaveSettings();
+	if (!m_s.bResetSettings) {
+		m_s.SaveSettings();
+	}
 
 	OleUninitialize();
 

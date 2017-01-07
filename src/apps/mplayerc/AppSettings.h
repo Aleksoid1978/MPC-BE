@@ -478,7 +478,7 @@ class CAppSettings
 
 public:
 
-	bool fReset;
+	bool bResetSettings;
 
 	bool fShadersNeedSave;
 
