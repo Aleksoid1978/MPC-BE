@@ -656,7 +656,6 @@ Note: when adding a new codec, you have to:
 #define CONFIG_PNG_DECODER 1
 #define CONFIG_APNG_DECODER 1
 #define CONFIG_QPEG_DECODER 0
-#define CONFIG_QDM2_DECODER 1
 #define CONFIG_QTRLE_DECODER 1
 #define CONFIG_PRORES_DECODER 1
 #define CONFIG_R10K_DECODER 1
@@ -735,6 +734,8 @@ Note: when adding a new codec, you have to:
 #define CONFIG_MP3FLOAT_DECODER 1
 #define CONFIG_NELLYMOSER_DECODER 1
 #define CONFIG_OPUS_DECODER 1
+#define CONFIG_QDM2_DECODER 1
+#define CONFIG_QDMC_DECODER 1
 #define CONFIG_RA_144_DECODER 1
 #define CONFIG_RA_288_DECODER 1
 #define CONFIG_RALF_DECODER 1

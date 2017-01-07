@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2422,8 +2422,9 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_transform.AddTail(pFGF);
 
 		pFGF = DNew CFGFilterInternal<CMpaDecFilter>(
-					(audio[ADEC_QDM2]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
-					(audio[ADEC_QDM2]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+					(audio[ADEC_QDMC]) ? MPCAudioDecName : LowMerit(MPCAudioDecName),
+					(audio[ADEC_QDMC]) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_QDMC);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_QDM2);
 		m_transform.AddTail(pFGF);
 

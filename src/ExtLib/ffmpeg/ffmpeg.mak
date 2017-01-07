@@ -360,6 +360,7 @@ SRCS_LC_B = \
 	libavcodec/pthread_frame.c \
 	libavcodec/pthread_slice.c \
 	libavcodec/qdm2.c \
+	libavcodec/qdmc.c \
 	libavcodec/qpeldsp.c \
 	libavcodec/qtrle.c \
 	libavcodec/proresdata.c \

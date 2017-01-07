@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -158,7 +158,7 @@ CAppSettings::CAppSettings()
 	AudioFiltersKeys[ADEC_NELLY]			= L"adec_nelly";
 	AudioFiltersKeys[ADEC_OPUS]				= L"adec_opus";
 	AudioFiltersKeys[ADEC_PS2]				= L"adec_ps2";
-	AudioFiltersKeys[ADEC_QDM2]				= L"adec_qdm2";
+	AudioFiltersKeys[ADEC_QDMC]				= L"adec_qdmc";
 	AudioFiltersKeys[ADEC_REAL]				= L"adec_real";
 	AudioFiltersKeys[ADEC_SHORTEN]			= L"adec_shorten";
 	AudioFiltersKeys[ADEC_SPEEX]			= L"adec_speex";

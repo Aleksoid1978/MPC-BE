@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2016 see Authors.txt
+ * (C) 2010-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -133,7 +133,7 @@ enum AUDIO_FILTER {
 	ADEC_NELLY,
 	ADEC_OPUS,
 	ADEC_PS2,
-	ADEC_QDM2,
+	ADEC_QDMC,
 	ADEC_REAL,
 	ADEC_SHORTEN,
 	ADEC_SPEEX,

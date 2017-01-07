@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -98,7 +98,8 @@ static const struct {
 	// FLAC
 	{ &MEDIASUBTYPE_FLAC_FRAMED,       AV_CODEC_ID_FLAC },
 	{ &MEDIASUBTYPE_FLAC,              AV_CODEC_ID_FLAC },
-	// QDM2
+	// QDesign Music
+	{ &MEDIASUBTYPE_QDMC,              AV_CODEC_ID_QDMC },
 	{ &MEDIASUBTYPE_QDM2,              AV_CODEC_ID_QDM2 },
 	// WavPack4
 	{ &MEDIASUBTYPE_WAVPACK4,          AV_CODEC_ID_WAVPACK },

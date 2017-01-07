@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -123,7 +123,7 @@ static filter_t s_filters[] = {
 	{L"Nellymoser",					AUDIO_DECODER, ADEC_NELLY,			0},
 	{L"Opus",						AUDIO_DECODER, ADEC_OPUS,			0},
 	{L"PS2 Audio (PCM/ADPCM)",		AUDIO_DECODER, ADEC_PS2,			IDS_TRA_PS2AUD},
-	{L"QDesign Music Codec 2",		AUDIO_DECODER, ADEC_QDM2,			0},
+	{L"QDesign Music Codec",		AUDIO_DECODER, ADEC_QDMC,			0},
 	{L"RealAudio",					AUDIO_DECODER, ADEC_REAL,			IDS_TRA_RA},
 	{L"Shorten",					AUDIO_DECODER, ADEC_SHORTEN,		0},
 	{L"Speex",						AUDIO_DECODER, ADEC_SPEEX,			0},
