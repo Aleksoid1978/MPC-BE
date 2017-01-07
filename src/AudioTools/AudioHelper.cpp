@@ -33,17 +33,19 @@ static const __m128i __shift          = _mm_set_epi32(0, 0, 0, 8);
 
 inline static void convert_float_to_int32_sse2(int32_t* pOut, float* pIn, const size_t allsamples)
 {
-	__m128  __tmpIn  = _mm_setzero_ps();
-	__m128i __tmpOut = _mm_setzero_si128();
-
 	size_t k = 0;
-	for (; k < allsamples - 3; k += 4) {
-		__tmpIn  = _mm_loadu_ps(&pIn[k]);                                   // in = pIn
-		__tmpIn  = _mm_min_ps(_mm_max_ps(__tmpIn, __32bitMax), __32bitMin); // in = min(max(in, -1.0f), 24MAX)
-		__tmpIn  = _mm_mul_ps(__tmpIn, __32bitScalar);                      // in = in * INT32_PEAK
+	if (allsamples > 3) {
+		__m128  __tmpIn  = _mm_setzero_ps();
+		__m128i __tmpOut = _mm_setzero_si128();
 
-		__tmpOut = _mm_cvtps_epi32(__tmpIn);                                // out = in
-		_mm_storeu_si128((__m128i*)&pOut[k], __tmpOut);                     // pOut = out
+		for (; k < allsamples - 3; k += 4) {
+			__tmpIn  = _mm_loadu_ps(&pIn[k]);                                   // in = pIn
+			__tmpIn  = _mm_min_ps(_mm_max_ps(__tmpIn, __32bitMax), __32bitMin); // in = min(max(in, -1.0f), 24MAX)
+			__tmpIn  = _mm_mul_ps(__tmpIn, __32bitScalar);                      // in = in * INT32_PEAK
+
+			__tmpOut = _mm_cvtps_epi32(__tmpIn);                                // out = in
+			_mm_storeu_si128((__m128i*)&pOut[k], __tmpOut);                     // pOut = out
+		}
 	}
 
 	for (; k < allsamples; k++) {
@@ -53,16 +55,18 @@ inline static void convert_float_to_int32_sse2(int32_t* pOut, float* pIn, const 
 
 inline static void convert_int32_to_float_sse2(float* pOut, int32_t* pIn, const size_t allsamples)
 {
-	__m128i __tmpIn  = _mm_setzero_si128();
-	__m128  __tmpOut = _mm_setzero_ps();
-
 	size_t k = 0;
-	for (; k < allsamples - 3; k += 4) {
-		__tmpIn  = _mm_loadu_si128((const __m128i*)&pIn[k]); // in = pIn
+	if (allsamples > 3) {
+		__m128i __tmpIn  = _mm_setzero_si128();
+		__m128  __tmpOut = _mm_setzero_ps();
 
-		__tmpOut = _mm_cvtepi32_ps(__tmpIn);                 // out = in
-		__tmpOut = _mm_mul_ps(__tmpOut, __32bitScalarDiv);   // out = out / INT32_PEAK;
-		_mm_storeu_ps(&pOut[k], __tmpOut);                   // pOut = out
+		for (; k < allsamples - 3; k += 4) {
+			__tmpIn  = _mm_loadu_si128((const __m128i*)&pIn[k]); // in = pIn
+
+			__tmpOut = _mm_cvtepi32_ps(__tmpIn);                 // out = in
+			__tmpOut = _mm_mul_ps(__tmpOut, __32bitScalarDiv);   // out = out / INT32_PEAK;
+			_mm_storeu_ps(&pOut[k], __tmpOut);                   // pOut = out
+		}
 	}
 
 	for (; k < allsamples; k++) {
@@ -72,26 +76,28 @@ inline static void convert_int32_to_float_sse2(float* pOut, int32_t* pIn, const 
 
 inline static void convert_float_to_int24_sse2(BYTE* pOut, float* pIn, const size_t allsamples)
 {
-	__m128  __tmpIn  = _mm_setzero_ps();
-	__m128i __tmpOut = _mm_setzero_si128();
-
 	size_t k = 0;
-	for (; k < allsamples - 7; k += 4) {
-		__tmpIn  = _mm_loadu_ps(&pIn[k]);                                   // in = pIn
-		__tmpIn  = _mm_min_ps(_mm_max_ps(__tmpIn, __32bitMax), __32bitMin); // in = min(max(in, -1.0f), 24MAX)
-		__tmpIn  = _mm_mul_ps(__tmpIn, __32bitScalar);                      // in = in * INT32_PEAK
+	if (allsamples > 7) {
+		__m128  __tmpIn  = _mm_setzero_ps();
+		__m128i __tmpOut = _mm_setzero_si128();
 
-		__tmpOut = _mm_cvtps_epi32(__tmpIn);                                // out = in
-		__tmpOut = _mm_srl_epi32(__tmpOut, __shift);                        // out >> 8
+		for (; k < allsamples - 7; k += 4) {
+			__tmpIn  = _mm_loadu_ps(&pIn[k]);                                   // in = pIn
+			__tmpIn  = _mm_min_ps(_mm_max_ps(__tmpIn, __32bitMax), __32bitMin); // in = min(max(in, -1.0f), 24MAX)
+			__tmpIn  = _mm_mul_ps(__tmpIn, __32bitScalar);                      // in = in * INT32_PEAK
 
-		*(int32_t*)(pOut) = _mm_extract_epi32(__tmpOut, 0);                 // pOut = out
-		pOut += 3;
-		*(int32_t*)(pOut) = _mm_extract_epi32(__tmpOut, 1);
-		pOut += 3;
-		*(int32_t*)(pOut) = _mm_extract_epi32(__tmpOut, 2);
-		pOut += 3;
-		*(int32_t*)(pOut) = _mm_extract_epi32(__tmpOut, 3);
-		pOut += 3;
+			__tmpOut = _mm_cvtps_epi32(__tmpIn);                                // out = in
+			__tmpOut = _mm_srl_epi32(__tmpOut, __shift);                        // out >> 8
+
+			*(int32_t*)(pOut) = _mm_extract_epi32(__tmpOut, 0);                 // pOut = out
+			pOut += 3;
+			*(int32_t*)(pOut) = _mm_extract_epi32(__tmpOut, 1);
+			pOut += 3;
+			*(int32_t*)(pOut) = _mm_extract_epi32(__tmpOut, 2);
+			pOut += 3;
+			*(int32_t*)(pOut) = _mm_extract_epi32(__tmpOut, 3);
+			pOut += 3;
+		}
 	}
 
 	for (; k < allsamples; k++) {
@@ -103,18 +109,20 @@ inline static void convert_float_to_int24_sse2(BYTE* pOut, float* pIn, const siz
 #define GETINT(pos) *(int32_t*)(pIn + 3 * (k + pos))
 inline static void convert_int24_to_float_sse2(float* pOut, BYTE* pIn, const size_t allsamples)
 {
-	__m128i __tmpIn  = _mm_setzero_si128();
-	__m128  __tmpOut = _mm_setzero_ps();
-
 	size_t k = 0;
-	for (; k < allsamples - 7; k += 4) {
-		__tmpIn = _mm_setr_epi32(GETINT(0), GETINT(1),     // in = pIn
-								 GETINT(2), GETINT(3));
-		__tmpIn = _mm_sll_epi32(__tmpIn, __shift);         // in << 8
+	if (allsamples > 7) {
+		__m128i __tmpIn  = _mm_setzero_si128();
+		__m128  __tmpOut = _mm_setzero_ps();
 
-		__tmpOut = _mm_cvtepi32_ps(__tmpIn);               // out = in
-		__tmpOut = _mm_mul_ps(__tmpOut, __32bitScalarDiv); // out = out / INT32_PEAK;
-		_mm_storeu_ps(&pOut[k], __tmpOut);                 // pOut = out
+		for (; k < allsamples - 7; k += 4) {
+			__tmpIn = _mm_setr_epi32(GETINT(0), GETINT(1),     // in = pIn
+									 GETINT(2), GETINT(3));
+			__tmpIn = _mm_sll_epi32(__tmpIn, __shift);         // in << 8
+
+			__tmpOut = _mm_cvtepi32_ps(__tmpIn);               // out = in
+			__tmpOut = _mm_mul_ps(__tmpOut, __32bitScalarDiv); // out = out / INT32_PEAK;
+			_mm_storeu_ps(&pOut[k], __tmpOut);                 // pOut = out
+		}
 	}
 
 	for (; k < allsamples; k++) {
@@ -130,22 +138,24 @@ static const __m128i __zero        = _mm_setzero_si128();
 
 inline static void convert_float_to_int16_sse2(int16_t* pOut, float* pIn, const size_t allsamples)
 {
-	__m128  __tmpInLo = _mm_setzero_ps();
-	__m128  __tmpInHi = _mm_setzero_ps();
-	__m128i __tmpOut  = _mm_setzero_si128();
-
 	size_t k = 0;
-	for (; k < allsamples - 7; k += 8) {
-		__tmpInLo = _mm_loadu_ps(&pIn[k]);                                                   // in = pIn
-		__tmpInLo = _mm_min_ps(_mm_max_ps(__tmpInLo, __16bitMax), __16bitMin);               // in = min(max(in, -1.0f), 16MAX)
-		__tmpInLo = _mm_mul_ps(__tmpInLo, __16bitScalar);                                    // in = in * INT16_PEAK
+	if (allsamples > 7) {
+		__m128  __tmpInLo = _mm_setzero_ps();
+		__m128  __tmpInHi = _mm_setzero_ps();
+		__m128i __tmpOut  = _mm_setzero_si128();
 
-		__tmpInHi = _mm_loadu_ps(&pIn[k + 4]);                                               // in = pIn
-		__tmpInHi = _mm_min_ps(_mm_max_ps(__tmpInHi, __16bitMax), __16bitMin);               // in = min(max(in, -1.0f), 16MAX)
-		__tmpInHi = _mm_mul_ps(__tmpInHi, __16bitScalar);                                    // in = in * INT16_PEAK
+		for (; k < allsamples - 7; k += 8) {
+			__tmpInLo = _mm_loadu_ps(&pIn[k]);                                                   // in = pIn
+			__tmpInLo = _mm_min_ps(_mm_max_ps(__tmpInLo, __16bitMax), __16bitMin);               // in = min(max(in, -1.0f), 16MAX)
+			__tmpInLo = _mm_mul_ps(__tmpInLo, __16bitScalar);                                    // in = in * INT16_PEAK
 
-		__tmpOut  = _mm_packs_epi32(_mm_cvtps_epi32(__tmpInLo), _mm_cvtps_epi32(__tmpInHi)); // out = in
-		_mm_storeu_si128((__m128i*)&pOut[k], __tmpOut);                                      // pOut = out
+			__tmpInHi = _mm_loadu_ps(&pIn[k + 4]);                                               // in = pIn
+			__tmpInHi = _mm_min_ps(_mm_max_ps(__tmpInHi, __16bitMax), __16bitMin);               // in = min(max(in, -1.0f), 16MAX)
+			__tmpInHi = _mm_mul_ps(__tmpInHi, __16bitScalar);                                    // in = in * INT16_PEAK
+
+			__tmpOut  = _mm_packs_epi32(_mm_cvtps_epi32(__tmpInLo), _mm_cvtps_epi32(__tmpInHi)); // out = in
+			_mm_storeu_si128((__m128i*)&pOut[k], __tmpOut);                                      // pOut = out
+		}
 	}
 
 	for (; k < allsamples; k++) {
@@ -155,22 +165,24 @@ inline static void convert_float_to_int16_sse2(int16_t* pOut, float* pIn, const 
 
 inline static void convert_int16_to_float_sse2(float* pOut, int16_t* pIn, const size_t allsamples)
 {
-	__m128i __tmpIn    = _mm_setzero_si128();
-	__m128  __tmpOutLo = _mm_setzero_ps();
-	__m128  __tmpOutHi = _mm_setzero_ps();
-
 	size_t k = 0;
-	for (; k < allsamples - 7; k += 8) {
-		__tmpIn    = _mm_loadu_si128((const __m128i*)&pIn[k]);             // in = pIn
+	if (allsamples > 7) {
+		__m128i __tmpIn    = _mm_setzero_si128();
+		__m128  __tmpOutLo = _mm_setzero_ps();
+		__m128  __tmpOutHi = _mm_setzero_ps();
 
-		__tmpOutLo = _mm_cvtepi32_ps(_mm_unpacklo_epi16(__zero, __tmpIn)); // out = in
-		__tmpOutLo = _mm_mul_ps(__tmpOutLo, __32bitScalarDiv);             // out = out / INT32_PEAK;
+		for (; k < allsamples - 7; k += 8) {
+			__tmpIn    = _mm_loadu_si128((const __m128i*)&pIn[k]);             // in = pIn
 
-		__tmpOutHi = _mm_cvtepi32_ps(_mm_unpackhi_epi16(__zero, __tmpIn)); // out = in
-		__tmpOutHi = _mm_mul_ps(__tmpOutHi, __32bitScalarDiv);             // out = out / INT32_PEAK;
+			__tmpOutLo = _mm_cvtepi32_ps(_mm_unpacklo_epi16(__zero, __tmpIn)); // out = in
+			__tmpOutLo = _mm_mul_ps(__tmpOutLo, __32bitScalarDiv);             // out = out / INT32_PEAK;
 
-		_mm_storeu_ps(&pOut[k], __tmpOutLo);                               // pOut = out
-		_mm_storeu_ps(&pOut[k + 4], __tmpOutHi);                           // pOut = out
+			__tmpOutHi = _mm_cvtepi32_ps(_mm_unpackhi_epi16(__zero, __tmpIn)); // out = in
+			__tmpOutHi = _mm_mul_ps(__tmpOutHi, __32bitScalarDiv);             // out = out / INT32_PEAK;
+
+			_mm_storeu_ps(&pOut[k], __tmpOutLo);                               // pOut = out
+			_mm_storeu_ps(&pOut[k + 4], __tmpOutHi);                           // pOut = out
+		}
 	}
 
 	for (; k < allsamples; k++) {
