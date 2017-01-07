@@ -957,7 +957,7 @@ void CMainFrame::OnDestroy()
 
 	m_wndPreView.DestroyWindow();
 
-	if (AfxGetAppSettings().fReset) {
+	if (AfxGetAppSettings().bResetSettings) {
 		ShellExecute(NULL, L"open", GetProgramPath(), L"/reset", NULL, SW_SHOWNORMAL);
 	}
 
@@ -1024,7 +1024,9 @@ void CMainFrame::OnClose()
 
 	m_wndPlaylistBar.SavePlaylist();
 
-	SaveControlBars();
+	if (!s.bResetSettings) {
+		SaveControlBars();
+	}
 
 	CloseMedia();
 
@@ -16420,7 +16422,7 @@ void CMainFrame::ShowOptions(int idPage)
 
 	m_bInOptions = true;
 	INT_PTR dResult = options.DoModal();
-	if (s.fReset) {
+	if (s.bResetSettings) {
 		PostMessage(WM_CLOSE);
 		return;
 	}

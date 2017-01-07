@@ -59,7 +59,7 @@ CAppSettings::CAppSettings()
 	, nCmdlnWebServerPort(-1)
 	, fShowDebugInfo(false)
 	, fShadersNeedSave(false)
-	, fReset(false)
+	, bResetSettings(false)
 	, bSubSaveExternalStyleFile(false)
 {
 	// Internal source filters
