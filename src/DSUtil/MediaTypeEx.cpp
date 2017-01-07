@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -405,6 +405,7 @@ CString CMediaTypeEx::GetAudioCodecName(const GUID& subtype, WORD wFormatTag)
 			guidnames[MEDIASUBTYPE_ADPCM_SWF]		= L"ADPCM";
 			guidnames[MEDIASUBTYPE_IMA_AMV]			= L"ADPCM";
 			guidnames[MEDIASUBTYPE_ALS]				= L"ALS";
+			guidnames[MEDIASUBTYPE_QDMC]			= L"QDMC";
 			guidnames[MEDIASUBTYPE_QDM2]			= L"QDM2";
 			guidnames[MEDIASUBTYPE_RoQA]			= L"ROQA";
 			guidnames[MEDIASUBTYPE_APE]				= L"APE";
