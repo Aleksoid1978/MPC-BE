@@ -1842,7 +1842,7 @@ HRESULT CMpaDecFilter::AC3Encode(BYTE* pBuff, int size, SampleFormat sfmt, DWORD
 		p = m_encbuff.GetData() + remain;
 
 		added = m_Mixer.Mixing((BYTE*)p, added, pBuff, nSamples) * new_channels;
-		if (added <= 0) {
+		if (!added) {
 			m_encbuff.SetCount(remain);
 			return S_OK;
 		}
