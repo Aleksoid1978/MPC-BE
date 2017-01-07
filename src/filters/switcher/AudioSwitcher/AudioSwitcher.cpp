@@ -275,6 +275,10 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 		delay			= m_Mixer.GetInputDelay();
 		out_samples		= m_Mixer.Mixing(out, out_samples, data, in_samples);
+		if (!out_samples) {
+			pOut->SetActualDataLength(0);
+			return S_OK;
+		}
 		data			= out;
 		in_samples		= out_samples;
 		in_channels		= out_wfe->nChannels;
