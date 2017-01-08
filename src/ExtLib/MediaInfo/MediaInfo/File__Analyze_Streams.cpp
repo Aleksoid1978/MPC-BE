@@ -178,7 +178,7 @@ size_t File__Analyze::Stream_Prepare (stream_t KindOfStream, size_t StreamPos)
             Fill(StreamKind_Last, StreamPos_Last, Fill_Temp[Fill_Temp_StreamKind][Pos].Parameter.To_UTF8().c_str(), Fill_Temp[Fill_Temp_StreamKind][Pos].Value);
             #if MEDIAINFO_DEMUX
                 if (!Retrieve(KindOfStream, StreamPos_Last, "Demux_InitBytes").empty())
-                    (*Stream_More)[KindOfStream][StreamPos_Last](Ztring().From_Local("Demux_InitBytes"), Info_Options)=__T("N NT"); //TODO: find a better way to hide additional fields by default
+                    Fill_SetOptions(KindOfStream, StreamPos_Last, "Demux_InitBytes", "N NT");
             #endif //MEDIAINFO_DEMUX
         }
     Fill_Temp[Fill_Temp_StreamKind].clear();
@@ -989,7 +989,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, const char* Par
         {
             Target=Value; //First value
             (*Stream_More)[StreamKind][StreamPos](Ztring().From_ISO_8859_1(Parameter), Info_Name_Text)=MediaInfoLib::Config.Language_Get(Ztring().From_Local(Parameter));
-            (*Stream_More)[StreamKind][StreamPos](Ztring().From_ISO_8859_1(Parameter), Info_Options)=__T("Y NT");
+            Fill_SetOptions(StreamKind, StreamPos, Parameter, "Y NT");
         }
         else
         {
@@ -998,6 +998,31 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, const char* Par
         }
     }
     Fill(StreamKind, StreamPos, (size_t)General_Count, Count_Get(StreamKind, StreamPos), 10, true);
+}
+
+//---------------------------------------------------------------------------
+void File__Analyze::Fill_SetOptions(stream_t StreamKind, size_t StreamPos, const char* Parameter, const char* Options)
+{
+    //Integrity
+    if (!Status[IsAccepted] || StreamKind>Stream_Max || Parameter==NULL || Parameter[0]=='\0')
+        return;
+
+    //Handle Value before StreamKind
+    if (StreamKind==Stream_Max || StreamPos>=(*Stream)[StreamKind].size())
+    {
+        //TODO: implement support of options when the stream is not yet prepared
+        return; //No streams
+    }
+
+    //Handling of well known parameters
+    size_t Pos=MediaInfoLib::Config.Info_Get(StreamKind).Find(Ztring().From_Local(Parameter));
+    if (Pos!=Error)
+    {
+        //We can not change that
+        return;
+    }
+
+    (*Stream_More)[StreamKind][StreamPos](Ztring().From_ISO_8859_1(Parameter), Info_Options).From_UTF8(Options);
 }
 
 //---------------------------------------------------------------------------
@@ -1292,7 +1317,7 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, bool Erase)
 size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t StreamPos_From, size_t StreamPos_To, bool Erase)
 {
     //Integrity
-    if (&ToAdd==NULL || StreamKind>=Stream_Max || !ToAdd.Stream || StreamPos_From>=(*ToAdd.Stream)[StreamKind].size())
+    if (StreamKind>=Stream_Max || !ToAdd.Stream || StreamPos_From>=(*ToAdd.Stream)[StreamKind].size())
         return 0;
 
     //Destination
@@ -1369,7 +1394,7 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
             else
             {
                 Fill(StreamKind, StreamPos_To, ToAdd.Get(StreamKind, StreamPos_From, Pos, Info_Name).To_UTF8().c_str(), ToFill_Value, true);
-                (*Stream_More)[StreamKind][StreamPos_To](ToAdd.Get(StreamKind, StreamPos_From, Pos, Info_Name), Info_Options)=ToAdd.Get(StreamKind, StreamPos_From, Pos, Info_Options);
+                Fill_SetOptions(StreamKind, StreamPos_To, ToAdd.Get(StreamKind, StreamPos_From, Pos, Info_Name).To_UTF8().c_str(), ToAdd.Get(StreamKind, StreamPos_From, Pos, Info_Options).To_UTF8().c_str());
             }
             Count++;
         }

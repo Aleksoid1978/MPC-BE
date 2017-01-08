@@ -914,7 +914,11 @@ void File_Riff::Header_Parse()
         Size_Complete=0; //Hack in some indexes with Size==0 (why?), ignoring content of header
     }
     if (File_Offset+Buffer_Offset+8+Size_Complete>File_Size)
+    {
         Size_Complete=File_Size-(File_Offset+Buffer_Offset+8);
+        if (Element_Level<=2) //Incoherencies info only at the top level chunk
+            Fill(Stream_General, 0, "IsTruncated", "Yes");
+    }
 
     //Alignment
     if (Size_Complete%2 && !IsNotWordAligned)

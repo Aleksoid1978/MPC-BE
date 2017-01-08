@@ -38,7 +38,6 @@ public :
     #if defined(MEDIAINFO_MPEGPS_YES)
         bool FromMpegPs;
     #endif
-    bool IsSubtitle;
 
 private :
     //Streams management
@@ -66,12 +65,14 @@ private :
     struct stream
     {
         vector<std::wstring> CC_Displayed_Values;
+        bool IsSubtitle;
 
         stream()
         {
             CC_Displayed_Values.resize(26);
             for (size_t PosY=0; PosY<26; ++PosY)
                 CC_Displayed_Values[PosY].resize(40, L' ');
+            IsSubtitle=false;
         }
 
         void Clear()

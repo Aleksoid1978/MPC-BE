@@ -596,7 +596,7 @@ void File_MpegTs::Streams_Update_Programs()
                             Fill(Stream_Menu, StreamPos_Last, Info->first.c_str(), Info->second, true);
                         Program->second.ExtraInfos_Content.clear();
                         for (std::map<std::string, ZenLib::Ztring>::iterator Info=Program->second.ExtraInfos_Option.begin(); Info!=Program->second.ExtraInfos_Option.end(); ++Info)
-                            (*Stream_More)[Stream_Menu][StreamPos_Last](Ztring().From_Local(Info->first.c_str()), Info_Options)=Info->second;
+                            Fill_SetOptions(Stream_Menu, StreamPos_Last, Info->first.c_str(), Info->second.To_UTF8().c_str());
                         Program->second.ExtraInfos_Option.clear();
 
                         if (!Formats.empty())
@@ -809,11 +809,12 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
 
                     }
                     else
+                    {
                         Fill((stream_t)StreamKind, StreamPos, Info->first.c_str(), Info->second, true);
+                        Fill_SetOptions((stream_t)StreamKind, StreamPos, Info->first.c_str(), Info->second.To_UTF8().c_str());
+                    }
                 }
             }
-            for (std::map<std::string, ZenLib::Ztring>::iterator Info=Temp->Infos_Option.begin(); Info!=Temp->Infos_Option.end(); ++Info)
-                (*Stream_More)[(stream_t)StreamKind][StreamPos](Ztring().From_Local(Info->first.c_str()), Info_Options)=Info->second;
 
             //Common
             if (Temp->SubStream_pid!=0x0000) //Wit a substream
@@ -1262,9 +1263,9 @@ void File_MpegTs::Streams_Update_Duration_Update()
         //Min and Max are based on a a 1 byte precision in the computed byte count + +/- 500 ns tolerance for hte PCR vale
         Fill(Stream_General, 0, General_OverallBitRate, Bytes_Sum * 8 / (((float64)Duration_Sum) / 27000000), 0, true);
         Fill(Stream_General, 0, "OverallBitRate_Precision_Min", (Bytes_Sum - Duration_Count) * 8 / (((float64)(Duration_Sum + 13500 * Duration_Count)) / 27000000), 0, true);
-        (*Stream_More)[Stream_General][0](Ztring().From_Local("OverallBitRate_Precision_Min"), Info_Options) = __T("N NT");
+        Fill_SetOptions(Stream_General, 0, "OverallBitRate_Precision_Min", "N NT");
         Fill(Stream_General, 0, "OverallBitRate_Precision_Max", (Bytes_Sum + Duration_Count) * 8 / (((float64)(Duration_Sum - 13500 * Duration_Count)) / 27000000), 0, true);
-        (*Stream_More)[Stream_General][0](Ztring().From_Local("OverallBitRate_Precision_Max"), Info_Options) = __T("N NT");
+        Fill_SetOptions(Stream_General, 0, "OverallBitRate_Precision_Max", "N NT");
     }
 
     if (IsVbr)
@@ -1287,21 +1288,21 @@ void File_MpegTs::Streams_Update_Duration_Update()
             if (TimeStamp_Distance_Count)
             {
                 Fill(Stream_General, 0, "PCR_Distance_Average", ((float64)TimeStamp_Distance_Total)/27000000/TimeStamp_Distance_Count, 9, true);
-                (*Stream_More)[Stream_General][0](Ztring().From_Local("PCR_Distance_Average"), Info_Options)=__T("N NT");
+                Fill_SetOptions(Stream_General, 0, "PCR_Distance_Average", "N NT");
             }
             if (TimeStamp_Distance_Min!=(int64u)-1)
             {
                 Fill(Stream_General, 0, "PCR_Distance_Min", ((float64)TimeStamp_Distance_Min)/27000000, 9, true);
-                (*Stream_More)[Stream_General][0](Ztring().From_Local("PCR_Distance_Min"), Info_Options)=__T("N NT");
+                Fill_SetOptions(Stream_General, 0, "PCR_Distance_Min", "N NT");
             }
             if (TimeStamp_Distance_Max)
             {
                 Fill(Stream_General, 0, "PCR_Distance_Max", ((float64)TimeStamp_Distance_Max)/27000000, 9, true);
-                (*Stream_More)[Stream_General][0](Ztring().From_Local("PCR_Distance_Max"), Info_Options)=__T("N NT");
+                Fill_SetOptions(Stream_General, 0, "PCR_Distance_Max", "N NT");
             }
             {
                 Fill(Stream_General, 0, "PCR_Invalid_Count", TimeStamp_HasProblems, 10, true);
-                (*Stream_More)[Stream_General][0](Ztring().From_Local("PCR_Invalid_Count"), Info_Options)=__T("N NT");
+                Fill_SetOptions(Stream_General, 0, "PCR_Invalid_Count", "N NT");
             }
 
         }

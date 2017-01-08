@@ -317,14 +317,14 @@ void File_Ancillary::Streams_Finish()
     #if defined(MEDIAINFO_SDP_YES)
         if (Sdp_Parser && !Sdp_Parser->Status[IsFinished] && Sdp_Parser->Status[IsAccepted])
         {
-            size_t StreamPos_Base=Count_Get(Stream_Text);
             Finish(Sdp_Parser);
-            for (size_t StreamPos=0; StreamPos<Sdp_Parser->Count_Get(Stream_Text); StreamPos++)
-            {
-                Merge(*Sdp_Parser, Stream_Text, StreamPos, StreamPos_Base+StreamPos);
-                Ztring MuxingMode=Sdp_Parser->Retrieve(Stream_General, 0, General_Format);
-                Fill(Stream_Text, StreamPos_Last, "MuxingMode", __T("Ancillary data / OP-47 / ")+MuxingMode, true);
-            }
+            Ztring MuxingMode=Sdp_Parser->Retrieve(Stream_General, 0, General_Format);
+            for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Max; StreamKind++)
+                for (size_t StreamPos=0; StreamPos<Sdp_Parser->Count_Get((stream_t)StreamKind); StreamPos++)
+                {
+                    Merge(*Sdp_Parser, (stream_t)StreamKind, StreamPos, StreamPos);
+                    Fill((stream_t)StreamKind, StreamPos_Last, "MuxingMode", __T("Ancillary data / OP-47 / ")+MuxingMode, true);
+                }
         }
     #endif //defined(MEDIAINFO_SDP_YES)
 

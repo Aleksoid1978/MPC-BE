@@ -1489,7 +1489,7 @@ void File_Mpegv::Streams_Fill()
     if (intra_dc_precision!=(int8u)-1)
     {
         Fill(Stream_Video, 0, "intra_dc_precision", 8+intra_dc_precision);
-        (*Stream_More)[Stream_Video][0](Ztring().From_Local("intra_dc_precision"), Info_Options)=__T("N NT");
+        Fill_SetOptions(Stream_Video, 0, "intra_dc_precision", "N NT");
     }
 
     //Commercial name

@@ -83,36 +83,6 @@ static const string HuffYUV_ColorSpace(bool rgb, bool chroma, bool alpha)
     return ToReturn;
 }
 
-static const char* HuffYUV_method (int16u BitCount, int8u method)
-{
-    switch (BitCount&0x0007)
-    {
-        case 0 :
-                    switch (method)
-                    {
-                        case 0xFE : return "old";
-                        case    0 : return "left";
-                        case    1 : return "gradient";
-                        case    2 : return "median";
-                        case   64 : return "left with decorrelation";
-                        case   65 : return "gradient with decorrelation";
-                        default : return "";
-                    }
-        case 1 :    return "left";
-        case 2 :    return "left with decorrelation";
-        case 3 :
-                    switch (BitCount&0xFFF8)
-                    {
-                        case 16 : return "gradient";
-                        case 24 :
-                        case 32 : return "gradient with decorrelation";
-                        default : return "";
-                    }
-        case 4 :    return "median";
-        default :   return "";
-    }
-}
-
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************

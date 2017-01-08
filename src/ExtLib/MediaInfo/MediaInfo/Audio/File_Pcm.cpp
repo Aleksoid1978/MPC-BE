@@ -69,6 +69,10 @@ File_Pcm::File_Pcm()
 {
     //Configuration
     ParserName="PCM";
+    #if MEDIAINFO_EVENTS
+        ParserIDs[0]=MediaInfo_Parser_Pcm;
+        StreamIDs_Width[0]=0;
+    #endif //MEDIAINFO_EVENTS
     #if MEDIAINFO_TRACE
         Trace_Layers_Update(8); //Stream
     #endif //MEDIAINFO_TRACE
@@ -83,9 +87,6 @@ File_Pcm::File_Pcm()
     SamplingRate=0;
     Endianness='\0';
     Sign='\0';
-    #if MEDIAINFO_DEMUX
-    Frame_Count_Valid_Demux=0;
-    #endif //MEDIAINFO_DEMUX
 }
 
 //***************************************************************************
@@ -262,11 +263,24 @@ void File_Pcm::Read_Buffer_Continue()
     }
 
     #if MEDIAINFO_DEMUX
-        if (Demux_UnpacketizeContainer && !Status[IsAccepted])
+        if (Demux_UnpacketizeContainer && !Frame_Count && !Status[IsAccepted])
         {
-            Frame_Count_Valid_Demux++;
-            if (Frame_Count_Valid_Demux<Frame_Count_Valid)
+            if (Demux_Items.size()<Frame_Count_Valid)
+            {
+                demux_item Item;
+                Item.DTS=FrameInfo_Next.Buffer_Offset_End!=(int64u)-1?FrameInfo_Next.DTS:FrameInfo.DTS;
+                Item.DUR=FrameInfo_Next.Buffer_Offset_End!=(int64u)-1?FrameInfo_Next.DUR:FrameInfo.DUR;
+                Item.Size=Buffer_Size;
+                for (size_t i=0; i<Demux_Items.size(); i++)
+                    Item.Size-=Demux_Items[i].Size;
+                Demux_Items.push_back(Item);
+            }
+            if (Demux_Items.size()<Frame_Count_Valid)
+            {
                 Element_WaitForMoreData();
+                return;
+            }
+            Accept();
         }
     #endif //MEDIAINFO_DEMUX
 }
@@ -296,6 +310,18 @@ void File_Pcm::Header_Parse()
 {
     //Filling
     Header_Fill_Code(0, "Block");
+    #if MEDIAINFO_DEMUX
+        if (!Demux_Items.empty())
+        {
+            FrameInfo.DTS=Demux_Items[0].DTS;
+            FrameInfo.DUR=Demux_Items[0].DUR;
+            Element_Size=Demux_Items[0].Size;
+            if (Frame_Count_NotParsedIncluded!=(int64u)-1 && Frame_Count_NotParsedIncluded>=Demux_Items.size()-1)
+                Frame_Count_NotParsedIncluded-=Demux_Items.size()-1;
+            Demux_Items.pop_front();
+        }
+    #endif MEDIAINFO_DEMUX
+
     if (BitDepth && Channels)
     {
         int64u Size=(Element_Size/(BitDepth*Channels/8))*(BitDepth*Channels/8); //A complete sample
@@ -315,13 +341,6 @@ void File_Pcm::Data_Parse()
 {
     #if MEDIAINFO_DEMUX
         FrameInfo.PTS=FrameInfo.DTS;
-        if (Frame_Count_Valid_Demux)
-        {
-            if (FrameInfo.DUR!=(int64u)-1)
-                FrameInfo.DUR*=Frame_Count_Valid_Demux;
-            if (Frame_Count_NotParsedIncluded!=(int64u)-1 && Frame_Count_NotParsedIncluded>=Frame_Count_Valid_Demux)
-                Frame_Count_NotParsedIncluded-=Frame_Count_Valid_Demux-1;
-        }
         Demux_random_access=true;
         Element_Code=(int64u)-1;
 
@@ -390,23 +409,6 @@ void File_Pcm::Data_Parse()
     //Parsing
     Skip_XX(Element_Size,                                       "Data"); //It is impossible to detect... Default is no detection, only filling
 
-    #if MEDIAINFO_DEMUX
-    if (Frame_Count_Valid_Demux)
-    {
-        FrameInfo_Next=frame_info();
-        Frame_Count+=Frame_Count_Valid_Demux;
-        if (Frame_Count_NotParsedIncluded!=(int64u)-1)
-            Frame_Count_NotParsedIncluded+=Frame_Count_Valid_Demux;
-        if (FrameInfo.DTS!=(int64u)-1 && FrameInfo.DUR!=(int64u)-1)
-        {
-            FrameInfo.DUR/=Frame_Count_Valid_Demux;
-            if (FrameInfo.DTS!=(int64u)-1)
-                FrameInfo.DTS+=FrameInfo.DUR*Frame_Count;
-        }
-        Frame_Count_Valid_Demux=0;
-    }
-    else
-    #endif //MEDIAINFO_DEMUX
     {
         if (FrameInfo.DTS!=(int64u)-1 && FrameInfo.DUR!=(int64u)-1)
         {

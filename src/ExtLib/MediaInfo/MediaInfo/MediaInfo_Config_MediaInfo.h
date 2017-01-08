@@ -283,6 +283,8 @@ public :
     int64u        Demux_FirstFrameNumber_Get ();
     void          Demux_InitData_Set (int8u NewValue);
     int8u         Demux_InitData_Get ();
+    void          Demux_SplitAudioBlocks_Set(bool NewValue);
+    bool          Demux_SplitAudioBlocks_Get();
     std::map<Ztring, File> Demux_Files;
     #endif //MEDIAINFO_DEMUX
 
@@ -513,6 +515,7 @@ private :
     bool                    Demux_Avc_Transcode_Iso14496_15_to_Iso14496_10;
     bool                    Demux_Hevc_Transcode_Iso14496_15_to_AnnexB;
     bool                    Demux_Unpacketize;
+    bool                    Demux_SplitAudioBlocks;
     float64                 Demux_Rate;
     int64u                  Demux_FirstDts;
     int64u                  Demux_FirstFrameNumber;

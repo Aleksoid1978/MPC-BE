@@ -163,8 +163,8 @@ void File_Nut::main()
         Skip_VS(                                                "time_base_denom");
         //time_base[i]= time_base_num/time_base_denom
     }
-    int64u tmp_mul=1, tmp_stream=0;
-    int64s tmp_pts=0;
+    int64u tmp_mul=1;
+
     for(int16u i=0; i<256;)
     {
         int64u tmp_fields, tmp_size, tmp_res, count;

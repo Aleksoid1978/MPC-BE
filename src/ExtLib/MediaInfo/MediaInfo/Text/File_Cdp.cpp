@@ -171,8 +171,8 @@ void File_Cdp::Streams_Update_PerStream(size_t Pos)
             {
                 Fill(Stream_Text, StreamPos_Last, "cdp_length_Min", cdp_length_Min, 10, true);
                 Fill(Stream_Text, StreamPos_Last, "cdp_length_Max", cdp_length_Max, 10, true);
-                (*Stream_More)[Stream_Text][StreamPos_Last](Ztring().From_Local("cdp_length_Min"), Info_Options)=__T("N NT");
-                (*Stream_More)[Stream_Text][StreamPos_Last](Ztring().From_Local("cdp_length_Max"), Info_Options)=__T("N NT");
+                Fill_SetOptions(Stream_Text, StreamPos_Last, "cdp_length_Min", "N NT");
+                Fill_SetOptions(Stream_Text, StreamPos_Last, "cdp_length_Max", "N NT");
             }
         }
 

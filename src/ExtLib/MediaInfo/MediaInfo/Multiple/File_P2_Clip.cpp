@@ -92,6 +92,24 @@ size_t File_P2_Clip::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+void File_P2_Clip::FillContentDate(XMLElement* Access,const char* Node, general Parameter)
+{
+    XMLElement* ChildElement = Access->FirstChildElement(Node);
+    if (ChildElement)
+    {
+        Ztring Content = ChildElement->GetText();
+        if (Content.size() >= 11 && Content[10] == __T('T'))
+            Content[10] = __T(' ');
+        if (Content.find(__T("+00:00")) != string::npos)
+        {
+            Content.resize(10 + 1 + 8);
+            Content.insert(0, __T("UTC "));
+        }
+        Fill(Stream_General, 0, Parameter, Content);
+    }
+}
+
+//---------------------------------------------------------------------------
 bool File_P2_Clip::FileHeader_Begin()
 {
     XMLDocument document;
@@ -323,34 +341,10 @@ bool File_P2_Clip::FileHeader_Begin()
                     if (Access)
                     {
                         //CreationDate
-                        ChildElement=Access->FirstChildElement("CreationDate");
-                        if (ChildElement)
-                        {
-                            Ztring Content=ChildElement->GetText();
-                            if (Content.size()>=11 && Content[10]==__T('T'))
-                                Content[10]=__T(' ');
-                            if (Content.find(__T("+00:00"))!=string::npos)
-                            {
-                                Content.resize(10+1+8);
-                                Content.insert(0, __T("UTC "));
-                            }
-                            Fill(Stream_General, 0, General_Recorded_Date, Content);
-                        }
+                        FillContentDate(Access, "CreationDate", General_Recorded_Date);
 
                         //CreationDate
-                        ChildElement=Access->FirstChildElement("LastUpdateDate");
-                        if (ChildElement)
-                        {
-                            Ztring Content=ChildElement->GetText();
-                            if (Content.size()>=11 && Content[10]==__T('T'))
-                                Content[10]=__T(' ');
-                            if (Content.find(__T("+00:00"))!=string::npos)
-                            {
-                                Content.resize(10+1+8);
-                                Content.insert(0, __T("UTC "));
-                            }
-                            Fill(Stream_General, 0, General_Tagged_Date, Content);
-                        }
+                        FillContentDate(Access, "LastUpdateDate", General_Tagged_Date);
                     }
 
                     XMLElement* Device=ClipMetadata->FirstChildElement("Device");
@@ -367,34 +361,10 @@ bool File_P2_Clip::FileHeader_Begin()
                     if (Shoot)
                     {
                         //StartDate
-                        ChildElement=Shoot->FirstChildElement("StartDate");
-                        if (ChildElement)
-                        {
-                            Ztring Content=ChildElement->GetText();
-                            if (Content.size()>=11 && Content[10]==__T('T'))
-                                Content[10]=__T(' ');
-                            if (Content.find(__T("+00:00"))!=string::npos)
-                            {
-                                Content.resize(10+1+8);
-                                Content.insert(0, __T("UTC "));
-                            }
-                            Fill(Stream_General, 0, General_Duration_Start, Content);
-                        }
+                        FillContentDate(Shoot, "StartDate", General_Duration_Start);
 
                         //EndDate
-                        ChildElement=Shoot->FirstChildElement("EndDate");
-                        if (ChildElement)
-                        {
-                            Ztring Content=ChildElement->GetText();
-                            if (Content.size()>=11 && Content[10]==__T('T'))
-                                Content[10]=__T(' ');
-                            if (Content.find(__T("+00:00"))!=string::npos)
-                            {
-                                Content.resize(10+1+8);
-                                Content.insert(0, __T("UTC "));
-                            }
-                            Fill(Stream_General, 0, General_Duration_End, Content);
-                        }
+                        FillContentDate(Shoot, "EndDate", General_Duration_End);
 
                         //Location
                         XMLElement* Location=Shoot->FirstChildElement("Location");

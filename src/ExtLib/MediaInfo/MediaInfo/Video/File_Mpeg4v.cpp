@@ -558,14 +558,14 @@ void File_Mpeg4v::Streams_Fill()
         if (user_data_start_SNC_Data[Pos][0]==__T("AlmEvent") && user_data_start_SNC_Data[Pos][1].size()==16)
             Fill(Stream_Video, 0, "Alarm event", user_data_start_SNC_Data[Pos][1]);
     }
-    if (video_object_layer_start_IsParsed && shape!=2 && !complexity_estimation_disable)
+    if (!(profile_and_level_indication >= B8(11100001) && profile_and_level_indication <= B8(11101000)) && video_object_layer_start_IsParsed && shape!=2 && !complexity_estimation_disable)
     {
         Fill(Stream_Video, 0, "data_partitioned", data_partitioned?"Yes":"No");
-        (*Stream_More)[Stream_Video][0](Ztring().From_Local("data_partitioned"), Info_Options)=__T("N NT");
+        Fill_SetOptions(Stream_Video, 0 ,"data_partitioned", "N NT");
         if (data_partitioned)
         {
             Fill(Stream_Video, 0, "reversible_vlc", reversible_vlc?"Yes":"No");
-            (*Stream_More)[Stream_Video][0](Ztring().From_Local("reversible_vlc"), Info_Options)=__T("N NT");
+            Fill_SetOptions(Stream_Video, 0, "reversible_vlc", "N NT");
         }
     }
 

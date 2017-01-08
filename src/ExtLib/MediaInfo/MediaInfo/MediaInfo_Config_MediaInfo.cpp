@@ -195,6 +195,7 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
         Demux_Avc_Transcode_Iso14496_15_to_Iso14496_10=false;
         Demux_Hevc_Transcode_Iso14496_15_to_AnnexB=false;
         Demux_Unpacketize=false;
+        Demux_SplitAudioBlocks=false;
         Demux_Rate=0;
         Demux_FirstDts=(int64u)-1;
         Demux_FirstFrameNumber=(int64u)-1;
@@ -746,6 +747,15 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
                 Demux_Unpacketize_Set(false);
             else
                 Demux_Unpacketize_Set(true);
+            return Ztring();
+        #else //MEDIAINFO_DEMUX
+            return __T("Demux manager is disabled due to compilation options");
+        #endif //MEDIAINFO_DEMUX
+    }
+    else if (Option_Lower==__T("file_demux_splitaudioblocks"))
+    {
+        #if MEDIAINFO_DEMUX
+            Demux_SplitAudioBlocks_Set(!(Value==__T("0") || Value.empty()));
             return Ztring();
         #else //MEDIAINFO_DEMUX
             return __T("Demux manager is disabled due to compilation options");
@@ -1897,6 +1907,21 @@ bool MediaInfo_Config_MediaInfo::Demux_Unpacketize_Get ()
 {
     CriticalSectionLocker CSL(CS);
     return Demux_Unpacketize;
+}
+#endif //MEDIAINFO_DEMUX
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_DEMUX
+void MediaInfo_Config_MediaInfo::Demux_SplitAudioBlocks_Set(bool NewValue)
+{
+    CriticalSectionLocker CSL(CS);
+    Demux_SplitAudioBlocks = NewValue;
+}
+
+bool MediaInfo_Config_MediaInfo::Demux_SplitAudioBlocks_Get()
+{
+    CriticalSectionLocker CSL(CS);
+    return Demux_SplitAudioBlocks;
 }
 #endif //MEDIAINFO_DEMUX
 

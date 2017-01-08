@@ -490,20 +490,22 @@ void File_Aac::AudioSpecificConfig_OutOfBand (int64s sampling_frequency_, int8u 
     {
         if (audioObjectType==(int8u)-1)
             return; //All data is not yet available
-        if (Infos.find("Format_Settings_SBR")!=Infos.end())
+        std::map<std::string, Ztring>::const_iterator i=Infos.find("Format_Settings_SBR");
+        if (i!=Infos.end())
         {
             sbrData=true;
-            sbrPresentFlag=Infos["Format_Settings_SBR"].find(__T("Yes"))!=string::npos;
+            sbrPresentFlag=i->second.find(__T("Yes"))!=string::npos;
         }
         else
         {
             sbrData=false;
             sbrPresentFlag=false;
         }
-        if (Infos.find("Format_Settings_PS")!=Infos.end())
+        i = Infos.find("Format_Settings_PS");
+        if (i!=Infos.end())
         {
             psData=true;
-            psPresentFlag=Infos["Format_Settings_PS"].find(__T("Yes"))!=string::npos;
+            psPresentFlag=i->second.find(__T("Yes"))!=string::npos;
         }
         else
         {

@@ -1579,15 +1579,15 @@ void File_DvDif::Errors_Stats_Update_Finnish()
     if (Count_Get(Stream_Video)==0)
         Stream_Prepare(Stream_Video);
     Fill(Stream_Video, 0, "Errors_Stats_Begin", "Frame # \tAbsolute time\tDV timecode\tN\tRecorded date/time     \tN\tA\tN\tS\tE\t1\t2\t3\t4\t5\t6\t7\t8\t9\t0\t1\t2\t3\t4\t5\t6\t7\t8\t9\t0");
-    (*Stream_More)[Stream_Video][0](Ztring().From_Local("Errors_Stats_Begin"), Info_Options)=__T("N NT");
+    Fill_SetOptions(Stream_Video, 0, "Errors_Stats_Begin", "N NT");
     Fill(Stream_Video, 0, "Errors_Stats_03", Errors_Stats_03);
-    (*Stream_More)[Stream_Video][0](Ztring().From_Local("Errors_Stats_03"), Info_Options)=__T("N NT");
+    Fill_SetOptions(Stream_Video, 0, "Errors_Stats_03", "N NT");
     Fill(Stream_Video, 0, "Errors_Stats_05", Errors_Stats_05);
-    (*Stream_More)[Stream_Video][0](Ztring().From_Local("Errors_Stats_05"), Info_Options)=__T("N NT");
+    Fill_SetOptions(Stream_Video, 0, "Errors_Stats_05", "N NT");
     Fill(Stream_Video, 0, "Errors_Stats_09", Errors_Stats_09);
-    (*Stream_More)[Stream_Video][0](Ztring().From_Local("Errors_Stats_09"), Info_Options)=__T("N NT");
+    Fill_SetOptions(Stream_Video, 0, "Errors_Stats_09", "N NT");
     Fill(Stream_Video, 0, "Errors_Stats_10", Errors_Stats_10);
-    (*Stream_More)[Stream_Video][0](Ztring().From_Local("Errors_Stats_10"), Info_Options)=__T("N NT");
+    Fill_SetOptions(Stream_Video, 0, "Errors_Stats_10", "N NT");
     if (MediaInfoLib::Config.Verbosity_Get()>=(float32)1.0)
         Fill(Stream_Video, 0, "Errors_Stats", Errors_Stats_10);
     else if (MediaInfoLib::Config.Verbosity_Get()>=(float32)0.5)
@@ -1596,18 +1596,18 @@ void File_DvDif::Errors_Stats_Update_Finnish()
         Fill(Stream_Video, 0, "Errors_Stats", Errors_Stats_05);
     else
         Fill(Stream_Video, 0, "Errors_Stats", Errors_Stats_03);
-    (*Stream_More)[Stream_Video][0](Ztring().From_Local("Errors_Stats"), Info_Options)=__T("N NT");
+    Fill_SetOptions(Stream_Video, 0, "Errors_Stats", "N NT");
     Fill(Stream_Video, 0, "Errors_Stats_End_03", Errors_Stats_End_03);
-    (*Stream_More)[Stream_Video][0](Ztring().From_Local("Errors_Stats_End_03"), Info_Options)=__T("N NT");
+    Fill_SetOptions(Stream_Video, 0, "Errors_Stats_End_03", "N NT");
     Fill(Stream_Video, 0, "Errors_Stats_End_05", Errors_Stats_End_05);
-    (*Stream_More)[Stream_Video][0](Ztring().From_Local("Errors_Stats_End_05"), Info_Options)=__T("N NT");
+    Fill_SetOptions(Stream_Video, 0, "Errors_Stats_End_05", "N NT");
     if (MediaInfoLib::Config.Verbosity_Get()>=(float32)0.5)
         Fill(Stream_Video, 0, "Errors_Stats_End", Errors_Stats_End_05);
     else
         Fill(Stream_Video, 0, "Errors_Stats_End", Errors_Stats_End_03);
-    (*Stream_More)[Stream_Video][0](Ztring().From_Local("Errors_Stats_End"), Info_Options)=__T("N NT");
+    Fill_SetOptions(Stream_Video, 0, "Errors_Stats_End", "N NT");
     Fill(Stream_Video, 0, "FrameCount_Speed", Speed_FrameCount);
-    (*Stream_More)[Stream_Video][0](Ztring().From_Local("FrameCount_Speed"), Info_Options)=__T("N NT");
+    Fill_SetOptions(Stream_Video, 0, "FrameCount_Speed", "N NT");
 }
 
 } //NameSpace

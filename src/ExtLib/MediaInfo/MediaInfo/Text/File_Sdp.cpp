@@ -72,13 +72,13 @@ void File_Sdp::Streams_Finish()
     {
         if (Stream->second.Parser)
         {
-            size_t Current=Count_Get(Stream_Text);
             Finish(Stream->second.Parser);
-            Merge(*Stream->second.Parser);
-            //Fill(Stream_Text, StreamPos_Last, Text_ID, Ztring::ToZtring((Stream->first&0x80)?2:1)+__T('-')+Ztring::ToZtring(Stream->first&0x1F)+__T("-")+Stream->second.Parser->Get(Stream_Text, 0, Text_ID), true);
-            size_t Count=Count_Get(Stream_Text)-Current;
-            for (size_t Pos=0; Pos<Count; Pos++)
-                Fill(Stream_Text, Current+Pos, Text_ID, Stream->second.Parser->Get(Stream_Text, Pos, Text_ID), true);
+            for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Max; StreamKind++)
+                for (size_t StreamPos=0; StreamPos<Stream->second.Parser->Count_Get((stream_t)StreamKind); StreamPos++)
+                {
+                    Merge(*Stream->second.Parser, (stream_t)StreamKind, StreamPos, StreamPos);
+                    Fill((stream_t)StreamKind, StreamPos, General_ID, Stream->second.Parser->Get((stream_t)StreamKind, StreamPos, General_ID), true);
+                }
         }
     }
 }
@@ -232,7 +232,6 @@ void File_Sdp::Data_Parse()
             if (Stream.Parser==NULL)
             {
                 Stream.Parser=new File_Teletext();
-                Stream.Parser->IsSubtitle=true;
                 Open_Buffer_Init(Stream.Parser);
             }
             if (Stream.Parser->PTS_DTS_Needed)

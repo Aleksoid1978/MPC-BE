@@ -388,16 +388,6 @@ static void Matroska_CRC32_Compute(int32u &CRC32, const int8u* Buffer_Current, c
 }
 
 //---------------------------------------------------------------------------
-static void Matroska_CRC32_Compute(int32u &CRC32, int32u Init, const int8u* Buffer_Current, const int8u* Buffer_End)
-{
-    CRC32 ^= Init;
-
-    Matroska_CRC32_Compute(CRC32, Buffer_Current, Buffer_End);
-
-    CRC32 ^= Init;
-}
-
-//---------------------------------------------------------------------------
 #if MEDIAINFO_FIXITY
 static size_t Matroska_TryToFixCRC(int8u* Buffer, size_t Buffer_Size, int32u CRCExpected, int8u& Modified)
 {
@@ -421,7 +411,7 @@ static size_t Matroska_TryToFixCRC(int8u* Buffer, size_t Buffer_Size, int32u CRC
 
     if (BitPositions.size()!=1)
         return (size_t)-1;
-        
+
     Modified=Buffer[BitPositions[0]>>3]; //Save the byte here as we already have the content
     return BitPositions[0];
 }
@@ -1165,7 +1155,7 @@ void File_Mk::Header_Parse()
                 size_t Pos=(size_t)(Element_Offset-1);
                 while (!Buffer[Buffer_Offset+Pos])
                     Pos--;
-                size_t ToWrite_Size=Element_Offset-Pos; 
+                size_t ToWrite_Size=Element_Offset-Pos;
                 if (ToWrite_Size<=8)
                 {
                     int8u ToWrite[8];
@@ -3260,7 +3250,7 @@ void File_Mk::Segment_Tracks_TrackEntry_CodecPrivate__Parse()
                         std::string Data_Raw((const char*)(Buffer+Buffer_Offset), (size_t)Element_Size);
                         std::string Data_Base64(Base64::encode(Data_Raw));
                         Fill(StreamKind_Last, StreamPos_Last, "Demux_InitBytes", Data_Base64);
-                        (*Stream_More)[StreamKind_Last][StreamPos_Last](Ztring().From_Local("Demux_InitBytes"), Info_Options)=__T("N NT");
+                        Fill_SetOptions(StreamKind_Last, StreamPos_Last, "Demux_InitBytes", "N NT");
                         }
                         break;
             default :   ;

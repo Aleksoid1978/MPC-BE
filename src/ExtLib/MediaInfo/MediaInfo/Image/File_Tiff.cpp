@@ -169,17 +169,6 @@ static const char* Tiff_PhotometricInterpretation_ColorSpace (int32u Photometric
     }
 }
 
-static const char* Tiff_ExtraSamples(int32u ExtraSamples)
-{
-    switch (ExtraSamples)
-    {
-        case     0 :
-        case     1 : return "Associated Alpha";
-        case     2 : return "Unassocieted Alpha";
-        default    : return ""; //Unknown
-    }
-}
-
 static const char* Tiff_ExtraSamples_ColorSpace(int32u ExtraSamples)
 {
     switch (ExtraSamples)

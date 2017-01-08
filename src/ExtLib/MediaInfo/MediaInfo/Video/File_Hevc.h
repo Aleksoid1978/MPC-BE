@@ -363,6 +363,7 @@ private :
     void sei_message_decoded_picture_hash(int32u payloadSize);
     void sei_message_mastering_display_colour_volume();
     void sei_message_light_level();
+    void sei_alternative_transfer_characteristics();
 
     //Packets - SubElements
     void slice_segment_header();
@@ -399,6 +400,8 @@ private :
     seq_parameter_set_structs           seq_parameter_sets;
     pic_parameter_set_structs           pic_parameter_sets;
 
+    void Clean_Seq_Parameter();
+
     //File specific
     int8u                               lengthSizeMinusOne;
 
@@ -424,6 +427,7 @@ private :
     int8u   profile_space;
     int8u   profile_idc;
     int8u   level_idc;
+    int8u   preferred_transfer_characteristics;
     bool    tier_flag;
     bool    general_progressive_source_flag;
     bool    general_interlaced_source_flag;

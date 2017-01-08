@@ -164,6 +164,7 @@
     <ClInclude Include="MediaInfo\Multiple\File_HdsF4m.h" />
     <ClInclude Include="MediaInfo\Multiple\File_Pmp.h" />
     <ClInclude Include="MediaInfo\Multiple\File_Ptx.h" />
+    <ClInclude Include="MediaInfo\Multiple\File_Vbi.h" />
     <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Common.h" />
     <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Resource.h" />
     <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Sequence.h" />
@@ -424,6 +425,7 @@
     <ClCompile Include="MediaInfo\Multiple\File_HdsF4m.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File_Pmp.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File_Ptx.cpp" />
+    <ClCompile Include="MediaInfo\Multiple\File_Vbi.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File__ReferenceFilesHelper.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Resource.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Sequence.cpp" />

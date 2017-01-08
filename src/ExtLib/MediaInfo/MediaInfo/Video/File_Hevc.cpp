@@ -170,6 +170,21 @@ File_Hevc::File_Hevc()
 //---------------------------------------------------------------------------
 File_Hevc::~File_Hevc()
 {
+    Clean_Seq_Parameter();
+}
+//---------------------------------------------------------------------------
+void File_Hevc::Clean_Seq_Parameter()
+{
+    for (size_t Pos = 0; Pos < seq_parameter_sets.size(); Pos++)
+        delete seq_parameter_sets[Pos]; //seq_parameter_sets[Pos]=NULL;
+    seq_parameter_sets.clear();
+    for (size_t Pos = 0; Pos<pic_parameter_sets.size(); Pos++)
+        delete pic_parameter_sets[Pos]; //pic_parameter_sets[Pos]=NULL;
+    pic_parameter_sets.clear();
+    for (size_t Pos = 0; Pos<video_parameter_sets.size(); Pos++)
+        delete video_parameter_sets[Pos]; //video_parameter_sets[Pos]=NULL;
+    video_parameter_sets.clear();
+    
 }
 
 //***************************************************************************
@@ -255,6 +270,8 @@ void File_Hevc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator se
     if ((*seq_parameter_set_Item)->bit_depth_luma_minus8==(*seq_parameter_set_Item)->bit_depth_chroma_minus8)
         Fill(Stream_Video, 0, Video_BitDepth, (*seq_parameter_set_Item)->bit_depth_luma_minus8+8);
 
+    if (preferred_transfer_characteristics!=2)
+        Fill(Stream_Video, 0, Video_transfer_characteristics, Mpegv_transfer_characteristics(preferred_transfer_characteristics));
     if ((*seq_parameter_set_Item)->vui_parameters)
     {
         if ((*seq_parameter_set_Item)->vui_parameters->timing_info_present_flag)
@@ -739,6 +756,7 @@ void File_Hevc::Synched_Init()
     chroma_sample_loc_type_bottom_field=(int32u)-1;
     maximum_content_light_level=0;
     maximum_frame_average_light_level=0;
+    preferred_transfer_characteristics=2;
 
     //Default values
     Streams.resize(0x100);
@@ -1816,6 +1834,7 @@ void File_Hevc::sei_message(int32u &seq_parameter_set_id)
         case 132 :   sei_message_decoded_picture_hash(payloadSize); break;
         case 137 :   sei_message_mastering_display_colour_volume(); break;
         case 144 :   sei_message_light_level(); break;
+        case 147 :   sei_alternative_transfer_characteristics(); break;
         default :
                     Element_Info1("unknown");
                     Skip_XX(payloadSize,                        "data");
@@ -2159,6 +2178,15 @@ void File_Hevc::sei_message_light_level()
     //Parsing
     Get_B2(maximum_content_light_level,                         "maximum_content_light_level");
     Get_B2(maximum_frame_average_light_level,                   "maximum_frame_average_light_level");
+}
+
+//---------------------------------------------------------------------------
+void File_Hevc::sei_alternative_transfer_characteristics()
+{
+    Element_Info1("alternative_transfer_characteristics");
+
+    //Parsing
+    Get_B1(preferred_transfer_characteristics,                  "preferred_transfer_characteristics"); Param_Info1(Mpegv_transfer_characteristics(preferred_transfer_characteristics));
 }
 
 //***************************************************************************

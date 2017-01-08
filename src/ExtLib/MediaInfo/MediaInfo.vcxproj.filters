@@ -704,6 +704,9 @@
     <ClInclude Include="MediaInfo\File__Analyze_Element.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Multiple\File_Vbi.h">
+      <Filter>Header Files\Multiple</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1344,6 +1347,9 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\File__Analyze_Element.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Multiple\File_Vbi.cpp">
+      <Filter>Source Files\Multiple</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

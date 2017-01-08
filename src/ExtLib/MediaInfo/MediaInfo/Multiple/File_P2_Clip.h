@@ -28,7 +28,6 @@ class File__ReferenceFilesHelper;
 //***************************************************************************
 // Class File_P2_Clip
 //***************************************************************************
-
 class File_P2_Clip : public File__Analyze
 {
 public :
@@ -47,6 +46,8 @@ private :
 
     //Buffer - File header
     bool FileHeader_Begin();
+
+    void FillContentDate(tinyxml2::XMLElement* Access, const char* Node, general Parameter);
 
     //Temp
     File__ReferenceFilesHelper*     ReferenceFiles;

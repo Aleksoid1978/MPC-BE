@@ -17,6 +17,7 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
+#include <deque>
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -42,7 +43,13 @@ public :
     //Buffer - Global
     void Read_Buffer_Continue ();
     #if MEDIAINFO_DEMUX
-    int64u  Frame_Count_Valid_Demux;
+    struct demux_item
+    {
+        int64u Size;
+        int64u DTS;
+        int64u DUR;
+    };
+    std::deque<demux_item> Demux_Items;
     #endif //MEDIAINFO_DEMUX
 
     //Constructor/Destructor

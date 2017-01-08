@@ -85,6 +85,17 @@ private :
                         //initial_cpb_removal_delay_offset(initial_cpb_removal_delay_offset_)
                     {
                     }
+
+                    xxl_data &operator=(const xxl_data &x)
+                    {
+                        bit_rate_value=x.bit_rate_value;
+                        cpb_size_value=x.cpb_size_value;
+                        cbr_flag=x.cbr_flag;
+                        //initial_cpb_removal_delay=x.initial_cpb_removal_delay;
+                        //initial_cpb_removal_delay_offset=x.initial_cpb_removal_delay_offset;
+                        return *this;
+                    }
+
                 private:
                     xxl_data();
                 };
@@ -103,26 +114,32 @@ private :
                     time_offset_length(time_offset_length_)
                 {
                 }
+
+                xxl(const xxl &x)
+                {
+                    SchedSel=x.SchedSel;
+                    initial_cpb_removal_delay_length_minus1=x.initial_cpb_removal_delay_length_minus1;
+                    cpb_removal_delay_length_minus1=x.cpb_removal_delay_length_minus1;
+                    dpb_output_delay_length_minus1=x.dpb_output_delay_length_minus1;
+                    time_offset_length=x.time_offset_length;
+                }
+
+                xxl &operator=(const xxl &x)
+                {
+                    SchedSel=x.SchedSel;
+                    initial_cpb_removal_delay_length_minus1=x.initial_cpb_removal_delay_length_minus1;
+                    cpb_removal_delay_length_minus1=x.cpb_removal_delay_length_minus1;
+                    dpb_output_delay_length_minus1=x.dpb_output_delay_length_minus1;
+                    time_offset_length=x.time_offset_length;
+
+                    return *this;
+                }
+
             private:
                 xxl();
-                xxl &operator =(const xxl &);
-                xxl(const xxl &);
-            };
-            struct bitstream_restriction_struct
-            {
-                int8u  max_num_reorder_frames;
-
-                bitstream_restriction_struct(int8u max_num_reorder_frames_)
-                    :
-                    max_num_reorder_frames(max_num_reorder_frames_)
-                {
-                }
-            private:
-                bitstream_restriction_struct();
             };
             xxl*    NAL;
             xxl*    VCL;
-            bitstream_restriction_struct* bitstream_restriction;
             int32u  num_units_in_tick;
             int32u  time_scale;
             int16u  sar_width;
@@ -140,11 +157,10 @@ private :
             bool    fixed_frame_rate_flag;
             bool    pic_struct_present_flag;
 
-            vui_parameters_struct(xxl* NAL_, xxl* VCL_, bitstream_restriction_struct* bitstream_restriction_, int32u num_units_in_tick_, int32u time_scale_, int16u  sar_width_, int16u  sar_height_, int8u aspect_ratio_idc_, int8u video_format_, int8u video_full_range_flag_, int8u colour_primaries_, int8u transfer_characteristics_, int8u matrix_coefficients_, bool aspect_ratio_info_present_flag_, bool video_signal_type_present_flag_, bool colour_description_present_flag_, bool timing_info_present_flag_, bool fixed_frame_rate_flag_, bool pic_struct_present_flag_)
+            vui_parameters_struct(xxl* NAL_, xxl* VCL_, int32u num_units_in_tick_, int32u time_scale_, int16u  sar_width_, int16u  sar_height_, int8u aspect_ratio_idc_, int8u video_format_, int8u video_full_range_flag_, int8u colour_primaries_, int8u transfer_characteristics_, int8u matrix_coefficients_, bool aspect_ratio_info_present_flag_, bool video_signal_type_present_flag_, bool colour_description_present_flag_, bool timing_info_present_flag_, bool fixed_frame_rate_flag_, bool pic_struct_present_flag_)
                 :
                 NAL(NAL_),
                 VCL(VCL_),
-                bitstream_restriction(bitstream_restriction_),
                 num_units_in_tick(num_units_in_tick_),
                 time_scale(time_scale_),
                 sar_width(sar_width_),
@@ -168,7 +184,6 @@ private :
             {
                 delete NAL; //NAL=NULL;
                 delete VCL; //VCL=NULL;
-                delete bitstream_restriction; //bitstream_restriction=NULL;
             }
 
         private:
@@ -478,6 +493,7 @@ private :
     };
     typedef vector<temporal_reference*> temporal_references;
     temporal_references                 TemporalReferences; //per pic_order_cnt_lsb
+    void Clean_Temp_References();
     temporal_reference*                 TemporalReferences_DelayedElement;
     size_t                              TemporalReferences_Min;
     size_t                              TemporalReferences_Max;
@@ -500,6 +516,7 @@ private :
     seq_parameter_set_structs           seq_parameter_sets;
     seq_parameter_set_structs           subset_seq_parameter_sets;
     pic_parameter_set_structs           pic_parameter_sets;
+    void Clean_Seq_Parameter();
 
     //File specific
     int8u                               SizeOfNALU_Minus1;

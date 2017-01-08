@@ -147,31 +147,6 @@ static stream_t Gxf_MediaTypes_StreamKind(int8u Type)
 }
 
 //---------------------------------------------------------------------------
-static const char* Gxf_MediaTypes_Format(int8u Type)
-{
-    switch (Type)
-    {
-        case  3 : return "JPEG"; //525 lines
-        case  4 : return "JPEG"; //625 lines
-        case  9 : return "PCM"; //24-bit
-        case 10 : return "PCM"; //16-bit
-        case 11 : return "MPEG Video"; //525 lines
-        case 12 : return "MPEG Video"; //625 lines
-        case 13 : return "DV"; //25 Mbps, 525 lines
-        case 14 : return "DV"; //25 Mbps, 625 lines
-        case 15 : return "DV"; //50 Mbps, 525 lines
-        case 16 : return "DV"; //50 Mbps, 625 lines
-        case 17 : return "AC-3"; //16-bit
-        case 18 : return "SMPTE 338M, table 1, data type 28"; //SMPTE 338M, table 1, data type 28
-        case 20 : return "MPEG Video"; //HD, Main Profile at High Level
-        case 22 : return "MPEG Video"; //525 lines
-        case 23 : return "MPEG Video"; //625 lines
-        case 25 : return "DV"; //DVCPRO HD
-        default : return "";
-    }
-}
-
-//---------------------------------------------------------------------------
 double Gxf_FrameRate(int32u Content)
 {
     switch (Content)
@@ -197,19 +172,6 @@ static int32u Gxf_LinesPerFrame_Height(int32u Content)
         case 2 : return  576;
         case 4 : return 1080;
         case 6 : return  720;
-        default: return    0;
-    }
-}
-
-//---------------------------------------------------------------------------
-static int32u Gxf_LinesPerFrame_Width(int32u Content)
-{
-    switch (Content)
-    {
-        case 1 : return  720;
-        case 2 : return  720;
-        case 4 : return 1920;
-        case 6 : return 1080;
         default: return    0;
     }
 }

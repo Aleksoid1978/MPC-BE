@@ -922,16 +922,16 @@ void File_Ac3::Streams_Fill()
         Fill(Stream_Audio, 0, "bsid", bsid_Max);
 
         Fill(Stream_Audio, 0, "dialnorm", FirstFrame_Dolby.dialnorm==0?-31:-FirstFrame_Dolby.dialnorm);
-        (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dialnorm"), Info_Options)=__T("N NT");
+        Fill_SetOptions(Stream_Audio, 0, "dialnorm", "N NT");
         Fill(Stream_Audio, 0, "dialnorm/String", Ztring::ToZtring(FirstFrame_Dolby.dialnorm==0?-31:-FirstFrame_Dolby.dialnorm)+__T(" dB"));
-        (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dialnorm/String"), Info_Options)=__T("N NT");
+        Fill_SetOptions(Stream_Audio, 0, "dialnorm/String", "N NT");
         if (FirstFrame_Dolby.compre)
         {
             float64 Value=AC3_compr[FirstFrame_Dolby.compr>>4]+20*std::log10(((float)(0x10+(FirstFrame_Dolby.compr&0x0F)))/32);
             Fill(Stream_Audio, 0, "compr", Value, 2);
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("compr"), Info_Options)=__T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "compr", "N NT");
             Fill(Stream_Audio, 0, "compr/String", Ztring::ToZtring(Value, 2)+__T(" dB"));
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("compr/String"), Info_Options)=__T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "compr/String", "N NT");
         }
         if (FirstFrame_Dolby.dynrnge)
         {
@@ -941,9 +941,9 @@ void File_Ac3::Streams_Fill()
             else
                 Value=AC3_dynrng[FirstFrame_Dolby.dynrng>>5]+20*std::log10(((float)(0x20+(FirstFrame_Dolby.dynrng&0x1F)))/64);
             Fill(Stream_Audio, 0, "dynrng", Value, 2);
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dynrng"), Info_Options)=__T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dynrng", "N NT");
             Fill(Stream_Audio, 0, "dynrng/String", Ztring::ToZtring(Value, 2)+__T(" dB"));
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dynrng/String"), Info_Options)=__T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dynrng/String", "N NT");
         }
 
         for (int8u Pos=0; Pos<8; Pos++)
@@ -956,15 +956,15 @@ void File_Ac3::Streams_Fill()
                     if (acmod_Max[Pos][Pos2]==2)
                     {
                         Fill(Stream_Audio, 0, "dsurmod", dsurmod_Max[Pos][Pos2]);
-                        (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dsurmod"), Info_Options)=__T("N NT");
+                        Fill_SetOptions(Stream_Audio, 0, "dsurmod", "N NT");
                         Fill(Stream_Audio, 0, "dsurmod/String", AC3_Surround[dsurmod_Max[Pos][Pos2]]);
-                        (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dsurmod/String"), Info_Options)=__T("N NT");
+                        Fill_SetOptions(Stream_Audio, 0, "dsurmod/String", "N NT");
                     }
-                    (*Stream_More)[Stream_Audio][0](Ztring().From_Local("bsid"), Info_Options)=__T("N NT");
+                    Fill_SetOptions(Stream_Audio, 0, "bsid", "N NT");
                     Fill(Stream_Audio, 0, "acmod", acmod_Max[Pos][Pos2]);
-                    (*Stream_More)[Stream_Audio][0](Ztring().From_Local("acmod"), Info_Options)=__T("N NT");
+                    Fill_SetOptions(Stream_Audio, 0, "acmod", "N NT");
                     Fill(Stream_Audio, 0, "lfeon", (lfeon_Max[Pos][Pos2])?1:0);
-                    (*Stream_More)[Stream_Audio][0](Ztring().From_Local("lfeon"), Info_Options)=__T("N NT");
+                    Fill_SetOptions(Stream_Audio, 0, "lfeon", "N NT");
                 }
             }
     }
@@ -1018,19 +1018,19 @@ void File_Ac3::Streams_Finish()
         {
             float64 Average_dB = log10(Sum_Intensity / Count) * 10;
             Fill(Stream_Audio, 0, "dialnorm_Average", Average_dB, 0);
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dialnorm_Average"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dialnorm_Average", "N NT");
             Fill(Stream_Audio, 0, "dialnorm_Average/String", Ztring::ToZtring(Average_dB, 0) + __T(" dB"));
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dialnorm_Average/String"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dialnorm_Average/String", "N NT");
             Fill(Stream_Audio, 0, "dialnorm_Minimum", -Minimum_Raw);
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dialnorm_Minimum"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dialnorm_Minimum", "N NT");
             Fill(Stream_Audio, 0, "dialnorm_Minimum/String", Ztring::ToZtring(-Minimum_Raw) + __T(" dB"));
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dialnorm_Minimum/String"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dialnorm_Minimum/String", "N NT");
             Fill(Stream_Audio, 0, "dialnorm_Maximum", -Maximum_Raw);
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dialnorm_Maximum"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dialnorm_Maximum", "N NT");
             Fill(Stream_Audio, 0, "dialnorm_Maximum/String", Ztring::ToZtring(-Maximum_Raw) + __T(" dB"));
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dialnorm_Maximum/String"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dialnorm_Maximum/String", "N NT");
             Fill(Stream_Audio, 0, "dialnorm_Count", Count);
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dialnorm_Count"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dialnorm_Count", "N NT");
         }
     }
     if (!comprs.empty())
@@ -1054,19 +1054,19 @@ void File_Ac3::Streams_Finish()
         {
             float64 Average_dB = log10(Sum_Intensity / Count) * 10;
             Fill(Stream_Audio, 0, "compr_Average", Average_dB, 2);
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("compr_Average"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "compr_Average", "N NT");
             Fill(Stream_Audio, 0, "compr_Average/String", Ztring::ToZtring(Average_dB, 2) + __T(" dB"));
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("compr_Average/String"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "compr_Average/String", "N NT");
             Fill(Stream_Audio, 0, "compr_Minimum", Minimum_dB, 2);
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("compr_Minimum"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "compr_Minimum", "N NT");
             Fill(Stream_Audio, 0, "compr_Minimum/String", Ztring::ToZtring(Minimum_dB, 2) + __T(" dB"));
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("compr_Minimum/String"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "compr_Minimum/String", "N NT");
             Fill(Stream_Audio, 0, "compr_Maximum", Maximum_dB, 2);
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("compr_Maximum"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "compr_Maximum", "N NT");
             Fill(Stream_Audio, 0, "compr_Maximum/String", Ztring::ToZtring(Maximum_dB, 2) + __T(" dB"));
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("compr_Maximum/String"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "compr_Maximum/String", "N NT");
             Fill(Stream_Audio, 0, "compr_Count", Count);
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("compr_Count"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "compr_Count", "N NT");
         }
     }
     if (dynrnge_Exists && !dynrngs.empty())
@@ -1094,19 +1094,19 @@ void File_Ac3::Streams_Finish()
         {
             float64 Average_dB = log10(Sum_Intensity / Count) * 10;
             Fill(Stream_Audio, 0, "dynrng_Average", Average_dB, 2);
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dynrng_Average"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dynrng_Average", "N NT");
             Fill(Stream_Audio, 0, "dynrng_Average/String", Ztring::ToZtring(Average_dB, 2) + __T(" dB"));
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dynrng_Average/String"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dynrng_Average/String", "N NT");
             Fill(Stream_Audio, 0, "dynrng_Minimum", Minimum_dB, 2);
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dynrng_Minimum"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dynrng_Minimum", "N NT");
             Fill(Stream_Audio, 0, "dynrng_Minimum/String", Ztring::ToZtring(Minimum_dB, 2) + __T(" dB"));
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dynrng_Minimum/String"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dynrng_Minimum/String", "N NT");
             Fill(Stream_Audio, 0, "dynrng_Maximum", Maximum_dB, 2);
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dynrng_Maximum"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dynrng_Maximum", "N NT");
             Fill(Stream_Audio, 0, "dynrng_Maximum/String", Ztring::ToZtring(Maximum_dB, 2) + __T(" dB"));
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dynrng_Maximum/String"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dynrng_Maximum/String", "N NT");
             Fill(Stream_Audio, 0, "dynrng_Count", Count);
-            (*Stream_More)[Stream_Audio][0](Ztring().From_Local("dynrng_Count"), Info_Options) = __T("N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dynrng_Count", "N NT");
         }
     }
 

@@ -48,21 +48,6 @@ static const char*  Dv_sct[]=
 };
 
 //---------------------------------------------------------------------------
-static const char* Dv_Ssyb_Pc0(int8u Pc0)
-{
-    switch (Pc0)
-    {
-        case 0x13 : return "Timecode";
-        case 0x14 : return "Binary group";
-        case 0x50 :
-        case 0x60 : return "Source";
-        case 0x51 :
-        case 0x61 : return "Source control";
-        default   : return "";
-    }
-}
-
-//---------------------------------------------------------------------------
 static const char*  Dv_Disp[]=
 {
     "4/3",                              //S306M, S314M

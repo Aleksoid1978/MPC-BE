@@ -537,6 +537,9 @@
 #if !defined(MEDIAINFO_MULTI_NO) && !defined(MEDIAINFO_UMF_NO) && !defined(MEDIAINFO_UMF_YES)
     #define MEDIAINFO_UMF_YES
 #endif
+#if !defined(MEDIAINFO_MULTI_NO) && !defined(MEDIAINFO_VBI_NO) && !defined(MEDIAINFO_VBI_YES)
+    #define MEDIAINFO_VBI_YES
+#endif
 #if !defined(MEDIAINFO_MULTI_NO) && !defined(MEDIAINFO_WM_NO) && !defined(MEDIAINFO_WM_YES)
     #define MEDIAINFO_WM_YES
 #endif

@@ -58,7 +58,6 @@ File_Teletext::File_Teletext()
         FromMpegPs=false;
         Parser=NULL;
     #endif
-    IsSubtitle=false;
 
     //Stream
     Stream_HasChanged=0;
@@ -117,9 +116,9 @@ void File_Teletext::Streams_Finish()
     else
         for (streams::iterator Stream = Streams.begin(); Stream != Streams.end(); ++Stream)
         {
-            Stream_Prepare(IsSubtitle?Stream_Text:Stream_Other);
+            Stream_Prepare(Stream->second.IsSubtitle?Stream_Text:Stream_Other);
             Fill(StreamKind_Last, StreamPos_Last, General_ID, Ztring::ToZtring(Stream->first, 16));
-            Fill(StreamKind_Last, StreamPos_Last, "Format", IsSubtitle?"Teletext Subtitle":"Teletext");
+            Fill(StreamKind_Last, StreamPos_Last, "Format", Stream->second.IsSubtitle?"Teletext Subtitle":"Teletext");
         }
 }
 
@@ -275,7 +274,7 @@ void File_Teletext::Read_Buffer_Continue()
                     {
                         Parser=new File_Teletext();
                         Parser->MustSynchronize=false;
-                        Parser->IsSubtitle=data_unit_id==0x03;
+                        //Parser->IsSubtitle=data_unit_id==0x03; //Not needed, there is a Subtitle flag in Teletext directly
                         Parser->Teletexts=Teletexts;
                         Open_Buffer_Init(Parser);
                         Parser->Accept(); //Force to be accepted because there is no other synchronization layer (MustSynchronize set to false)
@@ -573,6 +572,9 @@ void File_Teletext::Header_Parse()
             HasChanged();
             Stream_HasChanged=0;
         }
+
+        if (C[6] && PageNumber!=0xFF)
+            Streams[(X<<8)|PageNumber].IsSubtitle=true;
 
         if (C[4] && PageNumber!=0xFF)
         {
