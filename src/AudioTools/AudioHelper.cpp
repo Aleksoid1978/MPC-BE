@@ -77,11 +77,11 @@ inline static void convert_int32_to_float_sse2(float* pOut, int32_t* pIn, const 
 inline static void convert_float_to_int24_sse2(BYTE* pOut, float* pIn, const size_t allsamples)
 {
 	size_t k = 0;
-	if (allsamples > 7) {
+	if (allsamples > 3) {
 		__m128  __tmpIn  = _mm_setzero_ps();
 		__m128i __tmpOut = _mm_setzero_si128();
 
-		for (; k < allsamples - 7; k += 4) {
+		for (; k < allsamples - 3; k += 4) {
 			__tmpIn  = _mm_loadu_ps(&pIn[k]);                                   // in = pIn
 			__tmpIn  = _mm_min_ps(_mm_max_ps(__tmpIn, __32bitMax), __32bitMin); // in = min(max(in, -1.0f), 24MAX)
 			__tmpIn  = _mm_mul_ps(__tmpIn, __32bitScalar);                      // in = in * INT32_PEAK
@@ -110,11 +110,11 @@ inline static void convert_float_to_int24_sse2(BYTE* pOut, float* pIn, const siz
 inline static void convert_int24_to_float_sse2(float* pOut, BYTE* pIn, const size_t allsamples)
 {
 	size_t k = 0;
-	if (allsamples > 7) {
+	if (allsamples > 3) {
 		__m128i __tmpIn  = _mm_setzero_si128();
 		__m128  __tmpOut = _mm_setzero_ps();
 
-		for (; k < allsamples - 7; k += 4) {
+		for (; k < allsamples - 3; k += 4) {
 			__tmpIn = _mm_setr_epi32(GETINT(0), GETINT(1),     // in = pIn
 									 GETINT(2), GETINT(3));
 			__tmpIn = _mm_sll_epi32(__tmpIn, __shift);         // in << 8
