@@ -99,9 +99,11 @@ void avpriv_copy_bits(PutBitContext *pb, const uint8_t *src, int length)
     case 2:                                                 \
         v = *(const uint16_t *)ptr;                         \
         break;                                              \
-    default:                                                \
+    case 4:                                                 \
         v = *(const uint32_t *)ptr;                         \
         break;                                              \
+    default:                                                \
+        av_assert1(0);                                      \
     }                                                       \
 }
 
@@ -264,7 +266,7 @@ static int build_table(VLC *vlc, int table_nb_bits, int nb_codes,
    'bits' or 'codes' tables.
 
    'xxx_size' : gives the number of bytes of each entry of the 'bits'
-   or 'codes' tables.
+   or 'codes' tables. Currently 1,2 and 4 are supported.
 
    'wrap' and 'size' make it possible to use any memory configuration and types
    (byte/word/long) to store the 'bits', 'codes', and 'symbols' tables.
