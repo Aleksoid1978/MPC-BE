@@ -352,14 +352,17 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 				int hsize = GETDWORD(pAVCtx->extradata + 4);
 				if (hsize >= 32 && pAVCtx->extradata[8] == 7) {
 					switch (pAVCtx->extradata[9]) {
-					case 0x65: pAVCtx->pix_fmt = AV_PIX_FMT_GBRP;     break;
-					case 0x66: pAVCtx->pix_fmt = AV_PIX_FMT_GBRAP;    break;
-					case 0x67: pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P;  break;
-					case 0x68: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;  break;
-					case 0x69: pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;  break;
-					case 0x6a: pAVCtx->pix_fmt = AV_PIX_FMT_YUVA444P; break;
-					case 0x6b: pAVCtx->pix_fmt = AV_PIX_FMT_GRAY8;    break;
-					}
+					case 0x65: pAVCtx->pix_fmt = AV_PIX_FMT_GBRP;      break;
+					case 0x66: pAVCtx->pix_fmt = AV_PIX_FMT_GBRAP;     break;
+					case 0x67: pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P;   break;
+					case 0x68: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;   break;
+					case 0x69: pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;   break;
+					case 0x6a: pAVCtx->pix_fmt = AV_PIX_FMT_YUVA444P;  break;
+					case 0x6b: pAVCtx->pix_fmt = AV_PIX_FMT_GRAY8;     break;
+					case 0x6c: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10; break;
+					case 0x6d: pAVCtx->pix_fmt = AV_PIX_FMT_GBRP10;    break;
+					case 0x6e: pAVCtx->pix_fmt = AV_PIX_FMT_GBRAP10;   break;
+					case 0x73: pAVCtx->pix_fmt = AV_PIX_FMT_GRAY10;    break;
 				}
 			}
 			else if (pAVCtx->extradata_size >= 8) {

@@ -358,6 +358,24 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('UNMC'):
 					mt.subtype = FOURCCMap(pbmi->biCompression = FCC('H264'));
 					break;
+				case FCC('MAGY'):
+				case FCC('M8RG'):
+				case FCC('M8RA'):
+				case FCC('M8G0'):
+				case FCC('M8Y0'):
+				case FCC('M8Y2'):
+				case FCC('M8Y4'):
+				case FCC('M8YA'):
+				//case FCC('M0RG'):
+				//case FCC('M0RA'):
+				//case FCC('M0G0'):
+				//case FCC('M0Y2'):
+				//case FCC('M2RG'):
+				//case FCC('M2RA'):
+				//case FCC('M4RG'):
+				//case FCC('M4RA'):
+					mt.subtype = FOURCCMap(FCC('MAGY'));
+					break;
 				case FCC('DXSB'):
 				case FCC('DXSA'):
 					label = L"XSub";
