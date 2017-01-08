@@ -366,10 +366,10 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('M8Y2'):
 				case FCC('M8Y4'):
 				case FCC('M8YA'):
-				//case FCC('M0RG'):
-				//case FCC('M0RA'):
-				//case FCC('M0G0'):
-				//case FCC('M0Y2'):
+				case FCC('M0RG'):
+				case FCC('M0RA'):
+				case FCC('M0G0'):
+				case FCC('M0Y2'):
 				//case FCC('M2RG'):
 				//case FCC('M2RA'):
 				//case FCC('M4RG'):
