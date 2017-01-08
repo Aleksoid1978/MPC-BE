@@ -24,7 +24,9 @@
  * JPEG 2000 decoder using libopenjpeg
  */
 
+// ==> Start patch MPC
 #define  OPJ_STATIC
+// ==> End patch MPC
 
 #include "libavutil/common.h"
 #include "libavutil/imgutils.h"
@@ -548,6 +550,8 @@ static int libopenjpeg_decode_frame(AVCodecContext *avctx,
     }
 
     *got_frame = 1;
+    picture->pict_type = AV_PICTURE_TYPE_I;
+    picture->key_frame = 1;
     ret        = buf_size;
 
 done:
