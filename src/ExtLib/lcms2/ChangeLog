@@ -5,13 +5,13 @@
 
 Changed ChangeLog direction
 Fixed many typos in comments, thanks to Stefan Weil for doing that.
-Fixed localization bug, added a new test case crayons.icc thnaks to Richard Hughes for providing the profile. 
+Fixed localization bug, added a new test case crayons.icc thanks to Richard Hughes for providing the profile. 
 Fixed a bug in optimizer that made some formats (i.e, bits planar) unavailable
 Fixed misalignment problems on Alpha. The compiler does not align strings, and accessing begin of string as a uint16 makes code to fail.
 Added some extra checks to the tools and examples.
-Fix a bug that prevented to read luminance tag
+Fixed a bug that prevented to read luminance tag
 BIG amount of functionality contributed/Sponsored  by Alien Skin Software: TransformStride, copyAlpha, performance plug-ins. Fixes some warnings as well.
-added an extra _ to _stdcall to make it more portable
+Added an extra _ to _stdcall to make it more portable
 Fixed a bug in transicc for named color profiles
 Fixed several compiler warnings
 Added support for Visual Studio 2015

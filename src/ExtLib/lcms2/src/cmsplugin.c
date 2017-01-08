@@ -172,18 +172,19 @@ cmsBool CMSEXPORT  _cmsReadFloat32Number(cmsIOHANDLER* io, cmsFloat32Number* n)
 
     _cmsAssert(io != NULL);
 
-    if (io -> Read(io, &tmp, sizeof(cmsUInt32Number), 1) != 1)
-            return FALSE;
+    if (io->Read(io, &tmp, sizeof(cmsUInt32Number), 1) != 1)
+        return FALSE;
 
     if (n != NULL) {
 
         tmp = _cmsAdjustEndianess32(tmp);
-        *n = *(cmsFloat32Number*) (void*) &tmp;
+        *n = *(cmsFloat32Number*)(void*)&tmp;
+
+        // fpclassify() required by C99
+        return ((fpclassify(*n) == FP_ZERO) || (fpclassify(*n) == FP_NORMAL));
     }
 
-    // fpclassify() required by C99
-    return ((fpclassify(*n) == FP_ZERO) || (fpclassify(*n) == FP_NORMAL));
-    
+    return TRUE;
 }
 
 
@@ -196,10 +197,12 @@ cmsBool CMSEXPORT   _cmsReadUInt64Number(cmsIOHANDLER* io, cmsUInt64Number* n)
     if (io -> Read(io, &tmp, sizeof(cmsUInt64Number), 1) != 1)
             return FALSE;
 
-    if (n != NULL) _cmsAdjustEndianess64(n, &tmp);
+    if (n != NULL) {
 
-    // fpclassify() required by C99
-    return ((fpclassify(*n) == FP_ZERO) || (fpclassify(*n) == FP_NORMAL));
+        _cmsAdjustEndianess64(n, &tmp);
+    }
+
+    return TRUE;
 }
 
 
