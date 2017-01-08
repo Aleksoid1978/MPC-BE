@@ -363,6 +363,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 					case 0x6d: pAVCtx->pix_fmt = AV_PIX_FMT_GBRP10;    break;
 					case 0x6e: pAVCtx->pix_fmt = AV_PIX_FMT_GBRAP10;   break;
 					case 0x73: pAVCtx->pix_fmt = AV_PIX_FMT_GRAY10;    break;
+					}
 				}
 			}
 			else if (pAVCtx->extradata_size >= 8) {
