@@ -33,11 +33,6 @@ public :
     File_SmpteSt0302();
     ~File_SmpteSt0302();
 
-    #if MEDIAINFO_EVENTS
-        int16u pid;
-        int8u  stream_id;
-    #endif // MEDIAINFO_EVENTS
-
 private :
     //Streams management
     void Streams_Accept();

@@ -625,14 +625,14 @@ void File_DolbyE::Streams_Fill()
                 float GuardBand_Before_Initial_Duration=GuardBand_Before_Initial*8/BitRate;
                 Fill(Stream_Audio, StreamPos_Last, "GuardBand_Before", GuardBand_Before_Initial_Duration, 9);
                 Fill(Stream_Audio, StreamPos_Last, "GuardBand_Before/String", Ztring::ToZtring(GuardBand_Before_Initial_Duration*1000000, 0)+Ztring().From_UTF8(" \xC2xB5s")); //0xC2 0xB5 = micro sign
-                (*Stream_More)[Stream_Audio][StreamPos_Last](Ztring().From_Local("GuardBand_Before"), Info_Options)=__T("N NT");
-                (*Stream_More)[Stream_Audio][StreamPos_Last](Ztring().From_Local("GuardBand_Before/String"), Info_Options)=__T("N NT");
+                Fill_SetOptions(Stream_Audio, StreamPos_Last, "GuardBand_Before", "N NT");
+                Fill_SetOptions(Stream_Audio, StreamPos_Last, "GuardBand_Before/String", "N NT");
 
                 float GuardBand_After_Initial_Duration=GuardBand_After_Initial*8/BitRate;
                 Fill(Stream_Audio, StreamPos_Last, "GuardBand_After", GuardBand_After_Initial_Duration, 9);
                 Fill(Stream_Audio, StreamPos_Last, "GuardBand_After/String", Ztring::ToZtring(GuardBand_After_Initial_Duration*1000000, 0)+Ztring().From_UTF8(" \xC2xB5s")); //0xC2 0xB5 = micro sign
-                (*Stream_More)[Stream_Audio][StreamPos_Last](Ztring().From_Local("GuardBand_After"), Info_Options)=__T("N NT");
-                (*Stream_More)[Stream_Audio][StreamPos_Last](Ztring().From_Local("GuardBand_After/String"), Info_Options)=__T("N NT");
+                Fill_SetOptions(Stream_Audio, StreamPos_Last, "GuardBand_After", "N NT");
+                Fill_SetOptions(Stream_Audio, StreamPos_Last, "GuardBand_After/String", "N NT");
             }
         }
     }

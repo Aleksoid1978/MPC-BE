@@ -419,22 +419,33 @@ File_Avc::File_Avc()
 //---------------------------------------------------------------------------
 File_Avc::~File_Avc()
 {
-    for (size_t Pos=0; Pos<TemporalReferences.size(); Pos++)
-        delete TemporalReferences[Pos]; //TemporalReferences[Pos]=NULL;
+    Clean_Temp_References();
     #if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
         delete GA94_03_Parser; //GA94_03_Parser=NULL;
     #endif //defined(MEDIAINFO_DTVCCTRANSPORT_YES)
-
-    for (size_t Pos=0; Pos<seq_parameter_sets.size(); Pos++)
-        delete seq_parameter_sets[Pos]; //TemporalReferences[Pos]=NULL;
-
-    for (size_t Pos=0; Pos<subset_seq_parameter_sets.size(); Pos++)
-        delete subset_seq_parameter_sets[Pos]; //TemporalReferences[Pos]=NULL;
-
-    for (size_t Pos=0; Pos<pic_parameter_sets.size(); Pos++)
-        delete pic_parameter_sets[Pos]; //TemporalReferences[Pos]=NULL;
+     Clean_Seq_Parameter();
 }
 
+//---------------------------------------------------------------------------
+void File_Avc::Clean_Temp_References()
+{
+    for (size_t Pos = 0; Pos<TemporalReferences.size(); Pos++)
+        delete TemporalReferences[Pos]; //TemporalReferences[Pos]=NULL;
+    TemporalReferences.clear();
+}
+//---------------------------------------------------------------------------
+void File_Avc::Clean_Seq_Parameter()
+{
+    for (size_t Pos = 0; Pos<seq_parameter_sets.size(); Pos++)
+        delete seq_parameter_sets[Pos]; //TemporalReferences[Pos]=NULL;
+    seq_parameter_sets.clear();
+    for (size_t Pos = 0; Pos<subset_seq_parameter_sets.size(); Pos++)
+        delete subset_seq_parameter_sets[Pos]; //subset_seq_parameter_sets[Pos]=NULL;
+    subset_seq_parameter_sets.clear();
+    for (size_t Pos = 0; Pos<pic_parameter_sets.size(); Pos++)
+        delete pic_parameter_sets[Pos]; //pic_parameter_sets[Pos]=NULL;
+    pic_parameter_sets.clear();
+}
 //***************************************************************************
 // AVC-Intra hardcoded headers
 //***************************************************************************
@@ -1362,9 +1373,7 @@ void File_Avc::Read_Buffer_SegmentChange()
 void File_Avc::Read_Buffer_Unsynched()
 {
     //Temporal references
-    for (size_t Pos=0; Pos<TemporalReferences.size(); Pos++)
-        delete TemporalReferences[Pos]; //TemporalReferences[Pos]=NULL;
-    TemporalReferences.clear();
+    Clean_Temp_References();
     delete TemporalReferences_DelayedElement; TemporalReferences_DelayedElement=NULL;
     TemporalReferences_Min=0;
     TemporalReferences_Max=0;
@@ -1400,9 +1409,7 @@ void File_Avc::Read_Buffer_Unsynched()
     }
     else
     {
-        seq_parameter_sets.clear();
-        subset_seq_parameter_sets.clear();
-        pic_parameter_sets.clear();
+        Clean_Seq_Parameter();
     }
 
     //Status
@@ -1899,7 +1906,8 @@ void File_Avc::slice_header()
 
     //Parsing
     int32u  slice_type, pic_order_cnt_lsb=(int32u)-1;
-    int32u  first_mb_in_slice, pic_parameter_set_id, frame_num, num_ref_idx_l0_active_minus1, num_ref_idx_l1_active_minus1, disable_deblocking_filter_idc, num_slice_groups_minus1, slice_group_map_type;
+    int32u  first_mb_in_slice, pic_parameter_set_id, frame_num, num_ref_idx_l0_active_minus1, num_ref_idx_l1_active_minus1, disable_deblocking_filter_idc;
+
     int32s  delta_pic_order_cnt_bottom=0;
     bool    field_pic_flag=false, bottom_field_flag=false;
     Get_UE (first_mb_in_slice,                                  "first_mb_in_slice");
@@ -2062,10 +2070,6 @@ void File_Avc::slice_header()
             Skip_SE(                                           "slice_beta_offset_div2");
         }
     }
-    num_slice_groups_minus1=(*pic_parameter_set_Item)->num_slice_groups_minus1; //Default
-    slice_group_map_type=(*pic_parameter_set_Item)->slice_group_map_type; //Default
-    //if (num_slice_groups_minus1 > 0 && slice_group_map_type >=3 && slice_group_map_type <=5)
-    //    Get_BS ((*seq_parameter_set_Item)->log2_max_slice_group_change_cycle_minus4+4, slice_group_change_cycle, "slice_group_change_cycle");
 
     Element_End0();
 
@@ -2259,13 +2263,14 @@ void File_Avc::slice_header()
                         {
                             if ((Pos%2)==0)
                                 PictureTypes_PreviousFrames+=Avc_slice_type[TemporalReferences[Pos]->slice_type];
+                            delete TemporalReferences[Pos];
+                            TemporalReferences[Pos] = NULL;
                         }
                         else if (!PictureTypes_PreviousFrames.empty()) //Only if stream already started
                         {
                             if ((Pos%2)==0)
                                 PictureTypes_PreviousFrames+=' ';
                         }
-                        delete TemporalReferences[Pos];
                     }
                     if (PictureTypes_PreviousFrames.size()>=8*TemporalReferences.size())
                         PictureTypes_PreviousFrames.erase(PictureTypes_PreviousFrames.begin(), PictureTypes_PreviousFrames.begin()+PictureTypes_PreviousFrames.size()-TemporalReferences.size());
@@ -3804,7 +3809,6 @@ void File_Avc::vui_parameters(seq_parameter_set_struct::vui_parameters_struct* &
 {
     //Parsing
     seq_parameter_set_struct::vui_parameters_struct::xxl *NAL=NULL, *VCL=NULL;
-    seq_parameter_set_struct::vui_parameters_struct::bitstream_restriction_struct* bitstream_restriction=NULL;
     int32u  num_units_in_tick=(int32u)-1, time_scale=(int32u)-1;
     int16u  sar_width=(int16u)-1, sar_height=(int16u)-1;
     int8u   aspect_ratio_idc=0, video_format=5, video_full_range_flag = 0, colour_primaries=2, transfer_characteristics=2, matrix_coefficients=2;
@@ -3856,17 +3860,12 @@ void File_Avc::vui_parameters(seq_parameter_set_struct::vui_parameters_struct* &
         Skip_UE(                                                "log2_max_mv_length_vertical");
         Get_UE (max_num_reorder_frames,                         "max_num_reorder_frames");
         Skip_UE(                                                "max_dec_frame_buffering");
-        if (max_num_reorder_frames<256)
-            bitstream_restriction=new seq_parameter_set_struct::vui_parameters_struct::bitstream_restriction_struct(
-                                                                                                                    (int8u)max_num_reorder_frames
-                                                                                                                   );
     TEST_SB_END();
 
     FILLING_BEGIN();
         vui_parameters_Item_=new seq_parameter_set_struct::vui_parameters_struct(
                                                                                     NAL,
                                                                                     VCL,
-                                                                                    bitstream_restriction,
                                                                                     num_units_in_tick,
                                                                                     time_scale,
                                                                                     sar_width,
@@ -3887,7 +3886,6 @@ void File_Avc::vui_parameters(seq_parameter_set_struct::vui_parameters_struct* &
     FILLING_ELSE();
         delete NAL;
         delete VCL;
-        delete bitstream_restriction;
     FILLING_END();
 }
 

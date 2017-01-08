@@ -127,26 +127,6 @@ static const char* MpegPs_stream_id(int8u Element_Name)
 }
 
 //---------------------------------------------------------------------------
-static const char* MpegPs_Codec(int8u Element_Name)
-{
-         if (Element_Name>=0xC0
-          && Element_Name<=0xDF) return "MPEG-A";
-    else if (Element_Name>=0xE0
-          && Element_Name<=0xEF) return "MPEG-V";
-    else                         return "";
-}
-
-//---------------------------------------------------------------------------
-static int32u MpegPs_Default_stream_type(int8u Element_Name, int8u Mpeg_Version)
-{
-         if (Element_Name>=0xC0
-          && Element_Name<=0xDF) return Mpeg_Version==0x02?0x04:0x03;
-    else if (Element_Name>=0xE0
-          && Element_Name<=0xEF) return Mpeg_Version==0x02?0x02:0x01;
-    else                         return 0x00;
-}
-
-//---------------------------------------------------------------------------
 static const char* MpegPs_trick_mode_control_values[8]=
 {
     "Fast forward",

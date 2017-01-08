@@ -42,12 +42,18 @@ class HashWrapper
 public:
     enum HashFunction
     {
+#if MEDIAINFO_MD5
         MD5,
+#endif
+#if MEDIAINFO_SHA1
         SHA1,
+#endif
+#if MEDIAINFO_SHA2
         SHA224,
         SHA256,
         SHA384,
         SHA512,
+#endif
         HashFunction_Max,
     };
     typedef bitset<HashFunction_Max> HashFunctions;
@@ -65,7 +71,7 @@ public:
 
 private:
     void    Init(const HashFunctions &Functions);
-    void*   m;
+    void*   m[HashFunction_Max];
 };
 
 } //NameSpace

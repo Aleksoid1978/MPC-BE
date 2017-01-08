@@ -813,8 +813,7 @@ void File_Mpeg4_Descriptors::Descriptor_05()
                             std::string Data_Raw((const char*)(Buffer+Buffer_Offset), (size_t)Element_Size);
                             std::string Data_Base64(Base64::encode(Data_Raw));
                             Parser->Fill(KindOfStream, PosOfStream, "Demux_InitBytes", Data_Base64);
-                            if (PosOfStream<(*Parser->Stream_More)[KindOfStream].size())
-                                (*Parser->Stream_More)[KindOfStream][PosOfStream](Ztring().From_Local("Demux_InitBytes"), Info_Options)=__T("N NT");
+                            Parser->Fill_SetOptions(KindOfStream, PosOfStream, "Demux_InitBytes", "N NT");
                             }
                             break;
                 default :   ;

@@ -1185,7 +1185,7 @@ void File__ReferenceFilesHelper::ParseReference_Finalize_PerStream ()
     {
         ID_Base=Ztring::ToZtring(ID_Max+Sequences[Sequences_Current]->StreamID-1);
         MI->Fill(StreamKind_Last, StreamPos_To, "SideCar_FilePos", Sequences[Sequences_Current]->StreamID-1);
-        (*MI->Stream_More)[StreamKind_Last][StreamPos_To](Ztring().From_Local("SideCar_FilePos"), Info_Options)=__T("N NT");
+        MI->Fill_SetOptions(StreamKind_Last, StreamPos_To, "SideCar_FilePos", "N NT");
     }
     else if (Sequences[Sequences_Current]->StreamID!=(int64u)-1)
         ID_Base=Ztring::ToZtring(Sequences[Sequences_Current]->StreamID);
@@ -1507,20 +1507,20 @@ void File__ReferenceFilesHelper::List_Compute()
                         MI->Fill(StreamKind_Target, StreamPos_Target, "Source", Temp);
                     }
                     MI->Fill(StreamKind_Target, StreamPos_Target, ("Source_"+Hash_Name+"_Generated").c_str(), Sequences[Sequences_Current]->MI->Get(Stream_General, 0, Hash_NameU+__T("_Generated")));
-                    (*MI->Stream_More)[StreamKind_Target][StreamPos_Target](Ztring().From_Local("Source_"+Hash_Name+"_Generated"), Info_Options)=__T("N NT");
+                    MI->Fill_SetOptions(StreamKind_Target, StreamPos_Target, ("Source_"+Hash_Name+"_Generated").c_str(), "N NT");
                 }
                 MI->Fill(StreamKind_Target, StreamPos_Target, ("Source_List_"+Hash_Name+"_Generated").c_str(), Sequences[Sequences_Current]->MI->Get(Stream_General, 0, Hash_NameU+__T("_Generated")));
-                (*MI->Stream_More)[StreamKind_Target][StreamPos_Target](Ztring().From_Local("Source_List_"+Hash_Name+"_Generated"), Info_Options)=__T("N NT");
+                MI->Fill_SetOptions(StreamKind_Target, StreamPos_Target, ("Source_List_"+Hash_Name+"_Generated").c_str(), "N NT");
             }
             if (!Sequences[Sequences_Current]->MI->Get(Stream_General, 0, __T("Source_List_")+Hash_NameU+__T("_Generated")).empty())
             {
                 MI->Fill(StreamKind_Target, StreamPos_Target, ("Source_List_"+Hash_Name+"_Generated").c_str(), Sequences[Sequences_Current]->MI->Get(Stream_General, 0, __T("Source_List_")+Hash_NameU+__T("_Generated")));
-                (*MI->Stream_More)[StreamKind_Target][StreamPos_Target](Ztring().From_Local("Source_List_"+Hash_Name+"_Generated"), Info_Options)=__T("N NT");
+                MI->Fill_SetOptions(StreamKind_Target, StreamPos_Target, ("Source_List_"+Hash_Name+"_Generated").c_str(), "N NT");
             }
             else if (!Sequences[Sequences_Current]->MI->Get(StreamKind, StreamPos, __T("Source_List_")+Hash_NameU+__T("_Generated")).empty())
             {
                 MI->Fill(StreamKind_Target, StreamPos_Target, ("Source_List_"+Hash_Name+"_Generated").c_str(), Sequences[Sequences_Current]->MI->Get(StreamKind, StreamPos, __T("Source_List_")+Hash_NameU+__T("_Generated")));
-                (*MI->Stream_More)[StreamKind_Target][StreamPos_Target](Ztring().From_Local("Source_List_"+Hash_Name+"_Generated"), Info_Options)=__T("N NT");
+                MI->Fill_SetOptions(StreamKind_Target, StreamPos_Target, ("Source_List_"+Hash_Name+"_Generated").c_str(), "N NT");
             }
             }
         }
@@ -1561,7 +1561,7 @@ void File__ReferenceFilesHelper::List_Compute()
                     MI->Fill(StreamKind_Target, StreamPos_Target, "Source_List", Temp);
                 }
             }
-            (*MI->Stream_More)[StreamKind_Target][StreamPos_Target](Ztring().From_Local("Source_List"), Info_Options)=__T("N NT");
+            MI->Fill_SetOptions(StreamKind_Target, StreamPos_Target, "Source_List", "N NT");
         }
     #endif //MEDIAINFO_ADVANCED
 }
@@ -1863,7 +1863,6 @@ size_t File__ReferenceFilesHelper::Seek (size_t Method, int64u Value, int64u ID)
                         float64 DurationF=Duration;
                         DurationF*=Value;
                         DurationF/=10; // divided by 10000 for 0.01 percentage then x1000 for milliseconds
-                        int64u DurationM=(int64u)DurationF;
 
                         CountOfReferencesToParse=Sequences.size();
                         bool HasProblem=false;

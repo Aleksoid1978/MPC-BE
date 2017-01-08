@@ -310,6 +310,7 @@ File__Analyze::File__Analyze ()
     //Hash
     #if MEDIAINFO_HASH
         Hash=NULL;
+        Hash_Offset=0;
         Hash_ParseUpTo=0;
     #endif //MEDIAINFO_HASH
 
@@ -548,7 +549,19 @@ void File__Analyze::Open_Buffer_Continue (const int8u* ToAdd, size_t ToAdd_Size)
                 delete Hash; Hash=new HashWrapper(Config->File_Hash_Get().to_ulong());
             }
             if (Hash)
-                Hash->Update(ToAdd, ToAdd_Size);
+            {
+                if (File_Offset+Buffer_Size==Hash_Offset)
+                {
+                    Hash->Update(ToAdd, ToAdd_Size);
+                    Hash_Offset+=ToAdd_Size;
+                }
+                else if (Hash_Offset>File_Offset+Buffer_Size && Hash_Offset<File_Offset+Buffer_Size+ToAdd_Size)
+                {
+                    size_t ToAdd_ToHashSize=(size_t)(File_Offset+Buffer_Size+ToAdd_Size-Hash_Offset);
+                    Hash->Update(ToAdd+ToAdd_Size-ToAdd_ToHashSize, ToAdd_ToHashSize);
+                    Hash_Offset+=ToAdd_ToHashSize;
+                }
+            }
         }
     #endif //MEDIAINFO_HASH
 
@@ -590,6 +603,20 @@ void File__Analyze::Open_Buffer_Continue (const int8u* ToAdd, size_t ToAdd_Size)
         }
     #endif //MEDIAINFO_AES
 
+    #if MEDIAINFO_HASH
+        //Hash parsing only
+        if (Hash_ParseUpTo>File_Offset+Buffer_Size+ToAdd_Size)
+        {
+            File_Offset+=ToAdd_Size;
+            return; //No need of this piece of data
+        }
+        if (Hash_ParseUpTo>=File_Offset && Hash_ParseUpTo<=File_Offset+ToAdd_Size)
+        {
+            Buffer_Offset+=(size_t)(Hash_ParseUpTo-File_Offset);
+            Hash_ParseUpTo=0;
+        }
+    #endif //MEDIAINFO_HASH
+
     //Integrity
     if (Status[IsFinished])
         return;
@@ -606,20 +633,6 @@ void File__Analyze::Open_Buffer_Continue (const int8u* ToAdd, size_t ToAdd_Size)
             return; //No need of this piece of data
         }
     }
-
-    #if MEDIAINFO_HASH
-        //Hash parsing only
-        if (Hash_ParseUpTo>File_Offset+Buffer_Size+ToAdd_Size)
-        {
-            File_Offset+=ToAdd_Size;
-            return; //No need of this piece of data
-        }
-        if (Hash_ParseUpTo>File_Offset && Hash_ParseUpTo<=File_Offset+ToAdd_Size)
-        {
-            Buffer_Offset+=(size_t)(Hash_ParseUpTo-File_Offset);
-            Hash_ParseUpTo=0;
-        }
-    #endif //MEDIAINFO_HASH
 
     if (Buffer_Temp_Size) //There is buffered data from before
     {
@@ -679,7 +692,7 @@ void File__Analyze::Open_Buffer_Continue (const int8u* ToAdd, size_t ToAdd_Size)
         if (Hash_ParseUpTo>File_Size)
             Hash_ParseUpTo=File_Size;
 
-        if (Hash && File_Offset+Buffer_Size>=Config->File_Current_Size && Status[IsAccepted])
+        if (Hash && Hash_Offset>=Config->File_Current_Size && Status[IsAccepted])
         {
         for (size_t Hash_Pos=0; Hash_Pos<HashWrapper::HashFunction_Max; ++Hash_Pos)
         {
@@ -691,22 +704,23 @@ void File__Analyze::Open_Buffer_Continue (const int8u* ToAdd, size_t ToAdd_Size)
                 Clear(Stream_General, 0, HashPos.c_str());
             Fill(Stream_General, 0, HashPos.c_str(), Temp);
             if (Config->File_Names_Pos<=1)
-                (*Stream_More)[Stream_General][0](Ztring().From_Local(HashPos), Info_Options)=__T("N NT");
+                Fill_SetOptions(Stream_General, 0, HashPos.c_str(), "N NT");
         }
 
             delete Hash; Hash=NULL;
         }
 
-        if (Hash && File_GoTo!=(int64u)-1)
-        {
-            delete Hash; Hash=NULL; //Hash not possible with a seek
-        }
-
-        if (Hash && Buffer_Offset>Buffer_Size)
+        if (Hash && Buffer_Offset>=Buffer_Size && Hash_Offset>File_Offset+Buffer_Size && Buffer_Offset<Buffer_Size+16*1024*1024)
         {
             //We need the next data
             Hash_ParseUpTo=File_Offset+Buffer_Offset;
             Buffer_Offset=Buffer_Size;
+        }
+        else if (Hash && File_GoTo>Hash_Offset && File_GoTo<Hash_Offset + 16 * 1024 * 1024)
+        {
+            //We need the next data
+            Hash_ParseUpTo=File_GoTo;
+            File_GoTo=Hash_Offset;
         }
     #endif //MEDIAINFO_HASH
 
@@ -2583,51 +2597,6 @@ void File__Analyze::Data_GoToFromEnd (int64u GoToFromEnd, const char* ParserName
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-#if MEDIAINFO_TRACE
-Ztring Log_Offset (int64u OffsetToShow, MediaInfo_Config::trace_Format Config_Trace_Format)
-{
-    Ztring Pos2;
-
-    switch (Config_Trace_Format)
-    {
-        case MediaInfo_Config::Trace_Format_XML        : break;
-        case MediaInfo_Config::Trace_Format_MICRO_XML  : break;
-        default                                         :
-            if (OffsetToShow==(int64u)-1)
-                return __T("         ");
-            int64u Offset=OffsetToShow%0x100000000ULL; //Only 32 bits
-            Ztring Pos1; Pos1.From_Number(Offset, 16);
-            Pos2.resize(8-Pos1.size(), __T('0'));
-            Pos2+=Pos1;
-            Pos2.MakeUpperCase();
-    }
-    switch (Config_Trace_Format)
-    {
-        case MediaInfo_Config::Trace_Format_Tree        : Pos2+=__T(' '); break;
-        case MediaInfo_Config::Trace_Format_CSV         : Pos2+=__T(','); break;
-        case MediaInfo_Config::Trace_Format_XML         : Pos2+=__T("<data");
-                                                          if (OffsetToShow!=(int64u)-1)
-                                                          {
-                                                               Pos2+=__T(" offset=\"");
-                                                               Pos2+=Ztring().From_Number(OffsetToShow);
-                                                               Pos2+=__T("\"");
-                                                          }
-                                                          break;
-        case MediaInfo_Config::Trace_Format_MICRO_XML   : Pos2+=__T("<");
-                                                          if (OffsetToShow!=(int64u)-1)
-                                                          {
-                                                               Pos2+=__T(" o=\"");
-                                                               Pos2+=Ztring().From_Number(OffsetToShow);
-                                                               Pos2+=__T("\"");
-                                                          }
-                                                          break;
-        default                                         : ;
-    }
-    return Pos2;
-}
-#endif //MEDIAINFO_TRACE
-
-//---------------------------------------------------------------------------
 void File__Analyze::Element_Begin()
 {
     //Level
@@ -2832,9 +2801,6 @@ void File__Analyze::Info(const std::string& Value, size_t Element_Level_Minus)
         return; //Do not display info
 
     //Handling a different level (only Element_Level_Minus to 1 is currently well supported)
-    size_t Element_Level_Final=Element_Level;
-    if (Element_Level_Minus<=Element_Level)
-        Element_Level_Final-=Element_Level_Minus;
 
     if (Config_Trace_Level==0 || !(Trace_Layers.to_ulong()&Config_Trace_Layers.to_ulong()))
         return;
@@ -3030,7 +2996,7 @@ void File__Analyze::Fill ()
     if (File_Size==(int64u)-1 && FrameInfo.PTS!=(int64u)-1 && PTS_Begin!=(int64u)-1 && FrameInfo.PTS-PTS_Begin && StreamKind_Last!=Stream_General && StreamKind_Last!=Stream_Max)
     {
         Fill(StreamKind_Last, 0, "BitRate_Instantaneous", Buffer_TotalBytes*8*1000000000/(FrameInfo.PTS-PTS_Begin));
-        (*Stream_More)[StreamKind_Last][0](Ztring().From_Local("BitRate_Instantaneous"), Info_Options)=__T("N NI");
+        Fill_SetOptions(StreamKind_Last, 0, "BitRate_Instantaneous", "N NI");
     }
 }
 
@@ -3617,9 +3583,6 @@ void File__Analyze::BookMark_Get ()
     }
     if (File_GoTo==(int64u)-1)
     {
-        #if MEDIAINFO_HASH
-            delete Hash; Hash=NULL;
-        #endif //MEDIAINFO_HASH
         File_GoTo=BookMark_GoTo;
     }
 }
@@ -4084,7 +4047,7 @@ void File__Analyze::Ibi_Stream_Finish ()
         if (!IbiText.empty())
         {
             Fill(Stream_General, 0, "IBI", IbiText);
-            (*Stream_More)[Stream_General][0]("IBI", Info_Options)=__T("N NT");
+            Fill_SetOptions(Stream_General, 0, "IBI", "N NT");
         }
     }
 }

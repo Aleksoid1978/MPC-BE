@@ -199,7 +199,6 @@ private :
     void moov_trak_mdia_minf_stbl_stss();
     void moov_trak_mdia_minf_stbl_stsz();
     void moov_trak_mdia_minf_stbl_stts();
-    void moov_trak_mdia_minf_stbl_stts_Common(int32u SampleCount, int32u SampleDuration, int32u Pos=0, int32u NumberOfEntries=1);
     void moov_trak_mdia_minf_stbl_stz2() {moov_trak_mdia_minf_stbl_stsz();}
     void moov_trak_meta() {moov_meta();}
     void moov_trak_meta_hdlr() {moov_meta_hdlr();}
@@ -445,10 +444,12 @@ private :
             size_t          stts_Durations_Pos;
             int64u          stts_FramePos;
         #endif //MEDIAINFO_DEMUX || MEDIAINFO_SEEK
+        void                moov_trak_mdia_minf_stbl_stts_Common(int32u SampleCount, int32u SampleDuration, int32u Pos=0, int32u NumberOfEntries=1);
         #if MEDIAINFO_DEMUX
             bool            PtsDtsAreSame;
             bool            Demux_EventWasSent;
             int32u          CodecID;
+            void            SplitAudio(File_Mpeg4::stream& Video, int32u moov_mvhd_TimeScale);
         #endif //MEDIAINFO_DEMUX
 
         stream()
@@ -532,6 +533,10 @@ private :
         int32u StreamID;
         int32u Reserved1;
         int64u Reserved2;
+        friend bool operator<(const mdat_Pos_Type& l, const mdat_Pos_Type& r)
+        {
+            return l.Offset<r.Offset;
+        }
     };
     typedef std::vector<mdat_Pos_Type> mdat_pos;
     static bool mdat_pos_sort (const File_Mpeg4::mdat_Pos_Type &i,const File_Mpeg4::mdat_Pos_Type &j) { return (i.Offset<j.Offset); }
@@ -541,6 +546,7 @@ private :
     #endif //MEDIAINFO_DEMUX
     mdat_pos mdat_Pos;
     mdat_Pos_Type* mdat_Pos_Temp;
+    mdat_Pos_Type* mdat_Pos_Temp_ToJump;
     mdat_Pos_Type* mdat_Pos_Max;
     std::vector<int32u> mdat_Pos_ToParseInPriority_StreamIDs;
     bool                mdat_Pos_NormalParsing;

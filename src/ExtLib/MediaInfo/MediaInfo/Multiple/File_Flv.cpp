@@ -1078,8 +1078,8 @@ void File_Flv::video_VP6(bool WithAlpha)
     {
         int8u Version, Version2, Width, Height;
         BS_Begin();
-        Get_S1 ( 5, Version,                                    "Version");
-        Get_S1 ( 2, Version2,                                   "Version2");
+        Get_S1 ( 5, Version,                                    "Version"); Param_Info1(Flv_VP6_Version[Version]);
+        Get_S1 ( 2, Version2,                                   "Version2"); Param_Info1(Flv_VP6_Version2[Version2]);
         Skip_SB(                                                "Interlace");
         BS_End();
         if (Marker || Version2==0)
@@ -1199,7 +1199,7 @@ void File_Flv::video_HEVC()
                                         std::string Data_Raw((const char*)(Buffer+Buffer_Offset+2), (size_t)(Element_Size-2));
                                         std::string Data_Base64(Base64::encode(Data_Raw));
                                         Fill(Stream_Video, StreamPos_Last, "Demux_InitBytes", Data_Base64);
-                                        (*Stream_More)[Stream_Video][StreamPos_Last](Ztring().From_Local("Demux_InitBytes"), Info_Options)=__T("N NT");
+                                        Fill_SetOptions(Stream_Video, StreamPos_Last, "Demux_InitBytes", "N NT");
                                         }
                                         break;
                             default :   ;
@@ -1376,7 +1376,7 @@ void File_Flv::audio_AAC()
                                         std::string Data_Raw((const char*)(Buffer+Buffer_Offset+2), (size_t)(Element_Size-2));
                                         std::string Data_Base64(Base64::encode(Data_Raw));
                                         Fill(Stream_Audio, StreamPos_Last, "Demux_InitBytes", Data_Base64);
-                                        (*Stream_More)[Stream_Audio][StreamPos_Last](Ztring().From_Local("Demux_InitBytes"), Info_Options)=__T("N NT");
+                                        Fill_SetOptions(Stream_Audio, StreamPos_Last, "Demux_InitBytes", "N NT");
                                         }
                                         break;
                             default :   ;

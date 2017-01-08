@@ -164,6 +164,7 @@ const File__Analyze::vlc Vc1_ptype[]=
 };
 
 //---------------------------------------------------------------------------
+/*
 static int32u Vc1_bfraction(int8u Size, int32u Value)
 {
     switch (Size)
@@ -204,6 +205,7 @@ static int32u Vc1_bfraction(int8u Size, int32u Value)
         default: return (int32u)-1;
     }
 };
+*/
 
 //***************************************************************************
 // Constructor/Destructor
@@ -562,7 +564,7 @@ bool File_Vc1::Demux_UnpacketizeContainer_Test()
                                 std::string Data_Raw((const char*)(Buffer+Buffer_Offset), (size_t)(Header_End-Buffer_Offset));
                                 std::string Data_Base64(Base64::encode(Data_Raw));
                                 Fill(Stream_Video, StreamPos_Last, "Demux_InitBytes", Data_Base64);
-                                (*Stream_More)[Stream_Video][StreamPos_Last](Ztring().From_Local("Demux_InitBytes"), Info_Options)=__T("N NT");
+                                Fill_SetOptions(Stream_Video, StreamPos_Last, "Demux_InitBytes", "N NT");
                                 }
                                 break;
                     default :   ;
@@ -1035,7 +1037,7 @@ void File_Vc1::EntryPointHeader()
                                 std::string Data_Raw((char*)InitData_Buffer_Temp, InitData_Buffer_Temp_Size);
                                 std::string Data_Base64(Base64::encode(Data_Raw));
                                 Fill(Stream_Video, StreamPos_Last, "Demux_InitBytes", Data_Base64);
-                                (*Stream_More)[Stream_Video][StreamPos_Last](Ztring().From_Local("Demux_InitBytes"), Info_Options)=__T("N NT");
+                                Fill_SetOptions(Stream_Video, StreamPos_Last, "Demux_InitBytes", "N NT");
                                 }
                                 break;
                     default :   ;

@@ -1060,6 +1060,7 @@ public :
         Ztring Parameter;
         Ztring Value;
     };
+    void Fill_SetOptions(stream_t StreamKind, size_t StreamPos, const char* Parameter, const char* Options);
     vector<fill_temp_item> Fill_Temp[Stream_Max+1]; // +1 because Fill_Temp[Stream_Max] is used when StreamKind is unknown
     void Fill_Flush ();
     static size_t Fill_Parameter(stream_t StreamKind, generic StreamPos);
@@ -1387,6 +1388,7 @@ public :
     //Hash
     #if MEDIAINFO_HASH
         HashWrapper*        Hash;
+        int64u              Hash_Offset;
         int64u              Hash_ParseUpTo;
     #endif //MEDIAINFO_HASH
 

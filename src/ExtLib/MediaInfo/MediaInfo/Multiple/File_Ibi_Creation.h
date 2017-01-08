@@ -18,8 +18,6 @@
 //---------------------------------------------------------------------------
 #include "ZenLib/Ztring.h"
 #include <vector>
-#include <map>
-using namespace ZenLib;
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib

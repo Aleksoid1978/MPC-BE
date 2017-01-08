@@ -124,12 +124,12 @@ void File_Eia608::Streams_Fill()
                 ID+='1'+(cc_type*2)+(Pos%2);
                 Fill(Stream_Text, StreamPos_Last, Text_ID, ID);
                 Fill(Stream_Text, StreamPos_Last, "CaptionServiceName", ID);
-                (*Stream_More)[StreamKind_Last][StreamPos_Last](Ztring().From_Local("CaptionServiceName"), Info_Options)=__T("N NT");
+                Fill_SetOptions(StreamKind_Last, StreamKind_Last, "CaptionServiceName", "N NT");
             }
             if (Config->ParseSpeed>=1.0)
             {
                 Fill(Stream_Text, StreamPos_Last, "CaptionServiceContent_IsPresent", DataDetected[Pos+1]?"Yes":"No", Unlimited, true, true); //1 bit per service, starting at 1
-                (*Stream_More)[Stream_Text][StreamPos_Last](Ztring().From_Local("CaptionServiceContent_IsPresent"), Info_Options)=__T("N NT");
+                Fill_SetOptions(Stream_Text, StreamPos_Last, "CaptionServiceContent_IsPresent", "N NT");
             }
             if (ServiceDescriptors)
             {
@@ -139,12 +139,12 @@ void File_Eia608::Streams_Fill()
                     if (Pos==0 && Retrieve(Stream_Text, StreamPos_Last, Text_Language).empty()) //Only CC1/CC3
                         Fill(Stream_Text, StreamPos_Last, Text_Language, ServiceDescriptor->second.language, true);
                     Fill(Stream_Text, StreamPos_Last, "CaptionServiceDescriptor_IsPresent", "Yes", Unlimited, true, true);
-                    (*Stream_More)[Stream_Text][StreamPos_Last](Ztring().From_Local("CaptionServiceDescriptor_IsPresent"), Info_Options)=__T("N NT");
+                    Fill_SetOptions(Stream_Text, StreamPos_Last, "CaptionServiceDescriptor_IsPresent", "N NT");
                 }
                 else //ServiceDescriptors pointer is for the support by the transport layer of the info
                 {
                     Fill(Stream_Text, StreamPos_Last, "CaptionServiceDescriptor_IsPresent", "No", Unlimited, true, true);
-                    (*Stream_More)[Stream_Text][StreamPos_Last](Ztring().From_Local("CaptionServiceDescriptor_IsPresent"), Info_Options)=__T("N NT");
+                    Fill_SetOptions(Stream_Text, StreamPos_Last, "CaptionServiceDescriptor_IsPresent", "N NT");
                 }
             }
         }

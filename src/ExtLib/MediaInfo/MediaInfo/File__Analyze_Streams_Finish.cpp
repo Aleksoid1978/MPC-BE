@@ -290,7 +290,7 @@ void File__Analyze::TestContinuousFileNames(size_t CountOfFiles, Ztring FileExte
                 Temp.erase(0, SourcePath_Size);
                 Fill(Stream_General, 0, "Source_List", Temp);
             }
-            (*Stream_More)[Stream_General][0](Ztring().From_Local("Source_List"), Info_Options)=__T("N NT");
+            Fill_SetOptions(Stream_General, 0, "Source_List", "N NT");
         }
     #endif //MEDIAINFO_ADVANCED
 }

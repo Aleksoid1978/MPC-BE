@@ -1661,6 +1661,7 @@ void File_Mpeg4::mdat_xxxx()
             {
                 stream::stts_durations::iterator stts_Duration=Stream_Temp.stts_Durations.begin()+Stream_Temp.stts_Durations_Pos;
                 int64u stts_Offset=stts_Duration->DTS_Begin+(((int64u)stts_Duration->SampleDuration)*(Frame_Count_NotParsedIncluded-stts_Duration->Pos_Begin));
+                FrameInfo.DTS=Stream_Temp.mdhd_TimeScale?(TimeCode_DtsOffset+stts_Offset*1000000000/Stream_Temp.mdhd_TimeScale):((int64u)-1);
                 if (!Stream_Temp.edts.empty())
                 {
                     int64s Delay=0;
@@ -1684,12 +1685,11 @@ void File_Mpeg4::mdat_xxxx()
                                 break; //TODO: handle more complex Edit Lists
                     }
 
-                    if (-Delay<(int64s)stts_Offset)
-                        stts_Offset+=Delay;
+                    if (FrameInfo.DTS!=(int64u)-1 && -Delay<(int64s)stts_Offset) //TODO: check potential incoherency between movie timescale and track timescale
+                        FrameInfo.DTS+=Delay*1000000000/moov_mvhd_TimeScale;
                     else
-                        stts_Offset=0;
+                        FrameInfo.DTS=TimeCode_DtsOffset;
                 }
-                FrameInfo.DTS=Stream_Temp.mdhd_TimeScale?(TimeCode_DtsOffset+stts_Offset*1000000000/Stream_Temp.mdhd_TimeScale):((int64u)-1);
                 FrameInfo.PTS=Stream_Temp.PtsDtsAreSame?FrameInfo.DTS:(int64u)-1;
                 FrameInfo.DUR=Stream_Temp.mdhd_TimeScale?(((int64u)stts_Duration->SampleDuration)*1000000000/Stream_Temp.mdhd_TimeScale):((int64u)-1);
                 Stream_Temp.stts_FramePos++;
@@ -1880,19 +1880,15 @@ void File_Mpeg4::mdat_xxxx()
 void File_Mpeg4::mdat_StreamJump()
 {
     #if MEDIAINFO_DEMUX
-        if (Config->ParseSpeed==1 && !mdat_Pos.empty())
+        if (Config->ParseSpeed==1 && !mdat_Pos.empty() && !StreamOffset_Jump.empty())
         {
-            int64u ToJump=File_Offset+Buffer_Offset+Element_Size;
-            if (mdat_Pos_Temp!=mdat_Pos_Max)
-                ToJump=mdat_Pos_Temp->Offset;
-            std::map<int64u, int64u>::iterator StreamOffset_Jump_Temp=StreamOffset_Jump.find(ToJump);
+            std::map<int64u, int64u>::iterator StreamOffset_Jump_Temp=StreamOffset_Jump.find(File_Offset+Buffer_Offset+Element_Size);
             if (StreamOffset_Jump_Temp!=StreamOffset_Jump.end())
             {
-                ToJump=StreamOffset_Jump_Temp->second;
                 if (!mdat_Pos.empty())
                 {
                     mdat_Pos_Temp=&mdat_Pos[0];
-                    while (mdat_Pos_Temp<mdat_Pos_Max && mdat_Pos_Temp->Offset!=ToJump)
+                    while (mdat_Pos_Temp<mdat_Pos_Max && mdat_Pos_Temp->Offset!=StreamOffset_Jump_Temp->second)
                         mdat_Pos_Temp++;
                 }
                 else
@@ -1912,8 +1908,12 @@ void File_Mpeg4::mdat_StreamJump()
         if (!Status[IsAccepted])
             Data_Accept("MPEG-4");
         #if MEDIAINFO_HASH
-            if (Config->File_Hash_Get().to_ulong() && (IsSecondPass && mdat_Pos_NormalParsing))
-                Hash_ParseUpTo=ToJump;
+            if (ToJump==File_Size && Config->File_Hash_Get().to_ulong() && (IsSecondPass && mdat_Pos_NormalParsing))
+            {
+                //This is the end of the parsing, jump to the hash position, for hash only up to the end of the file)
+                Hash_ParseUpTo=File_Size;
+                Data_GoTo(Hash_Offset, "MPEG-4"); 
+            }
             else
         #endif //MEDIAINFO_HASH
                 Data_GoTo(ToJump, "MPEG-4"); //Not just after
@@ -2117,8 +2117,10 @@ void File_Mpeg4::moof_traf_trun()
         Stsc.FirstChunk=Stream->second.stsc[Stream->second.stsc.size()-1].FirstChunk+1;
     Stsc.SamplesPerChunk=sample_count;
     Stream->second.stsc.push_back(Stsc);
-    if (!sample_duration_present)
-        moov_trak_mdia_minf_stbl_stts_Common(sample_count, moof_traf_default_sample_duration);
+    FILLING_BEGIN();
+        if (!sample_duration_present)
+            Stream->second.moov_trak_mdia_minf_stbl_stts_Common(sample_count, moof_traf_default_sample_duration);
+    FILLING_END();
     if (!sample_size_present)
         Stream->second.stsz.resize(Stream->second.stsz.size()+sample_count, moof_traf_default_sample_size);
 
@@ -2132,7 +2134,9 @@ void File_Mpeg4::moof_traf_trun()
             int32u sample_duration;
             Get_B4 (sample_duration,                            "sample_duration");
 
-            moov_trak_mdia_minf_stbl_stts_Common(1, sample_duration);
+            FILLING_BEGIN(); 
+                Stream->second.moov_trak_mdia_minf_stbl_stts_Common(1, sample_duration);
+            FILLING_END();
         }
         if (sample_size_present)
         {
@@ -4524,7 +4528,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxSound()
                                     std::string Data_Raw((const char*)(Buffer+Buffer_Offset+Element_Offset-(18+Data_Size)), (size_t)(18+Data_Size));
                                     std::string Data_Base64(Base64::encode(Data_Raw));
                                     Fill(Stream_Audio, StreamPos_Last, "Demux_InitBytes", Data_Base64);
-                                    (*Stream_More)[Stream_Audio][StreamPos_Last](Ztring().From_Local("Demux_InitBytes"), Info_Options)=__T("N NT");
+                                    Fill_SetOptions(Stream_Audio, StreamPos_Last, "Demux_InitBytes", "N NT");
                                     }
                                     break;
                         default :   ;
@@ -5113,7 +5117,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_avcC()
                                     std::string Data_Raw((const char*)(Buffer+Buffer_Offset), (size_t)Element_Size);
                                     std::string Data_Base64(Base64::encode(Data_Raw));
                                     Fill(Stream_Video, StreamPos_Last, "Demux_InitBytes", Data_Base64);
-                                    (*Stream_More)[Stream_Video][StreamPos_Last](Ztring().From_Local("Demux_InitBytes"), Info_Options)=__T("N NT");
+                                    Fill_SetOptions(Stream_Video, StreamPos_Last, "Demux_InitBytes", "N NT");
                                     }
                                     break;
                         default :   ;
@@ -5859,7 +5863,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_hvcC()
                                 std::string Data_Raw((const char*)(Buffer+Buffer_Offset), (size_t)Element_Size);
                                 std::string Data_Base64(Base64::encode(Data_Raw));
                                 Fill(Stream_Video, StreamPos_Last, "Demux_InitBytes", Data_Base64);
-                                (*Stream_More)[Stream_Video][StreamPos_Last](Ztring().From_Local("Demux_InitBytes"), Info_Options)=__T("N NT");
+                                Fill_SetOptions(Stream_Video, StreamPos_Last, "Demux_InitBytes", "N NT");
                                 }
                                 break;
                     default :   ;
@@ -6324,7 +6328,9 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stts()
         Get_B4(SampleCount,                                     "Sample Count");
         Get_B4(SampleDuration,                                  "Sample Duration");
 
-        moov_trak_mdia_minf_stbl_stts_Common(SampleCount, SampleDuration, Pos, NumberOfEntries);
+        FILLING_BEGIN();
+            Streams[moov_trak_tkhd_TrackID].moov_trak_mdia_minf_stbl_stts_Common(SampleCount, SampleDuration, Pos, NumberOfEntries);
+        FILLING_END();
 
         #ifdef MEDIAINFO_DVDIF_ANALYZE_YES
             if (StreamKind_Last==Stream_Video && Retrieve(Stream_Video, StreamPos_Last, "Format")==__T("DV"))
@@ -6371,50 +6377,48 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stts()
     FILLING_END();
 }
 
-void File_Mpeg4::moov_trak_mdia_minf_stbl_stts_Common(int32u SampleCount, int32u SampleDuration, int32u Pos, int32u NumberOfEntries)
+void File_Mpeg4::stream::moov_trak_mdia_minf_stbl_stts_Common(int32u SampleCount, int32u SampleDuration, int32u Pos, int32u NumberOfEntries)
 {
-    FILLING_BEGIN();
-        stream::stts_struct Stts;
-        Stts.SampleCount=SampleCount;
-        Stts.SampleDuration=SampleDuration;
-        Stream->second.stts.push_back(Stts);
-        if (Pos==1 && NumberOfEntries>=2 && NumberOfEntries<=3 && Stream->second.stts_FrameCount==1 && Stts.SampleDuration!=Stream->second.stts_Max && Stream->second.mdhd_TimeScale)
-        {
-            Stream->second.stts_Duration_FirstFrame=Stream->second.stts[0].SampleDuration;
-            Stream->second.stts_Min=Stts.SampleDuration;
-            Stream->second.stts_Max=Stts.SampleDuration;
-        }
-        if (NumberOfEntries>=2 && NumberOfEntries<=3 && Pos+1==NumberOfEntries && Stts.SampleCount==1 && Stream->second.stts_Min==Stream->second.stts_Max && Stts.SampleDuration!=Stream->second.stts_Max && Stream->second.mdhd_TimeScale)
-        {
-            Stream->second.stts_Duration_LastFrame=Stts.SampleDuration;
-        }
-        else
-        {
-            if (Stts.SampleDuration<Stream->second.stts_Min) Stream->second.stts_Min=Stts.SampleDuration;
-            if (Stts.SampleDuration>Stream->second.stts_Max) Stream->second.stts_Max=Stts.SampleDuration;
-        }
-        Stream->second.stts_FrameCount+=Stts.SampleCount;
-        if (Stts.SampleDuration<0x80000000)
-            Stream->second.stts_Duration+=Stts.SampleCount*Stts.SampleDuration;
-        else
-            Stream->second.stts_Duration-=Stts.SampleCount*(((int32u)-1)-Stts.SampleDuration+1); //Negative value
+    stream::stts_struct Stts;
+    Stts.SampleCount=SampleCount;
+    Stts.SampleDuration=SampleDuration;
+    stts.push_back(Stts);
+    if (Pos==1 && NumberOfEntries>=2 && NumberOfEntries<=3 && stts_FrameCount==1 && Stts.SampleDuration!=stts_Max && mdhd_TimeScale)
+    {
+        stts_Duration_FirstFrame=stts[0].SampleDuration;
+        stts_Min=Stts.SampleDuration;
+        stts_Max=Stts.SampleDuration;
+    }
+    if (NumberOfEntries>=2 && NumberOfEntries<=3 && Pos+1==NumberOfEntries && Stts.SampleCount==1 && stts_Min==stts_Max && Stts.SampleDuration!=stts_Max && mdhd_TimeScale)
+    {
+        stts_Duration_LastFrame=Stts.SampleDuration;
+    }
+    else
+    {
+        if (Stts.SampleDuration<stts_Min) stts_Min=Stts.SampleDuration;
+        if (Stts.SampleDuration>stts_Max) stts_Max=Stts.SampleDuration;
+    }
+    stts_FrameCount+=Stts.SampleCount;
+    if (Stts.SampleDuration<0x80000000)
+        stts_Duration+=Stts.SampleCount*Stts.SampleDuration;
+    else
+        stts_Duration-=Stts.SampleCount*(((int32u)-1)-Stts.SampleDuration+1); //Negative value
 
-        #if MEDIAINFO_DEMUX
-            stream::stts_duration stts_Duration;
-            stts_Duration.Pos_Begin=Stream->second.stts_FrameCount-Stts.SampleCount;
-            stts_Duration.Pos_End=Stream->second.stts_FrameCount;
-            stts_Duration.SampleDuration=Stts.SampleDuration;
-            if (Streams[moov_trak_tkhd_TrackID].stts_Durations.empty())
-                stts_Duration.DTS_Begin=0;
-            else
-            {
-                stream::stts_durations::iterator Previous=Streams[moov_trak_tkhd_TrackID].stts_Durations.end(); --Previous;
-                stts_Duration.DTS_Begin=Previous->DTS_End;
-            }
-            stts_Duration.DTS_End=stts_Duration.DTS_Begin+Stts.SampleCount*Stts.SampleDuration;
-            Streams[moov_trak_tkhd_TrackID].stts_Durations.push_back(stts_Duration);
-        #endif //MEDIAINFO_DEMUX
-    FILLING_END();
+    #if MEDIAINFO_DEMUX
+        stream::stts_duration stts_Duration_Item;
+        stts_Duration_Item.Pos_Begin=stts_FrameCount-Stts.SampleCount;
+        stts_Duration_Item.Pos_End=stts_FrameCount;
+        stts_Duration_Item.SampleDuration=Stts.SampleDuration;
+        if (stts_Durations.empty())
+            stts_Duration_Item.DTS_Begin=0;
+        else
+        {
+            stream::stts_durations::iterator Previous=stts_Durations.end(); --Previous;
+            stts_Duration_Item.DTS_Begin=Previous->DTS_End;
+        }
+        stts_Duration_Item.DTS_End= stts_Duration_Item.DTS_Begin+Stts.SampleCount*Stts.SampleDuration;
+        stts_Durations.push_back(stts_Duration_Item);
+    #endif //MEDIAINFO_DEMUX
 }
 
 //---------------------------------------------------------------------------

@@ -553,8 +553,8 @@ String MediaInfoList_Internal::Option (const String &Option, const String &Value
 {
     CriticalSectionLocker CSL(CS);
     Ztring OptionLower=Option; OptionLower.MakeLowerCase();
-         if (Option==__T(""))
-        return __T("");
+    if (Option.empty())
+        return String();
     else if (OptionLower==__T("manguage_update"))
     {
         //Special case : Language_Update must update all MediaInfo classes

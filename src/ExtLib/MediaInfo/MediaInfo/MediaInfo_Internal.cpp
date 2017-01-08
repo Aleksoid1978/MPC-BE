@@ -1214,8 +1214,8 @@ String MediaInfo_Internal::Option (const String &Option, const String &Value)
     CriticalSectionLocker CSL(CS);
     MEDIAINFO_DEBUG_CONFIG_TEXT(Debug+=__T("Option, Option=");Debug+=Ztring(Option);Debug+=__T(", Value=");Debug+=Ztring(Value);)
     Ztring OptionLower=Option; OptionLower.MakeLowerCase();
-         if (Option.empty())
-        return __T("");
+    if (Option.empty())
+        return String();
     else if (OptionLower==__T("language_update"))
     {
         if (!Info || Info->Get(Stream_General, 0, __T("CompleteName"))==__T(""))

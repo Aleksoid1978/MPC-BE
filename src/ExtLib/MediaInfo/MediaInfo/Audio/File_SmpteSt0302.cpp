@@ -53,10 +53,6 @@ File_SmpteSt0302::File_SmpteSt0302()
     #endif //MEDIAINFO_EVENTS
     PTS_DTS_Needed=true;
     IsRawStream=true;
-    #if MEDIAINFO_EVENTS
-        pid=(int16u)-1;
-        stream_id=(int8u)-1;
-    #endif //MEDIAINFO_EVENTS
 }
 
 //---------------------------------------------------------------------------
@@ -88,9 +84,6 @@ void File_SmpteSt0302::Streams_Accept()
                 SmpteSt0337->Demux_UnpacketizeContainer=true;
             }
         #endif //MEDIAINFO_DEMUX
-        #if MEDIAINFO_EVENTS
-            SmpteSt0337->IgnoreGuardBandTest=true;
-        #endif //MEDIAINFO_EVENTS
         Parsers.push_back(SmpteSt0337);
     }
 #endif // MEDIAINFO_SMPTEST0337_YES
