@@ -1937,6 +1937,7 @@ STRING IDS_WEBSERVER_ERROR_TEST		"Pred otestovaním je potrebné aplikovať nov�
 STRING IDS_ZOOM1		"Priblíženie 1"
 STRING IDS_ZOOM2		"Priblíženie 2"
 STRING IDS_ZOOM_AUTOFIT		"Auto fit"
+STRING IDS_ZOOM_AUTOFITLARGE		"Auto fit (larger only)"
 STRING ID_NAVIGATE_SKIPBACK		"Preskočiť dozadu\nPreskočiť dozadu"
 STRING ID_NAVIGATE_SKIPFORWARD		"Preskočiť dopredu\nPreskočiť dopredu"
 STRING ID_PLAY_DECRATE		"Znížiť rýchlosť\nZnížiť rýchlosť"

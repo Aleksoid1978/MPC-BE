@@ -1173,6 +1173,7 @@
 #define IDS_UNKNOWN_SWITCH              33134
 #define IDS_AG_SETTINGS                 33143
 #define IDS_ZOOM_AUTOFIT                33158
+#define IDS_ZOOM_AUTOFITLARGE           33159
 #define IDS_ADD_TO_PLAYLIST             33161
 #define IDS_OPEN_WITH_MPC               33162
 #define IDS_CANNOT_CHANGE_FORMAT        33163

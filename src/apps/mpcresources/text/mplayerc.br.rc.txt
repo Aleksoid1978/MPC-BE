@@ -1937,6 +1937,7 @@ STRING IDS_WEBSERVER_ERROR_TEST		"You need to apply the new settings before test
 STRING IDS_ZOOM1		"Zoom 1"
 STRING IDS_ZOOM2		"Zoom 2"
 STRING IDS_ZOOM_AUTOFIT		"Auto fit"
+STRING IDS_ZOOM_AUTOFITLARGE		"Auto fit (larger only)"
 STRING ID_NAVIGATE_SKIPBACK		"Voltar\nVoltar"
 STRING ID_NAVIGATE_SKIPFORWARD		"Avançar\nAvançar"
 STRING ID_PLAY_DECRATE		"Diminuir velocidade\nDiminuir velocidade"

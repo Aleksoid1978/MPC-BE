@@ -1937,6 +1937,7 @@ STRING IDS_WEBSERVER_ERROR_TEST		"Önce yeni ayarları uygulamanız gerekmektedi
 STRING IDS_ZOOM1		"Yakınlaştırma 1"
 STRING IDS_ZOOM2		"Yakınlaştırma 2"
 STRING IDS_ZOOM_AUTOFIT		"Oto Sığdır"
+STRING IDS_ZOOM_AUTOFITLARGE		"Auto fit (larger only)"
 STRING ID_NAVIGATE_SKIPBACK		"Önceki dosya\nÖnceki dosya"
 STRING ID_NAVIGATE_SKIPFORWARD		"Sonraki dosya\nSonraki dosya"
 STRING ID_PLAY_DECRATE		"Hızı azalt\nHızı azalt"

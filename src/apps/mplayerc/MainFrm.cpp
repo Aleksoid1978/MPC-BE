@@ -10885,7 +10885,7 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 			s.iZoomLevel == 0 ? 0.5 :
 			s.iZoomLevel == 1 ? 1.0 :
 			s.iZoomLevel == 2 ? 2.0 :
-			s.iZoomLevel == 3 ? GetZoomAutoFitScale() :
+			s.iZoomLevel >= 3 ? GetZoomAutoFitScale() :
 			1.0;
 	}
 
@@ -11001,10 +11001,13 @@ double CMainFrame::GetZoomAutoFitScale()
 	const CAppSettings& s = AfxGetAppSettings();
 	CSize arxy = GetVideoSize();
 
-	double sx = s.nAutoFitFactor / 100.0 * m_rcDesktop.Width() / arxy.cx;
-	double sy = s.nAutoFitFactor / 100.0 * m_rcDesktop.Height() / arxy.cy;
+	double fitscale = s.nAutoFitFactor / 100.0 * (std::min)((double)m_rcDesktop.Width() / arxy.cx, (double)m_rcDesktop.Height() / arxy.cy);
 
-	return sx < sy ? sx : sy;
+	if (s.iZoomLevel == 4 && fitscale > 1.0) {
+		fitscale = 1.0;
+	}
+
+	return fitscale;
 }
 
 CRect CMainFrame::GetInvisibleBorderSize() const

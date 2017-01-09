@@ -2721,6 +2721,7 @@ BEGIN
     IDS_UNKNOWN_SWITCH      "Unrecognized switch(es) found in command line string: \n\n"
     IDS_AG_SETTINGS         "Settings"
     IDS_ZOOM_AUTOFIT        "Auto fit"
+    IDS_ZOOM_AUTOFITLARGE   "Auto fit (larger only)"
 END
 
 STRINGTABLE

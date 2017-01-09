@@ -134,6 +134,7 @@ BOOL CPPagePlayback::OnInitDialog()
 	m_cmbZoomLevel.AddString(L"100%");
 	m_cmbZoomLevel.AddString(L"200%");
 	m_cmbZoomLevel.AddString(ResStr(IDS_ZOOM_AUTOFIT));
+	m_cmbZoomLevel.AddString(ResStr(IDS_ZOOM_AUTOFITLARGE));
 	CorrectComboListWidth(m_cmbZoomLevel);
 	m_cmbZoomLevel.SetCurSel(s.iZoomLevel);
 	m_nAutoFitFactor = s.nAutoFitFactor;
@@ -227,7 +228,7 @@ void CPPagePlayback::OnAutoZoomCheck()
 {
 	if (m_chkRememberZoomLevel.GetCheck()) {
 		m_cmbZoomLevel.EnableWindow(TRUE);
-		if (m_cmbZoomLevel.GetCurSel() == 3) {
+		if (m_cmbZoomLevel.GetCurSel() >= 3) {
 			GetDlgItem(IDC_STATIC2)->EnableWindow(TRUE);
 			GetDlgItem(IDC_EDIT4)->EnableWindow(TRUE);
 			m_spnAutoFitFactor.EnableWindow(TRUE);
@@ -244,7 +245,7 @@ void CPPagePlayback::OnAutoZoomCheck()
 
 void CPPagePlayback::OnAutoZoomSelChange()
 {
-	if (m_cmbZoomLevel.GetCurSel() == 3) {
+	if (m_cmbZoomLevel.GetCurSel() >= 3) {
 		GetDlgItem(IDC_STATIC2)->EnableWindow(TRUE);
 		GetDlgItem(IDC_EDIT4)->EnableWindow(TRUE);
 		m_spnAutoFitFactor.EnableWindow(TRUE);
