@@ -1928,6 +1928,7 @@ STRING IDS_WEBSERVER_ERROR_TEST		"Musisz zastosować nowe ustawienia zanim je pr
 STRING IDS_ZOOM1		"Skala 1"
 STRING IDS_ZOOM2		"Skala 2"
 STRING IDS_ZOOM_AUTOFIT		"Automatyczne dopasowanie"
+STRING IDS_ZOOM_AUTOFITLARGE		"Auto fit (larger only)"
 STRING ID_NAVIGATE_SKIPBACK		"Przejdź wstecz\nPrzechodzi do poprzedniej pozycji listy odtwarzania"
 STRING ID_NAVIGATE_SKIPFORWARD		"Przejdź naprzód\nPrzechodzi do następnej pozycji listy odtwarzania"
 STRING ID_PLAY_DECRATE		"Zmniejszono tempo odtwarzania\nZmniejsza tempo odtwarzania"

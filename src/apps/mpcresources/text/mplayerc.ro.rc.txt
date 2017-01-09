@@ -1940,6 +1940,7 @@ STRING IDS_WEBSERVER_ERROR_TEST		"Trebuie să aplicați noile setări înainte d
 STRING IDS_ZOOM1		"Zoom 1"
 STRING IDS_ZOOM2		"Zoom 2"
 STRING IDS_ZOOM_AUTOFIT		"Auto fit"
+STRING IDS_ZOOM_AUTOFITLARGE		"Auto fit (larger only)"
 STRING ID_NAVIGATE_SKIPBACK		"Sari înapoi\nSari înapoi"
 STRING ID_NAVIGATE_SKIPFORWARD		"Sari înainte\nSari înainte"
 STRING ID_PLAY_DECRATE		"Micșorează viteză\nMicșorează viteză"

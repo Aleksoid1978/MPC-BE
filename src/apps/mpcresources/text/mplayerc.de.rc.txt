@@ -1937,6 +1937,7 @@ STRING IDS_WEBSERVER_ERROR_TEST		"Sie müssen die neuen Einstellungen bestätige
 STRING IDS_ZOOM1		"Zoom 1"
 STRING IDS_ZOOM2		"Zoom 2"
 STRING IDS_ZOOM_AUTOFIT		"Auto-Anpassung"
+STRING IDS_ZOOM_AUTOFITLARGE		"Auto fit (larger only)"
 STRING ID_NAVIGATE_SKIPBACK		"Rückwärts springen\nRückwärts springen"
 STRING ID_NAVIGATE_SKIPFORWARD		"Vorwärts springen\nVorwärts springen"
 STRING ID_PLAY_DECRATE		"Geschwindigkeit verringern\nGeschwindigkeit verringern"

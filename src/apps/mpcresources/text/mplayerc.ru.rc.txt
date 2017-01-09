@@ -1937,6 +1937,7 @@ STRING IDS_WEBSERVER_ERROR_TEST		"Вы должны применить новы�
 STRING IDS_ZOOM1		"Zoom 1"
 STRING IDS_ZOOM2		"Zoom 2"
 STRING IDS_ZOOM_AUTOFIT		"Вписать"
+STRING IDS_ZOOM_AUTOFITLARGE		"Вписать большие"
 STRING ID_NAVIGATE_SKIPBACK		"Шаг назад\nШаг назад"
 STRING ID_NAVIGATE_SKIPFORWARD		"Шаг вперед\nШаг вперед"
 STRING ID_PLAY_DECRATE		"Уменьшить скорость\nУменьшить скорость"

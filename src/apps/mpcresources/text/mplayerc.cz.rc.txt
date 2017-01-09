@@ -1937,6 +1937,7 @@ STRING IDS_WEBSERVER_ERROR_TEST		"Než budete moci nová nastavení vyzkoušet, 
 STRING IDS_ZOOM1		"Roztáhnout 1"
 STRING IDS_ZOOM2		"Roztáhnout 2"
 STRING IDS_ZOOM_AUTOFIT		"Auto fit"
+STRING IDS_ZOOM_AUTOFITLARGE		"Auto fit (larger only)"
 STRING ID_NAVIGATE_SKIPBACK		"Skočit zpět\nSkočit zpět"
 STRING ID_NAVIGATE_SKIPFORWARD		"Skočit vpřed\nSkočit vpřed"
 STRING ID_PLAY_DECRATE		"Snížit rychlost\nSnížit rychlost"

@@ -1937,6 +1937,7 @@ STRING IDS_WEBSERVER_ERROR_TEST		"설정들을 테스트해보려면 설정들�
 STRING IDS_ZOOM1		"줌 1"
 STRING IDS_ZOOM2		"줌 2"
 STRING IDS_ZOOM_AUTOFIT		"Auto fit"
+STRING IDS_ZOOM_AUTOFITLARGE		"Auto fit (larger only)"
 STRING ID_NAVIGATE_SKIPBACK		"뒤로 이동\n뒤로 이동"
 STRING ID_NAVIGATE_SKIPFORWARD		"앞으로 이동\n앞으로 이동"
 STRING ID_PLAY_DECRATE		"재생속도 감소\n재생속도 감소"

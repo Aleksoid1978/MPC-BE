@@ -1940,6 +1940,7 @@ STRING IDS_WEBSERVER_ERROR_TEST		"Πρέπει να κάνετε εφαρμογ�
 STRING IDS_ZOOM1		"Μεγέθυνση 1"
 STRING IDS_ZOOM2		"Μεγέθυνση 2"
 STRING IDS_ZOOM_AUTOFIT		"Αυτόματη προσαρμογή"
+STRING IDS_ZOOM_AUTOFITLARGE		"Auto fit (larger only)"
 STRING ID_NAVIGATE_SKIPBACK		"Μετάβαση πίσω\nΜετάβαση πίσω"
 STRING ID_NAVIGATE_SKIPFORWARD		"Μετάβαση μπροστά\nΜετάβαση μπροστά"
 STRING ID_PLAY_DECRATE		"Μείωση ταχύτητας\nΜείωση ταχύτητας"
