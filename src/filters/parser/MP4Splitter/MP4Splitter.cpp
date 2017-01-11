@@ -1496,11 +1496,6 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		return;
 	}
 
-	if (rt <= 0) {
-		DemuxInit();
-		return;
-	}
-
 	AP4_Movie* movie = m_pFile->GetMovie();
 
 	if (movie->HasFragmentsIndex()
@@ -1509,6 +1504,11 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		return;
 	}
 	bSelectMoofSuccessfully = TRUE;
+
+	if (rt <= 0) {
+		DemuxInit();
+		return;
+	}
 
 	POSITION pos = m_trackpos.GetStartPosition();
 	while (pos) {
