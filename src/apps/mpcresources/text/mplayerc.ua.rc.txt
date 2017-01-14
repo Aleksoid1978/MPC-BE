@@ -122,7 +122,7 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 14		"Гаразд"
 15		"Скасувати"
 16		"Лише додати до списка відтворення"
-17		"Paste URL from clipboard"
+17		"Вставити URL з буферу обміну"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
@@ -1937,7 +1937,7 @@ STRING IDS_WEBSERVER_ERROR_TEST		"Вам необхідно застосуват
 STRING IDS_ZOOM1		"Збільшення 1"
 STRING IDS_ZOOM2		"Збільшення 2"
 STRING IDS_ZOOM_AUTOFIT		"Вписати"
-STRING IDS_ZOOM_AUTOFITLARGE		"Auto fit (larger only)"
+STRING IDS_ZOOM_AUTOFITLARGE		"Вписати (тільки великі)"
 STRING ID_NAVIGATE_SKIPBACK		"Крок назад\nКрок назад"
 STRING ID_NAVIGATE_SKIPFORWARD		"Крок вперед\nКрок вперед"
 STRING ID_PLAY_DECRATE		"Повільніше\nПовільніше"
