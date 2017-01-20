@@ -735,7 +735,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 
 					std::vector<REFERENCE_TIME> timecodes;
-					timecodes.reserve(FrameDuration::MAXTESTEDFRAMES);
+					timecodes.reserve(FrameDuration::DefaultFrameNum);
 
 					bool readmore = true;
 
@@ -764,7 +764,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									}
 									timecodes.push_back(c.TimeCode + bg->Block.TimeCode);
 
-									if (timecodes.size() >= FrameDuration::MAXTESTEDFRAMES) {
+									if (timecodes.size() >= FrameDuration::DefaultFrameNum) {
 										readmore = false;
 										break;
 									}

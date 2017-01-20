@@ -96,7 +96,7 @@ REFERENCE_TIME FrameDuration::Calculate(std::vector<int64_t>& timecodes, const i
 
 
 		std::vector<int> frametimes;
-		frametimes.reserve(MAXTESTEDFRAMES - 1);
+		frametimes.reserve(timecodes.size() - 1);
 
 		unsigned k = 0;
 		for (size_t i = 1; i < timecodes.size(); i++) {

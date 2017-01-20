@@ -22,7 +22,11 @@
 
 #include "stdafx.h"
 
-namespace FrameDuration {
-	const int MAXTESTEDFRAMES = 120;
+namespace FrameDuration
+{
+	// A sufficient number of frames for calculating the average fps in most cases.
+	const unsigned DefaultFrameNum = 120;
+
+	// The function calculates the minimum average fps.
 	REFERENCE_TIME Calculate(std::vector<int64_t>& timecodes, const int64_t timecodescale);
 }

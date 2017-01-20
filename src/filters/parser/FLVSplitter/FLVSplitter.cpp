@@ -1043,7 +1043,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						__int64 sync_pos = m_DataOffset;
 						if (Sync(sync_pos)) {
 							std::vector<REFERENCE_TIME> timecodes;
-							timecodes.reserve(FrameDuration::MAXTESTEDFRAMES);
+							timecodes.reserve(FrameDuration::DefaultFrameNum);
 
 							Tag tag;
 							VideoTag vtag;
@@ -1059,7 +1059,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									}
 
 									timecodes.push_back(tag.TimeStamp);
-									if (timecodes.size() >= FrameDuration::MAXTESTEDFRAMES) {
+									if (timecodes.size() >= FrameDuration::DefaultFrameNum) {
 										break;
 									}
 								}
