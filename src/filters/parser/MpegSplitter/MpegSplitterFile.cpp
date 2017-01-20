@@ -1292,7 +1292,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				REFERENCE_TIME rt = NextPTS(s, s.codec, nextPos);
 				if (rt != INVALID_TIME) {
 					std::vector<REFERENCE_TIME> timecodes;
-					timecodes.reserve(FrameDuration::MAXTESTEDFRAMES);
+					timecodes.reserve(FrameDuration::DefaultFrameNum);
 
 					Seek(nextPos);
 					int count = 0;
@@ -1303,7 +1303,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 						}
 
 						timecodes.push_back((rt + 100) / 200); // get a real precision for time codes (need for some files)
-						if (timecodes.size() >= FrameDuration::MAXTESTEDFRAMES) {
+						if (timecodes.size() >= FrameDuration::DefaultFrameNum) {
 							break;
 						}
 
