@@ -1930,10 +1930,6 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 		m_OSD.OnSize(nType, cx, cy);
 	}
 
-	if (nType == SIZE_RESTORED && m_fTrayIcon) {
-		ShowWindow(SW_SHOW);
-	}
-
 	CAppSettings& s = AfxGetAppSettings();
 	if (!m_bFirstFSAfterLaunchOnFullScreen && IsWindowVisible() && !m_bFullScreen) {
 		if (nType != SIZE_MAXIMIZED && nType != SIZE_MINIMIZED) {
