@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1785,7 +1785,7 @@ HRESULT CDX9RenderingEngine::DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_
 		{float(_Rect.right), float(_Rect.bottom), 0.5f, 2.0f, Color},
 	};
 
-	for (int i = 0; i < _countof(v); i++) {
+	for (unsigned i = 0; i < _countof(v); i++) {
 		v[i].x -= 0.5f;
 		v[i].y -= 0.5f;
 	}
@@ -1840,7 +1840,7 @@ HRESULT CDX9RenderingEngine::AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9*
 		{(float)dst.right, (float)dst.bottom, 0.5f, 2.0f, (float)src.right / w, (float)src.bottom / h},
 	};
 
-	for (int i = 0; i < _countof(pVertices); i++) {
+	for (unsigned i = 0; i < _countof(pVertices); i++) {
 		pVertices[i].x -= 0.5f;
 		pVertices[i].y -= 0.5f;
 	}

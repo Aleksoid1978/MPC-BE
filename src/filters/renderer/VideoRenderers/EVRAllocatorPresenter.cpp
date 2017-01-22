@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2470,12 +2470,10 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 
 				double DetectedRate = 1.0/ (double(DectedSum) / (nFrames * 10000000.0) );
 
-				double AllowedError = 0.0003;
+				const double AllowedError = 0.0003;
+				static double AllowedValues[] = {60.0, 60/1.001, 50.0, 48.0, 48/1.001, 30.0, 30/1.001, 25.0, 24.0, 24/1.001};
 
-				static double AllowedValues[] = {/*75, 72/1.001,*/ 60.0, 60/1.001, 50.0, 48.0, 48/1.001, 30.0, 30/1.001, 25.0, 24.0, 24/1.001};
-
-				int nAllowed = _countof(AllowedValues);
-				for (int i = 0; i < nAllowed; ++i) {
+				for (unsigned i = 0; i < _countof(AllowedValues); ++i) {
 					if (fabs(1.0 - DetectedRate / AllowedValues[i]) < AllowedError) {
 						DetectedRate = AllowedValues[i];
 						break;
@@ -2528,7 +2526,7 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 				}
 
 				m_DetectedLock = false;
-				for (int i = 0; i < nAllowed; ++i) {
+				for (unsigned i = 0; i < _countof(AllowedValues); ++i) {
 					if (BestVal == AllowedValues[i]) {
 						m_DetectedLock = true;
 						break;

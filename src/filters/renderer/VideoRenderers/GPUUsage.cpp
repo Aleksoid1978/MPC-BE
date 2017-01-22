@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2016 see Authors.txt
+ * (C) 2013-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -181,7 +181,7 @@ HRESULT CGPUUsage::Init(CString DeviceName, CString Device)
 									iOverdriveVersions[2] = 0;
 								}
 
-								for (int i = 0; i < _countof(iOverdriveVersions) && iOverdriveVersions[i] != 0; i++) {
+								for (unsigned i = 0; i < _countof(iOverdriveVersions) && iOverdriveVersions[i] != 0; i++) {
 									switch (iOverdriveVersions[i]) {
 										case 5:
 											{
