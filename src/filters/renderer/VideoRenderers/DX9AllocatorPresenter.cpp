@@ -1834,12 +1834,32 @@ void CDX9AllocatorPresenter::DrawStats()
 			}
 
 			if (g_nFrameType != PICT_NONE) {
-				strText.Format(L"Frame rate   : %7.03f   (%7.3f ms = %.03f, %s)   (%7.3f ms = %.03f%s, %2.03f StdDev)  Clock: %1.4f %%", m_fAvrFps, rtMS, rtFPS, g_nFrameType == PICT_FRAME ? L"P" : L"I", GetFrameTime() * 1000.0, GetFrameRate(), m_DetectedLock ? L" L" : L"", m_DetectedFrameTimeStdDev / 10000.0, m_ModeratedTimeSpeed*100.0);
+				strText.Format(L"Frame rate   : %7.03f   (%7.3f ms = %.03f, %s)   (%7.3f ms = %.03f%s, %2.03f StdDev)  Clock: %1.4f %%",
+					m_fAvrFps,
+					rtMS,
+					rtFPS,
+					g_nFrameType == PICT_FRAME ? L"P" : L"I",
+					GetFrameTime() * 1000.0,
+					GetFrameRate(),
+					m_DetectedLock ? L" L" : L"",
+					m_DetectedFrameTimeStdDev / 10000.0,
+					m_ModeratedTimeSpeed*100.0);
 			} else {
-				strText.Format(L"Frame rate   : %7.03f   (%7.3f ms = %.03f)   (%7.3f ms = %.03f%s, %2.03f StdDev)  Clock: %1.4f %%", m_fAvrFps, rtMS, rtFPS, GetFrameTime() * 1000.0, GetFrameRate(), m_DetectedLock ? L" L" : L"", m_DetectedFrameTimeStdDev / 10000.0, m_ModeratedTimeSpeed*100.0);
+				strText.Format(L"Frame rate   : %7.03f   (%7.3f ms = %.03f)   (%7.3f ms = %.03f%s, %2.03f StdDev)  Clock: %1.4f %%",
+					m_fAvrFps,
+					rtMS,
+					rtFPS,
+					GetFrameTime() * 1000.0,
+					GetFrameRate(),
+					m_DetectedLock ? L" L" : L"",
+					m_DetectedFrameTimeStdDev / 10000.0,
+					m_ModeratedTimeSpeed*100.0);
 			}
 		} else {
-			strText.Format(L"Frame rate   : %7.03f   (%.03f%s)", m_fAvrFps, GetFrameRate(), m_DetectedLock ? L" L" : L"");
+			strText.Format(L"Frame rate   : %7.03f   (%.03f%s)",
+				m_fAvrFps,
+				GetFrameRate(),
+				m_DetectedLock ? L" L" : L"");
 		}
 		drawText(strText);
 

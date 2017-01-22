@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -384,7 +384,7 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	m_pPSC.Free();
 	m_pD3DDevEx = NULL;
 
-	for (int i = 0; i < _countof(m_pResizerPixelShaders); i++) {
+	for (unsigned i = 0; i < _countof(m_pResizerPixelShaders); i++) {
 		m_pResizerPixelShaders[i] = NULL;
 	}
 
@@ -863,7 +863,7 @@ HRESULT CBaseAP::TextureCopy(IDirect3DTexture9* pTexture)
 		{0, h, 0.5f, 2.0f, 0, 1},
 		{w, h, 0.5f, 2.0f, 1, 1},
 	};
-	for (int i = 0; i < _countof(v); i++) {
+	for (unsigned i = 0; i < _countof(v); i++) {
 		v[i].x -= 0.5;
 		v[i].y -= 0.5;
 	}
@@ -880,7 +880,7 @@ HRESULT CBaseAP::DrawRect(DWORD _Color, DWORD _Alpha, const CRect &_Rect)
 		{float(_Rect.left), float(_Rect.bottom), 0.5f, 2.0f, Color},
 		{float(_Rect.right), float(_Rect.bottom), 0.5f, 2.0f, Color},
 	};
-	for (int i = 0; i < _countof(v); i++) {
+	for (unsigned i = 0; i < _countof(v); i++) {
 		v[i].x -= 0.5;
 		v[i].y -= 0.5;
 	}
