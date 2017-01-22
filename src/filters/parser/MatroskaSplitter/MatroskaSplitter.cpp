@@ -728,8 +728,12 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					AvgTimePerFrame = (REFERENCE_TIME)pTE->DefaultDuration / 100;
 				}
 
-				if (AvgTimePerFrame < 50000 // incorrect fps - calculate avarage value
-						&& CodecID != "V_DSHOW/MPEG1VIDEO" && CodecID != "V_MPEG1" && CodecID != "V_MPEG2") {
+				if (CodecID == "V_DSHOW/MPEG1VIDEO" || CodecID == "V_MPEG1") {
+					DLog(L"CMatroskaSplitterFilter: HACK: MPEG1 fps = %.6f overwritten to %.6f", 10000000.0 / AvgTimePerFrame, 10000000.0 / (AvgTimePerFrame * 2));
+					AvgTimePerFrame *= 2; // hack is not necessary (cosmetic hack), because without works
+				}
+
+				if (AvgTimePerFrame < 50000 && CodecID != "V_MPEG2") { // incorrect fps - calculate avarage value
 					CMatroskaNode Root(m_pFile);
 					m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
 					m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
@@ -817,13 +821,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										};
 							VIDEOINFOHEADER *vih = (VIDEOINFOHEADER*)mts[i].Format();
 							vih->rcSource = vih->rcTarget = rect;
-						}
-
-						if (AvgTimePerFrame) {
-							if (mts[i].subtype == MEDIASUBTYPE_MPEG1Payload) {
-								AvgTimePerFrame *= 2; // Need more testing, but work on all sample that i have :)
-							}
-							((VIDEOINFOHEADER*)mts[i].Format())->AvgTimePerFrame = AvgTimePerFrame;
 						}
 					}
 				}
