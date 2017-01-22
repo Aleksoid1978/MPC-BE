@@ -582,6 +582,9 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 		str.Format(_T("dwBitErrorRate: %u"), vih.dwBitErrorRate);
 		sl.AddTail(str);
 		str.Format(_T("AvgTimePerFrame: %I64d"), vih.AvgTimePerFrame);
+		if (vih.AvgTimePerFrame > 0) {
+			str.AppendFormat(_T(" (%.3f fps)"), 10000000.0 / vih.AvgTimePerFrame);
+		}
 		sl.AddTail(str);
 
 		sl.AddTail(_T(""));
