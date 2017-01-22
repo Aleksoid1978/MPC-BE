@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -730,7 +730,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				if (CodecID == "V_DSHOW/MPEG1VIDEO" || CodecID == "V_MPEG1") {
 					DLog(L"CMatroskaSplitterFilter: HACK: MPEG1 fps = %.6f overwritten to %.6f", 10000000.0 / AvgTimePerFrame, 10000000.0 / (AvgTimePerFrame * 2));
-					AvgTimePerFrame *= 2; // hack is not necessary (cosmetic hack), because without works
+					AvgTimePerFrame *= 2;
 				}
 
 				if (AvgTimePerFrame < 50000 && CodecID != "V_MPEG2") { // incorrect fps - calculate avarage value
