@@ -822,6 +822,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							VIDEOINFOHEADER *vih = (VIDEOINFOHEADER*)mts[i].Format();
 							vih->rcSource = vih->rcTarget = rect;
 						}
+
+						if (AvgTimePerFrame) {
+							((VIDEOINFOHEADER*)mts[i].Format())->AvgTimePerFrame = AvgTimePerFrame;
+						}
 					}
 				}
 
