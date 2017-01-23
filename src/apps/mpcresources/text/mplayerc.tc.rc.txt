@@ -38,7 +38,7 @@ BEGIN DIALOGEX IDD_CAPTURE_DLG LINES 41
 21		"預覽"
 26		"錄製音訊"
 27		"預覽"
-32		"V/A 緩衝區："
+32		"V/A 緩衝區:"
 38		"輸出成 WAV 檔"
 39		"錄製"
 END
@@ -122,7 +122,7 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 14		"確認"
 15		"取消"
 16		"加入播放清單而不開啟"
-17		"Paste URL from clipboard"
+17		"從剪貼簿貼上網址"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
@@ -459,7 +459,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 5		"垂直同步"
 6		"精確式垂直同步"
 7		"替代式垂直同步"
-8		"垂直同步偏移量："
+8		"垂直同步偏移量:"
 11		"停用桌面轉譯緩衝處理 (Aero)"
 12		"啟用影格時間校正"
 13		"在垂直同步之前排空 GPU"
@@ -1937,7 +1937,7 @@ STRING IDS_WEBSERVER_ERROR_TEST		"您需要先套用設定才可以測試。"
 STRING IDS_ZOOM1		"縮放 1"
 STRING IDS_ZOOM2		"縮放 2"
 STRING IDS_ZOOM_AUTOFIT		"自動調整"
-STRING IDS_ZOOM_AUTOFITLARGE		"Auto fit (larger only)"
+STRING IDS_ZOOM_AUTOFITLARGE		"自動調整（僅限影片較大時）"
 STRING ID_NAVIGATE_SKIPBACK		"前一段\n前一段"
 STRING ID_NAVIGATE_SKIPFORWARD		"次一段\n次一段"
 STRING ID_PLAY_DECRATE		"降低速度\n降低速度"
