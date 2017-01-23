@@ -583,12 +583,7 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 		sl.AddTail(str);
 		str.Format(_T("AvgTimePerFrame: %I64d"), vih.AvgTimePerFrame);
 		if (vih.AvgTimePerFrame > 0) {
-			CString fps;
-			fps.Format(_T(" (%0.3f"), 10000000.0f / vih.AvgTimePerFrame);
-			fps.TrimRight(_T('0')); // remove trailing zeros
-			fps.TrimRight(_T('.')); // remove the trailing dot
-			fps += _T(" fps)");
-			str.Append(fps);
+			str.AppendFormat(_T(" (%.3f fps)"), 10000000.0 / vih.AvgTimePerFrame);
 		}
 		sl.AddTail(str);
 
