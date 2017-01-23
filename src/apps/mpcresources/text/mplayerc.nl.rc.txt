@@ -122,7 +122,7 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 14		"OK"
 15		"Annuleren"
 16		"Aan afspeellijst toevoegen zonder te openen"
-17		"Paste URL from clipboard"
+17		"URL vanuit het klembord plakken"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
@@ -1937,7 +1937,7 @@ STRING IDS_WEBSERVER_ERROR_TEST		"U moet de nieuwe instellingen toepassen voorda
 STRING IDS_ZOOM1		"Zoom 1"
 STRING IDS_ZOOM2		"Zoom 2"
 STRING IDS_ZOOM_AUTOFIT		"Autom. passend"
-STRING IDS_ZOOM_AUTOFITLARGE		"Auto fit (larger only)"
+STRING IDS_ZOOM_AUTOFITLARGE		"Autom. passend (enkel als video groter is)"
 STRING ID_NAVIGATE_SKIPBACK		"Spring terug\nSpring terug"
 STRING ID_NAVIGATE_SKIPFORWARD		"Spring verder\nSpring verder"
 STRING ID_PLAY_DECRATE		"Snelheid verlagen\nSnelheid verlagen"
