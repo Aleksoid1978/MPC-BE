@@ -161,7 +161,7 @@ FLAC__OggDecoderAspectReadStatus FLAC__ogg_decoder_aspect_read_callback_wrapper(
 					/* if it is the first header packet, check for magic and a supported Ogg FLAC mapping version */
 					if (aspect->working_packet.bytes > 0 && aspect->working_packet.packet[0] == FLAC__OGG_MAPPING_FIRST_HEADER_PACKET_TYPE) {
 						const FLAC__byte *b = aspect->working_packet.packet;
-						const unsigned header_length =
+						const uint32_t header_length =
 							FLAC__OGG_MAPPING_PACKET_TYPE_LENGTH +
 							FLAC__OGG_MAPPING_MAGIC_LENGTH +
 							FLAC__OGG_MAPPING_VERSION_MAJOR_LENGTH +
@@ -173,9 +173,9 @@ FLAC__OggDecoderAspectReadStatus FLAC__ogg_decoder_aspect_read_callback_wrapper(
 						if (memcmp(b, FLAC__OGG_MAPPING_MAGIC, FLAC__OGG_MAPPING_MAGIC_LENGTH))
 							return FLAC__OGG_DECODER_ASPECT_READ_STATUS_NOT_FLAC;
 						b += FLAC__OGG_MAPPING_MAGIC_LENGTH;
-						aspect->version_major = (unsigned)(*b);
+						aspect->version_major = (uint32_t)(*b);
 						b += FLAC__OGG_MAPPING_VERSION_MAJOR_LENGTH;
-						aspect->version_minor = (unsigned)(*b);
+						aspect->version_minor = (uint32_t)(*b);
 						if (aspect->version_major != 1)
 							return FLAC__OGG_DECODER_ASPECT_READ_STATUS_UNSUPPORTED_MAPPING_VERSION;
 						aspect->working_packet.packet += header_length;

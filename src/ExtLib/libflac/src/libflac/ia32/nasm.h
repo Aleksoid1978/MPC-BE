@@ -46,6 +46,11 @@
 	%idefine code_section section .text
 	%idefine data_section section .data
 	%idefine bss_section  section .bss
+%elifdef OBJ_FORMAT_coff
+	%define FLAC__PUBLIC_NEEDS_UNDERSCORE
+	%idefine code_section section .text
+	%idefine data_section section .data
+	%idefine bss_section  section .bss
 %elifdef OBJ_FORMAT_macho
 	%define FLAC__PUBLIC_NEEDS_UNDERSCORE
 	%idefine code_section section .text

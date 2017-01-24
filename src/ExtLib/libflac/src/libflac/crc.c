@@ -75,7 +75,7 @@ FLAC__byte const FLAC__crc8_table[256] = {
 
 /* CRC-16, poly = x^16 + x^15 + x^2 + x^0, init = 0 */
 
-unsigned const FLAC__crc16_table[256] = {
+uint32_t const FLAC__crc16_table[256] = {
 	0x0000,  0x8005,  0x800f,  0x000a,  0x801b,  0x001e,  0x0014,  0x8011,
 	0x8033,  0x0036,  0x003c,  0x8039,  0x0028,  0x802d,  0x8027,  0x0022,
 	0x8063,  0x0066,  0x006c,  0x8069,  0x0078,  0x807d,  0x8077,  0x0072,
@@ -116,13 +116,13 @@ void FLAC__crc8_update(const FLAC__byte data, FLAC__uint8 *crc)
 	*crc = FLAC__crc8_table[*crc ^ data];
 }
 
-void FLAC__crc8_update_block(const FLAC__byte *data, unsigned len, FLAC__uint8 *crc)
+void FLAC__crc8_update_block(const FLAC__byte *data, uint32_t len, FLAC__uint8 *crc)
 {
 	while(len--)
 		*crc = FLAC__crc8_table[*crc ^ *data++];
 }
 
-FLAC__uint8 FLAC__crc8(const FLAC__byte *data, unsigned len)
+FLAC__uint8 FLAC__crc8(const FLAC__byte *data, uint32_t len)
 {
 	FLAC__uint8 crc = 0;
 
@@ -132,9 +132,9 @@ FLAC__uint8 FLAC__crc8(const FLAC__byte *data, unsigned len)
 	return crc;
 }
 
-unsigned FLAC__crc16(const FLAC__byte *data, unsigned len)
+uint32_t FLAC__crc16(const FLAC__byte *data, uint32_t len)
 {
-	unsigned crc = 0;
+	uint32_t crc = 0;
 
 	while(len--)
 		crc = ((crc<<8) ^ FLAC__crc16_table[(crc>>8) ^ *data++]) & 0xffff;

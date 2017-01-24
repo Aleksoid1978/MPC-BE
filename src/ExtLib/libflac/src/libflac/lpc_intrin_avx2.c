@@ -48,7 +48,7 @@
 #include <immintrin.h> /* AVX2 */
 
 FLAC__SSE_TARGET("avx2")
-void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_avx2(const FLAC__int32 *data, unsigned data_len, const FLAC__int32 qlp_coeff[], unsigned order, int lp_quantization, FLAC__int32 residual[])
+void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_avx2(const FLAC__int32 *data, uint32_t data_len, const FLAC__int32 qlp_coeff[], uint32_t order, int lp_quantization, FLAC__int32 residual[])
 {
 	int i;
 	FLAC__int32 sum;
@@ -403,7 +403,7 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_avx2(const FLAC_
 }
 
 FLAC__SSE_TARGET("avx2")
-void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_avx2(const FLAC__int32 *data, unsigned data_len, const FLAC__int32 qlp_coeff[], unsigned order, int lp_quantization, FLAC__int32 residual[])
+void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_avx2(const FLAC__int32 *data, uint32_t data_len, const FLAC__int32 qlp_coeff[], uint32_t order, int lp_quantization, FLAC__int32 residual[])
 {
 	int i;
 	FLAC__int32 sum;
@@ -760,7 +760,7 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_avx2(const FLAC__in
 static FLAC__int32 pack_arr[8] = { 0, 2, 4, 6, 1, 3, 5, 7 };
 
 FLAC__SSE_TARGET("avx2")
-void FLAC__lpc_compute_residual_from_qlp_coefficients_wide_intrin_avx2(const FLAC__int32 *data, unsigned data_len, const FLAC__int32 qlp_coeff[], unsigned order, int lp_quantization, FLAC__int32 residual[])
+void FLAC__lpc_compute_residual_from_qlp_coefficients_wide_intrin_avx2(const FLAC__int32 *data, uint32_t data_len, const FLAC__int32 qlp_coeff[], uint32_t order, int lp_quantization, FLAC__int32 residual[])
 {
 	int i;
 	FLAC__int64 sum;

@@ -39,12 +39,11 @@
  * the 1999 ISO C Standard header file <stdint.h>.
  */
 
-typedef __int8 FLAC__int8;
+typedef signed __int8 FLAC__int8;
+typedef signed __int16 FLAC__int16;
+typedef signed __int32 FLAC__int32;
+typedef signed __int64 FLAC__int64;
 typedef unsigned __int8 FLAC__uint8;
-
-typedef __int16 FLAC__int16;
-typedef __int32 FLAC__int32;
-typedef __int64 FLAC__int64;
 typedef unsigned __int16 FLAC__uint16;
 typedef unsigned __int32 FLAC__uint32;
 typedef unsigned __int64 FLAC__uint64;

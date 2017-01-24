@@ -46,7 +46,7 @@ typedef struct FLAC__OggDecoderAspect {
 	/* these are for internal state related to Ogg decoding */
 	ogg_stream_state stream_state;
 	ogg_sync_state sync_state;
-	unsigned version_major, version_minor;
+	uint32_t version_major, version_minor;
 	FLAC__bool need_serial_number;
 	FLAC__bool end_of_stream;
 	FLAC__bool have_working_page; /* only if true will the following vars be valid */

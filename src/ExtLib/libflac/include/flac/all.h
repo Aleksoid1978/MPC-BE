@@ -321,7 +321,7 @@
  *
  * The \a bytes parameter to FLAC__StreamDecoderReadCallback,
  * FLAC__StreamEncoderReadCallback, and FLAC__StreamEncoderWriteCallback
- * is now \c size_t instead of \c unsigned.
+ * is now \c size_t instead of \c uint32_t.
  */
 
 /** \defgroup porting_1_1_3_to_1_1_4 Porting from FLAC 1.1.3 to 1.1.4
