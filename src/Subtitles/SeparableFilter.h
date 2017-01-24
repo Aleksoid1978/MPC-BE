@@ -361,6 +361,9 @@ struct GaussianKernel {
 			kernel[x] = val;
 			kernel[width - x - 1] = val;
 		}
+		if (divisor == 0) {
+			divisor = 1;
+		}
 	}
 
 	inline ~GaussianKernel() {
