@@ -81,14 +81,14 @@ extern const FLAC__fixedpoint FLAC__FP_E;
  *	be < 32 and evenly divisible by 4 (0 is OK but not very precise).
  *
  *	'precision' roughly limits the number of iterations that are done;
- *	use (unsigned)(-1) for maximum precision.
+ *	use (uint32_t)(-1) for maximum precision.
  *
  *	If 'x' is less than one -- that is, x < (1<<fracbits) -- then this
  *	function will punt and return 0.
  *
  *	The return value will also have 'fracbits' fractional bits.
  */
-FLAC__uint32 FLAC__fixedpoint_log2(FLAC__uint32 x, unsigned fracbits, unsigned precision);
+FLAC__uint32 FLAC__fixedpoint_log2(FLAC__uint32 x, uint32_t fracbits, uint32_t precision);
 
 #endif
 

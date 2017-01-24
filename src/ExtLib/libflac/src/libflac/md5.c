@@ -136,7 +136,7 @@ static void FLAC__MD5Transform(FLAC__uint32 buf[4], FLAC__uint32 const in[16])
 
 #if WORDS_BIGENDIAN
 //@@@@@@ OPT: use bswap/intrinsics
-static void byteSwap(FLAC__uint32 *buf, unsigned words)
+static void byteSwap(FLAC__uint32 *buf, uint32_t words)
 {
 	register FLAC__uint32 x;
 	do {
@@ -175,7 +175,7 @@ static void byteSwapX16(FLAC__uint32 *buf)
  * Update context to reflect the concatenation of another buffer full
  * of bytes.
  */
-static void FLAC__MD5Update(FLAC__MD5Context *ctx, FLAC__byte const *buf, unsigned len)
+static void FLAC__MD5Update(FLAC__MD5Context *ctx, FLAC__byte const *buf, uint32_t len)
 {
 	FLAC__uint32 t;
 
@@ -271,13 +271,13 @@ void FLAC__MD5Final(FLAC__byte digest[16], FLAC__MD5Context *ctx)
 /*
  * Convert the incoming audio signal to a byte stream
  */
-static void format_input_(FLAC__multibyte *mbuf, const FLAC__int32 * const signal[], unsigned channels, unsigned samples, unsigned bytes_per_sample)
+static void format_input_(FLAC__multibyte *mbuf, const FLAC__int32 * const signal[], uint32_t channels, uint32_t samples, uint32_t bytes_per_sample)
 {
 	FLAC__byte *buf_ = mbuf->p8;
 	FLAC__int16 *buf16 = mbuf->p16;
 	FLAC__int32 *buf32 = mbuf->p32;
 	FLAC__int32 a_word;
-	unsigned channel, sample;
+	uint32_t channel, sample;
 
 	/* Storage in the output buffer, buf, is little endian. */
 
@@ -488,7 +488,7 @@ static void format_input_(FLAC__multibyte *mbuf, const FLAC__int32 * const signa
 /*
  * Convert the incoming audio signal to a byte stream and FLAC__MD5Update it.
  */
-FLAC__bool FLAC__MD5Accumulate(FLAC__MD5Context *ctx, const FLAC__int32 * const signal[], unsigned channels, unsigned samples, unsigned bytes_per_sample)
+FLAC__bool FLAC__MD5Accumulate(FLAC__MD5Context *ctx, const FLAC__int32 * const signal[], uint32_t channels, uint32_t samples, uint32_t bytes_per_sample)
 {
 	const size_t bytes_needed = (size_t)channels * (size_t)samples * (size_t)bytes_per_sample;
 

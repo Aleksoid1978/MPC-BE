@@ -920,7 +920,7 @@ FLAC_API FLAC__bool FLAC__stream_decoder_get_md5_checking(const FLAC__StreamDeco
  * \param  decoder  A decoder instance to query.
  * \assert
  *    \code decoder != NULL \endcode
- * \retval unsigned
+ * \retval uint32_t
  *    See above.
  */
 FLAC_API FLAC__uint64 FLAC__stream_decoder_get_total_samples(const FLAC__StreamDecoder *decoder);
@@ -932,10 +932,10 @@ FLAC_API FLAC__uint64 FLAC__stream_decoder_get_total_samples(const FLAC__StreamD
  * \param  decoder  A decoder instance to query.
  * \assert
  *    \code decoder != NULL \endcode
- * \retval unsigned
+ * \retval uint32_t
  *    See above.
  */
-FLAC_API unsigned FLAC__stream_decoder_get_channels(const FLAC__StreamDecoder *decoder);
+FLAC_API uint32_t FLAC__stream_decoder_get_channels(const FLAC__StreamDecoder *decoder);
 
 /** Get the current channel assignment in the stream being decoded.
  *  Will only be valid after decoding has started and will contain the
@@ -956,10 +956,10 @@ FLAC_API FLAC__ChannelAssignment FLAC__stream_decoder_get_channel_assignment(con
  * \param  decoder  A decoder instance to query.
  * \assert
  *    \code decoder != NULL \endcode
- * \retval unsigned
+ * \retval uint32_t
  *    See above.
  */
-FLAC_API unsigned FLAC__stream_decoder_get_bits_per_sample(const FLAC__StreamDecoder *decoder);
+FLAC_API uint32_t FLAC__stream_decoder_get_bits_per_sample(const FLAC__StreamDecoder *decoder);
 
 /** Get the current sample rate in Hz of the stream being decoded.
  *  Will only be valid after decoding has started and will contain the
@@ -968,10 +968,10 @@ FLAC_API unsigned FLAC__stream_decoder_get_bits_per_sample(const FLAC__StreamDec
  * \param  decoder  A decoder instance to query.
  * \assert
  *    \code decoder != NULL \endcode
- * \retval unsigned
+ * \retval uint32_t
  *    See above.
  */
-FLAC_API unsigned FLAC__stream_decoder_get_sample_rate(const FLAC__StreamDecoder *decoder);
+FLAC_API uint32_t FLAC__stream_decoder_get_sample_rate(const FLAC__StreamDecoder *decoder);
 
 /** Get the current blocksize of the stream being decoded.
  *  Will only be valid after decoding has started and will contain the
@@ -980,10 +980,10 @@ FLAC_API unsigned FLAC__stream_decoder_get_sample_rate(const FLAC__StreamDecoder
  * \param  decoder  A decoder instance to query.
  * \assert
  *    \code decoder != NULL \endcode
- * \retval unsigned
+ * \retval uint32_t
  *    See above.
  */
-FLAC_API unsigned FLAC__stream_decoder_get_blocksize(const FLAC__StreamDecoder *decoder);
+FLAC_API uint32_t FLAC__stream_decoder_get_blocksize(const FLAC__StreamDecoder *decoder);
 
 /** Returns the decoder's current read position within the stream.
  *  The position is the byte offset from the start of the stream.

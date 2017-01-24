@@ -60,7 +60,7 @@
  * silog2(  9) = 5
  * silog2( 10) = 5
  */
-unsigned FLAC__bitmath_silog2(FLAC__int64 v)
+uint32_t FLAC__bitmath_silog2(FLAC__int64 v)
 {
 	if(v == 0)
 		return 0;

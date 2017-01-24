@@ -54,7 +54,7 @@
 #define     DATA32_RESULT(xmmN) data[i] = residual[i] + (_mm_cvtsi128_si32(xmmN) >> lp_quantization);
 
 FLAC__SSE_TARGET("sse2")
-void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_sse2(const FLAC__int32 *data, unsigned data_len, const FLAC__int32 qlp_coeff[], unsigned order, int lp_quantization, FLAC__int32 residual[])
+void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_sse2(const FLAC__int32 *data, uint32_t data_len, const FLAC__int32 qlp_coeff[], uint32_t order, int lp_quantization, FLAC__int32 residual[])
 {
 	int i;
 	FLAC__int32 sum;
@@ -408,7 +408,7 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_sse2(const FLAC_
 }
 
 FLAC__SSE_TARGET("sse2")
-void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__int32 *data, unsigned data_len, const FLAC__int32 qlp_coeff[], unsigned order, int lp_quantization, FLAC__int32 residual[])
+void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__int32 *data, uint32_t data_len, const FLAC__int32 qlp_coeff[], uint32_t order, int lp_quantization, FLAC__int32 residual[])
 {
 	int i;
 
@@ -937,7 +937,7 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2(const FLAC__in
 #if defined FLAC__CPU_IA32 && !defined FLAC__HAS_NASM /* unused for x64; not better than MMX asm */
 
 FLAC__SSE_TARGET("sse2")
-void FLAC__lpc_restore_signal_16_intrin_sse2(const FLAC__int32 residual[], unsigned data_len, const FLAC__int32 qlp_coeff[], unsigned order, int lp_quantization, FLAC__int32 data[])
+void FLAC__lpc_restore_signal_16_intrin_sse2(const FLAC__int32 residual[], uint32_t data_len, const FLAC__int32 qlp_coeff[], uint32_t order, int lp_quantization, FLAC__int32 data[])
 {
 	if (order < 8 || order > 12) {
 		FLAC__lpc_restore_signal(residual, data_len, qlp_coeff, order, lp_quantization, data);

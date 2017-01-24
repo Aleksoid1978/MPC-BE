@@ -55,10 +55,10 @@
 #endif
 
 FLAC__SSE_TARGET("sse2")
-unsigned FLAC__fixed_compute_best_predictor_intrin_sse2(const FLAC__int32 data[], unsigned data_len, float residual_bits_per_sample[FLAC__MAX_FIXED_ORDER + 1])
+uint32_t FLAC__fixed_compute_best_predictor_intrin_sse2(const FLAC__int32 data[], uint32_t data_len, float residual_bits_per_sample[FLAC__MAX_FIXED_ORDER + 1])
 {
 	FLAC__uint32 total_error_0, total_error_1, total_error_2, total_error_3, total_error_4;
-	unsigned i, order;
+	uint32_t i, order;
 
 	__m128i total_err0, total_err1, total_err2;
 
@@ -152,10 +152,10 @@ unsigned FLAC__fixed_compute_best_predictor_intrin_sse2(const FLAC__int32 data[]
 }
 
 FLAC__SSE_TARGET("sse2")
-unsigned FLAC__fixed_compute_best_predictor_wide_intrin_sse2(const FLAC__int32 data[], unsigned data_len, float residual_bits_per_sample[FLAC__MAX_FIXED_ORDER + 1])
+uint32_t FLAC__fixed_compute_best_predictor_wide_intrin_sse2(const FLAC__int32 data[], uint32_t data_len, float residual_bits_per_sample[FLAC__MAX_FIXED_ORDER + 1])
 {
 	FLAC__uint64 total_error_0, total_error_1, total_error_2, total_error_3, total_error_4;
-	unsigned i, order;
+	uint32_t i, order;
 
 	__m128i total_err0, total_err1, total_err3;
 
