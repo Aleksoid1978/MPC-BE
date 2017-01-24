@@ -1605,13 +1605,26 @@ HRESULT CDirectVobSubFilter2::CheckInputType(const CMediaType* mtIn)
 
 bool CDirectVobSubFilter2::ShouldWeAutoload(IFilterGraph* pGraph)
 {
-	WCHAR blacklistedapps[][32] = {
-		L"WM8EUTIL.", // wmp8 encoder's dummy renderer releases the outputted media sample after calling Receive on its input pin (yes, even when dvobsub isn't registered at all)
-		L"explorer.", // as some users reported thumbnail preview loads dvobsub, I've never experienced this yet...
-		L"producer.", // this is real's producer
-		L"GoogleDesktopIndex.", // Google Desktop
-		L"GoogleDesktopDisplay.", // Google Desktop
-		L"GoogleDesktopCrawl.", // Google Desktop
+	WCHAR* blacklistedapps[] = {
+		L"wm8eutil.",        // wmp8 encoder's dummy renderer releases the outputted media sample after calling Receive on its input pin (yes, even when dvobsub isn't registered at all)
+		L"explorer.",        // as some users reported thumbnail preview loads dvobsub, I've never experienced this yet...
+		L"producer.",        // this is real's producer
+		L"googledesktop",    // Google Desktop
+		L"subtitleworkshop", // Subtitle Workshop
+		L"darksouls.",       // Dark Souls (Game)
+		L"rometw.",          // Rome Total War (Game)
+		L"everquest2.",      // EverQuest II (Game)
+		L"yso_win.",         // Ys Origin (Game)
+		L"launcher_main.",   // Logitech WebCam Software
+		L"webcamdell",       // Dell WebCam Software
+		L"data.",            // Dark Souls 1 (Game)
+		L"unravel",          // Unravel (Game)
+		L"mshta",            // MS Scripting Host
+#if WIN64
+		L"ridex64.exe",      // Ride (Game)
+#else
+		L"ride.exe",         // Ride (Game)
+#endif
 	};
 
 	for (size_t i = 0; i < _countof(blacklistedapps); i++) {
