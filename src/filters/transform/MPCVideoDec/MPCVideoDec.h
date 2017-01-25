@@ -92,6 +92,7 @@ protected:
 	BYTE*									m_pFFBuffer2;
 	int										m_nFFBufferSize2;
 
+	REFERENCE_TIME							m_rtLastStart;			// rtStart  for last delivered frame
 	REFERENCE_TIME							m_rtLastStop;			// rtStop  for last delivered frame
 	double									m_dRate;
 
@@ -123,7 +124,6 @@ protected:
 
 	BOOL									m_bWaitingForKeyFrame;
 	BOOL									m_bRVDropBFrameTimings;
-	BOOL									m_bUsePTS;
 
 	REFERENCE_TIME							m_rtStart;
 	REFERENCE_TIME							m_rtStartCache;
