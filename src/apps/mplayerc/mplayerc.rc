@@ -7,8 +7,7 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
-
+#include "afxres.h"
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -197,8 +196,8 @@ BEGIN
     EDITTEXT        IDC_LIBAVCODEC_VERSION,130,84,100,13,ES_AUTOHSCROLL | ES_READONLY
     CONTROL         "<a>http://sourceforge.net/projects/mpcbe/</a>",IDC_SOURCEFORGE_LINK,
                     "SysLink",WS_TABSTOP,30,101,200,8
-    LTEXT           "This program is freeware and released under the GNU General Public License.",IDC_STATIC,30,113,195,18
-    LTEXT           "English translation made by MPC-BE Team",IDC_STATIC,30,136,150,18
+    LTEXT           "This program is freeware and released under the GNU General Public License.",IDC_STATIC,30,113,200,18
+    LTEXT           "English translation made by MPC-BE Team",IDC_STATIC,30,136,200,18
     DEFPUSHBUTTON   "OK",IDOK,185,161,50,14,WS_GROUP
 END
 
@@ -1195,6 +1194,7 @@ BEGIN
     BEGIN
         VERTGUIDE, 30
         VERTGUIDE, 130
+        VERTGUIDE, 230
     END
 
     IDD_PPAGEPLAYER, DIALOG
