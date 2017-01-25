@@ -267,7 +267,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
-6		" ""Siyah"" arayüzü kullan (varsayılan)"
+6		"'Siyah' arayüzü kullan (varsayılan)"
 7		"Parlaklık :"
 9		"Ses göstergesi renk ayarı:"
 10		"Doldurma:"
