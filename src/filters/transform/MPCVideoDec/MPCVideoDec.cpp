@@ -925,8 +925,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_DXVADecoderGUID(GUID_NULL)
 	, m_nActiveCodecs(CODECS_ALL & ~CODEC_H264_MVC)
 	, m_rtAvrTimePerFrame(0)
+	, m_rtLastStart(INVALID_TIME)
 	, m_rtLastStop(0)
-	, m_bUsePTS(FALSE)
 	, m_rtStartCache(INVALID_TIME)
 	, m_rtStopCache(INVALID_TIME)
 	, m_nWorkaroundBug(FF_BUG_AUTODETECT)
@@ -1121,7 +1121,7 @@ void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME
 {
 	const REFERENCE_TIME AvgTimePerFrame = GetFrameDuration();
 
-	if (rtStart == INVALID_TIME) {
+	if (rtStart == INVALID_TIME || (m_rtLastStart != INVALID_TIME && rtStart < m_rtLastStart)) {
 		rtStart = m_rtLastStop;
 		rtStop = INVALID_TIME;
 	}
@@ -1131,17 +1131,18 @@ void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME
 	}
 
 	if (rtStop == INVALID_TIME) {
-		const REFERENCE_TIME rtFrameDuration = AvgTimePerFrame * (m_pFrame ? (m_pFrame->repeat_pict ? 3 : 2)  / 2 : 1);
+		const REFERENCE_TIME rtFrameDuration = AvgTimePerFrame * (m_pFrame && m_pFrame->repeat_pict ? 3 : 2) / 2;
 		rtStop = rtStart + (rtFrameDuration / m_dRate);
 	}
 
+	m_rtLastStart = rtStart;
 	m_rtLastStop = rtStop;
 }
 
 void CMPCVideoDecFilter::GetFrameTimeStamp(AVFrame* pFrame, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
 {
-	rtStart = m_bUsePTS ? pFrame->pts : av_frame_get_best_effort_timestamp(pFrame);
-	int64_t pkt_duration = av_frame_get_pkt_duration(pFrame);
+	rtStart = av_frame_get_best_effort_timestamp(pFrame);
+	const int64_t pkt_duration = av_frame_get_pkt_duration(pFrame);
 	if (pkt_duration) {
 		rtStop = rtStart + pkt_duration;
 	} else {
@@ -1651,12 +1652,12 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 {
 	DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::InitDecoder()"));
 
-	BOOL bReinit = (m_pAVCtx != NULL);
-	BOOL bChangeType = (m_pCurrentMediaType != *pmt);
+	const BOOL bReinit = (m_pAVCtx != NULL);
+	const BOOL bChangeType = (m_pCurrentMediaType != *pmt);
 
 	ffmpegCleanup();
 
-	int nNewCodec = FindCodec(pmt, bReinit);
+	const int nNewCodec = FindCodec(pmt, bReinit);
 	if (nNewCodec == -1) {
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
@@ -1708,7 +1709,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 								|| bNotTrustSourceTimeStamp);
 
 		m_bRVDropBFrameTimings = (m_nCodecId == AV_CODEC_ID_RV10 || m_nCodecId == AV_CODEC_ID_RV20 || m_nCodecId == AV_CODEC_ID_RV30 || m_nCodecId == AV_CODEC_ID_RV40);
-		m_bUsePTS = (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO || m_nCodecId == AV_CODEC_ID_MPEG1VIDEO);
 	}
 
 	m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
@@ -1798,7 +1798,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	}
 
 	avcodec_lock;
-	int ret = avcodec_open2(m_pAVCtx, m_pAVCodec, NULL);
+	const int ret = avcodec_open2(m_pAVCtx, m_pAVCodec, NULL);
 	avcodec_unlock;
 	if (ret < 0) {
 		return VFW_E_INVALIDMEDIATYPE;
@@ -2371,6 +2371,8 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	m_rtStart		= rtStart;
 	m_rtStartCache	= INVALID_TIME;
 	m_rtStopCache	= INVALID_TIME;
+
+	m_rtLastStart	= INVALID_TIME;
 	m_rtLastStop	= 0;
 
 	if (m_nCodecId == AV_CODEC_ID_H264 && m_bDecodingStart && (m_nDecoderMode == MODE_SOFTWARE || (m_nPCIVendor == PCIV_ATI && m_bInterlaced))) {
