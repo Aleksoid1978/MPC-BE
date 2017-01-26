@@ -312,33 +312,6 @@ class AP4_Mp4vSampleEntry : public AP4_VisualSampleEntry
 };
 
 /*----------------------------------------------------------------------
-|       AP4_AvcSampleEntry
-+---------------------------------------------------------------------*/
-class AP4_AvcSampleEntry : public AP4_VisualSampleEntry
-{
-public:
-    // constructors
-    AP4_AvcSampleEntry(AP4_UI32         format,
-                       AP4_Size         size,
-                       AP4_ByteStream&  stream,
-                       AP4_AtomFactory& atom_factory);
-};
-
-/*----------------------------------------------------------------------
-|       AP4_HevcSampleEntry
-+---------------------------------------------------------------------*/
-
-class AP4_HevcSampleEntry : public AP4_VisualSampleEntry
-{
-public:
-    // constructors
-    AP4_HevcSampleEntry(AP4_UI32         format,
-                        AP4_Size         size,
-                        AP4_ByteStream&  stream,
-                        AP4_AtomFactory& atom_factory);
-};
-
-/*----------------------------------------------------------------------
 |       AP4_RtpHintSampleEntry
 +---------------------------------------------------------------------*/
 class AP4_RtpHintSampleEntry : public AP4_SampleEntry

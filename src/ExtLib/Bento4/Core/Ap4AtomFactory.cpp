@@ -266,22 +266,6 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
             atom = new AP4_Mp4vSampleEntry(size, stream, *this);
             break;
 
-        case AP4_ATOM_TYPE_AVC1:
-        case AP4_ATOM_TYPE_AVC2:
-        case AP4_ATOM_TYPE_AVC3:
-        case AP4_ATOM_TYPE_AVC4:
-        case AP4_ATOM_TYPE_DVAV:
-        case AP4_ATOM_TYPE_DVA1:
-            atom = new AP4_AvcSampleEntry(type, size, stream, *this);
-            break;
-
-        case AP4_ATOM_TYPE_HVC1:
-        case AP4_ATOM_TYPE_HEV1:
-        case AP4_ATOM_TYPE_DVHE:
-        case AP4_ATOM_TYPE_DVH1:
-            atom = new AP4_HevcSampleEntry(type, size, stream, *this);
-            break;
-
         case AP4_ATOM_TYPE_ENCA:
             atom = new AP4_EncaSampleEntry(size, stream, *this);
             break;
@@ -572,6 +556,20 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_M8Y2:
         case AP4_ATOM_TYPE_M8Y4:
         case AP4_ATOM_TYPE_M8YA:
+        // H.264/AVC
+        case AP4_ATOM_TYPE_AVC1:
+        case AP4_ATOM_TYPE_AVC2:
+        case AP4_ATOM_TYPE_AVC3:
+        case AP4_ATOM_TYPE_AVC4:
+        case AP4_ATOM_TYPE_DVAV:
+        case AP4_ATOM_TYPE_DVA1:
+        case AP4_ATOM_TYPE_AVLG:
+        case AP4_ATOM_TYPE_XALG:
+        // H.265/HEVC
+        case AP4_ATOM_TYPE_HVC1:
+        case AP4_ATOM_TYPE_HEV1:
+        case AP4_ATOM_TYPE_DVHE:
+        case AP4_ATOM_TYPE_DVH1:
             atom = new AP4_VisualSampleEntry(type, size, stream, *this);
             break;
 

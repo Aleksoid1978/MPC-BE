@@ -906,6 +906,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							case AP4_ATOM_TYPE_AVC4:
 							case AP4_ATOM_TYPE_DVAV:
 							case AP4_ATOM_TYPE_DVA1:
+							case AP4_ATOM_TYPE_AVLG:
+							case AP4_ATOM_TYPE_XALG:
 								{
 									SetTrackName(&TrackName, L"MPEG4 Video (H264)");
 
