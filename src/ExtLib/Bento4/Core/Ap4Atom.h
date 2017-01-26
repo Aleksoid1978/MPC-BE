@@ -320,9 +320,11 @@ const AP4_Atom::Type AP4_ATOM_TYPE_AVC3 = AP4_ATOM_TYPE('a','v','c','3');
 const AP4_Atom::Type AP4_ATOM_TYPE_AVC4 = AP4_ATOM_TYPE('a','v','c','4');
 const AP4_Atom::Type AP4_ATOM_TYPE_DVAV = AP4_ATOM_TYPE('d','v','a','v');
 const AP4_Atom::Type AP4_ATOM_TYPE_DVA1 = AP4_ATOM_TYPE('d','v','a','1');
+const AP4_Atom::Type AP4_ATOM_TYPE_AVLG = AP4_ATOM_TYPE('a','v','l','g');
+const AP4_Atom::Type AP4_ATOM_TYPE_XALG = AP4_ATOM_TYPE('x','a','l','g');
 
 const AP4_Atom::Type AP4_ATOM_TYPE_AVCC = AP4_ATOM_TYPE('a','v','c','C');
-// HEVC
+// H.265/HEVC
 const AP4_Atom::Type AP4_ATOM_TYPE_HVC1 = AP4_ATOM_TYPE('h','v','c','1');
 const AP4_Atom::Type AP4_ATOM_TYPE_HEV1 = AP4_ATOM_TYPE('h','e','v','1');
 const AP4_Atom::Type AP4_ATOM_TYPE_DVHE = AP4_ATOM_TYPE('d','v','h','e');
