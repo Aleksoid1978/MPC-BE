@@ -1068,6 +1068,36 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
 					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 					mts.Add(mt);
+				} else if (CodecID.Left(6) == "A_AAC/") {
+					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_RAW_AAC1);
+					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 5);
+					wfe->cbSize = 2;
+
+					int profile;
+					if (CodecID.Find("/MAIN") > 0) {
+						profile = 0;
+					} else if (CodecID.Find("/SBR") > 0) {
+						profile = -1;
+					} else if (CodecID.Find("/LC") > 0) {
+						profile = 1;
+					} else if (CodecID.Find("/SSR") > 0) {
+						profile = 2;
+					} else if (CodecID.Find("/LTP") > 0) {
+						profile = 3;
+					} else {
+						continue;
+					}
+
+					WORD cbSize = MakeAACInitData((BYTE*)(wfe + 1), profile, wfe->nSamplesPerSec, (int)pTE->a.Channels);
+					mts.Add(mt);
+
+					if (profile < 0) {
+						wfe->cbSize = cbSize;
+						wfe->nSamplesPerSec *= 2;
+						wfe->nAvgBytesPerSec *= 2;
+
+						mts.InsertAt(0, mt);
+					}
 				} else if (CodecID == "A_WAVPACK4") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_WAVPACK4);
 					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
@@ -1143,38 +1173,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										  (DWORD)pTE->a.SamplingFrequency,
 										  DWORD(pTE->a.BitDepth),
 										  pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
-				} else if (CodecID.Find("A_AAC/") == 0) {
-					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_RAW_AAC1);
-					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 5);
-					wfe->cbSize = 2;
-
-					int profile;
-
-					if (CodecID.Find("/MAIN") > 0) {
-						profile = 0;
-					} else if (CodecID.Find("/SBR") > 0) {
-						profile = -1;
-					} else if (CodecID.Find("/LC") > 0) {
-						profile = 1;
-					} else if (CodecID.Find("/SSR") > 0) {
-						profile = 2;
-					} else if (CodecID.Find("/LTP") > 0) {
-						profile = 3;
-					} else {
-						continue;
-					}
-
-					WORD cbSize = MakeAACInitData((BYTE*)(wfe + 1), profile, wfe->nSamplesPerSec, (int)pTE->a.Channels);
-
-					mts.Add(mt);
-
-					if (profile < 0) {
-						wfe->cbSize = cbSize;
-						wfe->nSamplesPerSec *= 2;
-						wfe->nAvgBytesPerSec *= 2;
-
-						mts.InsertAt(0, mt);
-					}
 				} else if (CodecID.Left(7) == "A_REAL/" && CodecID.GetLength() >= 11) {
 					mt.subtype = FOURCCMap((DWORD)CodecID[7]|((DWORD)CodecID[8]<<8)|((DWORD)CodecID[9]<<16)|((DWORD)CodecID[10]<<24));
 					mt.bTemporalCompression = TRUE;
