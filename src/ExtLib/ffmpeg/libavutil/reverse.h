@@ -1,4 +1,6 @@
 /*
+ * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
+ *
  * This file is part of FFmpeg.
  *
  * FFmpeg is free software; you can redistribute it and/or
@@ -16,25 +18,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVCODEC_HUFFYUVENCDSP_H
-#define AVCODEC_HUFFYUVENCDSP_H
+#ifndef AVUTIL_REVERSE_H
+#define AVUTIL_REVERSE_H
 
 #include <stdint.h>
 
-#include "avcodec.h"
+extern const uint8_t ff_reverse[256];
 
-typedef struct HuffYUVEncDSPContext {
-    void (*diff_int16)(uint16_t *dst /* align 16 */,
-                       const uint16_t *src1 /* align 16 */,
-                       const uint16_t *src2 /* align 1 */,
-                       unsigned mask, int w);
-
-    void (*sub_hfyu_median_pred_int16)(uint16_t *dst, const uint16_t *src1,
-                                       const uint16_t *src2, unsigned mask,
-                                       int w, int *left, int *left_top);
-} HuffYUVEncDSPContext;
-
-void ff_huffyuvencdsp_init(HuffYUVEncDSPContext *c, AVCodecContext *avctx);
-void ff_huffyuvencdsp_init_x86(HuffYUVEncDSPContext *c, AVCodecContext *avctx);
-
-#endif /* AVCODEC_HUFFYUVENCDSP_H */
+#endif /* AVUTIL_REVERSE_H */

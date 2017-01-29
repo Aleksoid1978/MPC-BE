@@ -223,7 +223,8 @@ HRESULT CFilter::Pull(CAutoPtr<CPacket>& p)
 
 	int ret = av_buffersink_get_frame(m_pFilterBufferSink, m_pFrame);
 	if (ret >= 0) {
-		p->rtStart = av_rescale(m_pFrame->pts, m_pFilterBufferSink->inputs[0]->time_base.num * UNITS, m_pFilterBufferSink->inputs[0]->time_base.den);
+		const AVRational time_base = av_buffersink_get_time_base(m_pFilterBufferSink);
+		p->rtStart = av_rescale(m_pFrame->pts, time_base.num * UNITS, time_base.den);
 		p->rtStop  = p->rtStart + llMulDiv(UNITS, m_pFrame->nb_samples, m_pFrame->sample_rate, 0);
 
 		if (m_av_sample_fmt == AV_SAMPLE_FMT_S32 && m_sample_fmt == SAMPLE_FMT_S24) {
