@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -99,8 +99,6 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 private:
 	CCritSec m_csProps;
 	bool m_bLoadEmbeddedFonts, m_bCalcDuration;
-
-	REFERENCE_TIME CalcFrameDuration(CUInt trackNumber);
 
 protected:
 	CAutoPtr<MatroskaReader::CMatroskaFile> m_pFile;
