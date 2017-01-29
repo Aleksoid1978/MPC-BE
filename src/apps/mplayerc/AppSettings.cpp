@@ -49,6 +49,30 @@ const LPCWSTR channel_mode_sets[] = {
 	L"7.1", // SPK_7_1    "7.1"
 };
 
+// CFiltersPrioritySettings
+
+void CFiltersPrioritySettings::SaveSettings()
+{
+	POSITION pos = values.GetStartPosition();
+	while (pos) {
+		CAtlStringMap<CLSID>::CPair* pPair = values.GetNext(pos);
+		AfxGetMyApp()->WriteProfileString(IDS_R_FILTERS_PRIORITY, pPair->m_key, CStringFromGUID(pPair->m_value));
+	}
+};
+
+void CFiltersPrioritySettings::LoadSettings()
+{
+	SetDefault();
+
+	POSITION pos = values.GetStartPosition();
+	while (pos) {
+		CAtlStringMap<CLSID>::CPair* pPair = values.GetNext(pos);
+		pPair->m_value = GUIDFromCString(AfxGetMyApp()->GetProfileString(IDS_R_FILTERS_PRIORITY, pPair->m_key, CStringFromGUID(pPair->m_value)));
+	}
+};
+
+// CAppSettings
+
 CAppSettings::CAppSettings()
 	: fInitialized(false)
 	, fKeepHistory(true)
@@ -1654,7 +1678,7 @@ void CAppSettings::LoadShaders()
 
 int CAppSettings::GetMultiInst()
 {
-	int multiinst = AfxGetApp()->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, 1);
+	int multiinst = AfxGetMyApp()->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, 1);
 	if (multiinst < 0 || multiinst > 2) {
 		multiinst = 1;
 	}
@@ -1971,7 +1995,7 @@ void CAppSettings::GetFav(favtype ft, CAtlList<CString>& sl)
 	for (int i = 0; ; i++) {
 		CString s;
 		s.Format(L"Name%d", i);
-		s = AfxGetApp()->GetProfileString(root, s);
+		s = AfxGetMyApp()->GetProfileString(root, s);
 		if (s.IsEmpty()) {
 			break;
 		}
@@ -2004,14 +2028,14 @@ void CAppSettings::SetFav(favtype ft, CAtlList<CString>& sl)
 			return;
 	}
 
-	AfxGetApp()->WriteProfileString(root, NULL, NULL);
+	AfxGetMyApp()->WriteProfileString(root, NULL, NULL);
 
 	int i = 0;
 	POSITION pos = sl.GetHeadPosition();
 	while (pos) {
 		CString s;
 		s.Format(L"Name%d", i++);
-		AfxGetApp()->WriteProfileString(root, s, sl.GetNext(pos));
+		AfxGetMyApp()->WriteProfileString(root, s, sl.GetNext(pos));
 	}
 }
 

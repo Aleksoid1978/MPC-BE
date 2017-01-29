@@ -317,7 +317,7 @@ BOOL CSubtitleDlDlg::OnInitDialog()
 	int n, curPos = 0;
 	CArray<int> columnWidth;
 
-	CString strColumnWidth = AfxGetApp()->GetProfileString(IDS_R_DLG_SUBTITLEDL, IDS_RS_DLG_SUBTITLEDL_COLWIDTH);
+	CString strColumnWidth = AfxGetMyApp()->GetProfileString(IDS_R_DLG_SUBTITLEDL, IDS_RS_DLG_SUBTITLEDL_COLWIDTH);
 	CString token = strColumnWidth.Tokenize(L",", curPos);
 
 	while (!token.IsEmpty()) {
@@ -547,7 +547,7 @@ void CSubtitleDlDlg::OnDestroy()
 		int w = m_list.GetColumnWidth(i);
 		strColumnWidth.AppendFormat(L"%d,", w);
 	}
-	AfxGetApp()->WriteProfileString(IDS_R_DLG_SUBTITLEDL, IDS_RS_DLG_SUBTITLEDL_COLWIDTH, strColumnWidth);
+	AfxGetMyApp()->WriteProfileString(IDS_R_DLG_SUBTITLEDL, IDS_RS_DLG_SUBTITLEDL_COLWIDTH, strColumnWidth);
 
 	__super::OnDestroy();
 }
