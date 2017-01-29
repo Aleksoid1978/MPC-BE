@@ -392,23 +392,8 @@ public:
 		}
 	};
 
-	void LoadSettings() {
-		SetDefault();
-
-		POSITION pos = values.GetStartPosition();
-		while (pos) {
-			CAtlStringMap<CLSID>::CPair* pPair = values.GetNext(pos);
-			pPair->m_value = GUIDFromCString(AfxGetApp()->GetProfileString(IDS_R_FILTERS_PRIORITY, pPair->m_key, CStringFromGUID(pPair->m_value)));
-		}
-	};
-
-	void SaveSettings() {
-		POSITION pos = values.GetStartPosition();
-		while (pos) {
-			CAtlStringMap<CLSID>::CPair* pPair = values.GetNext(pos);
-			AfxGetApp()->WriteProfileString(IDS_R_FILTERS_PRIORITY, pPair->m_key, CStringFromGUID(pPair->m_value));
-		}
-	};
+	void LoadSettings();
+	void SaveSettings();
 };
 
 class CSubtitleItem

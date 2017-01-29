@@ -119,8 +119,7 @@ void CAuthDlg::OnBnClickedOk()
 	UpdateData();
 
 	if (!m_username.IsEmpty()) {
-		CWinApp* pApp = AfxGetApp();
-		pApp->WriteProfileString(IDS_R_LOGINS, m_username, m_remember ? DEncrypt(m_password) : L"");
+		AfxGetMyApp()->WriteProfileString(IDS_R_LOGINS, m_username, m_remember ? DEncrypt(m_password) : L"");
 	}
 
 	OnOK();

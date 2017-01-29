@@ -91,7 +91,7 @@ static bool LoadMediaType(CStringW DisplayName, AM_MEDIA_TYPE** ppmt)
 
 	BYTE* pData;
 	UINT len;
-	if (AfxGetApp()->GetProfileBinary(IDS_R_CAPTURE L"\\" + CString(DisplayName), L"MediaType", &pData, &len)) {
+	if (AfxGetMyApp()->GetProfileBinary(IDS_R_CAPTURE L"\\" + CString(DisplayName), L"MediaType", &pData, &len)) {
 		if ( len != sizeof(AM_MEDIA_TYPE) ) {
 			CoTaskMemFree(*ppmt);
 			delete [] pData;
@@ -105,7 +105,7 @@ static bool LoadMediaType(CStringW DisplayName, AM_MEDIA_TYPE** ppmt)
 
 		fRet = true;
 
-		if (AfxGetApp()->GetProfileBinary(IDS_R_CAPTURE L"\\" + CString(DisplayName), L"Format", &pData, &len)) {
+		if (AfxGetMyApp()->GetProfileBinary(IDS_R_CAPTURE L"\\" + CString(DisplayName), L"Format", &pData, &len)) {
 			if ( !len ) {
 				delete [] pData;
 				return(fRet);
@@ -126,8 +126,8 @@ static void SaveMediaType(CStringW DisplayName, AM_MEDIA_TYPE* pmt)
 		return;
 	}
 
-	AfxGetApp()->WriteProfileBinary(IDS_R_CAPTURE L"\\" + CString(DisplayName), L"MediaType", (BYTE*)pmt, sizeof(AM_MEDIA_TYPE));
-	AfxGetApp()->WriteProfileBinary(IDS_R_CAPTURE L"\\" + CString(DisplayName), L"Format", pmt->pbFormat, pmt->cbFormat);
+	AfxGetMyApp()->WriteProfileBinary(IDS_R_CAPTURE L"\\" + CString(DisplayName), L"MediaType", (BYTE*)pmt, sizeof(AM_MEDIA_TYPE));
+	AfxGetMyApp()->WriteProfileBinary(IDS_R_CAPTURE L"\\" + CString(DisplayName), L"Format", pmt->pbFormat, pmt->cbFormat);
 }
 
 static void LoadDefaultCodec(CAtlArray<Codec>& codecs, CComboBox& box, const GUID& cat)
@@ -141,7 +141,7 @@ static void LoadDefaultCodec(CAtlArray<Codec>& codecs, CComboBox& box, const GUI
 		return;
 	}
 
-	CString DisplayName = AfxGetApp()->GetProfileString(IDS_R_CAPTURE L"\\" + CStringFromGUID(cat), L"DisplayName");
+	CString DisplayName = AfxGetMyApp()->GetProfileString(IDS_R_CAPTURE L"\\" + CStringFromGUID(cat), L"DisplayName");
 
 	for (int i = 0; i < len; i++) {
 		int iSel = box.GetItemData(i);
@@ -168,7 +168,7 @@ static void SaveDefaultCodec(CAtlArray<Codec>& codecs, CComboBox& box, const GUI
 
 	CString guid = CStringFromGUID(cat);
 
-	AfxGetApp()->WriteProfileString(IDS_R_CAPTURE L"\\" + guid, NULL, NULL);
+	AfxGetMyApp()->WriteProfileString(IDS_R_CAPTURE L"\\" + guid, NULL, NULL);
 
 	int iSel = box.GetCurSel();
 	if (iSel < 0) {
@@ -181,7 +181,7 @@ static void SaveDefaultCodec(CAtlArray<Codec>& codecs, CComboBox& box, const GUI
 
 	Codec& codec = codecs[iSel];
 
-	AfxGetApp()->WriteProfileString(IDS_R_CAPTURE L"\\" + guid, L"DisplayName", CString(codec.DisplayName));
+	AfxGetMyApp()->WriteProfileString(IDS_R_CAPTURE L"\\" + guid, L"DisplayName", CString(codec.DisplayName));
 }
 
 static void SetupDefaultCaps(AM_MEDIA_TYPE* pmt, VIDEO_STREAM_CONFIG_CAPS& caps)
@@ -661,7 +661,7 @@ void CPlayerCaptureDialog::EmptyVideo()
 	if (m_pAMTuner && !m_VidDisplayName.IsEmpty()) {
 		long lChannel = 0, lVivSub = 0, lAudSub = 0;
 		m_pAMTuner->get_Channel(&lChannel, &lVivSub, &lAudSub);
-		AfxGetApp()->WriteProfileInt(IDS_R_CAPTURE L"\\" + CString(m_VidDisplayName), L"Channel", lChannel);
+		AfxGetMyApp()->WriteProfileInt(IDS_R_CAPTURE L"\\" + CString(m_VidDisplayName), L"Channel", lChannel);
 	}
 
 	//
@@ -1351,23 +1351,24 @@ BOOL CPlayerCaptureDialog::OnInitDialog()
 	UpdateAudioCodec();
 
 	m_fEnableOgm = IsCLSIDRegistered(CLSID_OggMux);
+	CMPlayerCApp* pApp = AfxGetMyApp();
 
-	m_nVidBuffers = AfxGetApp()->GetProfileInt(IDS_R_CAPTURE, L"VidBuffers", 50);
-	m_nAudBuffers = AfxGetApp()->GetProfileInt(IDS_R_CAPTURE, L"AudBuffers", 50);
-	m_fVidOutput = !!AfxGetApp()->GetProfileInt(IDS_R_CAPTURE, L"VidOutput", TRUE);
-	m_fAudOutput = !!AfxGetApp()->GetProfileInt(IDS_R_CAPTURE, L"AudOutput", TRUE);
-	m_fVidPreview = AfxGetApp()->GetProfileInt(IDS_R_CAPTURE, L"VidPreview", TRUE);
-	m_fAudPreview = AfxGetApp()->GetProfileInt(IDS_R_CAPTURE, L"AudPreview", TRUE);
-	m_muxtype = AfxGetApp()->GetProfileInt(IDS_R_CAPTURE, L"FileFormat", 0);
-	m_file = AfxGetApp()->GetProfileString(IDS_R_CAPTURE, L"FileName", L"");
-	m_fSepAudio = AfxGetApp()->GetProfileInt(IDS_R_CAPTURE, L"SepAudio", TRUE);
+	m_nVidBuffers = pApp->GetProfileInt(IDS_R_CAPTURE, L"VidBuffers", 50);
+	m_nAudBuffers = pApp->GetProfileInt(IDS_R_CAPTURE, L"AudBuffers", 50);
+	m_fVidOutput  = !!pApp->GetProfileInt(IDS_R_CAPTURE, L"VidOutput", TRUE);
+	m_fAudOutput  = !!pApp->GetProfileInt(IDS_R_CAPTURE, L"AudOutput", TRUE);
+	m_fVidPreview = pApp->GetProfileInt(IDS_R_CAPTURE, L"VidPreview", TRUE);
+	m_fAudPreview = pApp->GetProfileInt(IDS_R_CAPTURE, L"AudPreview", TRUE);
+	m_muxtype     = pApp->GetProfileInt(IDS_R_CAPTURE, L"FileFormat", 0);
+	m_file        = pApp->GetProfileString(IDS_R_CAPTURE, L"FileName", L"");
+	m_fSepAudio   = pApp->GetProfileInt(IDS_R_CAPTURE, L"SepAudio", TRUE);
 
 	m_muxctrl.AddString(L"AVI");
 	m_muxctrl.AddString(L"Ogg Media");
 	m_muxctrl.AddString(L"Matroska");
 	m_muxctrl.AddString(L"DirectShow Media");
 
-	//	UpdateMuxer();
+	// UpdateMuxer();
 
 	UpdateData(FALSE);
 
@@ -1380,14 +1381,15 @@ BOOL CPlayerCaptureDialog::OnInitDialog()
 void CPlayerCaptureDialog::OnDestroy()
 {
 	UpdateData();
+	CMPlayerCApp* pApp = AfxGetMyApp();
 
-	AfxGetApp()->WriteProfileInt(IDS_R_CAPTURE, L"VidOutput", m_fVidOutput);
-	AfxGetApp()->WriteProfileInt(IDS_R_CAPTURE, L"AudOutput", m_fAudOutput);
-	AfxGetApp()->WriteProfileInt(IDS_R_CAPTURE, L"VidPreview", m_fVidPreview);
-	AfxGetApp()->WriteProfileInt(IDS_R_CAPTURE, L"AudPreview", m_fAudPreview);
-	AfxGetApp()->WriteProfileInt(IDS_R_CAPTURE, L"FileFormat", m_muxtype);
-	AfxGetApp()->WriteProfileString(IDS_R_CAPTURE, L"FileName", m_file);
-	AfxGetApp()->WriteProfileInt(IDS_R_CAPTURE, L"SepAudio", m_fSepAudio);
+	pApp->WriteProfileInt(IDS_R_CAPTURE, L"VidOutput", m_fVidOutput);
+	pApp->WriteProfileInt(IDS_R_CAPTURE, L"AudOutput", m_fAudOutput);
+	pApp->WriteProfileInt(IDS_R_CAPTURE, L"VidPreview", m_fVidPreview);
+	pApp->WriteProfileInt(IDS_R_CAPTURE, L"AudPreview", m_fAudPreview);
+	pApp->WriteProfileInt(IDS_R_CAPTURE, L"FileFormat", m_muxtype);
+	pApp->WriteProfileString(IDS_R_CAPTURE, L"FileName", m_file);
+	pApp->WriteProfileInt(IDS_R_CAPTURE, L"SepAudio", m_fSepAudio);
 
 	__super::OnDestroy();
 }
@@ -1700,13 +1702,13 @@ void CPlayerCaptureDialog::OnRecord()
 void CPlayerCaptureDialog::OnEnChangeEdit9()
 {
 	UpdateData();
-	AfxGetApp()->WriteProfileInt(IDS_R_CAPTURE, L"VidBuffers", max(m_nVidBuffers, 0));
+	AfxGetMyApp()->WriteProfileInt(IDS_R_CAPTURE, L"VidBuffers", max(m_nVidBuffers, 0));
 }
 
 void CPlayerCaptureDialog::OnEnChangeEdit12()
 {
 	UpdateData();
-	AfxGetApp()->WriteProfileInt(IDS_R_CAPTURE, L"AudBuffers", max(m_nAudBuffers, 0));
+	AfxGetMyApp()->WriteProfileInt(IDS_R_CAPTURE, L"AudBuffers", max(m_nAudBuffers, 0));
 }
 
 void CPlayerCaptureDialog::OnTimer(UINT_PTR nIDEvent)

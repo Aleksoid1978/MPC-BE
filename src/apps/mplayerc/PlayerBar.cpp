@@ -45,7 +45,7 @@ BOOL CPlayerBar::Create(LPCTSTR lpszWindowName, CWnd* pParentWnd, UINT nID, UINT
 
 void CPlayerBar::LoadState(CFrameWnd *pParent)
 {
-	CWinApp* pApp = AfxGetApp();
+	CMPlayerCApp* pApp = AfxGetMyApp();
 
 	CRect r;
 	pParent->GetWindowRect(r);
@@ -87,7 +87,7 @@ void CPlayerBar::LoadState(CFrameWnd *pParent)
 
 void CPlayerBar::SaveState()
 {
-	CWinApp* pApp = AfxGetApp();
+	CMPlayerCApp* pApp = AfxGetMyApp();
 
 	CString section = L"ToolBars\\" + m_strSettingName;
 
