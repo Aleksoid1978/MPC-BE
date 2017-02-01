@@ -382,6 +382,9 @@ namespace Youtube
 			}
 			if (!JSUrl.IsEmpty()) {
 				JSUrl.Replace(L"\\/", L"/");
+				if (JSUrl.Find(L"s.ytimg.com") == -1) {
+					JSUrl = L"//s.ytimg.com" + JSUrl;
+				}
 				JSUrl = L"https:" + JSUrl;
 			}
 
