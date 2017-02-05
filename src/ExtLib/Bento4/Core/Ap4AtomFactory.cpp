@@ -556,6 +556,10 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_M8Y2:
         case AP4_ATOM_TYPE_M8Y4:
         case AP4_ATOM_TYPE_M8YA:
+        case AP4_ATOM_TYPE_M0RG:
+        case AP4_ATOM_TYPE_M0RA:
+        case AP4_ATOM_TYPE_M0R0:
+        case AP4_ATOM_TYPE_M0Y2:
         // H.264/AVC
         case AP4_ATOM_TYPE_AVC1:
         case AP4_ATOM_TYPE_AVC2:
