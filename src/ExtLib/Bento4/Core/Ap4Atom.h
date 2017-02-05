@@ -458,7 +458,10 @@ const AP4_Atom::Type AP4_ATOM_TYPE_M8Y0 = AP4_ATOM_TYPE('M','8','Y','0');
 const AP4_Atom::Type AP4_ATOM_TYPE_M8Y2 = AP4_ATOM_TYPE('M','8','Y','2');
 const AP4_Atom::Type AP4_ATOM_TYPE_M8Y4 = AP4_ATOM_TYPE('M','8','Y','4');
 const AP4_Atom::Type AP4_ATOM_TYPE_M8YA = AP4_ATOM_TYPE('M','8','Y','A');
-
+const AP4_Atom::Type AP4_ATOM_TYPE_M0RG = AP4_ATOM_TYPE('M','0','R','G');
+const AP4_Atom::Type AP4_ATOM_TYPE_M0RA = AP4_ATOM_TYPE('M','0','R','A');
+const AP4_Atom::Type AP4_ATOM_TYPE_M0R0 = AP4_ATOM_TYPE('M','0','R','0');
+const AP4_Atom::Type AP4_ATOM_TYPE_M0Y2 = AP4_ATOM_TYPE('M','0','Y','2');
 // fragmented atom ...
 const AP4_Atom::Type AP4_ATOM_TYPE_MVEX = AP4_ATOM_TYPE('m','v','e','x');
 const AP4_Atom::Type AP4_ATOM_TYPE_TREX = AP4_ATOM_TYPE('t','r','e','x');
