@@ -36,6 +36,7 @@
 #define MATCH_WIDTH_START           "meta property=\"og:video:width\" content=\""
 #define MATCH_HLSVP_START           "\"hlsvp\":\""
 #define MATCH_JS_START              "\"js\":\""
+#define MATCH_MPD_START             "\"dashmpd\":\""
 #define MATCH_END                   "\""
 
 #define MATCH_PLAYLIST_ITEM_START   "<li class=\"yt-uix-scroller-scroll-unit "
@@ -454,9 +455,73 @@ namespace Youtube
 				strUrls.Replace("\\u0026", "&");
 			}
 
-			free(data);
+			YoutubeUrllist audioList;
 
-			YoutubeUrllist AudioList;
+			auto AddUrl = [](YoutubeUrllist& videoUrls, YoutubeUrllist& audioUrls, CString url, int itag, int fps = 0) {
+				if (const YoutubeProfile* profile = GetProfile(itag)) {
+					YoutubeUrllistItem item;
+					item.profile = profile;
+					item.url = url;
+					item.title.Format(L"%s %dp",
+						profile->format == 1 ? L"WebM" : L"MP4",
+						profile->quality);
+					if (profile->type == y_video) {
+						item.title.Append(L" dash");
+					}
+					if (fps) {
+						item.title.AppendFormat(L" %dfps", fps);
+					} else if (profile->fps60) {
+						item.title.Append(L" 60fps");
+					}
+					if (profile->hdr) {
+						item.title.Append(L" HDR (10 bit)");
+					}
+
+					videoUrls.emplace_back(item);
+				} else if (const YoutubeProfile* audioprofile = GetAudioProfile(itag)) {
+					YoutubeUrllistItem item;
+					item.profile = audioprofile;
+					item.url = url;
+
+					audioUrls.emplace_back(item);
+				}
+			};
+
+			CString dashmpdUrl = UTF8To16(GetEntry(data, MATCH_MPD_START, MATCH_END));
+			if (!dashmpdUrl.IsEmpty()) {
+				dashmpdUrl.Replace(L"\\/", L"/");
+				hUrl = InternetOpenUrl(hInet, dashmpdUrl, NULL, 0, INTERNET_OPEN_FALGS, 0);
+				if (hUrl) {
+					char* dashmpd = NULL;
+					DWORD dashmpdSize = 0;
+					InternetReadData(hUrl, &dashmpd, dashmpdSize, NULL);
+					InternetCloseHandle(hUrl);
+					if (dashmpdSize) {
+						CString xml = UTF8To16(dashmpd);
+						free(dashmpd);
+						const std::wregex regex(L"<Representation(.*?)</Representation>");
+						std::wcmatch match;
+						LPCTSTR text = xml.GetBuffer();
+						while (std::regex_search(text, match, regex)) {
+							if (match.size() == 2) {
+								const CString xmlElement(match[1].first, match[1].length());
+								const CString url = RegExpParse(xmlElement, L"<BaseURL>(.*?)</BaseURL>");
+								const int itag = _wtoi(RegExpParse(xmlElement, L"id=\"([0-9]+)\""));
+								const int fps = _wtoi(RegExpParse(xmlElement, L"frameRate=\"([0-9]+)\""));
+								const int width = _wtoi(RegExpParse(xmlElement, L"width=\"([0-9]+)\""));
+								if (!(itag == 135 && width > 640)) {
+									// TODO - understand what is wrong with the url with itag = 135 !!!
+									AddUrl(youtubeUrllist, audioList, url, itag, fps);
+								}
+							}
+
+							text = match[0].second;
+						}
+					}
+				}
+			}
+
+			free(data);
 
 			CAtlList<CStringA> linesA;
 			Explode(strUrls, linesA, ',');
@@ -640,32 +705,7 @@ namespace Youtube
 
 					SignatureDecode(url);
 
-					if (const YoutubeProfile* profile = GetProfile(itag)) {
-						YoutubeUrllistItem item;
-						item.profile = profile;
-						item.url = url;
-						item.title.Format(L"%s %dp",
-							profile->format == 1 ? L"WebM" : L"MP4",
-							profile->quality);
-						if (profile->type == y_video) {
-							item.title.Append(L" dash");
-						}
-						if (profile->fps60) {
-							item.title.Append(L" 60fps");
-						}
-						if (profile->hdr) {
-							item.title.Append(L" HDR (10 bit)");
-						}
-
-						youtubeUrllist.emplace_back(item);
-					}
-					else if (const YoutubeProfile* audioprofile = GetAudioProfile(itag)) {
-						YoutubeUrllistItem item;
-						item.profile = audioprofile;
-						item.url = url;
-
-						AudioList.emplace_back(item);
-					}
+					AddUrl(youtubeUrllist, audioList, CString(url), itag);
 				}
 			}
 
@@ -674,7 +714,7 @@ namespace Youtube
 			}
 
 			std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), CompareUrllistItem);
-			std::sort(AudioList.begin(), AudioList.end(), CompareUrllistItem);
+			std::sort(audioList.begin(), audioList.end(), CompareUrllistItem);
 
 			const CAppSettings& s = AfxGetAppSettings();
 
@@ -732,19 +772,19 @@ namespace Youtube
 			const YoutubeProfile* final_video_profile = final_item->profile;
 
 			CString final_audio_url;
-			if (final_item->profile->type == y_video && !AudioList.empty()) {
+			if (final_item->profile->type == y_video && !audioList.empty()) {
 				int fmt = final_item->profile->format;
 				final_item = NULL;
 
 				// select audio stream
-				for (auto item : AudioList) {
+				for (auto item : audioList) {
 					if (fmt == item.profile->format) {
 						final_item = &item;
 						break;
 					}
 				}
 				if (!final_item) {
-					final_item = &AudioList[0];
+					final_item = &audioList[0];
 				}
 
 				final_audio_url = final_item->url;
@@ -781,15 +821,15 @@ namespace Youtube
 							while (std::regex_search(text, match, regex)) {
 								if (match.size() == 2) {
 									CString url, name;
-									CString xmlElement = CString(match[1].first, match[1].length());
+									CString xmlElement(match[1].first, match[1].length());
 
 									const std::wregex regexValues(L"([a-z_]+)=\"([^\"]+)\"");
 									std::wcmatch matchValues;
 									LPCTSTR textValues = xmlElement.GetBuffer();
 									while (std::regex_search(textValues, matchValues, regexValues)) {
 										if (matchValues.size() == 3) {
-											const CString xmlHeader = CString(matchValues[1].first, matchValues[1].length());
-											const CString xmlValue = CString(matchValues[2].first, matchValues[2].length());
+											const CString xmlHeader(matchValues[1].first, matchValues[1].length());
+											const CString xmlValue(matchValues[2].first, matchValues[2].length());
 
 											if (xmlHeader == L"lang_code") {
 												url.Format(L"https://www.youtube.com/api/timedtext?lang=%s&v=%s&fmt=vtt", xmlValue, videoId);
@@ -883,8 +923,8 @@ namespace Youtube
 				LPCTSTR text = item.GetBuffer();
 				while (std::regex_search(text, match, regex)) {
 					if (match.size() == 3) {
-						const CString propHeader = CString(match[1].first, match[1].length());
-						const CString propValue = CString(match[2].first, match[2].length());
+						const CString propHeader(match[1].first, match[1].length());
+						const CString propValue(match[2].first, match[2].length());
 
 						// data-video-id, data-video-clip-end, data-index, data-video-username, data-video-title, data-video-clip-start.
 						if (propHeader == L"data-video-id") {
