@@ -564,7 +564,7 @@ void CPlayerSeekBar::OnLButtonDown(UINT nFlags, CPoint point)
 		if (m_bEnabled && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
 			SetCapture();
 			MoveThumb(point);
-			m_pMainFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
+			m_pMainFrame->SeekTo(GetPos());
 		} else {
 			if (!m_pMainFrame->m_bFullScreen) {
 				MapWindowPoints(m_pMainFrame, &point, 1);
