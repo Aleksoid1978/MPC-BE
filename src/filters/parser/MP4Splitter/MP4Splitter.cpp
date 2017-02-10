@@ -1054,6 +1054,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						} else if (type == AP4_ATOM_TYPE_FLAC) {
 							SetTrackName(&TrackName, L"FLAC");
 							fourcc = WAVE_FORMAT_FLAC;
+						} else if (type == AP4_ATOM_TYPE_DTSC || type == AP4_ATOM_TYPE_DTSE
+								|| type == AP4_ATOM_TYPE_DTSH || type == AP4_ATOM_TYPE_DTSL) {
+							fourcc = type = WAVE_FORMAT_DTS2;
 						}
 
 						if (type == AP4_ATOM_TYPE_NONE ||
@@ -1175,6 +1178,49 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							mts.Add(mt);
 
 							mt.subtype = MEDIASUBTYPE_FLAC;
+						} else if (type == WAVE_FORMAT_DTS2) {
+							CString Suffix = L"DTS audio";
+
+							m_pFile->Seek(sample.GetOffset());
+							AP4_DataBuffer data;
+							if (AP4_SUCCEEDED(sample.ReadData(data))) {
+								const BYTE* start = data.GetData();
+								const BYTE* end = start + data.GetDataSize();
+								audioframe_t aframe;
+								const int size = ParseDTSHeader(start);
+								if (size) {
+									if (start + size + 40 <= end) {
+										const int sizehd = ParseDTSHDHeader(start + size, end - start - size, &aframe);
+										if (sizehd) {
+											WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
+											wfe->nSamplesPerSec = aframe.samplerate;
+											wfe->nChannels = aframe.channels;
+											if (aframe.param1) {
+												wfe->wBitsPerSample = aframe.param1;
+											}
+											wfe->nBlockAlign = (wfe->nChannels * wfe->wBitsPerSample) / 8;
+											if (aframe.param2 == DCA_PROFILE_HD_HRA) {
+												Suffix = L"DTS-HD High Resolution Audio";
+												wfe->nAvgBytesPerSec += CalcBitrate(aframe) / 8;
+											} else {
+												Suffix = L"DTS-HD Master Audio";
+												wfe->nAvgBytesPerSec = 0;
+											}
+										}
+									}
+								} else if (ParseDTSHDHeader(start, end - start, &aframe) && aframe.param2 == DCA_PROFILE_EXPRESS) {
+									WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
+									wfe->nSamplesPerSec = aframe.samplerate;
+									wfe->nChannels = aframe.channels;
+									wfe->wBitsPerSample = aframe.param1;
+									wfe->nBlockAlign = wfe->nChannels * wfe->wBitsPerSample / 8;
+									wfe->nAvgBytesPerSec = CalcBitrate(aframe) / 8;
+
+									Suffix = L"DTS Express";
+								}
+							}
+
+							SetTrackName(&TrackName, Suffix);
 						} else if (db.GetDataSize() > 0) {
 							//always needed extra data for QDM2
 							wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + db.GetDataSize());
