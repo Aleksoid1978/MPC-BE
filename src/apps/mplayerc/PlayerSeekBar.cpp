@@ -564,7 +564,7 @@ void CPlayerSeekBar::OnLButtonDown(UINT nFlags, CPoint point)
 		if (m_bEnabled && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
 			SetCapture();
 			MoveThumb(point);
-			m_pMainFrame->SeekTo(GetPos());
+			m_pMainFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
 		} else {
 			if (!m_pMainFrame->m_bFullScreen) {
 				MapWindowPoints(m_pMainFrame, &point, 1);
@@ -637,11 +637,11 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 
 void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 {
-	if (m_CurrentPoint.x == point.x) {
-		if (AfxGetAppSettings().fUseTimeTooltip || m_pMainFrame->CanPreviewUse()) {
-			UpdateTooltip(point);
-		}
+	if (AfxGetAppSettings().fUseTimeTooltip || m_pMainFrame->CanPreviewUse()) {
+		UpdateTooltip(point);
+	}
 
+	if (m_CurrentPoint.x == point.x) {
 		CDialogBar::OnMouseMove(nFlags, point);
 		return;
 	}
@@ -652,16 +652,14 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 		if (m_pMainFrame->ValidateSeek(pos, m_stop)) {
 			MoveThumb(point);
 
-			m_pMainFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBTRACK), (LPARAM)m_hWnd);
+			m_pMainFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
 
 			Invalidate();
 			UpdateWindow();
 		}
 	}
 
-	if (AfxGetAppSettings().fUseTimeTooltip || m_pMainFrame->CanPreviewUse()) {
-		UpdateTooltip(point);
-	}
+	m_CurrentPoint = point;
 
 	const OAFilterState fs = m_pMainFrame->GetMediaState();
 
@@ -673,8 +671,6 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 	} else {
 		m_pMainFrame->PreviewWindowHide();
 	}
-
-	m_CurrentPoint = point;
 
 	CDialogBar::OnMouseMove(nFlags, point);
 }
