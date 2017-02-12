@@ -144,7 +144,6 @@
 #define ID_FILE_SAVE_THUMBNAILS         808
 #define ID_FILE_LOAD_SUBTITLE           809
 #define ID_FILE_SAVE_SUBTITLE           810
-#define ID_FILE_ISDB_UPLOAD             811
 #define ID_FILE_ISDB_DOWNLOAD           812
 #define ID_FILE_ISDB_SEARCH             813
 #define ID_FILE_PROPERTIES              814
