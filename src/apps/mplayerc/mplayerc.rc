@@ -7,7 +7,8 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+#include "afxres.h"
+
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -1410,7 +1411,6 @@ BEGIN
         POPUP "Subtitle Data&base"
         BEGIN
             MENUITEM "&Search...",                  ID_FILE_ISDB_SEARCH
-            MENUITEM "&Upload...",                  ID_FILE_ISDB_UPLOAD
             MENUITEM "&Download...",                ID_FILE_ISDB_DOWNLOAD
         END
         MENUITEM SEPARATOR
@@ -1618,7 +1618,6 @@ BEGIN
             POPUP "Subtitle Data&base"
             BEGIN
                 MENUITEM "&Search...",                  ID_FILE_ISDB_SEARCH
-                MENUITEM "&Upload...",                  ID_FILE_ISDB_UPLOAD
                 MENUITEM "&Download...",                ID_FILE_ISDB_DOWNLOAD
             END
             MENUITEM SEPARATOR
@@ -1814,7 +1813,6 @@ BEGIN
             POPUP "Subtitle Data&base"
             BEGIN
                 MENUITEM "&Search...",                  ID_FILE_ISDB_SEARCH
-                MENUITEM "&Upload...",                  ID_FILE_ISDB_UPLOAD
                 MENUITEM "&Download...",                ID_FILE_ISDB_DOWNLOAD
             END
             MENUITEM SEPARATOR

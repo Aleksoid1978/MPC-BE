@@ -305,8 +305,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_FILE_LOAD_AUDIO, OnFileLoadAudio)
 	ON_COMMAND(ID_FILE_ISDB_SEARCH, OnFileISDBSearch)
 	ON_UPDATE_COMMAND_UI(ID_FILE_ISDB_SEARCH, OnUpdateFileISDBSearch)
-	ON_COMMAND(ID_FILE_ISDB_UPLOAD, OnFileISDBUpload)
-	ON_UPDATE_COMMAND_UI(ID_FILE_ISDB_UPLOAD, OnUpdateFileISDBUpload)
 	ON_COMMAND(ID_FILE_ISDB_DOWNLOAD, OnFileISDBDownload)
 	ON_UPDATE_COMMAND_UI(ID_FILE_ISDB_DOWNLOAD, OnUpdateFileISDBDownload)
 	ON_COMMAND(ID_FILE_PROPERTIES, OnFileProperties)
@@ -6301,18 +6299,6 @@ void CMainFrame::OnFileISDBSearch()
 void CMainFrame::OnUpdateFileISDBSearch(CCmdUI *pCmdUI)
 {
 	pCmdUI->Enable(TRUE);
-}
-
-void CMainFrame::OnFileISDBUpload()
-{
-	CStringA url = "http://" + AfxGetAppSettings().strISDb + "/ul.php?";
-	CStringA args = makeargs(m_wndPlaylistBar.m_pl);
-	ShellExecute(m_hWnd, L"open", CString(url+args), NULL, NULL, SW_SHOWDEFAULT);
-}
-
-void CMainFrame::OnUpdateFileISDBUpload(CCmdUI *pCmdUI)
-{
-	pCmdUI->Enable(m_wndPlaylistBar.GetCount() > 0);
 }
 
 void CMainFrame::OnFileISDBDownload()

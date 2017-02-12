@@ -983,8 +983,6 @@ public:
 	afx_msg void OnFileLoadAudio();
 	afx_msg void OnFileISDBSearch();
 	afx_msg void OnUpdateFileISDBSearch(CCmdUI* pCmdUI);
-	afx_msg void OnFileISDBUpload();
-	afx_msg void OnUpdateFileISDBUpload(CCmdUI* pCmdUI);
 	afx_msg void OnFileISDBDownload();
 	afx_msg void OnUpdateFileISDBDownload(CCmdUI* pCmdUI);
 	afx_msg void OnFileProperties();
