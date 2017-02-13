@@ -10889,82 +10889,96 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 		videoSize.cy = max(videoSize.cy, DEFCLIENTH);
 	}
 
-	long lWidth = long(videoSize.cx * scale + 0.5);
-	long lHeight = long(videoSize.cy * scale + 0.5);
-
-	DWORD style = GetStyle();
-
-	CRect r1, r2;
-	GetClientRect(&r1);
-	m_wndView.GetClientRect(&r2);
-
-	int w = r1.Width() - r2.Width() + lWidth;
-	int h = r1.Height() - r2.Height() + lHeight;
+	CSize videoTargetSize(int(videoSize.cx * scale + 0.5), int(videoSize.cy * scale + 0.5));
 
 	CRect decorationsRect;
 	VERIFY(AdjustWindowRectEx(decorationsRect, GetWindowStyle(m_hWnd), !IsMenuHidden(), GetWindowExStyle(m_hWnd)));
-	w += decorationsRect.Width();
-	h += decorationsRect.Height();
 
+	/*
 	if (GetPlaybackMode() == PM_CAPTURE && !s.fHideNavigation && !m_bFullScreen && !m_wndNavigationBar.IsVisible()) {
 		CSize r = m_wndNavigationBar.CalcFixedLayout(FALSE, TRUE);
-		w += r.cx;
+		videoTargetSize.cx += r.cx;
+	}
+	*/
+
+	CSize controlsSize;
+	CalcControlsSize(controlsSize);
+
+	CRect workRect;
+	CMonitors::GetNearestMonitor(this).GetWorkAreaRect(workRect);
+	if (workRect.Width() && workRect.Height()) {
+		if (IsWin10orLater()) {
+			workRect.InflateRect(GetInvisibleBorderSize());
+		}
+
+		// don't go larger than the current monitor working area and prevent black bars in this case
+		const CSize videoSpaceSize = workRect.Size() - controlsSize - decorationsRect.Size();
+
+		// Do not adjust window size for video frame aspect ratio when video size is independent from window size
+		const bool bAdjustWindowAR = !(s.iDefaultVideoSize == DVS_HALF || s.iDefaultVideoSize == DVS_NORMAL || s.iDefaultVideoSize == DVS_DOUBLE);
+		const double videoAR = videoSize.cx / (double)videoSize.cy;
+
+		if (videoTargetSize.cx > videoSpaceSize.cx) {
+			videoTargetSize.cx = videoSpaceSize.cx;
+			if (bAdjustWindowAR) {
+				videoTargetSize.cy = std::lround(videoSpaceSize.cx / videoAR);
+			}
+		}
+
+		if (videoTargetSize.cy > videoSpaceSize.cy) {
+			videoTargetSize.cy = videoSpaceSize.cy;
+			if (bAdjustWindowAR) {
+				videoTargetSize.cx = std::lround(videoSpaceSize.cy * videoAR);
+			}
+		}
+	} else {
+		ASSERT(FALSE);
 	}
 
-	w = max(w, mmi.ptMinTrackSize.x);
-	h = max(h, mmi.ptMinTrackSize.y);
-
-	// Prevention of going beyond the scopes of screen
-	MONITORINFO mi = { sizeof(mi) };
-	GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
-	CRect rcWork(mi.rcWork);
-	if (IsWin10orLater()) {
-		rcWork.InflateRect(GetInvisibleBorderSize());
-	}
-
-	w = min(w, rcWork.Width());
-	h = min(h, rcWork.Height());
+	CSize finalSize = videoTargetSize + controlsSize + decorationsRect.Size();
+	finalSize.cx = max(finalSize.cx, mmi.ptMinTrackSize.x);
+	finalSize.cy = max(finalSize.cy, mmi.ptMinTrackSize.y);
 
 	if (!s.fRememberWindowPos) {
 		bool isSnapped = false;
 
 		if (snap && s.fSnapToDesktopEdges && m_bWasSnapped) { // check if snapped to edges
-			isSnapped = (r.left == rcWork.left) || (r.top == rcWork.top)
-						|| (r.right == rcWork.right) || (r.bottom == rcWork.bottom);
+			isSnapped = (r.left == workRect.left) || (r.top == workRect.top)
+						|| (r.right == workRect.right) || (r.bottom == workRect.bottom);
 		}
 
 		if (isSnapped) { // prefer left, top snap to right, bottom snap
-			if (r.left == rcWork.left) {}
-			else if (r.right == rcWork.right) {
-				r.left = r.right - w;
+			if (r.left == workRect.left) {}
+			else if (r.right == workRect.right) {
+				r.left = r.right - finalSize.cx;
 			}
 
-			if (r.top == rcWork.top) {}
-			else if (r.bottom == rcWork.bottom) {
-				r.top = r.bottom - h;
+			if (r.top == workRect.top) {}
+			else if (r.bottom == workRect.bottom) {
+				r.top = r.bottom - finalSize.cy;
 			}
-		} else {	// center window
+		} else { // center window
 			CPoint cp = r.CenterPoint();
-			r.left = cp.x - lround(w / 2);
-			r.top = cp.y - lround(h / 2);
+			r.left = cp.x - std::lround(finalSize.cx / 2.0);
+			r.top = cp.y - std::lround(finalSize.cy / 2.0);
 			m_bWasSnapped = false;
 		}
 	}
 
-	r.right = r.left + w;
-	r.bottom = r.top + h;
+	r.right = r.left + finalSize.cx;
+	r.bottom = r.top + finalSize.cy;
 
-	if (r.right > rcWork.right) {
-		r.OffsetRect(rcWork.right - r.right, 0);
+	if (r.right > workRect.right) {
+		r.OffsetRect(workRect.right - r.right, 0);
 	}
-	if (r.left < rcWork.left) {
-		r.OffsetRect(rcWork.left - r.left, 0);
+	if (r.left < workRect.left) {
+		r.OffsetRect(workRect.left - r.left, 0);
 	}
-	if (r.bottom > rcWork.bottom) {
-		r.OffsetRect(0, rcWork.bottom - r.bottom);
+	if (r.bottom > workRect.bottom) {
+		r.OffsetRect(0, workRect.bottom - r.bottom);
 	}
-	if (r.top < rcWork.top) {
-		r.OffsetRect(0, rcWork.top - r.top);
+	if (r.top < workRect.top) {
+		r.OffsetRect(0, workRect.top - r.top);
 	}
 
 	if ((m_bFullScreen || !s.HasFixedWindowSize()) && !IsD3DFullScreenMode()) {
