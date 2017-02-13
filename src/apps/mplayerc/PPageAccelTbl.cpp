@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -181,9 +181,6 @@ CString CPPageAccelTbl::MakeAccelModLabel(BYTE fVirt)
 {
 	CString str;
 	if (fVirt&FCONTROL) {
-		if (!str.IsEmpty()) {
-			str += L" + ";
-		}
 		str += L"Ctrl";
 	}
 	if (fVirt&FALT) {
@@ -825,7 +822,7 @@ void CPPageAccelTbl::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 			CString str;
 			HotkeyToString(cod, mod, str);
-			m_list.SetItemText(pItem->iItem, pItem->iSubItem, str);
+			m_list.SetItemText(pItem->iItem, COL_KEY, str);
 
 			*pResult = TRUE;
 		}
@@ -852,14 +849,14 @@ void CPPageAccelTbl::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 		case COL_RMCMD:
 			wc.rmcmd = CStringA(CString(pItem->pszText)).Trim();
 			wc.rmcmd.Replace(' ', '_');
-			m_list.SetItemText(pItem->iItem, pItem->iSubItem, CString(wc.rmcmd));
+			m_list.SetItemText(pItem->iItem, COL_RMCMD, CString(wc.rmcmd));
 			*pResult = TRUE;
 			break;
 		case COL_RMREPCNT:
 			CString str = CString(pItem->pszText).Trim();
 			wc.rmrepcnt = wcstol(str, NULL, 10);
 			str.Format(L"%d", wc.rmrepcnt);
-			m_list.SetItemText(pItem->iItem, pItem->iSubItem, str);
+			m_list.SetItemText(pItem->iItem, COL_RMREPCNT, str);
 			*pResult = TRUE;
 			break;
 	}
@@ -907,9 +904,9 @@ HBRUSH CPPageAccelTbl::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	}
 
 	if (status == 0 || (status == 2 && (m_counter&1))) {
-		pDC->SetTextColor(0x0000ff);
+		pDC->SetTextColor(RGB(255,0,0));
 	} else if (status == 1) {
-		pDC->SetTextColor(0x008000);
+		pDC->SetTextColor(RGB(0,128,0));
 	}
 
 	return hbr;
