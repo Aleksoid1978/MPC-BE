@@ -11008,9 +11008,8 @@ double CMainFrame::GetZoomAutoFitScale()
 
 CRect CMainFrame::GetInvisibleBorderSize() const
 {
-	static CRect invisibleBorders;
-	if (invisibleBorders.IsRectNull()
-			&& IsWin10orLater()
+	CRect invisibleBorders;
+	if (IsWin10orLater()
 			&& m_DwmGetWindowAttributeFnc && SUCCEEDED(m_DwmGetWindowAttributeFnc(GetSafeHwnd(), DWMWA_EXTENDED_FRAME_BOUNDS, &invisibleBorders, sizeof(RECT)))) {
 		CRect windowRect;
 		GetWindowRect(&windowRect);
