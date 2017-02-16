@@ -162,15 +162,15 @@ void CRenderersSettings::Load()
 	GET_OPTION_INT(iColumnDelta, IDS_RS_SYNC_COLUMNDELTA);
 	double* dPtr;
 	UINT dSize;
-	if (pApp->GetProfileBinary(IDS_R_SETTINGS, IDS_RS_SYNC_CYCLEDELTA, (LPBYTE*)&dPtr, &dSize)) {
+	if (pApp->GetProfileBinary(IDS_R_VIDEO, IDS_RS_SYNC_CYCLEDELTA, (LPBYTE*)&dPtr, &dSize) && dSize == 8) {
 		dCycleDelta = *dPtr;
 		delete[] dPtr;
 	}
-	if (pApp->GetProfileBinary(IDS_R_SETTINGS, IDS_RS_SYNC_TARGETOFFSET, (LPBYTE*)&dPtr, &dSize)) {
+	if (pApp->GetProfileBinary(IDS_R_VIDEO, IDS_RS_SYNC_TARGETOFFSET, (LPBYTE*)&dPtr, &dSize) && dSize == 8) {
 		dTargetSyncOffset = *dPtr;
 		delete[] dPtr;
 	}
-	if (pApp->GetProfileBinary(IDS_R_SETTINGS, IDS_RS_SYNC_CONTROLLIMIT, (LPBYTE*)&dPtr, &dSize)) {
+	if (pApp->GetProfileBinary(IDS_R_VIDEO, IDS_RS_SYNC_CONTROLLIMIT, (LPBYTE*)&dPtr, &dSize) && dSize == 8) {
 		dControlLimit = *dPtr;
 		delete[] dPtr;
 	}
@@ -227,9 +227,9 @@ void CRenderersSettings::Save()
 	WRITE_OPTION_INT(iSynchronizeMode, IDS_RS_SYNC_MODE);
 	WRITE_OPTION_INT(iLineDelta, IDS_RS_SYNC_LINEDELTA);
 	WRITE_OPTION_INT(iColumnDelta, IDS_RS_SYNC_COLUMNDELTA);
-	pApp->WriteProfileBinary(IDS_R_SETTINGS, IDS_RS_SYNC_CYCLEDELTA, (LPBYTE)&(dCycleDelta), sizeof(dCycleDelta));
-	pApp->WriteProfileBinary(IDS_R_SETTINGS, IDS_RS_SYNC_TARGETOFFSET, (LPBYTE)&(dTargetSyncOffset), sizeof(dTargetSyncOffset));
-	pApp->WriteProfileBinary(IDS_R_SETTINGS, IDS_RS_SYNC_CONTROLLIMIT, (LPBYTE)&(dControlLimit), sizeof(dControlLimit));
+	pApp->WriteProfileBinary(IDS_R_VIDEO, IDS_RS_SYNC_CYCLEDELTA, (LPBYTE)&(dCycleDelta), sizeof(dCycleDelta));
+	pApp->WriteProfileBinary(IDS_R_VIDEO, IDS_RS_SYNC_TARGETOFFSET, (LPBYTE)&(dTargetSyncOffset), sizeof(dTargetSyncOffset));
+	pApp->WriteProfileBinary(IDS_R_VIDEO, IDS_RS_SYNC_CONTROLLIMIT, (LPBYTE)&(dControlLimit), sizeof(dControlLimit));
 
 	WRITE_OPTION_INT(bColorManagementEnable, IDS_RS_COLMAN);
 	WRITE_OPTION_INT(iColorManagementInput, IDS_RS_COLMAN_INPUT);
