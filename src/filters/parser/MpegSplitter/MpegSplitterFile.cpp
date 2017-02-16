@@ -877,14 +877,11 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 		// AAC
 		if (type == stream_type::unknown && (stream_type & AAC_AUDIO) && m_type == MPEG_TYPES::mpeg_ts) {
 			Seek(start);
-			aachdr h = { 0 };
-
-			if (!m_streams[stream_type::audio].Find(s)) {
-				if (Read(h, len, &s.mt)) {
-					m_aacValid[s].Handle(h);
-					if (m_aacValid[s].IsValid()) {
-						type = stream_type::audio;
-					}
+			aachdr h;
+			if (!m_streams[stream_type::audio].Find(s) && Read(h, len, &s.mt, false)) {
+				m_aacValid[s].Handle(h);
+				if (m_aacValid[s].IsValid()) {
+					type = stream_type::audio;
 				}
 			}
 		}
@@ -896,8 +893,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 		// AAC_LATM
 		if (type == stream_type::unknown && (stream_type & AAC_AUDIO) && m_type == MPEG_TYPES::mpeg_ts) {
 			Seek(start);
-			latm_aachdr h = { 0 };
-
+			latm_aachdr h;
 			if (Read(h, len, &s.mt)) {
 				m_aaclatmValid[s].Handle(h);
 				if (m_aaclatmValid[s].IsValid()) {
@@ -909,8 +905,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 		// AAC
 		if (type == stream_type::unknown && (stream_type & AAC_AUDIO)) {
 			Seek(start);
-			aachdr h = { 0 };
-
+			aachdr h;
 			if (Read(h, len, &s.mt)) {
 				m_aacValid[s].Handle(h);
 				if (m_aacValid[s].IsValid()) {
@@ -922,8 +917,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 		// MPEG Audio
 		if (type == stream_type::unknown && (stream_type & MPEG_AUDIO)) {
 			Seek(start);
-			mpahdr h = { 0 };
-
+			mpahdr h;
 			if (Read(h, len, &s.mt, false, true)) {
 				m_mpaValid[s].Handle(h);
 				if (m_mpaValid[s].IsValid()) {
@@ -935,8 +929,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 		// AC3
 		if (type == stream_type::unknown && (stream_type & AC3_AUDIO)) {
 			Seek(start);
-			ac3hdr h = { 0 };
-
+			ac3hdr h;
 			if (Read(h, len, &s.mt)) {
 				m_ac3Valid[s].Handle(h);
 				if (m_ac3Valid[s].IsValid()) {
@@ -958,7 +951,6 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 		if (type == unknown && m_type == MPEG_TYPES::mpeg_ps
 				&& m_bIMKH_CCTV && pesid == 0xc0
 				&& stream_type != MPEG_AUDIO && stream_type != AAC_AUDIO) {
-
 			pcm_law_hdr h;
 			if (Read(h, len, true, &s.mt)) {
 				type = audio;
@@ -972,8 +964,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				// AAC_LATM
 				if (type == stream_type::unknown && (stream_type & AAC_AUDIO) && m_type == MPEG_TYPES::mpeg_ts) {
 					Seek(start);
-					latm_aachdr h = { 0 };
-
+					latm_aachdr h;
 					if (Read(h, len, &s.mt)) {
 						m_aaclatmValid[s].Handle(h);
 						if (m_aaclatmValid[s].IsValid()) {
@@ -984,6 +975,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 
 				// AC3, E-AC3, TrueHD
 				if (type == stream_type::unknown && (stream_type & AC3_AUDIO)) {
+					Seek(start);
 					ac3hdr h;
 					if (Read(h, len, &s.mt, true, (m_AC3CoreOnly != 0))) {
 						type = stream_type::audio;
@@ -1121,9 +1113,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				type = stream_type::video;
 			}
 		} else {
-			BYTE b		= (BYTE)BitRead(8, true);
-			WORD w		= (WORD)BitRead(16, true);
-			DWORD dw	= (DWORD)BitRead(32, true);
+			BYTE b   = (BYTE)BitRead(8, true);
+			WORD w   = (WORD)BitRead(16, true);
+			DWORD dw = (DWORD)BitRead(32, true);
 
 			if (b >= 0x80 && b < 0x88 || w == 0x0b77) { // ac3
 				s.ps1id = (b >= 0x80 && b < 0x88) ? (BYTE)(BitRead(32) >> 24) : 0x80;
@@ -1217,7 +1209,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				}
 			} else if (w == 0xffa0 || w == 0xffa1) { // ps2-mpg audio
 				s.ps1id = (BYTE)BitRead(8);
-				s.pid = (WORD)((BitRead(8) << 8) | BitRead(16)); // pid = 0xa000 | track id
+				s.pid   = (WORD)((BitRead(8) << 8) | BitRead(16)); // pid = 0xa000 | track id
 
 				ps2audhdr h;
 				if (!m_streams[stream_type::audio].Find(s) && Read(h, &s.mt)) {
@@ -1225,7 +1217,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				}
 			} else if (w == 0xff90) { // ps2-mpg ac3 or subtitles
 				s.ps1id = (BYTE)BitRead(8);
-				s.pid = (WORD)((BitRead(8) << 8) | BitRead(16)); // pid = 0x9000 | track id
+				s.pid   = (WORD)((BitRead(8) << 8) | BitRead(16)); // pid = 0x9000 | track id
 
 				w = (WORD)BitRead(16, true);
 
