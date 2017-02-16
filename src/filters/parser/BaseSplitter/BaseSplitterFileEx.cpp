@@ -272,12 +272,12 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt,
 	return true;
 }
 
-#define AGAIN_OR_EXIT						\
-	if (find_sync) {						\
-		Seek(pos); BitRead(8); continue;	\
-	} else {								\
-		return false;						\
-	}										\
+#define AGAIN_OR_EXIT				\
+	if (find_sync) {				\
+		Seek(pos + 1); continue;	\
+	} else {						\
+		return false;				\
+	}								\
 
 bool CBaseSplitterFileEx::Read(mpahdr& h, int len, CMediaType* pmt/* = NULL*/, bool fAllowV25/* = false*/, bool find_sync/* = false*/)
 {
