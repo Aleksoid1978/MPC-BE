@@ -114,7 +114,7 @@ static filter_t s_filters[] = {
 	{L"Bink Audio",					AUDIO_DECODER, ADEC_BINK,			0},
 	{L"DSP Group TrueSpeech",		AUDIO_DECODER, ADEC_TRUESPEECH,		0},
 	{L"DTS",						AUDIO_DECODER, ADEC_DTS,			0},
-	{L"DSD (experimental)",			AUDIO_DECODER, ADEC_DSD,			0},
+	{L"DSD/DST (experimental)",		AUDIO_DECODER, ADEC_DSD,			0},
 	{L"FLAC",						AUDIO_DECODER, ADEC_FLAC,			0},
 	{L"Indeo Audio",				AUDIO_DECODER, ADEC_INDEO,			0},
 	{L"LPCM",						AUDIO_DECODER, ADEC_LPCM,			IDS_TRA_LPCM},

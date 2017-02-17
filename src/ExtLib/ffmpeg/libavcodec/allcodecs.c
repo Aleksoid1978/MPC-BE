@@ -88,6 +88,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (DSD_MSBF, dsd_msbf);
     REGISTER_DECODER (DSD_LSBF_PLANAR, dsd_lsbf_planar);
     REGISTER_DECODER (DSD_MSBF_PLANAR, dsd_msbf_planar);
+    REGISTER_DECODER (DST, dst);
     REGISTER_DECODER (DVVIDEO, dvvideo);
     REGISTER_DECODER (FFV1, ffv1);
     REGISTER_DECODER (FFVHUFF, ffvhuff);
