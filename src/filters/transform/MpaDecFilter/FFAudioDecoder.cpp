@@ -142,6 +142,8 @@ static const struct {
 	{ &MEDIASUBTYPE_DSDM,              AV_CODEC_ID_DSD_MSBF },
 	{ &MEDIASUBTYPE_DSD1,              AV_CODEC_ID_DSD_LSBF_PLANAR },
 	{ &MEDIASUBTYPE_DSD8,              AV_CODEC_ID_DSD_MSBF_PLANAR },
+	// DST
+	{ &MEDIASUBTYPE_DST,               AV_CODEC_ID_DST },
 
 	{ &MEDIASUBTYPE_None,              AV_CODEC_ID_NONE },
 };

@@ -126,8 +126,13 @@ bool CDFFFile::parse_dsd_prop(__int64 eof)
 			}
 			break;
 		case FCC('CMPR'):
-			if (chunk.size < 4 || m_pFile->ByteRead((BYTE*)&tag, 4) != S_OK || tag != FCC('DSD ')) {
+			if (chunk.size < 4 || m_pFile->ByteRead((BYTE*)&tag, 4) != S_OK) {
 				return false;
+			}
+			switch (tag) {
+				case FCC('DSD '): m_subtype = MEDIASUBTYPE_DSDM; break;
+				case FCC('DST '): m_subtype = MEDIASUBTYPE_DST ; break;
+				default: return false;
 			}
 			break;
 		case FCC('FS  '):
@@ -200,6 +205,32 @@ bool CDFFFile::parse_dsd_diin(__int64 eof)
 	return true;
 }
 
+bool CDFFFile::parse_dsd_dst(__int64 eof)
+{
+	dffchunk_t chunk;
+
+	while (m_pFile->GetPos() + 12 < eof && ReadDFFChunk(chunk)) {
+		__int64 pos = m_pFile->GetPos();
+
+		if (chunk.size >= 4 && chunk.id == FCC('FRTE')) {
+			uint32_t count;
+			if (S_OK != m_pFile->ByteRead((BYTE*)&count, 4)) {
+				break;
+			}
+			count = _byteswap_ulong(count);
+			const int fixed_samplerate = m_samplerate / 8;
+			m_rtduration = SCALE64(count, 588LL * fixed_samplerate, 44100);
+			m_rtduration = SCALE64(m_rtduration, UNITS, fixed_samplerate);
+
+			break;
+		}
+
+		m_pFile->Seek(pos + chunk.size);
+	}
+
+	return true;
+}
+
 #define ABORT									\
 	DLog(L"CDFFFile::Open() : broken file!");	\
 	return E_ABORT;								\
@@ -257,9 +288,14 @@ HRESULT CDFFFile::Open(CBaseSplitterFile* pFile)
 			}
 			break;
 		case FCC('DSD '):
+		case FCC('DST '):
 			m_startpos = pos;
 			m_length = Chunk.size;
 			m_endpos = m_startpos + m_length;
+			if (Chunk.id == FCC('DST ')
+					&& !parse_dsd_dst(pos + Chunk.size)) {
+				return E_ABORT;
+			}
 			break;
 		case FCC('COMT'):
 			if (Chunk.size < 2) {
@@ -322,16 +358,19 @@ HRESULT CDFFFile::Open(CBaseSplitterFile* pFile)
 		m_pFile->Seek(pos + Chunk.size);
 	}
 
-	m_bitdepth			= 8;  // hack for ffmpeg decoder
-	m_samplerate		/= 8; // hack for ffmpeg decoder
-	m_block_size		= m_channels;
-	int max_blocks		= m_samplerate / 20; // 50 ms
-	m_max_blocksize		= m_block_size * max_blocks;
-	m_nAvgBytesPerSec	= m_samplerate * m_channels;
+	m_bitdepth        = 8;  // hack for ffmpeg decoder
+	m_samplerate      /= 8; // hack for ffmpeg decoder
+	m_block_size      = m_channels;
+	int max_blocks    = m_samplerate / 20; // 50 ms
+	m_max_blocksize   = m_block_size * max_blocks;
+	m_nAvgBytesPerSec = m_samplerate * m_channels;
 
-	m_length		-= m_length % m_block_size;
-	m_endpos		= m_startpos + m_length;
-	m_rtduration	= 10000000i64 * m_length / m_nAvgBytesPerSec;
+	m_length          -= m_length % m_block_size;
+	m_endpos          = m_startpos + m_length;
+
+	if (m_subtype == MEDIASUBTYPE_DSDM) {
+		m_rtduration = 10000000i64 * m_length / m_nAvgBytesPerSec;
+	}
 
 	return S_OK;
 }
@@ -392,6 +431,12 @@ REFERENCE_TIME CDFFFile::Seek(REFERENCE_TIME rt)
 		return 0;
 	}
 
+	if (m_subtype == MEDIASUBTYPE_DST) {
+		__int64 len = SCALE64(m_length, rt , m_rtduration);
+		m_pFile->Seek(m_startpos + len);
+		return rt;
+	}
+
 	__int64 len = SCALE64(m_length, rt , m_rtduration);
 	len -= len % m_block_size;
 	m_pFile->Seek(m_startpos + len);
@@ -403,6 +448,35 @@ REFERENCE_TIME CDFFFile::Seek(REFERENCE_TIME rt)
 
 int CDFFFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 {
+	if (m_subtype == MEDIASUBTYPE_DST) {
+		const __int64 start = m_pFile->GetPos();
+		DWORD dw;
+		for (__int64 i = 0, j = m_endpos - start - sizeof(dffchunk_t);
+				i <= 10 * MEGABYTE && i < j && S_OK == m_pFile->ByteRead((BYTE*)&dw, sizeof(dw));
+				i++, m_pFile->Seek(start + i)) {
+			if (dw == FCC('DSTF')) {
+				// sync
+				m_pFile->Seek(start + i);
+				dffchunk_t Chunk;
+				if (ReadDFFChunk(Chunk) && ((__int64)Chunk.size + m_pFile->GetPos()) <= m_endpos) {
+					const int size = Chunk.size;
+					if (!packet->SetCount(size) || m_pFile->ByteRead(packet->GetData(), size) != S_OK) {
+						return 0;
+					}
+
+					REFERENCE_TIME duration = (588 * m_samplerate / 44100);
+					duration = SCALE64(duration, UNITS, m_samplerate);
+					packet->rtStart	= rtStart;
+					packet->rtStop	= rtStart + duration;
+
+					return size;
+				}
+			}
+		}
+
+		return 0;
+	}
+
 	if (m_pFile->GetPos() + m_block_size > m_endpos) {
 		return 0;
 	}

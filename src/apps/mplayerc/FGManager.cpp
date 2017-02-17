@@ -2547,6 +2547,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_DSDM);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_DSD1);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_DSD8);
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_DST);
 		m_transform.AddTail(pFGF);
 	}
 

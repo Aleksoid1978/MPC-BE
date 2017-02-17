@@ -38,6 +38,7 @@ class CDFFFile : public CAudioFile
 	bool ReadDFFChunk(dffchunk_t& chunk);
 	bool parse_dsd_prop(__int64 eof);
 	bool parse_dsd_diin(__int64 eof);
+	bool parse_dsd_dst(__int64 eof);
 
 public:
 	CDFFFile();
@@ -49,7 +50,7 @@ public:
 	HRESULT Open(CBaseSplitterFile* pFile);
 	REFERENCE_TIME Seek(REFERENCE_TIME rt);
 	int GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart);
-	CString GetName() const { return L"DSD-IFF"; };
+	CString GetName() const { return m_subtype == MEDIASUBTYPE_DSDM ? L"DSD-IFF" : L"DST-IFF"; };
 
 protected:
 	CAtlMap<DWORD, CStringA> m_info;

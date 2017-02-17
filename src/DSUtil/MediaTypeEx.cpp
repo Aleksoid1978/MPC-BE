@@ -415,10 +415,12 @@ CString CMediaTypeEx::GetAudioCodecName(const GUID& subtype, WORD wFormatTag)
 			guidnames[MEDIASUBTYPE_OPUS]			= L"Opus";
 			guidnames[MEDIASUBTYPE_BINKA_DCT]		= L"BINK DCT";
 			guidnames[MEDIASUBTYPE_AAC_ADTS]		= L"AAC";
+			guidnames[MEDIASUBTYPE_DSD]				= L"DSD";
 			guidnames[MEDIASUBTYPE_DSD1]			= L"DSD";
 			guidnames[MEDIASUBTYPE_DSD8]			= L"DSD";
 			guidnames[MEDIASUBTYPE_DSDL]			= L"DSD";
 			guidnames[MEDIASUBTYPE_DSDM]			= L"DSD";
+			guidnames[MEDIASUBTYPE_DST]				= L"DST";
 			guidnames[MEDIASUBTYPE_NELLYMOSER]		= L"Nelly Moser";
 		}
 
