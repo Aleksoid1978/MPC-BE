@@ -519,6 +519,9 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		return (bVideoMetadataExists + bAudioMetadataExists) != (bVideoFound + bAudioFound) && m_pFile->GetPos() <= 10 * MEGABYTE;
 	};
 
+	CMediaType mt;
+	CMediaType mtAAC;
+
 	// read up to 180 tags (actual maximum was 168)
 	UINT i = 0;
 	while (((i++ <= 180 && (fTypeFlagsVideo || fTypeFlagsAudio)) || CheckMetadataStreams())
@@ -536,9 +539,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		CString name;
-
 		CMediaType mt;
-		mt.subtype = GUID_NULL;
 
 		if (t.TagType == FLV_SCRIPTDATA && t.DataSize) {
 			BYTE type = m_pFile->BitRead(8);
@@ -661,6 +662,9 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							fTypeFlagsAudio = true;
 							break;
 						}
+
+						FreeMediaType(mtAAC);
+						mtAAC.InitMediaType();
 						mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_RAW_AAC1);
 						name += L" AAC";
 
@@ -672,36 +676,37 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						// Might break depending on the AAC profile, see ff_mpeg4audio_get_config in ffmpeg's mpeg4audio.c
 						m_pFile->BitRead(5);
-						int iSampleRate = (int)m_pFile->BitRead(4);
-						int iChannels   = (int)m_pFile->BitRead(4);
-						if (iSampleRate > 12 || iChannels > 7) {
+						int nSampleRate = (int)m_pFile->BitRead(4);
+						int nChannels   = (int)m_pFile->BitRead(4);
+						if (nSampleRate > 12 || nChannels > 7) {
 							break;
 						}
 
-						const int sampleRates[] = {
-							96000, 88200, 64000, 48000, 44100, 32000, 24000,
-							22050, 16000, 12000, 11025, 8000, 7350
-						};
-						const int channels[] = {
-							0, 1, 2, 3, 4, 5, 6, 8
-						};
+						static const int sampleRates[] = { 96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350, 0, 0, 0 };
+						static const int channels[] = { 0, 1, 2, 3, 4, 5, 6, 8 };
 
 						wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + configSize);
 						memset(wfe, 0, mt.FormatLength());
 						wfe->wFormatTag     = WAVE_FORMAT_RAW_AAC1;
-						wfe->nSamplesPerSec = sampleRates[iSampleRate];
+						wfe->nSamplesPerSec = sampleRates[nSampleRate];
 						wfe->wBitsPerSample = 16;
-						wfe->nChannels      = channels[iChannels];
+						wfe->nChannels      = channels[nChannels];
 						wfe->cbSize         = configSize;
 
 						m_pFile->Seek(configOffset);
 						m_pFile->ByteRead((BYTE*)(wfe+1), configSize);
 					}
 				}
-				wfe->nBlockAlign		= wfe->nChannels * wfe->wBitsPerSample / 8;
-				wfe->nAvgBytesPerSec	= wfe->nSamplesPerSec * wfe->nBlockAlign;
+				wfe->nBlockAlign     = wfe->nChannels * wfe->wBitsPerSample / 8;
+				wfe->nAvgBytesPerSec = wfe->nSamplesPerSec * wfe->nBlockAlign;
 
 				mt.SetSampleSize(wfe->wBitsPerSample * wfe->nChannels / 8);
+
+				if (at.SoundFormat == FLV_AUDIO_AAC && mt.subtype == GUID_NULL && mtAAC.subtype == GUID_NULL) {
+					mtAAC = mt;
+					WAVEFORMATEX* wfeAAC = (WAVEFORMATEX*)mtAAC.pbFormat;
+					mtAAC.subtype = FOURCCMap(wfeAAC->wFormatTag = WAVE_FORMAT_RAW_AAC1);
+				}
 			}
 		} else if (t.TagType == FLV_VIDEODATA && t.DataSize != 0 && fTypeFlagsVideo) {
 			UNREFERENCED_PARAMETER(vt);
@@ -1102,6 +1107,13 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		m_pFile->Seek(next);
+	}
+
+	if (mtAAC.subtype != GUID_NULL) {
+		CAtlArray<CMediaType> mts;
+		mts.Add(mtAAC);
+		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio AAC", this, this, &hr));
+		EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(FLV_AUDIODATA, pPinOut)));
 	}
 
 	m_rtDuration = metaDataDuration;
