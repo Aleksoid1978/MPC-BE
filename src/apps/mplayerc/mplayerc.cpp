@@ -324,15 +324,27 @@ void CMPlayerCApp::FlushProfile(bool bForce/* = true*/)
 
 BOOL CMPlayerCApp::GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBYTE* ppData, UINT* pBytes)
 {
+    if (!lpszSection || !lpszEntry || !ppData || !pBytes) {
+        ASSERT(FALSE);
+        return FALSE;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
 
     if (m_pszRegistryKey) {
-        return CWinApp::GetProfileBinary(lpszSection, lpszEntry, ppData, pBytes);
-    } else {
-        if (!lpszSection || !lpszEntry || !ppData || !pBytes) {
-            ASSERT(FALSE);
-            return FALSE;
+        BOOL ret = FALSE;
+        CRegKey regkey;
+        if (ERROR_SUCCESS == regkey.Open(HKEY_CURRENT_USER, m_RegPath + lpszSection, KEY_READ)) {
+            if (ERROR_SUCCESS == regkey.QueryBinaryValue(lpszEntry, NULL, (ULONG*)pBytes)) {
+                *ppData = new(std::nothrow) BYTE[*pBytes];
+                if (*ppData && ERROR_SUCCESS == regkey.QueryBinaryValue(lpszEntry, *ppData, (ULONG*)pBytes)) {
+                    ret = TRUE;
+                }
+            }
+            regkey.Close();
         }
+        return ret;
+    } else {
         CString sectionStr(lpszSection);
         CString keyStr(lpszEntry);
         if (sectionStr.IsEmpty() || keyStr.IsEmpty()) {
@@ -379,16 +391,21 @@ BOOL CMPlayerCApp::GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBY
 
 UINT CMPlayerCApp::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault)
 {
+    if (!lpszSection || !lpszEntry) {
+        ASSERT(FALSE);
+        return nDefault;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
 
     int res = nDefault;
     if (m_pszRegistryKey) {
-        res = CWinApp::GetProfileInt(lpszSection, lpszEntry, nDefault);
-    } else {
-        if (!lpszSection || !lpszEntry) {
-            ASSERT(FALSE);
-            return res;
+        CRegKey regkey;
+        if (ERROR_SUCCESS == regkey.Open(HKEY_CURRENT_USER, m_RegPath + lpszSection, KEY_READ)) {
+            regkey.QueryDWORDValue(lpszEntry, *(DWORD*)&res);
+            regkey.Close();
         }
+    } else {
         CString sectionStr(lpszSection);
         CString keyStr(lpszEntry);
         if (sectionStr.IsEmpty() || keyStr.IsEmpty()) {
@@ -410,16 +427,32 @@ UINT CMPlayerCApp::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDe
 
 CString CMPlayerCApp::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszDefault/* = NULL*/)
 {
+    CString res;
+    if (!lpszSection || !lpszEntry) {
+        ASSERT(FALSE);
+        return res;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
 
-    CString res;
     if (m_pszRegistryKey) {
-        res = CWinApp::GetProfileString(lpszSection, lpszEntry, lpszDefault);
-    } else {
-        if (!lpszSection || !lpszEntry) {
-            ASSERT(FALSE);
-            return res;
+        bool ok = false;
+        CRegKey regkey;
+        if (ERROR_SUCCESS == regkey.Open(HKEY_CURRENT_USER, m_RegPath + lpszSection, KEY_READ)) {
+            ULONG nChars = 0;
+            if (ERROR_SUCCESS == regkey.QueryStringValue(lpszEntry, NULL, &nChars)) {
+                if (ERROR_SUCCESS == regkey.QueryStringValue(lpszEntry, res.GetBuffer(nChars), &nChars)) {
+                    res.ReleaseBuffer(nChars);
+                    ok = true;
+                }
+            }
+            regkey.Close();
         }
+        if (!ok && lpszDefault) {
+            res = lpszDefault;
+        }
+        return res;
+    } else {
         CString sectionStr(lpszSection);
         CString keyStr(lpszEntry);
         if (sectionStr.IsEmpty() || keyStr.IsEmpty()) {
@@ -444,15 +477,24 @@ CString CMPlayerCApp::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, L
 
 BOOL CMPlayerCApp::WriteProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBYTE pData, UINT nBytes)
 {
+    if (!lpszSection || !lpszEntry || !pData || !nBytes) {
+        ASSERT(FALSE);
+        return FALSE;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
 
     if (m_pszRegistryKey) {
-        return CWinApp::WriteProfileBinary(lpszSection, lpszEntry, pData, nBytes);
-    } else {
-        if (!lpszSection || !lpszEntry || !pData || !nBytes) {
-            ASSERT(FALSE);
-            return FALSE;
+        BOOL ret = FALSE;
+        CRegKey regkey;
+        if (ERROR_SUCCESS == regkey.Create(HKEY_CURRENT_USER, m_RegPath + lpszSection)) {
+            if (ERROR_SUCCESS == regkey.SetBinaryValue(lpszEntry, pData, nBytes)) {
+                ret = TRUE;
+            }
+            regkey.Close();
         }
+        return ret;
+    } else {
         CString sectionStr(lpszSection);
         CString keyStr(lpszEntry);
         if (sectionStr.IsEmpty() || keyStr.IsEmpty()) {
@@ -481,15 +523,24 @@ BOOL CMPlayerCApp::WriteProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LP
 
 BOOL CMPlayerCApp::WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nValue)
 {
+    if (!lpszSection || !lpszEntry) {
+        ASSERT(FALSE);
+        return FALSE;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
 
     if (m_pszRegistryKey) {
-        return CWinApp::WriteProfileInt(lpszSection, lpszEntry, nValue);
-    } else {
-        if (!lpszSection || !lpszEntry) {
-            ASSERT(FALSE);
-            return FALSE;
+        BOOL ret = FALSE;
+        CRegKey regkey;
+        if (ERROR_SUCCESS == regkey.Create(HKEY_CURRENT_USER, m_RegPath + lpszSection)) {
+            if (ERROR_SUCCESS == regkey.SetDWORDValue(lpszEntry, (DWORD)nValue)) {
+                ret = TRUE;
+            }
+            regkey.Close();
         }
+        return ret;
+    } else {
         CString sectionStr(lpszSection);
         CString keyStr(lpszEntry);
         if (sectionStr.IsEmpty() || keyStr.IsEmpty()) {
@@ -511,15 +562,40 @@ BOOL CMPlayerCApp::WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int n
 
 BOOL CMPlayerCApp::WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszValue)
 {
+    if (!lpszSection) {
+        ASSERT(FALSE);
+        return FALSE;
+    }
+
     std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
 
     if (m_pszRegistryKey) {
-        return CWinApp::WriteProfileString(lpszSection, lpszEntry, lpszValue);
-    } else {
-        if (!lpszSection) {
-            ASSERT(FALSE);
-            return FALSE;
+        BOOL ret = FALSE;
+        CRegKey regkey;
+        if (!lpszEntry) {
+            if (ERROR_SUCCESS == regkey.Open(HKEY_CURRENT_USER, m_RegPath, KEY_WRITE)) {
+                if (ERROR_SUCCESS == regkey.RecurseDeleteKey(lpszSection)) {
+                    ret = TRUE;
+                }
+                regkey.Close();
+            }
         }
+        else if (!lpszValue) {
+            if (ERROR_SUCCESS == regkey.Open(HKEY_CURRENT_USER, m_RegPath + lpszSection, KEY_WRITE)) {
+                if (ERROR_SUCCESS == regkey.DeleteValue(lpszEntry)) {
+                    ret = TRUE;
+                }
+                regkey.Close();
+            }
+        }
+        else if (ERROR_SUCCESS == regkey.Create(HKEY_CURRENT_USER, m_RegPath + lpszSection)) {
+            if (ERROR_SUCCESS == regkey.SetStringValue(lpszEntry, lpszValue)) {
+                ret = TRUE;
+            }
+            regkey.Close();
+        }
+        return ret;
+    } else {
         CString sectionStr(lpszSection);
         if (sectionStr.IsEmpty()) {
             ASSERT(FALSE);
@@ -564,16 +640,12 @@ bool CMPlayerCApp::HasProfileEntry(LPCTSTR lpszSection, LPCTSTR lpszEntry)
 
     bool ret = false;
     if (m_pszRegistryKey) {
-        if (HKEY hAppKey = GetAppRegistryKey()) {
-            HKEY hSectionKey;
-            if (RegOpenKeyEx(hAppKey, lpszSection, 0, KEY_READ, &hSectionKey) == ERROR_SUCCESS) {
-                LONG lResult = RegQueryValueEx(hSectionKey, lpszEntry, NULL, NULL, NULL, NULL);
-                ret = (lResult == ERROR_SUCCESS);
-                VERIFY(RegCloseKey(hSectionKey) == ERROR_SUCCESS);
+        CRegKey regkey;
+        if (ERROR_SUCCESS == regkey.Open(HKEY_CURRENT_USER, m_RegPath + lpszSection, KEY_READ)) {
+            if (ERROR_SUCCESS == regkey.QueryValue(lpszEntry, NULL, NULL, NULL)) {
+                ret = true;
             }
-            VERIFY(RegCloseKey(hAppKey) == ERROR_SUCCESS);
-        } else {
-            ASSERT(FALSE);
+            regkey.Close();
         }
     } else {
         InitProfile();
@@ -669,7 +741,7 @@ bool CMPlayerCApp::GetAppSavePath(CString& path)
 	if (IsIniValid()) { // If settings ini file found, store stuff in the same folder as the exe file
 		path = GetProgramDir();
 	} else {
-		HRESULT hr = SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, path.GetBuffer(_MAX_PATH));
+		HRESULT hr = SHGetFolderPathW(NULL, CSIDL_APPDATA, NULL, 0, path.GetBuffer(_MAX_PATH));
 		path.ReleaseBuffer();
 		if (FAILED(hr)) {
 			return false;
@@ -878,8 +950,8 @@ void CMPlayerCApp::ExportSettings()
 		if (IsIniValid()) {
 			success = !!CopyFile(GetIniPath(), savePath, FALSE);
 		} else {
-			CString regKey;
-			regKey.Format(L"Software\\%s", m_pszProfileName);
+			CString regKey(L"Software\\");
+			regKey.Append(m_pszProfileName);
 
 			FILE* fStream;
 			errno_t error = _wfopen_s(&fStream, savePath, L"wt,ccs=UNICODE");
@@ -1299,7 +1371,7 @@ BOOL CMPlayerCApp::InitInstance()
 			CFile::Remove(GetIniPath());
 		} else {
 			HKEY reg = GetAppRegistryKey();
-			SHDeleteKey(reg, L"");
+			SHDeleteKeyW(reg, L"");
 			RegCloseKey(reg);
 		}
 
