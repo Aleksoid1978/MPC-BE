@@ -442,7 +442,7 @@ CString CMPlayerCApp::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, L
             ULONG nChars = 0;
             if (ERROR_SUCCESS == regkey.QueryStringValue(lpszEntry, NULL, &nChars)) {
                 if (ERROR_SUCCESS == regkey.QueryStringValue(lpszEntry, res.GetBuffer(nChars), &nChars)) {
-                    res.ReleaseBuffer(nChars-1);
+                    res.ReleaseBuffer(nChars - 1);
                     ok = true;
                 }
             }
