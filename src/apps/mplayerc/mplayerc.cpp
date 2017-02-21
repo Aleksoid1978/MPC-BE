@@ -440,9 +440,8 @@ CString CMPlayerCApp::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, L
         CRegKey regkey;
         if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_READ)) {
             ULONG nChars = 0;
-            if (ERROR_SUCCESS == regkey.QueryStringValue(lpszEntry, NULL, &nChars)) {
-                if (ERROR_SUCCESS == regkey.QueryStringValue(lpszEntry, res.GetBuffer(nChars), &nChars)) {
-                    res.ReleaseBuffer(nChars - 1);
+            if (ERROR_SUCCESS == regkey.QueryStringValue(lpszEntry, NULL, &nChars) && nChars > 0) {
+                if (ERROR_SUCCESS == regkey.QueryStringValue(lpszEntry, res.GetBufferSetLength(nChars-1), &nChars)) {
                     ok = true;
                 }
             }
@@ -714,9 +713,6 @@ bool CMPlayerCApp::StoreSettingsToIni()
 
 bool CMPlayerCApp::StoreSettingsToRegistry()
 {
-	free((void*)m_pszRegistryKey);
-	m_pszRegistryKey = NULL;
-
 	SetRegistryKey(L"");
 
 	if (!m_hAppRegKey) {
