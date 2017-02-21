@@ -334,7 +334,7 @@ BOOL CMPlayerCApp::GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBY
     if (m_pszRegistryKey) {
         BOOL ret = FALSE;
         CRegKey regkey;
-        if (ERROR_SUCCESS == regkey.Open(HKEY_CURRENT_USER, m_RegPath + lpszSection, KEY_READ)) {
+        if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_READ)) {
             if (ERROR_SUCCESS == regkey.QueryBinaryValue(lpszEntry, NULL, (ULONG*)pBytes)) {
                 *ppData = new(std::nothrow) BYTE[*pBytes];
                 if (*ppData && ERROR_SUCCESS == regkey.QueryBinaryValue(lpszEntry, *ppData, (ULONG*)pBytes)) {
@@ -401,7 +401,7 @@ UINT CMPlayerCApp::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDe
     int res = nDefault;
     if (m_pszRegistryKey) {
         CRegKey regkey;
-        if (ERROR_SUCCESS == regkey.Open(HKEY_CURRENT_USER, m_RegPath + lpszSection, KEY_READ)) {
+        if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_READ)) {
             regkey.QueryDWORDValue(lpszEntry, *(DWORD*)&res);
             regkey.Close();
         }
@@ -438,11 +438,10 @@ CString CMPlayerCApp::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, L
     if (m_pszRegistryKey) {
         bool ok = false;
         CRegKey regkey;
-        if (ERROR_SUCCESS == regkey.Open(HKEY_CURRENT_USER, m_RegPath + lpszSection, KEY_READ)) {
+        if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_READ)) {
             ULONG nChars = 0;
             if (ERROR_SUCCESS == regkey.QueryStringValue(lpszEntry, NULL, &nChars)) {
-                if (ERROR_SUCCESS == regkey.QueryStringValue(lpszEntry, res.GetBuffer(nChars), &nChars)) {
-                    res.ReleaseBuffer(nChars);
+                if (ERROR_SUCCESS == regkey.QueryStringValue(lpszEntry, res.GetBufferSetLength(nChars), &nChars)) {
                     ok = true;
                 }
             }
@@ -487,7 +486,7 @@ BOOL CMPlayerCApp::WriteProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LP
     if (m_pszRegistryKey) {
         BOOL ret = FALSE;
         CRegKey regkey;
-        if (ERROR_SUCCESS == regkey.Create(HKEY_CURRENT_USER, m_RegPath + lpszSection)) {
+        if (ERROR_SUCCESS == regkey.Create(m_hAppRegKey, lpszSection)) {
             if (ERROR_SUCCESS == regkey.SetBinaryValue(lpszEntry, pData, nBytes)) {
                 ret = TRUE;
             }
@@ -533,7 +532,7 @@ BOOL CMPlayerCApp::WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int n
     if (m_pszRegistryKey) {
         BOOL ret = FALSE;
         CRegKey regkey;
-        if (ERROR_SUCCESS == regkey.Create(HKEY_CURRENT_USER, m_RegPath + lpszSection)) {
+        if (ERROR_SUCCESS == regkey.Create(m_hAppRegKey, lpszSection)) {
             if (ERROR_SUCCESS == regkey.SetDWORDValue(lpszEntry, (DWORD)nValue)) {
                 ret = TRUE;
             }
@@ -573,7 +572,7 @@ BOOL CMPlayerCApp::WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LP
         BOOL ret = FALSE;
         CRegKey regkey;
         if (!lpszEntry) {
-            if (ERROR_SUCCESS == regkey.Open(HKEY_CURRENT_USER, m_RegPath, KEY_WRITE)) {
+            if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, L"", KEY_WRITE)) {
                 if (ERROR_SUCCESS == regkey.RecurseDeleteKey(lpszSection)) {
                     ret = TRUE;
                 }
@@ -581,14 +580,14 @@ BOOL CMPlayerCApp::WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LP
             }
         }
         else if (!lpszValue) {
-            if (ERROR_SUCCESS == regkey.Open(HKEY_CURRENT_USER, m_RegPath + lpszSection, KEY_WRITE)) {
+            if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_WRITE)) {
                 if (ERROR_SUCCESS == regkey.DeleteValue(lpszEntry)) {
                     ret = TRUE;
                 }
                 regkey.Close();
             }
         }
-        else if (ERROR_SUCCESS == regkey.Create(HKEY_CURRENT_USER, m_RegPath + lpszSection)) {
+        else if (ERROR_SUCCESS == regkey.Create(m_hAppRegKey, lpszSection)) {
             if (ERROR_SUCCESS == regkey.SetStringValue(lpszEntry, lpszValue)) {
                 ret = TRUE;
             }
@@ -641,7 +640,7 @@ bool CMPlayerCApp::HasProfileEntry(LPCTSTR lpszSection, LPCTSTR lpszEntry)
     bool ret = false;
     if (m_pszRegistryKey) {
         CRegKey regkey;
-        if (ERROR_SUCCESS == regkey.Open(HKEY_CURRENT_USER, m_RegPath + lpszSection, KEY_READ)) {
+        if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_READ)) {
             if (ERROR_SUCCESS == regkey.QueryValue(lpszEntry, NULL, NULL, NULL)) {
                 ret = true;
             }
@@ -718,6 +717,13 @@ bool CMPlayerCApp::StoreSettingsToRegistry()
 	m_pszRegistryKey = NULL;
 
 	SetRegistryKey(L"");
+
+	if (!m_hAppRegKey) {
+		m_hAppRegKey = GetAppRegistryKey(); // must be run after SetRegistryKey(L"")
+		if (!m_hAppRegKey) {
+			exit(-1); // if this happens, then all bad
+		}
+	}
 
 	return true;
 }

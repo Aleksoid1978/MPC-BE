@@ -107,7 +107,7 @@ private:
 	bool m_bQueuedProfileFlush;
 	std::recursive_mutex m_profileMutex;
 	DWORD m_dwProfileLastAccessTick;
-	const CString m_RegPath = L"Software\\MPC-BE\\";
+	HKEY m_hAppRegKey = NULL;
 
 	void InitProfile();
 
