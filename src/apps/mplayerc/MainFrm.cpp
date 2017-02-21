@@ -15007,14 +15007,10 @@ void CMainFrame::SetupRecentFilesSubMenu()
 		if (!MRU[i].IsEmpty()) {
 			CString path(MRU[i]);
 			if (path.Find(L"\\") != 0 && ::PathIsDirectory(path)) {
-				CString tmp = path + L"\\VIDEO_TS.IFO";
-				if (::PathFileExists(tmp)) {
+				if (::PathFileExists(path + L"\\VIDEO_TS.IFO")) {
 					path = L"DVD - " + path;
-				} else {
-					tmp = path + L"\\BDMV\\index.bdmv";
-					if (::PathFileExists(tmp)) {
-						path.Format(L"%s - %s", BLU_RAY, path);
-					}
+				} else if (::PathFileExists(path + L"\\BDMV\\index.bdmv")) {
+					path.Format(L"%s - %s", BLU_RAY, path);
 				}
 			}
 
