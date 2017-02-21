@@ -17471,12 +17471,8 @@ void CMainFrame::OnFileOpenDirectory()
 		COpenDirHelper::RecurseAddDir(path, &sl);
 	}
 
-	if (m_wndPlaylistBar.IsWindowVisible()) {
-		m_wndPlaylistBar.Append(sl, true);
-	} else {
-		m_wndPlaylistBar.Open(sl, true);
-		OpenCurPlaylistItem();
-	}
+	m_wndPlaylistBar.Open(sl, true);
+	OpenCurPlaylistItem();
 }
 
 HRESULT CMainFrame::CreateThumbnailToolbar()
