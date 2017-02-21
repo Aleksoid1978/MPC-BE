@@ -441,7 +441,8 @@ CString CMPlayerCApp::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, L
         if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_READ)) {
             ULONG nChars = 0;
             if (ERROR_SUCCESS == regkey.QueryStringValue(lpszEntry, NULL, &nChars)) {
-                if (ERROR_SUCCESS == regkey.QueryStringValue(lpszEntry, res.GetBufferSetLength(nChars), &nChars)) {
+                if (ERROR_SUCCESS == regkey.QueryStringValue(lpszEntry, res.GetBuffer(nChars), &nChars)) {
+                    res.ReleaseBuffer(nChars-1);
                     ok = true;
                 }
             }
