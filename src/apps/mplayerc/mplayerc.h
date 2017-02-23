@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -102,12 +102,12 @@ public:
 	void			UnregisterHotkeys();
 
 private:
+	std::recursive_mutex m_profileMutex;
+	HKEY m_hAppRegKey = NULL;
 	std::map<CString, std::map<CString, CString, CStringUtils::IgnoreCaseLess>, CStringUtils::IgnoreCaseLess> m_ProfileMap;
 	bool m_bProfileInitialized;
 	bool m_bQueuedProfileFlush;
-	std::recursive_mutex m_profileMutex;
 	DWORD m_dwProfileLastAccessTick;
-	HKEY m_hAppRegKey = NULL;
 
 	void InitProfile();
 
