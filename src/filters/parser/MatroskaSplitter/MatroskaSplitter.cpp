@@ -1763,6 +1763,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 						continue;
 					}
 
+					// prevent processing the same position
 					if (lastCueClusterPosition == pCueTrackPositions->CueClusterPosition) {
 						continue;
 					}
@@ -1868,11 +1869,11 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 		Segment& s = m_pFile->m_segment;
 		POSITION pos1 = s.Tracks.GetHeadPosition();
 		while (pos1) {
-			Track* pT = s.Tracks.GetNext(pos1);
+			const Track* pT = s.Tracks.GetNext(pos1);
 
 			POSITION pos2 = pT->TrackEntries.GetHeadPosition();
 			while (pos2) {
-				TrackEntry* pTE = pT->TrackEntries.GetNext(pos2);
+				const TrackEntry* pTE = pT->TrackEntries.GetNext(pos2);
 
 				if (pTE->TrackType == TrackEntry::TypeSubtitle) {
 					TrackNumbers.AddTail(pTE->TrackNumber);
@@ -1885,16 +1886,17 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 			CAutoPtr<CMatroskaNode> pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 
 			QWORD lastCueClusterPosition = ULONGLONG_MAX;
+			QWORD lastCueRelativePosition = ULONGLONG_MAX;
 			BOOL bBreak = FALSE;
 
 			if (pCluster) {
 				pos1 = s.Cues.GetHeadPosition();
 				while (pos1) {
-					Cue* pCue = s.Cues.GetNext(pos1);
+					const Cue* pCue = s.Cues.GetNext(pos1);
 
 					POSITION pos2 = pCue->CuePoints.GetTailPosition();
 					while (pos2 && !bBreak) {
-						CuePoint* pCuePoint = pCue->CuePoints.GetPrev(pos2);
+						const CuePoint* pCuePoint = pCue->CuePoints.GetPrev(pos2);
 
 						REFERENCE_TIME cueTime = s.GetRefTime(pCuePoint->CueTime);
 						if (cueTime > m_Seek_rt) {
@@ -1903,7 +1905,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 
 						POSITION pos3 = pCuePoint->CueTrackPositions.GetHeadPosition();
 						while (pos3 && !bBreak) {
-							CueTrackPosition* pCueTrackPositions = pCuePoint->CueTrackPositions.GetNext(pos3);
+							const CueTrackPosition* pCueTrackPositions = pCuePoint->CueTrackPositions.GetNext(pos3);
 
 							if (m_bSupportCueDuration && !TrackNumbers.Find(pCueTrackPositions->CueTrack)) {
 								continue;
@@ -1913,20 +1915,29 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 								continue;
 							}
 
-							if (lastCueClusterPosition == pCueTrackPositions->CueClusterPosition) {
-								continue;
+							if (!m_bSupportCueDuration) {
+								// prevent processing the same position
+								if (lastCueClusterPosition == pCueTrackPositions->CueClusterPosition) {
+									continue;
+								}
+								lastCueClusterPosition = pCueTrackPositions->CueClusterPosition;
 							}
-							lastCueClusterPosition = pCueTrackPositions->CueClusterPosition;
 
 							if (m_bSupportCueDuration) {
-								REFERENCE_TIME cueDuration = s.GetRefTime(pCueTrackPositions->CueDuration);
+								const REFERENCE_TIME cueDuration = s.GetRefTime(pCueTrackPositions->CueDuration);
+
 								if (cueTime + cueDuration > m_Seek_rt) {
 									pCluster->SeekTo(m_pSegment->m_start + pCueTrackPositions->CueClusterPosition);
 									if (FAILED(pCluster->Parse())) {
 										continue;
 									}
 
-									QWORD pos = pCluster->GetPos();
+									const QWORD pos = pCluster->GetPos();
+									// prevent processing the same position
+									if (lastCueRelativePosition == pos + pCueTrackPositions->CueRelativePosition) {
+										continue;
+									}
+									lastCueRelativePosition = pos + pCueTrackPositions->CueRelativePosition;
 
 									Cluster c;
 									c.ParseTimeCode(pCluster);
