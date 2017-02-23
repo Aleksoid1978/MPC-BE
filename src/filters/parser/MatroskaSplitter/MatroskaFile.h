@@ -652,7 +652,7 @@ namespace MatroskaReader
 		UINT64 GetMasterTrack();
 
 		REFERENCE_TIME GetRefTime(INT64 t) const {
-			return t*(REFERENCE_TIME)(SegmentInfo.TimeCodeScale)/100;
+			return llMulDiv(t, SegmentInfo.TimeCodeScale, 100, 0);
 		}
 		ChapterAtom* FindChapterAtom(UINT64 id, int nEditionEntry = 0);
 	};
