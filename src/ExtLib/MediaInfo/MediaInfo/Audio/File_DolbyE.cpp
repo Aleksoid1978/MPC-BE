@@ -844,7 +844,9 @@ void File_DolbyE::Data_Parse()
         else
             FrameInfo.DUR=(int64u)-1;
         if (FrameInfo.DTS!=(int64u)-1)
-            FrameInfo.PTS=FrameInfo.DTS+=FrameInfo.DUR;
+            FrameInfo.DTS+=FrameInfo.DUR;
+        if (FrameInfo.PTS!=(int64u)-1)
+            FrameInfo.PTS+=FrameInfo.DUR;
         if (Frame_Count==1)
         {
             Finish("Dolby E");

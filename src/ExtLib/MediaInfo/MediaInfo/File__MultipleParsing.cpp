@@ -128,6 +128,9 @@
 #if defined(MEDIAINFO_WM_YES)
     #include "MediaInfo/Multiple/File_Wm.h"
 #endif
+#if defined(MEDIAINFO_WM_YES)
+    #include "MediaInfo/Multiple/File_Wtv.h"
+#endif
 #if defined(MEDIAINFO_XDCAM_YES)
     #include "MediaInfo/Multiple/File_Xdcam_Clip.h"
 #endif
@@ -503,6 +506,9 @@ File__MultipleParsing::File__MultipleParsing()
     #endif
     #if defined(MEDIAINFO_WM_YES)
         Parser.push_back(new File_Wm());
+    #endif
+    #if defined(MEDIAINFO_WTV_YES)
+        Parser.push_back(new File_Wtv());
     #endif
     #if defined(MEDIAINFO_XDCAM_YES)
         Parser.push_back(new File_Xdcam_Clip());

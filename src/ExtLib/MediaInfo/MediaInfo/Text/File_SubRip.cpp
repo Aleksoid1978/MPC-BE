@@ -123,7 +123,8 @@ bool File_SubRip::FileHeader_Begin()
     List.Separator_Set(0, __T("\n\n"));
     List.Separator_Set(1, __T("\n"));
 
-    if (Buffer[0]==0xEF
+    if (Buffer_Size>=3
+     && Buffer[0]==0xEF
      && Buffer[1]==0xBB
      && Buffer[2]==0xBF)
         HasBOM=true;

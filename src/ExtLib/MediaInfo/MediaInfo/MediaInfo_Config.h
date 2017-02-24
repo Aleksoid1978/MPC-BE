@@ -222,6 +222,11 @@ public :
           Ztring      MAXML_Fields_Get (const Ztring &StreamKind);
     #endif //MEDIAINFO_ADVANCED
 
+    #if MEDIAINFO_ADVANCED
+          void        Format_Profile_Split_Set (bool Value);
+          bool        Format_Profile_Split_Get ();
+    #endif //MEDIAINFO_ADVANCED
+
     ZtringListList  SubFile_Config_Get ();
 
     void            CustomMapping_Set (const Ztring &Value);
@@ -245,6 +250,7 @@ public :
     #endif //MEDIAINFO_EVENTS
 
     #if defined(MEDIAINFO_LIBCURL_YES)
+          bool      CanHandleUrls();
           void      Ssh_PublicKeyFileName_Set (const Ztring &NewValue);
           Ztring    Ssh_PublicKeyFileName_Get ();
           void      Ssh_PrivateKeyFileName_Set (const Ztring &NewValue);
@@ -290,6 +296,9 @@ private :
         float64     MpegTs_VbrDetection_Delta;
         int64u      MpegTs_VbrDetection_Occurences;
         bool        MpegTs_VbrDetection_GiveUp;
+    #endif //MEDIAINFO_ADVANCED
+    #if MEDIAINFO_ADVANCED
+        bool        Format_Profile_Split;
     #endif //MEDIAINFO_ADVANCED
     size_t          Complete;
     size_t          BlockMethod;

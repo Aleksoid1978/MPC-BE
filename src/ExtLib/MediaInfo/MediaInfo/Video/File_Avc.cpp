@@ -1035,6 +1035,12 @@ bool File_Avc::Demux_UnpacketizeContainer_Test()
         while (Buffer_Offset+SizeOfNALU_Minus1+1+1<=Buffer_Size)
         {
             size_t Size;
+            if (Buffer_Offset+SizeOfNALU_Minus1>Buffer_Size)
+            {
+                Size=0;
+                Buffer_Offset=Buffer_Size;
+            }
+            else
             switch (SizeOfNALU_Minus1)
             {
                 case 0: Size=Buffer[Buffer_Offset];
@@ -1290,7 +1296,7 @@ void File_Avc::Synched_Init()
 {
     //FrameInfo
     PTS_End=0;
-    if (FrameInfo.DTS==(int64u)-1)
+    if (!IsSub)
         FrameInfo.DTS=0; //No DTS in container
     DTS_Begin=FrameInfo.DTS;
     DTS_End=FrameInfo.DTS;

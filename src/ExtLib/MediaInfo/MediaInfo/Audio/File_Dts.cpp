@@ -1084,7 +1084,7 @@ void File_Dts::Data_Parse()
             if (FrameInfo.DTS!=(int64u)-1)
                 FrameInfo.DTS+=FrameInfo.DUR;
             if (FrameInfo.PTS!=(int64u)-1)
-                FrameInfo.PTS=FrameInfo.DTS;
+                FrameInfo.PTS+=FrameInfo.DUR;
         }
     }
 

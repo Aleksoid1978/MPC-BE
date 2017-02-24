@@ -1547,13 +1547,13 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version)
     if (As11_Core_Pos!=(size_t)-1 && !MI.Get(Stream_Other, As11_Core_Pos, __T("ProgrammeTitle")).empty())
     {
         ToReturn+=__T("\t\t<ebucore:title typeLabel=\"PROGRAMME TITLE\">\n");
-        ToReturn+=__T("\t\t\t<dc:title>")+MI.Get(Stream_Other, As11_Core_Pos, __T("ProgrammeTitle"))+__T("</dc:title>\n");
+        ToReturn+=__T("\t\t\t<dc:title>")+XML_Encode(MI.Get(Stream_Other, As11_Core_Pos, __T("ProgrammeTitle")))+__T("</dc:title>\n");
         ToReturn+=__T("\t\t</ebucore:title>\n");
     }
     else if (As11_Core_Pos!=(size_t)-1 && !MI.Get(Stream_Other, As11_Core_Pos, __T("EpisodeTitleNumber")).empty())
     {
         ToReturn+=__T("\t\t<ebucore:title typeLabel=\"EPISODE TITLE NUMBER\">\n");
-        ToReturn+=__T("\t\t\t<dc:title>")+MI.Get(Stream_Other, As11_Core_Pos, __T("EpisodeTitleNumber"))+__T("</dc:title>\n");
+        ToReturn+=__T("\t\t\t<dc:title>")+XML_Encode(MI.Get(Stream_Other, As11_Core_Pos, __T("EpisodeTitleNumber")))+__T("</dc:title>\n");
         ToReturn+=__T("\t\t</ebucore:title>\n");
     }
 
@@ -1561,13 +1561,13 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version)
     if (As11_Core_Pos!=(size_t)-1 && !MI.Get(Stream_Other, As11_Core_Pos, __T("SeriesTitle")).empty())
     {
         ToReturn+=__T("\t\t<ebucore:alternativeTitle typeLabel=\"SERIES TITLE\">\n");
-        ToReturn+=__T("\t\t\t<dc:title>")+MI.Get(Stream_Other, As11_Core_Pos, __T("SeriesTitle"))+__T("</dc:title>\n");
+        ToReturn+=__T("\t\t\t<dc:title>")+XML_Encode(MI.Get(Stream_Other, As11_Core_Pos, __T("SeriesTitle")))+__T("</dc:title>\n");
         ToReturn+=__T("\t\t</ebucore:alternativeTitle>\n");
     }
     if (As11_Core_Pos!=(size_t)-1 && !MI.Get(Stream_Other, As11_Core_Pos, __T("EpisodeTitleNumber")).empty() && !MI.Get(Stream_Other, As11_Core_Pos, __T("ProgrammeTitle")).empty())
     {
         ToReturn+=__T("\t\t<ebucore:alternativeTitle typeLabel=\"EPISODE TITLE NUMBER\">\n");
-        ToReturn+=__T("\t\t\t<dc:title>")+MI.Get(Stream_Other, As11_Core_Pos, __T("EpisodeTitleNumber"))+__T("</dc:title>\n");
+        ToReturn+=__T("\t\t\t<dc:title>")+XML_Encode(MI.Get(Stream_Other, As11_Core_Pos, __T("EpisodeTitleNumber")))+__T("</dc:title>\n");
         ToReturn+=__T("\t\t</ebucore:alternativeTitle>\n");
     }
 
@@ -1575,7 +1575,7 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version)
     if (As11_UkDpp_Pos!=(size_t)-1 && !MI.Get(Stream_Other, As11_UkDpp_Pos, __T("Synopsis")).empty())
     {
         ToReturn+=__T("\t\t<ebucore:description typeLabel=\"SYNOPSIS\">\n");
-        ToReturn+=__T("\t\t\t<dc:description>")+MI.Get(Stream_Other, As11_UkDpp_Pos, __T("Synopsis"))+__T("</dc:description>\n");
+        ToReturn+=__T("\t\t\t<dc:description>")+XML_Encode(MI.Get(Stream_Other, As11_UkDpp_Pos, __T("Synopsis")))+__T("</dc:description>\n");
         ToReturn+=__T("\t\t</ebucore:description>\n");
     }
 
@@ -1619,7 +1619,7 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version)
     {
         ToReturn+=__T("\t\t<ebucore:contributor>\n");
         ToReturn+=__T("\t\t\t<ebucore:organisationDetails>\n");
-        ToReturn+=__T("\t\t\t\t<ebucore:organisationName>")+MI.Get(Stream_Other, As11_UkDpp_Pos, __T("Distributor"))+__T("</ebucore:organisationName>\n");
+        ToReturn+=__T("\t\t\t\t<ebucore:organisationName>")+XML_Encode(MI.Get(Stream_Other, As11_UkDpp_Pos, __T("Distributor")))+__T("</ebucore:organisationName>\n");
         ToReturn+=__T("\t\t\t</ebucore:organisationDetails>\n");
         ToReturn+=__T("\t\t\t<ebucore:role typeLabel=\"distributor\"/>\n");
         ToReturn+=__T("\t\t</ebucore:contributor>\n");
@@ -1637,7 +1637,7 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version)
     if (As11_UkDpp_Pos!=(size_t)-1 && !MI.Get(Stream_Other, As11_UkDpp_Pos, __T("Genre")).empty())
     {
         ToReturn+=__T("\t\t<ebucore:type>\n");
-        ToReturn+=__T("\t\t\t<ebucore:genre typeDefinition=\"")+MI.Get(Stream_Other, As11_UkDpp_Pos, __T("Genre"))+__T("\"/>\n");
+        ToReturn+=__T("\t\t\t<ebucore:genre typeDefinition=\"")+XML_Encode(MI.Get(Stream_Other, As11_UkDpp_Pos, __T("Genre")))+__T("\"/>\n");
         ToReturn+=__T("\t\t</ebucore:type>\n");
     }
 
@@ -1708,13 +1708,13 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version)
     //format - containerFormat - technicalAttributeString - Encoded_Application
     if (!MI.Get(Stream_General, 0, __T("Encoded_Application")).empty())
     {
-        ToReturn+=__T("\t\t\t\t<ebucore:")+Ztring(Version>=Version_1_6?__T("technicalAttributeString"):__T("comment"))+__T(" typeLabel=\"WritingApplication\">")+MI.Get(Stream_General, 0, __T("Encoded_Application"))+__T("</ebucore:")+Ztring(Version>=Version_1_6?__T("technicalAttributeString"):__T("comment"))+__T(">\n");
+        ToReturn+=__T("\t\t\t\t<ebucore:")+Ztring(Version>=Version_1_6?__T("technicalAttributeString"):__T("comment"))+__T(" typeLabel=\"WritingApplication\">")+XML_Encode(MI.Get(Stream_General, 0, __T("Encoded_Application")))+__T("</ebucore:")+Ztring(Version>=Version_1_6?__T("technicalAttributeString"):__T("comment"))+__T(">\n");
     }
 
     //format - containerFormat - technicalAttributeString - Encoded_Library
     if (!MI.Get(Stream_General, 0, __T("Encoded_Library/String")).empty())
     {
-        ToReturn+=__T("\t\t\t\t<ebucore:")+Ztring(Version>=Version_1_6?__T("technicalAttributeString"):__T("comment"))+__T(" typeLabel=\"WritingLibrary\">")+MI.Get(Stream_General, 0, __T("Encoded_Library/String"))+__T("</ebucore:")+Ztring(Version>=Version_1_6?__T("technicalAttributeString"):__T("comment"))+__T(">\n");
+        ToReturn+=__T("\t\t\t\t<ebucore:")+Ztring(Version>=Version_1_6?__T("technicalAttributeString"):__T("comment"))+__T(" typeLabel=\"WritingLibrary\">")+XML_Encode(MI.Get(Stream_General, 0, __T("Encoded_Library/String"))+__T("</ebucore:")+Ztring(Version>=Version_1_6?__T("technicalAttributeString"):__T("comment"))+__T(">\n"));
     }
 
     ToReturn+=__T("\t\t\t</ebucore:containerFormat>\n");

@@ -261,6 +261,34 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
     if (StreamKind>Stream_Max || Parameter==(size_t)-1)
         return;
 
+    //Format_Profile split (see similar code in MediaInfo_Inform.cpp, dedicated to MIXML)
+    #if MEDIAINFO_ADVANCED
+        if (Parameter==Fill_Parameter(StreamKind, Generic_Format_Profile) && MediaInfoLib::Config.Format_Profile_Split_Get())
+        {
+            size_t SeparatorPos=Value.find(__T('@'));
+            if (SeparatorPos!=string::npos && Value.find(__T(" / "))==string::npos) //TODO: better support of compatibility modes (e.g. "Multiview") and sequences (e.g. different profiles in different files "BCS@L3 / BCS@L2 / BCS@L3")
+            {
+                Ztring Value2(Value);
+                Ztring Format_Profile_More=Value2.substr(SeparatorPos+1);
+                Value2.erase(SeparatorPos);
+                if (Format_Profile_More.size()>=2 && Format_Profile_More[0]==__T('L') && Format_Profile_More[1]>=__T('0') && Format_Profile_More[1]<=__T('9'))
+                    Format_Profile_More.erase(0, 1);
+                size_t SeparatorPos=Format_Profile_More.find(__T('@'));
+                Fill(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_Format_Profile), Value2, Replace);
+                if (SeparatorPos!=string::npos)
+                {
+                    Fill(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_Format_Level), Format_Profile_More.substr(0, SeparatorPos));
+                    Fill(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_Format_Tier), Format_Profile_More.substr(SeparatorPos+1));
+                }
+                else
+                {
+                    Fill(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_Format_Level), Format_Profile_More);
+                }
+                return;
+            }
+        }
+    #endif //MEDIAINFO_ADVANCED
+
     //Handling values with \r\n inside
     if (Value.find(__T('\r'))!=string::npos || Value.find(__T('\n'))!=string::npos)
     {
@@ -1115,7 +1143,7 @@ void File__Analyze::Clear (stream_t StreamKind, size_t StreamPos, const char* Pa
             if (Fill_Temp[StreamKind][Pos].Parameter==Parameter_String)
             {
                 Fill_Temp[StreamKind].erase(Fill_Temp[StreamKind].begin() + Pos);
-                return;
+                Pos--;
             }
         return;
     }
@@ -2415,6 +2443,7 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_Format_Commercial : return General_Format_Commercial;
                                     case Generic_Format_Commercial_IfAny : return General_Format_Commercial_IfAny;
                                     case Generic_Format_Profile : return General_Format_Profile;
+                                    case Generic_Format_Level: return General_Format_Level;
                                     case Generic_Format_Settings : return General_Format_Settings;
                                     case Generic_InternetMediaType : return General_InternetMediaType;
                                     case Generic_CodecID : return General_CodecID;
@@ -2468,6 +2497,8 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_Format_Commercial_IfAny : return Video_Format_Commercial_IfAny;
                                     case Generic_Format_Version : return Video_Format_Version;
                                     case Generic_Format_Profile : return Video_Format_Profile;
+                                    case Generic_Format_Level: return Video_Format_Level;
+                                    case Generic_Format_Tier: return Video_Format_Tier;
                                     case Generic_Format_Settings : return Video_Format_Settings;
                                     case Generic_InternetMediaType : return Video_InternetMediaType;
                                     case Generic_CodecID : return Video_CodecID;
@@ -2583,6 +2614,7 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_Format_Commercial_IfAny : return Audio_Format_Commercial_IfAny;
                                     case Generic_Format_Version : return Audio_Format_Version;
                                     case Generic_Format_Profile : return Audio_Format_Profile;
+                                    case Generic_Format_Level: return Audio_Format_Level;
                                     case Generic_Format_Settings : return Audio_Format_Settings;
                                     case Generic_InternetMediaType : return Audio_InternetMediaType;
                                     case Generic_CodecID : return Audio_CodecID;

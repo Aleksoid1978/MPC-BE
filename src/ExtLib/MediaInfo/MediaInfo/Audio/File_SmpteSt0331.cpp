@@ -196,10 +196,17 @@ void File_SmpteSt0331::Read_Buffer_Continue()
     if (Frame_Count_NotParsedIncluded!=(int64u)-1)
         Frame_Count_NotParsedIncluded++;
     #if MEDIAINFO_DEMUX
-        if (FrameInfo.DTS!=(int64u)-1 && FrameInfo.DUR!=(int64u)-1)
+        if (FrameInfo.DUR!=(int64u)-1)
         {
-            FrameInfo.DTS+=FrameInfo.DUR;
-            FrameInfo.PTS=FrameInfo.DTS;
+            if (FrameInfo.DTS!=(int64u)-1)
+                FrameInfo.DTS+=FrameInfo.DUR;
+            if (FrameInfo.PTS!=(int64u)-1)
+                FrameInfo.PTS+=FrameInfo.DUR;
+        }
+        else
+        {
+            FrameInfo.DTS=(int64u)-1;
+            FrameInfo.PTS=(int64u)-1;
         }
     #endif //MEDIAINFO_DEMUX
 

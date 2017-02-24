@@ -4444,7 +4444,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxSound()
                 }
             }
             Parser->Codec=Ztring().From_Local(Codec.c_str());
-            Streams[moov_trak_tkhd_TrackID].Parsers.push_back(Parser);
+            Streams[moov_trak_tkhd_TrackID].Parsers.push_back(Parser); //Warning: PCM parser must be the last one (for detection "by default" and this property is used when e.g. "Demux_SplitAudioBlocks" is used)
             Streams[moov_trak_tkhd_TrackID].IsPcm=true;
 
             #if MEDIAINFO_DEMUX

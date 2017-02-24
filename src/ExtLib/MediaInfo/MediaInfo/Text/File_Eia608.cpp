@@ -204,6 +204,11 @@ void File_Eia608::Read_Buffer_Unsynched()
 //---------------------------------------------------------------------------
 void File_Eia608::Read_Buffer_Init()
 {
+    if (!IsSub)
+    {
+        FrameInfo.DTS=0; //No DTS in container
+        FrameInfo.PTS=0; //No PTS in container
+    }
     #if MEDIAINFO_DEMUX
         if (Frame_Count_NotParsedIncluded==(int64u)-1)
             Frame_Count_NotParsedIncluded=Config->Demux_FirstFrameNumber_Get();
@@ -212,13 +217,6 @@ void File_Eia608::Read_Buffer_Init()
         if (FrameInfo.DTS==(int64u)-1)
             FrameInfo.DTS=Config->Demux_FirstDts_Get();
     #endif //MEDIAINFO_DEMUX
-    if (FrameInfo.DUR!=(int64u)-1)
-    {
-        if (FrameInfo.DTS==(int64u)-1)
-            FrameInfo.DTS=0;
-        if (FrameInfo.PTS==(int64u)-1)
-            FrameInfo.PTS=0;
-    }
 
     #if MEDIAINFO_EVENTS
         if (MuxingMode==(int8u)-1)
@@ -254,8 +252,15 @@ void File_Eia608::Read_Buffer_AfterParsing()
         Frame_Count_NotParsedIncluded++;
     if (FrameInfo.DUR!=(int64u)-1)
     {
-        FrameInfo.DTS+=FrameInfo.DUR;
-        FrameInfo.PTS=FrameInfo.DTS;
+        if (FrameInfo.DTS!=(int64u)-1)
+            FrameInfo.DTS+=FrameInfo.DUR;
+        if (FrameInfo.PTS!=(int64u)-1)
+            FrameInfo.PTS+=FrameInfo.DUR;
+    }
+    else
+    {
+        FrameInfo.DTS=(int64u)-1;
+        FrameInfo.PTS=(int64u)-1;
     }
 }
 

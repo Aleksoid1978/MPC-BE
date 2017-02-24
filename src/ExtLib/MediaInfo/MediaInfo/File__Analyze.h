@@ -425,12 +425,16 @@ public :
         if (Element[Element_Level].UnTrusted)
             return ;
 
-        //Position
-        int64u Pos=Element_Offset+BS->OffsetBeforeLastCall_Get();
-
         element_details::Element_Node *node = new element_details::Element_Node;
         node->Set_Name(Parameter);
-        node->Pos = Pos==(int64u)-1 ? Pos : (File_Offset+Buffer_Offset+Pos);
+        node->Pos = File_Offset+Buffer_Offset+Element_Offset;
+        if (BS_Size)
+        {
+            int64u BS_BitOffset = BS_Size-BS->Remain();
+            if (GenericOption != (int8u)-1)
+                BS_BitOffset -= GenericOption;
+            node->Pos += BS_BitOffset>>3; //Including Bits to Bytes
+        }
         node->Value.set_Option(GenericOption);
         node->Value = Value;
         Element[Element_Level].TraceNode.Current_Child = Element[Element_Level].TraceNode.Children.size();
@@ -1296,9 +1300,10 @@ private :
 public: //TO CHANGE
     BitStream_Fast* BS;             //For conversion from bytes to bitstream
     BitStream*      BT;             //For conversion from bytes to bitstream
+    int64u          BS_Size;
 public : //TO CHANGE
     int64u Header_Size;             //Size of the header of the current element
-    Ztring Details_Get(size_t Level=0) { std::string str; if (Element[Level].TraceNode.Print(Config_Trace_Format, str) < 0) return Ztring(); return Ztring().From_UTF8(str);}
+    Ztring Details_Get(size_t Level=0) { std::string str; if (Element[Level].TraceNode.Print(Config_Trace_Format, str, Config_LineSeparator.To_UTF8(), File_Size) < 0) return Ztring(); return Ztring().From_UTF8(str);}
     void   Details_Clear();
 protected :
     bool Trace_DoNotSave;

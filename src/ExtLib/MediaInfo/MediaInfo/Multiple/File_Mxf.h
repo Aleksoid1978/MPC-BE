@@ -172,11 +172,12 @@ protected :
     void MCALabelSubDescriptor();
     void TimedTextDescriptor();
     void TimedTextResourceSubDescriptor();
-    void Unknown67SubDescriptor();
+    void ContainerConstraintsSubDescriptor();
     void Mpeg4VisualSubDescriptor();
     void AudioChannelLabelSubDescriptor();
     void SoundfieldGroupLabelSubDescriptor();
     void GroupOfSoundfieldGroupsLabelSubDescriptor();
+    void AVCSubDescriptor();
     void OpenIncompleteHeaderPartition();
     void ClosedIncompleteHeaderPartition();
     void OpenCompleteHeaderPartition();
@@ -331,7 +332,7 @@ protected :
     void JPEG2000PictureSubDescriptor_CodingStyleDefault();     //
     void JPEG2000PictureSubDescriptor_QuantizationDefault();    //
     void MpegAudioDescriptor_BitRate();                         //
-    void MultipleDescriptor_SubDescriptorUIDs();                //3F01
+    void MultipleDescriptor_FileDescriptors();                  //3F01
     void PrimaryExtendedSpokenLanguage();                       //
     void SecondaryExtendedSpokenLanguage();                     //
     void OriginalExtendedSpokenLanguage();                      //
@@ -357,6 +358,21 @@ protected :
     void Mpeg4VisualDescriptor_BPictureCount() {MPEG2VideoDescriptor_BPictureCount();}
     void Mpeg4VisualDescriptor_ProfileAndLevel();               //
     void Mpeg4VisualDescriptor_BitRate() {MPEG2VideoDescriptor_BitRate();}
+    void AVCDescriptor_ConstantBFrames() {MPEG2VideoDescriptor_ConstantBFrames();}
+    void AVCDescriptor_CodedContentType() {MPEG2VideoDescriptor_CodedContentType();}
+    void AVCDescriptor_ClosedGOP() {MPEG2VideoDescriptor_ClosedGOP();}
+    void AVCDescriptor_IdenticalGOP() {MPEG2VideoDescriptor_IdenticalGOP();}
+    void AVCDescriptor_MaxGOP() {MPEG2VideoDescriptor_MaxGOP();}
+    void AVCDescriptor_BPictureCount() {MPEG2VideoDescriptor_BPictureCount();}
+    void AVCDescriptor_Profile();
+    void AVCDescriptor_MaximumBitRate();
+    void AVCDescriptor_ProfileConstraint();
+    void AVCDescriptor_Level();
+    void AVCDescriptor_DecodingDelay();
+    void AVCDescriptor_MaximumRefFrames();
+    void AVCDescriptor_SequenceParameterSetFlag();
+    void AVCDescriptor_PictureParameterSetFlag();
+    void AVCDescriptor_AverageBitRate();
     void NetworkLocator_URLString();                            //4001
     void Preface_LastModifiedDate();                            //3B02
     void Preface_ContentStorage();                              //3B03

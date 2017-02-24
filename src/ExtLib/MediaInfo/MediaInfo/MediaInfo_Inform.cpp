@@ -526,6 +526,16 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                         if (SlashPos!=string::npos)
                             Valeur.erase(SlashPos);
                     }
+                    Ztring Format_Profile_More;
+                    if (XML_0_7_78 && Nom==__T("Format_Profile"))
+                    {
+                        size_t SeparatorPos=Valeur.find(__T('@'));
+                        if (SeparatorPos!=string::npos && Valeur.find(__T(" / "))==string::npos) //TODO: better support of compatibility modes (e.g. "Multiview") and sequences (e.g. different profiles in different files "BCS@L3 / BCS@L2 / BCS@L3")
+                        {
+                            Format_Profile_More=Valeur.substr(SeparatorPos+1);
+                            Valeur.erase(SeparatorPos);
+                        }
+                    }
 
                     Retour+=__T("<");
                     Retour+=Nom;
@@ -539,6 +549,27 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                     Retour+=__T("</");
                     Retour+=Nom;
                     Retour+=__T(">");
+
+                    if (!Format_Profile_More.empty())
+                    {
+                        if (Format_Profile_More.size()>=2 && Format_Profile_More[0]==__T('L') && Format_Profile_More[1]>=__T('0') && Format_Profile_More[1]<=__T('9'))
+                            Format_Profile_More.erase(0, 1);
+                        size_t SeparatorPos=Format_Profile_More.find(__T('@'));
+                        if (SeparatorPos!=string::npos)
+                        {
+                            Retour+=__T("\n<Format_Level>");
+                            Retour+=Format_Profile_More.substr(0, SeparatorPos);
+                            Retour+=__T("</Format_Level>\n<Format_Tier>");
+                            Retour+=Format_Profile_More.substr(SeparatorPos+1);
+                            Retour+=__T("</Format_Tier>");
+                        }
+                        else
+                        {
+                            Retour+=__T("\n<Format_Level>");
+                            Retour+=Format_Profile_More;
+                            Retour+=__T("</Format_Level>");
+                        }
+                    }
                 }
                 #endif //defined(MEDIAINFO_XML_YES)
                 #if defined(MEDIAINFO_CSV_YES)

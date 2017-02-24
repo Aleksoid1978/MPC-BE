@@ -159,6 +159,7 @@ namespace Elements
     const int32u SYTC=0x53595443;
     const int32u TALB=0x54414C42;
     const int32u TBPM=0x5442504D;
+    const int32u TCAT=0x54434154;
     const int32u TCMP=0x54434D50;
     const int32u TCOM=0x54434F4D;
     const int32u TCON=0x54434F4E;
@@ -623,6 +624,7 @@ void File_Id3v2::Data_Parse()
         CASE_INFO(SYTC,                                         "Synchronised tempo codes");
         CASE_INFO(TALB,                                         "Album/Movie/Show title");
         CASE_INFO(TBPM,                                         "BPM (beats per minute)");
+        CASE_INFO(TCAT,                                         "iTunes Podcast category");
         CASE_INFO(TCMP,                                         "iTunes Compilation Flag");
         CASE_INFO(TCOM,                                         "Composer");
         CASE_INFO(TCON,                                         "Content type");
@@ -1184,6 +1186,7 @@ void File_Id3v2::Fill_Name()
         case Elements::SYTC : break;
         case Elements::TALB : Fill(Stream_General, 0, General_Album, Element_Value); break;
         case Elements::TBPM : Fill(Stream_General, 0, General_BPM, Element_Value); break;
+        case Elements::TCAT : Fill(Stream_General, 0, General_PodcastCategory, Element_Value); break;
         case Elements::TCMP : Fill(Stream_General, 0, General_Compilation, Element_Value); break;
         case Elements::TCOM : Fill(Stream_General, 0, General_Composer, Element_Value); break;
         case Elements::TCON :
@@ -1261,9 +1264,9 @@ void File_Id3v2::Fill_Name()
         case Elements::TRSN : Fill(Stream_General, 0, General_ServiceName, Element_Value); break;
         case Elements::TRSO : Fill(Stream_General, 0, General_ServiceProvider, Element_Value); break;
         case Elements::TSIZ : Fill(Stream_General, 0, "Size", Element_Value); break;
-        case Elements::TSO2 : Fill(Stream_General, 0, General_Performer_Sort, Element_Value); break;
+        case Elements::TSO2 : Fill(Stream_General, 0, General_Album_Performer_Sort, Element_Value); break;
         case Elements::TSOA : Fill(Stream_General, 0, General_Album_Sort, Element_Value); break;
-        case Elements::TSOC : Fill(Stream_General, 0, "Composer/Sort", Element_Value); break;
+        case Elements::TSOC : Fill(Stream_General, 0, General_Composer_Sort, Element_Value); break;
         case Elements::TSOP : Fill(Stream_General, 0, General_Performer_Sort, Element_Value); break;
         case Elements::TSOT : Fill(Stream_General, 0, General_Track_Sort, Element_Value); break;
         case Elements::TSRC : Fill(Stream_General, 0, General_ISRC, Element_Value); break;
@@ -1352,7 +1355,7 @@ void File_Id3v2::Fill_Name()
         case Elements::TOR  : Normalize_Date(Element_Value); Fill(Stream_General, 0, "Original/Released_Date", Element_Value); break;
         case Elements::TOT  : Fill(Stream_General, 0, "Original/Album", Element_Value); break;
         case Elements::TP1  : Fill(Stream_General, 0, "Performer", Element_Value); break;
-        case Elements::TP2  : Fill(Stream_General, 0, "Accompaniment", Element_Value); break;
+        case Elements::TP2  : Fill(Stream_General, 0, General_Album_Performer, Element_Value); break;
         case Elements::TP3  : Fill(Stream_General, 0, "Conductor", Element_Value); break;
         case Elements::TP4  : Fill(Stream_General, 0, "RemixedBy", Element_Value); break;
         case Elements::TPA  :

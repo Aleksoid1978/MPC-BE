@@ -253,7 +253,7 @@ static const int8u AribStdB24B37_DefaultMacros_size[] =
 // for each data byte do
 //     CRC_CCIT_Xmodem=(CRC_CCIT_Xmodem<<8) ^ CRC_CCIT_Xmodem_Table[(CRC_CCIT_Xmodem>>8)^(data_byte)];
 // Array built with the help of http://www.sanity-free.com/133/crc_16_ccitt_in_csharp.html
-static int16u AribStdB24B37_CRC_CCIT_Xmodem_Table[256] =
+static const int16u AribStdB24B37_CRC_CCIT_Xmodem_Table[256] =
 {
     0x0000, 0x1021, 0x2042, 0x3063,
     0x4084, 0x50A5, 0x60C6, 0x70E7,
