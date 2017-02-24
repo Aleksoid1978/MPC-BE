@@ -462,9 +462,7 @@ class CAppSettings
 	};
 
 public:
-
 	bool bResetSettings;
-
 	bool fShadersNeedSave;
 
 	// cmdline params

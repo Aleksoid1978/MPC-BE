@@ -102,6 +102,8 @@ public:
 	void			UnregisterHotkeys();
 
 private:
+	bool ClearSettings();
+
 	std::recursive_mutex m_profileMutex;
 	HKEY m_hAppRegKey = NULL;
 	std::map<CString, std::map<CString, CString, CStringUtils::IgnoreCaseLess>, CStringUtils::IgnoreCaseLess> m_ProfileMap;
