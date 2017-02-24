@@ -474,6 +474,7 @@ File_Ffv1::File_Ffv1()
     ConfigurationRecordIsPresent=false;
     RC=NULL;
     version=0;
+    error_correction = 0;
     num_h_slices = 1;
     num_v_slices = 1;
     slices = NULL;

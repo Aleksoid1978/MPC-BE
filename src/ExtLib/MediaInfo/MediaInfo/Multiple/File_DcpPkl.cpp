@@ -123,7 +123,8 @@ bool File_DcpPkl::FileHeader_Begin()
         return false;
     }
     if (strcmp(NameSpace, "http://www.digicine.com/PROTO-ASDCP-PKL-20040311#") &&
-        strcmp(NameSpace, "http://www.smpte-ra.org/schemas/429-8/2007/PKL"))
+        strcmp(NameSpace, "http://www.smpte-ra.org/schemas/429-8/2007/PKL") &&
+        strcmp(NameSpace, "http://www.smpte-ra.org/schemas/2067-2/2016/PKL"))
     {
         Reject("DcpPkl");
         return false;

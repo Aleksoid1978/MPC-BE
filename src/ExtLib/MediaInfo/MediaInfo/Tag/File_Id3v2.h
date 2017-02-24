@@ -84,6 +84,7 @@ private :
     void SYTC()   {Skip_XX(Element_Size, "Data");}
     void TALB()   {T___();}
     void TBPM()   {T___();}
+    void TCAT()   {T___();}
     void TCMP()   {T___();}
     void TCOM()   {T___();}
     void TCON()   {T___();}

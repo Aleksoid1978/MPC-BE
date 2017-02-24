@@ -117,6 +117,9 @@
 #include "ZenLib/ZtringListListF.h"
 #include "ZenLib/File.h"
 #include <algorithm>
+#if defined(MEDIAINFO_LIBCURL_YES)
+    #include "MediaInfo/Reader/Reader_libcurl.h"
+#endif //defined(MEDIAINFO_LIBCURL_YES)
 using namespace ZenLib;
 using namespace std;
 //---------------------------------------------------------------------------
@@ -125,7 +128,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=__T("MediaInfoLib - v0.7.91");
+const Char*  MediaInfo_Version=__T("MediaInfoLib - v0.7.92");
 const Char*  MediaInfo_Url=__T("http://MediaArea.net/MediaInfo");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
@@ -202,6 +205,9 @@ void MediaInfo_Config::Init()
         MpegTs_VbrDetection_Delta=0;
         MpegTs_VbrDetection_Occurences=4;
         MpegTs_VbrDetection_GiveUp=false;
+    #endif //MEDIAINFO_ADVANCED
+    #if MEDIAINFO_ADVANCED
+        Format_Profile_Split=false;
     #endif //MEDIAINFO_ADVANCED
     Complete=0;
     BlockMethod=0;
@@ -888,6 +894,23 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
         CustomMapping_Set(Value);
         return Ztring();
     }
+    else if (Option_Lower==__T("format_profile_split"))
+    {
+        #if MEDIAINFO_ADVANCED
+            Format_Profile_Split_Set(Value.To_int8u()?true:false);
+            return Ztring();
+        #else // MEDIAINFO_ADVANCED
+            return __T("advanced features are disabled due to compilation options");
+        #endif // MEDIAINFO_ADVANCED
+    }
+    else if (Option_Lower==__T("format_profile_split_get"))
+    {
+        #if MEDIAINFO_ADVANCED
+            return Format_Profile_Split_Get()?__T("1"):__T("0");;
+        #else // MEDIAINFO_ADVANCED
+            return __T("advanced features are disabled due to compilation options");
+        #endif // MEDIAINFO_ADVANCED
+    }
     else if (Option_Lower==__T("event_callbackfunction"))
     {
         #if MEDIAINFO_EVENTS
@@ -901,6 +924,14 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
         #if defined(MEDIAINFO_LIBCURL_YES)
             Ssh_KnownHostsFileName_Set(Value);
             return Ztring();
+        #else // defined(MEDIAINFO_LIBCURL_YES)
+            return __T("Libcurl support is disabled due to compilation options");
+        #endif // defined(MEDIAINFO_LIBCURL_YES)
+    }
+    else if (Option_Lower==__T("info_canhandleurls"))
+    {
+        #if defined(MEDIAINFO_LIBCURL_YES)
+            return CanHandleUrls()?__T("1"):__T("0");;
         #else // defined(MEDIAINFO_LIBCURL_YES)
             return __T("Libcurl support is disabled due to compilation options");
         #endif // defined(MEDIAINFO_LIBCURL_YES)
@@ -2385,6 +2416,24 @@ bool MediaInfo_Config::CustomMapping_IsPresent(const Ztring &Format, const Ztrin
 }
 
 //***************************************************************************
+// Report changes
+//***************************************************************************
+
+#if MEDIAINFO_ADVANCED
+void MediaInfo_Config::Format_Profile_Split_Set(bool Value)
+{
+    CriticalSectionLocker CSL(CS);
+    Format_Profile_Split=Value;
+}
+
+bool MediaInfo_Config::Format_Profile_Split_Get ()
+{
+    CriticalSectionLocker CSL(CS);
+    return Format_Profile_Split;
+}
+#endif // MEDIAINFO_ADVANCED
+
+//***************************************************************************
 // Event
 //***************************************************************************
 
@@ -2501,6 +2550,12 @@ void MediaInfo_Config::Log_Send (int8u Type, int8u Severity, int32u MessageCode,
 //***************************************************************************
 
 #if defined(MEDIAINFO_LIBCURL_YES)
+bool MediaInfo_Config::CanHandleUrls()
+{
+    CriticalSectionLocker CSL(CS);
+    return Reader_libcurl::Load();
+}
+
 void MediaInfo_Config::Ssh_PublicKeyFileName_Set (const Ztring &Value)
 {
     CriticalSectionLocker CSL(CS);

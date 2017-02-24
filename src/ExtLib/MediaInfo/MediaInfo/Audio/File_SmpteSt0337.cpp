@@ -817,8 +817,11 @@ void File_SmpteSt0337::Synched_Init()
 {
     if (Frame_Count_NotParsedIncluded==(int64u)-1)
         Frame_Count_NotParsedIncluded=0;
-    if (FrameInfo.DTS==(int64u)-1)
-        FrameInfo.DTS=0;
+    if (!IsSub)
+    {
+        FrameInfo.DTS=0; //No DTS in container
+        FrameInfo.PTS=0; //No PTS in container
+    }
 }
 
 //***************************************************************************
@@ -1299,10 +1302,17 @@ void File_SmpteSt0337::Data_Parse()
         #if MEDIAINFO_DEMUX
             FrameInfo.DUR=Parser->FrameInfo.DUR;
             if (FrameInfo.DUR!=(int64u)-1)
-                FrameInfo.DTS+=FrameInfo.DUR;
+            {
+                if (FrameInfo.DTS!=(int64u)-1)
+                    FrameInfo.DTS+=FrameInfo.DUR;
+                if (FrameInfo.PTS!=(int64u)-1)
+                    FrameInfo.PTS+=FrameInfo.DUR;
+            }
             else
+            {
                 FrameInfo.DTS=(int64u)-1;
-            FrameInfo.PTS=FrameInfo.DTS;
+                FrameInfo.PTS=(int64u)-1;
+            }
         #endif // MEDIAINFO_DEMUX
 
         switch (data_type)

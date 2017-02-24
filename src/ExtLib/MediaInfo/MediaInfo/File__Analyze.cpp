@@ -288,6 +288,9 @@ File__Analyze::File__Analyze ()
     //BitStream
     BS=new BitStream_Fast;
     BT=new BitStream_LE;
+    #if MEDIAINFO_TRACE
+        BS_Size=0;
+    #endif //MEDIAINFO_TRACE
 
     //Temp
     Status[IsAccepted]=false;
@@ -726,6 +729,7 @@ void File__Analyze::Open_Buffer_Continue (const int8u* ToAdd, size_t ToAdd_Size)
 
     //Should parse again?
     if (((File_GoTo==File_Size && File_Size!=(int64u)-1) || File_Offset+Buffer_Offset>=File_Size)
+        && !Config->File_IsGrowing
        #if MEDIAINFO_DEMUX
          && !Config->Demux_EventWasSent
         #endif //MEDIAINFO_DEMUX
@@ -789,6 +793,7 @@ void File__Analyze::Open_Buffer_Continue (const int8u* ToAdd, size_t ToAdd_Size)
     if (Buffer_Size && Buffer_Offset<=Buffer_Size) //all is not used
     {
         if (File_Offset+Buffer_Size>=File_Size //No more data will come
+         && !Config->File_IsGrowing
         #if MEDIAINFO_DEMUX
          && !Config->Demux_EventWasSent
         #endif //MEDIAINFO_DEMUX
@@ -1034,9 +1039,9 @@ void File__Analyze::Open_Buffer_Continue (File__Analyze* Sub, const int8u* ToAdd
         if (Frequency_c)
             Sub->Frequency_c=Frequency_c;
     #endif //MEDIAINFO_ADVANCED2
-    if (Sub->FrameInfo.DTS!=(int64u)-1)
+    if (Sub->FrameInfo.DTS!=(int64u)-1 || Sub->FrameInfo.PTS!=(int64u)-1)
         Sub->FrameInfo.Buffer_Offset_End=Sub->Buffer_Offset+Sub->Buffer_Size+ToAdd_Size;
-    else if (Sub->FrameInfo_Previous.DTS!=(int64u)-1)
+    else if (Sub->FrameInfo_Previous.DTS!=(int64u)-1 || Sub->FrameInfo_Previous.PTS!=(int64u)-1)
         Sub->FrameInfo_Previous.Buffer_Offset_End=Sub->Buffer_Offset+Sub->Buffer_Size+ToAdd_Size;
     if (Sub->FrameInfo_Previous.DTS!=(int64u)-1)
     {
@@ -1300,16 +1305,7 @@ void File__Analyze::Open_Buffer_Finalize (bool NoBufferModification)
 
     #if MEDIAINFO_TRACE
     if (Details && Details->empty())
-    {
-        Element[0].TraceNode.Print(Config_Trace_Format, *Details);
-        if (Config_LineSeparator != __T("\n"))
-        {
-            Ztring Temp;
-            Temp.From_UTF8(*Details);
-            Temp.FindAndReplace(__T("\n"), Config_LineSeparator, 0, Ztring_Recursive);
-            *Details=Temp.To_UTF8();
-        }
-    }
+        Element[0].TraceNode.Print(Config_Trace_Format, *Details, Config_LineSeparator.To_UTF8(), File_Size);
     #endif //MEDIAINFO_TRACE
 
     #if MEDIAINFO_EVENTS
@@ -1647,6 +1643,13 @@ bool File__Analyze::FileHeader_Begin_0x000001()
                             Reject();
                             return false;
         default         :   break;
+    }
+
+    //WTV
+    if (Magic8==0xB7D800203749DA11LL && CC8(Buffer+8)==0xA64E0007E95EAD8DLL)
+    {
+        Reject();
+        return false;
     }
 
     //Detect TS files, and the parser is not enough precise to detect them later
@@ -2659,9 +2662,14 @@ void File__Analyze::Element_Begin(const char* Name)
 
     //TraceNode
     Element[Element_Level].TraceNode.Init();
-    Element[Element_Level].TraceNode.Pos=File_Offset+Buffer_Offset+Element_Offset+BS->OffsetBeforeLastCall_Get(); //TODO: change this, used in Element_End0()
     if (Trace_Activated)
     {
+        Element[Element_Level].TraceNode.Pos=File_Offset+Buffer_Offset+Element_Offset; //TODO: change this, used in Element_End0()
+        if (BS_Size)
+        {
+            int64u BS_BitOffset=BS_Size-BS->Remain();
+            Element[Element_Level].TraceNode.Pos+=BS_BitOffset>>3; //Including Bits to Bytes
+        }
         Element[Element_Level].TraceNode.Size=Element[Element_Level].Next-(File_Offset+Buffer_Offset+Element_Offset+BS->OffsetBeforeLastCall_Get());
         Element_Name(Name);
     }

@@ -253,15 +253,6 @@ void File_Pcm::Streams_Finish()
 //---------------------------------------------------------------------------
 void File_Pcm::Read_Buffer_Continue()
 {
-    //Testing if we get enough data
-    if (SamplingRate && BitDepth && Channels)
-    {
-        int64u BitRate=SamplingRate*BitDepth*Channels;
-        int64u ByteRate=BitRate/8;
-        if (Buffer_Size>=ByteRate/4) // 1/4 of second is enough for detection
-            Frame_Count_Valid=2;
-    }
-
     #if MEDIAINFO_DEMUX
         if (Demux_UnpacketizeContainer && !Frame_Count && !Status[IsAccepted])
         {
@@ -410,13 +401,19 @@ void File_Pcm::Data_Parse()
     Skip_XX(Element_Size,                                       "Data"); //It is impossible to detect... Default is no detection, only filling
 
     {
-        if (FrameInfo.DTS!=(int64u)-1 && FrameInfo.DUR!=(int64u)-1)
+        if (BitDepth && Channels && SamplingRate)
+            FrameInfo.DUR=Element_Size*1000000000*8/BitDepth/Channels/SamplingRate;
+        if (FrameInfo.DUR!=(int64u)-1)
         {
-            if (BitDepth && Channels && SamplingRate)
-                FrameInfo.DTS+=Element_Size*1000000000*8/BitDepth/Channels/SamplingRate;
-            else
+            if (FrameInfo.DTS!=(int64u)-1)
                 FrameInfo.DTS+=FrameInfo.DUR;
-            FrameInfo.PTS=FrameInfo.DTS;
+            if (FrameInfo.PTS!=(int64u)-1)
+                FrameInfo.PTS+=FrameInfo.DUR;
+        }
+        else
+        {
+            FrameInfo.DTS=(int64u)-1;
+            FrameInfo.PTS=(int64u)-1;
         }
         Frame_Count++;
         if (Frame_Count_NotParsedIncluded!=(int64u)-1)

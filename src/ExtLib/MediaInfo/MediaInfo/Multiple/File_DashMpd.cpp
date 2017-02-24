@@ -603,6 +603,14 @@ bool File_DashMpd::FileHeader_Begin()
                                             for (XMLElement* SegmentBase_Item=Representation_Item->FirstChildElement(); SegmentBase_Item; SegmentBase_Item=SegmentBase_Item->NextSiblingElement())
                                             {
                                                 //Initialization
+                                                if (string(SegmentBase_Item->Value())=="Initialization")
+                                                {
+                                                    Attribute=SegmentBase_Item->Attribute("sourceURL");
+                                                    if (Attribute)
+                                                        Template_Generic_PerRepresentation.Sequence->AddFileName(BaseURL+Ztring().From_UTF8(Attribute), 0);
+                                                }
+
+                                                //SegmentURL
                                                 if (string(SegmentBase_Item->Value())=="SegmentURL")
                                                 {
                                                     bool IsSupported=true;

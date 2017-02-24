@@ -86,7 +86,9 @@ extern MediaInfo_Config Config;
 //---------------------------------------------------------------------------
 void File__Analyze::BS_Begin()
 {
-    size_t BS_Size;
+    #if !MEDIAINFO_TRACE
+        size_t BS_Size;
+    #endif
     if (Element_Offset>=Element_Size)
         BS_Size=0;
     else if (Buffer_Offset+Element_Size<=Buffer_Size)
@@ -97,12 +99,17 @@ void File__Analyze::BS_Begin()
         BS_Size=0;
 
     BS->Attach(Buffer+Buffer_Offset+(size_t)Element_Offset, BS_Size);
+    #if MEDIAINFO_TRACE
+        BS_Size<<=3; //In bits
+    #endif
 }
 
 //---------------------------------------------------------------------------
 void File__Analyze::BS_Begin_LE()
 {
-    size_t BS_Size;
+    #if !MEDIAINFO_TRACE
+        size_t BS_Size;
+    #endif
     if (Buffer_Offset+Element_Size<=Buffer_Size)
         BS_Size=(size_t)(Element_Size-Element_Offset);
     else if (Buffer_Offset+Element_Offset<=Buffer_Size)
@@ -111,6 +118,9 @@ void File__Analyze::BS_Begin_LE()
         BS_Size=0;
 
     BT->Attach(Buffer+Buffer_Offset+(size_t)Element_Offset, BS_Size);
+    #if MEDIAINFO_TRACE
+        BS_Size<<=3; //In bits
+    #endif
 }
 
 //---------------------------------------------------------------------------
@@ -119,6 +129,9 @@ void File__Analyze::BS_End()
     BS->Byte_Align();
     Element_Offset+=BS->Offset_Get();
     BS->Attach(NULL, 0);
+    #if MEDIAINFO_TRACE
+        BS_Size=0;
+    #endif
 }
 
 //---------------------------------------------------------------------------
@@ -127,6 +140,9 @@ void File__Analyze::BS_End_LE()
     BT->Byte_Align();
     Element_Offset+=BT->Offset_Get();
     BT->Attach(NULL, 0);
+    #if MEDIAINFO_TRACE
+        BS_Size=0;
+    #endif
 }
 
 //***************************************************************************
@@ -1285,7 +1301,7 @@ void File__Analyze::Get_SE(int32s &Info, const char* Name)
     Info=(int32s)(pow((double)-1, InfoD+1)*(int32u)ceil(InfoD/2));
 
     if (Trace_Activated)
-        Param(Name, Info);
+        Param(Name, Info, LeadingZeroBits<<1);
 }
 
 //---------------------------------------------------------------------------
@@ -1300,7 +1316,7 @@ void File__Analyze::Skip_SE(const char* Name)
         INTEGRITY(LeadingZeroBits<=32, "(Problem)", 0)
         double InfoD=pow((float)2, (float)LeadingZeroBits)-1+BS->Get4(LeadingZeroBits);
         INTEGRITY(InfoD<int32u(-1), "(Problem)", 0)
-        Param(Name, (int32s)(pow(-1, InfoD+1)*(int32u)ceil(InfoD/2)));
+        Param(Name, (int32s)(pow(-1, InfoD+1)*(int32u)ceil(InfoD/2)), LeadingZeroBits<<1);
     }
     else
         BS->Skip(LeadingZeroBits);
@@ -1318,7 +1334,7 @@ void File__Analyze::Get_UE(int32u &Info, const char* Name)
     Info=(int32u)InfoD-1+BS->Get4(LeadingZeroBits);
 
     if (Trace_Activated)
-        Param(Name, Info);
+        Param(Name, Info, LeadingZeroBits<<1);
 }
 
 //---------------------------------------------------------------------------
@@ -1332,7 +1348,7 @@ void File__Analyze::Skip_UE(const char* Name)
     {
         INTEGRITY(LeadingZeroBits<=32, "(Problem)", 0)
         double InfoD=pow(2, (float)LeadingZeroBits);
-        Param(Name, (int32u)InfoD-1+BS->Get4(LeadingZeroBits));
+        Param(Name, (int32u)InfoD-1+BS->Get4(LeadingZeroBits), LeadingZeroBits<<1);
     }
     else
         BS->Skip(LeadingZeroBits);
@@ -2019,7 +2035,7 @@ void File__Analyze::Get_BS(int8u Bits, int32u &Info, const char* Name)
 {
     INTEGRITY_INT(Bits<=BS->Remain(), "Size is wrong", BS->Offset_Get())
     Info=BS->Get4(Bits);
-    if (Trace_Activated) Param(Name, Info);
+    if (Trace_Activated) Param(Name, Info, Bits);
 }
 
 //---------------------------------------------------------------------------
@@ -2027,7 +2043,7 @@ void File__Analyze::Get_SB(             bool &Info, const char* Name)
 {
     INTEGRITY_INT(1<=BS->Remain(), "Size is wrong", BS->Offset_Get())
     Info=BS->GetB();
-    if (Trace_Activated) Param(Name, Info);
+    if (Trace_Activated) Param(Name, Info, 1);
 }
 
 //---------------------------------------------------------------------------
@@ -2038,7 +2054,7 @@ void File__Analyze::Get_S1(int8u Bits, int8u &Info, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            Param(Name, Info);
+            Param(Name, Info, Bits);
             Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
     #endif //MEDIAINFO_TRACE
@@ -2052,7 +2068,7 @@ void File__Analyze::Get_S2(int8u Bits, int16u &Info, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            Param(Name, Info);
+            Param(Name, Info, Bits);
             Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
     #endif //MEDIAINFO_TRACE
@@ -2066,7 +2082,7 @@ void File__Analyze::Get_S3(int8u Bits, int32u &Info, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            Param(Name, Info);
+            Param(Name, Info, Bits);
             Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
     #endif //MEDIAINFO_TRACE
@@ -2080,7 +2096,7 @@ void File__Analyze::Get_S4(int8u Bits, int32u &Info, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            Param(Name, Info);
+            Param(Name, Info, Bits);
             Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
     #endif //MEDIAINFO_TRACE
@@ -2094,7 +2110,7 @@ void File__Analyze::Get_S5(int8u Bits, int64u &Info, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            Param(Name, Info);
+            Param(Name, Info, Bits);
             Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
     #endif //MEDIAINFO_TRACE
@@ -2108,7 +2124,7 @@ void File__Analyze::Get_S6(int8u Bits, int64u &Info, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            Param(Name, Info);
+            Param(Name, Info, Bits);
             Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
     #endif //MEDIAINFO_TRACE
@@ -2122,7 +2138,7 @@ void File__Analyze::Get_S7(int8u Bits, int64u &Info, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            Param(Name, Info);
+            Param(Name, Info, Bits);
             Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
     #endif //MEDIAINFO_TRACE
@@ -2136,7 +2152,7 @@ void File__Analyze::Get_S8(int8u Bits, int64u &Info, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            Param(Name, Info);
+            Param(Name, Info, Bits);
             Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
     #endif //MEDIAINFO_TRACE
@@ -2219,7 +2235,7 @@ void File__Analyze::Skip_BS(size_t Bits, const char* Name)
     if (Trace_Activated)
     {
         if (Bits<=32) //TODO: in BitStream.h, handle >32 bit gets
-            Param(Name, BS->Get4((int8u)Bits));
+            Param(Name, BS->Get4((int8u)Bits), Bits);
         else
         {
             Param(Name, "(Data)");
@@ -2235,7 +2251,7 @@ void File__Analyze::Skip_SB(              const char* Name)
 {
     INTEGRITY(1<=BS->Remain(), "Size is wrong", BS->Offset_Get())
     if (Trace_Activated)
-        Param(Name, BS->GetB());
+        Param(Name, BS->GetB(), 1);
     else
         BS->Skip(1);
 }
@@ -2247,7 +2263,7 @@ void File__Analyze::Skip_S1(int8u Bits, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            Param(Name, BS->Get1(Bits));
+            Param(Name, BS->Get1(Bits), 1);
             Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
         else
@@ -2262,7 +2278,7 @@ void File__Analyze::Skip_S2(int8u Bits, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            Param(Name, BS->Get2(Bits));
+            Param(Name, BS->Get2(Bits), Bits);
             Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
         else
@@ -2277,7 +2293,7 @@ void File__Analyze::Skip_S3(int8u Bits, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            Param(Name, BS->Get4(Bits));
+            Param(Name, BS->Get4(Bits), Bits);
             Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
         else
@@ -2292,7 +2308,7 @@ void File__Analyze::Skip_S4(int8u Bits, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            Param(Name, BS->Get4(Bits));
+            Param(Name, BS->Get4(Bits), Bits);
             Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
         else
@@ -2307,7 +2323,7 @@ void File__Analyze::Skip_S5(int8u Bits, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            Param(Name, BS->Get8(Bits));
+            Param(Name, BS->Get8(Bits), Bits);
             Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
         else
@@ -2322,7 +2338,7 @@ void File__Analyze::Skip_S6(int8u Bits, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            Param(Name, BS->Get8(Bits));
+            Param(Name, BS->Get8(Bits), Bits);
             Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
         else
@@ -2337,7 +2353,7 @@ void File__Analyze::Skip_S7(int8u Bits, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            Param(Name, BS->Get8(Bits));
+            Param(Name, BS->Get8(Bits), Bits);
             Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
         else
@@ -2352,7 +2368,7 @@ void File__Analyze::Skip_S8(int8u Bits, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            Param(Name, BS->Get8(Bits));
+            Param(Name, BS->Get8(Bits), Bits);
             Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
         else
@@ -2367,7 +2383,7 @@ void File__Analyze::Mark_0()
     bool Info=BS->GetB();
     if (Info)
     {
-        Param("0", Info);
+        Param("0", Info, 1);
         Element_DoNotTrust("Mark bit is wrong");
     }
 }
@@ -2379,7 +2395,7 @@ void File__Analyze::Mark_0_NoTrustError()
     bool Info=BS->GetB();
     if (Info)
     {
-        Param("0", Info);
+        Param("0", Info, 1);
         Param_Info("Warning: should be 0");
     }
 }
@@ -2391,7 +2407,7 @@ void File__Analyze::Mark_1()
     bool Info=BS->GetB();
     if (!Info)
     {
-        Param("1", Info);
+        Param("1", Info, 1);
         Element_DoNotTrust("Mark bit is wrong");
     }
 }
@@ -2403,7 +2419,7 @@ void File__Analyze::Mark_1_NoTrustError()
     bool Info=BS->GetB();
     if (!Info)
     {
-        Param("1", Info);
+        Param("1", Info, 1);
         Param_Info("Warning: should be 1");
     }
 }

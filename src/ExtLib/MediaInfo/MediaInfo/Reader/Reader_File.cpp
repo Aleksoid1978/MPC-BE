@@ -186,15 +186,11 @@ size_t Reader_File::Format_Test(MediaInfo_Internal* MI, String File_Name)
         Format=FormatList.begin();
         while (Format!=FormatList.end())
         {
-            const Ztring &Extensions=FormatList.Get(Format->first, InfoFormat_Extensions);
-            if (Extensions.find(Extension)!=Error)
-            {
-                if(Extension.size()==Extensions.size())
-                    break; //Only one extenion in the list
-                if(Extensions.find(Extension+__T(" "))!=Error
-                || Extensions.find(__T(" ")+Extension)!=Error)
-                    break;
-            }
+            ZtringList Extensions;
+            Extensions.Separator_Set(0, __T(" "));
+            Extensions.Write(FormatList.Get(Format->first, InfoFormat_Extensions));
+            if (Extensions.Find(Extension)!=Error)
+                break;
             ++Format;
         }
     }
@@ -661,7 +657,20 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
             }
             if (MI->Config.File_IsGrowing && (Growing_Temp!=(int64u)-1 || MI->Config.File_Current_Offset+F.Position_Get()>=MI->Config.File_Size))
             {
-                for (size_t CountOfSeconds=0; CountOfSeconds<(size_t)MI->Config.File_GrowingFile_Delay_Get(); CountOfSeconds++)
+                #if MEDIAINFO_EVENTS
+                    {
+                        struct MediaInfo_Event_General_WaitForMoreData_Start_0 Event;
+                        memset(&Event, 0xFF, sizeof(struct MediaInfo_Event_Generic));
+                        Event.EventCode=MediaInfo_EventCode_Create(MediaInfo_Parser_None, MediaInfo_Event_General_WaitForMoreData_Start, 0);
+                        Event.EventSize=sizeof(struct MediaInfo_Event_General_Start_0);
+                        Event.StreamIDs_Size=0;
+                        Event.Duration_Max=(double)MI->Config.File_GrowingFile_Delay_Get();
+                        MI->Config.Event_Send(NULL, (const int8u*)&Event, sizeof(MediaInfo_Event_General_Start_0));
+                    }
+                #endif //MEDIAINFO_EVENTS
+
+                size_t CountOfSeconds=0;
+                for (; CountOfSeconds<(size_t)MI->Config.File_GrowingFile_Delay_Get(); CountOfSeconds++)
                 {
                     int64u LastFile_Size_Old=MI->Config.File_Sizes[MI->Config.File_Sizes.size()-1];
                     size_t Files_Count_Old=MI->Config.File_Names.size();
@@ -671,6 +680,19 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
 
                     if (LastFile_Size_New!=LastFile_Size_Old || Files_Count_New!=Files_Count_Old)
                     {
+                        #if MEDIAINFO_EVENTS
+                            {
+                                struct MediaInfo_Event_General_WaitForMoreData_End_0 Event;
+                                memset(&Event, 0xFF, sizeof(struct MediaInfo_Event_Generic));
+                                Event.EventCode=MediaInfo_EventCode_Create(MediaInfo_Parser_None, MediaInfo_Event_General_WaitForMoreData_End, 0);
+                                Event.EventSize=sizeof(struct MediaInfo_Event_General_WaitForMoreData_End_0);
+                                Event.StreamIDs_Size=0;
+                                Event.Duration_Max=(double)MI->Config.File_GrowingFile_Delay_Get();
+                                Event.Duration_Actual=(double)CountOfSeconds;
+                                Event.Flags=0; //Countinuing
+                                MI->Config.Event_Send(NULL, (const int8u*)&Event, sizeof(MediaInfo_Event_General_End_0));
+                            }
+                        #endif //MEDIAINFO_EVENTS
                         if (MI->Config.File_Names.size()==1) //if more than 1 file, file size config is already done in TestContinuousFileNames()
                         {
                             MI->Config.File_Current_Size=MI->Config.File_Size=LastFile_Size_New;
@@ -682,6 +704,25 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                     #ifdef WINDOWS
                         Sleep(1000);
                     #endif //WINDOWS
+                }
+
+                if (CountOfSeconds>=(size_t)MI->Config.File_GrowingFile_Delay_Get())
+                {
+                    #if MEDIAINFO_EVENTS
+                        {
+                            struct MediaInfo_Event_General_WaitForMoreData_End_0 Event;
+                            memset(&Event, 0xFF, sizeof(struct MediaInfo_Event_Generic));
+                            Event.EventCode=MediaInfo_EventCode_Create(MediaInfo_Parser_None, MediaInfo_Event_General_WaitForMoreData_End, 0);
+                            Event.EventSize=sizeof(struct MediaInfo_Event_General_WaitForMoreData_End_0);
+                            Event.StreamIDs_Size=0;
+                            Event.Duration_Max=(double)MI->Config.File_GrowingFile_Delay_Get();
+                            Event.Duration_Actual=(double)CountOfSeconds;
+                            Event.Flags=1; //Giving up
+                            MI->Config.Event_Send(NULL, (const int8u*)&Event, sizeof(MediaInfo_Event_General_End_0));
+                        }
+                    #endif //MEDIAINFO_EVENTS
+
+                    MI->Config.File_IsGrowing=false;
                 }
             }
 
@@ -710,7 +751,7 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                 }
             #endif //MEDIAINFO_READTHREAD
 
-            if (MI->Config.File_Buffer_Size==0)
+            if (!MI->Config.File_IsGrowing && MI->Config.File_Buffer_Size==0)
             {
                 #if MEDIAINFO_EVENTS
                     MediaInfoLib::Config.Log_Send(0xC0, 0xFF, 0xF0F00101, "File read error");

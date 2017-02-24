@@ -105,7 +105,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* Mpega_Version_String[4]=
+static const char* Mpega_Version_String[4]=
 {
     "MPEG-2.5 Audio",
     "",
@@ -114,7 +114,7 @@ const char* Mpega_Version_String[4]=
 };
 
 //---------------------------------------------------------------------------
-const char* Mpega_Layer_String[4]=
+static const char* Mpega_Layer_String[4]=
 {
     "",
     " layer 3",
@@ -123,7 +123,7 @@ const char* Mpega_Layer_String[4]=
 };
 
 //---------------------------------------------------------------------------
-const int16u Mpega_BitRate[4][4][16]=
+static const int16u Mpega_BitRate[4][4][16]=
 {
     {{0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0},  //MPEG Audio 2.5 layer X
      {0,   8,  16,  24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160,   0},  //MPEG Audio 2.5 layer 3
@@ -144,7 +144,7 @@ const int16u Mpega_BitRate[4][4][16]=
 };
 
 //---------------------------------------------------------------------------
-const int16u Mpega_SamplingRate[4][4]=
+static const int16u Mpega_SamplingRate[4][4]=
 {
     {11025, 12000,  8000, 0}, //MPEG Audio 2.5
     {    0,     0,     0, 0}, //MPEG Audio X
@@ -153,7 +153,7 @@ const int16u Mpega_SamplingRate[4][4]=
 };
 
 //---------------------------------------------------------------------------
-const int16u Mpega_Channels[4]=
+static const int16u Mpega_Channels[4]=
 {
     2,
     2,
@@ -162,7 +162,7 @@ const int16u Mpega_Channels[4]=
 };
 
 //---------------------------------------------------------------------------
-const char* Mpega_Codec_Profile[4]=
+static const char* Mpega_Codec_Profile[4]=
 {
     "",
     "Joint stereo",
@@ -171,7 +171,7 @@ const char* Mpega_Codec_Profile[4]=
 };
 
 //---------------------------------------------------------------------------
-const char* Mpega_Codec_Profile_Extension[]=
+static const char* Mpega_Codec_Profile_Extension[]=
 {
     "",
     "Intensity Stereo",
@@ -180,7 +180,7 @@ const char* Mpega_Codec_Profile_Extension[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Mpega_Emphasis[]=
+static const char* Mpega_Emphasis[]=
 {
     "",
     "50/15ms",
@@ -189,7 +189,7 @@ const char* Mpega_Emphasis[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Lame_BitRate_Mode[]=
+static const char* Lame_BitRate_Mode[]=
 {
     "",
     "CBR",
@@ -210,7 +210,7 @@ const char* Lame_BitRate_Mode[]=
 };
 
 //---------------------------------------------------------------------------
-const char* Lame_Method[]=
+static const char* Lame_Method[]=
 {
     "",
     "CBR",
@@ -231,7 +231,7 @@ const char* Lame_Method[]=
 };
 
 //---------------------------------------------------------------------------
-const int8u Mpega_Coefficient[4][4] = //Samples per Frame / 8
+static const int8u Mpega_Coefficient[4][4] = //Samples per Frame / 8
 {
     {  0,  72, 144,  12}, //MPEG Audio 2.5
     {  0,   0,   0,   0}, //MPEG Audio X
@@ -240,7 +240,7 @@ const int8u Mpega_Coefficient[4][4] = //Samples per Frame / 8
 };
 
 //---------------------------------------------------------------------------
-const int8u Mpega_SlotSize[4]= //A frame is coposed of slots
+static const int8u Mpega_SlotSize[4]= //A frame is coposed of slots
 {
     0, // Layer X
     1, // Layer3
@@ -249,7 +249,7 @@ const int8u Mpega_SlotSize[4]= //A frame is coposed of slots
 };
 
 //---------------------------------------------------------------------------
-const int16u Mpega_CRC12_Table[]=
+static const int16u Mpega_CRC12_Table[]=
 {
   0x000, 0x80f, 0x811, 0x01e, 0x82d, 0x022, 0x03c, 0x833,
   0x855, 0x05a, 0x044, 0x84b, 0x078, 0x877, 0x869, 0x066,

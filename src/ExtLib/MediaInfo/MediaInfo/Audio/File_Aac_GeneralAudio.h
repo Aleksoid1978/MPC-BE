@@ -26,8 +26,8 @@ namespace MediaInfoLib
 //2-step 1st pass
 struct hcb_struct_1
 {
-    int8u Offset;
-    int8u Extra;
+    const int8u Offset;
+    const int8u Extra;
 };
 
 //2-step 2nd pass or binary
@@ -35,7 +35,7 @@ typedef int8s hcb_struct[5]; //0=bits to read (2step) or more to read (binary), 
 
 //---------------------------------------------------------------------------
 // Scalefactor Huffman Codebook
-static int8u huffman_sf[241][2]=
+static const int8u huffman_sf[241][2]=
 {
     {   1,   2 },
     {  60,   0 },
@@ -282,7 +282,7 @@ static int8u huffman_sf[241][2]=
 
 //---------------------------------------------------------------------------
 // Spectrum Huffman Codebook 1
-static hcb_struct_1 huffman_01_1[32]=
+static const hcb_struct_1 huffman_01_1[32]=
 {
     {  0, 0 },
     {  0, 0 },
@@ -318,7 +318,7 @@ static hcb_struct_1 huffman_01_1[32]=
     { 49, 6 }
 };
 
-static hcb_struct huffman_01[114]=
+static const hcb_struct huffman_01[114]=
 {
     {  1,  0,  0,  0,  0 },
     {  5,  1,  0,  0,  0 },
@@ -437,7 +437,7 @@ static hcb_struct huffman_01[114]=
 
 //---------------------------------------------------------------------------
 // Spectrum Huffman Codebook 2
-static hcb_struct_1 huffman_02_1[] =
+static const hcb_struct_1 huffman_02_1[] =
 {
     {  0, 0 },
     {  0, 0 },
@@ -473,7 +473,7 @@ static hcb_struct_1 huffman_02_1[] =
     { 69, 4 }
 };
 
-static hcb_struct huffman_02[86]=
+static const hcb_struct huffman_02[86]=
 {
     { 3,  0,  0,  0,  0 },
     { 4,  1,  0,  0,  0 },
@@ -564,7 +564,7 @@ static hcb_struct huffman_02[86]=
 
 //---------------------------------------------------------------------------
 // Spectrum Huffman Codebook 2
-static hcb_struct huffman_03[161] =
+static const hcb_struct huffman_03[161] =
 {
     { 0,  1,  2 },
     { 1,  0,  0 },
@@ -731,7 +731,7 @@ static hcb_struct huffman_03[161] =
 
 //---------------------------------------------------------------------------
 // Spectrum Huffman Codebook 4
-static hcb_struct_1 huffman_04_1[32]=
+static const hcb_struct_1 huffman_04_1[32]=
 {
     {  0, 0 },
     {  0, 0 },
@@ -767,7 +767,7 @@ static hcb_struct_1 huffman_04_1[32]=
     { 56, 7 }
 };
 
-static hcb_struct huffman_04[185]=
+static const hcb_struct huffman_04[185]=
 {
     {  4,  1,  1,  1,  1 },
     {  4,  0,  1,  1,  1 },
@@ -957,7 +957,7 @@ static hcb_struct huffman_04[185]=
 
 //---------------------------------------------------------------------------
 // Spectrum Huffman Codebook 5
-static hcb_struct huffman_05[161]=
+static const hcb_struct huffman_05[161]=
 {
     { 0,  1,  2 },
     { 1,  0,  0 },
@@ -1124,7 +1124,7 @@ static hcb_struct huffman_05[161]=
 
 //---------------------------------------------------------------------------
 // Spectrum Huffman Codebook 6
-static hcb_struct_1 huffman_06_1[32] = {
+static const hcb_struct_1 huffman_06_1[32] = {
     {  0, 0 },
     {  0, 0 },
     {  1, 0 },
@@ -1159,7 +1159,7 @@ static hcb_struct_1 huffman_06_1[32] = {
     {  61, 6 }
 };
 
-static hcb_struct huffman_06[126]=
+static const hcb_struct huffman_06[126]=
 {
     {  4,  0,  0 },
     {  4,  1,  0 },
@@ -1290,7 +1290,7 @@ static hcb_struct huffman_06[126]=
 
 //---------------------------------------------------------------------------
 // Spectrum Huffman Codebook 7
-static hcb_struct huffman_07[127] =
+static const hcb_struct huffman_07[127] =
 {
     { 0,  1,  2 },
     { 1,  0,  0 },
@@ -1423,7 +1423,7 @@ static hcb_struct huffman_07[127] =
 
 //---------------------------------------------------------------------------
 // Spectrum Huffman Codebook 8
-static hcb_struct_1 huffman_08_1[32]=
+static const hcb_struct_1 huffman_08_1[32]=
 {
     {  0, 0 },
     {  0, 0 },
@@ -1459,7 +1459,7 @@ static hcb_struct_1 huffman_08_1[32]=
     { 51, 5 }
 };
 
-static hcb_struct huffman_08[83]=
+static const hcb_struct huffman_08[83]=
 {
     {  3,  1,  1 },
     {  4,  2,  1 },
@@ -1548,7 +1548,7 @@ static hcb_struct huffman_08[83]=
 
 //---------------------------------------------------------------------------
 // Spectrum Huffman Codebook 9
-static hcb_struct huffman_09[337]=
+static const hcb_struct huffman_09[337]=
 {
     { 0,  1,  2 },
     { 1,  0,  0 },
@@ -1891,7 +1891,7 @@ static hcb_struct huffman_09[337]=
 
 //---------------------------------------------------------------------------
 // Spectrum Huffman Codebook 10
-static hcb_struct_1 huffman_10_1[64]=
+static const hcb_struct_1 huffman_10_1[64]=
 {
     {   0, 0 },
     {   0, 0 },
@@ -1959,7 +1959,7 @@ static hcb_struct_1 huffman_10_1[64]=
     { 145, 6 }
 };
 
-static hcb_struct huffman_10[210]=
+static const hcb_struct huffman_10[210]=
 {
     {  4,  1,  1 },
     {  4,  1,  2 },
@@ -2174,7 +2174,7 @@ static hcb_struct huffman_10[210]=
 
 //---------------------------------------------------------------------------
 // Spectrum Huffman Codebook 11
-static hcb_struct_1 huffman_11_1[32]=
+static const hcb_struct_1 huffman_11_1[32]=
 {
     {   0, 0 },
     {   0, 0 },
@@ -2210,7 +2210,7 @@ static hcb_struct_1 huffman_11_1[32]=
     { 246, 7 }
 };
 
-static hcb_struct huffman_11[374]=
+static const hcb_struct huffman_11[374]=
 {
     { 4,  0,  0 },
     { 4,  1,  1 },

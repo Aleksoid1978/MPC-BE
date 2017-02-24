@@ -356,7 +356,7 @@ int16u AC3_FrameSize_Get(int8u frmsizecod, int8u fscod)
 // Init: int32u CRC_16 = 0x0000;
 // for each data byte do
 //     CRC_16=(CRC_16<<8) ^ CRC_16_Table[(CRC_16>>8)^(data_byte)];
-int16u CRC_16_Table[256] =
+static const int16u CRC_16_Table[256] =
 {
     0x0000, 0x8005, 0x800f, 0x000a, 0x801b, 0x001e, 0x0014, 0x8011,
     0x8033, 0x0036, 0x003c, 0x8039, 0x0028, 0x802d, 0x8027, 0x0022,
@@ -1340,10 +1340,11 @@ void File_Ac3::Synched_Init()
 {
     //FrameInfo
     PTS_End=0;
-    if (FrameInfo.DTS==(int64u)-1)
+    if (!IsSub)
+    {
         FrameInfo.DTS=0; //No DTS in container
-    if (FrameInfo.PTS==(int64u)-1)
         FrameInfo.PTS=0; //No PTS in container
+    }
     DTS_Begin=FrameInfo.DTS;
     DTS_End=FrameInfo.DTS;
     if (Frame_Count_NotParsedIncluded==(int64u)-1)
@@ -2142,7 +2143,7 @@ void File_Ac3::HD()
         if (FrameInfo.DTS!=(int64u)-1)
             FrameInfo.DTS+=FrameInfo.DUR;
         if (FrameInfo.PTS!=(int64u)-1)
-            FrameInfo.PTS=FrameInfo.DTS;
+            FrameInfo.PTS+=FrameInfo.DUR;
 
         //Filling
         if (!Status[IsAccepted])

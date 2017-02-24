@@ -223,7 +223,7 @@ namespace Elements
     UUID(060E2B34, 01010105, 04010602, 020A0000, 0000, "SMPTE ST 381-2", Mpeg4VisualDescriptor_ProfileAndLevel, "")
     UUID(060E2B34, 01010105, 04010602, 020B0000, 0000, "SMPTE ST 381-2", Mpeg4VisualDescriptor_BitRate, "")
 
-    //                             02 - JPEG 2000 Coding Parameters
+    //                             03 - JPEG 2000 Coding Parameters
     UUID(060E2B34, 0101010A, 04010603, 01000000, 0000, "", JPEG2000PictureSubDescriptor_Rsiz, "")
     UUID(060E2B34, 0101010A, 04010603, 02000000, 0000, "", JPEG2000PictureSubDescriptor_Xsiz, "")
     UUID(060E2B34, 0101010A, 04010603, 03000000, 0000, "", JPEG2000PictureSubDescriptor_Ysiz, "")
@@ -237,6 +237,24 @@ namespace Elements
     UUID(060E2B34, 0101010A, 04010603, 0B000000, 0000, "", JPEG2000PictureSubDescriptor_PictureComponentSizing, "")
     UUID(060E2B34, 0101010A, 04010603, 0C000000, 0000, "", JPEG2000PictureSubDescriptor_CodingStyleDefault, "")
     UUID(060E2B34, 0101010A, 04010603, 0D000000, 0000, "", JPEG2000PictureSubDescriptor_QuantizationDefault, "")
+
+    //                             06 - AVC Parameters
+    //                                 01 - AVC Parameters
+    UUID(060E2B34, 01010105, 04010606, 01030000, 0000, "SMPTE ST 381-3", AVCDescriptor_ConstantBFrames, "")
+    UUID(060E2B34, 01010105, 04010606, 01040000, 0000, "SMPTE ST 381-3", AVCDescriptor_CodedContentType, "")
+    UUID(060E2B34, 01010105, 04010606, 01060000, 0000, "SMPTE ST 381-3", AVCDescriptor_ClosedGOP, "")
+    UUID(060E2B34, 01010105, 04010606, 01070000, 0000, "SMPTE ST 381-3", AVCDescriptor_IdenticalGOP, "")
+    UUID(060E2B34, 01010105, 04010606, 01080000, 0000, "SMPTE ST 381-3", AVCDescriptor_MaxGOP, "")
+    UUID(060E2B34, 01010105, 04010606, 01090000, 0000, "SMPTE ST 381-3", AVCDescriptor_BPictureCount, "")
+    UUID(060E2B34, 01010105, 04010606, 010A0000, 0000, "SMPTE ST 381-3", AVCDescriptor_Profile, "")
+    UUID(060E2B34, 01010105, 04010606, 010B0000, 0000, "SMPTE ST 381-3", AVCDescriptor_MaximumBitRate, "")
+    UUID(060E2B34, 01010105, 04010606, 010C0000, 0000, "SMPTE ST 381-3", AVCDescriptor_ProfileConstraint, "")
+    UUID(060E2B34, 01010105, 04010606, 010D0000, 0000, "SMPTE ST 381-3", AVCDescriptor_Level, "")
+    UUID(060E2B34, 01010105, 04010606, 010E0000, 0000, "SMPTE ST 381-3", AVCDescriptor_DecodingDelay, "")
+    UUID(060E2B34, 01010105, 04010606, 010F0000, 0000, "SMPTE ST 381-3", AVCDescriptor_MaximumRefFrames, "")
+    UUID(060E2B34, 01010105, 04010606, 01100000, 0000, "SMPTE ST 381-3", AVCDescriptor_SequenceParameterSetFlag, "")
+    UUID(060E2B34, 01010105, 04010606, 01110000, 0000, "SMPTE ST 381-3", AVCDescriptor_PictureParameterSetFlag, "")
+    UUID(060E2B34, 01010105, 04010606, 01140000, 0000, "SMPTE ST 381-3", AVCDescriptor_AverageBitRate, "")
 
     //                         02 - Audio Essence Characteristics
     //                           04 - Audio Compression Parameters
@@ -316,12 +334,13 @@ namespace Elements
     UUID(060E2B34, 02530101, 0D010101, 01016400, 0000, "SMPTE ST 429-5", TimedTextDescriptor, "")
     UUID(060E2B34, 02530101, 0D010101, 01016500, 0000, "SMPTE ST 429-5", TimedTextResourceSubDescriptor, "")
     UUID(060E2B34, 02530101, 0D010101, 01016600, 0000, "SMPTE ST 377-1", ApplicationObject, "Application Object")
-    UUID(060E2B34, 02530101, 0D010101, 01016700, 0000, "SMPTE ST ?", Unknown67SubDescriptor, "Unknown 0x67 Sub-Descriptor")
+    UUID(060E2B34, 02530101, 0D010101, 01016700, 0000, "SMPTE ST ?", ContainerConstraintsSubDescriptor, "Container Constraints Sub-Descriptor")
     UUID(060E2B34, 02530101, 0D010101, 01016800, 0000, "SMPTE ST 381-2", Mpeg4VisualSubDescriptor, "MPEG-4 Visual Sub-Descriptor")
     UUID(060E2B34, 02530101, 0D010101, 01016A00, 0000, "SMPTE ST 377-4", MCALabelSubDescriptor, "")
     UUID(060E2B34, 02530101, 0D010101, 01016B00, 0000, "SMPTE ST 377-4", AudioChannelLabelSubDescriptor, "")
     UUID(060E2B34, 02530101, 0D010101, 01016C00, 0000, "SMPTE ST 377-4", SoundfieldGroupLabelSubDescriptor, "")
     UUID(060E2B34, 02530101, 0D010101, 01016D00, 0000, "SMPTE ST 377-4", GroupOfSoundfieldGroupsLabelSubDescriptor, "")
+    UUID(060E2B34, 02530101, 0D010101, 01016E00, 0000, "SMPTE ST 381-3", AVCSubDescriptor, "AVC Sub-Descriptor")
 
     //                           02 - MXF File Structure
     //                             01 - Version 1
@@ -443,6 +462,7 @@ namespace Elements
 extern const char* Mpegv_profile_and_level_indication_profile[];
 extern const char* Mpegv_profile_and_level_indication_level[];
 extern const char* Mpeg4v_Profile_Level(int32u Profile_Level);
+extern const char* Avc_profile_idc(int8u profile_idc);
 extern string Jpeg2000_Rsiz(int16u Rsiz);
 
 //---------------------------------------------------------------------------
@@ -522,6 +542,27 @@ static const char* Mxf_MPEG2_CodedContentType(int8u CodedContentType)
         case 0x01 : return "Progressive";
         case 0x02 : return "Interlaced";
         case 0x03 : return ""; //Mixed
+        default   : return "";
+    }
+}
+
+//---------------------------------------------------------------------------
+static const char* Mxf_AVC_SequenceParameterSetFlag_Constancy(bool Constancy)
+{
+    if (Constancy)
+        return "";
+    else
+        return "Constant";
+}
+
+//---------------------------------------------------------------------------
+static const char* Mxf_AVC_ParameterSetFlag_Location(int8u Location)
+{
+    switch (Location)
+    {
+        case 0x01 : return "First access unit";
+        case 0x02 : return "Every access unit";
+        case 0x03 : return "Every GOP";
         default   : return "";
     }
 }
@@ -3613,6 +3654,29 @@ void File_Mxf::Streams_Finish_Descriptor(const int128u DescriptorUID, const int1
                                                 #endif //MEDIAINFO_ADVANCED
                     }
 
+                    //Special cases
+                    std::map<std::string, Ztring>::iterator Info_Level=SubDescriptor->second.Infos.find("Temp_AVC_Format_Level");
+                    std::map<std::string, Ztring>::iterator Info_constraint=SubDescriptor->second.Infos.find("Temp_AVC_constraint_set3_flag");
+                    if (Info_Level!=SubDescriptor->second.Infos.end() || Info_constraint!=SubDescriptor->second.Infos.end())
+                    {
+                        //AVC Descriptor creates that, adapting
+                        std::map<std::string, Ztring>::iterator Info_Profile=SubDescriptor->second.Infos.find("Format_Profile");
+                        if (Info_Profile!=SubDescriptor->second.Infos.end())
+                        {
+                            if (Info_constraint!=SubDescriptor->second.Infos.end())
+                            {
+                                if (Info_constraint->second==__T("1"))
+                                    Info_Profile->second+=__T(" Intra");
+                                SubDescriptor->second.Infos.erase(Info_constraint);
+                            }
+                            if (Info_Level!=SubDescriptor->second.Infos.end())
+                            {
+                                Info_Profile->second+=__T("@L")+Info_Level->second;
+                                SubDescriptor->second.Infos.erase(Info_Level);
+                            }
+                        }
+                    }
+                    
                     for (std::map<std::string, Ztring>::iterator Info=SubDescriptor->second.Infos.begin(); Info!=SubDescriptor->second.Infos.end(); ++Info)
                         if (Retrieve(StreamKind_Last, StreamPos_Last, Info->first.c_str()).empty())
                             Fill(StreamKind_Last, StreamPos_Last, Info->first.c_str(), Info->second);
@@ -5642,11 +5706,12 @@ void File_Mxf::Data_Parse()
     ELEMENT(MCALabelSubDescriptor,                              "MCA Label Sub-Descriptor")
     ELEMENT(TimedTextDescriptor,                                "Timed Text Descriptor")
     ELEMENT(TimedTextResourceSubDescriptor,                     "Timed Text Resource Sub-Descriptor")
-    ELEMENT(Unknown67SubDescriptor,                             "Unknown 0x67 Sub-Descriptor")
+    ELEMENT(ContainerConstraintsSubDescriptor,                  "Container Constraints Sub-Descriptor")
     ELEMENT(Mpeg4VisualSubDescriptor,                           "MPEG-4 Visual Sub-Descriptor")
     ELEMENT(AudioChannelLabelSubDescriptor,                     "Audio Channel Label Sub-Descriptor")
     ELEMENT(SoundfieldGroupLabelSubDescriptor,                  "Soundfield Group Label Sub-Descriptor")
     ELEMENT(GroupOfSoundfieldGroupsLabelSubDescriptor,          "Group Of Soundfield Groups Label Sub-Descriptor")
+    ELEMENT(AVCSubDescriptor,                                   "AVC Sub-Descriptor")
     ELEMENT(OpenIncompleteHeaderPartition,                      "Open and Incomplete Header Partition Pack")
     ELEMENT(ClosedIncompleteHeaderPartition,                    "Closed and Iomplete Header Partition Pack")
     ELEMENT(OpenCompleteHeaderPartition,                        "Open and Complete Header Partition Pack")
@@ -5870,7 +5935,7 @@ void File_Mxf::Data_Parse()
                             if (Format.empty())
                                 Format.From_Local(Mxf_EssenceContainer(Descriptor->second.EssenceContainer));
                             if (Format.find(__T("PCM"))==0)
-                                i->second=__T("Little");
+                                Descriptor->second.Infos["Format_Settings_Endianness"]=__T("Little");
                         }
                     }
 
@@ -6945,7 +7010,7 @@ void File_Mxf::MultipleDescriptor()
 
     switch(Code2)
     {
-        ELEMENT(3F01, MultipleDescriptor_SubDescriptorUIDs,     "SubDescriptorUIDs")
+        ELEMENT(3F01, MultipleDescriptor_FileDescriptors,       "FileDescriptors")
         default: FileDescriptor();
     }
 }
@@ -7675,7 +7740,7 @@ void File_Mxf::TimedTextResourceSubDescriptor()
 }
 
 //---------------------------------------------------------------------------
-void File_Mxf::Unknown67SubDescriptor()
+void File_Mxf::ContainerConstraintsSubDescriptor()
 {
     //switch(Code2)
     //{
@@ -7832,6 +7897,52 @@ void File_Mxf::GroupOfSoundfieldGroupsLabelSubDescriptor()
     //{
     //    default:
                 MCALabelSubDescriptor();
+    //}
+}
+
+//---------------------------------------------------------------------------
+void File_Mxf::AVCSubDescriptor()
+{
+    if (Code2>=0x8000)
+    {
+        // Not a short code
+        std::map<int16u, int128u>::iterator Primer_Value=Primer_Values.find(Code2);
+        if (Primer_Value!=Primer_Values.end())
+        {
+            int32u Code_Compare1=Primer_Value->second.hi>>32;
+            int32u Code_Compare2=(int32u)Primer_Value->second.hi;
+            int32u Code_Compare3=Primer_Value->second.lo>>32;
+            int32u Code_Compare4=(int32u)Primer_Value->second.lo;
+            if(0);
+            ELEMENT_UUID(AVCDescriptor_ConstantBFrames,                 "Number of B frames always constant")
+            ELEMENT_UUID(AVCDescriptor_CodedContentType,                "Coded content type")
+            ELEMENT_UUID(AVCDescriptor_ClosedGOP,                       "Closed GOP")
+            ELEMENT_UUID(AVCDescriptor_IdenticalGOP,                    "Identical GOP")
+            ELEMENT_UUID(AVCDescriptor_MaxGOP,                          "Maximum occurring spacing between I frames")
+            ELEMENT_UUID(AVCDescriptor_BPictureCount,                   "Maximum number of B pictures between P or I frames")
+            ELEMENT_UUID(AVCDescriptor_Profile,                         "Profile")
+            ELEMENT_UUID(AVCDescriptor_MaximumBitRate,                  "Maximum bit rate")
+            ELEMENT_UUID(AVCDescriptor_ProfileConstraint,               "Profile Constraint")
+            ELEMENT_UUID(AVCDescriptor_Level,                           "Level")
+            ELEMENT_UUID(AVCDescriptor_DecodingDelay,                   "Decoding delay")
+            ELEMENT_UUID(AVCDescriptor_MaximumRefFrames,                "Maximum reference frames")
+            ELEMENT_UUID(AVCDescriptor_SequenceParameterSetFlag,        "Sequence parameter set flag")
+            ELEMENT_UUID(AVCDescriptor_PictureParameterSetFlag,         "Picture parameter set flag")
+            ELEMENT_UUID(AVCDescriptor_AverageBitRate,                  "Average bit rate")
+            else
+            {
+                Element_Info1(Ztring().From_UUID(Primer_Value->second));
+                Skip_XX(Length2,                                        "Data");
+            }
+
+            return;
+        }
+    }
+
+    //switch(Code2)
+    //{
+    //    default:
+                GenerationInterchangeObject();
     //}
 }
 
@@ -10171,11 +10282,129 @@ void File_Mxf::Mpeg4VisualDescriptor_ProfileAndLevel()
 
 //---------------------------------------------------------------------------
 // 0x
+void File_Mxf::AVCDescriptor_Profile()
+{
+    //Parsing
+    int8u profile_idc;
+    Get_B1 (profile_idc,                                        "profile_idc"); Element_Info1(Avc_profile_idc(profile_idc));
+
+    FILLING_BEGIN();
+        if (profile_idc)
+            Descriptor_Fill("Format_Profile", Avc_profile_idc(profile_idc));
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+// 0x
 void File_Mxf::MPEG2VideoDescriptor_BitRate()
 {
     //Parsing
     int32u Data;
     Get_B4 (Data,                                               "Data"); Element_Info1(Data);
+
+    FILLING_BEGIN();
+        Descriptor_Fill("BitRate", Ztring().From_Number(Data));
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+// 0x
+void File_Mxf::AVCDescriptor_MaximumBitRate()
+{
+    //Parsing
+    int32u Data;
+    Get_B4 (Data,                                               "Data"); Element_Info1(Data);
+
+    FILLING_BEGIN();
+        Descriptor_Fill("BitRate_Maximum", Ztring().From_Number(Data));
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+// 0x
+void File_Mxf::AVCDescriptor_ProfileConstraint()
+{
+    //Parsing
+    BS_Begin();
+    bool constraint_set3_flag;
+    Element_Begin1("constraints");
+        Skip_SB(                                                "constraint_set0_flag");
+        Skip_SB(                                                "constraint_set1_flag");
+        Skip_SB(                                                "constraint_set2_flag");
+        Get_SB (constraint_set3_flag,                           "constraint_set3_flag");
+        Skip_SB(                                                "constraint_set4_flag");
+        Skip_SB(                                                "constraint_set5_flag");
+        Skip_BS(2,                                              "reserved_zero_2bits");
+    Element_End0();
+    BS_End();
+
+    FILLING_BEGIN();
+        Descriptor_Fill("Temp_AVC_constraint_set3_flag", Ztring::ToZtring(constraint_set3_flag?1:0));
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+// 0x
+void File_Mxf::AVCDescriptor_Level()
+{
+    //Parsing
+    int8u level_idc;
+    Get_B1 (level_idc,                                          "level_idc"); Element_Info1(Ztring().From_Number(((float)level_idc)/10, (level_idc%10)?1:0));
+
+    FILLING_BEGIN();
+        if (level_idc)
+            Descriptor_Fill("Temp_AVC_Format_Level", Ztring().From_Number(((float)level_idc)/10, (level_idc%10)?1:0));
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+// 0x
+void File_Mxf::AVCDescriptor_DecodingDelay()
+{
+    //Parsing
+    Info_B1(Data,                                               "Data"); Element_Info1(Data==0xFF?"":(Data?"Yes":"No"));
+}
+
+//---------------------------------------------------------------------------
+// 0x
+void File_Mxf::AVCDescriptor_MaximumRefFrames()
+{
+    //Parsing
+    Info_B1(Data,                                               "max_num_ref_frames"); Element_Info1(Data);
+}
+
+//---------------------------------------------------------------------------
+// 0x
+void File_Mxf::AVCDescriptor_SequenceParameterSetFlag()
+{
+    //Parsing
+    BS_Begin();
+    bool constraint_set3_flag;
+    Info_SB(   Constancy,                                       "Constancy");
+    Info_BS(3, Location,                                        "In-band location"); Element_Info1(Mxf_AVC_SequenceParameterSetFlag_Constancy(Constancy));
+    Skip_BS(4,                                                  "reserved"); Element_Info1(Mxf_AVC_SequenceParameterSetFlag_Constancy(Location));
+    BS_End();
+}
+
+//---------------------------------------------------------------------------
+// 0x
+void File_Mxf::AVCDescriptor_PictureParameterSetFlag()
+{
+    //Parsing
+    BS_Begin();
+    Info_SB(   Constancy,                                       "Constancy");
+    Info_BS(3, Location,                                        "In-band location"); Element_Info1(Mxf_AVC_SequenceParameterSetFlag_Constancy(Constancy));
+    Skip_BS(4,                                                  "reserved"); Element_Info1(Mxf_AVC_SequenceParameterSetFlag_Constancy(Location));
+    BS_End();
+}
+
+//---------------------------------------------------------------------------
+// 0x
+void File_Mxf::AVCDescriptor_AverageBitRate()
+{
+    //Parsing
+    int32u Data;
+    Get_B4 (Data,                                               "Data");
 
     FILLING_BEGIN();
         Descriptor_Fill("BitRate", Ztring().From_Number(Data));
@@ -10197,7 +10426,7 @@ void File_Mxf::NetworkLocator_URLString()
 
 //---------------------------------------------------------------------------
 // 0x3F01
-void File_Mxf::MultipleDescriptor_SubDescriptorUIDs()
+void File_Mxf::MultipleDescriptor_FileDescriptors()
 {
     Descriptors[InstanceUID].SubDescriptors.clear();
 

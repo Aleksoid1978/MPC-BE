@@ -207,9 +207,6 @@ void File_ChannelGrouping::Read_Buffer_Continue()
     Common->Channels[Channel_Pos]->Offsets_Buffer.insert(Common->Channels[Channel_Pos]->Offsets_Buffer.begin(), Offsets_Buffer.begin(), Offsets_Buffer.end());
     Offsets_Buffer.clear();
     Skip_XX(Buffer_Size,                                        "Channel grouping data");
-    Common->Channel_Current++;
-    if (Common->Channel_Current>=Channel_Total)
-        Common->Channel_Current=0;
 
     //Copying to merged channel
     size_t Minimum=(size_t)-1;

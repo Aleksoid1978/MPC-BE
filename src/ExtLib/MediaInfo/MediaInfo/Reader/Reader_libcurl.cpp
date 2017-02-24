@@ -565,64 +565,8 @@ Reader_libcurl::~Reader_libcurl ()
 //---------------------------------------------------------------------------
 size_t Reader_libcurl::Format_Test(MediaInfo_Internal* MI, String File_Name)
 {
-    #if defined MEDIAINFO_LIBCURL_DLL_RUNTIME
-        if (libcurl_Module_Count==0)
-        {
-            size_t Errors=0;
-
-            /* Load library */
-            #ifdef MEDIAINFO_GLIBC
-                libcurl_Module=g_module_open(MEDIAINFODLL_NAME, G_MODULE_BIND_LAZY);
-            #elif defined (_WIN32) || defined (WIN32)
-                libcurl_Module=LoadLibrary(MEDIAINFODLL_NAME);
-            #else
-                libcurl_Module=dlopen(MEDIAINFODLL_NAME, RTLD_LAZY);
-                if (!libcurl_Module)
-                    libcurl_Module=dlopen("./" MEDIAINFODLL_NAME, RTLD_LAZY);
-                if (!libcurl_Module)
-                    libcurl_Module=dlopen("/usr/local/lib/" MEDIAINFODLL_NAME, RTLD_LAZY);
-                if (!libcurl_Module)
-                    libcurl_Module=dlopen("/usr/local/lib64/" MEDIAINFODLL_NAME, RTLD_LAZY);
-                if (!libcurl_Module)
-                    libcurl_Module=dlopen("/usr/lib/" MEDIAINFODLL_NAME, RTLD_LAZY);
-                if (!libcurl_Module)
-                    libcurl_Module=dlopen("/usr/lib64/" MEDIAINFODLL_NAME, RTLD_LAZY);
-            #endif
-            if (!libcurl_Module)
-            {
-                #if MEDIAINFO_EVENTS
-                    MediaInfoLib::Config.Log_Send(0xC0, 0xFF, 0, Reader_libcurl_FileNameWithoutPassword(File_Name)+__T(", Libcurl library is not found"));
-                #endif //MEDIAINFO_EVENTS
-                return 0;
-            }
-
-            /* Load methods */
-            MEDIAINFO_ASSIGN    (curl_easy_init,            "curl_easy_init")
-            MEDIAINFO_ASSIGN    (curl_easy_setopt,          "curl_easy_setopt")
-            MEDIAINFO_ASSIGN    (curl_easy_perform,         "curl_easy_perform")
-            MEDIAINFO_ASSIGN    (curl_easy_cleanup,         "curl_easy_cleanup")
-            MEDIAINFO_ASSIGN    (curl_easy_getinfo,         "curl_easy_getinfo")
-            MEDIAINFO_ASSIGN    (curl_slist_append,         "curl_slist_append")
-            MEDIAINFO_ASSIGN    (curl_slist_free_all,       "curl_slist_free_all")
-            MEDIAINFO_ASSIGN    (curl_easy_duphandle,       "curl_easy_duphandle")
-            MEDIAINFO_ASSIGN    (curl_easy_strerror,        "curl_easy_strerror")
-            MEDIAINFO_ASSIGN    (curl_version_info,         "curl_version_info")
-            MEDIAINFO_ASSIGN    (curl_multi_init,           "curl_multi_init")
-            MEDIAINFO_ASSIGN    (curl_multi_add_handle,     "curl_multi_add_handle")
-            MEDIAINFO_ASSIGN    (curl_multi_remove_handle,  "curl_multi_remove_handle")
-            MEDIAINFO_ASSIGN    (curl_multi_perform,        "curl_multi_perform")
-            MEDIAINFO_ASSIGN    (curl_multi_cleanup,        "curl_multi_cleanup")
-            if (Errors>0)
-            {
-                #if MEDIAINFO_EVENTS
-                    MediaInfoLib::Config.Log_Send(0xC0, 0xFF, 0, Reader_libcurl_FileNameWithoutPassword(File_Name)+__T(", Libcurl library is not correctly loaded"));
-                #endif //MEDIAINFO_EVENTS
-                return 0;
-            }
-
-            libcurl_Module_Count++;
-        }
-    #endif //defined MEDIAINFO_LIBCURL_DLL_RUNTIME
+    if (!Load())
+        return 0;
 
     #if MEDIAINFO_EVENTS
         {
@@ -1182,6 +1126,77 @@ size_t Reader_libcurl::Format_Test_PerParser_Seek (MediaInfo_Internal* MI, size_
     return ToReturn;
 }
 #endif //MEDIAINFO_SEEK
+
+//***************************************************************************
+// Open/Close library
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+bool Reader_libcurl::Load(const Ztring File_Name)
+{
+    #if defined MEDIAINFO_LIBCURL_DLL_RUNTIME
+        if (libcurl_Module_Count==0)
+        {
+            size_t Errors=0;
+
+            /* Load library */
+            #ifdef MEDIAINFO_GLIBC
+                libcurl_Module=g_module_open(MEDIAINFODLL_NAME, G_MODULE_BIND_LAZY);
+            #elif defined (_WIN32) || defined (WIN32)
+                libcurl_Module=LoadLibrary(MEDIAINFODLL_NAME);
+            #else
+                libcurl_Module=dlopen(MEDIAINFODLL_NAME, RTLD_LAZY);
+                if (!libcurl_Module)
+                    libcurl_Module=dlopen("./" MEDIAINFODLL_NAME, RTLD_LAZY);
+                if (!libcurl_Module)
+                    libcurl_Module=dlopen("/usr/local/lib/" MEDIAINFODLL_NAME, RTLD_LAZY);
+                if (!libcurl_Module)
+                    libcurl_Module=dlopen("/usr/local/lib64/" MEDIAINFODLL_NAME, RTLD_LAZY);
+                if (!libcurl_Module)
+                    libcurl_Module=dlopen("/usr/lib/" MEDIAINFODLL_NAME, RTLD_LAZY);
+                if (!libcurl_Module)
+                    libcurl_Module=dlopen("/usr/lib64/" MEDIAINFODLL_NAME, RTLD_LAZY);
+            #endif
+            if (!libcurl_Module)
+            {
+                #if MEDIAINFO_EVENTS
+                    if (!File_Name.empty())
+                        MediaInfoLib::Config.Log_Send(0xC0, 0xFF, 0, Reader_libcurl_FileNameWithoutPassword(File_Name)+__T(", Libcurl library is not found"));
+                #endif //MEDIAINFO_EVENTS
+                return 0;
+            }
+
+            /* Load methods */
+            MEDIAINFO_ASSIGN    (curl_easy_init,            "curl_easy_init")
+            MEDIAINFO_ASSIGN    (curl_easy_setopt,          "curl_easy_setopt")
+            MEDIAINFO_ASSIGN    (curl_easy_perform,         "curl_easy_perform")
+            MEDIAINFO_ASSIGN    (curl_easy_cleanup,         "curl_easy_cleanup")
+            MEDIAINFO_ASSIGN    (curl_easy_getinfo,         "curl_easy_getinfo")
+            MEDIAINFO_ASSIGN    (curl_slist_append,         "curl_slist_append")
+            MEDIAINFO_ASSIGN    (curl_slist_free_all,       "curl_slist_free_all")
+            MEDIAINFO_ASSIGN    (curl_easy_duphandle,       "curl_easy_duphandle")
+            MEDIAINFO_ASSIGN    (curl_easy_strerror,        "curl_easy_strerror")
+            MEDIAINFO_ASSIGN    (curl_version_info,         "curl_version_info")
+            MEDIAINFO_ASSIGN    (curl_multi_init,           "curl_multi_init")
+            MEDIAINFO_ASSIGN    (curl_multi_add_handle,     "curl_multi_add_handle")
+            MEDIAINFO_ASSIGN    (curl_multi_remove_handle,  "curl_multi_remove_handle")
+            MEDIAINFO_ASSIGN    (curl_multi_perform,        "curl_multi_perform")
+            MEDIAINFO_ASSIGN    (curl_multi_cleanup,        "curl_multi_cleanup")
+            if (Errors>0)
+            {
+                #if MEDIAINFO_EVENTS
+                    if (!File_Name.empty())
+                        MediaInfoLib::Config.Log_Send(0xC0, 0xFF, 0, Reader_libcurl_FileNameWithoutPassword(File_Name)+__T(", Libcurl library is not correctly loaded"));
+                #endif //MEDIAINFO_EVENTS
+                return 0;
+            }
+
+            libcurl_Module_Count++;
+        }
+    #endif //defined MEDIAINFO_LIBCURL_DLL_RUNTIME
+
+    return true;
+}
 
 } //NameSpace
 

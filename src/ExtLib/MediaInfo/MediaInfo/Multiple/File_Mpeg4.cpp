@@ -32,6 +32,9 @@
 #if defined(MEDIAINFO_MPEGPS_YES)
     #include "MediaInfo/Multiple/File_MpegPs.h"
 #endif
+#if defined(MEDIAINFO_PCM_YES)
+    #include "MediaInfo/Audio/File_Pcm.h"
+#endif
 #include "ZenLib/FileName.h"
 #include "MediaInfo/MediaInfo_Internal.h"
 #if MEDIAINFO_EVENTS
@@ -2130,6 +2133,12 @@ bool File_Mpeg4::BookMark_Needed()
         for (std::map<int32u, stream>::iterator Temp=Streams.begin(); Temp!=Streams.end(); ++Temp)
             if (!Temp->second.Parsers.empty())
         {
+            //Limit the detection
+            #if defined(MEDIAINFO_SMPTEST0337_YES) && defined(MEDIAINFO_PCM_YES)
+                if (Temp->second.IsPcm && Temp->second.Parsers.size()>=2 && !Temp->second.stsc.empty() && Temp->second.stsc[0].SamplesPerChunk>=48000/4) // 1/4 of second is enough for detection
+                    ((File_Pcm*)Temp->second.Parsers[Temp->second.Parsers.size()-1])->Frame_Count_Valid=2; //2 for checking the PCM block after this one (next track)
+            #endif //defined(MEDIAINFO_PCM_YES)
+
             //PCM split
             #if MEDIAINFO_DEMUX
             if (Temp->second.IsPcm && Config->Demux_SplitAudioBlocks_Get())
@@ -2137,6 +2146,10 @@ bool File_Mpeg4::BookMark_Needed()
                     if (Temp2->second.StreamKind==Stream_Video)
                     {
                         Temp->second.SplitAudio(Temp2->second, moov_mvhd_TimeScale);
+                        #if defined(MEDIAINFO_SMPTEST0337_YES) && defined(MEDIAINFO_PCM_YES)
+                            if (Temp->second.Parsers.size()>=2 && Temp->second.stsz.size() && Temp->second.stco.size())
+                                ((File_Pcm*)Temp->second.Parsers[Temp->second.Parsers.size()-1])->Frame_Count_Valid=Temp->second.stsz.size()/Temp->second.stco.size()+2; //+1 for handling rounding, +1 for taking the first frame of the next stco
+                        #endif //defined(MEDIAINFO_PCM_YES)
                         break;
                     }
             #endif //#if MEDIAINFO_DEMUX

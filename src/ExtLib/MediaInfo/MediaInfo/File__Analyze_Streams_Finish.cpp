@@ -423,16 +423,20 @@ void File__Analyze::Streams_Finish_StreamOnly_General(size_t StreamPos)
     //File extension test
     if (Retrieve(Stream_General, StreamPos, "FileExtension_Invalid").empty())
     {
-        InfoMap &FormatList=MediaInfoLib::Config.Format_Get();
-        InfoMap::iterator Format=FormatList.find(Retrieve(Stream_General, StreamPos, General_Format));
-        if (Format!=FormatList.end())
+        const Ztring& Name=Retrieve(Stream_General, StreamPos, General_FileName);
+        const Ztring& Extension=Retrieve(Stream_General, StreamPos, General_FileExtension);
+        if (!Name.empty() && !Extension.empty())
         {
-            ZtringList ValidExtensions;
-            ValidExtensions.Separator_Set(0, __T(" "));
-            ValidExtensions.Write(FormatList.Get(Format->first, InfoFormat_Extensions));
-            const Ztring& Extension=Retrieve(Stream_General, StreamPos, General_FileExtension);
-            if (!ValidExtensions.empty() && ValidExtensions.Find(Extension)==string::npos)
-                Fill(Stream_General, StreamPos, "FileExtension_Invalid", ValidExtensions.Read());
+            InfoMap &FormatList=MediaInfoLib::Config.Format_Get();
+            InfoMap::iterator Format=FormatList.find(Retrieve(Stream_General, StreamPos, General_Format));
+            if (Format!=FormatList.end())
+            {
+                ZtringList ValidExtensions;
+                ValidExtensions.Separator_Set(0, __T(" "));
+                ValidExtensions.Write(FormatList.Get(Format->first, InfoFormat_Extensions));
+                if (!ValidExtensions.empty() && ValidExtensions.Find(Extension)==string::npos)
+                    Fill(Stream_General, StreamPos, "FileExtension_Invalid", ValidExtensions.Read());
+            }
         }
     }
 }

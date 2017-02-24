@@ -114,6 +114,7 @@ static bool IsSmpteSt2067_3(const char* Ns)
 {
     return Ns &&
            (!strcmp(Ns, "http://www.smpte-ra.org/schemas/2067-3/2013") ||
+            !strcmp(Ns, "http://www.smpte-ra.org/schemas/2067-3/2016") ||
             !strcmp(Ns, "http://www.smpte-ra.org/schemas/2067-3/XXXX")); //Some muxers use XXXX instead of year
 
 }

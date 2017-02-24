@@ -649,7 +649,7 @@ void element_details::Element_Node::Init()
 }
 
 //---------------------------------------------------------------------------
-int element_details::Element_Node::Print_Micro_Xml(std::ostringstream& ss, size_t level)
+int element_details::Element_Node::Print_Micro_Xml(print_struc& s)
 {
     if (NoShow)
         return 0;
@@ -658,9 +658,9 @@ int element_details::Element_Node::Print_Micro_Xml(std::ostringstream& ss, size_
         goto print_children;
 
     if (Value.empty())
-        ss << "<b";
+        s.ss << "<b";
     else
-        ss << "<d";
+        s.ss << "<d";
 
     {
     size_t MustEscape = Xml_Content_Escape_MustEscape(Name);
@@ -668,10 +668,10 @@ int element_details::Element_Node::Print_Micro_Xml(std::ostringstream& ss, size_
     {
         std::string str;
         Xml_Content_Escape(Name, str, MustEscape);
-        ss << " o=\"" << Pos << "\" n=\"" << str << "\"";
+        s.ss << " o=\"" << Pos << "\" n=\"" << str << "\"";
     }
     else
-        ss << " o=\"" << Pos << "\" n=\"" << Name << "\"";
+        s.ss << " o=\"" << Pos << "\" n=\"" << Name << "\"";
     }
 
     for (size_t i = 0, info_nb = 0; i < Infos.size(); ++i)
@@ -681,38 +681,40 @@ int element_details::Element_Node::Print_Micro_Xml(std::ostringstream& ss, size_
         if (Info->Measure == "Parser")
         {
             if (!(Info->data == string()))
-                ss << " parser=\"" << Info->data << "\"";
+                s.ss << " parser=\"" << Info->data << "\"";
             continue;
         }
         else
             info_nb++;
 
-        ss << " i";
+        s.ss << " i";
         if (info_nb > 1)
-            ss << info_nb;
-        ss << "=\"" << Infos[i] << "\"";
+            s.ss << info_nb;
+        s.ss << "=\"" << Infos[i] << "\"";
     }
 
     if (!Value.empty())
     {
         Value.Set_Output_Format(Element_Node_Data::Format_Xml);
-        ss << ">" << Value << "</d>";
+        s.ss << ">" << Value << "</d>";
     }
     else
-        ss << " s=\"" << Size << "\">";
+        s.ss << " s=\"" << Size << "\">";
 
-    level += 4;
+    s.level += 4;
 print_children:
     for (size_t i = 0; i < Children.size(); ++i)
-        Children[i]->Print_Micro_Xml(ss, level);
+        Children[i]->Print_Micro_Xml(s);
 
     if (!IsCat && !Name_Is_Empty())
     {
+        s.level -= 4;
+        
         //end tag
         if (Value.empty())
         {
             //block
-            ss << "</b>";
+            s.ss << "</b>";
         }
     }
 
@@ -720,7 +722,7 @@ print_children:
 }
 
 //---------------------------------------------------------------------------
-int element_details::Element_Node::Print_Xml(std::ostringstream& ss, size_t level)
+int element_details::Element_Node::Print_Xml(print_struc& s)
 {
     if (NoShow)
         return 0;
@@ -730,13 +732,13 @@ int element_details::Element_Node::Print_Xml(std::ostringstream& ss, size_t leve
     if (IsCat || Name_Is_Empty())
         goto print_children;
 
-    spaces.resize(level, ' ');
-    ss << spaces;
+    spaces.resize(s.level, ' ');
+    s.ss << spaces;
 
     if (Value.empty())
-        ss << "<block";
+        s.ss << "<block";
     else
-        ss << "<data";
+        s.ss << "<data";
 
     {
     size_t MustEscape = Xml_Content_Escape_MustEscape(Name);
@@ -744,10 +746,10 @@ int element_details::Element_Node::Print_Xml(std::ostringstream& ss, size_t leve
     {
         std::string str;
         Xml_Content_Escape(Name, str, MustEscape);
-        ss << " offset=\"" << Pos << "\" name=\"" << str << "\"";
+        s.ss << " offset=\"" << Pos << "\" name=\"" << str << "\"";
     }
     else
-        ss << " offset=\"" << Pos << "\" name=\"" << Name << "\"";
+        s.ss << " offset=\"" << Pos << "\" name=\"" << Name << "\"";
     }
 
     for (size_t i = 0, info_nb = 0; i < Infos.size(); ++i)
@@ -757,40 +759,42 @@ int element_details::Element_Node::Print_Xml(std::ostringstream& ss, size_t leve
         if (Info->Measure == "Parser")
         {
             if (!(Info->data == string()))
-                ss << " parser=\"" << Info->data << "\"";
+                s.ss << " parser=\"" << Info->data << "\"";
             continue;
         }
         else
             info_nb++;
 
-        ss << " info";
+        s.ss << " info";
         if (info_nb > 1)
-            ss << info_nb;
-        ss << "=\"" << Infos[i] << "\"";
+            s.ss << info_nb;
+        s.ss << "=\"" << Infos[i] << "\"";
     }
 
     if (!Value.empty())
     {
         Value.Set_Output_Format(Element_Node_Data::Format_Xml);
-        ss << ">" << Value << "</data>";
+        s.ss << ">" << Value << "</data>";
     }
     else
-        ss << " size=\"" << Size << "\">";
+        s.ss << " size=\"" << Size << "\">";
 
-    ss << "\n";
+    s.ss << s.eol;
 
-    level += 4;
+    s.level += 4;
 print_children:
     for (size_t i = 0; i < Children.size(); ++i)
-        Children[i]->Print_Xml(ss, level);
+        Children[i]->Print_Xml(s);
 
     if (!IsCat && !Name_Is_Empty())
     {
+        s.level -= 4;
+
         //end tag
         if (Value.empty())
         {
             //block
-            ss << spaces << "</block>" << "\n";
+            s.ss << spaces << "</block>" << s.eol;
         }
     }
 
@@ -798,13 +802,13 @@ print_children:
 }
 
 //---------------------------------------------------------------------------
-int element_details::Element_Node::Print_Tree_Cat(std::ostringstream& ss, size_t level)
+int element_details::Element_Node::Print_Tree_Cat(print_struc& s)
 {
     std::ostringstream offset;
-    offset << std::setfill('0') << std::setw(8) << std::hex << std::uppercase << Pos << std::nouppercase << std::dec;
+    offset << std::setfill('0') << std::setw(s.offset_size) << std::hex << std::uppercase << Pos << std::nouppercase << std::dec;
 
     std::string spaces;
-    spaces.resize(level, ' ');
+    spaces.resize(s.level, ' ');
 
     std::string ToShow;
     ToShow += "---   ";
@@ -814,14 +818,14 @@ int element_details::Element_Node::Print_Tree_Cat(std::ostringstream& ss, size_t
     std::string minuses;
     minuses.resize(ToShow.size(), '-');
 
-    ss << offset.str() << spaces << minuses << "\n";
-    ss << offset.str() << spaces << ToShow << "\n";
-    ss << offset.str() << spaces << minuses << "\n";
+    s.ss << offset.str() << spaces << minuses << s.eol;
+    s.ss << offset.str() << spaces << ToShow << s.eol;
+    s.ss << offset.str() << spaces << minuses << s.eol;
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int element_details::Element_Node::Print_Tree(std::ostringstream& ss, size_t level)
+int element_details::Element_Node::Print_Tree(print_struc& s)
 {
     std::string spaces;
 
@@ -829,25 +833,25 @@ int element_details::Element_Node::Print_Tree(std::ostringstream& ss, size_t lev
         return 0;
 
     if (IsCat)
-        return Print_Tree_Cat(ss, level);
+        return Print_Tree_Cat(s);
     else if (Name_Is_Empty())
         goto print_children;
 
-    ss << std::setfill('0') << std::setw(8) << std::hex << std::uppercase << Pos << std::nouppercase << std::dec;
-    spaces.resize(level, ' ');
-    ss << spaces;
-    ss << Name;
+    s.ss << std::setfill('0') << std::setw(s.offset_size) << std::hex << std::uppercase << Pos << std::nouppercase << std::dec;
+    spaces.resize(s.level, ' ');
+    s.ss << spaces;
+    s.ss << Name;
 
     spaces.clear();
 
 #define NB_SPACES 40
     if (!Value.empty())
     {
-        ss << ":";
-        int nb_free = NB_SPACES - level - (Name_Is_Empty() ? 0 : Name.length()); // 40 - len(Name) - len(spaces)
+        s.ss << ":";
+        int nb_free = NB_SPACES - s.level - (Name_Is_Empty() ? 0 : Name.length()); // 40 - len(Name) - len(spaces)
         spaces.resize(nb_free > 0 ? nb_free : 1, ' ');
         Value.Set_Output_Format(Element_Node_Data::Format_Tree);
-        ss << spaces << Value;
+        s.ss << spaces << Value;
         spaces.clear();
     }
 #undef NB_SPACES
@@ -862,44 +866,56 @@ int element_details::Element_Node::Print_Tree(std::ostringstream& ss, size_t lev
         if (Info->Measure == "Parser")
         {
             if (!(Info->data == string()))
-                ss << " - Parser=" << Info->data;
+                s.ss << " - Parser=" << Info->data;
             continue;
         }
 
         Info->data.Set_Output_Format(Element_Node_Data::Format_Tree);
-        ss << " - " << Info;
+        s.ss << " - " << Info;
     }
 
     if (Value.empty())
-        ss << " (" << Size << " bytes)";
+        s.ss << " (" << Size << " bytes)";
 
-    ss << "\n";
+    s.ss << s.eol;
 
-    level += 1;
+    s.level++;
 print_children:
     for (size_t i = 0; i < Children.size(); ++i)
-        Children[i]->Print_Tree(ss, level);
+        Children[i]->Print_Tree(s);
+
+    if (!Name_Is_Empty())
+        s.level--;
 
     return 0;
 }
 
 //---------------------------------------------------------------------------
-int element_details::Element_Node::Print(MediaInfo_Config::trace_Format Format, std::string& Str)
+int element_details::Element_Node::Print(MediaInfo_Config::trace_Format Format, std::string& Str, const string& eol, int64u File_Size)
 {
+    //Computing how many characters are needed for displaying maximum file size
+    size_t offset_size = sizeof(File_Size)*8-1;
+    while (offset_size>1 && (((int64u)1) << offset_size) - 1 >= File_Size)
+        offset_size--;
+    offset_size++;
+    offset_size = (offset_size / 4) + ((offset_size % 4) ? 1 : 0); //4 bits per offset char
+
     std::ostringstream ss;
     int ret = -1;
+    print_struc s(ss, eol, offset_size);
     switch (Format)
     {
         case MediaInfo_Config::Trace_Format_Tree:
-            ret = Print_Tree(ss, 1);
-            break;
+            s.level = 1;
+            ret = Print_Tree(s);
+        break;
         case MediaInfo_Config::Trace_Format_CSV:
             break;
         case MediaInfo_Config::Trace_Format_XML:
-            ret = Print_Xml(ss, 0);
+            ret = Print_Xml(s);
             break;
         case MediaInfo_Config::Trace_Format_MICRO_XML:
-            ret = Print_Micro_Xml(ss, 0);
+            ret = Print_Micro_Xml(s);
             break;
         default:
             break;

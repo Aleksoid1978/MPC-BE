@@ -424,6 +424,26 @@ struct MediaInfo_Event_General_SubFile_End_0
     MEDIAINFO_EVENT_GENERIC
 };
 
+
+/*-------------------------------------------------------------------------*/
+/* WaitForMoreData_Start                                                   */
+#define MediaInfo_Event_General_WaitForMoreData_Start 0x7008
+struct MediaInfo_Event_General_WaitForMoreData_Start_0
+{
+    MEDIAINFO_EVENT_GENERIC
+    double                  Duration_Max;       //In seconds
+};
+/*-------------------------------------------------------------------------*/
+/* WaitForMoreData_End                                                     */
+#define MediaInfo_Event_General_WaitForMoreData_End 0x7009
+struct MediaInfo_Event_General_WaitForMoreData_End_0
+{
+    MEDIAINFO_EVENT_GENERIC
+    double                  Duration_Max;       //In seconds
+    double                  Duration_Actual;    //In seconds
+    MediaInfo_int8u         Flags;              //bit 0: Outcome (1 is giving up)
+};
+
 /***************************************************************************/
 /* MPEG-TS / BDAV / TSP                                                    */
 /***************************************************************************/

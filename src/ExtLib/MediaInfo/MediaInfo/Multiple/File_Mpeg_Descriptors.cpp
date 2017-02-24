@@ -52,6 +52,7 @@ namespace Elements
     const int32u HDMV=0x48444D56; //BluRay
     const int32u HEVC=0x48455643; //HEVC
     const int32u KLVA=0x4B4C5641; //KLV Packets
+    const int32u Opus=0x4F707573; //Opus
     const int32u S14A=0x53313441; //ATSC - Satellite
     const int32u SCTE=0x53435445; //SCTE
     const int32u TSHV=0x54534856; //TSHV
@@ -634,6 +635,7 @@ const char* Mpeg_Descriptors_registration_format_identifier_Format(int32u format
         case Elements::HEVC : return "HEVC";
         case Elements::KLVA : return "KLV";
         case Elements::S14A : return "ATSC - Satellite";
+        case Elements::Opus : return "Opus";
         case Elements::SCTE : return "SCTE 54 2003 - DV Service Multiplex and Transport System for Cable Television";
         case Elements::TSHV : return "DV";
         case Elements::VC_1 : return "VC-1";
@@ -652,6 +654,7 @@ stream_t Mpeg_Descriptors_registration_format_identifier_StreamKind(int32u forma
         case Elements::DTS2 : return Stream_Audio;
         case Elements::DTS3 : return Stream_Audio;
         case Elements::HEVC : return Stream_Video;
+        case Elements::Opus : return Stream_Audio;
         case Elements::VC_1 : return Stream_Video;
         default :             return Stream_Max;
     }

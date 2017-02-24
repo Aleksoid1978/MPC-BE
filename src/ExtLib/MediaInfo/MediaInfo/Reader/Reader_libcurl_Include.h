@@ -917,7 +917,7 @@ extern "C"
     #define MEDIAINFODLL_NAME  "libcurl.4.dylib"
     #define __stdcall
 #else
-    #define MEDIAINFODLL_NAME  "libcurl.so.0"
+    #define MEDIAINFODLL_NAME  "libcurl.so.4"
     #define __stdcall
 #endif //!defined(_WIN32) || defined (WIN32)
 

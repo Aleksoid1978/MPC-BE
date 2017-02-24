@@ -40,6 +40,9 @@ public :
     size_t Format_Test_PerParser_Continue (MediaInfo_Internal* MI);
     size_t Format_Test_PerParser_Seek (MediaInfo_Internal* MI, size_t Method, int64u Value, int64u ID);
 
+    // Open/Close library
+    static bool Load(const Ztring File_Name=Ztring());
+
 public:
     struct curl_data;
 
