@@ -955,10 +955,6 @@ void CMainFrame::OnDestroy()
 
 	m_wndPreView.DestroyWindow();
 
-	if (AfxGetAppSettings().bResetSettings) {
-		ShellExecute(NULL, L"open", GetProgramPath(), L"/reset", NULL, SW_SHOWNORMAL);
-	}
-
 	if (m_hNotifyRenderThread) {
 		SetEvent(m_hStopNotifyRenderThreadEvent);
 		if (WaitForSingleObject(m_hNotifyRenderThread, 3000) == WAIT_TIMEOUT) {

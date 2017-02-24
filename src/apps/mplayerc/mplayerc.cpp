@@ -186,6 +186,44 @@ BOOL CMPlayerCApp::OnIdle(LONG lCount)
 	return ret;
 }
 
+bool CMPlayerCApp::ClearSettings()
+{
+	// We want the other instances to be closed before resetting the settings.
+	HWND hWnd = FindWindow(_T(MPC_WND_CLASS_NAME), NULL);
+	while (hWnd) {
+		Sleep(500);
+		hWnd = FindWindow(_T(MPC_WND_CLASS_NAME), NULL);
+		if (hWnd && MessageBox(NULL, ResStr(IDS_RESET_SETTINGS_MUTEX), ResStr(IDS_RESET_SETTINGS), MB_ICONEXCLAMATION | MB_RETRYCANCEL) == IDCANCEL) {
+			return false;
+		}
+	}
+
+	// Remove the settings
+	if (IsIniValid()) {
+		CFile file;
+		if (file.Open(GetIniPath(), CFile::modeWrite)) {
+			file.SetLength(0); // clear, but not delete
+			file.Close();
+		}
+	} else {
+		SHDeleteKeyW(m_hAppRegKey, L"");
+	}
+
+	// Remove the current playlist if it exists
+	CString strSavePath;
+	if (AfxGetMyApp()->GetAppSavePath(strSavePath)) {
+		CPath playlistPath;
+		playlistPath.Combine(strSavePath, L"default.mpcpl");
+
+		CFileStatus status;
+		if (CFile::GetStatus(playlistPath, status)) {
+			CFile::Remove(playlistPath);
+		}
+	}
+
+	return true;
+}
+
 void CMPlayerCApp::InitProfile()
 {
 	std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
@@ -1339,14 +1377,13 @@ BOOL CMPlayerCApp::InitInstance()
 		return FALSE;
 	}
 
-	PreProcessCommandLine();
-
 	if (IsIniValid()) {
 		StoreSettingsToIni();
 	} else {
 		StoreSettingsToRegistry();
 	}
 
+	PreProcessCommandLine();
 	m_s.ParseCommandLine(m_cmdln);
 
 	if (m_s.nCLSwitches & (CLSW_HELP | CLSW_UNRECOGNIZEDSWITCH)) { // show comandline help window
@@ -1356,38 +1393,8 @@ BOOL CMPlayerCApp::InitInstance()
 	}
 
 	if (m_s.nCLSwitches & CLSW_RESET) { // reset settings
-		// We want the other instances to be closed before resetting the settings.
-		HWND hWnd = FindWindow(_T(MPC_WND_CLASS_NAME), NULL);
-
-		while (hWnd) {
-			Sleep(500);
-
-			hWnd = FindWindow(_T(MPC_WND_CLASS_NAME), NULL);
-
-			if (hWnd && MessageBox(NULL, ResStr(IDS_RESET_SETTINGS_MUTEX), ResStr(IDS_RESET_SETTINGS), MB_ICONEXCLAMATION | MB_RETRYCANCEL) == IDCANCEL) {
-				return FALSE;
-			}
-		}
-
-		// Remove the settings
-		if (IsIniValid()) {
-			CFile::Remove(GetIniPath());
-		} else {
-			HKEY reg = GetAppRegistryKey();
-			SHDeleteKeyW(reg, L"");
-			RegCloseKey(reg);
-		}
-
-		// Remove the current playlist if it exists
-		CString strSavePath;
-		if (AfxGetMyApp()->GetAppSavePath(strSavePath)) {
-			CPath playlistPath;
-			playlistPath.Combine(strSavePath, L"default.mpcpl");
-
-			CFileStatus status;
-			if (CFile::GetStatus(playlistPath, status)) {
-				CFile::Remove(playlistPath);
-			}
+		if (!ClearSettings()) {
+			return FALSE;
 		}
 	}
 
@@ -1796,7 +1803,10 @@ UINT CMPlayerCApp::GetVKFromAppCommand(UINT nAppCommand)
 
 int CMPlayerCApp::ExitInstance()
 {
-	if (!m_s.bResetSettings) {
+	if (m_s.bResetSettings) {
+		ClearSettings();
+		ShellExecuteW(NULL, L"open", GetProgramPath(), NULL, NULL, SW_SHOWNORMAL);
+	} else {
 		m_s.SaveSettings();
 	}
 
