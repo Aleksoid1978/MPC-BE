@@ -35,6 +35,7 @@
 #include <basestruct.h>
 #include <list>
 #include <libavutil/pixfmt.h>
+#include <libavutil/intreadwrite.h>
 
 // option names
 #define OPT_REGKEY_MATROSKASplit	L"Software\\MPC-BE Filters\\Matroska Splitter"
@@ -2469,25 +2470,6 @@ HRESULT CMatroskaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 	return hr;
 }
 
-static WORD RL16(BYTE* p)
-{
-	return ((WORD)p[0] | (WORD)p[1] << 8);
-}
-
-static void WL16(BYTE* p, WORD d)
-{
-	p[0] = (d);
-	p[1] = (d) >> 8;
-}
-
-static void WL32(BYTE* p, DWORD d)
-{
-	p[0] = (d);
-	p[1] = (d) >> 8;
-	p[2] = (d) >> 16;
-	p[3] = (d) >> 24;
-}
-
 // reconstruct full wavpack blocks from mangled matroska ones.
 // From LAV's ffmpeg
 static bool ParseWavpack(CMediaType* mt, CBinary* Data, CAutoPtr<CPacket>& p)
@@ -2510,7 +2492,7 @@ static bool ParseWavpack(CMediaType* mt, CBinary* Data, CAutoPtr<CPacket>& p)
 	if (mt->formattype == FORMAT_WaveFormatEx) {
 		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt->Format();
 		if (wfe->cbSize >= 2) {
-			ver = RL16(mt->pbFormat);
+			ver = AV_RL16(mt->pbFormat);
 		}
 	}
 
@@ -2538,15 +2520,15 @@ static bool ParseWavpack(CMediaType* mt, CBinary* Data, CAutoPtr<CPacket>& p)
 
 		dstlen += blocksize + 32;
 
-		WL32(dst + offset, MAKEFOURCC('w', 'v', 'p', 'k'));			// tag
-		WL32(dst + offset + 4,  blocksize + 24);					// blocksize - 8
-		WL16(dst + offset + 8,  ver);								// version
-		WL16(dst + offset + 10, 0);									// track/index_no
-		WL32(dst + offset + 12, 0);									// total samples
-		WL32(dst + offset + 16, 0);									// block index
-		WL32(dst + offset + 20, samples);							// number of samples
-		WL32(dst + offset + 24, flags);								// flags
-		WL32(dst + offset + 28, crc);								// crc
+		AV_WL32(dst + offset, MAKEFOURCC('w', 'v', 'p', 'k'));		// tag
+		AV_WL32(dst + offset + 4,  blocksize + 24);					// blocksize - 8
+		AV_WL16(dst + offset + 8,  ver);							// version
+		AV_WL16(dst + offset + 10, 0);								// track/index_no
+		AV_WL32(dst + offset + 12, 0);								// total samples
+		AV_WL32(dst + offset + 16, 0);								// block index
+		AV_WL32(dst + offset + 20, samples);						// number of samples
+		AV_WL32(dst + offset + 24, flags);							// flags
+		AV_WL32(dst + offset + 28, crc);							// crc
 		memcpy(dst + offset + 32, gb.GetBufferPos(), blocksize);	// block data
 
 		gb.SkipBytes(blocksize);
@@ -2557,8 +2539,6 @@ static bool ParseWavpack(CMediaType* mt, CBinary* Data, CAutoPtr<CPacket>& p)
 
 	return true;
 }
-
-#define RL24(p) (p[2] << 16 | p[1] << 8 | p[0])
 
 HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REFERENCE_TIME rtBlockDuration/* = 0*/)
 {
@@ -2622,30 +2602,21 @@ HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REF
 			if ((marker & 0xe0) == 0xc0) {
 				const BYTE nbytes = 1 + ((marker >> 3) & 0x3);
 				BYTE n_frames = 1 + (marker & 0x7);
-				size_t idx_sz = 2 + n_frames * nbytes;
+				const size_t idx_sz = 2 + n_frames * nbytes;
 				if (size >= idx_sz && pData[size - idx_sz] == marker && nbytes >= 1 && nbytes <= 4) {
 					const BYTE *idx = pData + size + 1 - idx_sz;
-					int first = 1;
 
 					while (n_frames--) {
-						size_t sz;
+						size_t sz = 0;
 						switch(nbytes) {
-							case 1:
-								sz = (BYTE)*idx;
-								break;
-							case 2:
-								sz = GETWORD(idx);
-								break;
-							case 3:
-								sz = RL24(idx);
-								break;
-							case 4:
-								sz = GETDWORD(idx);
-								break;
+							case 1: sz = (BYTE)*idx; break;
+							case 2: sz = AV_RL16(idx); break;
+							case 3: sz = AV_RL24(idx); break;
+							case 4: sz = AV_RL32(idx); break;
 						}
 
 						idx += nbytes;
-						if (sz > size) {
+						if (sz > size || !sz) {
 							break;
 						}
 
