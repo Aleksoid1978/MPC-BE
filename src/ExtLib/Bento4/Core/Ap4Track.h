@@ -110,6 +110,7 @@ class AP4_Track {
     AP4_Track::Type GetType() { return m_Type; }
     AP4_UI64     GetDuration();
     AP4_Duration GetDurationMs();
+    double       GetDurationHighPrecision();
     AP4_Cardinal GetSampleCount();
     AP4_Result   GetSample(AP4_Ordinal index, AP4_Sample& sample);
     AP4_Result   ReadSample(AP4_Ordinal     index, 

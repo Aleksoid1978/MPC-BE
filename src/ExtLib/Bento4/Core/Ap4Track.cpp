@@ -249,6 +249,17 @@ AP4_Track::GetDurationMs()
 }
 
 /*----------------------------------------------------------------------
+|       AP4_Track::GetDurationHighPrecision
++---------------------------------------------------------------------*/
+double
+AP4_Track::GetDurationHighPrecision()
+{
+    const AP4_UI64 duration = GetDuration();
+    const AP4_UI32 units_per_second = m_FragmentSampleTable.GetDuration() ? m_MediaTimeScale : m_MovieTimeScale;
+    return units_per_second ? (double)duration * 1000.0 / units_per_second : 0.0;
+}
+
+/*----------------------------------------------------------------------
 |       AP4_Track::GetSampleCount
 +---------------------------------------------------------------------*/
 AP4_Cardinal
