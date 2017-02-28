@@ -105,8 +105,8 @@ static void DumpWaveFormatEx(WAVEFORMATEX* pwfx)
 	}
 }
 
-#define FramesToTime(frames, wfex) (FractionScale64(frames, UNITS, wfex->nSamplesPerSec))
-#define TimeToFrames(time, wfex)   (FractionScale64(time, wfex->nSamplesPerSec, UNITS))
+#define SamplesToTime(samples, wfex) (FractionScale64(samples, UNITS, wfex->nSamplesPerSec))
+#define TimeToSamples(time, wfex)    (FractionScale64(time, wfex->nSamplesPerSec, UNITS))
 
 #define IsExclusive(wfex)          (m_WASAPIMode == MODE_WASAPI_EXCLUSIVE || IsBitstream(wfex))
 
@@ -1303,7 +1303,7 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 			lSize = out_samples * m_output_params.channels * get_bytes_per_sample(m_output_params.sf);
 
 			if (delay && rtStart != INVALID_TIME) {
-				const REFERENCE_TIME rtDelay = FramesToTime(delay, m_pWaveFormatExInput);
+				const REFERENCE_TIME rtDelay = SamplesToTime(delay, m_pWaveFormatExInput);
 				rtStart -= rtDelay;
 				rtStop  -= rtDelay;
 			}
@@ -1400,7 +1400,7 @@ HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 	}
 	if (!m_pRenderClient) {
 		if (p->rtStart != INVALID_TIME) {
-			const REFERENCE_TIME rtDuration = FramesToTime(p->GetCount() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
+			const REFERENCE_TIME rtDuration = SamplesToTime(p->GetCount() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
 			const REFERENCE_TIME rtStop = p->rtStart + rtDuration;
 			REFERENCE_TIME rtRefClock = INVALID_TIME;
 
@@ -2158,11 +2158,11 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 							}
 						}
 
-						const REFERENCE_TIME rtDuration = FramesToTime(m_CurrentPacket->GetCount() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
+						const REFERENCE_TIME rtDuration = SamplesToTime(m_CurrentPacket->GetCount() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
 						m_rtNextSampleTime = m_CurrentPacket->rtStart + rtDuration;
 					}
 
-					const REFERENCE_TIME offsetDelay = m_nSampleOffset > 0 ? FramesToTime(m_nSampleOffset / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput) : 0;
+					const REFERENCE_TIME offsetDelay = m_nSampleOffset > 0 ? SamplesToTime(m_nSampleOffset / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput) : 0;
 					const REFERENCE_TIME dueTime = m_CurrentPacket->rtStart + offsetDelay;
 					if (dueTime < rtRefClock - m_hnsPeriod) {
 #if defined(_DEBUG) && DBGLOG_LEVEL
@@ -2181,7 +2181,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 						&& rtRefClock != INVALID_TIME
 						&& rtWaitRenderTime > rtRefClock) {
 					const REFERENCE_TIME rtSilenceDuration = rtWaitRenderTime - rtRefClock;
-					const UINT32 nSilenceFrames = TimeToFrames(rtSilenceDuration, m_pWaveFormatExOutput);
+					const UINT32 nSilenceFrames = TimeToSamples(rtSilenceDuration, m_pWaveFormatExOutput);
 					const UINT32 nSilenceBytes  = min(nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign, nAvailableBytes - nWritenBytes);
 #if defined(_DEBUG) && DBGLOG_LEVEL
 					DLog(L"CMpcAudioRenderer::RenderWasapiBuffer() - Pad silence %.2f ms [%u/%u (frames/bytes)] for clock matching at %I64d/%I64d",
@@ -2353,7 +2353,7 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCh
 		}
 
 		// calculate the new aligned periodicity
-		m_hnsPeriod = FramesToTime(m_nFramesInBuffer, pWaveFormatEx);
+		m_hnsPeriod = SamplesToTime(m_nFramesInBuffer, pWaveFormatEx);
 
 		DLog(L"CMpcAudioRenderer::InitAudioClient() - Trying again with periodicity of %I64d hundred-nanoseconds, or %u frames.", m_hnsPeriod, m_nFramesInBuffer);
 		if (SUCCEEDED(hr)) {
@@ -2633,7 +2633,7 @@ void CMpcAudioRenderer::WaitFinish()
 				if (out_samples) {
 					CAutoPtr<CPacket> p(DNew CPacket());
 					p->rtStart = rtStart;
-					p->rtStop  = rtStart + FramesToTime(out_samples, m_pWaveFormatExOutput);
+					p->rtStop  = rtStart + SamplesToTime(out_samples, m_pWaveFormatExOutput);
 					p->SetData(buff, out_samples * m_output_params.channels * get_bytes_per_sample(m_output_params.sf));
 
 					rtStart = p->rtStop;
