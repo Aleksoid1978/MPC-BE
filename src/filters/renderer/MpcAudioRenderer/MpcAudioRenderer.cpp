@@ -105,8 +105,8 @@ static void DumpWaveFormatEx(WAVEFORMATEX* pwfx)
 	}
 }
 
-#define FramesToTime(frames, wfex) (llMulDiv(frames, UNITS, wfex->nSamplesPerSec, 0))
-#define TimeToFrames(time, wfex)   (llMulDiv(time, wfex->nSamplesPerSec, UNITS, 0))
+#define FramesToTime(frames, wfex) (FractionScale64(frames, UNITS, wfex->nSamplesPerSec))
+#define TimeToFrames(time, wfex)   (FractionScale64(time, wfex->nSamplesPerSec, UNITS))
 
 #define IsExclusive(wfex)          (m_WASAPIMode == MODE_WASAPI_EXCLUSIVE || IsBitstream(wfex))
 
