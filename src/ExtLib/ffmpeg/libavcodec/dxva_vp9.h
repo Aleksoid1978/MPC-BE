@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef _MSC_VER
-#include <windows.h>
+#ifdef __GNUC__
+    #include <windows.h>
 #endif
 
 #include "compat/windows/dxva_vpx.h"
