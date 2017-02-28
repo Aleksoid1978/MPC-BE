@@ -398,7 +398,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 				}
 
-				AvgTimePerFrame = track->GetSampleCount() ? track->GetDurationMs() * 10000 / (track->GetSampleCount()) : 0;
+				AvgTimePerFrame = track->GetSampleCount() ? REFERENCE_TIME(track->GetDurationHighPrecision() * 10000.0 / (track->GetSampleCount())) : 0;
 				if (AP4_SttsAtom* stts = dynamic_cast<AP4_SttsAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stts"))) {
 					AP4_Duration totalDuration	= stts->GetTotalDuration();
 					AP4_UI32 totalFrames		= stts->GetTotalFrames();
@@ -1252,7 +1252,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				continue;
 			}
 
-			REFERENCE_TIME rtDuration = 10000i64 * track->GetDurationMs();
+			REFERENCE_TIME rtDuration = 10000i64 * track->GetDurationHighPrecision();
 			if (m_rtDuration < rtDuration) {
 				m_rtDuration = rtDuration;
 			}
