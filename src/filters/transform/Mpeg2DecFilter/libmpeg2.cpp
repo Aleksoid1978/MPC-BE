@@ -1372,8 +1372,12 @@ int CMpeg2Dec::sequence_display_ext()
 	// ???
 //	sequence->flags = flags;
 
-	sequence->display_width = (buffer[1] << 6) | (buffer[2] >> 2);
-    sequence->display_height = ((buffer[2]& 1 ) << 13) | (buffer[3] << 5) | (buffer[4] >> 3);
+	const unsigned int display_width = (buffer[1] << 6) | (buffer[2] >> 2);
+	const unsigned int display_height = ((buffer[2]& 1 ) << 13) | (buffer[3] << 5) | (buffer[4] >> 3);
+	if (display_width && display_height) {
+		sequence->display_width = display_width;
+		sequence->display_height = display_height;
+	}
 
     return 0;
 }
