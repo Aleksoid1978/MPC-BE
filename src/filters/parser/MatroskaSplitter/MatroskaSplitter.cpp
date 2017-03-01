@@ -549,6 +549,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 					} else if (CodecID.Left(9) == "V_REAL/RV" && CodecID.GetLength() >= 11) {
 						fourcc = CodecID[7] + (CodecID[8] << 8) + (CodecID[9] << 16) + (CodecID[10] << 24);
+					} else if (CodecID == "V_FFV1") {
+						fourcc = FCC('FFV1');
 					} else if (CodecID == "V_UNCOMPRESSED") {
 						fourcc = FCC((DWORD)pTE->v.ColourSpace);
 						switch (fourcc) {
@@ -960,7 +962,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					f->wHeadEmphasis	= 0;
 
 					mts.Add(mt);
-				} else if (CodecID == "A_AC3") {
+				} else if (CodecID.Left(5) == "A_AC3") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_DOLBY_AC3);
 					mts.Add(mt);
 				} else if (CodecID == "A_EAC3") {
