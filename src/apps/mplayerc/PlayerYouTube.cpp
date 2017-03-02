@@ -29,6 +29,7 @@
 #define YOUTUBE_URL                 L"youtube.com/watch?"
 #define YOUTUBE_URL_A               L"www.youtube.com/attribution_link"
 #define YOUTUBE_URL_V               L"youtube.com/v/"
+#define YOUTUBE_URL_EMBED           L"youtube.com/embed/"
 #define YOUTU_BE_URL                L"youtu.be/"
 
 #define MATCH_STREAM_MAP_START      "\"url_encoded_fmt_stream_map\":\""
@@ -149,6 +150,10 @@ namespace Youtube
 				url.Replace(L"watch?", L"watch?v=");
 			} else if (url.Find(YOUTUBE_URL_V) != -1) {
 				url.Replace(L"v/", L"watch?v=");
+				url.Replace(L"?list=", L"&list=");
+			} else if (url.Find(YOUTUBE_URL_EMBED) != -1) {
+				url.Replace(L"embed/", L"watch?v=");
+				url.Replace(L"?list=", L"&list=");
 			}
 		}
 	}
@@ -161,6 +166,7 @@ namespace Youtube
 		if (tmp_fn.Find(YOUTUBE_URL) != -1
 				|| tmp_fn.Find(YOUTUBE_URL_A) != -1
 				|| tmp_fn.Find(YOUTUBE_URL_V) != -1
+				|| tmp_fn.Find(YOUTUBE_URL_EMBED) != -1
 				|| tmp_fn.Find(YOUTU_BE_URL) != -1) {
 			return true;
 		}
@@ -175,7 +181,8 @@ namespace Youtube
 
 		if (tmp_fn.Find(YOUTUBE_PL_URL) != -1
 				|| (tmp_fn.Find(YOUTUBE_URL) != -1 && tmp_fn.Find(L"&list=") != -1)
-				|| (tmp_fn.Find(YOUTUBE_URL_A) != -1 && tmp_fn.Find(L"/watch_videos?video_ids") != -1)) {
+				|| (tmp_fn.Find(YOUTUBE_URL_A) != -1 && tmp_fn.Find(L"/watch_videos?video_ids") != -1)
+				|| ((tmp_fn.Find(YOUTUBE_URL_V) != -1 || tmp_fn.Find(YOUTUBE_URL_EMBED) != -1) && tmp_fn.Find(L"list=") != -1)) {
 			return true;
 		}
 
