@@ -153,6 +153,7 @@ struct {
 	// VP9
 	{ AV_CODEC_ID_VP9, DXVA_ModeVP9_VLD_10bit_Profile2, true },
 	{ AV_CODEC_ID_VP9, DXVA_ModeVP9_VLD_Profile0, false },
+	{ AV_CODEC_ID_VP9, DXVA_VP9_VLD_Intel, false },
 };
 
 FFMPEG_CODECS ffCodecs[] = {

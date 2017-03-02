@@ -65,7 +65,7 @@ CDXVA2Decoder* CDXVA2Decoder::CreateDXVA2Decoder(CMPCVideoDecFilter* pFilter, ID
 {
 	CDXVA2Decoder* pDecoder = NULL;
 
-	if ((*guidDecoder == DXVA2_ModeH264_E) || (*guidDecoder == DXVA2_ModeH264_F) || (*guidDecoder == DXVA_Intel_H264_ClearVideo)) {
+	if (*guidDecoder == DXVA2_ModeH264_E || *guidDecoder == DXVA2_ModeH264_F || *guidDecoder == DXVA_Intel_H264_ClearVideo) {
 		pDecoder = DNew CDXVA2DecoderH264(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
 	} else if (*guidDecoder == DXVA2_ModeVC1_D || *guidDecoder == DXVA2_ModeVC1_D2010) {
 		pDecoder = DNew CDXVA2DecoderVC1(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
@@ -73,7 +73,7 @@ CDXVA2Decoder* CDXVA2Decoder::CreateDXVA2Decoder(CMPCVideoDecFilter* pFilter, ID
 		pDecoder = DNew CDXVA2DecoderHEVC(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
 	} else if (*guidDecoder == DXVA2_ModeMPEG2_VLD) {
 		pDecoder = DNew CDXVA2DecoderMPEG2(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
-	} else if (*guidDecoder == DXVA_ModeVP9_VLD_Profile0 || *guidDecoder == DXVA_ModeVP9_VLD_10bit_Profile2) {
+	} else if (*guidDecoder == DXVA_ModeVP9_VLD_Profile0 || *guidDecoder == DXVA_ModeVP9_VLD_10bit_Profile2 || *guidDecoder == DXVA_VP9_VLD_Intel) {
 		pDecoder = DNew CDXVA2DecoderVP9(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
 	} else {
 		ASSERT(FALSE); // Unknown decoder !!
