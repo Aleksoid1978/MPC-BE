@@ -11526,26 +11526,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			m_strUrl = fn;
 		}
 
-		if ((CString(fn).MakeLower().Find(L"://")) < 0 && bFirst) {
-			if (s.fKeepHistory && s.fRememberFilePos && !s.NewFile(fn)) {
-				FILE_POSITION* FilePosition = s.CurrentFilePosition();
-				REFERENCE_TIME rtPos = FilePosition->llPosition;
-				if (m_pMS) {
-					m_pMS->SetPositions(&rtPos, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
-				}
-
-				if (m_nAudioTrackStored == -1) {
-					m_nAudioTrackStored = FilePosition->nAudioTrack;
-				}
-
-				if (m_nSubtitleTrackStored == -1) {
-					m_nSubtitleTrackStored = FilePosition->nSubtitleTrack;
-				}
-			}
-		}
-
-		QueryPerformanceCounter(&m_LastSaveTime);
-
 		if (m_bUseSmartSeek && bFirst) {
 			bool bIsVideo = false;
 			BeginEnumFilters(m_pGB, pEF, pBF) {
@@ -11674,6 +11654,27 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			break;
 		}
 	}
+
+	if (!pOFD->fns.IsEmpty()){
+		const CString fn = pOFD->fns.GetHead();
+		if (fn.Find(L"://") < 0
+				&& s.fKeepHistory && s.fRememberFilePos && !s.NewFile(fn)) {
+			const FILE_POSITION* FilePosition = s.CurrentFilePosition();
+			if (m_pMS) {
+				REFERENCE_TIME rtPos = FilePosition->llPosition;
+				m_pMS->SetPositions(&rtPos, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
+			}
+
+			if (m_nAudioTrackStored == -1) {
+				m_nAudioTrackStored = FilePosition->nAudioTrack;
+			}
+
+			if (m_nSubtitleTrackStored == -1) {
+				m_nSubtitleTrackStored = FilePosition->nSubtitleTrack;
+			}
+		}
+	}
+	QueryPerformanceCounter(&m_LastSaveTime);
 
 	if (s.fReportFailedPins) {
 		CComQIPtr<IGraphBuilderDeadEnd> pGBDE = m_pGB;
