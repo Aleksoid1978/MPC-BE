@@ -1020,19 +1020,15 @@ void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CSubtitleItemList
 	if (bCheck && !Youtube::CheckURL(fns.GetHead())) {
 		CAtlList<CString> sl;
 		if (SearchFiles(fns.GetHead(), sl)) {
-
 			bool bDVD_BD = false;
-			{
-				POSITION pos = sl.GetHeadPosition();
-				while (pos) {
-					CString fn = sl.GetNext(pos);
-					if (CString(fn).MakeUpper().Right(13) == L"\\VIDEO_TS.IFO"
-						|| CString(fn).MakeUpper().Right(11) == L"\\INDEX.BDMV") {
-						fns.RemoveAll();
-						fns.AddHead(fn);
-						bDVD_BD = true;
-						break;
-					}
+			POSITION pos = sl.GetHeadPosition();
+			while (pos) {
+				const CString& fn = sl.GetNext(pos);
+				if (m_pMainFrame->CheckBD(fn) || m_pMainFrame->CheckDVD(fn)) {
+					fns.RemoveAll();
+					fns.AddHead(fn);
+					bDVD_BD = true;
+					break;
 				}
 			}
 
@@ -1048,7 +1044,6 @@ void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CSubtitleItemList
 			}
 		}
 
-
 		const CString fn = fns.GetHead();
 		Content::Online::Clear(fn);
 
@@ -1062,11 +1057,21 @@ void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CSubtitleItemList
 			return;
 		}
 
-		if (ct == L"application/x-mpc-playlist") {
-			ParseMPCPlayList(fn);
+		if (m_pMainFrame->CheckBD(fn)) {
+			AddItem(fns, subs);
+
+			CString empty, label;
+			m_pMainFrame->MakeBDLabel(fn, empty, &label);
+			m_pl.GetTail().m_label = label;
 			return;
-		} else if (ct == L"application/x-bdmv-playlist" && s.SrcFilters[SRC_MPEG]) {
-			ParseBDMVPlayList(fn);
+		} else if (m_pMainFrame->CheckDVD(fn)) {
+			AddItem(fns, subs);
+			CString empty, label;
+			m_pMainFrame->MakeDVDLabel(fn, empty, &label);
+			m_pl.GetTail().m_label = label;
+			return;
+		} else if (ct == L"application/x-mpc-playlist") {
+			ParseMPCPlayList(fn);
 			return;
 		} else if (ct == L"audio/x-mpegurl" || ct == L"application/http-live-streaming-m3u") {
 			ParseM3UPlayList(fn);
@@ -2130,10 +2135,12 @@ void CPlayerPlaylistBar::DropFiles(CAtlList<CString>& slFiles)
 	SetForegroundWindow();
 	m_list.SetFocus();
 
-	m_pMainFrame->ParseDirs(slFiles);
+	if (!(slFiles.GetCount() == 1
+			&& (m_pMainFrame->CheckBD(slFiles.GetHead()) || m_pMainFrame->CheckDVD(slFiles.GetHead())))) {
+		m_pMainFrame->ParseDirs(slFiles);
+	}
 
 	Append(slFiles, true);
-
 }
 
 void CPlayerPlaylistBar::OnBeginDrag(NMHDR* pNMHDR, LRESULT* pResult)

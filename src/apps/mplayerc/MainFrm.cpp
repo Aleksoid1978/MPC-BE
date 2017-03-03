@@ -5028,12 +5028,6 @@ void CMainFrame::OnFileOpenQuick()
 	ShowWindow(SW_SHOW);
 	SetForegroundWindow();
 
-	if (fns.GetCount() == 1) {
-		if (OpenBD(fns.GetHead())) {
-			return;
-		}
-	}
-
 	if (AddSimilarFiles(fns)) {
 		bMultipleFiles = true;
 	}
@@ -5068,12 +5062,6 @@ void CMainFrame::OnFileOpenMedia()
 
 	ShowWindow(SW_SHOW);
 	SetForegroundWindow();
-
-	if (!dlg.m_bMultipleFiles) {
-		if (OpenBD(dlg.m_fns.GetHead())) {
-			return;
-		}
-	}
 
 	CString fn = dlg.m_fns.GetHead();
 	if (OpenYoutubePlaylist(fn)) {
@@ -5216,10 +5204,7 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 		m_wndPlaylistBar.Open(sl, true);
 		OpenCurPlaylistItem();
 	} else if (!s.slFiles.IsEmpty()) {
-		if (s.slFiles.GetCount() == 1
-				&& (OpenBD(s.slFiles.GetHead())
-					|| OpenIso(s.slFiles.GetHead())
-					|| OpenYoutubePlaylist(s.slFiles.GetHead()))) {
+		if (s.slFiles.GetCount() == 1 && OpenYoutubePlaylist(s.slFiles.GetHead())) {
 			;
 		} else if (s.slFiles.GetCount() == 1 && ::PathIsDirectory(s.slFiles.GetHead() + L"\\VIDEO_TS")) {
 			SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
@@ -5371,8 +5356,10 @@ void CMainFrame::OnFileOpenIso()
 			return;
 		}
 
-		CString pathName = fd.GetPathName();
-		OpenIso(pathName);
+		CAtlList<CString> sl;
+		sl.AddHead(fd.GetPathName());
+		m_wndPlaylistBar.Open(sl, false);
+		OpenCurPlaylistItem();
 	}
 }
 
@@ -5430,12 +5417,6 @@ void CMainFrame::OnFileOpenCD(UINT nID)
 			SetForegroundWindow();
 			ShowWindow(SW_SHOW);
 
-			if (CDRom_t == CDROM_BDVideo && sl.GetCount() == 1) {
-				if (OpenBD(sl.GetHead())) {
-					return;
-				}
-			}
-
 			m_wndPlaylistBar.Open(sl, true);
 			OpenCurPlaylistItem();
 
@@ -5447,10 +5428,6 @@ void CMainFrame::OnFileOpenCD(UINT nID)
 void CMainFrame::OnFileReOpen()
 {
 	if (m_eMediaLoadState == MLS_LOADING) {
-		return;
-	}
-
-	if (!m_LastOpenBDPath.IsEmpty() && OpenBD(m_LastOpenBDPath)) {
 		return;
 	}
 
@@ -5542,13 +5519,9 @@ void CMainFrame::DropFiles(CAtlList<CString>& slFiles)
 		return;
 	}
 
-	if (slFiles.GetCount() == 1) {
-		const CString& path = slFiles.GetHead();
-		if (OpenBD(path)
-				|| OpenIso(path)
-				|| OpenYoutubePlaylist(path)) {
-			return;
-		}
+	if (slFiles.GetCount() == 1
+			&& OpenYoutubePlaylist(slFiles.GetHead())) {
+		return;
 	}
 
 	AddSimilarFiles(slFiles);
@@ -7512,8 +7485,7 @@ void CMainFrame::OnPlayPlay()
 					strOSD.Delete(i, strOSD.GetLength()-i);
 				}
 				strOSD += L" DVD";
-
-				MakeDVDLabel(strOSD);
+				MakeDVDLabel(L"", strOSD);
 			}
 		}
 	}
@@ -9321,10 +9293,8 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 					SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 					m_bIsBDPlay = TRUE;
 
-					CAtlList<CString> sl;
-					sl.AddTail(Item->m_strFileName);
-					m_wndPlaylistBar.Open(sl, false);
-					OpenCurPlaylistItem(INVALID_TIME, !m_DiskImage.DriveAvailable());
+					OpenFile(Item->m_strFileName, INVALID_TIME, FALSE);
+
 					return;
 				}
 				idx++;
@@ -9649,7 +9619,7 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 		str += relativeDrive;
 
 		// Paths
-		if (m_LastOpenBDPath.GetLength() > 0) {
+		if (m_LastOpenBDPath.GetLength() > 0 && !m_DiskImage.DriveAvailable()) {
 			str += L";" + m_LastOpenBDPath;
 		} else {
 			CPlaylistItem pli;
@@ -9848,10 +9818,6 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 		}
 	}
 
-	if (::PathIsDirectory(args.GetHead()) && OpenBD(args.GetHead(), rtStart)) {
-		return;
-	}
-
 	if (!m_wndPlaylistBar.SelectFileInPlaylist(args.GetHead())) {
 		m_wndPlaylistBar.Open(args, false);
 	}
@@ -9889,10 +9855,6 @@ void CMainFrame::OnRecentFile(UINT nID)
 	}
 
 	if (str.IsEmpty()) {
-		return;
-	}
-
-	if (OpenBD(str) || OpenIso(str)) {
 		return;
 	}
 
@@ -12587,8 +12549,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 			}
 		} else if (GetPlaybackMode() == PM_DVD) {
 			fn = L"DVD";
-
-			MakeDVDLabel(fn);
+			MakeDVDLabel(L"", fn);
 		} else if (GetPlaybackMode() == PM_CAPTURE) {
 			fn = ResStr(IDS_CAPTURE_LIVE);
 		}
@@ -14584,7 +14545,7 @@ void CMainFrame::SetupNavChaptersSubMenu()
 				CString time = L"[" + ReftimeToString2(Item->Duration()) + L"]";
 				CString name = StripPath(Item->m_strFileName);
 
-				if (name == m_wndPlaylistBar.m_pl.GetHead().GetLabel()) {
+				if (name == GetFileOnly(m_strFnFull)) {
 					flags |= MF_CHECKED | MFT_RADIOCHECK;
 				}
 
@@ -15002,14 +14963,13 @@ void CMainFrame::SetupRecentFilesSubMenu()
 		UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 		if (!MRU[i].IsEmpty()) {
 			CString path(MRU[i]);
-			if (path.Find(L"\\") != 0 && ::PathIsDirectory(path)) {
-				if (::PathFileExists(path + L"\\VIDEO_TS.IFO")) {
-					path = L"DVD - " + path;
-				} else if (::PathFileExists(path + L"\\BDMV\\index.bdmv")) {
+			if (path.Find(L"\\") != 0) {
+				if (CheckBD(path)) {
 					path.Format(L"%s - %s", BLU_RAY, path);
+				} else if (CheckDVD(path)) {
+					path = L"DVD - " + path;
 				}
 			}
-
 			pSub->AppendMenu(flags, id, path);
 		}
 		id++;
@@ -16482,6 +16442,11 @@ BOOL CMainFrame::OpenCurPlaylistItem(REFERENCE_TIME rtStart/* = INVALID_TIME*/, 
 		return FALSE;
 	}
 
+	if (pli.m_fns.GetCount()
+			&& (OpenIso(pli.m_fns.GetHead(), rtStart) || OpenBD(pli.m_fns.GetHead(), rtStart, bAddRecent))) {
+		return TRUE;
+	}
+
 	CAutoPtr<OpenMediaData> p(m_wndPlaylistBar.GetCurOMD(rtStart));
 	if (p) {
 		p->bAddRecent = bAddRecent;
@@ -16490,6 +16455,25 @@ BOOL CMainFrame::OpenCurPlaylistItem(REFERENCE_TIME rtStart/* = INVALID_TIME*/, 
 
 	return TRUE;
 }
+
+BOOL CMainFrame::OpenFile(const CString fname, REFERENCE_TIME rtStart/* = INVALID_TIME*/, BOOL bAddRecent/* = TRUE*/)
+{
+	CAutoPtr<OpenMediaData> p(m_wndPlaylistBar.GetCurOMD(rtStart));
+	if (p) {
+		auto pFileData = dynamic_cast<OpenFileData*>(p.m_p);
+		if (pFileData->fns.IsEmpty()) {
+			pFileData->fns.AddHead(fname);
+		} else {
+			pFileData->fns.GetHead() = fname;
+		}
+		p->bAddRecent = bAddRecent;
+		OpenMedia(p);
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
 
 void CMainFrame::AddCurDevToPlaylist()
 {
@@ -17871,9 +17855,13 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/,
 	m_BDLabel.Empty();
 	m_LastOpenBDPath.Empty();
 
+	const CString originalPath(path);
+
 	path.TrimRight('\\');
 	if (path.Right(5).MakeLower() == L".bdmv") {
 		path.Truncate(path.ReverseFind('\\'));
+	} else if (path.Right(5).MakeLower() == L".mpls") {
+		path.Truncate(path.Find(L"\\PLAYLIST"));
 	} else if (::PathIsDirectory(path + L"\\BDMV")) {
 		path += L"\\BDMV";
 	}
@@ -17904,17 +17892,14 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/,
 			}
 
 			if (bAddRecent) {
-				AddRecent(path);
+				AddRecent(originalPath.Right(5).MakeLower() == L".mpls" ? originalPath : path);
 			}
 
 			SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 			m_bIsBDPlay = TRUE;
 			m_LastOpenBDPath = path;
 
-			CAtlList<CString> sl;
-			sl.AddTail(strPlaylistFile);
-			m_wndPlaylistBar.Open(sl, false);
-			if (OpenCurPlaylistItem(rtStart, FALSE)) {
+			if (OpenFile(originalPath.Right(5).MakeLower() == L".mpls" ? originalPath : strPlaylistFile, rtStart, FALSE) == TRUE) {
 				return TRUE;
 			}
 		}
@@ -17924,6 +17909,32 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/,
 	m_BDLabel.Empty();
 	m_LastOpenBDPath.Empty();
 	return FALSE;
+}
+
+BOOL CMainFrame::CheckBD(CString path)
+{
+	path.TrimRight('\\');
+	if (path.Right(5).MakeLower() == L".bdmv") {
+		path.Truncate(path.ReverseFind('\\'));
+	} else if (path.Right(5).MakeLower() == L".mpls") {
+		path.Truncate(path.Find(L"\\PLAYLIST"));
+	} else if (::PathIsDirectory(path + L"\\BDMV")) {
+		path += L"\\BDMV";
+	}
+
+	return ::PathFileExists(path + L"\\index.bdmv");
+}
+
+BOOL CMainFrame::CheckDVD(CString path)
+{
+	path.TrimRight('\\');
+	if (path.Right(13).MakeLower() == L"\\video_ts.ifo") {
+		path.Truncate(path.ReverseFind('\\'));
+	} else if (::PathIsDirectory(path + L"\\VIDEO_TS")) {
+		path += L"\\VIDEO_TS";
+	}
+
+	return ::PathFileExists(path + L"\\VIDEO_TS.IFO");
 }
 
 void CMainFrame::SetStatusMessage(CString m_msg)
@@ -18638,30 +18649,35 @@ void CMainFrame::MakeBDLabel(CString path, CString& label, CString* pBDlabel)
 	}
 }
 
-void CMainFrame::MakeDVDLabel(CString& label, CString* pDVDlabel)
+void CMainFrame::MakeDVDLabel(CString path, CString& label, CString* pDVDlabel)
 {
 	WCHAR buff[MAX_PATH] = { 0 };
 	ULONG len = 0;
-	if (m_pDVDI && SUCCEEDED(m_pDVDI->GetDVDDirectory(buff, _countof(buff), &len))) {
-		CString DVDPath(buff);
-		DVDPath.Replace('\\', '/');
-		int pos = DVDPath.Find(L"/VIDEO_TS");
+
+	CString DVDPath(path);
+	if (DVDPath.IsEmpty()
+			&& m_pDVDI && SUCCEEDED(m_pDVDI->GetDVDDirectory(buff, _countof(buff), &len))) {
+		DVDPath = buff;
+	}
+
+	if (!DVDPath.IsEmpty()) {
+		const int pos = DVDPath.Find(L"\\VIDEO_TS");
 		if (pos > 1) {
 			DVDPath.Delete(pos, DVDPath.GetLength() - pos);
-			CString fn2 = DVDPath.Mid(DVDPath.ReverseFind('/') + 1);
+			DVDPath = DVDPath.Mid(DVDPath.ReverseFind('\\') + 1);
 
 			if (pDVDlabel) {
-				*pDVDlabel = fn2;
+				*pDVDlabel = DVDPath;
 			}
 
-			if (fn2.GetLength() == 2 && fn2[fn2.GetLength() - 1] == ':') {
-				WCHAR drive = fn2[0];
+			if (DVDPath.GetLength() == 2 && DVDPath[DVDPath.GetLength() - 1] == ':') {
+				WCHAR drive = DVDPath[0];
 				CAtlList<CString> sl;
 				cdrom_t CDRom_t = GetCDROMType(drive, sl);
 				if (CDRom_t == CDROM_DVDVideo) {
-					CString DVDLabel = GetDriveLabel(drive);
+					const CString DVDLabel = GetDriveLabel(drive);
 					if (DVDLabel.GetLength() > 0) {
-						fn2.AppendFormat(L" (%s)", DVDLabel);
+						DVDPath.AppendFormat(L" (%s)", DVDLabel);
 						if (pDVDlabel) {
 							*pDVDlabel = DVDLabel;
 						}
@@ -18669,8 +18685,8 @@ void CMainFrame::MakeDVDLabel(CString& label, CString* pDVDlabel)
 				}
 			}
 
-			if (!fn2.IsEmpty()) {
-				label.AppendFormat(L" \"%s\"", fn2);
+			if (!DVDPath.IsEmpty()) {
+				label.AppendFormat(L" \"%s\"", DVDPath);
 			}
 		}
 	}
@@ -18678,7 +18694,7 @@ void CMainFrame::MakeDVDLabel(CString& label, CString* pDVDlabel)
 
 CString CMainFrame::GetCurFileName()
 {
-	CString fn = m_wndPlaylistBar.GetCurFileName();
+	CString fn = (!m_LastOpenBDPath.IsEmpty() || m_DiskImage.DriveAvailable()) ? m_strFnFull : m_wndPlaylistBar.GetCurFileName();
 	if (fn.IsEmpty() && m_pMainFSF) {
 		LPOLESTR pFN = NULL;
 		AM_MEDIA_TYPE mt;
@@ -18725,15 +18741,14 @@ GUID CMainFrame::GetTimeFormat()
 	return ret;
 }
 
-BOOL CMainFrame::OpenIso(CString pathName)
+BOOL CMainFrame::OpenIso(CString pathName, REFERENCE_TIME rtStart/* = INVALID_TIME*/)
 {
 	if (m_DiskImage.CheckExtension(pathName)) {
 		SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 
 		WCHAR diskletter = m_DiskImage.MountDiskImage(pathName);
 		if (diskletter) {
-
-			if (OpenBD(CString(diskletter) + L":\\", INVALID_TIME, FALSE)) {
+			if (OpenBD(CString(diskletter) + L":\\", rtStart, FALSE)) {
 				AddRecent(pathName);
 				return TRUE;
 			}
@@ -18749,11 +18764,7 @@ BOOL CMainFrame::OpenIso(CString pathName)
 			}
 
 			if (::PathFileExists(CString(diskletter) + L":\\AUDIO_TS\\ATS_01_0.IFO")) {
-				CAtlList<CString> sl;
-				sl.AddTail(CString(diskletter) + L":\\AUDIO_TS\\ATS_01_0.IFO");
-				m_wndPlaylistBar.Open(sl, false);
-				OpenCurPlaylistItem(INVALID_TIME, FALSE);
-
+				OpenFile(CString(diskletter) + L":\\AUDIO_TS\\ATS_01_0.IFO", rtStart, FALSE);
 				AddRecent(pathName);
 				return TRUE;
 			}
@@ -18762,12 +18773,8 @@ BOOL CMainFrame::OpenIso(CString pathName)
 				WIN32_FIND_DATA fd;
 				HANDLE hFind = FindFirstFile(CString(diskletter) + L":\\*.wv", &fd);
 				if (hFind != INVALID_HANDLE_VALUE) {
-					CAtlList<CString> sl;
-					sl.AddTail(CString(diskletter) + L":\\" + fd.cFileName);
+					OpenFile(CString(diskletter) + L":\\" + fd.cFileName, rtStart, FALSE);
 					FindClose(hFind);
-
-					m_wndPlaylistBar.Open(sl, false);
-					OpenCurPlaylistItem(INVALID_TIME, FALSE);
 
 					AddRecent(pathName);
 					return TRUE;

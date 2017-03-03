@@ -730,6 +730,7 @@ protected:
 
 public:
 	BOOL OpenCurPlaylistItem(REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
+	BOOL OpenFile(const CString fname, REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
 	void OpenMedia(CAutoPtr<OpenMediaData> pOMD);
 	void PlayFavoriteFile(CString fav);
 	void PlayFavoriteDVD(CString fav);
@@ -1329,7 +1330,10 @@ public:
 
 	CHdmvClipInfo::CPlaylist m_MPLSPlaylist;
 	BOOL m_bIsBDPlay;
-	BOOL OpenBD(CString Path, REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
+	BOOL OpenBD(CString path, REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
+	BOOL CheckBD(CString path);
+
+	BOOL CheckDVD(CString path);
 
 	void CheckMenuRadioItem(UINT first, UINT last, UINT check);
 
@@ -1351,7 +1355,7 @@ public:
 	void		AddAudioPathsAddons(CString FileName);
 
 	void		MakeBDLabel(CString path, CString& label, CString* pBDlabel = NULL);
-	void		MakeDVDLabel(CString& label, CString* pDVDlabel = NULL);
+	void		MakeDVDLabel(CString path, CString& label, CString* pDVDlabel = NULL);
 
 	CString		GetCurFileName();
 	CString		GetCurDVDPath(BOOL bSelectCurTitle = FALSE);
@@ -1362,7 +1366,7 @@ public:
 protected:
 	CDiskImage	m_DiskImage;
 	BOOL		m_bNeedUnmountImage = TRUE;
-	BOOL		OpenIso(CString pathName);
+	BOOL		OpenIso(CString pathName, REFERENCE_TIME rtStart = INVALID_TIME);
 
 	void		AddRecent(CString pathName);
 
