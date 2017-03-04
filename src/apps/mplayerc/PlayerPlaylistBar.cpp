@@ -1105,25 +1105,6 @@ static CString CombinePath(CPath p, CString fn)
 	return out;
 }
 
-bool CPlayerPlaylistBar::ParseBDMVPlayList(CString fn)
-{
-	CHdmvClipInfo	ClipInfo;
-	CString			strPlaylistFile;
-	CHdmvClipInfo::CPlaylist MainPlaylist;
-
-	CPath Path(fn);
-	Path.RemoveFileSpec();
-	Path.RemoveFileSpec();
-
-	if (SUCCEEDED(ClipInfo.FindMainMovie(Path + L"\\", strPlaylistFile, MainPlaylist, m_pMainFrame->m_MPLSPlaylist))) {
-		CAtlList<CString> strFiles;
-		strFiles.AddHead(strPlaylistFile);
-		Append(strFiles, MainPlaylist.GetCount() > 1, NULL);
-	}
-
-	return m_pl.GetCount() > 0;
-}
-
 bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 {
 	CString str;
@@ -1442,6 +1423,13 @@ bool CPlayerPlaylistBar::Empty()
 	SavePlaylist();
 
 	return bWasPlaying;
+}
+
+void CPlayerPlaylistBar::Open(CString fn)
+{
+	CAtlList<CString> fns;
+	fns.AddHead(fn);
+	Open(fns, false);
 }
 
 void CPlayerPlaylistBar::Open(CAtlList<CString>& fns, bool fMulti, CSubtitleItemList* subs/* = NULL*/, bool bCheck/* = true*/)
