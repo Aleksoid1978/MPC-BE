@@ -13684,16 +13684,18 @@ void CMainFrame::CloseMediaPrivate()
 void CMainFrame::ParseDirs(CAtlList<CString>& sl)
 {
 	POSITION pos = sl.GetHeadPosition();
-
 	while (pos) {
 		CString fn = sl.GetNext(pos);
 		WIN32_FIND_DATA fd = {0};
 		HANDLE hFind = FindFirstFile(fn, &fd);
-
 		if (hFind != INVALID_HANDLE_VALUE) {
-			if (fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
-				if (fn[fn.GetLength()-1] != '\\') {
+			if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+				if (fn[fn.GetLength() - 1] != '\\') {
 					fn += '\\';
+				}
+
+				if (CheckBD(fn) || CheckDVD(fn)) {
+					continue;
 				}
 
 				COpenDirHelper::RecurseAddDir(fn, &sl);

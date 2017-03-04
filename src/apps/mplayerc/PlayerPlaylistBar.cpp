@@ -2123,10 +2123,7 @@ void CPlayerPlaylistBar::DropFiles(CAtlList<CString>& slFiles)
 	SetForegroundWindow();
 	m_list.SetFocus();
 
-	if (!(slFiles.GetCount() == 1
-			&& (m_pMainFrame->CheckBD(slFiles.GetHead()) || m_pMainFrame->CheckDVD(slFiles.GetHead())))) {
-		m_pMainFrame->ParseDirs(slFiles);
-	}
+	m_pMainFrame->ParseDirs(slFiles);
 
 	Append(slFiles, true);
 }
