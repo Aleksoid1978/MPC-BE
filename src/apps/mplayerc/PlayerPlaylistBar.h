@@ -181,8 +181,6 @@ private:
 	void ParsePlayList(CAtlList<CString>& fns, CSubtitleItemList* subs, bool bCheck = true);
 	void ResolveLinkFiles(CAtlList<CString> &fns);
 
-	bool ParseBDMVPlayList(CString fn);
-
 	bool ParseMPCPlayList(CString fn);
 	bool SaveMPCPlayList(CString fn, CTextFile::enc e, bool fRemovePath);
 
@@ -244,6 +242,7 @@ public:
 	void Refresh();
 	bool Empty();
 
+	void Open(CString fn);
 	void Open(CAtlList<CString>& fns, bool fMulti, CSubtitleItemList* subs = NULL, bool bCheck = true);
 	void Append(CAtlList<CString>& fns, bool fMulti, CSubtitleItemList* subs = NULL, bool bCheck = true);
 	void Append(CFileItemList& fis);

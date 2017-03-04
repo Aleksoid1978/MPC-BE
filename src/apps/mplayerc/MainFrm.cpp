@@ -5251,7 +5251,6 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 				}
 
 				m_wndPlaylistBar.Open(sl, fMulti, &s.slSubs);
-
 				OpenCurPlaylistItem((s.nCLSwitches & CLSW_STARTVALID) ? s.rtStart : INVALID_TIME);
 
 				s.nCLSwitches &= ~CLSW_STARTVALID;
@@ -5356,9 +5355,7 @@ void CMainFrame::OnFileOpenIso()
 			return;
 		}
 
-		CAtlList<CString> sl;
-		sl.AddHead(fd.GetPathName());
-		m_wndPlaylistBar.Open(sl, false);
+		m_wndPlaylistBar.Open(fd.GetPathName());
 		OpenCurPlaylistItem();
 	}
 }
@@ -9859,9 +9856,7 @@ void CMainFrame::OnRecentFile(UINT nID)
 	}
 
 	if (!m_wndPlaylistBar.SelectFileInPlaylist(str)) {
-		CAtlList<CString> fns;
-		fns.AddTail(str);
-		m_wndPlaylistBar.Open(fns, false);
+		m_wndPlaylistBar.Open(str);
 	}
 	OpenCurPlaylistItem();
 }
@@ -11405,9 +11400,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 					fn = (CString)pOFD->fns.GetHead();
 					CString tmp(fn); tmp.MakeLower();
 					if (tmp.Find(L".m3u8") > 0) {
-						CAtlList<CString> fns;
-						fns.AddTail(fn);
-						m_wndPlaylistBar.Open(fns, false);
+						m_wndPlaylistBar.Open(fn);
 
 						POSITION pos = m_wndPlaylistBar.m_pl.GetHeadPosition();
 						while (pos) {
@@ -13786,9 +13779,7 @@ int CMainFrame::SearchInDir(bool DirForward)
 		}
 	}
 
-	CAtlList<CString> Play_sl;
-	Play_sl.AddHead(sl.GetAt(Pos));
-	m_wndPlaylistBar.Open(Play_sl, false);
+	m_wndPlaylistBar.Open(sl.GetAt(Pos));
 	OpenCurPlaylistItem();
 
 	return (sl.GetCount());
