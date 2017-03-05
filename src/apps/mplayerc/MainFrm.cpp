@@ -16370,6 +16370,9 @@ void CMainFrame::ShowOptions(int idPage)
 		PostMessage(WM_CLOSE);
 		return;
 	}
+	if (m_bClosingState) {
+		return; //prevent crash when player closes with options dialog opened
+	}
 
 	if (dResult == IDOK) {
 		m_bInOptions = false;
