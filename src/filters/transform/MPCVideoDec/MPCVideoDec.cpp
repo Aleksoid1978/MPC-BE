@@ -2659,7 +2659,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 		REFERENCE_TIME rtStart = rtStartIn, rtStop = rtStopIn;
 
 		int got_picture = 0;
-		int ret         = -1;
+		int ret         = 0;
 
 		if (!bFlush) {
 			avpkt.data = pDataBuffer;
@@ -2751,8 +2751,8 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 					avpkt.size = 0;
 				}
 
-				ret = decode(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
-				if (ret < 0) {
+				int ret2 = decode(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
+				if (ret2 < 0) {
 					DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::Decode() - decoding failed despite successfull parsing"));
 				}
 			}
