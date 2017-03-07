@@ -5298,7 +5298,7 @@ void CMainFrame::OnFileOpenDVD()
 	CString path;
 	{
 		CFileDialog dlg(TRUE);
-		IFileOpenDialog *openDlgPtr = dlg.GetIFileOpenDialog();
+		CComPtr<IFileOpenDialog> openDlgPtr = dlg.GetIFileOpenDialog();
 
 		if (openDlgPtr != NULL) {
 			openDlgPtr->SetTitle(strTitle);
@@ -5310,11 +5310,10 @@ void CMainFrame::OnFileOpenDVD()
 
 			openDlgPtr->SetOptions(FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST);
 			if (FAILED(openDlgPtr->Show(m_hWnd))) {
-				openDlgPtr->Release();
 				return;
 			}
 
-			psiFolder = NULL;
+			psiFolder.Release();
 			if (SUCCEEDED(openDlgPtr->GetResult(&psiFolder))) {
 				LPWSTR folderpath = NULL;
 				if(SUCCEEDED(psiFolder->GetDisplayName(SIGDN_FILESYSPATH, &folderpath))) {
@@ -5322,19 +5321,16 @@ void CMainFrame::OnFileOpenDVD()
 					CoTaskMemFree(folderpath);
 				}
 			}
-
-			openDlgPtr->Release();
 		}
 	}
 
 	if (!path.IsEmpty()) {
-		s.strDVDPath = AddSlash(path);
-		if (!OpenBD(path)) {
-			CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
-			p->path = AddSlash(path);
-			p->path.Replace('/', '\\');
-
-			OpenMedia(p);
+		if (CheckBD(path) || CheckDVD(path)) {
+			s.strDVDPath = AddSlash(path);
+			m_wndPlaylistBar.Open(path);
+			OpenCurPlaylistItem();
+		} else {
+			m_closingmsg = ResStr(IDS_MAINFRM_93);
 		}
 	}
 }
@@ -17402,7 +17398,7 @@ void CMainFrame::OnFileOpenDirectory()
 	{
 		CFileDialog dlg(TRUE);
 		dlg.AddCheckButton(IDS_MAINFRM_DIR_CHECK, ResStr(IDS_MAINFRM_DIR_CHECK), TRUE);
-		IFileOpenDialog *openDlgPtr = dlg.GetIFileOpenDialog();
+		CComPtr<IFileOpenDialog> openDlgPtr = dlg.GetIFileOpenDialog();
 
 		if (openDlgPtr != NULL) {
 			CComPtr<IShellItem> psiFolder;
@@ -17413,10 +17409,10 @@ void CMainFrame::OnFileOpenDirectory()
 			openDlgPtr->SetTitle(strTitle);
 			openDlgPtr->SetOptions(FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST);
 			if (FAILED(openDlgPtr->Show(m_hWnd))) {
-				openDlgPtr->Release();
 				return;
 			}
 
+			psiFolder.Release();
 			if (SUCCEEDED(openDlgPtr->GetResult(&psiFolder))) {
 				LPWSTR folderpath = NULL;
 				if(SUCCEEDED(psiFolder->GetDisplayName(SIGDN_FILESYSPATH, &folderpath))) {
@@ -17424,8 +17420,6 @@ void CMainFrame::OnFileOpenDirectory()
 					CoTaskMemFree(folderpath);
 				}
 			}
-
-			openDlgPtr->Release();
 
 			BOOL recur = TRUE;
 			dlg.GetCheckButtonState(IDS_MAINFRM_DIR_CHECK, recur);
@@ -17440,7 +17434,8 @@ void CMainFrame::OnFileOpenDirectory()
 
 	CAtlList<CString> sl;
 	sl.AddTail(path);
-	if (COpenDirHelper::m_incl_subdir) {
+	if (COpenDirHelper::m_incl_subdir
+			&& !(CheckBD(path) || CheckDVD(path))) {
 		COpenDirHelper::RecurseAddDir(path, &sl);
 	}
 
