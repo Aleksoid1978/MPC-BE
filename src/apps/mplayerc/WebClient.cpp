@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <atlisapi.h>
 #include "MainFrm.h"
 #include "Misc.h"
 #include "../../Subtitles/TextFile.h"
