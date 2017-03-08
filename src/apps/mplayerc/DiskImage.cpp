@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 
+#include <InitGuid.h>
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/Filehandle.h"
 #include <WinIoCtl.h>
