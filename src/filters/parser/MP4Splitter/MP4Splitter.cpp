@@ -748,6 +748,12 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						memset(si, 0, mt.FormatLength());
 						si->dwOffset = sizeof(SUBTITLEINFO);
 						strcpy_s(si->IsoLang, _countof(si->IsoLang), CStringA(TrackLanguage));
+						if (AP4_Tx3gSampleEntry* tx3g = dynamic_cast<AP4_Tx3gSampleEntry*>(sample_entry)) {
+							const AP4_Tx3gSampleEntry::AP4_Tx3gDescription& description = tx3g->GetDescription();
+							if (description.DisplayFlags & 0x80000000) {
+								TrackName += L" [Forced]";
+							}
+						}
 						wcscpy_s(si->TrackName, _countof(si->TrackName), TrackName);
 						mts.Add(mt);
 					}
