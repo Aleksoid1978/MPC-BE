@@ -183,6 +183,7 @@ public:
 		b10BitOutput		= rs.b10BitOutput;
 		bVSyncAccurate		= rs.bVSyncAccurate;
 		bAlterativeVSync	= rs.bAlterativeVSync;
+		bDisableDesktopComposition = rs.bDisableDesktopComposition;
 	}
 };
 
