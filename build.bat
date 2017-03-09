@@ -1,5 +1,5 @@
 @ECHO OFF
-REM (C) 2009-2016 see Authors.txt
+REM (C) 2009-2017 see Authors.txt
 REM
 REM This file is part of MPC-BE.
 REM
@@ -41,26 +41,26 @@ IF /I "%ARG%" == "?"          GOTO ShowHelp
 FOR %%A IN (%ARG%) DO (
   IF /I "%%A" == "help"       GOTO ShowHelp
   IF /I "%%A" == "GetVersion" ENDLOCAL & CALL :SubGetVersion & EXIT /B
-  IF /I "%%A" == "Build"      SET "BUILDTYPE=Build"   & SET /A ARGB+=1
-  IF /I "%%A" == "Clean"      SET "BUILDTYPE=Clean"   & SET /A ARGB+=1  & SET /A ARGCL+=1
-  IF /I "%%A" == "Rebuild"    SET "BUILDTYPE=Rebuild" & SET /A ARGB+=1
-  IF /I "%%A" == "Both"       SET "PLATFORM=Both"     & SET /A ARGPL+=1
-  IF /I "%%A" == "Win32"      SET "PLATFORM=Win32"    & SET /A ARGPL+=1
-  IF /I "%%A" == "x86"        SET "PLATFORM=Win32"    & SET /A ARGPL+=1
-  IF /I "%%A" == "x64"        SET "PLATFORM=x64"      & SET /A ARGPL+=1
-  IF /I "%%A" == "All"        SET "CONFIG=All"        & SET /A ARGC+=1
-  IF /I "%%A" == "Main"       SET "CONFIG=Main"       & SET /A ARGC+=1  & SET /A ARGM+=1
-  IF /I "%%A" == "Filters"    SET "CONFIG=Filters"    & SET /A ARGC+=1  & SET /A ARGF+=1
-  IF /I "%%A" == "MPCBE"      SET "CONFIG=MPCBE"      & SET /A ARGC+=1
-  IF /I "%%A" == "MPC-BE"     SET "CONFIG=MPCBE"      & SET /A ARGC+=1
-  IF /I "%%A" == "Resource"   SET "CONFIG=Resources"  & SET /A ARGC+=1  & SET /A ARGD+=1
-  IF /I "%%A" == "Resources"  SET "CONFIG=Resources"  & SET /A ARGC+=1  & SET /A ARGD+=1
-  IF /I "%%A" == "Debug"      SET "BUILDCFG=Debug"    & SET /A ARGBC+=1 & SET /A ARGD+=1
-  IF /I "%%A" == "Release"    SET "BUILDCFG=Release"  & SET /A ARGBC+=1
-  IF /I "%%A" == "Packages"   SET "PACKAGES=True"     & SET /A ARGPA+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
-  IF /I "%%A" == "Installer"  SET "INSTALLER=True"    & SET /A ARGIN+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
-  IF /I "%%A" == "Zip"        SET "ZIP=True"          & SET /A ARGZI+=1 & SET /A ARGCL+=1 & SET /A ARGM+=1
-  IF /I "%%A" == "Sign"       SET "SIGN=True"         & SET /A ARGSIGN+=1
+  IF /I "%%A" == "Build"      SET "BUILDTYPE=Build"     & SET /A ARGB+=1
+  IF /I "%%A" == "Clean"      SET "BUILDTYPE=Clean"     & SET /A ARGB+=1  & SET /A ARGCL+=1
+  IF /I "%%A" == "Rebuild"    SET "BUILDTYPE=Rebuild"   & SET /A ARGB+=1
+  IF /I "%%A" == "Both"       SET "BUILDPLATFORM=Both"  & SET /A ARGPL+=1
+  IF /I "%%A" == "Win32"      SET "BUILDPLATFORM=Win32" & SET /A ARGPL+=1
+  IF /I "%%A" == "x86"        SET "BUILDPLATFORM=Win32" & SET /A ARGPL+=1
+  IF /I "%%A" == "x64"        SET "BUILDPLATFORM=x64"   & SET /A ARGPL+=1
+  IF /I "%%A" == "All"        SET "CONFIG=All"          & SET /A ARGC+=1
+  IF /I "%%A" == "Main"       SET "CONFIG=Main"         & SET /A ARGC+=1  & SET /A ARGM+=1
+  IF /I "%%A" == "Filters"    SET "CONFIG=Filters"      & SET /A ARGC+=1  & SET /A ARGF+=1
+  IF /I "%%A" == "MPCBE"      SET "CONFIG=MPCBE"        & SET /A ARGC+=1
+  IF /I "%%A" == "MPC-BE"     SET "CONFIG=MPCBE"        & SET /A ARGC+=1
+  IF /I "%%A" == "Resource"   SET "CONFIG=Resources"    & SET /A ARGC+=1  & SET /A ARGD+=1
+  IF /I "%%A" == "Resources"  SET "CONFIG=Resources"    & SET /A ARGC+=1  & SET /A ARGD+=1
+  IF /I "%%A" == "Debug"      SET "BUILDCFG=Debug"      & SET /A ARGBC+=1 & SET /A ARGD+=1
+  IF /I "%%A" == "Release"    SET "BUILDCFG=Release"    & SET /A ARGBC+=1
+  IF /I "%%A" == "Packages"   SET "PACKAGES=True"       & SET /A ARGPA+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
+  IF /I "%%A" == "Installer"  SET "INSTALLER=True"      & SET /A ARGIN+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
+  IF /I "%%A" == "Zip"        SET "ZIP=True"            & SET /A ARGZI+=1 & SET /A ARGCL+=1 & SET /A ARGM+=1
+  IF /I "%%A" == "Sign"       SET "SIGN=True"           & SET /A ARGSIGN+=1
 )
 
 REM pre-build checks
@@ -77,7 +77,7 @@ SET /A VALID=%ARGB%+%ARGPL%+%ARGC%+%ARGBC%+%ARGPA%+%ARGIN%+%ARGZI%+%ARGSIGN%
 IF %VALID% NEQ %INPUT% GOTO UnsupportedSwitch
 
 IF %ARGB%  GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGB% == 0  (SET "BUILDTYPE=Build")
-IF %ARGPL% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGPL% == 0 (SET "PLATFORM=Both")
+IF %ARGPL% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGPL% == 0 (SET "BUILDPLATFORM=Both")
 IF %ARGC%  GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGC% == 0  (SET "CONFIG=MPCBE")
 IF %ARGBC% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGBC% == 0 (SET "BUILDCFG=Release")
 IF %ARGPA% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGPA% == 0 (SET "PACKAGES=False")
@@ -90,12 +90,25 @@ IF %ARGM%  GTR 1 (GOTO UnsupportedSwitch)
 
 IF /I "%PACKAGES%" == "True" SET "INSTALLER=True" & SET "ZIP=True"
 
-rem SET SLN=_2015
-SET BUILD=VS2015
-SET "VSCOMNTOOLS=%VS140COMNTOOLS%"
-SET "BIN=bin"
+IF NOT DEFINED VS150COMNTOOLS (
+  FOR /F "tokens=2*" %%A IN (
+    'REG QUERY "HKLM\SOFTWARE\Microsoft\VisualStudio\SxS\VS7" /v "15.0" 2^>NUL ^| FIND "REG_SZ" ^|^|
+     REG QUERY "HKLM\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\SxS\VS7" /v "15.0" 2^>NUL ^| FIND "REG_SZ"') DO SET "VS150COMNTOOLS=%%BCommon7\Tools\"
+)
 
-IF NOT DEFINED VSCOMNTOOLS GOTO MissingVar
+IF DEFINED VS150COMNTOOLS (
+  SET "VCVARS=%VS150COMNTOOLS%..\..\VC\Auxiliary\Build\vcvarsall.bat"
+)
+
+IF NOT DEFINED VCVARS (
+  IF DEFINED VS140COMNTOOLS (
+    SET "VCVARS=%VS140COMNTOOLS%..\..\VC\vcvarsall.bat"
+  )
+)
+
+IF NOT DEFINED VCVARS GOTO MissingVar
+
+SET "BIN=bin"
 
 IF /I "%SIGN%" == "True" (
   IF NOT EXIST "%~dp0contrib\signinfo.txt" (
@@ -116,10 +129,10 @@ SET "MSBUILD_SWITCHES=/nologo /consoleloggerparameters:Verbosity=minimal /maxcpu
 SET START_TIME=%TIME%
 SET START_DATE=%DATE%
 
-IF /I "%PLATFORM%" == "Win32" (GOTO Win32) ELSE IF /I "%PLATFORM%" == "x64" (GOTO x64)
+IF /I "%BUILDPLATFORM%" == "Win32" (GOTO Win32) ELSE IF /I "%BUILDPLATFORM%" == "x64" (GOTO x64)
 
 :Win32
-CALL "%VSCOMNTOOLS%..\..\VC\vcvarsall.bat" x86
+CALL "%VCVARS%" x86 > nul
 
 IF /I "%CONFIG%" == "Filters" (
   CALL :SubFilters Win32
@@ -144,9 +157,9 @@ IF /I "%CONFIG%" == "All" (
 )
 
 :x64
-IF /I "%PLATFORM%" == "Win32" GOTO End
+IF /I "%BUILDPLATFORM%" == "Win32" GOTO End
 
-CALL "%VSCOMNTOOLS%..\..\VC\vcvarsall.bat" %x64_type%
+CALL "%VCVARS%" %x64_type% > nul
 
 IF /I "%CONFIG%" == "Filters" (
   CALL :SubFilters x64

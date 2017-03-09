@@ -1,5 +1,5 @@
 @ECHO OFF
-REM (C) 2009-2016 see Authors.txt
+REM (C) 2009-2017 see Authors.txt
 REM
 REM This file is part of MPC-BE.
 REM
@@ -86,18 +86,34 @@ IF /I "%DEBUG%" == "Debug=yes" (
 )
 
 SET "TARGETFOLDER=%CONFIGBUILDS%_%ARCHBUILDS%"
-SET "VSCOMNTOOLS=%VS140COMNTOOLS%"
 SET "BINDIR=..\..\..\bin"
-SET "VSNAME=Visual Studio 2015"
+
+IF NOT DEFINED VS150COMNTOOLS (
+  FOR /F "tokens=2*" %%A IN (
+    'REG QUERY "HKLM\SOFTWARE\Microsoft\VisualStudio\SxS\VS7" /v "15.0" 2^>NUL ^| FIND "REG_SZ" ^|^|
+     REG QUERY "HKLM\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\SxS\VS7" /v "15.0" 2^>NUL ^| FIND "REG_SZ"') DO SET "VS150COMNTOOLS=%%BCommon7\Tools\"
+)
+
+IF DEFINED VS150COMNTOOLS (
+  SET "VSNAME=Visual Studio 2017"
+  SET "VCVARS=%VS150COMNTOOLS%..\..\VC\Auxiliary\Build\vcvarsall.bat"
+)
+
+IF NOT DEFINED VCVARS (
+  IF DEFINED VS140COMNTOOLS (
+    SET "VSNAME=Visual Studio 2015"
+    SET "VCVARS=%VS140COMNTOOLS%..\..\VC\vcvarsall.bat"
+  )
+)
 
 IF "%BUILDTYPE%" NEQ "clean" (
-  IF NOT DEFINED VSCOMNTOOLS (
+  IF NOT DEFINED VCVARS (
     ECHO ERROR: "%VSNAME% environment variable(s) is missing - possible it's not installed on your PC"
     ENDLOCAL
     EXIT /B
   )
 
-  CALL "%VSCOMNTOOLS%..\..\VC\vcvarsall.bat" %VCVARSTYPE%
+  CALL "%VCVARS%" %VCVARSTYPE% > nul
   lib /NOLOGO /ignore:4006,4221 /OUT:%BINDIR%\lib\%TARGETFOLDER%\ffmpeg.lib %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libavcodec.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libavcodec_b.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libavfilter.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libavutil.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libswresample.a %BINDIR%\obj\%TARGETFOLDER%\ffmpeg\libswscale.a
 )
 
