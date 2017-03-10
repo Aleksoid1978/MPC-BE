@@ -200,6 +200,17 @@ namespace Youtube
 		return L"";
 	}
 
+	static CStringA RegExpParseA(LPCSTR szIn, LPCSTR szRE)
+	{
+		const std::regex regex(szRE);
+		std::cmatch match;
+		if (std::regex_search(szIn, match, regex) && match.size() == 2) {
+			return CStringA(match[1].first, match[1].length());
+		}
+
+		return "";
+	}
+
 	static void InternetReadData(HINTERNET& f, char** pData, DWORD& dataSize, LPCSTR endCondition)
 	{
 		char buffer[16 * KILOBYTE] = { 0 };
@@ -577,10 +588,10 @@ namespace Youtube
 									InternetReadData(hUrl, &data, dataSize, NULL);
 									InternetCloseHandle(hUrl);
 									if (dataSize) {
-										const CStringA funcName = GetEntry(data, "\"signature\",", "(");
+										const CStringA funcName = RegExpParseA(data, "\"signature\",([a-zA-Z0-9]+)\\(");
 										if (!funcName.IsEmpty()) {
-											const CStringA varfunc = funcName + "=function(a){";
-											const CStringA funcBody = GetEntry(data, varfunc, "};");
+											const CStringA funcRegExp = funcName + "=function\\(a\\)\\{([^\\n]+)\\};";
+											const CStringA funcBody = RegExpParseA(data, funcRegExp);
 											if (!funcBody.IsEmpty()) {
 												CStringA funcGroup;
 												CAtlList<CStringA> funcList;
@@ -608,9 +619,10 @@ namespace Youtube
 												}
 
 												if (!funcGroup.IsEmpty()) {
-													CStringA tmp = "var " + funcGroup + "={";
+													CStringA tmp; tmp.Format("var %s={", funcGroup);
 													tmp = GetEntry(data, tmp, "};");
 													if (!tmp.IsEmpty()) {
+														tmp.Remove('\n');
 														Explode(tmp, funcCodeList, "},");
 													}
 												}
