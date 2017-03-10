@@ -767,7 +767,7 @@ void CPlayerSeekBar::HideToolTip()
 	}
 }
 
-void CPlayerSeekBar::UpdateToolTipPosition(CPoint& point)
+void CPlayerSeekBar::UpdateToolTipPosition(CPoint point)
 {
 	if (m_pMainFrame->CanPreviewUse()) {
 		if (!m_pMainFrame->m_wndPreView.IsWindowVisible()) {

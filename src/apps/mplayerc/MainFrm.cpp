@@ -11355,6 +11355,10 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 	*/
 
 	if (!m_wndPreView.IsWindowVisible()) {
+		CPoint point;
+		GetCursorPos(&point);
+		m_wndSeekBar.ScreenToClient(&point);
+		m_wndSeekBar.UpdateToolTipPosition(point);
 		m_wndPreView.ShowWindow(SW_SHOWNOACTIVATE);
 	}
 

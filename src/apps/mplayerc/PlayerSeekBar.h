@@ -85,7 +85,7 @@ public:
 	BOOL HasDuration() const { return m_stop > 0; }
 
 	void HideToolTip();
-	void UpdateToolTipPosition(CPoint& point);
+	void UpdateToolTipPosition(CPoint point);
 	void UpdateToolTipText();
 
 	void SetChapterBag(CComPtr<IDSMChapterBag>& pCB);
