@@ -4267,8 +4267,8 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		ShowControlBar(&m_wndSubresyncBar, FALSE, TRUE);
 	}
 
-	m_nCurSubtitle		= -1;
-	m_lSubtitleShift	= 0;
+	m_nCurSubtitle   = -1;
+	m_lSubtitleShift = 0;
 
 	if (m_pDVS) {
 		int SubtitleDelay, SubtitleSpeedMul, SubtitleSpeedDiv;
@@ -13646,6 +13646,7 @@ void CMainFrame::CloseMediaPrivate()
 	}
 
 	if (m_pGB_preview) {
+		PreviewWindowHide();
 		m_pMFVP_preview.Release();
 		m_pMFVDC_preview.Release();
 
