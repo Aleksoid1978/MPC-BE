@@ -4364,6 +4364,17 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		OnSizing(WMSZ_LEFT, r);
 		MoveWindow(r);
 	}
+
+	if (CanPreviewUse() && m_wndSeekBar.IsVisible()) {
+		CPoint point;
+		GetCursorPos(&point);
+
+		CRect rect;
+		m_wndSeekBar.GetWindowRect(&rect);
+		if (rect.PtInRect(point)) {
+			m_wndSeekBar.PreviewWindowShow();
+		}
+	}
 }
 
 void CMainFrame::OnFilePostCloseMedia()

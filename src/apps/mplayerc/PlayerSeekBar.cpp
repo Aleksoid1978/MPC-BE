@@ -630,13 +630,13 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 
 void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 {
-	if (AfxGetAppSettings().fUseTimeTooltip || m_pMainFrame->CanPreviewUse()) {
-		UpdateTooltip(point);
-	}
-
 	if (m_CurrentPoint.x == point.x) {
 		CDialogBar::OnMouseMove(nFlags, point);
 		return;
+	}
+
+	if (AfxGetAppSettings().fUseTimeTooltip || m_pMainFrame->CanPreviewUse()) {
+		UpdateTooltip(point);
 	}
 
 	const CWnd* w = GetCapture();
@@ -714,6 +714,19 @@ BOOL CPlayerSeekBar::OnPlayStop(UINT nID)
 	return FALSE;
 }
 
+void CPlayerSeekBar::PreviewWindowShow()
+{
+	if (m_pMainFrame->CanPreviewUse()) {
+		if (!m_pMainFrame->m_wndPreView.IsWindowVisible()) {
+			CPoint point;
+			GetCursorPos(&point);
+			ScreenToClient(&point);
+			MoveThumbPreview(point);
+		}
+		m_pMainFrame->PreviewWindowShow(m_pos_preview);
+	}
+}
+
 void CPlayerSeekBar::OnTimer(UINT_PTR nIDEvent)
 {
 	if (nIDEvent == m_tooltipTimer) {
@@ -741,13 +754,7 @@ void CPlayerSeekBar::OnTimer(UINT_PTR nIDEvent)
 			case TOOLTIP_VISIBLE:
 			{
 				HideToolTip();
-				if (m_pMainFrame->CanPreviewUse() && !m_pMainFrame->m_wndPreView.IsWindowVisible()) {
-					CPoint point;
-					GetCursorPos(&point);
-					ScreenToClient(&point);
-					MoveThumbPreview(point);
-				}
-				m_pMainFrame->PreviewWindowShow(m_pos_preview);
+				PreviewWindowShow();
 			}
 			break;
 		}
