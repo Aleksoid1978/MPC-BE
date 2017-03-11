@@ -24,11 +24,9 @@
 
 static COLORREF RGBFill(int r1, int g1, int b1, int r2, int g2, int b2, int i, int k)
 {
-	int r, g, b;
-
-	r = r1 + (i * (r2 - r1) / k);
-	g = g1 + (i * (g2 - g1) / k);
-	b = b1 + (i * (b2 - b1) / k);
+	const int r = r1 + MulDiv(i, r2 - r1, k);
+	const int g = g1 + MulDiv(i, g2 - g1, k);
+	const int b = b1 + MulDiv(i, b2 - b1, k);
 
 	return RGB(r, g, b);
 }
@@ -50,7 +48,7 @@ BOOL CPreView::SetWindowText(LPCWSTR lpString)
 	m_tooltipstr = lpString;
 
 	CRect rect;
-	GetClientRect(rect);
+	GetClientRect(&rect);
 
 	rect.bottom = m_caption;
 	rect.left += 10;
@@ -101,7 +99,7 @@ int CPreView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_caption = m_pMainFrame->ScaleY(20);
 
 	CRect rc;
-	GetClientRect(rc);
+	GetClientRect(&rc);
 
 	m_videorect.left   = (m_border + 1);
 	m_videorect.top    = (m_caption + 1);
@@ -120,7 +118,7 @@ void CPreView::OnPaint()
 	CPaintDC dc(this);
 
 	CRect rcBar;
-	GetClientRect(rcBar);
+	GetClientRect(&rcBar);
 
 	CDC mdc;
 	mdc.CreateCompatibleDC(&dc);
@@ -146,8 +144,8 @@ void CPreView::OnPaint()
 		b1 = b2 = GetBValue(bg);
 	}
 	k = rcBar.Height();
-	for(i=0;i<k;i++) {
-		mdc.FillSolidRect(0,i,rcBar.Width(),1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
+	for(i=0; i < k; i++) {
+		mdc.FillSolidRect(0, i, rcBar.Width(), 1, RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.bUseDarkTheme) {
@@ -159,8 +157,8 @@ void CPreView::OnPaint()
 		b1 = b2 = GetBValue(light);
 	}
 	k = rcBar.Width();
-	for(i=0;i<k;i++) {
-		mdc.FillSolidRect(i,0,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
+	for(i=0; i < k; i++) {
+		mdc.FillSolidRect(i, 0, 1, 1, RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.bUseDarkTheme) {
@@ -172,8 +170,8 @@ void CPreView::OnPaint()
 		b1 = b2 = GetBValue(shadow);
 	}
 	k = rcBar.Width();
-	for(i=rcBar.left+m_border;i<k-m_border;i++) {
-		mdc.FillSolidRect(i,m_caption,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
+	for(i = rcBar.left + m_border; i < k - m_border; i++) {
+		mdc.FillSolidRect(i, m_caption, 1, 1, RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.bUseDarkTheme) {
@@ -185,8 +183,8 @@ void CPreView::OnPaint()
 		b1 = b2 = GetBValue(light);
 	}
 	k = rcBar.Width();
-	for(i=rcBar.left+m_border;i<k-m_border;i++) {
-		mdc.FillSolidRect(i,rcBar.bottom-m_border-1,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
+	for(i = rcBar.left + m_border; i < k-m_border; i++) {
+		mdc.FillSolidRect(i, rcBar.bottom - m_border - 1, 1, 1, RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.bUseDarkTheme) {
@@ -198,8 +196,8 @@ void CPreView::OnPaint()
 		b1 = b2 = GetBValue(shadow);
 	}
 	k = rcBar.Width();
-	for(i=0;i<k;i++) {
-		mdc.FillSolidRect(i,rcBar.bottom-1,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
+	for(i = 0; i < k; i++) {
+		mdc.FillSolidRect(i, rcBar.bottom - 1, 1, 1, RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.bUseDarkTheme) {
@@ -211,8 +209,8 @@ void CPreView::OnPaint()
 		b1 = b2 = GetBValue(light);
 	}
 	k = rcBar.Height();
-	for(i=0;i<k-1;i++) {
-		mdc.FillSolidRect(0,i,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
+	for(i = 0; i < k - 1; i++) {
+		mdc.FillSolidRect(0, i, 1, 1, RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.bUseDarkTheme) {
@@ -224,8 +222,8 @@ void CPreView::OnPaint()
 		b1 = b2 = GetBValue(shadow);
 	}
 	k = rcBar.Height();
-	for(i=m_caption;i<k-m_border;i++) {
-		mdc.FillSolidRect(m_border,i,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
+	for(i = m_caption; i < k - m_border; i++) {
+		mdc.FillSolidRect(m_border, i, 1, 1, RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.bUseDarkTheme) {
@@ -237,8 +235,8 @@ void CPreView::OnPaint()
 		b1 = b2 = GetBValue(light);
 	}
 	k = rcBar.Height();
-	for(i=m_caption;i<k-m_border;i++) {
-		mdc.FillSolidRect(rcBar.right-m_border-1,i,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
+	for(i = m_caption; i < k - m_border; i++) {
+		mdc.FillSolidRect(rcBar.right - m_border - 1, i, 1, 1, RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	if (s.bUseDarkTheme) {
@@ -250,8 +248,8 @@ void CPreView::OnPaint()
 		b1 = b2 = GetBValue(shadow);
 	}
 	k = rcBar.Height();
-	for(i=0;i<k;i++) {
-		mdc.FillSolidRect(rcBar.right-1,i,1,1,RGBFill(r1, g1, b1, r2, g2, b2, i, k));
+	for(i =0 ; i < k; i++) {
+		mdc.FillSolidRect(rcBar.right - 1, i, 1, 1, RGBFill(r1, g1, b1, r2, g2, b2, i, k));
 	}
 
 	// text (time)
@@ -268,8 +266,7 @@ void CPreView::OnPaint()
 	mdc.SetTextColor(RGB(r1,g1,b1));
 
 	font.CreateFont(m_pMainFrame->ScaleY(13), 0, 0, 0, FW_SEMIBOLD, 0, 0, 0, DEFAULT_CHARSET,
-									OUT_RASTER_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH | FF_MODERN,
-									L"Tahoma");
+					OUT_RASTER_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH | FF_MODERN, L"Tahoma");
 
 	mdc.SelectObject(&font);
 	CRect rtime = rcBar;
@@ -300,7 +297,7 @@ void CPreView::SetWindowSize()
 	GetMonitorInfo(MonitorFromWindow(GetParent()->GetSafeHwnd(), MONITOR_DEFAULTTONEAREST), &mi);
 
 	CRect wr;
-	GetParent()->GetClientRect(wr);
+	GetParent()->GetClientRect(&wr);
 
 	int w = (mi.rcWork.right - mi.rcWork.left) * m_relativeSize / 100;
 	// the preview size should not be larger than half size of the main window, but not less than 160

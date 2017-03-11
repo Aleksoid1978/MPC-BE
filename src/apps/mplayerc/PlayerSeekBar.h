@@ -32,14 +32,15 @@ class CPlayerSeekBar : public CDialogBar
 {
 	DECLARE_DYNAMIC(CPlayerSeekBar)
 
+	friend class CMainFrame;
+
 private:
 	enum tooltip_state { TOOLTIP_HIDDEN, TOOLTIP_TRIGGERED, TOOLTIP_VISIBLE };
 
 	REFERENCE_TIME m_stop           = 0;
 	REFERENCE_TIME m_pos            = 0;
 	REFERENCE_TIME m_posreal        = 0;
-	REFERENCE_TIME m_pos2           = 0;
-	REFERENCE_TIME m_posreal2       = 0;
+	REFERENCE_TIME m_pos_preview    = 0;
 	bool           m_bEnabled       = false;
 	tooltip_state  m_tooltipState   = TOOLTIP_HIDDEN;
 	REFERENCE_TIME m_tooltipPos     = 0;
@@ -58,13 +59,15 @@ private:
 
 	CPoint          m_CurrentPoint;
 
-	void MoveThumb(CPoint point);
-	REFERENCE_TIME CalculatePosition(CPoint point);
-	void SetPosInternal(REFERENCE_TIME pos);
+	REFERENCE_TIME CalculatePosition(const CPoint point);
 
-	void MoveThumb2(CPoint point);
-	void SetPosInternal2(REFERENCE_TIME pos);
-	void UpdateTooltip(CPoint point);
+	void MoveThumb(const CPoint point);
+	void SetPosInternal(const REFERENCE_TIME pos);
+
+	void MoveThumbPreview(const CPoint point);
+	void SetPosInternalPreview(const REFERENCE_TIME pos);
+
+	void UpdateTooltip(const CPoint point);
 
 	CRect GetChannelRect();
 	CRect GetThumbRect();
@@ -77,8 +80,8 @@ public:
 	void Enable(bool bEnable);
 
 	void GetRange(REFERENCE_TIME& stop);
-	void SetRange(REFERENCE_TIME stop);
-	void SetPos(REFERENCE_TIME pos);
+	void SetRange(const REFERENCE_TIME stop);
+	void SetPos(const REFERENCE_TIME pos);
 
 	REFERENCE_TIME GetPos() const { return m_pos; }
 	REFERENCE_TIME GetPosReal() const { return m_posreal; }
