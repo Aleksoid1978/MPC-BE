@@ -100,7 +100,7 @@ void CPlayerSeekBar::GetRange(REFERENCE_TIME& stop)
 	stop = m_stop;
 }
 
-void CPlayerSeekBar::SetRange(REFERENCE_TIME stop)
+void CPlayerSeekBar::SetRange(const REFERENCE_TIME stop)
 {
 	if (stop > 0) {
 		m_stop = stop;
@@ -113,7 +113,7 @@ void CPlayerSeekBar::SetRange(REFERENCE_TIME stop)
 	}
 }
 
-void CPlayerSeekBar::SetPos(REFERENCE_TIME pos)
+void CPlayerSeekBar::SetPos(const REFERENCE_TIME pos)
 {
 	const CWnd* w = GetCapture();
 
@@ -130,7 +130,37 @@ void CPlayerSeekBar::SetPos(REFERENCE_TIME pos)
 	}
 }
 
-void CPlayerSeekBar::SetPosInternal(REFERENCE_TIME pos)
+REFERENCE_TIME CPlayerSeekBar::CalculatePosition(const CPoint point)
+{
+	REFERENCE_TIME pos = -1;
+	const CRect r = GetChannelRect();
+
+	if (point.x < r.left) {
+		pos = 0;
+	} else if (point.x >= r.right) {
+		pos = m_stop;
+	} else if (m_stop > 0) {
+		const LONG w = r.right - r.left;
+		pos = (m_stop * (point.x - r.left) + (w / 2)) / w;
+	}
+
+	return pos;
+}
+
+void CPlayerSeekBar::MoveThumb(const CPoint point)
+{
+	REFERENCE_TIME pos = CalculatePosition(point);
+
+	if (pos >= 0) {
+		if (AfxGetAppSettings().fFastSeek ^ (GetKeyState(VK_SHIFT) < 0)) {
+			pos = m_pMainFrame->GetClosestKeyFrame(pos);
+		}
+
+		SetPosInternal(pos);
+	}
+}
+
+void CPlayerSeekBar::SetPosInternal(const REFERENCE_TIME pos)
 {
 	if (m_pos == pos) {
 		return;
@@ -146,20 +176,26 @@ void CPlayerSeekBar::SetPosInternal(REFERENCE_TIME pos)
 	}
 }
 
-void CPlayerSeekBar::SetPosInternal2(REFERENCE_TIME pos)
+void CPlayerSeekBar::MoveThumbPreview(const CPoint point)
 {
-	if (m_pos2 == pos) {
+	REFERENCE_TIME pos = CalculatePosition(point);
+
+	if (pos >= 0) {
+		if (AfxGetAppSettings().fFastSeek ^ (GetKeyState(VK_SHIFT) < 0)) {
+			pos = m_pMainFrame->GetClosestKeyFrame(pos);
+		}
+
+		SetPosInternalPreview(pos);
+	}
+}
+
+void CPlayerSeekBar::SetPosInternalPreview(const REFERENCE_TIME pos)
+{
+	if (m_pos_preview == pos) {
 		return;
 	}
 
-	const CRect before = GetThumbRect();
-	m_pos2 = clamp(pos, 0LL, m_stop);
-	m_posreal2 = pos;
-	const CRect after = GetThumbRect();
-
-	if (before != after && !AfxGetAppSettings().bUseDarkTheme) {
-		InvalidateRect(before | after);
-	}
+	m_pos_preview = clamp(pos, 0LL, m_stop);
 }
 
 CRect CPlayerSeekBar::GetChannelRect()
@@ -212,49 +248,6 @@ CRect CPlayerSeekBar::GetInnerThumbRect()
 	r.DeflateRect(dx, dy, dx, dy);
 
 	return r;
-}
-
-__int64 CPlayerSeekBar::CalculatePosition(CPoint point)
-{
-	REFERENCE_TIME pos = -1;
-	const CRect r = GetChannelRect();
-
-	if (point.x < r.left) {
-		pos = 0;
-	} else if (point.x >= r.right) {
-		pos = m_stop;
-	} else if (m_stop > 0) {
-		const LONG w = r.right - r.left;
-		pos = (m_stop * (point.x - r.left) + (w / 2)) / w;
-	}
-
-	return pos;
-}
-
-void CPlayerSeekBar::MoveThumb(CPoint point)
-{
-	REFERENCE_TIME pos = CalculatePosition(point);
-
-	if (pos >= 0) {
-		if (AfxGetAppSettings().fFastSeek ^ (GetKeyState(VK_SHIFT) < 0)) {
-			pos = m_pMainFrame->GetClosestKeyFrame(pos);
-		}
-
-		SetPosInternal(pos);
-	}
-}
-
-void CPlayerSeekBar::MoveThumb2(CPoint point)
-{
-	REFERENCE_TIME pos = CalculatePosition(point);
-
-	if (pos >= 0) {
-		if (AfxGetAppSettings().fFastSeek ^ (GetKeyState(VK_SHIFT) < 0)) {
-			pos = m_pMainFrame->GetClosestKeyFrame(pos);
-		}
-
-		SetPosInternal2(pos);
-	}
 }
 
 BEGIN_MESSAGE_MAP(CPlayerSeekBar, CDialogBar)
@@ -662,10 +655,9 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 	m_CurrentPoint = point;
 
 	const OAFilterState fs = m_pMainFrame->GetMediaState();
-
 	if (fs != -1) {
 		if (m_pMainFrame->CanPreviewUse()) {
-			MoveThumb2(point);
+			MoveThumbPreview(point);
 			UpdateToolTipPosition(point);
 		}
 	} else {
@@ -749,7 +741,13 @@ void CPlayerSeekBar::OnTimer(UINT_PTR nIDEvent)
 			case TOOLTIP_VISIBLE:
 			{
 				HideToolTip();
-				m_pMainFrame->PreviewWindowShow(m_pos2);
+				if (m_pMainFrame->CanPreviewUse() && !m_pMainFrame->m_wndPreView.IsWindowVisible()) {
+					CPoint point;
+					GetCursorPos(&point);
+					ScreenToClient(&point);
+					MoveThumbPreview(point);
+				}
+				m_pMainFrame->PreviewWindowShow(m_pos_preview);
 			}
 			break;
 		}

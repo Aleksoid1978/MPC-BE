@@ -10737,19 +10737,23 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 void CMainFrame::SetPreviewVideoPosition()
 {
 	if (m_bUseSmartSeek) {
+		CPoint point;
+		GetCursorPos(&point);
+		m_wndSeekBar.ScreenToClient(&point);
+		m_wndSeekBar.UpdateToolTipPosition(point);
+
 		CRect wr;
 		m_wndPreView.GetVideoRect(&wr);
 
-		CSize ws = wr.Size();
+		const CSize ws(wr.Size());
 		int w = ws.cx;
 		int h = ws.cy;
 
-		CSize arxy = GetVideoSize();
+		const CSize arxy(GetVideoSize());
 		{
-			int dh = ws.cy;
-			int dw = MulDiv(dh, arxy.cx, arxy.cy);
+			const int dh = ws.cy;
+			const int dw = MulDiv(dh, arxy.cx, arxy.cy);
 
-			int i = 0;
 			int minw = dw;
 			int maxw = dw;
 			if (ws.cx < dw) {
@@ -10758,14 +10762,13 @@ void CMainFrame::SetPreviewVideoPosition()
 				maxw = ws.cx;
 			}
 
-			float scale = i / 3.0f;
+			const float scale = 1 / 3.0f;
 			w = minw + (maxw - minw) * scale;
 			h = MulDiv(w, arxy.cy, arxy.cx);
 		}
 
-		CPoint pos(m_PosX * (wr.Width() * 3 - w) - wr.Width(), m_PosY * (wr.Height() * 3 - h) - wr.Height());
-
-		CRect vr(pos, CSize(w, h));
+		const CPoint pos(m_PosX * (wr.Width() * 3 - w) - wr.Width(), m_PosY * (wr.Height() * 3 - h) - wr.Height());
+		const CRect vr(pos, CSize(w, h));
 
 		if (m_pMFVDC_preview) {
 			m_pMFVDC_preview->SetVideoPosition(NULL, wr);
@@ -11279,12 +11282,11 @@ HRESULT CMainFrame::PreviewWindowHide()
 
 HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 {
-	HRESULT hr = S_OK;
-
-	if (!m_bUseSmartSeek || !AfxGetAppSettings().fSmartSeek || m_bAudioOnly || IsD3DFullScreenMode()) {
+	if (!CanPreviewUse()) {
 		return E_FAIL;
 	}
 
+	HRESULT hr = S_OK;
 	rtCur2 = GetClosestKeyFrame(rtCur2);
 
 	if (GetPlaybackMode() == PM_DVD && m_pDVDC_preview) {
@@ -11355,10 +11357,6 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 	*/
 
 	if (!m_wndPreView.IsWindowVisible()) {
-		CPoint point;
-		GetCursorPos(&point);
-		m_wndSeekBar.ScreenToClient(&point);
-		m_wndSeekBar.UpdateToolTipPosition(point);
 		m_wndPreView.ShowWindow(SW_SHOWNOACTIVATE);
 	}
 
