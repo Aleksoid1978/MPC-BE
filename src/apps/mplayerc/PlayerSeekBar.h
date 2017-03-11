@@ -98,6 +98,8 @@ public:
 
 	BOOL OnPlayStop(UINT nID);
 
+	void PreviewWindowShow();
+
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
