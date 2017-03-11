@@ -31,6 +31,12 @@ ENDLOCAL
 EXIT /B
 
 :VarOk
+IF NOT DEFINED VS150COMNTOOLS (
+  FOR /F "tokens=2*" %%A IN (
+    'REG QUERY "HKLM\SOFTWARE\Microsoft\VisualStudio\SxS\VS7" /v "15.0" 2^>NUL ^| FIND "REG_SZ" ^|^|
+     REG QUERY "HKLM\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\SxS\VS7" /v "15.0" 2^>NUL ^| FIND "REG_SZ"') DO SET "VS150COMNTOOLS=%%BCommon7\Tools\"
+)
+
 SET PATH=%MSYS%\bin;%MINGW32%\bin;%PATH%
 
 SET "BUILDTYPE=build"
@@ -87,12 +93,6 @@ IF /I "%DEBUG%" == "Debug=yes" (
 
 SET "TARGETFOLDER=%CONFIGBUILDS%_%ARCHBUILDS%"
 SET "BINDIR=..\..\..\bin"
-
-IF NOT DEFINED VS150COMNTOOLS (
-  FOR /F "tokens=2*" %%A IN (
-    'REG QUERY "HKLM\SOFTWARE\Microsoft\VisualStudio\SxS\VS7" /v "15.0" 2^>NUL ^| FIND "REG_SZ" ^|^|
-     REG QUERY "HKLM\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\SxS\VS7" /v "15.0" 2^>NUL ^| FIND "REG_SZ"') DO SET "VS150COMNTOOLS=%%BCommon7\Tools\"
-)
 
 IF DEFINED VS150COMNTOOLS (
   SET "VSNAME=Visual Studio 2017"
