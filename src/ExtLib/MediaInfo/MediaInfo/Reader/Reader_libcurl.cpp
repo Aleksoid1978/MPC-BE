@@ -45,6 +45,7 @@
 #endif //MEDIAINFO_HMAC
 #include "MediaInfo/HashWrapper.h"
 #include "ZenLib/File.h"
+#include "ZenLib/Format/Http/Http_Utils.h"
 #include "tinyxml2.h"
 using namespace tinyxml2;
 using namespace ZenLib;
@@ -678,6 +679,16 @@ size_t Reader_libcurl::Format_Test_PerParser(MediaInfo_Internal* MI, const Strin
     Http::Url File_URL=Http::Url(Ztring(File_Name).To_UTF8());
     if (!File_URL.Protocol.empty())
     {
+        // URL encoding
+        MediaInfo_Config::urlencode ShouldUrlEncode=Config.URLEncode_Get();
+        if (ShouldUrlEncode==MediaInfo_Config::URLEncode_Guess)
+        {
+            if (File_URL.Path.find(' '))
+                ShouldUrlEncode=MediaInfo_Config::URLEncode_Yes;
+        }
+        if (ShouldUrlEncode==MediaInfo_Config::URLEncode_Yes)
+            File_URL.Path=ZenLib::Format::Http::URL_Encoded_Encode(File_URL.Path);
+
         // Amazon S3 specific credentials
         if ((File_URL.Protocol=="http" || File_URL.Protocol=="https") && !File_URL.User.empty())
         {

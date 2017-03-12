@@ -164,6 +164,7 @@ Alignment;
 Alignment_Aligned;
 Alignment_Split;
 All;Toate
+AlternateGroup;
 Archival_Location;Locul arhivei
 Arranger;Regizor
 ArtDirector;Director artistic
@@ -188,6 +189,7 @@ BarCode;Cod de bare
 Basic;Principal
 Basic_Note;Nota: pentru mai multe informatii despre acest fisier, tebuie sa selectati modul avansat
 BitDepth;
+BitDepth_Detected;
 BitDepth_Stored;
 BitRate;
 BitRate_Encoded;
@@ -292,6 +294,7 @@ Digitized_Date;Data digitizarii
 Dimensions;
 Director;Director
 DirectorOfPhotography;Director de film
+Disabled;
 DisplayAspectRatio;Raport imagine
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;
@@ -304,6 +307,7 @@ Duration_End;
 Duration_Start;
 Edit;Editare
 EditedBy;Editat de
+ElementCount;
 EMail;E-mail
 Encoded_Application;Dezvoltator aplicatie
 Encoded_Date;Data codarii
@@ -345,6 +349,8 @@ Format_Commercial_IfAny;
 Format_Description;
 Format_Info;
 Format_Profile;
+Format_Level;
+Format_Tier;
 Format_Settings;
 Format_Settings_BVOP;
 Format_Settings_CABAC;
@@ -580,11 +586,11 @@ Genre_189;
 Genre_190;
 Genre_191;
 Go to WebSite;
-Grouping;
 Gop_OpenClosed;
 Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;Grouping
+Grouping;
 h; h
 Header file;Generare header fisier
 Height;Inaltime
@@ -667,6 +673,7 @@ Language_en-gb;
 Language_en-us;
 Language_eo;
 Language_es;
+Language_es-419;
 Language_et;
 Language_eu;
 Language_fa;
@@ -913,6 +920,7 @@ Original;Original
 OriginalNetworkName;
 OriginalSourceForm;
 OriginalSourceMedium;
+OriginalSourceMedium_ID;
 Originator;
 Other;Altele
 OtherIdentifier;
@@ -924,12 +932,14 @@ OverallBitRate_Maximum;
 OverallBitRate_Minimum;
 OverallBitRate_Mode;
 OverallBitRate_Nominal;
+PackageName;
 Part;Parte
 Part_Count;
 PartNumber;
 PartTotal;
 Performer;Cantaret
 Period;Perioada
+PodcastCategory;
 Phone;Telefon
 PictureRatio;
 PixelAspectRatio;Dimensiune pixel
@@ -965,6 +975,7 @@ ReplayGain_Gain;
 ReplayGain_Peak;
 Resolution;Rezolutie
 s;s
+SamplesPerFrame;
 SamplingCount;
 SamplingRate;
 Save;Salveaza
@@ -985,6 +996,7 @@ Separator_Columns;separator coloane
 Separator_Lines;separator linii
 SeriesTitle;
 ServiceChannel;
+ServiceKind;
 ServiceName;
 ServiceProvider;
 ServiceType;
@@ -1024,6 +1036,7 @@ StreamKind;Tipul fluxului
 StreamKindID;
 StreamKindPos;
 StreamSize;
+StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;
 Subject;Subiect
@@ -1107,4 +1120,4 @@ WrittenBy;Scris de
 Yes;Da
 Your system;Sistemul dvs
 ZZ_Automatic_Percent;30
-ZZ_AutomaticLanguage_Percent;68
+ZZ_AutomaticLanguage_Percent;67

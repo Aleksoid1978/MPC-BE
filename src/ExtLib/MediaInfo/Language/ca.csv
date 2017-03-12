@@ -164,6 +164,7 @@ Alignment;Alineació
 Alignment_Aligned;Alineament a intercalats
 Alignment_Split;Dividir a través intercalats
 All;Tot
+AlternateGroup;
 Archival_Location;Arxivat a
 Arranger;Arranjador
 ArtDirector;Director artístic
@@ -188,6 +189,7 @@ BarCode;Codi de barres
 Basic;Bàsic
 Basic_Note;Nota: Per a més informació quant aquest arxiu, has de triar una vista diferent (fulla, arbre...)
 BitDepth;Profunditat de bits
+BitDepth_Detected;
 BitDepth_Stored;Profunditat bits emmagatzemada
 BitRate;Taxa de bits
 BitRate_Encoded;Taxa de bits codificada
@@ -292,6 +294,7 @@ Digitized_Date;Data de la digitalització
 Dimensions;Mides
 Director;Director
 DirectorOfPhotography;Director de fotografia
+Disabled;
 DisplayAspectRatio;Relació d'aspecte
 DisplayAspectRatio_CleanAperture;Relació d'aspecte d'obertura neta
 DisplayAspectRatio_Original;Relació d'aspecte original
@@ -304,6 +307,7 @@ Duration_End;Temps final
 Duration_Start;Temps inicial
 Edit;Edita
 EditedBy;Editat per
+ElementCount;
 EMail;Correu
 Encoded_Application;Aplicació
 Encoded_Date;Data de codificació
@@ -345,6 +349,8 @@ Format_Commercial_IfAny;Nom comercial
 Format_Description;Descripció format
 Format_Info;Detalls del format
 Format_Profile;Perfil format
+Format_Level;
+Format_Tier;
 Format_Settings;Ajustos del perfil
 Format_Settings_BVOP;Ajustos del perfil, BVOP
 Format_Settings_CABAC;Ajustos del perfil, CABAC
@@ -580,11 +586,11 @@ Genre_189;
 Genre_190;Rock de garatge
 Genre_191;
 Go to WebSite;Vés al lloc web
-Grouping;Agrupament
 Gop_OpenClosed;GOP, obert/tancat
 Gop_OpenClosed_Open;Obert
 Gop_OpenClosed_Closed;Tancat
 Gop_OpenClosed_FirstFrame;GOP, obert/tancat primer fotograma
+Grouping;Agrupament
 h; h
 Header file;Capçalera de l'arxiu
 Height;Alçada
@@ -667,6 +673,7 @@ Language_en-gb;Anglès (Gran Bretanya)
 Language_en-us;Anglès (Estats Units)
 Language_eo;Esperanto
 Language_es;Castellà
+Language_es-419;
 Language_et;Estonian
 Language_eu;Basc
 Language_fa;Persià
@@ -913,6 +920,7 @@ Original;Original
 OriginalNetworkName;Nom xarxa original
 OriginalSourceForm;Formulari font original
 OriginalSourceMedium;Mitjà font original
+OriginalSourceMedium_ID;
 Originator;Creador
 Other;Altres
 OtherIdentifier;Altre identificador
@@ -924,12 +932,14 @@ OverallBitRate_Maximum;Velocitat màxima bits general
 OverallBitRate_Minimum;Velocitat mínima bits general
 OverallBitRate_Mode;Mode general velocitat bits
 OverallBitRate_Nominal;Velocitat de bits nominal
+PackageName;
 Part;Part
 Part_Count;Quantitat total
 PartNumber;Codi sèrie
 PartTotal;Codi publicació
 Performer;Intèrpret
 Period;Període
+PodcastCategory;
 Phone;Telèfon
 PictureRatio;Relació imatge
 PixelAspectRatio;Relació d'aspecte
@@ -965,6 +975,7 @@ ReplayGain_Gain;Ganància reproducció
 ReplayGain_Peak;Límit ganància reproducció
 Resolution;Resolució
 s; s
+SamplesPerFrame;
 SamplingCount;Quantitat mostres
 SamplingRate;Freqüència de mostreig
 Save;Desa
@@ -985,6 +996,7 @@ Separator_Columns;Separador de columnes
 Separator_Lines;Separador de línies
 SeriesTitle;Títol sèrie
 ServiceChannel;Canal servei
+ServiceKind;
 ServiceName;Nom servei
 ServiceProvider;Proveïdor servei
 ServiceType;Tipus servei
@@ -1024,6 +1036,7 @@ StreamKind;Tipus de pista
 StreamKindID;Identificador pista
 StreamKindPos;Identificador pista
 StreamSize;Mida pista
+StreamSize_Demuxed;
 StreamSize_Encoded;Mida pista codificada
 StreamSize_Proportion;Proporció d'aquesta pista
 Subject;Subjecte
@@ -1106,5 +1119,5 @@ Written_Location;Ubicació escrita
 WrittenBy;Escrit per
 Yes;Sí
 Your system;El teu sistema
-ZZ_Automatic_Percent;96
-ZZ_AutomaticLanguage_Percent;100
+ZZ_Automatic_Percent;95
+ZZ_AutomaticLanguage_Percent;98

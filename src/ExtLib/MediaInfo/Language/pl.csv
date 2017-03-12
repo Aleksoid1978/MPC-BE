@@ -164,6 +164,7 @@ Alignment;Wyrównanie
 Alignment_Aligned;Wyrównane w przeplocie
 Alignment_Split;Rozdzielone w przeplocie
 All;Wszystkie
+AlternateGroup;
 Archival_Location;Lokalizacja archiwalna
 Arranger;Aranżer
 ArtDirector;Dyrektor artystyczny
@@ -188,6 +189,7 @@ BarCode;Kod kreskowy
 Basic;Podstawowy
 Basic_Note;Uwaga: Aby uzyskać więcej informacji musisz wybrać inny widok (Karta, Drzewo...)
 BitDepth;
+BitDepth_Detected;
 BitDepth_Stored;
 BitRate;Przepływność bitów
 BitRate_Encoded;
@@ -292,6 +294,7 @@ Digitized_Date;Dyskretyzowana data
 Dimensions;Wymiary
 Director;Reżyser
 DirectorOfPhotography;Zdjęcia
+Disabled;
 DisplayAspectRatio;Proporcje obrazu
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Oryginalne proporcje obrazu
@@ -304,6 +307,7 @@ Duration_End;Czas rozpoczęcia
 Duration_Start;Czas zakończenia
 Edit;Edytuj
 EditedBy;Edytowany przez
+ElementCount;
 EMail;email
 Encoded_Application;Aplikacja zapisująca
 Encoded_Date;Zdekodowana data
@@ -345,6 +349,8 @@ Format_Commercial_IfAny;
 Format_Description;Opis formatu
 Format_Info;Szczegóły formatu
 Format_Profile;Profil formatu
+Format_Level;
+Format_Tier;
 Format_Settings;Ustawienia formatu
 Format_Settings_BVOP;Ustawienia formatu, BVOP
 Format_Settings_CABAC;Ustawienia formatu, CABAC
@@ -580,11 +586,11 @@ Genre_189;
 Genre_190;
 Genre_191;
 Go to WebSite;Odwiedź stronę programu
-Grouping;
 Gop_OpenClosed;
 Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Grouping;
 h; h
 Header file;Utwórz plik nagłówka
 Height;Wysokość
@@ -667,6 +673,7 @@ Language_en-gb;Angielski (Wielka Brytania)
 Language_en-us;Angielski (Stany Zjednoczone)
 Language_eo;Esperanto
 Language_es;Hiszpański
+Language_es-419;
 Language_et;Estoński
 Language_eu;Baskijski
 Language_fa;Perski
@@ -913,6 +920,7 @@ Original;Oryginalny
 OriginalNetworkName;Oryginalna nazwa sieciowa
 OriginalSourceForm;Forma źródła oryginału
 OriginalSourceMedium;Nośnik źródła oryginału
+OriginalSourceMedium_ID;
 Originator;
 Other;Inny
 OtherIdentifier;
@@ -924,12 +932,14 @@ OverallBitRate_Maximum;Maksymalna całkowita przepływność bitów
 OverallBitRate_Minimum;Minimalna całkowita przepływność bitów
 OverallBitRate_Mode;Rodzaj całkowitej przepływności bitów
 OverallBitRate_Nominal;Nominalna całkowita przepływność bitów
+PackageName;
 Part;Część
 Part_Count;Ogółem
 PartNumber;
 PartTotal;
 Performer;Wykonawca
 Period;Okres
+PodcastCategory;
 Phone;Telefon
 PictureRatio;
 PixelAspectRatio;Proporcje pikseli
@@ -965,6 +975,7 @@ ReplayGain_Gain;Wzmocnienie
 ReplayGain_Peak;Współczynnik wzmocnienia
 Resolution;Rozdzielczość
 s;s
+SamplesPerFrame;
 SamplingCount;
 SamplingRate;Częstotliwość próbkowania
 Save;Zapisz
@@ -985,6 +996,7 @@ Separator_Columns;Separator kolumn
 Separator_Lines;Separator wierszy
 SeriesTitle;
 ServiceChannel;Numer kanału usługowego
+ServiceKind;
 ServiceName;Nazwa usługi
 ServiceProvider;Dostawca usługi
 ServiceType;Rodzaj usługi
@@ -1024,6 +1036,7 @@ StreamKind;Rodzaj strumienia
 StreamKindID;Identyfikator strumienia
 StreamKindPos;Identyfikator strumienia
 StreamSize;Rozmiar strumienia
+StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;Proporcje strumienia
 Subject;Temat
@@ -1106,5 +1119,5 @@ Written_Location;Lokalizacja
 WrittenBy;Napisał
 Yes;Tak
 Your system;System
-ZZ_Automatic_Percent;75
-ZZ_AutomaticLanguage_Percent;88
+ZZ_Automatic_Percent;74
+ZZ_AutomaticLanguage_Percent;87

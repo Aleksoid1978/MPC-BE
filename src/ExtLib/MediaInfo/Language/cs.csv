@@ -164,6 +164,7 @@ Alignment;
 Alignment_Aligned;
 Alignment_Split;
 All;Vše
+AlternateGroup;
 Archival_Location;Archival location
 Arranger;Arranger
 ArtDirector;ArtDirector
@@ -188,6 +189,7 @@ BarCode;BarCode
 Basic;Základní
 Basic_Note;Info : Pro více detailů vyberte jiný mód zobrazení(List, Strom...)
 BitDepth;
+BitDepth_Detected;
 BitDepth_Stored;
 BitRate;Bit rate
 BitRate_Encoded;
@@ -292,6 +294,7 @@ Digitized_Date;Digitized date
 Dimensions;
 Director;Director
 DirectorOfPhotography;Director of photography
+Disabled;
 DisplayAspectRatio;Poměr stran
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;
@@ -304,6 +307,7 @@ Duration_End;
 Duration_Start;
 Edit;Upravit
 EditedBy;Upravil
+ElementCount;
 EMail;E-Mail
 Encoded_Application;Použitý software
 Encoded_Date;Encoded date
@@ -345,6 +349,8 @@ Format_Commercial_IfAny;
 Format_Description;
 Format_Info;
 Format_Profile;
+Format_Level;
+Format_Tier;
 Format_Settings;
 Format_Settings_BVOP;
 Format_Settings_CABAC;
@@ -580,11 +586,11 @@ Genre_189;
 Genre_190;
 Genre_191;
 Go to WebSite;Web programu
-Grouping;
 Gop_OpenClosed;
 Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Grouping;
 h; h
 Header file;Create a header file
 Height;Výška
@@ -667,6 +673,7 @@ Language_en-gb;
 Language_en-us;
 Language_eo;Esperanto
 Language_es;Spanish
+Language_es-419;
 Language_et;Estonian
 Language_eu;Basque
 Language_fa;Persian
@@ -913,6 +920,7 @@ Original;Originál
 OriginalNetworkName;
 OriginalSourceForm;
 OriginalSourceMedium;
+OriginalSourceMedium_ID;
 Originator;
 Other;Různé
 OtherIdentifier;
@@ -924,12 +932,14 @@ OverallBitRate_Maximum;
 OverallBitRate_Minimum;
 OverallBitRate_Mode;
 OverallBitRate_Nominal;
+PackageName;
 Part;Část
 Part_Count;Total count
 PartNumber;
 PartTotal;
 Performer;Performer
 Period;Period
+PodcastCategory;
 Phone;Phone
 PictureRatio;
 PixelAspectRatio;Poměr pixelů
@@ -965,6 +975,7 @@ ReplayGain_Gain;
 ReplayGain_Peak;
 Resolution;Rozlišení
 s; s
+SamplesPerFrame;
 SamplingCount;
 SamplingRate;Sampling rate
 Save;Uložit
@@ -985,6 +996,7 @@ Separator_Columns;columns separator
 Separator_Lines;lines separator
 SeriesTitle;
 ServiceChannel;
+ServiceKind;
 ServiceName;
 ServiceProvider;
 ServiceType;
@@ -1024,6 +1036,7 @@ StreamKind;Kind of stream
 StreamKindID;
 StreamKindPos;
 StreamSize;
+StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;
 Subject;Subject
@@ -1106,5 +1119,5 @@ Written_Location;Written location
 WrittenBy;Napsal
 Yes;Ano
 Your system;Instalované kodeky
-ZZ_Automatic_Percent;68
-ZZ_AutomaticLanguage_Percent;76
+ZZ_Automatic_Percent;67
+ZZ_AutomaticLanguage_Percent;75

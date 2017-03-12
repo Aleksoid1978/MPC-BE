@@ -35,16 +35,29 @@ extern const int32u AC3_SamplingRate[]=
 { 48000,  44100,  32000,      0,};
 
 //---------------------------------------------------------------------------
-const char*  AC3_Mode[]=
+const char*  AC3_Mode[] =
 {
-    "CM (complete main)",
-    "ME (music and effects)",
-    "VI (visually impaired)",
-    "HI (hearing impaired)",
-    "D (dialogue)",
-    "C (commentary)",
-    "E (emergency)",
-    "VO (voice over)",
+    "CM",
+    "ME",
+    "VI",
+    "HI",
+    "D",
+    "C",
+    "E",
+    "VO",
+};
+
+//---------------------------------------------------------------------------
+const char*  AC3_Mode_String[] =
+{
+    "Complete Main",
+    "Music and Effects",
+    "Visually Impaired",
+    "Hearing Impaired",
+    "Dialogue",
+    "Commentary",
+    "Emergency",
+    "Voice Over",
 };
 
 //---------------------------------------------------------------------------
@@ -644,6 +657,138 @@ static const int32u AC3_MLP_Resolution[16]=
     0,
 };
 
+//---------------------------------------------------------------------------
+const char* Ac3_emdf_payload_id[16]=
+{
+    "Container End",
+    "Programme loudness data",
+    "Programme information",
+    "E-AC-3 substream structure",
+    "Dynamic range compression data for portable devices",
+    "Programme Language",
+    "External Data",
+    "Headphone rendering data",
+    "",
+    "",
+    "",
+    "OAMD",
+    "",
+    "",
+    "JOC",
+    "",
+};
+
+//---------------------------------------------------------------------------
+int32u Ac3_variable_bits(BitStream_Fast &Search2, int8u Bits)
+{
+    int32u ToReturn = 0;
+
+    do
+    {
+        ToReturn += Search2.Get4(Bits);
+    }
+    while (Search2.GetB());
+
+    return ToReturn;
+}
+
+//---------------------------------------------------------------------------
+bool Ac3_EMDF_Test(const BitStream_Fast &Search)
+{
+    BitStream_Fast Search2(Search);
+    Search2.Skip(16); //syncword
+    size_t Size=((size_t)Search2.Get2(16))*8+17; //emdf_container_length
+    if (Size>Search2.Remain())
+        return false;
+    size_t End=Search2.Remain()-Size;
+    if (Search2.Get1(2)) //emdf_version
+        return false;
+    if (Search2.Get1(3) == 0x7) //key_id
+        Ac3_variable_bits(Search2, 3);
+    for (;;)
+    {
+        int8u emdf_payload_id=Search2.Get1(5);
+        if (!emdf_payload_id)
+            break;
+        if (emdf_payload_id == 0x1F)
+            Ac3_variable_bits(Search2, 5);
+        bool smploffste=Search2.GetB();
+        if (smploffste)
+            Search2.Skip(12);
+        if (Search2.GetB()) //duratione
+            Ac3_variable_bits(Search2, 11); //duration
+        if (Search2.GetB()) //groupide
+            Ac3_variable_bits(Search2, 2); //groupid
+        if (Search2.GetB()) //codecdatae
+            return false; //must be 0
+        if (!Search2.GetB()) //discard_unknown_payload
+        {
+            bool payload_frame_aligned=false;
+            if (!smploffste)
+            {
+                payload_frame_aligned=Search2.GetB();
+                if (payload_frame_aligned)
+                    Search2.Skip(2);
+            }
+            if (smploffste || payload_frame_aligned)
+                Search2.Skip(7);
+        }
+        size_t emdf_payload_size=((size_t)Ac3_variable_bits(Search2, 8))*8;
+        Search2.Skip(emdf_payload_size);
+    }
+    int8u protection_length_primary=Search2.Get1(2);
+    switch (protection_length_primary)
+    {
+        case 0: return false;
+        case 1: protection_length_primary=8; break;
+        case 2: protection_length_primary=32; break;
+        case 3: protection_length_primary=128; break;
+        default: ;
+    }
+    int8u protection_bits_secondary=Search2.Get1(2);
+    switch (protection_bits_secondary)
+    {
+        case 0: protection_bits_secondary=0; break;
+        case 1: protection_bits_secondary=8; break;
+        case 2: protection_bits_secondary=32; break;
+        case 3: protection_bits_secondary=128; break;
+        default: ;
+    }
+    Search2.Skip(protection_length_primary);
+    Search2.Skip(protection_bits_secondary);
+    return Search2.Remain()>=17?true:false;
+}
+
+//---------------------------------------------------------------------------
+/*
+static const int8u ecplsubbndtab[]=
+{
+    13,
+    19,
+    25,
+    31,
+    37,
+    49,
+    61,
+    73,
+    85,
+    97,
+    109,
+    121,
+    133,
+    145,
+    157,
+    169,
+    181,
+    193,
+    205,
+    217,
+    229,
+    241,
+    253,
+};
+*/
+
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -725,19 +870,18 @@ void File_Ac3::Streams_Fill()
 
         if (HD_StreamType==0xBA) //TrueHD
         {
+            Fill(Stream_General, 0, General_Format, "TrueHD");
+            Fill(Stream_Audio, 0, Audio_Format, "TrueHD");
+            Fill(Stream_Audio, 0, Audio_Codec, "TrueHD");
             if (HD_HasAtmos)
             {
 
-                Fill(Stream_General, 0, General_Format, "Atmos");
-                Fill(Stream_Audio, 0, Audio_Format, "Atmos");
-                Fill(Stream_Audio, 0, Audio_Codec, "Atmos");
+                Fill(Stream_Audio, 0, Audio_Format_Profile, "TrueHD+Atmos / TrueHD");
+                Fill(Stream_Audio, 0, Audio_Codec_Profile, "TrueHD+Atmos / TrueHD");
                 Fill(Stream_Audio, 0, Audio_Channel_s_, "Object Based");
                 Fill(Stream_Audio, 0, Audio_ChannelPositions, "Object Based");
                 Fill(Stream_Audio, 0, Audio_ChannelPositions_String2, "Object Based");
             }
-            Fill(Stream_General, 0, General_Format, "TrueHD");
-            Fill(Stream_Audio, 0, Audio_Format, "TrueHD");
-            Fill(Stream_Audio, 0, Audio_Codec, "TrueHD");
             Fill(Stream_Audio, 0, Audio_BitRate_Mode, "VBR");
             Ztring Sampling;
             Sampling.From_Number(AC3_HD_SamplingRate(HD_SamplingRate1));
@@ -746,8 +890,6 @@ void File_Ac3::Streams_Fill()
             Fill(Stream_Audio, 0, Audio_Channel_s_, AC3_TrueHD_Channels(HD_Channels2));
             Fill(Stream_Audio, 0, Audio_ChannelPositions, AC3_TrueHD_Channels_Positions(HD_Channels2));
             Fill(Stream_Audio, 0, Audio_ChannelPositions_String2, AC3_TrueHD_Channels_Positions2(HD_Channels2));
-            if (Core_IsPresent && !IsSub)
-                Fill(Stream_Audio, 0, Audio_MuxingMode, "After core data");
         }
 
         if (HD_StreamType==0xBB) //TrueHD
@@ -769,6 +911,16 @@ void File_Ac3::Streams_Fill()
             if (HD_Resolution1!=HD_Resolution2)
                 Fill(Stream_Audio, 0, Audio_BitDepth, AC3_MLP_Resolution[HD_Resolution1]);
         }
+    }
+
+    if (joc_num_objects_map.size()==1 && (joc_num_objects_map.begin()->second >= Frame_Count_Valid / 2 || joc_num_objects_map.begin()->second >= Frame_Count / 2)) //Accepting that some frames do not contain JOC
+    {
+        joc_num_objects = joc_num_objects_map.begin()->first;
+        Fill(Stream_Audio, 0, Audio_Format_Profile, bsid_Max<=0x09?"AC-3+Atmos":"E-AC-3+Atmos");
+        Fill(Stream_Audio, 0, Audio_Codec_Profile, bsid_Max<=0x09?"AC-3+Atmos":"E-AC-3+Atmos");
+        Fill(Stream_Audio, 0, Audio_Channel_s_, Ztring::ToZtring(joc_num_objects)+__T(" objects"));
+        Fill(Stream_Audio, 0, Audio_ChannelPositions, Ztring::ToZtring(joc_num_objects) + __T(" objects"));
+        Fill(Stream_Audio, 0, Audio_ChannelPositions_String2, Ztring::ToZtring(joc_num_objects) + __T(" objects"));
     }
 
     //AC-3
@@ -798,9 +950,8 @@ void File_Ac3::Streams_Fill()
             }
         }
 
-        Fill(Stream_Audio, 0, Audio_Format_Settings_ModeExtension, AC3_Mode[bsmod_Max[0][0]]);
-        if (acmod_Max[0][0]==0)
-            Fill(Stream_Audio, 0, Audio_Format_Settings_Mode, "Dual Mono");
+        Fill(Stream_Audio, 0, Audio_ServiceKind, AC3_Mode[bsmod_Max[0][0]]);
+        Fill(Stream_Audio, 0, Audio_ServiceKind_String, AC3_Mode_String[bsmod_Max[0][0]]);
         if (acmod_Max[0][0]!=(int8u)-1)
         {
             int8u Channels=AC3_Channels[acmod_Max[0][0]];
@@ -823,10 +974,11 @@ void File_Ac3::Streams_Fill()
                 Fill(Stream_Audio, 0, Audio_ChannelLayout, ChannelLayout);
         }
         if (dsurmod_Max[0][0]==2)
-        {
-            Fill(Stream_Audio, 0, Audio_Format_Profile, "Dolby Digital");
-            Fill(Stream_Audio, 0, Audio_Codec_Profile, "Dolby Digital");
-        }
+            Fill(Stream_Audio, 0, Audio_Format_Settings_Mode, "Dolby Digital");
+        if (!Retrieve(Stream_Audio, 0, Audio_Format_Profile).empty())
+            Fill(Stream_Audio, 0, Audio_Format_Profile, "AC-3");
+        if (!Retrieve(Stream_Audio, 0, Audio_Codec_Profile).empty())
+            Fill(Stream_Audio, 0, Audio_Codec_Profile, "AC-3");
         if (__T("CBR")!=Retrieve(Stream_Audio, 0, Audio_BitRate_Mode))
             Fill(Stream_Audio, 0, Audio_BitRate_Mode, "CBR");
     }
@@ -878,17 +1030,20 @@ void File_Ac3::Streams_Fill()
                             }
                         }
 
+                    Fill(Stream_Audio, 0, Audio_Format_Profile, "E-AC-3+Dep");
+                    Fill(Stream_Audio, 0, Audio_Codec_Profile, "E-AC-3+Dep");
                     Fill(Stream_Audio, 0, Audio_Channel_s_, AC3_chanmap_Channels(chanmap_Final));
                     Fill(Stream_Audio, 0, Audio_ChannelPositions, AC3_chanmap_ChannelPositions(chanmap_Final));
                     Ztring ChannelLayout; ChannelLayout.From_Local(lfeon_Max[0][0]?AC3_ChannelLayout_lfeon[acmod_Max[0][0]]:AC3_ChannelLayout_lfeoff[acmod_Max[0][0]]);
                     Fill(Stream_Audio, 0, Audio_ChannelLayout, AC3_chanmap_ChannelLayout(chanmap_Final, ChannelLayout));
                 }
-                if (acmod_Max[Pos][0]==0)
-                {
-                    Fill(Stream_Audio, 0, Audio_Format_Profile, "Dual Mono");
-                    Fill(Stream_Audio, 0, Audio_Codec_Profile, "Dual Mono");
-                }
-                else if (acmod_Max[Pos][0]!=(int8u)-1)
+                if (!Retrieve(Stream_Audio, 0, Audio_Format_Profile).empty())
+                    Fill(Stream_Audio, 0, Audio_Format_Profile, "E-AC-3");
+                if (!Retrieve(Stream_Audio, 0, Audio_Codec_Profile).empty())
+                    Fill(Stream_Audio, 0, Audio_Codec_Profile, "E-AC-3");
+                Fill(Stream_Audio, 0, Audio_ServiceKind, AC3_Mode[bsmod_Max[0][0]]);
+                Fill(Stream_Audio, 0, Audio_ServiceKind_String, AC3_Mode_String[bsmod_Max[0][0]]);
+                if (acmod_Max[Pos][0]!=(int8u)-1)
                 {
                     int8u Channels=AC3_Channels[acmod_Max[Pos][0]];
                     Ztring ChannelPositions; ChannelPositions.From_Local(AC3_ChannelPositions[acmod_Max[Pos][0]]);
@@ -1728,12 +1883,39 @@ void File_Ac3::Core()
 //---------------------------------------------------------------------------
 void File_Ac3::Core_Frame()
 {
+    //Save true Element_Size (if Core+substreams, Element_Size is for all elements, and we want to limit to core)
+    int64u Element_Size_Save=Element_Size;
+    if (bsid>0x0A && bsid<=0x10) //E-AC-3 only
+    {
+        int16u frmsiz=CC2(Buffer+Buffer_Offset+(size_t)Element_Offset+2)&0x07FF;
+        Element_Size=Element_Offset+2+frmsiz*2;
+    }
+
+    //Pre-parsing, finding some elements presence
+    if (Buffer[Buffer_Offset+(Element_Size)-3]&0x02) //auxdatae
+        auxdatal=(((int16u)Buffer[Buffer_Offset+(Element_Size)-4])<<6)
+                |(         Buffer[Buffer_Offset+(Element_Size)-3] >>2);
+    else
+        auxdatal=(int16u)-1; //auxdata is empty
+    BitStream_Fast Search(Buffer+Buffer_Offset, Element_Size);
+    while(Search.Remain()>18)
+    {
+        if (Search.Peek2(16)==0x5838 && Ac3_EMDF_Test(Search))
+            break;
+        Search.Skip(1);
+    }
+    if (Search.Remain()>18)
+        EMDF_RemainPos=Search.Remain();
+    else
+        EMDF_RemainPos=(size_t)-1;
+
     //Parsing
     int16u frmsiz=0, chanmap=0;
     int8u  dialnorm=(int8u)-1, dialnorm2=(int8u)-1, compr=(int8u)-1, compr2=(int8u)-1, dynrng=(int8u)-1, dynrng2=(int8u)-1;
     int8u  strmtyp=0, substreamid=0, acmod=0, bsmod=0, dsurmod=0;
     bool   compre=false, compr2e=false, dynrnge=false, dynrng2e=false;
     bool   lfeon=false, chanmape=false;
+
     if (bsid<=0x09)
     {
         Element_Begin1("synchinfo");
@@ -1743,6 +1925,7 @@ void File_Ac3::Core_Frame()
             Get_S1 (2, fscod,                                       "fscod - Sample Rate Code"); Param_Info2(AC3_SamplingRate[fscod], " Hz");
             Get_S1 (6, frmsizecod,                                  "frmsizecod - Frame Size Code"); if (frmsizecod/2<19) {Param_Info2(AC3_BitRate[frmsizecod/2]*1000, " bps");}
         Element_End0();
+
         Element_Begin1("bsi");
             Get_S1 (5, bsid,                                        "bsid - Bit Stream Identification");
             Get_S1 (3, bsmod,                                       "bsmod - Bit Stream Mode"); Param_Info1(AC3_Mode[bsmod]);
@@ -1808,12 +1991,53 @@ void File_Ac3::Core_Frame()
                 if (dynrng2e)
                     Get_S1 (8, dynrng2,                             "dynrng2 - Dynamic Range Gain Word");
             }
-            BS_End();
         Element_End0();
-        Skip_XX(Element_Size-Element_Offset,                        "audblk(continue)+5*audblk+auxdata+errorcheck");
     }
     else if (bsid>0x0A && bsid<=0x10)
     {
+        /* Not finished, for reference only
+        static const size_t MAX_AUD_BLK = 6;
+        static const size_t MAX_CHANNELS = 5;
+        struct Aud_Blk
+        {
+            bool  cplstre;
+            bool  cplinu;
+            bool  lfeexpstr;
+            int8u blkmixcfginfo;
+            int8u cplexpstr;
+
+            int8u chexpstr[MAX_CHANNELS];
+        };
+        Aud_Blk aud_blks[MAX_AUD_BLK];
+
+        struct Aud_Chan_Blk
+        {
+            bool  blksw;
+            bool  chahtinu;
+            bool  chincpl;
+            bool  chinspx;
+            bool  cplcoe;
+            bool  dithflag;
+            bool  ecplparam1e;
+            bool  firstspxcos;
+            bool  firstcplcos;
+            bool  rsvdfieldse;
+            bool  spxcoe;
+
+            int8u chactivegaqbins; //todo
+            int8u chbwcod;
+            int8u convexpstr;
+            int8u deltbae;
+            int8u endmant;
+            int8u frmchexpstr;
+            int8u mstrspxco;
+            int8u spxblnd;
+            int8u strtmant;
+        };
+        Aud_Chan_Blk aud_chan_blk[MAX_CHANNELS];
+        bool firstcplleak = false;
+        //*/
+
         Element_Begin1("synchinfo");
             Skip_B2(                                               "syncword");
         Element_End0();
@@ -1840,7 +2064,7 @@ void File_Ac3::Core_Frame()
             TEST_SB_END();
             if (acmod==0) //1+1 mode
             {
-                Get_S1 (5, dialnorm2,                              "dialnorm2");
+                Get_S1 (5, dialnorm2,                               "dialnorm2");
                 TEST_SB_GET(compr2e,                                "compr2e");
                     Get_S1 (8, compr2,                              "compr2");
                 TEST_SB_END();
@@ -1851,25 +2075,1309 @@ void File_Ac3::Core_Frame()
                     Get_S2(16, chanmap,                             "chanmap"); Param_Info1(AC3_chanmap_ChannelPositions(chanmap));
                 TEST_SB_END();
             }
+            /* Not finished, for reference only
+            TEST_SB_SKIP(                                           "mixmdate");
+                int8u dmixmod, ltrtcmixlev, lorocmixlev, ltrtsurmixlev, lorosurmixlev, mixdef;
+                if(acmod > 0x2)
+                    Get_S1 (2, dmixmod,                             "dmixmod");
+                if((acmod&0x1) && (acmod>0x2))
+                {
+                    Get_S1 (3, ltrtcmixlev,                         "ltrtcmixlev");
+                    Get_S1 (3, lorocmixlev,                         "lorocmixlev");
+                }
+                if(acmod>0x4)
+                {
+                    Get_S1 (3, ltrtsurmixlev,                       "ltrtsurmixlev");
+                    Get_S1 (3, lorosurmixlev,                       "lorosurmixlev");
+                }
+                if(lfeon)
+                {
+                    TEST_SB_SKIP(                                   "lfemixlevcode");
+                        Skip_S1 (5,                                 "lfemixlevcod");
+                    TEST_SB_END();
+                }
+                if(strmtyp == 0x0)
+                {
+                    TEST_SB_SKIP(                                   "pgmscle");
+                        Skip_S1 (6,                                 "pgmscl");
+                    TEST_SB_END();
+                    if (acmod == 0x0)
+                    {
+                        TEST_SB_SKIP(                               "pgmscle12e");
+                            Skip_S1 (6,                             "pgmscl12e");
+                        TEST_SB_END();
+                    }
+                    TEST_SB_SKIP(                                   "extpgmscle");
+                        Skip_S1 (6,                                 "extpgmscl");
+                    TEST_SB_END();
+                    Get_S1 (2, mixdef,                              "mixdef");
+                    if(mixdef == 0x1)
+                    {
+                        Skip_S1 (1,                                 "premixcmpsel");
+                        Skip_S1 (1,                                 "drcsrc");
+                        Skip_S1 (3,                                 "premixcmpscl");
+                    }
+                    else if(mixdef == 0x2) Skip_S2 (12,             "mixdata");
+                    else if(mixdef == 0x3)
+                    {
+                        int8u mixdeflen;
+                        Get_S1 (5, mixdeflen,                       "mixdeflen");
+                        TEST_SB_SKIP(                               "mixdata2e");
+                            Skip_S1 (6,                             "premixcmpsel");
+                            Skip_S1 (1,                             "drcsrc");
+                            Skip_S1 (3,                             "premixcmpscl");
+                            TEST_SB_SKIP(                           "extpgmlscle");
+                                Skip_S1 (4,                         "extpgmlscl");
+                            TEST_SB_END();
+                            TEST_SB_SKIP(                           "extpgmcscle");
+                                Skip_S1 (4,                         "extpgmcscl");
+                            TEST_SB_END();
+                            TEST_SB_SKIP(                           "extpgmrscle");
+                                Skip_S1 (4,                         "extpgmrscl");
+                            TEST_SB_END();
+                            TEST_SB_SKIP(                           "extpgmlssle");
+                                Skip_S1 (4,                         "extpgmlssl");
+                            TEST_SB_END();
+                            TEST_SB_SKIP(                           "extpgmrssle");
+                                Skip_S1 (4,                         "extpgmrssl");
+                            TEST_SB_END();
+                            TEST_SB_SKIP(                           "extpgmlfescle");
+                                Skip_S1 (4,                         "extpgmlfescl");
+                            TEST_SB_END();
+                            TEST_SB_SKIP(                           "dmixscle");
+                                Skip_S1 (4,                         "dmixscl");
+                            TEST_SB_END();
+                            TEST_SB_SKIP(                           "addche");
+                                TEST_SB_SKIP(                       "extpgmaux1scle");
+                                    Skip_S1 (4,                     "extpgmaux1scl");
+                                TEST_SB_END();
+                                TEST_SB_SKIP(                       "extpgmaux2scle");
+                                    Skip_S1 (4,                     "extpgmaux2scl");
+                                TEST_SB_END();
+                            TEST_SB_END();
+                        TEST_SB_END();
+                        TEST_SB_SKIP(                               "mixdata3e");
+                            Skip_S1 (5,                             "spchdat");
+                            TEST_SB_SKIP(                           "addspchdate");
+                                Skip_S1 (5,                         "spchdat1");
+                                Skip_S1 (2,                         "spchan1att");
+                                TEST_SB_SKIP(                       "addspdat1e");
+                                    Skip_S1 (5,                     "spchdat2");
+                                    Skip_S1 (2,                     "spchan2att");
+                                TEST_SB_END();
+                            TEST_SB_END();
+                        TEST_SB_END();
+                        Skip_S2 (8*(mixdeflen+2),                   "mixdata");
+                        //Skip_S1 (,                                 "mixdatafill");
+                    }
+                    if(acmod<0x2)
+                    {
+                        TEST_SB_SKIP(                               "paninfoe");
+                            Skip_S1 (6,                             "panmean");
+                            Skip_S1 (8,                             "paninfo");
+                        TEST_SB_END();
+                        if(acmod==0x0)
+                        {
+                            TEST_SB_SKIP(                           "paninfo2e");
+                               Skip_S1 (6,                          "panmean2");
+                               Skip_S1 (8,                          "paninfo2");
+                            TEST_SB_END();
+                        }
+                    }
+                    TEST_SB_SKIP(                                   "frmmixcfginfoe");
+                        if(numblkscod==0x0)
+                        {
+                            int8u blkmixcfginfo;
+                            Get_S1 (5, blkmixcfginfo,               "blkmixcfginfo[0]");
+                            aud_blks[0].blkmixcfginfo = blkmixcfginfo;
+                        }
+                        else
+                        {
+                            int8u nb_blocks_per_syncframe = numblkscod == 3 ? 6 : (numblkscod + 1);
+                            for (int8u blk = 0; blk < nb_blocks_per_syncframe; ++blk)
+                            {
+                                TEST_SB_SKIP(                       "blkmixcfginfoe");
+                                    int8u blkmixcfginfo;
+                                    Get_S1 (5, blkmixcfginfo,       "blkmixcfginfo[x]");
+                                    aud_blks[blk].blkmixcfginfo = blkmixcfginfo;
+                                TEST_SB_END();
+                            }
+                        }
+                    TEST_SB_END();
+                }
+            TEST_SB_END();
+
+            TEST_SB_SKIP(                                           "infomdate");
+                Skip_S1(3,                                          "bsmod");
+                Skip_SB(                                            "copyrightb - Copyright Bit");
+                Skip_SB(                                            "origbs - Original Bit Stream");
+                if (acmod==0x2)
+                {
+                    Skip_S1(2,                                      "dsurmod");
+                    Skip_S1(2,                                      "dheadphonmod");
+                }
+                if (acmod>=0x6)
+                    Skip_S1(2,                                      "dsurexmod");
+                TEST_SB_SKIP(                                       "audprodie");
+                    Skip_S1(5,                                      "mixlevel");
+                    Skip_S1(2,                                      "roomtyp");
+                    Skip_S1(1,                                      "adconvtyp");
+                TEST_SB_END();
+                if (acmod==0x0)
+                {
+                    TEST_SB_SKIP(                                   "audprodi2e");
+                        Skip_S1(5,                                  "mixlevel2");
+                        Skip_S1(2,                                  "roomtyp2");
+                        Skip_S1(1,                                  "adconvtyp2");
+                    TEST_SB_END();
+                }
+                if (fscod < 0x3)
+                    Skip_S1(1,                                      "sourcefscod");
+            TEST_SB_END();
+
+            if (strmtyp==0x0 && numblkscod!=0x3)
+                Skip_S1(1,                                          "convsync");
+
+            if (strmtyp == 0x2)
+            {
+                int8u blkid = 0;
+                if (numblkscod==0x3)
+                    blkid = 1;
+                else
+                    Get_S1(1, blkid,                                "blkid");
+                if (blkid)
+                    Get_S1(6, frmsizecod,                           "frmsizecod");
+            }
+
+            TEST_SB_SKIP(                                           "addbsie");
+                int8u addbsil;
+                Get_S1 (6, addbsil,                                 "addbsil");
+                size_t addbsilen = (addbsil + 1) * 8;
+                Skip_BS(addbsilen,                                  "addbsi");
+            TEST_SB_END();
         Element_End0();
-        if (Data_BS_Remain()<17)
+
+        int8u numblks = numblkscod == 3 ? 6 : (numblkscod + 1);
+
+        Element_Begin1("audfrm");
+        int8u snroffststr, ncplblks = 0;
+        bool expstre = true, ahte = false;
+        bool transproce, blkswe, dithflage, bamode, frmfgaincode, dbaflde, skipflde, spxattene;
+        if (numblkscod==0x3)
         {
-            BS_End();
-            Trusted_IsNot("Not enough data");
+            Get_SB(expstre,                                         "expstre");
+            Get_SB(ahte,                                            "ahte");
+        }
+        Get_S1 (2, snroffststr,                                     "snroffststr");
+        Get_SB (transproce,                                         "transproce");
+        Get_SB (blkswe,                                             "blkswe");
+        Get_SB (dithflage,                                          "dithflage");
+        Get_SB (bamode,                                             "bamode");
+        Get_SB (frmfgaincode,                                       "frmfgaincode");
+        Get_SB (dbaflde,                                            "dbaflde");
+        Get_SB (skipflde,                                           "skipflde");
+        Get_SB (spxattene,                                          "spxattene");
+
+        if (acmod>0x1)
+        {
+            aud_blks[0].cplstre = 1;
+            aud_blks[0].cplinu = 0;
+            for (int8u blk = 1; blk < numblks; ++blk)
+            {
+                Get_SB (aud_blks[blk].cplstre,                      "cplstre[x]");
+                if (aud_blks[blk].cplstre==1)
+                    Get_SB (aud_blks[blk].cplinu,                   "cplinu[x]");
+                else
+                    aud_blks[blk].cplinu = aud_blks[blk - 1].cplinu;
+            }
         }
         else
         {
-            Element_Begin1("errorcheck");
-            size_t BitsUpToEndOfFrame=(frmsiz*2)*8-(Bits_Begin-Data_BS_Remain());
-            Skip_BS(BitsUpToEndOfFrame-17,                          "bsi(continue)+audfrm+x*audblk+auxdata+errorcheck");
-            Skip_SB(                                                "encinfo");
-            BS_End();
-            Skip_B2(                                                "crc2");
-            Element_End0();
+            for(int8u blk = 0; blk < numblks; ++blk)
+                aud_blks[blk].cplinu = 0;
         }
+
+        if (expstre)
+        {
+            for(int8u blk = 0; blk < numblks; ++blk)
+            {
+                if (aud_blks[blk].cplinu==1)
+                    Get_S1 (2, aud_blks[blk].cplexpstr,             "cplexpstr[x]");
+                for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                    Get_S1(2, aud_blks[blk].chexpstr[Pos],          "chexpstr[blk][ch]");
+            }
+        }
+        else
+        {
+            int8u frmcplexpstr = 0;
+            ncplblks = 0;
+            for (int8u blk = 0; blk < numblks; ++blk)
+                ncplblks += aud_blks[blk].cplinu;
+            if (acmod > 0x1 && ncplblks > 0)
+                Get_S1(5, frmcplexpstr,                             "frmcplexpstr");
+            for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                Get_S1(5, aud_chan_blk[Pos].frmchexpstr,            "frmchexpstr[ch]");
+        }
+        if (lfeon)
+            for (int8u blk = 0; blk < numblks; ++blk)
+                Get_SB(aud_blks[blk].lfeexpstr,                     "lfeexpstr[blk]");
+
+        if (strmtyp == 0x0)
+        {
+            bool convexpstre = true;
+            if (numblkscod!=0x3)
+                Get_SB (convexpstre,                                "convexpstre");
+            if (convexpstre)
+                for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                    Get_S1(5, aud_chan_blk[Pos].convexpstr,         "convexpstr[ch]");
+        }
+
+        int8u cplahtinu = 0;
+        int8u lfeahtinu = 0;
+        int8u *hebap = NULL; //TODO in ahte
+        if (ahte)
+        {
+            ncplblks = 0;
+
+            int8u ncplregs = 0;
+            for (int8u blk = 0; blk < numblks; ++blk)
+            {
+                //reuse corresponds to 0
+                if (aud_blks[blk].cplstre == 1 || aud_blks[blk].cplexpstr != 0)
+                    ++ncplregs;
+            }
+
+            if (ncplblks==6 && ncplregs==1)
+            {
+                bool tmp;
+                Get_SB (tmp,                                        "cplahtinu");
+                if (tmp)
+                    cplahtinu = 1;
+            }
+
+            for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+            {
+                int8u nchregs = 0;
+                for (int8u blk = 0; blk < numblks; ++blk)
+                {
+                    if (aud_blks[blk].chexpstr[Pos]!=0)
+                        ++nchregs;
+                }
+
+                aud_chan_blk[Pos].chahtinu = 0;
+                if (nchregs==1)
+                {
+                    bool tmp;
+                    Get_SB (tmp,                                    "chahtinu[ch]");
+                    if (tmp)
+                        aud_chan_blk[Pos].chahtinu = 1;
+                }
+            }
+
+            if (lfeon)
+            {
+                int8u nlferegs = 0;
+                for (int8u blk = 0; blk < numblks; ++blk)
+                {
+                    if (aud_blks[blk].lfeexpstr!=false)
+                        ++nlferegs;
+                }
+
+                if (nlferegs==1)
+                {
+                    bool tmp = false;
+                    Get_SB (tmp,                                    "lfeahtinu");
+                    if (tmp)
+                        lfeahtinu = 1;
+                }
+            }
+        }
+
+        if (snroffststr)
+        {
+            Skip_S1 (6,                                             "frmcsnroffst");
+            Skip_S1 (4,                                             "frmfsnroffst");
+        }
+
+        if (transproce)
+        {
+            for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+            {
+                TEST_SB_SKIP(                                       "chintransproc[ch]");
+                    Skip_S2(10,                                     "transprocloc[ch]");
+                    Skip_S1(8,                                      "transproclen[ch]");
+                TEST_SB_END();
+            }
+        }
+
+        if (spxattene)
+        {
+            for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+            {
+                TEST_SB_SKIP(                                       "chinspxatten[ch]");
+                    Skip_S1(5,                                      "spxattencod[ch]");
+                TEST_SB_END();
+            }
+        }
+
+        bool blkstrtinfoe = false;
+        int8u blkstrtinfo = 0;
+        if (numblkscod != 0x0)
+            Get_SB (blkstrtinfoe,                                   "blkstrtinfoe");
+        if (blkstrtinfoe)
+            blkstrtinfo = (numblks - 1) * (4 + ceil(log2(frmsiz + 1)));
+
+        // These fields for syntax state initialization
+        for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+        {
+            aud_chan_blk[Pos].firstspxcos = true;
+            aud_chan_blk[Pos].firstcplcos = true;
+        }
+        firstcplleak = true;
+        Element_End0();
+
+        Element_Begin1("audblks");
+            for (int8u blk = 0; blk < numblks; ++blk)
+            {
+                Element_Begin1("audblk");
+                    if (blkswe)
+                        for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                            Get_SB (aud_chan_blk[Pos].blksw,        "blksw[ch]");
+                    else
+                        for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                            aud_chan_blk[Pos].blksw = false;
+
+                    if (dithflage)
+                        for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                            Get_SB (aud_chan_blk[Pos].dithflag,     "dithflag[ch]");
+                    else
+                        for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                            aud_chan_blk[Pos].dithflag = true;
+
+                    int8u dynrng = 0;
+                    int8u dynrng2 = 0;
+                    TEST_SB_SKIP(                                   "dynrnge");
+                        Get_S1 (8, dynrng,                          "dynrng");
+                    TEST_SB_END();
+
+                    if (acmod==0x0)
+                    {
+                        TEST_SB_SKIP(                               "dynrng2e");
+                            Get_S1 (8, dynrng,                      "dynrng2");
+                        TEST_SB_END();
+                    }
+
+                    int8u spx_begin_subbnd, spx_end_subbnd;
+                    int8u spxbegf = 0;
+                    bool spxbndstrc[256];
+                    bool spxstre = true;
+                    bool spxinu = false;
+                    if (blk!=0)
+                        Peek_SB(spxstre);
+
+                    if (spxstre)
+                    {
+                        Element_Begin1("spxstr");
+                        Skip_SB(                                    "spxstre");
+                        Get_SB (spxinu,                             "spxinu");
+                        if (spxinu)
+                        {
+                            if (acmod==0x1)
+                                aud_chan_blk[0].chinspx = true;
+                            else
+                            {
+                                for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                                    Get_SB (aud_chan_blk[Pos].chinspx,"chinspx[ch]");
+                            }
+
+                            int8u spxstrtf, spxendf;
+
+                            Get_S1 (2, spxstrtf,                    "spxstrtf");
+                            Get_S1 (3, spxbegf,                     "spxbegf");
+                            Get_S1 (3, spxendf,                     "spxendf");
+
+                            if (spxbegf<6)
+                                spx_begin_subbnd = spxbegf + 2;
+                            else
+                                spx_begin_subbnd = spxbegf * 2 - 3;
+
+                            if (spxendf < 3)
+                                spx_end_subbnd = spxendf + 5;
+                            else
+                                spx_end_subbnd = spxendf * 2 + 3;
+
+                            TEST_SB_SKIP(                           "spxbndstrce");
+                            for (int8u bnd = spx_begin_subbnd+1; bnd < spx_end_subbnd; ++bnd)
+                                Get_SB (spxbndstrc[bnd],            "spxbndstrc[bnd]");
+                            TEST_SB_END();
+                        }
+                        else
+                        {
+                            for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                            {
+                                aud_chan_blk[Pos].chinspx = false;
+                                aud_chan_blk[Pos].firstspxcos = true;
+                            }
+                        }
+                        Element_End0();
+                    }
+
+                    if (spxinu)
+                    {
+                        Element_Begin1("spxin"); 
+                        for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                        {
+                            Element_Begin1("Channel"); 
+                            if (aud_chan_blk[Pos].chinspx)
+                            {
+                                if (aud_chan_blk[Pos].firstspxcos)
+                                {
+                                    aud_chan_blk[Pos].spxcoe = true;
+                                    aud_chan_blk[Pos].firstspxcos = false;
+                                }
+                                else
+                                    Get_SB (aud_chan_blk[Pos].spxcoe,   "spxcoe[ch]");
+
+                                if (aud_chan_blk[Pos].spxcoe)
+                                {
+                                    Get_S1 (5, aud_chan_blk[Pos].spxblnd,"spxblnd[ch]");
+                                    Get_S1 (2, aud_chan_blk[Pos].mstrspxco,"mstrspxco[ch]");
+
+                                    int8u nspxbnds = 1;
+                                    int8u spxbndsztab[256] = {0};
+                                    spxbndsztab[0] = 12;
+                                    for (int8u bnd = spx_begin_subbnd+1; bnd < spx_end_subbnd; ++bnd)
+                                    {
+                                        if (spxbndstrc[bnd] == false)
+                                        {
+                                            spxbndsztab[nspxbnds] = 12;
+                                            ++nspxbnds;
+                                        }
+                                        else
+                                            spxbndsztab[nspxbnds - 1] += 12;
+                                    }
+
+                                    for (int8u bnd = 0; bnd < nspxbnds; ++bnd)
+                                    {
+                                        Element_Begin1("Bnd"); 
+                                        Skip_S1 (4,                     "spxcoexp[ch][bnd]");
+                                        Skip_S1 (2,                     "spxcomant[ch][bnd]");
+                                        Element_End0();
+                                    }
+                                }
+                            }
+                            else
+                                aud_chan_blk[Pos].firstspxcos = true;
+                            Element_End0();
+                        }
+                        Element_End0();
+                    }
+
+                    bool  ecplinu = false;
+                    bool  phsflginu = false;
+                    bool  cplbndstrce = false;
+                    int8u ncplsubnd = 0;
+                    bool *cplbndstrc = NULL;
+                    int16u necplbnd = 0;
+                    int8u ecplbegf, ecplendf = 0;
+                    int8u cplbegf, cplendf = 0;
+                    int16u ecpl_begin_subbnd = 0, ecpl_end_subbnd = 0;
+                    size_t cplstrtmant = 0;
+                    size_t lfeactivegaqbins = 0;
+                    size_t cplendmant = 0;
+
+                    if (aud_blks[blk].cplstre)
+                    {
+                        Element_Begin1("cplstr");
+                        if (aud_blks[blk].cplinu)
+                        {
+                            Element_Begin1("cplin"); 
+                            Get_SB (ecplinu,                            "ecplinu");
+
+                            if (acmod==0x2)
+                            {
+                                aud_chan_blk[0].chincpl = true;
+                                aud_chan_blk[1].chincpl = true;
+                            }
+                            else
+                            {
+                                for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                                    Get_SB (aud_chan_blk[1].chincpl,    "chincpl[ch]");
+                            }
+
+                            if (!ecplinu)
+                            {
+                                if (acmod==0x2)
+                                    Get_SB (phsflginu,                  "phsflginu");
+                                Get_S1 (4, cplbegf,                     "cplbegf");
+                                cplstrtmant = (cplbegf * 12) + 37;;
+
+                                if (!spxinu)
+                                    Get_S1 (4, cplendf,                 "cplendf");
+                                else
+                                {
+                                    if (spxbegf < 6)
+                                        cplendf = spxbegf - 2;
+                                    else
+                                        cplendf = (spxbegf * 2) - 7;
+                                }
+
+                                ncplsubnd = 3 + cplendf - cplbegf;
+                                Get_SB (cplbndstrce,                    "cplbndstrce");
+                                if (cplbndstrce)
+                                {
+                                    cplbndstrc = new bool [ncplsubnd];
+                                    cplbndstrc[0] = false;
+                                    for (int8u bnd = 1; bnd < ncplsubnd; ++bnd)
+                                        Get_SB (cplbndstrc[bnd],        "cplbndstrc[bnd]");
+                                }
+                            }
+                            else
+                            {
+                                Get_S1 (4, ecplbegf,                    "ecplbegf");
+                                cplstrtmant = (cplbegf * 12) + 37;;
+
+                                if (ecplbegf<3)
+                                    ecpl_begin_subbnd = ecplbegf * 2;
+                                else if (ecplbegf<13)
+                                    ecpl_begin_subbnd = ecplbegf + 2;
+                                else
+                                    ecpl_begin_subbnd = ecplbegf * 2 - 10;
+
+                                if (!spxinu)
+                                {
+                                    Get_S1 (4, ecplendf,                "ecplendf");
+                                    ecpl_end_subbnd = ecplendf + 7;
+                                }
+                                else
+                                {
+                                    if (spxbegf < 6)
+                                        ecpl_end_subbnd = spxbegf + 5;
+                                    else
+                                        ecpl_end_subbnd = spxbegf * 2;
+                                }
+
+                                necplbnd = ecpl_end_subbnd - ecpl_begin_subbnd;
+                                TEST_SB_SKIP(                           "ecplbndstrce");
+                                int16u max = 9;
+                                if (max < ecpl_begin_subbnd+1)
+                                    max = ecpl_begin_subbnd+1;
+                                ncplsubnd = ecpl_end_subbnd;
+
+                                cplbndstrc = new bool [ecpl_end_subbnd];
+                                for (size_t i = 0; i < max; ++i)
+                                    cplbndstrc[i] = false;
+
+                                for (int16u sbnd = max; sbnd < ecpl_end_subbnd; ++sbnd)
+                                    Get_SB (cplbndstrc[sbnd],           "cplbndstrc[bnd]");
+
+                                necplbnd = 0;
+                                for (int16u i = ecpl_begin_subbnd; i < ecpl_end_subbnd; ++i)
+                                    necplbnd += cplbndstrc[i];
+                                TEST_SB_END();
+                            }
+                            Element_End0();
+                        }
+                        else
+                        {
+                            for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                            {
+                                aud_chan_blk[Pos].chincpl = false;
+                                aud_chan_blk[Pos].firstcplcos = true;
+                            }
+                            firstcplleak = true;
+                        }
+                        Element_End0();
+                    }
+
+                    if (aud_blks[blk].cplinu)
+                    {
+                        if (!ecplinu)
+                        {
+                            int16u ncplbnd = ncplsubnd;
+                            for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                            {
+                                if (aud_chan_blk[Pos].chincpl)
+                                {
+                                    if (aud_chan_blk[Pos].firstcplcos)
+                                    {
+                                        aud_chan_blk[Pos].cplcoe = true;
+                                        aud_chan_blk[Pos].firstcplcos = false;
+                                    }
+                                    else
+                                        Get_SB(aud_chan_blk[Pos].cplcoe,"cplcoe[ch]");
+
+                                    if (aud_chan_blk[Pos].cplcoe)
+                                    {
+                                        Skip_S1 (2,                     "mstrcplco[ch]");
+                                        ncplbnd = ncplsubnd;
+                                        for (size_t i = 1; i < ncplsubnd; ++i)
+                                            ncplbnd += cplbndstrc[i];
+                                        for (int16u bnd = 0; bnd < ncplbnd; bnd++)
+                                        {
+                                            Skip_S1(4,                  "cplcoexp[ch][bnd]");
+                                            Skip_S1(4,                  "cplcomant[ch][bnd]");
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    aud_chan_blk[Pos].firstcplcos = true;
+                                }
+                            }
+
+                            if (acmod==0x2 && phsflginu && (aud_chan_blk[0].cplcoe || aud_chan_blk[1].cplcoe))
+                            {
+                                for (size_t bnd = 0; bnd < ncplbnd; ++bnd)
+                                    Skip_SB(                            "phsflg[bnd]}");
+                            }
+                        }
+                        else
+                        {
+                            int firstchincpl = -1;
+                            Skip_SB(                                    "reserved");
+                            for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                            {
+                                if (aud_chan_blk[Pos].chincpl)
+                                {
+                                    if (firstchincpl == -1)
+                                        firstchincpl = Pos;
+
+                                    if (aud_chan_blk[Pos].firstcplcos)
+                                    {
+                                        aud_chan_blk[Pos].ecplparam1e = true;
+                                        if (Pos > firstchincpl)
+                                            aud_chan_blk[Pos].rsvdfieldse = true;
+                                        else
+                                            aud_chan_blk[Pos].rsvdfieldse = false;
+                                        aud_chan_blk[Pos].firstcplcos = false;
+                                    }
+                                    else
+                                    {
+                                        Get_SB (aud_chan_blk[Pos].ecplparam1e, "ecplparam1e");
+                                        if (Pos > firstchincpl)
+                                            Get_SB (aud_chan_blk[Pos].rsvdfieldse, "rsvdfieldse");
+                                        else
+                                            aud_chan_blk[Pos].rsvdfieldse = false;
+                                    }
+
+                                    if (aud_chan_blk[Pos].ecplparam1e)
+                                    {
+                                        if (aud_chan_blk[Pos].ecplparam1e)
+                                        {
+                                            for (size_t bnd = 0; bnd < necplbnd; bnd++)
+                                                Skip_S1(5,                  "ecplamp[ch][bnd]");
+                                        }
+
+                                        if (aud_chan_blk[Pos].rsvdfieldse)
+                                            Skip_BS(9 * (necplbnd - 1),     "reserved");
+                                        if (Pos > firstchincpl)
+                                            Skip_SB(                        "reserved");
+                                    }
+                                }
+                                else
+                                    aud_chan_blk[Pos].firstcplcos = true;
+                            }
+                        }
+                    }
+
+                    //aud_chan_blk_init(acmod, cplbegf);
+                    for (int8u Pos = 0; Pos<AC3_Channels[acmod]; ++Pos)
+                    {
+                        aud_chan_blk[Pos].strtmant = 0;
+                        if (aud_chan_blk[Pos].chincpl)
+                            aud_chan_blk[Pos].endmant = 37 + (12 * cplbegf);
+                        else
+                            aud_chan_blk[Pos].endmant = 37 + (3 * (aud_chan_blk[Pos].chbwcod + 12));
+                    }
+
+                    if (acmod==0x2)
+                    {
+                        bool rematstr = true;
+                        if (blk!=0)
+                            Get_SB(rematstr,                                "rematstr");
+
+                        if (rematstr)
+                        {
+                            size_t nrematbd = 0;
+                            if (aud_blks[blk].cplinu)
+                            {
+                                if (ecplinu)
+                                {
+                                    if (ecplbegf == 0)
+                                        nrematbd = 0;
+                                    else if (ecplbegf == 1)
+                                        nrematbd = 1;
+                                    else if (ecplbegf == 2)
+                                        nrematbd = 2;
+                                    else if (ecplbegf < 5)
+                                        nrematbd = 3;
+                                    else
+                                        nrematbd = 4;
+                                }
+                                else
+                                {
+                                    if (cplbegf == 0)
+                                        nrematbd = 2;
+                                    else if (cplbegf < 3)
+                                        nrematbd = 3;
+                                    else
+                                        nrematbd = 4;
+                                }
+                            }
+                            else if (spxinu)
+                            {
+                                if (spxbegf < 2)
+                                    nrematbd = 3;
+                                else
+                                    nrematbd = 4;
+                            }
+                            else
+                            {
+                                nrematbd = 4;
+                            }
+
+                            for (size_t bnd = 0; bnd < nrematbd; ++bnd)
+                                Skip_SB(                                    "rematflg[bnd]");
+                        }
+                    }
+
+                    for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                    {
+                        if (aud_blks[blk].chexpstr[Pos])
+                        {
+                            if (!aud_chan_blk[Pos].chincpl && !aud_chan_blk[Pos].chinspx)
+                                Get_S1 (6, aud_chan_blk[Pos].chbwcod,       "chbwcod[ch]");
+                        }
+                    }
+
+                    if (aud_blks[blk].cplinu)
+                    {
+                        if (aud_blks[blk].cplexpstr!=0)
+                        {
+                            Skip_S1(4,                                      "cplabsexp");
+
+                            size_t ncplgrps = 0;
+                            if (ecplinu)
+                            {
+                                int8u ecplstartmant = ecplsubbndtab[ecpl_begin_subbnd];
+                                int8u ecplendmant = ecplsubbndtab[ecpl_end_subbnd];
+                                if (aud_blks[blk].cplexpstr == 0x01)
+                                    ncplgrps = (ecplendmant - ecplstartmant) / 3;
+                                else if (aud_blks[blk].cplexpstr == 0x02)
+                                    ncplgrps = (ecplendmant - ecplstartmant) / 6;
+                                else if (aud_blks[blk].cplexpstr == 0x03)
+                                    ncplgrps = (ecplendmant - ecplstartmant) / 12;
+                            }
+                            else
+                            {
+                                cplendmant = ((cplendf + 3) * 12) + 37;
+                                if (aud_blks[blk].cplexpstr == 0x01)
+                                    ncplgrps = (cplendmant - cplstrtmant) / 3;
+                                else if (aud_blks[blk].cplexpstr == 0x02)
+                                    ncplgrps = (cplendmant - cplstrtmant) / 6;
+                                else if (aud_blks[blk].cplexpstr == 0x03)
+                                    ncplgrps = (cplendmant - cplstrtmant) / 12;
+                            }
+
+                            for(size_t grp = 0; grp < ncplgrps; grp++)
+                                Skip_S1(7,                                  "cplexps[grp]");
+                        }
+                    }
+
+                    for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                    {
+                        if (aud_blks[blk].chexpstr[Pos]!=0)
+                        {
+                            Skip_S1(4,                                      "exps[ch][0]");
+                            size_t nchgrps = 0;
+                            if (!aud_chan_blk[Pos].chincpl)
+                                aud_chan_blk[Pos].endmant = ((aud_chan_blk[Pos].chbwcod + 12) * 3) + 37;
+                            else
+                                aud_chan_blk[Pos].endmant = cplstrtmant;
+
+                            if (aud_blks[blk].cplexpstr==0x01)
+                                nchgrps = (aud_chan_blk[Pos].endmant - 1) / 3;
+                            else if (aud_blks[blk].cplexpstr==0x02)
+                                nchgrps = (aud_chan_blk[Pos].endmant - 1) / 3;
+                            else if (aud_blks[blk].cplexpstr==0x03)
+                                nchgrps = (aud_chan_blk[Pos].endmant - 1) / 3;
+
+                            for (size_t grp = 1; grp <= nchgrps; grp++)
+                                Skip_S1(7,                                  "exps[ch][grp]");
+                            Skip_S1(2,                                      "gainrng[ch]");
+                        }
+                    }
+
+                    if (lfeon)
+                    {
+                        if (aud_blks[blk].lfeexpstr!=0)
+                        {
+                            Skip_S1(4,                                      "lfeexps[0]");
+                            size_t nlfegrps = 2;
+                            for (size_t grp = 1; grp <= nlfegrps; ++grp)
+                                Skip_S1(7,                                  "lfeexps[grp]");
+                        }
+                    }
+
+                    int8u sdcycod = 0x2;
+                    int8u fdcycod = 0x1;
+                    int8u sgaincod = 0x1;
+                    int8u dbpbcod = 0x2;
+                    int8u floorcod = 0x7;
+                    if (bamode)
+                    {
+                        bool baie = false;
+                        Get_SB(baie,                                        "baie");
+                        if (baie)
+                        {
+                            Get_S1(2, sdcycod,                              "sdcycod");
+                            Get_S1(2, fdcycod,                              "fdcycod");
+                            Get_S1(2, sgaincod,                             "sgaincod");
+                            Get_S1(2, dbpbcod,                              "dbpbcod");
+                            Get_S1(3, floorcod,                             "floorcod");
+                        }
+                    }
+
+                    if (snroffststr!=0x0)
+                    {
+                        bool snroffste = true;
+                        if (blk!=0)
+                            Get_SB (snroffste,                              "snroffste");
+
+                        if (snroffste)
+                        {
+                            Skip_S1(6,                                      "csnroffst");
+                            if (snroffststr==0x1)
+                                Skip_S1(4,                                  "blkfsnroffst");
+                            else if (snroffststr == 0x2)
+                            {
+                                if (aud_blks[blk].cplinu)
+                                    Skip_S1(4,                              "cplfsnroffst");
+                                for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                                    Skip_S1(4,                              "fsnroffst[ch]");
+                                if (lfeon)
+                                    Skip_S1(4,                              "lfefsnroffst");
+                            }
+                        }
+                    }
+
+                    bool fgaincode = false;
+                    if (frmfgaincode)
+                        Get_SB(fgaincode,                                   "fgaincode");
+
+                    if (fgaincode)
+                    {
+                        if (aud_blks[blk].cplinu)
+                            Skip_S1(3, "cplfgaincod");
+                        for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                            Skip_S1(3,                                      "fgaincod[ch]");
+                        if (lfeon)
+                            Skip_S1(3,                                      "lfefgaincod");
+                    }
+
+                    if (strmtyp == 0x0)
+                    {
+                        TEST_SB_SKIP(                                       "convsnroffste");
+                        Skip_S2(10,                                         "convsnroffst");
+                        TEST_SB_END();
+                    }
+
+                    if (aud_blks[blk].cplinu)
+                    {
+                        bool cplleake = true;
+                        if (firstcplleak)
+                            firstcplleak = false;
+                        else
+                            Get_SB (cplleake,                               "cplleake");
+
+                        if (cplleake)
+                        {
+                            Skip_S1(3,                                      "cplfleak");
+                            Skip_S1(3,                                      "cplsleak");
+                        }
+                    }
+
+                    if (dbaflde)
+                    {
+                        TEST_SB_SKIP(                                       "deltbaie");
+                        int8u cpldeltbae = 0;
+                        if (aud_blks[blk].cplinu)
+                            Get_S1 (2, cpldeltbae,                          "cpldeltbae");
+                        for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                            Get_S1 (2, aud_chan_blk[Pos].deltbae,        "deltbae[ch]");
+
+                        if (aud_blks[blk].cplinu)
+                        {
+                            if (cpldeltbae==0x01)
+                            {
+                                int8u cpldeltnseg;
+                                Get_S1 (3, cpldeltnseg,                 "cpldeltnseg");
+                                for (int8u seg = 0; seg <= cpldeltnseg; ++seg)
+                                {
+                                    Skip_S1(5,                          "cpldeltoffst[seg]");
+                                    Skip_S1(4,                          "cpldeltlen[seg]");
+                                    Skip_S1(3,                          "cpldeltba[seg]");
+                                }
+                            }
+                        }
+
+                        for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                        {
+                            if (aud_chan_blk[Pos].deltbae==0x01)
+                            {
+                                int8u deltnseg;
+                                Get_S1 (3, deltnseg,                    "deltnseg[ch]");
+                                for (int8u seg = 0; seg <= deltnseg; ++seg)
+                                {
+                                    Skip_S1(5,                          "deltoffst[ch][seg]");
+                                    Skip_S1(4,                          "deltlen[ch][seg]");
+                                    Skip_S1(3,                          "deltba[ch][seg]");
+                                }
+                            }
+                        }
+                        TEST_SB_END();
+                    }
+
+                    if (skipflde)
+                    {
+                        TEST_SB_SKIP(                                   "skiple");
+                        int16u skipl;
+                        Get_S2 (9, skipl,                               "skipl");
+                        Skip_BS(skipl * 8,                              "skipfld");
+                        //TODO: EMDF();
+                        TEST_SB_END();
+                    }
+
+                    bool   got_cplchan = false;
+                    size_t cplactivegaqbins = 0;
+                    int8u  lfegaqmod = 0;
+                    int8u* lfegaqbin = NULL;
+                    size_t lfeendmant = 7;
+                    int8u  cplgaqmod = 0;
+                    lfegaqbin = new int8u[lfeendmant];
+
+                    int8u *cplgaqbin = NULL;
+                    cplgaqbin = new int8u[cplendmant];
+                    for (size_t bin = 0; bin < lfeendmant; ++bin)
+                        lfegaqbin[bin] = 0;
+
+                    for (int8u Pos=0; Pos<AC3_Channels[acmod]; ++Pos)
+                    {
+                        if (!aud_chan_blk[Pos].chahtinu)
+                        {
+                            aud_chan_blk[Pos].endmant = ((aud_chan_blk[Pos].chbwcod + 12) * 3) + 37;
+                            for (size_t bin = 0; bin < aud_chan_blk[Pos].endmant; ++bin)
+                            {
+                                //TODO
+                                // chmant[ch][bin];
+                                // (0-16);
+                            }
+                        }
+
+                        else if (aud_chan_blk[Pos].chahtinu)
+                        {
+                            int8u chgaqmod = 0;
+                            size_t chgaqsections = 0;
+                            Get_S1 (2, chgaqmod,                        "chgaqmod[ch]");
+                            switch (chgaqmod)
+                            {
+                                case 0:
+                                {
+                                    chgaqsections = 0;
+                                    break;
+                                }
+                                case 1:
+                                case 2:
+                                {
+                                    chgaqsections = aud_chan_blk[Pos].chactivegaqbins;
+                                    break;
+                                }
+                                case 3:
+                                {
+                                    chgaqsections = aud_chan_blk[Pos].chactivegaqbins / 3;
+                                    if (aud_chan_blk[Pos].chactivegaqbins % 3)
+                                        ++chgaqsections;
+                                    break;
+                                }
+                            };
+
+                            if (chgaqmod>0x0 && chgaqmod<0x3)
+                            {
+                                for (size_t n = 0; n < chgaqsections; ++n)
+                                    Skip_SB(                        "chgaqgain[ch][n]");
+                            }
+                            else if (chgaqmod==0x3)
+                            {
+                                for (size_t n = 0; n < chgaqsections; ++n)
+                                    Skip_S1(5,                          "chgaqgain[ch][n]");
+                            }
+
+                            aud_chan_blk[Pos].endmant = cplstrtmant;
+                            int8u* chgaqbin = new int8u [aud_chan_blk[Pos].endmant];
+                            if (aud_chan_blk[Pos].chahtinu == 0)
+                            {
+                                for (size_t i = 0; i < aud_chan_blk[Pos].endmant; ++i)
+                                    chgaqbin[i] = 0;
+                            }
+                            else
+                            {
+                                int8u endbap = 17;
+                                if (chgaqmod < 2)
+                                    endbap = 12;
+
+                                aud_chan_blk[Pos].chactivegaqbins = 0;
+                                for (size_t i = 0; i < aud_chan_blk[Pos].endmant; ++i)
+                                {
+                                    if (hebap[i] > 7 && hebap[i] < endbap)
+                                    {
+                                        chgaqbin[i] = 1;
+                                        ++aud_chan_blk[Pos].chactivegaqbins;
+                                    }
+                                    else if (hebap[i] >= endbap)
+                                        chgaqbin[i] = -1;
+                                    else
+                                        chgaqbin[i] = 0;
+                                }
+                            }
+
+                            for (size_t bin = 0; bin < aud_chan_blk[Pos].endmant; ++bin)
+                            {
+
+                                if (!cplahtinu)
+                                {
+                                    for (size_t i = cplstrtmant; i < cplendmant; ++i)
+                                        cplgaqbin[i] = 0;
+                                }
+                                else
+                                {
+                                    int8u endbap = 17;
+                                    if (cplgaqmod < 2)
+                                        endbap = 12;
+
+                                    cplactivegaqbins = 0;
+                                }
+
+                                if (chgaqbin[bin])
+                                {
+                                    for (size_t n = 0; n < 6; n++)
+                                    {
+                                        //TODO
+                                        // {pre_chmant[n][ch][bin]} ...........................
+                                        //     (0-16);
+                                    }
+                                }
+                                else
+                                {
+                                    //TODO
+                                    // pre_chmant[0][ch][bin] .................................................;
+                                    // (0-9);
+                                }
+                            }
+                            aud_chan_blk[Pos].chahtinu = -1;
+                        }
+
+                        if (aud_blks[blk].cplinu && aud_chan_blk[Pos].chincpl && !got_cplchan)
+                        {
+                            size_t ncplmant = 12 * ncplsubnd;
+                            if (cplahtinu==0)
+                            {
+                                for (size_t bin = 0; bin < ncplmant; ++bin)
+                                {
+                                    //TODO
+                                    // cplmant[bin] ...........................;
+                                    // (0-16);
+                                }
+                                got_cplchan = true;
+                            }
+                            else if (cplahtinu==1)
+                            {
+                                Get_S1 (2, cplgaqmod,                   "cplgaqmod");
+
+                                if (lfeahtinu == 0)
+                                {
+                                    for (size_t bin = 0; bin < lfeendmant; bin++)
+                                        lfegaqbin[bin] = 0;
+                                }
+                                else
+                                {
+                                    int8u endbap = 17;
+                                    if (lfegaqmod<2)
+                                        endbap = 12;
+
+                                    for (size_t bin = 0; bin < lfeendmant; bin++)
+                                    {
+                                        if (hebap[bin] > 7 && hebap[bin] < endbap)
+                                        {
+                                            lfegaqbin[bin] = 1;
+                                            ++lfeactivegaqbins;
+                                        }
+                                        else if (hebap[bin] >= endbap)
+                                            lfegaqbin[bin] = -1;
+                                        else
+                                            lfegaqbin[bin] = 0;
+                                    }
+                                }
+
+                                if (cplgaqmod>0x0 && cplgaqmod<0x3)
+                                {
+                                    size_t cplgaqsections = cplactivegaqbins;
+                                    for (size_t n = 0; n < cplgaqsections; n++)
+                                        Skip_SB(                        "cplgaqgain[n]");
+                                }
+                                else if (cplgaqmod == 0x3)
+                                {
+                                    size_t cplgaqsections = cplactivegaqbins / 3;
+                                    if (cplactivegaqbins % 3)
+                                        ++cplgaqsections;
+
+                                    for (size_t n = 0; n < cplgaqsections; n++)
+                                        Skip_S1(5,                      "cplgaqgain[n]");
+                                }
+
+                                for (size_t bin = 0; bin < ncplmant; ++bin)
+                                {
+                                    if (cplgaqbin[bin])
+                                    {
+                                        for (size_t n = 0; n < 6; ++n)
+                                        {
+                                            //TODO
+                                            // pre_cplmant[n][bin] ...........................;
+                                            // (0-16);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //TODO
+                                        // pre_cplmant[0][bin] .................................................;
+                                        // (0-9);
+                                    }
+                                }
+                                got_cplchan = true;
+                                cplahtinu = -1;
+                            }
+                            else
+                                got_cplchan = true;
+                        }
+                    }
+
+                    if (lfeon)
+                    {
+                        int8u nlfemant = 7;
+                        if (lfeahtinu == 0)
+                        {
+                            for (size_t bin = 0; bin < nlfemant; ++bin)
+                            {
+                                //TODO
+                                // lfemant[bin]..............................;
+                                // (0-16);
+                            }
+                        }
+                        else if (lfeahtinu == 1)
+                        {
+                            size_t lfegaqsections = 0;
+                            Get_S1 (2, lfegaqmod,                        "lfegaqmod");
+
+                            if (lfeahtinu!=0)
+                            {
+                                size_t sumgaqbins = 0;
+                                for (size_t bin = 0; bin < lfeendmant; bin++)
+                                    sumgaqbins += lfegaqbin[bin];
+
+                                switch (lfegaqmod)
+                                {
+                                    case 0:
+                                    {
+                                        lfegaqsections = 0;
+                                        break;
+                                    }
+                                    case 1:
+                                    case 2:
+                                    {
+                                        lfegaqsections = lfeactivegaqbins;
+                                        break;
+                                    }
+                                    case 3:
+                                    {
+                                        lfegaqsections = lfeactivegaqbins / 3;
+                                        if (lfeactivegaqbins % 3)
+                                            lfegaqsections++;
+                                        break;
+                                    }
+                                };
+                            }
+
+                            if (lfegaqmod>0x0 && lfegaqmod<0x3)
+                            {
+                                for (size_t n = 0; n < lfegaqsections; ++n)
+                                    Skip_SB(                             "lfegaqgain[n]");
+                            }
+                            else if (lfegaqmod==0x3)
+                            {
+                                for (size_t n = 0; n < lfegaqsections; ++n)
+                                    Skip_S1(5,                           "lfegaqgain[n]");
+                            }
+
+                            for (size_t bin = 0; bin < nlfemant; ++bin)
+                            {
+                                if (lfegaqbin[bin])
+                                {
+                                    for (size_t n = 0; n < 6; ++n)
+                                    {
+                                        //TODO
+                                        // pre_lfemant[n][bin] ..............................;
+                                        // (0-16);
+                                    }
+                                }
+                                else
+                                {
+                                    //TODO
+                                    // pre_lfemant[0][bin] ....................................................;
+                                    // (0-9);
+                                }
+                            }
+
+                            lfeahtinu = (int8u)-1;
+                        }
+                    }
+
+                Element_End0();
+            }
+            //*/
+
+        Element_End0();
     }
     else
         Skip_XX(Element_Size-Element_Offset,                        "Unknown");
+
+    //true Element_Size is back
+    Element_Size=Element_Size_Save;
+
+    if (bsid<=0x10)
+    {
+        size_t BitsAtEnd=18; //auxdatae+errorcheck
+        if (auxdatal!=(int16u)-1)
+            BitsAtEnd+=auxdatal+14; //auxbits+auxdatal
+        if (Data_BS_Remain()>=BitsAtEnd)
+        {
+            if (EMDF_RemainPos!=(size_t)-1 && BitsAtEnd<EMDF_RemainPos)
+            {
+                Skip_BS(Data_BS_Remain()-EMDF_RemainPos,            bsid<=0x0A?"(Unparsed audblk(continue)+5*audblk+padding)":"(Unparsed bsi+6*audblk+padding)");
+                emdf();
+                Skip_BS(Data_BS_Remain()-BitsAtEnd,                 bsid<=0x0A?"(Unparsed audblk(continue)+5*audblk+padding)":"(Unparsed bsi+6*audblk+padding)");
+            }
+            else if (Data_BS_Remain()>BitsAtEnd)
+                Skip_BS(Data_BS_Remain()-BitsAtEnd,                 bsid<=0x0A?"(Unparsed audblk(continue)+5*audblk+padding)":"(Unparsed bsi+6*audblk+padding)");
+            Element_Begin1("auxdata");
+                Skip_SB(                                            "auxdatae");
+            Element_End0();
+            Element_Begin1("errorcheck");
+                Skip_SB(                                            "encinfo");
+                BS_End();
+                Skip_B2(                                            "crc2");
+            Element_End0();
+        }
+    }
 
     FILLING_BEGIN();
         if (bsid>0x10)
@@ -1941,6 +3449,367 @@ void File_Ac3::Core_Frame()
             dialnorm2s[dialnorm2]++;
         }
     FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Ac3::emdf()
+{
+    Element_Begin1("emdf");
+    emdf_sync();
+    emdf_container();
+    Element_End0();
+}
+
+//---------------------------------------------------------------------------
+void File_Ac3::emdf_sync()
+{
+    int16u emdf_container_length;
+    Element_Begin1("emdf_sync");
+    Skip_S2(16,                                                 "syncword");
+    Get_S2 (16, emdf_container_length,                          "emdf_container_length");
+    Element_End0();
+
+    RemainAfterEMDF=Data_BS_Remain()-emdf_container_length*8; //emdf_container_length coherency was already tested in sync layer
+}
+
+//---------------------------------------------------------------------------
+void File_Ac3::emdf_container()
+{
+    size_t Start = Data_BS_Remain();
+    int32u version, key_id;
+    Element_Begin1("emdf_container");
+    Get_S4 (2, version,                                         "emdf_version");
+    if (version == 3)
+    {
+        int32u add;
+        Get_V4(2, add,                                          "emdf_version addition");
+        version += add;
+    }
+    if (version)
+    {
+        Skip_BS(Data_BS_Remain()-RemainAfterEMDF,               "(Unparsed emdf_container data)");
+        Element_End0(); 
+        return;
+    }
+
+    Get_S4 (3, key_id,                                          "key_id");
+    if (key_id == 7)
+    {
+        int32u add;
+        Get_V4 (2, add,                                         "key_id addition");
+        key_id += add;
+    }
+
+    int32u emdf_payload_id = 0;
+        
+    for(;;)
+    {
+        Element_Begin1("emdf_payload");
+        Get_S4 (5, emdf_payload_id,                             "emdf_payload_id");
+        if (emdf_payload_id==0x1F)
+        {
+            int32u add;
+            Get_V4 (5, add,                                     "emdf_payload_id addition");
+            emdf_payload_id += add;
+        }
+
+        if (emdf_payload_id<16)
+            Element_Info1(Ac3_emdf_payload_id[emdf_payload_id]);
+        if (emdf_payload_id == 0x00)
+        {
+            Element_End0();
+            break;
+        }
+
+        emdf_payload_config();
+
+        int32u emdf_payload_size = 0;
+        Get_V4 (8, emdf_payload_size,                           "emdf_payload_size");
+        size_t emdf_payload_End=Data_BS_Remain()-emdf_payload_size*8; //emdf_payload_size coherency was already tested in sync layer
+
+        Element_Begin1("emdf_payload_bytes");
+            switch (emdf_payload_id)
+            {
+                case 11: object_audio_metadata_payload(); break;
+                case 14: joc(); break;
+                default: Skip_BS(emdf_payload_size*8,           "(Unknown)");
+            }
+            if (Data_BS_Remain() - emdf_payload_End < 8)
+            {
+                int8u padding;
+                Peek_S1(Data_BS_Remain() - emdf_payload_End, padding);
+                if (!padding)
+                    Skip_S1(Data_BS_Remain() - emdf_payload_End, "padding");
+            }
+            if (Data_BS_Remain() > emdf_payload_End)
+            {
+                Skip_BS(Data_BS_Remain() - emdf_payload_End,    "(Unparsed emdf_payload bytes)");
+            }
+            else if (Data_BS_Remain() < emdf_payload_End)
+            {
+                //There is a problem, too many bits were consumed by the parser. //TODO: prevent the parser to consume more bits than count of bits in this element
+                if (Data_BS_Remain() >= RemainAfterEMDF)
+                    Skip_BS(Data_BS_Remain() - RemainAfterEMDF, "(Problem during emdf_payload parsing)");
+                else
+                    Skip_BS(Data_BS_Remain(),                   "(Problem during emdf_payload parsing, going to end directly)");
+                Element_End0();
+                Element_End0();
+                break;
+            }
+        Element_End0();
+
+        Element_End0();
+    }
+
+    emdf_protection();
+    Element_End0();
+}
+
+//---------------------------------------------------------------------------
+void File_Ac3::emdf_payload_config()
+{
+    Element_Begin1("emdf_payload_config");
+    bool smploffste = false;
+    Get_SB (smploffste,                                         "smploffste");
+    if (smploffste)
+    {
+        Skip_S2(11,                                             "smploffst");
+        Skip_SB(                                                "reserved");
+    }
+
+    TEST_SB_SKIP(                                               "duratione");
+        Skip_V4(11,                                             "duration");
+    TEST_SB_END();
+    TEST_SB_SKIP(                                               "groupide");
+        Skip_V4(2,                                              "groupid");
+    TEST_SB_END();
+    TEST_SB_SKIP(                                               "codecdatae");
+        Skip_S1(8,                                              "reserved");
+    TEST_SB_END();
+
+    bool discard_unknown_payload = false;
+    Get_SB(discard_unknown_payload,                             "discard_unknown_payload");
+    if (!discard_unknown_payload)
+    {
+        bool payload_frame_aligned = false;
+        if (!smploffste)
+        {
+            Get_SB (payload_frame_aligned,                      "payload_frame_aligned");
+            if (payload_frame_aligned)
+            {
+                Skip_SB(                                        "create_duplicate");
+                Skip_SB(                                        "remove_duplicate");
+            }
+        }
+
+        if (smploffste || payload_frame_aligned)
+        {
+            Skip_S1(5,                                          "priority");
+            Skip_S1(2,                                          "proc_allowed");
+        }
+    }
+    Element_End0();
+}
+
+//---------------------------------------------------------------------------
+void File_Ac3::emdf_protection()
+{
+    int8u len_primary = 0, len_second = 0;
+    Element_Begin1("emdf_protection");
+    Get_S1(2, len_primary,                                      "protection_length_primary");
+    Get_S1(2, len_second,                                       "protection_length_secondary");
+
+    switch (len_primary)
+    {
+        //case 0: break; //protection_length_primary coherency was already tested in sync layer
+        case 1: len_primary = 8; break;
+        case 2: len_primary = 32; break;
+        case 3: len_primary = 128; break;
+        default:; //Cannot append, read only 2 bits
+    };
+    switch (len_second)
+    {
+        case 0: len_second = 0; break;
+        case 1: len_second = 8; break;
+        case 2: len_second = 32; break;
+        case 3: len_second = 128; break;
+        default:; //Cannot append, read only 2 bits
+    };
+    Skip_BS(len_primary,                                        "protection_bits_primary");
+    if (len_second)
+        Skip_BS(len_primary,                                    "protection_bits_secondary");
+
+    Element_End0();
+}
+
+//---------------------------------------------------------------------------
+void File_Ac3::object_audio_metadata_payload()
+{
+    Element_Begin1("object_audio_metadata_payload");
+    int8u oa_md_version_bits;
+    Get_S1 (2, oa_md_version_bits,                              "oa_md_version_bits");
+    if (oa_md_version_bits == 0x3)
+    {
+        int8u oa_md_version_bits_ext;
+        Get_S1 (3, oa_md_version_bits_ext,                      "oa_md_version_bits_ext");
+        oa_md_version_bits += oa_md_version_bits_ext;
+    }
+
+    int8u object_count_bits;
+    Get_S1 (5, object_count_bits,                               "object_count_bits");
+    if (object_count_bits == 0x1F)
+    {
+        int8u object_count_bits_ext;
+        Get_S1 (7, object_count_bits_ext,                       "object_count_bits_ext");
+        object_count_bits += object_count_bits_ext;
+    }
+
+    program_assignment();
+
+    //TODO: next
+
+    Element_End0();
+}
+
+//---------------------------------------------------------------------------
+void File_Ac3::program_assignment()
+{
+    Element_Begin1("program_assignment");
+    bool b_dyn_object_only_program = false;
+    Get_SB (b_dyn_object_only_program,                          "b_dyn_object_only_program");
+    if (b_dyn_object_only_program)
+    {
+        Skip_SB(                                                "b_lfe_present");
+    }
+    else
+    {
+        int8u content_description_mask;
+        Get_S1 (4, content_description_mask,                    "content_description_mask");
+        if (content_description_mask & 0x1)
+        {
+            bool b_bed_object_chan_distribute, b_multiple_bed_instances_present;
+
+            Get_SB (b_bed_object_chan_distribute,               "b_bed_object_chan_distribute");
+            Get_SB (b_multiple_bed_instances_present,           "b_multiple_bed_instances_present");
+            int32u num_bed_instances = 1;
+            if (b_multiple_bed_instances_present)
+            {
+                int8u num_bed_instances_bits = 0;
+                Get_S1 (3, num_bed_instances_bits,              "num_bed_instances_bits");
+                num_bed_instances = num_bed_instances_bits + 2;
+            }
+
+            for (int32u bed = 0; bed < num_bed_instances; ++bed)
+            {
+                Element_Begin1("Bed");
+                bool b_lfe_only = true;
+                Get_SB (b_lfe_only,                             "b_lfe_only");
+                if (!b_lfe_only)
+                {
+                    bool b_standard_chan_assign;
+                    Get_SB (b_standard_chan_assign,             "b_standard_chan_assign");
+                    if (b_standard_chan_assign)
+                        Skip_S2(10,                             "bed_channel_assignment_mask");
+                    else
+                        Skip_S3(17,                             "nonstd_bed_channel_assignment_mask");
+                }
+                Element_End0();
+            }
+        }
+
+        if (content_description_mask & 0x2)
+            Skip_S1(3,                                          "intermediate_spatial_format_idx");
+
+        if (content_description_mask & 0x4)
+        {
+            int8u num_dynamic_objects_bits;
+            Get_S1 (5, num_dynamic_objects_bits,                "num_dynamic_objects_bits");
+            if (num_dynamic_objects_bits == 0x1F)
+            {
+                int8u num_dynamic_objects_bits_ext = 0;
+                Get_S1 (7, num_dynamic_objects_bits_ext,        "num_dynamic_objects_bits_ext");
+                num_dynamic_objects_bits += num_dynamic_objects_bits_ext;
+            }
+        }
+
+        if (content_description_mask & 0x8)
+        {
+            int8u reserved_data_size_bits;
+            Get_S1 (4, reserved_data_size_bits,                 "reserved_data_size_bits");
+            int8u padding = 8 - (reserved_data_size_bits % 8);
+            Skip_S1(reserved_data_size_bits,                    "reserved_data()");
+            Skip_S1(padding,                                    "padding");
+        }
+    }
+
+    Element_End0();
+}
+
+//---------------------------------------------------------------------------
+void File_Ac3::joc()
+{
+    Element_Begin1("joc");
+    joc_header();
+    joc_info();
+    joc_data();
+    if (joc_ext_config_idx > 0)
+        joc_ext_data();
+    Element_End0();
+}
+
+//---------------------------------------------------------------------------
+void File_Ac3::joc_header()
+{
+    Element_Begin1("joc_header");
+        Skip_S1(3,                                              "joc_dmx_config_idx");
+        int8u joc_num_objects_bits = 0;
+        Get_S1 (6, joc_num_objects_bits,                        "joc_num_objects_bits");
+        joc_num_objects = joc_num_objects_bits + 1;
+        joc_num_objects_map[joc_num_objects] ++;
+        Get_S1 (3, joc_ext_config_idx,                          "joc_ext_config_idx");
+    Element_End0();
+}
+
+//---------------------------------------------------------------------------
+void File_Ac3::joc_info()
+{
+    Element_Begin1("joc_info");
+    int8u joc_clipgain_x_bits, joc_clipgain_y_bits;
+    int16u joc_seq_count_bits;
+    Get_S1 (3, joc_clipgain_x_bits,                                 "joc_clipgain_x_bits");
+    Get_S1 (5, joc_clipgain_y_bits,                                 "joc_clipgain_y_bits");
+    Get_S2 (10, joc_seq_count_bits,                                 "joc_seq_count_bits");
+    for (int8u obj = 0; obj < joc_num_objects; obj++)
+    {
+        TEST_SB_SKIP("b_joc_obj_present[obj]");
+            //TODO
+        TEST_SB_END();
+    }
+    Element_End0();
+}
+
+//---------------------------------------------------------------------------
+void File_Ac3::joc_data_point_info()
+{
+    Element_Begin1("joc_data_point_info");
+    //TODO
+    Element_End0();
+}
+
+//---------------------------------------------------------------------------
+void File_Ac3::joc_data()
+{
+    Element_Begin1("joc_data");
+    //TODO
+    Element_End0();
+}
+
+//---------------------------------------------------------------------------
+void File_Ac3::joc_ext_data()
+{
+    Element_Begin1("joc_ext_data");
+    //TODO
+    Element_End0();
 }
 
 //---------------------------------------------------------------------------
@@ -2528,6 +4397,59 @@ size_t File_Ac3::HD_Size_Get()
     Size*=2;
 
     return Size;
+}
+
+//---------------------------------------------------------------------------
+void File_Ac3::Get_V4(int8u  Bits, int32u  &Info, const char* Name)
+{
+    Info = 0;
+
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            int8u Count = 0;
+            do
+            {
+                Info += BS->Get1(Bits);
+                Count += Bits;
+            }
+            while (BS->GetB());
+            Param(Name, Info, Count);
+            Param_Info(__T("(")+Ztring::ToZtring(Count)+__T(" bits)"));
+        }
+        else
+    #endif //MEDIAINFO_TRACE
+        {
+            do
+                Info += BS->Get1(Bits);
+            while (BS->GetB());
+        }
+}
+
+//---------------------------------------------------------------------------
+void File_Ac3::Skip_V4(int8u  Bits, const char* Name)
+{
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            int8u Info = 0;
+            int8u Count = 0;
+            do
+            {
+                Info += BS->Get1(Bits);
+                Count += Bits;
+            }
+            while (BS->GetB());
+            Param(Name, Info, Count);
+            Param_Info(__T("(")+Ztring::ToZtring(Count)+__T(" bits)"));
+        }
+        else
+    #endif //MEDIAINFO_TRACE
+        {
+            do
+                BS->Skip(Bits);
+            while (BS->GetB());
+        }
 }
 
 } //NameSpace

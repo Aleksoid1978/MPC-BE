@@ -251,6 +251,14 @@ public :
 
     #if defined(MEDIAINFO_LIBCURL_YES)
           bool      CanHandleUrls();
+          enum urlencode
+          {
+              URLEncode_No,
+              URLEncode_Guess,
+              URLEncode_Yes,
+          };
+          void      URLEncode_Set(urlencode NewValue);
+          urlencode URLEncode_Get();
           void      Ssh_PublicKeyFileName_Set (const Ztring &NewValue);
           Ztring    Ssh_PublicKeyFileName_Get ();
           void      Ssh_PrivateKeyFileName_Set (const Ztring &NewValue);
@@ -360,6 +368,7 @@ private :
     #endif //MEDIAINFO_EVENTS
 
     #if defined(MEDIAINFO_LIBCURL_YES)
+          urlencode URLEncode;
           Ztring    Ssh_PublicKeyFileName;
           Ztring    Ssh_PrivateKeyFileName;
           Ztring    Ssh_KnownHostsFileName;

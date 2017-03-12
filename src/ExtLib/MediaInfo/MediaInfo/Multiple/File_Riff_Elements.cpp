@@ -1934,8 +1934,7 @@ void File_Riff::AVI__hdlr_strl_strf_vids_Ffv1()
     //Parsing
     Element_Begin1("FFV1 options");
     #if defined(MEDIAINFO_FFV1_YES)
-        File_Ffv1* Parser=(File_Ffv1*)Stream[Stream_ID].Parsers[0];
-        Open_Buffer_OutOfBand(Parser);
+        Open_Buffer_OutOfBand(Stream[Stream_ID].Parsers[0]);
     #else //MEDIAINFO_FFV1_YES
         Skip_XX(Element_Size-Element_Offset,                    "(FFV1 headers)");
     #endif
@@ -1949,10 +1948,9 @@ void File_Riff::AVI__hdlr_strl_strf_vids_HuffYUV(int16u BitCount, int32u Height)
     Element_Begin1("HuffYUV options");
     #if defined(MEDIAINFO_HUFFYUV_YES)
         File_HuffYuv* Parser=(File_HuffYuv*)Stream[Stream_ID].Parsers[0];
-        Parser->IsOutOfBandData=true;
         Parser->BitCount=BitCount;
         Parser->Height=Height;
-        Open_Buffer_Continue(Parser);
+        Open_Buffer_OutOfBand(Parser);
     #else //MEDIAINFO_HUFFYUV_YES
         Skip_XX(Element_Size-Element_Offset,                    "(HuffYUV headers)");
     #endif

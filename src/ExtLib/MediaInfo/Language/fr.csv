@@ -164,6 +164,7 @@ Alignment;Alignement
 Alignment_Aligned;Alignée sur les interleaves
 Alignment_Split;Eparpillé à travers les interleaves
 All;Tout
+AlternateGroup;
 Archival_Location;Archivé à
 Arranger;Arrangement
 ArtDirector;Directeur artistique
@@ -188,6 +189,7 @@ BarCode;Code-barre
 Basic;Basique
 Basic_Note;Note : pour plus d'informations sur ce fichier, vous devez utiliser une vue différente (Tableau, Arbre...)
 BitDepth;Profondeur des couleurs
+BitDepth_Detected;
 BitDepth_Stored;Profondeur stockée des couleurs
 BitRate;Débit
 BitRate_Encoded;débit encodé
@@ -292,6 +294,7 @@ Digitized_Date;Date de numérisation
 Dimensions;Dimensions
 Director;Réalisateur
 DirectorOfPhotography;Responsable de la photographie
+Disabled;
 DisplayAspectRatio;Format à l'écran
 DisplayAspectRatio_CleanAperture;Format à l'écran, Clean Aperture
 DisplayAspectRatio_Original;Format à l'écran d'origine
@@ -304,6 +307,7 @@ Duration_End;Heure de fin
 Duration_Start;Heure de début
 Edit;Modifier
 EditedBy;Monté par
+ElementCount;
 EMail;E-mail
 Encoded_Application;Application utilisée
 Encoded_Date;Date d'encodage
@@ -345,6 +349,8 @@ Format_Commercial_IfAny;Nom commercial
 Format_Description;Description du format
 Format_Info;Infos sur le format
 Format_Profile;Profil du format
+Format_Level;
+Format_Tier;
 Format_Settings;Paramètres du format
 Format_Settings_BVOP;Paramètres du format, BVOP
 Format_Settings_CABAC;Paramètres du format, CABAC
@@ -580,11 +586,11 @@ Genre_189;
 Genre_190;
 Genre_191;
 Go to WebSite;Aller sur le site Web
-Grouping;Groupement
 Gop_OpenClosed;GOP, ouvert/fermé
 Gop_OpenClosed_Open;Ouvert
 Gop_OpenClosed_Closed;Fermé
 Gop_OpenClosed_FirstFrame;GOP, ouvert/fermé de la première imageGrouping
+Grouping;Groupement
 h; h
 Header file;Créer un fichier Header
 Height;Hauteur
@@ -667,6 +673,7 @@ Language_en-gb;Anglais (Royaume-Uni)
 Language_en-us;Anglais (États-Unis)
 Language_eo;Espéranto
 Language_es;Espagnol
+Language_es-419;
 Language_et;Estonien
 Language_eu;Basque
 Language_fa;Persan
@@ -913,6 +920,7 @@ Original;Original
 OriginalNetworkName;Nom d'origine du réseau
 OriginalSourceForm;Format d'origine
 OriginalSourceMedium;Support d'origine
+OriginalSourceMedium_ID;
 Originator;
 Other;Autre
 OtherIdentifier;
@@ -924,12 +932,14 @@ OverallBitRate_Maximum;Débit global maximum
 OverallBitRate_Minimum;Débit global minimum
 OverallBitRate_Mode;Type de débit global
 OverallBitRate_Nominal;Débit global nominal
+PackageName;
 Part;Partie
 Part_Count;Nombre de parties
 PartNumber;
 PartTotal;
 Performer;Interprète
 Period;Période
+PodcastCategory;
 Phone;Téléphone
 PictureRatio;
 PixelAspectRatio;Taille du pixel
@@ -965,6 +975,7 @@ ReplayGain_Gain;Gain en lecture
 ReplayGain_Peak;Crête de gain en lecture
 Resolution;Résolution
 s;s
+SamplesPerFrame;
 SamplingCount;Nombre d'échantillons
 SamplingRate;Echantillonnage
 Save;Sauvegarder
@@ -985,6 +996,7 @@ Separator_Columns;Séparateur de colonnes
 Separator_Lines;Séparateur de lignes
 SeriesTitle;
 ServiceChannel;Numéro du service
+ServiceKind;
 ServiceName;Nom du service
 ServiceProvider;Fournisseur du service
 ServiceType;Type de service
@@ -1024,6 +1036,7 @@ StreamKind;Type de flux
 StreamKindID;Identifiant du flux
 StreamKindPos;Identifiant du flux
 StreamSize;Taille du flux
+StreamSize_Demuxed;
 StreamSize_Encoded;Taille du flux encodé
 StreamSize_Proportion;Proportion de ce flux
 Subject;Sujet
@@ -1106,5 +1119,5 @@ Written_Location;Lieu d'écriture
 WrittenBy;Écrit par
 Yes;Oui
 Your system;Votre système
-ZZ_Automatic_Percent;90
-ZZ_AutomaticLanguage_Percent;94
+ZZ_Automatic_Percent;89
+ZZ_AutomaticLanguage_Percent;93

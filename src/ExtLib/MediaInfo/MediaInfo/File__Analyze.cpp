@@ -467,10 +467,13 @@ void File__Analyze::Open_Buffer_Init (File__Analyze* Sub, int64u File_Size_)
     Sub->Open_Buffer_Init(File_Size_);
 }
 
-void File__Analyze::Open_Buffer_OutOfBand (File__Analyze* Sub, const int8u* ToAdd, size_t ToAdd_Size)
+void File__Analyze::Open_Buffer_OutOfBand (File__Analyze* Sub)
 {
     if (Sub==NULL)
+    {
+        Skip_XX(Element_Size-Element_Offset,                    "Unknown");
         return;
+    }
 
     //Sub
     if (Sub->File_GoTo!=(int64u)-1)
@@ -491,7 +494,8 @@ void File__Analyze::Open_Buffer_OutOfBand (File__Analyze* Sub, const int8u* ToAd
         bool Demux_EventWasSent_Save=Config->Demux_EventWasSent;
         Config->Demux_EventWasSent=false;
     #endif //MEDIAINFO_DEMUX
-    Sub->Open_Buffer_OutOfBand(ToAdd, ToAdd_Size);
+    Sub->Open_Buffer_OutOfBand(Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset));
+    Element_Offset=Element_Size;
     #if MEDIAINFO_DEMUX
         if (Demux_EventWasSent_Save)
             Config->Demux_EventWasSent=true;
@@ -3777,6 +3781,35 @@ void File__Analyze::Demux_UnpacketizeContainer_Demux_Clear ()
     //Element_Begin1("Frame or Field");
 }
 #endif //MEDIAINFO_DEMUX
+
+//***************************************************************************
+// Decode
+//***************************************************************************
+
+#if MEDIAINFO_DECODE
+
+//---------------------------------------------------------------------------
+void File__Analyze::Decoded (const int8u* Buffer, size_t Buffer_Size)
+{
+    if (!Buffer_Size)
+        return;
+
+    #if MEDIAINFO_EVENTS
+        //Demux
+        if (StreamIDs_Size)
+            StreamIDs[StreamIDs_Size-1]=Element_Code;
+
+        EVENT_BEGIN(Global, Decoded, 0)
+            if (StreamIDs_Size)
+                Event.EventCode|=((int32u)ParserIDs[StreamIDs_Size-1]<<24);
+            Event.Content_Size=Buffer_Size;
+            Event.Content=Buffer;
+            Event.Flags=0;
+        EVENT_END()
+    #endif MEDIAINFO_EVENTS
+}
+
+#endif //MEDIAINFO_DECODE
 
 //***************************************************************************
 // IBI

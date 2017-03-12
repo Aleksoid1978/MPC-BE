@@ -1,51 +1,44 @@
   Language_ISO639;zh-CN
-  Author_Email;ChrisStudio@Live.Com
-  Author_Name;chriszxl, erabbit
-  Author_OldNames;Initial translator
+Author_Email;weiq530@gmail.com
+Author_Name;weiq530
+Author_OldNames;chriszxl,erabbit
   Language_Name;简体中文
   Config_Text_ColumnSize;40
   Config_Text_Separator; : 
   Config_Text_NumberTag; #
   Config_Text_FloatSeparator;.
   Config_Text_ThousandsSeparator; 
- audio stream1;音频
- audio stream2;个音频
- audio stream3;个音频
- bit1;位
- bit2;位
- bit3;位
+audio stream2; 个音频流
+audio stream3; 个音频流
+bit2; 位
+bit3; 位
+BitDepth;位深
  bps; b/s
  Bps; B/s
- Byte1;字节
- Byte2;字节
- Byte3;字节
- channel1;声道
- channel2;声道
- channel3;声道
- chapter1;段落
- chapter2;个段落
- chapter3;个段落
- chapters stream1;段落流
- chapters stream2;个段落流
- chapters stream3;个段落流
- character1;
- character2;
- character3;
- day1;天
- day2;天
- day3;天
+Byte2; 字节
+Byte3; 字节
+channel2; 声道
+channel3; 声道
+chapter2; 个段落
+chapter3; 个段落
+chapters stream2; 个段落流
+chapters stream3; 个段落流
+character1; 文本
+character2; 个文本
+character3; 个文本
+day2; 天
+day3; 天
  dB1; dB
  dB2; dB
  dB3; dB
- file1;文件
- file2;个文件
- file3;个文件
+file2; 个文件
+file3; 个文件
  fps1; FPS
  fps2; FPS
  fps3; FPS
- frame1; frame
- frame2; frames
- frame3; frames
+frame1; 帧
+frame2; 帧
+frame3; 帧
  GB; GB
  Gb; Gb
  Gbps; Gb/s
@@ -62,13 +55,11 @@
  GigaByte1; GigaByte
  GigaByte2; GigaBytes
  GigaByte3; GigaBytes
- hour1;小时
- hour2;小时
- hour3;小时
+hour2; 小时
+hour3; 小时
  Hz; Hz
- image stream1;图像流
- image stream2;个图像流
- image stream3;个图像流
+image stream2; 个图像流
+image stream3; 个图像流
  KB; kB
  Kb; kb
  KBps; kB/s
@@ -98,6 +89,7 @@
  MebiByte1; MebiByte
  MebiByte2; MebiBytes
  MebiByte3; MebiBytes
+MediaInfo_About;MediaInfo 能轻松的读取音视频文件的编码和标签信息。支持多种格式的多媒体文件:\r\nMatroska,OGG (包括 OGM)\r\nMPEG-1 (包括 VCD)\r\nMPEG-2 (包括 DVD,SVCD)\r\nMPEG-4 (包括 iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (包括 WMV,WMA)\r\nMicrosoft RIFF (包括 AVI,WAV)\r\n纯声音格式 (AC3,DTS,AAC,AU,AIFF…)
  MegaBit1; MegaBit
  MegaBit2; MegaBits
  MegaBit3; MegaBits
@@ -108,49 +100,44 @@
  MiB; MiB
  Mib; Mib
  MiBps; MiB/s
- millisecond1;毫秒
- millisecond2;毫秒
- millisecond3;毫秒
- minute1;分
- minute2;分
- minute3;分
- month1;月
- month2;月
- month3;月
- pixel1;像素
- pixel2;像素
- pixel3;像素
- second1;秒
- second2;秒
- second3;秒
- text stream1;字幕
- text stream2;个字幕
- text stream3;个字幕
- video frames1; 帧
- video frames2; 帧
- video frames3; 帧
- video stream1;视频
- video stream2;个视频
- video stream3;个视频
- warppoint0;No warppoints
- warppoint1; warppoint
- warppoint2; warppoints
- warppoint3; warppoints
- week1;周
- week2;周
- week3;周
- year1;年
- year2;年
- year3;年
+millisecond1; 毫秒
+millisecond2; 毫秒
+millisecond3; 毫秒
+minute1; 分
+minute2; 分
+minute3; 分
+month2; 月
+month3; 月
+pixel2; 像素
+pixel3; 像素
+PixelAspectRatio;像素画面比例
+second2; 秒
+second3; 秒
+text stream2; 个字幕
+text stream3; 个字幕
+video frames1; 视频帧
+video frames2; 视频帧
+video frames3; 视频帧
+Video stream(s);视频流
+video stream2; 个视频
+video stream3; 个视频
+warppoint1; 跳跃点
+warppoint2; 跳跃点
+warppoint3; 跳跃点
+week2; 周
+week3; 周
+Width;宽度
+year2; 年
+year3; 年
 , ;, 
 : ;: 
-3D;
-3DType;
+3D;3D
+3DType;3D类型
 About;关于
 About_Hint;联系作者以及获得最新版
 Accompaniment;伴奏
-ActiveFormatDescription;
-ActiveFormatDescription_MuxingMode;
+ActiveFormatDescription;有效的格式描述
+ActiveFormatDescription_MuxingMode;有效的格式描述，混合模式
 Actor;演员
 Actor_Character;角色
 Added_Date;附加数据
@@ -164,50 +151,57 @@ Alignment;对齐方式
 Alignment_Aligned;对齐标注
 Alignment_Split;分离标注
 All;全部
+AlternateGroup;
 Archival_Location;归档地址
 Arranger;改编者
 ArtDirector;艺术指导
 AspectRatio;画面比例
 AssistantDirector;副导演
+At least one file;(至少要打开一个多媒体文件)
 at;于
-At least one file;至少要有一个文件
 Audio;音频
 Audio stream(s);音频流
+audio stream1; 音频流
 Audio_Codec_List;音频编解码器
 Audio_No;没有音频
 Audio1;音频1
 Audio2;音频2
-AudioComments;
-AudioCount;音频总数
-AudioDescriptionPresent;
-AudioDescriptionType;
-AudioLoudnessStandard;
-AudioTrackLayout;
+AudioComments;音频注释
+AudioCount;音频流总数
+AudioDescriptionPresent;音频描述
+AudioDescriptionType;音频描述类型
+AudioLoudnessStandard;音频音量标准
+AudioTrackLayout;音轨格式
 Author;作者
 BarCode;条形码
 Basic;基本
 Basic_Note;注意: 要了解更多关于此文件的信息, 请选择不同的视图 (表格, 树状图 ...)
-BitDepth;位深度
-BitDepth_Stored;
+bit1; 位
+BitDepth_Detected;
+BitDepth_Stored;存储的位深
 BitRate;码率
-BitRate_Encoded;
+BitRate_Encoded;编码码率
 BitRate_Maximum;最大码率
 BitRate_Minimum;最小码率
 BitRate_Mode;码率模式
-BitRate_Mode_CBR;CBR
-BitRate_Mode_VBR;VBR
+BitRate_Mode_CBR;恒定(CBR)
+BitRate_Mode_VBR;动态(VBR)
 BitRate_Nominal;额定码率
-Bits-(Pixel*Frame);bits/(pixel*frame)(数据密度)
+Bits-(Pixel*Frame);Bits/(Pixel*Frame)(数据密度)
 BufferSize;缓冲大小
+Byte1; 字节
 Cancel;取消
 Channel(s);声道
+channel1; 声道
 ChannelPositions;声道位置
 Chapter(s);段落
+chapter1; 段落
 Chapters;段落
 Chapters stream(s);段落流
+chapters stream1; 段落流
 Chapters_Codec_List;段落编解码器列表
 Chapters_No;没有段落
-ChaptersCount;段落数
+ChaptersCount;段落流总数
 CheckNewVersion;检查新版本
 Choose custom;自定义
 Choose custom sheet;选择自定义表格
@@ -216,20 +210,20 @@ Choose export format;选择输出格式
 Choose file(s);选择文件
 Choose filename;选择文件名
 Choose language;选择语言
-Choregrapher;编舞
+Choregrapher;动作指导
 Chroma;色度
 ChromaSubsampling;色度抽样
 Close;关闭
 Close all before open;打开新文件前关闭其他文件
-ClosedCaptionsLanguage;
-ClosedCaptionsPresent;
-ClosedCaptionsType;
+ClosedCaptionsLanguage;闭合的标题语言
+ClosedCaptionsPresent;闭合的标题描述
+ClosedCaptionsType;闭合的标题类型
 Codec;编解码器
 Codec_Description;编解码器描述
 Codec_Info;编解码器信息
 Codec_Profile;编码设置简介
 Codec_Settings;编解码器设置
-Codec_Settings_BVOP;编码设置, BVOP
+Codec_Settings_BVOP;编码设置,B帧
 Codec_Settings_CABAC;编码设置, CABAC
 Codec_Settings_Endianness;编码设置, Endianness
 Codec_Settings_Firm;编码设置, Firm
@@ -237,37 +231,37 @@ Codec_Settings_Floor;编码设置, Floor
 Codec_Settings_GMC;编码设置, GMC
 Codec_Settings_ITU;编码设置, ITU
 Codec_Settings_Law;编码设置, Law
-Codec_Settings_Matrix;编码设置, Matrix
-Codec_Settings_PacketBitStream;编码设置, Packet bitstream
+Codec_Settings_Matrix;编码设置,矩阵
+Codec_Settings_PacketBitStream;编码设置,数据包比特流
 Codec_Settings_QPel;编码设置, QPel
 Codec_Settings_Sign;编码设置, Sign
-Codec_Url;编码设置网址
-CodecID;编码设置ID
-CodecID_Description;编码描述
-CoDirector;
+Codec_Url;编解码器的网址
+CodecID;编解码器ID
+CodecID_Description;编解码器描述
+CoDirector;合作导演
 Collection;收集
 Colorimetry;比色法
 ColorSpace;色彩空间
-colour_primaries;颜色初选
-colour_range;
+colour_primaries;基色
+colour_range;色彩范围
 Comment;评论
 CommissionedBy;评论人
-Compilation;
+Compilation;编辑
 CompleteName;完整名称
-CompletionDate;
-Composer;作曲
+CompletionDate;完整日期
+Composer;作曲家
 Compression_Mode;压缩模式
 Compression_Mode_Lossless;无损
 Compression_Mode_Lossy;有损压缩
 Compression_Ratio;压缩比
 Conductor;指挥
-ContactEmail;
-ContactTelephoneNumber;
-Container and general information;文件格式和一般信息
+ContactEmail;联系邮件
+ContactTelephoneNumber;联系电话号码
+Container and general information;容器和一般信息
 ContentType;内容类型
 CoProducer;联合制片人
 Copyright;版权
-CopyrightYear;
+CopyrightYear;版权年份
 CostumeDesigner;服装设计
 Count;数量
 Country;国家(地区)
@@ -280,40 +274,43 @@ Cropped;公司规模
 Custom;自定义
 Customize;自定义
 Date;日期
+day1; 天
 Debug;调试
 Decimal point;小数点
 Delay;延迟
 Delay_Source;延迟, 初始值
 Delay_Source_Container;容器
-Delay_Source_Stream;Raw stream
+Delay_Source_Stream;Raw 流
 Delete;删除
-Description;说明
+Description;描述
 Digitized_Date;数字化日期
 Dimensions;规模
 Director;导演
 DirectorOfPhotography;摄影导演
+Disabled;
 DisplayAspectRatio;画面比例
-DisplayAspectRatio_CleanAperture;
-DisplayAspectRatio_Original;原始高宽比
-DistributedBy;发行
-Distributor;
+DisplayAspectRatio_CleanAperture;清除采样画面比例
+DisplayAspectRatio_Original;原始画面比例
+DistributedBy;发行人
+Distributor;分销商
 Donate;赞助
 DotsPerInch;点/英寸(DPI)
-Duration;长度
+Duration;持续时间
 Duration_End;结束时间
 Duration_Start;开始时间
 Edit;编辑
-EditedBy;编辑
+EditedBy;编辑者
+ElementCount;
 EMail;电子邮件
 Encoded_Application;编码程序
 Encoded_Date;编码日期
 Encoded_Library;编码函数库
 Encoded_Library_Settings;编码设置
 Encoded_Original;编码源
-EncodedBy;编码
+EncodedBy;编码者
 EPG_Positions;EPG位置(内部)
-EpisodeTitleNumber;
-Error_File;读文件时出错
+EpisodeTitleNumber;每集标题数字
+Error_File;读取文件时出错
 ExecutiveProducer;监制
 Exit;退出
 Exit_Hint;退出程序
@@ -330,6 +327,7 @@ File_Created_Date_Local;文件创建日期(本地)
 File_Hint;选择多媒体文件
 File_Modified_Date;最后修改日期
 File_Modified_Date_Local;最后修改日期(本地)
+file1; 文件
 FileExtension;扩展名
 FileName;文件名
 FileSize;文件大小
@@ -339,14 +337,15 @@ Folder (R)_Hint;选择一个文件夹(包含所有子文件夹)
 Folder (Recursively);文件夹 (包含子文件夹)
 Folder_Hint;选择文件夹
 FolderName;文件夹名　
-Format;文件格式
+Format;格式
 Format_Commercial;格式名称
-Format_Commercial_IfAny;
+Format_Commercial_IfAny;格式名称
 Format_Description;格式描述
 Format_Info;格式详情
-Format_Profile;格式简介
+Format_Level;
+Format_Profile;格式概况
 Format_Settings;格式设置
-Format_Settings_BVOP;格式设置, BVOP
+Format_Settings_BVOP;格式设置,B帧
 Format_Settings_CABAC;格式设置, CABAC
 Format_Settings_Emphasis;加强
 Format_Settings_Endianness;格式设置, Endianness
@@ -357,263 +356,266 @@ Format_Settings_GMC;格式设置, GMC
 Format_Settings_GOP;格式设置, GOP
 Format_Settings_ITU;格式设置, ITU
 Format_Settings_Law;格式设置, Law
-Format_Settings_Matrix;格式设置, Matrix
+Format_Settings_Matrix;格式设置,矩阵
 Format_Settings_Matrix_Custom;自定义
 Format_Settings_Matrix_Default;默认
 Format_Settings_Mode;模式
 Format_Settings_ModeExtension;扩展模式
-Format_Settings_PacketBitStream;格式设置, Packet bitstream
-Format_Settings_PictureStructure;
+Format_Settings_PacketBitStream;格式设置,数据包比特流
+Format_Settings_PictureStructure;格式设置,图像结构
 Format_Settings_PS;格式设置, PS
 Format_Settings_Pulldown;格式设置, Pulldown
 Format_Settings_QPel;格式设置, QPel
 Format_Settings_RefFrames;格式设置, ReFrames
 Format_Settings_SBR;格式设置, SBR
 Format_Settings_Sign;格式设置, Sign
-Format_Settings_Wrapping;
-Format_Url;编解码器网址
+Format_Settings_Wrapping;格式设置,封装模式
+Format_Tier;
+Format_Url;格式网址
 Format_Version;格式版本
-FpaManufacturer;
-FpaPass;
-FpaVersion;
+FpaManufacturer;FPA制造商
+FpaPass;FPA通过
+FpaVersion;FPA版本
 FrameCount;总帧数
 FrameRate;帧率
 FrameRate_Maximum;最大帧率
 FrameRate_Minimum;最小帧率
 FrameRate_Mode;帧率模式
 FrameRate_Mode_CFR;恒定
-FrameRate_Mode_VFR;可变
+FrameRate_Mode_VFR;动态
 FrameRate_Nominal;额定帧率
 FrameRate_Original;原始帧率
 General;概要
 Genre;风格
-Genre_000;Blues
-Genre_001;Classic Rock
-Genre_002;Country
-Genre_003;Dance
-Genre_004;Disco
-Genre_005;Funk
-Genre_006;Grunge
-Genre_007;Hip-Hop
-Genre_008;Jazz
-Genre_009;Metal
-Genre_010;New Age
-Genre_011;Oldies
-Genre_012;Other
-Genre_013;Pop
-Genre_014;R&B
-Genre_015;Rap
-Genre_016;Reggae
-Genre_017;Rock
-Genre_018;Techno
-Genre_019;Industrial
-Genre_020;Alternative
-Genre_021;Ska
-Genre_022;Death Metal
-Genre_023;Pranks
-Genre_024;Soundtrack
-Genre_025;Euro-Techno
-Genre_026;Ambient
-Genre_027;Trip-Hop
-Genre_028;Vocal
-Genre_029;Jazz+Funk
-Genre_030;Fusion
-Genre_031;Trance
-Genre_032;Classical
-Genre_033;Instrumental
-Genre_034;Acid
-Genre_035;House
-Genre_036;Game
-Genre_037;Sound Clip
-Genre_038;Gospel
-Genre_039;Noise
-Genre_040;AlternRock
-Genre_041;Bass
-Genre_042;Soul
-Genre_043;Punk
-Genre_044;Space
-Genre_045;Meditative
-Genre_046;Instrumental Pop
-Genre_047;Instrumental Rock
-Genre_048;Ethnic
-Genre_049;Gothic
-Genre_050;Darkwave
-Genre_051;Techno-Industrial
-Genre_052;Electronic
-Genre_053;Pop-Folk
-Genre_054;Eurodance
-Genre_055;Dream
-Genre_056;Southern Rock
-Genre_057;Comedy
-Genre_058;Cult
-Genre_059;Gangsta
-Genre_060;Top 40
-Genre_061;Christian Rap
-Genre_062;Pop/Funk
-Genre_063;Jungle
-Genre_064;Native American
-Genre_065;Cabaret
-Genre_066;New Wave
-Genre_067;Psychadelic
-Genre_068;Rave
-Genre_069;Showtunes
-Genre_070;Trailer
-Genre_071;Lo-Fi
-Genre_072;Tribal
-Genre_073;Acid Punk
-Genre_074;Acid Jazz
-Genre_075;Polka
-Genre_076;Retro
-Genre_077;Musical
-Genre_078;Rock & Roll
-Genre_079;Hard Rock
-Genre_080;Folk
-Genre_081;Folk-Rock
-Genre_082;National Folk
-Genre_083;Swing
-Genre_084;Fast Fusion
-Genre_085;Bebob
-Genre_086;Latin
-Genre_087;Revival
-Genre_088;Celtic
-Genre_089;Bluegrass
-Genre_090;Avantgarde
-Genre_091;Gothic Rock
-Genre_092;Progressive Rock
-Genre_093;Psychedelic Rock
-Genre_094;Symphonic Rock
-Genre_095;Slow Rock
-Genre_096;Big Band
-Genre_097;Chorus
-Genre_098;Easy Listening
-Genre_099;Acoustic
-Genre_100;Humour
-Genre_101;Speech
-Genre_102;Chanson
-Genre_103;Opera
-Genre_104;Chamber Music
-Genre_105;Sonata
-Genre_106;Symphony
-Genre_107;Booty Bass
-Genre_108;Primus
-Genre_109;Porn Groove
-Genre_110;Satire
-Genre_111;Slow Jam
-Genre_112;Club
-Genre_113;Tango
-Genre_114;Samba
-Genre_115;Folklore
-Genre_116;Ballad
-Genre_117;Power Ballad
-Genre_118;Rhythmic Soul
-Genre_119;Freestyle
-Genre_120;Duet
-Genre_121;Punk Rock
-Genre_122;Drum Solo
-Genre_123;A capella
-Genre_124;Euro-House
-Genre_125;Dance Hall
-Genre_126;Goa
-Genre_127;Drum & Bass
-Genre_128;Club-House
-Genre_129;Hardcore
-Genre_130;Terror
-Genre_131;Indie
-Genre_132;Britpop
-Genre_133;Negerpunk
-Genre_134;Polsk Punk
-Genre_135;Beat
-Genre_136;Christian Gangsta Rap
-Genre_137;Heavy Metal
-Genre_138;Black Metal
-Genre_139;Crossover
-Genre_140;Contemporary Christian
-Genre_141;Christian Rock
-Genre_142;Merengue
-Genre_143;Salsa
-Genre_144;Trash Metal
-Genre_145;Anime
-Genre_146;JPop
-Genre_147;Synthpop
-Genre_148;
-Genre_149;
-Genre_150;
-Genre_151;
-Genre_152;
-Genre_153;
-Genre_154;
-Genre_155;
-Genre_156;
-Genre_157;
-Genre_158;
-Genre_159;
-Genre_160;
-Genre_161;
-Genre_162;
-Genre_163;
-Genre_164;
-Genre_165;
-Genre_166;
-Genre_167;
-Genre_168;
-Genre_169;
-Genre_170;
-Genre_171;
-Genre_172;
-Genre_173;
-Genre_174;
-Genre_175;
-Genre_176;
-Genre_177;
-Genre_178;
-Genre_179;
-Genre_180;
-Genre_181;
-Genre_182;
-Genre_183;
-Genre_184;
-Genre_185;
-Genre_186;
-Genre_187;
-Genre_188;
-Genre_189;
-Genre_190;
-Genre_191;
+Genre_000;蓝调 (Blues)
+Genre_001;古典摇滚 (Classic Rock)
+Genre_002;乡村 (Country)
+Genre_003;舞曲 (Dance)
+Genre_004;迪士可 (Disco)
+Genre_005;疯克 (Funk)
+Genre_006;颓废 (Grunge)
+Genre_007;嘻哈 (Hip-Hop)
+Genre_008;爵士 (Jazz)
+Genre_009;金属 (Metal)
+Genre_010;新世纪 (New Age)
+Genre_011;老歌 (Oldies)
+Genre_012;其它类型 (Other)
+Genre_013;流行 (Pop)
+Genre_014;节奏蓝调 (R&B)
+Genre_015;饶舌 (Rap)
+Genre_016;雷盖 (Reggae)
+Genre_017;摇滚 (Rock)
+Genre_018;电音 (Techno)
+Genre_019;工业摇滚 (Industrial)
+Genre_020;另类 (Alternative)
+Genre_021;斯卡 (Ska)
+Genre_022;死亡金属 (Death Metal)
+Genre_023;恶作剧 (Pranks)
+Genre_024;原声带 (Soundtrack)
+Genre_025;欧式-电音 (Euro-Techno)
+Genre_026;环境 (Ambient)
+Genre_027;迷幻嘻哈 (Trip-Hop)
+Genre_028;人声 (Vocal)
+Genre_029;爵士+疯客 (Jazz+Funk)
+Genre_030;融合 (Fusion)
+Genre_031;玄幻 (Trance)
+Genre_032;古典 (Classical)
+Genre_033;器乐 (Instrumental)
+Genre_034;迷幻 (Acid)
+Genre_035;舞曲 (House)
+Genre_036;游戏 (Game)
+Genre_037;音效素材 (Sound Clip)
+Genre_038;福音 (Gospel)
+Genre_039;噪音 (Noise)
+Genre_040;另类摇滚 (AlternRock)
+Genre_041;贝斯 (Bass)
+Genre_042;爵士灵乐 (Soul)
+Genre_043;庞克 (Punk)
+Genre_044;空间 (Space)
+Genre_045;冥想 (Meditative)
+Genre_046;器乐流行 (Instrumental Pop)
+Genre_047;器乐摇滚 (Instrumental Rock)
+Genre_048;民族音乐 (Ethnic)
+Genre_049;歌德 (Gothic)
+Genre_050;黑潮 (Darkwave)
+Genre_051;电音-工业 (Techno-Industrial)
+Genre_052;电子 (Electronic)
+Genre_053;流行-民歌 (Pop-Folk)
+Genre_054;欧式舞曲 (Eurodance)
+Genre_055;梦幻 (Dream)
+Genre_056;南方摇滚 (Southern Rock)
+Genre_057;喜剧 (Comedy)
+Genre_058;狂热 (Cult)
+Genre_059;匪帮说唱 (Gangsta Rap)
+Genre_060;排行榜 (Top 40)
+Genre_061;基督饶舌 (Christian Rap)
+Genre_062;流行/疯克 (Pop/Funk)
+Genre_063;丛林 (Jungle)
+Genre_064;美洲原住民 (Native American)
+Genre_065;酒馆 (Cabaret)
+Genre_066;新潮 (New Wave)
+Genre_067;迷幻 (Psychedelic)
+Genre_068;狂欢舞会 (Rave)
+Genre_069;秀场音乐 (Showtunes)
+Genre_070;预告片 (Trailer)
+Genre_071;低保真 (Lo-Fi)
+Genre_072;部落 (Tribal)
+Genre_073;迷幻庞克 (Acid Punk)
+Genre_074;迷幻爵士 (Acid Jazz)
+Genre_075;波卡 (Polka)
+Genre_076;怀旧 (Retro)
+Genre_077;音乐剧 (Musical)
+Genre_078;摇滚 (Rock & Roll)
+Genre_079;硬式摇滚 (Hard Rock)
+Genre_080;民歌 (Folk)
+Genre_081;民歌摇滚 (Folk-Rock)
+Genre_082;国歌　(National Folk)
+Genre_083;摇摆 (Swing)
+Genre_084;爵士摇滚 (Fast Fusion)
+Genre_085;毕博普 (Bebop)
+Genre_086;拉丁 (Latin)
+Genre_087;复兴 (Revival)
+Genre_088;凯尔特 (Celtic)
+Genre_089;蓝草 (Bluegrass)
+Genre_090;前卫 (Avantgarde)
+Genre_091;歌德摇滚 (Gothic Rock)
+Genre_092;前卫摇滚 (Progressive Rock)
+Genre_093;迷幻摇滚 (Psychedelic Rock)
+Genre_094;交响摇滚 (Symphonic Rock)
+Genre_095;慢摇滚 (Slow Rock)
+Genre_096;大乐团 (Big Band)
+Genre_097;合唱 (Chorus)
+Genre_098;轻音乐 (Easy Listening)
+Genre_099;原味 (Acoustic)
+Genre_100;幽默 (Humour)
+Genre_101;演说 (Speech)
+Genre_102;法国香颂 (Chanson)
+Genre_103;歌剧 (Opera)
+Genre_104;室内乐 (Chamber Music)
+Genre_105;奏鸣曲 (Sonata)
+Genre_106;交响乐 (Symphony)
+Genre_107;煽情贝斯 (Booty Bass)
+Genre_108;前卫摇滚 (Primus)
+Genre_109;情色 (Porn Groove)
+Genre_110;讽刺 (Satire)
+Genre_111;即兴爵士 (Slow Jam)
+Genre_112;会所 (Club)
+Genre_113;探戈 (Tango)
+Genre_114;森巴 (Samba)
+Genre_115;民俗乐 (Folklore)
+Genre_116;抒情 (Ballad)
+Genre_117;强力抒情 (Power Ballad)
+Genre_118;节奏灵魂 (Rhythmic Soul)
+Genre_119;自由风 (Freestyle)
+Genre_120;二重奏 (Duet)
+Genre_121;庞克摇滚 (Punk Rock)
+Genre_122;独鼓 (Drum Solo)
+Genre_123;无伴奏清唱 (A Cappella)
+Genre_124;欧式-舞曲 (Euro-House)
+Genre_125;舞厅 (Dance Hall)
+Genre_126;果亚 (Goa)
+Genre_127;鼓&贝斯 (Drum & Bass)
+Genre_128;会所-舞曲 (Club-House)
+Genre_129;硬派 (Hardcore)
+Genre_130;惊悚 (Terror)
+Genre_131;独立制作 (Indie)
+Genre_132;英伦摇滚 (BritPop)
+Genre_133;黑人庞克 (Afro-Punk)
+Genre_134;波兰庞克 (Polsk Punk)
+Genre_135;打击乐 (Beat)
+Genre_136;基督帮派饶舌 (Christian Gangsta Rap)
+Genre_137;重金属 (Heavy Metal)
+Genre_138;黑金属 (Black Metal)
+Genre_139;跨界 (Crossover)
+Genre_140;当代基督 (Contemporary Christian)
+Genre_141;基督摇滚 (Christian Rock)
+Genre_142;默朗格 (Merengue)
+Genre_143;萨尔萨 (Salsa)
+Genre_144;敲击金属 (Thrash Metal)
+Genre_145;动画歌曲 (Anime)
+Genre_146;日本流行乐 (JPop)
+Genre_147;合成器流行 (Synthpop)
+Genre_148;抽象 (Abstract)
+Genre_149;艺术摇滚 (Art Rock)
+Genre_150;巴洛克 (Baroque)
+Genre_151;邦格拉 (Bhangra)
+Genre_152;摇摆舞 (Big Beat)
+Genre_153;碎拍 (Breakbeat)
+Genre_154;舒放音乐(Chillout)
+Genre_155;慢摇 (Downtempo)
+Genre_156;配乐 (Dub)
+Genre_157;工业暗电子 (EBM)
+Genre_158;混搭 (Eclectic)
+Genre_159;电子合成舞曲 (Electro)
+Genre_160;电子铙钹 (Electroclash)
+Genre_161;情感硬核 (Emo)
+Genre_162;尝试性 (Experimental)
+Genre_163;车库乐 (Garage)
+Genre_164;全球 (Global)
+Genre_165;智能舞曲 (IDM)
+Genre_166;病态环境 (Illbient)
+Genre_167;工业哥特摇滚 (Industro-Goth)
+Genre_168;即兴意味 (Jam Band)
+Genre_169;德国摇滚乐 (Krautrock)
+Genre_170;怪诞 (Leftfield)
+Genre_171;懒散 (Lounge)
+Genre_172;数学摇滚 (Math Rock)
+Genre_173;新浪漫主义 (New Romantic)
+Genre_174;碎拍 (Nu-Breakz)
+Genre_175;后疯克 (Post-Punk)
+Genre_176;后摇滚 (Post-Rock)
+Genre_177;迷幻摇滚 (Psytrance)
+Genre_178;自赏 (Shoegaze)
+Genre_179;太空摇滚 (Space Rock)
+Genre_180;热情摇滚 (Trop Rock)
+Genre_181;西方流行乐 (World Music)
+Genre_182;新古典主义 (Neoclassical)
+Genre_183;有声读物 (Audiobook)
+Genre_184;广播剧 (Audio Theatre)
+Genre_185;新德国浪潮 (Neue Deutsche Welle)
+Genre_186;播客 (Podcast)
+Genre_187;独立摇滚 (Indie Rock)
+Genre_188;匪帮疯克 (G-Funk)
+Genre_189;重音回响 (Dubstep)
+Genre_190;车库摇滚 (Garage Rock)
+Genre_191;心理环境 (Psybient)
 Go to WebSite;访问网站
-Grouping;
-Gop_OpenClosed;
-Gop_OpenClosed_Open;
-Gop_OpenClosed_Closed;
-Gop_OpenClosed_FirstFrame;
+Grouping;集团
+Gop_OpenClosed;GOP,开启/闭合
+Gop_OpenClosed_Open;开启
+Gop_OpenClosed_Closed;闭合
+Gop_OpenClosed_FirstFrame;GOP,开启/闭合第一帧
 h;小时
 Header file;创建头文件
-Height;画面高度
-Height_CleanAperture;
+Height;高度
+Height_CleanAperture;清除采样高度
 Height_Original;原始高度
 Help;帮助
 Hint;提示信息
-How many audio streams?;有多少个音轨?
-How many chapters streams?;有多少个段落?
-How many text streams?;有多少个字幕?
-How many video streams?;有多少视频?
+hour1; 小时
+How many audio streams?;有多少个音频流?
+How many chapters streams?;有多少个段落流?
+How many text streams?;有多少个字幕流?
+How many video streams?;有多少个视频流?
 HTML;网页
 ID;ID
-IdentClockStart;
+IdentClockStart;标识时钟开始
 Image;图像
 Image stream(s);图像流
+image stream1; 图像流
 Image_Codec_List;图像编解码器列表
 ImageCount;图像数
 Info;信息
-Instruments;乐器
+Instruments;方法
 Interlaced_BFF;偶数场(后场BFF)优先
 Interlaced_Interlaced;隔行扫描
 Interlaced_PPF;逐行扫描
 Interlaced_Progressive;逐行扫描
 Interlaced_TFF;奇数场(前场TFF)优先
-Interlacement;隔行扫描模式
-Interleave_Duration;交错间隔时间
-Interleave_Preload;音频预读时间
-Interleave_VideoFrames;交错帧间隔
+Interlacement;隔行扫描
+Interleave_Duration;交错,间隔时间
+Interleave_Preload;交错,预读时间
+Interleave_VideoFrames;交错,帧间隔
 Interleaved;交错
 InternetMediaType;因特网媒体类型
 IRCA;IRCA
@@ -625,234 +627,235 @@ Known formats;已知格式
 Known parameters;已知参数
 Label;标签
 Language;语言
-Language_aa;Afar
-Language_ab;Abkhazian
-Language_ae;Avestan
-Language_af;Afrikaans
-Language_ak;Akan
-Language_am;Amharic
-Language_an;Aragonese
-Language_ar;Arabic
-Language_as;Assamese
-Language_av;Avaric
-Language_ay;Aymara
-Language_az;Azerbaijani
-Language_ba;Bashkir
-Language_be;Belarusian
-Language_bg;Bulgarian
-Language_bh;Bihari
-Language_bi;Bislama
-Language_bm;Bambara
-Language_bn;Bengali
-Language_bo;Tibetan
-Language_br;Breton
-Language_bs;Bosnian
-Language_ca;Catalan
-Language_ce;Chechen
-Language_ch;Chamorro
-Language_co;Corsican
-Language_cr;Cree
-Language_cs;Czech
-Language_cu;Slave
-Language_cv;Chuvash
-Language_cy;Welsh
-Language_da;Danish
-Language_de;German
-Language_dv;Divehi
-Language_dz;Dzongkha
-Language_ee;Ewe
-Language_el;Greek
-Language_en;English
-Language_en-gb;English (Great Britain)
-Language_en-us;English (United States)
-Language_eo;Esperanto
-Language_es;Spanish
-Language_et;Estonian
-Language_eu;Basque
-Language_fa;Persian
-Language_ff;Fulah
-Language_fi;Finnish
-Language_fj;Fijian
-Language_fo;Faroese
-Language_fr;French
-Language_fy;Frisian
-Language_ga;Irish
-Language_gd;Gaelic
-Language_gl;Galician
-Language_gn;Guarani
-Language_gu;Gujarati
-Language_gv;Manx
-Language_ha;Hausa
-Language_he;Hebrew
-Language_hi;Hindi
-Language_ho;Hiri Motu
-Language_hr;Croatian
-Language_ht;Haitian
-Language_hu;Hungarian
-Language_hy;Armenian
-Language_hz;Herero
-Language_ia;Auxiliary Language Association
-Language_id;Indonesian
-Language_ie;Interlingue
-Language_ig;Igbo
-Language_ii;Sichuan Yi
-Language_ik;Inupiaq
+Language_aa;伊索匹亚语 (Afar)
+Language_ab;阿布哈兹语 (Abkhazian)
+Language_ae;古波斯语 (Avestan)
+Language_af;南非语 (Afrikaans)
+Language_ak;阿坎语 (Akan)
+Language_am;阿姆哈拉语 (Amharic)
+Language_an;阿拉贡语 (Aragonese)
+Language_ar;阿拉伯语 (Arabic)
+Language_as;阿萨姆语 (Assamese)
+Language_av;阿瓦尔语 (Avaric)
+Language_ay;艾马拉语 (Aymara)
+Language_az;亚塞拜然语 (Azerbaijani)
+Language_ba;巴什噶尔语 (Bashkir)
+Language_be;白俄罗斯语 (Belarusian)
+Language_bg;保加利亚语 (Bulgarian)
+Language_bh;比哈尔语 (Bihari)
+Language_bi;必斯拉马语 (Bislama)
+Language_bm;班巴拉语 (Bambara)
+Language_bn;孟加拉语 (Bengali)
+Language_bo;西藏语 (Tibetan)
+Language_br;布里多尼语 (Breton)
+Language_bs;波斯尼亚语 (Bosnian)
+Language_ca;加泰隆尼亚语 (Catalan)
+Language_ce;车臣语 (Chechen)
+Language_ch;查莫罗语 (Chamorro)
+Language_co;科西嘉语 (Corsican)
+Language_cr;克里语 (Cree)
+Language_cs;捷克语 (Czech)
+Language_cu;古教会斯拉夫语 (Slave)
+Language_cv;楚瓦什语 (Chuvash)
+Language_cy;威尔斯语 (Welsh)
+Language_da;丹麦语 (Danish)
+Language_de;德语 (German)
+Language_dv;迪维希语 (Divehi)
+Language_dz;不丹语 (Dzongkha)
+Language_ee;埃维语 (Ewe)
+Language_el;希腊语 (Greek)
+Language_en;英语 (English)
+Language_en-gb;英语 (英国) (English,Great Britain)
+Language_en-us;英语 (美国) (English,United States)
+Language_eo;世界语 (Esperanto)
+Language_es;西班牙语 (Spanish)
+Language_es-419;
+Language_et;爱沙尼亚语 (Estonian)
+Language_eu;巴斯克语 (Basque)
+Language_fa;波斯语 (Persian)
+Language_ff;富拉赫语 (Fulah)
+Language_fi;芬兰语 (Finnish)
+Language_fj;斐济语 (Fijian)
+Language_fo;法罗斯语 (Faroese)
+Language_fr;法语 (French)
+Language_fy;弗利然群岛语 (Frisian)
+Language_ga;爱尔兰语 (Irish)
+Language_gd;苏格兰盖尔语 (Gaelic)
+Language_gl;加里西亚语 (Galician)
+Language_gn;巴拉圭语 (Guarani)
+Language_gu;古吉拉特语 (Gujarati)
+Language_gv;曼岛语 (Manx)
+Language_ha;豪撒语 (Hausa)
+Language_he;希伯来语 (Hebrew)
+Language_hi;印地语 (Hindi)
+Language_ho;希里木托语 (Hiri Motu)
+Language_hr;克罗埃西亚语 (Croatian)
+Language_ht;海地语 (Haitian)
+Language_hu;匈牙利语 (Hungarian)
+Language_hy;亚美尼亚语 (Armenian)
+Language_hz;赫雷罗语 (Herero)
+Language_ia;国际语 (Auxiliary Language Association)
+Language_id;印尼语 (Indonesian)
+Language_ie;国际语 (Interlingue)
+Language_ig;伊格博语 (Igbo)
+Language_ii;四川彝语 (Sichuan Yi)
+Language_ik;因纽必语 (Inupiaq)
 Language_Info;语言信息
-Language_io;Ido
-Language_is;Icelandic
-Language_it;Italian
-Language_iu;Inuktitut
-Language_ja;Japanese
-Language_jv;Javanese
-Language_ka;Georgian
-Language_kg;Kongo
-Language_ki;Kikuyu
-Language_kj;Kuanyama
-Language_kk;Kazakh
-Language_kl;Kalaallisut
-Language_km;Khmer
-Language_kn;Kannada
-Language_ko;Korean
-Language_kr;Kanuri
-Language_ks;Kashmiri
-Language_ku;Kurdish
-Language_kv;Komi
-Language_kw;Cornish
-Language_ky;Kirghiz
-Language_la;Latin
-Language_lb;Luxembourgish
-Language_lg;Ganda
-Language_li;Limburgish
-Language_ln;Lingala
-Language_lo;Lao
-Language_lt;Lithuanian
-Language_lu;Luba-Katanga
-Language_lv;Latvian
-Language_mg;Malagasy
-Language_mh;Marshallese
-Language_mi;Maori
-Language_mk;Macedonian
-Language_ml;Malayalam
-Language_mn;Mongolian
-Language_mo;Moldavian
+Language_io;伊多语 (Ido)
+Language_is;冰岛语 (Icelandic)
+Language_it;义大利语 (Italian)
+Language_iu;伊努特语 (Inuktitut)
+Language_ja;日语 (Japanese)
+Language_jv;爪哇语 (Javanese)
+Language_ka;乔治亚语 (Georgian)
+Language_kg;刚果语 (Kongo)
+Language_ki;基库尤语 (Kikuyu)
+Language_kj;贡耶玛语 (Kuanyama)
+Language_kk;哈萨克语 (Kazakh)
+Language_kl;格陵兰语 (Kalaallisut)
+Language_km;高棉语 (Khmer)
+Language_kn;坎纳达语 (Kannada)
+Language_ko;韩语 (Korean)
+Language_kr;卡努里语 (Kanuri)
+Language_ks;克什米尔语 (Kashmiri)
+Language_ku;库德语 (Kurdish)
+Language_kv;科米语 (Komi)
+Language_kw;康瓦耳语 (Cornish)
+Language_ky;吉尔吉斯语 (Kirghiz)
+Language_la;拉丁语 (Latin)
+Language_lb;卢森堡语 (Luxembourgish)
+Language_lg;干达语 (Ganda)
+Language_li;林堡语 (Limburgish)
+Language_ln;班图语 (Lingala)
+Language_lo;寮国语 (Lao)
+Language_lt;立陶宛语 (Lithuanian)
+Language_lu;卢巴卡丹加语 (Luba-Katanga)
+Language_lv;拉脱维亚语 (Latvian)
+Language_mg;马达加西语 (Malagasy)
+Language_mh;马绍尔语 (Marshallese)
+Language_mi;毛利语 (Maori)
+Language_mk;马其顿语 (Macedonian)
+Language_ml;马拉雅拉姆语 (Malayalam)
+Language_mn;蒙古语 (Mongolian)
+Language_mo;摩达维亚语 (Moldavian)
 Language_More;语言, 详情
-Language_mr;Marathi
-Language_ms;Malay
-Language_mt;Maltese
+Language_mr;马拉塔语 (Marathi)
+Language_ms;马来语 (Malay)
+Language_mt;马尔他语 (Maltese)
 Language_mul;多国语言
-Language_my;Burmese
-Language_na;Nauru
-Language_nb;Norwegian Bokmal
-Language_nd;Ndebele
-Language_ne;Nepali
-Language_ng;Ndonga
-Language_nl;Dutch
-Language_nn;Norwegian Nynorsk
-Language_no;Norwegian
-Language_nr;Ndebele
-Language_nv;Navaho
-Language_ny;Nyanja
-Language_oc;Occitan
-Language_oj;Ojibwa
-Language_om;Oromo
-Language_or;Oriya
-Language_os;Ossetic
-Language_pa;Panjabi
-Language_pi;Pali
-Language_pl;Polish
-Language_ps;Pushto
-Language_pt;Portuguese
-Language_pt-br;Portuguese (Brazil)
-Language_qu;Quechua
-Language_rm;Raeto-Romance
-Language_rn;Rundi
-Language_ro;Romanian
-Language_ru;Russian
-Language_rw;Kinyarwanda
-Language_sa;Sanskrit
-Language_sc;Sardinian
-Language_sd;Sindhi
-Language_se;Northern Sami
-Language_sg;Sango
-Language_si;Sinhala
-Language_sk;Slovak
-Language_sl;Slovenian
-Language_sm;Samoan
-Language_sn;Shona
-Language_so;Somali
-Language_sq;Albanian
-Language_sr;Serbian
-Language_ss;Swati
-Language_st;Sotho
-Language_su;Sundanese
-Language_sv;Swedish
-Language_sw;Swahili
-Language_ta;Tamil
-Language_te;Telugu
-Language_tg;Tajik
-Language_th;Thai
-Language_ti;Tigrinya
-Language_tk;Turkmen
-Language_tl;Tagalog
-Language_tn;Tswana
-Language_to;Tonga
-Language_tr;Turkish
-Language_ts;Tsonga
-Language_tt;Tatar
-Language_tw;Twi
-Language_ty;Tahitian
-Language_ug;Uighur
-Language_uk;Ukrainian
-Language_ur;Urdu
-Language_uz;Uzbek
-Language_ve;Venda
-Language_vi;Vietnamese
-Language_vo;Volapuk
-Language_wa;Walloon
-Language_wo;Wolof
-Language_xh;Xhosa
-Language_yi;Yiddish
-Language_yo;Yoruba
-Language_za;Zhuang
-Language_zh;中文
-Language_zh-cn;简体中文
-Language_zh-tw;繁体中文
-Language_zu;Zulu
+Language_my;缅甸语 (Burmese)
+Language_na;诺鲁语 (Nauru)
+Language_nb;挪威波克默尔语 (Norwegian Bokmal)
+Language_nd;北恩德贝勒语 (Ndebele)
+Language_ne;尼泊尔语 (Nepali)
+Language_ng;恩东加语 (Ndonga)
+Language_nl;荷兰语 (Dutch)
+Language_nn;新挪威语 (Norwegian Nynorsk)
+Language_no;挪威语 (Norwegian)
+Language_nr;南恩德贝勒语 (Ndebele)
+Language_nv;纳瓦霍语 (Navaho)
+Language_ny;尼扬贾语 (Nyanja)
+Language_oc;奥克西坦语 (Occitan)
+Language_oj;奥吉布瓦语 (Ojibwa)
+Language_om;澳洛莫语 (Oromo)
+Language_or;奥里雅语 (Oriya)
+Language_os;奥塞梯语 (Ossetic)
+Language_pa;旁遮普语 (Panjabi)
+Language_pi;巴利语 (Pali)
+Language_pl;波兰语 (Polish)
+Language_ps;阿富汗语 (Pushto)
+Language_pt;葡萄牙语 (Portuguese)
+Language_pt-br;葡萄牙语 (巴西) (Portuguese,Brazil)
+Language_qu;印加语 (Quechua)
+Language_rm;罗曼语 (Raeto-Romance)
+Language_rn;可兰地语 (Rundi)
+Language_ro;罗马尼亚语 (Romanian)
+Language_ru;俄语 (Russian)
+Language_rw;卢安达语 (Kinyarwanda)
+Language_sa;梵语 (Sanskrit)
+Language_sc;萨丁尼亚语 (Sardinian)
+Language_sd;信德语 (Sindhi)
+Language_se;萨米语 (Northern Sami)
+Language_sg;桑戈语 (Sango)
+Language_si;锡兰语 (Sinhala)
+Language_sk;斯洛伐克语 (Slovak)
+Language_sl;斯洛维尼亚语 (Slovenian)
+Language_sm;萨摩亚语 (Samoan)
+Language_sn;绍纳语 (Shona)
+Language_so;索马利语 (Somali)
+Language_sq;阿尔巴尼亚语 (Albanian)
+Language_sr;塞尔维亚语 (Serbian)
+Language_ss;史瓦济兰语 (Swati)
+Language_st;索托语 (Sotho)
+Language_su;巽他语 (Sundanese)
+Language_sv;瑞典语 (Swedish)
+Language_sw;斯华西里语 (Swahili)
+Language_ta;坦米尔语 (Tamil)
+Language_te;泰卢固语 (Telugu)
+Language_tg;塔吉克语 (Tajik)
+Language_th;泰语 (Thai)
+Language_ti;达米亚语 (Tigrinya)
+Language_tk;土库曼语 (Turkmen)
+Language_tl;菲律宾语 (Tagalog)
+Language_tn;茨瓦纳语 (Tswana)
+Language_to;东加语 (Tonga)
+Language_tr;土耳其语 (Turkish)
+Language_ts;聪加语 (Tsonga)
+Language_tt;鞑靼语 (Tatar)
+Language_tw;奇族语 (Twi)
+Language_ty;大溪地语 (Tahitian)
+Language_ug;维吾尔语 (Uighur)
+Language_uk;乌克兰语 (Ukrainian)
+Language_ur;晤鲁都语 (Urdu)
+Language_uz;乌兹别克语 (Uzbek)
+Language_ve;文达语 (Venda)
+Language_vi;越南语 (Vietnamese)
+Language_vo;沃拉卜克语 (Volapuk)
+Language_wa;华隆语 (Walloon)
+Language_wo;沃洛夫语 (Wolof)
+Language_xh;科萨语 (Xhosa)
+Language_yi;意地绪语 (Yiddish)
+Language_yo;库哇语 (Yoruba)
+Language_za;壮语 (Zhuang)
+Language_zh;中文 (Chinese)
+Language_zh-cn;中文 (中国) (Chinese,China)
+Language_zh-tw;中文 (台湾) (Chinese,Taiwan)
+Language_zu;祖鲁语 (Zulu)
 LawRating;分级
 LCCN;LCCN
 Library;合成函数库
 Lightness;高亮
-LineUpStart;
+LineUpStart;行向上开始
 List;列表
 Lyricist;作词
 Lyrics;歌词
 Mastered_Date;母带完成日期
-MasteredBy;母带制做
-MasteringDisplay_ColorPrimaries;
-MasteringDisplay_Luminance;
-Matrix_Channel(s);
-Matrix_ChannelPositions;
+MasteredBy;母带制作
+MasteringDisplay_ColorPrimaries;控制显示基色
+MasteringDisplay_Luminance;控制显示亮度
+Matrix_Channel(s);矩阵编码,信道
+Matrix_ChannelPositions;矩阵编码,信道位置
 matrix_coefficients;矩阵系数
-Matrix_Format;
-MaxCLL;
-MaxFALL;
-MediaInfo_About;支持多种格式的多媒体文件:\r\nMatroska, OGG (包括 OGM)\r\nMPEG-1 (包括 VCD)\r\nMPEG-2 (包括 DVD, SVCD)\r\nMPEG-4 (包括 iTunes M4A)\r\nQuicktime\r\nRealMedia\r\nWindowsMedia (包括 WMV, WMA)\r\nMicrosoft RIFF (包括 AVI, WAV)\r\n纯声音格式 (AC3, DTS, AAC, AU, AIFF...)
+Matrix_Format;矩阵编码,格式
+MaxCLL;最大内容亮度等级
+MaxFALL;最大帧平均亮度等级
 Menu;菜单
-Menu stream(s);菜单
+Menu stream(s);菜单流
 Menu_Codec_List;菜单编解码器
 Menu_Hint;更多选择
 Menu_No;没有菜单
-MenuCount;菜单数
+MenuCount;菜单流总数
 MenuID;菜单ID
 mn;分
+month1; 月
 Mood;情绪
 More;更多
-Movie;电影
-ms; ms
+Movie;电影名称
+ms;毫秒
 MSDI;MSDI
 MusicBy;音乐制作
 MuxingMode;混合模式
-MuxingMode_MoreInfo;详细信息
+MuxingMode_MoreInfo;混合模式,详细信息
 MuxingMode_PackedBitstream;打包的比特流
 Name;名称
 Nationality;国藉
@@ -871,7 +874,7 @@ Open;打开
 OpenCandy_01;正在下载 ________
 OpenCandy_02;__% 已完成
 OpenCandy_03;网络连接中断
-OpenCandy_04;________ 完成下载
+OpenCandy_04;________ 下载完成
 OpenCandy_05;点击开始安装 ________
 OpenCandy_06;确定要取消安装吗？\r\n如果要继续安装，请点击'否'。\r\n提示：你可以点击菜单中的‘退出’，当下次启动电脑的时候再安装。
 OpenCandy_07;________ 的下载被暂停。\r\n请点击任务栏右侧托盘中的图标继续下载。
@@ -886,8 +889,8 @@ OpenCandy_15;正在下载___________（由 ___________ 推荐）。当下载完�
 OpenCandy_16;___________ 可以开始安装了。
 OpenCandy_17;___________ 已下载完成，请点击'安装'继续。
 OpenCandy_18;___________个（共___________个）已下载。
-OpenCandy_19;使用OpenCandy实现
-OpenCandy_20;访问OpenCandy.com了解更多信息。
+OpenCandy_19;由 OpenCandy 提供
+OpenCandy_20;访问 OpenCandy.com 了解更多信息。
 OpenCandy_21;安装
 OpenCandy_22;安装 ___________
 OpenCandy_23;将取消安装 ___________\r\n确定要退出吗？
@@ -902,21 +905,22 @@ OpenCandy_31;请选择一个安装选项
 OpenCandy_32;安装 ___________
 OpenCandy_33;不安装
 OpenCandy_34;请选择一个安装选项
-OpenCandy_35;______ 推荐使用软件
-OpenCandy_36;您当前的配置将不会被阻止
-OpenCaptionsLanguage;
-OpenCaptionsPresent;
-OpenCaptionsType;
+OpenCandy_35;______ 推荐此软件
+OpenCandy_36;您当前的安装不会被中断
+OpenCaptionsLanguage;打开字幕语言
+OpenCaptionsPresent;打开字幕介绍
+OpenCaptionsType;打开字幕格式
 Options;选项
 Options_Hint;参数设定
 Original;源
-OriginalNetworkName;源网络名称
-OriginalSourceForm;资源来源
-OriginalSourceMedium;资源媒介
-Originator;
+OriginalNetworkName;原始网络名称
+OriginalSourceForm;原始源来自
+OriginalSourceMedium;原始源媒体
+OriginalSourceMedium_ID;
+Originator;创作者
 Other;其它
-OtherIdentifier;
-OtherIdentifierType;
+OtherIdentifier;其它标识符
+OtherIdentifierType;其它标识符类型
 Output;输出
 Output format;输出格式
 OverallBitRate;平均混合码率
@@ -924,110 +928,116 @@ OverallBitRate_Maximum;最大混合码率
 OverallBitRate_Minimum;最小混合码率
 OverallBitRate_Mode;混合码率模式
 OverallBitRate_Nominal;额定混合码率
-Part;部分
+PackageName;
+Part;分段
 Part_Count;总计
-PartNumber;
-PartTotal;
-Performer;艺术家
+PartNumber;段数
+PartTotal;分段总数
+Performer;演员
 Period;时代
 Phone;电话
-PictureRatio;
-PixelAspectRatio;画面比例(像素)
-PixelAspectRatio_CleanAperture;
-PixelAspectRatio_Original;画面比例(像素)
+PictureRatio;画面比率
+pixel1; 像素
+PixelAspectRatio_CleanAperture;清除采样像素画面比例
+PixelAspectRatio_Original;原始像素画面比例
 PlayCounter;播放计数器
 Played_Count;已播放时间
-Played_First_Date;首次播放的
-Played_Last_Date;最后播放的
+Played_First_Date;首次播放
+Played_Last_Date;最后播放
 PlayTime;播放时间
+PodcastCategory;
 Position;位置
 Position_Total;总计
 Preferences;参数设置
-PrimaryAudioLanguage;
+PrimaryAudioLanguage;主音频语言
 Producer;制片人
-ProductionDesigner;制做设计师
-ProductionNumber;
-ProductionStudio;制做机构
-ProductPlacement;
-ProgrammeHasText;
-ProgrammeTextLanguage;
-ProgrammeTitle;
-Publisher;发行
+ProductionDesigner;美术指导
+ProductionNumber;制作数
+ProductionStudio;制作机构
+ProductPlacement;产品布局
+ProgrammeHasText;程序特征文本
+ProgrammeTextLanguage;程序文本语言
+ProgrammeTitle;程序标题
+Publisher;发行人
 Purchased_Date;购买日期
 Quote character;引用符号
-RadioStation;电台
+RadioStation;电台配置
 Rating;分级
 Recorded_Date;录制日期
-Recorded_Location;录制地点
+Recorded_Location;录制位置
 Released_Date;发布日期
 RemixedBy;重新混合
 ReplayGain_Gain;回放增益
 ReplayGain_Peak;回放增益峰值
 Resolution;分辨率
 s;秒
-SamplingCount;样本计数
+SamplesPerFrame;
+SamplingCount;采样数
 SamplingRate;采样率
 Save;保存
 ScanOrder;扫描顺序
-ScanOrder_Original;
-ScanOrder_Stored;
-ScanOrder_StoredDisplayedInverted;
-ScanOrder_StoreMethod;
+ScanOrder_Original;原始扫描顺序
+ScanOrder_Stored;存储的扫描顺序
+ScanOrder_StoredDisplayedInverted;扫描顺序,反转的存储/显示顺序
+ScanOrder_StoreMethod;扫描顺序,存储方式
 ScanType;扫描方式
-ScanType_Original;
-ScanType_StoreMethod;
+ScanType_Original;原始扫描方式
+ScanType_StoreMethod;存储的扫描方式
 ScreenplayBy;编剧
 Season;季
-SecondaryAudioLanguage;
-see below;请看下面列出的内容
-Send HeaderFile;发送头文件: http://sourceforge.net/projects/mediainfo/
+second1; 秒
+SecondaryAudioLanguage;次音频语言
+see below;详见下述
+Send HeaderFile;发送头文件到: http://sourceforge.net/projects/mediainfo/
 Separator_Columns;列分隔符
-Separator_Lines;换行符
-SeriesTitle;
+Separator_Lines;行分隔符
+SeriesTitle;列标题
 ServiceChannel;服务频道号码
-ServiceName;服务名
-ServiceProvider;服务提供
+ServiceKind;
+ServiceName;服务名称
+ServiceProvider;服务提供者
 ServiceType;服务类型
-Set;设置
-Set_Count;设置项目
+Set;设定
+Set_Count;设定项目
 Setup;设置
-Sharpness;锐利
+Sharpness;锐利度
 Sheet;表格
 Sheet (Complete);表格(完整)
 Shell extension;[资源管理器]右键菜单 (为多媒体文件的右键菜单添加 MediaInfo 选项)
 Shell extension, folder;包含文件夹右键
 Shell InfoTip;[资源管理器]气泡提示 (将鼠标移到文件图标上会显示相关信息)
-ShimName;
-ShimVersion;
+ShimName;Shim名称
+ShimVersion;Shim版本
 Show menu;显示菜单
 Show toolbar;显示工具栏
-SigningPresent;
-SignLanguage;
+SigningPresent;签名介绍
+SignLanguage;签名语言
 Sort;排序
 SoundEngineer;录音师
-Source;
-Source_Duration;
-Source_FrameCount;
-Source_SamplingCount;
-Source_StreamSize;
-Source_StreamSize_Encoded;
+Source;源
+Source_Duration;源时长
+Source_FrameCount;源帧数
+Source_SamplingCount;源采样数
+Source_StreamSize;源流大小
+Source_StreamSize_Encoded;源编码的流大小
 Standard;标准
-StoreMethod_InterleavedFields;
-StoreMethod_SeparatedFields;
-StoreMethod_SeparatedFields_1;
-StoreMethod_SeparatedFields_2;
+StoreMethod_InterleavedFields;隔行扫描的域
+StoreMethod_SeparatedFields;逐行扫描的域
+StoreMethod_SeparatedFields_1;逐行扫描的域（每块1域）
+StoreMethod_SeparatedFields_2;逐行扫描的域（每块2域）
 Stream;流
-Stream_MoreInfo;更多信息
+Stream_MoreInfo;关于此流的更多信息
 StreamCount;此类型流的数量
 StreamID;流ID
 StreamKind;流类型
 StreamKindID;流ID
 StreamKindPos;流ID
-StreamSize;大小
-StreamSize_Encoded;
+StreamSize;流大小
+StreamSize_Demuxed;
+StreamSize_Encoded;编码的流大小
 StreamSize_Proportion;流属性
 Subject;主题
-SubTrack;子轨道
+SubTrack;副标道
 Summary;摘要
 Supported formats;支持的格式
 Supported?;支持?
@@ -1037,74 +1047,77 @@ Tagged_Application;标记软件
 Tagged_Date;标记日期
 Technician;技术员
 TermsOfUse;使用方法
-TertiaryAudioLanguage;
+TertiaryAudioLanguage;第三音频语言
 Text;文本
 Text - Custom;文本-自定义
 Text (HTML);文本(HTML)
-Text stream(s);文字流
-Text streams;文字流
+Text stream(s);文本流
+text stream1; 字幕
+Text streams;文本流
 Text_Codec_List;字幕编解码器
 Text_No;没有字幕
 Text1;字幕1
 Text2;字幕2
 Text3;字幕3
-TextCount;字幕总数
-TextlessElementsExist;
+TextCount;字幕流总数
+TextlessElementsExist;无文本元素存在
 ThanksTo;感谢
 Thousands separator;数字分隔符
-TimeCode;
-TimeCode_FirstFrame;
-TimeCode_Settings;
-TimeCode_Source;
-TimeCode_Striped;
-TimeStamp;
+TimeCode;时间编码
+TimeCode_FirstFrame;第一帧时间编码
+TimeCode_Settings;时间编码设置
+TimeCode_Source;时间编码源
+TimeCode_Striped;时间编码条
+TimeStamp;时间标志
 TimeZone;时区
 Title;标题
-Title_More;更多标题
+Title_More;标题,更多信息
 Total;总计
-TotalNumberOfParts;
-TotalProgrammeDuration;
-Track;音轨
+TotalNumberOfParts;分段总数
+TotalProgrammeDuration;程序时长总计
+Track;音轨名
 Track_Count;音轨数
 transfer_characteristics;传输特质
 Translator;翻译
 Tree;树状图
 Tree & Text;树状图和文本
-Type;
+Type;类型
 UniqueID;唯一ID
-Unknown;不详
-Url;相关网址
+Unknown;未知
+Url;网址
 Video;视频
-Video stream(s);视频流/多条
+video stream1; 视频
 Video_Codec_List;视频编解码器
-Video_Delay;视频延迟
+Video_Delay;音频延迟
 Video_No;没有视频
 Video0_Delay;视频延迟
 Video1;视频1
-VideoComments;
-VideoCount;视频总数
+VideoComments;视频注释
+VideoCount;视频流总数
 View;查看
-View_Hint;改变查看方示
+View_Hint;改变查看方式
 Warning : more streams in the files;注意：这个文件中还有更多的流
+warppoint0; 无跳跃点
 Web;网页
-WebSite_Audio;访问此音频编解码器的网页
-WebSite_Audio_More;更多音频编解码器的网页
-WebSite_General;访问此播放程序的网页
-WebSite_General_More;更多播放程序的网页
-WebSite_Text;访问此文字编解码器的网页
-WebSite_Text_More;更多文字编解码器的网页
-WebSite_Url;网址http://MediaArea.net/MediaInfo
-WebSite_Video;访问此视频编解码器的网页
-WebSite_Video_More;更多视频编解码器的网页(%Url%)
-Width;画面宽度
-Width_CleanAperture;
+WebSite_Audio;访问此音频编解码器的网站
+WebSite_Audio_More;访问网站 (%Url%) 查找此音频编解码器
+WebSite_General;访问此播放程序的网站
+WebSite_General_More;访问此播放程序的网站
+WebSite_Text;访问此字幕编解码器的网站
+WebSite_Text_More;访问网站 (%Url%) 查找此字幕编解码器
+WebSite_Url;http://MediaArea.net/MediaInfo
+WebSite_Video;访问此视频编解码器的网站
+WebSite_Video_More;访问网站 (%Url%) 查找此视频编解码器
+week1; 周
+Width_CleanAperture;清除采样宽度
 Width_Original;原始宽度
 WriteMe;给作者写信
 WriteToTranslator;给译者写信
 Written_Date;写入日期
-Written_Location;写入地点
-WrittenBy;作者
+Written_Location;写入位置
+WrittenBy;书写人:
+year1; 年
 Yes;是
 Your system;您的系统
-ZZ_Automatic_Percent;87
-ZZ_AutomaticLanguage_Percent;90
+ZZ_Automatic_Percent;98
+ZZ_AutomaticLanguage_Percent;98

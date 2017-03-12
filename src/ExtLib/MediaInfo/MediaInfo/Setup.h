@@ -285,6 +285,16 @@
         #define MEDIAINFO_DEMUX 1
     #endif
 #endif
+#if !defined(MEDIAINFO_DECODE)
+    #if defined(MEDIAINFO_DECODE_NO) && defined(MEDIAINFO_DECODE_YES)
+        #undef MEDIAINFO_DECODE_NO //MEDIAINFO_DECODE_YES has priority
+    #endif
+    #if defined(MEDIAINFO_DECODE_NO)
+        #define MEDIAINFO_DECODE 0
+    #else
+        #define MEDIAINFO_DECODE 1
+    #endif
+#endif
 #if MEDIAINFO_DEMUX && !MEDIAINFO_EVENTS
     pragma error MEDIAINFO_DEMUX can be set to 1 only if MEDIAINFO_EVENTS is set to 1
 #endif

@@ -1988,7 +1988,7 @@ void File_Mpeg_Descriptors::Descriptor_28()
                         if (elementary_PID_IsValid)
                         {
                             Complete_Stream->Streams[elementary_PID]->Infos["Format"]=__T("AVC");
-                            Complete_Stream->Streams[elementary_PID]->Infos["Format_Profile"]=Ztring().From_Local(Avc_profile_idc(profile_idc))+__T("@L")+Ztring().From_Number(((float)level_idc)/10, 1);
+                            Complete_Stream->Streams[elementary_PID]->Infos["Format_Profile"]=Ztring().From_Local(Avc_profile_idc(profile_idc))+__T("@L")+Ztring().From_Number(((float)level_idc)/10, (level_idc%10)?1:0);
                         }
                         break;
             default    : ;

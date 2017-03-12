@@ -726,11 +726,18 @@ void File_Ffv1::Read_Buffer_Continue()
     {
         while (Slices_BufferPos)
         {
+            if (Slices_BufferPos < tail)
+            {
+                //There is a problem
+                Slices_BufferSizes.insert(Slices_BufferSizes.begin(), Slices_BufferPos);
+                break;
+            }
+
             int32u Size = BigEndian2int24u(Buffer + Buffer_Offset + (size_t)Slices_BufferPos - tail);
             Size += tail;
 
-            if (Slices_BufferPos < Size)
-                Slices_BufferPos = Size;
+            if (Size > Slices_BufferPos)
+                Size = Slices_BufferPos; //There is a problem
             Slices_BufferPos-=Size;
 
             Slices_BufferSizes.insert(Slices_BufferSizes.begin(), Size);
@@ -1115,7 +1122,7 @@ int File_Ffv1::slice(states &States)
     else if (colorspace_type == 1)
         rgb();
 
-    if (!coder_type && ((version == 3 && micro_version > 1) || version > 3))
+    if (!coder_type)
         BS_End();
 
     if (coder_type)
@@ -1127,6 +1134,10 @@ int File_Ffv1::slice(states &States)
         }
         Element_Offset+=RC->BytesUsed();
     }
+
+    #if MEDIAINFO_DECODE
+        //Decode(Buffer, Buffer_Size);
+    #endif //MEDIAINFO_DECODE
 
     #if MEDIAINFO_TRACE
         Trace_Activated=Trace_Activated_Save; // Trace is too huge, reactivating after during pixel decoding

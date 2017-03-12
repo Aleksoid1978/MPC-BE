@@ -164,6 +164,7 @@ Alignment;Выравнивание
 Alignment_Aligned;Соединение по промежуткам
 Alignment_Split;Разделение по промежуткам
 All;Все
+AlternateGroup;
 Archival_Location;Место хранения
 Arranger;Аранжировщик
 ArtDirector;Арт-директор
@@ -188,6 +189,7 @@ BarCode;Штрих-код
 Basic;Кратко
 Basic_Note;Примечание: для дополнительной информации выберите другую закладку (таблица, дерево,...)
 BitDepth;Битовая глубина
+BitDepth_Detected;
 BitDepth_Stored;Сохранённая битовая глубина
 BitRate;Битрейт
 BitRate_Encoded;Закодированный битрейт
@@ -292,6 +294,7 @@ Digitized_Date;Дата оцифровки
 Dimensions;Размеры
 Director;Режиссёр
 DirectorOfPhotography;Оператор
+Disabled;
 DisplayAspectRatio;Соотношение сторон
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Соотношение сторон в оригинале
@@ -304,6 +307,7 @@ Duration_End;Время окончания
 Duration_Start;Время начала
 Edit;Править
 EditedBy;Изменено
+ElementCount;
 EMail;Почта
 Encoded_Application;Программа кодирования
 Encoded_Date;Дата кодирования
@@ -344,6 +348,7 @@ Format_Commercial;Коммерческое название
 Format_Commercial_IfAny;Коммерческое название
 Format_Description;Описание формата
 Format_Info;Подробно о формате
+Format_Level;
 Format_Profile;Профиль формата
 Format_Settings;Настройки формата
 Format_Settings_BVOP;Параметр BVOP формата
@@ -371,6 +376,7 @@ Format_Settings_RefFrames;Параметр ReFrames формата
 Format_Settings_SBR;Параметр SBR формата
 Format_Settings_Sign;Параметр Sign формата
 Format_Settings_Wrapping;Режим переноса
+Format_Tier;
 Format_Url;Ссылка на формат
 Format_Version;Версия формата
 FpaManufacturer;Производитель FPA
@@ -667,6 +673,7 @@ Language_en-gb;English (Great Britain)
 Language_en-us;English (United States)
 Language_eo;Esperanto
 Language_es;Spanish
+Language_es-419;
 Language_et;Estonian
 Language_eu;Basque
 Language_fa;Persian
@@ -913,6 +920,7 @@ Original;Оригинал
 OriginalNetworkName;Оригинальное название сети
 OriginalSourceForm;Формат оригинала
 OriginalSourceMedium;Носитель оригинала
+OriginalSourceMedium_ID;
 Originator;Инициатор
 Other;Прочее
 OtherIdentifier;Другой идентификатор
@@ -924,6 +932,7 @@ OverallBitRate_Maximum;Максимальный общий битрейт
 OverallBitRate_Minimum;Минимальный общий битрейт
 OverallBitRate_Mode;Режим общего битрейта
 OverallBitRate_Nominal;Номинальный общий битрейт
+PackageName;
 Part;Часть
 Part_Count;Количество частей
 PartNumber;Номер части
@@ -940,6 +949,7 @@ Played_Count;Воспроизведено раз
 Played_First_Date;Первое воспроизведение
 Played_Last_Date;Последнее воспроизведение
 PlayTime;Длительность
+PodcastCategory;
 Position;Положение
 Position_Total;Всего
 Preferences;Настройки
@@ -965,6 +975,7 @@ ReplayGain_Gain;Нормализатор звука
 ReplayGain_Peak;Пик нормализатор звука
 Resolution;Разрешение
 s; с.
+SamplesPerFrame;
 SamplingCount;Количество образцов
 SamplingRate;Частота
 Save;Сохранить
@@ -985,6 +996,7 @@ Separator_Columns;Разделитель столбцов
 Separator_Lines;Разделитель строк
 SeriesTitle;Заголовок серий
 ServiceChannel;Номер канала сервиса
+ServiceKind;
 ServiceName;Название сервиса
 ServiceProvider;Поставщик сервиса
 ServiceType;Тип сервиса
@@ -1024,6 +1036,7 @@ StreamKind;Тип потока
 StreamKindID;Идентификатор типа потока
 StreamKindPos;Позиция идентификатора типа потока
 StreamSize;Размер потока
+StreamSize_Demuxed;
 StreamSize_Encoded;Закодированный размер потока
 StreamSize_Proportion;Пропорции потока
 Subject;Тема
@@ -1106,5 +1119,5 @@ Written_Location;Место записи
 WrittenBy;Запись произвёл
 Yes;Да
 Your system;Ваша система
-ZZ_Automatic_Percent;99
-ZZ_AutomaticLanguage_Percent;99
+ZZ_Automatic_Percent;98
+ZZ_AutomaticLanguage_Percent;98
