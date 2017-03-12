@@ -82,7 +82,6 @@ CAppSettings::CAppSettings()
 	, hAccel(NULL)
 	, nCmdlnWebServerPort(-1)
 	, fShowDebugInfo(false)
-	, fShadersNeedSave(false)
 	, bResetSettings(false)
 	, bSubSaveExternalStyleFile(false)
 {
@@ -699,8 +698,22 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_HUE, iHue);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_SATURATION, iSaturation);
 
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLIST, strShaderList);
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLISTSCREENSPACE, strShaderListScreenSpace);
+	{ // save shader list
+		CString str;
+		POSITION pos;
+
+		pos = ShaderList.GetHeadPosition();
+		while (pos) {
+			str += ShaderList.GetNext(pos) + "|";
+		}
+		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLIST, str);
+
+		pos = ShaderListScreenSpace.GetHeadPosition();
+		while (pos) {
+			str += ShaderListScreenSpace.GetNext(pos) + "|";
+		}
+		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLISTSCREENSPACE, str);
+	}
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADER, (int)fToggleShader);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADERSSCREENSPACE, (int)fToggleShaderScreenSpace);
 
@@ -905,11 +918,6 @@ void CAppSettings::SaveSettings()
 	if (pApp->m_pszRegistryKey) {
 		// WINBUG: on win2k this would crash WritePrivateProfileString
 		pApp->WriteProfileInt(L"", L"", pApp->GetProfileInt(L"", L"", 0) ? 0 : 1);
-	}
-
-	if (fShadersNeedSave) { // This is a large data block. Save it only when really necessary.
-		SaveShaders();
-		fShadersNeedSave = false;
 	}
 
 	pApp->FlushProfile();
@@ -1438,8 +1446,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	nLastUsedPage = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LASTUSEDPAGE, 0);
 
-	LoadShaders();
-
 	fD3DFullscreen	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_D3DFULLSCREEN, FALSE);
 	//fMonitorAutoRefreshRate	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, FALSE);
 	iStereo3DMode	= discard(pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, 0), 0u, 3u, 0u);
@@ -1455,8 +1461,26 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	iHue			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_HUE, 0);
 	iSaturation		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_SATURATION, 0);
 
-	strShaderList				= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLIST);
-	strShaderListScreenSpace	= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLISTSCREENSPACE);
+	{ // load shader list
+		int curPos;
+		CString token;
+
+		str = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLIST);
+		curPos = 0;
+		token = str.Tokenize(L"|", curPos);
+		while (token.GetLength()) {
+			ShaderList.AddTail(token);
+			token = str.Tokenize(L"|", curPos);
+		}
+
+		str = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLISTSCREENSPACE);
+		curPos = 0;
+		token = str.Tokenize(L"|", curPos);
+		while (token.GetLength()) {
+			ShaderListScreenSpace.AddTail(token);
+			token = str.Tokenize(L"|", curPos);
+		}
+	}
 	fToggleShader				= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADER, 0);
 	fToggleShaderScreenSpace	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADERSSCREENSPACE, 0);
 
@@ -1592,88 +1616,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 
 	fInitialized = true;
-}
-
-void CAppSettings::SaveShaders()
-{
-	if (m_shaders.GetCount() > 0) {
-		CString path;
-		if (AfxGetMyApp()->GetAppSavePath(path)) {
-			path += L"Shaders\\";
-			// Only create this folder when needed
-			if (!::PathFileExists(path)) {
-				::CreateDirectory(path, NULL);
-			}
-
-			POSITION pos = m_shaders.GetHeadPosition();
-			while (pos) {
-				const Shader& s = m_shaders.GetNext(pos);
-				if (!s.label.IsEmpty()) {
-					CString shname = s.label + L".hlsl";
-					CStdioFile shfile;
-					if (shfile.Open(path + shname, CFile::modeCreate | CFile::modeWrite | CFile::shareDenyNone | CFile::typeText)) {
-						shfile.WriteString(L"// $MinimumShaderProfile: " + s.target + L"\n");
-						shfile.WriteString(s.srcdata);
-
-						shfile.Close();
-					}
-				}
-			}
-		}
-	}
-}
-
-void CAppSettings::LoadShaders()
-{
-	m_shaders.RemoveAll();
-
-	CString path;
-	if (AfxGetMyApp()->GetAppSavePath(path)) {
-		path += L"Shaders\\";
-		if (!::PathFileExists(path) && !AfxGetMyApp()->IsIniValid()) {
-			// profile does not contain "Shaders" folder. try to take shaders from program folder
-			path = GetProgramDir();
-			path += L"Shaders\\";
-			fShadersNeedSave = true;
-		}
-
-		WIN32_FIND_DATA wfd;
-		HANDLE hFile = FindFirstFile(path + L"*.hlsl", &wfd);
-		if (hFile != INVALID_HANDLE_VALUE) {
-			do {
-				CString shname = wfd.cFileName;
-				CStdioFile shfile;
-
-				if (shfile.Open(path + shname, CFile::modeRead | CFile::shareDenyWrite | CFile::typeText)) {
-
-					Shader s;
-					s.label = shname.Left(shname.GetLength() - 5); // filename without extension (.hlsl)
-
-					CString str;
-					shfile.ReadString(str); // read first string
-					if (str.Left(25) == L"// $MinimumShaderProfile:") {
-						s.target = str.Mid(25).Trim(); // shader version property
-					} else if (str.Left(18) == L"// $ShaderVersion:") {
-						// ignore and delete the old properties
-						fShadersNeedSave = true;
-					} else {
-						shfile.SeekToBegin();
-					}
-					if (s.target != L"ps_2_0" && s.target != L"ps_2_a" && s.target != L"ps_2_sw" && s.target != L"ps_3_0" && s.target != L"ps_3_sw") {
-						s.target = L"ps_2_0";
-					}
-
-					while (shfile.ReadString(str)) {
-						s.srcdata += str + L"\n";
-					}
-					shfile.Close();
-
-					m_shaders.AddTail(s);
-				}
-			} while (FindNextFile(hFile, &wfd));
-			FindClose(hFile);
-		}
-	}
 }
 
 int CAppSettings::GetMultiInst()

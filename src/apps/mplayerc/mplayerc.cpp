@@ -797,8 +797,6 @@ bool CMPlayerCApp::GetAppSavePath(CString& path)
 
 bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 {
-	bool success;
-
 	CString oldpath;
 	AfxGetMyApp()->GetAppSavePath(oldpath);
 
@@ -809,27 +807,42 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 	AfxGetAppSettings().GetFav(FAV_DEVICE, devicesFav);
 
 	if (useIni) {
-		success = StoreSettingsToIni();
+		bool success = StoreSettingsToIni();
+		if (!success) {
+			return false;
+		}
 	} else {
-		success = StoreSettingsToRegistry();
+		StoreSettingsToRegistry();
 		_wremove(GetIniPath());
 	}
 
-	if (success && oldpath.GetLength() > 0) {
-		DeleteFile(oldpath + L"default.mpcpl");
+	CString newpath;
+	AfxGetMyApp()->GetAppSavePath(newpath);
 
-		WIN32_FIND_DATA wfd;
-		HANDLE hFile = FindFirstFile(oldpath + L"Shaders\\*.hlsl", &wfd);
-		if (hFile != INVALID_HANDLE_VALUE) {
-			do {
-				DeleteFile(oldpath + L"Shaders\\" + wfd.cFileName);
-			} while (FindNextFile(hFile, &wfd));
-			FindClose(hFile);
+	if (oldpath.GetLength() > 0) {
+		DeleteFileW(oldpath + L"default.mpcpl");
+
+		// moving shader files
+		CStringW shaderpath = oldpath + L"\\Shaders";
+		if (::PathFileExistsW(shaderpath)) {
+			// use SHFileOperation, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
+			WCHAR pathFrom[MAX_PATH] = { 0 }; // for double null-terminated string
+			wcscpy(pathFrom, shaderpath);
+
+			WCHAR pathTo[MAX_PATH] = { 0 }; // for double null-terminated string
+			wcscpy(pathTo, newpath);
+
+			SHFILEOPSTRUCT sf = { 0 };
+			sf.wFunc = FO_MOVE;
+			sf.hwnd = 0;
+			sf.fFlags = FOF_NOCONFIRMATION | FOF_NOCONFIRMMKDIR | FOF_NOERRORUI;
+			sf.pFrom = pathFrom;
+			sf.pTo = pathTo;
+			if (SHFileOperation(&sf) != 0) {
+				MessageBox(NULL, L"Moving shader files failed", ResStr(IDS_AG_ERROR), MB_OK);
+			}
 		}
-		::RemoveDirectory(oldpath + L"Shaders");
 	}
-	// Ensure the shaders are properly saved
-	AfxGetAppSettings().fShadersNeedSave = true;
 
 	// Save favorites to the new location
 	AfxGetAppSettings().SetFav(FAV_FILE, filesFav);
@@ -842,7 +855,7 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 	// Write settings immediately
 	m_s.SaveSettings();
 
-	return success;
+	return true;
 }
 
 static const CString GetHiveName(HKEY hive)

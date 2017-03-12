@@ -841,30 +841,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		}
 	}
 
-	// reload Shaders
-	{
-		CString		strList = s.strShaderList;
-		CString		strRes;
-		int			curPos= 0;
-
-		strRes = strList.Tokenize (L"|", curPos);
-		while (strRes.GetLength() > 0) {
-			m_shaderlabels.AddTail (strRes);
-			strRes = strList.Tokenize(L"|",curPos);
-		}
-	}
-	{
-		CString		strList = s.strShaderListScreenSpace;
-		CString		strRes;
-		int			curPos= 0;
-
-		strRes = strList.Tokenize (L"|", curPos);
-		while (strRes.GetLength() > 0) {
-			m_shaderlabelsScreenSpace.AddTail (strRes);
-			strRes = strList.Tokenize(L"|",curPos);
-		}
-	}
-
 	m_bToggleShader = s.fToggleShader;
 	m_bToggleShaderScreenSpace = s.fToggleShaderScreenSpace;
 
@@ -985,30 +961,6 @@ void CMainFrame::OnClose()
 	DestroyFlyBar();
 
 	CAppSettings& s = AfxGetAppSettings();
-
-	// save shaders list
-	{
-		POSITION	pos;
-		CString		strList;
-
-		pos = m_shaderlabels.GetHeadPosition();
-		while (pos) {
-			strList += m_shaderlabels.GetAt (pos) + "|";
-			m_dockingbars.GetNext(pos);
-		}
-		s.strShaderList = strList;
-	}
-	{
-		POSITION	pos;
-		CString		strList;
-
-		pos = m_shaderlabelsScreenSpace.GetHeadPosition();
-		while (pos) {
-			strList += m_shaderlabelsScreenSpace.GetAt (pos) + "|";
-			m_dockingbars.GetNext(pos);
-		}
-		s.strShaderListScreenSpace = strList;
-	}
 
 	s.fToggleShader = m_bToggleShader;
 	s.fToggleShaderScreenSpace = m_bToggleShaderScreenSpace;
@@ -6564,7 +6516,7 @@ void CMainFrame::OnViewOSDFileName()
 
 void CMainFrame::OnUpdateShaderToggle(CCmdUI* pCmdUI)
 {
-	if (m_shaderlabels.IsEmpty()) {
+	if (AfxGetAppSettings().ShaderList.IsEmpty()) {
 		pCmdUI->Enable(FALSE);
 		m_bToggleShader = false;
 		pCmdUI->SetCheck (0);
@@ -6576,7 +6528,7 @@ void CMainFrame::OnUpdateShaderToggle(CCmdUI* pCmdUI)
 
 void CMainFrame::OnUpdateShaderToggleScreenSpace(CCmdUI* pCmdUI)
 {
-	if (m_shaderlabelsScreenSpace.IsEmpty()) {
+	if (AfxGetAppSettings().ShaderListScreenSpace.IsEmpty()) {
 		pCmdUI->Enable(FALSE);
 		m_bToggleShaderScreenSpace = false;
 		pCmdUI->SetCheck(0);
@@ -6843,8 +6795,8 @@ void CMainFrame::OnUpdateViewCapture(CCmdUI* pCmdUI)
 
 void CMainFrame::OnViewShaderEditor()
 {
-	ShowControlBar(&m_wndShaderEditorBar, !m_wndShaderEditorBar.IsWindowVisible(), TRUE);
-	AfxGetAppSettings().fShadersNeedSave = true;
+	// TODO: SHADERS
+	//T//ShowControlBar(&m_wndShaderEditorBar, !m_wndShaderEditorBar.IsWindowVisible(), TRUE);
 }
 
 void CMainFrame::OnUpdateViewShaderEditor(CCmdUI* pCmdUI)
@@ -8146,7 +8098,7 @@ enum {
 void CMainFrame::OnPlayShaders(UINT nID)
 {
 	if (nID == ID_SHADERS_SELECT) {
-		if (IDOK != CShaderCombineDlg(m_shaderlabels, m_shaderlabelsScreenSpace, GetModalParent()).DoModal()) {
+		if (IDOK != CShaderCombineDlg(GetModalParent()).DoModal()) {
 			return;
 		}
 	}
@@ -10995,6 +10947,60 @@ void CMainFrame::RepaintVideo()
 	}
 }
 
+ShaderC* CMainFrame::GetShader(LPCWSTR label)
+{
+	ShaderC* pShader = NULL;
+
+	POSITION pos = m_ShaderCashe.GetHeadPosition();
+	while (pos) {
+		pShader = &m_ShaderCashe.GetNext(pos);
+		if (pShader->label.CompareNoCase(label)) {
+			break;
+		}
+	}
+
+	if (!pShader) {
+		CString path;
+		if (AfxGetMyApp()->GetAppSavePath(path)) {
+			path.AppendFormat(L"Shaders\\%s.hlsl", label);
+			if (::PathFileExistsW(path)) {
+				CStdioFile shfile;
+				if (shfile.Open(path, CFile::modeRead | CFile::shareDenyWrite | CFile::typeText)) {
+					ShaderC shader;
+					shader.label = label;
+
+					CString str;
+					shfile.ReadString(str); // read first string
+					if (str.Left(25) == L"// $MinimumShaderProfile:") {
+						shader.target = str.Mid(25).Trim(); // shader version property
+					}
+					else {
+						shfile.SeekToBegin();
+					}
+
+					if (shader.target != L"ps_2_0"
+							&& shader.target != L"ps_2_a"
+							&& shader.target != L"ps_2_sw"
+							&& shader.target != L"ps_3_0"
+							&& shader.target != L"ps_3_sw") {
+						shader.target = L"ps_2_0";
+					}
+
+					while (shfile.ReadString(str)) {
+						shader.srcdata += str + L"\n";
+					}
+					shfile.Close();
+
+					m_ShaderCashe.AddTail(shader);
+					pShader = &m_ShaderCashe.GetTail();
+				}
+			}
+		}
+	}
+
+	return pShader;
+}
+
 void CMainFrame::SetShaders()
 {
 	if (!m_pCAP) {
@@ -11003,85 +11009,67 @@ void CMainFrame::SetShaders()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	CAtlStringMap<const CAppSettings::Shader*> s2s;
-
-	POSITION pos = s.m_shaders.GetHeadPosition();
-	while (pos) {
-		const CAppSettings::Shader* pShader = &s.m_shaders.GetNext(pos);
-		s2s[pShader->label] = pShader;
-	}
-
 	m_pCAP->ClearPixelShaders(TARGET_FRAME);
 	m_pCAP->ClearPixelShaders(TARGET_SCREEN);
 
-	for (int i = 0; i < 2; ++i) {
-		if (i == 0 && !m_bToggleShader) {
-			continue;
-		}
-		if (i == 1 && !m_bToggleShaderScreenSpace) {
-			continue;
-		}
-		CAtlList<CString> labels;
-
-		CAtlList<CString> *pLabels;
-		if (i == 0) {
-			pLabels = &m_shaderlabels;
-		} else {
-			pLabels = &m_shaderlabelsScreenSpace;
-		}
-
-		pos = pLabels->GetHeadPosition();
+	if (m_bToggleShader) {
+		POSITION pos = s.ShaderList.GetHeadPosition();
 		while (pos) {
-			const CAppSettings::Shader* pShader = NULL;
-			if (s2s.Lookup(pLabels->GetNext(pos), pShader)) {
+			ShaderC* pShader = GetShader(s.ShaderList.GetNext(pos));
+			if (pShader) {
 				CStringA target = pShader->target;
 				CStringA srcdata = pShader->srcdata;
 
-				HRESULT hr;
-				if (i == 0) {
-					hr = m_pCAP->AddPixelShader(TARGET_FRAME, srcdata, target);
-				} else {
-					hr = m_pCAP->AddPixelShader(TARGET_SCREEN, srcdata, target);
-				}
-
+				HRESULT hr = m_pCAP->AddPixelShader(TARGET_FRAME, srcdata, target);
 				if (FAILED(hr)) {
-					m_pCAP->ClearPixelShaders(TARGET_FRAME);
-					m_pCAP->ClearPixelShaders(TARGET_SCREEN);
+					m_pCAP->ClearPixelShaders(TARGET_FRAME); // ???
 					SendStatusMessage(ResStr(IDS_MAINFRM_73) + pShader->label, 3000);
-					return;
+					return; // ???
 				}
-
-				labels.AddTail(pShader->label);
 			}
 		}
+	}
 
-		if (m_eMediaLoadState == MLS_LOADED) {
-			CString str = Implode(labels, '|');
-			str.Replace(L"|", L", ");
-			SendStatusMessage(ResStr(IDS_AG_SHADER) + str, 3000);
+	if (m_bToggleShaderScreenSpace) {
+		POSITION pos = s.ShaderListScreenSpace.GetHeadPosition();
+		while (pos) {
+			ShaderC* pShader = GetShader(s.ShaderListScreenSpace.GetNext(pos));
+			if (pShader) {
+				CStringA target = pShader->target;
+				CStringA srcdata = pShader->srcdata;
+
+				HRESULT hr = m_pCAP->AddPixelShader(TARGET_SCREEN, srcdata, target);
+				if (FAILED(hr)) {
+					m_pCAP->ClearPixelShaders(TARGET_SCREEN); // ???
+					SendStatusMessage(ResStr(IDS_MAINFRM_73) + pShader->label, 3000);
+					return; // ???
+				}
+			}
 		}
 	}
 }
 
 void CMainFrame::UpdateShaders(CString label)
 {
+	auto& shaders = AfxGetAppSettings().ShaderList;
+
 	if (!m_pCAP) {
 		return;
 	}
 
-	if (m_shaderlabels.GetCount() <= 1) {
-		m_shaderlabels.RemoveAll();
+	if (shaders.GetCount() <= 1) {
+		shaders.RemoveAll();
 	}
 
-	if (m_shaderlabels.IsEmpty() && !label.IsEmpty()) {
-		m_shaderlabels.AddTail(label);
+	if (shaders.IsEmpty() && !label.IsEmpty()) {
+		shaders.AddTail(label);
 	}
 
-	bool fUpdate = m_shaderlabels.IsEmpty();
+	bool fUpdate = shaders.IsEmpty();
 
-	POSITION pos = m_shaderlabels.GetHeadPosition();
+	POSITION pos = shaders.GetHeadPosition();
 	while (pos) {
-		if (label == m_shaderlabels.GetNext(pos)) {
+		if (label == shaders.GetNext(pos)) {
 			fUpdate = true;
 			break;
 		}
@@ -17832,7 +17820,7 @@ void CMainFrame::WTSUnRegisterSessionNotification()
 
 void CMainFrame::EnableShaders1(bool enable)
 {
-	if (enable && !m_shaderlabels.IsEmpty()) {
+	if (enable && !AfxGetAppSettings().ShaderList.IsEmpty()) {
 		m_bToggleShader = true;
 		SetShaders();
 	} else {
@@ -17845,7 +17833,7 @@ void CMainFrame::EnableShaders1(bool enable)
 
 void CMainFrame::EnableShaders2(bool enable)
 {
-	if (enable && !m_shaderlabelsScreenSpace.IsEmpty()) {
+	if (enable && !AfxGetAppSettings().ShaderListScreenSpace.IsEmpty()) {
 		m_bToggleShaderScreenSpace = true;
 		SetShaders();
 	} else {
