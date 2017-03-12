@@ -164,6 +164,7 @@ Alignment; Uitlijning
 Alignment_Aligned;Uitgelijnd op interleaves
 Alignment_Split;Gesplitst over interleaves
 All;Alles
+AlternateGroup;
 Archival_Location;Archieflocatie
 Arranger;Arrangeur
 ArtDirector;Artdirector
@@ -188,6 +189,7 @@ BarCode;Streepjescode
 Basic;Elementair
 Basic_Note;Let op : voor meer informatie over dit bestand, moet u een ander beeld kiezen (Blad, Boomstructuur,...)
 BitDepth;
+BitDepth_Detected;
 BitDepth_Stored;
 BitRate;Bitrate
 BitRate_Encoded;
@@ -292,6 +294,7 @@ Digitized_Date;Digitaliseringsdatum
 Dimensions;Afmetingen
 Director;Regisseur
 DirectorOfPhotography;Cinematograaf
+Disabled;
 DisplayAspectRatio;Beeldverhouding
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Originele beeldverhouding
@@ -304,6 +307,7 @@ Duration_End;
 Duration_Start;
 Edit;Bewerken
 EditedBy;Bewerkt door
+ElementCount;
 EMail;E-Mail
 Encoded_Application;Gebruikt programma
 Encoded_Date;Datum codering
@@ -345,6 +349,8 @@ Format_Commercial_IfAny;
 Format_Description;Formaatbeschrijving
 Format_Info;Details over formaat
 Format_Profile;Formaatprofiel
+Format_Level;
+Format_Tier;
 Format_Settings;Formaatinstellingen
 Format_Settings_BVOP;Formaatinstellingen, BVOP
 Format_Settings_CABAC;Formaatinstellingen, CABAC
@@ -580,11 +586,11 @@ Genre_189;
 Genre_190;
 Genre_191;
 Go to WebSite;Ga naar website
-Grouping;
 Gop_OpenClosed;
 Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;Grouping
+Grouping;
 h; h
 Header file;Headerbestand maken
 Height;Hoogte
@@ -667,6 +673,7 @@ Language_en-gb;Engels (Groot-Brittannië)
 Language_en-us;Engels (Verenigde Staten)
 Language_eo;Esperanto
 Language_es;Spaans
+Language_es-419;
 Language_et;Estisch
 Language_eu;Baskisch
 Language_fa;Perzisch
@@ -913,6 +920,7 @@ Original;Origineel
 OriginalNetworkName;
 OriginalSourceForm;Originele bronvorm
 OriginalSourceMedium;Originele bronmedium
+OriginalSourceMedium_ID;
 Originator;
 Other;Ander
 OtherIdentifier;
@@ -924,12 +932,14 @@ OverallBitRate_Maximum;Maximale Totale bitrate
 OverallBitRate_Minimum;Minimale Totale bitrate
 OverallBitRate_Mode;Totale bitratemodus
 OverallBitRate_Nominal;Nominale Totale bitrate
+PackageName;
 Part;Deel
 Part_Count;Totale telling
 PartNumber;
 PartTotal;
 Performer;Artiest
 Period;Periode
+PodcastCategory;
 Phone;Telefoon
 PictureRatio;
 PixelAspectRatio;Pixelverhouding
@@ -965,6 +975,7 @@ ReplayGain_Gain;Replay gain
 ReplayGain_Peak;Replay gain piek
 Resolution;Resolutie
 s;s
+SamplesPerFrame;
 SamplingCount;
 SamplingRate;Samplerate
 Save;Opslaan
@@ -985,6 +996,7 @@ Separator_Columns;scheidingsteken kolommen
 Separator_Lines;scheidingsteken regels
 SeriesTitle;
 ServiceChannel;Servicekanaalnummer
+ServiceKind;
 ServiceName;Servicenaam
 ServiceProvider;Serviceprovider
 ServiceType;Servicesoort
@@ -1024,6 +1036,7 @@ StreamKind;Soort stroom
 StreamKindID;Stroomidentifier
 StreamKindPos;Stroomidentifier
 StreamSize;Stroomgrootte
+StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;Proporties van deze stroom
 Subject;Onderwerp
@@ -1106,5 +1119,5 @@ Written_Location;Locatie van schrijven
 WrittenBy;Geschreven door
 Yes;Ja
 Your system;Uw systeem
-ZZ_Automatic_Percent;83
-ZZ_AutomaticLanguage_Percent;87
+ZZ_Automatic_Percent;82
+ZZ_AutomaticLanguage_Percent;86

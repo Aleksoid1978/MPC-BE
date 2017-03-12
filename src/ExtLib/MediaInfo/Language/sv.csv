@@ -164,6 +164,7 @@ Alignment;Justering
 Alignment_Aligned;Justerad efter interfoliering
 Alignment_Split;Uppdelad över interfoliering
 All;Alla
+AlternateGroup;
 Archival_Location;Arkiveringsplats
 Arranger;Arrangör
 ArtDirector;Formgivare
@@ -188,6 +189,7 @@ BarCode;Streckkod
 Basic;Enkel
 Basic_Note;OBS! För mer information om den här filen, måste du välja en annan vy (Lista, Träd...)
 BitDepth;Bitdjup
+BitDepth_Detected;
 BitDepth_Stored;Lagrat 
 BitRate;Dataflöde
 BitRate_Encoded;Kodat dataflöde
@@ -292,6 +294,7 @@ Digitized_Date;Digitaliseringsdatum
 Dimensions;Dimensioner
 Director;Regissör
 DirectorOfPhotography;Kamerachef
+Disabled;
 DisplayAspectRatio;Skärmbildförhållande
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Ursprungligt skärmbildförhållande
@@ -304,6 +307,7 @@ Duration_End;Sluttid
 Duration_Start;Starttid
 Edit;Redigera
 EditedBy;Redigerad av
+ElementCount;
 EMail;E-post
 Encoded_Application;Skrivande program
 Encoded_Date;Kodningsdatum
@@ -344,6 +348,7 @@ Format_Commercial;Kommersiellt namn
 Format_Commercial_IfAny;Kommersiellt namn
 Format_Description;Formatbeskrivning
 Format_Info;Formatdetaljer
+Format_Level;
 Format_Profile;Formatprofil
 Format_Settings;Formatinställningar
 Format_Settings_BVOP;Formatinställningar, BVOP
@@ -371,6 +376,7 @@ Format_Settings_RefFrames;Formatinställningar, ReFrames
 Format_Settings_SBR;Formatinställningar, SBR
 Format_Settings_Sign;Formatinställningar, Sign
 Format_Settings_Wrapping;Formatinställningar, Omslagsläge
+Format_Tier;
 Format_Url;Webblänk för format
 Format_Version;Formatversion
 FpaManufacturer;FPA Tillverkare
@@ -667,6 +673,7 @@ Language_en-gb;Engelska (GB)
 Language_en-us;Engelska (USA)
 Language_eo;Esperanto
 Language_es;Spanska
+Language_es-419;
 Language_et;Estniska
 Language_eu;Baskiska
 Language_fa;Persiska
@@ -913,6 +920,7 @@ Original;Original
 OriginalNetworkName;Ursprungligt nätverksnam
 OriginalSourceForm;Ursprunglig källform
 OriginalSourceMedium;Ursprungligt källmedium
+OriginalSourceMedium_ID;
 Originator;Upphovsman
 Other;Annat
 OtherIdentifier;Annan identifierare
@@ -924,6 +932,7 @@ OverallBitRate_Maximum;Max. sammanlagt dataflöde
 OverallBitRate_Minimum;Min. sammanlagt dataflöde
 OverallBitRate_Mode;Sammanlagt dataflödesläge
 OverallBitRate_Nominal;Nominellt sammanlagt dataflöde
+PackageName;
 Part;Del
 Part_Count;Totalt antal
 PartNumber;Delnummer
@@ -940,6 +949,7 @@ Played_Count;Spelad
 Played_First_Date;Spelades först
 Played_Last_Date;Spelades senast
 PlayTime;Speltid
+PodcastCategory;
 Position;Position
 Position_Total;Totalt
 Preferences;Inställningar
@@ -965,6 +975,7 @@ ReplayGain_Gain;Replay gain
 ReplayGain_Peak;Replay gain peak
 Resolution;Upplösning
 s; sek
+SamplesPerFrame;
 SamplingCount;Antal samplingar
 SamplingRate;Samplingsfrekvens
 Save;Spara
@@ -985,6 +996,7 @@ Separator_Columns;Kolumnseparator
 Separator_Lines;Linjeseparator
 SeriesTitle;Seriestitel
 ServiceChannel;Kanalnummer
+ServiceKind;
 ServiceName;Tjänstnamn
 ServiceProvider;Tjänstleverantör
 ServiceType;Tjänsttyp
@@ -1024,6 +1036,7 @@ StreamKind;Strömtyp
 StreamKindID;Strömidentifierare
 StreamKindPos;Strömidentifierare
 StreamSize;Strömstorlek
+StreamSize_Demuxed;
 StreamSize_Encoded;Kodad strömstorlek
 StreamSize_Proportion;Strömproportioner
 Subject;Ämne
@@ -1106,5 +1119,5 @@ Written_Location;Ort
 WrittenBy;Skrivet av
 Yes;Ja
 Your system;Ditt system
-ZZ_Automatic_Percent;99
-ZZ_AutomaticLanguage_Percent;99
+ZZ_Automatic_Percent;97
+ZZ_AutomaticLanguage_Percent;98

@@ -231,6 +231,7 @@ size_t Reader_File::Format_Test_PerParser(MediaInfo_Internal* MI, const String &
     MI->Config.File_Current_Size=MI->Config.File_Size;
     MI->Config.File_Sizes.clear();
     MI->Config.File_Sizes.push_back(MI->Config.File_Size);
+    MI->Config.File_Names_Pos=1;
     if (MI->Config.File_Names.size()>1)
     {
         #if MEDIAINFO_ADVANCED

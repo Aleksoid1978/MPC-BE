@@ -164,6 +164,7 @@ Alignment;Выраўніванне
 Alignment_Aligned;Злучэнне па прамежках
 Alignment_Split;Падзел па прамежках
 All;Усё
+AlternateGroup;
 Archival_Location;Месца захоўвання
 Arranger;Размясціў
 ArtDirector;Рэжысёр
@@ -188,6 +189,7 @@ BarCode;Штрыхкод
 Basic;Каротка
 Basic_Note;Падказка: для дадатковай інфармацыі абярыце іншую закладку (Табліца, Дрэва,...)
 BitDepth;
+BitDepth_Detected;
 BitDepth_Stored;
 BitRate;Бітрэйт
 BitRate_Encoded;
@@ -292,6 +294,7 @@ Digitized_Date;Дата аблічбоўкі
 Dimensions;Памеры
 Director;Рэжысёр
 DirectorOfPhotography;Аператар
+Disabled;
 DisplayAspectRatio;Суадносіны кадра
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Арыгінальныя суадносіны бакоў
@@ -304,6 +307,7 @@ Duration_End;Час канчатку
 Duration_Start;Час пачатку
 Edit;Змяніць
 EditedBy;Зменена
+ElementCount;
 EMail;Пошта
 Encoded_Application;Праграма-кадавальнік
 Encoded_Date;Дата кадавання
@@ -345,6 +349,8 @@ Format_Commercial_IfAny;
 Format_Description;Апісанне фармату
 Format_Info;Падрабязна аб фармаце
 Format_Profile;Прафайл фармату
+Format_Level;
+Format_Tier;
 Format_Settings;Налады фармату
 Format_Settings_BVOP;Налада BVOP фармату
 Format_Settings_CABAC;Налада CABAC фармату
@@ -580,11 +586,11 @@ Genre_189;
 Genre_190;
 Genre_191;
 Go to WebSite;Перайсці на сайт
-Grouping;
 Gop_OpenClosed;
 Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Grouping;
 h;г.
 Header file;Стварыць загаловак
 Height;Вышыня
@@ -667,6 +673,7 @@ Language_en-gb;English (Great Britain)
 Language_en-us;English (United States)
 Language_eo;Esperanto
 Language_es;Spanish
+Language_es-419;
 Language_et;Estonian
 Language_eu;Basque
 Language_fa;Persian
@@ -913,6 +920,7 @@ Original;Арыгінал
 OriginalNetworkName;Арыгінальнае сеткавае імя
 OriginalSourceForm;Фармат арыгінала
 OriginalSourceMedium;Носьбіт арыгінала
+OriginalSourceMedium_ID;
 Originator;
 Other;Іншае
 OtherIdentifier;
@@ -924,12 +932,14 @@ OverallBitRate_Maximum;Максімальны агульны бітрэйт
 OverallBitRate_Minimum;Мінімальны агульны бітрэйт
 OverallBitRate_Mode;Рэжым агульнага бітрэйту
 OverallBitRate_Nominal;Намінальны агульны бітрэйт
+PackageName;
 Part;Частка
 Part_Count;Коль-ць частак
 PartNumber;
 PartTotal;
 Performer;Выканаўца
 Period;Перыяд
+PodcastCategory;
 Phone;Тэлефон
 PictureRatio;
 PixelAspectRatio;Суадносіны пікселяў
@@ -965,6 +975,7 @@ ReplayGain_Gain;Нармалізатар гука
 ReplayGain_Peak;Пік нармалізатара гука
 Resolution;Вырашальнасць (Resolution)
 s;с
+SamplesPerFrame;
 SamplingCount;Колькасць узораў
 SamplingRate;Частата
 Save;Захаваць
@@ -985,6 +996,7 @@ Separator_Columns;Падзельнік слупкоў
 Separator_Lines;Падзельнік радкоў
 SeriesTitle;
 ServiceChannel;Нумар канала сэрвіса
+ServiceKind;
 ServiceName;Назва сэрвіса
 ServiceProvider;Пастаўшчык сэрвіса
 ServiceType;Іып сэрвіса
@@ -1024,6 +1036,7 @@ StreamKind;Тып струменя
 StreamKindID;Ідэнтыфікатар струменя
 StreamKindPos;Ідэнтыфікатар струменя
 StreamSize;Памер струменя
+StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;Прапорцыі струменя
 Subject;Тэма
@@ -1106,5 +1119,5 @@ Written_Location;Месца напісання
 WrittenBy;Напісаў
 Yes;Так
 Your system;Ваша сістэма
-ZZ_Automatic_Percent;86
-ZZ_AutomaticLanguage_Percent;90
+ZZ_Automatic_Percent;85
+ZZ_AutomaticLanguage_Percent;89

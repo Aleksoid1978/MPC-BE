@@ -164,6 +164,7 @@ Alignment;Lerrokapena
 Alignment_Aligned;Lerrokatu tarteetan
 Alignment_Split;Banandu tarteetan
 All;Denak
+AlternateGroup;
 Archival_Location;Agiritegi helbidea
 Arranger;Konpontzailea
 ArtDirector;Arte-Zuzendaria
@@ -188,6 +189,7 @@ BarCode;BarraKodea
 Basic;Ohinarrizkoa
 Basic_Note;Oharra: Agiri honi buruzko argibide gehiagorako, ikuspegi ezberdin bat hautatu behar duzu (Orria, Zuhaitza...)
 BitDepth;Bit sakonera
+BitDepth_Detected;
 BitDepth_Stored;
 BitRate;Bit neurria
 BitRate_Encoded;Kodeaketa bit neurria
@@ -292,6 +294,7 @@ Digitized_Date;Digitalizatze eguna
 Dimensions;Neurriak
 Director;Zuzendaria
 DirectorOfPhotography;Argazki zuzendaria
+Disabled;
 DisplayAspectRatio;Erakuspen ikuspegi maila
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Jatorrizko ikuspegi maila
@@ -304,6 +307,7 @@ Duration_End;Amaiera denbora
 Duration_Start;Hasiera denbora
 Edit;Editatu
 EditedBy;Editatzailea
+ElementCount;
 EMail;Post@
 Encoded_Application;Idazketa aplikazioa
 Encoded_Date;Kodeaketa eguna
@@ -345,6 +349,8 @@ Format_Commercial_IfAny;Merkatal izena
 Format_Description;Heuskarriaren azalpena
 Format_Info;Heuskarriaren xehatasunak
 Format_Profile;Heuskarriaren profila
+Format_Level;
+Format_Tier;
 Format_Settings;Heuskarriaren ezarpenak
 Format_Settings_BVOP;Heuskarri ezarpenak, BVOP
 Format_Settings_CABAC;Heuskarri ezarpenak, CABAC
@@ -580,11 +586,11 @@ Genre_189;Dubstep
 Genre_190;Garage Rocka
 Genre_191;Psybienta
 Go to WebSite;Joan webgunera
-Grouping;
 Gop_OpenClosed;
 Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Grouping;
 h; h
 Header file;Sortu idazburu agiria
 Height;Garaiera
@@ -667,6 +673,7 @@ Language_en-gb;Ingelera (Erresuma Batua)
 Language_en-us;Ingelera (Estatu Batuak)
 Language_eo;Esperantoera
 Language_es;Espainiera
+Language_es-419;
 Language_et;Estoniera
 Language_eu;Euskara
 Language_fa;Persiera
@@ -913,6 +920,7 @@ Original;Jatorrizkoa
 OriginalNetworkName;Jatorrizko sare izena
 OriginalSourceForm;Jatorrizko iturburua forma
 OriginalSourceMedium;Jatorrizko iturburu tartekoa
+OriginalSourceMedium_ID;
 Originator;
 Other;Beste
 OtherIdentifier;
@@ -924,12 +932,14 @@ OverallBitRate_Maximum;Gehienezko bit neurria guztira
 OverallBitRate_Minimum;Gutxienezko bit neurria guztira
 OverallBitRate_Mode;Bit neurri modua guztira
 OverallBitRate_Nominal;Bit neurria izendatua guztira
+PackageName;
 Part;Zatia
 Part_Count;Zenbatekoa guztira
 PartNumber;
 PartTotal;
 Performer;Egilea
 Period;Aldia
+PodcastCategory;
 Phone;Urrutizkina
 PictureRatio;
 PixelAspectRatio;Pixel ikuspegi maila
@@ -965,6 +975,7 @@ ReplayGain_Gain;Berrirakurkea irabazia
 ReplayGain_Peak;Berrirakurkea irabazi gailurra
 Resolution;Bereizmena
 s;s
+SamplesPerFrame;
 SamplingCount;Lagin zenbatekoa
 SamplingRate;Laginketa neurria
 Save;Gorde
@@ -985,6 +996,7 @@ Separator_Columns;Zutabe banantzailea
 Separator_Lines;Lerro banatzailea
 SeriesTitle;
 ServiceChannel;Zerbitzuaren bide zenbatekoa
+ServiceKind;
 ServiceName;Zerbitzuaren izena
 ServiceProvider;Zerbitzu hornitzailea
 ServiceType;Zerbitzu mota
@@ -1024,6 +1036,7 @@ StreamKind;Jario Mota
 StreamKindID;Jario ezagutarazlea
 StreamKindPos;Jario ezagutarazlea
 StreamSize;Jario neurria
+StreamSize_Demuxed;
 StreamSize_Encoded;Kodeaketa jario neurria
 StreamSize_Proportion;Jario honen proporzioa
 Subject;Gaia
@@ -1106,5 +1119,5 @@ Written_Location;Idazte helbidea
 WrittenBy;Idazlea
 Yes;Bai
 Your system;Zure sistema
-ZZ_Automatic_Percent;92
-ZZ_AutomaticLanguage_Percent;92
+ZZ_Automatic_Percent;91
+ZZ_AutomaticLanguage_Percent;91

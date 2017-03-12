@@ -164,6 +164,7 @@ Alignment;Igazítás
 Alignment_Aligned;igazított
 Alignment_Split;osztott
 All;Mind
+AlternateGroup;
 Archival_Location;Arhiválás helye
 Arranger;Szerkesztő
 ArtDirector;Művészeti vezető
@@ -188,6 +189,7 @@ BarCode;Vonalkód
 Basic;Egyszerű
 Basic_Note;Megjegyzés: a többi nézet (Táblázat, Fa ...) bővebb adatokat mutat a fájlról
 BitDepth;
+BitDepth_Detected;
 BitDepth_Stored;
 BitRate;Adatsebesség
 BitRate_Encoded;
@@ -292,6 +294,7 @@ Digitized_Date;Digitalizálás dátuma
 Dimensions;Méretek
 Director;Rendező
 DirectorOfPhotography;Fényképezte
+Disabled;
 DisplayAspectRatio;Képarány
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Eredeti képarány
@@ -304,6 +307,7 @@ Duration_End;
 Duration_Start;
 Edit;Szerkesztés
 EditedBy;Szerkesztő
+ElementCount;
 EMail;Email
 Encoded_Application;Kódoló szoftver
 Encoded_Date;Kódolás dátuma
@@ -345,6 +349,8 @@ Format_Commercial_IfAny;
 Format_Description;Formátum leírás
 Format_Info;A kódek részletei
 Format_Profile;Formátum profil
+Format_Level;
+Format_Tier;
 Format_Settings;Formátum beállítások
 Format_Settings_BVOP;Formátum beállítások, BVOP
 Format_Settings_CABAC;Formátum beállítások, CABAC
@@ -580,11 +586,11 @@ Genre_189;
 Genre_190;
 Genre_191;
 Go to WebSite;A weblap meglátogatása
-Grouping;
 Gop_OpenClosed;
 Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Grouping;
 h; óra
 Header file;Fejléc fájl létrehozása
 Height;Magasság
@@ -667,6 +673,7 @@ Language_en-gb;
 Language_en-us;
 Language_eo;eszperantó
 Language_es;spanyol
+Language_es-419;
 Language_et;észt
 Language_eu;baszk
 Language_fa;perzsa
@@ -913,6 +920,7 @@ Original;Eredeti
 OriginalNetworkName;
 OriginalSourceForm;Eredeti forrás formátuma
 OriginalSourceMedium;Eredeti adathordozója
+OriginalSourceMedium_ID;
 Originator;
 Other;Egyéb
 OtherIdentifier;
@@ -924,12 +932,14 @@ OverallBitRate_Maximum;Legnagyobb adatsebesség
 OverallBitRate_Minimum;Legkisebb adatsebesség
 OverallBitRate_Mode;Teljes adatsebesség
 OverallBitRate_Nominal;Névleges adatsebesség
+PackageName;
 Part;Rész
 Part_Count;Részek száma
 PartNumber;
 PartTotal;
 Performer;Előadó
 Period;Korszak
+PodcastCategory;
 Phone;Telefon
 PictureRatio;
 PixelAspectRatio;Képpont arány
@@ -965,6 +975,7 @@ ReplayGain_Gain;Visszajátszás erősítése
 ReplayGain_Peak;Visszajátszás csúcserősítése
 Resolution;Felbontás
 s; mp
+SamplesPerFrame;
 SamplingCount;
 SamplingRate;Mintavételezési gyakoriság
 Save;Mentés
@@ -985,6 +996,7 @@ Separator_Columns;Oszlop elválasztó
 Separator_Lines;Sor elválasztó
 SeriesTitle;
 ServiceChannel;Szolgáltatás csatornája
+ServiceKind;
 ServiceName;Szolgáltatás neve
 ServiceProvider;Szolgáltató
 ServiceType;Szolgáltatás típusa
@@ -1024,6 +1036,7 @@ StreamKind;Sáv fajtája
 StreamKindID;Sáv fajta azonosító
 StreamKindPos;Sáv fajta sorszáma
 StreamSize;Adatfolyam mérete
+StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;Adatofolyam aránya
 Subject;Tárgy
@@ -1106,5 +1119,5 @@ Written_Location;Írás helye
 WrittenBy;Írta
 Yes;igen
 Your system;Rendszer
-ZZ_Automatic_Percent;77
-ZZ_AutomaticLanguage_Percent;87
+ZZ_Automatic_Percent;76
+ZZ_AutomaticLanguage_Percent;86

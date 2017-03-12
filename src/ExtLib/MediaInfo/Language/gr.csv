@@ -164,6 +164,7 @@ Alignment;
 Alignment_Aligned;
 Alignment_Split;
 All;Όλα
+AlternateGroup;
 Archival_Location;Archival location
 Arranger;Arranger
 ArtDirector;ArtDirector
@@ -188,6 +189,7 @@ BarCode;BarCode
 Basic;Βασική
 Basic_Note;Σημείωση : για περισσότερες πληροφορίες σχετικά με το αρχείο, επιλέξτε διαφορετική προβολή (Φύλλο, Δένδρο...)
 BitDepth;
+BitDepth_Detected;
 BitDepth_Stored;
 BitRate;Ρυθμός μετάδοσης δεδομένων
 BitRate_Encoded;
@@ -292,6 +294,7 @@ Digitized_Date;Ημερομηνία Ψηφιοποίησης
 Dimensions;
 Director;Director
 DirectorOfPhotography;Director of photography
+Disabled;
 DisplayAspectRatio;Λόγος εικόνας
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;
@@ -304,6 +307,7 @@ Duration_End;
 Duration_Start;
 Edit;Επεξεργασία
 EditedBy;Τροποποιημένο από
+ElementCount;
 EMail;E-Mail
 Encoded_Application;Εφαρμογή εγγραφής
 Encoded_Date;Ημερομηνία κωδικοποίησης
@@ -345,6 +349,8 @@ Format_Commercial_IfAny;
 Format_Description;
 Format_Info;
 Format_Profile;
+Format_Level;
+Format_Tier;
 Format_Settings;
 Format_Settings_BVOP;
 Format_Settings_CABAC;
@@ -580,11 +586,11 @@ Genre_189;
 Genre_190;
 Genre_191;
 Go to WebSite;Επίσκεψη του δυκτιακού τόπου
-Grouping;
 Gop_OpenClosed;
 Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;Групаванне
+Grouping;
 h; h
 Header file;Δημιουργήστε αρχείο κεφαλίδας
 Height;Ύψος
@@ -667,6 +673,7 @@ Language_en-gb;
 Language_en-us;
 Language_eo;Esperanto
 Language_es;Spanish
+Language_es-419;
 Language_et;Estonian
 Language_eu;Basque
 Language_fa;Persian
@@ -913,6 +920,7 @@ Original;Original
 OriginalNetworkName;
 OriginalSourceForm;
 OriginalSourceMedium;
+OriginalSourceMedium_ID;
 Originator;
 Other;Άλλος
 OtherIdentifier;
@@ -924,12 +932,14 @@ OverallBitRate_Maximum;
 OverallBitRate_Minimum;
 OverallBitRate_Mode;
 OverallBitRate_Nominal;
+PackageName;
 Part;Μέρος
 Part_Count;Συνολικός αριθμός
 PartNumber;
 PartTotal;
 Performer;Performer
 Period;Περίοδος
+PodcastCategory;
 Phone;Τηλέφωνο
 PictureRatio;
 PixelAspectRatio;Λόγος εικονοστοιχείου
@@ -965,6 +975,7 @@ ReplayGain_Gain;
 ReplayGain_Peak;
 Resolution;Ανάλυση
 s;s
+SamplesPerFrame;
 SamplingCount;
 SamplingRate;Συχνότητα δειγματοληψίας
 Save;Αποθήκευση
@@ -985,6 +996,7 @@ Separator_Columns;διαχωριστής στηλών
 Separator_Lines;διαχωριστής γραμμών
 SeriesTitle;
 ServiceChannel;
+ServiceKind;
 ServiceName;
 ServiceProvider;
 ServiceType;
@@ -1024,6 +1036,7 @@ StreamKind;Τύπος/Είδος Ροής
 StreamKindID;
 StreamKindPos;
 StreamSize;
+StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;
 Subject;Subject
@@ -1106,5 +1119,5 @@ Written_Location;Τοποθεσία καταγραφής
 WrittenBy;Γραμμένο από
 Yes;Ναι
 Your system;Το σύστημά σας
-ZZ_Automatic_Percent;69
-ZZ_AutomaticLanguage_Percent;76
+ZZ_Automatic_Percent;68
+ZZ_AutomaticLanguage_Percent;75

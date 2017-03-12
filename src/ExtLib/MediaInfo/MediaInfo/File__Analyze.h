@@ -57,8 +57,7 @@ public :
     void    Open_Buffer_Init        (File__Analyze* Sub);
     void    Open_Buffer_Init        (File__Analyze* Sub, int64u File_Size);
     void    Open_Buffer_OutOfBand   (                    const int8u* Buffer, size_t Buffer_Size) {File__Analyze::Buffer=Buffer; File__Analyze::Buffer_Size=Buffer_Size; Element_Offset=0; Element_Size=Buffer_Size; Read_Buffer_OutOfBand(); File__Analyze::Buffer=NULL; File__Analyze::Buffer_Size=0; Element_Offset=0; Element_Size=0;}
-    void    Open_Buffer_OutOfBand   (File__Analyze* Sub, const int8u* Buffer, size_t Buffer_Size);
-    void    Open_Buffer_OutOfBand   (File__Analyze* Sub) {if (Element_Offset<=Element_Size) Open_Buffer_OutOfBand(Sub, Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset)); Element_Offset=Element_Size;}
+    void    Open_Buffer_OutOfBand   (File__Analyze* Sub);
     void    Open_Buffer_Continue    (                    const int8u* Buffer, size_t Buffer_Size);
     void    Open_Buffer_Continue    (File__Analyze* Sub, const int8u* Buffer, size_t Buffer_Size, bool IsNewPacket=true, float64 Ratio=1.0);
     void    Open_Buffer_Continue    (File__Analyze* Sub, size_t Buffer_Size) {if (Element_Offset+Buffer_Size<=Element_Size) Open_Buffer_Continue(Sub, Buffer+Buffer_Offset+(size_t)Element_Offset, Buffer_Size); Element_Offset+=Buffer_Size;}
@@ -234,7 +233,7 @@ protected :
 
     //Buffer
     virtual void Read_Buffer_Init ()          {}; //Temp, should be in File__Base caller
-    virtual void Read_Buffer_OutOfBand ()     {}; //Temp, should be in File__Base caller
+    virtual void Read_Buffer_OutOfBand ()     {Open_Buffer_Continue(Buffer, Buffer_Size);} //Temp, should be in File__Base caller
     virtual void Read_Buffer_Continue ()      {}; //Temp, should be in File__Base caller
     virtual void Read_Buffer_AfterParsing ()  {}; //Temp, should be in File__Base caller
     #if MEDIAINFO_SEEK
@@ -1406,6 +1405,9 @@ public :
     #else //MEDIAINFO_DEMUX
         #define Demux(_A, _B, _C)
     #endif //MEDIAINFO_DEMUX
+    #if MEDIAINFO_DECODE
+        void Decoded(const int8u* Buffer, size_t Buffer_Size);
+    #endif //MEDIAINFO_DECODE
 
     //Events data
     bool    PES_FirstByte_IsAvailable;

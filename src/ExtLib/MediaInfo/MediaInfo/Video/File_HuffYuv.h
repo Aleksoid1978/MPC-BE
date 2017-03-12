@@ -30,7 +30,6 @@ class File_HuffYuv : public File__Analyze
 {
 public :
     //In
-    bool    IsOutOfBandData;
     int16u  BitCount;
     int32u  Height;
 
@@ -42,6 +41,7 @@ private :
     void Streams_Accept();
 
     //Buffer - Global
+    void Read_Buffer_OutOfBand();
     void Read_Buffer_Continue();
 
     //Elements

@@ -128,7 +128,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=__T("MediaInfoLib - v0.7.92");
+const Char*  MediaInfo_Version=__T("MediaInfoLib - v0.7.93");
 const Char*  MediaInfo_Url=__T("http://MediaArea.net/MediaInfo");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
@@ -243,6 +243,7 @@ void MediaInfo_Config::Init()
         Event_UserHandler=NULL;
     #endif //MEDIAINFO_EVENTS
     #if defined(MEDIAINFO_LIBCURL_YES)
+        URLEncode=URLEncode_Guess;
         Ssh_IgnoreSecurity=false;
         Ssl_IgnoreSecurity=false;
     #endif //defined(MEDIAINFO_LIBCURL_YES)
@@ -258,6 +259,138 @@ void MediaInfo_Config::Init()
 //***************************************************************************
 // Info
 //***************************************************************************
+
+static inline int _OctDigitValue(const String::value_type &ch)
+{
+    switch (ch)
+    {
+    case __T('0'): return 0;
+    case __T('1'): return 1;
+    case __T('2'): return 2;
+    case __T('3'): return 3;
+    case __T('4'): return 4;
+    case __T('5'): return 5;
+    case __T('6'): return 6;
+    case __T('7'): return 7;
+    }
+    return -1;
+}
+
+static inline int _HexDigitValue(const String::value_type &ch)
+{
+    switch (ch)
+    {
+    case __T('0'): return 0;
+    case __T('1'): return 1;
+    case __T('2'): return 2;
+    case __T('3'): return 3;
+    case __T('4'): return 4;
+    case __T('5'): return 5;
+    case __T('6'): return 6;
+    case __T('7'): return 7;
+    case __T('8'): return 8;
+    case __T('9'): return 9;
+    case __T('a'): case __T('A'): return 10;
+    case __T('b'): case __T('B'): return 11;
+    case __T('c'): case __T('C'): return 12;
+    case __T('d'): case __T('D'): return 13;
+    case __T('e'): case __T('E'): return 14;
+    case __T('f'): case __T('F'): return 15;
+    }
+    return -1;
+}
+
+static String _DecodeEscapeC(String::const_iterator first, String::const_iterator last)
+{
+    String decoded;
+    for (String::const_iterator it = first; it != last; ++it)
+    {
+        String::value_type ch = 0;
+        int inc = 0;
+        if (*it == __T('\\') && (it+1) != last)
+        {
+            switch (*(it+1))
+            {
+            case __T('a'):   ch = __T('\a'); inc = 1; break;
+            case __T('b'):   ch = __T('\b'); inc = 1; break;
+            case __T('f'):   ch = __T('\f'); inc = 1; break;
+            case __T('n'):   ch = __T('\n'); inc = 1; break;
+            case __T('r'):   ch = __T('\r'); inc = 1; break;
+            case __T('t'):   ch = __T('\t'); inc = 1; break;
+            case __T('v'):   ch = __T('\v'); inc = 1; break;
+            case __T('\''):  ch = __T('\''); inc = 1; break;
+            case __T('\"'):  ch = __T('\"'); inc = 1; break;
+            case __T('\\'):  ch = __T('\\'); inc = 1; break;
+            case __T('?'):   ch = __T('?');  inc = 1; break;
+            case __T('x'): // Hex
+                {
+                    int d;
+                    if ((it+2) != last && (d = _HexDigitValue(*(it+2))) >= 0)
+                    {
+                        ch = String::value_type(d);
+                        inc = 2;
+                        if ((it+3) != last && (d = _HexDigitValue(*(it+3))) >= 0)
+                        {
+                            ch = (ch << 4) | String::value_type(d);
+                            ++inc;
+                        }
+                    }
+                }
+                break;
+#if defined(__UNICODE__)
+            case __T('u'): case __T('U'): // Unicode
+                {
+                    int d;
+                    if ((it+2) != last && (d = _HexDigitValue(*(it+2))) >= 0)
+                    {
+                        ch = String::value_type(d);
+                        inc = 2;
+                        for (int i = 0; i < 3; ++i)
+                        {
+                            if ((it+3+i) != last && (d = _HexDigitValue(*(it+3+i))) >= 0)
+                            {
+                                ch = (ch << 4) | String::value_type(d);
+                                ++inc;
+                            }
+                        }
+                    }
+                }
+                break;
+#endif
+            default:
+                {
+                    int d;
+                    if ((d = _OctDigitValue(*(it+1))) >= 0) // Oct
+                    {
+                        ch = String::value_type(d);
+                        inc = 1;
+                        if ((it+2) != last && (d = _OctDigitValue(*(it+2))) >= 0)
+                        {
+                            ch = (ch << 3) | String::value_type(d);
+                            ++inc;
+                            if ((it+3) != last && (d = _OctDigitValue(*(it+3))) >= 0)
+                            {
+                                ch = (ch << 3) | String::value_type(d);
+                                ++inc;
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        if (inc > 0)
+        {
+            decoded += ch;
+            it += inc;
+        }
+        else
+        {
+            decoded += *it;
+        }
+    }
+    return decoded;
+}
 
 Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
 {
@@ -294,6 +427,10 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
 
         //Merge
         Value=FromFile;
+    }
+    else if (Value_Raw.substr(0, 7)==__T("cstr://"))
+    {
+        Value=_DecodeEscapeC(Value_Raw.begin() + 7, Value_Raw.end());
     }
     else
         Value=Value_Raw;
@@ -918,6 +1055,21 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
         #else //MEDIAINFO_EVENTS
             return __T("Event manager is disabled due to compilation options");
         #endif //MEDIAINFO_EVENTS
+    }
+    else if (Option_Lower==__T("urlencode"))
+    {
+        #if defined(MEDIAINFO_LIBCURL_YES)
+            String Value_Lower(Value);
+            transform(Value_Lower.begin(), Value_Lower.end(), Value_Lower.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+
+                 if (Value_Lower==__T("guess"))
+                URLEncode_Set(URLEncode_Guess);
+            else
+                URLEncode_Set(Value.To_int8u()?URLEncode_Yes:URLEncode_No);
+            return Ztring();
+        #else // defined(MEDIAINFO_LIBCURL_YES)
+            return __T("Libcurl support is disabled due to compilation options");
+        #endif // defined(MEDIAINFO_LIBCURL_YES)
     }
     else if (Option_Lower==__T("ssh_knownhostsfilename"))
     {
@@ -2554,6 +2706,18 @@ bool MediaInfo_Config::CanHandleUrls()
 {
     CriticalSectionLocker CSL(CS);
     return Reader_libcurl::Load();
+}
+
+void MediaInfo_Config::URLEncode_Set (MediaInfo_Config::urlencode Value)
+{
+    CriticalSectionLocker CSL(CS);
+    URLEncode=Value;
+}
+
+MediaInfo_Config::urlencode MediaInfo_Config::URLEncode_Get()
+{
+    CriticalSectionLocker CSL(CS);
+    return URLEncode;
 }
 
 void MediaInfo_Config::Ssh_PublicKeyFileName_Set (const Ztring &Value)

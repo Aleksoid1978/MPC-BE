@@ -425,7 +425,7 @@ void File__Analyze::Streams_Finish_StreamOnly_General(size_t StreamPos)
     {
         const Ztring& Name=Retrieve(Stream_General, StreamPos, General_FileName);
         const Ztring& Extension=Retrieve(Stream_General, StreamPos, General_FileExtension);
-        if (!Name.empty() && !Extension.empty())
+        if (!Name.empty() || !Extension.empty())
         {
             InfoMap &FormatList=MediaInfoLib::Config.Format_Get();
             InfoMap::iterator Format=FormatList.find(Retrieve(Stream_General, StreamPos, General_Format));

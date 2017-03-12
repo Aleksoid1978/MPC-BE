@@ -164,6 +164,7 @@ Alignment;Hizalama
 Alignment_Aligned;Boşluklarda sıraya dizilmiş
 Alignment_Split;Boşlukları karşılıklı böl
 All;Tümü
+AlternateGroup;
 Archival_Location;Arşiv konumu
 Arranger;Düzenleyici
 ArtDirector;Sanat Yönetmeni
@@ -188,6 +189,7 @@ BarCode;BarKod
 Basic;Temel
 Basic_Note;Not : Bu dosya hakkında daha fazla bilgi için farklı görünüm seçmelisiniz (Sayfa, Ağaç...)
 BitDepth;Bit yoğunluğu
+BitDepth_Detected;
 BitDepth_Stored;
 BitRate;Bit oranı
 BitRate_Encoded;Kodlanmış bit oranı
@@ -292,6 +294,7 @@ Digitized_Date;Sayısallaştırılmış tarih
 Dimensions;Boyutlar
 Director;Yönetmen
 DirectorOfPhotography;Fotoğrafçılık yönetmeni
+Disabled;
 DisplayAspectRatio;Görüntü en-boy oranı
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Orijinal görüntü en-boy oranı
@@ -304,6 +307,7 @@ Duration_End;Bitiş zamanı
 Duration_Start;Başlangıç zamanı
 Edit;Düzenle
 EditedBy;Düzenleyen
+ElementCount;
 EMail;E-Posta
 Encoded_Application;Yapım uygulaması
 Encoded_Date;Kodlanma tarihi
@@ -344,6 +348,7 @@ Format_Commercial;Ticari adı
 Format_Commercial_IfAny;Ticari adı
 Format_Description;Biçim açıklaması
 Format_Info;Biçim için ayrıntılar
+Format_Level;
 Format_Profile;Biçim profili
 Format_Settings;Biçim ayarları
 Format_Settings_BVOP;Biçim ayarları, BVOP
@@ -371,6 +376,7 @@ Format_Settings_RefFrames;Biçim ayarları, ReFrames
 Format_Settings_SBR;Biçim ayarları, SBR
 Format_Settings_Sign;Biçim ayarları, Sign
 Format_Settings_Wrapping;
+Format_Tier;
 Format_Url;Biçim için web bağlantısı
 Format_Version;Biçim sürümü
 FpaManufacturer;
@@ -667,6 +673,7 @@ Language_en-gb;İngilizce (UK)
 Language_en-us;İngilizce (ABD)
 Language_eo;Esperanto
 Language_es;İspanyolca
+Language_es-419;
 Language_et;Estonca
 Language_eu;Basque
 Language_fa;Farsça
@@ -913,6 +920,7 @@ Original;Orijinal
 OriginalNetworkName;Orijinal ağ adı
 OriginalSourceForm;Orijinal kaynak biçimi
 OriginalSourceMedium;Orijinal kaynak ortamı
+OriginalSourceMedium_ID;
 Originator;
 Other;Diğer
 OtherIdentifier;
@@ -924,6 +932,7 @@ OverallBitRate_Maximum;En fazla kapsamlı bit oranı
 OverallBitRate_Minimum;En düşük kapsamlı bit oranı
 OverallBitRate_Mode;Kapsamlı bit oranı modu
 OverallBitRate_Nominal;Düşük kapsamlı bit oranı
+PackageName;
 Part;Parça
 Part_Count;Toplam sayı
 PartNumber;
@@ -940,6 +949,7 @@ Played_Count;Oynatma süresi
 Played_First_Date;İlk oynatma
 Played_Last_Date;Son oynatma
 PlayTime;Oynatma Süresi
+PodcastCategory;
 Position;Konum
 Position_Total;Toplam
 Preferences;Tercihler
@@ -965,6 +975,7 @@ ReplayGain_Gain;Tekrar oynatma kazancı
 ReplayGain_Peak;Tekrar oynatma kazancı ucu
 Resolution;Çözünürlük
 s;s
+SamplesPerFrame;
 SamplingCount;Örnek sayısı
 SamplingRate;Örnekleme oranı
 Save;Kaydet
@@ -985,6 +996,7 @@ Separator_Columns;Sütun ayırıcı
 Separator_Lines;Satır ayırıcı
 SeriesTitle;
 ServiceChannel;Hizmet kanal numarası
+ServiceKind;
 ServiceName;Hizmet adı
 ServiceProvider;Hizmet sağlayıcısı
 ServiceType;Hizmet türü
@@ -1024,6 +1036,7 @@ StreamKind;Akış çeşidi
 StreamKindID;Akış tanımlayıcısı
 StreamKindPos;Akış tanımlayıcısı
 StreamSize;Akış boyutu
+StreamSize_Demuxed;
 StreamSize_Encoded;Kodlanmış akış boyutu
 StreamSize_Proportion;Bu akışın oranı
 Subject;Konu
@@ -1106,5 +1119,5 @@ Written_Location;Yazıldığı yer
 WrittenBy;Yazan
 Yes;Evet
 Your system;Sisteminiz
-ZZ_Automatic_Percent;92
-ZZ_AutomaticLanguage_Percent;92
+ZZ_Automatic_Percent;91
+ZZ_AutomaticLanguage_Percent;91

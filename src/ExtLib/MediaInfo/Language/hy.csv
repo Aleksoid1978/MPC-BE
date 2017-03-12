@@ -164,6 +164,7 @@ Alignment;Հավասարեցումը
 Alignment_Aligned;Միացում դադարներով
 Alignment_Split;Բաժանում դադարներով
 All;Բոլորը
+AlternateGroup;
 Archival_Location;Տեղադրությունը
 Arranger;Կազմակերպիչը
 ArtDirector;ArtDirector
@@ -188,6 +189,7 @@ BarCode;Կոդը
 Basic;Կարճ
 Basic_Note;Ուշադր. լրացուցիչ տեղեկությունների համար ընտրեք այլ տարբերակ (աղյուսակ, ծառի տեսքով,...)
 BitDepth;Բիթայնությունը
+BitDepth_Detected;
 BitDepth_Stored;
 BitRate;Բիթրեյթը
 BitRate_Encoded;
@@ -292,6 +294,7 @@ Digitized_Date;Թվայնացման ամսաթիվը
 Dimensions;Չափերը
 Director;Ռեժիսորը
 DirectorOfPhotography;Օպերատորը
+Disabled;
 DisplayAspectRatio;Կողմերի հարաբերականությունը
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Կողմերի հարաբեր-ը օրիգինալում
@@ -304,6 +307,7 @@ Duration_End;Ավարտվելու ժ-ը
 Duration_Start;Սկսվելու ժ-ը
 Edit;Փոփոխել
 EditedBy;Փոփոխվել է
+ElementCount;
 EMail;Փոստը
 Encoded_Application;Կոդավորող ծրագիրը
 Encoded_Date;Կոդավորման ամսաթիվը
@@ -345,6 +349,8 @@ Format_Commercial_IfAny;
 Format_Description;Տեսակի նկարագրությունը
 Format_Info;Մանրամասն տեսակի մասին
 Format_Profile;Տեսակի պրոֆիլը
+Format_Level;
+Format_Tier;
 Format_Settings;Տեսակի կարգավորումները
 Format_Settings_BVOP;BVOP տեսակի ցուցիչները
 Format_Settings_CABAC;CABAC տեսակի ցուցիչները
@@ -580,11 +586,11 @@ Genre_189;
 Genre_190;
 Genre_191;
 Go to WebSite;Բացել կայքը
-Grouping;
 Gop_OpenClosed;
 Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Grouping;
 h; ժ.
 Header file;Ստեղծել գլխագիրը
 Height;Բարձր-ը
@@ -667,6 +673,7 @@ Language_en-gb;English (Great Britain)
 Language_en-us;English (United States)
 Language_eo;Esperanto
 Language_es;Spanish
+Language_es-419;
 Language_et;Estonian
 Language_eu;Basque
 Language_fa;Persian
@@ -913,6 +920,7 @@ Original;Բնօրինակը
 OriginalNetworkName;Ցանցի հիմնական անունը
 OriginalSourceForm;Օրիգինալի ֆայլը
 OriginalSourceMedium;Օրիգինալի կրիչը
+OriginalSourceMedium_ID;
 Originator;
 Other;Այլ
 OtherIdentifier;
@@ -924,12 +932,14 @@ OverallBitRate_Maximum;Առավելագույն ընդ. բիթրեյթը
 OverallBitRate_Minimum;Նվազագույն ընդ. բիթրեյթը
 OverallBitRate_Mode;Բիթրեյթի ընդ. եղանակը
 OverallBitRate_Nominal;Բիթրեյթի պայմ. եղանակը
+PackageName;
 Part;Մաս
 Part_Count;Ժամերի ք-ը.
 PartNumber;
 PartTotal;
 Performer;Կատարողը
 Period;Շրջանը
+PodcastCategory;
 Phone;Հեռախոս
 PictureRatio;
 PixelAspectRatio;Փիքսելների համամասնությունը
@@ -965,6 +975,7 @@ ReplayGain_Gain;Ձայնի կարգավորիչ
 ReplayGain_Peak;Ձայնի կարգավորման գագաթը
 Resolution;Լուծաչափը
 s; վայր.
+SamplesPerFrame;
 SamplingCount;Նմուշների քանակը
 SamplingRate;Հաճախականությունը
 Save;Պահպանել
@@ -985,6 +996,7 @@ Separator_Columns;Սյուների բաժանիչ
 Separator_Lines;Տողերի բաժանիչ
 SeriesTitle;
 ServiceChannel;Ծառայության ալիքի համարը
+ServiceKind;
 ServiceName;Ծառայության անունը
 ServiceProvider;Ծառայության մատակարարը
 ServiceType;Ծառայության տեսակը
@@ -1024,6 +1036,7 @@ StreamKind;Հոսքի տեսակը
 StreamKindID;Հոսքի տեսակ ID-ին
 StreamKindPos;Հոսքի տեսակ ID-ի դիրքը
 StreamSize;Հոսքի չափը
+StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;Հոսքի համամասնությունը
 Subject;Թեման
@@ -1106,5 +1119,5 @@ Written_Location;Գրելու տեղը
 WrittenBy;Գրվել է՝
 Yes;Այո
 Your system;Ձեր համակարգը
-ZZ_Automatic_Percent;86
-ZZ_AutomaticLanguage_Percent;90
+ZZ_Automatic_Percent;85
+ZZ_AutomaticLanguage_Percent;89

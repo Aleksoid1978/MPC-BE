@@ -164,6 +164,7 @@ Alignment;
 Alignment_Aligned;
 Alignment_Split;
 All;Všetko
+AlternateGroup;
 Archival_Location;Archival location
 Arranger;Arranger
 ArtDirector;ArtDirector
@@ -188,6 +189,7 @@ BarCode;BarCode
 Basic;Základné
 Basic_Note;Info : Pre viac detailov vyberte iný režim zobrazenia (List, Strom...)
 BitDepth;
+BitDepth_Detected;
 BitDepth_Stored;
 BitRate;Dátový tok
 BitRate_Encoded;
@@ -292,6 +294,7 @@ Digitized_Date;Digitized date
 Dimensions;
 Director;Director
 DirectorOfPhotography;Director of photography
+Disabled;
 DisplayAspectRatio;Pomer strán
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Pôvodný pomer strán pre zobrazenie
@@ -304,6 +307,7 @@ Duration_End;
 Duration_Start;
 Edit;Upraviť
 EditedBy;Upravil
+ElementCount;
 EMail;E-Mail
 Encoded_Application;Použitý software
 Encoded_Date;Dátum zakódovania
@@ -344,6 +348,7 @@ Format_Commercial;
 Format_Commercial_IfAny;
 Format_Description;Popis formátu
 Format_Info;Informácie o formáte
+Format_Level;
 Format_Profile;Profil formátu
 Format_Settings;Nastavenia formátu
 Format_Settings_BVOP;
@@ -371,6 +376,7 @@ Format_Settings_RefFrames;
 Format_Settings_SBR;
 Format_Settings_Sign;
 Format_Settings_Wrapping;
+Format_Tier;
 Format_Url;
 Format_Version;
 FpaManufacturer;
@@ -667,6 +673,7 @@ Language_en-gb;Anglicky (V.Británia)
 Language_en-us;Anglicky (USA)
 Language_eo;Esperanto
 Language_es;Španielsky
+Language_es-419;
 Language_et;Estónsky
 Language_eu;Baskidsky
 Language_fa;Perzsky
@@ -913,6 +920,7 @@ Original;Originál
 OriginalNetworkName;
 OriginalSourceForm;
 OriginalSourceMedium;
+OriginalSourceMedium_ID;
 Originator;
 Other;Rôzne
 OtherIdentifier;
@@ -924,6 +932,7 @@ OverallBitRate_Maximum;
 OverallBitRate_Minimum;
 OverallBitRate_Mode;
 OverallBitRate_Nominal;
+PackageName;
 Part;Časť
 Part_Count;Celkový počet
 PartNumber;
@@ -940,6 +949,7 @@ Played_Count;
 Played_First_Date;Dátum prvého prehratia
 Played_Last_Date;Dátum posledného prehratia
 PlayTime;Hrací čas
+PodcastCategory;
 Position;Pozícia
 Position_Total;Celkom
 Preferences;Predvoľby
@@ -965,6 +975,7 @@ ReplayGain_Gain;
 ReplayGain_Peak;
 Resolution;Rozlíšenie
 s; sek.
+SamplesPerFrame;
 SamplingCount;
 SamplingRate;Sampling rate
 Save;Uložiť
@@ -985,6 +996,7 @@ Separator_Columns;Oddeľovač stĺpcov
 Separator_Lines;Oddeľovač riadkov
 SeriesTitle;
 ServiceChannel;
+ServiceKind;
 ServiceName;
 ServiceProvider;
 ServiceType;
@@ -1024,6 +1036,7 @@ StreamKind;Kind of stream
 StreamKindID;
 StreamKindPos;
 StreamSize;
+StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;
 Subject;Subjekt
@@ -1106,5 +1119,5 @@ Written_Location;Written location
 WrittenBy;Napísal
 Yes;Áno
 Your system;Váš systém
-ZZ_Automatic_Percent;75
-ZZ_AutomaticLanguage_Percent;80
+ZZ_Automatic_Percent;74
+ZZ_AutomaticLanguage_Percent;79

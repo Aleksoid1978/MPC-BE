@@ -65,6 +65,20 @@ private :
     void Core();
     void Core_Frame();
     void HD();
+    void emdf();
+    void emdf_sync();
+    void emdf_container();
+    void emdf_payload_config();
+    void emdf_protection();
+    void object_audio_metadata_payload();
+    void program_assignment();
+    void joc();
+    void joc_header();
+    void joc_info();
+    void joc_data_point_info();
+    void joc_data();
+    void joc_ext_data();
+
     void TimeStamp();
     void dac3();
     void dec3();
@@ -73,11 +87,27 @@ private :
     size_t Core_Size_Get();
     size_t HD_Size_Get();
 
+    //Parsing
+    void Get_V4(int8u  Bits, int32u  &Info, const char* Name);
+    void Skip_V4(int8u  Bits, const char* Name);
+
     //Buffer
     const int8u* Save_Buffer;
     size_t Save_Buffer_Offset;
     size_t Save_Buffer_Size;
 
+    //Temp auxdata
+    int16u  auxdatal;
+
+    //Temp EMDF
+    size_t EMDF_RemainPos;
+    size_t RemainAfterEMDF;
+
+    //Temp JOC
+    int8u joc_num_objects;
+    std::map<int8u, size_t> joc_num_objects_map;
+    int8u joc_ext_config_idx;
+    
     //Temp
     struct dolby
     {

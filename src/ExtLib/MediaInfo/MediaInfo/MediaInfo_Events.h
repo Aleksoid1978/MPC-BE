@@ -324,6 +324,33 @@ struct MediaInfo_Event_Global_BytesRead_0
 };
 
 /*-------------------------------------------------------------------------*/
+/* Decoded                                                                 */
+#define MediaInfo_Event_Global_Decoded 0xAF03
+
+struct MediaInfo_Event_Global_Decoded_0
+{
+    MEDIAINFO_EVENT_GENERIC
+    size_t                  Content_Size;
+    const MediaInfo_int8u*  Content;
+    MediaInfo_int64u        Flags;
+};
+
+/*-------------------------------------------------------------------------*/
+/* AttachedFile                                                            */
+#define MediaInfo_Event_Global_AttachedFile 0xAF04
+
+struct MediaInfo_Event_Global_AttachedFile_0
+{
+    MEDIAINFO_EVENT_GENERIC
+    size_t                  Content_Size;
+    const MediaInfo_int8u*  Content;
+    MediaInfo_int64u        Flags;
+    const char*             Name;
+    const char*             MimeType;
+    const char*             Description;
+};
+
+/*-------------------------------------------------------------------------*/
 /* MediaInfo_Event_Video_SliceInfo_0                                       */
 #define MediaInfo_Event_Video_SliceInfo 0x7801
 struct MediaInfo_Event_Video_SliceInfo_0

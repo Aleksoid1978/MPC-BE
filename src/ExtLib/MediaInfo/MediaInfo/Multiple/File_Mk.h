@@ -37,6 +37,9 @@ public :
     ~File_Mk();
 
 private :
+    //Buffer - Global
+    void Read_Buffer_Continue();
+
     //Buffer
     void Header_Parse();
     void Data_Parse();
@@ -342,6 +345,9 @@ private :
     int64u  Segment_Tags_Tag_Targets_TagTrackUID_Value;
     bool    CurrentAttachmentIsCover;
     bool    CoverIsSetFromAttachment;
+    string  AttachedFile_FileName;
+    string  AttachedFile_FileMimeType;
+    string  AttachedFile_FileDescription;
     struct crc32
     {
         int64u  Pos;
@@ -351,6 +357,7 @@ private :
         int32u  Expected;
     };
     std::vector<crc32> CRC32Compute;
+    int64u CRC32Compute_SkipUpTo;
 
     //Chapters
     struct chapterdisplay

@@ -164,6 +164,7 @@ Alignment;Allineamento
 Alignment_Aligned;Audio allineato 
 Alignment_Split;Audio splittato
 All;Tutti
+AlternateGroup;
 Archival_Location;Posizione dell'archivio
 Arranger;Compositore
 ArtDirector;Regista
@@ -188,6 +189,7 @@ BarCode;Codice a barre
 Basic;Semplice
 Basic_Note;Nota: per maggiori informazioni seleziona Scheda, Albero....
 BitDepth;Profondità bit
+BitDepth_Detected;
 BitDepth_Stored;
 BitRate;Bitrate
 BitRate_Encoded;Bitrate codifica
@@ -292,6 +294,7 @@ Digitized_Date;Data digitalizzazione
 Dimensions;Dimensioni
 Director;Regista
 DirectorOfPhotography;Direttore della fotografia
+Disabled;
 DisplayAspectRatio;Rapporto aspetto visualizzazione
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Rapporto aspetto originale
@@ -304,6 +307,7 @@ Duration_End;Fine
 Duration_Start;Inizio
 Edit;Modifica
 EditedBy;Modificato da
+ElementCount;
 EMail;Email
 Encoded_Application;Creato con
 Encoded_Date;Data codifica
@@ -345,6 +349,8 @@ Format_Commercial_IfAny;Nome commereciale
 Format_Description;Descrizione formato
 Format_Info;Dettagli sui formati
 Format_Profile;Profilo formato
+Format_Level;
+Format_Tier;
 Format_Settings;Impostazioni formato
 Format_Settings_BVOP;Impostazioni formato, BVOP
 Format_Settings_CABAC;Impostazioni formato, CABAC
@@ -580,11 +586,11 @@ Genre_189;Dubstep
 Genre_190;Garage Rock
 Genre_191;Psybient
 Go to WebSite;Vai al sito internet
-Grouping;
 Gop_OpenClosed;
 Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Grouping;
 h; o
 Header file;Crea intestazione file
 Height;Altezza
@@ -667,6 +673,7 @@ Language_en-gb;Inglese (Gran Bretagna)
 Language_en-us;Inglese (Americano)
 Language_eo;Esperanto
 Language_es;Spagnolo
+Language_es-419;
 Language_et;Estone
 Language_eu;basco
 Language_fa;Persiano
@@ -913,6 +920,7 @@ Original;Originale
 OriginalNetworkName;Nome originale in rete
 OriginalSourceForm;Modulo originale sorgente
 OriginalSourceMedium;Supporto originale
+OriginalSourceMedium_ID;
 Originator;
 Other;Altri
 OtherIdentifier;
@@ -924,12 +932,14 @@ OverallBitRate_Maximum;Bitrate massimo generale
 OverallBitRate_Minimum;Bitrate minimo generale
 OverallBitRate_Mode;Modo bitrate generale
 OverallBitRate_Nominal;BitRate nominale generale
+PackageName;
 Part;Parte
 Part_Count;Totale
 PartNumber;
 PartTotal;
 Performer;Esecutore
 Period;Periodo
+PodcastCategory;
 Phone;Telefono
 PictureRatio;
 PixelAspectRatio;Rapporto aspetto pixel
@@ -965,6 +975,7 @@ ReplayGain_Gain;Replay gain
 ReplayGain_Peak;Replau gain peak
 Resolution;Risoluzione
 s;s
+SamplesPerFrame;
 SamplingCount;Contatore frequenza
 SamplingRate;Frequenza campionamento
 Save;Salva
@@ -985,6 +996,7 @@ Separator_Columns;Separatore colonne
 Separator_Lines;Separatore linea
 SeriesTitle;
 ServiceChannel;Numero canale di servizio
+ServiceKind;
 ServiceName;Nome servizio
 ServiceProvider;Fornitore servizio
 ServiceType;Tipo servizio
@@ -1024,6 +1036,7 @@ StreamKind;Tipo di traccia
 StreamKindID;Identificatore traccia
 StreamKindPos;Identificatore traccia
 StreamSize;Dimensione della traccia
+StreamSize_Demuxed;
 StreamSize_Encoded;Dim. traccia codificata
 StreamSize_Proportion;Proprorzioni traccia
 Subject;Soggetto
@@ -1106,5 +1119,5 @@ Written_Location;Realizzato in
 WrittenBy;Realizzato da
 Yes;Si
 Your system;Info sul sistema
-ZZ_Automatic_Percent;92
-ZZ_AutomaticLanguage_Percent;92
+ZZ_Automatic_Percent;91
+ZZ_AutomaticLanguage_Percent;91

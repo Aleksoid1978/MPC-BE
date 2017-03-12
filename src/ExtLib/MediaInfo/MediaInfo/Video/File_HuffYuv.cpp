@@ -99,7 +99,6 @@ File_HuffYuv::File_HuffYuv()
     IsRawStream=true;
 
     //In
-    IsOutOfBandData=false;
     BitCount=0;
     Height=0;
 }
@@ -120,18 +119,27 @@ void File_HuffYuv::Streams_Accept()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+void File_HuffYuv::Read_Buffer_OutOfBand()
+{
+    FrameHeader();
+    if (Element_Offset<Element_Size)
+        Skip_XX(Element_Size-Element_Offset,                    "Unknown");
+
+    FILLING_BEGIN()
+        Accept();
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
 void File_HuffYuv::Read_Buffer_Continue()
 {
-    Accept();
+    Skip_XX(Element_Size,                                       "Data");
 
-    if (IsOutOfBandData)
+    if (!Status[IsAccepted]) //No test except that the stream has no out of band data
     {
-        FrameHeader();
-    }
-    else if (Frame_Count==0)
+        Accept();
         Fill(Stream_Video, 0, Video_Format_Version, "Version 1");
-
-    Skip_XX(Element_Size-Element_Offset,                        "Other data");
+    }
 
     Frame_Count++;
     Finish();

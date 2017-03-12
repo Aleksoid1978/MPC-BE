@@ -164,6 +164,7 @@ Alignment;アラインメント
 Alignment_Aligned;アライン
 Alignment_Split;分割
 All;すべて
+AlternateGroup;
 Archival_Location;作成された場所
 Arranger;アレンジ者
 ArtDirector;アートディレクター
@@ -188,6 +189,7 @@ BarCode;バーコード
 Basic;基本
 Basic_Note;メモ : ファイルについてのさらなる情報は別のビューで開かねばなりません(シート、ツリー...)
 BitDepth;
+BitDepth_Detected;
 BitDepth_Stored;
 BitRate;ビットレート
 BitRate_Encoded;
@@ -292,6 +294,7 @@ Digitized_Date;デジタル日付
 Dimensions;ディメンション
 Director;ディレクター
 DirectorOfPhotography;フォトディレクター
+Disabled;
 DisplayAspectRatio;解像度
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;元解像度
@@ -304,6 +307,7 @@ Duration_End;終了時間
 Duration_Start;開始時間
 Edit;編集
 EditedBy;編集者
+ElementCount;
 EMail;E-Mail
 Encoded_Application;使用したエンコーダ
 Encoded_Date;エンコード日
@@ -345,6 +349,8 @@ Format_Commercial_IfAny;
 Format_Description;詳細
 Format_Info;情報
 Format_Profile;プロファイル
+Format_Level;
+Format_Tier;
 Format_Settings;設定
 Format_Settings_BVOP;BVOP
 Format_Settings_CABAC;CABAC
@@ -580,11 +586,11 @@ Genre_189;
 Genre_190;
 Genre_191;
 Go to WebSite;Web サイトへ移動
-Grouping;
 Gop_OpenClosed;
 Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Grouping;
 h;時
 Header file;ヘッダーファイルを作成
 Height;高さ
@@ -667,6 +673,7 @@ Language_en-gb;英語(英国)
 Language_en-us;英語(米国)
 Language_eo;Esperanto
 Language_es;エスパーニャ
+Language_es-419;
 Language_et;Estonian
 Language_eu;バスク語
 Language_fa;Persian
@@ -858,10 +865,10 @@ Name;名前
 Nationality;製作国
 NetworkName;ネットワーク名
 New;新規
-Newest version;新バージョンチェック（要インターネット接続）
-NewVersion_Menu;新バージョンメニュー
-NewVersion_Question_Content;新バージョン確認 コンテンツ
-NewVersion_Question_Title;新バージョン確認 タイトル
+Newest version;新しいバージョンを確認（要インターネット接続
+NewVersion_Menu;新しいバージョンがあります
+NewVersion_Question_Content;新しいバージョン(v%Version%)があります。更新しますか？
+NewVersion_Question_Title;新しいバージョン
 No;いいえ
 Not yet;準備中です
 NumColors;色
@@ -913,6 +920,7 @@ Original;オリジナル
 OriginalNetworkName;オリジナル ネットワーク名
 OriginalSourceForm;オリジナル ソース フォーム
 OriginalSourceMedium;中間ソース フォーム
+OriginalSourceMedium_ID;
 Originator;
 Other;その他
 OtherIdentifier;
@@ -924,12 +932,14 @@ OverallBitRate_Maximum;最大
 OverallBitRate_Minimum;最小
 OverallBitRate_Mode;OBR モード
 OverallBitRate_Nominal;OBR ノミナル
+PackageName;
 Part;パート
 Part_Count;合計
 PartNumber;
 PartTotal;
 Performer;パフォーマー
 Period;ピリオド
+PodcastCategory;
 Phone;電話
 PictureRatio;
 PixelAspectRatio;ピクセル比
@@ -965,6 +975,7 @@ ReplayGain_Gain;リプレイゲイン ゲイン
 ReplayGain_Peak;リプレイ ゲイン ピーク
 Resolution;解像度
 s;秒
+SamplesPerFrame;
 SamplingCount;
 SamplingRate;サンプルレート
 Save;保存
@@ -985,6 +996,7 @@ Separator_Columns;列の区切り
 Separator_Lines;区切り線
 SeriesTitle;
 ServiceChannel;チャンネル
+ServiceKind;
 ServiceName;名前
 ServiceProvider;プロバイダ
 ServiceType;種類
@@ -1024,6 +1036,7 @@ StreamKind;ストリーム種
 StreamKindID;ID
 StreamKindPos;ポジション
 StreamSize;ストリームサイズ
+StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;サイズ整形
 Subject;件名
@@ -1106,5 +1119,5 @@ Written_Location;作成場所
 WrittenBy;著者
 Yes;はい
 Your system;システム情報
-ZZ_Automatic_Percent;84
-ZZ_AutomaticLanguage_Percent;88
+ZZ_Automatic_Percent;83
+ZZ_AutomaticLanguage_Percent;87

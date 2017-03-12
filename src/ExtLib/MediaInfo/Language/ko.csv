@@ -164,6 +164,7 @@ Alignment;정렬
 Alignment_Aligned;인터리브에 정렬
 Alignment_Split;인터리브로 분할
 All;전체
+AlternateGroup;
 Archival_Location;기록 장소
 Arranger;편곡자
 ArtDirector;미술 감독
@@ -188,6 +189,7 @@ BarCode;바코드
 Basic;기본
 Basic_Note;노트 : 이 파일에 관한 더 자세한 정보를 원하시면 다른 보기를 선택하세요(시트, 트리...)
 BitDepth;
+BitDepth_Detected;
 BitDepth_Stored;
 BitRate;비트레이트
 BitRate_Encoded;
@@ -292,6 +294,7 @@ Digitized_Date;디지털화 날짜
 Dimensions;영역
 Director;감독
 DirectorOfPhotography;촬영 감독
+Disabled;
 DisplayAspectRatio;화면 종횡비
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;원본 화면 종횡비
@@ -304,6 +307,7 @@ Duration_End;종료 시간
 Duration_Start;시작 시간
 Edit;편집
 EditedBy;편집
+ElementCount;
 EMail;이메일
 Encoded_Application;인코딩 프로그램
 Encoded_Date;인코딩 날짜
@@ -345,6 +349,8 @@ Format_Commercial_IfAny;
 Format_Description;포맷 설명
 Format_Info;포맷 정보
 Format_Profile;포맷 프로파일
+Format_Level;
+Format_Tier;
 Format_Settings;포맷 설정
 Format_Settings_BVOP;포맷 설정, BVOP
 Format_Settings_CABAC;포맷 설정, CABAC
@@ -580,11 +586,11 @@ Genre_189;
 Genre_190;
 Genre_191;
 Go to WebSite;웹사이트로 가기
-Grouping;
 Gop_OpenClosed;
 Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Grouping;
 h;시
 Header file;헤더 파일 만들기
 Height;높이
@@ -667,6 +673,7 @@ Language_en-gb;English (Great Britain)
 Language_en-us;English (United States)
 Language_eo;Esperanto
 Language_es;Spanish
+Language_es-419;
 Language_et;Estonian
 Language_eu;Basque
 Language_fa;Persian
@@ -913,6 +920,7 @@ Original;원본
 OriginalNetworkName;원본 네트워크 이름
 OriginalSourceForm;원본 소스 폼
 OriginalSourceMedium;원본 소스 미디어
+OriginalSourceMedium_ID;
 Originator;
 Other;기타
 OtherIdentifier;
@@ -924,12 +932,14 @@ OverallBitRate_Maximum;최대 총 비트레이트
 OverallBitRate_Minimum;최소 총 비트레이트
 OverallBitRate_Mode;총 비트레이트 모드
 OverallBitRate_Nominal;명목상의 총 비트레이트
+PackageName;
 Part;파트
 Part_Count;총계
 PartNumber;
 PartTotal;
 Performer;연기자
 Period;시대
+PodcastCategory;
 Phone;전화
 PictureRatio;
 PixelAspectRatio;픽셀 종횡비
@@ -965,6 +975,7 @@ ReplayGain_Gain;재생 게인
 ReplayGain_Peak;재생 게인 피크
 Resolution;해상도
 s;초
+SamplesPerFrame;
 SamplingCount;
 SamplingRate;샘플링레이트
 Save;저장
@@ -985,6 +996,7 @@ Separator_Columns;컬럼 구분자
 Separator_Lines;라인 구분자
 SeriesTitle;
 ServiceChannel;서비스 채널 번호
+ServiceKind;
 ServiceName;서비스 이름
 ServiceProvider;서비스 제공자
 ServiceType;서비스 종류
@@ -1024,6 +1036,7 @@ StreamKind;스트림 종류
 StreamKindID;스트림 ID
 StreamKindPos;스트림 ID
 StreamSize;스트림 크기
+StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;이 스트림의 비율
 Subject;제목
@@ -1106,5 +1119,5 @@ Written_Location;제작 장소
 WrittenBy;제작자
 Yes;예
 Your system;이 시스템
-ZZ_Automatic_Percent;84
-ZZ_AutomaticLanguage_Percent;88
+ZZ_Automatic_Percent;83
+ZZ_AutomaticLanguage_Percent;87

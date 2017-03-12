@@ -164,6 +164,7 @@ Alignment;排列方式
 Alignment_Aligned;對齊交錯訊號
 Alignment_Split;橫越交錯訊號
 All;全部
+AlternateGroup;
 Archival_Location;檔案位置
 Arranger;編曲
 ArtDirector;藝術指導
@@ -188,6 +189,7 @@ BarCode;條碼
 Basic;基本
 Basic_Note;注意: 想知道更多關於此檔案的資訊, 您得選擇不同的視點 (表格, 樹狀圖 ...)
 BitDepth;
+BitDepth_Detected;
 BitDepth_Stored;
 BitRate;流量
 BitRate_Encoded;
@@ -292,6 +294,7 @@ Digitized_Date;數位化日期
 Dimensions;維度
 Director;導演
 DirectorOfPhotography;攝影導演
+Disabled;
 DisplayAspectRatio;顯示長寬比例
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;原始顯示長寬比例
@@ -304,6 +307,7 @@ Duration_End;結束時間
 Duration_Start;開始時間
 Edit;編輯
 EditedBy;編輯者
+ElementCount;
 EMail;電子信箱
 Encoded_Application;使用編碼程式
 Encoded_Date;編碼日期
@@ -344,6 +348,7 @@ Format_Commercial;
 Format_Commercial_IfAny;
 Format_Description;格式敘述
 Format_Info;格式詳細資訊
+Format_Level;
 Format_Profile;格式類型
 Format_Settings;格式設定
 Format_Settings_BVOP;格式設定, BVOP
@@ -371,6 +376,7 @@ Format_Settings_RefFrames;格式設定, RefFrames
 Format_Settings_SBR;格式設定, SBR
 Format_Settings_Sign;格式設定, Sign
 Format_Settings_Wrapping;
+Format_Tier;
 Format_Url;該格式的網址
 Format_Version;格式版本
 FpaManufacturer;
@@ -667,6 +673,7 @@ Language_en-gb;英語 (英國) (English, Great Britain)
 Language_en-us;英語 (美國) (English, United States)
 Language_eo;世界語 (Esperanto)
 Language_es;西班牙語 (Spanish)
+Language_es-419;
 Language_et;愛沙尼亞語 (Estonian)
 Language_eu;巴斯克語 (Basque)
 Language_fa;波斯語 (Persian)
@@ -913,6 +920,7 @@ Original;來源
 OriginalNetworkName;來源網路名稱
 OriginalSourceForm;來源格式
 OriginalSourceMedium;來源媒介
+OriginalSourceMedium_ID;
 Originator;
 Other;其它
 OtherIdentifier;
@@ -924,6 +932,7 @@ OverallBitRate_Maximum;最大整體流量
 OverallBitRate_Minimum;最小整體流量
 OverallBitRate_Mode;整體流量模式
 OverallBitRate_Nominal;正常整體流量
+PackageName;
 Part;部分
 Part_Count;總數
 PartNumber;
@@ -940,6 +949,7 @@ Played_Count;已播放數
 Played_First_Date;首次播放
 Played_Last_Date;前次播放
 PlayTime;播放長度
+PodcastCategory;
 Position;順序
 Position_Total;總數
 Preferences;偏好設定
@@ -965,6 +975,7 @@ ReplayGain_Gain;播放增益
 ReplayGain_Peak;播放增益尖峰值
 Resolution;顏色深度
 s;秒
+SamplesPerFrame;
 SamplingCount;
 SamplingRate;取樣率
 Save;儲存
@@ -985,6 +996,7 @@ Separator_Columns;換列字元
 Separator_Lines;換行字元
 SeriesTitle;
 ServiceChannel;服務頻道
+ServiceKind;
 ServiceName;服務名稱
 ServiceProvider;服務提供者
 ServiceType;服務類型
@@ -1024,6 +1036,7 @@ StreamKind;串流類型
 StreamKindID;串流識別字
 StreamKindPos;串流識別字
 StreamSize;串流大小
+StreamSize_Demuxed;
 StreamSize_Encoded;
 StreamSize_Proportion;此串流的比例
 Subject;主題
@@ -1106,5 +1119,5 @@ Written_Location;撰寫地點
 WrittenBy;撰寫人
 Yes;是
 Your system;您的系統
-ZZ_Automatic_Percent;85
-ZZ_AutomaticLanguage_Percent;89
+ZZ_Automatic_Percent;84
+ZZ_AutomaticLanguage_Percent;88

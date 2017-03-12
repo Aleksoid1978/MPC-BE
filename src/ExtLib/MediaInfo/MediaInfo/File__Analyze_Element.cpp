@@ -423,8 +423,26 @@ static void Xml_Content_Escape(const char* Content, size_t Size, std::string& To
                 Pos += 3;
                 Size += 3;
                 break;
-            case '\r':
             case '\n':
+                ToReturn[Pos] = '&';
+                ToReturn.insert(Pos + 1, "#xA;");
+                Pos += 4;
+                Size += 4;
+                break;
+            case '\r': //Doing like XML rule "(...) translating both the two-character sequence #xD #xA and any #xD that is not followed by #xA to a single #xA character".
+                ToReturn[Pos] = '&';
+                if (Pos + 1 < Size && ToReturn[Pos + 1] == '\n')
+                {
+                    Pos++;
+                    ToReturn[Pos] = '#';
+                    ToReturn.insert(Pos + 1, "xA;");
+                    Pos += 3;
+                    Size += 3;
+                    break;
+                }
+                ToReturn.insert(Pos + 1, "#xA;");
+                Pos += 4;
+                Size += 4;
                 break;
             default:
                 if (C<0x20)

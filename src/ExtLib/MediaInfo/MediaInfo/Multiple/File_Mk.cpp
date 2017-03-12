@@ -93,6 +93,9 @@
 #include <cmath>
 #include <algorithm>
 #include "ThirdParty/base64/base64.h"
+#if MEDIAINFO_EVENTS
+    #include "MediaInfo/MediaInfo_Events_Internal.h"
+#endif //MEDIAINFO_EVENTS
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -619,6 +622,7 @@ File_Mk::File_Mk()
     Segment_Cluster_Count=0;
     CurrentAttachmentIsCover=false;
     CoverIsSetFromAttachment=false;
+    CRC32Compute_SkipUpTo=0;
 
     //Hints
     File_Buffer_Size_Hint_Pointer=NULL;
@@ -1083,6 +1087,24 @@ void File_Mk::Streams_Finish()
 }
 
 //***************************************************************************
+// Buffer - Global
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void File_Mk::Read_Buffer_Continue()
+{
+    //Handling CRC32 computing when there is no need of the data (data not parsed, only needed for CRC32)
+    if (CRC32Compute_SkipUpTo>File_Offset)
+    {
+        int64u Size=CRC32Compute_SkipUpTo-File_Offset;
+        if (Element_Size>Size)
+            Element_Size=Size;
+        Element_Offset=Element_Size;
+        CRC32_Check();
+    }
+}
+
+//***************************************************************************
 // Buffer
 //***************************************************************************
 
@@ -1507,7 +1529,7 @@ void File_Mk::Data_Parse()
         ATOM_END_MK
     DATA_END
 
-    if (!CRC32Compute.empty())
+    if (!Element_IsWaitingForMoreData() && !CRC32Compute.empty())
         CRC32_Check();
 }
 
@@ -1697,6 +1719,10 @@ void File_Mk::Segment_Attachments()
 void File_Mk::Segment_Attachments_AttachedFile()
 {
     Element_Name("AttachedFile");
+
+    AttachedFile_FileName.clear();
+    AttachedFile_FileMimeType.clear();
+    AttachedFile_FileDescription.clear();
 }
 
 //---------------------------------------------------------------------------
@@ -1705,7 +1731,9 @@ void File_Mk::Segment_Attachments_AttachedFile_FileDescription()
     Element_Name("FileDescription");
 
     //Parsing
-    UTF8_Info();
+    Ztring Data=UTF8_Get();
+
+    AttachedFile_FileDescription=Data.To_UTF8();
 }
 
 //---------------------------------------------------------------------------
@@ -1721,6 +1749,8 @@ void File_Mk::Segment_Attachments_AttachedFile_FileName()
     //Cover is in the first file which name contains "cover"
     if (!CoverIsSetFromAttachment && Data.MakeLowerCase().find(__T("cover")) != string::npos)
         CurrentAttachmentIsCover=true;
+
+    AttachedFile_FileName=Data.To_UTF8();
 }
 
 //---------------------------------------------------------------------------
@@ -1729,7 +1759,9 @@ void File_Mk::Segment_Attachments_AttachedFile_FileMimeType()
     Element_Name("FileMimeType");
 
     //Parsing
-    Local_Info();
+    Ztring Data=Local_Get();
+
+    AttachedFile_FileMimeType=Data.To_UTF8();
 }
 
 //---------------------------------------------------------------------------
@@ -1737,8 +1769,10 @@ void File_Mk::Segment_Attachments_AttachedFile_FileData()
 {
     Element_Name("FileData");
 
+    bool Attachments_Demux=true;
+
     //Parsing
-    if (!CoverIsSetFromAttachment && CurrentAttachmentIsCover && Element_Size<=8*1024*1024) //TODO: option for setting the acceptable maximum size of the attachment
+    if ((Attachments_Demux || !CoverIsSetFromAttachment && CurrentAttachmentIsCover) && Element_Size<=16*1024*1024) //TODO: option for setting the acceptable maximum size of the attachment
     {
         if (!Element_IsComplete_Get())
         {
@@ -1748,12 +1782,30 @@ void File_Mk::Segment_Attachments_AttachedFile_FileData()
 
         std::string Data_Raw;
         Peek_String(Element_TotalSize_Get(), Data_Raw);
-        std::string Data_Base64(Base64::encode(Data_Raw));
 
-        //Filling
-        Fill(Stream_General, 0, General_Cover_Data, Data_Base64);
-        Fill(Stream_General, 0, General_Cover, "Yes");
-        CoverIsSetFromAttachment=true;
+        if (!CoverIsSetFromAttachment && CurrentAttachmentIsCover)
+        {
+            std::string Data_Base64(Base64::encode(Data_Raw));
+
+            //Filling
+            Fill(Stream_General, 0, General_Cover_Data, Data_Base64);
+            Fill(Stream_General, 0, General_Cover, "Yes");
+            CoverIsSetFromAttachment=true;
+        }
+
+        #if MEDIAINFO_EVENTS
+            if (Attachments_Demux)
+            {
+                EVENT_BEGIN(Global, AttachedFile, 0)
+                    Event.Content_Size=Data_Raw.size();
+                    Event.Content=(const int8u*)Data_Raw.c_str();
+                    Event.Flags=0;
+                    Event.Name=AttachedFile_FileName.c_str();
+                    Event.MimeType=AttachedFile_FileMimeType.c_str();
+                    Event.Description=AttachedFile_FileDescription.c_str();
+                EVENT_END()
+            }
+        #endif MEDIAINFO_EVENTS
     }
     
     Skip_XX(Element_TotalSize_Get(),                            "Data");
@@ -3258,7 +3310,7 @@ void File_Mk::Segment_Tracks_TrackEntry_CodecPrivate__Parse()
     #endif // MEDIAINFO_DEMUX
 
     //Parsing
-    Open_Buffer_Continue(streamItem.Parser);
+    Open_Buffer_OutOfBand(streamItem.Parser);
 
     //Filling
     if (streamItem.Parser->Status[IsFinished]) //Can be finnished here...
@@ -3444,24 +3496,7 @@ void File_Mk::Segment_Tracks_TrackEntry_CodecPrivate_vids()
     if (Data_Remain())
     {
         Element_Begin1("Private data");
-        stream& streamItem = Stream[TrackNumber];
-        if (streamItem.Parser)
-        {
-            #if defined(MEDIAINFO_FFV1_YES)
-                if (Compression==0x46465631) //FFV1
-                    Open_Buffer_OutOfBand(streamItem.Parser);
-            #endif
-            #if defined(MEDIAINFO_FFV1_YES)
-                if (Compression==0x46465648) //FFVH
-                {
-                    ((File_HuffYuv*)streamItem.Parser)->IsOutOfBandData=true; //TODO: implement ISOutOfBandData in a generic maner
-                    Open_Buffer_Continue(streamItem.Parser);
-                    Element_Offset=Element_Size;
-                }
-            #endif
-        }
-        else
-            Skip_XX(Element_Size-Element_Offset,                "Unknown");
+        Open_Buffer_OutOfBand(Stream[TrackNumber].Parser);
         Element_End0();
     }
 }
@@ -3927,6 +3962,20 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_PixelHeight()
         Fill(Stream_Video, StreamPos_Last, Video_Height, UInteger, 10, true);
         if (!TrackVideoDisplayHeight)
             TrackVideoDisplayHeight=UInteger; //Default value of DisplayHeight is PixelHeight
+
+        //In case CodecID was defined before this item, some decoders are not initialized with the correct values, filling it now
+        #if defined(MEDIAINFO_FFV1_YES)
+            const Ztring &Format=Retrieve(Stream_Video, StreamPos_Last, Video_Format);
+            stream& streamItem = Stream[TrackNumber];
+            if (0);
+        #endif
+        #if defined(MEDIAINFO_FFV1_YES)
+        else if (Format==__T("FFV1"))
+        {
+            File_Ffv1* parser = (File_Ffv1*)streamItem.Parser;
+            parser->Height=UInteger;
+        }
+        #endif
     FILLING_END();
 }
 
@@ -3945,6 +3994,20 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_PixelWidth()
         Fill(Stream_Video, StreamPos_Last, Video_Width, UInteger, 10, true);
         if (!TrackVideoDisplayWidth)
             TrackVideoDisplayWidth=UInteger; //Default value of DisplayWidth is PixelWidth
+
+        //In case CodecID was defined before this item, some decoders are not initialized with the correct values, filling it now
+        #if defined(MEDIAINFO_FFV1_YES)
+            const Ztring &Format=Retrieve(Stream_Video, StreamPos_Last, Video_Format);
+            stream& streamItem = Stream[TrackNumber];
+            if (0);
+        #endif
+        #if defined(MEDIAINFO_FFV1_YES)
+        else if (Format==__T("FFV1"))
+        {
+            File_Ffv1* parser = (File_Ffv1*)streamItem.Parser;
+            parser->Width=UInteger;
+        }
+        #endif
     FILLING_END();
 }
 
@@ -4622,8 +4685,16 @@ void File_Mk::CRC32_Check ()
     for (size_t i = 0; i<CRC32Compute.size(); i++)
         if (CRC32Compute[i].UpTo && File_Offset + Buffer_Offset - (size_t)Header_Size >= CRC32Compute[i].From)
         {
-            Matroska_CRC32_Compute(CRC32Compute[i].Computed, Buffer + Buffer_Offset - (size_t)Header_Size, Buffer + Buffer_Offset + (size_t)(Element_WantNextLevel?Element_Offset:Element_Size));
-            if (File_Offset + Buffer_Offset + (Element_WantNextLevel?Element_Offset:Element_Size) >= CRC32Compute[i].UpTo)
+            //Handling of case when data is not completetely loaded because it is not needed by the parser
+            const size_t Offset = Buffer_Offset + (size_t)((Element_WantNextLevel && Element_Offset <= Element_Size) ? Element_Offset : Element_Size);
+            if (Element_Offset > Element_Size)
+            {
+                CRC32Compute_SkipUpTo = File_Offset + Element_Offset;
+                Element_Offset = Element_Size;
+            }
+            
+            Matroska_CRC32_Compute(CRC32Compute[i].Computed, Buffer + Buffer_Offset - (size_t)Header_Size, Buffer + Offset);
+            if (File_Offset + Offset >= CRC32Compute[i].UpTo)
             {
                 CRC32Compute[i].Computed ^= 0xFFFFFFFF;
 

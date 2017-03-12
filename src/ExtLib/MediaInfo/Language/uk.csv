@@ -164,6 +164,7 @@ Alignment;Вирівнювання
 Alignment_Aligned;Вирівнювання по проміжкам
 Alignment_Split;Розділення по проміжкам
 All;Все
+AlternateGroup;
 Archival_Location;Розміщення архіву
 Arranger;Розміщено
 ArtDirector;Режисер
@@ -188,6 +189,7 @@ BarCode;Штрихкод
 Basic;Стисло
 Basic_Note;Примітка: Для додаткової інформації оберіть інший вигляд (Таблиця, Дерево,...)
 BitDepth;Бітова глибина
+BitDepth_Detected;
 BitDepth_Stored;
 BitRate;Бітрейт
 BitRate_Encoded;Бітрейт кодування
@@ -292,6 +294,7 @@ Digitized_Date;Дата оцифровування
 Dimensions;Розміри
 Director;Режисер
 DirectorOfPhotography;Оператор
+Disabled;
 DisplayAspectRatio;Співвідношення сторін екрану
 DisplayAspectRatio_CleanAperture;
 DisplayAspectRatio_Original;Оригінальне співвідношення сторін екрану
@@ -304,6 +307,7 @@ Duration_End;Кінець
 Duration_Start;Початок
 Edit;Редагувати
 EditedBy;Змінено
+ElementCount;
 EMail;Е-mail
 Encoded_Application;Програма кодування
 Encoded_Date;Дата кодування
@@ -344,6 +348,7 @@ Format_Commercial;Комерційна назва
 Format_Commercial_IfAny;Комерційна назва
 Format_Description;Опис формату
 Format_Info;Деталі формату
+Format_Level;
 Format_Profile;Профіль формату
 Format_Settings;Налаштування формату
 Format_Settings_BVOP;Налаштування формату, BVOP
@@ -371,6 +376,7 @@ Format_Settings_RefFrames;Налаштування формату, ReFrames
 Format_Settings_SBR;Налаштування формату, SBR
 Format_Settings_Sign;Налаштування формату, Sign
 Format_Settings_Wrapping;
+Format_Tier;
 Format_Url;Інтернет-адреса формату
 Format_Version;Версія формату
 FpaManufacturer;
@@ -667,6 +673,7 @@ Language_en-gb;English (Great Britain)
 Language_en-us;English (United States)
 Language_eo;Esperanto
 Language_es;Spanish
+Language_es-419;
 Language_et;Estonian
 Language_eu;Basque
 Language_fa;Persian
@@ -913,6 +920,7 @@ Original;Оригінальний
 OriginalNetworkName;Оригінальна мережева назва
 OriginalSourceForm;Оригінальна форма джерела
 OriginalSourceMedium;Оригінальне розташування джерела
+OriginalSourceMedium_ID;
 Originator;
 Other;Інше
 OtherIdentifier;
@@ -924,6 +932,7 @@ OverallBitRate_Maximum;Максимальний загальний бітрей�
 OverallBitRate_Minimum;Мінімальний загальний бітрейт
 OverallBitRate_Mode;Режим загального бітрейту
 OverallBitRate_Nominal;Номінальний загальний бітрейт
+PackageName;
 Part;Частина
 Part_Count;Кількість частин
 PartNumber;
@@ -940,6 +949,7 @@ Played_Count;Кількість відтворень
 Played_First_Date;Вперше відтворено
 Played_Last_Date;Востаннє відтворено
 PlayTime;Тривалість програвання
+PodcastCategory;
 Position;Положення
 Position_Total;Загальне
 Preferences;Налаштування
@@ -965,6 +975,7 @@ ReplayGain_Gain;Вирівнювання гучності
 ReplayGain_Peak;Пік вирівнювання гучності
 Resolution;Роздільна здатність
 s; сек.
+SamplesPerFrame;
 SamplingCount;Кількість семплів
 SamplingRate;Частота дискретизації
 Save;Зберегти
@@ -985,6 +996,7 @@ Separator_Columns;Роздільник стовпців
 Separator_Lines;Роздільник рядків
 SeriesTitle;
 ServiceChannel;Номер сервісного каналу
+ServiceKind;
 ServiceName;Сервісне ім'я
 ServiceProvider;Провайдер
 ServiceType;Тип сервісу
@@ -1024,6 +1036,7 @@ StreamKind;Вид потоку
 StreamKindID;Ідентифікатор потоку
 StreamKindPos;Ідентифікатор потоку
 StreamSize;Розмір потоку
+StreamSize_Demuxed;
 StreamSize_Encoded;Розмір кодованого потоку
 StreamSize_Proportion;Відносний розмір потоку
 Subject;Тема
@@ -1106,5 +1119,5 @@ Written_Location;Місце запису
 WrittenBy;Записано
 Yes;Так
 Your system;Ваша система
-ZZ_Automatic_Percent;85
-ZZ_AutomaticLanguage_Percent;92
+ZZ_Automatic_Percent;84
+ZZ_AutomaticLanguage_Percent;91
