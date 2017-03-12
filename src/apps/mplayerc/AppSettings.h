@@ -182,6 +182,12 @@ enum engine_t {
 	ShockWave
 };
 
+struct ShaderC {
+	CString		label;
+	CString		target;
+	CString		srcdata;
+};
+
 #pragma pack(push, 1)
 
 struct dispmode {
@@ -463,7 +469,6 @@ class CAppSettings
 
 public:
 	bool bResetSettings;
-	bool fShadersNeedSave;
 
 	// cmdline params
 	UINT nCLSwitches;
@@ -757,18 +762,11 @@ public:
 	int				iThumbRows, iThumbCols, iThumbWidth, iThumbQuality, iThumbLevelPNG;
 	// Save Subtitle
 	bool			bSubSaveExternalStyleFile;
-	// Shader Editor
-	struct Shader {
-		CString		label;
-		CString		target;
-		CString		srcdata;
-	};
-	CAtlList<Shader> m_shaders;
 	// Shader Combiner
 	bool			fToggleShader;
 	bool			fToggleShaderScreenSpace;
-	CString			strShaderList;
-	CString			strShaderListScreenSpace;
+	CAtlList<CString> ShaderList;
+	CAtlList<CString> ShaderListScreenSpace;
 	// Playlist (contex menu)
 	bool			bShufflePlaylistItems;
 	bool			bHidePlaylistFullScreen;
@@ -852,8 +850,6 @@ public:
 	void			SaveSettings();
 	void			SaveExternalFilters();
 	void			LoadSettings(bool bForce = false);
-	void			SaveShaders();
-	void			LoadShaders();
 
 	void			GetFav(favtype ft, CAtlList<CString>& sl);
 	void			SetFav(favtype ft, CAtlList<CString>& sl);

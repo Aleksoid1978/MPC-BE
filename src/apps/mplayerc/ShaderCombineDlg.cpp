@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,12 +25,10 @@
 
 // CShaderCombineDlg dialog
 
-CShaderCombineDlg::CShaderCombineDlg(CAtlList<CString>& labels1, CAtlList<CString>& labels2, CWnd* pParent)
+CShaderCombineDlg::CShaderCombineDlg(CWnd* pParent)
 	: CCmdUIDialog(CShaderCombineDlg::IDD, pParent)
 	, m_fcheck1(FALSE)
 	, m_fcheck2(FALSE)
-	, m_labels1(labels1)
-	, m_labels2(labels2)
 {
 }
 
@@ -79,39 +77,45 @@ BOOL CShaderCombineDlg::OnInitDialog()
 	auto pFrame = AfxGetMainFrame();
 	m_fcheck1 = m_oldcheck1 = pFrame->m_bToggleShader;
 	m_fcheck2 = m_oldcheck2 = pFrame->m_bToggleShaderScreenSpace;
-	m_oldlabels1.AddTailList(&m_labels1);
-	m_oldlabels2.AddTailList(&m_labels2);
+	m_oldlabels1.AddTailList(&s.ShaderList);
+	m_oldlabels2.AddTailList(&s.ShaderListScreenSpace);
 
-	POSITION pos;
-
-	pos = m_labels1.GetHeadPosition();
-
-	while (pos) {
-		m_list1.AddString(m_labels1.GetNext(pos));
-	}
-
-	m_list1.AddString(L"");
-
-	pos = m_labels2.GetHeadPosition();
-
-	while (pos) {
-		m_list2.AddString(m_labels2.GetNext(pos));
-	}
-
-	m_list2.AddString(L"");
-
-	pos = s.m_shaders.GetHeadPosition();
-	CString str;
-
-	while (pos) {
-		str = s.m_shaders.GetNext(pos).label;
-		m_combo.AddString(str);
+	CString path;
+	if (AfxGetMyApp()->GetAppSavePath(path)) {
+		path += L"Shaders\\";
+		if (::PathFileExists(path)) {
+			WIN32_FIND_DATA wfd;
+			HANDLE hFile = FindFirstFile(path + L"*.hlsl", &wfd);
+			if (hFile != INVALID_HANDLE_VALUE) {
+				do {
+					CString filename(wfd.cFileName);
+					filename.Truncate(filename.GetLength() - 5);
+					m_combo.AddString(filename);
+				} while (FindNextFile(hFile, &wfd));
+				FindClose(hFile);
+			}
+		}
 	}
 
 	if (m_combo.GetCount()) {
 		m_combo.SetCurSel(0);
 		CorrectComboListWidth(m_combo);
 	}
+
+
+	POSITION pos;
+
+	pos = s.ShaderList.GetHeadPosition();
+	while (pos) {
+		m_list1.AddString(s.ShaderList.GetNext(pos));
+	}
+	m_list1.AddString(L"");
+
+	pos = s.ShaderListScreenSpace.GetHeadPosition();
+	while (pos) {
+		m_list2.AddString(s.ShaderListScreenSpace.GetNext(pos));
+	}
+	m_list2.AddString(L"");
 
 	UpdateData(FALSE);
 
@@ -126,13 +130,14 @@ void CShaderCombineDlg::OnOK()
 void CShaderCombineDlg::OnCancel()
 {
 	auto pFrame = AfxGetMainFrame();
+	CAppSettings& s = AfxGetAppSettings();
 
-	m_labels1.RemoveAll();
-	m_labels1.AddTailList(&m_oldlabels1);
+	s.ShaderList.RemoveAll();
+	s.ShaderList.AddTailList(&m_oldlabels1);
 	pFrame->EnableShaders1(m_oldcheck1);
 
-	m_labels2.RemoveAll();
-	m_labels2.AddTailList(&m_oldlabels2);
+	s.ShaderListScreenSpace.RemoveAll();
+	s.ShaderListScreenSpace.AddTailList(&m_oldlabels2);
 	pFrame->EnableShaders2(m_oldcheck2);
 
 	__super::OnCancel();
@@ -298,26 +303,27 @@ void CShaderCombineDlg::OnBnClickedDown()
 void CShaderCombineDlg::UpdateShaders(unsigned char type)
 {
 	auto pFrame = AfxGetMainFrame();
+	CAppSettings& s = AfxGetAppSettings();
 
 	if (type & SHADER1) {
-		m_labels1.RemoveAll();
+		s.ShaderList.RemoveAll();
 
 		for (int i = 0, j = m_list1.GetCount()-1; i < j; i++) {
 			CString label;
 			m_list1.GetText(i, label);
-			m_labels1.AddTail(label);
+			s.ShaderList.AddTail(label);
 		}
 
 		pFrame->EnableShaders1(!!m_fcheck1);
 	}
 
 	if (type & SHADER2) {
-		m_labels2.RemoveAll();
+		s.ShaderListScreenSpace.RemoveAll();
 
 		for (int m = 0, n = m_list2.GetCount()-1; m < n; m++) {
 			CString label;
 			m_list2.GetText(m, label);
-			m_labels2.AddTail(label);
+			s.ShaderListScreenSpace.AddTail(label);
 		}
 
 		pFrame->EnableShaders2(!!m_fcheck2);

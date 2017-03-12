@@ -69,7 +69,7 @@ private:
 	bool HitTestSplitter(CPoint p);
 
 	CPixelShaderCompiler* m_pPSC;
-	CAppSettings::Shader* m_pShader;
+	ShaderC* m_pShader;
 
 public:
 	CShaderEditorDlg();

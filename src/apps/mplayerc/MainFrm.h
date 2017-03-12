@@ -783,9 +783,6 @@ public:
 	int  GetAudioTrackIdx();
 	int  GetSubtitleTrackIdx();
 
-	// shaders
-	CAtlList<CString> m_shaderlabels;
-	CAtlList<CString> m_shaderlabelsScreenSpace;
 	void SetShaders();
 	void UpdateShaders(CString label);
 
@@ -1230,6 +1227,9 @@ public:
 
 	bool		m_bToggleShader;
 	bool		m_bToggleShaderScreenSpace;
+	CAtlList<ShaderC> m_ShaderCashe;
+	ShaderC*	GetShader(LPCWSTR label);
+
 	bool		m_bInOptions;
 	bool		m_bStopTunerScan;
 

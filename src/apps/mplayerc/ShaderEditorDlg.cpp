@@ -240,12 +240,13 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 	m_targets.AddString(L"ps_3_0");
 	m_targets.AddString(L"ps_3_sw");
 
-	POSITION pos = AfxGetAppSettings().m_shaders.GetHeadPosition();
+	// TODO: SHADERS
+	//T//POSITION pos = AfxGetAppSettings().m_shaders.GetHeadPosition();
 
-	while (pos) {
-		const CAppSettings::Shader& s = AfxGetAppSettings().m_shaders.GetNext(pos);
-		m_labels.SetItemDataPtr(m_labels.AddString(s.label), (void*)&s);
-	}
+	//T//while (pos) {
+	//T//	const CAppSettings::Shader& s = AfxGetAppSettings().m_shaders.GetNext(pos);
+	//T//	m_labels.SetItemDataPtr(m_labels.AddString(s.label), (void*)&s);
+	//T//}
 
 	CorrectComboListWidth(m_labels);
 
@@ -329,7 +330,7 @@ void CShaderEditorDlg::OnCbnSelchangeCombo1()
 		}
 
 		for (int k = 0; k < m_labels.GetCount(); k++) {
-			if (label.CompareNoCase(((CAppSettings::Shader*)m_labels.GetItemDataPtr(k))->label) == 0) {
+			if (label.CompareNoCase(((ShaderC*)m_labels.GetItemDataPtr(k))->label) == 0) {
 				m_labels.SetCurSel(k);
 				i = k;
 				break;
@@ -343,19 +344,20 @@ void CShaderEditorDlg::OnCbnSelchangeCombo1()
 			return;
 		}
 
-		CAppSettings::Shader s;
+		ShaderC s;
 		s.label = label;
 		s.target = L"ps_2_0";
 		s.srcdata = CString(srcdata);
 
-		POSITION pos = AfxGetAppSettings().m_shaders.AddTail(s);
+		// TODO: SHADERS
+		//T//POSITION pos = AfxGetAppSettings().m_shaders.AddTail(s);
 
 		i = m_labels.AddString(s.label);
 		m_labels.SetCurSel(i);
-		m_labels.SetItemDataPtr(i, (void*)&AfxGetAppSettings().m_shaders.GetAt(pos));
+		//T//m_labels.SetItemDataPtr(i, (void*)&AfxGetAppSettings().m_shaders.GetAt(pos));
 	}
 
-	m_pShader = (CAppSettings::Shader*)m_labels.GetItemDataPtr(i);
+	m_pShader = (ShaderC*)m_labels.GetItemDataPtr(i);
 
 	m_targets.SetWindowText(m_pShader->target);
 
@@ -378,30 +380,31 @@ void CShaderEditorDlg::OnBnClickedButton2()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	for (POSITION pos = s.m_shaders.GetHeadPosition(); pos; s.m_shaders.GetNext(pos)) {
-		if (m_pShader == &s.m_shaders.GetAt(pos)) {
-			CString strShaderPath;
-			if (AfxGetMyApp()->GetAppSavePath(strShaderPath)) {
-				strShaderPath += L"Shaders\\" + m_pShader->label + L".hlsl";
-				DeleteFile(strShaderPath);
-			}
-
-			m_pShader = NULL;
-			s.m_shaders.RemoveAt(pos);
-			int i = m_labels.GetCurSel();
-
-			if (i >= 0) {
-				m_labels.DeleteString(i);
-			}
-
-			m_labels.SetWindowText(L"");
-			m_targets.SetWindowText(L"");
-			m_srcdata.SetWindowText(L"");
-			m_output.SetWindowText(L"");
-			AfxGetMainFrame()->UpdateShaders(L"");
-			break;
-		}
-	}
+	// TODO: SHADERS
+	//T//for (POSITION pos = s.m_shaders.GetHeadPosition(); pos; s.m_shaders.GetNext(pos)) {
+	//T//	if (m_pShader == &s.m_shaders.GetAt(pos)) {
+	//T//		CString strShaderPath;
+	//T//		if (AfxGetMyApp()->GetAppSavePath(strShaderPath)) {
+	//T//			strShaderPath += L"Shaders\\" + m_pShader->label + L".hlsl";
+	//T//			DeleteFile(strShaderPath);
+	//T//		}
+	//T//
+	//T//		m_pShader = NULL;
+	//T//		s.m_shaders.RemoveAt(pos);
+	//T//		int i = m_labels.GetCurSel();
+	//T//
+	//T//		if (i >= 0) {
+	//T//			m_labels.DeleteString(i);
+	//T//		}
+	//T//
+	//T//		m_labels.SetWindowText(L"");
+	//T//		m_targets.SetWindowText(L"");
+	//T//		m_srcdata.SetWindowText(L"");
+	//T//		m_output.SetWindowText(L"");
+	//T//		AfxGetMainFrame()->UpdateShaders(L"");
+	//T//		break;
+	//T//	}
+	//T//}
 }
 
 void CShaderEditorDlg::OnTimer(UINT_PTR nIDEvent)

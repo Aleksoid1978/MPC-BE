@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,17 +36,16 @@ class CShaderCombineDlg : public CCmdUIDialog
 	CComboBox m_combo;
 
 	BOOL m_fcheck1, m_fcheck2;
-	CAtlList<CString>& m_labels1;
-	CAtlList<CString>& m_labels2;
 
-	bool m_oldcheck1, m_oldcheck2;
+	bool m_oldcheck1;
+	bool m_oldcheck2;
 	CAtlList<CString> m_oldlabels1;
 	CAtlList<CString> m_oldlabels2;
 
 	void UpdateShaders(unsigned char type = SHADERS);
 
 public:
-	CShaderCombineDlg(CAtlList<CString>& labels1, CAtlList<CString>& labels2, CWnd* pParent);
+	CShaderCombineDlg(CWnd* pParent);
 	virtual ~CShaderCombineDlg();
 
 	enum { IDD = IDD_SHADERCOMBINE_DLG };
