@@ -719,6 +719,28 @@ static void p010BEToUV_c(uint8_t *dstU, uint8_t *dstV,
     }
 }
 
+static void p016LEToUV_c(uint8_t *dstU, uint8_t *dstV,
+                       const uint8_t *unused0, const uint8_t *src1, const uint8_t *src2,
+                       int width, uint32_t *unused)
+{
+    int i;
+    for (i = 0; i < width; i++) {
+        AV_WN16(dstU + i * 2, AV_RL16(src1 + i * 4 + 0));
+        AV_WN16(dstV + i * 2, AV_RL16(src1 + i * 4 + 2));
+    }
+}
+
+static void p016BEToUV_c(uint8_t *dstU, uint8_t *dstV,
+                       const uint8_t *unused0, const uint8_t *src1, const uint8_t *src2,
+                       int width, uint32_t *unused)
+{
+    int i;
+    for (i = 0; i < width; i++) {
+        AV_WN16(dstU + i * 2, AV_RB16(src1 + i * 4 + 0));
+        AV_WN16(dstV + i * 2, AV_RB16(src1 + i * 4 + 2));
+    }
+}
+
 #define input_pixel(pos) (isBE(origin) ? AV_RB16(pos) : AV_RL16(pos))
 
 static void bgr24ToY_c(uint8_t *_dst, const uint8_t *src, const uint8_t *unused1, const uint8_t *unused2,
@@ -926,16 +948,23 @@ static void planar_rgb##nbits##endian_name##_to_y(uint8_t *dst, const uint8_t *s
 {                                                                                                   \
     planar_rgb16_to_y(dst, src, w, nbits, endian, rgb2yuv);                                         \
 }                                                                                                   \
-static void planar_rgb##nbits##endian_name##_to_a(uint8_t *dst, const uint8_t *src[4],              \
-                                                  int w, int32_t *rgb2yuv)                          \
-{                                                                                                   \
-    planar_rgb16_to_a(dst, src, w, nbits, endian, rgb2yuv);                                         \
-}                                                                                                   \
 static void planar_rgb##nbits##endian_name##_to_uv(uint8_t *dstU, uint8_t *dstV,                    \
                                                    const uint8_t *src[4], int w, int32_t *rgb2yuv)  \
 {                                                                                                   \
     planar_rgb16_to_uv(dstU, dstV, src, w, nbits, endian, rgb2yuv);                                 \
 }                                                                                                   \
+
+#define rgb9plus_planar_transparency_funcs(nbits)                           \
+static void planar_rgb##nbits##le_to_a(uint8_t *dst, const uint8_t *src[4], \
+                                       int w, int32_t *rgb2yuv)             \
+{                                                                           \
+    planar_rgb16_to_a(dst, src, w, nbits, 0, rgb2yuv);                      \
+}                                                                           \
+static void planar_rgb##nbits##be_to_a(uint8_t *dst, const uint8_t *src[4], \
+                                       int w, int32_t *rgb2yuv)             \
+{                                                                           \
+    planar_rgb16_to_a(dst, src, w, nbits, 1, rgb2yuv);                      \
+}
 
 #define rgb9plus_planar_funcs(nbits)            \
     rgb9plus_planar_funcs_endian(nbits, le, 0)  \
@@ -946,6 +975,10 @@ rgb9plus_planar_funcs(10)
 rgb9plus_planar_funcs(12)
 rgb9plus_planar_funcs(14)
 rgb9plus_planar_funcs(16)
+
+rgb9plus_planar_transparency_funcs(10)
+rgb9plus_planar_transparency_funcs(12)
+rgb9plus_planar_transparency_funcs(16)
 
 av_cold void ff_sws_init_input_funcs(SwsContext *c)
 {
@@ -1084,6 +1117,12 @@ av_cold void ff_sws_init_input_funcs(SwsContext *c)
         break;
     case AV_PIX_FMT_P010BE:
         c->chrToYV12 = p010BEToUV_c;
+        break;
+    case AV_PIX_FMT_P016LE:
+        c->chrToYV12 = p016LEToUV_c;
+        break;
+    case AV_PIX_FMT_P016BE:
+        c->chrToYV12 = p016BEToUV_c;
         break;
     }
     if (c->chrSrcHSubSample) {
@@ -1326,6 +1365,8 @@ av_cold void ff_sws_init_input_funcs(SwsContext *c)
     case AV_PIX_FMT_GRAY10LE:
     case AV_PIX_FMT_GRAY12LE:
     case AV_PIX_FMT_GRAY16LE:
+
+    case AV_PIX_FMT_P016LE:
         c->lumToYV12 = bswap16Y_c;
         break;
     case AV_PIX_FMT_YUVA444P9LE:
@@ -1362,6 +1403,8 @@ av_cold void ff_sws_init_input_funcs(SwsContext *c)
     case AV_PIX_FMT_GRAY10BE:
     case AV_PIX_FMT_GRAY12BE:
     case AV_PIX_FMT_GRAY16BE:
+
+    case AV_PIX_FMT_P016BE:
         c->lumToYV12 = bswap16Y_c;
         break;
     case AV_PIX_FMT_YUVA444P9BE:

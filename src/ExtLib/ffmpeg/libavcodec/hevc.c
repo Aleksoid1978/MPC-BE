@@ -1056,7 +1056,7 @@ static int hls_transform_unit(HEVCContext *s, int x0, int y0,
                         for (i = 0; i < (size * size); i++) {
                             coeffs[i] = ((lc->tu.res_scale_val * coeffs_y[i]) >> 3);
                         }
-                        s->hevcdsp.transform_add[log2_trafo_size_c-2](dst, coeffs, stride);
+                        s->hevcdsp.add_residual[log2_trafo_size_c-2](dst, coeffs, stride);
                     }
             }
 
@@ -1085,7 +1085,7 @@ static int hls_transform_unit(HEVCContext *s, int x0, int y0,
                         for (i = 0; i < (size * size); i++) {
                             coeffs[i] = ((lc->tu.res_scale_val * coeffs_y[i]) >> 3);
                         }
-                        s->hevcdsp.transform_add[log2_trafo_size_c-2](dst, coeffs, stride);
+                        s->hevcdsp.add_residual[log2_trafo_size_c-2](dst, coeffs, stride);
                     }
             }
         } else if (s->ps.sps->chroma_format_idc && blk_idx == 3) {
@@ -3450,5 +3450,6 @@ AVCodec ff_hevc_decoder = {
     .init_thread_copy      = hevc_init_thread_copy,
     .capabilities          = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY |
                              AV_CODEC_CAP_SLICE_THREADS | AV_CODEC_CAP_FRAME_THREADS,
+    .caps_internal         = FF_CODEC_CAP_INIT_THREADSAFE,
     .profiles              = NULL_IF_CONFIG_SMALL(ff_hevc_profiles),
 };

@@ -112,6 +112,12 @@
  * are filled. This situation is handled transparently if you follow the steps
  * outlined above.
  *
+ * In theory, sending input can result in EAGAIN - this should happen only if
+ * not all output was received. You can use this to structure alternative decode
+ * or encode loops other than the one suggested above. For example, you could
+ * try sending new input on each iteration, and try to receive output if that
+ * returns EAGAIN.
+ *
  * End of stream situations. These require "flushing" (aka draining) the codec,
  * as the codec might buffer multiple frames or packets internally for
  * performance or out of necessity (consider B-frames).
@@ -146,7 +152,8 @@
  *   Unlike with the old video decoding API, multiple frames might result from
  *   a packet. For audio, splitting the input packet into frames by partially
  *   decoding packets becomes transparent to the API user. You never need to
- *   feed an AVPacket to the API twice.
+ *   feed an AVPacket to the API twice (unless it is rejected with EAGAIN - then
+ *   no data was read from the packet).
  *   Additionally, sending a flush/draining packet is required only once.
  * - avcodec_encode_video2()/avcodec_encode_audio2():
  *   Use avcodec_send_frame() to feed input to the encoder, then use
@@ -159,7 +166,22 @@
  * and will result in undefined behavior.
  *
  * Some codecs might require using the new API; using the old API will return
- * an error when calling it.
+ * an error when calling it. All codecs support the new API.
+ *
+ * A codec is not allowed to return EAGAIN for both sending and receiving. This
+ * would be an invalid state, which could put the codec user into an endless
+ * loop. The API has no concept of time either: it cannot happen that trying to
+ * do avcodec_send_packet() results in EAGAIN, but a repeated call 1 second
+ * later accepts the packet (with no other receive/flush API calls involved).
+ * The API is a strict state machine, and the passage of time is not supposed
+ * to influence it. Some timing-dependent behavior might still be deemed
+ * acceptable in certain cases. But it must never result in both send/receive
+ * returning EAGAIN at the same time at any point. It must also absolutely be
+ * avoided that the current state is "unstable" and can "flip-flop" between
+ * the send/receive APIs allowing progress. For example, it's not allowed that
+ * the codec randomly decides that it actually wants to consume a packet now
+ * instead of returning a frame, after it just returned EAGAIN on an
+ * avcodec_send_packet() call.
  * @}
  */
 
@@ -414,6 +436,9 @@ enum AVCodecID {
     AV_CODEC_ID_PSD,
     AV_CODEC_ID_PIXLET,
     AV_CODEC_ID_SPEEDHQ,
+    AV_CODEC_ID_FMVC,
+    AV_CODEC_ID_SCPR,
+    AV_CODEC_ID_CLEARVIDEO,
 
     /* various PCM "codecs" */
     AV_CODEC_ID_FIRST_AUDIO = 0x10000,     ///< A dummy id pointing at the start of audio codecs
@@ -603,6 +628,8 @@ enum AVCodecID {
     AV_CODEC_ID_XMA1,
     AV_CODEC_ID_XMA2,
     AV_CODEC_ID_DST,
+    AV_CODEC_ID_ATRAC3AL,
+    AV_CODEC_ID_ATRAC3PAL,
 
     /* subtitle codecs */
     AV_CODEC_ID_FIRST_SUBTITLE = 0x17000,          ///< A dummy ID pointing at the start of subtitle codecs.
@@ -1676,7 +1703,7 @@ enum AVFieldOrder {
  * New fields can be added to the end with minor version bumps.
  * Removal, reordering and changes to existing fields require a major
  * version bump.
- * Please use AVOptions (av_opt* / av_set/get*()) to access these fields from user
+ * You can use AVOptions (av_opt* / av_set/get*()) to access these fields from user
  * applications.
  * The name string for AVOptions options matches the associated command line
  * parameter name and can be found in libavcodec/options_table.h
@@ -2947,8 +2974,8 @@ typedef struct AVCodecContext {
 #define FF_DEBUG_MMCO        0x00000800
 #define FF_DEBUG_BUGS        0x00001000
 #if FF_API_DEBUG_MV
-#define FF_DEBUG_VIS_QP      0x00002000 ///< only access through AVOptions from outside libavcodec
-#define FF_DEBUG_VIS_MB_TYPE 0x00004000 ///< only access through AVOptions from outside libavcodec
+#define FF_DEBUG_VIS_QP      0x00002000
+#define FF_DEBUG_VIS_MB_TYPE 0x00004000
 #endif
 #define FF_DEBUG_BUFFERS     0x00008000
 #define FF_DEBUG_THREADS     0x00010000
@@ -2958,7 +2985,6 @@ typedef struct AVCodecContext {
 #if FF_API_DEBUG_MV
     /**
      * debug
-     * Code outside libavcodec should access this field using AVOptions
      * - encoding: Set by user.
      * - decoding: Set by user.
      */
@@ -3093,8 +3119,6 @@ typedef struct AVCodecContext {
      * low resolution decoding, 1-> 1/2 size, 2->1/4 size
      * - encoding: unused
      * - decoding: Set by user.
-     * Code outside libavcodec should access this field using:
-     * av_codec_{get,set}_lowres(avctx)
      */
      int lowres;
 #endif
@@ -3395,8 +3419,6 @@ typedef struct AVCodecContext {
 
     /**
      * Timebase in which pkt_dts/pts and AVPacket.dts/pts are.
-     * Code outside libavcodec should access this field using:
-     * av_codec_{get,set}_pkt_timebase(avctx)
      * - encoding unused.
      * - decoding set by user.
      */
@@ -3404,8 +3426,6 @@ typedef struct AVCodecContext {
 
     /**
      * AVCodecDescriptor
-     * Code outside libavcodec should access this field using:
-     * av_codec_{get,set}_codec_descriptor(avctx)
      * - encoding: unused.
      * - decoding: set by libavcodec.
      */
@@ -3416,8 +3436,6 @@ typedef struct AVCodecContext {
      * low resolution decoding, 1-> 1/2 size, 2->1/4 size
      * - encoding: unused
      * - decoding: Set by user.
-     * Code outside libavcodec should access this field using:
-     * av_codec_{get,set}_lowres(avctx)
      */
      int lowres;
 #endif
@@ -3458,7 +3476,6 @@ typedef struct AVCodecContext {
      * However for formats that do not use pre-multiplied alpha
      * there might be serious artefacts (though e.g. libswscale currently
      * assumes pre-multiplied alpha anyway).
-     * Code outside libavcodec should access this field using AVOptions
      *
      * - decoding: set by user
      * - encoding: unused
@@ -3475,7 +3492,6 @@ typedef struct AVCodecContext {
 #if !FF_API_DEBUG_MV
     /**
      * debug motion vectors
-     * Code outside libavcodec should access this field using AVOptions
      * - encoding: Set by user.
      * - decoding: Set by user.
      */
@@ -3487,7 +3503,6 @@ typedef struct AVCodecContext {
 
     /**
      * custom intra quantization matrix
-     * Code outside libavcodec should access this field using av_codec_g/set_chroma_intra_matrix()
      * - encoding: Set by user, can be NULL.
      * - decoding: unused.
      */
@@ -3496,8 +3511,6 @@ typedef struct AVCodecContext {
     /**
      * dump format separator.
      * can be ", " or "\n      " or anything else
-     * Code outside libavcodec should access this field using AVOptions
-     * (NO direct access).
      * - encoding: Set by user.
      * - decoding: Set by user.
      */
@@ -3507,13 +3520,12 @@ typedef struct AVCodecContext {
      * ',' separated list of allowed decoders.
      * If NULL then all are allowed
      * - encoding: unused
-     * - decoding: set by user through AVOPtions (NO direct access)
+     * - decoding: set by user
      */
     char *codec_whitelist;
 
     /*
      * Properties of the stream that gets decoded
-     * To be accessed through av_codec_get_properties() (NO direct access)
      * - encoding: unused
      * - decoding: set by libavcodec
      */
@@ -3538,7 +3550,8 @@ typedef struct AVCodecContext {
     /**
      * A reference to the AVHWFramesContext describing the input (for encoding)
      * or output (decoding) frames. The reference is set by the caller and
-     * afterwards owned (and freed) by libavcodec.
+     * afterwards owned (and freed) by libavcodec - it should never be read by
+     * the caller after being set.
      *
      * - decoding: This field should be set by the caller from the get_format()
      *             callback. The previous reference (if any) will always be
@@ -3588,6 +3601,27 @@ typedef struct AVCodecContext {
      */
     int64_t max_pixels;
 
+    /**
+     * A reference to the AVHWDeviceContext describing the device which will
+     * be used by a hardware encoder/decoder.  The reference is set by the
+     * caller and afterwards owned (and freed) by libavcodec.
+     *
+     * This should be used if either the codec device does not require
+     * hardware frames or any that are used are to be allocated internally by
+     * libavcodec.  If the user wishes to supply any of the frames used as
+     * encoder input or decoder output then hw_frames_ctx should be used
+     * instead.  When hw_frames_ctx is set in get_format() for a decoder, this
+     * field will be ignored while decoding the associated stream segment, but
+     * may again be used on a following one after another get_format() call.
+     *
+     * For both encoders and decoders this field should be set before
+     * avcodec_open2() is called and must not be written to thereafter.
+     *
+     * Note that some decoders may require this field to be set initially in
+     * order to support hw_frames_ctx at all - in that case, all frames
+     * contexts used must be created on the same device.
+     */
+    AVBufferRef *hw_device_ctx;
 } AVCodecContext;
 
 AVRational av_codec_get_pkt_timebase         (const AVCodecContext *avctx);
@@ -3647,7 +3681,7 @@ typedef struct AVCodec {
     const int *supported_samplerates;       ///< array of supported audio samplerates, or NULL if unknown, array is terminated by 0
     const enum AVSampleFormat *sample_fmts; ///< array of supported sample formats, or NULL if unknown, array is terminated by -1
     const uint64_t *channel_layouts;         ///< array of support channel layouts, or NULL if unknown. array is terminated by 0
-    uint8_t max_lowres;                     ///< maximum value for lowres supported by the decoder, no direct access, use av_codec_get_max_lowres()
+    uint8_t max_lowres;                     ///< maximum value for lowres supported by the decoder
     const AVClass *priv_class;              ///< AVClass for the private context
     const AVProfile *profiles;              ///< array of recognized profiles, or NULL if unknown, array is terminated by {FF_PROFILE_UNKNOWN}
 
@@ -4907,8 +4941,10 @@ int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
  *                  a flush packet.
  *
  * @return 0 on success, otherwise negative error code:
- *      AVERROR(EAGAIN):   input is not accepted right now - the packet must be
- *                         resent after trying to read output
+ *      AVERROR(EAGAIN):   input is not accepted in the current state - user
+ *                         must read output with avcodec_receive_frame() (once
+ *                         all output is read, the packet should be resent, and
+ *                         the call will not fail with EAGAIN).
  *      AVERROR_EOF:       the decoder has been flushed, and no new packets can
  *                         be sent to it (also returned if more than 1 flush
  *                         packet is sent)
@@ -4929,7 +4965,7 @@ int avcodec_send_packet(AVCodecContext *avctx, const AVPacket *avpkt);
  *
  * @return
  *      0:                 success, a frame was returned
- *      AVERROR(EAGAIN):   output is not available right now - user must try
+ *      AVERROR(EAGAIN):   output is not available in this state - user must try
  *                         to send new input
  *      AVERROR_EOF:       the decoder has been fully flushed, and there will be
  *                         no more output frames
@@ -4962,8 +4998,10 @@ int avcodec_receive_frame(AVCodecContext *avctx, AVFrame *frame);
  *                  avctx->frame_size for all frames except the last.
  *                  The final frame may be smaller than avctx->frame_size.
  * @return 0 on success, otherwise negative error code:
- *      AVERROR(EAGAIN):   input is not accepted right now - the frame must be
- *                         resent after trying to read output packets
+ *      AVERROR(EAGAIN):   input is not accepted in the current state - user
+ *                         must read output with avcodec_receive_packet() (once
+ *                         all output is read, the packet should be resent, and
+ *                         the call will not fail with EAGAIN).
  *      AVERROR_EOF:       the encoder has been flushed, and no new frames can
  *                         be sent to it
  *      AVERROR(EINVAL):   codec not opened, refcounted_frames not set, it is a
@@ -4981,8 +5019,8 @@ int avcodec_send_frame(AVCodecContext *avctx, const AVFrame *frame);
  *              encoder. Note that the function will always call
  *              av_frame_unref(frame) before doing anything else.
  * @return 0 on success, otherwise negative error code:
- *      AVERROR(EAGAIN):   output is not available right now - user must try
- *                         to send input
+ *      AVERROR(EAGAIN):   output is not available in the current state - user
+ *                         must try to send input
  *      AVERROR_EOF:       the encoder has been fully flushed, and there will be
  *                         no more output packets
  *      AVERROR(EINVAL):   codec not opened, or it is an encoder

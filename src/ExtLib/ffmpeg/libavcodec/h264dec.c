@@ -563,8 +563,7 @@ static int get_last_needed_nal(H264Context *h)
 {
     int nals_needed = 0;
     int first_slice = 0;
-    int i;
-    int ret;
+    int i, ret;
 
     for (i = 0; i < h->pkt.nb_nals; i++) {
         H2645NAL *nal = &h->pkt.nals[i];
@@ -582,9 +581,14 @@ static int get_last_needed_nal(H264Context *h)
         case H264_NAL_DPA:
         case H264_NAL_IDR_SLICE:
         case H264_NAL_SLICE:
-            ret = init_get_bits8(&gb, nal->data + 1, (nal->size - 1));
-            if (ret < 0)
-                return ret;
+            ret = init_get_bits8(&gb, nal->data + 1, nal->size - 1);
+            if (ret < 0) {
+                av_log(h->avctx, AV_LOG_ERROR, "Invalid zero-sized VCL NAL unit\n");
+                if (h->avctx->err_recognition & AV_EF_EXPLODE)
+                    return ret;
+
+                break;
+            }
             if (!get_ue_golomb_long(&gb) ||  // first_mb_in_slice
                 !first_slice ||
                 first_slice != nal->type)
@@ -907,7 +911,12 @@ static int output_frame(H264Context *h, AVFrame *dst, H264Picture *srcp)
     AVFrame *src = srcp->f;
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(src->format);
     int i;
-    int ret = av_frame_ref(dst, src);
+    int ret;
+
+    if (src->format == AV_PIX_FMT_VIDEOTOOLBOX && src->buf[0]->size == 1)
+        return AVERROR_EXTERNAL;
+
+    ret = av_frame_ref(dst, src);
     if (ret < 0)
         return ret;
 

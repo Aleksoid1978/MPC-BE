@@ -26,6 +26,11 @@
 #include "mem.h"
 #include "samplefmt.h"
 
+
+static AVFrameSideData *frame_new_side_data(AVFrame *frame,
+                                            enum AVFrameSideDataType type,
+                                            AVBufferRef *buf);
+
 MAKE_ACCESSORS(AVFrame, frame, int64_t, best_effort_timestamp)
 MAKE_ACCESSORS(AVFrame, frame, int64_t, pkt_duration)
 MAKE_ACCESSORS(AVFrame, frame, int64_t, pkt_pos)
@@ -344,19 +349,10 @@ FF_ENABLE_DEPRECATION_WARNINGS
             }
             memcpy(sd_dst->data, sd_src->data, sd_src->size);
         } else {
-            sd_dst = av_frame_new_side_data(dst, sd_src->type, 0);
+            sd_dst = frame_new_side_data(dst, sd_src->type, av_buffer_ref(sd_src->buf));
             if (!sd_dst) {
                 wipe_side_data(dst);
                 return AVERROR(ENOMEM);
-            }
-            if (sd_src->buf) {
-                sd_dst->buf = av_buffer_ref(sd_src->buf);
-                if (!sd_dst->buf) {
-                    wipe_side_data(dst);
-                    return AVERROR(ENOMEM);
-                }
-                sd_dst->data = sd_dst->buf->data;
-                sd_dst->size = sd_dst->buf->size;
             }
         }
         av_dict_copy(&sd_dst->metadata, sd_src->metadata, 0);
@@ -378,6 +374,13 @@ FF_DISABLE_DEPRECATION_WARNINGS
     }
 FF_ENABLE_DEPRECATION_WARNINGS
 #endif
+
+    av_buffer_unref(&dst->opaque_ref);
+    if (src->opaque_ref) {
+        dst->opaque_ref = av_buffer_ref(src->opaque_ref);
+        if (!dst->opaque_ref)
+            return AVERROR(ENOMEM);
+    }
 
     return 0;
 }
@@ -513,6 +516,8 @@ void av_frame_unref(AVFrame *frame)
 
     av_buffer_unref(&frame->hw_frames_ctx);
 
+    av_buffer_unref(&frame->opaque_ref);
+
     get_frame_defaults(frame);
 }
 
@@ -624,40 +629,47 @@ AVBufferRef *av_frame_get_plane_buffer(AVFrame *frame, int plane)
     return NULL;
 }
 
-AVFrameSideData *av_frame_new_side_data(AVFrame *frame,
-                                        enum AVFrameSideDataType type,
-                                        int size)
+static AVFrameSideData *frame_new_side_data(AVFrame *frame,
+                                            enum AVFrameSideDataType type,
+                                            AVBufferRef *buf)
 {
     AVFrameSideData *ret, **tmp;
 
-    if (frame->nb_side_data > INT_MAX / sizeof(*frame->side_data) - 1)
+    if (!buf)
         return NULL;
+
+    if (frame->nb_side_data > INT_MAX / sizeof(*frame->side_data) - 1)
+        goto fail;
 
     tmp = av_realloc(frame->side_data,
                      (frame->nb_side_data + 1) * sizeof(*frame->side_data));
     if (!tmp)
-        return NULL;
+        goto fail;
     frame->side_data = tmp;
 
     ret = av_mallocz(sizeof(*ret));
     if (!ret)
-        return NULL;
+        goto fail;
 
-    if (size > 0) {
-        ret->buf = av_buffer_alloc(size);
-        if (!ret->buf) {
-            av_freep(&ret);
-            return NULL;
-        }
-
-        ret->data = ret->buf->data;
-        ret->size = size;
-    }
+    ret->buf = buf;
+    ret->data = ret->buf->data;
+    ret->size = buf->size;
     ret->type = type;
 
     frame->side_data[frame->nb_side_data++] = ret;
 
     return ret;
+fail:
+    av_buffer_unref(&buf);
+    return NULL;
+}
+
+AVFrameSideData *av_frame_new_side_data(AVFrame *frame,
+                                        enum AVFrameSideDataType type,
+                                        int size)
+{
+
+    return frame_new_side_data(frame, type, av_buffer_alloc(size));
 }
 
 AVFrameSideData *av_frame_get_side_data(const AVFrame *frame,
@@ -725,7 +737,7 @@ int av_frame_copy(AVFrame *dst, const AVFrame *src)
 
     if (dst->width > 0 && dst->height > 0)
         return frame_copy_video(dst, src);
-    else if (dst->nb_samples > 0 && dst->channel_layout)
+    else if (dst->nb_samples > 0 && dst->channels > 0)
         return frame_copy_audio(dst, src);
 
     return AVERROR(EINVAL);

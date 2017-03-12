@@ -1308,6 +1308,8 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
         goto free_and_end;
     }
 
+    avctx->internal->skip_samples_multiplier = 1;
+
     if (codec->priv_data_size > 0) {
         if (!avctx->priv_data) {
             avctx->priv_data = av_mallocz(codec->priv_data_size);
@@ -1594,6 +1596,17 @@ FF_ENABLE_DEPRECATION_WARNINGS
                 ret = AVERROR(EINVAL);
                 goto free_and_end;
             }
+            if (avctx->sw_pix_fmt != AV_PIX_FMT_NONE &&
+                avctx->sw_pix_fmt != frames_ctx->sw_format) {
+                av_log(avctx, AV_LOG_ERROR,
+                       "Mismatching AVCodecContext.sw_pix_fmt (%s) "
+                       "and AVHWFramesContext.sw_format (%s)\n",
+                       av_get_pix_fmt_name(avctx->sw_pix_fmt),
+                       av_get_pix_fmt_name(frames_ctx->sw_format));
+                ret = AVERROR(EINVAL);
+                goto free_and_end;
+            }
+            avctx->sw_pix_fmt = frames_ctx->sw_format;
         }
     }
 
@@ -2101,7 +2114,7 @@ static int64_t guess_correct_pts(AVCodecContext *ctx,
     return pts;
 }
 
-static int apply_param_change(AVCodecContext *avctx, AVPacket *avpkt)
+static int apply_param_change(AVCodecContext *avctx, const AVPacket *avpkt)
 {
     int size = 0, ret;
     const uint8_t *data;
@@ -2396,7 +2409,7 @@ int attribute_align_arg avcodec_decode_audio4(AVCodecContext *avctx,
 
         side= av_packet_get_side_data(avctx->internal->pkt, AV_PKT_DATA_SKIP_SAMPLES, &side_size);
         if(side && side_size>=10) {
-            avctx->internal->skip_samples = AV_RL32(side);
+            avctx->internal->skip_samples = AV_RL32(side) * avctx->internal->skip_samples_multiplier;
             discard_padding = AV_RL32(side + 4);
             av_log(avctx, AV_LOG_DEBUG, "skip %d / discard %d samples due to side data\n",
                    avctx->internal->skip_samples, (int)discard_padding);
@@ -2723,13 +2736,19 @@ int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
                                                      avctx->pkt_timebase, ms);
             }
 
+            if (avctx->codec_descriptor->props & AV_CODEC_PROP_BITMAP_SUB)
+                sub->format = 0;
+            else if (avctx->codec_descriptor->props & AV_CODEC_PROP_TEXT_SUB)
+                sub->format = 1;
+
             for (i = 0; i < sub->num_rects; i++) {
                 if (sub->rects[i]->ass && !utf8_check(sub->rects[i]->ass)) {
                     av_log(avctx, AV_LOG_ERROR,
                            "Invalid UTF-8 in decoded subtitles text; "
                            "maybe missing -sub_charenc option\n");
                     avsubtitle_free(sub);
-                    return AVERROR_INVALIDDATA;
+                    ret = AVERROR_INVALIDDATA;
+                    break;
                 }
             }
 
@@ -2740,10 +2759,6 @@ int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
 
                 av_packet_unref(&pkt_recoded);
             }
-            if (avctx->codec_descriptor->props & AV_CODEC_PROP_BITMAP_SUB)
-                sub->format = 0;
-            else if (avctx->codec_descriptor->props & AV_CODEC_PROP_TEXT_SUB)
-                sub->format = 1;
             avctx->internal->pkt = NULL;
         }
 
@@ -2814,11 +2829,11 @@ static int do_decode(AVCodecContext *avctx, AVPacket *pkt)
     if (ret == AVERROR(EAGAIN))
         ret = pkt->size;
 
-    if (ret < 0)
-        return ret;
-
     if (avctx->internal->draining && !got_frame)
         avctx->internal->draining_done = 1;
+
+    if (ret < 0)
+        return ret;
 
     if (ret >= pkt->size) {
         av_packet_unref(avctx->internal->buffer_pkt);
@@ -3074,6 +3089,7 @@ av_cold int avcodec_close(AVCodecContext *avctx)
     avctx->nb_coded_side_data = 0;
 
     av_buffer_unref(&avctx->hw_frames_ctx);
+    av_buffer_unref(&avctx->hw_device_ctx);
 
     if (avctx->priv_data && avctx->codec && avctx->codec->priv_class)
         av_opt_free(avctx->priv_data);
