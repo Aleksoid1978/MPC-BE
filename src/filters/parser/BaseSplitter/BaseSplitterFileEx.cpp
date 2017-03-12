@@ -1391,7 +1391,7 @@ bool CBaseSplitterFileEx::Read(teletextsub& h, int len, CMediaType* pmt, bool bS
 	return false;
 }
 
-static bool ParseAvc(CAtlArray<BYTE>& pData, CMediaType* pmt)
+bool CBaseSplitterFileEx::Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt/* = NULL*/)
 {
 	NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
 	CH264Nalu Nalu;
@@ -1434,19 +1434,19 @@ static bool ParseAvc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 	if (AVCParser::ParseSequenceParameterSet(Nalu.GetDataBuffer() + 1, Nalu.GetDataLength() - 1, params)) {
 		if (pmt) {
 			BITMAPINFOHEADER bmi = { 0 };
-			bmi.biSize			= sizeof(bmi);
-			bmi.biWidth			= params.width;
-			bmi.biHeight		= params.height;
-			bmi.biCompression	= nalu_type == NALU_TYPE_SUBSET_SPS ? FCC('AMVC') : FCC('H264');
-			bmi.biPlanes		= 1;
-			bmi.biBitCount		= 24;
-			bmi.biSizeImage		= DIBSIZE(bmi);
+			bmi.biSize           = sizeof(bmi);
+			bmi.biWidth          = params.width;
+			bmi.biHeight         = params.height;
+			bmi.biCompression    = nalu_type == NALU_TYPE_SUBSET_SPS ? FCC('AMVC') : FCC('H264');
+			bmi.biPlanes         = 1;
+			bmi.biBitCount       = 24;
+			bmi.biSizeImage      = DIBSIZE(bmi);
 
 			CSize aspect(params.width * params.sar.num, params.height * params.sar.den);
 			ReduceDim(aspect);
 
-			BYTE* extradata		= NULL;
-			size_t extrasize	= 0;
+			BYTE* extradata  = NULL;
+			size_t extrasize = 0;
 
 			{
 				int sps_present = 0;
@@ -1454,7 +1454,7 @@ static bool ParseAvc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 
 				Nalu.SetBuffer(pData.GetData(), pData.GetCount());
 				while (!(sps_present && pps_present)
-					   && Nalu.ReadNext()) {
+						&& Nalu.ReadNext()) {
 					nalu_type = Nalu.GetType();
 					switch (nalu_type) {
 						case NALU_TYPE_SPS:
@@ -1502,9 +1502,11 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt/* = NULL*/)
 {
 	CAtlArray<BYTE> pData;
 	pData.SetCount(len);
-	ByteRead(pData.GetData(), len);
+	if (S_OK != ByteRead(pData.GetData(), len)) {
+		return false;
+	}
 
-	return ParseAvc(pData, pmt);
+	return Read(h, pData, pmt);
 }
 
 bool CBaseSplitterFileEx::Read(avchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt/* = NULL*/)
@@ -1534,10 +1536,10 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CAtlArray<BYTE>& pData, CMedi
 		ByteRead(pData.GetData() + dataLen, len);
 	}
 
-	return ParseAvc(pData, pmt);
+	return Read(h, pData, pmt);
 }
 
-static bool ParseHevc(CAtlArray<BYTE>& pData, CMediaType* pmt)
+bool CBaseSplitterFileEx::Read(hevchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt/* = NULL*/)
 {
 	NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
 	CH265Nalu Nalu;
@@ -1578,19 +1580,19 @@ static bool ParseHevc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 	if (HEVCParser::ParseSequenceParameterSet(Nalu.GetDataBuffer() + 2, Nalu.GetDataLength() - 2, params)) {
 		if (pmt) {
 			BITMAPINFOHEADER bmi = { 0 };
-			bmi.biSize			= sizeof(bmi);
-			bmi.biWidth			= params.width;
-			bmi.biHeight		= params.height;
-			bmi.biCompression	= FCC('HEVC');
-			bmi.biPlanes		= 1;
-			bmi.biBitCount		= 24;
-			bmi.biSizeImage		= DIBSIZE(bmi);
+			bmi.biSize           = sizeof(bmi);
+			bmi.biWidth          = params.width;
+			bmi.biHeight         = params.height;
+			bmi.biCompression    = FCC('HEVC');
+			bmi.biPlanes         = 1;
+			bmi.biBitCount       = 24;
+			bmi.biSizeImage      = DIBSIZE(bmi);
 
 			CSize aspect(params.width * params.sar.num, params.height * params.sar.den);
 			ReduceDim(aspect);
 
-			BYTE* extradata		= NULL;
-			size_t extrasize	= 0;
+			BYTE* extradata  = NULL;
+			size_t extrasize = 0;
 
 			{
 				int vps_present = 0;
@@ -1599,7 +1601,7 @@ static bool ParseHevc(CAtlArray<BYTE>& pData, CMediaType* pmt)
 
 				Nalu.SetBuffer(pData.GetData(), pData.GetCount());
 				while (!(vps_present && sps_present && pps_present)
-					   && Nalu.ReadNext()) {
+						&& Nalu.ReadNext()) {
 					nalu_type = Nalu.GetType();
 					switch (nalu_type) {
 						case NALU_TYPE_HEVC_VPS:
@@ -1660,9 +1662,11 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt/* = NULL*/)
 {
 	CAtlArray<BYTE> pData;
 	pData.SetCount(len);
-	ByteRead(pData.GetData(), len);
+	if (S_OK != ByteRead(pData.GetData(), len)) {
+		return false;
+	}
 
-	return ParseHevc(pData, pmt);
+	return Read(h, pData, pmt);
 }
 
 bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt/* = NULL*/)
@@ -1691,7 +1695,7 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CAtlArray<BYTE>& pData, CMed
 		ByteRead(pData.GetData() + dataLen, len);
 	}
 
-	return ParseHevc(pData, pmt);
+	return Read(h, pData, pmt);
 }
 
 bool CBaseSplitterFileEx::Read(adx_adpcm_hdr& h, int len, CMediaType* pmt)

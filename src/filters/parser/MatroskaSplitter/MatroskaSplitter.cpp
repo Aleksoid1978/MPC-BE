@@ -221,6 +221,63 @@ static int chroma_pos_to_enum(int xpos, int ypos)
 	return AVCHROMA_LOC_UNSPECIFIED;
 }
 
+bool CMatroskaSplitterFilter::ReadFirtsBlock(CAtlArray<byte>& pData, TrackEntry* pTE)
+{
+	const __int64 pos = m_pFile->GetPos();
+
+	CMatroskaNode Root(m_pFile);
+	m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
+	m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
+
+	Cluster c;
+	c.ParseTimeCode(m_pCluster);
+
+	if (!m_pBlock) {
+		m_pBlock = m_pCluster->GetFirstBlock();
+	}
+
+	do {
+		CBlockGroupNode bgn;
+
+		const __int64 startpos = m_pFile->GetPos();
+
+		if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
+			bgn.Parse(m_pBlock, true);
+		}
+		else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
+			CAutoPtr<BlockGroup> bg(DNew BlockGroup());
+			bg->Block.Parse(m_pBlock, true);
+			bgn.AddTail(bg);
+		}
+		__int64 endpos = m_pFile->GetPos();
+
+		POSITION pos = bgn.GetHeadPosition();
+		while (pos) {
+			BlockGroup* bg = bgn.GetNext(pos);
+			if (bg->Block.TrackNumber != pTE->TrackNumber) {
+				continue;
+			}
+
+			POSITION pos2 = bg->Block.BlockData.GetHeadPosition();
+			while (pos2) {
+				CBinary* pb = bg->Block.BlockData.GetNext(pos2);
+				pTE->Expand(*pb, ContentEncoding::AllFrameContents);
+
+				pData.Copy(*pb);
+			}
+
+			break;
+		}
+	} while (m_pBlock->NextBlock() && !CheckRequest(NULL) && pData.IsEmpty());
+
+	m_pBlock.Free();
+	m_pCluster.Free();
+
+	m_pFile->Seek(pos);
+
+	return !pData.IsEmpty();
+}
+
 HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
@@ -329,57 +386,14 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 
 						if (mt.subtype == MEDIASUBTYPE_HM10) {
-							__int64 pos = m_pFile->GetPos();
-
-							CMatroskaNode Root(m_pFile);
-							m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
-							m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
-
-							Cluster c;
-							c.ParseTimeCode(m_pCluster);
-
-							if (!m_pBlock) {
-								m_pBlock = m_pCluster->GetFirstBlock();
+							CAtlArray<BYTE> pData;
+							if (ReadFirtsBlock(pData, pTE)) {
+								CBaseSplitterFileEx::hevchdr h;
+								CMediaType mt2;
+								if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
+									mts.InsertAt(0, mt2);
+								}
 							}
-
-							BOOL bIsParse = FALSE;
-							do {
-								CBlockGroupNode bgn;
-
-								__int64 startpos = m_pFile->GetPos();
-
-								if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
-									bgn.Parse(m_pBlock, true);
-								} else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
-									CAutoPtr<BlockGroup> bg(DNew BlockGroup());
-									bg->Block.Parse(m_pBlock, true);
-									bgn.AddTail(bg);
-								}
-								__int64 endpos = m_pFile->GetPos();
-
-								POSITION pos = bgn.GetHeadPosition();
-								while (pos) {
-									BlockGroup* bg = bgn.GetNext(pos);
-									if (bg->Block.TrackNumber != pTE->TrackNumber) {
-										continue;
-									}
-
-									m_pFile->Seek(startpos);
-									CBaseSplitterFileEx::hevchdr h;
-									CMediaType mt2;
-									if (m_pFile->CBaseSplitterFileEx::Read(h, endpos - startpos, &mt2)) {
-										mts.InsertAt(0, mt2);
-									}
-
-									bIsParse = TRUE;
-									break;
-								}
-							} while (m_pBlock->NextBlock() && SUCCEEDED(hr) && !CheckRequest(NULL) && !bIsParse);
-
-							m_pBlock.Free();
-							m_pCluster.Free();
-
-							m_pFile->Seek(pos);
 						}
 					}
 					bHasVideo = true;
@@ -410,6 +424,18 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						if (SUCCEEDED(CreateMPEG2VIfromMVC(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount()))) {
 							mts.InsertAt(0, mt);
+						} else if (pTE->CodecPrivate.IsEmpty()) {
+							CAtlArray<BYTE> pData;
+							if (ReadFirtsBlock(pData, pTE)) {
+								CBaseSplitterFileEx::avchdr h;
+								CMediaType mt2;
+								if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
+									if (mt2.subtype == MEDIASUBTYPE_H264) {
+										CreateAVCfromH264(&mt2);
+									}
+									mts.InsertAt(0, mt2);
+								}
+							}
 						}
 					}
 					bHasVideo = true;
@@ -519,8 +545,19 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						pm2vi->dwFlags = (extradata[21] & 3) + 1;
 					}
 
-					if (!bHasVideo)
+					if (!bHasVideo) {
 						mts.Add(mt);
+						if (pTE->CodecPrivate.IsEmpty()) {
+							CAtlArray<BYTE> pData;
+							if (ReadFirtsBlock(pData, pTE)) {
+								CBaseSplitterFileEx::hevchdr h;
+								CMediaType mt2;
+								if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
+									mts.InsertAt(0, mt2);
+								}
+							}
+						}
+					}
 					bHasVideo = true;
 				} else {
 					DWORD fourcc = 0;
