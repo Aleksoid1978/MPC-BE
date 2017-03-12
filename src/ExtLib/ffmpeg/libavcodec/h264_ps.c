@@ -247,7 +247,7 @@ static inline int decode_vui_parameters(GetBitContext *gb, AVCodecContext *avctx
     return 0;
 }
 
-static void decode_scaling_list(GetBitContext *gb, uint8_t *factors, int size,
+static int decode_scaling_list(GetBitContext *gb, uint8_t *factors, int size,
                                 const uint8_t *jvt_list,
                                 const uint8_t *fallback_list)
 {
@@ -257,14 +257,21 @@ static void decode_scaling_list(GetBitContext *gb, uint8_t *factors, int size,
         memcpy(factors, fallback_list, size * sizeof(uint8_t));
     else
         for (i = 0; i < size; i++) {
-            if (next)
-                next = (last + get_se_golomb(gb)) & 0xff;
+            if (next) {
+                int v = get_se_golomb(gb);
+                if (v < -128 || v > 127) {
+                    av_log(NULL, AV_LOG_ERROR, "delta scale %d is invalid\n", v);
+                    return AVERROR_INVALIDDATA;
+                }
+                next = (last + v) & 0xff;
+            }
             if (!i && !next) { /* matrix not written, we use the preset one */
                 memcpy(factors, jvt_list, size * sizeof(uint8_t));
                 break;
             }
             last = factors[scan[i]] = next ? next : last;
         }
+    return 0;
 }
 
 /* returns non zero if the provided SPS scaling matrix has been filled */
@@ -282,23 +289,24 @@ static int decode_scaling_matrices(GetBitContext *gb, const SPS *sps,
     };
     int ret = 0;
     if (get_bits1(gb)) {
-        ret = is_sps;
-        decode_scaling_list(gb, scaling_matrix4[0], 16, default_scaling4[0], fallback[0]);        // Intra, Y
-        decode_scaling_list(gb, scaling_matrix4[1], 16, default_scaling4[0], scaling_matrix4[0]); // Intra, Cr
-        decode_scaling_list(gb, scaling_matrix4[2], 16, default_scaling4[0], scaling_matrix4[1]); // Intra, Cb
-        decode_scaling_list(gb, scaling_matrix4[3], 16, default_scaling4[1], fallback[1]);        // Inter, Y
-        decode_scaling_list(gb, scaling_matrix4[4], 16, default_scaling4[1], scaling_matrix4[3]); // Inter, Cr
-        decode_scaling_list(gb, scaling_matrix4[5], 16, default_scaling4[1], scaling_matrix4[4]); // Inter, Cb
+        ret |= decode_scaling_list(gb, scaling_matrix4[0], 16, default_scaling4[0], fallback[0]);        // Intra, Y
+        ret |= decode_scaling_list(gb, scaling_matrix4[1], 16, default_scaling4[0], scaling_matrix4[0]); // Intra, Cr
+        ret |= decode_scaling_list(gb, scaling_matrix4[2], 16, default_scaling4[0], scaling_matrix4[1]); // Intra, Cb
+        ret |= decode_scaling_list(gb, scaling_matrix4[3], 16, default_scaling4[1], fallback[1]);        // Inter, Y
+        ret |= decode_scaling_list(gb, scaling_matrix4[4], 16, default_scaling4[1], scaling_matrix4[3]); // Inter, Cr
+        ret |= decode_scaling_list(gb, scaling_matrix4[5], 16, default_scaling4[1], scaling_matrix4[4]); // Inter, Cb
         if (is_sps || pps->transform_8x8_mode) {
-            decode_scaling_list(gb, scaling_matrix8[0], 64, default_scaling8[0], fallback[2]); // Intra, Y
-            decode_scaling_list(gb, scaling_matrix8[3], 64, default_scaling8[1], fallback[3]); // Inter, Y
+            ret |= decode_scaling_list(gb, scaling_matrix8[0], 64, default_scaling8[0], fallback[2]); // Intra, Y
+            ret |= decode_scaling_list(gb, scaling_matrix8[3], 64, default_scaling8[1], fallback[3]); // Inter, Y
             if (sps->chroma_format_idc == 3) {
-                decode_scaling_list(gb, scaling_matrix8[1], 64, default_scaling8[0], scaling_matrix8[0]); // Intra, Cr
-                decode_scaling_list(gb, scaling_matrix8[4], 64, default_scaling8[1], scaling_matrix8[3]); // Inter, Cr
-                decode_scaling_list(gb, scaling_matrix8[2], 64, default_scaling8[0], scaling_matrix8[1]); // Intra, Cb
-                decode_scaling_list(gb, scaling_matrix8[5], 64, default_scaling8[1], scaling_matrix8[4]); // Inter, Cb
+                ret |= decode_scaling_list(gb, scaling_matrix8[1], 64, default_scaling8[0], scaling_matrix8[0]); // Intra, Cr
+                ret |= decode_scaling_list(gb, scaling_matrix8[4], 64, default_scaling8[1], scaling_matrix8[3]); // Inter, Cr
+                ret |= decode_scaling_list(gb, scaling_matrix8[2], 64, default_scaling8[0], scaling_matrix8[1]); // Intra, Cb
+                ret |= decode_scaling_list(gb, scaling_matrix8[5], 64, default_scaling8[1], scaling_matrix8[4]); // Inter, Cb
             }
         }
+        if (!ret)
+            ret = is_sps;
     }
 
     return ret;
@@ -329,6 +337,7 @@ int ff_h264_decode_seq_parameter_set(GetBitContext *gb, AVCodecContext *avctx,
     unsigned int sps_id;
     int i, log2_max_frame_num_minus4;
     SPS *sps;
+    int ret;
 
     sps_buf = av_buffer_allocz(sizeof(*sps));
     if (!sps_buf)
@@ -407,8 +416,11 @@ int ff_h264_decode_seq_parameter_set(GetBitContext *gb, AVCodecContext *avctx,
             goto fail;
         }
         sps->transform_bypass = get_bits1(gb);
-        sps->scaling_matrix_present |= decode_scaling_matrices(gb, sps, NULL, 1,
-                                sps->scaling_matrix4, sps->scaling_matrix8);
+        ret = decode_scaling_matrices(gb, sps, NULL, 1,
+                                      sps->scaling_matrix4, sps->scaling_matrix8);
+        if (ret < 0)
+            goto fail;
+        sps->scaling_matrix_present |= ret;
     } else {
         sps->chroma_format_idc = 1;
         sps->bit_depth_luma    = 8;
@@ -468,7 +480,7 @@ int ff_h264_decode_seq_parameter_set(GetBitContext *gb, AVCodecContext *avctx,
 
     sps->frame_mbs_only_flag = get_bits1(gb);
 
-    if (sps->mb_height >= INT_MAX / 2) {
+    if (sps->mb_height >= INT_MAX / 2U) {
         av_log(avctx, AV_LOG_ERROR, "height overflow\n");
         goto fail;
     }
@@ -822,6 +834,11 @@ int ff_h264_decode_picture_parameter_set(GetBitContext *gb, AVCodecContext *avct
     pps->init_qp                              = get_se_golomb(gb) + 26 + qp_bd_offset;
     pps->init_qs                              = get_se_golomb(gb) + 26 + qp_bd_offset;
     pps->chroma_qp_index_offset[0]            = get_se_golomb(gb);
+    if (pps->chroma_qp_index_offset[0] < -12 || pps->chroma_qp_index_offset[0] > 12) {
+        ret = AVERROR_INVALIDDATA;
+        goto fail;
+    }
+
     pps->deblocking_filter_parameters_present = get_bits1(gb);
     pps->constrained_intra_pred               = get_bits1(gb);
     pps->redundant_pic_cnt_present            = get_bits1(gb);
@@ -835,10 +852,16 @@ int ff_h264_decode_picture_parameter_set(GetBitContext *gb, AVCodecContext *avct
     bits_left = bit_length - get_bits_count(gb);
     if (bits_left > 0 && more_rbsp_data_in_pps(sps, avctx)) {
         pps->transform_8x8_mode = get_bits1(gb);
-        decode_scaling_matrices(gb, sps, pps, 0,
+        ret = decode_scaling_matrices(gb, sps, pps, 0,
                                 pps->scaling_matrix4, pps->scaling_matrix8);
+        if (ret < 0)
+            goto fail;
         // second_chroma_qp_index_offset
         pps->chroma_qp_index_offset[1] = get_se_golomb(gb);
+        if (pps->chroma_qp_index_offset[1] < -12 || pps->chroma_qp_index_offset[1] > 12) {
+            ret = AVERROR_INVALIDDATA;
+            goto fail;
+        }
     } else {
         pps->chroma_qp_index_offset[1] = pps->chroma_qp_index_offset[0];
     }

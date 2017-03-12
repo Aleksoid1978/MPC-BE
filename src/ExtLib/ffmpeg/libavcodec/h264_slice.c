@@ -1159,7 +1159,7 @@ static int h264_export_frame_props(H264Context *h)
     /* Prioritize picture timing SEI information over used
      * decoding process if it exists. */
 
-    if (sps->pic_struct_present_flag) {
+    if (sps->pic_struct_present_flag && h->sei.picture_timing.present) {
         H264SEIPictureTiming *pt = &h->sei.picture_timing;
         switch (pt->pic_struct) {
         case SEI_PIC_STRUCT_FRAME:
@@ -1204,7 +1204,7 @@ static int h264_export_frame_props(H264Context *h)
         /* Derive top_field_first from field pocs. */
         cur->f->top_field_first = cur->field_poc[0] < cur->field_poc[1];
     } else {
-        if (sps->pic_struct_present_flag) {
+        if (sps->pic_struct_present_flag && h->sei.picture_timing.present) {
             /* Use picture timing SEI information. Even if it is a
              * information of a past frame, better than nothing. */
             if (h->sei.picture_timing.pic_struct == SEI_PIC_STRUCT_TOP_BOTTOM ||
@@ -2030,8 +2030,10 @@ int ff_h264_queue_decode_slice(H264Context *h, const H2645NAL *nal)
         return ret;
 
     // discard redundant pictures
-    if (sl->redundant_pic_count > 0)
+    if (sl->redundant_pic_count > 0) {
+        sl->ref_count[0] = sl->ref_count[1] = 0;
         return 0;
+    }
 
     if (sl->first_mb_addr == 0 || !h->current_slice) {
         if (h->setup_finished) {

@@ -60,6 +60,7 @@ mailing lists                           Baptiste Coudurier, Lou Logan
 Google+                                 Paul B Mahol, Michael Niedermayer, Alexander Strasser
 Twitter                                 Lou Logan, Reynaldo H. Verdejo Pinochet
 Launchpad                               Timothy Gu
+ffmpeg-security                         Andreas Cadhalpun, Carl Eugen Hoyos, Clément Bœsch, Michael Niedermayer, Reimar Doeffinger, Rodger Combs, wm4
 
 
 libavutil
@@ -115,6 +116,8 @@ Generic Parts:
     lzw.*                               Michael Niedermayer
   floating point AAN DCT:
     faandct.c, faandct.h                Michael Niedermayer
+  Non-power-of-two MDCT:
+    mdct15.c, mdct15.h                  Rostislav Pehlivanov
   Golomb coding:
     golomb.c, golomb.h                  Michael Niedermayer
   motion estimation:
@@ -209,6 +212,7 @@ Codecs:
   msvideo1.c                            Mike Melanson
   nuv.c                                 Reimar Doeffinger
   nvenc*                                Timo Rothenpieler
+  opus*                                 Rostislav Pehlivanov
   paf.*                                 Paul B Mahol
   pcx.c                                 Ivo van Poorten
   pgssubdec.c                           Reimar Doeffinger
@@ -260,7 +264,8 @@ Codecs:
 
 Hardware acceleration:
   crystalhd.c                           Philip Langdale
-  dxva2*                                Hendrik Leppkes, Laurent Aimar
+  dxva2*                                Hendrik Leppkes, Laurent Aimar, Steve Lhomme
+  d3d11va*                              Steve Lhomme
   mediacodec*                           Matthieu Bouron
   vaapi*                                Gwenole Beauchesne
   vaapi_encode*                         Mark Thompson
@@ -383,6 +388,7 @@ Muxers/Demuxers:
   avisynth.c                            Stephen Hutchinson
   avr.c                                 Paul B Mahol
   bink.c                                Peter Ross
+  boadec.c                              Michael Niedermayer
   brstm.c                               Paul B Mahol
   caf*                                  Peter Ross
   cdxl.c                                Paul B Mahol

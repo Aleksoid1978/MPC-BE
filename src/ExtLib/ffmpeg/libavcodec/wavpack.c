@@ -99,11 +99,13 @@ static av_always_inline int get_tail(GetBitContext *gb, int k)
     return res;
 }
 
-static void update_error_limit(WavpackFrameContext *ctx)
+static int update_error_limit(WavpackFrameContext *ctx)
 {
     int i, br[2], sl[2];
 
     for (i = 0; i <= ctx->stereo_in; i++) {
+        if (ctx->ch[i].bitrate_acc > UINT_MAX - ctx->ch[i].bitrate_delta)
+            return AVERROR_INVALIDDATA;
         ctx->ch[i].bitrate_acc += ctx->ch[i].bitrate_delta;
         br[i]                   = ctx->ch[i].bitrate_acc >> 16;
         sl[i]                   = LEVEL_DECAY(ctx->ch[i].slow_level);
@@ -131,6 +133,8 @@ static void update_error_limit(WavpackFrameContext *ctx)
             ctx->ch[i].error_limit = wp_exp2(br[i]);
         }
     }
+
+    return 0;
 }
 
 static int wv_get_value(WavpackFrameContext *ctx, GetBitContext *gb,
@@ -200,8 +204,10 @@ static int wv_get_value(WavpackFrameContext *ctx, GetBitContext *gb,
         ctx->zero = !ctx->one;
     }
 
-    if (ctx->hybrid && !channel)
-        update_error_limit(ctx);
+    if (ctx->hybrid && !channel) {
+        if (update_error_limit(ctx) < 0)
+            goto error;
+    }
 
     if (!t) {
         base = 0;
@@ -264,10 +270,10 @@ error:
 static inline int wv_get_value_integer(WavpackFrameContext *s, uint32_t *crc,
                                        int S)
 {
-    int bit;
+    unsigned bit;
 
     if (s->extra_bits) {
-        S <<= s->extra_bits;
+        S *= 1 << s->extra_bits;
 
         if (s->got_extra_bits &&
             get_bits_left(&s->gb_extra_bits) >= s->extra_bits) {
@@ -681,8 +687,11 @@ static int wavpack_decode_block(AVCodecContext *avctx, int block_no,
     s->hybrid         =   s->frame_flags & WV_HYBRID_MODE;
     s->hybrid_bitrate =   s->frame_flags & WV_HYBRID_BITRATE;
     s->post_shift     = bpp * 8 - orig_bpp + ((s->frame_flags >> 13) & 0x1f);
+    if (s->post_shift < 0 || s->post_shift > 31) {
+        return AVERROR_INVALIDDATA;
+    }
     s->hybrid_maxclip =  ((1LL << (orig_bpp - 1)) - 1);
-    s->hybrid_minclip = ((-1LL << (orig_bpp - 1)));
+    s->hybrid_minclip = ((-1UL << (orig_bpp - 1)));
     s->CRC            = bytestream2_get_le32(&gb);
 
     // parse metadata blocks
@@ -736,13 +745,13 @@ static int wavpack_decode_block(AVCodecContext *avctx, int block_no,
             }
             for (i = 0; i < weights; i++) {
                 t = (int8_t)bytestream2_get_byte(&gb);
-                s->decorr[s->terms - i - 1].weightA = t << 3;
+                s->decorr[s->terms - i - 1].weightA = t * (1 << 3);
                 if (s->decorr[s->terms - i - 1].weightA > 0)
                     s->decorr[s->terms - i - 1].weightA +=
                         (s->decorr[s->terms - i - 1].weightA + 64) >> 7;
                 if (s->stereo_in) {
                     t = (int8_t)bytestream2_get_byte(&gb);
-                    s->decorr[s->terms - i - 1].weightB = t << 3;
+                    s->decorr[s->terms - i - 1].weightB = t * (1 << 3);
                     if (s->decorr[s->terms - i - 1].weightB > 0)
                         s->decorr[s->terms - i - 1].weightB +=
                             (s->decorr[s->terms - i - 1].weightB + 64) >> 7;

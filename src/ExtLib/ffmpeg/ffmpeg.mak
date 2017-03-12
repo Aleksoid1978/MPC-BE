@@ -255,7 +255,6 @@ SRCS_LC = \
 	libavcodec/huffyuvdsp.c \
 	libavcodec/idctdsp.c \
 	libavcodec/imc.c \
-	libavcodec/imdct15.c \
 	libavcodec/imgconvert.c \
 	libavcodec/indeo3.c \
 	libavcodec/indeo4.c \
@@ -285,6 +284,7 @@ SRCS_LC = \
 	libavcodec/mdct_fixed.c \
 	libavcodec/mdct_fixed_32.c \
 	libavcodec/mdct_float.c \
+	libavcodec/mdct15.c \
 	libavcodec/metasound.c \
 	libavcodec/metasound_data.c \
 	libavcodec/mjpeg_parser.c \
@@ -347,6 +347,7 @@ SRCS_LC_B = \
 	libavcodec/opus.c \
 	libavcodec/opus_celt.c \
 	libavcodec/opus_parser.c \
+	libavcodec/opus_pvq.c \
 	libavcodec/opus_rc.c \
 	libavcodec/opus_silk.c \
 	libavcodec/opusdec.c \
@@ -495,6 +496,7 @@ SRCS_LC_B = \
 	libavcodec/x86/hevcdsp_init.c \
 	libavcodec/x86/h264_qpel.c \
 	libavcodec/x86/hpeldsp_init.c \
+	libavcodec/x86/hpeldsp_vp3_init.c \
 	libavcodec/x86/huffyuvdsp_init.c \
 	libavcodec/x86/idctdsp_init.c \
 	libavcodec/x86/lossless_audiodsp_init.c \
@@ -673,6 +675,7 @@ SRCS_YASM_LC = \
 	libavcodec/x86/hevc_sao.asm \
 	libavcodec/x86/hevc_sao_10bit.asm \
 	libavcodec/x86/hpeldsp.asm \
+	libavcodec/x86/hpeldsp_vp3.asm \
 	libavcodec/x86/huffyuvdsp.asm \
 	libavcodec/x86/idctdsp.asm \
 	libavcodec/x86/imdct36.asm \

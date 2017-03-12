@@ -348,6 +348,8 @@ uint8_t *av_packet_get_side_data(AVPacket *pkt, enum AVPacketSideDataType type,
             return pkt->side_data[i].data;
         }
     }
+    if (size)
+        *size = 0;
     return NULL;
 }
 
@@ -506,7 +508,7 @@ int av_packet_unpack_dictionary(const uint8_t *data, int size, AVDictionary **di
         const uint8_t *key = data;
         const uint8_t *val = data + strlen(key) + 1;
 
-        if (val >= end)
+        if (val >= end || !*key)
             return AVERROR_INVALIDDATA;
 
         ret = av_dict_set(dict, key, val, 0);
