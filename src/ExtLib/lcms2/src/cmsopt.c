@@ -216,7 +216,7 @@ cmsBool _MultiplyMatrix(cmsPipeline* Lut)
                      // Multiply both matrices to get the result
                      _cmsMAT3per(&res, (cmsMAT3*)m2->Double, (cmsMAT3*)m1->Double);
 
-                     // Get the next in chain afer the matrices
+                     // Get the next in chain after the matrices
                      chain = (*pt2)->Next;
 
                      // Remove both matrices
@@ -691,7 +691,7 @@ cmsBool OptimizeByResampling(cmsPipeline** Lut, cmsUInt32Number Intent, cmsUInt3
                     goto Error;
 
                 // Remove prelinearization. Since we have duplicated the curve
-                // in destination LUT, the sampling shoud be applied after this stage.
+                // in destination LUT, the sampling should be applied after this stage.
                 cmsPipelineUnlinkStage(Src, cmsAT_BEGIN, &KeepPreLin);
             }
         }
@@ -723,14 +723,14 @@ cmsBool OptimizeByResampling(cmsPipeline** Lut, cmsUInt32Number Intent, cmsUInt3
                 if (!cmsPipelineInsertStage(Dest, cmsAT_END, NewPostLin))
                     goto Error;
 
-                // In destination LUT, the sampling shoud be applied after this stage.
+                // In destination LUT, the sampling should be applied after this stage.
                 cmsPipelineUnlinkStage(Src, cmsAT_END, &KeepPostLin);
             }
         }
     }
 
     // Now its time to do the sampling. We have to ignore pre/post linearization
-    // The source LUT whithout pre/post curves is passed as parameter.
+    // The source LUT without pre/post curves is passed as parameter.
     if (!cmsStageSampleCLut16bit(CLUT, XFormSampler16, (void*) Src, 0)) {
 Error:
         // Ops, something went wrong, Restore stages

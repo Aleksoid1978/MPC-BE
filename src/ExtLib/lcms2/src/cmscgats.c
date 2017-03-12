@@ -147,23 +147,24 @@ typedef struct {
         SUBALLOCATOR   Allocator;             // String suballocator -- just to keep it fast
 
         // Parser state machine
-        SYMBOL         sy;                    // Current symbol
-        int            ch;                    // Current character
+        SYMBOL             sy;                // Current symbol
+        int                ch;                // Current character
 
-        int            inum;                  // integer value
-        cmsFloat64Number         dnum;                  // real value
+        cmsInt32Number     inum;              // integer value
+        cmsFloat64Number   dnum;              // real value
+
         char           id[MAXID];             // identifier
         char           str[MAXSTR];           // string
 
         // Allowed keywords & datasets. They have visibility on whole stream
-        KEYVALUE*     ValidKeywords;
-        KEYVALUE*     ValidSampleID;
+        KEYVALUE*      ValidKeywords;
+        KEYVALUE*      ValidSampleID;
 
         char*          Source;                // Points to loc. being parsed
-        int            lineno;                // line counter for error reporting
+        cmsInt32Number lineno;                // line counter for error reporting
 
         FILECTX*       FileStack[MAXINCLUDE]; // Stack of files being parsed
-        int            IncludeSP;             // Include Stack Pointer
+        cmsInt32Number IncludeSP;             // Include Stack Pointer
 
         char*          MemoryBlock;           // The stream if holded in memory
 
@@ -535,13 +536,13 @@ cmsFloat64Number xpow10(int n)
 
 //  Reads a Real number, tries to follow from integer number
 static
-void ReadReal(cmsIT8* it8, int inum)
+void ReadReal(cmsIT8* it8, cmsInt32Number inum)
 {
     it8->dnum = (cmsFloat64Number) inum;
 
     while (isdigit(it8->ch)) {
 
-        it8->dnum = it8->dnum * 10.0 + (it8->ch - '0');
+        it8->dnum = (cmsFloat64Number) it8->dnum * 10.0 + (cmsFloat64Number) (it8->ch - '0');
         NextCh(it8);
     }
 
@@ -554,7 +555,7 @@ void ReadReal(cmsIT8* it8, int inum)
 
         while (isdigit(it8->ch)) {
 
-            frac = frac * 10.0 + (it8->ch - '0');
+            frac = frac * 10.0 + (cmsFloat64Number) (it8->ch - '0');
             prec++;
             NextCh(it8);
         }
@@ -565,8 +566,8 @@ void ReadReal(cmsIT8* it8, int inum)
     // Exponent, example 34.00E+20
     if (toupper(it8->ch) == 'E') {
 
-        int e;
-        int sgn;
+        cmsInt32Number e;
+        cmsInt32Number sgn;
 
         NextCh(it8); sgn = 1;
 
@@ -584,8 +585,10 @@ void ReadReal(cmsIT8* it8, int inum)
             e = 0;
             while (isdigit(it8->ch)) {
 
-                if ((cmsFloat64Number) e * 10L < INT_MAX)
-                    e = e * 10 + (it8->ch - '0');
+                cmsInt32Number digit = (it8->ch - '0');
+
+                if ((cmsFloat64Number) e * 10.0 + (cmsFloat64Number) digit < (cmsFloat64Number) +2147483647.0)
+                    e = e * 10 + digit;
 
                 NextCh(it8);
             }
@@ -623,7 +626,7 @@ cmsFloat64Number ParseFloatNumber(const char *Buffer)
     if (*Buffer == '.') {
 
         cmsFloat64Number frac = 0.0;      // fraction
-        int prec = 0;                     // precission
+        int prec = 0;                     // precision
 
         if (*Buffer) Buffer++;
 
@@ -661,8 +664,10 @@ cmsFloat64Number ParseFloatNumber(const char *Buffer)
             e = 0;
             while (*Buffer && isdigit((int) *Buffer)) {
 
-                if ((cmsFloat64Number) e * 10L < INT_MAX)
-                    e = e * 10 + (*Buffer - '0');
+                cmsInt32Number digit = (*Buffer - '0');
+
+                if ((cmsFloat64Number) e * 10.0 + digit < (cmsFloat64Number)+2147483647.0)
+                    e = e * 10 + digit;
 
                 if (*Buffer) Buffer++;
             }
@@ -737,7 +742,7 @@ void InSymbol(cmsIT8* it8)
                             if (it8->ch >= 'A' && it8->ch <= 'F')  j = it8->ch -'A'+10;
                             else j = it8->ch - '0';
 
-                            if ((long) it8->inum * 16L > (long) INT_MAX)
+                            if ((cmsFloat64Number) it8->inum * 16.0 + (cmsFloat64Number) j > (cmsFloat64Number)+2147483647.0)
                             {
                                 SynError(it8, "Invalid hexadecimal number");
                                 return;
@@ -758,7 +763,7 @@ void InSymbol(cmsIT8* it8)
                         {
                             j = it8->ch - '0';
 
-                            if ((long) it8->inum * 2L > (long) INT_MAX)
+                            if ((cmsFloat64Number) it8->inum * 2.0 + j > (cmsFloat64Number)+2147483647.0)
                             {
                                 SynError(it8, "Invalid binary number");
                                 return;
@@ -774,14 +779,16 @@ void InSymbol(cmsIT8* it8)
 
                 while (isdigit(it8->ch)) {
 
-                    if ((long) it8->inum * 10L > (long) INT_MAX) {
+                    cmsInt32Number digit = (it8->ch - '0');
+
+                    if ((cmsFloat64Number) it8->inum * 10.0 + (cmsFloat64Number) digit > (cmsFloat64Number) +2147483647.0) {
                         ReadReal(it8, it8->inum);
                         it8->sy = SDNUM;
                         it8->dnum *= sign;
                         return;
                     }
 
-                    it8->inum = it8->inum * 10 + (it8->ch - '0');
+                    it8->inum = it8->inum * 10 + digit;
                     NextCh(it8);
                 }
 
@@ -1486,8 +1493,8 @@ cmsBool SetDataFormat(cmsIT8* it8, int n, const char *label)
 
 cmsBool CMSEXPORT cmsIT8SetDataFormat(cmsHANDLE  h, int n, const char *Sample)
 {
-        cmsIT8* it8 = (cmsIT8*) h;
-        return SetDataFormat(it8, n, Sample);
+    cmsIT8* it8 = (cmsIT8*)h;
+    return SetDataFormat(it8, n, Sample);
 }
 
 static
@@ -1512,8 +1519,8 @@ static
 char* GetData(cmsIT8* it8, int nSet, int nField)
 {
     TABLE* t = GetTable(it8);
-    int  nSamples   = t -> nSamples;
-    int  nPatches   = t -> nPatches;
+    int nSamples    = t -> nSamples;
+    int nPatches    = t -> nPatches;
 
     if (nSet >= nPatches || nField >= nSamples)
         return NULL;

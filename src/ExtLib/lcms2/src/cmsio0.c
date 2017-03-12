@@ -1153,7 +1153,7 @@ cmsHPROFILE CMSEXPORT cmsOpenProfileFromMemTHR(cmsContext ContextID, const void*
     NewIcc = (_cmsICCPROFILE*) hEmpty;
 
     // Ok, in this case const void* is casted to void* just because open IO handler
-    // shares read and writting modes. Don't abuse this feature!
+    // shares read and writing modes. Don't abuse this feature!
     NewIcc ->IOhandler = cmsOpenIOhandlerFromMem(ContextID, (void*) MemPtr, dwSize, "r");
     if (NewIcc ->IOhandler == NULL) goto Error;
 
@@ -1443,7 +1443,7 @@ cmsBool  CMSEXPORT cmsCloseProfile(cmsHPROFILE hProfile)
     // Was open in write mode?
     if (Icc ->IsWrite) {
 
-        Icc ->IsWrite = FALSE;      // Assure no further writting
+        Icc ->IsWrite = FALSE;      // Assure no further writing
         rc &= cmsSaveProfileToFile(hProfile, Icc ->IOhandler->PhysicalFile);
     }
 
@@ -1871,7 +1871,7 @@ Error:
 }
 
 // Similar to the anterior. This function allows to write directly to the ICC profile any data, without
-// checking anything. As a rule, mixing Raw with cooked doesn't work, so writting a tag as raw and then reading
+// checking anything. As a rule, mixing Raw with cooked doesn't work, so writing a tag as raw and then reading
 // it as cooked without serializing does result into an error. If that is what you want, you will need to dump
 // the profile to memry or disk and then reopen it.
 cmsBool CMSEXPORT cmsWriteRawTag(cmsHPROFILE hProfile, cmsTagSignature sig, const void* data, cmsUInt32Number Size)

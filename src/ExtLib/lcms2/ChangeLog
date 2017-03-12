@@ -91,7 +91,7 @@ User defined parametric curves can now be saved in ICC profiles.
 --------------------
 
 Added a check for maximum input channels
-Fixed an unitialized read on PatchLUT
+Fixed an uninitialized read on PatchLUT
 Fixed a bug in XYZ floating point PCS
 added half float variants (ABGR and so)
 Added formatter resolution after xform optimization plugin

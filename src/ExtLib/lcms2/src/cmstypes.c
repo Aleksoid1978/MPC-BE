@@ -960,7 +960,7 @@ cmsBool  Type_Text_Description_Write(struct _cms_typehandler_struct* self, cmsIO
     cmsBool  rc = FALSE;
     char Filler[68];
 
-    // Used below for writting zeroes
+    // Used below for writing zeroes
     memset(Filler, 0, sizeof(Filler));
 
     // Get the len of string
@@ -1185,7 +1185,7 @@ void Type_Curve_Free(struct _cms_typehandler_struct* self, void* Ptr)
 // ********************************************************************************
 
 
-// Decide which curve type to use on writting
+// Decide which curve type to use on writing
 static
 cmsTagTypeSignature DecideCurveType(cmsFloat64Number ICCVersion, const void *Data)
 {
@@ -1578,7 +1578,7 @@ void Type_MLU_Free(struct _cms_typehandler_struct* self, void* Ptr)
 // Type cmsSigLut8Type
 // ********************************************************************************
 
-// Decide which LUT type to use on writting
+// Decide which LUT type to use on writing
 static
 cmsTagTypeSignature DecideLUTtypeA2B(cmsFloat64Number ICCVersion, const void *Data)
 {
@@ -1763,8 +1763,8 @@ void *Type_LUT8_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, cms
     if (!_cmsReadUInt8Number(io, NULL)) goto Error;
 
     // Do some checking
-    if (InputChannels > cmsMAXCHANNELS)  goto Error;
-    if (OutputChannels > cmsMAXCHANNELS) goto Error;
+    if (InputChannels == 0 || InputChannels > cmsMAXCHANNELS)  goto Error;
+    if (OutputChannels == 0 || OutputChannels > cmsMAXCHANNELS) goto Error;
 
    // Allocates an empty Pipeline
     NewLUT = cmsPipelineAlloc(self ->ContextID, InputChannels, OutputChannels);
@@ -2058,8 +2058,8 @@ void *Type_LUT16_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, cm
     if (!_cmsReadUInt8Number(io, NULL)) return NULL;
 
     // Do some checking
-    if (InputChannels > cmsMAXCHANNELS)  goto Error;
-    if (OutputChannels > cmsMAXCHANNELS) goto Error;
+    if (InputChannels == 0 || InputChannels > cmsMAXCHANNELS)  goto Error;
+    if (OutputChannels == 0 || OutputChannels > cmsMAXCHANNELS) goto Error;
 
     // Allocates an empty LUT
     NewLUT = cmsPipelineAlloc(self ->ContextID, InputChannels, OutputChannels);
@@ -2496,7 +2496,10 @@ void* Type_LUTA2B_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, c
     if (!_cmsReadUInt32Number(io, &offsetC)) return NULL;
     if (!_cmsReadUInt32Number(io, &offsetA)) return NULL;
 
-   // Allocates an empty LUT
+    if (inputChan == 0 || inputChan >= cmsMAXCHANNELS) return NULL;
+    if (outputChan == 0 || outputChan >= cmsMAXCHANNELS) return NULL;
+
+    // Allocates an empty LUT
     NewLUT = cmsPipelineAlloc(self ->ContextID, inputChan, outputChan);
     if (NewLUT == NULL) return NULL;
 
@@ -2803,6 +2806,9 @@ void* Type_LUTB2A_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, c
 
     if (!_cmsReadUInt8Number(io, &inputChan)) return NULL;
     if (!_cmsReadUInt8Number(io, &outputChan)) return NULL;
+
+    if (inputChan == 0 || inputChan >= cmsMAXCHANNELS) return NULL;
+    if (outputChan == 0 || outputChan >= cmsMAXCHANNELS) return NULL;
 
     // Padding
     if (!_cmsReadUInt16Number(io, NULL)) return NULL;
@@ -4207,9 +4213,13 @@ void *Type_MPEmatrix_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io
     if (!_cmsReadUInt16Number(io, &OutputChans)) return NULL;
 
 
+    // Input and output chans may be ANY (up to 0xffff), 
+    // but we choose to limit to 16 channels for now
+    if (InputChans >= cmsMAXCHANNELS) return NULL;
+    if (OutputChans >= cmsMAXCHANNELS) return NULL;
+
     nElems = InputChans * OutputChans;
 
-    // Input and output chans may be ANY (up to 0xffff)
     Matrix = (cmsFloat64Number*) _cmsCalloc(self ->ContextID, nElems, sizeof(cmsFloat64Number));
     if (Matrix == NULL) return NULL;
 
@@ -4457,6 +4467,9 @@ void *Type_MPE_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, cmsU
     if (!_cmsReadUInt16Number(io, &InputChans)) return NULL;
     if (!_cmsReadUInt16Number(io, &OutputChans)) return NULL;
 
+    if (InputChans == 0 || InputChans >= cmsMAXCHANNELS) return NULL;
+    if (OutputChans == 0 || OutputChans >= cmsMAXCHANNELS) return NULL;
+
     // Allocates an empty LUT
     NewLUT = cmsPipelineAlloc(self ->ContextID, InputChans, OutputChans);
     if (NewLUT == NULL) return NULL;
@@ -4532,7 +4545,7 @@ cmsBool Type_MPE_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, v
 
                 _cmsTagSignature2String(String, (cmsTagSignature) ElementSig);
 
-                 // An unknow element was found.
+                 // An unknown element was found.
                  cmsSignalError(self->ContextID, cmsERROR_UNKNOWN_EXTENSION, "Found unknown MPE type '%s'", String);
                  goto Error;
         }
