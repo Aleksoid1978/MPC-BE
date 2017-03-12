@@ -318,7 +318,7 @@ typedef struct {
 
 // Parametric curves. A negative type means same function but analytically inverted. Max. number of params is 10
 
-// Evaluator callback for user-suplied parametric curves. May implement more than one type
+// Evaluator callback for user-supplied parametric curves. May implement more than one type
 typedef  cmsFloat64Number (* cmsParametricCurveEvaluator)(cmsInt32Number Type, const cmsFloat64Number Params[10], cmsFloat64Number R);
 
 // Plug-in may implement an arbitrary number of parametric curves
@@ -428,7 +428,7 @@ typedef struct {
     cmsUInt32Number     nSupportedTypes;    // In how many types this tag can come (MAX_TYPES_IN_LCMS_PLUGIN maximum)
     cmsTagTypeSignature SupportedTypes[MAX_TYPES_IN_LCMS_PLUGIN];
 
-    // For writting
+    // For writing
     cmsTagTypeSignature (* DecideType)(cmsFloat64Number ICCVersion, const void *Data);
 
 } cmsTagDescriptor;

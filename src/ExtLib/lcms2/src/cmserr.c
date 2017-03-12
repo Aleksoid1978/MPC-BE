@@ -88,7 +88,7 @@ cmsBool   _cmsRegisterMemHandlerPlugin(cmsContext ContextID, cmsPluginBase* Plug
 // *********************************************************************************
 
 // This is the default memory allocation function. It does a very coarse
-// check of amout of memory, just to prevent exploits
+// check of amount of memory, just to prevent exploits
 static
 void* _cmsMallocDefaultFn(cmsContext ContextID, cmsUInt32Number size)
 {
@@ -195,7 +195,7 @@ void _cmsAllocMemPluginChunk(struct _cmsContext_struct* ctx, const struct _cmsCo
     }
     else {
 
-        // To reset it, we use the default allocators, which cannot be overriden
+        // To reset it, we use the default allocators, which cannot be overridden
         ctx ->chunks[MemPlugin] = &ctx ->DefaultMemoryManager;
     } 
 }

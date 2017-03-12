@@ -266,7 +266,7 @@ cmsBool _cmsAdaptMatrixToD50(cmsMAT3* r, const cmsCIExyY* SourceWhitePt)
 // Build a White point, primary chromas transfer matrix from RGB to CIE XYZ
 // This is just an approximation, I am not handling all the non-linear
 // aspects of the RGB to XYZ process, and assumming that the gamma correction
-// has transitive property in the tranformation chain.
+// has transitive property in the transformation chain.
 //
 // the alghoritm:
 //
