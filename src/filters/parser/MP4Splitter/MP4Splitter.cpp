@@ -947,6 +947,18 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 									mts.RemoveAll();
 									mts.Add(mt);
+
+									if (!di->GetDataSize()) {
+										m_pFile->Seek(sample.GetOffset());
+										CBaseSplitterFileEx::avchdr h;
+										CMediaType mt2;
+										if (m_pFile->Read(h, sample.GetSize(), &mt2)) {
+											if (mt2.subtype == MEDIASUBTYPE_H264) {
+												CreateAVCfromH264(&mt2);
+											}
+											mts.InsertAt(0, mt2);
+										}
+									}
 								}
 								break;
 							case AP4_ATOM_TYPE_HVC1:
@@ -985,6 +997,15 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 									mts.RemoveAll();
 									mts.Add(mt);
+
+									if (!di->GetDataSize()) {
+										m_pFile->Seek(sample.GetOffset());
+										CBaseSplitterFileEx::hevchdr h;
+										CMediaType mt2;
+										if (m_pFile->Read(h, sample.GetSize(), &mt2)) {
+											mts.InsertAt(0, mt2);
+										}
+									}
 								}
 								break;
 						}

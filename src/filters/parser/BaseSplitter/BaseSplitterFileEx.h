@@ -351,10 +351,15 @@ public:
 	bool Read(dirachdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(dvbsub& h, int len, CMediaType* pmt = NULL, bool bSimpleAdd = false);
 	bool Read(teletextsub& h, int len, CMediaType* pmt = NULL, bool bSimpleAdd = false);
+	
+	bool Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt = NULL);
 	bool Read(avchdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(avchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt = NULL);
+	
+	bool Read(hevchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt = NULL);
 	bool Read(hevchdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(hevchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt = NULL);
+	
 	bool Read(adx_adpcm_hdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(pcm_law_hdr& h, int len, bool bAlaw, CMediaType* pmt = NULL);
 	bool Read(opus_ts_hdr& h, int len, CAtlArray<BYTE>& extradata, CMediaType* pmt = NULL);
