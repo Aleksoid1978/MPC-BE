@@ -793,8 +793,9 @@ HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int*
 			switch (mix_fmt) {
 				case FCC('NV12'): *pMerit = 90; break;
 				case FCC('YUY2'): *pMerit = 80; break;
-				case D3DFMT_X8R8G8B8: *pMerit = 70; break;
-				case D3DFMT_A2R10G10B10: *pMerit = 60; break;
+				case FCC('P010'): *pMerit = 70; break;
+				case D3DFMT_X8R8G8B8: *pMerit = 60; break;
+				case D3DFMT_A2R10G10B10: *pMerit = 50; break;
 			}
 		}
 		else if (m_inputMediaType.subtype == MEDIASUBTYPE_YUY2) {
@@ -803,14 +804,16 @@ HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int*
 				case D3DFMT_X8R8G8B8: *pMerit = 80; break;
 				case D3DFMT_A2R10G10B10: *pMerit = 70; break;
 				case FCC('NV12'): *pMerit = 60; break; // colour degradation
+				case FCC('P010'): *pMerit = 50; break; // colour degradation
 			}
 		}
 		else if (m_inputMediaType.subtype == MEDIASUBTYPE_P010) {
 			switch (mix_fmt) {
-				case D3DFMT_A2R10G10B10: *pMerit = 90; break;
-				case D3DFMT_X8R8G8B8: *pMerit = 80; break; // bit depth degradation
-				case FCC('YUY2'): *pMerit = 70; break; // bit depth degradation
-				case FCC('NV12'): *pMerit = 60; break; // bit depth degradation
+				case FCC('P010'): *pMerit = 90; break;
+				case D3DFMT_A2R10G10B10: *pMerit = 80; break;
+				case D3DFMT_X8R8G8B8: *pMerit = 70; break; // bit depth degradation
+				case FCC('YUY2'): *pMerit = 60; break; // bit depth degradation
+				case FCC('NV12'): *pMerit = 50; break; // bit depth degradation
 			}
 		}
 		else if (m_inputMediaType.subtype == MEDIASUBTYPE_AYUV
@@ -821,6 +824,7 @@ HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int*
 				case D3DFMT_A2R10G10B10: *pMerit = 80; break;
 				case FCC('YUY2'): *pMerit = 70; break; // colour degradation
 				case FCC('NV12'): *pMerit = 60; break; // colour degradation
+				case FCC('P010'): *pMerit = 50; break; // colour degradation
 			}
 		}
 	}
