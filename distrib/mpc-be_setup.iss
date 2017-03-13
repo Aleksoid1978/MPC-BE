@@ -225,8 +225,7 @@ Source: "..\docs\Authors mpc-hc team.txt"; DestDir: "{app}";                    
 Source: "..\docs\Changelog.txt";           DestDir: "{app}";                             Flags: ignoreversion; Components: main
 Source: "..\docs\Changelog.Rus.txt";       DestDir: "{app}";                             Flags: ignoreversion; Components: main
 Source: "..\docs\Readme.txt";              DestDir: "{app}";                             Flags: ignoreversion; Components: main
-Source: "Shaders\*.hlsl";                  DestDir: "{commonappdata}\{#app_name}\Shaders"; Flags: ignoreversion; Components: main;
-;Source: "Shaders\*.hlsl";                  DestDir: "{userappdata}\{#app_name}\Shaders"; Flags: ignoreversion; Components: main; Check: NOT IniUsed()
+Source: "Shaders\*.hlsl";                  DestDir: "{userappdata}\{#app_name}\Shaders"; Flags: ignoreversion; Components: main; Check: NOT IniUsed()
 Source: "Shaders\*.hlsl";                  DestDir: "{app}\Shaders";                     Flags: ignoreversion; Components: main; Check: IniUsed()
 
 [Icons]
@@ -264,7 +263,6 @@ Type: files; Name: {app}\COPYING;                   Check: IsUpgrade()
 ; remove the old language dlls when upgrading
 Type: files; Name: {app}\mpcresources.??.dll
 #endif
-Type: files; Name: {commonappdata}\{#app_name}\Shaders\*.hlsl'));
 
 [UninstallDelete]
 Type: files; Name: {app}\{#msdk_dll}
