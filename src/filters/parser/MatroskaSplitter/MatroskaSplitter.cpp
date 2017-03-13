@@ -430,9 +430,6 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								CBaseSplitterFileEx::avchdr h;
 								CMediaType mt2;
 								if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
-									if (mt2.subtype == MEDIASUBTYPE_H264) {
-										CreateAVCfromH264(&mt2);
-									}
 									mts.InsertAt(0, mt2);
 								}
 							}
