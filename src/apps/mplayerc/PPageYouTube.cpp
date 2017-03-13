@@ -67,7 +67,7 @@ BOOL CPPageYoutube::OnInitDialog()
 	m_cbFormat.AddString(L"WebM");
 	m_cbFormat.SetCurSel(s.YoutubeFormat.fmt);
 
-	int resolutions[] = { 2160, 1440, 1080, 720, 480, 360 };
+	static const int resolutions[] = { 2160, 1440, 1080, 720, 480, 360, 240 };
 	for (int i = 0; i < _countof(resolutions); i++) {
 		CString str;
 		str.Format(L"%dp", resolutions[i]);
