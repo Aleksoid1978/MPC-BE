@@ -82,8 +82,8 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	CorrectCWndWidth(GetDlgItem(IDC_CHECK2));
 
-	OnCheckPageParser();
 	OnCheck60fps();
+	OnCheckPageParser();
 
 	UpdateData(FALSE);
 
@@ -108,12 +108,15 @@ BOOL CPPageYoutube::OnApply()
 
 void CPPageYoutube::OnCheckPageParser()
 {
-	if (m_chkPageParser.GetCheck()) {
-		GetDlgItem(IDC_STATIC2)->EnableWindow(TRUE);
-		m_cbFormat.EnableWindow(TRUE);
-	} else {
-		GetDlgItem(IDC_STATIC2)->EnableWindow(FALSE);
-		m_cbFormat.EnableWindow(FALSE);
+	const BOOL bEnable = m_chkPageParser.GetCheck();
+	GetDlgItem(IDC_STATIC2)->EnableWindow(bEnable);
+	m_cbFormat.EnableWindow(bEnable);
+	m_cbResolution.EnableWindow(bEnable);
+	m_chk60fps.EnableWindow(bEnable);
+	m_chkHdr.EnableWindow(bEnable);
+
+	if (bEnable) {
+		OnCheck60fps();
 	}
 
 	SetModified();
