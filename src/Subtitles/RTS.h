@@ -378,6 +378,8 @@ class __declspec(uuid("537DCACA-2812-4a4f-B2C6-1A34C17ADEB0"))
 
 	CSubtitle* GetSubtitle(int entry);
 
+	bool m_bForced = false;
+
 protected:
 	virtual void OnChanged();
 
@@ -398,6 +400,8 @@ public:
 		m_bOverridePlacement = bOverridePlacement;
 		m_overridePlacement.SetSize(lHorPos, lVerPos);
 	}
+
+	void SetName(const CString name);
 
 public:
 	bool Init(CSize size, const CRect& vidrect); // will call Deinit()
