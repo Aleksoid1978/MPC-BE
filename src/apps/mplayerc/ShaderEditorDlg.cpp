@@ -236,6 +236,7 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 
 	m_targets.AddString(L"ps_2_0");
 	m_targets.AddString(L"ps_2_a");
+	m_targets.AddString(L"ps_2_b");
 	m_targets.AddString(L"ps_2_sw");
 	m_targets.AddString(L"ps_3_0");
 	m_targets.AddString(L"ps_3_sw");
