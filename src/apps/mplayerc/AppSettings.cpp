@@ -942,7 +942,6 @@ void CAppSettings::SaveExternalFilters()
 			break;
 		}
 	}
-	pApp->WriteProfileString(IDS_R_FILTERS, NULL, NULL);
 
 	unsigned int k = 0;
 	POSITION pos = m_filters.GetHeadPosition();
