@@ -2051,7 +2051,7 @@ BEGIN
     IDS_GRAPHBUILDER_AUDIOSWITCHER "Audio Switcher"
     IDS_SHADERS_EDIT        "&Edit shaders..."
     IDS_SUBTITLES_DEFAULT_STYLE "&Default Style"
-    IDS_SUBTITLES_FORCED        "&Forced only (PGS/VOB)"
+    IDS_SUBTITLES_FORCED        "&Forced only"
     IDS_FAVFILES            "Files"
     IDS_FAVDVDS             "DVDs"
 END
