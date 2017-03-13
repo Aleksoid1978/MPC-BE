@@ -953,9 +953,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										CBaseSplitterFileEx::avchdr h;
 										CMediaType mt2;
 										if (m_pFile->Read(h, sample.GetSize(), &mt2)) {
-											if (mt2.subtype == MEDIASUBTYPE_H264) {
-												CreateAVCfromH264(&mt2);
-											}
 											mts.InsertAt(0, mt2);
 										}
 									}
