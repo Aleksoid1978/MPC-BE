@@ -13159,8 +13159,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 		UINT index = 0;
 		while (pos) {
 			CFileItem& fileItem = pFileData->fns.GetNext(pos);
-
-			if (fileItem.GetName().Left(4) == L"www.") {
+			if (::PathIsURL(fileItem) && fileItem.GetName().Find(L"://") <= 0) {
 				fileItem = L"http://" + fileItem.GetName();
 			}
 

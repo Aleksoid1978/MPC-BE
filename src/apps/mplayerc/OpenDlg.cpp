@@ -110,10 +110,8 @@ BOOL COpenDlg::OnInitDialog()
 	}
 
 	if (m_bPasteClipboardURL && ::IsClipboardFormatAvailable(CF_UNICODETEXT) && ::OpenClipboard(m_hWnd)) {
-		HGLOBAL hglb = ::GetClipboardData(CF_UNICODETEXT);
-		if (hglb) {
-			LPCWSTR pText = (LPCWSTR)::GlobalLock(hglb);
-			if (pText) {
+		if (HGLOBAL hglb = ::GetClipboardData(CF_UNICODETEXT)) {
+			if (LPCWSTR pText = (LPCWSTR)::GlobalLock(hglb)) {
 				if (AfxIsValidString(pText) && ::PathIsURL(pText)) {
 					m_mrucombo.SetWindowTextW(pText);
 				}
@@ -259,7 +257,7 @@ void COpenDlg::OnUpdateDub(CCmdUI* pCmdUI)
 	UpdateData();
 
 	pCmdUI->Enable(AfxGetAppSettings().GetFileEngine(m_path) == DirectShow
-					&& ((CString(m_path).MakeLower().Find(L"://")) == -1));
+				   && !::PathIsURL(m_path));
 }
 
 void COpenDlg::OnUpdateAppendToPlaylist(CCmdUI* pCmdUI)
