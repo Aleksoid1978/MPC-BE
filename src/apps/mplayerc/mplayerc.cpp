@@ -1561,6 +1561,38 @@ BOOL CMPlayerCApp::InitInstance()
 		return FALSE;
 	}
 
+	CString shaderpath;
+	GetAppSavePath(shaderpath);
+	shaderpath.Append(L"Shaders");
+	if (!::PathFileExistsW(shaderpath)) {
+		// restore shaders if the "Shaders" folder is missing only
+		CString shaderstorage;
+		SHGetFolderPathW(NULL, CSIDL_COMMON_APPDATA, NULL, 0, shaderstorage.GetBuffer(_MAX_PATH));
+		shaderstorage.ReleaseBuffer();
+		shaderstorage.Append(L"\\MPC-BE\\Shaders");
+
+		if (::PathFileExistsW(shaderstorage)) {
+			WCHAR pathFrom[MAX_PATH] = { 0 }; // for double null-terminated string
+			wcscpy(pathFrom, shaderstorage);
+
+			WCHAR pathTo[MAX_PATH] = { 0 }; // for double null-terminated string
+			wcscpy(pathTo, shaderpath);
+
+			SHFILEOPSTRUCT sf = { 0 };
+			sf.wFunc = FO_COPY;
+			sf.hwnd = 0;
+			sf.fFlags = FOF_NOCONFIRMATION | FOF_NOCONFIRMMKDIR | FOF_NOERRORUI;
+			sf.pFrom = pathFrom;
+			sf.pTo = pathTo;
+			int ret = SHFileOperationW(&sf);
+			if (ret == 0) {
+				DLog(L"CMPlayerCApp::InitInstance(): default shaders restored");
+			} else {
+				DLog(L"CMPlayerCApp::InitInstance(): default shaders are not copied. Error: %x", ret);
+			}
+		}
+	}
+
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Create(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
 		CString path = GetProgramPath();
