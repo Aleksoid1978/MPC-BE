@@ -1390,12 +1390,14 @@ BOOL CMPlayerCApp::InitInstance()
 		return FALSE;
 	}
 
+	// select setting location
 	if (IsIniValid()) {
 		StoreSettingsToIni();
 	} else {
 		StoreSettingsToRegistry();
 	}
 
+	// process command line
 	PreProcessCommandLine();
 	m_s.ParseCommandLine(m_cmdln);
 
@@ -1551,7 +1553,8 @@ BOOL CMPlayerCApp::InitInstance()
 		}
 	}
 
-	m_s.LoadSettings(); // read settings
+	// read settings
+	m_s.LoadSettings();
 
 	if (!__super::InitInstance()) {
 		AfxMessageBox(L"InitInstance failed!");
