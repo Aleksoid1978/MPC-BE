@@ -1,5 +1,5 @@
 ﻿;
-; (C) 2009-2016 see Authors.txt
+; (C) 2009-2017 see Authors.txt
 ;
 ; This file is part of MPC-BE.
 ;
@@ -225,6 +225,7 @@ Source: "..\docs\Authors mpc-hc team.txt"; DestDir: "{app}";                    
 Source: "..\docs\Changelog.txt";           DestDir: "{app}";                             Flags: ignoreversion; Components: main
 Source: "..\docs\Changelog.Rus.txt";       DestDir: "{app}";                             Flags: ignoreversion; Components: main
 Source: "..\docs\Readme.txt";              DestDir: "{app}";                             Flags: ignoreversion; Components: main
+Source: "Shaders\*.hlsl";                  DestDir: "{commonappdata}\{#app_name}\Shaders"; Flags: ignoreversion; Components: main;
 Source: "Shaders\*.hlsl";                  DestDir: "{userappdata}\{#app_name}\Shaders"; Flags: ignoreversion; Components: main; Check: NOT IniUsed()
 Source: "Shaders\*.hlsl";                  DestDir: "{app}\Shaders";                     Flags: ignoreversion; Components: main; Check: IniUsed()
 
@@ -252,16 +253,17 @@ Filename: "{app}\Changelog.txt";     WorkingDir: "{app}"; Flags: nowait postinst
 Filename: "{app}\Changelog.Rus.txt"; WorkingDir: "{app}"; Flags: nowait postinstall skipifsilent unchecked shellexec; Description: "{cm:ViewChangelog}"; Languages: ru
 
 [InstallDelete]
-Type: files; Name: {userdesktop}\{#app_name}.lnk;   Check: not IsTaskSelected('desktopicon\user')   and IsUpgrade()
-Type: files; Name: {commondesktop}\{#app_name}.lnk; Check: not IsTaskSelected('desktopicon\common') and IsUpgrade()
-Type: files; Name: {#quick_launch}\{#app_name}.lnk; Check: not IsTaskSelected('quicklaunchicon')    and IsUpgrade(); OnlyBelowVersion: 0,6.1
-Type: files; Name: {app}\AUTHORS;                   Check: IsUpgrade()
-Type: files; Name: {app}\ChangeLog;                 Check: IsUpgrade()
-Type: files; Name: {app}\ChangeLogRus;              Check: IsUpgrade()
-Type: files; Name: {app}\COPYING;                   Check: IsUpgrade()
+Type: files; Name: "{userdesktop}\{#app_name}.lnk";   Check: not IsTaskSelected('desktopicon\user')   and IsUpgrade()
+Type: files; Name: "{commondesktop}\{#app_name}.lnk"; Check: not IsTaskSelected('desktopicon\common') and IsUpgrade()
+Type: files; Name: "{#quick_launch}\{#app_name}.lnk"; OnlyBelowVersion: 0,6.1; Check: not IsTaskSelected('quicklaunchicon') and IsUpgrade()
+Type: files; Name: "{app}\AUTHORS";                   Check: IsUpgrade()
+Type: files; Name: "{app}\ChangeLog";                 Check: IsUpgrade()
+Type: files; Name: "{app}\ChangeLogRus";              Check: IsUpgrade()
+Type: files; Name: "{app}\COPYING";                   Check: IsUpgrade()
+Type: filesandordirs; Name: "{commonappdata}\{#app_name}\Shaders"; Tasks: reset_settings
 #ifdef localize
 ; remove the old language dlls when upgrading
-Type: files; Name: {app}\mpcresources.??.dll
+Type: files; Name: "{app}\mpcresources.??.dll"
 #endif
 
 [UninstallDelete]
