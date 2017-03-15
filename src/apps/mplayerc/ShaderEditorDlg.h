@@ -68,10 +68,10 @@ public:
 	BOOL Create(CWnd* pParent = NULL);
 
 	enum { IDD = IDD_SHADEREDITOR_DLG };
-	CComboBox m_labels;
-	CComboBox m_targets;
-	CShaderEdit m_srcdata;
-	CEdit m_output;
+	CComboBox m_cbLabels;
+	CComboBox m_cbTargets;
+	CShaderEdit m_edSrcdata;
+	CEdit m_edOutput;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
@@ -83,7 +83,7 @@ protected:
 
 public:
 	afx_msg void OnCbnSelchangeCombo1();
-	afx_msg void OnBnClickedButton2();
+	afx_msg void OnBnClickedButtonDelete();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
