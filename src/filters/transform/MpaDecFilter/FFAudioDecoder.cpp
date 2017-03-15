@@ -458,6 +458,7 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 		int used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, p, size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
 		if (used_bytes < 0) {
 			DLog(L"CFFAudioDecoder::Decode() : audio parsing failed (ret: %d)", -used_bytes);
+			av_packet_unref(&avpkt);
 			return E_FAIL;
 		} else if (used_bytes == 0 && pOut_size == 0) {
 			DLog(L"CFFAudioDecoder::Decode() : could not process buffer while parsing");
