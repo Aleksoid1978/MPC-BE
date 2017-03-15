@@ -929,7 +929,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_rtLastStart(INVALID_TIME)
 	, m_rtLastStop(0)
 	, m_rtStartCache(INVALID_TIME)
-	, m_rtStopCache(INVALID_TIME)
 	, m_nWorkaroundBug(FF_BUG_AUTODETECT)
 	, m_nErrorConcealment(FF_EC_DEBLOCK | FF_EC_GUESS_MVS)
 	, m_bDXVACompatible(true)
@@ -2369,9 +2368,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 
 	m_bWaitingForKeyFrame = TRUE;
 
-	m_rtStart		= rtStart;
 	m_rtStartCache	= INVALID_TIME;
-	m_rtStopCache	= INVALID_TIME;
 
 	m_rtLastStart	= INVALID_TIME;
 	m_rtLastStop	= 0;
@@ -2612,7 +2609,7 @@ static BOOL GOPFound(BYTE *buf, int len)
 	return FALSE;
 }
 
-#define Continue av_frame_unref(m_pFrame); continue;
+#define Continue { av_frame_unref(m_pFrame); av_packet_unref(&avpkt); continue; }
 HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn)
 {
 	HRESULT hr     = S_OK;
@@ -2645,7 +2642,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 
 		if (m_bWaitingForKeyFrame
 				&& (m_nCodecId == AV_CODEC_ID_VP8 || m_nCodecId == AV_CODEC_ID_VP9)) {
-			BOOL bKeyFrame = m_nCodecId == AV_CODEC_ID_VP8 ? !(pDataBuffer[0] & 1) : !(pDataBuffer[0] & 4);
+			const BOOL bKeyFrame = m_nCodecId == AV_CODEC_ID_VP8 ? !(pDataBuffer[0] & 1) : !(pDataBuffer[0] & 4);
 			if (bKeyFrame) {
 				DLog(L"CMPCVideoDecFilter::Decode(): Found VP8/9 key-frame, resuming decoding");
 				m_bWaitingForKeyFrame = FALSE;
@@ -2666,7 +2663,6 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 			avpkt.data = pDataBuffer;
 			avpkt.size = nSize;
 			avpkt.pts  = rtStartIn;
-			avpkt.dts  = rtStopIn;
 			if (rtStartIn != INVALID_TIME && rtStopIn != INVALID_TIME) {
 				avpkt.duration = rtStopIn - rtStartIn;
 			} else {
@@ -2698,7 +2694,6 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 			if (used_bytes > pOut_size) {
 				if (rtStartIn != INVALID_TIME) {
 					m_rtStartCache = rtStartIn;
-					m_rtStopCache  = rtStopIn;
 				}
 			/*
 			} else if (used_bytes == pOut_size || ((used_bytes + 9) == pOut_size)) {
@@ -2711,12 +2706,9 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 			*/
 			} else {
 				rtStart        = m_rtStartCache;
-				rtStop         = m_rtStopCache;
 				m_rtStartCache = rtStartIn;
-				m_rtStopCache  = rtStopIn;
 				// The value was used once, don't use it for multiple frames, that ends up in weird timings
 				rtStartIn      = INVALID_TIME;
-				rtStopIn       = INVALID_TIME;
 			}
 
 			if (pOut_size > 0 || bFlush) {
@@ -2733,15 +2725,10 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 					memcpy(m_pFFBuffer2, pOut, pOut_size);
 					memset(m_pFFBuffer2 + pOut_size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 
-					avpkt.data = m_pFFBuffer2;
-					avpkt.size = pOut_size;
-					avpkt.pts  = rtStart;
-					avpkt.dts  = rtStop;
-					if (rtStart != INVALID_TIME && rtStop != INVALID_TIME) {
-						avpkt.duration = rtStop - rtStart;
-					} else {
-						avpkt.duration = 0;
-					}
+					avpkt.data     = m_pFFBuffer2;
+					avpkt.size     = pOut_size;
+					avpkt.pts      = rtStart;
+					avpkt.duration = 0;
 
 					if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO && m_bWaitingForKeyFrame
 							&& GOPFound(avpkt.data, avpkt.size)) {
@@ -2769,6 +2756,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 
 		if (ret < 0) {
 			av_frame_unref(m_pFrame);
+			av_packet_unref(&avpkt);
 			return S_OK;
 		}
 
@@ -2857,6 +2845,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 		hr = m_pOutput->Deliver(pOut);
 	}
 
+	av_packet_unref(&avpkt);
 	return hr;
 }
 
