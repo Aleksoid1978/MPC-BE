@@ -10951,10 +10951,9 @@ ShaderC* CMainFrame::GetShader(LPCWSTR label)
 {
 	ShaderC* pShader = NULL;
 
-	POSITION pos = m_ShaderCashe.GetHeadPosition();
-	while (pos) {
-		pShader = &m_ShaderCashe.GetNext(pos);
-		if (pShader->label.CompareNoCase(label) == 0) {
+	for (POSITION pos = m_ShaderCashe.GetHeadPosition(); pos; m_ShaderCashe.GetNext(pos)) {
+		if (m_ShaderCashe.GetAt(pos).label.CompareNoCase(label) == 0) {
+			pShader = &m_ShaderCashe.GetAt(pos);
 			break;
 		}
 	}
