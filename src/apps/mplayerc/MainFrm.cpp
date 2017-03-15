@@ -10954,7 +10954,7 @@ ShaderC* CMainFrame::GetShader(LPCWSTR label)
 	POSITION pos = m_ShaderCashe.GetHeadPosition();
 	while (pos) {
 		pShader = &m_ShaderCashe.GetNext(pos);
-		if (pShader->label.CompareNoCase(label)) {
+		if (pShader->label.CompareNoCase(label) == 0) {
 			break;
 		}
 	}
@@ -10977,7 +10977,6 @@ ShaderC* CMainFrame::GetShader(LPCWSTR label)
 					else {
 						shfile.SeekToBegin();
 					}
-
 
 					if (shader.target == L"ps_3_sw") {
 						shader.target = L"ps_3_0";
@@ -11002,6 +11001,26 @@ ShaderC* CMainFrame::GetShader(LPCWSTR label)
 	}
 
 	return pShader;
+}
+
+bool CMainFrame::DeleteShaderFile(LPCWSTR label)
+{
+	CString path;
+	if (AfxGetMyApp()->GetAppSavePath(path)) {
+		path.AppendFormat(L"Shaders\\%s.hlsl", label);
+
+		if (!::PathFileExistsW(path) || ::DeleteFileW(path)) {
+			// if the file is missing or deleted successfully, then remove it from the cache
+			for (POSITION pos = m_ShaderCashe.GetHeadPosition(); pos; m_ShaderCashe.GetNext(pos)) {
+				if (m_ShaderCashe.GetAt(pos).label.CompareNoCase(label) == 0) {
+					m_ShaderCashe.RemoveAt(pos);
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
 }
 
 void CMainFrame::SetShaders()

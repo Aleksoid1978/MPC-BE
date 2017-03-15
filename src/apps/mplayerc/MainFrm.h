@@ -1229,6 +1229,7 @@ public:
 	bool		m_bToggleShaderScreenSpace;
 	CAtlList<ShaderC> m_ShaderCashe;
 	ShaderC*	GetShader(LPCWSTR label);
+	bool		DeleteShaderFile(LPCWSTR label);
 
 	bool		m_bInOptions;
 	bool		m_bStopTunerScan;

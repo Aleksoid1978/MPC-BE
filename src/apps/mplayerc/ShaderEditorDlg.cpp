@@ -204,14 +204,14 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 	AddAnchor(IDC_BUTTON3, TOP_RIGHT);
 	AddAnchor(IDC_BUTTON4, BOTTOM_RIGHT);
 
-	m_srcdata.SetTabStops(16);
+	m_edSrcdata.SetTabStops(16);
 
 	SetMinTrackSize(CSize(250, 40));
 
-	m_targets.AddString(L"ps_2_0");
-	m_targets.AddString(L"ps_2_a");
-	m_targets.AddString(L"ps_2_b");
-	m_targets.AddString(L"ps_3_0");
+	m_cbTargets.AddString(L"ps_2_0");
+	m_cbTargets.AddString(L"ps_2_a");
+	m_cbTargets.AddString(L"ps_2_b");
+	m_cbTargets.AddString(L"ps_3_0");
 
 	CString path;
 	if (AfxGetMyApp()->GetAppSavePath(path)) {
@@ -223,13 +223,13 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 				do {
 					CString filename(wfd.cFileName);
 					filename.Truncate(filename.GetLength() - 5);
-					m_labels.AddString(filename);
+					m_cbLabels.AddString(filename);
 				} while (FindNextFile(hFile, &wfd));
 				FindClose(hFile);
 			}
 		}
 	}
-	CorrectComboListWidth(m_labels);
+	CorrectComboListWidth(m_cbLabels);
 
 	m_nIDEventShader = SetTimer(1, 1000, NULL);
 
@@ -240,17 +240,17 @@ void CShaderEditorDlg::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
-	DDX_Control(pDX, IDC_COMBO1, m_labels);
-	DDX_Control(pDX, IDC_COMBO2, m_targets);
-	DDX_Control(pDX, IDC_EDIT1, m_srcdata);
-	DDX_Control(pDX, IDC_EDIT2, m_output);
+	DDX_Control(pDX, IDC_COMBO1, m_cbLabels);
+	DDX_Control(pDX, IDC_COMBO2, m_cbTargets);
+	DDX_Control(pDX, IDC_EDIT1, m_edSrcdata);
+	DDX_Control(pDX, IDC_EDIT2, m_edOutput);
 }
 
 bool CShaderEditorDlg::HitTestSplitter(CPoint p)
 {
 	CRect r, rs, ro;
-	m_srcdata.GetWindowRect(&rs);
-	m_output.GetWindowRect(&ro);
+	m_edSrcdata.GetWindowRect(&rs);
+	m_edOutput.GetWindowRect(&ro);
 	ScreenToClient(&rs);
 	ScreenToClient(&ro);
 	GetClientRect(&r);
@@ -263,7 +263,7 @@ bool CShaderEditorDlg::HitTestSplitter(CPoint p)
 
 BEGIN_MESSAGE_MAP(CShaderEditorDlg, CResizableDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO1, OnCbnSelchangeCombo1)
-	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedButton2)
+	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedButtonDelete)
 	ON_WM_TIMER()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
@@ -276,11 +276,11 @@ END_MESSAGE_MAP()
 BOOL CShaderEditorDlg::PreTranslateMessage(MSG* pMsg)
 {
 	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_TAB
-			   && pMsg->hwnd == m_srcdata.GetSafeHwnd()) {
+			   && pMsg->hwnd == m_edSrcdata.GetSafeHwnd()) {
 		int nStartChar, nEndChar;
-		m_srcdata.GetSel(nStartChar, nEndChar);
+		m_edSrcdata.GetSel(nStartChar, nEndChar);
 		if (nStartChar == nEndChar) {
-			m_srcdata.ReplaceSel(L"\t");
+			m_edSrcdata.ReplaceSel(L"\t");
 		}
 		return TRUE;
 	} else if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE) {
@@ -292,69 +292,51 @@ BOOL CShaderEditorDlg::PreTranslateMessage(MSG* pMsg)
 
 void CShaderEditorDlg::OnCbnSelchangeCombo1()
 {
-	CString label;
-	m_labels.GetLBText(m_labels.GetCurSel(), label);
+	int i = m_cbLabels.GetCurSel();
+	if (i >= 0) {
+		CString label;
+		m_cbLabels.GetLBText(i, label);
 
-	ShaderC* pShader = AfxGetMainFrame()->GetShader(label);
+		ShaderC* pShader = AfxGetMainFrame()->GetShader(label);
 
-	m_targets.SetWindowText(pShader->target);
+		m_cbTargets.SetWindowText(pShader->target);
 
-	CString srcdata(pShader->srcdata);
-	srcdata.Replace(L"\n", L"\r\n");
-	m_srcdata.SetWindowText(srcdata);
-
-	AfxGetMainFrame()->UpdateShaders(pShader->label);
+		CString srcdata(pShader->srcdata);
+		srcdata.Replace(L"\n", L"\r\n");
+		m_edSrcdata.SetWindowText(srcdata);
+	}
 }
 
-void CShaderEditorDlg::OnBnClickedButton2()
+void CShaderEditorDlg::OnBnClickedButtonDelete()
 {
-	if (!m_pShader) {
-		return;
+	int i = m_cbLabels.GetCurSel();
+	if (i >= 0) {
+		if (IDYES != AfxMessageBox(ResStr(IDS_SHADEREDITORDLG_0), MB_YESNO)) {
+			return;
+		}
+
+		CString label;
+		m_cbLabels.GetLBText(i, label);
+
+		if (AfxGetMainFrame()->DeleteShaderFile(label)) {
+			m_cbLabels.DeleteString(i);
+
+			m_edSrcdata.SetWindowText(L"");
+			m_edOutput.SetWindowText(L"");
+		}
 	}
-
-	if (IDYES != AfxMessageBox(ResStr(IDS_SHADEREDITORDLG_0), MB_YESNO)) {
-		return;
-	}
-
-	CAppSettings& s = AfxGetAppSettings();
-
-	// TODO: SHADERS
-	//T//for (POSITION pos = s.m_shaders.GetHeadPosition(); pos; s.m_shaders.GetNext(pos)) {
-	//T//	if (m_pShader == &s.m_shaders.GetAt(pos)) {
-	//T//		CString strShaderPath;
-	//T//		if (AfxGetMyApp()->GetAppSavePath(strShaderPath)) {
-	//T//			strShaderPath += L"Shaders\\" + m_pShader->label + L".hlsl";
-	//T//			DeleteFile(strShaderPath);
-	//T//		}
-	//T//
-	//T//		m_pShader = NULL;
-	//T//		s.m_shaders.RemoveAt(pos);
-	//T//		int i = m_labels.GetCurSel();
-	//T//
-	//T//		if (i >= 0) {
-	//T//			m_labels.DeleteString(i);
-	//T//		}
-	//T//
-	//T//		m_labels.SetWindowText(L"");
-	//T//		m_targets.SetWindowText(L"");
-	//T//		m_srcdata.SetWindowText(L"");
-	//T//		m_output.SetWindowText(L"");
-	//T//		AfxGetMainFrame()->UpdateShaders(L"");
-	//T//		break;
-	//T//	}
-	//T//}
 }
 
 void CShaderEditorDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	if (nIDEvent == m_nIDEventShader && IsWindowVisible() && m_pShader) {
 		CString srcdata;
-		m_srcdata.GetWindowText(srcdata);
+		m_edSrcdata.GetWindowText(srcdata);
 		srcdata.Replace(L"\r", L"");
 		srcdata.Trim();
 
 		CString target;
-		m_targets.GetWindowText(target);
+		m_cbTargets.GetWindowText(target);
 		target.Trim();
 
 		if (!srcdata.IsEmpty() && !target.IsEmpty() && (m_pShader->srcdata != srcdata || m_pShader->target != target)) {
@@ -380,7 +362,7 @@ void CShaderEditorDlg::OnTimer(UINT_PTR nIDEvent)
 
 			errmsg.Replace(L"\n", L"\r\n");
 
-			m_output.SetWindowText(errmsg);
+			m_edOutput.SetWindowText(errmsg);
 
 			// TODO: autosave
 
@@ -416,8 +398,8 @@ void CShaderEditorDlg::OnMouseMove(UINT nFlags, CPoint point)
 	if (m_fSplitterGrabbed) {
 		CRect r, rs, ro;
 		GetClientRect(&r);
-		m_srcdata.GetWindowRect(&rs);
-		m_output.GetWindowRect(&ro);
+		m_edSrcdata.GetWindowRect(&rs);
+		m_edOutput.GetWindowRect(&ro);
 		ScreenToClient(&rs);
 		ScreenToClient(&ro);
 
@@ -426,8 +408,8 @@ void CShaderEditorDlg::OnMouseMove(UINT nFlags, CPoint point)
 
 		rs.bottom = min(max(point.y, rs.top + 40), ro.bottom - 40) - avgdist;
 		ro.top = rs.bottom + dist;
-		m_srcdata.MoveWindow(&rs);
-		m_output.MoveWindow(&ro);
+		m_edSrcdata.MoveWindow(&rs);
+		m_edOutput.MoveWindow(&ro);
 
 		int div = 100 * ((rs.bottom + ro.top) / 2) / (ro.bottom - rs.top);
 
