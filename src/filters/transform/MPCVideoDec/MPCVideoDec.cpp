@@ -2660,7 +2660,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 
 		int got_picture = 0;
 		int ret         = 0;
-		int retParser   = -1;
+		bool bDecodeOk  = false;
 
 		if (!bFlush) {
 			avpkt.data = pDataBuffer;
@@ -2752,13 +2752,15 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 					avpkt.size = 0;
 				}
 
-				retParser = decode(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
-				if (retParser < 0) {
+				int ret2 = decode(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
+				bDecodeOk = (ret2 >= 0);
+				if (ret2 < 0) {
 					DLog(L"CMPCVideoDecFilter::Decode() - decoding failed despite successfull parsing");
 				}
 			}
 		} else {
 			ret = decode(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
+			bDecodeOk = (ret >= 0);
 			if (ret < 0) {
 				DLog(L"CMPCVideoDecFilter::Decode() - decoding failed");
 			}
@@ -2783,7 +2785,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 
 		UpdateAspectRatio();
 
-		if (m_nDecoderMode != MODE_SOFTWARE && retParser >= 0) {
+		if (m_nDecoderMode != MODE_SOFTWARE && bDecodeOk) {
 			hr = m_pDXVADecoder->DeliverFrame(got_picture, rtStart, rtStop);
 		}
 
