@@ -492,6 +492,8 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 		Init(GetCodecId(), NULL);
 	}
 
+	av_packet_unref(&avpkt);
+
 	return hr;
 }
 
