@@ -630,12 +630,16 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 
 void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 {
+	if (AfxGetAppSettings().fUseTimeTooltip) {
+		UpdateTooltip(point);
+	}
+
 	if (m_CurrentPoint.x == point.x) {
 		CDialogBar::OnMouseMove(nFlags, point);
 		return;
 	}
 
-	if (AfxGetAppSettings().fUseTimeTooltip || m_pMainFrame->CanPreviewUse()) {
+	if (m_pMainFrame->CanPreviewUse()) {
 		UpdateTooltip(point);
 	}
 
