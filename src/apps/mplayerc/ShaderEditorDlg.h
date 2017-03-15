@@ -26,17 +26,7 @@
 #include "ShaderAutoCompleteDlg.h"
 #include <ResizableLib/ResizableDialog.h>
 
-// Q174667
-
-class CShaderLabelComboBox : public CComboBox
-{
-public:
-	CEdit m_edit;
-
-	DECLARE_MESSAGE_MAP()
-	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
-	afx_msg void OnDestroy();
-};
+// CShaderEdit
 
 class CShaderEdit : public CLineNumberEdit
 {
@@ -78,7 +68,7 @@ public:
 	BOOL Create(CWnd* pParent = NULL);
 
 	enum { IDD = IDD_SHADEREDITOR_DLG };
-	CShaderLabelComboBox m_labels;
+	CComboBox m_labels;
 	CComboBox m_targets;
 	CShaderEdit m_srcdata;
 	CEdit m_output;

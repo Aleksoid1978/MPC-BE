@@ -23,35 +23,6 @@
 #include "MainFrm.h"
 #include "ShaderEditorDlg.h"
 
-#undef SubclassWindow
-
-// CShaderLabelComboBox
-
-BEGIN_MESSAGE_MAP(CShaderLabelComboBox, CComboBox)
-	ON_WM_CTLCOLOR()
-	ON_WM_DESTROY()
-END_MESSAGE_MAP()
-
-HBRUSH CShaderLabelComboBox::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
-{
-	if (nCtlColor == CTLCOLOR_EDIT) {
-		if (m_edit.GetSafeHwnd() == NULL) {
-			m_edit.SubclassWindow(pWnd->GetSafeHwnd());
-		}
-	}
-
-	return __super::OnCtlColor(pDC, pWnd, nCtlColor);
-}
-
-void CShaderLabelComboBox::OnDestroy()
-{
-	if (m_edit.GetSafeHwnd() != NULL) {
-		m_edit.UnsubclassWindow();
-	}
-
-	__super::OnDestroy();
-}
-
 // CShaderEdit
 
 CShaderEdit::CShaderEdit()
@@ -225,10 +196,13 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 	}
 
 	AddAnchor(IDC_COMBO1, TOP_LEFT, TOP_RIGHT);
-	AddAnchor(IDC_COMBO2, TOP_RIGHT);
+	AddAnchor(IDC_COMBO2, BOTTOM_RIGHT);
 	AddAnchor(IDC_EDIT1, TOP_LEFT, BOTTOM_RIGHT);
 	AddAnchor(IDC_EDIT2, BOTTOM_LEFT, BOTTOM_RIGHT);
 	AddAnchor(IDC_BUTTON1, TOP_RIGHT);
+	AddAnchor(IDC_BUTTON2, TOP_RIGHT);
+	AddAnchor(IDC_BUTTON3, TOP_RIGHT);
+	AddAnchor(IDC_BUTTON4, BOTTOM_RIGHT);
 
 	m_srcdata.SetTabStops(16);
 
@@ -239,14 +213,22 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 	m_targets.AddString(L"ps_2_b");
 	m_targets.AddString(L"ps_3_0");
 
-	// TODO: SHADERS
-	//T//POSITION pos = AfxGetAppSettings().m_shaders.GetHeadPosition();
-
-	//T//while (pos) {
-	//T//	const CAppSettings::Shader& s = AfxGetAppSettings().m_shaders.GetNext(pos);
-	//T//	m_labels.SetItemDataPtr(m_labels.AddString(s.label), (void*)&s);
-	//T//}
-
+	CString path;
+	if (AfxGetMyApp()->GetAppSavePath(path)) {
+		path += L"Shaders\\";
+		if (::PathFileExists(path)) {
+			WIN32_FIND_DATA wfd;
+			HANDLE hFile = FindFirstFile(path + L"*.hlsl", &wfd);
+			if (hFile != INVALID_HANDLE_VALUE) {
+				do {
+					CString filename(wfd.cFileName);
+					filename.Truncate(filename.GetLength() - 5);
+					m_labels.AddString(filename);
+				} while (FindNextFile(hFile, &wfd));
+				FindClose(hFile);
+			}
+		}
+	}
 	CorrectComboListWidth(m_labels);
 
 	m_nIDEventShader = SetTimer(1, 1000, NULL);
@@ -293,12 +275,7 @@ END_MESSAGE_MAP()
 
 BOOL CShaderEditorDlg::PreTranslateMessage(MSG* pMsg)
 {
-	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN
-			&& pMsg->hwnd == m_labels.m_edit.GetSafeHwnd()) {
-		OnCbnSelchangeCombo1();
-
-		return TRUE;
-	} else if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_TAB
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_TAB
 			   && pMsg->hwnd == m_srcdata.GetSafeHwnd()) {
 		int nStartChar, nEndChar;
 		m_srcdata.GetSel(nStartChar, nEndChar);
@@ -315,56 +292,18 @@ BOOL CShaderEditorDlg::PreTranslateMessage(MSG* pMsg)
 
 void CShaderEditorDlg::OnCbnSelchangeCombo1()
 {
-	int i = m_labels.GetCurSel();
-
-
 	CString label;
-	if (i < 0) {
-		m_labels.GetWindowText(label);
-		//label.Trim();
-		FixFilename(label);
+	m_labels.GetLBText(m_labels.GetCurSel(), label);
 
-		if (label.IsEmpty()) {
-			return;
-		}
+	ShaderC* pShader = AfxGetMainFrame()->GetShader(label);
 
-		for (int k = 0; k < m_labels.GetCount(); k++) {
-			if (label.CompareNoCase(((ShaderC*)m_labels.GetItemDataPtr(k))->label) == 0) {
-				m_labels.SetCurSel(k);
-				i = k;
-				break;
-			}
-		}
-	}
+	m_targets.SetWindowText(pShader->target);
 
-	if (i < 0) {
-		CStringA srcdata;
-		if (!LoadResource(IDF_SHADER_EMPTY, srcdata, L"FILE")) {
-			return;
-		}
-
-		ShaderC s;
-		s.label = label;
-		s.target = L"ps_2_0";
-		s.srcdata = CString(srcdata);
-
-		// TODO: SHADERS
-		//T//POSITION pos = AfxGetAppSettings().m_shaders.AddTail(s);
-
-		i = m_labels.AddString(s.label);
-		m_labels.SetCurSel(i);
-		//T//m_labels.SetItemDataPtr(i, (void*)&AfxGetAppSettings().m_shaders.GetAt(pos));
-	}
-
-	m_pShader = (ShaderC*)m_labels.GetItemDataPtr(i);
-
-	m_targets.SetWindowText(m_pShader->target);
-
-	CString srcdata = m_pShader->srcdata;
+	CString srcdata(pShader->srcdata);
 	srcdata.Replace(L"\n", L"\r\n");
 	m_srcdata.SetWindowText(srcdata);
 
-	AfxGetMainFrame()->UpdateShaders(m_pShader->label);
+	AfxGetMainFrame()->UpdateShaders(pShader->label);
 }
 
 void CShaderEditorDlg::OnBnClickedButton2()
