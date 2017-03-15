@@ -1186,7 +1186,7 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 
 				return true;
 			} else {
-				DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR data of an unexpected size (%d)", sd->size));
+				DLog(L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR data of an unexpected size (%d)", sd->size);
 			}
 		} else if (m_baseFilterInfo.masterDataHDR) {
 			pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)m_baseFilterInfo.masterDataHDR, sizeof(MediaSideDataHDR));
@@ -1525,17 +1525,17 @@ bool CMPCVideoDecFilter::IsAVI()
 		CFile f;
 		CFileException fileException;
 		if (!f.Open(fname, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone, &fileException)) {
-			DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::IsAVI() : Can't open file '%s', error = %u", fname, fileException.m_cause));
+			DLog(L"CMPCVideoDecFilter::IsAVI() : Can't open file '%s', error = %u", fname, fileException.m_cause);
 			return false;
 		}
 
 		if (f.Read(&m_fSYNC, sizeof(m_fSYNC)) != sizeof(m_fSYNC)) {
-			DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::IsAVI() : Can't read SYNC from file '%s'", fname));
+			DLog(L"CMPCVideoDecFilter::IsAVI() : Can't read SYNC from file '%s'", fname);
 			return false;
 		}
 
 		if (m_fSYNC == MAKEFOURCC('R','I','F','F')) {
-			DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::IsAVI() : '%s' is a valid AVI file", fname));
+			DLog(L"CMPCVideoDecFilter::IsAVI() : '%s' is a valid AVI file", fname);
 			return true;
 		}
 	}
@@ -1587,7 +1587,7 @@ bool CMPCVideoDecFilter::IsDXVASupported()
 
 HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 {
-	DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::FindDecoderConfiguration(DXVA2)"));
+	DLog(L"CMPCVideoDecFilter::FindDecoderConfiguration(DXVA2)");
 
 	HRESULT hr = E_FAIL;
 
@@ -1603,7 +1603,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 		if (SUCCEEDED(hr = m_pDecoderService->GetDecoderDeviceGuids(&cDecoderGuids, &pDecoderGuids)) && cDecoderGuids) {
 
 			std::vector<GUID> supportedDecoderGuids;
-			DbgLog((LOG_TRACE, 3, L"    => Enumerating supported DXVA2 modes:"));
+			DLog(L"    => Enumerating supported DXVA2 modes:");
 			for (UINT iGuid = 0; iGuid < cDecoderGuids; iGuid++) {
 				CString msg;
 				msg.Format(L"        %s", GetGUIDString(pDecoderGuids[iGuid]));
@@ -1611,12 +1611,12 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 					msg.Append(L" - supported");
 					supportedDecoderGuids.emplace_back(pDecoderGuids[iGuid]);
 				}
-				DbgLog((LOG_TRACE, 3, msg));
+				DLog(msg);
 			}
 
 			if (!supportedDecoderGuids.empty()) {
 				for (auto guid = supportedDecoderGuids.begin(); guid != supportedDecoderGuids.end(); guid++) {
-					DbgLog((LOG_TRACE, 3, L"    => Attempt : %s", GetGUIDString(*guid)));
+					DLog(L"    => Attempt : %s", GetGUIDString(*guid));
 
 					// Find a configuration that we support.
 					if (FAILED(hr = FindDXVA2DecoderConfiguration(m_pDecoderService, *guid, &config, &bFoundDXVA2Configuration))) {
@@ -1626,7 +1626,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 					if (bFoundDXVA2Configuration) {
 						// Found a good configuration. Save the GUID.
 						decoderGuid = *guid;
-						DbgLog((LOG_TRACE, 3, L"    => Use : %s", GetGUIDString(decoderGuid)));
+						DLog(L"    => Use : %s", GetGUIDString(decoderGuid));
 						break;
 					}
 				}
@@ -1651,7 +1651,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 
 HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 {
-	DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::InitDecoder()"));
+	DLog(L"CMPCVideoDecFilter::InitDecoder()");
 
 	const BOOL bReinit = (m_pAVCtx != NULL);
 	const BOOL bChangeType = (m_pCurrentMediaType != *pmt);
@@ -2105,7 +2105,7 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 
 	BOOL bH264avc = FALSE;
 	if (pmt->formattype == FORMAT_MPEG2Video && (m_pAVCtx->codec_tag == MAKEFOURCC('a','v','c','1') || m_pAVCtx->codec_tag == MAKEFOURCC('A','V','C','1') || m_pAVCtx->codec_tag == MAKEFOURCC('C','C','V','1'))) {
-		DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::AllocExtradata() : processing AVC1 extradata of %d bytes", extralen));
+		DLog(L"CMPCVideoDecFilter::AllocExtradata() : processing AVC1 extradata of %d bytes", extralen);
 		// Reconstruct AVC1 extradata format
 		MPEG2VIDEOINFO *mp2vi = (MPEG2VIDEOINFO *)pmt->Format();
 		extralen += 7;
@@ -2146,7 +2146,7 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 
 		bH264avc = TRUE;
 	} else if (extralen > 0) {
-		DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::AllocExtradata() : processing extradata of %d bytes", extralen));
+		DLog(L"CMPCVideoDecFilter::AllocExtradata() : processing extradata of %d bytes", extralen);
 		// Just copy extradata for other formats
 		extra = (uint8_t *)av_mallocz(extralen + AV_INPUT_BUFFER_PADDING_SIZE);
 		getExtraData((const BYTE *)pmt->Format(), pmt->FormatType(), pmt->FormatLength(), extra, NULL);
@@ -2218,7 +2218,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 				CComPtr<IDirectXVideoDecoderService> pDXVA2Service;
 				hr = m_pDeviceManager->GetVideoService(m_hDevice, IID_PPV_ARGS(&pDXVA2Service));
 				if (FAILED(hr)) {
-					DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::CompleteConnect() : IDirect3DDeviceManager9::GetVideoService() - FAILED (0x%08x)", hr));
+					DLog(L"CMPCVideoDecFilter::CompleteConnect() : IDirect3DDeviceManager9::GetVideoService() - FAILED (0x%08x)", hr);
 					break;
 				}
 				if (!pDXVA2Service) {
@@ -2238,14 +2238,14 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 						pSurfaces,
 						NULL);
 				if (FAILED(hr)) {
-					DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::CompleteConnect() : IDirectXVideoDecoderService::CreateSurface() - FAILED (0x%08x)", hr));
+					DLog(L"CMPCVideoDecFilter::CompleteConnect() : IDirectXVideoDecoderService::CreateSurface() - FAILED (0x%08x)", hr);
 					break;
 				}
 
 				CComPtr<IDirectXVideoDecoder> pDirectXVideoDec;
 				hr = m_pDecoderService->CreateVideoDecoder(m_DXVADecoderGUID, &m_VideoDesc, &m_DXVA2Config, pSurfaces, numSurfaces, &pDirectXVideoDec);
 				if (FAILED(hr)) {
-					DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::CompleteConnect() : IDirectXVideoDecoder::CreateVideoDecoder() - FAILED (0x%08x)", hr));
+					DLog(L"CMPCVideoDecFilter::CompleteConnect() : IDirectXVideoDecoder::CreateVideoDecoder() - FAILED (0x%08x)", hr);
 				}
 
 				for (UINT i = 0; i < DXVA2_MAX_SURFACES; i++) {
@@ -2344,7 +2344,7 @@ HRESULT CMPCVideoDecFilter::EndFlush()
 
 HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, double dRate)
 {
-	DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::NewSegment()"));
+	DLog(L"CMPCVideoDecFilter::NewSegment()");
 
 	CAutoLock cAutoLock(&m_csReceive);
 
@@ -2647,7 +2647,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 				&& (m_nCodecId == AV_CODEC_ID_VP8 || m_nCodecId == AV_CODEC_ID_VP9)) {
 			BOOL bKeyFrame = m_nCodecId == AV_CODEC_ID_VP8 ? !(pDataBuffer[0] & 1) : !(pDataBuffer[0] & 4);
 			if (bKeyFrame) {
-				DbgLog((LOG_TRACE, 10, L"CMPCVideoDecFilter::Decode(): Found VP8/9 key-frame, resuming decoding"));
+				DLog(L"CMPCVideoDecFilter::Decode(): Found VP8/9 key-frame, resuming decoding");
 				m_bWaitingForKeyFrame = FALSE;
 			} else {
 				return S_OK;
@@ -2660,6 +2660,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 
 		int got_picture = 0;
 		int ret         = 0;
+		int retParser   = -1;
 
 		if (!bFlush) {
 			avpkt.data = pDataBuffer;
@@ -2684,7 +2685,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 
 			int used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, avpkt.data, avpkt.size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
 			if (used_bytes == 0 && pOut_size == 0 && !bFlush) {
-				DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::Decode() - could not process buffer, starving?"));
+				DLog(L"CMPCVideoDecFilter::Decode() - could not process buffer, starving?");
 				break;
 			} else if (used_bytes > 0) {
 				nSize       -= used_bytes;
@@ -2751,15 +2752,15 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 					avpkt.size = 0;
 				}
 
-				int ret2 = decode(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
-				if (ret2 < 0) {
-					DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::Decode() - decoding failed despite successfull parsing"));
+				retParser = decode(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
+				if (retParser < 0) {
+					DLog(L"CMPCVideoDecFilter::Decode() - decoding failed despite successfull parsing");
 				}
 			}
 		} else {
 			ret = decode(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
 			if (ret < 0) {
-				DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::Decode() - decoding failed"));
+				DLog(L"CMPCVideoDecFilter::Decode() - decoding failed");
 			}
 			nSize = 0;
 		}
@@ -2772,7 +2773,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 		if (m_bWaitKeyFrame) {
 			if (m_bWaitingForKeyFrame && got_picture) {
 				if (m_pFrame->key_frame) {
-					DbgLog((LOG_TRACE, 10, L"CMPCVideoDecFilter::Decode(): Found key-frame, resuming decoding"));
+					DLog(L"CMPCVideoDecFilter::Decode(): Found key-frame, resuming decoding");
 					m_bWaitingForKeyFrame = FALSE;
 				} else {
 					got_picture = 0;
@@ -2782,7 +2783,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 
 		UpdateAspectRatio();
 
-		if (m_nDecoderMode != MODE_SOFTWARE && ret >= 0) {
+		if (m_nDecoderMode != MODE_SOFTWARE && retParser >= 0) {
 			hr = m_pDXVADecoder->DeliverFrame(got_picture, rtStart, rtStop);
 		}
 
@@ -3183,7 +3184,7 @@ HRESULT CMPCVideoDecFilter::SetEVRForDXVA2(IPin *pPin)
 
 HRESULT CMPCVideoDecFilter::CreateDXVA2Decoder(UINT nNumRenderTargets, IDirect3DSurface9** pDecoderRenderTargets)
 {
-	DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::CreateDXVA2Decoder()"));
+	DLog(L"CMPCVideoDecFilter::CreateDXVA2Decoder()");
 
 	HRESULT							hr;
 	CComPtr<IDirectXVideoDecoder>	pDirectXVideoDec;
@@ -3232,13 +3233,13 @@ HRESULT CMPCVideoDecFilter::RecommitAllocator()
 		// Re-Commit the allocator (creates surfaces and new decoder)
 		hr = m_pDXVA2Allocator->Decommit();
 		if (m_pDXVA2Allocator->DecommitInProgress()) {
-			DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::RecommitAllocator() : WARNING! DXVA2 Allocator is still busy, trying to flush downstream"));
+			DLog(L"CMPCVideoDecFilter::RecommitAllocator() : WARNING! DXVA2 Allocator is still busy, trying to flush downstream");
 			GetOutputPin()->GetConnected()->BeginFlush();
 			GetOutputPin()->GetConnected()->EndFlush();
 			if (m_pDXVA2Allocator->DecommitInProgress()) {
-				DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::RecommitAllocator() : WARNING! Flush had no effect, decommit of the allocator still not complete"));
+				DLog(L"CMPCVideoDecFilter::RecommitAllocator() : WARNING! Flush had no effect, decommit of the allocator still not complete");
 			} else {
-				DbgLog((LOG_TRACE, 3, L"CMPCVideoDecFilter::RecommitAllocator() : Flush was successfull, decommit completed!"));
+				DLog(L"CMPCVideoDecFilter::RecommitAllocator() : Flush was successfull, decommit completed!");
 			}
 		}
 		hr = m_pDXVA2Allocator->Commit();
