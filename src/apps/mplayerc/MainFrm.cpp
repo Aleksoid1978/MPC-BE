@@ -10978,12 +10978,14 @@ ShaderC* CMainFrame::GetShader(LPCWSTR label)
 						shfile.SeekToBegin();
 					}
 
+
+					if (shader.target == L"ps_3_sw") {
+						shader.target = L"ps_3_0";
+					}
 					if (shader.target != L"ps_2_0"
 							&& shader.target != L"ps_2_a"
 							&& shader.target != L"ps_2_b"
-							&& shader.target != L"ps_2_sw"
-							&& shader.target != L"ps_3_0"
-							&& shader.target != L"ps_3_sw") {
+							&& shader.target != L"ps_3_0") {
 						shader.target = L"ps_2_0";
 					}
 
