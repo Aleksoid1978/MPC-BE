@@ -186,6 +186,8 @@ struct ShaderC {
 	CString		label;
 	CString		target;
 	CString		srcdata;
+	ULONGLONG	length = 0;
+	FILETIME	ftwrite = {0,0};
 };
 
 #pragma pack(push, 1)

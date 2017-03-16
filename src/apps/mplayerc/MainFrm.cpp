@@ -398,10 +398,10 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_COMMAND(ID_VIEW_VSYNCOFFSET_INCREASE, OnViewVSyncOffsetIncrease)
 	ON_COMMAND(ID_VIEW_VSYNCOFFSET_DECREASE, OnViewVSyncOffsetDecrease)
-	ON_UPDATE_COMMAND_UI(ID_SHADERS_TOGGLE, OnUpdateShaderToggle)
-	ON_COMMAND(ID_SHADERS_TOGGLE, OnShaderToggle)
-	ON_UPDATE_COMMAND_UI(ID_SHADERS_TOGGLE_SCREENSPACE, OnUpdateShaderToggleScreenSpace)
-	ON_COMMAND(ID_SHADERS_TOGGLE_SCREENSPACE, OnShaderToggleScreenSpace)
+	ON_UPDATE_COMMAND_UI(ID_SHADERS_TOGGLE, OnUpdateShaderToggle1)
+	ON_COMMAND(ID_SHADERS_TOGGLE, OnShaderToggle1)
+	ON_UPDATE_COMMAND_UI(ID_SHADERS_TOGGLE_SCREENSPACE, OnUpdateShaderToggle2)
+	ON_COMMAND(ID_SHADERS_TOGGLE_SCREENSPACE, OnShaderToggle2)
 
 	ON_UPDATE_COMMAND_UI(ID_OSD_LOCAL_TIME, OnUpdateViewOSDLocalTime)
 	ON_UPDATE_COMMAND_UI(ID_OSD_FILE_NAME, OnUpdateViewOSDFileName)
@@ -6514,7 +6514,7 @@ void CMainFrame::OnViewOSDFileName()
 	OnTimer(TIMER_STREAMPOSPOLLER2);
 }
 
-void CMainFrame::OnUpdateShaderToggle(CCmdUI* pCmdUI)
+void CMainFrame::OnUpdateShaderToggle1(CCmdUI* pCmdUI)
 {
 	if (AfxGetAppSettings().ShaderList.IsEmpty()) {
 		pCmdUI->Enable(FALSE);
@@ -6526,7 +6526,7 @@ void CMainFrame::OnUpdateShaderToggle(CCmdUI* pCmdUI)
 	}
 }
 
-void CMainFrame::OnUpdateShaderToggleScreenSpace(CCmdUI* pCmdUI)
+void CMainFrame::OnUpdateShaderToggle2(CCmdUI* pCmdUI)
 {
 	if (AfxGetAppSettings().ShaderListScreenSpace.IsEmpty()) {
 		pCmdUI->Enable(FALSE);
@@ -6538,7 +6538,7 @@ void CMainFrame::OnUpdateShaderToggleScreenSpace(CCmdUI* pCmdUI)
 	}
 }
 
-void CMainFrame::OnShaderToggle()
+void CMainFrame::OnShaderToggle1()
 {
 	m_bToggleShader = !m_bToggleShader;
 	if (m_bToggleShader) {
@@ -6553,7 +6553,7 @@ void CMainFrame::OnShaderToggle()
 	}
 }
 
-void CMainFrame::OnShaderToggleScreenSpace()
+void CMainFrame::OnShaderToggle2()
 {
 	m_bToggleShaderScreenSpace = !m_bToggleShaderScreenSpace;
 	if (m_bToggleShaderScreenSpace) {
@@ -10963,18 +10963,18 @@ ShaderC* CMainFrame::GetShader(LPCWSTR label)
 		if (AfxGetMyApp()->GetAppSavePath(path)) {
 			path.AppendFormat(L"Shaders\\%s.hlsl", label);
 			if (::PathFileExistsW(path)) {
-				CStdioFile shfile;
-				if (shfile.Open(path, CFile::modeRead | CFile::shareDenyWrite | CFile::typeText)) {
+				CStdioFile file;
+				if (file.Open(path, CFile::modeRead | CFile::shareDenyWrite | CFile::typeText)) {
 					ShaderC shader;
 					shader.label = label;
 
 					CString str;
-					shfile.ReadString(str); // read first string
+					file.ReadString(str); // read first string
 					if (str.Left(25) == L"// $MinimumShaderProfile:") {
 						shader.target = str.Mid(25).Trim(); // shader version property
 					}
 					else {
-						shfile.SeekToBegin();
+						file.SeekToBegin();
 					}
 
 					if (shader.target == L"ps_3_sw") {
@@ -10987,10 +10987,18 @@ ShaderC* CMainFrame::GetShader(LPCWSTR label)
 						shader.target = L"ps_2_0";
 					}
 
-					while (shfile.ReadString(str)) {
+					while (file.ReadString(str)) {
 						shader.srcdata += str + L"\n";
 					}
-					shfile.Close();
+
+					shader.length = file.GetLength();
+
+					FILETIME ftCreate, ftAccess, ftWrite;
+					if (GetFileTime(file.m_hFile, &ftCreate, &ftAccess, &ftWrite)) {
+						shader.ftwrite = ftWrite;
+					}
+
+					file.Close();
 
 					m_ShaderCashe.AddTail(shader);
 					pShader = &m_ShaderCashe.GetTail();
@@ -11000,6 +11008,29 @@ ShaderC* CMainFrame::GetShader(LPCWSTR label)
 	}
 
 	return pShader;
+}
+
+bool CMainFrame::SaveShaderFile(ShaderC* shader)
+{
+	CString path;
+	if (AfxGetMyApp()->GetAppSavePath(path)) {
+		path.AppendFormat(L"Shaders\\%s.hlsl", shader->label);
+
+		CStdioFile file;
+		if (file.Open(path, CFile::modeWrite  | CFile::shareExclusive | CFile::typeText)) {
+			file.SetLength(0);
+
+			CString str;
+			str.Format(L"// $MinimumShaderProfile: %s\n", shader->target);
+			file.WriteString(str);
+
+			file.WriteString(shader->srcdata);
+			file.Close();
+
+			return true;
+		}
+	}
+	return false;
 }
 
 bool CMainFrame::DeleteShaderFile(LPCWSTR label)
@@ -11020,6 +11051,35 @@ bool CMainFrame::DeleteShaderFile(LPCWSTR label)
 	}
 
 	return false;
+}
+
+void CMainFrame::TidyShaderCashe()
+{
+	CString appsavepath;
+	if (!AfxGetMyApp()->GetAppSavePath(appsavepath)) {
+		return;
+	}
+
+	for (POSITION pos = m_ShaderCashe.GetHeadPosition(); pos; m_ShaderCashe.GetNext(pos)) {
+		ShaderC* shader = &m_ShaderCashe.GetAt(pos);
+		CString path (appsavepath + L"Shaders\\" + shader->label + L".hlsl");
+
+		CFile file;
+		if (file.Open(path, CFile::modeRead | CFile::modeCreate | CFile::shareDenyNone)) {
+			ULONGLONG length = file.GetLength();
+			FILETIME ftCreate = {}, ftAccess = {}, ftWrite = {};
+			GetFileTime(file.m_hFile, &ftCreate, &ftAccess, &ftWrite);
+
+			file.Close();
+
+			if (shader->length == length && CompareFileTime(&shader->ftwrite, &ftWrite) == 0) {
+				continue; // actual shader
+			}
+		}
+
+		shader = NULL;
+		m_ShaderCashe.RemoveAt(pos); // outdated shader
+	}
 }
 
 void CMainFrame::SetShaders()
@@ -17105,7 +17165,7 @@ void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)
 			m_wndToolBar.m_volctrl.DecreaseVolume();
 			break;
 		case CMD_SHADER_TOGGLE :
-			OnShaderToggle();
+			OnShaderToggle1();
 			break;
 		case CMD_CLOSEAPP :
 			PostMessage(WM_CLOSE);

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -231,8 +231,6 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 	}
 	CorrectComboListWidth(m_cbLabels);
 
-	m_nIDEventShader = SetTimer(1, 1000, NULL);
-
 	return TRUE;
 }
 
@@ -263,8 +261,10 @@ bool CShaderEditorDlg::HitTestSplitter(CPoint p)
 
 BEGIN_MESSAGE_MAP(CShaderEditorDlg, CResizableDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO1, OnCbnSelchangeCombo1)
+	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedButtonSave)
+	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedButtonNew)
 	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedButtonDelete)
-	ON_WM_TIMER()
+	ON_BN_CLICKED(IDC_BUTTON4, OnBnClickedButtonApply)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEMOVE()
@@ -299,12 +299,35 @@ void CShaderEditorDlg::OnCbnSelchangeCombo1()
 
 		ShaderC* pShader = AfxGetMainFrame()->GetShader(label);
 
-		m_cbTargets.SetWindowText(pShader->target);
+		m_cbTargets.SelectString(0, pShader->target);
 
 		CString srcdata(pShader->srcdata);
 		srcdata.Replace(L"\n", L"\r\n");
 		m_edSrcdata.SetWindowText(srcdata);
+
+		m_edOutput.SetWindowText(L"");
 	}
+}
+
+void CShaderEditorDlg::OnBnClickedButtonSave()
+{
+	int i = m_cbLabels.GetCurSel();
+	if (i >= 0) {
+		ShaderC shader;
+
+		m_cbLabels.GetLBText(i, shader.label);
+		m_cbTargets.GetLBText(m_cbTargets.GetCurSel(), shader.target);
+
+		m_edSrcdata.GetWindowText(shader.srcdata);
+		shader.srcdata.Remove('\r');
+
+		bool ret = AfxGetMainFrame()->SaveShaderFile(&shader);
+	}
+}
+
+void CShaderEditorDlg::OnBnClickedButtonNew()
+{
+	// TODO
 }
 
 void CShaderEditorDlg::OnBnClickedButtonDelete()
@@ -327,24 +350,18 @@ void CShaderEditorDlg::OnBnClickedButtonDelete()
 	}
 }
 
-void CShaderEditorDlg::OnTimer(UINT_PTR nIDEvent)
+void CShaderEditorDlg::OnBnClickedButtonApply()
 {
-	if (nIDEvent == m_nIDEventShader && IsWindowVisible() && m_pShader) {
-		CString srcdata;
-		m_edSrcdata.GetWindowText(srcdata);
-		srcdata.Replace(L"\r", L"");
-		srcdata.Trim();
-
+	int i = m_cbLabels.GetCurSel();
+	if (i >= 0) {
 		CString target;
-		m_cbTargets.GetWindowText(target);
-		target.Trim();
+		m_cbTargets.GetLBText(m_cbTargets.GetCurSel(), target);
 
-		if (!srcdata.IsEmpty() && !target.IsEmpty() && (m_pShader->srcdata != srcdata || m_pShader->target != target)) {
-			KillTimer(m_nIDEventShader);
+		CString srcdata;
+		m_edSrcdata.GetWindowTextW(srcdata);
+		srcdata.Remove('\r');
 
-			m_pShader->srcdata = srcdata;
-			m_pShader->target = target;
-
+		if (srcdata.GetLength() && target.GetLength()) {
 			if (!m_pPSC) {
 				m_pPSC = DNew CPixelShaderCompiler(NULL);
 			}
@@ -357,20 +374,14 @@ void CShaderEditorDlg::OnTimer(UINT_PTR nIDEvent)
 				errmsg += L"\n";
 				errmsg += disasm;
 
-				AfxGetMainFrame()->UpdateShaders(m_pShader->label);
+				//AfxGetMainFrame()->UpdateShaders(m_pShader->label);
 			}
 
 			errmsg.Replace(L"\n", L"\r\n");
 
 			m_edOutput.SetWindowText(errmsg);
-
-			// TODO: autosave
-
-			m_nIDEventShader = SetTimer(1, 1000, NULL);
 		}
 	}
-
-	__super::OnTimer(nIDEvent);
 }
 
 void CShaderEditorDlg::OnLButtonDown(UINT nFlags, CPoint point)

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -783,6 +783,13 @@ public:
 	int  GetAudioTrackIdx();
 	int  GetSubtitleTrackIdx();
 
+	bool m_bToggleShader;
+	bool m_bToggleShaderScreenSpace;
+	CAtlList<ShaderC> m_ShaderCashe;
+	ShaderC* GetShader(LPCWSTR label);
+	bool SaveShaderFile(ShaderC* shader);
+	bool DeleteShaderFile(LPCWSTR label);
+	void TidyShaderCashe();
 	void SetShaders();
 	void UpdateShaders(CString label);
 
@@ -1073,10 +1080,10 @@ public:
 	afx_msg void OnViewEnableFrameTimeCorrection();
 	afx_msg void OnViewVSyncOffsetIncrease();
 	afx_msg void OnViewVSyncOffsetDecrease();
-	afx_msg void OnUpdateShaderToggle(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateShaderToggleScreenSpace(CCmdUI* pCmdUI);
-	afx_msg void OnShaderToggle();
-	afx_msg void OnShaderToggleScreenSpace();
+	afx_msg void OnUpdateShaderToggle1(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateShaderToggle2(CCmdUI* pCmdUI);
+	afx_msg void OnShaderToggle1();
+	afx_msg void OnShaderToggle2();
 	afx_msg void OnViewRemainingTime();
 
 	afx_msg void OnUpdateViewOSDLocalTime(CCmdUI* pCmdUI);
@@ -1224,12 +1231,6 @@ public:
 	Youtube::YoutubeUrllist m_youtubeUrllist;
 	CString		GetStrForTitle();
 	CString		GetAltFileName();
-
-	bool		m_bToggleShader;
-	bool		m_bToggleShaderScreenSpace;
-	CAtlList<ShaderC> m_ShaderCashe;
-	ShaderC*	GetShader(LPCWSTR label);
-	bool		DeleteShaderFile(LPCWSTR label);
 
 	bool		m_bInOptions;
 	bool		m_bStopTunerScan;

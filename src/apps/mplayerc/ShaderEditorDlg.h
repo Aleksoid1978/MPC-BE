@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -53,8 +53,6 @@ class CPixelShaderCompiler;
 class CShaderEditorDlg : public CResizableDialog
 {
 private:
-	UINT_PTR m_nIDEventShader;
-
 	bool m_fSplitterGrabbed;
 	bool HitTestSplitter(CPoint p);
 
@@ -83,8 +81,10 @@ protected:
 
 public:
 	afx_msg void OnCbnSelchangeCombo1();
+	afx_msg void OnBnClickedButtonSave();
+	afx_msg void OnBnClickedButtonNew();
 	afx_msg void OnBnClickedButtonDelete();
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnBnClickedButtonApply();
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
