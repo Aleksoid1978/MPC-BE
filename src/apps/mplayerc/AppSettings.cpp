@@ -546,6 +546,8 @@ void CAppSettings::SaveSettings()
 		return;
 	}
 
+	CString str;
+
 	FiltersPrioritySettings.SaveSettings();
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, iCaptionMenuMode);
@@ -581,7 +583,6 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWPOS, fRememberWindowPos);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWSIZE, fRememberWindowSize);
 	if (fSavePnSZoom) {
-		CString str;
 		str.Format(L"%.3f,%.3f", dZoomX, dZoomY);
 		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM, str);
 	} else {
@@ -699,15 +700,16 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_SATURATION, iSaturation);
 
 	{ // save shader list
-		CString str;
 		POSITION pos;
 
+		str.Empty();
 		pos = ShaderList.GetHeadPosition();
 		while (pos) {
 			str += ShaderList.GetNext(pos) + "|";
 		}
 		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLIST, str);
 
+		str.Empty();
 		pos = ShaderListScreenSpace.GetHeadPosition();
 		while (pos) {
 			str += ShaderListScreenSpace.GetNext(pos) + "|";
@@ -794,7 +796,6 @@ void CAppSettings::SaveSettings()
 
 	pApp->WriteProfileString(IDS_R_PNSPRESETS, NULL, NULL);
 	for (int i = 0, j = m_pnspresets.GetCount(); i < j; i++) {
-		CString str;
 		str.Format(L"Preset%d", i);
 		pApp->WriteProfileString(IDS_R_PNSPRESETS, str, m_pnspresets[i]);
 	}
@@ -804,7 +805,6 @@ void CAppSettings::SaveSettings()
 	for (int i = 0; pos;) {
 		wmcmd& wc = wmcmds.GetNext(pos);
 		if (wc.IsModified()) {
-			CString str;
 			str.Format(L"CommandMod%d", i);
 			CString str2;
 			str2.Format(L"%d %x %x \"%S\" %d %u %u %u",
