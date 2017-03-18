@@ -334,7 +334,7 @@ void CDVBSub::CleanOld(REFERENCE_TIME rt)
 	}
 }
 
-void CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
+HRESULT CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 {
 	DVB_PAGE* pPage = FindPage(rt);
 
@@ -376,6 +376,8 @@ void CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 
 		FinalizeRender(spd);
 	}
+
+	return S_OK;
 }
 
 HRESULT CDVBSub::GetTextureSize(POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft)

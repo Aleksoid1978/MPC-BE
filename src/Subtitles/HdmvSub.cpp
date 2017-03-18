@@ -162,16 +162,18 @@ static void SetPalette(CompositionObject* pObject, const int nNbEntry, HDMV_PALE
 	pObject->SetPalette(nNbEntry, pPalette, yuvMatrix == L"709" ? true : yuvMatrix == L"601" ? false : nVideoWidth > 720, convertType);
 }
 
-void CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
+HRESULT CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 {
 	bbox.left	= LONG_MAX;
 	bbox.top	= LONG_MAX;
 	bbox.right	= 0;
 	bbox.bottom	= 0;
 
+	HRESULT hr = E_FAIL;
+
 	POSITION pos = m_pObjects.GetHeadPosition();
 	while (pos) {
-		CompositionObject* pObject = m_pObjects.GetAt (pos);
+		CompositionObject* pObject = m_pObjects.GetNext(pos);
 
 		if (pObject && rt >= pObject->m_rtStart && rt < pObject->m_rtStop) {
 			if (pObject->GetRLEDataSize() && pObject->m_width > 0 && pObject->m_height > 0 &&
@@ -180,7 +182,7 @@ void CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 
 				if (g_bForcedSubtitle && !pObject->m_forced_on_flag) {
 					TRACE_HDMVSUB(_T("CHdmvSub::Render() : skip non forced subtitle - forced = %d, %I64d = %s"), pObject->m_forced_on_flag, rt, ReftimeToString(rt));
-					return;
+					continue;
 				}
 
 				if (!pObject->HavePalette() && m_DefaultCLUT.Palette) {
@@ -189,7 +191,7 @@ void CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 
 				if (!pObject->HavePalette()) {
 					TRACE_HDMVSUB(_T("CHdmvSub::Render() : The palette is missing - cancel rendering\n"));
-					return;
+					continue;
 				}
 
 				bbox.left	= min(pObject->m_horizontal_position, bbox.left);
@@ -216,13 +218,15 @@ void CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 
 				InitSpd(spd, m_VideoDescriptor.nVideoWidth, m_VideoDescriptor.nVideoHeight);
 				pObject->RenderHdmv(spd, m_bResizedRender ? &m_spd : NULL);
+
+				hr = S_OK;
 			}
 		}
-
-		m_pObjects.GetNext(pos);
 	}
 
 	FinalizeRender(spd);
+
+	return hr;
 }
 
 HRESULT CHdmvSub::GetTextureSize(POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft)

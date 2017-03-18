@@ -93,7 +93,7 @@ public:
 
 	HRESULT					ParseSample(BYTE* pData, long nLen, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 
-	virtual void			Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox);
+	virtual HRESULT			Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox);
 	virtual HRESULT			GetTextureSize (POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft);
 	virtual void			Reset();
 
