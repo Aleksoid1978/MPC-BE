@@ -2906,7 +2906,7 @@ static int lscomp(const void* ls1, const void* ls2)
 STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps, RECT& bbox)
 {
 	if (g_bForcedSubtitle && !m_bForced) {
-		return S_FALSE;
+		return E_FAIL;
 	}
 
 	CRect bbox2;

@@ -34,7 +34,7 @@ public:
 	virtual POSITION		GetNext(POSITION pos) PURE;
 	virtual REFERENCE_TIME	GetStart(POSITION nPos) PURE;
 	virtual REFERENCE_TIME	GetStop(POSITION nPos)  PURE;
-	virtual void			Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox) PURE;
+	virtual HRESULT			Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox) PURE;
 	virtual HRESULT			GetTextureSize (POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft) PURE;
 	virtual void			CleanOld(REFERENCE_TIME rt) PURE;
 	virtual HRESULT			EndOfStream() PURE;

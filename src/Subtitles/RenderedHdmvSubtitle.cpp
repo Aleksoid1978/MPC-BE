@@ -100,10 +100,10 @@ STDMETHODIMP CRenderedHdmvSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 {
 	CAutoLock cAutoLock(&m_csCritSec);
 
-	m_pSub->Render(spd, rt, bbox);
+	const HRESULT hr = m_pSub->Render(spd, rt, bbox);
 	m_pSub->CleanOld(rt - 60*10000000i64); // Cleanup subtitles older than 1 minute ...
 
-	return S_OK;
+	return hr;
 }
 
 STDMETHODIMP CRenderedHdmvSubtitle::GetTextureSize(POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft)
