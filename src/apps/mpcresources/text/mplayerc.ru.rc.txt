@@ -1837,6 +1837,7 @@ STRING IDS_SUBTITLES_STEREO_TOPANDBOTTOM		"Вертикальная стерео
 STRING IDS_SUBTITLES_STYLES		"&Стили..."
 STRING IDS_SUBTITLE_STREAM		"Субтитры: %s"
 STRING IDS_SUBTITLE_STREAM_OFF		"Субтитры: отключены"
+STRING IDS_SUB_COPYTOCLIPBOARD		"Скопировать отображаемые субтитры в буфер обмена"
 STRING IDS_SUB_NOT_USE		"не показывать субтитры"
 STRING IDS_SUB_POS_DOWN		"Сдвиг позиции субтитров вниз"
 STRING IDS_SUB_POS_LEFT		"Сдвиг позиции субтитров влево"

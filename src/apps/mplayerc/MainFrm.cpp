@@ -525,6 +525,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	// Subtitle position
 	ON_COMMAND_RANGE(ID_SUB_POS_UP, IDS_SUB_POS_RESTORE, OnSubtitlePos)
 
+	ON_COMMAND(ID_SUB_COPYTOCLIPBOARD, OnSubCopyClipboard)
+
 	ON_WM_WTSSESSION_CHANGE()
 END_MESSAGE_MAP()
 
@@ -9952,6 +9954,11 @@ void CMainFrame::OnSubtitlePos(UINT nID)
 			m_pCAP->Paint(false);
 		}
 	}
+}
+
+void CMainFrame::OnSubCopyClipboard()
+{
+	// TODO
 }
 
 //////////////////////////////////

@@ -1837,6 +1837,7 @@ STRING IDS_SUBTITLES_STEREO_TOPANDBOTTOM		"Розміщені один над і
 STRING IDS_SUBTITLES_STYLES		"&Стилі..."
 STRING IDS_SUBTITLE_STREAM		"Субтитри: %s"
 STRING IDS_SUBTITLE_STREAM_OFF		"Субтитри: вимкнено"
+STRING IDS_SUB_COPYTOCLIPBOARD		"Copy the displayed subtitles to the clipboard"
 STRING IDS_SUB_NOT_USE		"не показувати субтитри"
 STRING IDS_SUB_POS_DOWN		"Зміщення позиції субтитрів донизу"
 STRING IDS_SUB_POS_LEFT		"Зміщення позиції субтитрів ліворуч"
