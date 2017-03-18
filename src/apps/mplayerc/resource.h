@@ -374,6 +374,7 @@
 #define ID_SUB_POS_LEFT                 1102
 #define ID_SUB_POS_RIGHT                1103
 #define ID_SUB_POS_RESTORE              1104
+#define ID_SUB_COPYTOCLIPBOARD          1106
 #define ID_STEREO3D_AUTO                1110
 #define ID_STEREO3D_MONO                1111
 #define ID_STEREO3D_HALFOVERUNDER       1112
@@ -1290,6 +1291,8 @@
 #define IDS_SUB_POS_LEFT                34012
 #define IDS_SUB_POS_RIGHT               34013
 #define IDS_SUB_POS_RESTORE             34014
+//
+#define IDS_SUB_COPYTOCLIPBOARD         34016
 // subtitle renderer
 #define IDS_SUB_NOT_USE                 34020
 #define IDS_SUB_USE_INTERNAL            34021
