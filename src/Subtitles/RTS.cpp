@@ -2840,6 +2840,10 @@ STDMETHODIMP CRenderedTextSubtitle::NonDelegatingQueryInterface(REFIID riid, voi
 
 STDMETHODIMP_(POSITION) CRenderedTextSubtitle::GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld)
 {
+	if (g_bForcedSubtitle && !m_bForced) {
+		return NULL;
+	}
+
 	int iSegment = -1;
 	SearchSubs((int)(rt / 10000), fps, &iSegment, NULL);
 
@@ -2905,10 +2909,6 @@ static int lscomp(const void* ls1, const void* ls2)
 
 STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps, RECT& bbox)
 {
-	if (g_bForcedSubtitle && !m_bForced) {
-		return E_FAIL;
-	}
-
 	CRect bbox2;
 
 	if (m_size != CSize(spd.w*8, spd.h*8) || m_vidrect != CRect(spd.vidrect.left*8, spd.vidrect.top*8, spd.vidrect.right*8, spd.vidrect.bottom*8)) {

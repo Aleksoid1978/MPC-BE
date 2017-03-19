@@ -55,7 +55,7 @@ POSITION CHdmvSub::GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld
 	POSITION pos = m_pObjects.GetHeadPosition();
 	while (pos) {
 		const CompositionObject* pObject = m_pObjects.GetAt(pos);
-		if (pObject->m_rtStop <= rt) {
+		if (pObject->m_rtStop <= rt || (g_bForcedSubtitle && !pObject->m_forced_on_flag)) {
 			m_pObjects.GetNext(pos);
 		} else {
 			break;
@@ -179,11 +179,6 @@ HRESULT CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 			if (pObject->GetRLEDataSize() && pObject->m_width > 0 && pObject->m_height > 0 &&
 					m_VideoDescriptor.nVideoWidth >= (pObject->m_horizontal_position + pObject->m_width) &&
 					m_VideoDescriptor.nVideoHeight >= (pObject->m_vertical_position + pObject->m_height)) {
-
-				if (g_bForcedSubtitle && !pObject->m_forced_on_flag) {
-					TRACE_HDMVSUB(_T("CHdmvSub::Render() : skip non forced subtitle - forced = %d, %I64d = %s"), pObject->m_forced_on_flag, rt, ReftimeToString(rt));
-					continue;
-				}
 
 				if (!pObject->HavePalette() && m_DefaultCLUT.Palette) {
 					SetPalette(pObject, m_DefaultCLUT.pSize, m_DefaultCLUT.Palette, yuvMatrix, m_VideoDescriptor.nVideoWidth, convertType);
