@@ -1157,7 +1157,7 @@ const CVobSubFile::SubPos* CVobSubFile::GetFrameInfo(int idx, int iLang /*= -1*/
 
 	if (idx < 0 || (size_t)idx >= sp.GetCount()
 			|| !sp[idx].fValid
-			|| (m_fOnlyShowForcedSubs && !sp[idx].fForced)) {
+			|| ((m_fOnlyShowForcedSubs || g_bForcedSubtitle) && !sp[idx].fForced)) {
 		return NULL;
 	}
 
@@ -1324,10 +1324,6 @@ STDMETHODIMP CVobSubFile::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps,
 	}
 
 	if (rt >= (m_img.start + m_img.delay)) {
-		return E_FAIL;
-	}
-
-	if (g_bForcedSubtitle && !m_img.fForced) {
 		return E_FAIL;
 	}
 
