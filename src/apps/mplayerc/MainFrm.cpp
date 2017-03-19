@@ -523,7 +523,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_NAVIGATION, OnUpdateViewNavigation)
 
 	// Subtitle position
-	ON_COMMAND_RANGE(ID_SUB_POS_UP, IDS_SUB_POS_RESTORE, OnSubtitlePos)
+	ON_COMMAND_RANGE(ID_SUB_POS_UP, ID_SUB_POS_RESTORE, OnSubtitlePos)
 
 	ON_COMMAND(ID_SUB_COPYTOCLIPBOARD, OnSubCopyClipboard)
 
@@ -9958,7 +9958,35 @@ void CMainFrame::OnSubtitlePos(UINT nID)
 
 void CMainFrame::OnSubCopyClipboard()
 {
-	// TODO
+	if (m_pCAP && GetPlaybackMode() == PM_FILE && m_pMS) {
+		if (auto pRTS = dynamic_cast<CRenderedTextSubtitle*>((ISubStream*)m_pCurrentSubStream)) {
+			REFERENCE_TIME rtNow = 0;
+			m_pMS->GetCurrentPosition(&rtNow);
+
+			CString text;
+			if (pRTS->GetText(rtNow, m_pCAP->GetFPS(), text)) {
+				const int len = text.GetLength() + 1;
+				if (HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, len * sizeof(WCHAR))) {
+					if (WCHAR* sData = (WCHAR*)GlobalLock(hGlob)) {
+						wcscpy_s(sData, len, text);
+						GlobalUnlock(hGlob);
+
+						if (OpenClipboard()) {
+							if (EmptyClipboard() && SetClipboardData(CF_UNICODETEXT, hGlob)) {
+								hGlob = NULL;
+							}
+
+							CloseClipboard();
+						}
+					}
+
+					if (hGlob) {
+						::GlobalFree(hGlob);
+					}
+				}
+			}
+		}
+	}
 }
 
 //////////////////////////////////

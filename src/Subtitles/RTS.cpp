@@ -2822,6 +2822,75 @@ void CRenderedTextSubtitle::SetName(const CString name)
 	m_bForced = (CString(name).MakeLower().Find(L"forced") >= 0);
 }
 
+struct LSub {
+	int idx, layer, readorder;
+};
+
+static int lscomp(const void* ls1, const void* ls2)
+{
+	int ret = ((LSub*)ls1)->layer - ((LSub*)ls2)->layer;
+	if (!ret) {
+		ret = ((LSub*)ls1)->readorder - ((LSub*)ls2)->readorder;
+	}
+	return ret;
+}
+
+const bool CRenderedTextSubtitle::GetText(const REFERENCE_TIME rt, const double fps, CString& text)
+{
+	text.Empty();
+
+	const int t = (int)(rt / 10000);
+	int segment;
+	const STSSegment* stss = SearchSubs(t, fps, &segment);
+	if (!stss) {
+		return false;
+	}
+
+	m_sla.AdvanceToSegment(segment, stss->subs);
+
+	CAtlArray<LSub> subs;
+	for (size_t i = 0, j = stss->subs.GetCount(); i < j; i++) {
+		LSub ls;
+		ls.idx = stss->subs[i];
+		ls.layer = GetAt(stss->subs[i]).layer;
+		ls.readorder = GetAt(stss->subs[i]).readorder;
+		subs.Add(ls);
+	}
+
+	qsort(subs.GetData(), subs.GetCount(), sizeof(LSub), lscomp);
+
+	for (size_t i = 0, j = subs.GetCount(); i < j; i++) {
+		const int entry = subs[i].idx;
+		const CSubtitle* s = GetSubtitle(entry);
+		if (!s) {
+			continue;
+		}
+
+		CString line;
+		POSITION pos = s->m_words.GetHeadPosition();
+		while (pos) {
+			const CWord* w = s->m_words.GetNext(pos);
+			const CString& s = w->GetText();
+			line.Append(s);
+			if (w->m_fLineBreak && line) {
+				if (!text.IsEmpty()) {
+					text.Append(L"\r\n");
+				}
+				text.Append(line);
+				line.Empty();
+			}
+		}
+		if (!line.IsEmpty()) {
+			if (!text.IsEmpty()) {
+				text.Append(L"\r\n");
+			}
+			text.Append(line);
+		}
+	}
+
+	return !text.IsEmpty();
+}
+
 //
 
 STDMETHODIMP CRenderedTextSubtitle::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -2892,19 +2961,6 @@ STDMETHODIMP_(bool) CRenderedTextSubtitle::IsAnimated(POSITION pos)
 	}
 
 	return false;
-}
-
-struct LSub {
-	int idx, layer, readorder;
-};
-
-static int lscomp(const void* ls1, const void* ls2)
-{
-	int ret = ((LSub*)ls1)->layer - ((LSub*)ls2)->layer;
-	if (!ret) {
-		ret = ((LSub*)ls1)->readorder - ((LSub*)ls2)->readorder;
-	}
-	return ret;
 }
 
 STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps, RECT& bbox)

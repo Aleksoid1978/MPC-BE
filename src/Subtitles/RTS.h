@@ -117,6 +117,8 @@ public:
 	void Paint(const CPoint& p, const CPoint& org);
 
 	friend class COutlineKey;
+
+	CString GetText() const { return m_str; }
 };
 
 class CText : public CWord
@@ -402,6 +404,8 @@ public:
 	}
 
 	void SetName(const CString name);
+
+	const bool GetText(const REFERENCE_TIME rt, const double fps, CString& text);
 
 public:
 	bool Init(CSize size, const CRect& vidrect); // will call Deinit()
