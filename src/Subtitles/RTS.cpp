@@ -2837,6 +2837,8 @@ static int lscomp(const void* ls1, const void* ls2)
 
 const bool CRenderedTextSubtitle::GetText(const REFERENCE_TIME rt, const double fps, CString& text)
 {
+	std::unique_lock<std::mutex> lock(m_mutexRender);
+
 	text.Empty();
 
 	const int t = (int)(rt / 10000);
@@ -2845,8 +2847,6 @@ const bool CRenderedTextSubtitle::GetText(const REFERENCE_TIME rt, const double 
 	if (!stss) {
 		return false;
 	}
-
-	m_sla.AdvanceToSegment(segment, stss->subs);
 
 	CAtlArray<LSub> subs;
 	for (size_t i = 0, j = stss->subs.GetCount(); i < j; i++) {
@@ -2869,15 +2869,16 @@ const bool CRenderedTextSubtitle::GetText(const REFERENCE_TIME rt, const double 
 		CString line;
 		POSITION pos = s->m_words.GetHeadPosition();
 		while (pos) {
-			const CWord* w = s->m_words.GetNext(pos);
-			const CString& s = w->GetText();
-			line.Append(s);
-			if (w->m_fLineBreak && line) {
-				if (!text.IsEmpty()) {
-					text.Append(L"\r\n");
+			if (auto pText = dynamic_cast<const CText*>(s->m_words.GetNext(pos))) {
+				const CString& s = pText->GetText();
+				line.Append(s);
+				if (pText->m_fLineBreak && line) {
+					if (!text.IsEmpty()) {
+						text.Append(L"\r\n");
+					}
+					text.Append(line);
+					line.Empty();
 				}
-				text.Append(line);
-				line.Empty();
 			}
 		}
 		if (!line.IsEmpty()) {
@@ -2965,6 +2966,8 @@ STDMETHODIMP_(bool) CRenderedTextSubtitle::IsAnimated(POSITION pos)
 
 STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps, RECT& bbox)
 {
+	std::unique_lock<std::mutex> lock(m_mutexRender);
+
 	CRect bbox2;
 
 	if (m_size != CSize(spd.w*8, spd.h*8) || m_vidrect != CRect(spd.vidrect.left*8, spd.vidrect.top*8, spd.vidrect.right*8, spd.vidrect.bottom*8)) {

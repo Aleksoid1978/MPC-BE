@@ -26,6 +26,7 @@
 #include "Rasterizer.h"
 #include "../SubPic/SubPicProviderImpl.h"
 #include "RenderingCache.h"
+#include <mutex>
 
 struct CTextDims;
 struct CPolygonPath {
@@ -381,6 +382,8 @@ class __declspec(uuid("537DCACA-2812-4a4f-B2C6-1A34C17ADEB0"))
 	CSubtitle* GetSubtitle(int entry);
 
 	bool m_bForced = false;
+
+	std::mutex m_mutexRender;
 
 protected:
 	virtual void OnChanged();
