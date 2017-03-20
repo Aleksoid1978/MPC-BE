@@ -541,461 +541,6 @@ CString CAppSettings::SerializeHex(BYTE* pBuffer, int nBufSize) const
 	return strResult;
 }
 
-void CAppSettings::SaveSettings()
-{
-	CMPlayerCApp* pApp = AfxGetMyApp();
-	ASSERT(pApp);
-
-	if (!fInitialized) {
-		return;
-	}
-
-	CString str;
-
-	FiltersPrioritySettings.SaveSettings();
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, iCaptionMenuMode);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_HIDENAVIGATION, fHideNavigation);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CONTROLSTATE, nCS);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DEFAULTVIDEOFRAME, iDefaultVideoSize);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_KEEPASPECTRATIO, fKeepAspectRatio);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_COMPMONDESKARDIFF, fCompMonDeskARDiff);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VOLUME, nVolume);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_BALANCE, nBalance);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MUTE, fMute);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LOOPNUM, nLoops);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LOOP, fLoopForever);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REWIND, fRewind);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ZOOM, iZoomLevel);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOFITFACTOR, nAutoFitFactor);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, nVolumeStep);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPEED_STEP, nSpeedStep);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, iMultipleInst);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXTSTYLE, iTitleBarTextStyle);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXTTITLE, fTitleBarTextTitle);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ONTOP, iOnTop);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TRAYICON, fTrayIcon);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOZOOM, fRememberZoomLevel);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLS, fShowBarsWhenFullScreen);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLSTIMEOUT, nShowBarsWhenFullScreenTimeOut);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATTHEEND, fExitFullScreenAtTheEnd);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATFOCUSLOST, fExitFullScreenAtFocusLost);
-	pApp->WriteProfileBinary(IDS_R_SETTINGS, IDS_RS_FULLSCREENRES, (BYTE*)&AutoChangeFullscrRes, sizeof(AutoChangeFullscrRes));
-	pApp->WriteProfileBinary(IDS_R_SETTINGS, L"AccelTblColWidth", (BYTE*)&AccelTblColWidth, sizeof(AccelTblColWidth));
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DISPLAYMODECHANGEDELAY, iDMChangeDelay);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_RESTORERESAFTEREXIT, fRestoreResAfterExit);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWPOS, fRememberWindowPos);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWSIZE, fRememberWindowSize);
-	if (fSavePnSZoom) {
-		str.Format(L"%.3f,%.3f", dZoomX, dZoomY);
-		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM, str);
-	} else {
-		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM, NULL);
-	}
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SNAPTODESKTOPEDGES, fSnapToDesktopEdges);
-	pApp->WriteProfileBinary(IDS_R_SETTINGS, IDS_RS_LASTWINDOWRECT, (BYTE*)&rcLastWindowPos, sizeof(rcLastWindowPos));
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LASTWINDOWTYPE, (nLastWindowType == SIZE_MINIMIZED) ? SIZE_RESTORED : nLastWindowType);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_X, sizeAspectRatio.cx);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_Y, sizeAspectRatio.cy);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, fKeepHistory);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, iRecentFilesNumber);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SHUFFLEPLAYLISTITEMS, bShufflePlaylistItems);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REMEMBERPLAYLISTITEMS, bRememberPlaylistItems);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_HIDEPLAYLISTFULLSCREEN, bHidePlaylistFullScreen);
-	pApp->WriteProfileInt(IDS_R_FAVORITES, IDS_RS_FAV_REMEMBERPOS, bFavRememberPos);
-	pApp->WriteProfileInt(IDS_R_FAVORITES, IDS_RS_FAV_RELATIVEDRIVE, bFavRelativeDrive);
-
-	m_VRSettings.Save();
-
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIORENDERERTYPE, strAudioRendererDisplayName);
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SECONDAUDIORENDERER, strSecondAudioRendererDisplayName);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DUALAUDIOOUTPUT, fDualAudioOutput);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOLOADAUDIO, fAutoloadAudio);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_PRIORITIZEEXTERNALAUDIO, fPrioritizeExternalAudio);
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOPATHS, strAudioPaths);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SUBTITLERENDERER, iSubtitleRenderer);
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SUBTITLESLANGORDER, CString(strSubtitlesLanguageOrder));
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOSLANGORDER, CString(strAudiosLanguageOrder));
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_INTERNALSELECTTRACKLOGIC, fUseInternalSelectTrackLogic);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOWINDOWMODE, nAudioWindowMode);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ADDSIMILARFILES, bAddSimilarFiles);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEWORKERTHREADFOROPENING, fEnableWorkerThreadForOpening);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REPORTFAILEDPINS, fReportFailedPins);
-
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_DVDPATH, strDVDPath);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USEDVDPATH, fUseDVDPath);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MENULANG, idMenuLang);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOLANG, idAudioLang);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SUBTITLESLANG, idSubtitlesLang);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CLOSEDCAPTIONS, fClosedCaptions);
-
-	CString style;
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SPLOGFONT, style <<= subdefstyle);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPOVERRIDEPLACEMENT, fOverridePlacement);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPHORPOS, nHorPos);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPVERPOS, nVerPos);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SUBDELAYINTERVAL, nSubDelayInterval);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLESUBTITLES, fEnableSubtitles);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FORCEDSUBTITLES, fForcedSubtitles);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_PRIORITIZEEXTERNALSUBTITLES, fPrioritizeExternalSubtitles);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DISABLEINTERNALSUBTITLES, fDisableInternalSubtitles);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUTORELOADEXTSUBTITLES, fAutoReloadExtSubtitles);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USE_SUBRESYNC, fUseSybresync);
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SUBTITLEPATHS, strSubtitlePaths);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USEDEFAULTSUBTITLESSTYLE, fUseDefaultSubtitlesStyle);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOMIXER, bAudioMixer);
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOMIXERLAYOUT, channel_mode_sets[nAudioMixerLayout]);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOBASSREDIRECT, bAudioBassRedirect);
-	CString strGain;
-	strGain.Format(L"%.1f", fAudioGain_dB);
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, strGain);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, bAudioAutoVolumeControl);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, bAudioNormBoost);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, iAudioNormLevel);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMREALEASETIME, iAudioNormRealeaseTime);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEAUDIOTIMESHIFT, bAudioTimeShift);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration);
-
-	// Multi-monitor code
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR, CString(strFullScreenMonitor));
-	// DeviceID
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITORID, CString(strFullScreenMonitorID));
-
-	// Prevent Minimize when in Fullscreen mode on non default monitor
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_PREVENT_MINIMIZE, fPreventMinimize);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_PAUSEMINIMIZEDVIDEO, bPauseMinimizedVideo);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_WIN7TASKBAR, fUseWin7TaskBar);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_EXIT_AFTER_PB, fExitAfterPlayback);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_NEXT_AFTER_PB, fNextInDirAfterPlayback);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_NEXT_AFTER_PB_LOOPED, fNextInDirAfterPlaybackLooped);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_NO_SEARCH_IN_FOLDER, fDontUseSearchInFolder);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USE_TIME_TOOLTIP, fUseTimeTooltip);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TIME_TOOLTIP_POSITION, nTimeTooltipPosition);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_SIZE, nOSDSize);
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_OSD_FONT, strOSDFont);
-
-	// Associated types with icon or not...
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ASSOCIATED_WITH_ICON, fAssociatedWithIcons);
-	// file/dir context menu
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CONTEXTFILES, bSetContextFiles);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CONTEXTDIR, bSetContextDir);
-
-	// Last Open Dir
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_DIR, strLastOpenDir);
-	// Last Saved Playlist Dir
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LAST_SAVED_PLAYLIST_DIR, strLastSavedPlaylistDir);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_D3DFULLSCREEN, fD3DFullscreen);
-	//pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, fMonitorAutoRefreshRate);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, iStereo3DMode);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_SWAPLEFTRIGHT, bStereo3DSwapLR);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_BRIGHTNESS, iBrightness);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_CONTRAST, iContrast);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_HUE, iHue);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_SATURATION, iSaturation);
-
-	{ // save shader list
-		POSITION pos;
-
-		str.Empty();
-		pos = ShaderList.GetHeadPosition();
-		while (pos) {
-			str += ShaderList.GetNext(pos) + "|";
-		}
-		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLIST, str);
-
-		str.Empty();
-		pos = ShaderListScreenSpace.GetHeadPosition();
-		while (pos) {
-			str += ShaderListScreenSpace.GetNext(pos) + "|";
-		}
-		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLISTSCREENSPACE, str);
-	}
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADER, (int)fToggleShader);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADERSSCREENSPACE, (int)fToggleShaderScreenSpace);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, iShowOSD);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEEDLEDITOR, (int)fEnableEDLEditor);
-
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LANGUAGE, CMPlayerCApp::languageResources[iLanguage].strcode);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FASTSEEK_KEYFRAME, (int)fFastSeek);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MINI_DUMP, (int)fMiniDump);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LCD_SUPPORT, (int)fLCDSupport);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK, (int)fSmartSeek);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK_SIZE, iSmartSeekSize);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CHAPTER_MARKER, (int)fChapterMarker);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR, (int)fFlybar);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR_ONTOP, (int)fFlybarOnTop);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTSHADOW, (int)fFontShadow);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTAA, (int)fFontAA);
-
-	// Save analog capture settings
-	pApp->WriteProfileInt   (IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, iDefaultCaptureDevice);
-	pApp->WriteProfileString(IDS_R_CAPTURE, IDS_RS_VIDEO_DISP_NAME, strAnalogVideo);
-	pApp->WriteProfileString(IDS_R_CAPTURE, IDS_RS_AUDIO_DISP_NAME, strAnalogAudio);
-	pApp->WriteProfileInt   (IDS_R_CAPTURE, IDS_RS_COUNTRY,		 iAnalogCountry);
-
-	// Save digital capture settings (BDA)
-	pApp->WriteProfileString(IDS_R_DVB, IDS_RS_BDA_NETWORKPROVIDER, strBDANetworkProvider);
-	pApp->WriteProfileString(IDS_R_DVB, IDS_RS_BDA_TUNER, strBDATuner);
-	pApp->WriteProfileString(IDS_R_DVB, IDS_RS_BDA_RECEIVER, strBDAReceiver);
-	//pApp->WriteProfileString(IDS_R_DVB, IDS_RS_BDA_STANDARD, strBDAStandard);
-	pApp->WriteProfileInt(IDS_R_DVB, IDS_RS_BDA_SCAN_FREQ_START, iBDAScanFreqStart);
-	pApp->WriteProfileInt(IDS_R_DVB, IDS_RS_BDA_SCAN_FREQ_END, iBDAScanFreqEnd);
-	pApp->WriteProfileInt(IDS_R_DVB, IDS_RS_BDA_BANDWIDTH, iBDABandwidth);
-	pApp->WriteProfileInt(IDS_R_DVB, IDS_RS_BDA_USE_OFFSET, fBDAUseOffset);
-	pApp->WriteProfileInt(IDS_R_DVB, IDS_RS_BDA_OFFSET, iBDAOffset);
-	pApp->WriteProfileInt(IDS_R_DVB, IDS_RS_BDA_IGNORE_ENCRYPTEDCHANNELS, fBDAIgnoreEncryptedChannels);
-	pApp->WriteProfileInt(IDS_R_DVB, IDS_RS_DVB_LAST_CHANNEL, nDVBLastChannel);
-
-	int			iChannel = 0;
-	POSITION	pos = m_DVBChannels.GetHeadPosition();
-	while (pos) {
-		CString			strTemp;
-		CString			strChannel;
-		CDVBChannel&	Channel = m_DVBChannels.GetNext(pos);
-		strTemp.Format(L"%d", iChannel);
-		pApp->WriteProfileString(IDS_R_DVB, strTemp, Channel.ToString());
-		iChannel++;
-	}
-
-	// playback positions for last played DVDs
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DVDPOS, (int)fRememberDVDPos);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FILEPOS, (int)fRememberFilePos);
-	if (fKeepHistory) {
-		if (fRememberDVDPos) {
-			for (int i = 0; i < min(iRecentFilesNumber, MAX_DVD_POSITION); i++) {
-				CString strDVDPos;
-				CString strValue;
-
-				strDVDPos.Format(L"DVD%d", i + 1);
-				strValue = SerializeHex((BYTE*)&DvdPosition[i], sizeof(DVD_POSITION));
-				pApp->WriteProfileString(IDS_R_RECENTFILES, strDVDPos, strValue);
-			}
-		}
-
-		if (fRememberFilePos) {
-			for (int i = 0; i < min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
-				CString lpKeyName;
-				CString lpString;
-
-				lpKeyName.Format(L"File%d", i + 1);
-				lpString.Format(L"%s|%I64d|%d|%d", FilePosition[i].strFile, FilePosition[i].llPosition, FilePosition[i].nAudioTrack, FilePosition[i].nSubtitleTrack);
-				pApp->WriteProfileString(IDS_R_RECENTFILES, lpKeyName, lpString);
-			}
-		}
-	}
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DVD_START_MAIN_TITLE, (int)fStartMainTitle);
-
-	pApp->WriteProfileString(IDS_R_PNSPRESETS, NULL, NULL);
-	for (int i = 0, j = m_pnspresets.GetCount(); i < j; i++) {
-		str.Format(L"Preset%d", i);
-		pApp->WriteProfileString(IDS_R_PNSPRESETS, str, m_pnspresets[i]);
-	}
-
-	pApp->WriteProfileString(IDS_R_COMMANDS, NULL, NULL);
-	pos = wmcmds.GetHeadPosition();
-	for (int i = 0; pos;) {
-		wmcmd& wc = wmcmds.GetNext(pos);
-		if (wc.IsModified()) {
-			str.Format(L"CommandMod%d", i);
-			CString str2;
-			str2.Format(L"%d %x %x \"%S\" %d %u %u %u",
-						wc.cmd, wc.fVirt, wc.key,
-						wc.rmcmd, wc.rmrepcnt,
-						wc.mouse, wc.appcmd, wc.mouseFS);
-			pApp->WriteProfileString(IDS_R_COMMANDS, str, str2);
-			i++;
-		}
-	}
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_WINLIRC, fWinLirc);
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_WINLIRCADDR, strWinLircAddr);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_UICE, fUIce);
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_UICEADDR, strUIceAddr);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, fGlobalMedia);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USEDARKTHEME, bUseDarkTheme);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THEMEBRIGHTNESS, nThemeBrightness);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THEMERED, nThemeRed);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THEMEGREEN, nThemeGreen);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THEMEBLUE, nThemeBlue);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_TRANSPARENT, nOSDTransparent);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_BORDER, nOSDBorder);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FILENAMEONSEEKBAR, fFileNameOnSeekBar);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, clrFaceABGR);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, clrOutlineABGR);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTCOLOR, clrFontABGR);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD1COLOR, clrGrad1ABGR);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD2COLOR, clrGrad2ABGR);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, nJumpDistS);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, nJumpDistM);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTL, nJumpDistL);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LIMITWINDOWPROPORTIONS, fLimitWindowProportions);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LASTUSEDPAGE, nLastUsedPage);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DLGPROPX, iDlgPropX);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DLGPROPY, iDlgPropY);
-
-	m_Formats.UpdateData(true);
-
-	// Internal filters
-	for (int f = 0; f < SRC_LAST; f++) {
-		pApp->WriteProfileInt(IDS_R_INTERNAL_FILTERS, SrcFiltersKeys[f], SrcFilters[f]);
-	}
-	for (int f = 0; f < VDEC_DXVA_LAST; f++) {
-		pApp->WriteProfileInt(IDS_R_INTERNAL_FILTERS, DXVAFiltersKeys[f], DXVAFilters[f]);
-	}
-	for (int f = 0; f < VDEC_LAST; f++) {
-		pApp->WriteProfileInt(IDS_R_INTERNAL_FILTERS, VideoFiltersKeys[f], VideoFilters[f]);
-	}
-	for (int f = 0; f < ADEC_LAST; f++) {
-		pApp->WriteProfileInt(IDS_R_INTERNAL_FILTERS, AudioFiltersKeys[f], AudioFilters[f]);
-	}
-
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LOGOFILE, strLogoFileName);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LOGOID, nLogoId);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LOGOEXT, fLogoExternal);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_HIDECDROMSSUBMENU, fHideCDROMsSubMenu);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_PRIORITY, dwPriority);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, fLaunchfullscreen);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEWEBSERVER, fEnableWebServer);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERPORT, nWebServerPort);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERQUALITY, nWebServerQuality);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERPRINTDEBUGINFO, fWebServerPrintDebugInfo);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERUSECOMPRESSION, fWebServerUseCompression);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERLOCALHOSTONLY, fWebServerLocalhostOnly);
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_WEBROOT, strWebRoot);
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_WEBDEFINDEX, strWebDefIndex);
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_WEBSERVERCGI, strWebServerCGI);
-
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTPATH, strSnapShotPath);
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTEXT, strSnapShotExt);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBROWS, iThumbRows);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBCOLS, iThumbCols);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBWIDTH, iThumbWidth);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBQUALITY, iThumbQuality);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBLEVELPNG, iThumbLevelPNG);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SUBSAVEEXTERNALSTYLEFILE, bSubSaveExternalStyleFile);
-
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_ISDB, strISDb);
-
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, strLastOpenFilterDir);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_PAGEPARSER, bYoutubePageParser);
-	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_YOUTUBE_FORMAT, YoutubeFormat.fmt == 1 ? L"WEBM" : L"MP4");
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_RESOLUTION, YoutubeFormat.res);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_60FPS, YoutubeFormat.fps60);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_HDR, YoutubeFormat.hdr);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, fRemainingTime);
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, nLastFileInfoPage);
-
-	pApp->WriteProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_AUTO_CHECK, bUpdaterAutoCheck);
-	pApp->WriteProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_DELAY, nUpdaterDelay);
-	pApp->WriteProfileBinary(IDS_R_UPDATER, IDS_RS_UPDATER_LAST_CHECK, (LPBYTE)&tUpdaterLastCheck, sizeof(time_t));
-
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_REMAINING_TIME, bOSDRemainingTime);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_PASTECLIPBOARDURL, bPasteClipboardURL);
-
-	if (pApp->m_pszRegistryKey) {
-		// WINBUG: on win2k this would crash WritePrivateProfileString
-		pApp->WriteProfileInt(L"", L"", pApp->GetProfileInt(L"", L"", 0) ? 0 : 1);
-	}
-
-	pApp->FlushProfile();
-}
-
-void CAppSettings::SaveExternalFilters()
-{
-	// External Filter settings are saved for a long time. Use only when really necessary.
-	CMPlayerCApp* pApp = AfxGetMyApp();
-	ASSERT(pApp);
-
-	if (!fInitialized) {
-		return;
-	}
-
-	for (unsigned int i = 0; ; i++) {
-		CString key;
-		key.Format(L"%s\\%04u", IDS_R_FILTERS, i);
-		int j = pApp->GetProfileInt(key, L"Enabled", -1);
-		pApp->WriteProfileString(key, NULL, NULL);
-		if (j < 0) {
-			break;
-		}
-	}
-
-	unsigned int k = 0;
-	POSITION pos = m_filters.GetHeadPosition();
-	while (pos) {
-		FilterOverride* f = m_filters.GetNext(pos);
-
-		if (f->fTemporary) {
-			continue;
-		}
-
-		CString key;
-		key.Format(L"%s\\%04u", IDS_R_FILTERS, k);
-
-		pApp->WriteProfileInt(key, L"SourceType", (int)f->type);
-		pApp->WriteProfileInt(key, L"Enabled", (int)!f->fDisabled);
-		if (f->type == FilterOverride::REGISTERED) {
-			pApp->WriteProfileString(key, L"DisplayName", CString(f->dispname));
-			pApp->WriteProfileString(key, L"Name", f->name);
-			if (f->clsid == CLSID_NULL) {
-				CComPtr<IBaseFilter> pBF;
-				CStringW FriendlyName;
-				if (CreateFilter(f->dispname, &pBF, FriendlyName)) {
-					f->clsid = GetCLSID(pBF);
-				}
-			}
-			pApp->WriteProfileString(key, L"CLSID", CStringFromGUID(f->clsid));
-		} else if (f->type == FilterOverride::EXTERNAL) {
-			pApp->WriteProfileString(key, L"Path", f->path);
-			pApp->WriteProfileString(key, L"Name", f->name);
-			pApp->WriteProfileString(key, L"CLSID", CStringFromGUID(f->clsid));
-		}
-		POSITION pos2 = f->backup.GetHeadPosition();
-		for (unsigned int i = 0; pos2; i++) {
-			CString val;
-			val.Format(L"org%04u", i);
-			pApp->WriteProfileString(key, val, CStringFromGUID(f->backup.GetNext(pos2)));
-		}
-		pos2 = f->guids.GetHeadPosition();
-		for (unsigned int i = 0; pos2; i++) {
-			CString val;
-			val.Format(L"mod%04u", i);
-			pApp->WriteProfileString(key, val, CStringFromGUID(f->guids.GetNext(pos2)));
-		}
-		pApp->WriteProfileInt(key, L"LoadType", f->iLoadType);
-		pApp->WriteProfileInt(key, L"Merit", f->dwMerit);
-
-		k++;
-	}
-}
-
 void CAppSettings::LoadSettings(bool bForce/* = false*/)
 {
 	CMPlayerCApp* pApp = AfxGetMyApp();
@@ -1619,6 +1164,461 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 
 	fInitialized = true;
+}
+
+void CAppSettings::SaveSettings()
+{
+	CMPlayerCApp* pApp = AfxGetMyApp();
+	ASSERT(pApp);
+
+	if (!fInitialized) {
+		return;
+	}
+
+	CString str;
+
+	FiltersPrioritySettings.SaveSettings();
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, iCaptionMenuMode);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_HIDENAVIGATION, fHideNavigation);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CONTROLSTATE, nCS);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DEFAULTVIDEOFRAME, iDefaultVideoSize);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_KEEPASPECTRATIO, fKeepAspectRatio);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_COMPMONDESKARDIFF, fCompMonDeskARDiff);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VOLUME, nVolume);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_BALANCE, nBalance);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MUTE, fMute);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LOOPNUM, nLoops);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LOOP, fLoopForever);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REWIND, fRewind);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ZOOM, iZoomLevel);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOFITFACTOR, nAutoFitFactor);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, nVolumeStep);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPEED_STEP, nSpeedStep);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, iMultipleInst);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXTSTYLE, iTitleBarTextStyle);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXTTITLE, fTitleBarTextTitle);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ONTOP, iOnTop);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TRAYICON, fTrayIcon);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOZOOM, fRememberZoomLevel);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLS, fShowBarsWhenFullScreen);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLSTIMEOUT, nShowBarsWhenFullScreenTimeOut);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATTHEEND, fExitFullScreenAtTheEnd);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATFOCUSLOST, fExitFullScreenAtFocusLost);
+	pApp->WriteProfileBinary(IDS_R_SETTINGS, IDS_RS_FULLSCREENRES, (BYTE*)&AutoChangeFullscrRes, sizeof(AutoChangeFullscrRes));
+	pApp->WriteProfileBinary(IDS_R_SETTINGS, L"AccelTblColWidth", (BYTE*)&AccelTblColWidth, sizeof(AccelTblColWidth));
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DISPLAYMODECHANGEDELAY, iDMChangeDelay);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_RESTORERESAFTEREXIT, fRestoreResAfterExit);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWPOS, fRememberWindowPos);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWSIZE, fRememberWindowSize);
+	if (fSavePnSZoom) {
+		str.Format(L"%.3f,%.3f", dZoomX, dZoomY);
+		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM, str);
+	} else {
+		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM, NULL);
+	}
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SNAPTODESKTOPEDGES, fSnapToDesktopEdges);
+	pApp->WriteProfileBinary(IDS_R_SETTINGS, IDS_RS_LASTWINDOWRECT, (BYTE*)&rcLastWindowPos, sizeof(rcLastWindowPos));
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LASTWINDOWTYPE, (nLastWindowType == SIZE_MINIMIZED) ? SIZE_RESTORED : nLastWindowType);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_X, sizeAspectRatio.cx);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_Y, sizeAspectRatio.cy);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, fKeepHistory);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, iRecentFilesNumber);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SHUFFLEPLAYLISTITEMS, bShufflePlaylistItems);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REMEMBERPLAYLISTITEMS, bRememberPlaylistItems);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_HIDEPLAYLISTFULLSCREEN, bHidePlaylistFullScreen);
+	pApp->WriteProfileInt(IDS_R_FAVORITES, IDS_RS_FAV_REMEMBERPOS, bFavRememberPos);
+	pApp->WriteProfileInt(IDS_R_FAVORITES, IDS_RS_FAV_RELATIVEDRIVE, bFavRelativeDrive);
+
+	m_VRSettings.Save();
+
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIORENDERERTYPE, strAudioRendererDisplayName);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SECONDAUDIORENDERER, strSecondAudioRendererDisplayName);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DUALAUDIOOUTPUT, fDualAudioOutput);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOLOADAUDIO, fAutoloadAudio);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_PRIORITIZEEXTERNALAUDIO, fPrioritizeExternalAudio);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOPATHS, strAudioPaths);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SUBTITLERENDERER, iSubtitleRenderer);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SUBTITLESLANGORDER, CString(strSubtitlesLanguageOrder));
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOSLANGORDER, CString(strAudiosLanguageOrder));
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_INTERNALSELECTTRACKLOGIC, fUseInternalSelectTrackLogic);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOWINDOWMODE, nAudioWindowMode);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ADDSIMILARFILES, bAddSimilarFiles);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEWORKERTHREADFOROPENING, fEnableWorkerThreadForOpening);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REPORTFAILEDPINS, fReportFailedPins);
+
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_DVDPATH, strDVDPath);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USEDVDPATH, fUseDVDPath);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MENULANG, idMenuLang);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOLANG, idAudioLang);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SUBTITLESLANG, idSubtitlesLang);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CLOSEDCAPTIONS, fClosedCaptions);
+
+	CString style;
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SPLOGFONT, style <<= subdefstyle);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPOVERRIDEPLACEMENT, fOverridePlacement);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPHORPOS, nHorPos);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPVERPOS, nVerPos);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SUBDELAYINTERVAL, nSubDelayInterval);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLESUBTITLES, fEnableSubtitles);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FORCEDSUBTITLES, fForcedSubtitles);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_PRIORITIZEEXTERNALSUBTITLES, fPrioritizeExternalSubtitles);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DISABLEINTERNALSUBTITLES, fDisableInternalSubtitles);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUTORELOADEXTSUBTITLES, fAutoReloadExtSubtitles);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USE_SUBRESYNC, fUseSybresync);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SUBTITLEPATHS, strSubtitlePaths);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USEDEFAULTSUBTITLESSTYLE, fUseDefaultSubtitlesStyle);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOMIXER, bAudioMixer);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOMIXERLAYOUT, channel_mode_sets[nAudioMixerLayout]);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOBASSREDIRECT, bAudioBassRedirect);
+	CString strGain;
+	strGain.Format(L"%.1f", fAudioGain_dB);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, strGain);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, bAudioAutoVolumeControl);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, bAudioNormBoost);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, iAudioNormLevel);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMREALEASETIME, iAudioNormRealeaseTime);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEAUDIOTIMESHIFT, bAudioTimeShift);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration);
+
+	// Multi-monitor code
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR, CString(strFullScreenMonitor));
+	// DeviceID
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITORID, CString(strFullScreenMonitorID));
+
+	// Prevent Minimize when in Fullscreen mode on non default monitor
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_PREVENT_MINIMIZE, fPreventMinimize);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_PAUSEMINIMIZEDVIDEO, bPauseMinimizedVideo);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_WIN7TASKBAR, fUseWin7TaskBar);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_EXIT_AFTER_PB, fExitAfterPlayback);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_NEXT_AFTER_PB, fNextInDirAfterPlayback);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_NEXT_AFTER_PB_LOOPED, fNextInDirAfterPlaybackLooped);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_NO_SEARCH_IN_FOLDER, fDontUseSearchInFolder);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USE_TIME_TOOLTIP, fUseTimeTooltip);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TIME_TOOLTIP_POSITION, nTimeTooltipPosition);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_SIZE, nOSDSize);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_OSD_FONT, strOSDFont);
+
+	// Associated types with icon or not...
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ASSOCIATED_WITH_ICON, fAssociatedWithIcons);
+	// file/dir context menu
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CONTEXTFILES, bSetContextFiles);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CONTEXTDIR, bSetContextDir);
+
+	// Last Open Dir
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_DIR, strLastOpenDir);
+	// Last Saved Playlist Dir
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LAST_SAVED_PLAYLIST_DIR, strLastSavedPlaylistDir);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_D3DFULLSCREEN, fD3DFullscreen);
+	//pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, fMonitorAutoRefreshRate);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, iStereo3DMode);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_SWAPLEFTRIGHT, bStereo3DSwapLR);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_BRIGHTNESS, iBrightness);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_CONTRAST, iContrast);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_HUE, iHue);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_SATURATION, iSaturation);
+
+	{ // save shader list
+		POSITION pos;
+
+		str.Empty();
+		pos = ShaderList.GetHeadPosition();
+		while (pos) {
+			str += ShaderList.GetNext(pos) + "|";
+		}
+		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLIST, str);
+
+		str.Empty();
+		pos = ShaderListScreenSpace.GetHeadPosition();
+		while (pos) {
+			str += ShaderListScreenSpace.GetNext(pos) + "|";
+		}
+		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLISTSCREENSPACE, str);
+	}
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADER, (int)fToggleShader);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADERSSCREENSPACE, (int)fToggleShaderScreenSpace);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, iShowOSD);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEEDLEDITOR, (int)fEnableEDLEditor);
+
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LANGUAGE, CMPlayerCApp::languageResources[iLanguage].strcode);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FASTSEEK_KEYFRAME, (int)fFastSeek);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MINI_DUMP, (int)fMiniDump);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LCD_SUPPORT, (int)fLCDSupport);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK, (int)fSmartSeek);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK_SIZE, iSmartSeekSize);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CHAPTER_MARKER, (int)fChapterMarker);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR, (int)fFlybar);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR_ONTOP, (int)fFlybarOnTop);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTSHADOW, (int)fFontShadow);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTAA, (int)fFontAA);
+
+	// Save analog capture settings
+	pApp->WriteProfileInt   (IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, iDefaultCaptureDevice);
+	pApp->WriteProfileString(IDS_R_CAPTURE, IDS_RS_VIDEO_DISP_NAME, strAnalogVideo);
+	pApp->WriteProfileString(IDS_R_CAPTURE, IDS_RS_AUDIO_DISP_NAME, strAnalogAudio);
+	pApp->WriteProfileInt   (IDS_R_CAPTURE, IDS_RS_COUNTRY,		 iAnalogCountry);
+
+	// Save digital capture settings (BDA)
+	pApp->WriteProfileString(IDS_R_DVB, IDS_RS_BDA_NETWORKPROVIDER, strBDANetworkProvider);
+	pApp->WriteProfileString(IDS_R_DVB, IDS_RS_BDA_TUNER, strBDATuner);
+	pApp->WriteProfileString(IDS_R_DVB, IDS_RS_BDA_RECEIVER, strBDAReceiver);
+	//pApp->WriteProfileString(IDS_R_DVB, IDS_RS_BDA_STANDARD, strBDAStandard);
+	pApp->WriteProfileInt(IDS_R_DVB, IDS_RS_BDA_SCAN_FREQ_START, iBDAScanFreqStart);
+	pApp->WriteProfileInt(IDS_R_DVB, IDS_RS_BDA_SCAN_FREQ_END, iBDAScanFreqEnd);
+	pApp->WriteProfileInt(IDS_R_DVB, IDS_RS_BDA_BANDWIDTH, iBDABandwidth);
+	pApp->WriteProfileInt(IDS_R_DVB, IDS_RS_BDA_USE_OFFSET, fBDAUseOffset);
+	pApp->WriteProfileInt(IDS_R_DVB, IDS_RS_BDA_OFFSET, iBDAOffset);
+	pApp->WriteProfileInt(IDS_R_DVB, IDS_RS_BDA_IGNORE_ENCRYPTEDCHANNELS, fBDAIgnoreEncryptedChannels);
+	pApp->WriteProfileInt(IDS_R_DVB, IDS_RS_DVB_LAST_CHANNEL, nDVBLastChannel);
+
+	int			iChannel = 0;
+	POSITION	pos = m_DVBChannels.GetHeadPosition();
+	while (pos) {
+		CString			strTemp;
+		CString			strChannel;
+		CDVBChannel&	Channel = m_DVBChannels.GetNext(pos);
+		strTemp.Format(L"%d", iChannel);
+		pApp->WriteProfileString(IDS_R_DVB, strTemp, Channel.ToString());
+		iChannel++;
+	}
+
+	// playback positions for last played DVDs
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DVDPOS, (int)fRememberDVDPos);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FILEPOS, (int)fRememberFilePos);
+	if (fKeepHistory) {
+		if (fRememberDVDPos) {
+			for (int i = 0; i < min(iRecentFilesNumber, MAX_DVD_POSITION); i++) {
+				CString strDVDPos;
+				CString strValue;
+
+				strDVDPos.Format(L"DVD%d", i + 1);
+				strValue = SerializeHex((BYTE*)&DvdPosition[i], sizeof(DVD_POSITION));
+				pApp->WriteProfileString(IDS_R_RECENTFILES, strDVDPos, strValue);
+			}
+		}
+
+		if (fRememberFilePos) {
+			for (int i = 0; i < min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
+				CString lpKeyName;
+				CString lpString;
+
+				lpKeyName.Format(L"File%d", i + 1);
+				lpString.Format(L"%s|%I64d|%d|%d", FilePosition[i].strFile, FilePosition[i].llPosition, FilePosition[i].nAudioTrack, FilePosition[i].nSubtitleTrack);
+				pApp->WriteProfileString(IDS_R_RECENTFILES, lpKeyName, lpString);
+			}
+		}
+	}
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DVD_START_MAIN_TITLE, (int)fStartMainTitle);
+
+	pApp->WriteProfileString(IDS_R_PNSPRESETS, NULL, NULL);
+	for (int i = 0, j = m_pnspresets.GetCount(); i < j; i++) {
+		str.Format(L"Preset%d", i);
+		pApp->WriteProfileString(IDS_R_PNSPRESETS, str, m_pnspresets[i]);
+	}
+
+	pApp->WriteProfileString(IDS_R_COMMANDS, NULL, NULL);
+	pos = wmcmds.GetHeadPosition();
+	for (int i = 0; pos;) {
+		wmcmd& wc = wmcmds.GetNext(pos);
+		if (wc.IsModified()) {
+			str.Format(L"CommandMod%d", i);
+			CString str2;
+			str2.Format(L"%d %x %x \"%S\" %d %u %u %u",
+						wc.cmd, wc.fVirt, wc.key,
+						wc.rmcmd, wc.rmrepcnt,
+						wc.mouse, wc.appcmd, wc.mouseFS);
+			pApp->WriteProfileString(IDS_R_COMMANDS, str, str2);
+			i++;
+		}
+	}
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_WINLIRC, fWinLirc);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_WINLIRCADDR, strWinLircAddr);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_UICE, fUIce);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_UICEADDR, strUIceAddr);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, fGlobalMedia);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_USEDARKTHEME, bUseDarkTheme);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THEMEBRIGHTNESS, nThemeBrightness);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THEMERED, nThemeRed);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THEMEGREEN, nThemeGreen);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THEMEBLUE, nThemeBlue);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_TRANSPARENT, nOSDTransparent);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_BORDER, nOSDBorder);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FILENAMEONSEEKBAR, fFileNameOnSeekBar);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, clrFaceABGR);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, clrOutlineABGR);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTCOLOR, clrFontABGR);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD1COLOR, clrGrad1ABGR);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD2COLOR, clrGrad2ABGR);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, nJumpDistS);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, nJumpDistM);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTL, nJumpDistL);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LIMITWINDOWPROPORTIONS, fLimitWindowProportions);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LASTUSEDPAGE, nLastUsedPage);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DLGPROPX, iDlgPropX);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DLGPROPY, iDlgPropY);
+
+	m_Formats.UpdateData(true);
+
+	// Internal filters
+	for (int f = 0; f < SRC_LAST; f++) {
+		pApp->WriteProfileInt(IDS_R_INTERNAL_FILTERS, SrcFiltersKeys[f], SrcFilters[f]);
+	}
+	for (int f = 0; f < VDEC_DXVA_LAST; f++) {
+		pApp->WriteProfileInt(IDS_R_INTERNAL_FILTERS, DXVAFiltersKeys[f], DXVAFilters[f]);
+	}
+	for (int f = 0; f < VDEC_LAST; f++) {
+		pApp->WriteProfileInt(IDS_R_INTERNAL_FILTERS, VideoFiltersKeys[f], VideoFilters[f]);
+	}
+	for (int f = 0; f < ADEC_LAST; f++) {
+		pApp->WriteProfileInt(IDS_R_INTERNAL_FILTERS, AudioFiltersKeys[f], AudioFilters[f]);
+	}
+
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LOGOFILE, strLogoFileName);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LOGOID, nLogoId);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LOGOEXT, fLogoExternal);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_HIDECDROMSSUBMENU, fHideCDROMsSubMenu);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_PRIORITY, dwPriority);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, fLaunchfullscreen);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEWEBSERVER, fEnableWebServer);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERPORT, nWebServerPort);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERQUALITY, nWebServerQuality);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERPRINTDEBUGINFO, fWebServerPrintDebugInfo);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERUSECOMPRESSION, fWebServerUseCompression);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERLOCALHOSTONLY, fWebServerLocalhostOnly);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_WEBROOT, strWebRoot);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_WEBDEFINDEX, strWebDefIndex);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_WEBSERVERCGI, strWebServerCGI);
+
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTPATH, strSnapShotPath);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTEXT, strSnapShotExt);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBROWS, iThumbRows);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBCOLS, iThumbCols);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBWIDTH, iThumbWidth);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBQUALITY, iThumbQuality);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBLEVELPNG, iThumbLevelPNG);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SUBSAVEEXTERNALSTYLEFILE, bSubSaveExternalStyleFile);
+
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_ISDB, strISDb);
+
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, strLastOpenFilterDir);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_PAGEPARSER, bYoutubePageParser);
+	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_YOUTUBE_FORMAT, YoutubeFormat.fmt == 1 ? L"WEBM" : L"MP4");
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_RESOLUTION, YoutubeFormat.res);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_60FPS, YoutubeFormat.fps60);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_HDR, YoutubeFormat.hdr);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, fRemainingTime);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, nLastFileInfoPage);
+
+	pApp->WriteProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_AUTO_CHECK, bUpdaterAutoCheck);
+	pApp->WriteProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_DELAY, nUpdaterDelay);
+	pApp->WriteProfileBinary(IDS_R_UPDATER, IDS_RS_UPDATER_LAST_CHECK, (LPBYTE)&tUpdaterLastCheck, sizeof(time_t));
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_REMAINING_TIME, bOSDRemainingTime);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_PASTECLIPBOARDURL, bPasteClipboardURL);
+
+	if (pApp->m_pszRegistryKey) {
+		// WINBUG: on win2k this would crash WritePrivateProfileString
+		pApp->WriteProfileInt(L"", L"", pApp->GetProfileInt(L"", L"", 0) ? 0 : 1);
+	}
+
+	pApp->FlushProfile();
+}
+
+void CAppSettings::SaveExternalFilters()
+{
+	// External Filter settings are saved for a long time. Use only when really necessary.
+	CMPlayerCApp* pApp = AfxGetMyApp();
+	ASSERT(pApp);
+
+	if (!fInitialized) {
+		return;
+	}
+
+	for (unsigned int i = 0; ; i++) {
+		CString key;
+		key.Format(L"%s\\%04u", IDS_R_FILTERS, i);
+		int j = pApp->GetProfileInt(key, L"Enabled", -1);
+		pApp->WriteProfileString(key, NULL, NULL);
+		if (j < 0) {
+			break;
+		}
+	}
+
+	unsigned int k = 0;
+	POSITION pos = m_filters.GetHeadPosition();
+	while (pos) {
+		FilterOverride* f = m_filters.GetNext(pos);
+
+		if (f->fTemporary) {
+			continue;
+		}
+
+		CString key;
+		key.Format(L"%s\\%04u", IDS_R_FILTERS, k);
+
+		pApp->WriteProfileInt(key, L"SourceType", (int)f->type);
+		pApp->WriteProfileInt(key, L"Enabled", (int)!f->fDisabled);
+		if (f->type == FilterOverride::REGISTERED) {
+			pApp->WriteProfileString(key, L"DisplayName", CString(f->dispname));
+			pApp->WriteProfileString(key, L"Name", f->name);
+			if (f->clsid == CLSID_NULL) {
+				CComPtr<IBaseFilter> pBF;
+				CStringW FriendlyName;
+				if (CreateFilter(f->dispname, &pBF, FriendlyName)) {
+					f->clsid = GetCLSID(pBF);
+				}
+			}
+			pApp->WriteProfileString(key, L"CLSID", CStringFromGUID(f->clsid));
+		} else if (f->type == FilterOverride::EXTERNAL) {
+			pApp->WriteProfileString(key, L"Path", f->path);
+			pApp->WriteProfileString(key, L"Name", f->name);
+			pApp->WriteProfileString(key, L"CLSID", CStringFromGUID(f->clsid));
+		}
+		POSITION pos2 = f->backup.GetHeadPosition();
+		for (unsigned int i = 0; pos2; i++) {
+			CString val;
+			val.Format(L"org%04u", i);
+			pApp->WriteProfileString(key, val, CStringFromGUID(f->backup.GetNext(pos2)));
+		}
+		pos2 = f->guids.GetHeadPosition();
+		for (unsigned int i = 0; pos2; i++) {
+			CString val;
+			val.Format(L"mod%04u", i);
+			pApp->WriteProfileString(key, val, CStringFromGUID(f->guids.GetNext(pos2)));
+		}
+		pApp->WriteProfileInt(key, L"LoadType", f->iLoadType);
+		pApp->WriteProfileInt(key, L"Merit", f->dwMerit);
+
+		k++;
+	}
 }
 
 int CAppSettings::GetMultiInst()
