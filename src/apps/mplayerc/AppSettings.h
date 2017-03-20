@@ -849,9 +849,9 @@ private :
 public:
 	CAppSettings();
 	virtual ~CAppSettings();
+	void			LoadSettings(bool bForce = false);
 	void			SaveSettings();
 	void			SaveExternalFilters();
-	void			LoadSettings(bool bForce = false);
 
 	void			GetFav(favtype ft, CAtlList<CString>& sl);
 	void			SetFav(favtype ft, CAtlList<CString>& sl);
