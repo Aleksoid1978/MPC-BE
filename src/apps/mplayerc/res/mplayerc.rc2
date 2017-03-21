@@ -185,14 +185,6 @@ IDB_DXVA_INDICATOR_350           PNG                     "res\\gpu_350.png"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// AVI
-//
-
-IDR_AVI_FILECOPY                 AVI                     "res\\ani.avi"
-IDR_AVI_WEB_FILECOPY             AVI                     "res\\ani_web.avi"
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Version
 //
 

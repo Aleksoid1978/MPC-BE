@@ -32,8 +32,6 @@
 #define IDI_DVD                         302
 #define IDI_AUDIOCD                     303
 #define IDI_UNKNOWN                     304
-#define IDR_AVI_FILECOPY                400
-#define IDR_AVI_WEB_FILECOPY            401
 #define IDR_HTML_INFO                   499
 #define IDR_HTML_INDEX                  500
 #define IDR_HTML_404                    501
@@ -541,7 +539,6 @@
 #define IDD_OPENCAPDEVICE_DLG           10001
 #define IDD_MEDIATYPES_DLG              10002
 #define IDD_AUTH_DLG                    10003
-#define IDD_SAVE_DLG                    10004
 #define IDD_SUBTITLEDL_DLG              10005
 #define IDD_FILEPROPDETAILS             10010
 #define IDD_FILEPROPCLIP                10011
@@ -594,6 +591,7 @@
 #define IDD_PPAGESUBRENDERING           10064
 #define IDD_UPDATE_DIALOG               10065
 #define IDD_ITEMPROPERTIES_DIALOG       10066
+#define IDD_SHADERNEW_DLG               10067
 // controls
 #define IDC_STATIC1                     10201
 #define IDC_STATIC2                     10202
