@@ -176,6 +176,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Include", "Include", "{EA36
 		include\IChapterInfo.h = include\IChapterInfo.h
 		include\IFilterVersion.h = include\IFilterVersion.h
 		include\IKeyFrameInfo.h = include\IKeyFrameInfo.h
+		include\IMediaOffset3D.h = include\IMediaOffset3D.h
 		include\IMediaSideData.h = include\IMediaSideData.h
 		include\ITrackInfo.h = include\ITrackInfo.h
 		include\moreuuids.h = include\moreuuids.h

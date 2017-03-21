@@ -52,7 +52,8 @@ namespace DSObjects
 		public IQualProp,
 		public IMFRateSupport,
 		public IMFVideoDisplayControl,
-		public IEVRTrustedVideoPlugin
+		public IEVRTrustedVideoPlugin,
+		public IMediaOffset3D
 		//public IMFVideoPositionMapper, // Non mandatory EVR Presenter Interfaces (see later...)
 	{
 	public:
@@ -151,6 +152,9 @@ namespace DSObjects
 		STDMETHODIMP	LockDevice(HANDLE hDevice, IDirect3DDevice9 **ppDevice, BOOL fBlock);
 		STDMETHODIMP	UnlockDevice(HANDLE hDevice, BOOL fSaveState);
 		STDMETHODIMP	GetVideoService(HANDLE hDevice, REFIID riid, void **ppService);
+
+		// IMediaOffset3D
+		STDMETHODIMP SetOffset(const BYTE *pData, size_t size);
 
 	protected :
 		void			OnResetDevice();

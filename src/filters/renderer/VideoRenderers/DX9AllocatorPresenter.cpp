@@ -69,6 +69,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_FocusThread(NULL)
 	, m_bMVC_Base_View_R_flag(false)
 	, m_nStereoOffsetInPixels(4)
+	, m_nCurrentSubtitlesStream(0)
 {
 	if (FAILED(hr)) {
 		_Error += L"ISubPicAllocatorPresenterImpl failed\n";
@@ -1348,7 +1349,31 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	if (rs.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE
 			|| rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM
 			|| rd->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
-		xOffsetInPixels = (m_bMVC_Base_View_R_flag != rd->m_bStereo3DSwapLR) ? -m_nStereoOffsetInPixels : m_nStereoOffsetInPixels;	
+		if (!m_mediaOffsetQueue.empty()) {
+			MediaOffset3D offset3D = { INVALID_TIME };
+			auto selected = m_mediaOffsetQueue.begin();
+			for (auto it = m_mediaOffsetQueue.begin(); it != m_mediaOffsetQueue.end(); it++) {
+				if (it->timestamp > m_rtNow) {
+					break;
+				}
+
+				offset3D = *it;
+				selected = it;
+			}
+			m_mediaOffsetQueue.erase(m_mediaOffsetQueue.begin(), selected);
+
+			if (offset3D.timestamp != INVALID_TIME) {
+				int idx = m_nCurrentSubtitlesStream;
+				if (!m_stereo_subtitle_offset_ids.empty() && (size_t)m_nCurrentSubtitlesStream < m_stereo_subtitle_offset_ids.size()) {
+					idx = m_stereo_subtitle_offset_ids[m_nCurrentSubtitlesStream];
+				}
+				if (idx < offset3D.offset.offset_count) {
+					m_nStereoOffsetInPixels = offset3D.offset.offset[idx];
+				}
+			}
+		}
+
+		xOffsetInPixels = (m_bMVC_Base_View_R_flag != rd->m_bStereo3DSwapLR) ? -m_nStereoOffsetInPixels : m_nStereoOffsetInPixels;
 	}
 	AlphaBltSubPic(rDstPri, rDstVid, xOffsetInPixels);
 

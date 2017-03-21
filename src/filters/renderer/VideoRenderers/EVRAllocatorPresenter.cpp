@@ -24,6 +24,7 @@
 #include <Mferror.h>
 #include "IPinHook.h"
 #include "MacrovisionKicker.h"
+#include <IMediaSideData.h>
 
 #if (0)		// Set to 1 to activate EVR traces
 	#define TRACE_EVR	TRACE
@@ -343,6 +344,8 @@ STDMETHODIMP CEVRAllocatorPresenter::NonDelegatingQueryInterface(REFIID riid, vo
 		hr = m_pD3DManager->QueryInterface(__uuidof(IDirect3DDeviceManager9), (void**) ppv);
 	} else if (riid == __uuidof(ID3DFullscreenControl)) {
 		hr = GetInterface((ID3DFullscreenControl*)this, ppv);
+	} else if (riid == __uuidof(IMediaOffset3D)) {
+		hr = GetInterface((IMediaOffset3D*)this, ppv);
 	} else {
 		hr = __super::NonDelegatingQueryInterface(riid, ppv);
 	}
@@ -358,6 +361,35 @@ STDMETHODIMP CEVRAllocatorPresenter::OnClockStart(MFTIME hnsSystemTime,  LONGLON
 	m_nRenderState			= Started;
 	m_ModeratedTimeLast		= -1;
 	m_ModeratedClockLast	= -1;
+
+	if (m_pSS) {
+		// Get the selected subtitles stream
+		DWORD cStreams = 0;
+		if (SUCCEEDED(m_pSS->Count(&cStreams)) && cStreams > 0) {
+			int selectedStream = 0;
+			for (long i = 0; i < (long)cStreams; i++) {
+				DWORD dwFlags = DWORD_MAX;
+				DWORD dwGroup = DWORD_MAX;
+
+				if (FAILED(m_pSS->Info(i, NULL, &dwFlags, NULL, &dwGroup, NULL, NULL, NULL))) {
+					continue;
+				}
+
+				if (dwGroup != 2) {
+					continue;
+				}
+
+				if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
+					m_nCurrentSubtitlesStream = selectedStream;
+					break;
+				}
+
+				selectedStream++;
+			}
+		}
+	}
+
+	m_mediaOffsetQueue.clear();
 
 	return S_OK;
 }
@@ -1342,6 +1374,16 @@ STDMETHODIMP CEVRAllocatorPresenter::GetVideoService(HANDLE hDevice, REFIID riid
 	return hr;
 }
 
+STDMETHODIMP CEVRAllocatorPresenter::SetOffset(const BYTE *pData, size_t size)
+{
+	if (size == sizeof(MediaOffset3D)) {
+		m_mediaOffsetQueue.emplace_back((MediaOffset3D&)(*pData));
+		return S_OK;
+	}
+
+	return E_FAIL;
+}
+
 STDMETHODIMP CEVRAllocatorPresenter::GetNativeVideoSize(LONG* lpWidth, LONG* lpHeight, LONG* lpARWidth, LONG* lpARHeight)
 {
 	// This function should be called...
@@ -1412,6 +1454,7 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 
 	{
 		m_bMVC_Base_View_R_flag = false;
+		m_stereo_subtitle_offset_ids.clear();
 
 		CComPtr<IBaseFilter> pBF;
 		if (SUCCEEDED(m_pOuterEVR->QueryInterface(IID_PPV_ARGS(&pBF)))) {
@@ -1419,7 +1462,7 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 				if (CComQIPtr<IPropertyBag> pPB = pBF) {
 					CComVariant var;
 					if (SUCCEEDED(pPB->Read(L"ROTATION", &var, NULL)) && var.vt == VT_BSTR) {
-						int rotation = _wtoi(var.bstrVal);
+						const int rotation = _wtoi(var.bstrVal);
 						SetRotation(rotation);
 					}
 					var.Clear();
@@ -1428,7 +1471,21 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 						CString mode(var.bstrVal); mode.MakeLower();
 						m_bMVC_Base_View_R_flag = mode == L"mvc_rl";
 					}
+					var.Clear();
+
+					if (SUCCEEDED(pPB->Read(L"stereo_subtitle_offset_ids", &var, NULL)) && var.vt == VT_BSTR) {
+						const CString offset_ids(var.bstrVal);
+						CAtlList<CString> list;
+						Explode(offset_ids, list, L',');
+						POSITION pos = list.GetHeadPosition();
+						while (pos) {
+							const int value = _wtoi(list.GetNext(pos));
+							m_stereo_subtitle_offset_ids.emplace_back(value);
+						}
+					}
 				}
+
+				m_pSS = pBF;
 			}
 		}
 	}

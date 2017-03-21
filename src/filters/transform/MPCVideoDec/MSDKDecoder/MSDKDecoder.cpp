@@ -529,6 +529,9 @@ void CMSDKDecoder::GetOffsetSideData(IMediaSample* pSample, mfxU64 timestamp)
     CComPtr<IMediaSideData> pMediaSideData;
     if (SUCCEEDED(pSample->QueryInterface(&pMediaSideData))) {
       pMediaSideData->SetSideData(IID_MediaSideData3DOffset, (const BYTE*)&offset, sizeof(offset));
+    } else if (m_pMediaOffset3D) {
+      const MediaOffset3D offset3D = { timestamp, offset };
+      m_pMediaOffset3D->SetOffset((const BYTE*)&offset3D, sizeof(offset3D));
     }
   }
 }
@@ -753,6 +756,15 @@ void CMSDKDecoder::Flush()
 
   m_GOPs.clear();
   memset(&m_PrevOffset, 0, sizeof(m_PrevOffset));
+
+  m_pMediaOffset3D.Release();
+  BeginEnumFilters(m_pFilter->m_pGraph, pEF, pBF) {
+    if (CComQIPtr<IMediaOffset3D> pFilter = pBF) {
+      m_pMediaOffset3D = pFilter;
+      break;
+    };
+  }
+  EndEnumFilters
 }
 
 HRESULT CMSDKDecoder::EndOfStream()
