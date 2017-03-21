@@ -245,6 +245,7 @@
     <ClCompile Include="ShaderAutoCompleteDlg.cpp" />
     <ClCompile Include="ShaderCombineDlg.cpp" />
     <ClCompile Include="ShaderEditorDlg.cpp" />
+    <ClCompile Include="ShaderNewDlg.cpp" />
     <ClCompile Include="ShockwaveGraph.cpp" />
     <ClCompile Include="StaticLink.cpp" />
     <ClCompile Include="StatusLabel.cpp" />
@@ -364,6 +365,7 @@
     <ClInclude Include="ShaderAutoCompleteDlg.h" />
     <ClInclude Include="ShaderCombineDlg.h" />
     <ClInclude Include="ShaderEditorDlg.h" />
+    <ClInclude Include="ShaderNewDlg.h" />
     <ClInclude Include="ShockwaveGraph.h" />
     <ClInclude Include="SmoothImageResampling.h" />
     <ClInclude Include="StaticLink.h" />

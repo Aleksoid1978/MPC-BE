@@ -6800,7 +6800,9 @@ void CMainFrame::OnUpdateViewCapture(CCmdUI* pCmdUI)
 void CMainFrame::OnViewShaderEditor()
 {
 	// TODO: SHADERS
-	//T//ShowControlBar(&m_wndShaderEditorBar, !m_wndShaderEditorBar.IsWindowVisible(), TRUE);
+#ifdef _DEBUG
+	ShowControlBar(&m_wndShaderEditorBar, !m_wndShaderEditorBar.IsWindowVisible(), TRUE);
+#endif
 }
 
 void CMainFrame::OnUpdateViewShaderEditor(CCmdUI* pCmdUI)
