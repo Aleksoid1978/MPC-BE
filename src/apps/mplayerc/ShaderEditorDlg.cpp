@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "MainFrm.h"
+#include "ShaderNewDlg.h"
 #include "ShaderEditorDlg.h"
 
 // CShaderEdit
@@ -327,7 +328,37 @@ void CShaderEditorDlg::OnBnClickedButtonSave()
 
 void CShaderEditorDlg::OnBnClickedButtonNew()
 {
-	// TODO
+	CShaderNewDlg dlg;
+	if (IDOK != dlg.DoModal()) {
+		return;
+	}
+
+
+	// if shader already exists, then select it
+	int i = m_cbLabels.SelectString(0, dlg.m_Name);
+	if (i > 0) {
+		return;
+	}
+
+	CStringA srcdata;
+	if (!LoadResource(IDF_SHADER_EMPTY, srcdata, L"FILE")) {
+		return;
+	}
+
+	CString path;
+	if (AfxGetMyApp()->GetAppSavePath(path)) {
+		path.AppendFormat(L"Shaders\\%s.hlsl", dlg.m_Name);
+
+		CStdioFile file;
+		if (file.Open(path, CFile::modeCreate|CFile::modeWrite|CFile::shareExclusive|CFile::typeBinary)) {
+			file.Write(srcdata.GetBuffer(), srcdata.GetLength());
+			file.Close();
+
+			m_cbLabels.AddString(dlg.m_Name);
+			m_cbLabels.SelectString(0, dlg.m_Name);
+			OnCbnSelchangeCombo1();
+		}
+	}
 }
 
 void CShaderEditorDlg::OnBnClickedButtonDelete()
@@ -343,6 +374,7 @@ void CShaderEditorDlg::OnBnClickedButtonDelete()
 
 		if (AfxGetMainFrame()->DeleteShaderFile(label)) {
 			m_cbLabels.DeleteString(i);
+			m_cbLabels.SetCurSel(-1);
 
 			m_edSrcdata.SetWindowText(L"");
 			m_edOutput.SetWindowText(L"");
