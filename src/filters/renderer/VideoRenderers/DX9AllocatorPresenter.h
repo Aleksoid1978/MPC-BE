@@ -26,6 +26,9 @@
 #include "CPUUsage.h"
 #include "GPUUsage.h"
 #include "MemUsage.h"
+#include <deque>
+#include <vector>
+#include <IMediaOffset3D.h>
 
 #define VMRBITMAP_UPDATE 0x80000000
 
@@ -275,6 +278,11 @@ namespace DSObjects
 
 		bool					m_bMVC_Base_View_R_flag;
 		int						m_nStereoOffsetInPixels;
+
+		CComQIPtr<IAMStreamSelect> m_pSS;
+		int                        m_nCurrentSubtitlesStream;
+		std::vector<int>           m_stereo_subtitle_offset_ids;
+		std::deque<MediaOffset3D>  m_mediaOffsetQueue;
 
 	public:
 		CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, bool bIsEVR, CString &_Error);
