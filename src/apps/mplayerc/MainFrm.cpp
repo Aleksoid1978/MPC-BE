@@ -1902,6 +1902,7 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 			CRect wr(mi.rcWork);
 			if (s.iCaptionMenuMode == MODE_FRAMEONLY && IsWin10orLater()) {
 				CRect invisibleBorders = GetInvisibleBorderSize();
+				wr.InflateRect(invisibleBorders);
 			}
 			SetWindowPos(NULL, wr.left, wr.top, wr.Width(), wr.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
 		}
