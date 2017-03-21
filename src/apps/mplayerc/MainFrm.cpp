@@ -1902,9 +1902,6 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 			CRect wr(mi.rcWork);
 			if (s.iCaptionMenuMode == MODE_FRAMEONLY && IsWin10orLater()) {
 				CRect invisibleBorders = GetInvisibleBorderSize();
-				// remove the thin edge for a better view when the window is maximized.
-				invisibleBorders.InflateRect(1, 0, 1, 1);
-				wr.InflateRect(invisibleBorders);
 			}
 			SetWindowPos(NULL, wr.left, wr.top, wr.Width(), wr.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
 		}
