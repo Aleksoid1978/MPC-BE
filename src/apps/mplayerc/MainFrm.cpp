@@ -4143,11 +4143,15 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	CAppSettings& s = AfxGetAppSettings();
 	const CRenderersSettings& rs = s.m_VRSettings;
+	CRenderersData* rd = GetRenderersData();
 
+	if (s.iStereo3DMode != 3) {
+		rd->m_iStereo3DTransform = STEREO3D_AsIs;
+	}
 	if (CComQIPtr<IMPCVideoDecFilter> pVDF = FindFilter(__uuidof(CMPCVideoDecFilter), m_pGB)) {
 		const BOOL bMvcActive = pVDF->GetMvcActive();
 		if (bMvcActive && s.iStereo3DMode == 0 && !m_pBFmadVR) {
-			GetRenderersData()->m_iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
+			rd->m_iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
 		}
 	}
 
