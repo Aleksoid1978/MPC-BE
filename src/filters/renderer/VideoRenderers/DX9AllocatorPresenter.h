@@ -273,6 +273,9 @@ namespace DSObjects
 
 		CFocusThread*			m_FocusThread;
 
+		bool					m_bMVC_Base_View_R_flag;
+		int						m_nStereoOffsetInPixels;
+
 	public:
 		CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, bool bIsEVR, CString &_Error);
 		~CDX9AllocatorPresenter();

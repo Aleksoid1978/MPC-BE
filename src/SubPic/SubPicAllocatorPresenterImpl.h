@@ -58,9 +58,6 @@ protected:
 	bool m_bDeviceResetRequested;
 	bool m_bPendingResetDevice;
 
-	bool m_bMVC_Base_View_R_flag;
-	bool m_bStereo3DSwapLR;
-
 	void InitMaxSubtitleTextureSize(const int maxWidth, const CSize& desktopSize);
 	void AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, int xOffsetInPixels = 0);
 	void AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget = NULL, int xOffsetInPixels = 0, const BOOL bUseSpecialCase = TRUE);
