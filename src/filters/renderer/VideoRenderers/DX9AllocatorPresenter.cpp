@@ -67,6 +67,8 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_pD3DXCreateFont(NULL)
 	, m_pD3DXCreateSprite(NULL)
 	, m_FocusThread(NULL)
+	, m_bMVC_Base_View_R_flag(false)
+	, m_nStereoOffsetInPixels(4)
 {
 	if (FAILED(hr)) {
 		_Error += L"ISubPicAllocatorPresenterImpl failed\n";
@@ -1342,8 +1344,13 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	// paint subtitles on the backbuffer
-	m_bStereo3DSwapLR = m_bMVC_Base_View_R_flag != rd->m_bStereo3DSwapLR;
-	AlphaBltSubPic(rDstPri, rDstVid);
+	int xOffsetInPixels = 0;
+	if (rs.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE
+			|| rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM
+			|| rd->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
+		xOffsetInPixels = (m_bMVC_Base_View_R_flag != rd->m_bStereo3DSwapLR) ? -m_nStereoOffsetInPixels : m_nStereoOffsetInPixels;	
+	}
+	AlphaBltSubPic(rDstPri, rDstVid, xOffsetInPixels);
 
 	// Casimir666 : show OSD
 	if (m_VMR9AlphaBitmap.dwFlags & VMRBITMAP_UPDATE) {
