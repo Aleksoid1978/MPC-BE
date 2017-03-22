@@ -15752,7 +15752,8 @@ void CMainFrame::UpdateSubDefaultStyle()
 		if (GetMediaState() != State_Running) {
 			m_pCAP->Paint(false);
 		}
-	} else if (dynamic_cast<CRenderedHdmvSubtitle*>((ISubStream*)m_pCurrentSubStream)) {
+	} else if (dynamic_cast<CRenderedHdmvSubtitle*>((ISubStream*)m_pCurrentSubStream)
+			|| dynamic_cast<CSupSubFile*>((ISubStream*)m_pCurrentSubStream)) {
 		s.m_VRSettings.bSubpicPosRelative = s.subdefstyle.relativeTo;
 		InvalidateSubtitle();
 		if (GetMediaState() != State_Running) {
