@@ -154,7 +154,7 @@ namespace DSObjects
 		STDMETHODIMP	GetVideoService(HANDLE hDevice, REFIID riid, void **ppService);
 
 		// IMediaOffset3D
-		STDMETHODIMP SetOffset(const BYTE *pData, size_t size);
+		STDMETHODIMP SetSubtitles3DOffset(const BYTE *pData, size_t size);
 
 	protected :
 		void			OnResetDevice();

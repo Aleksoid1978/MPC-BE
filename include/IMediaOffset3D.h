@@ -31,5 +31,5 @@ struct MediaOffset3D {
 interface __declspec(uuid("C8241FE9-7C4D-4CA2-A980-B7C9C4E117D8"))
 IMediaOffset3D :
 public IUnknown {
-	STDMETHOD(SetOffset)(const BYTE *pData, size_t size) PURE;
+	STDMETHOD(SetSubtitles3DOffset)(const BYTE *pData, size_t size) PURE;
 };

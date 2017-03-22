@@ -531,7 +531,7 @@ void CMSDKDecoder::GetOffsetSideData(IMediaSample* pSample, mfxU64 timestamp)
       pMediaSideData->SetSideData(IID_MediaSideData3DOffset, (const BYTE*)&offset, sizeof(offset));
     } else if (m_pMediaOffset3D) {
       const MediaOffset3D offset3D = { timestamp, offset };
-      m_pMediaOffset3D->SetOffset((const BYTE*)&offset3D, sizeof(offset3D));
+      m_pMediaOffset3D->SetSubtitles3DOffset((const BYTE*)&offset3D, sizeof(offset3D));
     }
   }
 }
