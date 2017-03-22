@@ -53,7 +53,7 @@ namespace DSObjects
 		public IMFRateSupport,
 		public IMFVideoDisplayControl,
 		public IEVRTrustedVideoPlugin,
-		public IMediaOffset3D
+		public IMediaSideData
 		//public IMFVideoPositionMapper, // Non mandatory EVR Presenter Interfaces (see later...)
 	{
 	public:
@@ -63,17 +63,15 @@ namespace DSObjects
 		DECLARE_IUNKNOWN;
 		STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-		STDMETHODIMP	CreateRenderer(IUnknown** ppRenderer);
+		STDMETHODIMP        CreateRenderer(IUnknown** ppRenderer);
 		STDMETHODIMP_(bool) Paint(bool fAll);
-		STDMETHODIMP	GetNativeVideoSize(LONG* lpWidth, LONG* lpHeight, LONG* lpARWidth, LONG* lpARHeight);
-		STDMETHODIMP	InitializeDevice(IMFMediaType* pMediaType);
-		STDMETHODIMP_(bool)	ResetDevice();
-		STDMETHODIMP_(bool)	DisplayChange();
+		STDMETHODIMP        GetNativeVideoSize(LONG* lpWidth, LONG* lpHeight, LONG* lpARWidth, LONG* lpARHeight);
+		STDMETHODIMP        InitializeDevice(IMFMediaType* pMediaType);
+		STDMETHODIMP_(bool) ResetDevice();
+		STDMETHODIMP_(bool) DisplayChange();
 
 		// ISubPicAllocatorPresenter3
-		STDMETHODIMP_(bool) IsRendering() {
-			return (m_nRenderState == Started);
-		}
+		STDMETHODIMP_(bool) IsRendering() { return (m_nRenderState == Started); }
 
 		// IMFClockStateSink
 		STDMETHODIMP OnClockStart(/* [in] */ MFTIME hnsSystemTime, /* [in] */ LONGLONG llClockStartOffset);
@@ -83,42 +81,42 @@ namespace DSObjects
 		STDMETHODIMP OnClockSetRate(/* [in] */ MFTIME hnsSystemTime, /* [in] */ float flRate);
 
 		// IBaseFilter delegate
-		bool			GetState( DWORD dwMilliSecsTimeout, FILTER_STATE *State, HRESULT &_ReturnValue);
+		bool         GetState( DWORD dwMilliSecsTimeout, FILTER_STATE *State, HRESULT &_ReturnValue);
 
 		// IQualProp (EVR statistics window)
-		STDMETHODIMP	get_FramesDroppedInRenderer		(int *pcFrames);
-		STDMETHODIMP	get_FramesDrawn					(int *pcFramesDrawn);
-		STDMETHODIMP	get_AvgFrameRate				(int *piAvgFrameRate);
-		STDMETHODIMP	get_Jitter						(int *iJitter);
-		STDMETHODIMP	get_AvgSyncOffset				(int *piAvg);
-		STDMETHODIMP	get_DevSyncOffset				(int *piDev);
+		STDMETHODIMP get_FramesDroppedInRenderer(int *pcFrames);
+		STDMETHODIMP get_FramesDrawn(int *pcFramesDrawn);
+		STDMETHODIMP get_AvgFrameRate(int *piAvgFrameRate);
+		STDMETHODIMP get_Jitter(int *iJitter);
+		STDMETHODIMP get_AvgSyncOffset(int *piAvg);
+		STDMETHODIMP get_DevSyncOffset(int *piDev);
 
 		// IMFRateSupport
-		STDMETHODIMP	GetSlowestRate(MFRATE_DIRECTION eDirection, BOOL fThin, float *pflRate);
-		STDMETHODIMP	GetFastestRate(MFRATE_DIRECTION eDirection, BOOL fThin, float *pflRate);
-		STDMETHODIMP	IsRateSupported(BOOL fThin, float flRate, float *pflNearestSupportedRate);
+		STDMETHODIMP GetSlowestRate(MFRATE_DIRECTION eDirection, BOOL fThin, float *pflRate);
+		STDMETHODIMP GetFastestRate(MFRATE_DIRECTION eDirection, BOOL fThin, float *pflRate);
+		STDMETHODIMP IsRateSupported(BOOL fThin, float flRate, float *pflNearestSupportedRate);
 
-		float			GetMaxRate(BOOL bThin);
+		float        GetMaxRate(BOOL bThin);
 
 		// IMFVideoPresenter
-		STDMETHODIMP	ProcessMessage(MFVP_MESSAGE_TYPE eMessage, ULONG_PTR ulParam);
-		STDMETHODIMP	GetCurrentMediaType(__deref_out  IMFVideoMediaType **ppMediaType);
+		STDMETHODIMP ProcessMessage(MFVP_MESSAGE_TYPE eMessage, ULONG_PTR ulParam);
+		STDMETHODIMP GetCurrentMediaType(__deref_out  IMFVideoMediaType **ppMediaType);
 
 		// IMFTopologyServiceLookupClient
-		STDMETHODIMP	InitServicePointers(/* [in] */ __in  IMFTopologyServiceLookup *pLookup);
-		STDMETHODIMP	ReleaseServicePointers();
+		STDMETHODIMP InitServicePointers(/* [in] */ __in  IMFTopologyServiceLookup *pLookup);
+		STDMETHODIMP ReleaseServicePointers();
 
 		// IMFVideoDeviceID
-		STDMETHODIMP	GetDeviceID(/* [out] */	__out  IID *pDeviceID);
+		STDMETHODIMP GetDeviceID(/* [out] */ __out  IID *pDeviceID);
 
 		// IMFGetService
-		STDMETHODIMP	GetService (/* [in] */ __RPC__in REFGUID guidService,
-											   /* [in] */ __RPC__in REFIID riid,
-											   /* [iid_is][out] */ __RPC__deref_out_opt LPVOID *ppvObject);
+		STDMETHODIMP GetService(/* [in] */ __RPC__in REFGUID guidService,
+								/* [in] */ __RPC__in REFIID riid,
+								/* [iid_is][out] */ __RPC__deref_out_opt LPVOID *ppvObject);
 
 		// IMFAsyncCallback
-		STDMETHODIMP	GetParameters(	/* [out] */ __RPC__out DWORD *pdwFlags, /* [out] */ __RPC__out DWORD *pdwQueue);
-		STDMETHODIMP	Invoke		 (	/* [in] */ __RPC__in_opt IMFAsyncResult *pAsyncResult);
+		STDMETHODIMP GetParameters(/* [out] */ __RPC__out DWORD *pdwFlags, /* [out] */ __RPC__out DWORD *pdwQueue);
+		STDMETHODIMP Invoke(/* [in] */ __RPC__in_opt IMFAsyncResult *pAsyncResult);
 
 		// IMFVideoDisplayControl
 		STDMETHODIMP GetNativeVideoSize(SIZE *pszVideo, SIZE *pszARVideo);
@@ -145,16 +143,17 @@ namespace DSObjects
 		STDMETHODIMP DisableImageExport(BOOL bDisable);
 
 		// IDirect3DDeviceManager9
-		STDMETHODIMP	ResetDevice(IDirect3DDevice9 *pDevice,UINT resetToken);
-		STDMETHODIMP	OpenDeviceHandle(HANDLE *phDevice);
-		STDMETHODIMP	CloseDeviceHandle(HANDLE hDevice);
-		STDMETHODIMP	TestDevice(HANDLE hDevice);
-		STDMETHODIMP	LockDevice(HANDLE hDevice, IDirect3DDevice9 **ppDevice, BOOL fBlock);
-		STDMETHODIMP	UnlockDevice(HANDLE hDevice, BOOL fSaveState);
-		STDMETHODIMP	GetVideoService(HANDLE hDevice, REFIID riid, void **ppService);
+		STDMETHODIMP ResetDevice(IDirect3DDevice9 *pDevice,UINT resetToken);
+		STDMETHODIMP OpenDeviceHandle(HANDLE *phDevice);
+		STDMETHODIMP CloseDeviceHandle(HANDLE hDevice);
+		STDMETHODIMP TestDevice(HANDLE hDevice);
+		STDMETHODIMP LockDevice(HANDLE hDevice, IDirect3DDevice9 **ppDevice, BOOL fBlock);
+		STDMETHODIMP UnlockDevice(HANDLE hDevice, BOOL fSaveState);
+		STDMETHODIMP GetVideoService(HANDLE hDevice, REFIID riid, void **ppService);
 
-		// IMediaOffset3D
-		STDMETHODIMP SetSubtitles3DOffset(const BYTE *pData, size_t size);
+		// IMediaSideData
+		STDMETHODIMP SetSideData(GUID guidType, const BYTE *pData, size_t size);
+		STDMETHODIMP GetSideData(GUID guidType, const BYTE **pData, size_t *pSize);
 
 	protected :
 		void			OnResetDevice();

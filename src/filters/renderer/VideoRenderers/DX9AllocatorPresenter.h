@@ -29,7 +29,7 @@
 #include <deque>
 #include <mutex>
 #include <vector>
-#include <IMediaOffset3D.h>
+#include <MediaOffset3D.h>
 
 #define VMRBITMAP_UPDATE 0x80000000
 
