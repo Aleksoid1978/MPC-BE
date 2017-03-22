@@ -122,7 +122,7 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 14		"&OK"
 15		"&Abbrechen"
 16		"Nur zur Wiedergabeliste hinzufügen"
-17		"Paste URL from clipboard"
+17		"URL aus Zwischenablage einfügen"
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
@@ -560,17 +560,17 @@ BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 13
-6		"Save"
-7		"New"
+6		"Speichern"
+7		"Neu"
 8		"&Löschen"
-12		"Apply"
+12		"Übernehmen"
 END
 
 BEGIN DIALOGEX IDD_SHADERNEW_DLG LINES 10
-3		"Create new shader"
+3		"Neuen Shader erstellen"
 6		"Name:"
 8		"OK"
-9		"Cancel"
+9		"Abbrechen"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
@@ -1839,7 +1839,7 @@ STRING IDS_SUBTITLES_STEREO_TOPANDBOTTOM		"Oben und Unten"
 STRING IDS_SUBTITLES_STYLES		"&Stile..."
 STRING IDS_SUBTITLE_STREAM		"Untertitel: %s"
 STRING IDS_SUBTITLE_STREAM_OFF		"Untertitel: aus"
-STRING IDS_SUB_COPYTOCLIPBOARD		"Copy the displayed subtitles to the clipboard"
+STRING IDS_SUB_COPYTOCLIPBOARD		"Angezeigte Untertitel in Zwischenablage speichern"
 STRING IDS_SUB_NOT_USE		"Keine Untertitel anzeigen"
 STRING IDS_SUB_POS_DOWN		"Untertitelposition nach unten verschieben"
 STRING IDS_SUB_POS_LEFT		"Untertitelposition nach links verschieben"
@@ -1939,8 +1939,8 @@ STRING IDS_VTSREADER_LOAD_PGC		"Titel-Auswahl aktivieren"
 STRING IDS_WEBSERVER_ERROR_TEST		"Sie müssen die neuen Einstellungen bestätigen, bevor Sie diese Testen können."
 STRING IDS_ZOOM1		"Zoom 1"
 STRING IDS_ZOOM2		"Zoom 2"
-STRING IDS_ZOOM_AUTOFIT		"Auto-Anpassung"
-STRING IDS_ZOOM_AUTOFITLARGE		"Auto fit (larger only)"
+STRING IDS_ZOOM_AUTOFIT		"Eingepasst"
+STRING IDS_ZOOM_AUTOFITLARGE		"Nur verkleinert"
 STRING ID_NAVIGATE_SKIPBACK		"Rückwärts springen\nRückwärts springen"
 STRING ID_NAVIGATE_SKIPFORWARD		"Vorwärts springen\nVorwärts springen"
 STRING ID_PLAY_DECRATE		"Geschwindigkeit verringern\nGeschwindigkeit verringern"
