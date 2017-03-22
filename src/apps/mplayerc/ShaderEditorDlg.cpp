@@ -187,6 +187,7 @@ CShaderEditorDlg::CShaderEditorDlg()
 
 CShaderEditorDlg::~CShaderEditorDlg()
 {
+	m_Font.DeleteObject();
 	delete m_pPSC;
 }
 
@@ -194,6 +195,20 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 {
 	if (!__super::Create(IDD, pParent)) {
 		return FALSE;
+	}
+
+	if (CDPI* pDpi = dynamic_cast<CDPI*>(AfxGetMainWnd())) {
+		LOGFONT lf = {};
+		lf.lfHeight = -pDpi->PointsToPixels(8);
+		lf.lfPitchAndFamily = FIXED_PITCH | FF_MODERN;
+
+		for (const auto &fontname : MonospaceFonts) {
+			wcscpy_s(lf.lfFaceName, LF_FACESIZE, fontname);
+			if (IsFontInstalled(fontname) && m_Font.CreateFontIndirectW(&lf)) {
+				m_edSrcdata.SetFont(&m_Font);
+				break;
+			}
+		}
 	}
 
 	AddAnchor(IDC_COMBO1, TOP_LEFT, TOP_RIGHT);
@@ -209,10 +224,10 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 
 	SetMinTrackSize(CSize(250, 40));
 
-	m_cbTargets.AddString(L"ps_2_0");
-	m_cbTargets.AddString(L"ps_2_a");
-	m_cbTargets.AddString(L"ps_2_b");
-	m_cbTargets.AddString(L"ps_3_0");
+	m_cbProfile.AddString(L"ps_2_0");
+	m_cbProfile.AddString(L"ps_2_a");
+	m_cbProfile.AddString(L"ps_2_b");
+	m_cbProfile.AddString(L"ps_3_0");
 
 	CString path;
 	if (AfxGetMyApp()->GetAppSavePath(path)) {
@@ -240,7 +255,7 @@ void CShaderEditorDlg::DoDataExchange(CDataExchange* pDX)
 	__super::DoDataExchange(pDX);
 
 	DDX_Control(pDX, IDC_COMBO1, m_cbLabels);
-	DDX_Control(pDX, IDC_COMBO2, m_cbTargets);
+	DDX_Control(pDX, IDC_COMBO2, m_cbProfile);
 	DDX_Control(pDX, IDC_EDIT1, m_edSrcdata);
 	DDX_Control(pDX, IDC_EDIT2, m_edOutput);
 }
@@ -300,7 +315,7 @@ void CShaderEditorDlg::OnCbnSelchangeCombo1()
 
 		ShaderC* pShader = AfxGetMainFrame()->GetShader(label);
 
-		m_cbTargets.SelectString(0, pShader->target);
+		m_cbProfile.SelectString(0, pShader->profile);
 
 		CString srcdata(pShader->srcdata);
 		srcdata.Replace(L"\n", L"\r\n");
@@ -317,7 +332,7 @@ void CShaderEditorDlg::OnBnClickedButtonSave()
 		ShaderC shader;
 
 		m_cbLabels.GetLBText(i, shader.label);
-		m_cbTargets.GetLBText(m_cbTargets.GetCurSel(), shader.target);
+		m_cbProfile.GetLBText(m_cbProfile.GetCurSel(), shader.profile);
 
 		m_edSrcdata.GetWindowText(shader.srcdata);
 		shader.srcdata.Remove('\r');
@@ -386,31 +401,34 @@ void CShaderEditorDlg::OnBnClickedButtonApply()
 {
 	int i = m_cbLabels.GetCurSel();
 	if (i >= 0) {
-		CString target;
-		m_cbTargets.GetLBText(m_cbTargets.GetCurSel(), target);
+		CString str;
+		m_cbProfile.GetLBText(m_cbProfile.GetCurSel(), str);
+		CStringA profile(str);
 
-		CString srcdata;
-		m_edSrcdata.GetWindowTextW(srcdata);
-		srcdata.Remove('\r');
+		m_edSrcdata.GetWindowTextW(str);
+		str.Remove('\r');
+		CStringA srcdata(str);
 
-		if (srcdata.GetLength() && target.GetLength()) {
+		if (srcdata.GetLength() && profile.GetLength()) {
 			if (!m_pPSC) {
 				m_pPSC = DNew CPixelShaderCompiler(NULL);
 			}
 
 			CString disasm, errmsg;
-			HRESULT hr = m_pPSC->CompileShader(CStringA(srcdata), "main", CStringA(target), D3DCOMPILE_DEBUG, NULL, NULL, &errmsg, &disasm);
+			HRESULT hr = m_pPSC->CompileShader(srcdata, "main", profile, D3DCOMPILE_DEBUG, NULL, NULL, &errmsg, &disasm);
 
 			if (SUCCEEDED(hr)) {
 				errmsg = L"D3DXCompileShader succeeded\n";
 				errmsg += L"\n";
 				errmsg += disasm;
 
-				//AfxGetMainFrame()->UpdateShaders(m_pShader->label);
+				//if (AfxGetMainFrame()->m_pCAP) {
+				//	// add the shader to the existing ones. it will be removed from the list after restarting playback or after changing the main shader list
+				//	hr = AfxGetMainFrame()->m_pCAP->AddPixelShader(TARGET_FRAME, srcdata, profile);
+				//}
 			}
 
 			errmsg.Replace(L"\n", L"\r\n");
-
 			m_edOutput.SetWindowText(errmsg);
 		}
 	}

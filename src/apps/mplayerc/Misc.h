@@ -32,3 +32,6 @@ bool  LoadResource(UINT resid, CStringA& str, LPCTSTR restype);
 WORD AssignedToCmd(UINT keyOrMouseValue, bool bIsFullScreen = false, bool bCheckMouse = true);
 void SetAudioRenderer(int AudioDevNo);
 void ThemeRGB(int iR, int iG, int iB, int& iRed, int& iGreen, int& iBlue);
+
+const LPCWSTR MonospaceFonts[] = {L"Consolas", L"Lucida Console", L"Courier New", L"" };
+bool IsFontInstalled(LPCWSTR lpszFont);

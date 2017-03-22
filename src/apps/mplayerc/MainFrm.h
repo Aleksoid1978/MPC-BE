@@ -273,6 +273,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	friend class COSD;
 	friend class CChildView;
 	friend class CThumbsTaskDlg;
+	friend class CShaderEditorDlg;
 
 	// TODO: wrap these graph objects into a class to make it look cleaner
 

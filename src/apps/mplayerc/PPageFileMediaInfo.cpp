@@ -112,33 +112,6 @@ static LRESULT CALLBACK ControlProc(HWND control, UINT message, WPARAM wParam, L
 	return CallWindowProc(OldControlProc, control, message, wParam, lParam);
 }
 
-static int CALLBACK EnumFontFamExProc(ENUMLOGFONTEX* /*lpelfe*/, NEWTEXTMETRICEX* /*lpntme*/, int /*FontType*/, LPARAM lParam)
-{
-	LPARAM* l = (LPARAM*)lParam;
-	*l = TRUE;
-	return TRUE;
-}
-
-static bool IsFontInstalled(LPCTSTR lpszFont)
-{
-	// Get the screen DC
-	CDC dc;
-	if (!dc.CreateCompatibleDC(NULL)) {
-		return false;
-	}
-
-	LOGFONT lf = {0};
-	// Any character set will do
-	lf.lfCharSet = DEFAULT_CHARSET;
-	// Set the facename to check for
-	wcscpy_s(lf.lfFaceName, lpszFont);
-	LPARAM lParam = 0;
-	// Enumerate fonts
-	EnumFontFamiliesEx(dc.GetSafeHdc(), &lf, (FONTENUMPROC)EnumFontFamExProc, (LPARAM)&lParam, 0);
-
-	return lParam ? true : false;
-}
-
 BOOL CPPageFileMediaInfo::OnInitDialog()
 {
 	__super::OnInitDialog();
@@ -168,8 +141,6 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 	memset(&lf, 0, sizeof(lf));
 	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
 
-	const LPCWSTR fonts[] = {L"Consolas", L"Lucida Console", L"Courier New", L"" };
-
 	UINT i = 0;
 	BOOL success;
 
@@ -177,11 +148,11 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 	CDC* cDC = m_mediainfo.BeginPaint(&ps);
 
 	do {
-		wcscpy_s(lf.lfFaceName, LF_FACESIZE, fonts[i]);
+		wcscpy_s(lf.lfFaceName, LF_FACESIZE, MonospaceFonts[i]);
 		lf.lfHeight = -MulDiv(8, cDC->GetDeviceCaps(LOGPIXELSY), 72);
-		success = IsFontInstalled(fonts[i]) && m_pCFont->CreateFontIndirect(&lf);
+		success = IsFontInstalled(MonospaceFonts[i]) && m_pCFont->CreateFontIndirect(&lf);
 		i++;
-	} while (!success && i < _countof(fonts));
+	} while (!success && i < _countof(MonospaceFonts));
 
 	m_mediainfo.SetFont(m_pCFont);
 	m_mediainfo.SetWindowText(MI_Text);

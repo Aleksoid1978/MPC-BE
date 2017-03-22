@@ -67,9 +67,10 @@ public:
 
 	enum { IDD = IDD_SHADEREDITOR_DLG };
 	CComboBox m_cbLabels;
-	CComboBox m_cbTargets;
+	CComboBox m_cbProfile;
 	CShaderEdit m_edSrcdata;
 	CEdit m_edOutput;
+	CFont m_Font;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
