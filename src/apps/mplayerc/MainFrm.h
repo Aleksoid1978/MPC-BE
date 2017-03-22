@@ -254,26 +254,19 @@ interface ISubClock;
 
 class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 {
-	enum {
-		TIMER_STREAMPOSPOLLER = 1,
-		TIMER_STREAMPOSPOLLER2,
-		TIMER_FULLSCREENCONTROLBARHIDER,
-		TIMER_FULLSCREENMOUSEHIDER,
-		TIMER_STATS,
-		TIMER_LEFTCLICK,
-		TIMER_STATUSERASER,
-		TIMER_FLYBARWINDOWHIDER,
-		TIMER_DM_AUTOCHANGING
-	};
-
 	friend class CPPageFileInfoSheet;
 	friend class CPPageLogo;
 	friend class CSubtitleDlDlg;
-	friend class CFullscreenWnd;
-	friend class COSD;
 	friend class CChildView;
 	friend class CThumbsTaskDlg;
 	friend class CShaderEditorDlg;
+	friend class CTextPassThruFilter;
+	friend class CWebClientSocket;
+	friend class CGraphThread;
+	friend class CPPagePlayback;
+	friend class CPPageAudio;
+	friend class CPPagePlayer;
+	friend class CMPlayerCApp;
 
 	// TODO: wrap these graph objects into a class to make it look cleaner
 
@@ -356,8 +349,6 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CInterfaceList<ISubStream> m_pSubStreams;
 	int m_iSubtitleSel; // if (m_iSubtitleSel & 0x80000000) - disabled
 	CComPtr<ISubStream> m_pCurrentSubStream;
-
-	friend class CTextPassThruFilter;
 
 	// windowing
 
@@ -484,8 +475,6 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	//
 
-	friend class CWebClientSocket;
-	friend class CWebServer;
 	CAutoPtr<CWebServer> m_pWebServer;
 	PMODE m_ePlaybackMode;
 	ULONG m_lCurrentChapter;
@@ -494,6 +483,18 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	bool m_bWasPausedOnMinimizedVideo = false;
 
 public:
+	enum {
+		TIMER_STREAMPOSPOLLER = 1,
+		TIMER_STREAMPOSPOLLER2,
+		TIMER_FULLSCREENCONTROLBARHIDER,
+		TIMER_FULLSCREENMOUSEHIDER,
+		TIMER_STATS,
+		TIMER_LEFTCLICK,
+		TIMER_STATUSERASER,
+		TIMER_FLYBARWINDOWHIDER,
+		TIMER_DM_AUTOCHANGING
+	};
+
 	void StartWebServer(int nPort);
 	void StopWebServer();
 
@@ -610,7 +611,6 @@ protected:
 
 	bool GraphEventComplete();
 
-	friend class CGraphThread;
 	CGraphThread* m_pGraphThread;
 	bool m_bOpenedThruThread;
 
@@ -856,11 +856,6 @@ protected:  // control bar embedded members
 	void DropFiles(CAtlList<CString>& slFiles);
 
 	LPCTSTR GetRecentFile();
-
-	friend class CPPagePlayback; // TODO
-	friend class CPPageAudio; // TODO
-	friend class CPPagePlayer;
-	friend class CMPlayerCApp; // TODO
 
 	void RestoreControlBars();
 	void SaveControlBars();
