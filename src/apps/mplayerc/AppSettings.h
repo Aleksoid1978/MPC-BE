@@ -184,7 +184,7 @@ enum engine_t {
 
 struct ShaderC {
 	CString		label;
-	CString		target;
+	CString		profile;
 	CString		srcdata;
 	ULONGLONG	length = 0;
 	FILETIME	ftwrite = {0,0};

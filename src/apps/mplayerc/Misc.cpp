@@ -412,3 +412,31 @@ void ThemeRGB(int iR, int iG, int iB, int& iRed, int& iGreen, int& iBlue)
 	iGreen = clamp(iGreen, 0, 255);
 	iBlue  = clamp(iBlue,  0, 255);
 }
+
+
+static int CALLBACK EnumFontFamExProc(ENUMLOGFONTEX* /*lpelfe*/, NEWTEXTMETRICEX* /*lpntme*/, int /*FontType*/, LPARAM lParam)
+{
+	LPARAM* l = (LPARAM*)lParam;
+	*l = TRUE;
+	return TRUE;
+}
+
+bool IsFontInstalled(LPCWSTR lpszFont)
+{
+	// Get the screen DC
+	CDC dc;
+	if (!dc.CreateCompatibleDC(NULL)) {
+		return false;
+	}
+
+	LOGFONT lf = {0};
+	// Any character set will do
+	lf.lfCharSet = DEFAULT_CHARSET;
+	// Set the facename to check for
+	wcscpy_s(lf.lfFaceName, lpszFont);
+	LPARAM lParam = 0;
+	// Enumerate fonts
+	EnumFontFamiliesExW(dc.GetSafeHdc(), &lf, (FONTENUMPROC)EnumFontFamExProc, (LPARAM)&lParam, 0);
+
+	return lParam ? true : false;
+}

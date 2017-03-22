@@ -11010,20 +11010,20 @@ ShaderC* CMainFrame::GetShader(LPCWSTR label)
 					CString str;
 					file.ReadString(str); // read first string
 					if (str.Left(25) == L"// $MinimumShaderProfile:") {
-						shader.target = str.Mid(25).Trim(); // shader version property
+						shader.profile = str.Mid(25).Trim(); // shader version property
 					}
 					else {
 						file.SeekToBegin();
 					}
 
-					if (shader.target == L"ps_3_sw") {
-						shader.target = L"ps_3_0";
+					if (shader.profile == L"ps_3_sw") {
+						shader.profile = L"ps_3_0";
 					}
-					if (shader.target != L"ps_2_0"
-							&& shader.target != L"ps_2_a"
-							&& shader.target != L"ps_2_b"
-							&& shader.target != L"ps_3_0") {
-						shader.target = L"ps_2_0";
+					if (shader.profile != L"ps_2_0"
+							&& shader.profile != L"ps_2_a"
+							&& shader.profile != L"ps_2_b"
+							&& shader.profile != L"ps_3_0") {
+						shader.profile = L"ps_2_0";
 					}
 
 					while (file.ReadString(str)) {
@@ -11060,7 +11060,7 @@ bool CMainFrame::SaveShaderFile(ShaderC* shader)
 			file.SetLength(0);
 
 			CString str;
-			str.Format(L"// $MinimumShaderProfile: %s\n", shader->target);
+			str.Format(L"// $MinimumShaderProfile: %s\n", shader->profile);
 			file.WriteString(str);
 
 			file.WriteString(shader->srcdata);
@@ -11137,10 +11137,10 @@ void CMainFrame::SetShaders()
 		while (pos) {
 			ShaderC* pShader = GetShader(s.ShaderList.GetNext(pos));
 			if (pShader) {
-				CStringA target = pShader->target;
+				CStringA profile = pShader->profile;
 				CStringA srcdata = pShader->srcdata;
 
-				HRESULT hr = m_pCAP->AddPixelShader(TARGET_FRAME, srcdata, target);
+				HRESULT hr = m_pCAP->AddPixelShader(TARGET_FRAME, srcdata, profile);
 				if (FAILED(hr)) {
 					m_pCAP->ClearPixelShaders(TARGET_FRAME); // ???
 					SendStatusMessage(ResStr(IDS_MAINFRM_73) + pShader->label, 3000);
@@ -11155,10 +11155,10 @@ void CMainFrame::SetShaders()
 		while (pos) {
 			ShaderC* pShader = GetShader(s.ShaderListScreenSpace.GetNext(pos));
 			if (pShader) {
-				CStringA target = pShader->target;
+				CStringA profile = pShader->profile;
 				CStringA srcdata = pShader->srcdata;
 
-				HRESULT hr = m_pCAP->AddPixelShader(TARGET_SCREEN, srcdata, target);
+				HRESULT hr = m_pCAP->AddPixelShader(TARGET_SCREEN, srcdata, profile);
 				if (FAILED(hr)) {
 					m_pCAP->ClearPixelShaders(TARGET_SCREEN); // ???
 					SendStatusMessage(ResStr(IDS_MAINFRM_73) + pShader->label, 3000);
