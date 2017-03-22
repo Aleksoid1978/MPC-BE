@@ -1377,6 +1377,7 @@ STDMETHODIMP CEVRAllocatorPresenter::GetVideoService(HANDLE hDevice, REFIID riid
 STDMETHODIMP CEVRAllocatorPresenter::SetOffset(const BYTE *pData, size_t size)
 {
 	if (size == sizeof(MediaOffset3D)) {
+		std::unique_lock<std::mutex> lock(m_mutexOffsetQueue);
 		m_mediaOffsetQueue.emplace_back((MediaOffset3D&)(*pData));
 		return S_OK;
 	}

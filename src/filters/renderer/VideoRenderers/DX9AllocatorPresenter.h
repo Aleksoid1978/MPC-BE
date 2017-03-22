@@ -27,6 +27,7 @@
 #include "GPUUsage.h"
 #include "MemUsage.h"
 #include <deque>
+#include <mutex>
 #include <vector>
 #include <IMediaOffset3D.h>
 
@@ -283,6 +284,7 @@ namespace DSObjects
 		int                        m_nCurrentSubtitlesStream;
 		std::vector<int>           m_stereo_subtitle_offset_ids;
 		std::deque<MediaOffset3D>  m_mediaOffsetQueue;
+		std::mutex                 m_mutexOffsetQueue;
 
 	public:
 		CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, bool bIsEVR, CString &_Error);
