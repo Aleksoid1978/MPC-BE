@@ -21,15 +21,13 @@
 #pragma once
 #include <IMediaSideData.h>
 
+// {8F18231E-B24C-48C8-B776-891DDF6F077E}
+DEFINE_GUID(IID_MediaOffset3D, 
+	0x8f18231e, 0xb24c, 0x48c8, 0xb7, 0x76, 0x89, 0x1d, 0xdf, 0x6f, 0x7, 0x7e);
+
 #pragma pack(push, 1)
 struct MediaOffset3D {
 	REFERENCE_TIME timestamp;
 	MediaSideData3DOffset offset;
 };
 #pragma pack(pop)
-
-interface __declspec(uuid("C8241FE9-7C4D-4CA2-A980-B7C9C4E117D8"))
-IMediaOffset3D :
-public IUnknown {
-	STDMETHOD(SetSubtitles3DOffset)(const BYTE *pData, size_t size) PURE;
-};

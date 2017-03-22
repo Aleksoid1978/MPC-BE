@@ -344,8 +344,8 @@ STDMETHODIMP CEVRAllocatorPresenter::NonDelegatingQueryInterface(REFIID riid, vo
 		hr = m_pD3DManager->QueryInterface(__uuidof(IDirect3DDeviceManager9), (void**) ppv);
 	} else if (riid == __uuidof(ID3DFullscreenControl)) {
 		hr = GetInterface((ID3DFullscreenControl*)this, ppv);
-	} else if (riid == __uuidof(IMediaOffset3D)) {
-		hr = GetInterface((IMediaOffset3D*)this, ppv);
+	} else if (riid == __uuidof(IMediaSideData)) {
+		hr = GetInterface((IMediaSideData*)this, ppv);
 	} else {
 		hr = __super::NonDelegatingQueryInterface(riid, ppv);
 	}
@@ -358,9 +358,9 @@ STDMETHODIMP CEVRAllocatorPresenter::OnClockStart(MFTIME hnsSystemTime,  LONGLON
 {
 	TRACE_EVR("EVR: OnClockStart  hnsSystemTime = %I64d,   llClockStartOffset = %I64d\n", hnsSystemTime, llClockStartOffset);
 
-	m_nRenderState			= Started;
-	m_ModeratedTimeLast		= -1;
-	m_ModeratedClockLast	= -1;
+	m_nRenderState       = Started;
+	m_ModeratedTimeLast  = -1;
+	m_ModeratedClockLast = -1;
 
 	if (m_pSS) {
 		// Get the selected subtitles stream
@@ -398,9 +398,9 @@ STDMETHODIMP CEVRAllocatorPresenter::OnClockStop(MFTIME hnsSystemTime)
 {
 	TRACE_EVR("EVR: OnClockStop  hnsSystemTime = %I64d\n", hnsSystemTime);
 
-	m_nRenderState			= Stopped;
-	m_ModeratedClockLast	= -1;
-	m_ModeratedTimeLast		= -1;
+	m_nRenderState       = Stopped;
+	m_ModeratedTimeLast  = -1;
+	m_ModeratedClockLast = -1;
 
 	return S_OK;
 }
@@ -410,10 +410,10 @@ STDMETHODIMP CEVRAllocatorPresenter::OnClockPause(MFTIME hnsSystemTime)
 	TRACE_EVR("EVR: OnClockPause  hnsSystemTime = %I64d\n", hnsSystemTime);
 
 	if (!m_bSignaledStarvation) {
-		m_nRenderState		= Paused;
+		m_nRenderState   = Paused;
 	}
-	m_ModeratedTimeLast		= -1;
-	m_ModeratedClockLast	= -1;
+	m_ModeratedTimeLast  = -1;
+	m_ModeratedClockLast = -1;
 
 	return S_OK;
 }
@@ -422,9 +422,9 @@ STDMETHODIMP CEVRAllocatorPresenter::OnClockRestart(MFTIME hnsSystemTime)
 {
 	TRACE_EVR("EVR: OnClockRestart  hnsSystemTime = %I64d\n", hnsSystemTime);
 
-	m_nRenderState			= Started;
-	m_ModeratedTimeLast		= -1;
-	m_ModeratedClockLast	= -1;
+	m_nRenderState       = Started;
+	m_ModeratedTimeLast  = -1;
+	m_ModeratedClockLast = -1;
 
 	return S_OK;
 }
@@ -470,17 +470,17 @@ STDMETHODIMP CEVRAllocatorPresenter::get_AvgFrameRate(int *piAvgFrameRate)
 }
 STDMETHODIMP CEVRAllocatorPresenter::get_Jitter(int *iJitter)
 {
-	*iJitter = (int)((m_fJitterStdDev/10000.0) + 0.5);
+	*iJitter = (int)((m_fJitterStdDev / 10000.0) + 0.5);
 	return S_OK;
 }
 STDMETHODIMP CEVRAllocatorPresenter::get_AvgSyncOffset(int *piAvg)
 {
-	*piAvg = (int)((m_fSyncOffsetAvr/10000.0) + 0.5);
+	*piAvg = (int)((m_fSyncOffsetAvr / 10000.0) + 0.5);
 	return S_OK;
 }
 STDMETHODIMP CEVRAllocatorPresenter::get_DevSyncOffset(int *piDev)
 {
-	*piDev = (int)((m_fSyncOffsetStdDev/10000.0) + 0.5);
+	*piDev = (int)((m_fSyncOffsetStdDev / 10000.0) + 0.5);
 	return S_OK;
 }
 
@@ -496,7 +496,6 @@ STDMETHODIMP CEVRAllocatorPresenter::GetSlowestRate(MFRATE_DIRECTION eDirection,
 STDMETHODIMP CEVRAllocatorPresenter::GetFastestRate(MFRATE_DIRECTION eDirection, BOOL fThin, float *pflRate)
 {
 	HRESULT hr = S_OK;
-	float		fMaxRate = 0.0f;
 
 	CAutoLock lock(this);
 
@@ -504,7 +503,7 @@ STDMETHODIMP CEVRAllocatorPresenter::GetFastestRate(MFRATE_DIRECTION eDirection,
 	CHECK_HR(CheckShutdown());
 
 	// Get the maximum forward rate.
-	fMaxRate = GetMaxRate(fThin);
+	float fMaxRate = GetMaxRate(fThin);
 
 	// For reverse playback, swap the sign.
 	if (eDirection == MFRATE_REVERSE) {
@@ -524,14 +523,13 @@ STDMETHODIMP CEVRAllocatorPresenter::IsRateSupported(BOOL fThin, float flRate, f
 	CAutoLock lock(this);
 
 	HRESULT hr = S_OK;
-	float   fMaxRate = 0.0f;
-	float   fNearestRate = flRate;   // Default.
 
 	CheckPointer(pflNearestSupportedRate, E_POINTER);
 	CHECK_HR(CheckShutdown());
 
+	float fNearestRate = flRate; // Default.
 	// Find the maximum forward rate.
-	fMaxRate = GetMaxRate(fThin);
+	float fMaxRate = GetMaxRate(fThin);
 
 	if (fabsf(flRate) > fMaxRate) {
 		// The (absolute) requested rate exceeds the maximum rate.
@@ -555,8 +553,8 @@ STDMETHODIMP CEVRAllocatorPresenter::IsRateSupported(BOOL fThin, float flRate, f
 
 float CEVRAllocatorPresenter::GetMaxRate(BOOL bThin)
 {
-	float   fMaxRate		= FLT_MAX;  // Default.
-	UINT32  fpsNumerator	= 0, fpsDenominator = 0;
+	float  fMaxRate     = FLT_MAX;  // Default.
+	UINT32 fpsNumerator = 0, fpsDenominator = 0;
 
 	if (!bThin && (m_pMediaType != NULL)) {
 		// Non-thinned: Use the frame rate and monitor refresh rate.
@@ -591,8 +589,6 @@ void CEVRAllocatorPresenter::CompleteFrameStep(bool bCancel)
 // IMFVideoPresenter
 STDMETHODIMP CEVRAllocatorPresenter::ProcessMessage(MFVP_MESSAGE_TYPE eMessage, ULONG_PTR ulParam)
 {
-	HRESULT hr = S_OK;
-
 	switch (eMessage) {
 		case MFVP_MESSAGE_BEGINSTREAMING :			// The EVR switched from stopped to paused. The presenter should allocate resources
 			TRACE_EVR("EVR: MFVP_MESSAGE_BEGINSTREAMING\n");
@@ -650,23 +646,21 @@ STDMETHODIMP CEVRAllocatorPresenter::ProcessMessage(MFVP_MESSAGE_TYPE eMessage, 
 		case MFVP_MESSAGE_STEP :					// Requests a frame step.
 			TRACE_EVR("EVR: MFVP_MESSAGE_STEP\n");
 			m_nStepCount = (int)ulParam;
-			hr = S_OK;
 			break;
 
 		default:
 			ASSERT(FALSE);
 			break;
 	}
-	return hr;
+
+	return S_OK;
 }
 
 HRESULT CEVRAllocatorPresenter::IsMediaTypeSupported(IMFMediaType* pMixerType)
 {
-	HRESULT hr;
-
 	// We support only video types
 	GUID MajorType;
-	hr = pMixerType->GetMajorType(&MajorType);
+	HRESULT hr = pMixerType->GetMajorType(&MajorType);
 
 	if (SUCCEEDED(hr)) {
 		if (MajorType != MFMediaType_Video) {
@@ -873,19 +867,17 @@ LPCTSTR CEVRAllocatorPresenter::GetMediaTypeFormatDesc(IMFMediaType* pMediaType)
 
 HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 {
-	HRESULT hr = S_OK;
-
-	CComPtr<IMFMediaType> pMixerType;
-	CComPtr<IMFMediaType> pType;
-
 	if (!m_pMixer) {
 		return MF_E_INVALIDREQUEST;
 	}
 
+	CComPtr<IMFMediaType> pMixerType;
+	CComPtr<IMFMediaType> pType;
+
 	CInterfaceArray<IMFMediaType> ValidMixerTypes;
 
 	// Get the mixer's input type
-	hr = m_pMixer->GetInputCurrentType(0, &pType);
+	HRESULT hr = m_pMixer->GetInputCurrentType(0, &pType);
 	if (SUCCEEDED(hr)) {
 		AM_MEDIA_TYPE* pMT;
 		hr = pType->GetRepresentation(FORMAT_VideoInfo2, (LPVOID*)&pMT);
@@ -991,14 +983,14 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 
 bool CEVRAllocatorPresenter::GetImageFromMixer()
 {
-	MFT_OUTPUT_DATA_BUFFER		Buffer;
-	HRESULT						hr = S_OK;
-	DWORD						dwStatus;
-	REFERENCE_TIME				nsSampleTime;
-	LONGLONG					llClockBefore = 0;
-	LONGLONG					llClockAfter  = 0;
-	LONGLONG					llMixerLatency;
-	UINT32						iSurface;
+	MFT_OUTPUT_DATA_BUFFER Buffer;
+	HRESULT                hr = S_OK;
+	DWORD                  dwStatus = 0;
+	REFERENCE_TIME         nsSampleTime = 0;
+	LONGLONG               llClockBefore = 0;
+	LONGLONG               llClockAfter  = 0;
+	LONGLONG               llMixerLatency = 0;
+	UINT32                 iSurface = 0;
 
 	bool bDoneSomething = false;
 
@@ -1131,9 +1123,9 @@ STDMETHODIMP CEVRAllocatorPresenter::GetDeviceID(/* [out] */ __out  IID *pDevice
 }
 
 // IMFGetService
-STDMETHODIMP CEVRAllocatorPresenter::GetService (/* [in] */ __RPC__in REFGUID guidService,
-		/* [in] */ __RPC__in REFIID riid,
-		/* [iid_is][out] */ __RPC__deref_out_opt LPVOID *ppvObject)
+STDMETHODIMP CEVRAllocatorPresenter::GetService(/* [in] */ __RPC__in REFGUID guidService,
+												/* [in] */ __RPC__in REFIID riid,
+												/* [iid_is][out] */ __RPC__deref_out_opt LPVOID *ppvObject)
 {
 	if (guidService == MR_VIDEO_RENDER_SERVICE) {
 		return NonDelegatingQueryInterface (riid, ppvObject);
@@ -1145,12 +1137,12 @@ STDMETHODIMP CEVRAllocatorPresenter::GetService (/* [in] */ __RPC__in REFGUID gu
 }
 
 // IMFAsyncCallback
-STDMETHODIMP CEVRAllocatorPresenter::GetParameters(	/* [out] */ __RPC__out DWORD *pdwFlags, /* [out] */ __RPC__out DWORD *pdwQueue)
+STDMETHODIMP CEVRAllocatorPresenter::GetParameters(/* [out] */ __RPC__out DWORD *pdwFlags, /* [out] */ __RPC__out DWORD *pdwQueue)
 {
 	return E_NOTIMPL;
 }
 
-STDMETHODIMP CEVRAllocatorPresenter::Invoke		 (	/* [in] */ __RPC__in_opt IMFAsyncResult *pAsyncResult)
+STDMETHODIMP CEVRAllocatorPresenter::Invoke(/* [in] */ __RPC__in_opt IMFAsyncResult *pAsyncResult)
 {
 	return E_NOTIMPL;
 }
@@ -1159,12 +1151,12 @@ STDMETHODIMP CEVRAllocatorPresenter::Invoke		 (	/* [in] */ __RPC__in_opt IMFAsyn
 STDMETHODIMP CEVRAllocatorPresenter::GetNativeVideoSize(SIZE *pszVideo, SIZE *pszARVideo)
 {
 	if (pszVideo) {
-		pszVideo->cx	= m_nativeVideoSize.cx;
-		pszVideo->cy	= m_nativeVideoSize.cy;
+		pszVideo->cx = m_nativeVideoSize.cx;
+		pszVideo->cy = m_nativeVideoSize.cy;
 	}
 	if (pszARVideo) {
-		pszARVideo->cx	= m_nativeVideoSize.cx * m_aspectRatio.cx;
-		pszARVideo->cy	= m_nativeVideoSize.cy * m_aspectRatio.cy;
+		pszARVideo->cx = m_nativeVideoSize.cx * m_aspectRatio.cx;
+		pszARVideo->cy = m_nativeVideoSize.cy * m_aspectRatio.cy;
 	}
 	return S_OK;
 }
@@ -1172,17 +1164,15 @@ STDMETHODIMP CEVRAllocatorPresenter::GetNativeVideoSize(SIZE *pszVideo, SIZE *ps
 STDMETHODIMP CEVRAllocatorPresenter::GetIdealVideoSize(SIZE *pszMin, SIZE *pszMax)
 {
 	if (pszMin) {
-		pszMin->cx	= 1;
-		pszMin->cy	= 1;
+		pszMin->cx = 1;
+		pszMin->cy = 1;
 	}
 
 	if (pszMax) {
-		D3DDISPLAYMODE d3ddm;
-
-		ZeroMemory(&d3ddm, sizeof(d3ddm));
+		D3DDISPLAYMODE d3ddm = { 0 };
 		if (SUCCEEDED(m_pD3DEx->GetAdapterDisplayMode(GetAdapter(m_pD3DEx), &d3ddm))) {
-			pszMax->cx	= d3ddm.Width;
-			pszMax->cy	= d3ddm.Height;
+			pszMax->cx = d3ddm.Width;
+			pszMax->cy = d3ddm.Height;
 		}
 	}
 
@@ -1247,7 +1237,7 @@ STDMETHODIMP CEVRAllocatorPresenter::GetVideoWindow(HWND *phwndVideo)
 
 STDMETHODIMP CEVRAllocatorPresenter::RepaintVideo()
 {
-	Paint (true);
+	Paint(true);
 	return S_OK;
 }
 
@@ -1362,27 +1352,33 @@ STDMETHODIMP CEVRAllocatorPresenter::GetVideoService(HANDLE hDevice, REFIID riid
 	HRESULT hr = m_pD3DManager->GetVideoService(hDevice, riid, ppService);
 
 	if (riid == __uuidof(IDirectXVideoDecoderService)) {
-		UINT		nNbDecoder = 5;
-		GUID*		pDecoderGuid;
-		IDirectXVideoDecoderService*		pDXVAVideoDecoder = (IDirectXVideoDecoderService*) *ppService;
+		UINT  nNbDecoder = 5;
+		GUID* pDecoderGuid;
+		IDirectXVideoDecoderService* pDXVAVideoDecoder = (IDirectXVideoDecoderService*)(*ppService);
 		pDXVAVideoDecoder->GetDecoderDeviceGuids (&nNbDecoder, &pDecoderGuid);
 	} else if (riid == __uuidof(IDirectXVideoProcessorService)) {
-		IDirectXVideoProcessorService*		pDXVAProcessor = (IDirectXVideoProcessorService*) *ppService;
+		IDirectXVideoProcessorService* pDXVAProcessor = (IDirectXVideoProcessorService*)(*ppService);
 		UNREFERENCED_PARAMETER(pDXVAProcessor);
 	}
 
 	return hr;
 }
 
-STDMETHODIMP CEVRAllocatorPresenter::SetSubtitles3DOffset(const BYTE *pData, size_t size)
+STDMETHODIMP CEVRAllocatorPresenter::SetSideData(GUID guidType, const BYTE *pData, size_t size)
 {
-	if (size == sizeof(MediaOffset3D)) {
+	CheckPointer(pData, E_POINTER);
+	if (guidType == IID_MediaOffset3D && size == sizeof(MediaOffset3D)) {
 		std::unique_lock<std::mutex> lock(m_mutexOffsetQueue);
 		m_mediaOffsetQueue.emplace_back((MediaOffset3D&)(*pData));
 		return S_OK;
 	}
 
 	return E_FAIL;
+}
+
+STDMETHODIMP CEVRAllocatorPresenter::GetSideData(GUID guidType, const BYTE **pData, size_t *pSize)
+{
+	return E_NOTIMPL;
 }
 
 STDMETHODIMP CEVRAllocatorPresenter::GetNativeVideoSize(LONG* lpWidth, LONG* lpHeight, LONG* lpARWidth, LONG* lpARHeight)

@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <IMediaOffset3D.h>
+#include <MediaOffset3D.h>
 
 #include "./include/mfxvideo.h"
 #include "./include/mfxmvc.h"
@@ -126,5 +126,5 @@ private:
   int                   m_iNewOutputMode = MVC_OUTPUT_Auto;
   bool                  m_bSwapLR = false;
 
-  CComQIPtr<IMediaOffset3D> m_pMediaOffset3D;
+  CComQIPtr<IMediaSideData> m_pMediaSideData;
 };
