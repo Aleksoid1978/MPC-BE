@@ -389,11 +389,6 @@ STDMETHODIMP CEVRAllocatorPresenter::OnClockStart(MFTIME hnsSystemTime,  LONGLON
 		}
 	}
 
-	{
-		std::unique_lock<std::mutex> lock(m_mutexOffsetQueue);
-		m_mediaOffsetQueue.clear();
-	}
-
 	return S_OK;
 }
 
@@ -1857,7 +1852,7 @@ STDMETHODIMP_(bool) CEVRAllocatorPresenter::DisplayChange()
 
 void CEVRAllocatorPresenter::RenderThread()
 {
-	HANDLE		hEvts[]		= { m_hEvtQuit, m_hEvtFlush };
+	HANDLE		hEvts[]		= { m_hEvtQuit, m_hEvtFlush, g_hNewSegmentEvent };
 	bool		bQuit		= false, bForcePaint = false;
 	TIMECAPS	tc;
 	DWORD		dwResolution;
@@ -1910,6 +1905,13 @@ void CEVRAllocatorPresenter::RenderThread()
 				ResetEvent(m_hEvtFlush);
 				bForcePaint = true;
 				TRACE_EVR("EVR: Flush done!\n");
+				break;
+			case WAIT_OBJECT_0 + 2 :
+				{
+					std::unique_lock<std::mutex> lock(m_mutexOffsetQueue);
+					m_mediaOffsetQueue.clear();
+				}
+				TRACE_EVR("EVR: NewSegment\n");
 				break;
 
 			case WAIT_TIMEOUT :
