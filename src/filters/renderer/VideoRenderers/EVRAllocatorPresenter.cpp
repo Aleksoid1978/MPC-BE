@@ -1913,7 +1913,6 @@ void CEVRAllocatorPresenter::RenderThread()
 				}
 				TRACE_EVR("EVR: NewSegment\n");
 				break;
-
 			case WAIT_TIMEOUT :
 				if (m_LastSetOutputRange != -1 && m_LastSetOutputRange != rs.iEVROutputRange) {
 					{

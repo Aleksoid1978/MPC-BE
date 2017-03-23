@@ -52,7 +52,7 @@ IPinC*             g_pPinC             = NULL;
 
 REFERENCE_TIME g_tSegmentStart    = 0;
 FRAME_TYPE     g_nFrameType       = PICT_NONE;
-HANDLE         g_hNewSegmentEvent = NULL;
+HANDLE         g_hNewSegmentEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
 const LPCWSTR DXVAVersion[] = {
 	L"DXVA ",
@@ -191,8 +191,6 @@ void UnhookNewSegmentAndReceive()
 		NewSegmentOrg        = NULL;
 		ReceiveConnectionOrg = NULL;
 		ReceiveOrg           = NULL;
-
-		SAFE_CLOSE_HANDLE(g_hNewSegmentEvent);
 	}
 }
 
@@ -207,7 +205,6 @@ bool HookNewSegmentAndReceive(IPin* pPin)
 	}
 
 	g_tSegmentStart = 0;
-	g_hNewSegmentEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
 	BOOL res;
 	DWORD flOldProtect = 0;
