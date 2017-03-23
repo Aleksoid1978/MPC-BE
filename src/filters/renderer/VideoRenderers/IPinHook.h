@@ -81,7 +81,7 @@ extern HANDLE         g_hNewSegmentEvent;
 void HookDirectXVideoDecoderService(void* pIDirectXVideoDecoderService);
 
 // common function
-CString GetDXVADecoderDescription();
-LPCTSTR GetDXVAVersion();
-int     GetDXVAStatus();
-void    ClearDXVAState();
+const CString GetDXVADecoderDescription();
+const LPCTSTR GetDXVAVersion();
+const BOOL    GetDXVAStatus();
+void          ClearDXVAState();
