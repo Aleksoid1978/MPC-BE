@@ -389,7 +389,10 @@ STDMETHODIMP CEVRAllocatorPresenter::OnClockStart(MFTIME hnsSystemTime,  LONGLON
 		}
 	}
 
-	m_mediaOffsetQueue.clear();
+	{
+		std::unique_lock<std::mutex> lock(m_mutexOffsetQueue);
+		m_mediaOffsetQueue.clear();
+	}
 
 	return S_OK;
 }
@@ -1369,7 +1372,10 @@ STDMETHODIMP CEVRAllocatorPresenter::SetSideData(GUID guidType, const BYTE *pDat
 	CheckPointer(pData, E_POINTER);
 	if (guidType == IID_MediaOffset3D && size == sizeof(MediaOffset3D)) {
 		std::unique_lock<std::mutex> lock(m_mutexOffsetQueue);
-		m_mediaOffsetQueue.emplace_back((MediaOffset3D&)(*pData));
+		MediaOffset3D offset3D;
+		memcpy(&offset3D, pData, size);
+		offset3D.timestamp += g_tSegmentStart;
+		m_mediaOffsetQueue.push_back(offset3D);
 		return S_OK;
 	}
 

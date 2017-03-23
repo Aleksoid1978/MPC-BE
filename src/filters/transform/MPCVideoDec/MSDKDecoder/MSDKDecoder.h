@@ -93,7 +93,7 @@ private:
 
   void AddFrameToGOP(mfxU64 timestamp);
   BOOL RemoveFrameFromGOP(MVCGOP * pGOP, mfxU64 timestamp);
-  void GetOffsetSideData(IMediaSample* pSample, mfxU64 timestamp);
+  void GetOffsetSideData(IMediaSample* pSample, mfxU64 timestamp, const REFERENCE_TIME sampletimestamp);
 
   void SetTypeSpecificFlags(IMediaSample* pSample);
 

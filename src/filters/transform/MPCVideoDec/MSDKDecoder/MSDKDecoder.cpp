@@ -490,7 +490,7 @@ BOOL CMSDKDecoder::RemoveFrameFromGOP(MVCGOP * pGOP, mfxU64 timestamp)
   return FALSE;
 }
 
-void CMSDKDecoder::GetOffsetSideData(IMediaSample* pSample, mfxU64 timestamp)
+void CMSDKDecoder::GetOffsetSideData(IMediaSample* pSample, mfxU64 timestamp, const REFERENCE_TIME sampletimestamp)
 {
   MediaSideData3DOffset offset = { 255 };
 
@@ -530,7 +530,7 @@ void CMSDKDecoder::GetOffsetSideData(IMediaSample* pSample, mfxU64 timestamp)
     if (SUCCEEDED(pSample->QueryInterface(&pMediaSideData))) {
       pMediaSideData->SetSideData(IID_MediaSideData3DOffset, (const BYTE*)&offset, sizeof(offset));
     } else if (m_pMediaSideData) {
-      const MediaOffset3D offset3D = { timestamp, offset };
+      const MediaOffset3D offset3D = { sampletimestamp, offset };
       m_pMediaSideData->SetSideData(IID_MediaOffset3D, (const BYTE*)&offset3D, sizeof(offset3D));
     }
   }
@@ -710,7 +710,7 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
     pOut->SetTime(&rtStart, &rtStop);
     pOut->SetMediaTime(NULL, NULL);
 
-    GetOffsetSideData(pOut, pBaseView->surface.Data.TimeStamp);
+    GetOffsetSideData(pOut, pBaseView->surface.Data.TimeStamp, rtStart);
 
     SetTypeSpecificFlags(pOut);
 
