@@ -73,8 +73,7 @@ interface IMemInputPinC {
 extern bool HookNewSegmentAndReceive(IPin* pPin);
 extern void UnhookNewSegmentAndReceive();
 
-extern REFERENCE_TIME g_tSegmentStart, g_tSampleStart;
-
+extern REFERENCE_TIME g_tSegmentStart;
 extern FRAME_TYPE g_nFrameType;
 
 // DXVA2 hooks
