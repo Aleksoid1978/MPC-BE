@@ -51,7 +51,6 @@ IMemInputPinCVtbl* g_pMemInputPinCVtbl = NULL;
 IPinC*             g_pPinC             = NULL;
 
 REFERENCE_TIME g_tSegmentStart = 0;
-REFERENCE_TIME g_tSampleStart  = 0;
 
 FRAME_TYPE g_nFrameType = PICT_NONE;
 
@@ -133,11 +132,6 @@ static HRESULT (STDMETHODCALLTYPE* ReceiveOrg)(IMemInputPinC * This, IMediaSampl
 static HRESULT STDMETHODCALLTYPE ReceiveMineI(IMemInputPinC * This, IMediaSample *pSample)
 {
 	if (pSample) {
-		REFERENCE_TIME rtStart, rtStop;
-		if (SUCCEEDED(pSample->GetTime(&rtStart, &rtStop))) {
-			g_tSampleStart = rtStart;
-		}
-
 		// Get frame type
 		if (CComQIPtr<IMediaSample2> pMS2 = pSample) {
 			AM_SAMPLE2_PROPERTIES props;
@@ -209,7 +203,7 @@ bool HookNewSegmentAndReceive(IPin* pPin)
 		return false;
 	}
 
-	g_tSegmentStart = g_tSampleStart = 0;
+	g_tSegmentStart = 0;
 
 	BOOL res;
 	DWORD flOldProtect = 0;
