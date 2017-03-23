@@ -558,7 +558,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 	LRESULT lr				= CDRF_DODEFAULT;
 
 	CAppSettings& s	= AfxGetAppSettings();
-	bool bGPU		= (m_pMainFrame->GetMediaState() != -1) && (GetDXVAStatus() != 0);
+	bool bGPU		= (m_pMainFrame->GetMediaState() != -1) && (GetDXVAStatus() == TRUE);
 
 	int R, G, B, R2, G2, B2;
 

@@ -44,7 +44,7 @@
 #endif
 
 GUID g_guidDXVADecoder = GUID_NULL;
-int  g_nDXVAVersion    = 0;
+BOOL g_nDXVAVersion    = FALSE;
 
 IPinCVtbl*         g_pPinCVtbl         = NULL;
 IMemInputPinCVtbl* g_pMemInputPinCVtbl = NULL;
@@ -54,23 +54,22 @@ REFERENCE_TIME g_tSegmentStart    = 0;
 FRAME_TYPE     g_nFrameType       = PICT_NONE;
 HANDLE         g_hNewSegmentEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
-const LPCWSTR DXVAVersion[] = {
+static const LPCWSTR DXVAVersion[] = {
 	L"DXVA ",
-	L"DXVA1",
 	L"DXVA2"
 };
 
-CString GetDXVADecoderDescription()
+const CString GetDXVADecoderDescription()
 {
 	return GetDXVAMode(&g_guidDXVADecoder);
 }
 
-LPCTSTR GetDXVAVersion()
+const LPCTSTR GetDXVAVersion()
 {
 	return DXVAVersion[g_nDXVAVersion];
 }
 
-int GetDXVAStatus()
+const BOOL GetDXVAStatus()
 {
 	return g_nDXVAVersion;
 }
@@ -78,7 +77,7 @@ int GetDXVAStatus()
 void ClearDXVAState()
 {
 	g_guidDXVADecoder = GUID_NULL;
-	g_nDXVAVersion    = 0;
+	g_nDXVAVersion    = FALSE;
 }
 
 // DirectShow hooks
@@ -929,7 +928,7 @@ static HRESULT STDMETHODCALLTYPE CreateVideoDecoderMine(IDirectXVideoDecoderServ
 	//	DebugBreak();
 	//	((DXVA2_VideoDesc*)pVideoDesc)->Format = (D3DFORMAT)0x3231564E;
 	g_guidDXVADecoder = Guid;
-	g_nDXVAVersion    = 2;
+	g_nDXVAVersion    = TRUE;
 
 #ifdef _DEBUG
 	LOG(L"\n\n");
@@ -941,7 +940,7 @@ static HRESULT STDMETHODCALLTYPE CreateVideoDecoderMine(IDirectXVideoDecoderServ
 
 	if (FAILED(hr)) {
 		g_guidDXVADecoder = GUID_NULL;
-		g_nDXVAVersion    = 0;
+		g_nDXVAVersion    = FALSE;
 	}
 #ifdef _DEBUG
 	else {
@@ -1026,7 +1025,7 @@ void HookDirectXVideoDecoderService(void* pIDirectXVideoDecoderService)
 		GetDecoderConfigurationsOrg         = NULL;
 #endif
 		g_guidDXVADecoder                   = GUID_NULL;
-		g_nDXVAVersion                      = 0;
+		g_nDXVAVersion                      = FALSE;
 	}
 
 #if defined(_DEBUG) && DXVA_LOGFILE_A
