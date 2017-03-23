@@ -74,7 +74,8 @@ extern bool HookNewSegmentAndReceive(IPin* pPin);
 extern void UnhookNewSegmentAndReceive();
 
 extern REFERENCE_TIME g_tSegmentStart;
-extern FRAME_TYPE g_nFrameType;
+extern FRAME_TYPE     g_nFrameType;
+extern HANDLE         g_hNewSegmentEvent;
 
 // DXVA2 hooks
 void HookDirectXVideoDecoderService(void* pIDirectXVideoDecoderService);

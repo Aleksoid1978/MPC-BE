@@ -50,9 +50,9 @@ IPinCVtbl*         g_pPinCVtbl         = NULL;
 IMemInputPinCVtbl* g_pMemInputPinCVtbl = NULL;
 IPinC*             g_pPinC             = NULL;
 
-REFERENCE_TIME g_tSegmentStart = 0;
-
-FRAME_TYPE g_nFrameType = PICT_NONE;
+REFERENCE_TIME g_tSegmentStart    = 0;
+FRAME_TYPE     g_nFrameType       = PICT_NONE;
+HANDLE         g_hNewSegmentEvent = NULL;
 
 const LPCWSTR DXVAVersion[] = {
 	L"DXVA ",
@@ -88,6 +88,7 @@ static HRESULT STDMETHODCALLTYPE NewSegmentMine(IPinC * This, /* [in] */ REFEREN
 	if (g_pPinC == This) {
 		g_tSegmentStart = tStart;
 		g_nFrameType    = PICT_NONE;
+		SetEvent(g_hNewSegmentEvent);
 	}
 
 	return NewSegmentOrg(This, tStart, tStop, dRate);
@@ -190,6 +191,8 @@ void UnhookNewSegmentAndReceive()
 		NewSegmentOrg        = NULL;
 		ReceiveConnectionOrg = NULL;
 		ReceiveOrg           = NULL;
+
+		SAFE_CLOSE_HANDLE(g_hNewSegmentEvent);
 	}
 }
 
@@ -204,6 +207,7 @@ bool HookNewSegmentAndReceive(IPin* pPin)
 	}
 
 	g_tSegmentStart = 0;
+	g_hNewSegmentEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
 	BOOL res;
 	DWORD flOldProtect = 0;

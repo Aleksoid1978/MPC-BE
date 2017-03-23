@@ -1358,7 +1358,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 				offset3D = *it;
 				selected = it;
 			}
-			m_mediaOffsetQueue.erase(m_mediaOffsetQueue.begin(), selected);
+			m_mediaOffsetQueue.erase(m_mediaOffsetQueue.begin(), ++selected);
 		}
 	}
 
