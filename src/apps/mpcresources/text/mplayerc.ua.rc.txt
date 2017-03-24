@@ -560,17 +560,17 @@ BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 END
 
 BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 13
-6		"Save"
-7		"New"
+6		"Зберегти"
+7		"Новий"
 8		"Видалити"
-12		"Apply"
+12		"Застосувати"
 END
 
 BEGIN DIALOGEX IDD_SHADERNEW_DLG LINES 10
-3		"Create new shader"
-6		"Name:"
-8		"OK"
-9		"Cancel"
+3		"Створити новий шейдер"
+6		"Назва:"
+8		"Гаразд"
+9		"Скасувати"
 END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
@@ -1839,7 +1839,7 @@ STRING IDS_SUBTITLES_STEREO_TOPANDBOTTOM		"Розміщені один над і
 STRING IDS_SUBTITLES_STYLES		"&Стилі..."
 STRING IDS_SUBTITLE_STREAM		"Субтитри: %s"
 STRING IDS_SUBTITLE_STREAM_OFF		"Субтитри: вимкнено"
-STRING IDS_SUB_COPYTOCLIPBOARD		"Copy the displayed subtitles to the clipboard"
+STRING IDS_SUB_COPYTOCLIPBOARD		"Копіювати субтитри, що відображаються, до буферу обміну"
 STRING IDS_SUB_NOT_USE		"не показувати субтитри"
 STRING IDS_SUB_POS_DOWN		"Зміщення позиції субтитрів донизу"
 STRING IDS_SUB_POS_LEFT		"Зміщення позиції субтитрів ліворуч"
