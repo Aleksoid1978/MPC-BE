@@ -285,7 +285,7 @@ void CFlyBar::UpdateWnd(CPoint point)
 	CPoint p;
 	p.x = max(0, min(point.x, mi.rcMonitor.right - r_tooltip.Width()));
 	int iCursorHeight = 24;
-	m_tooltip.SetWindowPos(NULL, p.x, point.y + iCursorHeight, r_tooltip.Width(), iCursorHeight, SWP_NOACTIVATE | SWP_NOZORDER);
+	m_tooltip.SetWindowPos(NULL, p.x, point.y + iCursorHeight, r_tooltip.Width(), m_pMainFrame->ScaleY(iCursorHeight), SWP_NOACTIVATE | SWP_NOZORDER);
 
 	Invalidate();
 }
