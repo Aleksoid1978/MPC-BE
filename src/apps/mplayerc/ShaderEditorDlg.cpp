@@ -393,6 +393,9 @@ void CShaderEditorDlg::OnBnClickedButtonDelete()
 
 			m_edSrcdata.SetWindowText(L"");
 			m_edOutput.SetWindowText(L"");
+
+			AfxGetMainFrame()->TidyShaderCashe();
+			AfxGetMainFrame()->SetShaders(); // reset shaders
 		}
 	}
 }
@@ -422,10 +425,10 @@ void CShaderEditorDlg::OnBnClickedButtonApply()
 				errmsg += L"\n";
 				errmsg += disasm;
 
-				//if (AfxGetMainFrame()->m_pCAP) {
-				//	// add the shader to the existing ones. it will be removed from the list after restarting playback or after changing the main shader list
-				//	hr = AfxGetMainFrame()->m_pCAP->AddPixelShader(TARGET_FRAME, srcdata, profile);
-				//}
+				if (AfxGetMainFrame()->m_pCAP) {
+					AfxGetMainFrame()->SetShaders(); // reset shaders
+					hr = AfxGetMainFrame()->m_pCAP->AddPixelShader(TARGET_FRAME, srcdata, profile); // and add shader to the end of list
+				}
 			}
 
 			errmsg.Replace(L"\n", L"\r\n");
