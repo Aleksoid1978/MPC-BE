@@ -500,9 +500,6 @@
     <ProjectReference Include="..\..\ExtLib\Bento4\Bento4.vcxproj">
       <Project>{40177920-a66c-4647-b119-332a10224c83}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\ExtLib\jsoncpp\jsoncpp.vcxproj">
-      <Project>{1f4798a2-ace4-456e-93b3-d3f3b41b5b87}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\ExtLib\openjpeg\openjpeg.vcxproj">
       <Project>{1557aa86-976c-4315-8fe8-a138e33f6580}</Project>
     </ProjectReference>

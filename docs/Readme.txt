@@ -42,7 +42,6 @@ CLineNumberEdit     -                          -
 CSizingControlBar   GPLv2                      http://datamekanix.com/sizecbar/
 Detours             MSR-SSLA                   http://research.microsoft.com/en-us/projects/detours/
 FFmpeg              GPLv3                      http://ffmpeg.org/
-jsoncpp             MIT License                https://github.com/open-source-parsers/jsoncpp/
 libflac             GPLv2 / BSD License        https://github.com/xiph/flac/
 libpng              zlib / libpng License      https://github.com/glennrp/libpng/
 libopenjpeg         BSD License                https://github.com/uclouvain/openjpeg/
@@ -51,6 +50,7 @@ Little CMS          MIT License                http://littlecms.com/
 Logitech SDK        -                          -
 MediaInfo           BSD License                http://sourceforge.net/projects/mediainfo/
 MusePack            GPL                        http://musepack.net/
+RapidJSON           MIT License                https://github.com/miloyip/rapidjson
 ResizableLib        Artistic License           http://sourceforge.net/projects/resizablelib/
 soxr                LGPL                       http://soxr.sourceforge.net
 TreePropSheet       -                          -

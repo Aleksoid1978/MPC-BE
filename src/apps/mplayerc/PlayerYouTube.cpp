@@ -21,9 +21,11 @@
 #include "stdafx.h"
 #include <afxinet.h>
 #include <regex>
-#include <jsoncpp/include/json/json.h>
 #include "../../DSUtil/text.h"
 #include "PlayerYouTube.h"
+
+#define RAPIDJSON_ASSERT(x) ASSERT(x)
+#include <rapidjson/include/rapidjson/document.h>
 
 #define YOUTUBE_PL_URL              L"youtube.com/playlist?"
 #define YOUTUBE_URL                 L"youtube.com/watch?"
@@ -245,34 +247,22 @@ namespace Youtube
 				InternetCloseHandle(hUrl);
 
 				if (dataSize) {
-					Json::Reader reader;
-					Json::Value root;
-					if (reader.parse(data, root)) {
-						Json::Value snippet = root["items"][0]["snippet"];
-						if (!snippet["title"].empty()
-								&& snippet["title"].isString()) {
-							const CStringA sTitle = snippet["title"].asCString();
-							y_fields.title = FixHtmlSymbols(UTF8To16(sTitle));
+					rapidjson::Document d;
+					if (!d.Parse(data).HasParseError()) {
+						const rapidjson::Value& snippet = d["items"][0]["snippet"];
+						if (snippet["title"].IsString()) {
+							y_fields.title = FixHtmlSymbols(UTF8To16(snippet["title"].GetString()));
 						}
-
-						if (!snippet["channelTitle"].empty()
-								&& snippet["channelTitle"].isString()) {
-							const CStringA sAuthor = snippet["channelTitle"].asCString();
-							y_fields.author = UTF8To16(sAuthor);
+						if (snippet["channelTitle"].IsString()) {
+							y_fields.author = UTF8To16(snippet["channelTitle"].GetString());
 						}
-
-						if (!snippet["description"].empty()
-								&& snippet["description"].isString()) {
-							const CStringA sContent = snippet["description"].asCString();
-							y_fields.content = FixHtmlSymbols(UTF8To16(sContent));
+						if (snippet["description"].IsString()) {
+							y_fields.content = UTF8To16(snippet["description"].GetString());
 						}
-
-						if (!snippet["publishedAt"].empty()
-								&& snippet["publishedAt"].isString()) {
-							const CStringA sDate = snippet["publishedAt"].asCString();
+						if (snippet["publishedAt"].IsString()) {
 							WORD y, m, d;
 							WORD hh, mm, ss;
-							if (sscanf_s(sDate, "%04hu-%02hu-%02huT%02hu:%02hu:%02hu", &y, &m, &d, &hh, &mm, &ss) == 6) {
+							if (sscanf_s(snippet["publishedAt"].GetString(), "%04hu-%02hu-%02huT%02hu:%02hu:%02hu", &y, &m, &d, &hh, &mm, &ss) == 6) {
 								y_fields.dtime.wYear   = y;
 								y_fields.dtime.wMonth  = m;
 								y_fields.dtime.wDay    = d;
@@ -282,13 +272,11 @@ namespace Youtube
 							}
 						}
 
-						Json::Value contentDetails = root["items"][0]["contentDetails"];
-						if (!contentDetails["duration"].empty()
-								&& contentDetails["duration"].isString()) {
-							CStringA sDuration = contentDetails["duration"].asCString();
+						const rapidjson::Value& duration = d["items"][0]["contentDetails"]["duration"];
+						if (duration.IsString()) {
 							const std::regex regex("PT(\\d+H)?(\\d{1,2}M)?(\\d{1,2}S)?", std::regex_constants::icase);
 							std::cmatch match;
-							if (std::regex_search(sDuration.GetBuffer(), match, regex) && match.size() == 4) {
+							if (std::regex_search(duration.GetString(), match, regex) && match.size() == 4) {
 								int h = 0;
 								int m = 0;
 								int s = 0;
