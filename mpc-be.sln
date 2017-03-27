@@ -163,8 +163,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AudioSplitter", "src\filter
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RawVideoSplitter", "src\filters\parser\RawVideoSplitter\RawVideoSplitter.vcxproj", "{E73D2FF6-5738-4E17-B895-7D206FBA9DE2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jsoncpp", "src\ExtLib\jsoncpp\jsoncpp.vcxproj", "{1F4798A2-ACE4-456E-93B3-D3F3B41B5B87}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Include", "Include", "{EA3670A9-FD3E-413C-99DD-DF79E42CE0AC}"
 	ProjectSection(SolutionItems) = preProject
 		include\basestruct.h = include\basestruct.h
@@ -177,8 +175,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Include", "Include", "{EA36
 		include\IFilterVersion.h = include\IFilterVersion.h
 		include\IKeyFrameInfo.h = include\IKeyFrameInfo.h
 		include\IMediaSideData.h = include\IMediaSideData.h
-		include\MediaOffset3D.h = include\MediaOffset3D.h
 		include\ITrackInfo.h = include\ITrackInfo.h
+		include\MediaOffset3D.h = include\MediaOffset3D.h
 		include\moreuuids.h = include\moreuuids.h
 		include\mpc_defines.h = include\mpc_defines.h
 		include\Version.h = include\Version.h
@@ -1200,18 +1198,6 @@ Global
 		{E73D2FF6-5738-4E17-B895-7D206FBA9DE2}.Release|Win32.Build.0 = Release|Win32
 		{E73D2FF6-5738-4E17-B895-7D206FBA9DE2}.Release|x64.ActiveCfg = Release|x64
 		{E73D2FF6-5738-4E17-B895-7D206FBA9DE2}.Release|x64.Build.0 = Release|x64
-		{1F4798A2-ACE4-456E-93B3-D3F3B41B5B87}.Debug Filter|Win32.ActiveCfg = Debug|Win32
-		{1F4798A2-ACE4-456E-93B3-D3F3B41B5B87}.Debug Filter|x64.ActiveCfg = Debug|x64
-		{1F4798A2-ACE4-456E-93B3-D3F3B41B5B87}.Debug|Win32.ActiveCfg = Debug|Win32
-		{1F4798A2-ACE4-456E-93B3-D3F3B41B5B87}.Debug|Win32.Build.0 = Debug|Win32
-		{1F4798A2-ACE4-456E-93B3-D3F3B41B5B87}.Debug|x64.ActiveCfg = Debug|x64
-		{1F4798A2-ACE4-456E-93B3-D3F3B41B5B87}.Debug|x64.Build.0 = Debug|x64
-		{1F4798A2-ACE4-456E-93B3-D3F3B41B5B87}.Release Filter|Win32.ActiveCfg = Release|Win32
-		{1F4798A2-ACE4-456E-93B3-D3F3B41B5B87}.Release Filter|x64.ActiveCfg = Release|x64
-		{1F4798A2-ACE4-456E-93B3-D3F3B41B5B87}.Release|Win32.ActiveCfg = Release|Win32
-		{1F4798A2-ACE4-456E-93B3-D3F3B41B5B87}.Release|Win32.Build.0 = Release|Win32
-		{1F4798A2-ACE4-456E-93B3-D3F3B41B5B87}.Release|x64.ActiveCfg = Release|x64
-		{1F4798A2-ACE4-456E-93B3-D3F3B41B5B87}.Release|x64.Build.0 = Release|x64
 		{2BC02329-D46C-4EC5-B5C7-30E21CD41F78}.Debug Filter|Win32.ActiveCfg = Debug Filter|Win32
 		{2BC02329-D46C-4EC5-B5C7-30E21CD41F78}.Debug Filter|Win32.Build.0 = Debug Filter|Win32
 		{2BC02329-D46C-4EC5-B5C7-30E21CD41F78}.Debug Filter|x64.ActiveCfg = Debug Filter|x64
@@ -1335,7 +1321,6 @@ Global
 		{1B6DE4C0-9D27-4150-A327-E7F3B492B5F0} = {D9A0529B-9EC4-4D30-9E05-A5D533739D95}
 		{0A836E1E-C383-4F70-8129-4A0C22E356AA} = {D626CC4F-BFB1-4030-8DD8-1A3A1D41248E}
 		{E73D2FF6-5738-4E17-B895-7D206FBA9DE2} = {D626CC4F-BFB1-4030-8DD8-1A3A1D41248E}
-		{1F4798A2-ACE4-456E-93B3-D3F3B41B5B87} = {D9A0529B-9EC4-4D30-9E05-A5D533739D95}
 		{2BC02329-D46C-4EC5-B5C7-30E21CD41F78} = {D626CC4F-BFB1-4030-8DD8-1A3A1D41248E}
 		{154D3FA8-9BB8-4EC1-8D56-DA14715ACD56} = {A21F07E6-A891-479C-98EA-EDB58CE4EFAB}
 		{88240767-4B7A-49E9-9E83-2F9E283D4F26} = {D9A0529B-9EC4-4D30-9E05-A5D533739D95}
