@@ -25,7 +25,7 @@
 void vc1_getcurframe(struct AVCodecContext* avctx, AVFrame** frame)
 {
     const VC1Context *v = avctx->priv_data;
-    *frame              = v->s.current_picture_ptr->f;
+    *frame              = v->s.current_picture_ptr ? v->s.current_picture_ptr->f : NULL;
 }
 
 static void dxva_fill_picture_parameters(AVCodecContext *avctx,
