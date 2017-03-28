@@ -90,27 +90,26 @@ void CPPageFileMediaInfo::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_MIEDIT, m_mediainfo);
 }
 
+BOOL CPPageFileMediaInfo::PreTranslateMessage(MSG* pMsg)
+{
+	if (pMsg->message == WM_KEYDOWN && pMsg->hwnd == m_mediainfo) {
+		if ((LOWORD(pMsg->wParam) == 'A' || LOWORD(pMsg->wParam) == 'a')
+				&& GetKeyState(VK_CONTROL) < 0) {
+			m_mediainfo.SetSel(0, -1, TRUE);
+			return TRUE;
+		}
+	}
+
+	return __super::PreTranslateMessage(pMsg);
+}
+
+
 BEGIN_MESSAGE_MAP(CPPageFileMediaInfo, CPropertyPage)
 	ON_WM_SIZE()
 	ON_WM_SHOWWINDOW()
 END_MESSAGE_MAP()
 
 // CPPageFileMediaInfo message handlers
-
-static WNDPROC OldControlProc;
-
-static LRESULT CALLBACK ControlProc(HWND control, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	if (message == WM_KEYDOWN) {
-		if ((LOWORD(wParam)== 'A' || LOWORD(wParam) == 'a') && GetKeyState(VK_CONTROL) < 0) {
-			CEdit *pEdit = (CEdit*)CWnd::FromHandle(control);
-			pEdit->SetSel(0, pEdit->GetWindowTextLength(), TRUE);
-			return 0;
-		}
-	}
-
-	return CallWindowProc(OldControlProc, control, message, wParam, lParam);
-}
 
 BOOL CPPageFileMediaInfo::OnInitDialog()
 {
@@ -158,8 +157,6 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 	m_mediainfo.SetWindowText(MI_Text);
 
 	m_mediainfo.EndPaint(&ps);
-
-	OldControlProc = (WNDPROC)SetWindowLongPtr(m_mediainfo.m_hWnd, GWLP_WNDPROC, (LONG_PTR)ControlProc);
 
 	return TRUE;
 }
