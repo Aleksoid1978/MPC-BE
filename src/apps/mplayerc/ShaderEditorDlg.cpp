@@ -67,13 +67,20 @@ BOOL CShaderEdit::PreTranslateMessage(MSG* pMsg)
 
 			SetSel(nStartChar, nEndChar);
 			ReplaceSel(str, TRUE);
-		} else if (pMsg->wParam == VK_ESCAPE) {
+		}
+		else if (pMsg->wParam == VK_ESCAPE) {
 			m_acdlg.ShowWindow(SW_HIDE);
 			return GetParent()->PreTranslateMessage(pMsg);
-		} else {
+		}
+		else {
 			m_acdlg.m_list.SendMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
 		}
 
+		return TRUE;
+	}
+
+	if (pMsg->message == WM_KEYDOWN && (pMsg->wParam == 'A' || pMsg->wParam == 'a') && GetKeyState(VK_CONTROL) < 0) {
+		SetSel(0, -1, TRUE);
 		return TRUE;
 	}
 
