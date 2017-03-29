@@ -801,7 +801,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 
 					return TRUE;
 				}
-			} else if (pMsg->wParam == 55 && GetKeyState(VK_CONTROL) < 0) {
+			} else if (pMsg->wParam == '7' && GetKeyState(VK_CONTROL) < 0) {
 				GetParentFrame()->ShowControlBar(this, FALSE, TRUE);
 
 				return TRUE;

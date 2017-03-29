@@ -559,11 +559,10 @@ BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 17		"Скасувати"
 END
 
-BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 13
+BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 12
 6		"Зберегти"
-7		"Новий"
-8		"Видалити"
-12		"Застосувати"
+7		"MENU"
+11		"Застосувати"
 END
 
 BEGIN DIALOGEX IDD_SHADERNEW_DLG LINES 10
@@ -1770,7 +1769,10 @@ STRING IDS_SHADERS_SELECT		"&Вибрати шейдери..."
 STRING IDS_SHADERS_SELECT_SCREENSPACE		"Вибрати після-масштабовні шейдери..."
 STRING IDS_SHADERS_TOGGLE		"Ввімкнути перед-масштабовні піксельні шейдери"
 STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Ввімкнути після-масштабовні піксельні шейдери"
+STRING IDS_SHADER_DELETE		"Delete"
 STRING IDS_SHADER_EDITOR		"Редактор шейдерів"
+STRING IDS_SHADER_NEW		"New..."
+STRING IDS_SHADER_SAVE		"Save"
 STRING IDS_SIDE_LEFT		"Бічний лівий"
 STRING IDS_SIDE_RIGHT		"Бічний правий"
 STRING IDS_SIZE_UNIT_G		"ГБ"

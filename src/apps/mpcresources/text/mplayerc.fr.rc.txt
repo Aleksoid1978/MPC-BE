@@ -559,11 +559,10 @@ BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 17		"Annuler"
 END
 
-BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 13
+BEGIN DIALOGEX IDD_SHADEREDITOR_DLG LINES 12
 6		"Save"
-7		"New"
-8		"Supprimer"
-12		"Apply"
+7		"MENU"
+11		"Apply"
 END
 
 BEGIN DIALOGEX IDD_SHADERNEW_DLG LINES 10
@@ -1770,7 +1769,10 @@ STRING IDS_SHADERS_SELECT		"&Sélectionner les pixels shaders..."
 STRING IDS_SHADERS_SELECT_SCREENSPACE		"Sélectionner les pixels shaders post-redimensionnement..."
 STRING IDS_SHADERS_TOGGLE		"Activer les pixels shaders pré-redimensionnement"
 STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Activer les pixels shaders post-redimensionnement"
+STRING IDS_SHADER_DELETE		"Delete"
 STRING IDS_SHADER_EDITOR		"Shader Editor"
+STRING IDS_SHADER_NEW		"New..."
+STRING IDS_SHADER_SAVE		"Save"
 STRING IDS_SIDE_LEFT		"Coté Gauche"
 STRING IDS_SIDE_RIGHT		"Coté Droite"
 STRING IDS_SIZE_UNIT_G		"Go"
