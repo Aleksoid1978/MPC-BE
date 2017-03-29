@@ -224,7 +224,6 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 	AddAnchor(IDC_EDIT2, BOTTOM_LEFT, BOTTOM_RIGHT);
 	AddAnchor(IDC_BUTTON1, TOP_RIGHT);
 	AddAnchor(IDC_BUTTON2, TOP_RIGHT);
-	AddAnchor(IDC_BUTTON3, TOP_RIGHT);
 	AddAnchor(IDC_BUTTON4, BOTTOM_RIGHT);
 
 	m_edSrcdata.SetTabStops(16);
@@ -282,12 +281,71 @@ bool CShaderEditorDlg::HitTestSplitter(CPoint p)
 	return !!r.PtInRect(p);
 }
 
+
+void CShaderEditorDlg::NewShader()
+{
+	CShaderNewDlg dlg;
+	if (IDOK != dlg.DoModal()) {
+		return;
+	}
+
+
+	// if shader already exists, then select it
+	int i = m_cbLabels.SelectString(0, dlg.m_Name);
+	if (i > 0) {
+		return;
+	}
+
+	CStringA srcdata;
+	if (!LoadResource(IDF_SHADER_EMPTY, srcdata, L"FILE")) {
+		return;
+	}
+
+	CString path;
+	if (AfxGetMyApp()->GetAppSavePath(path)) {
+		path.AppendFormat(L"Shaders\\%s.hlsl", dlg.m_Name);
+
+		CStdioFile file;
+		if (file.Open(path, CFile::modeCreate|CFile::modeWrite|CFile::shareExclusive|CFile::typeBinary)) {
+			file.Write(srcdata.GetBuffer(), srcdata.GetLength());
+			file.Close();
+
+			m_cbLabels.AddString(dlg.m_Name);
+			m_cbLabels.SelectString(0, dlg.m_Name);
+			OnCbnSelchangeCombo1();
+		}
+	}
+}
+
+void CShaderEditorDlg::DeleteShader()
+{
+	int i = m_cbLabels.GetCurSel();
+	if (i >= 0) {
+		if (IDYES != AfxMessageBox(ResStr(IDS_SHADEREDITORDLG_0), MB_YESNO)) {
+			return;
+		}
+
+		CString label;
+		m_cbLabels.GetLBText(i, label);
+
+		if (AfxGetMainFrame()->DeleteShaderFile(label)) {
+			m_cbLabels.DeleteString(i);
+			m_cbLabels.SetCurSel(-1);
+
+			m_edSrcdata.SetWindowText(L"");
+			m_edOutput.SetWindowText(L"");
+
+			AfxGetMainFrame()->TidyShaderCashe();
+			AfxGetMainFrame()->SetShaders(); // reset shaders
+		}
+	}
+}
+
 BEGIN_MESSAGE_MAP(CShaderEditorDlg, CResizableDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO1, OnCbnSelchangeCombo1)
-	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedButtonSave)
-	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedButtonNew)
-	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedButtonDelete)
-	ON_BN_CLICKED(IDC_BUTTON4, OnBnClickedButtonApply)
+	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedSave)
+	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedMenu)
+	ON_BN_CLICKED(IDC_BUTTON4, OnBnClickedApply)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
 	ON_WM_MOUSEMOVE()
@@ -332,7 +390,7 @@ void CShaderEditorDlg::OnCbnSelchangeCombo1()
 	}
 }
 
-void CShaderEditorDlg::OnBnClickedButtonSave()
+void CShaderEditorDlg::OnBnClickedSave()
 {
 	int i = m_cbLabels.GetCurSel();
 	if (i >= 0) {
@@ -348,66 +406,41 @@ void CShaderEditorDlg::OnBnClickedButtonSave()
 	}
 }
 
-void CShaderEditorDlg::OnBnClickedButtonNew()
-{
-	CShaderNewDlg dlg;
-	if (IDOK != dlg.DoModal()) {
-		return;
-	}
-
-
-	// if shader already exists, then select it
-	int i = m_cbLabels.SelectString(0, dlg.m_Name);
-	if (i > 0) {
-		return;
-	}
-
-	CStringA srcdata;
-	if (!LoadResource(IDF_SHADER_EMPTY, srcdata, L"FILE")) {
-		return;
-	}
-
-	CString path;
-	if (AfxGetMyApp()->GetAppSavePath(path)) {
-		path.AppendFormat(L"Shaders\\%s.hlsl", dlg.m_Name);
-
-		CStdioFile file;
-		if (file.Open(path, CFile::modeCreate|CFile::modeWrite|CFile::shareExclusive|CFile::typeBinary)) {
-			file.Write(srcdata.GetBuffer(), srcdata.GetLength());
-			file.Close();
-
-			m_cbLabels.AddString(dlg.m_Name);
-			m_cbLabels.SelectString(0, dlg.m_Name);
-			OnCbnSelchangeCombo1();
-		}
-	}
-}
-
-void CShaderEditorDlg::OnBnClickedButtonDelete()
+void CShaderEditorDlg::OnBnClickedMenu()
 {
 	int i = m_cbLabels.GetCurSel();
-	if (i >= 0) {
-		if (IDYES != AfxMessageBox(ResStr(IDS_SHADEREDITORDLG_0), MB_YESNO)) {
-			return;
-		}
 
-		CString label;
-		m_cbLabels.GetLBText(i, label);
+	enum {
+		M_SAVE = 1,
+		M_NEW,
+		M_DELETE
+	};
 
-		if (AfxGetMainFrame()->DeleteShaderFile(label)) {
-			m_cbLabels.DeleteString(i);
-			m_cbLabels.SetCurSel(-1);
+	CMenu menu;
+	menu.CreatePopupMenu();
+	menu.AppendMenuW(MF_STRING | (i >= 0 ? MF_ENABLED : MF_GRAYED), M_SAVE, ResStr(IDS_SHADER_SAVE));
+	menu.AppendMenuW(MF_SEPARATOR);
+	menu.AppendMenuW(MF_STRING | MF_ENABLED, M_NEW, ResStr(IDS_SHADER_NEW));
+	menu.AppendMenuW(MF_STRING | (i >= 0 ? MF_ENABLED : MF_GRAYED), M_DELETE, ResStr(IDS_SHADER_DELETE));
 
-			m_edSrcdata.SetWindowText(L"");
-			m_edOutput.SetWindowText(L"");
+	CRect wrect;
+	GetDlgItem(IDC_BUTTON1)->GetWindowRect(&wrect);
 
-			AfxGetMainFrame()->TidyShaderCashe();
-			AfxGetMainFrame()->SetShaders(); // reset shaders
-		}
+	int id = menu.TrackPopupMenu(TPM_LEFTBUTTON|TPM_RETURNCMD, wrect.left, wrect.bottom, this);
+	switch (id) {
+	case M_SAVE:
+		OnBnClickedSave();
+		break;
+	case M_NEW:
+		NewShader();
+		break;
+	case M_DELETE:
+		DeleteShader();
+		break;
 	}
 }
 
-void CShaderEditorDlg::OnBnClickedButtonApply()
+void CShaderEditorDlg::OnBnClickedApply()
 {
 	int i = m_cbLabels.GetCurSel();
 	if (i >= 0) {

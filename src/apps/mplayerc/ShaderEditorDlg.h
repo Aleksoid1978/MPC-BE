@@ -54,10 +54,13 @@ class CShaderEditorDlg : public CResizableDialog
 {
 private:
 	bool m_fSplitterGrabbed;
-	bool HitTestSplitter(CPoint p);
-
 	CPixelShaderCompiler* m_pPSC;
 	ShaderC* m_pShader;
+
+	bool HitTestSplitter(CPoint p);
+	void NewShader();
+	void DeleteShader();
+
 
 public:
 	CShaderEditorDlg();
@@ -82,10 +85,9 @@ protected:
 
 public:
 	afx_msg void OnCbnSelchangeCombo1();
-	afx_msg void OnBnClickedButtonSave();
-	afx_msg void OnBnClickedButtonNew();
-	afx_msg void OnBnClickedButtonDelete();
-	afx_msg void OnBnClickedButtonApply();
+	afx_msg void OnBnClickedSave();
+	afx_msg void OnBnClickedMenu();
+	afx_msg void OnBnClickedApply();
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
