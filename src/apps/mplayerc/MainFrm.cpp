@@ -6801,6 +6801,9 @@ void CMainFrame::OnViewShaderEditor()
 {
 	// TODO: SHADERS
 #ifdef _DEBUG
+	if (!m_wndShaderEditorBar.IsWindowVisible()) {
+		m_wndShaderEditorBar.m_dlg.UpdateShaderList();
+	}
 	ShowControlBar(&m_wndShaderEditorBar, !m_wndShaderEditorBar.IsWindowVisible(), TRUE);
 #endif
 }

@@ -73,7 +73,7 @@ BEGIN_MESSAGE_MAP(CPlayerNavigationBar, CPlayerBar)
 	ON_WM_NCLBUTTONUP()
 END_MESSAGE_MAP()
 
-// CPlayerShaderEditorBar message handlers
+// CPlayerNavigationBar message handlers
 
 void CPlayerNavigationBar::OnSize(UINT nType, int cx, int cy)
 {
