@@ -235,6 +235,11 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 	m_cbProfile.AddString(L"ps_2_b");
 	m_cbProfile.AddString(L"ps_3_0");
 
+	return TRUE;
+}
+
+void CShaderEditorDlg::UpdateShaderList()
+{
 	CString path;
 	if (AfxGetMyApp()->GetAppSavePath(path)) {
 		path += L"Shaders\\";
@@ -252,8 +257,6 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 		}
 	}
 	CorrectComboListWidth(m_cbLabels);
-
-	return TRUE;
 }
 
 void CShaderEditorDlg::DoDataExchange(CDataExchange* pDX)

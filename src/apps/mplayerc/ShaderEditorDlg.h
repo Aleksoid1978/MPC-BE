@@ -57,23 +57,23 @@ private:
 	CPixelShaderCompiler* m_pPSC;
 	ShaderC* m_pShader;
 
-	bool HitTestSplitter(CPoint p);
-	void NewShader();
-	void DeleteShader();
-
-
-public:
-	CShaderEditorDlg();
-	virtual ~CShaderEditorDlg();
-
-	BOOL Create(CWnd* pParent = NULL);
-
 	enum { IDD = IDD_SHADEREDITOR_DLG };
 	CComboBox m_cbLabels;
 	CComboBox m_cbProfile;
 	CShaderEdit m_edSrcdata;
 	CEdit m_edOutput;
 	CFont m_Font;
+
+	bool HitTestSplitter(CPoint p);
+	void NewShader();
+	void DeleteShader();
+
+public:
+	CShaderEditorDlg();
+	virtual ~CShaderEditorDlg();
+
+	BOOL Create(CWnd* pParent = NULL);
+	void UpdateShaderList();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
