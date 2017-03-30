@@ -819,25 +819,26 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 					seqh[s].Init();
 				}
 
-				if (seqh[s].data.GetCount()) {
-					if (seqh[s].data.GetCount() < 512) {
-						size_t size = seqh[s].data.GetCount();
-						seqh[s].data.SetCount(size + (size_t)len);
-						ByteRead(seqh[s].data.GetData() + size, len);
-					} else {
-						seqhdr h;
-						if (Read(h, seqh[s].data, &s.mt)) {
+				seqhdr& h = seqh[s];
+				if (h.data.GetCount()) {
+					if (h.data.GetCount() < 512) {
+						const size_t size = h.data.GetCount();
+						h.data.SetCount(size + (size_t)len);
+						ByteRead(h.data.GetData() + size, len);
+					}
+					if (h.data.GetCount() >= 512) {
+						if (Read(h, h.data, &s.mt)) {
 							s.codec = stream_codec::MPEG;
 							type = stream_type::video;
 						}
 					}
 				} else {
 					CMediaType mt;
-					if (Read(seqh[s], len, &mt)) {
+					if (Read(h, len, &mt)) {
 						if (m_type == MPEG_TYPES::mpeg_ts) {
 							Seek(start);
-							seqh[s].data.SetCount((size_t)len);
-							ByteRead(seqh[s].data.GetData(), len);
+							h.data.SetCount((size_t)len);
+							ByteRead(h.data.GetData(), len);
 						} else {
 							s.mt = mt;
 							s.codec = stream_codec::MPEG;
