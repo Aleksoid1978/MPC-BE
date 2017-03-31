@@ -60,7 +60,7 @@ BOOL CShaderEdit::PreTranslateMessage(MSG* pMsg)
 			GetSel(nStartChar, nEndChar);
 
 			CString text;
-			GetWindowText(text);
+			GetWindowTextW(text);
 			while (nStartChar > 0 && _istalnum(text.GetAt(nStartChar-1))) {
 				nStartChar--;
 			}
@@ -104,7 +104,7 @@ void CShaderEdit::OnUpdate()
 	GetSel(nStartChar, nEndChar);
 
 	if (nStartChar == nEndChar) {
-		GetWindowText(text);
+		GetWindowTextW(text);
 		while (nStartChar > 0 && _istalnum(text.GetAt(nStartChar-1))) {
 			nStartChar--;
 		}
@@ -161,9 +161,9 @@ void CShaderEdit::OnUpdate()
 void CShaderEdit::OnKillFocus(CWnd* pNewWnd)
 {
 	CString text;
-	GetWindowText(text);
+	GetWindowTextW(text);
 	__super::OnKillFocus(pNewWnd);
-	GetWindowText(text);
+	GetWindowTextW(text);
 
 	m_acdlg.ShowWindow(SW_HIDE);
 }
@@ -204,17 +204,15 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 		return FALSE;
 	}
 
-	if (CDPI* pDpi = dynamic_cast<CDPI*>(AfxGetMainWnd())) {
-		LOGFONT lf = {};
-		lf.lfHeight = -pDpi->PointsToPixels(8);
-		lf.lfPitchAndFamily = FIXED_PITCH | FF_MODERN;
+	LOGFONT lf = {};
+	lf.lfHeight = -AfxGetMainFrame()->PointsToPixels(8);
+	lf.lfPitchAndFamily = FIXED_PITCH | FF_MODERN;
 
-		for (const auto &fontname : MonospaceFonts) {
-			wcscpy_s(lf.lfFaceName, LF_FACESIZE, fontname);
-			if (IsFontInstalled(fontname) && m_Font.CreateFontIndirectW(&lf)) {
-				m_edSrcdata.SetFont(&m_Font);
-				break;
-			}
+	for (const auto &fontname : MonospaceFonts) {
+		wcscpy_s(lf.lfFaceName, LF_FACESIZE, fontname);
+		if (IsFontInstalled(fontname) && m_Font.CreateFontIndirectW(&lf)) {
+			m_edSrcdata.SetFont(&m_Font);
+			break;
 		}
 	}
 
@@ -334,15 +332,17 @@ void CShaderEditorDlg::DeleteShader()
 		CString label;
 		m_cbLabels.GetLBText(i, label);
 
-		if (AfxGetMainFrame()->DeleteShaderFile(label)) {
+		auto pFrame = AfxGetMainFrame();
+
+		if (pFrame->DeleteShaderFile(label)) {
 			m_cbLabels.DeleteString(i);
 			m_cbLabels.SetCurSel(-1);
 
-			m_edSrcdata.SetWindowText(L"");
-			m_edOutput.SetWindowText(L"");
+			m_edSrcdata.SetWindowTextW(L"");
+			m_edOutput.SetWindowTextW(L"");
 
-			AfxGetMainFrame()->TidyShaderCashe();
-			AfxGetMainFrame()->SetShaders(); // reset shaders
+			pFrame->TidyShaderCashe();
+			pFrame->SetShaders(); // reset shaders
 		}
 	}
 }
@@ -379,20 +379,23 @@ BOOL CShaderEditorDlg::PreTranslateMessage(MSG* pMsg)
 
 void CShaderEditorDlg::OnCbnSelchangeCombo1()
 {
+	auto pFrame = AfxGetMainFrame();
+	pFrame->SetShaders(); // reset shaders
+
 	int i = m_cbLabels.GetCurSel();
 	if (i >= 0) {
 		CString label;
 		m_cbLabels.GetLBText(i, label);
 
-		ShaderC* pShader = AfxGetMainFrame()->GetShader(label);
+		ShaderC* pShader = pFrame->GetShader(label);
 
 		m_cbProfile.SelectString(0, pShader->profile);
 
 		CString srcdata(pShader->srcdata);
 		srcdata.Replace(L"\n", L"\r\n");
-		m_edSrcdata.SetWindowText(srcdata);
+		m_edSrcdata.SetWindowTextW(srcdata);
 
-		m_edOutput.SetWindowText(L"");
+		m_edOutput.SetWindowTextW(L"");
 	}
 }
 
@@ -405,7 +408,7 @@ void CShaderEditorDlg::OnBnClickedSave()
 		m_cbLabels.GetLBText(i, shader.label);
 		m_cbProfile.GetLBText(m_cbProfile.GetCurSel(), shader.profile);
 
-		m_edSrcdata.GetWindowText(shader.srcdata);
+		m_edSrcdata.GetWindowTextW(shader.srcdata);
 		shader.srcdata.Remove('\r');
 
 		bool ret = AfxGetMainFrame()->SaveShaderFile(&shader);
@@ -460,6 +463,9 @@ void CShaderEditorDlg::OnBnClickedMenu()
 
 void CShaderEditorDlg::OnBnClickedApply()
 {
+	auto pFrame = AfxGetMainFrame();
+	pFrame->SetShaders(); // reset shaders
+
 	int i = m_cbLabels.GetCurSel();
 	if (i >= 0) {
 		CString str;
@@ -483,14 +489,13 @@ void CShaderEditorDlg::OnBnClickedApply()
 				errmsg += L"\n";
 				errmsg += disasm;
 
-				if (AfxGetMainFrame()->m_pCAP) {
-					AfxGetMainFrame()->SetShaders(); // reset shaders
-					hr = AfxGetMainFrame()->m_pCAP->AddPixelShader(TARGET_FRAME, srcdata, profile); // and add shader to the end of list
+				if (pFrame->m_pCAP) {
+					hr = pFrame->m_pCAP->AddPixelShader(TARGET_FRAME, srcdata, profile); // and add shader to the end of list
 				}
 			}
 
 			errmsg.Replace(L"\n", L"\r\n");
-			m_edOutput.SetWindowText(errmsg);
+			m_edOutput.SetWindowTextW(errmsg);
 		}
 	}
 }
@@ -528,7 +533,9 @@ void CShaderEditorDlg::OnMouseMove(UINT nFlags, CPoint point)
 		int dist = ro.top - rs.bottom;
 		int avgdist = dist / 2;
 
-		rs.bottom = min(max(point.y, rs.top + 40), ro.bottom - 40) - avgdist;
+		auto pFrame = AfxGetMainFrame();
+
+		rs.bottom = min(max(point.y, rs.top + pFrame->ScaleY(40)), ro.bottom - pFrame->ScaleY(48)) - avgdist;
 		ro.top = rs.bottom + dist;
 		m_edSrcdata.MoveWindow(&rs);
 		m_edOutput.MoveWindow(&ro);
