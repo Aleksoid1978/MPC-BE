@@ -1771,6 +1771,7 @@ STRING IDS_SHADERS_TOGGLE		"Zapnúť pixel-shadery pre predbežnú zmenu veľkos
 STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Zapnúť pixel-shadery pre dodatočnú zmenu veľkosti"
 STRING IDS_SHADER_DELETE		"Delete"
 STRING IDS_SHADER_EDITOR		"Shader Editor"
+STRING IDS_SHADER_FOLDER		"Open the shader folder"
 STRING IDS_SHADER_NEW		"New..."
 STRING IDS_SHADER_SAVE		"Save"
 STRING IDS_SIDE_LEFT		"Bočný ľavý"
