@@ -241,19 +241,21 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 void CShaderEditorDlg::UpdateShaderList()
 {
 	m_cbLabels.ResetContent();
+	m_edSrcdata.SetWindowTextW(L"");
+	m_edOutput.SetWindowTextW(L"");
 
 	CString path;
 	if (AfxGetMyApp()->GetAppSavePath(path)) {
 		path += L"Shaders\\";
-		if (::PathFileExists(path)) {
+		if (::PathFileExistsW(path)) {
 			WIN32_FIND_DATA wfd;
-			HANDLE hFile = FindFirstFile(path + L"*.hlsl", &wfd);
+			HANDLE hFile = FindFirstFileW(path + L"*.hlsl", &wfd);
 			if (hFile != INVALID_HANDLE_VALUE) {
 				do {
 					CString filename(wfd.cFileName);
 					filename.Truncate(filename.GetLength() - 5);
 					m_cbLabels.AddString(filename);
-				} while (FindNextFile(hFile, &wfd));
+				} while (FindNextFileW(hFile, &wfd));
 				FindClose(hFile);
 			}
 		}
@@ -417,7 +419,8 @@ void CShaderEditorDlg::OnBnClickedMenu()
 	enum {
 		M_SAVE = 1,
 		M_NEW,
-		M_DELETE
+		M_DELETE,
+		M_FOLDER
 	};
 
 	CMenu menu;
@@ -426,6 +429,8 @@ void CShaderEditorDlg::OnBnClickedMenu()
 	menu.AppendMenuW(MF_SEPARATOR);
 	menu.AppendMenuW(MF_STRING | MF_ENABLED, M_NEW, ResStr(IDS_SHADER_NEW));
 	menu.AppendMenuW(MF_STRING | (i >= 0 ? MF_ENABLED : MF_GRAYED), M_DELETE, ResStr(IDS_SHADER_DELETE));
+	menu.AppendMenuW(MF_SEPARATOR);
+	menu.AppendMenuW(MF_STRING | MF_ENABLED, M_FOLDER, ResStr(IDS_SHADER_FOLDER));
 
 	CRect wrect;
 	GetDlgItem(IDC_BUTTON1)->GetWindowRect(&wrect);
@@ -440,6 +445,15 @@ void CShaderEditorDlg::OnBnClickedMenu()
 		break;
 	case M_DELETE:
 		DeleteShader();
+		break;
+	case M_FOLDER:
+		{
+			CString path;
+			if (AfxGetMyApp()->GetAppSavePath(path)) {
+				path.Append(L"Shaders");
+				ShellExecuteW(NULL, L"open", path, NULL, NULL, SW_RESTORE);
+			}
+		}
 		break;
 	}
 }

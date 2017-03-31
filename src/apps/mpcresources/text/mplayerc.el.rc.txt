@@ -1774,6 +1774,7 @@ STRING IDS_SHADERS_TOGGLE		"Ενεργοποίηση προμεγεθυμένω�
 STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Ενεργοποίηση μεταμεγεθυμένων Pixel Shaders"
 STRING IDS_SHADER_DELETE		"Delete"
 STRING IDS_SHADER_EDITOR		"Επεξεργαστής σκίασης"
+STRING IDS_SHADER_FOLDER		"Open the shader folder"
 STRING IDS_SHADER_NEW		"New..."
 STRING IDS_SHADER_SAVE		"Save"
 STRING IDS_SIDE_LEFT		"Αριστερή πλευρά"

@@ -1771,6 +1771,7 @@ STRING IDS_SHADERS_TOGGLE		"Уключыць Pre-Resize Піксельныя ш�
 STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Уключыь Post-Resize Піксельныя шэйдары"
 STRING IDS_SHADER_DELETE		"Delete"
 STRING IDS_SHADER_EDITOR		"Shader Editor"
+STRING IDS_SHADER_FOLDER		"Open the shader folder"
 STRING IDS_SHADER_NEW		"New..."
 STRING IDS_SHADER_SAVE		"Save"
 STRING IDS_SIDE_LEFT		"Бакавы левы"

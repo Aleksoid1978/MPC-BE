@@ -1771,6 +1771,7 @@ STRING IDS_SHADERS_TOGGLE		"Միացնել Նախա-Վերաչափման շեյ�
 STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Միացնել Հետ-Վերաչափման շեյդերները"
 STRING IDS_SHADER_DELETE		"Delete"
 STRING IDS_SHADER_EDITOR		"Shader Editor"
+STRING IDS_SHADER_FOLDER		"Open the shader folder"
 STRING IDS_SHADER_NEW		"New..."
 STRING IDS_SHADER_SAVE		"Save"
 STRING IDS_SIDE_LEFT		"Կողային ձախ"

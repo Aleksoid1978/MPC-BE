@@ -3287,6 +3287,7 @@ BEGIN
     IDS_SHADER_SAVE                 "Save"
     IDS_SHADER_NEW                  "New..."
     IDS_SHADER_DELETE               "Delete"
+    IDS_SHADER_FOLDER               "Open the shader folder"
     IDS_EXTERNAL                    "external"
 END
 

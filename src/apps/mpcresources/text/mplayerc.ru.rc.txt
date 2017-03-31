@@ -1771,6 +1771,7 @@ STRING IDS_SHADERS_TOGGLE		"Включить пиксельные шейдеры
 STRING IDS_SHADERS_TOGGLE_SCREENSPACE		"Включить пиксельные шейдеры окна"
 STRING IDS_SHADER_DELETE		"Удалить"
 STRING IDS_SHADER_EDITOR		"Редактор шейдеров"
+STRING IDS_SHADER_FOLDER		"Открыть папку с шейдерами"
 STRING IDS_SHADER_NEW		"Создать новый..."
 STRING IDS_SHADER_SAVE		"Сохранить"
 STRING IDS_SIDE_LEFT		"Боковой левый"

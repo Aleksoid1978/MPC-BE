@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include "MainFrm.h"
 #include "PlayerShaderEditorBar.h"
 
 // CPlayerShaderEditorBar
@@ -71,6 +72,7 @@ BOOL CPlayerShaderEditorBar::PreTranslateMessage(MSG* pMsg)
 
 BEGIN_MESSAGE_MAP(CPlayerShaderEditorBar, CPlayerBar)
 	ON_WM_SIZE()
+	ON_WM_NCLBUTTONUP()
 END_MESSAGE_MAP()
 
 // CPlayerShaderEditorBar message handlers
@@ -83,5 +85,14 @@ void CPlayerShaderEditorBar::OnSize(UINT nType, int cx, int cy)
 		CRect r;
 		GetClientRect(r);
 		m_dlg.MoveWindow(r);
+	}
+}
+
+void CPlayerShaderEditorBar::OnNcLButtonUp(UINT nHitTest, CPoint point)
+{
+	__super::OnNcLButtonUp(nHitTest, point);
+
+	if (nHitTest == HTCLOSE) {
+		AfxGetMainFrame()->SetShaders(); // reset shaders;
 	}
 }

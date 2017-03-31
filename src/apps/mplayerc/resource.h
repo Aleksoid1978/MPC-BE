@@ -1601,6 +1601,7 @@
 #define IDS_SHADER_SAVE                 41600
 #define IDS_SHADER_NEW                  41601
 #define IDS_SHADER_DELETE               41602
+#define IDS_SHADER_FOLDER               41603
 #define IDS_PPAGE_OUTPUT_VMR9WINDOWED   42004
 #define IDS_PPAGE_OUTPUT_EVR            42007
 #define IDS_PPAGE_OUTPUT_EVR_CUSTOM     42008
