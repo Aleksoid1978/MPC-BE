@@ -240,6 +240,8 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 
 void CShaderEditorDlg::UpdateShaderList()
 {
+	m_cbLabels.ResetContent();
+
 	CString path;
 	if (AfxGetMyApp()->GetAppSavePath(path)) {
 		path += L"Shaders\\";
@@ -291,7 +293,6 @@ void CShaderEditorDlg::NewShader()
 	if (IDOK != dlg.DoModal()) {
 		return;
 	}
-
 
 	// if shader already exists, then select it
 	int i = m_cbLabels.SelectString(0, dlg.m_Name);
