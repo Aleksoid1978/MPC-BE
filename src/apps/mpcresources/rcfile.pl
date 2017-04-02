@@ -107,8 +107,8 @@ my($MenuDiffs, $DialogDiffs) = ({}, {});
 my($BaseDesignInfos, $NewDesignInfos) = ({}, {});
 
 # /!\ Note that the English RC file is ASCII encoded
-my @BaseFile = readFile($BaseFileName, 0);
-my @NewFile = readFile($NewFileName, 0);
+my @BaseFile = readFile($BaseFileName, 2);
+my @NewFile = readFile($NewFileName, 2);
 print "Scanning changes between baseline file and new version...\n\n";
 getDifference();
 
