@@ -9,6 +9,7 @@ Updated libraries:
 	libpng git-v1.6.28-12-gb8afc73b7;
 	Little-CMS git-lcms2.8-66-gf9d75cc;
 	MediaInfo git-v0.7.94-8-g74ed2db3;
+	Speex-1.2.0-1-gcae5026;
 	rapidjson git-v1.1.0-165-gb8f0414b;
 	ZenLib git-v0.4.34-2-geda2854;
 	zlib 1.2.11.
