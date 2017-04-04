@@ -887,16 +887,6 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
                 Fill(Stream_Video, StreamPos, Video_Bits__Pixel_Frame_, BitRate/F1, 3, true);
         }
 
-        //Special audio cases
-        if (StreamKind==Stream_Audio && Parameter==Audio_CodecID
-         && Retrieve(Stream_Audio, StreamPos, Audio_Channel_s_).empty()
-         &&(Value==__T("samr")
-         || Value==__T("sawb")
-         || Value==__T("7A21")
-         || Value==__T("7A22"))
-            )
-            Fill(Stream_Audio, StreamPos, Audio_Channel_s_, 1, 10, true); //AMR is always with 1 channel
-
         //Well known bitrate values
         if (StreamKind==Stream_Video && (Parameter==Video_BitRate || Parameter==Video_BitRate_Nominal))
             Video_BitRate_Rounding(StreamPos, (video)Parameter);

@@ -83,11 +83,11 @@
 #if defined(MEDIAINFO_TELETEXT_YES)
     #include "MediaInfo/Text/File_Teletext.h"
 #endif
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #include "MediaInfo/File_Unknown.h"
 #include <ZenLib/Utils.h>
 #include <algorithm>
 #if MEDIAINFO_EVENTS
-    #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
     #include "MediaInfo/MediaInfo_Events_Internal.h"
 #endif //MEDIAINFO_EVENTS
 #if MEDIAINFO_IBIUSAGE && MEDIAINFO_SEEK
@@ -425,11 +425,11 @@ void File_MpegPs::Streams_Fill_PerStream_PerKind(size_t StreamID, ps_stream &Tem
         if (KindOfStream==KindOfStream_Main)
         {
             Ztring ID; ID.From_Number(StreamID);
-            Ztring ID_String; ID_String.From_Number(StreamID); ID_String+=__T(" (0x"); ID_String+=Ztring::ToZtring(StreamID, 16); ID_String+=__T(")");
+            Ztring ID_String = Get_Hex_ID(StreamID);
             if (!Retrieve(StreamKind_Last, StreamPos, General_ID).empty())
             {
                 Fill(StreamKind_Last, StreamPos, General_ID, StreamID);
-                Ztring ID_String; ID_String.From_Number(StreamID); ID_String+=__T(" (0x"); ID_String+=Ztring::ToZtring(StreamID, 16); ID_String+=__T(")");
+                Ztring ID_String = Get_Hex_ID(StreamID);
                 Fill(StreamKind_Last, StreamPos, General_ID_String, ID_String, true); //TODO: merge with Decimal_Hexa in file_MpegTs
             }
             Fill(StreamKind_Last, StreamPos, General_ID, ID, true);
@@ -445,7 +445,7 @@ void File_MpegPs::Streams_Fill_PerStream_PerKind(size_t StreamID, ps_stream &Tem
             Fill(StreamKind_Last, StreamPos, General_ID, ID, true);
             Ztring ID_String=__T("189 (0xBD)");
             if (StreamID)
-                ID_String+=__T("-")+Ztring::ToZtring(StreamID)+__T(" (0x")+Ztring::ToZtring(StreamID, 16)+__T(")");
+                ID_String+=__T("-")+ Get_Hex_ID(StreamID);
             if (!Temp.Parsers[0]->Retrieve(StreamKind_Last, StreamPos, General_ID_String).empty())
                 ID_String+=__T("-")+Temp.Parsers[0]->Retrieve(StreamKind_Last, StreamPos, General_ID_String);
             else if (!Temp.Parsers[0]->Retrieve(StreamKind_Last, StreamPos, General_ID).empty())
@@ -464,7 +464,7 @@ void File_MpegPs::Streams_Fill_PerStream_PerKind(size_t StreamID, ps_stream &Tem
             Fill(StreamKind_Last, StreamPos, General_ID, ID, true);
             Ztring ID_String=__T("253 (0xFD)");
             if (StreamID)
-                ID_String+=__T("-")+Ztring::ToZtring(StreamID)+__T(" (0x")+Ztring::ToZtring(StreamID, 16)+__T(")");
+                ID_String+=__T("-")+ Get_Hex_ID(StreamID);
             Fill(StreamKind_Last, StreamPos, General_ID_String, ID_String, true); //TODO: merge with Decimal_Hexa in file_MpegTs
             }
         }
@@ -1428,7 +1428,7 @@ bool File_MpegPs::Header_Parse_Fill_Size()
 
     if (Buffer_Offset_Temp+4>Buffer_Size)
     {
-        if (File_Offset+Buffer_Size>=File_Size)
+        if (Config->IsFinishing)
             Buffer_Offset_Temp=Buffer_Size; //We are sure that the next bytes are a start
         else
             return false;
@@ -1450,8 +1450,8 @@ bool File_MpegPs::Header_Parse_PES_packet(int8u stream_id)
         if (Demux_UnpacketizeContainer && Buffer_Offset+6+PES_packet_length>Buffer_Size)
             return false;
     #endif //MEDIAINFO_DEMUX
-    if (PES_packet_length && File_Offset+Buffer_Offset+6+PES_packet_length>=File_Size)
-        PES_packet_length=(int16u)(File_Size-(File_Offset+Buffer_Offset+6));
+    if (PES_packet_length && Buffer_Offset+6+PES_packet_length>=Buffer_Size && Config->IsFinishing)
+        PES_packet_length=(int16u)(Buffer_Size-(Buffer_Offset+6));
 
     //Parsing
     switch (stream_id)

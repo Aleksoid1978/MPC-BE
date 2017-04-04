@@ -30,8 +30,8 @@
 #include "MediaInfo/Video/File_Hevc.h"
 #include <cmath>
 #include <algorithm>
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #if MEDIAINFO_EVENTS
-    #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
     #include "MediaInfo/MediaInfo_Config_PerPackage.h"
     #include "MediaInfo/MediaInfo_Events.h"
     #include "MediaInfo/MediaInfo_Events_Internal.h"
@@ -615,7 +615,7 @@ bool File_Hevc::Demux_UnpacketizeContainer_Test()
 
                 if (Demux_Offset+6>Buffer_Size)
                 {
-                    if (File_Offset+Buffer_Size==File_Size)
+                    if (Config->IsFinishing)
                         Demux_Offset=Buffer_Size;
                     break;
                 }
@@ -675,7 +675,7 @@ bool File_Hevc::Demux_UnpacketizeContainer_Test()
                 Demux_Offset++;
             }
 
-            if (Demux_Offset+6>Buffer_Size && !FrameIsAlwaysComplete && File_Offset+Buffer_Size<File_Size)
+            if (Demux_Offset+6>Buffer_Size && !FrameIsAlwaysComplete && !Config->IsFinishing)
                 return false; //No complete frame
 
             if (Demux_Offset && Buffer[Demux_Offset-1]==0x00)
@@ -898,7 +898,7 @@ bool File_Hevc::Header_Parser_Fill_Size()
     //Must wait more data?
     if (Buffer_Offset_Temp+5>Buffer_Size)
     {
-        if (FrameIsAlwaysComplete || File_Offset+Buffer_Size>=File_Size)
+        if (FrameIsAlwaysComplete || Config->IsFinishing)
             Buffer_Offset_Temp=Buffer_Size; //We are sure that the next bytes are a start
         else
             return false;

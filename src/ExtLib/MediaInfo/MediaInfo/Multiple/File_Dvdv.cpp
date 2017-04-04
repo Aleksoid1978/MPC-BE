@@ -1279,7 +1279,7 @@ void File_Dvdv::PGC(int64u Offset, bool Title)
                         ToAdd=0x88;
                     if (Retrieve(Stream_Audio, Pos, Audio_Format)==__T("LPCM"))
                         ToAdd=0xA0;
-                    Ztring ID_String; ID_String.From_Number(ToAdd+Number); ID_String+=__T(" (0x"); ID_String+=Ztring::ToZtring(ToAdd+Number, 16); ID_String+=__T(")");
+                    Ztring ID_String = Get_Hex_ID(ToAdd + Number);
                     Fill(Stream_Audio, Pos, Audio_ID, ID_String);
                     Fill(Stream_Audio, Pos, Audio_ID_String, ID_String, true);
                 }
@@ -1313,7 +1313,7 @@ void File_Dvdv::PGC(int64u Offset, bool Title)
                     while (Pos>Count_Get(Stream_Text))
                         Stream_Prepare(Stream_Text);
 
-                    Ztring ID_String; ID_String.From_Number(0x20+Number_Wide); ID_String+=__T(" (0x"); ID_String+=Ztring::ToZtring(0x20+Number_Wide, 16); ID_String+=__T(")");
+                    Ztring ID_String = Get_Hex_ID(0x20 + Number_Wide);
                     Fill(Stream_Text, Pos, Text_ID, ID_String);
                     Fill(Stream_Text, Pos, Text_ID_String, ID_String, true);
                 }

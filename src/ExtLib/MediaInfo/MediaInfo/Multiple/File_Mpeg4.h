@@ -533,9 +533,9 @@ private :
         int32u StreamID;
         int32u Reserved1;
         int64u Reserved2;
-        friend bool operator<(const mdat_Pos_Type& l, const mdat_Pos_Type& r)
+        bool operator<(const mdat_Pos_Type& r) const
         {
-            return l.Offset<r.Offset;
+            return Offset<r.Offset;
         }
     };
     typedef std::vector<mdat_Pos_Type> mdat_pos;

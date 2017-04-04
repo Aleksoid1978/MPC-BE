@@ -68,6 +68,7 @@ public :
     std::bitset<32> Open_Buffer_Continue (const ZenLib::int8u* Buffer, size_t Buffer_Size);
     ZenLib::int64u Open_Buffer_Continue_GoTo_Get ();
     bool   Open_Buffer_Position_Set(int64u File_Offset);
+    void Open_Buffer_CheckFileModifications();
     #if MEDIAINFO_SEEK
     size_t Open_Buffer_Seek        (size_t Method, int64u Value, int64u ID);
     #endif //MEDIAINFO_SEEK

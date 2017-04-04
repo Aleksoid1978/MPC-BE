@@ -43,10 +43,6 @@ private :
     void Streams_Fill();
     void Streams_Finish();
 
-    //Buffer - Synchro
-    bool Synchronize();
-    bool Synched_Test();
-
     //Buffer - Demux
     #if MEDIAINFO_DEMUX
     bool Demux_UnpacketizeContainer_Test();
@@ -77,16 +73,25 @@ private :
     #endif //defined(MEDIAINFO_CDP_YES)
 
     //Temp
+    string  TimeCode_FirstFrame;
+    int32u  HS;
     int32u  CID;
-    bool    CRCF;
     int16u  ALPF;
     int16u  SPL;
+    int16u  PARC;
+    int16u  PARN;
     int8u   SBD;
     int8u   FFC_FirstFrame;
     int8u   HVN;
-    int8u   CLR;
-    bool    SST;
+    int8u   CLV;
+    bool    CLF;
     bool    SSC;
+    bool    CRCF;
+    bool    SST;
+    bool    VBR;
+    bool    PMA;
+    bool    LLA;
+    bool    ALP;
 };
 
 } //NameSpace

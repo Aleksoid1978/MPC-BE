@@ -128,13 +128,9 @@ private :
         }
     };
     dolby  FirstFrame_Dolby;
-    dolby  FirstFrame_Dolby2;
     std::vector<int64u> dialnorms;
-    std::vector<int64u> dialnorm2s;
     std::vector<int64u> comprs;
-    std::vector<int64u> compr2s;
     std::vector<int64u> dynrngs;
-    std::vector<int64u> dynrng2s;
     std::map<int8u, int64u> fscods;
     std::map<int8u, int64u> frmsizecods;
     int64u Frame_Count_HD;
@@ -158,7 +154,6 @@ private :
     int8u  HD_Channels1;
     int8u  HD_Resolution1;
     int8u  HD_Resolution2;
-    int8u  dynrng_Old;
     int8u  substreamid_Independant_Current;
     int8u  substreams_Count;
     bool   lfeon_Max[8][9];

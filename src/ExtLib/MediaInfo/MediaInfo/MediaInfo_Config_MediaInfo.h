@@ -334,7 +334,8 @@ public :
     #endif //MEDIAINFO_MACROBLOCKS
     void          File_GrowingFile_Delay_Set(float64 Value);
     float64       File_GrowingFile_Delay_Get();
-    void          File_GrowingFile_Force_Set(float64 Value);
+    void          File_GrowingFile_Force_Set(bool Value);
+    bool          File_GrowingFile_Force_Get();
     #if defined(MEDIAINFO_LIBCURL_YES)
     void          File_Curl_Set (const Ztring &NewValue);
     void          File_Curl_Set (const Ztring &Field, const Ztring &NewValue);
@@ -387,6 +388,7 @@ public :
     float64       File_EditRate;
     int64u        File_Size;
     float32       ParseSpeed;
+    bool          IsFinishing;
     #if MEDIAINFO_EVENTS
     MediaInfo_Config_PerPackage* Config_PerPackage;
     bool          Events_TimestampShift_Disabled;
@@ -552,6 +554,7 @@ private :
     bool                    File_Macroblocks_Parse;
     #endif //MEDIAINFO_MACROBLOCKS
     float64                 File_GrowingFile_Delay;
+    bool                    File_GrowingFile_Force;
     #if defined(MEDIAINFO_LIBMMS_YES)
     bool                    File_Mmsh_Describe_Only;
     #endif //defined(MEDIAINFO_LIBMMS_YES)

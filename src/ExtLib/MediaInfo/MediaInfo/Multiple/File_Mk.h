@@ -40,7 +40,14 @@ private :
     //Buffer - Global
     void Read_Buffer_Continue();
 
+    //Buffer - Global
+    void Read_Buffer_Unsynched();
+    #if MEDIAINFO_SEEK
+    size_t Read_Buffer_Seek (size_t Method, int64u Value, int64u ID);
+    #endif //MEDIAINFO_SEEK
+
     //Buffer
+    bool Header_Begin();
     void Header_Parse();
     void Data_Parse();
 
@@ -97,6 +104,7 @@ private :
     void Segment_Cluster();
     void Segment_Cluster_BlockGroup();
     void Segment_Cluster_BlockGroup_Block();
+    void Segment_Cluster_BlockGroup_Block_Lace();
     void Segment_Cluster_BlockGroup_BlockAdditions();
     void Segment_Cluster_BlockGroup_BlockAdditions_BlockMore();
     void Segment_Cluster_BlockGroup_BlockAdditions_BlockMore_BlockAddID();
@@ -233,7 +241,7 @@ private :
     void Segment_Tracks_TrackEntry_Video_PixelHeight();
     void Segment_Tracks_TrackEntry_Video_PixelWidth();
     void Segment_Tracks_TrackEntry_Video_StereoMode();
-    void Segment_Tracks_TrackEntry_Video_StereoModeBuggy() {Segment_Tracks_TrackEntry_Video_StereoMode();}
+    void Segment_Tracks_TrackEntry_Video_OldStereoMode();
     void Segment_Tracks_TrackEntry_TrackOverlay();
     void Segment_Tracks_TrackEntry_TrackTranslate();
     void Segment_Tracks_TrackEntry_TrackTranslate_Codec();
@@ -267,6 +275,9 @@ private :
         int64u                  PixelCropLeft;
         int64u                  PixelCropRight;
         int64u                  PixelCropTop;
+        #if MEDIAINFO_TRACE
+            size_t Trace_Segment_Cluster_Block_Count;
+        #endif // MEDIAINFO_TRACE
 
         stream()
         {
@@ -292,6 +303,9 @@ private :
             PixelCropLeft=0;
             PixelCropRight=0;
             PixelCropTop=0;
+            #if MEDIAINFO_TRACE
+                Trace_Segment_Cluster_Block_Count=0;
+            #endif // MEDIAINFO_TRACE
         }
 
         ~stream()
@@ -390,6 +404,11 @@ private :
     std::vector<Ztring> Segment_Tag_SimpleTag_TagNames;
     int64u Segment_Cluster_BlockGroup_BlockDuration_Value;
     int64u Segment_Cluster_BlockGroup_BlockDuration_TrackNumber;
+    std::vector<int64u> Laces;
+    size_t              Laces_Pos;
+    #if MEDIAINFO_DEMUX
+        int64u              Demux_EventWasSent;
+    #endif //MEDIAINFO_DEMUX
 
     //Hints
     size_t*                 File_Buffer_Size_Hint_Pointer;
@@ -398,9 +417,12 @@ private :
     void JumpTo(int64u GoTo);
     void TestMultipleInstances(size_t* Instances=NULL);
     void CRC32_Check();
-#if MEDIAINFO_TRACE
-    bool CRC32_Check_In_Node(const std::string& ToSearchInInfo, const std::string& info, element_details::Element_Node *node);
-#endif // MEDIAINFO_TRACE
+    #if MEDIAINFO_TRACE
+        bool CRC32_Check_In_Node(const std::string& ToSearchInInfo, const std::string& info, element_details::Element_Node *node);
+        size_t Trace_Segment_Cluster_Count;
+        size_t Trace_Segment_Cues_CuePoint_Count;
+        size_t Trace_Segment_SeekHead_Seek_Count;
+    #endif // MEDIAINFO_TRACE
 };
 
 } //NameSpace

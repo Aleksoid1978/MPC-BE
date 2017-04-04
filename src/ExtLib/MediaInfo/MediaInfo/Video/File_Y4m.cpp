@@ -189,7 +189,7 @@ void File_Y4m::FileHeader_Parse()
                             {
                             Ztring Value=List[Pos].substr(1);
                             Height=Value.To_int64u();
-                            Fill(Stream_Video, 0, Video_Height, Height); break;
+                            Fill(Stream_Video, 0, Video_Height, Height);
                             }
                             break;
                 case 'I' :  //Interlacing
@@ -207,7 +207,7 @@ void File_Y4m::FileHeader_Parse()
                             {
                             Ztring Value=List[Pos].substr(1);
                             Width=Value.To_int64u();
-                            Fill(Stream_Video, 0, Video_Width, Width); break;
+                            Fill(Stream_Video, 0, Video_Width, Width);
                             }
                             break;
                 default  : ;

@@ -352,10 +352,14 @@ void File_Wm::Header_StreamProperties_Audio ()
     CodecID_Fill(Codec, Stream_Audio, StreamPos_Last, InfoCodecID_Format_Riff);
     Fill(Stream_Audio, StreamPos_Last, Audio_Codec, Codec); //May be replaced by codec parser
     Fill(Stream_Audio, StreamPos_Last, Audio_Codec_CC, Codec);
-    Fill(Stream_Audio, StreamPos_Last, Audio_Channel_s_, Channels);
-    Fill(Stream_Audio, StreamPos_Last, Audio_SamplingRate, SamplingRate);
-    Fill(Stream_Audio, StreamPos_Last, Audio_BitRate, BytesPerSec*8);
-    Fill(Stream_Audio, StreamPos_Last, Audio_BitDepth, Resolution);
+    if (Channels)
+        Fill(Stream_Audio, StreamPos_Last, Audio_Channel_s_, Channels);
+    if (SamplingRate)
+        Fill(Stream_Audio, StreamPos_Last, Audio_SamplingRate, SamplingRate);
+    if (BytesPerSec)
+        Fill(Stream_Audio, StreamPos_Last, Audio_BitRate, BytesPerSec*8);
+    if (Resolution)
+        Fill(Stream_Audio, StreamPos_Last, Audio_BitDepth, Resolution);
 
     FILLING_BEGIN();
         //Creating the parser

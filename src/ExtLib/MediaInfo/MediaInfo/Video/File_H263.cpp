@@ -286,7 +286,7 @@ bool File_H263::Header_Parser_Fill_Size()
     //Must wait more data?
     if (Buffer_Offset_Temp+3>Buffer_Size)
     {
-        if (FrameIsAlwaysComplete || File_Offset+Buffer_Size==File_Size)
+        if (FrameIsAlwaysComplete || Config->IsFinishing)
             Buffer_Offset_Temp=Buffer_Size; //We are sure that the next bytes are a start
         else
             return false;

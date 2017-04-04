@@ -90,6 +90,7 @@ protected :
     //Buffer - Global
     void Read_Buffer_Init ();
     void Read_Buffer_Continue ();
+    void Read_Buffer_CheckFileModifications();
     void Read_Buffer_AfterParsing ();
     void Read_Buffer_Unsynched();
     #if MEDIAINFO_SEEK
@@ -623,6 +624,7 @@ protected :
     bool   IsSearchingFooterPartitionAddress;
     bool   FooterPartitionAddress_Jumped;
     bool   PartitionPack_Parsed;
+    bool   HeaderPartition_IsOpen;
     size_t IdIsAlwaysSame_Offset;
 
     //Primer
@@ -731,6 +733,9 @@ protected :
         int64u      Field_Count_InThisBlock_1;
         int64u      Field_Count_InThisBlock_2;
         int64u      Frame_Count_NotParsedIncluded;
+        #if MEDIAINFO_TRACE
+            int64u  Trace_Count;
+        #endif // MEDIAINFO_TRACE
         frame_info  FrameInfo;
 
         essence()
@@ -748,6 +753,9 @@ protected :
             Field_Count_InThisBlock_1=0;
             Field_Count_InThisBlock_2=0;
             Frame_Count_NotParsedIncluded=(int64u)-1;
+            #if MEDIAINFO_TRACE
+                Trace_Count=0;
+            #endif // MEDIAINFO_TRACE
             FrameInfo.DTS=(int64u)-1;
         }
 
@@ -1157,6 +1165,11 @@ protected :
     int64u SDTI_SizePerFrame;
     bool   SDTI_IsPresent; //Used to test if SDTI packet is used for Index StreamOffset calculation
     bool   SDTI_IsInIndexStreamOffset; //Used to test if SDTI packet is used for Index StreamOffset calculation
+    #if MEDIAINFO_TRACE
+        int64u SDTI_SystemMetadataPack_Trace_Count;
+        int64u SDTI_PackageMetadataSet_Trace_Count;
+        int64u Padding_Trace_Count;
+    #endif // MEDIAINFO_TRACE
     string SystemScheme1_TimeCodeArray_StartTimecode;
     int64u SystemScheme1_TimeCodeArray_StartTimecode_ms;
     int64u SystemScheme1_FrameRateFromDescriptor;

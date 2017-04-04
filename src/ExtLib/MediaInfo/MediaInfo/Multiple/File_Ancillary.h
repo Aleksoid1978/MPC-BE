@@ -41,28 +41,12 @@ public :
     int32u  LineNumber;
 
     //In/Out
-    struct buffered_data
-    {
-        size_t Size;
-        int8u* Data;
-
-        buffered_data()
-        {
-            Size=0;
-            Data=NULL;
-        }
-
-        ~buffered_data()
-        {
-            delete[] Data; //Data=NULL;
-        }
-    };
     #if defined(MEDIAINFO_CDP_YES)
-        std::vector<buffered_data*> Cdp_Data;
+        std::vector<buffer_data*> Cdp_Data;
         File__Analyze*  Cdp_Parser;
     #endif //defined(MEDIAINFO_CDP_YES)
     #if defined(MEDIAINFO_AFDBARDATA_YES)
-        std::vector<buffered_data*> AfdBarData_Data;
+        std::vector<buffer_data*> AfdBarData_Data;
     #endif //defined(MEDIAINFO_AFDBARDATA_YES)
     #if defined(MEDIAINFO_ARIBSTDB24B37_YES)
         File__Analyze*  AribStdB34B37_Parser;

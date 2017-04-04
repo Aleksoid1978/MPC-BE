@@ -95,7 +95,8 @@ size_t MediaInfoList_Internal::Open(const String &File_Name, const fileoptions_t
     #endif //defined(MEDIAINFO_DIRECTORY_YES)
 
     //Registering files
-    CS.Enter();
+    {
+    CriticalSectionLocker CSL(CS);
     if (ToParse.empty())
         CountValid=0;
     for (ZtringList::iterator L=List.begin(); L!=List.end(); ++L)
@@ -105,18 +106,17 @@ size_t MediaInfoList_Internal::Open(const String &File_Name, const fileoptions_t
         State=ToParse_AlreadyDone*10000/ToParse_Total;
     else
         State=10000;
-    CS.Leave();
+    }
 
     //Parsing
     if (BlockMethod==1)
     {
-        CS.Enter();
+        CriticalSectionLocker CSL(CS);
         if (!IsRunning()) //If already created, the routine will read the new files
         {
             RunAgain();
             IsInThread=true;
         }
-        CS.Leave();
         return 0;
     }
     else

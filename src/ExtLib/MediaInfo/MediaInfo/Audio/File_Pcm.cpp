@@ -311,7 +311,7 @@ void File_Pcm::Header_Parse()
                 Frame_Count_NotParsedIncluded-=Demux_Items.size()-1;
             Demux_Items.pop_front();
         }
-    #endif MEDIAINFO_DEMUX
+    #endif //MEDIAINFO_DEMUX
 
     if (BitDepth && Channels)
     {

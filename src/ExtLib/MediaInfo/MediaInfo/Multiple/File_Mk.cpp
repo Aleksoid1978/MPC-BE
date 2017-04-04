@@ -106,6 +106,11 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+#if MEDIAINFO_TRACE
+    static const size_t MaxCountSameElementInTrace=10;
+#endif // MEDIAINFO_TRACE
+
+//---------------------------------------------------------------------------
 namespace Elements
 {
     //Common
@@ -165,6 +170,7 @@ namespace Elements
     const int64u Segment_Cluster=0xF43B675;
     const int64u Segment_Cluster_BlockGroup=0x20;
     const int64u Segment_Cluster_BlockGroup_Block=0x21;
+    const int64u Segment_Cluster_BlockGroup_Block_Lace=0xFFFFFFFFFFFFFFFELL; //Fake one
     const int64u Segment_Cluster_BlockGroup_BlockVirtual=0x22;
     const int64u Segment_Cluster_BlockGroup_BlockAdditions=0x35A1;
     const int64u Segment_Cluster_BlockGroup_BlockAdditions_BlockMore=0x26;
@@ -299,7 +305,7 @@ namespace Elements
     const int64u Segment_Tracks_TrackEntry_Video_PixelHeight=0x3A;
     const int64u Segment_Tracks_TrackEntry_Video_PixelWidth=0x30;
     const int64u Segment_Tracks_TrackEntry_Video_StereoMode=0x13B8;
-    const int64u Segment_Tracks_TrackEntry_Video_StereoModeBuggy=0x13B9;
+    const int64u Segment_Tracks_TrackEntry_Video_OldStereoMode=0x13B9;
     const int64u Segment_Tracks_TrackEntry_TrackOverlay=0x2FAB;
     const int64u Segment_Tracks_TrackEntry_TrackTranslate=0x2624;
     const int64u Segment_Tracks_TrackEntry_TrackTranslate_Codec=0x26BF;
@@ -458,7 +464,7 @@ static const char* Mk_StereoMode(int64u StereoMode)
 }
 
 //---------------------------------------------------------------------------
-static const char* Mk_StereoMode_v2(int64u StereoMode)
+static const char* Mk_OldStereoMode(int64u StereoMode)
 {
     switch (StereoMode)
     {
@@ -550,7 +556,7 @@ static Ztring Mk_ID_String_From_Source_ID (const Ztring &Value)
                 return Value;
         }
 
-        return Ztring::ToZtring(ValueI) + __T(" (0x") + Ztring::ToZtring(ValueI, 16) + __T(")");
+        return Get_Hex_ID(ValueI);
     }
 
     if (Value.size()==6 && Value[0] == __T('0') && Value[1] == __T('1'))
@@ -575,7 +581,7 @@ static Ztring Mk_ID_String_From_Source_ID (const Ztring &Value)
         if (ValueI)
             ID2=ValueI>>8;
 
-        return Ztring::ToZtring(ID1) + __T(" (0x") + Ztring::ToZtring(ID1, 16) + __T(")") + (ID2?(__T('-') + Ztring::ToZtring(ID2) + __T(" (0x") + Ztring::ToZtring(ID2, 16) + __T(")")):Ztring());
+        return Get_Hex_ID(ID1) + (ID2? Get_Hex_ID(ID2):Ztring());
     }
 
     return Value;
@@ -622,6 +628,10 @@ File_Mk::File_Mk()
     Segment_Cluster_Count=0;
     CurrentAttachmentIsCover=false;
     CoverIsSetFromAttachment=false;
+    Laces_Pos=0;
+    #if MEDIAINFO_DEMUX
+        Demux_EventWasSent=(int64u)-1;
+    #endif //MEDIAINFO_DEMUX
     CRC32Compute_SkipUpTo=0;
 
     //Hints
@@ -652,9 +662,9 @@ void File_Mk::Streams_Finish()
         if (!Item->first || Item->first == (int64u)-1)
         {
             for (tagspertrack::iterator Tag=Item->second.begin(); Tag!=Item->second.end(); ++Tag)
-                if ((Tag->first!=__T("Encoded_Library") || Retrieve(StreamKind_Last, StreamPos_Last, "Encoded_Library").empty()) // Prioritize Info block over tags
-                 && (Tag->first!=__T("Encoded_Date") || Retrieve(StreamKind_Last, StreamPos_Last, "Encoded_Date").empty())
-                 && (Tag->first!=__T("Title") || Retrieve(StreamKind_Last, StreamPos_Last, "Title").empty()))
+                if ((Tag->first!=__T("Encoded_Library") || Retrieve(Stream_General, 0, "Encoded_Library")!=Tag->second) // Avoid repetition if Info block is same as tags
+                 && (Tag->first!=__T("Encoded_Date") || Retrieve(StreamKind_Last, StreamPos_Last, "Encoded_Date")!=Tag->second)
+                 && (Tag->first!=__T("Title") || Retrieve(StreamKind_Last, StreamPos_Last, "Title")!=Tag->second))
                     Fill(Stream_General, 0, Tag->first.To_UTF8().c_str(), Tag->second);
         }
 
@@ -815,7 +825,7 @@ void File_Mk::Streams_Finish()
                     float64 Duration_1000 = Statistics_FrameCount / float64_int64s(FrameRate_FromTags) * 1.001001;
                     bool CanBe1001 = false;
                     bool CanBe1000 = false;
-                    if (fabs((Duration_1000 - Duration_1001) * 10000) >= 15)
+                    if (std::fabs((Duration_1000 - Duration_1001) * 10000) >= 15)
                     {
                         Ztring DurationS; DurationS.From_Number(Statistics_Duration, 3);
                         Ztring DurationS_1001; DurationS_1001.From_Number(Duration_1001, 3);
@@ -830,9 +840,9 @@ void File_Mk::Streams_Finish()
                     }
 
                     // Duration from tags not reliable, checking TrackDefaultDuration
-                    if (CanBe1000 == CanBe1001)
+                    if (CanBe1000 == CanBe1001 && Temp->second.TrackDefaultDuration)
                     {
-                        float64 Duration_Default=((float64)1000000000)/Temp->second.TrackDefaultDuration;
+                        const float64 Duration_Default=((float64)1000000000)/Temp->second.TrackDefaultDuration;
                         if (float64_int64s(Duration_Default) - Duration_Default*1.001000 > -0.000002
                          && float64_int64s(Duration_Default) - Duration_Default*1.001000 < +0.000002) // Detection of precise 1.001 (e.g. 24000/1001) taking into account precision of 32-bit float
                         {
@@ -1091,6 +1101,38 @@ void File_Mk::Streams_Finish()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+void File_Mk::Read_Buffer_Unsynched()
+{
+    Laces_Pos=0;
+    Laces.clear();
+    if (!File_GoTo)
+        Element_Level=0;
+
+    for (std::map<int64u, stream>::iterator streamItem=Stream.begin(); streamItem!=Stream.end(); streamItem++)
+    {
+        if (!File_GoTo)
+            streamItem->second.PacketCount=0;
+        if (streamItem->second.Parser)
+            streamItem->second.Parser->Open_Buffer_Unsynch();
+    }
+}   
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_SEEK
+size_t File_Mk::Read_Buffer_Seek(size_t Method, int64u Value, int64u ID)
+{
+    //Currently stupidely go back to 0 //TODO: 
+    GoTo(0);
+    Open_Buffer_Unsynch();
+    return 1;
+}
+#endif //MEDIAINFO_SEEK
+
+//***************************************************************************
+// Buffer - Global
+//***************************************************************************
+
+//---------------------------------------------------------------------------
 void File_Mk::Read_Buffer_Continue()
 {
     //Handling CRC32 computing when there is no need of the data (data not parsed, only needed for CRC32)
@@ -1109,8 +1151,36 @@ void File_Mk::Read_Buffer_Continue()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+bool File_Mk::Header_Begin()
+{
+    #if MEDIAINFO_DEMUX
+        //Handling of multiple frames in one block
+        if (Config->Demux_Unpacketize_Get() && Demux_EventWasSent!=(int64u)-1)
+        {
+            stream &Stream_Temp=Stream[Demux_EventWasSent];
+            Frame_Count_NotParsedIncluded=Stream_Temp.Parser->Frame_Count_NotParsedIncluded;
+            FrameInfo.PTS=Stream_Temp.Parser->FrameInfo.PTS;
+            Open_Buffer_Continue(Stream_Temp.Parser, Buffer + Buffer_Offset, 0);
+            if (Config->Demux_EventWasSent)
+                return false;
+            Demux_EventWasSent=(int64u)-1;
+        }
+    #endif //MEDIAINFO_DEMUX
+
+    return true;
+}
+
+//---------------------------------------------------------------------------
 void File_Mk::Header_Parse()
 {
+    //Handling of laces
+    if (!Laces.empty())
+    {
+        Header_Fill_Code(Elements::Segment_Cluster_BlockGroup_Block_Lace, "Data");
+        Header_Fill_Size(Laces[Laces_Pos]);
+        return;
+    }
+
     //Test of zero padding
     int8u Null;
     Peek_B1(Null);
@@ -1318,7 +1388,10 @@ void File_Mk::Data_Parse()
             ATOM_BEGIN
             LIST(Segment_Cluster_BlockGroup)
                 ATOM_BEGIN
-                ATOM(Segment_Cluster_BlockGroup_Block)
+                LIST(Segment_Cluster_BlockGroup_Block)
+                    ATOM_BEGIN
+                    ATOM(Segment_Cluster_BlockGroup_Block_Lace)
+                    ATOM_END_MK
                 LIST(Segment_Cluster_BlockGroup_BlockAdditions)
                     ATOM_BEGIN
                     LIST(Segment_Cluster_BlockGroup_BlockAdditions_BlockMore)
@@ -1347,7 +1420,10 @@ void File_Mk::Data_Parse()
                 ATOM_BEGIN
                 ATOM(Segment_Cluster_SilentTracks_SilentTrackNumber)
                 ATOM_END_MK
-            ATOM(Segment_Cluster_SimpleBlock)
+            LIST(Segment_Cluster_SimpleBlock)
+                ATOM_BEGIN
+                ATOM(Segment_Cluster_BlockGroup_Block_Lace)
+                ATOM_END_MK
             ATOM(Segment_Cluster_Timecode)
             ATOM_END_MK
         LIST(Segment_Cues)
@@ -1708,6 +1784,10 @@ void File_Mk::Segment()
 
     Segment_Offset_Begin=File_Offset+Buffer_Offset;
     Segment_Offset_End=File_Offset+Buffer_Offset+Element_TotalSize_Get();
+
+    #if MEDIAINFO_TRACE
+        Trace_Segment_Cluster_Count=0;
+    #endif // MEDIAINFO_TRACE
 }
 
 void File_Mk::Segment_Attachments()
@@ -1805,7 +1885,7 @@ void File_Mk::Segment_Attachments_AttachedFile_FileData()
                     Event.Description=AttachedFile_FileDescription.c_str();
                 EVENT_END()
             }
-        #endif MEDIAINFO_EVENTS
+        #endif //MEDIAINFO_EVENTS
     }
     
     Skip_XX(Element_TotalSize_Get(),                            "Data");
@@ -2100,9 +2180,15 @@ void File_Mk::Segment_Cluster()
 {
     Element_Name("Cluster");
 
-#if MEDIAINFO_TRACE
-    Element_Set_Remove_Children_IfNoErrors();
-#endif // MEDIAINFO_TRACE
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (Trace_Segment_Cluster_Count<MaxCountSameElementInTrace)
+                Trace_Segment_Cluster_Count++;
+            else
+                Element_Set_Remove_Children_IfNoErrors();
+        }
+    #endif // MEDIAINFO_TRACE
 
     //For each stream
     std::map<int64u, stream>::iterator Temp=Stream.begin();
@@ -2163,15 +2249,25 @@ void File_Mk::Segment_Cluster_BlockGroup()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Cluster_BlockGroup_Block()
 {
-    bool is_simple_block = Element_Level == 3;
-    Element_Name(is_simple_block?"SimpleBlock":"Block");
+    if (!Element_IsComplete_Get())
+        return;
+
+    Element_Name((Element_Level==3)?"SimpleBlock":"Block");
 
     //Parsing
-    int64u TrackNumber;
-    Get_EB (TrackNumber,                                        "TrackNumber");
+    Get_EB (TrackNumber,                                        "TrackNumber"); Element_Info1(TrackNumber);
 
     //Finished?
     stream& streamItem = Stream[TrackNumber];
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (streamItem.Trace_Segment_Cluster_Block_Count<=MaxCountSameElementInTrace)
+                streamItem.Trace_Segment_Cluster_Block_Count++;
+            //else
+            //    Element_Set_Remove_Children_IfNoErrors();
+        }
+    #endif // MEDIAINFO_TRACE
     streamItem.PacketCount++;
     if (streamItem.Searching_Payload || streamItem.Searching_TimeStamps || streamItem.Searching_TimeStamp_Start)
     {
@@ -2180,6 +2276,9 @@ void File_Mk::Segment_Cluster_BlockGroup_Block()
         Get_B2 (TimeCodeU,                                      "TimeCode"); // Should be signed, but we don't have signed integer reader
         int16s TimeCode = (int16s)TimeCodeU;
         Element_Info1(TimeCodeU);
+        #if MEDIAINFO_DEMUX
+        FrameInfo.PTS=(Segment_Cluster_TimeCode_Value+TimeCode)*1000000;
+        #endif //MEDIAINFO_DEMUX
 
         FILLING_BEGIN();
             if (Segment_Cluster_TimeCode_Value+TimeCode<streamItem.TimeCode_Start) //Does not work well: streamItem.Searching_TimeStamp_Start)
@@ -2205,7 +2304,6 @@ void File_Mk::Segment_Cluster_BlockGroup_Block()
 
         if (streamItem.Searching_Payload)
         {
-            std::vector<int64u> Laces;
             int32u Lacing;
             Element_Begin1("Flags");
                 BS_Begin();
@@ -2240,7 +2338,14 @@ void File_Mk::Segment_Cluster_BlockGroup_Block()
                                         Element_Offset_Virtual+=Size;
                                         Laces.push_back(Size);
                                     }
-                                    Laces.push_back(Element_Size-Element_Offset-Element_Offset_Virtual); //last lace
+                                    if (Element_Offset+Element_Offset_Virtual>Element_Size)
+                                    {
+                                        //Problem
+                                        Laces.clear();
+                                        Laces.push_back(Element_Size - Element_Offset);
+                                    }
+                                    else
+                                        Laces.push_back(Element_Size-Element_Offset-Element_Offset_Virtual); //last lace
                                 }
                                 break;
                         case 2 : //Fixed-size lacing - No more data
@@ -2263,7 +2368,14 @@ void File_Mk::Segment_Cluster_BlockGroup_Block()
                                         Element_Offset_Virtual+=Size;
                                         Laces.push_back(Size);
                                     }
-                                    Laces.push_back(Element_Size-Element_Offset-Element_Offset_Virtual); Param_Info1(Size); //last lace
+                                    if (Element_Offset+Element_Offset_Virtual>Element_Size)
+                                    {
+                                        //Problem
+                                        Laces.clear();
+                                        Laces.push_back(Element_Size - Element_Offset);
+                                    }
+                                    else
+                                        Laces.push_back(Element_Size-Element_Offset-Element_Offset_Virtual); Param_Info1(Size); //last lace
                                 }
                                 break;
                         default : ; //Should never be here
@@ -2272,70 +2384,115 @@ void File_Mk::Segment_Cluster_BlockGroup_Block()
             }
             else
                 Laces.push_back(Element_Size-Element_Offset);
-
-            FILLING_BEGIN();
-                //Parsing
-                for (size_t Pos=0; Pos<Laces.size(); Pos++)
-                {
-                    //Content compression
-                    if (streamItem.ContentCompAlgo!=(int32u)-1 && streamItem.ContentCompAlgo!=3)
-                        streamItem.Searching_Payload=false; //Unsupported
-
-                    //Integrity test
-                    if (Element_Offset+Laces[Pos]>Element_Size)
-                        streamItem.Searching_Payload=false; //There is a problem
-
-                    if (streamItem.Searching_Payload)
-                    {
-                        Element_Begin1("Data");
-                        Element_Parser(streamItem.Parser->ParserName.c_str());
-
-                        Element_Code=TrackNumber;
-
-                        //Content compression
-                        if (streamItem.ContentCompAlgo==3) //Header Stripping
-                        {
-                            Element_Offset-=(size_t)streamItem.ContentCompSettings_Buffer_Size; //This is an extra array, not in the stream
-                            Open_Buffer_Continue(streamItem.Parser, streamItem.ContentCompSettings_Buffer, (size_t)streamItem.ContentCompSettings_Buffer_Size);
-                            Element_Offset+=(size_t)streamItem.ContentCompSettings_Buffer_Size;
-                            Demux(streamItem.ContentCompSettings_Buffer, (size_t)streamItem.ContentCompSettings_Buffer_Size, ContentType_MainStream);
-                        }
-
-                        //Parsing
-                        #if MEDIAINFO_DEMUX
-                            int8u Demux_Level_old=Demux_Level;
-                            if (streamItem.Parser && streamItem.Parser->Demux_Level==2)
-                                Demux_Level=4;
-                            Demux(Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset), ContentType_MainStream);
-                            Demux_Level=Demux_Level_old;
-                        #endif //MEDIAINFO_DEMUX
-                        Open_Buffer_Continue(streamItem.Parser, (size_t)Laces[Pos]);
-                        if (streamItem.Parser->Status[IsFinished]
-                         || (streamItem.PacketCount>=300 && MediaInfoLib::Config.ParseSpeed_Get()<1))
-                            streamItem.Searching_Payload=false;
-
-                        Element_End0();
-                    }
-                    else
-                        Skip_XX(Laces[Pos],                         "Data");
-                }
-
-                //Positionning
-                Element_Offset=Element_Size;
-            FILLING_END();
         }
         else
         {
-            Skip_XX(Element_Size-Element_Offset,                    "Data");
+            Laces.push_back(Element_Size-Element_Offset);
         }
-
-        if (!streamItem.Searching_Payload && !streamItem.Searching_TimeStamps && !streamItem.Searching_TimeStamp_Start)
-            Stream_Count--;
     }
     else
     {
-        Skip_XX(Element_Size-Element_Offset,                        "Data");
+        Laces.push_back(Element_Size-Element_Offset);
     }
+
+    if (Laces.size()==1)
+    {
+        Element_Begin1("Data");
+        Segment_Cluster_BlockGroup_Block_Lace();
+        Element_End0();
+    }
+
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated && (Trace_Segment_Cluster_Count>MaxCountSameElementInTrace || streamItem.Trace_Segment_Cluster_Block_Count>MaxCountSameElementInTrace))
+            Element_Children_IfNoErrors();
+    #endif // MEDIAINFO_TRACE
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Cluster_BlockGroup_Block_Lace()
+{
+    stream& streamItem=Stream[TrackNumber];
+
+    //Content compression
+    if (streamItem.ContentCompAlgo!=(int32u)-1 && streamItem.ContentCompAlgo!=3)
+        streamItem.Searching_Payload=false; //Unsupported
+
+    if (streamItem.Searching_Payload)
+    {
+        Element_Parser(streamItem.Parser->ParserName.c_str());
+
+        Element_Code=TrackNumber;
+
+        //Content compression
+        /* Old method, does not support all needs e.g. 1 complete frame per demux packet
+        if (streamItem.ContentCompAlgo==3) //Header Stripping
+        {
+            Element_Offset-=(size_t)streamItem.ContentCompSettings_Buffer_Size; //This is an extra array, not in the stream
+            Open_Buffer_Continue(streamItem.Parser, streamItem.ContentCompSettings_Buffer, (size_t)streamItem.ContentCompSettings_Buffer_Size);
+            Element_Offset+=(size_t)streamItem.ContentCompSettings_Buffer_Size;
+            Demux(streamItem.ContentCompSettings_Buffer, (size_t)streamItem.ContentCompSettings_Buffer_Size, ContentType_MainStream);
+        }
+        */
+        int8u* Buffer_Stripping=NULL;
+        const int8u* Save_Buffer=Buffer;
+        int64u Save_File_Offset=File_Offset;
+        size_t Save_Buffer_Offset=Buffer_Offset;
+        int64u Save_Element_Size=Element_Size;
+        size_t Save_Element_Offset=(size_t)Element_Offset;
+        if (streamItem.ContentCompAlgo==3) //Header Stripping
+        {
+            Element_Size=streamItem.ContentCompSettings_Buffer_Size+Save_Element_Size-Save_Element_Offset;
+            File_Offset+=Buffer_Offset+Element_Offset-streamItem.ContentCompSettings_Buffer_Size;
+            Buffer_Offset=0;
+            Element_Offset=0;
+            Buffer_Stripping=new int8u[(size_t)Element_Size];
+            std::memcpy(Buffer_Stripping, streamItem.ContentCompSettings_Buffer, streamItem.ContentCompSettings_Buffer_Size);
+            std::memcpy(Buffer_Stripping+streamItem.ContentCompSettings_Buffer_Size, Save_Buffer+Save_Buffer_Offset+Save_Element_Offset, Save_Element_Size-Save_Element_Offset);
+            Buffer=Buffer_Stripping;
+        }
+
+        //Parsing
+        if(Laces_Pos)
+            FrameInfo.PTS=streamItem.Parser->FrameInfo.PTS;
+        else
+            streamItem.Parser->FrameInfo.PTS=FrameInfo.PTS;
+        Frame_Count_NotParsedIncluded=(streamItem.PacketCount==1 && !Laces_Pos)?0:streamItem.Parser->Frame_Count_NotParsedIncluded;
+        #if MEDIAINFO_DEMUX
+            int8u Demux_Level_old=Demux_Level;
+            if (streamItem.Parser && streamItem.Parser->Demux_Level==2)
+                Demux_Level=4;
+            Demux(Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset), ContentType_MainStream);
+            Demux_Level=Demux_Level_old;
+            streamItem.Parser->FrameInfo.PTS=FrameInfo.PTS;
+        #endif //MEDIAINFO_DEMUX
+            Open_Buffer_Continue(streamItem.Parser, (size_t)(Element_Size-Element_Offset));
+        if (streamItem.Parser->Status[IsFinished]
+            || (streamItem.PacketCount>=300 && MediaInfoLib::Config.ParseSpeed_Get()<1))
+        {
+            streamItem.Searching_Payload=false;
+            if (!streamItem.Searching_TimeStamps && !streamItem.Searching_TimeStamp_Start)
+                Stream_Count--;
+        }
+        FrameInfo.PTS=(int64u)-1;
+        Frame_Count_NotParsedIncluded=(int64u)-1;
+
+        #if MEDIAINFO_DEMUX
+            if (Config->Demux_EventWasSent && Config->Demux_Unpacketize_Get())
+                Demux_EventWasSent=Element_Code;
+        #endif //MEDIAINFO_DEMUX
+
+        if (Save_Buffer!=Buffer)
+        {
+            //We must change the buffer for keeping out
+            Element_Offset=Save_Element_Size;
+            Element_Size=Save_Element_Size;
+            File_Offset=Save_File_Offset;
+            Buffer_Offset=Save_Buffer_Offset;
+            delete[] Buffer; Buffer=Save_Buffer;
+        }
+    }
+    else
+        Skip_XX(Element_Size-Element_Offset,                    "Data");
 
     //Filling
     Frame_Count++;
@@ -2350,19 +2507,32 @@ void File_Mk::Segment_Cluster_BlockGroup_Block()
                 if (Segment_Seeks[Pos]>File_Offset+Buffer_Offset+Element_Size)
                 {
                     JumpTo(Segment_Seeks[Pos]);
+                    Open_Buffer_Unsynch();
                     break;
                 }
             if (File_GoTo==(int64u)-1)
+            {
                 JumpTo(Segment_Offset_End);
+                Open_Buffer_Unsynch();
+            }
         }
+
+        Laces.clear();
+    }
+
+    Laces_Pos++;
+    if (Laces_Pos>=Laces.size())
+    {
+        Laces.clear();
+        Laces_Pos=0;
     }
 
     Element_Show();
 
-#if MEDIAINFO_TRACE
-    if (is_simple_block)
-        Element_Children_IfNoErrors();
-#endif // MEDIAINFO_TRACE
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated && (Trace_Segment_Cluster_Count>MaxCountSameElementInTrace || streamItem.Trace_Segment_Cluster_Block_Count>MaxCountSameElementInTrace))
+            Element_Children_IfNoErrors();
+    #endif // MEDIAINFO_TRACE
 }
 
 //---------------------------------------------------------------------------
@@ -2526,12 +2696,26 @@ void File_Mk::Segment_Cues()
 
     //Skipping Cues, we don't need of them
     TestMultipleInstances();
+
+    #if MEDIAINFO_TRACE
+        Trace_Segment_Cues_CuePoint_Count=0;
+    #endif // MEDIAINFO_TRACE
 }
 
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Cues_CuePoint()
 {
     Element_Name("CuePoint");
+
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (Trace_Segment_Cues_CuePoint_Count<MaxCountSameElementInTrace)
+                Trace_Segment_Cues_CuePoint_Count++;
+            else
+                Element_Set_Remove_Children_IfNoErrors();
+        }
+    #endif // MEDIAINFO_TRACE
 }
 
 //---------------------------------------------------------------------------
@@ -2797,12 +2981,26 @@ void File_Mk::Segment_SeekHead()
     Element_Name("SeekHead");
 
     Segment_Seeks.clear();
+
+    #if MEDIAINFO_TRACE
+        Trace_Segment_SeekHead_Seek_Count=0;
+    #endif // MEDIAINFO_TRACE
 }
 
 //---------------------------------------------------------------------------
 void File_Mk::Segment_SeekHead_Seek()
 {
     Element_Name("Seek");
+
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            if (Trace_Segment_SeekHead_Seek_Count<MaxCountSameElementInTrace)
+                Trace_Segment_SeekHead_Seek_Count++;
+            else
+                Element_Set_Remove_Children_IfNoErrors();
+        }
+    #endif // MEDIAINFO_TRACE
 }
 
 //---------------------------------------------------------------------------
@@ -4017,14 +4215,31 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_StereoMode()
     Element_Name("StereoMode");
 
     //Parsing
-    int64u UInteger=UInteger_Get(); Element_Info1(Format_Version==2?Mk_StereoMode_v2(UInteger):Mk_StereoMode(UInteger));
+    int64u UInteger=UInteger_Get(); Element_Info1(Mk_StereoMode(UInteger));
 
     //Filling
     FILLING_BEGIN();
         if (Segment_Info_Count>1)
             return; //First element has the priority
         Fill(Stream_Video, StreamPos_Last, Video_MultiView_Count, 2); //Matroska seems to be limited to 2 views
-        Fill(Stream_Video, StreamPos_Last, Video_MultiView_Layout, Format_Version==2?Mk_StereoMode_v2(UInteger):Mk_StereoMode(UInteger));
+        Fill(Stream_Video, StreamPos_Last, Video_MultiView_Layout, Mk_StereoMode(UInteger));
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tracks_TrackEntry_Video_OldStereoMode()
+{
+    Element_Name("StereoMode");
+
+    //Parsing
+    int64u UInteger=UInteger_Get(); Element_Info1(Mk_StereoMode(UInteger));
+
+    //Filling
+    FILLING_BEGIN();
+        if (Segment_Info_Count>1)
+            return; //First element has the priority
+        Fill(Stream_Video, StreamPos_Last, Video_MultiView_Count, 2); //Matroska seems to be limited to 2 views
+        Fill(Stream_Video, StreamPos_Last, Video_MultiView_Layout, Mk_StereoMode(UInteger));
     FILLING_END();
 }
 
@@ -4357,6 +4572,13 @@ void File_Mk::CodecID_Manage()
             parser->MustSynchronize=false;
             parser->MustParse_SPS_PPS=true;
             parser->SizedBlocks=true;
+            #if MEDIAINFO_DEMUX
+                if (Config->Demux_Avc_Transcode_Iso14496_15_to_Iso14496_10_Get())
+                {
+                    streamItem.Parser->Demux_Level=2; //Container
+                    streamItem.Parser->Demux_UnpacketizeContainer=true;
+                }
+            #endif //MEDIAINFO_DEMUX
         }
     }
     #endif

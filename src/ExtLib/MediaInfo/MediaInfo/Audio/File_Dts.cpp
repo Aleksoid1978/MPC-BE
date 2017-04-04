@@ -490,7 +490,10 @@ void File_Dts::Streams_Fill_Core_ES()
     }
     else
     {
-        Ztring Debug=__T("Debug, Core_Core_AMODE=")+Ztring::ToZtring(Core_Core_AMODE)+(Presence[presence_Core_XCh]?(__T(", Core_XCh_AMODE=")+Ztring::ToZtring(Core_XCh_AMODE)):__T(""))+__T(", Core_Core_LFF=")+Ztring::ToZtring(Core_Core_LFF);
+        Ztring Debug=__T("Debug, Core_Core_AMODE=")+Ztring::ToZtring(Core_Core_AMODE);
+        if(Presence[presence_Core_XCh])
+           Debug +=__T(", Core_XCh_AMODE=")+Ztring::ToZtring(Core_XCh_AMODE);
+        Debug +=__T(", Core_Core_LFF=")+Ztring::ToZtring(Core_Core_LFF);
         Data[ChannelPositions].push_back(Debug);
         Data[ChannelPositions2].push_back(Debug);
         Data[ChannelLayout].push_back(Debug);

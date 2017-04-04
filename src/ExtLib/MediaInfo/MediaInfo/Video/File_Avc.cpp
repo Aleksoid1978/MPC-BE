@@ -76,8 +76,8 @@ const char* Avc_profile_idc(int8u profile_idc)
 #if MEDIAINFO_ADVANCED2
     #include "ThirdParty/base64/base64.h"
 #endif //MEDIAINFO_ADVANCED2
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #if MEDIAINFO_EVENTS
-    #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
     #include "MediaInfo/MediaInfo_Config_PerPackage.h"
     #include "MediaInfo/MediaInfo_Events.h"
     #include "MediaInfo/MediaInfo_Events_Internal.h"
@@ -1193,7 +1193,7 @@ bool File_Avc::Demux_UnpacketizeContainer_Test()
 
                 if (Demux_Offset+6>Buffer_Size)
                 {
-                    if (File_Offset+Buffer_Size==File_Size)
+                    if (Config->IsFinishing)
                         Demux_Offset=Buffer_Size;
                     break;
                 }
@@ -1214,7 +1214,7 @@ bool File_Avc::Demux_UnpacketizeContainer_Test()
                 Demux_Offset++;
             }
 
-            if (Demux_Offset+6>Buffer_Size && !FrameIsAlwaysComplete && File_Offset+Buffer_Size<File_Size)
+            if (Demux_Offset+6>Buffer_Size && !FrameIsAlwaysComplete && !Config->IsFinishing)
                 return false; //No complete frame
 
             if (Demux_Offset && Buffer[Demux_Offset-1]==0x00)
@@ -1336,6 +1336,7 @@ void File_Avc::Synched_Init()
     //Temp
     FrameRate_Divider=1;
     FirstPFrameInGop_IsParsed=false;
+    Config_IsRepeated=false;
     tc=0;
 
     //Default values
@@ -1395,7 +1396,7 @@ void File_Avc::Read_Buffer_Unsynched()
     #endif //defined(MEDIAINFO_DTVCCTRANSPORT_YES)
 
     //parameter_sets
-    if (SizedBlocks) //If sized blocks, it is not a broadcasted stream so SPS/PPS are only in container header, we must not disable them.
+    if (SizedBlocks || !Config_IsRepeated) //If sized blocks, it is not a broadcasted stream so SPS/PPS are only in container header, we must not disable them.
     {
         //Rebuilding immediatly TemporalReferences
         for (std::vector<seq_parameter_set_struct*>::iterator seq_parameter_set_Item=seq_parameter_sets.begin(); seq_parameter_set_Item!=seq_parameter_sets.end(); ++seq_parameter_set_Item)
@@ -1537,7 +1538,7 @@ bool File_Avc::Header_Parser_Fill_Size()
     //Must wait more data?
     if (Buffer_Offset_Temp+5>Buffer_Size)
     {
-        if (FrameIsAlwaysComplete || File_Offset+Buffer_Size>=File_Size)
+        if (FrameIsAlwaysComplete || Config->IsFinishing)
             Buffer_Offset_Temp=Buffer_Size; //We are sure that the next bytes are a start
         else
             return false;
@@ -2897,11 +2898,7 @@ void File_Avc::sei_message_user_data_registered_itu_t_t35_GA94_03()
         //Coherency
         delete TemporalReferences_DelayedElement; TemporalReferences_DelayedElement=new temporal_reference();
 
-        TemporalReferences_DelayedElement->GA94_03=new temporal_reference::buffer_data;
-        TemporalReferences_DelayedElement->GA94_03->Size=(size_t)(Element_Size-Element_Offset);
-        delete[] TemporalReferences_DelayedElement->GA94_03->Data;
-        TemporalReferences_DelayedElement->GA94_03->Data=new int8u[(size_t)(Element_Size-Element_Offset)];
-        std::memcpy(TemporalReferences_DelayedElement->GA94_03->Data, Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset));
+        TemporalReferences_DelayedElement->GA94_03=new buffer_data(Buffer+Buffer_Offset+(size_t)Element_Offset,(size_t)(Element_Size-Element_Offset));
 
         //Parsing
         Skip_XX(Element_Size-Element_Offset,                    "CC data");
@@ -3306,6 +3303,8 @@ void File_Avc::seq_parameter_set_data_Add(std::vector<seq_parameter_set_struct*>
     //Creating Data
     if (Data_id>=Data.size())
         Data.resize(Data_id+1);
+    else
+        FirstPFrameInGop_IsParsed=true;
     std::vector<seq_parameter_set_struct*>::iterator Data_Item=Data.begin()+Data_id;
     delete *Data_Item; *Data_Item=Data_Item_New;
 

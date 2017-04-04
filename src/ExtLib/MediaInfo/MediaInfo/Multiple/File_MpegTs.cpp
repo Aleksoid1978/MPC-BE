@@ -234,12 +234,7 @@ static const char* MpegTs_DtsNeural_ChannelPositions2(int8u Channels, int8u conf
 //---------------------------------------------------------------------------
 static Ztring Decimal_Hexa(int64u Number)
 {
-    Ztring Temp;
-    Temp.From_Number(Number);
-    Temp+=__T(" (0x");
-    Temp+=Ztring::ToZtring(Number, 16);
-    Temp+=__T(")");
-    return Temp;
+    return Get_Hex_ID(Number);
 }
 
 //***************************************************************************
@@ -288,6 +283,7 @@ File_MpegTs::File_MpegTs()
     Complete_Stream=NULL;
     Begin_MaxDuration=MediaInfoLib::Config.ParseSpeed_Get()>=0.8?(int64u)-1:MediaInfoLib::Config.MpegTs_MaximumScanDuration_Get()*27/1000;
     ForceStreamDisplay=MediaInfoLib::Config.MpegTs_ForceStreamDisplay_Get();
+    ForceTextStreamDisplay=MediaInfoLib::Config.MpegTs_ForceTextStreamDisplay_Get();
 
     #if MEDIAINFO_SEEK
         Seek_Value=(int64u)-1;
@@ -456,6 +452,26 @@ void File_MpegTs::Streams_Update_Programs()
         {
             if (Program->second.IsParsed)
             {
+                // Special case: force text stream display if requested and if video stream is present
+                if (ForceTextStreamDisplay)
+                {
+                    for (size_t Pos = 0; Pos < Program->second.elementary_PIDs.size(); Pos++)
+                    {
+                        int16u elementary_PID = Program->second.elementary_PIDs[Pos];
+                        if (Complete_Stream->Streams[elementary_PID]->StreamKind == Stream_Video && Complete_Stream->Streams[elementary_PID]->IsRegistered)
+                        {
+                            // Video stream is present, finding and filling text streams
+                            for (size_t Pos = 0; Pos < Program->second.elementary_PIDs.size(); Pos++)
+                            {
+                                int16u elementary_PID = Program->second.elementary_PIDs[Pos];
+                                if (Complete_Stream->Streams[elementary_PID]->StreamKind_FromDescriptor == Stream_Text && !Complete_Stream->Streams[elementary_PID]->IsRegistered)
+                                    Streams_Update_Programs_PerStream(elementary_PID);
+                            }
+                            break;
+                        }
+                    }
+                }
+
                 //Per pid
                 Ztring Languages, Codecs, Formats, StreamKinds, StreamPoss, elementary_PIDs, elementary_PIDs_String, Delay, LawRating, Title;
                 for (size_t Pos=0; Pos<Program->second.elementary_PIDs.size(); Pos++)
@@ -763,7 +779,7 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
         }
 
         //By the StreamKind
-        if (StreamKind_Last==Stream_Max && Temp->StreamKind_FromDescriptor!=Stream_Max && (Temp->IsRegistered || ForceStreamDisplay || (!Temp->program_numbers.empty() && Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[Temp->program_numbers[0]].registration_format_identifier==Elements::HDMV)))
+        if (StreamKind_Last==Stream_Max && Temp->StreamKind_FromDescriptor!=Stream_Max && (Temp->IsRegistered || ForceStreamDisplay || (ForceTextStreamDisplay && Temp->StreamKind_FromDescriptor==Stream_Text) || (!Temp->program_numbers.empty() && Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs[Temp->program_numbers[0]].registration_format_identifier==Elements::HDMV)))
         {
             Stream_Prepare(Temp->StreamKind_FromDescriptor);
         }

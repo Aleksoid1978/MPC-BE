@@ -439,12 +439,7 @@ static const char* Mpls_PlayListMarks_Mark_type(int8u type)
 //---------------------------------------------------------------------------
 static Ztring Bdmv_Decimal_Hexa(int64u Number)
 {
-    Ztring Temp;
-    Temp.From_Number(Number);
-    Temp+=__T(" (0x");
-    Temp+=Ztring::ToZtring(Number, 16);
-    Temp+=__T(")");
-    return Temp;
+    return Get_Hex_ID(Number);
 }
 
 //***************************************************************************
