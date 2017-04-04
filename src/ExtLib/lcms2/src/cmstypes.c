@@ -4477,6 +4477,10 @@ void *Type_MPE_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, cmsU
     if (!_cmsReadUInt32Number(io, &ElementCount)) goto Error;    
     if (!ReadPositionTable(self, io, ElementCount, BaseOffset, NewLUT, ReadMPEElem)) goto Error;
 
+    // Check channel count
+    if (InputChans != NewLUT->InputChannels ||
+        OutputChans != NewLUT->OutputChannels) goto Error;
+
     // Success
     *nItems = 1;
     return NewLUT;

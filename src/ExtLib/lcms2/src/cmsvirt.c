@@ -830,8 +830,10 @@ cmsHPROFILE CMSEXPORT cmsCreateNULLProfileTHR(cmsContext ContextID)
     cmsHPROFILE hProfile;
     cmsPipeline* LUT = NULL;
     cmsStage* PostLin;
-    cmsToneCurve* EmptyTab;
+    cmsStage* OutLin;
+    cmsToneCurve* EmptyTab[3];
     cmsUInt16Number Zero[2] = { 0, 0 };
+    const cmsFloat64Number PickLstarMatrix[] = { 1, 0, 0 };
 
     hProfile = cmsCreateProfilePlaceholder(ContextID);
     if (!hProfile)                          // can't allocate
@@ -842,20 +844,26 @@ cmsHPROFILE CMSEXPORT cmsCreateNULLProfileTHR(cmsContext ContextID)
     if (!SetTextTags(hProfile, L"NULL profile built-in")) goto Error;
 
 
-
     cmsSetDeviceClass(hProfile, cmsSigOutputClass);
     cmsSetColorSpace(hProfile,  cmsSigGrayData);
     cmsSetPCS(hProfile,         cmsSigLabData);
 
-    // An empty LUTs is all we need
-    LUT = cmsPipelineAlloc(ContextID, 1, 1);
+    // Create a valid ICC 4 structure
+    LUT = cmsPipelineAlloc(ContextID, 3, 1);
     if (LUT == NULL) goto Error;
-
-    EmptyTab = cmsBuildTabulatedToneCurve16(ContextID, 2, Zero);
-    PostLin = cmsStageAllocToneCurves(ContextID, 1, &EmptyTab);
-    cmsFreeToneCurve(EmptyTab);
+    
+    EmptyTab[0] = EmptyTab[1] = EmptyTab[2] = cmsBuildTabulatedToneCurve16(ContextID, 2, Zero);
+    PostLin = cmsStageAllocToneCurves(ContextID, 3, EmptyTab);
+    OutLin  = cmsStageAllocToneCurves(ContextID, 1, EmptyTab);
+    cmsFreeToneCurve(EmptyTab[0]);
 
     if (!cmsPipelineInsertStage(LUT, cmsAT_END, PostLin))
+        goto Error;
+
+    if (!cmsPipelineInsertStage(LUT, cmsAT_END, cmsStageAllocMatrix(ContextID, 1, 3, PickLstarMatrix, NULL)))
+        goto Error;
+
+    if (!cmsPipelineInsertStage(LUT, cmsAT_END, OutLin))
         goto Error;
 
     if (!cmsWriteTag(hProfile, cmsSigBToA0Tag, (void*) LUT)) goto Error;
