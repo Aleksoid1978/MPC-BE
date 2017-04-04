@@ -5582,19 +5582,65 @@ void CMainFrame::OnUpdateFileSaveAs(CCmdUI* pCmdUI)
 	pCmdUI->Enable(TRUE);
 }
 
-bool CMainFrame::GetDIB(BYTE** ppData, long& size, bool fSilent)
+HRESULT GetBasicVideoFrame(IBasicVideo* pBasicVideo, std::vector<BYTE>& dib)
 {
-	if (!ppData) {
-		return false;
+	// IBasicVideo::GetCurrentImage() gives the original frame
+
+	long size;
+
+	HRESULT hr = pBasicVideo->GetCurrentImage(&size, NULL);
+	if (FAILED(hr)) {
+		return hr;
+	}
+	if (size <= 0) {
+		return E_ABORT;
 	}
 
-	*ppData = NULL;
-	size = 0;
+	dib.resize(size);
+
+	hr = pBasicVideo->GetCurrentImage(&size, (long*)dib.data());
+	if (FAILED(hr)) {
+		dib.clear();
+	}
+
+	return hr;
+}
+
+HRESULT GetVideoDisplayControlFrame(IMFVideoDisplayControl* pVideoDisplayControl, std::vector<BYTE>& dib)
+{
+	// IMFVideoDisplayControl::GetCurrentImage() gives the displayed frame
+
+	BITMAPINFOHEADER	bih = {sizeof(BITMAPINFOHEADER)};
+	BYTE*				pDib;
+	DWORD				size;
+	REFERENCE_TIME		rtImage = 0;
+
+	HRESULT hr = pVideoDisplayControl->GetCurrentImage(&bih, &pDib, &size, &rtImage);
+	if (S_OK != hr) {
+		return hr;
+	}
+	if (size == 0) {
+		return E_ABORT;
+	}
+
+	dib.resize(sizeof(BITMAPINFOHEADER) + size);
+
+	memcpy(dib.data(), &bih, sizeof(BITMAPINFOHEADER));
+	memcpy(dib.data() + sizeof(BITMAPINFOHEADER), pDib, size);
+	CoTaskMemFree(pDib);
+
+	return hr;
+}
+
+
+HRESULT CMainFrame::GetCurrentFrame(std::vector<BYTE>& dib, CString& errmsg)
+{
+	HRESULT hr = S_OK;
+	errmsg.Empty();
 
 	OAFilterState fs = GetMediaState();
-
-	if (!(m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly && (fs == State_Paused || fs == State_Running))) {
-		return false;
+	if (m_eMediaLoadState != MLS_LOADED || m_bAudioOnly || (fs != State_Paused && fs != State_Running)) {
+		return E_ABORT;
 	}
 
 	if (fs == State_Running && !m_pCAP) {
@@ -5602,100 +5648,58 @@ bool CMainFrame::GetDIB(BYTE** ppData, long& size, bool fSilent)
 		GetMediaState(); // wait for completion of the pause command
 	}
 
-	HRESULT hr = S_OK;
-	CString errmsg;
+	if (m_pCAP) {
+		DWORD size;
+		hr = m_pCAP->GetDIB(NULL, &size);
 
-	do {
-		if (m_pCAP) {
-			hr = m_pCAP->GetDIB(NULL, (DWORD*)&size);
-			if (FAILED(hr)) {
-				errmsg.Format(ResStr(IDS_MAINFRM_49), hr);
-				break;
-			}
+		if (S_OK == hr) {
+			dib.resize(size);
+			hr = m_pCAP->GetDIB(dib.data(), &size);
 
-			*ppData = DNew BYTE[size];
-			if (!(*ppData)) {
-				return false;
-			}
-
-			hr = m_pCAP->GetDIB(*ppData, (DWORD*)&size);
 			if (FAILED(hr)) {
 				OnPlayPause();
 				GetMediaState(); // Pause and retry to support ffdshow queuing.
 				int retry = 0;
 				while (FAILED(hr) && retry < 20) {
-					hr = m_pCAP->GetDIB(*ppData, (DWORD*)&size);
+					hr = m_pCAP->GetDIB(dib.data(), &size);
 					if (SUCCEEDED(hr)) {
 						break;
 					}
 					Sleep(1);
 					retry++;
 				}
-				if (FAILED(hr)) {
-					errmsg.Format(ResStr(IDS_MAINFRM_49), hr);
-					break;
-				}
 			}
-		} else if (m_pMFVDC) {
-			// Capture with EVR
-			BITMAPINFOHEADER	bih = {sizeof(BITMAPINFOHEADER)};
-			BYTE*				pDib;
-			DWORD				dwSize;
-			REFERENCE_TIME		rtImage = 0;
-			hr = m_pMFVDC->GetCurrentImage (&bih, &pDib, &dwSize, &rtImage);
-			if (FAILED(hr) || dwSize == 0) {
-				errmsg.Format(ResStr(IDS_MAINFRM_51), hr);
-				break;
-			}
+		}
 
-			size = (long)dwSize + sizeof(BITMAPINFOHEADER);
-			*ppData = DNew BYTE[size];
-			if (!(*ppData)) {
-				return false;
-			}
-			memcpy_s(*ppData, size, &bih, sizeof(BITMAPINFOHEADER));
-			memcpy_s(*ppData+sizeof(BITMAPINFOHEADER), size - sizeof(BITMAPINFOHEADER), pDib, dwSize);
-			CoTaskMemFree(pDib);
-		} else {
-			hr = m_pBV->GetCurrentImage(&size, NULL);
-			if (FAILED(hr) || size == 0) {
-				errmsg.Format(ResStr(IDS_MAINFRM_51), hr);
-				break;
-			}
+		if (FAILED(hr)) {
+			errmsg.Format(L"ISubPicAllocatorPresenter3::GetDIB() failed, %s", hr);
+		}
+	}
+	else if (m_pBV) {
+		hr = GetBasicVideoFrame(m_pBV, dib);
 
-			*ppData = DNew BYTE[size];
-			if (!(*ppData)) {
-				return false;
-			}
+		if (hr == E_NOINTERFACE && m_pMFVDC) {
+			// hmm, EVR is not able to give the original frame, giving the display frame
+			hr = GetVideoDisplayControlFrame(m_pMFVDC, dib);
 
-			hr = m_pBV->GetCurrentImage(&size, (long*)*ppData);
 			if (FAILED(hr)) {
-				errmsg.Format(ResStr(IDS_MAINFRM_51), hr);
-				break;
+				errmsg.Format(L"IMFVideoDisplayControl::GetCurrentImage() failed, %s", hr);
 			}
 		}
-	} while (0);
-
-	if (!fSilent) {
-		if (!errmsg.IsEmpty()) {
-			AfxMessageBox(errmsg, MB_OK);
+		else if (FAILED(hr)) {
+			errmsg.Format(L"IBasicVideo::GetCurrentImage() failed, %s", hr);
 		}
+	}
+	else {
+		hr = E_POINTER;
+		errmsg.Format(L"Interface not found!");
 	}
 
 	if (fs == State_Running && GetMediaState() != State_Running) {
 		m_pMC->Run();
 	}
 
-	if (FAILED(hr)) {
-		if (*ppData) {
-			ASSERT(0);
-			delete [] *ppData;
-			*ppData = NULL;
-		}
-		return false;
-	}
-
-	return true;
+	return hr;
 }
 
 void CMainFrame::SaveDIB(LPCWSTR fn, BYTE* pData, long size)
@@ -5728,15 +5732,20 @@ void CMainFrame::SaveDIB(LPCWSTR fn, BYTE* pData, long size)
 
 void CMainFrame::SaveImage(LPCWSTR fn)
 {
-	BYTE* pData = NULL;
-	long size = 0;
+	std::vector<BYTE> dib;
+	CString errmsg;
+	HRESULT hr = GetCurrentFrame(dib, errmsg);
 
-	if (GetDIB(&pData, size)) {
-		SaveDIB(fn, pData, size);
-		delete [] pData;
+	if (hr == S_OK) {
+		SaveDIB(fn, dib.data(), dib.size());
 
 		m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_IMAGE_SAVED), 3000);
 	}
+	else {
+		m_OSD.DisplayMessage(OSD_TOPLEFT, errmsg, 3000);
+	}
+
+
 }
 
 void CMainFrame::SaveThumbnails(LPCWSTR fn)
