@@ -431,7 +431,7 @@ void File_Ibi::Stream_ByteOffset()
         #if MEDIAINFO_IBIUSAGE
         Param_Info1(Pos);
         #endif //MEDIAINFO_IBIUSAGE
-        Param_Info1(Ztring::ToZtring(Offset)+__T(" (0x")+Ztring::ToZtring(Offset, 16)+__T(')'));
+        Param_Info1(Get_Hex_ID(Offset));
 
         #if MEDIAINFO_IBIUSAGE
         FILLING_BEGIN();
@@ -470,7 +470,7 @@ void File_Ibi::Stream_FrameNumber()
         #if MEDIAINFO_IBIUSAGE
         Param_Info1(Pos);
         #endif //MEDIAINFO_IBIUSAGE
-        Param_Info1(Ztring::ToZtring(Offset)+__T(" (0x")+Ztring::ToZtring(Offset, 16)+__T(')'));
+        Param_Info1(Get_Hex_ID(Offset));
 
         #if MEDIAINFO_IBIUSAGE
         FILLING_BEGIN();
@@ -531,7 +531,7 @@ void File_Ibi::Stream_Dts()
         #if MEDIAINFO_IBIUSAGE
         Param_Info1(Pos);
         #endif //MEDIAINFO_IBIUSAGE
-        Param_Info1(Ztring::ToZtring(Offset)+__T(" (0x")+Ztring::ToZtring(Offset, 16)+__T(')'));
+        Param_Info1(Get_Hex_ID(Offset));
 
         #if MEDIAINFO_IBIUSAGE
         FILLING_BEGIN();

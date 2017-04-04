@@ -208,6 +208,8 @@ public :
           int64u    MpegTs_MaximumScanDuration_Get ();
           void      MpegTs_ForceStreamDisplay_Set (bool Value);
           bool      MpegTs_ForceStreamDisplay_Get ();
+          void      MpegTs_ForceTextStreamDisplay_Set(bool Value);
+          bool      MpegTs_ForceTextStreamDisplay_Get();
     #if MEDIAINFO_ADVANCED
           void      MpegTs_VbrDetection_Delta_Set (float64 Value);
           float64   MpegTs_VbrDetection_Delta_Get ();
@@ -300,6 +302,7 @@ private :
     int64u          MpegTs_MaximumOffset;
     int64u          MpegTs_MaximumScanDuration;
     bool            MpegTs_ForceStreamDisplay;
+    bool            MpegTs_ForceTextStreamDisplay;
     #if MEDIAINFO_ADVANCED
         float64     MpegTs_VbrDetection_Delta;
         int64u      MpegTs_VbrDetection_Occurences;

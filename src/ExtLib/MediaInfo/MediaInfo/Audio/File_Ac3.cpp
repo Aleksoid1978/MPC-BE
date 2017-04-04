@@ -3409,45 +3409,31 @@ void File_Ac3::Core_Frame()
                 FirstFrame_Dolby.dynrng=dynrng;
             FirstFrame_Dolby.compre=compre;
             FirstFrame_Dolby.dynrnge=dynrnge;
-            if (acmod==0) //1+1 mode
-            {
-                FirstFrame_Dolby2.dialnorm=dialnorm2;
-                if (compr2e)
-                    FirstFrame_Dolby2.compr=compr2;
-                if (dynrng2e)
-                    FirstFrame_Dolby2.dynrng=dynrng2;
-                FirstFrame_Dolby2.compre=compr2e;
-                FirstFrame_Dolby2.dynrnge=dynrng2e;
-            }
         }
 
         //Stats
         if (dialnorms.empty())
             dialnorms.resize(32);
-        dialnorms[dialnorm]++;
+        if (dialnorm!=(int8u)-1)
+            dialnorms[dialnorm]++;
         if (compre)
         {
             if (comprs.empty())
                 comprs.resize(256);
-            comprs[compr]++;
+            if (compr!=(int8u)-1)
+                comprs[compr]++;
         }
         if (dynrnge)
         {
             //Saving new value
             dynrnge_Exists=true;
-            dynrng_Old=dynrng;
         }
         if (!dynrnge)
             dynrng=0;
         if (dynrngs.empty())
             dynrngs.resize(256);
-        dynrngs[dynrng]++;
-        if (acmod==0) //1+1 mode
-        {
-            if (dialnorm2s.empty())
-                dialnorm2s.resize(32);
-            dialnorm2s[dialnorm2]++;
-        }
+        if (dynrng!=(int8u)-1)
+            dynrngs[dynrng]++;
     FILLING_END();
 }
 

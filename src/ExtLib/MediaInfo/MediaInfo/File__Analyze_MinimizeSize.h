@@ -37,6 +37,7 @@ public :
     void    Open_Buffer_Continue    (File__Analyze* Sub, size_t Buffer_Size) {if (Element_Offset+Buffer_Size<=Element_Size) Open_Buffer_Continue(Sub, Buffer+Buffer_Offset+(size_t)Element_Offset, Buffer_Size); Element_Offset+=Buffer_Size;}
     void    Open_Buffer_Continue    (File__Analyze* Sub) {if (Element_Offset<=Element_Size) Open_Buffer_Continue(Sub, Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset)); Element_Offset=Element_Size;}
     void    Open_Buffer_Position_Set(int64u File_Offset);
+    void    Open_Buffer_CheckFileModifications();
     #if MEDIAINFO_SEEK
     size_t  Open_Buffer_Seek        (size_t Method, int64u Value, int64u ID);
     #endif //MEDIAINFO_SEEK
@@ -209,6 +210,7 @@ protected :
     virtual void Read_Buffer_Init ()          {}; //Temp, should be in File__Base caller
     virtual void Read_Buffer_OutOfBand ()     {Open_Buffer_Continue(Buffer, Buffer_Size);} //Temp, should be in File__Base caller
     virtual void Read_Buffer_Continue ()      {}; //Temp, should be in File__Base caller
+    virtual void Read_Buffer_CheckFileModifications() {} //Temp, should be in File__Base caller
     virtual void Read_Buffer_AfterParsing ()  {}; //Temp, should be in File__Base caller
     #if MEDIAINFO_SEEK
     virtual size_t Read_Buffer_Seek (size_t, int64u, int64u); //Temp, should be in File__Base caller

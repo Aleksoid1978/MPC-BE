@@ -1894,7 +1894,7 @@ bool File_Mpegv::Demux_UnpacketizeContainer_Test()
                 }
                 if (Demux_Offset+4>Buffer_Size)
                 {
-                    if (File_Offset+Buffer_Size==File_Size)
+                    if (Config->IsFinishing)
                         Demux_Offset=Buffer_Size;
                     break;
                 }
@@ -1923,7 +1923,7 @@ bool File_Mpegv::Demux_UnpacketizeContainer_Test()
                 Demux_Offset++;
             }
 
-            if (Demux_Offset+4>Buffer_Size && File_Offset+Buffer_Size!=File_Size)
+            if (Demux_Offset+4>Buffer_Size && !Config->IsFinishing)
                 return false; //No complete frame
         }
 
@@ -2092,7 +2092,7 @@ bool File_Mpegv::Header_Parser_Fill_Size()
     //Must wait more data?
     if (Buffer_Offset_Temp+4>Buffer_Size)
     {
-        if (FrameIsAlwaysComplete || File_Offset+Buffer_Size==File_Size)
+        if (FrameIsAlwaysComplete || Config->IsFinishing)
             Buffer_Offset_Temp=Buffer_Size; //We are sure that the next bytes are a start
         else
             return false;
@@ -3291,10 +3291,7 @@ void File_Mpegv::user_data_start_3()
             TemporalReference.resize(TemporalReference_Offset+temporal_reference+1);
         if (TemporalReference[TemporalReference_Offset+temporal_reference]==NULL)
             TemporalReference[TemporalReference_Offset+temporal_reference]=new temporalreference;
-        temporalreference::buffer_data* BufferData=new temporalreference::buffer_data;
-        BufferData->Size=(size_t)(Element_Size-Element_Offset);
-        BufferData->Data=new int8u[(size_t)(Element_Size-Element_Offset)];
-        std::memcpy(BufferData->Data, Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset));
+        buffer_data* BufferData=new buffer_data(Buffer+Buffer_Offset+(size_t)Element_Offset,(size_t)(Element_Size-Element_Offset));
         TemporalReference[TemporalReference_Offset+temporal_reference]->Scte.push_back(BufferData);
         TemporalReference[TemporalReference_Offset+temporal_reference]->Scte_Parsed.push_back(false);
         if (TemporalReference[TemporalReference_Offset+temporal_reference]->Scte_Parsed.size()>=2 && TemporalReference[TemporalReference_Offset+temporal_reference]->Scte_Parsed[TemporalReference[TemporalReference_Offset+temporal_reference]->Scte_Parsed.size()-2] && Scte_TemporalReference_Offset==TemporalReference_Offset+temporal_reference+1)
@@ -3472,8 +3469,8 @@ void File_Mpegv::user_data_start_GA94_03()
         if (Ref==NULL)
             Ref=new temporalreference;
         if (Ref->GA94_03==NULL)
-            Ref->GA94_03=new temporalreference::buffer_data;
-        temporalreference::buffer_data* NewBuffer=Ref->GA94_03;
+            Ref->GA94_03=new buffer_data;
+        buffer_data* NewBuffer=Ref->GA94_03;
         int8u* NewData=new int8u[NewBuffer->Size+(size_t)(Element_Size-Element_Offset)];
         if (NewBuffer->Size)
         {

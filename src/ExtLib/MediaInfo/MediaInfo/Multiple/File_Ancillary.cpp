@@ -621,10 +621,7 @@ void File_Ancillary::Data_Parse()
                             case 0x05 : //Bar Data (from SMPTE 2016-3), saving data for future use
                                         #if defined(MEDIAINFO_AFDBARDATA_YES)
                                         {
-                                            buffered_data* AfdBarData=new buffered_data;
-                                            AfdBarData->Data=new int8u[(size_t)DataCount];
-                                            std::memcpy(AfdBarData->Data, Payload, (size_t)DataCount);
-                                            AfdBarData->Size=(size_t)DataCount;
+                                            buffer_data* AfdBarData= new buffer_data(Payload, (size_t)DataCount);
                                             AfdBarData_Data.push_back(AfdBarData);
                                         }
                                         #endif //MEDIAINFO_AFDBARDATA_YES
@@ -872,10 +869,7 @@ void File_Ancillary::Data_Parse()
                                             else
                                             {
                                                 //Saving data for future use
-                                                buffered_data* Cdp=new buffered_data;
-                                                Cdp->Data=new int8u[(size_t)DataCount];
-                                                std::memcpy(Cdp->Data, Payload, (size_t)DataCount);
-                                                Cdp->Size=(size_t)DataCount;
+                                                buffer_data* Cdp=new buffer_data(Payload, (size_t)DataCount);
                                                 Cdp_Data.push_back(Cdp);
                                             }
                                         }

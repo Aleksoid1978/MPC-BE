@@ -346,8 +346,9 @@ size_t MediaInfo_Internal::Open(const String &File_Name_)
             }
         }
     #endif //MEDIAINFO_IBIUSAGE
+    {
+    CriticalSectionLocker CSL(CS);
 
-    CS.Enter();
     MEDIAINFO_DEBUG_CONFIG_TEXT(Debug+=__T("Open, File=");Debug+=Ztring(File_Name_).c_str();)
     Config.File_Names.clear();
     if (Config.File_FileNameFormat_Get()==__T("CSV"))
@@ -359,11 +360,10 @@ size_t MediaInfo_Internal::Open(const String &File_Name_)
         Config.File_Names.push_back(File_Name_);
     if (Config.File_Names.empty())
     {
-        CS.Leave();
         return 0;
     }
     Config.File_Names_Pos=1;
-    CS.Leave();
+    }
 
     //Parsing
     if (BlockMethod==1)
@@ -385,10 +385,11 @@ size_t MediaInfo_Internal::Open(const String &File_Name_)
 //---------------------------------------------------------------------------
 void MediaInfo_Internal::Entry()
 {
-    CS.Enter();
+    {
+    CriticalSectionLocker CSL(CS);
     MEDIAINFO_DEBUG_CONFIG_TEXT(Debug+=__T("Entry");)
     Config.State_Set(0);
-    CS.Leave();
+    }
 
     if ((Config.File_Names[0].size()>=6
         && Config.File_Names[0][0]==__T('m')
@@ -425,14 +426,14 @@ void MediaInfo_Internal::Entry()
     else if (Config.File_Names[0].find(__T("://"))!=string::npos)
         #if defined(MEDIAINFO_LIBCURL_YES)
         {
-            CS.Enter();
+            {
+            CriticalSectionLocker CSL(CS);
             if (Reader)
             {
-                CS.Leave();
                 return; //There is a problem
             }
             Reader=new Reader_libcurl();
-            CS.Leave();
+            }
 
             Reader->Format_Test(this, Config.File_Names[0]);
 
@@ -612,14 +613,14 @@ void MediaInfo_Internal::Entry()
 
                 if (Dxw.empty())
                 {
-                    CS.Enter();
+                    {
+                    CriticalSectionLocker CSL(CS);
                     if (Reader)
                     {
-                        CS.Leave();
                         return; //There is a problem
                     }
                     Reader=new Reader_File();
-                    CS.Leave();
+                    }
 
                     Reader->Format_Test(this, Config.File_Names[0]);
                 }
@@ -634,15 +635,14 @@ void MediaInfo_Internal::Entry()
                     Open_Buffer_Finalize();
                 }
             #else //defined(MEDIAINFO_REFERENCES_YES)
-                CS.Enter();
+                {
+                CriticalSectionLocker CSL(CS);
                 if (Reader)
                 {
-                    CS.Leave();
                     return; //There is a problem
                 }
                 Reader=new Reader_File();
-                CS.Leave();
-
+                }
                 Reader->Format_Test(this, Config.File_Names[0]);
             #endif //defined(MEDIAINFO_REFERENCES_YES)
 
@@ -653,9 +653,10 @@ void MediaInfo_Internal::Entry()
         }
     #endif //MEDIAINFO_FILE_YES
 
-    CS.Enter();
+    {
+    CriticalSectionLocker CSL(CS);
     Config.State_Set(1);
-    CS.Leave();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -878,6 +879,16 @@ int64u MediaInfo_Internal::Open_Buffer_Continue_GoTo_Get ()
 }
 
 //---------------------------------------------------------------------------
+void MediaInfo_Internal::Open_Buffer_CheckFileModifications()
+{
+    CriticalSectionLocker CSL(CS);
+    if (Info == NULL)
+        return;
+
+    Info->Open_Buffer_CheckFileModifications();
+}
+
+//---------------------------------------------------------------------------
 bool MediaInfo_Internal::Open_Buffer_Position_Set(int64u File_Offset)
 {
     CriticalSectionLocker CSL(CS);
@@ -904,16 +915,6 @@ size_t MediaInfo_Internal::Open_Buffer_Seek (size_t Method, int64u Value, int64u
 //---------------------------------------------------------------------------
 size_t MediaInfo_Internal::Open_Buffer_Finalize ()
 {
-    CS.Enter();
-    if (Info && Info->Status[File__Analyze::IsUpdated])
-    {
-        Info->Open_Buffer_Update();
-        Info->Status[File__Analyze::IsUpdated]=false;
-        for (size_t Pos=File__Analyze::User_16; Pos<File__Analyze::User_16+16; Pos++)
-            Info->Status[Pos]=false;
-    }
-    CS.Leave();
-
     CriticalSectionLocker CSL(CS);
     MEDIAINFO_DEBUG_CONFIG_TEXT(Debug+=__T("Open_Buffer_Finalize");)
     if (Info==NULL)

@@ -451,22 +451,6 @@ private :
     //Temporal references
     struct temporal_reference
     {
-        struct buffer_data
-        {
-            size_t Size;
-            int8u* Data;
-
-            buffer_data()
-            {
-                Size=0;
-                Data=NULL;
-            }
-
-            ~buffer_data()
-            {
-                delete[] Data; //Data=NULL;
-            }
-        };
         #if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
             buffer_data* GA94_03;
         #endif //MEDIAINFO_DTVCCTRANSPORT_YES
@@ -551,6 +535,7 @@ private :
     int8u                               nal_ref_idc;
     int8u                               FrameRate_Divider;
     bool                                FirstPFrameInGop_IsParsed;
+    bool                                Config_IsRepeated;
     #if MEDIAINFO_ADVANCED2
         std::vector<std::string>        Dump_SPS;
         std::vector<std::string>        Dump_PPS;

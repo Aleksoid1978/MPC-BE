@@ -24,6 +24,7 @@
 #if defined(MEDIAINFO_MPEG4V_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MXF_YES)
 //---------------------------------------------------------------------------
 
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #if MEDIAINFO_EVENTS
     #include "MediaInfo/MediaInfo_Events_Internal.h"
 #endif //MEDIAINFO_EVENTS
@@ -664,7 +665,7 @@ bool File_Mpeg4v::Demux_UnpacketizeContainer_Test()
             Demux_Offset++;
         }
 
-        if (Demux_Offset+4>Buffer_Size && File_Offset+Buffer_Size!=File_Size)
+        if (Demux_Offset+4>Buffer_Size && !Config->IsFinishing)
             return false; //No complete frame
 
         if (!Status[IsAccepted])
@@ -739,7 +740,7 @@ bool File_Mpeg4v::Header_Parser_Fill_Size()
     //Must wait more data?
     if (Buffer_Offset_Temp+4>Buffer_Size)
     {
-        if (FrameIsAlwaysComplete || File_Offset+Buffer_Size==File_Size)
+        if (FrameIsAlwaysComplete || Config->IsFinishing)
             Buffer_Offset_Temp=Buffer_Size; //We are sure that the next bytes are a start
         else
             return false;

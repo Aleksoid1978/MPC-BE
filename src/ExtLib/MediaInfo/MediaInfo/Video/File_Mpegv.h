@@ -126,22 +126,6 @@ private :
     //Temporal reference
     struct temporalreference
     {
-        struct buffer_data
-        {
-            size_t Size;
-            int8u* Data;
-
-            buffer_data()
-            {
-                Size=0;
-                Data=NULL;
-            }
-
-            ~buffer_data()
-            {
-                delete[] Data; //Data=NULL;
-            }
-        };
         #if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
             buffer_data* GA94_03;
         #endif //MEDIAINFO_DTVCCTRANSPORT_YES

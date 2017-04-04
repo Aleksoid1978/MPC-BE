@@ -109,6 +109,7 @@ private :
     int64u Begin_MaxDuration; //in 27 MHz
     int64u Buffer_TotalBytes_LastSynched;
     bool   ForceStreamDisplay;
+    bool   ForceTextStreamDisplay;
     bool   Searching_TimeStamp_Start;
 
     #if MEDIAINFO_EVENTS

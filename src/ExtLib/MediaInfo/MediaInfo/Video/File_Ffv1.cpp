@@ -162,6 +162,8 @@ void RangeCoder::ResizeBuffer(size_t Buffer_Size)
 //---------------------------------------------------------------------------
 size_t RangeCoder::BytesUsed()
 {
+    if (Buffer_Cur>Buffer_End)
+        return Buffer_End-Buffer_Beg;
     return Buffer_Cur-Buffer_Beg-(Mask<0x100?0:1);
 }
 
@@ -653,8 +655,8 @@ void File_Ffv1::Read_Buffer_OutOfBand()
 
     FrameHeader();
     Element_Offset+=RC->BytesUsed();
-    if (Element_Offset<Element_Size)
-        Skip_XX(Element_Size-Element_Offset,                    "Reserved");
+    if (Element_Offset+4<Element_Size)
+        Skip_XX(Element_Size-Element_Offset-4,                  "Reserved");
     Skip_B4(                                                    "CRC-32");
 
     delete RC; RC=NULL;
@@ -1127,7 +1129,7 @@ int File_Ffv1::slice(states &States)
 
     if (coder_type)
     {
-        if (version > 2)
+        //if (version > 2)
         {
             int8u s = 129;
             RC->get_rac(&s);

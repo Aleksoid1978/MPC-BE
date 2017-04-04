@@ -90,10 +90,11 @@ extern MediaInfo_Config Config;
 //---------------------------------------------------------------------------
 Ztring MediaInfo_Internal::Inform()
 {
-    CS.Enter();
+    {
+        CriticalSectionLocker CSL(CS);
     if (Info && Info->Status[File__Analyze::IsUpdated])
         Info->Open_Buffer_Update();
-    CS.Leave();
+    }
 
     #if MEDIAINFO_TRACE
         if (MediaInfoLib::Config.Inform_Get()!=__T("MAXML") && (MediaInfoLib::Config.Trace_Level_Get() || MediaInfoLib::Config.Inform_Get()==__T("Details")))

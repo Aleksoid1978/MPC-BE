@@ -451,7 +451,6 @@ struct MediaInfo_Event_General_SubFile_End_0
     MEDIAINFO_EVENT_GENERIC
 };
 
-
 /*-------------------------------------------------------------------------*/
 /* WaitForMoreData_Start                                                   */
 #define MediaInfo_Event_General_WaitForMoreData_Start 0x7008

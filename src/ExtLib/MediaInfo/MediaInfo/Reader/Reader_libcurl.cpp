@@ -168,6 +168,9 @@ Ztring Reader_libcurl_FileNameWithoutPassword(const Ztring &FileName)
 //---------------------------------------------------------------------------
 struct Reader_libcurl::curl_data
 {
+    int64u              FileSize;
+    int64u              FileOffset;
+    double              CountOfSeconds;
     MediaInfo_Internal* MI;
     CURL*               Curl;
     char                ErrorBuffer[CURL_ERROR_SIZE];
@@ -200,12 +203,12 @@ struct Reader_libcurl::curl_data
         int64u          Debug_BytesRead;
         int64u          Debug_Count;
     #endif // MEDIAINFO_DEBUG
-    #if MEDIAINFO_EVENTS
-        int64u          Stream_Offset;
-    #endif //MEDIAINFO_EVENTS
 
     curl_data()
     {
+        FileSize=(int64u)-1;
+        FileOffset=(int64u)-1;
+        CountOfSeconds=0;
         MI=NULL;
         Curl=NULL;
         ErrorBuffer[0]='\0';
@@ -226,9 +229,6 @@ struct Reader_libcurl::curl_data
             Debug_BytesRead=0;
             Debug_Count=1;
         #endif // MEDIAINFO_DEBUG
-        #if MEDIAINFO_EVENTS
-            Stream_Offset=(int64u)-1;
-        #endif //MEDIAINFO_EVENTS
     }
 };
 
@@ -460,13 +460,37 @@ size_t libcurl_WriteData_CallBack(void *ptr, size_t size, size_t nmemb, void *da
         }
         else if (Result==CURLE_OK && File_SizeD!=-1)
         {
-            ((Reader_libcurl::curl_data*)data)->MI->Open_Buffer_Init((int64u)File_SizeD, ((Reader_libcurl::curl_data*)data)->File_Name);
+            if (((Reader_libcurl::curl_data*)data)->FileSize!=(int64u)-1)
+            {
+                #if MEDIAINFO_EVENTS
+                    {
+                        struct MediaInfo_Event_General_WaitForMoreData_End_0 Event;
+                        memset(&Event, 0xFF, sizeof(struct MediaInfo_Event_Generic));
+                        Event.EventCode=MediaInfo_EventCode_Create(MediaInfo_Parser_None, MediaInfo_Event_General_WaitForMoreData_End, 0);
+                        Event.EventSize=sizeof(struct MediaInfo_Event_General_WaitForMoreData_End_0);
+                        Event.StreamIDs_Size=0;
+                        Event.Duration_Max=(double)((Reader_libcurl::curl_data*)data)->MI->Config.File_GrowingFile_Delay_Get();
+                        Event.Duration_Actual=(double)((Reader_libcurl::curl_data*)data)->CountOfSeconds;
+                        Event.Flags=0; //Countinuing
+                        ((Reader_libcurl::curl_data*)data)->MI->Config.Event_Send(NULL, (const int8u*)&Event, sizeof(MediaInfo_Event_General_WaitForMoreData_End_0));
+                    }
+                #endif //MEDIAINFO_EVENTS
+
+                //More iterations (growing file)
+                ((Reader_libcurl::curl_data*)data)->CountOfSeconds=0;
+                ((Reader_libcurl::curl_data*)data)->FileSize+=(int64u)File_SizeD;
+                ((Reader_libcurl::curl_data*)data)->MI->Open_Buffer_Init(((Reader_libcurl::curl_data*)data)->FileSize);
+            }
+            else
+            {
+                //First time
+                ((Reader_libcurl::curl_data*)data)->FileSize=(int64u)File_SizeD;
+                ((Reader_libcurl::curl_data*)data)->MI->Open_Buffer_Init((int64u)File_SizeD, ((Reader_libcurl::curl_data*)data)->File_Name);
+            }
         }
         else
             ((Reader_libcurl::curl_data*)data)->MI->Open_Buffer_Init((int64u)-1, ((Reader_libcurl::curl_data*)data)->File_Name);
-        #if MEDIAINFO_EVENTS
-            ((Reader_libcurl::curl_data*)data)->Stream_Offset=0;
-        #endif //MEDIAINFO_EVENTS
+        ((Reader_libcurl::curl_data*)data)->FileOffset=0;
         ((Reader_libcurl::curl_data*)data)->Init_AlreadyDone=true;
     }
 
@@ -478,11 +502,16 @@ size_t libcurl_WriteData_CallBack(void *ptr, size_t size, size_t nmemb, void *da
             Event.EventCode=MediaInfo_EventCode_Create(MediaInfo_Parser_None, MediaInfo_Event_Global_BytesRead, 0);
             Event.EventSize=sizeof(struct MediaInfo_Event_Global_BytesRead_0);
             Event.StreamIDs_Size=0;
-            Event.StreamOffset=((Reader_libcurl::curl_data*)data)->Stream_Offset;
+            Event.StreamOffset=((Reader_libcurl::curl_data*)data)->FileOffset;
             Event.Content_Size=size*nmemb;
             Event.Content=(int8u*)ptr;
             ((Reader_libcurl::curl_data*)data)->MI->Config.Event_Send(NULL, (const int8u*)&Event, sizeof(MediaInfo_Event_Global_BytesRead_0));
-            ((Reader_libcurl::curl_data*)data)->Stream_Offset+=size*nmemb;
+            ((Reader_libcurl::curl_data*)data)->FileOffset+=size*nmemb;
+            if (((Reader_libcurl::curl_data*)data)->FileOffset>((Reader_libcurl::curl_data*)data)->FileSize)
+            {
+                ((Reader_libcurl::curl_data*)data)->MI->Config.File_IsGrowing=true;
+                ((Reader_libcurl::curl_data*)data)->FileOffset=((Reader_libcurl::curl_data*)data)->FileSize;
+            }
         }
     #endif //MEDIAINFO_EVENTS
 
@@ -1008,9 +1037,7 @@ size_t Reader_libcurl::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                 }
                 if (Code==CURLE_OK)
                 {
-                    #if MEDIAINFO_EVENTS
-                        Curl_Data->Stream_Offset=Curl_Data->MI->Open_Buffer_Continue_GoTo_Get();
-                    #endif //MEDIAINFO_EVENTS
+                    Curl_Data->FileOffset=Curl_Data->MI->Open_Buffer_Continue_GoTo_Get();
                     MI->Open_Buffer_Init((int64u)-1, Curl_Data->MI->Open_Buffer_Continue_GoTo_Get());
                 }
             }
@@ -1020,8 +1047,10 @@ size_t Reader_libcurl::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                 if (Curl_Data->NextPacket)
                 {
                     int running_handles=0;
-                    do
+                    bool TestingGrowing=false;
+                    for (;;)
                     {
+                        int64u FileSize_Old=((Reader_libcurl::curl_data*)Curl_Data)->FileSize;
                         CURLMcode CodeM=curl_multi_perform(Curl_Data->CurlM, &running_handles);
                         if (Result==CURLE_WRITE_ERROR && Curl_Data->Init_NotAFile)
                         {
@@ -1038,9 +1067,84 @@ size_t Reader_libcurl::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                                 return 2; //Must return immediately
                         #endif //MEDIAINFO_DEMUX
                         if (running_handles==0)
+                        {
+                            if ((MI->Config.File_IsGrowing                                                                          //Was previously detected as growing
+                              || (!MI->Config.File_IsNotGrowingAnymore && MI->Config.File_GrowingFile_Force_Get())))                //Forced test and container did not indicate it is not growing anymore
+                            {
+                                if (Curl_Data->CountOfSeconds<(size_t)MI->Config.File_GrowingFile_Delay_Get() && !MI->Config.File_IsNotGrowingAnymore)
+                                {
+                                    TestingGrowing=true;
+                                    #if MEDIAINFO_EVENTS
+                                        if (!Curl_Data->CountOfSeconds)
+                                        {
+                                            struct MediaInfo_Event_General_WaitForMoreData_Start_0 Event;
+                                            memset(&Event, 0xFF, sizeof(struct MediaInfo_Event_Generic));
+                                            Event.EventCode=MediaInfo_EventCode_Create(MediaInfo_Parser_None, MediaInfo_Event_General_WaitForMoreData_Start, 0);
+                                            Event.EventSize=sizeof(struct MediaInfo_Event_General_WaitForMoreData_Start_0);
+                                            Event.StreamIDs_Size=0;
+                                            Event.Duration_Max=(double)MI->Config.File_GrowingFile_Delay_Get();
+                                            MI->Config.Event_Send(NULL, (const int8u*)&Event, sizeof(MediaInfo_Event_General_WaitForMoreData_Start_0));
+                                        }
+                                    #endif //MEDIAINFO_EVENTS
+
+                                    ((Reader_libcurl::curl_data*)Curl_Data)->Init_AlreadyDone=false;
+                                
+                                    CURL* Temp=curl_easy_duphandle(Curl_Data->Curl);
+                                    if (Temp==0)
+                                        return 0;
+                                    #if MEDIAINFO_NEXTPACKET
+                                        if (Curl_Data->CurlM)
+                                                curl_multi_remove_handle(Curl_Data->CurlM, Curl_Data->Curl);
+                                    #endif //MEDIAINFO_NEXTPACKET
+                                    curl_easy_cleanup(Curl_Data->Curl); Curl_Data->Curl=Temp;
+                                    #if MEDIAINFO_NEXTPACKET
+                                        if (Curl_Data->CurlM)
+                                                curl_multi_add_handle(Curl_Data->CurlM, Curl_Data->Curl);
+                                    #endif //MEDIAINFO_NEXTPACKET
+                                    if (Curl_Data->MI->Open_Buffer_Continue_GoTo_Get()<0x80000000)
+                                    {
+                                        //We do NOT use large version if we can, because some version (tested: 7.15 linux) do NOT like large version (error code 18)
+                                        long FileSize_Old_Long=(long)FileSize_Old;
+                                        curl_easy_setopt(Curl_Data->Curl, CURLOPT_RESUME_FROM, FileSize_Old_Long);
+                                    }
+                                    else
+                                    {
+                                        curl_off_t FileSize_Old_Off=(curl_off_t)FileSize_Old;
+                                        curl_easy_setopt(Curl_Data->Curl, CURLOPT_RESUME_FROM_LARGE, FileSize_Old_Off);
+                                    }
+
+                                    Curl_Data->CountOfSeconds++;
+                                    #ifdef WINDOWS
+                                        Sleep(1000);
+                                    #endif //WINDOWS
+
+                                    continue;
+                                }
+
+                                if (TestingGrowing && ((Reader_libcurl::curl_data*)Curl_Data)->CountOfSeconds>=(size_t)MI->Config.File_GrowingFile_Delay_Get())
+                                {
+                                    #if MEDIAINFO_EVENTS
+                                        {
+                                            struct MediaInfo_Event_General_WaitForMoreData_End_0 Event;
+                                            memset(&Event, 0xFF, sizeof(struct MediaInfo_Event_Generic));
+                                            Event.EventCode=MediaInfo_EventCode_Create(MediaInfo_Parser_None, MediaInfo_Event_General_WaitForMoreData_End, 0);
+                                            Event.EventSize=sizeof(struct MediaInfo_Event_General_WaitForMoreData_End_0);
+                                            Event.StreamIDs_Size=0;
+                                            Event.Duration_Max=(double)MI->Config.File_GrowingFile_Delay_Get();
+                                            Event.Duration_Actual=(double)((Reader_libcurl::curl_data*)Curl_Data)->CountOfSeconds;
+                                            Event.Flags=1; //Giving up
+                                            MI->Config.Event_Send(NULL, (const int8u*)&Event, sizeof(MediaInfo_Event_General_WaitForMoreData_End_0));
+                                        }
+                                    #endif //MEDIAINFO_EVENTS
+
+                                    MI->Config.File_IsGrowing=false;
+                                    break;
+                                }
+                            }
+
                             break; //cUrl has finished
+                        }
                     }
-                    while (running_handles);
                     if (running_handles==0 && Curl_Data->MI->Open_Buffer_Continue_GoTo_Get()==(int64u)-1)
                         break; //cUrl has finished
                     Result=CURLE_WRITE_ERROR; //Configuring as if classic method is used
@@ -1056,6 +1160,70 @@ size_t Reader_libcurl::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                     string FileName_String=Ztring(Curl_Data->File_Name).To_Local();
                     curl_easy_setopt(Curl_Data->Curl, CURLOPT_URL, FileName_String.c_str());
                     Result=curl_easy_perform(Curl_Data->Curl);
+                }
+                if ((MI->Config.File_IsGrowing                                                                          //Was previously detected as growing
+                  || (!MI->Config.File_IsNotGrowingAnymore && MI->Config.File_GrowingFile_Force_Get())))                //Forced test and container did not indicate it is not growing anymore
+                {
+                    while (Result==CURLE_OK && !MI->Config.File_IsNotGrowingAnymore)
+                    {
+                        #if MEDIAINFO_EVENTS
+                            {
+                                struct MediaInfo_Event_General_WaitForMoreData_Start_0 Event;
+                                memset(&Event, 0xFF, sizeof(struct MediaInfo_Event_Generic));
+                                Event.EventCode=MediaInfo_EventCode_Create(MediaInfo_Parser_None, MediaInfo_Event_General_WaitForMoreData_Start, 0);
+                                Event.EventSize=sizeof(struct MediaInfo_Event_General_WaitForMoreData_Start_0);
+                                Event.StreamIDs_Size=0;
+                                Event.Duration_Max=(double)MI->Config.File_GrowingFile_Delay_Get();
+                                MI->Config.Event_Send(NULL, (const int8u*)&Event, sizeof(MediaInfo_Event_General_WaitForMoreData_Start_0));
+                            }
+                        #endif //MEDIAINFO_EVENTS
+
+                        Curl_Data->CountOfSeconds=0;
+                        for (; Curl_Data->CountOfSeconds<(size_t)MI->Config.File_GrowingFile_Delay_Get(); Curl_Data->CountOfSeconds++)
+                        {
+                            int64u FileSize_Old=Curl_Data->FileSize;
+                            Curl_Data->Init_AlreadyDone=false;
+                            if (Curl_Data->MI->Open_Buffer_Continue_GoTo_Get()<0x80000000)
+                            {
+                                //We do NOT use large version if we can, because some version (tested: 7.15 linux) do NOT like large version (error code 18)
+                                long FileSize_Old_Long=(long)FileSize_Old;
+                                curl_easy_setopt(Curl_Data->Curl, CURLOPT_RESUME_FROM, FileSize_Old_Long);
+                            }
+                            else
+                            {
+                                curl_off_t FileSize_Old_Off=(curl_off_t)FileSize_Old;
+                                curl_easy_setopt(Curl_Data->Curl, CURLOPT_RESUME_FROM_LARGE, FileSize_Old_Off);
+                            }
+                            Result=curl_easy_perform(Curl_Data->Curl);
+
+                            if (FileSize_Old==Curl_Data->FileSize)
+                            {
+                                #ifdef WINDOWS
+                                    Sleep(1000);
+                                #endif //WINDOWS
+                            }
+                        }
+
+                        if (((Reader_libcurl::curl_data*)Curl_Data)->CountOfSeconds>=(size_t)MI->Config.File_GrowingFile_Delay_Get())
+                        {
+                            #if MEDIAINFO_EVENTS
+                                {
+                                    struct MediaInfo_Event_General_WaitForMoreData_End_0 Event;
+                                    memset(&Event, 0xFF, sizeof(struct MediaInfo_Event_Generic));
+                                    Event.EventCode=MediaInfo_EventCode_Create(MediaInfo_Parser_None, MediaInfo_Event_General_WaitForMoreData_End, 0);
+                                    Event.EventSize=sizeof(struct MediaInfo_Event_General_WaitForMoreData_End_0);
+                                    Event.StreamIDs_Size=0;
+                                    Event.Duration_Max=(double)MI->Config.File_GrowingFile_Delay_Get();
+                                    Event.Duration_Actual=(double)((Reader_libcurl::curl_data*)Curl_Data)->CountOfSeconds;
+                                    Event.Flags=1; //Giving up
+                                    MI->Config.Event_Send(NULL, (const int8u*)&Event, sizeof(MediaInfo_Event_General_WaitForMoreData_End_0));
+                                }
+                            #endif //MEDIAINFO_EVENTS
+
+                            MI->Config.File_IsGrowing=false;
+                            break;
+                        }
+                    }
                 }
             }
 
