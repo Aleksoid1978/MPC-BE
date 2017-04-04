@@ -189,18 +189,16 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 
 		rts.Render(spd, 0, 25, bbox);
 
-		BYTE* pData = NULL;
-		long size = 0;
-		if (!m_pMainFrm->GetDIB(&pData, size)) {
+		std::vector<BYTE> dib;
+		CString errmsg;
+		if (S_OK != m_pMainFrm->GetCurrentFrame(dib, errmsg)) {
 			m_iProgress = PROGRESS_E_FAIL;
 			return;
 		}
 
-		const BITMAPINFO* bi = (BITMAPINFO*)pData;
+		const BITMAPINFO* bi = (BITMAPINFO*)dib.data();
 		if (bi->bmiHeader.biBitCount != 32) {
 			m_ErrorMsg.Format(ResStr(IDS_MAINFRM_57), bi->bmiHeader.biBitCount);
-			delete [] pData;
-
 			m_iProgress = PROGRESS_E_VIDFMT;
 			return;
 		}
@@ -221,8 +219,6 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 		}
 
 		rts.Render(spd, 10000, 25, bbox);
-
-		delete [] pData;
 
 		m_iProgress++; // make one more thumbnail
 		if (m_bAbort) {

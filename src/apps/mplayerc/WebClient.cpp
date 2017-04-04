@@ -815,12 +815,14 @@ bool CWebClientSocket::OnSnapShotJpeg(CStringA& hdr, CStringA& body, CStringA& m
 {
 	bool fRet = false;
 
-	BYTE *pData = NULL, *jpeg = NULL;
+	BYTE *jpeg = NULL;
 	long size = 0;
 	size_t jpeg_size = 0;
 
-	if (m_pMainFrame->GetDIB(&pData, size, true)) {
-		if (BMPDIB(0, pData, L"image/jpeg", AfxGetAppSettings().nWebServerQuality, 1, &jpeg, &jpeg_size)) {
+	std::vector<BYTE> dib;
+	CString errmsg;
+	if (S_OK == m_pMainFrame->GetCurrentFrame(dib, errmsg)) {
+		if (BMPDIB(0, dib.data(), L"image/jpeg", AfxGetAppSettings().nWebServerQuality, 1, &jpeg, &jpeg_size)) {
 			hdr +=
 				"Expires: Thu, 19 Nov 1981 08:52:00 GMT\r\n"
 				"Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0\r\n"
@@ -829,8 +831,6 @@ bool CWebClientSocket::OnSnapShotJpeg(CStringA& hdr, CStringA& body, CStringA& m
 			mime = "image/jpeg";
 			fRet = true;
 		}
-
-		delete [] pData;
 	}
 
 	return fRet;
