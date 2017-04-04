@@ -1541,6 +1541,8 @@ void* CMSEXPORT cmsReadTag(cmsHPROFILE hProfile, cmsTagSignature sig)
     Offset    = Icc -> TagOffsets[n];
     TagSize   = Icc -> TagSizes[n];
 
+    if (TagSize < 8) goto Error;
+
     // Seek to its location
     if (!io -> Seek(io, Offset))
         goto Error;
@@ -1563,8 +1565,8 @@ void* CMSEXPORT cmsReadTag(cmsHPROFILE hProfile, cmsTagSignature sig)
     if (BaseType == 0) goto Error;
 
     if (!IsTypeSupported(TagDescriptor, BaseType)) goto Error;
-
-    TagSize  -= 8;                      // Alredy read by the type base logic
+   
+    TagSize  -= 8;       // Alredy read by the type base logic
 
     // Get type handler
     TypeHandler = _cmsGetTagTypeHandler(Icc ->ContextID, BaseType);

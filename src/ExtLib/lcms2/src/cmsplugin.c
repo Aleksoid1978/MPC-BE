@@ -180,8 +180,12 @@ cmsBool CMSEXPORT  _cmsReadFloat32Number(cmsIOHANDLER* io, cmsFloat32Number* n)
         tmp = _cmsAdjustEndianess32(tmp);
         *n = *(cmsFloat32Number*)(void*)&tmp;
 
-        // fpclassify() required by C99
-        return ((fpclassify(*n) == FP_ZERO) || (fpclassify(*n) == FP_NORMAL));
+        #if defined(_MSC_VER) && _MSC_VER < 1800
+           return TRUE;
+        #else
+           // fpclassify() required by C99 (only provided by MSVC >= 1800, VS2013 onwards)
+           return ((fpclassify(*n) == FP_ZERO) || (fpclassify(*n) == FP_NORMAL));
+        #endif        
     }
 
     return TRUE;
