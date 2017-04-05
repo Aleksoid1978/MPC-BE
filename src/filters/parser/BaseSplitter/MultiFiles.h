@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,21 +27,21 @@ class CMultiFiles : public CObject
 {
 	DECLARE_DYNAMIC(CMultiFiles)
 
-	CAtlArray<LONGLONG>			m_FilesSize;
-	LONGLONG					m_llTotalLength;
-	CAtlArray<REFERENCE_TIME>	m_rtPtsOffsets;
-
 protected:
-	HANDLE						m_hFile;
-	CAtlArray<CString>			m_strFiles;
-	int							m_nCurPart;
-	REFERENCE_TIME*				m_pCurrentPTSOffset;
+	CAtlArray<CString>        m_strFiles;
+	CAtlArray<LONGLONG>       m_FilesSize;
+	CAtlArray<REFERENCE_TIME> m_rtPtsOffsets;
+
+	LONGLONG                  m_llTotalLength     = 0;
+	HANDLE                    m_hFile             = INVALID_HANDLE_VALUE;
+	size_t                    m_nCurPart          = SIZE_T_MAX;
+	REFERENCE_TIME*           m_pCurrentPTSOffset = NULL;
 
 private:
-	BOOL		OpenPart(int nPart);
-	void		ClosePart();
-	LONGLONG	GetAbsolutePosition(LONGLONG lOff, UINT nFrom);
-	void		Reset();
+	BOOL     OpenPart(size_t nPart);
+	void     ClosePart();
+	void     Reset();
+	LONGLONG GetAbsolutePosition(LONGLONG lOff, UINT nFrom);
 
 public:
 	CMultiFiles();
