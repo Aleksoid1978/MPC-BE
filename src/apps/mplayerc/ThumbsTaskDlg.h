@@ -31,7 +31,6 @@ class CThumbsTaskDlg : public CTaskDialog
 	DECLARE_DYNAMIC(CThumbsTaskDlg)
 
 private:
-	HICON         m_hIcon;
 	CString       m_filename;
 
 	CMainFrame*   m_pMainFrm;

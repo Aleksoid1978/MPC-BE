@@ -336,34 +336,28 @@ void CDVBSub::CleanOld(REFERENCE_TIME rt)
 
 HRESULT CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 {
-	DVB_PAGE* pPage = FindPage(rt);
-
-	if (pPage != NULL) {
+	if (DVB_PAGE* pPage = FindPage(rt)) {
 		pPage->rendered = true;
 		TRACE_DVB(_T("DVB - Renderer - %s - %s"), ReftimeToString(pPage->rtStart), ReftimeToString(pPage->rtStop));
 
 		int nRegion = 1, nObject = 1;
 		for (POSITION pos = pPage->regionsPos.GetHeadPosition(); pos; nRegion++) {
 			DVB_REGION_POS regionPos = pPage->regionsPos.GetNext(pos);
-			DVB_REGION* pRegion = FindRegion(pPage, regionPos.id);
+			if (DVB_REGION* pRegion = FindRegion(pPage, regionPos.id)) {
+				if (DVB_CLUT* pCLUT = FindClut(pPage, pRegion->CLUT_id)) {
+					for (POSITION posO = pRegion->objects.GetHeadPosition(); posO; nObject++) {
+						DVB_OBJECT objectPos = pRegion->objects.GetNext(posO);
+						if (CompositionObject* pObject = FindObject(pPage, objectPos.object_id)) {
+							SHORT nX = regionPos.horizAddr + objectPos.object_horizontal_position;
+							SHORT nY = regionPos.vertAddr  + objectPos.object_vertical_position;
+							pObject->m_width  = pRegion->width;
+							pObject->m_height = pRegion->height;
+							pObject->SetPalette(pCLUT->size, pCLUT->palette, yuvMatrix == L"709" ? true : yuvMatrix == L"601" ? false : m_Display.width > 720, convertType);
 
-			DVB_CLUT* pCLUT = FindClut(pPage, pRegion->CLUT_id);
-
-			if (pRegion && pCLUT) {
-				for (POSITION posO = pRegion->objects.GetHeadPosition(); posO; nObject++) {
-					DVB_OBJECT objectPos = pRegion->objects.GetNext(posO);
-					CompositionObject* pObject = FindObject(pPage, objectPos.object_id);
-					if (pObject) {
-						SHORT nX, nY;
-						nX					= regionPos.horizAddr + objectPos.object_horizontal_position;
-						nY					= regionPos.vertAddr  + objectPos.object_vertical_position;
-						pObject->m_width	= pRegion->width;
-						pObject->m_height	= pRegion->height;
-						pObject->SetPalette(pCLUT->size, pCLUT->palette, yuvMatrix == L"709" ? true : yuvMatrix == L"601" ? false : m_Display.width > 720, convertType);
-
-						InitSpd(spd, m_Display.width, m_Display.height);
-						pObject->RenderDvb(spd, nX, nY, m_bResizedRender ? &m_spd : NULL);
-						TRACE_DVB(_T(" --> %d/%d - %d/%d"), nRegion, pPage->regionsPos.GetCount(), nObject, pRegion->objects.GetCount());
+							InitSpd(spd, m_Display.width, m_Display.height);
+							pObject->RenderDvb(spd, nX, nY, m_bResizedRender ? &m_spd : NULL);
+							TRACE_DVB(_T(" --> %d/%d - %d/%d"), nRegion, pPage->regionsPos.GetCount(), nObject, pRegion->objects.GetCount());
+						}
 					}
 				}
 			}

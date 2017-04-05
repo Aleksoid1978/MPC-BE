@@ -305,10 +305,6 @@ CThumbsTaskDlg::~CThumbsTaskDlg()
 		m_bAbort = true;
 		m_Thread.join();
 	}
-
-	if (m_hIcon) {
-		DestroyIcon(m_hIcon);
-	}
 }
 
 HRESULT CThumbsTaskDlg::OnInit()

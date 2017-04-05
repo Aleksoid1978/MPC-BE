@@ -305,9 +305,6 @@ void CPlayerSeekBar::OnPaint()
 
 		memdc.SetBkMode(TRANSPARENT);
 
-		CPen penPlayed(s.clrFaceABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, s.clrFaceABGR);
-		CPen penPlayedOutline(s.clrOutlineABGR == 0x00ff00ff ? PS_NULL : PS_SOLID, 0, s.clrOutlineABGR);
-
 		CRect rc = GetChannelRect();
 		const int nposx = GetThumbRect().right - 2;
 		const int nposy = r.top;

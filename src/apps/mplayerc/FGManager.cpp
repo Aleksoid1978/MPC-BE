@@ -1833,7 +1833,6 @@ STDMETHODIMP CFGManager::RenderSubFile(LPCWSTR lpcwstrFileName)
 	CAutoLock cAutoLock(this);
 
 	HRESULT hr = VFW_E_CANNOT_RENDER;
-	CAutoPtrArray<CStreamDeadEnd> deadends;
 
 	m_bOnlySub = TRUE;
 
@@ -2993,7 +2992,6 @@ STDMETHODIMP CFGManagerDVD::AddSourceFilter(LPCWSTR lpcwstrFileName, LPCWSTR lpc
 	HRESULT hr;
 
 	CStringW fn = CStringW(lpcwstrFileName).TrimLeft();
-	CStringW protocol = fn.Left(fn.Find(':')+1).TrimRight(':').MakeLower();
 	CStringW ext = CPathW(fn).GetExtension().MakeLower();
 
 	GUID clsid = ext == L".ratdvd" ? CLSID_RatDVDNavigator : CLSID_DVDNavigator;
