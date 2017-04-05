@@ -294,7 +294,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_FILE_SAVE_COPY, OnUpdateFileSaveAs)
 	ON_COMMAND(ID_FILE_SAVE_IMAGE, OnFileSaveImage)
 	ON_UPDATE_COMMAND_UI(ID_FILE_SAVE_IMAGE, OnUpdateFileSaveImage)
-	ON_COMMAND(ID_FILE_SAVE_IMAGE_AUTO, OnFileSaveImageAuto)
+	ON_COMMAND(ID_FILE_AUTOSAVE_IMAGE, OnAutoSaveImage)
+	ON_COMMAND(ID_FILE_AUTOSAVE_DISPLAY, OnAutoSaveDisplay)
 	ON_COMMAND(ID_FILE_SAVE_THUMBNAILS, OnFileSaveThumbnails)
 	ON_UPDATE_COMMAND_UI(ID_FILE_SAVE_THUMBNAILS, OnUpdateFileSaveThumbnails)
 	ON_COMMAND(ID_FILE_LOAD_SUBTITLE, OnFileLoadSubtitle)
@@ -5742,22 +5743,24 @@ void CMainFrame::SaveDIB(LPCWSTR fn, BYTE* pData, long size)
 	SendStatusMessage((LPCWSTR)p, 3000);
 }
 
-void CMainFrame::SaveImage(LPCWSTR fn)
+void CMainFrame::SaveImage(LPCWSTR fn, bool displayed)
 {
 	std::vector<BYTE> dib;
 	CString errmsg;
-	HRESULT hr = GetCurrentFrame(dib, errmsg);
+	HRESULT hr;
+	if (displayed) {
+		hr = GetDisplayedImage(dib, errmsg);
+	} else {
+		hr = GetCurrentFrame(dib, errmsg);
+	}
 
 	if (hr == S_OK) {
 		SaveDIB(fn, dib.data(), dib.size());
-
 		m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_IMAGE_SAVED), 3000);
 	}
 	else {
 		m_OSD.DisplayMessage(OSD_TOPLEFT, errmsg, 3000);
 	}
-
-
 }
 
 void CMainFrame::SaveThumbnails(LPCWSTR fn)
@@ -5945,23 +5948,33 @@ void CMainFrame::OnFileSaveImage()
 	}
 
 	s.strSnapShotPath = GetFolderOnly(pdst);
-	SaveImage(pdst);
-}
-
-void CMainFrame::OnFileSaveImageAuto()
-{
-	// Check if a compatible renderer is being used
-	if (!IsRendererCompatibleWithSaveImage()) {
-		return;
-	}
-
-	SaveImage(CreateSnapShotFileName());
+	SaveImage(pdst, false);
 }
 
 void CMainFrame::OnUpdateFileSaveImage(CCmdUI* pCmdUI)
 {
 	OAFilterState fs = GetMediaState();
 	pCmdUI->Enable(m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly && (fs == State_Paused || fs == State_Running));
+}
+
+void CMainFrame::OnAutoSaveImage()
+{
+	// Check if a compatible renderer is being used
+	if (!IsRendererCompatibleWithSaveImage()) {
+		return;
+	}
+
+	SaveImage(CreateSnapShotFileName(), false);
+}
+
+void CMainFrame::OnAutoSaveDisplay()
+{
+	// Check if a compatible renderer is being used
+	if (!m_pMFVDC) {
+		return;
+	}
+
+	SaveImage(CreateSnapShotFileName(), true);
 }
 
 void CMainFrame::OnFileSaveThumbnails()
