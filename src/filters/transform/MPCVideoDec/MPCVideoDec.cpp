@@ -3528,7 +3528,7 @@ STDMETHODIMP CMPCVideoDecFilter::SetSwRefresh(int nValue)
 STDMETHODIMP CMPCVideoDecFilter::SetSwPixelFormat(MPCPixelFormat pf, bool enable)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	if (pf < 0 && pf >= PixFmt_count) {
+	if (pf < 0 || pf >= PixFmt_count) {
 		return E_INVALIDARG;
 	}
 
@@ -3540,7 +3540,7 @@ STDMETHODIMP_(bool) CMPCVideoDecFilter::GetSwPixelFormat(MPCPixelFormat pf)
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (pf < 0 && pf >= PixFmt_count) {
+	if (pf < 0 || pf >= PixFmt_count) {
 		return false;
 	}
 
