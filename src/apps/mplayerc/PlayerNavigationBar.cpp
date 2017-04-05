@@ -118,7 +118,6 @@ void CPlayerNavigationBar::OnNcLButtonUp(UINT nHitTest, CPoint point)
 
 void CPlayerNavigationBar::ShowControls(CWnd* pMainfrm, bool bShow)
 {
-	CSize s = this->CalcFixedLayout(FALSE, TRUE);
 	((CMainFrame*)pMainfrm)->ShowControlBar(this, bShow, TRUE);
 
 	WINDOWPLACEMENT wp;

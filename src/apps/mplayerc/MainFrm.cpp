@@ -10643,7 +10643,7 @@ void CMainFrame::SetDispMode(dispmode& dm, CString& DisplayName, BOOL bForceRegi
 void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVideoRect/* = false*/)
 {
 	if (!m_bDelaySetOutputRect && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly && IsWindowVisible()) {
-		CRect wr, wr2;
+		CRect wr;
 
 		if (IsD3DFullScreenMode()) {
 			m_pFullscreenWnd->GetClientRect(&wr);
@@ -11979,7 +11979,6 @@ void CMainFrame::SetupChapters()
 			if (::PathFileExists(path) && CIfoFile::GetTitleInfo(path, loc.TitleNum, VTSN, TTN)) {
 				path.Format(L"%s\\VTS_%02lu_0.IFO", buff, VTSN);
 
-				CAtlList<CString> files;
 				CIfoFile ifo;
 				CVobFile vob;
 				if (::PathFileExists(path) && ifo.OpenIFO(path, &vob, TTN) && ulNumOfChapters == ifo.GetChaptersCount()) {

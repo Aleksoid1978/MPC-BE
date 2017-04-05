@@ -302,7 +302,6 @@ BOOL CPPageFullscreen::OnApply()
 	s.fLaunchfullscreen						= !!m_bLaunchFullScreen;
 
 	CString str;
-	CString strCurFSMonID;
 	CString strCurMon;
 	str = m_MonitorDisplayNames[m_iMonitorType];
 	if (str.GetLength() == 14) { m_f_hmonitor = str.Left(7); }
