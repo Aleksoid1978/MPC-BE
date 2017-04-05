@@ -150,6 +150,7 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_AmbientLight(AMBIENT_LIGHT_BRIGHT)
 	, m_RenderingIntent(COLOR_RENDERING_INTENT_PERCEPTUAL)
 	, m_bFinalPass(false)
+	, m_bDither(false)
 {
 #if DXVAVP
 	m_hDxva2Lib = LoadLibrary(L"dxva2.dll");
