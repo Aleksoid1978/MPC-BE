@@ -954,7 +954,7 @@
 #define IDS_AG_OPEN_DEVICE              32880
 #define IDS_AG_SAVE_AS                  32881
 #define IDS_AG_SAVE_IMAGE               32882
-#define IDS_MPLAYERC_6                  32883
+#define IDS_AG_SAVE_IMAGE_AUTO          32883
 #define IDS_OSD_IMAGE_SAVED             32884
 #define IDS_AG_LOAD_SUBTITLE            32885
 #define IDS_AG_SAVE_SUBTITLE            32886
