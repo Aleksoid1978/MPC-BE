@@ -5672,7 +5672,7 @@ HRESULT CMainFrame::GetCurrentFrame(std::vector<BYTE>& dib, CString& errmsg)
 		}
 
 		if (FAILED(hr)) {
-			errmsg.Format(L"ISubPicAllocatorPresenter3::GetDIB() failed, %s", hr);
+			errmsg.Format(L"ISubPicAllocatorPresenter3::GetDIB() failed, 0x%08x", hr);
 		}
 	}
 	else if (m_pBV) {
@@ -5683,11 +5683,11 @@ HRESULT CMainFrame::GetCurrentFrame(std::vector<BYTE>& dib, CString& errmsg)
 			hr = GetVideoDisplayControlFrame(m_pMFVDC, dib);
 
 			if (FAILED(hr)) {
-				errmsg.Format(L"IMFVideoDisplayControl::GetCurrentImage() failed, %s", hr);
+				errmsg.Format(L"IMFVideoDisplayControl::GetCurrentImage() failed, 0x%08x", hr);
 			}
 		}
 		else if (FAILED(hr)) {
-			errmsg.Format(L"IBasicVideo::GetCurrentImage() failed, %s", hr);
+			errmsg.Format(L"IBasicVideo::GetCurrentImage() failed, 0x%08x", hr);
 		}
 	}
 	else {
