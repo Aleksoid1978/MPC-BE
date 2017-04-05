@@ -471,7 +471,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	HRESULT GetCurrentFrame(std::vector<BYTE>& dib, CString& errmsg);
 	void SaveDIB(LPCWSTR fn, BYTE* pData, long size);
 	BOOL IsRendererCompatibleWithSaveImage();
-	void SaveImage(LPCWSTR fn);
+	void SaveImage(LPCWSTR fn, bool displayed);
 	void SaveThumbnails(LPCWSTR fn);
 
 	//
@@ -974,8 +974,9 @@ public:
 	afx_msg void OnFileSaveAs();
 	afx_msg void OnUpdateFileSaveAs(CCmdUI* pCmdUI);
 	afx_msg void OnFileSaveImage();
-	afx_msg void OnFileSaveImageAuto();
 	afx_msg void OnUpdateFileSaveImage(CCmdUI* pCmdUI);
+	afx_msg void OnAutoSaveImage();
+	afx_msg void OnAutoSaveDisplay();
 	afx_msg void OnFileSaveThumbnails();
 	afx_msg void OnUpdateFileSaveThumbnails(CCmdUI* pCmdUI);
 	afx_msg void OnFileLoadSubtitle();

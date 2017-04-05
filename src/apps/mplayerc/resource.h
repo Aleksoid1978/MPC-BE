@@ -138,7 +138,7 @@
 #define ID_FILE_CLOSEPLAYLIST           804
 #define ID_FILE_SAVE_COPY               805
 #define ID_FILE_SAVE_IMAGE              806
-#define ID_FILE_SAVE_IMAGE_AUTO         807
+#define ID_FILE_AUTOSAVE_IMAGE          807
 #define ID_FILE_SAVE_THUMBNAILS         808
 #define ID_FILE_LOAD_SUBTITLE           809
 #define ID_FILE_SAVE_SUBTITLE           810
@@ -313,6 +313,7 @@
 #define ID_COLOR_RESET                  992
 #define ID_NORMALIZE                    994
 #define ID_PLAY_AUDIODELAY_ONOFF        995
+#define ID_FILE_AUTOSAVE_DISPLAY        996
 #define ID_MENU_NAVIGATE_AUDIO          1000
 #define ID_MENU_NAVIGATE_SUBTITLES      1001
 #define ID_MENU_NAVIGATE_JUMPTO         1002
@@ -954,7 +955,7 @@
 #define IDS_AG_OPEN_DEVICE              32880
 #define IDS_AG_SAVE_AS                  32881
 #define IDS_AG_SAVE_IMAGE               32882
-#define IDS_AG_SAVE_IMAGE_AUTO          32883
+#define IDS_AG_AUTOSAVE_IMAGE           32883
 #define IDS_OSD_IMAGE_SAVED             32884
 #define IDS_AG_LOAD_SUBTITLE            32885
 #define IDS_AG_SAVE_SUBTITLE            32886
@@ -1048,6 +1049,7 @@
 #define IDS_MPLAYERC_103                32980
 #define IDS_AG_DISPLAY_STATS            32981
 #define IDS_AG_AUDIODELAY_ONOFF         32982
+#define IDS_AG_AUTOSAVE_DISPLAY         32984
 #define IDS_PPAGEWEBSERVER_0            32996
 #define IDS_AG_DEFAULT                  33000
 #define IDS_AG_DEFAULT_L                33001
