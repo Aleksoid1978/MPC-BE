@@ -89,11 +89,7 @@ static bool BMPDIB(LPCWSTR fn, BYTE* pData, CStringW format, ULONG quality, bool
 
 	BYTE *src = pData + sih, *rgb = (BYTE*)malloc(len);
 
-	for (int y = 0; y < height; y++) {
-		for (int x = 0; x < width; x++) {
-			memcpy(rgb + (3 * x) + (stride * y), src + (width * bpp * y) + (bpp * x), 3);
-		}
-	}
+	BitBltFromRGBToRGB(width, height, rgb, stride, bit, src, width * bpp, bih->biBitCount);
 
 	BITMAPFILEHEADER bfh;
 	bfh.bfType = 0x4d42;
