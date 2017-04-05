@@ -467,6 +467,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	void ShowOptions(int idPage = 0);
 
+	HRESULT GetDisplayedImage(std::vector<BYTE>& dib, CString& errmsg);
 	HRESULT GetCurrentFrame(std::vector<BYTE>& dib, CString& errmsg);
 	void SaveDIB(LPCWSTR fn, BYTE* pData, long size);
 	BOOL IsRendererCompatibleWithSaveImage();

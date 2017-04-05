@@ -1241,8 +1241,51 @@ STDMETHODIMP CEVRAllocatorPresenter::RepaintVideo()
 
 STDMETHODIMP CEVRAllocatorPresenter::GetCurrentImage(BITMAPINFOHEADER *pBih, BYTE **pDib, DWORD *pcbDib, LONGLONG *pTimeStamp)
 {
-	ASSERT(FALSE);
-	return E_NOTIMPL;
+	if (!pBih || !pDib || !pcbDib) {
+		return E_POINTER;
+	}
+	CheckPointer(m_pD3DDevEx, E_ABORT);
+
+	HRESULT hr = S_OK;
+	const unsigned width  = m_windowRect.Width();
+	const unsigned height = m_windowRect.Height();
+	const unsigned len = width * height * 4;
+
+	memset(pBih, 0, sizeof(BITMAPINFOHEADER));
+	pBih->biSize      = sizeof(BITMAPINFOHEADER);
+	pBih->biWidth     = width;
+	pBih->biHeight    = height;
+	pBih->biBitCount  = 32;
+	pBih->biPlanes    = 1;
+	pBih->biSizeImage = DIBSIZE(*pBih);
+
+	BYTE* p = (BYTE*)CoTaskMemAlloc(len); // only this allocator can be used
+	if (!p) {
+		return E_OUTOFMEMORY;
+	}
+
+	CComPtr<IDirect3DSurface9> pBackBuffer;
+	CComPtr<IDirect3DSurface9> pDestSurface;
+	D3DLOCKED_RECT r;
+	if (FAILED(hr = m_pD3DDevEx->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer))
+			|| FAILED(hr = m_pD3DDevEx->CreateRenderTarget(width, height, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pDestSurface, NULL))
+			|| (FAILED(hr = m_pD3DDevEx->StretchRect(pBackBuffer, m_windowRect, pDestSurface, NULL, D3DTEXF_NONE)))
+			|| (FAILED(hr = pDestSurface->LockRect(&r, NULL, D3DLOCK_READONLY)))) {
+		DLog(L"CEVRAllocatorPresenter::GetCurrentImage filed : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
+		CoTaskMemFree(p);
+		return hr;
+	}
+
+	BitBltFromRGBToRGB(pBih->biWidth, pBih->biHeight,
+		p, pBih->biWidth * 4, 32,
+		(BYTE*)r.pBits + r.Pitch * (pBih->biHeight - 1), -(int)r.Pitch, 32);
+
+	pDestSurface->UnlockRect();
+
+	*pDib = p;
+	*pcbDib = len;
+
+	return S_OK;
 }
 
 STDMETHODIMP CEVRAllocatorPresenter::SetBorderColor(COLORREF Clr)
