@@ -5632,6 +5632,23 @@ HRESULT GetVideoDisplayControlFrame(IMFVideoDisplayControl* pVideoDisplayControl
 	return hr;
 }
 
+HRESULT CMainFrame::GetDisplayedImage(std::vector<BYTE>& dib, CString& errmsg)
+{
+	errmsg.Empty();
+	HRESULT hr;
+
+	if (m_pMFVDC) {
+		hr = GetVideoDisplayControlFrame(m_pMFVDC, dib);
+	} else {
+		hr = E_NOINTERFACE;
+	}
+
+	if (FAILED(hr)) {
+		errmsg.Format(L"IMFVideoDisplayControl::GetCurrentImage() failed, %s", hr);
+	}
+
+	return hr;
+}
 
 HRESULT CMainFrame::GetCurrentFrame(std::vector<BYTE>& dib, CString& errmsg)
 {
@@ -5679,12 +5696,8 @@ HRESULT CMainFrame::GetCurrentFrame(std::vector<BYTE>& dib, CString& errmsg)
 		hr = GetBasicVideoFrame(m_pBV, dib);
 
 		if (hr == E_NOINTERFACE && m_pMFVDC) {
-			// hmm, EVR is not able to give the original frame, giving the display frame
-			hr = GetVideoDisplayControlFrame(m_pMFVDC, dib);
-
-			if (FAILED(hr)) {
-				errmsg.Format(L"IMFVideoDisplayControl::GetCurrentImage() failed, 0x%08x", hr);
-			}
+			// hmm, EVR is not able to give the original frame, giving the displayed image
+			hr = GetDisplayedImage(dib, errmsg);
 		}
 		else if (FAILED(hr)) {
 			errmsg.Format(L"IBasicVideo::GetCurrentImage() failed, 0x%08x", hr);
