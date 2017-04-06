@@ -53,7 +53,7 @@ class CSaveThumbnailsDialog : public CSaveImageDialog
 
 public:
 	CSaveThumbnailsDialog(
-		int rows, int cols, int width, int quality, int levelPNG,
+		int rows, int cols, int width, int quality, int levelPNG, bool bSnapShotSubtitles,
 		LPCWSTR lpszDefExt = NULL, LPCWSTR lpszFileName = NULL,
 		LPCWSTR lpszFilter = NULL, CWnd* pParentWnd = NULL);
 	virtual ~CSaveThumbnailsDialog();

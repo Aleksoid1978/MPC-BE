@@ -141,10 +141,10 @@ void CSaveImageDialog::OnTypeChange()
 
 IMPLEMENT_DYNAMIC(CSaveThumbnailsDialog, CSaveImageDialog)
 CSaveThumbnailsDialog::CSaveThumbnailsDialog(
-	int rows, int cols, int width, int quality, int levelPNG,
+	int rows, int cols, int width, int quality, int levelPNG, bool bSnapShotSubtitles,
 	LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
 	LPCWSTR lpszFilter, CWnd* pParentWnd)
-	: CSaveImageDialog(quality, levelPNG, false,
+	: CSaveImageDialog(quality, levelPNG, bSnapShotSubtitles,
 					   lpszDefExt, lpszFileName,
 					   lpszFilter, pParentWnd)
 	, m_rows(rows)
@@ -170,8 +170,6 @@ CSaveThumbnailsDialog::CSaveThumbnailsDialog(
 		str.Format(L"%d", clamp(m_width, 256, 2560));
 		pfdc->AddEditBox(IDC_EDIT3, str);
 		pfdc->EndVisualGroup();
-
-		pfdc->SetControlState(IDS_SNAPSHOT_SUBTITLES, CDCS_INACTIVE);
 
 		pfdc->Release();
 	}
