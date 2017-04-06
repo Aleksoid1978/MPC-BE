@@ -1600,6 +1600,7 @@
 #define IDS_THUMB_THUMBNAILS            41507
 #define IDS_THUMB_PIXELS                41508
 #define IDS_THUMB_LEVEL                 41509
+#define IDS_SNAPSHOT_SUBTITLES          41510
 #define IDS_SHADER_SAVE                 41600
 #define IDS_SHADER_NEW                  41601
 #define IDS_SHADER_DELETE               41602

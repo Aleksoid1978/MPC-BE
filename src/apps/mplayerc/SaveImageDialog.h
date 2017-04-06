@@ -29,7 +29,7 @@ class CSaveImageDialog : public CFileDialog
 
 public:
 	CSaveImageDialog(
-		int quality, int levelPNG,
+		int quality, int levelPNG, bool bSnapShotSubtitles,
 		LPCWSTR lpszDefExt = NULL, LPCWSTR lpszFileName = NULL,
 		LPCWSTR lpszFilter = NULL, CWnd* pParentWnd = NULL);
 	virtual ~CSaveImageDialog();
@@ -41,6 +41,7 @@ protected:
 
 public:
 	int m_quality, m_levelPNG;
+	bool m_bSnapShotSubtitles;
 	CSpinButtonCtrl m_qualityctrl;
 };
 

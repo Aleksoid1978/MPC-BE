@@ -26,7 +26,7 @@
 
 IMPLEMENT_DYNAMIC(CSaveImageDialog, CFileDialog)
 CSaveImageDialog::CSaveImageDialog(
-	int quality, int levelPNG,
+	int quality, int levelPNG, bool bSnapShotSubtitles,
 	LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
 	LPCWSTR lpszFilter, CWnd* pParentWnd)
 	: CFileDialog(FALSE, lpszDefExt, lpszFileName,
@@ -34,6 +34,7 @@ CSaveImageDialog::CSaveImageDialog(
 				  lpszFilter, pParentWnd)
 	, m_quality(quality)
 	, m_levelPNG(levelPNG)
+	, m_bSnapShotSubtitles(bSnapShotSubtitles)
 {
 	IFileDialogCustomize* pfdc = GetIFileDialogCustomize();
 	if (pfdc) {
@@ -48,6 +49,8 @@ CSaveImageDialog::CSaveImageDialog(
 		str.Format(L"%d", clamp(m_levelPNG, 1, 9));
 		pfdc->AddEditBox(IDC_EDIT5, str);
 		pfdc->EndVisualGroup();
+
+		pfdc->AddCheckButton(IDS_SNAPSHOT_SUBTITLES, ResStr(IDS_SNAPSHOT_SUBTITLES), m_bSnapShotSubtitles);
 
 		pfdc->Release();
 	}
@@ -81,6 +84,10 @@ BOOL CSaveImageDialog::OnFileNameOK()
 		pfdc->GetEditBoxText(IDC_EDIT5, &result);
 		m_levelPNG = _wtoi(result);
 		CoTaskMemFree(result);
+
+		BOOL bChecked;
+		pfdc->GetCheckButtonState(IDS_SNAPSHOT_SUBTITLES, &bChecked);
+		m_bSnapShotSubtitles = !!bChecked;
 
 		pfdc->Release();
 	}
@@ -137,7 +144,7 @@ CSaveThumbnailsDialog::CSaveThumbnailsDialog(
 	int rows, int cols, int width, int quality, int levelPNG,
 	LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
 	LPCWSTR lpszFilter, CWnd* pParentWnd)
-	: CSaveImageDialog(quality, levelPNG,
+	: CSaveImageDialog(quality, levelPNG, false,
 					   lpszDefExt, lpszFileName,
 					   lpszFilter, pParentWnd)
 	, m_rows(rows)
@@ -164,6 +171,8 @@ CSaveThumbnailsDialog::CSaveThumbnailsDialog(
 		pfdc->AddEditBox(IDC_EDIT3, str);
 		pfdc->EndVisualGroup();
 
+		pfdc->SetControlState(IDS_SNAPSHOT_SUBTITLES, CDCS_INACTIVE);
+
 		pfdc->Release();
 	}
 }
@@ -183,9 +192,11 @@ BOOL CSaveThumbnailsDialog::OnFileNameOK()
 		pfdc->GetEditBoxText(IDC_EDIT4, &result);
 		m_rows = _wtoi(result);
 		CoTaskMemFree(result);
+
 		pfdc->GetEditBoxText(IDC_EDIT2, &result);
 		m_cols = _wtoi(result);
 		CoTaskMemFree(result);
+
 		pfdc->GetEditBoxText(IDC_EDIT3, &result);
 		m_width = _wtoi(result);
 		CoTaskMemFree(result);

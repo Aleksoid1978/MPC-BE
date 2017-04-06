@@ -182,6 +182,7 @@
 #define IDS_RS_SNAPSHOTPATH					L"SnapShotPath"
 #define IDS_RS_PRIORITY						L"Priority"
 #define IDS_RS_SNAPSHOTEXT					L"SnapShotExt"
+#define IDS_RS_SNAPSHOT_SUBTITLES			L"SnapShotSubtitles"
 #define IDS_RS_ISDB							L"ISDb"
 #define IDS_RS_WEBROOT						L"WebRoot"
 #define IDS_RS_WEBSERVERLOCALHOSTONLY		L"WebServerLocalhostOnly"

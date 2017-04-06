@@ -980,8 +980,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		MyPictures = CString(szPath) + L"\\";
 	}
 
-	strSnapShotPath = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTPATH, MyPictures);
-	strSnapShotExt = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTEXT, L".jpg");
+	strSnapShotPath		= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTPATH, MyPictures);
+	strSnapShotExt		= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTEXT, L".jpg");
+	bSnapShotSubtitles	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SNAPSHOT_SUBTITLES, 0);
 
 	iThumbRows		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBROWS, 4);
 	iThumbCols		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBCOLS, 4);
@@ -1513,6 +1514,7 @@ void CAppSettings::SaveSettings()
 
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTPATH, strSnapShotPath);
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTEXT, strSnapShotExt);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SNAPSHOT_SUBTITLES, bSnapShotSubtitles);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBROWS, iThumbRows);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBCOLS, iThumbCols);
