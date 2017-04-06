@@ -77,6 +77,7 @@
 #include "../../Subtitles/RenderedHdmvSubtitle.h"
 #include "../../Subtitles/SupSubFile.h"
 #include "../../Subtitles/XSUBSubtitle.h"
+#include "../../SubPic/MemSubPic.h"
 
 #include "MultiMonitor.h"
 #include <mvrInterfaces.h>
@@ -5713,19 +5714,35 @@ HRESULT CMainFrame::RenderCurrentSubtitles(BYTE* pData)
 			const int width  = bih->biWidth;
 			const int height = bih->biHeight;
 
-			SubPicDesc spd;
-			spd.w       = width;
-			spd.h       = height;
-			spd.bpp     = 32;
-			spd.pitch   = -width * 4;
-			spd.vidrect = {0, 0, width, height};
-			spd.bits    = (BYTE*)(bih + 1) + (width * 4) * (height - 1);
+			SubPicDesc spdRender;
+			spdRender.type    = MSP_RGB32;
+			spdRender.w       = width;
+			spdRender.h       = abs(height);
+			spdRender.bpp     = 32;
+			spdRender.pitch   = width * 4;
+			spdRender.vidrect = {0, 0, width, height};
+			spdRender.bits    = DNew BYTE[spdRender.pitch * spdRender.h];
+
+			CMemSubPic memSubPic(spdRender);
+			memSubPic.ClearDirtyRect(0xFF000000);
 
 			REFERENCE_TIME rtNow = 0;
 			m_pMS->GetCurrentPosition(&rtNow);
 
 			RECT bbox = {};
-			hr = pSubPicProvider->Render(spd, rtNow, m_pCAP->GetFPS(), bbox);
+			hr = pSubPicProvider->Render(spdRender, rtNow, m_pCAP->GetFPS(), bbox);
+			if (S_OK == hr) {
+				SubPicDesc spdTarget;
+				spdTarget.type    = MSP_RGB32;
+				spdTarget.w       = width;
+				spdTarget.h       = height;
+				spdTarget.bpp     = 32;
+				spdTarget.pitch   = -width * 4;
+				spdTarget.vidrect = {0, 0, width, height};
+				spdTarget.bits    = (BYTE*)(bih + 1) + (width * 4) * (height - 1);
+
+				hr = memSubPic.AlphaBlt(&spdRender.vidrect, &spdTarget.vidrect, &spdTarget);
+			}
 		}
 	}
 
