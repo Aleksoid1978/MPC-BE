@@ -98,6 +98,8 @@ STDMETHODIMP CXSUBSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fp
 	bbox.right	= 0;
 	bbox.bottom	= 0;
 
+	HRESULT hr = E_FAIL;
+
 	POSITION pos = m_pObjects.GetHeadPosition();
 	while (pos) {
 		CompositionObject* pObject = m_pObjects.GetAt (pos);
@@ -132,6 +134,8 @@ STDMETHODIMP CXSUBSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fp
 				bbox.bottom	= bbox.bottom < spd.h ? bbox.bottom : spd.h;
 
 				pObject->RenderXSUB(spd);
+
+				hr = S_OK;
 			}
 		}
 
@@ -140,7 +144,7 @@ STDMETHODIMP CXSUBSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fp
 
 	CleanOld(rt - 60*10000000i64);
 
-	return S_OK;
+	return hr;
 }
 
 STDMETHODIMP CXSUBSubtitle::GetTextureSize (POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft)

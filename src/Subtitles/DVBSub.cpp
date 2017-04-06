@@ -336,6 +336,8 @@ void CDVBSub::CleanOld(REFERENCE_TIME rt)
 
 HRESULT CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 {
+	HRESULT hr = E_FAIL;
+
 	if (DVB_PAGE* pPage = FindPage(rt)) {
 		pPage->rendered = true;
 		TRACE_DVB(_T("DVB - Renderer - %s - %s"), ReftimeToString(pPage->rtStart), ReftimeToString(pPage->rtStop));
@@ -369,9 +371,11 @@ HRESULT CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 		bbox.bottom	= spd.h;
 
 		FinalizeRender(spd);
+
+		hr = S_OK;
 	}
 
-	return S_OK;
+	return hr;
 }
 
 HRESULT CDVBSub::GetTextureSize(POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft)

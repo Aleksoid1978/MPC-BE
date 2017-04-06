@@ -189,16 +189,13 @@ STDMETHODIMP_(bool) CSupSubFile::IsAnimated(POSITION pos)
 STDMETHODIMP CSupSubFile::Render(SubPicDesc& spd, REFERENCE_TIME rt, double fps, RECT& bbox)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
-	m_pSub->Render(spd, rt, bbox);
-
-	return S_OK;
+	return m_pSub->Render(spd, rt, bbox);
 }
 
 STDMETHODIMP CSupSubFile::GetTextureSize(POSITION pos, SIZE& MaxTextureSize, SIZE& VideoSize, POINT& VideoTopLeft)
 {
 	CAutoLock cAutoLock(&m_csCritSec);
-	HRESULT hr = m_pSub->GetTextureSize(pos, MaxTextureSize, VideoSize, VideoTopLeft);
-	return hr;
+	return m_pSub->GetTextureSize(pos, MaxTextureSize, VideoSize, VideoTopLeft);
 }
 
 // IPersist
