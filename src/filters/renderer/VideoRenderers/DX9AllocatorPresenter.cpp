@@ -32,9 +32,6 @@
 #include "../../transform/VSFilter/IDirectVobSub.h"
 #include "FocusThread.h"
 
-CCritSec g_ffdshowReceive;
-bool queue_ffdshow_support = false;
-
 #define FRAMERATE_MAX_DELTA 3000
 
 using namespace DSObjects;

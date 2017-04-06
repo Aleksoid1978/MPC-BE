@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -151,12 +151,6 @@ static HRESULT STDMETHODCALLTYPE ReceiveMineI(IMemInputPinC * This, IMediaSample
 
 static HRESULT STDMETHODCALLTYPE ReceiveMine(IMemInputPinC * This, IMediaSample *pSample)
 {
-	// Support ffdshow queueing.
-	// To avoid black out on pause, we have to lock g_ffdshowReceive to synchronize with CMainFrame::OnPlayPause.
-	if (queue_ffdshow_support) {
-		CAutoLock lck(&g_ffdshowReceive);
-		return ReceiveMineI(This, pSample);
-	}
 	return ReceiveMineI(This, pSample);
 }
 

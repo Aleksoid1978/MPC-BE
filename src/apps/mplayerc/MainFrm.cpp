@@ -417,7 +417,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_COMMAND(ID_PLAY_PLAY, OnPlayPlay)
 	ON_COMMAND(ID_PLAY_PAUSE, OnPlayPause)
-	ON_COMMAND(ID_PLAY_PLAYPAUSE, OnPlayPlaypause)
+	ON_COMMAND(ID_PLAY_PLAYPAUSE, OnPlayPlayPause)
 	ON_COMMAND(ID_PLAY_STOP, OnPlayStop)
 	ON_UPDATE_COMMAND_UI(ID_PLAY_PLAY, OnUpdatePlayPauseStop)
 	ON_UPDATE_COMMAND_UI(ID_PLAY_PAUSE, OnUpdatePlayPauseStop)
@@ -7511,7 +7511,7 @@ void CMainFrame::OnPlayPlay()
 	}
 }
 
-void CMainFrame::OnPlayPauseI()
+void CMainFrame::OnPlayPause()
 {
 	OAFilterState fs = GetMediaState();
 
@@ -7545,18 +7545,7 @@ void CMainFrame::OnPlayPauseI()
 	SetPlayState(PS_PAUSE);
 }
 
-void CMainFrame::OnPlayPause()
-{
-	// Support ffdshow queuing.
-	// To avoid black out on pause, we have to lock g_ffdshowReceive to synchronize with ReceiveMine.
-	if (queue_ffdshow_support) {
-		CAutoLock lck(&g_ffdshowReceive);
-		return OnPlayPauseI();
-	}
-	OnPlayPauseI();
-}
-
-void CMainFrame::OnPlayPlaypause()
+void CMainFrame::OnPlayPlayPause()
 {
 	OAFilterState fs = GetMediaState();
 	if (fs == State_Running) {
@@ -7686,7 +7675,7 @@ void CMainFrame::OnPlayFrameStep(UINT nID)
 	m_OSD.EnableShowMessage(false);
 
 	if (m_pFS && nID == ID_PLAY_FRAMESTEP) {
-		if (GetMediaState() != State_Paused && !queue_ffdshow_support) {
+		if (GetMediaState() != State_Paused) {
 			SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
 		}
 
@@ -17172,7 +17161,7 @@ void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)
 			CloseMedia();
 			break;
 		case CMD_PLAYPAUSE :
-			OnPlayPlaypause();
+			OnPlayPlayPause();
 			break;
 		case CMD_ADDTOPLAYLIST :
 			fns.AddHead((LPCWSTR)pCDS->lpData);
