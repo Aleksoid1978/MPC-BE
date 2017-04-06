@@ -561,7 +561,6 @@ namespace GothSync
 
 	class CSyncRenderer:
 		public CUnknown,
-		public IVMRffdshow9,
 		public IVMRMixerBitmap9,
 		public IBaseFilter
 	{
@@ -587,9 +586,6 @@ namespace GothSync
 		virtual HRESULT STDMETHODCALLTYPE SetSyncSource(__in_opt  IReferenceClock *pClock);
 		virtual HRESULT STDMETHODCALLTYPE GetSyncSource(__deref_out_opt  IReferenceClock **pClock);
 		virtual HRESULT STDMETHODCALLTYPE GetClassID(__RPC__out CLSID *pClassID);
-
-		// IVMRffdshow9
-		virtual HRESULT STDMETHODCALLTYPE support_ffdshow();
 
 		// IVMRMixerBitmap9
 		STDMETHODIMP GetAlphaBitmapParameters(VMR9AlphaBitmap* pBmpParms);

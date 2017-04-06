@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,24 +26,8 @@
 #include "../../../SubPic/ISubPic.h"
 #include "PixelShaderCompiler.h"
 
-extern CCritSec g_ffdshowReceive;
-extern bool queue_ffdshow_support;
-
 extern HRESULT CreateAP9(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP);
 extern HRESULT CreateEVR(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP);
-
-// Support ffdshow queuing.
-// This interface is used to check version of MPC-BE.
-// {A273C7F6-25D4-46b0-B2C8-4F7FADC44E37}
-DEFINE_GUID(IID_IVMRffdshow9,
-			0xa273c7f6, 0x25d4, 0x46b0, 0xb2, 0xc8, 0x4f, 0x7f, 0xad, 0xc4, 0x4e, 0x37);
-
-MIDL_INTERFACE("A273C7F6-25D4-46b0-B2C8-4F7FADC44E37")
-IVMRffdshow9 :
-public IUnknown {
-public:
-	virtual STDMETHODIMP support_ffdshow(void) PURE;
-};
 
 // Set and query D3DFullscreen mode.
 interface __declspec(uuid("8EA1E899-B77D-4777-9F0E-66421BEA50F8"))
