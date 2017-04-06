@@ -5672,20 +5672,6 @@ HRESULT CMainFrame::GetCurrentFrame(std::vector<BYTE>& dib, CString& errmsg)
 		if (S_OK == hr) {
 			dib.resize(size);
 			hr = m_pCAP->GetDIB(dib.data(), &size);
-
-			if (FAILED(hr)) {
-				OnPlayPause();
-				GetMediaState(); // Pause and retry to support ffdshow queuing.
-				int retry = 0;
-				while (FAILED(hr) && retry < 20) {
-					hr = m_pCAP->GetDIB(dib.data(), &size);
-					if (SUCCEEDED(hr)) {
-						break;
-					}
-					Sleep(1);
-					retry++;
-				}
-			}
 		}
 
 		if (FAILED(hr)) {
