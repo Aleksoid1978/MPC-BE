@@ -5715,12 +5715,34 @@ HRESULT CMainFrame::GetCurrentFrame(std::vector<BYTE>& dib, CString& errmsg)
 	return hr;
 }
 
-void CMainFrame::SaveDIB(LPCWSTR fn, BYTE* pData, long size)
+void CMainFrame::SaveDIB(LPCWSTR fn, BYTE* pData, long size, bool bSnapShotSubtitles/* = false*/)
 {
-	CAppSettings& s = AfxGetAppSettings();
+	const CAppSettings& s = AfxGetAppSettings();
 
-	CString ext = GetFileExt(fn).MakeLower();
+	if (bSnapShotSubtitles && s.fEnableSubtitles) {
+		if (CComQIPtr<ISubPicProvider> pSubPicProvider = m_pCurrentSubStream) {
+			const PBITMAPINFOHEADER bih = (PBITMAPINFOHEADER)pData;
+			const int width  = bih->biWidth;
+			const int height = bih->biHeight;
 
+			SubPicDesc spd;
+			spd.w       = width;
+			spd.h       = height;
+			spd.bpp     = 32;
+			spd.pitch   = -width * 4;
+			spd.vidrect = {0, 0, width, height};
+			spd.bits    = (BYTE*)(bih + 1) + (width * 4) * (height - 1);
+
+			REFERENCE_TIME rtNow = 0;
+			m_pMS->GetCurrentPosition(&rtNow);
+
+			RECT bbox = {};
+			HRESULT hr = pSubPicProvider->Render(spd, rtNow, m_pCAP->GetFPS(), bbox);
+			UNREFERENCED_PARAMETER(hr);
+		}
+	}
+
+	const CString ext = GetFileExt(fn).MakeLower();
 	if (ext == L".bmp") {
 		BMPDIB(fn, pData, L"", 0, 0, 0, 0);
 	} else if (ext == L".png") {
@@ -5735,12 +5757,12 @@ void CMainFrame::SaveDIB(LPCWSTR fn, BYTE* pData, long size)
 	CPath p(fName);
 	if (CDC* pDC = m_wndStatusBar.GetDC()) {
 		CRect r;
-		m_wndStatusBar.GetClientRect(r);
+		m_wndStatusBar.GetClientRect(&r);
 		p.CompactPath(pDC->m_hDC, r.Width());
 		m_wndStatusBar.ReleaseDC(pDC);
 	}
 
-	SendStatusMessage((LPCWSTR)p, 3000);
+	SendStatusMessage(p, 3000);
 }
 
 void CMainFrame::SaveImage(LPCWSTR fn, bool displayed)
@@ -5755,7 +5777,7 @@ void CMainFrame::SaveImage(LPCWSTR fn, bool displayed)
 	}
 
 	if (hr == S_OK) {
-		SaveDIB(fn, dib.data(), dib.size());
+		SaveDIB(fn, dib.data(), dib.size(), AfxGetAppSettings().bSnapShotSubtitles && !displayed);
 		m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_IMAGE_SAVED), 3000);
 	}
 	else {
@@ -5915,7 +5937,7 @@ void CMainFrame::OnFileSaveImage()
 	}
 
 	CSaveImageDialog fd(
-		s.iThumbQuality, s.iThumbLevelPNG,
+		s.iThumbQuality, s.iThumbLevelPNG, s.bSnapShotSubtitles,
 		0, CreateSnapShotFileName(),
 		L"BMP - Windows Bitmap (*.bmp)|*.bmp|JPG - JPEG Image (*.jpg)|*.jpg|PNG - Portable Network Graphics (*.png)|*.png||", GetModalParent());
 
@@ -5939,8 +5961,9 @@ void CMainFrame::OnFileSaveImage()
 		s.strSnapShotExt = L".png";
 	}
 
-	s.iThumbQuality		= fd.m_quality;
-	s.iThumbLevelPNG	= fd.m_levelPNG;
+	s.iThumbQuality      = fd.m_quality;
+	s.iThumbLevelPNG     = fd.m_levelPNG;
+	s.bSnapShotSubtitles = fd.m_bSnapShotSubtitles;
 
 	CString pdst = fd.GetPathName();
 	if (GetFileExt(pdst).MakeLower() != s.strSnapShotExt) {
