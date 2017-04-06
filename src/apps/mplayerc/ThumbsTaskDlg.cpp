@@ -50,13 +50,17 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 	}
 
 	// get frame size and aspect ratio
-	CSize framesize, dar;
+	CSize framesize, dar, aspectframesize;
 	if (m_pMainFrm->m_pCAP) {
 		framesize = m_pMainFrm->m_pCAP->GetVideoSize();
-		dar = m_pMainFrm->m_pCAP->GetVideoSizeAR();
+		aspectframesize = dar = m_pMainFrm->m_pCAP->GetVideoSizeAR();
 	}
 	else if (m_pMainFrm->m_pMFVDC) {
 		m_pMainFrm->m_pMFVDC->GetNativeVideoSize(&framesize, &dar);
+		aspectframesize = framesize;
+		if (dar.cx > 0 && dar.cy > 0) {
+			aspectframesize.cx = MulDiv(aspectframesize.cy, dar.cx, dar.cy);
+		}
 	}
 	else if (m_pMainFrm->m_pBV) {
 		m_pMainFrm->m_pBV->GetVideoSize(&framesize.cx, &framesize.cy);
@@ -64,6 +68,10 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 		CComQIPtr<IBasicVideo2> pBV2 = m_pMainFrm->m_pBV;
 		if (pBV2 && SUCCEEDED(pBV2->GetPreferredAspectRatio(&arx, &ary)) && arx > 0 && ary > 0) {
 			dar.SetSize(arx, ary);
+		}
+		aspectframesize = framesize;
+		if (dar.cx > 0 && dar.cy > 0) {
+			aspectframesize.cx = MulDiv(aspectframesize.cy, dar.cx, dar.cy);
 		}
 	}
 	else {
@@ -96,7 +104,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 
 	CSize thumbsize;
 	thumbsize.cx = (width - margin) / cols - margin;
-	thumbsize.cy = MulDiv(thumbsize.cx, framesize.cy, framesize.cx);
+	thumbsize.cy = MulDiv(thumbsize.cx, aspectframesize.cy, aspectframesize.cx);
 
 	const int height = infoheight + margin + (thumbsize.cy + margin) * rows;
 	const int dibsize = sizeof(BITMAPINFOHEADER) + width * height * 4;
@@ -203,6 +211,8 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 			return;
 		}
 
+		m_pMainFrm->RenderCurrentSubtitles(dib.data());
+
 		Resize_HQ_4ch((const BYTE*)(&bi->bmiHeader + 1), bi->bmiHeader.biWidth, abs(bi->bmiHeader.biHeight),
 					  thumb.get(), thumbsize.cx, thumbsize.cy);
 
@@ -242,7 +252,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 		const DVD_HMSF_TIMECODE hmsf = RT2HMS_r(duration);
 
 		CStringW ar;
-		if (dar.cx > 0 && dar.cy > 0 && dar.cx != framesize.cx && dar.cy != framesize.cy) {
+		if (dar.cx > 0 && dar.cy > 0 && dar != framesize) {
 			ar.Format(L"(%d:%d)", dar.cx, dar.cy);
 		}
 

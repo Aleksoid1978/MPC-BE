@@ -469,7 +469,8 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	HRESULT GetDisplayedImage(std::vector<BYTE>& dib, CString& errmsg);
 	HRESULT GetCurrentFrame(std::vector<BYTE>& dib, CString& errmsg);
-	void SaveDIB(LPCWSTR fn, BYTE* pData, long size, bool bSnapShotSubtitles = false);
+	HRESULT RenderCurrentSubtitles(BYTE* pData);
+	void SaveDIB(LPCWSTR fn, BYTE* pData, long size);
 	BOOL IsRendererCompatibleWithSaveImage();
 	void SaveImage(LPCWSTR fn, bool displayed);
 	void SaveThumbnails(LPCWSTR fn);

@@ -5701,11 +5701,13 @@ HRESULT CMainFrame::GetCurrentFrame(std::vector<BYTE>& dib, CString& errmsg)
 	return hr;
 }
 
-void CMainFrame::SaveDIB(LPCWSTR fn, BYTE* pData, long size, bool bSnapShotSubtitles/* = false*/)
+HRESULT CMainFrame::RenderCurrentSubtitles(BYTE* pData)
 {
-	const CAppSettings& s = AfxGetAppSettings();
+	CheckPointer(pData, E_FAIL);
+	HRESULT hr = S_FALSE;
 
-	if (bSnapShotSubtitles && s.fEnableSubtitles) {
+	const CAppSettings& s = AfxGetAppSettings();
+	if (s.fEnableSubtitles && s.bSnapShotSubtitles) {
 		if (CComQIPtr<ISubPicProvider> pSubPicProvider = m_pCurrentSubStream) {
 			const PBITMAPINFOHEADER bih = (PBITMAPINFOHEADER)pData;
 			const int width  = bih->biWidth;
@@ -5723,10 +5725,16 @@ void CMainFrame::SaveDIB(LPCWSTR fn, BYTE* pData, long size, bool bSnapShotSubti
 			m_pMS->GetCurrentPosition(&rtNow);
 
 			RECT bbox = {};
-			HRESULT hr = pSubPicProvider->Render(spd, rtNow, m_pCAP->GetFPS(), bbox);
-			UNREFERENCED_PARAMETER(hr);
+			hr = pSubPicProvider->Render(spd, rtNow, m_pCAP->GetFPS(), bbox);
 		}
 	}
+
+	return hr;
+}
+
+void CMainFrame::SaveDIB(LPCWSTR fn, BYTE* pData, long size)
+{
+	const CAppSettings& s = AfxGetAppSettings();
 
 	const CString ext = GetFileExt(fn).MakeLower();
 	if (ext == L".bmp") {
@@ -5760,10 +5768,13 @@ void CMainFrame::SaveImage(LPCWSTR fn, bool displayed)
 		hr = GetDisplayedImage(dib, errmsg);
 	} else {
 		hr = GetCurrentFrame(dib, errmsg);
+		if (hr == S_OK) {
+			RenderCurrentSubtitles(dib.data());
+		}
 	}
 
 	if (hr == S_OK) {
-		SaveDIB(fn, dib.data(), dib.size(), AfxGetAppSettings().bSnapShotSubtitles && !displayed);
+		SaveDIB(fn, dib.data(), dib.size());
 		m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_OSD_IMAGE_SAVED), 3000);
 	}
 	else {
@@ -6008,7 +6019,7 @@ void CMainFrame::OnFileSaveThumbnails()
 	psrc.Combine(s.strSnapShotPath, MakeSnapshotFileName(prefix));
 
 	CSaveThumbnailsDialog fd(
-		s.iThumbRows, s.iThumbCols, s.iThumbWidth, s.iThumbQuality, s.iThumbLevelPNG,
+		s.iThumbRows, s.iThumbCols, s.iThumbWidth, s.iThumbQuality, s.iThumbLevelPNG, s.bSnapShotSubtitles,
 		0, (LPCTSTR)psrc,
 		L"BMP - Windows Bitmap (*.bmp)|*.bmp|JPG - JPEG Image (*.jpg)|*.jpg|PNG - Portable Network Graphics (*.png)|*.png||", GetModalParent());
 
@@ -6032,11 +6043,12 @@ void CMainFrame::OnFileSaveThumbnails()
 		s.strSnapShotExt = L".png";
 	}
 
-	s.iThumbRows		= fd.m_rows;
-	s.iThumbCols		= fd.m_cols;
-	s.iThumbWidth		= fd.m_width;
-	s.iThumbQuality		= fd.m_quality;
-	s.iThumbLevelPNG	= fd.m_levelPNG;
+	s.iThumbRows         = fd.m_rows;
+	s.iThumbCols         = fd.m_cols;
+	s.iThumbWidth        = fd.m_width;
+	s.iThumbQuality      = fd.m_quality;
+	s.iThumbLevelPNG     = fd.m_levelPNG;
+	s.bSnapShotSubtitles = fd.m_bSnapShotSubtitles;
 
 	CString pdst = fd.GetPathName();
 	if (GetFileExt(pdst).MakeLower() != s.strSnapShotExt) {
