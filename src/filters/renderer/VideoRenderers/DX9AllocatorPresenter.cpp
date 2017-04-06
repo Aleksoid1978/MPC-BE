@@ -27,7 +27,6 @@
 #include "../../../SubPic/DX9SubPic.h"
 #include "../../../SubPic/SubPicQueueImpl.h"
 #include "IPinHook.h"
-#include <Version.h>
 #include "../DSUtil/WinAPIUtils.h"
 #include "../../transform/VSFilter/IDirectVobSub.h"
 #include "FocusThread.h"
