@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include "RenderersSettings.h"
 #include "../../../apps/mplayerc/mplayerc.h"
-#include <version.h>
 
 #define IDS_R_VIDEO					L"Settings\\Video"
 
