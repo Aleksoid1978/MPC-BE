@@ -41,7 +41,6 @@
 #include "ShaderCombineDlg.h"
 #include "FullscreenWnd.h"
 #include "TunerScanDlg.h"
-#include "OpenDirHelper.h"
 #include "SubtitleDlDlg.h"
 #include "ISDb.h"
 #include "UpdateChecker.h"
@@ -5242,19 +5241,6 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 	return TRUE;
 }
 
-int CALLBACK BrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lp, LPARAM pData)
-{
-	switch (uMsg) {
-		case BFFM_INITIALIZED:
-			//Initial directory is set here
-			SendMessage(hwnd, BFFM_SETSELECTION, TRUE,(LPARAM)(LPCTSTR)AfxGetAppSettings().strDVDPath);
-			break;
-		default:
-			break;
-	}
-	return 0;
-}
-
 void CMainFrame::OnFileOpenDVD()
 {
 	if (m_eMediaLoadState == MLS_LOADING) {
@@ -5262,32 +5248,29 @@ void CMainFrame::OnFileOpenDVD()
 	}
 
 	CAppSettings& s = AfxGetAppSettings();
-	CString strTitle = ResStr(IDS_MAINFRM_46);
 	CString path;
-	{
-		CFileDialog dlg(TRUE);
-		CComPtr<IFileOpenDialog> openDlgPtr = dlg.GetIFileOpenDialog();
 
-		if (openDlgPtr != NULL) {
-			openDlgPtr->SetTitle(strTitle);
+	CFileDialog dlg(TRUE);
+	CComPtr<IFileOpenDialog> openDlgPtr = dlg.GetIFileOpenDialog();
+	if (openDlgPtr != NULL) {
+		openDlgPtr->SetTitle(ResStr(IDS_MAINFRM_46));
 
-			CComPtr<IShellItem> psiFolder;
-			if (SUCCEEDED(afxGlobalData.ShellCreateItemFromParsingName(s.strDVDPath, NULL, IID_PPV_ARGS(&psiFolder)))) {
-				openDlgPtr->SetFolder(psiFolder);
-			}
+		CComPtr<IShellItem> psiFolder;
+		if (SUCCEEDED(afxGlobalData.ShellCreateItemFromParsingName(s.strDVDPath, NULL, IID_PPV_ARGS(&psiFolder)))) {
+			openDlgPtr->SetFolder(psiFolder);
+		}
 
-			openDlgPtr->SetOptions(FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST);
-			if (FAILED(openDlgPtr->Show(m_hWnd))) {
-				return;
-			}
+		openDlgPtr->SetOptions(FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST);
+		if (FAILED(openDlgPtr->Show(m_hWnd))) {
+			return;
+		}
 
-			psiFolder.Release();
-			if (SUCCEEDED(openDlgPtr->GetResult(&psiFolder))) {
-				LPWSTR folderpath = NULL;
-				if(SUCCEEDED(psiFolder->GetDisplayName(SIGDN_FILESYSPATH, &folderpath))) {
-					path = folderpath;
-					CoTaskMemFree(folderpath);
-				}
+		psiFolder.Release();
+		if (SUCCEEDED(openDlgPtr->GetResult(&psiFolder))) {
+			LPWSTR folderpath = NULL;
+			if(SUCCEEDED(psiFolder->GetDisplayName(SIGDN_FILESYSPATH, &folderpath))) {
+				path = folderpath;
+				CoTaskMemFree(folderpath);
 			}
 		}
 	}
@@ -13860,6 +13843,33 @@ void CMainFrame::CloseMediaPrivate()
 	DLog(L"CMainFrame::CloseMediaPrivate() : end");
 }
 
+static void RecurseAddDir(CString path, CAtlList<CString>* sl)
+{
+	WIN32_FIND_DATA fd = {0};
+
+	HANDLE hFind = FindFirstFile(path + L"*.*", &fd);
+	if (hFind != INVALID_HANDLE_VALUE) {
+		do {
+			CString f_name = fd.cFileName;
+
+			if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && (f_name != L".") && (f_name != L"..")) {
+				CString fullpath = path + f_name;
+
+				if (fullpath[fullpath.GetLength() - 1] != '\\') {
+					fullpath += '\\';
+				}
+
+				sl->AddTail(fullpath);
+				RecurseAddDir(fullpath, sl);
+			} else {
+				continue;
+			}
+		} while (FindNextFile(hFind, &fd));
+
+		FindClose(hFind);
+	}
+}
+
 void CMainFrame::ParseDirs(CAtlList<CString>& sl)
 {
 	POSITION pos = sl.GetHeadPosition();
@@ -13877,7 +13887,7 @@ void CMainFrame::ParseDirs(CAtlList<CString>& sl)
 					continue;
 				}
 
-				COpenDirHelper::RecurseAddDir(fn, &sl);
+				RecurseAddDir(fn, &sl);
 			}
 
 			FindClose(hFind);
@@ -17576,55 +17586,50 @@ void CMainFrame::OnFileOpenDirectory()
 	}
 
 	CAppSettings& s = AfxGetAppSettings();
-	CString strTitle = ResStr(IDS_MAINFRM_DIR_TITLE);
 	CString path;
+	BOOL recur = TRUE;
 
-	{
-		CFileDialog dlg(TRUE);
-		dlg.AddCheckButton(IDS_MAINFRM_DIR_CHECK, ResStr(IDS_MAINFRM_DIR_CHECK), TRUE);
-		CComPtr<IFileOpenDialog> openDlgPtr = dlg.GetIFileOpenDialog();
+	CFileDialog dlg(TRUE);
+	dlg.AddCheckButton(IDS_MAINFRM_DIR_CHECK, ResStr(IDS_MAINFRM_DIR_CHECK), TRUE);
+	CComPtr<IFileOpenDialog> openDlgPtr = dlg.GetIFileOpenDialog();
+	if (openDlgPtr != NULL) {
+		CComPtr<IShellItem> psiFolder;
+		if (SUCCEEDED(afxGlobalData.ShellCreateItemFromParsingName(s.strLastOpenDir, NULL, IID_PPV_ARGS(&psiFolder)))) {
+			openDlgPtr->SetFolder(psiFolder);
+		}
 
-		if (openDlgPtr != NULL) {
-			CComPtr<IShellItem> psiFolder;
-			if (SUCCEEDED(afxGlobalData.ShellCreateItemFromParsingName(s.strLastOpenDir, NULL, IID_PPV_ARGS(&psiFolder)))) {
-				openDlgPtr->SetFolder(psiFolder);
-			}
-
-			openDlgPtr->SetTitle(strTitle);
-			openDlgPtr->SetOptions(FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST);
-			if (FAILED(openDlgPtr->Show(m_hWnd))) {
-				return;
-			}
-
-			psiFolder.Release();
-			if (SUCCEEDED(openDlgPtr->GetResult(&psiFolder))) {
-				LPWSTR folderpath = NULL;
-				if(SUCCEEDED(psiFolder->GetDisplayName(SIGDN_FILESYSPATH, &folderpath))) {
-					path = folderpath;
-					CoTaskMemFree(folderpath);
-				}
-			}
-
-			BOOL recur = TRUE;
-			dlg.GetCheckButtonState(IDS_MAINFRM_DIR_CHECK, recur);
-			COpenDirHelper::m_incl_subdir = !!recur;
-		} else {
+		openDlgPtr->SetTitle(ResStr(IDS_MAINFRM_DIR_TITLE));
+		openDlgPtr->SetOptions(FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST);
+		if (FAILED(openDlgPtr->Show(m_hWnd))) {
 			return;
 		}
+
+		psiFolder.Release();
+		if (SUCCEEDED(openDlgPtr->GetResult(&psiFolder))) {
+			LPWSTR folderpath = NULL;
+			if(SUCCEEDED(psiFolder->GetDisplayName(SIGDN_FILESYSPATH, &folderpath))) {
+				path = folderpath;
+				CoTaskMemFree(folderpath);
+			}
+		}
+
+		dlg.GetCheckButtonState(IDS_MAINFRM_DIR_CHECK, recur);
 	}
 
-	path = AddSlash(path);
-	s.strLastOpenDir = path;
+	if (!path.IsEmpty()) {
+		path = AddSlash(path);
+		s.strLastOpenDir = path;
 
-	CAtlList<CString> sl;
-	sl.AddTail(path);
-	if (COpenDirHelper::m_incl_subdir
-			&& !(CheckBD(path) || CheckDVD(path))) {
-		COpenDirHelper::RecurseAddDir(path, &sl);
+		CAtlList<CString> sl;
+		sl.AddTail(path);
+		if (recur
+				&& !(CheckBD(path) || CheckDVD(path))) {
+			RecurseAddDir(path, &sl);
+		}
+
+		m_wndPlaylistBar.Open(sl, true);
+		OpenCurPlaylistItem();
 	}
-
-	m_wndPlaylistBar.Open(sl, true);
-	OpenCurPlaylistItem();
 }
 
 HRESULT CMainFrame::CreateThumbnailToolbar()
