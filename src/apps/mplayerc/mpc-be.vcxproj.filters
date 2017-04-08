@@ -111,9 +111,6 @@
     <ClCompile Include="MultiMonitor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OpenDirHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="OpenDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -450,9 +447,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MultiMonitor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenDirHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OpenDlg.h">

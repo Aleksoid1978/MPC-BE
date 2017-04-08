@@ -193,7 +193,6 @@
     <ClCompile Include="Mpeg2SectionData.cpp" />
     <ClCompile Include="mplayerc.cpp" />
     <ClCompile Include="MultiMonitor.cpp" />
-    <ClCompile Include="OpenDirHelper.cpp" />
     <ClCompile Include="OpenDlg.cpp" />
     <ClCompile Include="PlayerBar.cpp" />
     <ClCompile Include="PlayerCaptureBar.cpp" />
@@ -312,7 +311,6 @@
     <ClInclude Include="Mpeg2SectionData.h" />
     <ClInclude Include="mplayerc.h" />
     <ClInclude Include="MultiMonitor.h" />
-    <ClInclude Include="OpenDirHelper.h" />
     <ClInclude Include="OpenDlg.h" />
     <ClInclude Include="PlayerBar.h" />
     <ClInclude Include="PlayerCaptureBar.h" />
