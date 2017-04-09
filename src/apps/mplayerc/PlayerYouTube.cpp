@@ -249,7 +249,15 @@ namespace Youtube
 				if (dataSize) {
 					rapidjson::Document d;
 					if (!d.Parse(data).HasParseError()) {
-						const rapidjson::Value& snippet = d["items"][0]["snippet"];
+						const auto& items = d.FindMember("items");
+						if (items == d.MemberEnd()
+								|| !items->value.IsArray()
+								|| items->value.Empty()) {
+							free(data);
+							return false;
+						}
+
+						const rapidjson::Value& snippet = items->value[0]["snippet"];
 						if (snippet["title"].IsString()) {
 							y_fields.title = FixHtmlSymbols(UTF8To16(snippet["title"].GetString()));
 						}
@@ -272,7 +280,7 @@ namespace Youtube
 							}
 						}
 
-						const rapidjson::Value& duration = d["items"][0]["contentDetails"]["duration"];
+						const rapidjson::Value& duration = items->value[0]["contentDetails"]["duration"];
 						if (duration.IsString()) {
 							const std::regex regex("PT(\\d+H)?(\\d{1,2}M)?(\\d{1,2}S)?", std::regex_constants::icase);
 							std::cmatch match;
