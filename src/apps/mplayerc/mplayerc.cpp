@@ -1518,9 +1518,9 @@ BOOL CMPlayerCApp::InitInstance()
 				(m_s.GetMultiInst() == 1 && !m_cmdln.IsEmpty()) ||
 				m_s.GetMultiInst() == 0)) {
 
-		DWORD res = WaitForSingleObject(m_mutexOneInstance.m_h, 5000);
-		if (res == WAIT_OBJECT_0 || res == WAIT_ABANDONED) {
-			HWND hWnd = ::FindWindow(_T(MPC_WND_CLASS_NAME), NULL);
+		const DWORD result = WaitForSingleObject(m_mutexOneInstance.m_h, 5000);
+		if (result == WAIT_OBJECT_0 || result == WAIT_ABANDONED) {
+			const HWND hWnd = ::FindWindow(_T(MPC_WND_CLASS_NAME), NULL);
 			if (hWnd) {
 				DWORD dwProcessId = 0;
 				if (GetWindowThreadProcessId(hWnd, &dwProcessId) && dwProcessId) {
@@ -1536,7 +1536,7 @@ BOOL CMPlayerCApp::InitInstance()
 				BOOL bDataIsSent = TRUE;
 
 				std::thread sendThread = std::thread([this, hWnd] { SendCommandLine(hWnd); });
-				if (WaitForSingleObject(sendThread.native_handle(), 7000) == WAIT_TIMEOUT) { // in CMainFrame::CloseMedia() wait to graph thread is complete 7000
+				if (WaitForSingleObject(sendThread.native_handle(), 5000) == WAIT_TIMEOUT) { // 5 seconds should be enough to send data
 					bDataIsSent = FALSE;
 					sendThread.detach();
 				}

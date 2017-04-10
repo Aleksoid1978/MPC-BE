@@ -624,7 +624,6 @@ protected:
 
 	UINT	m_flastnID;
 	bool	m_bfirstPlay;
-	DWORD	m_dwLastRun;
 
 	struct touchPoint {
 		LONG  x_start = 0;
@@ -966,7 +965,16 @@ public:
 	afx_msg void OnFileOpenQuick();
 	afx_msg void OnFileOpenMedia();
 	afx_msg void OnUpdateFileOpen(CCmdUI* pCmdUI);
+
+	std::mutex m_mutex_cmdLineQueue;
+	std::deque<std::vector<BYTE>> m_cmdLineQueue;
+	LRESULT HandleCmdLine(WPARAM wParam, LPARAM lParam);
+	CAMEvent m_EventCmdLineQueue;
+	CAMEvent m_ExitCmdLineQueue;
+	std::thread cmdLineThread;
+	void cmdLineThreadFunction();
 	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
+
 	afx_msg void OnFileOpenDVD();
 	afx_msg void OnFileOpenIso();
 	afx_msg void OnFileOpenDevice();

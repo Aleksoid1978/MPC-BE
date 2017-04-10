@@ -453,6 +453,8 @@ public:
 };
 typedef CAtlList<CSubtitleItem> CSubtitleItemList;
 
+typedef CAtlList<CString> cmdLine;
+
 class CAppSettings
 {
 	bool	fInitialized;
@@ -493,8 +495,8 @@ public:
 	//int			iFixedWidth, iFixedHeight;
 	int				iMonitor;
 
-	CString			ParseFileName(CString const& param);
-	void			ParseCommandLine(CAtlList<CString>& cmdln);
+	CString			ParseFileName(const CString& param);
+	void			ParseCommandLine(cmdLine& cmdln);
 
 	// Added a Debug display to the screen (/debug option)
 	bool			fShowDebugInfo;

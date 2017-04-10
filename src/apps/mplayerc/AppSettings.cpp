@@ -1761,7 +1761,7 @@ void CAppSettings::ExtractDVDStartPos(CString& strParam)
 	}
 }
 
-CString CAppSettings::ParseFileName(CString const& param)
+CString CAppSettings::ParseFileName(const CString& param)
 {
 	CString fullPathName;
 
@@ -1778,7 +1778,7 @@ CString CAppSettings::ParseFileName(CString const& param)
 	return param;
 }
 
-void CAppSettings::ParseCommandLine(CAtlList<CString>& cmdln)
+void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 {
 	nCLSwitches = 0;
 	slFiles.RemoveAll();
