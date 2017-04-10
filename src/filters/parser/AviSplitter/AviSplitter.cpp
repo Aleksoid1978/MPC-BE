@@ -640,7 +640,28 @@ HRESULT CAviSplitterFilter::ReIndex(__int64 end, UINT64& Size, DWORD TrackNumber
 					c.filepos	= pos;
 					c.size		= Size;
 					c.orgsize	= size;
-					c.fKeyFrame	= size > 0; // TODO: find a better way...
+
+					if (s->cs.IsEmpty()) {
+						c.fKeyFrame = true; // force the first frame as a keyframe
+					}
+					else if (size == 0) {
+						c.fKeyFrame = false; // drop frame
+					}
+					else {
+						c.fKeyFrame = true;
+
+						if (s->strh.fccType == FCC('vids') && size >= 4 && (type == 'db' || type == 'dc' || type == 'wb')) {
+							DWORD frametype;
+							if (S_OK == m_pFile->ReadAvi(frametype)) {
+								// Xvid   : 0xb0010000 - keyframe, 0xb6010000 - delta frame.
+								// DivX 5 : 0x00010000 - keyframe, 0xb6010000 - delta frame.
+								if (frametype == 0xb6010000) {
+									c.fKeyFrame = false; // delta frame for Xvid and DivX 5
+								}
+							}
+						}
+					}
+
 					c.fChunkHdr	= true;
 					s->cs.Add(c);
 
