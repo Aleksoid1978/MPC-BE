@@ -645,6 +645,7 @@ HRESULT CAviSplitterFilter::ReIndex(__int64 end, UINT64& Size, DWORD TrackNumber
 					s->cs.Add(c);
 
 					Size += s->GetChunkSize(size);
+					s->totalsize = Size;
 
 					REFERENCE_TIME rt	= s->GetRefTime((DWORD)s->cs.GetCount()-1, Size);
 					m_rtDuration		= max(rt, m_rtDuration);
@@ -772,7 +773,7 @@ bool CAviSplitterFilter::DemuxLoop()
 			}
 #if defined(_DEBUG) && 0
 			DLog(L"%d (%d): %I64d - %I64d, %I64d - %I64d (size = %u)",
-					minTrack, (int)p->bSyncPoint,
+					curTrack, (int)p->bSyncPoint,
 					(p->rtStart) / 10000, (p->rtStop) / 10000,
 					(p->rtStart - m_rtStart) / 10000, (p->rtStop - m_rtStart) / 10000,
 					size);
