@@ -198,9 +198,13 @@ static CString FormatStreamName(CString name, LCID lcid)
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame
 
+#define WM_HANDLE_CMDLINE (WM_USER + 300)
+
 IMPLEMENT_DYNAMIC(CMainFrame, CFrameWnd)
 
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
+	ON_MESSAGE(WM_HANDLE_CMDLINE, HandleCmdLine)
+
 	ON_WM_CREATE()
 	ON_WM_DESTROY()
 	ON_WM_CLOSE()
@@ -658,7 +662,6 @@ CMainFrame::CMainFrame() :
 	m_bUseSmartSeek(false),
 	m_flastnID(0),
 	m_bfirstPlay(false),
-	m_dwLastRun(0),
 	IsMadVRExclusiveMode(false),
 	m_pBFmadVR(NULL),
 	m_hDWMAPI(0),
@@ -894,6 +897,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		SetThreadPriority(m_hNotifyRenderThread, THREAD_PRIORITY_LOWEST);
 	}
 
+	cmdLineThread = std::thread([this] { cmdLineThreadFunction(); });
+
 	return 0;
 }
 
@@ -957,6 +962,12 @@ void CMainFrame::OnClose()
 	DLog(L"CMainFrame::OnClose() : start");
 
 	m_bClosingState = true;
+
+	m_EventCmdLineQueue.Reset();
+	m_ExitCmdLineQueue.Set();
+	if (cmdLineThread.joinable()) {
+		cmdLineThread.join();
+	}
 
 	KillTimer(TIMER_FLYBARWINDOWHIDER);
 	DestroyOSDBar();
@@ -5057,39 +5068,16 @@ void CMainFrame::OnUpdateFileOpen(CCmdUI* pCmdUI)
 	}
 }
 
-BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
+LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 {
 	if (m_bClosingState) {
-		return FALSE;
+		return 0;
 	}
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	if (pCDS->dwData != 0x6ABE51 || pCDS->cbData < sizeof(DWORD)) {
-		if (s.hMasterWnd) {
-			ProcessAPICommand(pCDS);
-			return TRUE;
-		} else {
-			return FALSE;
-		}
-	}
-
-	DWORD len		= *((DWORD*)pCDS->lpData);
-	WCHAR* pBuff	= (WCHAR*)((DWORD*)pCDS->lpData + 1);
-	WCHAR* pBuffEnd	= (WCHAR*)((BYTE*)pBuff + pCDS->cbData - sizeof(DWORD));
-
-	CAtlList<CString> cmdln;
-
-	while (len-- > 0) {
-		CString str;
-		while (pBuff < pBuffEnd && *pBuff) {
-			str += *pBuff++;
-		}
-		pBuff++;
-		cmdln.AddTail(str);
-	}
-
-	s.ParseCommandLine(cmdln);
+	cmdLine* cmdln = (cmdLine*)lParam;
+	s.ParseCommandLine(*cmdln);
 
 	if (s.nCLSwitches & CLSW_SLAVE) {
 		SendAPICommand(CMD_CONNECT, L"%d", PtrToInt(GetSafeHwnd()));
@@ -5194,11 +5182,6 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 				sl.AddTailList(&s.slDubs);
 			}
 
-			if (m_dwLastRun && ((GetTickCount() - m_dwLastRun) < 500)) {
-				s.nCLSwitches |= CLSW_ADD;
-			}
-			m_dwLastRun = GetTickCount();
-
 			if ((s.nCLSwitches & CLSW_ADD) && m_wndPlaylistBar.GetCount() > 0) {
 				m_wndPlaylistBar.Append(sl, fMulti, &s.slSubs);
 
@@ -5237,6 +5220,83 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 	s.nCLSwitches &= ~CLSW_NOFOCUS;
 
 	UpdateThumbarButton();
+
+	return 0;
+}
+
+void CMainFrame::cmdLineThreadFunction()
+{
+	HANDLE handles[2] = {
+		m_ExitCmdLineQueue,
+		m_EventCmdLineQueue,
+	};
+
+	for (;;) {
+		const DWORD result = WaitForMultipleObjects(2, handles, FALSE, INFINITE);
+		switch (result) {
+			case WAIT_OBJECT_0:     // exit event
+				return;
+			case WAIT_OBJECT_0 + 1: // new event
+				{
+					cmdLine cmdLine;
+
+					std::unique_lock<std::mutex> lock(m_mutex_cmdLineQueue);
+					if (!m_cmdLineQueue.empty()) {
+						DLog(L"CMainFrame::cmdLineThreadFunction() : command line queue size - %u", m_cmdLineQueue.size());
+						const std::vector<BYTE>& pData = m_cmdLineQueue.front();
+						const BYTE* p = pData.data();
+						DWORD cnt = GETDWORD(p);
+						p += sizeof(DWORD);
+						const WCHAR* pBuff    = (WCHAR*)(p);
+						const WCHAR* pBuffEnd = (WCHAR*)(p + pData.size() - sizeof(DWORD));
+						
+						while (cnt-- > 0) {
+							CString str;
+							while (pBuff < pBuffEnd && *pBuff) {
+								str += *pBuff++;
+							}
+							pBuff++;
+							cmdLine.AddTail(str);
+						}
+
+						m_cmdLineQueue.pop_front();
+						if (!m_cmdLineQueue.empty()) {
+							m_EventCmdLineQueue.Set();
+						}
+					}
+					lock.unlock();
+
+					if (!cmdLine.IsEmpty()) {
+						SendMessage(WM_HANDLE_CMDLINE, 0, LPARAM(&cmdLine));
+					}
+				}
+		}
+	}
+}
+
+BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
+{
+	if (m_bClosingState) {
+		return FALSE;
+	}
+
+	if (pCDS->dwData != 0x6ABE51 || pCDS->cbData < sizeof(DWORD)) {
+		if (AfxGetAppSettings().hMasterWnd) {
+			ProcessAPICommand(pCDS);
+			return TRUE;
+		} else {
+			return FALSE;
+		}
+	}
+
+	std::vector<BYTE> pData(pCDS->cbData);
+	memcpy(pData.data(), pCDS->lpData, pCDS->cbData);
+
+	{
+		std::unique_lock<std::mutex> lock(m_mutex_cmdLineQueue);
+		m_cmdLineQueue.push_back(pData);
+		m_EventCmdLineQueue.Set();
+	}
 
 	return TRUE;
 }
