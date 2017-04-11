@@ -11172,6 +11172,14 @@ bool CMainFrame::SaveShaderFile(ShaderC* shader)
 			file.WriteString(shader->srcdata);
 			file.Close();
 
+			// delete out-of-date data from the cache
+			for (POSITION pos = m_ShaderCashe.GetHeadPosition(); pos; m_ShaderCashe.GetNext(pos)) {
+				if (m_ShaderCashe.GetAt(pos).label.CompareNoCase(shader->label) == 0) {
+					m_ShaderCashe.RemoveAt(pos);
+					break;
+				}
+			}
+
 			return true;
 		}
 	}
