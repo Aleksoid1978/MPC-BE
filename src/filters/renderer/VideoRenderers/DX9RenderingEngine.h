@@ -139,6 +139,7 @@ namespace DSObjects
 
 		// Custom pixel shaders
 		CComPtr<IDirect3DPixelShader9>	m_pYCgCoCorrectionPixelShader;
+		CComPtr<IDirect3DPixelShader9>	m_pST2084CorrectionPixelShader;
 		CAtlList<CExternalPixelShader>	m_pCustomPixelShaders;
 
 		// Resizers
