@@ -1,5 +1,5 @@
 /*
- *      Copyright (C) 2010-2014 Hendrik Leppkes
+ *      Copyright (C) 2010-2016 Hendrik Leppkes
  *      http://www.1f0.de
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -16,7 +16,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
- *  Adaptation for MPC-BE (C) 2013-2016 v0lt & Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+ *  Adaptation for MPC-BE (C) 2013-2017 v0lt & Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
  *
  */
 
@@ -63,6 +63,8 @@ HRESULT CFormatConverter::ConvertToAYUV(const uint8_t* const src[4], const ptrdi
     ptrdiff_t scaleStride = FFALIGN(width, 32);
 
     pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 3);
+    if (pTmpBuffer == NULL)
+      return E_OUTOFMEMORY;
 
     tmp[0] = pTmpBuffer;
     tmp[1] = tmp[0] + (height * scaleStride);
@@ -90,7 +92,7 @@ HRESULT CFormatConverter::ConvertToAYUV(const uint8_t* const src[4], const ptrdi
 
   BYTE *out = dst[0];
   for (line = 0; line < height; ++line) {
-    int32_t *idst = (int32_t *)out;
+    uint32_t *idst = (uint32_t *)out;
     for (i = 0; i < (width-7); i+=8) {
       YUV444_PACK_AYUV(0)
       YUV444_PACK_AYUV(1)
@@ -133,6 +135,8 @@ HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const ptrdi
     ptrdiff_t scaleStride = FFALIGN(width, 32) * 2;
 
     pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 2);
+    if (pTmpBuffer == NULL)
+      return E_OUTOFMEMORY;
 
     tmp[0] = pTmpBuffer;
     tmp[1] = tmp[0] + (height * scaleStride);
@@ -165,10 +169,10 @@ HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const ptrdi
     if (shift == 0) {
       memcpy(pLineOut, pLineIn, width * 2);
     } else {
-      const int16_t *yc = (int16_t *)pLineIn;
-      int16_t *idst = (int16_t *)pLineOut;
+      const uint16_t *yc = (uint16_t *)pLineIn;
+      uint16_t *idst = (uint16_t *)pLineOut;
       for (i = 0; i < width; ++i) {
-        int32_t yv = AV_RL16(yc+i);
+        uint16_t yv = AV_RL16(yc+i);
         if (shift) yv <<= shift;
         *idst++ = yv;
       }
@@ -181,13 +185,13 @@ HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const ptrdi
 
   // Merge U/V
   BYTE *out = dst[1];
-  const int16_t *uc = (int16_t *)u;
-  const int16_t *vc = (int16_t *)v;
+  const uint16_t *uc = (uint16_t *)u;
+  const uint16_t *vc = (uint16_t *)v;
   for (line = 0; line < height/chromaVertical; ++line) {
-    int32_t *idst = (int32_t *)out;
+    uint32_t *idst = (uint32_t *)out;
     for (i = 0; i < width/2; ++i) {
-      int32_t uv = AV_RL16(uc+i);
-      int32_t vv = AV_RL16(vc+i);
+      uint16_t uv = AV_RL16(uc+i);
+      uint16_t vv = AV_RL16(vc+i);
       if (shift) {
         uv <<= shift;
         vv <<= shift;
@@ -206,9 +210,9 @@ HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const ptrdi
 
 #define YUV444_PACKED_LOOP_HEAD(width, height, y, u, v, out) \
   for (int line = 0; line < height; ++line) { \
-    int32_t *idst = (int32_t *)out; \
+    uint32_t *idst = (uint32_t *)out; \
     for(int i = 0; i < width; ++i) { \
-      int32_t yv, uv, vv;
+      uint32_t yv, uv, vv;
 
 #define YUV444_PACKED_LOOP_HEAD_LE(width, height, y, u, v, out) \
   YUV444_PACKED_LOOP_HEAD(width, height, y, u, v, out) \
@@ -224,9 +228,9 @@ HRESULT CFormatConverter::ConvertToPX1X(const uint8_t* const src[4], const ptrdi
 
 HRESULT CFormatConverter::ConvertToY410(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
 {
-  const int16_t *y = NULL;
-  const int16_t *u = NULL;
-  const int16_t *v = NULL;
+  const uint16_t *y = NULL;
+  const uint16_t *u = NULL;
+  const uint16_t *v = NULL;
   ptrdiff_t sourceStride = 0;
   bool b9Bit = false;
 
@@ -238,6 +242,8 @@ HRESULT CFormatConverter::ConvertToY410(const uint8_t* const src[4], const ptrdi
     ptrdiff_t scaleStride = FFALIGN(width, 32);
 
     pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 6);
+    if (pTmpBuffer == NULL)
+      return E_OUTOFMEMORY;
 
     tmp[0] = pTmpBuffer;
     tmp[1] = tmp[0] + (height * scaleStride * 2);
@@ -250,14 +256,14 @@ HRESULT CFormatConverter::ConvertToY410(const uint8_t* const src[4], const ptrdi
 
     sws_scale2(m_pSwsContext, src, srcStride, 0, height, tmp, tmpStride);
 
-    y = (int16_t *)tmp[0];
-    u = (int16_t *)tmp[1];
-    v = (int16_t *)tmp[2];
+    y = (uint16_t *)tmp[0];
+    u = (uint16_t *)tmp[1];
+    v = (uint16_t *)tmp[2];
     sourceStride = scaleStride;
   } else {
-    y = (int16_t *)src[0];
-    u = (int16_t *)src[1];
-    v = (int16_t *)src[2];
+    y = (uint16_t *)src[0];
+    u = (uint16_t *)src[1];
+    v = (uint16_t *)src[2];
     sourceStride = srcStride[0] / 2;
 
     b9Bit = (m_FProps.lumabits == 9);
@@ -283,19 +289,22 @@ HRESULT CFormatConverter::ConvertToY410(const uint8_t* const src[4], const ptrdi
 
 HRESULT CFormatConverter::ConvertToY416(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
 {
-  const int16_t *y = NULL;
-  const int16_t *u = NULL;
-  const int16_t *v = NULL;
+  const uint16_t *y = NULL;
+  const uint16_t *u = NULL;
+  const uint16_t *v = NULL;
   ptrdiff_t sourceStride = 0;
 
   BYTE *pTmpBuffer = NULL;
 
+  int shift = (16 - m_FProps.lumabits);
   if (m_FProps.pftype != PFType_YUV444Px || m_FProps.lumabits != 16) {
     uint8_t  *tmp[4] = {NULL};
     ptrdiff_t tmpStride[4] = {0};
     ptrdiff_t scaleStride = FFALIGN(width, 32);
 
     pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 6);
+    if (pTmpBuffer == NULL)
+      return E_OUTOFMEMORY;
 
     tmp[0] = pTmpBuffer;
     tmp[1] = tmp[0] + (height * scaleStride * 2);
@@ -308,24 +317,27 @@ HRESULT CFormatConverter::ConvertToY416(const uint8_t* const src[4], const ptrdi
 
     sws_scale2(m_pSwsContext, src, srcStride, 0, height, tmp, tmpStride);
 
-    y = (int16_t *)tmp[0];
-    u = (int16_t *)tmp[1];
-    v = (int16_t *)tmp[2];
+    y = (uint16_t *)tmp[0];
+    u = (uint16_t *)tmp[1];
+    v = (uint16_t *)tmp[2];
     sourceStride = scaleStride;
+    shift = 0;
   } else {
-    y = (int16_t *)src[0];
-    u = (int16_t *)src[1];
-    v = (int16_t *)src[2];
+    y = (uint16_t *)src[0];
+    u = (uint16_t *)src[1];
+    v = (uint16_t *)src[2];
     sourceStride = srcStride[0] / 2;
   }
 
-#define YUV444_Y416_PACK \
-  *idst++ = 0xFFFF | (vv << 16); \
-  *idst++ = yv | (uv << 16);
-
   BYTE *out = dst[0];
   YUV444_PACKED_LOOP_HEAD_LE(width, height, y, u, v, out)
-    YUV444_Y416_PACK
+    uint16_t *p = (uint16_t *)idst;
+    p[0] = (uv << shift);
+    p[1] = (yv << shift);
+    p[2] = (vv << shift);
+    p[3] = 0xFFFF;
+
+    idst += 2;
   YUV444_PACKED_LOOP_END(y, u, v, out, sourceStride, dstStride[0])
 
   av_freep(&pTmpBuffer);
