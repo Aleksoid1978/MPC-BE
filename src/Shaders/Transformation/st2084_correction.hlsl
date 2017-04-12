@@ -39,7 +39,7 @@ float4 main(float2 tex : TEXCOORD0) : COLOR
     float4 pixel = tex2D(image, tex);
 
     // ST2084 to Linear
-    pixel.rgb = pow(pixel, 1.0 / ST2084_m2);
+    pixel.rgb = pow(pixel.rgb, 1.0 / ST2084_m2);
     pixel.rgb = max(pixel.rgb - ST2084_c1, 0.0) / (ST2084_c2 - ST2084_c3 * pixel.rgb);
     pixel.rgb = pow(pixel.rgb, 1.0 / ST2084_m1);
 

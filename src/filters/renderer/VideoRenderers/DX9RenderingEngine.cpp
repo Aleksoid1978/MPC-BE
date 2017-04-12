@@ -906,7 +906,8 @@ HRESULT CDX9RenderingEngine::TextureResizeDXVA(IDirect3DTexture9* pTexture, cons
 HRESULT CDX9RenderingEngine::InitVideoTextures()
 {
 	HRESULT hr = S_OK;
-	size_t count = min(_countof(m_pFrameTextures), m_pCustomPixelShaders.GetCount() + (m_inputExtFormat.VideoTransferMatrix == 7 ? 1 : 0) + (m_iRotation == 180 || !m_iRotation && m_bFlip ? 1 : 0));
+	size_t count = min(_countof(m_pFrameTextures), m_pCustomPixelShaders.GetCount()
+				 + ((m_inputExtFormat.VideoTransferMatrix == 7 || m_inputExtFormat.VideoTransferFunction == 16) ? 1 : 0) + (m_iRotation == 180 || !m_iRotation && m_bFlip ? 1 : 0));
 
 	for (size_t i = 0; i < count; i++) {
 		if (m_pFrameTextures[i] == NULL) {
