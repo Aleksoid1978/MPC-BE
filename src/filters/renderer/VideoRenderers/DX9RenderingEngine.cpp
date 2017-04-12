@@ -224,6 +224,7 @@ void CDX9RenderingEngine::CleanupRenderingEngine()
 	m_pResizeTexture = NULL;
 
 	m_pYCgCoCorrectionPixelShader.Release();
+	m_pST2084CorrectionPixelShader.Release();
 	m_pConvertToInterlacePixelShader.Release();
 }
 
@@ -366,6 +367,23 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
 			hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
 			hr = m_pD3DDevEx->SetPixelShader(m_pYCgCoCorrectionPixelShader);
+			TextureCopy(m_pVideoTextures[m_iCurSurface]);
+			first = false;
+			std::swap(src, dst);
+			pVideoTexture = m_pFrameTextures[src];
+		}
+	}
+
+	if (m_inputExtFormat.VideoTransferFunction == 16) {
+		if (!m_pST2084CorrectionPixelShader && m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0)) {
+			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pST2084CorrectionPixelShader, IDF_SHADER_ST2084CORRECTION);
+		}
+
+		if (m_pST2084CorrectionPixelShader) {
+			CComPtr<IDirect3DSurface9> pTemporarySurface;
+			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
+			hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
+			hr = m_pD3DDevEx->SetPixelShader(m_pST2084CorrectionPixelShader);
 			TextureCopy(m_pVideoTextures[m_iCurSurface]);
 			first = false;
 			std::swap(src, dst);

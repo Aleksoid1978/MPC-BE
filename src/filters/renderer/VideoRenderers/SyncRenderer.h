@@ -164,6 +164,7 @@ namespace GothSync
 		CAtlList<CExternalPixelShader>	m_pPixelShadersScreenSpace;
 		CComPtr<IDirect3DPixelShader9>	m_pResizerPixelShaders[shader_count];
 		CComPtr<IDirect3DPixelShader9>	m_pYCgCoCorrectionPixelShader;
+		CComPtr<IDirect3DPixelShader9>	m_pST2084CorrectionPixelShader;
 
 		bool SettingsNeedResetDevice();
 		void SendResetRequest();

@@ -1252,6 +1252,24 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				}
 			}
 
+			if (m_inputExtFormat.VideoTransferFunction == 16) {
+				if (!m_pST2084CorrectionPixelShader && m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0)) {
+					hr = CreateShaderFromResource(m_pD3DDevEx, &m_pST2084CorrectionPixelShader, IDF_SHADER_ST2084CORRECTION);
+				}
+
+				if (m_pST2084CorrectionPixelShader) {
+					hr = m_pD3DDevEx->SetRenderTarget(0, m_pVideoSurfaces[dst]);
+					hr = m_pD3DDevEx->SetPixelShader(m_pST2084CorrectionPixelShader);
+					TextureCopy(m_pVideoTextures[src]);
+					pVideoTexture = m_pVideoTextures[dst];
+					src = dst;
+					dst++;
+
+					hr = m_pD3DDevEx->SetRenderTarget(0, pBackBuffer);
+					hr = m_pD3DDevEx->SetPixelShader(NULL);
+				}
+			}
+
 			// pre-resize pixel shaders
 			if (m_pPixelShaders.GetCount()) {
 				static __int64 counter = 0;

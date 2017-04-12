@@ -103,6 +103,7 @@ IDF_SHADER_RESIZER_LANCZOS3_Y    SHADER                  "..\\..\\..\\bin\\shade
 IDF_SHADER_DOWNSCALING_X         SHADER                  "..\\..\\..\\bin\\shaders\\resizer_downscaling_x.cso"
 IDF_SHADER_DOWNSCALING_Y         SHADER                  "..\\..\\..\\bin\\shaders\\resizer_downscaling_y.cso"
 IDF_SHADER_YCGCOCORRECTION       SHADER                  "..\\..\\..\\bin\\shaders\\ycgco_correction.cso"
+IDF_SHADER_ST2084CORRECTION      SHADER                  "..\\..\\..\\bin\\shaders\\st2084_correction.cso"
 IDF_SHADER_CONVERT_TO_INTERLACE  SHADER                  "..\\..\\..\\bin\\shaders\\halfoverunder_to_interlace.cso"
 
 IDF_SHADER_PS20_BSPLINE4_X       SHADER                  "..\\..\\..\\bin\\shaders\\ps20_resizer_bspline4_x.cso"
