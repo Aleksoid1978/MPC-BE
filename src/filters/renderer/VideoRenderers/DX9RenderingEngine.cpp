@@ -223,8 +223,9 @@ void CDX9RenderingEngine::CleanupRenderingEngine()
 	NULL_PTR_ARRAY(m_pScreenSpaceTextures);
 	m_pResizeTexture = NULL;
 
-	m_pYCgCoCorrectionPixelShader.Release();
-	m_pST2084CorrectionPixelShader.Release();
+	m_pPSCorrectionYCgCo.Release();
+	m_pPSCorrectionST2084.Release();
+	m_pPSCorrectionHLG.Release();
 	m_pConvertToInterlacePixelShader.Release();
 }
 
@@ -353,37 +354,50 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 	unsigned dst = 0;
 	bool first = true;
 
+	bool ps30 = m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0);
+
 	if (m_inputExtFormat.VideoTransferMatrix == 7) {
-		if (!m_pYCgCoCorrectionPixelShader) {
-			if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
-				hr = CreateShaderFromResource(m_pD3DDevEx, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_PS20_CORRECTION_YCGCO);
-			} else {
-				hr = CreateShaderFromResource(m_pD3DDevEx, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_CORRECTION_YCGCO);
-			}
+		if (!m_pPSCorrectionYCgCo) {
+			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrectionYCgCo, ps30 ? IDF_SHADER_CORRECTION_YCGCO : IDF_SHADER_PS20_CORRECTION_YCGCO);
 		}
 
-		if (m_pYCgCoCorrectionPixelShader) {
+		if (m_pPSCorrectionYCgCo) {
 			CComPtr<IDirect3DSurface9> pTemporarySurface;
 			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
 			hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
-			hr = m_pD3DDevEx->SetPixelShader(m_pYCgCoCorrectionPixelShader);
+			hr = m_pD3DDevEx->SetPixelShader(m_pPSCorrectionYCgCo);
 			TextureCopy(m_pVideoTextures[m_iCurSurface]);
 			first = false;
 			std::swap(src, dst);
 			pVideoTexture = m_pFrameTextures[src];
 		}
 	}
-
-	if (m_inputExtFormat.VideoTransferFunction == 16) {
-		if (!m_pST2084CorrectionPixelShader && m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0)) {
-			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pST2084CorrectionPixelShader, IDF_SHADER_CORRECTION_ST2084);
+	else if (m_inputExtFormat.VideoTransferFunction == 16) {
+		if (!m_pPSCorrectionST2084) {
+			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrectionST2084, ps30 ? IDF_SHADER_CORRECTION_ST2084 : IDF_SHADER_PS20_CORRECTION_ST2084);
 		}
 
-		if (m_pST2084CorrectionPixelShader) {
+		if (m_pPSCorrectionST2084) {
 			CComPtr<IDirect3DSurface9> pTemporarySurface;
 			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
 			hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
-			hr = m_pD3DDevEx->SetPixelShader(m_pST2084CorrectionPixelShader);
+			hr = m_pD3DDevEx->SetPixelShader(m_pPSCorrectionST2084);
+			TextureCopy(m_pVideoTextures[m_iCurSurface]);
+			first = false;
+			std::swap(src, dst);
+			pVideoTexture = m_pFrameTextures[src];
+		}
+	}
+	else if (m_inputExtFormat.VideoTransferFunction == 18) {
+		if (!m_pPSCorrectionHLG) {
+			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrectionHLG, ps30 ? IDF_SHADER_CORRECTION_HLG : IDF_SHADER_PS20_CORRECTION_HLG);
+		}
+
+		if (m_pPSCorrectionHLG) {
+			CComPtr<IDirect3DSurface9> pTemporarySurface;
+			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
+			hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
+			hr = m_pD3DDevEx->SetPixelShader(m_pPSCorrectionHLG);
 			TextureCopy(m_pVideoTextures[m_iCurSurface]);
 			first = false;
 			std::swap(src, dst);
@@ -906,8 +920,9 @@ HRESULT CDX9RenderingEngine::TextureResizeDXVA(IDirect3DTexture9* pTexture, cons
 HRESULT CDX9RenderingEngine::InitVideoTextures()
 {
 	HRESULT hr = S_OK;
-	size_t count = min(_countof(m_pFrameTextures), m_pCustomPixelShaders.GetCount()
-				 + ((m_inputExtFormat.VideoTransferMatrix == 7 || m_inputExtFormat.VideoTransferFunction == 16) ? 1 : 0) + (m_iRotation == 180 || !m_iRotation && m_bFlip ? 1 : 0));
+	size_t count = (std::min)(_countof(m_pFrameTextures), m_pCustomPixelShaders.GetCount()
+				 + ((m_inputExtFormat.VideoTransferMatrix == 7 || m_inputExtFormat.VideoTransferFunction == 16 || m_inputExtFormat.VideoTransferFunction == 18) ? 1 : 0)
+				 + (m_iRotation == 180 || !m_iRotation && m_bFlip ? 1 : 0));
 
 	for (size_t i = 0; i < count; i++) {
 		if (m_pFrameTextures[i] == NULL) {

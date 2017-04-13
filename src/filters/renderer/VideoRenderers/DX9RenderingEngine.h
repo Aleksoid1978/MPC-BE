@@ -138,8 +138,9 @@ namespace DSObjects
 		ColorRenderingIntent			m_RenderingIntent;
 
 		// Custom pixel shaders
-		CComPtr<IDirect3DPixelShader9>	m_pYCgCoCorrectionPixelShader;
-		CComPtr<IDirect3DPixelShader9>	m_pST2084CorrectionPixelShader;
+		CComPtr<IDirect3DPixelShader9>	m_pPSCorrectionYCgCo;
+		CComPtr<IDirect3DPixelShader9>	m_pPSCorrectionST2084;
+		CComPtr<IDirect3DPixelShader9>	m_pPSCorrectionHLG;
 		CAtlList<CExternalPixelShader>	m_pCustomPixelShaders;
 
 		// Resizers
