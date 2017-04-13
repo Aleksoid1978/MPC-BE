@@ -16,7 +16,9 @@ set LIST=%LIST% Resizers\resizer_lanczos2_x.hlsl
 set LIST=%LIST% Resizers\resizer_lanczos2_y.hlsl
 set LIST=%LIST% Resizers\resizer_downscaling_x.hlsl
 set LIST=%LIST% Resizers\resizer_downscaling_y.hlsl
-set LIST=%LIST% Transformation\YCgCo_correction.hlsl
+set LIST=%LIST% Transformation\ycgco_correction.hlsl
+set LIST=%LIST% Transformation\st2084_correction.hlsl
+set LIST=%LIST% Transformation\hlg_correction.hlsl
 set LIST=%LIST% Transformation\halfoverunder_to_interlace.hlsl
 
 for %%f in (%LIST%) do (

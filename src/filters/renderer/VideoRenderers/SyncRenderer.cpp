@@ -1230,36 +1230,18 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			unsigned dst = m_nSurfaces;
 
 			if (m_inputExtFormat.VideoTransferMatrix == 7) {
-				if (!m_pYCgCoCorrectionPixelShader) {
+				if (!m_pPSCorrectionYCgCo) {
 					if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
-						hr = CreateShaderFromResource(m_pD3DDevEx, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_PS20_CORRECTION_YCGCO);
+						hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrectionYCgCo, IDF_SHADER_PS20_CORRECTION_YCGCO);
 					}
 					else {
-						hr = CreateShaderFromResource(m_pD3DDevEx, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_CORRECTION_YCGCO);
+						hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrectionYCgCo, IDF_SHADER_CORRECTION_YCGCO);
 					}
 				}
 
-				if (m_pYCgCoCorrectionPixelShader) {
+				if (m_pPSCorrectionYCgCo) {
 					hr = m_pD3DDevEx->SetRenderTarget(0, m_pVideoSurfaces[dst]);
-					hr = m_pD3DDevEx->SetPixelShader(m_pYCgCoCorrectionPixelShader);
-					TextureCopy(m_pVideoTextures[src]);
-					pVideoTexture = m_pVideoTextures[dst];
-					src = dst;
-					dst++;
-
-					hr = m_pD3DDevEx->SetRenderTarget(0, pBackBuffer);
-					hr = m_pD3DDevEx->SetPixelShader(NULL);
-				}
-			}
-
-			if (m_inputExtFormat.VideoTransferFunction == 16) {
-				if (!m_pST2084CorrectionPixelShader && m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0)) {
-					hr = CreateShaderFromResource(m_pD3DDevEx, &m_pST2084CorrectionPixelShader, IDF_SHADER_CORRECTION_ST2084);
-				}
-
-				if (m_pST2084CorrectionPixelShader) {
-					hr = m_pD3DDevEx->SetRenderTarget(0, m_pVideoSurfaces[dst]);
-					hr = m_pD3DDevEx->SetPixelShader(m_pST2084CorrectionPixelShader);
+					hr = m_pD3DDevEx->SetPixelShader(m_pPSCorrectionYCgCo);
 					TextureCopy(m_pVideoTextures[src]);
 					pVideoTexture = m_pVideoTextures[dst];
 					src = dst;
