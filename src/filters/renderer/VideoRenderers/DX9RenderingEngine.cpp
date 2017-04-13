@@ -356,9 +356,9 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 	if (m_inputExtFormat.VideoTransferMatrix == 7) {
 		if (!m_pYCgCoCorrectionPixelShader) {
 			if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
-				hr = CreateShaderFromResource(m_pD3DDevEx, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_PS20_YCGCOCORRECTION);
+				hr = CreateShaderFromResource(m_pD3DDevEx, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_PS20_CORRECTION_YCGCO);
 			} else {
-				hr = CreateShaderFromResource(m_pD3DDevEx, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_YCGCOCORRECTION);
+				hr = CreateShaderFromResource(m_pD3DDevEx, &m_pYCgCoCorrectionPixelShader, IDF_SHADER_CORRECTION_YCGCO);
 			}
 		}
 
@@ -376,7 +376,7 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 
 	if (m_inputExtFormat.VideoTransferFunction == 16) {
 		if (!m_pST2084CorrectionPixelShader && m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0)) {
-			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pST2084CorrectionPixelShader, IDF_SHADER_ST2084CORRECTION);
+			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pST2084CorrectionPixelShader, IDF_SHADER_CORRECTION_ST2084);
 		}
 
 		if (m_pST2084CorrectionPixelShader) {

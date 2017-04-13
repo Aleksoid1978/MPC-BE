@@ -26,6 +26,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">LUT3D_ENABLED=1;DITHER_ENABLED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </FxCompile>
     <FxCompile Include="Transformation\halfoverunder_to_interlace.hlsl" />
+    <FxCompile Include="Transformation\hlg_correction.hlsl" />
     <FxCompile Include="Transformation\st2084_correction.hlsl" />
     <FxCompile Include="Transformation\ycgco_correction.hlsl" />
     <None Include="OnePassResizers\resizer_bicubic06.hlsl">
