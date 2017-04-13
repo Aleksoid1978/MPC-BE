@@ -2474,7 +2474,7 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 			fmt.VideoPrimaries = DXVA2_VideoPrimaries_SMPTE240M;
 			break;
 		case AVCOL_PRI_BT2020:
-			fmt.VideoPrimaries = (DXVA2_VideoPrimaries)9;
+			fmt.VideoPrimaries = 9;
 			break;
 	}
 
@@ -2493,13 +2493,13 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 		// Custom values, not official standard, but understood by madVR
 		case AVCOL_SPC_BT2020_CL:
 		case AVCOL_SPC_BT2020_NCL:
-			fmt.VideoTransferMatrix = (DXVA2_VideoTransferMatrix)4;
+			fmt.VideoTransferMatrix = 4;
 			break;
 		case AVCOL_SPC_FCC:
-			fmt.VideoTransferMatrix = (DXVA2_VideoTransferMatrix)6;
+			fmt.VideoTransferMatrix = 6;
 			break;
 		case AVCOL_SPC_YCGCO:
-			fmt.VideoTransferMatrix = (DXVA2_VideoTransferMatrix)7;
+			fmt.VideoTransferMatrix = 7;
 			break;
 	}
 
