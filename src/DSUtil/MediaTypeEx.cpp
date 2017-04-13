@@ -614,7 +614,7 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 				const LPCSTR primaries[] = { NULL, "Reserved", "BT.709", "BT.470-4 System M", "BT.470-4 System B,G",
 					"SMPTE 170M", "SMPTE 240M", "EBU Tech. 3213", "SMPTE", "BT.2020" };
 				const LPCSTR transfunc[] = { NULL, "Linear RGB", "1.8 gamma", "2.0 gamma", "2.2 gamma", "BT.709", "SMPTE 240M",
-					"sRGB", "2.8 gamma", "Log100", "Log316", "Symmetric BT.709", NULL, NULL, NULL, NULL, "SMPTE ST 2084" };
+					"sRGB", "2.8 gamma", "Log100", "Log316", "Symmetric BT.709", NULL, NULL, NULL, NULL, "SMPTE ST 2084", NULL, "ARIB STD-B67 (HLG)" };
 
 #define ADD_PARAM_DESC(str, parameter, descs) if (parameter < _countof(descs) && descs[parameter]) str.AppendFormat(L" (%hS)", descs[parameter])
 
