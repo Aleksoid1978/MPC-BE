@@ -36,8 +36,8 @@
 #define ASYNC_DEPTH 8
 #define ASYNC_QUEUE_SIZE (ASYNC_DEPTH + 2)
 
-// 1s timestamp offset to avoid negative timestamps
-#define TIMESTAMP_OFFSET 10000000i64
+// 2s timestamp offset to avoid negative timestamps
+#define TIMESTAMP_OFFSET 20000000i64
 
 typedef struct _MVCBuffer {
   mfxFrameSurface1 surface = { 0 };
