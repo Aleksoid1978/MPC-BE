@@ -885,11 +885,6 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 		}
 	}
 
-	m_inputExtFormat.value = 0;
-	if (m_inputMediaType.formattype == FORMAT_VideoInfo2) {
-		m_inputExtFormat.value = ((VIDEOINFOHEADER2*)m_inputMediaType.pbFormat)->dwControlFlags;
-	}
-
 	// Loop through all of the mixer's proposed output types.
 	DWORD iTypeIndex = 0;
 	while ((hr != MF_E_NO_MORE_TYPES)) {
@@ -1596,6 +1591,11 @@ void CEVRAllocatorPresenter::GetMixerThread()
 							&& SUCCEEDED(pPin->ConnectionMediaType(&mt)) ) {
 
 						FillAddingField(pPin, &mt);
+
+						m_inputExtFormat.value = 0;
+						if (mt.formattype == FORMAT_VideoInfo2) {
+							m_inputExtFormat.value = ((VIDEOINFOHEADER2*)mt.pbFormat)->dwControlFlags;
+						}
 					}
 					// If framerate not set by Video Decoder - choose 23.976
 					if (m_rtTimePerFrame == 1) {
