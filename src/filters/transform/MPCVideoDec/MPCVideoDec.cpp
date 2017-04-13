@@ -2530,6 +2530,10 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 			// Custom values, not official standard, but understood by madVR
 			fmt.VideoTransferFunction = 16;
 			break;
+		case AVCOL_TRC_ARIB_STD_B67:
+			// Custom values, not official standard, but understood by EVR Custom
+			fmt.VideoTransferFunction = 18;
+			break;
 	}
 
 	if (frame->format == AV_PIX_FMT_XYZ12LE || frame->format == AV_PIX_FMT_XYZ12BE) {
