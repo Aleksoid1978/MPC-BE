@@ -67,6 +67,9 @@
     <FxCompile Include="Transformation\st2084_correction.hlsl">
       <Filter>Transformation</Filter>
     </FxCompile>
+    <FxCompile Include="Transformation\hlg_correction.hlsl">
+      <Filter>Transformation</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OnePassResizers\resizer_bicubic_base.hlsl">
