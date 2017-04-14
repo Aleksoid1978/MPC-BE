@@ -34,8 +34,11 @@ float3 ToneMapping(float3 rgb)
     return hable3(rgb) / HABLE_DIV;
 }
 
+#pragma warning( disable : 3571) // fix warning X3571 in pow().
+
 float4 main(float2 tex : TEXCOORD0) : COLOR
 {
+    //float4 pixel = saturate(tex2D(image, tex)); // use mindless saturate() for fix warning X3571 in pow()
     float4 pixel = tex2D(image, tex);
 
     // ST2084 to Linear
