@@ -25,6 +25,16 @@
 #include "../../DSUtil/FileHandle.h"
 #include "../../DSUtil/HTTPAsync.h"
 
+static const CString ConvertToStr(LPCSTR lpMultiByteStr)
+{
+	CString str = AltUTF8To16(lpMultiByteStr);
+	if (str.IsEmpty()) {
+		str = ConvertToUTF16(lpMultiByteStr, CP_ACP);
+	}
+
+	return str;
+}
+
 namespace Content {
 	static void GetContentTypeByExt(CString path, CString& ct)
 	{
@@ -83,8 +93,10 @@ namespace Content {
 					DWORD dwSizeRead = 0;
 					if (content.HTTPAsync->Read(content.raw.data(), nMinSize, &dwSizeRead) == S_OK) {
 						content.raw.resize(dwSizeRead);
-						CStringA str((char*)content.raw.data(), dwSizeRead);
-						content.body += AToT(str);
+						if (dwSizeRead) {
+							CStringA str((char*)content.raw.data(), dwSizeRead);
+							content.body += ConvertToStr(str);
+						}
 					}
 				}
 			}
@@ -121,9 +133,9 @@ namespace Content {
 
 					CStringA str;
 					DWORD dwSizeRead = 0;
-					if (content.HTTPAsync->Read((PBYTE)str.GetBuffer(nMaxSize), nMaxSize, &dwSizeRead) == S_OK) {
+					if (content.HTTPAsync->Read((PBYTE)str.GetBuffer(nMaxSize), nMaxSize, &dwSizeRead) == S_OK && dwSizeRead) {
 						str.ReleaseBuffer(dwSizeRead);
-						content.body += AToT(str);
+						content.body += ConvertToStr(str);
 					}
 				}
 			}
