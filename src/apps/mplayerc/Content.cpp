@@ -1,5 +1,5 @@
 /*
- * (C) 2016 see Authors.txt
+ * (C) 2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,8 +25,38 @@
 #include "../../DSUtil/FileHandle.h"
 #include "../../DSUtil/HTTPAsync.h"
 
-static const CString ConvertToStr(LPCSTR lpMultiByteStr)
+static const CString ConvertToUTF16(const BYTE* pData, size_t size)
 {
+	BOOL bUTF8    = FALSE;
+	BOOL bUTF16LE = FALSE;
+	BOOL bUTF16BE = FALSE;
+	if (size > 2) {
+		if (pData[0] == 0xFE && pData[1] == 0xFF) {
+			bUTF16BE = TRUE; pData += 2; size -= 2;
+		} else if (pData[0] == 0xFF && pData[1] == 0xFE) {
+			bUTF16LE = TRUE; pData += 2; size -= 2;
+		} else if (size > 3 && pData[0] == 0xEF && pData[1] == 0xBB && pData[2] == 0xBF) {
+			bUTF8 = TRUE; pData += 3; size -= 3;
+		}
+	}
+
+	if (bUTF16BE || bUTF16LE) {
+		size /= 2;
+		CString str((LPCTSTR)pData, size);
+		if (bUTF16BE) {
+			for (int i = 0, j = str.GetLength(); i < j; i++) {
+				str.SetAt(i, (str[i] << 8) | (str[i] >> 8));
+			}
+		}
+		return str;
+	}
+
+	CStringA lpMultiByteStr((LPCSTR)pData, size);
+	if (bUTF8) {
+		CString str = UTF8To16(lpMultiByteStr);
+		return str;
+	}
+
 	CString str = AltUTF8To16(lpMultiByteStr);
 	if (str.IsEmpty()) {
 		str = ConvertToUTF16(lpMultiByteStr, CP_ACP);
@@ -93,10 +123,6 @@ namespace Content {
 					DWORD dwSizeRead = 0;
 					if (content.HTTPAsync->Read(content.raw.data(), nMinSize, &dwSizeRead) == S_OK) {
 						content.raw.resize(dwSizeRead);
-						if (dwSizeRead) {
-							CStringA str((char*)content.raw.data(), dwSizeRead);
-							content.body += ConvertToStr(str);
-						}
 					}
 				}
 			}
@@ -125,20 +151,31 @@ namespace Content {
 				content.bGOTRedir = true;
 
 				if (content.bHTTPConnected) {
-					int nMaxSize = 16 * KILOBYTE;
+					size_t nMaxSize = 16 * KILOBYTE;
 					const QWORD ContentLength = content.HTTPAsync->GetLenght();
 					if (ContentLength) {
 						nMaxSize = min(ContentLength, nMaxSize);
 					}
 
-					CStringA str;
-					DWORD dwSizeRead = 0;
-					if (content.HTTPAsync->Read((PBYTE)str.GetBuffer(nMaxSize), nMaxSize, &dwSizeRead) == S_OK && dwSizeRead) {
-						str.ReleaseBuffer(dwSizeRead);
-						content.body += ConvertToStr(str);
+					if (nMaxSize > content.raw.size()) {
+						const size_t old_size = content.raw.size();
+						nMaxSize -= old_size;
+						content.raw.resize(old_size + nMaxSize);
+						DWORD dwSizeRead = 0;
+						if (content.HTTPAsync->Read(content.raw.data() + old_size, nMaxSize, &dwSizeRead) == S_OK) {
+							content.raw.resize(old_size + dwSizeRead);
+						}
 					}
 				}
 			}
+		}
+	}
+
+	static void Encoding(Content& content)
+	{
+		content.body.Empty();
+		if (!content.raw.empty()) {
+			content.body = ConvertToUTF16(content.raw.data(), content.raw.size());
 		}
 	}
 
@@ -350,6 +387,8 @@ namespace Content {
 						&& (Content.ct == L"audio/x-scpls" || Content.ct == L"audio/x-mpegurl" || Content.ct == L"application/xspf+xml")) {
 					GetRedirectData(Content);
 				}
+
+				Encoding(Content);
 
 				ct = Content.ct;
 				body = Content.body;
