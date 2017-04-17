@@ -483,7 +483,7 @@ void File_Rm::MDPR_realaudio()
         }
 
         //Filling
-        Fill(Stream_General, 0, General_Duration, title);
+        Fill(Stream_General, 0, General_Title, title);
         Fill(Stream_General, 0, General_Performer, author);
         Fill(Stream_General, 0, General_Copyright, copyright);
         Fill(Stream_General, 0, General_Comment, comment);

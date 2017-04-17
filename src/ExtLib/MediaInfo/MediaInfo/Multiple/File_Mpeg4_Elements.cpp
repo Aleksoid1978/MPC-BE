@@ -4325,7 +4325,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxSound()
             Fill(Stream_Audio, StreamPos_Last, Audio_Codec_CC, Codec, true);
         }
         #if defined(MEDIAINFO_AAC_YES)
-        if (Version==2 && Element_Code==Elements::moov_trak_mdia_minf_stbl_stsd_mp4a) //This is not normal, but I don't know where is audioObjectType, default to 2 (AAC LC)
+        if ((Version == 1 || Version == 2) && Element_Code == Elements::moov_trak_mdia_minf_stbl_stsd_mp4a) //This is not normal, but I don't know where is audioObjectType, default to 2 (AAC LC)
         {
             File_Aac* Parser=new File_Aac;
             Parser->AudioSpecificConfig_OutOfBand(SampleRate, 2);
