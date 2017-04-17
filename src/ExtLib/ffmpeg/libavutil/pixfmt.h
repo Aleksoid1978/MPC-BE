@@ -396,6 +396,7 @@ enum AVPixelFormat {
 
 /**
   * Chromaticity coordinates of the source primaries.
+  * These values match the ones defined by ISO/IEC 23001-8_2013 § 7.1.
   */
 enum AVColorPrimaries {
     AVCOL_PRI_RESERVED0   = 0,
@@ -411,13 +412,15 @@ enum AVColorPrimaries {
     AVCOL_PRI_BT2020      = 9,  ///< ITU-R BT2020
     AVCOL_PRI_SMPTE428    = 10, ///< SMPTE ST 428-1 (CIE 1931 XYZ)
     AVCOL_PRI_SMPTEST428_1 = AVCOL_PRI_SMPTE428,
-    AVCOL_PRI_SMPTE431    = 11, ///< SMPTE ST 431-2 (2011)
-    AVCOL_PRI_SMPTE432    = 12, ///< SMPTE ST 432-1 D65 (2010)
+    AVCOL_PRI_SMPTE431    = 11, ///< SMPTE ST 431-2 (2011) / DCI P3
+    AVCOL_PRI_SMPTE432    = 12, ///< SMPTE ST 432-1 (2010) / P3 D65 / Display P3
+    AVCOL_PRI_JEDEC_P22   = 22, ///< JEDEC P22 phosphors
     AVCOL_PRI_NB                ///< Not part of ABI
 };
 
 /**
  * Color Transfer Characteristic.
+ * These values match the ones defined by ISO/IEC 23001-8_2013 § 7.2.
  */
 enum AVColorTransferCharacteristic {
     AVCOL_TRC_RESERVED0    = 0,
@@ -446,6 +449,7 @@ enum AVColorTransferCharacteristic {
 
 /**
  * YUV colorspace type.
+ * These values match the ones defined by ISO/IEC 23001-8_2013 § 7.3.
  */
 enum AVColorSpace {
     AVCOL_SPC_RGB         = 0,  ///< order of coefficients is actually GBR, also IEC 61966-2-1 (sRGB)
@@ -456,7 +460,8 @@ enum AVColorSpace {
     AVCOL_SPC_BT470BG     = 5,  ///< also ITU-R BT601-6 625 / ITU-R BT1358 625 / ITU-R BT1700 625 PAL & SECAM / IEC 61966-2-4 xvYCC601
     AVCOL_SPC_SMPTE170M   = 6,  ///< also ITU-R BT601-6 525 / ITU-R BT1358 525 / ITU-R BT1700 NTSC
     AVCOL_SPC_SMPTE240M   = 7,  ///< functionally identical to above
-    AVCOL_SPC_YCOCG       = 8,  ///< Used by Dirac / VC-2 and H.264 FRext, see ITU-T SG16
+    AVCOL_SPC_YCGCO       = 8,  ///< Used by Dirac / VC-2 and H.264 FRext, see ITU-T SG16
+    AVCOL_SPC_YCOCG       = AVCOL_SPC_YCGCO,
     AVCOL_SPC_BT2020_NCL  = 9,  ///< ITU-R BT2020 non-constant luminance system
     AVCOL_SPC_BT2020_CL   = 10, ///< ITU-R BT2020 constant luminance system
     AVCOL_SPC_SMPTE2085   = 11, ///< SMPTE 2085, Y'D'zD'x

@@ -446,15 +446,7 @@ static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
                                       (8 * B + 24 * C) * (1 << 30);
                     }
                     coeff /= (1LL<<54)/fone;
-                }
-#if 0
-                else if (flags & SWS_X) {
-                    double p  = param ? param * 0.01 : 0.3;
-                    coeff     = d ? sin(d * M_PI) / (d * M_PI) : 1.0;
-                    coeff    *= pow(2.0, -p * d * d);
-                }
-#endif
-                else if (flags & SWS_X) {
+                } else if (flags & SWS_X) {
                     double A = param[0] != SWS_PARAM_DEFAULT ? param[0] : 1.0;
                     double c;
 
@@ -1024,6 +1016,10 @@ static int handle_jpeg(enum AVPixelFormat *format)
         return 1;
     case AV_PIX_FMT_GRAY8:
     case AV_PIX_FMT_YA8:
+    case AV_PIX_FMT_GRAY10LE:
+    case AV_PIX_FMT_GRAY10BE:
+    case AV_PIX_FMT_GRAY12LE:
+    case AV_PIX_FMT_GRAY12BE:
     case AV_PIX_FMT_GRAY16LE:
     case AV_PIX_FMT_GRAY16BE:
     case AV_PIX_FMT_YA16BE:

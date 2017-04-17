@@ -236,47 +236,30 @@ WEIGHTING_PROTOTYPES(12, sse4);
 ///////////////////////////////////////////////////////////////////////////////
 // TRANSFORM_ADD
 ///////////////////////////////////////////////////////////////////////////////
-void ff_hevc_add_residual4_8_mmxext(uint8_t *dst, int16_t *coeffs, ptrdiff_t stride);
-void ff_hevc_add_residual8_8_sse2(uint8_t *dst, int16_t *coeffs, ptrdiff_t stride);
-void ff_hevc_add_residual16_8_sse2(uint8_t *dst, int16_t *coeffs, ptrdiff_t stride);
-void ff_hevc_add_residual32_8_sse2(uint8_t *dst, int16_t *coeffs, ptrdiff_t stride);
 
-void ff_hevc_add_residual8_8_avx(uint8_t *dst, int16_t *coeffs, ptrdiff_t stride);
-void ff_hevc_add_residual16_8_avx(uint8_t *dst, int16_t *coeffs, ptrdiff_t stride);
-void ff_hevc_add_residual32_8_avx(uint8_t *dst, int16_t *coeffs, ptrdiff_t stride);
+void ff_hevc_add_residual_4_8_mmxext(uint8_t *dst, int16_t *res, ptrdiff_t stride);
+void ff_hevc_add_residual_8_8_sse2(uint8_t *dst, int16_t *res, ptrdiff_t stride);
+void ff_hevc_add_residual_16_8_sse2(uint8_t *dst, int16_t *res, ptrdiff_t stride);
+void ff_hevc_add_residual_32_8_sse2(uint8_t *dst, int16_t *res, ptrdiff_t stride);
 
-void ff_hevc_add_residual32_8_avx2(uint8_t *dst, int16_t *coeffs, ptrdiff_t stride);
+void ff_hevc_add_residual_8_8_avx(uint8_t *dst, int16_t *res, ptrdiff_t stride);
+void ff_hevc_add_residual_16_8_avx(uint8_t *dst, int16_t *res, ptrdiff_t stride);
+void ff_hevc_add_residual_32_8_avx(uint8_t *dst, int16_t *res, ptrdiff_t stride);
 
-void ff_hevc_add_residual4_10_mmxext(uint8_t *dst, int16_t *coeffs, ptrdiff_t stride);
-void ff_hevc_add_residual8_10_sse2(uint8_t *dst, int16_t *coeffs, ptrdiff_t stride);
-void ff_hevc_add_residual16_10_sse2(uint8_t *dst, int16_t *coeffs, ptrdiff_t stride);
-void ff_hevc_add_residual32_10_sse2(uint8_t *dst, int16_t *coeffs, ptrdiff_t stride);
+void ff_hevc_add_residual_32_8_avx2(uint8_t *dst, int16_t *res, ptrdiff_t stride);
 
-void ff_hevc_add_residual16_10_avx2(uint8_t *dst, int16_t *coeffs, ptrdiff_t stride);
-void ff_hevc_add_residual32_10_avx2(uint8_t *dst, int16_t *coeffs, ptrdiff_t stride);
+void ff_hevc_add_residual_4_10_mmxext(uint8_t *dst, int16_t *res, ptrdiff_t stride);
+void ff_hevc_add_residual_8_10_sse2(uint8_t *dst, int16_t *res, ptrdiff_t stride);
+void ff_hevc_add_residual_16_10_sse2(uint8_t *dst, int16_t *res, ptrdiff_t stride);
+void ff_hevc_add_residual_32_10_sse2(uint8_t *dst, int16_t *res, ptrdiff_t stride);
+
+void ff_hevc_add_residual_16_10_avx2(uint8_t *dst, int16_t *res, ptrdiff_t stride);
+void ff_hevc_add_residual_32_10_avx2(uint8_t *dst, int16_t *res, ptrdiff_t stride);
 
 // ==> Start patch MPC
-void ff_hevc_transform_skip_8_sse(uint8_t *_dst, int16_t *coeffs, ptrdiff_t _stride);
-
-void ff_hevc_transform_4x4_luma_8_sse2(int16_t *coeffs);
-void ff_hevc_transform_4x4_luma_10_sse2(int16_t *coeffs);
-void ff_hevc_transform_4x4_luma_12_sse2(int16_t *coeffs);
-
-#define IDCT_FUNC(s, b) void ff_hevc_transform_ ## s ## x ## s ##_## b ##_sse2\
-            (int16_t *coeffs, int col_limit);
-
-IDCT_FUNC(4, 8)
-IDCT_FUNC(4, 10)
-IDCT_FUNC(4, 12)
-IDCT_FUNC(8, 8)
-IDCT_FUNC(8, 10)
-IDCT_FUNC(8, 12)
-IDCT_FUNC(16, 8)
-IDCT_FUNC(16, 10)
-IDCT_FUNC(16, 12)
-IDCT_FUNC(32, 8)
-IDCT_FUNC(32, 10)
-IDCT_FUNC(32, 12)
+void ff_hevc_transform_4x4_luma_8_sse2(int16_t *res);
+void ff_hevc_transform_4x4_luma_10_sse2(int16_t *res);
+void ff_hevc_transform_4x4_luma_12_sse2(int16_t *res);
 // ==> End patch MPC
 
 #endif // AVCODEC_X86_HEVCDSP_H

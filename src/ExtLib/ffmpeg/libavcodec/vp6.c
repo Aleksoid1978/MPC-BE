@@ -108,7 +108,7 @@ static int vp6_parse_header(VP56Context *s, const uint8_t *buf, int buf_size)
 
         ret = ff_vp56_init_range_decoder(c, buf+6, buf_size-6);
         if (ret < 0)
-            return ret;
+            goto fail;
         vp56_rac_gets(c, 2);
 
         parse_filter_info = s->filter_header;
@@ -162,9 +162,8 @@ static int vp6_parse_header(VP56Context *s, const uint8_t *buf, int buf_size)
         buf      += coeff_offset;
         buf_size -= coeff_offset;
         if (buf_size < 0) {
-            if (s->frames[VP56_FRAME_CURRENT]->key_frame)
-                ff_set_dimensions(s->avctx, 0, 0);
-            return AVERROR_INVALIDDATA;
+            ret = AVERROR_INVALIDDATA;
+            goto fail;
         }
         if (s->use_huffman) {
             s->parse_coeff = vp6_parse_coeff_huffman;
@@ -172,7 +171,7 @@ static int vp6_parse_header(VP56Context *s, const uint8_t *buf, int buf_size)
         } else {
             ret = ff_vp56_init_range_decoder(&s->cc, buf, buf_size);
             if (ret < 0)
-                return ret;
+                goto fail;
             s->ccp = &s->cc;
         }
     } else {
@@ -180,6 +179,10 @@ static int vp6_parse_header(VP56Context *s, const uint8_t *buf, int buf_size)
     }
 
     return res;
+fail:
+    if (res == VP56_SIZE_CHANGE)
+        ff_set_dimensions(s->avctx, 0, 0);
+    return ret;
 }
 
 static void vp6_coeff_order_table_init(VP56Context *s)
@@ -528,7 +531,7 @@ static int vp6_parse_coeff(VP56Context *s)
     return 0;
 }
 
-static int vp6_block_variance(uint8_t *src, int stride)
+static int vp6_block_variance(uint8_t *src, ptrdiff_t stride)
 {
     int sum = 0, square_sum = 0;
     int y, x;
@@ -543,7 +546,7 @@ static int vp6_block_variance(uint8_t *src, int stride)
     return (16*square_sum - sum*sum) >> 8;
 }
 
-static void vp6_filter_hv4(uint8_t *dst, uint8_t *src, int stride,
+static void vp6_filter_hv4(uint8_t *dst, uint8_t *src, ptrdiff_t stride,
                            int delta, const int16_t *weights)
 {
     int x, y;
@@ -561,7 +564,7 @@ static void vp6_filter_hv4(uint8_t *dst, uint8_t *src, int stride,
 }
 
 static void vp6_filter_diag2(VP56Context *s, uint8_t *dst, uint8_t *src,
-                             int stride, int h_weight, int v_weight)
+                             ptrdiff_t stride, int h_weight, int v_weight)
 {
     uint8_t *tmp = s->edge_emu_buffer+16;
     s->h264chroma.put_h264_chroma_pixels_tab[0](tmp, src, stride, 9, h_weight, 0);
@@ -569,7 +572,7 @@ static void vp6_filter_diag2(VP56Context *s, uint8_t *dst, uint8_t *src,
 }
 
 static void vp6_filter(VP56Context *s, uint8_t *dst, uint8_t *src,
-                       int offset1, int offset2, int stride,
+                       int offset1, int offset2, ptrdiff_t stride,
                        VP56mv mv, int mask, int select, int luma)
 {
     int filter4 = 0;
@@ -628,6 +631,7 @@ static av_cold int vp6_decode_init(AVCodecContext *avctx)
     if ((ret = ff_vp56_init(avctx, avctx->codec->id == AV_CODEC_ID_VP6,
                             avctx->codec->id == AV_CODEC_ID_VP6A)) < 0)
         return ret;
+    ff_vp6dsp_init(&s->vp56dsp);
 
     vp6_decode_init_context(s);
 
@@ -635,6 +639,7 @@ static av_cold int vp6_decode_init(AVCodecContext *avctx)
         s->alpha_context = av_mallocz(sizeof(VP56Context));
         ff_vp56_init_context(avctx, s->alpha_context,
                              s->flip == -1, s->has_alpha);
+        ff_vp6dsp_init(&s->alpha_context->vp56dsp);
         vp6_decode_init_context(s->alpha_context);
     }
 

@@ -121,6 +121,24 @@ void av_image_copy(uint8_t *dst_data[4], int dst_linesizes[4],
                    enum AVPixelFormat pix_fmt, int width, int height);
 
 /**
+ * Copy image data located in uncacheable (e.g. GPU mapped) memory. Where
+ * available, this function will use special functionality for reading from such
+ * memory, which may result in greatly improved performance compared to plain
+ * av_image_copy().
+ *
+ * The data pointers and the linesizes must be aligned to the maximum required
+ * by the CPU architecture.
+ *
+ * @note The linesize parameters have the type ptrdiff_t here, while they are
+ *       int for av_image_copy().
+ * @note On x86, the linesizes currently need to be aligned to the cacheline
+ *       size (i.e. 64) to get improved performance.
+ */
+void av_image_copy_uc_from(uint8_t *dst_data[4],       const ptrdiff_t dst_linesizes[4],
+                           const uint8_t *src_data[4], const ptrdiff_t src_linesizes[4],
+                           enum AVPixelFormat pix_fmt, int width, int height);
+
+/**
  * Setup the data pointers and linesizes based on the specified image
  * parameters and the provided array.
  *
@@ -137,7 +155,7 @@ void av_image_copy(uint8_t *dst_data[4], int dst_linesizes[4],
  * one call, use av_image_alloc().
  *
  * @param dst_data      data pointers to be filled in
- * @param dst_linesizes linesizes for the image in dst_data to be filled in
+ * @param dst_linesize  linesizes for the image in dst_data to be filled in
  * @param src           buffer which will contain or contains the actual image data, can be NULL
  * @param pix_fmt       the pixel format of the image
  * @param width         the width of the image in pixels
@@ -167,7 +185,7 @@ int av_image_get_buffer_size(enum AVPixelFormat pix_fmt, int width, int height, 
  * @param dst           a buffer into which picture data will be copied
  * @param dst_size      the size in bytes of dst
  * @param src_data      pointers containing the source image data
- * @param src_linesizes linesizes for the image in src_data
+ * @param src_linesize  linesizes for the image in src_data
  * @param pix_fmt       the pixel format of the source image
  * @param width         the width of the source image in pixels
  * @param height        the height of the source image in pixels
