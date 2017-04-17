@@ -883,7 +883,7 @@ FLAC_API FLAC__bool FLAC__stream_encoder_set_blocksize(FLAC__StreamEncoder *enco
  *  number of channels must be 2 for this to have any effect.  Set to
  *  \c false to use only independent channel coding.
  *
- * \default \c false
+ * \default \c true
  * \param  encoder  An encoder instance to set.
  * \param  value    Flag value (see above).
  * \assert
@@ -977,7 +977,7 @@ FLAC_API FLAC__bool FLAC__stream_encoder_set_apodization(FLAC__StreamEncoder *en
 
 /** Set the maximum LPC order, or \c 0 to use only the fixed predictors.
  *
- * \default \c 0
+ * \default \c 8
  * \param  encoder  An encoder instance to set.
  * \param  value    See above.
  * \assert
@@ -1081,7 +1081,7 @@ FLAC_API FLAC__bool FLAC__stream_encoder_set_min_residual_partition_order(FLAC__
  *  all orders, using the mean of each context for its Rice parameter,
  *  and use the best.
  *
- * \default \c 0
+ * \default \c 5
  * \param  encoder  An encoder instance to set.
  * \param  value    See above.
  * \assert

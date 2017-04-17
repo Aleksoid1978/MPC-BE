@@ -206,10 +206,9 @@ void FLAC__lpc_restore_signal_wide_asm_ia32(const FLAC__int32 residual[], uint32
 #    endif /* FLAC__HAS_NASM */
 #  endif /* FLAC__CPU_IA32 */
 #  if (defined FLAC__CPU_IA32 || defined FLAC__CPU_X86_64) && FLAC__HAS_X86INTRIN
-#    ifdef FLAC__SSE2_SUPPORTED
-void FLAC__lpc_restore_signal_16_intrin_sse2(const FLAC__int32 residual[], uint32_t data_len, const FLAC__int32 qlp_coeff[], uint32_t order, int lp_quantization, FLAC__int32 data[]);
-#    endif
 #    ifdef FLAC__SSE4_1_SUPPORTED
+void FLAC__lpc_restore_signal_intrin_sse41(const FLAC__int32 residual[], uint32_t data_len, const FLAC__int32 qlp_coeff[], uint32_t order, int lp_quantization, FLAC__int32 data[]);
+void FLAC__lpc_restore_signal_16_intrin_sse41(const FLAC__int32 residual[], uint32_t data_len, const FLAC__int32 qlp_coeff[], uint32_t order, int lp_quantization, FLAC__int32 data[]);
 void FLAC__lpc_restore_signal_wide_intrin_sse41(const FLAC__int32 residual[], uint32_t data_len, const FLAC__int32 qlp_coeff[], uint32_t order, int lp_quantization, FLAC__int32 data[]);
 #    endif
 #  endif
