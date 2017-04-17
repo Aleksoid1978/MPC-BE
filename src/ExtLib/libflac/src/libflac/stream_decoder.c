@@ -384,7 +384,7 @@ static FLAC__StreamDecoderInitStatus init_stream_internal_(
 		FLAC__ASSERT(decoder->private_->cpuinfo.type == FLAC__CPUINFO_TYPE_IA32);
 #ifdef FLAC__HAS_NASM
 		decoder->private_->local_lpc_restore_signal_64bit = FLAC__lpc_restore_signal_wide_asm_ia32; /* OPT_IA32: was really necessary for GCC < 4.9 */
-		if(decoder->private_->cpuinfo.ia32.mmx) {
+		if (decoder->private_->cpuinfo.x86.mmx) {
 			decoder->private_->local_lpc_restore_signal = FLAC__lpc_restore_signal_asm_ia32;
 			decoder->private_->local_lpc_restore_signal_16bit = FLAC__lpc_restore_signal_asm_ia32_mmx;
 		}
@@ -394,13 +394,10 @@ static FLAC__StreamDecoderInitStatus init_stream_internal_(
 		}
 #endif
 #if FLAC__HAS_X86INTRIN && ! defined FLAC__INTEGER_ONLY_LIBRARY
-# if defined FLAC__SSE2_SUPPORTED && !defined FLAC__HAS_NASM /* OPT_SSE: not better than MMX asm */
-		if(decoder->private_->cpuinfo.ia32.sse2) {
-			decoder->private_->local_lpc_restore_signal_16bit = FLAC__lpc_restore_signal_16_intrin_sse2;
-		}
-# endif
 # if defined FLAC__SSE4_1_SUPPORTED
-		if(decoder->private_->cpuinfo.ia32.sse41) {
+		if (decoder->private_->cpuinfo.x86.sse41) {
+			decoder->private_->local_lpc_restore_signal = FLAC__lpc_restore_signal_intrin_sse41;
+			decoder->private_->local_lpc_restore_signal_16bit = FLAC__lpc_restore_signal_16_intrin_sse41;
 			decoder->private_->local_lpc_restore_signal_64bit = FLAC__lpc_restore_signal_wide_intrin_sse41;
 		}
 # endif
@@ -650,10 +647,10 @@ FLAC_API FLAC__bool FLAC__stream_decoder_finish(FLAC__StreamDecoder *decoder)
 	FLAC__bitreader_free(decoder->private_->input);
 	for(i = 0; i < FLAC__MAX_CHANNELS; i++) {
 		/* WATCHOUT:
-		 * FLAC__lpc_restore_signal_asm_ia32_mmx() requires that the
-		 * output arrays have a buffer of up to 3 zeroes in front
-		 * (at negative indices) for alignment purposes; we use 4
-		 * to keep the data well-aligned.
+		 * FLAC__lpc_restore_signal_asm_ia32_mmx() and ..._intrin_sseN()
+		 * require that the output arrays have a buffer of up to 3 zeroes
+		 * in front (at negative indices) for alignment purposes;
+		 * we use 4 to keep the data well-aligned.
 		 */
 		if(0 != decoder->private_->output[i]) {
 			free(decoder->private_->output[i]-4);
@@ -1253,9 +1250,6 @@ FILE *get_binary_stdin_(void)
 	 */
 #if defined _MSC_VER || defined __MINGW32__
 	_setmode(_fileno(stdin), _O_BINARY);
-#elif defined __CYGWIN__
-	/* almost certainly not needed for any modern Cygwin, but let's be safe... */
-	setmode(_fileno(stdin), _O_BINARY);
 #elif defined __EMX__
 	setmode(fileno(stdin), O_BINARY);
 #endif
@@ -1286,10 +1280,10 @@ FLAC__bool allocate_output_(FLAC__StreamDecoder *decoder, uint32_t size, uint32_
 
 	for(i = 0; i < channels; i++) {
 		/* WATCHOUT:
-		 * FLAC__lpc_restore_signal_asm_ia32_mmx() requires that the
-		 * output arrays have a buffer of up to 3 zeroes in front
-		 * (at negative indices) for alignment purposes; we use 4
-		 * to keep the data well-aligned.
+		 * FLAC__lpc_restore_signal_asm_ia32_mmx() and ..._intrin_sseN()
+		 * require that the output arrays have a buffer of up to 3 zeroes
+		 * in front (at negative indices) for alignment purposes;
+		 * we use 4 to keep the data well-aligned.
 		 */
 		tmp = safe_malloc_muladd2_(sizeof(FLAC__int32), /*times (*/size, /*+*/4/*)*/);
 		if(tmp == 0) {
@@ -1759,6 +1753,9 @@ FLAC__bool read_metadata_vorbiscomment_(FLAC__StreamDecoder *decoder, FLAC__Stre
 					}
 					memset (obj->comments[i].entry, 0, obj->comments[i].length) ;
 					if (!FLAC__bitreader_read_byte_block_aligned_no_crc(decoder->private_->input, obj->comments[i].entry, obj->comments[i].length)) {
+						/* Current i-th entry is bad, so we delete it. */
+						free (obj->comments[i].entry) ;
+						obj->comments[i].entry = NULL ;
 						obj->num_comments = i;
 						goto skip;
 					}

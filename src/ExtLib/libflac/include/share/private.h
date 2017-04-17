@@ -33,7 +33,7 @@
 #define FLAC__SHARE__PRIVATE_H
 
 /*
- * Unpublished debug routines from libFLAC> This should not be used from any
+ * Unpublished debug routines from libFLAC. This should not be used from any
  * client code other than code shipped with the FLAC sources.
  */
 FLAC_API FLAC__bool FLAC__stream_encoder_disable_constant_subframes(FLAC__StreamEncoder *encoder, FLAC__bool value);

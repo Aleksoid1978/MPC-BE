@@ -889,7 +889,7 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 #  ifdef FLAC__CPU_IA32
 		FLAC__ASSERT(encoder->private_->cpuinfo.type == FLAC__CPUINFO_TYPE_IA32);
 #   ifdef FLAC__HAS_NASM
-		if(encoder->private_->cpuinfo.ia32.sse) {
+		if (encoder->private_->cpuinfo.x86.sse) {
 			if(encoder->protected_->max_lpc_order < 4)
 				encoder->private_->local_lpc_compute_autocorrelation = FLAC__lpc_compute_autocorrelation_asm_ia32_sse_lag_4_old;
 			else if(encoder->protected_->max_lpc_order < 8)
@@ -905,7 +905,7 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 			encoder->private_->local_lpc_compute_autocorrelation = FLAC__lpc_compute_autocorrelation_asm_ia32;
 
 		encoder->private_->local_lpc_compute_residual_from_qlp_coefficients_64bit = FLAC__lpc_compute_residual_from_qlp_coefficients_wide_asm_ia32; /* OPT_IA32: was really necessary for GCC < 4.9 */
-		if(encoder->private_->cpuinfo.ia32.mmx) {
+		if (encoder->private_->cpuinfo.x86.mmx) {
 			encoder->private_->local_lpc_compute_residual_from_qlp_coefficients = FLAC__lpc_compute_residual_from_qlp_coefficients_asm_ia32;
 			encoder->private_->local_lpc_compute_residual_from_qlp_coefficients_16bit = FLAC__lpc_compute_residual_from_qlp_coefficients_asm_ia32_mmx;
 		}
@@ -914,13 +914,13 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 			encoder->private_->local_lpc_compute_residual_from_qlp_coefficients_16bit = FLAC__lpc_compute_residual_from_qlp_coefficients_asm_ia32;
 		}
 
-		if(encoder->private_->cpuinfo.ia32.mmx && encoder->private_->cpuinfo.ia32.cmov)
+		if (encoder->private_->cpuinfo.x86.mmx && encoder->private_->cpuinfo.x86.cmov)
 			encoder->private_->local_fixed_compute_best_predictor = FLAC__fixed_compute_best_predictor_asm_ia32_mmx_cmov;
 #   endif /* FLAC__HAS_NASM */
 #   if FLAC__HAS_X86INTRIN
 #    if defined FLAC__SSE_SUPPORTED
-		if(encoder->private_->cpuinfo.ia32.sse) {
-			if(encoder->private_->cpuinfo.ia32.sse42 || !encoder->private_->cpuinfo.ia32.intel) { /* use new autocorrelation functions */
+		if (encoder->private_->cpuinfo.x86.sse) {
+			if (encoder->private_->cpuinfo.x86.sse42 || !encoder->private_->cpuinfo.x86.intel) { /* use new autocorrelation functions */
 				if(encoder->protected_->max_lpc_order < 4)
 					encoder->private_->local_lpc_compute_autocorrelation = FLAC__lpc_compute_autocorrelation_intrin_sse_lag_4_new;
 				else if(encoder->protected_->max_lpc_order < 8)
@@ -948,19 +948,19 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 #    endif
 
 #    ifdef FLAC__SSE2_SUPPORTED
-		if(encoder->private_->cpuinfo.ia32.sse2) {
+		if (encoder->private_->cpuinfo.x86.sse2) {
 			encoder->private_->local_lpc_compute_residual_from_qlp_coefficients       = FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse2;
 			encoder->private_->local_lpc_compute_residual_from_qlp_coefficients_16bit = FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_sse2;
 		}
 #    endif
 #    ifdef FLAC__SSE4_1_SUPPORTED
-		if(encoder->private_->cpuinfo.ia32.sse41) {
+		if (encoder->private_->cpuinfo.x86.sse41) {
 			encoder->private_->local_lpc_compute_residual_from_qlp_coefficients       = FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_sse41;
 			encoder->private_->local_lpc_compute_residual_from_qlp_coefficients_64bit = FLAC__lpc_compute_residual_from_qlp_coefficients_wide_intrin_sse41;
 		}
 #    endif
 #    ifdef FLAC__AVX2_SUPPORTED
-		if(encoder->private_->cpuinfo.ia32.avx2) {
+		if (encoder->private_->cpuinfo.x86.avx2) {
 			encoder->private_->local_lpc_compute_residual_from_qlp_coefficients_16bit = FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_avx2;
 			encoder->private_->local_lpc_compute_residual_from_qlp_coefficients       = FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_avx2;
 			encoder->private_->local_lpc_compute_residual_from_qlp_coefficients_64bit = FLAC__lpc_compute_residual_from_qlp_coefficients_wide_intrin_avx2;
@@ -968,13 +968,13 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 #    endif
 
 #    ifdef FLAC__SSE2_SUPPORTED
-		if (encoder->private_->cpuinfo.ia32.sse2) {
+		if (encoder->private_->cpuinfo.x86.sse2) {
 			encoder->private_->local_fixed_compute_best_predictor      = FLAC__fixed_compute_best_predictor_intrin_sse2;
 			encoder->private_->local_fixed_compute_best_predictor_wide = FLAC__fixed_compute_best_predictor_wide_intrin_sse2;
 		}
 #    endif
 #    ifdef FLAC__SSSE3_SUPPORTED
-		if (encoder->private_->cpuinfo.ia32.ssse3) {
+		if (encoder->private_->cpuinfo.x86.ssse3) {
 			encoder->private_->local_fixed_compute_best_predictor      = FLAC__fixed_compute_best_predictor_intrin_ssse3;
 			encoder->private_->local_fixed_compute_best_predictor_wide = FLAC__fixed_compute_best_predictor_wide_intrin_ssse3;
 		}
@@ -1041,15 +1041,15 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 	if(encoder->private_->cpuinfo.use_asm) {
 # if defined FLAC__CPU_IA32
 #  ifdef FLAC__SSE2_SUPPORTED
-		if(encoder->private_->cpuinfo.ia32.sse2)
+		if (encoder->private_->cpuinfo.x86.sse2)
 			encoder->private_->local_precompute_partition_info_sums = FLAC__precompute_partition_info_sums_intrin_sse2;
 #  endif
 #  ifdef FLAC__SSSE3_SUPPORTED
-		if(encoder->private_->cpuinfo.ia32.ssse3)
+		if (encoder->private_->cpuinfo.x86.ssse3)
 			encoder->private_->local_precompute_partition_info_sums = FLAC__precompute_partition_info_sums_intrin_ssse3;
 #  endif
 #  ifdef FLAC__AVX2_SUPPORTED
-		if(encoder->private_->cpuinfo.ia32.avx2)
+		if (encoder->private_->cpuinfo.x86.avx2)
 			encoder->private_->local_precompute_partition_info_sums = FLAC__precompute_partition_info_sums_intrin_avx2;
 #  endif
 # elif defined FLAC__CPU_X86_64
@@ -1439,7 +1439,9 @@ FLAC_API FLAC__bool FLAC__stream_encoder_finish(FLAC__StreamEncoder *encoder)
 {
 	FLAC__bool error = false;
 
-	FLAC__ASSERT(0 != encoder);
+	if (encoder == NULL)
+		return false;
+
 	FLAC__ASSERT(0 != encoder->private_);
 	FLAC__ASSERT(0 != encoder->protected_);
 
@@ -4538,9 +4540,6 @@ FILE *get_binary_stdout_(void)
 	 */
 #if defined _MSC_VER || defined __MINGW32__
 	_setmode(_fileno(stdout), _O_BINARY);
-#elif defined __CYGWIN__
-	/* almost certainly not needed for any modern Cygwin, but let's be safe... */
-	setmode(_fileno(stdout), _O_BINARY);
 #elif defined __EMX__
 	setmode(fileno(stdout), O_BINARY);
 #endif

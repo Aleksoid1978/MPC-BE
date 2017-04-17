@@ -61,36 +61,56 @@ cident FLAC__cpu_have_cpuid_asm_ia32
 	popfd
 	ret
 
+
 ; **********************************************************************
 ;
-; void FLAC__cpu_info_asm_ia32(FLAC__uint32 *flags_edx, FLAC__uint32 *flags_ecx)
+; void FLAC__cpu_info_asm_ia32(FLAC__uint32 level, FLAC__uint32 *eax, FLAC__uint32 *ebx, FLAC__uint32 *ecx, FLAC__uint32 *edx)
 ;
 
 cident FLAC__cpu_info_asm_ia32
-	;[esp + 8] == flags_edx
-	;[esp + 12] == flags_ecx
+	;[esp + 8] == level
+	;[esp + 12] == flags_eax
+	;[esp + 16] == flags_ebx
+	;[esp + 20] == flags_ecx
+	;[esp + 24] == flags_edx
 
 	push	ebx
 	call	FLAC__cpu_have_cpuid_asm_ia32
 	test	eax, eax
 	jz	.no_cpuid
-	mov	eax, 0
+
+	mov	eax, [esp + 8]
+	and	eax, 0x80000000
 	cpuid
-	cmp	eax, 1
+	cmp	eax, [esp + 8]
 	jb	.no_cpuid
 	xor	ecx, ecx
-	mov	eax, 1
+	mov	eax, [esp + 8]
 	cpuid
-	mov	ebx, [esp + 8]
-	mov	[ebx], edx
-	mov	ebx, [esp + 12]
+
+	push	ebx
+	;[esp + 16] == flags_eax
+	mov	ebx, [esp + 16]
+	mov	[ebx], eax
+	pop	eax
+	;[esp + 16] == flags_ebx
+	mov	ebx, [esp + 16]
+	mov	[ebx], eax
+	mov	ebx, [esp + 20]
 	mov	[ebx], ecx
+	mov	ebx, [esp + 24]
+	mov	[ebx], edx
 	jmp	.end
+
 .no_cpuid:
 	xor	eax, eax
-	mov	ebx, [esp + 8]
-	mov	[ebx], eax
 	mov	ebx, [esp + 12]
+	mov	[ebx], eax
+	mov	ebx, [esp + 16]
+	mov	[ebx], eax
+	mov	ebx, [esp + 20]
+	mov	[ebx], eax
+	mov	ebx, [esp + 24]
 	mov	[ebx], eax
 .end:
 	pop	ebx

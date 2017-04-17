@@ -52,7 +52,7 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_16_intrin_avx2(const FLAC_
 {
 	int i;
 	FLAC__int32 sum;
-	__m128i cnt = _mm_cvtsi32_si128(lp_quantization);
+	const __m128i cnt = _mm_cvtsi32_si128(lp_quantization);
 
 	FLAC__ASSERT(order > 0);
 	FLAC__ASSERT(order <= 32);
@@ -407,7 +407,7 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_intrin_avx2(const FLAC__in
 {
 	int i;
 	FLAC__int32 sum;
-	__m128i cnt = _mm_cvtsi32_si128(lp_quantization);
+	const __m128i cnt = _mm_cvtsi32_si128(lp_quantization);
 
 	FLAC__ASSERT(order > 0);
 	FLAC__ASSERT(order <= 32);
@@ -764,8 +764,8 @@ void FLAC__lpc_compute_residual_from_qlp_coefficients_wide_intrin_avx2(const FLA
 {
 	int i;
 	FLAC__int64 sum;
-	__m128i cnt = _mm_cvtsi32_si128(lp_quantization);
-	__m256i pack = _mm256_loadu_si256((const __m256i *)pack_arr);
+	const __m128i cnt = _mm_cvtsi32_si128(lp_quantization);
+	const __m256i pack = _mm256_loadu_si256((const __m256i *)pack_arr);
 
 	FLAC__ASSERT(order > 0);
 	FLAC__ASSERT(order <= 32);
