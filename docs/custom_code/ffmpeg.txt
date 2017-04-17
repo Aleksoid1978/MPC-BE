@@ -4,8 +4,6 @@
 * config.asm
 * ffmpeg.mak
 
-* compat/w32pthreads.h
-
 * libavcodec/x86/hevcdsp.h
 * libavcodec/x86/hevcdsp_init.c
 

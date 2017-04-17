@@ -23,7 +23,7 @@
  */
 
 #include "golomb.h"
-#include "hevc.h"
+#include "hevcdec.h"
 
 enum HEVC_SEI_TYPE {
     SEI_TYPE_BUFFERING_PERIOD                     = 0,
@@ -100,6 +100,19 @@ static int decode_nal_sei_mastering_display_info(HEVCContext *s)
     // persists for the coded video sequence (e.g., between two IRAPs)
     s->sei_mastering_display_info_present = 2;
     return 0;
+}
+
+static int decode_nal_sei_content_light_info(HEVCContext *s)
+{
+    GetBitContext *gb = &s->HEVClc->gb;
+    // Max and average light levels
+    s->max_content_light_level     = get_bits_long(gb, 16);
+    s->max_pic_average_light_level = get_bits_long(gb, 16);
+    // As this SEI message comes before the first frame that references it,
+    // initialize the flag to 2 and decrement on IRAP access unit so it
+    // persists for the coded video sequence (e.g., between two IRAPs)
+    s-> sei_content_light_present = 2;
+    return  0;
 }
 
 static int decode_nal_sei_frame_packing_arrangement(HEVCContext *s)
@@ -272,7 +285,7 @@ static int active_parameter_sets(HEVCContext *s)
     }
 
     active_seq_parameter_set_id = get_ue_golomb_long(gb);
-    if (active_seq_parameter_set_id >= MAX_SPS_COUNT) {
+    if (active_seq_parameter_set_id >= HEVC_MAX_SPS_COUNT) {
         av_log(s->avctx, AV_LOG_ERROR, "active_parameter_set_id %d invalid\n", active_seq_parameter_set_id);
         return AVERROR_INVALIDDATA;
     }
@@ -304,6 +317,8 @@ static int decode_nal_sei_prefix(HEVCContext *s, int type, int size)
         }
     case SEI_TYPE_MASTERING_DISPLAY_INFO:
         return decode_nal_sei_mastering_display_info(s);
+    case SEI_TYPE_CONTENT_LIGHT_LEVEL_INFO:
+        return decode_nal_sei_content_light_info(s);
     case SEI_TYPE_ACTIVE_PARAMETER_SETS:
         active_parameter_sets(s);
         av_log(s->avctx, AV_LOG_DEBUG, "Skipped PREFIX SEI %d\n", type);
@@ -349,12 +364,11 @@ static int decode_nal_sei_message(HEVCContext *s)
         byte          = get_bits(gb, 8);
         payload_size += byte;
     }
-    if (s->nal_unit_type == NAL_SEI_PREFIX) {
+    if (s->nal_unit_type == HEVC_NAL_SEI_PREFIX) {
         return decode_nal_sei_prefix(s, payload_type, payload_size);
     } else { /* nal_unit_type == NAL_SEI_SUFFIX */
         return decode_nal_sei_suffix(s, payload_type, payload_size);
     }
-    return 1;
 }
 
 static int more_rbsp_data(GetBitContext *gb)

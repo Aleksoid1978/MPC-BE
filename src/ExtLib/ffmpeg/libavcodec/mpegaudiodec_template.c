@@ -253,7 +253,7 @@ static inline int l3_unscale(int value, int exponent)
 #endif
     if (e > (SUINT)31)
         return 0;
-    m = (m + (1 << (e - 1))) >> e;
+    m = (m + ((1U << e)>>1)) >> e;
 
     return m;
 }
@@ -280,7 +280,8 @@ static av_cold void decode_init_static(void)
         scale_factor_mult[i][0] = MULLx(norm, FIXR(1.0          * 2.0), FRAC_BITS);
         scale_factor_mult[i][1] = MULLx(norm, FIXR(0.7937005259 * 2.0), FRAC_BITS);
         scale_factor_mult[i][2] = MULLx(norm, FIXR(0.6299605249 * 2.0), FRAC_BITS);
-        ff_dlog(NULL, "%d: norm=%x s=%x %x %x\n", i, norm,
+        ff_dlog(NULL, "%d: norm=%x s=%"PRIx32" %"PRIx32" %"PRIx32"\n", i,
+                (unsigned)norm,
                 scale_factor_mult[i][0],
                 scale_factor_mult[i][1],
                 scale_factor_mult[i][2]);
@@ -898,8 +899,8 @@ static int huffman_decode(MPADecodeContext *s, GranuleDef *g,
 
             exponent= exponents[s_index];
 
-            ff_dlog(s->avctx, "region=%d n=%d x=%d y=%d exp=%d\n",
-                    i, g->region_size[i] - j, x, y, exponent);
+            ff_dlog(s->avctx, "region=%d n=%d y=%d exp=%d\n",
+                    i, g->region_size[i] - j, y, exponent);
             if (y & 16) {
                 x = y >> 5;
                 y = y & 0x0f;
@@ -1038,7 +1039,8 @@ static void compute_stereo(MPADecodeContext *s, GranuleDef *g0, GranuleDef *g1)
 {
     int i, j, k, l;
     int sf_max, sf, len, non_zero_found;
-    INTFLOAT (*is_tab)[16], *tab0, *tab1, tmp0, tmp1, v1, v2;
+    INTFLOAT (*is_tab)[16], *tab0, *tab1, v1, v2;
+    SUINTFLOAT tmp0, tmp1;
     int non_zero_found_short[3];
 
     /* intensity stereo */

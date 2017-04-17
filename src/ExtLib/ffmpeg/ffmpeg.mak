@@ -163,6 +163,7 @@ SRCS_LC = \
 	libavcodec/dct.c \
 	libavcodec/dct32_fixed.c \
 	libavcodec/dct32_float.c \
+	libavcodec/decode.c \
 	libavcodec/dirac.c \
 	libavcodec/dirac_arith.c \
 	libavcodec/dirac_dwt.c \
@@ -183,6 +184,7 @@ SRCS_LC = \
 	libavcodec/eac3_data.c \
 	libavcodec/eac3dec.c \
 	libavcodec/elsdec.c \
+	libavcodec/encode.c \
 	libavcodec/error_resilience.c \
 	libavcodec/exif.c \
 	libavcodec/faandct.c \
@@ -231,15 +233,16 @@ SRCS_LC = \
 	libavcodec/h264idct.c \
 	libavcodec/h264pred.c \
 	libavcodec/h264qpel.c \
-	libavcodec/hevc.c \
 	libavcodec/hevc_cabac.c \
 	libavcodec/hevc_data.c \
 	libavcodec/hevc_filter.c \
 	libavcodec/hevc_mvs.c \
+	libavcodec/hevc_parse.c \
 	libavcodec/hevc_parser.c \
 	libavcodec/hevc_ps.c \
 	libavcodec/hevc_refs.c \
 	libavcodec/hevc_sei.c \
+	libavcodec/hevcdec.c \
 	libavcodec/hevcdsp.c \
 	libavcodec/hevcpred.c \
 	libavcodec/hpeldsp.c \
@@ -452,10 +455,16 @@ SRCS_LC_B = \
 	libavcodec/vp8dsp.c \
 	libavcodec/vp9.c \
 	libavcodec/vp9_parser.c \
+	libavcodec/vp9block.c \
+	libavcodec/vp9data.c \
 	libavcodec/vp9dsp.c \
 	libavcodec/vp9dsp_8bpp.c \
 	libavcodec/vp9dsp_10bpp.c \
 	libavcodec/vp9dsp_12bpp.c \
+	libavcodec/vp9lpf.c \
+	libavcodec/vp9mvs.c \
+	libavcodec/vp9prob.c \
+	libavcodec/vp9recon.c \
 	libavcodec/wavpack.c \
 	libavcodec/wma.c \
 	libavcodec/wma_common.c \
@@ -488,6 +497,7 @@ SRCS_LC_B = \
 	libavcodec/x86/flacdsp_init.c \
 	libavcodec/x86/fmtconvert_init.c \
 	libavcodec/x86/h263dsp_init.c \
+	libavcodec/x86/h264_cabac.c \
 	libavcodec/x86/h264_intrapred_init.c \
 	libavcodec/x86/h264chroma_init.c \
 	libavcodec/x86/h264dsp_init.c \
@@ -601,6 +611,7 @@ SRCS_LU = \
 	libavutil/x86/cpu.c \
 	libavutil/x86/fixed_dsp_init.c \
 	libavutil/x86/float_dsp_init.c \
+	libavutil/x86/imgutils_init.c \
 	libavutil/x86/lls_init.c
 
 SRCS_LR = \
@@ -643,6 +654,7 @@ SRCS_LS = \
 SRCS_YASM_LC = \
 	libavcodec/x86/aacpsdsp.asm \
 	libavcodec/x86/ac3dsp.asm \
+	libavcodec/x86/ac3dsp_downmix.asm \
 	libavcodec/x86/alacdsp.asm \
 	libavcodec/x86/audiodsp.asm \
 	libavcodec/x86/blockdsp.asm \
@@ -668,10 +680,10 @@ SRCS_YASM_LC = \
 	libavcodec/x86/h264_qpel_8bit.asm \
 	libavcodec/x86/h264_weight.asm \
 	libavcodec/x86/h264_weight_10bit.asm \
+	libavcodec/x86/hevc_add_res.asm \
 	libavcodec/x86/hevc_deblock.asm \
 	libavcodec/x86/hevc_idct.asm \
 	libavcodec/x86/hevc_mc.asm \
-	libavcodec/x86/hevc_res_add.asm \
 	libavcodec/x86/hevc_sao.asm \
 	libavcodec/x86/hevc_sao_10bit.asm \
 	libavcodec/x86/hpeldsp.asm \
@@ -725,6 +737,7 @@ SRCS_YASM_LU = \
 	libavutil/x86/emms.asm \
 	libavutil/x86/fixed_dsp.asm \
 	libavutil/x86/float_dsp.asm \
+	libavutil/x86/imgutils.asm \
 	libavutil/x86/lls.asm
 
 SRCS_YASM_LR = \

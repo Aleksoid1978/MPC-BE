@@ -307,9 +307,6 @@ static int h264_init_context(AVCodecContext *avctx, H264Context *h)
     int i;
 
     h->avctx                 = avctx;
-    h->backup_width          = -1;
-    h->backup_height         = -1;
-    h->backup_pix_fmt        = AV_PIX_FMT_NONE;
     h->cur_chroma_format_idc = -1;
 
     h->picture_structure     = PICT_FRAME;
@@ -711,7 +708,7 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size)
             }
 
             if (h->current_slice == 1) {
-                if (avctx->active_thread_type & FF_THREAD_FRAME && !h->avctx->hwaccel &&
+                if (avctx->active_thread_type & FF_THREAD_FRAME &&
                     // ==> Start patch MPC
                     !h->avctx->using_dxva &&
                     // ==> End patch MPC
@@ -922,14 +919,6 @@ static int output_frame(H264Context *h, AVFrame *dst, H264Picture *srcp)
 
     av_dict_set(&dst->metadata, "stereo_mode", ff_h264_sei_stereo_mode(&h->sei.frame_packing), 0);
 
-    h->backup_width   = h->avctx->width;
-    h->backup_height  = h->avctx->height;
-    h->backup_pix_fmt = h->avctx->pix_fmt;
-
-    h->avctx->width   = dst->width;
-    h->avctx->height  = dst->height;
-    h->avctx->pix_fmt = dst->format;
-
     if (srcp->sei_recovery_frame_cnt == 0)
         dst->key_frame = 1;
     if (!srcp->crop)
@@ -1077,19 +1066,6 @@ static int h264_decode_frame(AVCodecContext *avctx, void *data,
     h->setup_finished = 0;
     h->nb_slice_ctx_queued = 0;
 
-    if (h->backup_width != -1) {
-        avctx->width    = h->backup_width;
-        h->backup_width = -1;
-    }
-    if (h->backup_height != -1) {
-        avctx->height    = h->backup_height;
-        h->backup_height = -1;
-    }
-    if (h->backup_pix_fmt != AV_PIX_FMT_NONE) {
-        avctx->pix_fmt    = h->backup_pix_fmt;
-        h->backup_pix_fmt = AV_PIX_FMT_NONE;
-    }
-
     ff_h264_unref_picture(h, &h->last_pic_for_ec);
 
     /* end of stream, output what is still in the buffers */
@@ -1151,8 +1127,8 @@ static int h264_decode_frame(AVCodecContext *avctx, void *data,
 #define OFFSET(x) offsetof(H264Context, x)
 #define VD AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_DECODING_PARAM
 static const AVOption h264_options[] = {
-    {"is_avc", "is avc", offsetof(H264Context, is_avc), AV_OPT_TYPE_BOOL, {.i64 = 0}, 0, 1, 0},
-    {"nal_length_size", "nal_length_size", offsetof(H264Context, nal_length_size), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 4, 0},
+    { "is_avc", "is avc", OFFSET(is_avc), AV_OPT_TYPE_BOOL, {.i64 = 0}, 0, 1, 0 },
+    { "nal_length_size", "nal_length_size", OFFSET(nal_length_size), AV_OPT_TYPE_INT, {.i64 = 0}, 0, 4, 0 },
     { "enable_er", "Enable error resilience on damaged frames (unsafe)", OFFSET(enable_er), AV_OPT_TYPE_BOOL, { .i64 = -1 }, -1, 1, VD },
     { NULL },
 };

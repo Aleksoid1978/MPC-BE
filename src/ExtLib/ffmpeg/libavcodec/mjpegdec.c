@@ -71,20 +71,36 @@ static int build_vlc(VLC *vlc, const uint8_t *bits_table,
                               huff_code, 2, 2, huff_sym, 2, 2, use_static);
 }
 
-static void build_basic_mjpeg_vlc(MJpegDecodeContext *s)
+static int build_basic_mjpeg_vlc(MJpegDecodeContext *s)
 {
-    build_vlc(&s->vlcs[0][0], avpriv_mjpeg_bits_dc_luminance,
-              avpriv_mjpeg_val_dc, 12, 0, 0);
-    build_vlc(&s->vlcs[0][1], avpriv_mjpeg_bits_dc_chrominance,
-              avpriv_mjpeg_val_dc, 12, 0, 0);
-    build_vlc(&s->vlcs[1][0], avpriv_mjpeg_bits_ac_luminance,
-              avpriv_mjpeg_val_ac_luminance, 251, 0, 1);
-    build_vlc(&s->vlcs[1][1], avpriv_mjpeg_bits_ac_chrominance,
-              avpriv_mjpeg_val_ac_chrominance, 251, 0, 1);
-    build_vlc(&s->vlcs[2][0], avpriv_mjpeg_bits_ac_luminance,
-              avpriv_mjpeg_val_ac_luminance, 251, 0, 0);
-    build_vlc(&s->vlcs[2][1], avpriv_mjpeg_bits_ac_chrominance,
-              avpriv_mjpeg_val_ac_chrominance, 251, 0, 0);
+    int ret;
+
+    if ((ret = build_vlc(&s->vlcs[0][0], avpriv_mjpeg_bits_dc_luminance,
+                         avpriv_mjpeg_val_dc, 12, 0, 0)) < 0)
+        return ret;
+
+    if ((ret = build_vlc(&s->vlcs[0][1], avpriv_mjpeg_bits_dc_chrominance,
+                         avpriv_mjpeg_val_dc, 12, 0, 0)) < 0)
+        return ret;
+
+    if ((ret = build_vlc(&s->vlcs[1][0], avpriv_mjpeg_bits_ac_luminance,
+                         avpriv_mjpeg_val_ac_luminance, 251, 0, 1)) < 0)
+        return ret;
+
+    if ((ret = build_vlc(&s->vlcs[1][1], avpriv_mjpeg_bits_ac_chrominance,
+                         avpriv_mjpeg_val_ac_chrominance, 251, 0, 1)) < 0)
+        return ret;
+
+    if ((ret = build_vlc(&s->vlcs[2][0], avpriv_mjpeg_bits_ac_luminance,
+                         avpriv_mjpeg_val_ac_luminance, 251, 0, 0)) < 0)
+        return ret;
+
+    if ((ret = build_vlc(&s->vlcs[2][1], avpriv_mjpeg_bits_ac_chrominance,
+                         avpriv_mjpeg_val_ac_chrominance, 251, 0, 0)) < 0)
+        return ret;
+
+
+    return 0;
 }
 
 static void parse_avid(MJpegDecodeContext *s, uint8_t *buf, int len)
@@ -110,6 +126,7 @@ static void init_idct(AVCodecContext *avctx)
 av_cold int ff_mjpeg_decode_init(AVCodecContext *avctx)
 {
     MJpegDecodeContext *s = avctx->priv_data;
+    int ret;
 
     if (!s->picture_ptr) {
         s->picture = av_frame_alloc();
@@ -131,11 +148,13 @@ av_cold int ff_mjpeg_decode_init(AVCodecContext *avctx)
     avctx->chroma_sample_location = AVCHROMA_LOC_CENTER;
     avctx->colorspace = AVCOL_SPC_BT470BG;
 
-    build_basic_mjpeg_vlc(s);
+    if ((ret = build_basic_mjpeg_vlc(s)) < 0)
+        return ret;
 
     if (s->extern_huff) {
         av_log(avctx, AV_LOG_INFO, "using external huffman table\n");
-        init_get_bits(&s->gb, avctx->extradata, avctx->extradata_size * 8);
+        if ((ret = init_get_bits(&s->gb, avctx->extradata, avctx->extradata_size * 8)) < 0)
+            return ret;
         if (ff_mjpeg_decode_dht(s)) {
             av_log(avctx, AV_LOG_ERROR,
                    "error using external huffman table, switching back to internal\n");
@@ -188,6 +207,10 @@ int ff_mjpeg_decode_dqt(MJpegDecodeContext *s)
         /* read quant table */
         for (i = 0; i < 64; i++) {
             s->quant_matrixes[index][i] = get_bits(&s->gb, pr ? 16 : 8);
+            if (s->quant_matrixes[index][i] == 0) {
+                av_log(s->avctx, AV_LOG_ERROR, "dqt: 0 quant value\n");
+                return AVERROR_INVALIDDATA;
+            }
         }
 
         // XXX FIXME fine-tune, and perhaps add dc too
@@ -303,7 +326,7 @@ int ff_mjpeg_decode_sof(MJpegDecodeContext *s)
         height= s->height;
 
     av_log(s->avctx, AV_LOG_DEBUG, "sof0: picture: %dx%d\n", width, height);
-    if (av_image_check_size(width, height, 0, s->avctx))
+    if (av_image_check_size(width, height, 0, s->avctx) < 0)
         return AVERROR_INVALIDDATA;
 
     nb_components = get_bits(&s->gb, 8);
@@ -582,13 +605,13 @@ int ff_mjpeg_decode_sof(MJpegDecodeContext *s)
         break;
     default:
 unk_pixfmt:
-        av_log(s->avctx, AV_LOG_ERROR, "Unhandled pixel format 0x%x bits:%d\n", pix_fmt_id, s->bits);
+        avpriv_report_missing_feature(s->avctx, "Pixel format 0x%x bits:%d", pix_fmt_id, s->bits);
         memset(s->upscale_h, 0, sizeof(s->upscale_h));
         memset(s->upscale_v, 0, sizeof(s->upscale_v));
         return AVERROR_PATCHWELCOME;
     }
     if ((AV_RB32(s->upscale_h) || AV_RB32(s->upscale_v)) && s->avctx->lowres) {
-        av_log(s->avctx, AV_LOG_ERROR, "lowres not supported for weird subsampling\n");
+        avpriv_report_missing_feature(s->avctx, "Lowres for weird subsampling");
         return AVERROR_PATCHWELCOME;
     }
     if (s->ls) {
@@ -682,7 +705,7 @@ static inline int mjpeg_decode_dc(MJpegDecodeContext *s, int dc_index)
 
 /* decode block and dequantize */
 static int decode_block(MJpegDecodeContext *s, int16_t *block, int component,
-                        int dc_index, int ac_index, int16_t *quant_matrix)
+                        int dc_index, int ac_index, uint16_t *quant_matrix)
 {
     int code, i, j, level, val;
 
@@ -732,7 +755,7 @@ static int decode_block(MJpegDecodeContext *s, int16_t *block, int component,
 
 static int decode_dc_progressive(MJpegDecodeContext *s, int16_t *block,
                                  int component, int dc_index,
-                                 int16_t *quant_matrix, int Al)
+                                 uint16_t *quant_matrix, int Al)
 {
     int val;
     s->bdsp.clear_block(block);
@@ -750,7 +773,7 @@ static int decode_dc_progressive(MJpegDecodeContext *s, int16_t *block,
 /* decode block and dequantize - progressive JPEG version */
 static int decode_block_progressive(MJpegDecodeContext *s, int16_t *block,
                                     uint8_t *last_nnz, int ac_index,
-                                    int16_t *quant_matrix,
+                                    uint16_t *quant_matrix,
                                     int ss, int se, int Al, int *EOBRUN)
 {
     int code, i, j, level, val, run;
@@ -848,7 +871,7 @@ for (; ; i++) {                                                     \
 /* decode block and dequantize - progressive JPEG refinement pass */
 static int decode_block_refinement(MJpegDecodeContext *s, int16_t *block,
                                    uint8_t *last_nnz,
-                                   int ac_index, int16_t *quant_matrix,
+                                   int ac_index, uint16_t *quant_matrix,
                                    int ss, int se, int Al, int *EOBRUN)
 {
     int code, i = ss, j, sign, val, run;
@@ -965,6 +988,9 @@ static int ljpeg_decode_rgb_scan(MJpegDecodeContext *s, int nb_components, int p
 
     av_fast_malloc(&s->ljpeg_buffer, &s->ljpeg_buffer_size,
                    (unsigned)s->mb_width * 4 * sizeof(s->ljpeg_buffer[0][0]));
+    if (!s->ljpeg_buffer)
+        return AVERROR(ENOMEM);
+
     buffer = s->ljpeg_buffer;
 
     for (i = 0; i < 4; i++)
@@ -1379,7 +1405,7 @@ static int mjpeg_decode_scan_progressive_ac(MJpegDecodeContext *s, int ss,
     int mb_x, mb_y;
     int EOBRUN = 0;
     int c = s->comp_index[0];
-    int16_t *quant_matrix = s->quant_matrixes[s->quant_sindex[0]];
+    uint16_t *quant_matrix = s->quant_matrixes[s->quant_sindex[0]];
 
     av_assert0(ss>=0 && Ah>=0 && Al>=0);
     if (se < ss || se > 63) {
@@ -1479,8 +1505,9 @@ int ff_mjpeg_decode_sos(MJpegDecodeContext *s, const uint8_t *mb_bitmask,
     len = get_bits(&s->gb, 16);
     nb_components = get_bits(&s->gb, 8);
     if (nb_components == 0 || nb_components > MAX_COMPONENTS) {
-        av_log(s->avctx, AV_LOG_ERROR,
-               "decode_sos: nb_components (%d) unsupported\n", nb_components);
+        avpriv_report_missing_feature(s->avctx,
+                                      "decode_sos: nb_components (%d)",
+                                      nb_components);
         return AVERROR_PATCHWELCOME;
     }
     if (len != 6 + 2 * nb_components) {
@@ -1645,11 +1672,9 @@ static int mjpeg_decode_app(MJpegDecodeContext *s)
     id   = get_bits_long(&s->gb, 32);
     len -= 6;
 
-    if (s->avctx->debug & FF_DEBUG_STARTCODE) {
-        char id_str[32];
-        av_get_codec_tag_string(id_str, sizeof(id_str), av_bswap32(id));
-        av_log(s->avctx, AV_LOG_DEBUG, "APPx (%s / %8X) len=%d\n", id_str, id, len);
-    }
+    if (s->avctx->debug & FF_DEBUG_STARTCODE)
+        av_log(s->avctx, AV_LOG_DEBUG, "APPx (%s / %8X) len=%d\n",
+               av_fourcc2str(av_bswap32(id)), id, len);
 
     /* Buggy AVID, it puts EOI only at every 10th frame. */
     /* Also, this fourcc is used by non-avid files too, it holds some
@@ -1665,16 +1690,8 @@ static int mjpeg_decode_app(MJpegDecodeContext *s)
             s->buggy_avid = 1;
         i = get_bits(&s->gb, 8); len--;
         av_log(s->avctx, AV_LOG_DEBUG, "polarity %d\n", i);
-#if 0
-        skip_bits(&s->gb, 8);
-        skip_bits(&s->gb, 32);
-        skip_bits(&s->gb, 32);
-        len -= 10;
-#endif
         goto out;
     }
-
-//    len -= 2;
 
     if (id == AV_RB32("JFIF")) {
         int t_w, t_h, v1, v2;
@@ -1859,16 +1876,16 @@ static int mjpeg_decode_app(MJpegDecodeContext *s)
         len -= 4;
         /* Apple MJPEG-A */
         if (id == AV_RB32("mjpg")) {
-#if 0
-            skip_bits(&s->gb, 32); /* field size */
-            skip_bits(&s->gb, 32); /* pad field size */
-            skip_bits(&s->gb, 32); /* next off */
-            skip_bits(&s->gb, 32); /* quant off */
-            skip_bits(&s->gb, 32); /* huff off */
-            skip_bits(&s->gb, 32); /* image off */
-            skip_bits(&s->gb, 32); /* scan off */
-            skip_bits(&s->gb, 32); /* data off */
-#endif
+            /* structure:
+                4bytes      field size
+                4bytes      pad field size
+                4bytes      next off
+                4bytes      quant off
+                4bytes      huff off
+                4bytes      image off
+                4bytes      scan off
+                4bytes      data off
+            */
             if (s->avctx->debug & FF_DEBUG_PICT_INFO)
                 av_log(s->avctx, AV_LOG_INFO, "mjpeg: Apple MJPEG-A header found\n");
         }
@@ -2121,19 +2138,23 @@ int ff_mjpeg_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
             av_log(avctx, AV_LOG_DEBUG, "startcode: %X\n", start_code);
 
         /* process markers */
-        if (start_code >= 0xd0 && start_code <= 0xd7)
+        if (start_code >= 0xd0 && start_code <= 0xd7) {
             av_log(avctx, AV_LOG_DEBUG,
                    "restart marker: %d\n", start_code & 0x0f);
             /* APP fields */
-        else if (start_code >= APP0 && start_code <= APP15)
-            mjpeg_decode_app(s);
+        } else if (start_code >= APP0 && start_code <= APP15) {
+            if ((ret = mjpeg_decode_app(s)) < 0)
+                av_log(avctx, AV_LOG_ERROR, "unable to decode APP fields: %s\n",
+                       av_err2str(ret));
             /* Comment */
-        else if (start_code == COM) {
+        } else if (start_code == COM) {
             ret = mjpeg_decode_com(s);
             if (ret < 0)
                 return ret;
         } else if (start_code == DQT) {
-            ff_mjpeg_decode_dqt(s);
+            ret = ff_mjpeg_decode_dqt(s);
+            if (ret < 0)
+                return ret;
         }
 
         ret = -1;
@@ -2261,7 +2282,8 @@ eoi_parser:
                 goto fail;
             break;
         case DRI:
-            mjpeg_decode_dri(s);
+            if ((ret = mjpeg_decode_dri(s)) < 0)
+                return ret;
             break;
         case SOF5:
         case SOF6:
