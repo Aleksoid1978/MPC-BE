@@ -359,7 +359,7 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
         if (MI->IsTerminating())
             return 1; //Termination is requested
 
-        if (Status[File__Analyze::IsFinished] || CountOfSeconds>=(size_t)MI->Config.File_GrowingFile_Delay_Get() || (StopAfterFilled && Status[File__Analyze::IsFilled]))
+        if (Status[File__Analyze::IsFinished] || MI->Config.IsFinishing || (StopAfterFilled && Status[File__Analyze::IsFilled]))
             ShouldContinue=false;
     }
     #endif //MEDIAINFO_DEMUX
