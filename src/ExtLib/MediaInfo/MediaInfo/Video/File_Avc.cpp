@@ -1399,7 +1399,10 @@ void File_Avc::Read_Buffer_Unsynched()
     if (SizedBlocks || !Config_IsRepeated) //If sized blocks, it is not a broadcasted stream so SPS/PPS are only in container header, we must not disable them.
     {
         //Rebuilding immediatly TemporalReferences
-        for (std::vector<seq_parameter_set_struct*>::iterator seq_parameter_set_Item=seq_parameter_sets.begin(); seq_parameter_set_Item!=seq_parameter_sets.end(); ++seq_parameter_set_Item)
+        // ==> Start patch MPC
+        seq_parameter_set_structs* _seq_parameter_sets = !seq_parameter_sets.empty() ? &seq_parameter_sets : &subset_seq_parameter_sets;
+        for (std::vector<seq_parameter_set_struct*>::iterator seq_parameter_set_Item=(*_seq_parameter_sets).begin(); seq_parameter_set_Item!=(*_seq_parameter_sets).end(); ++seq_parameter_set_Item)
+        // ==> End patch MPC
             if ((*seq_parameter_set_Item))
             {
                 size_t MaxNumber;
@@ -1413,27 +1416,6 @@ void File_Avc::Read_Buffer_Unsynched()
                 TemporalReferences.resize(4*MaxNumber);
                 TemporalReferences_Reserved=MaxNumber;
             }
-        // ==> Start patch MPC
-        // Rebuilding TemporalReferences from Supset SPS for MVC Extension
-        if (seq_parameter_sets.empty() && !subset_seq_parameter_sets.empty())
-        {
-            //Rebuilding immediatly TemporalReferences
-            for (std::vector<seq_parameter_set_struct*>::iterator seq_parameter_set_Item=subset_seq_parameter_sets.begin(); seq_parameter_set_Item!=subset_seq_parameter_sets.end(); ++seq_parameter_set_Item)
-                if ((*seq_parameter_set_Item))
-                {
-                    size_t MaxNumber;
-                    switch ((*seq_parameter_set_Item)->pic_order_cnt_type)
-                    {
-                        case 0 : MaxNumber=(*seq_parameter_set_Item)->MaxPicOrderCntLsb; break;
-                        case 2 : MaxNumber=(*seq_parameter_set_Item)->MaxFrameNum*2; break;
-                        default: Trusted_IsNot("Not supported"); return;
-                    }
-
-                    TemporalReferences.resize(4*MaxNumber);
-                    TemporalReferences_Reserved=MaxNumber;
-                }
-        }
-        // ==> End patch MPC
     }
     else
     {
