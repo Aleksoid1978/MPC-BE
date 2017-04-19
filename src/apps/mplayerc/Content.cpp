@@ -106,6 +106,14 @@ namespace Content {
 	};
 	static std::map<CString, Content> Contents;
 
+	static void Encoding(Content& content)
+	{
+		content.body.Empty();
+		if (!content.raw.empty()) {
+			content.body = ConvertToUTF16(content.raw.data(), content.raw.size());
+		}
+	}
+
 	static void GetData(Content& content)
 	{
 		if (content.bInitialized) {
@@ -123,6 +131,9 @@ namespace Content {
 					DWORD dwSizeRead = 0;
 					if (content.HTTPAsync->Read(content.raw.data(), nMinSize, &dwSizeRead) == S_OK) {
 						content.raw.resize(dwSizeRead);
+						if (dwSizeRead) {
+							Encoding(content);
+						}
 					}
 				}
 			}
@@ -164,18 +175,13 @@ namespace Content {
 						DWORD dwSizeRead = 0;
 						if (content.HTTPAsync->Read(content.raw.data() + old_size, nMaxSize, &dwSizeRead) == S_OK) {
 							content.raw.resize(old_size + dwSizeRead);
+							if (dwSizeRead) {
+								Encoding(content);
+							}
 						}
 					}
 				}
 			}
-		}
-	}
-
-	static void Encoding(Content& content)
-	{
-		content.body.Empty();
-		if (!content.raw.empty()) {
-			content.body = ConvertToUTF16(content.raw.data(), content.raw.size());
 		}
 	}
 
@@ -387,8 +393,6 @@ namespace Content {
 						&& (Content.ct == L"audio/x-scpls" || Content.ct == L"audio/x-mpegurl" || Content.ct == L"application/xspf+xml")) {
 					GetRedirectData(Content);
 				}
-
-				Encoding(Content);
 
 				ct = Content.ct;
 				body = Content.body;
