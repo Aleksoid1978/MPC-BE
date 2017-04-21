@@ -5688,7 +5688,7 @@ HRESULT CMainFrame::GetDisplayedImage(std::vector<BYTE>& dib, CString& errmsg)
 	}
 
 	if (FAILED(hr)) {
-		errmsg.Format(L"IMFVideoDisplayControl::GetCurrentImage() failed, %s", hr);
+		errmsg.Format(L"IMFVideoDisplayControl::GetCurrentImage() failed, 0x%08x", hr);
 	}
 
 	return hr;
