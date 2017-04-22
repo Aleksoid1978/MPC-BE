@@ -1,6 +1,6 @@
 #/bin/perl
 #
-# (C) 2010-2014 see Authors.txt
+# (C) 2010-2017 see Authors.txt
 #
 # This file is part of MPC-BE.
 #
