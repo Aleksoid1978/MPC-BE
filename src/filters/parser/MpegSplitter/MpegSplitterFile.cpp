@@ -1490,17 +1490,15 @@ static void Descriptor_56(CGolombBuffer& gb, int descriptor_length, CStringA& IS
 		BYTE teletext_page_number_1   = gb.BitRead(4);
 		BYTE teletext_page_number_2   = gb.BitRead(4);
 
-		if (teletext_type == 0x02 || teletext_type == 0x05) {
-			if (ISO_639_language_code.IsEmpty() && ch[0] && strncmp(ch, und, 3)) {
-				ISO_639_language_code = ch;
-			}
+		if (ISO_639_language_code.IsEmpty() && ch[0] && strncmp(ch, und, 3)) {
+			ISO_639_language_code = ch;
+		}
 
 #ifdef _DEBUG
-			if (teletext_magazine_number == 0) teletext_magazine_number = 8;
-			USHORT page = (teletext_magazine_number << 8) | (teletext_page_number_1 << 4) | teletext_page_number_2;
-			teletexts[page] = CStringA(ch);
+		if (teletext_magazine_number == 0) teletext_magazine_number = 8;
+		USHORT page = (teletext_magazine_number << 8) | (teletext_page_number_1 << 4) | teletext_page_number_2;
+		teletexts[page] = CStringA(ch);
 #endif
-		}
 
 		pos += section_len;
 	}
