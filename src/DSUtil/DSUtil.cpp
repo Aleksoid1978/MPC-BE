@@ -2577,7 +2577,8 @@ static const struct {
 	{&DXVA_ModeHEVC_VLD_Main,			_T("H.265, bitstream decoder, Main")},
 	{&DXVA_ModeHEVC_VLD_Main10,			_T("H.265, bitstream decoder, Main10")},
 	{&DXVA_ModeVP9_VLD_Profile0,		_T("VP9, bitstream decoder, profile 0")},
-	{&DXVA_ModeVP9_VLD_10bit_Profile2,	_T("VP9, bitstream decoder, profile 2 10 bit")}
+	{&DXVA_ModeVP9_VLD_10bit_Profile2,	_T("VP9, bitstream decoder, profile 2 10 bit")},
+	{&DXVA_VP9_VLD_Intel,				_T("VP9, bitstream decoder, Intel")}
 };
 
 CString GetDXVAMode(const GUID* guidDecoder)
