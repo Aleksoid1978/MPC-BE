@@ -1064,22 +1064,6 @@ bool CBaseSplitterFileEx::Read(dvdspuhdr& h, CMediaType* pmt)
 	return true;
 }
 
-bool CBaseSplitterFileEx::Read(hdmvsubhdr& h, CMediaType* pmt, const char* language_code)
-{
-	if (pmt) {
-		pmt->majortype	= MEDIATYPE_Subtitle;
-		pmt->subtype	= MEDIASUBTYPE_HDMVSUB;
-		pmt->formattype	= FORMAT_None;
-
-		SUBTITLEINFO* psi = (SUBTITLEINFO*)pmt->AllocFormatBuffer(sizeof(SUBTITLEINFO));
-		if (psi) {
-			memset(psi, 0, pmt->FormatLength());
-			strcpy_s(psi->IsoLang, language_code ? language_code : "eng");
-		}
-	}
-
-	return true;
-}
 
 bool CBaseSplitterFileEx::Read(svcdspuhdr& h, CMediaType* pmt)
 {
@@ -1350,16 +1334,40 @@ bool CBaseSplitterFileEx::Read(dirachdr& h, int len, CMediaType* pmt)
 	return false;
 }
 
-bool CBaseSplitterFileEx::Read(dvbsub& h, int len, CMediaType* pmt, bool bSimpleAdd)
+bool CBaseSplitterFileEx::Read(hdmvsubhdr& h, CMediaType* pmt, LPCSTR language_code)
 {
-	if (bSimpleAdd || (len > 4 && (BitRead(32, true) & 0xFFFFFF00) == 0x20000f00)) {
-		if (pmt) {
-			static const SUBTITLEINFO SubFormat = { 0, "", L"" };
+	if (pmt) {
+		pmt->majortype	= MEDIATYPE_Subtitle;
+		pmt->subtype	= MEDIASUBTYPE_HDMVSUB;
+		pmt->formattype	= FORMAT_None;
 
+		SUBTITLEINFO* psi = (SUBTITLEINFO*)pmt->AllocFormatBuffer(sizeof(SUBTITLEINFO));
+		if (psi) {
+			memset(psi, 0, pmt->FormatLength());
+			if (language_code[0]) {
+				strcpy_s(psi->IsoLang, language_code);
+			}
+		}
+	}
+
+	return true;
+}
+
+bool CBaseSplitterFileEx::Read(dvbsubhdr& h, int len, CMediaType* pmt, LPCSTR language_code, bool bCheckFormat)
+{
+	if (!bCheckFormat || (len > 4 && (BitRead(32, true) & 0xFFFFFF00) == 0x20000f00)) {
+		if (pmt) {
 			pmt->majortype	= MEDIATYPE_Subtitle;
 			pmt->subtype	= MEDIASUBTYPE_DVB_SUBTITLES;
 			pmt->formattype	= FORMAT_None;
-			pmt->SetFormat((BYTE*)&SubFormat, sizeof(SUBTITLEINFO));
+
+			SUBTITLEINFO* psi = (SUBTITLEINFO*)pmt->AllocFormatBuffer(sizeof(SUBTITLEINFO));
+			if (psi) {
+				memset(psi, 0, pmt->FormatLength());
+				if (language_code[0]) {
+					strcpy_s(psi->IsoLang, language_code);
+				}
+			}
 		}
 
 		return true;
@@ -1368,21 +1376,26 @@ bool CBaseSplitterFileEx::Read(dvbsub& h, int len, CMediaType* pmt, bool bSimple
 	return false;
 }
 
-bool CBaseSplitterFileEx::Read(teletextsub& h, int len, CMediaType* pmt, bool bSimpleAdd)
+bool CBaseSplitterFileEx::Read(teletextsubhdr& h, int len, CMediaType* pmt, LPCSTR language_code, bool bCheckFormat)
 {
 	DWORD sync = 0;
-	if (!bSimpleAdd && len > 4) {
+	if (bCheckFormat && len > 4) {
 		sync = BitRead(32, true) & 0xFFFFFF00;
 	}
-	if (bSimpleAdd
+	if (!bCheckFormat
 			|| sync == 0x10022C00 || sync == 0x10032C00) {
 		if (pmt) {
-			static const SUBTITLEINFO SubFormat = { 0, "", L"" };
-
 			pmt->majortype	= MEDIATYPE_Subtitle;
 			pmt->subtype	= MEDIASUBTYPE_UTF8;
 			pmt->formattype	= FORMAT_None;
-			pmt->SetFormat((BYTE*)&SubFormat, sizeof(SUBTITLEINFO));
+
+			SUBTITLEINFO* psi = (SUBTITLEINFO*)pmt->AllocFormatBuffer(sizeof(SUBTITLEINFO));
+			if (psi) {
+				memset(psi, 0, pmt->FormatLength());
+				if (language_code[0]) {
+					strcpy_s(psi->IsoLang, language_code);
+				}
+			}
 		}
 
 		return true;

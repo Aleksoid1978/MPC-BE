@@ -798,9 +798,10 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 		}
 	}
 
-	if (m_streamData[s].codec != stream_codec::NONE) {
+	streamData& _streamData = m_streamData[s];
+	if (_streamData.codec != stream_codec::NONE) {
 		for (size_t i = 0; i < _countof(StreamDesc); i++) {
-			if (StreamDesc[i].codec == m_streamData[s].codec) {
+			if (StreamDesc[i].codec == _streamData.codec) {
 				stream_type = StreamDesc[i].stream_type;
 				break;
 			}
@@ -1034,8 +1035,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				// DVB subtitles
 				if (type == stream_type::unknown && (stream_type & DVB_SUB)) {
 					Seek(start);
-					dvbsub h;
-					if (Read(h, len, &s.mt)) {
+					dvbsubhdr h;
+					if (Read(h, len, &s.mt, _streamData.pmt.lang)) {
+						s.codec = stream_codec::DVB;
 						type = stream_type::subpic;
 					}
 				}
@@ -1043,8 +1045,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				// Teletext subtitles
 				if (type == stream_type::unknown && pesid == 0xbd && (stream_type & TELETEXT_SUB)) {
 					Seek(start);
-					teletextsub h;
-					if (Read(h, len, &s.mt)) {
+					teletextsubhdr h;
+					if (Read(h, len, &s.mt, _streamData.pmt.lang)) {
+						s.codec = stream_codec::TELETEXT;
 						type = stream_type::subpic;
 					}
 				}
@@ -1067,7 +1070,8 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 					const program* pProgram = FindProgram(s.pid, &nProgram, &pClipInfo);
 
 					hdmvsubhdr h;
-					if (!m_ClipInfo.IsHdmv() && Read(h, &s.mt, pClipInfo ? pClipInfo->m_LanguageCode : NULL)) {
+					if (!m_ClipInfo.IsHdmv() && Read(h, &s.mt, pClipInfo ? pClipInfo->m_LanguageCode : _streamData.pmt.lang)) {
+						s.codec = stream_codec::PGS;
 						type = stream_type::subpic;
 					}
 				}
@@ -1716,19 +1720,19 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 
 						if (stream_type == PRESENTATION_GRAPHICS_STREAM) {
 							CMpegSplitterFile::hdmvsubhdr hdr;
-							if (Read(hdr, &s.mt, NULL)) {
+							if (Read(hdr, &s.mt, _streamData.pmt.lang)) {
 								m_streams[stream_type::subpic].Insert(s, subpic);
 								m_streamData[pid].codec = stream_codec::PGS;
 							}
 						} else if (DVB_SUBTITLE) {
-							CMpegSplitterFile::dvbsub hdr;
-							if (Read(hdr, 0, &s.mt, true)) {
+							CMpegSplitterFile::dvbsubhdr hdr;
+							if (Read(hdr, 0, &s.mt, _streamData.pmt.lang, false)) {
 								m_streams[stream_type::subpic].Insert(s, subpic);
 								m_streamData[pid].codec = stream_codec::DVB;
 							}
 						} else if (TELETEXT_SUBTITLE) {
-							CMpegSplitterFile::teletextsub hdr;
-							if (Read(hdr, 0, &s.mt, true)) {
+							CMpegSplitterFile::teletextsubhdr hdr;
+							if (Read(hdr, 0, &s.mt, _streamData.pmt.lang, false)) {
 								m_streams[stream_type::subpic].Insert(s, subpic);
 								m_streamData[pid].codec = stream_codec::TELETEXT;
 							}

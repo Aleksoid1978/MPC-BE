@@ -259,9 +259,6 @@ public:
 	struct dvdspuhdr {
 	};
 
-	struct hdmvsubhdr {
-	};
-
 	struct svcdspuhdr {
 	};
 
@@ -304,10 +301,13 @@ public:
 	struct dirachdr {
 	};
 
-	struct dvbsub {
+	struct hdmvsubhdr {
 	};
 
-	struct teletextsub {
+	struct dvbsubhdr {
+	};
+
+	struct teletextsubhdr {
 	};
 
 	struct avchdr {
@@ -342,15 +342,16 @@ public:
 	bool Read(hdmvlpcmhdr& h, CMediaType* pmt = NULL);
 	bool Read(mlphdr& h, int len, CMediaType* pmt = NULL, bool find_sync = false);
 	bool Read(dvdspuhdr& h, CMediaType* pmt = NULL);
-	bool Read(hdmvsubhdr& h, CMediaType* pmt = NULL, const char* language_code = NULL);
 	bool Read(svcdspuhdr& h, CMediaType* pmt = NULL);
 	bool Read(cvdspuhdr& h, CMediaType* pmt = NULL);
 	bool Read(ps2audhdr& h, CMediaType* pmt = NULL);
 	bool Read(ps2subhdr& h, CMediaType* pmt = NULL);
 	bool Read(vc1hdr& h, int len, CMediaType* pmt = NULL);
 	bool Read(dirachdr& h, int len, CMediaType* pmt = NULL);
-	bool Read(dvbsub& h, int len, CMediaType* pmt = NULL, bool bSimpleAdd = false);
-	bool Read(teletextsub& h, int len, CMediaType* pmt = NULL, bool bSimpleAdd = false);
+
+	bool Read(hdmvsubhdr& h, CMediaType* pmt, LPCSTR language_code);
+	bool Read(dvbsubhdr& h, int len, CMediaType* pmt, LPCSTR language_code, bool bCheckFormat = true);
+	bool Read(teletextsubhdr& h, int len, CMediaType* pmt, LPCSTR language_code, bool bCheckFormat = true);
 	
 	bool Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt = NULL);
 	bool Read(avchdr& h, int len, CMediaType* pmt = NULL);
