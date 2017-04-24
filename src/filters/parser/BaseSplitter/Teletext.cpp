@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2016 see Authors.txt
+ * (C) 2015-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -89,6 +89,7 @@ enum g0_charsets_t {
 	ARABIC,
 	HEBREW
 };
+g0_charsets_t g0_charsets_default = LATIN;
 
 // --- G0 ----------------------------------------------------------------------
 
@@ -239,7 +240,7 @@ static uint16_t telx_to_ucs2(uint8_t c)
 
 	uint16_t r = c & 0x7f;
 	if (r >= 0x20)
-		r = G0[LATIN][r - 0x20];
+		r = G0[g0_charsets_default][r - 0x20];
 	return r;
 }
 
@@ -440,10 +441,12 @@ void CTeletext::ProcessTeletextPacket(teletext_packet_payload* packet, REFERENCE
 		}
 		m_page_buffer.tainted = NO;
 		m_bReceivingData = YES;
-		primary_charset.g0_x28 = UNDEF;
 
-		uint8_t c = (primary_charset.g0_m29 != UNDEF) ? primary_charset.g0_m29 : charset;
-		remap_g0_charset(c);
+		if (g0_charsets_default == LATIN) { // G0 Character National Option Sub-sets selection required only for Latin Character Sets
+			//primary_charset.g0_x28 = UNDEF;
+			uint8_t c = /*(primary_charset.g0_m29 != UNDEF) ? primary_charset.g0_m29 : */charset;
+			remap_g0_charset(c);
+		}
 	} else if ((m == MAGAZINE(m_nSuitablePage)) && (line >= 1) && (line <= 23) && (m_bReceivingData == YES)) {
 		for (uint8_t i = 0; i < 40; i++) {
 			m_page_buffer.text[line][i] = telx_to_ucs2(packet->data[i]);
@@ -492,6 +495,32 @@ void CTeletext::Flush()
 	m_bReceivingData = NO;
 
 	EraseOutput();
+}
+
+void CTeletext::SetLCID(const LCID lcid)
+{
+	static const LCID LCID_BULGARIAN = MAKELCID( MAKELANGID(LANG_BULGARIAN, SUBLANG_DEFAULT), SORT_DEFAULT);
+	static const LCID LCID_GREEK     = MAKELCID( MAKELANGID(LANG_GREEK, SUBLANG_DEFAULT), SORT_DEFAULT);
+	static const LCID LCID_RUSSIAN   = MAKELCID( MAKELANGID(LANG_RUSSIAN, SUBLANG_DEFAULT), SORT_DEFAULT);
+	static const LCID LCID_SERBIAN   = MAKELCID( MAKELANGID(LANG_SERBIAN, SUBLANG_DEFAULT), SORT_DEFAULT);
+	static const LCID LCID_UKRAINIAN = MAKELCID( MAKELANGID(LANG_UKRAINIAN, SUBLANG_DEFAULT), SORT_DEFAULT);
+
+	g0_charsets_default = LATIN;
+	switch (lcid) {
+		case LCID_BULGARIAN:
+		case LCID_RUSSIAN:
+			g0_charsets_default = CYRILLIC2;
+			break;
+		case LCID_SERBIAN:
+			g0_charsets_default = CYRILLIC1;
+			break;
+		case LCID_UKRAINIAN:
+			g0_charsets_default = CYRILLIC3;
+			break;
+		case LCID_GREEK:
+			g0_charsets_default = GREEK;
+			break;
+	}
 }
 
 void CTeletext::GetOutput(std::vector<TeletextData>& output)
