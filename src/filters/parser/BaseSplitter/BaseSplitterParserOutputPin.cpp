@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -64,20 +64,32 @@ HRESULT CBaseSplitterParserOutputPin::Flush()
 	m_ParseContext.bFrameStartFound = false;
 	m_ParseContext.state64          = 0;
 
-	InitAudioParams();
+	if (m_mt.majortype == MEDIATYPE_Audio && m_mt.pbFormat) {
+		const WAVEFORMATEX *wfe = GetFormatHelper(wfe, &m_mt);
+		m_nChannels             = wfe->nChannels;
+		m_nSamplesPerSec        = wfe->nSamplesPerSec;
+		m_wBitsPerSample        = wfe->wBitsPerSample;
+	}
 
-	m_teletext.Flush();
+	if (m_mt.subtype == MEDIASUBTYPE_UTF8) {
+		LCID lcid = 0;
+		if (m_mt.pbFormat) {
+			SUBTITLEINFO* psi = (SUBTITLEINFO*)m_mt.pbFormat;
+			lcid = ISO6392ToLcid(psi->IsoLang);
+		}
+
+		m_teletext.Flush();
+		m_teletext.SetLCID(lcid);
+	}
 
 	return S_OK;
 }
 
-HRESULT CBaseSplitterParserOutputPin::DeliverEndFlush()
+HRESULT CBaseSplitterParserOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
 {
-	CAutoLock cAutoLock(this);
-
 	Flush();
 
-	return __super::DeliverEndFlush();
+	return __super::DeliverNewSegment(tStart, tStop, dRate);
 }
 
 void CBaseSplitterParserOutputPin::InitPacket(CPacket* pSource)
@@ -96,16 +108,6 @@ void CBaseSplitterParserOutputPin::InitPacket(CPacket* pSource)
 
 		m_p->rtStop				= pSource->rtStop;
 		pSource->rtStop			= INVALID_TIME;
-	}
-}
-
-void CBaseSplitterParserOutputPin::InitAudioParams()
-{
-	if (m_mt.pbFormat) {
-		const WAVEFORMATEX *wfe	= GetFormatHelper(wfe, &m_mt);
-		m_nChannels				= wfe->nChannels;
-		m_nSamplesPerSec		= wfe->nSamplesPerSec;
-		m_wBitsPerSample		= wfe->wBitsPerSample;
 	}
 }
 
@@ -163,8 +165,6 @@ void CBaseSplitterParserOutputPin::InitAudioParams()
 
 HRESULT CBaseSplitterParserOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 {
-	CAutoLock cAutoLock(this);
-
 	if (p && p->pmt) {
 		if (*((CMediaType*)p->pmt) != m_mt) {
 			SetMediaType((CMediaType*)p->pmt);
@@ -172,9 +172,7 @@ HRESULT CBaseSplitterParserOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 		}
 	}
 
-	if (m_mt.majortype == MEDIATYPE_Audio && (!m_nChannels || !m_nSamplesPerSec)) {
-		InitAudioParams();
-	}
+	CAutoLock cAutoLock(this);
 
 	if (m_mt.subtype == MEDIASUBTYPE_RAW_AAC1) {
 		// AAC

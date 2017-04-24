@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -56,13 +56,12 @@ class CBaseSplitterParserOutputPin : public CBaseSplitterOutputPin, protected CC
 	int   m_adx_block_size = 0;
 
 protected:
+	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 	HRESULT DeliverPacket(CAutoPtr<CPacket> p);
-	HRESULT DeliverEndFlush();
 
 	HRESULT Flush();
 
 	void InitPacket(CPacket* pSource);
-	void InitAudioParams();
 
 	HRESULT ParseAAC(CAutoPtr<CPacket> p);
 	HRESULT ParseAACLATM(CAutoPtr<CPacket> p);

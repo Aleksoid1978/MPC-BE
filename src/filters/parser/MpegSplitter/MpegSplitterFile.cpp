@@ -1513,7 +1513,7 @@ static void Descriptor_56(CGolombBuffer& gb, int descriptor_length, CStringA& IS
 		POSITION pos = teletexts.GetStartPosition();
 		while (pos) {
 			CAtlMap<USHORT, CStringA>::CPair* pPair = teletexts.GetNext(pos);
-			DLog(L"    => %03x - '%S'", pPair->m_key, pPair->m_value);
+			DLog(L"    => 0x%03x - '%S'", pPair->m_key, pPair->m_value);
 		}
 	}
 #endif
