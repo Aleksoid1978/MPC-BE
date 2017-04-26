@@ -60,7 +60,7 @@ class CTeletext
 public:
 	CTeletext();
 
-	void ProcessData(uint8_t* buffer, uint16_t size, REFERENCE_TIME rtStart);
+	void ProcessData(uint8_t* buffer, uint16_t size, REFERENCE_TIME rtStart, WORD tlxPage);
 	void Flush();
 	void SetLCID(const LCID lcid);
 

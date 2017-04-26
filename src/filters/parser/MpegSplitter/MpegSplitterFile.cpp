@@ -1325,7 +1325,26 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 		}
 
 		if (!m_bOpeningCompleted || m_streams[type].GetCount() > 0) {
-			m_streams[type].Insert(s, type);
+			BOOL bAdded = FALSE;
+			if (_streamData.codec == stream_codec::TELETEXT && !_streamData.pmt.tlxPages.empty()) {
+				for (auto& tlxPage : _streamData.pmt.tlxPages) {
+					if (tlxPage.bSubtitle) {
+						s.tlxPage = tlxPage.page;
+						strcpy_s(s.lang, tlxPage.lang);
+						FreeMediaType(s.mt);
+						s.mt.InitMediaType();
+
+						teletextsubhdr hdr;
+						Read(hdr, 0, &s.mt, tlxPage.lang, false);
+
+						m_streams[type].Insert(s, type);
+						bAdded = TRUE;
+					}
+				}
+			}
+			if (!bAdded) {
+				m_streams[type].Insert(s, type);
+			}
 		}
 	}
 
@@ -1506,7 +1525,7 @@ static void Descriptor_56(CGolombBuffer& gb, int descriptor_length, LPSTR ISO_63
 	if (!tlxPages.empty()) {
 		DLog(L"ReadPMT() : found %Iu teletext pages", tlxPages.size());
 		for (auto& tlxPage : tlxPages) {
-			DLog(L"    => 0x%03x - '%S'", tlxPage.page, tlxPage.lang);
+			DLog(L"    => 0x%03x - '%S', %s", tlxPage.page, tlxPage.lang, tlxPage.bSubtitle ? L"subtitle" : L"teletext");
 		}
 	}
 #endif

@@ -468,8 +468,12 @@ CTeletext::CTeletext()
 	ZeroMemory(&m_page_buffer, sizeof(m_page_buffer));
 }
 
-void CTeletext::ProcessData(uint8_t* buffer, uint16_t size, REFERENCE_TIME rtStart)
+void CTeletext::ProcessData(uint8_t* buffer, uint16_t size, REFERENCE_TIME rtStart, WORD tlxPage)
 {
+	if (tlxPage) {
+		m_nSuitablePage = tlxPage;
+	}
+
 	if (size > 6) {
 		uint16_t i = 1;
 		while (i <= size - 6) {
