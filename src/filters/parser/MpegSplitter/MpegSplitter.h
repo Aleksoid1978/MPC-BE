@@ -57,6 +57,7 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	CAtlMap<DWORD, CAutoPtr<CPacket>> pPackets;
 
 	bool m_bIsBD;
+	WORD m_tlxCurrentPage = 0;
 
 #ifdef REGISTER_FILTER
 	CString m_AudioLanguageOrder, m_SubtitlesLanguageOrder;
@@ -85,7 +86,7 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	HRESULT DeliverPacket(CAutoPtr<CPacket> p);
 
 	template<typename T>
-	HRESULT HandleMPEGPacket(DWORD TrackNumber, __int64 nBytes, T& h, REFERENCE_TIME rtStartOffset, BOOL bStreamUsePTS);
+	HRESULT HandleMPEGPacket(DWORD TrackNumber, __int64 nBytes, T& h, REFERENCE_TIME rtStartOffset, BOOL bStreamUsePTS, WORD tlxPage = 0);
 	HRESULT DemuxNextPacket(REFERENCE_TIME rtStartOffset);
 
 	void HandleStream(CMpegSplitterFile::stream& s, CString fName, DWORD dwPictAspectRatioX, DWORD dwPictAspectRatioY, CStringA& palette);

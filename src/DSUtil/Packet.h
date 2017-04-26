@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,12 +26,17 @@
 class CPacket : public CAtlArray<BYTE>
 {
 public:
-	DWORD TrackNumber		= 0;
-	BOOL bDiscontinuity		= FALSE;
-	BOOL bSyncPoint			= FALSE;
-	REFERENCE_TIME rtStart	= INVALID_TIME;
-	REFERENCE_TIME rtStop	= INVALID_TIME;
-	AM_MEDIA_TYPE* pmt		= NULL;
+	DWORD TrackNumber      = 0;
+	BOOL bDiscontinuity    = FALSE;
+	BOOL bSyncPoint        = FALSE;
+	REFERENCE_TIME rtStart = INVALID_TIME;
+	REFERENCE_TIME rtStop  = INVALID_TIME;
+	AM_MEDIA_TYPE* pmt     = NULL;
+
+	struct extra_t {
+		DWORD Field1       = 0;
+	} extra;
+
 	virtual ~CPacket() {
 		DeleteMediaType(pmt);
 	}

@@ -240,32 +240,22 @@ public:
 	struct stream {
 		CMediaType mt;
 		std::vector<CMediaType> mts;
-		WORD pid;
-		BYTE pesid, ps1id;
 
-		WORD tlxPage;
-		bool lang_set;
-		char lang[4];
+		WORD pid   = 0;
+		BYTE pesid = 0;
+		BYTE ps1id = 0;
+
+		WORD tlxPage = 0;
+
+		bool lang_set = false;
+		char lang[4]  = {};
 
 		struct {
-			bool bDTSCore;
-			bool bDTSHD;
+			bool bDTSCore = false;
+			bool bDTSHD   = false;
 		} dts;
 
-		stream_codec codec;
-
-		stream()
-			: pid(0)
-			, pesid(0)
-			, ps1id(0)
-			, tlxPage(0)
-			, lang_set(false)
-			, codec(stream_codec::NONE)
-			, dts({false, false})
-		{
-			mt.InitMediaType();
-			memset(lang, 0, _countof(lang));
-		}
+		stream_codec codec = stream_codec::NONE;
 
 		operator DWORD() const {
 			return pid ? pid : ((pesid << 8) | ps1id);
