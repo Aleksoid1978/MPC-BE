@@ -92,7 +92,7 @@ static filter_t s_filters[] = {
 	{L"MS MPEG-4",					VIDEO_DECODER, VDEC_MSMPEG4,		0},
 	{L"PNG",						VIDEO_DECODER, VDEC_PNG,			0},
 	{L"QuickTime video (8BPS, QTRle, rpza)", VIDEO_DECODER, VDEC_QT,		0},
-	{L"Screen Recorder (CSCD, MS, TSCC, VMnc)", VIDEO_DECODER, VDEC_SCREEN, 0},
+	{L"Screen Recorder (CSCD, MS, TSCC, VMnc, G2M)", VIDEO_DECODER, VDEC_SCREEN, 0},
 	{L"SVQ1/3",						VIDEO_DECODER, VDEC_SVQ,			0},
 	{L"Theora",						VIDEO_DECODER, VDEC_THEORA,			0},
 	{L"Ut Video",					VIDEO_DECODER, VDEC_UT,				0},
