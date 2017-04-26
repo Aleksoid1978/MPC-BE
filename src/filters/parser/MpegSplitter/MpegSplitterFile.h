@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -242,6 +242,8 @@ public:
 		std::vector<CMediaType> mts;
 		WORD pid;
 		BYTE pesid, ps1id;
+
+		WORD tlxPage;
 		bool lang_set;
 		char lang[4];
 
@@ -256,6 +258,7 @@ public:
 			: pid(0)
 			, pesid(0)
 			, ps1id(0)
+			, tlxPage(0)
 			, lang_set(false)
 			, codec(stream_codec::NONE)
 			, dts({false, false})
@@ -343,7 +346,7 @@ public:
 
 	void SearchStreams(__int64 start, __int64 stop, DWORD msTimeOut = INFINITE);
 	DWORD AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, BOOL bAddStream = TRUE);
-	void  AddHdmvPGStream(WORD pid, const char* language_code);
+	void  AddHdmvPGStream(WORD pid, LPCSTR language_code);
 	CMpegSplitterFile::CStreamList* GetMasterStream();
 	bool IsHdmv() {
 		return m_ClipInfo.IsHdmv();
@@ -452,26 +455,35 @@ public:
 	const program* FindProgram(WORD pid, int* pStream = NULL, const CHdmvClipInfo::Stream** pClipInfo = NULL);
 
 	// program stream map - mpeg-ps
-	PES_STREAM_TYPE m_psm[256];
+	PES_STREAM_TYPE m_psm[256] = {};
 	void UpdatePSM();
 
 	bool GetStreamType(WORD pid, PES_STREAM_TYPE &stream_type);
 
+	struct teletextPage {
+		bool bSubtitle = false;
+		WORD page      = 0;
+		char lang[4]   = {};
+	};
+	typedef std::vector<teletextPage> teletextPages;
+
 	struct streamData {
 		struct {
-			CStringA        lang;
+			char            lang[4] = {};
 			CAtlArray<BYTE> extraData;
+			teletextPages   tlxPages;
 		} pmt;
 
 		BOOL         usePTS = FALSE;
 		stream_codec codec  = stream_codec::NONE;
 
 		streamData& operator = (const streamData& src) {
-			pmt.lang = src.pmt.lang;
+			strcpy_s(pmt.lang, src.pmt.lang);
 			pmt.extraData.Append(src.pmt.extraData);
+			pmt.tlxPages = src.pmt.tlxPages;
 
-			usePTS   = src.usePTS;
-			codec    = src.codec;
+			usePTS = src.usePTS;
+			codec  = src.codec;
 
 			return *this;
 		}

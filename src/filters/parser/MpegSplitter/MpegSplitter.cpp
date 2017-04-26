@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1841,8 +1841,8 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 				return E_UNEXPECTED;
 			}
 
-			CMpegSplitterFile::stream& s	= m_pFile->m_streams[type].GetAt(pos);
-			CHdmvClipInfo::Stream* pStream	= m_ClipInfo.FindStream(s.pid);
+			CMpegSplitterFile::stream& s   = m_pFile->m_streams[type].GetAt(pos);
+			CHdmvClipInfo::Stream* pStream = m_ClipInfo.FindStream(s.pid);
 
 			if (ppmt) {
 				*ppmt = CreateMediaType(&s.mts[0]);
@@ -1851,10 +1851,7 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 				*pdwFlags = GetOutputPin(s) ? (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE) : 0;
 			}
 			if (plcid) {
-				CStringA lang_name	= s.lang;
-				LCID lcid			= !lang_name.IsEmpty() ? ISO6392ToLcid(lang_name) : 0;
-
-				*plcid = pStream ? pStream->m_LCID : lcid;
+				*plcid = pStream ? pStream->m_LCID : ISO6392ToLcid(s.lang);
 			}
 			if (pdwGroup) {
 				*pdwGroup = type;
