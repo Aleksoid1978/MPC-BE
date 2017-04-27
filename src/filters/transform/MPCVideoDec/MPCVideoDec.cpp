@@ -932,10 +932,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nWorkaroundBug(FF_BUG_AUTODETECT)
 	, m_nErrorConcealment(FF_EC_DEBLOCK | FF_EC_GUESS_MVS)
 	, m_bDXVACompatible(true)
-	, m_pFFBuffer(NULL)
-	, m_nFFBufferSize(0)
-	, m_pFFBuffer2(NULL)
-	, m_nFFBufferSize2(0)
 	, m_nARX(0)
 	, m_nARY(0)
 	, m_bUseDXVA(true)
@@ -1451,11 +1447,6 @@ void CMPCVideoDecFilter::ffmpegCleanup()
 	avcodec_free_context(&m_pAVCtx);
 
 	av_frame_free(&m_pFrame);
-
-	av_freep(&m_pFFBuffer);
-	m_nFFBufferSize = 0;
-	av_freep(&m_pFFBuffer2);
-	m_nFFBufferSize2 = 0;
 
 	m_FormatConverter.Cleanup();
 
@@ -2613,46 +2604,32 @@ static BOOL GOPFound(BYTE *buf, int len)
 	return FALSE;
 }
 
-#define Continue { av_frame_unref(m_pFrame); av_packet_unref(&avpkt); continue; }
+static inline HRESULT FillAVPacket(AVPacket *avpkt, const uint8_t *buffer, int buflen)
+{
+	if (av_new_packet(avpkt, buflen) < 0) {
+		return E_OUTOFMEMORY;
+	}
+	if (buflen) {
+		memcpy(avpkt->data, buffer, buflen);
+	}
+
+	return S_OK;
+}
+
+#define Continue { av_frame_unref(m_pFrame); av_packet_free(&avpkt); continue; }
 HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn)
 {
 	HRESULT hr     = S_OK;
 	BOOL    bFlush = (pDataIn == NULL);
 
-	AVPacket avpkt;
-	av_init_packet(&avpkt);
-
-	BYTE *pDataBuffer = NULL;
-	if (!bFlush && nSize > 0) {
-		// code from LAV
-		if (!((m_pAVCtx->active_thread_type & FF_THREAD_FRAME) || m_nDecoderMode != MODE_SOFTWARE) || m_pParser) {
-			// Copy bitstream into temporary buffer to ensure overread protection
-			// Verify buffer size
-			if (nSize > m_nFFBufferSize) {
-				m_nFFBufferSize = nSize;
-				m_pFFBuffer     = (BYTE *)av_realloc_f(m_pFFBuffer, m_nFFBufferSize + AV_INPUT_BUFFER_PADDING_SIZE, 1);
-				if (!m_pFFBuffer) {
-					m_nFFBufferSize = 0;
-					return E_OUTOFMEMORY;
-				}
-			}
-
-			memcpy(m_pFFBuffer, pDataIn, nSize);
-			memset(m_pFFBuffer + nSize, 0, AV_INPUT_BUFFER_PADDING_SIZE);
-			pDataBuffer = m_pFFBuffer;
+	if (!bFlush && m_bWaitingForKeyFrame
+			&& (m_nCodecId == AV_CODEC_ID_VP8 || m_nCodecId == AV_CODEC_ID_VP9)) {
+		const BOOL bKeyFrame = m_nCodecId == AV_CODEC_ID_VP8 ? !(pDataIn[0] & 1) : !(pDataIn[0] & 4);
+		if (bKeyFrame) {
+			DLog(L"CMPCVideoDecFilter::Decode(): Found VP8/9 key-frame, resuming decoding");
+			m_bWaitingForKeyFrame = FALSE;
 		} else {
-			pDataBuffer = pDataIn;
-		}
-
-		if (m_bWaitingForKeyFrame
-				&& (m_nCodecId == AV_CODEC_ID_VP8 || m_nCodecId == AV_CODEC_ID_VP9)) {
-			const BOOL bKeyFrame = m_nCodecId == AV_CODEC_ID_VP8 ? !(pDataBuffer[0] & 1) : !(pDataBuffer[0] & 4);
-			if (bKeyFrame) {
-				DLog(L"CMPCVideoDecFilter::Decode(): Found VP8/9 key-frame, resuming decoding");
-				m_bWaitingForKeyFrame = FALSE;
-			} else {
-				return S_OK;
-			}
+			return S_OK;
 		}
 	}
 
@@ -2663,33 +2640,20 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 		int ret         = 0;
 		bool bDecodeOk  = false;
 
-		if (!bFlush) {
-			avpkt.data = pDataBuffer;
-			avpkt.size = nSize;
-			avpkt.pts  = rtStartIn;
-			if (rtStartIn != INVALID_TIME && rtStopIn != INVALID_TIME) {
-				avpkt.duration = rtStopIn - rtStartIn;
-			} else {
-				avpkt.duration = 0;
-			}
-			avpkt.flags = AV_PKT_FLAG_KEY;
-		} else {
-			avpkt.data = NULL;
-			avpkt.size = 0;
-		}
+		AVPacket *avpkt = av_packet_alloc();
 
 		// all Parser code from LAV ... thanks to it's author
 		if (m_pParser) {
 			BYTE *pOut    = NULL;
 			int pOut_size = 0;
 
-			int used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, avpkt.data, avpkt.size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
+			int used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, pDataIn, nSize, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
 			if (used_bytes == 0 && pOut_size == 0 && !bFlush) {
 				DLog(L"CMPCVideoDecFilter::Decode() - could not process buffer, starving?");
 				break;
 			} else if (used_bytes > 0) {
-				nSize       -= used_bytes;
-				pDataBuffer += used_bytes;
+				nSize   -= used_bytes;
+				pDataIn += used_bytes;
 			}
 
 			// Update start time cache
@@ -2718,39 +2682,42 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 			if (pOut_size > 0 || bFlush) {
 
 				if (pOut && pOut_size > 0) {
-					if (pOut_size > m_nFFBufferSize2) {
-						m_nFFBufferSize2 = pOut_size;
-						m_pFFBuffer2     = (BYTE *)av_realloc_f(m_pFFBuffer2, m_nFFBufferSize2 + AV_INPUT_BUFFER_PADDING_SIZE, 1);
-						if (!m_pFFBuffer2) {
-							m_nFFBufferSize2 = 0;
-							return E_OUTOFMEMORY;
-						}
+					if (FAILED(FillAVPacket(avpkt, pOut, pOut_size))) {
+						av_packet_free(&avpkt);
+						return E_OUTOFMEMORY;
 					}
-					memcpy(m_pFFBuffer2, pOut, pOut_size);
-					memset(m_pFFBuffer2 + pOut_size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
-
-					avpkt.data     = m_pFFBuffer2;
-					avpkt.size     = pOut_size;
-					avpkt.pts      = rtStart;
-					avpkt.duration = 0;
+					avpkt->pts = rtStart;
 
 					if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO && m_bWaitingForKeyFrame
-							&& GOPFound(avpkt.data, avpkt.size)) {
+							&& GOPFound(avpkt->data, avpkt->size)) {
 						m_bWaitingForKeyFrame = FALSE;
 					}
 				} else {
-					avpkt.data = NULL;
-					avpkt.size = 0;
+					FillAVPacket(avpkt, NULL, 0);
 				}
 
-				int ret2 = decode(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
+				const int ret2 = decode(m_pAVCtx, m_pFrame, &got_picture, avpkt);
 				bDecodeOk = (ret2 >= 0);
 				if (ret2 < 0) {
 					DLog(L"CMPCVideoDecFilter::Decode() - decoding failed despite successfull parsing");
 				}
 			}
 		} else {
-			ret = decode(m_pAVCtx, m_pFrame, &got_picture, &avpkt);
+			if (!bFlush) {
+				if (FAILED(FillAVPacket(avpkt, pDataIn, nSize))) {
+					av_packet_free(&avpkt);
+					return E_OUTOFMEMORY;
+				}
+				avpkt->pts = rtStartIn;
+				if (rtStartIn != INVALID_TIME && rtStopIn != INVALID_TIME) {
+					avpkt->duration = rtStopIn - rtStartIn;
+				}
+				avpkt->flags = pIn->IsSyncPoint() == S_OK ? AV_PKT_FLAG_KEY : 0;
+			} else {
+				FillAVPacket(avpkt, NULL, 0);
+			}
+
+			ret = decode(m_pAVCtx, m_pFrame, &got_picture, avpkt);
 			bDecodeOk = (ret >= 0);
 			if (ret < 0) {
 				DLog(L"CMPCVideoDecFilter::Decode() - decoding failed");
@@ -2760,7 +2727,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 
 		if (ret < 0) {
 			av_frame_unref(m_pFrame);
-			av_packet_unref(&avpkt);
+			av_packet_free(&avpkt);
 			return S_OK;
 		}
 
@@ -2782,7 +2749,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 		}
 
 		if (!got_picture) {
-			if (!avpkt.size) {
+			if (!avpkt->size) {
 				bFlush = FALSE; // End flushing, no more frames
 			}
 
@@ -2844,12 +2811,12 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 
 		AddFrameSideData(pOut, m_pFrame);
 
-		av_frame_unref(m_pFrame);
-
 		hr = m_pOutput->Deliver(pOut);
+
+		av_frame_unref(m_pFrame);
+		av_packet_free(&avpkt);
 	}
 
-	av_packet_unref(&avpkt);
 	return hr;
 }
 
