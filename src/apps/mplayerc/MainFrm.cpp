@@ -1944,96 +1944,53 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 	}
 }
 
-void CMainFrame::OnSizing(UINT fwSide, LPRECT pRect)
+void CMainFrame::OnSizing(UINT nSide, LPRECT pRect)
 {
-	__super::OnSizing(fwSide, pRect);
+	__super::OnSizing(nSide, pRect);
 
-	CAppSettings& s = AfxGetAppSettings();
-
-	bool fCtrl = !!(GetAsyncKeyState(VK_CONTROL)&0x80000000);
+	const CAppSettings& s = AfxGetAppSettings();
+	const bool bCtrl = !!(GetAsyncKeyState(VK_CONTROL) & 0x80000000);
 
 	if (m_eMediaLoadState != MLS_LOADED || m_bFullScreen
 			|| s.iDefaultVideoSize == DVS_STRETCH
-			|| (fCtrl == s.fLimitWindowProportions)) {	// remember that fCtrl is initialized with !!whatever(), same with fLimitWindowProportions
+			|| (bCtrl == s.fLimitWindowProportions)) {
 		return;
 	}
 
-	CSize wsize(pRect->right - pRect->left, pRect->bottom - pRect->top);
-	CSize vsize = GetVideoSize();
-	CSize fsize(0, 0);
-
-	if (!vsize.cx || !vsize.cy) {
+	CSize windowSize(pRect->right - pRect->left, pRect->bottom - pRect->top);
+	CSize videoSize = GetVideoSize();
+	if (!videoSize.cx || !videoSize.cy) {
 		return;
 	}
 
-	// TODO
-	{
-		DWORD style = GetStyle();
+	CSize decorationsSize;
+	CalcControlsSize(decorationsSize);
 
-		// This doesn't give correct menu pixel size
-		//MENUBARINFO mbi;
-		//memset(&mbi, 0, sizeof(mbi));
-		//mbi.cbSize = sizeof(mbi);
-		//::GetMenuBarInfo(m_hWnd, OBJID_MENU, 0, &mbi);
+	CRect decorationsRect;
+	VERIFY(AdjustWindowRectEx(decorationsRect, GetWindowStyle(m_hWnd), !IsMenuHidden(), GetWindowExStyle(m_hWnd)));
+	decorationsSize.cx += decorationsRect.Width();
+	decorationsSize.cy += decorationsRect.Height();
 
-		if (style & WS_THICKFRAME) {
-			fsize.cx += GetSystemMetrics(SM_CXSIZEFRAME) * 2;
-			fsize.cy += GetSystemMetrics(SM_CYSIZEFRAME) * 2;
-			if ( (style & WS_CAPTION) == 0 ) {
-				fsize.cx -= 2;
-				fsize.cy -= 2;
-			}
-		}
+	windowSize -= decorationsSize;
 
-		if ( style & WS_CAPTION ) {
-			fsize.cy += GetSystemMetrics( SM_CYCAPTION );
-			if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU) {
-				fsize.cy += GetSystemMetrics( SM_CYMENU );    //mbi.rcBar.bottom - mbi.rcBar.top;
-			}
-			//else MODE_HIDEMENU
-		}
+	const bool bWider = windowSize.cy < windowSize.cx;
 
-		POSITION pos = m_bars.GetHeadPosition();
-		while ( pos ) {
-			CControlBar * pCB = m_bars.GetNext( pos );
-			if ( IsWindow(pCB->m_hWnd) && pCB->IsVisible() ) {
-				fsize.cy += pCB->CalcFixedLayout(TRUE, TRUE).cy;
-			}
-		}
+	windowSize.SetSize(
+		int(windowSize.cy * videoSize.cx / (double)videoSize.cy + 0.5),
+		int(windowSize.cx * videoSize.cy / (double)videoSize.cx + 0.5));
 
-		pos = m_dockingbars.GetHeadPosition();
-		while ( pos ) {
-			CSizingControlBar *pCB = m_dockingbars.GetNext( pos );
+	windowSize += decorationsSize;
 
-			if ( IsWindow(pCB->m_hWnd) && pCB->IsWindowVisible() && !pCB->IsFloating() ) {
-				if ( pCB->IsHorzDocked() ) {
-					fsize.cy += pCB->CalcFixedLayout(TRUE, TRUE).cy - 2;
-				} else if ( pCB->IsVertDocked() ) {
-					fsize.cx += pCB->CalcFixedLayout(TRUE, FALSE).cx;
-				}
-			}
-		}
+	if (nSide == WMSZ_TOP || nSide == WMSZ_BOTTOM || (!bWider && (nSide == WMSZ_TOPRIGHT || nSide == WMSZ_BOTTOMRIGHT))) {
+		pRect->right = pRect->left + windowSize.cx;
+	} else if (nSide == WMSZ_LEFT || nSide == WMSZ_RIGHT || (bWider && (nSide == WMSZ_BOTTOMLEFT || nSide == WMSZ_BOTTOMRIGHT))) {
+		pRect->bottom = pRect->top + windowSize.cy;
+	} else if (!bWider && (nSide == WMSZ_TOPLEFT || nSide == WMSZ_BOTTOMLEFT)) {
+		pRect->left = pRect->right - windowSize.cx;
+	} else if (bWider && (nSide == WMSZ_TOPLEFT || nSide == WMSZ_TOPRIGHT)) {
+		pRect->top = pRect->bottom - windowSize.cy;
 	}
 
-	wsize -= fsize;
-
-	bool fWider = wsize.cy < wsize.cx;
-
-	wsize.SetSize(
-		wsize.cy * vsize.cx / vsize.cy,
-		wsize.cx * vsize.cy / vsize.cx);
-
-	wsize += fsize;
-
-	if (fwSide == WMSZ_TOP || fwSide == WMSZ_BOTTOM || (!fWider && (fwSide == WMSZ_TOPRIGHT || fwSide == WMSZ_BOTTOMRIGHT))) {
-		pRect->right = pRect->left + wsize.cx;
-	} else if (fwSide == WMSZ_LEFT || fwSide == WMSZ_RIGHT || (fWider && (fwSide == WMSZ_BOTTOMLEFT || fwSide == WMSZ_BOTTOMRIGHT))) {
-		pRect->bottom = pRect->top + wsize.cy;
-	} else if (!fWider && (fwSide == WMSZ_TOPLEFT || fwSide == WMSZ_BOTTOMLEFT)) {
-		pRect->left = pRect->right - wsize.cx;
-	} else if (fWider && (fwSide == WMSZ_TOPLEFT || fwSide == WMSZ_TOPRIGHT)) {
-		pRect->top = pRect->bottom - wsize.cy;
-	}
 	FlyBarSetPos();
 	OSDBarSetPos();
 }
