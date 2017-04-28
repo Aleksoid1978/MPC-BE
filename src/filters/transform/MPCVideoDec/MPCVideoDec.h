@@ -40,6 +40,7 @@ struct AVCodec;
 struct AVCodecContext;
 struct AVCodecParserContext;
 struct AVFrame;
+struct AVPacket;
 
 class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 	CMPCVideoDecFilter
@@ -159,7 +160,9 @@ protected:
 	void			DetectVideoCard(HWND hWnd);
 	void			BuildOutputFormat();
 
-	HRESULT			Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
+	HRESULT			DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bPreroll = FALSE);
+	HRESULT			ParseInternal(const BYTE *buffer, int buflen, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bPreroll);
+	HRESULT			Decode(const BYTE *buffer, int buflen, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bSyncPoint = FALSE, BOOL bPreroll = FALSE);
 	HRESULT			ChangeOutputMediaFormat(int nType);
 
 	HRESULT			ReopenVideo();
