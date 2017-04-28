@@ -310,37 +310,6 @@ static const SampleFormat MPCtoSamplefmt[sfcount] = {
 	SAMPLE_FMT_FLT  // <-- SF_FLOAT
 };
 
-//void DD_stats_t::Reset()
-//{
-//	mode = AV_CODEC_ID_NONE;
-//	ac3_frames  = 0;
-//	eac3_frames = 0;
-//}
-//
-//bool DD_stats_t::Desired(int type)
-//{
-//	if (mode != AV_CODEC_ID_NONE) {
-//		return (mode == type);
-//	};
-//	// unknown mode
-//	if (type == AV_CODEC_ID_AC3) {
-//		++ac3_frames;
-//	} else if (type == AV_CODEC_ID_EAC3) {
-//		++eac3_frames;
-//	}
-//
-//	if (ac3_frames + eac3_frames >= 4) {
-//		if (eac3_frames > 2 * ac3_frames) {
-//			mode = AV_CODEC_ID_EAC3; // EAC3
-//		} else {
-//			mode = AV_CODEC_ID_AC3;  // AC3 or mixed AC3+EAC3
-//		}
-//		return (mode == type);
-//	}
-//
-//	return true;
-//}
-
 CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CTransformFilter(NAME("CMpaDecFilter"), lpunk, __uuidof(this))
 	, m_InternalSampleFormat(SAMPLE_FMT_NONE)
@@ -383,8 +352,6 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	}
 
 	memset(&m_bBitstreamSupported, FALSE, sizeof(m_bBitstreamSupported));
-
-//	m_DDstats.Reset();
 
 	// default settings
 	m_fSampleFmt[SF_PCM16] = true;
@@ -652,10 +619,6 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	}
 
 	m_buff.Append(pDataIn, len, 4096);
-
-//	if (subtype == MEDIASUBTYPE_DOLBY_AC3 || subtype == MEDIASUBTYPE_WAVE_DOLBY_AC3 || subtype == MEDIASUBTYPE_DNET) {
-//		return ProcessAC3();
-//	}
 
 	if (nCodecId != AV_CODEC_ID_NONE) {
 		if (ProcessBitstream(nCodecId, hr)) {
@@ -952,67 +915,6 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 
 	return S_OK;
 }
-
-//HRESULT CMpaDecFilter::ProcessAC3()
-//{
-//	HRESULT hr;
-//
-//	BYTE* const base = m_buff.GetData();
-//	BYTE* end = base + m_buff.GetCount();
-//	BYTE* p = base;
-//
-//	while (p + 8 <= end) {
-//		if (*(WORD*)p != 0x770b) {
-//			p++;
-//			continue;
-//		}
-//
-//		AVCodecID ftype;
-//		int size;
-//		if ((size = ParseAC3Header(p)) > 0) {
-//			ftype = AV_CODEC_ID_AC3;
-//		} else if ((size = ParseEAC3Header(p)) > 0) {
-//			ftype = AV_CODEC_ID_EAC3;
-//		} else {
-//			p += 2;
-//			continue;
-//		}
-//
-//		if (p + size > end) {
-//			break;
-//		}
-//
-//		if (m_DDstats.Desired(ftype)) {
-//			if (m_FFAudioDec.GetCodecId() != ftype) {
-//				m_FFAudioDec.Init(ftype, m_pInput);
-//				m_FFAudioDec.SetDRC(GetDynamicRangeControl());
-//			}
-//
-//			CAtlArray<BYTE> output;
-//			SampleFormat samplefmt = SAMPLE_FMT_NONE;
-//
-//			hr = m_FFAudioDec.Decode(ftype, p, size, size, output, samplefmt);
-//			if (FAILED(hr)) {
-//				m_buff.RemoveAll();
-//				m_bResync = true;
-//				return S_OK;
-//			} else if (hr == S_FALSE) {
-//				m_bResync = true;
-//				p += size;
-//				continue;
-//			} else if (!output.IsEmpty()) { // && SUCCEEDED(hr)
-//				hr = Deliver(output.GetData(), output.GetCount(), samplefmt, m_FFAudioDec.GetSampleRate(), m_FFAudioDec.GetChannels(), m_FFAudioDec.GetChannelMask());
-//			} else if (size == 0) { // && pBuffOut.IsEmpty()
-//				break;
-//			}
-//		}
-//		p += size;
-//	}
-//
-//	m_buff.Consume(p - base);
-//
-//	return S_OK;
-//}
 
 HRESULT CMpaDecFilter::ProcessAC3_SPDIF()
 {
