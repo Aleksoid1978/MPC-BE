@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -47,24 +47,13 @@ struct ps2_state_t {
 	}
 };
 
-//struct DD_stats_t {
-//protected:
-//	int mode;
-//	unsigned int ac3_frames;
-//	unsigned int eac3_frames;
-//
-//public:
-//	void Reset();
-//	bool Desired(int type);
-//};
-
 class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F"))
 	CMpaDecFilter
 	: public CTransformFilter
 	, public IMpaDecFilter
 	, public ISpecifyPropertyPages2
 {
-	SampleFormat	m_InternalSampleFormat;
+	SampleFormat    m_InternalSampleFormat;
 protected:
 	// settings
 	CCritSec        m_csProps;
@@ -76,13 +65,12 @@ protected:
 	CPaddedArray    m_buff;
 
 	REFERENCE_TIME  m_rtStart;
-	double			m_dStartOffset;
+	double          m_dStartOffset;
 
 	BOOL            m_bDiscontinuity;
 	bool            m_bResync;
 
 	ps2_state_t     m_ps2_state;
-//	DD_stats_t      m_DDstats;
 
 	BYTE            m_hdmibuff[61440];
 	int             m_hdmicount;
@@ -92,16 +80,16 @@ protected:
 
 	CFFAudioDecoder m_FFAudioDec;
 
-	BOOL			m_bNeedCheck;
-	BOOL			m_bHasVideo;
-	BOOL			m_bIgnoreJitter;
+	BOOL            m_bNeedCheck;
+	BOOL            m_bHasVideo;
+	BOOL            m_bIgnoreJitter;
 
-	double			m_dRate;
+	double          m_dRate;
 
-	BOOL			m_bFlushing;
-	BOOL			m_bNeedSyncPoint;
+	BOOL            m_bFlushing;
+	BOOL            m_bNeedSyncPoint;
 
-	int				m_DTSHDProfile;
+	int             m_DTSHDProfile;
 
 	enum BitstreamType {
 		SPDIF,
@@ -110,7 +98,7 @@ protected:
 		DTSHD,
 		BTCOUNT
 	};
-	BOOL			m_bBitstreamSupported[BTCOUNT];
+	BOOL            m_bBitstreamSupported[BTCOUNT];
 
 	CMixer m_Mixer;
 	CAtlArray<float> m_encbuff;
@@ -123,7 +111,6 @@ protected:
 
 	HRESULT ProcessLPCM();
 	HRESULT ProcessHdmvLPCM(bool bAlignOldBuffer);
-//	HRESULT ProcessAC3();
 	HRESULT ProcessAC3_SPDIF();
 	HRESULT ProcessEAC3_SPDIF();
 	HRESULT ProcessTrueHD_SPDIF();
