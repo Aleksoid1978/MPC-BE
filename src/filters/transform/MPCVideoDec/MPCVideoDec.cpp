@@ -2376,7 +2376,7 @@ HRESULT CMPCVideoDecFilter::EndOfStream()
 	CAutoLock cAutoLock(&m_csReceive);
 	m_pMSDKDecoder
 		? m_pMSDKDecoder->EndOfStream()
-		: Decode(NULL, NULL, 0, INVALID_TIME, INVALID_TIME);
+		: Decode(NULL, 0, INVALID_TIME, INVALID_TIME);
 
 	return __super::EndOfStream();
 }
@@ -2566,30 +2566,7 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 	return fmt;
 }
 
-static inline int decode(AVCodecContext *avctx, AVFrame *frame, int *got_picture, AVPacket *pkt)
-{
-	*got_picture = 0;
-	int ret;
-
-	if (pkt) {
-		ret = avcodec_send_packet(avctx, pkt);
-		if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
-			return ret;
-		}
-	}
-
-	ret = avcodec_receive_frame(avctx, frame);
-	if (ret >= 0) {
-		*got_picture = 1;
-	}
-	if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-		ret = 0;
-	}
-
-	return ret;
-}
-
-static BOOL GOPFound(BYTE *buf, int len)
+static inline BOOL GOPFound(BYTE *buf, int len)
 {
 	if (buf && len > 0) {
 		CGolombBuffer gb(buf, len);
@@ -2604,171 +2581,85 @@ static BOOL GOPFound(BYTE *buf, int len)
 	return FALSE;
 }
 
-static inline HRESULT FillAVPacket(AVPacket *avpkt, const uint8_t *buffer, int buflen)
+static inline HRESULT FillAVPacket(AVPacket *avpkt, const BYTE *buffer, int buflen)
 {
 	if (av_new_packet(avpkt, buflen) < 0) {
 		return E_OUTOFMEMORY;
 	}
-	if (buflen) {
-		memcpy(avpkt->data, buffer, buflen);
-	}
+	memcpy(avpkt->data, buffer, buflen);
 
 	return S_OK;
 }
 
-#define Continue { av_frame_unref(m_pFrame); av_packet_free(&avpkt); continue; }
-HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn)
+#define Continue { av_frame_unref(m_pFrame); continue; }
+HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bPreroll/* = FALSE*/)
 {
-	HRESULT hr     = S_OK;
-	BOOL    bFlush = (pDataIn == NULL);
+	if (avpkt) {
+		if (m_bWaitingForKeyFrame) {
+			if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO
+					&& GOPFound(avpkt->data, avpkt->size)) {
+				m_bWaitingForKeyFrame = FALSE;
+			}
 
-	if (!bFlush && m_bWaitingForKeyFrame
-			&& (m_nCodecId == AV_CODEC_ID_VP8 || m_nCodecId == AV_CODEC_ID_VP9)) {
-		const BOOL bKeyFrame = m_nCodecId == AV_CODEC_ID_VP8 ? !(pDataIn[0] & 1) : !(pDataIn[0] & 4);
-		if (bKeyFrame) {
-			DLog(L"CMPCVideoDecFilter::Decode(): Found VP8/9 key-frame, resuming decoding");
-			m_bWaitingForKeyFrame = FALSE;
-		} else {
-			return S_OK;
+			if (m_nCodecId == AV_CODEC_ID_VP8 || m_nCodecId == AV_CODEC_ID_VP9) {
+				const BOOL bKeyFrame = m_nCodecId == AV_CODEC_ID_VP8 ? !(avpkt->data[0] & 1) : !(avpkt->data[0] & 4);
+				if (bKeyFrame) {
+					DLog(L"CMPCVideoDecFilter::DecodeInternal(): Found VP8/9 key-frame, resuming decoding");
+					m_bWaitingForKeyFrame = FALSE;
+				} else {
+					return S_OK;
+				}
+			}
 		}
 	}
 
-	while (nSize > 0 || bFlush) {
-		REFERENCE_TIME rtStart = rtStartIn, rtStop = rtStopIn;
+	int ret = avcodec_send_packet(m_pAVCtx, avpkt);
+	if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
+		return E_FAIL;
+	}
 
-		int got_picture = 0;
-		int ret         = 0;
-		bool bDecodeOk  = false;
-
-		AVPacket *avpkt = av_packet_alloc();
-
-		// all Parser code from LAV ... thanks to it's author
-		if (m_pParser) {
-			BYTE *pOut    = NULL;
-			int pOut_size = 0;
-
-			int used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, pDataIn, nSize, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
-			if (used_bytes == 0 && pOut_size == 0 && !bFlush) {
-				DLog(L"CMPCVideoDecFilter::Decode() - could not process buffer, starving?");
-				break;
-			} else if (used_bytes > 0) {
-				nSize   -= used_bytes;
-				pDataIn += used_bytes;
-			}
-
-			// Update start time cache
-			// If more data was read then output, update the cache (incomplete frame)
-			// If output is bigger or equal, a frame was completed, update the actual rtStart with the cached value, and then overwrite the cache
-			if (used_bytes > pOut_size) {
-				if (rtStartIn != INVALID_TIME) {
-					m_rtStartCache = rtStartIn;
-				}
-			/*
-			} else if (used_bytes == pOut_size || ((used_bytes + 9) == pOut_size)) {
-				// Why +9 above?
-				// Well, apparently there are some broken MKV muxers that like to mux the MPEG-2 PICTURE_START_CODE block (which is 9 bytes) in the package with the previous frame
-				// This would cause the frame timestamps to be delayed by one frame exactly, and cause timestamp reordering to go wrong.
-				// So instead of failing on those samples, lets just assume that 9 bytes are that case exactly.
-				m_rtStartCache = rtStartIn = INVALID_TIME;
-			} else if (pOut_size > used_bytes) {
-			*/
-			} else {
-				rtStart        = m_rtStartCache;
-				m_rtStartCache = rtStartIn;
-				// The value was used once, don't use it for multiple frames, that ends up in weird timings
-				rtStartIn      = INVALID_TIME;
-			}
-
-			if (pOut_size > 0 || bFlush) {
-
-				if (pOut && pOut_size > 0) {
-					if (FAILED(FillAVPacket(avpkt, pOut, pOut_size))) {
-						av_packet_free(&avpkt);
-						return E_OUTOFMEMORY;
-					}
-					avpkt->pts = rtStart;
-
-					if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO && m_bWaitingForKeyFrame
-							&& GOPFound(avpkt->data, avpkt->size)) {
-						m_bWaitingForKeyFrame = FALSE;
-					}
-				} else {
-					FillAVPacket(avpkt, NULL, 0);
-				}
-
-				const int ret2 = decode(m_pAVCtx, m_pFrame, &got_picture, avpkt);
-				bDecodeOk = (ret2 >= 0);
-				if (ret2 < 0) {
-					DLog(L"CMPCVideoDecFilter::Decode() - decoding failed despite successfull parsing");
-				}
-			}
-		} else {
-			if (!bFlush) {
-				if (FAILED(FillAVPacket(avpkt, pDataIn, nSize))) {
-					av_packet_free(&avpkt);
-					return E_OUTOFMEMORY;
-				}
-				avpkt->pts = rtStartIn;
-				if (rtStartIn != INVALID_TIME && rtStopIn != INVALID_TIME) {
-					avpkt->duration = rtStopIn - rtStartIn;
-				}
-				avpkt->flags = pIn->IsSyncPoint() == S_OK ? AV_PKT_FLAG_KEY : 0;
-			} else {
-				FillAVPacket(avpkt, NULL, 0);
-			}
-
-			ret = decode(m_pAVCtx, m_pFrame, &got_picture, avpkt);
-			bDecodeOk = (ret >= 0);
-			if (ret < 0) {
-				DLog(L"CMPCVideoDecFilter::Decode() - decoding failed");
-			}
-			nSize = 0;
-		}
-
-		if (ret < 0) {
+	HRESULT hr = S_OK;
+	BOOL bDXVADeliverFrame = FALSE;
+	for (;;) {
+		ret = avcodec_receive_frame(m_pAVCtx, m_pFrame);
+		if (ret < 0 && ret != AVERROR(EAGAIN)) {
 			av_frame_unref(m_pFrame);
-			av_packet_free(&avpkt);
-			return S_OK;
+			return S_FALSE;
 		}
 
 		if (m_bWaitKeyFrame) {
-			if (m_bWaitingForKeyFrame && got_picture) {
+			if (m_bWaitingForKeyFrame && (ret >= 0)) {
 				if (m_pFrame->key_frame) {
-					DLog(L"CMPCVideoDecFilter::Decode(): Found key-frame, resuming decoding");
+					DLog(L"CMPCVideoDecFilter::DecodeInternal(): Found key-frame, resuming decoding");
 					m_bWaitingForKeyFrame = FALSE;
 				} else {
-					got_picture = 0;
+					ret = AVERROR(EAGAIN);
 				}
 			}
 		}
 
 		UpdateAspectRatio();
 
-		if (m_nDecoderMode != MODE_SOFTWARE && bDecodeOk) {
-			hr = m_pDXVADecoder->DeliverFrame(got_picture, rtStart, rtStop);
-		}
-
-		if (!got_picture) {
-			if (!avpkt->size) {
-				bFlush = FALSE; // End flushing, no more frames
-			}
-
+		if (m_nDecoderMode == MODE_DXVA2 && ((ret >= 0) || !bDXVADeliverFrame)) {
+			hr = m_pDXVADecoder->DeliverFrame((ret >= 0), rtStartIn, rtStopIn);
+			bDXVADeliverFrame = TRUE;
 			Continue;
 		}
 
-		if (m_nDecoderMode != MODE_SOFTWARE) {
-			Continue;
+		if (ret < 0) {
+			av_frame_unref(m_pFrame);
+			break;
 		}
 
-		GetFrameTimeStamp(m_pFrame, rtStart, rtStop);
+		GetFrameTimeStamp(m_pFrame, rtStartIn, rtStopIn);
 		if (m_bRVDropBFrameTimings && m_pFrame->pict_type == AV_PICTURE_TYPE_B) {
-			rtStart = m_rtLastStop;
-			rtStop = INVALID_TIME;
+			rtStartIn = m_rtLastStop;
+			rtStopIn = INVALID_TIME;
 		}
 
-		UpdateFrameTime(rtStart, rtStop);
+		UpdateFrameTime(rtStartIn, rtStopIn);
 
-		if ((pIn && pIn->IsPreroll() == S_OK) || rtStart < 0) {
+		if (bPreroll || rtStartIn < 0) {
 			Continue;
 		}
 
@@ -2805,7 +2696,7 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 			m_FormatConverter.Converting(pDataOut, m_pFrame);
 		}
 
-		pOut->SetTime(&rtStart, &rtStop);
+		pOut->SetTime(&rtStartIn, &rtStopIn);
 		pOut->SetMediaTime(NULL, NULL);
 		SetTypeSpecificFlags(pOut);
 
@@ -2814,6 +2705,103 @@ HRESULT CMPCVideoDecFilter::Decode(IMediaSample* pIn, BYTE* pDataIn, int nSize, 
 		hr = m_pOutput->Deliver(pOut);
 
 		av_frame_unref(m_pFrame);
+	}
+
+	return hr;
+}
+
+HRESULT CMPCVideoDecFilter::ParseInternal(const BYTE *buffer, int buflen, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bPreroll)
+{
+	BOOL bFlush = (buffer == NULL);
+	BYTE* pDataBuffer = (BYTE*)buffer;
+	HRESULT hr = S_OK;
+
+	while (buflen > 0 || bFlush) {
+		REFERENCE_TIME rtStart = rtStartIn, rtStop = rtStopIn;
+
+		BYTE *pOutBuffer = NULL;
+		int pOutLen = 0;
+
+		int used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOutBuffer, &pOutLen, pDataBuffer, buflen, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
+		if (used_bytes == 0 && pOutLen == 0 && !bFlush) {
+			DLog(L"CMPCVideoDecFilter::ParseInternal() - could not process buffer, starving?");
+			break;
+		} else if (used_bytes > 0) {
+			buflen -= used_bytes;
+			pDataBuffer += used_bytes;
+		}
+
+		// Update start time cache
+		// If more data was read then output, update the cache (incomplete frame)
+		// If output is bigger or equal, a frame was completed, update the actual rtStart with the cached value, and then overwrite the cache
+		if (used_bytes > pOutLen) {
+			if (rtStartIn != INVALID_TIME) {
+				m_rtStartCache = rtStartIn;
+			}
+		/*
+		} else if (used_bytes == pOutLen || ((used_bytes + 9) == pOutLen)) {
+			// Why +9 above?
+			// Well, apparently there are some broken MKV muxers that like to mux the MPEG-2 PICTURE_START_CODE block (which is 9 bytes) in the package with the previous frame
+			// This would cause the frame timestamps to be delayed by one frame exactly, and cause timestamp reordering to go wrong.
+			// So instead of failing on those samples, lets just assume that 9 bytes are that case exactly.
+			m_rtStartCache = rtStartIn = INVALID_TIME;
+		} else if (pOut_size > used_bytes) {
+		*/
+		} else {
+			rtStart        = m_rtStartCache;
+			m_rtStartCache = rtStartIn;
+			// The value was used once, don't use it for multiple frames, that ends up in weird timings
+			rtStartIn      = INVALID_TIME;
+		}
+
+		if (pOutLen > 0) {
+			AVPacket *avpkt = av_packet_alloc();
+			if (FAILED(hr = FillAVPacket(avpkt, pOutBuffer, pOutLen))) {
+				break;
+			}
+
+			avpkt->pts = rtStart;
+
+			hr = DecodeInternal(avpkt, rtStartIn, rtStopIn, bPreroll);
+
+			av_packet_free(&avpkt);
+
+			if (FAILED(hr)) {
+				break;
+			}
+		} else if (bFlush) {
+			hr = DecodeInternal(NULL, INVALID_TIME, INVALID_TIME);
+			break;
+		}
+	}
+
+	return hr;
+}
+
+HRESULT CMPCVideoDecFilter::Decode(const BYTE *buffer, int buflen, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bSyncPoint/* = FALSE*/, BOOL bPreroll/* = FALSE*/)
+{
+	HRESULT hr = S_OK;
+
+	if (m_pParser) {
+		hr = ParseInternal(buffer, buflen, rtStartIn, rtStopIn, bPreroll);
+	} else {
+		if (!buffer) {
+			return DecodeInternal(NULL, INVALID_TIME, INVALID_TIME);
+		}
+
+		AVPacket *avpkt = av_packet_alloc();
+		if (FAILED(FillAVPacket(avpkt, buffer, buflen))) {
+			return E_OUTOFMEMORY;
+		}
+
+		avpkt->pts  = rtStartIn;
+		if (rtStartIn != INVALID_TIME && rtStopIn != INVALID_TIME) {
+			avpkt->duration = rtStopIn - rtStartIn;
+		}
+		avpkt->flags = bSyncPoint ? AV_PKT_FLAG_KEY : 0;
+
+		hr = DecodeInternal(avpkt, rtStartIn, rtStopIn, bPreroll);
+
 		av_packet_free(&avpkt);
 	}
 
@@ -2905,17 +2893,17 @@ void CMPCVideoDecFilter::SetThreadCount()
 HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 {
 	HRESULT			hr;
-	BYTE*			pDataIn;
-	int				nSize;
+	BYTE*			buffer;
+	int				buflen;
 	REFERENCE_TIME	rtStart	= INVALID_TIME;
 	REFERENCE_TIME	rtStop	= INVALID_TIME;
 
-	if (FAILED(hr = pIn->GetPointer(&pDataIn))) {
+	if (FAILED(hr = pIn->GetPointer(&buffer))) {
 		return hr;
 	}
 
-	nSize = pIn->GetActualDataLength();
-	if (nSize == 0) {
+	buflen = pIn->GetActualDataLength();
+	if (buflen == 0) {
 		return S_OK;
 	}
 
@@ -2931,12 +2919,12 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 	}
 
 	hr = m_pMSDKDecoder
-		? m_pMSDKDecoder->Decode(pDataIn, nSize, rtStart, rtStop)
-		: Decode(pIn, pDataIn, nSize, rtStart, rtStop);
+		? m_pMSDKDecoder->Decode(buffer, buflen, rtStart, rtStop)
+		: Decode(buffer, buflen, rtStart, rtStop, pIn->IsSyncPoint() == S_OK, pIn->IsPreroll() == S_OK);
 
 	m_bDecodingStart = TRUE;
 
-	return hr;
+	return S_OK;
 }
 
 void CMPCVideoDecFilter::UpdateAspectRatio()
