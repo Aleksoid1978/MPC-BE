@@ -1516,7 +1516,10 @@ static void Descriptor_56(CGolombBuffer& gb, int descriptor_length, LPSTR ISO_63
 		tlxPage.bSubtitle = (teletext_type == 0x02 || teletext_type == 0x05);
 		tlxPage.page = (teletext_magazine_number << 8) | (teletext_page_number_1 << 4) | teletext_page_number_2;
 		strcpy_s(tlxPage.lang, ch);
-		tlxPages.emplace_back(tlxPage);
+
+		if (std::find(tlxPages.begin(), tlxPages.end(), tlxPage) == tlxPages.end()) {
+			tlxPages.emplace_back(tlxPage);
+		}
 
 		pos += section_len;
 	}
