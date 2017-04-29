@@ -261,7 +261,7 @@ public:
 			return pid ? pid : ((pesid << 8) | ps1id);
 		}
 
-		bool operator == (const struct stream& s) const {
+		bool operator == (const stream& s) const {
 			return (DWORD)*this == (DWORD)s;
 		}
 	};
@@ -454,6 +454,12 @@ public:
 		bool bSubtitle = false;
 		WORD page      = 0;
 		char lang[4]   = {};
+
+		bool operator == (const teletextPage& tlxPage) const {
+			return (page == tlxPage.page
+				&& bSubtitle == tlxPage.bSubtitle
+				&& !strcmp(lang, tlxPage.lang));
+		}
 	};
 	typedef std::vector<teletextPage> teletextPages;
 
