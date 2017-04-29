@@ -1328,7 +1328,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 			BOOL bAdded = FALSE;
 			if (_streamData.codec == stream_codec::TELETEXT && !_streamData.pmt.tlxPages.empty()) {
 				for (auto& tlxPage : _streamData.pmt.tlxPages) {
-					if (tlxPage.bSubtitle) {
+					if (tlxPage.bSubtitle && tlxPage.page != 0x100) {
 						s.tlxPage = tlxPage.page;
 						strcpy_s(s.lang, tlxPage.lang);
 						FreeMediaType(s.mt);
@@ -1753,7 +1753,7 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 							teletextsubhdr hdr;
 							if (!_streamData.pmt.tlxPages.empty()) {
 								for (auto& tlxPage : _streamData.pmt.tlxPages) {
-									if (tlxPage.bSubtitle) {
+									if (tlxPage.bSubtitle && tlxPage.page != 0x100) {
 										s.tlxPage = tlxPage.page;
 										strcpy_s(s.lang, tlxPage.lang);
 										FreeMediaType(s.mt);
