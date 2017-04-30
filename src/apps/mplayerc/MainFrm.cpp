@@ -10718,8 +10718,10 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 		if (fs != State_Stopped || bForcedSetVideoRect || (fs == State_Stopped && m_fShockwaveGraph)) {
 			const CSize arxy = GetVideoSize();
 
-			int w = wr.Width();
-			int h = wr.Height();
+			double w = wr.Width();
+			double h = wr.Height();
+			long wy = wr.Width() * arxy.cy;
+			long hx = wr.Height() * arxy.cx;
 
 			dvstype dvs = (dvstype)AfxGetAppSettings().iDefaultVideoSize;
 
@@ -10737,29 +10739,52 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 				h = arxy.cy * 2;
 				break;
 			case DVS_FROMINSIDE:
+				if (!m_fShockwaveGraph) {
+					if (wy > hx) {
+						w = (double)hx / arxy.cy;
+					} else {
+						h = (double)wy / arxy.cx;
+					}
+				}
+				break;
 			case DVS_FROMOUTSIDE:
+				if (!m_fShockwaveGraph) {
+					if (wy < hx) {
+						w = (double)hx / arxy.cy;
+					} else {
+						h = (double)wy / arxy.cx;
+					}
+				}
+				break;
 			case DVS_ZOOM1:
+				if (!m_fShockwaveGraph) {
+					if (wy > hx) {
+						w = ((double)hx + (wy - hx)*0.333) / arxy.cy;
+						h = wy / arxy.cx;
+					} else {
+						h = ((double)wy + (hx - wy)*0.333)/ arxy.cx;
+						w = hx / arxy.cy;
+					}
+				}
+				break;
 			case DVS_ZOOM2:
 				if (!m_fShockwaveGraph) {
-					int dw = MulDiv(h, arxy.cx, arxy.cy);
-
-					double scale = 0;
-					switch (dvs) {
-					case DVS_ZOOM1: scale = 1.0 / 3; break;
-					case DVS_ZOOM2: scale = 2.0 / 3; break;
-					case DVS_FROMOUTSIDE: scale = 1.0; break;
+					if (wy > hx) {
+						w = ((double)hx + (wy - hx)*0.667) / arxy.cy;
+						h = w * arxy.cy / arxy.cx;
+					} else {
+						h = ((double)wy + (hx - wy)*0.667)/ arxy.cx;
+						w = h * arxy.cx / arxy.cy;
 					}
-
-					w = min(dw, w) + (int)(abs(dw - w) * scale);
-					h = MulDiv(w, arxy.cy, arxy.cx);
 				}
+				break;
 			}
 
-			CSize size((int)(m_ZoomX*w), (int)(m_ZoomY*h));
+			CSize size((int)(m_ZoomX*w + 0.5), (int)(m_ZoomY*h + 0.5));
 
 			CPoint pos(
-				(int)(m_PosX*(wr.Width()*3 - m_ZoomX*w) - wr.Width()),
-				(int)(m_PosY*(wr.Height()*3 - m_ZoomY*h) - wr.Height()));
+				(int)(m_PosX*(wr.Width()*3.0 - m_ZoomX*w) - wr.Width()),
+				(int)(m_PosY*(wr.Height()*3.0 - m_ZoomY*h) - wr.Height()));
 
 			vr = CRect(pos, size);
 		}
