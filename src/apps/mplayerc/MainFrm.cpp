@@ -10712,57 +10712,50 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 			wr -= r.TopLeft();
 		}
 
-		CRect vr = CRect(0,0,0,0);
+		CRect vr; // {0,0,0,0}
 
 		OAFilterState fs = GetMediaState();
 		if (fs != State_Stopped || bForcedSetVideoRect || (fs == State_Stopped && m_fShockwaveGraph)) {
-			CSize arxy = GetVideoSize();
+			const CSize arxy = GetVideoSize();
 
-			dvstype iDefaultVideoSize = (dvstype)AfxGetAppSettings().iDefaultVideoSize;
+			int w = wr.Width();
+			int h = wr.Height();
 
-			CSize ws =
-				iDefaultVideoSize == DVS_HALF ? CSize(arxy.cx/2, arxy.cy/2) :
-				iDefaultVideoSize == DVS_NORMAL ? arxy :
-				iDefaultVideoSize == DVS_DOUBLE ? CSize(arxy.cx*2, arxy.cy*2) :
-				wr.Size();
-			int w = ws.cx;
-			int h = ws.cy;
+			dvstype dvs = (dvstype)AfxGetAppSettings().iDefaultVideoSize;
 
-			if (!m_fShockwaveGraph) {
-				if (iDefaultVideoSize == DVS_FROMINSIDE || iDefaultVideoSize == DVS_FROMOUTSIDE ||
-						iDefaultVideoSize == DVS_ZOOM1 || iDefaultVideoSize == DVS_ZOOM2) {
-					int dh = ws.cy;
-					int dw = MulDiv(dh, arxy.cx, arxy.cy);
+			switch (dvs) {
+			case DVS_HALF:
+				w = arxy.cx / 2;
+				h = arxy.cy / 2;
+				break;
+			case DVS_NORMAL:
+				w = arxy.cx;
+				h = arxy.cy;
+				break;
+			case DVS_DOUBLE:
+				w = arxy.cx * 2;
+				h = arxy.cy * 2;
+				break;
+			case DVS_FROMINSIDE:
+			case DVS_FROMOUTSIDE:
+			case DVS_ZOOM1:
+			case DVS_ZOOM2:
+				if (!m_fShockwaveGraph) {
+					int dw = MulDiv(h, arxy.cx, arxy.cy);
 
-					int i = 0;
-					switch (iDefaultVideoSize) {
-						case DVS_ZOOM1:
-							i = 1;
-							break;
-						case DVS_ZOOM2:
-							i = 2;
-							break;
-						case DVS_FROMOUTSIDE:
-							i = 3;
-							break;
-					}
-					int minw = dw;
-					int maxw = dw;
-					if (ws.cx < dw) {
-						minw = ws.cx;
-					} else if (ws.cx > dw) {
-						maxw = ws.cx;
+					double scale = 0;
+					switch (dvs) {
+					case DVS_ZOOM1: scale = 1.0 / 3; break;
+					case DVS_ZOOM2: scale = 2.0 / 3; break;
+					case DVS_FROMOUTSIDE: scale = 1.0; break;
 					}
 
-					float scale = i / 3.0f;
-					w = minw + (maxw - minw) * scale;
+					w = min(dw, w) + (int)(abs(dw - w) * scale);
 					h = MulDiv(w, arxy.cy, arxy.cx);
 				}
 			}
 
-			CSize size(
-				(int)(m_ZoomX*w),
-				(int)(m_ZoomY*h));
+			CSize size((int)(m_ZoomX*w), (int)(m_ZoomY*h));
 
 			CPoint pos(
 				(int)(m_PosX*(wr.Width()*3 - m_ZoomX*w) - wr.Width()),
@@ -10770,11 +10763,6 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 
 			vr = CRect(pos, size);
 		}
-
-		// What does this do exactly ?
-		// Add comments when you add this kind of code !
-		//wr |= CRect(0,0,0,0);
-		//vr |= CRect(0,0,0,0);
 
 		if (m_pCAP) {
 			m_pCAP->SetPosition(wr, vr);
