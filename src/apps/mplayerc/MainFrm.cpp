@@ -1975,19 +1975,20 @@ void CMainFrame::OnSizing(UINT nSide, LPRECT pRect)
 
 	const bool bWider = windowSize.cy < windowSize.cx;
 
-	windowSize.SetSize(
-		int(windowSize.cy * videoSize.cx / (double)videoSize.cy + 0.5),
-		int(windowSize.cx * videoSize.cy / (double)videoSize.cx + 0.5));
+	windowSize.SetSize(MulDiv(windowSize.cy, videoSize.cx, videoSize.cy), MulDiv(windowSize.cx, videoSize.cy, videoSize.cx));
 
 	windowSize += decorationsSize;
 
 	if (nSide == WMSZ_TOP || nSide == WMSZ_BOTTOM || (!bWider && (nSide == WMSZ_TOPRIGHT || nSide == WMSZ_BOTTOMRIGHT))) {
 		pRect->right = pRect->left + windowSize.cx;
-	} else if (nSide == WMSZ_LEFT || nSide == WMSZ_RIGHT || (bWider && (nSide == WMSZ_BOTTOMLEFT || nSide == WMSZ_BOTTOMRIGHT))) {
+	}
+	else if (nSide == WMSZ_LEFT || nSide == WMSZ_RIGHT || (bWider && (nSide == WMSZ_BOTTOMLEFT || nSide == WMSZ_BOTTOMRIGHT))) {
 		pRect->bottom = pRect->top + windowSize.cy;
-	} else if (!bWider && (nSide == WMSZ_TOPLEFT || nSide == WMSZ_BOTTOMLEFT)) {
+	}
+	else if (!bWider && (nSide == WMSZ_TOPLEFT || nSide == WMSZ_BOTTOMLEFT)) {
 		pRect->left = pRect->right - windowSize.cx;
-	} else if (bWider && (nSide == WMSZ_TOPLEFT || nSide == WMSZ_TOPRIGHT)) {
+	}
+	else if (bWider && (nSide == WMSZ_TOPLEFT || nSide == WMSZ_TOPRIGHT)) {
 		pRect->top = pRect->bottom - windowSize.cy;
 	}
 
@@ -10254,10 +10255,12 @@ CSize CMainFrame::GetVideoSize()
 		return ret;
 	}
 
-	// with the overlay mixer IBasicVideo2 won't tell the new AR when changed dynamically
-	DVD_VideoAttributes VATR;
-	if (GetPlaybackMode() == PM_DVD && SUCCEEDED(m_pDVDI->GetCurrentVideoAttributes(&VATR))) {
-		arxy.SetSize(VATR.ulAspectX, VATR.ulAspectY);
+	if (GetPlaybackMode() == PM_DVD) {
+		// with the overlay mixer IBasicVideo2 won't tell the new AR when changed dynamically
+		DVD_VideoAttributes VATR;
+		if (SUCCEEDED(m_pDVDI->GetCurrentVideoAttributes(&VATR))) {
+			arxy.SetSize(VATR.ulAspectX, VATR.ulAspectY);
+		}
 	}
 
 	CSize& ar = AfxGetAppSettings().sizeAspectRatio;
