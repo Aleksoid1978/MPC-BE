@@ -10779,8 +10779,8 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 			CSize size((int)(m_ZoomX*w + 0.5), (int)(m_ZoomY*h + 0.5));
 
 			// HACK: remove jitter of frame width
-			if (size.cx + 1 == wr.Width()) {
-				size.cx += 1;
+			if (abs(wr.Width() - size.cx) == 1) {
+				size.cx = wr.Width();
 			}
 
 			CPoint pos(
