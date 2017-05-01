@@ -10756,10 +10756,10 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 				if (!m_fShockwaveGraph) {
 					if (wy > hx) {
 						w = ((double)hx + (wy - hx)*0.333) / arxy.cy;
-						h = wy / arxy.cx;
+						h = w * arxy.cy / arxy.cx;
 					} else {
 						h = ((double)wy + (hx - wy)*0.333)/ arxy.cx;
-						w = hx / arxy.cy;
+						w = h * arxy.cx / arxy.cy;
 					}
 				}
 				break;
@@ -10777,6 +10777,11 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 			}
 
 			CSize size((int)(m_ZoomX*w + 0.5), (int)(m_ZoomY*h + 0.5));
+
+			// HACK: remove jitter of frame width
+			if (size.cx + 1 == wr.Width()) {
+				size.cx += 1;
+			}
 
 			CPoint pos(
 				(int)(m_PosX*(wr.Width()*3.0 - m_ZoomX*w) - wr.Width()),
