@@ -1957,39 +1957,35 @@ void CMainFrame::OnSizing(UINT nSide, LPRECT pRect)
 		return;
 	}
 
-	CSize windowSize(pRect->right - pRect->left, pRect->bottom - pRect->top);
-	CSize videoSize = GetVideoSize();
+	const CSize videoSize = GetVideoSize();
 	if (!videoSize.cx || !videoSize.cy) {
 		return;
 	}
 
 	CSize decorationsSize;
-	CalcControlsSize(decorationsSize);
-
 	CRect decorationsRect;
+	CalcControlsSize(decorationsSize);
 	VERIFY(AdjustWindowRectEx(decorationsRect, GetWindowStyle(m_hWnd), !IsMenuHidden(), GetWindowExStyle(m_hWnd)));
-	decorationsSize.cx += decorationsRect.Width();
-	decorationsSize.cy += decorationsRect.Height();
+	decorationsSize += decorationsRect.Size();
 
-	windowSize -= decorationsSize;
+	const CSize videoAreaSize(pRect->right - pRect->left - decorationsSize.cx, pRect->bottom - pRect->top - decorationsSize.cy);
+	const bool bWider = videoAreaSize.cy < videoAreaSize.cx;
 
-	const bool bWider = windowSize.cy < windowSize.cx;
-
-	windowSize.SetSize(MulDiv(windowSize.cy, videoSize.cx, videoSize.cy), MulDiv(windowSize.cx, videoSize.cy, videoSize.cx));
-
-	windowSize += decorationsSize;
+	// new proportional width and height of the window. only one of these values is used.
+	long w = MulDiv(videoAreaSize.cy, videoSize.cx, videoSize.cy) + decorationsSize.cx;
+	long h = MulDiv(videoAreaSize.cx, videoSize.cy, videoSize.cx) + decorationsSize.cy;
 
 	if (nSide == WMSZ_TOP || nSide == WMSZ_BOTTOM || (!bWider && (nSide == WMSZ_TOPRIGHT || nSide == WMSZ_BOTTOMRIGHT))) {
-		pRect->right = pRect->left + windowSize.cx;
+		pRect->right = pRect->left + w;
 	}
 	else if (nSide == WMSZ_LEFT || nSide == WMSZ_RIGHT || (bWider && (nSide == WMSZ_BOTTOMLEFT || nSide == WMSZ_BOTTOMRIGHT))) {
-		pRect->bottom = pRect->top + windowSize.cy;
+		pRect->bottom = pRect->top + h;
 	}
 	else if (!bWider && (nSide == WMSZ_TOPLEFT || nSide == WMSZ_BOTTOMLEFT)) {
-		pRect->left = pRect->right - windowSize.cx;
+		pRect->left = pRect->right - w;
 	}
 	else if (bWider && (nSide == WMSZ_TOPLEFT || nSide == WMSZ_TOPRIGHT)) {
-		pRect->top = pRect->bottom - windowSize.cy;
+		pRect->top = pRect->bottom - h;
 	}
 
 	FlyBarSetPos();
