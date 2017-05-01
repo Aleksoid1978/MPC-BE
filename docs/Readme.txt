@@ -35,7 +35,6 @@ MPC-BE makes use of the following 3rd party code:
 
 Project             License                    Website
 -------------------------------------------------------------------------------------
-ATL Server          Ms-LPL                     http://atlserver.codeplex.com/
 Bento4              GPLv2                      http://zebulon.bok.net/trac/Bento4/
 CFileVersionInfo    -                          -
 CLineNumberEdit     -                          -
