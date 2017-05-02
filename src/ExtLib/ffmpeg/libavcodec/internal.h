@@ -48,8 +48,8 @@
 #define FF_CODEC_CAP_INIT_CLEANUP           (1 << 1)
 /**
  * Decoders marked with FF_CODEC_CAP_SETS_PKT_DTS want to set
- * AVFrame.pkt_dts manually. If the flag is set, utils.c won't overwrite
- * this field. If it's unset, utils.c tries to guess the pkt_dts field
+ * AVFrame.pkt_dts manually. If the flag is set, decode.c won't overwrite
+ * this field. If it's unset, decode.c tries to guess the pkt_dts field
  * from the input AVPacket.
  */
 #define FF_CODEC_CAP_SETS_PKT_DTS           (1 << 2)
@@ -101,6 +101,16 @@ typedef struct FramePool {
     int samples;
 } FramePool;
 
+typedef struct DecodeSimpleContext {
+    AVPacket *in_pkt;
+    AVFrame  *out_frame;
+} DecodeSimpleContext;
+
+typedef struct DecodeFilterContext {
+    AVBSFContext **bsfs;
+    int         nb_bsfs;
+} DecodeFilterContext;
+
 typedef struct AVCodecInternal {
     /**
      * Whether the parent AVCodecContext is a copy of the context which had
@@ -137,11 +147,14 @@ typedef struct AVCodecInternal {
 
     void *thread_ctx;
 
+    DecodeSimpleContext ds;
+    DecodeFilterContext filter;
+
     /**
-     * Current packet as passed into the decoder, to avoid having to pass the
-     * packet into every function.
+     * Properties (timestamps+side data) extracted from the last packet passed
+     * for decoding.
      */
-    const AVPacket *pkt;
+    AVPacket *last_pkt_props;
 
     /**
      * temporary buffer used for encoders to store their bitstream
@@ -173,9 +186,23 @@ typedef struct AVCodecInternal {
     int buffer_pkt_valid; // encoding: packet without data can be valid
     AVFrame *buffer_frame;
     int draining_done;
+    /* set to 1 when the caller is using the old decoding API */
+    int compat_decode;
+    int compat_decode_warned;
+    /* this variable is set by the decoder internals to signal to the old
+     * API compat wrappers the amount of data consumed from the last packet */
+    size_t compat_decode_consumed;
+    /* when a partial packet has been consumed, this stores the remaining size
+     * of the packet (that should be submitted in the next decode call */
+    size_t compat_decode_partial_size;
+    AVFrame *compat_decode_frame;
+
     int showed_multi_packet_warning;
 
     int skip_samples_multiplier;
+
+    /* to prevent infinite loop on errors when draining */
+    int nb_draining_errors;
 } AVCodecInternal;
 
 struct AVCodecDefault {

@@ -85,6 +85,7 @@ SRCS_LC = \
 	\
 	libavcodec/8bps.c \
 	libavcodec/aac_ac3_parser.c \
+	libavcodec/aac_adtstoasc_bsf.c \
 	libavcodec/aac_parser.c \
 	libavcodec/aacadtsdec.c \
 	libavcodec/aacdec.c \
@@ -144,6 +145,7 @@ SRCS_LC = \
 	libavcodec/celp_math.c \
 	libavcodec/cfhd.c \
 	libavcodec/cfhddata.c \
+	libavcodec/chomp_bsf.c \
 	libavcodec/cinepak.c \
 	libavcodec/cllc.c \
 	libavcodec/codec_desc.c \
@@ -151,6 +153,7 @@ SRCS_LC = \
 	libavcodec/cscd.c \
 	libavcodec/dca.c \
 	libavcodec/dca_core.c \
+	libavcodec/dca_core_bsf.c \
 	libavcodec/dca_exss.c \
 	libavcodec/dca_lbr.c \
 	libavcodec/dca_parser.c \
@@ -177,6 +180,7 @@ SRCS_LC = \
 	libavcodec/dsd.c \
 	libavcodec/dsddec.c \
 	libavcodec/dstdec.c \
+	libavcodec/dump_extradata_bsf.c \
 	libavcodec/dv.c \
 	libavcodec/dv_profile.c \
 	libavcodec/dvdata.c \
@@ -187,6 +191,7 @@ SRCS_LC = \
 	libavcodec/encode.c \
 	libavcodec/error_resilience.c \
 	libavcodec/exif.c \
+	libavcodec/extract_extradata_bsf.c \
 	libavcodec/faandct.c \
 	libavcodec/faanidct.c \
 	libavcodec/fdctdsp.c \
@@ -236,6 +241,7 @@ SRCS_LC = \
 	libavcodec/hevc_cabac.c \
 	libavcodec/hevc_data.c \
 	libavcodec/hevc_filter.c \
+	libavcodec/hevc_mp4toannexb_bsf.c \
 	libavcodec/hevc_mvs.c \
 	libavcodec/hevc_parse.c \
 	libavcodec/hevc_parser.c \
@@ -259,6 +265,7 @@ SRCS_LC = \
 	libavcodec/idctdsp.c \
 	libavcodec/imc.c \
 	libavcodec/imgconvert.c \
+	libavcodec/imx_dump_header_bsf.c \
 	libavcodec/indeo3.c \
 	libavcodec/indeo4.c \
 	libavcodec/indeo5.c \
@@ -291,6 +298,8 @@ SRCS_LC = \
 	libavcodec/metasound.c \
 	libavcodec/metasound_data.c \
 	libavcodec/mjpeg_parser.c \
+	libavcodec/mjpeg2jpeg_bsf.c \
+	libavcodec/mjpega_dump_header_bsf.c \
 	libavcodec/mjpegbdec.c \
 	libavcodec/mjpegdec.c \
 	libavcodec/mlp.c \
@@ -299,6 +308,8 @@ SRCS_LC = \
 	libavcodec/mlpdsp.c \
 	libavcodec/mlz.c \
 	libavcodec/motion_est.c \
+	libavcodec/movsub_bsf.c \
+	libavcodec/mp3_header_decompress_bsf.c \
 	libavcodec/mpc.c \
 	libavcodec/mpc7.c \
 	libavcodec/mpc8.c \
@@ -307,6 +318,7 @@ SRCS_LC = \
 	libavcodec/mpeg12data.c \
 	libavcodec/mpeg12dec.c \
 	libavcodec/mpeg12framerate.c \
+	libavcodec/mpeg4_unpack_bframes_bsf.c \
 	libavcodec/mpeg4audio.c \
 	libavcodec/mpeg4video.c \
 	libavcodec/mpeg4video_parser.c \
@@ -346,6 +358,8 @@ SRCS_LC = \
 	libavcodec/nellymoserdec.c
 
 SRCS_LC_B = \
+	libavcodec/noise_bsf.c \
+	libavcodec/null_bsf.c \
 	libavcodec/options.c \
 	libavcodec/opus.c \
 	libavcodec/opus_celt.c \
@@ -380,6 +394,7 @@ SRCS_LC_B = \
 	libavcodec/raw.c \
 	libavcodec/rawdec.c \
 	libavcodec/rdft.c \
+	libavcodec/remove_extradata_bsf.c \
 	libavcodec/rl.c \
 	libavcodec/rpza.c \
 	libavcodec/rv10.c \
@@ -455,6 +470,8 @@ SRCS_LC_B = \
 	libavcodec/vp8dsp.c \
 	libavcodec/vp9.c \
 	libavcodec/vp9_parser.c \
+	libavcodec/vp9_superframe_bsf.c \
+	libavcodec/vp9_superframe_split_bsf.c \
 	libavcodec/vp9block.c \
 	libavcodec/vp9data.c \
 	libavcodec/vp9dsp.c \
