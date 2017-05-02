@@ -195,6 +195,7 @@ private :
 
         stream_t       StreamKind;
         size_t         StreamPos;
+        size_t         Count; //TODO: in case there are different stream kinds
         int8u          stream_type;
         int32u         program_format_identifier;
         int32u         format_identifier;
@@ -215,6 +216,7 @@ private :
         {
             StreamKind=Stream_Max;
             StreamPos=0;
+            Count=0;
             stream_type=0;
             program_format_identifier=0x00000000; //No info
             format_identifier=0x00000000; //No info

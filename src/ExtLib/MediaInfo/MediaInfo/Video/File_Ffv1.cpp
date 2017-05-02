@@ -824,7 +824,7 @@ void File_Ffv1::Read_Buffer_Continue()
             Fill(Stream_Video, 0, Video_ScanType, Ffv1_picture_structure_ScanType(picture_structure));
             Fill(Stream_Video, 0, Video_ScanOrder, Ffv1_picture_structure_ScanOrder(picture_structure));
             if (sample_aspect_ratio_num && sample_aspect_ratio_den)
-                Fill(Stream_Video, 0, Video_PixelAspectRatio, sample_aspect_ratio_num/sample_aspect_ratio_den);
+                Fill(Stream_Video, 0, Video_PixelAspectRatio, ((float64)sample_aspect_ratio_num)/sample_aspect_ratio_den);
         }
 
         Frame_Count++;

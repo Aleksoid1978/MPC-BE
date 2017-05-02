@@ -3286,7 +3286,8 @@ void File_Mk::Segment_Tracks_TrackEntry_Audio_BitDepth()
     FILLING_BEGIN();
         if (Segment_Info_Count>1)
             return; //First element has the priority
-        Fill(StreamKind_Last, StreamPos_Last, "BitDepth", UInteger, 10, true);
+        if (UInteger)
+            Fill(StreamKind_Last, StreamPos_Last, "BitDepth", UInteger, 10, true);
     FILLING_END();
 }
 

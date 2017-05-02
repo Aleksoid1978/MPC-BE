@@ -389,6 +389,7 @@ void File_MpegPs::Streams_Fill_PerStream(size_t StreamID, ps_stream &Temp, kindo
             }
         }
     }
+    Temp.Count=Count;
 
     #ifdef MEDIAINFO_MPEG4_YES
         if (StreamKind_Last==Stream_Audio && SLConfig)
@@ -618,11 +619,14 @@ void File_MpegPs::Streams_Finish_PerStream(size_t StreamID, ps_stream &Temp, kin
                     return;
             #endif //MEDIAINFO_DEMUX
         }
-        Ztring ID=Retrieve(StreamKind_Last, StreamPos_Last, General_ID);
-        Ztring ID_String=Retrieve(StreamKind_Last, StreamPos_Last, General_ID_String);
-        Merge(*Temp.Parsers[0], StreamKind_Last, 0, StreamPos_Last);
-        Fill(StreamKind_Last, StreamPos_Last, General_ID, ID, true);
-        Fill(StreamKind_Last, StreamPos_Last, General_ID_String, ID_String, true);
+        for (size_t Pos=0; Pos<Temp.Count; Pos++)
+        {
+            Ztring ID=Retrieve(StreamKind_Last, Temp.StreamPos+Pos, General_ID);
+            Ztring ID_String=Retrieve(StreamKind_Last, Temp.StreamPos+Pos, General_ID_String);
+            Merge(*Temp.Parsers[0], StreamKind_Last, Pos, Temp.StreamPos+Pos);
+            Fill(StreamKind_Last, Temp.StreamPos+Pos, General_ID, ID, true);
+            Fill(StreamKind_Last, Temp.StreamPos+Pos, General_ID_String, ID_String, true);
+        }
         if (!IsSub)
         {
             switch (KindOfStream)
@@ -702,6 +706,7 @@ void File_MpegPs::Streams_Finish_PerStream(size_t StreamID, ps_stream &Temp, kin
     }
 
     //Duration if it is missing from the parser
+    int64u Duration=0;
     if (Temp.StreamKind!=Stream_Max && Retrieve(Temp.StreamKind, Temp.StreamPos, Fill_Parameter(Temp.StreamKind, Generic_Duration)).empty())
     {
          StreamKind_Last=Temp.StreamKind;
@@ -727,7 +732,7 @@ void File_MpegPs::Streams_Finish_PerStream(size_t StreamID, ps_stream &Temp, kin
                 End+=0x200000000LL; //33 bits, cyclic
             if (Start<End)
             {
-                int64u Duration=End-Start;
+                Duration=End-Start;
                 if (ByteDifference!=(int64u)-1)
                 {
                     float BitRate=(ByteDifference*8)/(((float)Duration)/9000);
@@ -742,15 +747,21 @@ void File_MpegPs::Streams_Finish_PerStream(size_t StreamID, ps_stream &Temp, kin
                         if (FrameRate!=0)
                             Duration+=Ztring::ToZtring(90*1000/FrameRate, 0).To_int64u(); //We imagine that there is one frame in it
                     }
+                    Duration/=90;
 
-                    //Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Duration), Duration/90, 10, true); //TODO: refactor in order to have a more optimal way to manage several streams
-                    for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Max; StreamKind++)
-                        for (size_t StreamPos=0; StreamPos<Count_Get(StreamKind_Last); StreamPos++)
-                            if (Retrieve((stream_t)StreamKind, StreamPos, Fill_Parameter((stream_t)StreamKind, Generic_Duration)).empty())
-                                Fill((stream_t)StreamKind, StreamPos, Fill_Parameter((stream_t)StreamKind, Generic_Duration), Duration/90, 10);
+                    Fill(Temp.StreamKind, Temp.StreamPos, Fill_Parameter(Temp.StreamKind, Generic_Duration), Duration);
                 }
             }
         }
+    }
+    if (!Duration && !Retrieve(Temp.StreamKind, Temp.StreamPos, Fill_Parameter(Temp.StreamKind, Generic_Duration)).empty())
+        Duration=Retrieve(Temp.StreamKind, Temp.StreamPos, Fill_Parameter(Temp.StreamKind, Generic_Duration)).To_int64u();
+    if (Duration)
+    {
+        for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Max; StreamKind++)
+            for (size_t StreamPos=0; StreamPos<Count_Get((stream_t)StreamKind); StreamPos++)
+                if ((IsSub || (KindOfStream==KindOfStream_Main && Retrieve((stream_t)StreamKind, StreamPos, General_ID).To_int64u()==StreamID)) && Retrieve((stream_t)StreamKind, StreamPos, Fill_Parameter((stream_t)StreamKind, Generic_Duration)).empty())
+                    Fill((stream_t)StreamKind, StreamPos, Fill_Parameter((stream_t)StreamKind, Generic_Duration), Duration);
     }
 
     //Bitrate calculation
@@ -3233,6 +3244,8 @@ void File_MpegPs::private_stream_2()
         Stream_Prepare(Stream_Menu);
         Fill(Stream_Menu, StreamPos_Last, Menu_Format, "DVD-Video");
         Fill(Stream_Menu, StreamPos_Last, Menu_Codec, "DVD-Video");
+        Streams[0xBF].StreamKind=StreamKind_Last;
+        Streams[0xBF].StreamPos=StreamPos_Last;
 
         //Disabling this Stream
         Streams[0xBF].Searching_Payload=false;

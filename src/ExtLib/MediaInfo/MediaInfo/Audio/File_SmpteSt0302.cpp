@@ -148,6 +148,22 @@ void File_SmpteSt0302::Streams_Fill()
         Fill(Stream_Audio, Pos, Audio_BitRate_Encoded, 0);
 }
 
+//---------------------------------------------------------------------------
+void File_SmpteSt0302::Streams_Finish()
+{
+    if (Parsers.size()==1 && Parsers[0]->Status[IsAccepted])
+    {
+        Finish(Parsers[0]);
+        for (size_t Pos=0; Pos<Count_Get(Stream_Audio); Pos++)
+        {
+            if (!Parsers[0]->Retrieve(Stream_Audio, Pos, Audio_Duration).empty())
+                Fill(Stream_Audio, Pos, Audio_Duration, Parsers[0]->Retrieve(Stream_Audio, Pos, Audio_Duration), true);
+            if (!Parsers[0]->Retrieve(Stream_Audio, Pos, Audio_FrameCount).empty())
+                Fill(Stream_Audio, Pos, Audio_FrameCount, Parsers[0]->Retrieve(Stream_Audio, Pos, Audio_FrameCount), true);
+        }
+    }
+}
+
 //***************************************************************************
 // Buffer - Global
 //***************************************************************************

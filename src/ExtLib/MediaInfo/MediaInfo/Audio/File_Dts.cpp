@@ -692,7 +692,10 @@ void File_Dts::Streams_Finish()
     if (FrameInfo.PTS!=(int64u)-1 && FrameInfo.PTS>PTS_Begin)
     {
         Fill(Stream_Audio, 0, Audio_Duration, ((float64)(FrameInfo.PTS-PTS_Begin))/1000000, 0, true);
-        Fill(Stream_Audio, 0, Audio_FrameCount, ((float64)(FrameInfo.PTS-PTS_Begin))/1000000/32, 0, true);
+        float64 SamplesPerFrame=Retrieve(Stream_Audio, 0, Audio_SamplesPerFrame).To_float64();
+        float64 SamplingRate=Retrieve(Stream_Audio, 0, Audio_SamplingRate).To_float64();
+        if (SamplesPerFrame && SamplingRate)
+            Fill(Stream_Audio, 0, Audio_FrameCount, ((float64)(FrameInfo.PTS-PTS_Begin))/1000000000/(SamplesPerFrame/SamplingRate), 0, true);
     }
 }
 

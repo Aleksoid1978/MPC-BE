@@ -32,8 +32,17 @@ public :
     {
         Version_1_5,
         Version_1_6,
+        Version_1_8,
+        Version_Max
     };
-    Ztring Transform(MediaInfo_Internal &MI, version Version=Version_1_6);
+    enum acquisitiondataoutputmode
+    {
+        AcquisitionDataOutputMode_Default,
+        AcquisitionDataOutputMode_parameterSegment,
+        AcquisitionDataOutputMode_segmentParameter,
+        AcquisitionDataOutputMode_Max,
+    };
+    ZenLib::Ztring Transform(MediaInfo_Internal &MI, version Version=version(Version_Max-1), acquisitiondataoutputmode AcquisitionDataOutputMode=AcquisitionDataOutputMode_Default);
 };
 
 } //NameSpace

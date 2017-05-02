@@ -1254,11 +1254,11 @@ Ztring Export_Fims::Transform(MediaInfo_Internal &MI, version Version)
     ToReturn+=__T("<!-- Preliminary version (not for production) -->\n");
     ToReturn+=__T("<!-- dateLastModified=\"")+Date+__T("\" timeLastModified=\"")+Time+__T("Z\" -->\n");
     if (Version==Version_1_1)
-        ToReturn+=__T("<bms:bmContent xmlns:desc=\"http://description.fims.tv\" xmlns:tim=\"http://baseTime.fims.tv\"\n    xmlns:bms=\"http://base.fims.tv\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n    xsi:schemaLocation=\"http://base.fims.tv http://mediaarea.net/temp/baseMediaService-V1_1_0.xsd\">\n");
+        ToReturn+=__T("<bms:bmContent xmlns:desc=\"http://description.fims.tv\" xmlns:tim=\"http://baseTime.fims.tv\"\n    xmlns:bms=\"http://base.fims.tv\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n    xsi:schemaLocation=\"http://base.fims.tv https://mediaarea.net/temp/baseMediaService-V1_1_0.xsd\">\n");
     if (Version==Version_1_2)
-        ToReturn+=__T("<bms:bmContent xmlns:desc=\"http://description.fims.tv\" xmlns:tim=\"http://baseTime.fims.tv\"\n    xmlns:bms=\"http://base.fims.tv\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n    xsi:schemaLocation=\"http://base.fims.tv http://mediaarea.net/temp/baseMediaService-V1_2_0.xsd\">\n");
+        ToReturn+=__T("<bms:bmContent xmlns:desc=\"http://description.fims.tv\" xmlns:tim=\"http://baseTime.fims.tv\"\n    xmlns:bms=\"http://base.fims.tv\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n    xsi:schemaLocation=\"http://base.fims.tv https://mediaarea.net/temp/baseMediaService-V1_2_0.xsd\">\n");
     if (Version==Version_1_3)
-        ToReturn+=__T("<bms:bmContent xmlns:desc=\"http://description.fims.tv\" xmlns:tim=\"http://baseTime.fims.tv\"\n    xmlns:bms=\"http://base.fims.tv\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n    xsi:schemaLocation=\"http://base.fims.tv http://mediaarea.net/temp/baseMediaService-V1_3_0.xsd\">\n");
+        ToReturn+=__T("<bms:bmContent xmlns:desc=\"http://description.fims.tv\" xmlns:tim=\"http://baseTime.fims.tv\"\n    xmlns:bms=\"http://base.fims.tv\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n    xsi:schemaLocation=\"http://base.fims.tv https://mediaarea.net/temp/baseMediaService-V1_3_0.xsd\">\n");
     ToReturn+=__T("\t<bms:resourceID/>\n");
 
     //bmContentFormats

@@ -104,8 +104,7 @@ void File_Nut::Header_Parse()
     {
         //Frame
         Header_Fill_Code(0, "Frame");
-        Header_Fill_Size(0);
-        Finish();
+        Header_Fill_Size(File_Size-(File_Offset+Buffer_Offset+Element_Offset));
     }
 }
 

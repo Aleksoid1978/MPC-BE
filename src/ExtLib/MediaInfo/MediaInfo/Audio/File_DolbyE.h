@@ -41,6 +41,7 @@ public :
 private :
     //Streams management
     void Streams_Fill();
+    void Streams_Finish();
 
     //Buffer - Synchro
     bool Synchronize();
