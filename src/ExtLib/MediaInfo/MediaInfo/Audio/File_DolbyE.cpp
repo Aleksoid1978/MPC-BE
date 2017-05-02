@@ -639,6 +639,27 @@ void File_DolbyE::Streams_Fill()
     Fill(Stream_General, 0, General_OverallBitRate, Element_Size*8*Mpegv_frame_rate[FrameRate], 0);
 }
 
+//---------------------------------------------------------------------------
+void File_DolbyE::Streams_Finish()
+{
+    if (FrameInfo.PTS!=(int64u)-1 && FrameInfo.PTS>PTS_Begin)
+    {
+        int64s Duration=float64_int64s(((float64)(FrameInfo.PTS-PTS_Begin))/1000000);
+        int64s FrameCount;
+        if (Mpegv_frame_rate[FrameRate])
+            FrameCount=float64_int64s(((float64)(FrameInfo.PTS-PTS_Begin))/1000000000*Mpegv_frame_rate[FrameRate]);
+        else
+            FrameCount=0;
+
+        for (size_t Pos=0; Pos<Count_Get(Stream_Audio); Pos++)
+        {
+            Fill(Stream_Audio, Pos, Audio_Duration, Duration);
+            if (FrameCount)
+                Fill(Stream_Audio, Pos, Audio_FrameCount, FrameCount);
+        }
+    }
+}
+
 //***************************************************************************
 // Buffer - Synchro
 //***************************************************************************
@@ -831,6 +852,7 @@ void File_DolbyE::Data_Parse()
         if (!Status[IsAccepted])
         {
             Accept("Dolby E");
+            PTS_Begin=FrameInfo.PTS;
 
             //Guard band
             GuardBand_Before_Initial=GuardBand_Before;
@@ -847,10 +869,8 @@ void File_DolbyE::Data_Parse()
             FrameInfo.DTS+=FrameInfo.DUR;
         if (FrameInfo.PTS!=(int64u)-1)
             FrameInfo.PTS+=FrameInfo.DUR;
-        if (Frame_Count==1)
-        {
-            Finish("Dolby E");
-        }
+        if (!Status[IsFilled])
+            Fill("Dolby E");
     FILLING_END();
     if (Frame_Count==0 && Buffer_TotalBytes>Buffer_TotalBytes_FirstSynched_Max)
         Reject("Dolby E");

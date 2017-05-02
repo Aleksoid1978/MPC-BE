@@ -1161,54 +1161,6 @@ Ztring EbuCore_Transform_Text(Ztring &ToReturn, MediaInfo_Internal &MI, size_t S
 }
 
 //---------------------------------------------------------------------------
-#if 0 //Old version
-void EbuCore_Transform_AcquisitionMetadata(Ztring &ToReturn, MediaInfo_Internal &MI, size_t StreamPos, Export_EbuCore::version Version)
-{
-    ToReturn+=__T("\t\t\t<!-- (Proof of concept, for feedback only)\n");
-
-    ToReturn+=__T("\t\t\t<ebucore:acquisitionDataFormat>\n");
-    for (size_t i = MediaInfoLib::Config.Info_Get(Stream_Other).size(); i < MI.Count_Get(Stream_Other, StreamPos); ++i)
-    {
-        Ztring Name=MI.Get(Stream_Other, StreamPos, i, Info_Name);
-        Ztring totalFrameCount=MI.Get(Stream_Other, StreamPos, Other_FrameCount);
-        if (Name.size()>7 && Name.find(__T("_Values"), 7) == Name.size() - 7)
-        {
-            ZtringList Values;
-            Values.Separator_Set(0, __T(" / "));
-            Values.Write(MI.Get(Stream_Other, StreamPos, i));
-            ZtringList FrameCounts;
-            FrameCounts.Separator_Set(0, __T(" / "));
-            FrameCounts.Write(MI.Get(Stream_Other, StreamPos, i+1)); // _FrameCounts is afters _Values
-            Name.resize(Name.size() - 7);
-            if (Values.size() == FrameCounts.size())
-            {
-                ToReturn+=__T("\t\t\t\t<acquisitionParameter name=\"");
-                ToReturn+=Name;
-                ToReturn+=__T("\"");
-                if (!totalFrameCount.empty())
-                    ToReturn+=__T(" totalDuration=\"")+totalFrameCount+__T("\"");
-                ToReturn+=__T(">\n");
-                for (size_t Pos = 0; Pos < Values.size(); Pos++)
-                {
-                    ToReturn+=__T("\t\t\t\t\t<value");
-                    if (FrameCounts[Pos]!=__T("1"))
-                        ToReturn+=__T(" duration=\"")+FrameCounts[Pos]+__T("\"");
-                    ToReturn+=__T(">");
-                    ToReturn += Values[Pos];
-                    ToReturn+=__T("</value>\n");
-                }
-                ToReturn+=__T("\t\t\t\t</acquisitionParameter>\n");
-            }
-        }
-    }
-
-    ToReturn+=__T("\t\t\t</ebucore:acquisitionDataFormat>\n");
-
-    ToReturn+=__T("\t\t\t-->\n");
-}
-#endif //0
-
-//---------------------------------------------------------------------------
 Ztring EbuCore_Duration(int64s MS)
 {
     Ztring DurationString3;
@@ -1278,147 +1230,384 @@ Ztring EbuCore_Duration(int64s MS)
 }
 
 //---------------------------------------------------------------------------
-void EbuCore_Transform_AcquisitionMetadata(Ztring &ToReturn, MediaInfo_Internal &MI, size_t StreamPos, Export_EbuCore::version Version)
+Ztring EbuCore_FrameRate(const Ztring& Name, const Ztring& Rational, const Ztring& Num, const Ztring& Den)
 {
-    ToReturn+=__T("\t\t\t<!-- (Proof of concept, for feedback only)\n");
-
-    ToReturn+=__T("\t\t\t<acquisitionDataFormat>\n");
-    Ztring StreamDuration=MI.Get(Stream_Other, StreamPos, Other_Duration_String3);
-    if (!StreamDuration.empty())
-       ToReturn+=__T("\t\t\t\t<duration>")+StreamDuration+__T("</duration>\n");
-    float64 FrameRate=MI.Get(Stream_Other, StreamPos, Other_FrameRate_Num).To_float64();
-    if (FrameRate)
-        FrameRate/=MI.Get(Stream_Other, StreamPos, Other_FrameRate_Den).To_float64();
-    else
-        FrameRate=MI.Get(Stream_Other, StreamPos, Other_FrameRate).To_float64();
-
-    for (size_t Method=0; Method<2; ++Method) // 0=one value only, 1=more than 1 value
+    Ztring factorNumerator, factorDenominator;
+    if (Rational==__T("23.976"))
     {
-        bool NotFirst=false;
-        for (size_t i = MediaInfoLib::Config.Info_Get(Stream_Other).size(); i < MI.Count_Get(Stream_Other, StreamPos); ++i)
-        {
-            Ztring Name=MI.Get(Stream_Other, StreamPos, i, Info_Name);
-            if (Name.size()>7 && Name.find(__T("_Values"), 7) == Name.size() - 7)
-            {
-                ZtringList Values;
-                Values.Separator_Set(0, __T(" / "));
-                Values.Write(MI.Get(Stream_Other, StreamPos, i));
-                ZtringList FrameCounts;
-                FrameCounts.Separator_Set(0, __T(" / "));
-                FrameCounts.Write(MI.Get(Stream_Other, StreamPos, i+1)); // _FrameCounts is afters _Values
-                Name.resize(Name.size() - 7);
-                int64u FrameCount_Current=0;
-                if (Values.size() == FrameCounts.size())
-                {
-                    for (size_t Pos = 0; Pos < Values.size();)
-                    {
-                        size_t Pos2=Pos+1;
-                        for (; Pos2 < Values.size(); Pos2++)
-                        {
-                            if (FrameCounts[Pos2]!=FrameCounts[Pos])
-                                break;
-                        }
-
-                        if (((Method==0 && Values.size()==1) || (Method==1 && Values.size()>1)))
-                        {
-                            if ((Method==0 && !NotFirst) || (Method==1 && Values.size()>1))
-                            {
-                                ToReturn+=__T("\t\t\t\t<segment startTime=\"");
-                                ToReturn+=EbuCore_Duration(float64_int64s(FrameCount_Current/FrameRate*1000));
-                                FrameCount_Current += FrameCounts[Pos].To_int64u();
-                                ToReturn+=__T("\" endTime=\"");
-                                ToReturn+=EbuCore_Duration(float64_int64s(FrameCount_Current/FrameRate*1000));
-                                ToReturn+=__T("\">\n");
-                            }
-                            ToReturn+=__T("\t\t\t\t\t<acquisitionParameter name=\"");
-                            ToReturn+=Name;
-                            ToReturn+=__T("\"");
-                            if (Values[Pos]!=__T("Infinite"))
-                            {
-                                if (Name == __T("FocusPosition_ImagePlane")
-                                 || Name == __T("FocusPosition_FrontLensVertex")
-                                 || Name == __T("LensZoom_35mmStillCameraEquivalent")
-                                 || Name == __T("LensZoom_ActualFocalLength"))
-                                    ToReturn+=__T(" unit=\"meter\"");
-                                if (Name == __T("OpticalExtenderMagnification")
-                                 || Name == __T("ElectricalExtenderMagnification")
-                                 || Name == __T("CameraMasterBlackLevel")
-                                 || Name == __T("CameraKneePoint")
-                                 || Name == __T("CameraLuminanceDynamicRange"))
-                                    ToReturn+=__T(" unit=\"percentage\"");
-                                if (Name == __T("ShutterSpeed_Angle")
-                                 || Name == __T("HorizontalFieldOfView"))
-                                    ToReturn+=__T(" unit=\"degree\"");
-                                if (Name == __T("ShutterSpeed_Time"))
-                                    ToReturn+=__T(" unit=\"second\"");
-                                if (Name == __T("WhiteBalance"))
-                                    ToReturn+=__T(" unit=\"kelvin\"");
-                                if (Name == __T("EffectiveFocaleLength")
-                                 || Name == __T("ImagerDimension_EffectiveWidth")
-                                 || Name == __T("ImagerDimension_EffectiveHeight"))
-                                    ToReturn+=__T(" unit=\"millimeter\"");
-                                if (Name == __T("CameraMasterGainAdjustment"))
-                                    ToReturn+=__T(" unit=\"dB\"");
-                                if (Name == __T("CaptureFrameRate"))
-                                    ToReturn+=__T(" unit=\"fps\"");
-                                if (Name == __T("FocusDistance")
-                                 || Name == __T("HyperfocalDistance")
-                                 || Name == __T("NearFocusDistance")
-                                 || Name == __T("FarFocusDistance")
-                                 || Name == __T("EntrancePupilPosition"))
-                                {
-                                    Ztring CookeProtocol_CalibrationType=MI.Get(Stream_Other, StreamPos, __T("CookeProtocol_CalibrationType_Values"));
-                                    if (CookeProtocol_CalibrationType.find(__T(" / "))==string::npos)
-                                    {
-                                        if (CookeProtocol_CalibrationType==__T("mm"))
-                                            CookeProtocol_CalibrationType=__T("millimeter");
-                                        if (CookeProtocol_CalibrationType==__T("in"))
-                                            CookeProtocol_CalibrationType=__T("inch");
-                                        ToReturn+=__T(" unit=\"");
-                                        ToReturn+=CookeProtocol_CalibrationType;
-                                        ToReturn+=__T("\"");
-                                    }
-                                }
-                            }
-                 
-                            if (Pos2-Pos>1)
-                            {
-                                ToReturn+=__T(" interval=\"");
-                                ToReturn+=Ztring::ToZtring(1/FrameRate, 3);
-                                ToReturn+=__T("\"");
-                            }
-
-                            ToReturn+=__T(">");
-                            for (; Pos < Pos2; Pos++)
-                            {
-                                if (Method)
-                                    Values[Pos].FindAndReplace(__T(" "), Ztring(), 0, Ztring_Recursive);
-                                ToReturn += Values[Pos];
-                                ToReturn+=__T(' ');
-                            }
-                            ToReturn.resize(ToReturn.size()-1);
-
-                            ToReturn+=__T("</acquisitionParameter>\n");
-
-                            if (Method==1 && Values.size()>1)
-                                ToReturn+=__T("\t\t\t\t</segment>\n");
-                            else
-                                NotFirst=true;
-                        }
-                        else
-                            Pos++;
-                    }
-                }
-            }
-        }
-
-        if (!NotFirst)
-            ToReturn+=__T("\t\t\t\t</segment>\n");
+        factorNumerator=__T("24000");
+        factorDenominator=__T("1001");
+    }
+    if (Rational==__T("29.970"))
+    {
+        factorNumerator=__T("30000");
+        factorDenominator=__T("1001");
+    }
+    if (Rational==__T("59.940"))
+    {
+        factorNumerator=__T("60000");
+        factorDenominator=__T("1001");
+    }
+    if (factorNumerator.empty())
+    {
+        factorNumerator=Ztring::ToZtring(Rational.To_float64()*1000, 0);
+        factorDenominator=__T("1000");
     }
 
-    ToReturn+=__T("\t\t\t</acquisitionDataFormat>\n");
+    Ztring ToReturn;
+    ToReturn+=__T("<");
+    ToReturn+=Name;
+    ToReturn+=__T(" factorNumerator=\"")+factorNumerator+__T("\"");
+    ToReturn+=__T(" factorDenominator=\"")+factorDenominator+__T("\"");
+    ToReturn+=__T(">")+Ztring::ToZtring(Rational.To_float64(), 0);
+    ToReturn+=__T("</");
+    ToReturn+=Name;
+    ToReturn+=__T(">");
+    return ToReturn;
+}
 
-    ToReturn+=__T("\t\t\t-->\n");
+//---------------------------------------------------------------------------
+void EbuCore_Transform_AcquisitionMetadata_Unit(Ztring &Unit, const Ztring &Name)
+{
+    if (Name == __T("FocusPosition_ImagePlane")
+        || Name == __T("FocusPosition_FrontLensVertex")
+        || Name == __T("LensZoom_35mmStillCameraEquivalent")
+        || Name == __T("LensZoom_ActualFocalLength"))
+        Unit += __T(" unit=\"meter\"");
+    if (Name == __T("OpticalExtenderMagnification")
+        || Name == __T("ElectricalExtenderMagnification")
+        || Name == __T("CameraMasterBlackLevel")
+        || Name == __T("CameraKneePoint")
+        || Name == __T("CameraLuminanceDynamicRange"))
+        Unit += __T(" unit=\"percentage\"");
+    if (Name == __T("ShutterSpeed_Angle")
+        || Name == __T("HorizontalFieldOfView"))
+        Unit += __T(" unit=\"degree\"");
+    if (Name == __T("ShutterSpeed_Time"))
+        Unit += __T(" unit=\"second\"");
+    if (Name == __T("WhiteBalance"))
+        Unit += __T(" unit=\"kelvin\"");
+    if (Name == __T("EffectiveFocaleLength")
+        || Name == __T("ImagerDimension_EffectiveWidth")
+        || Name == __T("ImagerDimension_EffectiveHeight"))
+        Unit += __T(" unit=\"millimeter\"");
+    if (Name == __T("CameraMasterGainAdjustment"))
+        Unit += __T(" unit=\"dB\"");
+    if (Name == __T("CaptureFrameRate"))
+        Unit += __T(" unit=\"fps\"");
+    if (Name == __T("FocusDistance")
+        || Name == __T("HyperfocalDistance")
+        || Name == __T("NearFocusDistance")
+        || Name == __T("FarFocusDistance")
+        || Name == __T("EntrancePupilPosition"))
+    {
+        /*
+        Ztring CookeProtocol_CalibrationType = MI.Get(Stream_Other, StreamPos, __T("CookeProtocol_CalibrationType_Values"));
+        if (CookeProtocol_CalibrationType.find(__T(" / ")) == string::npos)
+        {
+            if (CookeProtocol_CalibrationType == __T("mm"))
+                CookeProtocol_CalibrationType = __T("millimeter");
+            if (CookeProtocol_CalibrationType == __T("in"))
+                CookeProtocol_CalibrationType = __T("inch");
+            Unit += __T(" unit=\"");
+            Unit += CookeProtocol_CalibrationType;
+            Unit += __T("\"");
+        }
+        */
+    }
+}
+
+//---------------------------------------------------------------------------
+void EbuCore_Transform_AcquisitionMetadata_Unit(Ztring &Unit, const Ztring &Name, const Ztring &Value)
+{
+    if (Value != __T("Infinite"))
+    {
+        EbuCore_Transform_AcquisitionMetadata_Unit(Unit, Name);
+        return;
+    }
+}
+
+//---------------------------------------------------------------------------
+void EbuCore_Transform_AcquisitionMetadata_Unit(Ztring &Unit, const Ztring &Name, const ZtringList &Values)
+{
+    for (size_t Pos = 0; Pos < Values.size(); Pos++)
+        if (Values[Pos] != __T("Infinite"))
+        {
+            EbuCore_Transform_AcquisitionMetadata_Unit(Unit, Name);
+            return;
+        }
+}
+
+//---------------------------------------------------------------------------
+struct line
+{
+    Ztring Name;
+    ZtringList Values;
+    vector<int64u> FrameCounts;
+
+    line()
+    {
+        Values.Separator_Set(0, __T(" / "));
+    }
+};
+
+//---------------------------------------------------------------------------
+void EbuCore_Transform_AcquisitionMetadata_Segment_Begin(Ztring &ToReturn, bool IsFirst, line& Line, size_t Values_Begin, size_t Values_End, int64u& Frame_Pos, float64 FrameRate, bool DoIncrement=true)
+{
+    ToReturn.append(IsFirst?5:6, __T('\t'));
+    ToReturn += __T("<ebucore:segment startTime=\"");
+    ToReturn += EbuCore_Duration(float64_int64s(Frame_Pos / FrameRate * 1000));
+    if (DoIncrement)
+        Frame_Pos += (Values_End - Values_Begin) * Line.FrameCounts[Values_Begin];
+    ToReturn += __T("\" endTime=\"");
+    ToReturn += EbuCore_Duration(float64_int64s((Frame_Pos+(DoIncrement?0:1)) / FrameRate * 1000));
+    ToReturn += __T("\"");
+    if (IsFirst)
+        ToReturn += __T(">\n");
+}
+
+//---------------------------------------------------------------------------
+void EbuCore_Transform_AcquisitionMetadata_Segment_End(Ztring &ToReturn, bool IsFirst)
+{
+    if (IsFirst)
+        ToReturn.append(5, __T('\t'));
+    ToReturn += __T("</ebucore:segment>\n");
+}
+
+//---------------------------------------------------------------------------
+void EbuCore_Transform_AcquisitionMetadata_Parameter_Begin(Ztring &ToReturn, bool IsFirst, line& Line)
+{
+    ToReturn.append(IsFirst ? 5 : 6, __T('\t'));
+    ToReturn += __T("<ebucore:parameter name=\"");
+    ToReturn += Line.Name;
+    ToReturn += __T("\"");
+    EbuCore_Transform_AcquisitionMetadata_Unit(ToReturn, Line.Name, Line.Values[0]);
+    if (IsFirst)
+        ToReturn += __T(">\n");
+}
+
+//---------------------------------------------------------------------------
+void EbuCore_Transform_AcquisitionMetadata_Parameter_End(Ztring &ToReturn, bool IsFirst)
+{
+    if (IsFirst)
+        ToReturn.append(5, __T('\t'));
+    ToReturn += __T("</ebucore:parameter>\n");
+}
+
+//---------------------------------------------------------------------------
+void EbuCore_Transform_AcquisitionMetadata_Common(Ztring &ToReturn, line& Line, size_t& Values_Begin, size_t Values_End, float64 FrameRate)
+{
+    //if (Values_End - Values_Begin>1)
+    //{
+    //    ToReturn += __T(" interval=\"");
+    //    ToReturn += Ztring::ToZtring(Line.FrameCounts[Values_Begin] / FrameRate, 3);
+    //    ToReturn += __T("\"");
+    //}
+    ToReturn += __T(">");
+    if (Values_Begin < Values_End)
+    {
+        for (; Values_Begin < Values_End; Values_Begin++)
+        {
+            Line.Values[Values_Begin].FindAndReplace(__T(" "), Ztring(), 0, Ztring_Recursive);
+            ToReturn += Line.Values[Values_Begin];
+            ToReturn += __T(' ');
+        }
+        ToReturn.resize(ToReturn.size() - 1);
+    }
+}
+
+//---------------------------------------------------------------------------
+void EbuCore_Transform_AcquisitionMetadata_SegmentThenParameter_PerParameter(Ztring &ToReturn, line& Line, size_t& Values_Begin, size_t Values_End, float64 FrameRate)
+{
+    EbuCore_Transform_AcquisitionMetadata_Parameter_Begin(ToReturn, false, Line);
+    EbuCore_Transform_AcquisitionMetadata_Common(ToReturn, Line, Values_Begin, Values_End, FrameRate);
+    EbuCore_Transform_AcquisitionMetadata_Parameter_End(ToReturn, false);
+}
+
+//---------------------------------------------------------------------------
+void EbuCore_Transform_AcquisitionMetadata_ParameterThenSegment_PerParameter(Ztring &ToReturn, line& Line, size_t& Values_Begin, size_t Values_End, int64u& Frame_Pos, float64 FrameRate)
+{
+    EbuCore_Transform_AcquisitionMetadata_Segment_Begin(ToReturn, false, Line, Values_Begin, Values_End, Frame_Pos, FrameRate);
+    EbuCore_Transform_AcquisitionMetadata_Common(ToReturn, Line, Values_Begin, Values_End, FrameRate);
+    EbuCore_Transform_AcquisitionMetadata_Segment_End(ToReturn, false);
+}
+
+//---------------------------------------------------------------------------
+void EbuCore_Transform_AcquisitionMetadata_Run(Ztring &ToReturn, line& Line, float64 FrameRate, bool SegmentFirst, bool WithSegment)
+{
+    int64u Frame_Pos = 0; 
+    
+    for (size_t Values_Begin = 0; Values_Begin < Line.Values.size();)
+    {
+        //Looking for intervals
+        size_t Values_End = Values_Begin + 1;
+        for (; Values_End < Line.Values.size(); Values_End++)
+            if (Line.FrameCounts[Values_End] != Line.FrameCounts[Values_Begin])
+                break;
+
+        //segment
+        if (WithSegment)
+            EbuCore_Transform_AcquisitionMetadata_Segment_Begin(ToReturn, true, Line, Values_Begin, Values_End, Frame_Pos, FrameRate);
+
+        //acquisitionParameter
+        if (SegmentFirst)
+            EbuCore_Transform_AcquisitionMetadata_SegmentThenParameter_PerParameter(ToReturn, Line, Values_Begin, Values_End, FrameRate);
+        else
+            EbuCore_Transform_AcquisitionMetadata_ParameterThenSegment_PerParameter(ToReturn, Line, Values_Begin, Values_End, Frame_Pos, FrameRate);
+
+        //segment
+        if (WithSegment)
+            EbuCore_Transform_AcquisitionMetadata_Segment_End(ToReturn, true);
+    }
+}
+
+//---------------------------------------------------------------------------
+void EbuCore_Transform_AcquisitionMetadata_PerFrame_Multiple(Ztring &ToReturn, vector<line>& Lines, vector<size_t> Lines_Multiple, float64 FrameRate, int64u FrameCount)
+{
+    vector<size_t> Values_Pos;
+    Values_Pos.resize(Lines_Multiple.size());
+    vector<size_t> Values_Pos_Remain;
+    Values_Pos_Remain.resize(Lines_Multiple.size());
+    for (int64u Frame_Pos = 0; Frame_Pos < FrameCount; Frame_Pos++)
+    {
+        //Run
+        EbuCore_Transform_AcquisitionMetadata_Segment_Begin(ToReturn, true, Lines[Lines_Multiple[0]], 0, 1, Frame_Pos, FrameRate, false);
+        for (size_t i = 0; i < Lines_Multiple.size(); ++i)
+        {
+            if (!Values_Pos_Remain[i])
+            {
+                Values_Pos_Remain[i] = Lines[Lines_Multiple[i]].FrameCounts[Values_Pos[i]];
+                Values_Pos[i]++;
+            }
+            Values_Pos_Remain[i]--;
+
+            EbuCore_Transform_AcquisitionMetadata_Parameter_Begin(ToReturn, false, Lines[Lines_Multiple[i]]);
+            ToReturn += __T(">");
+            ToReturn += Lines[Lines_Multiple[i]].Values[Values_Pos[i] - 1];
+            EbuCore_Transform_AcquisitionMetadata_Parameter_End(ToReturn, false);
+        }
+        EbuCore_Transform_AcquisitionMetadata_Segment_End(ToReturn, true);
+    }
+}
+
+//---------------------------------------------------------------------------
+void EbuCore_Transform_AcquisitionMetadata_parameterSegment(Ztring &ToReturn, vector<line> &Lines, vector<size_t> &Lines_All, float64 FrameRate)
+{
+    ToReturn += __T("\t\t\t\t<ebucore:parameterSegmentDataOutput>\n");
+
+    for (size_t i = 0; i < Lines_All.size(); ++i)
+    {
+        //Init
+        line &Line = Lines[Lines_All[i]];
+
+        //Run
+        EbuCore_Transform_AcquisitionMetadata_Parameter_Begin(ToReturn, true, Line);
+        EbuCore_Transform_AcquisitionMetadata_Run(ToReturn, Line, FrameRate, false, false);
+        EbuCore_Transform_AcquisitionMetadata_Parameter_End(ToReturn, true);
+    }
+
+    ToReturn += __T("\t\t\t\t</ebucore:parameterSegmentDataOutput>\n");
+}
+
+//---------------------------------------------------------------------------
+void EbuCore_Transform_AcquisitionMetadata_segmentParameter(Ztring &ToReturn, vector<line> &Lines, vector<size_t> &Lines_Unique, vector<size_t> &Lines_Multiple, float64 FrameRate)
+{
+    ToReturn += __T("\t\t\t\t<ebucore:segmentParameterDataOutput>\n");
+
+    //Single value
+    if (!Lines_Unique.empty())
+    {
+        //Init
+        int64u Frame_Pos = 0;
+
+        //Run
+        EbuCore_Transform_AcquisitionMetadata_Segment_Begin(ToReturn, true, Lines[Lines_Unique[0]], 0, 1, Frame_Pos, FrameRate);
+        for (size_t i = 0; i < Lines_Unique.size(); ++i)
+            EbuCore_Transform_AcquisitionMetadata_Run(ToReturn, Lines[Lines_Unique[i]], FrameRate, true, false);
+        EbuCore_Transform_AcquisitionMetadata_Segment_End(ToReturn, true);
+    }
+
+    //Multiple values
+    for (size_t i = 0; i < Lines_Multiple.size(); ++i)
+    {
+        //Run
+        EbuCore_Transform_AcquisitionMetadata_Run(ToReturn, Lines[Lines_Multiple[i]], FrameRate, true, true);
+    }
+
+    ToReturn += __T("\t\t\t\t</ebucore:segmentParameterDataOutput>\n");
+}
+
+//---------------------------------------------------------------------------
+void EbuCore_Transform_AcquisitionMetadata(Ztring &ToReturn, MediaInfo_Internal &MI, size_t StreamPos, Export_EbuCore::version Version, Export_EbuCore::acquisitiondataoutputmode AcquisitionDataOutputMode)
+{
+    if (Version<Export_EbuCore::Version_1_8)
+        ToReturn+=__T("\t\t\t<!-- (In EBUCore v1.8+ only)\n");
+
+    ToReturn+=__T("\t\t\t<ebucore:acquisitionData>\n");
+    Ztring StreamDuration=MI.Get(Stream_Other, StreamPos, Other_Duration_String3);
+    if (!StreamDuration.empty())
+       ToReturn+=__T("\t\t\t\t<ebucore:extractionDuration>")+StreamDuration+__T("</ebucore:extractionDuration>\n");
+    const Ztring FrameRate_String=MI.Get(Stream_Other, StreamPos, Other_FrameRate);
+    const Ztring FrameRate_Num_String=MI.Get(Stream_Other, StreamPos, Other_FrameRate_Num);
+    const Ztring FrameRate_Den_String=MI.Get(Stream_Other, StreamPos, Other_FrameRate_Den);
+    float64 FrameRate=FrameRate_Num_String.To_float64();
+    if (FrameRate)
+        FrameRate/=FrameRate_Den_String.To_float64();
+    else
+        FrameRate=FrameRate_String.To_float64();
+    if (FrameRate)
+       ToReturn+=__T("\t\t\t\t")+EbuCore_FrameRate(__T("ebucore:acquisitionFrameRate"), FrameRate_String, FrameRate_Num_String, FrameRate_Den_String)+__T("\n");
+    int64u FrameCount=MI.Get(Stream_Other, StreamPos, Other_FrameCount).To_int64u();
+
+    vector<size_t> Lines_Unique;
+    vector<size_t> Lines_Multiple;
+    vector<size_t> Lines_All;
+    vector<line> Lines;
+    size_t Count= MI.Count_Get(Stream_Other, StreamPos);
+    for (size_t i = MediaInfoLib::Config.Info_Get(Stream_Other).size(); i < Count; ++i)
+    {
+        Ztring Name = MI.Get(Stream_Other, StreamPos, i, Info_Name);
+        if (Name.size() > 7 && Name.find(__T("_Values"), 7) == Name.size() - 7)
+        {
+            size_t Pos = Lines.size();
+            Lines.resize(Pos + 1);
+            Lines[Pos].Name=Name.substr(0, Name.size() - 7);
+            Lines[Pos].Values.Write(MI.Get(Stream_Other, StreamPos, i));
+            ZtringList FrameCounts;
+            FrameCounts.Separator_Set(0, __T(" / "));
+            FrameCounts.Write(MI.Get(Stream_Other, StreamPos, i + 1));
+            if (Lines[Pos].Values.empty() || Lines[Pos].Values.size() != FrameCounts.size())
+            {
+                Lines.resize(Pos); //Invalid, remove it
+                continue;
+            }
+            for (size_t j = 0; j < FrameCounts.size(); j++)
+                Lines[Pos].FrameCounts.push_back(FrameCounts[j].To_int64u()); // _FrameCounts is afters _Values
+
+            if (FrameCounts.size() == 1)
+                Lines_Unique.push_back(Pos);
+            else
+                Lines_Multiple.push_back(Pos);
+            Lines_All.push_back(Pos);
+        }
+    }
+
+    switch (AcquisitionDataOutputMode)
+    {
+        case Export_EbuCore::AcquisitionDataOutputMode_Default :
+        case Export_EbuCore::AcquisitionDataOutputMode_parameterSegment :
+                                                                    EbuCore_Transform_AcquisitionMetadata_parameterSegment(ToReturn, Lines, Lines_All, FrameRate);
+                                                                    break;
+        case Export_EbuCore::AcquisitionDataOutputMode_segmentParameter :
+                                                                    EbuCore_Transform_AcquisitionMetadata_segmentParameter(ToReturn, Lines, Lines_Unique, Lines_Multiple, FrameRate);
+                                                                    break;
+        default:;
+    }
+
+    ToReturn+=__T("\t\t\t</ebucore:acquisitionData>\n");
+
+    if (Version<Export_EbuCore::Version_1_8)
+        ToReturn+=__T("\t\t\t-->\n");
 }
 
 //---------------------------------------------------------------------------
@@ -1504,7 +1693,7 @@ Ztring EbuCore_Transform_Metadata(Ztring &ToReturn, MediaInfo_Internal &MI, size
 }
 
 //---------------------------------------------------------------------------
-Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version)
+Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version, acquisitiondataoutputmode AcquisitionDataOutputMode)
 {
     //Current date/time is ISO format
     time_t Seconds=time(NULL);
@@ -1537,8 +1726,10 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version)
     ToReturn+=__T("<!-- Generated by ")+MediaInfoLib::Config.Info_Version_Get()+__T(" -->\n");
     if (Version==Version_1_5)
         ToReturn+=__T("<ebucore:ebuCoreMain xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:ebucore=\"urn:ebu:metadata-schema:ebuCore_2014\"\n    xmlns:xalan=\"http://xml.apache.org/xalan\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n    xsi:schemaLocation=\"urn:ebu:metadata-schema:ebuCore_2014 http://www.ebu.ch/metadata/schemas/EBUCore/20140318/EBU_CORE_20140318.xsd\" version=\"1.5\" dateLastModified=\"")+Date+__T("\" timeLastModified=\"")+Time+__T("\">\n");
-    else
+    else if (Version==Version_1_6)
         ToReturn+=__T("<ebucore:ebuCoreMain xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:ebucore=\"urn:ebu:metadata-schema:ebuCore_2015\"\n    xmlns:xalan=\"http://xml.apache.org/xalan\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n    xsi:schemaLocation=\"urn:ebu:metadata-schema:ebuCore_2015 http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://www.ebu.ch/metadata/schemas/EBUCore/20150522/ebucore_20150522.xsd\" version=\"1.6\" dateLastModified=\"")+Date+__T("\" timeLastModified=\"")+Time+__T("\">\n");
+    else if (Version==Version_1_8)
+        ToReturn+=__T("<ebucore:ebuCoreMain xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:ebucore=\"urn:ebu:metadata-schema:ebuCore_2017\"\n    xmlns:xalan=\"http://xml.apache.org/xalan\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n    xsi:schemaLocation=\"urn:ebu:metadata-schema:ebuCore_2017 http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://raw.githubusercontent.com/ebu/ebucore/master/ebucore.xsd\" version=\"1.8\" dateLastModified=\"")+Date+__T("\" timeLastModified=\"")+Time+__T("\">\n");
 
     //coreMetadata
     ToReturn+=__T("\t<ebucore:coreMetadata>\n");
@@ -1714,7 +1905,7 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version)
     //format - containerFormat - technicalAttributeString - Encoded_Library
     if (!MI.Get(Stream_General, 0, __T("Encoded_Library/String")).empty())
     {
-        ToReturn+=__T("\t\t\t\t<ebucore:")+Ztring(Version>=Version_1_6?__T("technicalAttributeString"):__T("comment"))+__T(" typeLabel=\"WritingLibrary\">")+XML_Encode(MI.Get(Stream_General, 0, __T("Encoded_Library/String"))+__T("</ebucore:")+Ztring(Version>=Version_1_6?__T("technicalAttributeString"):__T("comment"))+__T(">\n"));
+        ToReturn+=__T("\t\t\t\t<ebucore:")+Ztring(Version>=Version_1_6?__T("technicalAttributeString"):__T("comment"))+__T(" typeLabel=\"WritingLibrary\">")+XML_Encode(MI.Get(Stream_General, 0, __T("Encoded_Library/String")))+__T("</ebucore:")+Ztring(Version>=Version_1_6?__T("technicalAttributeString"):__T("comment"))+__T(">\n");
     }
 
     ToReturn+=__T("\t\t\t</ebucore:containerFormat>\n");
@@ -1763,7 +1954,7 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version)
 
     for (size_t Pos=0; Pos<MI.Count_Get(Stream_Other); Pos++)
         if (MI.Get(Stream_Other, Pos, Other_Format)==__T("Acquisition Metadata"))
-            EbuCore_Transform_AcquisitionMetadata(ToReturn, MI, Pos, Version);
+            EbuCore_Transform_AcquisitionMetadata(ToReturn, MI, Pos, Version, AcquisitionDataOutputMode);
 
     //format - technicalAttributeString - LineUpStart
     bool startDone=false;

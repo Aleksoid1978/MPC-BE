@@ -120,6 +120,9 @@
 #if defined(MEDIAINFO_LIBCURL_YES)
     #include "MediaInfo/Reader/Reader_libcurl.h"
 #endif //defined(MEDIAINFO_LIBCURL_YES)
+#if defined(MEDIAINFO_EBUCORE_YES)
+    #include "MediaInfo/Export/Export_EbuCore.h"
+#endif //defined(MEDIAINFO_EBUCORE_YES)
 using namespace ZenLib;
 using namespace std;
 //---------------------------------------------------------------------------
@@ -209,6 +212,9 @@ void MediaInfo_Config::Init()
     #if MEDIAINFO_ADVANCED
         Format_Profile_Split=false;
     #endif //MEDIAINFO_ADVANCED
+    #if defined(MEDIAINFO_EBUCORE_YES)
+        AcquisitionDataOutputMode=Export_EbuCore::AcquisitionDataOutputMode_Default;
+    #endif //defined(MEDIAINFO_EBUCORE_YES)
     Complete=0;
     BlockMethod=0;
     Internet=0;
@@ -1057,6 +1063,24 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
         #else // MEDIAINFO_ADVANCED
             return __T("advanced features are disabled due to compilation options");
         #endif // MEDIAINFO_ADVANCED
+    }
+    else if (Option_Lower==__T("acquisitiondataoutputmode"))
+    {
+        #if defined(MEDIAINFO_EBUCORE_YES)
+            Ztring Mode(Value);
+            Mode.MakeLowerCase();
+            if (     Mode==__T("default"))
+                AcquisitionDataOutputMode_Set(Export_EbuCore::AcquisitionDataOutputMode_Default);
+            else if (Mode==__T("parametersegment"))
+                AcquisitionDataOutputMode_Set(Export_EbuCore::AcquisitionDataOutputMode_parameterSegment);
+            else if (Mode==__T("segmentparameter"))
+                AcquisitionDataOutputMode_Set(Export_EbuCore::AcquisitionDataOutputMode_segmentParameter);
+            else
+                return __T("Invalid value");
+            return Ztring();
+        #else // MEDIAINFO_EBUCORE_YES
+            return __T("EBUCore features are disabled due to compilation options");
+        #endif // MEDIAINFO_EBUCORE_YES
     }
     else if (Option_Lower==__T("event_callbackfunction"))
     {
@@ -2613,6 +2637,20 @@ bool MediaInfo_Config::Format_Profile_Split_Get ()
     return Format_Profile_Split;
 }
 #endif // MEDIAINFO_ADVANCED
+
+#if defined(MEDIAINFO_EBUCORE_YES)
+void MediaInfo_Config::AcquisitionDataOutputMode_Set(size_t Value)
+{
+    CriticalSectionLocker CSL(CS);
+    AcquisitionDataOutputMode=Value;
+}
+
+size_t MediaInfo_Config::AcquisitionDataOutputMode_Get ()
+{
+    CriticalSectionLocker CSL(CS);
+    return AcquisitionDataOutputMode;
+}
+#endif // MEDIAINFO_EBUCORE_YES
 
 //***************************************************************************
 // Event

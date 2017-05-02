@@ -41,6 +41,7 @@
     #include "MediaInfo/MediaInfo_Internal.h"
 #endif // MEDIAINFO_SEEK
 #include "MediaInfo/File_Unknown.h"
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -190,7 +191,9 @@ void File_SmpteSt0337::Streams_Fill()
         if (OverallBitRate)
         {
             OverallBitRate*=Element_Size; OverallBitRate/=Element_Size-Stream_Bits*4/8;
-            Fill(Stream_General, 0, General_OverallBitRate, Ztring::ToZtring(OverallBitRate)+__T(" / ")+Parser->Retrieve(Stream_General, 0, General_OverallBitRate));
+            OverallBitRate*=Container_Bits;
+            OverallBitRate/=Stream_Bits;
+            Fill(Stream_General, 0, General_OverallBitRate, OverallBitRate);
         }
         if (Parser->Count_Get(Stream_Audio))
             FrameRate=Retrieve(Stream_Audio, 0, Audio_FrameRate).To_float64();
@@ -215,7 +218,7 @@ void File_SmpteSt0337::Streams_Fill()
 
     if (FrameRate && FrameSizes.size()==1)
     {
-        Fill(Stream_General, 0, General_OverallBitRate, FrameSizes.begin()->first*Container_Bits*FrameRate, 0);
+        Fill(Stream_General, 0, General_OverallBitRate, FrameSizes.begin()->first*8*FrameRate, 0, true);
     }
 
     for (size_t Pos=0; Pos<Count_Get(StreamKind_Last); Pos++)
@@ -242,10 +245,30 @@ void File_SmpteSt0337::Streams_Fill()
             Fill(StreamKind_Last, Pos, "MuxingMode", "SMPTE ST 337");
         if (Retrieve(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitRate_Mode))!=__T("CBR"))
             Fill(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_BitRate_Mode), "CBR");
-        if (File_Size!=(int64u)-1 && FrameSizes.size()==1)
-            Fill(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_FrameCount), File_Size/FrameSizes.begin()->first);
-        if (Retrieve(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_Duration)).empty())
-            Fill(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_Duration), Retrieve(Stream_General, 0, General_Duration));
+    }
+}
+
+//---------------------------------------------------------------------------
+void File_SmpteSt0337::Streams_Finish()
+{
+    if (Parser && Parser->Status[IsAccepted])
+    {
+        Finish(Parser);
+        for (size_t Pos=0; Pos<Count_Get(Stream_Audio); Pos++)
+        {
+            if (!Parser->Retrieve(Stream_Audio, Pos, Audio_Duration).empty())
+                Fill(Stream_Audio, Pos, Audio_Duration, Parser->Retrieve(Stream_Audio, Pos, Audio_Duration), true);
+            if (!Parser->Retrieve(Stream_Audio, Pos, Audio_FrameCount).empty())
+                Fill(Stream_Audio, Pos, Audio_FrameCount, Parser->Retrieve(Stream_Audio, Pos, Audio_FrameCount), true);
+
+            if (!IsSub)
+            {
+                if (Retrieve(StreamKind_Last, Pos, Fill_Parameter(Stream_Audio, Generic_FrameCount)).empty() && File_Size!=(int64u)-1 && FrameSizes.size()==1)
+                    Fill(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_FrameCount), File_Size/FrameSizes.begin()->first);
+                if (Retrieve(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_Duration)).empty())
+                    Fill(StreamKind_Last, Pos, Fill_Parameter(StreamKind_Last, Generic_Duration), Retrieve(Stream_General, 0, General_Duration));
+            }
+        }
     }
 }
 
@@ -262,6 +285,9 @@ void File_SmpteSt0337::Read_Buffer_Unsynched()
         Frame_Count_NotParsedIncluded=float64_int64s(File_GoTo/FrameRate);
         FrameInfo.DTS=Frame_Count_NotParsedIncluded*1000000000/48000;
     }
+
+    if (Parser)
+        Parser->Open_Buffer_Unsynch();
 }
 #endif // MEDIAINFO_SEEK
 
@@ -1338,7 +1364,14 @@ void File_SmpteSt0337::Data_Parse()
             Frame_Count_NotParsedIncluded++;
 
         if (Parser==NULL || (Frame_Count>=2 && Parser->Status[IsFilled]))
+        {
             Fill("SMPTE ST 337");
+            if (!IsSub && Config->ParseSpeed<1.0)
+            {
+                Open_Buffer_Unsynch();
+                Finish();
+            }
+        }
         if (Parser==NULL || (Frame_Count>=2 && Parser->Status[IsFinished]))
             Finish("SMPTE ST 337");
     FILLING_END();
