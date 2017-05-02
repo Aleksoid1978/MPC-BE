@@ -4,7 +4,7 @@
 ==============================
 
 Updated libraries:
-	ffmpeg n3.4-dev-453-g3390a2be9d;
+	ffmpeg git-n3.4-dev-648-g0a6ca7aa0a;
 	libflac git-1.3.2-52-g59bedcf2;
 	libpng git-v1.6.28-12-gb8afc73b7;
 	Little-CMS git-lcms2.8-66-gf9d75cc;
