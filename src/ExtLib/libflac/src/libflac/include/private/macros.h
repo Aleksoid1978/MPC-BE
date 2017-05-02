@@ -61,12 +61,12 @@
 #define flac_min(a,b) __min(a,b)
 #endif
 
-#ifndef MIN
-#define MIN(x,y)	((x) <= (y) ? (x) : (y))
+#ifndef flac_min
+#define flac_min(x,y)	((x) <= (y) ? (x) : (y))
 #endif
 
-#ifndef MAX
-#define MAX(x,y)	((x) >= (y) ? (x) : (y))
+#ifndef flac_max
+#define flac_max(x,y)	((x) >= (y) ? (x) : (y))
 #endif
 
 #endif
