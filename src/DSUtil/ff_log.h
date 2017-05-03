@@ -24,17 +24,22 @@ extern "C" {
 	#include <ffmpeg/libavutil/log.h>
 }
 
-inline void ff_log(void* par, int level, const char *fmt, va_list valist)
+#define LOG_BUF_LEN 2048
+inline void ff_log(void* ptr, int level, const char *fmt, va_list valist)
 {
 #ifdef _DEBUG
 	if (level <= AV_LOG_VERBOSE) {
-		char Msg[500] = { 0 };
+		static int print_prefix = 1;
+		static char line[LOG_BUF_LEN] = {};
 
-		CStringA fmtStr(fmt);
-		fmtStr.Replace("%td", "%ld");
-		fmtStr.TrimRight('\n');
-		vsnprintf_s(Msg, sizeof(Msg), _TRUNCATE, fmtStr, valist);
-		DbgLog((LOG_TRACE, 3, L"FF_LOG : %S", Msg));
+		av_log_format_line(ptr, level, fmt, valist, line, sizeof(line), &print_prefix);
+
+		const size_t len = strnlen_s(line, LOG_BUF_LEN);
+		if (len > 0 && line[len - 1] == '\n') {
+			line[len - 1] = 0;
+		}
+
+		DbgLog((LOG_TRACE, 3, L"FF_LOG : %S", line));
 	}
 #endif
 }
