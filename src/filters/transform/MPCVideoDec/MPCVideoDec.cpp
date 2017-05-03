@@ -1542,6 +1542,14 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaTy
 			return hr;
 		}
 
+		if (m_nDecoderMode == MODE_DXVA2
+				&& (m_pCurrentMediaType != *pmt)) {
+			hr = ReinitDXVA2Decoder();
+			if (FAILED(hr)) {
+				return hr;
+			}
+		}
+
 		m_bDecodingStart    = FALSE;
 		m_pCurrentMediaType = *pmt;
 	} else if (direction == PINDIR_OUTPUT) {
@@ -1940,11 +1948,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 
 	BuildOutputFormat();
 
-	if (bReinit && m_nDecoderMode == MODE_DXVA2) {
-		SAFE_DELETE(m_pDXVADecoder);
-		if (m_pDXVA2Allocator && IsDXVASupported() && SUCCEEDED(FindDecoderConfiguration())) {
-			RecommitAllocator();
-		}
+	if (m_nDecoderMode == MODE_DXVA2 && m_pDXVADecoder && !m_pAVCtx->dxva_context) {
+		m_pDXVADecoder->UpdateDXVA2Context();
 	}
 
 	return S_OK;
@@ -2364,8 +2369,18 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	m_rtLastStart	= INVALID_TIME;
 	m_rtLastStop	= 0;
 
-	if (m_nCodecId == AV_CODEC_ID_H264 && m_bDecodingStart && (m_nDecoderMode == MODE_SOFTWARE || (m_nPCIVendor == PCIV_ATI && m_bInterlaced))) {
-		InitDecoder(&m_pInput->CurrentMediaType());
+	if (m_bDecodingStart) {
+		if (m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_MPEG2VIDEO) {
+			InitDecoder(&m_pInput->CurrentMediaType());
+		}
+
+		if (m_nDecoderMode == MODE_DXVA2
+				&& (m_nCodecId == AV_CODEC_ID_H264 && m_nPCIVendor == PCIV_ATI && m_bInterlaced)) {
+			HRESULT hr = ReinitDXVA2Decoder();
+			if (FAILED(hr)) {
+				return hr;
+			}
+		}
 	}
 
 	return __super::NewSegment(rtStart, rtStop, dRate);
@@ -3154,6 +3169,18 @@ HRESULT CMPCVideoDecFilter::CreateDXVA2Decoder(UINT nNumRenderTargets, IDirect3D
 	if (FAILED(hr)) {
 		m_DXVADecoderGUID = GUID_NULL;
 		ZeroMemory(&m_DXVA2Config, sizeof(m_DXVA2Config));
+	}
+
+	return hr;
+}
+
+HRESULT CMPCVideoDecFilter::ReinitDXVA2Decoder()
+{
+	HRESULT hr = E_FAIL;
+
+	SAFE_DELETE(m_pDXVADecoder);
+	if (m_pDXVA2Allocator && IsDXVASupported() && SUCCEEDED(FindDecoderConfiguration())) {
+		hr = RecommitAllocator();
 	}
 
 	return hr;

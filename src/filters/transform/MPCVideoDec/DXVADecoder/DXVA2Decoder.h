@@ -57,6 +57,8 @@ public :
 	static CDXVA2Decoder*			CreateDXVA2Decoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config);
 	virtual							~CDXVA2Decoder();
 
+	void							UpdateDXVA2Context();
+
 	void							Flush() { m_dxva_context.report_id = 0; };
 	HRESULT							DeliverFrame(int got_picture, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 
