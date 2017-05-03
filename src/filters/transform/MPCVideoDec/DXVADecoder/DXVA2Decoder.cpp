@@ -82,6 +82,11 @@ CDXVA2Decoder* CDXVA2Decoder::CreateDXVA2Decoder(CMPCVideoDecFilter* pFilter, ID
 	return pDecoder;
 }
 
+void CDXVA2Decoder::UpdateDXVA2Context()
+{
+	m_pFilter->GetAVCtx()->dxva_context = &m_dxva_context;
+}
+
 HRESULT CDXVA2Decoder::DeliverFrame(int got_picture, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
 	HRESULT	hr;
