@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -128,6 +128,7 @@ HRESULT CHdmvClipInfo::ReadProgramInfo()
 				case VIDEO_STREAM_MPEG1:
 				case VIDEO_STREAM_MPEG2:
 				case VIDEO_STREAM_H264:
+				case VIDEO_STREAM_HEVC:
 				case VIDEO_STREAM_VC1: {
 						BYTE Temp = ReadByte();
 						BDVM_VideoFormat VideoFormat     = (BDVM_VideoFormat)(Temp >> 4);
@@ -156,7 +157,6 @@ HRESULT CHdmvClipInfo::ReadProgramInfo()
 						BDVM_SampleRate SampleRate           = (BDVM_SampleRate)(Temp & 0xF);
 
 						ReadBuffer((BYTE*)m_Streams[iStream].m_LanguageCode, 3);
-						m_Streams[iStream].m_LanguageCode[3] = '\0';
 						m_Streams[iStream].m_LCID            = ISO6392ToLcid(m_Streams[iStream].m_LanguageCode);
 						m_Streams[iStream].m_ChannelLayout   = ChannelLayout;
 						m_Streams[iStream].m_SampleRate      = SampleRate;
@@ -165,14 +165,12 @@ HRESULT CHdmvClipInfo::ReadProgramInfo()
 				case PRESENTATION_GRAPHICS_STREAM:
 				case INTERACTIVE_GRAPHICS_STREAM: {
 						ReadBuffer((BYTE*)m_Streams[iStream].m_LanguageCode, 3);
-						m_Streams[iStream].m_LanguageCode[3] = '\0';
 						m_Streams[iStream].m_LCID            = ISO6392ToLcid(m_Streams[iStream].m_LanguageCode);
 					}
 					break;
 				case SUBTITLE_STREAM: {
 						ReadByte(); // Should this really be here?
 						ReadBuffer((BYTE*)m_Streams[iStream].m_LanguageCode, 3);
-						m_Streams[iStream].m_LanguageCode[3] = '\0';
 						m_Streams[iStream].m_LCID            = ISO6392ToLcid(m_Streams[iStream].m_LanguageCode);
 					}
 					break;
@@ -300,6 +298,8 @@ HRESULT CHdmvClipInfo::ReadCpiInfo(CAtlArray<SyncPoint>* sps)
 #define dwShareMode          FILE_SHARE_READ | FILE_SHARE_WRITE
 #define dwFlagsAndAttributes FILE_ATTRIBUTE_READONLY | FILE_FLAG_SEQUENTIAL_SCAN
 
+#define CheckVer() (!(memcmp(Buff, "0300", 4)) || (!memcmp(Buff, "0200", 4)) || (!memcmp(Buff, "0100", 4)))
+
 HRESULT CHdmvClipInfo::ReadInfo(LPCTSTR strFile, CAtlArray<SyncPoint>* sps)
 {
 	m_bIsHdmv = false;
@@ -314,7 +314,7 @@ HRESULT CHdmvClipInfo::ReadInfo(LPCTSTR strFile, CAtlArray<SyncPoint>* sps)
 		}
 
 		ReadBuffer(Buff, 4);
-		if ((memcmp(Buff, "0200", 4)) && (memcmp(Buff, "0100", 4))) {
+		if (!CheckVer()) {
 			return CloseFile(VFW_E_INVALID_FILE_FORMAT);
 		}
 
@@ -348,53 +348,8 @@ CHdmvClipInfo::Stream* CHdmvClipInfo::FindStream(SHORT wPID)
 	return NULL;
 }
 
-LPCTSTR CHdmvClipInfo::Stream::Format()
-{
-	switch (m_Type) {
-		case VIDEO_STREAM_MPEG1:
-			return _T("Mpeg1");
-		case VIDEO_STREAM_MPEG2:
-			return _T("Mpeg2");
-		case VIDEO_STREAM_H264:
-			return _T("H264");
-		case VIDEO_STREAM_VC1:
-			return _T("VC-1");
-		case AUDIO_STREAM_MPEG1:
-			return _T("MPEG1");
-		case AUDIO_STREAM_MPEG2:
-			return _T("MPEG2");
-		case AUDIO_STREAM_LPCM:
-			return _T("LPCM");
-		case AUDIO_STREAM_AC3:
-			return _T("AC3");
-		case AUDIO_STREAM_DTS:
-			return _T("DTS");
-		case AUDIO_STREAM_AC3_TRUE_HD:
-			return _T("MLP");
-		case AUDIO_STREAM_AC3_PLUS:
-			return _T("DD+");
-		case AUDIO_STREAM_DTS_HD:
-			return _T("DTS-HD");
-		case AUDIO_STREAM_DTS_HD_MASTER_AUDIO:
-			return _T("DTS-HD XLL");
-		case SECONDARY_AUDIO_AC3_PLUS:
-			return _T("Sec DD+");
-		case SECONDARY_AUDIO_DTS_HD:
-			return _T("Sec DTS-HD");
-		case PRESENTATION_GRAPHICS_STREAM :
-			return _T("PG");
-		case INTERACTIVE_GRAPHICS_STREAM :
-			return _T("IG");
-		case SUBTITLE_STREAM :
-			return _T("Text");
-		default :
-			return _T("Unknown");
-	}
-}
-
 HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bFullInfoRead/* = FALSE*/, BYTE* MVC_Base_View_R_flag/* = NULL*/)
 {
-
 	CPath Path(strPlaylistFile);
 	rtDuration = 0;
 
@@ -414,7 +369,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 		}
 
 		ReadBuffer(Buff, 4);
-		if ((memcmp(Buff, "0200", 4)) && (memcmp(Buff, "0100", 4))) {
+		if (!CheckVer()) {
 			return CloseFile(VFW_E_INVALID_FILE_FORMAT);
 		}
 
@@ -742,7 +697,7 @@ HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CPlaylist& Playlist
 		}
 
 		ReadBuffer(Buff, 4);
-		if ((memcmp(Buff, "0200", 4)) && (memcmp(Buff, "0100", 4))) {
+		if (!CheckVer()) {
 			return CloseFile(VFW_E_INVALID_FILE_FORMAT);
 		}
 
