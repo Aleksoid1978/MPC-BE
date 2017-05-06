@@ -503,7 +503,6 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 	, m_AC3CoreOnly(0)
 	, m_SubEmptyPin(false)
 	, m_hasHdmvDvbSubPin(false)
-	, m_bIsBD(false)
 {
 	m_nFlag |= SOURCE_SUPPORT_URL;
 	m_nFlag |= PACKET_PTS_DISCONTINUITY;
@@ -1079,7 +1078,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	ReadClipInfo(GetPartFilename(pAsyncReader));
 
-	m_pFile.Attach(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo, m_bIsBD, m_ForcedSub, m_AC3CoreOnly, m_SubEmptyPin));
+	m_pFile.Attach(DNew CMpegSplitterFile(pAsyncReader, hr, m_ClipInfo, m_ForcedSub, m_AC3CoreOnly, m_SubEmptyPin));
 	if (!m_pFile) {
 		return E_OUTOFMEMORY;
 	}
@@ -1541,7 +1540,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		if (minseekpos != _I64_MIN) {
 			DLog(L"CMpegSplitterFilter::DemuxSeek() : seek by timestamp, %I64d -> %I64d, position - %I64d", rt, minseekrt, minseekpos);
 			seekpos = minseekpos;
-			if (m_bIsBD) {
+			if (m_ClipInfo.IsHdmv()) {
 				m_rtSeekOffset = minseekrt;
 			}
 		} else {
@@ -1602,7 +1601,7 @@ bool CMpegSplitterFilter::BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPla
 {
 	m_rtPlaylistDuration = 0;
 
-	bool res = SUCCEEDED(m_ClipInfo.ReadPlaylist(pszFileName, m_rtPlaylistDuration, Items, TRUE, &m_MVC_Base_View_R_flag));
+	const bool res = SUCCEEDED(m_ClipInfo.ReadPlaylist(pszFileName, m_rtPlaylistDuration, Items, TRUE, &m_MVC_Base_View_R_flag));
 	if (res) {
 		m_rtMin = Items.GetHead()->m_rtIn;
 		REFERENCE_TIME rtDur = 0;
@@ -1614,8 +1613,6 @@ bool CMpegSplitterFilter::BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPla
 
 		m_rtMax = m_rtMin + rtDur;
 	}
-
-	m_bIsBD = res;
 
 	return res;
 }
