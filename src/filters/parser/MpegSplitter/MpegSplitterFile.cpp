@@ -855,7 +855,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 			avchdr h;
 			if (!m_streams[stream_type::video].Find(s) && !m_streams[stream_type::stereo].Find(s)
 					&& Read(h, len, avch[s], &s.mt)) {
-				if (pes_stream_type == MVC_H264) {
+				if (s.mt.subtype == MEDIASUBTYPE_AMVC) {
 					s.codec = stream_codec::MVC;
 					type = stream_type::stereo;
 				} else {
