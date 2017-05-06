@@ -216,8 +216,9 @@ public:
 		unknown
 	};
 
+	bool m_bIsBD;
 	CHdmvClipInfo &m_ClipInfo;
-	CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin);
+	CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin);
 
 	BOOL CheckKeyFrame(CAtlArray<BYTE>& pData, stream_codec codec);
 	REFERENCE_TIME NextPTS(DWORD TrackNum, stream_codec codec, __int64& nextPos, BOOL bKeyFrameOnly = FALSE, REFERENCE_TIME rtLimit = _I64_MAX);

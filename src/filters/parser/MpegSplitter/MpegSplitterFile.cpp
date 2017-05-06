@@ -30,11 +30,12 @@
 #endif
 #include <moreuuids.h>
 
-CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin)
+CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin)
 	: CBaseSplitterFileEx(pAsyncReader, hr, FM_FILE | FM_FILE_DL | FM_FILE_VAR | FM_STREAM)
 	, m_type(MPEG_TYPES::mpeg_invalid)
 	, m_rate(0)
 	, m_bPESPTSPresent(TRUE)
+	, m_bIsBD(bIsBD)
 	, m_ClipInfo(ClipInfo)
 	, m_ForcedSub(ForcedSub)
 	, m_AC3CoreOnly(AC3CoreOnly)
@@ -185,7 +186,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		SearchStreams(0, stop, 2000);
 	}
 
-	if (!m_ClipInfo.IsHdmv()) {
+	if (!m_bIsBD) {
 		REFERENCE_TIME rtMin = _I64_MAX;
 		__int64 posMin       = -1;
 		__int64 posMax       = posMin;
@@ -723,7 +724,7 @@ static const struct StreamType {
 	// H.264/AVC1 Video
 	{ VIDEO_STREAM_H264,					H264_VIDEO	},
 	{ VIDEO_STREAM_H264_ADDITIONAL_VIEW,	H264_VIDEO	},
-	{ MVC_H264,								H264_VIDEO	},
+	{ VIDEO_STREAM_H264_MVC,				H264_VIDEO	},
 	// VC-1 Video
 	{ VIDEO_STREAM_VC1,						VC1_VIDEO	},
 	// Dirac Video
