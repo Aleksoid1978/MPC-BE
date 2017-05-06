@@ -322,7 +322,7 @@ HRESULT CHdmvClipInfo::ReadInfo(LPCTSTR strFile, CAtlArray<SyncPoint>* sps)
 			return CloseFile(VFW_E_INVALID_FILE_FORMAT);
 		}
 
-		SequenceInfo_start_address = ReadDword();
+		ReadDword(); // sequence_info_start_address
 		ProgramInfo_start_address  = ReadDword();
 		Cpi_start_addrress         = ReadDword();
 		ReadDword(); // clip_mark_start_address
