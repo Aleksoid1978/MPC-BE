@@ -177,7 +177,6 @@ public:
 	HRESULT		ReadChapters(CString strPlaylistFile, CPlaylist& PlaylistItems, CPlaylistChapter& Chapters);
 
 private :
-	DWORD		SequenceInfo_start_address;
 	DWORD		ProgramInfo_start_address;
 	DWORD		Cpi_start_addrress;
 	DWORD		Ext_data_start_address;
