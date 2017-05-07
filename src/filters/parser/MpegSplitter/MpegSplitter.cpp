@@ -1100,7 +1100,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	REFERENCE_TIME rt_IfoDuration = 0;
 	fraction_t     IfoASpect      = {};
-	if (m_pFile->m_type == MPEG_TYPES::mpeg_ps) {
+	if (m_pFile->m_type == MPEG_TYPES::mpeg_ps && m_pInput) {
 		if (CComQIPtr<IVTSReader> VTSReader = GetFilterFromPin(m_pInput->GetConnected())) {
 			m_pTI = VTSReader;
 			rt_IfoDuration = VTSReader->GetDuration();
