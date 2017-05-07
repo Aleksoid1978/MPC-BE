@@ -1098,25 +1098,13 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_pFile->m_rtMax = m_rtMax;
 	}
 
-	REFERENCE_TIME	rt_IfoDuration	= 0;
-	fraction_t		IfoASpect		= {0, 0};
+	REFERENCE_TIME rt_IfoDuration = 0;
+	fraction_t     IfoASpect      = {};
 	if (m_pFile->m_type == MPEG_TYPES::mpeg_ps) {
-		if (m_pInput && m_pInput->IsConnected() && (GetCLSID(m_pInput->GetConnected()) == __uuidof(CVTSReader))) { // MPC VTS Reader
-			CComPtr<IBaseFilter> pBF = GetFilterFromPin(m_pInput->GetConnected());
-			m_pTI = pBF;
-			if (CComQIPtr<IVTSReader> VTSReader = pBF) {
-				rt_IfoDuration	= VTSReader->GetDuration();
-				IfoASpect		= VTSReader->GetAspectRatio();
-			}
-		}
-	}
-
-	if (m_ClipInfo.IsHdmv()) {
-		for (size_t i = 0; i < m_ClipInfo.GetStreamCount(); i++) {
-			CHdmvClipInfo::Stream* stream = m_ClipInfo.GetStreamByIndex (i);
-			if (stream->m_Type == PRESENTATION_GRAPHICS_STREAM) {
-				m_pFile->AddHdmvPGStream(stream->m_PID, stream->m_LanguageCode);
-			}
+		if (CComQIPtr<IVTSReader> VTSReader = GetFilterFromPin(m_pInput->GetConnected())) {
+			m_pTI = VTSReader;
+			rt_IfoDuration = VTSReader->GetDuration();
+			IfoASpect      = VTSReader->GetAspectRatio();
 		}
 	}
 

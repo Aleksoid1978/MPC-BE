@@ -88,6 +88,7 @@ public:
 		BDVM_ChannelLayout m_ChannelLayout = BDVM_ChannelLayout_Unknown;
 		BDVM_SampleRate    m_SampleRate    = BDVM_SampleRate_Unknown;
 	};
+	typedef CAtlArray<Stream> Streams;
 
 	struct PlaylistItem {
 		PlaylistItem() {}
@@ -96,20 +97,21 @@ public:
 			*this = pi;
 		}
 
-		CString					m_strFileName;
-		REFERENCE_TIME			m_rtIn        = 0;
-		REFERENCE_TIME			m_rtOut       = 0;
-		REFERENCE_TIME			m_rtStartTime = 0;
+		CString              m_strFileName;
 
-		__int64					m_SizeIn      = 0;
-		__int64					m_SizeOut     = 0;
+		REFERENCE_TIME       m_rtIn        = 0;
+		REFERENCE_TIME       m_rtOut       = 0;
+		REFERENCE_TIME       m_rtStartTime = 0;
 
-		BYTE					m_num_video   = 0;
+		__int64              m_SizeIn      = 0;
+		__int64              m_SizeOut     = 0;
 
-		std::vector<BYTE>		m_pg_offset_sequence_id;
-		std::vector<BYTE>		m_ig_offset_sequence_id;
+		BYTE                 m_num_video   = 0;
 
-		CAtlArray<SyncPoint>	m_sps;
+		std::vector<BYTE>    m_pg_offset_sequence_id;
+		std::vector<BYTE>    m_ig_offset_sequence_id;
+
+		CAtlArray<SyncPoint> m_sps;
 
 		REFERENCE_TIME Duration() const {
 			return m_rtOut - m_rtIn;
@@ -124,16 +126,16 @@ public:
 		}
 
 		PlaylistItem& operator = (const PlaylistItem& pi) {
-			m_strFileName			= pi.m_strFileName;
-			m_rtIn					= pi.m_rtIn;
-			m_rtOut					= pi.m_rtOut;
-			m_rtStartTime			= pi.m_rtStartTime;
-			m_SizeIn				= pi.m_SizeIn;
-			m_SizeOut				= pi.m_SizeOut;
-			m_num_video				= pi.m_num_video;
+			m_strFileName           = pi.m_strFileName;
+			m_rtIn                  = pi.m_rtIn;
+			m_rtOut                 = pi.m_rtOut;
+			m_rtStartTime           = pi.m_rtStartTime;
+			m_SizeIn                = pi.m_SizeIn;
+			m_SizeOut               = pi.m_SizeOut;
+			m_num_video             = pi.m_num_video;
 
-			m_pg_offset_sequence_id	= pi.m_pg_offset_sequence_id;
-			m_ig_offset_sequence_id	= pi.m_ig_offset_sequence_id;
+			m_pg_offset_sequence_id = pi.m_pg_offset_sequence_id;
+			m_ig_offset_sequence_id = pi.m_ig_offset_sequence_id;
 
 			m_sps.Copy(pi.m_sps);
 
@@ -141,104 +143,80 @@ public:
 		}
 	};
 
-	enum PlaylistMarkType
-	{
-		Reserved				= 0x00,
-		EntryMark				= 0x01,
-		LinkPoint				= 0x02
+	enum PlaylistMarkType {
+		Reserved  = 0x00,
+		EntryMark = 0x01,
+		LinkPoint = 0x02
 	};
 
 	struct PlaylistChapter {
-		PlaylistChapter() {
-			memset(this, 0, sizeof(*this));
-		}
-
-		SHORT					m_nPlayItemId;
-		PlaylistMarkType		m_nMarkType;
-		REFERENCE_TIME			m_rtTimestamp;
-		SHORT					m_nEntryPID;
-		REFERENCE_TIME			m_rtDuration;
+		SHORT            m_nPlayItemId = 0;
+		PlaylistMarkType m_nMarkType   = Reserved;
+		REFERENCE_TIME   m_rtTimestamp = 0;
+		SHORT            m_nEntryPID   = 0;
+		REFERENCE_TIME   m_rtDuration  = 0;
 	};
 
-	typedef CAutoPtrList<PlaylistItem>	CPlaylist;
-	typedef CAtlList<PlaylistChapter>	CPlaylistChapter;
+	typedef CAutoPtrList<PlaylistItem> CPlaylist;
+	typedef CAtlList<PlaylistChapter>  CPlaylistChapter;
 
 	CHdmvClipInfo();
 	~CHdmvClipInfo();
 
-	HRESULT		ReadInfo(LPCTSTR strFile, CAtlArray<SyncPoint>* sps = NULL);
-	Stream*		FindStream(SHORT wPID);
-	bool		IsHdmv() const { return !m_Streams.IsEmpty(); };
-	size_t		GetStreamCount() const { return m_Streams.GetCount(); };
-	Stream*		GetStreamByIndex(size_t nIndex) {return (nIndex < m_Streams.GetCount()) ? &m_Streams[nIndex] : NULL; };
+	HRESULT ReadInfo(LPCTSTR strFile, CAtlArray<SyncPoint>* sps = NULL);
+	bool    IsHdmv() const { return !m_Streams.IsEmpty(); }
 
-	HRESULT		FindMainMovie(LPCTSTR strFolder, CString& strPlaylistFile, CPlaylist& MainPlaylist, CPlaylist& MPLSPlaylists);
-	HRESULT		ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bFullInfoRead = FALSE, BYTE* MVC_Base_View_R_flag = NULL);
-	HRESULT		ReadChapters(CString strPlaylistFile, CPlaylist& PlaylistItems, CPlaylistChapter& Chapters);
+	Stream*  FindStream(SHORT wPID);
+	Streams& GetStreams() { return m_Streams; }
+
+	HRESULT FindMainMovie(LPCTSTR strFolder, CString& strPlaylistFile, CPlaylist& MainPlaylist, CPlaylist& MPLSPlaylists);
+	HRESULT ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bFullInfoRead = FALSE, BYTE* MVC_Base_View_R_flag = NULL);
+	HRESULT ReadChapters(CString strPlaylistFile, CPlaylist& PlaylistItems, CPlaylistChapter& Chapters);
 
 private :
-	DWORD		ProgramInfo_start_address;
-	DWORD		Cpi_start_addrress;
-	DWORD		Ext_data_start_address;
+	DWORD  ProgramInfo_start_address = 0;
+	DWORD  Cpi_start_addrress        = 0;
+	DWORD  Ext_data_start_address    = 0;
 
-	HANDLE		m_hFile;
+	HANDLE m_hFile = INVALID_HANDLE_VALUE;
 
-	CAtlArray<Stream> m_Streams;
+	Streams m_Streams;
 
-	void		ReadBuffer(BYTE* pBuff, DWORD nLen);
-	DWORD		ReadDword();
-	SHORT		ReadShort();
-	BYTE		ReadByte();
+	void    ReadBuffer(BYTE* pBuff, DWORD nLen);
+	DWORD   ReadDword();
+	SHORT   ReadShort();
+	BYTE    ReadByte();
 
-	BOOL		Skip(LONGLONG nLen);
-	BOOL		GetPos(LONGLONG& Pos);
-	BOOL		SetPos(LONGLONG Pos, DWORD dwMoveMethod = FILE_BEGIN);
+	BOOL    Skip(LONGLONG nLen);
+	BOOL    GetPos(LONGLONG& Pos);
+	BOOL    SetPos(LONGLONG Pos, DWORD dwMoveMethod = FILE_BEGIN);
 
-	HRESULT		ReadProgramInfo();
-	HRESULT		ReadCpiInfo(CAtlArray<SyncPoint>* sps);
-	HRESULT		CloseFile(HRESULT hr);
+	HRESULT ReadProgramInfo();
+	HRESULT ReadCpiInfo(CAtlArray<SyncPoint>* sps);
+	HRESULT CloseFile(HRESULT hr);
 
 private:
 	struct ClpiEpCoarse {
-		ClpiEpCoarse() {
-			memset(this, 0, sizeof(*this));
-		}
-
-		WORD			ref_ep_fine_id;
-		WORD			pts_ep;
-		DWORD			spn_ep;
+		WORD  ref_ep_fine_id = 0;
+		WORD  pts_ep         = 0;
+		DWORD spn_ep         = 0;
 	};
 
 	struct ClpiEpFine {
-		ClpiEpFine() {
-			memset(this, 0, sizeof(*this));
-		}
-
-		BYTE			is_angle_change_point;
-		BYTE			i_end_position_offset;
-		SHORT			pts_ep;
-		WORD			spn_ep;
+		BYTE  is_angle_change_point = 0;
+		BYTE  i_end_position_offset = 0;
+		SHORT pts_ep                = 0;
+		WORD  spn_ep                = 0;
 	};
 
 	struct ClpiEpMapEntry {
-		SHORT			pid;
-		BYTE			ep_stream_type;
-		SHORT			num_ep_coarse;
-		WORD			num_ep_fine;
-		DWORD			ep_map_stream_start_addr;
+		SHORT pid                      = 0;
+		BYTE  ep_stream_type           = 0;
+		SHORT num_ep_coarse            = 0;
+		WORD  num_ep_fine              = 0;
+		DWORD ep_map_stream_start_addr = 0;
 
-		ClpiEpCoarse*	coarse;
-		ClpiEpFine*		fine;
-
-		ClpiEpMapEntry() {
-			pid							= 0;
-			ep_stream_type				= 0;
-			num_ep_coarse				= 0;
-			num_ep_fine					= 0;
-			ep_map_stream_start_addr	= 0;
-
-			coarse						= NULL;
-			fine						= NULL;
-		}
+		ClpiEpCoarse* coarse           = NULL;
+		ClpiEpFine*   fine             = NULL;
 	};
 };

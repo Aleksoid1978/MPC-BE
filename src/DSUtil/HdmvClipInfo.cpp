@@ -26,7 +26,6 @@
 extern LCID	ISO6392ToLcid(LPCSTR code);
 
 CHdmvClipInfo::CHdmvClipInfo()
-	: m_hFile(INVALID_HANDLE_VALUE)
 {
 }
 

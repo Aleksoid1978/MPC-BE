@@ -150,6 +150,16 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		return E_FAIL;
 	}
 
+	if (m_ClipInfo.IsHdmv()) {
+		CHdmvClipInfo::Streams& streams = m_ClipInfo.GetStreams();
+		for (size_t i = 0; i < streams.GetCount(); i++) {
+			CHdmvClipInfo::Stream& stream = streams[i];
+			if (stream.m_Type == PRESENTATION_GRAPHICS_STREAM) {
+				AddHdmvPGStream(stream.m_PID, stream.m_LanguageCode);
+			}
+		}
+	}
+
 	if (IsRandomAccess()) {
 		const __int64 len = GetLength();
 
@@ -1070,7 +1080,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 					const program* pProgram = FindProgram(s.pid, &nProgram, &pClipInfo);
 
 					hdmvsubhdr h;
-					if (!m_ClipInfo.IsHdmv() && Read(h, &s.mt, pClipInfo ? pClipInfo->m_LanguageCode : _streamData.pmt.lang)) {
+					if (Read(h, &s.mt, pClipInfo ? pClipInfo->m_LanguageCode : _streamData.pmt.lang)) {
 						s.codec = stream_codec::PGS;
 						type = stream_type::subpic;
 					}
