@@ -5203,7 +5203,7 @@ void CMainFrame::cmdLineThreadFunction()
 						p += sizeof(DWORD);
 						const WCHAR* pBuff    = (WCHAR*)(p);
 						const WCHAR* pBuffEnd = (WCHAR*)(p + pData.size() - sizeof(DWORD));
-						
+
 						while (cnt-- > 0) {
 							CString str;
 							while (pBuff < pBuffEnd && *pBuff) {

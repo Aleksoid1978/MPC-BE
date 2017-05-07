@@ -478,7 +478,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 									fileName.Format(L"%s\\STREAM\\%c%c%c%c%c.M2TS", CString(Path), Buff[0], Buff[1], Buff[2], Buff[3], Buff[4]);
 									_ext_sub_path.extFileNames.emplace_back(fileName);
 								}
-				
+
 								SetPos(savePos);
 							}
 
