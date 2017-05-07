@@ -27,7 +27,6 @@ extern LCID	ISO6392ToLcid(LPCSTR code);
 
 CHdmvClipInfo::CHdmvClipInfo()
 	: m_hFile(INVALID_HANDLE_VALUE)
-	, m_bIsHdmv(false)
 {
 }
 
@@ -379,7 +378,6 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 	CPath Path(strPlaylistFile);
 	rtDuration = 0;
 
-	m_bIsHdmv = false;
 	m_Streams.RemoveAll();
 
 	// Get BDMV folder
@@ -729,8 +727,6 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 				}
 			}
 		}
-
-		m_bIsHdmv = !Playlist.IsEmpty();
 
 		return Playlist.IsEmpty() ? E_FAIL : bDuplicate ? S_FALSE : S_OK;
 	}

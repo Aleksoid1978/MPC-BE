@@ -168,7 +168,7 @@ public:
 
 	HRESULT		ReadInfo(LPCTSTR strFile, CAtlArray<SyncPoint>* sps = NULL);
 	Stream*		FindStream(SHORT wPID);
-	bool		IsHdmv() const { return m_bIsHdmv; };
+	bool		IsHdmv() const { return !m_Streams.IsEmpty(); };
 	size_t		GetStreamCount() const { return m_Streams.GetCount(); };
 	Stream*		GetStreamByIndex(size_t nIndex) {return (nIndex < m_Streams.GetCount()) ? &m_Streams[nIndex] : NULL; };
 
@@ -183,8 +183,7 @@ private :
 
 	HANDLE		m_hFile;
 
-	CAtlArray<Stream>	m_Streams;
-	bool				m_bIsHdmv;
+	CAtlArray<Stream> m_Streams;
 
 	void		ReadBuffer(BYTE* pBuff, DWORD nLen);
 	DWORD		ReadDword();
