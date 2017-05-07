@@ -3610,6 +3610,10 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 		case INFO_InputFormat:
 			if (m_pAVCtx) {
 				infostr = m_pAVCtx->codec_descriptor->name;
+				if (m_pAVCtx->codec_id == AV_CODEC_ID_RAWVIDEO) {
+					char* fourcc = (char*)&m_pAVCtx->codec_tag;
+					infostr.AppendFormat(L" '%C%C%C%C'", fourcc[0], fourcc[1], fourcc[2], fourcc[3]);
+				}
 				if (const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(m_pAVCtx->pix_fmt)) {
 					if (desc->flags & AV_PIX_FMT_FLAG_PAL) {
 						infostr.Append(L", palettized RGB");
