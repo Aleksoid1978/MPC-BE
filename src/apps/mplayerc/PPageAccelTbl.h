@@ -56,15 +56,15 @@ public:
 
 	enum { IDD = IDD_PPAGEACCELTBL };
 	CPlayerListCtrl m_list;
-	BOOL m_fWinLirc;
+	BOOL m_bWinLirc;
 	CString m_WinLircAddr;
 	CEdit m_WinLircEdit;
 	CStaticLink m_WinLircLink;
-	BOOL m_fUIce;
+	BOOL m_bUIce;
 	CString m_UIceAddr;
 	CEdit m_UIceEdit;
 	CStaticLink m_UIceLink;
-	BOOL m_fGlobalMedia;
+	BOOL m_bGlobalMedia;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

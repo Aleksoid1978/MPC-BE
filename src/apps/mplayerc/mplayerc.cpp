@@ -1616,11 +1616,11 @@ BOOL CMPlayerCApp::InitInstance()
 	pFrame->UpdateWindow();
 	pFrame->m_hAccelTable = m_s.hAccel;
 	m_s.WinLircClient.SetHWND(m_pMainWnd->m_hWnd);
-	if (m_s.fWinLirc) {
+	if (m_s.bWinLirc) {
 		m_s.WinLircClient.Connect(m_s.strWinLircAddr);
 	}
 	m_s.UIceClient.SetHWND(m_pMainWnd->m_hWnd);
-	if (m_s.fUIce) {
+	if (m_s.bUIce) {
 		m_s.UIceClient.Connect(m_s.strUIceAddr);
 	}
 
@@ -1779,7 +1779,7 @@ void CMPlayerCApp::RegisterHotkeys()
 
 	RegisterRawInputDevices(MCEInputDevice, _countof(MCEInputDevice), sizeof(RAWINPUTDEVICE));
 
-	if (m_s.fGlobalMedia) {
+	if (m_s.bGlobalMedia) {
 		POSITION pos = m_s.wmcmds.GetHeadPosition();
 
 		while (pos) {
@@ -1793,7 +1793,7 @@ void CMPlayerCApp::RegisterHotkeys()
 
 void CMPlayerCApp::UnregisterHotkeys()
 {
-	if (m_s.fGlobalMedia) {
+	if (m_s.bGlobalMedia) {
 		POSITION pos = m_s.wmcmds.GetHeadPosition();
 
 		while (pos) {

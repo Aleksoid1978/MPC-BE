@@ -111,7 +111,7 @@ void CChildView::LoadLogo()
 	if (m_logo.FileExists(logoFName, true)) {
 		m_logo.Attach(OpenImage(logoFName));
 	} else {
-		if (s.fLogoExternal) {
+		if (s.bLogoExternal) {
 			m_logo.Attach(OpenImage(s.strLogoFileName));
 			if (m_logo) {
 				bHaveLogo = true;
@@ -119,7 +119,7 @@ void CChildView::LoadLogo()
 		}
 
 		if (!bHaveLogo) {
-			s.fLogoExternal = false;
+			s.bLogoExternal = false;
 			s.strLogoFileName.Empty();
 
 			if (!m_logo.LoadFromResource(s.nLogoId)) {

@@ -2214,7 +2214,7 @@ LRESULT CMainFrame::OnHotKey(WPARAM wParam, LPARAM lParam)
 	CAppSettings& s = AfxGetAppSettings();
 	BOOL fRet = FALSE;
 
-	if (GetActiveWindow() == this || s.fGlobalMedia == TRUE) {
+	if (GetActiveWindow() == this || s.bGlobalMedia == TRUE) {
 		POSITION pos = s.wmcmds.GetHeadPosition();
 
 		while (pos) {

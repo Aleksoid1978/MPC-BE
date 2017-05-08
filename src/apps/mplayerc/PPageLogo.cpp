@@ -64,7 +64,7 @@ BOOL CPPageLogo::OnInitDialog()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	m_intext = s.fLogoExternal ? 1 : 0;
+	m_intext = s.bLogoExternal ? 1 : 0;
 	m_logofn = s.strLogoFileName;
 
 	UpdateData(FALSE);
@@ -94,7 +94,7 @@ BOOL CPPageLogo::OnApply()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.fLogoExternal = !!m_intext;
+	s.bLogoExternal = !!m_intext;
 	s.strLogoFileName = m_logofn;
 	s.nLogoId = m_logoids.GetAt(m_logoidpos);
 
