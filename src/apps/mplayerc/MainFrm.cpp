@@ -638,7 +638,7 @@ CMainFrame::CMainFrame() :
 	m_fOpeningAborted(false),
 	m_fBuffering(false),
 	m_fileDropTarget(this),
-	m_fTrayIcon(false),
+	m_bTrayIcon(false),
 	m_pFullscreenWnd(NULL),
 	m_pVideoWnd(NULL),
 	m_pOSDWnd(NULL),
@@ -829,7 +829,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	SetAlwaysOnTop(s.iOnTop);
 
-	ShowTrayIcon(s.fTrayIcon);
+	ShowTrayIcon(s.bTrayIcon);
 
 	SetFocus();
 
@@ -846,8 +846,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		}
 	}
 
-	m_bToggleShader = s.fToggleShader;
-	m_bToggleShaderScreenSpace = s.fToggleShaderScreenSpace;
+	m_bToggleShader = s.bToggleShader;
+	m_bToggleShaderScreenSpace = s.bToggleShaderScreenSpace;
 
 #ifdef _WIN64
 	m_strTitle.Format(L"%s x64 - v%s", ResStr(IDR_MAINFRAME), _T(MPC_VERSION_STR));
@@ -975,8 +975,8 @@ void CMainFrame::OnClose()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.fToggleShader = m_bToggleShader;
-	s.fToggleShaderScreenSpace = m_bToggleShaderScreenSpace;
+	s.bToggleShader = m_bToggleShader;
+	s.bToggleShaderScreenSpace = m_bToggleShaderScreenSpace;
 
 	s.dZoomX = m_ZoomX;
 	s.dZoomY = m_ZoomY;
@@ -1134,8 +1134,8 @@ void CMainFrame::SaveControlBars()
 
 LRESULT CMainFrame::OnTaskBarRestart(WPARAM, LPARAM)
 {
-	m_fTrayIcon = false;
-	ShowTrayIcon(AfxGetAppSettings().fTrayIcon);
+	m_bTrayIcon = false;
+	ShowTrayIcon(AfxGetAppSettings().bTrayIcon);
 
 	return 0;
 }
@@ -1208,20 +1208,20 @@ void CMainFrame::ShowTrayIcon(bool fShow)
 	tnid.uID = IDR_MAINFRAME;
 
 	if (fShow) {
-		if (!m_fTrayIcon) {
+		if (!m_bTrayIcon) {
 			tnid.hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 			tnid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
 			tnid.uCallbackMessage = WM_NOTIFYICON;
 			StringCchCopy(tnid.szTip, _countof(tnid.szTip), TEXT("MPC-BE"));
 			Shell_NotifyIcon(NIM_ADD, &tnid);
 
-			m_fTrayIcon = true;
+			m_bTrayIcon = true;
 		}
 	} else {
-		if (m_fTrayIcon) {
+		if (m_bTrayIcon) {
 			Shell_NotifyIcon(NIM_DELETE, &tnid);
 
-			m_fTrayIcon = false;
+			m_bTrayIcon = false;
 		}
 	}
 
@@ -1843,7 +1843,7 @@ void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 		return;
 	}
 
-	if (AfxGetAppSettings().fSnapToDesktopEdges && !fCtrl) {
+	if (AfxGetAppSettings().bSnapToDesktopEdges && !fCtrl) {
 
 		MONITORINFO mi = { sizeof(mi) };
 		GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
@@ -1953,7 +1953,7 @@ void CMainFrame::OnSizing(UINT nSide, LPRECT pRect)
 
 	if (m_eMediaLoadState != MLS_LOADED || m_bFullScreen
 			|| s.iDefaultVideoSize == DVS_STRETCH
-			|| (bCtrl == s.fLimitWindowProportions)) {
+			|| (bCtrl == s.bLimitWindowProportions)) {
 		return;
 	}
 
@@ -2048,7 +2048,7 @@ void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 	if ((GetMediaState() == State_Running && !m_bAudioOnly) && (((nID & 0xFFF0) == SC_SCREENSAVE) || ((nID & 0xFFF0) == SC_MONITORPOWER))) {
 		DLog(L"SC_SCREENSAVE, nID = %d, lParam = %d", nID, lParam);
 		return;
-	} else if ((nID & 0xFFF0) == SC_MINIMIZE && m_fTrayIcon) {
+	} else if ((nID & 0xFFF0) == SC_MINIMIZE && m_bTrayIcon) {
 		if (m_wndFlyBar && m_wndFlyBar.IsWindowVisible()) {
 			m_wndFlyBar.ShowWindow(SW_HIDE);
 		}
@@ -2317,7 +2317,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 								QueryPerformanceFrequency(&freq);
 								if ((time.QuadPart - m_LastSaveTime.QuadPart) >= 30 * freq.QuadPart) { // save every half of minute
 									m_LastSaveTime = time;
-									if (s.fKeepHistory && s.fRememberFilePos) {
+									if (s.bKeepHistory && s.bRememberFilePos) {
 										FilePosition->nAudioTrack = GetAudioTrackIdx();
 										FilePosition->nSubtitleTrack = GetSubtitleTrackIdx();
 
@@ -2800,7 +2800,7 @@ bool CMainFrame::GraphEventComplete()
 		FilePosition->nSubtitleTrack = -1;
 
 		QueryPerformanceCounter(&m_LastSaveTime);
-		if (s.fKeepHistory && s.fRememberFilePos) {
+		if (s.bKeepHistory && s.bRememberFilePos) {
 			s.SaveCurrentFilePosition();
 		}
 	}
@@ -2968,14 +2968,14 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 
 							Domain = L"First Play";
 
-							if ( s.fShowDebugInfo ) {
+							if (s.bShowDebugInfo) {
 								m_OSD.DebugMessage(L"%s", Domain);
 							}
 
 							if (m_pDVDI && SUCCEEDED (m_pDVDI->GetDiscID (NULL, &llDVDGuid))) {
 								m_fValidDVDOpen = true;
 
-								if ( s.fShowDebugInfo ) {
+								if (s.bShowDebugInfo) {
 									m_OSD.DebugMessage(L"DVD Title: %d", s.lDVDTitle);
 								}
 
@@ -2984,7 +2984,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 									// Set command line position
 									hr = m_pDVDC->PlayTitle(s.lDVDTitle, DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, NULL);
 
-									if ( s.fShowDebugInfo ) {
+									if (s.bShowDebugInfo) {
 										m_OSD.DebugMessage(L"PlayTitle: 0x%08X", hr);
 										m_OSD.DebugMessage(L"DVD Chapter: %d", s.lDVDChapter);
 									}
@@ -2992,14 +2992,14 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 									if (s.lDVDChapter > 1) {
 										hr = m_pDVDC->PlayChapterInTitle(s.lDVDTitle, s.lDVDChapter, DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, NULL);
 
-										if ( s.fShowDebugInfo ) {
+										if (s.bShowDebugInfo) {
 											m_OSD.DebugMessage(L"PlayChapterInTitle: 0x%08X", hr);
 										}
 									} else {
 										// Trick: skip trailers with some DVDs
 										hr = m_pDVDC->Resume(DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, NULL);
 
-										if ( s.fShowDebugInfo ) {
+										if (s.bShowDebugInfo) {
 											m_OSD.DebugMessage(L"Resume: 0x%08X", hr);
 										}
 
@@ -3010,11 +3010,11 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 											hr = m_pDVDC->PlayAtTime(&s.DVDPosition,
 																   DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, NULL);
 
-											if ( s.fShowDebugInfo ) {
+											if (s.bShowDebugInfo) {
 												m_OSD.DebugMessage(L"PlayAtTime: 0x%08X", hr);
 											}
 										} else {
-											if ( s.fShowDebugInfo )
+											if (s.bShowDebugInfo)
 												m_OSD.DebugMessage(L"Timecode requested: %02d:%02d:%02d.%03d",
 																   s.DVDPosition.bHours, s.DVDPosition.bMinutes,
 																   s.DVDPosition.bSeconds, s.DVDPosition.bFrames);
@@ -3023,7 +3023,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 											hr = m_pDVDC->PlayChapterInTitle(s.lDVDTitle, 1,
 																			 DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, NULL);
 
-											if ( s.fShowDebugInfo ) {
+											if (s.bShowDebugInfo) {
 												m_OSD.DebugMessage(L"PlayChapterInTitle: 0x%08X", hr);
 											}
 
@@ -3031,7 +3031,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 											hr = m_pDVDC->PlayAtTime(&s.DVDPosition,
 																	 DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, NULL);
 
-											if ( s.fShowDebugInfo ) {
+											if (s.bShowDebugInfo) {
 												m_OSD.DebugMessage(L"PlayAtTime: 0x%08X", hr);
 											}
 
@@ -3039,7 +3039,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 												hr = m_pDVDC->PlayAtTimeInTitle(s.lDVDTitle, &s.DVDPosition,
 																				DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, NULL);
 
-												if ( s.fShowDebugInfo ) {
+												if (s.bShowDebugInfo) {
 													m_OSD.DebugMessage(L"PlayAtTimeInTitle: 0x%08X", hr);
 												}
 											}
@@ -3048,7 +3048,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 										hr = m_pDVDC->PlayAtTime(&s.DVDPosition,
 																 DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, NULL);
 
-										if ( s.fShowDebugInfo ) {
+										if (s.bShowDebugInfo) {
 											m_OSD.DebugMessage(L"PlayAtTime: %d", hr);
 										}
 									}
@@ -3062,7 +3062,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 									// We don't want to restore the position from the favorite
 									// if the playback is reinitialized so we clear the saved state
 									pDVDData->pDvdState.Release();
-								} else if (s.fKeepHistory && s.fRememberDVDPos && !s.NewDvd(llDVDGuid)) {
+								} else if (s.bKeepHistory && s.bRememberDVDPos && !s.NewDvd(llDVDGuid)) {
 									// Set last remembered position (if founded...)
 									DVD_POSITION* DvdPos = s.CurrentDVDPosition();
 
@@ -3081,30 +3081,30 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 									if (SUCCEEDED(hr)) {
 										m_iDVDTitle = DvdPos->lTitle;
 									}
-								} else if (s.fStartMainTitle && s.fNormalStartDVD) {
+								} else if (s.bStartMainTitle && s.bNormalStartDVD) {
 									m_pDVDC->ShowMenu(DVD_MENU_Title, DVD_CMD_FLAG_Block | DVD_CMD_FLAG_Flush, NULL);
 								}
-								s.fNormalStartDVD = true;
-								if (s.fRememberZoomLevel && !m_bFullScreen && !IsD3DFullScreenMode()) { // Hack to the normal initial zoom for DVD + DXVA ...
+								s.bNormalStartDVD = true;
+								if (s.bRememberZoomLevel && !m_bFullScreen && !IsD3DFullScreenMode()) { // Hack to the normal initial zoom for DVD + DXVA ...
 									ZoomVideoWindow();
 								}
 							}
 							break;
 						case DVD_DOMAIN_VideoManagerMenu:
 							Domain = L"Video Manager Menu";
-							if ( s.fShowDebugInfo ) {
+							if (s.bShowDebugInfo) {
 								m_OSD.DebugMessage(L"%s", Domain);
 							}
 							break;
 						case DVD_DOMAIN_VideoTitleSetMenu:
 							Domain = L"Video Title Set Menu";
-							if ( s.fShowDebugInfo ) {
+							if (s.bShowDebugInfo) {
 								m_OSD.DebugMessage(L"%s", Domain);
 							}
 							break;
 						case DVD_DOMAIN_Title:
 							Domain.Format(ResStr(IDS_AG_TITLE), m_iDVDTitle);
-							if ( s.fShowDebugInfo ) {
+							if (s.bShowDebugInfo) {
 								m_OSD.DebugMessage(L"%s", Domain);
 							}
 							DVD_POSITION* DvdPos;
@@ -3121,13 +3121,13 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 							break;
 						case DVD_DOMAIN_Stop:
 							Domain = ResStr(IDS_AG_STOP);
-							if ( s.fShowDebugInfo ) {
+							if (s.bShowDebugInfo) {
 								m_OSD.DebugMessage(L"%s", Domain);
 							}
 							break;
 						default:
 							Domain = L"-";
-							if ( s.fShowDebugInfo ) {
+							if (s.bShowDebugInfo) {
 								m_OSD.DebugMessage(L"%s", Domain);
 							}
 							break;
@@ -3217,7 +3217,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 
 				m_bAudioOnly = (size.cx <= 0 || size.cy <= 0);
 
-				if (s.fRememberZoomLevel
+				if (s.bRememberZoomLevel
 						&& !(m_bFullScreen || wp.showCmd == SW_SHOWMAXIMIZED || wp.showCmd == SW_SHOWMINIMIZED)) {
 					ZoomVideoWindow();
 				} else {
@@ -4227,7 +4227,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		GetWindowPlacement(&wp);
 
 		// Workaround to avoid MadVR freezing when switching channels in PM_CAPTURE mode:
-		if (IsWindowVisible() && s.fRememberZoomLevel
+		if (IsWindowVisible() && s.bRememberZoomLevel
 				&& !(m_bFullScreen || wp.showCmd == SW_SHOWMAXIMIZED || wp.showCmd == SW_SHOWMINIMIZED)
 				&& GetPlaybackMode() == PM_CAPTURE && rs.iVideoRenderer == VIDRNDT_MADVR) {
 			ShowWindow(SW_MAXIMIZE);
@@ -4235,7 +4235,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		}
 
 		// restore magnification
-		if (IsWindowVisible() && s.fRememberZoomLevel
+		if (IsWindowVisible() && s.bRememberZoomLevel
 				&& !(m_bFullScreen || IsD3DFullScreenMode()
 					|| wp.showCmd == SW_SHOWMAXIMIZED || wp.showCmd == SW_SHOWMINIMIZED)) {
 			ZoomVideoWindow(false);
@@ -4260,7 +4260,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	SendNowPlayingToApi();
 
-	if (m_bFullScreen && s.fRememberZoomLevel) {
+	if (m_bFullScreen && s.bRememberZoomLevel) {
 		m_bFirstFSAfterLaunchOnFullScreen = true;
 	}
 
@@ -4279,7 +4279,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	SetToolBarSubtitleButton();
 
 	// correct window size if "Limit window proportions on resize" enable.
-	if (!s.fRememberZoomLevel) {
+	if (!s.bRememberZoomLevel) {
 		CRect r;
 		GetWindowRect(&r);
 		OnSizing(WMSZ_LEFT, r);
@@ -4930,7 +4930,7 @@ void CMainFrame::OnFileOpenQuick()
 	s.m_Formats.GetFilter(filter, mask);
 
 	DWORD dwFlags = OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_ALLOWMULTISELECT | OFN_ENABLEINCLUDENOTIFY | OFN_NOCHANGEDIR;
-	if (!s.fKeepHistory) {
+	if (!s.bKeepHistory) {
 		dwFlags |= OFN_DONTADDTORECENT;
 	}
 
@@ -9932,7 +9932,7 @@ void CMainFrame::PlayFavoriteDVD(CString fav)
 		UNREFERENCED_PARAMETER(hr);
 	}
 
-	AfxGetAppSettings().fNormalStartDVD = false;
+	AfxGetAppSettings().bNormalStartDVD = false;
 
 	CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
 	if (p) {
@@ -10081,7 +10081,7 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 
 	if (s.HasFixedWindowSize()) {
 		windowSize = s.sizeFixedWindow;
-	} else if (s.fRememberWindowSize) {
+	} else if (s.bRememberWindowSize) {
 		windowSize = rcLastWindowPos.Size();
 	} else {
 		CRect windowRect;
@@ -10104,7 +10104,7 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 	}
 
 	bool bRestoredWindowPosition = false;
-	if (s.fRememberWindowPos) {
+	if (s.bRememberWindowPos) {
 		CRect windowRect(rcLastWindowPos.TopLeft(), windowSize);
 		if (CMonitors::IsOnScreen(windowRect)) {
 			MoveWindow(windowRect);
@@ -10128,7 +10128,7 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		SetWindowPos(NULL, windowRect.left, windowRect.top, windowSize.cx, windowSize.cy, SWP_NOZORDER | SWP_NOACTIVATE);
 	}
 
-	if (s.fRememberWindowSize && s.fRememberWindowPos) {
+	if (s.bRememberWindowSize && s.bRememberWindowPos) {
 		UINT lastWindowType = s.nLastWindowType;
 		if (lastWindowType == SIZE_MAXIMIZED) {
 			ShowWindow(SW_MAXIMIZE);
@@ -10137,7 +10137,7 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		}
 	}
 
-	if (s.fSavePnSZoom) {
+	if (s.bSavePnSZoom) {
 		m_ZoomX = s.dZoomX;
 		m_ZoomY = s.dZoomY;
 	}
@@ -10165,12 +10165,12 @@ void CMainFrame::RestoreDefaultWindowRect()
 {
 	const CAppSettings& s = AfxGetAppSettings();
 
-	if (!m_bFullScreen && !IsZoomed() && !IsIconic() && !s.fRememberWindowSize) {
+	if (!m_bFullScreen && !IsZoomed() && !IsIconic() && !s.bRememberWindowSize) {
 		CSize windowSize;
 
 		if (s.HasFixedWindowSize()) {
 			windowSize = s.sizeFixedWindow;
-		} else if (s.fRememberWindowSize) {
+		} else if (s.bRememberWindowSize) {
 			windowSize = s.rcLastWindowPos.Size();
 		} else {
 			CRect windowRect;
@@ -10192,7 +10192,7 @@ void CMainFrame::RestoreDefaultWindowRect()
 			windowSize.cy += cSize.cy;
 		}
 
-		if (s.fRememberWindowPos) {
+		if (s.bRememberWindowPos) {
 			MoveWindow(CRect(s.rcLastWindowPos.TopLeft(), windowSize));
 		} else {
 			SetWindowPos(NULL, 0, 0, windowSize.cx, windowSize.cy, SWP_NOMOVE | SWP_NOZORDER);
@@ -10433,9 +10433,9 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	m_bAudioOnly = fAudioOnly;
 
 	if (m_bFirstFSAfterLaunchOnFullScreen) { //Play started in Fullscreen
-		if (s.fRememberWindowSize || s.fRememberWindowPos) {
+		if (s.bRememberWindowSize || s.bRememberWindowPos) {
 			r = s.rcLastWindowPos;
-			if (!s.fRememberWindowPos) {
+			if (!s.bRememberWindowPos) {
 				hm = MonitorFromPoint( CPoint( 0,0 ), MONITOR_DEFAULTTOPRIMARY );
 				GetMonitorInfo(hm, &mi);
 				CRect m_r = mi.rcMonitor;
@@ -10443,13 +10443,13 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 				int top = m_r.top + (m_r.Height() - r.Height())/2;
 				r = CRect(left, top, left + r.Width(), top + r.Height());
 			}
-			if (!s.fRememberWindowSize) {
+			if (!s.bRememberWindowSize) {
 				CSize vsize = GetVideoSize();
 				r = CRect(r.left, r.top, r.left + vsize.cx, r.top + vsize.cy);
 				ShowWindow(SW_HIDE);
 			}
 			SetWindowPos(NULL, r.left, r.top, r.Width(), r.Height(), SWP_NOZORDER | SWP_NOSENDCHANGING);
-			if (!s.fRememberWindowSize) {
+			if (!s.bRememberWindowSize) {
 				ZoomVideoWindow();
 				ShowWindow(SW_SHOW);
 			}
@@ -10541,7 +10541,7 @@ void CMainFrame::ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo)
 				m_pVMRWC->SetVideoClippingWindow(m_pVideoWnd->m_hWnd);
 			}
 
-			if ((s.iShowOSD & OSD_ENABLE) || s.fShowDebugInfo) {
+			if ((s.iShowOSD & OSD_ENABLE) || s.bShowDebugInfo) {
 				if (m_pVMB) {
 					m_OSD.Start(m_pVideoWnd, m_pVMB);
 				}
@@ -10973,10 +10973,10 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 	finalSize.cx = max(finalSize.cx, mmi.ptMinTrackSize.x);
 	finalSize.cy = max(finalSize.cy, mmi.ptMinTrackSize.y);
 
-	if (!s.fRememberWindowPos) {
+	if (!s.bRememberWindowPos) {
 		bool isSnapped = false;
 
-		if (snap && s.fSnapToDesktopEdges && m_bWasSnapped) { // check if snapped to edges
+		if (snap && s.bSnapToDesktopEdges && m_bWasSnapped) { // check if snapped to edges
 			isSnapped = (r.left == workRect.left) || (r.top == workRect.top)
 						|| (r.right == workRect.right) || (r.bottom == workRect.bottom);
 		}
@@ -11760,7 +11760,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 		}
 
-		if (s.fKeepHistory && pOFD->bAddRecent && fn.Find(L"pipe:") == -1) {
+		if (s.bKeepHistory && pOFD->bAddRecent && fn.Find(L"pipe:") == -1) {
 			CRecentFileList* pMRU = bFirst ? &s.MRU : &s.MRUDub;
 			pMRU->ReadList();
 			pMRU->Add(fn);
@@ -11856,7 +11856,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	if (!pOFD->fns.IsEmpty()){
 		const CString fn = pOFD->fns.GetHead();
 		if (fn.Find(L"://") < 0
-				&& s.fKeepHistory && s.fRememberFilePos && !s.NewFile(fn)) {
+				&& s.bKeepHistory && s.bRememberFilePos && !s.NewFile(fn)) {
 			const FILE_POSITION* FilePosition = s.CurrentFilePosition();
 			if (m_pMS) {
 				REFERENCE_TIME rtPos = FilePosition->llPosition;
@@ -12756,7 +12756,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 	m_strCurPlaybackLabel = fn;
 
 	if (i == 1) {
-		if (s.fTitleBarTextTitle) {
+		if (s.bTitleBarTextTitle) {
 			if (!m_youtubeFields.title.IsEmpty()) {
 				fn = m_youtubeFields.title;
 			}
@@ -13625,7 +13625,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 		BeginEnumFilters(m_pGB, pEF, pBF) {
 			if (m_pLN21 = pBF) {
-				m_pLN21->SetServiceState(s.fClosedCaptions ? AM_L21_CCSTATE_On : AM_L21_CCSTATE_Off);
+				m_pLN21->SetServiceState(s.bClosedCaptions ? AM_L21_CCSTATE_On : AM_L21_CCSTATE_Off);
 				break;
 			}
 		}
@@ -13652,7 +13652,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			BREAK(aborted)
 		}
 
-		if ((s.iShowOSD & OSD_ENABLE) || s.fShowDebugInfo) { // Force OSD on when the debug switch is used
+		if ((s.iShowOSD & OSD_ENABLE) || s.bShowDebugInfo) { // Force OSD on when the debug switch is used
 			m_OSD.Stop();
 
 			if (IsD3DFullScreenMode() && !m_bAudioOnly) {
@@ -13738,7 +13738,7 @@ void CMainFrame::CloseMediaPrivate()
 
 	if (!m_bEndOfStream && GetPlaybackMode() == PM_FILE) {
 		CAppSettings& s = AfxGetAppSettings();
-		if (s.fKeepHistory && s.fRememberFilePos) {
+		if (s.bKeepHistory && s.bRememberFilePos) {
 			FILE_POSITION* FilePosition = s.CurrentFilePosition();
 			if (FilePosition) {
 				FilePosition->nAudioTrack = GetAudioTrackIdx();
@@ -14069,7 +14069,7 @@ void CMainFrame::SetupOpenCDSubMenu()
 		pSub->CreatePopupMenu();
 	} else while (pSub->RemoveMenu(0, MF_BYPOSITION));
 
-	if (m_eMediaLoadState == MLS_LOADING || AfxGetAppSettings().fHideCDROMsSubMenu) {
+	if (m_eMediaLoadState == MLS_LOADING || AfxGetAppSettings().bHideCDROMsSubMenu) {
 		return;
 	}
 
@@ -18670,7 +18670,7 @@ CString CMainFrame::GetStrForTitle()
 	CAppSettings& s = AfxGetAppSettings();
 
 	if (s.iTitleBarTextStyle == 1) {
-		if (s.fTitleBarTextTitle) {
+		if (s.bTitleBarTextTitle) {
 			if (!m_youtubeFields.title.IsEmpty()) {
 				return m_youtubeFields.title;
 			} else if (m_bIsBDPlay || GetPlaybackMode() == PM_DVD) {
@@ -19013,7 +19013,7 @@ BOOL CMainFrame::OpenIso(CString pathName, REFERENCE_TIME rtStart/* = INVALID_TI
 
 void CMainFrame::AddRecent(CString pathName)
 {
-	if (AfxGetAppSettings().fKeepHistory) {
+	if (AfxGetAppSettings().bKeepHistory) {
 		CRecentFileList* pMRU = &AfxGetAppSettings().MRU;
 		pMRU->ReadList();
 		pMRU->Add(pathName);

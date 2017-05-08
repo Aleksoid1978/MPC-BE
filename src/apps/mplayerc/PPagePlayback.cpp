@@ -129,7 +129,7 @@ BOOL CPPagePlayback::OnInitDialog()
 	AddStringData(m_nSpeedStepCtrl, L"1.0", 100);
 	SelectByItemData(m_nSpeedStepCtrl, s.nSpeedStep);
 
-	m_chkRememberZoomLevel.SetCheck(s.fRememberZoomLevel);
+	m_chkRememberZoomLevel.SetCheck(s.bRememberZoomLevel);
 	m_cmbZoomLevel.AddString(L"50%");
 	m_cmbZoomLevel.AddString(L"100%");
 	m_cmbZoomLevel.AddString(L"200%");
@@ -176,7 +176,7 @@ BOOL CPPagePlayback::OnApply()
 	s.nLoops = m_nLoops;
 	s.fRewind = !!m_fRewind;
 	s.iZoomLevel = m_cmbZoomLevel.GetCurSel();
-	s.fRememberZoomLevel = !!m_chkRememberZoomLevel.GetCheck();
+	s.bRememberZoomLevel = !!m_chkRememberZoomLevel.GetCheck();
 	s.nAutoFitFactor = m_nAutoFitFactor = clamp(m_nAutoFitFactor, 20, 80);
 	s.nAudioWindowMode = m_cbAudioWindowMode.GetCurSel();
 	s.bAddSimilarFiles = !!m_bAddSimilarFiles;

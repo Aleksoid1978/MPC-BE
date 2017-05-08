@@ -81,7 +81,7 @@ BOOL COpenDlg::OnInitDialog()
 	m_bPasteClipboardURL = s.bPasteClipboardURL;
 	UpdateData(FALSE);
 
-	if (s.fKeepHistory) {
+	if (s.bKeepHistory) {
 		CRecentFileList& MRU = s.MRU;
 		MRU.ReadList();
 		m_mrucombo.ResetContent();
@@ -168,7 +168,7 @@ void COpenDlg::OnBnClickedBrowsebutton()
 
 	DWORD dwFlags = OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ALLOWMULTISELECT|OFN_ENABLEINCLUDENOTIFY|OFN_NOCHANGEDIR;
 
-	if (!s.fKeepHistory) {
+	if (!s.bKeepHistory) {
 		dwFlags |= OFN_DONTADDTORECENT;
 	}
 
@@ -217,7 +217,7 @@ void COpenDlg::OnBnClickedBrowsebutton2()
 
 	DWORD dwFlags = OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ENABLEINCLUDENOTIFY|OFN_NOCHANGEDIR;
 
-	if (!s.fKeepHistory) {
+	if (!s.bKeepHistory) {
 		dwFlags |= OFN_DONTADDTORECENT;
 	}
 
