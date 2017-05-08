@@ -81,9 +81,9 @@ void CPPageFormats::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK2, m_apmusic);
 	DDX_Control(pDX, IDC_CHECK3, m_apaudiocd);
 	DDX_Control(pDX, IDC_CHECK4, m_apdvd);
-	DDX_Control(pDX, IDC_CHECK6, m_fContextDir);
-	DDX_Control(pDX, IDC_CHECK7, m_fContextFiles);
-	DDX_Control(pDX, IDC_CHECK8, m_fAssociatedWithIcons);
+	DDX_Control(pDX, IDC_CHECK6, m_chContextDir);
+	DDX_Control(pDX, IDC_CHECK7, m_chContextFiles);
+	DDX_Control(pDX, IDC_CHECK8, m_chAssociatedWithIcons);
 }
 
 int CPPageFormats::GetChecked(int iItem)
@@ -703,9 +703,9 @@ BOOL CPPageFormats::OnInitDialog()
 		SetListItemState(i);
 	}
 
-	m_fContextFiles.SetCheck(s.bSetContextFiles);
-	m_fContextDir.SetCheck(s.bSetContextDir);
-	m_fAssociatedWithIcons.SetCheck(s.fAssociatedWithIcons);
+	m_chContextFiles.SetCheck(s.bSetContextFiles);
+	m_chContextDir.SetCheck(s.bSetContextDir);
+	m_chAssociatedWithIcons.SetCheck(s.bAssociatedWithIcons);
 
 	m_apvideo.SetCheck(IsAutoPlayRegistered(AP_VIDEO));
 	m_apmusic.SetCheck(IsAutoPlayRegistered(AP_MUSIC));
@@ -887,8 +887,8 @@ void GetUnRegisterExts(CString saved_ext, CString new_ext, CAtlList<CString>& Un
 
 BOOL CPPageFormats::OnApply()
 {
-	bool bSetAssociatedWithIconOld	= !!m_fAssociatedWithIcons.GetCheck();
-	bool bSetContextFileOld			= !!m_fContextFiles.GetCheck();
+	bool bSetAssociatedWithIconOld	= !!m_chAssociatedWithIcons.GetCheck();
+	bool bSetContextFileOld			= !!m_chContextFiles.GetCheck();
 
 	UpdateData();
 
@@ -919,8 +919,8 @@ BOOL CPPageFormats::OnApply()
 
 	RegisterApp();
 
-	bool bSetAssociatedWithIcon	= !!m_fAssociatedWithIcons.GetCheck();
-	bool bSetContextFile		= !!m_fContextFiles.GetCheck();
+	bool bSetAssociatedWithIcon	= !!m_chAssociatedWithIcons.GetCheck();
+	bool bSetContextFile		= !!m_chContextFiles.GetCheck();
 
 	m_bFileExtChanged = m_bFileExtChanged || (bSetContextFileOld != bSetContextFile || bSetAssociatedWithIconOld != bSetAssociatedWithIcon);
 
@@ -947,15 +947,15 @@ BOOL CPPageFormats::OnApply()
 	}
 
 	if (m_bFileExtChanged
-			|| !!m_fContextFiles.GetCheck() != s.bSetContextFiles
-			|| !!m_fContextDir.GetCheck() != s.bSetContextDir) {
+			|| !!m_chContextFiles.GetCheck() != s.bSetContextFiles
+			|| !!m_chContextDir.GetCheck() != s.bSetContextDir) {
 		CRegKey key;
 		if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
 			key.SetStringValue(L"Play", ResStr(IDS_OPEN_WITH_MPC));
 			key.SetStringValue(L"Add", ResStr(IDS_ADD_TO_PLAYLIST));
 
-			key.SetDWORDValue(L"ShowFiles", !!m_fContextFiles.GetCheck());
-			key.SetDWORDValue(L"ShowDir", !!m_fContextDir.GetCheck());
+			key.SetDWORDValue(L"ShowFiles", !!m_chContextFiles.GetCheck());
+			key.SetDWORDValue(L"ShowDir", !!m_chContextDir.GetCheck());
 		}
 
 		BOOL bIs64 = IsW64();
@@ -971,7 +971,7 @@ BOOL CPPageFormats::OnApply()
 	}
 
 	CRegKey key;
-	if (m_fContextDir.GetCheck() && !ShellExtExists()) {
+	if (m_chContextDir.GetCheck() && !ShellExtExists()) {
 		if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, L"Directory\\shell\\" PROGID L".enqueue")) {
 			key.SetStringValue(NULL, ResStr(IDS_ADD_TO_PLAYLIST));
 			key.SetStringValue(L"Icon", L"\"" + GetProgramPath() + L"\",0");
@@ -1003,9 +1003,9 @@ BOOL CPPageFormats::OnApply()
 	AddAutoPlayToRegistry(AP_DVDMOVIE,	!!m_apdvd.GetCheck());
 	AddAutoPlayToRegistry(AP_BDMOVIE,	!!m_apdvd.GetCheck());
 
-	s.bSetContextFiles		= !!m_fContextFiles.GetCheck();
-	s.bSetContextDir		= !!m_fContextDir.GetCheck();
-	s.fAssociatedWithIcons	= !!m_fAssociatedWithIcons.GetCheck();
+	s.bSetContextFiles		= !!m_chContextFiles.GetCheck();
+	s.bSetContextDir		= !!m_chContextDir.GetCheck();
+	s.bAssociatedWithIcons	= !!m_chAssociatedWithIcons.GetCheck();
 
 	if (m_bFileExtChanged) {
 		if (IsWin8orLater()) {
@@ -1150,9 +1150,9 @@ void CPPageFormats::OnBnRunAdmin()
 	CAppSettings& s = AfxGetAppSettings();
 	s.LoadSettings(true);
 
-	m_fContextFiles.SetCheck(s.bSetContextFiles);
-	m_fContextDir.SetCheck(s.bSetContextDir);
-	m_fAssociatedWithIcons.SetCheck(s.fAssociatedWithIcons);
+	m_chContextFiles.SetCheck(s.bSetContextFiles);
+	m_chContextDir.SetCheck(s.bSetContextDir);
+	m_chAssociatedWithIcons.SetCheck(s.bAssociatedWithIcons);
 
 	m_apvideo.SetCheck(IsAutoPlayRegistered(AP_VIDEO));
 	m_apmusic.SetCheck(IsAutoPlayRegistered(AP_MUSIC));

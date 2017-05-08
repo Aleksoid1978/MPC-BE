@@ -114,11 +114,11 @@ CPPageAccelTbl::CPPageAccelTbl()
 	: CPPageBase(CPPageAccelTbl::IDD, CPPageAccelTbl::IDD)
 	, m_list(0)
 	, m_counter(0)
-	, m_fWinLirc(FALSE)
+	, m_bWinLirc(FALSE)
 	, m_WinLircLink(L"http://winlirc.sourceforge.net/")
-	, m_fUIce(FALSE)
+	, m_bUIce(FALSE)
 	, m_UIceLink(L"http://www.mediatexx.com/")
-	, m_fGlobalMedia(FALSE)
+	, m_bGlobalMedia(FALSE)
 {
 }
 
@@ -512,12 +512,12 @@ void CPPageAccelTbl::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT1, m_WinLircAddr);
 	DDX_Control(pDX, IDC_EDIT1, m_WinLircEdit);
 	DDX_Control(pDX, IDC_STATICLINK, m_WinLircLink);
-	DDX_Check(pDX, IDC_CHECK1, m_fWinLirc);
+	DDX_Check(pDX, IDC_CHECK1, m_bWinLirc);
 	DDX_Text(pDX, IDC_EDIT2, m_UIceAddr);
 	DDX_Control(pDX, IDC_EDIT2, m_UIceEdit);
 	DDX_Control(pDX, IDC_STATICLINK2, m_UIceLink);
-	DDX_Check(pDX, IDC_CHECK9, m_fUIce);
-	DDX_Check(pDX, IDC_CHECK2, m_fGlobalMedia);
+	DDX_Check(pDX, IDC_CHECK9, m_bUIce);
+	DDX_Check(pDX, IDC_CHECK2, m_bGlobalMedia);
 }
 
 BEGIN_MESSAGE_MAP(CPPageAccelTbl, CPPageBase)
@@ -559,11 +559,11 @@ BOOL CPPageAccelTbl::OnInitDialog()
 
 	m_wmcmds.RemoveAll();
 	m_wmcmds.AddTail(&s.wmcmds);
-	m_fWinLirc = s.fWinLirc;
+	m_bWinLirc = s.bWinLirc;
 	m_WinLircAddr = s.strWinLircAddr;
-	m_fUIce = s.fUIce;
+	m_bUIce = s.bUIce;
 	m_UIceAddr = s.strUIceAddr;
-	m_fGlobalMedia = s.fGlobalMedia;
+	m_bGlobalMedia = s.bGlobalMedia;
 
 	UpdateData(FALSE);
 
@@ -630,17 +630,17 @@ BOOL CPPageAccelTbl::OnApply()
 
 	GetParentFrame()->m_hAccelTable = s.hAccel;
 
-	s.fWinLirc = !!m_fWinLirc;
+	s.bWinLirc = !!m_bWinLirc;
 	s.strWinLircAddr = m_WinLircAddr;
-	if (s.fWinLirc) {
+	if (s.bWinLirc) {
 		s.WinLircClient.Connect(m_WinLircAddr);
 	}
-	s.fUIce = !!m_fUIce;
+	s.bUIce = !!m_bUIce;
 	s.strUIceAddr = m_UIceAddr;
-	if (s.fUIce) {
+	if (s.bUIce) {
 		s.UIceClient.Connect(m_UIceAddr);
 	}
-	s.fGlobalMedia = !!m_fGlobalMedia;
+	s.bGlobalMedia = !!m_bGlobalMedia;
 
 	AfxGetMyApp()->RegisterHotkeys();
 
@@ -870,7 +870,7 @@ void CPPageAccelTbl::OnTimer(UINT_PTR nIDEvent)
 {
 	UpdateData();
 
-	if (m_fWinLirc) {
+	if (m_bWinLirc) {
 		CString addr;
 		m_WinLircEdit.GetWindowText(addr);
 		AfxGetAppSettings().WinLircClient.Connect(addr);
@@ -878,7 +878,7 @@ void CPPageAccelTbl::OnTimer(UINT_PTR nIDEvent)
 
 	m_WinLircEdit.Invalidate();
 
-	if (m_fUIce) {
+	if (m_bUIce) {
 		CString addr;
 		m_UIceEdit.GetWindowText(addr);
 		AfxGetAppSettings().UIceClient.Connect(addr);
@@ -930,10 +930,10 @@ void CPPageAccelTbl::OnCancel()
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	if (!s.fWinLirc) {
+	if (!s.bWinLirc) {
 		s.WinLircClient.DisConnect();
 	}
-	if (!s.fUIce) {
+	if (!s.bUIce) {
 		s.UIceClient.DisConnect();
 	}
 

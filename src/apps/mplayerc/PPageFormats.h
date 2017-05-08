@@ -87,9 +87,9 @@ public:
 	CButton m_apmusic;
 	CButton m_apaudiocd;
 	CButton m_apdvd;
-	CButton m_fContextDir;
-	CButton m_fContextFiles;
-	CButton m_fAssociatedWithIcons;
+	CButton m_chContextDir;
+	CButton m_chContextFiles;
+	CButton m_chAssociatedWithIcons;
 
 	enum { IDD = IDD_PPAGEFORMATS };
 

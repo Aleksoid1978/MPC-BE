@@ -529,7 +529,7 @@ public:
 
 	// Formats
 	CMediaFormats	m_Formats;
-	bool			fAssociatedWithIcons;
+	bool			bAssociatedWithIcons;
 	// file/dir context menu
 	bool			bSetContextFiles;
 	bool			bSetContextDir;
@@ -537,17 +537,17 @@ public:
 	// Keys
 	CList<wmcmd>	wmcmds;
 	HACCEL			hAccel;
-	bool			fWinLirc;
+	bool			bWinLirc;
 	CString			strWinLircAddr;
 	CWinLircClient	WinLircClient;
-	bool			fUIce;
+	bool			bUIce;
 	CString			strUIceAddr;
 	CUIceClient		UIceClient;
-	bool			fGlobalMedia;
+	bool			bGlobalMedia;
 
 	// Logo
 	UINT			nLogoId;
-	bool			fLogoExternal;
+	bool			bLogoExternal;
 	CString			strLogoFileName;
 
 	// Web Inteface
