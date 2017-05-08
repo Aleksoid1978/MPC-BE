@@ -48,8 +48,8 @@ public:
 	LCID m_idAudioLang;
 	LCID m_idSubtitlesLang;
 
-	BOOL m_fClosedCaptions;
-	BOOL m_fStartMainTitle;
+	BOOL m_bClosedCaptions;
+	BOOL m_bStartMainTitle;
 
 	enum { IDD = IDD_PPAGEDVD};
 

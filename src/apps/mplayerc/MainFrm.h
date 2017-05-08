@@ -744,7 +744,7 @@ public:
 
 	void AddCurDevToPlaylist();
 
-	bool m_fTrayIcon;
+	bool m_bTrayIcon;
 	void ShowTrayIcon(bool fShow);
 	void SetTrayTip(CString str);
 

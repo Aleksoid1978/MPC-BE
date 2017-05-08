@@ -175,7 +175,7 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 		ShowWindow(SW_HIDE);
 		m_pMainFrame->PostMessage(WM_COMMAND, ID_FILE_EXIT);
 	} else if (r_MinIcon.PtInRect(p)) {
-		m_pMainFrame->m_fTrayIcon ? m_pMainFrame->SendMessage(WM_SYSCOMMAND, SC_MINIMIZE, -1) : m_pMainFrame->ShowWindow(SW_SHOWMINIMIZED);
+		m_pMainFrame->m_bTrayIcon ? m_pMainFrame->SendMessage(WM_SYSCOMMAND, SC_MINIMIZE, -1) : m_pMainFrame->ShowWindow(SW_SHOWMINIMIZED);
 	} else if (r_RestoreIcon.PtInRect(p)) {
 		if (m_pMainFrame->m_bFullScreen) {
 			m_pMainFrame->ToggleFullscreen(true, true);

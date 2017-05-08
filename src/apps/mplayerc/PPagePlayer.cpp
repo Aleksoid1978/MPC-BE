@@ -32,22 +32,22 @@ CPPagePlayer::CPPagePlayer()
 	, m_iMultipleInst(1)
 	, m_iTitleBarTextStyle(0)
 	, m_bTitleBarTextTitle(FALSE)
-	, m_fKeepHistory(FALSE)
+	, m_bKeepHistory(FALSE)
 	, m_nRecentFiles(APP_RECENTFILES_DEF)
-	, m_fRememberDVDPos(FALSE)
-	, m_fRememberFilePos(FALSE)
-	, m_fRememberWindowPos(FALSE)
-	, m_fRememberWindowSize(FALSE)
-	, m_fSavePnSZoom(FALSE)
+	, m_bRememberDVDPos(FALSE)
+	, m_bRememberFilePos(FALSE)
+	, m_bRememberWindowPos(FALSE)
+	, m_bRememberWindowSize(FALSE)
+	, m_bSavePnSZoom(FALSE)
 	, m_bRememberPlaylistItems(FALSE)
-	, m_fTrayIcon(FALSE)
-	, m_fShowOSD(FALSE)
-	, m_fOSDFileName(FALSE)
-	, m_fOSDSeekTime(FALSE)
-	, m_fLimitWindowProportions(TRUE)
-	, m_fSnapToDesktopEdges(FALSE)
-	, m_fUseIni(FALSE)
-	, m_fHideCDROMsSubMenu(FALSE)
+	, m_bTrayIcon(FALSE)
+	, m_bShowOSD(FALSE)
+	, m_bOSDFileName(FALSE)
+	, m_bOSDSeekTime(FALSE)
+	, m_bLimitWindowProportions(TRUE)
+	, m_bSnapToDesktopEdges(FALSE)
+	, m_bUseIni(FALSE)
+	, m_bHideCDROMsSubMenu(FALSE)
 	, m_bPriority(FALSE)
 {
 }
@@ -63,21 +63,21 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 	DDX_Radio(pDX, IDC_RADIO1, m_iMultipleInst);
 	DDX_Radio(pDX, IDC_RADIO4, m_iTitleBarTextStyle);
 	DDX_Check(pDX, IDC_CHECK13, m_bTitleBarTextTitle);
-	DDX_Check(pDX, IDC_CHECK3, m_fTrayIcon);
-	DDX_Check(pDX, IDC_CHECK6, m_fRememberWindowPos);
-	DDX_Check(pDX, IDC_CHECK7, m_fRememberWindowSize);
-	DDX_Check(pDX, IDC_CHECK11, m_fSavePnSZoom);
-	DDX_Check(pDX, IDC_CHECK12, m_fSnapToDesktopEdges);
-	DDX_Check(pDX, IDC_CHECK8, m_fUseIni);
-	DDX_Check(pDX, IDC_CHECK1, m_fKeepHistory);
-	DDX_Check(pDX, IDC_CHECK10, m_fHideCDROMsSubMenu);
+	DDX_Check(pDX, IDC_CHECK3, m_bTrayIcon);
+	DDX_Check(pDX, IDC_CHECK6, m_bRememberWindowPos);
+	DDX_Check(pDX, IDC_CHECK7, m_bRememberWindowSize);
+	DDX_Check(pDX, IDC_CHECK11, m_bSavePnSZoom);
+	DDX_Check(pDX, IDC_CHECK12, m_bSnapToDesktopEdges);
+	DDX_Check(pDX, IDC_CHECK8, m_bUseIni);
+	DDX_Check(pDX, IDC_CHECK1, m_bKeepHistory);
+	DDX_Check(pDX, IDC_CHECK10, m_bHideCDROMsSubMenu);
 	DDX_Check(pDX, IDC_CHECK9, m_bPriority);
-	DDX_Check(pDX, IDC_SHOW_OSD, m_fShowOSD);
-	DDX_Check(pDX, IDC_CHECK14, m_fOSDFileName);
-	DDX_Check(pDX, IDC_CHECK15, m_fOSDSeekTime);
-	DDX_Check(pDX, IDC_CHECK4, m_fLimitWindowProportions);
-	DDX_Check(pDX, IDC_DVD_POS, m_fRememberDVDPos);
-	DDX_Check(pDX, IDC_FILE_POS, m_fRememberFilePos);
+	DDX_Check(pDX, IDC_SHOW_OSD, m_bShowOSD);
+	DDX_Check(pDX, IDC_CHECK14, m_bOSDFileName);
+	DDX_Check(pDX, IDC_CHECK15, m_bOSDSeekTime);
+	DDX_Check(pDX, IDC_CHECK4, m_bLimitWindowProportions);
+	DDX_Check(pDX, IDC_DVD_POS, m_bRememberDVDPos);
+	DDX_Check(pDX, IDC_FILE_POS, m_bRememberFilePos);
 	DDX_Check(pDX, IDC_CHECK2, m_bRememberPlaylistItems);
 	DDX_Text(pDX, IDC_EDIT1, m_nRecentFiles);
 	DDX_Control(pDX, IDC_SPIN1, m_RecentFilesCtrl);
@@ -109,22 +109,22 @@ BOOL CPPagePlayer::OnInitDialog()
 
 	m_iMultipleInst				= s.iMultipleInst;
 	m_iTitleBarTextStyle		= s.iTitleBarTextStyle;
-	m_bTitleBarTextTitle		= s.fTitleBarTextTitle;
-	m_fTrayIcon					= s.fTrayIcon;
-	m_fRememberWindowPos		= s.fRememberWindowPos;
-	m_fRememberWindowSize		= s.fRememberWindowSize;
-	m_fSavePnSZoom				= s.fSavePnSZoom;
-	m_fSnapToDesktopEdges		= s.fSnapToDesktopEdges;
-	m_fUseIni					= AfxGetMyApp()->IsIniValid();
-	m_fKeepHistory				= s.fKeepHistory;
-	m_fHideCDROMsSubMenu		= s.fHideCDROMsSubMenu;
+	m_bTitleBarTextTitle		= s.bTitleBarTextTitle;
+	m_bTrayIcon					= s.bTrayIcon;
+	m_bRememberWindowPos		= s.bRememberWindowPos;
+	m_bRememberWindowSize		= s.bRememberWindowSize;
+	m_bSavePnSZoom				= s.bSavePnSZoom;
+	m_bSnapToDesktopEdges		= s.bSnapToDesktopEdges;
+	m_bUseIni					= AfxGetMyApp()->IsIniValid();
+	m_bKeepHistory				= s.bKeepHistory;
+	m_bHideCDROMsSubMenu		= s.bHideCDROMsSubMenu;
 	m_bPriority					= s.dwPriority != NORMAL_PRIORITY_CLASS;
-	m_fShowOSD					= !!(s.iShowOSD & OSD_ENABLE);
-	m_fOSDFileName				= !!(s.iShowOSD & OSD_FILENAME);
-	m_fOSDSeekTime				= !!(s.iShowOSD & OSD_SEEKTIME);
-	m_fRememberDVDPos			= s.fRememberDVDPos;
-	m_fRememberFilePos			= s.fRememberFilePos;
-	m_fLimitWindowProportions	= s.fLimitWindowProportions;
+	m_bShowOSD					= !!(s.iShowOSD & OSD_ENABLE);
+	m_bOSDFileName				= !!(s.iShowOSD & OSD_FILENAME);
+	m_bOSDSeekTime				= !!(s.iShowOSD & OSD_SEEKTIME);
+	m_bRememberDVDPos			= s.bRememberDVDPos;
+	m_bRememberFilePos			= s.bRememberFilePos;
+	m_bLimitWindowProportions	= s.bLimitWindowProportions;
 	m_bRememberPlaylistItems	= s.bRememberPlaylistItems;
 
 	m_nRecentFiles = s.iRecentFilesNumber;
@@ -135,9 +135,9 @@ BOOL CPPagePlayer::OnInitDialog()
 
 	UpdateData(FALSE);
 
-	GetDlgItem(IDC_FILE_POS)->EnableWindow(s.fKeepHistory);
-	GetDlgItem(IDC_DVD_POS)->EnableWindow(s.fKeepHistory);
-	m_RecentFilesCtrl.EnableWindow(s.fKeepHistory);
+	GetDlgItem(IDC_FILE_POS)->EnableWindow(s.bKeepHistory);
+	GetDlgItem(IDC_DVD_POS)->EnableWindow(s.bKeepHistory);
+	m_RecentFilesCtrl.EnableWindow(s.bKeepHistory);
 
 	CString iniDirPath = GetProgramDir();
 	HANDLE hDir = CreateFile(iniDirPath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
@@ -157,26 +157,26 @@ BOOL CPPagePlayer::OnApply()
 	auto pFrame = AfxGetMainFrame();
 
 	s.iMultipleInst = m_iMultipleInst;
-	if (s.iTitleBarTextStyle != m_iTitleBarTextStyle || s.fTitleBarTextTitle != !!m_bTitleBarTextTitle) {
+	if (s.iTitleBarTextStyle != m_iTitleBarTextStyle || s.bTitleBarTextTitle != !!m_bTitleBarTextTitle) {
 		s.iTitleBarTextStyle = m_iTitleBarTextStyle;
-		s.fTitleBarTextTitle = !!m_bTitleBarTextTitle;
+		s.bTitleBarTextTitle = !!m_bTitleBarTextTitle;
 		pFrame->OpenSetupWindowTitle(pFrame->m_strFnFull);
 	}
-	s.fTrayIcon = !!m_fTrayIcon;
-	s.fRememberWindowPos = !!m_fRememberWindowPos;
-	s.fRememberWindowSize = !!m_fRememberWindowSize;
-	s.fSavePnSZoom = !!m_fSavePnSZoom;
-	s.fSnapToDesktopEdges = !!m_fSnapToDesktopEdges;
-	s.fKeepHistory = !!m_fKeepHistory;
-	s.fHideCDROMsSubMenu = !!m_fHideCDROMsSubMenu;
+	s.bTrayIcon = !!m_bTrayIcon;
+	s.bRememberWindowPos = !!m_bRememberWindowPos;
+	s.bRememberWindowSize = !!m_bRememberWindowSize;
+	s.bSavePnSZoom = !!m_bSavePnSZoom;
+	s.bSnapToDesktopEdges = !!m_bSnapToDesktopEdges;
+	s.bKeepHistory = !!m_bKeepHistory;
+	s.bHideCDROMsSubMenu = !!m_bHideCDROMsSubMenu;
 	s.dwPriority = !m_bPriority ? NORMAL_PRIORITY_CLASS : ABOVE_NORMAL_PRIORITY_CLASS;
-	BOOL bShowOSDChanged = ((s.iShowOSD & OSD_ENABLE) != !!m_fShowOSD);
+	BOOL bShowOSDChanged = ((s.iShowOSD & OSD_ENABLE) != !!m_bShowOSD);
 
-	s.iShowOSD = m_fShowOSD ? OSD_ENABLE : 0;
-	if (m_fOSDFileName) { s.iShowOSD |= OSD_FILENAME; }
-	if (m_fOSDSeekTime) { s.iShowOSD |= OSD_SEEKTIME; }
+	s.iShowOSD = m_bShowOSD ? OSD_ENABLE : 0;
+	if (m_bOSDFileName) { s.iShowOSD |= OSD_FILENAME; }
+	if (m_bOSDSeekTime) { s.iShowOSD |= OSD_SEEKTIME; }
 	if (bShowOSDChanged) {
-		if (m_fShowOSD & OSD_ENABLE) {
+		if (m_bShowOSD & OSD_ENABLE) {
 			pFrame->m_OSD.Start(pFrame->m_pOSDWnd);
 			pFrame->OSDBarSetPos();
 			pFrame->m_OSD.ClearMessage(false);
@@ -184,12 +184,12 @@ BOOL CPPagePlayer::OnApply()
 			pFrame->m_OSD.Stop();
 		}
 	}
-	s.fLimitWindowProportions = !!m_fLimitWindowProportions;
-	s.fRememberDVDPos = !!m_fRememberDVDPos;
-	s.fRememberFilePos = !!m_fRememberFilePos;
+	s.bLimitWindowProportions = !!m_bLimitWindowProportions;
+	s.bRememberDVDPos = !!m_bRememberDVDPos;
+	s.bRememberFilePos = !!m_bRememberFilePos;
 	s.bRememberPlaylistItems = !!m_bRememberPlaylistItems;
 
-	if (!m_fKeepHistory) {
+	if (!m_bKeepHistory) {
 		for (int i = s.MRU.GetSize() - 1; i >= 0; i--) {
 			s.MRU.Remove(i);
 		}
@@ -208,10 +208,10 @@ BOOL CPPagePlayer::OnApply()
 			hr = pDests->RemoveAllDestinations();
 		}
 	}
-	if (!m_fKeepHistory || !m_fRememberDVDPos) {
+	if (!m_bKeepHistory || !m_bRememberDVDPos) {
 		s.ClearDVDPositions();
 	}
-	if (!m_fKeepHistory || !m_fRememberFilePos) {
+	if (!m_bKeepHistory || !m_bRememberFilePos) {
 		s.ClearFilePositions();
 	}
 
@@ -220,17 +220,17 @@ BOOL CPPagePlayer::OnApply()
 	s.MRUDub.SetSize(s.iRecentFilesNumber);
 
 	// Check if the settings location needs to be changed
-	if (AfxGetMyApp()->IsIniValid() != !!m_fUseIni) {
-		AfxGetMyApp()->ChangeSettingsLocation(!!m_fUseIni);
+	if (AfxGetMyApp()->IsIniValid() != !!m_bUseIni) {
+		AfxGetMyApp()->ChangeSettingsLocation(!!m_bUseIni);
 	}
 
-	AfxGetMainFrame()->ShowTrayIcon(s.fTrayIcon);
+	AfxGetMainFrame()->ShowTrayIcon(s.bTrayIcon);
 
 	::SetPriorityClass(::GetCurrentProcess(), s.dwPriority);
 
-	GetDlgItem(IDC_FILE_POS)->EnableWindow(s.fKeepHistory);
-	GetDlgItem(IDC_DVD_POS)->EnableWindow(s.fKeepHistory);
-	m_RecentFilesCtrl.EnableWindow(s.fKeepHistory);
+	GetDlgItem(IDC_FILE_POS)->EnableWindow(s.bKeepHistory);
+	GetDlgItem(IDC_DVD_POS)->EnableWindow(s.bKeepHistory);
+	m_RecentFilesCtrl.EnableWindow(s.bKeepHistory);
 
 	return __super::OnApply();
 }
@@ -246,14 +246,14 @@ void CPPagePlayer::OnUpdatePos(CCmdUI* pCmdUI)
 {
 	UpdateData();
 
-	pCmdUI->Enable(!!m_fKeepHistory);
+	pCmdUI->Enable(!!m_bKeepHistory);
 }
 
 void CPPagePlayer::OnUpdateOSD(CCmdUI* pCmdUI)
 {
 	UpdateData();
 
-	pCmdUI->Enable(!!m_fShowOSD);
+	pCmdUI->Enable(!!m_bShowOSD);
 }
 
 void CPPagePlayer::OnKillFocusEdit1()

@@ -485,8 +485,8 @@ public:
 	ULONG				lDVDTitle;
 	ULONG				lDVDChapter;
 	DVD_HMSF_TIMECODE	DVDPosition;
-	bool				fStartMainTitle;
-	bool				fNormalStartDVD;
+	bool				bStartMainTitle;
+	bool				bNormalStartDVD;
 
 	bool				bPasteClipboardURL;
 
@@ -499,31 +499,31 @@ public:
 	void			ParseCommandLine(cmdLine& cmdln);
 
 	// Added a Debug display to the screen (/debug option)
-	bool			fShowDebugInfo;
+	bool			bShowDebugInfo;
 	int				iAdminOption;
 	int				iDXVer;
 
 
 	// Player
 	int				iMultipleInst;
-	bool			fTrayIcon;
+	bool			bTrayIcon;
 	int				iShowOSD;
-	bool			fLimitWindowProportions;
-	bool			fSnapToDesktopEdges;
-	bool			fHideCDROMsSubMenu;
+	bool			bLimitWindowProportions;
+	bool			bSnapToDesktopEdges;
+	bool			bHideCDROMsSubMenu;
 	DWORD			dwPriority;
 	int				iTitleBarTextStyle;
-	bool			fTitleBarTextTitle;
-	bool			fKeepHistory;
+	bool			bTitleBarTextTitle;
+	bool			bKeepHistory;
 	int				iRecentFilesNumber;
 	CRecentFileAndURLList MRU;
 	CRecentFileAndURLList MRUDub;
-	bool			fRememberDVDPos;
-	bool			fRememberFilePos;
+	bool			bRememberDVDPos;
+	bool			bRememberFilePos;
 	bool			bRememberPlaylistItems;
-	bool			fRememberWindowPos;
-	bool			fRememberWindowSize;
-	bool			fSavePnSZoom;
+	bool			bRememberWindowPos;
+	bool			bRememberWindowSize;
+	bool			bSavePnSZoom;
 	float			dZoomX;
 	float			dZoomY;
 
@@ -570,7 +570,7 @@ public:
 	bool			fLoopForever;
 	bool			fRewind;
 	int				nSpeedStep;
-	bool			fRememberZoomLevel;
+	bool			bRememberZoomLevel;
 	int				iZoomLevel;
 	int				nAutoFitFactor;
 	bool			fUseInternalSelectTrackLogic;
@@ -587,10 +587,10 @@ public:
 	CString			strAudioPaths;
 
 	// DVD-Video
-	bool			fUseDVDPath;
+	bool			bUseDVDPath;
 	CString			strDVDPath;
 	LCID			idMenuLang, idAudioLang, idSubtitlesLang;
-	bool			fClosedCaptions;
+	bool			bClosedCaptions;
 
 	// Output
 	CRenderersSettings m_VRSettings;
@@ -768,8 +768,8 @@ public:
 	// Save Subtitle
 	bool			bSubSaveExternalStyleFile;
 	// Shader Combiner
-	bool			fToggleShader;
-	bool			fToggleShaderScreenSpace;
+	bool			bToggleShader;
+	bool			bToggleShaderScreenSpace;
 	CAtlList<CString> ShaderList;
 	CAtlList<CString> ShaderListScreenSpace;
 	// Playlist (contex menu)
