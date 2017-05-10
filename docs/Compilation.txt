@@ -1,7 +1,9 @@
-﻿Part A: Preparing the Visual Studio 2015 environment
+﻿Part A: Preparing the Visual Studio 2015/2017 environment
 
  Visual Studio 2015
   1. Install Visual C++ 2015, part of Visual Studio 2015 with Update 2 (any edition will work fine).
+ Visual Studio 2017
+  1. Install Visual C++ 2017, part of Visual Studio 2017 (any edition will work fine).
 
   Download URL: http://www.visualstudio.com/downloads/download-visual-studio-vs
 
