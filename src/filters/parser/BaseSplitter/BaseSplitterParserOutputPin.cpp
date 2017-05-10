@@ -1098,17 +1098,15 @@ HRESULT CBaseSplitterParserOutputPin::ParseTeletext(CAutoPtr<CPacket> p)
 	}
 
 	if (!output.empty()) {
-		for (size_t i = 0; i < output.size(); i++) {
-			TeletextData tData = output[i];
-
-			CStringA strA = UTF16To8(tData.str);
+		for (auto& tData : output) {
+			const CStringA strA = UTF16To8(tData.str);
 
 			CAutoPtr<CPacket> p2(DNew CPacket());
-			p2->TrackNumber	= m_p->TrackNumber;
-			p2->rtStart		= tData.rtStart;
-			p2->rtStop		= tData.rtStop;
-			p2->bSyncPoint	= TRUE;
-			p2->SetData((VOID*)(LPCSTR)strA, strA.GetLength());
+			p2->TrackNumber = m_p->TrackNumber;
+			p2->rtStart     = tData.rtStart;
+			p2->rtStop      = tData.rtStop;
+			p2->bSyncPoint  = TRUE;
+			p2->SetData((const void *)(LPCSTR)strA, strA.GetLength());
 
 			hr = __super::DeliverPacket(p2);
 		}
