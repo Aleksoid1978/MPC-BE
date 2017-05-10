@@ -535,6 +535,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_APCO:
         case AP4_ATOM_TYPE_APCS:
         case AP4_ATOM_TYPE_AP4H:
+        case AP4_ATOM_TYPE_AP4X:
         // Motion-JPEG
         case AP4_ATOM_TYPE_MJPG:
         case AP4_ATOM_TYPE_AVDJ:
