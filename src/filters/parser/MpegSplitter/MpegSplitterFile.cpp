@@ -1741,6 +1741,7 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 					s.pid = pid;
 
 					if (!m_streams[stream_type::subpic].Find(s)) {
+						s.codec = _streamData.codec;
 						if (_streamData.pmt.lang[0]) {
 							strcpy_s(s.lang, _streamData.pmt.lang);
 							s.lang_set = true;
@@ -1750,13 +1751,12 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 							hdmvsubhdr hdr;
 							if (Read(hdr, &s.mt, _streamData.pmt.lang)) {
 								m_streams[stream_type::subpic].Insert(s, stream_type::subpic);
-								_streamData.codec = stream_codec::PGS;
+								s.codec = _streamData.codec = stream_codec::PGS;
 							}
 						} else if (_streamData.codec == stream_codec::DVB) {
 							dvbsubhdr hdr;
 							if (Read(hdr, 0, &s.mt, _streamData.pmt.lang, false)) {
 								m_streams[stream_type::subpic].Insert(s, stream_type::subpic);
-								_streamData.codec = stream_codec::DVB;
 							}
 						} else if (_streamData.codec == stream_codec::TELETEXT) {
 							BOOL bAdded = FALSE;
