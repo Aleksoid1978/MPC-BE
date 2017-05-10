@@ -802,7 +802,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								   type == AP4_ATOM_TYPE_APCH ||
 								   type == AP4_ATOM_TYPE_APCO ||
 								   type == AP4_ATOM_TYPE_APCS ||
-								   type == AP4_ATOM_TYPE_AP4H) {
+								   type == AP4_ATOM_TYPE_AP4H ||
+								   type == AP4_ATOM_TYPE_AP4X) {
 							FormatTrackName(L"Apple ProRes", 0);
 						} else if (type == AP4_ATOM_TYPE_SVQ1 ||
 								   type == AP4_ATOM_TYPE_SVQ2 ||
