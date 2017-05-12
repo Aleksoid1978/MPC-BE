@@ -172,7 +172,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         return result;
     }
     if (parent && parent->GetType() == type) {
-        type = 0x0000;
+        // type = 0x0000; // TODO - need a sample
     }
 
     if (size == 1) {
