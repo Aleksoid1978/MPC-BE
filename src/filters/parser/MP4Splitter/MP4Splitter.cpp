@@ -1592,7 +1592,7 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		CAtlMap<DWORD, trackpos>::CPair* pPair = m_trackpos.GetNext(pos);
 		AP4_Track* track = movie->GetTrack(pPair->m_key);
 
-		if (track->HasIndex() && track->GetIndexEntries().ItemCount() > 1) {
+		if (track->HasIndex() && track->GetIndexEntries().ItemCount()) {
 			if (AP4_FAILED(track->GetIndexForRefTime(rt, pPair->m_value.index, pPair->m_value.ts, pPair->m_value.offset))) {
 				continue;
 			}
