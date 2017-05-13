@@ -448,6 +448,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_S263:
         case AP4_ATOM_TYPE_JPEG:
         case AP4_ATOM_TYPE_MJP2:
+        case AP4_ATOM_TYPE_AVj2:
         case AP4_ATOM_TYPE_PNG:
         case AP4_ATOM_TYPE_RLE:
         case AP4_ATOM_TYPE_MJPA:

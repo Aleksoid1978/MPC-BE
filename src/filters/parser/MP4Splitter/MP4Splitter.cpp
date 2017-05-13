@@ -235,6 +235,11 @@ static const DWORD GetFourcc(AP4_VisualSampleEntry* vse)
 	case AP4_ATOM_TYPE_DMB1: // uncommon fourcc
 		fourcc = FCC('MJPG');
 		break;
+	// JPEG2000
+	case AP4_ATOM_TYPE_MJP2:
+	case AP4_ATOM_TYPE_AVj2: // uncommon fourcc
+		fourcc = FCC('MJP2');
+		break;
 	// VC-1
 	case AP4_ATOM_TYPE_OVC1:
 	case AP4_ATOM_TYPE_VC1:
@@ -792,9 +797,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								mt = mt2;
 							}
 							mts.Add(mt);
-
 							break;
-						} else if (type == AP4_ATOM_TYPE_MJPA || type == AP4_ATOM_TYPE_MJPB || fourcc == FCC('MJPG')) {
+						}
+
+						if (type == AP4_ATOM_TYPE_MJPA || type == AP4_ATOM_TYPE_MJPB || fourcc == FCC('MJPG')) {
 							FormatTrackName(L"M-Jpeg", 1);
 						} else if (type == AP4_ATOM_TYPE_MJP2) {
 							FormatTrackName(L"M-Jpeg 2000", 1);
@@ -866,7 +872,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							} else if (bitcount == 32) {
 								mt.subtype = MEDIASUBTYPE_ARGB32;
 							} else {
-								break;
+								break; // incorect or unsuported
 							}
 							mts.Add(mt);
 							break;
