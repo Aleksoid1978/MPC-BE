@@ -335,6 +335,7 @@ const AP4_Atom::Type AP4_ATOM_TYPE_HVCC = AP4_ATOM_TYPE('h','v','c','C');
 // image
 const AP4_Atom::Type AP4_ATOM_TYPE_JPEG = AP4_ATOM_TYPE('j','p','e','g');
 const AP4_Atom::Type AP4_ATOM_TYPE_MJP2 = AP4_ATOM_TYPE('m','j','p','2');
+const AP4_Atom::Type AP4_ATOM_TYPE_AVj2 = AP4_ATOM_TYPE('A','V','j','2');
 const AP4_Atom::Type AP4_ATOM_TYPE_PNG  = AP4_ATOM_TYPE('p','n','g',' ');
 // Motion-JPEG
 const AP4_Atom::Type AP4_ATOM_TYPE_MJPA = AP4_ATOM_TYPE('m','j','p','a');
