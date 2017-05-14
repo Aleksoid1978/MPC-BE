@@ -1026,14 +1026,14 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int resizer)
 
 	if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
 		switch (iShader) {
-		case shader_bspline4_x:    resid = IDF_SHADER_PS20_BSPLINE4_X;    break;
-		case shader_mitchell4_x:   resid = IDF_SHADER_PS20_MITCHELL4_X;   break;
-		case shader_catmull4_x:    resid = IDF_SHADER_PS20_CATMULL4_X;    break;
-		case shader_bicubic06_x:   resid = IDF_SHADER_PS20_BICUBIC06_X;   break;
-		case shader_bicubic08_x:   resid = IDF_SHADER_PS20_BICUBIC08_X;   break;
-		case shader_bicubic10_x:   resid = IDF_SHADER_PS20_BICUBIC10_X;   break;
-		case shader_lanczos2_x:    resid = IDF_SHADER_PS20_LANCZOS2_X;    break;
-		case shader_downscaling_x: resid = IDF_SHADER_PS20_DOWNSCALING_X; break;
+		case shader_bspline4_x:    resid = IDF_SHADER_PS20_BSPLINE4_X;          break;
+		case shader_mitchell4_x:   resid = IDF_SHADER_PS20_MITCHELL4_X;         break;
+		case shader_catmull4_x:    resid = IDF_SHADER_PS20_CATMULL4_X;          break;
+		case shader_bicubic06_x:   resid = IDF_SHADER_PS20_BICUBIC06_X;         break;
+		case shader_bicubic08_x:   resid = IDF_SHADER_PS20_BICUBIC08_X;         break;
+		case shader_bicubic10_x:   resid = IDF_SHADER_PS20_BICUBIC10_X;         break;
+		case shader_lanczos2_x:    resid = IDF_SHADER_PS20_LANCZOS2_X;          break;
+		case shader_downscaling_x: resid = IDF_SHADER_PS20_DOWNSCALER_SIMPLE_X; break;
 		default:
 			return E_INVALIDARG;
 		}
@@ -1048,7 +1048,7 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int resizer)
 		case shader_bicubic10_x:   resid = IDF_SHADER_RESIZER_BICUBIC10_X; break;
 		case shader_lanczos2_x:    resid = IDF_SHADER_RESIZER_LANCZOS2_X;  break;
 		case shader_lanczos3_x:    resid = IDF_SHADER_RESIZER_LANCZOS3_X;  break;
-		case shader_downscaling_x: resid = IDF_SHADER_DOWNSCALING_X;       break;
+		case shader_downscaling_x: resid = IDF_SHADER_DOWNSCALER_SIMPLE_X; break;
 		default:
 			return E_INVALIDARG;
 		}
@@ -1059,9 +1059,9 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int resizer)
 		hr = CreateShaderFromResource(m_pD3DDevEx, &m_pResizerPixelShaders[iShader + 1], resid + 1);
 	}
 	if (FAILED(hr)) {
+		ASSERT(0);
 		m_pResizerPixelShaders[iShader] = NULL;
 		m_pResizerPixelShaders[iShader + 1] = NULL;
-		ASSERT(0);
 		return hr;
 	}
 
