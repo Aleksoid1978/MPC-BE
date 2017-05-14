@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2016 see Authors.txt
+ * (C) 2011-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,6 @@
 
 #include "stdafx.h"
 #include "AudioParser.h"
-#include "GolombBuffer.h"
 #include <mpc_defines.h>
 #include "Utils.h"
 
@@ -1057,7 +1056,7 @@ static inline int get_sample_rate(CGolombBuffer& gb)
 	return samplingFrequency;
 }
 
-static bool ReadAudioConfig(CGolombBuffer& gb, int& samplingFrequency, int& channels)
+bool ReadAudioConfig(CGolombBuffer& gb, int& samplingFrequency, int& channels)
 {
 	static int channels_layout[8] = {0, 1, 2, 3, 4, 5, 6, 8};
 

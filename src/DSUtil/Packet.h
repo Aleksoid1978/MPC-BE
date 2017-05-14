@@ -23,6 +23,8 @@
 #include <atlcoll.h>
 #include <mpc_defines.h>
 
+#define PACKET_AAC_RAW 0x0001
+
 class CPacket : public CAtlArray<BYTE>
 {
 public:
@@ -33,9 +35,7 @@ public:
 	REFERENCE_TIME rtStop  = INVALID_TIME;
 	AM_MEDIA_TYPE* pmt     = NULL;
 
-	struct extra_t {
-		DWORD Field1       = 0;
-	} extra;
+	DWORD Flag             = 0;
 
 	virtual ~CPacket() {
 		DeleteMediaType(pmt);

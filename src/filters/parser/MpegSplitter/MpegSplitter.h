@@ -86,7 +86,7 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	HRESULT DeliverPacket(CAutoPtr<CPacket> p);
 
 	template<typename T>
-	HRESULT HandleMPEGPacket(DWORD TrackNumber, __int64 nBytes, T& h, REFERENCE_TIME rtStartOffset, BOOL bStreamUsePTS, WORD tlxPage = 0);
+	HRESULT HandleMPEGPacket(DWORD TrackNumber, __int64 nBytes, T& h, REFERENCE_TIME rtStartOffset, BOOL bStreamUsePTS, DWORD Flag = 0);
 	HRESULT DemuxNextPacket(REFERENCE_TIME rtStartOffset);
 
 	void HandleStream(CMpegSplitterFile::stream& s, CString fName, DWORD dwPictAspectRatioX, DWORD dwPictAspectRatioY, CStringA& palette);

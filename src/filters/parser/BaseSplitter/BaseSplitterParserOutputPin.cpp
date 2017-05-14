@@ -82,6 +82,8 @@ HRESULT CBaseSplitterParserOutputPin::Flush()
 		m_teletext.SetLCID(lcid);
 	}
 
+	packetFlag = 0;
+
 	return S_OK;
 }
 
@@ -174,7 +176,11 @@ HRESULT CBaseSplitterParserOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 
 	CAutoLock cAutoLock(this);
 
-	if (m_mt.subtype == MEDIASUBTYPE_RAW_AAC1) {
+	if (p) {
+		packetFlag = p->Flag;
+	}
+
+	if (m_mt.subtype == MEDIASUBTYPE_RAW_AAC1 && packetFlag != PACKET_AAC_RAW) {
 		// AAC
 		return ParseAAC(p);
 	} else if (m_mt.subtype == MEDIASUBTYPE_LATM_AAC) {
@@ -1090,7 +1096,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseTeletext(CAutoPtr<CPacket> p)
 			return S_OK;
 		}
 
-		m_teletext.ProcessData(p->GetData(), p->GetCount(), p->rtStart, p->extra.Field1);
+		m_teletext.ProcessData(p->GetData(), p->GetCount(), p->rtStart, p->Flag);
 		if (m_teletext.IsOutputPresent()) {
 			m_teletext.GetOutput(output);
 			m_teletext.EraseOutput();

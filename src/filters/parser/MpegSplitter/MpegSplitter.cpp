@@ -717,7 +717,7 @@ HRESULT CMpegSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 }
 
 template<typename T>
-inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(DWORD TrackNumber, __int64 nBytes, T& h, REFERENCE_TIME rtStartOffset, BOOL bStreamUsePTS, WORD tlxPage/* = 0*/)
+inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(DWORD TrackNumber, __int64 nBytes, T& h, REFERENCE_TIME rtStartOffset, BOOL bStreamUsePTS, DWORD Flag/* = 0*/)
 {
 	HRESULT hr = S_OK;
 
@@ -744,11 +744,11 @@ inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(DWORD TrackNumber, __int64 
 				}
 
 				p.Attach(DNew CPacket());
-				p->TrackNumber  = TrackNumber;
-				p->bSyncPoint   = bPacketStart;
-				p->rtStart      = h.fpts ? (h.pts - rtStartOffset) : INVALID_TIME;
-				p->rtStop       = (p->rtStart == INVALID_TIME) ? INVALID_TIME : p->rtStart + 1;
-				p->extra.Field1 = tlxPage;
+				p->TrackNumber = TrackNumber;
+				p->bSyncPoint  = bPacketStart;
+				p->rtStart     = h.fpts ? (h.pts - rtStartOffset) : INVALID_TIME;
+				p->rtStop      = (p->rtStart == INVALID_TIME) ? INVALID_TIME : p->rtStart + 1;
+				p->Flag        = Flag;
 			}
 
 			size_t oldSize = p->GetCount();
@@ -764,11 +764,11 @@ inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(DWORD TrackNumber, __int64 
 			}
 
 			CAutoPtr<CPacket> p(DNew CPacket());
-			p->TrackNumber  = TrackNumber;
-			p->rtStart      = rtStart;
-			p->rtStop       = (p->rtStart == INVALID_TIME) ? INVALID_TIME : p->rtStart + 1;
-			p->bSyncPoint   = p->rtStart != INVALID_TIME;
-			p->extra.Field1 = tlxPage;
+			p->TrackNumber = TrackNumber;
+			p->rtStart     = rtStart;
+			p->rtStop      = (p->rtStart == INVALID_TIME) ? INVALID_TIME : p->rtStart + 1;
+			p->bSyncPoint  = p->rtStart != INVALID_TIME;
+			p->Flag        = Flag;
 			p->SetCount(nBytes);
 			m_pFile->ByteRead(p->GetData(), nBytes);
 			hr = DeliverPacket(p);
@@ -837,24 +837,35 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 		if (h.payload && ISVALIDPID(h.pid)) {
 			DWORD TrackNumber = h.pid;
 			if (GetOutputPin(TrackNumber) || TrackNumber == m_dwMVCExtensionTrackNumber) {
+				BOOL bReadPES = FALSE;
 				CMpegSplitterFile::peshdr peshdr;
-				if (h.payloadstart) {
-					if (m_pFile->NextMpegStartCode(b, 4)) { // pes packet
-						if (m_pFile->ReadPES(peshdr, b)) {
-							if (peshdr.type == CMpegSplitterFile::mpeg2 && peshdr.scrambling) {
-								m_pFile->Seek(h.next);
-								return S_OK;
-							}
-							TrackNumber = m_pFile->AddStream(h.pid, b, 0, (DWORD)(h.bytes - (m_pFile->GetPos() - pos)));
-						}
-					} else {
-						m_pFile->Seek(pos);
+				if (m_pFile->NextMpegStartCode(b, 4) && m_pFile->ReadPES(peshdr, b)) {
+					if (peshdr.type == CMpegSplitterFile::mpeg2 && peshdr.scrambling) {
+						m_pFile->Seek(h.next);
+						return S_OK;
 					}
+					TrackNumber = m_pFile->AddStream(h.pid, b, 0, (DWORD)(h.bytes - (m_pFile->GetPos() - pos)));
+					bReadPES = TRUE;
+				}
+
+				if (!bReadPES) {
+					m_pFile->Seek(pos);
 				}
 
 				if (h.bytes > (m_pFile->GetPos() - pos)) {
+					DWORD Flag = 0;
+					if (auto s = m_pFile->m_streams[CMpegSplitterFile::stream_type::audio].FindStream(TrackNumber)) {
+						if (s->codec == CMpegSplitterFile::stream_codec::AAC_RAW) {
+							Flag = PACKET_AAC_RAW;
+						}
+					} else if (auto s = m_pFile->m_streams[CMpegSplitterFile::stream_type::subpic].FindStream(TrackNumber)) {
+						if (s->codec == CMpegSplitterFile::stream_codec::TELETEXT) {
+							Flag = m_tlxCurrentPage;
+						}
+					}
+
 					const __int64 nBytes = h.bytes - (m_pFile->GetPos() - pos);
-					hr = HandleMPEGPacket(TrackNumber, nBytes, peshdr, rtStartOffset, m_pFile->m_streamData[TrackNumber].usePTS, m_tlxCurrentPage);
+					hr = HandleMPEGPacket(TrackNumber, nBytes, peshdr, rtStartOffset, m_pFile->m_streamData[TrackNumber].usePTS, Flag);
 				}
 			}
 		}
