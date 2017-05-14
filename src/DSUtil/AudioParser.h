@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2016 see Authors.txt
+ * (C) 2011-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,6 +22,7 @@
 
 #include <WinDef.h>
 #include <MMReg.h>
+#include "GolombBuffer.h"
 
 #define AC3_SYNCWORD                 0x770B
 #define AAC_ADTS_SYNCWORD            0xF0FF
@@ -124,4 +125,5 @@ int ParseHdmvLPCMHeader    (const BYTE* buf, audioframe_t* audioframe = NULL);
 // need >= 7 bytes, param1 = header size, param2 = MPEG-4 Audio Object Type
 int ParseADTSAACHeader     (const BYTE* buf, audioframe_t* audioframe = NULL);
 
+bool ReadAudioConfig(CGolombBuffer& gb, int& samplingFrequency, int& channels);
 bool ParseAACLatmHeader(const BYTE* buf, int len, int& samplerate, int& channels, BYTE* extra, unsigned int& extralen);

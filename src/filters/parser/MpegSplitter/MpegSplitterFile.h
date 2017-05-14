@@ -201,6 +201,7 @@ public:
 		DIRAC,
 		AC3,
 		EAC3,
+		AAC_RAW,
 		DTS,
 		ARIB,
 		PGS,
