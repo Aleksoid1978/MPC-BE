@@ -839,7 +839,7 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 			if (GetOutputPin(TrackNumber) || TrackNumber == m_dwMVCExtensionTrackNumber) {
 				BOOL bReadPES = FALSE;
 				CMpegSplitterFile::peshdr peshdr;
-				if (m_pFile->NextMpegStartCode(b, 4) && m_pFile->ReadPES(peshdr, b)) {
+				if (h.payloadstart && m_pFile->NextMpegStartCode(b, 4) && m_pFile->ReadPES(peshdr, b)) {
 					if (peshdr.type == CMpegSplitterFile::mpeg2 && peshdr.scrambling) {
 						m_pFile->Seek(h.next);
 						return S_OK;
