@@ -94,6 +94,20 @@ CBaseSplitterFile::~CBaseSplitterFile()
 	}
 }
 
+HRESULT CBaseSplitterFile::Refresh()
+{
+	CheckPointer(m_pAsyncReader, E_FAIL);
+
+	LONGLONG total = 0, available = 0;
+	HRESULT hr = m_pAsyncReader->Length(&total, &available);
+	if (SUCCEEDED(hr)) {
+		m_len = total;
+		m_available = available;
+	}
+
+	return hr;
+}
+
 void CBaseSplitterFile::ThreadUpdateLength()
 {
 	HANDLE hEvts[] = { m_evStopThreadLength };

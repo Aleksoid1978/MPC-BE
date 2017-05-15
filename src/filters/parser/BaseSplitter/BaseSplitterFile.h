@@ -66,6 +66,8 @@ public:
 	CBaseSplitterFile(IAsyncReader* pReader, HRESULT& hr, int fmode = FM_FILE);
 	~CBaseSplitterFile();
 
+	HRESULT Refresh();
+
 	bool SetCacheSize(int cachelen);
 
 	__int64 GetPos();

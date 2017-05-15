@@ -81,9 +81,10 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	CAtlMap<DWORD, SyncPoints> m_SyncPoints;
 
 	int m_tslen = 0; // transport stream packet length (188 or 192 bytes, auto-detected)
-	REFERENCE_TIME m_rtPTSOffset = 0;
 
 public:
+	REFERENCE_TIME m_rtPTSOffset = 0;
+
 	struct pshdr {
 		mpeg_t type;
 		UINT64 scr, bitrate;

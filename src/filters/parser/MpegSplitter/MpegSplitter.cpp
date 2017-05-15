@@ -1303,14 +1303,6 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	if (m_bUseMVCExtension && !m_Items.IsEmpty()) {
 		SetProperty(L"STEREOSCOPIC3DMODE", m_MVC_Base_View_R_flag ? L"mvc_rl" : L"mvc_lr");
 
-		if (m_Items.GetCount()) {
-			POSITION pos = m_Items.GetHeadPosition();
-			while (pos) {
-				CHdmvClipInfo::PlaylistItem* Item = m_Items.GetNext(pos);
-				Item->m_sps.RemoveAll();
-			}
-		}
-
 		// PG offsets
 		const CHdmvClipInfo::PlaylistItem* Item = m_Items.GetHead();
 		if (Item->m_pg_offset_sequence_id.size()) {
@@ -1401,6 +1393,24 @@ bool CMpegSplitterFilter::DemuxInit()
 					m_bUseMVCExtension          = FALSE;
 					m_dwMasterH264TrackNumber   = DWORD_MAX;
 					m_dwMVCExtensionTrackNumber = DWORD_MAX;
+				}
+			}
+		}
+
+		if (m_Items.GetCount()) {
+			if (m_bUseMVCExtension) {
+				POSITION pos = m_Items.GetHeadPosition();
+				while (pos) {
+					CHdmvClipInfo::PlaylistItem* Item = m_Items.GetNext(pos);
+					Item->m_sps.RemoveAll();
+				}
+			} else {
+				if (m_pSyncReader) {
+					m_Items.RemoveAll();
+					BuildPlaylist(m_fn, m_Items, FALSE);
+					m_pSyncReader->ReOpen(m_Items);
+					m_pSyncReader->SetPTSOffset(&m_pFile->m_rtPTSOffset);
+					m_pFile->Refresh();
 				}
 			}
 		}
@@ -1582,11 +1592,11 @@ bool CMpegSplitterFilter::DemuxLoop()
 	return true;
 }
 
-bool CMpegSplitterFilter::BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& Items)
+bool CMpegSplitterFilter::BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& Items, BOOL bReadMVCExtension/* = TRUE*/)
 {
 	m_rtPlaylistDuration = 0;
 
-	const bool res = SUCCEEDED(m_ClipInfo.ReadPlaylist(pszFileName, m_rtPlaylistDuration, Items, TRUE, &m_MVC_Base_View_R_flag));
+	const bool res = SUCCEEDED(m_ClipInfo.ReadPlaylist(pszFileName, m_rtPlaylistDuration, Items, bReadMVCExtension, TRUE, &m_MVC_Base_View_R_flag));
 	if (res) {
 		m_rtMin = Items.GetHead()->m_rtIn;
 		REFERENCE_TIME rtDur = 0;

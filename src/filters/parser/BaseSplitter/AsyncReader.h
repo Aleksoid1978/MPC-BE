@@ -32,6 +32,7 @@ public IUnknown {
 	STDMETHOD_(void, ClearErrors)() PURE;
 	STDMETHOD_(void, SetPTSOffset)(REFERENCE_TIME* rtPTSOffset) PURE;
 	STDMETHOD_(int, GetSourceType)() PURE;
+	STDMETHOD (ReOpen)(CHdmvClipInfo::CPlaylist& Items) PURE;
 };
 
 interface __declspec(uuid("7D55F67A-826E-40B9-8A7D-3DF0CBBD272D"))
@@ -89,6 +90,7 @@ public:
 	STDMETHODIMP_(void) ClearErrors() { m_lOsError = 0; }
 	STDMETHODIMP_(void) SetPTSOffset(REFERENCE_TIME* rtPTSOffset) { m_pCurrentPTSOffset = rtPTSOffset; };
 	STDMETHODIMP_(int) GetSourceType() { return (int)m_sourcetype; }
+	STDMETHODIMP ReOpen(CHdmvClipInfo::CPlaylist& Items) { return OpenFiles(Items); }
 
 	// IFileHandle
 	STDMETHODIMP_(HANDLE) GetFileHandle() { return m_hFile; }
