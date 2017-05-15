@@ -80,7 +80,7 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	bool DemuxInit();
 	void DemuxSeek(REFERENCE_TIME rt);
 	bool DemuxLoop();
-	bool BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& files);
+	bool BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& files, BOOL bReadMVCExtension = TRUE);
 	bool BuildChapters(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& PlaylistItems, CHdmvClipInfo::CPlaylistChapter& Items);
 
 	HRESULT DeliverPacket(CAutoPtr<CPacket> p);

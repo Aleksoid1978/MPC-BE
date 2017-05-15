@@ -67,10 +67,8 @@ class CBaseSplitterFilter
 
 	CAutoPtrList<CBaseSplitterOutputPin> m_pRetiredOutputs;
 
-	CComQIPtr<ISyncReader>		m_pSyncReader;
-
 protected:
-	CHdmvClipInfo::CPlaylist	m_Items;
+	CHdmvClipInfo::CPlaylist m_Items;
 	CStringW m_fn;
 
 	CAutoPtr<CBaseSplitterInputPin> m_pInput;
@@ -117,7 +115,7 @@ protected:
 	virtual bool DemuxInit() PURE;
 	virtual void DemuxSeek(REFERENCE_TIME rt) PURE;
 	virtual bool DemuxLoop() PURE;
-	virtual bool BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& Items) { return false; };
+	virtual bool BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& Items, BOOL bReadMVCExtension = TRUE) { return false; };
 	virtual bool BuildChapters(LPCTSTR pszFileName, CHdmvClipInfo::CPlaylist& PlaylistItems, CHdmvClipInfo::CPlaylistChapter& Items) { return false; };
 
 public:
@@ -232,6 +230,8 @@ public:
 	STDMETHODIMP GetBin   (LPCSTR field, LPVOID *value, size_t *size ) { return E_NOTIMPL; }
 
 public:
+	CComQIPtr<ISyncReader> m_pSyncReader;
+
 	DWORD GetFlag() { return m_nFlag; }
 
 protected:

@@ -372,7 +372,7 @@ CHdmvClipInfo::Stream* CHdmvClipInfo::FindStream(SHORT wPID)
 	return NULL;
 }
 
-HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bFullInfoRead/* = FALSE*/, BYTE* MVC_Base_View_R_flag/* = NULL*/)
+HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bReadMVCExtension/* = FALSE*/, BOOL bFullInfoRead/* = FALSE*/, BYTE* MVC_Base_View_R_flag/* = NULL*/)
 {
 	CPath Path(strPlaylistFile);
 	rtDuration = 0;
@@ -432,7 +432,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 
 		// Extension
 		LONGLONG stnssextPos = 0;
-		if (extPos) {
+		if (extPos && bReadMVCExtension) {
 			SetPos(extPos);
 			ReadDword();					// lenght
 			ReadDword();					// start address
@@ -698,7 +698,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 
 		CloseFile(S_OK);
 
-		if (bFullInfoRead) {
+		if (bFullInfoRead && !Playlist.IsEmpty())  {
 			POSITION pos = Playlist.GetHeadPosition();
 			while (pos) {
 				PlaylistItem* pItem = Playlist.GetNext(pos);
