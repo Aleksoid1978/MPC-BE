@@ -435,7 +435,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, stream_codec codec, __
 			const __int64 packet_pos = GetPos();
 			nextPos = h.next;
 
-			if (h.pid == TrackNum) {
+			if (h.pid == TrackNum && h.payloadstart) {
 				if (NextMpegStartCode(b, 4)) {
 					peshdr h2;
 					if (ReadPES(h2, b) && h2.fpts) { // pes packet
@@ -473,7 +473,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, stream_codec codec, __
 
 											if (trhdr_2.payload && trhdr_2.pid == TrackNum) {
 												BOOL bReadPES = FALSE;
-												if (NextMpegStartCode(b, 4)) {
+												if (trhdr_2.payloadstart && NextMpegStartCode(b, 4)) {
 													peshdr peshdr_2;
 													if (ReadPES(peshdr_2, b)) {
 														if (peshdr_2.fpts) {
@@ -638,7 +638,7 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, DWORD msTimeO
 				b = 0;
 				peshdr h2;
 				BOOL bReadPES = FALSE;
-				if (NextMpegStartCode(b, 4) && ReadPES(h2, b)) {
+				if (h.payloadstart && NextMpegStartCode(b, 4) && ReadPES(h2, b)) {
 					if (h2.type == mpeg2 && h2.scrambling) {
 						Seek(h.next);
 						continue;
