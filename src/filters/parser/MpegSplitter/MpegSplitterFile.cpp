@@ -2840,9 +2840,10 @@ bool CMpegSplitterFile::ReadPSI(psihdr& h)
 
 	h.table_id                   = (BYTE)BitRead(8);
 	h.section_syntax_indicator   = (BYTE)BitRead(1);
-	h.zero                       = (BYTE)BitRead(1);
+	h.private_bits               = (BYTE)BitRead(1);
 	h.reserved1                  = (BYTE)BitRead(2);
-	h.section_length             = (int)BitRead(12);
+	h.section_length_unused      = (BYTE)BitRead(2);
+	h.section_length             = (int)BitRead(10);
 	h.hdr_size += 3;
 	if (h.section_syntax_indicator) {
 		h.transport_stream_id    = (WORD)BitRead(16);
@@ -2856,5 +2857,5 @@ bool CMpegSplitterFile::ReadPSI(psihdr& h)
 		h.hdr_size += 5;
 	}
 
-	return (h.table_id <= 0x06) ? (h.section_syntax_indicator == 1 && h.section_length > 4) : h.section_length > 0;
+	return h.reserved1 == 0x03 && h.section_length_unused == 0x00 && h.reserved2 == 0x03 && ((h.table_id <= 0x06) ? (h.section_syntax_indicator == 1 && h.section_length > 4) : h.section_length > 0);
 }

@@ -167,9 +167,10 @@ public:
 	struct psihdr
 	{
 		BYTE section_syntax_indicator:1;
-		BYTE zero:1;
+		BYTE private_bits:1;
 		BYTE reserved1:2;
-		int section_length:12;
+		BYTE section_length_unused:2;
+		int section_length:10;
 		WORD transport_stream_id;
 		BYTE table_id;
 		BYTE reserved2:2;
