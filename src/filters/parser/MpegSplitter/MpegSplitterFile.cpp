@@ -1099,10 +1099,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len,
 						type = stream_type::subpic;
 					}
 				}
-			} else if (!m_bOpeningCompleted && type == stream_type::unknown) {
+			} else if (!m_bOpeningCompleted && type == stream_type::unknown && (pes_stream_type == AUDIO_STREAM_DTS_HD || pes_stream_type == AUDIO_STREAM_DTS_HD_MASTER_AUDIO)) {
 				stream* source = (stream*)m_streams[stream_type::audio].FindStream(s);
-				if (source
-						&& (pes_stream_type == AUDIO_STREAM_DTS_HD || pes_stream_type == AUDIO_STREAM_DTS_HD_MASTER_AUDIO) && source->dts.bDTSCore && !source->dts.bDTSHD && source->mt.pbFormat) {
+				if (source && source->dts.bDTSCore && !source->dts.bDTSHD && source->mt.pbFormat) {
 					Seek(start);
 					if (BitRead(32, true) == FCC(DTS_SYNCWORD_SUBSTREAM)) {
 						BYTE* buf = DNew BYTE[len];
