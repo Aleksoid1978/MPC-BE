@@ -557,12 +557,6 @@ bool CBaseSplitterFileEx::Read(aachdr& h, int len, CMediaType* pmt, bool find_sy
 
 bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sync, bool AC3CoreOnly)
 {
-	static int freq[] = {48000, 44100, 32000, 0};
-
-	bool e_ac3 = false;
-
-	__int64 startpos = GetPos();
-
 	memset(&h, 0, sizeof(h));
 
 	// Parse TrueHD and MLP header
@@ -575,30 +569,32 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 		audioframe_t aframe;
 		fsize = ParseMLPHeader(buf, &aframe);
 		if (fsize) {
-
 			if (pmt) {
-				int bitrate = (int)(fsize * 8i64 * aframe.samplerate / aframe.samples); // inaccurate, because fsize is not constant
+				const int bitrate = (int)(fsize * 8i64 * aframe.samplerate / aframe.samples); // inaccurate, because fsize is not constant
 
-				pmt->majortype			= MEDIATYPE_Audio;
-				pmt->subtype			= aframe.param2 ? MEDIASUBTYPE_DOLBY_TRUEHD : MEDIASUBTYPE_MLP;
-				pmt->formattype			= FORMAT_WaveFormatEx;
+				pmt->majortype       = MEDIATYPE_Audio;
+				pmt->subtype         = aframe.param2 ? MEDIASUBTYPE_DOLBY_TRUEHD : MEDIASUBTYPE_MLP;
+				pmt->formattype      = FORMAT_WaveFormatEx;
 
-				WAVEFORMATEX* wfe		= (WAVEFORMATEX*)pmt->AllocFormatBuffer(sizeof(WAVEFORMATEX));
+				WAVEFORMATEX* wfe    = (WAVEFORMATEX*)pmt->AllocFormatBuffer(sizeof(WAVEFORMATEX));
 				memset(wfe, 0, sizeof(WAVEFORMATEX));
-				wfe->wFormatTag			= WAVE_FORMAT_UNKNOWN;
-				wfe->nChannels			= aframe.channels;
-				wfe->nSamplesPerSec		= aframe.samplerate;
-				wfe->nAvgBytesPerSec	= (bitrate + 4) / 8;
-				wfe->nBlockAlign		= fsize < WORD_MAX ? fsize : WORD_MAX;
-				wfe->wBitsPerSample		= aframe.param1;
+				wfe->wFormatTag      = WAVE_FORMAT_UNKNOWN;
+				wfe->nChannels       = aframe.channels;
+				wfe->nSamplesPerSec  = aframe.samplerate;
+				wfe->nAvgBytesPerSec = (bitrate + 4) / 8;
+				wfe->nBlockAlign     = fsize < WORD_MAX ? fsize : WORD_MAX;
+				wfe->wBitsPerSample  = aframe.param1;
 
 				pmt->SetSampleSize(0);
 			}
 			return true;
 		}
+
+		return false;
 	}
 
-	Seek(startpos);
+	static int freq[] = {48000, 44100, 32000, 0};
+	bool e_ac3 = false;
 
 	if (find_sync) {
 		for (; len >= 7 && BitRead(16, true) != 0x0b77; len--) {

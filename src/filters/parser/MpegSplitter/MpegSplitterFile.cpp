@@ -650,7 +650,7 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, DWORD msTimeO
 					Seek(pos);
 				}
 
-				DWORD TrackNum = AddStream(h.pid, b, 0, DWORD(h.bytes - (GetPos() - pos)));
+				DWORD TrackNum = AddStream(h.pid, b, h2.id_ext, DWORD(h.bytes - (GetPos() - pos)));
 
 				if (h2.fpts) {
 					SyncPoints& sps = m_SyncPoints[TrackNum];
@@ -767,7 +767,7 @@ static const struct {
 	{ 'Opus', CMpegSplitterFile::stream_codec::OPUS,  OPUS_AUDIO  }
 };
 
-DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, BOOL bAddStream/* = TRUE*/)
+DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len, BOOL bAddStream/* = TRUE*/)
 {
 	if (pid) {
 		if (pesid) {
@@ -780,7 +780,9 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 	stream s;
 	s.pid   = pid;
 	s.pesid = pesid;
-	s.ps1id = ps1id;
+	if (m_type != MPEG_TYPES::mpeg_ts) {
+		s.ps1id = ext_id;
+	}
 
 	if (m_bOpeningCompleted && m_type == MPEG_TYPES::mpeg_ts) {
 		if (m_ClipInfo.IsHdmv()) {
@@ -991,7 +993,17 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				if (type == stream_type::unknown && (stream_type & AC3_AUDIO)) {
 					Seek(start);
 					ac3hdr h;
-					if (Read(h, len, &s.mt, true, (m_AC3CoreOnly != 0))) {
+					if (pes_stream_type == AUDIO_STREAM_AC3_TRUE_HD) {
+						if (m_AC3CoreOnly) {
+							if (ext_id == 0x76 && Read(h, len, &s.mt)) { // AC3 sub-stream
+								type = stream_type::audio;
+							}
+						} else {
+							if (ext_id == 0x72 && Read(h, len, &s.mt, false, false)) { // TrueHD core
+								type = stream_type::audio;
+							}
+						}
+					} else if (Read(h, len, &s.mt)) {
 						type = stream_type::audio;
 					}
 				}
@@ -1089,37 +1101,28 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ps1id, DWORD len, 
 				}
 			} else if (!m_bOpeningCompleted && type == stream_type::unknown) {
 				stream* source = (stream*)m_streams[stream_type::audio].FindStream(s);
-				if (source) {
-					if (!m_AC3CoreOnly && pes_stream_type == AUDIO_STREAM_AC3_TRUE_HD && source->mt.subtype == MEDIASUBTYPE_DOLBY_AC3) {
-						Seek(start);
-						ac3hdr h;
-						if (Read(h, len, &s.mt, false, false) && s.mt.subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
-							source->mts.push_back(s.mt);
-							source->mts.push_back(source->mt);
-							source->mt = s.mt;
-						}
-					} else if ((pes_stream_type == AUDIO_STREAM_DTS_HD || pes_stream_type == AUDIO_STREAM_DTS_HD_MASTER_AUDIO) && source->dts.bDTSCore && !source->dts.bDTSHD && source->mt.pbFormat) {
-						Seek(start);
-						if (BitRead(32, true) == FCC(DTS_SYNCWORD_SUBSTREAM)) {
-							BYTE* buf = DNew BYTE[len];
-							audioframe_t aframe;
-							if (ByteRead(buf, len) == S_OK && ParseDTSHDHeader(buf, len, &aframe)) {
-								WAVEFORMATEX* wfe = (WAVEFORMATEX*)source->mt.pbFormat;
-								wfe->nSamplesPerSec = aframe.samplerate;
-								wfe->nChannels = aframe.channels;
-								if (aframe.param1) {
-									wfe->wBitsPerSample = aframe.param1;
-								}
-								if (aframe.param2 == DCA_PROFILE_HD_HRA) {
-									wfe->nAvgBytesPerSec += CalcBitrate(aframe) / 8;
-								} else {
-									wfe->nAvgBytesPerSec = 0;
-								}
-
-								source->dts.bDTSHD	= true;
+				if (source
+						&& (pes_stream_type == AUDIO_STREAM_DTS_HD || pes_stream_type == AUDIO_STREAM_DTS_HD_MASTER_AUDIO) && source->dts.bDTSCore && !source->dts.bDTSHD && source->mt.pbFormat) {
+					Seek(start);
+					if (BitRead(32, true) == FCC(DTS_SYNCWORD_SUBSTREAM)) {
+						BYTE* buf = DNew BYTE[len];
+						audioframe_t aframe;
+						if (ByteRead(buf, len) == S_OK && ParseDTSHDHeader(buf, len, &aframe)) {
+							WAVEFORMATEX* wfe = (WAVEFORMATEX*)source->mt.pbFormat;
+							wfe->nSamplesPerSec = aframe.samplerate;
+							wfe->nChannels = aframe.channels;
+							if (aframe.param1) {
+								wfe->wBitsPerSample = aframe.param1;
 							}
-							delete [] buf;
+							if (aframe.param2 == DCA_PROFILE_HD_HRA) {
+								wfe->nAvgBytesPerSec += CalcBitrate(aframe) / 8;
+							} else {
+								wfe->nAvgBytesPerSec = 0;
+							}
+
+							source->dts.bDTSHD	= true;
 						}
+						delete [] buf;
 					}
 				}
 			}
