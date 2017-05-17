@@ -808,14 +808,9 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 				return S_FALSE;
 			}
 
-			if (peshdr.type == CMpegSplitterFile::mpeg2 && peshdr.scrambling) {
-				m_pFile->Seek(m_pFile->GetPos() + peshdr.len);
-				return S_FALSE;
-			}
+			const __int64 pos = m_pFile->GetPos();
 
-			__int64 pos = m_pFile->GetPos();
-
-			DWORD TrackNumber = m_pFile->AddStream(0, b, peshdr.id_ext, peshdr.len);
+			const DWORD TrackNumber = m_pFile->AddStream(0, b, peshdr.id_ext, peshdr.len);
 			if (GetOutputPin(TrackNumber)) {
 				const __int64 nBytes = peshdr.len - (m_pFile->GetPos() - pos);
 				hr = HandleMPEGPacket(TrackNumber, nBytes, peshdr, rtStartOffset, m_pFile->m_streamData[TrackNumber].usePTS);
@@ -832,19 +827,17 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 			m_rtGlobalPCRTimeStamp = h.PCR;
 		}
 
-		__int64 pos = m_pFile->GetPos();
-
 		if (h.payload && ISVALIDPID(h.pid)) {
-			DWORD TrackNumber = h.pid;
+			const DWORD TrackNumber = h.pid;
 			if (GetOutputPin(TrackNumber) || TrackNumber == m_dwMVCExtensionTrackNumber) {
+				const __int64 pos = m_pFile->GetPos();
 				BOOL bReadPES = FALSE;
 				CMpegSplitterFile::peshdr peshdr;
-				if (h.payloadstart && m_pFile->NextMpegStartCode(b, 4) && m_pFile->ReadPES(peshdr, b)) {
-					if (peshdr.type == CMpegSplitterFile::mpeg2 && peshdr.scrambling) {
+				if (h.payloadstart && m_pFile->NextMpegStartCode(b, 4)) {
+					if (!m_pFile->ReadPES(peshdr, b)) {
 						m_pFile->Seek(h.next);
-						return S_OK;
+						return S_FALSE;
 					}
-					TrackNumber = m_pFile->AddStream(h.pid, b, 0, (DWORD)(h.bytes - (m_pFile->GetPos() - pos)));
 					bReadPES = TRUE;
 				}
 
@@ -877,9 +870,9 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 			return S_FALSE;
 		}
 
-		__int64 pos = m_pFile->GetPos();
+		const __int64 pos = m_pFile->GetPos();
 
-		DWORD TrackNumber = pvahdr.streamid;
+		const DWORD TrackNumber = pvahdr.streamid;
 		if (GetOutputPin(TrackNumber)) {
 			hr = HandleMPEGPacket(TrackNumber, pvahdr.length, pvahdr, rtStartOffset, m_pFile->m_streamData[TrackNumber].usePTS);
 		}

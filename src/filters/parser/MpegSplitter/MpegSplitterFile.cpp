@@ -435,78 +435,78 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, stream_codec codec, __
 			const __int64 packet_pos = GetPos();
 			nextPos = h.next;
 
-			if (h.pid == TrackNum && h.payloadstart) {
-				if (NextMpegStartCode(b, 4)) {
-					peshdr h2;
-					if (ReadPES(h2, b) && h2.fpts) { // pes packet
-						if (rtLimit != _I64_MAX && (h2.pts - m_rtMin) > rtLimit) {
-							Seek(pos);
-							return INVALID_TIME;
-						}
+			if (h.pid == TrackNum && h.payloadstart && NextMpegStartCode(b, 4)) {
+				peshdr h2;
+				if (ReadPES(h2, b) && h2.fpts) {
+					if (rtLimit != _I64_MAX && (h2.pts - m_rtMin) > rtLimit) {
+						Seek(pos);
+						return INVALID_TIME;
+					}
 
-						rt    = h2.pts;
-						rtpos = h.hdrpos;
+					rt    = h2.pts;
+					rtpos = h.hdrpos;
 
-						BOOL bKeyFrame = TRUE;
-						if (bKeyFrameOnly) {
-							if (!h.randomaccess) {
-								bKeyFrame = FALSE;
+					BOOL bKeyFrame = TRUE;
+					if (bKeyFrameOnly) {
+						if (!h.randomaccess) {
+							bKeyFrame = FALSE;
 
-								int nBytes = h.bytes - (GetPos() - packet_pos);
-								if (nBytes > 0) {
-									CAtlArray<BYTE> p;
-									p.SetCount((size_t)nBytes);
-									ByteRead(p.GetData(), nBytes);
+							int nBytes = h.bytes - (GetPos() - packet_pos);
+							if (nBytes > 0) {
+								CAtlArray<BYTE> p;
+								p.SetCount((size_t)nBytes);
+								ByteRead(p.GetData(), nBytes);
 
-									// collect solid data packet
-									{
-										Seek(h.next);
-										while (GetRemaining()) {
-											__int64 start_pos_2 = GetPos();
+								// collect solid data packet
+								{
+									Seek(h.next);
+									while (GetRemaining()) {
+										__int64 start_pos_2 = GetPos();
 
-											trhdr trhdr_2;
-											if (!ReadTR(trhdr_2)) {
-												continue;
-											}
-
-											const __int64 packet_pos_2 = GetPos();
-
-											if (trhdr_2.payload && trhdr_2.pid == TrackNum) {
-												BOOL bReadPES = FALSE;
-												if (trhdr_2.payloadstart && NextMpegStartCode(b, 4)) {
-													peshdr peshdr_2;
-													if (ReadPES(peshdr_2, b)) {
-														if (peshdr_2.fpts) {
-															bKeyFrame = CheckKeyFrame(p, codec);
-															nextPos = h.next = start_pos_2;
-															break;
-														}
-														bReadPES = TRUE;
-													}
-												}
-
-												if (!bReadPES) {
-													Seek(packet_pos_2);
-												}
-
-												if (trhdr_2.bytes > (GetPos() - packet_pos_2)) {
-													__int64 nBytes_2 = trhdr_2.bytes - (GetPos() - packet_pos_2);
-													size_t pSize = p.GetCount();
-													p.SetCount(pSize + (size_t)nBytes_2);
-													ByteRead(p.GetData() + pSize, nBytes_2);
-												}
-											}
-
-											Seek(trhdr_2.next);
+										trhdr trhdr_2;
+										if (!ReadTR(trhdr_2)) {
+											continue;
 										}
+
+										const __int64 packet_pos_2 = GetPos();
+
+										if (trhdr_2.payload && trhdr_2.pid == TrackNum) {
+											BOOL bReadPES = FALSE;
+											if (trhdr_2.payloadstart && NextMpegStartCode(b, 4)) {
+												peshdr peshdr_2;
+												if (!ReadPES(peshdr_2, b)) {
+													Seek(trhdr_2.next);
+													continue;
+												}
+												if (peshdr_2.fpts) {
+													bKeyFrame = CheckKeyFrame(p, codec);
+													nextPos = h.next = start_pos_2;
+													break;
+												}
+												bReadPES = TRUE;
+											}
+
+											if (!bReadPES) {
+												Seek(packet_pos_2);
+											}
+
+											if (trhdr_2.bytes > (GetPos() - packet_pos_2)) {
+												__int64 nBytes_2 = trhdr_2.bytes - (GetPos() - packet_pos_2);
+												size_t pSize = p.GetCount();
+												p.SetCount(pSize + (size_t)nBytes_2);
+												ByteRead(p.GetData() + pSize, nBytes_2);
+											}
+										}
+
+										Seek(trhdr_2.next);
 									}
 								}
 							}
 						}
+					}
 
-						if (bKeyFrame) {
-							break;
-						}
+					if (bKeyFrame) {
+						break;
 					}
 				}
 			}
@@ -611,13 +611,8 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, DWORD msTimeO
 					continue;
 				}
 
-				if (h.type == mpeg2 && h.scrambling) {
-					Seek(GetPos() + h.len);
-					continue;
-				}
-
-				__int64 pos = GetPos();
-				DWORD TrackNum = AddStream(0, b, h.id_ext, h.len);
+				const __int64 pos = GetPos();
+				const DWORD TrackNum = AddStream(0, b, h.id_ext, h.len);
 
 				if (h.fpts) {
 					SyncPoints& sps = m_SyncPoints[TrackNum];
@@ -632,14 +627,12 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, DWORD msTimeO
 				continue;
 			}
 
-			const __int64 pos = GetPos();
-
 			if (h.payload && ISVALIDPID(h.pid)) {
-				b = 0;
-				peshdr h2;
+				const __int64 pos = GetPos();
 				BOOL bReadPES = FALSE;
-				if (h.payloadstart && NextMpegStartCode(b, 4) && ReadPES(h2, b)) {
-					if (h2.type == mpeg2 && h2.scrambling) {
+				peshdr h2;
+				if (h.payloadstart && NextMpegStartCode(b, 4)) {
+					if (!ReadPES(h2, b)) {
 						Seek(h.next);
 						continue;
 					}
@@ -650,7 +643,7 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, DWORD msTimeO
 					Seek(pos);
 				}
 
-				DWORD TrackNum = AddStream(h.pid, b, h2.id_ext, DWORD(h.bytes - (GetPos() - pos)));
+				const DWORD TrackNum = AddStream(h.pid, b, h2.id_ext, DWORD(h.bytes - (GetPos() - pos)));
 
 				if (h2.fpts) {
 					SyncPoints& sps = m_SyncPoints[TrackNum];
@@ -665,7 +658,7 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, DWORD msTimeO
 				continue;
 			}
 
-			__int64 pos = GetPos();
+			const __int64 pos = GetPos();
 
 			DWORD TrackNum = 0;
 			if (h.streamid == 1) {
@@ -782,18 +775,6 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len,
 	s.pesid = pesid;
 	if (m_type != MPEG_TYPES::mpeg_ts) {
 		s.ps1id = ext_id;
-	}
-
-	if (m_bOpeningCompleted && m_type == MPEG_TYPES::mpeg_ts) {
-		if (m_ClipInfo.IsHdmv()) {
-			return s;
-		}
-
-		for (int type = stream_type::video; type < stream_type::unknown; type++) {
-			if (m_streams[type].Find(s)) {
-				return s;
-			}
-		}
 	}
 
 	const __int64 start   = GetPos();
@@ -2550,10 +2531,7 @@ bool CMpegSplitterFile::ReadPES(peshdr& h, BYTE code)
 		h.extension = (BYTE)BitRead(1);
 		h.hdrlen = (BYTE)BitRead(8);
 	} else {
-		if (h.len) {
-			Skip(h.len);
-			h.len = 0;
-		}
+		ASSERT(FALSE);
 		goto error;
 	}
 
@@ -2627,6 +2605,10 @@ bool CMpegSplitterFile::ReadPES(peshdr& h, BYTE code)
 		}
 
 		Skip(left);
+
+		if (h.scrambling) {
+			goto error;
+		}
 	}
 
 	return true;
