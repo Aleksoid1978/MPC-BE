@@ -1392,8 +1392,7 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 
 	programData& ProgramData = m_ProgramData[h.pid];
 	if (ProgramData.bFinished) {
-		// disable the check, because the program's data may change
-		// return;
+		return;
 	}
 
 	if (h.payload && h.payloadstart) {
