@@ -204,10 +204,12 @@ __int64 CBaseSplitterFile::GetRemaining()
 
 void CBaseSplitterFile::Seek(__int64 pos)
 {
-	if (IsStreaming()) {
-		m_pos = pos;
-	} else {
-		m_pos = clamp(pos, 0LL, m_len);
+	if (m_pos != pos) {
+		if (IsStreaming()) {
+			m_pos = pos;
+		} else {
+			m_pos = clamp(pos, 0LL, m_len);
+		}
 	}
 
 	BitFlush();
