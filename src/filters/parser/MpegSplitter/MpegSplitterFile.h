@@ -442,7 +442,7 @@ public:
 	void ReadPrograms(const trhdr& h);
 	void ReadPAT(CAtlArray<BYTE>& pData);
 	void ReadPMT(CAtlArray<BYTE>& pData, WORD pid);
-	void ReadSDT(CAtlArray<BYTE>& pData, BYTE table_id);
+	void ReadSDT(CAtlArray<BYTE>& pData);
 	void ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id);
 
 	const program* FindProgram(WORD pid, int* pStream = NULL, const CHdmvClipInfo::Stream** pClipInfo = NULL);

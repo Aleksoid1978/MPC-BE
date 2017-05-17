@@ -1401,7 +1401,7 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 		if (ReadPSI(h2)) {
 			switch (h2.table_id) {
 				case DVB_SI::SI_PAT:
-					if (!m_programs.IsEmpty() || h.pid != MPEG2_PID::PID_PAT) {
+					if (h.pid != MPEG2_PID::PID_PAT) {
 						return;
 					}
 					break;
@@ -1419,9 +1419,6 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 					}
 					break;
 				case DVB_SI::SI_PMT:
-					if (m_programs.IsEmpty()) {
-						return;
-					}
 					break;
 				default:
 					return;
@@ -1460,7 +1457,7 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 				break;
 			case DVB_SI::SI_SDT: // DVB - Service Description Table - actual_transport_stream
 			case 0x46:           // DVB - Service Description Table - other_transport_stream
-				ReadSDT(ProgramData.pData, ProgramData.table_id);
+				ReadSDT(ProgramData.pData);
 				break;
 			case 0xC8: // ATSC - Terrestrial Virtual Channel Table (TVCT)
 			case 0xC9: // ATSC - Cable Virtual Channel Table (CVCT) / Long-form Virtual Channel Table (L-VCT)
@@ -1791,254 +1788,256 @@ static int mp4_read_dec_config_descr(CAtlArray<BYTE>& dec_config_descr, CMpegSpl
 
 void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 {
-	if (CPrograms::CPair* pPair = m_programs.Lookup(pid)) {
-		mp4_descr.Clear();
+	mp4_descr.Clear();
 
-		program* pr = &pPair->m_value;
+	auto& pr = m_programs[pid];
 
-		CGolombBuffer gb(pData.GetData(), pData.GetCount());
-		int len = gb.GetSize();
+	CGolombBuffer gb(pData.GetData(), pData.GetCount());
+	int len = gb.GetSize();
 
-		BYTE reserved1           = (BYTE)gb.BitRead(3);
-		WORD PCR_PID             = (WORD)gb.BitRead(13);
-		BYTE reserved2           = (BYTE)gb.BitRead(4);
-		WORD program_info_length = (WORD)gb.BitRead(12);
-		UNREFERENCED_PARAMETER(reserved1);
-		UNREFERENCED_PARAMETER(PCR_PID);
-		UNREFERENCED_PARAMETER(reserved2);
+	BYTE reserved1           = (BYTE)gb.BitRead(3);
+	WORD PCR_PID             = (WORD)gb.BitRead(13);
+	BYTE reserved2           = (BYTE)gb.BitRead(4);
+	WORD program_info_length = (WORD)gb.BitRead(12);
+	UNREFERENCED_PARAMETER(reserved1);
+	UNREFERENCED_PARAMETER(PCR_PID);
+	UNREFERENCED_PARAMETER(reserved2);
 
-		len -= (4 + program_info_length);
-		if (len <= 0)
-			return;
+	len -= (4 + program_info_length);
+	if (len <= 0)
+		return;
 
-		if (program_info_length) {
-			const int end_pos = gb.GetPos() + program_info_length;
-			while (program_info_length >= 2) {
-				int tag = gb.BitRead(8);
-				int len = gb.BitRead(8);
-				if (len > program_info_length - 2) {
-					break;
-				}
-				program_info_length -= len + 2;
-
-				if (tag == 0x1d) { // IOD descriptor
-					gb.BitRead(8);
-					gb.BitRead(8);
-					len -= 2;
-
-					parse_mp4_descr(gb, len, MP4IODescrTag);
-				}
-
-				gb.SkipBytes(len);
-			}
-
-			gb.Seek(end_pos);
-		}
-
-		for (;;) {
-			PES_STREAM_TYPE stream_type = (PES_STREAM_TYPE)gb.BitRead(8);
-			BYTE nreserved1             = (BYTE)gb.BitRead(3);
-			WORD pid                    = (WORD)gb.BitRead(13);
-			BYTE nreserved2             = (BYTE)gb.BitRead(4);
-			WORD ES_info_length         = (WORD)gb.BitRead(12);
-			UNREFERENCED_PARAMETER(nreserved1);
-			UNREFERENCED_PARAMETER(nreserved2);
-
-			if (stream_type != PES_STREAM_TYPE::INVALID && !pr->streamFind(pid)) {
-				program::stream s;
-				s.pid  = pid;
-				s.type = stream_type;
-
-				pr->streams.push_back(s);
-			}
-
-			len -= (5 + ES_info_length);
-			if (len < 0) {
+	if (program_info_length) {
+		const int end_pos = gb.GetPos() + program_info_length;
+		while (program_info_length >= 2) {
+			int tag = gb.BitRead(8);
+			int len = gb.BitRead(8);
+			if (len > program_info_length - 2) {
 				break;
 			}
+			program_info_length -= len + 2;
 
-			streamData& _streamData = m_streamData[pid];
-			stream s_aac_mp4;
+			if (tag == 0x1d) { // IOD descriptor
+				gb.BitRead(8);
+				gb.BitRead(8);
+				len -= 2;
 
-			if (ES_info_length > 2) {
-				int	info_length = ES_info_length;
-				for (;;) {
-					BYTE descriptor_tag    = (BYTE)gb.BitRead(8);
-					BYTE descriptor_length = (BYTE)gb.BitRead(8);
-					info_length           -= (2 + descriptor_length);
-					if (info_length < 0) {
-						break;
-					}
+				parse_mp4_descr(gb, len, MP4IODescrTag);
+			}
 
-					char ISO_639_language_code[4] = {};
-					teletextPages tlxPages;
-					switch (descriptor_tag) {
-						case 0x05: // registration descriptor
-							{
-								const DWORD codec_tag = gb.ReadDword();
-								if (descriptor_length > 4) {
-									gb.SkipBytes(descriptor_length - 4);
-								}
-								for (size_t i = 0; i < _countof(StreamDesc); i++) {
-									if (codec_tag == StreamDesc[i].codec_tag) {
-										_streamData.codec = StreamDesc[i].codec;
-										break;
-									}
-								}
-							}
-							break;
-						case 0x0a: // ISO 639 language descriptor
-							Descriptor_0A(gb, ISO_639_language_code);
-							break;
-						case 0x1E: // SL descriptor
-						case 0x1F: // FMC descriptor
-							{
-								WORD es_id = gb.BitRead(16); descriptor_length -= 2;
-								if (descriptor_length) {
-									gb.SkipBytes(descriptor_length);
-								}
-								if (es_id && !mp4_descr.dec_config_descr.IsEmpty()) {
-									CAtlArray<BYTE>& dec_config_descr = mp4_descr.dec_config_descr[es_id];
-									if (!dec_config_descr.IsEmpty()) {
-										s_aac_mp4.pid = pid;
-										if (!m_streams[stream_type::audio].Find(s_aac_mp4)) {
-											if (mp4_read_dec_config_descr(dec_config_descr, s_aac_mp4) == 0) {
-												_streamData.codec = stream_codec::AAC_RAW;
-											}
-										}
-									}
-								}
-							}
-							break;
-						case 0x56: // Teletext descriptor
-							Descriptor_56(gb, descriptor_length, ISO_639_language_code, tlxPages);
-							_streamData.codec = stream_codec::TELETEXT;
-							break;
-						case 0x59: // Subtitling descriptor
-							Descriptor_59(gb, descriptor_length, ISO_639_language_code);
-							_streamData.codec = stream_codec::DVB;
-							break;
-						case 0x7f: // DVB extension descriptor
-							{
-								const BYTE ext_desc_tag = gb.BitRead(8);
-								if (ext_desc_tag == 0x80) {
-									int channel_config_code = gb.BitRead(8);
-									if (channel_config_code >= 0 && channel_config_code <= 0x8) {
-										CAtlArray<BYTE>& extradata = _streamData.pmt.extraData;
-										if (extradata.GetCount() != sizeof(opus_default_extradata)) {
-											extradata.SetCount(sizeof(opus_default_extradata));
-											memcpy(extradata.GetData(), &opus_default_extradata, sizeof(opus_default_extradata));
+			gb.SkipBytes(len);
+		}
 
-											BYTE channels = 0;
-											extradata[9]  = channels = channel_config_code ? channel_config_code : 2;
-											extradata[18] = channel_config_code ? (channels > 2) : 255;
-											extradata[19] = opus_stream_cnt[channel_config_code];
-											extradata[20] = opus_coupled_stream_cnt[channel_config_code];
-											if (channels >= 1) {
-												memcpy(&extradata[21], opus_channel_map[channels - 1], channels);
-											}
+		gb.Seek(end_pos);
+	}
 
-											_streamData.codec = stream_codec::OPUS;
-										}
-									}
-								}
-							}
-							break;
-						case 0xfd: // Data Component descriptor
-							{
-								const SHORT data_component_id = gb.ReadShort();
-								if (data_component_id == 0x0008) {
-									// ARIB Subtitle
-									_streamData.codec = stream_codec::ARIB;
-								}
-							}
-							break;
-						default:
+	while (len >= 5) {
+		PES_STREAM_TYPE stream_type = (PES_STREAM_TYPE)gb.BitRead(8);
+		BYTE nreserved1             = (BYTE)gb.BitRead(3);
+		WORD pid                    = (WORD)gb.BitRead(13);
+		BYTE nreserved2             = (BYTE)gb.BitRead(4);
+		WORD ES_info_length         = (WORD)gb.BitRead(12);
+		UNREFERENCED_PARAMETER(nreserved1);
+		UNREFERENCED_PARAMETER(nreserved2);
+
+		len -= 5;
+		if (ES_info_length > len) {
+			break;
+		}
+		len -= ES_info_length;
+
+		if (stream_type != PES_STREAM_TYPE::INVALID && !pr.streamFind(pid)) {
+			program::stream s;
+			s.pid  = pid;
+			s.type = stream_type;
+
+			pr.streams.push_back(s);
+		}
+
+		streamData& _streamData = m_streamData[pid];
+		stream s_aac_mp4;
+
+		while (ES_info_length >= 2) {
+			BYTE descriptor_tag    = (BYTE)gb.BitRead(8);
+			BYTE descriptor_length = (BYTE)gb.BitRead(8);
+			ES_info_length -= 2;
+
+			if (!descriptor_length) {
+				continue;
+			}
+			if (descriptor_length > ES_info_length) {
+				break;
+			}
+			ES_info_length -= descriptor_length;
+
+			char ISO_639_language_code[4] = {};
+			teletextPages tlxPages;
+			switch (descriptor_tag) {
+				case 0x05: // registration descriptor
+					{
+						const DWORD codec_tag = gb.ReadDword(); descriptor_length -= 4;
+						if (descriptor_length) {
 							gb.SkipBytes(descriptor_length);
-							break;
-					}
-
-					if (ISO_639_language_code[0]) {
-						strcpy_s(_streamData.pmt.lang, ISO_639_language_code);
-					}
-					if (!tlxPages.empty()) {
-						_streamData.pmt.tlxPages = tlxPages;
-					}
-
-					if (info_length <= 2) {
-						if (info_length > 0) {
-							gb.SkipBytes(info_length);
 						}
-						break;
-					}
-				}
-			} else if (ES_info_length) {
-				gb.SkipBytes(ES_info_length);
-			}
-
-			if (s_aac_mp4.codec == stream_codec::AAC_RAW) {
-				if (_streamData.pmt.lang[0]) {
-					strcpy_s(s_aac_mp4.lang, _streamData.pmt.lang);
-					s_aac_mp4.lang_set = true;
-				}
-				m_streams[stream_type::audio].Insert(s_aac_mp4, stream_type::audio);
-			}
-
-			if (m_ForcedSub) {
-				if (stream_type == PRESENTATION_GRAPHICS_STREAM
-						|| _streamData.codec == stream_codec::DVB
-						|| _streamData.codec == stream_codec::TELETEXT) {
-					stream s;
-					s.pid = pid;
-
-					if (!m_streams[stream_type::subpic].Find(s)) {
-						s.codec = _streamData.codec;
-						if (_streamData.pmt.lang[0]) {
-							strcpy_s(s.lang, _streamData.pmt.lang);
-							s.lang_set = true;
+						for (size_t i = 0; i < _countof(StreamDesc); i++) {
+							if (codec_tag == StreamDesc[i].codec_tag) {
+								_streamData.codec = StreamDesc[i].codec;
+								break;
+							}
 						}
-
-						if (stream_type == PRESENTATION_GRAPHICS_STREAM) {
-							hdmvsubhdr hdr;
-							if (Read(hdr, &s.mt, _streamData.pmt.lang)) {
-								m_streams[stream_type::subpic].Insert(s, stream_type::subpic);
-								s.codec = _streamData.codec = stream_codec::PGS;
-							}
-						} else if (_streamData.codec == stream_codec::DVB) {
-							dvbsubhdr hdr;
-							if (Read(hdr, 0, &s.mt, _streamData.pmt.lang, false)) {
-								m_streams[stream_type::subpic].Insert(s, stream_type::subpic);
-							}
-						} else if (_streamData.codec == stream_codec::TELETEXT) {
-							BOOL bAdded = FALSE;
-							teletextsubhdr hdr;
-							if (!_streamData.pmt.tlxPages.empty()) {
-								for (auto& tlxPage : _streamData.pmt.tlxPages) {
-									if (tlxPage.bSubtitle && tlxPage.page != 0x100) {
-										s.tlxPage = tlxPage.page;
-										strcpy_s(s.lang, tlxPage.lang);
-										FreeMediaType(s.mt);
-										s.mt.InitMediaType();
-
-										Read(hdr, 0, &s.mt, _streamData.pmt.lang, false);
-										m_streams[stream_type::subpic].Insert(s, stream_type::subpic);
-
-										bAdded = TRUE;
+					}
+					break;
+				case 0x0a: // ISO 639 language descriptor
+					Descriptor_0A(gb, ISO_639_language_code);
+					break;
+				case 0x1E: // SL descriptor
+				case 0x1F: // FMC descriptor
+					{
+						WORD es_id = gb.BitRead(16); descriptor_length -= 2;
+						if (descriptor_length) {
+							gb.SkipBytes(descriptor_length);
+						}
+						if (es_id && !mp4_descr.dec_config_descr.IsEmpty()) {
+							CAtlArray<BYTE>& dec_config_descr = mp4_descr.dec_config_descr[es_id];
+							if (!dec_config_descr.IsEmpty()) {
+								s_aac_mp4.pid = pid;
+								if (!m_streams[stream_type::audio].Find(s_aac_mp4)) {
+									if (mp4_read_dec_config_descr(dec_config_descr, s_aac_mp4) == 0) {
+										_streamData.codec = stream_codec::AAC_RAW;
 									}
 								}
 							}
-							if (!bAdded) {
-								Read(hdr, 0, &s.mt, _streamData.pmt.lang, false);
-								m_streams[stream_type::subpic].Insert(s, stream_type::subpic);
+						}
+					}
+					break;
+				case 0x56: // Teletext descriptor
+					Descriptor_56(gb, descriptor_length, ISO_639_language_code, tlxPages);
+					_streamData.codec = stream_codec::TELETEXT;
+					break;
+				case 0x59: // Subtitling descriptor
+					Descriptor_59(gb, descriptor_length, ISO_639_language_code);
+					_streamData.codec = stream_codec::DVB;
+					break;
+				case 0x7f: // DVB extension descriptor
+					{
+						const BYTE ext_desc_tag = gb.BitRead(8); descriptor_length -= 1;
+						if (ext_desc_tag == 0x80) {
+							int channel_config_code = gb.BitRead(8); descriptor_length -= 1;
+							if (channel_config_code >= 0 && channel_config_code <= 0x8) {
+								CAtlArray<BYTE>& extradata = _streamData.pmt.extraData;
+								if (extradata.GetCount() != sizeof(opus_default_extradata)) {
+									extradata.SetCount(sizeof(opus_default_extradata));
+									memcpy(extradata.GetData(), &opus_default_extradata, sizeof(opus_default_extradata));
+
+									BYTE channels = 0;
+									extradata[9]  = channels = channel_config_code ? channel_config_code : 2;
+									extradata[18] = channel_config_code ? (channels > 2) : 255;
+									extradata[19] = opus_stream_cnt[channel_config_code];
+									extradata[20] = opus_coupled_stream_cnt[channel_config_code];
+									if (channels >= 1) {
+										memcpy(&extradata[21], opus_channel_map[channels - 1], channels);
+									}
+
+									_streamData.codec = stream_codec::OPUS;
+								}
 							}
+						}
+						if (descriptor_length) {
+							gb.SkipBytes(descriptor_length);
+						}
+					}
+					break;
+				case 0xfd: // Data Component descriptor
+					{
+						const SHORT data_component_id = gb.ReadShort(); descriptor_length -= 1;
+						if (descriptor_length) {
+							gb.SkipBytes(descriptor_length);
+						}
+						if (data_component_id == 0x0008) {
+							// ARIB Subtitle
+							_streamData.codec = stream_codec::ARIB;
+						}
+					}
+					break;
+				default:
+					gb.SkipBytes(descriptor_length);
+					break;
+			}
+
+			if (ISO_639_language_code[0]) {
+				strcpy_s(_streamData.pmt.lang, ISO_639_language_code);
+			}
+			if (!tlxPages.empty()) {
+				_streamData.pmt.tlxPages = tlxPages;
+			}
+		}
+
+		if (ES_info_length) {
+			gb.SkipBytes(ES_info_length);
+		}
+
+		if (s_aac_mp4.codec == stream_codec::AAC_RAW) {
+			if (_streamData.pmt.lang[0]) {
+				strcpy_s(s_aac_mp4.lang, _streamData.pmt.lang);
+				s_aac_mp4.lang_set = true;
+			}
+			m_streams[stream_type::audio].Insert(s_aac_mp4, stream_type::audio);
+		}
+
+		if (m_ForcedSub) {
+			if (stream_type == PRESENTATION_GRAPHICS_STREAM
+					|| _streamData.codec == stream_codec::DVB
+					|| _streamData.codec == stream_codec::TELETEXT) {
+				stream s;
+				s.pid = pid;
+
+				if (!m_streams[stream_type::subpic].Find(s)) {
+					s.codec = _streamData.codec;
+					if (_streamData.pmt.lang[0]) {
+						strcpy_s(s.lang, _streamData.pmt.lang);
+						s.lang_set = true;
+					}
+
+					if (stream_type == PRESENTATION_GRAPHICS_STREAM) {
+						hdmvsubhdr hdr;
+						if (Read(hdr, &s.mt, _streamData.pmt.lang)) {
+							m_streams[stream_type::subpic].Insert(s, stream_type::subpic);
+							s.codec = _streamData.codec = stream_codec::PGS;
+						}
+					} else if (_streamData.codec == stream_codec::DVB) {
+						dvbsubhdr hdr;
+						if (Read(hdr, 0, &s.mt, _streamData.pmt.lang, false)) {
+							m_streams[stream_type::subpic].Insert(s, stream_type::subpic);
+						}
+					} else if (_streamData.codec == stream_codec::TELETEXT) {
+						BOOL bAdded = FALSE;
+						teletextsubhdr hdr;
+						if (!_streamData.pmt.tlxPages.empty()) {
+							for (auto& tlxPage : _streamData.pmt.tlxPages) {
+								if (tlxPage.bSubtitle && tlxPage.page != 0x100) {
+									s.tlxPage = tlxPage.page;
+									strcpy_s(s.lang, tlxPage.lang);
+									FreeMediaType(s.mt);
+									s.mt.InitMediaType();
+
+									Read(hdr, 0, &s.mt, _streamData.pmt.lang, false);
+									m_streams[stream_type::subpic].Insert(s, stream_type::subpic);
+
+									bAdded = TRUE;
+								}
+							}
+						}
+						if (!bAdded) {
+							Read(hdr, 0, &s.mt, _streamData.pmt.lang, false);
+							m_streams[stream_type::subpic].Insert(s, stream_type::subpic);
 						}
 					}
 				}
 			}
 		}
-
-		mp4_descr.Clear();
 	}
+
+	mp4_descr.Clear();
 }
 
 CString ConvertDVBString(const BYTE* pBuffer, int nLength)
@@ -2132,7 +2131,7 @@ CString ConvertDVBString(const BYTE* pBuffer, int nLength)
 	return strResult;
 }
 
-void CMpegSplitterFile::ReadSDT(CAtlArray<BYTE>& pData, BYTE table_id)
+void CMpegSplitterFile::ReadSDT(CAtlArray<BYTE>& pData)
 {
 	if (pData.GetCount() < 3) {
 		return;
