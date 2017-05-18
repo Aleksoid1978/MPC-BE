@@ -432,7 +432,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, stream_codec codec, __
 				continue;
 			}
 
-			const __int64 packet_pos = GetPos();
+			__int64 packet_pos = GetPos();
 			nextPos = h.next;
 
 			if (h.pid == TrackNum && h.payloadstart && NextMpegStartCode(b, 4)) {
@@ -451,50 +451,42 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, stream_codec codec, __
 						if (!h.randomaccess) {
 							bKeyFrame = FALSE;
 
-							int nBytes = h.bytes - (GetPos() - packet_pos);
-							if (nBytes > 0) {
+							if (h.bytes > (GetPos() - packet_pos)) {
+								size_t size = h.bytes - (GetPos() - packet_pos);
 								CAtlArray<BYTE> p;
-								p.SetCount((size_t)nBytes);
-								ByteRead(p.GetData(), nBytes);
+								p.SetCount(size);
+								ByteRead(p.GetData(), size);
 
 								// collect solid data packet
 								{
 									Seek(h.next);
 									while (GetRemaining()) {
-										__int64 start_pos_2 = GetPos();
+										const __int64 start_pos_2 = GetPos();
 
 										trhdr trhdr_2;
 										if (!ReadTR(trhdr_2)) {
 											continue;
 										}
 
-										const __int64 packet_pos_2 = GetPos();
-
 										if (trhdr_2.payload && trhdr_2.pid == TrackNum) {
-											BOOL bReadPES = FALSE;
-											if (trhdr_2.payloadstart && NextMpegStartCode(b, 4)) {
-												peshdr peshdr_2;
-												if (!ReadPES(peshdr_2, b)) {
-													Seek(trhdr_2.next);
-													continue;
-												}
-												if (peshdr_2.fpts) {
-													bKeyFrame = CheckKeyFrame(p, codec);
-													nextPos = h.next = start_pos_2;
-													break;
-												}
-												bReadPES = TRUE;
+											packet_pos = GetPos();
+											peshdr peshdr_2;
+											if (trhdr_2.payloadstart && 
+													(!NextMpegStartCode(b, 4) || !ReadPES(peshdr_2, b))) {
+												Seek(trhdr_2.next);
+												continue;
+											}
+											if (peshdr_2.fpts) {
+												bKeyFrame = CheckKeyFrame(p, codec);
+												nextPos = h.next = start_pos_2;
+												break;
 											}
 
-											if (!bReadPES) {
-												Seek(packet_pos_2);
-											}
-
-											if (trhdr_2.bytes > (GetPos() - packet_pos_2)) {
-												__int64 nBytes_2 = trhdr_2.bytes - (GetPos() - packet_pos_2);
-												size_t pSize = p.GetCount();
-												p.SetCount(pSize + (size_t)nBytes_2);
-												ByteRead(p.GetData() + pSize, nBytes_2);
+											if (trhdr_2.bytes > (GetPos() - packet_pos)) {
+												size = trhdr_2.bytes - (GetPos() - packet_pos);
+												const size_t old_size = p.GetCount();
+												p.SetCount(old_size + size);
+												ByteRead(p.GetData() + old_size, size);
 											}
 										}
 
@@ -629,25 +621,20 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, DWORD msTimeO
 
 			if (h.payload && ISVALIDPID(h.pid)) {
 				const __int64 pos = GetPos();
-				BOOL bReadPES = FALSE;
 				peshdr h2;
-				if (h.payloadstart && NextMpegStartCode(b, 4)) {
-					if (!ReadPES(h2, b)) {
-						Seek(h.next);
-						continue;
+				if (h.payloadstart
+						&& (!NextMpegStartCode(b, 4) || !ReadPES(h2, b))) {
+					Seek(h.next);
+					continue;
+				}
+
+				if (h.bytes > (GetPos() - pos)) {
+					const DWORD TrackNum = AddStream(h.pid, b, h2.id_ext, h.bytes - (GetPos() - pos));
+
+					if (h2.fpts) {
+						SyncPoints& sps = m_SyncPoints[TrackNum];
+						sps.Add({ h2.pts, h.hdrpos });
 					}
-					bReadPES = TRUE;
-				}
-
-				if (!bReadPES) {
-					Seek(pos);
-				}
-
-				const DWORD TrackNum = AddStream(h.pid, b, h2.id_ext, DWORD(h.bytes - (GetPos() - pos)));
-
-				if (h2.fpts) {
-					SyncPoints& sps = m_SyncPoints[TrackNum];
-					sps.Add({ h2.pts, h.hdrpos });
 				}
 			}
 
@@ -2812,6 +2799,10 @@ bool CMpegSplitterFile::ReadTR(trhdr& h, bool fSync)
 bool CMpegSplitterFile::ReadPSI(psihdr& h)
 {
 	memset(&h, 0, sizeof(h));
+
+	if (BitRead(24, true) == 0x000001) {
+		return false;
+	}
 
 	BYTE pointer_field           = (BYTE)BitRead(8);
 	h.hdr_size++;

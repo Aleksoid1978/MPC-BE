@@ -831,18 +831,11 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 			const DWORD TrackNumber = h.pid;
 			if (GetOutputPin(TrackNumber) || TrackNumber == m_dwMVCExtensionTrackNumber) {
 				const __int64 pos = m_pFile->GetPos();
-				BOOL bReadPES = FALSE;
 				CMpegSplitterFile::peshdr peshdr;
-				if (h.payloadstart && m_pFile->NextMpegStartCode(b, 4)) {
-					if (!m_pFile->ReadPES(peshdr, b)) {
-						m_pFile->Seek(h.next);
-						return S_FALSE;
-					}
-					bReadPES = TRUE;
-				}
-
-				if (!bReadPES) {
-					m_pFile->Seek(pos);
+				if (h.payloadstart
+						&& (!m_pFile->NextMpegStartCode(b, 4) || !m_pFile->ReadPES(peshdr, b))) {
+					m_pFile->Seek(h.next);
+					return S_FALSE;
 				}
 
 				if (h.bytes > (m_pFile->GetPos() - pos)) {
