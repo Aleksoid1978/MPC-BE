@@ -35,7 +35,7 @@ MPC-BE makes use of the following 3rd party code:
 
 Project             License                    Website
 -------------------------------------------------------------------------------------
-Bento4              GPLv2                      http://zebulon.bok.net/trac/Bento4/
+Bento4              GPLv2                      https://www.bento4.com/
 CFileVersionInfo    -                          -
 CLineNumberEdit     -                          -
 CSizingControlBar   GPLv2                      http://datamekanix.com/sizecbar/
@@ -47,12 +47,12 @@ libopenjpeg         BSD License                https://github.com/uclouvain/open
 libspeex            BSD License                http://speex.org/
 Little CMS          MIT License                http://littlecms.com/
 Logitech SDK        -                          -
-MediaInfo           BSD License                http://sourceforge.net/projects/mediainfo/
+MediaInfo           BSD License                https://mediaarea.net/MediaInfo
 MusePack            GPL                        http://musepack.net/
 RapidJSON           MIT License                https://github.com/miloyip/rapidjson
-ResizableLib        Artistic License           http://sourceforge.net/projects/resizablelib/
-soxr                LGPL                       http://soxr.sourceforge.net
+ResizableLib        Artistic License           https://github.com/ppescher/resizablelib
+soxr                LGPL                       https://sourceforge.net/projects/soxr/
 TreePropSheet       -                          -
 VirtualDub          GPLv2                      http://virtualdub.org/
-ZenLib              zlib / libpng License      http://sourceforge.net/projects/zenlib/
-zlib                zlib License               http://zlib.net/
+ZenLib              zlib License               https://github.com/MediaArea/ZenLib
+zlib                zlib License               https://zlib.net/
