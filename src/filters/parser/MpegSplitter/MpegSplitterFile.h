@@ -21,8 +21,7 @@
 
 #pragma once
 
-#include <atlbase.h>
-#include <atlcoll.h>
+#include <map>
 #include "../BaseSplitter/BaseSplitter.h"
 #include "../../../DSUtil/GolombBuffer.h"
 
@@ -40,11 +39,9 @@ enum MPEG_TYPES {
 
 class CMpegSplitterFile : public CBaseSplitterFileEx
 {
-	CAtlMap<WORD, BYTE> m_pid2pes;
-
-	CAtlMap<DWORD, seqhdr> seqh;
-	CAtlMap<DWORD, CAtlArray<BYTE>> avch;
-	CAtlMap<DWORD, CAtlArray<BYTE>> hevch;
+	std::map<DWORD, seqhdr> seqh;
+	std::map<DWORD, CAtlArray<BYTE>> avch;
+	std::map<DWORD, CAtlArray<BYTE>> hevch;
 
 	template<class T, int validCount = 5>
 	class CValidStream {
@@ -66,10 +63,10 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 		BOOL IsValid() const { return m_nValidStream >= validCount; }
 	};
 
-	CAtlMap<DWORD, CValidStream<latm_aachdr, 3>>	m_aaclatmValid;
-	CAtlMap<DWORD, CValidStream<aachdr>>			m_aacValid;
-	CAtlMap<DWORD, CValidStream<ac3hdr>>			m_ac3Valid;
-	CAtlMap<DWORD, CValidStream<mpahdr>>			m_mpaValid;
+	std::map<DWORD, CValidStream<latm_aachdr, 3>> m_aaclatmValid;
+	std::map<DWORD, CValidStream<aachdr>>         m_aacValid;
+	std::map<DWORD, CValidStream<ac3hdr>>         m_ac3Valid;
+	std::map<DWORD, CValidStream<mpahdr>>         m_mpaValid;
 
 	BOOL m_bOpeningCompleted;
 
@@ -78,7 +75,7 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	BOOL m_bIMKH_CCTV;
 
 	typedef CAtlArray<SyncPoint> SyncPoints;
-	CAtlMap<DWORD, SyncPoints> m_SyncPoints;
+	std::map<DWORD, SyncPoints> m_SyncPoints;
 
 	int m_tslen = 0; // transport stream packet length (188 or 192 bytes, auto-detected)
 
@@ -386,7 +383,7 @@ public:
 		}
 	};
 
-	class CPrograms : public CAtlMap<WORD, program>
+	class CPrograms : public std::map<WORD, program>
 	{
 		CStreamsList* s;
 	public:
@@ -395,10 +392,8 @@ public:
 		}
 		size_t GetValidCount() {
 			size_t cnt = 0;
-			POSITION pos = GetStartPosition();
-			while (pos) {
-				program* p = &GetNextValue(pos);
-				if (p->streamCount(*s)) {
+			for (auto it = begin(); it != end(); it++) {
+				if (it->second.streamCount(*s)) {
 					cnt++;
 				}
 			}
@@ -406,14 +401,11 @@ public:
 			return cnt;
 		}
 
-		const program* FindProgram(WORD pid) {
-			POSITION pos = GetStartPosition();
-			while (pos) {
-				program* p = &GetNextValue(pos);
-				for (auto stream = p->streams.begin(); stream != p->streams.end(); stream++) {
-					if (stream->pid == pid) {
-						return p;
-					}
+		program* FindProgram(const WORD program_number) {
+			for (auto it = begin(); it != end(); it++) {
+				auto p = &it->second;
+				if (p->program_number == program_number) {
+					return p;
 				}
 			}
 
@@ -436,7 +428,7 @@ public:
 
 		bool IsFull() { return !pData.IsEmpty() && pData.GetCount() == section_length; }
 	};
-	CAtlMap<WORD, programData> m_ProgramData;
+	std::map<WORD, programData> m_ProgramData;
 
 	void SearchPrograms(__int64 start, __int64 stop);
 	void ReadPrograms(const trhdr& h);
@@ -487,5 +479,5 @@ public:
 			return *this;
 		}
 	};
-	CAtlMap<WORD, streamData> m_streamData;
+	std::map<WORD, streamData> m_streamData;
 };

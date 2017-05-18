@@ -21,14 +21,13 @@
 
 #include "stdafx.h"
 #include <MMReg.h>
-#include "MpegSplitterFile.h"
-#include "../BaseSplitter/FrameDuration.h"
-#include "../../../DSUtil/AudioParser.h"
-
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
 #endif
 #include <moreuuids.h>
+#include "MpegSplitterFile.h"
+#include "../BaseSplitter/FrameDuration.h"
+#include "../../../DSUtil/AudioParser.h"
 
 CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin)
 	: CBaseSplitterFileEx(pAsyncReader, hr, FM_FILE | FM_FILE_DL | FM_FILE_VAR | FM_STREAM)
@@ -207,18 +206,40 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		}
 
 		WORD main_program_number = WORD_MAX;
-		if (m_type == MPEG_TYPES::mpeg_ts && m_programs.GetCount() > 1) {
-			DWORD pid = pMasterStream->GetHead();
-			const program* pProgram = FindProgram(pid);
-			if (pProgram) {
-				main_program_number = pProgram->program_number;
+		if (m_type == MPEG_TYPES::mpeg_ts && m_programs.size() > 1) {
+			// Remove empty programs
+			for (auto it = m_programs.begin(); it != m_programs.end();) {
+				auto& p = it->second;
+				if (!p.streamCount(m_streams)) {
+					m_programs.erase(it++);
+				} else {
+					it++;
+				}
+			}
+
+			if (m_programs.size() > 1) {
+				const DWORD pid = pMasterStream->GetHead();
+				const auto program = FindProgram(pid);
+				if (program) {
+					main_program_number = program->program_number;
+
+					// deduplicate programs
+					for (auto it = m_programs.begin(); it != m_programs.end();) {
+						auto& p = it->second;
+						if (p.program_number != main_program_number && p.streamFind(pid)) {
+							m_programs.erase(it++);
+						} else {
+							it++;
+						}
+					}
+				}
 			}
 		}
 
 		auto verifyProgram = [&](const stream& s) {
 			if (main_program_number != WORD_MAX) {
-				const program* pProgram = FindProgram(s);
-				if (!pProgram || pProgram->program_number != main_program_number) {
+				const auto program = FindProgram(s);
+				if (!program || program->program_number != main_program_number) {
 					return false;
 				}
 			}
@@ -325,6 +346,11 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			}
 		}
 	}
+
+	m_ProgramData.clear();
+	avch.clear();
+	hevch.clear();
+	seqh.clear();
 
 	Seek(m_posMin);
 
@@ -537,7 +563,7 @@ void CMpegSplitterFile::SearchPrograms(__int64 start, __int64 stop)
 		return;
 	}
 
-	m_ProgramData.RemoveAll();
+	m_ProgramData.clear();
 
 	Seek(start);
 
@@ -556,9 +582,9 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, DWORD msTimeO
 {
 	const ULONGLONG startTime = GetPerfCounter();
 
-	avch.RemoveAll();
-	hevch.RemoveAll();
-	seqh.RemoveAll();
+	avch.clear();
+	hevch.clear();
+	seqh.clear();
 
 	Seek(start);
 
@@ -749,14 +775,6 @@ static const struct {
 
 DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len, BOOL bAddStream/* = TRUE*/)
 {
-	if (pid) {
-		if (pesid) {
-			m_pid2pes[pid] = pesid;
-		} else {
-			m_pid2pes.Lookup(pid, pesid);
-		}
-	}
-
 	stream s;
 	s.pid   = pid;
 	s.pesid = pesid;
@@ -798,10 +816,6 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len,
 		if (stream_type & MPEG2_VIDEO) {
 			// Sequence/extension header can be split into multiple packets
 			if (!m_streams[stream_type::video].Find(s)) {
-				if (!seqh.Lookup(s)) {
-					seqh[s].Init();
-				}
-
 				seqhdr& h = seqh[s];
 				if (h.data.GetCount()) {
 					if (h.data.GetCount() < 512) {
@@ -1358,11 +1372,12 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 		return;
 	}
 
-	programData& ProgramData = m_ProgramData[h.pid];
-	if (ProgramData.bFinished) {
+	auto it = m_ProgramData.find(h.pid);
+	if (it != m_ProgramData.end() && it->second.bFinished) {
 		return;
 	}
 
+	programData* ProgramData = (it != m_ProgramData.end()) ? &it->second : NULL;
 	if (h.payload && h.payloadstart) {
 		psihdr h2;
 		if (ReadPSI(h2)) {
@@ -1374,14 +1389,14 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 					break;
 				case DVB_SI::SI_SDT:
 				case 0x46:
-					if (m_programs.IsEmpty() || h.pid != MPEG2_PID::PID_SDT) {
+					if (m_programs.empty() || h.pid != MPEG2_PID::PID_SDT) {
 						return;
 					}
 					break;
 				case 0xC8:
 				case 0xC9:
 				case 0xDA:
-					if (m_programs.IsEmpty() || h.pid != MPEG2_PID::PID_VCT) {
+					if (m_programs.empty() || h.pid != MPEG2_PID::PID_VCT) {
 						return;
 					}
 					break;
@@ -1399,41 +1414,43 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 			const int max_len    = min(packet_len, h2.section_length);
 
 			if (max_len > 0) {
-				ProgramData.table_id       = h2.table_id;
-				ProgramData.section_length = h2.section_length;
+				ProgramData = &m_ProgramData[h.pid];
 
-				ProgramData.pData.SetCount(max_len);
-				ByteRead(ProgramData.pData.GetData(), max_len);
+				ProgramData->table_id       = h2.table_id;
+				ProgramData->section_length = h2.section_length;
+
+				ProgramData->pData.SetCount(max_len);
+				ByteRead(ProgramData->pData.GetData(), max_len);
 			}
 		}
-	} else if (!ProgramData.pData.IsEmpty()) {
-		const size_t data_len = ProgramData.pData.GetCount();
-		const size_t max_len  = min((size_t)h.bytes, ProgramData.section_length - data_len);
+	} else if (ProgramData && !ProgramData->pData.IsEmpty()) {
+		const size_t data_len = ProgramData->pData.GetCount();
+		const size_t max_len  = min((size_t)h.bytes, ProgramData->section_length - data_len);
 
-		ProgramData.pData.SetCount(data_len + max_len);
-		ByteRead(ProgramData.pData.GetData() + data_len, max_len);
+		ProgramData->pData.SetCount(data_len + max_len);
+		ByteRead(ProgramData->pData.GetData() + data_len, max_len);
 	}
 
-	if (ProgramData.IsFull()) {
-		switch (ProgramData.table_id) {
+	if (ProgramData && ProgramData->IsFull()) {
+		switch (ProgramData->table_id) {
 			case DVB_SI::SI_PAT:
-				ReadPAT(ProgramData.pData);
+				ReadPAT(ProgramData->pData);
 				break;
 			case DVB_SI::SI_PMT:
-				ReadPMT(ProgramData.pData, h.pid);
+				ReadPMT(ProgramData->pData, h.pid);
 				break;
 			case DVB_SI::SI_SDT: // DVB - Service Description Table - actual_transport_stream
 			case 0x46:           // DVB - Service Description Table - other_transport_stream
-				ReadSDT(ProgramData.pData);
+				ReadSDT(ProgramData->pData);
 				break;
 			case 0xC8: // ATSC - Terrestrial Virtual Channel Table (TVCT)
 			case 0xC9: // ATSC - Cable Virtual Channel Table (CVCT) / Long-form Virtual Channel Table (L-VCT)
 			case 0xDA: // ATSC - Satellite VCT (SVCT)
-				ReadVCT(ProgramData.pData, ProgramData.table_id);
+				ReadVCT(ProgramData->pData, ProgramData->table_id);
 				break;
 		}
 
-		ProgramData.Finish();
+		ProgramData->Finish();
 	}
 }
 
@@ -2149,13 +2166,8 @@ void CMpegSplitterFile::ReadSDT(CAtlArray<BYTE>& pData)
 						const CString service_name = ConvertDVBString(pBuffer, service_name_length);
 
 						if (!service_name.IsEmpty()) {
-							POSITION pos = m_programs.GetStartPosition();
-							while (pos) {
-								CPrograms::CPair* pPair = m_programs.GetNext(pos);
-								if (pPair->m_value.program_number == program_number) {
-									pPair->m_value.name = service_name;
-									break;
-								}
+							if (auto p = m_programs.FindProgram(program_number)) {
+								p->name = service_name;
 							}
 						}
 					}
@@ -2231,14 +2243,8 @@ void CMpegSplitterFile::ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id)
 
 		WORD program_number = (WORD)gb.BitRead(16);
 		if (program_number > 0 && program_number < 0x2000) {
-
-			POSITION pos = m_programs.GetStartPosition();
-			while (pos) {
-				CPrograms::CPair* pPair = m_programs.GetNext(pos);
-				if (pPair->m_value.program_number == program_number) {
-					pPair->m_value.name = short_name;
-					break;
-				}
+			if (auto p = m_programs.FindProgram(program_number)) {
+				p->name = short_name;
 			}
 		}
 
@@ -2309,9 +2315,8 @@ const CMpegSplitterFile::program* CMpegSplitterFile::FindProgram(WORD pid, int* 
 			*ppClipInfo = m_ClipInfo.FindStream(pid);
 		}
 
-		POSITION pos = m_programs.GetStartPosition();
-		while (pos) {
-			program* p = &m_programs.GetNextValue(pos);
+		for (auto it = m_programs.begin(); it != m_programs.end(); it++) {
+			auto p = &it->second;
 			if (p->streamFind(pid, pStream)) {
 				return p;
 			}
