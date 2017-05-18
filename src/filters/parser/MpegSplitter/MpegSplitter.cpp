@@ -1010,35 +1010,45 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 
 CString CMpegSplitterFilter::FormatStreamName(CMpegSplitterFile::stream& s, CMpegSplitterFile::stream_type type)
 {
-	CString name = CMpegSplitterFile::CStreamList::ToString(type);
-	CString str;
-
-	int nProgram;
+	int nStream;
 	const CHdmvClipInfo::Stream *pClipInfo;
-	const CMpegSplitterFile::program * pProgram = m_pFile->FindProgram(s.pid, &nProgram, &pClipInfo);
-	const wchar_t *pStreamName	= NULL;
-	PES_STREAM_TYPE StreamType	= pClipInfo ? pClipInfo->m_Type : pProgram ? pProgram->streams[nProgram].type : INVALID;
-	pStreamName					= StreamTypeToName((PES_STREAM_TYPE)StreamType);
+	const CMpegSplitterFile::program *pProgram = m_pFile->FindProgram(s.pid, &nStream, &pClipInfo);
+	const PES_STREAM_TYPE StreamType = pClipInfo ? pClipInfo->m_Type : pProgram ? pProgram->streams[nStream].type : INVALID;
+	const wchar_t *pStreamName = StreamTypeToName(StreamType);
 
-	CStringA lang_name	= s.lang;
-	lang_name			= m_pTI ? CStringA(m_pTI->GetTrackName(s.ps1id)) : lang_name;
+	CStringA lang_name(s.lang);
+	if (m_pTI) {
+		lang_name = m_pTI->GetTrackName(s.ps1id);
+	}
 
-	CString FormatDesc = GetMediaTypeDesc(s.mts.empty() ? &s.mt : &s.mts[0], pClipInfo, StreamType, lang_name);
+	CString FormatId;
+	if (s.pid) {
+		FormatId.Format(L"%04x", s.pid);
+	} else if (s.pesid) {
+		if (s.ps1id) {
+			FormatId.Format(L"%02x - %02x", s.pesid, s.ps1id);
+		} else {
+			FormatId.Format(L"%02x", s.pesid);
+		}
+	}
 
+	const CString name = CMpegSplitterFile::CStreamList::ToString(type);
+	const CString FormatDesc = GetMediaTypeDesc(s.mts.empty() ? &s.mt : &s.mts[0], pClipInfo, StreamType, lang_name);
+	CString streamName;
 	if (!FormatDesc.IsEmpty()) {
-		str.Format(L"%s (%04x,%02x,%02x)", FormatDesc, s.pid, s.pesid, s.ps1id);
+		streamName.Format(L"%s (%s)", FormatDesc, FormatId);
 	} else if (pStreamName) {
-		str.Format(L"%s - %s (%04x,%02x,%02x)", name, pStreamName, s.pid, s.pesid, s.ps1id);
+		streamName.Format(L"%s - %s (%s)", name, pStreamName, FormatId);
 	} else {
-		str.Format(L"%s (%04x,%02x,%02x)", name, s.pid, s.pesid, s.ps1id);
+		streamName.Format(L"%s (%s)", name, FormatId);
 	}
 
 	if (s.tlxPage) {
-		str.Delete(str.GetLength() - 1, 1);
-		str.AppendFormat(L" - %03x)", s.tlxPage);
+		streamName.Delete(streamName.GetLength() - 1, 1);
+		streamName.AppendFormat(L" - %03x)", s.tlxPage);
 	}
 
-	return str;
+	return streamName;
 }
 
 __int64 CMpegSplitterFilter::SeekBD(REFERENCE_TIME rt)

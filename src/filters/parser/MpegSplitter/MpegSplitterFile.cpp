@@ -2325,13 +2325,13 @@ bool CMpegSplitterFile::GetStreamType(WORD pid, PES_STREAM_TYPE &stream_type)
 {
 	if (ISVALIDPID(pid)) {
 		if (m_type == MPEG_TYPES::mpeg_ts) {
-			int nProgram;
+			int nStream;
 			const CHdmvClipInfo::Stream *pClipInfo;
-			const program* pProgram = FindProgram(pid, &nProgram, &pClipInfo);
+			const program* pProgram = FindProgram(pid, &nStream, &pClipInfo);
 			if (pClipInfo) {
 				stream_type = pClipInfo->m_Type;
 			} else if (pProgram) {
-				stream_type = pProgram->streams[nProgram].type;
+				stream_type = pProgram->streams[nStream].type;
 			}
 
 			if (stream_type != INVALID) {
