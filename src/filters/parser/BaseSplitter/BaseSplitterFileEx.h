@@ -72,12 +72,8 @@ public:
 		//
 		CAtlArray<BYTE> data;
 
-		void Init() {
-			memset(this, 0, sizeof(*this));
-		}
-
 		seqhdr() {
-			Init();
+			memset(this, 0, sizeof(*this));
 		}
 	};
 

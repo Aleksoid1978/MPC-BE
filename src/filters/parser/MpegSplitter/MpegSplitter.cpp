@@ -25,10 +25,10 @@
 #include <InitGuid.h>
 #endif
 #include <dmodshow.h>
+#include <list>
 #include "MpegSplitter.h"
 #include <moreuuids.h>
 #include <basestruct.h>
-#include <list>
 
 #include "../../reader/VTSReader/VTSReader.h"
 #include "../apps/mplayerc/SettingsDefines.h"
@@ -1642,13 +1642,10 @@ STDMETHODIMP CMpegSplitterFilter::Enable(long lIndex, DWORD dwFlags)
 		auto& programs = m_pFile->m_programs;
 
 		if (lIndex < (long)programs.GetValidCount()) {
-			POSITION pos = programs.GetStartPosition();
 			int j = 0;
-			while (pos) {
-				CMpegSplitterFile::program* p = &programs.GetNextValue(pos);
-				if (!p->streamCount(m_pFile->m_streams)) {
-					continue;
-				}
+			for (auto it = programs.begin(); it != programs.end(); it++) {
+				auto p = &it->second;
+
 				if (j == lIndex) {
 					for (auto stream = p->streams.begin(); stream != p->streams.end(); stream++) {
 						if (stream->pid) {
@@ -1758,7 +1755,6 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 {
 	if (m_pFile->m_programs.GetValidCount() > 1) {
 		auto& programs = m_pFile->m_programs;
-
 		if (lIndex < (long)programs.GetValidCount()) {
 			int type = -1;
 			for (type = CMpegSplitterFile::stream_type::video; type <= CMpegSplitterFile::stream_type::subpic; type++) {
@@ -1785,13 +1781,9 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 				}
 			}
 
-			POSITION pos = programs.GetStartPosition();
 			int j = 0;
-			while (pos) {
-				CMpegSplitterFile::program* p = &programs.GetNextValue(pos);
-				if (!p->streamCount(m_pFile->m_streams)) {
-					continue;
-				}
+			for (auto it = programs.begin(); it != programs.end(); it++) {
+				auto p = &it->second;
 
 				if (j == lIndex) {
 					if (ppmt) {
