@@ -1939,7 +1939,7 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 					break;
 				case 0xfd: // Data Component descriptor
 					{
-						const SHORT data_component_id = gb.ReadShort(); descriptor_length -= 1;
+						const SHORT data_component_id = gb.ReadShort(); descriptor_length -= 2;
 						if (descriptor_length) {
 							gb.SkipBytes(descriptor_length);
 						}
