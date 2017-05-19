@@ -782,6 +782,12 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len,
 		s.ps1id = ext_id;
 	}
 
+	if (pesid == 0xbe || pesid == 0xbf) {
+		// padding
+		// private stream 2
+		return s;
+	}
+
 	const __int64 start   = GetPos();
 	enum stream_type type = stream_type::unknown;
 
@@ -2471,15 +2477,17 @@ bool CMpegSplitterFile::ReadPES(peshdr& h, BYTE code)
 {
 	memset(&h, 0, sizeof(h));
 
-	if (code == 0xbe || code == 0xbf) {
-		return false;
-	}
-
 	if (!((code >= 0xbd && code < 0xf0) || (code >= 0xfa && code <= 0xfe))) { // 0xfd => blu-ray (.m2ts)
 		return false;
 	}
 
 	h.len = (WORD)BitRead(16);
+
+	if (code == 0xbe || code == 0xbf) {
+		// padding
+		// private stream 2
+		return true;
+	}
 
 	// mpeg1 stuffing (ff ff .. , max 16x)
 	for (int i = 0; i < 16 && BitRead(8, true) == 0xff; i++) {
