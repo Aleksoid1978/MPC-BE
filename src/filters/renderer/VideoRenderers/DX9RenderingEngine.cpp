@@ -1001,15 +1001,20 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int resizer)
 	case RESIZER_BILINEAR:
 	case RESIZER_DXVA2:
 		return S_FALSE;
-	case RESIZER_SHADER_BSPLINE4:  iShader = shader_bspline4_x;    break;
-	case RESIZER_SHADER_MITCHELL4: iShader = shader_mitchell4_x;   break;
-	case RESIZER_SHADER_CATMULL4:  iShader = shader_catmull4_x;    break;
-	case RESIZER_SHADER_BICUBIC06: iShader = shader_bicubic06_x;   break;
-	case RESIZER_SHADER_BICUBIC08: iShader = shader_bicubic08_x;   break;
-	case RESIZER_SHADER_BICUBIC10: iShader = shader_bicubic10_x;   break;
-	case RESIZER_SHADER_LANCZOS2:  iShader = shader_lanczos2_x;    break;
-	case RESIZER_SHADER_LANCZOS3:  iShader = shader_lanczos3_x;    break;
-	case RESIZER_SHADER_AVERAGE:   iShader = shader_downscaling_x; break;
+	case RESIZER_SHADER_BSPLINE4:  iShader = shader_bspline4_x;            break;
+	case RESIZER_SHADER_MITCHELL4: iShader = shader_mitchell4_x;           break;
+	case RESIZER_SHADER_CATMULL4:  iShader = shader_catmull4_x;            break;
+	case RESIZER_SHADER_BICUBIC06: iShader = shader_bicubic06_x;           break;
+	case RESIZER_SHADER_BICUBIC08: iShader = shader_bicubic08_x;           break;
+	case RESIZER_SHADER_BICUBIC10: iShader = shader_bicubic10_x;           break;
+	case RESIZER_SHADER_LANCZOS2:  iShader = shader_lanczos2_x;            break;
+	case RESIZER_SHADER_LANCZOS3:  iShader = shader_lanczos3_x;            break;
+	case DOWNSCALER_SIMPLE:        iShader = shader_downscaler_simple_x;   break;
+	case DOWNSCALER_BOX:           iShader = shader_downscaler_box_x;      break;
+	case DOWNSCALER_BILINEAR:      iShader = shader_downscaler_bilinear_x; break;
+	case DOWNSCALER_HAMMING:       iShader = shader_downscaler_hamming_x;  break;
+	case DOWNSCALER_BICUBIC:       iShader = shader_downscaler_bicubic_x;  break;
+	case DOWNSCALER_LANCZOS:       iShader = shader_downscaler_lanczos_x;  break;
 	default:
 		return E_INVALIDARG;
 	}
@@ -1026,29 +1031,34 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int resizer)
 
 	if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
 		switch (iShader) {
-		case shader_bspline4_x:    resid = IDF_SHADER_PS20_BSPLINE4_X;          break;
-		case shader_mitchell4_x:   resid = IDF_SHADER_PS20_MITCHELL4_X;         break;
-		case shader_catmull4_x:    resid = IDF_SHADER_PS20_CATMULL4_X;          break;
-		case shader_bicubic06_x:   resid = IDF_SHADER_PS20_BICUBIC06_X;         break;
-		case shader_bicubic08_x:   resid = IDF_SHADER_PS20_BICUBIC08_X;         break;
-		case shader_bicubic10_x:   resid = IDF_SHADER_PS20_BICUBIC10_X;         break;
-		case shader_lanczos2_x:    resid = IDF_SHADER_PS20_LANCZOS2_X;          break;
-		case shader_downscaling_x: resid = IDF_SHADER_PS20_DOWNSCALER_SIMPLE_X; break;
+		case shader_bspline4_x:          resid = IDF_SHADER_PS20_BSPLINE4_X;          break;
+		case shader_mitchell4_x:         resid = IDF_SHADER_PS20_MITCHELL4_X;         break;
+		case shader_catmull4_x:          resid = IDF_SHADER_PS20_CATMULL4_X;          break;
+		case shader_bicubic06_x:         resid = IDF_SHADER_PS20_BICUBIC06_X;         break;
+		case shader_bicubic08_x:         resid = IDF_SHADER_PS20_BICUBIC08_X;         break;
+		case shader_bicubic10_x:         resid = IDF_SHADER_PS20_BICUBIC10_X;         break;
+		case shader_lanczos2_x:          resid = IDF_SHADER_PS20_LANCZOS2_X;          break;
+		case shader_downscaler_simple_x: resid = IDF_SHADER_PS20_DOWNSCALER_SIMPLE_X; break;
 		default:
 			return E_INVALIDARG;
 		}
 	}
 	else {
 		switch (iShader) {
-		case shader_bspline4_x:    resid = IDF_SHADER_RESIZER_BSPLINE4_X;  break;
-		case shader_mitchell4_x:   resid = IDF_SHADER_RESIZER_MITCHELL4_X; break;
-		case shader_catmull4_x:    resid = IDF_SHADER_RESIZER_CATMULL4_X;  break;
-		case shader_bicubic06_x:   resid = IDF_SHADER_RESIZER_BICUBIC06_X; break;
-		case shader_bicubic08_x:   resid = IDF_SHADER_RESIZER_BICUBIC08_X; break;
-		case shader_bicubic10_x:   resid = IDF_SHADER_RESIZER_BICUBIC10_X; break;
-		case shader_lanczos2_x:    resid = IDF_SHADER_RESIZER_LANCZOS2_X;  break;
-		case shader_lanczos3_x:    resid = IDF_SHADER_RESIZER_LANCZOS3_X;  break;
-		case shader_downscaling_x: resid = IDF_SHADER_DOWNSCALER_SIMPLE_X; break;
+		case shader_bspline4_x:            resid = IDF_SHADER_RESIZER_BSPLINE4_X;    break;
+		case shader_mitchell4_x:           resid = IDF_SHADER_RESIZER_MITCHELL4_X;   break;
+		case shader_catmull4_x:            resid = IDF_SHADER_RESIZER_CATMULL4_X;    break;
+		case shader_bicubic06_x:           resid = IDF_SHADER_RESIZER_BICUBIC06_X;   break;
+		case shader_bicubic08_x:           resid = IDF_SHADER_RESIZER_BICUBIC08_X;   break;
+		case shader_bicubic10_x:           resid = IDF_SHADER_RESIZER_BICUBIC10_X;   break;
+		case shader_lanczos2_x:            resid = IDF_SHADER_RESIZER_LANCZOS2_X;    break;
+		case shader_lanczos3_x:            resid = IDF_SHADER_RESIZER_LANCZOS3_X;    break;
+		case shader_downscaler_simple_x:   resid = IDF_SHADER_DOWNSCALER_SIMPLE_X;   break;
+		case shader_downscaler_box_x:      resid = IDF_SHADER_DOWNSCALER_BOX_X;      break;
+		case shader_downscaler_bilinear_x: resid = IDF_SHADER_DOWNSCALER_BILINEAR_X; break;
+		case shader_downscaler_hamming_x:  resid = IDF_SHADER_DOWNSCALER_HAMMING_X;  break;
+		case shader_downscaler_bicubic_x:  resid = IDF_SHADER_DOWNSCALER_BICUBIC_X;  break;
+		case shader_downscaler_lanczos_x:  resid = IDF_SHADER_DOWNSCALER_LANCZOS_X;  break;
 		default:
 			return E_INVALIDARG;
 		}
@@ -1121,7 +1131,11 @@ HRESULT CDX9RenderingEngine::TextureResizeShader(IDirect3DTexture9* pTexture, co
 		{(float)destRect.right - 0.5f, (float)destRect.bottom - 0.5f, 0.5f, 2.0f, { tx1, ty1 } },
 	};
 
-	float fConstData[][4] = { { dx, dy, 0, 0 }, { steps_x, steps_y, 0, 0 } };
+	float fConstData[][4] = {
+		{ dx, dy, 0, 0 },
+		{ steps_x, steps_y, 0, 0 },
+		{(float)srcRect.Width() / destRect.Width(), (float)srcRect.Height() / destRect.Height(), 0, 0}
+	};
 	hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 	hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[iShader]);
 
@@ -1175,7 +1189,8 @@ HRESULT CDX9RenderingEngine::ApplyResize(IDirect3DTexture9* pTexture, const CRec
 		break;
 	case RESIZER_SHADER_BICUBIC10:
 		wsResizer = L"Bicubic A=-1.0";
-		hr = TextureResizeShader(pTexture, srcRect, destRect, shader_bicubic10_x + y);    break;
+		hr = TextureResizeShader(pTexture, srcRect, destRect, shader_bicubic10_x + y);
+		break;
 	case RESIZER_SHADER_LANCZOS2:
 		wsResizer = L"Lanczos2";
 		hr = TextureResizeShader(pTexture, srcRect, destRect, shader_lanczos2_x + y);
@@ -1184,9 +1199,29 @@ HRESULT CDX9RenderingEngine::ApplyResize(IDirect3DTexture9* pTexture, const CRec
 		wsResizer = L"Lanczos3";
 		hr = TextureResizeShader(pTexture, srcRect, destRect, shader_lanczos3_x + y);
 		break;
-	case RESIZER_SHADER_AVERAGE:
+	case DOWNSCALER_SIMPLE:
 		wsResizer = L"Simple averaging";
-		hr = TextureResizeShader(pTexture, srcRect, destRect, shader_downscaling_x + y);
+		hr = TextureResizeShader(pTexture, srcRect, destRect, shader_downscaler_simple_x + y);
+		break;
+	case DOWNSCALER_BOX:
+		wsResizer = L"Box";
+		hr = TextureResizeShader(pTexture, srcRect, destRect, shader_downscaler_box_x + y);
+		break;
+	case DOWNSCALER_BILINEAR:
+		wsResizer = L"Bilinear";
+		hr = TextureResizeShader(pTexture, srcRect, destRect, shader_downscaler_bilinear_x + y);
+		break;
+	case DOWNSCALER_HAMMING:
+		wsResizer = L"Hamming";
+		hr = TextureResizeShader(pTexture, srcRect, destRect, shader_downscaler_hamming_x + y);
+		break;
+	case DOWNSCALER_BICUBIC:
+		wsResizer = L"Bicubic";
+		hr = TextureResizeShader(pTexture, srcRect, destRect, shader_downscaler_bicubic_x + y);
+		break;
+	case DOWNSCALER_LANCZOS:
+		wsResizer = L"Lanczos";
+		hr = TextureResizeShader(pTexture, srcRect, destRect, shader_downscaler_lanczos_x + y);
 		break;
 	}
 

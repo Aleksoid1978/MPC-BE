@@ -45,8 +45,18 @@ namespace DSObjects
 		shader_lanczos2_y,
 		shader_lanczos3_x,
 		shader_lanczos3_y,
-		shader_downscaling_x,
-		shader_downscaling_y,
+		shader_downscaler_simple_x,
+		shader_downscaler_simple_y,
+		shader_downscaler_box_x,
+		shader_downscaler_box_y,
+		shader_downscaler_bilinear_x,
+		shader_downscaler_bilinear_y,
+		shader_downscaler_hamming_x,
+		shader_downscaler_hamming_y,
+		shader_downscaler_bicubic_x,
+		shader_downscaler_bicubic_y,
+		shader_downscaler_lanczos_x,
+		shader_downscaler_lanczos_y,
 		shader_count
 	};
 
