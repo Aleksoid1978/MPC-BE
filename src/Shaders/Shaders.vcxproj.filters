@@ -70,6 +70,12 @@
     <FxCompile Include="Transformation\hlg_correction.hlsl">
       <Filter>Transformation</Filter>
     </FxCompile>
+    <FxCompile Include="Resizers\downscaler.hlsl">
+      <Filter>Resizers</Filter>
+    </FxCompile>
+    <FxCompile Include="Resizers\downscaler_filters.hlsl">
+      <Filter>Resizers</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OnePassResizers\resizer_bicubic_base.hlsl">
