@@ -1990,6 +1990,12 @@ void CMainFrame::OnSizing(UINT nSide, LPRECT pRect)
 
 	FlyBarSetPos();
 	OSDBarSetPos();
+
+#if _DEBUG
+	CString msg;
+	msg.Format(L"W x H = %d x %d", pRect->right - pRect->left - decorationsSize.cx, pRect->bottom - pRect->top - decorationsSize.cy);
+	SetStatusMessage(msg);
+#endif
 }
 
 void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
