@@ -6,8 +6,8 @@ IF NOT EXIST %fxc% set fxc="c:\Program Files (x86)\Windows Kits\8.1\bin\x86\fxc.
 IF NOT EXIST %fxc% set fxc="C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Utilities\bin\x86\fxc.exe"
 
 echo === Compiling downscaler shaders ===
-%fxc% /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_box_x.cso" "Resizers\downscaler.hlsl" /DFILTER=0 /DAXIS=0
-%fxc% /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_box_y.cso" "Resizers\downscaler.hlsl" /DFILTER=0 /DAXIS=1
+%fxc% /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_box_x.cso" "Resizers\downscaler_box.hlsl" /DAXIS=0
+%fxc% /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_box_y.cso" "Resizers\downscaler_box.hlsl" /DAXIS=1
 %fxc% /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_bilinear_x.cso" "Resizers\downscaler.hlsl" /DFILTER=1 /DAXIS=0
 %fxc% /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_bilinear_y.cso" "Resizers\downscaler.hlsl" /DFILTER=1 /DAXIS=1
 %fxc% /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_hamming_x.cso" "Resizers\downscaler.hlsl" /DFILTER=2 /DAXIS=0

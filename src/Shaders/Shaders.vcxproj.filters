@@ -73,7 +73,7 @@
     <FxCompile Include="Resizers\downscaler.hlsl">
       <Filter>Resizers</Filter>
     </FxCompile>
-    <FxCompile Include="Resizers\downscaler_filters.hlsl">
+    <FxCompile Include="Resizers\downscaler_box.hlsl">
       <Filter>Resizers</Filter>
     </FxCompile>
   </ItemGroup>
@@ -115,6 +115,9 @@
       <Filter>Resizers</Filter>
     </None>
     <None Include="Resizers\resizer_bicubic_base_y.hlsl">
+      <Filter>Resizers</Filter>
+    </None>
+    <None Include="Resizers\downscaler_filters.hlsl">
       <Filter>Resizers</Filter>
     </None>
   </ItemGroup>
