@@ -17,7 +17,7 @@ float4 main ( float2 tex : TEXCOORD0 ) : COLOR
     tex += 0.5;
 
     int low = (int)floor(tex[AXIS] - support);
-    int high = (int)floor(tex[AXIS] + support);
+    int high = (int)ceil(tex[AXIS] + support);
 
     float ww = 0.0;
     float4 avg = 0;
