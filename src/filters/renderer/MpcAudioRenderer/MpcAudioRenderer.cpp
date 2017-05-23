@@ -151,7 +151,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_CurrentPacket(NULL)
 	, m_rtStartTime(0)
 	, m_rtNextSampleTime(0)
-	, m_nSampleNum(0)
+	, m_bFirstSampleToRender(TRUE)
 	, m_bUseDefaultDevice(FALSE)
 	, m_nSampleOffset(0)
 	, m_SyncMethod(SYNC_BY_DURATION)
@@ -625,8 +625,6 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME rtStart)
 	if (m_State == State_Running) {
 		return NOERROR;
 	}
-
-	m_nSampleNum = 0;
 
 	m_filterState = State_Running;
 	m_rtStartTime = rtStart;
@@ -2131,7 +2129,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 					break;
 				}
 
-				if (m_nSampleNum == 0) {
+				if (m_bFirstSampleToRender) {
 					m_rtNextSampleTime = m_CurrentPacket->rtStart;
 				}
 
@@ -2169,10 +2167,10 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 						DLog(L"CMpcAudioRenderer::RenderWasapiBuffer() - Drop packet, size = %Iu, dueTime = %I64d, refclock = %I64d",
 								m_CurrentPacket->GetCount(), dueTime, rtRefClock);
 #endif
-						m_nSampleNum = 0;
+						m_bFirstSampleToRender = TRUE;
 						m_CurrentPacket.Free();
 						continue;
-					} else if ((m_nSampleNum == 0 && dueTime > rtRefClock) || bReSync) {
+					} else if ((m_bFirstSampleToRender && dueTime > rtRefClock) || bReSync) {
 						rtWaitRenderTime = dueTime;
 					}
 				}
@@ -2208,7 +2206,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 						m_nSampleOffset += nFilledBytes;
 					}
 
-					m_nSampleNum++;
+					m_bFirstSampleToRender = FALSE;
 				}
 			} while (nWritenBytes < nAvailableBytes && dwFlags != AUDCLNT_BUFFERFLAGS_SILENT);
 
@@ -2574,7 +2572,7 @@ void CMpcAudioRenderer::WasapiFlush()
 		m_CurrentPacket.Free();
 
 		m_nSampleOffset = 0;
-		m_nSampleNum = 0;
+		m_bFirstSampleToRender = TRUE;
 	}
 
 	{
