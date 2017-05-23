@@ -133,6 +133,8 @@ IDF_SHADER_PS20_LANCZOS2_X       SHADER                  "..\\..\\..\\bin\\shade
 IDF_SHADER_PS20_LANCZOS2_Y       SHADER                  "..\\..\\..\\bin\\shaders\\ps20_resizer_lanczos2_y.cso"
 IDF_SHADER_PS20_DOWNSCALER_SIMPLE_X  SHADER              "..\\..\\..\\bin\\shaders\\ps20_downscaler_simple_x.cso"
 IDF_SHADER_PS20_DOWNSCALER_SIMPLE_Y  SHADER              "..\\..\\..\\bin\\shaders\\ps20_downscaler_simple_y.cso"
+IDF_SHADER_PS20_DOWNSCALER_BOX_X     SHADER              "..\\..\\..\\bin\\shaders\\ps20_downscaler_box_x.cso"
+IDF_SHADER_PS20_DOWNSCALER_BOX_Y     SHADER              "..\\..\\..\\bin\\shaders\\ps20_downscaler_box_y.cso"
 IDF_SHADER_PS20_CORRECTION_YCGCO     SHADER              "..\\..\\..\\bin\\shaders\\ps20_ycgco_correction.cso"
 IDF_SHADER_PS20_CORRECTION_ST2084    SHADER              "..\\..\\..\\bin\\shaders\\ps20_st2084_correction.cso"
 IDF_SHADER_PS20_CORRECTION_HLG       SHADER              "..\\..\\..\\bin\\shaders\\ps20_hlg_correction.cso"

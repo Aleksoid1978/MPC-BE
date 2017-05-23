@@ -42,3 +42,6 @@ set LIST=%LIST% Transformation\halfoverunder_to_interlace.hlsl
 for %%f in (%LIST%) do (
   %fxc% /nologo /T ps_2_0 /Fo ..\..\bin\shaders\ps20_%%~nf.cso %%f
 )
+
+%fxc% /nologo /T ps_2_0 /Fo "..\..\bin\shaders\ps20_downscaler_box_x.cso" "Resizers\downscaler_box.hlsl" /DPS20 /DAXIS=0
+%fxc% /nologo /T ps_2_0 /Fo "..\..\bin\shaders\ps20_downscaler_box_y.cso" "Resizers\downscaler_box.hlsl" /DPS20 /DAXIS=1

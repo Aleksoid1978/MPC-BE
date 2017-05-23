@@ -363,7 +363,7 @@ void CPPageVideo::UpdateDownscalerList(int select)
 	}
 #endif
 	AddStringData(m_cbDownscaler, L"PS: Simple averaging", DOWNSCALER_SIMPLE);
-	AddStringData(m_cbDownscaler, L"PS 3.0: Box*", DOWNSCALER_BOX);
+	AddStringData(m_cbDownscaler, L"PS: Box*", DOWNSCALER_BOX);
 	AddStringData(m_cbDownscaler, L"PS 3.0: Bilinear*", DOWNSCALER_BILINEAR);
 	AddStringData(m_cbDownscaler, L"PS 3.0: Hamming*", DOWNSCALER_HAMMING);
 	AddStringData(m_cbDownscaler, L"PS 3.0: Bicubic*", DOWNSCALER_BICUBIC);
