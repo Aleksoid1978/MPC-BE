@@ -1039,6 +1039,7 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int resizer)
 		case shader_bicubic10_x:         resid = IDF_SHADER_PS20_BICUBIC10_X;         break;
 		case shader_lanczos2_x:          resid = IDF_SHADER_PS20_LANCZOS2_X;          break;
 		case shader_downscaler_simple_x: resid = IDF_SHADER_PS20_DOWNSCALER_SIMPLE_X; break;
+		case shader_downscaler_box_x:    resid = IDF_SHADER_PS20_DOWNSCALER_BOX_X;    break;
 		default:
 			return E_INVALIDARG;
 		}
