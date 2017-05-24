@@ -4,9 +4,9 @@ float2 dxdy  : register(c0);
 float2 scale : register(c2);
 
 #ifdef PS20
-    #define Get(pos) tex2D(s0, (pos))
+    #define GetFrom(s, pos) tex2D(s, (pos))
 #else
-    #define Get(pos) tex2D(s0, (pos), 0, 0)
+    #define GetFrom(s, pos) tex2D(s, (pos), 0, 0)
 #endif
 
 #ifndef AXIS
@@ -22,7 +22,6 @@ float4 main ( float2 tex : TEXCOORD0 ) : COLOR
     const float low = floor(tex[AXIS] + 0.5 - support);
     const int n = (int)(tex[AXIS] + 0.5 + support- low);
 
-    float ww = 0.0;
     float4 avg = 0;
 
 #ifdef PS20
@@ -32,9 +31,9 @@ float4 main ( float2 tex : TEXCOORD0 ) : COLOR
 #endif
     for (int k = 0; k < n; k++) {
 #if (AXIS == 0)
-        avg += Get(float2(low + k + 0.5, tex.y) * dxdy);
+        avg += GetFrom(s0, float2(low + k + 0.5, tex.y) * dxdy);
 #else
-        avg += Get(float2(tex.x, low + k + 0.5) * dxdy);
+        avg += GetFrom(s0, float2(tex.x, low + k + 0.5) * dxdy);
 #endif
     }
     avg /= n;
