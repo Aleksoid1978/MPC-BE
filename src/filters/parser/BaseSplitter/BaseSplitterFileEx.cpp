@@ -1484,10 +1484,18 @@ bool CBaseSplitterFileEx::Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pm
 							ASSERT(new_extradata);
 							if (new_extradata) {
 								extradata = new_extradata;
-								memcpy(extradata + extrasize, start_code, start_code_size);
-								extrasize += start_code_size;
-								memcpy(extradata + extrasize, Nalu.GetDataBuffer(), Nalu.GetDataLength());
-								extrasize += Nalu.GetDataLength();
+								if ((nalu_type == NALU_TYPE_SPS || nalu_type == NALU_TYPE_SUBSET_SPS) && pps_present) {
+									memmove(extradata + start_code_size + Nalu.GetDataLength(), extradata, extrasize);
+									memcpy(extradata, start_code, start_code_size);
+									extrasize += start_code_size;
+									memcpy(extradata + start_code_size, Nalu.GetDataBuffer(), Nalu.GetDataLength());
+									extrasize += Nalu.GetDataLength();
+								} else {
+									memcpy(extradata + extrasize, start_code, start_code_size);
+									extrasize += start_code_size;
+									memcpy(extradata + extrasize, Nalu.GetDataBuffer(), Nalu.GetDataLength());
+									extrasize += Nalu.GetDataLength();
+								}
 							}
 					}
 				}
