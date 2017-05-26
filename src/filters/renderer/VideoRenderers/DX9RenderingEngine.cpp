@@ -244,10 +244,9 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 		// on Intel EVR-Mixer can work with X8R8G8B8 surface only
 		m_VideoBufferFmt = D3DFMT_X8R8G8B8;
 	}
-	else if (m_D3D9VendorId == PCIV_nVidia
-		&& m_nativeVideoSize.cx == 1920 && m_nativeVideoSize.cy == 1088
-		&& (m_SurfaceFmt == D3DFMT_A16B16G16R16F || m_SurfaceFmt == D3DFMT_A32B32G32R32F)) {
-		// fix Nvidia driver bug ('Integer division by zero' in nvd3dumx.dll)
+	else if (m_D3D9VendorId == PCIV_nVidia && m_nativeVideoSize.cy == 1088
+			&& (m_SurfaceFmt == D3DFMT_A16B16G16R16F || m_SurfaceFmt == D3DFMT_A32B32G32R32F)) {
+		// fix Nvidia driver bug ('Integer division by zero' in nvd3dum.dll)
 		m_VideoBufferFmt = D3DFMT_A2R10G10B10;
 	}
 	else {
