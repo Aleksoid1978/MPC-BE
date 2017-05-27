@@ -87,6 +87,14 @@ public:
 	size_t WasapiQueueSize();
 	void WaitFinish();
 
+	CAMEvent m_eReleaseEvent{TRUE};
+	bool m_bReleased             = false;
+	HANDLE m_hReleaseTimerHandle = NULL;
+
+	BOOL StartReleaseTimer();
+	void EndReleaseTimer();
+	void ReleaseDevice();
+
 	DECLARE_IUNKNOWN
 
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void **ppv) override;
@@ -197,7 +205,6 @@ private:
 	void					CreateFormat(WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSample, WORD nChannels, DWORD dwChannelMask, DWORD nSamplesPerSec, WORD wValidBitsPerSample = 0);
 
 	HRESULT					StartAudioClient();
-	HRESULT					StopAudioClient();
 
 	void					SetReinitializeAudioDevice(BOOL bFullInitialization = FALSE);
 	HRESULT					ReinitializeAudioDevice(BOOL bFullInitialization = FALSE);
