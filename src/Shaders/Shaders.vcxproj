@@ -24,6 +24,7 @@
       <FileType>Document</FileType>
     </None>
     <FxCompile Include="Resizers\downscaler_box.hlsl" />
+    <FxCompile Include="Resizers\downscaler_simple.hlsl" />
     <FxCompile Include="Transformation\final_pass.hlsl">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">LUT3D_ENABLED=1;DITHER_ENABLED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">LUT3D_ENABLED=1;DITHER_ENABLED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -74,8 +75,6 @@
     <None Include="OnePassResizers\downscaler_simple.hlsl">
       <FileType>Document</FileType>
     </None>
-    <FxCompile Include="Resizers\downscaler_simple_x.hlsl" />
-    <FxCompile Include="Resizers\downscaler_simple_y.hlsl" />
     <FxCompile Include="Resizers\resizer_lanczos2_x.hlsl" />
     <FxCompile Include="Resizers\resizer_lanczos2_y.hlsl" />
     <FxCompile Include="Resizers\resizer_lanczos3_x.hlsl" />
