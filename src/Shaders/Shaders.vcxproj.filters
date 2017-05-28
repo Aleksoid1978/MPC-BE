@@ -31,12 +31,6 @@
     <FxCompile Include="Resizers\resizer_catmull4_y.hlsl">
       <Filter>Resizers</Filter>
     </FxCompile>
-    <FxCompile Include="Resizers\downscaler_simple_x.hlsl">
-      <Filter>Resizers</Filter>
-    </FxCompile>
-    <FxCompile Include="Resizers\downscaler_simple_y.hlsl">
-      <Filter>Resizers</Filter>
-    </FxCompile>
     <FxCompile Include="Resizers\resizer_lanczos2_x.hlsl">
       <Filter>Resizers</Filter>
     </FxCompile>
@@ -74,6 +68,9 @@
       <Filter>Resizers</Filter>
     </FxCompile>
     <FxCompile Include="Resizers\downscaler_box.hlsl">
+      <Filter>Resizers</Filter>
+    </FxCompile>
+    <FxCompile Include="Resizers\downscaler_simple.hlsl">
       <Filter>Resizers</Filter>
     </FxCompile>
   </ItemGroup>
