@@ -2206,42 +2206,49 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 			ReconstructH264Extra(extra, extralen, 0);
 		} else if (m_nCodecId == AV_CODEC_ID_HEVC) {
 			// try Reconstruct NAL units sequence into NAL Units in Byte-Stream Format
-			BYTE* src     = extra;
-			BYTE* src_end = extra + extralen;
-			BYTE* dst     = NULL;
-			int dst_len   = 0;
+			BYTE* dst   = NULL;
+			int dst_len = 0;
+			BOOL vps_present = FALSE, sps_present = FALSE, pps_present = FALSE;
+			CH265Nalu Nalu;
+			Nalu.SetBuffer(extra, extralen, 2);
+			while (!(vps_present && sps_present && pps_present)
+					&& Nalu.ReadNext()) {
+				const NALU_TYPE nalu_type = Nalu.GetType();
+				switch (nalu_type) {
+					case NALU_TYPE_HEVC_VPS:
+					case NALU_TYPE_HEVC_SPS:
+					case NALU_TYPE_HEVC_PPS:
+						if (nalu_type == NALU_TYPE_HEVC_VPS) {
+							if (vps_present) continue;
+							vc_params_t params = { 0 };
+							if (!HEVCParser::ParseVideoParameterSet(Nalu.GetDataBuffer() + 2, Nalu.GetDataLength() - 2, params)) {
+								break;
+							}
+							vps_present = TRUE;
+						} else if (nalu_type == NALU_TYPE_HEVC_SPS) {
+							if (sps_present) continue;
+							vc_params_t params = { 0 };
+							if (!HEVCParser::ParseSequenceParameterSet(Nalu.GetDataBuffer() + 2, Nalu.GetDataLength() - 2, params)) {
+								break;
+							}
+							sps_present = TRUE;
+						} else if (nalu_type == NALU_TYPE_HEVC_PPS) {
+							if (pps_present) continue;
+							pps_present = TRUE;
+						}
 
-			int NALCount	= 0;
-			while (src + 2 < src_end) {
-				const int len = (src[0] << 8 | src[1]);
-				if (!len) {
-					break;
+						static const BYTE start_code[]    = { 0, 0, 1 };
+						static const UINT start_code_size = sizeof(start_code);
+
+						dst = (BYTE *)av_realloc_f(dst, dst_len + Nalu.GetDataLength() + start_code_size + AV_INPUT_BUFFER_PADDING_SIZE, 1);
+						memcpy(dst + dst_len, start_code, start_code_size);
+						dst_len += start_code_size;
+						memcpy(dst + dst_len, Nalu.GetDataBuffer(), Nalu.GetDataLength());
+						dst_len += Nalu.GetDataLength();
 				}
-				if ((len <= 2) || (src + len + 2 > src_end)) {
-					NALCount = 0;
-					break;
-				}
-				src += 2;
-				const int nat = (src[0] >> 1) & 0x3F;
-				if (nat < NALU_TYPE_HEVC_VPS || nat > NALU_TYPE_HEVC_PPS) {
-					NALCount = 0;
-					break;
-				}
-
-				dst = (BYTE *)av_realloc_f(dst, dst_len + len + 3 + AV_INPUT_BUFFER_PADDING_SIZE, 1);
-				// put startcode 0x000001
-				dst[dst_len]     = 0x00;
-				dst[dst_len + 1] = 0x00;
-				dst[dst_len + 2] = 0x01;
-				memcpy(dst + dst_len + 3, src, len);
-
-				dst_len += len + 3;
-
-				src += len;
-				NALCount++;
 			}
 
-			if (NALCount > 1) {
+			if (vps_present && sps_present && pps_present) {
 				av_freep(&extra);
 				extra    = dst;
 				extralen = dst_len;
