@@ -45,6 +45,8 @@
 #include <Bento4/Core/Ap4Dvc1Atom.h>
 #include <Bento4/Core/Ap4DataInfoAtom.h>
 
+#include <libavutil/intreadwrite.h>
+
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
@@ -274,6 +276,12 @@ static const DWORD GetFourcc(AP4_VisualSampleEntry* vse)
 	case AP4_ATOM_TYPE_M0R0:
 	case AP4_ATOM_TYPE_M0Y2:
 		fourcc = FCC('MAGY');
+		break;
+	case AP4_ATOM_TYPE_VP80:
+		fourcc = FCC('VP80');
+		break;
+	case AP4_ATOM_TYPE_VP90:
+		fourcc = FCC('VP90');
 		break;
 	default:
 		fourcc = _byteswap_ulong(type);
@@ -817,6 +825,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							FormatTrackName(L"Sorenson", 0);
 						} else if (type == AP4_ATOM_TYPE_CVID) {
 							FormatTrackName(L"Cinepack", 0);
+						} else if (type == AP4_ATOM_TYPE_VP80) {
+							FormatTrackName(L"VP8", 0);
+						} else if (type == AP4_ATOM_TYPE_VP90) {
+							FormatTrackName(L"VP9", 0);
 						} else if (fourcc == FCC('WVC1')) {
 							FormatTrackName(L"VC-1", 0);
 							if (AP4_Dvc1Atom* Dvc1 = dynamic_cast<AP4_Dvc1Atom*>(vse->GetChild(AP4_ATOM_TYPE_DVC1))) {
@@ -1837,5 +1849,64 @@ HRESULT CMP4SplitterOutputPin::DeliverEndFlush()
 HRESULT CMP4SplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 {
 	CAutoLock cAutoLock(this);
+
+	if (p && m_mt.subtype == MEDIASUBTYPE_VP90) {
+		REFERENCE_TIME rtStartTmp = p->rtStart;
+		REFERENCE_TIME rtStopTmp  = p->rtStop;
+
+		const BYTE* pData = p->GetData();
+		size_t size = p->GetCount();
+
+		BYTE marker = pData[size - 1];
+		if ((marker & 0xe0) == 0xc0) {
+			HRESULT hr = S_OK;
+
+			const BYTE nbytes = 1 + ((marker >> 3) & 0x3);
+			BYTE n_frames = 1 + (marker & 0x7);
+			const size_t idx_sz = 2 + n_frames * nbytes;
+			if (size >= idx_sz && pData[size - idx_sz] == marker && nbytes >= 1 && nbytes <= 4) {
+				const BYTE *idx = pData + size + 1 - idx_sz;
+
+				while (n_frames--) {
+					size_t sz = 0;
+					switch(nbytes) {
+						case 1: sz = (BYTE)*idx; break;
+						case 2: sz = AV_RL16(idx); break;
+						case 3: sz = AV_RL24(idx); break;
+						case 4: sz = AV_RL32(idx); break;
+					}
+
+					idx += nbytes;
+					if (sz > size || !sz) {
+						break;
+					}
+
+					CAutoPtr<CPacket> packet(DNew CPacket());
+					packet->SetData(pData, sz);
+
+					packet->TrackNumber    = p->TrackNumber;
+					packet->bDiscontinuity = p->bDiscontinuity;
+					packet->bSyncPoint     = p->bSyncPoint;
+
+					const BYTE* buf = packet->GetData();
+					if (buf[0] & 0x2) {
+						packet->rtStart = rtStartTmp;
+						packet->rtStop  = rtStopTmp;
+						rtStartTmp      = INVALID_TIME;
+						rtStopTmp       = INVALID_TIME;
+					}
+					if (S_OK != (hr = __super::DeliverPacket(packet))) {
+						break;
+					}
+
+					pData += sz;
+					size -= sz;
+				}
+			}
+
+			return hr;
+		}
+	}
+
 	return __super::DeliverPacket(p);
 }
