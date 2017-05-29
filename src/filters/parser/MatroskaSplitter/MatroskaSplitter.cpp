@@ -649,108 +649,66 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 
 							if (mt.subtype == MEDIASUBTYPE_VP90) {
-								const __int64 pos = m_pFile->GetPos();
-
-								CMatroskaNode Root(m_pFile);
-								m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
-								m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
-
-								Cluster c;
-								c.ParseTimeCode(m_pCluster);
-
-								if (!m_pBlock) {
-									m_pBlock = m_pCluster->GetFirstBlock();
-								}
-
-								BOOL bIsParse = FALSE;
-								do {
-									CBlockGroupNode bgn;
-
-									if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
-										bgn.Parse(m_pBlock, true);
-									} else if (m_pBlock->m_id == MATROSKA_ID_SIMPLEBLOCK) {
-										CAutoPtr<BlockGroup> bg(DNew BlockGroup());
-										bg->Block.Parse(m_pBlock, true);
-										bgn.AddTail(bg);
-									}
-
-									while (bgn.GetCount() && !bIsParse) {
-										CAutoPtr<MatroskaReader::BlockGroup> bg = bgn.RemoveHead();
-										if (bg->Block.TrackNumber != pTE->TrackNumber) {
-											continue;
+								CAtlArray<BYTE> pData;
+								if (ReadFirtsBlock(pData, pTE)) {
+									CGolombBuffer gb(pData.GetData(), pData.GetCount());
+									const BYTE marker = gb.BitRead(2);
+									if (marker == 0x2) {
+										BYTE profile = gb.BitRead(1);
+										profile |= gb.BitRead(1) << 1;
+										if (profile == 3) {
+											profile += gb.BitRead(1);
 										}
 
-										if (!bg->Block.BlockData.IsEmpty()) {
-											CBinary* pb = bg->Block.BlockData.GetHead();
-											pTE->Expand(*pb, ContentEncoding::AllFrameContents);
+										#define VP9_SYNCCODE 0x498342
 
-											CGolombBuffer gb(pb->GetData(), pb->GetCount());
-											const BYTE marker = gb.BitRead(2);
-											if (marker == 0x2) {
-												BYTE profile = gb.BitRead(1);
-												profile |= gb.BitRead(1) << 1;
-												if (profile == 3) {
-													profile += gb.BitRead(1);
-												}
+										AVPixelFormat pix_fmt = AV_PIX_FMT_NONE;
+										if (!gb.BitRead(1)) {
+											const BYTE keyframe = !gb.BitRead(1);
+											gb.BitRead(1);
+											gb.BitRead(1);
 
-												#define VP9_SYNCCODE 0x498342
+											if (keyframe) {
+												if (VP9_SYNCCODE == gb.BitRead(24)) {
+													static const enum AVColorSpace colorspaces[8] = {
+														AVCOL_SPC_UNSPECIFIED, AVCOL_SPC_BT470BG, AVCOL_SPC_BT709, AVCOL_SPC_SMPTE170M,
+														AVCOL_SPC_SMPTE240M, AVCOL_SPC_BT2020_NCL, AVCOL_SPC_RESERVED, AVCOL_SPC_RGB,
+													};
 
-												AVPixelFormat pix_fmt = AV_PIX_FMT_NONE;
-												if (!gb.BitRead(1)) {
-													const BYTE keyframe = !gb.BitRead(1);
-													gb.BitRead(1);
-													gb.BitRead(1);
+													const int bits = profile <= 1 ? 0 : 1 + gb.BitRead(1); // 0:8, 1:10, 2:12
+													const AVColorSpace colorspace = colorspaces[gb.BitRead(3)];
+													if (colorspace == AVCOL_SPC_RGB) {
+														static const enum AVPixelFormat pix_fmt_rgb[3] = {
+															AV_PIX_FMT_GBRP, AV_PIX_FMT_GBRP10, AV_PIX_FMT_GBRP12
+														};
+														pix_fmt = pix_fmt_rgb[bits];
+													} else {
+														static const enum AVPixelFormat pix_fmt_for_ss[3][2 /* v */][2 /* h */] = {
+															{ { AV_PIX_FMT_YUV444P, AV_PIX_FMT_YUV422P },
+																{ AV_PIX_FMT_YUV440P, AV_PIX_FMT_YUV420P } },
+															{ { AV_PIX_FMT_YUV444P10, AV_PIX_FMT_YUV422P10 },
+																{ AV_PIX_FMT_YUV440P10, AV_PIX_FMT_YUV420P10 } },
+															{ { AV_PIX_FMT_YUV444P12, AV_PIX_FMT_YUV422P12 },
+																{ AV_PIX_FMT_YUV440P12, AV_PIX_FMT_YUV420P12 } }
+														};
 
-													if (keyframe) {
-														if (VP9_SYNCCODE == gb.BitRead(24)) {
-															static const enum AVColorSpace colorspaces[8] = {
-																AVCOL_SPC_UNSPECIFIED, AVCOL_SPC_BT470BG, AVCOL_SPC_BT709, AVCOL_SPC_SMPTE170M,
-																AVCOL_SPC_SMPTE240M, AVCOL_SPC_BT2020_NCL, AVCOL_SPC_RESERVED, AVCOL_SPC_RGB,
-															};
-
-															const int bits = profile <= 1 ? 0 : 1 + gb.BitRead(1); // 0:8, 1:10, 2:12
-															const AVColorSpace colorspace = colorspaces[gb.BitRead(3)];
-															if (colorspace == AVCOL_SPC_RGB) {
-																static const enum AVPixelFormat pix_fmt_rgb[3] = {
-																	AV_PIX_FMT_GBRP, AV_PIX_FMT_GBRP10, AV_PIX_FMT_GBRP12
-																};
-																pix_fmt = pix_fmt_rgb[bits];
-															} else {
-																static const enum AVPixelFormat pix_fmt_for_ss[3][2 /* v */][2 /* h */] = {
-																	{ { AV_PIX_FMT_YUV444P, AV_PIX_FMT_YUV422P },
-																	  { AV_PIX_FMT_YUV440P, AV_PIX_FMT_YUV420P } },
-																	{ { AV_PIX_FMT_YUV444P10, AV_PIX_FMT_YUV422P10 },
-																	  { AV_PIX_FMT_YUV440P10, AV_PIX_FMT_YUV420P10 } },
-																	{ { AV_PIX_FMT_YUV444P12, AV_PIX_FMT_YUV422P12 },
-																	  { AV_PIX_FMT_YUV440P12, AV_PIX_FMT_YUV420P12 } }
-																};
-
-																gb.BitRead(1);
-																if (profile & 1) {
-																	const BYTE h = gb.BitRead(1);
-																	const BYTE v = gb.BitRead(1);
-																	pix_fmt = pix_fmt_for_ss[bits][v][h];
-																} else {
-																	pix_fmt = pix_fmt_for_ss[bits][1][1];
-																}
-															}
+														gb.BitRead(1);
+														if (profile & 1) {
+															const BYTE h = gb.BitRead(1);
+															const BYTE v = gb.BitRead(1);
+															pix_fmt = pix_fmt_for_ss[bits][v][h];
+														} else {
+															pix_fmt = pix_fmt_for_ss[bits][1][1];
 														}
 													}
 												}
-
-												m_profile = profile;
-												m_pix_fmt = pix_fmt;
 											}
-
-											bIsParse = TRUE;
 										}
+
+										m_profile = profile;
+										m_pix_fmt = pix_fmt;
 									}
-								} while (m_pBlock->NextBlock() && SUCCEEDED(hr) && !CheckRequest(NULL) && !bIsParse);
-
-								m_pBlock.Free();
-								m_pCluster.Free();
-
-								m_pFile->Seek(pos);
+								}
 							}
 						}
 
