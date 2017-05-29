@@ -1477,24 +1477,17 @@ bool CBaseSplitterFileEx::Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pm
 								pps_present++;
 							}
 
-							static const BYTE start_code[4] = { 0, 0, 0, 1 };
-							static const UINT start_code_size = sizeof(start_code);
-
-							BYTE* new_extradata = (BYTE*)realloc(extradata, extrasize + Nalu.GetDataLength() + start_code_size);
+							BYTE* new_extradata = (BYTE*)realloc(extradata, extrasize + Nalu.GetLength());
 							ASSERT(new_extradata);
 							if (new_extradata) {
 								extradata = new_extradata;
 								if ((nalu_type == NALU_TYPE_SPS || nalu_type == NALU_TYPE_SUBSET_SPS) && pps_present) {
-									memmove(extradata + start_code_size + Nalu.GetDataLength(), extradata, extrasize);
-									memcpy(extradata, start_code, start_code_size);
-									extrasize += start_code_size;
-									memcpy(extradata + start_code_size, Nalu.GetDataBuffer(), Nalu.GetDataLength());
-									extrasize += Nalu.GetDataLength();
+									memmove(extradata + Nalu.GetLength(), extradata, extrasize);
+									memcpy(extradata, Nalu.GetNALBuffer(), Nalu.GetLength());
+									extrasize += Nalu.GetLength();
 								} else {
-									memcpy(extradata + extrasize, start_code, start_code_size);
-									extrasize += start_code_size;
-									memcpy(extradata + extrasize, Nalu.GetDataBuffer(), Nalu.GetDataLength());
-									extrasize += Nalu.GetDataLength();
+									memcpy(extradata + extrasize, Nalu.GetNALBuffer(), Nalu.GetLength());
+									extrasize += Nalu.GetLength();
 								}
 							}
 					}
@@ -1638,17 +1631,12 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, CAtlArray<BYTE>& pData, CMediaType* p
 								pps_present++;
 							}
 
-							static const BYTE start_code[3] = { 0, 0, 1 };
-							static const UINT start_code_size = sizeof(start_code);
-
-							BYTE* new_extradata = (BYTE*)realloc(extradata, extrasize + Nalu.GetDataLength() + start_code_size);
+							BYTE* new_extradata = (BYTE*)realloc(extradata, extrasize + Nalu.GetLength());
 							ASSERT(new_extradata);
 							if (new_extradata) {
 								extradata = new_extradata;
-								memcpy(extradata + extrasize, start_code, start_code_size);
-								extrasize += start_code_size;
-								memcpy(extradata + extrasize, Nalu.GetDataBuffer(), Nalu.GetDataLength());
-								extrasize += Nalu.GetDataLength();
+								memcpy(extradata + extrasize, Nalu.GetNALBuffer(), Nalu.GetLength());
+								extrasize += Nalu.GetLength();
 							}
 					}
 				}
