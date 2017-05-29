@@ -2096,6 +2096,55 @@ void CMPCVideoDecFilter::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** p
 	*ppFormats = m_pVideoOutputFormat;
 }
 
+static void ReconstructH264Extra(BYTE *extra, unsigned& extralen, int NALSize)
+{
+	CH264Nalu Nalu;
+	Nalu.SetBuffer(extra, extralen, NALSize);
+	int pps_present = 0;
+	bool bNeedReconstruct = false;
+
+	while (Nalu.ReadNext()) {
+		NALU_TYPE nalu_type = Nalu.GetType();
+		switch (nalu_type) {
+			case NALU_TYPE_PPS:
+				pps_present++;
+				break;
+		}
+
+		if (nalu_type == NALU_TYPE_SPS) {
+			bNeedReconstruct = !!pps_present;
+			break;
+		}
+	}
+
+	if (bNeedReconstruct) {
+		BYTE* dst = (uint8_t *)av_mallocz(extralen);
+		if (!dst) {
+			return;
+		}
+		size_t dstlen = 0;
+		Nalu.SetBuffer(extra, extralen, NALSize);
+		while (Nalu.ReadNext()) {
+			if (Nalu.GetType() == NALU_TYPE_SPS) {
+				memcpy(dst, Nalu.GetNALBuffer(), Nalu.GetLength());
+				dstlen += Nalu.GetLength();
+				break;
+			}
+		}
+
+		Nalu.SetBuffer(extra, extralen, NALSize);
+		while (Nalu.ReadNext()) {
+			if (Nalu.GetType() != NALU_TYPE_SPS) {
+				memcpy(dst + dstlen, Nalu.GetNALBuffer(), Nalu.GetLength());
+				dstlen += Nalu.GetLength();
+			}
+		}
+
+		memcpy(extra, dst, extralen);
+		av_freep(&dst);
+	}
+}
+
 void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType* pmt)
 {
 	// code from LAV ...
@@ -2123,6 +2172,7 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 			// Actually copy the metadata into our new buffer
 			unsigned actual_len;
 			getExtraData((const BYTE *)pmt->Format(), pmt->FormatType(), pmt->FormatLength(), extra + 6, &actual_len);
+			ReconstructH264Extra(extra + 6, actual_len, 2);
 
 			// Count the number of SPS/PPS in them and set the length
 			// We'll put them all into one block and add a second block with 0 elements afterwards
@@ -2152,17 +2202,19 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 		extra = (uint8_t *)av_mallocz(extralen + AV_INPUT_BUFFER_PADDING_SIZE);
 		getExtraData((const BYTE *)pmt->Format(), pmt->FormatType(), pmt->FormatLength(), extra, NULL);
 
-		if (m_nCodecId == AV_CODEC_ID_HEVC) {
+		if (m_nCodecId == AV_CODEC_ID_H264) {
+			ReconstructH264Extra(extra, extralen, 0);
+		} else if (m_nCodecId == AV_CODEC_ID_HEVC) {
 			// try Reconstruct NAL units sequence into NAL Units in Byte-Stream Format
-			BYTE* src		= extra;
-			BYTE* src_end	= extra + extralen;
-			BYTE* dst		= NULL;
-			int dst_len		= 0;
+			BYTE* src     = extra;
+			BYTE* src_end = extra + extralen;
+			BYTE* dst     = NULL;
+			int dst_len   = 0;
 
 			int NALCount	= 0;
 			while (src + 2 < src_end) {
-				int len = (src[0] << 8 | src[1]);
-				if (len == 0) {
+				const int len = (src[0] << 8 | src[1]);
+				if (!len) {
 					break;
 				}
 				if ((len <= 2) || (src + len + 2 > src_end)) {
@@ -2170,7 +2222,7 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 					break;
 				}
 				src += 2;
-				int nat = (src[0] >> 1) & 0x3F;
+				const int nat = (src[0] >> 1) & 0x3F;
 				if (nat < NALU_TYPE_HEVC_VPS || nat > NALU_TYPE_HEVC_PPS) {
 					NALCount = 0;
 					break;
@@ -2178,9 +2230,9 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 
 				dst = (BYTE *)av_realloc_f(dst, dst_len + len + 3 + AV_INPUT_BUFFER_PADDING_SIZE, 1);
 				// put startcode 0x000001
-				dst[dst_len]		= 0x00;
-				dst[dst_len + 1]	= 0x00;
-				dst[dst_len + 2]	= 0x01;
+				dst[dst_len]     = 0x00;
+				dst[dst_len + 1] = 0x00;
+				dst[dst_len + 2] = 0x01;
 				memcpy(dst + dst_len + 3, src, len);
 
 				dst_len += len + 3;
@@ -2191,8 +2243,8 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 
 			if (NALCount > 1) {
 				av_freep(&extra);
-				extra		= dst;
-				extralen	= dst_len;
+				extra    = dst;
+				extralen = dst_len;
 			} else {
 				av_freep(&dst);
 			}
@@ -2205,8 +2257,8 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 		extralen = 0;
 	}
 
-	m_pAVCtx->extradata			= extra;
-	m_pAVCtx->extradata_size	= (int)extralen;
+	m_pAVCtx->extradata      = extra;
+	m_pAVCtx->extradata_size = (int)extralen;
 }
 
 #define DXVA2_MAX_SURFACES 64
