@@ -2100,19 +2100,15 @@ static void ReconstructH264Extra(BYTE *extra, unsigned& extralen, int NALSize)
 {
 	CH264Nalu Nalu;
 	Nalu.SetBuffer(extra, extralen, NALSize);
-	int pps_present = 0;
+	bool pps_present = false;
 	bool bNeedReconstruct = false;
 
 	while (Nalu.ReadNext()) {
-		NALU_TYPE nalu_type = Nalu.GetType();
-		switch (nalu_type) {
-			case NALU_TYPE_PPS:
-				pps_present++;
-				break;
-		}
-
-		if (nalu_type == NALU_TYPE_SPS) {
-			bNeedReconstruct = !!pps_present;
+		const NALU_TYPE nalu_type = Nalu.GetType();
+		if (nalu_type == NALU_TYPE_PPS) {
+			pps_present = true;
+		} if (nalu_type == NALU_TYPE_SPS) {
+			bNeedReconstruct = pps_present;
 			break;
 		}
 	}
