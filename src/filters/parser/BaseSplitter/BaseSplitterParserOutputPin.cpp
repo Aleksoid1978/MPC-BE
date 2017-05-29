@@ -402,12 +402,8 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 				memcpy(p3->GetData(), &dwNalLength, dwSize);
 				memcpy(p3->GetData() + dwSize, Nalu.GetDataBuffer(), Nalu.GetDataLength());
 			} else {
-				static const BYTE start_code[]		= { 0, 0, 0, 1 };
-				static const UINT start_code_size	= sizeof(start_code);
-
-				p3->SetCount(Nalu.GetDataLength() + start_code_size);
-				memcpy(p3->GetData(), start_code, start_code_size);
-				memcpy(p3->GetData() + start_code_size, Nalu.GetDataBuffer(), Nalu.GetDataLength());
+				p3->SetCount(Nalu.GetLength());
+				memcpy(p3->GetData(), Nalu.GetNALBuffer(), Nalu.GetLength());
 			}
 
 			if (p2 == NULL) {
