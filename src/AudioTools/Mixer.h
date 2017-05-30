@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,6 +29,7 @@ class CMixer
 protected:
 	SwrContext* m_pSWRCxt;
 	double* m_matrix_dbl;
+	bool    m_normalize_matrix;
 	bool    m_ActualContext;
 
 	SampleFormat m_in_sf;
@@ -46,6 +47,8 @@ protected:
 public:
 	CMixer();
 	~CMixer();
+
+	void SetOptions(bool normalize_matrix);
 
 	void UpdateInput (SampleFormat  in_sf, DWORD  in_layout, int  in_samplerate = 48000);
 	void UpdateOutput(SampleFormat out_sf, DWORD out_layout, int out_samplerate = 48000);

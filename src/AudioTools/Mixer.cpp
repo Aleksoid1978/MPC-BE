@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,6 +34,7 @@ extern "C" {
 CMixer::CMixer()
 	: m_pSWRCxt(NULL)
 	, m_matrix_dbl(NULL)
+	, m_normalize_matrix(false)
 	, m_ActualContext(false)
 	, m_in_sf(SAMPLE_FMT_NONE)
 	, m_out_sf(SAMPLE_FMT_NONE)
@@ -160,6 +161,28 @@ bool CMixer::Init()
 		}
 	}
 
+	if (m_normalize_matrix) {
+		double peekmax = 0.0;
+
+		for (int j = 0; j < out_ch; j++) {
+			double peek = 0.0;
+			for (int i = 0; i < in_ch; i++) {
+				peek += m_matrix_dbl[j * in_ch + i];
+			}
+			if (peek > peekmax) {
+				peekmax = peek;
+			}
+		}
+
+		if (fabs(peekmax - 1.0) < 0.0001) {
+			for (int j = 0; j < out_ch; j++) {
+				for (int i = 0; i < in_ch; i++) {
+					m_matrix_dbl[j * in_ch + i] /= peekmax;
+				}
+			}
+		}
+	}
+
 #ifdef _DEBUG
 	CString matrix_str = L"CMixer::Init() : matrix";
 	double k = 0.0;
@@ -196,6 +219,14 @@ bool CMixer::Init()
 
 	m_ActualContext = true;
 	return true;
+}
+
+void CMixer::SetOptions(bool normalize_matrix)
+{
+	if (normalize_matrix != m_normalize_matrix) {
+		m_normalize_matrix = normalize_matrix;
+		m_ActualContext = false;
+	}
 }
 
 void CMixer::UpdateInput(SampleFormat in_sf, DWORD in_layout, int in_samplerate)
