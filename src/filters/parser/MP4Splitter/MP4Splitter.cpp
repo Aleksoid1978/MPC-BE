@@ -1024,6 +1024,22 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									}
 								}
 								break;
+							case AP4_ATOM_TYPE_VP90:
+								if (AP4_DataInfoAtom* vpcC = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_VPCC))) {
+									const AP4_DataBuffer* di = vpcC->GetData();
+									if (di->GetDataSize() >= 12) {
+										vih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + di->GetDataSize() + 4);
+										BYTE *extra = (BYTE*)(vih2 + 1);
+										memcpy(extra, "vpcC", 4);
+										memcpy(extra + 4, di->GetData(), di->GetDataSize());
+										
+										mts.RemoveAll();
+
+										mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = fourcc);
+										mts.Add(mt);
+									}
+								}
+								break;
 						}
 					} else if (AP4_AudioSampleEntry* ase = dynamic_cast<AP4_AudioSampleEntry*>(atom)) {
 						DWORD fourcc        = _byteswap_ulong(ase->GetType());

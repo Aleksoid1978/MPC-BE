@@ -468,6 +468,8 @@ const AP4_Atom::Type AP4_ATOM_TYPE_M0Y2 = AP4_ATOM_TYPE('M','0','Y','2');
 // VP8/VP9
 const AP4_Atom::Type AP4_ATOM_TYPE_VP80 = AP4_ATOM_TYPE('v','p','0','8');
 const AP4_Atom::Type AP4_ATOM_TYPE_VP90 = AP4_ATOM_TYPE('v','p','0','9');
+
+const AP4_Atom::Type AP4_ATOM_TYPE_VPCC = AP4_ATOM_TYPE('v','p','c','C');
 // fragmented atom ...
 const AP4_Atom::Type AP4_ATOM_TYPE_MVEX = AP4_ATOM_TYPE('m','v','e','x');
 const AP4_Atom::Type AP4_ATOM_TYPE_TREX = AP4_ATOM_TYPE('t','r','e','x');
