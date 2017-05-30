@@ -215,7 +215,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 		{ // search first audio frame
 			bool deepsearch = false;
-			if (ext == L".dts" || ext == L".dtshd" || ext == L".ac3" || ext == L".eac3") { //check only specific extensions
+			if (ext == L".dts" || ext == L".dtshd" || ext == L".ac3" || ext == L".eac3" || ext == L".thd") { //check only specific extensions
 				deepsearch = true; // deep search for specific extensions only
 			}
 
@@ -387,10 +387,10 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			m_channels    = aframe.channels;
 			m_framelength = aframe.samples;
 			m_bitdepth    = aframe.param1;
-			/*if (aframe.param2) {
+			if (aframe.param2) {
 				m_streamtype = TrueHD;
 				m_subtype    = MEDIASUBTYPE_DOLBY_TRUEHD;
-			} else */{
+			} else {
 				m_streamtype = MLP;
 				m_subtype    = MEDIASUBTYPE_MLP;
 			}
@@ -489,7 +489,7 @@ HRESULT CDTSAC3Stream::GetMediaType(int iPosition, CMediaType* pmt)
 		wfe->wBitsPerSample  = m_bitdepth;
 		wfe->cbSize = 0;
 
-		if (m_streamtype == MLP /*|| m_streamtype == TrueHD*/) {
+		if (m_streamtype == MLP || m_streamtype == TrueHD) {
 			pmt->SetSampleSize(0);
 		}
 
@@ -517,10 +517,9 @@ HRESULT CDTSAC3Stream::CheckMediaType(const CMediaType* pmt)
 			return S_OK;
 		} else if (pmt->subtype == MEDIASUBTYPE_MLP && wFmtTag == WAVE_FORMAT_UNKNOWN) {
 			return S_OK;
+		} else if (pmt->subtype == MEDIASUBTYPE_DOLBY_TRUEHD && wFmtTag == WAVE_FORMAT_UNKNOWN) {
+		    return S_OK;
 		}
-		//else if (pmt->subtype == MEDIASUBTYPE_DOLBY_TRUEHD && wFmtTag == WAVE_FORMAT_UNKNOWN) {
-		//    return S_OK;
-		//}
 	}
 	return E_INVALIDARG;
 }
