@@ -174,7 +174,7 @@ bool CMixer::Init()
 			}
 		}
 
-		if (fabs(peekmax - 1.0) < 0.0001) {
+		if (fabs(peekmax - 1.0) > 0.0001) {
 			for (int j = 0; j < out_ch; j++) {
 				for (int i = 0; i < in_ch; i++) {
 					m_matrix_dbl[j * in_ch + i] /= peekmax;
