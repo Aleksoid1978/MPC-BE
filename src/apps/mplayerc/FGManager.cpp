@@ -2016,10 +2016,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->m_chkbytes.AddTail(L"0,4,,64582025");               // DTS Substream
 		pFGF->m_chkbytes.AddTail(L"0,2,,0B77");                   // AC3, E-AC3
 		pFGF->m_chkbytes.AddTail(L"4,4,,F8726FBB");               // MLP
+		pFGF->m_chkbytes.AddTail(L"4,4,,F8726FBA");               // TrueHD
 		pFGF->m_extensions.AddTail(L".ac3");
 		pFGF->m_extensions.AddTail(L".dts");
 		pFGF->m_extensions.AddTail(L".dtshd");
 		pFGF->m_extensions.AddTail(L".eac3");
+		pFGF->m_extensions.AddTail(L".thd");
 		m_source.AddTail(pFGF);
 	}
 
