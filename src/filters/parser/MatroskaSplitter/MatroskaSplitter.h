@@ -95,6 +95,7 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 
 	int m_profile;
 	int m_pix_fmt;
+	int m_bits;
 
 private:
 	CCritSec m_csProps;

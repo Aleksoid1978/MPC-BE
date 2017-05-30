@@ -48,6 +48,7 @@ extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
 	#include <ffmpeg/libavutil/mastering_display_metadata.h>
 	#include <ffmpeg/libavutil/pixdesc.h>
+	#include <libavutil/intreadwrite.h>
 	#include <ffmpeg/libavutil/imgutils.h>
 }
 #pragma warning(pop)
@@ -2250,6 +2251,36 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 				extralen = dst_len;
 			} else {
 				av_freep(&dst);
+			}
+		} else if (m_nCodecId == AV_CODEC_ID_VP9) {
+			// use code from LAV
+			// read custom vpcC headers
+			if (extralen >= 16) {
+				if (AV_RB32(extra) == 'vpcC' && AV_RB8(extra + 4) == 1) {
+					m_pAVCtx->profile = AV_RB8(extra + 8);
+					m_pAVCtx->color_primaries = (AVColorPrimaries)AV_RB8(extra + 11);
+					m_pAVCtx->color_trc = (AVColorTransferCharacteristic)AV_RB8(extra + 12);
+					m_pAVCtx->colorspace = (AVColorSpace)AV_RB8(extra + 13);
+
+					m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;
+					int bitdepth = AV_RB8(extra + 10) >> 4;
+					if (m_pAVCtx->profile == FF_PROFILE_VP9_2) {
+						if (bitdepth == 10) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P10;
+						} else if (bitdepth == 12) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P12;
+						}
+					} else if (m_pAVCtx->profile == FF_PROFILE_VP9_3) {
+						if (bitdepth == 10) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10;
+						} else if (bitdepth == 12) {
+							m_pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P12;
+						}
+					}
+				}
+
+				av_freep(&extra);
+				extralen = 0;
 			}
 		}
 	}

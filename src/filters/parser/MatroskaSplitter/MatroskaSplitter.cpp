@@ -106,6 +106,7 @@ CMatroskaSplitterFilter::CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	, m_ColorSpace(NULL)
 	, m_profile(-1)
 	, m_pix_fmt(-1)
+	, m_bits(8)
 {
 	m_nFlag |= SOURCE_SUPPORT_URL;
 #ifdef REGISTER_FILTER
@@ -663,6 +664,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										#define VP9_SYNCCODE 0x498342
 
 										AVPixelFormat pix_fmt = AV_PIX_FMT_NONE;
+										int bits = 0;
 										if (!gb.BitRead(1)) {
 											const BYTE keyframe = !gb.BitRead(1);
 											gb.BitRead(1);
@@ -675,7 +677,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 														AVCOL_SPC_SMPTE240M, AVCOL_SPC_BT2020_NCL, AVCOL_SPC_RESERVED, AVCOL_SPC_RGB,
 													};
 
-													const int bits = profile <= 1 ? 0 : 1 + gb.BitRead(1); // 0:8, 1:10, 2:12
+													bits = profile <= 1 ? 0 : 1 + gb.BitRead(1); // 0:8, 1:10, 2:12
 													const AVColorSpace colorspace = colorspaces[gb.BitRead(3)];
 													if (colorspace == AVCOL_SPC_RGB) {
 														static const enum AVPixelFormat pix_fmt_rgb[3] = {
@@ -707,6 +709,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 										m_profile = profile;
 										m_pix_fmt = pix_fmt;
+										m_bits    = bits == 0 ? 8 : bits == 1 ? 10 : 12;
 									}
 								}
 							}
@@ -917,6 +920,24 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					m_MasterDataHDR->white_point_y = metadata.WhitePointChromaticityY;
 					m_MasterDataHDR->max_display_mastering_luminance = metadata.LuminanceMax;
 					m_MasterDataHDR->min_display_mastering_luminance = metadata.LuminanceMin;
+				}
+
+				if (mt.subtype == MEDIASUBTYPE_VP90 && m_profile != -1 && m_pix_fmt != -1) {
+					VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + 16);
+					BYTE *extra = (BYTE*)(vih2 + 1);
+					memcpy(extra, "vpcC", 4);
+					// use code from LAV
+					AV_WB8 (extra +  4, 1); // version
+					AV_WB24(extra +  5, 0); // flags
+					AV_WB8 (extra +  8, m_profile);
+					AV_WB8 (extra +  9, 0);
+					AV_WB8 (extra + 10, m_bits << 4 | (m_ColorSpace ? m_ColorSpace->ChromaLocation : 0 ) << 1 | (m_ColorSpace ? m_ColorSpace->Range == AVCOL_RANGE_JPEG : 0));
+					AV_WB8 (extra + 11, m_ColorSpace ? m_ColorSpace->Primaries : AVCOL_PRI_UNSPECIFIED);
+					AV_WB8 (extra + 12, m_ColorSpace ? m_ColorSpace->TransferCharacteristics : AVCOL_TRC_UNSPECIFIED);
+					AV_WB8 (extra + 13, m_ColorSpace ? m_ColorSpace->MatrixCoefficients : AVCOL_SPC_UNSPECIFIED);
+					AV_WB16(extra + 14, 0); // no codec init data
+
+					mts.InsertAt(0, mt);
 				}
 			} else if (pTE->TrackType == TrackEntry::TypeAudio) {
 				Name.Format(L"Audio %d", iAudio++);

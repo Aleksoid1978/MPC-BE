@@ -405,6 +405,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         // other
         case AP4_ATOM_TYPE_AVCC:
         case AP4_ATOM_TYPE_HVCC:
+        case AP4_ATOM_TYPE_VPCC:
             atom = new AP4_DataInfoAtom(type, size, stream);
             break;
 
