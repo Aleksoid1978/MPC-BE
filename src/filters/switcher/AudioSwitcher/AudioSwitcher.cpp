@@ -260,6 +260,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	DWORD out_layout = GetChannelLayout(out_wfe);
 
 	if (in_layout != out_layout || in_wfe->nSamplesPerSec != out_wfe->nSamplesPerSec) {
+		//m_Mixer.SetOptions(true);
 		m_Mixer.UpdateInput(in_sampleformat, in_layout, in_wfe->nSamplesPerSec);
 		m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, out_layout, out_wfe->nSamplesPerSec);
 
