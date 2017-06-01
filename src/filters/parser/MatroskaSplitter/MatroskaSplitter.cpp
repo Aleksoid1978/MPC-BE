@@ -2493,16 +2493,16 @@ static bool ParseWavpack(CMediaType* mt, CBinary* Data, CAutoPtr<CPacket>& p)
 	CheckPointer(mt->pbFormat, false);
 	CheckPointer(Data, false);
 
-	CGolombBuffer gb(Data->GetData(), Data->GetCount());
-
-	if (gb.GetSize() < 12) {
+	if (Data->GetCount() < 12) {
 		return false;
 	}
 
-	DWORD samples	= gb.ReadDwordLE();
-	WORD ver		= 0;
-	int dstlen		= 0;
-	int offset		= 0;
+	CGolombBuffer gb(Data->GetData(), Data->GetCount());
+
+	DWORD samples = gb.ReadDwordLE();
+	WORD ver      = 0;
+	int dstlen    = 0;
+	int offset    = 0;
 
 	if (mt->formattype == FORMAT_WaveFormatEx) {
 		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt->Format();
@@ -2544,7 +2544,7 @@ static bool ParseWavpack(CMediaType* mt, CBinary* Data, CAutoPtr<CPacket>& p)
 		AV_WL32(dst + offset + 20, samples);						// number of samples
 		AV_WL32(dst + offset + 24, flags);							// flags
 		AV_WL32(dst + offset + 28, crc);							// crc
-		memcpy(dst + offset + 32, gb.GetBufferPos(), blocksize);	// block data
+		memcpy (dst + offset + 32, gb.GetBufferPos(), blocksize);	// block data
 
 		gb.SkipBytes(blocksize);
 		offset += blocksize + 32;
@@ -2559,18 +2559,18 @@ HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REF
 {
 	HRESULT hr = S_FALSE;
 
-	size_t BlockCount = p->bg->Block.BlockData.GetCount();
+	const size_t BlockCount = p->bg->Block.BlockData.GetCount();
 
-	REFERENCE_TIME rtStart		= p->rtStart;
-	REFERENCE_TIME rtDuration	= 0;
+	REFERENCE_TIME rtStart    = p->rtStart;
+	REFERENCE_TIME rtDuration = 0;
 	if (p->rtStop != p->rtStart) {
-		rtDuration				= (p->rtStop - p->rtStart) / BlockCount;
+		rtDuration = (p->rtStop - p->rtStart) / BlockCount;
 	} else if (rtBlockDuration > 0) {
-		rtDuration				= rtBlockDuration / BlockCount;
+		rtDuration = rtBlockDuration / BlockCount;
 	} else if (m_rtLastDuration) {
-		rtDuration				= m_rtLastDuration;
+		rtDuration = m_rtLastDuration;
 	}
-	REFERENCE_TIME rtStop		= rtStart + rtDuration;
+	REFERENCE_TIME rtStop = rtStart + rtDuration;
 
 	m_rtLastDuration = rtDuration;
 
@@ -2578,11 +2578,11 @@ HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REF
 	while (pos) {
 		CAutoPtr<CPacket> tmp(DNew CPacket());
 
-		tmp->TrackNumber	= p->TrackNumber;
-		tmp->bDiscontinuity	= p->bDiscontinuity;
-		tmp->bSyncPoint		= p->bSyncPoint;
-		tmp->rtStart		= rtStart;
-		tmp->rtStop			= rtStop;
+		tmp->TrackNumber    = p->TrackNumber;
+		tmp->bDiscontinuity = p->bDiscontinuity;
+		tmp->bSyncPoint     = p->bSyncPoint;
+		tmp->rtStart        = rtStart;
+		tmp->rtStop         = rtStop;
 
 		if (m_mt.subtype == MEDIASUBTYPE_DVB_SUBTITLES) {
 			// Add DBV subtitle missing start code - 0x20 0x00 (in Matroska DVB packets start with 0x0F ...)
@@ -2613,7 +2613,7 @@ HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REF
 			const BYTE* pData = ptr->GetData();
 			size_t size = ptr->GetCount();
 
-			BYTE marker = pData[size - 1];
+			const BYTE marker = pData[size - 1];
 			if ((marker & 0xe0) == 0xc0) {
 				const BYTE nbytes = 1 + ((marker >> 3) & 0x3);
 				BYTE n_frames = 1 + (marker & 0x7);
@@ -2638,16 +2638,15 @@ HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REF
 						CAutoPtr<CPacket> packet(DNew CPacket());
 						packet->SetData(pData, sz);
 
-						packet->TrackNumber		= tmp->TrackNumber;
-						packet->bDiscontinuity	= tmp->bDiscontinuity;
-						packet->bSyncPoint		= tmp->bSyncPoint;
+						packet->TrackNumber    = tmp->TrackNumber;
+						packet->bDiscontinuity = tmp->bDiscontinuity;
+						packet->bSyncPoint     = tmp->bSyncPoint;
 
-						const BYTE* buf = packet->GetData();
-						if (buf[0] & 0x2) {
-							packet->rtStart		= rtStartTmp;
-							packet->rtStop		= rtStopTmp;
-							rtStartTmp			= INVALID_TIME;
-							rtStopTmp			= INVALID_TIME;
+						if (pData[0] & 0x2) {
+							packet->rtStart = rtStartTmp;
+							packet->rtStop  = rtStopTmp;
+							rtStartTmp      = INVALID_TIME;
+							rtStopTmp       = INVALID_TIME;
 						}
 						if (S_OK != (hr = DeliverPacket(packet))) {
 							break;
@@ -2661,8 +2660,8 @@ HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REF
 				rtStart += rtDuration;
 				rtStop += rtDuration;
 
-				p->bSyncPoint		= false;
-				p->bDiscontinuity	= false;
+				p->bSyncPoint     = FALSE;
+				p->bDiscontinuity = FALSE;
 
 				continue;
 			}
@@ -2679,8 +2678,8 @@ HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REF
 		rtStart += rtDuration;
 		rtStop += rtDuration;
 
-		p->bSyncPoint		= false;
-		p->bDiscontinuity	= false;
+		p->bSyncPoint     = false;
+		p->bDiscontinuity = false;
 	}
 
 	if (m_mt.subtype == MEDIASUBTYPE_WAVPACK4) {
@@ -2689,11 +2688,9 @@ HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REF
 			BlockMore* bm = p->bg->ba.bm.GetNext(pos);
 			CAutoPtr<CPacket> tmp(DNew CPacket());
 
-			tmp->TrackNumber	= p->TrackNumber;
-			tmp->bDiscontinuity	= false;
-			tmp->bSyncPoint		= false;
-			tmp->rtStart		= p->rtStart;
-			tmp->rtStop			= p->rtStop;
+			tmp->TrackNumber = p->TrackNumber;
+			tmp->rtStart     = p->rtStart;
+			tmp->rtStop      = p->rtStop;
 
 			if (!ParseWavpack(&m_mt, &bm->BlockAdditional, tmp)) {
 				continue;

@@ -1873,7 +1873,7 @@ HRESULT CMP4SplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 		const BYTE* pData = p->GetData();
 		size_t size = p->GetCount();
 
-		BYTE marker = pData[size - 1];
+		const BYTE marker = pData[size - 1];
 		if ((marker & 0xe0) == 0xc0) {
 			HRESULT hr = S_OK;
 
@@ -1904,8 +1904,7 @@ HRESULT CMP4SplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 					packet->bDiscontinuity = p->bDiscontinuity;
 					packet->bSyncPoint     = p->bSyncPoint;
 
-					const BYTE* buf = packet->GetData();
-					if (buf[0] & 0x2) {
+					if (pData[0] & 0x2) {
 						packet->rtStart = rtStartTmp;
 						packet->rtStop  = rtStopTmp;
 						rtStartTmp      = INVALID_TIME;
