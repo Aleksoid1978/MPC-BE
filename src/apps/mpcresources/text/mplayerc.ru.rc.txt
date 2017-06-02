@@ -146,7 +146,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Сбросить выбранные"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 32
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 34
 5		"Аудио-рендерер"
 7		"Свойства"
 9		"2-й вывод"
@@ -157,10 +157,10 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 32
 16		"Обработка звука"
 17		"Микшировать каналы в:"
 19		"Перенаправить бас в LFE*"
-22		"Автоматическая регулировка громкости"
-23		"Повышать громкость"
-28		"Смещение звука (в мс):"
-31		"По умолчанию"
+23		"Автоматическая регулировка громкости"
+24		"Повышать громкость"
+30		"Смещение звука (в мс):"
+33		"По умолчанию"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
