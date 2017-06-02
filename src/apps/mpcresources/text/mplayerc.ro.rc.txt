@@ -146,7 +146,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Resetează selectate"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 34
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 35
 5		"Randor audio"
 7		"Properties"
 9		"Dual output"
@@ -156,11 +156,12 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 34
 14		"Prefer external audio files over embedded audio track"
 16		"Sound processing"
 17		"Mix channels to:"
-19		"Redirect bass to LFE*"
-23		"Auto volume control"
-24		"Boost audio"
-30		"Decalare timp audio (ms):"
-33		"Default"
+19		"Request stereo from the decoder"
+20		"Redirect bass to LFE*"
+24		"Auto volume control"
+25		"Boost audio"
+31		"Decalare timp audio (ms):"
+34		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

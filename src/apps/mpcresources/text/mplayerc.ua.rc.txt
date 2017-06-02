@@ -146,7 +146,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Скинути обране"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 34
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 35
 5		"Аудіорендерер"
 7		"Властивості"
 9		"Подвійний вивід"
@@ -156,11 +156,12 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 34
 14		"Віддавати перевагу зовнішнім аудіофайлам перед вбудованими доріжками"
 16		"Обробка звуку"
 17		"Мікшування каналів:"
-19		"Перенаправлення басів до LFE*"
-23		"Автоматичне регулювання гучності"
-24		"Підсилення аудіо"
-30		"Затримка звуку (мс):"
-33		"Типово"
+19		"Request stereo from the decoder"
+20		"Перенаправлення басів до LFE*"
+24		"Автоматичне регулювання гучності"
+25		"Підсилення аудіо"
+31		"Затримка звуку (мс):"
+34		"Типово"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
