@@ -146,7 +146,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"重置已选项"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 34
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 35
 5		"音频渲染器"
 7		"属性"
 9		"多重输出"
@@ -156,11 +156,12 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 34
 14		"选择外部音频文件替代内嵌音轨。"
 16		"声音处理"
 17		"混合声道至:"
-19		"低音重定向到 LFE 声道*"
-23		"自动音量控制"
-24		"音频增强"
-30		"音频延迟时间(毫秒): "
-33		"默认值"
+19		"Request stereo from the decoder"
+20		"低音重定向到 LFE 声道*"
+24		"自动音量控制"
+25		"音频增强"
+31		"音频延迟时间(毫秒): "
+34		"默认值"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

@@ -146,7 +146,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Επαναφορά επιλεγμένων"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 34
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 35
 5		"Πρόγραμμα απόδοσης ήχου"
 7		"Ιδιότητες"
 9		"Διπλή έξοδος"
@@ -156,11 +156,12 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 34
 14		"Προτίμηση εξωτερικών αρχείων ήχου πάνω από το ενσωματωμένο κομμάτι ήχου"
 16		"Sound processing"
 17		"Μίξη καναλιών σε:"
-19		"Redirect bass to LFE*"
-23		"Αυτόματος έλεγχος έντασης"
-24		"Ώθηση ήχου"
-30		"Χρονική μετατόπιση ήχου (ms):"
-33		"Προεπιλογή"
+19		"Request stereo from the decoder"
+20		"Redirect bass to LFE*"
+24		"Αυτόματος έλεγχος έντασης"
+25		"Ώθηση ήχου"
+31		"Χρονική μετατόπιση ήχου (ms):"
+34		"Προεπιλογή"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

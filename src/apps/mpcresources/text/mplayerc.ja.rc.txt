@@ -146,7 +146,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"選択アイテムをリセット"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 34
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 35
 5		"音声レンダラー"
 7		"プロパティ"
 9		"二重出力"
@@ -156,11 +156,12 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 34
 14		"内蔵音声トラックより外部音声ファイルを優先"
 16		"サウンド プロセッシング"
 17		"チャンネルをミックス:"
-19		"LFE* にバスをリダイレクト"
-23		"自動音量コントロール"
-24		"音声のブースト"
-30		"音声のタイム シフト(ミリ秒):"
-33		"デフォルト"
+19		"Request stereo from the decoder"
+20		"LFE* にバスをリダイレクト"
+24		"自動音量コントロール"
+25		"音声のブースト"
+31		"音声のタイム シフト(ミリ秒):"
+34		"デフォルト"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

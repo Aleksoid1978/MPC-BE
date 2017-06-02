@@ -96,6 +96,7 @@ BOOL CPPageAudio::OnInitDialog()
 {
 	__super::OnInitDialog();
 
+	GetDlgItem(IDC_CHECK8)->ShowWindow(SW_HIDE);
 	SetCursor(m_hWnd, IDC_AUDRND_COMBO, IDC_HAND);
 
 	CAppSettings& s = AfxGetAppSettings();

@@ -146,7 +146,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Berrezarri Hautatutakoa"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 34
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 35
 5		"Audio Aurkezlea"
 7		"Ezaugarriak"
 9		"Biko irteera"
@@ -156,11 +156,12 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 34
 14		"Hobetsi kanpoko audio agiriak barneratutako audio bideen gainetik"
 16		"Soinu prozesapena"
 17		"Nahastu bideak:"
-19		"Redirect bass to LFE*"
-23		"Berez irabazi agintea"
-24		"Audioa bultzada"
-30		"Audio denbora aldaketa (sm):"
-33		"Berezkoa"
+19		"Request stereo from the decoder"
+20		"Redirect bass to LFE*"
+24		"Berez irabazi agintea"
+25		"Audioa bultzada"
+31		"Audio denbora aldaketa (sm):"
+34		"Berezkoa"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
