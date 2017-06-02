@@ -146,7 +146,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Befehl &zurücksetzen"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 32
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 34
 5		"Audio-Renderer"
 7		"Eigenschaften"
 9		"Duale Ausgabe"
@@ -157,10 +157,10 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 32
 16		"Audiobearbeitung"
 17		"Kanäle mischen zu:"
 19		"Bass zum LFE umleiten*"
-22		"Automatische Verstärkungsregelung"
-23		"Audio verstärken"
-28		"Audioverzögerung (ms):"
-31		"Zurücksetzen"
+23		"Automatische Verstärkungsregelung"
+24		"Audio verstärken"
+30		"Audioverzögerung (ms):"
+33		"Zurücksetzen"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

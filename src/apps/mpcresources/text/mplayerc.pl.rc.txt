@@ -146,7 +146,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Resetuj wybrane"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 32
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 34
 5		"Renderer dźwięku"
 7		"Właściwości"
 9		"Podwójne wyjście"
@@ -157,10 +157,10 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 32
 16		"Przetwarzanie dźwięku"
 17		"Miksuj kanały do:"
 19		"Przekieruj niskie tony do LFE*"
-22		"Automatyczna regulacja głośności"
-23		"Wzmocnienie dźwięku"
-28		"Opóźnienie dźwięku (ms):"
-31		"Domyślne"
+23		"Automatyczna regulacja głośności"
+24		"Wzmocnienie dźwięku"
+30		"Opóźnienie dźwięku (ms):"
+33		"Domyślne"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

@@ -146,7 +146,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Скинути обране"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 32
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 34
 5		"Аудіорендерер"
 7		"Властивості"
 9		"Подвійний вивід"
@@ -157,10 +157,10 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 32
 16		"Обробка звуку"
 17		"Мікшування каналів:"
 19		"Перенаправлення басів до LFE*"
-22		"Автоматичне регулювання гучності"
-23		"Підсилення аудіо"
-28		"Затримка звуку (мс):"
-31		"Типово"
+23		"Автоматичне регулювання гучності"
+24		"Підсилення аудіо"
+30		"Затримка звуку (мс):"
+33		"Типово"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

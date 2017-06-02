@@ -146,7 +146,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Výchozí (označené)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 32
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 34
 5		"Audio renderer"
 7		"Properties"
 9		"Dual output"
@@ -157,10 +157,10 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 32
 16		"Sound processing"
 17		"Mix channels to:"
 19		"Redirect bass to LFE*"
-22		"Auto volume control"
-23		"Boost audio"
-28		"Posunout zvukovou stopu (ms):"
-31		"Default"
+23		"Auto volume control"
+24		"Boost audio"
+30		"Posunout zvukovou stopu (ms):"
+33		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
