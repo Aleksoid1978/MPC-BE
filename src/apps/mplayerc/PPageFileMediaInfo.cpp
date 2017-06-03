@@ -125,7 +125,7 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 
 	MediaInfo MI;
 
-	MI.Option(L"ParseSpeed", L"0.5");
+	MI.Option(L"ParseSpeed", L"0");
 	MI.Option(L"Language", mi_get_lang_file());
 	MI.Option(L"Complete");
 	MI.Open(m_fn.GetString());
