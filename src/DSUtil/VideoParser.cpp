@@ -919,6 +919,10 @@ namespace HEVCParser {
 
 	bool ParseVideoParameterSet(BYTE* data, int size, vc_params_t& params)
 	{
+		if (size < 15) {
+			return false;
+		}
+
 		CGolombBuffer gb(data, size, true);
 
 		int vps_id = gb.BitRead(4);
