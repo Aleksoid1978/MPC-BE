@@ -91,14 +91,14 @@ static uint32_t softfloat_mul(uint32_t x, uint64_t mantissa)
     uint64_t h = x * (mantissa >> 32);
     h += l >> 32;
     l &= 0xffffffff;
-    l += 1 << av_log2(h >> 21);
+    l += 1LL << av_log2(h >> 21);
     h += l >> 32;
     return h >> 20;
 }
 
 static uint8_t lag_calc_zero_run(int8_t x)
 {
-    return (x << 1) ^ (x >> 7);
+    return (x * 2) ^ (x >> 7);
 }
 
 static int lag_decode_prob(GetBitContext *gb, uint32_t *value)
@@ -191,7 +191,9 @@ static int lag_read_prob_header(lag_rac *rac, GetBitContext *gb)
         }
 
         scale_factor++;
-        cumulative_target = 1 << scale_factor;
+        if (scale_factor >= 32U)
+            return AVERROR_INVALIDDATA;
+        cumulative_target = 1U << scale_factor;
 
         if (scaled_cumul_prob > cumulative_target) {
             av_log(rac->avctx, AV_LOG_ERROR,

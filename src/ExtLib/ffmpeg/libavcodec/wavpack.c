@@ -113,10 +113,10 @@ static int update_error_limit(WavpackFrameContext *ctx)
     if (ctx->stereo_in && ctx->hybrid_bitrate) {
         int balance = (sl[1] - sl[0] + br[1] + 1) >> 1;
         if (balance > br[0]) {
-            br[1] = br[0] << 1;
+            br[1] = br[0] * 2;
             br[0] = 0;
         } else if (-balance > br[0]) {
-            br[0] <<= 1;
+            br[0]  *= 2;
             br[1]   = 0;
         } else {
             br[1] = br[0] + balance;
@@ -157,7 +157,7 @@ static int wv_get_value(WavpackFrameContext *ctx, GetBitContext *gb,
         } else {
             t = get_unary_0_33(gb);
             if (t >= 2) {
-                if (get_bits_left(gb) < t - 1)
+                if (t >= 32 || get_bits_left(gb) < t - 1)
                     goto error;
                 t = get_bits_long(gb, t - 1) | (1 << (t - 1));
             } else {
@@ -188,7 +188,7 @@ static int wv_get_value(WavpackFrameContext *ctx, GetBitContext *gb,
                     goto error;
                 t += t2;
             } else {
-                if (get_bits_left(gb) < t2 - 1)
+                if (t2 >= 32 || get_bits_left(gb) < t2 - 1)
                     goto error;
                 t += get_bits_long(gb, t2 - 1) | (1 << (t2 - 1));
             }
@@ -240,16 +240,16 @@ static int wv_get_value(WavpackFrameContext *ctx, GetBitContext *gb,
         if (get_bits_left(gb) <= 0)
             goto error;
     } else {
-        int mid = (base * 2 + add + 1) >> 1;
+        int mid = (base * 2U + add + 1) >> 1;
         while (add > c->error_limit) {
             if (get_bits_left(gb) <= 0)
                 goto error;
             if (get_bits1(gb)) {
-                add -= (mid - base);
+                add -= (mid - (unsigned)base);
                 base = mid;
             } else
                 add = mid - base - 1;
-            mid = (base * 2 + add + 1) >> 1;
+            mid = (base * 2U + add + 1) >> 1;
         }
         ret = mid;
     }
@@ -310,7 +310,7 @@ static float wv_get_value_float(WavpackFrameContext *s, uint32_t *crc, int S)
     }
 
     if (S) {
-        S  <<= s->float_shift;
+        S  *= 1U << s->float_shift;
         sign = S < 0;
         if (sign)
             S = -S;
@@ -433,8 +433,8 @@ static inline int wv_unpack_stereo(WavpackFrameContext *s, GetBitContext *gb,
                     L2 = L + ((s->decorr[i].weightA * (int64_t)A + 512) >> 10);
                     R2 = R + ((s->decorr[i].weightB * (int64_t)B + 512) >> 10);
                 } else {
-                    L2 = L + ((s->decorr[i].weightA * A + 512) >> 10);
-                    R2 = R + ((s->decorr[i].weightB * B + 512) >> 10);
+                    L2 = L + ((int)(s->decorr[i].weightA * (unsigned)A + 512) >> 10);
+                    R2 = R + ((int)(s->decorr[i].weightB * (unsigned)B + 512) >> 10);
                 }
                 if (A && L)
                     s->decorr[i].weightA -= ((((L ^ A) >> 30) & 2) - 1) * s->decorr[i].delta;
@@ -446,13 +446,13 @@ static inline int wv_unpack_stereo(WavpackFrameContext *s, GetBitContext *gb,
                 if (type != AV_SAMPLE_FMT_S16P)
                     L2 = L + ((s->decorr[i].weightA * (int64_t)s->decorr[i].samplesA[0] + 512) >> 10);
                 else
-                    L2 = L + ((s->decorr[i].weightA * s->decorr[i].samplesA[0] + 512) >> 10);
+                    L2 = L + ((int)(s->decorr[i].weightA * (unsigned)s->decorr[i].samplesA[0] + 512) >> 10);
                 UPDATE_WEIGHT_CLIP(s->decorr[i].weightA, s->decorr[i].delta, s->decorr[i].samplesA[0], L);
                 L = L2;
                 if (type != AV_SAMPLE_FMT_S16P)
                     R2 = R + ((s->decorr[i].weightB * (int64_t)L2 + 512) >> 10);
                 else
-                    R2 = R + ((s->decorr[i].weightB * L2 + 512) >> 10);
+                    R2 = R + ((int)(s->decorr[i].weightB * (unsigned)L2 + 512) >> 10);
                 UPDATE_WEIGHT_CLIP(s->decorr[i].weightB, s->decorr[i].delta, L2, R);
                 R                        = R2;
                 s->decorr[i].samplesA[0] = R;
@@ -460,7 +460,7 @@ static inline int wv_unpack_stereo(WavpackFrameContext *s, GetBitContext *gb,
                 if (type != AV_SAMPLE_FMT_S16P)
                     R2 = R + ((s->decorr[i].weightB * (int64_t)s->decorr[i].samplesB[0] + 512) >> 10);
                 else
-                    R2 = R + ((s->decorr[i].weightB * s->decorr[i].samplesB[0] + 512) >> 10);
+                    R2 = R + ((int)(s->decorr[i].weightB * (unsigned)s->decorr[i].samplesB[0] + 512) >> 10);
                 UPDATE_WEIGHT_CLIP(s->decorr[i].weightB, s->decorr[i].delta, s->decorr[i].samplesB[0], R);
                 R = R2;
 
@@ -472,7 +472,7 @@ static inline int wv_unpack_stereo(WavpackFrameContext *s, GetBitContext *gb,
                 if (type != AV_SAMPLE_FMT_S16P)
                     L2 = L + ((s->decorr[i].weightA * (int64_t)R2 + 512) >> 10);
                 else
-                    L2 = L + ((s->decorr[i].weightA * R2 + 512) >> 10);
+                    L2 = L + ((int)(s->decorr[i].weightA * (unsigned)R2 + 512) >> 10);
                 UPDATE_WEIGHT_CLIP(s->decorr[i].weightA, s->decorr[i].delta, R2, L);
                 L                        = L2;
                 s->decorr[i].samplesB[0] = L;
@@ -542,9 +542,9 @@ static inline int wv_unpack_mono(WavpackFrameContext *s, GetBitContext *gb,
             t = s->decorr[i].value;
             if (t > 8) {
                 if (t & 1)
-                    A =  2 * s->decorr[i].samplesA[0] - s->decorr[i].samplesA[1];
+                    A =  2U * s->decorr[i].samplesA[0] - s->decorr[i].samplesA[1];
                 else
-                    A = (3 * s->decorr[i].samplesA[0] - s->decorr[i].samplesA[1]) >> 1;
+                    A = (int)(3U * s->decorr[i].samplesA[0] - s->decorr[i].samplesA[1]) >> 1;
                 s->decorr[i].samplesA[1] = s->decorr[i].samplesA[0];
                 j                        = 0;
             } else {
@@ -554,7 +554,7 @@ static inline int wv_unpack_mono(WavpackFrameContext *s, GetBitContext *gb,
             if (type != AV_SAMPLE_FMT_S16P)
                 S = T + ((s->decorr[i].weightA * (int64_t)A + 512) >> 10);
             else
-                S = T + ((s->decorr[i].weightA * A + 512) >> 10);
+                S = T + ((int)(s->decorr[i].weightA * (unsigned)A + 512) >> 10);
             if (A && T)
                 s->decorr[i].weightA -= ((((T ^ A) >> 30) & 2) - 1) * s->decorr[i].delta;
             s->decorr[i].samplesA[j] = T = S;
@@ -887,6 +887,12 @@ static int wavpack_decode_block(AVCodecContext *avctx, int block_no,
             s->float_flag    = bytestream2_get_byte(&gb);
             s->float_shift   = bytestream2_get_byte(&gb);
             s->float_max_exp = bytestream2_get_byte(&gb);
+            if (s->float_shift > 31) {
+                av_log(avctx, AV_LOG_ERROR,
+                       "Invalid FLOATINFO, shift = %d (> 31)\n", s->float_shift);
+                s->float_shift = 0;
+                continue;
+            }
             got_float        = 1;
             bytestream2_skip(&gb, 1);
             break;

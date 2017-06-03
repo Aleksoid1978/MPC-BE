@@ -140,7 +140,7 @@ static int msmpeg4v12_decode_mb(MpegEncContext *s, int16_t block[6][64])
         if(s->msmpeg4_version==2)
             cbp= get_vlc2(&s->gb, v2_intra_cbpc_vlc.table, V2_INTRA_CBPC_VLC_BITS, 1);
         else
-            cbp= get_vlc2(&s->gb, ff_h263_intra_MCBPC_vlc.table, INTRA_MCBPC_VLC_BITS, 1);
+            cbp= get_vlc2(&s->gb, ff_h263_intra_MCBPC_vlc.table, INTRA_MCBPC_VLC_BITS, 2);
         if(cbp<0 || cbp>3){
             av_log(s->avctx, AV_LOG_ERROR, "cbpc %d invalid at %d %d\n", cbp, s->mb_x, s->mb_y);
             return -1;
@@ -169,12 +169,23 @@ static int msmpeg4v12_decode_mb(MpegEncContext *s, int16_t block[6][64])
         s->mv[0][0][1] = my;
         *mb_type_ptr = MB_TYPE_L0 | MB_TYPE_16x16;
     } else {
+        int v;
         if(s->msmpeg4_version==2){
             s->ac_pred = get_bits1(&s->gb);
-            cbp|= get_vlc2(&s->gb, ff_h263_cbpy_vlc.table, CBPY_VLC_BITS, 1)<<2; //FIXME check errors
+            v = get_vlc2(&s->gb, ff_h263_cbpy_vlc.table, CBPY_VLC_BITS, 1);
+            if (v < 0) {
+                av_log(s->avctx, AV_LOG_ERROR, "cbpy vlc invalid\n");
+                return -1;
+            }
+            cbp|= v<<2;
         } else{
             s->ac_pred = 0;
-            cbp|= get_vlc2(&s->gb, ff_h263_cbpy_vlc.table, CBPY_VLC_BITS, 1)<<2; //FIXME check errors
+            v = get_vlc2(&s->gb, ff_h263_cbpy_vlc.table, CBPY_VLC_BITS, 1);
+            if (v < 0) {
+                av_log(s->avctx, AV_LOG_ERROR, "cbpy vlc invalid\n");
+                return -1;
+            }
+            cbp|= v<<2;
             if(s->pict_type==AV_PICTURE_TYPE_P) cbp^=0x3C;
         }
         *mb_type_ptr = MB_TYPE_INTRA;

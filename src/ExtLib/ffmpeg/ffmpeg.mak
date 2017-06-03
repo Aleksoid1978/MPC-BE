@@ -158,6 +158,7 @@ SRCS_LC = \
 	libavcodec/dca_lbr.c \
 	libavcodec/dca_parser.c \
 	libavcodec/dca_xll.c \
+	libavcodec/dcaadpcm.c \
 	libavcodec/dcadata.c \
 	libavcodec/dcadct.c \
 	libavcodec/dcadec.c \
@@ -541,7 +542,6 @@ SRCS_LC_B = \
 	libavcodec/x86/rv34dsp_init.c \
 	libavcodec/x86/rv40dsp_init.c \
 	libavcodec/x86/sbrdsp_init.c \
-	libavcodec/x86/simple_idct.c \
 	libavcodec/x86/snowdsp.c \
 	libavcodec/x86/synth_filter_init.c \
 	libavcodec/x86/takdsp_init.c \
@@ -721,6 +721,7 @@ SRCS_YASM_LC = \
 	libavcodec/x86/rv34dsp.asm \
 	libavcodec/x86/rv40dsp.asm \
 	libavcodec/x86/sbrdsp.asm \
+	libavcodec/x86/simple_idct.asm \
 	libavcodec/x86/simple_idct10.asm \
 	libavcodec/x86/synth_filter.asm \
 	libavcodec/x86/takdsp.asm \

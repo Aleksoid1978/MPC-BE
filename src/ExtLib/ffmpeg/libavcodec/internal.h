@@ -58,6 +58,12 @@
  * skipped due to the skip_frame setting.
  */
 #define FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM  (1 << 3)
+/**
+ * The decoder sets the cropping fields in the output frames manually.
+ * If this cap is set, the generic code will initialize output frame
+ * dimensions to coded rather than display values.
+ */
+#define FF_CODEC_CAP_EXPORTS_CROPPING       (1 << 4)
 
 #ifdef TRACE
 #   define ff_tlog(ctx, ...) av_log(ctx, AV_LOG_TRACE, __VA_ARGS__)
@@ -358,6 +364,10 @@ int ff_set_sar(AVCodecContext *avctx, AVRational sar);
  */
 int ff_side_data_update_matrix_encoding(AVFrame *frame,
                                         enum AVMatrixEncoding matrix_encoding);
+
+#if FF_API_MERGE_SD
+int ff_packet_split_and_drop_side_data(AVPacket *pkt);
+#endif
 
 /**
  * Select the (possibly hardware accelerated) pixel format.

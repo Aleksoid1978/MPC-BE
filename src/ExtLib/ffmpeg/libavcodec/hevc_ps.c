@@ -751,7 +751,7 @@ static int scaling_list_data(GetBitContext *gb, AVCodecContext *avctx, ScalingLi
                                   ff_hevc_diag_scan8x8_x[i];
 
                     scaling_list_delta_coef = get_se_golomb(gb);
-                    next_coef = (next_coef + scaling_list_delta_coef + 256) % 256;
+                    next_coef = (next_coef + 256U + scaling_list_delta_coef) % 256;
                     sl->sl[size_id][matrix_id][pos] = next_coef;
                 }
             }
@@ -826,6 +826,7 @@ static int map_pixel_format(AVCodecContext *avctx, HEVCSPS *sps)
 int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
                       int apply_defdispwin, AVBufferRef **vps_list, AVCodecContext *avctx)
 {
+    HEVCWindow *ow;
     int ret = 0;
     int log2_diff_max_min_transform_block_size;
     int bit_depth_chroma, start, vui_present, sublayer_ordering_info;
@@ -1092,30 +1093,21 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
         sps->output_window.top_offset    += sps->vui.def_disp_win.top_offset;
         sps->output_window.bottom_offset += sps->vui.def_disp_win.bottom_offset;
     }
-    if (sps->output_window.left_offset & (0x1F >> (sps->pixel_shift)) &&
-        !(avctx->flags & AV_CODEC_FLAG_UNALIGNED)) {
-        sps->output_window.left_offset &= ~(0x1F >> (sps->pixel_shift));
-        av_log(avctx, AV_LOG_WARNING, "Reducing left output window to %d "
-               "chroma samples to preserve alignment.\n",
-               sps->output_window.left_offset);
-    }
-    sps->output_width  = sps->width -
-                         (sps->output_window.left_offset + sps->output_window.right_offset);
-    sps->output_height = sps->height -
-                         (sps->output_window.top_offset + sps->output_window.bottom_offset);
-    if (sps->width  <= sps->output_window.left_offset + (int64_t)sps->output_window.right_offset  ||
-        sps->height <= sps->output_window.top_offset  + (int64_t)sps->output_window.bottom_offset) {
-        av_log(avctx, AV_LOG_WARNING, "Invalid visible frame dimensions: %dx%d.\n",
-               sps->output_width, sps->output_height);
+
+    ow = &sps->output_window;
+    if (ow->left_offset >= INT_MAX - ow->right_offset     ||
+        ow->top_offset  >= INT_MAX - ow->bottom_offset    ||
+        ow->left_offset + ow->right_offset  >= sps->width ||
+        ow->top_offset  + ow->bottom_offset >= sps->height) {
+        av_log(avctx, AV_LOG_WARNING, "Invalid cropping offsets: %u/%u/%u/%u\n",
+               ow->left_offset, ow->right_offset, ow->top_offset, ow->bottom_offset);
         if (avctx->err_recognition & AV_EF_EXPLODE) {
             return AVERROR_INVALIDDATA;
         }
         av_log(avctx, AV_LOG_WARNING,
                "Displaying the whole video surface.\n");
+        memset(ow, 0, sizeof(*ow));
         memset(&sps->pic_conf_win, 0, sizeof(sps->pic_conf_win));
-        memset(&sps->output_window, 0, sizeof(sps->output_window));
-        sps->output_width               = sps->width;
-        sps->output_height              = sps->height;
     }
 
     // Inferred parameters
@@ -1221,7 +1213,8 @@ int ff_hevc_decode_nal_sps(GetBitContext *gb, AVCodecContext *avctx,
                "Parsed SPS: id %d; coded wxh: %dx%d; "
                "cropped wxh: %dx%d; pix_fmt: %s.\n",
                sps_id, sps->width, sps->height,
-               sps->output_width, sps->output_height,
+               sps->width - (sps->output_window.left_offset + sps->output_window.right_offset),
+               sps->height - (sps->output_window.top_offset + sps->output_window.bottom_offset),
                av_get_pix_fmt_name(sps->pix_fmt));
     }
 
@@ -1664,4 +1657,27 @@ int ff_hevc_decode_nal_pps(GetBitContext *gb, AVCodecContext *avctx,
 err:
     av_buffer_unref(&pps_buf);
     return ret;
+}
+
+int ff_hevc_compute_poc(const HEVCSPS *sps, int pocTid0, int poc_lsb, int nal_unit_type)
+{
+    int max_poc_lsb  = 1 << sps->log2_max_poc_lsb;
+    int prev_poc_lsb = pocTid0 % max_poc_lsb;
+    int prev_poc_msb = pocTid0 - prev_poc_lsb;
+    int poc_msb;
+
+    if (poc_lsb < prev_poc_lsb && prev_poc_lsb - poc_lsb >= max_poc_lsb / 2)
+        poc_msb = prev_poc_msb + max_poc_lsb;
+    else if (poc_lsb > prev_poc_lsb && poc_lsb - prev_poc_lsb > max_poc_lsb / 2)
+        poc_msb = prev_poc_msb - max_poc_lsb;
+    else
+        poc_msb = prev_poc_msb;
+
+    // For BLA picture types, POCmsb is set to 0.
+    if (nal_unit_type == HEVC_NAL_BLA_W_LP   ||
+        nal_unit_type == HEVC_NAL_BLA_W_RADL ||
+        nal_unit_type == HEVC_NAL_BLA_N_LP)
+        poc_msb = 0;
+
+    return poc_msb + poc_lsb;
 }

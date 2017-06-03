@@ -161,10 +161,6 @@ typedef struct H264Picture {
     int recovered;          ///< picture at IDR or recovery point + recovery count
     int invalid_gap;
     int sei_recovery_frame_cnt;
-
-    int crop;
-    int crop_left;
-    int crop_top;
 } H264Picture;
 
 typedef struct H264Ref {
@@ -380,6 +376,11 @@ typedef struct H264Context {
      */
     int picture_idr;
 
+    int crop_left;
+    int crop_right;
+    int crop_top;
+    int crop_bottom;
+
     int8_t(*intra4x4_pred_mode);
     H264PredContext hpc;
 
@@ -534,6 +535,11 @@ typedef struct H264Context {
     int cur_bit_depth_luma;
     int16_t slice_row[MAX_SLICES]; ///< to detect when MAX_SLICES is too low
 
+    /* original AVCodecContext dimensions, used to handle container
+     * cropping */
+    int width_from_caller;
+    int height_from_caller;
+
     int enable_er;
 
     H264SEIContext sei;
@@ -571,7 +577,6 @@ int ff_h264_decode_ref_pic_marking(H264SliceContext *sl, GetBitContext *gb,
                                    const H2645NAL *nal, void *logctx);
 
 void ff_h264_hl_decode_mb(const H264Context *h, H264SliceContext *sl);
-int ff_h264_decode_init(AVCodecContext *avctx);
 void ff_h264_decode_init_vlc(void);
 
 /**
