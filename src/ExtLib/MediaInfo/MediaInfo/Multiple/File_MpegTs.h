@@ -45,6 +45,7 @@ public :
     #ifdef MEDIAINFO_ARIBSTDB24B37_YES
         bool FromAribStdB24B37;
     #endif
+    bool NoPatPmt;
 
     //Constructor/Destructor
     File_MpegTs();
@@ -107,7 +108,6 @@ private :
     int64u MpegTs_JumpTo_End;
     int64u MpegTs_ScanUpTo;
     int64u Begin_MaxDuration; //in 27 MHz
-    int64u Buffer_TotalBytes_LastSynched;
     bool   ForceStreamDisplay;
     bool   ForceTextStreamDisplay;
     bool   Searching_TimeStamp_Start;

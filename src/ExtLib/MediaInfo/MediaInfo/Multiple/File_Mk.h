@@ -37,6 +37,9 @@ public :
     ~File_Mk();
 
 private :
+    //Buffer - Synchro
+    bool Synchronize();
+
     //Buffer - Global
     void Read_Buffer_Continue();
 

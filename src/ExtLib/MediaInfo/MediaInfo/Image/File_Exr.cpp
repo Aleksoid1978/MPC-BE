@@ -56,6 +56,7 @@ File_Exr::File_Exr()
 {
     //Configuration
     ParserName="EXR";
+    IsRawStream=true;
 }
 
 //***************************************************************************
@@ -107,6 +108,39 @@ bool File_Exr::FileHeader_Begin()
     return true;
 }
 
+//---------------------------------------------------------------------------
+void File_Exr::FileHeader_Parse()
+{
+    //Parsing
+    int32u Flags;
+    int8u Version;
+    bool Deep, Multipart;
+    Skip_L4(                                                    "Magic number");
+    Get_L1 (Version,                                            "Version field");
+    Get_L3 (Flags,                                              "Flags");
+        Skip_Flags(Flags, 0,                                    "Single tile");
+        Get_Flags (Flags, 1, LongName,                          "Long name");
+        Get_Flags (Flags, 2, Deep,                              "Non-image");
+        Get_Flags (Flags, 3, Multipart,                         "Multipart");
+
+    //Filling
+    if (Frame_Count==0)
+    {
+        Fill(Stream_General, 0, General_Format_Version, __T("Version ")+Ztring::ToZtring(Version));
+        Fill(StreamKind_Last, 0, "Format", "EXR");
+        Fill(StreamKind_Last, 0, "Format_Version", __T("Version ")+Ztring::ToZtring(Version));
+        Fill(StreamKind_Last, 0, "Format_Profile", (Flags&0x02)?"Tile":"Line");
+        if (Deep)
+            Fill(Stream_General, 0, "Deep", "Yes");
+        if (Deep)
+            Fill(Stream_General, 0, "Multipart", "Yes");
+    }
+    Frame_Count++;
+    if (Frame_Count_NotParsedIncluded!=(int64u)-1)
+        Frame_Count_NotParsedIncluded++;
+    ImageData_End=Config->File_Current_Size;
+}
+
 //***************************************************************************
 // Buffer - Per element
 //***************************************************************************
@@ -114,25 +148,19 @@ bool File_Exr::FileHeader_Begin()
 //---------------------------------------------------------------------------
 bool File_Exr::Header_Begin()
 {
-    //Header
-    if (Buffer_Offset+4>Buffer_Size)
-        return false;
-    if (CC4(Buffer+Buffer_Offset)==0x762F3101) //"v/1"+1
-        return Buffer_Offset+12<=Buffer_Size;
-
     //Name
     name_End=0;
     while (Buffer_Offset+name_End<Buffer_Size)
     {
         if (Buffer[Buffer_Offset+name_End]=='\0')
             break;
-        if (name_End==31)
+        if (name_End>(LongName?255:31))
             break;
         name_End++;
     }
     if (Buffer_Offset+name_End>=Buffer_Size)
         return false;
-    if (name_End>=31)
+    if (name_End>(LongName?255:31))
     {
         Reject();
         return false;
@@ -146,14 +174,14 @@ bool File_Exr::Header_Begin()
     {
         if (Buffer[Buffer_Offset+name_End+1+type_End]=='\0')
             break;
-        if (type_End==31)
+        if (type_End>(LongName?255:31))
             break;
         type_End++;
     }
 
     if (Buffer_Offset+name_End+1+type_End>=Buffer_Size)
         return false;
-    if (type_End>=31)
+    if (type_End>(LongName?255:31))
     {
         Reject();
         return false;
@@ -168,15 +196,6 @@ bool File_Exr::Header_Begin()
 //---------------------------------------------------------------------------
 void File_Exr::Header_Parse()
 {
-    //Header
-    if (CC4(Buffer+Buffer_Offset)==0x762F3101) //"v/1"+1
-    {
-        //Filling
-        Header_Fill_Code(0, "File header");
-        Header_Fill_Size(12);
-        return;
-    }
-
     //Image data
     if (name_End==0)
     {
@@ -201,10 +220,10 @@ void File_Exr::Header_Parse()
 //---------------------------------------------------------------------------
 void File_Exr::Data_Parse()
 {
-    if (CC4(Buffer+Buffer_Offset)==0x762F3101) //"v/1"+1 //Header
-        Header();
-    else if (name_End==0)
+         if (name_End==0)
         ImageData();
+    else if (name=="channels" && type=="chlist")
+        channels();
     else if (name=="comments" && type=="string")
         comments();
     else if (name=="compression" && type=="compression" && Element_Size==1)
@@ -220,30 +239,6 @@ void File_Exr::Data_Parse()
 }
 
 //---------------------------------------------------------------------------
-void File_Exr::Header()
-{
-    //Parsing
-    int32u Flags;
-    int8u Version;
-    Skip_L4(                                                    "Magic number");
-    Get_L1 (Version,                                            "Version field");
-    Get_L3 (Flags,                                              "Flags");
-
-    //Filling
-    if (Frame_Count==0)
-    {
-        Fill(Stream_General, 0, General_Format_Version, __T("Version ")+Ztring::ToZtring(Version));
-        Fill(StreamKind_Last, 0, "Format", "EXR");
-        Fill(StreamKind_Last, 0, "Format_Version", __T("Version ")+Ztring::ToZtring(Version));
-        Fill(StreamKind_Last, 0, "Format_Profile", (Flags&0x02)?"Tile":"Line");
-    }
-    Frame_Count++;
-    if (Frame_Count_NotParsedIncluded!=(int64u)-1)
-        Frame_Count_NotParsedIncluded++;
-    ImageData_End=Config->File_Current_Size;
-}
-
-//---------------------------------------------------------------------------
 void File_Exr::ImageData()
 {
     Skip_XX(Element_Size,                                       "data");
@@ -252,6 +247,112 @@ void File_Exr::ImageData()
         Fill();
     if (Config->ParseSpeed<1.0)
         Finish();
+}
+
+//---------------------------------------------------------------------------
+struct Exr_channel
+{
+    string name;
+    int32u xSampling;
+    int32u ySampling;
+};
+void File_Exr::channels()
+{
+    //Parsing
+    std::vector<Exr_channel> ChannelList;
+    while (Element_Offset+1<Element_Size)
+    {
+        Element_Begin1("channel");
+
+        //Name
+        size_t name_Size=0;
+        while (Element_Offset+name_Size<Element_Size)
+        {
+            if (!Buffer[Buffer_Offset+(size_t)Element_Offset+name_Size])
+                break;
+            name_Size++;
+        }
+        name_End++;
+
+        Exr_channel Channel;
+        Get_String(name_Size, Channel.name,                 "name"); Element_Info1(Channel.name);
+        Element_Offset++; //Null byte
+        Skip_L4(                                            "pixel type");
+        Skip_L1(                                            "pLinear");
+        Skip_B3(                                            "reserved");
+        Get_L4 (Channel.xSampling,                          "xSampling");
+        Get_L4 (Channel.ySampling,                          "ySampling");
+        ChannelList.push_back(Channel);
+
+        Element_End0();
+    }
+
+    //Color space
+    /* TODO: not finished
+    bool HasAlpha=false;
+    string ColorSpace, ChromaSubsampling;
+    if (!ChannelList.empty() && ChannelList[0].name=="A")
+    {
+        HasAlpha=true;
+        ChannelList.erase(ChannelList.begin());
+    }
+    if (ChannelList.size()==1 && ChannelList[0].name=="Y")
+    {
+        ColorSpace="Y";
+    }
+    else if (ChannelList.size()==3 && ChannelList[0].name=="V" && ChannelList[1].name=="U" && ChannelList[2].name=="Y")
+    {
+        ColorSpace="YUV";
+
+        //Chroma subsampling
+        if (ChannelList[2].xSampling==1 && ChannelList[2].xSampling==1 && ChannelList[0].xSampling==ChannelList[1].xSampling && ChannelList[0].ySampling==ChannelList[1].ySampling)
+        {
+            switch (ChannelList[0].xSampling)
+            {
+                case 1 :
+                        switch (ChannelList[0].ySampling)
+                        {
+                            case 1 : ChromaSubsampling="4:4:4"; break;
+                            default: ;
+                        }
+                        break;
+                case 2 :
+                        switch (ChannelList[0].ySampling)
+                        {
+                            case 1 : ChromaSubsampling="4:2:2"; break;
+                            case 2 : ChromaSubsampling="4:2:0"; break;
+                            default: ;
+                        }
+                        break;
+                case 4 :
+                        switch (ChannelList[0].ySampling)
+                        {
+                            case 1 : ChromaSubsampling="4:1:1"; break;
+                            case 2 : ChromaSubsampling="4:1:0"; break;
+                            default: ;
+                        }
+                        break;
+                default: ;
+            }
+        }
+    }
+    else if (ChannelList.size()==3 && ChannelList[0].name=="B" && ChannelList[1].name=="G" && ChannelList[2].name=="R")
+    {
+        ColorSpace="RGB";
+    }
+    else
+    {
+        //TODO
+    }
+    if (!ColorSpace.empty())
+    {
+        if (HasAlpha)
+            ColorSpace+='A';
+        Fill(StreamKind_Last, 0, "ColorSpace", ColorSpace);
+    }
+    if (!ChromaSubsampling.empty())
+        Fill(StreamKind_Last, 0, "ChromaSubsampling", ChromaSubsampling);
+    */
 }
 
 //---------------------------------------------------------------------------

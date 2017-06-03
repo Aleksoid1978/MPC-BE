@@ -388,7 +388,7 @@ void File__Analyze::Open_Buffer_Init (int64u File_Size_)
     //Configuring
     if (MediaInfoLib::Config.FormatDetection_MaximumOffset_Get())
         Buffer_TotalBytes_FirstSynched_Max=MediaInfoLib::Config.FormatDetection_MaximumOffset_Get();
-    Config->ParseSpeed=MediaInfoLib::Config.ParseSpeed_Get();
+    Config->File_ParseSpeed_Set(MediaInfoLib::Config.ParseSpeed_Get(), true);
     if (Config->File_IsSub_Get())
         IsSub=true;
     #if MEDIAINFO_DEMUX
@@ -732,7 +732,7 @@ void File__Analyze::Open_Buffer_Continue (const int8u* ToAdd, size_t ToAdd_Size)
     #endif //MEDIAINFO_HASH
 
     //Should parse again?
-    if (((File_GoTo==File_Size && File_Size!=(int64u)-1) || File_Offset+Buffer_Offset>=File_Size)
+    if (((File_GoTo==File_Size && File_Size!=(int64u)-1) || (File_GoTo==(int64u)-1 && File_Offset+Buffer_Offset>=File_Size))
         && !Config->File_IsGrowing
        #if MEDIAINFO_DEMUX
          && !Config->Demux_EventWasSent
@@ -1263,8 +1263,10 @@ void File__Analyze::Open_Buffer_Finalize (bool NoBufferModification)
     if (!NoBufferModification && !Config->IsFinishing)
     {
         Config->IsFinishing=true;
+        int64u FileSize_Real=File_Size;
         File_Size=File_Offset+Buffer_Size;
         Open_Buffer_Continue((const int8u*)NULL, 0);
+        File_Size=FileSize_Real;
         #if MEDIAINFO_DEMUX
             if (Config->Demux_EventWasSent)
             {

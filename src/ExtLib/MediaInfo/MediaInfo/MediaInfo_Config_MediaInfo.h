@@ -84,6 +84,9 @@ public :
     void          File_IsSub_Set (bool NewValue);
     bool          File_IsSub_Get ();
 
+    void          File_ParseSpeed_Set(float32 NewValue, bool FromGlobal=false);
+    float32       File_ParseSpeed_Get();
+
     void          File_IsDetectingDuration_Set (bool NewValue);
     bool          File_IsDetectingDuration_Get ();
 
@@ -388,6 +391,7 @@ public :
     float64       File_EditRate;
     int64u        File_Size;
     float32       ParseSpeed;
+    bool          ParseSpeed_FromFile;
     bool          IsFinishing;
     #if MEDIAINFO_EVENTS
     MediaInfo_Config_PerPackage* Config_PerPackage;

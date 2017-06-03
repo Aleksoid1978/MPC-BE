@@ -13,7 +13,6 @@
 #include "MediaInfo/File__Analyze.h"
 #include "MediaInfo/MediaInfo_Internal.h"
 #include "MediaInfo/Multiple/File__ReferenceFilesHelper_Sequence.h"
-#include "MediaInfo/Multiple/File__ReferenceFilesHelper_Common.h"
 #include <vector>
 //---------------------------------------------------------------------------
 
@@ -45,11 +44,6 @@ public :
 private :
     sequences                       Sequences;
     size_t                          Sequences_Current;
-
-    //Temp
-    rfh_common*                     Common;
-
-
 
 public:
     size_t                          Sequences_Size() {return Sequences.size();}

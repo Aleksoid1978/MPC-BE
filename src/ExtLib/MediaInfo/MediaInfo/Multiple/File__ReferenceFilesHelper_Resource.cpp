@@ -22,8 +22,6 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Multiple/File__ReferenceFilesHelper.h"
-#include "MediaInfo/Multiple/File__ReferenceFilesHelper_Sequence_Common.h"
-#include "MediaInfo/Multiple/File__ReferenceFilesHelper_Common.h"
 #include "ZenLib/FileName.h"
 #include "ZenLib/Format/Http/Http_Utils.h"
 #if MEDIAINFO_AES
@@ -53,7 +51,6 @@ resource::resource()
     IgnoreEditsAfter=(int64u)-1;
 
     //Config
-    Sequence=NULL;
     #if MEDIAINFO_NEXTPACKET
         Demux_Offset_Frame=(int64u)-1;
         Demux_Offset_DTS=(int64u)-1;
@@ -61,8 +58,6 @@ resource::resource()
 
     //Private
     MI=NULL;
-
-
 
     IgnoreEditsAfterDuration=(int64u)-1;
     #if MEDIAINFO_DEMUX

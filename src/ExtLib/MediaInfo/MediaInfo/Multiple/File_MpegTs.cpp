@@ -274,6 +274,7 @@ File_MpegTs::File_MpegTs()
     #ifdef MEDIAINFO_ARIBSTDB24B37_YES
         FromAribStdB24B37=false;
     #endif
+    NoPatPmt=false;
 
     //Data
     MpegTs_JumpTo_Begin=MediaInfoLib::Config.MpegTs_MaximumOffset_Get();
@@ -306,6 +307,8 @@ File_MpegTs::~File_MpegTs ()
 void File_MpegTs::Streams_Accept()
 {
     Fill(Stream_General, 0, General_Format, BDAV_Size?"BDAV":(TSP_Size?"MPEG-TS 188+16":"MPEG-TS"), Unlimited, true, true);
+    if (NoPatPmt)
+        Fill(Stream_General, 0, General_Format_Profile, "No PAT/PMT");
 
     #if MEDIAINFO_DEMUX && MEDIAINFO_NEXTPACKET
         if (Config->NextPacket_Get() && Config->Event_CallBackFunction_IsSet())
@@ -323,6 +326,20 @@ void File_MpegTs::Streams_Accept()
         #endif //MEDIAINFO_ADVANCED
 
         TestContinuousFileNames(24, Ztring(), true);
+    }
+
+    //Temp
+    MpegTs_JumpTo_Begin=(File_Offset_FirstSynched==(int64u)-1?0:Buffer_TotalBytes_LastSynched)+MediaInfoLib::Config.MpegTs_MaximumOffset_Get();
+    MpegTs_JumpTo_End=MediaInfoLib::Config.MpegTs_MaximumOffset_Get()/4;
+    if (MpegTs_JumpTo_Begin==(int64u)-1 || MpegTs_JumpTo_Begin+MpegTs_JumpTo_End>=File_Size)
+    {
+        if (MpegTs_JumpTo_Begin+MpegTs_JumpTo_End>File_Size)
+        {
+            MpegTs_JumpTo_Begin=File_Size;
+            MpegTs_JumpTo_End=0;
+        }
+        else
+            MpegTs_JumpTo_Begin=File_Size-MpegTs_JumpTo_End;
     }
 }
 
@@ -1426,10 +1443,6 @@ bool File_MpegTs::Synchronize()
         return false;
 
     //Synched is OK
-    if (!Status[IsAccepted])
-    {
-        Accept();
-    }
     return true;
 }
 
@@ -1853,21 +1866,6 @@ void File_MpegTs::Synched_Init()
     Complete_Stream->Streams[0x0003]->Kind=complete_stream::stream::psi;                        // IPMP Control Information Table
     Complete_Stream->Streams[0x0003]->Table_IDs.resize(0x100);
 
-    //Temp
-    MpegTs_JumpTo_Begin=(File_Offset_FirstSynched==(int64u)-1?0:Buffer_TotalBytes_LastSynched)+MediaInfoLib::Config.MpegTs_MaximumOffset_Get();
-    MpegTs_JumpTo_End=MediaInfoLib::Config.MpegTs_MaximumOffset_Get()/4;
-    Buffer_TotalBytes_LastSynched=Buffer_TotalBytes_FirstSynched;
-    if (MpegTs_JumpTo_Begin==(int64u)-1 || MpegTs_JumpTo_Begin+MpegTs_JumpTo_End>=File_Size)
-    {
-        if (MpegTs_JumpTo_Begin+MpegTs_JumpTo_End>File_Size)
-        {
-            MpegTs_JumpTo_Begin=File_Size;
-            MpegTs_JumpTo_End=0;
-        }
-        else
-            MpegTs_JumpTo_Begin=File_Size-MpegTs_JumpTo_End;
-    }
-
     //Config
     Config_Trace_TimeSection_OnlyFirstOccurrence=MediaInfoLib::Config.Trace_TimeSection_OnlyFirstOccurrence_Get();
     TimeSection_FirstOccurrenceParsed=false;
@@ -1886,6 +1884,9 @@ void File_MpegTs::Synched_Init()
             SetAllToPES();
         }
     #endif //MEDIAINFO_ARIBSTDB24B37_YES
+
+    if (NoPatPmt)
+        SetAllToPES(); //TODO: do not set up PAT ID when NoPatPmt is set
 
     //Continue, again, for Duplicate and Filter
     Option_Manage();
@@ -1972,27 +1973,20 @@ void File_MpegTs::Read_Buffer_AfterParsing()
     if (Complete_Stream==NULL)
         return; //No synchronization yet
 
+    //Stop parsing if sream is not coherent
+    if (!Status[IsAccepted] && Buffer_TotalBytes-Buffer_TotalBytes_FirstSynched>=MpegTs_JumpTo_Begin/4)
+    {
+        Reject();
+        return;
+    }
+
     if (!Status[IsFilled])
     {
         //Test if parsing of headers is OK
-        if ((Complete_Stream->Streams_NotParsedCount==0 && (Complete_Stream->NoPatPmt || (Complete_Stream->transport_stream_id_IsValid && Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs_NotParsedCount==0)))
+        if ((Complete_Stream->Streams_NotParsedCount==0 && (NoPatPmt || (Complete_Stream->transport_stream_id_IsValid && Complete_Stream->Transport_Streams[Complete_Stream->transport_stream_id].Programs_NotParsedCount==0)))
          || (Buffer_TotalBytes-Buffer_TotalBytes_FirstSynched>=MpegTs_JumpTo_Begin && Config->ParseSpeed<0.8)
          || File_Offset+Buffer_Size==File_Size)
         {
-            //Test if PAT/PMT are missing (ofen in .trp files)
-            if (!Complete_Stream->transport_stream_id_IsValid
-             && !Complete_Stream->NoPatPmt)
-            {
-                //Activating all streams as PES
-                SetAllToPES();
-                Fill(Stream_General, 0, General_Format_Profile, "No PAT/PMT");
-                Buffer_TotalBytes=0;
-                Buffer_TotalBytes_LastSynched=(int64u)-1;
-                Open_Buffer_Unsynch();
-                GoTo(0);
-                return;
-            }
-
             //Filling
             for (std::set<int16u>::iterator StreamID=Complete_Stream->PES_PIDs.begin(); StreamID!=Complete_Stream->PES_PIDs.end(); ++StreamID)
             {
@@ -3187,6 +3181,10 @@ void File_MpegTs::PES()
 //---------------------------------------------------------------------------
 void File_MpegTs::PES_Parse_Finish()
 {
+    //Test if parsing of headers is OK
+    if (NoPatPmt && !Status[IsAccepted])
+        Accept("MPEG-TS");
+
     if (Complete_Stream->Streams[pid]->Parser->Status[IsUpdated])
     {
         Complete_Stream->Streams[pid]->Parser->Status[IsUpdated]=false;
@@ -3318,7 +3316,6 @@ void File_MpegTs::PSI()
         //Program change
         if (pid==0x0000)
         {
-            Buffer_TotalBytes_LastSynched=Buffer_TotalBytes+Buffer_Offset-Header_Size;
             Status[IsFilled]=false;
 
             Status[IsUpdated]=true;
@@ -3326,7 +3323,6 @@ void File_MpegTs::PSI()
         }
         if (!Complete_Stream->Streams[pid]->Table_IDs.empty() && Complete_Stream->Streams[pid]->Table_IDs[0x02])
         {
-            Buffer_TotalBytes_LastSynched=Buffer_TotalBytes+Buffer_Offset-Header_Size;
             Status[IsFilled]=false;
 
             //Status[IsUpdated]=true;
@@ -3413,7 +3409,6 @@ void File_MpegTs::SetAllToPES()
             Complete_Stream->Streams[StreamID]->Searching_ParserTimeStamp_End_Set(false);
         #endif //MEDIAINFO_MPEGTS_PESTIMESTAMP_YES
     }
-    Complete_Stream->NoPatPmt=true;
 }
 
 //---------------------------------------------------------------------------

@@ -597,7 +597,6 @@ struct complete_stream
     sources Sources; //Key is source_id
     bool Sources_IsUpdated; //For EPG ATSC
     bool Programs_IsUpdated; //For EPG DVB
-    bool NoPatPmt;
 
     //File__Duplicate
     bool                                                File__Duplicate_HasChanged_;
@@ -630,7 +629,6 @@ struct complete_stream
         GPS_UTC_offset=0;
         Sources_IsUpdated=false;
         Programs_IsUpdated=false;
-        NoPatPmt=false;
         StreamPos_ToRemove.resize(Stream_Max);
         File__Duplicate_HasChanged_ = false;
         Config_File_Duplicate_Get_AlwaysNeeded_Count = 0;

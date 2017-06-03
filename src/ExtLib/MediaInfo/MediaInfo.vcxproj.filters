@@ -680,16 +680,10 @@
     <ClInclude Include="MediaInfo\Image\File_Bpg.h">
       <Filter>Header Files\Image</Filter>
     </ClInclude>
-    <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Common.h">
-      <Filter>Header Files\Multiple</Filter>
-    </ClInclude>
     <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Resource.h">
       <Filter>Header Files\Multiple</Filter>
     </ClInclude>
     <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Sequence.h">
-      <Filter>Header Files\Multiple</Filter>
-    </ClInclude>
-    <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Sequence_Common.h">
       <Filter>Header Files\Multiple</Filter>
     </ClInclude>
     <ClInclude Include="MediaInfo\Export\Export_Fims.h">

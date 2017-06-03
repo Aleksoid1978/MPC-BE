@@ -266,6 +266,7 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
     File_EditRate=0;
     File_Size=(int64u)-1;
     ParseSpeed=MediaInfoLib::Config.ParseSpeed_Get();
+    ParseSpeed_FromFile=false;
     IsFinishing=false;
     #if MEDIAINFO_EVENTS
         Config_PerPackage=NULL;
@@ -333,6 +334,15 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
     else if (Option_Lower==__T("file_issub_get"))
     {
         return File_IsSub_Get()?"1":"0";
+    }
+    if (Option_Lower==__T("file_parsespeed"))
+    {
+        File_ParseSpeed_Set(Ztring(Value).To_float32());
+        return __T("");
+    }
+    else if (Option_Lower==__T("file_parsespeed_get"))
+    {
+        return Ztring::ToZtring(File_ParseSpeed_Get(), 1);
     }
     if (Option_Lower==__T("file_isdetectingduration"))
     {
@@ -1229,6 +1239,26 @@ bool MediaInfo_Config_MediaInfo::File_IsSub_Get ()
 {
     CriticalSectionLocker CSL(CS);
     return FileIsSub;
+}
+
+//***************************************************************************
+// File Parse Speed
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void MediaInfo_Config_MediaInfo::File_ParseSpeed_Set (float32 NewValue, bool FromGlobal)
+{
+    CriticalSectionLocker CSL(CS);
+    if (ParseSpeed_FromFile && FromGlobal)
+        return; //Priority is file settings
+    ParseSpeed=NewValue;
+    ParseSpeed_FromFile=!FromGlobal;
+}
+
+float32 MediaInfo_Config_MediaInfo::File_ParseSpeed_Get ()
+{
+    CriticalSectionLocker CSL(CS);
+    return ParseSpeed;
 }
 
 //***************************************************************************

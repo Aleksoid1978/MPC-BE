@@ -763,6 +763,7 @@ int MediaInfo_Internal::ListFormats(const String &File_Name)
     #endif
     #if defined(MEDIAINFO_BDAV_YES)
         delete Info; Info=new File_MpegTs(); ((File_MpegTs*)Info)->BDAV_Size=4; if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        delete Info; Info=new File_MpegTs(); ((File_MpegTs*)Info)->BDAV_Size=4; ((File_MpegTs*)Info)->NoPatPmt=true; if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_BDMV_YES)
         delete Info; Info=new File_Bdmv();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
@@ -826,6 +827,7 @@ int MediaInfo_Internal::ListFormats(const String &File_Name)
     #endif
     #if defined(MEDIAINFO_MPEGTS_YES)
         delete Info; Info=new File_MpegTs();             if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        delete Info; Info=new File_MpegTs(); ((File_MpegTs*)Info)->NoPatPmt=true; if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_MPLI_YES)
         delete Info; Info=new File_Mpli();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
@@ -865,6 +867,7 @@ int MediaInfo_Internal::ListFormats(const String &File_Name)
     #endif
     #if defined(MEDIAINFO_TSP_YES)
         delete Info; Info=new File_MpegTs(); ((File_MpegTs*)Info)->TSP_Size=16; if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+        delete Info; Info=new File_MpegTs(); ((File_MpegTs*)Info)->TSP_Size=16; ((File_MpegTs*)Info)->NoPatPmt=true; if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_WM_YES)
         delete Info; Info=new File_Wm();                 if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;

@@ -1284,13 +1284,15 @@ void File_Mpeg4::Data_Parse()
         { \
             int32u Temp; \
             Get_B4(Temp,                                        _NAME); \
-            _INFO.Date_From_Seconds_1904(Temp); \
+            if (Temp) \
+                _INFO.Date_From_Seconds_1904(Temp); \
         } \
         else \
         { \
             int64u Temp; \
             Get_B8(Temp,                                        _NAME); \
-            _INFO.Date_From_Seconds_1904(Temp); \
+            if (Temp) \
+                _INFO.Date_From_Seconds_1904(Temp); \
         } \
         Param_Info1(_INFO); \
     } \

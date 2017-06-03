@@ -11,7 +11,6 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Multiple/File__ReferenceFilesHelper_Resource.h"
-#include "MediaInfo/Multiple/File__ReferenceFilesHelper_Sequence_Common.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -19,8 +18,6 @@ namespace MediaInfoLib
 
 class resource;
 typedef std::vector<resource*> resources;
-
-class rfhs_common;
 
 //***************************************************************************
 // Class sequence
@@ -59,18 +56,12 @@ public:
     #endif //MEDIAINFO_ADVANCED || MEDIAINFO_HASH
 
     //Config
-    rfh_common*                     Package;
     #if MEDIAINFO_NEXTPACKET && MEDIAINFO_IBIUSAGE
         ibi::stream                 IbiStream;
     #endif //MEDIAINFO_NEXTPACKET && MEDIAINFO_IBIUSAGE
 
     resources                       Resources;
     size_t                          Resources_Current;
-
-public:
-    rfhs_common*                    Common;
-
-
 
 public:
     ZtringList          FileNames;

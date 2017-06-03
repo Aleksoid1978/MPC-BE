@@ -22,7 +22,6 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Multiple/File__ReferenceFilesHelper_Sequence.h"
-#include "MediaInfo/Multiple/File__ReferenceFilesHelper_Common.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -47,15 +46,8 @@ sequence::sequence()
         List_Compute_Done=false;
     #endif //MEDIAINFO_ADVANCED || MEDIAINFO_HASH
 
-    //Config
-    Package=NULL;
-
     //Private
     Resources_Current=0;
-    Common=new rfhs_common(&StreamKind, &StreamPos, &StreamID, NULL, &Enabled, &IsMain);
-
-
-
 
     FileNames.Separator_Set(0, __T(","));
     FrameRate=0;
@@ -88,8 +80,6 @@ void sequence::AddFileName(const Ztring& FileName, size_t Pos)
 //---------------------------------------------------------------------------
 void sequence::AddResource(resource* NewResource, size_t Pos)
 {
-    NewResource->Sequence=Common;
-
     #if MEDIAINFO_DEMUX
     if (Resources.empty())
     {

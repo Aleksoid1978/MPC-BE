@@ -1149,7 +1149,7 @@ protected :
         inline void Locators_Test() {}
     #endif //defined(MEDIAINFO_REFERENCES_YES)
     void NextRandomIndexPack();
-    void TryToFinish();
+    bool BookMark_Needed();
 
     //Temp
     int128u EssenceContainer_FromPartitionMetadata;

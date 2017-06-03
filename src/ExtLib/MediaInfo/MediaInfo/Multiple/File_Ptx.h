@@ -51,7 +51,6 @@ private :
 
     //Temp
     File__ReferenceFilesHelper*     ReferenceFiles;
-    bool                            HasCpl;
     friend class File_DpcCpl;   //Theses classes need access to internal structure for optimization. There is recursivity with theses formats
 };
 

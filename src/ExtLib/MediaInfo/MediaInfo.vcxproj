@@ -166,10 +166,8 @@
     <ClInclude Include="MediaInfo\Multiple\File_Ptx.h" />
     <ClInclude Include="MediaInfo\Multiple\File_Vbi.h" />
     <ClInclude Include="MediaInfo\Multiple\File_Wtv.h" />
-    <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Common.h" />
     <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Resource.h" />
     <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Sequence.h" />
-    <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Sequence_Common.h" />
     <ClInclude Include="MediaInfo\Tag\File_PropertyList.h" />
     <ClInclude Include="MediaInfo\Tag\File_Xmp.h" />
     <ClInclude Include="MediaInfo\Text\File_AribStdB24B37.h" />
