@@ -7,6 +7,7 @@
 
 #include "private/md5.h"
 #include "share/alloc.h"
+#include "share/compat.h"
 #include "share/endswap.h"
 
 /*

@@ -175,6 +175,10 @@
 #define flac_fstat fstat
 #endif
 
+#ifdef ANDROID
+#include <limits.h>
+#endif
+
 #ifndef M_LN2
 #define M_LN2 0.69314718055994530942
 #endif
