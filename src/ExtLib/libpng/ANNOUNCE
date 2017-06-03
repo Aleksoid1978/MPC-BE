@@ -1,4 +1,4 @@
-Libpng 1.6.29beta02 - January 20, 2017
+Libpng 1.6.30beta04 - May 24, 2017
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -8,33 +8,44 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.29beta02.tar.xz (LZMA-compressed, recommended)
-   1.6.29beta02.tar.gz
+   1.6.30beta04.tar.xz (LZMA-compressed, recommended)
+   1.6.30beta04.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1629b02.7z  (LZMA-compressed, recommended)
-   lp1629b02.zip
+   lp1630b04.7z  (LZMA-compressed, recommended)
+   lp1630b04.zip
 
 Other information:
 
-   1.6.29beta02-README.txt
-   1.6.29beta02-LICENSE.txt
-   libpng-1.6.29beta02-*.asc (armored detached GPG signatures)
+   1.6.30beta04-README.txt
+   1.6.30beta04-LICENSE.txt
+   libpng-1.6.30beta04-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.6.28):
+Changes since the last public release (1.6.29):
 
-Version 1.6.29beta01 [January 12, 2017]
-  Readded "include(GNUInstallDirs)" to CMakeLists.txt (Gianfranco Costamagna).
-  Moved SSE2 optimization code into the main libpng source directory.
-    Configure libpng with "configure --enable-intel-sse" or compile
-    libpng with "-DPNG_INTEL_SSE" in CPPFLAGS to enable it.
-  Simplified conditional compilation in pngvalid.c, for AIX (Michael Felt).
+Version 1.6.30beta01 [April 1, 2017]
+  Added missing "$(CPPFLAGS)" to the compile line for c.pic.o in
+    makefile.linux and makefile.solaris-x86 (Cosmin).
+  Revised documentation of png_get_error_ptr() in the libpng manual.
+  Silence clang -Wcomma and const drop warnings (Viktor Szakats).
+  Update Sourceforge URLs in documentation (https instead of http).
 
-Version 1.6.29beta02 [January 20, 2017]
-  Avoid conditional directives that break statements in pngrutil.c (Romero
-    Malaquias)
+Version 1.6.30beta02 [April 22, 2017]
+  Document need to check for integer overflow when allocating a pixel
+    buffer for multiple rows in contrib/gregbook, contrib/pngminus,
+    example.c, and in the manual (suggested by Jaeseung Choi). This
+    is similar to the bug reported against pngquant in CVE-2016-5735.
+  Removed reference to the obsolete PNG_SAFE_LIMITS macro in the documentation.
+
+Version 1.6.30beta03 [May 22, 2017]
+  Check for integer overflow in contrib/visupng and contrib/tools/genpng.
+  Do not double evaluate CMAKE_SYSTEM_PROCESSOR in CMakeLists.txt.
+  Test CMAKE_HOST_WIN32 instead of WIN32 in CMakeLists.txt.
+  Fix some URL in documentation.
+
+Version 1.6.30beta04 [May 24, 2017]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
