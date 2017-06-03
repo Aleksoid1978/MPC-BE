@@ -116,10 +116,10 @@ void ff_ivi_recompose53(const IVIPlaneDesc *plane, uint8_t *dst,
                 b0_2 = b0_ptr[pitch+indx+1];
                 tmp1 = tmp0 + b0_1;
 
-                p0 =  tmp0 << 4;
-                p1 =  tmp1 << 3;
-                p2 = (tmp0 + tmp2) << 3;
-                p3 = (tmp1 + tmp2 + b0_2) << 2;
+                p0 =  tmp0 * 16;
+                p1 =  tmp1 * 8;
+                p2 = (tmp0 + tmp2) * 8;
+                p3 = (tmp1 + tmp2 + b0_2) * 4;
             }
 
             /* process the HL-band by applying HPF vertically and LPF horizontally */
@@ -132,10 +132,10 @@ void ff_ivi_recompose53(const IVIPlaneDesc *plane, uint8_t *dst,
                 tmp2 = tmp1 - tmp0*6 + b1_3;
                 b1_3 = b1_1 - b1_2*6 + b1_ptr[pitch+indx+1];
 
-                p0 += (tmp0 + tmp1) << 3;
-                p1 += (tmp0 + tmp1 + b1_1 + b1_2) << 2;
-                p2 +=  tmp2 << 2;
-                p3 += (tmp2 + b1_3) << 1;
+                p0 += (tmp0 + tmp1) * 8;
+                p1 += (tmp0 + tmp1 + b1_1 + b1_2) * 4;
+                p2 +=  tmp2 * 4;
+                p3 += (tmp2 + b1_3) * 2;
             }
 
             /* process the LH-band by applying LPF vertically and HPF horizontally */
@@ -146,10 +146,10 @@ void ff_ivi_recompose53(const IVIPlaneDesc *plane, uint8_t *dst,
                 tmp0 = b2_1 + b2_2;
                 tmp1 = b2_1 - b2_2*6 + b2_3;
 
-                p0 += tmp0 << 3;
-                p1 += tmp1 << 2;
-                p2 += (tmp0 + b2_4 + b2_5) << 2;
-                p3 += (tmp1 + b2_4 - b2_5*6 + b2_6) << 1;
+                p0 += tmp0 * 8;
+                p1 += tmp1 * 4;
+                p2 += (tmp0 + b2_4 + b2_5) * 4;
+                p3 += (tmp1 + b2_4 - b2_5*6 + b2_6) * 2;
             }
 
             /* process the HH-band by applying HPF both vertically and horizontally */
@@ -163,9 +163,9 @@ void ff_ivi_recompose53(const IVIPlaneDesc *plane, uint8_t *dst,
 
                 b3_9 = b3_3 - b3_6*6 + b3_ptr[pitch+indx+1];
 
-                p0 += (tmp0 + tmp1) << 2;
-                p1 += (tmp0 - tmp1*6 + tmp2) << 1;
-                p2 += (b3_7 + b3_8) << 1;
+                p0 += (tmp0 + tmp1) * 4;
+                p1 += (tmp0 - tmp1*6 + tmp2) * 2;
+                p2 += (b3_7 + b3_8) * 2;
                 p3 +=  b3_7 - b3_8*6 + b3_9;
             }
 
@@ -243,7 +243,7 @@ void ff_ivi_recompose_haar(const IVIPlaneDesc *plane, uint8_t *dst,
 #define INV_HAAR8(s1, s5, s3, s7, s2, s4, s6, s8,\
                   d1, d2, d3, d4, d5, d6, d7, d8,\
                   t0, t1, t2, t3, t4, t5, t6, t7, t8) {\
-    t1 = (s1) << 1; t5 = (s5) << 1;\
+    t1 = (s1) * 2; t5 = (s5) * 2;\
     IVI_HAAR_BFLY(t1, t5, t1, t5, t0); IVI_HAAR_BFLY(t1, s3, t1, t3, t0);\
     IVI_HAAR_BFLY(t5, s7, t5, t7, t0); IVI_HAAR_BFLY(t1, s2, t1, t2, t0);\
     IVI_HAAR_BFLY(t3, s4, t3, t4, t0); IVI_HAAR_BFLY(t5, s6, t5, t6, t0);\
@@ -284,10 +284,10 @@ void ff_ivi_inverse_haar_8x8(const int32_t *in, int16_t *out, ptrdiff_t pitch,
         if (flags[i]) {
             /* pre-scaling */
             shift = !(i & 4);
-            sp1 = src[ 0] << shift;
-            sp2 = src[ 8] << shift;
-            sp3 = src[16] << shift;
-            sp4 = src[24] << shift;
+            sp1 = src[ 0] * (1 << shift);
+            sp2 = src[ 8] * (1 << shift);
+            sp3 = src[16] * (1 << shift);
+            sp4 = src[24] * (1 << shift);
             INV_HAAR8(    sp1,     sp2,     sp3,     sp4,
                       src[32], src[40], src[48], src[56],
                       dst[ 0], dst[ 8], dst[16], dst[24],
@@ -393,8 +393,8 @@ void ff_ivi_inverse_haar_4x4(const int32_t *in, int16_t *out, ptrdiff_t pitch,
         if (flags[i]) {
             /* pre-scaling */
             shift = !(i & 2);
-            sp1 = src[0] << shift;
-            sp2 = src[4] << shift;
+            sp1 = src[0] * (1 << shift);
+            sp2 = src[4] * (1 << shift);
             INV_HAAR4(   sp1,    sp2, src[8], src[12],
                       dst[0], dst[4], dst[8], dst[12],
                       t0, t1, t2, t3, t4);
