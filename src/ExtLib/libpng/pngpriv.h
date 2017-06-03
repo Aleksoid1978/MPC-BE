@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * Last changed in libpng 1.6.29 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.30 [(PENDING RELEASE)]
  * Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -190,6 +190,14 @@
 #  endif
 #endif
 
+#ifndef PNG_POWERPC_VSX_OPT
+#  if defined(__PPC64__) && defined(__ALTIVEC__) && defined(__VSX__)
+#     define PNG_POWERPC_VSX_OPT 2
+#  else
+#     define PNG_POWERPC_VSX_OPT 0
+#  endif
+#endif
+
 #ifndef PNG_INTEL_SSE_OPT
 #   ifdef PNG_INTEL_SSE
       /* Only check for SSE if the build configuration has been modified to
@@ -245,6 +253,11 @@
 #     define PNG_MIPS_MSA_IMPLEMENTATION 1
 #  endif
 #endif /* PNG_MIPS_MSA_OPT > 0 */
+
+#if PNG_POWERPC_VSX_OPT > 0
+#  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_vsx
+#  define PNG_POWERPC_VSX_IMPLEMENTATION 1
+#endif
 
 
 /* Is this a build of a DLL where compilation of the object modules requires
@@ -453,7 +466,16 @@
    static_cast<type>(static_cast<const void*>(value))
 #else
 #  define png_voidcast(type, value) (value)
-#  define png_constcast(type, value) ((type)(value))
+#  ifdef _WIN64
+#     ifdef __GNUC__
+         typedef unsigned long long png_ptruint;
+#     else
+         typedef unsigned __int64 png_ptruint;
+#     endif
+#  else
+      typedef unsigned long png_ptruint;
+#  endif
+#  define png_constcast(type, value) ((type)(png_ptruint)(const void*)(value))
 #  define png_aligncast(type, value) ((void*)(value))
 #  define png_aligncastconst(type, value) ((const void*)(value))
 #endif /* __cplusplus */
@@ -1289,6 +1311,23 @@ PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg4_msa,(png_row_infop
 PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth3_msa,(png_row_infop
     row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_msa,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+#endif
+
+#if PNG_POWERPC_VSX_OPT > 0
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_up_vsx,(png_row_infop row_info,
+    png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub3_vsx,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub4_vsx,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg3_vsx,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg4_vsx,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth3_vsx,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_vsx,(png_row_infop
     row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
 #endif
 
