@@ -326,6 +326,9 @@
     #if defined(MEDIAINFO_READTHREAD_NO) && defined(MEDIAINFO_READTHREAD_YES)
         #undef MEDIAINFO_READTHREAD_NO //MEDIAINFO_READTHREAD_YES has priority
     #endif
+    #if !defined(MEDIAINFO_READTHREAD_NO) && !defined(MEDIAINFO_READTHREAD_YES)
+        #define MEDIAINFO_READTHREAD_NO //MEDIAINFO_READTHREAD_NO by default, as there are 
+    #endif
     #if defined(MEDIAINFO_READTHREAD_NO) || !defined(WINDOWS) //Currently supported only on Windows TODO: add support of non Windows OS
         #define MEDIAINFO_READTHREAD 0
     #else

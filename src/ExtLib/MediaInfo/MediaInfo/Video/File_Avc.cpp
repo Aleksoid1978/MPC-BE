@@ -208,15 +208,6 @@ static const char* Avc_ct_type[]=
 };
 
 //---------------------------------------------------------------------------
-static const char* Avc_Colorimetry_format_idc[]=
-{
-    "monochrome",
-    "4:2:0",
-    "4:2:2",
-    "4:4:4",
-};
-
-//---------------------------------------------------------------------------
 static const int8u Avc_SubWidthC[]=
 {
     1,
@@ -260,6 +251,19 @@ const char* Avc_user_data_DTG1_active_format[]=
 const char* Mpegv_colour_primaries(int8u colour_primaries);
 const char* Mpegv_transfer_characteristics(int8u transfer_characteristics);
 const char* Mpegv_matrix_coefficients(int8u matrix_coefficients);
+
+//---------------------------------------------------------------------------
+static const char* Avc_Colorimetry_format_idc(int8u chroma_format_idc)
+{
+    switch (chroma_format_idc)
+    {
+        case 0: return "monochrome";
+        case 1: return "4:2:0";
+        case 2: return "4:2:2";
+        case 3: return "4:4:4";
+        default: return "Unknown";
+    }
+}
 
 //---------------------------------------------------------------------------
 const char* Avc_user_data_GA94_cc_type(int8u cc_type)
@@ -613,8 +617,11 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
     //Calculating - Pixels
     int32u Width =((*seq_parameter_set_Item)->pic_width_in_mbs_minus1       +1)*16;
     int32u Height=((*seq_parameter_set_Item)->pic_height_in_map_units_minus1+1)*16*(2-(*seq_parameter_set_Item)->frame_mbs_only_flag);
-    int32u CropUnitX=Avc_SubWidthC [(*seq_parameter_set_Item)->ChromaArrayType()];
-    int32u CropUnitY=Avc_SubHeightC[(*seq_parameter_set_Item)->ChromaArrayType()]*(2-(*seq_parameter_set_Item)->frame_mbs_only_flag);
+    int8u chromaArrayType = (*seq_parameter_set_Item)->ChromaArrayType();
+    if (chromaArrayType >= 4)
+        chromaArrayType = 0;
+    int32u CropUnitX=Avc_SubWidthC [chromaArrayType];
+    int32u CropUnitY=Avc_SubHeightC[chromaArrayType]*(2-(*seq_parameter_set_Item)->frame_mbs_only_flag);
     Width -=((*seq_parameter_set_Item)->frame_crop_left_offset+(*seq_parameter_set_Item)->frame_crop_right_offset )*CropUnitX;
     Height-=((*seq_parameter_set_Item)->frame_crop_top_offset +(*seq_parameter_set_Item)->frame_crop_bottom_offset)*CropUnitY;
 
@@ -857,7 +864,7 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
         Fill(Stream_Video, 0, Video_ColorSpace, "RGB");
     else
         Fill(Stream_Video, 0, Video_ColorSpace, "YUV");
-    Fill(Stream_Video, 0, Video_Colorimetry, Avc_Colorimetry_format_idc[(*seq_parameter_set_Item)->chroma_format_idc]);
+    Fill(Stream_Video, 0, Video_Colorimetry, Avc_Colorimetry_format_idc((*seq_parameter_set_Item)->chroma_format_idc));
     if ((*seq_parameter_set_Item)->bit_depth_luma_minus8==(*seq_parameter_set_Item)->bit_depth_chroma_minus8)
         Fill(Stream_Video, 0, Video_BitDepth, (*seq_parameter_set_Item)->bit_depth_luma_minus8+8);
 }
@@ -1399,10 +1406,8 @@ void File_Avc::Read_Buffer_Unsynched()
     if (SizedBlocks || !Config_IsRepeated) //If sized blocks, it is not a broadcasted stream so SPS/PPS are only in container header, we must not disable them.
     {
         //Rebuilding immediatly TemporalReferences
-        // ==> Start patch MPC
-        seq_parameter_set_structs* _seq_parameter_sets = !seq_parameter_sets.empty() ? &seq_parameter_sets : &subset_seq_parameter_sets;
+        seq_parameter_set_structs* _seq_parameter_sets=!seq_parameter_sets.empty()?&seq_parameter_sets:&subset_seq_parameter_sets; //Some MVC streams have no seq_parameter_sets. TODO: better management of temporal references
         for (std::vector<seq_parameter_set_struct*>::iterator seq_parameter_set_Item=(*_seq_parameter_sets).begin(); seq_parameter_set_Item!=(*_seq_parameter_sets).end(); ++seq_parameter_set_Item)
-        // ==> End patch MPC
             if ((*seq_parameter_set_Item))
             {
                 size_t MaxNumber;
@@ -2736,7 +2741,7 @@ void File_Avc::sei_message_pic_timing(int32u /*payloadSize*/, int32u seq_paramet
             case  3 :
             case  4 :
             case  5 :
-            case  6 : break;
+            case  6 : FrameRate_Divider=1; break;
             case  7 : FrameRate_Divider=2; break;
             case  8 : FrameRate_Divider=3; break;
             default : Param_Info1("Reserved"); return; //NumClockTS is unknown
@@ -2797,7 +2802,7 @@ void File_Avc::sei_message_pic_timing(int32u /*payloadSize*/, int32u seq_paramet
     }
     BS_End();
 
-    FILLING_BEGIN();
+    FILLING_BEGIN_PRECISE();
         if ((*seq_parameter_set_Item)->pic_struct_FirstDetected==(int8u)-1 && (*seq_parameter_set_Item)->vui_parameters && (*seq_parameter_set_Item)->vui_parameters->pic_struct_present_flag)
             (*seq_parameter_set_Item)->pic_struct_FirstDetected=pic_struct;
     FILLING_END();
@@ -3298,6 +3303,8 @@ void File_Avc::seq_parameter_set()
         Streams[0x0B].Searching_Payload=true; //end_of_stream
         if (Streams[0x07].ShouldDuplicate)
             Streams[0x0B].ShouldDuplicate=true; //end_of_stream
+    FILLING_ELSE();
+        delete Data_Item_New;
     FILLING_END();
 }
 
@@ -3683,7 +3690,7 @@ File_Avc::seq_parameter_set_struct* File_Avc::seq_parameter_set_data(int32u &Dat
         case 128 :  //High profiles
         case 138 :
                     Element_Begin1("high profile specific");
-                    Get_UE (chroma_format_idc,                  "chroma_format_idc"); Param_Info1C((chroma_format_idc<3), Avc_Colorimetry_format_idc[chroma_format_idc]);
+                    Get_UE (chroma_format_idc,                  "chroma_format_idc"); Param_Info1C((chroma_format_idc<3), Avc_Colorimetry_format_idc(chroma_format_idc));
                     if (chroma_format_idc==3)
                         Get_SB (separate_colour_plane_flag,     "separate_colour_plane_flag");
                     Get_UE (bit_depth_luma_minus8,              "bit_depth_luma_minus8");

@@ -403,6 +403,7 @@ File__MultipleParsing::File__MultipleParsing()
     #endif
     #if defined(MEDIAINFO_BDAV_YES)
         {File_MpegTs* Temp=new File_MpegTs(); Temp->BDAV_Size=4; Parser.push_back(Temp);}
+        {File_MpegTs* Temp=new File_MpegTs(); Temp->BDAV_Size=4; Temp->NoPatPmt=true; Parser.push_back(Temp);}
     #endif
 //    Only with directories, no By Buffer interface
 //    #if defined(MEDIAINFO_BDMV_YES)
@@ -467,9 +468,11 @@ File__MultipleParsing::File__MultipleParsing()
     #endif
     #if defined(MEDIAINFO_MPEGTS_YES)
         Parser.push_back(new File_MpegTs());
+        {File_MpegTs* Temp=new File_MpegTs(); Temp->NoPatPmt=true; Parser.push_back(Temp);}
     #endif
     #if defined(MEDIAINFO_TSP_YES)
         {File_MpegTs* Temp=new File_MpegTs(); Temp->TSP_Size=16; Parser.push_back(Temp);}
+        {File_MpegTs* Temp=new File_MpegTs(); Temp->TSP_Size=16; Temp->NoPatPmt=true; Parser.push_back(Temp);}
     #endif
     #if defined(MEDIAINFO_MXF_YES)
         Parser.push_back(new File_Mxf());

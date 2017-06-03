@@ -1889,9 +1889,12 @@ void File_Ac3::Core_Frame()
     {
         int16u frmsiz=CC2(Buffer+Buffer_Offset+(size_t)Element_Offset+2)&0x07FF;
         Element_Size=Element_Offset+2+frmsiz*2;
+        if (Element_Size>Element_Size_Save)
+            Element_Size=Element_Size_Save; // Not expected, but trying to parse the begining
     }
 
     //Pre-parsing, finding some elements presence
+    int16u auxdatal;
     if (Buffer[Buffer_Offset+(Element_Size)-3]&0x02) //auxdatae
         auxdatal=(((int16u)Buffer[Buffer_Offset+(Element_Size)-4])<<6)
                 |(         Buffer[Buffer_Offset+(Element_Size)-3] >>2);
@@ -3350,9 +3353,6 @@ void File_Ac3::Core_Frame()
     else
         Skip_XX(Element_Size-Element_Offset,                        "Unknown");
 
-    //true Element_Size is back
-    Element_Size=Element_Size_Save;
-
     if (bsid<=0x10)
     {
         size_t BitsAtEnd=18; //auxdatae+errorcheck
@@ -3376,6 +3376,17 @@ void File_Ac3::Core_Frame()
                 BS_End();
                 Skip_B2(                                            "crc2");
             Element_End0();
+        }
+        else
+        {
+            BS_End();
+            Skip_XX(Element_Size-Element_Offset,                    "Unknown");
+        }
+
+        if (bsid>0x0A) //E-AC-3 only
+        {
+            //true Element_Size is back
+            Element_Size=Element_Size_Save;
         }
     }
 

@@ -4265,7 +4265,7 @@ void File_Mxf::Read_Buffer_Continue()
 
         if (B_Cur06<Buffer)
         {
-            TryToFinish();
+            GoToFromEnd(0);
             return;
         }
     }
@@ -4335,7 +4335,7 @@ void File_Mxf::Read_Buffer_Continue()
                 GoToFromEnd(64*1024); // Wrong offset, searching from end of file
             }
             else
-                TryToFinish();
+                GoToFromEnd(0);
             return;
         }
     }
@@ -4358,7 +4358,7 @@ void File_Mxf::Read_Buffer_Continue()
                 GoToFromEnd(64*1024); // Wrong offset, searching from end of file
             }
             else
-                TryToFinish();
+                GoToFromEnd(0);
             return;
         }
     }
@@ -4482,7 +4482,7 @@ void File_Mxf::Read_Buffer_AfterParsing()
 
         //Checking if we want to seek again
         if (File_GoTo==(int64u)-1)
-            TryToFinish();
+            GoToFromEnd(0);
     }
 }
 
@@ -9147,7 +9147,7 @@ void File_Mxf::GenericPackage_Name()
     Get_UTF16B(Length2, Data,                                   "Data"); Element_Info1(Data);
 
     FILLING_BEGIN();
-        if (!Partitions_IsFooter && Data!=Retrieve(Stream_General, 0, General_PackageName))
+        if (Essences.empty() && Data!=Retrieve(Stream_General, 0, General_PackageName))
             Fill(Stream_General, 0, General_PackageName, Data);
     FILLING_END();
 }
@@ -17144,10 +17144,10 @@ void File_Mxf::NextRandomIndexPack()
                 Open_Buffer_Unsynch();
             }
             else
-                TryToFinish();
+                GoToFromEnd(0);
         }
         else
-            TryToFinish();
+            GoToFromEnd(0);
     }
     else
     {
@@ -17160,7 +17160,7 @@ void File_Mxf::NextRandomIndexPack()
 }
 
 //---------------------------------------------------------------------------
-void File_Mxf::TryToFinish()
+bool File_Mxf::BookMark_Needed()
 {
     Frame_Count_NotParsedIncluded=(int64u)-1;
 
@@ -17170,11 +17170,11 @@ void File_Mxf::TryToFinish()
         GoTo(File_Size/2);
         Open_Buffer_Unsynch();
         IsParsingEnd=false;
+        IsCheckingRandomAccessTable=false;
         Streams_Count=(size_t)-1;
-        return;
     }
 
-    Finish();
+    return false;
 }
 
 //---------------------------------------------------------------------------

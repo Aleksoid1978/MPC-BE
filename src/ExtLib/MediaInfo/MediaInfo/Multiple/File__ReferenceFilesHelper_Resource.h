@@ -21,8 +21,6 @@
 namespace MediaInfoLib
 {
 
-class rfhs_common;
-
 class resource
 {
 public:
@@ -43,7 +41,6 @@ public:
     int64u                          IgnoreEditsAfter;
 
     //Config
-    rfhs_common*                    Sequence;
     #if MEDIAINFO_NEXTPACKET
         int64u                      Demux_Offset_Frame;
         int64u                      Demux_Offset_DTS;

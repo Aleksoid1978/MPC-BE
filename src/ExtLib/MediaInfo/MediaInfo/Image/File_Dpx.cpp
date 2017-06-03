@@ -306,7 +306,7 @@ enum Elements
 //
 string DPX_DateTime2Iso(const string &FromDpx)
 {
-    if (FromDpx.size()<20
+    if (FromDpx.size()<19
      || FromDpx[ 0]<'0' || FromDpx[ 0]>'9'
      || FromDpx[ 1]<'0' || FromDpx[ 1]>'9'
      || FromDpx[ 2]<'0' || FromDpx[ 2]>'9'
@@ -369,6 +369,7 @@ File_Dpx::File_Dpx()
 {
     //Configuration
     ParserName="DPX";
+    IsRawStream=true;
 }
 
 //***************************************************************************
@@ -542,10 +543,10 @@ void File_Dpx::GenericSectionHeader_Cineon()
     Get_X4 (Size_Industry,                                      "Industry specific header length");
     Get_X4 (Size_User,                                          "User-defined header length");
     Get_X4 (Size_Total,                                         "Total image file size");
-    Get_String(8, Version,                                      "Version number of header format");
+    Get_ASCII  (8, Version,                                     "Version number of header format");
     Skip_UTF8  (100,                                            "FileName");
-    Get_String (12,  CreationDate,                              "Creation Date");
-    Get_String (12,  CreationTime,                              "Creation Time");
+    Get_ASCII  (12,  CreationDate,                              "Creation Date");
+    Get_ASCII  (12,  CreationTime,                              "Creation Time");
     Skip_XX(36,                                                 "Reserved for future use");
     Element_End0();
 
@@ -585,8 +586,8 @@ void File_Dpx::GenericSectionHeader_Cineon()
     Skip_B4(                                                    "X offset");
     Skip_B4(                                                    "Y offset");
     Skip_UTF8  (100,                                            "FileName");
-    Get_String (12,  CreationDate,                              "Creation Date");
-    Get_String (12,  CreationTime,                              "Creation Time");
+    Get_ASCII  (12,  CreationDate,                              "Creation Date");
+    Get_ASCII  (12,  CreationTime,                              "Creation Time");
     Skip_UTF8(64,                                               "Input device");
     Skip_UTF8(32,                                               "Input device model number");
     Skip_UTF8(32,                                               "Input device serial number");
@@ -664,17 +665,17 @@ void File_Dpx::GenericSectionHeader_Dpx()
     int32u Size_Header, Size_Total, Size_Generic, Size_Industry, Size_User;
     Skip_String(4,                                              "Magic number");
     Get_X4 (Size_Header,                                        "Offset to image data");
-    Get_String(8, Version,                                      "Version number of header format");
+    Get_ASCII (8, Version,                                      "Version number of header format");
     Get_X4 (Size_Total,                                         "Total image file size");
     Skip_B4(                                                    "Ditto Key");
     Get_X4 (Size_Generic,                                       "Generic section header length");
     Get_X4 (Size_Industry,                                      "Industry specific header length");
     Get_X4 (Size_User,                                          "User-defined header length");
     Skip_UTF8  (100,                                            "FileName");
-    Get_String (24,  CreationDate,                              "Creation Date");
-    Get_String (100, Creator,                                   "Creator");
-    Get_String (200, Project,                                   "Project");
-    Get_String (200, Copyright,                                 "Right to use or copyright statement");
+    Get_ASCII  (24,  CreationDate,                              "Creation Date");
+    Get_ASCII  (100, Creator,                                   "Creator");
+    Get_ASCII  (200, Project,                                   "Project");
+    Get_ASCII  (200, Copyright,                                 "Right to use or copyright statement");
     Skip_B4(                                                    "Encryption key");
     Skip_XX(104,                                                "Reserved for future use");
     Element_End0();
@@ -946,6 +947,21 @@ void File_Dpx::Get_X4(int32u &Info, const char* Name)
         Get_L4 (Info,                                           Name);
     else
         Get_B4 (Info,                                           Name);
+}
+
+//---------------------------------------------------------------------------
+void File_Dpx::Get_ASCII(size_t Size, string &Info, const char* Name)
+{
+    //Looking for end of string (null byte)
+    size_t NullPos=0;
+    while (NullPos<Size && Element_Offset+NullPos<Element_Size)
+    {
+        if (!Buffer[Buffer_Offset+(size_t)Element_Offset+ NullPos])
+            break;
+        NullPos++;
+    }
+    Get_String (NullPos, Info,                                  Name);
+    Element_Offset+=Size-NullPos; //Skipping bytes including null bytes and bytes after null byte
 }
 
 } //NameSpace

@@ -76,6 +76,7 @@ private :
     //Helpers
     void Get_X2 (int16u &Info, const char* Name);
     void Get_X4 (int32u &Info, const char* Name);
+    void Get_ASCII (size_t Size, string &Info, const char* Name);
 };
 
 } //NameSpace

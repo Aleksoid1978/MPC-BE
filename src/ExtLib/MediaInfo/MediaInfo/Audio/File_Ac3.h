@@ -96,9 +96,6 @@ private :
     size_t Save_Buffer_Offset;
     size_t Save_Buffer_Size;
 
-    //Temp auxdata
-    int16u  auxdatal;
-
     //Temp EMDF
     size_t EMDF_RemainPos;
     size_t RemainAfterEMDF;

@@ -73,18 +73,6 @@ File__ReferenceFilesHelper::File__ReferenceFilesHelper(File__Analyze* MI_, Media
         Offset_Video_DTS=0;
     #endif //MEDIAINFO_DEMUX
 
-    //Private
-    #if MEDIAINFO_DEMUX
-        Common=new rfh_common(&Demux_Interleave, &DTS_Minimal);
-    #else //MEDIAINFO_DEMUX
-        Common=new rfh_common();
-    #endif //MEDIAINFO_DEMUX
-    Common->ReferenceFilesHelper=this;
-    Common->MI=MI;
-    Common->Config=Config;
-
-
-
     //Temp
     FilesForStorage=false;
     HasMainFile=false;
@@ -314,11 +302,6 @@ void File__ReferenceFilesHelper_InfoFromFileName (sequences &Sequences)
 //---------------------------------------------------------------------------
 void File__ReferenceFilesHelper::AddSequence(sequence* NewSequence)
 {
-    Common->HasMultipleSequences=!Sequences.empty(); //If not empty, there will be more than 1 sequence just after
-
-    NewSequence->Package=Common;
-    NewSequence->Common->Package=Common;
-
     Sequences.push_back(NewSequence);
 }
 

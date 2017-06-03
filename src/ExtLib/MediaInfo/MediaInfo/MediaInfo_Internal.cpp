@@ -971,10 +971,12 @@ std::bitset<32> MediaInfo_Internal::Open_NextPacket ()
                 #endif //MEDIAINFO_NEXTPACKET
                 Open_Buffer_Continue(NULL, 0);
                 #if MEDIAINFO_NEXTPACKET
-                    Demux_EventWasSent=Config.Demux_EventWasSent;
-                    if (!Demux_EventWasSent)
+                    if (!Config.Demux_EventWasSent)
                 #endif //MEDIAINFO_NEXTPACKET
                         Open_Buffer_Finalize();
+                #if MEDIAINFO_NEXTPACKET
+                    Demux_EventWasSent=Config.Demux_EventWasSent;
+                #endif //MEDIAINFO_NEXTPACKET
             }
     }
 

@@ -486,7 +486,7 @@ std::ostream& operator<<(std::ostream& os, const element_details::Element_Node_D
           if (v.format_out == element_details::Element_Node_Data::Format_Tree)
           {
               for (int8u i = 0; i < v.Option; ++i)
-                  os.rdbuf()->sputc(v.val.Chars[i]);
+                  os.rdbuf()->sputc(v.val.Chars[i]?v.val.Chars[i]:' '); //Text output does not like NULL chars, replacing it by space
               break;
           }
 

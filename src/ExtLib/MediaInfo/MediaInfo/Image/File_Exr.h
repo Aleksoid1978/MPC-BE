@@ -43,6 +43,7 @@ private :
 
     //Buffer - File header
     bool FileHeader_Begin();
+    void FileHeader_Parse();
 
     //Buffer - Global
     void Read_Buffer_Unsynched() {Read_Buffer_Unsynched_OneFramePerFile();}
@@ -56,8 +57,8 @@ private :
     void Data_Parse();
 
     //Elements
-    void Header();
     void ImageData();
+    void channels();
     void comments();
     void compression();
     void dataWindow();
@@ -70,6 +71,7 @@ private :
     size_t              name_End;
     size_t              type_End;
     int64u              ImageData_End;
+    bool                LongName;
 };
 
 } //NameSpace

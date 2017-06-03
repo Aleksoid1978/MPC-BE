@@ -64,7 +64,7 @@ void File__Analyze::Streams_Finish_Global()
     {
         if (Frame_Count_NotParsedIncluded!=(int64u)-1 && File_Offset+Buffer_Size==File_Size)
             Fill(Stream_Video, 0, Video_FrameCount, Frame_Count_NotParsedIncluded);
-        else if (Config->File_Names.size()>1)
+        else if (Config->File_Names.size()>1 && IsRawStream)
             Fill(Stream_Video, 0, Video_FrameCount, Config->File_Names.size());
         #if MEDIAINFO_IBIUSAGE
         else
@@ -234,12 +234,13 @@ void File__Analyze::TestContinuousFileNames(size_t CountOfFiles, Ztring FileExte
         return;
 
     Config->File_IsImageSequence=true;
-    Frame_Count_NotParsedIncluded=Pos_Base;
+    if (IsRawStream)
+        Frame_Count_NotParsedIncluded=Pos_Base;
     #if MEDIAINFO_DEMUX
         float64 Demux_Rate=Config->Demux_Rate_Get();
         if (!Demux_Rate)
             Demux_Rate=24;
-        if (!SkipComputeDelay)
+        if (!SkipComputeDelay && Frame_Count_NotParsedIncluded!=(int64u)-1)
             Fill(Stream_Video, 0, Video_Delay, float64_int64s(Frame_Count_NotParsedIncluded*1000/Demux_Rate));
     #endif //MEDIAINFO_DEMUX
 

@@ -617,9 +617,10 @@ File_Mk::File_Mk()
         Trace_Layers_Update(0); //Container1
     #endif //MEDIAINFO_TRACE
     DataMustAlwaysBeComplete=false;
+    MustSynchronize=true;
 
     //Temp
-    InvalidByteMax=(1<<(8-4))-1; //Default is max size of 4 bytes
+    InvalidByteMax=0; //Default is max size of 8 bytes
     Format_Version=0;
     TimecodeScale=1000000; //Default value
     Duration=0;
@@ -1122,11 +1123,46 @@ void File_Mk::Read_Buffer_Unsynched()
 size_t File_Mk::Read_Buffer_Seek(size_t Method, int64u Value, int64u ID)
 {
     //Currently stupidely go back to 0 //TODO: 
-    GoTo(0);
+    GoTo(Buffer_TotalBytes_FirstSynched);
     Open_Buffer_Unsynch();
     return 1;
 }
 #endif //MEDIAINFO_SEEK
+
+//***************************************************************************
+// Buffer - Synchro
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+bool File_Mk::Synchronize()
+{
+    //Synchronizing
+    while (Buffer_Offset+4<=Buffer_Size && (Buffer[Buffer_Offset  ]!=0x1A
+                                         || Buffer[Buffer_Offset+1]!=0x45
+                                         || Buffer[Buffer_Offset+2]!=0xDF
+                                         || Buffer[Buffer_Offset+3]!=0xA3))
+    {
+        Buffer_Offset++;
+        while (Buffer_Offset<Buffer_Size && Buffer[Buffer_Offset]!=0x1A)
+            Buffer_Offset++;
+    }
+
+    //Parsing last bytes if needed
+    if (Buffer_Offset+4>Buffer_Size)
+    {
+        if (Buffer_Offset+3==Buffer_Size && CC3(Buffer+Buffer_Offset)!=0x1A45DF)
+            Buffer_Offset++;
+        if (Buffer_Offset+2==Buffer_Size && CC2(Buffer+Buffer_Offset)!=0x1A45)
+            Buffer_Offset++;
+        if (Buffer_Offset+1==Buffer_Size && CC1(Buffer+Buffer_Offset)!=0x1A)
+            Buffer_Offset++;
+        return false;
+    }
+
+    //Synched is OK
+    MustSynchronize=false; //We need synchro only once (at the beginning, in case of junk bytes before EBML)
+    return true;
+}
 
 //***************************************************************************
 // Buffer - Global
@@ -1209,7 +1245,7 @@ void File_Mk::Header_Parse()
     }
 
     //Parsing
-    int64u Name, Size = 0;
+    int64u Name = 0, Size = 0;
     bool NameIsValid=true;
     if (Element_Offset+1<Element_Size)
     {
@@ -1702,11 +1738,7 @@ void File_Mk::Ebml_MaxSizeLength()
     //Filling
     FILLING_BEGIN();
         if (Value > 8)
-        {
-            //Not expected, rejecting the file
-            Reject();
-            return;
-        }
+            Value = 8; //Not expected, considerating it as if it is 8 for the moment
         InvalidByteMax = (int8u)((1 << (8-Value))-1);
     FILLING_END();
 }

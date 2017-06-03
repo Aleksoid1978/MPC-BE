@@ -363,10 +363,10 @@ void File_Vc1::Streams_Finish()
                 Numerator=framerateexp+1;
                 Denominator=32;
             }
-            else if (Vc1_FrameRate_dr(frameratecode_dr))
+            else if (const int16u rate_dr=Vc1_FrameRate_dr(frameratecode_dr))
             {
                 Numerator=(int64u)Vc1_FrameRate_enr(frameratecode_enr);
-                Denominator=(int64u)Vc1_FrameRate_dr(frameratecode_dr);
+                Denominator=(int64u)rate_dr;
             }
         }
         if (Numerator)
@@ -1164,8 +1164,8 @@ void File_Vc1::SequenceHeader()
         {
             if (framerate_form)
                 FrameRate=((float64)(framerateexp+1))/(float32)64;
-            else if (Vc1_FrameRate_dr(frameratecode_dr))
-                FrameRate=((float64)Vc1_FrameRate_enr(frameratecode_enr))/Vc1_FrameRate_dr(frameratecode_dr);
+            else if (const int16u rate_dr = Vc1_FrameRate_dr(frameratecode_dr))
+                FrameRate=((float64)Vc1_FrameRate_enr(frameratecode_enr))/rate_dr;
         }
 
         if (From_WMV3)

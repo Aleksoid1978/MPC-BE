@@ -640,6 +640,106 @@ Export_EbuCore::~Export_EbuCore ()
 }
 
 //***************************************************************************
+// Helpers
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+Ztring EbuCore_WithFactor(size_t TabCount, const Ztring& Name, const Ztring& Rational, const Ztring& Num, const Ztring& Den)
+{
+    Ztring nominal, factorNumerator, factorDenominator;
+    int64u num=0, den=0;
+    if (!Num.empty() && !Den.empty())
+    {
+        size_t Dot=Num.rfind(__T('.')); //Num can be a float (e.g. in DisplayAspectRatio)
+        if (Dot==string::npos)
+        {
+            num=Num.To_int64u();
+            den=Den.To_int64u();
+        }
+        else
+        {
+            den=(int64u)float64_int64s(pow((float64)10, (int)(Num.size()-(Dot+1))));
+            num=(int64u)float64_int64s(Num.To_float64()*den*Den.To_int64u());
+        }
+    }
+    else
+    {
+        size_t Dot=Rational.rfind(__T('.'));
+        if (Dot==string::npos)
+        {
+            //This is already an integer
+            if (TabCount)
+                nominal=Rational;
+            else
+            {
+                factorNumerator=Rational;
+                factorDenominator.From_Number(1);
+            }
+        }
+        else
+        {
+            //this is a float, converting it to num/den
+            den=(int64u)float64_int64s(pow((float64)10, (int)(Rational.size()-(Dot+1))));
+            num=(int64u)float64_int64s(Rational.To_float64()*den);
+        }
+    }
+    if (num && den)
+    {
+        //We need to find the nearest integer and adapt factors
+        float64 nom=((float64)num)/den;
+        int64u nom_rounded=(int64u)float64_int64s(nom);
+        int64u num2=float64_int64s(((float64)num)/(nom_rounded));
+        int64u den2=float64_int64s(num/nom);
+        if (!TabCount && num2==den2)
+        {
+            //This is an integer, no need of factor numbers
+            nominal.From_Number(nom_rounded);
+        }
+        else if (!TabCount && ((float64)num2)/den2*nom_rounded==nom) //If we find an exact match
+        {
+            //We found it, we can have good integer and factor numbers
+            factorNumerator.From_Number(num2);
+            factorDenominator.From_Number(den2);
+            nominal.From_Number(nom_rounded);
+        }
+        else
+        {
+            //Not found exact, we use integer of 1 and num/den directly
+            factorNumerator.From_Number(num);
+            factorDenominator.From_Number(den);
+            nominal.From_Number(1);
+        }
+    }
+
+    Ztring ToReturn;
+    if (TabCount)
+    {
+        ToReturn.append(TabCount, __T('\t'));
+        ToReturn+=__T("<ebucore:factorNumerator>");
+        ToReturn+=factorNumerator;
+        ToReturn+=__T("</ebucore:factorNumerator>\n");
+        ToReturn.append(TabCount, __T('\t'));
+        ToReturn+=__T("<ebucore:factorDenominator>");
+        ToReturn+=factorDenominator;
+        ToReturn+=__T("</ebucore:factorDenominator>\n");
+    }
+    else
+    {
+        ToReturn+=__T("<");
+        ToReturn+=Name;
+        if (!factorNumerator.empty())
+            ToReturn+=__T(" factorNumerator=\"")+factorNumerator+__T("\"");
+        if (!factorDenominator.empty())
+            ToReturn+=__T(" factorDenominator=\"")+factorDenominator+__T("\"");
+        ToReturn+=__T(">")+(nominal.empty()?Ztring::ToZtring(Rational.To_float64(), 0):nominal);
+        ToReturn+=__T("</");
+        ToReturn+=Name;
+        ToReturn+=__T(">");
+    }
+    return ToReturn;
+}
+
+//***************************************************************************
 // Input
 //***************************************************************************
 
@@ -690,35 +790,7 @@ Ztring EbuCore_Transform_Video(Ztring &ToReturn, MediaInfo_Internal &MI, size_t 
 
     //frameRate
     if (!MI.Get(Stream_Video, StreamPos, Video_FrameRate).empty())
-    {
-        Ztring FrameRateString=MI.Get(Stream_Video, StreamPos, Video_FrameRate);
-        Ztring factorNumerator, factorDenominator;
-        if (FrameRateString==__T("23.976"))
-        {
-            factorNumerator=__T("24000");
-            factorDenominator=__T("1001");
-        }
-        if (FrameRateString==__T("29.970"))
-        {
-            factorNumerator=__T("30000");
-            factorDenominator=__T("1001");
-        }
-        if (FrameRateString==__T("59.940"))
-        {
-            factorNumerator=__T("60000");
-            factorDenominator=__T("1001");
-        }
-        if (factorNumerator.empty())
-        {
-            factorNumerator=Ztring::ToZtring(FrameRateString.To_float64()*1000, 0);
-            factorDenominator=__T("1000");
-        }
-        ToReturn+=__T("\t\t\t\t<ebucore:frameRate");
-        ToReturn+=__T(" factorNumerator=\"")+factorNumerator+__T("\"");
-        ToReturn+=__T(" factorDenominator=\"")+factorDenominator+__T("\"");
-        ToReturn+=__T(">")+Ztring::ToZtring(FrameRateString.To_float64(), 0);
-        ToReturn+=__T("</ebucore:frameRate>\n");
-    }
+        ToReturn+=__T("\t\t\t\t")+EbuCore_WithFactor(0, __T("ebucore:frameRate"), MI.Get(Stream_Video, StreamPos, Video_FrameRate), MI.Get(Stream_Video, StreamPos, Video_FrameRate_Num), MI.Get(Stream_Video, StreamPos, Video_FrameRate_Den))+__T("\n");
 
     //aspectRatio
     if (!MI.Get(Stream_Video, StreamPos, Video_DisplayAspectRatio).empty())
@@ -731,24 +803,8 @@ Ztring EbuCore_Transform_Video(Ztring &ToReturn, MediaInfo_Internal &MI, size_t 
             factorNumerator=AspectRatioString.substr(0, AspectRatioString_Pos);
             factorDenominator=AspectRatioString.substr(AspectRatioString_Pos+1);
         }
-        else
-        {
-            AspectRatioString_Pos=AspectRatioString.find(__T('.'));
-            if (AspectRatioString_Pos!=(size_t)-1)
-            {
-                int64s Denominator=float64_int64s(pow((double)10, (int)(AspectRatioString.size()-AspectRatioString_Pos+1))); //Computing the right denomintor compared to the count of decimals in the value e.g. 1.778 will have a denominator of 1000 (3 digits after the comma)
-                factorNumerator=Ztring::ToZtring(AspectRatioString.To_float32()*Denominator, 0);
-                factorDenominator=Ztring::ToZtring(Denominator);
-            }
-            else
-            {
-                factorNumerator=AspectRatioString; //No decimal
-                factorDenominator=__T("1");
-            }
-        }
         ToReturn+=__T("\t\t\t\t<ebucore:aspectRatio typeLabel=\"display\">\n");
-        ToReturn+=__T("\t\t\t\t\t<ebucore:factorNumerator>")+factorNumerator+__T("</ebucore:factorNumerator>\n");
-        ToReturn+=__T("\t\t\t\t\t<ebucore:factorDenominator>")+factorDenominator+__T("</ebucore:factorDenominator>\n");
+        ToReturn+=EbuCore_WithFactor(5, Ztring(), MI.Get(Stream_Video, StreamPos, Video_DisplayAspectRatio), factorNumerator, factorDenominator);
         ToReturn+=__T("\t\t\t\t</ebucore:aspectRatio>\n");
     }
 
@@ -1230,43 +1286,6 @@ Ztring EbuCore_Duration(int64s MS)
 }
 
 //---------------------------------------------------------------------------
-Ztring EbuCore_FrameRate(const Ztring& Name, const Ztring& Rational, const Ztring& Num, const Ztring& Den)
-{
-    Ztring factorNumerator, factorDenominator;
-    if (Rational==__T("23.976"))
-    {
-        factorNumerator=__T("24000");
-        factorDenominator=__T("1001");
-    }
-    if (Rational==__T("29.970"))
-    {
-        factorNumerator=__T("30000");
-        factorDenominator=__T("1001");
-    }
-    if (Rational==__T("59.940"))
-    {
-        factorNumerator=__T("60000");
-        factorDenominator=__T("1001");
-    }
-    if (factorNumerator.empty())
-    {
-        factorNumerator=Ztring::ToZtring(Rational.To_float64()*1000, 0);
-        factorDenominator=__T("1000");
-    }
-
-    Ztring ToReturn;
-    ToReturn+=__T("<");
-    ToReturn+=Name;
-    ToReturn+=__T(" factorNumerator=\"")+factorNumerator+__T("\"");
-    ToReturn+=__T(" factorDenominator=\"")+factorDenominator+__T("\"");
-    ToReturn+=__T(">")+Ztring::ToZtring(Rational.To_float64(), 0);
-    ToReturn+=__T("</");
-    ToReturn+=Name;
-    ToReturn+=__T(">");
-    return ToReturn;
-}
-
-//---------------------------------------------------------------------------
 void EbuCore_Transform_AcquisitionMetadata_Unit(Ztring &Unit, const Ztring &Name)
 {
     if (Name == __T("FocusPosition_ImagePlane")
@@ -1556,7 +1575,7 @@ void EbuCore_Transform_AcquisitionMetadata(Ztring &ToReturn, MediaInfo_Internal 
     else
         FrameRate=FrameRate_String.To_float64();
     if (FrameRate)
-       ToReturn+=__T("\t\t\t\t")+EbuCore_FrameRate(__T("ebucore:acquisitionFrameRate"), FrameRate_String, FrameRate_Num_String, FrameRate_Den_String)+__T("\n");
+       ToReturn+=__T("\t\t\t\t")+EbuCore_WithFactor(0, __T("ebucore:acquisitionFrameRate"), FrameRate_String, FrameRate_Num_String, FrameRate_Den_String)+__T("\n");
     int64u FrameCount=MI.Get(Stream_Other, StreamPos, Other_FrameCount).To_int64u();
 
     vector<size_t> Lines_Unique;

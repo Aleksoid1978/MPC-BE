@@ -237,8 +237,11 @@ void File_Hevc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator se
 {
     int32u Width = (*seq_parameter_set_Item)->pic_width_in_luma_samples;
     int32u Height= (*seq_parameter_set_Item)->pic_height_in_luma_samples;
-    int32u CropUnitX=Hevc_SubWidthC [(*seq_parameter_set_Item)->ChromaArrayType()];
-    int32u CropUnitY=Hevc_SubHeightC[(*seq_parameter_set_Item)->ChromaArrayType()];
+    int8u chromaArrayType = (*seq_parameter_set_Item)->ChromaArrayType();
+    if (chromaArrayType >= 4)
+        chromaArrayType = 0;
+    int32u CropUnitX=Hevc_SubWidthC [chromaArrayType];
+    int32u CropUnitY=Hevc_SubHeightC[chromaArrayType];
     Width -=((*seq_parameter_set_Item)->conf_win_left_offset+(*seq_parameter_set_Item)->conf_win_right_offset)*CropUnitX;
     Height-=((*seq_parameter_set_Item)->conf_win_top_offset +(*seq_parameter_set_Item)->conf_win_bottom_offset)*CropUnitY;
 
