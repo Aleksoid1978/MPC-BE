@@ -330,7 +330,7 @@ cmsFloat64Number DefaultEvalParametricFn(cmsInt32Number Type, const cmsFloat64Nu
 
     // Type 1 Reversed: X = Y ^1/gamma
     case -1:
-         if (R < 0) {
+        if (R < 0) {
 
             if (fabs(Params[0] - 1.0) < MATRIX_DET_TOLERANCE)
                 Val = R;
@@ -338,80 +338,123 @@ cmsFloat64Number DefaultEvalParametricFn(cmsInt32Number Type, const cmsFloat64Nu
                 Val = 0;
         }
         else
-            Val = pow(R, 1/Params[0]);
+        {
+            if (fabs(Params[0]) < MATRIX_DET_TOLERANCE)
+                Val = PLUS_INF;
+            else
+                Val = pow(R, 1 / Params[0]);
+        }
         break;
 
     // CIE 122-1966
     // Y = (aX + b)^Gamma  | X >= -b/a
     // Y = 0               | else
     case 2:
-        disc = -Params[2] / Params[1];
+    {
 
-        if (R >= disc ) {
+        if (fabs(Params[1]) < MATRIX_DET_TOLERANCE)
+        {
+            Val = 0;
+        }
+        else
+        {
+            disc = -Params[2] / Params[1];
 
-            e = Params[1]*R + Params[2];
+            if (R >= disc) {
 
-            if (e > 0)
-                Val = pow(e, Params[0]);
+                e = Params[1] * R + Params[2];
+
+                if (e > 0)
+                    Val = pow(e, Params[0]);
+                else
+                    Val = 0;
+            }
             else
                 Val = 0;
         }
-        else
-            Val = 0;
-        break;
+    }
+    break;
 
      // Type 2 Reversed
      // X = (Y ^1/g  - b) / a
      case -2:
-         if (R < 0)
+     {
+         if (fabs(Params[0]) < MATRIX_DET_TOLERANCE ||
+             fabs(Params[1]) < MATRIX_DET_TOLERANCE)
+         {
              Val = 0;
+         }
          else
-             Val = (pow(R, 1.0/Params[0]) - Params[2]) / Params[1];
+         {
+             if (R < 0)
+                 Val = 0;
+             else
+                 Val = (pow(R, 1.0 / Params[0]) - Params[2]) / Params[1];
 
-         if (Val < 0)
-              Val = 0;
-         break;
+             if (Val < 0)
+                 Val = 0;
+         }
+     }         
+     break;
 
 
     // IEC 61966-3
     // Y = (aX + b)^Gamma | X <= -b/a
     // Y = c              | else
     case 3:
-        disc = -Params[2] / Params[1];
-        if (disc < 0)
-            disc = 0;
-
-        if (R >= disc) {
-
-            e = Params[1]*R + Params[2];
-
-            if (e > 0)
-                Val = pow(e, Params[0]) + Params[3];
-            else
-                Val = 0;
+    {
+        if (fabs(Params[1]) < MATRIX_DET_TOLERANCE)
+        {
+            Val = 0;
         }
         else
-            Val = Params[3];
-        break;
+        {
+            disc = -Params[2] / Params[1];
+            if (disc < 0)
+                disc = 0;
+
+            if (R >= disc) {
+
+                e = Params[1] * R + Params[2];
+
+                if (e > 0)
+                    Val = pow(e, Params[0]) + Params[3];
+                else
+                    Val = 0;
+            }
+            else
+                Val = Params[3];
+        }
+    }
+    break;
 
 
     // Type 3 reversed
     // X=((Y-c)^1/g - b)/a      | (Y>=c)
     // X=-b/a                   | (Y<c)
     case -3:
-        if (R >= Params[3])  {
-
-            e = R - Params[3];
-
-            if (e > 0)
-                Val = (pow(e, 1/Params[0]) - Params[2]) / Params[1];
-            else
-                Val = 0;
+    {
+        if (fabs(Params[1]) < MATRIX_DET_TOLERANCE)
+        {
+            Val = 0;
         }
-        else {
-            Val = -Params[2] / Params[1];
+        else
+        {
+            if (R >= Params[3]) {
+
+                e = R - Params[3];
+
+                if (e > 0)
+                    Val = (pow(e, 1 / Params[0]) - Params[2]) / Params[1];
+                else
+                    Val = 0;
+            }
+            else {
+                Val = -Params[2] / Params[1];
+            }
         }
-        break;
+    }
+    break;
 
 
     // IEC 61966-2.1 (sRGB)
@@ -435,20 +478,31 @@ cmsFloat64Number DefaultEvalParametricFn(cmsInt32Number Type, const cmsFloat64Nu
     // X=((Y^1/g-b)/a)    | Y >= (ad+b)^g
     // X=Y/c              | Y< (ad+b)^g
     case -4:
-        e = Params[1] * Params[4] + Params[2];
-        if (e < 0)
-            disc = 0;
+    {
+        if (fabs(Params[0]) < MATRIX_DET_TOLERANCE ||
+            fabs(Params[1]) < MATRIX_DET_TOLERANCE ||
+            fabs(Params[3]) < MATRIX_DET_TOLERANCE)
+        {
+            Val = 0;
+        }
         else
-            disc = pow(e, Params[0]);
+        {
+            e = Params[1] * Params[4] + Params[2];
+            if (e < 0)
+                disc = 0;
+            else
+                disc = pow(e, Params[0]);
 
-        if (R >= disc) {
+            if (R >= disc) {
 
-            Val = (pow(R, 1.0/Params[0]) - Params[2]) / Params[1];
+                Val = (pow(R, 1.0 / Params[0]) - Params[2]) / Params[1];
+            }
+            else {
+                Val = R / Params[3];
+            }
         }
-        else {
-            Val = R / Params[3];
-        }
-        break;
+    }
+    break;
 
 
     // Y = (aX + b)^Gamma + e | X >= d
@@ -472,20 +526,29 @@ cmsFloat64Number DefaultEvalParametricFn(cmsInt32Number Type, const cmsFloat64Nu
     // X=((Y-e)1/g-b)/a   | Y >=(ad+b)^g+e), cd+f
     // X=(Y-f)/c          | else
     case -5:
-
-        disc = Params[3] * Params[4] + Params[6];
-        if (R >= disc) {
-
-            e = R - Params[5];
-            if (e < 0)
-                Val = 0;
-            else
-                Val = (pow(e, 1.0/Params[0]) - Params[2]) / Params[1];
+    {
+        if (fabs(Params[1]) < MATRIX_DET_TOLERANCE ||
+            fabs(Params[3]) < MATRIX_DET_TOLERANCE)
+        {
+            Val = 0;
         }
-        else {
-            Val = (R - Params[6]) / Params[3];
+        else
+        {
+            disc = Params[3] * Params[4] + Params[6];
+            if (R >= disc) {
+
+                e = R - Params[5];
+                if (e < 0)
+                    Val = 0;
+                else
+                    Val = (pow(e, 1.0 / Params[0]) - Params[2]) / Params[1];
+            }
+            else {
+                Val = (R - Params[6]) / Params[3];
+            }
         }
-        break;
+    }
+    break;
 
 
     // Types 6,7,8 comes from segmented curves as described in ICCSpecRevision_02_11_06_Float.pdf
@@ -503,12 +566,21 @@ cmsFloat64Number DefaultEvalParametricFn(cmsInt32Number Type, const cmsFloat64Nu
 
     // ((Y - c) ^1/Gamma - b) / a
     case -6:
-        e = R - Params[3];
-        if (e < 0)
+    {
+        if (fabs(Params[1]) < MATRIX_DET_TOLERANCE)
+        {
             Val = 0;
+        }
         else
-        Val = (pow(e, 1.0/Params[0]) - Params[2]) / Params[1];
-        break;
+        {
+            e = R - Params[3];
+            if (e < 0)
+                Val = 0;
+            else
+                Val = (pow(e, 1.0 / Params[0]) - Params[2]) / Params[1];
+        }
+    }
+    break;
 
 
     // Y = a * log (b * X^Gamma + c) + d
@@ -525,8 +597,19 @@ cmsFloat64Number DefaultEvalParametricFn(cmsInt32Number Type, const cmsFloat64Nu
     // pow(10, (Y-d) / a) = b * X ^Gamma + c
     // pow((pow(10, (Y-d) / a) - c) / b, 1/g) = X
     case -7:
-       Val = pow((pow(10.0, (R-Params[4]) / Params[1]) - Params[3]) / Params[2], 1.0 / Params[0]);
-       break;
+    {
+        if (fabs(Params[0]) < MATRIX_DET_TOLERANCE ||
+            fabs(Params[1]) < MATRIX_DET_TOLERANCE ||
+            fabs(Params[2]) < MATRIX_DET_TOLERANCE)
+        {
+            Val = 0;
+        }
+        else
+        {
+            Val = pow((pow(10.0, (R - Params[4]) / Params[1]) - Params[3]) / Params[2], 1.0 / Params[0]);
+        }
+    }
+    break;
 
 
    //Y = a * b^(c*X+d) + e
@@ -542,12 +625,25 @@ cmsFloat64Number DefaultEvalParametricFn(cmsInt32Number Type, const cmsFloat64Nu
        disc = R - Params[4];
        if (disc < 0) Val = 0;
        else
-           Val = (log(disc / Params[0]) / log(Params[1]) - Params[3]) / Params[2];
+       {
+           if (fabs(Params[0]) < MATRIX_DET_TOLERANCE ||
+               fabs(Params[2]) < MATRIX_DET_TOLERANCE)
+           {
+               Val = 0;
+           }
+           else
+           {
+               Val = (log(disc / Params[0]) / log(Params[1]) - Params[3]) / Params[2];
+           }
+       }
        break;
 
    // S-Shaped: (1 - (1-x)^1/g)^1/g
    case 108:
-      Val = pow(1.0 - pow(1 - R, 1/Params[0]), 1/Params[0]);
+       if (fabs(Params[0]) < MATRIX_DET_TOLERANCE)
+           Val = 0;
+       else
+           Val = pow(1.0 - pow(1 - R, 1/Params[0]), 1/Params[0]);
       break;
 
     // y = (1 - (1-x)^1/g)^1/g

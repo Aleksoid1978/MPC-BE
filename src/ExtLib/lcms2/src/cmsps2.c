@@ -943,7 +943,6 @@ cmsFloat64Number* GetPtrToMatrix(const cmsStage* mpe)
 
 
 // Does create CSA based on matrix-shaper. Allowed types are gray and RGB based
-
 static
 int WriteInputMatrixShaper(cmsIOHANDLER* m, cmsHPROFILE hProfile, cmsStage* Matrix, cmsStage* Shaper)
 {
@@ -969,17 +968,17 @@ int WriteInputMatrixShaper(cmsIOHANDLER* m, cmsHPROFILE hProfile, cmsStage* Matr
 
             memmove(&Mat, GetPtrToMatrix(Matrix), sizeof(Mat));
 
-            for (i=0; i < 3; i++)
-                for (j=0; j < 3; j++)
+            for (i = 0; i < 3; i++)
+                for (j = 0; j < 3; j++)
                     Mat.v[i].n[j] *= MAX_ENCODEABLE_XYZ;
 
-            rc = EmitCIEBasedABC(m,  (cmsFloat64Number *) &Mat,
-                                _cmsStageGetPtrToCurveSet(Shaper),
-                                 &BlackPointAdaptedToD50);
+            rc = EmitCIEBasedABC(m, (cmsFloat64Number *)&Mat,
+                _cmsStageGetPtrToCurveSet(Shaper),
+                &BlackPointAdaptedToD50);
         }
-        else  {
+        else {
 
-            cmsSignalError(m ->ContextID, cmsERROR_COLORSPACE_CHECK, "Profile is not suitable for CSA. Unsupported colorspace.");
+            cmsSignalError(m->ContextID, cmsERROR_COLORSPACE_CHECK, "Profile is not suitable for CSA. Unsupported colorspace.");
             return 0;
         }
 
