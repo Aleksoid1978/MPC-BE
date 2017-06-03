@@ -178,6 +178,13 @@ cmsBool ReadPositionTable(struct _cms_typehandler_struct* self,
 {
     cmsUInt32Number i;
     cmsUInt32Number *ElementOffsets = NULL, *ElementSizes = NULL;
+    cmsUInt32Number currentPosition;
+
+    currentPosition = io->Tell(io);
+
+    // Verify there is enough space left to read at least two cmsUInt32Number items for Count items.
+    if (((io->ReportedSize - currentPosition) / (2 * sizeof(cmsUInt32Number))) < Count)
+        return FALSE;
 
     // Let's take the offsets to each element
     ElementOffsets = (cmsUInt32Number *) _cmsCalloc(io ->ContextID, Count, sizeof(cmsUInt32Number));

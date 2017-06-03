@@ -7,7 +7,7 @@ Updated libraries:
 	ffmpeg git-n3.4-dev-648-g0a6ca7aa0a;
 	libflac git-1.3.2-55-gbb750734;
 	libpng git-v1.6.30beta03-6-g11629b1c1;
-	Little-CMS git-lcms2.8-66-gf9d75cc;
+	Little-CMS git-lcms2.8-72-gd168300;
 	MediaInfo git-v0.7.94-35-ge569385d;
 	Speex-1.2.0-1-gcae5026;
 	rapidjson git-v1.1.0-165-gb8f0414b;
