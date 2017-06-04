@@ -1257,25 +1257,15 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 {
 	if (pMsg->message == WM_KEYDOWN) {
-		/*		if (m_fShockwaveGraph
-				&& (pMsg->wParam == VK_LEFT || pMsg->wParam == VK_RIGHT
-					|| pMsg->wParam == VK_UP || pMsg->wParam == VK_DOWN))
-					return FALSE;
-		*/
 		if (pMsg->wParam == VK_ESCAPE) {
-			bool fEscapeNotAssigned = !AssignedToCmd(VK_ESCAPE, m_bFullScreen, false);
-
-			if (fEscapeNotAssigned) {
-				if (m_bFullScreen || IsD3DFullScreenMode()) {
-					OnViewFullscreen();
-					if (m_eMediaLoadState == MLS_LOADED) {
-						PostMessage(WM_COMMAND, ID_PLAY_PAUSE);
-					}
-					return TRUE;
-				//} else if (IsCaptionHidden()) {
-				//	PostMessage(WM_COMMAND, ID_VIEW_CAPTIONMENU);
-				//	return TRUE;
+			const bool bEscapeNotAssigned = !AssignedToCmd(VK_ESCAPE, m_bFullScreen, false);
+			if (bEscapeNotAssigned
+					&& (m_bFullScreen || IsD3DFullScreenMode())) {
+				OnViewFullscreen();
+				if (m_eMediaLoadState == MLS_LOADED) {
+					PostMessage(WM_COMMAND, ID_PLAY_PAUSE);
 				}
+				return TRUE;
 			}
 		} else if (pMsg->wParam == VK_LEFT && pAMTuner) {
 			PostMessage(WM_COMMAND, ID_NAVIGATE_SKIPBACK);
@@ -1287,6 +1277,22 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 	} else if (pMsg->message == WM_SYSKEYDOWN && pMsg->wParam == VK_MENU
 			&& CursorOnD3DFullScreenWindow()) {
 		// disable pressing Alt on D3D FullScreen window.
+		return TRUE;
+	}
+
+	if (pMsg->message == WM_KEYDOWN) {
+		m_bAltDownClean = false;
+	}
+	if (pMsg->message == WM_SYSKEYDOWN) {
+		m_bAltDownClean = (pMsg->wParam == VK_MENU);
+	}
+	if ((m_dwMenuBarVisibility & AFX_MBV_DISPLAYONFOCUS) && pMsg->message == WM_SYSKEYUP && pMsg->wParam == VK_MENU
+			&& m_dwMenuBarState == AFX_MBS_HIDDEN) {
+		// mfc shows menubar when Ctrl+Alt+X is released in reverse order, but we don't want to
+		if (m_bAltDownClean) {
+			VERIFY(SetMenuBarState(AFX_MBS_VISIBLE));
+			return FALSE;
+		}
 		return TRUE;
 	}
 

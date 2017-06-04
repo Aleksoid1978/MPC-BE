@@ -1393,4 +1393,6 @@ protected:
 	void		SetToolBarSubtitleButton();
 
 	bool		CanSwitchD3DFS();
+
+	bool		m_bAltDownClean = false;
 };
