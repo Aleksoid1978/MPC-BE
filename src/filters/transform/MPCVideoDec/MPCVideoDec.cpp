@@ -39,6 +39,7 @@
 #include "../../parser/MpegSplitter/MpegSplitter.h"
 #include "../../Lock.h"
 #include <moreuuids.h>
+#include <IBaseFilterInfo.h>
 
 #include "Version.h"
 

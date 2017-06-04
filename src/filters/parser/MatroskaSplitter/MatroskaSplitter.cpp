@@ -156,6 +156,7 @@ STDMETHODIMP CMatroskaSplitterFilter::NonDelegatingQueryInterface(REFIID riid, v
 
 	return
 		QI(ITrackInfo)
+		QI(IBaseFilterInfo)
 		QI(IMatroskaSplitterFilter)
 		QI(ISpecifyPropertyPages)
 		QI(ISpecifyPropertyPages2)
