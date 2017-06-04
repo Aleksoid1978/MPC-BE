@@ -87,7 +87,6 @@ STDMETHODIMP CBaseSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void*
 		QI(IKeyFrameInfo)
 		QI(IBufferInfo)
 		QI(IBufferControl)
-		QI(IBaseFilterInfo)
 		QI(IPropertyBag)
 		QI(IPropertyBag2)
 		QI(IDSMPropertyBag)

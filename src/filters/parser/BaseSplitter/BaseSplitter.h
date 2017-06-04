@@ -23,7 +23,6 @@
 
 #include <atlbase.h>
 #include <qnetwork.h>
-#include <IBaseFilterInfo.h>
 #include <IKeyFrameInfo.h>
 #include <IBufferInfo.h>
 #include <IBufferControl.h>
@@ -57,7 +56,6 @@ class CBaseSplitterFilter
 	, public IKeyFrameInfo
 	, public IBufferInfo
 	, public IBufferControl
-	, public IBaseFilterInfo
 {
 	CCritSec m_csPinMap;
 	CAtlMap<DWORD, CBaseSplitterOutputPin*> m_pPinMap;
@@ -223,11 +221,6 @@ public:
 	// IBufferControl
 
 	STDMETHODIMP SetBufferDuration(int duration);
-
-	// IBaseFilterInfo
-	STDMETHODIMP GetInt   (LPCSTR field, int    *value)                { return E_NOTIMPL; }
-	STDMETHODIMP GetString(LPCSTR field, LPWSTR *value, size_t *chars) { return E_NOTIMPL; }
-	STDMETHODIMP GetBin   (LPCSTR field, LPVOID *value, size_t *size ) { return E_NOTIMPL; }
 
 public:
 	CComQIPtr<ISyncReader> m_pSyncReader;
