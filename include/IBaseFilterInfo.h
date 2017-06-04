@@ -1,5 +1,5 @@
 /*
- * (C) 2016 see Authors.txt
+ * (C) 2016-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,7 +25,6 @@ public IUnknown {
 	// The memory for strings and binary data is allocated by the callee
 	// by using LocalAlloc. It is the caller's responsibility to release the
 	// memory by calling LocalFree.
-	// Field names and LPWSTR values should be read case insensitive.
 	STDMETHOD(GetInt   )(LPCSTR field, int    *value) PURE;
 	STDMETHOD(GetString)(LPCSTR field, LPWSTR *value, size_t *chars) PURE;
 	STDMETHOD(GetBin   )(LPCSTR field, LPVOID *value, size_t *size ) PURE;
