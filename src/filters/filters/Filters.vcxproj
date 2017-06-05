@@ -57,6 +57,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FilterInterfacesImpl.h" />
     <ClInclude Include="Filters.h" />
     <ClInclude Include="InternalPropertyPage.h" />
     <ClInclude Include="stdafx.h" />
