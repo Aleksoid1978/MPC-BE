@@ -23,6 +23,7 @@
 #include <math.h>
 #include "../../DSUtil/SysVersion.h"
 #include "../../filters/renderer/MpcAudioRenderer/MpcAudioRenderer.h"
+#include "../../filters/transform/MpaDecFilter/MpaDecFilter.h"
 #include "ComPropertyPage.h"
 #include "MainFrm.h"
 #include "PPageAudio.h"
@@ -61,6 +62,7 @@ void CPPageAudio::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Control(pDX, IDC_CHECK7, m_chkMixer);
 	DDX_Control(pDX, IDC_COMBO2, m_cmbMixerLayout);
+	DDX_Control(pDX, IDC_CHECK8, m_chkStereoFromDecoder);
 	DDX_Control(pDX, IDC_BASSREDIRECT_CHECK, m_chkBassRedirect);
 
 	DDX_Control(pDX, IDC_SLIDER1, m_sldGain);
@@ -84,6 +86,7 @@ BEGIN_MESSAGE_MAP(CPPageAudio, CPPageBase)
 	ON_BN_CLICKED(IDC_CHECK1, OnDualAudioOutputCheck)
 	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedResetAudioPaths)
 	ON_BN_CLICKED(IDC_CHECK7, OnMixerCheck)
+	ON_CBN_SELCHANGE(IDC_COMBO2, OnMixerLayoutChange)
 	ON_BN_CLICKED(IDC_CHECK5, OnAutoVolumeControlCheck)
 	ON_BN_CLICKED(IDC_CHECK4, OnTimeShiftCheck)
 	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedSoundProcessingDefault)
@@ -96,7 +99,6 @@ BOOL CPPageAudio::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	GetDlgItem(IDC_CHECK8)->ShowWindow(SW_HIDE);
 	SetCursor(m_hWnd, IDC_AUDRND_COMBO, IDC_HAND);
 
 	CAppSettings& s = AfxGetAppSettings();
@@ -205,6 +207,7 @@ BOOL CPPageAudio::OnInitDialog()
 	AddStringData(m_cmbMixerLayout, L"5.1", SPK_5_1);
 	AddStringData(m_cmbMixerLayout, L"7.1", SPK_7_1);
 	SelectByItemData(m_cmbMixerLayout, s.nAudioMixerLayout);
+	m_chkStereoFromDecoder.SetCheck(s.bAudioStereoFromDecoder);
 	m_chkBassRedirect.SetCheck(s.bAudioBassRedirect);
 
 	m_sldGain.SetRange(-30, 100, TRUE);
@@ -255,6 +258,7 @@ BOOL CPPageAudio::OnApply()
 
 	s.bAudioMixer				= !!m_chkMixer.GetCheck();
 	s.nAudioMixerLayout			= GetCurItemData(m_cmbMixerLayout);
+	s.bAudioStereoFromDecoder	= !!m_chkStereoFromDecoder.GetCheck();
 	s.bAudioBassRedirect		= !!m_chkBassRedirect.GetCheck();
 
 	s.fAudioGain_dB				= m_sldGain.GetPos() / 10.0f;
@@ -268,8 +272,17 @@ BOOL CPPageAudio::OnApply()
 
 	IFilterGraph* pFG = AfxGetMainFrame()->m_pGB;
 	if (pFG) {
-		CComQIPtr<IAudioSwitcherFilter> m_pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG);
-		if (m_pASF) {
+		BeginEnumFilters(pFG, pEF, pBF) {
+			CLSID clsid2;
+			if (SUCCEEDED(pBF->GetClassID(&clsid2)) && __uuidof(CMpaDecFilter) == clsid2) {
+				if (CComQIPtr<IExFilterConfig> pEFC = pBF) {
+					pEFC->SetBool("stereodownmix", s.bAudioMixer && s.nAudioMixerLayout == SPK_STEREO && s.bAudioStereoFromDecoder);
+				}
+			}
+		}
+		EndEnumFilters
+
+		if (CComQIPtr<IAudioSwitcherFilter> m_pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG)) {
 			m_pASF->SetChannelMixer(s.bAudioMixer, s.nAudioMixerLayout);
 			m_pASF->SetBassRedirect(s.bAudioBassRedirect);
 			m_pASF->SetAudioGain(s.fAudioGain_dB);
@@ -425,13 +438,15 @@ void CPPageAudio::OnBnClickedResetAudioPaths()
 
 void CPPageAudio::OnMixerCheck()
 {
-	if (m_chkMixer.GetCheck()) {
-		m_cmbMixerLayout.EnableWindow();
-	} else {
-		m_cmbMixerLayout.EnableWindow(FALSE);
-	}
+	m_cmbMixerLayout.EnableWindow(m_chkMixer.GetCheck());
+	m_chkStereoFromDecoder.EnableWindow(m_chkMixer.GetCheck() && GetCurItemData(m_cmbMixerLayout) == SPK_STEREO);
 
 	SetModified();
+}
+
+void CPPageAudio::OnMixerLayoutChange()
+{
+	m_chkStereoFromDecoder.EnableWindow(m_chkMixer.GetCheck() && GetCurItemData(m_cmbMixerLayout) == SPK_STEREO);
 }
 
 void CPPageAudio::OnAutoVolumeControlCheck()

@@ -54,12 +54,14 @@ protected:
 	HRESULT ParseRealAudioHeader(const BYTE* extra, const int extralen);
 
 	bool m_bNeedSyncpoint;
+	bool m_bStereoDownmix;
 
 public:
 	CFFAudioDecoder();
 
 	bool    Init(enum AVCodecID codecID, CMediaType* mediaType);
 	void    SetDRC(bool fDRC);
+	void    SetStereoDownmix(bool stereodownmix);
 
 	HRESULT RealPrepare(BYTE* p, int buffsize, CPaddedArray& BuffOut);
 	HRESULT SendData(BYTE* p, int size, int* out_size = NULL);

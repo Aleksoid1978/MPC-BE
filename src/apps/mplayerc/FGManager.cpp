@@ -2779,6 +2779,10 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 		}
 	}
 
+	if (CComQIPtr<IExFilterConfig> pEFC = pBF) {
+		pEFC->SetBool("stereodownmix", s.bAudioMixer && s.nAudioMixerLayout == SPK_STEREO && s.bAudioStereoFromDecoder);
+	}
+
 	if (CComQIPtr<IAudioSwitcherFilter> pASF = pBF) {
 		pASF->SetChannelMixer(s.bAudioMixer, s.nAudioMixerLayout);
 		pASF->SetBassRedirect(s.bAudioBassRedirect);

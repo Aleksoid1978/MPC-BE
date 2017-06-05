@@ -204,6 +204,7 @@ CFFAudioDecoder::CFFAudioDecoder()
 	, m_pParser(NULL)
 	, m_pFrame(NULL)
 	, m_bNeedSyncpoint(false)
+	, m_bStereoDownmix(false)
 {
 	memset(&m_raData, 0, sizeof(m_raData));
 
@@ -332,9 +333,9 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 			m_pAVCtx->flags				|= AV_CODEC_FLAG_TRUNCATED;
 		}
 
-		//if (stereodownmix) { // works to AC3, TrueHD, DTS
-		//	m_pAVCtx->request_channel_layout = AV_CH_LAYOUT_STEREO;
-		//}
+		if (m_bStereoDownmix) { // works to AC3, TrueHD, DTS
+			m_pAVCtx->request_channel_layout = AV_CH_LAYOUT_STEREO;
+		}
 
 		m_pParser = av_parser_init(codec_id);
 
@@ -432,6 +433,18 @@ void CFFAudioDecoder::SetDRC(bool fDRC)
 		AVCodecID codec_id = m_pAVCtx->codec_id;
 		if (codec_id == AV_CODEC_ID_AC3 || codec_id == AV_CODEC_ID_EAC3) {
 			av_opt_set_double(m_pAVCtx, "drc_scale", fDRC ? 1.0f : 0.0f, AV_OPT_SEARCH_CHILDREN);
+		}
+	}
+}
+
+void CFFAudioDecoder::SetStereoDownmix(bool stereodownmix)
+{
+	if (stereodownmix != m_bStereoDownmix) {
+		m_bStereoDownmix = stereodownmix;
+		AVCodecID codec = GetCodecId();
+		if (codec == AV_CODEC_ID_AC3 || codec == AV_CODEC_ID_EAC3 || codec == AV_CODEC_ID_DTS || codec == AV_CODEC_ID_TRUEHD) {
+			// reinit for supported codec only
+			Init(codec, NULL);
 		}
 	}
 }
