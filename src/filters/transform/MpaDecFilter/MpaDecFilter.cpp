@@ -2508,7 +2508,8 @@ STDMETHODIMP CMpaDecFilter::SetBool(LPCSTR field, bool value)
 	if (strcmp(field, "stereodownmix") == 0) {
 		CAutoLock cAutoLock2(&m_csReceive); // because the decoder can be reinitialized
 		m_FFAudioDec.SetStereoDownmix(value);
+		return S_OK;
 	}
 
-	return S_OK;
+	return E_INVALIDARG;
 }

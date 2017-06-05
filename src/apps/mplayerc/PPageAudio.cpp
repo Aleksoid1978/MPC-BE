@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -270,11 +270,10 @@ BOOL CPPageAudio::OnApply()
 	s.bAudioTimeShift			= !!m_chkTimeShift.GetCheck();
 	s.iAudioTimeShift			= m_edtTimeShift;
 
-	IFilterGraph* pFG = AfxGetMainFrame()->m_pGB;
-	if (pFG) {
+	if (IFilterGraph* pFG = AfxGetMainFrame()->m_pGB) {
 		BeginEnumFilters(pFG, pEF, pBF) {
-			CLSID clsid2;
-			if (SUCCEEDED(pBF->GetClassID(&clsid2)) && __uuidof(CMpaDecFilter) == clsid2) {
+			CLSID clsid;
+			if (SUCCEEDED(pBF->GetClassID(&clsid)) && __uuidof(CMpaDecFilter) == clsid) {
 				if (CComQIPtr<IExFilterConfig> pEFC = pBF) {
 					pEFC->SetBool("stereodownmix", s.bAudioMixer && s.nAudioMixerLayout == SPK_STEREO && s.bAudioStereoFromDecoder);
 				}
