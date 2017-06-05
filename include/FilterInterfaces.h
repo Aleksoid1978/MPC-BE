@@ -46,6 +46,6 @@ interface __declspec(uuid("37CBDF10-D65E-4E5A-8F37-40E0C8EA1695")) IExFilterConf
 	STDMETHOD(SetInt   )(LPCSTR field, int     value) PURE;
 	STDMETHOD(SetInt64 )(LPCSTR field, __int64 value) PURE;
 	STDMETHOD(SetDouble)(LPCSTR field, double  value) PURE;
-	STDMETHOD(SetString)(LPCSTR field, LPWSTR  value, unsigned chars) PURE;
-	STDMETHOD(SetBin   )(LPCSTR field, LPVOID  value, unsigned size ) PURE;
+	STDMETHOD(SetString)(LPCSTR field, LPWSTR  value, int chars) PURE;
+	STDMETHOD(SetBin   )(LPCSTR field, LPVOID  value, int size ) PURE;
 };
