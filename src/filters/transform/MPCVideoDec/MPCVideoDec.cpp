@@ -39,7 +39,7 @@
 #include "../../parser/MpegSplitter/MpegSplitter.h"
 #include "../../Lock.h"
 #include <moreuuids.h>
-#include <IBaseFilterInfo.h>
+#include <FilterInterfaces.h>
 
 #include "Version.h"
 
@@ -1191,9 +1191,9 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 			} else {
 				DLog(L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR data of an unexpected size (%d)", sd->size);
 			}
-		} else if (m_baseFilterInfo.masterDataHDR) {
-			pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)m_baseFilterInfo.masterDataHDR, sizeof(MediaSideDataHDR));
-			SAFE_DELETE(m_baseFilterInfo.masterDataHDR);
+		} else if (m_FilterInfo.masterDataHDR) {
+			pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)m_FilterInfo.masterDataHDR, sizeof(MediaSideDataHDR));
+			SAFE_DELETE(m_FilterInfo.masterDataHDR);
 
 			return true;
 		}
@@ -1442,7 +1442,7 @@ void CMPCVideoDecFilter::Cleanup()
 	m_pDeviceManager.Release();
 	m_pDecoderService.Release();
 
-	m_baseFilterInfo.Clear();
+	m_FilterInfo.Clear();
 }
 
 void CMPCVideoDecFilter::ffmpegCleanup()
@@ -1814,49 +1814,49 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	FillAVCodecProps(m_pAVCtx);
 
 	if (bChangeType && pFilter) {
-		m_baseFilterInfo.Clear();
+		m_FilterInfo.Clear();
 
-		CComPtr<IBaseFilterInfo> pBaseFilterInfo;
-		if (SUCCEEDED(pFilter->QueryInterface(&pBaseFilterInfo))) {
+		CComPtr<IExFilterInfo> pIExFilterInfo;
+		if (SUCCEEDED(pFilter->QueryInterface(&pIExFilterInfo))) {
 			int value;
-			if (SUCCEEDED(pBaseFilterInfo->GetInt("VIDEO_PROFILE", &value))) {
-				m_baseFilterInfo.profile = value;
+			if (SUCCEEDED(pIExFilterInfo->GetInt("VIDEO_PROFILE", &value))) {
+				m_FilterInfo.profile = value;
 			}
-			if (SUCCEEDED(pBaseFilterInfo->GetInt("VIDEO_PIXEL_FORMAT", &value))) {
-				m_baseFilterInfo.pix_fmt = value;
+			if (SUCCEEDED(pIExFilterInfo->GetInt("VIDEO_PIXEL_FORMAT", &value))) {
+				m_FilterInfo.pix_fmt = value;
 			}
 
-			size_t size = 0;
+			unsigned size = 0;
 			LPVOID pData = NULL;
-			if (SUCCEEDED(pBaseFilterInfo->GetBin("VIDEO_COLOR_SPACE", &pData, &size))) {
+			if (SUCCEEDED(pIExFilterInfo->GetBin("VIDEO_COLOR_SPACE", &pData, &size))) {
 				if (size == sizeof(ColorSpace)) {
-					m_baseFilterInfo.colorSpace = DNew ColorSpace;
-					memcpy(m_baseFilterInfo.colorSpace, pData, sizeof(ColorSpace));
+					m_FilterInfo.colorSpace = DNew ColorSpace;
+					memcpy(m_FilterInfo.colorSpace, pData, sizeof(ColorSpace));
 				}
 				LocalFree(pData);
 			}
-			if (SUCCEEDED(pBaseFilterInfo->GetBin("HDR_MASTERING_METADATA", &pData, &size))) {
+			if (SUCCEEDED(pIExFilterInfo->GetBin("HDR_MASTERING_METADATA", &pData, &size))) {
 				if (size == sizeof(MediaSideDataHDR)) {
-					m_baseFilterInfo.masterDataHDR = DNew MediaSideDataHDR;
-					memcpy(m_baseFilterInfo.masterDataHDR, pData, sizeof(MediaSideDataHDR));
+					m_FilterInfo.masterDataHDR = DNew MediaSideDataHDR;
+					memcpy(m_FilterInfo.masterDataHDR, pData, sizeof(MediaSideDataHDR));
 				}
 				LocalFree(pData);
 			}
 		}
 	}
 
-	if (m_baseFilterInfo.profile != -1) {
-		m_pAVCtx->profile = m_baseFilterInfo.profile;
+	if (m_FilterInfo.profile != -1) {
+		m_pAVCtx->profile = m_FilterInfo.profile;
 	}
-	if (m_baseFilterInfo.pix_fmt != AV_PIX_FMT_NONE) {
-		m_pAVCtx->pix_fmt = (AVPixelFormat)m_baseFilterInfo.pix_fmt;
+	if (m_FilterInfo.pix_fmt != AV_PIX_FMT_NONE) {
+		m_pAVCtx->pix_fmt = (AVPixelFormat)m_FilterInfo.pix_fmt;
 	}
-	if (m_baseFilterInfo.colorSpace) {
-		m_pAVCtx->colorspace             = (AVColorSpace)m_baseFilterInfo.colorSpace->MatrixCoefficients;
-		m_pAVCtx->color_primaries        = (AVColorPrimaries)m_baseFilterInfo.colorSpace->Primaries;
-		m_pAVCtx->color_range            = (AVColorRange)m_baseFilterInfo.colorSpace->Range;
-		m_pAVCtx->color_trc              = (AVColorTransferCharacteristic)m_baseFilterInfo.colorSpace->TransferCharacteristics;
-		m_pAVCtx->chroma_sample_location = (AVChromaLocation)m_baseFilterInfo.colorSpace->ChromaLocation;
+	if (m_FilterInfo.colorSpace) {
+		m_pAVCtx->colorspace             = (AVColorSpace)m_FilterInfo.colorSpace->MatrixCoefficients;
+		m_pAVCtx->color_primaries        = (AVColorPrimaries)m_FilterInfo.colorSpace->Primaries;
+		m_pAVCtx->color_range            = (AVColorRange)m_FilterInfo.colorSpace->Range;
+		m_pAVCtx->color_trc              = (AVColorTransferCharacteristic)m_FilterInfo.colorSpace->TransferCharacteristics;
+		m_pAVCtx->chroma_sample_location = (AVChromaLocation)m_FilterInfo.colorSpace->ChromaLocation;
 	}
 
 	m_PixelFormat = m_pAVCtx->pix_fmt;
