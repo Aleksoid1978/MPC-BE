@@ -55,6 +55,7 @@ protected:
 
 	bool m_bNeedSyncpoint;
 	bool m_bStereoDownmix;
+	bool m_bNeedReinit;
 
 public:
 	CFFAudioDecoder();
@@ -78,5 +79,6 @@ public:
 	DWORD GetChannelMask();      // unsafe
 	WORD  GetCoddedBitdepth();   // unsafe
 
-	bool GetNeedSyncPoint() const { return m_bNeedSyncpoint; }
+	bool NeedReinit()    const { return m_bNeedReinit;    }
+	bool NeedSyncPoint() const { return m_bNeedSyncpoint; }
 };
