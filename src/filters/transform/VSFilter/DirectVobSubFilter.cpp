@@ -1605,25 +1605,28 @@ HRESULT CDirectVobSubFilter2::CheckInputType(const CMediaType* mtIn)
 
 bool CDirectVobSubFilter2::ShouldWeAutoload(IFilterGraph* pGraph)
 {
-	WCHAR* blacklistedapps[] = {
-		L"wm8eutil.",        // wmp8 encoder's dummy renderer releases the outputted media sample after calling Receive on its input pin (yes, even when dvobsub isn't registered at all)
-		L"explorer.",        // as some users reported thumbnail preview loads dvobsub, I've never experienced this yet...
-		L"producer.",        // this is real's producer
-		L"googledesktop",    // Google Desktop
-		L"subtitleworkshop", // Subtitle Workshop
-		L"darksouls.",       // Dark Souls (Game)
-		L"rometw.",          // Rome Total War (Game)
-		L"everquest2.",      // EverQuest II (Game)
-		L"yso_win.",         // Ys Origin (Game)
-		L"launcher_main.",   // Logitech WebCam Software
-		L"webcamdell",       // Dell WebCam Software
-		L"data.",            // Dark Souls 1 (Game)
-		L"unravel",          // Unravel (Game)
-		L"mshta",            // MS Scripting Host
+	// all entries must be lowercase!
+	TCHAR* blacklistedapps[] = {
+		_T("wm8eutil."),        // wmp8 encoder's dummy renderer releases the outputted media sample after calling Receive on its input pin (yes, even when dvobsub isn't registered at all)
+		_T("explorer."),        // as some users reported thumbnail preview loads dvobsub, I've never experienced this yet...
+		_T("producer."),        // this is real's producer
+		_T("googledesktop"),    // Google Desktop
+		_T("subtitleworkshop"), // Subtitle Workshop
+		_T("darksouls."),       // Dark Souls (Game)
+		_T("rometw."),          // Rome Total War (Game)
+		_T("everquest2."),      // EverQuest II (Game)
+		_T("yso_win."),         // Ys Origin (Game)
+		_T("launcher_main."),   // Logitech WebCam Software
+		_T("webcamdell"),       // Dell WebCam Software
+		_T("data."),            // Dark Souls 1 (Game)
+		_T("unravel"),          // Unravel (Game)
+		_T("mshta"),            // MS Scripting Host
+		_T("origin.exe"),       // Origin
+		_T("train.exe"),        // Train Simulator (Game)
 #if WIN64
-		L"ridex64.exe",      // Ride (Game)
+		_T("ridex64.exe"),      // Ride (Game)
 #else
-		L"ride.exe",         // Ride (Game)
+		_T("ride.exe"),         // Ride (Game)
 #endif
 	};
 
