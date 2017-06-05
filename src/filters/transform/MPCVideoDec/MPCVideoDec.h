@@ -149,7 +149,7 @@ protected:
 			pix_fmt = -1;
 		}
 
-	} m_baseFilterInfo;
+	} m_FilterInfo;
 
 	// === Private functions
 	void			Cleanup();

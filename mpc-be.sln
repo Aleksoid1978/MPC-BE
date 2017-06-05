@@ -166,8 +166,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Include", "Include", "{EA3670A9-FD3E-413C-99DD-DF79E42CE0AC}"
 	ProjectSection(SolutionItems) = preProject
 		include\basestruct.h = include\basestruct.h
+		include\FilterInterfaces.h = include\FilterInterfaces.h
 		include\HighDPI.h = include\HighDPI.h
-		include\IBaseFilterInfo.h = include\IBaseFilterInfo.h
 		include\IBitRateInfo.h = include\IBitRateInfo.h
 		include\IBufferControl.h = include\IBufferControl.h
 		include\IBufferInfo.h = include\IBufferInfo.h

@@ -156,7 +156,7 @@ STDMETHODIMP CMatroskaSplitterFilter::NonDelegatingQueryInterface(REFIID riid, v
 
 	return
 		QI(ITrackInfo)
-		QI(IBaseFilterInfo)
+		QI(IExFilterInfo)
 		QI(IMatroskaSplitterFilter)
 		QI(ISpecifyPropertyPages)
 		QI(ISpecifyPropertyPages2)
@@ -2325,7 +2325,7 @@ STDMETHODIMP_(BOOL) CMatroskaSplitterFilter::GetCalcDuration()
 	return m_bCalcDuration;
 }
 
-// IBaseFilterInfo
+// IExFilterInfo
 
 STDMETHODIMP CMatroskaSplitterFilter::GetInt(LPCSTR field, int *value)
 {
@@ -2346,7 +2346,7 @@ STDMETHODIMP CMatroskaSplitterFilter::GetInt(LPCSTR field, int *value)
 	return E_INVALIDARG;
 }
 
-STDMETHODIMP CMatroskaSplitterFilter::GetBin(LPCSTR field, LPVOID *value, size_t *size)
+STDMETHODIMP CMatroskaSplitterFilter::GetBin(LPCSTR field, LPVOID *value, unsigned *size)
 {
 	CheckPointer(value, E_INVALIDARG);
 	CheckPointer(size, E_INVALIDARG);
