@@ -205,6 +205,7 @@ CFFAudioDecoder::CFFAudioDecoder()
 	, m_pFrame(NULL)
 	, m_bNeedSyncpoint(false)
 	, m_bStereoDownmix(false)
+	, m_bNeedReinit(false)
 {
 	memset(&m_raData, 0, sizeof(m_raData));
 
@@ -243,14 +244,16 @@ static bool ParseVorbisTag(const CString field_name, const CString vorbisTag, CS
 
 bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 {
-	AVCodecID codec_id	= AV_CODEC_ID_NONE;
-	int samplerate		= 0;
-	int channels		= 0;
-	int bitdeph			= 0;
-	int block_align		= 0;
-	int64_t bitrate		= 0;
-	BYTE* extradata		= NULL;
-	unsigned extralen	= 0;
+	AVCodecID codec_id = AV_CODEC_ID_NONE;
+	int samplerate     = 0;
+	int channels       = 0;
+	int bitdeph        = 0;
+	int block_align    = 0;
+	int64_t bitrate    = 0;
+	BYTE* extradata    = NULL;
+	unsigned extralen  = 0;
+
+	m_bNeedReinit      = false;
 
 	if (codecID == AV_CODEC_ID_NONE || mediaType == NULL) {
 		if (m_pAVCodec == NULL || m_pAVCtx == NULL || m_pAVCtx->codec_id == AV_CODEC_ID_NONE) {
@@ -444,7 +447,7 @@ void CFFAudioDecoder::SetStereoDownmix(bool stereodownmix)
 		AVCodecID codec = GetCodecId();
 		if (codec == AV_CODEC_ID_AC3 || codec == AV_CODEC_ID_EAC3 || codec == AV_CODEC_ID_DTS || codec == AV_CODEC_ID_TRUEHD) {
 			// reinit for supported codec only
-			Init(codec, NULL);
+			m_bNeedReinit = true;
 		}
 	}
 }

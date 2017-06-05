@@ -485,7 +485,7 @@ HRESULT CMpaDecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, d
 	m_bResync = true;
 	m_rtStart = 0; // LOOKATTHIS // reset internal timer?
 
-	m_bNeedSyncPoint = m_FFAudioDec.GetNeedSyncPoint();
+	m_bNeedSyncPoint = m_FFAudioDec.NeedSyncPoint();
 
 	m_dRate = dRate > 0.0 ? dRate : 1.0;
 
@@ -841,6 +841,10 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 							  || nCodecId == AV_CODEC_ID_SIPR
 							  || nCodecId == AV_CODEC_ID_BINKAUDIO_DCT);
 		} else {
+			return S_OK;
+		}
+	} else if (m_FFAudioDec.NeedReinit()) {
+		if (!m_FFAudioDec.Init(nCodecId, NULL)) {
 			return S_OK;
 		}
 	}
@@ -2506,7 +2510,6 @@ STDMETHODIMP CMpaDecFilter::CreatePage(const GUID& guid, IPropertyPage** ppPage)
 STDMETHODIMP CMpaDecFilter::SetBool(LPCSTR field, bool value)
 {
 	if (strcmp(field, "stereodownmix") == 0) {
-		CAutoLock cAutoLock2(&m_csReceive); // because the decoder can be reinitialized
 		m_FFAudioDec.SetStereoDownmix(value);
 		return S_OK;
 	}
