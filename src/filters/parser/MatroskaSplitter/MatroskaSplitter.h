@@ -29,7 +29,7 @@
 #include <basestruct.h>
 #include <IMediaSideData.h>
 #include <ITrackInfo.h>
-#include <FilterInterfaces.h>
+#include "../../filters/FilterInterfacesImpl.h"
 
 #define MatroskaSplitterName L"MPC Matroska Splitter"
 #define MatroskaSourceName   L"MPC Matroska Source"
@@ -79,7 +79,7 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 	CMatroskaSplitterFilter
 	: public CBaseSplitterFilter
 	, public ITrackInfo
-	, public IExFilterInfo
+	, public CExFilterInfoImpl
 	, public IMatroskaSplitterFilter
 	, public ISpecifyPropertyPages2
 {
@@ -161,9 +161,8 @@ public:
 	STDMETHODIMP_(BOOL) GetCalcDuration();
 
 	// IExFilterInfo
-	STDMETHODIMP GetInt(LPCSTR field, int *value);
-	STDMETHODIMP GetString(LPCSTR field, LPWSTR *value, unsigned *chars) { return E_NOTIMPL; }
-	STDMETHODIMP GetBin(LPCSTR field, LPVOID *value, unsigned *size);
+	STDMETHODIMP GetInt(LPCSTR field, int *value) override;
+	STDMETHODIMP GetBin(LPCSTR field, LPVOID *value, unsigned *size) override;
 };
 
 class __declspec(uuid("0A68C3B5-9164-4a54-AFAF-995B2FF0E0D4"))
