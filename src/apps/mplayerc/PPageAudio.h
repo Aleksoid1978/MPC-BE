@@ -54,6 +54,7 @@ public:
 
 	CButton		m_chkMixer;
 	CComboBox	m_cmbMixerLayout;
+	CButton		m_chkStereoFromDecoder;
 	CButton		m_chkBassRedirect;
 
 	CStatic		m_stcGain;
@@ -91,6 +92,7 @@ public:
 	afx_msg void OnDualAudioOutputCheck();
 	afx_msg void OnBnClickedResetAudioPaths();
 	afx_msg void OnMixerCheck();
+	afx_msg void OnMixerLayoutChange();
 	afx_msg void OnAutoVolumeControlCheck();
 	afx_msg void OnTimeShiftCheck();
 	afx_msg void OnBnClickedSoundProcessingDefault();

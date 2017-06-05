@@ -22,9 +22,9 @@
 #pragma once
 
 #include <atlcoll.h>
-#include "SampleFormat.h"
 #include <stdint.h>
-
+#include "../../filters/FilterInterfacesImpl.h"
+#include "SampleFormat.h"
 #include "../DeCSSFilter/DeCSSFilter.h"
 #include "IMpaDecFilter.h"
 #include "MpaDecFilterSettingsWnd.h"
@@ -51,6 +51,7 @@ class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F"))
 	CMpaDecFilter
 	: public CTransformFilter
 	, public IMpaDecFilter
+	, public CExFilterConfigImpl
 	, public ISpecifyPropertyPages2
 {
 	SampleFormat    m_InternalSampleFormat;
@@ -61,7 +62,7 @@ protected:
 	bool            m_fDRC;
 	bool            m_fSPDIF[etcount];
 
-	CCritSec m_csReceive;
+	CCritSec        m_csReceive;
 	CPaddedArray    m_buff;
 
 	REFERENCE_TIME  m_rtStart;
@@ -157,12 +158,10 @@ public:
 	HRESULT BreakConnect(PIN_DIRECTION dir);
 
 	// ISpecifyPropertyPages2
-
 	STDMETHODIMP GetPages(CAUUID* pPages);
 	STDMETHODIMP CreatePage(const GUID& guid, IPropertyPage** ppPage);
 
 	// IMpaDecFilter
-
 	STDMETHODIMP SetOutputFormat(MPCSampleFormat sf, bool enable);
 	STDMETHODIMP_(bool) GetOutputFormat(MPCSampleFormat sf);
 	STDMETHODIMP_(MPCSampleFormat) SelectOutputFormat(MPCSampleFormat sf);
@@ -170,8 +169,9 @@ public:
 	STDMETHODIMP_(bool) GetDynamicRangeControl();
 	STDMETHODIMP SetSPDIF(enctype et, bool fSPDIF);
 	STDMETHODIMP_(bool) GetSPDIF(enctype et);
-
 	STDMETHODIMP SaveSettings();
-
 	STDMETHODIMP_(CString) GetInformation(MPCAInfo index);
+
+	// IExFilterConfig
+	STDMETHODIMP SetBool(LPCSTR field, bool value) override;
 };

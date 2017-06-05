@@ -655,6 +655,7 @@ public:
 	// Audio Switcher
 	bool			bAudioMixer;
 	int				nAudioMixerLayout;
+	bool			bAudioStereoFromDecoder;
 	bool			bAudioBassRedirect;
 	float			fAudioGain_dB;
 	bool			bAudioAutoVolumeControl;

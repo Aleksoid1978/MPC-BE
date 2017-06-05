@@ -434,6 +434,7 @@ STDMETHODIMP CMpaDecFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	return
 		QI(IMpaDecFilter)
+		QI(IExFilterConfig)
 		QI(ISpecifyPropertyPages)
 		QI(ISpecifyPropertyPages2)
 		__super::NonDelegatingQueryInterface(riid, ppv);
@@ -2498,4 +2499,16 @@ STDMETHODIMP CMpaDecFilter::CreatePage(const GUID& guid, IPropertyPage** ppPage)
 	}
 
 	return *ppPage ? S_OK : E_FAIL;
+}
+
+// IExFilterConfig
+
+STDMETHODIMP CMpaDecFilter::SetBool(LPCSTR field, bool value)
+{
+	if (strcmp(field, "stereodownmix") == 0) {
+		CAutoLock cAutoLock2(&m_csReceive); // because the decoder can be reinitialized
+		m_FFAudioDec.SetStereoDownmix(value);
+	}
+
+	return S_OK;
 }
