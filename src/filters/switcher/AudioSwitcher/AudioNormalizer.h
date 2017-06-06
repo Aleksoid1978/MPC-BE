@@ -22,6 +22,8 @@
 
 #include <atlcoll.h>
 
+#define AUTOVOLUME 0
+
 class CAudioNormalizer
 {
 protected:
@@ -47,6 +49,7 @@ protected:
 	DWORD m_pred_bad;
 	int m_vol;
 
+#if AUTOVOLUME
 	struct smooth_t {
 		double * data;
 		double max;
@@ -69,6 +72,7 @@ protected:
 	void SmoothDelete(smooth_t * del);
 	void SmoothAddSample(smooth_t * sm, double sample);
 	double SmoothGetMax(smooth_t * sm);
+#endif
 
 	int MSteadyLQ(void *samples, int numsamples, int nch, bool IsFloat);
 	int MSteadyHQ(void *samples, int numsamples, int nch, bool IsFloat);
@@ -80,7 +84,9 @@ public:
 	int MSteadyHQ16(short *samples, int numsamples, int nch);
 	int MSteadyHQ32(float *samples, int numsamples, int nch);
 
+#if AUTOVOLUME
 	int AutoVolume(short *samples, int numsamples, int nch);
+#endif
 
 public:
 	CAudioNormalizer(void);
