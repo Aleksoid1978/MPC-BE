@@ -2621,6 +2621,12 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 		case AVCOL_SPC_YCGCO:
 			fmt.VideoTransferMatrix = 7;
 			break;
+		case AVCOL_SPC_UNSPECIFIED:
+			if (ctx->width <= 1024 && ctx->height <= 576) { // SD
+				fmt.VideoTransferMatrix = DXVA2_VideoTransferMatrix_BT601;
+			} else { // HD
+				fmt.VideoTransferMatrix = DXVA2_VideoTransferMatrix_BT709;
+			}
 	}
 
 	// Color Transfer Function
