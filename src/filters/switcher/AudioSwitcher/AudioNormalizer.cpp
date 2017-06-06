@@ -55,6 +55,7 @@ CAudioNormalizer::CAudioNormalizer(void)
 
 	m_rising = 0;
 
+#if AUTOVOLUME
 	m_normalize_level = 0.25;
 	m_silence_level = 0.01;
 	m_max_mult = 5.0;
@@ -66,14 +67,17 @@ CAudioNormalizer::CAudioNormalizer(void)
 	{
 		m_smooth[i] = SmoothNew(100);
 	}
+#endif
 }
 
 CAudioNormalizer::~CAudioNormalizer(void)
 {
+#if AUTOVOLUME
 	for (size_t i = 0; i < _countof(m_smooth); i++)
 	{
 		if (m_smooth[i]) SmoothDelete(m_smooth[i]);
 	}
+#endif
 }
 
 int CAudioNormalizer::MSteadyLQ(void *samples, int numsamples, int nch, bool IsFloat)
@@ -390,6 +394,7 @@ void CAudioNormalizer::SetParam(int Level, bool Boost, int Steping)
 	}
 }
 
+#if AUTOVOLUME
 int CAudioNormalizer::AutoVolume(short *samples, int numsamples, int nch)
 {
 	double level = -1.0;
@@ -545,3 +550,4 @@ double CAudioNormalizer::SmoothGetMax(smooth_t * sm)
 
 	return sm->max;
 }
+#endif
