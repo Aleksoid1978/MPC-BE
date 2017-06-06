@@ -609,6 +609,14 @@ HRESULT Colour::Parse(CMatroskaNode* pMN0)
 		Primaries.Parse(pMN);
 		bValid = true;
 		break;
+	case 0x55BC:
+		MaxCLL.Parse(pMN);
+		bValid = true;
+		break;
+	case 0x55BD:
+		MaxFALL.Parse(pMN);
+		bValid = true;
+		break;
 	case 0x55D0:
 		SMPTE2086MasteringMetadata.Parse(pMN);
 		break;

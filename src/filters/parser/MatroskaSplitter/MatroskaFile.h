@@ -310,6 +310,8 @@ namespace MatroskaReader
 		CUInt Range;
 		CUInt TransferCharacteristics;
 		CUInt Primaries;
+		CUInt MaxCLL;
+		CUInt MaxFALL;
 
 		MasteringMetadata SMPTE2086MasteringMetadata;
 

@@ -103,6 +103,7 @@ CMatroskaSplitterFilter::CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	, m_Seek_rt(INVALID_TIME)
 	, m_bSupportCueDuration(FALSE)
 	, m_MasterDataHDR(NULL)
+	, m_HDRContentLightLevel(NULL)
 	, m_ColorSpace(NULL)
 	, m_profile(-1)
 	, m_pix_fmt(-1)
@@ -132,6 +133,7 @@ CMatroskaSplitterFilter::CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 CMatroskaSplitterFilter::~CMatroskaSplitterFilter()
 {
 	SAFE_DELETE(m_MasterDataHDR);
+	SAFE_DELETE(m_HDRContentLightLevel);
 	SAFE_DELETE(m_ColorSpace);
 }
 
@@ -902,6 +904,14 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 											   (pTE->v.VideoColorInformation.ChromaSitingVert - 1) << 7);
 					}
 
+				}
+
+				if (pTE->v.VideoColorInformation.MaxCLL.IsValid() && pTE->v.VideoColorInformation.MaxFALL.IsValid()) {
+					m_HDRContentLightLevel = DNew(MediaSideDataHDRContentLightLevel);
+					ZeroMemory(m_HDRContentLightLevel, sizeof(MediaSideDataHDRContentLightLevel));
+
+					m_HDRContentLightLevel->MaxCLL  = pTE->v.VideoColorInformation.MaxCLL;
+					m_HDRContentLightLevel->MaxFALL = pTE->v.VideoColorInformation.MaxFALL;
 				}
 
 				if (pTE->v.VideoColorInformation.SMPTE2086MasteringMetadata.bValid) {
@@ -2356,6 +2366,14 @@ STDMETHODIMP CMatroskaSplitterFilter::GetBin(LPCSTR field, LPVOID *value, unsign
 			*size = sizeof(*m_MasterDataHDR);
 			*value = (LPVOID)LocalAlloc(LPTR, *size);
 			memcpy(*value, m_MasterDataHDR, *size);
+
+			return S_OK;
+		}
+	} else if (!strcmp(field, "HDR_CONTENT_LIGHT_LEVEL")) {
+		if (m_HDRContentLightLevel) {
+			*size = sizeof(*m_HDRContentLightLevel);
+			*value = (LPVOID)LocalAlloc(LPTR, *size);
+			memcpy(*value, m_HDRContentLightLevel, *size);
 
 			return S_OK;
 		}
