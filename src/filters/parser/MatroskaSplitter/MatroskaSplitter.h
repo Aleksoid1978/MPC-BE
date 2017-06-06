@@ -93,6 +93,7 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 	BOOL m_bSupportCueDuration;
 
 	MediaSideDataHDR* m_MasterDataHDR;
+	MediaSideDataHDRContentLightLevel* m_HDRContentLightLevel;
 	ColorSpace* m_ColorSpace;
 
 	int m_profile;
