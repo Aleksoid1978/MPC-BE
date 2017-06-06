@@ -137,13 +137,15 @@ protected:
 	BOOL									m_MVC_Base_View_R_flag;
 
 	struct {
-		MediaSideDataHDR*   masterDataHDR = NULL;
-		ColorSpace*         colorSpace    = NULL;
-		int                 profile       = -1;
-		int                 pix_fmt       = -1;
+		MediaSideDataHDR*                  masterDataHDR        = NULL;
+		MediaSideDataHDRContentLightLevel* HDRContentLightLevel = NULL;
+		ColorSpace*                        colorSpace           = NULL;
+		int                                profile              = -1;
+		int                                pix_fmt              = -1;
 
 		void Clear() {
 			SAFE_DELETE(masterDataHDR);
+			SAFE_DELETE(HDRContentLightLevel)
 			SAFE_DELETE(colorSpace);
 			profile = -1;
 			pix_fmt = -1;
