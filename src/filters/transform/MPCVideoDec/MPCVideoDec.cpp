@@ -1162,41 +1162,51 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 
 	CComPtr<IMediaSideData> pMediaSideData;
 	if (SUCCEEDED(pSample->QueryInterface(&pMediaSideData))) {
+		HRESULT hr = E_FAIL;
 		if (AVFrameSideData* sd = av_frame_get_side_data(pFrame, AV_FRAME_DATA_MASTERING_DISPLAY_METADATA)) {
 			if (sd->size == sizeof(AVMasteringDisplayMetadata)) {
-				AVMasteringDisplayMetadata* metadataHDR = (AVMasteringDisplayMetadata*)sd->data;
+				AVMasteringDisplayMetadata* metadata = (AVMasteringDisplayMetadata*)sd->data;
 				MediaSideDataHDR hdr = { 0 };
 
-				if (metadataHDR->has_primaries) {
+				if (metadata->has_primaries) {
 					// export the display primaries in GBR order
-					hdr.display_primaries_x[0] = CALC_HDR_VALUE(metadataHDR->display_primaries[1][0]);
-					hdr.display_primaries_y[0] = CALC_HDR_VALUE(metadataHDR->display_primaries[1][1]);
-					hdr.display_primaries_x[1] = CALC_HDR_VALUE(metadataHDR->display_primaries[2][0]);
-					hdr.display_primaries_y[1] = CALC_HDR_VALUE(metadataHDR->display_primaries[2][1]);
-					hdr.display_primaries_x[2] = CALC_HDR_VALUE(metadataHDR->display_primaries[0][0]);
-					hdr.display_primaries_y[2] = CALC_HDR_VALUE(metadataHDR->display_primaries[0][1]);
+					hdr.display_primaries_x[0] = CALC_HDR_VALUE(metadata->display_primaries[1][0]);
+					hdr.display_primaries_y[0] = CALC_HDR_VALUE(metadata->display_primaries[1][1]);
+					hdr.display_primaries_x[1] = CALC_HDR_VALUE(metadata->display_primaries[2][0]);
+					hdr.display_primaries_y[1] = CALC_HDR_VALUE(metadata->display_primaries[2][1]);
+					hdr.display_primaries_x[2] = CALC_HDR_VALUE(metadata->display_primaries[0][0]);
+					hdr.display_primaries_y[2] = CALC_HDR_VALUE(metadata->display_primaries[0][1]);
 
-					hdr.white_point_x = CALC_HDR_VALUE(metadataHDR->white_point[0]);
-					hdr.white_point_y = CALC_HDR_VALUE(metadataHDR->white_point[1]);
+					hdr.white_point_x = CALC_HDR_VALUE(metadata->white_point[0]);
+					hdr.white_point_y = CALC_HDR_VALUE(metadata->white_point[1]);
 				}
 
-				if (metadataHDR->has_luminance) {
-					hdr.max_display_mastering_luminance = CALC_HDR_VALUE(metadataHDR->max_luminance);
-					hdr.min_display_mastering_luminance = CALC_HDR_VALUE(metadataHDR->min_luminance);
+				if (metadata->has_luminance) {
+					hdr.max_display_mastering_luminance = CALC_HDR_VALUE(metadata->max_luminance);
+					hdr.min_display_mastering_luminance = CALC_HDR_VALUE(metadata->min_luminance);
 				}
 
-				pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)&hdr, sizeof(hdr));
-
-				return true;
+				hr = pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)&hdr, sizeof(hdr));
 			} else {
 				DLog(L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR data of an unexpected size (%d)", sd->size);
 			}
 		} else if (m_FilterInfo.masterDataHDR) {
-			pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)m_FilterInfo.masterDataHDR, sizeof(MediaSideDataHDR));
+			hr = pMediaSideData->SetSideData(IID_MediaSideDataHDR, (const BYTE*)m_FilterInfo.masterDataHDR, sizeof(MediaSideDataHDR));
 			SAFE_DELETE(m_FilterInfo.masterDataHDR);
-
-			return true;
 		}
+
+		if (AVFrameSideData* sd = av_frame_get_side_data(pFrame, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL)) {
+			if (sd->size == sizeof(AVMasteringDisplayMetadata)) {
+				hr = pMediaSideData->SetSideData(IID_MediaSideDataHDRContentLightLevel, (const BYTE*)sd->data, sd->size);
+			} else {
+				DLog(L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR Light Level data of an unexpected size (%d)", sd->size);
+			}
+		} else if (m_FilterInfo.HDRContentLightLevel) {
+			hr = pMediaSideData->SetSideData(IID_MediaSideDataHDRContentLightLevel, (const BYTE*)m_FilterInfo.HDRContentLightLevel, sizeof(MediaSideDataHDRContentLightLevel));
+			SAFE_DELETE(m_FilterInfo.masterDataHDR);
+		}
+
+		return (hr == S_OK);
 	}
 
 	return false;
@@ -1831,14 +1841,21 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 			if (SUCCEEDED(pIExFilterInfo->GetBin("VIDEO_COLOR_SPACE", &pData, &size))) {
 				if (size == sizeof(ColorSpace)) {
 					m_FilterInfo.colorSpace = DNew ColorSpace;
-					memcpy(m_FilterInfo.colorSpace, pData, sizeof(ColorSpace));
+					memcpy(m_FilterInfo.colorSpace, pData, size);
 				}
 				LocalFree(pData);
 			}
 			if (SUCCEEDED(pIExFilterInfo->GetBin("HDR_MASTERING_METADATA", &pData, &size))) {
 				if (size == sizeof(MediaSideDataHDR)) {
 					m_FilterInfo.masterDataHDR = DNew MediaSideDataHDR;
-					memcpy(m_FilterInfo.masterDataHDR, pData, sizeof(MediaSideDataHDR));
+					memcpy(m_FilterInfo.masterDataHDR, pData, size);
+				}
+				LocalFree(pData);
+			}
+			if (SUCCEEDED(pIExFilterInfo->GetBin("HDR_CONTENT_LIGHT_LEVEL", &pData, &size))) {
+				if (size == sizeof(MediaSideDataHDRContentLightLevel)) {
+					m_FilterInfo.HDRContentLightLevel = DNew MediaSideDataHDRContentLightLevel;
+					memcpy(m_FilterInfo.HDRContentLightLevel, pData, size);
 				}
 				LocalFree(pData);
 			}
