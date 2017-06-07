@@ -1200,7 +1200,7 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 		}
 
 		if (AVFrameSideData* sd = av_frame_get_side_data(pFrame, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL)) {
-			if (sd->size == sizeof(AVMasteringDisplayMetadata)) {
+			if (sd->size == sizeof(AVContentLightMetadata)) {
 				hr = pMediaSideData->SetSideData(IID_MediaSideDataHDRContentLightLevel, (const BYTE*)sd->data, sd->size);
 			} else {
 				DLog(L"CMPCVideoDecFilter::AddFrameSideData(): Found HDR Light Level data of an unexpected size (%d)", sd->size);
