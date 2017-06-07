@@ -1145,10 +1145,9 @@ void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME
 
 void CMPCVideoDecFilter::GetFrameTimeStamp(AVFrame* pFrame, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
 {
-	rtStart = av_frame_get_best_effort_timestamp(pFrame);
-	const int64_t pkt_duration = av_frame_get_pkt_duration(pFrame);
-	if (pkt_duration) {
-		rtStop = rtStart + pkt_duration;
+	rtStart = pFrame->best_effort_timestamp;
+	if (pFrame->pkt_duration) {
+		rtStop = rtStart + pFrame->pkt_duration;
 	} else {
 		rtStop = INVALID_TIME;
 	}
