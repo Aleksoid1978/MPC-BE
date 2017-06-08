@@ -27,7 +27,7 @@ class CAudioNormalizer
 protected:
 	int m_level;
 	bool m_boost;
-	int m_stepping;
+	int m_stepping, m_stepping_vol;
 	int m_rising;
 
 	CAtlArray<double> m_bufHQ;
