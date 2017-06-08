@@ -35,7 +35,7 @@ CAudioNormalizer::CAudioNormalizer(void)
 	m_level = 75;
 	m_stepping = 8;
 	m_boost = true;
-	m_vol = 1 << m_stepping;
+	m_vol = m_stepping_vol = 1 << m_stepping;
 
 	m_rising = 0;
 }
@@ -66,7 +66,7 @@ int CAudioNormalizer::ProcessInternal(float *samples, unsigned numsamples, unsig
 	int tries = 0;
 
 redo:
-	const double factor = (double)m_vol / (double)(1 << m_stepping);
+	const double factor = m_vol != m_stepping_vol ? (double)m_vol / (double)(m_stepping_vol) : 1.0;
 	for (k = 0; k < allsamples; k++) {
 		bufHQ[k] = smpHQ[k] * factor;
 	}
@@ -122,8 +122,9 @@ redo:
 		samples[k] = (float)((bufHQ[k] + 0.5) / 32768);
 	}
 
-	if (m_boost == false) {
-		if (m_vol >= (1 << m_stepping)) m_vol = 1 << m_stepping;
+	if (m_boost == false
+			&& m_vol > m_stepping_vol) {
+		m_vol = m_stepping_vol;
 	}
 
 	return numsamples;
@@ -152,6 +153,7 @@ void CAudioNormalizer::SetParam(int Level, bool Boost, int Steping)
 		const int tmp = m_stepping;
 
 		m_stepping = Steping;
+		m_stepping_vol = 1 << m_stepping;
 		m_vol = (m_vol << m_stepping) / (1 << tmp);
 	}
 }
