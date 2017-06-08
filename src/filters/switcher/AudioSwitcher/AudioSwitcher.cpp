@@ -305,8 +305,8 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 			convert_to_float(in_sampleformat, in_channels, in_samples, data, m_buffer);
 			data = (BYTE*)m_buffer;
 		}
-		in_samples		= m_AudioNormalizer.MSteadyHQ32((float*)data, in_samples, in_channels);
-		in_allsamples	= in_samples * in_channels;
+		in_samples    = m_AudioNormalizer.Process((float*)data, in_samples, in_channels);
+		in_allsamples = in_samples * in_channels;
 	}
 
 	// Copy or convert to output
