@@ -79,6 +79,10 @@ BOOL CAboutDlg::OnInitDialog()
 	#error Please add support for your compiler
 #endif
 
+#ifdef _DEBUG
+	m_MPCCompiler += L" Debug";
+#endif
+
 #if (__AVX__)
 	m_MPCCompiler += L" (AVX)";
 #elif (__SSSE3__)
@@ -91,10 +95,6 @@ BOOL CAboutDlg::OnInitDialog()
 	#elif (_M_IX86_FP == 1) // /arch:SSE was used
 		m_MPCCompiler += L" (SSE)";
 	#endif
-#endif
-
-#ifdef _DEBUG
-	m_MPCCompiler += L" Debug";
 #endif
 
 	m_FFmpegCompiler	= GetFFmpegCompiler();
