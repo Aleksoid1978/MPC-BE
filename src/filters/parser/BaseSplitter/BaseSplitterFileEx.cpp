@@ -681,7 +681,7 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 
 		if (e_ac3) {
 			wfe.nSamplesPerSec = h.sample_rate;
-			wfe.nAvgBytesPerSec = h.frame_size * h.sample_rate / (h.num_blocks * 256);
+			wfe.nAvgBytesPerSec = h.frame_size * h.sample_rate / (h.sr_code == 3 ? 1536 : h.num_blocks * 256);
 		} else {
 			wfe.nSamplesPerSec = freq[h.fscod] >> h.sr_shift;
 			static int rate[] = { 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 448, 512, 576, 640, 768, 896, 1024, 1152, 1280 };
