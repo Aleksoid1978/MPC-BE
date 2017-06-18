@@ -23,7 +23,6 @@
 #include <math.h>
 #include <intrin.h>
 #include "RTS.h"
-#include "../DSUtil/CPUInfo.h"
 
 // WARNING: this isn't very thread safe, use only one RTS a time. We should use TLS in future.
 static HDC g_hDC;
@@ -139,7 +138,7 @@ void CWord::Paint(const CPoint& p, const CPoint& org)
 					return;
 				}
 
-				Transform(CPoint((org.x - p.x) * 8, (org.y - p.y) * 8));
+				Transform_SSE2(CPoint((org.x - p.x) * 8, (org.y - p.y) * 8));
 
 				if (!ScanConvert()) {
 					return;
@@ -189,15 +188,6 @@ void CWord::Paint(const CPoint& p, const CPoint& org)
 	}
 }
 
-void CWord::Transform(CPoint org)
-{
-	if (CPUInfo::HaveSSE2()) { // SSE code
-		Transform_SSE2(org);
-	} else { // C-code
-		Transform_C(org);
-	}
-}
-
 bool CWord::CreateOpaqueBox()
 {
 	if (m_pOpaqueBox) {
@@ -227,6 +217,7 @@ bool CWord::CreateOpaqueBox()
 	return !!m_pOpaqueBox;
 }
 
+/*
 void CWord::Transform_C(const CPoint &org )
 {
 	double scalex = m_style.fontScaleX / 100.0;
@@ -273,10 +264,11 @@ void CWord::Transform_C(const CPoint &org )
 		mpPathPoints[i].y = std::lround(y) + org.y;
 	}
 }
+*/
 
 void CWord::Transform_SSE2(const CPoint &org )
 {
-	// SSE code
+	// SSE2 code
 	// speed up ~1.5-1.7x
 	const __m128 __xshift = _mm_set_ps1((float)m_style.fontShiftX);
 	const __m128 __yshift = _mm_set_ps1((float)m_style.fontShiftY);

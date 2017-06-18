@@ -76,17 +76,17 @@ SAMPLECONVERTFUNCT(float, uint8)
 
 SAMPLECONVERTFUNCT(uint8, int16)
 SAMPLECONVERTFUNCT(int32, int16)
-SAMPLECONVERTFUNCT(float, int16)
+//SAMPLECONVERTFUNCT(float, int16)
 SAMPLECONVERTFUNCT(double, int16)
 
 SAMPLECONVERTFUNCT(uint8, int32)
 SAMPLECONVERTFUNCT(int16, int32)
-SAMPLECONVERTFUNCT(float, int32)
+//SAMPLECONVERTFUNCT(float, int32)
 SAMPLECONVERTFUNCT(double, int32)
 
 SAMPLECONVERTFUNCT(uint8, float)
-SAMPLECONVERTFUNCT(int16, float)
-SAMPLECONVERTFUNCT(int32, float)
+//SAMPLECONVERTFUNCT(int16, float)
+//SAMPLECONVERTFUNCT(int32, float)
 SAMPLECONVERTFUNCT(double, float)
 
 SAMPLECONVERTFUNCT(float, double)
@@ -121,6 +121,7 @@ inline void convert_int32_to_int24(BYTE* pOut, int32_t* pIn, size_t allsamples)
     }
 }
 
+/*
 inline void convert_int24_to_float(float* pOut, BYTE* pIn, size_t allsamples)
 {
     for (size_t i = 0; i < allsamples; i++) {
@@ -136,3 +137,4 @@ inline void convert_float_to_int24(BYTE* pOut, float* pIn, size_t allsamples)
         INT32_TO_INT24(i32, pOut);
     }
 }
+*/

@@ -23,7 +23,7 @@
 
 ; If you want to compile the 64-bit version define "x64build" (uncomment the define below or use build.bat)
 #define localize
-#define sse_required
+#define sse2_required
 ; #define x64Build
 
 ; Don't forget to update the DirectX SDK number in "include\Version.h" (not updated so often)

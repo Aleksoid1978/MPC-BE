@@ -32,7 +32,6 @@ extern "C" {
 #include "MSDKDecoder.h"
 #include <moreuuids.h>
 #include <IMediaSample3D.h>
-#include "../../../../DSUtil/CPUInfo.h"
 #include "../../../../DSUtil/D3D9Helper.h"
 #include "../../../../DSUtil/DSUtil.h"
 #include "../../../../DSUtil/SysVersion.h"
@@ -41,22 +40,7 @@ extern "C" {
 #include "../MPCVideoDec.h"
 #include "../pixconv_sse2_templates.h"
 
-#define COPY_FUNC_PARAMS uint8_t* dst, uint8_t* src1, uint8_t* src2, size_t linesize, unsigned lines
-inline void CopyEverySecondLine(COPY_FUNC_PARAMS)
-{
-	for (unsigned i = 0; i < lines; i++) {
-		memcpy(dst, src1, linesize);
-		dst += linesize;
-		src1 += linesize * 2;
-	}
-	for (unsigned i = 0; i < lines; i++) {
-		memcpy(dst, src2, linesize);
-		dst += linesize;
-		src2 += linesize * 2;
-	}
-}
-
-inline void CopyEverySecondLineSSE2(COPY_FUNC_PARAMS)
+inline void CopyEverySecondLineSSE2(uint8_t* dst, uint8_t* src1, uint8_t* src2, size_t linesize, unsigned lines)
 {
 	for (unsigned i = 0; i < lines; i++) {
 		PIXCONV_MEMCPY_ALIGNED(dst, src1, (ptrdiff_t)linesize)
@@ -69,8 +53,6 @@ inline void CopyEverySecondLineSSE2(COPY_FUNC_PARAMS)
 		src2 += linesize * 2;
 	}
 }
-
-void (*pCopyFunction)(COPY_FUNC_PARAMS) = &CopyEverySecondLine;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Bitstream buffering
@@ -163,9 +145,6 @@ CMSDKDecoder::CMSDKDecoder(CMPCVideoDecFilter* pFilter)
 {
   m_iOutputMode = m_iNewOutputMode = m_pFilter->m_iMvcOutputMode;
   m_bSwapLR = m_pFilter->m_bMvcSwapLR;
-  if (CPUInfo::HaveSSE2()) {
-    pCopyFunction = &CopyEverySecondLineSSE2;
-  }
 }
 
 CMSDKDecoder::~CMSDKDecoder()
@@ -692,14 +671,14 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
       uint8_t* srcBase = swapLR ? pExtraView->surface.Data.Y : pBaseView->surface.Data.Y;
       uint8_t* srcExtra = (swapLR ? pBaseView->surface.Data.Y : pExtraView->surface.Data.Y) + linesize;
 
-      pCopyFunction(dst, srcBase, srcExtra, linesize, height / 2);
+      CopyEverySecondLineSSE2(dst, srcBase, srcExtra, linesize, height / 2);
 
       // color
       dst  = m_pFrame->data[1];
       srcBase  = swapLR ? pExtraView->surface.Data.UV : pBaseView->surface.Data.UV;
       srcExtra = (swapLR ? pBaseView->surface.Data.UV : pExtraView->surface.Data.UV) + linesize;
 
-      pCopyFunction(dst, srcBase, srcExtra, linesize, height / 4);
+      CopyEverySecondLineSSE2(dst, srcBase, srcExtra, linesize, height / 4);
     }
     else {
       allocateFrame(true);

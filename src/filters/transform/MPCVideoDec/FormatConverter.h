@@ -168,7 +168,6 @@ protected:
 
 	HRESULT plane_copy_sse2(CONV_FUNC_PARAMS);
 	HRESULT plane_copy_direct_sse4(CONV_FUNC_PARAMS);
-	HRESULT plane_copy(CONV_FUNC_PARAMS);
 
 	HRESULT convert_yuv_rgb(CONV_FUNC_PARAMS);
 	const RGBCoeffs* getRGBCoeffs(int width, int height);

@@ -1306,31 +1306,6 @@ HRESULT CFormatConverter::plane_copy_direct_sse4(const uint8_t* const src[4], co
   return S_OK;
 }
 
-HRESULT CFormatConverter::plane_copy(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
-{
-  const SW_OUT_FMT& swof = s_sw_formats[m_out_pixfmt];
-
-  const int widthBytes = width * swof.codedbytes;
-  const int planes = max(swof.planes, 1);
-
-  ptrdiff_t line, plane;
-
-  for (plane = 0; plane < planes; plane++) {
-    const int planeWidth = widthBytes / swof.planeWidth[plane];
-    const int planeHeight = height / swof.planeHeight[plane];
-    const ptrdiff_t srcPlaneStride = srcStride[plane];
-    const ptrdiff_t dstPlaneStride = dstStride[plane];
-    const uint8_t * const srcBuf = src[plane];
-          uint8_t * const dstBuf = dst[plane];
-
-    for (line = 0; line < planeHeight; ++line) {
-      memcpy(dstBuf + line * dstPlaneStride, srcBuf + line * srcPlaneStride, planeWidth);
-    }
-  }
-
-  return S_OK;
-}
-
 // yuv2rgb
 #pragma warning(push)
 #pragma warning(disable: 4556)
