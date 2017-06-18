@@ -21,7 +21,6 @@
 #include "stdafx.h"
 #include <MMReg.h>
 #include "AudioHelper.h"
-#include "../DSUtil/CPUInfo.h"
 
 #define limit(a, x, b) if (x < a) { x = a; } else if (x > b) { x = b; }
 
@@ -247,11 +246,7 @@ HRESULT convert_to_int16(const SampleFormat sfmt, const WORD nChannels, const DW
 			convert_int32_to_int16(pOut, (int32_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_FLT:
-			if (CPUInfo::HaveSSE2()) {
-				convert_float_to_int16_sse2(pOut, (float*)pIn, allsamples);
-			} else {
-				convert_float_to_int16(pOut, (float*)pIn, allsamples);
-			}
+			convert_float_to_int16_sse2(pOut, (float*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_DBL:
 			convert_double_to_int16(pOut, (double*)pIn, allsamples);
@@ -423,11 +418,7 @@ HRESULT convert_to_int32(const SampleFormat sfmt, const WORD nChannels, const DW
 			memcpy(pOut, pIn, nSamples * nChannels * sizeof(int32_t));
 			break;
 		case SAMPLE_FMT_FLT:
-			if (CPUInfo::HaveSSE2()) {
-				convert_float_to_int32_sse2(pOut, (float*)pIn, allsamples);
-			} else {
-				convert_float_to_int32(pOut, (float*)pIn, allsamples);
-			}
+			convert_float_to_int32_sse2(pOut, (float*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_DBL:
 			convert_double_to_int32(pOut, (double*)pIn, allsamples);
@@ -488,25 +479,13 @@ HRESULT convert_to_float(const SampleFormat sfmt, const WORD nChannels, const DW
 			convert_uint8_to_float(pOut, (uint8_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S16:
-			if (CPUInfo::HaveSSE2()) {
-				convert_int16_to_float_sse2(pOut, (int16_t*)pIn, allsamples);
-			} else {
-				convert_int16_to_float(pOut, (int16_t*)pIn, allsamples);
-			}
+			convert_int16_to_float_sse2(pOut, (int16_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S24:
-			if (CPUInfo::HaveSSE2()) {
-				convert_int24_to_float_sse2(pOut, pIn, allsamples);
-			} else {
-				convert_int24_to_float(pOut, pIn, allsamples);
-			}
+			convert_int24_to_float_sse2(pOut, pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S32:
-			if (CPUInfo::HaveSSE2()) {
-				convert_int32_to_float_sse2(pOut, (int32_t*)pIn, allsamples);
-			} else {
-				convert_int32_to_float(pOut, (int32_t*)pIn, allsamples);
-			}
+			convert_int32_to_float_sse2(pOut, (int32_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_FLT:
 			memcpy(pOut, pIn, allsamples * sizeof(float));
@@ -611,18 +590,10 @@ HRESULT convert_to_planar_float(const SampleFormat sfmt, const WORD nChannels, c
 			convert_uint8_to_float(pOut, (uint8_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S16P:
-			if (CPUInfo::HaveSSE2()) {
-				convert_int16_to_float_sse2(pOut, (int16_t*)pIn, allsamples);
-			} else {
-				convert_int16_to_float(pOut, (int16_t*)pIn, allsamples);
-			}
+			convert_int16_to_float_sse2(pOut, (int16_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S32P:
-			if (CPUInfo::HaveSSE2()) {
-				convert_int32_to_float_sse2(pOut, (int32_t*)pIn, allsamples);
-			} else {
-				convert_int32_to_float(pOut, (int32_t*)pIn, allsamples);
-			}
+			convert_int32_to_float_sse2(pOut, (int32_t*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_FLTP:
 			memcpy(pOut, pIn, allsamples * sizeof(float));
@@ -645,25 +616,13 @@ HRESULT convert_float_to(const SampleFormat sfmt, const WORD nChannels, const DW
 			convert_float_to_uint8((uint8_t*)pOut, pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S16:
-			if (CPUInfo::HaveSSE2()) {
-				convert_float_to_int16_sse2((int16_t*)pOut, (float*)pIn, allsamples);
-			} else {
-				convert_float_to_int16((int16_t*)pOut, pIn, allsamples);
-			}
+			convert_float_to_int16_sse2((int16_t*)pOut, (float*)pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S24:
-			if (CPUInfo::HaveSSE2()) {
-				convert_float_to_int24_sse2(pOut, pIn, allsamples);
-			} else {
-				convert_float_to_int24(pOut, pIn, allsamples);
-			}
+			convert_float_to_int24_sse2(pOut, pIn, allsamples);
 			break;
 		case SAMPLE_FMT_S32:
-			if (CPUInfo::HaveSSE2()) {
-				convert_float_to_int32_sse2((int32_t*)pOut, pIn, allsamples);
-			} else {
-				convert_float_to_int32((int32_t*)pOut, pIn, allsamples);
-			}
+			convert_float_to_int32_sse2((int32_t*)pOut, pIn, allsamples);
 			break;
 		case SAMPLE_FMT_FLT:
 			memcpy(pOut, pIn, allsamples * sizeof(float));

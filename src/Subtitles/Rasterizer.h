@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -205,18 +205,18 @@ private:
 	static void _OverlapRegion(tSpanBuffer& dst, const tSpanBuffer& src, int dx, int dy);
 	void CreateWidenedRegionFast(int borderX, int borderY);
 	// helpers
-	void Draw_noAlpha_spFF_Body_0(RasterizerNfo& rnfo);
-	void Draw_noAlpha_spFF_noBody_0(RasterizerNfo& rnfo);
-	void Draw_noAlpha_sp_Body_0(RasterizerNfo& rnfo);
-	void Draw_noAlpha_sp_noBody_0(RasterizerNfo& rnfo);
+	//void Draw_noAlpha_spFF_Body_0(RasterizerNfo& rnfo);
+	//void Draw_noAlpha_spFF_noBody_0(RasterizerNfo& rnfo);
+	//void Draw_noAlpha_sp_Body_0(RasterizerNfo& rnfo);
+	//void Draw_noAlpha_sp_noBody_0(RasterizerNfo& rnfo);
 	void Draw_noAlpha_spFF_Body_sse2(RasterizerNfo& rnfo);
 	void Draw_noAlpha_spFF_noBody_sse2(RasterizerNfo& rnfo);
 	void Draw_noAlpha_sp_Body_sse2(RasterizerNfo& rnfo);
 	void Draw_noAlpha_sp_noBody_sse2(RasterizerNfo& rnfo);
-	void Draw_Alpha_spFF_Body_0(RasterizerNfo& rnfo);
-	void Draw_Alpha_spFF_noBody_0(RasterizerNfo& rnfo);
-	void Draw_Alpha_sp_Body_0(RasterizerNfo& rnfo);
-	void Draw_Alpha_sp_noBody_0(RasterizerNfo& rnfo);
+	//void Draw_Alpha_spFF_Body_0(RasterizerNfo& rnfo);
+	//void Draw_Alpha_spFF_noBody_0(RasterizerNfo& rnfo);
+	//void Draw_Alpha_sp_Body_0(RasterizerNfo& rnfo);
+	//void Draw_Alpha_sp_noBody_0(RasterizerNfo& rnfo);
 	void Draw_Alpha_spFF_Body_sse2(RasterizerNfo& rnfo);
 	void Draw_Alpha_spFF_noBody_sse2(RasterizerNfo& rnfo);
 	void Draw_Alpha_sp_Body_sse2(RasterizerNfo& rnfo);
