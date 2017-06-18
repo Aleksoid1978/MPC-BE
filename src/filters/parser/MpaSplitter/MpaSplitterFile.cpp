@@ -186,7 +186,7 @@ HRESULT CMpaSplitterFile::Init()
 				}
 
 				BYTE* start2 = start + frame_size;
-				while (start2 + MPA_HEADER_SIZE <= end) {
+				while (start2 + MPA_HEADER_SIZE <= end && valid_cnt < 10) {
 					frame_size = ParseMPAHeader(start2);
 					if (frame_size == 0) {
 						valid_cnt = 0;
@@ -228,7 +228,7 @@ HRESULT CMpaSplitterFile::Init()
 					}
 
 					BYTE* start2 = start + frame_size;
-					while (start2 + ADTS_HEADER_SIZE <= end) {
+					while (start2 + ADTS_HEADER_SIZE <= end && valid_cnt < 10) {
 						frame_size = ParseADTSAACHeader(start2);
 						if (frame_size == 0) {
 							valid_cnt = 0;
