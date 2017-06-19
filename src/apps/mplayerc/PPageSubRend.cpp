@@ -126,7 +126,7 @@ BOOL CPPageSubRend::OnInitDialog()
 	m_nHorPosCtrl.SetRange(-10,110);
 	m_edtVerPos = s.nVerPos;
 	m_edtVerPos.SetRange(-10,110);
-	m_nVerPosCtrl.SetRange(110,-10);
+	m_nVerPosCtrl.SetRange(-10, 110);
 	m_nSPCSize = s.m_VRSettings.nSubpicCount;
 	m_nSPCSizeCtrl.SetRange(RS_SPCSIZE_MIN, RS_SPCSIZE_MAX);
 	for (int i = 0; i < _countof(s_maxTexRes); i++) {
