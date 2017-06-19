@@ -11004,9 +11004,8 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 				r.top = r.bottom - finalSize.cy;
 			}
 		} else { // center window
-			CPoint cp = r.CenterPoint();
-			r.left = cp.x - std::lround(finalSize.cx / 2.0);
-			r.top = cp.y - std::lround(finalSize.cy / 2.0);
+			r.left += r.Width()  / 2 - finalSize.cx / 2;
+			r.top  += r.Height() / 2 - finalSize.cy / 2;
 			m_bWasSnapped = false;
 		}
 	}
