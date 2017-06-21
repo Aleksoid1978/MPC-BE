@@ -159,6 +159,7 @@
     <ClInclude Include="NullRenderers.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="SharedInclude.h" />
+    <ClInclude Include="SimpleBuffer.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SysVersion.h" />
     <ClInclude Include="text.h" />
