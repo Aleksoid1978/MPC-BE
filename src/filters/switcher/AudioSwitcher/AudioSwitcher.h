@@ -25,53 +25,9 @@
 #include "AudioNormalizer.h"
 #include "../../../AudioTools/Mixer.h"
 #include "../../../AudioTools/BassRedirect.h"
+#include "../../../DSUtil/SimpleBuffer.h"
 
 #define AudioSwitcherName L"MPC AudioSwitcher"
-
-template <typename T>
-class CSimpleBuffer
-{
-	T* m_data = NULL;
-	size_t m_size = 0;
-
-public:
-	CSimpleBuffer() {};
-	~CSimpleBuffer()
-	{
-		if (m_data) {
-			delete[] m_data;
-		}
-	}
-
-	// returns pointer to the data
-	T* Data() { return m_data; }
-	// returns the number of elements
-	size_t Size() { return m_size; }
-	// returns allocated size in bytes
-	size_t Bytes() { return m_size * sizeof(T); }
-
-	// set new size. old data will be lost
-	void SetSize(const size_t size)
-	{
-		if (m_data) {
-			delete[] m_data;
-		}
-		if (size) {
-			m_data = DNew T[size];
-		} else {
-			m_data = NULL;
-		}
-		m_size = size;
-	}
-
-	// increase the size if necessary. old data may be lost
-	void ExpandSize(const size_t size)
-	{
-		if (size > m_size) {
-			SetSize(size);
-		}
-	}
-};
 
 enum {
 	SPK_MONO = 0,
