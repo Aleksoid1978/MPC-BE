@@ -156,7 +156,7 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 35
 14		"Prefereer externe audiobestanden boven ingesloten audiospoor"
 16		"Geluidsbewerking"
 17		"Mix kanalen in:"
-19		"Request stereo from the decoder"
+19		"Stereo-audio uit decoder proberen te verkrijgen"
 20		"Herleid bas naar LFE-kanaal*"
 24		"Automatische volumeregeling"
 25		"Audio boosten"

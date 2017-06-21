@@ -156,7 +156,7 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 35
 14		"选择外部音频文件替代内嵌音轨。"
 16		"声音处理"
 17		"混合声道至:"
-19		"Request stereo from the decoder"
+19		"要求解码器输出 2.0 立体声"
 20		"低音重定向到 LFE 声道*"
 24		"自动音量控制"
 25		"音频增强"
