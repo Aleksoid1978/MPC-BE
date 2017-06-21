@@ -318,8 +318,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	CSize videoSize;
 
-	int nRotation      = 0;
-	int ChapterTrackId = INT_MIN;
+	int nRotation = 0;
+	AP4_Array<AP4_UI32> ChapterTrackEntries;
 
 	if (AP4_Movie* movie = m_pFile->GetMovie()) {
 		// looking for main video track (skip tracks with motionless frames)
@@ -368,11 +368,19 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 
 			if (AP4_ChapAtom* chap = dynamic_cast<AP4_ChapAtom*>(track->GetTrakAtom()->FindChild("tref/chap"))) {
-				ChapterTrackId = chap->GetChapterTrackId();
-			}
-
-			if (ChapterTrackId == track->GetId()) {
-				continue;
+				ChapterTrackEntries = chap->GetChapterTrackEntries();
+			} else {
+				bool bFoundChapterTrack = false;
+				for (AP4_Cardinal i = 0; i < ChapterTrackEntries.ItemCount(); i++) {
+					const AP4_UI32& ChapterTrackId = ChapterTrackEntries[i];
+					if (ChapterTrackId == track->GetId()) {
+						bFoundChapterTrack = true;
+						break;
+					}
+				}
+				if (bFoundChapterTrack) {
+					continue;
+				}
 			}
 
 			if (track->GetType() == AP4_Track::TYPE_VIDEO && !nRotation) {
@@ -1367,13 +1375,25 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				CString ChapterName = ConvertStr(chapter.Name.c_str());
 				ChapAppend(chapter.Time, ChapterName);
 			}
-		} else if (ChapterTrackId != INT_MIN) {
+		} else if (ChapterTrackEntries.ItemCount()) {
 			for (AP4_List<AP4_Track>::Item* item = movie->GetTracks().FirstItem();
 					item;
 					item = item->GetNext()) {
 				AP4_Track* track = item->GetData();
+				if (track->GetType() != AP4_Track::TYPE_TEXT) {
+					continue;
+				}
 
-				if (ChapterTrackId == track->GetId()) {
+				bool bFoundChapterTrack = false;
+				for (AP4_Cardinal i = 0; i < ChapterTrackEntries.ItemCount(); i++) {
+					const AP4_UI32& ChapterTrackId = ChapterTrackEntries[i];
+					if (ChapterTrackId == track->GetId()) {
+						bFoundChapterTrack = true;
+						break;
+					}
+				}
+
+				if (bFoundChapterTrack) {
 					char* buff = NULL;
 					for (AP4_Cardinal i = 0; i < track->GetSampleCount(); i++) {
 						AP4_Sample sample;

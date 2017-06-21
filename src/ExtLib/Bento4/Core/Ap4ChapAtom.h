@@ -2,7 +2,7 @@
 |
 |    AP4 - chap Atom
 |
-|    Copyright 2012 Aleksoid1978
+|    Copyright 2012-2017 Aleksoid1978
 |
  ****************************************************************/
 
@@ -13,6 +13,7 @@
 |       includes
 +---------------------------------------------------------------------*/
 #include "Ap4Atom.h"
+#include "Ap4Array.h"
 
 /*----------------------------------------------------------------------
 |       AP4_ChapAtom
@@ -21,13 +22,13 @@
 class AP4_ChapAtom : public AP4_Atom
 {
 public:
-    AP4_ChapAtom(AP4_Size         size,
-                 AP4_ByteStream&  stream);
+    AP4_ChapAtom(AP4_Size        size,
+                 AP4_ByteStream& stream);
 
-    AP4_UI32 GetChapterTrackId() const { return m_ChapterTrackId; }
+    const AP4_Array<AP4_UI32>& GetChapterTrackEntries() { return m_ChapterTrackEntries; }
 
 private:
-    AP4_UI32 m_ChapterTrackId;
+    AP4_Array<AP4_UI32> m_ChapterTrackEntries;
 };
 
 #endif // _AP4_CHAP_ATOM_H_
