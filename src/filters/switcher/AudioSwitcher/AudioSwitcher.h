@@ -28,6 +28,51 @@
 
 #define AudioSwitcherName L"MPC AudioSwitcher"
 
+template <typename T>
+class CSimpleBuffer
+{
+	T* m_data = NULL;
+	size_t m_size = 0;
+
+public:
+	CSimpleBuffer() {};
+	~CSimpleBuffer()
+	{
+		if (m_data) {
+			delete[] m_data;
+		}
+	}
+
+	// returns pointer to the data
+	T* Data() { return m_data; }
+	// returns the number of elements
+	size_t Size() { return m_size; }
+	// returns allocated size in bytes
+	size_t Bytes() { return m_size * sizeof(T); }
+
+	// set new size. old data will be lost
+	void SetSize(const size_t size)
+	{
+		if (m_data) {
+			delete[] m_data;
+		}
+		if (size) {
+			m_data = DNew T[size];
+		} else {
+			m_data = NULL;
+		}
+		m_size = size;
+	}
+
+	// increase the size if necessary. old data may be lost
+	void ExpandSize(const size_t size)
+	{
+		if (size > m_size) {
+			SetSize(size);
+		}
+	}
+};
+
 enum {
 	SPK_MONO = 0,
 	SPK_STEREO,
@@ -52,9 +97,7 @@ public IUnknown {
 class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	CAudioSwitcherFilter : public CStreamSwitcherFilter, public IAudioSwitcherFilter
 {
-	float*	m_buffer;
-	size_t	m_buf_size;
-	void UpdateBufferSize(size_t allsamples);
+	CSimpleBuffer<float> m_buffer;
 
 	CMixer	m_Mixer;
 	bool	m_bMixer;
