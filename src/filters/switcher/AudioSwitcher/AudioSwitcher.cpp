@@ -125,8 +125,6 @@ CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_bNormBoost(true)
 	, m_iNormLevel(75)
 	, m_iNormRealeaseTime(8)
-	, m_buffer(NULL)
-	, m_buf_size(0)
 	, m_fGain_dB(0.0f)
 	, m_fGainFactor(1.0f)
 	, m_rtAudioTimeShift(0)
@@ -145,16 +143,6 @@ CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 CAudioSwitcherFilter::~CAudioSwitcherFilter()
 {
-	SAFE_DELETE_ARRAY(m_buffer);
-}
-
-void CAudioSwitcherFilter::UpdateBufferSize(size_t allsamples)
-{
-	if (allsamples > m_buf_size) {
-		SAFE_DELETE_ARRAY(m_buffer);
-		m_buf_size = allsamples;
-		m_buffer = DNew float[m_buf_size];
-	}
 }
 
 STDMETHODIMP CAudioSwitcherFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -270,8 +258,8 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		if (in_sampleformat == SAMPLE_FMT_FLT) {
 			out = pDataOut;
 		} else {
-			UpdateBufferSize(out_samples * out_wfe->nChannels);
-			out = (BYTE*)m_buffer;
+			m_buffer.ExpandSize(out_samples * out_wfe->nChannels);
+			out = (BYTE*)m_buffer.Data();
 		}
 
 		delay			= m_Mixer.GetInputDelay();
@@ -301,9 +289,9 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	// Auto volume control
 	if (m_bAutoVolumeControl) {
 		if (data == pDataIn) {
-			UpdateBufferSize(in_allsamples);
-			convert_to_float(in_sampleformat, in_channels, in_samples, data, m_buffer);
-			data = (BYTE*)m_buffer;
+			m_buffer.ExpandSize(in_allsamples);
+			convert_to_float(in_sampleformat, in_channels, in_samples, data, m_buffer.Data());
+			data = (BYTE*)m_buffer.Data();
 		}
 		in_samples    = m_AudioNormalizer.Process((float*)data, in_samples, in_channels);
 		in_allsamples = in_samples * in_channels;
@@ -312,8 +300,8 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	// Copy or convert to output
 	if (data == pDataIn) {
 		memcpy(pDataOut, data, in_allsamples * in_bytespersample);
-	} else if (data == (BYTE*)m_buffer) {
-		convert_float_to(in_sampleformat, in_channels, in_samples, m_buffer, pDataOut);
+	} else if (data == (BYTE*)m_buffer.Data()) {
+		convert_float_to(in_sampleformat, in_channels, in_samples, m_buffer.Data(), pDataOut);
 	}
 
 	// Gain
