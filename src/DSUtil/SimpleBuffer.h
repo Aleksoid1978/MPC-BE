@@ -20,7 +20,8 @@
 
 #pragma once
 
-// Fast and simple container
+// CSimplePaddedBuffer - fast and simple container
+// PS: When resizing the old data will be lost.
 
 template <typename T>
 class CSimpleBuffer
