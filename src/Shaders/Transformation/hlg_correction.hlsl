@@ -5,28 +5,7 @@ sampler image : register(s0);
 #define SRC_LUMINANCE_PEAK     1000.0
 #define DISPLAY_LUMINANCE_PEAK 80.0
 
-float hable1(float x)
-{
-    const float A = 0.15, B = 0.50, C = 0.10, D = 0.20, E = 0.02, F = 0.30;
-
-    return ((x * (A * x + (C * B)) + (D * E)) / (x * (A * x + B) + (D * F))) - E / F;
-}
-
-float3 hable3(float3 rgb)
-{
-    rgb.r = hable1(rgb.r);
-    rgb.g = hable1(rgb.g);
-    rgb.b = hable1(rgb.b);
-
-    return rgb;
-}
-
-float3 ToneMapping(float3 rgb)
-{
-    const float HABLE_DIV = hable1(11.2);
-
-    return hable3(rgb) / HABLE_DIV;
-}
+#include "hdr_tone_mapping.hlsl"
 
 inline float inverse_HLG(float x)
 {
@@ -37,7 +16,7 @@ inline float inverse_HLG(float x)
     if (x <= 0.5)
         x = x * x * B67_inv_r2;
     else
-       x = exp((x - B67_c) / B67_a) + B67_b;
+        x = exp((x - B67_c) / B67_a) + B67_b;
 
     return x;
 }
@@ -53,7 +32,7 @@ float4 main(float2 tex : TEXCOORD0) : COLOR
     pixel.rgb /= 12.0;
 
     // HDR tone mapping
-    pixel.rgb = ToneMapping(pixel.rgb);
+    pixel.rgb = ToneMappingHable(pixel.rgb);
 
     // Peak luminance
     pixel.rgb = pixel.rgb * (SRC_LUMINANCE_PEAK / DISPLAY_LUMINANCE_PEAK);

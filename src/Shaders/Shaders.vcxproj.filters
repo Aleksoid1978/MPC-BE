@@ -129,4 +129,9 @@
       <UniqueIdentifier>{47767572-f2ee-4b2b-af5a-6a3abe6d6e94}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Transformation\hdr_tone_mapping.hlsl">
+      <Filter>Transformation</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>
