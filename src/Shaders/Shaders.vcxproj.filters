@@ -133,5 +133,8 @@
     <ClInclude Include="Transformation\hdr_tone_mapping.hlsl">
       <Filter>Transformation</Filter>
     </ClInclude>
+    <ClInclude Include="Transformation\colorspace_gamut_conversion.hlsl">
+      <Filter>Transformation</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
