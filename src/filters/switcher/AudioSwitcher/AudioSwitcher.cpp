@@ -225,11 +225,11 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	unsigned     audio_channels       = in_wfe->nChannels;
 	DWORD        audio_layout         = input_layout;
 	BYTE*        audio_data           = pDataIn;
-	unsigned     audio_samples        = pIn->GetActualDataLength() / (audio_channels * get_bytes_per_sample(audio_sampleformat));
+	int          audio_samples        = pIn->GetActualDataLength() / (audio_channels * get_bytes_per_sample(audio_sampleformat));
 	unsigned     audio_allsamples     = audio_samples * audio_channels;
 
 	// in_samples = 0 doesn't mean it's failed, return S_OK otherwise might screw the sound
-	if (audio_samples == 0) {
+	if (audio_samples <= 0) {
 		pOut->SetActualDataLength(0);
 		return S_OK;
 	}
@@ -239,7 +239,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	auto        &output_channels      = output_wfe->nChannels;
 	const DWORD  output_layout        = GetChannelLayout(output_wfe);
 	SampleFormat output_sampleformat  = GetSampleFormat(output_wfe);
-	const unsigned output_samplesize    = pOut->GetSize() / (output_channels * get_bytes_per_sample(output_sampleformat));
+	const int    output_samplesize    = pOut->GetSize() / (output_channels * get_bytes_per_sample(output_sampleformat));
 
 	// Mixer
 	int delay = 0;
