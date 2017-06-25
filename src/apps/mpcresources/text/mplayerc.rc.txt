@@ -397,6 +397,18 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Process priority above normal"
 END
 
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 23
+5		"Channel Mixer"
+6		"Mix channels to:"
+8		"Request stereo from the decoder"
+9		"Redirect bass to LFE*"
+10		"Volume control"
+13		"Auto volume control"
+14		"Boost audio"
+19		"Audio time shift (ms):"
+22		"Default"
+END
+
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Override placement"
 7		"Horizontal:"

@@ -397,15 +397,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"프로세스 우선순위 높이기"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
-5		"Sound processing"
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 23
+5		"Channel Mixer"
 6		"Mix channels to:"
 8		"Request stereo from the decoder"
 9		"Redirect bass to LFE*"
+10		"Volume control"
 13		"Auto volume control"
 14		"Boost audio"
-20		"오디오 시간 조절 (ms):"
-23		"Default"
+19		"오디오 시간 조절 (ms):"
+22		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
