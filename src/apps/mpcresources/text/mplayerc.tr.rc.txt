@@ -397,6 +397,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"İşlem önceliğini normalden yüksek tut"
 END
 
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
+5		"Ses işleme"
+6		"Kanalları karıştır:"
+8		"Request stereo from the decoder"
+9		"Basları LFE*'ye yönlendir"
+13		"Oto ses kontrolü"
+14		"Sesi güçlendir"
+20		"Ses zaman kaydırma (ms):"
+23		"Varsayılan"
+END
+
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Özel yerleşim"
 7		"Yatay:"
@@ -1073,6 +1084,7 @@ STRING IDD_PPAGELOGO		"Oynatıcı::Logo"
 STRING IDD_PPAGEMISC		"Çeşitli"
 STRING IDD_PPAGEPLAYBACK		"Oynatma"
 STRING IDD_PPAGEPLAYER		"Oynatıcı"
+STRING IDD_PPAGESOUNDPROCESSING		"Ses::Ses işleme"
 STRING IDD_PPAGESUBRENDERING		"Altyazılar::Oluşturma"
 STRING IDD_PPAGESUBSTYLE		"Altyazılar::Görünüm"
 STRING IDD_PPAGESUBTITLES		"Altyazılar"

@@ -397,6 +397,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Ekinbide lehentasuna arruntetik gora"
 END
 
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
+5		"Soinu prozesapena"
+6		"Nahastu bideak:"
+8		"Request stereo from the decoder"
+9		"Redirect bass to LFE*"
+13		"Berez irabazi agintea"
+14		"Audioa bultzada"
+20		"Audio denbora aldaketa (sm):"
+23		"Berezkoa"
+END
+
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Ezeztatu kokapena"
 7		"Etzana:"
@@ -1073,6 +1084,7 @@ STRING IDD_PPAGELOGO		"Irakurgailua::Logoa"
 STRING IDD_PPAGEMISC		"Askotarikoa"
 STRING IDD_PPAGEPLAYBACK		"Irakurketa"
 STRING IDD_PPAGEPLAYER		"Irakurgailua"
+STRING IDD_PPAGESOUNDPROCESSING		"Audioa::Soinu prozesapena"
 STRING IDD_PPAGESUBRENDERING		"Azpidatziak::Aurkezpena"
 STRING IDD_PPAGESUBSTYLE		"Azpidatziak::Berezko Estiloa"
 STRING IDD_PPAGESUBTITLES		"Azpidatziak"

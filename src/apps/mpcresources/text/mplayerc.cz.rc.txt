@@ -397,6 +397,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Spouštět se zvýšenou prioritou"
 END
 
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
+5		"Sound processing"
+6		"Mix channels to:"
+8		"Request stereo from the decoder"
+9		"Redirect bass to LFE*"
+13		"Auto volume control"
+14		"Boost audio"
+20		"Posunout zvukovou stopu (ms):"
+23		"Default"
+END
+
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Změnit polohu"
 7		"Horizontální:"
@@ -1073,6 +1084,7 @@ STRING IDD_PPAGELOGO		"Přehrávač::Logo"
 STRING IDD_PPAGEMISC		"Ostatní"
 STRING IDD_PPAGEPLAYBACK		"Přehrávání"
 STRING IDD_PPAGEPLAYER		"Přehrávač"
+STRING IDD_PPAGESOUNDPROCESSING		"Audio::Sound processing"
 STRING IDD_PPAGESUBRENDERING		"Titulky::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Titulky::Výchozí styl"
 STRING IDD_PPAGESUBTITLES		"Titulky"

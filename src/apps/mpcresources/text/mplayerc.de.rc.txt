@@ -397,6 +397,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"&Prozesspriorität ""Höher als normal"""
 END
 
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
+5		"Audiobearbeitung"
+6		"Kanäle mischen zu:"
+8		"Stereo vom Decoder anfordern"
+9		"Bass zum LFE umleiten*"
+13		"Automatische Verstärkungsregelung"
+14		"Audio verstärken"
+20		"Audioverzögerung (ms):"
+23		"Zurücksetzen"
+END
+
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Untertitelposition anpassen"
 7		"Horizontal:"
@@ -1073,6 +1084,7 @@ STRING IDD_PPAGELOGO		"Player::Logo"
 STRING IDD_PPAGEMISC		"Sonstige Einstellungen"
 STRING IDD_PPAGEPLAYBACK		"Wiedergabe"
 STRING IDD_PPAGEPLAYER		"Player"
+STRING IDD_PPAGESOUNDPROCESSING		"Audio::Audiobearbeitung"
 STRING IDD_PPAGESUBRENDERING		"Untertitel::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Untertitel::Standard-Darstellung"
 STRING IDD_PPAGESUBTITLES		"Untertitel"

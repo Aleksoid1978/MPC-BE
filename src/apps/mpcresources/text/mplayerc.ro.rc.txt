@@ -397,6 +397,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Prioritatea procesării peste normal"
 END
 
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
+5		"Sound processing"
+6		"Mix channels to:"
+8		"Request stereo from the decoder"
+9		"Redirect bass to LFE*"
+13		"Auto volume control"
+14		"Boost audio"
+20		"Decalare timp audio (ms):"
+23		"Default"
+END
+
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Suprascrie așezarea"
 7		"Orizontal:"
@@ -1076,6 +1087,7 @@ STRING IDD_PPAGELOGO		"Player::Logo"
 STRING IDD_PPAGEMISC		"Diverse"
 STRING IDD_PPAGEPLAYBACK		"Redare"
 STRING IDD_PPAGEPLAYER		"Player"
+STRING IDD_PPAGESOUNDPROCESSING		"Audio::Sound processing"
 STRING IDD_PPAGESUBRENDERING		"Subtitrări::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Subtitrări::Stil implicit"
 STRING IDD_PPAGESUBTITLES		"Subtitrări"

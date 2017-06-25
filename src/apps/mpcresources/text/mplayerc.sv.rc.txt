@@ -397,6 +397,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Process prioritet högre än normal"
 END
 
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
+5		"Sound processing"
+6		"Mix channels to:"
+8		"Request stereo from the decoder"
+9		"Redirect bass to LFE*"
+13		"Auto volume control"
+14		"Boost audio"
+20		"Ljud tidsförskjutning (ms):"
+23		"Default"
+END
+
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Överskugga placering"
 7		"Horisontal:"
@@ -1073,6 +1084,7 @@ STRING IDD_PPAGELOGO		"Spelare::Logo"
 STRING IDD_PPAGEMISC		"Diverse"
 STRING IDD_PPAGEPLAYBACK		"Uppspelning"
 STRING IDD_PPAGEPLAYER		"Spelare"
+STRING IDD_PPAGESOUNDPROCESSING		"Audio::Sound processing"
 STRING IDD_PPAGESUBRENDERING		"Undertexter::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Undertexter::Standard Stil"
 STRING IDD_PPAGESUBTITLES		"Undertexter"

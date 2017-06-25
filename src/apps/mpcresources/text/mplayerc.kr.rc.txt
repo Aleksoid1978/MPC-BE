@@ -397,6 +397,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"프로세스 우선순위 높이기"
 END
 
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
+5		"Sound processing"
+6		"Mix channels to:"
+8		"Request stereo from the decoder"
+9		"Redirect bass to LFE*"
+13		"Auto volume control"
+14		"Boost audio"
+20		"오디오 시간 조절 (ms):"
+23		"Default"
+END
+
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"자막 표시 위치"
 7		"수평:"
@@ -1073,6 +1084,7 @@ STRING IDD_PPAGELOGO		"플레이어::로고"
 STRING IDD_PPAGEMISC		"기타"
 STRING IDD_PPAGEPLAYBACK		"재생"
 STRING IDD_PPAGEPLAYER		"플레이어"
+STRING IDD_PPAGESOUNDPROCESSING		"Audio::Sound processing"
 STRING IDD_PPAGESUBRENDERING		"자막::렌더링"
 STRING IDD_PPAGESUBSTYLE		"자막::스타일"
 STRING IDD_PPAGESUBTITLES		"자막"
