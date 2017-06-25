@@ -397,6 +397,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Mayor prioridad para el proceso"
 END
 
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
+5		"Sound processing"
+6		"Mix channels to:"
+8		"Request stereo from the decoder"
+9		"Redirect bass to LFE*"
+13		"Auto volume control"
+14		"Boost audio"
+20		"Desplazamiento del audio (ms):"
+23		"Default"
+END
+
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Fijar ubicación"
 7		"Horizontal:"
@@ -1073,6 +1084,7 @@ STRING IDD_PPAGELOGO		"Reproductor::Logo"
 STRING IDD_PPAGEMISC		"Misceláneos"
 STRING IDD_PPAGEPLAYBACK		"Reproducción"
 STRING IDD_PPAGEPLAYER		"Reproductor"
+STRING IDD_PPAGESOUNDPROCESSING		"Cambia Audio::Sound processing"
 STRING IDD_PPAGESUBRENDERING		"Subtítulos::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Subtítulos::Estilo Predeterminado"
 STRING IDD_PPAGESUBTITLES		"Subtítulos"

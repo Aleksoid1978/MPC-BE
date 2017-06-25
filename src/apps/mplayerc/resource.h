@@ -580,6 +580,7 @@
 #define IDD_PPAGECOLOR                  10028
 #define IDD_PPAGEAUDIO                  10029
 #define IDD_PPAGEEXTERNALFILTERS        10030
+#define IDD_PPAGESOUNDPROCESSING        10031
 #define IDD_PPAGEACCELTBL               10032
 #define IDD_PPAGESUBSTYLE               10033
 #define IDD_PPAGEMOUSE                  10034

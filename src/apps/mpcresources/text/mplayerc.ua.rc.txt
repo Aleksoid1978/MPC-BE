@@ -397,6 +397,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Підвищений пріоритет процесу"
 END
 
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
+5		"Обробка звуку"
+6		"Мікшування каналів:"
+8		"Запит стерео у декодера"
+9		"Перенаправлення басів до LFE*"
+13		"Автоматичне регулювання гучності"
+14		"Підсилення аудіо"
+20		"Затримка звуку (мс):"
+23		"Типово"
+END
+
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Змінити положення"
 7		"Горизонт.:"
@@ -1073,6 +1084,7 @@ STRING IDD_PPAGELOGO		"Програвач::Логотип"
 STRING IDD_PPAGEMISC		"Різне"
 STRING IDD_PPAGEPLAYBACK		"Відтворення"
 STRING IDD_PPAGEPLAYER		"Програвач"
+STRING IDD_PPAGESOUNDPROCESSING		"Аудіо::Обробка звуку"
 STRING IDD_PPAGESUBRENDERING		"Субтитри::Візуалізація"
 STRING IDD_PPAGESUBSTYLE		"Субтитри::Стандартний стиль"
 STRING IDD_PPAGESUBTITLES		"Субтитри"

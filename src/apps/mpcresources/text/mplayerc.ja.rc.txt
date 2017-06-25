@@ -397,6 +397,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"プロセスの優先度を 通常以上 にする"
 END
 
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
+5		"サウンド プロセッシング"
+6		"チャンネルをミックス:"
+8		"Request stereo from the decoder"
+9		"LFE* にバスをリダイレクト"
+13		"自動音量コントロール"
+14		"音声のブースト"
+20		"音声のタイム シフト(ミリ秒):"
+23		"デフォルト"
+END
+
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"配置を強制指定する"
 7		"水平位置:"
@@ -1073,6 +1084,7 @@ STRING IDD_PPAGELOGO		"プレーヤー::ロゴ"
 STRING IDD_PPAGEMISC		"その他"
 STRING IDD_PPAGEPLAYBACK		"再生"
 STRING IDD_PPAGEPLAYER		"プレーヤー"
+STRING IDD_PPAGESOUNDPROCESSING		"音声::サウンド プロセッシング"
 STRING IDD_PPAGESUBRENDERING		"字幕::レンダリング"
 STRING IDD_PPAGESUBSTYLE		"字幕::デフォルト スタイル"
 STRING IDD_PPAGESUBTITLES		"字幕"

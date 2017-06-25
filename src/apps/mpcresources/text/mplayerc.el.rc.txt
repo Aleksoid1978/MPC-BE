@@ -397,6 +397,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Προτεραιότητα διεργασίας πάνω από κανονική"
 END
 
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
+5		"Sound processing"
+6		"Μίξη καναλιών σε:"
+8		"Request stereo from the decoder"
+9		"Redirect bass to LFE*"
+13		"Αυτόματος έλεγχος έντασης"
+14		"Ώθηση ήχου"
+20		"Χρονική μετατόπιση ήχου (ms):"
+23		"Προεπιλογή"
+END
+
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Παράκαμψη τοποθέτησης"
 7		"Οριζόντια:"
@@ -1076,6 +1087,7 @@ STRING IDD_PPAGELOGO		"Αναπαραγωγός::Λογότυπο"
 STRING IDD_PPAGEMISC		"Διάφορα"
 STRING IDD_PPAGEPLAYBACK		"Αναπαραγωγή"
 STRING IDD_PPAGEPLAYER		"Αναπαραγωγός"
+STRING IDD_PPAGESOUNDPROCESSING		"Ήχος::Sound processing"
 STRING IDD_PPAGESUBRENDERING		"Υπότιτλοι::Απόδοση"
 STRING IDD_PPAGESUBSTYLE		"Υπότιτλοι::Προεπιλεγμένο στυλ"
 STRING IDD_PPAGESUBTITLES		"Υπότιτλοι"

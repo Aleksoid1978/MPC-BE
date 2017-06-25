@@ -397,6 +397,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Падвышаны прыярытэт працэсу"
 END
 
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
+5		"Sound processing"
+6		"Mix channels to:"
+8		"Request stereo from the decoder"
+9		"Redirect bass to LFE*"
+13		"Auto volume control"
+14		"Boost audio"
+20		"Зрушэнне гуку (у мс):"
+23		"Default"
+END
+
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Змяніць становішча"
 7		"Гарызант:"
@@ -1073,6 +1084,7 @@ STRING IDD_PPAGELOGO		"Прайгравальнік::Лагатып"
 STRING IDD_PPAGEMISC		"Рознае"
 STRING IDD_PPAGEPLAYBACK		"Прайграванне"
 STRING IDD_PPAGEPLAYER		"Прайгравальнік"
+STRING IDD_PPAGESOUNDPROCESSING		"Audio::Sound processing"
 STRING IDD_PPAGESUBRENDERING		"Субтытры::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Субтытры::Стандартны стыль"
 STRING IDD_PPAGESUBTITLES		"Субтытры"

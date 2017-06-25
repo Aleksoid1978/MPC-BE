@@ -397,6 +397,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Prioridade do processo acima do normal"
 END
 
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
+5		"Sound processing"
+6		"Mix channels to:"
+8		"Request stereo from the decoder"
+9		"Redirect bass to LFE*"
+13		"Auto volume control"
+14		"Boost audio"
+20		"Mudança tempo do áudio (ms):"
+23		"Default"
+END
+
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Forçar posicionamento"
 7		"Horizontal:"
@@ -1073,6 +1084,7 @@ STRING IDD_PPAGELOGO		"Tocador::Logo"
 STRING IDD_PPAGEMISC		"Miscelaneas"
 STRING IDD_PPAGEPLAYBACK		"Reprodução"
 STRING IDD_PPAGEPLAYER		"Tocador"
+STRING IDD_PPAGESOUNDPROCESSING		"Muda Áudio::Sound processing"
 STRING IDD_PPAGESUBRENDERING		"Legendas::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Legendas::Estilo Pré-determinado"
 STRING IDD_PPAGESUBTITLES		"Legendas"

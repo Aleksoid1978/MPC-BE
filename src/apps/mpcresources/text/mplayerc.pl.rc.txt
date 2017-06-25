@@ -397,6 +397,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Priorytet programu powyżej normalnego"
 END
 
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
+5		"Przetwarzanie dźwięku"
+6		"Miksuj kanały do:"
+8		"Request stereo from the decoder"
+9		"Przekieruj niskie tony do LFE*"
+13		"Automatyczna regulacja głośności"
+14		"Wzmocnienie dźwięku"
+20		"Opóźnienie dźwięku (ms):"
+23		"Domyślne"
+END
+
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Nadpisanie położenia"
 7		"Poziomo:"
@@ -1064,6 +1075,7 @@ STRING IDD_PPAGELOGO		"Program::Logo"
 STRING IDD_PPAGEMISC		"Różne"
 STRING IDD_PPAGEPLAYBACK		"Odtwarzanie"
 STRING IDD_PPAGEPLAYER		"Program"
+STRING IDD_PPAGESOUNDPROCESSING		"Audio::Przetwarzanie dźwięku"
 STRING IDD_PPAGESUBRENDERING		"Napisy::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Napisy::Domyślny styl"
 STRING IDD_PPAGESUBTITLES		"Napisy"

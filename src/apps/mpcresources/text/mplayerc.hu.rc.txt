@@ -397,6 +397,17 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"A lejátszó prioritása normál érték felett"
 END
 
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
+5		"Sound processing"
+6		"Mix channels to:"
+8		"Request stereo from the decoder"
+9		"Redirect bass to LFE*"
+13		"Auto volume control"
+14		"Boost audio"
+20		"Audió időzítés-eltolása:\n(ezredmásodpercben)"
+23		"Default"
+END
+
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
 6		"Elhelyezés felülbírálása"
 7		"Vízszintes:"
@@ -1073,6 +1084,7 @@ STRING IDD_PPAGELOGO		"Lejátszó::Logó"
 STRING IDD_PPAGEMISC		"Vegyes"
 STRING IDD_PPAGEPLAYBACK		"Lejátszás"
 STRING IDD_PPAGEPLAYER		"Lejátszó"
+STRING IDD_PPAGESOUNDPROCESSING		"Audio::Sound processing"
 STRING IDD_PPAGESUBRENDERING		"Feliratok::Rendering"
 STRING IDD_PPAGESUBSTYLE		"Feliratok::Alapstílus"
 STRING IDD_PPAGESUBTITLES		"Feliratok"
