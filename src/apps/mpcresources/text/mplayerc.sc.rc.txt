@@ -397,15 +397,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"高于普通进程优先级"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
-5		"声音处理"
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 23
+5		"Channel Mixer"
 6		"混合声道至:"
 8		"要求解码器输出 2.0 立体声"
 9		"低音重定向到 LFE 声道*"
+10		"Volume control"
 13		"自动音量控制"
 14		"音频增强"
-20		"音频延迟时间(毫秒): "
-23		"默认值"
+19		"音频延迟时间(毫秒): "
+22		"默认值"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

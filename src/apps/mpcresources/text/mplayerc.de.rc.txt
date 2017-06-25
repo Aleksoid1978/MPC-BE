@@ -397,15 +397,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"&Prozesspriorität ""Höher als normal"""
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
-5		"Audiobearbeitung"
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 23
+5		"Channel Mixer"
 6		"Kanäle mischen zu:"
 8		"Stereo vom Decoder anfordern"
 9		"Bass zum LFE umleiten*"
+10		"Volume control"
 13		"Automatische Verstärkungsregelung"
 14		"Audio verstärken"
-20		"Audioverzögerung (ms):"
-23		"Zurücksetzen"
+19		"Audioverzögerung (ms):"
+22		"Zurücksetzen"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

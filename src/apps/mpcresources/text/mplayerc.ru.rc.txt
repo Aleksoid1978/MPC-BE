@@ -397,15 +397,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Повышенный приоритет процесса"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
-5		"Обработка звука"
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 23
+5		"Микшер каналов"
 6		"Микшировать каналы в:"
 8		"Запросить стерео у декодера"
 9		"Перенаправить бас в LFE*"
+10		"Управление громкостью"
 13		"Автоматическая регулировка громкости"
 14		"Повышать громкость"
-20		"Смещение звука (в мс):"
-23		"По умолчанию"
+19		"Смещение звука (в мс):"
+22		"По умолчанию"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

@@ -397,15 +397,16 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"İşlem önceliğini normalden yüksek tut"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 24
-5		"Ses işleme"
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 23
+5		"Channel Mixer"
 6		"Kanalları karıştır:"
 8		"Request stereo from the decoder"
 9		"Basları LFE*'ye yönlendir"
+10		"Volume control"
 13		"Oto ses kontrolü"
 14		"Sesi güçlendir"
-20		"Ses zaman kaydırma (ms):"
-23		"Varsayılan"
+19		"Ses zaman kaydırma (ms):"
+22		"Varsayılan"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
