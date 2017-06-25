@@ -146,7 +146,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Befehl &zurücksetzen"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 35
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
 5		"Audio-Renderer"
 7		"Eigenschaften"
 9		"Duale Ausgabe"
@@ -154,14 +154,6 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 35
 11		"Externe Audiodateien automatisch laden"
 13		"Zurücksetzen"
 14		"Externe Audiodateien gegenüber integrierten Audiospuren bevorzugen"
-16		"Audiobearbeitung"
-17		"Kanäle mischen zu:"
-19		"Stereo vom Decoder anfordern"
-20		"Bass zum LFE umleiten*"
-24		"Automatische Verstärkungsregelung"
-25		"Audio verstärken"
-31		"Audioverzögerung (ms):"
-34		"Zurücksetzen"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

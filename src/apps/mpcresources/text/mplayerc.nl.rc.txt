@@ -146,7 +146,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Selectie(s) resetten"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 35
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
 5		"Audiorenderer"
 7		"Eigenschappen"
 9		"Duale uitvoer"
@@ -154,14 +154,6 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 35
 11		"Geluidsbestanden autom. laden"
 13		"Resetten"
 14		"Prefereer externe audiobestanden boven ingesloten audiospoor"
-16		"Geluidsbewerking"
-17		"Mix kanalen in:"
-19		"Stereo-audio uit decoder proberen te verkrijgen"
-20		"Herleid bas naar LFE-kanaal*"
-24		"Automatische volumeregeling"
-25		"Audio boosten"
-31		"Audio-tijdsverschuiving (ms):"
-34		"Standaard"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

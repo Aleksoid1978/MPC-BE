@@ -59,6 +59,7 @@ CPPageSheet::CPPageSheet(LPCTSTR pszCaption, CWnd* pParentWnd, UINT idPage)
 	AddPage(&m_sync);
 	AddPage(&m_fullscreen);
 	AddPage(&m_audio);
+	AddPage(&m_soundprocessing);
 	AddPage(&m_subtitles);
 	AddPage(&m_subMisc);
 	AddPage(&m_substyle);

@@ -146,7 +146,7 @@ BEGIN DIALOGEX IDD_PPAGEACCELTBL LINES 15
 14		"Seçimi Sıfırla"
 END
 
-BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 35
+BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 16
 5		"Ses İşleyicisi"
 7		"Özellikler"
 9		"İkili çıkış"
@@ -154,14 +154,6 @@ BEGIN DIALOGEX IDD_PPAGEAUDIO LINES 35
 11		"Ses dosyalarını oto-yükle"
 13		"Sıfırla"
 14		"Her zaman harici ses dosyalarını tercih et"
-16		"Ses işleme"
-17		"Kanalları karıştır:"
-19		"Request stereo from the decoder"
-20		"Basları LFE*'ye yönlendir"
-24		"Oto ses kontrolü"
-25		"Sesi güçlendir"
-31		"Ses zaman kaydırma (ms):"
-34		"Varsayılan"
 END
 
 BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22

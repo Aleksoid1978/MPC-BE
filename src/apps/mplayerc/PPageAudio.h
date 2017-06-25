@@ -22,9 +22,6 @@
 #pragma once
 
 #include "PPageBase.h"
-#include "FloatEdit.h"
-#include "../../filters/switcher/AudioSwitcher/AudioSwitcher.h"
-
 
 // CPPageAudio dialog
 
@@ -52,29 +49,6 @@ public:
 	CString		m_sAudioPaths;
 	BOOL		m_fPrioritizeExternalAudio;
 
-	CButton		m_chkMixer;
-	CComboBox	m_cmbMixerLayout;
-	CButton		m_chkStereoFromDecoder;
-	CButton		m_chkBassRedirect;
-
-	CStatic		m_stcGain;
-	CSliderCtrl	m_sldGain;
-
-	CButton		m_chkAutoVolumeControl;
-	CButton		m_chkNormBoostAudio;
-	CStatic		m_stcNormLevel;
-	CStatic		m_stcNormRealeaseTime;
-	CSliderCtrl	m_sldNormLevel;
-	CSliderCtrl	m_sldNormRealeaseTime;
-
-	CButton		m_chkTimeShift;
-	CIntEdit	m_edtTimeShift;
-	CSpinButtonCtrl m_spnTimeShift;
-
-	void UpdateGainInfo() { CString str; str.Format(ResStr(IDS_AUDIO_GAIN), m_sldGain.GetPos() / 10.0f); m_stcGain.SetWindowText(str); };
-	void UpdateNormLevelInfo() { CString str; str.Format(ResStr(IDS_AUDIO_LEVEL), m_sldNormLevel.GetPos()); m_stcNormLevel.SetWindowText(str); };
-	void UpdateNormRealeaseTimeInfo() { CString str; str.Format(ResStr(IDS_AUDIO_RELEASETIME), m_sldNormRealeaseTime.GetPos()); m_stcNormRealeaseTime.SetWindowText(str); };
-
 	CToolTipCtrl m_tooltip;
 
 	void ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKNOWN lpunk, HRESULT* phr));
@@ -91,11 +65,4 @@ public:
 	afx_msg void OnAudioRenderPropClick();
 	afx_msg void OnDualAudioOutputCheck();
 	afx_msg void OnBnClickedResetAudioPaths();
-	afx_msg void OnMixerCheck();
-	afx_msg void OnMixerLayoutChange();
-	afx_msg void OnAutoVolumeControlCheck();
-	afx_msg void OnTimeShiftCheck();
-	afx_msg void OnBnClickedSoundProcessingDefault();
-
-	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 };

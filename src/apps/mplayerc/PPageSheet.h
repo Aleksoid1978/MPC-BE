@@ -35,6 +35,7 @@
 #include "PPageWebServer.h"
 #include "PPageInternalFilters.h"
 #include "PPageAudio.h"
+#include "PPageSoundProcessing.h"
 #include "PPageFiltersPriority.h"
 #include "PPageExternalFilters.h"
 #include "PPageSubtitles.h"
@@ -69,28 +70,29 @@ class CPPageSheet : public TreePropSheet::CTreePropSheet
 private:
 	bool m_bLockPage;
 
-	CPPagePlayer m_player;
-	CPPageFormats m_formats;
-	CPPageAccelTbl m_acceltbl;
-	CPPageLogo m_logo;
-	CPPageInterface m_interface;
-	CPPageWebServer m_webserver;
-	CPPagePlayback m_playback;
-	CPPageDVD m_dvd;
-	CPPageCapture m_tuner;
-	CPPageYoutube m_youtube;
-	CPPageVideo m_video;
-	CPPageColor m_color;
-	CPPageSync m_sync;
-	CPPageFullscreen m_fullscreen;
-	CPPageAudio m_audio;
-	CPPageSubtitles m_subtitles;
-	CPPageSubRend m_subMisc;
-	CPPageSubStyle m_substyle;
+	CPPagePlayer          m_player;
+	CPPageFormats         m_formats;
+	CPPageAccelTbl        m_acceltbl;
+	CPPageLogo            m_logo;
+	CPPageInterface       m_interface;
+	CPPageWebServer       m_webserver;
+	CPPagePlayback        m_playback;
+	CPPageDVD             m_dvd;
+	CPPageCapture         m_tuner;
+	CPPageYoutube         m_youtube;
+	CPPageVideo           m_video;
+	CPPageColor           m_color;
+	CPPageSync            m_sync;
+	CPPageFullscreen      m_fullscreen;
+	CPPageAudio           m_audio;
+	CPPageSoundProcessing m_soundprocessing;
+	CPPageSubtitles       m_subtitles;
+	CPPageSubRend         m_subMisc;
+	CPPageSubStyle        m_substyle;
 	CPPageInternalFilters m_internalfilters;
 	CPPageExternalFilters m_externalfilters;
 	CPPageFiltersPriority m_filterspriority;
-	CPPageMisc m_misc;
+	CPPageMisc            m_misc;
 
 	CTreeCtrl* CreatePageTreeObject();
 

@@ -264,7 +264,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	friend class CWebClientSocket;
 	friend class CGraphThread;
 	friend class CPPagePlayback;
-	friend class CPPageAudio;
+	friend class CPPageSoundProcessing;
 	friend class CPPagePlayer;
 	friend class CMPlayerCApp;
 
