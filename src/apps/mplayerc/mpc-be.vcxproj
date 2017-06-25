@@ -166,6 +166,7 @@
     <ClCompile Include="PPageColor.cpp" />
     <ClCompile Include="PPageFiltersPriority.cpp" />
     <ClCompile Include="PPageInterface.cpp" />
+    <ClCompile Include="PPageSoundProcessing.cpp" />
     <ClCompile Include="PPageYouTube.cpp" />
     <ClCompile Include="DeinterlacerFilter.cpp" />
     <ClCompile Include="DVBChannel.cpp" />
@@ -282,6 +283,7 @@
     <ClInclude Include="PPageColor.h" />
     <ClInclude Include="PPageFiltersPriority.h" />
     <ClInclude Include="PPageInterface.h" />
+    <ClInclude Include="PPageSoundProcessing.h" />
     <ClInclude Include="PPageYouTube.h" />
     <ClInclude Include="DeinterlacerFilter.h" />
     <ClInclude Include="DVBChannel.h" />
