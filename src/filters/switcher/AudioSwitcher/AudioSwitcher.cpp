@@ -24,6 +24,7 @@
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
 #endif
+#include <algorithm>
 #include <math.h>
 #include <MMReg.h>
 #include <Ks.h>
@@ -186,148 +187,157 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 {
 	HRESULT hr;
 
-	CStreamSwitcherInputPin* pInPin = GetInputPin();
-	CStreamSwitcherOutputPin* pOutPin = GetOutputPin();
-	if (!pInPin || !pOutPin) {
-		return __super::Transform(pIn, pOut);
-	}
-
-	const WAVEFORMATEX* in_wfe = (WAVEFORMATEX*)pInPin->CurrentMediaType().pbFormat;
-	const WAVEFORMATEX* out_wfe = (WAVEFORMATEX*)pOutPin->CurrentMediaType().pbFormat;
-
-	const SampleFormat in_sampleformat = GetSampleFormat(in_wfe);
-	if (in_sampleformat == SAMPLE_FMT_NONE) {
-		REFERENCE_TIME rtStart, rtStop;
-		if (SUCCEEDED(pIn->GetTime(&rtStart, &rtStop))) {
-			rtStart += m_rtAudioTimeShift;
-			rtStop  += m_rtAudioTimeShift;
-			pOut->SetTime(&rtStart, &rtStop);
-		}
-
-		return __super::Transform(pIn, pOut);
-	}
-
-	const unsigned in_bytespersample = in_wfe->wBitsPerSample / 8;
-	unsigned in_channels       = in_wfe->nChannels;
-	unsigned in_samples        = pIn->GetActualDataLength() / (in_channels * in_bytespersample);
-	unsigned in_allsamples     = in_samples * in_channels;
-
-	//if (pIn->IsDiscontinuity() == S_OK) {
-	//}
-
+	// check input an output buffers
 	BYTE* pDataIn = NULL;
 	BYTE* pDataOut = NULL;
 	if (FAILED(hr = pIn->GetPointer(&pDataIn)) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
 		return hr;
 	}
-
 	if (!pDataIn || !pDataOut) {
+		pOut->SetActualDataLength(0);
 		return S_FALSE;
 	}
 
+	// check input an output pins
+	CStreamSwitcherInputPin* pInPin = GetInputPin();
+	CStreamSwitcherOutputPin* pOutPin = GetOutputPin();
+	if (!pInPin || !pOutPin) {
+		return __super::Transform(pIn, pOut); // hmm
+	}
+
+	const WAVEFORMATEX* in_wfe = (WAVEFORMATEX*)pInPin->CurrentMediaType().pbFormat;
+	SampleFormat audio_sampleformat   = GetSampleFormat(in_wfe);
+
+	// bitsreaming
+	if (audio_sampleformat == SAMPLE_FMT_NONE) {
+		REFERENCE_TIME start, stop;
+		if (SUCCEEDED(pIn->GetTime(&start, &stop))) {
+			start += m_rtAudioTimeShift;
+			stop  += m_rtAudioTimeShift;
+			pOut->SetTime(&start, &stop);
+		}
+		return __super::Transform(pIn, pOut);
+	}
+
+	const DWORD  input_layout = GetChannelLayout(in_wfe); // need for BassRedirect
+
+	unsigned     audio_samplerate     = in_wfe->nSamplesPerSec;
+	unsigned     audio_channels       = in_wfe->nChannels;
+	DWORD        audio_layout         = input_layout;
+	BYTE*        audio_data           = pDataIn;
+	unsigned     audio_samples        = pIn->GetActualDataLength() / (audio_channels * get_bytes_per_sample(audio_sampleformat));
+	unsigned     audio_allsamples     = audio_samples * audio_channels;
+
 	// in_samples = 0 doesn't mean it's failed, return S_OK otherwise might screw the sound
-	if (in_samples == 0) {
+	if (audio_samples == 0) {
 		pOut->SetActualDataLength(0);
 		return S_OK;
 	}
 
-	if (long(in_samples * out_wfe->nChannels * in_bytespersample) > pOut->GetSize()) {
-		DLog(L"CAudioSwitcherFilter::Transform(): %d > %d", in_samples * out_wfe->nChannels * in_bytespersample, pOut->GetSize());
-		pOut->SetActualDataLength(0);
-		return S_OK;
-	}
-
-	BYTE* data = pDataIn;
-	int delay = 0;
-
-
-	SampleFormat sampleformat = in_sampleformat;
+	const WAVEFORMATEX* output_wfe = (WAVEFORMATEX*)pOutPin->CurrentMediaType().pbFormat;
+	auto        &output_samplerate    = output_wfe->nSamplesPerSec;
+	auto        &output_channels      = output_wfe->nChannels;
+	const DWORD  output_layout        = GetChannelLayout(output_wfe);
+	SampleFormat output_sampleformat  = GetSampleFormat(output_wfe);
+	const unsigned output_samplesize    = pOut->GetSize() / (output_channels * get_bytes_per_sample(output_sampleformat));
 
 	// Mixer
-	DWORD in_layout = GetChannelLayout(in_wfe);
-	DWORD out_layout = GetChannelLayout(out_wfe);
-
-	if (in_layout != out_layout || in_wfe->nSamplesPerSec != out_wfe->nSamplesPerSec) {
+	int delay = 0;
+	if (audio_layout != output_layout || audio_samplerate != output_samplerate) {
 		//m_Mixer.SetOptions(true);
-		m_Mixer.UpdateInput(in_sampleformat, in_layout, in_wfe->nSamplesPerSec);
-		m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, out_layout, out_wfe->nSamplesPerSec);
+		m_Mixer.UpdateInput(audio_sampleformat, audio_layout, audio_samplerate);
+		m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, output_layout, output_samplerate);
 
-		int out_samples = m_Mixer.CalcOutSamples(in_samples);
+		int mix_samples = m_Mixer.CalcOutSamples(audio_samples);
 
-		BYTE* out;
-		if (in_sampleformat == SAMPLE_FMT_FLT) {
-			out = pDataOut;
+		BYTE* mix_data;
+		if (output_sampleformat == SAMPLE_FMT_FLT) {
+			if (mix_samples > output_samplesize) {
+				return E_FAIL;
+			}
+			mix_data = pDataOut;
 		} else {
-			m_buffer.ExpandSize(out_samples * out_wfe->nChannels);
-			out = (BYTE*)m_buffer.Data();
+			m_buffer.ExpandSize(mix_samples * output_channels);
+			mix_data = (BYTE*)m_buffer.Data();
 		}
 
-		delay			= m_Mixer.GetInputDelay();
-		out_samples		= m_Mixer.Mixing(out, out_samples, data, in_samples);
-		if (!out_samples) {
+		delay = m_Mixer.GetInputDelay();
+		mix_samples = m_Mixer.Mixing(mix_data, mix_samples, audio_data, audio_samples);
+
+		if (!mix_samples) {
 			pOut->SetActualDataLength(0);
 			return S_OK;
 		}
-		data			= out;
-		in_samples		= out_samples;
-		in_channels		= out_wfe->nChannels;
-		in_allsamples	= in_samples * in_channels;
-
-		sampleformat = SAMPLE_FMT_FLT;
+		audio_data         = mix_data;
+		audio_samplerate   = output_samplerate;
+		audio_channels     = output_channels;
+		audio_layout       = output_layout;
+		audio_samples      = mix_samples;
+		audio_allsamples   = mix_samples * output_channels;
+		audio_sampleformat = SAMPLE_FMT_FLT;
 	}
-	else if (in_sampleformat == SAMPLE_FMT_FLT) {
-		memcpy(pDataOut, data, in_allsamples * sizeof(float));
-		data = pDataOut;
-	}
-
-	// Bass redirect
-	if ((m_bBassRedirect || in_layout == KSAUDIO_SPEAKER_STEREO) && CHL_CONTAINS_ALL(out_layout, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_LOW_FREQUENCY)) {
-		m_BassRedirect.UpdateInput(sampleformat, out_layout, out_wfe->nSamplesPerSec);
-		m_BassRedirect.Process(data, in_samples);
-	}
-
-	// Auto volume control
-	if (m_bAutoVolumeControl) {
-		if (data == pDataIn) {
-			m_buffer.ExpandSize(in_allsamples);
-			convert_to_float(in_sampleformat, in_channels, in_samples, data, m_buffer.Data());
-			data = (BYTE*)m_buffer.Data();
+	else if (audio_sampleformat == SAMPLE_FMT_FLT) {
+		if (audio_samples > output_samplesize) {
+			return E_FAIL;
 		}
-		in_samples    = m_AudioNormalizer.Process((float*)data, in_samples, in_channels);
-		in_allsamples = in_samples * in_channels;
+		memcpy(pDataOut, audio_data, audio_allsamples * sizeof(float));
+		audio_data = pDataOut;
+	}
+
+	// Bass redirect (works in place)
+	if ((m_bBassRedirect || input_layout == KSAUDIO_SPEAKER_STEREO) && CHL_CONTAINS_ALL(output_layout, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_LOW_FREQUENCY)) {
+		m_BassRedirect.UpdateInput(audio_sampleformat, audio_layout, audio_samplerate);
+		m_BassRedirect.Process(audio_data, audio_samples);
+	}
+
+	// Auto volume control (works in place, requires float)
+	if (m_bAutoVolumeControl) {
+		if (audio_data == pDataIn) {
+			m_buffer.ExpandSize(audio_allsamples);
+			convert_to_float(audio_sampleformat, audio_channels, audio_samples, audio_data, m_buffer.Data());
+
+			audio_data = (BYTE*)m_buffer.Data();
+			audio_sampleformat = SAMPLE_FMT_FLT;
+		}
+		audio_samples    = m_AudioNormalizer.Process((float*)audio_data, audio_samples, audio_channels);
+		audio_allsamples = audio_samples * audio_channels;
 	}
 
 	// Copy or convert to output
-	if (data == pDataIn) {
-		memcpy(pDataOut, data, in_allsamples * in_bytespersample);
-	} else if (data == (BYTE*)m_buffer.Data()) {
-		convert_float_to(in_sampleformat, in_channels, in_samples, m_buffer.Data(), pDataOut);
+	if (audio_data != pDataOut && audio_samples > output_samplesize) {
+		return E_FAIL;
+	}
+	if (audio_data == pDataIn) {
+		memcpy(pDataOut, audio_data, audio_allsamples * get_bytes_per_sample(audio_sampleformat));
+	} else if (audio_data == (BYTE*)m_buffer.Data()) {
+		convert_float_to(output_sampleformat, audio_channels, audio_samples, m_buffer.Data(), pDataOut);
+		audio_sampleformat = output_sampleformat;
 	}
 
 	// Gain
 	if (!m_bAutoVolumeControl && m_fGainFactor != 1.0f) {
-		switch (in_sampleformat) {
+		switch (audio_sampleformat) {
 		case SAMPLE_FMT_U8:
-			gain_uint8(m_fGainFactor, in_allsamples, (uint8_t*)pDataOut);
+			gain_uint8(m_fGainFactor, audio_allsamples, (uint8_t*)pDataOut);
 			break;
 		case SAMPLE_FMT_S16:
-			gain_int16(m_fGainFactor, in_allsamples, (int16_t*)pDataOut);
+			gain_int16(m_fGainFactor, audio_allsamples, (int16_t*)pDataOut);
 			break;
 		case SAMPLE_FMT_S24:
-			gain_int24(m_fGainFactor, in_allsamples, pDataOut);
+			gain_int24(m_fGainFactor, audio_allsamples, pDataOut);
 			break;
 		case SAMPLE_FMT_S32:
-			gain_int32(m_fGainFactor, in_allsamples, (int32_t*)pDataOut);
+			gain_int32(m_fGainFactor, audio_allsamples, (int32_t*)pDataOut);
 			break;
 		case SAMPLE_FMT_FLT:
-			gain_float(m_fGainFactor, in_allsamples, (float*)pDataOut);
+			gain_float(m_fGainFactor, audio_allsamples, (float*)pDataOut);
 			break;
 		}
 	}
 
-	pOut->SetActualDataLength(in_allsamples * get_bytes_per_sample(in_sampleformat));
+	pOut->SetActualDataLength(audio_allsamples * get_bytes_per_sample(audio_sampleformat));
 
-	REFERENCE_TIME rtDur = 10000000i64 * in_samples / out_wfe->nSamplesPerSec;
+	REFERENCE_TIME rtDur = 10000000i64 * audio_samples / audio_samplerate;
 	REFERENCE_TIME rtStart, rtStop;
 	if (FAILED(pIn->GetTime(&rtStart, &rtStop))) {
 		rtStart = m_rtNextStart;
