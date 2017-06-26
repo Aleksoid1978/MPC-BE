@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "ISDb.h"
 #include <moreuuids.h>
+#include "MainFrm.h"
 #include "PPageSubtitles.h"
 
 // CPPageSubtitles dialog
@@ -91,6 +92,8 @@ BOOL CPPageSubtitles::OnApply()
 
 	CAppSettings& s = AfxGetAppSettings();
 
+	const bool fAutoReloadExtSubtitles = s.fAutoReloadExtSubtitles;
+
 	s.iSubtitleRenderer				= m_cbSubtitleRenderer.GetCurSel();
 	s.fPrioritizeExternalSubtitles	= !!m_fPrioritizeExternalSubtitles;
 	s.fDisableInternalSubtitles		= !!m_fDisableInternalSubtitles;
@@ -100,6 +103,21 @@ BOOL CPPageSubtitles::OnApply()
 
 	s.strISDb = m_ISDb;
 	s.strISDb.TrimRight('/');
+
+	if (fAutoReloadExtSubtitles != s.fAutoReloadExtSubtitles) {
+		auto pFrame = AfxGetMainFrame();
+		if (s.fAutoReloadExtSubtitles) {
+			if (!pFrame->subChangeNotifyThread.joinable()) {
+				pFrame->subChangeNotifyThread = std::thread([&] { pFrame->subChangeNotifyThreadFunction(); });
+			}
+		} else {
+			if (pFrame->subChangeNotifyThread.joinable()) {
+				pFrame->m_EventSubChangeRefreshNotify.Reset();
+				pFrame->m_EventSubChangeStopNotify.Set();
+				pFrame->subChangeNotifyThread.join();
+			}
+		}
+	}
 
 	return __super::OnApply();
 }

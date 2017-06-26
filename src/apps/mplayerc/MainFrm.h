@@ -263,6 +263,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	friend class CTextPassThruFilter;
 	friend class CWebClientSocket;
 	friend class CGraphThread;
+	friend class CPPageSubtitles;
 	friend class CPPagePlayback;
 	friend class CPPageSoundProcessing;
 	friend class CPPagePlayer;
@@ -1308,28 +1309,27 @@ protected:
 	void SetStatusMessage(CString m_msg);
 	CString FillMessage();
 
-	bool	m_fValidDVDOpen;
+	bool m_fValidDVDOpen;
 
 	CComPtr<IBaseFilter> m_pBFmadVR;
 
-	HMODULE			m_hWtsLib;
+	HMODULE m_hWtsLib;
 
-	CDebugMonitor	m_DebugMonitor;
+	CDebugMonitor m_DebugMonitor;
 
-	static DWORD WINAPI		NotifyRenderThreadEntryPoint(LPVOID lpParameter);
-	void					SetupNotifyRenderThread(CAtlArray<HANDLE>& handles);
-	DWORD					NotifyRenderThread();
+	CStringArray      m_ExtSubFiles;
+	CAtlArray<CTime>  m_ExtSubFilesTime;
+	CStringArray      m_ExtSubPaths;
+	CAtlArray<HANDLE> m_ExtSubPathsHandles;
+	void              subChangeNotifySetupThread(CAtlArray<HANDLE>& handles);
 
-	CStringArray			m_ExtSubFiles;
-	CAtlArray<CTime>		m_ExtSubFilesTime;
-	CStringArray			m_ExtSubPaths;
-	CAtlArray<HANDLE>		m_ExtSubPathsHandles;
-	HANDLE					m_hNotifyRenderThread;
-	HANDLE					m_hStopNotifyRenderThreadEvent;
-	HANDLE					m_hRefreshNotifyRenderThreadEvent;
+	CAMEvent          m_EventSubChangeStopNotify;
+	CAMEvent          m_EventSubChangeRefreshNotify;
+	std::thread       subChangeNotifyThread;
+	void              subChangeNotifyThreadFunction();
 
-	::CEvent				m_hGraphThreadEventOpen;
-	::CEvent				m_hGraphThreadEventClose;
+	::CEvent m_hGraphThreadEventOpen;
+	::CEvent m_hGraphThreadEventClose;
 
 public:
 	afx_msg UINT OnPowerBroadcast(UINT nPowerEvent, LPARAM nEventData);
