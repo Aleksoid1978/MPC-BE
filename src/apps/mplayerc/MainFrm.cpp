@@ -15601,7 +15601,7 @@ bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 			s.fEnableSubtitles = true;
 		}
 
-		if (m_hNotifyRenderThread) {
+		if (m_hNotifyRenderThread && !::PathIsURL(fname)) {
 			BOOL bExists = FALSE;
 			for (INT_PTR idx = 0; idx < m_ExtSubFiles.GetCount(); idx++) {
 				if (fname == m_ExtSubFiles[idx]) {
