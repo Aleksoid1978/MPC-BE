@@ -109,6 +109,7 @@ BOOL CPPageSubtitles::OnApply()
 		if (s.fAutoReloadExtSubtitles) {
 			if (!pFrame->subChangeNotifyThread.joinable()) {
 				pFrame->subChangeNotifyThread = std::thread([&] { pFrame->subChangeNotifyThreadFunction(); });
+				::SetThreadPriority(pFrame->subChangeNotifyThread.native_handle(), THREAD_PRIORITY_LOWEST);
 			}
 		} else {
 			if (pFrame->subChangeNotifyThread.joinable()) {

@@ -882,6 +882,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	if (s.fAutoReloadExtSubtitles) {
 		subChangeNotifyThread = std::thread([this] { subChangeNotifyThreadFunction(); });
+		::SetThreadPriority(subChangeNotifyThread.native_handle(), THREAD_PRIORITY_LOWEST);
 	}
 
 	cmdLineThread = std::thread([this] { cmdLineThreadFunction(); });
