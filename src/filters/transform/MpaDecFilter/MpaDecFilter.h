@@ -133,6 +133,7 @@ protected:
 	CMediaType CreateMediaTypeHDMI(WORD type);
 
 	void CalculateDuration(int samples, int sample_rate, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, BOOL bIsTrueHDBitstream = FALSE);
+	MPCSampleFormat SelectOutputFormat(MPCSampleFormat sf);
 
 public:
 	CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr);
@@ -164,7 +165,6 @@ public:
 	// IMpaDecFilter
 	STDMETHODIMP SetOutputFormat(MPCSampleFormat sf, bool enable);
 	STDMETHODIMP_(bool) GetOutputFormat(MPCSampleFormat sf);
-	STDMETHODIMP_(MPCSampleFormat) SelectOutputFormat(MPCSampleFormat sf);
 	STDMETHODIMP SetDynamicRangeControl(bool fDRC);
 	STDMETHODIMP_(bool) GetDynamicRangeControl();
 	STDMETHODIMP SetSPDIF(enctype et, bool fSPDIF);

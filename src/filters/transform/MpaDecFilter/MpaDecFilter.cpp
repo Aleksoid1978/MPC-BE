@@ -517,7 +517,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 				memset(&m_bBitstreamSupported, FALSE, sizeof(m_bBitstreamSupported));
 
 				CMediaType mt = CreateMediaTypeSPDIF();
-				m_bBitstreamSupported[SPDIF]		= pPinRenderer->QueryAccept(&mt) == S_OK;
+				m_bBitstreamSupported[SPDIF]	= pPinRenderer->QueryAccept(&mt) == S_OK;
 
 				mt = CreateMediaTypeHDMI(IEC61937_EAC3);
 				m_bBitstreamSupported[EAC3]		= pPinRenderer->QueryAccept(&mt) == S_OK;
@@ -1959,6 +1959,28 @@ void CMpaDecFilter::CalculateDuration(int samples, int sample_rate, REFERENCE_TI
 	}
 }
 
+const MPCSampleFormat SFmtPrority[sfcount][sfcount] = {
+	{ SF_PCM16, SF_PCM32, SF_PCM24, SF_FLOAT }, // int16
+	{ SF_PCM24, SF_PCM32, SF_FLOAT, SF_PCM16 }, // int24
+	{ SF_PCM32, SF_PCM24, SF_FLOAT, SF_PCM16 }, // int32
+	{ SF_FLOAT, SF_PCM32, SF_PCM24, SF_PCM16 }, // float
+};
+
+MPCSampleFormat CMpaDecFilter::SelectOutputFormat(MPCSampleFormat mpcsf)
+{
+	CAutoLock cAutoLock(&m_csProps);
+
+	if (mpcsf >= 0 && mpcsf < sfcount) {
+		for (int i = 0; i < sfcount; i++) {
+			if (m_fSampleFmt[SFmtPrority[mpcsf][i]]) {
+				return SFmtPrority[mpcsf][i];
+			}
+		}
+	}
+
+	return SF_PCM16;
+}
+
 HRESULT CMpaDecFilter::CheckInputType(const CMediaType* mtIn)
 {
 	if (mtIn->subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
@@ -2159,29 +2181,6 @@ STDMETHODIMP_(bool) CMpaDecFilter::GetOutputFormat(MPCSampleFormat mpcsf)
 		return m_fSampleFmt[mpcsf];
 	}
 	return false;
-}
-
-
-const MPCSampleFormat SFmtPrority[sfcount][sfcount] = {
-	{ SF_PCM16, SF_PCM32, SF_PCM24, SF_FLOAT }, // int16
-	{ SF_PCM24, SF_PCM32, SF_FLOAT, SF_PCM16 }, // int24
-	{ SF_PCM32, SF_PCM24, SF_FLOAT, SF_PCM16 }, // int32
-	{ SF_FLOAT, SF_PCM32, SF_PCM24, SF_PCM16 }, // float
-};
-
-STDMETHODIMP_(MPCSampleFormat) CMpaDecFilter::SelectOutputFormat(MPCSampleFormat mpcsf)
-{
-	CAutoLock cAutoLock(&m_csProps);
-
-	if (mpcsf >= 0 && mpcsf < sfcount) {
-		for (int i = 0; i < sfcount; i++) {
-			if (m_fSampleFmt[SFmtPrority[mpcsf][i]]) {
-				return SFmtPrority[mpcsf][i];
-			}
-		}
-	}
-
-	return SF_PCM16;
 }
 
 STDMETHODIMP CMpaDecFilter::SetDynamicRangeControl(bool fDRC)
