@@ -48,7 +48,6 @@ public IUnknown {
 
 	STDMETHOD(SetOutputFormat(MPCSampleFormat sf, bool enable)) PURE;
 	STDMETHOD_(bool, GetOutputFormat(MPCSampleFormat sf)) PURE;
-	STDMETHOD_(MPCSampleFormat, SelectOutputFormat(MPCSampleFormat sf)) PURE;
 	STDMETHOD(SetDynamicRangeControl(bool fDRC)) PURE;
 	STDMETHOD_(bool, GetDynamicRangeControl()) PURE;
 	STDMETHOD(SetSPDIF(enctype et, bool fSPDIF)) PURE;
