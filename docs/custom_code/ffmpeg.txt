@@ -19,7 +19,6 @@
 * libavcodec/hevcpred.c
 * libavcodec/hevcpred.h
 * libavcodec/internal.h
-* libavcodec/libopenjpegdec.c
 * libavcodec/mpeg12dec.c
 * libavcodec/mpegaudio_parser.c
 * libavcodec/mpegpicture.c
