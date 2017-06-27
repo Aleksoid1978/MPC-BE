@@ -24,10 +24,6 @@
  * JPEG 2000 decoder using libopenjpeg
  */
 
-// ==> Start patch MPC
-#define  OPJ_STATIC
-// ==> End patch MPC
-
 #include "libavutil/common.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/intreadwrite.h"
