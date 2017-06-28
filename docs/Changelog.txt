@@ -13,7 +13,7 @@ Updated libraries:
 	MediaInfo git-v0.7.96;
 	openjpeg 2.2.0 git-6239ed7b;
 	Speex-1.2.0-1-gcae5026;
-	rapidjson git-v1.1.0-165-gb8f0414b;
+	rapidjson git-v1.1.0-199-g6a8f672c;
 	ZenLib git-v0.4.34-2-geda2854;
 	zlib 1.2.11.
 
