@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 #include <moreuuids.h>
-#include "../../switcher/AudioSwitcher/AudioSwitcher.h"
+#include "../../switcher/AudioSwitcher/StreamSwitcher.h" // for IStreamSwitcherInputPin
 #include "BaseSplitterOutputPin.h"
 #include "BaseSplitter.h"
 
