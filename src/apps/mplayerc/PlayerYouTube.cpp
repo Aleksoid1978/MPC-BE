@@ -25,6 +25,7 @@
 #include "PlayerYouTube.h"
 
 #define RAPIDJSON_ASSERT(x) ASSERT(x)
+#define RAPIDJSON_SSE2
 #include <rapidjson/include/rapidjson/document.h>
 
 #define YOUTUBE_PL_URL              L"youtube.com/playlist?"
@@ -50,6 +51,9 @@
 #define MATCH_ADAPTIVE_FMTS_START_2 "adaptive_fmts="
 #define MATCH_JS_START_2            "'PREFETCH_JS_RESOURCES': [\""
 #define MATCH_END_2                 "&"
+
+#define MATCH_PLAYER_RESPONSE       "\"player_response\":\""
+#define MATCH_PLAYER_RESPONSE_END   "}\""
 
 #define INTERNET_OPEN_FALGS         INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD
 
@@ -535,6 +539,8 @@ namespace Youtube
 				}
 			}
 
+			CStringA player_responce_jsonData = UrlDecode(GetEntry(data, MATCH_PLAYER_RESPONSE, MATCH_PLAYER_RESPONSE_END));
+
 			free(data);
 
 			CAtlList<CStringA> linesA;
@@ -817,7 +823,48 @@ namespace Youtube
 				y_fields.fname.Format(L"%s.%dp.%s", y_fields.title, final_video_profile->quality, final_video_profile->ext);
 				FixFilename(y_fields.fname);
 
-				if (!videoId.IsEmpty()) { // subtitle
+				if (!videoId.IsEmpty()) {
+					// subtitle
+					if (!player_responce_jsonData.IsEmpty()) {
+						player_responce_jsonData += "}";
+						player_responce_jsonData.Replace("\\u0026", "&");
+						player_responce_jsonData.Replace("\\/", "/");
+						player_responce_jsonData.Replace("\\\"", "\"");
+						player_responce_jsonData.Replace("\\&", "&");
+
+						rapidjson::Document d;
+						if (!d.Parse(player_responce_jsonData).HasParseError()) {
+							const auto& root = d.FindMember("captions");
+							if (root != d.MemberEnd()) {
+								const auto& iter = root->value.FindMember("playerCaptionsTracklistRenderer");
+								if (iter != root->value.MemberEnd()) {
+									const auto& captionTracks = iter->value.FindMember("captionTracks");
+									if (captionTracks != iter->value.MemberEnd() && captionTracks->value.IsArray()) {
+										for (auto elem = captionTracks->value.Begin(); elem != captionTracks->value.End(); ++elem) {
+											CString url, name;
+
+											CStringA urlA = elem->FindMember("baseUrl")->value.GetString();
+											if (!urlA.IsEmpty()) {
+												urlA += "&fmt=vtt";
+												url = UTF8To16(urlA);
+											}
+
+											CStringA nameA = elem->FindMember("name")->value["runs"][0]["text"].GetString();
+											if (!nameA.IsEmpty()) {
+												name = UTF8To16(nameA);
+											}
+
+											if (!url.IsEmpty() && !name.IsEmpty()) {
+												subs.AddTail(CSubtitleItem(url, name));
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+#if (0)
+					// This code is deprecated
 					CString link;
 					link.Format(L"https://video.google.com/timedtext?hl=en&type=list&v=%s", videoId);
 					hUrl = InternetOpenUrl(hInet, link, NULL, 0, INTERNET_OPEN_FALGS, 0);
@@ -865,6 +912,7 @@ namespace Youtube
 							}
 						}
 					}
+#endif
 				}
 
 				InternetCloseHandle(hInet);
