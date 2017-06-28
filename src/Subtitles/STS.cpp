@@ -22,8 +22,8 @@
 #include "stdafx.h"
 #include "STS.h"
 #include <atlbase.h>
-#include "RealTextParser.h"
 #include <fstream>
+#include "RealTextParser.h"
 #include "USFSubtitles.h"
 #include "../DSUtil/WinAPIUtils.h"
 
@@ -456,7 +456,7 @@ static CStringW RemoveSSATags(CStringW str, bool fUnicode, int CharSet)
 
 //
 
-static CStringW SubRipper2SSA(CStringW str, int CharSet)
+static CStringW SubRipper2SSA(CStringW str)
 {
 	str.Replace(L"<i>", L"{\\i1}");
 	str.Replace(L"</i>", L"{\\i}");
@@ -518,7 +518,7 @@ static bool OpenSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 			}
 
 			ret.Add(
-				SubRipper2SSA(str, CharSet),
+				SubRipper2SSA(str),
 				file->IsUnicode(),
 				(((hh1*60 + mm1)*60) + ss1)*1000 + ms1,
 				(((hh2*60 + mm2)*60) + ss2)*1000 + ms2);
@@ -567,13 +567,13 @@ static bool OpenOldSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int Char
 	return !ret.IsEmpty();
 }
 
-static CString WebVTT2SSA(CString str, int CharSet)
+static CString WebVTT2SSA(CString str)
 {
-	str = SubRipper2SSA(str, CharSet);
+	str = SubRipper2SSA(str);
 	str.Replace(L"</c>", L"");
 	str.Replace(L"</v>", L"");
 
-	static const LPWSTR tags2remove[] = {
+	static LPCWSTR tags2remove[] = {
 		L"<v ",
 		L"<c"
 	};
@@ -664,8 +664,12 @@ static bool OpenWebVTT(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 				subStr += tmp + L'\n';
 			}
 
+			if (subStr.IsEmpty()) {
+				continue;
+			}
+
 			ret.Add(
-				WebVTT2SSA(subStr, CharSet),
+				WebVTT2SSA(subStr),
 				file->IsUnicode(),
 				(((hh1 * 60 + mm1) * 60) + ss1) * 1000 + ms1,
 				(((hh2 * 60 + mm2) * 60) + ss2) * 1000 + ms2);
@@ -674,7 +678,7 @@ static bool OpenWebVTT(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 		}
 	}
 
-	return true;
+	return !ret.IsEmpty();
 }
 
 static bool OpenSubViewer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
@@ -3387,7 +3391,7 @@ static bool OpenRealText(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 
 	for (auto i = crRealText.m_mapLines.cbegin(); i != crRealText.m_mapLines.cend(); ++i) {
 		ret.Add(
-			SubRipper2SSA(i->second.c_str(), CharSet),
+			SubRipper2SSA(i->second.c_str()),
 			file->IsUnicode(),
 			i->first.first,
 			i->first.second);
