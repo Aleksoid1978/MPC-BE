@@ -596,6 +596,27 @@ static CString WebVTT2SSA(CString str, int CharSet)
 		}
 	}
 
+	pos = 0;
+	for (;;) {
+		pos = str.Find('<', pos);
+		if (pos >= 0) {
+			end = str.Find(L'>', pos);
+			if (end > pos) {
+				const CString tmp = str.Mid(pos, end - pos + 1);
+				int hour, minute, seconds, msesonds;
+				if (swscanf_s(tmp, L"<%02d:%02d:%02d.%03d>", &hour, &minute, &seconds, &msesonds) == 4) {
+					str.Delete(pos, end - pos + 1);
+				} else {
+					pos++;
+				}
+			} else {
+				break;
+			}
+		} else {
+			break;
+		}
+	}
+
 	return str;
 }
 
