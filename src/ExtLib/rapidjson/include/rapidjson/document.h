@@ -515,7 +515,7 @@ struct TypeHelper<ValueType, typename ValueType::Object> {
     static bool Is(const ValueType& v) { return v.IsObject(); }
     static ObjectType Get(ValueType& v) { return v.GetObject(); }
     static ValueType& Set(ValueType& v, ObjectType data) { return v = data; }
-    static ValueType& Set(ValueType& v, ObjectType data, typename ValueType::AllocatorType&) { v = data; }
+    static ValueType& Set(ValueType& v, ObjectType data, typename ValueType::AllocatorType&) { return v = data; }
 };
 
 template<typename ValueType> 
@@ -615,18 +615,19 @@ public:
         \tparam SourceAllocator allocator of \c rhs
         \param rhs Value to copy from (read-only)
         \param allocator Allocator for allocating copied elements and buffers. Commonly use GenericDocument::GetAllocator().
+        \param copyConstStrings Force copying of constant strings (e.g. referencing an in-situ buffer)
         \see CopyFrom()
     */
     template <typename SourceAllocator>
-    GenericValue(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator& allocator) {
+    GenericValue(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator& allocator, bool copyConstStrings = false) {
         switch (rhs.GetType()) {
         case kObjectType: {
                 SizeType count = rhs.data_.o.size;
                 Member* lm = reinterpret_cast<Member*>(allocator.Malloc(count * sizeof(Member)));
                 const typename GenericValue<Encoding,SourceAllocator>::Member* rm = rhs.GetMembersPointer();
                 for (SizeType i = 0; i < count; i++) {
-                    new (&lm[i].name) GenericValue(rm[i].name, allocator);
-                    new (&lm[i].value) GenericValue(rm[i].value, allocator);
+                    new (&lm[i].name) GenericValue(rm[i].name, allocator, copyConstStrings);
+                    new (&lm[i].value) GenericValue(rm[i].value, allocator, copyConstStrings);
                 }
                 data_.f.flags = kObjectFlag;
                 data_.o.size = data_.o.capacity = count;
@@ -638,14 +639,14 @@ public:
                 GenericValue* le = reinterpret_cast<GenericValue*>(allocator.Malloc(count * sizeof(GenericValue)));
                 const GenericValue<Encoding,SourceAllocator>* re = rhs.GetElementsPointer();
                 for (SizeType i = 0; i < count; i++)
-                    new (&le[i]) GenericValue(re[i], allocator);
+                    new (&le[i]) GenericValue(re[i], allocator, copyConstStrings);
                 data_.f.flags = kArrayFlag;
                 data_.a.size = data_.a.capacity = count;
                 SetElementsPointer(le);
             }
             break;
         case kStringType:
-            if (rhs.data_.f.flags == kConstStringFlag) {
+            if (rhs.data_.f.flags == kConstStringFlag && !copyConstStrings) {
                 data_.f.flags = rhs.data_.f.flags;
                 data_  = *reinterpret_cast<const Data*>(&rhs.data_);
             }
@@ -850,12 +851,13 @@ public:
         \tparam SourceAllocator Allocator type of \c rhs
         \param rhs Value to copy from (read-only)
         \param allocator Allocator to use for copying
+        \param copyConstStrings Force copying of constant strings (e.g. referencing an in-situ buffer)
      */
     template <typename SourceAllocator>
-    GenericValue& CopyFrom(const GenericValue<Encoding, SourceAllocator>& rhs, Allocator& allocator) {
+    GenericValue& CopyFrom(const GenericValue<Encoding, SourceAllocator>& rhs, Allocator& allocator, bool copyConstStrings = false) {
         RAPIDJSON_ASSERT(static_cast<void*>(this) != static_cast<void const*>(&rhs));
         this->~GenericValue();
-        new (this) GenericValue(rhs, allocator);
+        new (this) GenericValue(rhs, allocator, copyConstStrings);
         return *this;
     }
 
@@ -2293,7 +2295,7 @@ public:
     template <unsigned parseFlags, typename SourceEncoding>
     GenericDocument& Parse(const typename SourceEncoding::Ch* str, size_t length) {
         RAPIDJSON_ASSERT(!(parseFlags & kParseInsituFlag));
-        MemoryStream ms(static_cast<const char*>(str), length * sizeof(typename SourceEncoding::Ch));
+        MemoryStream ms(reinterpret_cast<const char*>(str), length * sizeof(typename SourceEncoding::Ch));
         EncodedInputStream<SourceEncoding, MemoryStream> is(ms);
         ParseStream<parseFlags, SourceEncoding>(is);
         return *this;

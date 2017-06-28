@@ -783,8 +783,10 @@ public:
         if (patternProperties_) {
             context.patternPropertiesSchemaCount = 0;
             for (SizeType i = 0; i < patternPropertyCount_; i++)
-                if (patternProperties_[i].pattern && IsPatternMatch(patternProperties_[i].pattern, str, len))
+                if (patternProperties_[i].pattern && IsPatternMatch(patternProperties_[i].pattern, str, len)) {
                     context.patternPropertiesSchemas[context.patternPropertiesSchemaCount++] = patternProperties_[i].schema;
+                    context.valueSchema = typeless_;
+                }
         }
 
         SizeType index;
@@ -1112,8 +1114,8 @@ private:
                 if (exclusiveMaximum_ ? i >= maximum_.GetInt64() : i > maximum_.GetInt64())
                     RAPIDJSON_INVALID_KEYWORD_RETURN(GetMaximumString());
             }
-            else if (maximum_.IsUint64())
-                /* do nothing */; // i <= max(int64_t) < maximum_.GetUint64()
+            else if (maximum_.IsUint64()) { }
+                /* do nothing */ // i <= max(int64_t) < maximum_.GetUint64()
             else if (!CheckDoubleMaximum(context, static_cast<double>(i)))
                 return false;
         }
@@ -1789,7 +1791,7 @@ RAPIDJSON_MULTILINEMACRO_END
     }
 
     virtual void FreeState(void* p) {
-        return StateAllocator::Free(p);
+        StateAllocator::Free(p);
     }
 
 private:
