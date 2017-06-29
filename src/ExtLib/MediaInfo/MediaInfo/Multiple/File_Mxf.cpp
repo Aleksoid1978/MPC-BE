@@ -2156,6 +2156,10 @@ File_Mxf::File_Mxf()
         Demux_EventWasSent_Accept_Specific=true;
     #endif //MEDIAINFO_DEMUX
 
+    //Hints
+    File_Buffer_Size_Hint_Pointer=NULL;
+    Synched_Count=0;
+
     //Temp
     RandomIndexPacks_AlreadyParsed=false;
     Streams_Count=(size_t)-1;
@@ -2252,8 +2256,11 @@ File_Mxf::~File_Mxf()
 //---------------------------------------------------------------------------
 void File_Mxf::Streams_Accept()
 {
+    Fill(Stream_General, 0, General_Format, "MXF");
+
     //Configuration
     Buffer_MaximumSize=64*1024*1024; //Some big frames are possible (e.g YUV 4:2:2 10 bits 1080p, 4K)
+    File_Buffer_Size_Hint_Pointer=Config->File_Buffer_Size_Hint_Pointer_Get();
 }
 
 //---------------------------------------------------------------------------
@@ -5159,14 +5166,8 @@ bool File_Mxf::Synchronize()
         return false;
     }
 
-    if (!Status[IsAccepted])
-    {
+    if (IsSub && !Status[IsAccepted])
         Accept();
-
-        Fill(Stream_General, 0, General_Format, "MXF");
-
-        File_Buffer_Size_Hint_Pointer=Config->File_Buffer_Size_Hint_Pointer_Get();
-    }
 
     //Synched is OK
     return true;
@@ -5181,7 +5182,18 @@ bool File_Mxf::Synched_Test()
 
     //Quick test of synchro
     if (CC4(Buffer+Buffer_Offset)!=0x060E2B34)
+    {
         Synched=false;
+        if (!Status[IsAccepted])
+            Trusted_IsNot("Sync"); //If there is an unsynch before the parser accepts the stream, very high risk the that the file is not MXF
+    }
+    else if (!Status[IsAccepted])
+    {
+        if (Synched_Count>=8)
+            Accept();
+        else
+            Synched_Count++;
+    }
 
     //Trace config
     #if MEDIAINFO_TRACE
@@ -6244,6 +6256,9 @@ void File_Mxf::Data_Parse()
                             Essence->second.Parsers.push_back(Parser);
                         }
                     }
+
+                    if (!Status[IsAccepted] && !Essence->second.Parsers.empty() && Essence->second.Parsers[0]->Status[IsAccepted])
+                        Accept();
                 }
 
                 Element_Offset=Element_Size;
@@ -6354,7 +6369,7 @@ void File_Mxf::Data_Parse()
         MustSynchronize=true;
     }
 
-    if ((!IsParsingEnd && IsParsingMiddle_MaxOffset==(int64u)-1 && MediaInfoLib::Config.ParseSpeed_Get()<1.0)
+    if ((!IsParsingEnd && IsParsingMiddle_MaxOffset==(int64u)-1 && Config->ParseSpeed<1.0)
      && ((!IsSub && File_Offset>=Buffer_PaddingBytes+0x4000000) //TODO: 64 MB by default (security), should be changed
       || (Streams_Count==0 && !Descriptors.empty())))
     {
@@ -7183,7 +7198,7 @@ void File_Mxf::RandomIndexPack()
     Skip_B4(                                                    "Length");
 
     FILLING_BEGIN();
-        if (MediaInfoLib::Config.ParseSpeed_Get()<1.0 && !RandomIndexPacks_AlreadyParsed && !RandomIndexPacks.empty() && Config->File_Mxf_ParseIndex_Get())
+        if (Config->ParseSpeed<1.0 && !RandomIndexPacks_AlreadyParsed && !RandomIndexPacks.empty() && Config->File_Mxf_ParseIndex_Get())
         {
             IsParsingEnd=true;
             GoTo(RandomIndexPacks[0].ByteOffset);
@@ -8508,6 +8523,11 @@ void File_Mxf::SDTI_SystemMetadataPack() //SMPTE 385M + 326M
     //Filling
     if (SDTI_SizePerFrame==0)
         Partitions_IsCalculatingSdtiByteCount=true;
+
+    FILLING_BEGIN_PRECISE();
+        if (!Status[IsAccepted])
+            Accept();
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
@@ -8566,6 +8586,11 @@ void File_Mxf::SDTI_PackageMetadataSet()
     //Filling
     if (SDTI_SizePerFrame==0)
         Partitions_IsCalculatingSdtiByteCount=true;
+
+    FILLING_BEGIN_PRECISE();
+        if (!Status[IsAccepted])
+            Accept();
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
@@ -10564,6 +10589,11 @@ void File_Mxf::PartitionMetadata()
                 EssenceContainer_FromPartitionMetadata=EssenceContainer;
         }
     Element_End0();
+
+    FILLING_BEGIN_PRECISE();
+        if (!Status[IsAccepted])
+            Accept();
+    FILLING_END();
 
     PartitionPack_Parsed=true;
     Partitions_IsFooter=(Code.lo&0x00FF0000)==0x00040000;
@@ -16579,6 +16609,7 @@ void File_Mxf::ChooseParser_Mpeg4v(const essences::iterator &Essence, const desc
     //Filling
     #if defined(MEDIAINFO_MPEG4V_YES)
         File_Mpeg4v* Parser=new File_Mpeg4v;
+        Open_Buffer_Init(Parser);
         Parser->OnlyVOP();
     #else
         //Filling

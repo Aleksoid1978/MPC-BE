@@ -135,6 +135,7 @@ const size_t Buffer_NormalSize=/*188*7;//*/64*1024;
 
 MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
 {
+    RequestTerminate=false;
     FileIsSeekable=true;
     FileIsSub=false;
     FileIsDetectingDuration=false;
@@ -317,6 +318,11 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
         Egal_Pos=Option_Lower.size();
     transform(Option_Lower.begin(), Option_Lower.begin()+Egal_Pos, Option_Lower.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
 
+    if (Option_Lower==__T("file_requestterminate"))
+    {
+        RequestTerminate=true;
+        return Ztring();
+    }
     if (Option_Lower==__T("file_isseekable"))
     {
         File_IsSeekable_Set(!(Value==__T("0") || Value.empty()));

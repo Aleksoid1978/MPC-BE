@@ -403,7 +403,7 @@ void MediaInfo_Config_DefaultLanguage (Translation &Info)
     "Format_Settings_PS;Format settings, PS\n"
     "Format_Settings_Pulldown;Format settings, Pulldown\n"
     "Format_Settings_QPel;Format settings, QPel\n"
-    "Format_Settings_RefFrames;Format settings, ReFrames\n"
+    "Format_Settings_RefFrames;Format settings, RefFrames\n"
     "Format_Settings_SBR;Format settings, SBR\n"
     "Format_Settings_Sign;Format settings, Sign\n"
     "Format_Settings_Wrapping;Format settings, wrapping mode\n"

@@ -1684,9 +1684,9 @@ size_t File_Mpeg4::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
 //---------------------------------------------------------------------------
 void File_Mpeg4::Read_Buffer_Init()
 {
-    if (MediaInfoLib::Config.ParseSpeed_Get()==1.00)
+    if (Config->ParseSpeed>=1.0)
         FrameCount_MaxPerStream=(int32u)-1;
-    else if (MediaInfoLib::Config.ParseSpeed_Get()<=0.3)
+    else if (Config->ParseSpeed<=0.3)
         FrameCount_MaxPerStream=128;
     else
         FrameCount_MaxPerStream=512;

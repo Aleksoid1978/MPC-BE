@@ -813,7 +813,7 @@ File_Ac3::File_Ac3()
     Frame_Count_NotParsedIncluded=0;
 
     //In
-    Frame_Count_Valid=MediaInfoLib::Config.ParseSpeed_Get()>=0.3?32:2;
+    Frame_Count_Valid=0;
     MustParse_dac3=false;
     MustParse_dec3=false;
     CalculateDelay=false;
@@ -1269,7 +1269,7 @@ void File_Ac3::Streams_Finish()
     if (!IsSub)
     {
         int64u Frame_Count_ForDuration=0;
-        if (MediaInfoLib::Config.ParseSpeed_Get()==1)
+        if (Config->ParseSpeed>=1)
         {
             Frame_Count_ForDuration=Frame_Count; //We have the exact count of frames
             Fill(Stream_Audio, 0, Audio_StreamSize, File_Offset+Buffer_Offset+Element_Size-File_Offset_FirstSynched);
@@ -1493,6 +1493,9 @@ bool File_Ac3::Synchronize()
 //---------------------------------------------------------------------------
 void File_Ac3::Synched_Init()
 {
+    if (!Frame_Count_Valid)
+        Frame_Count_Valid=Config->ParseSpeed>=0.3?32:2;
+
     //FrameInfo
     PTS_End=0;
     if (!IsSub)
@@ -1874,7 +1877,7 @@ void File_Ac3::Core()
             Fill("AC-3");
 
             //No more need data
-            if (!IsSub && MediaInfoLib::Config.ParseSpeed_Get()<1)
+            if (!IsSub && Config->ParseSpeed<1.0)
                 Finish("AC-3");
         }
     FILLING_END();
@@ -4023,7 +4026,7 @@ void File_Ac3::HD()
             Fill("AC-3");
 
             //No more need data
-            if (!IsSub && MediaInfoLib::Config.ParseSpeed_Get()<1)
+            if (!IsSub && Config->ParseSpeed<1.0)
                 Finish("AC-3");
         }
     FILLING_END();

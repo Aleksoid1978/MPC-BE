@@ -341,7 +341,7 @@ void File_Gxf_TimeCode::Read_Buffer_Continue()
         Accept();
         Fill();
 
-        if (MediaInfoLib::Config.ParseSpeed_Get()<1)
+        if (Config->ParseSpeed<1.0)
             Finish();
     }
 

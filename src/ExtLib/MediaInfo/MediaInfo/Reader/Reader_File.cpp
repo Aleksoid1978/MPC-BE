@@ -336,7 +336,7 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
         #endif //MEDIAINFO_DEMUX
 
         //Threading
-        if (MI->IsTerminating())
+        if (MI->IsTerminating() || MI->Config.RequestTerminate)
             return 1; //Termination is requested
 
         if (Status[File__Analyze::IsFinished] || (StopAfterFilled && Status[File__Analyze::IsFilled]))
@@ -356,7 +356,7 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
             return 2; //Must return immediately
 
         //Threading
-        if (MI->IsTerminating())
+        if (MI->IsTerminating() || MI->Config.RequestTerminate)
             return 1; //Termination is requested
 
         if (Status[File__Analyze::IsFinished] || MI->Config.IsFinishing || (StopAfterFilled && Status[File__Analyze::IsFilled]))
@@ -784,7 +784,7 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
             #endif //MEDIAINFO_DEMUX
 
             //Threading
-            if (MI->IsTerminating())
+            if (MI->IsTerminating() || MI->Config.RequestTerminate)
                 break; //Termination is requested
         }
     }

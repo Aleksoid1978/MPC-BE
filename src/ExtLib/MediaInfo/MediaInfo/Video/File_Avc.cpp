@@ -406,7 +406,7 @@ File_Avc::File_Avc()
     Frame_Count_NotParsedIncluded=0;
 
     //In
-    Frame_Count_Valid=MediaInfoLib::Config.ParseSpeed_Get()>=0.3?512:2;
+    Frame_Count_Valid=0;
     FrameIsAlwaysComplete=false;
     MustParse_SPS_PPS=false;
     SizedBlocks=false;
@@ -1301,6 +1301,9 @@ bool File_Avc::Demux_UnpacketizeContainer_Test()
 //---------------------------------------------------------------------------
 void File_Avc::Synched_Init()
 {
+    if (!Frame_Count_Valid)
+        Frame_Count_Valid=Config->ParseSpeed>=0.3?512:2;
+
     //FrameInfo
     PTS_End=0;
     if (!IsSub)
@@ -2467,7 +2470,7 @@ void File_Avc::slice_header()
             if (Frame_Count>=Frame_Count_Valid)
             {
                 Fill("AVC");
-                if (!IsSub && !Streams[(size_t)Element_Code].ShouldDuplicate && MediaInfoLib::Config.ParseSpeed_Get()<1.0)
+                if (!IsSub && !Streams[(size_t)Element_Code].ShouldDuplicate && Config->ParseSpeed<1.0)
                     Finish("AVC");
             }
         }

@@ -130,44 +130,35 @@ namespace Elements
 
     //Segment
     const int64u Segment=0x8538067;
-    const int64u Segment_Attachments=0x0941A469;
-    const int64u Segment_Attachments_AttachedFile=0x21A7;
-    const int64u Segment_Attachments_AttachedFile_FileDescription=0x067E;
-    const int64u Segment_Attachments_AttachedFile_FileName=0x066E;
-    const int64u Segment_Attachments_AttachedFile_FileMimeType=0x0660;
-    const int64u Segment_Attachments_AttachedFile_FileData=0x065C;
-    const int64u Segment_Attachments_AttachedFile_FileUID=0x06AE;
-    const int64u Segment_Attachments_AttachedFile_FileReferral=0x0675;
-    const int64u Segment_Attachments_AttachedFile_FileUsedStartTime=0x0661;
-    const int64u Segment_Attachments_AttachedFile_FileUsedEndTime=0x0662;
-    const int64u Segment_Chapters=0x43A770;
-    const int64u Segment_Chapters_EditionEntry=0x05B9;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom=0x36;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess=0x2944;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCodecID=0x2955;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand=0x2911;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand_ChapProcessData=0x2933;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand_ChapProcessTime=0x2922;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessPrivate=0x050D;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay=0x00;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapCountry=0x037E;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguage=0x037C;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapString=0x05;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterFlagEnabled=0x0598;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterFlagHidden=0x18;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterPhysicalEquiv=0x23C3;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterSegmentEditionUID=0x2EBC;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterSegmentUID=0x2E67;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterTimeStart=0x11;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterTimeEnd=0x12;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterTrack=0x0F;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterTrack_ChapterTrackNumber=0x09;
-    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterUID=0x33C4;
-    const int64u Segment_Chapters_EditionEntry_EditionFlagDefault=0x05DB;
-    const int64u Segment_Chapters_EditionEntry_EditionFlagHidden=0x05BD;
-    const int64u Segment_Chapters_EditionEntry_EditionFlagOrdered=0x05DD;
-    const int64u Segment_Chapters_EditionEntry_EditionUID=0x05BC;
+    const int64u Segment_SeekHead=0x14D9B74;
+    const int64u Segment_SeekHead_Seek=0xDBB;
+    const int64u Segment_SeekHead_Seek_SeekID=0x13AB;
+    const int64u Segment_SeekHead_Seek_SeekPosition=0x13AC;
+    const int64u Segment_Info=0x549A966;
+    const int64u Segment_Info_SegmentUID=0x33A4;
+    const int64u Segment_Info_SegmentFilename=0x3384;
+    const int64u Segment_Info_PrevUID=0x1CB923;
+    const int64u Segment_Info_PrevFilename=0x1C83AB;
+    const int64u Segment_Info_NextUID=0x1EB923;
+    const int64u Segment_Info_NextFilename=0x1E83BB;
+    const int64u Segment_Info_SegmentFamily=0x444;
+    const int64u Segment_Info_ChapterTranslate=0x2924;
+    const int64u Segment_Info_ChapterTranslate_ChapterTranslateEditionUID=0x29FC;
+    const int64u Segment_Info_ChapterTranslate_ChapterTranslateCodec=0x29BF;
+    const int64u Segment_Info_ChapterTranslate_ChapterTranslateID=0x29A5;
+    const int64u Segment_Info_TimecodeScale=0xAD7B1;
+    const int64u Segment_Info_Duration=0x489;
+    const int64u Segment_Info_DateUTC=0x461;
+    const int64u Segment_Info_Title=0x3BA9;
+    const int64u Segment_Info_MuxingApp=0xD80;
+    const int64u Segment_Info_WritingApp=0x1741;
     const int64u Segment_Cluster=0xF43B675;
+    const int64u Segment_Cluster_Timecode=0x67;
+    const int64u Segment_Cluster_SilentTracks=0x1854;
+    const int64u Segment_Cluster_SilentTracks_SilentTrackNumber=0x18D7;
+    const int64u Segment_Cluster_Position=0x27;
+    const int64u Segment_Cluster_PrevSize=0x2B;
+    const int64u Segment_Cluster_SimpleBlock=0x23;
     const int64u Segment_Cluster_BlockGroup=0x20;
     const int64u Segment_Cluster_BlockGroup_Block=0x21;
     const int64u Segment_Cluster_BlockGroup_Block_Lace=0xFFFFFFFFFFFFFFFELL; //Fake one
@@ -184,14 +175,132 @@ namespace Elements
     const int64u Segment_Cluster_BlockGroup_DiscardPadding=0x35A2;
     const int64u Segment_Cluster_BlockGroup_Slices=0xE;
     const int64u Segment_Cluster_BlockGroup_Slices_TimeSlice=0x68;
-    const int64u Segment_Cluster_BlockGroup_Slices_TimeSlice_Duration=0x4F;
     const int64u Segment_Cluster_BlockGroup_Slices_TimeSlice_LaceNumber=0x4C;
-    const int64u Segment_Cluster_Position=0x27;
-    const int64u Segment_Cluster_PrevSize=0x2B;
-    const int64u Segment_Cluster_SilentTracks=0x1854;
-    const int64u Segment_Cluster_SilentTracks_SilentTrackNumber=0x18D7;
-    const int64u Segment_Cluster_SimpleBlock=0x23;
-    const int64u Segment_Cluster_Timecode=0x67;
+    const int64u Segment_Cluster_BlockGroup_Slices_TimeSlice_FrameNumber=0x4D;
+    const int64u Segment_Cluster_BlockGroup_Slices_TimeSlice_BlockAdditionID=0x4B;
+    const int64u Segment_Cluster_BlockGroup_Slices_TimeSlice_Delay=0x4E;
+    const int64u Segment_Cluster_BlockGroup_Slices_TimeSlice_SliceDuration=0x4F;
+    const int64u Segment_Cluster_BlockGroup_ReferenceFrame=0x48;
+    const int64u Segment_Cluster_BlockGroup_ReferenceFrame_ReferenceOffset=0x49;
+    const int64u Segment_Cluster_BlockGroup_ReferenceFrame_ReferenceTimeCode=0x4A;
+    const int64u Segment_Cluster_EncryptedBlock=0x2F;
+    const int64u Segment_Tracks=0x654AE6B;
+    const int64u Segment_Tracks_TrackEntry=0x2E;
+    const int64u Segment_Tracks_TrackEntry_TrackNumber=0x57;
+    const int64u Segment_Tracks_TrackEntry_TrackUID=0x33C5;
+    const int64u Segment_Tracks_TrackEntry_TrackType=0x3;
+    const int64u Segment_Tracks_TrackEntry_FlagEnabled=0x39;
+    const int64u Segment_Tracks_TrackEntry_FlagDefault=0x8;
+    const int64u Segment_Tracks_TrackEntry_FlagForced=0x15AA;
+    const int64u Segment_Tracks_TrackEntry_FlagLacing=0x1C;
+    const int64u Segment_Tracks_TrackEntry_MinCache=0x2DE7;
+    const int64u Segment_Tracks_TrackEntry_MaxCache=0x2DF8;
+    const int64u Segment_Tracks_TrackEntry_DefaultDuration=0x3E383;
+    const int64u Segment_Tracks_TrackEntry_DefaultDecodedFieldDuration=0x34E7A;
+    const int64u Segment_Tracks_TrackEntry_TrackTimecodeScale=0x3314F;
+    const int64u Segment_Tracks_TrackEntry_TrackOffset=0x137F;
+    const int64u Segment_Tracks_TrackEntry_MaxBlockAdditionID=0x15EE;
+    const int64u Segment_Tracks_TrackEntry_Name=0x136E;
+    const int64u Segment_Tracks_TrackEntry_Language=0x2B59C;
+    const int64u Segment_Tracks_TrackEntry_LanguageIETF=0x2B59D;
+    const int64u Segment_Tracks_TrackEntry_CodecID=0x6;
+    const int64u Segment_Tracks_TrackEntry_CodecPrivate=0x23A2;
+    const int64u Segment_Tracks_TrackEntry_CodecName=0x58688;
+    const int64u Segment_Tracks_TrackEntry_AttachmentLink=0x3446;
+    const int64u Segment_Tracks_TrackEntry_CodecSettings=0x1A9697;
+    const int64u Segment_Tracks_TrackEntry_CodecInfoURL=0x1B4040;
+    const int64u Segment_Tracks_TrackEntry_CodecDownloadURL=0x6B240;
+    const int64u Segment_Tracks_TrackEntry_CodecDecodeAll=0x2A;
+    const int64u Segment_Tracks_TrackEntry_TrackOverlay=0x2FAB;
+    const int64u Segment_Tracks_TrackEntry_CodecDelay=0x16AA;
+    const int64u Segment_Tracks_TrackEntry_SeekPreRoll=0x16BB;
+    const int64u Segment_Tracks_TrackEntry_TrackTranslate=0x2624;
+    const int64u Segment_Tracks_TrackEntry_TrackTranslate_TrackTranslateEditionUID=0x26FC;
+    const int64u Segment_Tracks_TrackEntry_TrackTranslate_TrackTranslateCodec=0x26BF;
+    const int64u Segment_Tracks_TrackEntry_TrackTranslate_TrackTranslateTrackID=0x26A5;
+    const int64u Segment_Tracks_TrackEntry_Video=0x60;
+    const int64u Segment_Tracks_TrackEntry_Video_FlagInterlaced=0x1A;
+    const int64u Segment_Tracks_TrackEntry_Video_FieldOrder=0x1D;
+    const int64u Segment_Tracks_TrackEntry_Video_StereoMode=0x13B8;
+    const int64u Segment_Tracks_TrackEntry_Video_AlphaMode=0x13C0;
+    const int64u Segment_Tracks_TrackEntry_Video_OldStereoMode=0x13B9;
+    const int64u Segment_Tracks_TrackEntry_Video_PixelWidth=0x30;
+    const int64u Segment_Tracks_TrackEntry_Video_PixelHeight=0x3A;
+    const int64u Segment_Tracks_TrackEntry_Video_PixelCropBottom=0x14AA;
+    const int64u Segment_Tracks_TrackEntry_Video_PixelCropTop=0x14BB;
+    const int64u Segment_Tracks_TrackEntry_Video_PixelCropLeft=0x14CC;
+    const int64u Segment_Tracks_TrackEntry_Video_PixelCropRight=0x14DD;
+    const int64u Segment_Tracks_TrackEntry_Video_DisplayWidth=0x14B0;
+    const int64u Segment_Tracks_TrackEntry_Video_DisplayHeight=0x14BA;
+    const int64u Segment_Tracks_TrackEntry_Video_DisplayUnit=0x14B2;
+    const int64u Segment_Tracks_TrackEntry_Video_AspectRatioType=0x14B3;
+    const int64u Segment_Tracks_TrackEntry_Video_ColourSpace=0xEB524;
+    const int64u Segment_Tracks_TrackEntry_Video_GammaValue=0xFB523;
+    const int64u Segment_Tracks_TrackEntry_Video_FrameRate=0x383E3;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour=0x15B0;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_MatrixCoefficients=0x15B1;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_BitsPerChannel=0x15B2;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_ChromaSubsamplingHorz=0x15B3;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_ChromaSubsamplingVert=0x15B4;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_CbSubsamplingHorz=0x15B5;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_CbSubsamplingVert=0x15B6;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_ChromaSitingHorz=0x15B7;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_ChromaSitingVert=0x15B8;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_Range=0x15B9;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_TransferCharacteristics=0x15BA;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_Primaries=0x15BB;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_MaxCLL=0x15BC;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_MaxFALL=0x15BD;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata=0x15D0;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryRChromaticityX=0x15D1;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryRChromaticityY=0x15D2;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryGChromaticityX=0x15D3;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryGChromaticityY=0x15D4;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryBChromaticityX=0x15D5;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryBChromaticityY=0x15D6;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_WhitePointChromaticityX=0x15D7;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_WhitePointChromaticityY=0x15D8;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_LuminanceMax=0x15D9;
+    const int64u Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_LuminanceMin=0x15DA;
+    const int64u Segment_Tracks_TrackEntry_Video_Projection=0x3670;
+    const int64u Segment_Tracks_TrackEntry_Video_Projection_ProjectionType=0x3671;
+    const int64u Segment_Tracks_TrackEntry_Video_Projection_ProjectionPrivate=0x3672;
+    const int64u Segment_Tracks_TrackEntry_Video_Projection_ProjectionPoseYaw=0x3673;
+    const int64u Segment_Tracks_TrackEntry_Video_Projection_ProjectionPosePitch=0x3674;
+    const int64u Segment_Tracks_TrackEntry_Video_Projection_ProjectionPoseRoll=0x3675;
+    const int64u Segment_Tracks_TrackEntry_Audio=0x61;
+    const int64u Segment_Tracks_TrackEntry_Audio_SamplingFrequency=0x35;
+    const int64u Segment_Tracks_TrackEntry_Audio_OutputSamplingFrequency=0x38B5;
+    const int64u Segment_Tracks_TrackEntry_Audio_Channels=0x1F;
+    const int64u Segment_Tracks_TrackEntry_Audio_ChannelPositions=0x3D7B;
+    const int64u Segment_Tracks_TrackEntry_Audio_BitDepth=0x2264;
+    const int64u Segment_Tracks_TrackEntry_TrackOperation=0x62;
+    const int64u Segment_Tracks_TrackEntry_TrackOperation_TrackCombinePlanes=0x63;
+    const int64u Segment_Tracks_TrackEntry_TrackOperation_TrackCombinePlanes_TrackPlane=0x64;
+    const int64u Segment_Tracks_TrackEntry_TrackOperation_TrackCombinePlanes_TrackPlane_TrackPlaneUID=0x65;
+    const int64u Segment_Tracks_TrackEntry_TrackOperation_TrackCombinePlanes_TrackPlane_TrackPlaneType=0x66;
+    const int64u Segment_Tracks_TrackEntry_TrackOperation_TrackJoinBlocks=0x69;
+    const int64u Segment_Tracks_TrackEntry_TrackOperation_TrackJoinBlocks_TrackJoinUID=0x6D;
+    const int64u Segment_Tracks_TrackEntry_TrickTrackUID=0x40;
+    const int64u Segment_Tracks_TrackEntry_TrickTrackSegmentUID=0x41;
+    const int64u Segment_Tracks_TrackEntry_TrickTrackFlag=0x46;
+    const int64u Segment_Tracks_TrackEntry_TrickMasterTrackUID=0x47;
+    const int64u Segment_Tracks_TrackEntry_TrickMasterTrackSegmentUID=0x44;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings=0x2D80;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding=0x2240;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncodingOrder=0x1031;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncodingScope=0x1032;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncodingType=0x1033;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentCompression=0x1034;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentCompression_ContentCompAlgo=0x254;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentCompression_ContentCompSettings=0x255;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption=0x1035;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentEncAlgo=0x7E1;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentEncKeyID=0x7E2;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentSignature=0x7E3;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentSigKeyID=0x7E4;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentSigAlgo=0x7E5;
+    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentSigHashAlgo=0x7E6;
     const int64u Segment_Cues=0xC53BB6B;
     const int64u Segment_Cues_CuePoint=0x3B;
     const int64u Segment_Cues_CuePoint_CueTime=0x33;
@@ -201,36 +310,53 @@ namespace Elements
     const int64u Segment_Cues_CuePoint_CueTrackPositions_CueRelativePosition=0x70;
     const int64u Segment_Cues_CuePoint_CueTrackPositions_CueDuration=0x32;
     const int64u Segment_Cues_CuePoint_CueTrackPositions_CueBlockNumber=0x1378;
-    const int64u Segment_Info=0x549A966;
-    const int64u Segment_Info_ChapterTranslate=0x2924;
-    const int64u Segment_Info_ChapterTranslate_ChapterTranslateCodec=0x29BF;
-    const int64u Segment_Info_ChapterTranslate_ChapterTranslateEditionUID=0x29FC;
-    const int64u Segment_Info_ChapterTranslate_ChapterTranslateID=0x29A5;
-    const int64u Segment_Info_DateUTC=0x461;
-    const int64u Segment_Info_Duration=0x489;
-    const int64u Segment_Info_MuxingApp=0xD80;
-    const int64u Segment_Info_NextFilename=0x1E83BB;
-    const int64u Segment_Info_NextUID=0x1EB923;
-    const int64u Segment_Info_PrevFilename=0x1C83AB;
-    const int64u Segment_Info_PrevUID=0x1CB923;
-    const int64u Segment_Info_SegmentFamily=0x444;
-    const int64u Segment_Info_SegmentFilename=0x3384;
-    const int64u Segment_Info_SegmentUID=0x33A4;
-    const int64u Segment_Info_TimecodeScale=0xAD7B1;
-    const int64u Segment_Info_Title=0x3BA9;
-    const int64u Segment_Info_WritingApp=0x1741;
-    const int64u Segment_SeekHead=0x14D9B74;
-    const int64u Segment_SeekHead_Seek=0xDBB;
-    const int64u Segment_SeekHead_Seek_SeekID=0x13AB;
-    const int64u Segment_SeekHead_Seek_SeekPosition=0x13AC;
-    const int64u Segment_Tags=0x0254C367;
+    const int64u Segment_Cues_CuePoint_CueTrackPositions_CueCodecState=0x6A;
+    const int64u Segment_Cues_CuePoint_CueTrackPositions_CueReference=0x5B;
+    const int64u Segment_Cues_CuePoint_CueTrackPositions_CueReference_CueRefTime=0x16;
+    const int64u Segment_Cues_CuePoint_CueTrackPositions_CueReference_CueRefCluster=0x17;
+    const int64u Segment_Cues_CuePoint_CueTrackPositions_CueReference_CueRefNumber=0x135F;
+    const int64u Segment_Cues_CuePoint_CueTrackPositions_CueReference_CueRefCodecState=0x6B;
+    const int64u Segment_Attachments=0x941A469;
+    const int64u Segment_Attachments_AttachedFile=0x21A7;
+    const int64u Segment_Attachments_AttachedFile_FileDescription=0x67E;
+    const int64u Segment_Attachments_AttachedFile_FileName=0x66E;
+    const int64u Segment_Attachments_AttachedFile_FileMimeType=0x660;
+    const int64u Segment_Attachments_AttachedFile_FileData=0x65C;
+    const int64u Segment_Attachments_AttachedFile_FileUID=0x6AE;
+    const int64u Segment_Attachments_AttachedFile_FileReferral=0x675;
+    const int64u Segment_Attachments_AttachedFile_FileUsedStartTime=0x661;
+    const int64u Segment_Attachments_AttachedFile_FileUsedEndTime=0x662;
+    const int64u Segment_Chapters=0x43A770;
+    const int64u Segment_Chapters_EditionEntry=0x5B9;
+    const int64u Segment_Chapters_EditionEntry_EditionUID=0x5BC;
+    const int64u Segment_Chapters_EditionEntry_EditionFlagHidden=0x5BD;
+    const int64u Segment_Chapters_EditionEntry_EditionFlagDefault=0x5DB;
+    const int64u Segment_Chapters_EditionEntry_EditionFlagOrdered=0x5DD;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom=0x36;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterUID=0x33C4;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterStringUID=0x1654;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterTimeStart=0x11;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterTimeEnd=0x12;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterFlagHidden=0x18;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterFlagEnabled=0x598;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterSegmentUID=0x2E67;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterSegmentEditionUID=0x2EBC;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterPhysicalEquiv=0x23C3;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterTrack=0xF;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterTrack_ChapterTrackNumber=0x9;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay=0x0;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapString=0x5;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguage=0x37C;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguageIETF=0x37D;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapCountry=0x37E;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess=0x2944;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCodecID=0x2955;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessPrivate=0x50D;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand=0x2911;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand_ChapProcessTime=0x2922;
+    const int64u Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand_ChapProcessData=0x2933;
+    const int64u Segment_Tags=0x254C367;
     const int64u Segment_Tags_Tag=0x3373;
-    const int64u Segment_Tags_Tag_SimpleTag=0x27C8;
-    const int64u Segment_Tags_Tag_SimpleTag_TagBinary=0x485;
-    const int64u Segment_Tags_Tag_SimpleTag_TagDefault=0x484;
-    const int64u Segment_Tags_Tag_SimpleTag_TagLanguage=0x47A;
-    const int64u Segment_Tags_Tag_SimpleTag_TagName=0x5A3;
-    const int64u Segment_Tags_Tag_SimpleTag_TagString=0x487;
     const int64u Segment_Tags_Tag_Targets=0x23C0;
     const int64u Segment_Tags_Tag_Targets_TargetTypeValue=0x28CA;
     const int64u Segment_Tags_Tag_Targets_TargetType=0x23CA;
@@ -238,79 +364,13 @@ namespace Elements
     const int64u Segment_Tags_Tag_Targets_TagEditionUID=0x23C9;
     const int64u Segment_Tags_Tag_Targets_TagChapterUID=0x23C4;
     const int64u Segment_Tags_Tag_Targets_TagAttachmentUID=0x23C6;
-    const int64u Segment_Tracks=0x654AE6B;
-    const int64u Segment_Tracks_TrackEntry=0x2E;
-    const int64u Segment_Tracks_TrackEntry_AttachmentLink=0x3446;
-    const int64u Segment_Tracks_TrackEntry_Audio=0x61;
-    const int64u Segment_Tracks_TrackEntry_Audio_BitDepth=0x2264;
-    const int64u Segment_Tracks_TrackEntry_Audio_Channels=0x1F;
-    const int64u Segment_Tracks_TrackEntry_Audio_OutputSamplingFrequency=0x38B5;
-    const int64u Segment_Tracks_TrackEntry_Audio_SamplingFrequency=0x35;
-    const int64u Segment_Tracks_TrackEntry_CodecSettings=0x1A9697;
-    const int64u Segment_Tracks_TrackEntry_CodecInfoURL=0x1B4040;
-    const int64u Segment_Tracks_TrackEntry_CodecDownloadURL=0x06B240;
-    const int64u Segment_Tracks_TrackEntry_CodecDecodeAll=0x2A;
-    const int64u Segment_Tracks_TrackEntry_CodecID=0x6;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings=0x2D80;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding=0x2240;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncodingOrder=0x1031;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncodingScope=0x1032;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncodingType=0x1033;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentCompression=0x1034;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentCompression_ContentCompAlgo=0x0254;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentCompression_ContentCompSettings=0x0255;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption=0x1035;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentEncAlgo=0x07E1;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentEncKeyID=0x07E2;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentSignature=0x07E3;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentSigKeyID=0x07E4;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentSigAlgo=0x07E5;
-    const int64u Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentSigHashAlgo=0x07E6;
-    const int64u Segment_Tracks_TrackEntry_CodecName=0x58688;
-    const int64u Segment_Tracks_TrackEntry_CodecPrivate=0x23A2;
-    const int64u Segment_Tracks_TrackEntry_DefaultDuration=0x3E383;
-    const int64u Segment_Tracks_TrackEntry_FlagDefault=0x8;
-    const int64u Segment_Tracks_TrackEntry_FlagEnabled=0x39;
-    const int64u Segment_Tracks_TrackEntry_FlagForced=0x15AA;
-    const int64u Segment_Tracks_TrackEntry_FlagLacing=0x1C;
-    const int64u Segment_Tracks_TrackEntry_Language=0x2B59C;
-    const int64u Segment_Tracks_TrackEntry_MaxBlockAdditionID=0x15EE;
-    const int64u Segment_Tracks_TrackEntry_MaxCache=0x2DF8;
-    const int64u Segment_Tracks_TrackEntry_MinCache=0x2DE7;
-    const int64u Segment_Tracks_TrackEntry_Name=0x136E;
-    const int64u Segment_Tracks_TrackEntry_TrackNumber=0x57;
-    const int64u Segment_Tracks_TrackEntry_TrackTimecodeScale=0x3314F;
-    const int64u Segment_Tracks_TrackEntry_TrackOffset=0x137F;
-    const int64u Segment_Tracks_TrackEntry_TrackType=0x3;
-    const int64u Segment_Tracks_TrackEntry_TrackUID=0x33C5;
-    const int64u Segment_Tracks_TrackEntry_Video=0x60;
-    const int64u Segment_Tracks_TrackEntry_Video_AspectRatioType=0x14B3;
-    const int64u Segment_Tracks_TrackEntry_Video_ColourSpace=0xEB524;
-    const int64u Segment_Tracks_TrackEntry_Video_DisplayHeight=0x14BA;
-    const int64u Segment_Tracks_TrackEntry_Video_DisplayUnit=0x14B2;
-    const int64u Segment_Tracks_TrackEntry_Video_DisplayWidth=0x14B0;
-    const int64u Segment_Tracks_TrackEntry_Video_FlagInterlaced=0x1A;
-    const int64u Segment_Tracks_TrackEntry_Video_FieldOrder=0x1D;
-    const int64u Segment_Tracks_TrackEntry_Video_FrameRate=0x383E3;
-    const int64u Segment_Tracks_TrackEntry_Video_Colour=0x15B0;
-    const int64u Segment_Tracks_TrackEntry_Video_Colour_MatrixCoefficients=0x15B1;
-    const int64u Segment_Tracks_TrackEntry_Video_Colour_BitsPerChannel=0x15B2;
-    const int64u Segment_Tracks_TrackEntry_Video_Colour_Range=0x15B9;
-    const int64u Segment_Tracks_TrackEntry_Video_Colour_TransferCharacteristics=0x15BA;
-    const int64u Segment_Tracks_TrackEntry_Video_Colour_Primaries=0x15BB;
-    const int64u Segment_Tracks_TrackEntry_Video_PixelCropBottom=0x14AA;
-    const int64u Segment_Tracks_TrackEntry_Video_PixelCropLeft=0x14CC;
-    const int64u Segment_Tracks_TrackEntry_Video_PixelCropRight=0x14DD;
-    const int64u Segment_Tracks_TrackEntry_Video_PixelCropTop=0x14BB;
-    const int64u Segment_Tracks_TrackEntry_Video_PixelHeight=0x3A;
-    const int64u Segment_Tracks_TrackEntry_Video_PixelWidth=0x30;
-    const int64u Segment_Tracks_TrackEntry_Video_StereoMode=0x13B8;
-    const int64u Segment_Tracks_TrackEntry_Video_OldStereoMode=0x13B9;
-    const int64u Segment_Tracks_TrackEntry_TrackOverlay=0x2FAB;
-    const int64u Segment_Tracks_TrackEntry_TrackTranslate=0x2624;
-    const int64u Segment_Tracks_TrackEntry_TrackTranslate_Codec=0x26BF;
-    const int64u Segment_Tracks_TrackEntry_TrackTranslate_EditionUID=0x26FC;
-    const int64u Segment_Tracks_TrackEntry_TrackTranslate_TrackID=0x26A5;
+    const int64u Segment_Tags_Tag_SimpleTag=0x27C8;
+    const int64u Segment_Tags_Tag_SimpleTag_TagName=0x5A3;
+    const int64u Segment_Tags_Tag_SimpleTag_TagLanguage=0x47A;
+    const int64u Segment_Tags_Tag_SimpleTag_TagLanguageIETF=0x47B;
+    const int64u Segment_Tags_Tag_SimpleTag_TagDefault=0x484;
+    const int64u Segment_Tags_Tag_SimpleTag_TagString=0x487;
+    const int64u Segment_Tags_Tag_SimpleTag_TagBinary=0x485;
 }
 
 //---------------------------------------------------------------------------
@@ -1312,8 +1372,12 @@ void File_Mk::Header_Parse()
     }
 
     //Incoherencies
-    if (Element_Level<=2 && File_Offset+Buffer_Offset+Element_Offset+Size>File_Size)
-        Fill(Stream_General, 0, "IsTruncated", "Yes");
+    if (Element_Offset+Size>Element_TotalSize_Get())
+    {
+        Param_Error("TRUNCATED-ELEMENT:1");
+        if (Element_Level<=2)
+            Fill(Stream_General, 0, "IsTruncated", "Yes");
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -1353,220 +1417,229 @@ void File_Mk::Data_Parse()
 
     //Parsing
     DATA_BEGIN
-    LIST(Ebml)
+    LIS2(Ebml, "EBML")
         ATOM_BEGIN
-        ATOM(Ebml_Version)
-        ATOM(Ebml_ReadVersion)
-        ATOM(Ebml_MaxIDLength)
-        ATOM(Ebml_MaxSizeLength)
-        ATOM(Ebml_DocType)
-        ATOM(Ebml_DocTypeVersion)
-        ATOM(Ebml_DocTypeReadVersion)
+        ATO2(Ebml_Version, "EBMLVersion")
+        ATO2(Ebml_ReadVersion, "EBMLReadVersion")
+        ATO2(Ebml_MaxIDLength, "EBMLMaxIDLength")
+        ATO2(Ebml_MaxSizeLength, "EBMLMaxSizeLength")
+        ATO2(Ebml_DocType, "DocType")
+        ATO2(Ebml_DocTypeVersion, "DocTypeVersion")
+        ATO2(Ebml_DocTypeReadVersion, "DocTypeReadVersion")
         ATOM_END_MK
-    LIST(Segment)
+    LIS2(Segment, "Segment")
         ATOM_BEGIN
-        LIST(Segment_Attachments)
+        LIS2(Segment_SeekHead, "SeekHead")
             ATOM_BEGIN
-            LIST(Segment_Attachments_AttachedFile)
+            LIS2(Segment_SeekHead_Seek, "Seek")
                 ATOM_BEGIN
-                ATOM(Segment_Attachments_AttachedFile_FileDescription)
-                ATOM(Segment_Attachments_AttachedFile_FileName)
-                ATOM(Segment_Attachments_AttachedFile_FileMimeType)
-                LIST_SKIP(Segment_Attachments_AttachedFile_FileData) //This is ATOM, but some ATOMs are too big
-                ATOM(Segment_Attachments_AttachedFile_FileUID)
-                ATOM(Segment_Attachments_AttachedFile_FileReferral)
-                ATOM(Segment_Attachments_AttachedFile_FileUsedStartTime)
-                ATOM(Segment_Attachments_AttachedFile_FileUsedEndTime)
+                ATO2(Segment_SeekHead_Seek_SeekID, "SeekID")
+                ATO2(Segment_SeekHead_Seek_SeekPosition, "SeekPosition")
                 ATOM_END_MK
             ATOM_END_MK
-        LIST(Segment_Chapters)
+        LIS2(Segment_Info, "Info")
             ATOM_BEGIN
-            LIST(Segment_Chapters_EditionEntry)
+            ATO2(Segment_Info_SegmentUID, "SegmentUID")
+            ATO2(Segment_Info_SegmentFilename, "SegmentFilename")
+            ATO2(Segment_Info_PrevUID, "PrevUID")
+            ATO2(Segment_Info_PrevFilename, "PrevFilename")
+            ATO2(Segment_Info_NextUID, "NextUID")
+            ATO2(Segment_Info_NextFilename, "NextFilename")
+            ATO2(Segment_Info_SegmentFamily, "SegmentFamily")
+            LIS2(Segment_Info_ChapterTranslate, "ChapterTranslate")
                 ATOM_BEGIN
-                LIST(Segment_Chapters_EditionEntry_ChapterAtom)
+                ATO2(Segment_Info_ChapterTranslate_ChapterTranslateEditionUID, "ChapterTranslateEditionUID")
+                ATO2(Segment_Info_ChapterTranslate_ChapterTranslateCodec, "ChapterTranslateCodec")
+                ATO2(Segment_Info_ChapterTranslate_ChapterTranslateID, "ChapterTranslateID")
+                ATOM_END_MK
+            ATO2(Segment_Info_TimecodeScale, "TimecodeScale")
+            ATO2(Segment_Info_Duration, "Duration")
+            ATO2(Segment_Info_DateUTC, "DateUTC")
+            ATO2(Segment_Info_Title, "Title")
+            ATO2(Segment_Info_MuxingApp, "MuxingApp")
+            ATO2(Segment_Info_WritingApp, "WritingApp")
+            ATOM_END_MK
+        LIS2(Segment_Cluster, "Cluster")
+            ATOM_BEGIN
+            ATO2(Segment_Cluster_Timecode, "Timecode")
+            LIS2(Segment_Cluster_SilentTracks, "SilentTracks")
+                ATOM_BEGIN
+                ATO2(Segment_Cluster_SilentTracks_SilentTrackNumber, "SilentTrackNumber")
+                ATOM_END_MK
+            ATO2(Segment_Cluster_Position, "Position")
+            ATO2(Segment_Cluster_PrevSize, "PrevSize")
+            LIS2(Segment_Cluster_SimpleBlock, "SimpleBlock")
+                ATOM_BEGIN
+                ATO2(Segment_Cluster_BlockGroup_Block_Lace, "Lace")
+                ATOM_END_MK
+            LIS2(Segment_Cluster_BlockGroup, "BlockGroup")
+                ATOM_BEGIN
+                LIS2(Segment_Cluster_BlockGroup_Block, "Block")
                     ATOM_BEGIN
-                    LIST(Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess)
+                    ATO2(Segment_Cluster_BlockGroup_Block_Lace, "Lace")
+                    ATOM_END_MK
+                ATO2(Segment_Cluster_BlockGroup_BlockVirtual, "BlockVirtual")
+                LIS2(Segment_Cluster_BlockGroup_BlockAdditions, "BlockAdditions")
+                    ATOM_BEGIN
+                    LIS2(Segment_Cluster_BlockGroup_BlockAdditions_BlockMore, "BlockMore")
                         ATOM_BEGIN
-                        ATOM(Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCodecID)
-                        LIST(Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand)
+                        ATO2(Segment_Cluster_BlockGroup_BlockAdditions_BlockMore_BlockAddID, "BlockAddID")
+                        ATO2(Segment_Cluster_BlockGroup_BlockAdditions_BlockMore_BlockAdditional, "BlockAdditional")
+                        ATOM_END_MK
+                    ATOM_END_MK
+                ATO2(Segment_Cluster_BlockGroup_BlockDuration, "BlockDuration")
+                ATO2(Segment_Cluster_BlockGroup_ReferencePriority, "ReferencePriority")
+                ATO2(Segment_Cluster_BlockGroup_ReferenceBlock, "ReferenceBlock")
+                ATO2(Segment_Cluster_BlockGroup_ReferenceVirtual, "ReferenceVirtual")
+                ATO2(Segment_Cluster_BlockGroup_CodecState, "CodecState")
+                ATO2(Segment_Cluster_BlockGroup_DiscardPadding, "DiscardPadding")
+                LIS2(Segment_Cluster_BlockGroup_Slices, "Slices")
+                    ATOM_BEGIN
+                    LIS2(Segment_Cluster_BlockGroup_Slices_TimeSlice, "TimeSlice")
+                        ATOM_BEGIN
+                        ATO2(Segment_Cluster_BlockGroup_Slices_TimeSlice_LaceNumber, "LaceNumber")
+                        ATO2(Segment_Cluster_BlockGroup_Slices_TimeSlice_FrameNumber, "FrameNumber")
+                        ATO2(Segment_Cluster_BlockGroup_Slices_TimeSlice_BlockAdditionID, "BlockAdditionID")
+                        ATO2(Segment_Cluster_BlockGroup_Slices_TimeSlice_Delay, "Delay")
+                        ATO2(Segment_Cluster_BlockGroup_Slices_TimeSlice_SliceDuration, "SliceDuration")
+                        ATOM_END_MK
+                    ATOM_END_MK
+                LIS2(Segment_Cluster_BlockGroup_ReferenceFrame, "ReferenceFrame")
+                    ATOM_BEGIN
+                    ATO2(Segment_Cluster_BlockGroup_ReferenceFrame_ReferenceOffset, "ReferenceOffset")
+                    ATO2(Segment_Cluster_BlockGroup_ReferenceFrame_ReferenceTimeCode, "ReferenceTimeCode")
+                    ATOM_END_MK
+                ATOM_END_MK
+            ATO2(Segment_Cluster_EncryptedBlock, "EncryptedBlock")
+            ATOM_END_MK
+        LIS2(Segment_Tracks, "Tracks")
+            ATOM_BEGIN
+            LIS2(Segment_Tracks_TrackEntry, "TrackEntry")
+                ATOM_BEGIN
+                ATO2(Segment_Tracks_TrackEntry_TrackNumber, "TrackNumber")
+                ATO2(Segment_Tracks_TrackEntry_TrackUID, "TrackUID")
+                ATO2(Segment_Tracks_TrackEntry_TrackType, "TrackType")
+                ATO2(Segment_Tracks_TrackEntry_FlagEnabled, "FlagEnabled")
+                ATO2(Segment_Tracks_TrackEntry_FlagDefault, "FlagDefault")
+                ATO2(Segment_Tracks_TrackEntry_FlagForced, "FlagForced")
+                ATO2(Segment_Tracks_TrackEntry_FlagLacing, "FlagLacing")
+                ATO2(Segment_Tracks_TrackEntry_MinCache, "MinCache")
+                ATO2(Segment_Tracks_TrackEntry_MaxCache, "MaxCache")
+                ATO2(Segment_Tracks_TrackEntry_DefaultDuration, "DefaultDuration")
+                ATO2(Segment_Tracks_TrackEntry_DefaultDecodedFieldDuration, "DefaultDecodedFieldDuration")
+                ATO2(Segment_Tracks_TrackEntry_TrackTimecodeScale, "TrackTimecodeScale")
+                ATO2(Segment_Tracks_TrackEntry_TrackOffset, "TrackOffset")
+                ATO2(Segment_Tracks_TrackEntry_MaxBlockAdditionID, "MaxBlockAdditionID")
+                ATO2(Segment_Tracks_TrackEntry_Name, "Name")
+                ATO2(Segment_Tracks_TrackEntry_Language, "Language")
+                ATO2(Segment_Tracks_TrackEntry_LanguageIETF, "LanguageIETF")
+                ATO2(Segment_Tracks_TrackEntry_CodecID, "CodecID")
+                ATO2(Segment_Tracks_TrackEntry_CodecPrivate, "CodecPrivate")
+                ATO2(Segment_Tracks_TrackEntry_CodecName, "CodecName")
+                ATO2(Segment_Tracks_TrackEntry_AttachmentLink, "AttachmentLink")
+                ATO2(Segment_Tracks_TrackEntry_CodecSettings, "CodecSettings")
+                ATO2(Segment_Tracks_TrackEntry_CodecInfoURL, "CodecInfoURL")
+                ATO2(Segment_Tracks_TrackEntry_CodecDownloadURL, "CodecDownloadURL")
+                ATO2(Segment_Tracks_TrackEntry_CodecDecodeAll, "CodecDecodeAll")
+                ATO2(Segment_Tracks_TrackEntry_TrackOverlay, "TrackOverlay")
+                ATO2(Segment_Tracks_TrackEntry_CodecDelay, "CodecDelay")
+                ATO2(Segment_Tracks_TrackEntry_SeekPreRoll, "SeekPreRoll")
+                LIS2(Segment_Tracks_TrackEntry_TrackTranslate, "TrackTranslate")
+                    ATOM_BEGIN
+                    ATO2(Segment_Tracks_TrackEntry_TrackTranslate_TrackTranslateEditionUID, "TrackTranslateEditionUID")
+                    ATO2(Segment_Tracks_TrackEntry_TrackTranslate_TrackTranslateCodec, "TrackTranslateCodec")
+                    ATO2(Segment_Tracks_TrackEntry_TrackTranslate_TrackTranslateTrackID, "TrackTranslateTrackID")
+                    ATOM_END_MK
+                LIS2(Segment_Tracks_TrackEntry_Video, "Video")
+                    ATOM_BEGIN
+                    ATO2(Segment_Tracks_TrackEntry_Video_FlagInterlaced, "FlagInterlaced")
+                    ATO2(Segment_Tracks_TrackEntry_Video_FieldOrder, "FieldOrder")
+                    ATO2(Segment_Tracks_TrackEntry_Video_StereoMode, "StereoMode")
+                    ATO2(Segment_Tracks_TrackEntry_Video_AlphaMode, "AlphaMode")
+                    ATO2(Segment_Tracks_TrackEntry_Video_OldStereoMode, "OldStereoMode")
+                    ATO2(Segment_Tracks_TrackEntry_Video_PixelWidth, "PixelWidth")
+                    ATO2(Segment_Tracks_TrackEntry_Video_PixelHeight, "PixelHeight")
+                    ATO2(Segment_Tracks_TrackEntry_Video_PixelCropBottom, "PixelCropBottom")
+                    ATO2(Segment_Tracks_TrackEntry_Video_PixelCropTop, "PixelCropTop")
+                    ATO2(Segment_Tracks_TrackEntry_Video_PixelCropLeft, "PixelCropLeft")
+                    ATO2(Segment_Tracks_TrackEntry_Video_PixelCropRight, "PixelCropRight")
+                    ATO2(Segment_Tracks_TrackEntry_Video_DisplayWidth, "DisplayWidth")
+                    ATO2(Segment_Tracks_TrackEntry_Video_DisplayHeight, "DisplayHeight")
+                    ATO2(Segment_Tracks_TrackEntry_Video_DisplayUnit, "DisplayUnit")
+                    ATO2(Segment_Tracks_TrackEntry_Video_AspectRatioType, "AspectRatioType")
+                    ATO2(Segment_Tracks_TrackEntry_Video_ColourSpace, "ColourSpace")
+                    ATO2(Segment_Tracks_TrackEntry_Video_GammaValue, "GammaValue")
+                    ATO2(Segment_Tracks_TrackEntry_Video_FrameRate, "FrameRate")
+                    LIS2(Segment_Tracks_TrackEntry_Video_Colour, "Colour")
+                        ATOM_BEGIN
+                        ATO2(Segment_Tracks_TrackEntry_Video_Colour_MatrixCoefficients, "MatrixCoefficients")
+                        ATO2(Segment_Tracks_TrackEntry_Video_Colour_BitsPerChannel, "BitsPerChannel")
+                        ATO2(Segment_Tracks_TrackEntry_Video_Colour_ChromaSubsamplingHorz, "ChromaSubsamplingHorz")
+                        ATO2(Segment_Tracks_TrackEntry_Video_Colour_ChromaSubsamplingVert, "ChromaSubsamplingVert")
+                        ATO2(Segment_Tracks_TrackEntry_Video_Colour_CbSubsamplingHorz, "CbSubsamplingHorz")
+                        ATO2(Segment_Tracks_TrackEntry_Video_Colour_CbSubsamplingVert, "CbSubsamplingVert")
+                        ATO2(Segment_Tracks_TrackEntry_Video_Colour_ChromaSitingHorz, "ChromaSitingHorz")
+                        ATO2(Segment_Tracks_TrackEntry_Video_Colour_ChromaSitingVert, "ChromaSitingVert")
+                        ATO2(Segment_Tracks_TrackEntry_Video_Colour_Range, "Range")
+                        ATO2(Segment_Tracks_TrackEntry_Video_Colour_TransferCharacteristics, "TransferCharacteristics")
+                        ATO2(Segment_Tracks_TrackEntry_Video_Colour_Primaries, "Primaries")
+                        ATO2(Segment_Tracks_TrackEntry_Video_Colour_MaxCLL, "MaxCLL")
+                        ATO2(Segment_Tracks_TrackEntry_Video_Colour_MaxFALL, "MaxFALL")
+                        LIS2(Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata, "MasteringMetadata")
                             ATOM_BEGIN
-                            ATOM(Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand_ChapProcessData)
-                            ATOM(Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand_ChapProcessTime)
+                            ATO2(Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryRChromaticityX, "PrimaryRChromaticityX")
+                            ATO2(Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryRChromaticityY, "PrimaryRChromaticityY")
+                            ATO2(Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryGChromaticityX, "PrimaryGChromaticityX")
+                            ATO2(Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryGChromaticityY, "PrimaryGChromaticityY")
+                            ATO2(Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryBChromaticityX, "PrimaryBChromaticityX")
+                            ATO2(Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryBChromaticityY, "PrimaryBChromaticityY")
+                            ATO2(Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_WhitePointChromaticityX, "WhitePointChromaticityX")
+                            ATO2(Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_WhitePointChromaticityY, "WhitePointChromaticityY")
+                            ATO2(Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_LuminanceMax, "LuminanceMax")
+                            ATO2(Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_LuminanceMin, "LuminanceMin")
                             ATOM_END_MK
-                        ATOM(Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessPrivate)
                         ATOM_END_MK
-                    LIST(Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay)
+                    LIS2(Segment_Tracks_TrackEntry_Video_Projection, "Projection")
                         ATOM_BEGIN
-                        ATOM(Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapCountry)
-                        ATOM(Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguage)
-                        ATOM(Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapString)
-                        ATOM_END_MK
-                    ATOM(Segment_Chapters_EditionEntry_ChapterAtom_ChapterFlagEnabled)
-                    ATOM(Segment_Chapters_EditionEntry_ChapterAtom_ChapterFlagHidden)
-                    ATOM(Segment_Chapters_EditionEntry_ChapterAtom_ChapterPhysicalEquiv)
-                    ATOM(Segment_Chapters_EditionEntry_ChapterAtom_ChapterSegmentEditionUID)
-                    ATOM(Segment_Chapters_EditionEntry_ChapterAtom_ChapterSegmentUID)
-                    ATOM(Segment_Chapters_EditionEntry_ChapterAtom_ChapterTimeEnd)
-                    ATOM(Segment_Chapters_EditionEntry_ChapterAtom_ChapterTimeStart)
-                    LIST(Segment_Chapters_EditionEntry_ChapterAtom_ChapterTrack)
-                        ATOM_BEGIN
-                        ATOM(Segment_Chapters_EditionEntry_ChapterAtom_ChapterTrack_ChapterTrackNumber)
-                        ATOM_END_MK
-                    ATOM(Segment_Chapters_EditionEntry_ChapterAtom_ChapterUID)
-                    ATOM_END_MK
-                ATOM(Segment_Chapters_EditionEntry_EditionFlagDefault)
-                ATOM(Segment_Chapters_EditionEntry_EditionFlagHidden)
-                ATOM(Segment_Chapters_EditionEntry_EditionFlagOrdered)
-                ATOM(Segment_Chapters_EditionEntry_EditionUID)
-                ATOM_END_MK
-            ATOM_END_MK
-        LIST(Segment_Cluster)
-            ATOM_BEGIN
-            LIST(Segment_Cluster_BlockGroup)
-                ATOM_BEGIN
-                LIST(Segment_Cluster_BlockGroup_Block)
-                    ATOM_BEGIN
-                    ATOM(Segment_Cluster_BlockGroup_Block_Lace)
-                    ATOM_END_MK
-                LIST(Segment_Cluster_BlockGroup_BlockAdditions)
-                    ATOM_BEGIN
-                    LIST(Segment_Cluster_BlockGroup_BlockAdditions_BlockMore)
-                        ATOM_BEGIN
-                        ATOM(Segment_Cluster_BlockGroup_BlockAdditions_BlockMore_BlockAddID)
-                        ATOM(Segment_Cluster_BlockGroup_BlockAdditions_BlockMore_BlockAdditional)
+                        ATO2(Segment_Tracks_TrackEntry_Video_Projection_ProjectionType, "ProjectionType")
+                        ATO2(Segment_Tracks_TrackEntry_Video_Projection_ProjectionPrivate, "ProjectionPrivate")
+                        ATO2(Segment_Tracks_TrackEntry_Video_Projection_ProjectionPoseYaw, "ProjectionPoseYaw")
+                        ATO2(Segment_Tracks_TrackEntry_Video_Projection_ProjectionPosePitch, "ProjectionPosePitch")
+                        ATO2(Segment_Tracks_TrackEntry_Video_Projection_ProjectionPoseRoll, "ProjectionPoseRoll")
                         ATOM_END_MK
                     ATOM_END_MK
-                ATOM(Segment_Cluster_BlockGroup_BlockDuration)
-                ATOM(Segment_Cluster_BlockGroup_ReferencePriority)
-                ATOM(Segment_Cluster_BlockGroup_ReferenceBlock)
-                ATOM(Segment_Cluster_BlockGroup_ReferenceVirtual)
-                ATOM(Segment_Cluster_BlockGroup_CodecState)
-                LIST(Segment_Cluster_BlockGroup_Slices)
+                LIS2(Segment_Tracks_TrackEntry_Audio, "Audio")
                     ATOM_BEGIN
-                    LIST(Segment_Cluster_BlockGroup_Slices_TimeSlice)
-                        ATOM_BEGIN
-                        ATOM(Segment_Cluster_BlockGroup_Slices_TimeSlice_Duration)
-                        ATOM(Segment_Cluster_BlockGroup_Slices_TimeSlice_LaceNumber)
-                        ATOM_END_MK
+                    ATO2(Segment_Tracks_TrackEntry_Audio_SamplingFrequency, "SamplingFrequency")
+                    ATO2(Segment_Tracks_TrackEntry_Audio_OutputSamplingFrequency, "OutputSamplingFrequency")
+                    ATO2(Segment_Tracks_TrackEntry_Audio_Channels, "Channels")
+                    ATO2(Segment_Tracks_TrackEntry_Audio_ChannelPositions, "ChannelPositions")
+                    ATO2(Segment_Tracks_TrackEntry_Audio_BitDepth, "BitDepth")
                     ATOM_END_MK
-                ATOM_END_MK
-            ATOM(Segment_Cluster_Position)
-            ATOM(Segment_Cluster_PrevSize)
-            LIST(Segment_Cluster_SilentTracks)
-                ATOM_BEGIN
-                ATOM(Segment_Cluster_SilentTracks_SilentTrackNumber)
-                ATOM_END_MK
-            LIST(Segment_Cluster_SimpleBlock)
-                ATOM_BEGIN
-                ATOM(Segment_Cluster_BlockGroup_Block_Lace)
-                ATOM_END_MK
-            ATOM(Segment_Cluster_Timecode)
-            ATOM_END_MK
-        LIST(Segment_Cues)
-            ATOM_BEGIN
-            LIST(Segment_Cues_CuePoint)
-                ATOM_BEGIN
-                ATOM(Segment_Cues_CuePoint_CueTime)
-                LIST(Segment_Cues_CuePoint_CueTrackPositions)
+                LIS2(Segment_Tracks_TrackEntry_TrackOperation, "TrackOperation")
                     ATOM_BEGIN
-                    ATOM(Segment_Cues_CuePoint_CueTrackPositions_CueTrack)
-                    ATOM(Segment_Cues_CuePoint_CueTrackPositions_CueClusterPosition)
-                    ATOM(Segment_Cues_CuePoint_CueTrackPositions_CueRelativePosition)
-                    ATOM(Segment_Cues_CuePoint_CueTrackPositions_CueDuration)
-                    ATOM(Segment_Cues_CuePoint_CueTrackPositions_CueBlockNumber)
-                    ATOM_END_MK
-                ATOM_END_MK
-            ATOM_END_MK
-        LIST(Segment_Info)
-            ATOM_BEGIN
-            LIST(Segment_Info_ChapterTranslate)
-                ATOM_BEGIN
-                ATOM(Segment_Info_ChapterTranslate_ChapterTranslateCodec)
-                ATOM(Segment_Info_ChapterTranslate_ChapterTranslateEditionUID)
-                ATOM(Segment_Info_ChapterTranslate_ChapterTranslateID)
-                ATOM_END_MK
-            ATOM(Segment_Info_DateUTC)
-            ATOM(Segment_Info_Duration)
-            ATOM(Segment_Info_MuxingApp)
-            ATOM(Segment_Info_NextFilename)
-            ATOM(Segment_Info_NextUID)
-            ATOM(Segment_Info_PrevFilename)
-            ATOM(Segment_Info_PrevUID)
-            ATOM(Segment_Info_SegmentFamily)
-            ATOM(Segment_Info_SegmentFilename)
-            ATOM(Segment_Info_SegmentUID)
-            ATOM(Segment_Info_TimecodeScale)
-            ATOM(Segment_Info_Title)
-            ATOM(Segment_Info_WritingApp)
-            ATOM_END_MK
-        LIST(Segment_SeekHead)
-            ATOM_BEGIN
-            LIST(Segment_SeekHead_Seek)
-                ATOM_BEGIN
-                ATOM(Segment_SeekHead_Seek_SeekID)
-                ATOM(Segment_SeekHead_Seek_SeekPosition)
-                ATOM_END_MK
-            ATOM_END_MK
-        LIST(Segment_Tags)
-            ATOM_BEGIN
-            LIST(Segment_Tags_Tag)
-                ATOM_BEGIN
-                LIST(Segment_Tags_Tag_SimpleTag)
-                    ATOM_BEGIN
-                    LIST(Segment_Tags_Tag_SimpleTag)
+                    LIS2(Segment_Tracks_TrackEntry_TrackOperation_TrackCombinePlanes, "TrackCombinePlanes")
                         ATOM_BEGIN
-                        LIST(Segment_Tags_Tag_SimpleTag)
+                        LIS2(Segment_Tracks_TrackEntry_TrackOperation_TrackCombinePlanes_TrackPlane, "TrackPlane")
                             ATOM_BEGIN
-                            ATOM(Segment_Tags_Tag_SimpleTag_TagBinary)
-                            ATOM(Segment_Tags_Tag_SimpleTag_TagDefault)
-                            ATOM(Segment_Tags_Tag_SimpleTag_TagLanguage)
-                            ATOM(Segment_Tags_Tag_SimpleTag_TagName)
-                            ATOM(Segment_Tags_Tag_SimpleTag_TagString)
+                            ATO2(Segment_Tracks_TrackEntry_TrackOperation_TrackCombinePlanes_TrackPlane_TrackPlaneUID, "TrackPlaneUID")
+                            ATO2(Segment_Tracks_TrackEntry_TrackOperation_TrackCombinePlanes_TrackPlane_TrackPlaneType, "TrackPlaneType")
                             ATOM_END_MK
-                        ATOM(Segment_Tags_Tag_SimpleTag_TagBinary)
-                        ATOM(Segment_Tags_Tag_SimpleTag_TagDefault)
-                        ATOM(Segment_Tags_Tag_SimpleTag_TagLanguage)
-                        ATOM(Segment_Tags_Tag_SimpleTag_TagName)
-                        ATOM(Segment_Tags_Tag_SimpleTag_TagString)
                         ATOM_END_MK
-                    ATOM(Segment_Tags_Tag_SimpleTag_TagBinary)
-                    ATOM(Segment_Tags_Tag_SimpleTag_TagDefault)
-                    ATOM(Segment_Tags_Tag_SimpleTag_TagLanguage)
-                    ATOM(Segment_Tags_Tag_SimpleTag_TagName)
-                    ATOM(Segment_Tags_Tag_SimpleTag_TagString)
+                    LIS2(Segment_Tracks_TrackEntry_TrackOperation_TrackJoinBlocks, "TrackJoinBlocks")
+                        ATOM_BEGIN
+                        ATO2(Segment_Tracks_TrackEntry_TrackOperation_TrackJoinBlocks_TrackJoinUID, "TrackJoinUID")
+                        ATOM_END_MK
                     ATOM_END_MK
-                LIST(Segment_Tags_Tag_Targets)
-                    ATOM_BEGIN
-                    ATOM(Segment_Tags_Tag_Targets_TargetTypeValue)
-                    ATOM(Segment_Tags_Tag_Targets_TargetType)
-                    ATOM(Segment_Tags_Tag_Targets_TagTrackUID)
-                    ATOM(Segment_Tags_Tag_Targets_TagEditionUID)
-                    ATOM(Segment_Tags_Tag_Targets_TagChapterUID)
-                    ATOM(Segment_Tags_Tag_Targets_TagAttachmentUID)
-                    ATOM_END_MK
-                ATOM_END_MK
-            ATOM_END_MK
-        LIST(Segment_Tracks)
-            ATOM_BEGIN
-            LIST(Segment_Tracks_TrackEntry)
-                ATOM_BEGIN
-                ATOM(Segment_Tracks_TrackEntry_AttachmentLink)
-                LIST(Segment_Tracks_TrackEntry_Audio)
-                    ATOM_BEGIN
-                    ATOM(Segment_Tracks_TrackEntry_Audio_BitDepth)
-                    ATOM(Segment_Tracks_TrackEntry_Audio_Channels)
-                    ATOM(Segment_Tracks_TrackEntry_Audio_OutputSamplingFrequency)
-                    ATOM(Segment_Tracks_TrackEntry_Audio_SamplingFrequency)
-                    ATOM_END_MK
-                ATOM(Segment_Tracks_TrackEntry_CodecSettings)
-                ATOM(Segment_Tracks_TrackEntry_CodecInfoURL)
-                ATOM(Segment_Tracks_TrackEntry_CodecDownloadURL)
-                ATOM(Segment_Tracks_TrackEntry_CodecDecodeAll)
-                ATOM(Segment_Tracks_TrackEntry_CodecID)
+                ATO2(Segment_Tracks_TrackEntry_TrickTrackUID, "TrickTrackUID")
+                ATO2(Segment_Tracks_TrackEntry_TrickTrackSegmentUID, "TrickTrackSegmentUID")
+                ATO2(Segment_Tracks_TrackEntry_TrickTrackFlag, "TrickTrackFlag")
+                ATO2(Segment_Tracks_TrackEntry_TrickMasterTrackUID, "TrickMasterTrackUID")
+                ATO2(Segment_Tracks_TrackEntry_TrickMasterTrackSegmentUID, "TrickMasterTrackSegmentUID")
                 LIS2(Segment_Tracks_TrackEntry_ContentEncodings, "ContentEncodings")
                     ATOM_BEGIN
                     LIS2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding, "ContentEncoding")
-                    ATOM_BEGIN
+                        ATOM_BEGIN
                         ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncodingOrder, "ContentEncodingOrder")
                         ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncodingScope, "ContentEncodingScope")
                         ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncodingType, "ContentEncodingType")
@@ -1577,8 +1650,8 @@ void File_Mk::Data_Parse()
                             ATOM_END_MK
                         LIS2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption, "ContentEncryption")
                             ATOM_BEGIN
-                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentEncAlgo, "ContentAlgo")
-                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentEncKeyID, "ContentKeyID")
+                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentEncAlgo, "ContentEncAlgo")
+                            ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentEncKeyID, "ContentEncKeyID")
                             ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentSignature, "ContentSignature")
                             ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentSigKeyID, "ContentSigKeyID")
                             ATO2(Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_ContentEncryption_ContentSigAlgo, "ContentSigAlgo")
@@ -1586,55 +1659,151 @@ void File_Mk::Data_Parse()
                             ATOM_END_MK
                         ATOM_END_MK
                     ATOM_END_MK
-                ATOM(Segment_Tracks_TrackEntry_CodecName)
-                ATOM(Segment_Tracks_TrackEntry_CodecPrivate)
-                ATOM(Segment_Tracks_TrackEntry_DefaultDuration)
-                ATOM(Segment_Tracks_TrackEntry_FlagDefault)
-                ATOM(Segment_Tracks_TrackEntry_FlagEnabled)
-                ATOM(Segment_Tracks_TrackEntry_FlagForced)
-                ATOM(Segment_Tracks_TrackEntry_FlagLacing)
-                ATOM(Segment_Tracks_TrackEntry_Language)
-                ATOM(Segment_Tracks_TrackEntry_MaxBlockAdditionID)
-                ATOM(Segment_Tracks_TrackEntry_MaxCache)
-                ATOM(Segment_Tracks_TrackEntry_MinCache)
-                ATOM(Segment_Tracks_TrackEntry_Name)
-                ATOM(Segment_Tracks_TrackEntry_TrackNumber)
-                ATOM(Segment_Tracks_TrackEntry_TrackTimecodeScale)
-                ATOM(Segment_Tracks_TrackEntry_TrackOffset)
-                ATOM(Segment_Tracks_TrackEntry_TrackType)
-                ATOM(Segment_Tracks_TrackEntry_TrackUID)
-                LIST(Segment_Tracks_TrackEntry_Video)
+                ATOM_END_MK
+            ATOM_END_MK
+        LIS2(Segment_Cues, "Cues")
+            ATOM_BEGIN
+            LIS2(Segment_Cues_CuePoint, "CuePoint")
+                ATOM_BEGIN
+                ATO2(Segment_Cues_CuePoint_CueTime, "CueTime")
+                LIS2(Segment_Cues_CuePoint_CueTrackPositions, "CueTrackPositions")
                     ATOM_BEGIN
-                    ATOM(Segment_Tracks_TrackEntry_Video_AspectRatioType)
-                    ATOM(Segment_Tracks_TrackEntry_Video_ColourSpace)
-                    ATOM(Segment_Tracks_TrackEntry_Video_DisplayHeight)
-                    ATOM(Segment_Tracks_TrackEntry_Video_DisplayUnit)
-                    ATOM(Segment_Tracks_TrackEntry_Video_DisplayWidth)
-                    ATOM(Segment_Tracks_TrackEntry_Video_FlagInterlaced)
-                    ATOM(Segment_Tracks_TrackEntry_Video_FieldOrder)
-                    ATOM(Segment_Tracks_TrackEntry_Video_FrameRate)
-                    LIST(Segment_Tracks_TrackEntry_Video_Colour)
+                    ATO2(Segment_Cues_CuePoint_CueTrackPositions_CueTrack, "CueTrack")
+                    ATO2(Segment_Cues_CuePoint_CueTrackPositions_CueClusterPosition, "CueClusterPosition")
+                    ATO2(Segment_Cues_CuePoint_CueTrackPositions_CueRelativePosition, "CueRelativePosition")
+                    ATO2(Segment_Cues_CuePoint_CueTrackPositions_CueDuration, "CueDuration")
+                    ATO2(Segment_Cues_CuePoint_CueTrackPositions_CueBlockNumber, "CueBlockNumber")
+                    ATO2(Segment_Cues_CuePoint_CueTrackPositions_CueCodecState, "CueCodecState")
+                    LIS2(Segment_Cues_CuePoint_CueTrackPositions_CueReference, "CueReference")
                         ATOM_BEGIN
-                        ATOM(Segment_Tracks_TrackEntry_Video_Colour_MatrixCoefficients)
-                        ATOM(Segment_Tracks_TrackEntry_Video_Colour_BitsPerChannel)
-                        ATOM(Segment_Tracks_TrackEntry_Video_Colour_Range)
-                        ATOM(Segment_Tracks_TrackEntry_Video_Colour_TransferCharacteristics)
-                        ATOM(Segment_Tracks_TrackEntry_Video_Colour_Primaries)
+                        ATO2(Segment_Cues_CuePoint_CueTrackPositions_CueReference_CueRefTime, "CueRefTime")
+                        ATO2(Segment_Cues_CuePoint_CueTrackPositions_CueReference_CueRefCluster, "CueRefCluster")
+                        ATO2(Segment_Cues_CuePoint_CueTrackPositions_CueReference_CueRefNumber, "CueRefNumber")
+                        ATO2(Segment_Cues_CuePoint_CueTrackPositions_CueReference_CueRefCodecState, "CueRefCodecState")
                         ATOM_END_MK
-                    ATOM(Segment_Tracks_TrackEntry_Video_PixelCropBottom)
-                    ATOM(Segment_Tracks_TrackEntry_Video_PixelCropLeft)
-                    ATOM(Segment_Tracks_TrackEntry_Video_PixelCropRight)
-                    ATOM(Segment_Tracks_TrackEntry_Video_PixelCropTop)
-                    ATOM(Segment_Tracks_TrackEntry_Video_PixelHeight)
-                    ATOM(Segment_Tracks_TrackEntry_Video_PixelWidth)
-                    ATOM(Segment_Tracks_TrackEntry_Video_StereoMode)
                     ATOM_END_MK
-                ATOM(Segment_Tracks_TrackEntry_TrackOverlay)
-                LIST(Segment_Tracks_TrackEntry_TrackTranslate)
+                ATOM_END_MK
+            ATOM_END_MK
+        LIS2(Segment_Attachments, "Attachments")
+            ATOM_BEGIN
+            LIS2(Segment_Attachments_AttachedFile, "AttachedFile")
+                ATOM_BEGIN
+                ATO2(Segment_Attachments_AttachedFile_FileDescription, "FileDescription")
+                ATO2(Segment_Attachments_AttachedFile_FileName, "FileName")
+                ATO2(Segment_Attachments_AttachedFile_FileMimeType, "FileMimeType")
+                LIST_SKIP(Segment_Attachments_AttachedFile_FileData) //This is ATOM, but some ATOMs are too big
+                ATO2(Segment_Attachments_AttachedFile_FileUID, "FileUID")
+                ATO2(Segment_Attachments_AttachedFile_FileReferral, "FileReferral")
+                ATO2(Segment_Attachments_AttachedFile_FileUsedStartTime, "FileUsedStartTime")
+                ATO2(Segment_Attachments_AttachedFile_FileUsedEndTime, "FileUsedEndTime")
+                ATOM_END_MK
+            ATOM_END_MK
+        LIS2(Segment_Chapters, "Chapters")
+            ATOM_BEGIN
+            LIS2(Segment_Chapters_EditionEntry, "EditionEntry")
+                ATOM_BEGIN
+                ATO2(Segment_Chapters_EditionEntry_EditionUID, "EditionUID")
+                ATO2(Segment_Chapters_EditionEntry_EditionFlagHidden, "EditionFlagHidden")
+                ATO2(Segment_Chapters_EditionEntry_EditionFlagDefault, "EditionFlagDefault")
+                ATO2(Segment_Chapters_EditionEntry_EditionFlagOrdered, "EditionFlagOrdered")
+                LIS2(Segment_Chapters_EditionEntry_ChapterAtom, "ChapterAtom")
                     ATOM_BEGIN
-                    ATOM(Segment_Tracks_TrackEntry_TrackTranslate_Codec)
-                    ATOM(Segment_Tracks_TrackEntry_TrackTranslate_EditionUID)
-                    ATOM(Segment_Tracks_TrackEntry_TrackTranslate_TrackID)
+                    LIS2(Segment_Chapters_EditionEntry_ChapterAtom, "ChapterAtom")
+                        ATOM_BEGIN
+                        ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterUID, "ChapterUID")
+                        ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterStringUID, "ChapterStringUID")
+                        ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterTimeStart, "ChapterTimeStart")
+                        ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterTimeEnd, "ChapterTimeEnd")
+                        ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterFlagHidden, "ChapterFlagHidden")
+                        ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterFlagEnabled, "ChapterFlagEnabled")
+                        ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterSegmentUID, "ChapterSegmentUID")
+                        ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterSegmentEditionUID, "ChapterSegmentEditionUID")
+                        ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterPhysicalEquiv, "ChapterPhysicalEquiv")
+                        LIS2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterTrack, "ChapterTrack")
+                            ATOM_BEGIN
+                            ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterTrack_ChapterTrackNumber, "ChapterTrackNumber")
+                            ATOM_END_MK
+                        LIS2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay, "ChapterDisplay")
+                            ATOM_BEGIN
+                            ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapString, "ChapString")
+                            ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguage, "ChapLanguage")
+                            ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguageIETF, "ChapLanguageIETF")
+                            ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapCountry, "ChapCountry")
+                            ATOM_END_MK
+                        LIS2(Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess, "ChapProcess")
+                            ATOM_BEGIN
+                            ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCodecID, "ChapProcessCodecID")
+                            ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessPrivate, "ChapProcessPrivate")
+                            LIS2(Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand, "ChapProcessCommand")
+                                ATOM_BEGIN
+                                ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand_ChapProcessTime, "ChapProcessTime")
+                                ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand_ChapProcessData, "ChapProcessData")
+                                ATOM_END_MK
+                            ATOM_END_MK
+                        ATOM_END_MK
+                    ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterUID, "ChapterUID")
+                    ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterStringUID, "ChapterStringUID")
+                    ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterTimeStart, "ChapterTimeStart")
+                    ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterTimeEnd, "ChapterTimeEnd")
+                    ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterFlagHidden, "ChapterFlagHidden")
+                    ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterFlagEnabled, "ChapterFlagEnabled")
+                    ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterSegmentUID, "ChapterSegmentUID")
+                    ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterSegmentEditionUID, "ChapterSegmentEditionUID")
+                    ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterPhysicalEquiv, "ChapterPhysicalEquiv")
+                    LIS2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterTrack, "ChapterTrack")
+                        ATOM_BEGIN
+                        ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterTrack_ChapterTrackNumber, "ChapterTrackNumber")
+                        ATOM_END_MK
+                    LIS2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay, "ChapterDisplay")
+                        ATOM_BEGIN
+                        ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapString, "ChapString")
+                        ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguage, "ChapLanguage")
+                        ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguageIETF, "ChapLanguageIETF")
+                        ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapCountry, "ChapCountry")
+                        ATOM_END_MK
+                    LIS2(Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess, "ChapProcess")
+                        ATOM_BEGIN
+                        ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCodecID, "ChapProcessCodecID")
+                        ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessPrivate, "ChapProcessPrivate")
+                        LIS2(Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand, "ChapProcessCommand")
+                            ATOM_BEGIN
+                            ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand_ChapProcessTime, "ChapProcessTime")
+                            ATO2(Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand_ChapProcessData, "ChapProcessData")
+                            ATOM_END_MK
+                        ATOM_END_MK
+                    ATOM_END_MK
+                ATOM_END_MK
+            ATOM_END_MK
+        LIS2(Segment_Tags, "Tags")
+            ATOM_BEGIN
+            LIS2(Segment_Tags_Tag, "Tag")
+                ATOM_BEGIN
+                LIS2(Segment_Tags_Tag_Targets, "Targets")
+                    ATOM_BEGIN
+                    ATO2(Segment_Tags_Tag_Targets_TargetTypeValue, "TargetTypeValue")
+                    ATO2(Segment_Tags_Tag_Targets_TargetType, "TargetType")
+                    ATO2(Segment_Tags_Tag_Targets_TagTrackUID, "TagTrackUID")
+                    ATO2(Segment_Tags_Tag_Targets_TagEditionUID, "TagEditionUID")
+                    ATO2(Segment_Tags_Tag_Targets_TagChapterUID, "TagChapterUID")
+                    ATO2(Segment_Tags_Tag_Targets_TagAttachmentUID, "TagAttachmentUID")
+                    ATOM_END_MK
+                LIS2(Segment_Tags_Tag_SimpleTag, "SimpleTag")
+                    ATOM_BEGIN
+                    LIS2(Segment_Tags_Tag_SimpleTag, "SimpleTag")
+                        ATOM_BEGIN
+                        ATO2(Segment_Tags_Tag_SimpleTag_TagName, "TagName")
+                        ATO2(Segment_Tags_Tag_SimpleTag_TagLanguage, "TagLanguage")
+                        ATO2(Segment_Tags_Tag_SimpleTag_TagLanguageIETF, "TagLanguageIETF")
+                        ATO2(Segment_Tags_Tag_SimpleTag_TagDefault, "TagDefault")
+                        ATO2(Segment_Tags_Tag_SimpleTag_TagString, "TagString")
+                        ATO2(Segment_Tags_Tag_SimpleTag_TagBinary, "TagBinary")
+                        ATOM_END_MK
+                    ATO2(Segment_Tags_Tag_SimpleTag_TagName, "TagName")
+                    ATO2(Segment_Tags_Tag_SimpleTag_TagLanguage, "TagLanguage")
+                    ATO2(Segment_Tags_Tag_SimpleTag_TagLanguageIETF, "TagLanguageIETF")
+                    ATO2(Segment_Tags_Tag_SimpleTag_TagDefault, "TagDefault")
+                    ATO2(Segment_Tags_Tag_SimpleTag_TagString, "TagString")
+                    ATO2(Segment_Tags_Tag_SimpleTag_TagBinary, "TagBinary")
                     ATOM_END_MK
                 ATOM_END_MK
             ATOM_END_MK
@@ -1695,34 +1864,8 @@ void File_Mk::Void()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Ebml()
-{
-    Element_Name("EBML");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Ebml_Version()
-{
-    Element_Name("EBMLVersion");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Ebml_ReadVersion()
 {
-    Element_Name("EBMLReadVersion");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Ebml_MaxIDLength()
-{
-    Element_Name("EBMLMaxIDLength");
-
     //Parsing
     UInteger_Info();
 }
@@ -1730,8 +1873,6 @@ void File_Mk::Ebml_MaxIDLength()
 //---------------------------------------------------------------------------
 void File_Mk::Ebml_MaxSizeLength()
 {
-    Element_Name("EBMLMaxSizeLength");
-
     //Parsing
     int64u Value = UInteger_Get();
 
@@ -1746,11 +1887,8 @@ void File_Mk::Ebml_MaxSizeLength()
 //---------------------------------------------------------------------------
 void File_Mk::Ebml_DocType()
 {
-    Element_Name("DocType");
-
     //Parsing
-    Ztring Data;
-    Get_Local(Element_Size, Data,                               "Data"); Element_Info1(Data);
+    Ztring Data=String_Get();
 
     //Filling
     FILLING_BEGIN();
@@ -1777,8 +1915,6 @@ void File_Mk::Ebml_DocType()
 //---------------------------------------------------------------------------
 void File_Mk::Ebml_DocTypeVersion()
 {
-    Element_Name("DocTypeVersion");
-
     //Parsing
     Format_Version=UInteger_Get();
 
@@ -1791,8 +1927,6 @@ void File_Mk::Ebml_DocTypeVersion()
 //---------------------------------------------------------------------------
 void File_Mk::Ebml_DocTypeReadVersion()
 {
-    Element_Name("DocTypeReadVersion");
-
     //Parsing
     int64u UInteger=UInteger_Get();
 
@@ -1806,8 +1940,6 @@ void File_Mk::Ebml_DocTypeReadVersion()
 //---------------------------------------------------------------------------
 void File_Mk::Segment()
 {
-    Element_Name("Segment");
-
     if (!Status[IsAccepted])
     {
         Accept("Matroska");
@@ -1822,16 +1954,9 @@ void File_Mk::Segment()
     #endif // MEDIAINFO_TRACE
 }
 
-void File_Mk::Segment_Attachments()
-{
-    Element_Name("Attachments");
-}
-
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Attachments_AttachedFile()
 {
-    Element_Name("AttachedFile");
-
     AttachedFile_FileName.clear();
     AttachedFile_FileMimeType.clear();
     AttachedFile_FileDescription.clear();
@@ -1840,8 +1965,6 @@ void File_Mk::Segment_Attachments_AttachedFile()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Attachments_AttachedFile_FileDescription()
 {
-    Element_Name("FileDescription");
-
     //Parsing
     Ztring Data=UTF8_Get();
 
@@ -1851,8 +1974,6 @@ void File_Mk::Segment_Attachments_AttachedFile_FileDescription()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Attachments_AttachedFile_FileName()
 {
-    Element_Name("FileName");
-
     //Parsing
     Ztring Data=UTF8_Get();
 
@@ -1868,10 +1989,8 @@ void File_Mk::Segment_Attachments_AttachedFile_FileName()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Attachments_AttachedFile_FileMimeType()
 {
-    Element_Name("FileMimeType");
-
     //Parsing
-    Ztring Data=Local_Get();
+    Ztring Data=String_Get();
 
     AttachedFile_FileMimeType=Data.To_UTF8();
 }
@@ -1924,52 +2043,8 @@ void File_Mk::Segment_Attachments_AttachedFile_FileData()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Attachments_AttachedFile_FileUID()
-{
-    Element_Name("FileUID");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Attachments_AttachedFile_FileReferral()
-{
-    Element_Name("FileReferral");
-
-    //Parsing
-    Skip_XX(Element_Size,                                       "Data");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Attachments_AttachedFile_FileUsedStartTime()
-{
-    Element_Name("FileUsedStartTime");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Attachments_AttachedFile_FileUsedEndTime()
-{
-    Element_Name("FileUsedEndTime");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters()
-{
-    Element_Name("Chapters");
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Chapters_EditionEntry()
 {
-    Element_Name("EditionEntry");
-
     //Filling
     EditionEntries_Pos=EditionEntries.size();
     EditionEntries.resize(EditionEntries_Pos+1);
@@ -1978,87 +2053,24 @@ void File_Mk::Segment_Chapters_EditionEntry()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom()
 {
-    Element_Name("ChapterAtom");
-
     //Filling
     ChapterAtoms_Pos=EditionEntries[EditionEntries_Pos].ChapterAtoms.size();
     EditionEntries[EditionEntries_Pos].ChapterAtoms.resize(ChapterAtoms_Pos+1);
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess()
-{
-    Element_Name("ChapProcess");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCodecID()
-{
-    Element_Name("ChapProcessCodecID");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand()
-{
-    Element_Name("ChapProcessCommand");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand_ChapProcessData()
-{
-    Element_Name("ChapProcessData");
-
-    //Parsing
-    Skip_XX(Element_Size,                                       "Data");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCommand_ChapProcessTime()
-{
-    Element_Name("ChapProcessTime");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessPrivate()
-{
-    Element_Name("ChapProcessPrivate");
-
-    //Parsing
-    Skip_XX(Element_Size,                                       "Data");
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay()
 {
-    Element_Name("ChapterDisplay");
-
     //Filling
     ChapterDisplays_Pos=EditionEntries[EditionEntries_Pos].ChapterAtoms[ChapterAtoms_Pos].ChapterDisplays.size();
     EditionEntries[EditionEntries_Pos].ChapterAtoms[ChapterAtoms_Pos].ChapterDisplays.resize(ChapterDisplays_Pos+1);
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapCountry()
-{
-    Element_Name("ChapCountry");
-
-    //Parsing
-    Local_Info();
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguage()
 {
-    Element_Name("ChapLanguage");
-
     //Parsing
-    Ztring Data=Local_Get();
+    Ztring Data=String_Get();
 
     FILLING_BEGIN();
         EditionEntries[EditionEntries_Pos].ChapterAtoms[ChapterAtoms_Pos].ChapterDisplays[ChapterDisplays_Pos].ChapLanguage=Data;
@@ -2068,8 +2080,6 @@ void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLangu
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapString()
 {
-    Element_Name("ChapString");
-
     //Parsing
     Ztring Data=UTF8_Get();
 
@@ -2081,64 +2091,8 @@ void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapStrin
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapterFlagHidden()
-{
-    Element_Name("ChapterFlagHidden");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapterFlagEnabled()
-{
-    Element_Name("ChapterFlagEnabled");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapterPhysicalEquiv()
-{
-    Element_Name("ChapterPhysicalEquiv");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapterSegmentEditionUID()
-{
-    Element_Name("ChapterSegmentEditionUID");
-
-    //Parsing
-    Skip_XX(Element_Size,                                       "Data");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapterSegmentUID()
-{
-    Element_Name("ChapterSegmentUID");
-
-    //Parsing
-    Skip_XX(Element_Size,                                       "Data");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapterTimeEnd()
-{
-    Element_Name("ChapterTimeEnd");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapterTimeStart()
 {
-    Element_Name("ChapterTimeStart");
-
     //Parsing
     int64u Data=UInteger_Get();
 
@@ -2148,70 +2102,8 @@ void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapterTimeStart()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapterTrack()
-{
-    Element_Name("ChapterTrack");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapterTrack_ChapterTrackNumber()
-{
-    Element_Name("ChapterTrackNumber");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapterUID()
-{
-    Element_Name("ChapterUID");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_EditionFlagDefault()
-{
-    Element_Name("EditionFlagDefault");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_EditionFlagHidden()
-{
-    Element_Name("EditionFlagHidden");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_EditionFlagOrdered()
-{
-    Element_Name("EditionFlagOrdered");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Chapters_EditionEntry_EditionUID()
-{
-    Element_Name("EditionUID");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Cluster()
 {
-    Element_Name("Cluster");
-
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
@@ -2272,8 +2164,6 @@ void File_Mk::Segment_Cluster()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Cluster_BlockGroup()
 {
-    Element_Name("BlockGroup");
-
     Segment_Cluster_BlockGroup_BlockDuration_Value=(int64u)-1;
     Segment_Cluster_BlockGroup_BlockDuration_TrackNumber=(int64u)-1;
 }
@@ -2282,9 +2172,10 @@ void File_Mk::Segment_Cluster_BlockGroup()
 void File_Mk::Segment_Cluster_BlockGroup_Block()
 {
     if (!Element_IsComplete_Get())
+    {
+        Element_WaitForMoreData();
         return;
-
-    Element_Name((Element_Level==3)?"SimpleBlock":"Block");
+    }
 
     //Parsing
     Get_EB (TrackNumber,                                        "TrackNumber"); Element_Info1(TrackNumber);
@@ -2499,7 +2390,7 @@ void File_Mk::Segment_Cluster_BlockGroup_Block_Lace()
         #endif //MEDIAINFO_DEMUX
             Open_Buffer_Continue(streamItem.Parser, (size_t)(Element_Size-Element_Offset));
         if (streamItem.Parser->Status[IsFinished]
-            || (streamItem.PacketCount>=300 && MediaInfoLib::Config.ParseSpeed_Get()<1))
+            || (streamItem.PacketCount>=300 && Config->ParseSpeed<1.0))
         {
             streamItem.Searching_Payload=false;
             if (!streamItem.Searching_TimeStamps && !streamItem.Searching_TimeStamp_Start)
@@ -2531,7 +2422,7 @@ void File_Mk::Segment_Cluster_BlockGroup_Block_Lace()
     if (!Status[IsFilled] && ((Frame_Count>6 && (Stream_Count==0 ||Config->ParseSpeed==0.0)) || Frame_Count>512*Stream.size()))
     {
         Fill();
-        if (MediaInfoLib::Config.ParseSpeed_Get()<1)
+        if (Config->ParseSpeed<1.0)
         {
             //Jumping
             std::sort(Segment_Seeks.begin(), Segment_Seeks.end());
@@ -2568,37 +2459,8 @@ void File_Mk::Segment_Cluster_BlockGroup_Block_Lace()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Cluster_BlockGroup_BlockAdditions()
-{
-    Element_Name("BlockAdditions");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cluster_BlockGroup_BlockAdditions_BlockMore()
-{
-    Element_Name("BlockMore");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cluster_BlockGroup_BlockAdditions_BlockMore_BlockAddID()
-{
-    Element_Name("BlockAddID");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cluster_BlockGroup_BlockAdditions_BlockMore_BlockAdditional()
-{
-    Element_Name("BlockAdditional");
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Cluster_BlockGroup_BlockDuration()
 {
-    Element_Name("BlockDuration");
-
     //Parsing
     int64u Segment_Cluster_TimeCode_Value=UInteger_Get();
 
@@ -2614,96 +2476,6 @@ void File_Mk::Segment_Cluster_BlockGroup_BlockDuration()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Cluster_BlockGroup_ReferencePriority()
-{
-    Element_Name("ReferencePriority");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cluster_BlockGroup_ReferenceBlock()
-{
-    Element_Name("ReferenceBlock");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cluster_BlockGroup_ReferenceVirtual()
-{
-    Element_Name("ReferenceVirtual");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cluster_BlockGroup_CodecState()
-{
-    Element_Name("CodecState");
-
-    //Parsing
-    Skip_XX(Element_Size,                                       "Data");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cluster_BlockGroup_Slices()
-{
-    Element_Name("Slices");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cluster_BlockGroup_Slices_TimeSlice()
-{
-    Element_Name("TimeSlice");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cluster_BlockGroup_Slices_TimeSlice_Duration()
-{
-    Element_Name("Duration");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cluster_BlockGroup_Slices_TimeSlice_LaceNumber()
-{
-    Element_Name("LaceNumber");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cluster_Position()
-{
-    Element_Name("Position");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cluster_PrevSize()
-{
-    Element_Name("PrevSize");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cluster_SilentTracks()
-{
-    Element_Name("SilentTracks");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cluster_SilentTracks_SilentTrackNumber()
-{
-    Element_Name("SilentTrackNumber");
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Cluster_SimpleBlock()
 {
     Segment_Cluster_BlockGroup_BlockDuration_Value=(int64u)-1;
@@ -2715,8 +2487,6 @@ void File_Mk::Segment_Cluster_SimpleBlock()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Cluster_Timecode()
 {
-    Element_Name("Timecode");
-
     //Parsing
     Segment_Cluster_TimeCode_Value=UInteger_Get();
 }
@@ -2724,8 +2494,6 @@ void File_Mk::Segment_Cluster_Timecode()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Cues()
 {
-    Element_Name("Cues");
-
     //Skipping Cues, we don't need of them
     TestMultipleInstances();
 
@@ -2737,8 +2505,6 @@ void File_Mk::Segment_Cues()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Cues_CuePoint()
 {
-    Element_Name("CuePoint");
-
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
@@ -2751,105 +2517,14 @@ void File_Mk::Segment_Cues_CuePoint()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Cues_CuePoint_CueTime()
-{
-    Element_Name("CueTime");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cues_CuePoint_CueTrackPositions()
-{
-    Element_Name("CueTrackPositions");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cues_CuePoint_CueTrackPositions_CueTrack()
-{
-    Element_Name("CueTrack");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cues_CuePoint_CueTrackPositions_CueClusterPosition()
-{
-    Element_Name("CueClusterPosition");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cues_CuePoint_CueTrackPositions_CueRelativePosition()
-{
-    Element_Name("CueRelativePosition");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cues_CuePoint_CueTrackPositions_CueDuration()
-{
-    Element_Name("CueDuration");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Cues_CuePoint_CueTrackPositions_CueBlockNumber()
-{
-    Element_Name("CueBlockNumber");
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Info()
 {
-    Element_Name("Info");
-
     TestMultipleInstances(&Segment_Info_Count);
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Info_ChapterTranslate()
-{
-    Element_Name("ChapterTranslate");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Info_ChapterTranslate_ChapterTranslateCodec()
-{
-    Element_Name("ChapterTranslateCodec");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Info_ChapterTranslate_ChapterTranslateEditionUID()
-{
-    Element_Name("ChapterTranslateEditionUID");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Info_ChapterTranslate_ChapterTranslateID()
-{
-    Element_Name("ChapterTranslateID");
-
-    //Parsing
-    UInteger_Info();
 }
 
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Info_DateUTC()
 {
-    Element_Name("DateUTC");
-
     //Parsing
     int64u Data;
     Get_B8(Data,                                                "Data"); Element_Info1(Data/1000000000+978307200); //From Beginning of the millenium, in nanoseconds
@@ -2864,8 +2539,6 @@ void File_Mk::Segment_Info_DateUTC()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Info_Duration()
 {
-    Element_Name("Duration");
-
     //Parsing
     float64 Float=Float_Get();
 
@@ -2879,8 +2552,6 @@ void File_Mk::Segment_Info_Duration()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Info_MuxingApp()
 {
-    Element_Name("MuxingApp");
-
     //Parsing
     Ztring Data=UTF8_Get();
 
@@ -2892,64 +2563,8 @@ void File_Mk::Segment_Info_MuxingApp()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Info_NextFilename()
-{
-    Element_Name("NextFilename");
-
-    //Parsing
-    UTF8_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Info_NextUID()
-{
-    Element_Name("NextUID");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Info_PrevFilename()
-{
-    Element_Name("PrevFilename");
-
-    //Parsing
-    UTF8_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Info_PrevUID()
-{
-    Element_Name("PrevUID");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Info_SegmentFamily()
-{
-    Element_Name("SegmentFamily");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Info_SegmentFilename()
-{
-    Element_Name("SegmentFilename");
-
-    //Parsing
-    UTF8_Info();
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Info_SegmentUID()
 {
-    Element_Name("SegmentUID");
-
     //Parsing
     int128u Data;
     Data=UInteger16_Get();
@@ -2965,8 +2580,6 @@ void File_Mk::Segment_Info_SegmentUID()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Info_TimecodeScale()
 {
-    Element_Name("TimecodeScale");
-
     //Parsing
     int64u UInteger=UInteger_Get();
 
@@ -2980,8 +2593,6 @@ void File_Mk::Segment_Info_TimecodeScale()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Info_Title()
 {
-    Element_Name("Title");
-
     //Parsing
     Ztring Data=UTF8_Get();
 
@@ -2995,8 +2606,6 @@ void File_Mk::Segment_Info_Title()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Info_WritingApp()
 {
-    Element_Name("WritingApp");
-
     //Parsing
     Ztring Data=UTF8_Get();
 
@@ -3010,8 +2619,6 @@ void File_Mk::Segment_Info_WritingApp()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_SeekHead()
 {
-    Element_Name("SeekHead");
-
     Segment_Seeks.clear();
 
     #if MEDIAINFO_TRACE
@@ -3022,8 +2629,6 @@ void File_Mk::Segment_SeekHead()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_SeekHead_Seek()
 {
-    Element_Name("Seek");
-
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
@@ -3038,8 +2643,6 @@ void File_Mk::Segment_SeekHead_Seek()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_SeekHead_Seek_SeekID()
 {
-    Element_Name("SeekID");
-
     //Parsing
     int64u Data;
     Get_EB (Data,                                               "Data");
@@ -3048,8 +2651,6 @@ void File_Mk::Segment_SeekHead_Seek_SeekID()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_SeekHead_Seek_SeekPosition()
 {
-    Element_Name("SeekPosition");
-
     //Parsing
     int64u Data=UInteger_Get();
 
@@ -3060,16 +2661,12 @@ void File_Mk::Segment_SeekHead_Seek_SeekPosition()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tags()
 {
-    Element_Name("Tags");
-
     Segment_Tag_SimpleTag_TagNames.clear();
 }
 
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tags_Tag()
 {
-    Element_Name("Tag");
-
     //Previous tags
     tags::iterator Items0 = Segment_Tags_Tag_Items.find((int64u)-1);
     if (Items0 != Segment_Tags_Tag_Items.end())
@@ -3087,37 +2684,10 @@ void File_Mk::Segment_Tags_Tag()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tags_Tag_SimpleTag()
-{
-    Element_Name("SimpleTag");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tags_Tag_SimpleTag_TagBinary()
-{
-    Element_Name("TagBinary");
-
-    //Parsing
-    Skip_XX(Element_Size,                                       "Data");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tags_Tag_SimpleTag_TagDefault()
-{
-    Element_Name("TagDefault");
-
-    //Parsing
-    UInteger_Get();
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Tags_Tag_SimpleTag_TagLanguage()
 {
-    Element_Name("TagLanguage");
-
     //Parsing
-    Ztring Data;
-    Get_Local(Element_Size, Data,                              "Data"); Element_Info1(Data);
+    Ztring Data=String_Get();
 
     FILLING_BEGIN();
         //Fill(StreamKind_Last, StreamPos_Last, "Language", Data);
@@ -3127,8 +2697,6 @@ void File_Mk::Segment_Tags_Tag_SimpleTag_TagLanguage()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tags_Tag_SimpleTag_TagName()
 {
-    Element_Name("TagName");
-
     //Parsing
     Ztring TagName=UTF8_Get();
 
@@ -3139,8 +2707,6 @@ void File_Mk::Segment_Tags_Tag_SimpleTag_TagName()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tags_Tag_SimpleTag_TagString()
 {
-    Element_Name("TagString");
-
     //Parsing
     Ztring TagString;
     TagString=UTF8_Get();
@@ -3191,32 +2757,8 @@ void File_Mk::Segment_Tags_Tag_SimpleTag_TagString()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tags_Tag_Targets()
-{
-    Element_Name("Targets");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tags_Tag_Targets_TargetTypeValue()
-{
-    Element_Name("TargetTypeValue");
-
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tags_Tag_Targets_TargetType()
-{
-    Element_Name("TargetType");
-
-    UTF8_Info();
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Tags_Tag_Targets_TagTrackUID()
 {
-    Element_Name("TagTrackUID");
-
     //Parsing
     Segment_Tags_Tag_Targets_TagTrackUID_Value=UInteger_Get();
 
@@ -3235,42 +2777,14 @@ void File_Mk::Segment_Tags_Tag_Targets_TagTrackUID()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tags_Tag_Targets_TagEditionUID()
-{
-    Element_Name("TagEditionUID");
-
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tags_Tag_Targets_TagChapterUID()
-{
-    Element_Name("TagChapterUID");
-
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tags_Tag_Targets_TagAttachmentUID()
-{
-    Element_Name("TagAttachmentUID");
-
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks()
 {
-    Element_Name("Tracks");
-
     TestMultipleInstances(&Segment_Tracks_Count);
 }
 
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry()
 {
-    Element_Name("TrackEntry");
-
     if (Segment_Info_Count>1)
         return; //First element has the priority
 
@@ -3293,25 +2807,8 @@ void File_Mk::Segment_Tracks_TrackEntry()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_AttachmentLink()
-{
-    Element_Name("AttachmentLink");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_Audio()
-{
-    Element_Name("Audio");
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Audio_BitDepth()
 {
-    Element_Name("BitDepth");
-
     //Parsing
     int64u UInteger=UInteger_Get();
 
@@ -3326,8 +2823,6 @@ void File_Mk::Segment_Tracks_TrackEntry_Audio_BitDepth()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Audio_Channels()
 {
-    Element_Name("Channels");
-
     //Parsing
     int64u UInteger=UInteger_Get();
 
@@ -3341,8 +2836,6 @@ void File_Mk::Segment_Tracks_TrackEntry_Audio_Channels()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Audio_OutputSamplingFrequency()
 {
-    Element_Name("OutputSamplingFrequency");
-
     //Parsing
     float64 Float=Float_Get();
 
@@ -3356,8 +2849,6 @@ void File_Mk::Segment_Tracks_TrackEntry_Audio_OutputSamplingFrequency()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Audio_SamplingFrequency()
 {
-    Element_Name("SamplingFrequency");
-
     //Parsing
     float64 Float=Float_Get();
 
@@ -3373,49 +2864,10 @@ void File_Mk::Segment_Tracks_TrackEntry_Audio_SamplingFrequency()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_CodecSettings()
-{
-    Element_Name("CodecSettings");
-
-    //Parsing
-    UTF8_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_CodecInfoURL()
-{
-    Element_Name("CodecInfoURL");
-
-    //Parsing
-    Local_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_CodecDownloadURL()
-{
-    Element_Name("CodecDecodeAll");
-
-    //Parsing
-    Local_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_CodecDecodeAll()
-{
-    Element_Name("CodecDecodeAll");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_CodecID()
 {
-    Element_Name("CodecID");
-
     //Parsing
-    Ztring Data;
-    Get_Local(Element_Size, Data,                               "Data"); Element_Info1(Data);
+    Ztring Data=String_Get();
 
     FILLING_BEGIN();
         if (Segment_Info_Count>1)
@@ -3468,19 +2920,8 @@ void File_Mk::Segment_Tracks_TrackEntry_ContentEncodings_ContentEncoding_Content
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_CodecName()
-{
-    Element_Name("CodecName");
-
-    //Parsing
-    UTF8_Info();
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_CodecPrivate()
 {
-    Element_Name("CodecPrivate");
-
     if (Segment_Info_Count>1)
     {
         Skip_XX(Element_Size,                                   "Data (not parsed)");  
@@ -3655,9 +3096,9 @@ void File_Mk::Segment_Tracks_TrackEntry_CodecPrivate_vids()
     Element_Info1("Copy of vids");
 
     //Parsing
-    int32u Width, Height, Compression;
+    int32u Size, Width, Height, Compression;
     int16u Resolution;
-    Skip_L4(                                                    "Size");
+    Get_L4 (Size,                                               "Size");
     Get_L4 (Width,                                              "Width");
     Get_L4 (Height,                                             "Height");
     Skip_L2(                                                    "Planes");
@@ -3727,16 +3168,19 @@ void File_Mk::Segment_Tracks_TrackEntry_CodecPrivate_vids()
     if (Data_Remain())
     {
         Element_Begin1("Private data");
-        Open_Buffer_OutOfBand(Stream[TrackNumber].Parser);
+        if (Size>Element_Size)
+            Size=Element_Size;
+        Open_Buffer_OutOfBand(Stream[TrackNumber].Parser, Size-Element_Offset);
         Element_End0();
+
+        if (Element_Offset<Element_Size)
+            Skip_XX(Element_Size-Element_Offset,                "Padding");
     }
 }
 
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_DefaultDuration()
 {
-    Element_Name("DefaultDuration");
-
     //Parsing
     int64u UInteger=UInteger_Get();
 
@@ -3750,8 +3194,6 @@ void File_Mk::Segment_Tracks_TrackEntry_DefaultDuration()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_FlagDefault()
 {
-    Element_Name("FlagDefault");
-
     //Parsing
     int64u UInteger=UInteger_Get();
 
@@ -3763,19 +3205,8 @@ void File_Mk::Segment_Tracks_TrackEntry_FlagDefault()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_FlagEnabled()
-{
-    Element_Name("FlagEnabled");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_FlagForced()
 {
-    Element_Name("FlagForced");
-
     //Parsing
     int64u UInteger=UInteger_Get();
 
@@ -3787,22 +3218,10 @@ void File_Mk::Segment_Tracks_TrackEntry_FlagForced()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_FlagLacing()
-{
-    Element_Name("FlagLacing");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Language()
 {
-    Element_Name("Language");
-
     //Parsing
-    Ztring Data;
-    Get_Local(Element_Size, Data,                               "Data"); Element_Info1(Data);
+    Ztring Data=String_Get();
 
     FILLING_BEGIN();
         if (Segment_Info_Count>1)
@@ -3812,37 +3231,8 @@ void File_Mk::Segment_Tracks_TrackEntry_Language()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_MaxBlockAdditionID()
-{
-    Element_Name("MaxBlockAdditionID");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_MaxCache()
-{
-    Element_Name("MaxCache");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_MinCache()
-{
-    Element_Name("MinCache");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Name()
 {
-    Element_Name("Name");
-
     //Parsing
     Ztring Data;
     Get_UTF8(Element_Size, Data,                               "Data"); Element_Info1(Data);
@@ -3857,8 +3247,6 @@ void File_Mk::Segment_Tracks_TrackEntry_Name()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_TrackNumber()
 {
-    Element_Name("TrackNumber");
-
     //Parsing
     TrackNumber=UInteger_Get();
 
@@ -3883,26 +3271,8 @@ void File_Mk::Segment_Tracks_TrackEntry_TrackNumber()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_TrackTimecodeScale()
-{
-    Element_Name("TrackTimecodeScale");
-
-    Float_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_TrackOffset()
-{
-    Element_Name("TrackOffset");
-
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_TrackType()
 {
-    Element_Name("TrackType");
-
     //Parsing
     int64u UInteger=UInteger_Get();
 
@@ -3940,8 +3310,6 @@ void File_Mk::Segment_Tracks_TrackEntry_TrackType()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_TrackUID()
 {
-    Element_Name("TrackUID");
-
     //Parsing
     int64u UInteger=UInteger_Get();
 
@@ -3957,8 +3325,6 @@ void File_Mk::Segment_Tracks_TrackEntry_TrackUID()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Video()
 {
-    Element_Name("Video");
-
     //Preparing
     if (Segment_Info_Count>1)
         return; //First element has the priority
@@ -3967,28 +3333,8 @@ void File_Mk::Segment_Tracks_TrackEntry_Video()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_Video_AspectRatioType()
-{
-    Element_Name("AspectRatioType");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_Video_ColourSpace()
-{
-    Element_Name("ColourSpace");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Video_DisplayHeight()
 {
-    Element_Name("DisplayHeight");
-
     //Parsing
     int64u UInteger=UInteger_Get();
 
@@ -4003,19 +3349,8 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_DisplayHeight()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_Video_DisplayUnit()
-{
-    Element_Name("DisplayUnit");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Video_DisplayWidth()
 {
-    Element_Name("DisplayWidth");
-
     //Parsing
     int64u UInteger=UInteger_Get();
 
@@ -4030,28 +3365,8 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_DisplayWidth()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_Video_FlagInterlaced()
-{
-    Element_Name("FlagInterlaced");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_Video_FieldOrder()
-{
-    Element_Name("FieldOrder");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Video_FrameRate()
 {
-    Element_Name("FrameRate");
-
     //Parsing
    float64 Value=Float_Get();
 
@@ -4064,16 +3379,8 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_FrameRate()
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_Video_Colour()
-{
-    Element_Name("Colour");
-}
-
-//---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_MatrixCoefficients()
 {
-    Element_Name("MatrixCoefficients");
-
     //Parsing
     UInteger_Info();
 }
@@ -4081,8 +3388,6 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_MatrixCoefficients()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_BitsPerChannel()
 {
-    Element_Name("BitsPerChannel");
-
     //Parsing
     UInteger_Info();
 }
@@ -4090,8 +3395,6 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_BitsPerChannel()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_Range()
 {
-    Element_Name("Range");
-
     //Parsing
     UInteger_Info();
 }
@@ -4099,8 +3402,6 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_Range()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_TransferCharacteristics()
 {
-    Element_Name("TransferCharacteristics");
-
     //Parsing
     UInteger_Info();
 }
@@ -4108,8 +3409,6 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_TransferCharacteristics()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_Primaries()
 {
-    Element_Name("Primaries");
-
     //Parsing
     UInteger_Info();
 }
@@ -4117,8 +3416,6 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_Primaries()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Video_PixelCropBottom()
 {
-    Element_Name("PixelCropBottom");
-
     //Parsing
     int64u UInteger=UInteger_Get();
     
@@ -4133,8 +3430,6 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_PixelCropBottom()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Video_PixelCropLeft()
 {
-    Element_Name("PixelCropLeft");
-
     //Parsing
     int64u UInteger=UInteger_Get();
     
@@ -4149,8 +3444,6 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_PixelCropLeft()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Video_PixelCropRight()
 {
-    Element_Name("PixelCropRight");
-
     //Parsing
     int64u UInteger=UInteger_Get();
     
@@ -4165,8 +3458,6 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_PixelCropRight()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Video_PixelCropTop()
 {
-    Element_Name("PixelCropTop");
-
     //Parsing
     int64u UInteger=UInteger_Get();
     
@@ -4181,8 +3472,6 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_PixelCropTop()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Video_PixelHeight()
 {
-    Element_Name("PixelHeight");
-
     //Parsing
     int64u UInteger=UInteger_Get();
 
@@ -4213,8 +3502,6 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_PixelHeight()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Video_PixelWidth()
 {
-    Element_Name("PixelWidth");
-
     //Parsing
     int64u UInteger=UInteger_Get();
 
@@ -4245,8 +3532,6 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_PixelWidth()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Video_StereoMode()
 {
-    Element_Name("StereoMode");
-
     //Parsing
     int64u UInteger=UInteger_Get(); Element_Info1(Mk_StereoMode(UInteger));
 
@@ -4262,8 +3547,6 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_StereoMode()
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Video_OldStereoMode()
 {
-    Element_Name("StereoMode");
-
     //Parsing
     int64u UInteger=UInteger_Get(); Element_Info1(Mk_StereoMode(UInteger));
 
@@ -4274,45 +3557,6 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_OldStereoMode()
         Fill(Stream_Video, StreamPos_Last, Video_MultiView_Count, 2); //Matroska seems to be limited to 2 views
         Fill(Stream_Video, StreamPos_Last, Video_MultiView_Layout, Mk_StereoMode(UInteger));
     FILLING_END();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_TrackOverlay()
-{
-    Element_Name("TrackOverlay");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_TrackTranslate()
-{
-    Element_Name("TrackTranslate");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_TrackTranslate_Codec()
-{
-    Element_Name("Codec");
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_TrackTranslate_EditionUID()
-{
-    Element_Name("EditionUID");
-
-    //Parsing
-    UInteger_Info();
-}
-
-//---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_TrackTranslate_TrackID()
-{
-    Element_Name("TrackID");
-
-    //Parsing
-    UInteger_Info();
 }
 
 //***************************************************************************
@@ -4552,17 +3796,36 @@ void File_Mk::UTF8_Info()
 }
 
 //---------------------------------------------------------------------------
-Ztring File_Mk::Local_Get()
+Ztring File_Mk::String_Get()
 {
     Ztring Data;
-    Get_Local(Element_Size, Data,                               "Data"); Element_Info1(Data);
+    Get_UTF8(Element_Size, Data,                                "Data"); Element_Info1(Data);
+    #if MEDIAINFO_TRACE
+        if (Trace_Activated)
+        {
+            //Check that this is printable ASCII (0x20-0x7F) content only, accepting trailing NULL bytes
+            size_t s=Data.size();
+            while (s && !Data[s-1])
+                s--;
+            for (size_t i=0; i<s; i++)
+                if (Data[i]<0x20 || Data[i]>=0x80)
+                {
+                    Param_Error("EBML-ASCII-ONLY-IN-STRING:1");
+                    break;
+                }
+        }
+    #endif //MEDIAINFO_TRACE
     return Data;
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Local_Info()
+void File_Mk::String_Info()
 {
-    Info_Local(Element_Size, Data,                              "Data"); Element_Info1(Data);
+    #if MEDIAINFO_TRACE
+        String_Get(); //TODO: optimize by removal useless string copies
+    #else //MEDIAINFO_TRACE
+        Info_UTF8(Element_Size, Data,                               "Data"); Element_Info1(Data);
+    #endif //MEDIAINFO_TRACE
 }
 
 //***************************************************************************
@@ -5012,6 +4275,3 @@ void File_Mk::CRC32_Check ()
 } //NameSpace
 
 #endif //MEDIAINFO_MK_YES
-
-
-

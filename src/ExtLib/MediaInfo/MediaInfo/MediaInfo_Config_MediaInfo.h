@@ -75,6 +75,8 @@ public :
     MediaInfo_Config_MediaInfo();
     ~MediaInfo_Config_MediaInfo();
 
+    bool          RequestTerminate;
+
     //General
     Ztring Option (const String &Option, const String &Value=Ztring());
 

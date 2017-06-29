@@ -933,7 +933,7 @@ void File_Vc1::FrameHeader()
         {
             Fill("VC-1");
 
-            if (!IsSub && MediaInfoLib::Config.ParseSpeed_Get()<1)
+            if (!IsSub && Config->ParseSpeed<1.0)
                 Finish("VC-1");
         }
 

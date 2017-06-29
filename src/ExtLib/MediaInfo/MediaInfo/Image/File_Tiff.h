@@ -63,6 +63,7 @@ private :
     void Get_X2 (int16u &Info, const char* Name);
     void Get_X4 (int32u &Info, const char* Name);
     void GetValueOffsetu(ifditem &IfdItem);
+    void GoTo_IfNeeded(int64u GoTo);
 };
 
 } //NameSpace

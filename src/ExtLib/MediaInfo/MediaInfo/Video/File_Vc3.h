@@ -92,6 +92,7 @@ private :
     bool    PMA;
     bool    LLA;
     bool    ALP;
+    bool    FFE;
 };
 
 } //NameSpace

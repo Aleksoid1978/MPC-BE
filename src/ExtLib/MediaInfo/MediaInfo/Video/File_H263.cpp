@@ -133,7 +133,7 @@ File_H263::File_H263()
     IsRawStream=true;
 
     //In
-    Frame_Count_Valid=MediaInfoLib::Config.ParseSpeed_Get()>=0.3?8:2;
+    Frame_Count_Valid=0;
     FrameIsAlwaysComplete=false;
 }
 
@@ -238,6 +238,9 @@ bool File_H263::Synched_Test()
 //---------------------------------------------------------------------------
 void File_H263::Synched_Init()
 {
+    if (!Frame_Count_Valid)
+        Frame_Count_Valid=Config->ParseSpeed>=0.3?8:2;
+
     //Temp
     PAR_W=12;
     PAR_H=11;

@@ -76,6 +76,14 @@ private :
     //Helpers
     void Get_X2 (int16u &Info, const char* Name);
     void Get_X4 (int32u &Info, const char* Name);
+    void Get_XF4(float32 &Info, const char* Name);
+    #if MEDIAINFO_TRACE
+        #define Info_X2(_INFO, _NAME)   int16u  _INFO; Get_X2  (_INFO, _NAME)
+        #define Info_X4(_INFO, _NAME)   int32u  _INFO; Get_X4  (_INFO, _NAME)
+    #else //MEDIAINFO_TRACE
+        #define Info_X2(_INFO, _NAME)   Element_Offset+=2
+        #define Info_X4(_INFO, _NAME)   Element_Offset+=4
+    #endif //MEDIAINFO_TRACE
     void Get_ASCII (size_t Size, string &Info, const char* Name);
 };
 

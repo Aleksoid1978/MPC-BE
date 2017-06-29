@@ -154,7 +154,7 @@ Ztring MediaInfo_Internal::Inform()
      && MediaInfoLib::Config.Inform_Get(__T("Video")).empty()
      && MediaInfoLib::Config.Inform_Get(__T("Audio")).empty()
      && MediaInfoLib::Config.Inform_Get(__T("Text")).empty()
-     && MediaInfoLib::Config.Inform_Get(__T("Chapters")).empty()
+     && MediaInfoLib::Config.Inform_Get(__T("Other")).empty()
      && MediaInfoLib::Config.Inform_Get(__T("Image")).empty()
      && MediaInfoLib::Config.Inform_Get(__T("Menu")).empty()
      ))
@@ -195,15 +195,15 @@ Ztring MediaInfo_Internal::Inform()
         if (Count_Get(Stream_Text))
             Retour+=MediaInfoLib::Config.Inform_Get(__T("Text_End"));
         if (Count_Get(Stream_Other))
-            Retour+=MediaInfoLib::Config.Inform_Get(__T("Chapters_Begin"));
+            Retour+=MediaInfoLib::Config.Inform_Get(__T("Other_Begin"));
         for (size_t I1=0; I1<Count_Get(Stream_Other); I1++)
         {
             Retour+=Inform(Stream_Other, I1, false);
             if (I1!=Count_Get(Stream_Other)-1)
-                Retour+=MediaInfoLib::Config.Inform_Get(__T("Chapters_Middle"));
+                Retour+=MediaInfoLib::Config.Inform_Get(__T("Other_Middle"));
         }
         if (Count_Get(Stream_Other))
-            Retour+=MediaInfoLib::Config.Inform_Get(__T("Chapters_End"));
+            Retour+=MediaInfoLib::Config.Inform_Get(__T("Other_End"));
         if (Count_Get(Stream_Image))
             Retour+=MediaInfoLib::Config.Inform_Get(__T("Image_Begin"));
         for (size_t I1=0; I1<Count_Get(Stream_Image); I1++)
@@ -394,7 +394,7 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
      && MediaInfoLib::Config.Inform_Get(__T("Video")).empty()
      && MediaInfoLib::Config.Inform_Get(__T("Audio")).empty()
      && MediaInfoLib::Config.Inform_Get(__T("Text")).empty()
-     && MediaInfoLib::Config.Inform_Get(__T("Chapters")).empty()
+     && MediaInfoLib::Config.Inform_Get(__T("Other")).empty()
      && MediaInfoLib::Config.Inform_Get(__T("Image")).empty()
      && MediaInfoLib::Config.Inform_Get(__T("Menu")).empty())
     {

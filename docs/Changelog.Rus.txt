@@ -10,7 +10,7 @@
 	libflac git-1.3.2-60-g1b5c09e4;
 	libpng git-v1.6.30beta03-6-g11629b1c1;
 	Little-CMS git-lcms2.8-74-ge6f48f0;
-	MediaInfo git-v0.7.96;
+	MediaInfo git-v0.7.97;
 	openjpeg 2.2.0 git-6239ed7b;
 	Speex-1.2.0-1-gcae5026;
 	rapidjson git-v1.1.0-199-g6a8f672c;

@@ -89,6 +89,10 @@ public:
     void    run_mode_init() { run_segment_length = 0; run_mode=RUN_MODE_STOP; }
 
     //TEMP
+    int32u  slice_x;
+    int32u  slice_y;
+    int32u  slice_w;
+    int32u  slice_h;
     int32u  x;
     int32u  y;
     int32u  w;
@@ -198,18 +202,17 @@ private :
     void Skip_Frame();
 
     //Elements
-    void   FrameHeader();
-    void   Filling_FrameHeader(int32u intra);
-    int    slice(states &States);
-    int    slice_header(states &States);
+    void   Parameters();
+    bool   SliceHeader(states &States);
+    void   SliceContent(states &States);
     int32s get_symbol_with_bias_correlation(Slice::ContextPtr context);
     void rgb();
     void plane(int32u pos);
     void line(int pos, FFV1::pixel_t *sample[2]);
     int32s pixel_GR(int32s context);
     int32s pixel_RC(int32s context);
-    void read_quant_tables(int i);
-    void read_quant_table(int i, int j, size_t scale);
+    bool QuantizationTable(size_t i);
+    bool QuantizationTablePerContext(size_t i, size_t j, FFV1::pixel_t &scale);
     void copy_plane_states_to_slice(int8u plane_count);
 
     //Range coder
@@ -246,32 +249,37 @@ private :
     Slice *slices;
     Slice *current_slice;
 
+    //From Parameters
+    int32u  version;
+    int32u  micro_version;
+    int32u  coder_type;
+    int32u  colorspace_type;
+    int32u  bits_per_raw_sample;
+    int32u  h_chroma_subsample_log2;
+    int32u  v_chroma_subsample_log2;
+    int32u  num_h_slices;
+    int32u  num_v_slices;
+    int32u  ec;
+    int32u  intra;
+    bool    alpha_plane;
+
     //Temp
-    bool    ConfigurationRecordIsPresent;
+    bool    Parameters_IsValid;
+    bool    ConfigurationRecord_IsPresent;
     bool    KeyFramePassed;
+    bool    is_overflow_16bit;
     int32u  context_count[MAX_QUANT_TABLES];
-    int32u  len_count[MAX_QUANT_TABLES][MAX_CONTEXT_INPUTS];
     quant_table_struct quant_tables[MAX_QUANT_TABLES];
     int32u  quant_table_index[MAX_PLANES];
     int32u  quant_table_count;
-    int32u  version;
-    int32u  micro_version;
-    int32u  error_correction;
-    int32u  num_h_slices;
-    int32u  num_v_slices;
-    int32u  chroma_h_shift;
-    int32u  chroma_v_shift;
     int32u  picture_structure;
     int32u  sample_aspect_ratio_num;
     int32u  sample_aspect_ratio_den;
-    int8u   coder_type;
-    int8u   colorspace_type;
-    int8u   bits_per_sample;
     bool    keyframe;
     bool    chroma_planes;
-    bool    alpha_plane;
-    bool    is_overflow_16bit;
+    bool    BuggySlices;
     state_transitions state_transitions_table;
+    size_t  quant_table_index_count;
 
     //TEMP
     static const int32u PREFIX_MAX = 12; //limit

@@ -24,6 +24,7 @@
 #include "MediaInfo/Audio/File_Dts.h"
 #include "ZenLib/Utils.h"
 #include "ZenLib/BitStream.h"
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #if MEDIAINFO_EVENTS
     #include "MediaInfo/MediaInfo_Events.h"
 #endif //MEDIAINFO_EVENTS
@@ -354,7 +355,7 @@ File_Dts::File_Dts()
     IsRawStream=true;
 
     //In
-    Frame_Count_Valid=MediaInfoLib::Config.ParseSpeed_Get()>=0.3?32:2;
+    Frame_Count_Valid=0;
 
     //Buffer
     Save_Buffer=NULL;
@@ -721,6 +722,8 @@ bool File_Dts::FileHeader_Begin()
     }
 
     //All should be OK...
+    if (!Frame_Count_Valid)
+        Frame_Count_Valid=Config->ParseSpeed>=0.3?32:2;
     return true;
 }
 
@@ -1211,7 +1214,7 @@ void File_Dts::Core()
             Fill("DTS");
 
             //No more need data
-            if (!IsSub && MediaInfoLib::Config.ParseSpeed_Get()<1)
+            if (!IsSub && Config->ParseSpeed<1.0)
                 Finish("DTS");
         }
     FILLING_END();
@@ -1335,7 +1338,7 @@ void File_Dts::HD()
             Fill("DTS");
 
             //No more need data
-            if (!IsSub && MediaInfoLib::Config.ParseSpeed_Get()<1)
+            if (!IsSub && Config->ParseSpeed<1.0)
                 Finish("DTS");
         }
     FILLING_END();

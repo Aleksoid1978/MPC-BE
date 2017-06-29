@@ -1201,6 +1201,7 @@ protected :
 
     //Hints
     size_t* File_Buffer_Size_Hint_Pointer;
+    size_t  Synched_Count;
 
     //Partitions
     struct partition

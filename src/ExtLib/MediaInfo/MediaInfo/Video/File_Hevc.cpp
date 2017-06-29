@@ -156,7 +156,7 @@ File_Hevc::File_Hevc()
     Frame_Count_NotParsedIncluded=0;
 
     //In
-    Frame_Count_Valid=MediaInfoLib::Config.ParseSpeed_Get()>=0.3?16:16; //Note: should be replaced by "512:2" when I-frame/GOP detection is OK
+    Frame_Count_Valid=0;
     FrameIsAlwaysComplete=false;
     MustParse_VPS_SPS_PPS=false;
     MustParse_VPS_SPS_PPS_FromMatroska=false;
@@ -750,6 +750,9 @@ bool File_Hevc::Demux_UnpacketizeContainer_Test()
 //---------------------------------------------------------------------------
 void File_Hevc::Synched_Init()
 {
+    if (!Frame_Count_Valid)
+        Frame_Count_Valid=Config->ParseSpeed>=0.3?16:16; //Note: should be replaced by "512:2" when I-frame/GOP detection is OK
+
     //FrameInfo
     PTS_End=0;
     if (!IsSub)
@@ -1183,7 +1186,7 @@ void File_Hevc::slice_segment_layer()
                 if (Frame_Count>=Frame_Count_Valid)
                 {
                     Fill("HEVC");
-                    if (!IsSub && MediaInfoLib::Config.ParseSpeed_Get()<1.0)
+                    if (!IsSub && Config->ParseSpeed<1.0)
                         Finish("HEVC");
                 }
             }
@@ -1310,14 +1313,21 @@ void File_Hevc::video_parameter_set()
         }
         for (int32u HrdPos=0; HrdPos<vps_num_hrd_parameters; HrdPos++)
         {
+            seq_parameter_set_struct::vui_parameters_struct::xxl_common *xxL_Common=NULL;
+            seq_parameter_set_struct::vui_parameters_struct::xxl *NAL=NULL, *VCL=NULL;
             int32u hrd_layer_set_idx;
+            bool   cprms_present_flag;
             Get_UE (   hrd_layer_set_idx,                       "hrd_layer_set_idx");
             if (hrd_layer_set_idx>=1024)
                 Trusted_IsNot("hrd_layer_set_idx not valid");
             if (HrdPos)
-                Skip_SB(                                        "cprms_present_flag");
-            Trusted_IsNot("hrd_parameters not supported");
-            //hrd_parameters
+                Get_SB (cprms_present_flag,                     "cprms_present_flag");
+            else
+                cprms_present_flag=true;
+            hrd_parameters(cprms_present_flag, vps_max_sub_layers_minus1, xxL_Common, NAL, VCL);
+            delete xxL_Common; //TODO: keep VPS hrd_parameters
+            delete NAL;
+            delete VCL;
         }
     TEST_SB_END();
     TESTELSE_SB_SKIP(                                           "vps_extension_flag");

@@ -16,7 +16,7 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "MediaInfo/File__Analyze.h"
+#include "MediaInfo/Tag/File__Tags.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -26,7 +26,7 @@ namespace MediaInfoLib
 // Class File_Flv
 //***************************************************************************
 
-class File_Flv : public File__Analyze
+class File_Flv : public File__Analyze, public File__Tags_Helper
 {
 public :
     File_Flv();

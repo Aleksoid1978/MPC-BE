@@ -683,7 +683,7 @@ void File_Dpx::GenericSectionHeader_Dpx()
     Element_Begin1("Image information");
     int32u Width, Height, PAR_H, PAR_V;
     int16u ImageElements;
-    Info_B2(ImageOrientation,                                   "Image orientation");Param_Info1(DPX_Orientation[ImageOrientation]);
+    Info_X2(ImageOrientation,                                   "Image orientation");Param_Info1(DPX_Orientation[ImageOrientation]);
     Get_X2 (ImageElements,                                      "Number of image elements");
     if (ImageElements>8)
         ImageElements=8;
@@ -775,7 +775,7 @@ void File_Dpx::GenericSectionHeader_Dpx_ImageElement()
 {
     Element_Begin1("image element");
     int8u Descriptor, TransferCharacteristic, ColorimetricSpecification, BitDephs;
-    Info_B4(DataSign,                                           "Data sign");Param_Info1((DataSign==0?"unsigned":"signed"));
+    Info_X4(DataSign,                                           "Data sign");Param_Info1((DataSign==0?"unsigned":"signed"));
     Skip_B4(                                                    "Reference low data code value");
     Skip_BF4(                                                   "Reference low quantity represented");
     Skip_B4(                                                    "Reference high data code value");
@@ -784,8 +784,8 @@ void File_Dpx::GenericSectionHeader_Dpx_ImageElement()
     Get_B1 (TransferCharacteristic,                             "Transfer characteristic");Param_Info1(DPX_TransferCharacteristic(TransferCharacteristic));
     Get_B1 (ColorimetricSpecification,                          "Colorimetric specification");Param_Info1(DPX_ColorimetricSpecification(ColorimetricSpecification));
     Get_B1 (BitDephs,                                           "Bit depth");Param_Info1(DPX_ValidBitDephs(BitDephs));
-    Info_B2(ComponentDataPackingMethod,                         "Packing");Param_Info1((ComponentDataPackingMethod<8?DPX_ComponentDataPackingMethod[ComponentDataPackingMethod]:"invalid"));
-    Info_B2(ComponentDataEncodingMethod,                        "Encoding");Param_Info1((ComponentDataEncodingMethod<8?DPX_ComponentDataEncodingMethod[ComponentDataEncodingMethod]:"invalid"));
+    Info_X2(ComponentDataPackingMethod,                         "Packing");Param_Info1((ComponentDataPackingMethod<8?DPX_ComponentDataPackingMethod[ComponentDataPackingMethod]:"invalid"));
+    Info_X2(ComponentDataEncodingMethod,                        "Encoding");Param_Info1((ComponentDataEncodingMethod<8?DPX_ComponentDataEncodingMethod[ComponentDataEncodingMethod]:"invalid"));
     Skip_B4(                                                    "Offset to data");
     Skip_B4(                                                    "End-of-line padding");
     Skip_B4(                                                    "End-of-image padding");
@@ -844,7 +844,7 @@ void File_Dpx::IndustrySpecificHeader_Dpx()
     Skip_B4(                                                    "Frame position in sequence");
     Skip_B4(                                                    "Sequence length (frames)");
     Skip_B4(                                                    "Held count (1 = default)");
-    Get_BF4 (FrameRate,                                         "Frame rate of original (frames/s)");
+    Get_XF4 (FrameRate,                                         "Frame rate of original (frames/s)");
     Skip_BF4(                                                   "Shutter angle of camera in degrees");
     Skip_UTF8(32,                                               "Frame identification - e.g. keyframe");
     Skip_UTF8(100,                                              "Slate information");
@@ -947,6 +947,15 @@ void File_Dpx::Get_X4(int32u &Info, const char* Name)
         Get_L4 (Info,                                           Name);
     else
         Get_B4 (Info,                                           Name);
+}
+
+//---------------------------------------------------------------------------
+void File_Dpx::Get_XF4(float32 &Info, const char* Name)
+{
+    if (LittleEndian)
+        Get_LF4 (Info,                                           Name);
+    else
+        Get_BF4 (Info,                                           Name);
 }
 
 //---------------------------------------------------------------------------
