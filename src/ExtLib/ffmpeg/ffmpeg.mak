@@ -437,6 +437,7 @@ SRCS_LC_B = \
 	libavcodec/twinvq.c \
 	libavcodec/utvideo.c \
 	libavcodec/utvideodec.c \
+	libavcodec/utvideodsp.c \
 	libavcodec/utils.c \
 	libavcodec/v210dec.c \
 	libavcodec/v410dec.c \
@@ -471,6 +472,7 @@ SRCS_LC_B = \
 	libavcodec/vp8dsp.c \
 	libavcodec/vp9.c \
 	libavcodec/vp9_parser.c \
+	libavcodec/vp9_raw_reorder_bsf.c \
 	libavcodec/vp9_superframe_bsf.c \
 	libavcodec/vp9_superframe_split_bsf.c \
 	libavcodec/vp9block.c \
@@ -529,6 +531,7 @@ SRCS_LC_B = \
 	libavcodec/x86/idctdsp_init.c \
 	libavcodec/x86/lossless_audiodsp_init.c \
 	libavcodec/x86/lossless_videodsp_init.c \
+	libavcodec/x86/mdct15_init.c \
 	libavcodec/x86/me_cmp_init.c \
 	libavcodec/x86/mlpdsp_init.c \
 	libavcodec/x86/mpegaudiodsp.c \
@@ -546,6 +549,7 @@ SRCS_LC_B = \
 	libavcodec/x86/synth_filter_init.c \
 	libavcodec/x86/takdsp_init.c \
 	libavcodec/x86/ttadsp_init.c \
+	libavcodec/x86/utvideodsp_init.c \
 	libavcodec/x86/v210-init.c \
 	libavcodec/x86/vc1dsp_init.c \
 	libavcodec/x86/vc1dsp_mmx.c \
@@ -710,6 +714,7 @@ SRCS_YASM_LC = \
 	libavcodec/x86/imdct36.asm \
 	libavcodec/x86/lossless_audiodsp.asm \
 	libavcodec/x86/lossless_videodsp.asm \
+	libavcodec/x86/mdct15.asm \
 	libavcodec/x86/me_cmp.asm \
 	libavcodec/x86/mlpdsp.asm \
 	libavcodec/x86/mpegvideoencdsp.asm \
@@ -726,6 +731,7 @@ SRCS_YASM_LC = \
 	libavcodec/x86/synth_filter.asm \
 	libavcodec/x86/takdsp.asm \
 	libavcodec/x86/ttadsp.asm \
+	libavcodec/x86/utvideodsp.asm \
 	libavcodec/x86/v210.asm \
 	libavcodec/x86/vc1dsp_loopfilter.asm \
 	libavcodec/x86/vc1dsp_mc.asm \

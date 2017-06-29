@@ -22,7 +22,7 @@
 	#define HAVE_SSE42 1
 	#define HAVE_SSSE3 1
 	#define HAVE_XOP 1
-	#define HAVE_CPUNOP 1
+	#define HAVE_CPUNOP 0
 	#define HAVE_I686 1
 	#define HAVE_AESNI_EXTERNAL 1
 	#define HAVE_AMD3DNOW_EXTERNAL 1
@@ -303,6 +303,7 @@
 #define HAVE_DOS_PATHS 1
 #define HAVE_MMAL_PARAMETER_VIDEO_MAX_NUM_CALLBACKS 0
 /* #define HAVE_DXVA_H 1 */
+#define HAVE_BLOCKS_EXTENSION 0
 #define HAVE_EBP_AVAILABLE 1
 #define HAVE_EBX_AVAILABLE 1
 #define HAVE_FAST_CLZ 1
@@ -454,7 +455,7 @@
 #define CONFIG_CUDA 0
 #define CONFIG_ICONV 0
 #define CONFIG_JNI 0
-#define HAVE_YASM 1
+#define HAVE_X86ASM 1
 
 #ifdef __GNUC__
 	#define HAVE_ATTRIBUTE_MAY_ALIAS 1
@@ -573,6 +574,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_NULL_BSF 1
 #define CONFIG_REMOVE_EXTRADATA_BSF 1
 #define CONFIG_TEXT2MOVSUB_BSF 1
+#define CONFIG_VP9_RAW_REORDER_BSF 1
 #define CONFIG_VP9_SUPERFRAME_BSF 1
 #define CONFIG_VP9_SUPERFRAME_SPLIT_BSF 1
 

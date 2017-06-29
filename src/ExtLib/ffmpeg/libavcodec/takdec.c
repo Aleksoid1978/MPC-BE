@@ -483,7 +483,7 @@ static int decode_subframe(TAKDecContext *s, int32_t *decoded,
             int v = 1 << (filter_quant - 1);
 
             if (filter_order & -16)
-                v += s->adsp.scalarproduct_int16(&s->residues[i], s->filter,
+                v += (unsigned)s->adsp.scalarproduct_int16(&s->residues[i], s->filter,
                                                  filter_order & -16);
             for (j = filter_order & -16; j < filter_order; j += 4) {
                 v += s->residues[i + j + 3] * s->filter[j + 3] +
@@ -862,7 +862,7 @@ static int tak_decode_frame(AVCodecContext *avctx, void *data,
 
             if (s->sample_shift[chan] > 0)
                 for (i = 0; i < s->nb_samples; i++)
-                    decoded[i] *= 1 << s->sample_shift[chan];
+                    decoded[i] *= 1U << s->sample_shift[chan];
         }
     }
 
@@ -889,7 +889,7 @@ static int tak_decode_frame(AVCodecContext *avctx, void *data,
             uint8_t *samples = (uint8_t *)frame->extended_data[chan];
             int32_t *decoded = s->decoded[chan];
             for (i = 0; i < s->nb_samples; i++)
-                samples[i] = decoded[i] + 0x80;
+                samples[i] = decoded[i] + 0x80U;
         }
         break;
     case AV_SAMPLE_FMT_S16P:
@@ -904,7 +904,7 @@ static int tak_decode_frame(AVCodecContext *avctx, void *data,
         for (chan = 0; chan < avctx->channels; chan++) {
             int32_t *samples = (int32_t *)frame->extended_data[chan];
             for (i = 0; i < s->nb_samples; i++)
-                samples[i] *= 1 << 8;
+                samples[i] *= 1U << 8;
         }
         break;
     }

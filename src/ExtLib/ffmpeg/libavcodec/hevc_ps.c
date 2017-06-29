@@ -170,6 +170,12 @@ int ff_hevc_decode_short_term_rps(GetBitContext *gb, AVCodecContext *avctx,
             }
         }
 
+        if (k >= FF_ARRAY_ELEMS(rps->used)) {
+            av_log(avctx, AV_LOG_ERROR,
+                   "Invalid num_delta_pocs: %d\n", k);
+            return AVERROR_INVALIDDATA;
+        }
+
         rps->num_delta_pocs    = k;
         rps->num_negative_pics = k0;
         // sort in increasing order (smallest first)
@@ -719,6 +725,7 @@ static int scaling_list_data(GetBitContext *gb, AVCodecContext *avctx, ScalingLi
                  * which should already be in the arrays. */
                 if (delta) {
                     // Copy from previous array.
+                    delta *= (size_id == 3) ? 3 : 1;
                     if (matrix_id < delta) {
                         av_log(avctx, AV_LOG_ERROR,
                                "Invalid delta in scaling list data: %d.\n", delta);
@@ -934,9 +941,9 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
         sps->temporal_layer[i].max_dec_pic_buffering = get_ue_golomb_long(gb) + 1;
         sps->temporal_layer[i].num_reorder_pics      = get_ue_golomb_long(gb);
         sps->temporal_layer[i].max_latency_increase  = get_ue_golomb_long(gb) - 1;
-        if (sps->temporal_layer[i].max_dec_pic_buffering > HEVC_MAX_DPB_SIZE) {
+        if (sps->temporal_layer[i].max_dec_pic_buffering > (unsigned)HEVC_MAX_DPB_SIZE) {
             av_log(avctx, AV_LOG_ERROR, "sps_max_dec_pic_buffering_minus1 out of range: %d\n",
-                   sps->temporal_layer[i].max_dec_pic_buffering - 1);
+                   sps->temporal_layer[i].max_dec_pic_buffering - 1U);
             return AVERROR_INVALIDDATA;
         }
         if (sps->temporal_layer[i].num_reorder_pics > sps->temporal_layer[i].max_dec_pic_buffering - 1) {
