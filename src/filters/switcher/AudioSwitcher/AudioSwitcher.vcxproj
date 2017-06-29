@@ -222,6 +222,7 @@
   <ItemGroup>
     <ClInclude Include="AudioNormalizer.h" />
     <ClInclude Include="AudioSwitcher.h" />
+    <ClInclude Include="IAudioSwitcherFilter.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>
