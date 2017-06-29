@@ -69,7 +69,7 @@ void FLAC__lpc_compute_autocorrelation_intrin_sse_lag_4_new(const FLAC__real dat
 	for(i = 0; i <= limit; i++) {
 		__m128 d, d0;
 		d0 = _mm_loadu_ps(data+i);
-		d = d0; d = _mm_shuffle_ps(d, d, 0);
+		d = _mm_shuffle_ps(d0, d0, 0);
 		sum0 = _mm_add_ps(sum0, _mm_mul_ps(d0, d));
 	}
 
@@ -107,7 +107,7 @@ void FLAC__lpc_compute_autocorrelation_intrin_sse_lag_8_new(const FLAC__real dat
 		__m128 d, d0, d1;
 		d0 = _mm_loadu_ps(data+i);
 		d1 = _mm_loadu_ps(data+i+4);
-		d = d0; d = _mm_shuffle_ps(d, d, 0);
+		d = _mm_shuffle_ps(d0, d0, 0);
 		sum0 = _mm_add_ps(sum0, _mm_mul_ps(d0, d));
 		sum1 = _mm_add_ps(sum1, _mm_mul_ps(d1, d));
 	}
@@ -153,7 +153,7 @@ void FLAC__lpc_compute_autocorrelation_intrin_sse_lag_12_new(const FLAC__real da
 		d0 = _mm_loadu_ps(data+i);
 		d1 = _mm_loadu_ps(data+i+4);
 		d2 = _mm_loadu_ps(data+i+8);
-		d = d0; d = _mm_shuffle_ps(d, d, 0);
+		d = _mm_shuffle_ps(d0, d0, 0);
 		sum0 = _mm_add_ps(sum0, _mm_mul_ps(d0, d));
 		sum1 = _mm_add_ps(sum1, _mm_mul_ps(d1, d));
 		sum2 = _mm_add_ps(sum2, _mm_mul_ps(d2, d));
@@ -207,7 +207,7 @@ void FLAC__lpc_compute_autocorrelation_intrin_sse_lag_16_new(const FLAC__real da
 		d1 = _mm_loadu_ps(data+i+4);
 		d2 = _mm_loadu_ps(data+i+8);
 		d3 = _mm_loadu_ps(data+i+12);
-		d = d0; d = _mm_shuffle_ps(d, d, 0);
+		d = _mm_shuffle_ps(d0, d0, 0);
 		sum0 = _mm_add_ps(sum0, _mm_mul_ps(d0, d));
 		sum1 = _mm_add_ps(sum1, _mm_mul_ps(d1, d));
 		sum2 = _mm_add_ps(sum2, _mm_mul_ps(d2, d));
