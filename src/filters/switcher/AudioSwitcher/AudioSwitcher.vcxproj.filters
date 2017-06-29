@@ -48,6 +48,9 @@
     <ClInclude Include="AudioNormalizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IAudioSwitcherFilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AudioSwitcher.rc">

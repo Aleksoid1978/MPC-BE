@@ -21,34 +21,14 @@
 
 #pragma once
 
-#include "StreamSwitcher.h"
-#include "AudioNormalizer.h"
 #include "../../../AudioTools/Mixer.h"
 #include "../../../AudioTools/BassRedirect.h"
 #include "../../../DSUtil/SimpleBuffer.h"
+#include "StreamSwitcher.h"
+#include "IAudioSwitcherFilter.h"
+#include "AudioNormalizer.h"
 
 #define AudioSwitcherName L"MPC AudioSwitcher"
-
-enum {
-	SPK_MONO = 0,
-	SPK_STEREO,
-	SPK_4_0,
-	SPK_5_0,
-	SPK_5_1,
-	SPK_7_1
-};
-
-interface __declspec(uuid("CEDB2890-53AE-4231-91A3-B0AAFCD1DBDE"))
-IAudioSwitcherFilter :
-public IUnknown {
-	STDMETHOD(SetChannelMixer) (bool bMixer, int nLayout) PURE;
-	STDMETHOD(SetAudioGain) (float fGain_dB) PURE;
-	STDMETHOD(GetAutoVolumeControl) (bool& bAutoVolumeControl, bool& bNormBoost, int& iNormLevel, int& iNormRealeaseTime) PURE;
-	STDMETHOD(SetAutoVolumeControl) (bool bAutoVolumeControl, bool bNormBoost, int iNormLevel, int iNormRealeaseTime) PURE;
-	STDMETHOD_(REFERENCE_TIME, GetAudioTimeShift) () PURE;
-	STDMETHOD(SetAudioTimeShift) (REFERENCE_TIME rtAudioTimeShift) PURE;
-	STDMETHOD(SetBassRedirect) (bool bBassRedirect) PURE;
-};
 
 class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	CAudioSwitcherFilter : public CStreamSwitcherFilter, public IAudioSwitcherFilter
