@@ -91,9 +91,7 @@ const char* Mpega_Format_Profile_Layer[4]=
 #include "MediaInfo/Audio/File_Mpega.h"
 #include "ZenLib/BitStream.h"
 #include "ZenLib/Utils.h"
-#if MEDIAINFO_ADVANCED
-    #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
-#endif //MEDIAINFO_ADVANCED
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 using namespace ZenLib;
 //---------------------------------------------------------------------------
 
@@ -307,7 +305,7 @@ File_Mpega::File_Mpega()
     Frame_Count_NotParsedIncluded=0;
 
     //In
-    Frame_Count_Valid=MediaInfoLib::Config.ParseSpeed_Get()>=0.5?128:(MediaInfoLib::Config.ParseSpeed_Get()>=0.3?32:4);
+    Frame_Count_Valid=0;
     FrameIsAlwaysComplete=false;
     CalculateDelay=false;
 
@@ -556,6 +554,8 @@ bool File_Mpega::FileHeader_Begin()
     }
 
     //Seems OK
+    if (!Frame_Count_Valid)
+        Frame_Count_Valid=Config->ParseSpeed>=0.5?128:(Config->ParseSpeed>=0.3?32:4);
     return true;
 }
 
@@ -572,6 +572,18 @@ bool File_Mpega::Synchronize()
         return false;
     if (Tag_Found_Begin)
         return true;
+
+    //Synchro
+    if (Buffer_Offset+3>Buffer_Size)
+        return false;
+    if (!Status[IsAccepted]
+     && Buffer[Buffer_Offset+0]==0x46 //"FLV"
+     && Buffer[Buffer_Offset+1]==0x4C
+     && Buffer[Buffer_Offset+2]==0x56)
+    {
+        File__Tags_Helper::Reject(); //Parser accepts too easily FLV files with MPEG Audio (synchronization lost due to FLV header is  not enough), rejecting if FLV magic value is found before the first synchro 
+        return false;
+    }
 
     //Synchronizing
     while (Buffer_Offset+4<=Buffer_Size)
@@ -1069,7 +1081,7 @@ void File_Mpega::Data_Parse()
             Fill("MPEG Audio");
 
             //Jumping
-            if (!IsSub && MediaInfoLib::Config.ParseSpeed_Get()<1.0 && File_Offset+Buffer_Offset<File_Size/2)
+            if (!IsSub && Config->ParseSpeed<1.0 && File_Offset+Buffer_Offset<File_Size/2)
             {
                 File__Tags_Helper::GoToFromEnd(16*1024, "MPEG-A");
                 LastSync_Offset=(int64u)-1;

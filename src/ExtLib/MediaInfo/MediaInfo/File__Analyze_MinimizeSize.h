@@ -31,7 +31,8 @@ public :
     void    Open_Buffer_Init        (File__Analyze* Sub);
     void    Open_Buffer_Init        (File__Analyze* Sub, int64u File_Size);
     void    Open_Buffer_OutOfBand   (                    const int8u* Buffer, size_t Buffer_Size) {File__Analyze::Buffer=Buffer; File__Analyze::Buffer_Size=Buffer_Size; Element_Offset=0; Element_Size=Buffer_Size; Read_Buffer_OutOfBand(); File__Analyze::Buffer=NULL; File__Analyze::Buffer_Size=0; Element_Offset=0; Element_Size=0;}
-    void    Open_Buffer_OutOfBand   (File__Analyze* Sub);
+    void    Open_Buffer_OutOfBand   (File__Analyze* Sub                     , size_t Buffer_Size);
+    void    Open_Buffer_OutOfBand   (File__Analyze* Sub) {Open_Buffer_OutOfBand(Sub, Element_Size-Element_Offset);};
     void    Open_Buffer_Continue    (                    const int8u* Buffer, size_t Buffer_Size);
     void    Open_Buffer_Continue    (File__Analyze* Sub, const int8u* Buffer, size_t Buffer_Size, bool IsNewPacket=true, float64 Ratio=1.0);
     void    Open_Buffer_Continue    (File__Analyze* Sub, size_t Buffer_Size) {if (Element_Offset+Buffer_Size<=Element_Size) Open_Buffer_Continue(Sub, Buffer+Buffer_Offset+(size_t)Element_Offset, Buffer_Size); Element_Offset+=Buffer_Size;}
@@ -319,7 +320,9 @@ protected :
     #define Element_Info3(_A,_B,_C)
     #define Element_Info1C(_CONDITION,_A)
     #define Element_Info_From_Milliseconds(_A)
-    #define Element_Parser(_A)
+    #define Element_Parser(_A) {}
+    #define Element_Error(_A) {}
+    #define Param_Error(_A) {}
 
     //Elements - End
     inline void Element_End () {Element_End_Common_Flush();}

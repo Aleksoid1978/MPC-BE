@@ -873,7 +873,7 @@ void File_Lxf::Data_Parse()
             if (!Status[IsFilled] && ((Frame_Count>6 && (Stream_Count==0 ||Config->ParseSpeed==0.0)) || Frame_Count>512)) //5 video frames for 1 Audio frame
             {
                 Fill("LXF");
-                if (MediaInfoLib::Config.ParseSpeed_Get()<1)
+                if (Config->ParseSpeed<1.0)
                 {
                     LookingForLastFrame=true;
                     if (3*(File_Offset+Buffer_Offset)<=File_Size)

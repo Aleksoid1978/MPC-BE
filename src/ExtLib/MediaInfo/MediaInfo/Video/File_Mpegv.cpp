@@ -1058,7 +1058,7 @@ File_Mpegv::File_Mpegv()
 
     //In
     MPEG_Version=1;
-    Frame_Count_Valid=MediaInfoLib::Config.ParseSpeed_Get()>=0.3?512:2;
+    Frame_Count_Valid=0;
     FrameIsAlwaysComplete=false;
     TimeCodeIsNotTrustable=false;
     #if defined(MEDIAINFO_ANCILLARY_YES)
@@ -1727,6 +1727,9 @@ bool File_Mpegv::Synched_Test()
 //---------------------------------------------------------------------------
 void File_Mpegv::Synched_Init()
 {
+    if (!Frame_Count_Valid)
+        Frame_Count_Valid=Config->ParseSpeed>=0.3?512:2;
+
     //Temp
     BVOP_Count=0;
     progressive_frame_Count=0;

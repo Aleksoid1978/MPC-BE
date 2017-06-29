@@ -107,6 +107,7 @@ const char* AfdBarData_active_format_16_9[]=
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Video/File_AfdBarData.h"
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -219,7 +220,7 @@ void File_AfdBarData::Read_Buffer_Continue()
             Accept("AfdBarData");
             Fill("AfdBarData");
         }
-        if (MediaInfoLib::Config.ParseSpeed_Get()<1)
+        if (Config->ParseSpeed<1.0)
             Finish("AfdBarData");
     FILLING_END();
 }

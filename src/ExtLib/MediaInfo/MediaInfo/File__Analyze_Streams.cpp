@@ -2289,7 +2289,7 @@ void File__Analyze::Value_Value123(stream_t StreamKind, size_t StreamPos, size_t
         {
             List2[0] += __T(" (");
             List2[0] += SamplesPerFrame;
-            List2[0] += __T(" spf)");
+            List2[0] += __T(" SPF)");
         }
     }
 

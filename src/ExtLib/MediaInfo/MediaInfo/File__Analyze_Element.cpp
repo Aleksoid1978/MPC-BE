@@ -353,7 +353,7 @@ static size_t Xml_Content_Escape_MustEscape(const char* Content, size_t Size)
     // Cheking all chars
     for (size_t Pos = 0; Pos < Size; Pos++)
     {
-        const char C = Content[Pos];
+        const unsigned char C = Content[Pos];
         switch (C)
         {
             case '\"':
@@ -509,7 +509,21 @@ std::ostream& operator<<(std::ostream& os, const element_details::Element_Node_D
       {
           if (v.format_out == element_details::Element_Node_Data::Format_Tree)
           {
-              os << v.val.Str;
+              const char* a=v.val.Str;
+              for (;;)
+              {
+                  const char* b=strchr(a, '\n');
+                  if (!b)
+                      break;
+                  std::streamsize c=b-a;
+                  if (c && a[c-1]=='\r')
+                      c--;
+                  os.write(a, c);
+                  a=b+1;
+                  if (*a) // If it is not the last character
+                      os << " / ";
+              }
+              os << a;
               break;
           }
 
@@ -702,9 +716,14 @@ int element_details::Element_Node::Print_Micro_Xml(print_struc& s)
                 s.ss << " parser=\"" << Info->data << "\"";
             continue;
         }
-        else
-            info_nb++;
+        if (Info->Measure == "Error")
+        {
+            if (!(Info->data == string()))
+                s.ss << " e=\"" << Info->data << "\"";
+            continue;
+        }
 
+        info_nb++;
         s.ss << " i";
         if (info_nb > 1)
             s.ss << info_nb;
@@ -780,13 +799,18 @@ int element_details::Element_Node::Print_Xml(print_struc& s)
                 s.ss << " parser=\"" << Info->data << "\"";
             continue;
         }
-        else
-            info_nb++;
+        if (Info->Measure == "Error")
+        {
+            if (!(Info->data == string()))
+                s.ss << " error=\"" << Info->data << "\"";
+            continue;
+        }
 
+        info_nb++;
         s.ss << " info";
         if (info_nb > 1)
             s.ss << info_nb;
-        s.ss << "=\"" << Infos[i] << "\"";
+        s.ss << "=\"" << Info << "\"";
     }
 
     if (!Value.empty())
@@ -885,6 +909,12 @@ int element_details::Element_Node::Print_Tree(print_struc& s)
         {
             if (!(Info->data == string()))
                 s.ss << " - Parser=" << Info->data;
+            continue;
+        }
+        if (Info->Measure == "Error")
+        {
+            if (!(Info->data == string()))
+                s.ss << " - Error=" << Info->data;
             continue;
         }
 

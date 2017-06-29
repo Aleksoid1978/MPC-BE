@@ -175,9 +175,9 @@ void File_Skm::Data_Parse()
 {
     #if defined(MEDIAINFO_MPEG4V_YES)
         Stream.Parser=new File_Mpeg4v();
+        Open_Buffer_Init(Stream.Parser);
         ((File_Mpeg4v*)Stream.Parser)->FrameIsAlwaysComplete=true;
         ((File_Mpeg4v*)Stream.Parser)->OnlyVOP();
-        Open_Buffer_Init(Stream.Parser);
         Open_Buffer_Continue(Stream.Parser);
         Finish("SKM");
     #endif

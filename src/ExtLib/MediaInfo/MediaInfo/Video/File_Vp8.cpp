@@ -50,7 +50,7 @@ File_Vp8::File_Vp8()
     #endif //MEDIAINFO_TRACE
 
     //In
-    Frame_Count_Valid=MediaInfoLib::Config.ParseSpeed_Get()>=0.3?32:4;
+    Frame_Count_Valid=0;
 }
 
 //---------------------------------------------------------------------------
@@ -65,6 +65,9 @@ File_Vp8::~File_Vp8()
 //---------------------------------------------------------------------------
 void File_Vp8::Streams_Accept()
 {
+    if (!Frame_Count_Valid)
+        Frame_Count_Valid=Config->ParseSpeed>=0.3?32:4;
+
     Stream_Prepare(Stream_Video);
 }
 

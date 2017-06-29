@@ -502,6 +502,9 @@ void File_Vc3::Streams_Fill()
 
     if (!TimeCode_FirstFrame.empty())
         Fill(Stream_Video, 0, Video_TimeCode_FirstFrame, TimeCode_FirstFrame);
+
+    if (FrameInfo.DUR!=(int64u)-1)
+        Fill(Stream_Video, 0, Video_FrameRate, 1000000000.0/FrameInfo.DUR, 3);
 }
 
 //---------------------------------------------------------------------------
@@ -536,6 +539,8 @@ void File_Vc3::Streams_Finish()
 #if MEDIAINFO_DEMUX
 bool File_Vc3::Demux_UnpacketizeContainer_Test()
 {
+    //TODO: handling of the extra 4 bytes in a MOV container having 2 frames in a sample (see "Frame size?" part)
+
     if (Buffer_Offset+0x2C>Buffer_Size)
         return false;
 
@@ -584,6 +589,12 @@ void File_Vc3::Read_Buffer_Unsynched()
 //---------------------------------------------------------------------------
 bool File_Vc3::Header_Begin()
 {
+    if (IsSub && Buffer_Offset+4==Buffer_Size && BigEndian2int32u(Buffer+Buffer_Offset)*Frame_Count_InThisBlock==Buffer_Offset)
+    {
+        Skip_B4(                                                "Frame size?");
+        Buffer_Offset+=4;
+    }
+
     if (Buffer_Offset+0x00000280>Buffer_Size)
         return false;
 
@@ -656,12 +667,19 @@ void File_Vc3::Data_Parse()
 
     FILLING_BEGIN();
         Frame_Count++;
+        Frame_Count_InThisBlock++;
         if (Frame_Count_NotParsedIncluded!=(int64u)-1)
             Frame_Count_NotParsedIncluded++;
         if (FrameRate)
         {
             FrameInfo.PTS=FrameInfo.DTS+=float64_int64s(1000000000/FrameRate);
             FrameInfo.DUR=float64_int64s(1000000000/FrameRate);
+        }
+        else if (FrameInfo.DUR!=(int64u)-1)
+        {
+            if (Frame_Count_InThisBlock==1)
+                FrameInfo.DUR/=Buffer_Size/Element_Size;
+            FrameInfo.PTS=FrameInfo.DTS+=FrameInfo.DUR;
         }
         else
         {
@@ -673,7 +691,7 @@ void File_Vc3::Data_Parse()
         {
             Fill("VC-3");
 
-            if (!IsSub && Config->ParseSpeed<1)
+            if (!IsSub && Config->ParseSpeed<1.0)
                 Finish("VC-3");
         }
     FILLING_END();

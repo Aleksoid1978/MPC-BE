@@ -56,10 +56,10 @@ const int32s Slice::Context::Cmin = -128;
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-static int32u FFv1_CRC_Compute(const int8u* Buffer, size_t Start, size_t Size)
+static int32u FFv1_CRC_Compute(const int8u* Buffer, size_t Size)
 {
     int32u CRC_32 = 0;
-    const int8u* CRC_32_Buffer=Buffer+Start;
+    const int8u* CRC_32_Buffer=Buffer;
     const int8u* CRC_32_Buffer_End=CRC_32_Buffer+Size;
 
     while(CRC_32_Buffer<CRC_32_Buffer_End)
@@ -84,7 +84,7 @@ static size_t Ffv1_TryToFixCRC(const int8u* Buffer, size_t Buffer_Size)
         size_t BytePosition=BitPosition>>3;
         size_t BitInBytePosition=BitPosition&0x7;
         Buffer2[BytePosition]^=1<<BitInBytePosition;
-        int32u crc_left_New=FFv1_CRC_Compute(Buffer2, 0, Buffer_Size);
+        int32u crc_left_New=FFv1_CRC_Compute(Buffer2, Buffer_Size);
         if (!crc_left_New)
         {
             BitPositions.push_back(BitPosition);
@@ -473,17 +473,15 @@ File_Ffv1::File_Ffv1()
         plane_states[i] = NULL;
         plane_states_maxsizes[i] = 0;
     }
-    ConfigurationRecordIsPresent=false;
+    Parameters_IsValid=false;
+    ConfigurationRecord_IsPresent=false;
     RC=NULL;
-    version=0;
-    error_correction = 0;
-    num_h_slices = 1;
-    num_v_slices = 1;
     slices = NULL;
     picture_structure = (int32u)-1;
     sample_aspect_ratio_num = 0;
     sample_aspect_ratio_den = 0;
     KeyFramePassed = false;
+    memset(context_count, 0, MAX_QUANT_TABLES*sizeof(int32u));
 }
 
 //---------------------------------------------------------------------------
@@ -518,6 +516,13 @@ void File_Ffv1::Streams_Accept()
 {
     Stream_Prepare(Stream_Video);
     Fill(Stream_Video, 0, Video_Format, "FFV1");
+    Ztring Version=__T("Version ")+Ztring::ToZtring(version);
+    if (version>=3 && version<=4)
+    {
+        Version+=__T('.');
+        Version+=Ztring::ToZtring(micro_version);
+    }
+    Fill(Stream_Video, 0, Video_Format_Version, Version);
 }
 
 //***************************************************************************
@@ -531,7 +536,11 @@ void File_Ffv1::Get_RB (states &States, bool &Info, const char* Name)
     Info=RC->get_rac(States);
 
     if (Trace_Activated)
+    {
+        Element_Offset+=RC->BytesUsed();
         Param(Name, Info);
+        Element_Offset-=RC->BytesUsed();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -540,7 +549,11 @@ void File_Ffv1::Get_RU (states &States, int32u &Info, const char* Name)
     Info=RC->get_symbol_u(States);
 
     if (Trace_Activated)
+    {
+        Element_Offset+=RC->BytesUsed();
         Param(Name, Info);
+        Element_Offset-=RC->BytesUsed();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -549,7 +562,11 @@ void File_Ffv1::Get_RS (states &States, int32s &Info, const char* Name)
     Info=RC->get_symbol_s(States);
 
     if (Trace_Activated)
+    {
+        Element_Offset+=RC->BytesUsed();
         Param(Name, Info);
+        Element_Offset-=RC->BytesUsed();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -558,7 +575,11 @@ void File_Ffv1::Get_RS (int8u* &States, int32s &Info, const char* Name)
     Info=RC->get_symbol_s(States);
 
     if (Trace_Activated)
+    {
+        Element_Offset+=RC->BytesUsed();
         Param(Name, Info);
+        Element_Offset-=RC->BytesUsed();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -567,14 +588,22 @@ void File_Ffv1::Skip_RC (states &States, const char* Name)
     int8u Info=RC->get_rac(States);
 
     if (Trace_Activated)
+    {
+        Element_Offset+=RC->BytesUsed();
         Param(Name, Info);
+        Element_Offset-=RC->BytesUsed();
+    }
 }
 
 //---------------------------------------------------------------------------
 void File_Ffv1::Skip_RU (states &States, const char* Name)
 {
     if (Trace_Activated)
+    {
+        Element_Offset+=RC->BytesUsed();
         Param(Name, RC->get_symbol_u(States));
+        Element_Offset-=RC->BytesUsed();
+    }
     else
         RC->get_symbol_u(States);
 }
@@ -583,7 +612,11 @@ void File_Ffv1::Skip_RU (states &States, const char* Name)
 void File_Ffv1::Skip_RS (states &States, const char* Name)
 {
     if (Trace_Activated)
+    {
+        Element_Offset+=RC->BytesUsed();
         Param(Name, RC->get_symbol_s(States));
+        Element_Offset-=RC->BytesUsed();
+    }
     else
         RC->get_symbol_s(States);
 }
@@ -640,32 +673,33 @@ void File_Ffv1::Skip_RS_ (states &States)
 //---------------------------------------------------------------------------
 void File_Ffv1::Read_Buffer_OutOfBand()
 {
-    ConfigurationRecordIsPresent=true;
+    ConfigurationRecord_IsPresent=true;
 
-    int32u CRC_32=FFv1_CRC_Compute(Buffer+Buffer_Offset, (size_t)Element_Offset, (size_t)Element_Size);
-
-    if (Buffer_Size < 4 || CRC_32)
+    //Coherency tests
+    if (Buffer_Size<4)
     {
-        Reject();
+        Skip_XX(Element_Size,                                   "ConfigurationRecord");
+        Param_Error("FFV1-HEADER-END:1");
         return;
     }
+    int32u CRC_32=FFv1_CRC_Compute(Buffer+Buffer_Offset, (size_t)Element_Size);
 
-    if (!RC)
-        RC = new RangeCoder(Buffer, Buffer_Size-4, Ffv1_default_state_transition);
-
-    FrameHeader();
-    Element_Offset+=RC->BytesUsed();
+    Element_Begin1("ConfigurationRecord");
+    delete RC; RC=new RangeCoder(Buffer, Buffer_Size-4, Ffv1_default_state_transition);
+    Parameters();
+    delete RC; RC=NULL;
     if (Element_Offset+4<Element_Size)
         Skip_XX(Element_Size-Element_Offset-4,                  "Reserved");
-    Skip_B4(                                                    "CRC-32");
-
-    delete RC; RC=NULL;
+    Skip_B4(                                                    "configuration_record_crc_parity");
+    if (CRC_32)
+        Param_Error("FFV1-HEADER-configuration_record_crc_parity:1");
+    Element_End0();
 }
 
 //---------------------------------------------------------------------------
 void File_Ffv1::Skip_Frame()
 {
-    Skip_XX(Element_Size-Element_Offset, "Other data");
+    Skip_XX(Element_Size-Element_Offset, "Data");
 
     Frame_Count++;
 
@@ -680,8 +714,11 @@ void File_Ffv1::Skip_Frame()
 //---------------------------------------------------------------------------
 void File_Ffv1::Read_Buffer_Continue()
 {
-    if (!Status[IsAccepted])
-        Accept();
+    if (ConfigurationRecord_IsPresent && !Parameters_IsValid)
+    {
+        Skip_Frame();
+        return;
+    }
 
     if (!RC)
         RC = new RangeCoder(Buffer, Buffer_Size, Ffv1_default_state_transition);
@@ -689,9 +726,15 @@ void File_Ffv1::Read_Buffer_Continue()
     states States;
     memset(States, 128, states_size);
 
-    Get_RB (States, keyframe,                                   "keyframe");
+    Element_Begin1("Frame");
 
-    if (keyframe && !ConfigurationRecordIsPresent)
+    Get_RB (States, keyframe,                                   "keyframe");
+    if (intra && !keyframe)
+        Param_Error("FFV1-FRAME-key_frame-ISNOTINTRA:1");
+    if (keyframe)
+        KeyFramePassed=true;
+
+    if (!ConfigurationRecord_IsPresent && keyframe)
     {
         #if MEDIAINFO_TRACE
             bool Trace_Activated_Save=Trace_Activated;
@@ -699,124 +742,167 @@ void File_Ffv1::Read_Buffer_Continue()
                 Trace_Activated=false; // Trace is relatively huge, temporarary deactivating it. TODO: an option for it
         #endif //MEDIAINFO_TRACE
 
-        FrameHeader();
+        Parameters();
 
         #if MEDIAINFO_TRACE
             Trace_Activated=Trace_Activated_Save; // Trace is too huge, reactivating it.
         #endif //MEDIAINFO_TRACE
     }
-    else if (!KeyFramePassed)
+
+    if (!Parameters_IsValid || !KeyFramePassed)
     {
-        // If stream does not start with a key frame
         Skip_Frame();
         return;
     }
 
     int32u tail = (version >= 3) ? 3 : 0;
-    tail += error_correction == 1 ? 5 : 0;
+    tail += ec == 1 ? 5 : 0;
 
-    int64u Slices_BufferPos=Element_Size;
     vector<int32u> Slices_BufferSizes;
-    if (version < 2)
-        Slices_BufferSizes.push_back(Element_Size);
-    else if (version == 2)
+    if (version>=3)
     {
-        Skip_Frame();
-        return;
-    }
-    else
-    {
+        int64u Slices_BufferPos=Element_Size;
         while (Slices_BufferPos)
         {
-            if (Slices_BufferPos < tail)
+            if (Slices_BufferPos<tail)
             {
                 //There is a problem
-                Slices_BufferSizes.insert(Slices_BufferSizes.begin(), Slices_BufferPos);
+                Slices_BufferSizes.clear();
                 break;
             }
 
-            int32u Size = BigEndian2int24u(Buffer + Buffer_Offset + (size_t)Slices_BufferPos - tail);
-            Size += tail;
+            int32u Size=BigEndian2int24u(Buffer+Buffer_Offset+(size_t)Slices_BufferPos-tail);
+            Size+=tail;
 
-            if (Size > Slices_BufferPos)
-                Size = Slices_BufferPos; //There is a problem
+            if (Size>Slices_BufferPos)
+            {
+                //There is a problem
+                Slices_BufferSizes.clear();
+                break;
+            }
             Slices_BufferPos-=Size;
 
             Slices_BufferSizes.insert(Slices_BufferSizes.begin(), Size);
         }
     }
 
-    Element_Offset=0;
-    for (size_t Pos = 0; Pos < Slices_BufferSizes.size(); Pos++)
+    size_t Pos=0;
+    BuggySlices=false;
+    while (Element_Offset<Element_Size || (!Pos && coder_type)) // With some v0 RC, content may be in the last byte of the RC which is also in the Parameter() part
     {
         Element_Begin1("Slice");
         int64u Element_Offset_Begin=Element_Offset;
         int64u Element_Size_Save=Element_Size;
-        Element_Size=Element_Offset+Slices_BufferSizes[Pos]-tail;
+        if (Pos<Slices_BufferSizes.size())
+            Element_Size=Element_Offset+Slices_BufferSizes[Pos];
         int32u crc_left=0;
-
-        if (error_correction == 1)
-            crc_left=FFv1_CRC_Compute(Buffer+Buffer_Offset, (size_t)Element_Offset, Slices_BufferSizes[Pos]);
+        if (ec == 1)
+            crc_left=FFv1_CRC_Compute(Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset));
+        Element_Size-=tail;
 
         if (Pos)
         {
-            delete RC; RC = new RangeCoder(Buffer+Buffer_Offset+(size_t)Element_Offset, Slices_BufferSizes[Pos]-tail, state_transitions_table);
+            delete RC; RC = new RangeCoder(Buffer+Buffer_Offset+(size_t)Element_Offset, Element_Size-Element_Offset, state_transitions_table);
         }
         else
         {
-            RC->ResizeBuffer(Slices_BufferSizes[0]-tail);
+            RC->ResizeBuffer(Element_Size);
             RC->AssignStateTransitions(state_transitions_table);
         }
 
-#if MEDIAINFO_TRACE
-        if (!Frame_Count || Trace_Activated) // Parse slice only if trace feature is activated
+        //SliceHeader
+        bool ParseContent;
+        if (version>=3)
         {
-            if (!slice(States))
-            {
-                int64u SliceRealSize=Element_Offset-Element_Offset_Begin;
-                Element_Offset=Element_Offset_Begin;
-                Skip_XX(SliceRealSize,                          "slice_data");
-                if (Trusted_Get() && !RC->Underrun() && Element_Offset==Element_Size)
-                    Param_Info1("OK");
-                else
-                    Param_Info1("NOK");
-            }
+            ParseContent=SliceHeader(States);
+            if (!ParseContent)
+                BuggySlices=true;
         }
-#endif //MEDIAINFO_TRACE
+        else
+            ParseContent=true;
 
+        //SliceContent
+        #if MEDIAINFO_TRACE
+        if (ParseContent && (!Frame_Count || Trace_Activated)) // Parse slice only if trace feature is activated
+        {
+            SliceContent(States);
+        }
+        else
+        #endif //MEDIAINFO_TRACE
+            Skip_XX(Element_Size-Element_Offset,                "SliceContent");
         if (Element_Offset<Element_Size)
-            Skip_XX(Element_Size-Element_Offset,                    "Other data");
-        Element_Size=Element_Size_Save;
-        if (version > 2)
-            Skip_B3(                                                    "slice_size");
-        if (error_correction == 1)
         {
-            Skip_B1(                                                "error_status");
-            Skip_B4(                                                "crc_parity");
-            if (!crc_left)
-                Param_Info1("OK");
-            else
-            {
-                Param_Info1("NOK");
+            Skip_XX(Element_Size-Element_Offset,                "Junk");
+            Param_Error("FFV1-SLICE-JUNK:1");
+        }
 
-                #if MEDIAINFO_FIXITY
-                    if (Config->TryToFix_Get())
-                    {
-                        size_t BitPosition=Ffv1_TryToFixCRC(Buffer+Buffer_Offset+(size_t)Element_Offset_Begin, Element_Offset-Element_Offset_Begin);
-                        if (BitPosition!=(size_t)-1)
+        //SliceFooter
+        Element_Size=Element_Size_Save;
+        if (version>=3)
+        {
+            Element_Begin1("SliceFooter");
+            int32u slice_size;
+            Get_B3 (slice_size,                                 "slice_size");
+            if (Element_Offset_Begin+slice_size+3!=Element_Offset)
+                Param_Error("FFV1-SLICE-slice_size:1");
+            if (ec == 1)
+            {
+                int8u error_status;
+                Get_B1 (error_status,                           "error_status");
+                if (error_status)
+                    Param_Error("FFV1-SLICE-error_status:1");
+                Skip_B4(                                        "slice_crc_parity");
+                if (crc_left)
+                {
+                    Param_Error("FFV1-SLICE-slice_crc_parity:1");
+
+                    #if MEDIAINFO_FIXITY
+                        if (Config->TryToFix_Get())
                         {
-                            size_t BytePosition=BitPosition>>3;
-                            size_t BitInBytePosition=BitPosition&0x7;
-                            int8u Modified=Buffer[Buffer_Offset+(size_t)Element_Offset_Begin+BytePosition];
-                            Modified^=1<<BitInBytePosition;
-                            FixFile(File_Offset+Buffer_Offset+(size_t)Element_Offset_Begin+BytePosition, &Modified, 1)?Param_Info1("Fixed"):Param_Info1("Not fixed");
+                            size_t BitPosition=Ffv1_TryToFixCRC(Buffer+Buffer_Offset+(size_t)Element_Offset_Begin, Element_Offset-Element_Offset_Begin);
+                            if (BitPosition!=(size_t)-1)
+                            {
+                                size_t BytePosition=BitPosition>>3;
+                                size_t BitInBytePosition=BitPosition&0x7;
+                                int8u Modified=Buffer[Buffer_Offset+(size_t)Element_Offset_Begin+BytePosition];
+                                Modified^=1<<BitInBytePosition;
+                                FixFile(File_Offset+Buffer_Offset+(size_t)Element_Offset_Begin+BytePosition, &Modified, 1)?Param_Info1("Fixed"):Param_Info1("Not fixed");
+                            }
                         }
-                    }
-                #endif //MEDIAINFO_FIXITY
+                    #endif //MEDIAINFO_FIXITY
+                }
+                Element_End0();
             }
         }
+
         Element_End0();
+        Pos++;
     }
+
+    //Integrity test
+    if (!BuggySlices && version>=3 && slices)
+    {
+        vector<size_t> SlicesPlaces;
+        size_t SlicesPlaces_Size=num_h_slices*num_v_slices;
+        SlicesPlaces.resize(num_h_slices*num_v_slices);
+        Slice* Slice_Max=slices+SlicesPlaces_Size;
+        current_slice=slices;
+        while (current_slice<Slice_Max)
+        {
+            if (current_slice->sample_buffer)
+                SlicesPlaces[current_slice->slice_y*num_v_slices+current_slice->slice_x]++;
+
+            current_slice++;
+        }
+        for (size_t i=0; i<SlicesPlaces_Size; i++)
+            if (SlicesPlaces[i]!=1)
+            {
+                Element_Error("FFV1-FRAME-END:1");
+                break;
+            }
+    }
+
+    Element_End0();
 
     FILLING_BEGIN();
         if (Frame_Count==0)
@@ -843,108 +929,156 @@ void File_Ffv1::Read_Buffer_Continue()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void File_Ffv1::FrameHeader()
+void File_Ffv1::Parameters()
 {
+    Element_Begin1("Parameters");
+
     //Parsing
     states States;
     memset(States, 128, states_size);
-    int32u coder_type, colorspace_type, bits_per_raw_sample=8, num_h_slices_minus1=0, num_v_slices_minus1=0, intra;
-
-    KeyFramePassed = true;
-    micro_version = 0;
     Get_RU (States, version,                                    "version");
-    if (( ConfigurationRecordIsPresent && version<=1)
-     || (!ConfigurationRecordIsPresent && version> 1))
+    if ( ConfigurationRecord_IsPresent && version<=1)
     {
-        Trusted_IsNot("Invalid version in global header");
+        Param_Error("FFV1-HEADER-version-OUTOFBAND:1");
+        Accept(); //TODO: better check without removing error info in trace
+        Element_End0();
         return;
     }
-    else if (version == 2)
+    if (!ConfigurationRecord_IsPresent && version> 1)
     {
-        FILLING_BEGIN();
-            if (Frame_Count==0)
-            {
-                Accept();
-
-                Ztring Version=__T("Version ")+Ztring::ToZtring(version);
-                Fill(Stream_Video, 0, Video_Format_Version, Version);
-            }
-        FILLING_END();
+        Param_Error("FFV1-HEADER-version-OUTOFBAND:1");
+        Accept(); //TODO: better check without removing error info in trace
+        Element_End0();
         return;
     }
-
-    if (version>2)
+    if (version==2 || version>3)
+    {
+        Param_Error(version==2?"FFV1-HEADER-version-EXPERIMENTAL:1":"FFV1-HEADER-version-LATERVERSION:1");
+        if (version==2 || version>4)
+        {
+            Accept();
+            Element_End0();
+            return;
+        }
+    }
+    if (version>=3)
         Get_RU (States, micro_version,                          "micro_version");
+    if ((version==3 && micro_version<4))
+    {
+        Param_Error("FFV1-HEADER-micro_version-EXPERIMENTAL:1");
+        Accept();
+        Element_End0();
+        return;
+    }
+    if (version==4) // Version 4 is still experimental at the time of writing but contains micro_version so we show it
+    {
+        Accept();
+        Element_End0();
+        return;
+    }
+    if (Frame_Count==0)
+        Accept(); //TODO: better check without removing error info in trace
     Get_RU (States, coder_type,                                 "coder_type");
-    this->coder_type = coder_type;
-    if (coder_type == 2) //Range coder with custom state transition table
+    if (coder_type>2)
+    {
+        Param_Error("FFV1-HEADER-coder_type:1");
+        Element_End0();
+        return;
+    }
+    if (coder_type==2) //Range coder with custom state transition table
     {
         Element_Begin1("state_transition_deltas");
         for (size_t i = 1; i < state_transitions_size; i++)
         {
             int32s state_transition_delta;
             Get_RS (States, state_transition_delta,             "state_transition_delta");
-            state_transitions_table[i]=state_transition_delta+RC->one_state[i];
-            Param_Info1(state_transitions_table[i]);
+            state_transition_delta+=RC->one_state[i];
+            Param_Info1(state_transition_delta);
+            if (state_transition_delta<0x00 || state_transition_delta>0xFF)
+            {
+                Param_Error("FFV1-HEADER-state_transition_delta:1");
+                Element_End0();
+                Element_End0();
+                return;
+            }
+            state_transitions_table[i]=(int8u)state_transition_delta;
         }
         Element_End0();
     }
     Get_RU (States, colorspace_type,                            "colorspace_type");
-    this->colorspace_type = colorspace_type;
+    if (colorspace_type>1)
+    {
+        Param_Error("FFV1-HEADER-colorspace_type:1");
+        Element_End0();
+        Element_End0();
+        return;
+    }
     if (version)
     {
         Get_RU (States, bits_per_raw_sample,                    "bits_per_raw_sample");
+        if (bits_per_raw_sample>64)
+        {
+            Param_Error("FFV1-HEADER-bits_per_raw_sample:1");
+            Element_End0();
+            return;
+        }
         if (bits_per_raw_sample==0)
-            bits_per_raw_sample=8; //I don't know the reason, 8-bit is coded 0 and 10-bit coded 10 (not 2?).
+            bits_per_raw_sample=8; // Spec decision due to old encoders
     }
-    this->bits_per_sample = bits_per_raw_sample;
+    else
+    {
+        bits_per_raw_sample=8;
+    }
+    
     Get_RB (States, chroma_planes,                              "chroma_planes");
-    Get_RU (States, chroma_h_shift,                             "log2(h_chroma_subsample)");
-    Get_RU (States, chroma_v_shift,                             "log2(v_chroma_subsample)");
+    Get_RU (States, h_chroma_subsample_log2,                    "log2(h_chroma_subsample)");
+    Get_RU (States, v_chroma_subsample_log2,                    "log2(h_chroma_subsample)");
     Get_RB (States, alpha_plane,                                "alpha_plane");
     if (version>1)
     {
-        Get_RU (States, num_h_slices_minus1,                    "num_h_slices_minus1");
-        Get_RU (States, num_v_slices_minus1,                    "num_v_slices_minus1");
-        num_h_slices = num_h_slices_minus1 + 1;
-        num_v_slices = num_v_slices_minus1 + 1;
-        Get_RU (States, quant_table_count,                      "quant_table_count");
-    }
-    else
-        quant_table_count = 2 + alpha_plane;
-
-    if (!slices)
-    {
-        size_t nb_slices = (num_h_slices_minus1 + 1) * (num_v_slices_minus1 + 1);
-        slices = new Slice[nb_slices];
-        current_slice = &slices[0];
-    }
-
-    if (version > 1)
-        for (size_t i = 0; i < quant_table_count; i++)
-            read_quant_tables(i);
-    else
-    {
-        current_slice->x = 0;
-        current_slice->y = 0;
-        current_slice->w = Width;
-        current_slice->h = Height;
-        read_quant_tables(0);
-        quant_table_index[0] = 0;
-        for (size_t i = 1; i < quant_table_count; i++)
+        Get_RU (States, num_h_slices,                           "num_h_slices_minus1");
+        if (num_h_slices>=Width)
         {
-            quant_table_index[i] = 0;
-            context_count[i] = context_count[0];
+            Param_Error("FFV1-HEADER-num_h_slices:1");
+            Element_End0();
+            return;
+        }
+        Get_RU (States, num_v_slices,                           "num_v_slices_minus1");
+        if (num_v_slices>=Height)
+        {
+            Param_Error("FFV1-HEADER-num_v_slices:1");
+            Element_End0();
+            return;
+        }
+        num_h_slices++;
+        num_v_slices++;
+        Get_RU (States, quant_table_count,                      "quant_table_count");
+        if (quant_table_count>8)
+        {
+            Param_Error("FFV1-HEADER-quant_table_count:1");
+            Element_End0();
+            return;
         }
     }
-    memset(quant_tables+quant_table_count, 0x00, (MAX_QUANT_TABLES-quant_table_count)*MAX_CONTEXT_INPUTS*256*sizeof(pixel_t));
-
-    for (size_t i = 0; i < quant_table_count; i++)
+    else
     {
-        Element_Begin1("initial_state");
-        bool present = false;
-        if (version > 1)
-            Get_RB (States, present,                                "present");
+        num_h_slices=1;
+        num_v_slices=1;
+        quant_table_count=1;
+    }
+    for (size_t i=0; i<quant_table_count; i++)
+        if (!QuantizationTable(i))
+        {
+            Element_End0();
+            return;
+        }
+    for (size_t i=0; i<quant_table_count; i++)
+    {
+        if (version>=2)
+            Element_Begin1("initial_state");
+        bool present=false;
+        if (version>=2)
+            Get_RB (States, present,                                "states_coded");
 
         if (coder_type && context_count[i]>plane_states_maxsizes[i])
         {
@@ -964,11 +1098,11 @@ void File_Ffv1::FrameHeader()
         {
             if (present)
             {
-                Element_Begin1("initial_state");
+                Element_Begin1("initial_state_deltas");
                 for (size_t k = 0; k < states_size; k++)
                 {
                     int32s value;
-                    Get_RS (States, value,                  "value");
+                    Get_RS (States, value,                  "initial_state_delta");
                     if (coder_type)
                         plane_states[i][j][k] = value;
                 }
@@ -980,59 +1114,107 @@ void File_Ffv1::FrameHeader()
                     plane_states[i][j][k] = 128;
             }
         }
-        Element_End0();
+        if (version>=2)
+            Element_End0();
     }
 
-    if (version > 2)
+    if (version>=3)
     {
-        Get_RU (States, error_correction,                       "ec");
+        Get_RU (States, ec,                                     "ec");
+        if (ec>1)
+        {
+            Param_Error("FFV1-HEADER-ec:1");
+            Element_End0();
+            return;
+        }
         if (micro_version)
+        {
             Get_RU (States, intra,                              "intra");
+            if (intra>1)
+            {
+                Param_Error("FFV1-HEADER-intra:1");
+                Element_End0();
+                return;
+            }
+        }
+        else
+            intra=0;
+    }
+    else
+    {
+        ec=0;
+        intra=0;
     }
 
-    //Marking handling of 16-bit overflow computing
-    is_overflow_16bit=(colorspace_type==0 && bits_per_raw_sample==16 && (coder_type==1 || coder_type==2))?true:false; //TODO: check in FFmpeg the version when the stream is fixed. Note: only with YUV colorspace
+    if (!coder_type && version<=1)
+    {
+        states States;
+        memset(States, 129, states_size);
+        Skip_RC(States,                                         "end");
+    }
+
+    Element_End0();
 
     FILLING_BEGIN();
+        //Marking handling of 16-bit overflow computing
+        is_overflow_16bit=(colorspace_type==0 && bits_per_raw_sample==16 && (coder_type==1 || coder_type==2))?true:false; //TODO: check in FFmpeg the version when the stream is fixed. Note: only with YUV colorspace
+
+        //quant_table_index_Count
+        quant_table_index_count=1+(alpha_plane?1:0);
+        if (version < 4 || chroma_planes) // Warning: chroma is considered as 1 plane
+            quant_table_index_count++;
+
+        //Slices
+        if (!slices)
+        {
+            slices=new Slice[num_h_slices*num_v_slices];
+            current_slice=&slices[0];
+        }
+        if (version<=1)
+        {
+            current_slice->x=0;
+            current_slice->y=0;
+            current_slice->w=Width;
+            current_slice->h=Height;
+            quant_table_index[0]=0;
+            for (size_t i=1; i<quant_table_index_count; i++)
+            {
+                quant_table_index[i]=0;
+                context_count[i]=context_count[0];
+            }
+        }
+
+        //Filling
         if (Frame_Count==0)
         {
-            Accept();
-
-            Ztring Version=__T("Version ")+Ztring::ToZtring(version);
-            if (version>2)
-            {
-                Version+=__T('.');
-                Version+=Ztring::ToZtring(micro_version);
-            }
             Fill(Stream_Video, 0, "coder_type", Ffv1_coder_type(coder_type));
-            Fill(Stream_Video, 0, Video_Format_Version, Version);
             Fill(Stream_Video, 0, Video_BitDepth, bits_per_raw_sample);
-            if (version > 1)
+            if (version>1)
             {
-                Fill(Stream_Video, 0, "MaxSlicesCount", (num_h_slices_minus1+1)*(num_v_slices_minus1+1));
-            }
-            if (version > 2)
-            {
-                if (error_correction)
-                    Fill(Stream_Video, 0, "ErrorDetectionType", "Per slice");
-                if (micro_version && intra)
-                    Fill(Stream_Video, 0, Video_Format_Settings_GOP, "N=1");
+                Fill(Stream_Video, 0, "MaxSlicesCount", num_h_slices*num_v_slices);
+                if (version>2)
+                {
+                    if (ec)
+                        Fill(Stream_Video, 0, "ErrorDetectionType", "Per slice");
+                    if (micro_version && intra)
+                        Fill(Stream_Video, 0, Video_Format_Settings_GOP, "N=1");
+                }
             }
             Fill(Stream_Video, 0, Video_ColorSpace, Ffv1_colorspace_type(colorspace_type, chroma_planes, alpha_plane));
             if (colorspace_type==0 && chroma_planes)
             {
                 string ChromaSubsampling;
-                switch (chroma_h_shift)
+                switch (h_chroma_subsample_log2)
                 {
                     case 0 :
-                            switch (chroma_v_shift)
+                            switch (v_chroma_subsample_log2)
                             {
                                 case 0 : ChromaSubsampling="4:4:4"; break;
                                 default: ;
                             }
                             break;
                     case 1 :
-                            switch (chroma_v_shift)
+                            switch (v_chroma_subsample_log2)
                             {
                                 case 0 : ChromaSubsampling="4:2:2"; break;
                                 case 1 : ChromaSubsampling="4:2:0"; break;
@@ -1040,7 +1222,7 @@ void File_Ffv1::FrameHeader()
                             }
                             break;
                     case 2 :
-                            switch (chroma_v_shift)
+                            switch (v_chroma_subsample_log2)
                             {
                                 case 0 : ChromaSubsampling="4:1:1"; break;
                                 case 1 : ChromaSubsampling="4:1:0"; break;
@@ -1054,16 +1236,16 @@ void File_Ffv1::FrameHeader()
                     ChromaSubsampling+=":4";
                 Fill(Stream_Video, 0, Video_ChromaSubsampling, ChromaSubsampling);
             }
+
+            Parameters_IsValid=true;
         }
     FILLING_END();
 }
 
 //---------------------------------------------------------------------------
-int File_Ffv1::slice(states &States)
+void File_Ffv1::SliceContent(states &States)
 {
-    if (version>2)
-        if (slice_header(States) < 0)
-            return -1;
+    Element_Begin1("SliceContent");
 
     #if MEDIAINFO_TRACE
         bool Trace_Activated_Save=Trace_Activated;
@@ -1107,11 +1289,11 @@ int File_Ffv1::slice(states &States)
             int32u w = current_slice->w;
             int32u h = current_slice->h;
 
-            current_slice->w = w >> chroma_h_shift;
-            if (w & ((1 << chroma_h_shift) - 1))
+            current_slice->w = w >> h_chroma_subsample_log2;
+            if (w & ((1 << h_chroma_subsample_log2) - 1))
                 current_slice->w++; //Is ceil
-            current_slice->h = h >> chroma_v_shift;
-            if (h & ((1 << chroma_v_shift) - 1))
+            current_slice->h = h >> v_chroma_subsample_log2;
+            if (h & ((1 << v_chroma_subsample_log2) - 1))
                 current_slice->h++; //Is ceil
             plane(1); // Cb
             plane(1); // Cr
@@ -1124,6 +1306,9 @@ int File_Ffv1::slice(states &States)
     else if (colorspace_type == 1)
         rgb();
 
+    if (BS->BufferUnderRun || RC->Underrun())
+        Element_Error("FFV1-SLICE-SliceContent:1");
+
     if (!coder_type)
         BS_End();
 
@@ -1134,7 +1319,7 @@ int File_Ffv1::slice(states &States)
             int8u s = 129;
             RC->get_rac(&s);
         }
-        Element_Offset+=RC->BytesUsed();
+        Skip_XX(RC->BytesUsed(),                                "slice_data");
     }
 
     #if MEDIAINFO_DECODE
@@ -1144,12 +1329,11 @@ int File_Ffv1::slice(states &States)
     #if MEDIAINFO_TRACE
         Trace_Activated=Trace_Activated_Save; // Trace is too huge, reactivating after during pixel decoding
     #endif //MEDIAINFO_TRACE
-
-    return 0;
+    Element_End0();
 }
 
 //---------------------------------------------------------------------------
-int File_Ffv1::slice_header(states &States)
+bool File_Ffv1::SliceHeader(states &States)
 {
     Element_Begin1("SliceHeader");
 
@@ -1159,38 +1343,42 @@ int File_Ffv1::slice_header(states &States)
     Get_RU (States, slice_x,                                "slice_x");
     if (slice_x >= num_v_slices)
     {
-        Param_Info1("NOK");
+        Param_Error("FFV1-SLICE-slice_xywh:1");
         Element_End0();
-        return -1;
+        return false;
     }
 
     Get_RU (States, slice_y,                                "slice_y");
     if (slice_y >= num_h_slices)
     {
-        Param_Info1("NOK");
+        Param_Error("FFV1-SLICE-slice_xywh:1");
         Element_End0();
-        return -1;
+        return false;
     }
 
     Get_RU (States, slice_width_minus1,                     "slice_width_minus1");
     int32u slice_x2 = slice_x + slice_width_minus1 + 1; //right boundary
     if (slice_x2 > num_h_slices)
     {
-        Param_Info1("NOK");
+        Param_Error("FFV1-SLICE-slice_xywh:1");
         Element_End0();
-        return -1;
+        return false;
     }
 
     Get_RU (States, slice_height_minus1,                    "slice_height_minus1");
     int32u slice_y2 = slice_y + slice_height_minus1 + 1; //bottom boundary
     if (slice_y2 > num_v_slices)
     {
-        Param_Info1("NOK");
+        Param_Error("FFV1-SLICE-slice_xywh:1");
         Element_End0();
-        return -1;
+        return false;
     }
 
     current_slice = &slices[slice_x + slice_y * num_h_slices];
+    current_slice->slice_x = slice_x;
+    current_slice->slice_y = slice_y;
+    current_slice->slice_w = slice_x2;
+    current_slice->slice_h = slice_y2;
 
     //Computing boundaries, being careful about how are computed boundaries when there is not an integral number for Width  / num_h_slices or Height / num_v_slices (the last slice has more pixels)
     current_slice->x = slice_x  * Width  / num_h_slices;
@@ -1199,14 +1387,23 @@ int File_Ffv1::slice_header(states &States)
     current_slice->h = slice_y2 * Height / num_v_slices - current_slice->y;
 
 
-    int8u plane_count=1+(alpha_plane?1:0);
-    if (version < 4 || chroma_planes) // Warning: chroma is considered as 1 plane
-        plane_count += 1;
-    for (int8u i = 0; i < plane_count; i++)
+    for (int8u i = 0; i < quant_table_index_count; i++)
+    {
         Get_RU (States, quant_table_index[i],               "quant_table_index");
+        if (quant_table_index[i]>=quant_table_count)
+        {
+            Param_Error("FFV1-SLICE-quant_table_index:1");
+            Element_End0();
+            return false;
+        }
+    }
     Get_RU (States, picture_structure,                      "picture_structure");
-    Get_RU (States, sample_aspect_ratio_num,                "sample_aspect_ratio num");
-    Get_RU (States, sample_aspect_ratio_den,                "sample_aspect_ratio den");
+    if (picture_structure>3)
+        Param_Error("FFV1-SLICE-picture_structure:1");
+    Get_RU (States, sample_aspect_ratio_num,                "sar_num");
+    Get_RU (States, sample_aspect_ratio_den,                "sar_den");
+    if ((sample_aspect_ratio_num && !sample_aspect_ratio_den) || (!sample_aspect_ratio_num && sample_aspect_ratio_den))
+        Param_Error("FFV1-SLICE-sar_den:1");
     if (version > 3)
     {
         //TODO
@@ -1214,8 +1411,16 @@ int File_Ffv1::slice_header(states &States)
 
     RC->AssignStateTransitions(state_transitions_table);
 
+    if (!coder_type)
+    {
+        states States;
+        memset(States, 129, states_size);
+        Skip_RC(States,                                     "end");
+    }
+    //Element_Offset+=RC->BytesUsed(); // Computing how many bytes where consumed by the range coder
+
     Element_End0();
-    return 0;
+    return true;
 }
 
 //---------------------------------------------------------------------------
@@ -1225,10 +1430,10 @@ void File_Ffv1::plane(int32u pos)
         Element_Begin1("Plane");
     #endif //MEDIAINFO_TRACE_FFV1CONTENT
 
-    if (bits_per_sample <= 8)
+    if (bits_per_raw_sample <= 8)
         bits_max = 8;
     else
-        bits_max = bits_per_sample;
+        bits_max = bits_per_raw_sample;
     bits_mask1 = ((1 << bits_max) - 1);
     bits_mask2 = 1 << (bits_max - 1);
     bits_mask3 = bits_mask2 - 1;
@@ -1272,7 +1477,7 @@ void File_Ffv1::rgb()
         Element_Begin1("rgb");
     #endif //MEDIAINFO_TRACE_FFV1CONTENT
 
-    bits_max = bits_per_sample + 1;
+    bits_max = bits_per_raw_sample + 1;
     bits_mask1 = (1 << bits_max) - 1;
     bits_mask2 = 1 << (bits_max - 1);
     bits_mask3 = bits_mask2-1;
@@ -1571,47 +1776,45 @@ void File_Ffv1::line(int pos, pixel_t *sample[2])
 }
 
 //---------------------------------------------------------------------------
-void File_Ffv1::read_quant_tables(int i)
+bool File_Ffv1::QuantizationTable(size_t i)
 {
-    Element_Begin1("quant_table");
+    Element_Begin1("QuantizationTableSet");
 
-    int32u scale = 1;
+    FFV1::pixel_t scale = 1;
 
-    for (int j = 0; j < 5; j++)
+    for (size_t j = 0; j < 5; j++)
     {
-        read_quant_table(i, j, scale);
-        scale *= 2 * len_count[i][j] - 1;
-        if (scale > 32768U)
+        if (!QuantizationTablePerContext(i, j, scale))
         {
-            //TODO Error
-            context_count[i] = (scale + 1) / 2;
             Element_End0();
-            return;
+            return false;
         }
     }
     context_count[i] = (scale + 1) / 2;
 
     Element_End0();
+    return true;
 }
 
 //---------------------------------------------------------------------------
-void File_Ffv1::read_quant_table(int i, int j, size_t scale)
+bool File_Ffv1::QuantizationTablePerContext(size_t i, size_t j, FFV1::pixel_t &scale)
 {
-    Element_Begin1("per context");
+    Element_Begin1("QuantizationTable");
 
     int8u States[states_size];
     memset(States, 128, sizeof(States));
 
-    int v = 0;
-    for (int k=0; k < 128;)
+    FFV1::pixel_t v = 0;
+    for (size_t k=0; k < 128;)
     {
         int32u len_minus1;
         Get_RU (States, len_minus1,                             "len_minus1");
 
         if (k+len_minus1 >= 128)
         {
+            Param_Error("FFV1-HEADER-QuantizationTable-len:1");
             Element_End0();
-            return;
+            return false;
         }
 
         for (int32u a=0; a<=len_minus1; a++)
@@ -1627,9 +1830,16 @@ void File_Ffv1::read_quant_table(int i, int j, size_t scale)
         quant_tables[i][j][256 - k] = -quant_tables[i][j][k];
     quant_tables[i][j][128] = -quant_tables[i][j][127];
 
-    len_count[i][j]=v;
+    scale *= 2 * v - 1;
+    if (scale > 32768U)
+    {
+        Element_Error("FFV1-HEADER-QuantizationTable-scale:1");
+        Element_End0();
+        return false;
+    }
 
     Element_End0();
+    return true;
 }
 
 //***************************************************************************

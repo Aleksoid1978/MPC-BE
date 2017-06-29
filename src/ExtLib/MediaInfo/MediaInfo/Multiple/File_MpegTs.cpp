@@ -282,7 +282,6 @@ File_MpegTs::File_MpegTs()
     MpegTs_ScanUpTo=(int64u)-1;
     Searching_TimeStamp_Start=true;
     Complete_Stream=NULL;
-    Begin_MaxDuration=MediaInfoLib::Config.ParseSpeed_Get()>=0.8?(int64u)-1:MediaInfoLib::Config.MpegTs_MaximumScanDuration_Get()*27/1000;
     ForceStreamDisplay=MediaInfoLib::Config.MpegTs_ForceStreamDisplay_Get();
     ForceTextStreamDisplay=MediaInfoLib::Config.MpegTs_ForceTextStreamDisplay_Get();
 
@@ -1845,6 +1844,8 @@ bool File_MpegTs::Synched_Test()
 //---------------------------------------------------------------------------
 void File_MpegTs::Synched_Init()
 {
+    Begin_MaxDuration=Config->ParseSpeed>=0.8?(int64u)-1:MediaInfoLib::Config.MpegTs_MaximumScanDuration_Get()*27/1000;
+
     //Config->File_Filter_Set(462);
     //Default values
     Complete_Stream=new complete_stream;

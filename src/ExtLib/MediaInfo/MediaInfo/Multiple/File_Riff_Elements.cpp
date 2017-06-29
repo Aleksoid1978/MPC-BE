@@ -388,6 +388,7 @@ namespace Elements
     const int32u WAVE_id3_=0x69643320;
     const int32u WAVE_INFO=0x494E464F;
     const int32u WAVE_iXML=0x69584D4C;
+    const int32u WAVE_mext=0x6D657874;
     const int32u wave=0x77617665;
     const int32u wave_data=0x64617461;
     const int32u wave_fmt_=0x666D7420;
@@ -576,6 +577,7 @@ void File_Riff::Data_Parse()
         LIST(WAVE_INFO)
             ATOM_DEFAULT_ALONE(WAVE_INFO_xxxx)
         ATOM(WAVE_iXML)
+        ATOM(WAVE_mext)
         ATOM_END
     LIST(wave)
         ATOM_BEGIN
@@ -1097,7 +1099,7 @@ void File_Riff::AVI__hdlr_strl_indx_StandardIndex(int32u Entry_Count, int32u Chu
         Element_Offset+=8;
 
         //Stream Position and size
-        if (Pos<300 || MediaInfoLib::Config.ParseSpeed_Get()==1.00)
+        if (Pos<300 || Config->ParseSpeed>=1.0)
         {
             Stream_Structure[BaseOffset+Offset-8].Name=ChunkId&0xFFFF0000;
             Stream_Structure[BaseOffset+Offset-8].Size=Size;
@@ -1811,7 +1813,7 @@ void File_Riff::AVI__hdlr_strl_strf_vids()
         File_Mpeg4v* Parser=new File_Mpeg4v;
         Stream[Stream_ID].Specific_IsMpeg4v=true;
         Parser->FrameIsAlwaysComplete=true;
-        if (MediaInfoLib::Config.ParseSpeed_Get()>=0.5)
+        if (Config->ParseSpeed>=0.5)
             Parser->ShouldContinueParsing=true;
         Stream[Stream_ID].Parsers.push_back(Parser);
     }
@@ -2630,7 +2632,7 @@ void File_Riff::AVI__movi_xxxx___dc()
     stream& StreamItem = Stream[Stream_ID];
     if (StreamItem.Parsers.empty()
      || StreamItem.Parsers[0]->Status[IsFinished]
-     || (StreamItem.PacketPos>=300 && MediaInfoLib::Config.ParseSpeed_Get()<1.00))
+     || (StreamItem.PacketPos>=300 && Config->ParseSpeed<1.00))
     {
         StreamItem.SearchingPayload=false;
         stream_Count--;
@@ -2673,7 +2675,7 @@ void File_Riff::AVI__movi_xxxx___wb()
     if (StreamItem.PacketPos>=4 //For having the chunk alignement
      && (StreamItem.Parsers.empty()
       || StreamItem.Parsers[0]->Status[IsFinished]
-      || (StreamItem.PacketPos>=300 && MediaInfoLib::Config.ParseSpeed_Get()<1.00)))
+      || (StreamItem.PacketPos>=300 && Config->ParseSpeed<1.00)))
     {
         StreamItem.SearchingPayload=false;
         stream_Count--;
@@ -3706,7 +3708,7 @@ void File_Riff::WAVE_fact()
                 if (BitRate)
                 {
                     int64u Duration_FromBitRate = File_Size * 8 * 1000 / BitRate;
-                    if (Duration_FromBitRate > Duration*1.10 || Duration_FromBitRate < Duration*0.9)
+                    if (Duration_FromBitRate > Duration*1.02 || Duration_FromBitRate < Duration*0.98)
                         IsOK = false;
                 }
             }
@@ -3752,6 +3754,26 @@ void File_Riff::WAVE_iXML()
 
     //Parsing
     Skip_Local(Element_Size,                                    "XML data");
+}
+
+//---------------------------------------------------------------------------
+void File_Riff::WAVE_mext()
+{
+    Element_Name("MPEG Audio extension");
+
+    //Parsing
+    Info_L2(       SoundInformation,                            "SoundInformation");
+        Skip_Flags(SoundInformation,  0,                        "Homogeneous sound data");
+        Skip_Flags(SoundInformation,  1,                        "Padding bit is used");
+        Skip_Flags(SoundInformation,  2,                        "File contains a sequence of frames with padding bit set to 0");
+        Skip_Flags(SoundInformation,  3,                        "Free format is used");
+    Skip_L2(                                                    "FrameSize");
+    Skip_L2(                                                    "AncillaryDataLength");
+    Info_L2(       AncillaryDataDef,                            "AncillaryDataDef");
+        Skip_Flags(AncillaryDataDef,  0,                        "Energy of left channel present");
+        Skip_Flags(AncillaryDataDef,  1,                        "A private byte is free for internal use");
+        Skip_Flags(AncillaryDataDef,  2,                        "Energy of right channel present ");
+    Skip_L4(                                                    "Reserved");
 }
 
 //---------------------------------------------------------------------------

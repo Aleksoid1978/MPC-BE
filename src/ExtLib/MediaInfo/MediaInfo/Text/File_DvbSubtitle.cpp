@@ -65,7 +65,7 @@ File_DvbSubtitle::File_DvbSubtitle()
     MustSynchronize=true;
 
     //In
-    Frame_Count_Valid=MediaInfoLib::Config.ParseSpeed_Get()>=0.3?32:2;
+    Frame_Count_Valid=0;
 
     //Temp
     MustFindDvbHeader=true;
@@ -155,6 +155,8 @@ bool File_DvbSubtitle::Synchronize()
 
     //Synched is OK
     Synched=true;
+    if (!Frame_Count_Valid)
+        Frame_Count_Valid=Config->ParseSpeed>=0.3?32:2;
     return true;
 }
 

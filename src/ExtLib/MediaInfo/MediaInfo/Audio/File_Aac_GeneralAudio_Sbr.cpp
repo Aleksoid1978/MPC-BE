@@ -23,6 +23,7 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Audio/File_Aac.h"
 #include "MediaInfo/Audio/File_Aac_GeneralAudio_Sbr.h"
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #include <cmath>
 #include <algorithm>
 #include <cstring>
@@ -371,7 +372,7 @@ void File_Aac::sbr_extension_data(size_t End, int8u id_aac, bool crc_flag)
         sbr_data(id_aac);
 
         FILLING_BEGIN();
-            if (MediaInfoLib::Config.ParseSpeed_Get()<0.3)
+            if (Config->ParseSpeed<0.3)
             {
                 Frame_Count_Valid=Frame_Count+1;
                 if (Frame_Count<8)

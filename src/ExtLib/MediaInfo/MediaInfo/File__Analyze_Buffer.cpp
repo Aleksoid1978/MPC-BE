@@ -1016,9 +1016,9 @@ void File__Analyze::Get_EB(int64u &Info, const char* Name)
     INTEGRITY_SIZE_ATLEAST_INT(1);
     if (Buffer[Buffer_Offset+(size_t)Element_Offset]==0xFF)
     {
-        Info=File_Size-(File_Offset+Buffer_Offset+Element_Offset);
         if (Trace_Activated) Param(Name, "Unlimited");
         Element_Offset++;
+        Info=Element_TotalSize_Get()-Element_Offset;
         return;
     }
     int8u Size=0;

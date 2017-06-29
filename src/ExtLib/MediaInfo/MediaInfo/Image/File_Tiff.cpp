@@ -53,7 +53,10 @@ namespace Tiff_Tag
     const int16u Compression                = 259;
     const int16u PhotometricInterpretation  = 262;
     const int16u ImageDescription           = 270;
+    const int16u StripOffsets               = 273;
     const int16u SamplesPerPixel            = 277;
+    const int16u RowsPerStrip               = 278;
+    const int16u StripByteCounts            = 279;
     const int16u ExtraSamples               = 338;
 }
 
@@ -68,7 +71,10 @@ static const char* Tiff_Tag_Name(int32u Tag)
         case Tiff_Tag::Compression                  : return "Compression";
         case Tiff_Tag::PhotometricInterpretation    : return "PhotometricInterpretation";
         case Tiff_Tag::ImageDescription             : return "ImageDescription";
+        case Tiff_Tag::StripOffsets                 : return "StripOffsets";
         case Tiff_Tag::SamplesPerPixel              : return "SamplesPerPixel";
+        case Tiff_Tag::RowsPerStrip                 : return "RowsPerStrip";
+        case Tiff_Tag::StripByteCounts              : return "StripByteCounts";
         case Tiff_Tag::ExtraSamples                 : return "ExtraSamples";
         default                                     : return "";
     }
@@ -78,6 +84,7 @@ static const char* Tiff_Tag_Name(int32u Tag)
 namespace Tiff_Type
 {
     const int16u Byte       = 1;
+    const int16u ASCII      = 2;
     const int16u Short      = 3;
     const int16u Long       = 4;
 }
@@ -88,6 +95,7 @@ static const char* Tiff_Type_Name(int32u Type)
     switch (Type)
     {
         case Tiff_Type::Byte                        : return "Byte";
+        case Tiff_Type::ASCII                       : return "ASCII";
         case Tiff_Type::Short                       : return "Short";
         case Tiff_Type::Long                        : return "Long";
         default                                     : return ""; //Unknown
@@ -100,6 +108,7 @@ static const int8u Tiff_Type_Size(int32u Type)
     switch (Type)
     {
         case Tiff_Type::Byte                        : return 1;
+        case Tiff_Type::ASCII                       : return 1;
         case Tiff_Type::Short                       : return 2;
         case Tiff_Type::Long                        : return 4;
         default                                     : return 0; //Unknown
@@ -218,13 +227,13 @@ bool File_Tiff::FileHeader_Begin()
 void File_Tiff::FileHeader_Parse()
 {
     //The only IFD that is known at forehand is the first one, it's offset is placed byte 4-7 in the file.
-    int32u IFDOffset;
+    int32u FirstIFDOffset;
     Skip_B4(                                                    "Magic");
-    Get_X4 (IFDOffset,                                          "IFDOffset");
+    Get_X4 (FirstIFDOffset,                                     "FirstIFDOffset");
 
     FILLING_BEGIN();
         //Initial IFD
-        GoTo(IFDOffset, "TIFF");
+        GoTo_IfNeeded(FirstIFDOffset);
     FILLING_END();
 }
 
@@ -242,7 +251,15 @@ void File_Tiff::Header_Parse()
             IfdItems.clear(); //There was a problem during the seek, trashing remaining positions from last IFD
         else
         {
-            Header_Fill_Code(IfdItems.begin()->second.Tag, Tiff_Tag_Name(IfdItems.begin()->second.Tag));
+            #ifdef MEDIAINFO_TRACE
+                const char* Name=Tiff_Tag_Name(IfdItems.begin()->second.Tag);
+                if (!Name[0]) //Unknown
+                    Header_Fill_Code(IfdItems.begin()->second.Tag, Ztring::ToZtring(IfdItems.begin()->second.Tag));
+                else
+                    Header_Fill_Code(IfdItems.begin()->second.Tag, Name);
+            #else //MEDIAINFO_TRACE
+                Header_Fill_Code(IfdItems.begin()->second.Tag);
+            #endif //MEDIAINFO_TRACE
             Header_Fill_Size(Tiff_Type_Size(IfdItems.begin()->second.Type)*IfdItems.begin()->second.Count);
             return;
         }
@@ -295,13 +312,13 @@ void File_Tiff::Data_Parse()
 
     //Some items are not inside the directory, jumping to the offset
     if (!IfdItems.empty())
-        GoTo(IfdItems.begin()->first, "TIFF");
+        GoTo_IfNeeded(IfdItems.begin()->first);
     else
     {
         //This IFD is finished, filling data then going to next IFD
         Data_Parse_Fill();
         if (IFDOffset)
-            GoTo(IFDOffset, "TIFF");
+            GoTo_IfNeeded(IFDOffset);
         else
         {
             Finish(); //No more IFDs
@@ -392,20 +409,22 @@ void File_Tiff::Read_Directory()
     Get_X2 (IfdItem.Tag,                                        "Tag"); Param_Info1(Tiff_Tag_Name(IfdItem.Tag));
     Get_X2 (IfdItem.Type,                                       "Type"); Param_Info1(Tiff_Type_Name(IfdItem.Type));
     Get_X4 (IfdItem.Count,                                      "Count");
-    Element_Name(Tiff_Tag_Name(IfdItem.Tag));
+    #ifdef MEDIAINFO_TRACE
+        const char* Name=Tiff_Tag_Name(IfdItem.Tag);
+        if (!Name[0]) //Unknown
+            Element_Name(Ztring::ToZtring(IfdItem.Tag));
+        else
+            Element_Name(Name);
+    #endif //MEDIAINFO_TRACE
 
-    if (Tiff_Type_Size(IfdItem.Type)*IfdItem.Count<=4)
+    int32u Size=Tiff_Type_Size(IfdItem.Type)*IfdItem.Count;
+    if (Size<=4)
     {
         GetValueOffsetu(IfdItem);
 
-        /* Padding up, skip dummy bytes */
-        if (Tiff_Type_Size(IfdItem.Type)==0)
-        {
-            if (Element_Offset+4<Element_Size)
-                Skip_XX(Element_Size-(Element_Offset+4),        "Unknown");
-        }
-        else if (Tiff_Type_Size(IfdItem.Type)*IfdItem.Count<4)
-            Skip_XX(Tiff_Type_Size(IfdItem.Type)*IfdItem.Count, "Padding");
+        //Padding up, skip dummy bytes
+        if (Size<4)
+            Skip_XX(4-Size,                                     "Padding");
     }
     else
     {
@@ -442,13 +461,11 @@ void File_Tiff::Get_X4(int32u &Info, const char* Name)
 void File_Tiff::GetValueOffsetu(ifditem &IfdItem)
 {
     ZtringList &Info=Infos[IfdItem.Tag]; Info.clear(); Info.Separator_Set(0, __T(" / "));
-    const char* Name=Tiff_Tag_Name(IfdItem.Tag);
 
-    if (IfdItem.Count>=10)
+    if (IfdItem.Type!=Tiff_Type::ASCII && IfdItem.Count>=1000)
     {
         //Too many data, we don't currently need it and we skip it
-        Skip_XX(Element_Size-(Element_Offset+4),                Name);
-        Info.clear();
+        Skip_XX(Tiff_Type_Size(IfdItem.Type)*IfdItem.Count,     "Data");
         return;
     }
 
@@ -459,10 +476,7 @@ void File_Tiff::GetValueOffsetu(ifditem &IfdItem)
                 {
                     int8u Ret8;
                     #if MEDIAINFO_TRACE
-                        if (LittleEndian)
-                            Get_L1 (Ret8,                       Name);
-                        else
-                            Get_B1 (Ret8,                       Name);
+                            Get_B1 (Ret8,                       "Data"); //L1 and B1 are same
                         Element_Info1(Ztring::ToZtring(Ret8));
                     #else //MEDIAINFO_TRACE
                         if (Element_Offset+1>Element_Size)
@@ -470,25 +484,28 @@ void File_Tiff::GetValueOffsetu(ifditem &IfdItem)
                             Trusted_IsNot();
                             break;
                         }
-                        if (LittleEndian)
-                            Ret8=LittleEndian2int8u(Buffer+Buffer_Offset+(size_t)Element_Offset);
-                        else
-                            Ret8=BigEndian2int8u(Buffer+Buffer_Offset+(size_t)Element_Offset);
+                        Ret8=BigEndian2int8u(Buffer+Buffer_Offset+(size_t)Element_Offset); //LittleEndian2int8u and BigEndian2int8u are same
                         Element_Offset++;
                     #endif //MEDIAINFO_TRACE
                     Info.push_back(Ztring::ToZtring(Ret8));
                 }
                 break;
-
+        case 2:                /* ASCII */
+                {
+                    string Data;
+                    Get_String(IfdItem.Count, Data,             "Data"); Element_Info1(Data.c_str()); //TODO: multiple strings separated by NULL
+                    Info.push_back(Ztring().From_UTF8(Data.c_str()));
+                }
+                break;
         case 3:                /* 16-bit (2-byte) unsigned integer. */
                 for (int16u Pos=0; Pos<IfdItem.Count; Pos++)
                 {
                     int16u Ret16;
                     #if MEDIAINFO_TRACE
                         if (LittleEndian)
-                            Get_L2 (Ret16,                      Name);
+                            Get_L2 (Ret16,                      "Data");
                         else
-                            Get_B2 (Ret16,                      Name);
+                            Get_B2 (Ret16,                      "Data");
                         switch (IfdItem.Tag)
                         {
                             case Tiff_Tag::Compression : Element_Info1(Tiff_Compression(Ret16)); break;
@@ -517,9 +534,9 @@ void File_Tiff::GetValueOffsetu(ifditem &IfdItem)
                     int32u Ret32;
                     #if MEDIAINFO_TRACE
                         if (LittleEndian)
-                            Get_L4 (Ret32,                      Name);
+                            Get_L4 (Ret32,                      "Data");
                         else
-                            Get_B4 (Ret32,                      Name);
+                            Get_B4 (Ret32,                      "Data");
                         Element_Info1(Ztring::ToZtring(Ret32));
                     #else //MEDIAINFO_TRACE
                         if (Element_Offset+4>Element_Size)
@@ -538,15 +555,19 @@ void File_Tiff::GetValueOffsetu(ifditem &IfdItem)
                 break;
 
         default:            //Unknown
-                {
-                    if (LittleEndian)
-                        Skip_L4(                                Name);
-                    else
-                        Skip_B4(                                Name);
-                    Info.clear(); //We actually do not know the type
-                }
+                Skip_XX(Tiff_Type_Size(IfdItem.Type)*IfdItem.Count, "Data");
     }
 }
+
+//---------------------------------------------------------------------------
+void File_Tiff::GoTo_IfNeeded(int64u GoTo_) //TODO: move that in a generic section, but tests showed regressions, for later (main difference is text trace, info part)
+{
+    if (File_Offset+Buffer_Offset+Element_Offset==GoTo_)
+        return; //Useless
+
+    GoTo(GoTo_);
+}
+
 
 } //NameSpace
 

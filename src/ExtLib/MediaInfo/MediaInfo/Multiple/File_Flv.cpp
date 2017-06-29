@@ -417,6 +417,9 @@ static const char* Flv_AACPacketType(int8u Value)
 File_Flv::File_Flv()
 :File__Analyze()
 {
+    //File__Tags_Helper
+    Base=this;
+
     //Configuration
     ParserName="FLV";
     #if MEDIAINFO_EVENTS
@@ -550,12 +553,12 @@ void File_Flv::Streams_Finish()
 
     if (Stream[Stream_Video].Parser!=NULL)
     {
-        Finish(Stream[Stream_Video].Parser);
+        File__Analyze::Finish(Stream[Stream_Video].Parser);
         Merge(*Stream[Stream_Video].Parser, Stream_Video, 0, 0);
     }
     if (Stream[Stream_Audio].Parser!=NULL)
     {
-        Finish(Stream[Stream_Audio].Parser);
+        File__Analyze::Finish(Stream[Stream_Audio].Parser);
         Merge(*Stream[Stream_Audio].Parser, Stream_Audio, 0, 0);
     }
 
@@ -593,17 +596,20 @@ void File_Flv::Streams_Finish_PerStream(stream_t StreamKind)
 //---------------------------------------------------------------------------
 bool File_Flv::FileHeader_Begin()
 {
-    //Synchro
-    if (3>Buffer_Size)
+    if (!File__Tags_Helper::FileHeader_Begin())
         return false;
-    if (Buffer[0]!=0x46 //"FLV"
-     || Buffer[1]!=0x4C
-     || Buffer[2]!=0x56)
+    
+    //Synchro
+    if (Buffer_Offset+3>Buffer_Size)
+        return false;
+    if (Buffer[Buffer_Offset+0]!=0x46 //"FLV"
+     || Buffer[Buffer_Offset+1]!=0x4C
+     || Buffer[Buffer_Offset+2]!=0x56)
     {
-        Reject();
+        File__Analyze::Reject();
         return false;
     }
-    if (9>Buffer_Size)
+    if (Buffer_Offset+9>Buffer_Size)
         return false;
 
     return true;
@@ -630,12 +636,12 @@ void File_Flv::FileHeader_Parse()
         //Integrity
         if (Version==0 || Size<9)
         {
-            Reject();
+            File__Analyze::Reject();
             return;
         }
 
         //Filling
-        Accept();
+        File__Analyze::Accept();
 
         Fill(Stream_General, 0, General_Format, "Flash Video");
         if (!video_stream_Count && !audio_stream_Count)
@@ -646,7 +652,7 @@ void File_Flv::FileHeader_Parse()
         }
         if (video_stream_Count)
         {
-            Stream_Prepare(Stream_Video);
+            File__Analyze::Stream_Prepare(Stream_Video);
             #if MEDIAINFO_DEMUX
                 if (Config->Demux_ForceIds_Get())
                     Fill(Stream_Video, 0, Video_ID, 9);
@@ -657,7 +663,7 @@ void File_Flv::FileHeader_Parse()
             video_stream_FrameRate_Detected=true;
         if (audio_stream_Count)
         {
-            Stream_Prepare(Stream_Audio);
+            File__Analyze::Stream_Prepare(Stream_Audio);
             #if MEDIAINFO_DEMUX
                 if (Config->Demux_ForceIds_Get())
                     Fill(Stream_Audio, 0, Audio_ID, 8);
@@ -666,11 +672,11 @@ void File_Flv::FileHeader_Parse()
 
         if (Version>1)
         {
-            Finish();
+            File__Analyze::Finish();
             return; //Version more than 1 is not supported
         }
     FILLING_ELSE()
-        Reject();
+        File__Analyze::Reject();
     FILLING_END();
 }
 
@@ -742,9 +748,9 @@ bool File_Flv::Synched_Test()
         if (Searching_Duration)
         {
             //Error during parsing, stopping
-            Finish();
+            File__Analyze::Finish();
             Searching_Duration=false;
-            GoTo(File_Size);
+            File__Analyze::GoTo(File_Size);
             return true;
         }
 
@@ -860,11 +866,11 @@ void File_Flv::Data_Parse()
                                 Open_Buffer_Unsynch(); //There is a problem, trying to sync
                                 PreviousTagSize=1024*1024;
                             }
-                            GoTo(File_Size-PreviousTagSize-8, "FLV");
+                            File__Analyze::GoTo(File_Size-PreviousTagSize-8, "FLV");
                             return;
         default : if (Searching_Duration)
                   {
-                    Finish(); //This is surely a bad en of file, don't try anymore
+                    File__Analyze::Finish(); //This is surely a bad en of file, don't try anymore
                     return;
                   }
 
@@ -875,26 +881,26 @@ void File_Flv::Data_Parse()
         if ((((Count_Get(Stream_Video)==0 || Stream[Stream_Video].TimeStamp!=(int32u)-1)
            && (Count_Get(Stream_Audio)==0 || Stream[Stream_Audio].TimeStamp!=(int32u)-1))
           || (File_Size>1024*1024*2 && File_Offset+Buffer_Offset-Header_Size-PreviousTagSize-4<File_Size-1024*1024))
-         && Config->ParseSpeed<1)
-            Finish();
+         && Config->ParseSpeed<1.0)
+            File__Analyze::Finish();
         else if (Element_Code==0xFA) //RM metadata have a malformed PreviousTagSize, always
         {
             //Trying to sync
             Searching_Duration=false;
             Open_Buffer_Unsynch(); //There is a problem, trying to sync
-            GoToFromEnd(Header_Size+Element_Size+1024*1024);
+            File__Analyze::GoToFromEnd(Header_Size+Element_Size+1024*1024);
             return;
         }
         else
-            GoTo(File_Offset+Buffer_Offset-Header_Size-PreviousTagSize-4);
+            File__Analyze::GoTo(File_Offset+Buffer_Offset-Header_Size-PreviousTagSize-4);
     }
-    else if (!Status[IsFilled] && !video_stream_Count && !audio_stream_Count && video_stream_FrameRate_Detected && File_Offset+1024*1024*2<File_Size && MediaInfoLib::Config.ParseSpeed_Get()<1) //All streams are parsed
+    else if (!Status[IsFilled] && !video_stream_Count && !audio_stream_Count && video_stream_FrameRate_Detected && File_Offset+1024*1024*2<File_Size && Config->ParseSpeed<1.0) //All streams are parsed
     {
         Fill();
 
         //Trying to find the last frame for duration
         Read_Buffer_Unsynched(); //This is not synched yet, so we call directly this method instead of Open_Buffer_Unsynched
-        GoToFromEnd(4, "FLV");
+        File__Analyze::GoToFromEnd(4, "FLV");
         Searching_Duration=true;
     }
 }
@@ -926,7 +932,7 @@ void File_Flv::video()
     }
 
     //Needed?
-    if (!video_stream_Count && Config->ParseSpeed<1)
+    if (!video_stream_Count && Config->ParseSpeed<1.0)
         return; //No more need of Video stream
 
     //Parsing
@@ -943,7 +949,7 @@ void File_Flv::video()
         if (Retrieve(Stream_Video, 0, Video_Format).empty())
         {
             if (Count_Get(Stream_Video)==0)
-                Stream_Prepare(Stream_Video);
+                File__Analyze::Stream_Prepare(Stream_Video);
             Fill(Stream_Video, 0, Video_Format, Flv_Format_Video[Codec]);
             Fill(Stream_Video, 0, Video_Format_Profile, Flv_Format_Profile_Video[Codec]);
             Fill(Stream_Video, 0, Video_Codec, Flv_Codec_Video[Codec]);
@@ -1252,7 +1258,7 @@ void File_Flv::audio()
     }
 
     //Needed?
-    if (!audio_stream_Count && Config->ParseSpeed<1)
+    if (!audio_stream_Count && Config->ParseSpeed<1.0)
         return; //No more need of Audio stream
 
     //Parsing
@@ -1284,7 +1290,7 @@ void File_Flv::audio()
         {
             //Filling
             if (Count_Get(Stream_Audio)==0)
-                Stream_Prepare(Stream_Audio);
+                File__Analyze::Stream_Prepare(Stream_Audio);
             Fill(Stream_Audio, 0, Audio_Channel_s_, Flv_Channels[is_stereo], 10, true);
             if (codec!=2 && codec!=10 && codec!=14) //MPEG Audio and AAC are not fixed bit depth
                 Fill(Stream_Audio, 0, Audio_BitDepth, Flv_Resolution[is_16bit], 10, true);
@@ -1508,6 +1514,11 @@ void File_Flv::meta_SCRIPTDATAVALUE(const std::string &StringData)
                         ValueS.From_Number(Value, 0);
                     Element_Info1(ValueS);
                 #endif //MEDIAINFO_TRACE
+                if (StreamKind==Stream_Video && ToFill=="FrameRate")
+                {
+                    if (Retrieve(Stream_Video, 0, Video_FrameRate).To_float32()<1000 && Value>=1000)
+                        ToFill.clear(); //Such incoherency was found in 1 file (e.g. 30 then 30000)
+                }
                 if (!ToFill.empty())
                 {
                     Fill(StreamKind, 0, ToFill.c_str(), ValueS, true);
@@ -1552,6 +1563,7 @@ void File_Flv::meta_SCRIPTDATAVALUE(const std::string &StringData)
                     else if (StringDataModified=="Encoded_With") {ToFill=General_Encoded_Application;}
                     else if (StringDataModified=="Encoded_By") {ToFill=General_Encoded_Application;}
                     else if (StringDataModified=="metadatacreator") {ToFill=General_Tagged_Application;}
+                    else if (StringDataModified=="title") {ToFill=General_Title;}
                     else if (StringDataModified=="creation_time") {ToFill=General_Encoded_Date; Value.insert(0, __T("UTC "));}
                     else if (StringDataModified=="sourcedata") {}
                     else if (StringDataModified=="audiocodecid") {}
@@ -1715,7 +1727,7 @@ void File_Flv::Rm()
     Open_Buffer_Continue(&MI);
 
     //Filling
-    Finish(&MI);
+    File__Analyze::Finish(&MI);
     Merge(MI, Stream_General, 0, 0);
 }
 

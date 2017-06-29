@@ -99,29 +99,27 @@ void File_Speex::Identification()
         Skip_L4(                                                "reserved2");
         if (header_size<Element_Size)
             Skip_XX(Element_Size-header_size,                   "Unknown");
-
-        //Filling
-        FILLING_BEGIN();
-            Accept("Speex");
-
-            Stream_Prepare(Stream_Audio);
-            Fill(Stream_Audio, 0, Audio_Format, "Speex");
-            Fill(Stream_Audio, 0, Audio_Codec, "Speex");
-            if (Speex_version_id==1)
-            {
-                if (!speex_version.empty())
-                    Fill(Stream_Audio, 0, Audio_Encoded_Library, speex_version);
-                Fill(Stream_Audio, 0, Audio_SamplingRate, rate);
-                Fill(Stream_Audio, 0, Audio_Channel_s_, nb_channels);
-                if (bitrate!=(int32u)-1)
-                    Fill(Stream_Audio, 0, Audio_BitRate, bitrate);
-                Fill(Stream_Audio, 0, Audio_BitRate_Mode, vbr?"VBR":"CBR");
-            }
-        FILLING_END();
     }
 
-    //Filling
-    Identification_Done=true;
+    FILLING_BEGIN();
+        Accept("Speex");
+
+        Stream_Prepare(Stream_Audio);
+        Fill(Stream_Audio, 0, Audio_Format, "Speex");
+        Fill(Stream_Audio, 0, Audio_Codec, "Speex");
+        if (Speex_version_id==1)
+        {
+            if (!speex_version.empty())
+                Fill(Stream_Audio, 0, Audio_Encoded_Library, speex_version);
+            Fill(Stream_Audio, 0, Audio_SamplingRate, rate);
+            Fill(Stream_Audio, 0, Audio_Channel_s_, nb_channels);
+            if (bitrate!=(int32u)-1)
+                Fill(Stream_Audio, 0, Audio_BitRate, bitrate);
+            Fill(Stream_Audio, 0, Audio_BitRate_Mode, vbr?"VBR":"CBR");
+        }
+
+        Identification_Done=true;
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------

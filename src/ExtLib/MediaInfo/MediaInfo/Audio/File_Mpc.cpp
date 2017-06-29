@@ -198,6 +198,7 @@ void File_Mpc::FileHeader_Parse()
         Fill(Stream_Audio, 0, Audio_Codec_Settings, Mpc_Profile[Profile]);
         Fill(Stream_Audio, 0, Audio_Encoded_Library, Encoder);
         Fill(Stream_Audio, 0, Audio_BitDepth, 16); //MPC support only 16 bits
+        Fill(Stream_Audio, 0, Audio_Channel_s_, 2); // MPC support only stereo
         Fill(Stream_Audio, 0, Audio_Duration, ((int64u)FrameCount)*1152*1000/Mpc_SampleFreq[SampleFreq]);
         if (FrameCount)
             Fill(Stream_Audio, 0, Audio_BitRate, (File_Size-25)*8*Mpc_SampleFreq[SampleFreq]/FrameCount/1152);

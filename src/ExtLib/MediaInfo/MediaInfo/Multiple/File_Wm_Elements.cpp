@@ -40,8 +40,8 @@
 #if defined(MEDIAINFO_MPEGA_YES)
     #include "MediaInfo/Audio/File_Mpega.h"
 #endif
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #if MEDIAINFO_DEMUX
-    #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
     #include "ThirdParty/base64/base64.h"
 #endif //MEDIAINFO_DEMUX
 #include "ZenLib/Utils.h"
@@ -1576,7 +1576,7 @@ void File_Wm::Data_Packet()
 
                 Open_Buffer_Continue(StreamItem.Parser, (size_t)PayloadLength);
                 if (StreamItem.Parser->Status[IsFinished]
-                 || (StreamItem.PresentationTimes.size()>=300 && MediaInfoLib::Config.ParseSpeed_Get()<1))
+                 || (StreamItem.PresentationTimes.size()>=300 && Config->ParseSpeed<1.0))
                 {
                     StreamItem.Parser->Open_Buffer_Unsynch();
                     StreamItem.SearchingPayload=false;
@@ -1603,7 +1603,7 @@ void File_Wm::Data_Packet()
         Skip_XX(Data_Parse_Padding,                             "Padding");
 
     //Jumping if needed
-    if (Streams_Count==0 || (Packet_Count>=1000 && MediaInfoLib::Config.ParseSpeed_Get()<1))
+    if (Streams_Count==0 || (Packet_Count>=1000 && Config->ParseSpeed<1.0))
     {
         Info("Data, Jumping to end of chunk");
         GoTo(Data_AfterTheDataChunk, "Windows Media");
