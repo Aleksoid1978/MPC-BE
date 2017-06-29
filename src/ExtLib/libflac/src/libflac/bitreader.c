@@ -119,20 +119,20 @@ static inline void crc16_update_word_(FLAC__BitReader *br, brword word)
 	register uint32_t crc = br->read_crc16;
 #if FLAC__BYTES_PER_WORD == 4
 	switch(br->crc16_align) {
-		case  0: crc = FLAC__CRC16_UPDATE((uint32_t)(word >> 24), crc);
-		case  8: crc = FLAC__CRC16_UPDATE((uint32_t)((word >> 16) & 0xff), crc);
-		case 16: crc = FLAC__CRC16_UPDATE((uint32_t)((word >> 8) & 0xff), crc);
-		case 24: br->read_crc16 = FLAC__CRC16_UPDATE((uint32_t)(word & 0xff), crc);
+		case  0: crc = FLAC__CRC16_UPDATE((uint32_t)(word >> 24), crc); /* Falls through. */
+		case  8: crc = FLAC__CRC16_UPDATE((uint32_t)((word >> 16) & 0xff), crc); /* Falls through. */
+		case 16: crc = FLAC__CRC16_UPDATE((uint32_t)((word >> 8) & 0xff), crc); /* Falls through. */
+		case 24: br->read_crc16 = FLAC__CRC16_UPDATE((uint32_t)(word & 0xff), crc); /* Falls through. */
 	}
 #elif FLAC__BYTES_PER_WORD == 8
 	switch(br->crc16_align) {
-		case  0: crc = FLAC__CRC16_UPDATE((uint32_t)(word >> 56), crc);
-		case  8: crc = FLAC__CRC16_UPDATE((uint32_t)((word >> 48) & 0xff), crc);
-		case 16: crc = FLAC__CRC16_UPDATE((uint32_t)((word >> 40) & 0xff), crc);
-		case 24: crc = FLAC__CRC16_UPDATE((uint32_t)((word >> 32) & 0xff), crc);
-		case 32: crc = FLAC__CRC16_UPDATE((uint32_t)((word >> 24) & 0xff), crc);
-		case 40: crc = FLAC__CRC16_UPDATE((uint32_t)((word >> 16) & 0xff), crc);
-		case 48: crc = FLAC__CRC16_UPDATE((uint32_t)((word >> 8) & 0xff), crc);
+		case  0: crc = FLAC__CRC16_UPDATE((uint32_t)(word >> 56), crc); /* Falls through. */
+		case  8: crc = FLAC__CRC16_UPDATE((uint32_t)((word >> 48) & 0xff), crc); /* Falls through. */
+		case 16: crc = FLAC__CRC16_UPDATE((uint32_t)((word >> 40) & 0xff), crc); /* Falls through. */
+		case 24: crc = FLAC__CRC16_UPDATE((uint32_t)((word >> 32) & 0xff), crc); /* Falls through. */
+		case 32: crc = FLAC__CRC16_UPDATE((uint32_t)((word >> 24) & 0xff), crc); /* Falls through. */
+		case 40: crc = FLAC__CRC16_UPDATE((uint32_t)((word >> 16) & 0xff), crc); /* Falls through. */
+		case 48: crc = FLAC__CRC16_UPDATE((uint32_t)((word >> 8) & 0xff), crc); /* Falls through. */
 		case 56: br->read_crc16 = FLAC__CRC16_UPDATE((uint32_t)(word & 0xff), crc);
 	}
 #else
