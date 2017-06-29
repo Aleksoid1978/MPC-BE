@@ -352,10 +352,10 @@ void BilinearInterpFloat(const cmsFloat32Number Input[],
     y0 = (int) _cmsQuickFloor(py); fy = py - (cmsFloat32Number) y0;
 
     X0 = p -> opta[1] * x0;
-    X1 = X0 + (Input[0] >= 1.0 ? 0 : p->opta[1]);
+    X1 = X0 + (fclamp(Input[0]) >= 1.0 ? 0 : p->opta[1]);
 
     Y0 = p -> opta[0] * y0;
-    Y1 = Y0 + (Input[1] >= 1.0 ? 0 : p->opta[0]);
+    Y1 = Y0 + (fclamp(Input[1]) >= 1.0 ? 0 : p->opta[0]);
 
     for (OutChan = 0; OutChan < TotalOut; OutChan++) {
 
@@ -469,13 +469,13 @@ void TrilinearInterpFloat(const cmsFloat32Number Input[],
     z0 = (int) _cmsQuickFloor(pz); fz = pz - (cmsFloat32Number) z0;
 
     X0 = p -> opta[2] * x0;
-    X1 = X0 + (Input[0] >= 1.0 ? 0 : p->opta[2]);
+    X1 = X0 + (fclamp(Input[0]) >= 1.0 ? 0 : p->opta[2]);
 
     Y0 = p -> opta[1] * y0;
-    Y1 = Y0 + (Input[1] >= 1.0 ? 0 : p->opta[1]);
+    Y1 = Y0 + (fclamp(Input[1]) >= 1.0 ? 0 : p->opta[1]);
 
     Z0 = p -> opta[0] * z0;
-    Z1 = Z0 + (Input[2] >= 1.0 ? 0 : p->opta[0]);
+    Z1 = Z0 + (fclamp(Input[2]) >= 1.0 ? 0 : p->opta[0]);
 
     for (OutChan = 0; OutChan < TotalOut; OutChan++) {
 
@@ -614,13 +614,13 @@ void TetrahedralInterpFloat(const cmsFloat32Number Input[],
 
 
     X0 = p -> opta[2] * x0;
-    X1 = X0 + (Input[0] >= 1.0 ? 0 : p->opta[2]);
+    X1 = X0 + (fclamp(Input[0]) >= 1.0 ? 0 : p->opta[2]);
 
     Y0 = p -> opta[1] * y0;
-    Y1 = Y0 + (Input[1] >= 1.0 ? 0 : p->opta[1]);
+    Y1 = Y0 + (fclamp(Input[1]) >= 1.0 ? 0 : p->opta[1]);
 
     Z0 = p -> opta[0] * z0;
-    Z1 = Z0 + (Input[2] >= 1.0 ? 0 : p->opta[0]);
+    Z1 = Z0 + (fclamp(Input[2]) >= 1.0 ? 0 : p->opta[0]);
 
     for (OutChan=0; OutChan < TotalOut; OutChan++) {
 
@@ -1028,7 +1028,7 @@ void Eval4InputsFloat(const cmsFloat32Number Input[],
        rest = pk - (cmsFloat32Number) k0;
 
        K0 = p -> opta[3] * k0;
-       K1 = K0 + (Input[0] >= 1.0 ? 0 : p->opta[3]);
+       K1 = K0 + (fclamp(Input[0]) >= 1.0 ? 0 : p->opta[3]);
 
        p1 = *p;
        memmove(&p1.Domain[0], &p ->Domain[1], 3*sizeof(cmsUInt32Number));
@@ -1115,7 +1115,7 @@ void Eval5InputsFloat(const cmsFloat32Number Input[],
        rest = pk - (cmsFloat32Number) k0;
 
        K0 = p -> opta[4] * k0;
-       K1 = K0 + (Input[0] >= 1.0 ? 0 : p->opta[4]);
+       K1 = K0 + (fclamp(Input[0]) >= 1.0 ? 0 : p->opta[4]);
 
        p1 = *p;
        memmove(&p1.Domain[0], &p ->Domain[1], 4*sizeof(cmsUInt32Number));
@@ -1202,7 +1202,7 @@ void Eval6InputsFloat(const cmsFloat32Number Input[],
        rest = pk - (cmsFloat32Number) k0;
 
        K0 = p -> opta[5] * k0;
-       K1 = K0 + (Input[0] >= 1.0 ? 0 : p->opta[5]);
+       K1 = K0 + (fclamp(Input[0]) >= 1.0 ? 0 : p->opta[5]);
 
        p1 = *p;
        memmove(&p1.Domain[0], &p ->Domain[1], 5*sizeof(cmsUInt32Number));
@@ -1287,7 +1287,7 @@ void Eval7InputsFloat(const cmsFloat32Number Input[],
        rest = pk - (cmsFloat32Number) k0;
 
        K0 = p -> opta[6] * k0;
-       K1 = K0 + (Input[0] >= 1.0 ? 0 : p->opta[6]);
+       K1 = K0 + (fclamp(Input[0]) >= 1.0 ? 0 : p->opta[6]);
 
        p1 = *p;
        memmove(&p1.Domain[0], &p ->Domain[1], 6*sizeof(cmsUInt32Number));
@@ -1372,7 +1372,7 @@ void Eval8InputsFloat(const cmsFloat32Number Input[],
        rest = pk - (cmsFloat32Number) k0;
 
        K0 = p -> opta[7] * k0;
-       K1 = K0 + (Input[0] >= 1.0 ? 0 : p->opta[7]);
+       K1 = K0 + (fclamp(Input[0]) >= 1.0 ? 0 : p->opta[7]);
 
        p1 = *p;
        memmove(&p1.Domain[0], &p ->Domain[1], 7*sizeof(cmsUInt32Number));

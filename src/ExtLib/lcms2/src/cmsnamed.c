@@ -695,7 +695,8 @@ void EvalNamedColorPCS(const cmsFloat32Number In[], cmsFloat32Number Out[], cons
     cmsUInt16Number index = (cmsUInt16Number) _cmsQuickSaturateWord(In[0] * 65535.0);
 
     if (index >= NamedColorList-> nColors) {
-        cmsSignalError(NamedColorList ->ContextID, cmsERROR_RANGE, "Color %d out of range; ignored", index);
+        cmsSignalError(NamedColorList ->ContextID, cmsERROR_RANGE, "Color %d out of range", index);
+        Out[0] = Out[1] = Out[2] = 0.0f;
     }
     else {
 
@@ -714,7 +715,10 @@ void EvalNamedColor(const cmsFloat32Number In[], cmsFloat32Number Out[], const c
     cmsUInt32Number j;
 
     if (index >= NamedColorList-> nColors) {
-        cmsSignalError(NamedColorList ->ContextID, cmsERROR_RANGE, "Color %d out of range; ignored", index);
+        cmsSignalError(NamedColorList ->ContextID, cmsERROR_RANGE, "Color %d out of range", index);
+        for (j = 0; j < NamedColorList->ColorantCount; j++)
+            Out[j] = 0.0f;
+
     }
     else {
         for (j=0; j < NamedColorList ->ColorantCount; j++)
