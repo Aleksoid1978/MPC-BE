@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2016 see Authors.txt
+ * (C) 2011-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -67,34 +67,66 @@ void HexDump(CString fileName, BYTE* buf, int size)
 	}
 }
 
+static const CString GetLogFileName()
+{
+	CString ret = L"mpc-be.log";
+
+	TCHAR szPath[MAX_PATH] = {};
+	if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_DESKTOP, NULL, 0, szPath))) {
+		ret = CString(szPath) + L"\\mpc-be.log";
+	}
+
+	return ret;
+}
+static const CString logFileName = GetLogFileName();
+
+static const CString GetLocalTime()
+{
+	SYSTEMTIME st;
+	::GetLocalTime(&st);
+
+	CString time;
+	time.Format(L"%04u.%02u.%02u %02u:%02u:%02u.%03u", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+
+	return time;
+}
+
 void Log2File(LPCTSTR fmt, ...)
 {
-	static CString fname;
-	if (fname.IsEmpty()) {
-		TCHAR szPath[MAX_PATH];
-		if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_DESKTOP, NULL, 0, szPath))) {
-			fname = CString(szPath) + L"\\mpc-be.log";
-		}
-	}
+	if (FILE* f = _tfopen(logFileName, L"at, ccs=UTF-8")) {
+		fseek(f, 0, SEEK_END);
 
-	va_list args;
-	va_start(args, fmt);
-	size_t len = _vsctprintf(fmt, args) + 1;
-	if (TCHAR* buff = DNew TCHAR[len]) {
-		_vstprintf(buff, len, fmt, args);
-		if (FILE* f = _tfopen(fname, L"at, ccs=UTF-8")) {
-			fseek(f, 0, SEEK_END);
-
-			SYSTEMTIME st;
-			::GetLocalTime(&st);
-
-			CString lt;
-			lt.Format(L"%04u.%02u.%02u %02u:%02u:%02u.%03u", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
-
-			_ftprintf_s(f, _T("%s : %s\n"), lt, buff);
-			fclose(f);
-		}
+		va_list args;
+		va_start(args, fmt);
+		size_t len = _vscwprintf(fmt, args) + 1;
+		TCHAR* buff = DNew TCHAR[len];
+		vswprintf_s(buff, len, fmt, args);
+		
+		fwprintf_s(f, L"%s : %s\n", GetLocalTime(), buff);
+		
 		delete [] buff;
+		va_end(args);
+
+		fclose(f);
 	}
-	va_end(args);
+}
+
+void Log2File(LPCSTR fmt, ...)
+{
+	if (FILE* f = _tfopen(logFileName, L"at, ccs=UTF-8")) {
+		fseek(f, 0, SEEK_END);
+
+		va_list args;
+		va_start(args, fmt);
+		size_t len = _vscprintf(fmt, args) + 1;
+		CHAR* buff = DNew CHAR[len];
+		vsprintf_s(buff, len, fmt, args);
+		
+		fwprintf_s(f, L"%s : %S\n", GetLocalTime(), buff);
+		
+		delete [] buff;
+		va_end(args);
+
+		fclose(f);
+	}
 }

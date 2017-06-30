@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2016 see Authors.txt
+ * (C) 2011-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,13 +20,26 @@
 
 #pragma once
 
-#ifdef _DEBUG
-#define DLog(...) DbgLogInfo(LOG_TRACE, 3, __VA_ARGS__)
-#define DLogError(...) DbgLogInfo(LOG_ERROR, 3, __VA_ARGS__)
-#else
-#define DLog(...) __noop
-#define DLogError(...) __noop
-#endif
-
 void HexDump(CString fName, BYTE* buf, int size);
 void Log2File(LPCTSTR fmt, ...);
+void Log2File(LPCSTR fmt, ...);
+
+//#define _DEBUG_LOGFILE // Allow output to the log file
+
+#ifndef DEBUG_OR_LOG
+	#if defined(_DEBUG_LOGFILE) || defined(_DEBUG)
+		#define DEBUG_OR_LOG
+	#endif
+#endif
+
+#ifdef _DEBUG_LOGFILE
+	#define DLog(...) Log2File(__VA_ARGS__)
+	#define DLogError(...) Log2File(__VA_ARGS__)
+#elif _DEBUG
+	#define DLog(...) DbgLogInfo(LOG_TRACE, 3, __VA_ARGS__)
+	#define DLogError(...) DbgLogInfo(LOG_ERROR, 3, __VA_ARGS__)
+#else
+	#define DLog(...) __noop
+	#define DLogError(...) __noop
+#endif
+
