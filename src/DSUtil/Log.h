@@ -97,7 +97,7 @@ namespace Logger
 	}
 }
 
-#define _DEBUG_LOGFILE // Allow output to the log file
+//#define _DEBUG_LOGFILE // Allow output to the log file
 
 #ifndef DEBUG_OR_LOG
 	#if defined(_DEBUG_LOGFILE) || defined(_DEBUG)
