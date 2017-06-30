@@ -1523,7 +1523,7 @@ static void Descriptor_56(CGolombBuffer& gb, int descriptor_length, LPSTR ISO_63
 		pos += section_len;
 	}
 
-#ifdef _DEBUG
+#ifdef DEBUG_OR_LOG
 	if (!tlxPages.empty()) {
 		DLog(L"ReadPMT() : found %Iu teletext pages", tlxPages.size());
 		for (auto& tlxPage : tlxPages) {

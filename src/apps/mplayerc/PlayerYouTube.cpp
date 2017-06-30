@@ -742,7 +742,7 @@ namespace Youtube
 			std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), CompareUrllistItem);
 			std::sort(audioList.begin(), audioList.end(), CompareUrllistItem);
 
-#ifdef _DEBUG
+#ifdef DEBUG_OR_LOG
 			DLog(L"Youtube::Parse_URL() : parsed video formats list:");
 			for (const auto& it : youtubeUrllist) {
 				DLog(L"    %-35s, \"%s\"", it.title, it.url);

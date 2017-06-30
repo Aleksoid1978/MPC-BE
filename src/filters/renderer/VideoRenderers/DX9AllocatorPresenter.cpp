@@ -1710,7 +1710,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::ResetDevice()
 	// 'CVMR9AllocatorPresenter::InitializeDevice' which calls 'AllocSurfaces'
 	if (FAILED(hr = CreateDevice(Error)) || FAILED(hr = AllocSurfaces())) {
 		// TODO: We should probably pause player
-#ifdef _DEBUG
+#ifdef DEBUG_OR_LOG
 		Error += GetWindowsErrorMessage(hr, NULL);
 		DLog(L"CDX9AllocatorPresenter::ResetDevice() - Error:\n%s", Error);
 #endif

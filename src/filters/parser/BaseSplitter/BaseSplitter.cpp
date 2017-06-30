@@ -334,7 +334,7 @@ HRESULT CBaseSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 	DWORD TrackNumber = p->TrackNumber;
 	BOOL bDiscontinuity = p->bDiscontinuity;
 
-#if defined(_DEBUG) && 0
+#if defined(DEBUG_OR_LOG) && 0
 	DLog(L"[%u]: d%d s%d p%d, b=%Iu, [%20I64d - %20I64d]",
 		  p->TrackNumber,
 		  p->bDiscontinuity, p->bSyncPoint, p->rtStart != INVALID_TIME && p->rtStart < 0,

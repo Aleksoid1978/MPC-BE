@@ -183,7 +183,7 @@ bool CMixer::Init()
 		}
 	}
 
-#ifdef _DEBUG
+#ifdef DEBUG_OR_LOG
 	CString matrix_str = L"CMixer::Init() : matrix";
 	double k = 0.0;
 	for (int j = 0; j < out_ch; j++) {

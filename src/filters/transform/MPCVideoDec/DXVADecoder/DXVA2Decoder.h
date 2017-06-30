@@ -24,7 +24,7 @@
 
 #define DBGLOG_LEVEL 0
 
-#if defined(_DEBUG) && DBGLOG_LEVEL > 0
+#if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL > 0
 	#define CHECK_HR_FALSE(x)	hr = ##x; if (FAILED(hr)) { DLog(L"DXVA Error : 0x%08x, %s : %i", hr, CString(__FILE__), __LINE__); return S_FALSE; }
 	#define CHECK_HR_FRAME(x)	hr = ##x; if (FAILED(hr)) { DLog(L"DXVA Error : 0x%08x, %s : %i", hr, CString(__FILE__), __LINE__); CHECK_HR_FALSE (EndFrame()); return S_FALSE; }
 #else

@@ -458,7 +458,7 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 
 		bool fTimeValid = p->rtStart != INVALID_TIME;
 
-#if defined(_DEBUG) && 0
+#if defined(DEBUG_OR_LOG) && 0
 		DLog(L"[%u]: d%d s%d p%d, b=%d, [%20I64d - %20I64d]",
 			  p->TrackNumber,
 			  p->bDiscontinuity, p->bSyncPoint, fTimeValid && p->rtStart < 0,
