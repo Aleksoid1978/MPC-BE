@@ -80,9 +80,6 @@
     <ClCompile Include="FileHandle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Log.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FileVersionInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

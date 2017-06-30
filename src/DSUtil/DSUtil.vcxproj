@@ -111,7 +111,6 @@
     <ClCompile Include="HdmvClipInfo.cpp" />
     <ClCompile Include="HTTPAsync.cpp" />
     <ClCompile Include="ID3Tag.cpp" />
-    <ClCompile Include="Log.cpp" />
     <ClCompile Include="MediaDescription.cpp" />
     <ClCompile Include="MediaTypeEx.cpp" />
     <ClCompile Include="MFCHelper.cpp" />
