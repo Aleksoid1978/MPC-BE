@@ -384,7 +384,7 @@ void  CSubtitleInputPin::DecodeSamples()
 
 		if (rtInvalidate >= 0) {
 #if (FALSE)
-			DbgLog((LOG_TRACE, 3, L"InvalidateSubtitle() : %I64d", rtInvalidate));
+			DLog(L"InvalidateSubtitle() : %I64d", rtInvalidate);
 #endif
 			// IMPORTANT: m_pSubLock must not be locked when calling this
 			InvalidateSubtitle(rtInvalidate, m_pSubStream);

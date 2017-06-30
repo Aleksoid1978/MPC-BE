@@ -213,7 +213,7 @@ void CVobSubImage::GetPacketInfo(const BYTE* lpData, int packetsize, int datasiz
 			}
 
 			if (i + len >= packetsize) {
-				TRACE(_T("Warning: Wrong subpicture parameter block ending\n"));
+				DLog(L"Warning: Wrong subpicture parameter block ending");
 				break;
 			}
 

@@ -99,7 +99,7 @@ CVideoDecDXVAAllocator::CVideoDecDXVAAllocator(CMPCVideoDecFilter* pVideoDecFilt
 
 CVideoDecDXVAAllocator::~CVideoDecDXVAAllocator()
 {
-	DbgLog((LOG_TRACE, 3, L"CVideoDecDXVAAllocator::~CVideoDecDXVAAllocator()"));
+	DLog(L"CVideoDecDXVAAllocator::~CVideoDecDXVAAllocator()");
 
 	if (m_pVideoDecFilter) {
 		m_pVideoDecFilter->FlushDXVADecoder();
@@ -155,7 +155,7 @@ HRESULT CVideoDecDXVAAllocator::Alloc()
 	}
 
 	if (FAILED(hr)) {
-		DbgLog((LOG_TRACE, 3, L"CVideoDecDXVAAllocator::Alloc() : IDirectXVideoDecoderService::CreateSurface() - FAILED (0x%08x)", hr));
+		DLog(L"CVideoDecDXVAAllocator::Alloc() : IDirectXVideoDecoderService::CreateSurface() - FAILED (0x%08x)", hr);
 	}
 
 	if (SUCCEEDED(hr)) {
@@ -187,7 +187,7 @@ HRESULT CVideoDecDXVAAllocator::Alloc()
 
 		hr = m_pVideoDecFilter->CreateDXVA2Decoder(m_lCount, m_ppRTSurfaceArray);
 		if (FAILED(hr)) {
-			DbgLog((LOG_TRACE, 3, L"CVideoDecDXVAAllocator::Alloc() : CMPCVideoDecFilter::CreateDXVA2Decoder() - FAILED (0x%08x)", hr));
+			DLog(L"CVideoDecDXVAAllocator::Alloc() : CMPCVideoDecFilter::CreateDXVA2Decoder() - FAILED (0x%08x)", hr);
 			Free();
 		}
 	}

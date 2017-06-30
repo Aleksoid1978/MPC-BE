@@ -395,7 +395,7 @@ bool Rasterizer::ScanConvert()
 	// Note that mWidth and mHeight are in 1/8 pixels.
 	if (m_pOutlineData->mWidth > MAX_DIMENSION * SUBPIXEL_MULTIPLIER
 			|| m_pOutlineData->mHeight > MAX_DIMENSION * SUBPIXEL_MULTIPLIER) {
-		TRACE(_T("Error in Rasterizer::ScanConvert: size (%dx%d) is too big\n"),
+		DLog(L"Error in Rasterizer::ScanConvert: size (%dx%d) is too big",
 			  m_pOutlineData->mWidth / SUBPIXEL_MULTIPLIER, m_pOutlineData->mHeight / SUBPIXEL_MULTIPLIER);
 		return false;
 	}
@@ -409,7 +409,7 @@ bool Rasterizer::ScanConvert()
 	mEdgeHeapSize = 2048;
 	mpEdgeBuffer = (Edge*)malloc(sizeof(Edge)*mEdgeHeapSize);
 	if (!mpEdgeBuffer) {
-		TRACE(_T("Error in Rasterizer::ScanConvert: mpEdgeBuffer is NULL\n"));
+		DLog(L"Error in Rasterizer::ScanConvert: mpEdgeBuffer is NULL");
 		return false;
 	}
 
@@ -417,7 +417,7 @@ bool Rasterizer::ScanConvert()
 
 	mpScanBuffer = DEBUG_NEW unsigned int[m_pOutlineData->mHeight];
 	if (!mpScanBuffer) {
-		TRACE(_T("Error in Rasterizer::ScanConvert: mpScanBuffer is NULL\n"));
+		DLog(L"Error in Rasterizer::ScanConvert: mpScanBuffer is NULL");
 		return false;
 	}
 	ZeroMemory(mpScanBuffer, m_pOutlineData->mHeight * sizeof(unsigned int));

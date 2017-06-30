@@ -222,7 +222,7 @@ STDMETHODIMP CSubPicQueue::Invalidate(REFERENCE_TIME rtInvalidate)
 	std::unique_lock<std::mutex> lock(m_mutexQueue);
 
 #if SUBPIC_TRACE_LEVEL > 0
-	TRACE(_T("Invalidate: %f\n"), double(rtInvalidate) / 10000000.0);
+	DLog(L"Invalidate: %f", double(rtInvalidate) / 10000000.0);
 #endif
 
 	m_bInvalidate = true;
@@ -242,7 +242,7 @@ STDMETHODIMP CSubPicQueue::Invalidate(REFERENCE_TIME rtInvalidate)
 		REFERENCE_TIME rtStart = pSubPic->GetStart();
 		REFERENCE_TIME rtStop = pSubPic->GetStop();
 		REFERENCE_TIME rtSegmentStop = pSubPic->GetSegmentStop();
-		TRACE(_T("  %f -> %f -> %f\n"), double(rtStart) / 10000000.0, double(rtStop) / 10000000.0, double(rtSegmentStop) / 10000000.0);
+		DLog(L"  %f -> %f -> %f", double(rtStart) / 10000000.0, double(rtStop) / 10000000.0, double(rtSegmentStop) / 10000000.0);
 #endif
 		m_queue.RemoveTailNoReturn();
 	}
@@ -285,12 +285,12 @@ STDMETHODIMP_(bool) CSubPicQueue::LookupSubPic(REFERENCE_TIME rtNow, bool bAdvis
 
 				if (rtStart <= rtNow && rtNow < rtStop) {
 #if SUBPIC_TRACE_LEVEL > 2
-					TRACE(_T("LookupSubPic: Exact match on the latest subpic\n"));
+					DLog(L"LookupSubPic: Exact match on the latest subpic");
 #endif
 					bStopSearch = true;
 				} else {
 #if SUBPIC_TRACE_LEVEL > 2
-					TRACE(_T("LookupSubPic: Possible match on the latest subpic\n"));
+					DLog(L"LookupSubPic: Possible match on the latest subpic");
 #endif
 				}
 			} else if (rtSegmentStop <= rtNow) {
@@ -306,7 +306,7 @@ STDMETHODIMP_(bool) CSubPicQueue::LookupSubPic(REFERENCE_TIME rtNow, bool bAdvis
 			std::unique_lock<std::mutex> lock(m_mutexQueue);
 
 #if SUBPIC_TRACE_LEVEL > 2
-			TRACE(_T("LookupSubPic: Searching the queue\n"));
+			DLog(L"LookupSubPic: Searching the queue");
 #endif
 
 			while (!m_queue.IsEmpty() && !bStopSearch) {
@@ -315,7 +315,7 @@ STDMETHODIMP_(bool) CSubPicQueue::LookupSubPic(REFERENCE_TIME rtNow, bool bAdvis
 
 				if (rtSegmentStart > rtNow) {
 #if SUBPIC_TRACE_LEVEL > 2
-					TRACE(_T("rtSegmentStart > rtNow, stopping the search\n"));
+					DLog(L"rtSegmentStart > rtNow, stopping the search");
 #endif
 					bStopSearch = true;
 				} else { // rtSegmentStart <= rtNow
@@ -326,14 +326,14 @@ STDMETHODIMP_(bool) CSubPicQueue::LookupSubPic(REFERENCE_TIME rtNow, bool bAdvis
 
 					if (rtSegmentStop <= rtNow) {
 #if SUBPIC_TRACE_LEVEL > 2
-						TRACE(_T("Removing old subpic (rtNow=%f): %f -> %f -> %f\n"),
+						DLog(L"Removing old subpic (rtNow=%f): %f -> %f -> %f",
 							  double(rtNow) / 10000000.0, double(rtStart) / 10000000.0,
 							  double(rtStop) / 10000000.0, double(rtSegmentStop) / 10000000.0);
 #endif
 					} else { // rtNow < rtSegmentStop
 						if (rtStart <= rtNow && rtNow < rtStop) {
 #if SUBPIC_TRACE_LEVEL > 2
-							TRACE(_T("Exact match found in the queue\n"));
+							DLog(L"Exact match found in the queue");
 #endif
 							ppSubPic = pSubPic;
 							bStopSearch = true;
@@ -408,13 +408,13 @@ STDMETHODIMP_(bool) CSubPicQueue::LookupSubPic(REFERENCE_TIME rtNow, bool bAdvis
 		REFERENCE_TIME rtSegmentStop = ppSubPic->GetSegmentStop();
 		CRect r;
 		ppSubPic->GetDirtyRect(&r);
-		TRACE(_T("Display at %f: %f -> %f -> %f (%dx%d)\n"),
+		DLog(L"Display at %f: %f -> %f -> %f (%dx%d)",
 			  double(rtNow) / 10000000.0, double(rtStart) / 10000000.0, double(rtStop) / 10000000.0, double(rtSegmentStop) / 10000000.0,
 			  r.Width(), r.Height());
 #endif
 	} else {
 #if SUBPIC_TRACE_LEVEL > 1
-		TRACE(_T("No subpicture to display at %f\n"), double(rtNow) / 10000000.0);
+		DLog(L"No subpicture to display at %f", double(rtNow) / 10000000.0);
 #endif
 	}
 
@@ -478,7 +478,7 @@ bool CSubPicQueue::EnqueueSubPic(CComPtr<ISubPic>& pSubPic, bool bBlocking)
 	if (canAddToQueue()) {
 		if (m_bInvalidate && pSubPic->GetStop() > m_rtInvalidate) {
 #if SUBPIC_TRACE_LEVEL > 1
-			TRACE(_T("Subtitle Renderer Thread: Dropping rendered subpic because of invalidation\n"));
+			DLog(L"Subtitle Renderer Thread: Dropping rendered subpic because of invalidation");
 #endif
 		} else {
 			m_queue.AddTail(pSubPic);
@@ -615,7 +615,7 @@ DWORD CSubPicQueue::ThreadProc()
 #if SUBPIC_TRACE_LEVEL > 1
 						CRect r;
 						pStatic->GetDirtyRect(&r);
-						TRACE(_T("Subtitle Renderer Thread: Render %f -> %f -> %f -> %f (%dx%d)\n"),
+						DLog(L"Subtitle Renderer Thread: Render %f -> %f -> %f -> %f (%dx%d)",
 							  double(rtStart) / 10000000.0, double(pStatic->GetStart()) / 10000000.0,
 							  double(pStatic->GetStop()) / 10000000.0, double(rtStop) / 10000000.0,
 							  r.Width(), r.Height());
@@ -641,7 +641,7 @@ DWORD CSubPicQueue::ThreadProc()
 
 						if (m_rtNow > rtCurrent) {
 #if SUBPIC_TRACE_LEVEL > 0
-							TRACE(_T("Subtitle Renderer Thread: the queue is late, trying to catch up...\n"));
+							DLog(L"Subtitle Renderer Thread: the queue is late, trying to catch up...");
 #endif
 							rtCurrent = m_rtNow;
 						}
@@ -652,7 +652,7 @@ DWORD CSubPicQueue::ThreadProc()
 					}
 				} else {
 #if SUBPIC_TRACE_LEVEL > 0
-					TRACE(_T("Subtitle Renderer Thread: the queue is late, trying to catch up...\n"));
+					DLog(L"Subtitle Renderer Thread: the queue is late, trying to catch up...");
 #endif
 				}
 			}
