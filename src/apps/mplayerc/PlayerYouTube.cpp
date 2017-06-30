@@ -327,6 +327,8 @@ namespace Youtube
 	bool Parse_URL(CString url, CAtlList<CString>& urls, YoutubeFields& y_fields, YoutubeUrllist& youtubeUrllist, CSubtitleItemList& subs, REFERENCE_TIME& rtStart)
 	{
 		if (CheckURL(url)) {
+			DLog(L"Youtube::Parse_URL() : \"%s\"", url);
+
 			char* data = NULL;
 			DWORD dataSize = 0;
 
@@ -481,7 +483,7 @@ namespace Youtube
 					item.profile = profile;
 					item.url = url;
 					item.title.Format(L"%s %dp",
-						profile->format == 1 ? L"WebM" : L"MP4",
+						profile->format == y_webm ? L"WebM" : L"MP4",
 						profile->quality);
 					if (profile->type == y_video) {
 						item.title.Append(L" dash");
@@ -500,6 +502,9 @@ namespace Youtube
 					YoutubeUrllistItem item;
 					item.profile = audioprofile;
 					item.url = url;
+					item.title.Format(L"%s %dkbit/s",
+						audioprofile->format == y_webm ? L"WebM/Opus" : L"MP4/AAC",
+						audioprofile->quality);
 
 					audioUrls.emplace_back(item);
 				}
@@ -737,6 +742,20 @@ namespace Youtube
 			std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), CompareUrllistItem);
 			std::sort(audioList.begin(), audioList.end(), CompareUrllistItem);
 
+#ifdef _DEBUG
+			DLog(L"Youtube::Parse_URL() : parsed video formats list:");
+			for (const auto& it : youtubeUrllist) {
+				DLog(L"    %-35s, \"%s\"", it.title, it.url);
+			}
+
+			if (!audioList.empty()) {
+				DLog(L"Youtube::Parse_URL() : parsed audio formats list:");
+				for (const auto& it : audioList) {
+					DLog(L"    %-35s, \"%s\"", it.title, it.url);
+				}
+			}
+#endif
+
 			const CAppSettings& s = AfxGetAppSettings();
 
 			// select video stream
@@ -789,6 +808,8 @@ namespace Youtube
 				}
 			}
 
+			DLog(L"Youtube::Parse_URL() : output video format - %s, \"%s\"", final_item->title, final_item->url);
+
 			CString final_video_url = final_item->url;
 			const YoutubeProfile* final_video_profile = final_item->profile;
 
@@ -809,6 +830,8 @@ namespace Youtube
 				}
 
 				final_audio_url = final_item->url;
+
+				DLog(L"Youtube::Parse_URL() : output audio format - %s, \"%s\"", final_item->title, final_item->url);
 			}
 
 			if (!final_audio_url.IsEmpty()) {
