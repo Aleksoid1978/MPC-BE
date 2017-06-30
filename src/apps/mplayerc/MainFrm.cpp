@@ -534,7 +534,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_WTSSESSION_CHANGE()
 END_MESSAGE_MAP()
 
-#ifdef _DEBUG
+#ifdef DEBUG_OR_LOG
 const WCHAR* GetEventString(LONG evCode)
 {
 #define UNPACK_VALUE(VALUE) case VALUE: return L#VALUE;
@@ -2880,7 +2880,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 	LONG evCode = 0;
 	LONG_PTR evParam1, evParam2;
 	while (m_pME && SUCCEEDED(m_pME->GetEvent(&evCode, &evParam1, &evParam2, 0))) {
-#ifdef _DEBUG
+#ifdef DEBUG_OR_LOG
 		DLog(L"--> CMainFrame::OnGraphNotify on thread: %d; event: 0x%08x (%s)", GetCurrentThreadId(), evCode, GetEventString(evCode));
 #endif
 		CString str;
@@ -13306,7 +13306,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 
 void __stdcall MadVRExclusiveModeCallback(LPVOID context, int event)
 {
-#ifdef _DEBUG
+#ifdef DEBUG_OR_LOG
 	CString _event;
 	switch (event) {
 		case ExclusiveModeIsAboutToBeEntered : _event = L"ExclusiveModeIsAboutToBeEntered"; break;

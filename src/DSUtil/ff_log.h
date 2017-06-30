@@ -27,7 +27,7 @@ extern "C" {
 #define LOG_BUF_LEN 2048
 inline void ff_log(void* ptr, int level, const char *fmt, va_list valist)
 {
-#ifdef _DEBUG
+#ifdef DEBUG_OR_LOG
 	if (level <= AV_LOG_VERBOSE) {
 		static int print_prefix = 1;
 		static char line[LOG_BUF_LEN] = {};
@@ -39,7 +39,7 @@ inline void ff_log(void* ptr, int level, const char *fmt, va_list valist)
 			line[len - 1] = 0;
 		}
 
-		DbgLog((LOG_TRACE, 3, L"FF_LOG : %S", line));
+		DLog(L"FF_LOG : %S", line);
 	}
 #endif
 }

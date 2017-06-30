@@ -641,7 +641,7 @@ POSITION CFGFilterList::GetHeadPosition()
 				m_sortedfilters.AddTail(sort[i].pFGF);
 			}
 		}
-#ifdef _DEBUG
+#ifdef DEBUG_OR_LOG
 		DLog(L"FGM: Sorting filters");
 
 		pos = m_sortedfilters.GetHeadPosition();

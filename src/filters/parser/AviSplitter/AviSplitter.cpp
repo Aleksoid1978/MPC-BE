@@ -792,7 +792,7 @@ bool CAviSplitterFilter::DemuxLoop()
 			if (S_OK != (hr = m_pFile->ByteRead(p->GetData(), p->GetCount()))) {
 				return true;
 			}
-#if defined(_DEBUG) && 0
+#if defined(DEBUG_OR_LOG) && 0
 			DLog(L"%d (%d): %I64d - %I64d, %I64d - %I64d (size = %u)",
 					curTrack, (int)p->bSyncPoint,
 					(p->rtStart) / 10000, (p->rtStop) / 10000,

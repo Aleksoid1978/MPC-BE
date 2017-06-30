@@ -936,7 +936,7 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 		}
 	}
 
-#ifdef _DEBUG
+#ifdef DEBUG_OR_LOG
 	CString dbgmsg = L"EVR: Valid mixer output types:";
 	for (size_t i = 0; i < ValidMixerTypes.GetCount(); ++i) {
 		dbgmsg.AppendFormat(L"\n - %s", GetMediaTypeFormatDesc(ValidMixerTypes[i]));
