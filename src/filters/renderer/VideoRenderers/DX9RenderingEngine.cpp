@@ -651,7 +651,7 @@ BOOL CDX9RenderingEngine::InitializeDXVA2VP(int width, int height)
 		// Create DXVA2 Video Processor Service.
 		hr = pDXVA2CreateVideoService(m_pD3DDevEx, IID_IDirectXVideoProcessorService, (VOID**)&m_pDXVAVPS);
 		if (FAILED(hr)) {
-			TRACE("DXVA2CreateVideoService failed with error 0x%x.\n", hr);
+			DLog(L"DXVA2CreateVideoService failed with error 0x%x.", hr);
 			return FALSE;
 		}
 
@@ -677,7 +677,7 @@ BOOL CDX9RenderingEngine::InitializeDXVA2VP(int width, int height)
 	}
 
 	if (!m_pDXVAVPD) {
-		TRACE("Failed to create a DXVA2 device.\n");
+		DLog(L"Failed to create a DXVA2 device.");
 		return FALSE;
 	}
 
@@ -697,7 +697,7 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 	D3DFORMAT* formats = NULL;
 	hr = m_pDXVAVPS->GetVideoProcessorRenderTargets(guid, &m_VideoDesc, &count, &formats);
 	if (FAILED(hr)) {
-		TRACE("GetVideoProcessorRenderTargets failed with error 0x%x.\n", hr);
+		DLog(L"GetVideoProcessorRenderTargets failed with error 0x%x.", hr);
 		return FALSE;
 	}
 	for (i = 0; i < count; i++) {
@@ -707,33 +707,33 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 	}
 	CoTaskMemFree(formats);
 	if (i >= count) {
-		TRACE("GetVideoProcessorRenderTargets doesn't support that format.\n");
+		DLog(L"GetVideoProcessorRenderTargets doesn't support that format.");
 		return FALSE;
 	}
 
 	// Query video processor capabilities.
 	hr = m_pDXVAVPS->GetVideoProcessorCaps(guid, &m_VideoDesc, m_BackbufferFmt, &m_VPCaps);
 	if (FAILED(hr)) {
-		TRACE("GetVideoProcessorCaps failed with error 0x%x.\n", hr);
+		DLog(L"GetVideoProcessorCaps failed with error 0x%x.", hr);
 		return FALSE;
 	}
 
 	// Check to see if the device is hardware device.
 	if (!(m_VPCaps.DeviceCaps & DXVA2_VPDev_HardwareDevice)) {
-		TRACE("The DXVA2 device isn't a hardware device.\n");
+		DLog(L"The DXVA2 device isn't a hardware device.");
 		return FALSE;
 	}
 
 	// This is a progressive device and we cannot provide any reference sample.
 	if (m_VPCaps.NumForwardRefSamples > 0 || m_VPCaps.NumBackwardRefSamples > 0) {
-		TRACE("NumForwardRefSamples or NumBackwardRefSamples is greater than 0.\n");
+		DLog(L"NumForwardRefSamples or NumBackwardRefSamples is greater than 0.");
 		return FALSE;
 	}
 
 	// Check to see if the device supports all the VP operations we want.
 	const UINT VIDEO_REQUIED_OP = DXVA2_VideoProcess_StretchX | DXVA2_VideoProcess_StretchY;
 	if ((m_VPCaps.VideoProcessorOperations & VIDEO_REQUIED_OP) != VIDEO_REQUIED_OP) {
-		TRACE("The DXVA2 device doesn't support the VP operations.\n");
+		DLog(L"The DXVA2 device doesn't support the VP operations.");
 		return FALSE;
 	}
 
@@ -747,7 +747,7 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 											 1 << i,
 											 &range);
 			if (FAILED(hr)) {
-				TRACE("GetProcAmpRange failed with error 0x%x.\n", hr);
+				DLog(L"GetProcAmpRange failed with error 0x%x.", hr);
 				return FALSE;
 			}
 			// Set to default value
@@ -764,7 +764,7 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 													DXVA2_NoiseFilterLumaLevel + i,
 													&range);
 			if (FAILED(hr)) {
-				TRACE("GetFilterPropertyRange(Noise) failed with error 0x%x.\n", hr);
+				DLog(L"GetFilterPropertyRange(Noise) failed with error 0x%x.", hr);
 				return FALSE;
 			}
 			// Set to default value
@@ -781,7 +781,7 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 													DXVA2_DetailFilterLumaLevel + i,
 													&range);
 			if (FAILED(hr)) {
-				TRACE("GetFilterPropertyRange(Detail) failed with error 0x%x.\n", hr);
+				DLog(L"GetFilterPropertyRange(Detail) failed with error 0x%x.", hr);
 				return FALSE;
 			}
 			// Set to default value
@@ -792,7 +792,7 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 	// Finally create a video processor device.
 	hr = m_pDXVAVPS->CreateVideoProcessor(guid, &m_VideoDesc, m_BackbufferFmt, 0, &m_pDXVAVPD);
 	if (FAILED(hr)) {
-		TRACE("CreateVideoProcessor failed with error 0x%x.\n", hr);
+		DLog(L"CreateVideoProcessor failed with error 0x%x.", hr);
 		return FALSE;
 	}
 
@@ -909,7 +909,7 @@ HRESULT CDX9RenderingEngine::TextureResizeDXVA(IDirect3DTexture9* pTexture, cons
 
 	hr = m_pDXVAVPD->VideoProcessBlt(pRenderTarget, &blt, samples, 1, NULL);
 	if (FAILED(hr)) {
-		TRACE("VideoProcessBlt failed with error 0x%x.\n", hr);
+		DLog(L"VideoProcessBlt failed with error 0x%x.", hr);
 	}
 
 	return S_OK;

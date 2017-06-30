@@ -211,11 +211,11 @@ bool CFormatConverter::Init()
 	Cleanup();
 
 	if (m_FProps.avpixfmt == AV_PIX_FMT_NONE) {
-		DbgLog((LOG_TRACE, 3, L"FormatConverter::Init() - incorrect source format"));
+		DLog(L"FormatConverter::Init() - incorrect source format");
 		return false;
 	}
 	if (m_out_pixfmt == PixFmt_None) {
-		DbgLog((LOG_TRACE, 3, L"FormatConverter::Init() - incorrect output format"));
+		DLog(L"FormatConverter::Init() - incorrect output format");
 		return false;
 	}
 
@@ -235,7 +235,7 @@ bool CFormatConverter::Init()
 						NULL);
 
 	if (m_pSwsContext == NULL) {
-		DbgLog((LOG_TRACE, 3, L"FormatConverter::Init() - sws_getCachedContext() failed"));
+		DLog(L"FormatConverter::Init() - sws_getCachedContext() failed");
 		return false;
 	}
 
@@ -420,7 +420,7 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		m_FProps.colorrange = pFrame->color_range;
 
 		if (!Init()) {
-			DbgLog((LOG_TRACE, 3, L"CFormatConverter::Converting() - Init() failed"));
+			DLog(L"CFormatConverter::Converting() - Init() failed");
 			return 0;
 		}
 

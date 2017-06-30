@@ -423,7 +423,7 @@ bool CVobSubFile::ReadIdx(CString fn, int& ver)
 			int i = str.Find(buff);
 			if (i < 0 || _stscanf_s(&s[i+_tcslen(buff)], _T("%d"), &ver) != 1
 					|| ver > VOBSUBIDXVER) {
-				TRACE(_T("[CVobSubFile::ReadIdx] Wrong file version!\n"));
+				DLog(L"[CVobSubFile::ReadIdx] Wrong file version!");
 				fError = true;
 				continue;
 			}
@@ -2435,9 +2435,9 @@ void CVobSubStream::Add(REFERENCE_TIME tStart, REFERENCE_TIME tStop, BYTE* pData
 	// We can only render one subpicture at a time, thus if there is overlap
 	// we have to fix it. tStop = tStart seems to work.
 	if (m_subpics.GetCount() && m_subpics.GetTail()->tStop > p->tStart) {
-		TRACE(_T("[CVobSubStream::Add] Vobsub timestamp overlap detected! ")
-	          _T("Subpicture #%d, StopTime %I64d > %I64d (Next StartTime), making them equal!\n"),
-	          m_subpics.GetCount(), m_subpics.GetTail()->tStop, p->tStart);
+		DLog(L"[CVobSubStream::Add] Vobsub timestamp overlap detected!"
+			 L"Subpicture #%d, StopTime %I64d > %I64d (Next StartTime), making them equal!",
+			 m_subpics.GetCount(), m_subpics.GetTail()->tStop, p->tStart);
 		m_subpics.GetTail()->tStop = p->tStart;
 	}
 

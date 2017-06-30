@@ -1017,7 +1017,7 @@ bool CDX9AllocatorPresenter::GetVBlank(int &_ScanLine, int &_bInVBlank, bool _bM
 	if (_bMeasureTime) {
 		LONGLONG Time = GetPerfCounter() - llPerf;
 		if (Time > 5000000) { // 0.5 sec
-			TRACE("GetVBlank too long (%f sec)\n", Time / 10000000.0);
+			DLog(L"GetVBlank too long (%f sec)", Time / 10000000.0);
 		}
 		m_RasterStatusWaitTimeMaxCalc = max(m_RasterStatusWaitTimeMaxCalc, Time);
 	}

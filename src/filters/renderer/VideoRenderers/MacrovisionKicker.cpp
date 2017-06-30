@@ -62,7 +62,7 @@ STDMETHODIMP CMacrovisionKicker::Set(REFGUID PropSet, ULONG Id, LPVOID pInstance
 	if (CComQIPtr<IKsPropertySet> pKsPS = m_pInner) {
 		if (PropSet == AM_KSPROPSETID_CopyProt && Id == AM_PROPERTY_COPY_MACROVISION
 				/*&& DataLength == 4 && *(DWORD*)pPropertyData*/) {
-			TRACE(L"Oops, no-no-no, no macrovision please\n");
+			DLog(L"Oops, no-no-no, no macrovision please");
 			return S_OK;
 		}
 
