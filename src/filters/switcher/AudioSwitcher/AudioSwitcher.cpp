@@ -294,6 +294,26 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		audio_samples    = m_AudioNormalizer.Process((float*)audio_data, audio_samples, audio_channels);
 		audio_allsamples = audio_samples * audio_channels;
 	}
+	// Gain (works in place)
+	else if (m_fGainFactor != 1.0f) {
+		switch (audio_sampleformat) {
+		case SAMPLE_FMT_U8:
+			gain_uint8(m_fGainFactor, audio_allsamples, (uint8_t*)pDataOut);
+			break;
+		case SAMPLE_FMT_S16:
+			gain_int16(m_fGainFactor, audio_allsamples, (int16_t*)pDataOut);
+			break;
+		case SAMPLE_FMT_S24:
+			gain_int24(m_fGainFactor, audio_allsamples, pDataOut);
+			break;
+		case SAMPLE_FMT_S32:
+			gain_int32(m_fGainFactor, audio_allsamples, (int32_t*)pDataOut);
+			break;
+		case SAMPLE_FMT_FLT:
+			gain_float(m_fGainFactor, audio_allsamples, (float*)pDataOut);
+			break;
+		}
+	}
 
 	// Copy or convert to output
 	if (audio_data != pDataOut && audio_samples > output_samplesize) {
@@ -315,27 +335,6 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 			break;
 		}
 		audio_sampleformat = output_sampleformat;
-	}
-
-	// Gain
-	if (!m_bAutoVolumeControl && m_fGainFactor != 1.0f) {
-		switch (audio_sampleformat) {
-		case SAMPLE_FMT_U8:
-			gain_uint8(m_fGainFactor, audio_allsamples, (uint8_t*)pDataOut);
-			break;
-		case SAMPLE_FMT_S16:
-			gain_int16(m_fGainFactor, audio_allsamples, (int16_t*)pDataOut);
-			break;
-		case SAMPLE_FMT_S24:
-			gain_int24(m_fGainFactor, audio_allsamples, pDataOut);
-			break;
-		case SAMPLE_FMT_S32:
-			gain_int32(m_fGainFactor, audio_allsamples, (int32_t*)pDataOut);
-			break;
-		case SAMPLE_FMT_FLT:
-			gain_float(m_fGainFactor, audio_allsamples, (float*)pDataOut);
-			break;
-		}
 	}
 
 	pOut->SetActualDataLength(audio_allsamples * get_bytes_per_sample(audio_sampleformat));
