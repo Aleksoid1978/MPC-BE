@@ -29,15 +29,7 @@
 #include "../../DSUtil/FileHandle.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/WinAPIUtils.h"
-
-enum {
-	SPK_MONO = 0,
-	SPK_STEREO,
-	SPK_4_0,
-	SPK_5_0,
-	SPK_5_1,
-	SPK_7_1
-};
+#include "../../filters/switcher/AudioSwitcher/IAudioSwitcherFilter.h"
 
 const LPCWSTR channel_mode_sets[] = {
 	//         ID          Name
@@ -772,6 +764,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	bAudioNormBoost			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, TRUE);
 	iAudioNormLevel			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, 75);
 	iAudioNormRealeaseTime	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMREALEASETIME, 8);
+	iAudioSampleFormats		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOSAMPLEFORMATS, SFMT_MASK) & SFMT_MASK;
 
 	{
 		m_filters.RemoveAll();
@@ -1286,6 +1279,7 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, bAudioNormBoost);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, iAudioNormLevel);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMREALEASETIME, iAudioNormRealeaseTime);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOSAMPLEFORMATS, iAudioSampleFormats);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEAUDIOTIMESHIFT, bAudioTimeShift);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift);
 
