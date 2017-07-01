@@ -354,10 +354,6 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	memset(&m_bBitstreamSupported, FALSE, sizeof(m_bBitstreamSupported));
 
 	// default settings
-	m_fSampleFmt[SF_PCM16] = true;
-	m_fSampleFmt[SF_PCM24] = false;
-	m_fSampleFmt[SF_PCM32] = false;
-	m_fSampleFmt[SF_FLOAT] = false;
 	m_fDRC                 = false;
 	m_fSPDIF[ac3]          = false;
 	m_fSPDIF[eac3]         = false;
@@ -369,6 +365,11 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	// read settings
 	CString layout_str;
 #ifdef REGISTER_FILTER
+	m_fSampleFmt[SF_PCM16] = true;
+	m_fSampleFmt[SF_PCM24] = false;
+	m_fSampleFmt[SF_PCM32] = false;
+	m_fSampleFmt[SF_FLOAT] = false;
+
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_MpaDec, KEY_READ)) {
 		DWORD dw;
@@ -406,11 +407,11 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 			m_fSPDIF[ac3enc] = !!dw;
 		}
 	}
+
+	if (!(m_fSampleFmt[SF_PCM16] || m_fSampleFmt[SF_PCM24] || m_fSampleFmt[SF_PCM32] || m_fSampleFmt[SF_FLOAT])) {
+		m_fSampleFmt[SF_PCM16] = true;
+	}
 #else
-	m_fSampleFmt[SF_PCM16] = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SFormat_i16, m_fSampleFmt[SF_PCM16]);
-	m_fSampleFmt[SF_PCM24] = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SFormat_i24, m_fSampleFmt[SF_PCM24]);
-	m_fSampleFmt[SF_PCM32] = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SFormat_i32, m_fSampleFmt[SF_PCM32]);
-	m_fSampleFmt[SF_FLOAT] = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SFormat_flt, m_fSampleFmt[SF_FLOAT]);
 	m_fDRC                 = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_DRC, m_fDRC);
 	m_fSPDIF[ac3]          = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3, m_fSPDIF[ac3]);
 	m_fSPDIF[eac3]         = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_eac3, m_fSPDIF[eac3]);
@@ -419,10 +420,6 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_fSPDIF[dtshd]        = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dtshd, m_fSPDIF[dtshd]);
 	m_fSPDIF[ac3enc]       = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3enc, m_fSPDIF[ac3enc]);
 #endif
-
-	if (!(m_fSampleFmt[SF_PCM16] || m_fSampleFmt[SF_PCM24] || m_fSampleFmt[SF_PCM32] || m_fSampleFmt[SF_FLOAT])) {
-		m_fSampleFmt[SF_PCM16] = true;
-	}
 }
 
 CMpaDecFilter::~CMpaDecFilter()
@@ -1959,6 +1956,8 @@ void CMpaDecFilter::CalculateDuration(int samples, int sample_rate, REFERENCE_TI
 	}
 }
 
+#ifdef REGISTER_FILTER
+
 const MPCSampleFormat SFmtPrority[sfcount][sfcount] = {
 	{ SF_PCM16, SF_PCM32, SF_PCM24, SF_FLOAT }, // int16
 	{ SF_PCM24, SF_PCM32, SF_FLOAT, SF_PCM16 }, // int24
@@ -1980,6 +1979,19 @@ MPCSampleFormat CMpaDecFilter::SelectOutputFormat(MPCSampleFormat mpcsf)
 
 	return SF_PCM16;
 }
+
+#else
+
+MPCSampleFormat CMpaDecFilter::SelectOutputFormat(MPCSampleFormat mpcsf)
+{
+	if (mpcsf >= 0 && mpcsf < sfcount) {
+		return mpcsf;
+	}
+
+	return SF_PCM16;
+}
+
+#endif
 
 HRESULT CMpaDecFilter::CheckInputType(const CMediaType* mtIn)
 {
@@ -2162,6 +2174,8 @@ HRESULT CMpaDecFilter::BreakConnect(PIN_DIRECTION dir)
 
 // IMpaDecFilter
 
+#ifdef REGISTER_FILTER
+
 STDMETHODIMP CMpaDecFilter::SetOutputFormat(MPCSampleFormat mpcsf, bool enable)
 {
 	CAutoLock cAutoLock(&m_csProps);
@@ -2182,6 +2196,20 @@ STDMETHODIMP_(bool) CMpaDecFilter::GetOutputFormat(MPCSampleFormat mpcsf)
 	}
 	return false;
 }
+
+#else
+
+STDMETHODIMP CMpaDecFilter::SetOutputFormat(MPCSampleFormat mpcsf, bool enable)
+{
+	return E_NOTIMPL;
+}
+
+STDMETHODIMP_(bool) CMpaDecFilter::GetOutputFormat(MPCSampleFormat mpcsf)
+{
+	return true;
+}
+
+#endif
 
 STDMETHODIMP CMpaDecFilter::SetDynamicRangeControl(bool fDRC)
 {
@@ -2244,10 +2272,6 @@ STDMETHODIMP CMpaDecFilter::SaveSettings()
 		key.SetDWORDValue(OPTION_SPDIF_ac3enc, m_fSPDIF[ac3enc]);
 	}
 #else
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SFormat_i16, m_fSampleFmt[SF_PCM16]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SFormat_i24, m_fSampleFmt[SF_PCM24]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SFormat_i32, m_fSampleFmt[SF_PCM32]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SFormat_flt, m_fSampleFmt[SF_FLOAT]);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_DRC, m_fDRC);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3, m_fSPDIF[ac3]);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_eac3, m_fSPDIF[eac3]);

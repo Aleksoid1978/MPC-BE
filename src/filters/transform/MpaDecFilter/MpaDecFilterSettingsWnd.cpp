@@ -47,10 +47,12 @@ bool CMpaDecSettingsWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>
 		return false;
 	}
 
+#ifdef REGISTER_FILTER
 	m_outfmt_i16   = m_pMDF->GetOutputFormat(SF_PCM16);
 	m_outfmt_i24   = m_pMDF->GetOutputFormat(SF_PCM24);
 	m_outfmt_i32   = m_pMDF->GetOutputFormat(SF_PCM32);
 	m_outfmt_flt   = m_pMDF->GetOutputFormat(SF_FLOAT);
+#endif
 	m_drc          = m_pMDF->GetDynamicRangeControl();
 	m_spdif_ac3    = m_pMDF->GetSPDIF(IMpaDecFilter::ac3);
 	m_spdif_eac3   = m_pMDF->GetSPDIF(IMpaDecFilter::eac3);
@@ -100,6 +102,7 @@ bool CMpaDecSettingsWnd::OnActivate()
 	CPoint p(10, 10);
 	CRect r;
 
+#ifdef REGISTER_FILTER
 	m_outfmt_group.Create(ResStr(IDS_MPADEC_SAMPLE_FMT), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(ScaleX(230), h20 + h20)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 	m_outfmt_i16_check.Create(L"Int16", dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(ScaleX(50), m_fontheight)), this, IDC_PP_CHECK_I16);
@@ -111,6 +114,7 @@ bool CMpaDecSettingsWnd::OnActivate()
 	m_outfmt_i32_check.SetCheck(m_outfmt_i32);
 	m_outfmt_flt_check.SetCheck(m_outfmt_flt);
 	p.y += h25;
+#endif
 
 	m_drc_check.Create(ResStr(IDS_MPADEC_DRC), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(ScaleX(220), m_fontheight)), this, IDC_PP_CHECK_DRC);
 	m_drc_check.SetCheck(m_drc);
@@ -161,10 +165,12 @@ bool CMpaDecSettingsWnd::OnActivate()
 
 void CMpaDecSettingsWnd::OnDeactivate()
 {
+#ifdef REGISTER_FILTER
 	m_outfmt_i16   = !!m_outfmt_i16_check.GetCheck();
 	m_outfmt_i24   = !!m_outfmt_i24_check.GetCheck();
 	m_outfmt_i32   = !!m_outfmt_i32_check.GetCheck();
 	m_outfmt_flt   = !!m_outfmt_flt_check.GetCheck();
+#endif
 	m_drc          = !!m_drc_check.GetCheck();
 	m_spdif_ac3    = !!m_spdif_ac3_check.GetCheck();
 	m_spdif_eac3   = !!m_spdif_eac3_check.GetCheck();
@@ -179,10 +185,12 @@ bool CMpaDecSettingsWnd::OnApply()
 	OnDeactivate();
 
 	if (m_pMDF) {
+#ifdef REGISTER_FILTER
 		m_pMDF->SetOutputFormat(SF_PCM16, m_outfmt_i16);
 		m_pMDF->SetOutputFormat(SF_PCM24, m_outfmt_i24);
 		m_pMDF->SetOutputFormat(SF_PCM32, m_outfmt_i32);
 		m_pMDF->SetOutputFormat(SF_FLOAT, m_outfmt_flt);
+#endif
 		m_pMDF->SetDynamicRangeControl(m_drc);
 		m_pMDF->SetSPDIF(IMpaDecFilter::ac3, m_spdif_ac3);
 		m_pMDF->SetSPDIF(IMpaDecFilter::eac3, m_spdif_eac3);
@@ -198,13 +206,16 @@ bool CMpaDecSettingsWnd::OnApply()
 }
 
 BEGIN_MESSAGE_MAP(CMpaDecSettingsWnd, CInternalPropertyPageWnd)
+#ifdef REGISTER_FILTER
 	ON_BN_CLICKED(IDC_PP_CHECK_I16, OnInt16Check)
 	ON_BN_CLICKED(IDC_PP_CHECK_I24, OnInt24Check)
 	ON_BN_CLICKED(IDC_PP_CHECK_I32, OnInt32Check)
 	ON_BN_CLICKED(IDC_PP_CHECK_FLT, OnFloatCheck)
+#endif
 	ON_BN_CLICKED(IDC_PP_CHECK_SPDIF_DTS, OnDTSCheck)
 END_MESSAGE_MAP()
 
+#ifdef REGISTER_FILTER
 void CMpaDecSettingsWnd::OnInt16Check()
 {
 	if (m_outfmt_i16_check.GetCheck() == BST_UNCHECKED &&
@@ -244,6 +255,7 @@ void CMpaDecSettingsWnd::OnFloatCheck()
 		m_outfmt_flt_check.SetCheck(BST_CHECKED);
 	}
 }
+#endif
 
 void CMpaDecSettingsWnd::OnDTSCheck()
 {

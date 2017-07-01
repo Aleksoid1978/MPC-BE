@@ -58,7 +58,9 @@ class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F"))
 protected:
 	// settings
 	CCritSec        m_csProps;
+#ifdef REGISTER_FILTER
 	bool            m_fSampleFmt[sfcount];
+#endif
 	bool            m_fDRC;
 	bool            m_fSPDIF[etcount];
 
