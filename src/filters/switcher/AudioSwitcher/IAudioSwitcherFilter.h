@@ -20,6 +20,15 @@
 
 #pragma once
 
+#define SFMT_UINT8  (1<<0) // not used
+#define SFMT_INT16  (1<<1)
+#define SFMT_INT24  (1<<2)
+#define SFMT_INT32  (1<<3)
+#define SFMT_FLOAT  (1<<4)
+#define SFMT_DOUBLE (1<<4) // not used
+
+#define SFMT_MASK (SFMT_INT16|SFMT_INT24|SFMT_INT32|SFMT_FLOAT)
+
 enum {
 	SPK_MONO = 0,
 	SPK_STEREO,
@@ -33,10 +42,10 @@ interface __declspec(uuid("CEDB2890-53AE-4231-91A3-B0AAFCD1DBDE"))
 IAudioSwitcherFilter :
 public IUnknown {
 	STDMETHOD(SetChannelMixer) (bool bMixer, int nLayout) PURE;
+	STDMETHOD(SetBassRedirect) (bool bBassRedirect) PURE;
 	STDMETHOD(SetAudioGain) (float fGain_dB) PURE;
-	STDMETHOD(GetAutoVolumeControl) (bool& bAutoVolumeControl, bool& bNormBoost, int& iNormLevel, int& iNormRealeaseTime) PURE;
 	STDMETHOD(SetAutoVolumeControl) (bool bAutoVolumeControl, bool bNormBoost, int iNormLevel, int iNormRealeaseTime) PURE;
+	STDMETHOD(SetOutputFormats) (int iSampleFormat) PURE;
 	STDMETHOD_(REFERENCE_TIME, GetAudioTimeShift) () PURE;
 	STDMETHOD(SetAudioTimeShift) (REFERENCE_TIME rtAudioTimeShift) PURE;
-	STDMETHOD(SetBassRedirect) (bool bBassRedirect) PURE;
 };

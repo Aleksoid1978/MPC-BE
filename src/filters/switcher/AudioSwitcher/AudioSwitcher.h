@@ -33,6 +33,8 @@
 class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	CAudioSwitcherFilter : public CStreamSwitcherFilter, public IAudioSwitcherFilter
 {
+	CCritSec m_csTransform;
+
 	CSimpleBuffer<float> m_buffer;
 
 	CMixer	m_Mixer;
@@ -42,14 +44,19 @@ class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	CBassRedirect m_BassRedirect;
 	bool	m_bBassRedirect;
 
+	float	m_fGain_dB;
+	float	m_fGainFactor;
+
 	CAudioNormalizer m_AudioNormalizer;
 	bool	m_bAutoVolumeControl;
 	bool	m_bNormBoost;
 	int		m_iNormLevel;
 	int		m_iNormRealeaseTime;
 
-	float	m_fGain_dB;
-	float	m_fGainFactor;
+	bool	m_bInt16;
+	bool	m_bInt24;
+	bool	m_bInt32;
+	bool	m_bFloat;
 
 	REFERENCE_TIME m_rtAudioTimeShift;
 
@@ -59,21 +66,21 @@ public:
 	CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr);
 	~CAudioSwitcherFilter();
 
+	HRESULT CheckMediaType(const CMediaType* pmt) override;
+	HRESULT Transform(IMediaSample* pIn, IMediaSample* pOut) override;
+	void TransformMediaType(CMediaType& mt) override;
+
 	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-	HRESULT CheckMediaType(const CMediaType* pmt);
-	HRESULT Transform(IMediaSample* pIn, IMediaSample* pOut);
-	void TransformMediaType(CMediaType& mt);
-
 	// IAudioSwitcherFilter
 	STDMETHODIMP SetChannelMixer(bool bMixer, int nLayout);
+	STDMETHODIMP SetBassRedirect(bool bBassRedirect);
 	STDMETHODIMP SetAudioGain(float fGain_dB);
-	STDMETHODIMP GetAutoVolumeControl(bool& bAutoVolumeControl, bool& bNormBoost, int& iNormLevel, int& iNormRealeaseTime);
 	STDMETHODIMP SetAutoVolumeControl(bool bAutoVolumeControl, bool bNormBoost, int iNormLevel, int iNormRealeaseTime);
+	STDMETHODIMP SetOutputFormats(int iSampleFormats);
 	STDMETHODIMP_(REFERENCE_TIME) GetAudioTimeShift();
 	STDMETHODIMP SetAudioTimeShift(REFERENCE_TIME rtAudioTimeShift);
-	STDMETHODIMP SetBassRedirect(bool bBassRedirect);
 
 	// IAMStreamSelect
 	STDMETHODIMP Enable(long lIndex, DWORD dwFlags);
