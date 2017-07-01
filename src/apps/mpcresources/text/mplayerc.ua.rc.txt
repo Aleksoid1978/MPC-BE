@@ -389,7 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Підвищений пріоритет процесу"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 23
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 28
 5		"Channel Mixer"
 6		"Мікшування каналів:"
 8		"Запит стерео у декодера"
@@ -399,6 +399,11 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 23
 14		"Підсилення аудіо"
 19		"Затримка звуку (мс):"
 22		"Типово"
+23		"Формат виводу:"
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"Float"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

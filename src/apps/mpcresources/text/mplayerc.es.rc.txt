@@ -389,7 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Mayor prioridad para el proceso"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 23
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 28
 5		"Channel Mixer"
 6		"Mix channels to:"
 8		"Request stereo from the decoder"
@@ -399,6 +399,11 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 23
 14		"Boost audio"
 19		"Desplazamiento del audio (ms):"
 22		"Default"
+23		"Formato de Muestrs de Salida:"
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"Float"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

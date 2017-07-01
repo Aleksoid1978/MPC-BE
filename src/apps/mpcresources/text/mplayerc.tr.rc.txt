@@ -389,7 +389,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"İşlem önceliğini normalden yüksek tut"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 23
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 28
 5		"Channel Mixer"
 6		"Kanalları karıştır:"
 8		"Request stereo from the decoder"
@@ -399,6 +399,11 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 23
 14		"Sesi güçlendir"
 19		"Ses zaman kaydırma (ms):"
 22		"Varsayılan"
+23		"Çıktı örnekleme biçimi:"
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"Float"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
