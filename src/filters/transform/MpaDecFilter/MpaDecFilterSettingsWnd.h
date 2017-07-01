@@ -30,10 +30,18 @@ class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 {
 	CComQIPtr<IMpaDecFilter> m_pMDF;
 
+#ifdef REGISTER_FILTER
 	bool  m_outfmt_i16;
 	bool  m_outfmt_i24;
 	bool  m_outfmt_i32;
 	bool  m_outfmt_flt;
+
+	CButton   m_outfmt_group;
+	CButton   m_outfmt_i16_check;
+	CButton   m_outfmt_i24_check;
+	CButton   m_outfmt_i32_check;
+	CButton   m_outfmt_flt_check;
+#endif
 	bool m_drc;
 	bool m_spdif_ac3;
 	bool m_spdif_eac3;
@@ -55,12 +63,6 @@ class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 		IDC_PP_CHECK_SPDIF_DTSHD,
 		IDC_PP_CHECK_SPDIF_AC3ENC
 	};
-
-	CButton   m_outfmt_group;
-	CButton   m_outfmt_i16_check;
-	CButton   m_outfmt_i24_check;
-	CButton   m_outfmt_i32_check;
-	CButton   m_outfmt_flt_check;
 
 	CButton   m_drc_check;
 
@@ -91,9 +93,11 @@ public:
 
 	DECLARE_MESSAGE_MAP()
 
+#ifdef REGISTER_FILTER
 	afx_msg void OnInt16Check();
 	afx_msg void OnInt24Check();
 	afx_msg void OnInt32Check();
 	afx_msg void OnFloatCheck();
+#endif
 	afx_msg void OnDTSCheck();
 };
