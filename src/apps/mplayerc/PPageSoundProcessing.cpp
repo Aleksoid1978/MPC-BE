@@ -36,6 +36,17 @@ CPPageSoundProcessing::~CPPageSoundProcessing()
 {
 }
 
+int CPPageSoundProcessing::GetSampleFormats()
+{
+	int sampleformats = 0;
+	if (m_chkInt16.GetCheck() == BST_CHECKED) { sampleformats += SFMT_INT16; }
+	if (m_chkInt24.GetCheck() == BST_CHECKED) { sampleformats += SFMT_INT24; }
+	if (m_chkInt32.GetCheck() == BST_CHECKED) { sampleformats += SFMT_INT32; }
+	if (m_chkFloat.GetCheck() == BST_CHECKED) { sampleformats += SFMT_FLOAT; }
+
+	return sampleformats;
+}
+
 void CPPageSoundProcessing::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
@@ -55,6 +66,11 @@ void CPPageSoundProcessing::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SLIDER3, m_sldNormLevel);
 	DDX_Control(pDX, IDC_SLIDER4, m_sldNormRealeaseTime);
 
+	DDX_Control(pDX, IDC_CHECK9, m_chkInt16);
+	DDX_Control(pDX, IDC_CHECK10, m_chkInt24);
+	DDX_Control(pDX, IDC_CHECK11, m_chkInt32);
+	DDX_Control(pDX, IDC_CHECK12, m_chkFloat);
+
 	DDX_Control(pDX, IDC_CHECK4, m_chkTimeShift);
 	DDX_Control(pDX, IDC_EDIT2, m_edtTimeShift);
 	DDX_Control(pDX, IDC_SPIN2, m_spnTimeShift);
@@ -64,6 +80,10 @@ BEGIN_MESSAGE_MAP(CPPageSoundProcessing, CPPageBase)
 	ON_BN_CLICKED(IDC_CHECK7, OnMixerCheck)
 	ON_CBN_SELCHANGE(IDC_COMBO2, OnMixerLayoutChange)
 	ON_BN_CLICKED(IDC_CHECK5, OnAutoVolumeControlCheck)
+	ON_BN_CLICKED(IDC_CHECK9, OnInt16Check)
+	ON_BN_CLICKED(IDC_CHECK10, OnInt24Check)
+	ON_BN_CLICKED(IDC_CHECK11, OnInt32Check)
+	ON_BN_CLICKED(IDC_CHECK12, OnFloatCheck)
 	ON_BN_CLICKED(IDC_CHECK4, OnTimeShiftCheck)
 	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedSoundProcessingDefault)
 	ON_WM_HSCROLL()
@@ -97,6 +117,11 @@ BOOL CPPageSoundProcessing::OnInitDialog()
 	m_sldNormLevel.SetPos(s.iAudioNormLevel);
 	m_sldNormRealeaseTime.SetRange(5, 10, TRUE);
 	m_sldNormRealeaseTime.SetPos(s.iAudioNormRealeaseTime);
+
+	m_chkInt16.SetCheck((s.iAudioSampleFormats & SFMT_INT16) ? BST_CHECKED : BST_UNCHECKED);
+	m_chkInt24.SetCheck((s.iAudioSampleFormats & SFMT_INT24) ? BST_CHECKED : BST_UNCHECKED);
+	m_chkInt32.SetCheck((s.iAudioSampleFormats & SFMT_INT32) ? BST_CHECKED : BST_UNCHECKED);
+	m_chkFloat.SetCheck((s.iAudioSampleFormats & SFMT_FLOAT) ? BST_CHECKED : BST_UNCHECKED);
 
 	m_chkTimeShift.SetCheck(s.bAudioTimeShift);
 	m_edtTimeShift = s.iAudioTimeShift;
@@ -134,6 +159,9 @@ BOOL CPPageSoundProcessing::OnApply()
 	s.bAudioNormBoost			= !!m_chkNormBoostAudio.GetCheck();
 	s.iAudioNormLevel			= m_sldNormLevel.GetPos();
 	s.iAudioNormRealeaseTime	= m_sldNormRealeaseTime.GetPos();
+
+	s.iAudioSampleFormats		= GetSampleFormats();
+
 	s.bAudioTimeShift			= !!m_chkTimeShift.GetCheck();
 	s.iAudioTimeShift			= m_edtTimeShift;
 
@@ -148,12 +176,13 @@ BOOL CPPageSoundProcessing::OnApply()
 		}
 		EndEnumFilters
 
-		if (CComQIPtr<IAudioSwitcherFilter> m_pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG)) {
-			m_pASF->SetChannelMixer(s.bAudioMixer, s.nAudioMixerLayout);
-			m_pASF->SetBassRedirect(s.bAudioBassRedirect);
-			m_pASF->SetAudioGain(s.fAudioGain_dB);
-			m_pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
-			m_pASF->SetAudioTimeShift(s.bAudioTimeShift ? 10000i64*s.iAudioTimeShift : 0);
+		if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG)) {
+			pASF->SetChannelMixer(s.bAudioMixer, s.nAudioMixerLayout);
+			pASF->SetBassRedirect(s.bAudioBassRedirect);
+			pASF->SetAudioGain(s.fAudioGain_dB);
+			pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
+			pASF->SetOutputFormats(s.iAudioSampleFormats);
+			pASF->SetAudioTimeShift(s.bAudioTimeShift ? 10000i64*s.iAudioTimeShift : 0);
 		}
 	}
 
@@ -198,6 +227,34 @@ void CPPageSoundProcessing::OnAutoVolumeControlCheck()
 	SetModified();
 }
 
+void CPPageSoundProcessing::OnInt16Check()
+{
+	if (GetSampleFormats() == 0) {
+		m_chkInt16.SetCheck(BST_CHECKED);
+	}
+}
+
+void CPPageSoundProcessing::OnInt24Check()
+{
+	if (GetSampleFormats() == 0) {
+		m_chkInt24.SetCheck(BST_CHECKED);
+	}
+}
+
+void CPPageSoundProcessing::OnInt32Check()
+{
+	if (GetSampleFormats() == 0) {
+		m_chkInt32.SetCheck(BST_CHECKED);
+	}
+}
+
+void CPPageSoundProcessing::OnFloatCheck()
+{
+	if (GetSampleFormats() == 0) {
+		m_chkFloat.SetCheck(BST_CHECKED);
+	}
+}
+
 void CPPageSoundProcessing::OnTimeShiftCheck()
 {
 	if (m_chkTimeShift.GetCheck()) {
@@ -222,6 +279,12 @@ void CPPageSoundProcessing::OnBnClickedSoundProcessingDefault()
 	m_chkNormBoostAudio.SetCheck(BST_CHECKED);
 	m_sldNormLevel.SetPos(75);
 	m_sldNormRealeaseTime.SetPos(8);
+
+	m_chkInt16.SetCheck(BST_CHECKED);
+	m_chkInt24.SetCheck(BST_CHECKED);
+	m_chkInt32.SetCheck(BST_CHECKED);
+	m_chkFloat.SetCheck(BST_CHECKED);
+
 	m_chkTimeShift.SetCheck(BST_UNCHECKED);
 
 	UpdateGainInfo();

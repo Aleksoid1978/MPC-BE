@@ -50,6 +50,11 @@ public:
 	CSliderCtrl	m_sldNormLevel;
 	CSliderCtrl	m_sldNormRealeaseTime;
 
+	CButton		m_chkInt16;
+	CButton		m_chkInt24;
+	CButton		m_chkInt32;
+	CButton		m_chkFloat;
+
 	CButton		m_chkTimeShift;
 	CIntEdit	m_edtTimeShift;
 	CSpinButtonCtrl m_spnTimeShift;
@@ -58,7 +63,7 @@ public:
 	void UpdateNormLevelInfo() { CString str; str.Format(ResStr(IDS_AUDIO_LEVEL), m_sldNormLevel.GetPos()); m_stcNormLevel.SetWindowText(str); };
 	void UpdateNormRealeaseTimeInfo() { CString str; str.Format(ResStr(IDS_AUDIO_RELEASETIME), m_sldNormRealeaseTime.GetPos()); m_stcNormRealeaseTime.SetWindowText(str); };
 
-	CToolTipCtrl m_tooltip;
+	int GetSampleFormats();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
@@ -71,6 +76,10 @@ public:
 	afx_msg void OnMixerCheck();
 	afx_msg void OnMixerLayoutChange();
 	afx_msg void OnAutoVolumeControlCheck();
+	afx_msg void OnInt16Check();
+	afx_msg void OnInt24Check();
+	afx_msg void OnInt32Check();
+	afx_msg void OnFloatCheck();
 	afx_msg void OnTimeShiftCheck();
 	afx_msg void OnBnClickedSoundProcessingDefault();
 

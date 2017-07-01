@@ -74,6 +74,7 @@
 #define IDS_RS_AUDIONORMBOOST				L"AudioNormBoost"
 #define IDS_RS_AUDIONORMLEVEL				L"AudioNormLevel"
 #define IDS_RS_AUDIONORMREALEASETIME		L"AudioNormRealeaseTime"
+#define IDS_RS_AUDIOSAMPLEFORMATS			L"AudioSampleFormats"
 
 
 #define IDS_RS_D3DFULLSCREEN				L"D3DFullScreen"

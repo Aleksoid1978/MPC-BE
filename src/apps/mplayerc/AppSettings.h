@@ -662,6 +662,7 @@ public:
 	bool			bAudioNormBoost;
 	int				iAudioNormLevel;
 	int				iAudioNormRealeaseTime;
+	int				iAudioSampleFormats;
 	bool			bAudioTimeShift;
 	int				iAudioTimeShift;
 

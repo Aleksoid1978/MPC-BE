@@ -2788,6 +2788,7 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 		pASF->SetBassRedirect(s.bAudioBassRedirect);
 		pASF->SetAudioGain(s.fAudioGain_dB);
 		pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
+		pASF->SetOutputFormats(s.iAudioSampleFormats);
 		pASF->SetAudioTimeShift(s.bAudioTimeShift ? 10000i64 * s.iAudioTimeShift : 0);
 	}
 
