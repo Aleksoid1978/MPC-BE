@@ -29,6 +29,26 @@
 #endif
 #include <moreuuids.h>
 
+#define PauseGraph \
+	CComQIPtr<IMediaControl> _pMC(m_pGraph); \
+	OAFilterState _fs = -1; \
+	if(_pMC) _pMC->GetState(1000, &_fs); \
+	if(_fs == State_Running) \
+		_pMC->Pause(); \
+ \
+	HRESULT _hr = E_FAIL; \
+	CComQIPtr<IMediaSeeking> _pMS((IUnknown*)(INonDelegatingUnknown*)m_pGraph); \
+	LONGLONG _rtNow = 0; \
+	if(_pMS) _hr = _pMS->GetCurrentPosition(&_rtNow); \
+ 
+#define ResumeGraph \
+	if(SUCCEEDED(_hr) && _pMS && _fs != State_Stopped) \
+		_hr = _pMS->SetPositions(&_rtNow, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning); \
+ \
+	if(_fs == State_Running && _pMS) \
+		_pMC->Run(); \
+ 
+
 //
 // CStreamSwitcherPassThru
 //
@@ -791,8 +811,11 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 
 		CMediaType& out_mt = pOut->CurrentMediaType();
 		if (*out_mt.FormatType() == FORMAT_WaveFormatEx) {
-			cbBuffer *= ((WAVEFORMATEX*)out_mt.Format())->nChannels;
-			cbBuffer /= ((WAVEFORMATEX*)m_mt.Format())->nChannels;
+			WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_mt.Format();
+			WAVEFORMATEX* out_wfe = (WAVEFORMATEX*)out_mt.Format();
+
+			cbBuffer *= out_wfe->nChannels * out_wfe->wBitsPerSample;
+			cbBuffer /= wfe->nChannels * wfe->wBitsPerSample;
 		}
 
 		m_pSSF->m_bInputPinChanged = false;
