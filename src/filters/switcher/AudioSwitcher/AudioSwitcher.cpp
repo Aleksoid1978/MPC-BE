@@ -298,19 +298,19 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	else if (m_fGainFactor != 1.0f) {
 		switch (audio_sampleformat) {
 		case SAMPLE_FMT_U8:
-			gain_uint8(m_fGainFactor, audio_allsamples, (uint8_t*)pDataOut);
+			gain_uint8(m_fGainFactor, audio_allsamples, (uint8_t*)audio_data);
 			break;
 		case SAMPLE_FMT_S16:
-			gain_int16(m_fGainFactor, audio_allsamples, (int16_t*)pDataOut);
+			gain_int16(m_fGainFactor, audio_allsamples, (int16_t*)audio_data);
 			break;
 		case SAMPLE_FMT_S24:
-			gain_int24(m_fGainFactor, audio_allsamples, pDataOut);
+			gain_int24(m_fGainFactor, audio_allsamples, audio_data);
 			break;
 		case SAMPLE_FMT_S32:
-			gain_int32(m_fGainFactor, audio_allsamples, (int32_t*)pDataOut);
+			gain_int32(m_fGainFactor, audio_allsamples, (int32_t*)audio_data);
 			break;
 		case SAMPLE_FMT_FLT:
-			gain_float(m_fGainFactor, audio_allsamples, (float*)pDataOut);
+			gain_float(m_fGainFactor, audio_allsamples, (float*)audio_data);
 			break;
 		}
 	}
