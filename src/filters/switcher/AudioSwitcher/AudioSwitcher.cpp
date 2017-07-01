@@ -284,7 +284,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 	// Auto volume control (works in place, requires float)
 	if (m_bAutoVolumeControl) {
-		if (audio_data == pDataIn) {
+		if (audio_sampleformat != SAMPLE_FMT_FLT) {
 			m_buffer.ExpandSize(audio_allsamples);
 			convert_to_float(audio_sampleformat, audio_channels, audio_samples, audio_data, m_buffer.Data());
 
