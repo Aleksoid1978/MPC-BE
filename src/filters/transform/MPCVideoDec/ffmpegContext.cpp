@@ -67,25 +67,6 @@ static const WORD PCID_ATI_UVD [] = {
 	0x950F, // ATI Radeon HD 3850 X2
 };
 
-static const WORD PCID_AMD_4K [] = { // not tested
-	// http://pci-ids.ucw.cz/read/PC/1002
-	// UVD ?
-	0x67C0, // Polaris10 (Ellesmere)
-	0x67DF, // Radeon RX 470/480 (Ellesmere)
-	0X67E0, // Polaris11 (Baffin)
-	0X67E1, // Polaris11 (Baffin)
-	0X67E8, // Polaris11 (Baffin)
-	0X67E9, // Polaris11 (Baffin)
-	0X67EB, // Polaris11 (Baffin)
-	0X67EF, // Radeon RX 460 (Baffin)
-	0X67FF, // Polaris11 (Baffin)
-	// UVD 5
-	0x6939, // Radeon R9 285/380 (Tonga PRO)
-	// UVD 6
-	0x7300, // Radeon R9 FURY/NANO Series (Fiji)
-	0x9874, // Carrizo
-};
-
 static bool CheckPCID(DWORD pcid, const WORD* pPCIDs, size_t count)
 {
 	WORD wPCID = (WORD)pcid;
@@ -430,13 +411,8 @@ BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nP
 		}
 	}
 	else if (nPCIVendor == PCIV_ATI) {
-		if (DriverVersionCheck(VideoDriverVersion, 21, 19, 134, 1)) {
-			// For AMD graphics cards with support for 4k, you must install the driver v16.9.1 or newer (need more tests to find the boundary drivers)
-			return TRUE;
-		}
-		// UVD 5, UVD 6
-		if (CheckPCID(nPCIDevice, PCID_AMD_4K, _countof(PCID_AMD_4K)) && CHECK_AVC_L52_SIZE(width, height)) {
-			// not tested (it will be deleted after the tests of drivers)
+		if (DriverVersionCheck(VideoDriverVersion, 8, 17, 10, 1247)) {
+			// For AMD graphics cards with support for 4k, you must install the driver v15.x.x or newer (need more tests to find the boundary drivers)
 			return TRUE;
 		}
 		if (width <= 2048 && height <= 2304 && width * height <= 2048 * 2048) {
