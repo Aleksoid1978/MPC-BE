@@ -411,8 +411,8 @@ BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nP
 		}
 	}
 	else if (nPCIVendor == PCIV_ATI) {
-		if (DriverVersionCheck(VideoDriverVersion, 8, 17, 10, 1247)) {
-			// For AMD graphics cards with support for 4k, you must install the driver v15.x.x or newer (need more tests to find the boundary drivers)
+		if (DriverVersionCheck(VideoDriverVersion, 8, 17, 10, 1404)) { // aticfx32.dll/aticfx64.dll (v8.17.10.1404)
+			// For AMD graphics cards with support for 4k, you must install the Catalyst v15.7.1 or newer
 			return TRUE;
 		}
 		if (width <= 2048 && height <= 2304 && width * height <= 2048 * 2048) {
