@@ -821,7 +821,7 @@ bool CWebClientSocket::OnSnapShotJpeg(CStringA& hdr, CStringA& body, CStringA& m
 
 	std::vector<BYTE> dib;
 	CString errmsg;
-	if (S_OK == m_pMainFrame->GetCurrentFrame(dib, errmsg)) {
+	if (S_OK == m_pMainFrame->GetDisplayedImage(dib, errmsg) || S_OK == m_pMainFrame->GetCurrentFrame(dib, errmsg)) {
 		if (BMPDIB(0, dib.data(), L"image/jpeg", AfxGetAppSettings().nWebServerQuality, 1, &jpeg, &jpeg_size)) {
 			hdr +=
 				"Expires: Thu, 19 Nov 1981 08:52:00 GMT\r\n"
