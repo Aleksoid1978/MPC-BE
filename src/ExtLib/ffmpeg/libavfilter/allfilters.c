@@ -46,6 +46,7 @@ void avfilter_register_all(void)
         return;
     initialized = 1;
 
+    REGISTER_FILTER(ARESAMPLE,      aresample,      af);
     REGISTER_FILTER(ATEMPO,         atempo,         af);
     //REGISTER_FILTER(LOWPASS,        lowpass,        af);
 
