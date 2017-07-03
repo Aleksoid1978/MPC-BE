@@ -579,10 +579,7 @@ SRCS_LF = \
 	libavfilter/framequeue.c \
 	libavfilter/graphparser.c \
 	libavfilter/pthread.c \
-	libavfilter/vf_yadif.c \
-	libavfilter/video.c \
-	\
-	libavfilter/x86/vf_yadif_init.c
+	libavfilter/video.c
 
 SRCS_LU = \
 	libavutil/atomic.c \
@@ -752,10 +749,7 @@ SRCS_YASM_LC = \
 	libavcodec/x86/vp9mc_16bpp.asm \
 	libavcodec/x86/xvididct.asm
 
-SRCS_YASM_LF = \
-	libavfilter/x86/vf_yadif.asm \
-	libavfilter/x86/yadif-10.asm \
-	libavfilter/x86/yadif-16.asm
+SRCS_YASM_LF = 
 
 SRCS_YASM_LU = \
 	libavutil/x86/cpuid.asm \
