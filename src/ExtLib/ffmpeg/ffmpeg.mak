@@ -565,6 +565,7 @@ SRCS_LC_B = \
 	libavcodec/x86/xvididct_init.c
 
 SRCS_LF = \
+	libavfilter/af_aresample.c \
 	libavfilter/af_atempo.c \
 	libavfilter/af_biquads.c \
 	libavfilter/allfilters.c \
