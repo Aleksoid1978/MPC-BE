@@ -64,6 +64,7 @@ HRESULT CFilter::Init(double dRate, const WAVEFORMATEX* wfe)
 
 	m_pFilterGraph = avfilter_graph_alloc();
 	CheckPointer(m_pFilterGraph, E_FAIL);
+	avfilter_graph_set_auto_convert(m_pFilterGraph, AVFILTER_AUTO_CONVERT_NONE);
 
 	SampleFormat sample_fmt = GetSampleFormat(wfe);
 	AVSampleFormat av_sample_fmt = AV_SAMPLE_FMT_NONE;
