@@ -70,4 +70,18 @@ public:
 			SetSize(size);
 		}
 	}
+
+	void InsertData(size_t pos, const T* data, const size_t size)
+	{
+		size_t required_size = pos + size;
+
+		if (required_size > m_size) {
+			T* new_data = DNew T[required_size];
+			memcpy(new_data, m_data, pos * sizeof(T));
+			delete[] m_data;
+			m_data = new_data;
+		}
+
+		memcpy(m_data + pos, data, size * sizeof(T));
+	}
 };
