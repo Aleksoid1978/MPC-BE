@@ -186,7 +186,7 @@ public:
 	IPinConnection* CurrentPinConnection() { return m_pPinConnection; }
 
 	// pure virtual
-	HRESULT	DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_PROPERTIES* pProperties);
+	HRESULT DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_PROPERTIES* pProperties);
 
 	// virtual
 	HRESULT CheckConnect(IPin* pPin);

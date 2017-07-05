@@ -1019,8 +1019,12 @@ HRESULT CStreamSwitcherOutputPin::DecideBufferSize(IMemAllocator* pAllocator, AL
 
 	if (*m_mt.FormatType() == FORMAT_WaveFormatEx) {
 		long cbBuffer = pProperties->cbBuffer;
-		cbBuffer *= ((WAVEFORMATEX*)m_mt.Format())->nChannels;
-		cbBuffer /= ((WAVEFORMATEX*)pIn->CurrentMediaType().Format())->nChannels;
+		WAVEFORMATEX* wfe = (WAVEFORMATEX*)m_mt.Format();
+		WAVEFORMATEX* in_wfe = (WAVEFORMATEX*)pIn->CurrentMediaType().Format();
+
+		cbBuffer *= wfe->nChannels * wfe->wBitsPerSample;
+		cbBuffer /= in_wfe->nChannels * in_wfe->wBitsPerSample;
+
 		if (cbBuffer > pProperties->cbBuffer) {
 			pProperties->cbBuffer = cbBuffer;
 		}
