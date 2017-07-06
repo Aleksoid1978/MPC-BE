@@ -193,8 +193,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		return hr;
 	}
 	if (!pDataIn || !pDataOut) {
-		pOut->SetActualDataLength(0);
-		return S_FALSE;
+		return E_POINTER;
 	}
 
 	// check input an output pins
@@ -227,10 +226,13 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	int          audio_samples        = pIn->GetActualDataLength() / (audio_channels * get_bytes_per_sample(audio_sampleformat));
 	unsigned     audio_allsamples     = audio_samples * audio_channels;
 
-	// in_samples = 0 doesn't mean it's failed, return S_OK otherwise might screw the sound
-	if (audio_samples <= 0) {
+	// input samples = 0 doesn't mean it's failed, return S_OK otherwise might screw the sound
+	if (audio_samples == 0) {
 		pOut->SetActualDataLength(0);
 		return S_OK;
+	}
+	else if (audio_samples < 0) {
+		return E_FAIL;
 	}
 
 	const WAVEFORMATEX* output_wfe = (WAVEFORMATEX*)pOutPin->CurrentMediaType().pbFormat;
