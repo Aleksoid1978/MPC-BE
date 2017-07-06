@@ -80,6 +80,7 @@ public:
 			memcpy(new_data, m_data, pos * sizeof(T));
 			delete[] m_data;
 			m_data = new_data;
+			m_size = required_size;
 		}
 
 		memcpy(m_data + pos, data, size * sizeof(T));
