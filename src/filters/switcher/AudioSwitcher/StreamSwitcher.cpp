@@ -871,17 +871,17 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 
 	// Transform
 	hr = m_pSSF->Transform(pSample, pOutSample);
-	//
 
 	if (S_OK == hr) {
+		if (pSample->GetActualDataLength() > 0 && pOutSample->GetActualDataLength() == 0) {
+			return S_OK;
+		}
+
 		hr = pOut->Deliver(pOutSample);
 		m_bSampleSkipped = FALSE;
-		/*
-		if (FAILED(hr)) {
-			ASSERT(0);
-		}
-		*/
-	} else if (S_FALSE == hr) {
+		//ASSERT(SUCCEEDED(hr));
+	}
+	else if (S_FALSE == hr) {
 		hr = S_OK;
 		pOutSample = NULL;
 		m_bSampleSkipped = TRUE;
