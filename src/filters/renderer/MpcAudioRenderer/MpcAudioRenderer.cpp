@@ -1305,7 +1305,7 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 			m_Resampler.UpdateInput(m_input_params.sf, m_input_params.layout, m_input_params.samplerate);
 			m_Resampler.UpdateOutput(m_output_params.sf, m_output_params.layout, m_output_params.samplerate);
 			out_samples = m_Resampler.CalcOutSamples(in_samples);
-			int delay   = m_Resampler.GetInputDelay();
+			REFERENCE_TIME delay = m_Resampler.GetDelay();
 			out_buf     = DNew BYTE[out_samples * m_output_params.channels * get_bytes_per_sample(m_output_params.sf)];
 			out_samples = m_Resampler.Mixing(out_buf, out_samples, in_buff, in_samples);
 			if (!out_samples) {
@@ -1315,9 +1315,8 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 			lSize = out_samples * m_output_params.channels * get_bytes_per_sample(m_output_params.sf);
 
 			if (delay && rtStart != INVALID_TIME) {
-				const REFERENCE_TIME rtDelay = SamplesToTime(delay, m_pWaveFormatExInput);
-				rtStart -= rtDelay;
-				rtStop  -= rtDelay;
+				rtStart -= delay;
+				rtStop  -= delay;
 			}
 		} else {
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL > 2

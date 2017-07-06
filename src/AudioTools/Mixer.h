@@ -55,8 +55,8 @@ public:
 
 	int  Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples);
 
-	int  Receive(BYTE* pOutput, int out_samples); // needed when using resampling
-	int  GetInputDelay();                         // needed when using resampling
-	int  CalcOutSamples(int in_samples);          // needed when using resampling
-	void FlushBuffers();                          // needed when using resampling
+	int     Receive(BYTE* pOutput, int out_samples); // needed when using resampling
+	int64_t GetDelay();                              // needed when using resampling
+	int     CalcOutSamples(int in_samples);          // needed when using resampling
+	void    FlushBuffers();                          // needed when using resampling
 };
