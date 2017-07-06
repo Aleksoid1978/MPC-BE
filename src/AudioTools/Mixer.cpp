@@ -335,9 +335,9 @@ int CMixer::Receive(BYTE* pOutput, int out_samples)
 	return out_samples;
 }
 
-int CMixer::GetInputDelay()
+int64_t CMixer::GetDelay()
 {
-	return swr_get_delay(m_pSWRCxt, m_in_samplerate);
+	return swr_get_delay(m_pSWRCxt, UNITS);
 }
 
 int CMixer::CalcOutSamples(int in_samples)

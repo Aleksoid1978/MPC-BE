@@ -242,8 +242,9 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	SampleFormat output_sampleformat  = GetSampleFormat(output_wfe);
 	const int    output_samplesize    = pOut->GetSize() / (output_channels * get_bytes_per_sample(output_sampleformat));
 
+	REFERENCE_TIME delay = 0;
+
 	// Mixer
-	int delay = 0;
 	if (audio_layout != output_layout || audio_samplerate != output_samplerate) {
 		//m_Mixer.SetOptions(true);
 		m_Mixer.UpdateInput(audio_sampleformat, audio_layout, audio_samplerate);
@@ -262,7 +263,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 			mix_data = (BYTE*)m_buffer.Data();
 		}
 
-		delay = m_Mixer.GetInputDelay();
+		delay = m_Mixer.GetDelay();
 		mix_samples = m_Mixer.Mixing(mix_data, mix_samples, audio_data, audio_samples);
 
 		if (!mix_samples) {
@@ -347,7 +348,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		rtStart = m_rtNextStart;
 		rtStop  = m_rtNextStart + rtDur;
 	} else if (delay) {
-		rtStart -= 10000000i64 * delay / in_wfe->nSamplesPerSec;
+		rtStart -= delay;
 		rtStop   = rtStart + rtDur;
 	}
 	m_rtNextStart = rtStop;
