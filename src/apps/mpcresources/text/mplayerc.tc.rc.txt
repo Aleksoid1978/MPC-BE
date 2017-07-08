@@ -390,11 +390,11 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 28
-5		"Channel Mixer"
+5		"聲道混音"
 6		"混合聲道為："
 8		"要求解碼器輸出 2.0 立體聲"
 9		"低音重新分配到 LFE 聲道*"
-10		"Volume control"
+10		"音量控制"
 13		"自動音量控制"
 14		"音訊增強"
 19		"平移音訊時間 (ms)："
@@ -403,7 +403,7 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 28
 24		"Int16"
 25		"Int24"
 26		"Int32"
-27		"Float"
+27		"浮點"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
