@@ -83,6 +83,13 @@ protected:
 	REFERENCE_TIME							m_rtAvrTimePerFrame;
 	bool									m_bCalculateStopTime;
 
+	bool									m_bReorderBFrame;
+	struct Timings {
+		REFERENCE_TIME rtStart;
+		REFERENCE_TIME rtStop;
+	} m_tBFrameDelay[2];
+	int										m_nBFramePos;
+
 	bool									m_bWaitKeyFrame;
 
 	int										m_nARX, m_nARY;
@@ -171,6 +178,7 @@ protected:
 	void			SetThreadCount();
 	HRESULT			FindDecoderConfiguration();
 
+	bool			IsAVI();
 	HRESULT			InitDecoder(const CMediaType *pmt);
 
 	int				m_nAlign = 16;
@@ -192,7 +200,6 @@ public:
 	REFERENCE_TIME	GetFrameDuration();
 	void			UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 	void			GetFrameTimeStamp(AVFrame* pFrame, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
-	bool			IsAVI();
 	bool			AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame);
 
 	// === Overriden DirectShow functions
