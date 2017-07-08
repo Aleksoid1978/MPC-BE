@@ -21,7 +21,6 @@
 #include "stdafx.h"
 #include <atlbase.h>
 #include <MMReg.h>
-#include "../../../DSUtil/ff_log.h"
 
 #ifdef REGISTER_FILTER
 	#include <InitGuid.h>
@@ -34,9 +33,10 @@
 #include "../../../DSUtil/CPUInfo.h"
 #include "../../../DSUtil/D3D9Helper.h"
 #include "../../../DSUtil/DSUtil.h"
+#include "../../../DSUtil/ff_log.h"
+#include "../../../DSUtil/GolombBuffer.h"
 #include "../../../DSUtil/SysVersion.h"
-#include "../../../DSUtil/WinAPIUtils.h"
-#include "../../parser/MpegSplitter/MpegSplitter.h"
+#include "../../parser/AviSplitter/AviSplitter.h"
 #include "../../Lock.h"
 #include <moreuuids.h>
 #include <FilterInterfaces.h>
@@ -930,6 +930,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nCodecNb(-1)
 	, m_nCodecId(AV_CODEC_ID_NONE)
 	, m_bCalculateStopTime(false)
+	, m_bReorderBFrame(false)
+	, m_nBFramePos(0)
 	, m_bWaitKeyFrame(false)
 	, m_DXVADecoderGUID(GUID_NULL)
 	, m_nActiveCodecs(CODECS_ALL & ~CODEC_H264_MVC)
@@ -1145,11 +1147,17 @@ void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME
 
 void CMPCVideoDecFilter::GetFrameTimeStamp(AVFrame* pFrame, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
 {
-	rtStart = pFrame->best_effort_timestamp;
-	if (pFrame->pkt_duration) {
-		rtStop = rtStart + pFrame->pkt_duration;
+	// Reorder B-Frames if needed
+	if (m_bReorderBFrame && m_pAVCtx->has_b_frames) {
+		rtStart = m_tBFrameDelay[m_nBFramePos].rtStart;
+		rtStop  = m_tBFrameDelay[m_nBFramePos].rtStop;
 	} else {
-		rtStop = INVALID_TIME;
+		rtStart = pFrame->best_effort_timestamp;
+		if (pFrame->pkt_duration) {
+			rtStop = rtStart + pFrame->pkt_duration;
+		} else {
+			rtStop = INVALID_TIME;
+		}
 	}
 }
 
@@ -1729,6 +1737,9 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 								|| bNotTrustSourceTimeStamp);
 
 		m_bRVDropBFrameTimings = (m_nCodecId == AV_CODEC_ID_RV10 || m_nCodecId == AV_CODEC_ID_RV20 || m_nCodecId == AV_CODEC_ID_RV30 || m_nCodecId == AV_CODEC_ID_RV40);
+
+		// Enable B-Frame reorder for AVI files
+		m_bReorderBFrame = (clsidInput == __uuidof(CAviSourceFilter) || clsidInput == __uuidof(CAviSplitterFilter) || IsAVI());
 	}
 
 	m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
@@ -2482,6 +2493,12 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	m_rtLastStart	= INVALID_TIME;
 	m_rtLastStop	= 0;
 
+	if (m_bReorderBFrame) {
+		m_nBFramePos = 0;
+		m_tBFrameDelay[0].rtStart = m_tBFrameDelay[0].rtStop = INVALID_TIME;
+		m_tBFrameDelay[1].rtStart = m_tBFrameDelay[1].rtStop = INVALID_TIME;
+	}
+
 	if (m_bDecodingStart) {
 		if (m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_MPEG2VIDEO) {
 			InitDecoder(&m_pInput->CurrentMediaType());
@@ -2915,6 +2932,12 @@ HRESULT CMPCVideoDecFilter::ParseInternal(const BYTE *buffer, int buflen, REFERE
 HRESULT CMPCVideoDecFilter::Decode(const BYTE *buffer, int buflen, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bSyncPoint/* = FALSE*/, BOOL bPreroll/* = FALSE*/)
 {
 	HRESULT hr = S_OK;
+
+	if (m_bReorderBFrame) {
+		m_tBFrameDelay[m_nBFramePos].rtStart = rtStartIn;
+		m_tBFrameDelay[m_nBFramePos].rtStop  = rtStopIn;
+		m_nBFramePos = !m_nBFramePos;
+	}
 
 	if (m_pParser) {
 		hr = ParseInternal(buffer, buflen, rtStartIn, rtStopIn, bPreroll);
