@@ -41,7 +41,7 @@
 // MPC_VERSION_STATUS: 0 - beta; 1 - stable
 
 #define MPC_WND_CLASS_NAME      "MPC-BE"
-#define MPC_YEAR_COMMENTS       "2002-2016"
+#define MPC_YEAR_COMMENTS       "2002-2017"
 #define MPC_VERSION_COMMENTS    "http://sourceforge.net/projects/mpcbe/"
 
 #ifndef ISPP_INVOKED
