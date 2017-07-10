@@ -390,7 +390,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 END
 
 BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 28
-5		"Kanaalkmixer"
+5		"Kanaalmixer"
 6		"Mix kanalen in:"
 8		"Stereo-audio uit decoder proberen te verkrijgen"
 9		"Herleid bas naar LFE-kanaal*"
