@@ -275,6 +275,8 @@ static const DWORD GetFourcc(AP4_VisualSampleEntry* vse)
 	case AP4_ATOM_TYPE_M0RA:
 	case AP4_ATOM_TYPE_M0R0:
 	case AP4_ATOM_TYPE_M0Y2:
+	case AP4_ATOM_TYPE_M2RG:
+	case AP4_ATOM_TYPE_M2RA:
 		fourcc = FCC('MAGY');
 		break;
 	case AP4_ATOM_TYPE_VP80:
