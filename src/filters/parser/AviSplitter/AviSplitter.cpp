@@ -370,8 +370,8 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('M0RA'):
 				case FCC('M0G0'):
 				case FCC('M0Y2'):
-				//case FCC('M2RG'):
-				//case FCC('M2RA'):
+				case FCC('M2RG'):
+				case FCC('M2RA'):
 				//case FCC('M4RG'):
 				//case FCC('M4RA'):
 					mt.subtype = FOURCCMap(FCC('MAGY'));
