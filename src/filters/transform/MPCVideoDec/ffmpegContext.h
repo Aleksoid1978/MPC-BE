@@ -33,6 +33,7 @@ struct AVFrame;
 // === H264 functions
 int		FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
 								 DWORD nPCIVendor, DWORD nPCIDevice, UINT64 VideoDriverVersion);
+void	FFH264GetParams(struct AVCodecContext* pAVCtx, int& x264_build);
 
 // === Mpeg2 functions
 int		MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx);
@@ -41,7 +42,7 @@ int		MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx);
 HRESULT	FFGetCurFrame(struct AVCodecContext* pAVCtx, AVFrame** ppFrameOut);
 UINT	FFGetMBCount(struct AVCodecContext* pAVCtx);
 
-void	FillAVCodecProps(struct AVCodecContext* pAVCtx);
+void	FillAVCodecProps(struct AVCodecContext* pAVCtx, int x264_build);
 
 bool	IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice);
 BOOL	DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height,
