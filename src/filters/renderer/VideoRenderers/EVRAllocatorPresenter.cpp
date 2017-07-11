@@ -824,13 +824,7 @@ HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int*
 		}
 		else if (m_inputMediaType.subtype == MEDIASUBTYPE_YUY2) {
 			switch (mix_fmt) {
-				case FCC('YUY2'):
-					if (m_D3D9VendorId == PCIV_nVidia) {
-						*pMerit = 65; // fix Nvidia bag (poor quality of chroma upscaling)
-					} else {
-						*pMerit = 90;
-					}
-					break;
+				case FCC('YUY2'): *pMerit = 90; break;
 				case D3DFMT_X8R8G8B8: *pMerit = 80; break;
 				case D3DFMT_A2R10G10B10: *pMerit = 70; break;
 				case FCC('NV12'): *pMerit = 60; break; // colour degradation
