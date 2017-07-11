@@ -1683,6 +1683,11 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	const BOOL bReinit = (m_pAVCtx != NULL);
 	const BOOL bChangeType = (m_pCurrentMediaType != *pmt);
 
+	int x264_build = -1;
+	if (m_nCodecId == AV_CODEC_ID_H264 && bReinit && !bChangeType) {
+		FFH264GetParams(m_pAVCtx, x264_build);
+	}
+
 	ffmpegCleanup();
 
 	const int nNewCodec = FindCodec(pmt, bReinit);
@@ -1835,7 +1840,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		return VFW_E_INVALIDMEDIATYPE;
 	}
 
-	FillAVCodecProps(m_pAVCtx);
+	FillAVCodecProps(m_pAVCtx, x264_build);
 
 	if (bChangeType && pFilter) {
 		m_FilterInfo.Clear();
