@@ -7,6 +7,7 @@
 * libavcodec/x86/hevcdsp.h
 * libavcodec/x86/hevcdsp_init.c
 
+* libavcodec/aacdec_template.c
 * libavcodec/allcodecs.c
 * libavcodec/avcodec.h
 * libavcodec/error_resilience.c
@@ -19,6 +20,7 @@
 * libavcodec/hevcpred.c
 * libavcodec/hevcpred.h
 * libavcodec/internal.h
+* libavcodec/mpeg4audio.h
 * libavcodec/mpeg12dec.c
 * libavcodec/mpegaudio_parser.c
 * libavcodec/mpegpicture.c

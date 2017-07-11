@@ -561,7 +561,11 @@ static ChannelElement *get_che(AACContext *ac, int type, int elem_id)
 {
     /* For PCE based channel configurations map the channels solely based
      * on tags. */
-    if (!ac->oc[1].m4ac.chan_config) {
+    if (!ac->oc[1].m4ac.chan_config
+        // ==> Start patch MPC
+        || ac->oc[1].m4ac.pce
+        // ==> End patch MPC
+        ) {
         return ac->tag_che_map[type][elem_id];
     }
     // Allow single CPE stereo files to be signalled with mono configuration.
@@ -3054,7 +3058,10 @@ static int aac_decode_frame_int(AVCodecContext *avctx, void *data,
             } else {
                 err = output_configure(ac, layout_map, tags, OC_TRIAL_PCE, 1);
                 if (!err)
-                    ac->oc[1].m4ac.chan_config = 0;
+                    // ==> Start patch MPC
+                    // ac->oc[1].m4ac.chan_config = 0;
+                    ac->oc[1].m4ac.pce = 1;
+                    // ==> End patch MPC
                 pce_found = 1;
             }
             break;

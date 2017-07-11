@@ -39,6 +39,9 @@ typedef struct MPEG4AudioConfig {
     int channels;
     int ps;  ///< -1 implicit, 1 presence
     int frame_length_short;
+    // ==> Start patch MPC
+    int pce;
+    // ==> End patch MPC
 } MPEG4AudioConfig;
 
 extern av_export const int avpriv_mpeg4audio_sample_rates[16];
