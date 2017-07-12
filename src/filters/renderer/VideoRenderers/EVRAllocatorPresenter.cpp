@@ -787,8 +787,8 @@ HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int*
 		// DirectShow EVR not support 10 and 16-bit format
 
 		// Test result
-		// EVR input formats: NV12, YV12, YUY2, AYUV, RGB32, ARGB32, AI44 and P010 (GTX 960).
-		// EVR mixer formats
+		// EVR input formats: NV12, YV12, YUY2, UYVY, AYUV, RGB32, ARGB32, AI44 and P010.
+		// EVR mixer formats:
 		// Intel: YUY2, X8R8G8B8, A8R8G8B8 (HD 4000).
 		// Nvidia: NV12, YUY2, X8R8G8B8 (GTX 660Ti, GTX 960).
 		// ATI/AMD: NV12, X8R8G8B8 (HD 5770)
@@ -822,7 +822,7 @@ HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int*
 				case D3DFMT_A2R10G10B10: *pMerit = 50; break;
 			}
 		}
-		else if (m_inputMediaType.subtype == MEDIASUBTYPE_YUY2) {
+		else if (m_inputMediaType.subtype == MEDIASUBTYPE_YUY2 || m_inputMediaType.subtype == MEDIASUBTYPE_UYVY) {
 			switch (mix_fmt) {
 				case FCC('YUY2'): *pMerit = 90; break;
 				case D3DFMT_X8R8G8B8: *pMerit = 80; break;
