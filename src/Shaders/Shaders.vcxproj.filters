@@ -73,6 +73,9 @@
     <FxCompile Include="Resizers\downscaler_simple.hlsl">
       <Filter>Resizers</Filter>
     </FxCompile>
+    <FxCompile Include="Transformation\conv_matrix.hlsl">
+      <Filter>Transformation</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OnePassResizers\resizer_bicubic_base.hlsl">

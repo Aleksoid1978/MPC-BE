@@ -25,9 +25,12 @@
     </None>
     <FxCompile Include="Resizers\downscaler_box.hlsl" />
     <FxCompile Include="Resizers\downscaler_simple.hlsl" />
-    <ClInclude Include="Transformation\colorspace_gamut_conversion.hlsl">
+    <None Include="Transformation\colorspace_gamut_conversion.hlsl">
       <FileType>Document</FileType>
-    </ClInclude>
+    </None>
+    <None Include="Transformation\conv_matrix.hlsl">
+      <FileType>Document</FileType>
+    </None>
     <FxCompile Include="Transformation\final_pass.hlsl">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">LUT3D_ENABLED=1;DITHER_ENABLED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">LUT3D_ENABLED=1;DITHER_ENABLED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -35,9 +38,9 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">LUT3D_ENABLED=1;DITHER_ENABLED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </FxCompile>
     <FxCompile Include="Transformation\halfoverunder_to_interlace.hlsl" />
-    <ClInclude Include="Transformation\hdr_tone_mapping.hlsl">
+    <None Include="Transformation\hdr_tone_mapping.hlsl">
       <FileType>Document</FileType>
-    </ClInclude>
+    </None>
     <FxCompile Include="Transformation\hlg_correction.hlsl" />
     <FxCompile Include="Transformation\st2084_correction.hlsl" />
     <FxCompile Include="Transformation\ycgco_correction.hlsl" />
