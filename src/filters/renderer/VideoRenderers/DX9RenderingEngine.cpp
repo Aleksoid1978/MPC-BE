@@ -226,6 +226,7 @@ void CDX9RenderingEngine::CleanupRenderingEngine()
 	m_pPSCorrectionYCgCo.Release();
 	m_pPSCorrectionST2084.Release();
 	m_pPSCorrectionHLG.Release();
+	m_pPSCorrection422.Release();
 	m_pConvertToInterlacePixelShader.Release();
 }
 
@@ -355,6 +356,7 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 
 	bool ps30 = m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0);
 
+	// fix incorrect conversion in EVR mixer (TODO: remake it)
 	if (m_inputExtFormat.VideoTransferMatrix == 7) {
 		if (!m_pPSCorrectionYCgCo) {
 			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrectionYCgCo, ps30 ? IDF_SHADER_CORRECTION_YCGCO : IDF_SHADER_PS20_CORRECTION_YCGCO);
@@ -397,6 +399,25 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
 			hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
 			hr = m_pD3DDevEx->SetPixelShader(m_pPSCorrectionHLG);
+			TextureCopy(m_pVideoTextures[m_iCurSurface]);
+			first = false;
+			std::swap(src, dst);
+			pVideoTexture = m_pFrameTextures[src];
+		}
+	}
+	else if (m_D3D9VendorId == PCIV_nVidia && (m_inputMediaType.subtype == MEDIASUBTYPE_YUY2 || m_inputMediaType.subtype == MEDIASUBTYPE_UYVY)) {
+		if (!m_pPSCorrection422) {
+			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection422, ps30 ? IDF_SHADER_CORRECTION_422 : IDF_SHADER_PS20_CORRECTION_422);
+		}
+	
+		if (m_pPSCorrection422) {
+			const float fConstData[4] = {1.0f / videoDesc.Width, 0, 0, 0};
+			hr = m_pD3DDevEx->SetPixelShaderConstantF(0, fConstData, 1);
+
+			CComPtr<IDirect3DSurface9> pTemporarySurface;
+			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
+			hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
+			hr = m_pD3DDevEx->SetPixelShader(m_pPSCorrection422);
 			TextureCopy(m_pVideoTextures[m_iCurSurface]);
 			first = false;
 			std::swap(src, dst);
@@ -919,9 +940,19 @@ HRESULT CDX9RenderingEngine::TextureResizeDXVA(IDirect3DTexture9* pTexture, cons
 HRESULT CDX9RenderingEngine::InitVideoTextures()
 {
 	HRESULT hr = S_OK;
-	size_t count = (std::min)(_countof(m_pFrameTextures), m_pCustomPixelShaders.GetCount()
-				 + ((m_inputExtFormat.VideoTransferMatrix == 7 || m_inputExtFormat.VideoTransferFunction == 16 || m_inputExtFormat.VideoTransferFunction == 18) ? 1 : 0)
-				 + (m_iRotation == 180 || !m_iRotation && m_bFlip ? 1 : 0));
+
+	size_t count = m_pCustomPixelShaders.GetCount();
+
+	if (m_inputExtFormat.VideoTransferMatrix == 7 || m_inputExtFormat.VideoTransferFunction == 16 || m_inputExtFormat.VideoTransferFunction == 18 ||
+			m_D3D9VendorId == PCIV_nVidia && (m_inputMediaType.subtype == MEDIASUBTYPE_YUY2 || m_inputMediaType.subtype == MEDIASUBTYPE_UYVY)) {
+		count++;
+	}
+	if (m_iRotation == 180 || !m_iRotation && m_bFlip) {
+		count++;
+	}
+	if (count > _countof(m_pFrameTextures)) {
+		count = _countof(m_pFrameTextures);
+	}
 
 	for (size_t i = 0; i < count; i++) {
 		if (m_pFrameTextures[i] == NULL) {
