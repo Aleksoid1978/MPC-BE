@@ -872,9 +872,12 @@ namespace Youtube
 												url = UTF8To16(urlA);
 											}
 
-											CStringA nameA = elem->FindMember("name")->value["runs"][0]["text"].GetString();
-											if (!nameA.IsEmpty()) {
-												name = UTF8To16(nameA);
+											const auto& nameObject = elem->FindMember("name");
+											if (nameObject != elem->MemberEnd()) {
+												CStringA nameA = nameObject->value.FindMember("simpleText")->value.GetString();
+												if (!nameA.IsEmpty()) {
+													name = UTF8To16(nameA);
+												}
 											}
 
 											if (!url.IsEmpty() && !name.IsEmpty()) {
