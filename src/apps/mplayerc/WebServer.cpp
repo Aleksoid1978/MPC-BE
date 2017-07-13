@@ -199,7 +199,7 @@ DWORD CWebServer::ThreadProc()
 static void PutFileContents(LPCWSTR fn, const CStringA& data)
 {
 	FILE* f = NULL;
-	if (!_wfopen_s(&f, fn, L"wb")) {
+	if (_wfopen_s(&f, fn, L"wb") == 0) {
 		fwrite((LPCSTR)data, 1, data.GetLength(), f);
 		fclose(f);
 	}
@@ -286,7 +286,7 @@ bool CWebServer::LoadPage(UINT resid, CStringA& str, CString path)
 	CString redir;
 	if (ToLocalPath(path, redir)) {
 		FILE* f = NULL;
-		if (!_wfopen_s(&f, path, L"rb")) {
+		if (_wfopen_s(&f, path, L"rb") == 0) {
 			fseek(f, 0, 2);
 			char* buff = str.GetBufferSetLength(ftell(f));
 			fseek(f, 0, 0);

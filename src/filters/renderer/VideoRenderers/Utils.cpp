@@ -72,8 +72,7 @@ HRESULT DumpDX9Surface(IDirect3DDevice9* pD3DDev, IDirect3DSurface9* pSurface, w
 	bfh.bfReserved1 = bfh.bfReserved2 = 0;
 
 	FILE* fp;
-	_wfopen_s(&fp, filename, L"wb");
-	if (fp) {
+	if (_wfopen_s(&fp, filename, L"wb") == 0) {
 		fwrite(&bfh, sizeof(bfh), 1, fp);
 		fwrite(dib.get(), sizeof(BITMAPINFOHEADER) + len, 1, fp);
 		fclose(fp);
@@ -184,8 +183,7 @@ HRESULT SaveRAWVideoAsBMP(BYTE* data, DWORD format, unsigned pitch, unsigned wid
 	bfh.bfReserved1 = bfh.bfReserved2 = 0;
 
 	FILE* fp;
-	_wfopen_s(&fp, filename, L"wb");
-	if (fp) {
+	if (_wfopen_s(&fp, filename, L"wb") == 0) {
 		fwrite(&bfh, sizeof(bfh), 1, fp);
 		fwrite(dib.get(), sizeof(BITMAPINFOHEADER) + tablecolors * 4 + len, 1, fp);
 		fclose(fp);
