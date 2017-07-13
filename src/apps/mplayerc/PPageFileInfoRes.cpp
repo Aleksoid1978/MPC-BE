@@ -159,7 +159,7 @@ void CPPageFileInfoRes::OnSaveAs()
 				   ext_list, this, 0);
 	if (fd.DoModal() == IDOK) {
 		FILE* f = NULL;
-		if (!_wfopen_s(&f, fd.GetPathName(), L"wb")) {
+		if (_wfopen_s(&f, fd.GetPathName(), L"wb") == 0) {
 			fwrite(r.data.GetData(), 1, r.data.GetCount(), f);
 			fclose(f);
 		}

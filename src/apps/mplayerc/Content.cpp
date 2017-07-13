@@ -401,8 +401,7 @@ namespace Content {
 			GetContentTypeByExt(fn, ct);
 
 			FILE* f = NULL;
-			_wfopen_s(&f, fn, L"rb");
-			if (f) {
+			if (_wfopen_s(&f, fn, L"rb") == 0) {
 				CStringA str;
 				str.ReleaseBufferSetLength(fread(str.GetBuffer(3), 1, 3, f));
 				body = AToT(str);

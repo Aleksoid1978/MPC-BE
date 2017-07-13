@@ -101,8 +101,7 @@ static bool BMPDIB(LPCWSTR fn, BYTE* pData, CStringW format, ULONG quality, bool
 
 	if (format == L"") {
 		FILE* fp;
-		_wfopen_s(&fp, fn, L"wb");
-		if (fp) {
+		if (_wfopen_s(&fp, fn, L"wb") == 0) {
 			fwrite(&bfh, sizeof(bfh), 1, fp);
 			fwrite(&bi.bmiHeader, sih, 1, fp);
 			fwrite(rgb, len, 1, fp);
@@ -141,8 +140,7 @@ static bool BMPDIB(LPCWSTR fn, BYTE* pData, CStringW format, ULONG quality, bool
 static void PNGDIB(LPCWSTR fn, BYTE* pData, int level)
 {
 	FILE* fp;
-	_wfopen_s(&fp, fn, L"wb");
-	if (fp) {
+	if (_wfopen_s(&fp, fn, L"wb") == 0) {
 		BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
 
 		int line, width = bih->biWidth, height = abs(bih->biHeight), bpp = bih->biBitCount / 8;

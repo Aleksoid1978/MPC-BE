@@ -56,7 +56,7 @@ namespace Logger
 	{
 		std::unique_lock<std::mutex> lock(log_mutex);
 		FILE* f = NULL;
-		if (_wfopen_s(&f, logFileName, L"at, ccs=UTF-8") == 0 && f) {
+		if (_wfopen_s(&f, logFileName, L"at, ccs=UTF-8") == 0) {
 			fseek(f, 0, SEEK_END);
 
 			va_list args;
@@ -78,7 +78,7 @@ namespace Logger
 	{
 		std::unique_lock<std::mutex> lock(log_mutex);
 		FILE* f = NULL;
-		if (_wfopen_s(&f, logFileName, L"at, ccs=UTF-8") == 0 && f) {
+		if (_wfopen_s(&f, logFileName, L"at, ccs=UTF-8") == 0) {
 			fseek(f, 0, SEEK_END);
 
 			va_list args;

@@ -287,16 +287,17 @@ HBITMAP CMPCPngImage::LoadExternalImage(CString fn, int resid, IMG_TYPE type, in
 	int width, height, bpp;
 
 	FILE* fp = NULL;
-	if (fn.GetLength() > 0) {
-		_wfopen_s(&fp, path + fn + L".png", L"rb");
+	errno_t error = -1;
+	if (!fn.IsEmpty()) {
+		error = _wfopen_s(&fp, path + fn + L".png", L"rb");
 	}
-	if (fp) {
+	if (error == 0) {
 		return TypeLoadImage(IMG_TYPE::PNG, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
 	} else {
-		if (fn.GetLength() > 0) {
-			_wfopen_s(&fp, path + fn + L".bmp", L"rb");
+		if (!fn.IsEmpty()) {
+			error = _wfopen_s(&fp, path + fn + L".bmp", L"rb");
 		}
-		if (fp) {
+		if (error == 0) {
 			return TypeLoadImage(IMG_TYPE::BMP, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
 		} else {
 			if (resid && ((int)AfxGetAppSettings().bUseDarkTheme == !!type || type == IMG_TYPE::UNDEF)) {
@@ -313,25 +314,25 @@ bool CMPCPngImage::LoadExternalGradient(CString fn)
 	CString path = GetProgramDir();
 
 	FILE* fp = NULL;
-	_wfopen_s(&fp, path + fn + L".png", L"rb");
+	errno_t error = _wfopen_s(&fp, path + fn + L".png", L"rb");
 
 	if (m_ExtGradientHB) {
 		DeleteObject(m_ExtGradientHB);
 	}
 	m_ExtGradientHB = NULL;
 
-	if (fp) {
+	if (error == 0) {
 		m_ExtGradientHB = TypeLoadImage(IMG_TYPE::PNG, &m_pExtGradientDATA, &m_width, &m_height, &m_bpp, fp, 0);
 		m_type = IMG_TYPE::PNG;
 	} else {
-		_wfopen_s(&fp, path + fn + L".bmp", L"rb");
-		if (fp) {
+		error = _wfopen_s(&fp, path + fn + L".bmp", L"rb");
+		if (error == 0) {
 			m_ExtGradientHB = TypeLoadImage(IMG_TYPE::BMP, &m_pExtGradientDATA, &m_width, &m_height, &m_bpp, fp, 0);
 			m_type = IMG_TYPE::BMP;
 		}
 	}
 
-	if (fp) {
+	if (error == 0) {
 		fclose(fp);
 	}
 
