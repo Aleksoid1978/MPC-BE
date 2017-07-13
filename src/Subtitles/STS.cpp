@@ -570,6 +570,8 @@ static bool OpenOldSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int Char
 static CString WebVTT2SSA(CString str)
 {
 	str = SubRipper2SSA(str);
+	str.Replace(L"&nbsp;", L" ");
+	str.Replace(L"&quot;", L"\"");
 	str.Replace(L"</c>", L"");
 	str.Replace(L"</v>", L"");
 
