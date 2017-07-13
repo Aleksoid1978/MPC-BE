@@ -31,6 +31,7 @@
     <None Include="Transformation\conv_matrix.hlsl">
       <FileType>Document</FileType>
     </None>
+    <FxCompile Include="Transformation\chroma_422_correction.hlsl" />
     <FxCompile Include="Transformation\final_pass.hlsl">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">LUT3D_ENABLED=1;DITHER_ENABLED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">LUT3D_ENABLED=1;DITHER_ENABLED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>

@@ -115,6 +115,7 @@ IDF_SHADER_DOWNSCALER_LANCZOS_Y  SHADER                  "..\\..\\..\\bin\\shade
 IDF_SHADER_CORRECTION_YCGCO      SHADER                  "..\\..\\..\\bin\\shaders\\ycgco_correction.cso"
 IDF_SHADER_CORRECTION_ST2084     SHADER                  "..\\..\\..\\bin\\shaders\\st2084_correction.cso"
 IDF_SHADER_CORRECTION_HLG        SHADER                  "..\\..\\..\\bin\\shaders\\hlg_correction.cso"
+IDF_SHADER_CORRECTION_422        SHADER                  "..\\..\\..\\bin\\shaders\\chroma_422_correction.cso"
 IDF_SHADER_CONVERT_TO_INTERLACE  SHADER                  "..\\..\\..\\bin\\shaders\\halfoverunder_to_interlace.cso"
 
 IDF_SHADER_PS20_BSPLINE4_X       SHADER                  "..\\..\\..\\bin\\shaders\\ps20_resizer_bspline4_x.cso"
@@ -138,6 +139,7 @@ IDF_SHADER_PS20_DOWNSCALER_BOX_Y     SHADER              "..\\..\\..\\bin\\shade
 IDF_SHADER_PS20_CORRECTION_YCGCO     SHADER              "..\\..\\..\\bin\\shaders\\ps20_ycgco_correction.cso"
 IDF_SHADER_PS20_CORRECTION_ST2084    SHADER              "..\\..\\..\\bin\\shaders\\ps20_st2084_correction.cso"
 IDF_SHADER_PS20_CORRECTION_HLG       SHADER              "..\\..\\..\\bin\\shaders\\ps20_hlg_correction.cso"
+IDF_SHADER_PS20_CORRECTION_422       SHADER              "..\\..\\..\\bin\\shaders\\ps20_chroma_422_correction.cso"
 IDF_SHADER_PS20_CONVERT_TO_INTERLACE SHADER              "..\\..\\..\\bin\\shaders\\ps20_halfoverunder_to_interlace.cso"
 
 /////////////////////////////////////////////////////////////////////////////

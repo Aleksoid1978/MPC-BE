@@ -1592,9 +1592,10 @@ void CEVRAllocatorPresenter::GetMixerThread()
 
 						FillAddingField(pPin, &mt);
 
-						m_inputExtFormat.value = 0;
 						if (mt.formattype == FORMAT_VideoInfo2) {
 							m_inputExtFormat.value = ((VIDEOINFOHEADER2*)mt.pbFormat)->dwControlFlags;
+						} else {
+							m_inputExtFormat.value = 0;
 						}
 					}
 					// If framerate not set by Video Decoder - choose 23.976

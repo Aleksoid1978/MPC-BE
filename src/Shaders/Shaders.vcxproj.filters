@@ -73,7 +73,7 @@
     <FxCompile Include="Resizers\downscaler_simple.hlsl">
       <Filter>Resizers</Filter>
     </FxCompile>
-    <FxCompile Include="Transformation\conv_matrix.hlsl">
+    <FxCompile Include="Transformation\chroma_422_correction.hlsl">
       <Filter>Transformation</Filter>
     </FxCompile>
   </ItemGroup>
@@ -120,6 +120,15 @@
     <None Include="Resizers\downscaler_filters.hlsl">
       <Filter>Resizers</Filter>
     </None>
+    <None Include="Transformation\colorspace_gamut_conversion.hlsl">
+      <Filter>Transformation</Filter>
+    </None>
+    <None Include="Transformation\conv_matrix.hlsl">
+      <Filter>Transformation</Filter>
+    </None>
+    <None Include="Transformation\hdr_tone_mapping.hlsl">
+      <Filter>Transformation</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="OnePassResizers">
@@ -131,13 +140,5 @@
     <Filter Include="Transformation">
       <UniqueIdentifier>{47767572-f2ee-4b2b-af5a-6a3abe6d6e94}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Transformation\hdr_tone_mapping.hlsl">
-      <Filter>Transformation</Filter>
-    </ClInclude>
-    <ClInclude Include="Transformation\colorspace_gamut_conversion.hlsl">
-      <Filter>Transformation</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
