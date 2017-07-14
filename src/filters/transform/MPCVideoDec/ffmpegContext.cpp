@@ -285,13 +285,13 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, int x264_build)
 			break;
 		case AV_CODEC_ID_LAGARITH:
 			if (pAVCtx->extradata_size >= 4) {
-				switch (GETDWORD(pAVCtx->extradata)) {
+				switch (GETDWORD(pAVCtx->extradata)) { // "lossy_option"
 				case 0:
 					switch (pAVCtx->bits_per_coded_sample) {
 					case 32: pAVCtx->pix_fmt = AV_PIX_FMT_RGBA; break;
 					case 24: pAVCtx->pix_fmt = AV_PIX_FMT_RGB24; break;
-					case 16: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; break; // bug of encoder from VirtualDub FilterMod
-					case 12: pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; break; // bug of encoder from VirtualDub FilterMod
+					case 16: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; break;
+					case 12: pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; break;
 					}
 					break;
 				case 1:
