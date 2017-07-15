@@ -304,18 +304,16 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, int x264_build)
 			}
 			break;
 		case AV_CODEC_ID_PRORES:
-			if (pAVCtx->extradata_size >= 8) {
-				switch (GETDWORD(pAVCtx->extradata + 4)) {
-				case 'hcpa': // Apple ProRes 422 High Quality
-				case 'ncpa': // Apple ProRes 422 Standard Definition
-				case 'scpa': // Apple ProRes 422 LT
-				case 'ocpa': // Apple ProRes 422 Proxy
-					pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10LE;
-					break;
-				case 'h4pa': // Apple ProRes 4444
-					pAVCtx->pix_fmt = pAVCtx->bits_per_coded_sample == 32 ? AV_PIX_FMT_YUVA444P10LE : AV_PIX_FMT_YUV444P10LE;
-					break;
-				}
+			switch (pAVCtx->codec_tag) {
+			case FCC('apch'): // Apple ProRes 422 High Quality
+			case FCC('apcn'): // Apple ProRes 422 Standard Definition
+			case FCC('apcs'): // Apple ProRes 422 LT
+			case FCC('apco'): // Apple ProRes 422 Proxy
+				pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10LE;
+				break;
+			case FCC('ap4h'): // Apple ProRes 4444
+				pAVCtx->pix_fmt = pAVCtx->bits_per_coded_sample == 32 ? AV_PIX_FMT_YUVA444P10LE : AV_PIX_FMT_YUV444P10LE;
+				break;
 			}
 			break;
 		case AV_CODEC_ID_PNG:
