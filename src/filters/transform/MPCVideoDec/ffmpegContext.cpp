@@ -353,19 +353,27 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, int x264_build)
 					case 0x6c: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10; break;
 					case 0x6d: pAVCtx->pix_fmt = AV_PIX_FMT_GBRP10;    break;
 					case 0x6e: pAVCtx->pix_fmt = AV_PIX_FMT_GBRAP10;   break;
+					case 0x6f: pAVCtx->pix_fmt = AV_PIX_FMT_GBRP12;    break;
+					case 0x70: pAVCtx->pix_fmt = AV_PIX_FMT_GBRAP12;   break;
 					case 0x73: pAVCtx->pix_fmt = AV_PIX_FMT_GRAY10;    break;
 					}
 				}
 			}
 			else if (pAVCtx->extradata_size >= 8) {
 				switch (GETDWORD(pAVCtx->extradata + 4)) {
-				case FCC('M8RG'): pAVCtx->pix_fmt = AV_PIX_FMT_GBRP;     break;
-				case FCC('M8RA'): pAVCtx->pix_fmt = AV_PIX_FMT_GBRAP;    break;
-				case FCC('M8Y4'): pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P;  break;
-				case FCC('M8Y2'): pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;  break;
-				case FCC('M8Y0'): pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;  break;
-				case FCC('M8YA'): pAVCtx->pix_fmt = AV_PIX_FMT_YUVA444P; break;
-				case FCC('M8G0'): pAVCtx->pix_fmt = AV_PIX_FMT_GRAY8;    break;
+				case FCC('M8RG'): pAVCtx->pix_fmt = AV_PIX_FMT_GBRP;      break;
+				case FCC('M8RA'): pAVCtx->pix_fmt = AV_PIX_FMT_GBRAP;     break;
+				case FCC('M8Y4'): pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P;   break;
+				case FCC('M8Y2'): pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P;   break;
+				case FCC('M8Y0'): pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P;   break;
+				case FCC('M8YA'): pAVCtx->pix_fmt = AV_PIX_FMT_YUVA444P;  break;
+				case FCC('M8G0'): pAVCtx->pix_fmt = AV_PIX_FMT_GRAY8;     break;
+				case FCC('M0Y2'): pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10; break;
+				case FCC('M0RG'): pAVCtx->pix_fmt = AV_PIX_FMT_GBRP10;    break;
+				case FCC('M0RA'): pAVCtx->pix_fmt = AV_PIX_FMT_GBRAP10;   break;
+				case FCC('M2RG'): pAVCtx->pix_fmt = AV_PIX_FMT_GBRP12;    break;
+				case FCC('M2RA'): pAVCtx->pix_fmt = AV_PIX_FMT_GBRAP12;   break;
+				case FCC('M0R0'): pAVCtx->pix_fmt = AV_PIX_FMT_GRAY10;    break;
 				}
 			}
 			break;
