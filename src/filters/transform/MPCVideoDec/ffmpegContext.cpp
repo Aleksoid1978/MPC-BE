@@ -380,13 +380,29 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, int x264_build)
 				const FFV1Context* h = (FFV1Context*)pAVCtx->priv_data;
 				if (h->version > 0) { // extra data has been parse
 					if (h->colorspace == 0) {
-						switch (16 * h->chroma_h_shift + h->chroma_v_shift) {
-						case 0x00: pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P; break;
-						case 0x01: pAVCtx->pix_fmt = AV_PIX_FMT_YUV440P; break;
-						case 0x10: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; break;
-						case 0x11: pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; break;
-						case 0x20: pAVCtx->pix_fmt = AV_PIX_FMT_YUV411P; break;
-						case 0x22: pAVCtx->pix_fmt = AV_PIX_FMT_YUV410P; break;
+						if (pAVCtx->bits_per_raw_sample <= 8) { // <=8 bit and transparency
+							switch (16 * h->chroma_h_shift + h->chroma_v_shift) {
+							case 0x00: pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P; break;
+							case 0x01: pAVCtx->pix_fmt = AV_PIX_FMT_YUV440P; break;
+							case 0x10: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P; break;
+							case 0x11: pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; break;
+							case 0x20: pAVCtx->pix_fmt = AV_PIX_FMT_YUV411P; break;
+							case 0x22: pAVCtx->pix_fmt = AV_PIX_FMT_YUV410P; break;
+							}
+						}
+						else if (pAVCtx->bits_per_raw_sample <= 10) { // 9, 10 bit and transparency
+							switch (16 * h->chroma_h_shift + h->chroma_v_shift) {
+							case 0x00: pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P10; break;
+							case 0x10: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P10; break;
+							case 0x11: pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P10; break;
+							}
+						}
+						else if (pAVCtx->bits_per_raw_sample <= 16) { // 12, 14, 16 bit and transparency
+							switch (16 * h->chroma_h_shift + h->chroma_v_shift) {
+							case 0x00: pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P16; break;
+							case 0x10: pAVCtx->pix_fmt = AV_PIX_FMT_YUV422P16; break;
+							case 0x11: pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P16; break;
+							}
 						}
 					}
 					else if (h->colorspace == 1) {
