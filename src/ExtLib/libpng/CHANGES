@@ -5840,7 +5840,60 @@ Version 1.6.30beta03 [May 22, 2017]
   Test CMAKE_HOST_WIN32 instead of WIN32 in CMakeLists.txt.
   Fix some URL in documentation.
 
-Version 1.6.30beta04 [May 24, 2017]
+Version 1.6.30beta04 [June 7, 2017]
+  Avoid writing an empty IDAT when the last IDAT exactly fills the
+    compression buffer (bug report by Brian Baird). This bug was
+    introduced in libpng-1.6.0.
+
+Version 1.6.30rc01 [June 14, 2017]
+  No changes.
+
+Version 1.6.30rc02 [June 25, 2017]
+  Update copyright year in pnglibconf.h, make ltmain.sh executable.
+  Add a reference to the libpng.download site in README.
+
+Version 1.6.30 [June 28, 2017]
+  No changes.
+
+Version 1.6.31beta01 [July 5, 2017]
+  Guard the definition of _POSIX_SOURCE in pngpriv.h (AIX already defines it;
+    bug report by Michael Felt).
+  Revised pngpriv.h to work around failure to compile arm/filter_neon.S
+    ("typedef" directive is unrecognized by the assembler). The problem
+    was introduced in libpng-1.6.30beta01.
+  Added "Requires: zlib" to libpng.pc.in (Pieter Neerincx).
+  Added special case for FreeBSD in arm/filter_neon.S (Maya Rashish).
+
+Version 1.6.31beta02 [July 8, 2017]
+  Added instructions for disabling hardware optimizations in INSTALL.
+  Added "--enable-hardware-optimizations" configuration flag to enable
+    or disable all hardware optimizations with one flag.
+
+Version 1.6.31beta03 [July 9, 2017]
+  Updated CMakeLists.txt to add INTEL_SSE and MIPS_MSA platforms.
+  Changed "int" to "png_size_t" in intel/filter_sse2.c to prevent
+    possible integer overflow (Bug report by John Bowler).
+  Quieted "declaration after statement" warnings in intel/filter_sse2.c.
+  Added scripts/makefile-linux-opt, which has hardware optimizations enabled.
+
+Version 1.6.31beta04 [July 11, 2017]
+  Removed one of the GCC-7.1.0 'strict-overflow' warnings that result when
+    integers appear on both sides of a compare.  Worked around the others by
+    forcing the strict-overflow setting in the relevant functions to a level
+    where they are not reported (John Bowler).
+  Changed "FALL THROUGH" comments to "FALLTHROUGH" because GCC doesn't like
+    the space.
+  Worked around some C-style casts from (void*) because g++ 5.4.0 objects
+    to them.
+  Increased the buffer size for 'sprint' to pass the gcc 7.1.0 'sprint
+    overflow' check that is on by default with -Wall -Wextra.
+
+Version 1.6.31beta05 [July 13, 2017]
+  Added eXIf chunk support.
+
+Version 1.6.31beta06 [July 16, 2017]
+  Added a minimal eXIf chunk (with Orientation and FocalLengthIn35mmFilm
+    tags) to pngtest.png.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
