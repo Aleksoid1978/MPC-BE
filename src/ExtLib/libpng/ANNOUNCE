@@ -1,6 +1,6 @@
-Libpng 1.6.30beta04 - May 24, 2017
+Libpng 1.6.31beta06 - July 16, 2017
 
-This is not intended to be a public release.  It will be replaced
+This is not intended to be a public release. It will be replaced
 within a few weeks by a public version or by another test version.
 
 Files available for download:
@@ -8,44 +8,62 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.30beta04.tar.xz (LZMA-compressed, recommended)
-   1.6.30beta04.tar.gz
+   1.6.31beta06.tar.xz (LZMA-compressed, recommended)
+   1.6.31beta06.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1630b04.7z  (LZMA-compressed, recommended)
-   lp1630b04.zip
+   lp1631b06.7z  (LZMA-compressed, recommended)
+   lp1631b06.zip
 
 Other information:
 
-   1.6.30beta04-README.txt
-   1.6.30beta04-LICENSE.txt
-   libpng-1.6.30beta04-*.asc (armored detached GPG signatures)
+   1.6.31beta06-README.txt
+   1.6.31beta06-LICENSE.txt
+   libpng-1.6.31beta06-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.6.29):
+Changes since the last public release (1.6.30):
 
-Version 1.6.30beta01 [April 1, 2017]
-  Added missing "$(CPPFLAGS)" to the compile line for c.pic.o in
-    makefile.linux and makefile.solaris-x86 (Cosmin).
-  Revised documentation of png_get_error_ptr() in the libpng manual.
-  Silence clang -Wcomma and const drop warnings (Viktor Szakats).
-  Update Sourceforge URLs in documentation (https instead of http).
+Version 1.6.31beta01 [July 5, 2017]
+  Guard the definition of _POSIX_SOURCE in pngpriv.h (AIX already defines it;
+    bug report by Michael Felt).
+  Revised pngpriv.h to work around failure to compile arm/filter_neon.S
+    ("typedef" directive is unrecognized by the assembler). The problem
+    was introduced in libpng-1.6.30beta01.
+  Added "Requires: zlib" to libpng.pc.in (Pieter Neerincx).
+  Added special case for FreeBSD in arm/filter_neon.S (Maya Rashish).
 
-Version 1.6.30beta02 [April 22, 2017]
-  Document need to check for integer overflow when allocating a pixel
-    buffer for multiple rows in contrib/gregbook, contrib/pngminus,
-    example.c, and in the manual (suggested by Jaeseung Choi). This
-    is similar to the bug reported against pngquant in CVE-2016-5735.
-  Removed reference to the obsolete PNG_SAFE_LIMITS macro in the documentation.
+Version 1.6.31beta02 [July 8, 2017]
+  Added instructions for disabling hardware optimizations in INSTALL.
+  Added "--enable-hardware-optimizations" configuration flag to enable
+    or disable all hardware optimizations with one flag.
 
-Version 1.6.30beta03 [May 22, 2017]
-  Check for integer overflow in contrib/visupng and contrib/tools/genpng.
-  Do not double evaluate CMAKE_SYSTEM_PROCESSOR in CMakeLists.txt.
-  Test CMAKE_HOST_WIN32 instead of WIN32 in CMakeLists.txt.
-  Fix some URL in documentation.
+Version 1.6.31beta03 [July 9, 2017]
+  Updated CMakeLists.txt to add INTEL_SSE and MIPS_MSA platforms.
+  Changed "int" to "png_size_t" in intel/filter_sse2.c to prevent
+    possible integer overflow (Bug report by John Bowler).
+  Quieted "declaration after statement" warnings in intel/filter_sse2.c.
+  Added scripts/makefile-linux-opt, which has hardware optimizations enabled.
 
-Version 1.6.30beta04 [May 24, 2017]
+Version 1.6.31beta04 [July 11, 2017]
+  Removed one of the GCC-7.1.0 'strict-overflow' warnings that result when
+    integers appear on both sides of a compare.  Worked around the others by
+    forcing the strict-overflow setting in the relevant functions to a level
+    where they are not reported (John Bowler).
+  Changed "FALL THROUGH" comments to "FALLTHROUGH" because GCC doesn't like
+    the space.
+  Worked around some C-style casts from (void*) because g++ 5.4.0 objects
+    to them.
+  Increased the buffer size for 'sprint' to pass the gcc 7.1.0 'sprint
+    overflow' check that is on by default with -Wall -Wextra.
+
+Version 1.6.31beta05 [July 13, 2017]
+  Added eXIf chunk support.
+
+Version 1.6.31beta06 [July 16, 2017]
+  Added a minimal eXIf chunk (with Orientation and FocalLengthIn35mmFilm
+    tags) to pngtest.png.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -82,5 +82,11 @@
     <ClCompile Include="precomp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="filter_sse2_intrinsics.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="intel_init.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
