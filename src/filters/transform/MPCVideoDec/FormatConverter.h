@@ -113,7 +113,6 @@ protected:
 
 	MPCPixelFormat		m_out_pixfmt;
 
-	int					m_colorspace;
 	int					m_dstRGBRange;
 
 	int					m_dstStride;
@@ -128,8 +127,8 @@ protected:
 
 	int					m_NumThreads;
 
-	bool Init();
-	void UpdateDetails();
+	bool InitSWSContext();
+	void UpdateSWSContext();
 
 	int m_swsWidth  = 0;
 	int m_swsHeight = 0;
@@ -183,7 +182,7 @@ public:
 
 	MPCPixelFormat GetOutPixFormat() { return m_out_pixfmt; }
 
-	int  Converting(BYTE* dst, AVFrame* pFrame);
+	bool Converting(BYTE* dst, AVFrame* pFrame);
 
 	void Cleanup();
 

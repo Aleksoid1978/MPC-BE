@@ -347,6 +347,12 @@ HRESULT CFormatConverter::ConvertToY416(const uint8_t* const src[4], const ptrdi
 
 HRESULT CFormatConverter::ConvertGeneric(const uint8_t* const src[4], const ptrdiff_t srcStride[4], uint8_t* dst[], int width, int height, const ptrdiff_t dstStride[])
 {
+  if (!m_pSwsContext) {
+    InitSWSContext();
+  }
+
+  CheckPointer(m_pSwsContext, E_POINTER);
+
   switch (m_out_pixfmt) {
   case PixFmt_AYUV:
     ConvertToAYUV(src, srcStride, dst, width, height, dstStride);
