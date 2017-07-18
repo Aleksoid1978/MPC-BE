@@ -584,8 +584,8 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"Dostępne napisy"
-6		"Pobierz i otwórz"
-8		"Wczytanie napisów"
+7		"Wczytanie napisów"
+8		"Pobierz i otwórz"
 END
 
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25

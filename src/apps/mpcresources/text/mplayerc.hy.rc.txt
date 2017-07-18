@@ -584,8 +584,8 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"Հասանելի տողագրերի ցանկը"
-6		"Բեռնել և Բացել"
-8		"Փոփոխել արդեն բացված տողագրերը"
+7		"Փոփոխել արդեն բացված տողագրերը"
+8		"Բեռնել և Բացել"
 END
 
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25

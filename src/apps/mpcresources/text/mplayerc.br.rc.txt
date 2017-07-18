@@ -584,8 +584,8 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"Legendas disponiveis online"
-6		"Baixar e abrir"
-8		"Substituir legendas carregadas atualmente"
+7		"Substituir legendas carregadas atualmente"
+8		"Baixar e abrir"
 END
 
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25

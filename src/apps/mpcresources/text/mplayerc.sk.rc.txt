@@ -584,8 +584,8 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"Titulky na internete"
-6		"Stiahnuť a otvoriť"
-8		"Nahradiť práve načítané titulky"
+7		"Nahradiť práve načítané titulky"
+8		"Stiahnuť a otvoriť"
 END
 
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25

@@ -584,8 +584,8 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"Azpidatziak eskuragarri online"
-6		"Jeitsi eta Ireki"
-8		"Ordeztu orain gertatutako azpidatziak"
+7		"Ordeztu orain gertatutako azpidatziak"
+8		"Jeitsi eta Ireki"
 END
 
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25

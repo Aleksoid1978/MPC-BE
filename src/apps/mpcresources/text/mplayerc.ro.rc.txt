@@ -584,8 +584,8 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"Subtitrări disponibile online"
-6		"Descarcă && Deschide"
-8		"Înlocuiește subtitrările încărcate curent"
+7		"Înlocuiește subtitrările încărcate curent"
+8		"Descarcă && Deschide"
 END
 
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25

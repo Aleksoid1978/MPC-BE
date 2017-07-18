@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"バージョン情報"
 7		"MPC-BE"
 8		"Copyright © 2002-2017 (Authors.txt ファイルを参照)"
@@ -584,8 +584,8 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"オンラインで利用可能な字幕"
-6		"ダウンロードして開く"
-8		"現在ロードされている字幕を置き換える"
+7		"現在ロードされている字幕を置き換える"
+8		"ダウンロードして開く"
 END
 
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25

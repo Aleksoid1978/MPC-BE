@@ -584,8 +584,8 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"Online verfügbare Untertitel"
-6		"&Herunterladen && Öffnen"
-8		"Momentan geladene Untertitel &ersetzen"
+7		"Momentan geladene Untertitel &ersetzen"
+8		"&Herunterladen && Öffnen"
 END
 
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25

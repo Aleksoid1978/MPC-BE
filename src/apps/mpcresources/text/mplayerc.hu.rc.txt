@@ -584,8 +584,8 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"Online elérhető feliratok"
-6		"Letöltés && Megnyitás"
-8		"Jelenleg betöltött felirat lecserélése"
+7		"Jelenleg betöltött felirat lecserélése"
+8		"Letöltés && Megnyitás"
 END
 
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25
