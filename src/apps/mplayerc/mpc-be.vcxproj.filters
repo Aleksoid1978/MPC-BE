@@ -318,9 +318,6 @@
     <ClCompile Include="PPageFiltersPriority.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WinDebugMonitor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="OSD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -666,9 +663,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PPageFiltersPriority.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="WinDebugMonitor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OSD.h">

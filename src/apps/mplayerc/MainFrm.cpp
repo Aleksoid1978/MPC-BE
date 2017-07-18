@@ -669,7 +669,6 @@ CMainFrame::CMainFrame() :
 	m_hWtsLib(0),
 	m_CaptureWndBitmap(NULL),
 	m_ThumbCashedBitmap(NULL),
-	m_DebugMonitor(::GetCurrentProcessId()),
 	m_nSelSub2(-1),
 	m_hGraphThreadEventOpen(FALSE, TRUE),
 	m_hGraphThreadEventClose(FALSE, TRUE),

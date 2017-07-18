@@ -75,8 +75,6 @@
 #include "RateControl.h"
 #include "DiskImage.h"
 
-#include "WinDebugMonitor.h"
-
 #define USE_MEDIAINFO_STATIC
 #include <MediaInfo/MediaInfo.h>
 using namespace MediaInfoLib;
@@ -89,58 +87,6 @@ enum PMODE {
 	PM_FILE,
 	PM_DVD,
 	PM_CAPTURE
-};
-
-class CDebugMonitor : public CWinDebugMonitor
-{
-	FILE* m_File;
-
-private:
-	CString GetLocalTime() {
-		SYSTEMTIME st;
-		::GetLocalTime(&st);
-
-		CString lt;
-		lt.Format(L"%04d.%02d.%02d %02d:%02d:%02d.%03d", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
-
-		return lt;
-	}
-
-public:
-	CDebugMonitor(DWORD dwProcessId) : CWinDebugMonitor(dwProcessId) {
-		static CString sDesktop;
-		if (sDesktop.IsEmpty()) {
-			WCHAR szPath[MAX_PATH];
-			if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_DESKTOP, NULL, 0, szPath))) {
-				sDesktop = CString(szPath) + L"\\";
-			}
-		}
-
-		m_File = NULL;
-		if (bIsInitialize) {
-			CString fname = sDesktop + L"mpc-be_debug.log";
-			m_File = _wfopen(fname, L"at, ccs=UTF-8");
-			if (m_File) {
-				fseek(m_File, 0, 2);
-
-				fwprintf_s(m_File, L"=== Start MPC-BE Debug log [%s] ===\n", GetLocalTime());
-			}
-		}
-	}
-
-	~CDebugMonitor() {
-		if (m_File) {
-			fwprintf_s(m_File, L"=== End MPC-BE Debug log [%s] ===\n", GetLocalTime());
-
-			fclose(m_File);
-		}
-	}
-
-	virtual void OutputWinDebugString(const char *str) {
-		if (m_File) {
-			fwprintf_s(m_File, L"%s : %S", GetLocalTime(), str);
-		}
-	};
 };
 
 interface __declspec(uuid("6E8D4A21-310C-11d0-B79A-00AA003767A7")) // IID_IAMLine21Decoder
@@ -1315,8 +1261,6 @@ protected:
 	CComPtr<IBaseFilter> m_pBFmadVR;
 
 	HMODULE m_hWtsLib;
-
-	CDebugMonitor m_DebugMonitor;
 
 	CStringArray      m_ExtSubFiles;
 	CAtlArray<CTime>  m_ExtSubFilesTime;
