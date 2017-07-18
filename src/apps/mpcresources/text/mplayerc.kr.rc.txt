@@ -1775,6 +1775,7 @@ STRING IDS_SCALE_WIDESCREEN		"와이드스크린으로 확대,%.3f,%.3f,%.3f,%.3
 STRING IDS_SCREENSHOT_ERROR_MADVR		"'이미지 저장' 과 '썸네일 저장' 은 madVR 비디오 렌더와 호환되지 않습니다.\n MPC-BE의 출력 옵션에서 비디오 렌더러를 바꾼후 다시 파일을 여세요."
 STRING IDS_SCREENSHOT_ERROR_OVERLAY		"'이미지 저장' 과 '썸네일 저장' 은 비디오 렌더러가 오버레이 믹서로 설정되어있을 때는 작동하지 않습니다.\n'출력' 옵션에서 비디오 렌더러를 변경한 후에 파일을 다시 여십시오."
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"'이미지 저장' 과 '썸네일 저장' 은 Shockwave 파일에 대해서는 동작하지 않습니다."
+STRING IDS_SEEKBEGIN		"Jump to Beginning"
 STRING IDS_SHADEREDITORDLG_0		"이 셰이더를 삭제하겠습니까?"
 STRING IDS_SHADERS_EDIT		"셰이더 편집(&E)..."
 STRING IDS_SHADERS_SELECT		"셰이더 선택(&S)..."

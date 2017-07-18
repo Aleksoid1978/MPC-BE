@@ -1775,6 +1775,7 @@ STRING IDS_SCALE_WIDESCREEN		"Priblížiť na šírku obrazovky,%.3f,%.3f,%.3f,%
 STRING IDS_SCREENSHOT_ERROR_MADVR		"The 'Save Image' and 'Save Thumbnails' functions do not work with the madVR video renderer.\nChange the video renderer in MPC's output options and reopen the file."
 STRING IDS_SCREENSHOT_ERROR_OVERLAY		"Funkcie 'Uložiť obrázok' a 'Uložiť náhľady' nefungujú s vykresľovaním videa Overlay Mixer.\nZmeňte vykresľovač videa v nastaveniach výstupu MPC a otvorte súboru znovu."
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"Funkcie 'Uložiť obrázok' a 'Uložiť náhľady' nepracujú so súbormi ShockWave."
+STRING IDS_SEEKBEGIN		"Jump to Beginning"
 STRING IDS_SHADEREDITORDLG_0		"Naozaj chcete vymazať tento shader?"
 STRING IDS_SHADERS_EDIT		"&Úpravy shaderov..."
 STRING IDS_SHADERS_SELECT		"&Výber shaderov..."
