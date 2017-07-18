@@ -176,7 +176,6 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 CFormatConverter::CFormatConverter()
 	: m_pSwsContext(NULL)
 	, m_out_pixfmt(PixFmt_None)
-	, m_colorspace(SWS_CS_DEFAULT)
 	, m_dstRGBRange(0)
 	, m_dstStride(0)
 	, m_planeHeight(0)
@@ -185,6 +184,7 @@ CFormatConverter::CFormatConverter()
 	, m_nCPUFlag(0)
 	, m_RequiredAlignment(0)
 	, m_NumThreads(1)
+	, pConvertFn(NULL)
 {
 	ASSERT(PixFmt_count == _countof(s_sw_formats));
 
@@ -196,8 +196,6 @@ CFormatConverter::CFormatConverter()
 	m_FProps.colorspace	= AVCOL_SPC_UNSPECIFIED;
 	m_FProps.colorrange	= AVCOL_RANGE_UNSPECIFIED;
 
-	pConvertFn			= &CFormatConverter::ConvertGeneric;
-
 	m_NumThreads		= min(8, max(1, CPUInfo::GetProcessorNumber() / 2));
 }
 
@@ -206,16 +204,14 @@ CFormatConverter::~CFormatConverter()
 	Cleanup();
 }
 
-bool CFormatConverter::Init()
+bool CFormatConverter::InitSWSContext()
 {
-	Cleanup();
-
 	if (m_FProps.avpixfmt == AV_PIX_FMT_NONE) {
-		DLog(L"FormatConverter::Init() - incorrect source format");
+		DLog(L"FormatConverter::InitSWSContext() - incorrect source format");
 		return false;
 	}
 	if (m_out_pixfmt == PixFmt_None) {
-		DLog(L"FormatConverter::Init() - incorrect output format");
+		DLog(L"FormatConverter::InitSWSContext() - incorrect output format");
 		return false;
 	}
 
@@ -235,16 +231,16 @@ bool CFormatConverter::Init()
 						NULL);
 
 	if (m_pSwsContext == NULL) {
-		DLog(L"FormatConverter::Init() - sws_getCachedContext() failed");
+		DLog(L"FormatConverter::InitSWSContext() - sws_getCachedContext() failed");
 		return false;
 	}
 
-	SetConvertFunc();
+	UpdateSWSContext();
 
 	return true;
 }
 
-void CFormatConverter::UpdateDetails()
+void CFormatConverter::UpdateSWSContext()
 {
 	if (m_pSwsContext) {
 		int *inv_tbl = NULL, *tbl = NULL;
@@ -262,11 +258,9 @@ void CFormatConverter::UpdateDetails()
 				dstRange = 1;
 			}
 
-			m_colorspace = m_FProps.colorspace;
-			// SWS_CS_* does not fully comply with the AVCOL_SPC_*, but it is well handled in the libswscale.
-
 			if (isAnyRGB(m_pSwsContext->srcFormat) || isAnyRGB(m_pSwsContext->dstFormat)) {
-				inv_tbl = (int *)sws_getCoefficients(m_colorspace);
+				// SWS_CS_* does not fully comply with the AVCOL_SPC_*, but it is well handled in the libswscale.
+				inv_tbl = (int *)sws_getCoefficients(m_FProps.colorspace);
 			}
 
 			ret = sws_setColorspaceDetails(m_pSwsContext, inv_tbl, srcRange, tbl, dstRange, brightness, contrast, saturation);
@@ -400,13 +394,12 @@ void CFormatConverter::SetOptions(int rgblevels)
 {
 	m_dstRGBRange = rgblevels == 1 ? 0 : 1;
 
-	UpdateDetails();
+	UpdateSWSContext();
 }
 
-int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
+bool CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 {
-	if (!m_pSwsContext
-			|| FormatChanged(&m_FProps.avpixfmt, (AVPixelFormat*)&pFrame->format)
+	if (FormatChanged(&m_FProps.avpixfmt, (AVPixelFormat*)&pFrame->format)
 			|| pFrame->width != m_FProps.width || pFrame->height != m_FProps.height) {
 		// update the basic properties
 		m_FProps.avpixfmt   = (AVPixelFormat)pFrame->format;
@@ -419,12 +412,11 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		m_FProps.colorspace = pFrame->colorspace;
 		m_FProps.colorrange = pFrame->color_range;
 
-		if (!Init()) {
-			DLog(L"CFormatConverter::Converting() - Init() failed");
-			return 0;
-		}
+		Cleanup();
+	}
 
-		UpdateDetails();
+	if (!pConvertFn) {
+		SetConvertFunc();
 	}
 
 	const SW_OUT_FMT& swof = s_sw_formats[m_out_pixfmt];
@@ -491,7 +483,7 @@ int CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		}
 	}
 
-	return 0;
+	return true;
 }
 
 void CFormatConverter::Cleanup()
@@ -500,6 +492,7 @@ void CFormatConverter::Cleanup()
 		sws_freeContext(m_pSwsContext);
 		m_pSwsContext = NULL;
 	}
+
 	av_freep(&m_pAlignedBuffer);
 	m_nAlignedBufferSize = 0;
 
@@ -507,6 +500,8 @@ void CFormatConverter::Cleanup()
 		_aligned_free(m_rgbCoeffs);
 		m_rgbCoeffs = nullptr;
 	}
+
+	pConvertFn = NULL;
 }
 
 bool CFormatConverter::FormatChanged(AVPixelFormat* fmt1, AVPixelFormat* fmt2)
