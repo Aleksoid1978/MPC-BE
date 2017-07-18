@@ -584,8 +584,8 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"Online beschikbare ondertiteling"
-6		"Downloaden && openen"
-8		"Vervang huidig geladen ondertiteling"
+7		"Vervang huidig geladen ondertiteling"
+8		"Downloaden && openen"
 END
 
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25

@@ -584,8 +584,8 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"Спіс даступных субтытраў"
-6		"Загрузіць і адкрыць"
-8		"Замяняць ужо адкрытыя субтытры"
+7		"Замяняць ужо адкрытыя субтытры"
+8		"Загрузіць і адкрыць"
 END
 
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25

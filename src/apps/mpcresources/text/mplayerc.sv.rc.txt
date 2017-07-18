@@ -584,8 +584,8 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"Undertexter tillgängliga online"
-6		"Ladda ner && Öppna"
-8		"Byt ut med nuvarande laddade undertexter"
+7		"Byt ut med nuvarande laddade undertexter"
+8		"Ladda ner && Öppna"
 END
 
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25

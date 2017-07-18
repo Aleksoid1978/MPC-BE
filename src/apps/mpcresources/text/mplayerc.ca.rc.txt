@@ -584,8 +584,8 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"Subtítols disponibles en línea"
-6		"Descargar i Obrir"
-8		"Remplaçar els subtítols actuals"
+7		"Remplaçar els subtítols actuals"
+8		"Descargar i Obrir"
 END
 
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25

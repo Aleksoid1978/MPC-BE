@@ -584,8 +584,8 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"線上有可用的字幕"
-6		"下載並開啟"
-8		"取代目前載入的字幕"
+7		"取代目前載入的字幕"
+8		"下載並開啟"
 END
 
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25

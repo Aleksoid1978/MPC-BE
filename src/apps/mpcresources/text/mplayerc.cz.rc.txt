@@ -584,8 +584,8 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"Dostupné titulky"
-6		"Stáhnout a otevřít"
-8		"Nahradit aktuálně načtené titulky"
+7		"Nahradit aktuálně načtené titulky"
+8		"Stáhnout a otevřít"
 END
 
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25

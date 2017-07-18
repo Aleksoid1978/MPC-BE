@@ -584,8 +584,8 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"כתוביות זמינות ברשת"
-6		"הורד && פתח"
-8		"החלף את הכתוביות שכבר הועלו"
+7		"החלף את הכתוביות שכבר הועלו"
+8		"הורד && פתח"
 END
 
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25

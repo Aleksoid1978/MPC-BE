@@ -584,8 +584,8 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"자막파일을 찾았습니다"
-6		"다운로드 && 열기"
-8		"지금 로드한 자막과 대체"
+7		"지금 로드한 자막과 대체"
+8		"다운로드 && 열기"
 END
 
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25

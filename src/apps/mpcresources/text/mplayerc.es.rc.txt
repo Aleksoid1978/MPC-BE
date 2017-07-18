@@ -584,8 +584,8 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"Subtítulos disponibles en linea"
-6		"Descargar y Abrir"
-8		"Remplazar los subtítulos cargados actualmente"
+7		"Remplazar los subtítulos cargados actualmente"
+8		"Descargar y Abrir"
 END
 
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25
