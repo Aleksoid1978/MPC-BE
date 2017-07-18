@@ -1766,6 +1766,7 @@ STRING IDS_SCALE_WIDESCREEN		"Przeskaluj do formatu szerokoekranowego,%.3f,%.3f,
 STRING IDS_SCREENSHOT_ERROR_MADVR		"Funkcje 'Zapisz obraz' i 'Zapisz miniatury' ie działają z madVR.\nZmień renderer wideo w opcjach wyjścia i na nowo otwórz plik."
 STRING IDS_SCREENSHOT_ERROR_OVERLAY		"Funkcje 'Zapisz obraz' oraz 'Zapisz miniatury' nie działają w trybie nakładki (Overlay Mixer).\nProszę wybrać inny renderer wideo w opcjach strumienia wyjściowego oraz otworzyć plik ponownie."
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"Funkcje 'Zapisz obraz' oraz 'Zapisz miniatury' nie działają z plikami Shockwave."
+STRING IDS_SEEKBEGIN		"Jump to Beginning"
 STRING IDS_SHADEREDITORDLG_0		"Usunąć shader?"
 STRING IDS_SHADERS_EDIT		"&Edytuj shadery..."
 STRING IDS_SHADERS_SELECT		"&Wybierz shadery..."

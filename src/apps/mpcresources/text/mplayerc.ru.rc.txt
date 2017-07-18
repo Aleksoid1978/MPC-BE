@@ -1775,6 +1775,7 @@ STRING IDS_SCALE_WIDESCREEN		"Масштабировать в Widescreen,%.3f,%.
 STRING IDS_SCREENSHOT_ERROR_MADVR		"Функции 'Сохранить изображение' и 'Сохранить миниатюры' не работают с рендерером madVR.\nИзмените видеорендерер и вновь откройте файл."
 STRING IDS_SCREENSHOT_ERROR_OVERLAY		"Функции 'Сохранить изображение' и 'Сохранить миниатюры' не работают с рендерером Overlay Mixer.\nИзмените видеорендерер и вновь откройте файл."
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"Функции 'Сохранить изображение' и 'Сохранить миниатюры' не работают для Shockwave файлов."
+STRING IDS_SEEKBEGIN		"Перейти к началу"
 STRING IDS_SHADEREDITORDLG_0		"Вы уверены, что хотите удалить этот шейдер?"
 STRING IDS_SHADERS_EDIT		"&Редактировать..."
 STRING IDS_SHADERS_SELECT		"Выбрать..."

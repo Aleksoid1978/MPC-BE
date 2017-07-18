@@ -1778,6 +1778,7 @@ STRING IDS_SCALE_WIDESCREEN		"Εστίαση σε ευρυγώνια οθόνη,
 STRING IDS_SCREENSHOT_ERROR_MADVR		"Οι επιλογές ""Αποθήκευση εικόνας"" και ""Αποθήκευση μικρογραφιών"" δεν λειτουργούν με την απόδοση βίντεο madVR.\nΑλλάξτε την απόδοση βίντεο στις επιλογές εξόδου του MPC και ξανανοίξτε το αρχείο."
 STRING IDS_SCREENSHOT_ERROR_OVERLAY		"Οι επιλογές ""Αποθήκευση εικόνας"" και ""Αποθήκευση μικρογραφιών"" δεν λειτουργούν με την απόδοση βίντεο Overlay Mixer.\nΑλλάξτε την απόδοση βίντεο στις επιλογές εξόδου του MPC-BE και ανοίξτε πάλι το αρχείο."
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"Οι επιλογές ""Αποθήκευση εικόνας"" και ""Αποθήκευση μικρογραφιών"" δεν λειτουργούν για αρχεία Shockwave."
+STRING IDS_SEEKBEGIN		"Jump to Beginning"
 STRING IDS_SHADEREDITORDLG_0		"Είστε βέβαιος για τη διαγραφή αυτού του σκιαστή;"
 STRING IDS_SHADERS_EDIT		"Επε&ξεργασία σκιάσεων..."
 STRING IDS_SHADERS_SELECT		"Επι&λογή σκιάσεων..."

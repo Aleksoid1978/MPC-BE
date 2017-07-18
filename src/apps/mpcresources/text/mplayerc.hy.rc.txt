@@ -1775,6 +1775,7 @@ STRING IDS_SCALE_WIDESCREEN		"Նշել չափը Լայնէկրան,%.3f,%.3f,%.3
 STRING IDS_SCREENSHOT_ERROR_MADVR		"The 'Save Image' and 'Save Thumbnails' functions do not work with the madVR video renderer.\nChange the video renderer in MPC's output options and reopen the file."
 STRING IDS_SCREENSHOT_ERROR_OVERLAY		"'Պահպանել նկարը' և 'Պահպանել Մանրապատկերով' հնարավորությունները չեն աշխատի Overlay Mixer տեսակոդավորման ժամանակ:\nՓոխեք տեսակոդավորման սարքը MPC-ի արտածման կարգավորումներում և կրկին բացեք ֆայլը։"
 STRING IDS_SCREENSHOT_ERROR_SHOCKWAVE		"'Պահպանել նկարը' և 'Պահպանել Մանրապատկերով' հնարավորությունները չեն աշխատի Shockwave ֆայլերի համար։"
+STRING IDS_SEEKBEGIN		"Jump to Beginning"
 STRING IDS_SHADEREDITORDLG_0		"Ջնջե՞լ այս շեյդերները։"
 STRING IDS_SHADERS_EDIT		"&Խմբագրել շեյդերները..."
 STRING IDS_SHADERS_SELECT		"&Ընտրեք շեյդերները..."

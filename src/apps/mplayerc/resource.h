@@ -386,6 +386,8 @@
 #define ID_AFTERPLAYBACK_NEXT_LOOPED        1079
 #define ID_AFTERPLAYBACK_EVERYTIMEDONOTHING 1080
 
+#define ID_PLAY_SEEKBEGIN               1085
+
 #define ID_FILE_OPENISO                 1090
 
 #define ID_SUB_POS_UP                   1100
@@ -1301,6 +1303,7 @@
 #define IDS_AUDIO_RELEASETIME           33452
 #define IDS_AUDIO_GAIN                  33453
 #define IDS_SAVING_THUMBNAIL            33454
+#define IDS_SEEKBEGIN                   33455
 // stereoscopic subtitles
 #define IDS_SUBTITLES_STEREO              34000
 #define IDS_SUBTITLES_STEREO_DONTUSE      34001
