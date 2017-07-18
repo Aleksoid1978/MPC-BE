@@ -11601,6 +11601,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				}
 
 				m_strUrl = pOFD->fns.GetHead().GetName();
+				m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
 
 				if (pOFD->fns.GetCount() == 1) {
 					fn = (CString)pOFD->fns.GetHead();
