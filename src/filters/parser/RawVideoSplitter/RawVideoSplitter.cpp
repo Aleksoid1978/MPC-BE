@@ -57,6 +57,8 @@ STDAPI DllRegisterServer()
 	chkbytes.AddTail(L"0,3,,000001");					// MPEG1/2, VC-1
 	chkbytes.AddTail(L"0,4,,00000001");					// H.264/AVC, H.265/HEVC
 	chkbytes.AddTail(L"0,4,,434D5331,20,4,,50445652");	// 'CMS1................PDVR'
+	chkbytes.AddTail(L"0,5,,3236344456");				// '264DV'
+	chkbytes.AddTail(L"0,4,,44484156");					// 'DHAV'
 	chkbytes.AddTail(L"0,4,,FFFFFF88");
 
 	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_NULL, chkbytes, NULL);
@@ -354,7 +356,8 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			maxpos = 1536;
 		}
 		// LTV-DVR ?
-		else if (GETDWORD(buf) == 0x88FFFFFF && GETDWORD(buf + 12) == GETDWORD(buf + 20)) {
+		else if ((GETDWORD(buf) == 0x88FFFFFF && GETDWORD(buf + 12) == GETDWORD(buf + 20))
+				|| GETDWORD(buf) == FCC('DHAV')) {
 			m_pFile->Seek(28);
 			maxpos = 512;
 		}
