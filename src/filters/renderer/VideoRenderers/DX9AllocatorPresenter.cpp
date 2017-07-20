@@ -2322,24 +2322,37 @@ STDMETHODIMP CDX9AllocatorPresenter::AddPixelShader(int target, LPCSTR sourceCod
 	return AddCustomPixelShader(target, sourceCode, profile);
 }
 
-void CDX9AllocatorPresenter::FillAddingField(CComPtr<IPin> pPin, CMediaType* mt)
+void CDX9AllocatorPresenter::OnChangeInput(CComPtr<IPin> pPin)
 {
-	ExtractAvgTimePerFrame(mt, m_rtTimePerFrame);
+	CMediaType input_mt;
 
-	CString subtypestr = GetGUIDString(mt->subtype);
-	if (subtypestr.Left(13) == L"MEDIASUBTYPE_") {
-		m_strMixerFmtIn = subtypestr.Mid(13);
-	} else {
-		BITMAPINFOHEADER bih;
-		if (ExtractBIH(mt, &bih)) {
-			m_strMixerFmtIn.Format(L"%C%C%C%C",
-				((char*)&bih.biCompression)[0],
-				((char*)&bih.biCompression)[1],
-				((char*)&bih.biCompression)[2],
-				((char*)&bih.biCompression)[3]);
+	if (pPin->ConnectionMediaType(&input_mt) == S_OK) {
+		// set framerate
+		ExtractAvgTimePerFrame(&input_mt, m_rtTimePerFrame);
+		if (m_rtTimePerFrame == 1) { // if framerate not set by Video Decoder - choose 23.976
+			m_rtTimePerFrame = 417083;
 		}
+
+		// set mixer format string
+		CString subtypestr = GetGUIDString(input_mt.subtype);
+		if (subtypestr.Left(13) == L"MEDIASUBTYPE_") {
+			m_strMixerFmtIn = subtypestr.Mid(13);
+		} else {
+			BITMAPINFOHEADER bih;
+			if (ExtractBIH(&input_mt, &bih)) {
+				m_strMixerFmtIn.Format(L"%C%C%C%C",
+					((char*)&bih.biCompression)[0],
+					((char*)&bih.biCompression)[1],
+					((char*)&bih.biCompression)[2],
+					((char*)&bih.biCompression)[3]);
+			}
+		}
+
+		// set input DXVA2_ExtendedFormat and init shaders for image correction
+		InitCorectionPass(input_mt);
 	}
 
+	// set decoder string
 	m_Decoder.Empty();
 	CComPtr<IPin> pPinTo;
 	if (pPin && SUCCEEDED(pPin->ConnectedTo(&pPinTo)) && pPinTo) {

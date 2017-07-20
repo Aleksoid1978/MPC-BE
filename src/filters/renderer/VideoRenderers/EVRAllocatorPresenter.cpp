@@ -1584,23 +1584,9 @@ void CEVRAllocatorPresenter::GetMixerThread()
 					//CAutoLock lock2(&m_ImageProcessingLock);
 					//CAutoLock cRenderLock(&m_RenderLock);
 
-					// Use the code from VMR9 to get the movie fps, as this method is reliable.
-					CComPtr<IPin>	pPin;
-					CMediaType		mt;
-					if (SUCCEEDED(m_pOuterEVR->FindPin(L"EVR Input0", &pPin))
-							&& SUCCEEDED(pPin->ConnectionMediaType(&mt)) ) {
-
-						FillAddingField(pPin, &mt);
-
-						if (mt.formattype == FORMAT_VideoInfo2) {
-							m_inputExtFormat.value = ((VIDEOINFOHEADER2*)mt.pbFormat)->dwControlFlags;
-						} else {
-							m_inputExtFormat.value = 0;
-						}
-					}
-					// If framerate not set by Video Decoder - choose 23.976
-					if (m_rtTimePerFrame == 1) {
-						m_rtTimePerFrame = 417083;
+					CComPtr<IPin> pPin;
+					if (m_pOuterEVR->FindPin(L"EVR Input0", &pPin) == S_OK) {
+						OnChangeInput(pPin);
 					}
 
 					// Update internal subtitle clock
