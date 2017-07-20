@@ -262,7 +262,7 @@ namespace DSObjects
 
 		CString					m_Decoder;
 
-		void					FillAddingField(CComPtr<IPin> pPin, CMediaType* mt);
+		void					OnChangeInput(CComPtr<IPin> pPin);
 
 		CString					m_MonitorName;
 		UINT16					m_nMonitorHorRes, m_nMonitorVerRes;

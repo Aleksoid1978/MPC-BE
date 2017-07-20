@@ -111,6 +111,8 @@ namespace DSObjects
 		HRESULT ClearCustomPixelShaders(int target);
 		HRESULT AddCustomPixelShader(int target, LPCSTR sourceCode, LPCSTR profile);
 
+		HRESULT InitCorectionPass(const AM_MEDIA_TYPE& mt);
+
 	private:
 		D3DCAPS9					m_Caps;
 		LPCSTR						m_ShaderProfile; // for shader compiler
@@ -148,10 +150,7 @@ namespace DSObjects
 		ColorRenderingIntent			m_RenderingIntent;
 
 		// Custom pixel shaders
-		CComPtr<IDirect3DPixelShader9>	m_pPSCorrectionYCgCo;
-		CComPtr<IDirect3DPixelShader9>	m_pPSCorrectionST2084;
-		CComPtr<IDirect3DPixelShader9>	m_pPSCorrectionHLG;
-		CComPtr<IDirect3DPixelShader9>	m_pPSCorrection422;
+		CComPtr<IDirect3DPixelShader9>	m_pPSCorrection;
 		CAtlList<CExternalPixelShader>	m_pCustomPixelShaders;
 
 		// Resizers

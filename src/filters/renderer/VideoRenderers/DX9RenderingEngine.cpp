@@ -223,10 +223,7 @@ void CDX9RenderingEngine::CleanupRenderingEngine()
 	NULL_PTR_ARRAY(m_pScreenSpaceTextures);
 	m_pResizeTexture = NULL;
 
-	m_pPSCorrectionYCgCo.Release();
-	m_pPSCorrectionST2084.Release();
-	m_pPSCorrectionHLG.Release();
-	m_pPSCorrection422.Release();
+	m_pPSCorrection.Release();
 	m_pConvertToInterlacePixelShader.Release();
 }
 
@@ -356,73 +353,19 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 
 	bool ps30 = m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0);
 
-	// fix incorrect conversion in EVR mixer (TODO: remake it)
-	if (m_inputExtFormat.VideoTransferMatrix == 7) {
-		if (!m_pPSCorrectionYCgCo) {
-			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrectionYCgCo, ps30 ? IDF_SHADER_CORRECTION_YCGCO : IDF_SHADER_PS20_CORRECTION_YCGCO);
-		}
+	// fix incorrect conversion in EVR mixer
+	if (m_pPSCorrection) {
+		const float fConstData[4] = {1.0f / videoDesc.Width, 1.0f / videoDesc.Height, 0, 0};
+		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, fConstData, 1);
 
-		if (m_pPSCorrectionYCgCo) {
-			CComPtr<IDirect3DSurface9> pTemporarySurface;
-			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
-			hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
-			hr = m_pD3DDevEx->SetPixelShader(m_pPSCorrectionYCgCo);
-			TextureCopy(m_pVideoTextures[m_iCurSurface]);
-			first = false;
-			std::swap(src, dst);
-			pVideoTexture = m_pFrameTextures[src];
-		}
-	}
-	else if (m_inputExtFormat.VideoTransferFunction == 16) {
-		if (!m_pPSCorrectionST2084) {
-			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrectionST2084, ps30 ? IDF_SHADER_CORRECTION_ST2084 : IDF_SHADER_PS20_CORRECTION_ST2084);
-		}
-
-		if (m_pPSCorrectionST2084) {
-			CComPtr<IDirect3DSurface9> pTemporarySurface;
-			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
-			hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
-			hr = m_pD3DDevEx->SetPixelShader(m_pPSCorrectionST2084);
-			TextureCopy(m_pVideoTextures[m_iCurSurface]);
-			first = false;
-			std::swap(src, dst);
-			pVideoTexture = m_pFrameTextures[src];
-		}
-	}
-	else if (m_inputExtFormat.VideoTransferFunction == 18) {
-		if (!m_pPSCorrectionHLG) {
-			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrectionHLG, ps30 ? IDF_SHADER_CORRECTION_HLG : IDF_SHADER_PS20_CORRECTION_HLG);
-		}
-
-		if (m_pPSCorrectionHLG) {
-			CComPtr<IDirect3DSurface9> pTemporarySurface;
-			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
-			hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
-			hr = m_pD3DDevEx->SetPixelShader(m_pPSCorrectionHLG);
-			TextureCopy(m_pVideoTextures[m_iCurSurface]);
-			first = false;
-			std::swap(src, dst);
-			pVideoTexture = m_pFrameTextures[src];
-		}
-	}
-	else if (m_D3D9VendorId == PCIV_nVidia && (m_inputMediaType.subtype == MEDIASUBTYPE_YUY2 || m_inputMediaType.subtype == MEDIASUBTYPE_UYVY)) {
-		if (!m_pPSCorrection422) {
-			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection422, ps30 ? IDF_SHADER_CORRECTION_422 : IDF_SHADER_PS20_CORRECTION_422);
-		}
-	
-		if (m_pPSCorrection422) {
-			const float fConstData[4] = {1.0f / videoDesc.Width, 0, 0, 0};
-			hr = m_pD3DDevEx->SetPixelShaderConstantF(0, fConstData, 1);
-
-			CComPtr<IDirect3DSurface9> pTemporarySurface;
-			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
-			hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
-			hr = m_pD3DDevEx->SetPixelShader(m_pPSCorrection422);
-			TextureCopy(m_pVideoTextures[m_iCurSurface]);
-			first = false;
-			std::swap(src, dst);
-			pVideoTexture = m_pFrameTextures[src];
-		}
+		CComPtr<IDirect3DSurface9> pTemporarySurface;
+		hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
+		hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
+		hr = m_pD3DDevEx->SetPixelShader(m_pPSCorrection);
+		TextureCopy(m_pVideoTextures[m_iCurSurface]);
+		first = false;
+		std::swap(src, dst);
+		pVideoTexture = m_pFrameTextures[src];
 	}
 
 	if (bCustomPixelShaders) {
@@ -943,8 +886,7 @@ HRESULT CDX9RenderingEngine::InitVideoTextures()
 
 	size_t count = m_pCustomPixelShaders.GetCount();
 
-	if (m_inputExtFormat.VideoTransferMatrix == 7 || m_inputExtFormat.VideoTransferFunction == 16 || m_inputExtFormat.VideoTransferFunction == 18 ||
-			m_D3D9VendorId == PCIV_nVidia && (m_inputMediaType.subtype == MEDIASUBTYPE_YUY2 || m_inputMediaType.subtype == MEDIASUBTYPE_UYVY)) {
+	if (m_pPSCorrection) {
 		count++;
 	}
 	if (m_iRotation == 180 || !m_iRotation && m_bFlip) {
@@ -2057,6 +1999,38 @@ HRESULT CDX9RenderingEngine::AddCustomPixelShader(int target, LPCSTR sourceCode,
 	Paint(false);
 
 	return S_OK;
+}
+
+HRESULT CDX9RenderingEngine::InitCorectionPass(const AM_MEDIA_TYPE& input_mt)
+{
+	HRESULT hr = S_OK;
+
+	DXVA2_ExtendedFormat extformat = {};
+	if (input_mt.formattype == FORMAT_VideoInfo2) {
+		extformat.value = ((VIDEOINFOHEADER2*)input_mt.pbFormat)->dwControlFlags;
+	}
+
+	if (m_inputExtFormat.value != extformat.value) {
+		// DXVA2_ExtendedFormat was chaged
+		m_inputExtFormat.value = extformat.value;
+		m_pPSCorrection.Release();
+		bool ps30 = m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0);
+
+		if (extformat.VideoTransferMatrix == 7) {
+			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_YCGCO : IDF_SHADER_PS20_CORRECTION_YCGCO);
+		}
+		else if (extformat.VideoTransferFunction == 16) {
+			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_ST2084 : IDF_SHADER_PS20_CORRECTION_ST2084);
+		}
+		else if (extformat.VideoTransferFunction == 18) {
+			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_HLG : IDF_SHADER_PS20_CORRECTION_HLG);
+		}
+		else if (m_D3D9VendorId == PCIV_nVidia && (input_mt.subtype == MEDIASUBTYPE_YUY2 || input_mt.subtype == MEDIASUBTYPE_UYVY)) {
+			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_422 : IDF_SHADER_PS20_CORRECTION_422);
+		}
+	}
+
+	return hr;
 }
 
 // ISubPicAllocatorPresenter3
