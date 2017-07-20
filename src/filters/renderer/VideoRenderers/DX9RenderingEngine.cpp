@@ -2001,7 +2001,7 @@ HRESULT CDX9RenderingEngine::AddCustomPixelShader(int target, LPCSTR sourceCode,
 	return S_OK;
 }
 
-HRESULT CDX9RenderingEngine::InitCorectionPass(const AM_MEDIA_TYPE& input_mt)
+HRESULT CDX9RenderingEngine::InitCorrectionPass(const AM_MEDIA_TYPE& input_mt)
 {
 	HRESULT hr = S_OK;
 

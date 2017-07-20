@@ -111,7 +111,7 @@ namespace DSObjects
 		HRESULT ClearCustomPixelShaders(int target);
 		HRESULT AddCustomPixelShader(int target, LPCSTR sourceCode, LPCSTR profile);
 
-		HRESULT InitCorectionPass(const AM_MEDIA_TYPE& mt);
+		HRESULT InitCorrectionPass(const AM_MEDIA_TYPE& mt);
 
 	private:
 		D3DCAPS9					m_Caps;

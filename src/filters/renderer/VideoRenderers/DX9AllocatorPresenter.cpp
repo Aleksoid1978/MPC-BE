@@ -2349,7 +2349,7 @@ void CDX9AllocatorPresenter::OnChangeInput(CComPtr<IPin> pPin)
 		}
 
 		// set input DXVA2_ExtendedFormat and init shaders for image correction
-		InitCorectionPass(input_mt);
+		InitCorrectionPass(input_mt);
 	}
 
 	// set decoder string
