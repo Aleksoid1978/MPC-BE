@@ -794,6 +794,10 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len,
 	ULONGLONG stream_type = PES_STREAM_TYPE_ANY;
 	PES_STREAM_TYPE pes_stream_type = INVALID;
 	if (GetStreamType(s.pid ? s.pid : s.pesid, pes_stream_type)) {
+		if (m_ClipInfo.IsHdmv() && pes_stream_type == PRESENTATION_GRAPHICS_STREAM) {
+			return s;
+		}
+
 		stream_type = 0ULL;
 
 		for (size_t i = 0; i < _countof(PES_types); i++) {

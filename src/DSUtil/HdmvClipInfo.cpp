@@ -96,6 +96,14 @@ BOOL CHdmvClipInfo::SetPos(LONGLONG Pos, DWORD dwMoveMethod/* = FILE_BEGIN*/)
 	return SetFilePointerEx(m_hFile, newPos, NULL, dwMoveMethod);
 }
 
+HRESULT CHdmvClipInfo::ReadLang(Stream& s)
+{
+	ReadBuffer((BYTE*)s.m_LanguageCode, 3);
+	s.m_LCID = ISO6392ToLcid(s.m_LanguageCode);
+
+	return S_OK;
+}
+
 HRESULT CHdmvClipInfo::ReadProgramInfo()
 {
 	SetPos(ProgramInfo_start_address);
@@ -119,11 +127,17 @@ HRESULT CHdmvClipInfo::ReadProgramInfo()
 			Pos += ReadByte() + 1;	// length
 			s.m_Type = (PES_STREAM_TYPE)ReadByte();
 
+			BOOL bFoundStream = FALSE;
 			for (size_t k = 0; k < m_Streams.GetCount(); k++) {
 				if (s.m_PID == m_Streams[k].m_PID) {
 					SetPos(Pos);
-					continue;
+					bFoundStream = TRUE;
+					break;
 				}
+			}
+
+			if (bFoundStream) {
+				continue;
 			}
 
 			switch (s.m_Type) {
@@ -133,15 +147,11 @@ HRESULT CHdmvClipInfo::ReadProgramInfo()
 				case VIDEO_STREAM_H264_MVC:
 				case VIDEO_STREAM_HEVC:
 				case VIDEO_STREAM_VC1: {
-						BYTE Temp = ReadByte();
-						BDVM_VideoFormat VideoFormat     = (BDVM_VideoFormat)(Temp >> 4);
-						BDVM_FrameRate FrameRate         = (BDVM_FrameRate)(Temp & 0xf);
-						Temp                             = ReadByte();
-						BDVM_AspectRatio AspectRatio     = (BDVM_AspectRatio)(Temp >> 4);
-
-						s.m_VideoFormat = VideoFormat;
-						s.m_FrameRate   = FrameRate;
-						s.m_AspectRatio = AspectRatio;
+						BYTE Temp       = ReadByte();
+						s.m_VideoFormat = (BDVM_VideoFormat)(Temp >> 4);
+						s.m_FrameRate   = (BDVM_FrameRate)(Temp & 0xf);
+						Temp            = ReadByte();
+						s.m_AspectRatio = (BDVM_AspectRatio)(Temp >> 4);
 					}
 					break;
 				case AUDIO_STREAM_MPEG1:
@@ -155,27 +165,20 @@ HRESULT CHdmvClipInfo::ReadProgramInfo()
 				case AUDIO_STREAM_DTS_HD_MASTER_AUDIO:
 				case SECONDARY_AUDIO_AC3_PLUS:
 				case SECONDARY_AUDIO_DTS_HD: {
-						BYTE Temp = ReadByte();
-						BDVM_ChannelLayout ChannelLayout = (BDVM_ChannelLayout)(Temp >> 4);
-						BDVM_SampleRate SampleRate       = (BDVM_SampleRate)(Temp & 0xF);
+						BYTE Temp         = ReadByte();
+						s.m_ChannelLayout = (BDVM_ChannelLayout)(Temp >> 4);
+						s.m_SampleRate    = (BDVM_SampleRate)(Temp & 0xF);
 
-						ReadBuffer((BYTE*)s.m_LanguageCode, 3);
-						s.m_LCID          = ISO6392ToLcid(s.m_LanguageCode);
-						s.m_ChannelLayout = ChannelLayout;
-						s.m_SampleRate    = SampleRate;
+						ReadLang(s);
 					}
 					break;
 				case PRESENTATION_GRAPHICS_STREAM:
-				case INTERACTIVE_GRAPHICS_STREAM: {
-						ReadBuffer((BYTE*)s.m_LanguageCode, 3);
-						s.m_LCID = ISO6392ToLcid(s.m_LanguageCode);
-					}
+				case INTERACTIVE_GRAPHICS_STREAM:
+					ReadLang(s);
 					break;
-				case SUBTITLE_STREAM: {
-						ReadByte(); // Should this really be here?
-						ReadBuffer((BYTE*)s.m_LanguageCode, 3);
-						s.m_LCID = ISO6392ToLcid(s.m_LanguageCode);
-					}
+				case SUBTITLE_STREAM:
+					ReadByte(); // bd_char_code
+					ReadLang(s);
 					break;
 				default :
 					break;
@@ -372,6 +375,171 @@ CHdmvClipInfo::Stream* CHdmvClipInfo::FindStream(SHORT wPID)
 	return NULL;
 }
 
+HRESULT CHdmvClipInfo::ReadStreamInfo()
+{
+	BYTE len = ReadByte();
+	LONGLONG Pos = 0;
+	GetPos(Pos);
+
+	Stream s;
+	const BYTE stream_type = ReadByte();
+	switch (stream_type) {
+		case 1:
+			s.m_PID = ReadShort();
+			break;
+		case 2:
+		case 4:
+			ReadShort();
+			s.m_PID = ReadShort();
+			break;
+		case 3:
+			ReadByte();
+			s.m_PID = ReadShort();
+			break;
+	}
+
+	if (!SetPos(Pos + len)) {
+		return E_FAIL;
+	}
+
+	len = ReadByte();
+	GetPos(Pos);
+
+	s.m_Type = (PES_STREAM_TYPE)ReadByte();
+	switch (s.m_Type) {
+		case VIDEO_STREAM_MPEG1:
+		case VIDEO_STREAM_MPEG2:
+		case VIDEO_STREAM_H264:
+		case VIDEO_STREAM_H264_MVC:
+		case VIDEO_STREAM_HEVC:
+		case VIDEO_STREAM_VC1: {
+				const BYTE Temp = ReadByte();
+				s.m_VideoFormat = (BDVM_VideoFormat)(Temp >> 4);
+				s.m_FrameRate   = (BDVM_FrameRate)(Temp & 0xf);
+			}
+			break;
+		case AUDIO_STREAM_MPEG1:
+		case AUDIO_STREAM_MPEG2:
+		case AUDIO_STREAM_LPCM:
+		case AUDIO_STREAM_AC3:
+		case AUDIO_STREAM_DTS:
+		case AUDIO_STREAM_AC3_TRUE_HD:
+		case AUDIO_STREAM_AC3_PLUS:
+		case AUDIO_STREAM_DTS_HD:
+		case AUDIO_STREAM_DTS_HD_MASTER_AUDIO:
+		case SECONDARY_AUDIO_AC3_PLUS:
+		case SECONDARY_AUDIO_DTS_HD: {
+				const BYTE Temp   = ReadByte();
+				s.m_ChannelLayout = (BDVM_ChannelLayout)(Temp >> 4);
+				s.m_SampleRate    = (BDVM_SampleRate)(Temp & 0xF);
+
+				ReadLang(s);
+			}
+			break;
+		case PRESENTATION_GRAPHICS_STREAM:
+		case INTERACTIVE_GRAPHICS_STREAM:
+			ReadLang(s);
+			break;
+		case SUBTITLE_STREAM:
+			ReadByte(); // bd_char_code
+			ReadLang(s);
+			break;
+	}
+
+	stn.m_Streams.Add(s);
+
+	return SetPos(Pos + len) ? S_OK : E_FAIL;
+}
+
+HRESULT CHdmvClipInfo::ReadSTNInfo(BOOL bFullInfoRead)
+{
+	stn.m_Streams.RemoveAll();
+
+	ReadShort(); // length
+	ReadShort(); // reserved_for_future_use
+
+	stn.num_video           = ReadByte(); // number of Primary Video Streams
+	stn.num_audio           = ReadByte(); // number of Primary Audio Streams
+	stn.num_pg              = ReadByte(); // number of Presentation Graphic Streams
+	stn.num_ig              = ReadByte(); // number of Interactive Graphic Streams
+	stn.num_secondary_audio = ReadByte(); // number of Secondary Audio Streams
+	stn.num_secondary_video = ReadByte(); // number of Secondary Video Streams
+	stn.num_pip_pg          = ReadByte(); // number of Presentation Graphic Streams
+
+	Skip(5); // reserved_for_future_use
+
+	if (!bFullInfoRead) {
+		return S_OK;
+	}
+
+	for (BYTE i = 0; i < stn.num_video; i++) {
+		if (FAILED(ReadStreamInfo())) {
+			return E_FAIL;
+		}
+	}
+
+	for (BYTE i = 0; i < stn.num_audio; i++) {
+		if (FAILED(ReadStreamInfo())) {
+			return E_FAIL;
+		}
+	}
+
+	for (BYTE i = 0; i < (stn.num_pg + stn.num_pip_pg); i++) {
+		if (FAILED(ReadStreamInfo())) {
+			return E_FAIL;
+		}
+	}
+
+	for (BYTE i = 0; i < stn.num_ig; i++) {
+		if (FAILED(ReadStreamInfo())) {
+			return E_FAIL;
+		}
+	}
+
+	for (BYTE i = 0; i < stn.num_secondary_audio; i++) {
+		if (FAILED(ReadStreamInfo())) {
+			return E_FAIL;
+		}
+
+		// Secondary Audio Extra Attributes
+		const BYTE num_secondary_audio_extra = ReadByte();
+		ReadByte();
+		if (num_secondary_audio_extra) {
+			Skip(num_secondary_audio_extra);
+			if (num_secondary_audio_extra % 2) {
+				ReadByte();
+			}
+		}
+	}
+
+	for (BYTE i = 0; i < stn.num_secondary_video; i++) {
+		if (FAILED(ReadStreamInfo())) {
+			return E_FAIL;
+		}
+
+		// Secondary Video Extra Attributes
+		const BYTE num_secondary_video_extra = ReadByte();
+		ReadByte();
+		if (num_secondary_video_extra) {
+			Skip(num_secondary_video_extra);
+			if (num_secondary_video_extra % 2) {
+				ReadByte();
+			}
+		}
+
+		const BYTE num_pip_pg_extra = ReadByte();
+		ReadByte();
+		if (num_pip_pg_extra) {
+			Skip(num_pip_pg_extra);
+			if (num_pip_pg_extra % 2) {
+				ReadByte();
+			}
+		}
+	}
+
+	return S_OK;
+}
+
 HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bReadMVCExtension/* = FALSE*/, BOOL bFullInfoRead/* = FALSE*/, BYTE* MVC_Base_View_R_flag/* = NULL*/)
 {
 	CPath Path(strPlaylistFile);
@@ -542,10 +710,10 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 
 			rtDuration += (Item->m_rtOut - Item->m_rtIn);
 
-			ReadBuffer(Buff, 8);		// mpls uo
+			Skip(8);		// mpls uo
 			ReadByte();
-			ReadByte();					// still mode
-			ReadShort();				// still time
+			ReadByte();		// still mode
+			ReadShort();	// still time
 			BYTE angle_count = 1;
 			if (is_multi_angle) {
 				angle_count = ReadByte();
@@ -555,20 +723,17 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 				ReadByte();
 			}
 			for (BYTE i = 1; i < angle_count; i++) {
-				ReadBuffer(Buff, 9);	// M2TS file name
-				ReadByte();				// stc_id
+				Skip(9);	// M2TS file name
+				ReadByte();	// stc_id
 			}
 
 			// stn
-			ReadShort();					// length
-			ReadShort();					// reserved_for_future_use
-			Item->m_num_video = ReadByte();	// number of Primary Video Streams
-			ReadByte();						// number of Primary Audio Streams
-			const BYTE num_pg = ReadByte();	// number of Presentation Graphic Streams
-			const BYTE num_ig = ReadByte();	// number of Interactive Graphic Streams
+			ReadSTNInfo(bFullInfoRead);
 
-			Item->m_pg_offset_sequence_id.resize(num_pg, 0xFF);
-			Item->m_ig_offset_sequence_id.resize(num_ig, 0xFF);
+			Item->m_num_video = stn.num_video;
+
+			Item->m_pg_offset_sequence_id.resize(stn.num_pg, 0xFF);
+			Item->m_ig_offset_sequence_id.resize(stn.num_ig, 0xFF);
 
 			if (bFullInfoRead) {
 				LARGE_INTEGER size = {0, 0};
@@ -593,7 +758,11 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 				}
 			}
 
-			DLog(L"    ==> '%s', Duration : %s [%15I64d], Total duration : %s, Size : %I64d", Item->m_strFileName, ReftimeToString(Item->Duration()), Item->Duration(), ReftimeToString(rtDuration), Item->Size());
+			CString sizeStr;
+			if (bFullInfoRead) {
+				sizeStr.Format(L", Size : %I64d", Item->Size());
+			}
+			DLog(L"    ==> '%s', Duration : %s [%15I64d], Total duration : %s%s", Item->m_strFileName, ReftimeToString(Item->Duration()), Item->Duration(), ReftimeToString(rtDuration), sizeStr);
 
 			Playlist.AddTail(Item);
 		}
@@ -698,7 +867,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 
 		CloseFile(S_OK);
 
-		if (bFullInfoRead && !Playlist.IsEmpty())  {
+		if (bFullInfoRead && !Playlist.IsEmpty()) {
 			POSITION pos = Playlist.GetHeadPosition();
 			while (pos) {
 				PlaylistItem* pItem = Playlist.GetNext(pos);

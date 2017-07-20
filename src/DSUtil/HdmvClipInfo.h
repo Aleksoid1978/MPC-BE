@@ -167,7 +167,7 @@ public:
 	bool    IsHdmv() const { return !m_Streams.IsEmpty(); }
 
 	Stream*  FindStream(SHORT wPID);
-	Streams& GetStreams() { return m_Streams; }
+	Streams& GetStreams() { return !stn.m_Streams.IsEmpty() ? stn.m_Streams : m_Streams; }
 
 	HRESULT FindMainMovie(LPCTSTR strFolder, CString& strPlaylistFile, CPlaylist& MainPlaylist, CPlaylist& MPLSPlaylists);
 	HRESULT ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bReadMVCExtension = FALSE, BOOL bFullInfoRead = FALSE, BYTE* MVC_Base_View_R_flag = NULL);
@@ -182,6 +182,18 @@ private :
 
 	Streams m_Streams;
 
+	struct {
+		BYTE num_video           = 0;
+		BYTE num_audio           = 0;
+		BYTE num_pg              = 0;
+		BYTE num_ig              = 0;
+		BYTE num_secondary_audio = 0;
+		BYTE num_secondary_video = 0;
+		BYTE num_pip_pg          = 0;
+
+		Streams m_Streams;
+	} stn;
+
 	void    ReadBuffer(BYTE* pBuff, DWORD nLen);
 	DWORD   ReadDword();
 	SHORT   ReadShort();
@@ -191,9 +203,13 @@ private :
 	BOOL    GetPos(LONGLONG& Pos);
 	BOOL    SetPos(LONGLONG Pos, DWORD dwMoveMethod = FILE_BEGIN);
 
+	HRESULT ReadLang(Stream& s);
 	HRESULT ReadProgramInfo();
 	HRESULT ReadCpiInfo(CAtlArray<SyncPoint>* sps);
 	HRESULT CloseFile(HRESULT hr);
+
+	HRESULT ReadStreamInfo();
+	HRESULT ReadSTNInfo(BOOL bFullInfoRead);
 
 private:
 	struct ClpiEpCoarse {
