@@ -1109,6 +1109,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 	CString str;
 	CAtlMap<int, CPlaylistItem> pli;
 	CAtlArray<int> idx;
+	int selected_idx = -1;
 
 	CWebTextFile f(CTextFile::UTF8, CTextFile::ANSI);
 	if (!f.Open(fn) || !f.ReadString(str) || str != L"MPCPLAYLIST" || f.GetLength() > MEGABYTE) {
@@ -1136,6 +1137,10 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 				pli[i].m_label = value;
 			} else if (key == L"time") {
 				pli[i].m_duration = StringToReftime2(value);
+			} else if (key == L"selected") {
+				if (value == L"1") {
+					selected_idx = i - 1;
+				}
 			} else if (key == L"filename") {
 				value = MakePath(CombinePath(base, value));
 				pli[i].m_fns.AddTail(value);
@@ -1164,9 +1169,16 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 		}
 	}
 
+	const bool bIsEmpty = m_pl.IsEmpty();
+
 	qsort(idx.GetData(), idx.GetCount(), sizeof(int), s_int_comp);
 	for (size_t i = 0; i < idx.GetCount(); i++) {
 		m_pl.AddTail(pli[idx[i]]);
+	}
+
+	if (bIsEmpty && selected_idx >= 0 && selected_idx < m_pl.GetCount()) {
+		Refresh();
+		SetSelIdx(selected_idx, true);
 	}
 
 	return pli.GetCount() > 0;
@@ -1181,8 +1193,11 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(CString fn, CTextFile::enc e, bool fRem
 
 	f.WriteString(L"MPCPLAYLIST\n");
 
+	POSITION cur_pos = m_pl.GetPos();
+
 	POSITION pos = m_pl.GetHeadPosition(), pos2;
 	for (int i = 1; pos; i++) {
+		bool selected = (cur_pos == pos) && (m_pl.GetCount() > 1);
 		CPlaylistItem& pli = m_pl.GetNext(pos);
 
 		CString idx;
@@ -1198,6 +1213,10 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(CString fn, CTextFile::enc e, bool fRem
 
 		if (pli.m_duration > 0) {
 			f.WriteString(idx + L",time," + pli.GetLabel(1) + L"\n");
+		}
+
+		if (selected) {
+			f.WriteString(idx + L",selected,1\n");
 		}
 
 		if (pli.m_type == CPlaylistItem::file) {
