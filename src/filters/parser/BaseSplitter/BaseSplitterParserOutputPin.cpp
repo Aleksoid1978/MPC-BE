@@ -24,6 +24,7 @@
 #include "BaseSplitterParserOutputPin.h"
 
 #include "../../../DSUtil/AudioParser.h"
+#include "../../../DSUtil/H264Nalu.h"
 #include "../../../DSUtil/MediaDescription.h"
 
 #define SEQ_START_CODE     0xB3010000
@@ -550,16 +551,8 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 	return S_OK;
 }
 
-#define HEVC_NAL_RASL_R     9
-#define HEVC_NAL_BLA_W_LP   16
-#define HEVC_NAL_CRA_NUT    21
-
-#define HEVC_NAL_VPS        32
-#define HEVC_NAL_AUD        35
-#define HEVC_NAL_SEI_PREFIX 39
-
-#define START_CODE          0x000001	///< start_code_prefix_one_3bytes
-#define END_NOT_FOUND       (-100)
+#define START_CODE    0x000001 // start code prefix, 3 bytes
+#define END_NOT_FOUND (-100)
 static int hevc_find_frame_end(BYTE* pData, int nSize, MpegParseContext& pc)
 {
 	for (int i = 0; i < nSize; i++) {
@@ -571,14 +564,14 @@ static int hevc_find_frame_end(BYTE* pData, int nSize, MpegParseContext& pc)
 		int nut = (pc.state64 >> (2 * 8 + 1)) & 0x3F;
 
 		// Beginning of access unit
-		if ((nut >= HEVC_NAL_VPS && nut <= HEVC_NAL_AUD) || nut == HEVC_NAL_SEI_PREFIX ||
+		if ((nut >= NALU_TYPE_HEVC_VPS && nut <= NALU_TYPE_HEVC_AUD) || nut == NALU_TYPE_HEVC_SEI_PREFIX ||
 			(nut >= 41 && nut <= 44) || (nut >= 48 && nut <= 55)) {
 			if (pc.bFrameStartFound) {
 				pc.bFrameStartFound = 0;
 				return i - 5;
 			}
-		} else if (nut <= HEVC_NAL_RASL_R ||
-				  (nut >= HEVC_NAL_BLA_W_LP && nut <= HEVC_NAL_CRA_NUT)) {
+		} else if (nut <= NALU_TYPE_HEVC_RASL_R ||
+				  (nut >= NALU_TYPE_HEVC_BLA_W_LP && nut <= NALU_TYPE_HEVC_CRA_NUT)) {
 			int first_slice_segment_in_pic_flag = pData[i] >> 7;
 			if (first_slice_segment_in_pic_flag) {
 				if (!pc.bFrameStartFound) {
@@ -612,16 +605,15 @@ HRESULT CBaseSplitterParserOutputPin::ParseHEVC(CAutoPtr<CPacket> p)
 
 	BEGINDATA;
 
-	int size = 0;
-
 	MOVE_TO_H264_START_CODE(start, end);
 	if (start <= end - 4) {
-		if (start > m_p->GetData()) {
+		if (start > base) {
 			m_ParseContext.state64 = 0;
-			nBufferPos = max(0, nBufferPos - (start - m_p->GetData()));
+			nBufferPos = max(0, nBufferPos - (start - base));
 		}
 
 		for (;;) {
+			int size = 0;
 			if (m_bEndOfStream) {
 				size = end - start;
 			} else {
