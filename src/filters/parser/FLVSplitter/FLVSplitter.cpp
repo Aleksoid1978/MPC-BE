@@ -522,6 +522,14 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	CMediaType mt;
 	CMediaType mtAAC;
 
+	struct {
+		CString title, name;
+		CString album;
+		CString artist;
+		CString comment;
+		CString date;
+	} metaData;
+
 	// read up to 180 tags (actual maximum was 168)
 	UINT i = 0;
 	while (((i++ <= 180 && (fTypeFlagsVideo || fTypeFlagsAudio)) || CheckMetadataStreams())
@@ -584,6 +592,18 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								bVideoMetadataExists = TRUE;
 							} else if (AMF0Array[i].name == L"audiocodecid") {
 								bAudioMetadataExists = TRUE;
+							} else if (AMF0Array[i].name.CompareNoCase(L"title") == 0) {
+								metaData.title = AMF0Array[i];
+							} else if (AMF0Array[i].name.CompareNoCase(L"name") == 0) {
+								metaData.name = AMF0Array[i];
+							} else if (AMF0Array[i].name.CompareNoCase(L"album") == 0) {
+								metaData.album = AMF0Array[i];
+							} else if (AMF0Array[i].name.CompareNoCase(L"artist") == 0) {
+								metaData.artist = AMF0Array[i];
+							} else if (AMF0Array[i].name.CompareNoCase(L"comment") == 0) {
+								metaData.comment = AMF0Array[i];
+							} else if (AMF0Array[i].name.CompareNoCase(L"date") == 0) {
+								metaData.date = AMF0Array[i];
 							}
 						} else if (AMF0Array[i].type == AMF_DATA_TYPE_BOOL) {
 							if (AMF0Array[i].name == L"hasVideo") {
@@ -1114,6 +1134,29 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		mts.Add(mtAAC);
 		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio AAC", this, this, &hr));
 		EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(FLV_AUDIODATA, pPinOut)));
+	}
+
+	CString title;
+	if (!metaData.title.IsEmpty()) {
+		title = metaData.title;
+	} else if (!metaData.name.IsEmpty()) {
+		title = metaData.name;
+	}
+	if (!metaData.date.IsEmpty() && !title.IsEmpty()) {
+		title += L" (" + metaData.date + L")";
+	}
+	if (!title.IsEmpty()) {
+		SetProperty(L"TITL", title);
+	}
+
+	if (!metaData.album.IsEmpty()){
+		SetProperty(L"ALBUM", metaData.album);
+	}
+	if (!metaData.artist.IsEmpty()){
+		SetProperty(L"AUTH", metaData.artist);
+	}
+	if (!metaData.comment.IsEmpty()){
+		SetProperty(L"DESC", metaData.comment);
 	}
 
 	m_rtDuration = metaDataDuration;
