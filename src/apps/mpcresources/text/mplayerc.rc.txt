@@ -584,8 +584,8 @@ END
 
 BEGIN DIALOGEX IDD_SUBTITLEDL_DLG LINES 9
 3		"Subtitles available online"
-6		"Download && Open"
-8		"Replace currently loaded subtitles"
+7		"Replace currently loaded subtitles"
+8		"Download && Open"
 END
 
 BEGIN DIALOGEX IDD_TUNER_SCAN LINES 25
@@ -1178,6 +1178,7 @@ STRING IDS_AG_NEXT_FILE		"Next File"
 STRING IDS_AG_NEXT_SUBTITLE		"Next Subtitle"
 STRING IDS_AG_NEXT_VIDEO		"Next Video/DVD Angle"
 STRING IDS_AG_NONE		"None"
+STRING IDS_AG_NOTRECOMMENDED		"not recommended"
 STRING IDS_AG_NOT_KNOWN		"Not known"
 STRING IDS_AG_OPEN_DEVICE		"Open Device"
 STRING IDS_AG_OPEN_DISC		"Open Disc"
@@ -1215,6 +1216,7 @@ STRING IDS_AG_PREV_AUDIO		"Prev Audio"
 STRING IDS_AG_PREV_SUBTITLE		"Prev Subtitle"
 STRING IDS_AG_PREV_VIDEO		"Prev Video/DVD Angle"
 STRING IDS_AG_PROPERTIES		"Properties"
+STRING IDS_AG_RECOMMENDED		"recommended"
 STRING IDS_AG_REMOVING		"Removing: "
 STRING IDS_AG_REOPEN		"Reopen File"
 STRING IDS_AG_RESET_RATE		"Reset Rate"
