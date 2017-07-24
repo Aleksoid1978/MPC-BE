@@ -1169,7 +1169,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 		}
 	}
 
-	const bool bIsEmpty = m_pl.IsEmpty();
+	const BOOL bIsEmpty = m_pl.IsEmpty();
 
 	qsort(idx.GetData(), idx.GetCount(), sizeof(int), s_int_comp);
 	for (size_t i = 0; i < idx.GetCount(); i++) {
