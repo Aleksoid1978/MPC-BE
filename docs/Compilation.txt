@@ -1,9 +1,10 @@
 ﻿Part A: Preparing the Visual Studio 2015/2017 environment
 
  Visual Studio 2015
-  1. Install Visual C++ 2015, part of Visual Studio 2015 with Update 2 (any edition will work fine).
+  1. Install Visual Studio 2015 with Update 3 (any edition will work fine). During installation, you must select "Visual C ++" in the "Programming Languages" group.
+  2. Install Visual C++ Optimizer fixes for Visual Studio 2015 Update 3 (https://support.microsoft.com/en-us/help/3207317/visual-c-optimizer-fixes-for-visual-studio-2015-update-3)
  Visual Studio 2017
-  1. Install Visual C++ 2017, part of Visual Studio 2017 (any edition will work fine).
+  1. Install Visual Studio 2017 (any edition will work fine). During installation, you must select "Visual C ++" in the "Programming Languages" group.
 
   Download URL: http://www.visualstudio.com/downloads/download-visual-studio-vs
 
@@ -51,7 +52,7 @@ Alternatively, you can use build.bat (run: build.bat help for more info)
 
 Part D: Building the installer
 
-Download Inno Setup Unicode v5.5.8 or newer from: http://www.jrsoftware.org/isdl.php
+Download Inno Setup Unicode v5.5.9 or newer from: http://www.jrsoftware.org/isdl.php
 Download Inno Download Plugin from: https://bitbucket.org/mitrich_k/inno-download-plugin/downloads
 Install everything and then go to C:\mpc-be\distrib, open mpc-be_setup.iss with Inno Setup, read the first comments in the script and compile it.
 Note: Use Inno Setup's built-in IDE.
