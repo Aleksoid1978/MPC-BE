@@ -52,7 +52,7 @@ CSaveDlg::CSaveDlg(LPCWSTR in, LPCWSTR name, LPCWSTR out, HRESULT& hr)
 	}
 
 	SetProgressBarMarquee();
-	SetProgressBarRange(0, 100);
+	SetProgressBarRange(0, 1000);
 	SetProgressBarPosition(0);
 
 	SetDialogWidth(250);
@@ -438,7 +438,7 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 		SetContent(str);
 
 		if (m_len) {
-			SetProgressBarPosition(static_cast<int>(100 * m_pos / m_len));
+			SetProgressBarPosition(static_cast<int>(1000 * m_pos / m_len));
 		}
 
 		if (m_bAbort) {
@@ -491,7 +491,7 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 
 		SetContent(str);
 
-		SetProgressBarPosition(dur > 0 ? (int)(100 * pos / dur) : 0);
+		SetProgressBarPosition(dur > 0 ? (int)(1000 * pos / dur) : 0);
 
 		if (dur && pos >= dur) {
 			ClickCommandControl(IDCANCEL);
