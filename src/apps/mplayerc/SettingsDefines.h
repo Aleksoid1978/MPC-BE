@@ -101,7 +101,7 @@
 #define IDS_RS_MENULANG						L"MenuLang"
 #define IDS_RS_AUDIOLANG					L"AudioLang"
 #define IDS_RS_SUBTITLESLANG				L"SubtitlesLang"
-#define IDS_RS_SPLOGFONT					L"SPDefaultStyle"
+#define IDS_RS_SPSTYLE						L"SPDefaultStyle"
 #define IDS_RS_SPOVERRIDEPLACEMENT			L"SPOverridePlacement"
 #define IDS_RS_SPHORPOS						L"SPHorPos"
 #define IDS_RS_SPVERPOS						L"SPVerPos"
