@@ -2737,12 +2737,21 @@ static inline BOOL GOPFound(BYTE *buf, int len)
 	return FALSE;
 }
 
-static inline HRESULT FillAVPacket(AVPacket *avpkt, const BYTE *buffer, int buflen)
+HRESULT CMPCVideoDecFilter::FillAVPacket(AVPacket *avpkt, const BYTE *buffer, int buflen)
 {
-	if (av_new_packet(avpkt, buflen) < 0) {
+	int size = buflen;
+	if (m_nCodecId == AV_CODEC_ID_PRORES) {
+		// code from ffmpeg/libavutil/mem.c -> av_fast_realloc()
+		size = (buflen + AV_INPUT_BUFFER_PADDING_SIZE) + (buflen + AV_INPUT_BUFFER_PADDING_SIZE) / 16 + 32;
+	}
+
+	if (av_new_packet(avpkt, size) < 0) {
 		return E_OUTOFMEMORY;
 	}
 	memcpy(avpkt->data, buffer, buflen);
+	if (size > buflen) {
+		memset(avpkt->data + buflen, 0, size - buflen);
+	}
 
 	return S_OK;
 }

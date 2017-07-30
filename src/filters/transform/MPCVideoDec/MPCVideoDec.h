@@ -169,6 +169,7 @@ protected:
 	void			DetectVideoCard(HWND hWnd);
 	void			BuildOutputFormat();
 
+	HRESULT			FillAVPacket(AVPacket *avpkt, const BYTE *buffer, int buflen);
 	HRESULT			DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bPreroll = FALSE);
 	HRESULT			ParseInternal(const BYTE *buffer, int buflen, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bPreroll);
 	HRESULT			Decode(const BYTE *buffer, int buflen, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bSyncPoint = FALSE, BOOL bPreroll = FALSE);
