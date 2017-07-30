@@ -677,7 +677,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_MVC1_DECODER 0
 #define CONFIG_MVC2_DECODER 0
 #define CONFIG_PNG_DECODER 1
-#define CONFIG_APNG_DECODER 1
+#define CONFIG_APNG_DECODER 0
 #define CONFIG_QPEG_DECODER 0
 #define CONFIG_QTRLE_DECODER 1
 #define CONFIG_PRORES_DECODER 1
