@@ -387,13 +387,12 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 	static UINT speedUnits[] = { IDS_SPEED_UNIT_K, IDS_SPEED_UNIT_M, IDS_SPEED_UNIT_G };
 
 	if (m_hFile) {
-		const QWORD pos = m_pos;
+		const QWORD pos = m_pos;                             // bytes
+		const clock_t time = (clock() - m_startTime);        // milliseconds
+		const long speed = time > 0 ? pos * 1000 / time : 0; // bytes per second
 
 		double dPos = pos / 1024.0;
 		const unsigned int unitPos = AdaptUnit(dPos, _countof(sizeUnits));
-
-		const clock_t timeSec = (clock() - m_startTime) / 1000;
-		const LONG speed = timeSec > 0 ? pos / timeSec : 0;
 		double dSpeed = speed / 1024.0;
 		const unsigned int unitSpeed = AdaptUnit(dSpeed, _countof(speedUnits));
 
@@ -403,42 +402,43 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 			const unsigned int unitDur = AdaptUnit(dDur, _countof(sizeUnits));
 
 			str.Format(L"%.2lf %s / %.2lf %s , %.2lf %s",
-					   dPos, ResStr(sizeUnits[unitPos]), dDur, ResStr(sizeUnits[unitDur]),
+					   dPos, ResStr(sizeUnits[unitPos]),
+					   dDur, ResStr(sizeUnits[unitDur]),
 					   dSpeed, ResStr(speedUnits[unitSpeed]));
+
+			if (speed > 0) {
+				const REFERENCE_TIME sec = (m_len - pos) / speed;
+				if (sec > 0) {
+					DVD_HMSF_TIMECODE tcDur = {
+						(BYTE)(sec / 3600),
+						(BYTE)(sec / 60 % 60),
+						(BYTE)(sec % 60),
+						0
+					};
+
+					str.Append(L",");
+
+					if (tcDur.bHours > 0) {
+						str.AppendFormat(L" %0.2dh", tcDur.bHours);
+					}
+					if (tcDur.bMinutes > 0) {
+						str.AppendFormat(L" %0.2dm", tcDur.bMinutes);
+					}
+					if (tcDur.bSeconds > 0) {
+						str.AppendFormat(L" %0.2ds", tcDur.bSeconds);
+					}
+				}
+			}
 		} else {
 			str.Format(L"%.2lf %s , %.2lf %s",
 					   dPos, ResStr(sizeUnits[unitPos]),
 					   dSpeed, ResStr(speedUnits[unitSpeed]));
 		}
 
-		if (speed > 0 && m_len) {
-			const REFERENCE_TIME sec = (m_len - pos) / speed;
-			if (sec > 0) {
-				DVD_HMSF_TIMECODE tcDur = {
-					(BYTE)(sec / 3600),
-					(BYTE)(sec / 60 % 60),
-					(BYTE)(sec % 60),
-					0
-				};
-
-				str.Append(L",");
-
-				if (tcDur.bHours > 0) {
-					str.AppendFormat(L" %0.2dh", tcDur.bHours);
-				}
-				if (tcDur.bMinutes > 0) {
-					str.AppendFormat(L" %0.2dm", tcDur.bMinutes);
-				}
-				if (tcDur.bSeconds > 0) {
-					str.AppendFormat(L" %0.2ds", tcDur.bSeconds);
-				}
-			}
-		}
-
 		SetContent(str);
 
 		if (m_len) {
-			SetProgressBarPosition(static_cast<int>(1000 * m_pos / m_len));
+			SetProgressBarPosition(static_cast<int>(1000 * pos / m_len));
 		}
 
 		if (m_bAbort) {
@@ -462,7 +462,8 @@ HRESULT CSaveDlg::OnTimer(_In_ long lTime)
 		const unsigned int unitSpeed = AdaptUnit(dSpeed, _countof(speedUnits));
 
 		str.Format(L"%.2lf %s / %.2lf %s , %.2lf %s",
-				   dPos, ResStr(sizeUnits[unitPos]), dDur, ResStr(sizeUnits[unitDur]),
+				   dPos, ResStr(sizeUnits[unitPos]),
+				   dDur, ResStr(sizeUnits[unitDur]),
 				   dSpeed, ResStr(speedUnits[unitSpeed]));
 
 		if (speed > 0 && m_len) {
