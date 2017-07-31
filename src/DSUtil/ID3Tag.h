@@ -21,6 +21,7 @@
 #pragma once
 
 #include <atlcoll.h>
+#include "CUE.h"
 #include "GolombBuffer.h"
 
 //
@@ -72,9 +73,13 @@ protected:
 	CString ReadText(CGolombBuffer& gb, DWORD size, BYTE encoding);
 	CString ReadField(CGolombBuffer& gb, DWORD &size, BYTE encoding);
 
+	void ReadTag(DWORD tag, CGolombBuffer& gbData, DWORD &size, CID3TagItem** item);
+	void ReadChapter(CGolombBuffer& gbData, DWORD &size);
+
 public:
 	CAtlMap<DWORD, CString>	Tags;
 	CAtlList<CID3TagItem*>	TagItems;
+	CAtlList<Chapters>		ChaptersList;
 
 	CID3Tag(BYTE major = 0, BYTE flags = 0);
 	virtual ~CID3Tag();
