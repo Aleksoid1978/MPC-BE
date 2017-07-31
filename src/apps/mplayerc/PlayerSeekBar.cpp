@@ -591,8 +591,6 @@ void CPlayerSeekBar::OnRButtonDown(UINT nFlags, CPoint point)
 		}
 	}
 
-	m_pMainFrame->PostMessage(WM_COMMAND, ID_PLAY_GOTO);
-
 	CDialogBar::OnRButtonDown(nFlags, point);
 }
 
