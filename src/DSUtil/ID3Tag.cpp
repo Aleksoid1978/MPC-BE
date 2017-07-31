@@ -160,6 +160,124 @@ static void ReadLang(CGolombBuffer &gb, DWORD &size)
 	size -= 3;
 }
 
+void CID3Tag::ReadTag(DWORD tag, CGolombBuffer& gbData, DWORD &size, CID3TagItem** item)
+{
+	BYTE encoding = (BYTE)gbData.BitRead(8);
+	size--;
+
+	if (tag == 'APIC' || tag == '\0PIC') {
+		TCHAR mime[64];
+		memset(&mime, 0 ,64);
+
+		int mime_len = 0;
+		while (size-- && (mime[mime_len++] = gbData.BitRead(8)) != 0);
+
+		BYTE pic_type = (BYTE)gbData.BitRead(8);
+		size--;
+
+		if (tag == 'APIC') {
+			CString Desc = ReadField(gbData, size, encoding);
+			UNREFERENCED_PARAMETER(Desc);
+		}
+
+		CString mimeStr(mime);
+		if (tag == '\0PIC') {
+			if (CString(mimeStr).MakeUpper() == L"JPG") {
+				mimeStr = L"image/jpeg";
+			} else if (CString(mimeStr).MakeUpper() == L"PNG") {
+				mimeStr = L"image/png";
+			} else {
+				mimeStr.Format(L"image/%s", CString(mime));
+			}
+		}
+
+		CAtlArray<BYTE> data;
+		data.SetCount(size);
+		gbData.ReadBuffer(data.GetData(), size);
+
+		*item = DNew CID3TagItem(tag, data, mimeStr);
+	} else {
+		if (tag == 'COMM' || tag == '\0ULT' || tag == 'USLT') {
+			ReadLang(gbData, size);
+			CString Desc = ReadField(gbData, size, encoding);
+			UNREFERENCED_PARAMETER(Desc);
+		}
+
+		CString text;
+		if (((char*)&tag)[3] == 'T') {
+			while (size) {
+				CString field = ReadField(gbData, size, encoding);
+				if (!field.IsEmpty()) {
+					if (text.IsEmpty()) {
+						text = field;
+					} else {
+						text.AppendFormat(L"; %s", field);
+					}
+				}
+			}
+		} else {
+			text = ReadText(gbData, size, encoding);
+		}
+
+		if (!text.IsEmpty()) {
+			*item = DNew CID3TagItem(tag, text);
+		}
+	}
+}
+
+void CID3Tag::ReadChapter(CGolombBuffer& gbData, DWORD &size)
+{
+	CString chapterName;
+	CString element = ReadField(gbData, size, ID3v2Encoding::ISO8859);
+
+	DWORD start = gbData.ReadDword();
+	DWORD end   = gbData.ReadDword();
+	gbData.SkipBytes(8);
+
+	size -= 16;
+
+	int pos = gbData.GetPos();
+	while (size > 10) {
+		gbData.Seek(pos);
+
+		DWORD tag   = (DWORD)gbData.BitRead(32);
+		DWORD len   = (DWORD)gbData.BitRead(32);
+		DWORD flags = (WORD)gbData.BitRead(16); UNREFERENCED_PARAMETER(flags);
+		size -= 10;
+
+		pos += gbData.GetPos() + len;
+
+		if (len > size || tag == 0) {
+			break;
+		}
+
+		if (!len) {
+			continue;
+		}
+
+		size -= len;
+
+		if (((char*)&tag)[3] == 'T') {
+			CID3TagItem* item = NULL;
+			ReadTag(tag, gbData, len, &item);
+			if (item && item->GetType() == ID3Type::ID3_TYPE_STRING) {
+				if (chapterName.IsEmpty()) {
+					chapterName = item->GetValue();
+				} else {
+					chapterName += L" / " + item->GetValue();
+				}
+				delete item;
+			}
+		}
+	}
+
+	if (chapterName.IsEmpty()) {
+		chapterName = element;
+	}
+
+	ChaptersList.AddTail(Chapters(chapterName, MILLISECONDS_TO_100NS_UNITS(start)));
+}
+
 #define ID3v2_FLAG_DATALEN 0x0001
 #define ID3v2_FLAG_UNSYNCH 0x0002
 
@@ -246,71 +364,15 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 				|| tag == '\0TP1'
 				|| tag == '\0TT2'
 				|| tag == '\0PIC' || tag == 'APIC'
-				|| tag == '\0ULT' || tag == 'USLT'
-				) {
-			BYTE encoding = (BYTE)gbData.BitRead(8);
-			size--;
+				|| tag == '\0ULT' || tag == 'USLT') {
+			CID3TagItem* item = NULL;
+			ReadTag(tag, gbData, size, &item);
 
-			if (tag == 'APIC' || tag == '\0PIC') {
-				TCHAR mime[64];
-				memset(&mime, 0 ,64);
-
-				int mime_len = 0;
-				while (size-- && (mime[mime_len++] = gbData.BitRead(8)) != 0);
-
-				BYTE pic_type = (BYTE)gbData.BitRead(8);
-				size--;
-
-				if (tag == 'APIC') {
-					CString Desc = ReadField(gbData, size, encoding);
-					UNREFERENCED_PARAMETER(Desc);
-				}
-
-				CString mimeStr(mime);
-				if (tag == '\0PIC') {
-					if (CString(mimeStr).MakeUpper() == L"JPG") {
-						mimeStr = L"image/jpeg";
-					} else if (CString(mimeStr).MakeUpper() == L"PNG") {
-						mimeStr = L"image/png";
-					} else {
-						mimeStr.Format(L"image/%s", CString(mime));
-					}
-				}
-
-				CAtlArray<BYTE> data;
-				data.SetCount(size);
-				gbData.ReadBuffer(data.GetData(), size);
-
-				CID3TagItem* item = DNew CID3TagItem(tag, data, mimeStr);
+			if (item) {
 				TagItems.AddTail(item);
-			} else {
-				if (tag == 'COMM' || tag == '\0ULT' || tag == 'USLT') {
-					ReadLang(gbData, size);
-					CString Desc = ReadField(gbData, size, encoding);
-					UNREFERENCED_PARAMETER(Desc);
-				}
-
-				CString text;
-				if (((char*)&tag)[3] == 'T') {
-					while (size) {
-						CString field = ReadField(gbData, size, encoding);
-						if (!field.IsEmpty()) {
-							if (text.IsEmpty()) {
-								text = field;
-							} else {
-								text.AppendFormat(L"; %s", field);
-							}
-						}
-					}
-				} else {
-					text = ReadText(gbData, size, encoding);
-				}
-
-				if (!text.IsEmpty()) {
-					CID3TagItem* item = DNew CID3TagItem(tag, text);
-					TagItems.AddTail(item);
-				}
 			}
+		} else if (tag == 'CHAP') {
+			ReadChapter(gbData, size);
 		}
 	}
 
@@ -504,15 +566,24 @@ void SetID3TagProperties(IBaseFilter* pBF, const CID3Tag* ID3tag)
 				CString fname;
 				if (mime == L"image/jpeg" || mime == L"image/jpg") {
 					fname = L"cover.jpg";
-				} else if (mime == L"image/png") {
-					fname = L"cover.png";
 				} else {
 					fname = mime;
 					fname.Replace(L"image/", L"cover.");
 				}
 
-				HRESULT hr2 = pRB->ResAppend(fname, L"cover", mime, (BYTE*)item->GetData(), (DWORD)item->GetDataLen(), 0);
-				bResAppend = SUCCEEDED(hr2);
+				HRESULT hr = pRB->ResAppend(fname, L"cover", mime, (BYTE*)item->GetData(), (DWORD)item->GetDataLen(), 0);
+				bResAppend = SUCCEEDED(hr);
+			}
+		}
+	}
+
+	if (CComQIPtr<IDSMChapterBag> pCB = pBF) {
+		if (!ID3tag->ChaptersList.IsEmpty()) {
+			pCB->ChapRemoveAll();
+			POSITION pos = ID3tag->ChaptersList.GetHeadPosition();
+			while (pos) {
+				const Chapters& cp = ID3tag->ChaptersList.GetNext(pos);
+				pCB->ChapAppend(cp.rt, cp.name);
 			}
 		}
 	}
