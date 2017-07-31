@@ -21,6 +21,7 @@
 #pragma once
 
 #include <afxtaskdialog.h>
+#include <atomic>
 
 class CMainFrame;
 
@@ -31,15 +32,15 @@ class CThumbsTaskDlg : public CTaskDialog
 	DECLARE_DYNAMIC(CThumbsTaskDlg)
 
 private:
-	CString       m_filename;
+	CMainFrame*      m_pMainFrm;
 
-	CMainFrame*   m_pMainFrm;
+	CString          m_filename;
 
-	volatile int  m_iProgress;
-	volatile bool m_bAbort;
-	CString       m_ErrorMsg;
+	std::thread      m_Thread;
+	std::atomic_int  m_iProgress;
+	std::atomic_bool m_bAbort;
+	CString          m_ErrorMsg;
 
-	std::thread   m_Thread;
 	void SaveThumbnails(LPCWSTR filepath);
 
 public:

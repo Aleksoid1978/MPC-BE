@@ -22,7 +22,7 @@
 #pragma once
 
 #include <afxtaskdialog.h>
-#include <thread>
+#include <atomic>
 #include "../../DSUtil/HTTPAsync.h"
 
 // CSaveDlg dialog
@@ -47,13 +47,14 @@ private:
 	protocol m_protocol = protocol::PROTOCOL_NONE;
 
 	CHTTPAsync m_HTTPAsync;
-	HANDLE m_hFile         = INVALID_HANDLE_VALUE;
-	QWORD m_len            = 0;
-	volatile QWORD m_pos   = 0;
-	clock_t m_startTime    = 0;
+	HANDLE  m_hFile     = INVALID_HANDLE_VALUE;
+	QWORD   m_len       = 0;
+	clock_t m_startTime = 0;
 
-	volatile bool m_bAbort = false;
-	std::thread m_SaveThread;
+	std::thread        m_SaveThread;
+	std::atomic_ullong m_pos    = 0;
+	std::atomic_bool   m_bAbort = false;
+
 	void Save();
 
 	SOCKET m_UdpSocket     = INVALID_SOCKET;
