@@ -404,6 +404,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 
         // other
         case AP4_ATOM_TYPE_AVCC:
+        case AP4_ATOM_TYPE_ARES:
         case AP4_ATOM_TYPE_HVCC:
         case AP4_ATOM_TYPE_VPCC:
             atom = new AP4_DataInfoAtom(type, size, stream);
@@ -574,6 +575,20 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_DVA1:
         case AP4_ATOM_TYPE_AVLG:
         case AP4_ATOM_TYPE_XALG:
+        case AP4_ATOM_TYPE_AI1P:
+        case AP4_ATOM_TYPE_AI1Q:
+        case AP4_ATOM_TYPE_AI12:
+        case AP4_ATOM_TYPE_AI13:
+        case AP4_ATOM_TYPE_AI15:
+        case AP4_ATOM_TYPE_AI16:
+        case AP4_ATOM_TYPE_AI5P:
+        case AP4_ATOM_TYPE_AI5Q:
+        case AP4_ATOM_TYPE_AI52:
+        case AP4_ATOM_TYPE_AI53:
+        case AP4_ATOM_TYPE_AI55:
+        case AP4_ATOM_TYPE_AI56:
+        case AP4_ATOM_TYPE_AIVX:
+        case AP4_ATOM_TYPE_AVIN:
         // H.265/HEVC
         case AP4_ATOM_TYPE_HVC1:
         case AP4_ATOM_TYPE_HEV1:
