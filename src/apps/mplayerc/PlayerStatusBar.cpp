@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -388,19 +388,18 @@ void CPlayerStatusBar::OnPaint()
 		// background
 		int R, G, B, R2, G2, B2;
 
-		GRADIENT_RECT gr[1] = {{0, 1}};
-
 		if (m_BackGroundbm.IsExtGradiendLoading()) {
 			ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
 			m_BackGroundbm.PaintExternalGradient(&dc, r, 55, s.nThemeBrightness, R, G, B);
 		} else {
 			ThemeRGB(30, 35, 40, R, G, B);
 			ThemeRGB(0, 5, 10, R2, G2, B2);
+			GRADIENT_RECT gr = {0, 1};
 			TRIVERTEX tv[2] = {
 				{r.left, r.top, R * 256, G * 256, B * 256, 255 * 256},
 				{r.right, r.bottom, R2 * 256, G2 * 256, B2 * 256, 255 * 256},
 			};
-			memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+			memdc.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 		}
 
 		memdc.SetBkMode(TRANSPARENT);

@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2016 see Authors.txt
+ * (C) 2012-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -346,7 +346,7 @@ bool CMPCPngImage::PaintExternalGradient(CDC* dc, CRect r, int ptop, int br/* = 
 		BYTE* pData = DNew BYTE[size];
 		memcpy(pData, BrightnessRGB(IMG_TYPE::BMP, m_pExtGradientDATA, m_width, m_height, m_bpp, br, rc, gc, bc), size);
 
-		GRADIENT_RECT gr[1] = {{0, 1}};
+		GRADIENT_RECT gr = {0, 1};
 
 		int bt = m_bpp >> 3, st = 2, pa = 255 * 256;
 		int sp = bt * ptop, hs = bt * st;
@@ -357,7 +357,7 @@ bool CMPCPngImage::PaintExternalGradient(CDC* dc, CRect r, int ptop, int br/* = 
 					{t, 0, pData[k + 2] * 256, pData[k + 1] * 256, pData[k] * 256, pa},
 					{t + st, 1, pData[k + hs + 2] * 256, pData[k + hs + 1] * 256, pData[k + hs] * 256, pa},
 				};
-				dc->GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_H);
+				dc->GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_H);
 			}
 		} else {
 			for (int k = sp, t = 0; t < r.bottom; k += hs, t += st) {
@@ -365,7 +365,7 @@ bool CMPCPngImage::PaintExternalGradient(CDC* dc, CRect r, int ptop, int br/* = 
 					{r.left, t, pData[k + 2] * 256, pData[k + 1] * 256, pData[k] * 256, pa},
 					{r.right, t + st, pData[k + hs + 2] * 256, pData[k + hs + 1] * 256, pData[k + hs] * 256, pa},
 				};
-				dc->GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+				dc->GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 			}
 		}
 
