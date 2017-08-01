@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+ * Copyright (C) 2012-2017 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
  *
  * This file is part of MPC-BE.
  *
@@ -19,7 +19,6 @@
  */
 
 #include "stdafx.h"
-#include <VersionHelpers.h>
 #include <Amvideo.h>
 #include <algorithm>
 #include "MPCBEContextMenu.h"
