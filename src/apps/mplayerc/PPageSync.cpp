@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -116,7 +116,7 @@ void CPPageSync::InitDialogPrivate()
 	}
 	OnAlterativeVSyncCheck();
 
-	if ((IsWinVista() || IsWin7()) &&
+	if ((!SysVersion::IsWin8orLater()) &&
 			(rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
 			rs.iVideoRenderer == VIDRNDT_MADVR ||
 			rs.iVideoRenderer == VIDRNDT_SYNC)) {

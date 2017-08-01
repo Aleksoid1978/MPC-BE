@@ -1102,7 +1102,7 @@ void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
 			m_nPCIVendor         = AdapID9.VendorId;
 			m_nPCIDevice         = AdapID9.DeviceId;
 			m_VideoDriverVersion = AdapID9.DriverVersion.QuadPart;
-			if (IsWin81orLater() && (m_VideoDriverVersion & 0xffff00000000) == 0 && (m_VideoDriverVersion & 0xffff) == 0) {
+			if (SysVersion::IsWin81orLater() && (m_VideoDriverVersion & 0xffff00000000) == 0 && (m_VideoDriverVersion & 0xffff) == 0) {
 				// fix bug in GetAdapterIdentifier()
 				m_VideoDriverVersion = (m_VideoDriverVersion & 0xffff000000000000) | ((m_VideoDriverVersion & 0xffff0000) << 16) | 0xffffffff;
 			}
@@ -3468,7 +3468,7 @@ HRESULT CMPCVideoDecFilter::DetectVideoCard_EVR(IPin *pPin)
 								m_nPCIVendor         = AdapID9.VendorId;
 								m_nPCIDevice         = AdapID9.DeviceId;
 								m_VideoDriverVersion = AdapID9.DriverVersion.QuadPart;
-								if (IsWin81orLater() && (m_VideoDriverVersion & 0xffff00000000) == 0 && (m_VideoDriverVersion & 0xffff) == 0) {
+								if (SysVersion::IsWin81orLater() && (m_VideoDriverVersion & 0xffff00000000) == 0 && (m_VideoDriverVersion & 0xffff) == 0) {
 									// fix bug in GetAdapterIdentifier()
 									m_VideoDriverVersion = (m_VideoDriverVersion & 0xffff000000000000) | ((m_VideoDriverVersion & 0xffff0000) << 16) | 0xffffffff;
 								}
