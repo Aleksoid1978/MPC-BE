@@ -2009,7 +2009,7 @@ void CPlayerPlaylistBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 	int R, G, B;
 
 	if (CDDS_PREPAINT == pLVCD->nmcd.dwDrawStage) {
-		if (IsWin7orLater()) { // under WinXP cause the hang
+		if (SysVersion::IsWin7orLater()) { // under WinXP cause the hang
 			ResizeListColumn();
 		}
 

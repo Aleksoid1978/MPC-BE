@@ -1424,7 +1424,7 @@ BOOL CMPlayerCApp::InitInstance()
 
 			CPPageFormats::RegisterApp();
 
-			BOOL bIs64 = IsW64();
+			const bool bIs64 = SysVersion::IsW64();
 			CPPageFormats::UnRegisterShellExt(ShellExt);
 			if (bIs64) {
 				CPPageFormats::UnRegisterShellExt(ShellExt64);
@@ -1452,7 +1452,7 @@ BOOL CMPlayerCApp::InitInstance()
 				CPPageFormats::RegisterShellExt(ShellExt64);
 			}
 
-			if (IsWin8orLater()) {
+			if (SysVersion::IsWin8orLater()) {
 				CPPageFormats::RegisterUI();
 			}
 
@@ -1465,9 +1465,8 @@ BOOL CMPlayerCApp::InitInstance()
 		if (!IsUserAdmin()) {
 			AfxGetMyApp()->RunAsAdministrator(GetProgramPath(), m_lpCmdLine, false);
 		} else {
-			BOOL bIs64 = IsW64();
 			CPPageFormats::UnRegisterShellExt(GetProgramDir() + L"MPCBEShellExt.dll");
-			if (bIs64) {
+			if (SysVersion::IsW64()) {
 				CPPageFormats::UnRegisterShellExt(GetProgramDir() + L"MPCBEShellExt64.dll");
 			}
 
@@ -1482,7 +1481,7 @@ BOOL CMPlayerCApp::InitInstance()
 				}
 			}
 
-			if (IsWin8orLater()) {
+			if (SysVersion::IsWin8orLater()) {
 				CPPageFormats::RegisterUI();
 			}
 

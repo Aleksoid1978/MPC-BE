@@ -99,7 +99,7 @@ static HRESULT STDMETHODCALLTYPE ReceiveConnectionMine(IPinC* This, /* [in] */ I
 	if (pmt) {
 		// Force the renderer to always reject the P010(except the DXVA) and P016 pixel format
 		if (pmt->subtype == MEDIASUBTYPE_P010) {
-			if (IsWin10orLater() || GetCLSID((IPin*)pConnector) == GUID_LAVVideoDecoder) {
+			if (SysVersion::IsWin10orLater() || GetCLSID((IPin*)pConnector) == GUID_LAVVideoDecoder) {
 				// 1) Windows 10 support software P010 input
 				// 2) LAV Video Decoder used biCompression equal 'P010' for DXVA :(
 				return ReceiveConnectionOrg(This, pConnector, pmt);

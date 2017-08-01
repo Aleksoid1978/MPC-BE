@@ -71,9 +71,6 @@
     <ClCompile Include="GUIDString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SysVersion.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CUE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

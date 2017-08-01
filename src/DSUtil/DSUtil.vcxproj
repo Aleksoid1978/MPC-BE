@@ -120,7 +120,6 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="SysVersion.cpp" />
     <ClCompile Include="text.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="vd.cpp" />

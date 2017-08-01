@@ -40,7 +40,7 @@ CGPUUsage::CGPUUsage()
 {
 	Clean();
 
-	if (IsWin7orLater()) {
+	if (SysVersion::IsWin7orLater()) {
 		gdi32Handle = LoadLibrary(L"gdi32.dll");
 		if (gdi32Handle) {
 			pD3DKMTQueryStatistics = (PFND3DKMT_QUERYSTATISTICS)GetProcAddress(gdi32Handle, "D3DKMTQueryStatistics");
@@ -431,7 +431,7 @@ void CGPUUsage::GetUsage(UINT& gpu_usage, UINT& gpu_clock, UINT64& gpu_mem_usage
 						ULONG aperture;
 						ULONG64 commitLimit;
 
-						if (IsWin81orLater()) {
+						if (SysVersion::IsWin81orLater()) {
 							aperture = queryStatistics.QueryResult.SegmentInformation.Aperture;
 							commitLimit = queryStatistics.QueryResult.SegmentInformation.BytesResident;
 						} else {
@@ -448,7 +448,7 @@ void CGPUUsage::GetUsage(UINT& gpu_usage, UINT& gpu_clock, UINT64& gpu_mem_usage
 							queryStatistics.AdapterLuid = dxgiAdapterDesc.AdapterLuid;
 							queryStatistics.QuerySegment.SegmentId = i;
 							if (NT_SUCCESS(pD3DKMTQueryStatistics(&queryStatistics))) {
-								if (IsWin81orLater()) {
+								if (SysVersion::IsWin81orLater()) {
 									m_llGPUdedicatedBytesUsedCurrent += queryStatistics.QueryResult.ProcessSegmentInformation.BytesCommitted;
 								} else {
 									m_llGPUdedicatedBytesUsedCurrent += (ULONG)queryStatistics.QueryResult.ProcessSegmentInformation.BytesCommitted;

@@ -193,7 +193,7 @@ HRESULT CMSDKDecoder::Init()
     DLog(L"CMSDKDecoder::Init(): MSDK Initialized, version %d.%d, impl 0x%04x, using %s decoding", version.Major, version.Minor, impl, bHwAcceleration ? L"hardware" : L"software");
 
     if (bUseD3D11Alloc) {
-      if (!IsWin8orLater()) {
+      if (!SysVersion::IsWin8orLater()) {
         DLog(L"CMSDKDecoder::Init(): hardware decoding via D3D11 supported only in Windows 8 and higher");
         if (m_mfxSession) {
           MFXClose(m_mfxSession);

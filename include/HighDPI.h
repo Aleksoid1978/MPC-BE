@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2016 see Authors.txt
+ * (C) 2015-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,8 @@
  */
 
 #pragma once
+
+#include "../src/DSUtil/SysVersion.h"
 
 namespace
 {
@@ -90,15 +92,7 @@ public:
 protected:
     void UseCurentMonitorDPI(HWND hWindow)
     {
-        static OSVERSIONINFO osvi = { sizeof(osvi) };
-        if (osvi.dwMajorVersion == 0) {
-#pragma warning(push)
-#pragma warning(disable: 4996)
-            GetVersionEx(&osvi);
-#pragma warning(pop)
-        }
-
-        if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion >= 3 || osvi.dwMajorVersion > 6) {
+        if (SysVersion::IsWin8orLater()) {
             static HMODULE hShcore = LoadLibrary(L"Shcore.dll");
             if (hShcore) {
                 static tpGetDpiForMonitor pGetDpiForMonitor = (tpGetDpiForMonitor)GetProcAddress(hShcore, "GetDpiForMonitor");

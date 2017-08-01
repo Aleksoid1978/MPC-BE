@@ -49,7 +49,7 @@ COSD::COSD(CMainFrame* pMainFrame)
 	, m_pWndInsertAfter(&wndNoTopMost)
 	, m_nDEFFLAGS(SWP_NOACTIVATE | SWP_NOREDRAW | SWP_ASYNCWINDOWPOS | SWP_NOZORDER)
 {
-	if (IsWin8orLater()) {
+	if (SysVersion::IsWin8orLater()) {
 		// remove SWP_NOZORDER for Win 8 and later - it's use WS_CHILD style
 		m_nDEFFLAGS &= ~SWP_NOZORDER;
 		m_pWndInsertAfter = &wndTop;
@@ -127,7 +127,7 @@ HRESULT COSD::Create(CWnd* pWnd)
 	DWORD dwStyle	= WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
 	DWORD dwStyleEx	= WS_EX_TRANSPARENT | WS_EX_LAYERED;
 
-	if (IsWin8orLater()) {
+	if (SysVersion::IsWin8orLater()) {
 		dwStyle		|= WS_CHILD;
 	} else {
 		dwStyle		|= WS_POPUP;
@@ -947,7 +947,7 @@ void COSD::DrawWnd()
 	temp_DC.DeleteDC();
 
 	CRect wr(m_MainWndRect.left + 10 + rectMessages.left, m_MainWndRect.top + 10, rectMessages.Width() - rectMessages.left, rectMessages.Height());
-	if (IsWin8orLater()) {
+	if (SysVersion::IsWin8orLater()) {
 		wr.left	-= m_MainWndRect.left;
 		wr.top	-= m_MainWndRect.top;
 	}

@@ -34,7 +34,7 @@
 
 static BOOL ShellExtExists()
 {
-	if (IsW64()) {
+	if (SysVersion::IsW64()) {
 		return ::PathFileExists(ShellExt64);
 	}
 
@@ -57,7 +57,7 @@ CPPageFormats::CPPageFormats()
 	, m_list(0)
 	, m_bInsufficientPrivileges(false)
 {
-	if (!m_pAAR && !IsWin10orLater()) {
+	if (!m_pAAR && !SysVersion::IsWin10orLater()) {
 		// Default manager (requires at least Vista)
 		HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
 									  NULL,
@@ -156,7 +156,7 @@ bool CPPageFormats::IsRegistered(CString ext, bool bCheckProgId/* = false*/)
 		}
 	}
 
-	if (bIsDefault && IsWin10orLater() && bCheckProgId) {
+	if (bIsDefault && SysVersion::IsWin10orLater() && bCheckProgId) {
 		CRegKey key;
 		WCHAR   buff[_MAX_PATH] = { 0 };
 		ULONG   len = _countof(buff);
@@ -381,7 +381,7 @@ HRESULT CPPageFormats::RegisterUI()
 
 	HRESULT hr = E_FAIL;
 
-	if (IsWin10orLater()) {
+	if (SysVersion::IsWin10orLater()) {
 		IOpenControlPanel* pCP = NULL;
 		hr = CoCreateInstance(CLSID_OpenControlPanel,
 							  NULL,
@@ -392,7 +392,7 @@ HRESULT CPPageFormats::RegisterUI()
 			hr = pCP->Open(L"Microsoft.DefaultPrograms", L"pageDefaultProgram", NULL);
 			pCP->Release();
 		}
-	} else if (IsWin8orLater()) {
+	} else if (SysVersion::IsWin8orLater()) {
 		IApplicationAssociationRegistrationUI* pUI = NULL;
 		hr = CoCreateInstance(CLSID_ApplicationAssociationRegistrationUI,
 							  NULL,
@@ -958,7 +958,7 @@ BOOL CPPageFormats::OnApply()
 			key.SetDWORDValue(L"ShowDir", !!m_chContextDir.GetCheck());
 		}
 
-		BOOL bIs64 = IsW64();
+		const bool bIs64 = SysVersion::IsW64();
 		UnRegisterShellExt(ShellExt);
 		if (bIs64) {
 			UnRegisterShellExt(ShellExt64);
@@ -1008,7 +1008,7 @@ BOOL CPPageFormats::OnApply()
 	s.bAssociatedWithIcons	= !!m_chAssociatedWithIcons.GetCheck();
 
 	if (m_bFileExtChanged) {
-		if (IsWin8orLater()) {
+		if (SysVersion::IsWin8orLater()) {
 			RegisterUI();
 		}
 
