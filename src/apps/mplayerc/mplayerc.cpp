@@ -1465,9 +1465,9 @@ BOOL CMPlayerCApp::InitInstance()
 		if (!IsUserAdmin()) {
 			AfxGetMyApp()->RunAsAdministrator(GetProgramPath(), m_lpCmdLine, false);
 		} else {
-			CPPageFormats::UnRegisterShellExt(GetProgramDir() + L"MPCBEShellExt.dll");
+			CPPageFormats::UnRegisterShellExt(ShellExt);
 			if (SysVersion::IsW64()) {
-				CPPageFormats::UnRegisterShellExt(GetProgramDir() + L"MPCBEShellExt64.dll");
+				CPPageFormats::UnRegisterShellExt(ShellExt64);
 			}
 
 			CMediaFormats& mf = m_s.m_Formats;
