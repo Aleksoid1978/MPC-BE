@@ -94,6 +94,7 @@ enum MPCPixelFormat {
 	PixFmt_Y416,  // 4:4:4, 48(64) bit
 	// RGB
 	PixFmt_RGB32, // 24(32) bit
+	PixFmt_RGB48, // 48 bit
 	PixFmt_count
 };
 

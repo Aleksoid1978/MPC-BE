@@ -173,7 +173,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	////////// Format conversion //////////
 	p = CPoint(10 + width_s + 15, 10);
 	combo_w = ScaleX(85);
-	label_w = ScaleX(185);
+	label_w = ScaleX(192);
 	width_s = label_w + combo_w;
 	m_grpFmtConv.Create(ResStr(IDS_VDF_COLOR_FMT_CONVERSION), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p + CPoint(-5, 0), CSize(width_s + 10, ScaleY(170))), this, (UINT)IDC_STATIC);
 	p.y += h20;
@@ -205,6 +205,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += h20;
 	m_txtRGB.Create(L"RGB:", WS_VISIBLE|WS_CHILD, CRect(p, CSize(ScaleX(60), m_fontheight)), this, (UINT)IDC_STATIC);
 	m_cbFormat[PixFmt_RGB32].Create(L"RGB32", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(60), 0), CSize(ScaleX(56), m_fontheight)), this, IDC_PP_SW_RGB32);
+	m_cbFormat[PixFmt_RGB48].Create(L"RGB48", dwStyle | BS_AUTOCHECKBOX, CRect(p + CSize(ScaleX(225), 0), CSize(ScaleX(56), m_fontheight)), this, IDC_PP_SW_RGB48);
 	p.y += h25;
 
 	// Output levels
@@ -247,7 +248,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 		m_cbSwRGBLevels.SetCurSel(m_pMDF->GetSwRGBLevels());
 
-		if (m_cbFormat[PixFmt_RGB32].GetCheck() == BST_UNCHECKED) {
+		if (m_cbFormat[PixFmt_RGB32].GetCheck() == BST_UNCHECKED && m_cbFormat[PixFmt_RGB48].GetCheck() == BST_UNCHECKED) {
 			m_cbSwRGBLevels.EnableWindow(FALSE);
 		}
 
@@ -342,7 +343,7 @@ void CMPCVideoDecSettingsWnd::OnBnClickedYUY2()
 
 void CMPCVideoDecSettingsWnd::OnBnClickedRGB32()
 {
-	if (m_cbFormat[PixFmt_RGB32].GetCheck() == BST_UNCHECKED) {
+	if (m_cbFormat[PixFmt_RGB32].GetCheck() == BST_UNCHECKED && m_cbFormat[PixFmt_RGB48].GetCheck() == BST_UNCHECKED) {
 		m_cbSwRGBLevels.EnableWindow(FALSE);
 	} else {
 		m_cbSwRGBLevels.EnableWindow(TRUE);
@@ -360,7 +361,7 @@ void CMPCVideoDecSettingsWnd::OnBnClickedReset()
 	m_cbDXVA_SD.SetCheck(BST_UNCHECKED);
 
 	for (int i = 0; i < PixFmt_count; i++) {
-		if (i == PixFmt_AYUV) {
+		if (i == PixFmt_AYUV || i == PixFmt_RGB48) {
 			m_cbFormat[i].SetCheck(BST_UNCHECKED);
 		} else {
 			m_cbFormat[i].SetCheck(BST_CHECKED);
