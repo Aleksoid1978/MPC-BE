@@ -287,7 +287,7 @@ void CPlayerSeekBar::OnPaint()
 		m_bmPaint.CreateCompatibleBitmap(&dc, r.Width(), r.Height());
 		CBitmap *bmOld = memdc.SelectObject(&m_bmPaint);
 
-		GRADIENT_RECT gr[1] = {{0, 1}};
+		GRADIENT_RECT gr = {0, 1};
 		int pa = 255 * 256;
 
 		if (m_BackGroundbm.IsExtGradiendLoading()) {
@@ -300,7 +300,7 @@ void CPlayerSeekBar::OnPaint()
 				{r.left, r.top, R * 256, G * 256, B * 256, pa},
 				{r.right, r.bottom, R2 * 256, G2 * 256, B2 * 256, pa},
 			};
-			memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+			memdc.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 		}
 
 		memdc.SetBkMode(TRANSPARENT);
@@ -333,7 +333,7 @@ void CPlayerSeekBar::OnPaint()
 					{r.left, r.top, R * 256, G * 256, B * 256, pa},
 					{r_right, r.bottom - 3, R2 * 256, G2 * 256, B2 * 256, pa},
 				};
-				memdc.GradientFill(tvb, 2, gr, 1, GRADIENT_FILL_RECT_V);
+				memdc.GradientFill(tvb, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 				m_rLock.left = r_right;
 		}
 
@@ -355,7 +355,7 @@ void CPlayerSeekBar::OnPaint()
 					{rc.left, rc.top, R * 256, G * 256, B * 256, pa},
 					{nposx, rc.bottom - 3, R2 * 256, G2 * 256, B2 * 256, pa},
 				};
-				memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+				memdc.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 
 				CRect rc2;
 				rc2.left = nposx - 5;
@@ -369,7 +369,7 @@ void CPlayerSeekBar::OnPaint()
 					{rc2.left, rc2.top, R * 256, G * 256, B * 256, pa},
 					{rc2.right, rc.bottom - 3, R2 * 256, G2 * 256, B2 * 256, pa},
 				};
-				memdc.GradientFill(tv2, 2, gr, 1, GRADIENT_FILL_RECT_V);
+				memdc.GradientFill(tv2, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 			}
 
 			ThemeRGB(80, 85, 90, R, G, B);

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1075,40 +1075,36 @@ void COSD::GradientFill(CDC* pDc, CRect* rc)
 	int nOSDTransparent	= s.nOSDTransparent;
 	int nOSDBorder		= s.nOSDBorder;
 
-	GRADIENT_RECT gr[1] = {{0, 1}};
+	GRADIENT_RECT gr = {0, 1};
 	TRIVERTEX tv[2] = {
 		{rc->left, rc->top, R * 256, G * 256, B * 256, nOSDTransparent * 256},
 		{rc->right, rc->bottom, R1 * 256, G1 * 256, B1 * 256, nOSDTransparent * 256},
 	};
-	pDc->GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+	pDc->GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 
 	if (nOSDBorder > 0) {
-		GRADIENT_RECT gr2[1] = {{0, 1}};
 		TRIVERTEX tv2[2] = {
 			{rc->left, rc->top, R_ * 256, G_ * 256, B_ * 256, nOSDTransparent * 256},
 			{rc->left + nOSDBorder, rc->bottom, R1_ * 256, G1_ * 256, B1_ * 256, nOSDTransparent * 256},
 		};
-		pDc->GradientFill(tv2, 2, gr2, 1, GRADIENT_FILL_RECT_V);
+		pDc->GradientFill(tv2, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 
-		GRADIENT_RECT gr3[1] = {{0, 1}};
 		TRIVERTEX tv3[2] = {
 			{rc->right, rc->top, R_ * 256, G_ * 256, B_ * 256, nOSDTransparent * 256},
 			{rc->right - nOSDBorder, rc->bottom, R1_ * 256, G1_ * 256, B1_ * 256, nOSDTransparent * 256},
 		};
-		pDc->GradientFill(tv3, 2, gr3, 1, GRADIENT_FILL_RECT_V);
+		pDc->GradientFill(tv3, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 
-		GRADIENT_RECT gr4[1] = {{0, 1}};
 		TRIVERTEX tv4[2] = {
 			{rc->left, rc->top, R_ * 256, G_ * 256, B_ * 256, nOSDTransparent * 256},
 			{rc->right, rc->top + nOSDBorder, R_ * 256, G_ * 256, B_ * 256, nOSDTransparent * 256},
 		};
-		pDc->GradientFill(tv4, 2, gr4, 1, GRADIENT_FILL_RECT_V);
+		pDc->GradientFill(tv4, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 
-		GRADIENT_RECT gr5[1] = {{0, 1}};
 		TRIVERTEX tv5[2] = {
 			{rc->left, rc->bottom, R1_ * 256, G1_ * 256, B1_ * 256, nOSDTransparent * 256},
 			{rc->right, rc->bottom - nOSDBorder, R1_ * 256, G1_ * 256, B1_ * 256, nOSDTransparent * 256},
 		};
-		pDc->GradientFill(tv5, 2, gr5, 1, GRADIENT_FILL_RECT_V);
+		pDc->GradientFill(tv5, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 	}
 }

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -111,7 +111,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 	int R, G, B, R2, G2, B2;
 
-	GRADIENT_RECT gr[1] = {{0, 1}};
+	GRADIENT_RECT gr = {0, 1};
 
 	if (m_bSelfDrawn) {
 		switch (pNMCD->dwDrawStage) {
@@ -139,7 +139,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 							{ r.left, r.top, R * 256, G * 256, B * 256, 255 * 256 },
 							{ r.Width(), r.Height(), R2 * 256, G2 * 256, B2 * 256, 255 * 256 },
 						};
-						dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+						dc.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 					}
 
 					memdc.CreateCompatibleDC(&dc);
@@ -221,7 +221,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 							{rc.left, rc.top, ir1, ig1, ib1, pa},
 							{r_volume.Width(), 1, ir2, ig2, ib2, pa},
 						};
-						dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_H);
+						dc.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_H);
 					}
 
 					const COLORREF p3 = nVolPos > 30 ? dc.GetPixel(nVolPos, 0) : dc.GetPixel(30, 0);

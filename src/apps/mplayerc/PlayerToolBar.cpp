@@ -562,7 +562,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 
 	int R, G, B, R2, G2, B2;
 
-	GRADIENT_RECT gr[1] = {{0, 1}};
+	GRADIENT_RECT gr = {0, 1};
 
 	int sep[] = {2, 7, 10, 11};
 
@@ -591,7 +591,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 						{r.left, r.top, R * 256, G * 256, B * 256, 255 * 256},
 						{r.right, r.bottom, R2 * 256, G2 * 256, B2 * 256, 255 * 256},
 					};
-					dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+					dc.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 				}
 
 				dc.Detach();
@@ -629,7 +629,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 				{0, 0, 255 * 256, 255 * 256, 255 * 256, 255 * 256},
 				{nW, nH, 0, 0, 0, 0},
 			};
-			memdc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+			memdc.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 
 			BLENDFUNCTION bf;
 			bf.AlphaFormat			= AC_SRC_ALPHA;
@@ -668,7 +668,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 						{r.left, r.top, R * 256, G * 256, B * 256, 255 * 256},
 						{r.right, r.bottom, R2 * 256, G2 * 256, B2 * 256, 255 * 256},
 					};
-					dc.GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+					dc.GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 				}
 			}
 			CRect r10; //SUB
