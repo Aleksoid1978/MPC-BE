@@ -977,7 +977,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	}
 
 	for (int i = 0; i < PixFmt_count; i++) {
-		if (i == PixFmt_AYUV) {
+		if (i == PixFmt_AYUV || i == PixFmt_RGB48) {
 			m_fPixFmts[i] = false;
 		} else {
 			m_fPixFmts[i] = true;
@@ -2028,7 +2028,12 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 				}
 			}
 			else if (av_pfdesc->flags & (AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_PAL)) {
-				OutList = RGB_8;
+				if (lumabits <= 10) {
+					OutList = RGB_8;
+				}
+				else {
+					OutList = RGB_16;
+				}
 			}
 			else if (av_pfdesc->nb_components >= 3) {
 				if (av_pfdesc->log2_chroma_w == 1 && av_pfdesc->log2_chroma_h == 1) { // 4:2:0
@@ -2593,7 +2598,7 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 {
 	DXVA2_ExtendedFormat fmt = { 0 };
 
-	if (m_FormatConverter.GetOutPixFormat() == PixFmt_RGB32) {
+	if (m_FormatConverter.GetOutPixFormat() == PixFmt_RGB32 || m_FormatConverter.GetOutPixFormat() == PixFmt_RGB48) {
 		return fmt;
 	}
 
@@ -3718,7 +3723,7 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetColorSpaceConversion()
 		return -2;
 	}
 	bool in_rgb		= !!(av_pfdesc->flags & (AV_PIX_FMT_FLAG_RGB|AV_PIX_FMT_FLAG_PAL));
-	bool out_rgb	= (m_FormatConverter.GetOutPixFormat() == PixFmt_RGB32);
+	bool out_rgb	= (m_FormatConverter.GetOutPixFormat() == PixFmt_RGB32 || m_FormatConverter.GetOutPixFormat() == PixFmt_RGB48);
 	if (in_rgb < out_rgb) {
 		return 1; // YUV->RGB conversion
 	}
