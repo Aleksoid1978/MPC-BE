@@ -63,9 +63,9 @@ namespace Logger
 			size_t len = _vscwprintf(fmt, args) + 1;
 			TCHAR* buff = DNew TCHAR[len];
 			vswprintf_s(buff, len, fmt, args);
-		
+
 			fwprintf_s(f, L"%s : %s\n", GetLocalTime(), buff);
-		
+
 			delete [] buff;
 			va_end(args);
 
@@ -84,9 +84,9 @@ namespace Logger
 			size_t len = _vscprintf(fmt, args) + 1;
 			CHAR* buff = DNew CHAR[len];
 			vsprintf_s(buff, len, fmt, args);
-		
+
 			fwprintf_s(f, L"%s : %S\n", GetLocalTime(), buff);
-		
+
 			delete [] buff;
 			va_end(args);
 

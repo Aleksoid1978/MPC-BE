@@ -40,10 +40,10 @@ public:
 
 	// returns pointer to the data
 	T* Data() { return m_data; }
-	
+
 	// returns the number of elements
 	size_t Size() { return m_size; }
-	
+
 	// returns allocated size in bytes
 	size_t Bytes() { return m_size * sizeof(T); }
 
