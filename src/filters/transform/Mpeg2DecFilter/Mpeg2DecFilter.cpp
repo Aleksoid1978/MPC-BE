@@ -627,9 +627,6 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 			return S_OK;
 		}
 
-#ifndef _WIN64
-		__asm emms; // this one is missing somewhere in the precompiled mmx obj files
-#endif
 		switch (state) {
 			case STATE_BUFFER:
 				if (len > 0) {
@@ -1086,7 +1083,7 @@ void CMpeg2DecFilter::ApplyBrContHueSat(BYTE* srcy, BYTE* srcu, BYTE* srcv, int 
 	if (fabs(m_bright) > EPSILON || fabs(m_cont - 1.0) > EPSILON) {
 		int size = pitch*h;
 
-		if ((g_cpuid.m_flags & CCpuID::sse2) && ((DWORD_PTR)srcy & 15) == 0) {
+		if (((DWORD_PTR)srcy & 15) == 0) {
 			short Cont = (short)clamp((int)(m_cont * 512), 0, (1 << 16) - 1);
 			short Bright = (short)(m_bright + 16);
 

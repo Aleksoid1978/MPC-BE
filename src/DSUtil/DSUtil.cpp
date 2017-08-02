@@ -929,54 +929,6 @@ CString GetDriveLabel(TCHAR drive)
 	return label;
 }
 
-bool GetKeyFrames(CString fn, CUIntArray& kfs)
-{
-	kfs.RemoveAll();
-
-	CString fn2 = CString(fn).MakeLower();
-	if (fn2.Mid(fn2.ReverseFind('.')+1) == _T("avi")) {
-		AVIFileInit();
-
-		PAVIFILE pfile;
-		if (AVIFileOpen(&pfile, fn, OF_SHARE_DENY_WRITE, 0L) == 0) {
-			AVIFILEINFO afi;
-			memset(&afi, 0, sizeof(afi));
-			AVIFileInfo(pfile, &afi, sizeof(AVIFILEINFO));
-
-			CComPtr<IAVIStream> pavi;
-			if (AVIFileGetStream(pfile, &pavi, streamtypeVIDEO, 0) == AVIERR_OK) {
-				AVISTREAMINFO si;
-				AVIStreamInfo(pavi, &si, sizeof(si));
-
-				if (afi.dwCaps&AVIFILECAPS_ALLKEYFRAMES) {
-					kfs.SetSize(si.dwLength);
-					for (DWORD kf = 0; kf < si.dwLength; kf++) {
-						kfs[kf] = kf;
-					}
-				} else {
-					for (LONG kf = 0; ; kf++) {
-						kf = pavi->FindSample(kf, FIND_KEY|FIND_NEXT);
-						if (kf < 0 || (kfs.GetCount() > 0 && kfs[kfs.GetCount()-1] >= (UINT)kf)) {
-							break;
-						}
-						kfs.Add(kf);
-					}
-
-					if (kfs.GetCount() > 0 && kfs[kfs.GetCount()-1] < si.dwLength-1) {
-						kfs.Add(si.dwLength-1);
-					}
-				}
-			}
-
-			AVIFileRelease(pfile);
-		}
-
-		AVIFileExit();
-	}
-
-	return (kfs.GetCount() > 0);
-}
-
 DVD_HMSF_TIMECODE RT2HMSF(REFERENCE_TIME rt, double fps) // use to remember the current position
 {
 	DVD_HMSF_TIMECODE hmsf = {
@@ -1014,17 +966,15 @@ REFERENCE_TIME HMSF2RT(DVD_HMSF_TIMECODE hmsf, double fps)
 void memsetd(void* dst, unsigned int c, size_t nbytes)
 {
 #ifndef _WIN64
-	if (!(g_cpuid.m_flags & g_cpuid.sse2)) {
-		__asm {
-			mov eax, c
-			mov ecx, nbytes
-			shr ecx, 2
-			mov edi, dst
-			cld
-			rep stosd
-		}
-		return;
+	__asm {
+		mov eax, c
+		mov ecx, nbytes
+		shr ecx, 2
+		mov edi, dst
+		cld
+		rep stosd
 	}
+	return;
 #endif
 	size_t n = nbytes / 4;
 	size_t o = n - (n % 4);
