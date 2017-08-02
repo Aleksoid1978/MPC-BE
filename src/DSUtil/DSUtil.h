@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -116,8 +116,6 @@ enum cdrom_t {
 };
 extern cdrom_t			GetCDROMType(TCHAR drive, CAtlList<CString>& files);
 extern CString			GetDriveLabel(TCHAR drive);
-
-extern bool				GetKeyFrames(CString fn, CUIntArray& kfs);
 
 extern DVD_HMSF_TIMECODE	RT2HMSF(REFERENCE_TIME rt, double fps = 0); // use to remember the current position
 extern DVD_HMSF_TIMECODE	RT2HMS_r(REFERENCE_TIME rt);                // use only for information (for display on the screen)
