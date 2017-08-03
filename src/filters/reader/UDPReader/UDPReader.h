@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <deque>
 #include <AsyncReader/asyncio.h>
 #include <AsyncReader/asyncrdr.h>
 #include "../../../DSUtil/HTTPAsync.h"
@@ -71,7 +72,7 @@ private:
 	ULONGLONG          m_pos = 0;
 	ULONGLONG          m_len = 0;
 
-	CAtlList<CPacket*> m_packets;
+	std::deque<CPacket*> m_packets;
 
 	CAMEvent           m_EventComplete;
 
