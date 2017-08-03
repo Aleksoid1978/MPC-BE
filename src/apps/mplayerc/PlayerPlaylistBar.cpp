@@ -1106,6 +1106,8 @@ static CString CombinePath(CPath p, CString fn)
 
 bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 {
+	m_nSelected_idx = INT_MAX;
+
 	CString str;
 	CAtlMap<int, CPlaylistItem> pli;
 	CAtlArray<int> idx;
@@ -1643,12 +1645,12 @@ int CPlayerPlaylistBar::GetSelIdx()
 	return(FindItem(m_pl.GetPos()));
 }
 
-void CPlayerPlaylistBar::SetSelIdx(int i, bool bUpdatePos/* = FALSE*/)
+void CPlayerPlaylistBar::SetSelIdx(int i, bool bUpdatePos/* = false*/)
 {
 	POSITION pos = FindPos(i);
 	m_pl.SetPos(pos);
 	if (bUpdatePos) {
-		EnsureVisible(pos);
+		EnsureVisible(pos, false);
 	}
 }
 
@@ -1858,7 +1860,11 @@ void CPlayerPlaylistBar::LoadPlaylist(CString filename)
 			if (AfxGetAppSettings().bRememberPlaylistItems) {
 				ParseMPCPlayList(base);
 				Refresh();
-				SelectFileInPlaylist(filename);
+				if (m_nSelected_idx != INT_MAX) {
+					SetSelIdx(m_nSelected_idx + 1, true);
+				} else {
+					SelectFileInPlaylist(filename);
+				}
 			} else {
 				::DeleteFile(base);
 			}
