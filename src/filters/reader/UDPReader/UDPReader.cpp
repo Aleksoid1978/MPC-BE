@@ -200,7 +200,7 @@ void CUDPStream::Append(const BYTE* buff, UINT len)
 {
 	CAutoLock cPacketLock(&m_csPacketsLock);
 
-	m_packets.AddTail(DNew CPacket(buff, m_len, len));
+	m_packets.emplace_back(DNew CPacket(buff, m_len, len));
 	m_len += len;
 
 	if (m_SizeComplete && m_len >= m_SizeComplete) {
@@ -417,9 +417,9 @@ HRESULT CUDPStream::SetPointer(LONGLONG llPos)
 
 	m_pos = llPos;
 
-	const __int64 start = m_packets.IsEmpty() ? 0 : m_packets.GetHead()->m_start;
+	const __int64 start = m_packets.empty() ? 0 : m_packets.front()->m_start;
 	if (llPos < start) {
-		DLog(L"CUDPStream::SetPointer() warning! %lld misses in [%llu - %llu]", llPos, start, m_packets.GetTail()->m_end);
+		DLog(L"CUDPStream::SetPointer() warning! %lld misses in [%llu - %llu]", llPos, start, m_packets.back()->m_end);
 		return S_FALSE;
 	}
 
@@ -431,12 +431,12 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 	DWORD len = dwBytesToRead;
 	BYTE* ptr = pbBuffer;
 
-	if (!m_packets.IsEmpty()
-			&& m_pos + len > m_packets.GetTail()->m_end) {
+	if (!m_packets.empty()
+			&& m_pos + len > m_packets.back()->m_end) {
 		m_SizeComplete = m_pos + len;
 
 #if DEBUG
-		DLog(L"CUDPStream::Read() : wait %llu bytes, %llu -> %llu", m_SizeComplete - m_packets.GetTail()->m_end, m_packets.GetTail()->m_end, m_SizeComplete);
+		DLog(L"CUDPStream::Read() : wait %llu bytes, %llu -> %llu", m_SizeComplete - m_packets.back()->m_end, m_packets.back()->m_end, m_SizeComplete);
 		const ULONGLONG start = GetPerfCounter();
 #endif
 
@@ -460,9 +460,9 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 	CAutoLock cAutoLock(&m_csLock);
 	CAutoLock cPacketLock(&m_csPacketsLock);
 
-	POSITION pos = m_packets.GetHeadPosition();
-	while (pos && len > 0) {
-		const CPacket* p = m_packets.GetNext(pos);
+	auto it = m_packets.begin();
+	while (it != m_packets.end() && len > 0) {
+		const CPacket* p = *it++;
 
 		if (p->m_start <= m_pos && m_pos < p->m_end) {
 			size_t size;
@@ -522,7 +522,7 @@ inline const ULONGLONG CUDPStream::GetPacketsSize()
 {
 	CAutoLock cPacketLock(&m_csPacketsLock);
 
-	return m_packets.IsEmpty() ? 0 : m_packets.GetTail()->m_end - m_packets.GetHead()->m_start;
+	return m_packets.empty() ? 0 : m_packets.back()->m_end - m_packets.front()->m_start;
 }
 
 void CUDPStream::CheckBuffer()
@@ -530,8 +530,9 @@ void CUDPStream::CheckBuffer()
 	if (m_RequestCmd == CMD::CMD_RUN) {
 		CAutoLock cPacketLock(&m_csPacketsLock);
 
-		while (!m_packets.IsEmpty() && m_packets.GetHead()->m_start < m_pos - 256 * KILOBYTE) {
-			delete m_packets.RemoveHead();
+		while (!m_packets.empty() && m_packets.front()->m_start < m_pos - 256 * KILOBYTE) {
+			delete m_packets.front();
+			m_packets.pop_front();
 		}
 	}
 }
@@ -540,8 +541,9 @@ void CUDPStream::EmptyBuffer()
 {
 	CAutoLock cPacketLock(&m_csPacketsLock);
 
-	while (!m_packets.IsEmpty()) {
-		delete m_packets.RemoveHead();
+	while (!m_packets.empty()) {
+		delete m_packets.front();
+		m_packets.pop_front();
 	}
 
 	m_len = m_pos;
