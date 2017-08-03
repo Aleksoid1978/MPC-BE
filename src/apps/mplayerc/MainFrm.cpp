@@ -18909,7 +18909,7 @@ void CMainFrame::MakeDVDLabel(CString path, CString& label, CString* pDVDlabel)
 
 CString CMainFrame::GetCurFileName()
 {
-	CString fn = (!m_LastOpenBDPath.IsEmpty() || m_DiskImage.DriveAvailable()) ? m_strFnFull : m_wndPlaylistBar.GetCurFileName();
+	CString fn = (!m_LastOpenBDPath.IsEmpty() || m_DiskImage.GetDriveLetter()) ? m_strFnFull : m_wndPlaylistBar.GetCurFileName();
 	if (fn.IsEmpty() && m_pMainFSF) {
 		LPOLESTR pFN = NULL;
 		AM_MEDIA_TYPE mt;
