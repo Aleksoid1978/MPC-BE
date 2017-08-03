@@ -693,7 +693,6 @@ CMainFrame::CMainFrame() :
 	m_bMainIsMPEGSplitter(false)
 {
 	m_Lcd.SetVolumeRange(0, 100);
-	m_LastSaveTime.QuadPart = 0;
 }
 
 CMainFrame::~CMainFrame()
@@ -2295,31 +2294,10 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 									m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_MAINFRM_4));
 								}
 							}
-							m_nCurSubtitle		= -1;
-							m_lSubtitleShift	= 0;
+							m_nCurSubtitle   = -1;
+							m_lSubtitleShift = 0;
 						}
 
-						if (!m_bEndOfStream) {
-							CAppSettings& s = AfxGetAppSettings();
-							FILE_POSITION* FilePosition = s.CurrentFilePosition();
-							if (FilePosition) {
-								FilePosition->llPosition = rtNow;
-
-								LARGE_INTEGER time;
-								QueryPerformanceCounter(&time);
-								LARGE_INTEGER freq;
-								QueryPerformanceFrequency(&freq);
-								if ((time.QuadPart - m_LastSaveTime.QuadPart) >= 30 * freq.QuadPart) { // save every half of minute
-									m_LastSaveTime = time;
-									if (s.bKeepHistory && s.bRememberFilePos) {
-										FilePosition->nAudioTrack = GetAudioTrackIdx();
-										FilePosition->nSubtitleTrack = GetSubtitleTrackIdx();
-
-										s.SaveCurrentFilePosition();
-									}
-								}
-							}
-						}
 						m_wndStatusBar.SetStatusTimer(rtNow, rtDur, !!m_wndSubresyncBar.IsWindowVisible(), GetTimeFormat());
 						break;
 					case PM_DVD:
@@ -2390,6 +2368,25 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					AfxGetAppSettings().bStatusBarIsVisible = false;
 				} else {
 					AfxGetAppSettings().bStatusBarIsVisible = true;
+				}
+
+				if (GetPlaybackMode() == PM_FILE && !m_bEndOfStream) {
+					CAppSettings& s = AfxGetAppSettings();
+					if (s.bKeepHistory && s.bRememberFilePos) {
+						if (FILE_POSITION* FilePosition = s.CurrentFilePosition()) {
+							REFERENCE_TIME rtNow;
+							m_pMS->GetCurrentPosition(&rtNow);
+
+							const bool bSave = llabs(FilePosition->llPosition - rtNow) > 300000000LL;
+							if (bSave) {
+								FilePosition->llPosition = rtNow;
+								FilePosition->nAudioTrack = GetAudioTrackIdx();
+								FilePosition->nSubtitleTrack = GetSubtitleTrackIdx();
+
+								s.SaveCurrentFilePosition();
+							}
+						}
+					}
 				}
 
 				if (GetPlaybackMode() == PM_CAPTURE && !m_fCapturing) {
@@ -2787,14 +2784,12 @@ bool CMainFrame::DoAfterPlaybackEvent()
 bool CMainFrame::GraphEventComplete()
 {
 	CAppSettings& s = AfxGetAppSettings();
-	FILE_POSITION*	FilePosition = s.CurrentFilePosition();
-	if (FilePosition) {
-		FilePosition->llPosition = 0;
-		FilePosition->nAudioTrack = -1;
-		FilePosition->nSubtitleTrack = -1;
-
-		QueryPerformanceCounter(&m_LastSaveTime);
-		if (s.bKeepHistory && s.bRememberFilePos) {
+	if (s.bKeepHistory && s.bRememberFilePos) {
+		if (FILE_POSITION* FilePosition = s.CurrentFilePosition()) {
+			FilePosition->llPosition = 0;
+			FilePosition->nAudioTrack = -1;
+			FilePosition->nSubtitleTrack = -1;
+			
 			s.SaveCurrentFilePosition();
 		}
 	}
@@ -11855,9 +11850,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 	}
 
-	if (!pOFD->fns.IsEmpty()){
-		const CString fn = pOFD->fns.GetHead();
-		if (fn.Find(L"://") < 0
+	if (!pOFD->fns.IsEmpty()) {
+		const CString fn = !youtubeUrl.IsEmpty() ? youtubeUrl : pOFD->fns.GetHead();
+		if (fn.Find(L"pipe:") == -1
 				&& s.bKeepHistory && s.bRememberFilePos && !s.NewFile(fn)) {
 			const FILE_POSITION* FilePosition = s.CurrentFilePosition();
 			if (m_pMS) {
@@ -11874,7 +11869,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 		}
 	}
-	QueryPerformanceCounter(&m_LastSaveTime);
 
 	if (s.fReportFailedPins) {
 		CComQIPtr<IGraphBuilderDeadEnd> pGBDE = m_pGB;
@@ -13741,8 +13735,11 @@ void CMainFrame::CloseMediaPrivate()
 	if (!m_bEndOfStream && GetPlaybackMode() == PM_FILE) {
 		CAppSettings& s = AfxGetAppSettings();
 		if (s.bKeepHistory && s.bRememberFilePos) {
-			FILE_POSITION* FilePosition = s.CurrentFilePosition();
-			if (FilePosition) {
+			if (FILE_POSITION* FilePosition = s.CurrentFilePosition()) {
+				REFERENCE_TIME rtNow;
+				m_pMS->GetCurrentPosition(&rtNow);
+
+				FilePosition->llPosition = rtNow;
 				FilePosition->nAudioTrack = GetAudioTrackIdx();
 				FilePosition->nSubtitleTrack = GetSubtitleTrackIdx();
 

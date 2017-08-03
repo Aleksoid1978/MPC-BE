@@ -393,8 +393,6 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	bool m_bEndOfStream;
 
-	LARGE_INTEGER m_LastSaveTime;
-
 	bool m_fBuffering;
 
 	bool m_fLiveWM;
