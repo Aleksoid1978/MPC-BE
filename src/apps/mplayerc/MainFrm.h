@@ -1240,7 +1240,6 @@ public:
 
 	HRESULT			SetAudioPicture(BOOL show = TRUE);
 	CMPCPngImage	m_InternalImage, m_InternalImageSmall;
-	bool			m_bInternalImageRes;
 
 	HBITMAP			m_ThumbCashedBitmap;
 	CSize			m_ThumbCashedSize;

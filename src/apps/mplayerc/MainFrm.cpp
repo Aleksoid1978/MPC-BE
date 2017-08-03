@@ -18374,7 +18374,6 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_FORCE_ICONIC_REPRESENTATION, &set, sizeof(set));
 	}
 
-	m_bInternalImageRes = false;
 	m_InternalImage.Destroy();
 	if (m_InternalImageSmall) {
 		m_InternalImageSmall.Detach();
@@ -18435,7 +18434,6 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 
 		if (!bLoadRes) {
 			m_InternalImage.LoadFromResource(IDB_W7_AUDIO);
-			m_bInternalImageRes = true;
 			m_InternalImageSmall.Attach(m_InternalImage);
 		} else {
 			BITMAP bm;
@@ -18499,30 +18497,30 @@ LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 			BITMAP bm;
 			GetObject(m_InternalImageSmall, sizeof(bm), &bm);
 
-			int h	= min(abs(bm.bmHeight), nHeight);
-			int w	= MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
-			h		= MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
+			int h = min(abs(bm.bmHeight), nHeight);
+			int w = MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
+			h     = MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
 
-			BITMAPINFO bmi;
-			ZeroMemory(&bmi.bmiHeader, sizeof(BITMAPINFOHEADER));
+			BITMAPINFO bmi = {};
 			bmi.bmiHeader.biSize		= sizeof(BITMAPINFOHEADER);
-			bmi.bmiHeader.biWidth		= m_bInternalImageRes ? nWidth : w;
-			bmi.bmiHeader.biHeight		= -nHeight;
-			bmi.bmiHeader.biPlanes		= 1;
-			bmi.bmiHeader.biBitCount	= 32;
+			bmi.bmiHeader.biWidth       = nWidth;
+			bmi.bmiHeader.biHeight      = -nHeight;
+			bmi.bmiHeader.biPlanes      = 1;
+			bmi.bmiHeader.biBitCount    = 32;
 
-			PBYTE pbDS = NULL;
-			m_ThumbCashedBitmap = CreateDIBSection(hdcMem, &bmi, DIB_RGB_COLORS, (VOID**)&pbDS, NULL, NULL);
+			VOID* pvBits = NULL;
+			m_ThumbCashedBitmap = CreateDIBSection(hdcMem, &bmi, DIB_RGB_COLORS, &pvBits, NULL, NULL);
 			if (m_ThumbCashedBitmap) {
 				SelectObject(hdcMem, m_ThumbCashedBitmap);
 
-				int x = m_bInternalImageRes ? ((nWidth - w) / 2) : 0;
-				int y = (nHeight - h) / 2;
+				int x = nWidth / 2  - w / 2;
+				int y = nHeight / 2 - h / 2;
 				CRect r = CRect(CPoint(x, y), CSize(w, h));
 
 				SetStretchBltMode(hdcMem, STRETCH_HALFTONE);
 				m_InternalImageSmall.StretchBlt(hdcMem, r, CRect(0, 0, bm.bmWidth, abs(bm.bmHeight)));
 			}
+
 			DeleteDC(hdcMem);
 		}
 	}
