@@ -1177,8 +1177,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 	}
 
 	if (bIsEmpty && selected_idx >= 0 && selected_idx < m_pl.GetCount()) {
-		Refresh();
-		SetSelIdx(selected_idx, true);
+		m_nSelected_idx = selected_idx - 1;
 	}
 
 	return pli.GetCount() > 0;
@@ -1452,6 +1451,8 @@ void CPlayerPlaylistBar::Open(CString fn)
 
 void CPlayerPlaylistBar::Open(CAtlList<CString>& fns, bool fMulti, CSubtitleItemList* subs/* = NULL*/, bool bCheck/* = true*/)
 {
+	m_nSelected_idx = INT_MAX;
+
 	ResolveLinkFiles(fns);
 	Empty();
 	Append(fns, fMulti, subs, bCheck);
@@ -1479,7 +1480,7 @@ void CPlayerPlaylistBar::Append(CAtlList<CString>& fns, bool fMulti, CSubtitleIt
 	}
 
 	Refresh();
-	EnsureVisible(m_pl.FindIndex(idx + 1));
+	EnsureVisible(m_pl.FindIndex((m_nSelected_idx != INT_MAX ? m_nSelected_idx : idx) + 1));
 	SavePlaylist();
 
 	UpdateList();

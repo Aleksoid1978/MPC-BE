@@ -209,6 +209,8 @@ private:
 	CFont m_font;
 	void ScaleFontInternal();
 
+	int m_nSelected_idx = INT_MAX;
+
 public:
 	CPlayerPlaylistBar(CMainFrame* pMainFrame);
 	virtual ~CPlayerPlaylistBar();
