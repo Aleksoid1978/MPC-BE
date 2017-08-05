@@ -4002,11 +4002,7 @@ BOOL CMainFrame::OnMenu(CMenu* pMenu)
 
 void CMainFrame::OnMenuPlayerShort()
 {
-	if (IsMenuHidden() || IsD3DFullScreenMode()) {
-		OnMenu(m_popupMainMenu.GetSubMenu(0));
-	} else {
-		OnMenu(m_popupMenu.GetSubMenu(0));
-	}
+	OnMenu(IsD3DFullScreenMode() ? m_popupMainMenu.GetSubMenu(0) : m_popupMenu.GetSubMenu(0));
 }
 
 void CMainFrame::OnMenuPlayerLong()
@@ -17886,15 +17882,13 @@ HRESULT CMainFrame::UpdateThumbnailClip()
 {
 	CheckPointer(m_pTaskbarList, E_FAIL);
 
-	const CAppSettings& s = AfxGetAppSettings();
-
 	CRect r;
 	m_wndView.GetClientRect(&r);
-	if (s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU) {
+	if (!IsMenuHidden()) {
 		r.OffsetRect(0, GetSystemMetrics(SM_CYMENU));
 	}
 
-	if (!s.fUseWin7TaskBar || m_eMediaLoadState != MLS_LOADED || m_bAudioOnly || m_bFullScreen || IsD3DFullScreenMode() || r.Width() <= 0 || r.Height() <= 0) {
+	if (!AfxGetAppSettings().fUseWin7TaskBar || m_eMediaLoadState != MLS_LOADED || (m_bAudioOnly && !SysVersion::IsWin10orLater()) || m_bFullScreen || IsD3DFullScreenMode() || r.IsRectEmpty()) {
 		return m_pTaskbarList->SetThumbnailClip(m_hWnd, NULL);
 	}
 
