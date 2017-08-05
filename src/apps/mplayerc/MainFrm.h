@@ -1176,10 +1176,11 @@ public:
 	int			m_nCurSubtitle;
 	long		m_lSubtitleShift;
 	__int64		m_rtCurSubPos;
+
 	CString		m_strTitle;
-	CString		m_strCurPlaybackLabel;
-	CString		m_strFnFull;
-	CString		m_strUrl;
+
+	CString		m_strPlaybackLabel;
+	CString		m_strPlaybackRenderedPath;
 
 	Youtube::YoutubeFields m_youtubeFields;
 	Youtube::YoutubeUrllist m_youtubeUrllist;

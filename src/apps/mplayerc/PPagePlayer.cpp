@@ -160,7 +160,7 @@ BOOL CPPagePlayer::OnApply()
 	if (s.iTitleBarTextStyle != m_iTitleBarTextStyle || s.bTitleBarTextTitle != !!m_bTitleBarTextTitle) {
 		s.iTitleBarTextStyle = m_iTitleBarTextStyle;
 		s.bTitleBarTextTitle = !!m_bTitleBarTextTitle;
-		pFrame->OpenSetupWindowTitle(pFrame->m_strFnFull);
+		pFrame->OpenSetupWindowTitle(pFrame->m_strPlaybackRenderedPath);
 	}
 	s.bTrayIcon = !!m_bTrayIcon;
 	s.bRememberWindowPos = !!m_bRememberWindowPos;
