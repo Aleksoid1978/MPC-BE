@@ -860,7 +860,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	GetCurDispMode(s.dm_def, strFS);
 
 	if (SysVersion::IsWin7orLater()) {
-		if (m_hDWMAPI = LoadLibrary(L"dwmapi.dll")) {
+		m_hDWMAPI = LoadLibrary(L"dwmapi.dll");
+		if (m_hDWMAPI) {
 			if (SysVersion::IsWin10orLater()) {
 				(FARPROC &)m_DwmGetWindowAttributeFnc         = GetProcAddress(m_hDWMAPI, "DwmGetWindowAttribute");
 			} else {
