@@ -2415,7 +2415,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					}
 
 					if (m_bOSDFileName) {
-						str_temp.GetLength() > 0 ? str_temp += L"\n" + m_strCurPlaybackLabel : str_temp = m_strCurPlaybackLabel;
+						str_temp.GetLength() > 0 ? str_temp += L"\n" + m_strPlaybackLabel : str_temp = m_strPlaybackLabel;
 					}
 
 					if (bmadvr) {
@@ -4346,7 +4346,7 @@ void CMainFrame::OnFilePostCloseMedia()
 	UpdateWindow();
 
 	SetWindowText(m_strTitle);
-	m_Lcd.SetMediaTitle(LPCTSTR(m_strTitle));
+	m_Lcd.SetMediaTitle(m_strTitle);
 
 	SetAlwaysOnTop(s.iOnTop);
 
@@ -5479,7 +5479,7 @@ void CMainFrame::DropFiles(CAtlList<CString>& slFiles)
 
 void CMainFrame::OnFileSaveAs()
 {
-	CString ext, ext_list, in = m_strUrl, out = in;
+	CString ext, ext_list, in = m_strPlaybackRenderedPath, out = in;
 
 	if (!m_youtubeFields.fname.IsEmpty()) {
 		out = GetAltFileName();
@@ -9327,7 +9327,7 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 		if (m_youtubeUrllist.size() > 1 && id < m_youtubeUrllist.size()) {
 			UINT idx = 0;
 			for(auto item = m_youtubeUrllist.begin(); item != m_youtubeUrllist.end(); ++item) {
-				if (idx == id && item->url != m_strUrl) {
+				if (idx == id && item->url != m_strPlaybackRenderedPath) {
 					const int tagSelected = item->profile->iTag;
 					REFERENCE_TIME rtNow = INVALID_TIME;
 					m_pMS->GetCurrentPosition(&rtNow);
@@ -11578,7 +11578,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	m_youtubeFields.Empty();
 	m_youtubeUrllist.clear();
 
-	m_strUrl.Empty();
+	m_strPlaybackRenderedPath.Empty();
 
 	CString youtubeUrl;
 	if (s.bYoutubePageParser && pOFD->fns.GetCount() == 1) {
@@ -11595,7 +11595,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 					pOFD->fns.AddTail(urls.GetNext(pos));
 				}
 
-				m_strUrl = pOFD->fns.GetHead().GetName();
+				m_strPlaybackRenderedPath = pOFD->fns.GetHead().GetName();
 				m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
 
 				if (pOFD->fns.GetCount() == 1) {
@@ -11717,8 +11717,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			fn = youtubeUrl;
 		}
 
-		if (m_strUrl.IsEmpty()) {
-			m_strUrl = fn;
+		if (m_strPlaybackRenderedPath.IsEmpty()) {
+			m_strPlaybackRenderedPath = fn;
 		}
 
 		if (m_bUseSmartSeek && bFirst) {
@@ -11769,7 +11769,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 
 		if (bFirst) {
-			pOFD->title = (m_youtubeFields.fname.IsEmpty() ? m_strUrl : m_youtubeFields.fname);
+			pOFD->title = m_strPlaybackRenderedPath;
 			{
 				BeginEnumFilters(m_pGB, pEF, pBF);
 				if (!m_pMainFSF) {
@@ -12718,8 +12718,6 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 	title.LoadString(IDR_MAINFRAME);
 	CString fname = fn;
 
-	m_strFnFull = fn;
-
 	CAppSettings& s = AfxGetAppSettings();
 
 	int i = s.iTitleBarTextStyle;
@@ -12749,7 +12747,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 		}
 	}
 
-	m_strCurPlaybackLabel = fn;
+	m_strPlaybackLabel = fn;
 
 	if (i == 1) {
 		if (s.bTitleBarTextTitle) {
@@ -12783,7 +12781,8 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 	if (curTitle != title) {
 		SetWindowText(title);
 	}
-	m_Lcd.SetMediaTitle(LPCTSTR(fn));
+
+	m_Lcd.SetMediaTitle(fn);
 }
 
 BOOL CMainFrame::SelectMatchTrack(CAtlArray<Stream>& Tracks, CString pattern, BOOL bExtPrior, size_t& nIdx)
@@ -13748,9 +13747,8 @@ void CMainFrame::CloseMediaPrivate()
 		}
 	}
 
-	m_strCurPlaybackLabel.Empty();
-	m_strFnFull.Empty();
-	m_strUrl.Empty();
+	m_strPlaybackLabel.Empty();
+	m_strPlaybackRenderedPath.Empty();
 
 	m_youtubeFields.Empty();
 	m_youtubeUrllist.clear();
@@ -14769,7 +14767,7 @@ void CMainFrame::SetupNavChaptersSubMenu()
 				CString time = L"[" + ReftimeToString2(Item->Duration()) + L"]";
 				CString name = StripPath(Item->m_strFileName);
 
-				if (name == GetFileOnly(m_strFnFull)) {
+				if (name == GetFileOnly(m_strPlaybackRenderedPath)) {
 					flags |= MF_CHECKED | MFT_RADIOCHECK;
 				}
 
@@ -14786,7 +14784,7 @@ void CMainFrame::SetupNavChaptersSubMenu()
 				}
 				idx++;
 
-				if (item->url == m_strUrl) {
+				if (item->url == m_strPlaybackRenderedPath) {
 					flags |= MF_CHECKED | MFT_RADIOCHECK;
 				}
 
@@ -18278,7 +18276,7 @@ CString CMainFrame::FillMessage()
 
 		if (m_fUpdateInfoBar) {
 			OpenSetupInfoBar();
-			OpenSetupWindowTitle(m_strFnFull);
+			OpenSetupWindowTitle(m_strPlaybackRenderedPath);
 		}
 	}
 
@@ -18419,7 +18417,7 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 
 			if (!bLoadRes) {
 				// try to load image from file in the same dir that media file to show in preview & logo;
-				CString img_fname = GetCoverImgFromPath(m_strFnFull);
+				CString img_fname = GetCoverImgFromPath(m_strPlaybackRenderedPath);
 
 				if (!img_fname.IsEmpty()) {
 					if (SUCCEEDED(m_InternalImage.Load(img_fname))) {
@@ -18671,7 +18669,7 @@ CString CMainFrame::GetStrForTitle()
 			if (!m_youtubeFields.title.IsEmpty()) {
 				return m_youtubeFields.title;
 			} else if (m_bIsBDPlay || GetPlaybackMode() == PM_DVD) {
-				return m_strCurPlaybackLabel;
+				return m_strPlaybackLabel;
 			} else {
 				BeginEnumFilters(m_pGB, pEF, pBF) {
 					if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
@@ -18697,9 +18695,9 @@ CString CMainFrame::GetStrForTitle()
 				}
 			}
 		}
-		return m_strCurPlaybackLabel;
+		return m_strPlaybackLabel;
 	} else {
-		return m_strFnFull;
+		return m_strPlaybackRenderedPath;
 	}
 }
 
@@ -18909,7 +18907,7 @@ void CMainFrame::MakeDVDLabel(CString path, CString& label, CString* pDVDlabel)
 
 CString CMainFrame::GetCurFileName()
 {
-	CString fn = (!m_LastOpenBDPath.IsEmpty() || m_DiskImage.GetDriveLetter()) ? m_strFnFull : m_wndPlaylistBar.GetCurFileName();
+	CString fn = !m_youtubeFields.fname.IsEmpty() ? m_wndPlaylistBar.GetCurFileName() : m_strPlaybackRenderedPath;
 	if (fn.IsEmpty() && m_pMainFSF) {
 		LPOLESTR pFN = NULL;
 		AM_MEDIA_TYPE mt;
