@@ -483,7 +483,7 @@ public:
 		return(!m_bFullScreen && AfxGetAppSettings().iCaptionMenuMode > MODE_HIDEMENU);//!=MODE_SHOWCAPTIONMENU && !=MODE_HIDEMENU
 	}
 	bool IsMenuHidden() const {
-		return(!m_bFullScreen && AfxGetAppSettings().iCaptionMenuMode != MODE_SHOWCAPTIONMENU);
+		return GetMenuBarVisibility() != AFX_MBV_KEEPVISIBLE;
 	}
 	bool IsSomethingLoaded() const {
 		return((m_eMediaLoadState == MLS_LOADING || m_eMediaLoadState == MLS_LOADED) && !IsD3DFullScreenMode());
