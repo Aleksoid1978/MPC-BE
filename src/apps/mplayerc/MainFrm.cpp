@@ -860,15 +860,15 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	GetCurDispMode(s.dm_def, strFS);
 
 	if (SysVersion::IsWin7orLater()) {
-		m_hDWMAPI = LoadLibrary(L"dwmapi.dll");
-		if (m_hDWMAPI) {
+		if (m_hDWMAPI = LoadLibrary(L"dwmapi.dll")) {
 			if (SysVersion::IsWin10orLater()) {
-				(FARPROC &)m_DwmGetWindowAttributeFnc		= GetProcAddress(m_hDWMAPI, "DwmGetWindowAttribute");
+				(FARPROC &)m_DwmGetWindowAttributeFnc         = GetProcAddress(m_hDWMAPI, "DwmGetWindowAttribute");
+			} else {
+				(FARPROC &)m_DwmSetWindowAttributeFnc         = GetProcAddress(m_hDWMAPI, "DwmSetWindowAttribute");
+				(FARPROC &)m_DwmSetIconicThumbnailFnc         = GetProcAddress(m_hDWMAPI, "DwmSetIconicThumbnail");
+				(FARPROC &)m_DwmSetIconicLivePreviewBitmapFnc = GetProcAddress(m_hDWMAPI, "DwmSetIconicLivePreviewBitmap");
+				(FARPROC &)m_DwmInvalidateIconicBitmapsFnc    = GetProcAddress(m_hDWMAPI, "DwmInvalidateIconicBitmaps");
 			}
-			(FARPROC &)m_DwmSetWindowAttributeFnc			= GetProcAddress(m_hDWMAPI, "DwmSetWindowAttribute");
-			(FARPROC &)m_DwmSetIconicThumbnailFnc			= GetProcAddress(m_hDWMAPI, "DwmSetIconicThumbnail");
-			(FARPROC &)m_DwmSetIconicLivePreviewBitmapFnc	= GetProcAddress(m_hDWMAPI, "DwmSetIconicLivePreviewBitmap");
-			(FARPROC &)m_DwmInvalidateIconicBitmapsFnc		= GetProcAddress(m_hDWMAPI, "DwmInvalidateIconicBitmaps");
 		}
 	}
 
@@ -18362,8 +18362,8 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 	}
 	m_ThumbCashedSize.SetSize(0, 0);
 
-	if (SysVersion::IsWin7orLater() && m_DwmSetWindowAttributeFnc && m_DwmSetIconicThumbnailFnc) {
-		/* this is for custom draw in windows 7 preview */
+	if (m_DwmSetWindowAttributeFnc && m_DwmSetIconicThumbnailFnc) {
+		// for customize an iconic thumbnail and a live preview in Windows 7/8
 		const BOOL set = s.fUseWin7TaskBar && m_bAudioOnly && IsSomethingLoaded() && show;
 		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_HAS_ICONIC_BITMAP, &set, sizeof(set));
 		m_DwmSetWindowAttributeFnc(GetSafeHwnd(), DWMWA_FORCE_ICONIC_REPRESENTATION, &set, sizeof(set));
