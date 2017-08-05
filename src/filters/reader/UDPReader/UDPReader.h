@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,97 +21,12 @@
 
 #pragma once
 
-#include <deque>
-#include <AsyncReader/asyncio.h>
+#include "UDPStream.h"
 #include <AsyncReader/asyncrdr.h>
-#include "../../../DSUtil/HTTPAsync.h"
+
 
 #define UDPReaderName   L"MPC UDP/HTTP Reader"
 #define STDInReaderName L"MPC Std input Reader"
-
-class CUDPStream
-	: public CAsyncStream
-	, public CAMThread
-{
-public:
-	enum protocol {
-		PR_NONE,
-		PR_UDP,
-		PR_HTTP,
-		PR_PIPE
-	};
-
-private:
-	class CPacket
-	{
-	public:
-		BYTE*     m_buff;
-		ULONGLONG m_start, m_end;
-
-		CPacket(const BYTE* p, ULONGLONG start, UINT size);
-		virtual ~CPacket() {
-			delete [] m_buff;
-		}
-	};
-
-	CCritSec           m_csLock;
-	CCritSec           m_csPacketsLock;
-
-	CUrl               m_url;
-	CString            m_url_str;
-	protocol           m_protocol   = protocol::PR_NONE;
-	GUID               m_subtype    = MEDIASUBTYPE_NULL;
-	DWORD              m_RequestCmd = 0;
-
-	SOCKET             m_UdpSocket  = INVALID_SOCKET;
-	WSAEVENT           m_WSAEvent   = NULL;
-	sockaddr_in        m_addr;
-
-	CHTTPAsync         m_HTTPAsync;
-
-	ULONGLONG          m_pos = 0;
-	ULONGLONG          m_len = 0;
-
-	std::deque<CPacket*> m_packets;
-
-	CAMEvent           m_EventComplete;
-
-	volatile ULONGLONG m_SizeComplete = 0;
-	volatile BOOL      m_bEndOfStream = FALSE;
-
-	void Clear();
-	void Append(const BYTE* buff, UINT len);
-
-	inline const ULONGLONG GetPacketsSize();
-	void CheckBuffer();
-	void EmptyBuffer();
-
-	DWORD ThreadProc();
-
-public:
-	CUDPStream();
-	virtual ~CUDPStream();
-
-	enum CMD {
-		CMD_INIT,
-		CMD_RUN,
-		CMD_STOP,
-		CMD_EXIT
-	};
-
-	bool Load(const WCHAR* fnw);
-
-	// CAsyncStream
-	HRESULT SetPointer(LONGLONG llPos);
-	HRESULT Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWORD pdwBytesRead);
-	LONGLONG Size(LONGLONG* pSizeAvailable);
-	DWORD Alignment();
-	void Lock();
-	void Unlock();
-
-	GUID GetSubtype() const { return m_subtype; }
-	protocol GetProtocol() const { return m_protocol; }
-};
 
 class __declspec(uuid("0E4221A9-9718-48D5-A5CF-4493DAD4A015"))
 	CUDPReader

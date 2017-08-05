@@ -201,6 +201,7 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="UDPReader.cpp" />
+    <ClCompile Include="UDPStream.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="UDPReader.def" />
@@ -211,6 +212,7 @@
     </ClInclude>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="UDPReader.h" />
+    <ClInclude Include="UDPStream.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UDPReader.rc">
