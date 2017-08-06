@@ -392,6 +392,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	int m_nVolumeBeforeFrameStepping;
 
 	bool m_bEndOfStream;
+	bool m_bGraphEventComplete;
 
 	bool m_fBuffering;
 
