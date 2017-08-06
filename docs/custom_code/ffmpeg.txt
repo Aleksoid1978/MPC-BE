@@ -16,6 +16,7 @@
 * libavcodec/h264dec.h
 * libavcodec/hevc.c
 * libavcodec/hevc.h
+* libavcodec/hevc_ps.c
 * libavcodec/hevc_refs.c
 * libavcodec/hevcpred.c
 * libavcodec/hevcpred.h

@@ -1175,7 +1175,9 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
     if (get_bits_left(gb) < 0) {
         av_log(avctx, AV_LOG_ERROR,
                "Overread SPS by %d bits\n", -get_bits_left(gb));
-        return AVERROR_INVALIDDATA;
+        // ==> Start patch MPC
+        //return AVERROR_INVALIDDATA;
+        // ==> End patch MPC
     }
 
     return 0;
