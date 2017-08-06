@@ -164,7 +164,7 @@ struct DVD_POSITION {
 	DVD_HMSF_TIMECODE Timecode  = { 0 };
 };
 
-#define MAX_FILE_POSITION 50
+#define MAX_FILE_POSITION APP_RECENTFILES_MAX
 struct FILE_POSITION {
 	CString  strFile;
 	LONGLONG llPosition     = 0;

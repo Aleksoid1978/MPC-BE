@@ -1666,10 +1666,11 @@ void CAppSettings::ClearFilePositions()
 	CMPlayerCApp* pApp = AfxGetMyApp();
 	CString lpKeyName;
 
-	for (int i = 0; i < min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
+	for (int i = 0; i < MAX_FILE_POSITION; i++) {
 		FilePosition[i].strFile.Empty();
-		FilePosition[i].llPosition  = 0;
-		FilePosition[i].nAudioTrack = FilePosition[i].nSubtitleTrack = -1;
+		FilePosition[i].llPosition     = 0;
+		FilePosition[i].nAudioTrack    = -1;
+		FilePosition[i].nSubtitleTrack = -1;
 
 		lpKeyName.Format(L"File%d", i + 1);
 		pApp->WriteProfileString(IDS_R_RECENTFILES, lpKeyName, L"");
@@ -1694,7 +1695,7 @@ void CAppSettings::ClearDVDPositions()
 	CMPlayerCApp* pApp = AfxGetMyApp();
 	CString lpKeyName;
 
-	for (int i = 0; i < min(iRecentFilesNumber, MAX_DVD_POSITION); i++) {
+	for (int i = 0; i < MAX_DVD_POSITION; i++) {
 		DvdPosition[i].llDVDGuid = 0;
 		DvdPosition[i].lTitle    = 0;
 		memset(&DvdPosition[i].Timecode, 0, sizeof(DVD_HMSF_TIMECODE));
