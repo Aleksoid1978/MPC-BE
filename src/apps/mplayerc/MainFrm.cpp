@@ -634,6 +634,7 @@ CMainFrame::CMainFrame() :
 	m_fShockwaveGraph(false),
 	m_fFrameSteppingActive(false),
 	m_bEndOfStream(false),
+	m_bGraphEventComplete(false),
 	m_fCapturing(false),
 	m_fLiveWM(false),
 	m_fOpeningAborted(false),
@@ -2371,7 +2372,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					AfxGetAppSettings().bStatusBarIsVisible = true;
 				}
 
-				if (GetPlaybackMode() == PM_FILE && !m_bEndOfStream) {
+				if (GetPlaybackMode() == PM_FILE && !m_bGraphEventComplete) {
 					CAppSettings& s = AfxGetAppSettings();
 					if (s.bKeepHistory && s.bRememberFilePos) {
 						if (FILE_POSITION* FilePosition = s.CurrentFilePosition()) {
@@ -2784,6 +2785,8 @@ bool CMainFrame::DoAfterPlaybackEvent()
 //
 bool CMainFrame::GraphEventComplete()
 {
+	m_bGraphEventComplete = true;
+
 	CAppSettings& s = AfxGetAppSettings();
 	if (s.bKeepHistory && s.bRememberFilePos) {
 		if (FILE_POSITION* FilePosition = s.CurrentFilePosition()) {
@@ -13728,7 +13731,7 @@ void CMainFrame::CloseMediaPrivate()
 
 	KillTimer(TIMER_DM_AUTOCHANGING);
 
-	if (!m_bEndOfStream && GetPlaybackMode() == PM_FILE) {
+	if (!m_bGraphEventComplete && GetPlaybackMode() == PM_FILE) {
 		CAppSettings& s = AfxGetAppSettings();
 		if (s.bKeepHistory && s.bRememberFilePos) {
 			if (FILE_POSITION* FilePosition = s.CurrentFilePosition()) {
@@ -13779,6 +13782,7 @@ void CMainFrame::CloseMediaPrivate()
 
 	m_fLiveWM = false;
 	m_bEndOfStream = false;
+	m_bGraphEventComplete = false;
 	m_rtDurationOverride = -1;
 	m_kfs.clear();
 	m_pCB.Release();
@@ -16081,7 +16085,9 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool bShowOSD/* = true*/)
 	} else if (GetPlaybackMode() == PM_CAPTURE) {
 		//DLog(L"Warning (CMainFrame::SeekTo): Trying to seek in capture mode");
 	}
+
 	m_bEndOfStream = false;
+	m_bGraphEventComplete = false;
 
 	OnTimer(TIMER_STREAMPOSPOLLER);
 	OnTimer(TIMER_STREAMPOSPOLLER2);
