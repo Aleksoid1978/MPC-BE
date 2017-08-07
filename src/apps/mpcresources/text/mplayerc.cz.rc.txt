@@ -170,13 +170,17 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 18		"Přijímač"
 END
 
-BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 5		"Nastavení barev (VMR-9 a EVR)"
 6		"Jas"
 7		"Kontrast"
 8		"Odstín"
 9		"Sytost"
 18		"Výchozí"
+20		"Color Management"
+21		"Input type:"
+23		"Ambient Light:"
+25		"Rendering Intent:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
@@ -490,7 +494,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Změny se projeví až po zastavení a opětovném spuštění přehrávání."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 5		"Video renderer"
 7		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
 8		"Select D3D9 Render Device"
@@ -504,11 +508,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 19		"Downscaling <50%:"
 21		"Output range:"
 23		"EVR Buffers:"
-27		"Color Management"
-28		"Input type:"
-30		"Ambient Light:"
-32		"Rendering Intent:"
-34		"Default"
+26		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

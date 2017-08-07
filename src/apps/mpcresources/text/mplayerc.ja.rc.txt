@@ -170,13 +170,17 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 18		"受信機"
 END
 
-BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 5		"カラー コントロール (VMR-9 と EVR と madVR 用)"
 6		"明るさ"
 7		"コントラスト"
 8		"色相"
 9		"彩度"
 18		"リセット"
+20		"色管理"
+21		"入力タイプ:"
+23		"アンビエント ライト:"
+25		"レンダリング インテント:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
@@ -490,7 +494,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"ファイルを開き直すと変更が有効になります。"
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 5		"ビデオ レンダラー"
 7		"VMR-7/VMR-9 (レンダレス) と EVR-CP 設定"
 8		"D3D9 レンダー デバイスを選択"
@@ -504,11 +508,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 19		"ダウンスケーリング <50%:"
 21		"出力範囲:"
 23		"EVR バッファー:"
-27		"色管理"
-28		"入力タイプ:"
-30		"アンビエント ライト:"
-32		"レンダリング インテント:"
-34		"デフォルト"
+26		"デフォルト"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

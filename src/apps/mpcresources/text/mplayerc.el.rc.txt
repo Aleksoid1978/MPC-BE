@@ -170,13 +170,17 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 18		"Συσκευή λήψης"
 END
 
-BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 5		"Έλεγχος χρωμάτων (για VMR-9, EVR και madVR)"
 6		"Φωτεινότητα"
 7		"Αντίθεση"
 8		"Απόχρωση"
 9		"Κορεσμός"
 18		"Επαναφορά"
+20		"Διαχείριση χρώματος"
+21		"Τύπος εισόδου:"
+23		"Φωτισμός χώρου:"
+25		"Πρόθεση απόδοσης:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
@@ -490,7 +494,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Οι αλλαγές θα ενεργοποιηθούν μετά το κλείσιμο κι επανεκκίνηση της αναπαραγωγής."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 5		"Απόδοση βίντεο"
 7		"VMR-7/VMR-9 (χωρίς απόδοση) και ρυθμίσεις EVR (CP)"
 8		"Επιλογή συσκευής απόδοσης D3D9"
@@ -504,11 +508,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 19		"Συρρίκνωση <50%:"
 21		"Εύρος εξόδου:"
 23		"Προσωρινές μνήμες EVR:"
-27		"Διαχείριση χρώματος"
-28		"Τύπος εισόδου:"
-30		"Φωτισμός χώρου:"
-32		"Πρόθεση απόδοσης:"
-34		"Προεπιλογή"
+26		"Προεπιλογή"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

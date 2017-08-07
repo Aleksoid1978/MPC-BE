@@ -170,13 +170,17 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 18		"Receiver:"
 END
 
-BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 5		"Farbeinstellungen für VMR-9, EVR und madVR"
 6		"Helligkeit:"
 7		"Kontrast:"
 8		"Farbton:"
 9		"Sättigung:"
 18		"Zurücksetzen"
+20		"Farbmanagement"
+21		"Eingangstyp:"
+23		"Umgebungslicht:"
+25		"Wiedergabeziel:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
@@ -490,7 +494,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Änderungen werden erst nach Neustart der Wiedergabe wirksam."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 5		"Video-Renderer"
 7		"Einstellungen für VMR-7/VMR-9 (renderless) und EVR (custom presenter) "
 8		"Rendergerät verwenden:"
@@ -504,11 +508,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 19		"Skalierung:"
 21		"Ausgabebereich:"
 23		"EVR-Puffer:"
-27		"Farbmanagement"
-28		"Eingangstyp:"
-30		"Umgebungslicht:"
-32		"Wiedergabeziel:"
-34		"Zurücksetzen"
+26		"Zurücksetzen"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

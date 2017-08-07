@@ -170,13 +170,17 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 18		"Receiver"
 END
 
-BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 5		"Kleurregeling (voor VMR-9, EVR en madVR)"
 6		"Helderheid"
 7		"Contrast"
 8		"Tint"
 9		"Verzadiging"
 18		"Resetten"
+20		"Kleurmanagement"
+21		"Invoertype:"
+23		"Omgevingslicht:"
+25		"Render-intenties:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
@@ -490,7 +494,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Vereist heropenen van de video."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 5		"Videorenderer"
 7		"Instellingen van VMR-7/VMR-9 (Renderless) en EVR-CP"
 8		"Kies D3D9-renderapparaat"
@@ -504,11 +508,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 19		"Neerschaling <50%:"
 21		"Uitvoerbereik:"
 23		"EVR-buffers:"
-27		"Kleurmanagement"
-28		"Invoertype:"
-30		"Omgevingslicht:"
-32		"Render-intenties:"
-34		"Standaard"
+26		"Standaard"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

@@ -170,13 +170,17 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 18		"Рісівер"
 END
 
-BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 5		"Керування кольором (для VMR-9 і EVR)"
 6		"Яскравість"
 7		"Контраст"
 8		"Відтінок"
 9		"Насиченість"
 18		"Скинути"
+20		"Управління кольором"
+21		"Вхідний тип:"
+23		"Розсіяне освітлення:"
+25		"Призначення рендерингу:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
@@ -490,7 +494,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Зміни набудуть чинності після перезапуску плеєра."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 5		"Відеорендерер"
 7		"Налаштування VMR-7/VMR-9 (Renderless) і EVR-CP"
 8		"Вибір пристрою рендерингу D3D9"
@@ -504,11 +508,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 19		"Зменшення <50%:"
 21		"Вихідний діапазон:"
 23		"Буфери EVR:"
-27		"Управління кольором"
-28		"Вхідний тип:"
-30		"Розсіяне освітлення:"
-32		"Призначення рендерингу:"
-34		"Типово"
+26		"Типово"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

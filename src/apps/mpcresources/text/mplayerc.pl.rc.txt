@@ -170,13 +170,17 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 18		"Odbiornik:"
 END
 
-BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 5		"Zarządzanie kolorami trybów VMR-9 i EVR"
 6		"Jasność:"
 7		"Kontrast:"
 8		"Odcień:"
 9		"Nasycenie:"
 18		"Domyślne"
+20		"Zarządzanie kolorami"
+21		"Format wejściowy:"
+23		"Oświetlenie otoczenia:"
+25		"Sposób renderowania:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
@@ -490,7 +494,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Zmiany zostaną wprowadzone po ponownym uruchomieniu programu."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 5		"Renderer wideo"
 7		"Ustawienia VMR-7/VMR-9 (Renderless) i EVR-CP"
 8		"Wybór urzadzenia renderującego D3D9"
@@ -504,11 +508,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 19		"Downscaling <50%:"
 21		"Zakres wyjścia:"
 23		"Bufor EVR:"
-27		"Zarządzanie kolorami"
-28		"Format wejściowy:"
-30		"Oświetlenie otoczenia:"
-32		"Sposób renderowania:"
-34		"Domyślne"
+26		"Domyślne"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

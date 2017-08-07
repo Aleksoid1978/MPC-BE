@@ -56,12 +56,6 @@ private:
 	int  m_iD3D9RenderDevice;
 	BOOL m_bResetDevice;
 
-	// Color Managment
-	CButton   m_chkColorManagment;
-	CComboBox m_cbCMInputType;
-	CComboBox m_cbCMAmbientLight;
-	CComboBox m_cbCMRenderingIntent;
-
 public:
 	CPPageVideo();
 	virtual ~CPPageVideo();
@@ -83,6 +77,5 @@ public:
 	afx_msg void OnFullscreenCheck();
 	afx_msg void OnD3D9DeviceCheck();
 	afx_msg void OnSurfaceFormatChange();
-	afx_msg void OnColorManagmentCheck();
 	afx_msg void OnBnClickedDefault();
 };

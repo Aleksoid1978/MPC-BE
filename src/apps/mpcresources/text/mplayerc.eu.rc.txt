@@ -170,13 +170,17 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 18		"Hargailua"
 END
 
-BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 5		"Margo aginteak (VMR-9 eta EVR)"
 6		"Dizdira"
 7		"Zuribeltztasuna"
 8		"Nabardura"
 9		"Margoasetasuna"
 18		"Berrezarri"
+20		"Margo Kudeaketa"
+21		"Sarrera mota:"
+23		"Giro Argia:"
+25		"Aurkezpen Saiakera:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
@@ -490,7 +494,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Aldaketek eragina dute irakurketa itxi eta berrabiarazi ondoren."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 5		"Bideo aurkezlea"
 7		"VMR-7/VMR-9 (Aurkezgabe) eta EVR-CP ezarpenak"
 8		"Hautatu D3D9 Aurkezpen Gailua"
@@ -504,11 +508,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 19		"Beh-neurriratzea <%50:"
 21		"Irteera maila:"
 23		"EVR Bufferrak:"
-27		"Margo Kudeaketa"
-28		"Sarrera mota:"
-30		"Giro Argia:"
-32		"Aurkezpen Saiakera:"
-34		"Berezkoa"
+26		"Berezkoa"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
