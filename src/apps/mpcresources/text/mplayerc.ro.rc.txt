@@ -170,13 +170,17 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 18		"Receptor"
 END
 
-BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 5		"Controale de culoare (pentru VMR-9, EVR şi madVR)"
 6		"Luminozitate"
 7		"Contrast"
 8		"Nuanță"
 9		"Saturație"
 18		"Resetează"
+20		"Color Management"
+21		"Input type:"
+23		"Ambient Light:"
+25		"Rendering Intent:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
@@ -490,7 +494,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Modificările vor avea efect după ce redarea a fost închisă și repornită."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 5		"Video renderer"
 7		"Setări pentru VMR-7/VMR-9 (fără randare) și EVR (CP)"
 8		"Selectați dispozitivul de randare D3D9"
@@ -504,11 +508,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 19		"Downscaling <50%:"
 21		"Output range:"
 23		"Preîncărcări EVR:"
-27		"Color Management"
-28		"Input type:"
-30		"Ambient Light:"
-32		"Rendering Intent:"
-34		"Default"
+26		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

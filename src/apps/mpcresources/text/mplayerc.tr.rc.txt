@@ -170,13 +170,17 @@ BEGIN DIALOGEX IDD_PPAGECAPTURE LINES 22
 18		"Alıcı"
 END
 
-BEGIN DIALOGEX IDD_PPAGECOLOR LINES 19
+BEGIN DIALOGEX IDD_PPAGECOLOR LINES 27
 5		"Renk kontrolleri (VKİ-9, GVİ ve madVR için)"
 6		"Parlaklık"
 7		"Karşıtlık"
 8		"Renk"
 9		"Doygunluk"
 18		"Sıfırla"
+20		"Renk Yönetimi"
+21		"Girdi biçimi:"
+23		"Ortam Işığı:"
+25		"Oluşturma Amacı:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEDVD LINES 19
@@ -490,7 +494,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Değişiklikler, oynatma kapatıldıktan ve uygulama yeniden başlatıldıktan sonra uygulanacaktır."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 5		"Video işleyicisi"
 7		"VKİ-7/VKİ-9 (Oluşturulmamış) ve GVİ-ÖS ayarları"
 8		"D3D9 Karıştırıcı aygıtı seçimi"
@@ -504,11 +508,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 19		"Boyut küçültme <50%:"
 21		"Çıkış aralığı:"
 23		"GVİ Arabelleği:"
-27		"Renk Yönetimi"
-28		"Girdi biçimi:"
-30		"Ortam Işığı:"
-32		"Oluşturma Amacı:"
-34		"Varsayılan"
+26		"Varsayılan"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

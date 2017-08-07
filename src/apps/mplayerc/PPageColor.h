@@ -29,6 +29,7 @@ class CPPageColor : public CPPageBase
 	DECLARE_DYNAMIC(CPPageColor)
 
 private:
+	// Color control
 	int m_iBrightness;
 	int m_iContrast;
 	int m_iHue;
@@ -37,6 +38,12 @@ private:
 	CString m_sContrast;
 	CString m_sHue;
 	CString m_sSaturation;
+
+	// Color managment
+	CButton   m_chkColorManagment;
+	CComboBox m_cbCMInputType;
+	CComboBox m_cbCMAmbientLight;
+	CComboBox m_cbCMRenderingIntent;
 
 public:
 	CPPageColor();
@@ -58,6 +65,7 @@ public:
 	CSliderCtrl m_SliSaturation;
 
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	afx_msg void OnColorManagmentCheck();
 	afx_msg void OnBnClickedReset();
 	virtual void OnCancel();
 };

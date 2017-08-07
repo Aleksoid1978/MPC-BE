@@ -43,6 +43,7 @@ void CPPageColor::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
+	// Color control
 	DDX_Control(pDX, IDC_SLI_BRIGHTNESS, m_SliBrightness);
 	DDX_Control(pDX, IDC_SLI_CONTRAST, m_SliContrast);
 	DDX_Control(pDX, IDC_SLI_HUE, m_SliHue);
@@ -51,10 +52,16 @@ void CPPageColor::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_STATIC2, m_sContrast);
 	DDX_Text(pDX, IDC_STATIC3, m_sHue);
 	DDX_Text(pDX, IDC_STATIC4, m_sSaturation);
+	// Color managment
+	DDX_Control(pDX, IDC_CHECK3, m_chkColorManagment);
+	DDX_Control(pDX, IDC_COMBO3, m_cbCMInputType);
+	DDX_Control(pDX, IDC_COMBO4, m_cbCMAmbientLight);
+	DDX_Control(pDX, IDC_COMBO5, m_cbCMRenderingIntent);
 }
 
 BEGIN_MESSAGE_MAP(CPPageColor, CPPageBase)
 	ON_WM_HSCROLL()
+	ON_BN_CLICKED(IDC_CHECK3, OnColorManagmentCheck)
 	ON_BN_CLICKED(IDC_RESET, OnBnClickedReset)
 END_MESSAGE_MAP()
 
@@ -64,34 +71,35 @@ BOOL CPPageColor::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	CAppSettings& s = AfxGetAppSettings();
-
+	SetCursor(m_hWnd, IDC_COMBO3, IDC_HAND);
+	SetCursor(m_hWnd, IDC_COMBO4, IDC_HAND);
+	SetCursor(m_hWnd, IDC_COMBO5, IDC_HAND);
 	CreateToolTip();
 
+	CAppSettings& s = AfxGetAppSettings();
+	CRenderersSettings& rs = s.m_VRSettings;
+
+	// Color control
 	m_iBrightness = s.iBrightness;
 	m_iContrast   = s.iContrast;
 	m_iHue        = s.iHue;
 	m_iSaturation = s.iSaturation;
 
-	m_SliBrightness.EnableWindow	(TRUE);
 	m_SliBrightness.SetRange		(-100, 100, TRUE);
 	m_SliBrightness.SetTic			(0);
 	m_SliBrightness.SetPos			(m_iBrightness);
 	m_SliBrightness.SetPageSize		(10);
 
-	m_SliContrast.EnableWindow		(TRUE);
 	m_SliContrast.SetRange			(-100, 100, TRUE);
 	m_SliContrast.SetTic			(0);
 	m_SliContrast.SetPos			(m_iContrast);
 	m_SliContrast.SetPageSize		(10);
 
-	m_SliHue.EnableWindow			(TRUE);
 	m_SliHue.SetRange				(-180, 180, TRUE);
 	m_SliHue.SetTic					(0);
 	m_SliHue.SetPos					(m_iHue);
 	m_SliHue.SetPageSize			(10);
 
-	m_SliSaturation.EnableWindow	(TRUE);
 	m_SliSaturation.SetRange		(-100, 100, TRUE);
 	m_SliSaturation.SetTic			(0);
 	m_SliSaturation.SetPos			(m_iSaturation);
@@ -101,6 +109,32 @@ BOOL CPPageColor::OnInitDialog()
 	m_iContrast   ? m_sContrast.Format  (L"%+d", m_iContrast)   : m_sContrast   = L"0";
 	m_iHue        ? m_sHue.Format       (L"%+d", m_iHue)        : m_sHue        = L"0";
 	m_iSaturation ? m_sSaturation.Format(L"%+d", m_iSaturation) : m_sSaturation = L"0";
+
+	// Color managment
+	CorrectCWndWidth(&m_chkColorManagment);
+	m_chkColorManagment.SetCheck(rs.bColorManagementEnable);
+
+	m_cbCMInputType.AddString(ResStr(IDS_CM_INPUT_AUTO));
+	m_cbCMInputType.AddString(L"HDTV");
+	m_cbCMInputType.AddString(L"SDTV NTSC");
+	m_cbCMInputType.AddString(L"SDTV PAL");
+	m_cbCMInputType.SetCurSel(rs.iColorManagementInput);
+
+	m_cbCMAmbientLight.AddString(ResStr(IDS_CM_AMBIENTLIGHT_BRIGHT));
+	m_cbCMAmbientLight.AddString(ResStr(IDS_CM_AMBIENTLIGHT_DIM));
+	m_cbCMAmbientLight.AddString(ResStr(IDS_CM_AMBIENTLIGHT_DARK));
+	m_cbCMAmbientLight.SetCurSel(rs.iColorManagementAmbientLight);
+
+	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_PERCEPTUAL));
+	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_RELATIVECM));
+	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_SATURATION));
+	m_cbCMRenderingIntent.AddString(ResStr(IDS_CM_INTENT_ABSOLUTECM));
+	m_cbCMRenderingIntent.SetCurSel(rs.iColorManagementIntent);
+
+	CorrectComboListWidth(m_cbCMInputType);
+	CorrectComboListWidth(m_cbCMAmbientLight);
+	CorrectComboListWidth(m_cbCMRenderingIntent);
+	OnColorManagmentCheck();
 
 	UpdateData(FALSE);
 
@@ -112,11 +146,19 @@ BOOL CPPageColor::OnApply()
 	UpdateData();
 
 	CAppSettings& s = AfxGetAppSettings();
+	CRenderersSettings& rs = s.m_VRSettings;
 
-	s.iBrightness		= m_iBrightness;
-	s.iContrast			= m_iContrast;
-	s.iHue				= m_iHue;
-	s.iSaturation		= m_iSaturation;
+	// Color control
+	s.iBrightness = m_iBrightness;
+	s.iContrast   = m_iContrast;
+	s.iHue        = m_iHue;
+	s.iSaturation = m_iSaturation;
+
+	// Color managment
+	rs.bColorManagementEnable       = !!m_chkColorManagment.GetCheck();
+	rs.iColorManagementInput        = m_cbCMInputType.GetCurSel();
+	rs.iColorManagementAmbientLight = m_cbCMAmbientLight.GetCurSel();
+	rs.iColorManagementIntent       = m_cbCMRenderingIntent.GetCurSel();
 
 	return __super::OnApply();
 }
@@ -154,10 +196,33 @@ void CPPageColor::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	__super::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
+void CPPageColor::OnColorManagmentCheck()
+{
+	if (m_chkColorManagment.GetCheck() == BST_CHECKED) {
+		m_cbCMInputType.EnableWindow(TRUE);
+		m_cbCMAmbientLight.EnableWindow(TRUE);
+		m_cbCMRenderingIntent.EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC7)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC8)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC9)->EnableWindow(TRUE);
+	}
+	else {
+		m_cbCMInputType.EnableWindow(FALSE);
+		m_cbCMAmbientLight.EnableWindow(FALSE);
+		m_cbCMRenderingIntent.EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC7)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC8)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC9)->EnableWindow(FALSE);
+	}
+
+	SetModified();
+}
+
 void CPPageColor::OnBnClickedReset()
 {
 	CMainFrame* pMainFrame = AfxGetMainFrame();
 
+	// Color control
 	pMainFrame->m_ColorCintrol.GetDefaultValues(m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
 
 	m_SliBrightness.SetPos	(m_iBrightness);
@@ -171,6 +236,13 @@ void CPPageColor::OnBnClickedReset()
 	m_iSaturation ? m_sSaturation.Format(L"%+d", m_iSaturation) : m_sSaturation = L"0";
 
 	pMainFrame->SetColorControl(ProcAmp_All, m_iBrightness, m_iContrast, m_iHue, m_iSaturation);
+
+	// Color managment
+	m_chkColorManagment.SetCheck(BST_UNCHECKED);
+	m_cbCMInputType.SetCurSel(0);
+	m_cbCMAmbientLight.SetCurSel(0);
+	m_cbCMRenderingIntent.SetCurSel(0);
+	OnColorManagmentCheck();
 
 	UpdateData(FALSE);
 
