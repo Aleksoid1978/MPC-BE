@@ -496,7 +496,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 5		"Video renderer"
-7		"Setări pentru VMR-7/VMR-9 (fără randare) și EVR (CP)"
+7		"Setări pentru VMR-9 și EVR (CP)"
 8		"Selectați dispozitivul de randare D3D9"
 10		"Ecran complet D3D"
 11		"10-bit RGB output"

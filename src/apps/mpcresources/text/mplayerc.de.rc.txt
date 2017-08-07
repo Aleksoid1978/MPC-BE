@@ -496,7 +496,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 5		"Video-Renderer"
-7		"Einstellungen für VMR-7/VMR-9 (renderless) und EVR (custom presenter) "
+7		"Einstellungen für VMR-9 und EVR (custom presenter) "
 8		"Rendergerät verwenden:"
 10		"Direct3D-Vollbildmodus"
 11		"10-Bit-RGB-Ausgabe"

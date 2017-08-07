@@ -496,7 +496,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 5		"視訊繪製器"
-7		"VMR-7/VMR-9 （無轉換）及 EVR 自訂呈現設定"
+7		"VMR-9 及 EVR 自訂呈現設定"
 8		"選擇 D3D9 繪製裝置"
 10		"Direct3D 全螢幕"
 11		"10-bit RGB 輸出"

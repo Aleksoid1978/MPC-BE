@@ -496,7 +496,7 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 5		"Video renderer"
-7		"VMR-7/VMR-9 (Renderless) and EVR-CP settings"
+7		"VMR-9 and EVR-CP settings"
 8		"Select D3D9 Render Device"
 10		"Direct3D a Pantalla Completa"
 11		"10-bit RGB output"
