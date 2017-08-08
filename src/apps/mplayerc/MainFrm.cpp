@@ -3804,9 +3804,8 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			pPopupMenu->EnableMenuItem(i, MF_BYPOSITION|fState);
 			continue;
 		}
-		if (firstSubItemID == ID_VIEW_INCSIZE					// is "Pan&Scan" submenu
-				|| firstSubItemID == ID_ASPECTRATIO_SOURCE	// is "Override Aspect Ratio" submenu
-				|| firstSubItemID == ID_VIEW_ZOOM_50) {		// is "Zoom" submenu
+		if (firstSubItemID == ID_VIEW_INCSIZE           // is "Pan&Scan" submenu
+				|| firstSubItemID == ID_VIEW_ZOOM_50) { // is "Zoom" submenu
 			UINT fState = (m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly)
 						  ? MF_ENABLED
 						  : (MF_DISABLED | MF_GRAYED);
@@ -7042,7 +7041,6 @@ void CMainFrame::OnViewKeepaspectratio()
 
 void CMainFrame::OnUpdateViewKeepaspectratio(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly);
 	pCmdUI->SetCheck(AfxGetAppSettings().fKeepAspectRatio);
 }
 
@@ -7055,7 +7053,6 @@ void CMainFrame::OnViewCompMonDeskARDiff()
 
 void CMainFrame::OnUpdateViewCompMonDeskARDiff(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly);
 	pCmdUI->SetCheck(AfxGetAppSettings().fCompMonDeskARDiff);
 }
 
