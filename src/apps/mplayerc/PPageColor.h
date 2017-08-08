@@ -54,6 +54,7 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
+	virtual BOOL OnSetActive();
 	virtual BOOL OnApply();
 
 	DECLARE_MESSAGE_MAP()

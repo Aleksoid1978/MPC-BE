@@ -134,11 +134,32 @@ BOOL CPPageColor::OnInitDialog()
 	CorrectComboListWidth(m_cbCMInputType);
 	CorrectComboListWidth(m_cbCMAmbientLight);
 	CorrectComboListWidth(m_cbCMRenderingIntent);
-	OnColorManagmentCheck();
 
 	UpdateData(FALSE);
 
 	return TRUE;
+}
+
+BOOL CPPageColor::OnSetActive()
+{
+	CRenderersSettings& rs = AfxGetAppSettings().m_VRSettings;
+
+	if (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM && (rs.iSurfaceFormat == D3DFMT_A16B16G16R16F || rs.iSurfaceFormat == D3DFMT_A32B32G32R32F)) {
+		m_chkColorManagment.EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC6)->EnableWindow(TRUE);
+		OnColorManagmentCheck();
+	} else {
+		m_chkColorManagment.EnableWindow(FALSE);
+		m_cbCMInputType.EnableWindow(FALSE);
+		m_cbCMAmbientLight.EnableWindow(FALSE);
+		m_cbCMRenderingIntent.EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC6)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC7)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC8)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC9)->EnableWindow(FALSE);
+	}
+
+	return __super::OnSetActive();
 }
 
 BOOL CPPageColor::OnApply()
