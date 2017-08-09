@@ -23,6 +23,7 @@
 #include <MMReg.h>
 #include "AviFile.h"
 #include "AviSplitter.h"
+#include "moreuuids.h"
 
 // option names
 #define OPT_REGKEY_AVISplit  L"Software\\MPC-BE Filters\\AVI Splitter"
@@ -494,7 +495,8 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				pwfe->nChannels = 2;
 			}
 
-			if (pwfe->wFormatTag == WAVE_FORMAT_RAW_AAC1) {
+			if (mt.subtype == MEDIASUBTYPE_RAW_AAC1) {
+				pwfe->wFormatTag = WAVE_FORMAT_RAW_AAC1;
 				WAVEFORMATEX* pwfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 5);
 				pwfe->cbSize = MakeAACInitData((BYTE*)(pwfe + 1), 0, pwfe->nSamplesPerSec, pwfe->nChannels);
 			}
