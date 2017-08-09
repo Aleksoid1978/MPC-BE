@@ -185,16 +185,6 @@ static void SetAspect(CSize& Aspect, LONG width, LONG height, LONG codec_width, 
 	}
 }
 
-static const CString ConvertStr(const char* S)
-{
-	CString str = AltUTF8To16(S);
-	if (str.IsEmpty()) {
-		str = ConvertToUTF16(S, CP_ACP); //Trying Local...
-	}
-
-	return str;
-}
-
 static const DWORD GetFourcc(AP4_VisualSampleEntry* vse)
 {
 	DWORD fourcc = -1;
@@ -400,7 +390,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			AP4_UI32 width = 0;
 			AP4_UI32 height = 0;
 
-			CString TrackName = ConvertStr(track->GetTrackName().c_str());
+			CString TrackName = MultiByteToUTF16(track->GetTrackName().c_str());
 			if (TrackName.GetLength() && TrackName[0] < 0x20) {
 				TrackName.Delete(0);
 			}
@@ -1577,7 +1567,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			for (AP4_Cardinal i = 0; i < chapters.ItemCount(); ++i) {
 				AP4_ChplAtom::AP4_Chapter& chapter = chapters[i];
 
-				CString ChapterName = ConvertStr(chapter.Name.c_str());
+				CString ChapterName = MultiByteToUTF16(chapter.Name.c_str());
 				ChapAppend(chapter.Time, ChapterName);
 			}
 		} else if (ChapterTrackEntries.ItemCount()) {
@@ -1638,7 +1628,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								memcpy(buff, &ptr[2], size);
 								buff[size] = 0;
 
-								ChapterName = ConvertStr(buff);
+								ChapterName = MultiByteToUTF16(buff);
 
 								SAFE_DELETE_ARRAY(buff);
 							}

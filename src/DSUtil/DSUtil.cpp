@@ -1598,6 +1598,16 @@ CString AltUTF8To16(LPCSTR lpMultiByteStr) // Use if MultiByteToWideChar() funct
 	return str;
 }
 
+CString MultiByteToUTF16(LPCSTR lpMultiByteStr)
+{
+	CString str = AltUTF8To16(lpMultiByteStr);
+	if (str.IsEmpty()) {
+		str = ConvertToUTF16(lpMultiByteStr, CP_ACP); // Trying Local...
+	}
+
+	return str;
+}
+
 static struct {
 	LPCSTR name, iso6392, iso6391;
 	LCID lcid;
