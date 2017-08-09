@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -702,16 +702,6 @@ HRESULT CShoutcastStream::SetName(LPCWSTR pName)
 
 //
 
-static CString ConvertStr(LPCSTR S)
-{
-	CString str = AltUTF8To16(S);
-	if (str.IsEmpty()) {
-		str = ConvertToUTF16(S, CP_ACP); //Trying Local...
-	}
-
-	return str;
-}
-
 int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nFlags)
 {
 	if (nFlags & MSG_PEEK) {
@@ -733,7 +723,7 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 		static BYTE buff[255*16], b = 0;
 		memset(buff, 0, sizeof(buff));
 		if (1 == __super::Receive(&b, 1) && b && b*16 == __super::Receive(buff, b*16)) {
-			CString str = ConvertStr((LPCSTR)buff);
+			CString str = MultiByteToUTF16((LPCSTR)buff);
 
 			DLog(L"CShoutcastStream(): Metainfo: %s", str);
 
@@ -897,13 +887,13 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 				metaint = atoi(value);
 			}
 			else if (param == "icy-name") {
-				m_title = ConvertStr(value);
+				m_title = MultiByteToUTF16(value);
 			}
 			else if (param == "icy-url") {
 				m_url = value;
 			}
 			else if (param == "icy-description") {
-				m_description = ConvertStr(value);
+				m_description = MultiByteToUTF16(value);
 			}
 		}
 
