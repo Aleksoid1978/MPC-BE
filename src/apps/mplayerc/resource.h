@@ -313,7 +313,7 @@
 #define ID_VOLUME_GAIN_OFF              972
 #define ID_VOLUME_GAIN_MAX              973
 #define ID_NAVIGATE_TUNERSCAN           974
-#define ID_FAVORITES_QUICKADDFAVORITE   975
+#define ID_FAVORITES_QUICKADD           975
 #define ID_FILE_REOPEN                  976
 #define ID_FILTERS                      977
 #define ID_AUDIOS                       978
@@ -1409,7 +1409,7 @@
 #define IDS_NO_MORE_MEDIA               41026
 #define IDS_FIRST_IN_FOLDER             41027
 #define IDS_LAST_IN_FOLDER              41028
-#define IDS_FAVORITES_QUICKADDFAVORITE  41105
+#define IDS_FAVORITES_QUICKADD          41105
 #define IDS_DVB_CHANNEL_NUMBER          41109
 #define IDS_DVB_CHANNEL_NAME            41110
 #define IDS_DVB_CHANNEL_FREQUENCY       41111
@@ -1539,6 +1539,7 @@
 #define IDS_SATURATION_INC              41317
 #define IDS_SATURATION_DEC              41318
 #define IDS_RESET_COLOR                 41319
+#define IDS_AG_FAVORITES_ORGANIZE       41320
 #define IDS_USING_NEWER_VERSION         41323
 #define IDS_NEW_UPDATE_AVAILABLE        41324
 #define IDS_UPDATE_ERROR                41325

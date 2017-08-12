@@ -497,9 +497,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_COMMAND(ID_FAVORITES_ADD, OnFavoritesAdd)
 	ON_UPDATE_COMMAND_UI(ID_FAVORITES_ADD, OnUpdateFavoritesAdd)
-	ON_COMMAND(ID_FAVORITES_QUICKADDFAVORITE, OnFavoritesQuickAddFavorite)
+	ON_COMMAND(ID_FAVORITES_QUICKADD, OnFavoritesQuickAdd)
 	ON_COMMAND(ID_FAVORITES_ORGANIZE, OnFavoritesOrganize)
-	ON_UPDATE_COMMAND_UI(ID_FAVORITES_ORGANIZE, OnUpdateFavoritesOrganize)
 	ON_COMMAND_RANGE(ID_FAVORITES_FILE_START, ID_FAVORITES_FILE_END, OnFavoritesFile)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_FAVORITES_FILE_START, ID_FAVORITES_FILE_END, OnUpdateFavoritesFile)
 	ON_COMMAND_RANGE(ID_FAVORITES_DVD_START, ID_FAVORITES_DVD_END, OnFavoritesDVD)
@@ -9574,7 +9573,7 @@ void CMainFrame::OnUpdateFavoritesAdd(CCmdUI* pCmdUI)
 	pCmdUI->Enable(GetPlaybackMode() == PM_FILE || GetPlaybackMode() == PM_DVD);
 }
 
-void CMainFrame::OnFavoritesQuickAddFavorite()
+void CMainFrame::OnFavoritesQuickAdd()
 {
 	AddFavorite(true, false);
 }
@@ -9722,21 +9721,6 @@ void CMainFrame::OnFavoritesOrganize()
 {
 	CFavoriteOrganizeDlg dlg;
 	dlg.DoModal();
-}
-
-void CMainFrame::OnUpdateFavoritesOrganize(CCmdUI* pCmdUI)
-{
-	CAppSettings& s = AfxGetAppSettings();
-
-	CAtlList<CString> sl;
-	s.GetFav(FAV_FILE, sl);
-	bool enable = !sl.IsEmpty();
-	if (!enable) {
-		s.GetFav(FAV_DVD, sl);
-		enable = !sl.IsEmpty();
-	}
-
-	pCmdUI->Enable(enable);
 }
 
 void CMainFrame::OnRecentFileClear()
