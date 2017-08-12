@@ -1108,9 +1108,8 @@ public:
 
 	afx_msg void OnFavoritesAdd();
 	afx_msg void OnUpdateFavoritesAdd(CCmdUI* pCmdUI);
-	afx_msg void OnFavoritesQuickAddFavorite();
+	afx_msg void OnFavoritesQuickAdd();
 	afx_msg void OnFavoritesOrganize();
-	afx_msg void OnUpdateFavoritesOrganize(CCmdUI* pCmdUI);
 	afx_msg void OnFavoritesFile(UINT nID);
 	afx_msg void OnUpdateFavoritesFile(CCmdUI* pCmdUI);
 	afx_msg void OnFavoritesDVD(UINT nID);
