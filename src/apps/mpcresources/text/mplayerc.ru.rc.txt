@@ -1399,6 +1399,7 @@ STRING IDS_EXTERNAL_FILTERS_ERROR_MT		"Такой тип уже есть в сп
 STRING IDS_FAVDVDS		"DVD"
 STRING IDS_FAVFILES		"Файлы"
 STRING IDS_FAVORITES_ADD		"&Добавить..."
+STRING IDS_FAVORITES_MENU		"Меню закладок"
 STRING IDS_FAVORITES_ORGANIZE		"&Упорядочить..."
 STRING IDS_FAVORITES_QUICKADD		"Быстро добавить в закладки"
 STRING IDS_FILE_FAV_ADDED		"Файл добавлен в закладки"

@@ -894,6 +894,7 @@ public:
 	afx_msg void OnMenuNavSubtitleOptions();
 	afx_msg void OnMenuNavJumpTo();
 	afx_msg void OnMenuRecentFiles();
+	afx_msg void OnMenuFavorites();
 	afx_msg void OnUpdateMenuNavSubtitle(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateMenuNavAudio(CCmdUI* pCmdUI);
 

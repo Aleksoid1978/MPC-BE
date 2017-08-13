@@ -458,6 +458,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_MENU_NAVIGATE_SUBTITLES, OnMenuNavSubtitle)
 	ON_COMMAND(ID_MENU_NAVIGATE_JUMPTO, OnMenuNavJumpTo)
 	ON_COMMAND(ID_MENU_RECENT_FILES, OnMenuRecentFiles)
+	ON_COMMAND(ID_FAVORITES, OnMenuFavorites)
 
 	ON_UPDATE_COMMAND_UI_RANGE(ID_AUDIO_SUBITEM_START, ID_AUDIO_SUBITEM_END, OnUpdatePlayAudio)
 	ON_COMMAND_RANGE(ID_SUBTITLES_SUBITEM_START, ID_SUBTITLES_SUBITEM_END, OnPlaySubtitles)
@@ -8552,6 +8553,13 @@ void CMainFrame::OnMenuRecentFiles()
 	m_recentfilesMenu.DestroyMenu();
 	SetupRecentFilesSubMenu();
 	OnMenu(&m_recentfilesMenu);
+}
+
+void CMainFrame::OnMenuFavorites()
+{
+	m_favoritesMenu.DestroyMenu();
+	SetupFavoritesSubMenu();
+	OnMenu(&m_favoritesMenu);
 }
 
 void CMainFrame::OnUpdateMenuNavSubtitle(CCmdUI* pCmdUI)
