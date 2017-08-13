@@ -48,6 +48,8 @@ public IUnknown {
 
 	STDMETHOD(SetOutputFormat(MPCSampleFormat sf, bool enable)) PURE;
 	STDMETHOD_(bool, GetOutputFormat(MPCSampleFormat sf)) PURE;
+	STDMETHOD(SetAVSyncCorrection(bool bAVSync)) PURE;
+	STDMETHOD_(bool, GetAVSyncCorrection()) PURE;
 	STDMETHOD(SetDynamicRangeControl(bool fDRC)) PURE;
 	STDMETHOD_(bool, GetDynamicRangeControl()) PURE;
 	STDMETHOD(SetSPDIF(enctype et, bool fSPDIF)) PURE;

@@ -93,17 +93,18 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_FILTER_SETTINGS_CAPTION     "Settings"
-    IDS_MPADEC_SAMPLE_FMT   "Output sample format:"
-    IDS_MPADEC_DRC          "Apply DRC for AC-3 and E-AC3"
-    IDS_MPADEC_MIXER        "Mixer"
-    IDS_MPADEC_MIX_SPEAKERS "Output speakers:"
-    IDS_MPADEC_MONO         "Mono"
-    IDS_MPADEC_STEREO       "Stereo"
-    IDS_MPADEC_SPDIF        "Pass-through (S/PDIF, HDMI)"
-    IDS_MPADEC_AC3ENCODE    "Encode to AC-3"
-    IDS_MPADEC_STATUS       "Status"
-    IDS_MPADEC_NOTACTIVE    "The decoder is not active."
+    IDS_FILTER_SETTINGS_CAPTION "Settings"
+    IDS_MPADEC_SAMPLE_FMT       "Output sample format:"
+    IDS_MPADEC_AV_SYNC          "A/V Sync correction"
+    IDS_MPADEC_DRC              "Apply DRC for AC-3 and E-AC3"
+    IDS_MPADEC_MIXER            "Mixer"
+    IDS_MPADEC_MIX_SPEAKERS     "Output speakers:"
+    IDS_MPADEC_MONO             "Mono"
+    IDS_MPADEC_STEREO           "Stereo"
+    IDS_MPADEC_SPDIF            "Pass-through (S/PDIF, HDMI)"
+    IDS_MPADEC_AC3ENCODE        "Encode to AC-3"
+    IDS_MPADEC_STATUS           "Status"
+    IDS_MPADEC_NOTACTIVE        "The decoder is not active."
 END
 
 #endif    // English (United States) resources

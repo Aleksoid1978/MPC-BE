@@ -53,6 +53,7 @@ bool CMpaDecSettingsWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>
 	m_outfmt_i32   = m_pMDF->GetOutputFormat(SF_PCM32);
 	m_outfmt_flt   = m_pMDF->GetOutputFormat(SF_FLOAT);
 #endif
+	m_av_sync      = m_pMDF->GetAVSyncCorrection();
 	m_drc          = m_pMDF->GetDynamicRangeControl();
 	m_spdif_ac3    = m_pMDF->GetSPDIF(IMpaDecFilter::ac3);
 	m_spdif_eac3   = m_pMDF->GetSPDIF(IMpaDecFilter::eac3);
@@ -116,6 +117,10 @@ bool CMpaDecSettingsWnd::OnActivate()
 	p.y += h25;
 #endif
 
+	m_av_sync_check.Create(ResStr(IDS_MPADEC_AV_SYNC), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(ScaleX(220), m_fontheight)), this, IDC_PP_CHECK_AV_SYNC);
+	m_av_sync_check.SetCheck(m_av_sync);
+	p.y += h20;
+
 	m_drc_check.Create(ResStr(IDS_MPADEC_DRC), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(ScaleX(220), m_fontheight)), this, IDC_PP_CHECK_DRC);
 	m_drc_check.SetCheck(m_drc);
 	p.y += h25;
@@ -155,7 +160,7 @@ bool CMpaDecSettingsWnd::OnActivate()
 	}
 
 	SetCursor(m_hWnd, IDC_ARROW);
-	SetCursor(m_hWnd, IDC_PP_CHECK_I16, IDC_HAND);
+	SetCursor(m_hWnd, IDC_PP_CHECK_AV_SYNC, IDC_HAND);
 
 	// subclass the edit control
 	OldControlProc = (WNDPROC)SetWindowLongPtr(m_edtStatus.m_hWnd, GWLP_WNDPROC, (LONG_PTR)ControlProc);
@@ -171,6 +176,7 @@ void CMpaDecSettingsWnd::OnDeactivate()
 	m_outfmt_i32   = !!m_outfmt_i32_check.GetCheck();
 	m_outfmt_flt   = !!m_outfmt_flt_check.GetCheck();
 #endif
+	m_av_sync      = !!m_av_sync_check.GetCheck();
 	m_drc          = !!m_drc_check.GetCheck();
 	m_spdif_ac3    = !!m_spdif_ac3_check.GetCheck();
 	m_spdif_eac3   = !!m_spdif_eac3_check.GetCheck();
@@ -191,6 +197,7 @@ bool CMpaDecSettingsWnd::OnApply()
 		m_pMDF->SetOutputFormat(SF_PCM32, m_outfmt_i32);
 		m_pMDF->SetOutputFormat(SF_FLOAT, m_outfmt_flt);
 #endif
+		m_pMDF->SetAVSyncCorrection(m_av_sync);
 		m_pMDF->SetDynamicRangeControl(m_drc);
 		m_pMDF->SetSPDIF(IMpaDecFilter::ac3, m_spdif_ac3);
 		m_pMDF->SetSPDIF(IMpaDecFilter::eac3, m_spdif_eac3);

@@ -11,6 +11,7 @@
 #define IDS_MPADEC_STEREO               7305
 #define IDS_MPADEC_SPDIF                7306
 #define IDS_MPADEC_AC3ENCODE            7307
+#define IDS_MPADEC_AV_SYNC              7308
 #define IDS_MPADEC_STATUS               7310
 #define IDS_MPADEC_NOTACTIVE            7311
 
