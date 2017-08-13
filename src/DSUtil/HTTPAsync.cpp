@@ -242,8 +242,8 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	m_hConnect = InternetConnect(m_hInstance,
 								 m_host,
 								 m_nPort,
-								 NULL,
-								 NULL,
+								 m_url.GetUserNameW(),
+								 m_url.GetPassword(),
 								 INTERNET_SERVICE_HTTP,
 								 INTERNET_FLAG_KEEP_CONNECTION | INTERNET_FLAG_NO_CACHE_WRITE,
 								 (DWORD_PTR)this);
