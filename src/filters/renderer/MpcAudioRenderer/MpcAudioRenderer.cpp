@@ -2693,7 +2693,7 @@ BOOL CMpcAudioRenderer::StartReleaseTimer()
 				NULL,
 				TimerCallbackFunc,
 				this,
-				1000,
+				3000,
 				0,
 				WT_EXECUTEINTIMERTHREAD);
 	}
