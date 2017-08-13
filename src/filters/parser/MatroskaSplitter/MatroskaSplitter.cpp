@@ -1254,6 +1254,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mts.Add(mt);
 					isSub = true;
 				} else {
+					if (CodecID == "S_TEXT/WEBVTT") {
+						pTE->CodecPrivate.RemoveAll();
+					}
+
 					mt.majortype = MEDIATYPE_Subtitle;
 					mt.formattype = FORMAT_SubtitleInfo;
 					SUBTITLEINFO* psi = (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO) + pTE->CodecPrivate.GetCount());
