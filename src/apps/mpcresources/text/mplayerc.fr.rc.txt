@@ -1399,6 +1399,7 @@ STRING IDS_EXTERNAL_FILTERS_ERROR_MT		"Ce type est déjà présent dans la liste
 STRING IDS_FAVDVDS		"DVDs"
 STRING IDS_FAVFILES		"Fichiers"
 STRING IDS_FAVORITES_ADD		"&Ajouter aux favoris..."
+STRING IDS_FAVORITES_MENU		"Favorites menu"
 STRING IDS_FAVORITES_ORGANIZE		"&Organiser les favoris..."
 STRING IDS_FAVORITES_QUICKADD		"Ajout rapide aux favoris"
 STRING IDS_FILE_FAV_ADDED		"Fichier ajouté aux favoris"

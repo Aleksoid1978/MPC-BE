@@ -1399,6 +1399,7 @@ STRING IDS_EXTERNAL_FILTERS_ERROR_MT		"Այս տեսակը արդեն իսկ ա�
 STRING IDS_FAVDVDS		"DVD-ներ"
 STRING IDS_FAVFILES		"Ֆիլտրեր"
 STRING IDS_FAVORITES_ADD		"&Ավելացնել ընտրյալներին..."
+STRING IDS_FAVORITES_MENU		"Favorites menu"
 STRING IDS_FAVORITES_ORGANIZE		"&Դասավորել ընտրյալները..."
 STRING IDS_FAVORITES_QUICKADD		"Արագ ավելացնել ընտրյալներին"
 STRING IDS_FILE_FAV_ADDED		"File added to favorites"

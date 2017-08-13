@@ -1402,6 +1402,7 @@ STRING IDS_EXTERNAL_FILTERS_ERROR_MT		"Αυτός ο τύπος υπάρχει �
 STRING IDS_FAVDVDS		"DVDs"
 STRING IDS_FAVFILES		"Αρχεία"
 STRING IDS_FAVORITES_ADD		"&Προσθήκη στα αγαπημένα..."
+STRING IDS_FAVORITES_MENU		"Favorites menu"
 STRING IDS_FAVORITES_ORGANIZE		"&Οργάνωση αγαπημένων..."
 STRING IDS_FAVORITES_QUICKADD		"Ταχεία προσθήκη αγαπημένου"
 STRING IDS_FILE_FAV_ADDED		"Το αρχείο προστέθηκε στα αγαπημένα"

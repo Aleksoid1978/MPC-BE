@@ -1410,6 +1410,7 @@
 #define IDS_FIRST_IN_FOLDER             41027
 #define IDS_LAST_IN_FOLDER              41028
 #define IDS_FAVORITES_QUICKADD          41105
+#define IDS_FAVORITES_MENU              41106
 #define IDS_DVB_CHANNEL_NUMBER          41109
 #define IDS_DVB_CHANNEL_NAME            41110
 #define IDS_DVB_CHANNEL_FREQUENCY       41111
