@@ -43,6 +43,11 @@ BEGIN DIALOGEX IDD_CAPTURE_DLG LINES 41
 39		"Zaznamenat"
 END
 
+BEGIN DIALOGEX IDD_CMD_LINE_HELP LINES 9
+3		"Command line help"
+8		"OK"
+END
+
 BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"Přidat k oblíbeným"
 6		"Zadejte název oblíbené položky:"

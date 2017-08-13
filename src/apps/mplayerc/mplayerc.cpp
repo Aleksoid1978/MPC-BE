@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include <thread>
 #include "AboutDlg.h"
+#include "CmdLineHelpDlg.h"
 #include <Tlhelp32.h>
 #include "MainFrm.h"
 #include "Misc.h"
@@ -710,7 +711,9 @@ void CMPlayerCApp::ShowCmdlnSwitches() const
 
 	s += ResStr(IDS_USAGE);
 
-	AfxMessageBox(s, MB_ICONINFORMATION | MB_OK);
+	//AfxMessageBox(s, MB_ICONINFORMATION | MB_OK);
+	CmdLineHelpDlg dlg(s);
+	dlg.DoModal();
 }
 
 /////////////////////////////////////////////////////////////////////////////
