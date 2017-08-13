@@ -617,6 +617,7 @@
 #define IDD_UPDATE_DIALOG               10065
 #define IDD_ITEMPROPERTIES_DIALOG       10066
 #define IDD_SHADERNEW_DLG               10067
+#define IDD_CMD_LINE_HELP               10068
 // controls
 #define IDC_STATIC1                     10201
 #define IDC_STATIC2                     10202

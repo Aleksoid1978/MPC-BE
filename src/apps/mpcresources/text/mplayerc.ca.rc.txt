@@ -43,6 +43,11 @@ BEGIN DIALOGEX IDD_CAPTURE_DLG LINES 41
 39		"Gravar"
 END
 
+BEGIN DIALOGEX IDD_CMD_LINE_HELP LINES 9
+3		"Command line help"
+8		"OK"
+END
+
 BEGIN DIALOGEX IDD_FAVADD LINES 12
 3		"Afegir a Favorits"
 6		"Escull un nom per l'accés directe:"

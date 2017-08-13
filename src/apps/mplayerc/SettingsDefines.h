@@ -264,6 +264,7 @@
 #define IDS_RS_DLG_SUBTITLEDL_COLWIDTH		L"ColWidth"
 
 #define IDS_R_DLG_ORGANIZE_FAV				L"Dialogs\\OrganizeFavorites"
+#define IDS_R_DLG_CMD_LINE_HELP				L"Dialogs\\CmdLineHelp"
 
 #define IDS_RS_USE_FLYBAR					L"UseFlybar"
 #define IDS_RS_USE_FLYBAR_ONTOP				L"UseFlybarOnTop"

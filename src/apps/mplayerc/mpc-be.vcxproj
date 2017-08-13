@@ -89,6 +89,7 @@
     <ClCompile Include="AppSettings.cpp" />
     <ClCompile Include="AuthDlg.cpp" />
     <ClCompile Include="BaseGraph.cpp" />
+    <ClCompile Include="CmdLineHelpDlg.cpp" />
     <ClCompile Include="ColorControl.cpp" />
     <ClCompile Include="ComPropertyPage.cpp" />
     <ClCompile Include="Content.cpp" />
@@ -203,6 +204,7 @@
     <ClInclude Include="AppSettings.h" />
     <ClInclude Include="AuthDlg.h" />
     <ClInclude Include="BaseGraph.h" />
+    <ClInclude Include="CmdLineHelpDlg.h" />
     <ClInclude Include="ColorControl.h" />
     <ClInclude Include="ComPropertyPage.h" />
     <ClInclude Include="Content.h" />
