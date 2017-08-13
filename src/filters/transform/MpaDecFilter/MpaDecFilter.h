@@ -61,6 +61,7 @@ protected:
 #ifdef REGISTER_FILTER
 	bool            m_fSampleFmt[sfcount];
 #endif
+	bool            m_bAVSync;
 	bool            m_fDRC;
 	bool            m_fSPDIF[etcount];
 
@@ -167,6 +168,8 @@ public:
 	// IMpaDecFilter
 	STDMETHODIMP SetOutputFormat(MPCSampleFormat sf, bool enable);
 	STDMETHODIMP_(bool) GetOutputFormat(MPCSampleFormat sf);
+	STDMETHODIMP SetAVSyncCorrection(bool bAVSync);
+	STDMETHODIMP_(bool) GetAVSyncCorrection();
 	STDMETHODIMP SetDynamicRangeControl(bool fDRC);
 	STDMETHODIMP_(bool) GetDynamicRangeControl();
 	STDMETHODIMP SetSPDIF(enctype et, bool fSPDIF);

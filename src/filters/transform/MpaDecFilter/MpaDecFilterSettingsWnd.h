@@ -42,6 +42,7 @@ class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 	CButton   m_outfmt_i32_check;
 	CButton   m_outfmt_flt_check;
 #endif
+	bool m_av_sync;
 	bool m_drc;
 	bool m_spdif_ac3;
 	bool m_spdif_eac3;
@@ -55,6 +56,7 @@ class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 		IDC_PP_CHECK_I24,
 		IDC_PP_CHECK_I32,
 		IDC_PP_CHECK_FLT,
+		IDC_PP_CHECK_AV_SYNC,
 		IDC_PP_CHECK_DRC,
 		IDC_PP_CHECK_SPDIF_AC3,
 		IDC_PP_CHECK_SPDIF_EAC3,
@@ -64,6 +66,7 @@ class __declspec(uuid("24103041-884B-4772-B0D3-A600E7CBFEC7"))
 		IDC_PP_CHECK_SPDIF_AC3ENC
 	};
 
+	CButton   m_av_sync_check;
 	CButton   m_drc_check;
 
 	CButton   m_spdif_group;
