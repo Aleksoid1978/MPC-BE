@@ -190,7 +190,7 @@ private:
 	CFilter					m_Filter;
 
 	// CMpcAudioRenderer WASAPI methods
-	HRESULT					GetAudioDevice();
+	HRESULT					GetAudioDevice(const BOOL bForceUseDefaultDevice);
 	HRESULT					CreateAudioClient();
 	HRESULT					InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCheckFormat = TRUE);
 	HRESULT					CheckAudioClient(WAVEFORMATEX *pWaveFormatEx = NULL);
