@@ -2091,7 +2091,7 @@ void CDX9AllocatorPresenter::DrawStats()
 				}
 			}
 
-			strText.Format(L"%-13s: %s", GetDXVAVersion(), GetDXVADecoderDescription());
+			strText.Format(L"%-13s: %s", DXVAState::GetShortDescription(), DXVAState::GetDescription());
 			drawText(strText);
 
 			if (!m_D3D9Device.IsEmpty()) {
