@@ -96,7 +96,7 @@ static av_always_inline void RENAME(decode_line)(FFV1Context *s, int w,
         }
 
         if (sign)
-            diff = -diff;
+            diff = -(unsigned)diff;
 
         sample[1][x] = av_mod_uintp2(RENAME(predict)(sample[1] + x, sample[0] + x) + (SUINT)diff, bits);
     }
@@ -149,7 +149,7 @@ static void RENAME(decode_rgb_frame)(FFV1Context *s, uint8_t *src[3], int w, int
             }
 
             if (lbd)
-                *((uint32_t*)(src[0] + x*4 + stride[0]*y)) = b + (g<<8) + (r<<16) + (a<<24);
+                *((uint32_t*)(src[0] + x*4 + stride[0]*y)) = b + ((unsigned)g<<8) + ((unsigned)r<<16) + ((unsigned)a<<24);
             else if (sizeof(TYPE) == 4) {
                 *((uint16_t*)(src[0] + x*2 + stride[0]*y)) = g;
                 *((uint16_t*)(src[1] + x*2 + stride[1]*y)) = b;

@@ -621,6 +621,7 @@ SRCS_LU = \
 	libavutil/reverse.c \
 	libavutil/samplefmt.c \
 	libavutil/sha.c \
+	libavutil/slicethread.c \
 	libavutil/stereo3d.c \
 	libavutil/threadmessage.c \
 	libavutil/time.c \

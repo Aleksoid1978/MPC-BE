@@ -107,6 +107,8 @@ typedef struct PerThreadContext {
 
     int hwaccel_serializing;
     int async_serializing;
+
+    atomic_int debug_threads;       ///< Set if the FF_DEBUG_THREADS option is set.
 } PerThreadContext;
 
 /**
@@ -398,6 +400,9 @@ static int submit_packet(PerThreadContext *p, AVCodecContext *user_avctx,
         pthread_mutex_unlock(&p->mutex);
         return ret;
     }
+    atomic_store_explicit(&p->debug_threads,
+                          (p->avctx->debug & FF_DEBUG_THREADS) != 0,
+                          memory_order_relaxed);
 
     release_delayed_buffers(p);
 
@@ -565,10 +570,11 @@ void ff_thread_report_progress(ThreadFrame *f, int n, int field)
 
     p = f->owner[field]->internal->thread_ctx;
 
-    pthread_mutex_lock(&p->progress_mutex);
-    if (f->owner[field]->debug&FF_DEBUG_THREADS)
+    if (atomic_load_explicit(&p->debug_threads, memory_order_relaxed))
         av_log(f->owner[field], AV_LOG_DEBUG,
                "%p finished %d field %d\n", progress, n, field);
+
+    pthread_mutex_lock(&p->progress_mutex);
 
     atomic_store_explicit(&progress[field], n, memory_order_release);
 
@@ -587,10 +593,11 @@ void ff_thread_await_progress(ThreadFrame *f, int n, int field)
 
     p = f->owner[field]->internal->thread_ctx;
 
-    pthread_mutex_lock(&p->progress_mutex);
-    if (f->owner[field]->debug&FF_DEBUG_THREADS)
+    if (atomic_load_explicit(&p->debug_threads, memory_order_relaxed))
         av_log(f->owner[field], AV_LOG_DEBUG,
                "thread awaiting %d field %d from %p\n", n, field, progress);
+
+    pthread_mutex_lock(&p->progress_mutex);
     while (atomic_load_explicit(&progress[field], memory_order_relaxed) < n)
         pthread_cond_wait(&p->progress_cond, &p->progress_mutex);
     pthread_mutex_unlock(&p->progress_mutex);
@@ -822,6 +829,8 @@ int ff_frame_thread_init(AVCodecContext *avctx)
         }
 
         if (err) goto error;
+
+        atomic_init(&p->debug_threads, (copy->debug & FF_DEBUG_THREADS) != 0);
 
         err = AVERROR(pthread_create(&p->thread, NULL, frame_worker_thread, p));
         p->thread_init= !err;

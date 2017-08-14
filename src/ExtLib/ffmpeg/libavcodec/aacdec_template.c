@@ -767,7 +767,7 @@ static int decode_pce(AVCodecContext *avctx, MPEG4AudioConfig *m4ac,
     if (get_bits1(gb))
         skip_bits(gb, 3); // mixdown_coeff_index and pseudo_surround
 
-    if (get_bits_left(gb) < 4 * (num_front + num_side + num_back + num_lfe + num_assoc_data + num_cc)) {
+    if (get_bits_left(gb) < 5 * (num_front + num_side + num_back + num_cc) + 4 *(num_lfe + num_assoc_data + num_cc)) {
         av_log(avctx, AV_LOG_ERROR, "decode_pce: " overread_err);
         return -1;
     }
@@ -1215,7 +1215,7 @@ static av_cold int aac_decode_init(AVCodecContext *avctx)
     AAC_RENAME_32(ff_mdct_init)(&ac->mdct_small,  8, 1, 1.0 / RANGE15(128.0));
     AAC_RENAME_32(ff_mdct_init)(&ac->mdct_ltp,   11, 0, RANGE15(-2.0));
 #if !USE_FIXED
-    ret = ff_mdct15_init(&ac->mdct480, 1, 5, -1.0f);
+    ret = ff_mdct15_init(&ac->mdct480, 1, 5, 1.0f/(16*1024*960));
     if (ret < 0)
         return ret;
 #endif
@@ -2203,6 +2203,10 @@ static int decode_cce(AACContext *ac, GetBitContext *gb, ChannelElement *che)
             cge = coup->coupling_point == AFTER_IMDCT ? 1 : get_bits1(gb);
             gain = cge ? get_vlc2(gb, vlc_scalefactors.table, 7, 3) - 60: 0;
             gain_cache = GET_GAIN(scale, gain);
+#if USE_FIXED
+            if ((abs(gain_cache)-1024) >> 3 > 30)
+                return AVERROR(ERANGE);
+#endif
         }
         if (coup->coupling_point == AFTER_IMDCT) {
             coup->gain[c][0] = gain_cache;
@@ -2220,6 +2224,10 @@ static int decode_cce(AACContext *ac, GetBitContext *gb, ChannelElement *che)
                                     t >>= 1;
                                 }
                                 gain_cache = GET_GAIN(scale, t) * s;
+#if USE_FIXED
+                                if ((abs(gain_cache)-1024) >> 3 > 30)
+                                    return AVERROR(ERANGE);
+#endif
                             }
                         }
                         coup->gain[c][idx] = gain_cache;
@@ -2393,7 +2401,7 @@ static int decode_extension_payload(AACContext *ac, GetBitContext *gb, int cnt,
  * @param   decode  1 if tool is used normally, 0 if tool is used in LTP.
  * @param   coef    spectral coefficients
  */
-static void apply_tns(INTFLOAT coef[1024], TemporalNoiseShaping *tns,
+static void apply_tns(INTFLOAT coef_param[1024], TemporalNoiseShaping *tns,
                       IndividualChannelStream *ics, int decode)
 {
     const int mmm = FFMIN(ics->tns_max_bands, ics->max_sfb);
@@ -2401,6 +2409,7 @@ static void apply_tns(INTFLOAT coef[1024], TemporalNoiseShaping *tns,
     int bottom, top, order, start, end, size, inc;
     INTFLOAT lpc[TNS_MAX_ORDER];
     INTFLOAT tmp[TNS_MAX_ORDER+1];
+    UINTFLOAT *coef = coef_param;
 
     for (w = 0; w < ics->num_windows; w++) {
         bottom = ics->num_swb;
@@ -2430,7 +2439,7 @@ static void apply_tns(INTFLOAT coef[1024], TemporalNoiseShaping *tns,
                 // ar filter
                 for (m = 0; m < size; m++, start += inc)
                     for (i = 1; i <= FFMIN(m, order); i++)
-                        coef[start] -= AAC_MUL26(coef[start - i * inc], lpc[i - 1]);
+                        coef[start] -= AAC_MUL26((INTFLOAT)coef[start - i * inc], lpc[i - 1]);
             } else {
                 // ma filter
                 for (m = 0; m < size; m++, start += inc) {
@@ -2668,7 +2677,7 @@ static void imdct_and_windowing_eld(AACContext *ac, SingleChannelElement *sce)
     }
 #if !USE_FIXED
     if (n == 480)
-        ac->mdct480->imdct_half(ac->mdct480, buf, in, 1, -1.f/(16*1024*960));
+        ac->mdct480->imdct_half(ac->mdct480, buf, in, 1);
     else
 #endif
         ac->mdct.imdct_half(&ac->mdct_ld, buf, in);
