@@ -88,6 +88,7 @@
 #include "Content.h"
 
 #include <SubRenderIntf.h>
+#include <LAVVideoSettings.h>
 
 #define DEFCLIENTW		292
 #define DEFCLIENTH		200
@@ -4049,8 +4050,8 @@ CString CMainFrame::UpdatePlayerStatus()
 			if (!m_bAudioOnly &&
 					(fs == State_Paused || fs == State_Running) &&
 					!(AfxGetAppSettings().bUseDarkTheme && m_wndToolBar.IsVisible()) &&
-					GetDXVAStatus()) {
-				msg.AppendFormat(L" [%s]", GetDXVAVersion());
+					DXVAState::GetState()) {
+				msg.AppendFormat(L" [%s]", DXVAState::GetShortDescription());
 			}
 		}
 	} else if (m_eMediaLoadState == MLS_CLOSING) {
@@ -4282,6 +4283,31 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		m_wndSeekBar.GetWindowRect(&rect);
 		if (rect.PtInRect(point)) {
 			m_wndSeekBar.PreviewWindowShow();
+		}
+	}
+
+	if (!DXVAState::GetState()) {
+		// Trying to find LAV Video is in the graph
+		if (CComQIPtr<ILAVVideoStatus> pLAVVideoStatus = FindFilter(GUID_LAVVideoDecoder, m_pGB)) {
+			const CString decoderName = pLAVVideoStatus->GetActiveDecoderName();
+			if (decoderName != L"avcodec") {
+				static LPCTSTR FriendlyDecoderNames[][2] = {
+					{L"d3d11 cb", L"LAV Video, D3D11 Copy-back"},
+					{L"d3d11 cb direct", L"LAV Video, D3D11 Copy-back (Direct)"},
+					{L"cuvid", L"LAV Video, NVIDIA CUVID"},
+					{L"quicksync", L"LAV Video, Intel QuickSync"},
+				};
+
+				CString FriendlyDecoderName = decoderName;
+				for (size_t i = 0; i < _countof(FriendlyDecoderNames); i++) {
+					if (FriendlyDecoderNames[i][0] == decoderName) {
+						FriendlyDecoderName = FriendlyDecoderNames[i][1];
+						break;
+					}
+				}
+
+				DXVAState::SetActiveState(GUID_NULL, FriendlyDecoderName);
+			}
 		}
 	}
 }
@@ -13341,7 +13367,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	m_PlaybackRate = 1.0;
 	m_iDefRotation = 0;
 
-	ClearDXVAState();
+	DXVAState::ClearState();
 
 	m_bWasPausedOnMinimizedVideo = false;
 

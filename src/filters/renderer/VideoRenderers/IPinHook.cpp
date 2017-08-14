@@ -43,9 +43,6 @@
 #define LOG_FILE_BITSTREAM  L"bitstream.log"
 #endif
 
-GUID g_guidDXVADecoder = GUID_NULL;
-BOOL g_nDXVAVersion    = FALSE;
-
 IPinCVtbl*         g_pPinCVtbl         = NULL;
 IMemInputPinCVtbl* g_pMemInputPinCVtbl = NULL;
 IPinC*             g_pPinC             = NULL;
@@ -54,30 +51,45 @@ REFERENCE_TIME g_tSegmentStart    = 0;
 FRAME_TYPE     g_nFrameType       = PICT_NONE;
 HANDLE         g_hNewSegmentEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
-static const LPCWSTR DXVAVersion[] = {
-	L"DXVA ",
-	L"DXVA2"
-};
+namespace DXVAState {
+	BOOL m_bDXVActive      = FALSE;
+	GUID m_guidDXVADecoder = GUID_NULL;
 
-const CString GetDXVADecoderDescription()
-{
-	return GetDXVAMode(&g_guidDXVADecoder);
-}
+	CString m_sDXVADecoderDescription      = L"Not using DXVA";
+	CString m_sDXVADecoderShortDescription = L"DXVA";
 
-const LPCTSTR GetDXVAVersion()
-{
-	return DXVAVersion[g_nDXVAVersion];
-}
+	void ClearState()
+	{
+		m_bDXVActive      = FALSE;
+		m_guidDXVADecoder = GUID_NULL;
 
-const BOOL GetDXVAStatus()
-{
-	return g_nDXVAVersion;
-}
+		m_sDXVADecoderDescription      = L"Not using DXVA";
+		m_sDXVADecoderShortDescription = L"DXVA";
+	}
 
-void ClearDXVAState()
-{
-	g_guidDXVADecoder = GUID_NULL;
-	g_nDXVAVersion    = FALSE;
+	void SetActiveState(const GUID& guidDXVADecoder, const CString& customDescription/* = L""*/)
+	{
+		m_bDXVActive = TRUE;
+		m_guidDXVADecoder = guidDXVADecoder;
+
+		m_sDXVADecoderDescription = !customDescription.IsEmpty() ? customDescription : GetDXVAMode(&m_guidDXVADecoder);
+		m_sDXVADecoderShortDescription = (m_guidDXVADecoder != GUID_NULL) ? L"DXVA2" : L"H/W";
+	}
+
+	const BOOL GetState()
+	{
+		return m_bDXVActive;
+	}
+
+	const CString GetDescription()
+	{
+		return m_sDXVADecoderDescription;
+	}
+
+	const CString GetShortDescription()
+	{
+		return m_sDXVADecoderShortDescription;
+	}
 }
 
 // DirectShow hooks
@@ -921,8 +933,7 @@ static HRESULT STDMETHODCALLTYPE CreateVideoDecoderMine(IDirectXVideoDecoderServ
 {
 	//	DebugBreak();
 	//	((DXVA2_VideoDesc*)pVideoDesc)->Format = (D3DFORMAT)0x3231564E;
-	g_guidDXVADecoder = Guid;
-	g_nDXVAVersion    = TRUE;
+	DXVAState::SetActiveState(Guid);
 
 #ifdef _DEBUG
 	LOG(L"\n\n");
@@ -933,8 +944,7 @@ static HRESULT STDMETHODCALLTYPE CreateVideoDecoderMine(IDirectXVideoDecoderServ
 	HRESULT hr = CreateVideoDecoderOrg(pThis, Guid, pVideoDesc, pConfig, ppDecoderRenderTargets, NumRenderTargets, ppDecode);
 
 	if (FAILED(hr)) {
-		g_guidDXVADecoder = GUID_NULL;
-		g_nDXVAVersion    = FALSE;
+		DXVAState::ClearState();
 	}
 #ifdef _DEBUG
 	else {
@@ -954,9 +964,9 @@ static HRESULT STDMETHODCALLTYPE CreateVideoDecoderMine(IDirectXVideoDecoderServ
 	}
 #endif
 
-	DLog(L"DXVA Decoder : %s", GetDXVADecoderDescription());
+	DLog(L"DXVA Decoder : %s", DXVAState::GetDescription());
 #ifdef _DEBUG
-	LOG(L"IDirectXVideoDecoderService::CreateVideoDecoder  %s  (%d render targets) hr = %08x", GetDXVAMode(&g_guidDXVADecoder), NumRenderTargets, hr);
+	LOG(L"IDirectXVideoDecoderService::CreateVideoDecoder  %s  (%d render targets) hr = %08x", DXVAState::GetDescription(), NumRenderTargets, hr);
 #endif
 	return hr;
 }
@@ -1018,8 +1028,7 @@ void HookDirectXVideoDecoderService(void* pIDirectXVideoDecoderService)
 #ifdef _DEBUG
 		GetDecoderConfigurationsOrg         = NULL;
 #endif
-		g_guidDXVADecoder                   = GUID_NULL;
-		g_nDXVAVersion                      = FALSE;
+		DXVAState::ClearState();
 	}
 
 #if defined(_DEBUG) && DXVA_LOGFILE_A
