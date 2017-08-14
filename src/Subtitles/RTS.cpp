@@ -35,6 +35,15 @@ static long revcolor(long c)
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
+void alpha_mask_deleter::operator()(CAlphaMask* ptr) const noexcept
+{
+	m_alphaMaskPool.emplace_front(std::move(*ptr));
+	std::default_delete<CAlphaMask>()(ptr);
+	if (m_alphaMaskPool.size() > 10) {
+		m_alphaMaskPool.pop_back();
+	}
+}
+
 // CMyFont
 
 CMyFont::CMyFont(STSStyle& style)
@@ -212,7 +221,12 @@ bool CWord::CreateOpaqueBox()
 			   (m_width + w + 4) / 8, (m_ascent + m_descent + h + 4) / 8,
 			   -(w + 4) / 8, (m_ascent + m_descent + h + 4) / 8);
 
-	m_pOpaqueBox = DNew CPolygon(style, str, 0, 0, 0, 1.0, 1.0, 0, m_renderingCaches);
+	try {
+		m_pOpaqueBox = DNew CPolygon(style, str, 0, 0, 0, 1.0, 1.0, 0, m_renderingCaches);
+	} catch (CMemoryException* e) {
+		e->Delete();
+		m_pOpaqueBox = NULL;
+	}
 
 	return !!m_pOpaqueBox;
 }
@@ -771,22 +785,30 @@ CClipper::CClipper(CStringW str, const CSize& size, double scalex, double scaley
 	, m_inverse(inverse)
 	, m_cpOffset(cpOffset)
 	, m_pAlphaMask(NULL)
+	, m_effectType(-1)
 {
-	if (m_size.cx <= 0 || m_size.cy <= 0 ) {
-		return;
+}
+
+CAlphaMaskSharedPtr CClipper::GetAlphaMask(const std::shared_ptr<CClipper>& clipper)
+{
+	if (m_pAlphaMask) {
+		return m_pAlphaMask;
 	}
 
-	const size_t alphaMaskSize = size_t(m_size.cx) * m_size.cy;
+	ASSERT(this == clipper.get());
+	if (m_size.cx <= 0 || m_size.cy <= 0) {
+		return NULL;
+	}
 
-	try {
-		m_pAlphaMask = DNew BYTE[alphaMaskSize];
-	} catch (std::bad_alloc) {
-		return;
+	CClipperKey key(clipper);
+	if (m_renderingCaches.alphaMaskCache.Lookup(key, m_pAlphaMask)) {
+		return m_pAlphaMask;
 	}
 
 	Paint(CPoint(0, 0), CPoint(0, 0));
+
 	if (!m_pOverlayData) { // m_pOverlayData parameter can be empty if the '\clip' tag is incorrectly used
-		return;
+		return NULL;
 	}
 
 	int w = m_pOverlayData->mOverlayWidth, h = m_pOverlayData->mOverlayHeight;
@@ -812,19 +834,31 @@ CClipper::CClipper(CStringW str, const CSize& size, double scalex, double scaley
 	}
 
 	if (w <= 0 || h <= 0) {
-		return;
+		return NULL;
 	}
 
-	memset(m_pAlphaMask, (m_inverse ? 0x40 : 0), alphaMaskSize);
+	const size_t alphaMaskSize = size_t(m_size.cx) * m_size.cy;
+
+	try {
+		m_pAlphaMask = CAlphaMask::Alloc(m_renderingCaches.alphaMaskPool, alphaMaskSize);
+	} catch (CMemoryException* e) {
+		e->Delete();
+		m_pAlphaMask = NULL;
+		return NULL;
+	}
+
+	BYTE* pAlphaMask = m_pAlphaMask->get();
 
 	const BYTE* src = m_pOverlayData->mpOverlayBufferBody + m_pOverlayData->mOverlayPitch * yo + xo;
-	BYTE* dst = m_pAlphaMask + m_size.cx * y + x;
+	BYTE* dst = pAlphaMask + m_size.cx * y + x;
 
+	memset(pAlphaMask, (m_inverse ? 0x40 : 0), m_size.cx * y + x);
 	if (m_inverse) {
 		for (ptrdiff_t i = 0; i < h; ++i) {
 			for (ptrdiff_t wt = 0; wt < w; ++wt) {
 				dst[wt] = 0x40 - src[wt];
 			}
+			memset(dst + w, 0x40, m_size.cx - w);
 
 			src += m_pOverlayData->mOverlayPitch;
 			dst += m_size.cx;
@@ -832,15 +866,94 @@ CClipper::CClipper(CStringW str, const CSize& size, double scalex, double scaley
 	} else {
 		for (ptrdiff_t i = 0; i < h; ++i) {
 			memcpy(dst, src, w * sizeof(BYTE));
+			memset(dst + w, 0, m_size.cx - w);
 			src += m_pOverlayData->mOverlayPitch;
 			dst += m_size.cx;
 		}
 	}
-}
+	memset(dst, (m_inverse ? 0x40 : 0), alphaMaskSize - (dst - pAlphaMask));
 
-CClipper::~CClipper()
-{
-	SAFE_DELETE_ARRAY(m_pAlphaMask);
+	if (m_effectType == EF_SCROLL) {
+		int height = m_effect.param[4];
+		int spd_w = m_size.cx, spd_h = m_size.cy;
+		int da = (64 << 8) / height;
+		int a = 0;
+		int k = m_effect.param[0] >> 3;
+		int l = k + height;
+		if (k < 0) {
+			a += -k * da;
+			k = 0;
+		}
+		if (l > spd_h) {
+			l = spd_h;
+		}
+
+		if (k < spd_h) {
+			BYTE* am = &pAlphaMask[k * spd_w];
+
+			ZeroMemory(pAlphaMask, am - pAlphaMask);
+
+			for (ptrdiff_t j = k; j < l; j++, a += da) {
+				for (ptrdiff_t i = 0; i < spd_w; i++, am++) {
+					*am = BYTE(((*am) * a) >> 14);
+				}
+			}
+		}
+
+		da = -(64 << 8) / height;
+		a = 0x40 << 8;
+		l = m_effect.param[1] >> 3;
+		k = l - height;
+		if (k < 0) {
+			a += -k * da;
+			k = 0;
+		}
+		if (l > spd_h) {
+			l = spd_h;
+		}
+
+		if (k < spd_h) {
+			BYTE* am = &pAlphaMask[k * spd_w];
+
+			int j = k;
+			for (; j < l; j++, a += da) {
+				for (ptrdiff_t i = 0; i < spd_w; i++, am++) {
+					*am = BYTE(((*am) * a) >> 14);
+				}
+			}
+
+			ZeroMemory(am, (spd_h - j)*spd_w);
+		}
+	} else if (m_effectType == EF_BANNER)  {
+		int width = m_effect.param[2];
+		int spd_w = m_size.cx, spd_h = m_size.cy;
+		int da = (64 << 8) / width;
+		BYTE* am = pAlphaMask;
+
+		for (ptrdiff_t j = 0; j < spd_h; j++, am += spd_w) {
+			int a = 0;
+			int k = min(width, spd_w);
+
+			for (ptrdiff_t i = 0; i < k; i++, a += da) {
+				am[i] = BYTE((am[i] * a) >> 14);
+			}
+
+			a = 0x40 << 8;
+			k = spd_w - width;
+
+			if (k < 0) {
+				a -= -k * da;
+				k = 0;
+			}
+
+			for (ptrdiff_t i = k; i < spd_w; i++, a -= da) {
+				am[i] = BYTE((am[i] * a) >> 14);
+			}
+		}
+
+	}
+	m_renderingCaches.alphaMaskCache.SetAt(key, m_pAlphaMask);
+	return m_pAlphaMask;
 }
 
 CWord* CClipper::Copy()
@@ -981,7 +1094,7 @@ CRect CLine::PaintOutline(SubPicDesc& spd, CRect& clipRect, BYTE* pAlphaMask, CP
 			return bbox;	// should not happen since this class is just a line of text without any breaks
 		}
 
-		if (w->m_style.outlineWidthX + w->m_style.outlineWidthY > 0 && !(w->m_ktype == 2 && time < w->m_kstart)) {
+		if ((w->m_style.outlineWidthX + w->m_style.outlineWidthY > 0 || w->m_style.borderStyle == 1) && !(w->m_ktype == 2 && time < w->m_kstart)) {
 			int x = p.x;
 			int y = p.y + m_ascent - w->m_ascent;
 			DWORD aoutline = w->m_style.alpha[2];
@@ -1122,7 +1235,7 @@ void CSubtitle::Empty()
 
 	EmptyEffects();
 
-	SAFE_DELETE(m_pClipper);
+	m_pClipper.reset();
 }
 
 void CSubtitle::EmptyEffects()
@@ -1200,7 +1313,8 @@ CLine* CSubtitle::GetNextLine(POSITION& pos, int maxwidth)
 	CLine* ret;
 	try {
 		ret = DNew CLine();
-	} catch (std::bad_alloc) {
+	} catch (CMemoryException* e) {
+		e->Delete();
 		return NULL;
 	}
 
@@ -1285,107 +1399,30 @@ void CSubtitle::CreateClippers(CSize size)
 	size.cx >>= 3;
 	size.cy >>= 3;
 
+	auto createClipper = [this](const CSize & size) {
+		ASSERT(!m_pClipper);
+		CStringW str;
+		str.Format(L"m %d %d l %d %d %d %d %d %d", 0, 0, size.cx, 0, size.cx, size.cy, 0, size.cy);
+
+		try {
+			m_pClipper = std::make_shared<CClipper>(str, size, 1.0, 1.0, false, CPoint(0, 0), m_renderingCaches);
+		} catch (CMemoryException* e) {
+			e->Delete();
+		}
+
+		return !!m_pClipper;
+	};
+
 	if (m_effects[EF_BANNER] && m_effects[EF_BANNER]->param[2]) {
-		int width = m_effects[EF_BANNER]->param[2];
-
-		int w = size.cx, h = size.cy;
-
-		if (!m_pClipper) {
-			CStringW str;
-			str.Format(L"m %d %d l %d %d %d %d %d %d", 0, 0, w, 0, w, h, 0, h);
-			try {
-				m_pClipper = DNew CClipper(str, size, 1, 1, false, CPoint(0, 0), m_renderingCaches);
-			} catch (std::bad_alloc) {
-				return;
-			}
+		if (!m_pClipper && !createClipper(size)) {
+			return;
 		}
-
-		int da = (64<<8)/width;
-		BYTE* am = m_pClipper->m_pAlphaMask;
-
-		for (ptrdiff_t j = 0; j < h; j++, am += w) {
-			int a = 0;
-			int k = min(width, w);
-
-			for (ptrdiff_t i = 0; i < k; i++, a += da) {
-				am[i] = (am[i]*a)>>14;
-			}
-
-			a = 0x40<<8;
-			k = w-width;
-
-			if (k < 0) {
-				a -= -k*da;
-				k = 0;
-			}
-
-			for (ptrdiff_t i = k; i < w; i++, a -= da) {
-				am[i] = (am[i]*a)>>14;
-			}
-		}
+		m_pClipper->SetEffect(*m_effects[EF_BANNER], EF_BANNER);
 	} else if (m_effects[EF_SCROLL] && m_effects[EF_SCROLL]->param[4]) {
-		int height = m_effects[EF_SCROLL]->param[4];
-
-		int w = size.cx, h = size.cy;
-
-		if (!m_pClipper) {
-			CStringW str;
-			str.Format(L"m %d %d l %d %d %d %d %d %d", 0, 0, w, 0, w, h, 0, h);
-			try {
-				m_pClipper = DNew CClipper(str, size, 1, 1, false, CPoint(0, 0), m_renderingCaches);
-			} catch (std::bad_alloc) {
-				return;
-			}
+		if (!m_pClipper && !createClipper(size)) {
+			return;
 		}
-
-		int da = (64<<8)/height;
-		int a = 0;
-		int k = m_effects[EF_SCROLL]->param[0]>>3;
-		int l = k+height;
-		if (k < 0) {
-			a += -k*da;
-			k = 0;
-		}
-		if (l > h) {
-			l = h;
-		}
-
-		if (k < h) {
-			BYTE* am = &m_pClipper->m_pAlphaMask[k*w];
-
-			ZeroMemory(m_pClipper->m_pAlphaMask, am - m_pClipper->m_pAlphaMask);
-
-			for (ptrdiff_t j = k; j < l; j++, a += da) {
-				for (ptrdiff_t i = 0; i < w; i++, am++) {
-					*am = BYTE(((*am) * a) >> 14);
-				}
-			}
-		}
-
-		da = -(64<<8)/height;
-		a = 0x40<<8;
-		l = m_effects[EF_SCROLL]->param[1]>>3;
-		k = l-height;
-		if (k < 0) {
-			a += -k*da;
-			k = 0;
-		}
-		if (l > h) {
-			l = h;
-		}
-
-		if (k < h) {
-			BYTE* am = &m_pClipper->m_pAlphaMask[k*w];
-
-			int j = k;
-			for (; j < l; j++, a += da) {
-				for (ptrdiff_t i = 0; i < w; i++, am++) {
-					*am = BYTE(((*am) * a) >> 14);
-				}
-			}
-
-			ZeroMemory(am, (h - j)*w);
-		}
+		m_pClipper->SetEffect(*m_effects[EF_SCROLL], EF_SCROLL);
 	}
 }
 
@@ -1702,7 +1739,8 @@ void CRenderedTextSubtitle::ParseEffect(CSubtitle* sub, CString str)
 		Effect* e;
 		try {
 			e = DNew Effect;
-		} catch (std::bad_alloc) {
+		} catch (CMemoryException* e) {
+			e->Delete();
 			return;
 		}
 
@@ -1729,7 +1767,8 @@ void CRenderedTextSubtitle::ParseEffect(CSubtitle* sub, CString str)
 		Effect* e;
 		try {
 			e = DNew Effect;
-		} catch (std::bad_alloc) {
+		} catch (CMemoryException* e) {
+			e->Delete();
 			return;
 		}
 
@@ -1815,7 +1854,7 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
 			;
 		}
 		CStringW cmd = str.Mid(jOld, j - jOld);
-		cmd.Trim();
+		FastTrim(cmd);
 		if (cmd.IsEmpty()) {
 			continue;
 		}
@@ -1849,7 +1888,7 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
 				}
 			}
 			CStringW param = str.Mid(jOld, j - jOld);
-			param.Trim();
+			FastTrim(param);
 
 			while (!param.IsEmpty()) {
 				int k = param.Find(L','), l = param.Find(L'\\');
@@ -1861,7 +1900,7 @@ bool CRenderedTextSubtitle::ParseSSATag(SSATagsList& tagsList, const CStringW& s
 					}
 					param = k + 1 < param.GetLength() ? param.Mid(k + 1) : L"";
 				} else {
-					param.Trim();
+					FastTrim(param);
 					if (!param.IsEmpty()) {
 						tag.params.Add(param);
 					}
@@ -2145,18 +2184,18 @@ bool CRenderedTextSubtitle::CreateSubFromSSATag(CSubtitle* sub, const SSATagsLis
 				size_t nParamsInt = tag.paramsInt.GetCount();
 
 				if (nParams == 1 && nParamsInt == 0 && !sub->m_pClipper) {
-					sub->m_pClipper = DNew CClipper(tag.params[0], CSize(m_size.cx >> 3, m_size.cy >> 3), sub->m_scalex, sub->m_scaley,
-														 invert, (sub->m_relativeTo == 1) ? CPoint(m_vidrect.left, m_vidrect.top) : CPoint(0, 0),
-														 m_renderingCaches);
+					sub->m_pClipper = std::make_shared<CClipper>(tag.params[0], CSize(m_size.cx >> 3, m_size.cy >> 3), sub->m_scalex, sub->m_scaley,
+																 invert, (sub->m_relativeTo == 1) ? CPoint(m_vidrect.left, m_vidrect.top) : CPoint(0, 0),
+																 m_renderingCaches);
 				} else if (nParams == 1 && nParamsInt == 1 && !sub->m_pClipper) {
 					long scale = tag.paramsInt[0];
 					if (scale < 1) {
 						scale = 1;
 					}
-					sub->m_pClipper = DNew CClipper(tag.params[0], CSize(m_size.cx >> 3, m_size.cy >> 3),
-														 sub->m_scalex / (1 << (scale - 1)), sub->m_scaley / (1 << (scale - 1)), invert,
-														 (sub->m_relativeTo == 1) ? CPoint(m_vidrect.left, m_vidrect.top) : CPoint(0, 0),
-														 m_renderingCaches);
+					sub->m_pClipper = std::make_shared<CClipper>(tag.params[0], CSize(m_size.cx >> 3, m_size.cy >> 3),
+																 sub->m_scalex / (1 << (scale - 1)), sub->m_scaley / (1 << (scale - 1)), invert,
+																 (sub->m_relativeTo == 1) ? CPoint(m_vidrect.left, m_vidrect.top) : CPoint(0, 0),
+																 m_renderingCaches);
 				} else if (nParamsInt == 4) {
 					sub->m_clipInverse = invert;
 
@@ -2619,7 +2658,8 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 
 	try {
 		sub = DNew CSubtitle(m_renderingCaches);
-	} catch (std::bad_alloc) {
+	} catch (CMemoryException* e) {
+		e->Delete();
 		return NULL;
 	}
 
@@ -2763,7 +2803,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 		sub->m_fAnimated = false;
 		sub->m_bIsAnimated = false;
 		sub->EmptyEffects();
-		SAFE_DELETE(sub->m_pClipper);
+		sub->m_pClipper.reset();
 	}
 
 	// just a "work-around" solution... in most cases nobody will want to use \org together with moving but without rotating the subs
@@ -3032,7 +3072,8 @@ STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 
 		CPoint org2;
 
-		BYTE* pAlphaMask = s->m_pClipper ? s->m_pClipper->m_pAlphaMask : NULL;
+		CAlphaMaskSharedPtr ptrAlphaMask = s->m_pClipper ? s->m_pClipper->GetAlphaMask(s->m_pClipper) : NULL;
+		BYTE* pAlphaMask = ptrAlphaMask ? ptrAlphaMask->get() : NULL;
 
 		for (int k = 0; k < EF_NUMBEROFEFFECTS; k++) {
 			if (!s->m_effects[k]) {

@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2014 see Authors.txt
+ * (C) 2013-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,9 +36,9 @@ CTextDimsKey::CTextDimsKey(const CStringW& str, const STSStyle& style)
 }
 
 CTextDimsKey::CTextDimsKey(const CTextDimsKey& textDimsKey)
-	: m_str(textDimsKey.m_str)
+	: m_hash(textDimsKey.m_hash)
+	, m_str(textDimsKey.m_str)
 	, m_style(DNew STSStyle(*textDimsKey.m_style))
-	, m_hash(textDimsKey.m_hash)
 {
 }
 
@@ -85,10 +85,10 @@ CPolygonPathKey::CPolygonPathKey(const CStringW& str, double scalex, double scal
 }
 
 CPolygonPathKey::CPolygonPathKey(const CPolygonPathKey& polygonPathKey)
-	: m_str(polygonPathKey.m_str)
+	: m_hash(polygonPathKey.m_hash)
+	, m_str(polygonPathKey.m_str)
 	, m_scalex(polygonPathKey.m_scalex)
 	, m_scaley(polygonPathKey.m_scaley)
-	, m_hash(polygonPathKey.m_hash)
 {
 }
 
@@ -119,10 +119,10 @@ COutlineKey::COutlineKey(const CWord* word, CPoint org)
 
 COutlineKey::COutlineKey(const COutlineKey& outLineKey)
 	: CTextDimsKey(outLineKey.m_str, *outLineKey.m_style)
+	, m_hash(outLineKey.m_hash)
 	, m_scalex(outLineKey.m_scalex)
 	, m_scaley(outLineKey.m_scaley)
 	, m_org(outLineKey.m_org)
-	, m_hash(outLineKey.m_hash)
 {
 }
 
@@ -131,9 +131,9 @@ void COutlineKey::UpdateHash()
 	// CreatePath
 	m_hash = __super::GetHash();
 	m_hash += m_hash << 5;
-	m_hash += int(m_scalex);
+	m_hash += int(m_scalex * 1e6);
 	m_hash += m_hash << 5;
-	m_hash += int(m_scaley);
+	m_hash += int(m_scaley * 1e6);
 	m_hash += m_hash << 5;
 	// Transform
 	m_hash += int(m_style->fontScaleX);
@@ -211,4 +211,26 @@ bool COverlayKey::operator==(const COverlayKey& overlayKey) const
 		   && m_subp == overlayKey.m_subp
 		   && m_style->fBlur == overlayKey.m_style->fBlur
 		   && NEARLY_EQ(m_style->fGaussianBlur, overlayKey.m_style->fGaussianBlur, 1e-6);
+}
+
+CClipperKey::CClipperKey(const std::shared_ptr<CClipper>& clipper)
+	: m_clipper(clipper)
+{
+	UpdateHash();
+}
+
+void CClipperKey::UpdateHash()
+{
+	m_hash = m_clipper->Hash();
+}
+
+bool CClipperKey::operator==(const CClipperKey& clipperKey) const
+{
+	if (m_clipper == clipperKey.m_clipper) {
+		return true;
+	}
+	if (m_clipper && clipperKey.m_clipper) {
+		return *m_clipper == *clipperKey.m_clipper;
+	}
+	return false;
 }
