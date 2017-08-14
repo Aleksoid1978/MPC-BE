@@ -44,7 +44,7 @@ BEGIN DIALOGEX IDD_CAPTURE_DLG LINES 41
 END
 
 BEGIN DIALOGEX IDD_CMD_LINE_HELP LINES 9
-3		"Command line help"
+3		"Komut Satırı Anahtarları"
 8		"OK"
 END
 
