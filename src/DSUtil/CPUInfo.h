@@ -48,4 +48,5 @@ namespace CPUInfo {
 
 	const bool HaveSSE2();
 	const bool HaveSSE4();
+	const bool HaveAVX2();
 } // namespace CPUInfo

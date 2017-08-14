@@ -104,6 +104,7 @@ static int GetCPUFeatures()
 static const int  nCPUFeatures = GetCPUFeatures();
 static const bool bSSE2        = !!(nCPUFeatures & CPUInfo::CPU_SSE2);
 static const bool bSSE4        = !!(nCPUFeatures & CPUInfo::CPU_SSE4);
+static const bool bAVX2        = !!(nCPUFeatures & CPUInfo::CPU_AVX2);
 
 static DWORD GetProcessorNumber()
 {
@@ -121,4 +122,5 @@ namespace CPUInfo {
 
 	const bool HaveSSE2()            { return bSSE2; }
 	const bool HaveSSE4()            { return bSSE4; }
+	const bool HaveAVX2()            { return bAVX2; }
 } // namespace CPUInfo
