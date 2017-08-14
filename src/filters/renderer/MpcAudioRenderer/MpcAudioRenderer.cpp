@@ -1447,27 +1447,36 @@ HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 
 HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL*/)
 {
-	HRESULT hr = S_OK;
 	CAutoLock cAutoLock(&m_csCheck);
 	DLog(L"CMpcAudioRenderer::CheckAudioClient()");
+
+	HRESULT hr = S_OK;
+	BOOL bForceUseDefaultDevice = FALSE;
+
+again:
 	if (m_pMMDevice == NULL) {
-		hr = GetAudioDevice();
+		hr = GetAudioDevice(bForceUseDefaultDevice);
 		if (FAILED(hr)) {
 			return hr;
 		}
 	}
 
-	// If no WAVEFORMATEX structure provided and client already exists, return it
-	if (m_pAudioClient != NULL && pWaveFormatEx == NULL) {
-		return hr;
-	}
+	if (pWaveFormatEx == NULL) {
+		// If no WAVEFORMATEX structure provided and client already exists, return it
+		if (m_pAudioClient) {
+			return hr;
+		}
 
-	// Just create the audio client if no WAVEFORMATEX provided
-	if (m_pAudioClient == NULL && pWaveFormatEx == NULL) {
+		// Just create the audio client if no WAVEFORMATEX provided
 		if (SUCCEEDED(hr)) {
 			hr = CreateAudioClient();
 		}
+
 		return hr;
+	}
+
+	if (m_pAudioClient == NULL) {
+		hr = CreateAudioClient();
 	}
 
 	BOOL bInitNeed = TRUE;
@@ -1599,6 +1608,17 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL
 	if (SUCCEEDED(hr) && bInitNeed) {
 		SAFE_RELEASE(m_pRenderClient);
 		hr = InitAudioClient(m_pWaveFormatExOutput);
+
+		if (hr == AUDCLNT_E_DEVICE_IN_USE && !m_bUseDefaultDevice) {
+			SAFE_RELEASE(m_pRenderClient);
+			SAFE_RELEASE(m_pAudioClient);
+			SAFE_RELEASE(m_pMMDevice);
+
+			SAFE_DELETE_ARRAY(m_pWaveFormatExOutput);
+
+			bForceUseDefaultDevice = TRUE;
+			goto again;
+		}
 	}
 
 	if (SUCCEEDED(hr)) {
@@ -1653,7 +1673,7 @@ HRESULT CMpcAudioRenderer::CheckAudioClient(WAVEFORMATEX *pWaveFormatEx/* = NULL
 	return hr;
 }
 
-HRESULT CMpcAudioRenderer::GetAudioDevice()
+HRESULT CMpcAudioRenderer::GetAudioDevice(const BOOL bForceUseDefaultDevice)
 {
 	DLog(L"CMpcAudioRenderer::GetAudioDevice() - Target end point device Id: '%s'", m_DeviceId);
 
@@ -1667,7 +1687,7 @@ HRESULT CMpcAudioRenderer::GetAudioDevice()
 		return hr;
 	}
 
-	if (!m_DeviceId.IsEmpty()) {
+	if (!bForceUseDefaultDevice && !m_DeviceId.IsEmpty()) {
 		CComPtr<IMMDeviceCollection> devices;
 		hr = enumerator->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, &devices);
 		if (hr != S_OK) {
