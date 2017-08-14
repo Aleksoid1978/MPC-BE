@@ -1217,14 +1217,16 @@ void CFLVSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 	__int64 estimPos = 0;
 
-	if (m_sps.GetCount() > 1) {
-		int i    = range_bsearch(m_sps, rt);
-		estimPos = i >= 0 ? m_sps[i].fp : 0;
+	if (m_sps.GetCount() > 1 && rt <= m_sps[m_sps.GetCount() - 1].rt) {
+		const int i = range_bsearch(m_sps, rt);
+		if (i >= 0) {
+			estimPos = m_sps[i].fp - 4;
+			m_pFile->Seek(estimPos);
+			return;
+		}
 	}
 
-	if (!estimPos) {
-		estimPos = m_DataOffset + (__int64)(double(m_pFile->GetLength() - m_DataOffset) * rt / m_rtDuration);
-	}
+	estimPos = m_DataOffset + (__int64)(double(m_pFile->GetLength() - m_DataOffset) * rt / m_rtDuration);
 
 	if (estimPos > m_pFile->GetAvailable()) {
 		return;
