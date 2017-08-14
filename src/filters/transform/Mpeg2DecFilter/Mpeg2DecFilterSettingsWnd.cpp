@@ -112,8 +112,8 @@ bool CMpeg2DecSettingsWnd::OnActivate()
 		static const WCHAR* labels[] = {m_strBrightness, m_strContrast, m_strHue, m_strSaturation};
 		for (int i = 0; i < _countof(m_procamp_slider); i++) {
 			m_procamp_static[i].Create(labels[i], WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(80), m_fontheight)), this);
-			m_procamp_slider[i].Create(dwStyle, CRect(p + CPoint(ScaleX(85), 0), CSize(201, h)), this, IDC_PP_SLIDER1 + i);
-			m_procamp_value[i].Create(L"", WS_VISIBLE | WS_CHILD, CRect(p + CPoint(ScaleX(85) + 201, 0), CSize(ScaleX(30), m_fontheight)), this);
+			m_procamp_slider[i].Create(dwStyle, CRect(p + CPoint(ScaleX(85), 0), CSize(ScaleX(201), h)), this, IDC_PP_SLIDER1 + i);
+			m_procamp_value[i].Create(L"", WS_VISIBLE | WS_CHILD, CRect(p + CPoint(ScaleX(85 + 201), 0), CSize(ScaleX(30), m_fontheight)), this);
 			p.y += h;
 		}
 		m_procamp_slider[0].SetRange(0, 2*128);
@@ -130,8 +130,8 @@ bool CMpeg2DecSettingsWnd::OnActivate()
 		m_procamp_slider[3].SetPos((int)(100*m_procamp[3] + 0.5f));
 		p.y += 5;
 
-		m_procamp_tv2pc.Create(L"TV->PC", dwStyle, CRect(p + CPoint(ScaleX(85) + 200 / 2 - 80 -5, 0), CSize(80, m_fontheight + 6)), this, IDC_PP_BUTTON1);
-		m_procamp_reset.Create(ResStr(IDS_MPEG2_RESET), dwStyle, CRect(p + CPoint(ScaleX(85) + 200 / 2 + 6, 0), CSize(80, m_fontheight + 6)), this, IDC_PP_BUTTON2);
+		m_procamp_tv2pc.Create(L"TV->PC", dwStyle, CRect(p + CPoint(ScaleX(85 + 200 / 2 - 80 -5), 0), CSize(ScaleX(80), m_fontheight + 6)), this, IDC_PP_BUTTON1);
+		m_procamp_reset.Create(ResStr(IDS_MPEG2_RESET), dwStyle, CRect(p + CPoint(ScaleX(85 + 200 / 2 + 6), 0), CSize(ScaleX(80), m_fontheight + 6)), this, IDC_PP_BUTTON2);
 		p.y += h25;
 
 		UpdateProcampValues();
