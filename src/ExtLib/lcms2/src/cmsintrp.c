@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2016 Marti Maria Saguer
+//  Copyright (c) 1998-2017 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -28,6 +28,13 @@
 
 // This module incorporates several interpolation routines, for 1 to 8 channels on input and
 // up to 65535 channels on output. The user may change those by using the interpolation plug-in
+
+// Some people may want to compile as C++ with all warnings on, in this case make compiler silent
+#ifdef _MSC_VER
+#    if (_MSC_VER >= 1400)
+#       pragma warning( disable : 4365 )
+#    endif
+#endif
 
 // Interpolation routines by default
 static cmsInterpFunction DefaultInterpolatorsFactory(cmsUInt32Number nInputChannels, cmsUInt32Number nOutputChannels, cmsUInt32Number dwFlags);
@@ -102,12 +109,12 @@ cmsBool _cmsSetInterpolationRoutine(cmsContext ContextID, cmsInterpParams* p)
 // This function precalculates as many parameters as possible to speed up the interpolation.
 cmsInterpParams* _cmsComputeInterpParamsEx(cmsContext ContextID,
                                            const cmsUInt32Number nSamples[],
-                                           int InputChan, int OutputChan,
+                                           cmsUInt32Number InputChan, cmsUInt32Number OutputChan,
                                            const void *Table,
                                            cmsUInt32Number dwFlags)
 {
     cmsInterpParams* p;
-    int i;
+    cmsUInt32Number i;
 
     // Check for maximum inputs
     if (InputChan > MAX_INPUT_DIMENSIONS) {
@@ -151,7 +158,8 @@ cmsInterpParams* _cmsComputeInterpParamsEx(cmsContext ContextID,
 
 
 // This one is a wrapper on the anterior, but assuming all directions have same number of nodes
-cmsInterpParams* _cmsComputeInterpParams(cmsContext ContextID, int nSamples, int InputChan, int OutputChan, const void* Table, cmsUInt32Number dwFlags)
+cmsInterpParams* _cmsComputeInterpParams(cmsContext ContextID, cmsUInt32Number nSamples, 
+                                         cmsUInt32Number InputChan, cmsUInt32Number OutputChan, const void* Table, cmsUInt32Number dwFlags)
 {
     int i;
     cmsUInt32Number Samples[MAX_INPUT_DIMENSIONS];

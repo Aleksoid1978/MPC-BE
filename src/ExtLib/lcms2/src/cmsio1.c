@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2016 Marti Maria Saguer
+//  Copyright (c) 1998-2017 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -306,8 +306,8 @@ Error:
 
 // Read and create a BRAND NEW MPE LUT from a given profile. All stuff dependent of version, etc
 // is adjusted here in order to create a LUT that takes care of all those details.
-// We add intent = -1 as a way to read matrix shaper always, no matter of other LUT
-cmsPipeline* _cmsReadInputLUT(cmsHPROFILE hProfile, int Intent)
+// We add intent = 0xffffffff as a way to read matrix shaper always, no matter of other LUT
+cmsPipeline* _cmsReadInputLUT(cmsHPROFILE hProfile, cmsUInt32Number Intent)
 {
     cmsTagTypeSignature OriginalType;
     cmsTagSignature tag16;
@@ -337,8 +337,8 @@ cmsPipeline* _cmsReadInputLUT(cmsHPROFILE hProfile, int Intent)
     }
 
     // This is an attempt to reuse this function to retrieve the matrix-shaper as pipeline no
-    // matter other LUT are present and have precedence. Intent = -1 means just this.
-    if (Intent >= INTENT_PERCEPTUAL && Intent <= INTENT_ABSOLUTE_COLORIMETRIC) {
+    // matter other LUT are present and have precedence. Intent = 0xffffffff can be used for that.
+    if (Intent <= INTENT_ABSOLUTE_COLORIMETRIC) {
 
         tag16 = Device2PCS16[Intent];
         tagFloat = Device2PCSFloat[Intent];
@@ -582,7 +582,7 @@ Error:
 }
 
 // Create an output MPE LUT from agiven profile. Version mismatches are handled here
-cmsPipeline* _cmsReadOutputLUT(cmsHPROFILE hProfile, int Intent)
+cmsPipeline* _cmsReadOutputLUT(cmsHPROFILE hProfile, cmsUInt32Number Intent)
 {
     cmsTagTypeSignature OriginalType;
     cmsTagSignature tag16;
@@ -590,7 +590,7 @@ cmsPipeline* _cmsReadOutputLUT(cmsHPROFILE hProfile, int Intent)
     cmsContext ContextID  = cmsGetProfileContextID(hProfile);
 
 
-    if (Intent >= INTENT_PERCEPTUAL && Intent <= INTENT_ABSOLUTE_COLORIMETRIC) {
+    if (Intent <= INTENT_ABSOLUTE_COLORIMETRIC) {
 
         tag16 = PCS2Device16[Intent];
         tagFloat = PCS2DeviceFloat[Intent];
@@ -705,7 +705,7 @@ Error:
 
 // This one includes abstract profiles as well. Matrix-shaper cannot be obtained on that device class. The
 // tag name here may default to AToB0
-cmsPipeline* _cmsReadDevicelinkLUT(cmsHPROFILE hProfile, int Intent)
+cmsPipeline* _cmsReadDevicelinkLUT(cmsHPROFILE hProfile, cmsUInt32Number Intent)
 {
     cmsPipeline* Lut;
     cmsTagTypeSignature OriginalType;
@@ -714,7 +714,7 @@ cmsPipeline* _cmsReadDevicelinkLUT(cmsHPROFILE hProfile, int Intent)
     cmsContext ContextID = cmsGetProfileContextID(hProfile);
 
 
-    if (Intent < INTENT_PERCEPTUAL || Intent > INTENT_ABSOLUTE_COLORIMETRIC)
+    if (Intent > INTENT_ABSOLUTE_COLORIMETRIC)
         return NULL;
 
     tag16 = Device2PCS16[Intent];

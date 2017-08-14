@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2016 Marti Maria Saguer
+//  Copyright (c) 1998-2017 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -2233,10 +2233,10 @@ void CookPointers(cmsIT8* it8)
 // that should be something like some printable characters plus a \n
 // returns 0 if this is not like a CGATS, or an integer otherwise. This integer is the number of words in first line?
 static
-int IsMyBlock(const cmsUInt8Number* Buffer, int n)
+int IsMyBlock(const cmsUInt8Number* Buffer, cmsUInt32Number n)
 {
     int words = 1, space = 0, quot = 0;
-    int i;
+    cmsUInt32Number i;
 
     if (n < 10) return 0;   // Too small
 
@@ -2724,7 +2724,7 @@ int CMSEXPORT cmsIT8SetTableByLabel(cmsHANDLE hIT8, const char* cSet, const char
 {
     const char* cLabelFld;
     char Type[256], Label[256];
-    int nTable;
+    cmsUInt32Number nTable;
 
     _cmsAssert(hIT8 != NULL);
 
@@ -2737,7 +2737,7 @@ int CMSEXPORT cmsIT8SetTableByLabel(cmsHANDLE hIT8, const char* cSet, const char
     cLabelFld = cmsIT8GetData(hIT8, cSet, cField);
     if (!cLabelFld) return -1;
 
-    if (sscanf(cLabelFld, "%255s %d %255s", Label, &nTable, Type) != 3)
+    if (sscanf(cLabelFld, "%255s %u %255s", Label, &nTable, Type) != 3)
             return -1;
 
     if (ExpectedType != NULL && *ExpectedType == 0)
