@@ -2856,16 +2856,11 @@ void CRenderedTextSubtitle::SetName(const CString name)
 
 struct LSub {
 	int idx, layer, readorder;
-};
 
-static int lscomp(const void* ls1, const void* ls2)
-{
-	int ret = ((LSub*)ls1)->layer - ((LSub*)ls2)->layer;
-	if (!ret) {
-		ret = ((LSub*)ls1)->readorder - ((LSub*)ls2)->readorder;
+	bool operator <(const LSub& rhs) const {
+		return (layer == rhs.layer) ? readorder < rhs.readorder : layer < rhs.layer;
 	}
-	return ret;
-}
+};
 
 const bool CRenderedTextSubtitle::GetText(const REFERENCE_TIME rt, const double fps, CString& text)
 {
@@ -2882,14 +2877,12 @@ const bool CRenderedTextSubtitle::GetText(const REFERENCE_TIME rt, const double 
 
 	CAtlArray<LSub> subs;
 	for (size_t i = 0, j = stss->subs.GetCount(); i < j; i++) {
-		LSub ls;
-		ls.idx = stss->subs[i];
-		ls.layer = GetAt(stss->subs[i]).layer;
-		ls.readorder = GetAt(stss->subs[i]).readorder;
-		subs.Add(ls);
+		const auto idx = stss->subs[i];
+		const auto& sts_entry = GetAt(idx);
+		subs.Add({ idx, sts_entry.layer, sts_entry.readorder });
 	}
 
-	qsort(subs.GetData(), subs.GetCount(), sizeof(LSub), lscomp);
+	std::sort(subs.GetData(), subs.GetData() + subs.GetCount());
 
 	for (size_t i = 0, j = subs.GetCount(); i < j; i++) {
 		const int entry = subs[i].idx;
@@ -3034,15 +3027,13 @@ STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 
 	CAtlArray<LSub> subs;
 
-	for (ptrdiff_t i = 0, j = stss->subs.GetCount(); i < j; i++) {
-		LSub ls;
-		ls.idx = stss->subs[i];
-		ls.layer = GetAt(stss->subs[i]).layer;
-		ls.readorder = GetAt(stss->subs[i]).readorder;
-		subs.Add(ls);
+	for (size_t i = 0, j = stss->subs.GetCount(); i < j; i++) {
+		const auto idx = stss->subs[i];
+		const auto& sts_entry = GetAt(idx);
+		subs.Add({ idx, sts_entry.layer, sts_entry.readorder });
 	}
 
-	qsort(subs.GetData(), subs.GetCount(), sizeof(LSub), lscomp);
+	std::sort(subs.GetData(), subs.GetData() + subs.GetCount());
 
 	for (ptrdiff_t i = 0, j = subs.GetCount(); i < j; i++) {
 		int entry = subs[i].idx;
