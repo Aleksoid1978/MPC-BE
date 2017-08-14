@@ -338,7 +338,7 @@ bool ZtringListListF::NettoyerEspaces (Ztring &ANettoyer)
     while (Debut<ANettoyer.size() && ANettoyer[Debut]==__T(' '))
         Debut++;
     size_t Fin=ANettoyer.size()-1;
-    while (Fin!=(size_t)-2 && ANettoyer[Fin]==__T(' '))
+    while (Fin!=(size_t)-1 && ANettoyer[Fin]==__T(' '))
         Fin--;
     if (Fin>=Debut)
         ANettoyer=ANettoyer.substr(Debut, Fin-Debut+1);

@@ -48,6 +48,35 @@ extern MediaInfo_Config Config;
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
+Ztring File__Analyze_Encoded_Library_String (const Ztring &CompanyName, const Ztring &Name, const Ztring &Version, const Ztring &Date, const Ztring &Encoded_Library)
+{
+    if (!Name.empty())
+    {
+        Ztring String;
+        if (!CompanyName.empty())
+        {
+            String+=CompanyName;
+            String+=__T(" ");
+        }
+        String+=Name;
+        if (!Version.empty())
+        {
+            String+=__T(" ");
+            String+=Version;
+        }
+        if (!Date.empty())
+        {
+            String+=__T(" (");
+            String+=Date;
+            String+=__T(")");
+        }
+        return String;
+    }
+    else
+        return Encoded_Library;
+}
+
+//---------------------------------------------------------------------------
 void File__Analyze::Streams_Finish_Global()
 {
     if (IsSub)
@@ -1202,30 +1231,8 @@ void File__Analyze::Streams_Finish_HumanReadable_PerStream(stream_t StreamKind, 
         Ztring Name=Retrieve(StreamKind, StreamPos, "Encoded_Library_Name");
         Ztring Version=Retrieve(StreamKind, StreamPos, "Encoded_Library_Version");
         Ztring Date=Retrieve(StreamKind, StreamPos, "Encoded_Library_Date");
-        if (!Name.empty())
-        {
-            Ztring String;
-            if (!CompanyName.empty())
-            {
-                String+=CompanyName;
-                String+=__T(" ");
-            }
-            String+=Name;
-            if (!Version.empty())
-            {
-                String+=__T(" ");
-                String+=Version;
-            }
-            if (!Date.empty())
-            {
-                String+=__T(" (");
-                String+=Date;
-                String+=__T(")");
-            }
-            Fill(StreamKind, StreamPos, "Encoded_Library/String", String, true);
-        }
-        else
-            Fill(StreamKind, StreamPos, "Encoded_Library/String", Retrieve(StreamKind, StreamPos, "Encoded_Library"), true);
+        Ztring Encoded_Library=Retrieve(StreamKind, StreamPos, "Encoded_Library");
+        Fill(StreamKind, StreamPos, "Encoded_Library/String", File__Analyze_Encoded_Library_String(CompanyName, Name, Version, Date, Encoded_Library), true);
     }
 
     //Format_Settings_Matrix

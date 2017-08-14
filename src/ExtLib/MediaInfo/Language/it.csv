@@ -373,7 +373,7 @@ Format_Settings_PictureStructure;
 Format_Settings_PS;Impostazioni formato, PS
 Format_Settings_Pulldown;Impostazioni formato, Pulldown
 Format_Settings_QPel;Impostazioni formato, QPel
-Format_Settings_RefFrames;Impostazioni formato,RefFrames
+Format_Settings_RefFrames;Impostazioni formato, RefFrames
 Format_Settings_SBR;Impostazioni formato, SBR
 Format_Settings_Sign;Impostazioni formato, Sign
 Format_Settings_Wrapping;
@@ -843,7 +843,7 @@ matrix_coefficients;Coefficienti matrici
 Matrix_Format;
 MaxCLL;
 MaxFALL;
-MediaInfo_About;MediaInfo fornisce un acecsso velcoe alle informazioni tecniche ed ai tag dei file audio e video.\r\nAd eccezione dell'interfaccia grafica Mac APp Store, è un sofwtare open-source, che significa che è gratuito per l'utente finale e lo sviluppatore è libero di studiare, e ,migliorare e ridistribuire il programm (licenza LGPL)
+MediaInfo_About;MediaInfo fornisce un accesso veloce alle informazioni tecniche ed ai tag dei file audio e video.\r\nAd eccezione dell'interfaccia grafica Mac APp Store, è un software open-source, ciò significa che il programma è gratuito per l'utente finale e che lo sviluppatore è libero di studiare, migliorare e ridistribuire (licenza LGPL).
 Menu;Menu
 Menu stream(s);Flussi del menu
 Menu_Codec_List;Codec dei menu

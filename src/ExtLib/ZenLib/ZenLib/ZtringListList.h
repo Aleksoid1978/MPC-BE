@@ -47,7 +47,7 @@ public :
     ZtringList     &operator () (size_type Pos0); ///< Same as [], but write a empty string if Pos doesn't exist yet
     Ztring         &operator () (size_type Pos0, size_type Pos1);
     /// @brief Return [Pos][Pos1], Pos=First occurency of Pos0 in [xxx][0]
-    Ztring         &operator () (const Ztring &Pos0, size_type Pos1=1)             {return operator() (Pos0, 0 , Pos1);};
+    Ztring         &operator () (const Ztring &Pos0, size_type Pos1=1)             {return operator() (Pos0, 0 , Pos1);}
     /// @brief Return [Pos][Pos1], Pos=First occurency of Pos0 in [xxx][Pos0_1]
     Ztring         &operator () (const Ztring &Pos0, size_type Pos0_1, size_type Pos1);
 
@@ -80,13 +80,13 @@ public :
     /// @brief Add a vector of string (with separator is ZtringListList Separator)
     void push_back (const Ztring &ToAdd);
     /// @brief Add a vector of string (Char version)
-    void push_back (const Char* ToAdd)                                          {push_back(Ztring(ToAdd));};
+    void push_back (const Char* ToAdd)                                          {push_back(Ztring(ToAdd));}
     /// @brief Insert a vector of string at position Pos0
-    void Insert (const ZtringList &ToInsert, size_type Pos0)                       {insert(begin()+Pos0, ToInsert);};
+    void Insert (const ZtringList &ToInsert, size_type Pos0)                       {insert(begin()+Pos0, ToInsert);}
     /// @brief Insert a string at all positions Pos1
     void Insert1 (const Ztring &ToInsert, size_type Pos1);
     /// @brief Delete a vector of string at position Pos0
-    void Delete (size_type Pos0)                                                   {erase(begin()+Pos0);};
+    void Delete (size_type Pos0)                                                   {erase(begin()+Pos0);}
     /// @brief Delete all vectors of string, with [xxx][Pos1] == ToFind
     void Delete (const Ztring &ToFind, size_type Pos1=0, const Ztring &Comparator=__T("=="), ztring_t Options=Ztring_Nothing);
     /// @brief Delete a string at all positions Pos1

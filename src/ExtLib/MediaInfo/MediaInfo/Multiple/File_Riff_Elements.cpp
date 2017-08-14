@@ -1248,7 +1248,11 @@ void File_Riff::AVI__hdlr_strl_strf_auds()
     Fill(Stream_Audio, StreamPos_Last, Audio_Codec, Codec); //May be replaced by codec parser
     Fill(Stream_Audio, StreamPos_Last, Audio_Codec_CC, Codec);
     if (Channels)
-        Fill(Stream_Audio, StreamPos_Last, Audio_Channel_s_, (Channels!=5 || FormatTag==0xFFFE)?Channels:6);
+    {
+        Ztring Format=MediaInfoLib::Config.CodecID_Get(Stream_Audio, InfoCodecID_Format_Riff, Codec);
+        if (!(Channels==5 && (Format==__T("AC-3") || Format==__T("DTS")))) //Lot of 5.1 streams fill 5 here, but we don't know if it is 5.1 or 5.0, so we let info from container blank. TODO: streams without crosscheck error should be only with 5 or 6 channels
+            Fill(Stream_Audio, StreamPos_Last, Audio_Channel_s_, Channels);
+    }
     if (SamplesPerSec)
         Fill(Stream_Audio, StreamPos_Last, Audio_SamplingRate, SamplesPerSec);
     if (AvgBytesPerSec)

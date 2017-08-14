@@ -181,18 +181,14 @@ public:
         switch ((NewBits-1)>>3)
         {
             case 3 :    NewBits-=8;
-                        ToReturn|=*Buffer<<NewBits;
-                        Buffer++;
+                        ToReturn|=*(Buffer++)<<NewBits;
             case 2 :    NewBits-=8;
-                        ToReturn|=*Buffer<<NewBits;
-                        Buffer++;
+                        ToReturn|=*(Buffer++)<<NewBits;
             case 1 :    NewBits-=8;
-                        ToReturn|=*Buffer<<NewBits;
-                        Buffer++;
+                        ToReturn|=*(Buffer++)<<NewBits;
             default:    ;
         }
-        LastByte=*Buffer;
-        Buffer++;
+        LastByte=*(Buffer++);
         Buffer_Size-=HowMany;
         ToReturn|=(LastByte>>(Buffer_Size%8))&Mask[NewBits];
         return ToReturn&Mask[HowMany];

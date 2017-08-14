@@ -53,9 +53,9 @@ public :
     void Write (const Ztring &ToWrite); /// Write all
     void Write (const Ztring &ToWrite, size_type Pos); /// Write a string
     /// @brief Insert a string at position Pos0
-    void Insert (const Ztring &ToInsert, size_type Pos0)                           {insert(begin()+Pos0, ToInsert);};
+    void Insert (const Ztring &ToInsert, size_type Pos0)                           {insert(begin()+Pos0, ToInsert);}
     /// @brief Delete a string at position Pos0
-    void Delete (size_type Pos0)                                                   {erase(begin()+Pos0);};
+    void Delete (size_type Pos0)                                                   {erase(begin()+Pos0);}
 
     //Edition
     /// @brief Swap 2 positions

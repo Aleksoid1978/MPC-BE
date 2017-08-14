@@ -657,6 +657,12 @@ extern std::string ExtensibleWave_ChannelMask (int32u ChannelMask);
 //---------------------------------------------------------------------------
 extern std::string ExtensibleWave_ChannelMask2 (int32u ChannelMask);
 
+//---------------------------------------------------------------------------
+const char* Mpegv_colour_primaries(int8u colour_primaries);
+const char* Mpegv_transfer_characteristics(int8u transfer_characteristics);
+const char* Mpegv_matrix_coefficients(int8u matrix_coefficients);
+extern const char* Avc_video_full_range[];
+
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -690,6 +696,8 @@ File_Mk::File_Mk()
     CurrentAttachmentIsCover=false;
     CoverIsSetFromAttachment=false;
     Laces_Pos=0;
+    IsParsingSegmentTrack_SeekBackTo=0;
+    SegmentTrack_Offset_End=0;
     #if MEDIAINFO_DEMUX
         Demux_EventWasSent=(int64u)-1;
     #endif //MEDIAINFO_DEMUX
@@ -718,6 +726,9 @@ void File_Mk::Streams_Finish()
     if (Duration!=0 && TimecodeScale!=0)
         Fill(Stream_General, 0, General_Duration, Duration*int64u_float64(TimecodeScale)/1000000.0, 0);
 
+    if (Retrieve(Stream_General, 0, General_IsStreamable).empty())
+        Fill(Stream_General, 0, General_IsStreamable, "Yes");
+
     //Tags (General)
     for (tags::iterator Item=Segment_Tags_Tag_Items.begin(); Item!=Segment_Tags_Tag_Items.end(); ++Item)
         if (!Item->first || Item->first == (int64u)-1)
@@ -733,191 +744,246 @@ void File_Mk::Streams_Finish()
     {
         StreamKind_Last=Temp->second.StreamKind;
         StreamPos_Last=Temp->second.StreamPos;
+        float64 FrameRate_FromTags = 0.0;
+        bool HasStats=false;
 
         //Tags (per track)
         if (Temp->second.TrackUID && Temp->second.TrackUID!=(int64u)-1)
         {
+            //Technical info
+            for (std::map<std::string, Ztring>::iterator Info=Temp->second.Infos.begin(); Info!=Temp->second.Infos.end(); ++Info)
+                Fill(StreamKind_Last, StreamPos_Last, Info->first.c_str(), Info->second);
+
             tags::iterator Item=Segment_Tags_Tag_Items.find(Temp->second.TrackUID);
             if (Item != Segment_Tags_Tag_Items.end())
             {
+                //Statistic Tags
+                tagspertrack::iterator Item2=Item->second.find(__T("_STATISTICS_TAGS"));
+                HasStats=Item2!=Item->second.end();
+                if (HasStats)
+                {
+                    Ztring TagsList=Item2->second;
+                    Item->second.erase(Item2);
+                    bool Tags_Verified=false;
+                    {
+                        Ztring Happ = Retrieve(Stream_General, 0, "Encoded_Application");
+                        Ztring Hutc = Retrieve(Stream_General, 0, "Encoded_Date");
+                        Hutc.FindAndReplace(__T("UTC "), Ztring());
+                        Ztring App, Utc;
+                        Item2=Item->second.find(__T("_STATISTICS_WRITING_APP"));
+                        if (Item2!=Item->second.end())
+                        {
+                            App=Item2->second;
+                            Item->second.erase(Item2);
+                        }
+                        Item2=Item->second.find(__T("_STATISTICS_WRITING_DATE_UTC"));
+                        if (Item2!=Item->second.end())
+                        {
+                            Utc=Item2->second;
+                            Item->second.erase(Item2);
+                        }
+                        if (App==Happ && Utc==Hutc) Tags_Verified=true;
+                        else Fill(StreamKind_Last, StreamPos_Last, "Statistics Tags Issue", App + __T(' ') + Utc + __T(" / ") + Happ + __T(' ') + Hutc);
+                    }
+                    Ztring TempTag;
+
+                    float64 Statistics_Duration=0;
+                    float64 Statistics_FrameCount=0;
+                    for (Ztring::iterator Back = TagsList.begin();;++Back)
+                    {
+                        if ((Back == TagsList.end()) || (*Back == ' ') || (*Back == '\0'))
+                        {
+                            if (!TempTag.empty())
+                            {
+                                Item2=Item->second.find(TempTag);
+                                if (Item2!=Item->second.end())
+                                {
+                                    TempTag=Item2->first;
+                                    const Ztring& TagValue=Item2->second;
+                                    bool Set=false;
+                                    if (TempTag==__T("BPS"))
+                                    {
+                                        if (Tags_Verified)
+                                        { Item->second["BitRate"]=TagValue; Set=true; }
+                                        else
+                                            TempTag="BitRate";
+                                    }
+                                    else if (TempTag==__T("DURATION"))
+                                    {
+                                        if (Tags_Verified)
+                                        {
+                                            ZtringList Parts;
+                                            Parts.Separator_Set(0, ":");
+                                            Parts.Write(TagValue);
+                                            Statistics_Duration=0;
+                                            if (Parts.size()>=1)
+                                                Statistics_Duration += Parts[0].To_float64()*60*60;
+                                            if (Parts.size()>=2)
+                                                Statistics_Duration += Parts[1].To_float64()*60;
+                                            int8u Rounding=0; //Default is rounding to milliseconds, TODO: rounding to less than millisecond when "Duration" field is changed to seconds.
+                                            if (Parts.size()>=3)
+                                            {
+                                                Statistics_Duration += Parts[2].To_float64();
+                                                if (Parts[2].size()>6) //More than milliseconds
+                                                    Rounding=Parts[2].size()-6;
+                                            }
+                                            Item->second["Duration"].From_Number(Statistics_Duration*1000, Rounding);
+                                            Set=true;
+                                        }
+                                        if (!Set) TempTag="Duration";
+                                    }
+                                    else if (TempTag==__T("NUMBER_OF_FRAMES"))
+                                    {
+                                        if (Tags_Verified)
+                                        {
+                                            Statistics_FrameCount=TagValue.To_float64();
+                                            Item->second["FrameCount"]=TagValue;
+                                            if (StreamKind_Last==Stream_Text)
+                                            {
+                                                const Ztring &Format=Retrieve(Stream_Text, StreamPos_Last, "Format");
+                                                if (Format.find(__T("608"))==string::npos && Format.find(__T("708"))==string::npos)
+                                                    Item->second["ElementCount"]=TagValue; // if not 608 or 708, this is used to be also the count of elements
+                                            }
+                                            Set=true;
+                                        }
+                                        else
+                                            TempTag="FrameCount";
+                                    }
+                                    else if (TempTag==__T("NUMBER_OF_BYTES"))
+                                    {
+                                        if (Tags_Verified)
+                                        {
+                                            Item->second["StreamSize"]=TagValue;
+                                            Set=true;
+                                        }
+                                        else
+                                            TempTag="StreamSize";
+                                    }
+                                    else if (TempTag==__T("NUMBER_OF_BYTES_UNCOMPRESSED"))
+                                    {
+                                        if (Tags_Verified)
+                                        {
+                                            Item->second["StreamSize_Demuxed"]=TagValue;
+                                            Set=true;
+                                        }
+                                        else
+                                            TempTag="Stream Size (Uncompressed)";
+                                    }
+                                    else if (TempTag==__T("SOURCE_ID"))
+                                    {
+                                        if (Tags_Verified)
+                                        {
+                                            Item->second["OriginalSourceMedium_ID"]=Mk_ID_From_Source_ID(TagValue);
+                                            Item->second["OriginalSourceMedium_ID/String"]=Mk_ID_String_From_Source_ID(TagValue);
+                                            Item->second["OriginalSourceMedium"]=Mk_OriginalSourceMedium_From_Source_ID(TagValue);
+                                            Set=true;
+                                        }
+                                        else
+                                            TempTag="OriginalSourceMedium_ID";
+                                    }
+                                    if (!Set)
+                                    {
+                                        TempTag.insert(0, __T("FromStats_"));
+                                        Item->second[TempTag]=TagValue;
+                                    }
+
+                                    Item->second.erase(Item2);
+                                }
+                                if (Back == TagsList.end())
+                                    break;
+                                TempTag.clear();
+                            }
+                        }
+                        else
+                            TempTag+=*Back;
+                    }
+                    if (Statistics_Duration && Statistics_FrameCount)
+                    {
+                        FrameRate_FromTags = Statistics_FrameCount/Statistics_Duration;
+                        if (float64_int64s(FrameRate_FromTags) - FrameRate_FromTags*1.001 > -0.0001
+                         && float64_int64s(FrameRate_FromTags) - FrameRate_FromTags*1.001 < +0.0001)
+                        {
+                            // Checking 1.001 frame rates, Statistics_Duration is has often only a 1 ms precision so we test between -1ms and +1ms
+                            float64 Duration_1001 = Statistics_FrameCount / float64_int64s(FrameRate_FromTags) * 1.001000;
+                            float64 Duration_1000 = Statistics_FrameCount / float64_int64s(FrameRate_FromTags) * 1.001001;
+                            bool CanBe1001 = false;
+                            bool CanBe1000 = false;
+                            if (std::fabs((Duration_1000 - Duration_1001) * 10000) >= 15)
+                            {
+                                Ztring DurationS; DurationS.From_Number(Statistics_Duration, 3);
+                                Ztring DurationS_1001; DurationS_1001.From_Number(Duration_1001, 3);
+                                Ztring DurationS_1000; DurationS_1000.From_Number(Duration_1000, 3);
+
+                                CanBe1001=DurationS==DurationS_1001?true:false;
+                                CanBe1000=DurationS==DurationS_1000?true:false;
+                                if (CanBe1001 && !CanBe1000)
+                                    FrameRate_FromTags = float64_int64s(FrameRate_FromTags) / 1.001;
+                                if (CanBe1000 && !CanBe1001)
+                                    FrameRate_FromTags = float64_int64s(FrameRate_FromTags) / 1.001001;
+                            }
+
+                            // Duration from tags not reliable, checking TrackDefaultDuration
+                            if (CanBe1000 == CanBe1001 && Temp->second.TrackDefaultDuration)
+                            {
+                                const float64 Duration_Default=((float64)1000000000)/Temp->second.TrackDefaultDuration;
+                                if (float64_int64s(Duration_Default) - Duration_Default*1.001000 > -0.000002
+                                 && float64_int64s(Duration_Default) - Duration_Default*1.001000 < +0.000002) // Detection of precise 1.001 (e.g. 24000/1001) taking into account precision of 32-bit float
+                                {
+                                    FrameRate_FromTags = float64_int64s(FrameRate_FromTags) / 1.001;
+                                }
+                                if (float64_int64s(Duration_Default) - Duration_Default*1.001001 > -0.000002
+                                 && float64_int64s(Duration_Default) - Duration_Default*1.001001 < +0.000002) // Detection of rounded 1.001 (e.g. 23976/1000) taking into account precision of 32-bit float
+                                {
+                                    FrameRate_FromTags = float64_int64s(FrameRate_FromTags) / 1.001001;
+                                }
+                            }
+                        }
+
+                        Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_FrameRate), FrameRate_FromTags, 3, true);
+                    }
+                }
+
+                //Filling
                 for (tagspertrack::iterator Tag=Item->second.begin(); Tag!=Item->second.end(); ++Tag)
+                {
+                    if (!HasStats && Tag->first==__T("DURATION"))
+                    {
+                        //If this field is present but there is no stats tag, let's hope that the field was not copied as is after an edit of the file...
+                        const string& s=Tag->second.To_UTF8();
+                        if ( s.size()>=12
+                         &&  s[ 0]>='0' && s[ 0]<='9'
+                         &&  s[ 1]>='0' && s[ 1]<='9'
+                         &&  s[ 2]==':'
+                         &&  s[ 3]>='0' && s[ 3]<='9'
+                         &&  s[ 4]>='0' && s[ 4]<='9'
+                         &&  s[ 5]==':'
+                         &&  s[ 6]>='0' && s[ 6]<='9'
+                         &&  s[ 7]>='0' && s[ 7]<='9'
+                         &&  s[ 8]=='.')
+                        {
+                            bool IsNok=false;
+                            size_t s_size=s.size();
+                            for (size_t i=9; i<s_size; i++)
+                                if (s[i]<'0' || s[i]>'9')
+                                    IsNok=true;
+                            if (!IsNok)
+                            {
+                                float64 d=(s[ 0]-'0')*10*60*60
+                                        + (s[ 1]-'0')   *60*60
+                                        + (s[ 3]-'0')   *10*60
+                                        + (s[ 4]-'0')      *60
+                                        + (s[ 6]-'0')      *10
+                                        + (s[ 7]-'0')         ;
+                                for (size_t i=9; i<s_size; i++)
+                                    d+=(s[i]-'0')/pow(10.0, i-8);
+                                Fill(StreamKind_Last, StreamPos_Last, "Duration", d*1000, s.size()-12);
+                                continue;
+                            }
+                        }
+                    }
                     if ((Tag->first!=__T("Language") || Retrieve(StreamKind_Last, StreamPos_Last, "Language").empty())) // Prioritize Tracks block over tags
                         Fill(StreamKind_Last, StreamPos_Last, Tag->first.To_UTF8().c_str(), Tag->second);
-            }
-        }
-
-        //Tags
-        //Ztring Duration_Temp;
-        float64 FrameRate_FromTags = 0.0;
-        Ztring TagsList=Retrieve(StreamKind_Last, StreamPos_Last, "_STATISTICS_TAGS");
-        if (TagsList.size())
-        {
-            bool Tags_Verified=false;
-            {
-                Ztring Happ = Retrieve(Stream_General, 0, "Encoded_Application");
-                Ztring Hutc = Retrieve(Stream_General, 0, "Encoded_Date");
-                Ztring App = Retrieve(StreamKind_Last, StreamPos_Last, "_STATISTICS_WRITING_APP");
-                Ztring Utc = Retrieve(StreamKind_Last, StreamPos_Last, "_STATISTICS_WRITING_DATE_UTC");
-                Clear(StreamKind_Last, StreamPos_Last, "_STATISTICS_WRITING_APP");
-                Clear(StreamKind_Last, StreamPos_Last, "_STATISTICS_WRITING_DATE_UTC");
-                Clear(StreamKind_Last, StreamPos_Last, "_STATISTICS_TAGS");
-                Hutc.FindAndReplace(__T("UTC "), Ztring());
-                if (App==Happ && Utc==Hutc) Tags_Verified=true;
-                else Fill(StreamKind_Last, StreamPos_Last, "Statistics Tags Issue", App + __T(' ') + Utc + __T(" / ") + Happ + __T(' ') + Hutc);
-            }
-            Ztring TempTag;
-
-            float64 Statistics_Duration=0;
-            float64 Statistics_FrameCount=0;
-            for (Ztring::iterator Back = TagsList.begin();;++Back)
-            {
-                if ((Back == TagsList.end()) || (*Back == ' ') || (*Back == '\0'))
-                {
-                    if (TempTag.size())
-                    {
-                        Ztring TagValue = Retrieve(StreamKind_Last, StreamPos_Last, TempTag.To_Local().c_str());
-                        if (TagValue.size())
-                        {
-                            Clear(StreamKind_Last, StreamPos_Last, TempTag.To_Local().c_str());
-                            bool Set=false;
-                            if (TempTag==__T("BPS"))
-                            {
-                                if (Tags_Verified)
-                                { Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_BitRate), TagValue, true); Set=true; }
-                                else
-                                    TempTag="BitRate";
-                            }
-                            else if (TempTag==__T("DURATION"))
-                            {
-                                if (Tags_Verified)
-                                {
-                                    ZtringList Parts;
-                                    Parts.Separator_Set(0, ":");
-                                    Parts.Write(TagValue);
-                                    Statistics_Duration=0;
-                                    if (Parts.size()>=1)
-                                        Statistics_Duration += Parts[0].To_float64()*60*60;
-                                    if (Parts.size()>=2)
-                                        Statistics_Duration += Parts[1].To_float64()*60;
-                                    int8u Rounding=0; //Default is rounding to milliseconds, TODO: rounding to less than millisecond when "Duration" field is changed to seconds.
-                                    if (Parts.size()>=3)
-                                    {
-                                        Statistics_Duration += Parts[2].To_float64();
-                                        if (Parts[2].size()>6) //More than milliseconds
-                                            Rounding=Parts[2].size()-6;
-                                    }
-                                    Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Duration), Statistics_Duration*1000, Rounding, true);
-                                    Set=true;
-                                    //Duration_Temp = TagValue;
-                                }
-                                if (!Set) TempTag="Duration";
-                            }
-                            else if (TempTag==__T("NUMBER_OF_FRAMES"))
-                            {
-                                if (Tags_Verified)
-                                {
-                                    Statistics_FrameCount=TagValue.To_float64();
-                                    Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_FrameCount), TagValue, true);
-                                    if (StreamKind_Last==Stream_Text)
-                                    {
-                                        const Ztring &Format=Retrieve(Stream_Text, StreamPos_Last, "Format");
-                                        if (Format.find(__T("608"))==string::npos && Format.find(__T("708"))==string::npos)
-                                            Fill(Stream_Text, StreamPos_Last, Text_ElementCount, TagValue, true); // if not 608 or 708, this is used to be also the count of elements
-                                    }
-                                    Set=true;
-                                }
-                                else
-                                    TempTag="FrameCount";
-                            }
-                            else if (TempTag==__T("NUMBER_OF_BYTES"))
-                            {
-                                if (Tags_Verified)
-                                {
-                                    Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize), TagValue, true);
-                                    Set=true;
-                                }
-                                else
-                                    TempTag="StreamSize";
-                            }
-                            else if (TempTag==__T("NUMBER_OF_BYTES_UNCOMPRESSED"))
-                            {
-                                if (Tags_Verified)
-                                {
-                                    Fill(StreamKind_Last, StreamPos_Last, "StreamSize_Demuxed", TagValue, true);
-                                    Set=true;
-                                }
-                                else
-                                    TempTag="Stream Size (Uncompressed)";
-                            }
-                            else if (TempTag==__T("SOURCE_ID"))
-                            {
-                                if (Tags_Verified)
-                                {
-                                    Fill(StreamKind_Last, StreamPos_Last, "OriginalSourceMedium_ID", Mk_ID_From_Source_ID(TagValue), true);
-                                    Fill(StreamKind_Last, StreamPos_Last, "OriginalSourceMedium_ID/String", Mk_ID_String_From_Source_ID(TagValue), true);
-                                    Fill(Stream_General, 0, General_OriginalSourceMedium, Mk_OriginalSourceMedium_From_Source_ID(TagValue), Unlimited, true, true);
-                                    Set=true;
-                                }
-                                else
-                                    TempTag="OriginalSourceMedium_ID";
-                            }
-                            if (!Set)
-                            {
-                                TempTag.insert(0, __T("FromStats_"));
-                                Fill(StreamKind_Last, StreamPos_Last, TempTag.To_Local().c_str(), TagValue.To_Local().c_str());
-                            }
-                        }
-                        if (Back == TagsList.end())
-                            break;
-                        TempTag.clear();
-                    }
                 }
-                else
-                    TempTag+=*Back;
-            }
-            if (Statistics_Duration && Statistics_FrameCount)
-            {
-                FrameRate_FromTags = Statistics_FrameCount/Statistics_Duration;
-                if (float64_int64s(FrameRate_FromTags) - FrameRate_FromTags*1.001 > -0.0001
-                 && float64_int64s(FrameRate_FromTags) - FrameRate_FromTags*1.001 < +0.0001)
-                {
-                    // Checking 1.001 frame rates, Statistics_Duration is has often only a 1 ms precision so we test between -1ms and +1ms
-                    float64 Duration_1001 = Statistics_FrameCount / float64_int64s(FrameRate_FromTags) * 1.001000;
-                    float64 Duration_1000 = Statistics_FrameCount / float64_int64s(FrameRate_FromTags) * 1.001001;
-                    bool CanBe1001 = false;
-                    bool CanBe1000 = false;
-                    if (std::fabs((Duration_1000 - Duration_1001) * 10000) >= 15)
-                    {
-                        Ztring DurationS; DurationS.From_Number(Statistics_Duration, 3);
-                        Ztring DurationS_1001; DurationS_1001.From_Number(Duration_1001, 3);
-                        Ztring DurationS_1000; DurationS_1000.From_Number(Duration_1000, 3);
-
-                        CanBe1001=DurationS==DurationS_1001?true:false;
-                        CanBe1000=DurationS==DurationS_1000?true:false;
-                        if (CanBe1001 && !CanBe1000)
-                            FrameRate_FromTags = float64_int64s(FrameRate_FromTags) / 1.001;
-                        if (CanBe1000 && !CanBe1001)
-                            FrameRate_FromTags = float64_int64s(FrameRate_FromTags) / 1.001001;
-                    }
-
-                    // Duration from tags not reliable, checking TrackDefaultDuration
-                    if (CanBe1000 == CanBe1001 && Temp->second.TrackDefaultDuration)
-                    {
-                        const float64 Duration_Default=((float64)1000000000)/Temp->second.TrackDefaultDuration;
-                        if (float64_int64s(Duration_Default) - Duration_Default*1.001000 > -0.000002
-                         && float64_int64s(Duration_Default) - Duration_Default*1.001000 < +0.000002) // Detection of precise 1.001 (e.g. 24000/1001) taking into account precision of 32-bit float
-                        {
-                            FrameRate_FromTags = float64_int64s(FrameRate_FromTags) / 1.001;
-                        }
-                        if (float64_int64s(Duration_Default) - Duration_Default*1.001001 > -0.000002
-                         && float64_int64s(Duration_Default) - Duration_Default*1.001001 < +0.000002) // Detection of rounded 1.001 (e.g. 23976/1000) taking into account precision of 32-bit float
-                        {
-                            FrameRate_FromTags = float64_int64s(FrameRate_FromTags) / 1.001001;
-                        }
-                    }
-                }
-
-                Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_FrameRate), FrameRate_FromTags, 3, true);
             }
         }
 
@@ -1062,6 +1128,19 @@ void File_Mk::Streams_Finish()
                 //Filling
                 Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Delay), Delay, 0, true);
                 Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Delay_Source), "Container");
+
+                const Ztring &DurationS=Retrieve(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Duration));
+                float64 Duration=DurationS.To_float64();
+                if (!HasStats && Duration && Duration>=Delay) //Not sure about when tats are present, so for the moment we remove delay from duration only if there is no stats, Duration looks like more lie timestamp of the end of the last frame with the example we got
+                {
+                    Duration-=Delay;
+                    size_t DotPos=DurationS.find(__T('.'));
+                    if (DotPos == (size_t)-1)
+                        DotPos = DurationS.size();
+                    else
+                        DotPos++;
+                    Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Duration), Duration, DurationS.size()-DotPos, true);
+                }
             }
 
             Ztring Codec_Temp=Retrieve(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Codec)); //We want to keep the 4CC;
@@ -1377,6 +1456,35 @@ void File_Mk::Header_Parse()
         Param_Error("TRUNCATED-ELEMENT:1");
         if (Element_Level<=2)
             Fill(Stream_General, 0, "IsTruncated", "Yes");
+    }
+
+	//Should we parse Cluster?
+	if (Element_Level==3 && Name==Elements::Segment_Cluster && !Segment_Tracks_Count)
+    {
+        //Jumping
+        for (size_t Pos=0; Pos<Segment_Seeks.size(); Pos++)
+            if (Segment_Seeks[Pos].SeekID==Elements::Segment_Tracks)
+            {
+                Fill(Stream_General, 0, General_IsStreamable, "No");
+				Element_DoNotShow();
+                IsParsingSegmentTrack_SeekBackTo=File_Offset+Buffer_Offset;
+
+                JumpTo(Segment_Seeks[Pos].SeekPosition);
+                break;
+            }
+        if (File_GoTo==(int64u)-1)
+            JumpTo(Segment_Offset_End);
+        return;
+    }
+
+    //Is Tracks already parsed?
+    if (Element_Level==3 && Name==Elements::Segment_Tracks && SegmentTrack_Offset_End==File_Offset+Buffer_Offset+Element_Offset+Size)
+    {
+        //This element was already parsed, skipping it
+        JumpTo(SegmentTrack_Offset_End);
+        Element_DoNotShow();
+        SegmentTrack_Offset_End=0;
+        return;
     }
 }
 
@@ -1812,6 +1920,14 @@ void File_Mk::Data_Parse()
 
     if (!Element_IsWaitingForMoreData() && !CRC32Compute.empty())
         CRC32_Check();
+
+    if (IsParsingSegmentTrack_SeekBackTo && File_Offset+Buffer_Offset+Element_Offset==SegmentTrack_Offset_End) //TODO: implement check at end of an element
+    {
+        while (Element_Level>(Element_Offset==Element_Size?2:1))
+            Element_End0();
+        GoTo(IsParsingSegmentTrack_SeekBackTo);
+        IsParsingSegmentTrack_SeekBackTo=0;
+    }
 }
 
 //***************************************************************************
@@ -2115,11 +2231,10 @@ void File_Mk::Segment_Cluster()
     #endif // MEDIAINFO_TRACE
 
     //For each stream
-    std::map<int64u, stream>::iterator Temp=Stream.begin();
     if (!Segment_Cluster_Count)
     {
-        Stream_Count=0;
-        while (Temp!=Stream.end())
+        
+        for (std::map<int64u, stream>::iterator Temp=Stream.begin(); Temp!=Stream.end(); ++Temp)
         {
             if (Temp->second.Parser)
                 Temp->second.Searching_Payload=true;
@@ -2137,24 +2252,6 @@ void File_Mk::Segment_Cluster()
                 if (Retrieve(Temp->second.StreamKind, Temp->second.StreamPos, Audio_CodecID).find(__T("A_AAC/"))==0)
                     ((File_Aac*)Stream[Temp->first].Parser)->Mode=File_Aac::Mode_raw_data_block; //In case AudioSpecificConfig is not present
             #endif //MEDIAINFO_AAC_YES
-
-            ++Temp;
-        }
-
-        //We must parse moov?
-        if (Stream_Count==0)
-        {
-            //Jumping
-            std::sort(Segment_Seeks.begin(), Segment_Seeks.end());
-            for (size_t Pos=0; Pos<Segment_Seeks.size(); Pos++)
-                if (Segment_Seeks[Pos]>File_Offset+Buffer_Offset+Element_Size)
-                {
-                    JumpTo(Segment_Seeks[Pos]);
-                    break;
-                }
-            if (File_GoTo==(int64u)-1)
-                JumpTo(Segment_Offset_End);
-            return;
         }
     }
     Segment_Cluster_Count++;
@@ -2427,9 +2524,9 @@ void File_Mk::Segment_Cluster_BlockGroup_Block_Lace()
             //Jumping
             std::sort(Segment_Seeks.begin(), Segment_Seeks.end());
             for (size_t Pos=0; Pos<Segment_Seeks.size(); Pos++)
-                if (Segment_Seeks[Pos]>File_Offset+Buffer_Offset+Element_Size)
+                if (Segment_Seeks[Pos].SeekPosition>File_Offset+Buffer_Offset+Element_Size)
                 {
-                    JumpTo(Segment_Seeks[Pos]);
+                    JumpTo(Segment_Seeks[Pos].SeekPosition);
                     Open_Buffer_Unsynch();
                     break;
                 }
@@ -2638,6 +2735,8 @@ void File_Mk::Segment_SeekHead_Seek()
                 Element_Set_Remove_Children_IfNoErrors();
         }
     #endif // MEDIAINFO_TRACE
+
+    Segment_Seeks.resize(Segment_Seeks.size()+1);
 }
 
 //---------------------------------------------------------------------------
@@ -2646,6 +2745,10 @@ void File_Mk::Segment_SeekHead_Seek_SeekID()
     //Parsing
     int64u Data;
     Get_EB (Data,                                               "Data");
+
+    FILLING_BEGIN();
+        Segment_Seeks.back().SeekID=Data;
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
@@ -2654,7 +2757,9 @@ void File_Mk::Segment_SeekHead_Seek_SeekPosition()
     //Parsing
     int64u Data=UInteger_Get();
 
-    Segment_Seeks.push_back(Segment_Offset_Begin+Data);
+    FILLING_BEGIN();
+        Segment_Seeks.back().SeekPosition=Segment_Offset_Begin+Data;
+    FILLING_END();
     Element_Info1(Ztring::ToZtring(Segment_Offset_Begin+Data, 16));
 }
 
@@ -2726,6 +2831,12 @@ void File_Mk::Segment_Tags_Tag_SimpleTag_TagString()
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("ENCODED_BY")) Segment_Tag_SimpleTag_TagNames[0]=__T("EncodedBy");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("ENCODER")) Segment_Tag_SimpleTag_TagNames[0]=__T("Encoded_Library");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("FPS")) return; //Useless
+    if (Segment_Tag_SimpleTag_TagNames[0]==__T("HANDLER_NAME"))
+    {
+        if (TagString.find(__T("Handler"))!=std::string::npos || TagString.find(__T("handler"))!=std::string::npos || TagString.find(__T("vide"))!=std::string::npos || TagString.find(__T("soun"))!=std::string::npos)
+            return; //This is not a Title
+        Segment_Tag_SimpleTag_TagNames[0]=__T("Title");
+    }
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("LANGUAGE")) Segment_Tag_SimpleTag_TagNames[0]=__T("Language");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("MAJOR_BRAND")) return; //QuickTime techinical info, useless
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("MINOR_VERSION")) return; //QuickTime techinical info, useless
@@ -2735,6 +2846,13 @@ void File_Mk::Segment_Tags_Tag_SimpleTag_TagString()
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("SAMPLE") && Segment_Tag_SimpleTag_TagNames.size()==2 && Segment_Tag_SimpleTag_TagNames[1]==__T("TITLE")) {Segment_Tag_SimpleTag_TagNames.resize(1); Segment_Tag_SimpleTag_TagNames[0]=__T("Title_More");}
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("STEREO_MODE")) return; //Useless
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("TERMS_OF_USE")) Segment_Tag_SimpleTag_TagNames[0]=__T("TermsOfUse");
+    if (Segment_Tag_SimpleTag_TagNames[0]==__T("TIMECODE"))
+    {
+        if (TagString.find(__T("Handler"))!=std::string::npos || TagString.find(__T("handler"))!=std::string::npos || TagString.find(__T("vide"))!=std::string::npos || TagString.find(__T("soun"))!=std::string::npos)
+            return; //This is not a Title
+        Segment_Tag_SimpleTag_TagNames[0]=__T("TimeCode_FirstFrame");
+        Segment_Tags_Tag_Items[Segment_Tags_Tag_Targets_TagTrackUID_Value]["TimeCode_Source"]="Matroska tags";
+    }
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("TITLE")) Segment_Tag_SimpleTag_TagNames[0]=__T("Title");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("TOTAL_PARTS")) Segment_Tag_SimpleTag_TagNames[0]=__T("Track/Position_Total");
     for (size_t Pos=0; Pos<Segment_Tag_SimpleTag_TagNames.size(); Pos++)
@@ -2780,6 +2898,8 @@ void File_Mk::Segment_Tags_Tag_Targets_TagTrackUID()
 void File_Mk::Segment_Tracks()
 {
     TestMultipleInstances(&Segment_Tracks_Count);
+
+    SegmentTrack_Offset_End=File_Offset+Buffer_Offset+Element_TotalSize_Get();
 }
 
 //---------------------------------------------------------------------------
@@ -3382,7 +3502,15 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_FrameRate()
 void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_MatrixCoefficients()
 {
     //Parsing
-    UInteger_Info();
+    int64u UInteger=UInteger_Get(); Element_Info1(Mpegv_matrix_coefficients(UInteger));
+
+    //Filling
+    FILLING_BEGIN();
+        if (Segment_Info_Count>1)
+            return; //First element has the priority
+        Stream[TrackNumber].Infos["colour_description_present"]="Yes";
+        Stream[TrackNumber].Infos["matrix_coefficients"]=Mpegv_matrix_coefficients(UInteger);
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
@@ -3396,21 +3524,46 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_BitsPerChannel()
 void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_Range()
 {
     //Parsing
-    UInteger_Info();
+    int64u UInteger=UInteger_Get(); Element_Info1C(UInteger<2, Avc_video_full_range[UInteger]);
+
+    //Filling
+    FILLING_BEGIN();
+        if (Segment_Info_Count>1)
+            return; //First element has the priority
+        Stream[TrackNumber].Infos["colour_description_present"]="Yes";
+        if (UInteger<2)
+            Stream[TrackNumber].Infos["colour_range"]=Avc_video_full_range[UInteger];
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_TransferCharacteristics()
 {
     //Parsing
-    UInteger_Info();
+    int64u UInteger=UInteger_Get(); Element_Info1(Mpegv_transfer_characteristics(UInteger));
+
+    //Filling
+    FILLING_BEGIN();
+        if (Segment_Info_Count>1)
+            return; //First element has the priority
+        Stream[TrackNumber].Infos["colour_description_present"]="Yes";
+        Stream[TrackNumber].Infos["transfer_characteristics"]=Mpegv_transfer_characteristics(UInteger);
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
 void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_Primaries()
 {
     //Parsing
-    UInteger_Info();
+    int64u UInteger=UInteger_Get(); Element_Info1(Mpegv_colour_primaries(UInteger));
+
+    //Filling
+    FILLING_BEGIN();
+        if (Segment_Info_Count>1)
+            return; //First element has the priority
+        Stream[TrackNumber].Infos["colour_description_present"]="Yes";
+        Stream[TrackNumber].Infos["colour_primaries"]=Mpegv_colour_primaries(UInteger);
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------

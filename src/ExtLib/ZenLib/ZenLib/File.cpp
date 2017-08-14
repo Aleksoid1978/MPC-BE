@@ -45,7 +45,6 @@
 #endif //ZENLIB_USEWX
 #include "ZenLib/File.h"
 #include "ZenLib/OS_Utils.h"
-#include <map>
 //---------------------------------------------------------------------------
 
 namespace ZenLib
@@ -257,8 +256,8 @@ bool File::Open (const tstring &File_Name_, access_t Access)
             switch (Access)
             {
                 case Access_Read         : dwDesiredAccess=FILE_READ_DATA; dwShareMode=FILE_SHARE_READ|FILE_SHARE_WRITE; dwCreationDisposition=OPEN_EXISTING;   break;
-                case Access_Write        : dwDesiredAccess=GENERIC_WRITE;   dwShareMode=0;                                 dwCreationDisposition=OPEN_ALWAYS;   break;
-                case Access_Read_Write   : dwDesiredAccess=FILE_READ_DATA|GENERIC_WRITE;   dwShareMode=0; dwCreationDisposition=OPEN_ALWAYS;                    break;
+                case Access_Write        : dwDesiredAccess=GENERIC_WRITE;   dwShareMode=FILE_SHARE_READ|FILE_SHARE_WRITE; dwCreationDisposition=OPEN_ALWAYS;   break;
+                case Access_Read_Write   : dwDesiredAccess=FILE_READ_DATA|GENERIC_WRITE;   dwShareMode=FILE_SHARE_READ|FILE_SHARE_WRITE; dwCreationDisposition=OPEN_ALWAYS;                    break;
                 case Access_Write_Append : dwDesiredAccess = FILE_APPEND_DATA; dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE; dwCreationDisposition = OPEN_ALWAYS; break;
                 default                  : dwDesiredAccess=0;               dwShareMode=0;                                 dwCreationDisposition=0;             break;
             }
@@ -305,6 +304,11 @@ bool File::Open (const tstring &File_Name_, access_t Access)
 
             ZENLIB_DEBUG2(      "File Open",
                                 Debug+=", returns 1";)
+
+            if (Access==Access_Write_Append)
+                Size_Get();
+            else
+                Position=0;
 
             return true;
         #endif
@@ -789,6 +793,26 @@ Ztring File::Created_Get()
 }
 
 //---------------------------------------------------------------------------
+#if defined WINDOWS
+static Ztring Calc_Time(const FILETIME& TimeFT)
+{
+    int64u Time64 = 0x100000000ULL * TimeFT.dwHighDateTime + TimeFT.dwLowDateTime;
+    TIME_ZONE_INFORMATION Info;
+    DWORD Result = GetTimeZoneInformation(&Info);
+    if (Result != TIME_ZONE_ID_INVALID)
+    {
+        Time64 -= ((int64s)Info.Bias) * 60 * 1000 * 1000 * 10;
+        if (Result == TIME_ZONE_ID_DAYLIGHT)
+            Time64 -= ((int64s)Info.DaylightBias) * 60 * 1000 * 1000 * 10;
+        else
+            Time64 -= ((int64s)Info.StandardBias) * 60 * 1000 * 1000 * 10;
+    }
+    Ztring Time; Time.Date_From_Milliseconds_1601(Time64 / 10000);
+    Time.FindAndReplace(__T("UTC "), __T(""));
+    return Time;
+}
+#endif
+//---------------------------------------------------------------------------
 Ztring File::Created_Local_Get()
 {
     #ifdef ZENLIB_USEWX
@@ -811,20 +835,7 @@ Ztring File::Created_Local_Get()
             FILETIME TimeFT;
             if (GetFileTime(File_Handle, &TimeFT, NULL, NULL))
             {
-                int64u Time64=0x100000000ULL*TimeFT.dwHighDateTime+TimeFT.dwLowDateTime;
-                TIME_ZONE_INFORMATION Info;
-                DWORD Result=GetTimeZoneInformation(&Info);
-                if (Result!=TIME_ZONE_ID_INVALID)
-                {
-                    Time64-=((int64s)Info.Bias)*60*1000*1000*10;
-                    if (Result==TIME_ZONE_ID_DAYLIGHT)
-                        Time64-=((int64s)Info.DaylightBias)*60*1000*1000*10;
-                    else
-                        Time64-=((int64s)Info.StandardBias)*60*1000*1000*10;
-                }
-                Ztring Time; Time.Date_From_Milliseconds_1601(Time64/10000);
-                Time.FindAndReplace(__T("UTC "), __T(""));
-                return Time;
+                return Calc_Time(TimeFT);
             }
             else
                 return __T(""); //There was a problem
@@ -898,20 +909,7 @@ Ztring File::Modified_Local_Get()
             FILETIME TimeFT;
             if (GetFileTime(File_Handle, NULL, NULL, &TimeFT))
             {
-                int64u Time64=0x100000000ULL*TimeFT.dwHighDateTime+TimeFT.dwLowDateTime; //100-ns
-                TIME_ZONE_INFORMATION Info;
-                DWORD Result=GetTimeZoneInformation(&Info);
-                if (Result!=TIME_ZONE_ID_INVALID)
-                {
-                    Time64-=((int64s)Info.Bias)*60*1000*1000*10;
-                    if (Result==TIME_ZONE_ID_DAYLIGHT)
-                        Time64-=((int64s)Info.DaylightBias)*60*1000*1000*10;
-                    else
-                        Time64-=((int64s)Info.StandardBias)*60*1000*1000*10;
-                }
-                Ztring Time; Time.Date_From_Milliseconds_1601(Time64/10000);
-                Time.FindAndReplace(__T("UTC "), __T(""));
-                return Time;
+                return Calc_Time(TimeFT);
             }
             else
                 return __T(""); //There was a problem

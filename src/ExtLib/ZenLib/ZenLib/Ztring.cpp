@@ -1561,6 +1561,12 @@ std::string Ztring::To_UTF8 () const
 
         while (*Z)
         {
+            if (*Z < 0x80)
+            {
+                ToReturn += (char)(*(Z++));
+                continue;
+            }
+            
             int32u wc; // must be unsigned.
 
             #if defined(_MSC_VER)

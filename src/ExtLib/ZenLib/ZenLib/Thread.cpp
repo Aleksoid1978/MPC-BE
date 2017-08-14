@@ -188,23 +188,18 @@ THREAD_RETVAL THREAD_CALLCONV Thread_Start(void *param)
 //---------------------------------------------------------------------------
 Thread::Thread()
 {
-    C.Enter();
-
+    CriticalSectionLocker CSL(C);
     State=State_New;
     ThreadPointer=NULL;
 
-    C.Leave();
 }
 
 //---------------------------------------------------------------------------
 Thread::~Thread()
 {
-    C.Enter();
-
+    CriticalSectionLocker CSL(C);
     if (ThreadPointer!=NULL)
         CloseHandle((HANDLE)ThreadPointer); //ThreadPointer=NULL
-
-    C.Leave();
 }
 
 //***************************************************************************
@@ -214,12 +209,11 @@ Thread::~Thread()
 //---------------------------------------------------------------------------
 Thread::returnvalue Thread::Run()
 {
-    C.Enter();
+    CriticalSectionLocker CSL(C);
 
     //Coherency
     if (State!=State_New || ThreadPointer!=NULL)
     {
-        C.Leave();
         return Incoherent;
     }
 
@@ -237,7 +231,6 @@ Thread::returnvalue Thread::Run()
     #endif //USING_BEGINTHREAD
     if (ThreadPointer==NULL)
     {
-        C.Leave();
         return Resource;
     }
 
@@ -247,7 +240,6 @@ Thread::returnvalue Thread::Run()
     //Configuring
     State=State_Running;
 
-    C.Leave();
     return Ok;
 }
 
@@ -255,29 +247,27 @@ Thread::returnvalue Thread::Run()
 Thread::returnvalue Thread::RunAgain()
 {
     //Coherency
-    C.Enter();
-
-    //Coherency
-    if (State!=State_New
-     && State!=State_Terminated)
     {
-        C.Leave();
-        return Incoherent;
+        CriticalSectionLocker CSL(C);
+
+        //Coherency
+        if (State != State_New
+            && State != State_Terminated)
+        {
+            return Incoherent;
+        }
+
+        //Configuring
+        if (State == State_Terminated)
+            State = State_New;
     }
-
-    //Configuring
-    if (State==State_Terminated)
-        State=State_New;
-
-    C.Leave();
-
     return Run();
 }
 
 //---------------------------------------------------------------------------
 Thread::returnvalue Thread::Pause()
 {
-    C.Enter();
+    CriticalSectionLocker CSL(C);
 
     //Pausing
     SuspendThread((HANDLE)ThreadPointer);
@@ -285,33 +275,30 @@ Thread::returnvalue Thread::Pause()
     //Configuring
     State=State_Paused;
 
-    C.Leave();
     return Ok;
 }
 
 //---------------------------------------------------------------------------
 Thread::returnvalue Thread::RequestTerminate()
 {
-    C.Enter();
+    CriticalSectionLocker CSL(C);
 
     //Coherency
     if (State!=State_Running)
     {
-        C.Leave();
         return IsNotRunning;
     }
 
     //Configuring
     State=State_Terminating;
 
-    C.Leave();
     return Ok;
 }
 
 //---------------------------------------------------------------------------
 Thread::returnvalue Thread::ForceTerminate()
 {
-    C.Enter();
+    CriticalSectionLocker CSL(C);
 
     //Terminating (not clean)
     TerminateThread((HANDLE)ThreadPointer, 1); ThreadPointer=NULL;
@@ -319,7 +306,6 @@ Thread::returnvalue Thread::ForceTerminate()
     //Configuring
     State=State_Terminated;
 
-    C.Leave();
     return Ok;
 }
 
@@ -329,27 +315,24 @@ Thread::returnvalue Thread::ForceTerminate()
 
 bool Thread::IsRunning()
 {
-    C.Enter();
-    bool ToReturn=State==State_Running || State==State_Terminating;
-    C.Leave();
+    CriticalSectionLocker CSL(C);
+    const bool ToReturn=State==State_Running || State==State_Terminating;
     return ToReturn;
 }
 
 //---------------------------------------------------------------------------
 bool Thread::IsTerminating()
 {
-    C.Enter();
-    bool ToReturn=State==State_Terminating;
-    C.Leave();
+    CriticalSectionLocker CSL(C);
+    const bool ToReturn=State==State_Terminating;
     return ToReturn;
 }
 
 //---------------------------------------------------------------------------
 bool Thread::IsExited()
 {
-    C.Enter();
-    bool ToReturn=State==State_New || State==State_Terminated;
-    C.Leave();
+    CriticalSectionLocker CSL(C);
+    const bool ToReturn=State==State_New || State==State_Terminated;
     return ToReturn;
 }
 
@@ -384,13 +367,12 @@ void Thread::Yield()
 //---------------------------------------------------------------------------
 Thread::returnvalue Thread::Internal_Exit()
 {
-    C.Enter();
+    CriticalSectionLocker CSL(C);
 
     //Coherency
     if (State!=State_Running
      && State!=State_Terminating)
     {
-        C.Leave();
         return IsNotRunning;
     }
 
@@ -400,7 +382,6 @@ Thread::returnvalue Thread::Internal_Exit()
     //Configuring
     State=State_Terminated;
 
-    C.Leave();
     return Ok;
 }
 
@@ -446,12 +427,10 @@ void *Thread_Start(void *param)
 //---------------------------------------------------------------------------
 Thread::Thread()
 {
-    C.Enter();
+    CriticalSectionLocker CSL(C);
 
     State=State_New;
     ThreadPointer=NULL;
-
-    C.Leave();
 
 }
 
@@ -474,12 +453,11 @@ void Thread::Entry()
 
 Thread::returnvalue Thread::Run()
 {
-    C.Enter();
+    CriticalSectionLocker CSL(C);
 
     //Coherency
     if (State!=State_New || ThreadPointer!=NULL)
     {
-        C.Leave();
         return Incoherent;
     }
 
@@ -494,28 +472,24 @@ Thread::returnvalue Thread::Run()
     //Configuring
     State=State_Running;
 
-    C.Leave();
     return Ok;
 }
 
 Thread::returnvalue Thread::RunAgain()
 {
     //Coherency
-    C.Enter();
+    CriticalSectionLocker CSL(C);
 
     //Coherency
     if (State!=State_New
      && State!=State_Terminated)
     {
-        C.Leave();
         return Incoherent;
     }
 
     //Configuring
     if (State==State_Terminated)
         State=State_New;
-
-    C.Leave();
 
     return Run();
 }
@@ -528,17 +502,15 @@ Thread::returnvalue Thread::Pause()
 
 Thread::returnvalue Thread::RequestTerminate()
 {
-    C.Enter();
+    CriticalSectionLocker CSL(C);
 
     if (State!=State_Running)
     {
-        C.Leave();
         return IsNotRunning;
     }
 
     State=State_Terminating;
 
-    C.Leave();
     return Ok;
 }
 
@@ -559,27 +531,24 @@ Thread::returnvalue Thread::ForceTerminate()
 //---------------------------------------------------------------------------
 bool Thread::IsRunning()
 {
-    C.Enter();
-    bool ToReturn=State==State_Running;
-    C.Leave();
+    CriticalSectionLocker CSL(C);
+    const bool ToReturn=State==State_Running;
     return ToReturn;
 }
 
 //---------------------------------------------------------------------------
 bool Thread::IsTerminating()
 {
-    C.Enter();
-    bool ToReturn=State==State_Terminating;
-    C.Leave();
+    CriticalSectionLocker CSL(C);
+    const bool ToReturn=State==State_Terminating;
     return ToReturn;
 }
 
 //---------------------------------------------------------------------------
 bool Thread::IsExited()
 {
-    C.Enter();
-    bool ToReturn=State==State_New || State==State_Terminating;
-    C.Leave();
+    CriticalSectionLocker CSL(C);
+    const bool ToReturn=State==State_New || State==State_Terminating;
     return ToReturn;
 }
 
@@ -604,23 +573,21 @@ void Thread::Yield()
 
 Thread::returnvalue Thread::Internal_Exit()
 {
-    C.Enter();
+    CriticalSectionLocker CSL(C);
 
     //Coherency
     if (State!=State_Running
      && State!=State_Terminating)
     {
-        C.Leave();
         return IsNotRunning;
     }
 
     //Closing old handle
-    ; ThreadPointer=NULL;
+    ThreadPointer=NULL;
 
     //Configuring
     State=State_Terminated;
 
-    C.Leave();
     return Ok;
 }
 

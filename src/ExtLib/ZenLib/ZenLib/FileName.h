@@ -30,13 +30,13 @@ class FileName : public ZenLib::Ztring
 {
 public :
     //Constructor/Destructor
-    FileName ()                                                                 : Ztring(){};
-    FileName (const tstring& str)                                               : Ztring(str){};
-    FileName (const tstring& str, size_type pos, size_type n=npos)              : Ztring(str, pos, n){};
-    FileName (const Char* s, size_type n)                                       : Ztring(s, n){};
-    FileName (const Char* s)                                                    : Ztring(s){};
-    FileName (size_type n, char c)                                              : Ztring(n, c){};
-
+    FileName ()                                                                 : Ztring(){}
+    FileName (const tstring& str)                                               : Ztring(str){}
+    FileName (const tstring& str, size_type pos, size_type n=npos)              : Ztring(str, pos, n){}
+    FileName (const Char* s, size_type n)                                       : Ztring(s, n){}
+    FileName (const Char* s)                                                    : Ztring(s){}
+    FileName (size_type n, char c)                                              : Ztring(n, c){}
+    
     //Read/Write
     ZenLib::Ztring  Path_Get             () const;
     ZenLib::Ztring  Name_Get             () const;
@@ -46,9 +46,9 @@ public :
     ZenLib::Ztring& Extension_Set        (const Ztring &Extension);
 
     //Helpers
-    static ZenLib::Ztring Path_Get              (const Ztring &File_Name)       {return ((FileName&)File_Name).Path_Get();};
-    static ZenLib::Ztring Name_Get              (const Ztring &File_Name)       {return ((FileName&)File_Name).Name_Get();};
-    static ZenLib::Ztring Extension_Get         (const Ztring &File_Name)       {return ((FileName&)File_Name).Extension_Get();};
+    static ZenLib::Ztring Path_Get              (const Ztring &File_Name)       {return ((FileName&)File_Name).Path_Get();}
+    static ZenLib::Ztring Name_Get              (const Ztring &File_Name)       {return ((FileName&)File_Name).Name_Get();}
+    static ZenLib::Ztring Extension_Get         (const Ztring &File_Name)       {return ((FileName&)File_Name).Extension_Get();}
     static ZenLib::Ztring TempFileName_Create   (const Ztring &Prefix);
 };
 
