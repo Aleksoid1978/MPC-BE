@@ -1180,7 +1180,7 @@ void File_DvDif::Errors_Stats_Update()
                 Errors=Errors_Stats_Line_Details.To_Local();
                 Event.Errors=(char*)Errors.c_str();
             }
-            Config->Event_Send(this, (const int8u*)&Event, sizeof(MediaInfo_Event_DvDif_Analysis_Frame_0));
+            Config->Event_Send(NULL, (const int8u*)&Event, sizeof(MediaInfo_Event_DvDif_Analysis_Frame_0));
         #endif //MEDIAINFO_EVENTS
     }
 

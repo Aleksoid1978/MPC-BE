@@ -10,11 +10,11 @@ Updated libraries:
 	libflac git-1.3.2-63-gf7cd466c;
 	libpng git-v1.6.31beta04-5-gcd3721018;
 	Little-CMS git-lcms2.8-86-gd1652a0;
-	MediaInfo git-v0.7.97;
+	MediaInfo git-v0.7.98-2-g3436139b;
 	openjpeg 2.2.0 git-6239ed7b;
 	Speex-1.2.0-1-gcae5026;
 	rapidjson git-v1.1.0-199-g6a8f672c;
-	ZenLib git-v0.4.34-2-geda2854;
+	ZenLib git-v0.4.36;
 	zlib 1.2.11.
 
 1.5.0

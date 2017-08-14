@@ -262,6 +262,8 @@ namespace MediaInfo_Debug_MediaInfo_Internal
 }
 using namespace MediaInfo_Debug_MediaInfo_Internal;
 
+Ztring File__Analyze_Encoded_Library_String(const Ztring &CompanyName, const Ztring &Name, const Ztring &Version, const Ztring &Date, const Ztring &Encoded_Library);
+
 //***************************************************************************
 // Constructor/destructor
 //***************************************************************************
@@ -1110,6 +1112,16 @@ Ztring MediaInfo_Internal::Get(stream_t StreamKind, size_t StreamPos, const Stri
         return Get(StreamKind, StreamPos, __T("Encoded_Application/String"), KindOfInfo, KindOfSearch);
     if (Parameter==__T("Encoded_Library") && Info && !Info->Retrieve(StreamKind, StreamPos, "Encoded_Library/String").empty())
         return Get(StreamKind, StreamPos, __T("Encoded_Library/String"), KindOfInfo, KindOfSearch);
+    if (Parameter==__T("Encoded_Library/String") && !MediaInfoLib::Config.ReadByHuman_Get())
+    {
+        //TODO: slight duplicate of content in Streams_Finish_HumanReadable_PerStream, should be refactorized
+        Ztring CompanyName=Get(StreamKind, StreamPos, __T("Encoded_Library_CompanyName"));
+        Ztring Name=Get(StreamKind, StreamPos, __T("Encoded_Library_Name"));
+        Ztring Version=Get(StreamKind, StreamPos, __T("Encoded_Library_Version"));
+        Ztring Date=Get(StreamKind, StreamPos, __T("Encoded_Library_Date"));
+        Ztring Encoded_Library=Get(StreamKind, StreamPos, __T("Encoded_Library"));
+        return File__Analyze_Encoded_Library_String(CompanyName, Name, Version, Date, Encoded_Library);
+    }
 
     CS.Enter();
     MEDIAINFO_DEBUG_CONFIG_TEXT(Debug+=__T("Get, StreamKind=");Debug+=Ztring::ToZtring((size_t)StreamKind);Debug+=__T(", StreamKind=");Debug+=Ztring::ToZtring(StreamPos);Debug+=__T(", Parameter=");Debug+=Ztring(Parameter);)

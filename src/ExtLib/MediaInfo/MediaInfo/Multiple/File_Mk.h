@@ -460,7 +460,24 @@ private :
     size_t ChapterDisplays_Pos;
     int64u              Segment_Offset_Begin;
     int64u              Segment_Offset_End;
-    std::vector<int64u> Segment_Seeks;
+    int64u              IsParsingSegmentTrack_SeekBackTo;
+    int64u              SegmentTrack_Offset_End;
+    struct seek
+    {
+        int64u SeekID;
+        int64u SeekPosition;
+
+        seek()
+            : SeekID(0)
+            , SeekPosition(0)
+        {}
+
+        bool operator < (const seek &s) const
+        {
+            return SeekPosition < s.SeekPosition;
+        }
+    };
+    std::vector<seek>   Segment_Seeks;
     size_t              Segment_Seeks_Pos;
     std::vector<Ztring> Segment_Tag_SimpleTag_TagNames;
     int64u Segment_Cluster_BlockGroup_BlockDuration_Value;

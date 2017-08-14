@@ -23,6 +23,7 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Export/Export_PBCore.h"
 #include "MediaInfo/File__Analyse_Automatic.h"
+#include "MediaInfo/OutputHelpers.h"
 #include <ctime>
 using namespace std;
 //---------------------------------------------------------------------------
@@ -72,7 +73,7 @@ Export_PBCore::~Export_PBCore ()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-void PBCore_Transform(Ztring &ToReturn, MediaInfo_Internal &MI, stream_t StreamKind, size_t StreamPos)
+void PBCore_Transform(Node *Parent, MediaInfo_Internal &MI, stream_t StreamKind, size_t StreamPos)
 {
     //Menu: only if TimeCode
     if (StreamKind==Stream_Menu && MI.Get(Stream_Menu, StreamPos, Menu_Format)!=__T("TimeCode"))
@@ -108,84 +109,81 @@ void PBCore_Transform(Ztring &ToReturn, MediaInfo_Internal &MI, stream_t StreamK
         default:            return; //Not supported
     }
 
-    ToReturn+=__T("\t\t<pbcoreEssenceTrack>\n");
+    Node* Node_EssenceTrack=Parent->Add_Child("pbcoreEssenceTrack");
 
-    ToReturn+=__T("\t\t\t<essenceTrackType>")+essenceTrackType+__T("</essenceTrackType>\n");
+    Node_EssenceTrack->Add_Child("essenceTrackType", essenceTrackType);
 
     //essenceTrackIdentifier
     if (!MI.Get(StreamKind, StreamPos, __T("ID")).empty())
     {
-        ToReturn+=__T("\t\t\t<essenceTrackIdentifier>")+MI.Get(StreamKind, StreamPos, __T("ID"))+__T("</essenceTrackIdentifier>\n");
-        ToReturn+=__T("\t\t\t<essenceTrackIdentifierSource>ID (Mediainfo)</essenceTrackIdentifierSource>\n");
+        Node_EssenceTrack->Add_Child("essenceTrackIdentifier", MI.Get(StreamKind, StreamPos, __T("ID")));
+        Node_EssenceTrack->Add_Child("essenceTrackIdentifierSource", "ID (Mediainfo)");
     }
     else if (!MI.Get(StreamKind, StreamPos, __T("UniqueID")).empty())
     {
-        ToReturn+=__T("\t\t\t<essenceTrackIdentifier>")+MI.Get(StreamKind, StreamPos, __T("UniqueID"))+__T("</essenceTrackIdentifier>\n");
-        ToReturn+=__T("\t\t\t<essenceTrackIdentifierSource>UniqueID (Mediainfo)</essenceTrackIdentifierSource>\n");
+        Node_EssenceTrack->Add_Child("essenceTrackIdentifier", MI.Get(StreamKind, StreamPos, __T("UniqueID")));
+        Node_EssenceTrack->Add_Child("essenceTrackIdentifierSource", "UniqueID (Mediainfo)");
     }
     else if (!MI.Get(StreamKind, StreamPos, __T("StreamKindID")).empty())
     {
-        ToReturn+=__T("\t\t\t<essenceTrackIdentifier>")+MI.Get(StreamKind, StreamPos, __T("StreamKindID"))+__T("</essenceTrackIdentifier>\n");
-        ToReturn+=__T("\t\t\t<essenceTrackIdentifierSource>StreamKindID (Mediainfo)</essenceTrackIdentifierSource>\n");
+        Node_EssenceTrack->Add_Child("essenceTrackIdentifier", MI.Get(StreamKind, StreamPos, __T("StreamKindID")));
+        Node_EssenceTrack->Add_Child("essenceTrackIdentifierSource", "StreamKindID (Mediainfo)");
     }
 
     //essenceTrackStandard
-    if (StreamKind==Stream_Video && !MI.Get(Stream_Video, StreamPos, Video_Standard).empty())
-        ToReturn+=__T("\t\t\t<essenceTrackStandard>")+MI.Get(Stream_Video, StreamPos, Video_Standard)+__T("</essenceTrackStandard>\n");
+    if (StreamKind==Stream_Video)
+        Node_EssenceTrack->Add_Child_IfNotEmpty(MI, Stream_Video, StreamPos, Video_Standard, "essenceTrackStandard");
 
     //essenceTrackEncoding
     if (!MI.Get(StreamKind, StreamPos, __T("Format")).empty())
     {
-        ToReturn+=__T("\t\t\t<essenceTrackEncoding>");
-        ToReturn+=MI.Get(StreamKind, StreamPos, __T("Format"));
-        if (!MI.Get(StreamKind, StreamPos, __T("Format_Profile")).empty()) ToReturn+=__T(' ')+MI.Get(StreamKind, StreamPos, __T("Format_Profile"));
-        if (!MI.Get(StreamKind, StreamPos, __T("CodecID")).empty()) ToReturn+=__T(" (")+MI.Get(StreamKind, StreamPos, __T("CodecID"))+__T(')');
-        ToReturn+=__T("</essenceTrackEncoding>\n");
+        Ztring Format=MI.Get(StreamKind, StreamPos, __T("Format"));
+        if (!MI.Get(StreamKind, StreamPos, __T("Format_Profile")).empty())
+            Format+=__T(' ')+MI.Get(StreamKind, StreamPos, __T("Format_Profile"));
+        if (!MI.Get(StreamKind, StreamPos, __T("CodecID")).empty())
+            Format+=__T(" (")+MI.Get(StreamKind, StreamPos, __T("CodecID"))+__T(')');
+        Node_EssenceTrack->Add_Child("essenceTrackEncoding", Format);
     }
 
     //essenceTrackDataRate
     if (!MI.Get(StreamKind, StreamPos, __T("BitRate")).empty())
     {
-        ToReturn+=__T("\t\t\t<essenceTrackDataRate>");
-        ToReturn+=MI.Get(StreamKind, StreamPos, __T("BitRate"));
+        Ztring BitRate=MI.Get(StreamKind, StreamPos, __T("BitRate"));
         if (!MI.Get(StreamKind, StreamPos, __T("BitRate_Mode")).empty())
-            ToReturn+=__T(' ')+MI.Get(StreamKind, StreamPos, __T("BitRate_Mode"));
-        ToReturn+=__T("</essenceTrackDataRate>\n");
+            BitRate+=__T(' ')+MI.Get(StreamKind, StreamPos, __T("BitRate_Mode"));
+        Node_EssenceTrack->Add_Child("essenceTrackDataRate", BitRate);
     }
 
     //essenceTrackFrameRate
     if (StreamKind==Stream_Video && !MI.Get(Stream_Video, StreamPos, Video_FrameRate).empty())
     {
-        ToReturn+=__T("\t\t\t<essenceTrackFrameRate>");
-        ToReturn+=MI.Get(Stream_Video, StreamPos, Video_FrameRate);
+        Ztring FrameRate=MI.Get(Stream_Video, StreamPos, Video_FrameRate);
         if (!MI.Get(Stream_Video, StreamPos, Video_FrameRate_Mode).empty())
-            ToReturn+=__T(' ')+MI.Get(Stream_Video, StreamPos, Video_FrameRate_Mode);
-        ToReturn+=__T("</essenceTrackFrameRate>\n");
+            FrameRate+=__T(' ')+MI.Get(Stream_Video, StreamPos, Video_FrameRate_Mode);
+        Node_EssenceTrack->Add_Child("essenceTrackFrameRate", FrameRate);
     }
 
     //essenceTrackSamplingRate
-    if (StreamKind==Stream_Audio && !MI.Get(Stream_Audio, StreamPos, Audio_SamplingRate).empty())
-        ToReturn+=__T("\t\t\t<essenceTrackSamplingRate>")+MI.Get(Stream_Audio, StreamPos, Audio_SamplingRate)+__T("</essenceTrackSamplingRate>\n");
+    if (StreamKind==Stream_Audio)
+        Node_EssenceTrack->Add_Child_IfNotEmpty(MI, Stream_Audio, StreamPos, Audio_SamplingRate, "essenceTrackSamplingRate");
 
     //essenceTrackBitDepth
-    if (!MI.Get(StreamKind, StreamPos, __T("BitDepth")).empty())
-        ToReturn+=__T("\t\t\t<essenceTrackBitDepth version=\"PBCoreXSD_Ver_1.2_D1\">")+MI.Get(StreamKind, StreamPos, __T("BitDepth"))+__T("</essenceTrackBitDepth>\n");
+    Node_EssenceTrack->Add_Child_IfNotEmpty(MI, StreamKind, StreamPos, "BitDepth", "essenceTrackBitDepth", "version", "PBCoreXSD_Ver_1.2_D1");
 
     //essenceTrackFrameSize
     if (StreamKind==Stream_Video && !MI.Get(Stream_Video, StreamPos, Video_Width).empty())
-        ToReturn+=__T("\t\t\t<essenceTrackFrameSize>")+MI.Get(Stream_Video, StreamPos, Video_Width)+__T('x')+MI.Get(Stream_Video, StreamPos, Video_Height)+__T("</essenceTrackFrameSize>\n");
+        Node_EssenceTrack->Add_Child("essenceTrackFrameSize", MI.Get(Stream_Video, StreamPos, Video_Width)+__T('x')+MI.Get(Stream_Video, StreamPos, Video_Height));
 
     //essenceTrackAspectRatio
-    if (StreamKind==Stream_Video && !MI.Get(Stream_Video, StreamPos, Video_DisplayAspectRatio).empty())
-        ToReturn+=__T("\t\t\t<essenceTrackAspectRatio>")+MI.Get(Stream_Video, StreamPos, Video_DisplayAspectRatio)+__T("</essenceTrackAspectRatio>\n");
+    if (StreamKind==Stream_Video)
+        Node_EssenceTrack->Add_Child_IfNotEmpty(MI, Stream_Video, StreamPos, Video_DisplayAspectRatio, "essenceTrackAspectRatio");
 
     //essenceTrackDuration
-    if (!MI.Get(StreamKind, StreamPos, __T("Duration")).empty())
-        ToReturn+=__T("\t\t\t<essenceTrackDuration>")+MI.Get(StreamKind, StreamPos, __T("Duration"))+__T("</essenceTrackDuration>\n");
+    Node_EssenceTrack->Add_Child_IfNotEmpty(MI, StreamKind, StreamPos, "Duration", "essenceTrackDuration");
 
     //essenceTrackLanguage
     if (!MI.Get(StreamKind, StreamPos, __T("Language")).empty())
-        ToReturn+=__T("\t\t\t<essenceTrackLanguage>")+MediaInfoLib::Config.Iso639_2_Get(MI.Get(StreamKind, StreamPos, __T("Language")))+__T("</essenceTrackLanguage>\n");
+        Node_EssenceTrack->Add_Child("essenceTrackLanguage", MediaInfoLib::Config.Iso639_2_Get(MI.Get(StreamKind, StreamPos, __T("Language"))));
 
     //essenceTrackAnnotation - all fields (except *_String*) separated by |
     Ztring Temp;
@@ -195,74 +193,55 @@ void PBCore_Transform(Ztring &ToReturn, MediaInfo_Internal &MI, stream_t StreamK
     if (!Temp.empty())
     {
         Temp.resize(Temp.size()-1);
-        ToReturn+=__T("\t\t\t<essenceTrackAnnotation>"); ToReturn+=Temp; ToReturn+=__T("</essenceTrackAnnotation>\n");
+        Node_EssenceTrack->Add_Child("essenceTrackAnnotation", Temp);
     }
-
-    ToReturn+=__T("\t\t</pbcoreEssenceTrack>\n");
 }
 
 //---------------------------------------------------------------------------
 Ztring Export_PBCore::Transform(MediaInfo_Internal &MI)
 {
-    //Current date/time is ISO format
-    time_t Time=time(NULL);
-    Ztring TimeS; TimeS.Date_From_Seconds_1970((int32u)Time);
-    TimeS.FindAndReplace(__T("UTC "), __T(""));
-    TimeS.FindAndReplace(__T(" "), __T("T"));
-    TimeS+=__T('Z');
-
-    Ztring ToReturn;
-    ToReturn+=__T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-    ToReturn+=__T("<PBCoreDescriptionDocument xsi:schemaLocation=\"http://www.pbcore.org/PBCore/PBCoreNamespace.html http://www.pbcore.org/PBCore/PBCoreXSD_Ver_1-2-1.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://www.pbcore.org/PBCore/PBCoreNamespace.html\">\n");
-    ToReturn+=__T("\t<!-- Generated at ")+TimeS+__T(" by ")+MediaInfoLib::Config.Info_Version_Get()+__T(" -->\n");
-    ToReturn+=__T("\t<!-- Warning: MediaInfo outputs only pbcoreInstantiation, other mandatory PBCore data is junk -->\n");
-    ToReturn+=__T("\t<pbcoreIdentifier>\n");
-    ToReturn+=__T("\t\t<identifier>***</identifier>\n");
-    ToReturn+=__T("\t\t<identifierSource>***</identifierSource>\n");
-    ToReturn+=__T("\t</pbcoreIdentifier>\n");
-    ToReturn+=__T("\t<pbcoreTitle>\n");
-    ToReturn+=__T("\t\t<title>***</title>\n");
-    ToReturn+=__T("\t</pbcoreTitle>\n");
-    ToReturn+=__T("\t<pbcoreDescription>\n");
-    ToReturn+=__T("\t\t<description>***</description>\n");
-    ToReturn+=__T("\t\t<descriptionType>***</descriptionType>\n");
-    ToReturn+=__T("\t</pbcoreDescription>\n");
-    ToReturn+=__T("\t<pbcoreInstantiation>\n");
 
 
+    Node Node_Main("PBCoreDescriptionDocument");
+    Node_Main.Add_Attribute("xsi:schemaLocation", "http://www.pbcore.org/PBCore/PBCoreNamespace.html http://www.pbcore.org/PBCore/PBCoreXSD_Ver_1-2-1.xsd");
+    Node_Main.Add_Attribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+    Node_Main.Add_Attribute("xmlns", "http://www.pbcore.org/PBCore/PBCoreNamespace.html");
+    Node* Node_Identifier = Node_Main.Add_Child("pbcoreIdentifier");
+    Node_Identifier->Add_Child("identifier", "***");
+    Node_Identifier->Add_Child("identifierSource", "***");
+
+    Node_Main.Add_Child("pbcoreTitle")->Add_Child("title", "***");
+
+    Node* Node_Description = Node_Main.Add_Child("pbcoreDescription");
+    Node_Description->Add_Child("description", "***");
+    Node_Description->Add_Child("descriptionType", "***");
+    
+    Node* Node_Instantiation = Node_Main.Add_Child("pbcoreInstantiation");
+    
     //pbcoreFormatID
-    ToReturn+=__T("\t\t<pbcoreFormatID>\n");
-        //formatIdentifier
-        ToReturn+=__T("\t\t\t<formatIdentifier>")+MI.Get(Stream_General, 0, General_FileName)+__T("</formatIdentifier>\n");
-        //formatIdentifierSource
-        ToReturn+=__T("\t\t\t<formatIdentifierSource version=\"PBCoreXSD_Ver_1.2_D1\">File Name</formatIdentifierSource>\n");
-    ToReturn+=__T("\t\t</pbcoreFormatID>\n");
+    Node* Node_FormatID = Node_Instantiation->Add_Child("pbcoreFormatID");
+    //formatIdentifier
+    Node_FormatID->Add_Child("formatIdentifier", MI.Get(Stream_General, 0, General_FileName));
+    //formatIdentifierSource
+    Node_FormatID->Add_Child("formatIdentifierSource", "File Name", "version", "PBCoreXSD_Ver_1.2_D1");
 
     //formatDigital
+    //TODO: how to implement formats without Media Type?
+    Ztring Format;
     if (!MI.Get(Stream_General, 0, General_InternetMediaType).empty())
-    {
-        ToReturn+=__T("\t\t<formatDigital>");
-        ToReturn+=MI.Get(Stream_General, 0, General_InternetMediaType);
-        ToReturn+=__T("</formatDigital>\n");
-    }
+        Format=Ztring(MI.Get(Stream_General, 0, General_InternetMediaType));
+    else if (MI.Count_Get(Stream_Video))
+        Format=__T("video/x-")+Ztring(MI.Get(Stream_General, 0, __T("Format"))).MakeLowerCase();
+    else if (MI.Count_Get(Stream_Image))
+        Format=__T("image/x-")+Ztring(MI.Get(Stream_General, 0, __T("Format"))).MakeLowerCase();
+    else if (MI.Count_Get(Stream_Audio))
+        Format=__T("audio/x-")+Ztring(MI.Get(Stream_General, 0, __T("Format"))).MakeLowerCase();
     else
-    {
-        //TODO: how to implement formats without Media Type?
-        ToReturn+=__T("\t\t<formatDigital>");
-        if (MI.Count_Get(Stream_Video))
-            ToReturn+=__T("video/x-");
-        else if (MI.Count_Get(Stream_Image))
-            ToReturn+=__T("image/x-");
-        else if (MI.Count_Get(Stream_Audio))
-            ToReturn+=__T("audio/x-");
-        else
-            ToReturn+=__T("application/x-");
-        ToReturn+=Ztring(MI.Get(Stream_General, 0, __T("Format"))).MakeLowerCase();
-        ToReturn+=__T("</formatDigital>\n");
-    }
+        Format=__T("application/x-")+Ztring(MI.Get(Stream_General, 0, __T("Format"))).MakeLowerCase();
+    Node_Instantiation->Add_Child("formatDigital", Format);
 
     //formatLocation
-    ToReturn+=__T("\t\t<formatLocation>")+MI.Get(Stream_General, 0, General_CompleteName)+__T("</formatLocation>\n");
+    Node_Instantiation->Add_Child("formatLocation", MI.Get(Stream_General, 0, General_CompleteName));
 
     //dateCreated
     if (!MI.Get(Stream_General, 0, General_Encoded_Date).empty())
@@ -271,7 +250,7 @@ Ztring Export_PBCore::Transform(MediaInfo_Internal &MI)
         dateCreated.FindAndReplace(__T("UTC"), __T("-"));
         dateCreated.FindAndReplace(__T(" "), __T("T"));
         dateCreated+=__T('Z');
-        ToReturn+=__T("\t\t<dateCreated>")+dateCreated+__T("</dateCreated>\n");
+        Node_Instantiation->Add_Child("dateCreated", dateCreated);
     }
 
     //dateIssued
@@ -281,52 +260,51 @@ Ztring Export_PBCore::Transform(MediaInfo_Internal &MI)
         dateIssued.FindAndReplace(__T("UTC"), __T("-"));
         dateIssued.FindAndReplace(__T(" "), __T("T"));
         dateIssued+=__T('Z');
-        ToReturn+=__T("\t\t<dateIssued>")+dateIssued+__T("</dateIssued>\n");
+        Node_Instantiation->Add_Child("dateIssued", dateIssued);
     }
 
     //formatMediaType
-    if (!PBCore_MediaType(MI).empty())
-        ToReturn+=__T("\t\t<formatMediaType version=\"PBCoreXSD_Ver_1.2_D1\">")+PBCore_MediaType(MI)+__T("</formatMediaType>\n");
-    else
-        ToReturn+=__T("\t\t<formatMediaType version=\"PBCoreXSD_Ver_1.2_D1\">application/octet-stream</formatMediaType>\n");
+    Node_Instantiation->Add_Child("formatMediaType", PBCore_MediaType(MI).empty()?Ztring(__T("application/octet-stream")):PBCore_MediaType(MI), "version", "PBCoreXSD_Ver_1.2_D1");
 
     //formatGenerations
-    ToReturn+=__T("\t\t<formatGenerations version=\"PBCoreXSD_Ver_1.2_D1\" />\n");
+    Node_Instantiation->Add_Child("formatGenerations", "","version", "PBCoreXSD_Ver_1.2_D1");
 
     //formatFileSize
-    if (!MI.Get(Stream_General, 0, General_FileSize).empty())
-        ToReturn+=__T("\t\t<formatFileSize>")+MI.Get(Stream_General, 0, General_FileSize)+__T("</formatFileSize>\n");
+    Node_Instantiation->Add_Child_IfNotEmpty(MI, Stream_General, 0, General_FileSize, "formatFileSize");
 
     //formatTimeStart
     if (!MI.Get(Stream_Video, 0, Video_Delay_Original_String3).empty())
-        ToReturn+=__T("\t\t<formatTimeStart>")+MI.Get(Stream_Video, 0, Video_Delay_Original_String3)+__T("</formatTimeStart>\n");
+        Node_Instantiation->Add_Child("formatTimeStart", MI.Get(Stream_Video, 0, Video_Delay_Original_String3));
     else if (!MI.Get(Stream_Video, 0, Video_Delay_String3).empty())
-        ToReturn+=__T("\t\t<formatTimeStart>")+MI.Get(Stream_Video, 0, Video_Delay_String3)+__T("</formatTimeStart>\n");
+        Node_Instantiation->Add_Child("formatTimeStart", MI.Get(Stream_Video, 0, Video_Delay_String3));
 
     //formatDuration
-    if (!MI.Get(Stream_General, 0, General_Duration_String3).empty())
-        ToReturn+=__T("\t\t<formatDuration>")+MI.Get(Stream_General, 0, General_Duration_String3)+__T("</formatDuration>\n");
+    Node_Instantiation->Add_Child_IfNotEmpty(MI, Stream_General, 0, General_Duration_String3, "formatDuration");
 
     //formatDataRate
     if (!MI.Get(Stream_General, 0, General_OverallBitRate).empty())
     {
-        ToReturn+=__T("\t\t<formatDataRate>");
-        ToReturn+=MI.Get(Stream_General, 0, General_OverallBitRate);
+        Ztring formatDataRate=MI.Get(Stream_General, 0, General_OverallBitRate);
         if (!MI.Get(Stream_General, 0, General_OverallBitRate_Mode).empty())
-            ToReturn+=__T(' ')+MI.Get(Stream_General, 0, General_OverallBitRate_Mode);
-        ToReturn+=__T("</formatDataRate>\n");
+            formatDataRate+=__T(' ')+MI.Get(Stream_General, 0, General_OverallBitRate_Mode);
+        Node_Instantiation->Add_Child("formatDataRate", formatDataRate);
     }
 
     //formatTracks
-    ToReturn+=__T("\t\t<formatTracks>")+Ztring::ToZtring(MI.Count_Get(Stream_Video)+MI.Count_Get(Stream_Audio)+MI.Count_Get(Stream_Image)+MI.Count_Get(Stream_Text))+__T("</formatTracks>\n");
+    Node_Instantiation->Add_Child("formatTracks", Ztring::ToZtring(MI.Count_Get(Stream_Video)+MI.Count_Get(Stream_Audio)+MI.Count_Get(Stream_Image)+MI.Count_Get(Stream_Text)));
+
+    Ztring ToReturn;
 
     //Streams
     for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Max; StreamKind++)
         for (size_t StreamPos=0; StreamPos<MI.Count_Get((stream_t)StreamKind); StreamPos++)
-            PBCore_Transform(ToReturn, MI, (stream_t)StreamKind, StreamPos);
+            PBCore_Transform(Node_Instantiation, MI, (stream_t)StreamKind, StreamPos);
 
-    ToReturn+=__T("\t</pbcoreInstantiation>\n");
-    ToReturn+=__T("</PBCoreDescriptionDocument>\n");
+    ToReturn+=Ztring().From_UTF8(To_XML(Node_Main, 0).c_str());
+
+    size_t Pos=ToReturn.find(__T("<PBCoreDescriptionDocument"));
+    if(Pos!=Ztring::npos)
+        ToReturn.insert(Pos, __T("<!-- Warning: MediaInfo outputs only pbcoreInstantiation, other mandatory PBCore data is junk -->\n"));
 
     //Carriage return
     ToReturn.FindAndReplace(__T("\n"), EOL, 0, Ztring_Recursive);

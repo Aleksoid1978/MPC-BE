@@ -288,80 +288,111 @@ void ZtringListList::Write(const Ztring &ToWrite)
     if (ToWrite.empty())
         return;
 
-    size_type PosC=0;
-    bool Fini=false;
-    Ztring C1;
-    ZtringList ZL1;
-    ZL1.Separator_Set(0, Separator[1]);
-    ZL1.Quote_Set(Quote);
-    ZL1.Max_Set(0, Max[1]);
-
-    //Detecting carriage return format
-    Ztring WriteSeparator;
-    if (Separator[0]==EOL)
+    size_t l=ToWrite.size();
+    size_t i=0;
+    bool q=false; //In quotes
+    size_t Quote_Size=Quote.size();
+    size_t Separator0_Size=Separator[0].size();
+    size_t Separator1_Size=Separator[1].size();
+    size_t x=0, y=0;
+    while (i<l)
     {
-        size_t CarriageReturn_Pos=ToWrite.find_first_of(__T("\r\n"));
-        if (CarriageReturn_Pos!=string::npos)
+        //Quote
+        if (i+Quote_Size<=l)
         {
-            if (ToWrite[CarriageReturn_Pos]==__T('\r'))
+            bool IsQuote=true;
+            for (size_t j=0; j<Quote_Size; j++)
             {
-                if (CarriageReturn_Pos+1<ToWrite.size() && ToWrite[CarriageReturn_Pos+1]==__T('\n'))
-                    WriteSeparator=__T("\r\n");
-                else
-                    WriteSeparator=__T("\r");
-            }
-            else
-                WriteSeparator=__T("\n");
-        }
-        else
-            WriteSeparator=Separator[0];
-    }
-    else
-        WriteSeparator=Separator[0];
-
-    do
-    {
-        //Searching end of line, but it must not be in quotes
-        bool InQuotes=false;
-        Ztring CharsToFind=WriteSeparator+Quote;
-        size_t Pos_End=PosC;
-        while (Pos_End<ToWrite.size())
-        {
-            Pos_End=ToWrite.find(WriteSeparator, Pos_End);
-            if (Pos_End!=string::npos)
-            {
-                if (Pos_End+Quote.size()<ToWrite.size() && ToWrite[Pos_End]==Quote[0] && ToWrite[Pos_End+1]!=Quote[0])
+                if (ToWrite[i+j]!=Quote[j])
                 {
-                    InQuotes=!InQuotes; //This is not double quotes, so this is a normal quote
-                    /*if (!InQuotes)
-                    {
-                        C1=ToWrite.substr(PosC, Pos_End-PosC);
-                        break;
-                    }*/
-                }
-
-                if (!InQuotes && Pos_End+WriteSeparator.size()<=ToWrite.size() && ToWrite[Pos_End]==WriteSeparator[0])
-                {
-                    C1=ToWrite.substr(PosC, Pos_End-PosC);
+                    IsQuote=false;
                     break;
                 }
-
-                if (InQuotes && Pos_End+Quote.size()*2<ToWrite.size() && ToWrite[Pos_End]==Quote[0] && ToWrite[Pos_End+1]==Quote[0])
-                    Pos_End+=2;
-                else
-                    Pos_End++;
+            }
+            if (IsQuote)
+            {
+                //Double quote
+                if (i+Quote_Size*2<=l)
+                {
+                    IsQuote=false;
+                    for (size_t j=0; j<Quote_Size; j++)
+                    {
+                        if (ToWrite[i+Quote_Size+j]!=Quote[j])
+                        {
+                            IsQuote=true;
+                            break;
+                        }
+                    }
+                    if (!IsQuote)
+                        i++; // 2 quote chars transformed to one unique quote
+                }
+                if (IsQuote)
+                {
+                    i+=Quote_Size;
+                    q=!q;
+                    continue;
+                }
             }
         }
-        if (Pos_End>=ToWrite.size())
-            C1=ToWrite.substr(PosC, string::npos);
 
-        ZL1.Write(C1);
-        push_back(ZL1);
-        PosC+=C1.size()+WriteSeparator.size();
-        if (PosC>=ToWrite.size())
-            Fini=true;
+        if (!q)
+        {
+            //Carriage return
+            if (i+Separator0_Size<=l)
+            {
+                bool IsSeparator0=true;
+                for (size_t j=0; j<Separator0_Size; j++)
+                {
+                    if (ToWrite[i+j]!= Separator[0][j])
+                    {
+                        IsSeparator0=false;
+                        break;
+                    }
+                }
+                if (IsSeparator0)
+                {
+                    i+=Separator0_Size;
+                    y++;
+                    x=0;
+                    continue;
+                }
+            }
+
+            //Carriage return
+            if (i+Separator1_Size<=l)
+            {
+                bool IsSeparator1=true;
+                for (size_t j=0; j<Separator1_Size; j++)
+                {
+                    if (ToWrite[i+j]!= Separator[1][j])
+                    {
+                        IsSeparator1=false;
+                        break;
+                    }
+                }
+                if (IsSeparator1)
+                {
+                    i+=Separator1_Size;
+                    x++;
+                    continue;
+                }
+            }
+        }
+
+        if (y>=size())
+        {
+            size_t PreviousSize=size();
+            resize(y+1);
+            for (size_t j=0; j<=y; j++)
+                operator[](j).Separator_Set(0, Separator[1]);
+        }
+        ZtringList& Line=operator[](y);
+        if (x>=Line.size())
+            Line.resize(x+1);
+        Line.operator[](x).push_back(ToWrite[i]);
+
+        i++;
     }
-    while (!Fini);
 }
 
 void ZtringListList::Write(const ZtringList &ToWrite, size_type Pos)

@@ -23,6 +23,8 @@
 //---------------------------------------------------------------------------
 #include "ZenLib/Conf.h"
 #include <fstream>
+#include <sstream>
+#include <memory>
 #include <map>
 #include <stack>
 #include <string>

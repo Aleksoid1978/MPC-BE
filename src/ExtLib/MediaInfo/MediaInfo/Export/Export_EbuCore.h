@@ -42,6 +42,7 @@ public :
         AcquisitionDataOutputMode_segmentParameter,
         AcquisitionDataOutputMode_Max,
     };
+
     ZenLib::Ztring Transform(MediaInfo_Internal &MI, version Version=version(Version_Max-1), acquisitiondataoutputmode AcquisitionDataOutputMode=AcquisitionDataOutputMode_Default);
 };
 
