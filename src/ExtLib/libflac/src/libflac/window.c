@@ -109,7 +109,7 @@ void FLAC__window_flattop(FLAC__real *window, const FLAC__int32 L)
 	FLAC__int32 n;
 
 	for (n = 0; n < L; n++)
-		window[n] = (FLAC__real)(1.0f - 1.93f * cos(2.0f * M_PI * n / N) + 1.29f * cos(4.0f * M_PI * n / N) - 0.388f * cos(6.0f * M_PI * n / N) + 0.0322f * cos(8.0f * M_PI * n / N));
+		window[n] = (FLAC__real)(0.21557895f - 0.41663158f * cos(2.0f * M_PI * n / N) + 0.277263158f * cos(4.0f * M_PI * n / N) - 0.083578947f * cos(6.0f * M_PI * n / N) + 0.006947368f * cos(8.0f * M_PI * n / N));
 }
 
 void FLAC__window_gauss(FLAC__real *window, const FLAC__int32 L, const FLAC__real stddev)
