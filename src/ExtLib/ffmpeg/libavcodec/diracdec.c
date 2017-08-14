@@ -249,7 +249,7 @@ enum dirac_subband {
 /* magic number division by 3 from schroedinger */
 static inline int divide3(int x)
 {
-    return ((x+1)*21845 + 10922) >> 16;
+    return (int)((x+1U)*21845 + 10922) >> 16;
 }
 
 static DiracFrame *remove_frame(DiracFrame *framelist[], int picnum)
@@ -454,7 +454,8 @@ static inline int coeff_unpack_golomb(GetBitContext *gb, int qfactor, int qoffse
     static inline void coeff_unpack_arith_##n(DiracArith *c, int qfactor, int qoffset, \
                                               SubBand *b, type *buf, int x, int y) \
     { \
-        int coeff, sign, sign_pred = 0, pred_ctx = CTX_ZPZN_F1; \
+        int sign, sign_pred = 0, pred_ctx = CTX_ZPZN_F1; \
+        unsigned coeff; \
         const int mstride = -(b->stride >> (1+b->pshift)); \
         if (b->parent) { \
             const type *pbuf = (type *)b->parent->ibuf; \
@@ -1178,6 +1179,11 @@ static int dirac_unpack_prediction_parameters(DiracContext *s)
 
     if (get_bits1(gb)) {
         s->weight_log2denom = get_interleaved_ue_golomb(gb);
+        if (s->weight_log2denom < 1 || s->weight_log2denom > 8) {
+            av_log(s->avctx, AV_LOG_ERROR, "weight_log2denom unsupported or invalid\n");
+            s->weight_log2denom = 1;
+            return AVERROR_INVALIDDATA;
+        }
         s->weight[0] = dirac_get_se_golomb(gb);
         if (s->num_refs == 2)
             s->weight[1] = dirac_get_se_golomb(gb);
@@ -2090,7 +2096,10 @@ static int dirac_decode_data_unit(AVCodecContext *avctx, const uint8_t *buf, int
             return ret;
         }
 
-        ret = ff_set_dimensions(avctx, dsh->width, dsh->height);
+        if (CALC_PADDING((int64_t)dsh->width, MAX_DWT_LEVELS) * CALC_PADDING((int64_t)dsh->height, MAX_DWT_LEVELS) > avctx->max_pixels)
+            ret = AVERROR(ERANGE);
+        if (ret >= 0)
+            ret = ff_set_dimensions(avctx, dsh->width, dsh->height);
         if (ret < 0) {
             av_freep(&dsh);
             return ret;

@@ -27,6 +27,8 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
+#define UNCHECKED_BITSTREAM_READER 1
+
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 #include "bswapdsp.h"
@@ -73,8 +75,8 @@ static int build_huff10(const uint8_t *src, VLC *vlc, int *fsym)
         syms[i]  = he[i].sym;
         code += 0x80000000u >> (he[i].len - 1);
     }
-
-    return ff_init_vlc_sparse(vlc, FFMIN(he[last].len, 11), last + 1,
+#define VLC_BITS 11
+    return ff_init_vlc_sparse(vlc, VLC_BITS, last + 1,
                               bits,  sizeof(*bits),  sizeof(*bits),
                               codes, sizeof(*codes), sizeof(*codes),
                               syms,  sizeof(*syms),  sizeof(*syms), 0);
@@ -117,7 +119,7 @@ static int build_huff(const uint8_t *src, VLC *vlc, int *fsym)
         code += 0x80000000u >> (he[i].len - 1);
     }
 
-    return ff_init_vlc_sparse(vlc, FFMIN(he[last].len, 11), last + 1,
+    return ff_init_vlc_sparse(vlc, VLC_BITS, last + 1,
                               bits,  sizeof(*bits),  sizeof(*bits),
                               codes, sizeof(*codes), sizeof(*codes),
                               syms,  sizeof(*syms),  sizeof(*syms), 0);
@@ -185,23 +187,17 @@ static int decode_plane10(UtvideoContext *c, int plane_no,
             goto fail;
         }
 
-        memcpy(c->slice_bits, src + slice_data_start + c->slices * 4,
-               slice_size);
         memset(c->slice_bits + slice_size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
         c->bdsp.bswap_buf((uint32_t *) c->slice_bits,
-                          (uint32_t *) c->slice_bits,
+                          (uint32_t *)(src + slice_data_start + c->slices * 4),
                           (slice_data_end - slice_data_start + 3) >> 2);
         init_get_bits(&gb, c->slice_bits, slice_size * 8);
 
         prev = 0x200;
         for (j = sstart; j < send; j++) {
-            for (i = 0; i < width * step; i += step) {
-                if (get_bits_left(&gb) <= 0) {
-                    av_log(c->avctx, AV_LOG_ERROR,
-                           "Slice decoding ran out of bits\n");
-                    goto fail;
-                }
-                pix = get_vlc2(&gb, vlc.table, vlc.bits, 3);
+            int ws = width * step;
+            for (i = 0; i < ws; i += step) {
+                pix = get_vlc2(&gb, vlc.table, VLC_BITS, 3);
                 if (pix < 0) {
                     av_log(c->avctx, AV_LOG_ERROR, "Decoding error\n");
                     goto fail;
@@ -214,6 +210,11 @@ static int decode_plane10(UtvideoContext *c, int plane_no,
                 dest[i] = pix;
             }
             dest += stride;
+            if (get_bits_left(&gb) < 0) {
+                av_log(c->avctx, AV_LOG_ERROR,
+                        "Slice decoding ran out of bits\n");
+                goto fail;
+            }
         }
         if (get_bits_left(&gb) > 32)
             av_log(c->avctx, AV_LOG_WARNING,
@@ -291,23 +292,17 @@ static int decode_plane(UtvideoContext *c, int plane_no,
             goto fail;
         }
 
-        memcpy(c->slice_bits, src + slice_data_start + c->slices * 4,
-               slice_size);
         memset(c->slice_bits + slice_size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
         c->bdsp.bswap_buf((uint32_t *) c->slice_bits,
-                          (uint32_t *) c->slice_bits,
+                          (uint32_t *)(src + slice_data_start + c->slices * 4),
                           (slice_data_end - slice_data_start + 3) >> 2);
         init_get_bits(&gb, c->slice_bits, slice_size * 8);
 
         prev = 0x80;
         for (j = sstart; j < send; j++) {
-            for (i = 0; i < width * step; i += step) {
-                if (get_bits_left(&gb) <= 0) {
-                    av_log(c->avctx, AV_LOG_ERROR,
-                           "Slice decoding ran out of bits\n");
-                    goto fail;
-                }
-                pix = get_vlc2(&gb, vlc.table, vlc.bits, 3);
+            int ws = width * step;
+            for (i = 0; i < ws; i += step) {
+                pix = get_vlc2(&gb, vlc.table, VLC_BITS, 3);
                 if (pix < 0) {
                     av_log(c->avctx, AV_LOG_ERROR, "Decoding error\n");
                     goto fail;
@@ -317,6 +312,11 @@ static int decode_plane(UtvideoContext *c, int plane_no,
                     pix   = prev;
                 }
                 dest[i] = pix;
+            }
+            if (get_bits_left(&gb) < 0) {
+                av_log(c->avctx, AV_LOG_ERROR,
+                        "Slice decoding ran out of bits\n");
+                goto fail;
             }
             dest += stride;
         }
@@ -609,6 +609,8 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
            c->frame_info);
 
     c->frame_pred = (c->frame_info >> 8) & 3;
+
+    max_slice_size += 4*avctx->width;
 
     av_fast_malloc(&c->slice_bits, &c->slice_bits_size,
                    max_slice_size + AV_INPUT_BUFFER_PADDING_SIZE);

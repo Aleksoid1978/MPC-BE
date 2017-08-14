@@ -1434,6 +1434,7 @@ int ff_hevc_decode_nal_pps(GetBitContext *gb, AVCodecContext *avctx,
     int i, ret = 0;
     unsigned int pps_id = 0;
     ptrdiff_t nal_size;
+    unsigned log2_parallel_merge_level_minus2;
 
     AVBufferRef *pps_buf;
     HEVCPPS *pps = av_mallocz(sizeof(*pps));
@@ -1604,20 +1605,22 @@ int ff_hevc_decode_nal_pps(GetBitContext *gb, AVCodecContext *avctx,
         pps->deblocking_filter_override_enabled_flag = get_bits1(gb);
         pps->disable_dbf                             = get_bits1(gb);
         if (!pps->disable_dbf) {
-            pps->beta_offset = get_se_golomb(gb) * 2;
-            pps->tc_offset = get_se_golomb(gb) * 2;
-            if (pps->beta_offset/2 < -6 || pps->beta_offset/2 > 6) {
+            int beta_offset_div2 = get_se_golomb(gb);
+            int tc_offset_div2   = get_se_golomb(gb) ;
+            if (beta_offset_div2 < -6 || beta_offset_div2 > 6) {
                 av_log(avctx, AV_LOG_ERROR, "pps_beta_offset_div2 out of range: %d\n",
-                       pps->beta_offset/2);
+                       beta_offset_div2);
                 ret = AVERROR_INVALIDDATA;
                 goto err;
             }
-            if (pps->tc_offset/2 < -6 || pps->tc_offset/2 > 6) {
+            if (tc_offset_div2 < -6 || tc_offset_div2 > 6) {
                 av_log(avctx, AV_LOG_ERROR, "pps_tc_offset_div2 out of range: %d\n",
-                       pps->tc_offset/2);
+                       tc_offset_div2);
                 ret = AVERROR_INVALIDDATA;
                 goto err;
             }
+            pps->beta_offset = 2 * beta_offset_div2;
+            pps->tc_offset   = 2 *   tc_offset_div2;
         }
     }
 
@@ -1629,13 +1632,14 @@ int ff_hevc_decode_nal_pps(GetBitContext *gb, AVCodecContext *avctx,
             goto err;
     }
     pps->lists_modification_present_flag = get_bits1(gb);
-    pps->log2_parallel_merge_level       = get_ue_golomb_long(gb) + 2;
-    if (pps->log2_parallel_merge_level > sps->log2_ctb_size) {
+    log2_parallel_merge_level_minus2     = get_ue_golomb_long(gb);
+    if (log2_parallel_merge_level_minus2 > sps->log2_ctb_size) {
         av_log(avctx, AV_LOG_ERROR, "log2_parallel_merge_level_minus2 out of range: %d\n",
-               pps->log2_parallel_merge_level - 2);
+               log2_parallel_merge_level_minus2);
         ret = AVERROR_INVALIDDATA;
         goto err;
     }
+    pps->log2_parallel_merge_level       = log2_parallel_merge_level_minus2 + 2;
 
     pps->slice_header_extension_present_flag = get_bits1(gb);
 
