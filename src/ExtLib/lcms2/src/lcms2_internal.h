@@ -1,7 +1,7 @@
 
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2016 Marti Maria Saguer
+//  Copyright (c) 1998-2017 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -96,8 +96,16 @@
 # ifndef vsnprintf
 #       define vsnprintf  _vsnprintf
 # endif
-#endif
 
+/// Properly define some macros to accommodate
+/// older MSVC versions.
+# if _MSC_VER <= 1700
+        #include <float.h>
+        #define isnan _isnan
+        #define isinf(x) (!_finite((x)))
+# endif
+
+#endif
 
 // A fast way to convert from/to 16 <-> 8 bits
 #define FROM_8_TO_16(rgb) (cmsUInt16Number) ((((cmsUInt16Number) (rgb)) << 8)|(rgb))
@@ -815,8 +823,8 @@ void                 _cmsTagSignature2String(char String[5], cmsTagSignature sig
 
 // Interpolation ---------------------------------------------------------------------------------------------------------
 
-cmsInterpParams*     _cmsComputeInterpParams(cmsContext ContextID, int nSamples, int InputChan, int OutputChan, const void* Table, cmsUInt32Number dwFlags);
-cmsInterpParams*     _cmsComputeInterpParamsEx(cmsContext ContextID, const cmsUInt32Number nSamples[], int InputChan, int OutputChan, const void* Table, cmsUInt32Number dwFlags);
+cmsInterpParams*     _cmsComputeInterpParams(cmsContext ContextID, cmsUInt32Number nSamples, cmsUInt32Number InputChan, cmsUInt32Number OutputChan, const void* Table, cmsUInt32Number dwFlags);
+cmsInterpParams*     _cmsComputeInterpParamsEx(cmsContext ContextID, const cmsUInt32Number nSamples[], cmsUInt32Number InputChan, cmsUInt32Number OutputChan, const void* Table, cmsUInt32Number dwFlags);
 void                 _cmsFreeInterpParams(cmsInterpParams* p);
 cmsBool              _cmsSetInterpolationRoutine(cmsContext ContextID, cmsInterpParams* p);
 
@@ -875,13 +883,13 @@ cmsStage*        _cmsStageAllocLabV2ToV4(cmsContext ContextID);
 cmsStage*        _cmsStageAllocLabV2ToV4curves(cmsContext ContextID);
 cmsStage*        _cmsStageAllocLabV4ToV2(cmsContext ContextID);
 cmsStage*        _cmsStageAllocNamedColor(cmsNAMEDCOLORLIST* NamedColorList, cmsBool UsePCS);
-cmsStage*        _cmsStageAllocIdentityCurves(cmsContext ContextID, int nChannels);
-cmsStage*        _cmsStageAllocIdentityCLut(cmsContext ContextID, int nChan);
+cmsStage*        _cmsStageAllocIdentityCurves(cmsContext ContextID, cmsUInt32Number nChannels);
+cmsStage*        _cmsStageAllocIdentityCLut(cmsContext ContextID, cmsUInt32Number nChan);
 cmsStage*        _cmsStageNormalizeFromLabFloat(cmsContext ContextID);
 cmsStage*        _cmsStageNormalizeFromXyzFloat(cmsContext ContextID);
 cmsStage*        _cmsStageNormalizeToLabFloat(cmsContext ContextID);
 cmsStage*        _cmsStageNormalizeToXyzFloat(cmsContext ContextID);
-cmsStage*        _cmsStageClipNegatives(cmsContext ContextID, int nChannels);
+cmsStage*        _cmsStageClipNegatives(cmsContext ContextID, cmsUInt32Number nChannels);
 
 
 // For curve set only
@@ -916,9 +924,9 @@ struct _cmsPipeline_struct {
 // Read tags using low-level function, provide necessary glue code to adapt versions, etc. All those return a brand new copy
 // of the LUTS, since ownership of original is up to the profile. The user should free allocated resources.
 
-cmsPipeline*      _cmsReadInputLUT(cmsHPROFILE hProfile, int Intent);
-cmsPipeline*      _cmsReadOutputLUT(cmsHPROFILE hProfile, int Intent);
-cmsPipeline*      _cmsReadDevicelinkLUT(cmsHPROFILE hProfile, int Intent);
+cmsPipeline*      _cmsReadInputLUT(cmsHPROFILE hProfile, cmsUInt32Number Intent);
+cmsPipeline*      _cmsReadOutputLUT(cmsHPROFILE hProfile, cmsUInt32Number Intent);
+cmsPipeline*      _cmsReadDevicelinkLUT(cmsHPROFILE hProfile, cmsUInt32Number Intent);
 
 // Special values
 cmsBool           _cmsReadMediaWhitePoint(cmsCIEXYZ* Dest, cmsHPROFILE hProfile);
@@ -943,8 +951,8 @@ cmsSEQ* _cmsCompileProfileSequence(cmsContext ContextID, cmsUInt32Number nProfil
 
 // LUT optimization ------------------------------------------------------------------------------------------------
 
-cmsUInt16Number  _cmsQuantizeVal(cmsFloat64Number i, int MaxSamples);
-int              _cmsReasonableGridpointsByColorspace(cmsColorSpaceSignature Colorspace, cmsUInt32Number dwFlags);
+cmsUInt16Number  _cmsQuantizeVal(cmsFloat64Number i, cmsUInt32Number MaxSamples);
+cmsUInt32Number  _cmsReasonableGridpointsByColorspace(cmsColorSpaceSignature Colorspace, cmsUInt32Number dwFlags);
 
 cmsBool          _cmsEndPointsBySpace(cmsColorSpaceSignature Space,
                                       cmsUInt16Number **White,
@@ -953,7 +961,7 @@ cmsBool          _cmsEndPointsBySpace(cmsColorSpaceSignature Space,
 
 cmsBool          _cmsOptimizePipeline(cmsContext ContextID,
                                       cmsPipeline**    Lut,
-                                      int              Intent,
+                                      cmsUInt32Number  Intent,
                                       cmsUInt32Number* InputFormat,
                                       cmsUInt32Number* OutputFormat,
                                       cmsUInt32Number* dwFlags );

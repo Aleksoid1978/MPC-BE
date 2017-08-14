@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2016 Marti Maria Saguer
+//  Copyright (c) 1998-2017 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -400,7 +400,7 @@ void EmitRangeCheck(cmsIOHANDLER* m)
 // Does write the intent
 
 static
-void EmitIntent(cmsIOHANDLER* m, int RenderingIntent)
+void EmitIntent(cmsIOHANDLER* m, cmsUInt32Number RenderingIntent)
 {
     const char *intent;
 
@@ -534,7 +534,7 @@ void Emit1Gamma(cmsIOHANDLER* m, cmsToneCurve* Table)
 // Compare gamma table
 
 static
-cmsBool GammaTableEquals(cmsUInt16Number* g1, cmsUInt16Number* g2, int nEntries)
+cmsBool GammaTableEquals(cmsUInt16Number* g1, cmsUInt16Number* g2, cmsUInt32Number nEntries)
 {
     return memcmp(g1, g2, nEntries* sizeof(cmsUInt16Number)) == 0;
 }
@@ -543,9 +543,9 @@ cmsBool GammaTableEquals(cmsUInt16Number* g1, cmsUInt16Number* g2, int nEntries)
 // Does write a set of gamma curves
 
 static
-void EmitNGamma(cmsIOHANDLER* m, int n, cmsToneCurve* g[])
+void EmitNGamma(cmsIOHANDLER* m, cmsUInt32Number n, cmsToneCurve* g[])
 {
-    int i;
+    cmsUInt32Number i;
 
     for( i=0; i < n; i++ )
     {
@@ -768,7 +768,7 @@ int EmitCIEBasedABC(cmsIOHANDLER* m, cmsFloat64Number* Matrix, cmsToneCurve** Cu
 
 
 static
-int EmitCIEBasedDEF(cmsIOHANDLER* m, cmsPipeline* Pipeline, int Intent, cmsCIEXYZ* BlackPoint)
+int EmitCIEBasedDEF(cmsIOHANDLER* m, cmsPipeline* Pipeline, cmsUInt32Number Intent, cmsCIEXYZ* BlackPoint)
 {
     const char* PreMaj;
     const char* PostMaj;
@@ -828,7 +828,7 @@ int EmitCIEBasedDEF(cmsIOHANDLER* m, cmsPipeline* Pipeline, int Intent, cmsCIEXY
 // Generates a curve from a gray profile
 
 static
-    cmsToneCurve* ExtractGray2Y(cmsContext ContextID, cmsHPROFILE hProfile, int Intent)
+cmsToneCurve* ExtractGray2Y(cmsContext ContextID, cmsHPROFILE hProfile, cmsUInt32Number Intent)
 {
     cmsToneCurve* Out = cmsBuildTabulatedToneCurve16(ContextID, 256, NULL);
     cmsHPROFILE hXYZ  = cmsCreateXYZProfile();
@@ -858,7 +858,7 @@ static
 // a more perceptually uniform space... I do choose Lab.
 
 static
-int WriteInputLUT(cmsIOHANDLER* m, cmsHPROFILE hProfile, int Intent, cmsUInt32Number dwFlags)
+int WriteInputLUT(cmsIOHANDLER* m, cmsHPROFILE hProfile, cmsUInt32Number Intent, cmsUInt32Number dwFlags)
 {
     cmsHPROFILE hLab;
     cmsHTRANSFORM xform;
@@ -991,12 +991,12 @@ int WriteInputMatrixShaper(cmsIOHANDLER* m, cmsHPROFILE hProfile, cmsStage* Matr
 // This is a HP extension, and it works in Lab instead of XYZ
 
 static
-int WriteNamedColorCSA(cmsIOHANDLER* m, cmsHPROFILE hNamedColor, int Intent)
+int WriteNamedColorCSA(cmsIOHANDLER* m, cmsHPROFILE hNamedColor, cmsUInt32Number Intent)
 {
     cmsHTRANSFORM xform;
     cmsHPROFILE   hLab;
-    int i, nColors;
-    char ColorName[32];
+    cmsUInt32Number i, nColors;
+    char ColorName[cmsMAX_PATH];
     cmsNAMEDCOLORLIST* NamedColorList;
 
     hLab  = cmsCreateLab4ProfileTHR(m ->ContextID, NULL);
@@ -1274,20 +1274,20 @@ void EmitXYZ2Lab(cmsIOHANDLER* m)
 // 8 bits.
 
 static
-int WriteOutputLUT(cmsIOHANDLER* m, cmsHPROFILE hProfile, int Intent, cmsUInt32Number dwFlags)
+int WriteOutputLUT(cmsIOHANDLER* m, cmsHPROFILE hProfile, cmsUInt32Number Intent, cmsUInt32Number dwFlags)
 {
     cmsHPROFILE hLab;
     cmsHTRANSFORM xform;
-    int i, nChannels;
+    cmsUInt32Number i, nChannels;
     cmsUInt32Number OutputFormat;
     _cmsTRANSFORM* v;
     cmsPipeline* DeviceLink;
     cmsHPROFILE Profiles[3];
     cmsCIEXYZ BlackPointAdaptedToD50;
-    cmsBool lDoBPC = (dwFlags & cmsFLAGS_BLACKPOINTCOMPENSATION);
-    cmsBool lFixWhite = !(dwFlags & cmsFLAGS_NOWHITEONWHITEFIXUP);
+    cmsBool lDoBPC = (cmsBool) (dwFlags & cmsFLAGS_BLACKPOINTCOMPENSATION);
+    cmsBool lFixWhite = (cmsBool) !(dwFlags & cmsFLAGS_NOWHITEONWHITEFIXUP);
     cmsUInt32Number InFrm = TYPE_Lab_16;
-    int RelativeEncodingIntent;
+    cmsUInt32Number RelativeEncodingIntent;
     cmsColorSpaceSignature ColorSpace;
 
 
@@ -1383,10 +1383,10 @@ int WriteOutputLUT(cmsIOHANDLER* m, cmsHPROFILE hProfile, int Intent, cmsUInt32N
 
 // Builds a ASCII string containing colorant list in 0..1.0 range
 static
-void BuildColorantList(char *Colorant, int nColorant, cmsUInt16Number Out[])
+void BuildColorantList(char *Colorant, cmsUInt32Number nColorant, cmsUInt16Number Out[])
 {
     char Buff[32];
-    int j;
+    cmsUInt32Number j;
 
     Colorant[0] = 0;
     if (nColorant > cmsMAXCHANNELS)
@@ -1408,12 +1408,12 @@ void BuildColorantList(char *Colorant, int nColorant, cmsUInt16Number Out[])
 // This is a HP extension.
 
 static
-int WriteNamedColorCRD(cmsIOHANDLER* m, cmsHPROFILE hNamedColor, int Intent, cmsUInt32Number dwFlags)
+int WriteNamedColorCRD(cmsIOHANDLER* m, cmsHPROFILE hNamedColor, cmsUInt32Number Intent, cmsUInt32Number dwFlags)
 {
     cmsHTRANSFORM xform;
-    int i, nColors, nColorant;
+    cmsUInt32Number i, nColors, nColorant;
     cmsUInt32Number OutputFormat;
-    char ColorName[32];
+    char ColorName[cmsMAX_PATH];
     char Colorant[128];
     cmsNAMEDCOLORLIST* NamedColorList;
 

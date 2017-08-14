@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------
 //
 //  Little Color Management System
-//  Copyright (c) 1998-2016 Marti Maria Saguer
+//  Copyright (c) 1998-2017 Marti Maria Saguer
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -525,7 +525,7 @@ cmsInt32Number CMSEXPORT cmsGetTagCount(cmsHPROFILE hProfile)
     _cmsICCPROFILE* Icc = (_cmsICCPROFILE*) hProfile;
     if (Icc == NULL) return -1;
 
-    return  Icc->TagCount;
+    return  (cmsInt32Number) Icc->TagCount;
 }
 
 // Return the tag signature of a given tag number
@@ -543,9 +543,9 @@ cmsTagSignature CMSEXPORT cmsGetTagSignature(cmsHPROFILE hProfile, cmsUInt32Numb
 static
 int SearchOneTag(_cmsICCPROFILE* Profile, cmsTagSignature sig)
 {
-    cmsUInt32Number i;
+    int i;
 
-    for (i=0; i < Profile -> TagCount; i++) {
+    for (i=0; i < (int) Profile -> TagCount; i++) {
 
         if (sig == Profile -> TagNames[i])
             return i;
@@ -639,7 +639,7 @@ cmsBool _cmsNewTag(_cmsICCPROFILE* Icc, cmsTagSignature sig, int* NewPos)
             return FALSE;
         }
 
-        *NewPos = Icc ->TagCount;
+        *NewPos = (int) Icc ->TagCount;
         Icc -> TagCount++;
     }
 
@@ -670,10 +670,10 @@ cmsUInt32Number _validatedVersion(cmsUInt32Number DWord)
     cmsUInt8Number temp2;
 
     if (*pByte > 0x09) *pByte = (cmsUInt8Number) 0x09;
-    temp1 = *(pByte+1) & 0xf0;
-    temp2 = *(pByte+1) & 0x0f;
-    if (temp1 > 0x90) temp1 = 0x90;
-    if (temp2 > 0x09) temp2 = 0x09;
+    temp1 = (cmsUInt8Number) (*(pByte+1) & 0xf0);
+    temp2 = (cmsUInt8Number) (*(pByte+1) & 0x0f);
+    if (temp1 > 0x90U) temp1 = 0x90U;
+    if (temp2 > 0x09U) temp2 = 0x09U;
     *(pByte+1) = (cmsUInt8Number)(temp1 | temp2);
     *(pByte+2) = (cmsUInt8Number)0;
     *(pByte+3) = (cmsUInt8Number)0;
@@ -781,7 +781,7 @@ cmsBool _cmsWriteHeader(_cmsICCPROFILE* Icc, cmsUInt32Number UsedSpace)
     cmsICCHeader Header;
     cmsUInt32Number i;
     cmsTagEntry Tag;
-    cmsInt32Number Count = 0;
+    cmsUInt32Number Count;
 
     Header.size        = _cmsAdjustEndianess32(UsedSpace);
     Header.cmmId       = _cmsAdjustEndianess32(lcmsSignature);
@@ -812,9 +812,9 @@ cmsBool _cmsWriteHeader(_cmsICCPROFILE* Icc, cmsUInt32Number UsedSpace)
     Header.renderingIntent = _cmsAdjustEndianess32(Icc -> RenderingIntent);
 
     // Illuminant is always D50
-    Header.illuminant.X = _cmsAdjustEndianess32(_cmsDoubleTo15Fixed16(cmsD50_XYZ()->X));
-    Header.illuminant.Y = _cmsAdjustEndianess32(_cmsDoubleTo15Fixed16(cmsD50_XYZ()->Y));
-    Header.illuminant.Z = _cmsAdjustEndianess32(_cmsDoubleTo15Fixed16(cmsD50_XYZ()->Z));
+    Header.illuminant.X = (cmsS15Fixed16Number) _cmsAdjustEndianess32((cmsUInt32Number) _cmsDoubleTo15Fixed16(cmsD50_XYZ()->X));
+    Header.illuminant.Y = (cmsS15Fixed16Number) _cmsAdjustEndianess32((cmsUInt32Number) _cmsDoubleTo15Fixed16(cmsD50_XYZ()->Y));
+    Header.illuminant.Z = (cmsS15Fixed16Number) _cmsAdjustEndianess32((cmsUInt32Number) _cmsDoubleTo15Fixed16(cmsD50_XYZ()->Z));
 
     // Created by LittleCMS (that's me!)
     Header.creator      = _cmsAdjustEndianess32(lcmsSignature);
@@ -830,6 +830,7 @@ cmsBool _cmsWriteHeader(_cmsICCPROFILE* Icc, cmsUInt32Number UsedSpace)
     // Saves Tag directory
 
     // Get true count
+    Count = 0;
     for (i=0;  i < Icc -> TagCount; i++) {
         if (Icc ->TagNames[i] != (cmsTagSignature) 0)
             Count++;
@@ -842,9 +843,9 @@ cmsBool _cmsWriteHeader(_cmsICCPROFILE* Icc, cmsUInt32Number UsedSpace)
 
         if (Icc ->TagNames[i] == (cmsTagSignature) 0) continue;   // It is just a placeholder
 
-        Tag.sig    = (cmsTagSignature) _cmsAdjustEndianess32((cmsInt32Number) Icc -> TagNames[i]);
-        Tag.offset = _cmsAdjustEndianess32((cmsInt32Number) Icc -> TagOffsets[i]);
-        Tag.size   = _cmsAdjustEndianess32((cmsInt32Number) Icc -> TagSizes[i]);
+        Tag.sig    = (cmsTagSignature) _cmsAdjustEndianess32((cmsUInt32Number) Icc -> TagNames[i]);
+        Tag.offset = _cmsAdjustEndianess32((cmsUInt32Number) Icc -> TagOffsets[i]);
+        Tag.size   = _cmsAdjustEndianess32((cmsUInt32Number) Icc -> TagSizes[i]);
 
         if (!Icc ->IOhandler -> Write(Icc-> IOhandler, sizeof(cmsTagEntry), &Tag)) return FALSE;
     }
@@ -1755,7 +1756,7 @@ Error:
 // raw data written does not exactly correspond with the raw data proposed to cmsWriteRaw data, but this approach allows
 // to write a tag as raw data and the read it as handled.
 
-cmsInt32Number CMSEXPORT cmsReadRawTag(cmsHPROFILE hProfile, cmsTagSignature sig, void* data, cmsUInt32Number BufferSize)
+cmsUInt32Number CMSEXPORT cmsReadRawTag(cmsHPROFILE hProfile, cmsTagSignature sig, void* data, cmsUInt32Number BufferSize)
 {
     _cmsICCPROFILE* Icc = (_cmsICCPROFILE*) hProfile;
     void *Object;
