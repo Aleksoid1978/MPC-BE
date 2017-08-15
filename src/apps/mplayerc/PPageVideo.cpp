@@ -519,11 +519,13 @@ void CPPageVideo::OnSurfaceFormatChange()
 
 void CPPageVideo::OnFrameModeChange()
 {
-	if (m_cbFrameMode.GetCurSel() == IDS_FRAME_FROMINSIDE - IDS_FRAME_HALF) {
+	if (m_cbFrameMode.GetCurSel() == ID_VIEW_VF_FROMINSIDE - ID_VIEW_VF_HALF) {
 		m_chkNoSmallUpscale.EnableWindow(TRUE);
 	} else {
 		m_chkNoSmallUpscale.EnableWindow(FALSE);
 	}
+
+	SetModified();
 }
 
 void CPPageVideo::OnBnClickedDefault()
@@ -547,6 +549,10 @@ void CPPageVideo::OnBnClickedDefault()
 
 	OnFullscreenCheck();
 	OnSurfaceFormatChange();
+
+	m_cbFrameMode.SetCurSel(ID_VIEW_VF_FROMINSIDE - ID_VIEW_VF_HALF);
+	m_chkNoSmallUpscale.SetCheck(BST_UNCHECKED);
+	m_chkNoSmallUpscale.EnableWindow(TRUE);
 
 	Invalidate();
 	SetModified();
