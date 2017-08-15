@@ -745,6 +745,7 @@ public:
 	bool			fForcedSubtitles;
 	// Video Frame
 	int				iDefaultVideoSize;
+	bool			bNoSmallUpscale;
 	bool			fKeepAspectRatio;
 	CSize			sizeAspectRatio;
 	bool			fCompMonDeskARDiff;

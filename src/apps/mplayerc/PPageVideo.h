@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,10 +41,12 @@ private:
 	CComboBox m_cbDX9Resizer;
 	CComboBox m_cbDownscaler;
 	CComboBox m_cbEVROutputRange;
+	CComboBox m_cbFrameMode;
 	CButton   m_chkD3DFullscreen;
 	CButton   m_chk10bitOutput;
 	CButton   m_chkVMRMixerMode;
 	CButton   m_chkVMRMixerYUV;
+	CButton   m_chkNoSmallUpscale;
 
 	int m_iEvrBuffers;
 	CSpinButtonCtrl m_spnEvrBuffers;
@@ -77,5 +79,6 @@ public:
 	afx_msg void OnFullscreenCheck();
 	afx_msg void OnD3D9DeviceCheck();
 	afx_msg void OnSurfaceFormatChange();
+	afx_msg void OnFrameModeChange();
 	afx_msg void OnBnClickedDefault();
 };

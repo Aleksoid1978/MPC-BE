@@ -1308,6 +1308,14 @@
 #define IDS_AUDIO_GAIN                  33453
 #define IDS_SAVING_THUMBNAIL            33454
 #define IDS_SEEKBEGIN                   33455
+#define IDS_FRAME_HALF                  33500
+#define IDS_FRAME_NORMAL                33501
+#define IDS_FRAME_DOUBLE                33502
+#define IDS_FRAME_STRETCH               33503
+#define IDS_FRAME_FROMINSIDE            33504
+#define IDS_FRAME_ZOOM1                 33505
+#define IDS_FRAME_ZOOM2                 33506
+#define IDS_FRAME_FROMOUTSIDE           33507
 // stereoscopic subtitles
 #define IDS_SUBTITLES_STEREO              34000
 #define IDS_SUBTITLES_STEREO_DONTUSE      34001

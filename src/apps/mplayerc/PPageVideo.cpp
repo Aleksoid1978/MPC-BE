@@ -79,6 +79,8 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO2, m_cbEVROutputRange);
 	DDX_Text(pDX, IDC_EVR_BUFFERS, m_iEvrBuffers);
 	DDX_Control(pDX, IDC_SPIN1, m_spnEvrBuffers);
+	DDX_Control(pDX, IDC_COMBO8, m_cbFrameMode);
+	DDX_Control(pDX, IDC_CHECK7, m_chkNoSmallUpscale);
 
 	m_iEvrBuffers = clamp(m_iEvrBuffers, RS_EVRBUFFERS_MIN, RS_EVRBUFFERS_MAX);
 }
@@ -90,6 +92,7 @@ BEGIN_MESSAGE_MAP(CPPageVideo, CPPageBase)
 	ON_BN_CLICKED(IDC_FULLSCREEN_MONITOR_CHECK, OnFullscreenCheck)
 	ON_UPDATE_COMMAND_UI(IDC_DSVMRYUVMIXER, OnUpdateMixerYUV)
 	ON_CBN_SELCHANGE(IDC_COMBO1, OnSurfaceFormatChange)
+	ON_CBN_SELCHANGE(IDC_COMBO8, OnFrameModeChange)
 	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedDefault)
 END_MESSAGE_MAP()
 
@@ -256,6 +259,19 @@ BOOL CPPageVideo::OnInitDialog()
 
 	OnSurfaceFormatChange();
 
+	m_cbFrameMode.AddString(ResStr(IDS_FRAME_HALF));
+	m_cbFrameMode.AddString(ResStr(IDS_FRAME_NORMAL));
+	m_cbFrameMode.AddString(ResStr(IDS_FRAME_DOUBLE));
+	m_cbFrameMode.AddString(ResStr(IDS_FRAME_STRETCH));
+	m_cbFrameMode.AddString(ResStr(IDS_FRAME_FROMINSIDE));
+	m_cbFrameMode.AddString(ResStr(IDS_FRAME_FROMOUTSIDE));
+	m_cbFrameMode.AddString(ResStr(IDS_FRAME_ZOOM1));
+	m_cbFrameMode.AddString(ResStr(IDS_FRAME_ZOOM2));
+	m_cbFrameMode.SetCurSel(s.iDefaultVideoSize);
+
+	m_chkNoSmallUpscale.SetCheck(s.bNoSmallUpscale);
+	OnFrameModeChange();
+
 	UpdateData(TRUE);
 	SetModified(FALSE);
 
@@ -284,6 +300,9 @@ BOOL CPPageVideo::OnApply()
 	rs.nEVRBuffers = m_iEvrBuffers;
 
 	rs.sD3DRenderDevice = m_bD3D9RenderDevice ? m_D3D9GUIDNames[m_iD3D9RenderDevice] : L"";
+
+	s.iDefaultVideoSize = m_cbFrameMode.GetCurSel();
+	s.bNoSmallUpscale = !!m_chkNoSmallUpscale.GetCheck();
 
 	return __super::OnApply();
 }
@@ -496,6 +515,15 @@ void CPPageVideo::OnSurfaceFormatChange()
 	UpdateDownscalerList(GetCurItemData(m_cbDownscaler));
 
 	SetModified();
+}
+
+void CPPageVideo::OnFrameModeChange()
+{
+	if (m_cbFrameMode.GetCurSel() == IDS_FRAME_FROMINSIDE - IDS_FRAME_HALF) {
+		m_chkNoSmallUpscale.EnableWindow(TRUE);
+	} else {
+		m_chkNoSmallUpscale.EnableWindow(FALSE);
+	}
 }
 
 void CPPageVideo::OnBnClickedDefault()

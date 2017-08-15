@@ -10728,8 +10728,8 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 
 			double w = wr.Width();
 			double h = wr.Height();
-			long wy = wr.Width() * arxy.cy;
-			long hx = wr.Height() * arxy.cx;
+			const long wy = wr.Width() * arxy.cy;
+			const long hx = wr.Height() * arxy.cx;
 
 			dvstype dvs = (dvstype)AfxGetAppSettings().iDefaultVideoSize;
 
@@ -10752,6 +10752,14 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 						w = (double)hx / arxy.cy;
 					} else {
 						h = (double)wy / arxy.cx;
+					}
+
+					if (m_bFullScreen && AfxGetAppSettings().bNoSmallUpscale) {
+						double factor = (wy > hx) ? w / arxy.cx : h / arxy.cy;
+						if (factor > 1.0 && factor < 1.02) {
+							w = arxy.cx;
+							h = arxy.cy;
+						}
 					}
 				}
 				break;

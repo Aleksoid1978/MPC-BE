@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Le modifiche saranno effettive dopo un riavvio della riproduzione."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 5		"Video renderer"
 7		"Impostazioni di VMR-9 e EVR-CP"
 8		"Seleziona D3D9 Render Device"
@@ -514,6 +514,9 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 21		"Output range:"
 23		"EVR Buffers:"
 26		"Default"
+27		"Framing"
+28		"Mode:"
+30		"Do not scale at small frame size increases"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
@@ -1415,7 +1418,15 @@ STRING IDS_FILTERS_VIDEO		"Decoder Video"
 STRING IDS_FILTER_RESET_SETTINGS		"Reimposta"
 STRING IDS_FILTER_SETTINGS_CAPTION		"Impostazioni"
 STRING IDS_FIRST_IN_FOLDER		"Il primo file nella cartella è ora caricato."
+STRING IDS_FRAME_DOUBLE		"Raddoppia"
+STRING IDS_FRAME_FROMINSIDE		"Ritocca la finestra dall'interno"
+STRING IDS_FRAME_FROMOUTSIDE		"Ritocca la finestra dall'esterno"
+STRING IDS_FRAME_HALF		"Dimezza"
+STRING IDS_FRAME_NORMAL		"Normale"
 STRING IDS_FRAME_STEP_ERROR_RENDERER		"Impossibile generare i fotogrammi; tentare con un differente video renderer."
+STRING IDS_FRAME_STRETCH		"Allarga come la finestra"
+STRING IDS_FRAME_ZOOM1		"Zoom 1"
+STRING IDS_FRAME_ZOOM2		"Zoom 2"
 STRING IDS_FRONT_CENTER		"Frontale centrale"
 STRING IDS_FRONT_LEFT		"Frontale sinistro"
 STRING IDS_FRONT_LEFT_OF_CENTER		"Frontale a sinistra del centrale"

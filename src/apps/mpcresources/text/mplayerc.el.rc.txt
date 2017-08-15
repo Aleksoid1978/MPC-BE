@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Οι αλλαγές θα ενεργοποιηθούν μετά το κλείσιμο κι επανεκκίνηση της αναπαραγωγής."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 5		"Απόδοση βίντεο"
 7		"VMR-9 και ρυθμίσεις EVR (CP)"
 8		"Επιλογή συσκευής απόδοσης D3D9"
@@ -514,6 +514,9 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 21		"Εύρος εξόδου:"
 23		"Προσωρινές μνήμες EVR:"
 26		"Προεπιλογή"
+27		"Framing"
+28		"Mode:"
+30		"Do not scale at small frame size increases"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
@@ -1418,7 +1421,15 @@ STRING IDS_FILTERS_VIDEO		"Video Decoders"
 STRING IDS_FILTER_RESET_SETTINGS		"Επαναφορά"
 STRING IDS_FILTER_SETTINGS_CAPTION		"Ρυθμίσεις"
 STRING IDS_FIRST_IN_FOLDER		"Τώρα φορτώνεται το πρώτο αρχείο στο φάκελο."
+STRING IDS_FRAME_DOUBLE		"Διπλό μέγεθος"
+STRING IDS_FRAME_FROMINSIDE		"Άγγιγμα παραθύρου ε&σωτερικά"
+STRING IDS_FRAME_FROMOUTSIDE		"Άγγιγμα παραθύρου ε&ξωτερικά"
+STRING IDS_FRAME_HALF		"Μισό μέγεθος"
+STRING IDS_FRAME_NORMAL		"Κανονικό μέγεθος"
 STRING IDS_FRAME_STEP_ERROR_RENDERER		"Δεν είναι δυνατό το βήμα καρέ.\nΔοκιμάστε μια διαφορετική απόδοση βίντεο."
+STRING IDS_FRAME_STRETCH		"Επέκταση στο παράθυρο"
+STRING IDS_FRAME_ZOOM1		"Μεγέθυνσ 1"
+STRING IDS_FRAME_ZOOM2		"Μεγέθυνσ 2"
 STRING IDS_FRONT_CENTER		"Μπροστά κέντρο"
 STRING IDS_FRONT_LEFT		"Μπροστά αριστερά"
 STRING IDS_FRONT_LEFT_OF_CENTER		"Μπροστά αριστερά του κεντρικού"
