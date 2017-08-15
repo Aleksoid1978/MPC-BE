@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Zmeny sa uplatnia až po zastavení aktuálneho prehrávania a po reštartovaní."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 5		"Video renderer"
 7		"VMR-9 and EVR-CP settings"
 8		"Select D3D9 Render Device"
@@ -514,6 +514,9 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 21		"Output range:"
 23		"EVR Buffers:"
 26		"Default"
+27		"Framing"
+28		"Mode:"
+30		"Do not scale at small frame size increases"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
@@ -1415,7 +1418,15 @@ STRING IDS_FILTERS_VIDEO		"Video Decoders"
 STRING IDS_FILTER_RESET_SETTINGS		"Reset"
 STRING IDS_FILTER_SETTINGS_CAPTION		"Settings"
 STRING IDS_FIRST_IN_FOLDER		"Prvý súbor v priečinku je práve načítaný."
+STRING IDS_FRAME_DOUBLE		"Dvojitá veľkosť"
+STRING IDS_FRAME_FROMINSIDE		"Dotýkať sa okna zvnútra"
+STRING IDS_FRAME_FROMOUTSIDE		"Dotýkať sa okna zvonku"
+STRING IDS_FRAME_HALF		"Polovičná veľkosť"
+STRING IDS_FRAME_NORMAL		"Normálna veľkosť"
 STRING IDS_FRAME_STEP_ERROR_RENDERER		"Krokovanie snímkami nie je možné. Skúste použiť iný vykresľovač videa."
+STRING IDS_FRAME_STRETCH		"Roztiahnuť na veľkosť okna"
+STRING IDS_FRAME_ZOOM1		"Priblíženie 1"
+STRING IDS_FRAME_ZOOM2		"Priblíženie 2"
 STRING IDS_FRONT_CENTER		"Predný stredný"
 STRING IDS_FRONT_LEFT		"Predný ľavý"
 STRING IDS_FRONT_LEFT_OF_CENTER		"Predný ľavý - stred"

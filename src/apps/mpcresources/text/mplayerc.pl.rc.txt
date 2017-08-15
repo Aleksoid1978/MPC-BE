@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Zmiany zostaną wprowadzone po ponownym uruchomieniu programu."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 5		"Renderer wideo"
 7		"Ustawienia VMR-9 i EVR-CP"
 8		"Wybór urzadzenia renderującego D3D9"
@@ -514,6 +514,9 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 21		"Zakres wyjścia:"
 23		"Bufor EVR:"
 26		"Domyślne"
+27		"Framing"
+28		"Mode:"
+30		"Do not scale at small frame size increases"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
@@ -1406,7 +1409,12 @@ STRING IDS_FILTERS_VIDEO		"Dekodery Wideo"
 STRING IDS_FILTER_RESET_SETTINGS		"Reset"
 STRING IDS_FILTER_SETTINGS_CAPTION		"Ustawienia"
 STRING IDS_FIRST_IN_FOLDER		"Wczytano pierwszy plik z folderu."
+STRING IDS_FRAME_FROMINSIDE		"Dopasowanie do szerokości okna"
+STRING IDS_FRAME_FROMOUTSIDE		"Dopasowanie do &wysokości okna"
 STRING IDS_FRAME_STEP_ERROR_RENDERER		"Nie można przejść klatkę do przodu, proszę sprawdzić inny renderer wideo."
+STRING IDS_FRAME_STRETCH		"Dopasowanie do rozmiaru okna"
+STRING IDS_FRAME_ZOOM1		"Skala 1"
+STRING IDS_FRAME_ZOOM2		"Skala 2"
 STRING IDS_FRONT_CENTER		"Przedni środkowy"
 STRING IDS_FRONT_LEFT		"Przedni lewy"
 STRING IDS_FRONT_LEFT_OF_CENTER		"Przedni lewy środkowego"

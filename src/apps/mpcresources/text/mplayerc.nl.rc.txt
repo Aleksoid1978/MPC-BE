@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Vereist heropenen van de video."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 5		"Videorenderer"
 7		"Instellingen van VMR-9 en EVR-CP"
 8		"Kies D3D9-renderapparaat"
@@ -514,6 +514,9 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 21		"Uitvoerbereik:"
 23		"EVR-buffers:"
 26		"Standaard"
+27		"Framing"
+28		"Mode:"
+30		"Do not scale at small frame size increases"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
@@ -1415,7 +1418,15 @@ STRING IDS_FILTERS_VIDEO		"Videodecoders"
 STRING IDS_FILTER_RESET_SETTINGS		"Resetten"
 STRING IDS_FILTER_SETTINGS_CAPTION		"Instellingen"
 STRING IDS_FIRST_IN_FOLDER		"Het eerste bestand in de map is geladen."
+STRING IDS_FRAME_DOUBLE		"Dubbele grootte"
+STRING IDS_FRAME_FROMINSIDE		"Pas venster vanuit binnen aan"
+STRING IDS_FRAME_FROMOUTSIDE		"Pas venster vanaf buiten aan"
+STRING IDS_FRAME_HALF		"Halve grootte"
+STRING IDS_FRAME_NORMAL		"Normale grootte"
 STRING IDS_FRAME_STEP_ERROR_RENDERER		"Framestap mislukt, probeer een andere videorenderer."
+STRING IDS_FRAME_STRETCH		"Spreiden"
+STRING IDS_FRAME_ZOOM1		"Zoom 1"
+STRING IDS_FRAME_ZOOM2		"Zoom 2"
 STRING IDS_FRONT_CENTER		"Voor Midden"
 STRING IDS_FRONT_LEFT		"Voor Links"
 STRING IDS_FRONT_LEFT_OF_CENTER		"Voor Links van Midden"

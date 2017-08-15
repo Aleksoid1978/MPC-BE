@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Изменения применятся после остановки и перезапуска воспроизведения."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 5		"Видео-рендерер"
 7		"Параметры VMR-9 и EVR-CP"
 8		"Устройство D3D9-рендеринга"
@@ -514,6 +514,9 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 21		"Диапазон вывода:"
 23		"Буферы EVR:"
 26		"По умолчанию"
+27		"Кадрирование"
+28		"Режим:"
+30		"Не масштабировать кадр при малом увеличении"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
@@ -1415,7 +1418,15 @@ STRING IDS_FILTERS_VIDEO		"Видео декодеры"
 STRING IDS_FILTER_RESET_SETTINGS		"Сбросить настройки"
 STRING IDS_FILTER_SETTINGS_CAPTION		"Настройки"
 STRING IDS_FIRST_IN_FOLDER		"Загружен первый файл в каталоге"
+STRING IDS_FRAME_DOUBLE		"Двойной размер"
+STRING IDS_FRAME_FROMINSIDE		"Вписать в размер экрана"
+STRING IDS_FRAME_FROMOUTSIDE		"Заполнить экран и обрезать кадр"
+STRING IDS_FRAME_HALF		"Половинный размер"
+STRING IDS_FRAME_NORMAL		"Нормальный размер"
 STRING IDS_FRAME_STEP_ERROR_RENDERER		"Покадровый просмотр невозможен, попробуйте другой видеорендерер."
+STRING IDS_FRAME_STRETCH		"Растянуть до размера экрана"
+STRING IDS_FRAME_ZOOM1		"Zoom 1"
+STRING IDS_FRAME_ZOOM2		"Zoom 2"
 STRING IDS_FRONT_CENTER		"Передний центр"
 STRING IDS_FRONT_LEFT		"Передний левый"
 STRING IDS_FRONT_LEFT_OF_CENTER		"Перед. центр левый"

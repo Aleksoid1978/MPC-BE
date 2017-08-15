@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Ändring slår igenom efter omstart av uppspelning."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 5		"Video renderer"
 7		"VMR-9 and EVR-CP settings"
 8		"Select D3D9 Render Device"
@@ -514,6 +514,9 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 21		"Output range:"
 23		"EVR Buffers:"
 26		"Default"
+27		"Framing"
+28		"Mode:"
+30		"Do not scale at small frame size increases"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
@@ -1415,7 +1418,15 @@ STRING IDS_FILTERS_VIDEO		"Video Decoders"
 STRING IDS_FILTER_RESET_SETTINGS		"Reset"
 STRING IDS_FILTER_SETTINGS_CAPTION		"Settings"
 STRING IDS_FIRST_IN_FOLDER		"The first file in the folder is loaded now."
+STRING IDS_FRAME_DOUBLE		"Dubbla Storleken"
+STRING IDS_FRAME_FROMINSIDE		"Berör Fönstret Från Insidan"
+STRING IDS_FRAME_FROMOUTSIDE		"Berör Fönstret Från Utsidan"
+STRING IDS_FRAME_HALF		"Halva Storleken"
+STRING IDS_FRAME_NORMAL		"Normala Storleken"
 STRING IDS_FRAME_STEP_ERROR_RENDERER		"Cannot frame step, try a different video renderer."
+STRING IDS_FRAME_STRETCH		"Sträck Till Fönster"
+STRING IDS_FRAME_ZOOM1		"Zoom 1"
+STRING IDS_FRAME_ZOOM2		"Zoom 2"
 STRING IDS_FRONT_CENTER		"Front Center"
 STRING IDS_FRONT_LEFT		"Front Left"
 STRING IDS_FRONT_LEFT_OF_CENTER		"Front Left of Center"

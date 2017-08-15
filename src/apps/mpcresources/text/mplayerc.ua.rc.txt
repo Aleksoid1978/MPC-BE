@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Зміни набудуть чинності після перезапуску плеєра."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 5		"Відеорендерер"
 7		"Налаштування VMR-9 і EVR-CP"
 8		"Вибір пристрою рендерингу D3D9"
@@ -514,6 +514,9 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 21		"Вихідний діапазон:"
 23		"Буфери EVR:"
 26		"Типово"
+27		"Framing"
+28		"Mode:"
+30		"Do not scale at small frame size increases"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
@@ -1415,7 +1418,15 @@ STRING IDS_FILTERS_VIDEO		"Відеодекодери"
 STRING IDS_FILTER_RESET_SETTINGS		"Скинути"
 STRING IDS_FILTER_SETTINGS_CAPTION		"Налаштування"
 STRING IDS_FIRST_IN_FOLDER		"Перший файл в теці запущений."
+STRING IDS_FRAME_DOUBLE		"Подвійного розміру"
+STRING IDS_FRAME_FROMINSIDE		"На ширину екрану"
+STRING IDS_FRAME_FROMOUTSIDE		"На висоту екрану"
+STRING IDS_FRAME_HALF		"Половинного розміру"
+STRING IDS_FRAME_NORMAL		"Нормального розміру"
 STRING IDS_FRAME_STEP_ERROR_RENDERER		"Покадровий перегляд неможливий, спробуйте інший рендерер відео."
+STRING IDS_FRAME_STRETCH		"Розтягнути до розміру вікна"
+STRING IDS_FRAME_ZOOM1		"Збільшення 1"
+STRING IDS_FRAME_ZOOM2		"Збільшення 2"
 STRING IDS_FRONT_CENTER		"Фронтальний центральний"
 STRING IDS_FRONT_LEFT		"Фронтальний лівий"
 STRING IDS_FRONT_LEFT_OF_CENTER		"Фронтальний центральний лівий"

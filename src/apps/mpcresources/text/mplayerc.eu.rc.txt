@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Aldaketek eragina dute irakurketa itxi eta berrabiarazi ondoren."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 5		"Bideo aurkezlea"
 7		"VMR-9 eta EVR-CP ezarpenak"
 8		"Hautatu D3D9 Aurkezpen Gailua"
@@ -514,6 +514,9 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 21		"Irteera maila:"
 23		"EVR Bufferrak:"
 26		"Berezkoa"
+27		"Framing"
+28		"Mode:"
+30		"Do not scale at small frame size increases"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
@@ -1415,7 +1418,15 @@ STRING IDS_FILTERS_VIDEO		"Bideo Dekodeatzaileak"
 STRING IDS_FILTER_RESET_SETTINGS		"Berrezarri"
 STRING IDS_FILTER_SETTINGS_CAPTION		"Ezarpenak"
 STRING IDS_FIRST_IN_FOLDER		"Agiritegiko lehen agiria gertatzen da orain."
+STRING IDS_FRAME_DOUBLE		"Neurri Bikoitza"
+STRING IDS_FRAME_FROMINSIDE		"Ikutu Leihoa Barrualdetik"
+STRING IDS_FRAME_FROMOUTSIDE		"Ikutu Leihoa Kanpoaldetik"
+STRING IDS_FRAME_HALF		"Neurri Erdia"
+STRING IDS_FRAME_NORMAL		"Neurri Arrunta"
 STRING IDS_FRAME_STEP_ERROR_RENDERER		"Ezinezkoa frame urratsa, saiatu beste bideo aurkezle batekin."
+STRING IDS_FRAME_STRETCH		"Luzatu Leihora"
+STRING IDS_FRAME_ZOOM1		"Zoom 1"
+STRING IDS_FRAME_ZOOM2		"Zoom 2"
 STRING IDS_FRONT_CENTER		"Aurre Erdia"
 STRING IDS_FRONT_LEFT		"Aurre Ezkerra"
 STRING IDS_FRONT_LEFT_OF_CENTER		"Erdi Aurre Ezkerra"

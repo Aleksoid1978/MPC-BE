@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Değişiklikler, oynatma kapatıldıktan ve uygulama yeniden başlatıldıktan sonra uygulanacaktır."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 5		"Video işleyicisi"
 7		"VKİ-9 ve GVİ-ÖS ayarları"
 8		"D3D9 Karıştırıcı aygıtı seçimi"
@@ -514,6 +514,9 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 27
 21		"Çıkış aralığı:"
 23		"GVİ Arabelleği:"
 26		"Varsayılan"
+27		"Framing"
+28		"Mode:"
+30		"Do not scale at small frame size increases"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
@@ -1415,7 +1418,15 @@ STRING IDS_FILTERS_VIDEO		"Video Çözücüleri"
 STRING IDS_FILTER_RESET_SETTINGS		"Sıfırla"
 STRING IDS_FILTER_SETTINGS_CAPTION		"Ayarlar"
 STRING IDS_FIRST_IN_FOLDER		"Klasördeki ilk dosya yüklendi."
+STRING IDS_FRAME_DOUBLE		"İki Katı Boyut"
+STRING IDS_FRAME_FROMINSIDE		"Pencereyi İçeriden Uyarla"
+STRING IDS_FRAME_FROMOUTSIDE		"Pencereyi Dışarıdan Uyarla"
+STRING IDS_FRAME_HALF		"Yarım Boyut"
+STRING IDS_FRAME_NORMAL		"Normal Boyut"
 STRING IDS_FRAME_STEP_ERROR_RENDERER		"Görüntü değiştirilemiyor, lütfen başka bir video karıştırıcısını deneyiniz."
+STRING IDS_FRAME_STRETCH		"Pencereye Uzat"
+STRING IDS_FRAME_ZOOM1		"Yakınlaştırma 1"
+STRING IDS_FRAME_ZOOM2		"Yakınlaştırma 2"
 STRING IDS_FRONT_CENTER		"Ön Orta"
 STRING IDS_FRONT_LEFT		"Ön Sol"
 STRING IDS_FRONT_LEFT_OF_CENTER		"Ön Orta - Sol"
