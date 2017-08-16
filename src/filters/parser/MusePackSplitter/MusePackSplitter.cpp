@@ -1,23 +1,22 @@
 /*
- *
- * Adaptation for MPC-BE (C) 2012 Dmitry "Vortex" Koteroff (vortex@light-alloy.ru, http://light-alloy.ru)
- *
- * This file is part of MPC-BE and Light Alloy.
- *
- * MPC-BE is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * MPC-BE is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
+* (C) 2012-2017 see Authors.txt
+*
+* This file is part of MPC-BE.
+*
+* MPC-BE is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 3 of the License, or
+* (at your option) any later version.
+*
+* MPC-BE is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
 
 #include "stdafx.h"
 #include <windows.h>
@@ -102,22 +101,23 @@ CMusePackSplitter::~CMusePackSplitter()
 	if (reader) {
 		delete reader; reader = NULL;
 	}
-	for (int i=0; i<output.GetCount(); i++) {
+
+	for (size_t i = 0; i < output.GetCount(); i++) {
 		CMusePackOutputPin *pin = output[i];
 		if (pin) {
 			delete pin;
 		}
 	}
-
 	output.RemoveAll();
-	for (int i=0; i<retired.GetCount(); i++) {
+
+	for (size_t i = 0; i < retired.GetCount(); i++) {
 		CMusePackOutputPin	*pin = retired[i];
 		if (pin) {
 			delete pin;
 		}
 	}
-
 	retired.RemoveAll();
+
 	if (input) {
 		delete input;
 		input = NULL;
@@ -262,7 +262,7 @@ HRESULT CMusePackSplitter::RemoveOutputPins()
 	}
 
 	// we retire all current output pins
-	for (int i=0; i<output.GetCount(); i++) {
+	for (size_t i = 0; i < output.GetCount(); i++) {
 		CMusePackOutputPin *pin = output[i];
 		if (pin->IsConnected()) {
 			pin->GetConnected()->Disconnect();
@@ -271,6 +271,7 @@ HRESULT CMusePackSplitter::RemoveOutputPins()
 		retired.Add(pin);
 	}
 	output.RemoveAll();
+
 	return S_OK;
 }
 
@@ -477,7 +478,7 @@ STDMETHODIMP CMusePackSplitter::Pause()
 		ev_abort.Reset();
 
 		// activate pins
-		for (int i=0; i<output.GetCount(); i++) {
+		for (size_t i = 0; i < output.GetCount(); i++) {
 			output[i]->Active();
 		}
 		if (input) {
@@ -515,7 +516,7 @@ STDMETHODIMP CMusePackSplitter::Stop()
 			input->Inactive();
 		}
 
-		for (int i=0; i<output.GetCount(); i++) {
+		for (size_t i = 0; i < output.GetCount(); i++) {
 			output[i]->Inactive();
 		}
 
@@ -622,7 +623,7 @@ DWORD CMusePackSplitter::ThreadProc()
 					HRESULT		hr;
 					int64		current_sample;
 
-					if (output.GetCount() <= 0) {
+					if (output.IsEmpty()) {
 						break;
 					}
 					if (output[0]->IsConnected() == FALSE) {
@@ -860,7 +861,7 @@ STDMETHODIMP CMusePackOutputPin::NonDelegatingQueryInterface(REFIID riid, void *
 
 HRESULT CMusePackOutputPin::CheckMediaType(const CMediaType *mtOut)
 {
-	for (int i=0; i<mt_types.GetCount(); i++) {
+	for (size_t i = 0; i < mt_types.GetCount(); i++) {
 		if (mt_types[i] == *mtOut) {
 			return S_OK;
 		}

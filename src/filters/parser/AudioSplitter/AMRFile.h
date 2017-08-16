@@ -33,7 +33,7 @@ class CAMRFile : public CAudioFile
 
 	int                m_framelen;
 	bool               m_isAMRWB;
-	int                m_currentframe;
+	unsigned           m_currentframe;
 	CAtlArray<frame_t> m_seek_table;
 
 public:
