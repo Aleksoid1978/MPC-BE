@@ -1,23 +1,22 @@
 /*
- *
- * Adaptation for MPC-BE (C) 2012 Dmitry "Vortex" Koteroff (vortex@light-alloy.ru, http://light-alloy.ru)
- *
- * This file is part of MPC-BE and Light Alloy.
- *
- * MPC-BE is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * MPC-BE is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
+* (C) 2012-2017 see Authors.txt
+*
+* This file is part of MPC-BE.
+*
+* MPC-BE is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 3 of the License, or
+* (at your option) any later version.
+*
+* MPC-BE is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
 
 #pragma once
 
@@ -99,8 +98,6 @@ public:
 	virtual ~DataPacketMPC();
 };
 
-typedef CArray<CMediaType> CMediaTypes;
-
 //-----------------------------------------------------------------------------
 //
 //	CMusePackOutputPin class
@@ -115,26 +112,26 @@ public:
 	enum {CMD_EXIT, CMD_STOP, CMD_RUN};
 
 	// parser
-	CMusePackSplitter	*demux;
-	int					stream_index;
-	CMediaTypes			mt_types;
+	CMusePackSplitter		*demux;
+	int						stream_index;
+	CAtlArray<CMediaType>	mt_types;
 
 	// buffer queue
-	int					buffers;
+	int						buffers;
 	CList<DataPacketMPC*>	queue;
-	CCritSec			lock_queue;
-	CAMEvent			ev_can_read;
-	CAMEvent			ev_can_write;
-	CAMEvent			ev_abort;
-	int					buffer_time_ms;
+	CCritSec				lock_queue;
+	CAMEvent				ev_can_read;
+	CAMEvent				ev_can_write;
+	CAMEvent				ev_abort;
+	int						buffer_time_ms;
 
 	// time stamps
-	REFERENCE_TIME		rtStart;
-	REFERENCE_TIME		rtStop;
-	double				rate;
-	bool				active;
-	bool				discontinuity;
-	bool				eos_delivered;
+	REFERENCE_TIME			rtStart;
+	REFERENCE_TIME			rtStop;
+	double					rate;
+	bool					active;
+	bool					discontinuity;
+	bool					eos_delivered;
 
 public:
 	CMusePackOutputPin(TCHAR *pObjectName, CMusePackSplitter *pDemux, HRESULT *phr, LPCWSTR pName, int iBuffers);
@@ -251,8 +248,8 @@ public:
 
 	CCritSec						lock_filter;
 	CMusePackInputPin				*input;
-	CArray<CMusePackOutputPin*>		output;
-	CArray<CMusePackOutputPin*>		retired;
+	CAtlArray<CMusePackOutputPin*>	output;
+	CAtlArray<CMusePackOutputPin*>	retired;
 	CMusePackReader					*reader;
 	CMPCFile						*file;
 
