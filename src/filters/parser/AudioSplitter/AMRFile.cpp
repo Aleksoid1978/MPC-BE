@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2015 see Authors.txt
+ * (C) 2014-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -71,8 +71,7 @@ HRESULT CAMRFile::Open(CBaseSplitterFile* pFile)
 	m_channels = 1;
 	m_layout   = SPEAKER_FRONT_CENTER;
 
-	m_seek_table.SetSize(0, 512);
-	m_seek_table.RemoveAll();
+	m_seek_table.SetCount(0, 512);
 	BYTE toc = 0;
 	while (m_pFile->ByteRead(&toc, 1) == S_OK) {
 		frame_t frame;

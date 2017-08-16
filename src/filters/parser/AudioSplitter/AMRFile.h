@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2015 see Authors.txt
+ * (C) 2014-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,10 +31,10 @@ class CAMRFile : public CAudioFile
 		UINT64 size : 8, pos : 54;
 	};
 
-	int				m_framelen;
-	bool			m_isAMRWB;
-	int				m_currentframe;
-	CArray<frame_t>	m_seek_table;
+	int                m_framelen;
+	bool               m_isAMRWB;
+	int                m_currentframe;
+	CAtlArray<frame_t> m_seek_table;
 
 public:
 	CAMRFile();
