@@ -51,7 +51,7 @@
 #define OPTION_SFormat_i24  L"SampleFormat_int24"
 #define OPTION_SFormat_i32  L"SampleFormat_int32"
 #define OPTION_SFormat_flt  L"SampleFormat_float"
-#define OPTION_AV_SYNC      L"AVSync"
+#define OPTION_AVSYNC       L"AVSync"
 #define OPTION_DRC          L"DRC"
 #define OPTION_SPDIF_ac3    L"SPDIF_ac3"
 #define OPTION_SPDIF_eac3   L"HDMI_eac3"
@@ -387,11 +387,11 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SFormat_flt, dw)) {
 			m_fSampleFmt[SF_FLOAT] = !!dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(, dw)) {
-			m_fDRC = !!dw;
-		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_AV_SYNC, dw)) {
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_AVSYNC, dw)) {
 			m_bAVSync = !!dw;
+		}
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_DRC, dw)) {
+			m_fDRC = !!dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SPDIF_ac3, dw)) {
 			m_fSPDIF[ac3] = !!dw;
@@ -417,7 +417,7 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		m_fSampleFmt[SF_PCM16] = true;
 	}
 #else
-	m_bAVSync              = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_AV_SYNC, m_bAVSync);
+	m_bAVSync              = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_AVSYNC, m_bAVSync);
 	m_fDRC                 = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_DRC, m_fDRC);
 	m_fSPDIF[ac3]          = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3, m_fSPDIF[ac3]);
 	m_fSPDIF[eac3]         = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_eac3, m_fSPDIF[eac3]);
@@ -2285,7 +2285,7 @@ STDMETHODIMP CMpaDecFilter::SaveSettings()
 		key.SetDWORDValue(OPTION_SFormat_i24, m_fSampleFmt[SF_PCM24]);
 		key.SetDWORDValue(OPTION_SFormat_i32, m_fSampleFmt[SF_PCM32]);
 		key.SetDWORDValue(OPTION_SFormat_flt, m_fSampleFmt[SF_FLOAT]);
-		key.SetDWORDValue(OPTION_AV_SYNC, m_bAVSync);
+		key.SetDWORDValue(OPTION_AVSYNC, m_bAVSync);
 		key.SetDWORDValue(OPTION_DRC, m_fDRC);
 		key.SetDWORDValue(OPTION_SPDIF_ac3, m_fSPDIF[ac3]);
 		key.SetDWORDValue(OPTION_SPDIF_eac3, m_fSPDIF[eac3]);
@@ -2295,7 +2295,7 @@ STDMETHODIMP CMpaDecFilter::SaveSettings()
 		key.SetDWORDValue(OPTION_SPDIF_ac3enc, m_fSPDIF[ac3enc]);
 	}
 #else
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_AV_SYNC, m_bAVSync);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_AVSYNC, m_bAVSync);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_DRC, m_fDRC);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3, m_fSPDIF[ac3]);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_eac3, m_fSPDIF[eac3]);
