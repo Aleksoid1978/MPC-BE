@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,6 +38,7 @@ CPPageFileInfoSheet::CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWn
 	, m_clip(fn, pMainFrame->m_pGB)
 	, m_details(fn, pMainFrame->m_pGB, pMainFrame->m_pCAP, pMainFrame->m_pDVDI)
 	, m_res(fn, pMainFrame->m_pGB)
+	, m_pMainFrame(pMainFrame)
 	, m_mi(fn)
 	, m_fn(fn)
 	, m_bNeedInit(TRUE)
@@ -104,12 +105,12 @@ BOOL CPPageFileInfoSheet::OnInitDialog()
 	GetDlgItem(IDOK)->MoveWindow(r);
 
 	r.MoveToX(5);
-	r.right = r.left + 120;
+	r.right = r.left + m_pMainFrame->ScaleX(120);
 	m_Button_MI_SaveAs.Create(ResStr(IDS_AG_SAVE_AS), WS_CHILD | BS_PUSHBUTTON | WS_VISIBLE, r, this, IDC_BUTTON_MI_SAVEAS);
 	m_Button_MI_SaveAs.SetFont(GetFont());
 	m_Button_MI_SaveAs.ShowWindow(SW_HIDE);
 
-	r.MoveToX(r.Width() + 10);
+	r.MoveToX(r.Width() + m_pMainFrame->ScaleX(10));
 	m_Button_MI_Clipboard.Create(ResStr(IDS_COPY_TO_CLIPBOARD), WS_CHILD | BS_PUSHBUTTON | WS_VISIBLE, r, this, IDC_BUTTON_MI_CLIPBOARD);
 	m_Button_MI_Clipboard.SetFont(GetFont());
 	m_Button_MI_Clipboard.ShowWindow(SW_HIDE);
