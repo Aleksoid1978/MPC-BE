@@ -77,19 +77,19 @@ CUnknown *CMusePackSplitter::CreateInstance(LPUNKNOWN pUnk, HRESULT *phr)
 	return DNew CMusePackSplitter(pUnk, phr);
 }
 
-CMusePackSplitter::CMusePackSplitter(LPUNKNOWN pUnk, HRESULT *phr) :
-	CBaseFilter(L"Light Alloy/MPC MusePack Splitter", pUnk, &lock_filter, CLSID_MusePackSplitter, phr),
-	CAMThread(),
-	reader(NULL),
-	file(NULL),
-	wnd_prop(NULL),
-	rtCurrent(0),
-	rtStop(_I64_MAX),
-	rate(1.0),
-	ev_abort(TRUE)
+CMusePackSplitter::CMusePackSplitter(LPUNKNOWN pUnk, HRESULT *phr)
+	: CBaseFilter(L"Light Alloy/MPC MusePack Splitter", pUnk, &lock_filter, CLSID_MusePackSplitter, phr)
+	, CAMThread()
+	, reader(NULL)
+	, file(NULL)
+	, wnd_prop(NULL)
+	, rtCurrent(0)
+	, rtStop(_I64_MAX)
+	, rate(1.0)
+	, ev_abort(TRUE)
+	, output(NULL)
 {
 	input = DNew CMusePackInputPin(NAME("MPC Input Pin"), this, phr, L"In");
-	output.RemoveAll();
 	retired.RemoveAll();
 
 	ev_abort.Reset();
@@ -102,13 +102,10 @@ CMusePackSplitter::~CMusePackSplitter()
 		delete reader; reader = NULL;
 	}
 
-	for (size_t i = 0; i < output.GetCount(); i++) {
-		CMusePackOutputPin *pin = output[i];
-		if (pin) {
-			delete pin;
-		}
+	if (output) {
+		delete output;
+		output = NULL;
 	}
-	output.RemoveAll();
 
 	for (size_t i = 0; i < retired.GetCount(); i++) {
 		CMusePackOutputPin	*pin = retired[i];
@@ -147,7 +144,7 @@ int CMusePackSplitter::GetPinCount()
 	// return pin count
 	CAutoLock Lock(&lock_filter);
 
-	return ((input ? 1 : 0) + output.GetCount());
+	return (input ? 1 : 0) + (output ? 1 : 0);
 }
 
 CBasePin *CMusePackSplitter::GetPin(int n)
@@ -157,14 +154,12 @@ CBasePin *CMusePackSplitter::GetPin(int n)
 	if (n == 0) {
 		return input;
 	}
-	n -= 1;
-	int l = output.GetCount();
 
-	// return the requested output pin
-	if (n >= l) {
-		return NULL;
+	if (n == 1) {
+		return output;
 	}
-	return output[n];
+
+	return NULL;
 }
 
 HRESULT CMusePackSplitter::CheckConnect(PIN_DIRECTION Dir, IPin *pPin)
@@ -247,13 +242,13 @@ HRESULT CMusePackSplitter::CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller,
 		HRESULT hr = S_OK;
 		CMusePackOutputPin *opin = DNew CMusePackOutputPin(L"Outpin", this, &hr, L"Out", 5);
 		ConfigureMediaType(opin);
-		AddOutputPin(opin);
+		SetOutputPin(opin);
 	}
 
 	return S_OK;
 }
 
-HRESULT CMusePackSplitter::RemoveOutputPins()
+HRESULT CMusePackSplitter::RemoveOutputPin()
 {
 	CAutoLock Lck(&lock_filter);
 
@@ -261,16 +256,15 @@ HRESULT CMusePackSplitter::RemoveOutputPins()
 		return VFW_E_NOT_STOPPED;
 	}
 
-	// we retire all current output pins
-	for (size_t i = 0; i < output.GetCount(); i++) {
-		CMusePackOutputPin *pin = output[i];
-		if (pin->IsConnected()) {
-			pin->GetConnected()->Disconnect();
-			pin->Disconnect();
+	if (output) {
+		if (output->IsConnected()) {
+			output->GetConnected()->Disconnect();
+			output->Disconnect();
 		}
-		retired.Add(pin);
+
+		retired.Add(output);
+		output = NULL;
 	}
-	output.RemoveAll();
 
 	return S_OK;
 }
@@ -319,7 +313,7 @@ HRESULT CMusePackSplitter::BreakConnect(PIN_DIRECTION Dir, CBasePin *pCaller)
 		ev_abort.Set();
 		//ev_ready.Set();
 
-		HRESULT hr = RemoveOutputPins();
+		HRESULT hr = RemoveOutputPin();
 		if (FAILED(hr)) {
 			return hr;
 		}
@@ -341,11 +335,13 @@ HRESULT CMusePackSplitter::BreakConnect(PIN_DIRECTION Dir, CBasePin *pCaller)
 }
 
 // Output pins
-HRESULT CMusePackSplitter::AddOutputPin(CMusePackOutputPin *pPin)
+HRESULT CMusePackSplitter::SetOutputPin(CMusePackOutputPin *pPin)
 {
 	CAutoLock lck(&lock_filter);
 
-	output.Add(pPin);
+	RemoveOutputPin();
+	output = pPin;
+
 	return S_OK;
 }
 
@@ -478,8 +474,8 @@ STDMETHODIMP CMusePackSplitter::Pause()
 		ev_abort.Reset();
 
 		// activate pins
-		for (size_t i = 0; i < output.GetCount(); i++) {
-			output[i]->Active();
+		if (output) {
+			output->Active();
 		}
 		if (input) {
 			input->Active();
@@ -516,8 +512,8 @@ STDMETHODIMP CMusePackSplitter::Stop()
 			input->Inactive();
 		}
 
-		for (size_t i = 0; i < output.GetCount(); i++) {
-			output[i]->Inactive();
+		if (output) {
+			output->Inactive();
 		}
 
 		if (ThreadExists()) {
@@ -537,7 +533,7 @@ STDMETHODIMP CMusePackSplitter::Stop()
 
 HRESULT CMusePackSplitter::DoNewSeek()
 {
-	CMusePackOutputPin	*pin = output[0];
+	CMusePackOutputPin	*pin = output;
 	HRESULT				hr;
 
 	if (!pin->IsConnected()) {
@@ -623,13 +619,13 @@ DWORD CMusePackSplitter::ThreadProc()
 					HRESULT		hr;
 					int64		current_sample;
 
-					if (output.IsEmpty()) {
+					if (!output) {
 						break;
 					}
-					if (output[0]->IsConnected() == FALSE) {
+					if (output->IsConnected() == FALSE) {
 						break;
 					}
-					int	delivered = 0;
+					int delivered = 0;
 
 					do {
 						// are we supposed to abort ?
@@ -641,7 +637,7 @@ DWORD CMusePackSplitter::ThreadProc()
 						if (ret == -2) {
 							// end of stream
 							if (!ev_abort.Check()) {
-								output[0]->DoEndOfStream();
+								output->DoEndOfStream();
 							}
 							break;
 						} else if (ret < 0) {
@@ -655,7 +651,7 @@ DWORD CMusePackSplitter::ThreadProc()
 							packet.tStop  = tStop  - rtCurrent;
 
 							// deliver packet
-							hr = output[0]->DeliverPacket(packet);
+							hr = output->DeliverPacket(packet);
 							if (FAILED(hr)) {
 								break;
 							}

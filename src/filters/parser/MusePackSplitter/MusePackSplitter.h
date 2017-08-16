@@ -248,7 +248,7 @@ public:
 
 	CCritSec						lock_filter;
 	CMusePackInputPin				*input;
-	CAtlArray<CMusePackOutputPin*>	output;
+	CMusePackOutputPin*				output;
 	CAtlArray<CMusePackOutputPin*>	retired;
 	CMusePackReader					*reader;
 	CMPCFile						*file;
@@ -276,8 +276,8 @@ public:
 	virtual CBasePin *GetPin(int n);
 
 	// Output pins
-	HRESULT AddOutputPin(CMusePackOutputPin *pPin);
-	virtual HRESULT RemoveOutputPins();
+	HRESULT SetOutputPin(CMusePackOutputPin *pPin);
+	virtual HRESULT RemoveOutputPin();
 	CMusePackOutputPin *FindStream(int stream_no);
 
 	// check that we can support this input type
