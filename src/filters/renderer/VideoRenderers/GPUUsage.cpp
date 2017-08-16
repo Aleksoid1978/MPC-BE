@@ -233,7 +233,8 @@ HRESULT CGPUUsage::Init(CString DeviceName, CString Device)
 
 												ADLODNCapabilities overdriveCapabilities = { 0 };
 												if (ADL_OK != ADL2_OverdriveN_Capabilities_Get(NULL, adapterInfo.iAdapterIndex, &overdriveCapabilities)) {
-													continue;
+													// since Crimson 17.7.2 ADL2_OverdriveN_Capabilities_Get() are no longer working at all, it's replaced with ADL2_OverdriveN_CapabilitiesX2_Get()
+													// continue;
 												}
 
 												ATIData.iAdapterId = adapterInfo.iAdapterIndex;
