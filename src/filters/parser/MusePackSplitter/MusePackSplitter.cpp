@@ -883,7 +883,7 @@ HRESULT CMusePackOutputPin::GetMediaType(int iPosition, CMediaType *pmt)
 	if (iPosition < 0) {
 		return E_INVALIDARG;
 	}
-	if (iPosition >= mt_types.GetCount()) {
+	if (iPosition >= (int)mt_types.GetCount()) {
 		return VFW_S_NO_MORE_ITEMS;
 	}
 
