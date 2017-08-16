@@ -848,6 +848,7 @@ CAlphaMaskSharedPtr CClipper::GetAlphaMask(const std::shared_ptr<CClipper>& clip
 	}
 
 	BYTE* pAlphaMask = m_pAlphaMask->get();
+	memset(pAlphaMask, (m_inverse ? 0x40 : 0), alphaMaskSize);
 
 	const BYTE* src = m_pOverlayData->mpOverlayBufferBody + m_pOverlayData->mOverlayPitch * yo + xo;
 	BYTE* dst = pAlphaMask + m_size.cx * y + x;
@@ -858,20 +859,16 @@ CAlphaMaskSharedPtr CClipper::GetAlphaMask(const std::shared_ptr<CClipper>& clip
 			for (ptrdiff_t wt = 0; wt < w; ++wt) {
 				dst[wt] = 0x40 - src[wt];
 			}
-			memset(dst + w, 0x40, m_size.cx - w);
-
 			src += m_pOverlayData->mOverlayPitch;
 			dst += m_size.cx;
 		}
 	} else {
 		for (ptrdiff_t i = 0; i < h; ++i) {
 			memcpy(dst, src, w * sizeof(BYTE));
-			memset(dst + w, 0, m_size.cx - w);
 			src += m_pOverlayData->mOverlayPitch;
 			dst += m_size.cx;
 		}
 	}
-	memset(dst, (m_inverse ? 0x40 : 0), alphaMaskSize - (dst - pAlphaMask));
 
 	if (m_effectType == EF_SCROLL) {
 		int height = m_effect.param[4];
@@ -3063,7 +3060,7 @@ STDMETHODIMP CRenderedTextSubtitle::Render(SubPicDesc& spd, REFERENCE_TIME rt, d
 
 		CPoint org2;
 
-		CAlphaMaskSharedPtr ptrAlphaMask = s->m_pClipper ? s->m_pClipper->GetAlphaMask(s->m_pClipper) : NULL;
+		const auto& ptrAlphaMask = s->m_pClipper ? s->m_pClipper->GetAlphaMask(s->m_pClipper) : NULL;
 		BYTE* pAlphaMask = ptrAlphaMask ? ptrAlphaMask->get() : NULL;
 
 		for (int k = 0; k < EF_NUMBEROFEFFECTS; k++) {
