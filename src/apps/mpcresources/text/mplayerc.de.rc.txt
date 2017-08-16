@@ -514,9 +514,9 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 21		"Ausgabebereich:"
 23		"EVR-Puffer:"
 26		"Zurücksetzen"
-27		"Framing"
-28		"Mode:"
-30		"Do not scale at small frame size increases"
+27		"Videobild"
+28		"Modus:"
+30		"Bei kleiner Erhöhung der Bildgröße nicht skalieren"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
