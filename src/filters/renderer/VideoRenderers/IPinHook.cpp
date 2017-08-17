@@ -757,14 +757,14 @@ public :
 			LOG (strBuffer);*/
 
 			if (pExecuteParams->pCompressedBuffers[i].CompressedBufferType == DXVA2_PictureParametersBufferType) {
-				if (g_guidDXVADecoder == DXVA2_ModeH264_E || g_guidDXVADecoder == DXVA_Intel_H264_ClearVideo) {
+				if (DXVAState::m_guidDXVADecoder == DXVA2_ModeH264_E || DXVAState::m_guidDXVADecoder == DXVA_Intel_H264_ClearVideo) {
 					LogDXVA_PicParams_H264((DXVA_PicParams_H264*)m_ppBuffer[pExecuteParams->pCompressedBuffers[i].CompressedBufferType]);
-				} else if (g_guidDXVADecoder == DXVA2_ModeVC1_D || g_guidDXVADecoder == DXVA2_ModeMPEG2_VLD || g_guidDXVADecoder == DXVA_Intel_VC1_ClearVideo || g_guidDXVADecoder == DXVA2_ModeVC1_D2010) {
+				} else if (DXVAState::m_guidDXVADecoder == DXVA2_ModeVC1_D || DXVAState::m_guidDXVADecoder == DXVA2_ModeMPEG2_VLD || DXVAState::m_guidDXVADecoder == DXVA_Intel_VC1_ClearVideo || DXVAState::m_guidDXVADecoder == DXVA2_ModeVC1_D2010) {
 					LogDXVA_PictureParameters((DXVA_PictureParameters*)m_ppBuffer[pExecuteParams->pCompressedBuffers[i].CompressedBufferType]);
 				}
 			}
 
-			if (g_guidDXVADecoder == DXVA2_ModeH264_E || g_guidDXVADecoder == DXVA_Intel_H264_ClearVideo) {
+			if (DXVAState::m_guidDXVADecoder == DXVA2_ModeH264_E || DXVAState::m_guidDXVADecoder == DXVA_Intel_H264_ClearVideo) {
 				if (pExecuteParams->pCompressedBuffers[i].CompressedBufferType == DXVA2_SliceControlBufferType) {
 					if (pExecuteParams->pCompressedBuffers[i].DataSize % sizeof(DXVA_Slice_H264_Long) == 0) {
 						DXVA_Slice_H264_Long*	pSlice = (DXVA_Slice_H264_Long*)m_ppBuffer[pExecuteParams->pCompressedBuffers[i].CompressedBufferType];
@@ -774,7 +774,7 @@ public :
 						LogH264SliceShort(pSlice, pExecuteParams->pCompressedBuffers[i].DataSize / sizeof(DXVA_Slice_H264_Short));
 					}
 				}
-			} else if (g_guidDXVADecoder == DXVA2_ModeVC1_D || g_guidDXVADecoder == DXVA2_ModeMPEG2_VLD || g_guidDXVADecoder == DXVA_Intel_VC1_ClearVideo || g_guidDXVADecoder == DXVA2_ModeVC1_D2010) {
+			} else if (DXVAState::m_guidDXVADecoder == DXVA2_ModeVC1_D || DXVAState::m_guidDXVADecoder == DXVA2_ModeMPEG2_VLD || DXVAState::m_guidDXVADecoder == DXVA_Intel_VC1_ClearVideo || DXVAState::m_guidDXVADecoder == DXVA2_ModeVC1_D2010) {
 				if (pExecuteParams->pCompressedBuffers[i].CompressedBufferType == DXVA2_SliceControlBufferType) {
 					DXVA_SliceInfo*	pSlice = (DXVA_SliceInfo*)m_ppBuffer[pExecuteParams->pCompressedBuffers[i].CompressedBufferType];
 					LogSliceInfo(pSlice, pExecuteParams->pCompressedBuffers[i].DataSize / sizeof(DXVA_SliceInfo));
