@@ -534,30 +534,16 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 		return E_UNEXPECTED;
 	}
 
-	// this will make sure we won't connect to the old renderer in dvd mode
-	// that renderer can't switch the format dynamically
-
-	bool fFoundDVDNavigator = false;
-	CComPtr<IBaseFilter> pBF = this;
-	CComPtr<IPin> pPin = m_pInput;
-	for (; !fFoundDVDNavigator && (pBF = GetUpStreamFilter(pBF, pPin)); pPin = GetFirstPin(pBF)) {
-		fFoundDVDNavigator = !!(GetCLSID(pBF) == CLSID_DVDNavigator);
-	}
-
-	if (fFoundDVDNavigator || m_pInput->CurrentMediaType().formattype == FORMAT_VideoInfo2) {
-		iPosition = iPosition*2;
-	}
-
 	GetOutputFormats(nFormatCount, &fmts);
 	if (iPosition < 0) {
 		return E_INVALIDARG;
 	}
-	if (iPosition >= 2*nFormatCount) {
+	if (iPosition >= nFormatCount) {
 		return VFW_S_NO_MORE_ITEMS;
 	}
 
 	pmt->majortype = MEDIATYPE_Video;
-	pmt->subtype   = *fmts[iPosition/2].subtype;
+	pmt->subtype   = *fmts[iPosition].subtype;
 
 	int w = m_win, h = m_hin, arx = m_arxin, ary = m_aryin;
 	int vsfilter = 0;
@@ -572,19 +558,12 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	bihOut.biSize        = sizeof(bihOut);
 	bihOut.biWidth       = w;
 	bihOut.biHeight      = h;
-	bihOut.biPlanes      = fmts[iPosition/2].biPlanes;
-	bihOut.biBitCount    = fmts[iPosition/2].biBitCount;
-	bihOut.biCompression = fmts[iPosition/2].biCompression;
+	bihOut.biPlanes      = fmts[iPosition].biPlanes;
+	bihOut.biBitCount    = fmts[iPosition].biBitCount;
+	bihOut.biCompression = fmts[iPosition].biCompression;
 	bihOut.biSizeImage   = DIBSIZE(bihOut);
 
-	if (iPosition&1) {
-		pmt->formattype = FORMAT_VideoInfo;
-		VIDEOINFOHEADER* vih = (VIDEOINFOHEADER*)pmt->AllocFormatBuffer(sizeof(VIDEOINFOHEADER));
-		memset(vih, 0, sizeof(VIDEOINFOHEADER));
-		vih->bmiHeader = bihOut;
-		vih->bmiHeader.biXPelsPerMeter = vih->bmiHeader.biWidth * ary;
-		vih->bmiHeader.biYPelsPerMeter = vih->bmiHeader.biHeight * arx;
-	} else {
+	{
 		pmt->formattype = FORMAT_VideoInfo2;
 		VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)pmt->AllocFormatBuffer(sizeof(VIDEOINFOHEADER2));
 		memset(vih2, 0, sizeof(VIDEOINFOHEADER2));
