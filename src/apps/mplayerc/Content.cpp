@@ -147,7 +147,11 @@ namespace Content {
 		if (!content.bInitialized) {
 			content.bInitialized = true;
 			content.HTTPAsync = std::make_shared<CHTTPAsync>();
-			content.bHTTPConnected = (content.HTTPAsync->Connect(fn, 10000) == S_OK);
+
+			CString realPath(fn);
+			CorrectAceStream(realPath);
+
+			content.bHTTPConnected = (content.HTTPAsync->Connect(realPath, 10000) == S_OK);
 
 			GetData(content);
 		}
@@ -373,7 +377,10 @@ namespace Content {
 		CUrl url;
 		CString ct, body;
 
-		if (::PathIsURL(fn) && url.CrackUrl(fn)) {
+		CString realPath(fn);
+		CorrectAceStream(realPath);
+
+		if (::PathIsURL(realPath) && url.CrackUrl(realPath)) {
 			CString schemeName = url.GetSchemeName();
 			schemeName.MakeLower();
 			if (schemeName == L"pnm") {
@@ -449,9 +456,12 @@ namespace Content {
 	namespace Online {
 		const bool CheckConnect(const CString fn)
 		{
+			CString realPath(fn);
+			CorrectAceStream(realPath);
+
 			CUrl url;
-			if (::PathIsURL(fn)
-					&& url.CrackUrl(fn)
+			if (::PathIsURL(realPath)
+					&& url.CrackUrl(realPath)
 					&& (url.GetScheme() == ATL_URL_SCHEME_HTTP || url.GetScheme() == ATL_URL_SCHEME_HTTPS)) {
 				return Connect(fn);
 			}

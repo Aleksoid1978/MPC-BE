@@ -24,6 +24,8 @@
 #include <atlcoll.h>
 #include <atlstr.h>
 
+#define CorrectAceStream(path) { path.Replace(L"acestream://", L"http://127.0.0.1:6878/ace/getstream?id="); }
+
 namespace Content {
 	namespace Online {
 		const bool CheckConnect(const CString fn);

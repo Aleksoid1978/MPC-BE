@@ -11662,8 +11662,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		if (!Content::Online::CheckConnect(fn)) {
 			hr = VFW_E_NOT_FOUND;
 		}
-
 		Content::Online::Disconnect(fn);
+
+		CorrectAceStream(fn);
 
 		if (SUCCEEDED(hr)) {
 			WCHAR path[MAX_PATH] = { 0 };
