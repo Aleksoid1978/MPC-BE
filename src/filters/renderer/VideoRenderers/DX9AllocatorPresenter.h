@@ -136,7 +136,7 @@ namespace DSObjects
 			_In_  LPDIRECT3DDEVICE9 pDevice,
 			_Out_ LPD3DXLINE        *ppLine
 		);
-		HRESULT (__stdcall *m_pD3DXCreateFont)(
+		HRESULT (__stdcall *m_pD3DXCreateFontW)(
 			_In_  LPDIRECT3DDEVICE9 pDevice,
 			_In_  INT               Height,
 			_In_  UINT              Width,
@@ -147,7 +147,7 @@ namespace DSObjects
 			_In_  DWORD             OutputPrecision,
 			_In_  DWORD             Quality,
 			_In_  DWORD             PitchAndFamily,
-			_In_  LPCTSTR           pFacename,
+			_In_  LPCWSTR           pFacename,
 			_Out_ LPD3DXFONT        *ppFont
 		);
 		HRESULT (__stdcall *m_pD3DXCreateSprite)(

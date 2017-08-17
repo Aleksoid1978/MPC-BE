@@ -97,13 +97,13 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 	HINSTANCE hDll;
 	m_pD3DXLoadSurfaceFromMemory = NULL;
 	m_pD3DXCreateLine = NULL;
-	m_pD3DXCreateFont = NULL;
+	m_pD3DXCreateFontW = NULL;
 	m_pD3DXCreateSprite = NULL;
 	hDll = GetD3X9Dll();
 	if (hDll) {
 		(FARPROC &)m_pD3DXLoadSurfaceFromMemory = GetProcAddress(hDll, "D3DXLoadSurfaceFromMemory");
 		(FARPROC &)m_pD3DXCreateLine = GetProcAddress(hDll, "D3DXCreateLine");
-		(FARPROC &)m_pD3DXCreateFont = GetProcAddress(hDll, "D3DXCreateFontW");
+		(FARPROC &)m_pD3DXCreateFontW = GetProcAddress(hDll, "D3DXCreateFontW");
 		(FARPROC &)m_pD3DXCreateSprite = GetProcAddress(hDll, "D3DXCreateSprite");
 	} else {
 		_Error += L"The installed DirectX End-User Runtime is outdated. Please download and install the June 2010 release or newer in order for MPC-BE to function properly.\n";
@@ -594,13 +594,13 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		m_pSubPicQueue->SetSubPicProvider(pSubPicProvider);
 	}
 
-	if (m_pD3DXCreateFont) {
+	if (m_pD3DXCreateFontW) {
 		int MinSize = 1600;
 		int CurrentSize = min(m_ScreenSize.cx, MinSize);
 		double Scale = double(CurrentSize) / double(MinSize);
 		m_TextScale = Scale;
-		m_pD3DXCreateFont(m_pD3DDevEx, (int)(-24.0*Scale), (UINT)(-11.0*Scale), CurrentSize < 800 ? FW_NORMAL : FW_BOLD, 0, FALSE,
-						  DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FIXED_PITCH | FF_DONTCARE, L"Lucida Console", &m_pFont);
+		m_pD3DXCreateFontW(m_pD3DDevEx, (int)(-24.0*Scale), (UINT)(-11.0*Scale), CurrentSize < 800 ? FW_NORMAL : FW_BOLD, 0, FALSE,
+						   DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, FIXED_PITCH | FF_DONTCARE, L"Lucida Console", &m_pFont);
 	}
 	if (m_pD3DXCreateSprite) {
 		m_pD3DXCreateSprite(m_pD3DDevEx, &m_pSprite);
@@ -1724,8 +1724,8 @@ void CBaseAP::DrawText(const RECT &rc, const CString &strText, int _Priority)
 	RECT Rect1 = rc;
 	RECT Rect2 = rc;
 	OffsetRect(&Rect2 , 2, 2);
-	m_pFont->DrawText(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
-	m_pFont->DrawText( m_pSprite, strText, -1, &Rect1, DT_NOCLIP, Color1);
+	m_pFont->DrawTextW(m_pSprite, strText, -1, &Rect2, DT_NOCLIP, Color0);
+	m_pFont->DrawTextW( m_pSprite, strText, -1, &Rect1, DT_NOCLIP, Color1);
 }
 
 void CBaseAP::DrawStats()
