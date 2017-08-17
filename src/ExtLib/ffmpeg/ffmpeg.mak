@@ -50,7 +50,7 @@ endif
 ifeq ($(DEBUG),yes)
 	CFLAGS		+= -DDEBUG -D_DEBUG -g -Og
 else
-	CFLAGS		+= -DNDEBUG -UDEBUG -U_DEBUG -O2
+	CFLAGS		+= -DNDEBUG -UDEBUG -U_DEBUG -O3 -fno-tree-vectorize
 endif
 
 # Object directories
