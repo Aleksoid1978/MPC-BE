@@ -2433,14 +2433,14 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 HRESULT CMPCVideoDecFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_PROPERTIES* pProperties)
 {
 	if (UseDXVA2()) {
-		HRESULT					hr;
-		ALLOCATOR_PROPERTIES	Actual;
-
 		if (m_pInput->IsConnected() == FALSE) {
 			return E_UNEXPECTED;
 		}
 
-		pProperties->cBuffers = 24;
+		pProperties->cBuffers = 20;
+
+		HRESULT hr = S_OK;
+		ALLOCATOR_PROPERTIES Actual;
 
 		if (FAILED(hr = pAllocator->SetProperties(pProperties, &Actual))) {
 			return hr;
@@ -2450,7 +2450,7 @@ HRESULT CMPCVideoDecFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATO
 			   ? E_FAIL
 			   : NOERROR;
 	} else {
-		return __super::DecideBufferSize (pAllocator, pProperties);
+		return __super::DecideBufferSize(pAllocator, pProperties);
 	}
 }
 
