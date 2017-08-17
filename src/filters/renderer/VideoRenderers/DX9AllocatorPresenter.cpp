@@ -60,7 +60,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_rcMonitor(0, 0, 0, 0)
 	, m_pD3DXLoadSurfaceFromMemory(NULL)
 	, m_pD3DXCreateLine(NULL)
-	, m_pD3DXCreateFont(NULL)
+	, m_pD3DXCreateFontW(NULL)
 	, m_pD3DXCreateSprite(NULL)
 	, m_FocusThread(NULL)
 	, m_bMVC_Base_View_R_flag(false)
@@ -76,7 +76,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	if (hDll) {
 		(FARPROC&)m_pD3DXLoadSurfaceFromMemory = GetProcAddress(hDll, "D3DXLoadSurfaceFromMemory");
 		(FARPROC&)m_pD3DXCreateLine            = GetProcAddress(hDll, "D3DXCreateLine");
-		(FARPROC&)m_pD3DXCreateFont            = GetProcAddress(hDll, "D3DXCreateFontW");
+		(FARPROC&)m_pD3DXCreateFontW           = GetProcAddress(hDll, "D3DXCreateFontW");
 		(FARPROC&)m_pD3DXCreateSprite          = GetProcAddress(hDll, "D3DXCreateSprite");
 	} else {
 		_Error += L"The installed DirectX End-User Runtime is outdated. Please download and install the June 2010 release or newer in order for MPC-BE to function properly.\n";
@@ -1808,7 +1808,7 @@ void CDX9AllocatorPresenter::DrawStats()
 	}
 	WindowRect = m_windowRect;
 
-	if (!m_pFont && m_pD3DXCreateFont) {
+	if (!m_pFont && m_pD3DXCreateFontW) {
 		int  FontHeight = max(m_windowRect.Height() / 35, 6); // must be equal to 5 or more
 		UINT FontWidth  = max(m_windowRect.Width() / 130, 4); // 0 = auto
 		UINT FontWeight = FW_BOLD;
@@ -1818,18 +1818,18 @@ void CDX9AllocatorPresenter::DrawStats()
 
 		TextHeight = FontHeight;
 
-		m_pD3DXCreateFont(m_pD3DDevEx,					// D3D device
-						  FontHeight,					// Height
-						  FontWidth,					// Width
-						  FontWeight,					// Weight
-						  0,							// MipLevels, 0 = autogen mipmaps
-						  FALSE,						// Italic
-						  DEFAULT_CHARSET,				// CharSet
-						  OUT_DEFAULT_PRECIS,			// OutputPrecision
-						  ANTIALIASED_QUALITY,			// Quality
-						  FIXED_PITCH | FF_DONTCARE,	// PitchAndFamily
-						  L"Lucida Console",			// pFaceName
-						  &m_pFont);					// ppFont
+		m_pD3DXCreateFontW(m_pD3DDevEx,					// D3D device
+						   FontHeight,					// Height
+						   FontWidth,					// Width
+						   FontWeight,					// Weight
+						   0,							// MipLevels, 0 = autogen mipmaps
+						   FALSE,						// Italic
+						   DEFAULT_CHARSET,				// CharSet
+						   OUT_DEFAULT_PRECIS,			// OutputPrecision
+						   ANTIALIASED_QUALITY,			// Quality
+						   FIXED_PITCH | FF_DONTCARE,	// PitchAndFamily
+						   L"Lucida Console",			// pFaceName
+						   &m_pFont);					// ppFont
 	}
 
 	if (!m_pSprite && m_pD3DXCreateSprite) {
@@ -1845,10 +1845,10 @@ void CDX9AllocatorPresenter::DrawStats()
 			static const D3DXCOLOR ShadowColor(0.0f, 0.0f, 0.0f, 1.0f); // black
 			RECT rcShadow = rc;
 			OffsetRect(&rcShadow , 2, 2);
-			m_pFont->DrawText(m_pSprite, strText, -1, &rcShadow, DT_NOCLIP, ShadowColor);
+			m_pFont->DrawTextW(m_pSprite, strText, -1, &rcShadow, DT_NOCLIP, ShadowColor);
 
 			static const D3DXCOLOR TextColor(1.0f, 0.8f, 0.0f, 1.0f); // yellow
-			m_pFont->DrawText(m_pSprite, strText, -1, &rc, DT_NOCLIP, TextColor);
+			m_pFont->DrawTextW(m_pSprite, strText, -1, &rc, DT_NOCLIP, TextColor);
 
 			OffsetRect(&rc, 0, TextHeight);
 		};
