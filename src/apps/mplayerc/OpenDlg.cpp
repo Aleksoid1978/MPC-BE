@@ -112,7 +112,8 @@ BOOL COpenDlg::OnInitDialog()
 	if (m_bPasteClipboardURL && ::IsClipboardFormatAvailable(CF_UNICODETEXT) && ::OpenClipboard(m_hWnd)) {
 		if (HGLOBAL hglb = ::GetClipboardData(CF_UNICODETEXT)) {
 			if (LPCWSTR pText = (LPCWSTR)::GlobalLock(hglb)) {
-				if (AfxIsValidString(pText) && ::PathIsURL(pText)) {
+				if (AfxIsValidString(pText)
+						&& (::PathIsURL(pText) || wcsstr(pText, L"acestream://") == pText)) {
 					m_mrucombo.SetWindowTextW(pText);
 				}
 				GlobalUnlock(hglb);
