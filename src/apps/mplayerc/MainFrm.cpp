@@ -12779,6 +12779,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 				fn = m_youtubeFields.title;
 			}
 
+			bool bGetTitle = false;
 			BeginEnumFilters(m_pGB, pEF, pBF) {
 				if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
 					if (!CheckMainFilter(pBF)) {
@@ -12788,12 +12789,19 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 					CComBSTR bstr;
 					if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
 						fn = CString(bstr.m_str);
-						bstr.Empty();
+						bGetTitle = true;
 						break;
 					}
 				}
 			}
 			EndEnumFilters;
+
+			if (!bGetTitle) {
+				CPlaylistItem pli;
+				if (m_wndPlaylistBar.GetCur(pli) && !pli.m_fns.IsEmpty() && !pli.m_label.IsEmpty()) {
+					fn = pli.m_label;
+				}
+			}
 		}
 		title = fn + L" - " + m_strTitle;
 	} else if (i == 0) {
