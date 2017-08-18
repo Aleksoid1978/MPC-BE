@@ -265,10 +265,10 @@ struct AccelTbl {
 
 class wmcmd : public ACCEL
 {
-	ACCEL backup;
-	UINT appcmdorg;
-	UINT mouseorg;
-	UINT mouseFSorg;
+	ACCEL backup_accel;
+	UINT  backup_appcmd;
+	UINT  backup_mouse;
+	UINT  backup_mouseFS;
 
 public:
 	DWORD dwname;
@@ -304,16 +304,16 @@ public:
 	}
 
 	wmcmd(WORD cmd, WORD key, BYTE fVirt, DWORD dwname, UINT appcmd = 0, UINT mouse = NONE, UINT mouseFS = NONE, LPCSTR rmcmd = "", int rmrepcnt = 5) {
-		this->cmd = cmd;
-		this->key = key;
-		this->fVirt = fVirt;
-		this->appcmd = appcmdorg = appcmd;
-		this->dwname = dwname;
-		this->mouse = mouseorg = mouse;
-		this->mouseFS = mouseFSorg = mouseFS;
-		this->rmcmd = rmcmd;
+		this->cmd      = cmd;
+		this->key      = key;
+		this->fVirt    = fVirt;
+		this->dwname   = dwname;
+		this->appcmd   = backup_appcmd  = appcmd;
+		this->mouse    = backup_mouse   = mouse;
+		this->mouseFS  = backup_mouseFS = mouseFS;
+		this->rmcmd    = rmcmd;
 		this->rmrepcnt = rmrepcnt;
-		backup = *this;
+		backup_accel = *this;
 	}
 
 	bool operator == (const wmcmd& wc) const {
@@ -325,16 +325,21 @@ public:
 	}
 
 	void Restore() {
-		*(ACCEL*)this = backup;
-		appcmd = appcmdorg;
-		mouse = mouseorg;
-		mouseFS = mouseFSorg;
+		*(ACCEL*)this = backup_accel;
+		appcmd  = backup_appcmd;
+		mouse   = backup_mouse;
+		mouseFS = backup_mouseFS;
 		rmcmd.Empty();
 		rmrepcnt = 5;
 	}
 
 	bool IsModified() const {
-		return (memcmp((const ACCEL*)this, &backup, sizeof(ACCEL)) || appcmd != appcmdorg || mouse != mouseorg || mouseFS != mouseFSorg || !rmcmd.IsEmpty() || rmrepcnt != 5);
+		return (memcmp((const ACCEL*)this, &backup_accel, sizeof(ACCEL))
+			|| appcmd  != backup_appcmd
+			|| mouse   != backup_mouse
+			|| mouseFS != backup_mouseFS
+			|| !rmcmd.IsEmpty()
+			|| rmrepcnt != 5);
 	}
 };
 
