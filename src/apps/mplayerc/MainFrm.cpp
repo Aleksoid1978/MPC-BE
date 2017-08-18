@@ -2149,9 +2149,8 @@ LRESULT CMainFrame::OnAppCommand(WPARAM wParam, LPARAM lParam)
 
 		BOOL fRet = FALSE;
 
-		POSITION pos = s.wmcmds.GetHeadPosition();
-		while (pos) {
-			wmcmd& wc = s.wmcmds.GetNext(pos);
+		for (size_t i = 0; i < s.wmcmds.GetCount(); i++) {
+			wmcmd& wc = s.wmcmds[i];
 			if (wc.appcmd == cmd && TRUE == SendMessage(WM_COMMAND, wc.cmd)) {
 				fRet = TRUE;
 			}
@@ -2193,9 +2192,8 @@ void CMainFrame::OnRawInput(UINT nInputcode, HRAWINPUT hRawInput)
 		case MCE_BLUE :
 		case MCE_MEDIA_NEXTTRACK :
 		case MCE_MEDIA_PREVIOUSTRACK :
-			POSITION pos = s.wmcmds.GetHeadPosition();
-			while (pos) {
-				wmcmd& wc = s.wmcmds.GetNext(pos);
+			for (size_t i = 0; i < s.wmcmds.GetCount(); i++) {
+				wmcmd& wc = s.wmcmds[i];
 				if (wc.appcmd == nMceCmd) {
 					SendMessage(WM_COMMAND, wc.cmd);
 					break;
@@ -2211,10 +2209,8 @@ LRESULT CMainFrame::OnHotKey(WPARAM wParam, LPARAM lParam)
 	BOOL fRet = FALSE;
 
 	if (GetActiveWindow() == this || s.bGlobalMedia == TRUE) {
-		POSITION pos = s.wmcmds.GetHeadPosition();
-
-		while (pos) {
-			wmcmd& wc = s.wmcmds.GetNext(pos);
+		for (size_t i = 0; i < s.wmcmds.GetCount(); i++) {
+			wmcmd& wc = s.wmcmds[i];
 			if (wc.appcmd == wParam && TRUE == SendMessage(WM_COMMAND, wc.cmd)) {
 				fRet = TRUE;
 			}

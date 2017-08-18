@@ -329,9 +329,8 @@ WORD AssignedToCmd(UINT keyOrMouseValue, bool bIsFullScreen/* = false*/, bool bC
 	WORD assignTo = 0;
 	CAppSettings& s = AfxGetAppSettings();
 
-	POSITION pos = s.wmcmds.GetHeadPosition();
-	while (pos && !assignTo) {
-		wmcmd& wc = s.wmcmds.GetNext(pos);
+	for (size_t i = 0; i < s.wmcmds.GetCount() && !assignTo; i++) {
+		wmcmd& wc = s.wmcmds[i];
 
 		if (bCheckMouse) {
 			if (bIsFullScreen) {

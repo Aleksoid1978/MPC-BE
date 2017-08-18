@@ -540,7 +540,7 @@ public:
 	bool			bSetContextDir;
 
 	// Keys
-	CList<wmcmd>	wmcmds;
+	CAtlArray<wmcmd> wmcmds;
 	HACCEL			hAccel;
 	bool			bWinLirc;
 	CString			strWinLircAddr;

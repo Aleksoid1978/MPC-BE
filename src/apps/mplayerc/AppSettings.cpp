@@ -191,7 +191,7 @@ CAppSettings::CAppSettings()
 
 void CAppSettings::CreateCommands()
 {
-#define ADDCMD(cmd) wmcmds.AddTail(wmcmd##cmd)
+#define ADDCMD(cmd) wmcmds.Add(wmcmd##cmd)
 	ADDCMD((ID_FILE_OPENQUICK,					'Q', FVIRTKEY|FCONTROL|FNOINVERT,		IDS_MPLAYERC_0));
 	ADDCMD((ID_FILE_OPENMEDIA,					'O', FVIRTKEY|FCONTROL|FNOINVERT,		IDS_AG_OPEN_FILE));
 	ADDCMD((ID_FILE_OPENDVD,					'D', FVIRTKEY|FCONTROL|FNOINVERT,		IDS_AG_OPEN_DVD));
@@ -869,9 +869,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	wmcmds.RemoveAll();
 	CreateCommands();
-	for (int i = 0; i < wmcmds.GetCount(); i++) {
+	for (unsigned i = 0; i < wmcmds.GetCount(); i++) {
 		CString str;
-		str.Format(L"CommandMod%d", i);
+		str.Format(L"CommandMod%u", i);
 		str = pApp->GetProfileString(IDS_R_COMMANDS, str);
 		if (str.IsEmpty()) {
 			break;
@@ -883,32 +883,36 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		if (5 > (n = swscanf_s(str, L"%d %x %x %s %d %u %u %u", &cmd, &fVirt, &key, buff, _countof(buff), &repcnt, &mouse, &appcmd, &mouseFS))) {
 			break;
 		}
-		if (POSITION pos = wmcmds.Find(cmd)) {
-			wmcmd& wc = wmcmds.GetAt(pos);
-			wc.cmd = cmd;
-			wc.fVirt = fVirt;
-			wc.key = key;
-			if (n >= 6) {
-				wc.mouse = mouse;
+
+		for (size_t j = 0; j < wmcmds.GetCount(); j++) {
+			wmcmd& wc = wmcmds[j];
+			if (cmd == wc.cmd) {
+				wc.cmd = cmd;
+				wc.fVirt = fVirt;
+				wc.key = key;
+				if (n >= 6) {
+					wc.mouse = mouse;
+				}
+				if (n >= 7) {
+					wc.appcmd = appcmd;
+				}
+				// If there is no distinct bindings for windowed and
+				// fullscreen modes we use the same for both.
+				wc.mouseFS = (n >= 8) ? mouseFS : wc.mouse;
+				wc.rmcmd = CStringA(buff).Trim('\"');
+				wc.rmrepcnt = repcnt;
+
+				break;
 			}
-			if (n >= 7) {
-				wc.appcmd = appcmd;
-			}
-			// If there is no distinct bindings for windowed and
-			// fullscreen modes we use the same for both.
-			wc.mouseFS = (n >= 8) ? mouseFS : wc.mouse;
-			wc.rmcmd = CStringA(buff).Trim('\"');
-			wc.rmrepcnt = repcnt;
 		}
 	}
 
-	CAtlArray<ACCEL> pAccel;
-	pAccel.SetCount(wmcmds.GetCount());
-	POSITION pos = wmcmds.GetHeadPosition();
-	for (int i = 0; pos; i++) {
-		pAccel[i] = wmcmds.GetNext(pos);
+	CAtlArray<ACCEL> Accel;
+	Accel.SetCount(wmcmds.GetCount());
+	for (size_t i = 0; i < Accel.GetCount(); i++) {
+		Accel[i] = wmcmds[i];
 	}
-	hAccel = CreateAcceleratorTable(pAccel.GetData(), pAccel.GetCount());
+	hAccel = CreateAcceleratorTable(Accel.GetData(), Accel.GetCount());
 
 	strWinLircAddr = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_WINLIRCADDR, L"127.0.0.1:8765");
 	bWinLirc = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_WINLIRC, 0);
@@ -1437,9 +1441,8 @@ void CAppSettings::SaveSettings()
 	}
 
 	pApp->WriteProfileString(IDS_R_COMMANDS, NULL, NULL);
-	pos = wmcmds.GetHeadPosition();
-	for (int i = 0; pos;) {
-		wmcmd& wc = wmcmds.GetNext(pos);
+	for (unsigned i = 0; i < wmcmds.GetCount(); i++) {
+		wmcmd& wc = wmcmds[i];
 		if (wc.IsModified()) {
 			str.Format(L"CommandMod%d", i);
 			CString str2;
