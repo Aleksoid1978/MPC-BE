@@ -240,10 +240,13 @@ HRESULT CDXVA2Decoder::GetFreeSurfaceIndex(int& nSurfaceIndex, IMediaSample** pp
 {
 	HRESULT hr = E_UNEXPECTED;
 	CComPtr<IMediaSample> pSample;
-	if (SUCCEEDED(hr = m_pFilter->GetOutputPin()->GetDeliveryBuffer(&pSample, NULL, NULL, 0))) {
-		CComQIPtr<IMPCDXVA2Sample> pMPCDXVA2Sample	= pSample;
-		nSurfaceIndex								= pMPCDXVA2Sample ? pMPCDXVA2Sample->GetDXSurfaceId() : 0;
-		*ppSampleToDeliver							= pSample.Detach();
+	if (SUCCEEDED(hr = m_pFilter->m_pDXVA2Allocator->GetBuffer(&pSample, NULL, NULL, 0))) {
+		if (CComQIPtr<IMPCDXVA2Sample> pMPCDXVA2Sample = pSample) {
+			nSurfaceIndex      = pMPCDXVA2Sample->GetDXSurfaceId();
+			*ppSampleToDeliver = pSample.Detach();
+		} else {
+			hr = E_UNEXPECTED;
+		}
 	}
 
 	return hr;

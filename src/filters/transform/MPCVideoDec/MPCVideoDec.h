@@ -300,7 +300,9 @@ public:
 
 private:
 	friend class CVideoDecDXVAAllocator;
+	friend class CDXVA2Decoder;
 	friend class CMSDKDecoder;
+
 	CVideoDecDXVAAllocator*		m_pDXVA2Allocator;
 
 	// *** from LAV

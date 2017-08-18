@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,9 +41,9 @@ public:
 	//Note: CMediaSample does not derive from CUnknown, so we cannot use the
 	//		DECLARE_IUNKNOWN macro that is used by most of the filter classes.
 
-	STDMETHODIMP			QueryInterface(REFIID riid, __deref_out void **ppv);
-	STDMETHODIMP_(ULONG)	AddRef();
-	STDMETHODIMP_(ULONG)	Release();
+	STDMETHODIMP         QueryInterface(REFIID riid, __deref_out void **ppv);
+	STDMETHODIMP_(ULONG) AddRef();
+	STDMETHODIMP_(ULONG) Release();
 
 	// IMFGetService::GetService
 	STDMETHODIMP GetService(REFGUID guidService, REFIID riid, LPVOID *ppv);
@@ -59,8 +59,8 @@ private:
 	// Sets the pointer to the Direct3D surface.
 	void SetSurface(DWORD surfaceId, IDirect3DSurface9 *pSurf);
 
-	CComPtr<IDirect3DSurface9>	m_pSurface;
-	DWORD						m_dwSurfaceId;
+	CComPtr<IDirect3DSurface9> m_pSurface;
+	DWORD m_dwSurfaceId;
 };
 
 class CVideoDecDXVAAllocator : public CBaseAllocator
@@ -69,24 +69,16 @@ public:
 	CVideoDecDXVAAllocator(CMPCVideoDecFilter* pVideoDecFilter, HRESULT* phr);
 	virtual ~CVideoDecDXVAAllocator();
 
-	//	STDMETHODIMP GetBuffer(__deref_out IMediaSample **ppBuffer,		// Try for a circular buffer!
-	//                          __in_opt REFERENCE_TIME * pStartTime,
-	//                          __in_opt REFERENCE_TIME * pEndTime,
-	//                          DWORD dwFlags);
-	//
-	//	STDMETHODIMP ReleaseBuffer(IMediaSample *pBuffer);
-	//	CAtlList<int>			m_FreeSurface;
-
 	// *** from LAV
 	STDMETHODIMP_(BOOL) DecommitInProgress() { CAutoLock lock(this); return m_bDecommitInProgress; }
 
 protected:
-	HRESULT		Alloc(void);
-	void		Free(void);
+	HRESULT Alloc(void);
+	void    Free(void);
 
 private :
-	CMPCVideoDecFilter*		m_pVideoDecFilter;
+	CMPCVideoDecFilter* m_pVideoDecFilter;
 
-	IDirect3DSurface9**		m_ppRTSurfaceArray;
-	UINT					m_nSurfaceArrayCount;
+	IDirect3DSurface9** m_ppRTSurfaceArray;
+	UINT                m_nSurfaceArrayCount;
 };
