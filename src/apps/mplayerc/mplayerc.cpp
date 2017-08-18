@@ -1782,10 +1782,8 @@ void CMPlayerCApp::RegisterHotkeys()
 	RegisterRawInputDevices(MCEInputDevice, _countof(MCEInputDevice), sizeof(RAWINPUTDEVICE));
 
 	if (m_s.bGlobalMedia) {
-		POSITION pos = m_s.wmcmds.GetHeadPosition();
-
-		while (pos) {
-			wmcmd& wc = m_s.wmcmds.GetNext(pos);
+		for (size_t i = 0; i < m_s.wmcmds.GetCount(); i++) {
+			wmcmd& wc = m_s.wmcmds[i];
 			if (wc.appcmd != 0) {
 				RegisterHotKey(m_pMainWnd->m_hWnd, wc.appcmd, 0, GetVKFromAppCommand (wc.appcmd));
 			}
@@ -1796,10 +1794,8 @@ void CMPlayerCApp::RegisterHotkeys()
 void CMPlayerCApp::UnregisterHotkeys()
 {
 	if (m_s.bGlobalMedia) {
-		POSITION pos = m_s.wmcmds.GetHeadPosition();
-
-		while (pos) {
-			wmcmd& wc = m_s.wmcmds.GetNext(pos);
+		for (size_t i = 0; i < m_s.wmcmds.GetCount(); i++) {
+			wmcmd& wc = m_s.wmcmds[i];
 			if (wc.appcmd != 0) {
 				UnregisterHotKey(m_pMainWnd->m_hWnd, wc.appcmd);
 			}
@@ -1985,9 +1981,8 @@ void CRemoteCtrlClient::ExecuteCommand(CStringA cmd, int repcnt)
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	POSITION pos = s.wmcmds.GetHeadPosition();
-	while (pos) {
-		wmcmd wc = s.wmcmds.GetNext(pos);
+	for (size_t i = 0; i < s.wmcmds.GetCount(); i++) {
+		wmcmd wc = s.wmcmds[i];
 		CStringA name = TToA(wc.GetName());
 		name.Replace(' ', '_');
 		if ((repcnt == 0 && wc.rmrepcnt == 0 || wc.rmrepcnt > 0 && (repcnt%wc.rmrepcnt) == 0)

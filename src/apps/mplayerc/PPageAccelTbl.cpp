@@ -141,7 +141,7 @@ BOOL CPPageAccelTbl::PreTranslateMessage(MSG* pMsg)
 void CPPageAccelTbl::SetupList()
 {
 	for (int row = 0; row < m_list.GetItemCount(); row++) {
-		wmcmd& wc = m_wmcmds.GetAt((POSITION)m_list.GetItemData(row));
+		wmcmd& wc = m_wmcmds.GetAt(m_list.GetItemData(row));
 
 		CString hotkey;
 		HotkeyModToString(wc.key, wc.fVirt, hotkey);
@@ -203,10 +203,9 @@ CString CPPageAccelTbl::MakeAccelModLabel(BYTE fVirt)
 
 CString CPPageAccelTbl::MakeAccelShortcutLabel(UINT id)
 {
-	CList<wmcmd>& wmcmds = AfxGetAppSettings().wmcmds;
-	POSITION pos = wmcmds.GetHeadPosition();
-	while (pos) {
-		ACCEL& a = wmcmds.GetNext(pos);
+	auto& wmcmds = AfxGetAppSettings().wmcmds;
+	for (size_t i = 0; i < wmcmds.GetCount(); i++) {
+		ACCEL& a = wmcmds[i];
 		if (a.cmd == id) {
 			return(MakeAccelShortcutLabel(a));
 		}
@@ -558,7 +557,7 @@ BOOL CPPageAccelTbl::OnInitDialog()
 	CAppSettings& s = AfxGetAppSettings();
 
 	m_wmcmds.RemoveAll();
-	m_wmcmds.AddTail(&s.wmcmds);
+	m_wmcmds.Append(s.wmcmds);
 	m_bWinLirc = s.bWinLirc;
 	m_WinLircAddr = s.strWinLircAddr;
 	m_bUIce = s.bUIce;
@@ -591,11 +590,10 @@ BOOL CPPageAccelTbl::OnInitDialog()
 	m_list.InsertColumn(COL_RMCMD, L"RemoteCmd", LVCFMT_LEFT, s.AccelTblColWidth.remcmd);
 	m_list.InsertColumn(COL_RMREPCNT, L"RepCnt", LVCFMT_CENTER, s.AccelTblColWidth.repcnt);
 
-	POSITION pos = m_wmcmds.GetHeadPosition();
-	for (int i = 0; pos; i++) {
-		int row = m_list.InsertItem(m_list.GetItemCount(), m_wmcmds.GetAt(pos).GetName(), COL_CMD);
-		m_list.SetItemData(row, (DWORD_PTR)pos);
-		m_wmcmds.GetNext(pos);
+	for (size_t i = 0; i < m_wmcmds.GetCount(); i++) {
+		wmcmd& wc = m_wmcmds[i];
+		int row = m_list.InsertItem(m_list.GetItemCount(), wc.GetName(), COL_CMD);
+		m_list.SetItemData(row, (DWORD_PTR)i);
 	}
 
 	SetupList();
@@ -615,18 +613,17 @@ BOOL CPPageAccelTbl::OnApply()
 	CAppSettings& s = AfxGetAppSettings();
 
 	s.wmcmds.RemoveAll();
-	s.wmcmds.AddTail(&m_wmcmds);
+	s.wmcmds.Append(m_wmcmds);
 
-	CAtlArray<ACCEL> pAccel;
-	pAccel.SetCount(m_wmcmds.GetCount());
-	POSITION pos = m_wmcmds.GetHeadPosition();
-	for (int i = 0; pos; i++) {
-		pAccel[i] = m_wmcmds.GetNext(pos);
+	CAtlArray<ACCEL> Accel;
+	Accel.SetCount(m_wmcmds.GetCount());
+	for (size_t i = 0; i < Accel.GetCount(); i++) {
+		Accel[i] = m_wmcmds[i];
 	}
 	if (s.hAccel) {
 		DestroyAcceleratorTable(s.hAccel);
 	}
-	s.hAccel = CreateAcceleratorTable(pAccel.GetData(), pAccel.GetCount());
+	s.hAccel = CreateAcceleratorTable(Accel.GetData(), Accel.GetCount());
 
 	GetParentFrame()->m_hAccelTable = s.hAccel;
 
@@ -677,8 +674,7 @@ void CPPageAccelTbl::OnBnClickedButton2()
 
 	while (pos) {
 		int ni = m_list.GetNextSelectedItem(pos);
-		POSITION pi = (POSITION)m_list.GetItemData(ni);
-		wmcmd& wc = m_wmcmds.GetAt(pi);
+		wmcmd& wc = m_wmcmds.GetAt(m_list.GetItemData(ni));
 		wc.Restore();
 	}
 	AfxGetAppSettings().AccelTblColWidth.bEnable = false;
@@ -719,7 +715,7 @@ void CPPageAccelTbl::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 	*pResult = TRUE;
 
-	wmcmd& wc = m_wmcmds.GetAt((POSITION)m_list.GetItemData(pItem->iItem));
+	wmcmd& wc = m_wmcmds.GetAt(m_list.GetItemData(pItem->iItem));
 
 	CAtlList<CString> sl;
 	int nSel = -1;
@@ -800,7 +796,7 @@ void CPPageAccelTbl::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 		return;
 	}
 
-	wmcmd& wc = m_wmcmds.GetAt((POSITION)m_list.GetItemData(pItem->iItem));
+	wmcmd& wc = m_wmcmds.GetAt(m_list.GetItemData(pItem->iItem));
 
 	switch (pItem->iSubItem) {
 		case COL_KEY: {
