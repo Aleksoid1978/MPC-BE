@@ -221,6 +221,6 @@ void CVideoDecDXVAAllocator::Free()
 		delete [] m_ppRTSurfaceArray;
 		m_ppRTSurfaceArray = NULL;
 	}
-	m_lAllocated		 = 0;
+	m_lAllocated         = 0;
 	m_nSurfaceArrayCount = 0;
 }
