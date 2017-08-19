@@ -191,6 +191,8 @@ CAppSettings::CAppSettings()
 
 void CAppSettings::CreateCommands()
 {
+	wmcmds.RemoveAll();
+
 #define ADDCMD(cmd) wmcmds.Add(wmcmd##cmd)
 	ADDCMD((ID_FILE_OPENQUICK,					'Q', FVIRTKEY|FCONTROL|FNOINVERT,		IDS_MPLAYERC_0));
 	ADDCMD((ID_FILE_OPENMEDIA,					'O', FVIRTKEY|FCONTROL|FNOINVERT,		IDS_AG_OPEN_FILE));
@@ -386,9 +388,9 @@ void CAppSettings::CreateCommands()
 	ADDCMD((ID_EDL_NEWCLIP,						  0, FVIRTKEY|FNOINVERT,				IDS_AG_EDL_NEW_CLIP));
 	ADDCMD((ID_EDL_SAVE,						  0, FVIRTKEY|FNOINVERT,				IDS_AG_EDL_SAVE));
 	ADDCMD((ID_WINDOW_TO_PRIMARYSCREEN,			'1', FVIRTKEY|FCONTROL|FALT|FNOINVERT,	IDS_AG_WINDOW_TO_PRIMARYSCREEN));
+#undef ADDCMD
 
 	ResetPositions();
-#undef ADDCMD
 }
 
 CAppSettings::~CAppSettings()
@@ -867,8 +869,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		m_pnspresets.Add(str);
 	}
 
-	wmcmds.RemoveAll();
 	CreateCommands();
+
 	for (unsigned i = 0; i < wmcmds.GetCount(); i++) {
 		CString str;
 		str.Format(L"CommandMod%u", i);
@@ -1441,17 +1443,17 @@ void CAppSettings::SaveSettings()
 	}
 
 	pApp->WriteProfileString(IDS_R_COMMANDS, NULL, NULL);
-	for (unsigned i = 0; i < wmcmds.GetCount(); i++) {
+	for (unsigned i = 0, n = 0; i < wmcmds.GetCount(); i++) {
 		wmcmd& wc = wmcmds[i];
 		if (wc.IsModified()) {
-			str.Format(L"CommandMod%d", i);
+			str.Format(L"CommandMod%u", n);
 			CString str2;
 			str2.Format(L"%d %x %x \"%S\" %d %u %u %u",
 						wc.cmd, wc.fVirt, wc.key,
 						wc.rmcmd, wc.rmrepcnt,
 						wc.mouse, wc.appcmd, wc.mouseFS);
 			pApp->WriteProfileString(IDS_R_COMMANDS, str, str2);
-			i++;
+			n++;
 		}
 	}
 
