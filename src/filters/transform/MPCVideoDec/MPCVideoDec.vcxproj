@@ -221,6 +221,7 @@
     <ClCompile Include="DXVADecoder\DXVA2DecoderMPEG2.cpp" />
     <ClCompile Include="DXVADecoder\DXVA2DecoderVC1.cpp" />
     <ClCompile Include="DXVADecoder\DXVA2DecoderVP9.cpp" />
+    <ClCompile Include="DXVADecoder\DXVAAllocator.cpp" />
     <ClCompile Include="ffmpegContext.cpp">
       <WarningLevel>Level1</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -235,7 +236,6 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="DXVAAllocator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DXVADecoder\DXVA2Decoder.h" />
@@ -244,6 +244,7 @@
     <ClInclude Include="DXVADecoder\DXVA2DecoderMPEG2.h" />
     <ClInclude Include="DXVADecoder\DXVA2DecoderVC1.h" />
     <ClInclude Include="DXVADecoder\DXVA2DecoderVP9.h" />
+    <ClInclude Include="DXVADecoder\DXVAAllocator.h" />
     <ClInclude Include="DXVADecoder\stdafx.h" />
     <ClInclude Include="ffmpegContext.h" />
     <ClInclude Include="FormatConverter.h" />
@@ -267,7 +268,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="DXVAAllocator.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MPCVideoDec.rc">

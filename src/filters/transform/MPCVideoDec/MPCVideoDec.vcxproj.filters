@@ -30,9 +30,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DXVAAllocator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ffmpegContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -78,11 +75,11 @@
     <ClCompile Include="MSDKDecoder\ByteParser.cpp">
       <Filter>Source Files\MSDKDecoder</Filter>
     </ClCompile>
+    <ClCompile Include="DXVADecoder\DXVAAllocator.cpp">
+      <Filter>Source Files\DXVADecoder</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DXVAAllocator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ffmpegContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -163,6 +160,9 @@
     </ClInclude>
     <ClInclude Include="MSDKDecoder\ByteParser.h">
       <Filter>Header Files\MSDKDecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVADecoder\DXVAAllocator.h">
+      <Filter>Header Files\DXVADecoder</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

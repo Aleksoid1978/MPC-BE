@@ -27,7 +27,7 @@
 #endif
 
 #include "MPCVideoDec.h"
-#include "DXVAAllocator.h"
+#include "DXVADecoder/DXVAAllocator.h"
 #include "FfmpegContext.h"
 
 #include "../../../DSUtil/CPUInfo.h"
