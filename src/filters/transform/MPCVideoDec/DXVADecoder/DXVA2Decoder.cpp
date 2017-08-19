@@ -28,7 +28,7 @@
 #include "DXVA2DecoderMPEG2.h"
 #include "DXVA2DecoderVP9.h"
 #include "../MPCVideoDec.h"
-#include "../DXVAAllocator.h"
+#include "DXVAAllocator.h"
 #include "../FfmpegContext.h"
 extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>

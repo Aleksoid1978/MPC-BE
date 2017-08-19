@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include "DXVAAllocator.h"
-#include "MPCVideoDec.h"
+#include "../MPCVideoDec.h"
 
 CDXVA2Sample::CDXVA2Sample(CVideoDecDXVAAllocator *pAlloc, HRESULT *phr)
 	: CMediaSample(NAME("CDXVA2Sample"), (CBaseAllocator*)pAlloc, phr, NULL, 0)
@@ -38,11 +38,10 @@ STDMETHODIMP CDXVA2Sample::QueryInterface(REFIID riid, __deref_out void **ppv)
 
 	if (riid == __uuidof(IMFGetService)) {
 		return GetInterface((IMFGetService*)this, ppv);
-	}
-	if (riid == __uuidof(IMPCDXVA2Sample)) {
+	} else if (riid == __uuidof(IMPCDXVA2Sample)) {
 		return GetInterface((IMPCDXVA2Sample*)this, ppv);
 	} else {
-		return CMediaSample::QueryInterface(riid, ppv);
+		return __super::QueryInterface(riid, ppv);
 	}
 }
 
