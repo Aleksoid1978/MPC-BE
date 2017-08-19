@@ -23,7 +23,7 @@
 #include "../MPCVideoDec.h"
 
 CDXVA2Sample::CDXVA2Sample(CVideoDecDXVAAllocator *pAlloc, HRESULT *phr)
-	: CMediaSample(NAME("CDXVA2Sample"), (CBaseAllocator*)pAlloc, phr, NULL, 0)
+	: CMediaSampleSideData(NAME("CDXVA2Sample"), (CBaseAllocator*)pAlloc, phr, NULL, 0)
 	, m_dwSurfaceId(0)
 {
 }
