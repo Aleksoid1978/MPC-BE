@@ -222,6 +222,7 @@
     <ClCompile Include="DXVADecoder\DXVA2DecoderVC1.cpp" />
     <ClCompile Include="DXVADecoder\DXVA2DecoderVP9.cpp" />
     <ClCompile Include="DXVADecoder\DXVAAllocator.cpp" />
+    <ClCompile Include="DXVADecoder\MediaSampleSideData.cpp" />
     <ClCompile Include="ffmpegContext.cpp">
       <WarningLevel>Level1</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -245,6 +246,7 @@
     <ClInclude Include="DXVADecoder\DXVA2DecoderVC1.h" />
     <ClInclude Include="DXVADecoder\DXVA2DecoderVP9.h" />
     <ClInclude Include="DXVADecoder\DXVAAllocator.h" />
+    <ClInclude Include="DXVADecoder\MediaSampleSideData.h" />
     <ClInclude Include="DXVADecoder\stdafx.h" />
     <ClInclude Include="ffmpegContext.h" />
     <ClInclude Include="FormatConverter.h" />

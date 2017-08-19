@@ -78,6 +78,9 @@
     <ClCompile Include="DXVADecoder\DXVAAllocator.cpp">
       <Filter>Source Files\DXVADecoder</Filter>
     </ClCompile>
+    <ClCompile Include="DXVADecoder\MediaSampleSideData.cpp">
+      <Filter>Source Files\DXVADecoder</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ffmpegContext.h">
@@ -162,6 +165,9 @@
       <Filter>Header Files\MSDKDecoder</Filter>
     </ClInclude>
     <ClInclude Include="DXVADecoder\DXVAAllocator.h">
+      <Filter>Header Files\DXVADecoder</Filter>
+    </ClInclude>
+    <ClInclude Include="DXVADecoder\MediaSampleSideData.h">
       <Filter>Header Files\DXVADecoder</Filter>
     </ClInclude>
   </ItemGroup>

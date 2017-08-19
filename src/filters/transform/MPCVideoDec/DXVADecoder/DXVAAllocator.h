@@ -21,6 +21,7 @@
 #pragma once
 
 #include <d3d9.h>
+#include "MediaSampleSideData.h"
 
 class CMPCVideoDecFilter;
 class CVideoDecDXVAAllocator;
@@ -31,7 +32,7 @@ public IUnknown {
 	STDMETHOD_(int, GetDXSurfaceId()) PURE;
 };
 
-class CDXVA2Sample : public CMediaSample, public IMFGetService, public IMPCDXVA2Sample
+class CDXVA2Sample : public CMediaSampleSideData, public IMFGetService, public IMPCDXVA2Sample
 {
 	friend class CVideoDecDXVAAllocator;
 
