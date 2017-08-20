@@ -326,7 +326,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 11		"Nie używaj 'szukaj w folderze' oraz komend 'Przejdź do tyłu / do przodu', gdy jest tylko jedna pozycja na liście odtwarzania"
 13		"Zapobiegaj minimalizacji w trybie pełnoekranowym na dodatkowych wyświetlaczach"
 15		"Wstrzymaj odtwarzanie po minimalizacji"
-17		"Włącz wsparcie dla wyświetlacza LCD Logitech (eksperymentalne)"
+17		"Włącz wsparcie dla wyświetlacza LCD Logitech"
 19		"Włącz MiniDump"
 20		"Sprawdzanie aktualizacji"
 21		"Włącz automatyczne sprawdzanie aktualizacji"

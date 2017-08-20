@@ -326,7 +326,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 11		"Zoek NIET op andere bestanden in dezelfde map bij het gebruik van ""Vorige/Volgende"" als er alleen een item in afspeellijst staat."
 13		"Minimaliseren vermijden in geval van volledig scherm op niet-primair scherm"
 15		"Weergave pauseren als het venster geminimaliseerd is"
-17		"Activeer Logitech LCD-ondersteuning (experimenteel)"
+17		"Activeer Logitech LCD-ondersteuning"
 19		"Activeer MiniDump"
 20		"Op updates controleren"
 21		"Activeer automatische updatecontrole"

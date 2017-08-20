@@ -326,7 +326,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 11		"Non usare la funzione 'cerca nella cartella' nei comandi 'Salta avanti/indietro' quando è presente un solo elemento in playlist"
 13		"Evita che MPC-BE si minimizzi quando è a tutto schermo su un monitor non di default"
 15		"Pause the video playback when minimized"
-17		"Abilita supporto Logitech LCD (sperimentale)"
+17		"Abilita supporto Logitech LCD"
 19		"Abilita file 'MiniDump'"
 20		"Controllo aggiornamento"
 21		"Abilita controllo aggiornamento automatico"

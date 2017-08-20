@@ -326,7 +326,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 11		"Oynatma listesinde sadece bir öğe olduğunda 'Geri/İleri Git' komutlarındaki 'klasörde arama' özelliğini kullanma."
 13		"Varsayılan olmayan monitörde Tam Ekran olduğunda SİMGE DURUMUNA komutunu engelle"
 15		"Küçültüğünde video oynatmayı duraklat"
-17		"Logitech LCD desteğini kullan (deneysel)"
+17		"Logitech LCD desteğini kullan"
 19		"MiniDump etkinleştir"
 20		"Güncelleme kontrolü"
 21		"Otomatik güncelleme kontrolünü aç"
