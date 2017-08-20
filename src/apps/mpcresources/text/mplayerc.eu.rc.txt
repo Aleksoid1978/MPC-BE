@@ -326,7 +326,7 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 11		"Ez erabili 'bilatu agiritegian' 'Jauzi atzera/aurrera' aginduetan irakur-zerrendan gai bakarra dagoenean"
 13		"Saihestu TXIKIENTZEA Ikusleiho-osoan ez berezko monitorean"
 15		"Pausatu bideo irakurketa txikiendutakoan"
-17		"Gaitu Logitech LCD sostengua (esperimentala)"
+17		"Gaitu Logitech LCD sostengua"
 19		"Gaitu MiniDump"
 20		"Eguneraketa egiaztapena"
 21		"Gaitu berezgaitasunezko eguneraketa egiaztapena"
