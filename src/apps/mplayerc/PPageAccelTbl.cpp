@@ -556,8 +556,7 @@ BOOL CPPageAccelTbl::OnInitDialog()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	m_wmcmds.clear();
-	m_wmcmds.insert(m_wmcmds.end(), s.wmcmds.begin(), s.wmcmds.end());
+	m_wmcmds = s.wmcmds;
 	m_bWinLirc = s.bWinLirc;
 	m_WinLircAddr = s.strWinLircAddr;
 	m_bUIce = s.bUIce;
@@ -612,8 +611,7 @@ BOOL CPPageAccelTbl::OnApply()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.wmcmds.clear();
-	s.wmcmds.insert(s.wmcmds.end(), m_wmcmds.begin(), m_wmcmds.end());
+	s.wmcmds = m_wmcmds;
 
 	std::vector<ACCEL> Accel(m_wmcmds.size());
 	for (size_t i = 0; i < Accel.size(); i++) {
