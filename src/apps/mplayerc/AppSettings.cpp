@@ -191,9 +191,9 @@ CAppSettings::CAppSettings()
 
 void CAppSettings::CreateCommands()
 {
-	wmcmds.RemoveAll();
+	wmcmds.clear();
 
-#define ADDCMD(cmd) wmcmds.Add(wmcmd##cmd)
+#define ADDCMD(cmd) wmcmds.emplace_back(wmcmd##cmd)
 	ADDCMD((ID_FILE_OPENQUICK,					'Q', FVIRTKEY|FCONTROL|FNOINVERT,		IDS_MPLAYERC_0));
 	ADDCMD((ID_FILE_OPENMEDIA,					'O', FVIRTKEY|FCONTROL|FNOINVERT,		IDS_AG_OPEN_FILE));
 	ADDCMD((ID_FILE_OPENDVD,					'D', FVIRTKEY|FCONTROL|FNOINVERT,		IDS_AG_OPEN_DVD));
@@ -871,7 +871,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	CreateCommands();
 
-	for (unsigned i = 0; i < wmcmds.GetCount(); i++) {
+	for (unsigned i = 0; i < wmcmds.size(); i++) {
 		CString str;
 		str.Format(L"CommandMod%u", i);
 		str = pApp->GetProfileString(IDS_R_COMMANDS, str);
@@ -886,8 +886,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 			break;
 		}
 
-		for (size_t j = 0; j < wmcmds.GetCount(); j++) {
-			wmcmd& wc = wmcmds[j];
+		for (auto& wc : wmcmds) {
 			if (cmd == wc.cmd) {
 				wc.cmd = cmd;
 				wc.fVirt = fVirt;
@@ -909,12 +908,11 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		}
 	}
 
-	CAtlArray<ACCEL> Accel;
-	Accel.SetCount(wmcmds.GetCount());
-	for (size_t i = 0; i < Accel.GetCount(); i++) {
+	std::vector<ACCEL> Accel(wmcmds.size());
+	for (size_t i = 0; i < Accel.size(); i++) {
 		Accel[i] = wmcmds[i];
 	}
-	hAccel = CreateAcceleratorTable(Accel.GetData(), Accel.GetCount());
+	hAccel = CreateAcceleratorTable(Accel.data(), Accel.size());
 
 	strWinLircAddr = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_WINLIRCADDR, L"127.0.0.1:8765");
 	bWinLirc = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_WINLIRC, 0);
@@ -1443,8 +1441,8 @@ void CAppSettings::SaveSettings()
 	}
 
 	pApp->WriteProfileString(IDS_R_COMMANDS, NULL, NULL);
-	for (unsigned i = 0, n = 0; i < wmcmds.GetCount(); i++) {
-		wmcmd& wc = wmcmds[i];
+	unsigned n = 0;
+	for (const auto& wc : wmcmds) {
 		if (wc.IsModified()) {
 			str.Format(L"CommandMod%u", n);
 			CString str2;

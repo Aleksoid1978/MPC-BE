@@ -368,8 +368,7 @@ bool CWebClientSocket::OnIndex(CStringA& hdr, CStringA& body, CStringA& mime)
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	for (size_t i = 0; i < s.wmcmds.GetCount(); i++) {
-		wmcmd& wc = s.wmcmds[i];
+	for (const auto& wc : s.wmcmds) {
 		CStringA str;
 		str.Format("%d", wc.cmd);
 		CStringA valueName(UTF8(wc.GetName()));
