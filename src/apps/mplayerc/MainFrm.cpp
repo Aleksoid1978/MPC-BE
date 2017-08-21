@@ -2149,8 +2149,7 @@ LRESULT CMainFrame::OnAppCommand(WPARAM wParam, LPARAM lParam)
 
 		BOOL fRet = FALSE;
 
-		for (size_t i = 0; i < s.wmcmds.GetCount(); i++) {
-			wmcmd& wc = s.wmcmds[i];
+		for (const auto& wc : s.wmcmds) {
 			if (wc.appcmd == cmd && TRUE == SendMessage(WM_COMMAND, wc.cmd)) {
 				fRet = TRUE;
 			}
@@ -2192,8 +2191,7 @@ void CMainFrame::OnRawInput(UINT nInputcode, HRAWINPUT hRawInput)
 		case MCE_BLUE :
 		case MCE_MEDIA_NEXTTRACK :
 		case MCE_MEDIA_PREVIOUSTRACK :
-			for (size_t i = 0; i < s.wmcmds.GetCount(); i++) {
-				wmcmd& wc = s.wmcmds[i];
+			for (const auto& wc : s.wmcmds) {
 				if (wc.appcmd == nMceCmd) {
 					SendMessage(WM_COMMAND, wc.cmd);
 					break;
@@ -2209,8 +2207,7 @@ LRESULT CMainFrame::OnHotKey(WPARAM wParam, LPARAM lParam)
 	BOOL fRet = FALSE;
 
 	if (GetActiveWindow() == this || s.bGlobalMedia == TRUE) {
-		for (size_t i = 0; i < s.wmcmds.GetCount(); i++) {
-			wmcmd& wc = s.wmcmds[i];
+		for (const auto& wc : s.wmcmds) {
 			if (wc.appcmd == wParam && TRUE == SendMessage(WM_COMMAND, wc.cmd)) {
 				fRet = TRUE;
 			}

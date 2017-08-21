@@ -36,7 +36,7 @@ class CPPageAccelTbl : public CPPageBase
 private:
 	enum {COL_CMD, COL_KEY, COL_ID, COL_MOUSE, COL_MOUSE_FS, COL_APPCMD, COL_RMCMD, COL_RMREPCNT};
 
-	CAtlArray<wmcmd> m_wmcmds;
+	std::vector<wmcmd> m_wmcmds;
 
 	void SetupList();
 

@@ -326,26 +326,23 @@ bool LoadResource(UINT resid, CStringA& str, LPCTSTR restype)
 
 WORD AssignedToCmd(UINT keyOrMouseValue, bool bIsFullScreen/* = false*/, bool bCheckMouse/* = true*/)
 {
-	WORD assignTo = 0;
 	CAppSettings& s = AfxGetAppSettings();
 
-	for (size_t i = 0; i < s.wmcmds.GetCount() && !assignTo; i++) {
-		wmcmd& wc = s.wmcmds[i];
-
+	for (const auto& wc : s.wmcmds) {
 		if (bCheckMouse) {
 			if (bIsFullScreen) {
 				if (wc.mouseFS == keyOrMouseValue) {
-					assignTo = wc.cmd;
+					return wc.cmd;
 				}
 			} else if (wc.mouse == keyOrMouseValue) {
-				assignTo = wc.cmd;
+				return wc.cmd;
 			}
 		} else if (wc.key == keyOrMouseValue) {
-			assignTo = wc.cmd;
+			return wc.cmd;
 		}
 	}
 
-	return assignTo;
+	return 0;
 }
 
 void SetAudioRenderer(int AudioDevNo)

@@ -540,7 +540,7 @@ public:
 	bool			bSetContextDir;
 
 	// Keys
-	CAtlArray<wmcmd> wmcmds;
+	std::vector<wmcmd> wmcmds;
 	HACCEL			hAccel;
 	bool			bWinLirc;
 	CString			strWinLircAddr;
