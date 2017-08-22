@@ -34,13 +34,14 @@
 #include "MpcAudioRenderer.h"
 
 // option names
-#define OPT_REGKEY_AudRend			L"Software\\MPC-BE Filters\\MPC Audio Renderer"
-#define OPT_SECTION_AudRend			L"Filters\\MPC Audio Renderer"
-#define OPT_DeviceMode				L"UseWasapi"
-#define OPT_AudioDeviceId			L"SoundDeviceId"
-#define OPT_UseBitExactOutput		L"UseBitExactOutput"
-#define OPT_UseSystemLayoutChannels	L"UseSystemLayoutChannels"
-#define OPT_SyncMethod				L"SyncMethod"
+#define OPT_REGKEY_AudRend          L"Software\\MPC-BE Filters\\MPC Audio Renderer"
+#define OPT_SECTION_AudRend         L"Filters\\MPC Audio Renderer"
+#define OPT_DeviceMode              L"UseWasapi"
+#define OPT_AudioDeviceId           L"SoundDeviceId"
+#define OPT_UseBitExactOutput       L"UseBitExactOutput"
+#define OPT_UseSystemLayoutChannels L"UseSystemLayoutChannels"
+#define OPT_ReleaseDeviceIdle       L"ReleaseDeviceIdle"
+#define OPT_SyncMethod              L"SyncMethod"
 // TODO: rename option values
 
 // set to 1(or more) to enable more detail debug log
@@ -147,6 +148,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, pfAvRevertMmThreadCharacteristics(NULL)
 	, m_bUseBitExactOutput(TRUE)
 	, m_bUseSystemLayoutChannels(TRUE)
+	, m_bReleaseDeviceIdle(FALSE)
 	, m_filterState(State_Stopped)
 	, m_hRendererNeedMoreData(NULL)
 	, m_CurrentPacket(NULL)
@@ -186,6 +188,9 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_UseSystemLayoutChannels, dw)) {
 			m_bUseSystemLayoutChannels = !!dw;
 		}
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ReleaseDeviceIdle, dw)) {
+			m_bReleaseDeviceIdle = !!dw;
+		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SyncMethod, dw)) {
 			m_SyncMethod = (SYNC_METHOD)dw;
 		}
@@ -195,6 +200,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	m_DeviceId					= AfxGetApp()->GetProfileString(OPT_SECTION_AudRend, OPT_AudioDeviceId, m_DeviceId);
 	m_bUseBitExactOutput		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
 	m_bUseSystemLayoutChannels	= !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
+	m_bReleaseDeviceIdle		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 	m_SyncMethod				= (SYNC_METHOD)AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_SyncMethod, m_SyncMethod);
 #endif
 
@@ -980,6 +986,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 		key.SetStringValue(OPT_AudioDeviceId, m_DeviceId);
 		key.SetDWORDValue(OPT_UseBitExactOutput, m_bUseBitExactOutput);
 		key.SetDWORDValue(OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
+		key.SetDWORDValue(OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 		key.SetDWORDValue(OPT_SyncMethod, (DWORD)m_SyncMethod);
 	}
 #else
@@ -987,6 +994,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 	AfxGetApp()->WriteProfileString(OPT_SECTION_AudRend, OPT_AudioDeviceId, m_DeviceId);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_SyncMethod, (int)m_SyncMethod);
 #endif
 
@@ -1106,6 +1114,20 @@ STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetSystemLayoutChannels()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_bUseSystemLayoutChannels;
+}
+
+STDMETHODIMP CMpcAudioRenderer::SetReleaseDeviceIdle(BOOL nValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+
+	m_bReleaseDeviceIdle = nValue;
+	return S_OK;
+}
+
+STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetReleaseDeviceIdle()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_bReleaseDeviceIdle;
 }
 
 STDMETHODIMP_(BITSTREAM_MODE) CMpcAudioRenderer::GetBitstreamMode()
@@ -2707,7 +2729,7 @@ static VOID CALLBACK TimerCallbackFunc(PVOID lpParameter, BOOLEAN TimerOrWaitFir
 BOOL CMpcAudioRenderer::StartReleaseTimer()
 {
 	BOOL ret = FALSE;
-	if (IsExclusiveMode() && !m_hReleaseTimerHandle) {
+	if (m_bReleaseDeviceIdle && IsExclusiveMode() && !m_hReleaseTimerHandle) {
 		ret = CreateTimerQueueTimer(
 				&m_hReleaseTimerHandle,
 				NULL,

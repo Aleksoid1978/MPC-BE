@@ -56,6 +56,8 @@ public IUnknown {
 	STDMETHOD_(BOOL, GetBitExactOutput()) PURE;
 	STDMETHOD(SetSystemLayoutChannels(BOOL nValue)) PURE;
 	STDMETHOD_(BOOL, GetSystemLayoutChannels()) PURE;
+	STDMETHOD(SetReleaseDeviceIdle(BOOL nValue)) PURE;
+	STDMETHOD_(BOOL, GetReleaseDeviceIdle()) PURE;
 	STDMETHOD_(BITSTREAM_MODE, GetBitstreamMode()) PURE;
 	STDMETHOD_(CString, GetCurrentDeviceName()) PURE;
 	STDMETHOD_(CString, GetCurrentDeviceId()) PURE;

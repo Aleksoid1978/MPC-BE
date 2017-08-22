@@ -75,6 +75,8 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	m_cbUseBitExactOutput.Create(ResStr(IDS_ARS_BITEXACT_OUTPUT), WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_USE_BITEXACT_OUTPUT);
 	p.y += h20;
 	m_cbUseSystemLayoutChannels.Create(ResStr(IDS_ARS_SYSTEM_LAYOUT_CHANNELS), WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_USE_SYSTEM_LAYOUT_CHANNELS);
+	p.y += h20;
+	m_cbReleaseDeviceIdle.Create(ResStr(IDS_ARS_RELEASE_DEVICE_IDLE), WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_FREE_DEVICE_INACTIVE);
 	p.y += h30;
 
 	m_txtSyncMethod.Create(ResStr(IDS_ARS_SYNC_METHOD), WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(320), m_fontheight)), this, (UINT)IDC_STATIC);
@@ -105,6 +107,7 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 		m_cbWasapiMode.SetCurSel(m_pMAR->GetWasapiMode());
 		m_cbUseBitExactOutput.SetCheck(m_pMAR->GetBitExactOutput());
 		m_cbUseSystemLayoutChannels.SetCheck(m_pMAR->GetSystemLayoutChannels());
+		m_cbReleaseDeviceIdle.SetCheck(m_pMAR->GetReleaseDeviceIdle());
 		m_cbSyncMethod.SetCurSel(m_pMAR->GetSyncMethod());
 	}
 
@@ -135,6 +138,7 @@ bool CMpcAudioRendererSettingsWnd::OnApply()
 		m_pMAR->SetWasapiMode(m_cbWasapiMode.GetCurSel());
 		m_pMAR->SetBitExactOutput(m_cbUseBitExactOutput.GetCheck());
 		m_pMAR->SetSystemLayoutChannels(m_cbUseSystemLayoutChannels.GetCheck());
+		m_pMAR->SetReleaseDeviceIdle(m_cbReleaseDeviceIdle.GetCheck());
 		m_pMAR->SetSyncMethod(m_cbSyncMethod.GetCurSel());
 		int idx = m_cbSoundDevice.GetCurSel();
 		if (idx >= 0) {
@@ -157,6 +161,8 @@ void CMpcAudioRendererSettingsWnd::OnClickedWasapiMode()
 	int selected = m_cbWasapiMode.GetCurSel();
 	m_cbUseBitExactOutput.EnableWindow(selected == (int)MODE_WASAPI_EXCLUSIVE);
 	OnClickedBitExact();
+
+	m_cbReleaseDeviceIdle.EnableWindow(selected == (int)MODE_WASAPI_EXCLUSIVE);
 }
 
 void CMpcAudioRendererSettingsWnd::OnClickedBitExact()
