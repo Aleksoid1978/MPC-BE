@@ -163,6 +163,8 @@ public:
 	STDMETHODIMP_(BOOL)				GetBitExactOutput() override;
 	STDMETHODIMP					SetSystemLayoutChannels(BOOL nValue) override;
 	STDMETHODIMP_(BOOL)				GetSystemLayoutChannels() override;
+	STDMETHODIMP					SetReleaseDeviceIdle(BOOL nValue) override;
+	STDMETHODIMP_(BOOL)				GetReleaseDeviceIdle() override;
 	STDMETHODIMP_(BITSTREAM_MODE)	GetBitstreamMode() override;
 	STDMETHODIMP_(CString)			GetCurrentDeviceName() override;
 	STDMETHODIMP_(CString)			GetCurrentDeviceId() override;
@@ -230,6 +232,7 @@ private:
 	BITSTREAM_MODE			m_BitstreamMode;
 	BOOL					m_bUseBitExactOutput;
 	BOOL					m_bUseSystemLayoutChannels;
+	BOOL					m_bReleaseDeviceIdle;
 	SYNC_METHOD				m_SyncMethod;
 	FILTER_STATE			m_filterState;
 

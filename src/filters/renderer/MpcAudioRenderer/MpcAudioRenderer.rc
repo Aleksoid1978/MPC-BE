@@ -93,6 +93,7 @@ BEGIN
     IDS_ARS_SHARED                 "Shared"
     IDS_ARS_BITEXACT_OUTPUT        "Allow bit-exact output"
     IDS_ARS_SYSTEM_LAYOUT_CHANNELS "Use system layout channels"
+    IDS_ARS_RELEASE_DEVICE_IDLE    "Release device when idle"
     IDS_ARS_SOUND_DEVICE           "Sound Device:"
     IDS_ARS_WASAPI_MODE_STATUS     "Status"
     IDS_ARS_WASAPI_MODE_STATUS_1   "Not running"
