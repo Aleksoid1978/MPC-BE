@@ -1185,8 +1185,8 @@ public:
 
 	Youtube::YoutubeFields m_youtubeFields;
 	Youtube::YoutubeUrllist m_youtubeUrllist;
-	CString		GetStrForTitle();
-	CString		GetAltFileName();
+	const CString GetStrForTitle();
+	const CString GetAltFileName();
 
 	bool		m_bInOptions;
 	bool		m_bStopTunerScan;
