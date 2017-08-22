@@ -18686,48 +18686,43 @@ void CMainFrame::CreateCaptureWindow()
 	m_CaptureWndBitmap = CreateCaptureDIB(rectClient.Width(), rectClient.Height());
 }
 
-CString CMainFrame::GetStrForTitle()
+const CString CMainFrame::GetStrForTitle()
 {
-	CAppSettings& s = AfxGetAppSettings();
+	if (m_eMediaLoadState == MLS_LOADED) {
+		if (!m_youtubeFields.title.IsEmpty()) {
+			return m_youtubeFields.title;
+		} else if (m_bIsBDPlay || GetPlaybackMode() == PM_DVD) {
+			return m_strPlaybackLabel;
+		} else {
+			BeginEnumFilters(m_pGB, pEF, pBF) {
+				if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
+					if (!CheckMainFilter(pBF)) {
+						continue;
+					}
 
-	if (s.iTitleBarTextStyle == 1) {
-		if (s.bTitleBarTextTitle) {
-			if (!m_youtubeFields.title.IsEmpty()) {
-				return m_youtubeFields.title;
-			} else if (m_bIsBDPlay || GetPlaybackMode() == PM_DVD) {
-				return m_strPlaybackLabel;
-			} else {
-				BeginEnumFilters(m_pGB, pEF, pBF) {
-					if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
-						if (!CheckMainFilter(pBF)) {
-							continue;
-						}
-
-						CComBSTR bstr;
-						if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
-							CString title(bstr.m_str);
-							bstr.Empty();
-							return title;
-						}
+					CComBSTR bstr;
+					if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
+						return CString(bstr.m_str);
 					}
 				}
-				EndEnumFilters;
 			}
+			EndEnumFilters;
+		}
 
-			if (m_eMediaLoadState == MLS_LOADED) {
-				CPlaylistItem pli;
-				if (m_wndPlaylistBar.GetCur(pli)) {
-					return pli.GetLabel();
-				}
+		if (m_eMediaLoadState == MLS_LOADED) {
+			CPlaylistItem pli;
+			if (m_wndPlaylistBar.GetCur(pli)) {
+				return pli.GetLabel();
 			}
 		}
+
 		return m_strPlaybackLabel;
-	} else {
-		return m_strPlaybackRenderedPath;
 	}
+
+	return L"";
 }
 
-CString CMainFrame::GetAltFileName()
+const CString CMainFrame::GetAltFileName()
 {
 	CString ret;
 	if (!m_youtubeFields.fname.IsEmpty()) {
