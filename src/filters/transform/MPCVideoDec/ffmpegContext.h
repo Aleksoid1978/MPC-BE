@@ -21,7 +21,6 @@
 #pragma once
 
 struct AVCodecContext;
-struct AVFrame;
 
 // Bitmasks for DXVA compatibility check
 #define DXVA_UNSUPPORTED_LEVEL			1
@@ -39,9 +38,6 @@ void	FFH264GetParams(struct AVCodecContext* pAVCtx, int& x264_build);
 int		MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx);
 
 // === Common functions
-HRESULT	FFGetCurFrame(struct AVCodecContext* pAVCtx, AVFrame** ppFrameOut);
-UINT	FFGetMBCount(struct AVCodecContext* pAVCtx);
-
 void	FillAVCodecProps(struct AVCodecContext* pAVCtx, int x264_build);
 
 bool	IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice);

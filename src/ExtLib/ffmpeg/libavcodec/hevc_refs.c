@@ -400,11 +400,7 @@ static HEVCFrame *generate_missing_ref(HEVCContext *s, int poc)
     if (!frame)
         return NULL;
 
-    if (!s->avctx->hwaccel
-        // ==> Start patch MPC
-        && !s->avctx->using_dxva
-        // ==> End patch MPC
-        ) {
+    if (!s->avctx->hwaccel) {
         if (!s->ps.sps->pixel_shift) {
             for (i = 0; frame->frame->buf[i]; i++)
                 memset(frame->frame->buf[i]->data, 1 << (s->ps.sps->bit_depth - 1),

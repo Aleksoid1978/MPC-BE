@@ -1654,9 +1654,6 @@ static int get_buffer_internal(AVCodecContext *avctx, AVFrame *frame, int flags)
 
     ret = avctx->get_buffer2(avctx, frame, flags);
     if (ret >= 0)
-        // ==> Start patch MPC
-        if (!avctx->using_dxva)
-        // ==> End patch MPC
         validate_avframe_allocation(avctx, frame);
 
 end:

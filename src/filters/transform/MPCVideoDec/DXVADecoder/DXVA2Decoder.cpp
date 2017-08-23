@@ -19,186 +19,72 @@
  */
 
 #include "stdafx.h"
-#include <d3d9.h>
 #include <moreuuids.h>
 #include "DXVA2Decoder.h"
-#include "DXVA2DecoderH264.h"
-#include "DXVA2DecoderHEVC.h"
-#include "DXVA2DecoderVC1.h"
-#include "DXVA2DecoderMPEG2.h"
-#include "DXVA2DecoderVP9.h"
 #include "../MPCVideoDec.h"
 #include "DXVAAllocator.h"
 #include "../FfmpegContext.h"
+#include "../../../../DSUtil/DSUtil.h"
+
 extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
+	#include <ffmpeg/libavcodec/dxva2.h>
 }
 
-CDXVA2Decoder::CDXVA2Decoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config, int CompressedBuffersSize)
+CDXVA2Decoder::CDXVA2Decoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config, LPDIRECT3DSURFACE9* ppD3DSurface, UINT numSurfaces)
 	: m_pDirectXVideoDec(pDirectXVideoDec)
 	, m_guidDecoder(*guidDecoder)
 	, m_pFilter(pFilter)
+	, m_nNumSurfaces(numSurfaces)
 {
-	memcpy(&m_DXVA2Config, pDXVA2Config, sizeof(DXVA2_ConfigPictureDecode));
-	memset(&m_ExecuteParams, 0, sizeof(m_ExecuteParams));
-	m_ExecuteParams.pCompressedBuffers = DNew DXVA2_DecodeBufferDesc[CompressedBuffersSize];
-
-	for (int i = 0; i < CompressedBuffersSize; i++) {
-		memset(&m_ExecuteParams.pCompressedBuffers[i], 0, sizeof(DXVA2_DecodeBufferDesc));
+	ZeroMemory(&m_pD3DSurface, sizeof(m_pD3DSurface));
+	for (UINT i = 0; i < m_nNumSurfaces; i++) {
+		m_pD3DSurface[i] = ppD3DSurface[i];
 	}
 
-	memset(&m_dxva_context, 0, sizeof(dxva_context));
-	m_dxva_context.cfg = &m_DXVA2Config;
-	m_dxva_context.longslice = (m_DXVA2Config.ConfigBitstreamRaw != 2);
-	m_pFilter->GetAVCtx()->dxva_context = &m_dxva_context;
+	memcpy(&m_DXVA2Config, pDXVA2Config, sizeof(DXVA2_ConfigPictureDecode));
+
+	FillHWContext();
 };
 
-CDXVA2Decoder::~CDXVA2Decoder()
+void CDXVA2Decoder::FillHWContext()
 {
-	if (m_ExecuteParams.pCompressedBuffers) {
-		delete [] m_ExecuteParams.pCompressedBuffers;
+	dxva_context *ctx = (dxva_context *)m_pFilter->m_pAVCtx->hwaccel_context;
+	ctx->cfg           = &m_DXVA2Config;
+	ctx->decoder       = m_pDirectXVideoDec;
+	ctx->surface       = m_pD3DSurface;
+	ctx->surface_count = m_nNumSurfaces;
+
+	if (m_pFilter->m_nPCIVendor == PCIV_Intel && m_guidDecoder == DXVA_Intel_H264_ClearVideo) {
+		ctx->workaround = FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO;
+	} else if (IsATIUVD(m_pFilter->m_nPCIVendor, m_pFilter->m_nPCIDevice)) {
+		ctx->workaround = FF_DXVA2_WORKAROUND_SCALING_LIST_ZIGZAG;
 	}
-	m_pDirectXVideoDec.Release();
 }
 
-CDXVA2Decoder* CDXVA2Decoder::CreateDXVA2Decoder(CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, const GUID* guidDecoder, DXVA2_ConfigPictureDecode* pDXVA2Config)
+HRESULT CDXVA2Decoder::DeliverFrame()
 {
-	CDXVA2Decoder* pDecoder = NULL;
+	CheckPointer(m_pFilter->m_pFrame, S_FALSE);
+	AVFrame* pFrame = m_pFilter->m_pFrame;
 
-	if (*guidDecoder == DXVA2_ModeH264_E || *guidDecoder == DXVA2_ModeH264_F || *guidDecoder == DXVA_Intel_H264_ClearVideo) {
-		pDecoder = DNew CDXVA2DecoderH264(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
-	} else if (*guidDecoder == DXVA2_ModeVC1_D || *guidDecoder == DXVA2_ModeVC1_D2010) {
-		pDecoder = DNew CDXVA2DecoderVC1(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
-	} else if (*guidDecoder == DXVA2_ModeHEVC_VLD_Main || *guidDecoder == DXVA2_ModeHEVC_VLD_Main10) {
-		pDecoder = DNew CDXVA2DecoderHEVC(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
-	} else if (*guidDecoder == DXVA2_ModeMPEG2_VLD) {
-		pDecoder = DNew CDXVA2DecoderMPEG2(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
-	} else if (*guidDecoder == DXVA_ModeVP9_VLD_Profile0 || *guidDecoder == DXVA_ModeVP9_VLD_10bit_Profile2 || *guidDecoder == DXVA_VP9_VLD_Intel) {
-		pDecoder = DNew CDXVA2DecoderVP9(pFilter, pDirectXVideoDec, guidDecoder, pDXVA2Config);
-	} else {
-		ASSERT(FALSE); // Unknown decoder !!
-	}
+	IMediaSample* pSample = (IMediaSample *)pFrame->data[4];
+	CheckPointer(pSample, S_FALSE);
 
-	return pDecoder;
-}
-
-void CDXVA2Decoder::UpdateDXVA2Context()
-{
-	m_pFilter->GetAVCtx()->dxva_context = &m_dxva_context;
-}
-
-HRESULT CDXVA2Decoder::DeliverFrame(int got_picture, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
-{
-	HRESULT	hr;
-
-	AVFrame* pFrame;
-	CHECK_HR_FALSE (FFGetCurFrame(m_pFilter->GetAVCtx(), &pFrame));
-	CheckPointer(pFrame, S_FALSE);
-
-	IMediaSample* pSample;
-	CHECK_HR_FALSE (GetSampleWrapperData(pFrame, &pSample, NULL, NULL));
-
-	hr = ProcessDXVAFrame(pSample);
-	if (hr == S_OK && got_picture) {
-		hr = DeliverDXVAFrame();
-	}
-
-	return hr;
-}
-
-HRESULT CDXVA2Decoder::AddExecuteBuffer(DWORD CompressedBufferType, UINT nSize, void* pBuffer)
-{
-	HRESULT	hr			= E_INVALIDARG;
-	DWORD	dwNumMBs	= 0;
-	UINT	nDXVASize	= 0;
-	BYTE*	pDXVABuffer	= NULL;
-
-	hr = m_pDirectXVideoDec->GetBuffer(CompressedBufferType, (void**)&pDXVABuffer, &nDXVASize);
-	ASSERT(nSize <= nDXVASize);
-
-	if (SUCCEEDED(hr) && (nSize <= nDXVASize)) {
-		if (CompressedBufferType == DXVA2_BitStreamDateBufferType) {
-			HRESULT hr2 = CopyBitstream(pDXVABuffer, nSize, nDXVASize);
-			ASSERT(SUCCEEDED(hr2));
-		} else {
-			memcpy(pDXVABuffer, (BYTE*)pBuffer, nSize);
-		}
-
-		m_ExecuteParams.pCompressedBuffers[m_ExecuteParams.NumCompBuffers].CompressedBufferType = CompressedBufferType;
-		m_ExecuteParams.pCompressedBuffers[m_ExecuteParams.NumCompBuffers].DataSize				= nSize;
-		m_ExecuteParams.pCompressedBuffers[m_ExecuteParams.NumCompBuffers].NumMBsInBuffer		= dwNumMBs;
-		m_ExecuteParams.NumCompBuffers++;
-
-	}
-
-	return hr;
-}
-
-HRESULT CDXVA2Decoder::Execute()
-{
-	for (DWORD i = 0; i < m_ExecuteParams.NumCompBuffers; i++) {
-		HRESULT hr2 = m_pDirectXVideoDec->ReleaseBuffer(m_ExecuteParams.pCompressedBuffers[i].CompressedBufferType);
-		ASSERT(SUCCEEDED(hr2));
-	}
-
-	HRESULT hr = m_pDirectXVideoDec->Execute(&m_ExecuteParams);
-	m_ExecuteParams.NumCompBuffers	= 0;
-
-	return hr;
-}
-
-HRESULT CDXVA2Decoder::BeginFrame(IMediaSample* pSampleToDeliver)
-{
-	HRESULT	hr		= E_INVALIDARG;
-	int		nTry	= 0;
-
-	for (int i = 0; i < 20; i++) {
-		if (CComQIPtr<IMFGetService> pSampleService = pSampleToDeliver) {
-			CComPtr<IDirect3DSurface9> pDecoderRenderTarget;
-			hr = pSampleService->GetService(MR_BUFFER_SERVICE, IID_PPV_ARGS(&pDecoderRenderTarget));
-			if (SUCCEEDED(hr)) {
-				DO_DXVA_PENDING_LOOP (m_pDirectXVideoDec->BeginFrame(pDecoderRenderTarget, NULL));
-			}
-		}
-
-		// For slow accelerator wait a little...
-		if (SUCCEEDED(hr)) {
-			break;
-		}
-		Sleep(1);
-	}
-
-	return hr;
-}
-
-HRESULT CDXVA2Decoder::EndFrame()
-{
-	return m_pDirectXVideoDec->EndFrame(NULL);
-}
-
-HRESULT CDXVA2Decoder::DeliverDXVAFrame()
-{
-	HRESULT hr = E_FAIL;
-
-	AVFrame* pFrame = m_pFilter->GetFrame();
-	IMediaSample* pSample;
 	REFERENCE_TIME rtStop, rtStart;
-	CHECK_HR_FALSE (GetSampleWrapperData(pFrame, &pSample, &rtStart, &rtStop));
-
+	m_pFilter->GetFrameTimeStamp(pFrame, rtStart, rtStop);
 	m_pFilter->UpdateFrameTime(rtStart, rtStop);
 
 	if (rtStart < 0) {
 		return S_OK;
 	}
 
-	DXVA2_ExtendedFormat dxvaExtFormat = m_pFilter->GetDXVA2ExtendedFormat(m_pFilter->GetAVCtx(), pFrame);
+	DXVA2_ExtendedFormat dxvaExtFormat = m_pFilter->GetDXVA2ExtendedFormat(m_pFilter->m_pAVCtx, pFrame);
 
 	m_pFilter->ReconnectOutput(m_pFilter->PictWidth(), m_pFilter->PictHeight(), false, m_pFilter->GetFrameDuration(), &dxvaExtFormat);
 
 	m_pFilter->SetTypeSpecificFlags(pSample);
 	pSample->SetTime(&rtStart, &rtStop);
 	pSample->SetMediaTime(NULL, NULL);
-
 
 	bool bSizeChanged = false;
 	LONG biWidth, biHeight = 0;
@@ -227,7 +113,7 @@ HRESULT CDXVA2Decoder::DeliverDXVAFrame()
 
 	m_pFilter->AddFrameSideData(pSample, pFrame);
 
-	hr = m_pFilter->GetOutputPin()->Deliver(pSample);
+	HRESULT hr = m_pFilter->GetOutputPin()->Deliver(pSample);
 
 	if (bSizeChanged && biHeight) {
 		m_pFilter->NotifyEvent(EC_VIDEO_SIZE_CHANGED, MAKELPARAM(biWidth, abs(biHeight)), 0);
@@ -236,69 +122,36 @@ HRESULT CDXVA2Decoder::DeliverDXVAFrame()
 	return hr;
 }
 
-HRESULT CDXVA2Decoder::GetFreeSurfaceIndex(int& nSurfaceIndex, IMediaSample** ppSampleToDeliver)
-{
-	HRESULT hr = E_UNEXPECTED;
-	CComPtr<IMediaSample> pSample;
-	if (SUCCEEDED(hr = m_pFilter->m_pDXVA2Allocator->GetBuffer(&pSample, NULL, NULL, 0))) {
-		if (CComQIPtr<IMPCDXVA2Sample> pMPCDXVA2Sample = pSample) {
-			nSurfaceIndex      = pMPCDXVA2Sample->GetDXSurfaceId();
-			*ppSampleToDeliver = pSample.Detach();
-		} else {
-			hr = E_UNEXPECTED;
-		}
-	}
-
-	return hr;
-}
-
-HRESULT CDXVA2Decoder::GetSampleWrapperData(AVFrame* pFrame, IMediaSample** pSample, REFERENCE_TIME* rtStart, REFERENCE_TIME* rtStop)
-{
-	CheckPointer(pFrame, E_FAIL);
-
-	SampleWrapper* pSampleWrapper = (SampleWrapper*)pFrame->data[0];
-	if (pSampleWrapper) {
-		*pSample = pSampleWrapper->pSample;
-
-		if (rtStart && rtStop) {
-			m_pFilter->GetFrameTimeStamp(pFrame, *rtStart, *rtStop);
-		}
-
-		return S_OK;
-	}
-
-	return E_FAIL;
-}
-
 int CDXVA2Decoder::get_buffer_dxva(AVFrame *pic)
 {
-	CComPtr<IMediaSample> pSample;
+	IMediaSample* pSample = NULL;
 	int nSurfaceIndex = -1;
-	if (FAILED(GetFreeSurfaceIndex(nSurfaceIndex, &pSample))) {
-		return -1;
+	if (SUCCEEDED(m_pFilter->m_pDXVA2Allocator->GetBuffer(&pSample, NULL, NULL, 0))) {
+		if (CComQIPtr<IMPCDXVA2Sample> pMPCDXVA2Sample = pSample) {
+			nSurfaceIndex = pMPCDXVA2Sample->GetDXSurfaceId();
+		} else {
+			SAFE_RELEASE(pSample);
+		}
 	}
 
-	SampleWrapper* pSampleWrapper = DNew SampleWrapper();
-	pSampleWrapper->pSample       = pSample;
+	CheckPointer(pSample, -1);
+
+	LPDIRECT3DSURFACE9 pSurface = m_pD3DSurface[nSurfaceIndex];
 
 	ZeroMemory(pic->data, sizeof(pic->data));
 	ZeroMemory(pic->linesize, sizeof(pic->linesize));
 	ZeroMemory(pic->buf, sizeof(pic->buf));
 
-	pic->data[0] = (uint8_t *)pSampleWrapper;
-	pic->data[4] = (uint8_t *)nSurfaceIndex;
+	pic->data[0] = pic->data[3] = (uint8_t *)pSurface;
+	pic->data[4] = (uint8_t *)pSample;
 
-	pic->buf[0]  = av_buffer_create(NULL, 0, release_buffer_dxva, pSampleWrapper, 0);
+	pic->buf[0]  = av_buffer_create(nullptr, 0, release_buffer_dxva, pSample, 0);
 
 	return 0;
 }
 
 void CDXVA2Decoder::release_buffer_dxva(void *opaque, uint8_t *data)
 {
-	SampleWrapper* pSampleWrapper = (SampleWrapper*)opaque;
-	if (pSampleWrapper) {
-		pSampleWrapper->pSample.Release();
-
-		delete pSampleWrapper;
-	}
+	IMediaSample* pSample = (IMediaSample*)opaque;
+	SAFE_RELEASE(pSample);
 }

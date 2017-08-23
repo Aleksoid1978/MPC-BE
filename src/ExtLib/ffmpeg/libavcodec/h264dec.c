@@ -627,10 +627,6 @@ static void debug_green_metadata(const H264SEIGreenMetaData *gm, void *logctx)
     }
 }
 
-// ==> Start patch MPC
-#include "dxva_h264.c"
-// ==> End patch MPC
-
 static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size)
 {
     AVCodecContext *const avctx = h->avctx;
@@ -710,27 +706,10 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size)
 
             if (h->current_slice == 1) {
                 if (avctx->active_thread_type & FF_THREAD_FRAME &&
-                    // ==> Start patch MPC
-                    !h->avctx->using_dxva &&
-                    // ==> End patch MPC
                     i >= nals_needed && !h->setup_finished && h->cur_pic_ptr) {
                     ff_thread_finish_setup(avctx);
                     h->setup_finished = 1;
                 }
-
-                // ==> Start patch MPC
-                if (h->avctx->using_dxva && h->avctx->dxva_context) {
-                    dxva_context* ctx = (dxva_context*)h->avctx->dxva_context;
-                    if (ctx->dxva_decoder_context) {
-                        DXVA_H264_Context* decoder_ctx = (DXVA_H264_Context*)ctx->dxva_decoder_context;
-                        if (decoder_ctx->ctx_pic_count < MAX_H264_PICTURE_CONTEXT) {
-                            DXVA_H264_Picture_Context* ctx_pic = &decoder_ctx->ctx_pic[decoder_ctx->ctx_pic_count];
-                            dxva_start_frame(avctx, ctx_pic);
-                            decoder_ctx->ctx_pic_count++;
-                        }
-                    }
-                }
-                // ==> End patch MPC
 
                 if (h->avctx->hwaccel &&
                     (ret = h->avctx->hwaccel->start_frame(h->avctx, buf, buf_size)) < 0)
@@ -742,22 +721,8 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size)
 #endif
             }
 
-            max_slice_ctx = (avctx->hwaccel || h->avctx->using_dxva) ? 1 : h->nb_slice_ctx;
+            max_slice_ctx = avctx->hwaccel ? 1 : h->nb_slice_ctx;
             if (h->nb_slice_ctx_queued == max_slice_ctx) {
-
-                // ==> Start patch MPC
-                if (h->avctx->using_dxva && h->avctx->dxva_context) {
-                    dxva_context* ctx = (dxva_context*)h->avctx->dxva_context;
-                    if (ctx->dxva_decoder_context) {
-                        DXVA_H264_Context* decoder_ctx = (DXVA_H264_Context*)ctx->dxva_decoder_context;
-                        if (decoder_ctx->ctx_pic_count && decoder_ctx->ctx_pic_count <= MAX_H264_PICTURE_CONTEXT) {
-                            DXVA_H264_Picture_Context* ctx_pic = &decoder_ctx->ctx_pic[decoder_ctx->ctx_pic_count - 1];
-                            ret = dxva_decode_slice(avctx, ctx_pic, nal->raw_data, nal->raw_size);
-                            h->nb_slice_ctx_queued = 0;
-                        }
-                    }
-                }
-                // ==> End patch MPC
                 if (h->avctx->hwaccel) {
                     ret = avctx->hwaccel->decode_slice(avctx, nal->raw_data, nal->raw_size);
                     h->nb_slice_ctx_queued = 0;
@@ -955,9 +920,6 @@ static int finalize_frame(H264Context *h, AVFrame *dst, H264Picture *out, int *g
          out->recovered)) {
 
         if (!h->avctx->hwaccel &&
-            // ==> Start patch MPC
-            !h->avctx->using_dxva &&
-            // ==> End patch MPC
             (out->field_poc[0] == INT_MAX ||
              out->field_poc[1] == INT_MAX)
            ) {
@@ -1041,16 +1003,6 @@ static int h264_decode_frame(AVCodecContext *avctx, void *data,
     AVFrame *pict      = data;
     int buf_index;
     int ret;
-
-    // ==> Start patch MPC
-    if (avctx->using_dxva && avctx->dxva_context) {
-        dxva_context* ctx = (dxva_context*)avctx->dxva_context;
-        if (ctx->dxva_decoder_context) {
-            DXVA_H264_Context* decoder_ctx = (DXVA_H264_Context*)ctx->dxva_decoder_context;
-            memset(decoder_ctx, 0, sizeof(*decoder_ctx));
-        }
-    }
-    // ==> End patch MPC
 
     h->flags = avctx->flags;
     h->setup_finished = 0;

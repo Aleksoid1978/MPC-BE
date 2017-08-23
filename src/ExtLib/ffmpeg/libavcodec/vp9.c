@@ -127,6 +127,9 @@ static int update_size(AVCodecContext *avctx, int w, int h)
 
         switch (s->pix_fmt) {
         case AV_PIX_FMT_YUV420P:
+// ==> Start patch MPC
+        case AV_PIX_FMT_YUV420P10:
+// ==> End patch MPC
 #if CONFIG_VP9_DXVA2_HWACCEL
             *fmtp++ = AV_PIX_FMT_DXVA2_VLD;
 #endif
@@ -138,7 +141,9 @@ static int update_size(AVCodecContext *avctx, int w, int h)
             *fmtp++ = AV_PIX_FMT_VAAPI;
 #endif
             break;
-        case AV_PIX_FMT_YUV420P10:
+// ==> Start patch MPC
+        // case AV_PIX_FMT_YUV420P10:
+// ==> End patch MPC
         case AV_PIX_FMT_YUV420P12:
 #if CONFIG_VP9_VAAPI_HWACCEL
             *fmtp++ = AV_PIX_FMT_VAAPI;
@@ -459,7 +464,7 @@ static int decode_frame_header(AVCodecContext *avctx,
                 s->bytesperpixel = 1;
                 s->pix_fmt = AV_PIX_FMT_YUV420P;
                 avctx->colorspace = AVCOL_SPC_BT470BG;
-                avctx->color_range = AVCOL_RANGE_JPEG;
+                avctx->color_range = AVCOL_RANGE_MPEG;
             }
             s->s.h.refreshrefmask = get_bits(&s->gb, 8);
             w = get_bits(&s->gb, 16) + 1;
@@ -1097,9 +1102,6 @@ static av_cold int vp9_decode_free(AVCodecContext *avctx)
     return 0;
 }
 
-// ==> Start patch MPC
-#include "dxva_vp9.c"
-// ==> End patch MPC
 
 static int vp9_decode_frame(AVCodecContext *avctx, void *frame,
                             int *got_frame, AVPacket *pkt)
@@ -1113,16 +1115,6 @@ static int vp9_decode_frame(AVCodecContext *avctx, void *frame,
     ptrdiff_t yoff, uvoff, ls_y, ls_uv;
     AVFrame *f;
     int bytesperpixel;
-
-    // ==> Start patch MPC
-    if (avctx->using_dxva && avctx->dxva_context) {
-        dxva_context* dxva_ctx = (dxva_context*)avctx->dxva_context;
-        if (avctx->dxva_context) {
-            DXVA_VP9_Picture_Context* ctx_pic = (DXVA_VP9_Picture_Context*)dxva_ctx->dxva_decoder_context;
-            memset(ctx_pic, 0, sizeof(*ctx_pic));
-        }
-    }
-    // ==> End patch MPC
 
     if ((ret = decode_frame_header(avctx, data, size, &ref)) < 0) {
         return ret;
@@ -1206,20 +1198,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
             return ret;
         goto finish;
     }
-
-    // ==> Start patch MPC
-    if (avctx->using_dxva && avctx->dxva_context) {
-        dxva_context* dxva_ctx = (dxva_context*)avctx->dxva_context;
-        if (dxva_ctx->dxva_decoder_context) {
-            DXVA_VP9_Picture_Context* ctx_pic = (DXVA_VP9_Picture_Context*)dxva_ctx->dxva_decoder_context;
-            ret = dxva_start_frame(avctx, ctx_pic);
-            if (ret < 0)
-                return ret;
-            dxva_decode_slice(avctx, ctx_pic, pkt->data, pkt->size);
-            goto finish;
-        }
-    }
-    // ==> End patch MPC
 
     // main tile decode loop
     bytesperpixel = s->bytesperpixel;
@@ -1419,11 +1397,6 @@ static void vp9_decode_flush(AVCodecContext *avctx)
         vp9_frame_unref(avctx, &s->s.frames[i]);
     for (i = 0; i < 8; i++)
         ff_thread_release_buffer(avctx, &s->s.refs[i]);
-
-    // ==> Start patch MPC
-    for (i = 0; i < FF_ARRAY_ELEMS(s->next_refs); i++)
-        ff_thread_release_buffer(avctx, &s->next_refs[i]);
-    // ==> End patch MPC
 }
 
 static int init_frames(AVCodecContext *avctx)

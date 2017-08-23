@@ -59,9 +59,6 @@ int ff_mpeg_framesize_alloc(AVCodecContext *avctx, MotionEstContext *me,
     int alloc_size = FFALIGN(FFABS(linesize) + 64, 32);
 
     if (avctx->hwaccel
-        // ==> Start patch MPC
-        || avctx->using_dxva 
-        // ==> End patch MPC
 #if FF_API_CAP_VDPAU
         || avctx->codec->capabilities & AV_CODEC_CAP_HWACCEL_VDPAU
 #endif

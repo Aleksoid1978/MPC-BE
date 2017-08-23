@@ -144,11 +144,6 @@ static int init_context_defaults(AVCodecContext *s, const AVCodec *codec)
             d++;
         }
     }
-
-    // ==> Start patch MPC
-    s->using_dxva   = 0;
-    s->dxva_context = NULL;
-    // ==> End patch MPC
     return 0;
 }
 

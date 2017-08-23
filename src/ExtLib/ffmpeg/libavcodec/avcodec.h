@@ -3574,11 +3574,6 @@ typedef struct AVCodecContext {
     AVPacketSideData *coded_side_data;
     int            nb_coded_side_data;
 
-    // ==> Start patch MPC
-    int  using_dxva;
-    void *dxva_context;
-    // ==> End patch MPC
-
     /**
      * A reference to the AVHWFramesContext describing the input (for encoding)
      * or output (decoding) frames. The reference is set by the caller and

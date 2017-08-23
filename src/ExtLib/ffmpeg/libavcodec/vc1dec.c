@@ -615,9 +615,6 @@ av_cold int ff_vc1_decode_end(AVCodecContext *avctx)
     return 0;
 }
 
-// ==> Start patch MPC
-#include "dxva_vc1.c"
-// ==> End patch MPC
 
 /** Decode a VC1/WMV3 frame
  * @todo TODO: Handle VC-1 IDUs (Transport level?)
@@ -640,14 +637,6 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
         const uint8_t *rawbuf;
         int raw_size;
     } *slices = NULL, *tmp;
-
-    // ==> Start patch MPC
-    if (avctx->using_dxva && avctx->dxva_context) {
-        dxva_context* ctx = (dxva_context*)avctx->dxva_context;
-        DXVA_VC1_Context* decoder_ctx = (DXVA_VC1_Context*)ctx->dxva_decoder_context;
-        memset(decoder_ctx, 0, sizeof(*decoder_ctx));
-    }
-    // ==> End patch MPC
 
     v->second_field = 0;
 
@@ -699,9 +688,6 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
 #if FF_API_CAP_VDPAU
                         || s->avctx->codec->capabilities&AV_CODEC_CAP_HWACCEL_VDPAU
 #endif
-                        // ==> Start patch MPC
-                        || avctx->using_dxva
-                        // ==> End patch MPC
                         )
                         buf_start = start;
                     buf_size2 = vc1_unescape_buffer(start + 4, size, buf2);
@@ -712,9 +698,6 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
 #if FF_API_CAP_VDPAU
                         || s->avctx->codec->capabilities&AV_CODEC_CAP_HWACCEL_VDPAU
 #endif
-                        // ==> Start patch MPC
-                        || avctx->using_dxva
-                        // ==> End patch MPC
                         )
                         buf_start_second_field = start;
                     tmp = av_realloc_array(slices, sizeof(*slices), (n_slices+1));
@@ -785,9 +768,6 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
 #if FF_API_CAP_VDPAU
                     || s->avctx->codec->capabilities&AV_CODEC_CAP_HWACCEL_VDPAU
 #endif
-                    // ==> Start patch MPC
-                    || s->avctx->using_dxva
-                    // ==> End patch MPC
                     )
                     buf_start_second_field = divider;
                 tmp = av_realloc_array(slices, sizeof(*slices), (n_slices+1));
@@ -910,12 +890,6 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
     /* skip B-frames if we don't have reference frames */
     if (!s->last_picture_ptr && (s->pict_type == AV_PICTURE_TYPE_B || s->droppable)) {
         av_log(v->s.avctx, AV_LOG_DEBUG, "Skipping B frame without reference frames\n");
-        // ==> Start patch MPC
-        if (avctx->using_dxva) {
-            ret = AVERROR_INVALIDDATA;
-            goto err;
-        }
-        // ==> End patch MPC
         goto end;
     }
     if ((avctx->skip_frame >= AVDISCARD_NONREF && s->pict_type == AV_PICTURE_TYPE_B) ||
@@ -1032,83 +1006,7 @@ static int vc1_decode_frame(AVCodecContext *avctx, void *data,
             if ((ret = avctx->hwaccel->end_frame(avctx)) < 0)
                 goto err;
         }
-    } else
-        // ==> Start patch MPC
-        if (avctx->using_dxva && avctx->dxva_context) {
-            dxva_context* ctx = (dxva_context*)avctx->dxva_context;
-            if (ctx->dxva_decoder_context) {
-                s->mb_y = 0;
-                DXVA_VC1_Context* decoder_ctx = (DXVA_VC1_Context*)ctx->dxva_decoder_context;
-
-                if (v->field_mode && buf_start_second_field) {
-                    // decode first field
-                    DXVA_VC1_Picture_Context* ctx_pic = &decoder_ctx->ctx_pic[0];
-
-                    s->picture_structure = PICT_BOTTOM_FIELD - v->tff;
-
-                    dxva_fill_picture_parameters(avctx, v, &ctx_pic->pp);
-                    if ((ret = dxva_decode_slice(avctx, ctx_pic, buf_start, buf_start_second_field - buf_start)) < 0)
-                        goto err;
-
-                    // decode second field
-                    s->gb = slices[n_slices1 + 1].gb;
-                    s->picture_structure = PICT_TOP_FIELD + v->tff;
-                    v->second_field = 1;
-                    v->pic_header_flag = 0;
-                    if (ff_vc1_parse_frame_header_adv(v, &s->gb) < 0) {
-                        av_log(avctx, AV_LOG_ERROR, "parsing header for second field failed");
-                        goto err;
-                    }
-                    v->s.current_picture_ptr->f->pict_type = v->s.pict_type;
-
-                    ctx_pic = &decoder_ctx->ctx_pic[1];
-                    dxva_fill_picture_parameters(avctx, v, &ctx_pic->pp);
-                    if ((ret = dxva_decode_slice(avctx, ctx_pic, buf_start_second_field, (buf + buf_size) - buf_start_second_field)) < 0)
-                        goto err;
-
-                    decoder_ctx->ctx_pic_count = 2;
-                } else {
-                    s->picture_structure = PICT_FRAME;
-
-                    DXVA_VC1_Picture_Context* ctx_pic = &decoder_ctx->ctx_pic[0];
-                    dxva_fill_picture_parameters(avctx, v, &ctx_pic->pp);
-
-                    if (n_slices == 0) {
-                        // no slices, decode the frame as-is
-                        if ((ret = dxva_decode_slice(avctx, ctx_pic, buf_start, (buf + buf_size) - buf_start)) < 0)
-                            goto err;
-                    } else {
-                        // decode the frame part as the first slice
-                        if ((ret = dxva_decode_slice(avctx, ctx_pic, buf_start, slices[0].rawbuf - buf_start)) < 0)
-                            goto err;
-
-                        // and process the slices as additional slices afterwards
-                        for (i = 0 ; i < n_slices; i++) {
-                            s->gb = slices[i].gb;
-                            s->mb_y = slices[i].mby_start;
-
-                            v->pic_header_flag = get_bits1(&s->gb);
-                            if (v->pic_header_flag) {
-                                if (ff_vc1_parse_frame_header_adv(v, &s->gb) < 0) {
-                                    av_log(v->s.avctx, AV_LOG_ERROR, "Slice header damaged\n");
-                                    ret = AVERROR_INVALIDDATA;
-                                    if (avctx->err_recognition & AV_EF_EXPLODE)
-                                        goto err;
-                                    continue;
-                                }
-                            }
-
-                            if ((ret = dxva_decode_slice(avctx, ctx_pic, slices[i].rawbuf, slices[i].raw_size)) < 0)
-                                goto err;
-                        }
-                    }
-
-                    decoder_ctx->ctx_pic_count = 1;
-                }
-            }
-        } else
-        // ==> End patch MPC
-        {
+    } else {
         int header_ret = 0;
 
         ff_mpeg_er_frame_start(s);

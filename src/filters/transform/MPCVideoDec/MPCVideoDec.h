@@ -266,12 +266,7 @@ public:
 
 	DXVA2_ExtendedFormat		GetDXVA2ExtendedFormat(AVCodecContext *ctx, AVFrame *frame);
 
-	inline bool					UseDXVA2()			const { return m_nDecoderMode == MODE_DXVA2; }
-	inline AVCodecContext*		GetAVCtx()			const { return m_pAVCtx; }
-	inline AVFrame*				GetFrame()			const { return m_pFrame; }
-	inline enum AVCodecID		GetCodec()			const { return m_nCodecId; }
-	inline DWORD				GetPCIVendor()		const { return m_nPCIVendor; }
-	inline DWORD				GetPCIDevice()		const { return m_nPCIDevice; }
+	inline bool					UseDXVA2() const { return m_nDecoderMode == MODE_DXVA2; }
 
 	bool						IsDXVASupported();
 	void						UpdateAspectRatio();
@@ -286,7 +281,7 @@ public:
 															  const GUID& guidDecoder,
 															  DXVA2_ConfigPictureDecode *pSelectedConfig,
 															  BOOL *pbFoundDXVA2Configuration);
-	HRESULT						CreateDXVA2Decoder(UINT nNumRenderTargets, IDirect3DSurface9** pDecoderRenderTargets);
+	HRESULT						CreateDXVA2Decoder(LPDIRECT3DSURFACE9* ppDecoderRenderTargets, UINT nNumRenderTargets);
 	HRESULT						ReinitDXVA2Decoder();
 
 	HRESULT						InitAllocator(IMemAllocator **ppAlloc);
