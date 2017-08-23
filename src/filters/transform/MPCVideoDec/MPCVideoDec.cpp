@@ -953,7 +953,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_hDevice(INVALID_HANDLE_VALUE)
 	, m_bWaitingForKeyFrame(TRUE)
 	, m_bRVDropBFrameTimings(FALSE)
-	, m_PixelFormat(AV_PIX_FMT_NONE)
 	, m_bInterlaced(FALSE)
 	, m_fSYNC(0)
 	, m_bDecodingStart(FALSE)
@@ -1485,8 +1484,6 @@ void CMPCVideoDecFilter::ffmpegCleanup()
 
 	m_nCodecNb	= -1;
 	m_nCodecId	= AV_CODEC_ID_NONE;
-
-	m_PixelFormat = AV_PIX_FMT_NONE;
 }
 
 STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -1900,8 +1897,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		m_pAVCtx->color_trc              = (AVColorTransferCharacteristic)m_FilterInfo.colorSpace->TransferCharacteristics;
 		m_pAVCtx->chroma_sample_location = (AVChromaLocation)m_FilterInfo.colorSpace->ChromaLocation;
 	}
-
-	m_PixelFormat = m_pAVCtx->pix_fmt;
 
 	m_nAlign = 16;
 	if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO) {
@@ -3761,7 +3756,7 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 			break;
 		case INFO_InputFormat:
 			if (m_pAVCtx) {
-				const auto& pix_fmt = m_pDXVADecoder ? m_PixelFormat : m_pAVCtx->pix_fmt;
+				const auto& pix_fmt = m_pDXVADecoder ? m_pAVCtx->sw_pix_fmt : m_pAVCtx->pix_fmt;
 
 				infostr = m_pAVCtx->codec_descriptor->name;
 				if (m_pAVCtx->codec_id == AV_CODEC_ID_RAWVIDEO) {
