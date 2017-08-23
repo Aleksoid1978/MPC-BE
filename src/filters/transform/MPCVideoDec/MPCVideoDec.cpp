@@ -1824,6 +1824,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		m_pAVCtx->hwaccel_context	= (dxva_context *)av_mallocz(sizeof(dxva_context));
 		m_pAVCtx->get_format		= av_get_format;
 		m_pAVCtx->get_buffer2		= av_get_buffer;
+		m_pAVCtx->slice_flags	   |= SLICE_FLAG_ALLOW_FIELD;
 	}
 
 	AllocExtradata(m_pAVCtx, pmt);
