@@ -1485,6 +1485,8 @@ void CMPCVideoDecFilter::ffmpegCleanup()
 
 	m_nCodecNb	= -1;
 	m_nCodecId	= AV_CODEC_ID_NONE;
+
+	m_PixelFormat = AV_PIX_FMT_NONE;
 }
 
 STDMETHODIMP CMPCVideoDecFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -3759,17 +3761,19 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 			break;
 		case INFO_InputFormat:
 			if (m_pAVCtx) {
+				const auto& pix_fmt = m_pDXVADecoder ? m_PixelFormat : m_pAVCtx->pix_fmt;
+
 				infostr = m_pAVCtx->codec_descriptor->name;
 				if (m_pAVCtx->codec_id == AV_CODEC_ID_RAWVIDEO) {
 					char* fourcc = (char*)&m_pAVCtx->codec_tag;
 					infostr.AppendFormat(L" '%C%C%C%C'", fourcc[0], fourcc[1], fourcc[2], fourcc[3]);
 				}
-				if (const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(m_pAVCtx->pix_fmt)) {
+				if (const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(pix_fmt)) {
 					if (desc->flags & AV_PIX_FMT_FLAG_PAL) {
 						infostr.Append(L", palettized RGB");
 					}
 					else if (desc->nb_components == 1 || desc->nb_components == 2) {
-						infostr.AppendFormat(L", Gray %d-bit", GetLumaBits(m_pAVCtx->pix_fmt));
+						infostr.AppendFormat(L", Gray %d-bit", GetLumaBits(pix_fmt));
 					}
 					else if(desc->flags & AV_PIX_FMT_FLAG_RGB) {
 						int bidepth = 0;
@@ -3783,7 +3787,7 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 						// unknown
 					} else {
 						infostr.Append(desc->flags & AV_PIX_FMT_FLAG_ALPHA ? L", YUVA" : L", YUV");
-						infostr.AppendFormat(L" %d-bit %s", GetLumaBits(m_pAVCtx->pix_fmt), GetChromaSubsamplingStr(m_pAVCtx->pix_fmt));
+						infostr.AppendFormat(L" %d-bit %s", GetLumaBits(pix_fmt), GetChromaSubsamplingStr(pix_fmt));
 						if (desc->name && !strncmp(desc->name, "yuvj", 4)) {
 							infostr.Append(L" full range");
 						}
