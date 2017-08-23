@@ -469,6 +469,7 @@ void CPlayerSeekBar::OnPaint()
 		memdc.DeleteDC();
 		m_bmPaint.DeleteObject();
 	} else {
+		const COLORREF dark   = GetSysColor(COLOR_GRAYTEXT);
 		const COLORREF white  = GetSysColor(COLOR_WINDOW);
 		const COLORREF shadow = GetSysColor(COLOR_3DSHADOW);
 		const COLORREF light  = GetSysColor(COLOR_3DHILIGHT);
@@ -518,11 +519,34 @@ void CPlayerSeekBar::OnPaint()
 			}
 		}
 
+		const CRect channelRect(GetChannelRect());
+
+		// Chapters
+		if (s.fChapterMarker) {
+			CAutoLock lock(&m_CBLock);
+			if (m_pChapterBag) {
+				for (DWORD i = 0; i < m_pChapterBag->ChapGetCount(); i++) {
+					REFERENCE_TIME rtChap;
+					if (SUCCEEDED(m_pChapterBag->ChapGet(i, &rtChap, nullptr))) {
+						long chanPos = channelRect.left + (long)((m_stop > 0) ? channelRect.Width() * rtChap / m_stop : 0);
+						CRect r(chanPos, channelRect.top, chanPos + 1, channelRect.bottom);
+						if (r.right < channelRect.right) {
+							r.right++;
+						}
+						ASSERT(r.right <= channelRect.right);
+						dc.FillSolidRect(&r, dark);
+						dc.ExcludeClipRect(&r);
+					} else {
+						ASSERT(FALSE);
+					}
+				}
+			}
+		}
+
 		// channel
 		{
-			CRect r = GetChannelRect();
-
-			dc.FillSolidRect(&r, bEnabled ? white : bkg);
+			dc.FillSolidRect(&channelRect, bEnabled ? white : bkg);
+			CRect r(channelRect);
 			r.InflateRect(1, 1);
 			dc.Draw3dRect(&r, shadow, light);
 			dc.ExcludeClipRect(&r);
