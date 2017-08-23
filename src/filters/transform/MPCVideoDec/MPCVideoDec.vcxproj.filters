@@ -51,21 +51,6 @@
     <ClCompile Include="DXVADecoder\DXVA2Decoder.cpp">
       <Filter>Source Files\DXVADecoder</Filter>
     </ClCompile>
-    <ClCompile Include="DXVADecoder\DXVA2DecoderH264.cpp">
-      <Filter>Source Files\DXVADecoder</Filter>
-    </ClCompile>
-    <ClCompile Include="DXVADecoder\DXVA2DecoderHEVC.cpp">
-      <Filter>Source Files\DXVADecoder</Filter>
-    </ClCompile>
-    <ClCompile Include="DXVADecoder\DXVA2DecoderMPEG2.cpp">
-      <Filter>Source Files\DXVADecoder</Filter>
-    </ClCompile>
-    <ClCompile Include="DXVADecoder\DXVA2DecoderVC1.cpp">
-      <Filter>Source Files\DXVADecoder</Filter>
-    </ClCompile>
-    <ClCompile Include="DXVADecoder\DXVA2DecoderVP9.cpp">
-      <Filter>Source Files\DXVADecoder</Filter>
-    </ClCompile>
     <ClCompile Include="MSDKDecoder\AnnexBConverter.cpp">
       <Filter>Source Files\MSDKDecoder</Filter>
     </ClCompile>
@@ -110,22 +95,7 @@
     <ClInclude Include="DXVADecoder\DXVA2Decoder.h">
       <Filter>Header Files\DXVADecoder</Filter>
     </ClInclude>
-    <ClInclude Include="DXVADecoder\DXVA2DecoderH264.h">
-      <Filter>Header Files\DXVADecoder</Filter>
-    </ClInclude>
-    <ClInclude Include="DXVADecoder\DXVA2DecoderHEVC.h">
-      <Filter>Header Files\DXVADecoder</Filter>
-    </ClInclude>
-    <ClInclude Include="DXVADecoder\DXVA2DecoderMPEG2.h">
-      <Filter>Header Files\DXVADecoder</Filter>
-    </ClInclude>
-    <ClInclude Include="DXVADecoder\DXVA2DecoderVC1.h">
-      <Filter>Header Files\DXVADecoder</Filter>
-    </ClInclude>
     <ClInclude Include="DXVADecoder\stdafx.h">
-      <Filter>Header Files\DXVADecoder</Filter>
-    </ClInclude>
-    <ClInclude Include="DXVADecoder\DXVA2DecoderVP9.h">
       <Filter>Header Files\DXVADecoder</Filter>
     </ClInclude>
     <ClInclude Include="MSDKDecoder\AnnexBConverter.h">

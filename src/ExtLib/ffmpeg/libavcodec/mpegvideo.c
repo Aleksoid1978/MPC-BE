@@ -1316,9 +1316,6 @@ int ff_mpv_frame_start(MpegEncContext *s, AVCodecContext *avctx)
         }
 
         if (!avctx->hwaccel
-            // ==> Start patch MPC
-            && !avctx->using_dxva
-            // ==> End patch MPC
 #if FF_API_CAP_VDPAU
             && !(avctx->codec->capabilities&AV_CODEC_CAP_HWACCEL_VDPAU)
 #endif
@@ -1669,9 +1666,6 @@ void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict, uint8_t *mbskip_
 
     /* TODO: export all the following to make them accessible for users (and filters) */
     if (avctx->hwaccel || !mbtype_table
-        // ==> Start patch MPC
-        || avctx->using_dxva 
-        // ==> End patch MPC
 #if FF_API_CAP_VDPAU
         || (avctx->codec->capabilities&AV_CODEC_CAP_HWACCEL_VDPAU)
 #endif

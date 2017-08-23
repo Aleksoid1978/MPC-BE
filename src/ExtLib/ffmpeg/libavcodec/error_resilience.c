@@ -814,9 +814,6 @@ void ff_er_frame_start(ERContext *s)
 static int er_supported(ERContext *s)
 {
     if(s->avctx->hwaccel && s->avctx->hwaccel->decode_slice           ||
-       // ==> Start patch MPC
-       s->avctx->using_dxva                                           ||
-       // ==> End patch MPC
 #if FF_API_CAP_VDPAU
        s->avctx->codec->capabilities&AV_CODEC_CAP_HWACCEL_VDPAU          ||
 #endif
@@ -845,10 +842,6 @@ void ff_er_add_slice(ERContext *s, int startx, int starty,
 
     if (s->avctx->hwaccel && s->avctx->hwaccel->decode_slice)
         return;
-    // ==> Start patch MPC
-    if (s->avctx->using_dxva)
-        return;
-    // ==> End patch MPC
 
     if (start_i > end_i || start_xy > end_xy) {
         av_log(s->avctx, AV_LOG_ERROR,

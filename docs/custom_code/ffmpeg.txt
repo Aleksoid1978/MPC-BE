@@ -9,30 +9,24 @@
 
 * libavcodec/aacdec_template.c
 * libavcodec/allcodecs.c
-* libavcodec/avcodec.h
-* libavcodec/error_resilience.c
+* libavcodec/dxva2.c
 * libavcodec/h264_slice.c
 * libavcodec/h264dec.c
 * libavcodec/h264dec.h
-* libavcodec/hevc.c
-* libavcodec/hevc.h
 * libavcodec/hevc_ps.c
-* libavcodec/hevc_refs.c
 * libavcodec/hevcpred.c
 * libavcodec/hevcpred.h
 * libavcodec/internal.h
 * libavcodec/mpeg4audio.h
 * libavcodec/mpeg12dec.c
 * libavcodec/mpegaudio_parser.c
-* libavcodec/mpegpicture.c
-* libavcodec/mpegvideo.c
-* libavcodec/options.c
-* libavcodec/utils.c
 * libavcodec/vc1.h
 * libavcodec/vc1dec.c
 * libavcodec/vp9.c
 
 * libavfilter/allfilters.c 
+
+* libavutil/hwcontext_dxva2.c
 ======
 The following files are available only in MPC-BE (compared with ffmpeg):
 
@@ -44,15 +38,3 @@ The following files are available only in MPC-BE (compared with ffmpeg):
 * libavcodec/x86/hevc_idct_intrinsic.c
 * libavcodec/x86/hevc_intra_intrinsic.c
 * libavcodec/x86/hevcpred.h
-
-* libavcodec/dxva_h264.c
-* libavcodec/dxva_h264.h
-* libavcodec/dxva_hevc.c
-* libavcodec/dxva_hevc.h
-* libavcodec/dxva_internal.h
-* libavcodec/dxva_mpeg2.c
-* libavcodec/dxva_mpeg2.h
-* libavcodec/dxva_vc1.c
-* libavcodec/dxva_vc1.h
-* libavcodec/dxva_vp9.c
-* libavcodec/dxva_vp9.h

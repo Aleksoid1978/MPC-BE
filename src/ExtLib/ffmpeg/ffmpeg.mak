@@ -30,6 +30,7 @@ TARGET_LIB	 = $(TARGET_LIB_DIR)/ffmpeg.lib
 CFLAGS	= -I. -I.. -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I$(SPEEX_DIR) -I$(SOXR_DIR)\
 		-DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
 		-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DOPJ_STATIC \
+		-D_WIN32_WINNT=0x0600 -DWINVER=0x0600 \
 		-fomit-frame-pointer -std=gnu99 \
 		-fno-common -fno-ident -mthreads
 YASMFLAGS = -I. -Pconfig.asm
@@ -186,6 +187,12 @@ SRCS_LC = \
 	libavcodec/dv_profile.c \
 	libavcodec/dvdata.c \
 	libavcodec/dvdec.c \
+	libavcodec/dxva2.c \
+	libavcodec/dxva2_h264.c \
+	libavcodec/dxva2_hevc.c \
+	libavcodec/dxva2_mpeg2.c \
+	libavcodec/dxva2_vc1.c \
+	libavcodec/dxva2_vp9.c \
 	libavcodec/eac3_data.c \
 	libavcodec/eac3dec.c \
 	libavcodec/elsdec.c \
@@ -601,6 +608,7 @@ SRCS_LU = \
 	libavutil/float_dsp.c \
 	libavutil/frame.c \
 	libavutil/hwcontext.c \
+	libavutil/hwcontext_dxva2.c \
 	libavutil/imgutils.c \
 	libavutil/integer.c \
 	libavutil/intmath.c \

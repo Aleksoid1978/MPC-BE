@@ -80,6 +80,6 @@ protected:
 private :
 	CMPCVideoDecFilter* m_pVideoDecFilter;
 
-	IDirect3DSurface9** m_ppRTSurfaceArray;
+	LPDIRECT3DSURFACE9* m_ppRTSurfaceArray;
 	UINT                m_nSurfaceArrayCount;
 };

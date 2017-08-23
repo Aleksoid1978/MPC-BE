@@ -49,8 +49,9 @@ extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
 	#include <ffmpeg/libavutil/mastering_display_metadata.h>
 	#include <ffmpeg/libavutil/pixdesc.h>
-	#include <libavutil/intreadwrite.h>
+	#include <ffmpeg/libavutil/intreadwrite.h>
 	#include <ffmpeg/libavutil/imgutils.h>
+	#include <ffmpeg/libavcodec/dxva2.h>
 }
 #pragma warning(pop)
 
@@ -1473,7 +1474,10 @@ void CMPCVideoDecFilter::ffmpegCleanup()
 	av_parser_close(m_pParser);
 	m_pParser = NULL;
 
-	avcodec_free_context(&m_pAVCtx);
+	if (m_pAVCtx) {
+		av_freep(&m_pAVCtx->hwaccel_context);
+		avcodec_free_context(&m_pAVCtx);
+	}
 
 	av_frame_free(&m_pFrame);
 
@@ -1571,7 +1575,7 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaTy
 			return hr;
 		}
 
-		if (m_nDecoderMode == MODE_DXVA2
+		if (UseDXVA2()
 				&& (m_pCurrentMediaType != *pmt)) {
 			hr = ReinitDXVA2Decoder();
 			if (FAILED(hr)) {
@@ -1813,12 +1817,12 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	m_pAVCtx->skip_loop_filter      = (AVDiscard)m_nDiscardMode;
 	m_pAVCtx->refcounted_frames		= 1;
 	m_pAVCtx->opaque				= this;
-	m_pAVCtx->using_dxva			= IsDXVASupported();
 	if (m_pAVCtx->codec_tag == MAKEFOURCC('m','p','g','2')) {
 		m_pAVCtx->codec_tag = MAKEFOURCC('M','P','E','G');
 	}
 
-	if (m_pAVCtx->using_dxva) {
+	if (IsDXVASupported()) {
+		m_pAVCtx->hwaccel_context	= (dxva_context *)av_mallocz(sizeof(dxva_context));
 		m_pAVCtx->get_format		= av_get_format;
 		m_pAVCtx->get_buffer2		= av_get_buffer;
 	}
@@ -1992,8 +1996,8 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 
 	BuildOutputFormat();
 
-	if (m_nDecoderMode == MODE_DXVA2 && m_pDXVADecoder && !m_pAVCtx->dxva_context) {
-		m_pDXVADecoder->UpdateDXVA2Context();
+	if (UseDXVA2() && m_pDXVADecoder) {
+		m_pDXVADecoder->FillHWContext();
 	}
 
 	return S_OK;
@@ -2337,7 +2341,6 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 	m_pAVCtx->extradata_size = (int)extralen;
 }
 
-#define DXVA2_MAX_SURFACES 64
 HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pReceivePin)
 {
 	if (direction == PINDIR_OUTPUT) {
@@ -2486,10 +2489,6 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 		m_pParser = av_parser_init(m_nCodecId);
 	}
 
-	if (m_pDXVADecoder) {
-		m_pDXVADecoder->Flush();
-	}
-
 	if (m_pMSDKDecoder) {
 		m_pMSDKDecoder->Flush();
 	}
@@ -2514,7 +2513,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 			InitDecoder(&m_pInput->CurrentMediaType());
 		}
 
-		if (m_nDecoderMode == MODE_DXVA2
+		if (UseDXVA2()
 				&& (m_nCodecId == AV_CODEC_ID_H264 && m_nPCIVendor == PCIV_ATI && m_bInterlaced)) {
 			HRESULT hr = ReinitDXVA2Decoder();
 			if (FAILED(hr)) {
@@ -2789,7 +2788,6 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 	}
 
 	HRESULT hr = S_OK;
-	BOOL bDXVADeliverFrame = FALSE;
 	for (;;) {
 		ret = avcodec_receive_frame(m_pAVCtx, m_pFrame);
 		if (ret < 0 && ret != AVERROR(EAGAIN)) {
@@ -2798,7 +2796,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 		}
 
 		if (m_bWaitKeyFrame) {
-			if (m_bWaitingForKeyFrame && (ret >= 0)) {
+			if (m_bWaitingForKeyFrame && ret >= 0) {
 				if (m_pFrame->key_frame) {
 					DLog(L"CMPCVideoDecFilter::DecodeInternal(): Found key-frame, resuming decoding");
 					m_bWaitingForKeyFrame = FALSE;
@@ -2808,17 +2806,16 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			}
 		}
 
-		UpdateAspectRatio();
-
-		if (m_nDecoderMode == MODE_DXVA2 && ((ret >= 0) || !bDXVADeliverFrame)) {
-			hr = m_pDXVADecoder->DeliverFrame((ret >= 0), rtStartIn, rtStopIn);
-			bDXVADeliverFrame = TRUE;
-			Continue;
-		}
-
-		if (ret < 0) {
+		if (ret < 0 || !m_pFrame->data[0]) {
 			av_frame_unref(m_pFrame);
 			break;
+		}
+
+		UpdateAspectRatio();
+
+		if (UseDXVA2()) {
+			hr = m_pDXVADecoder->DeliverFrame();
+			Continue;
 		}
 
 		GetFrameTimeStamp(m_pFrame, rtStartIn, rtStopIn);
@@ -3041,7 +3038,7 @@ HRESULT CMPCVideoDecFilter::ReopenVideo()
 	if (m_pAVCtx) {
 		m_bUseDXVA = false;
 		avcodec_close(m_pAVCtx);
-		m_pAVCtx->using_dxva = false;
+		av_freep(&m_pAVCtx->hwaccel_context);
 		m_pAVCtx->get_format = avcodec_default_get_format;
 		m_pAVCtx->get_buffer2 = avcodec_default_get_buffer2;
 
@@ -3090,7 +3087,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 		rtStop = INVALID_TIME;
 	}
 
-	if (m_nDecoderMode == MODE_DXVA2) {
+	if (UseDXVA2()) {
 		CheckPointer(m_pDXVA2Allocator, E_UNEXPECTED);
 	}
 
@@ -3140,7 +3137,6 @@ void CMPCVideoDecFilter::FlushDXVADecoder()	{
 		if (m_pAVCtx && avcodec_is_open(m_pAVCtx)) {
 			avcodec_flush_buffers(m_pAVCtx);
 		}
-		m_pDXVADecoder->Flush();
 	}
 }
 
@@ -3308,7 +3304,7 @@ HRESULT CMPCVideoDecFilter::SetEVRForDXVA2(IPin *pPin)
 	return hr;
 }
 
-HRESULT CMPCVideoDecFilter::CreateDXVA2Decoder(UINT nNumRenderTargets, IDirect3DSurface9** pDecoderRenderTargets)
+HRESULT CMPCVideoDecFilter::CreateDXVA2Decoder(LPDIRECT3DSURFACE9* ppDecoderRenderTargets, UINT nNumRenderTargets)
 {
 	DLog(L"CMPCVideoDecFilter::CreateDXVA2Decoder()");
 
@@ -3316,15 +3312,12 @@ HRESULT CMPCVideoDecFilter::CreateDXVA2Decoder(UINT nNumRenderTargets, IDirect3D
 	CComPtr<IDirectXVideoDecoder>	pDirectXVideoDec;
 
 	hr = m_pDecoderService->CreateVideoDecoder(m_DXVADecoderGUID, &m_VideoDesc, &m_DXVA2Config,
-											   pDecoderRenderTargets, nNumRenderTargets, &pDirectXVideoDec);
+											   ppDecoderRenderTargets, nNumRenderTargets, &pDirectXVideoDec);
 
 	if (SUCCEEDED(hr)) {
 		// need recreate dxva decoder after "stop" on Intel HD Graphics
 		SAFE_DELETE(m_pDXVADecoder);
-		m_pDXVADecoder = CDXVA2Decoder::CreateDXVA2Decoder(this, pDirectXVideoDec, &m_DXVADecoderGUID, &m_DXVA2Config);
-		if (!m_pDXVADecoder) {
-			hr = E_FAIL;
-		}
+		m_pDXVADecoder = DNew CDXVA2Decoder(this, pDirectXVideoDec, &m_DXVADecoderGUID, &m_DXVA2Config, ppDecoderRenderTargets, nNumRenderTargets);
 	}
 
 	if (FAILED(hr)) {
@@ -3829,6 +3822,8 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 
 #define H264_CHECK_PROFILE(profile) \
 	(((profile) & ~FF_PROFILE_H264_CONSTRAINED) <= FF_PROFILE_H264_HIGH)
+#define VP9_CHECK_PROFILE(profile) \
+	(profile == FF_PROFILE_VP9_0 || profile == FF_PROFILE_VP9_2)
 
 int CMPCVideoDecFilter::av_get_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
@@ -3836,7 +3831,7 @@ int CMPCVideoDecFilter::av_get_buffer(struct AVCodecContext *c, AVFrame *pic, in
 	if (pFilter->m_pDXVADecoder) {
 		if ((c->codec_id == AV_CODEC_ID_H264 && !H264_CHECK_PROFILE(c->profile)) ||
 			(c->codec_id == AV_CODEC_ID_HEVC && c->profile > FF_PROFILE_HEVC_MAIN_10) ||
-			(c->codec_id == AV_CODEC_ID_VP9  && !(c->profile == FF_PROFILE_VP9_0 || c->profile == FF_PROFILE_VP9_2))) {
+			(c->codec_id == AV_CODEC_ID_VP9  && !VP9_CHECK_PROFILE(c->profile))) {
 			return -1;
 		}
 
@@ -3850,16 +3845,29 @@ enum AVPixelFormat CMPCVideoDecFilter::av_get_format(struct AVCodecContext *c, c
 {
 	CMPCVideoDecFilter* pFilter = static_cast<CMPCVideoDecFilter*>(c->opaque);
 	if (pFilter->m_pDXVADecoder) {
-		if (pFilter->m_nSurfaceWidth != c->coded_width
-				|| pFilter->m_nSurfaceHeight != c->coded_height) {
-			avcodec_flush_buffers(c);
-			if (SUCCEEDED(pFilter->FindDecoderConfiguration())) {
-				pFilter->RecommitAllocator();
-			}
+		const enum AVPixelFormat *p;
+		for (p = pix_fmts; *p != -1; p++) {
+			const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(*p);
 
-			pFilter->m_nSurfaceWidth  = c->coded_width;
-			pFilter->m_nSurfaceHeight = c->coded_height;
+			if (!desc || !(desc->flags & AV_PIX_FMT_FLAG_HWACCEL))
+				break;
+
+			if (*p == AV_PIX_FMT_DXVA2_VLD) {
+				if (pFilter->m_nSurfaceWidth != c->coded_width
+						|| pFilter->m_nSurfaceHeight != c->coded_height) {
+					avcodec_flush_buffers(c);
+					if (SUCCEEDED(pFilter->FindDecoderConfiguration())) {
+						pFilter->RecommitAllocator();
+					}
+
+					pFilter->m_nSurfaceWidth  = c->coded_width;
+					pFilter->m_nSurfaceHeight = c->coded_height;
+				}
+				break;
+			}
 		}
+
+		return *p;
 	}
 
 	return avcodec_default_get_format(c, pix_fmts);

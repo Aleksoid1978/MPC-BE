@@ -184,7 +184,7 @@ HRESULT CVideoDecDXVAAllocator::Alloc()
 			m_lFree.Add(pSample);
 		}
 
-		hr = m_pVideoDecFilter->CreateDXVA2Decoder(m_lCount, m_ppRTSurfaceArray);
+		hr = m_pVideoDecFilter->CreateDXVA2Decoder(m_ppRTSurfaceArray, m_lCount);
 		if (FAILED(hr)) {
 			DLog(L"CVideoDecDXVAAllocator::Alloc() : CMPCVideoDecFilter::CreateDXVA2Decoder() - FAILED (0x%08x)", hr);
 			Free();

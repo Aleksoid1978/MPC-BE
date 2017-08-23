@@ -61,6 +61,13 @@
 
 static void register_all(void)
 {
+    /* hardware accelerators */
+    REGISTER_HWACCEL(H264_DXVA2,        h264_dxva2);
+    REGISTER_HWACCEL(HEVC_DXVA2,        hevc_dxva2);
+    REGISTER_HWACCEL(MPEG2_DXVA2,       mpeg2_dxva2);
+    REGISTER_HWACCEL(VC1_DXVA2,         vc1_dxva2);
+    REGISTER_HWACCEL(VP9_DXVA2,         vp9_dxva2);
+    REGISTER_HWACCEL(WMV3_DXVA2,        wmv3_dxva2);
 
     /* video codecs */
     REGISTER_DECODER(8BPS,              eightbps);
@@ -234,9 +241,7 @@ static void register_all(void)
 
     /* external libraries */
     REGISTER_DECODER(LIBOPENJPEG,       libopenjpeg);
-    //REGISTER_DECODER(LIBOPUS,         libopus);
     REGISTER_DECODER(LIBSPEEX,          libspeex);
-    //REGISTER_DECODER(LIBVPX_VP9,      libvpx_vp9);
 }
 
 void avcodec_register_all(void)

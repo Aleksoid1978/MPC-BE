@@ -32,13 +32,7 @@ extern "C" {
 	#include <ffmpeg/libavcodec/mpegvideo.h>
 	#include <ffmpeg/libavcodec/h264dec.h>
 	#include <ffmpeg/libavcodec/ffv1.h>
-	#include <ffmpeg/libavcodec/vc1.h>
 #undef class
-	#include <ffmpeg/libavcodec/dxva_h264.h>
-	#include <ffmpeg/libavcodec/dxva_hevc.h>
-	#include <ffmpeg/libavcodec/dxva_mpeg2.h>
-	#include <ffmpeg/libavcodec/dxva_vc1.h>
-	#include <ffmpeg/libavcodec/dxva_vp9.h>
 }
 
 static const WORD PCID_ATI_UVD [] = {
@@ -190,64 +184,6 @@ void FFH264GetParams(struct AVCodecContext* pAVCtx, int& x264_build)
 int MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx)
 {
 	return (((MpegEncContext*)pAVCtx->priv_data)->chroma_format < 2);
-}
-
-// === Common functions
-HRESULT FFGetCurFrame(struct AVCodecContext* pAVCtx, AVFrame** ppFrameOut)
-{
-	*ppFrameOut = NULL;
-	switch (pAVCtx->codec_id) {
-		case AV_CODEC_ID_H264:
-			h264_getcurframe(pAVCtx, ppFrameOut);
-			break;
-		case AV_CODEC_ID_HEVC:
-			hevc_getcurframe(pAVCtx, ppFrameOut);
-			break;
-		case AV_CODEC_ID_MPEG2VIDEO:
-			mpeg2_getcurframe(pAVCtx, ppFrameOut);
-			break;
-		case AV_CODEC_ID_VC1:
-		case AV_CODEC_ID_WMV3:
-			vc1_getcurframe(pAVCtx, ppFrameOut);
-			break;
-		case AV_CODEC_ID_VP9:
-			vp9_getcurframe(pAVCtx, ppFrameOut);
-			break;
-		default:
-			return E_FAIL;
-	}
-
-	return S_OK;
-}
-
-UINT FFGetMBCount(struct AVCodecContext* pAVCtx)
-{
-	UINT MBCount = 0;
-	switch (pAVCtx->codec_id) {
-		case AV_CODEC_ID_H264 :
-			{
-				const H264Context* h    = (H264Context*)pAVCtx->priv_data;
-				MBCount                 = h->mb_width * h->mb_height;
-			}
-			break;
-		case AV_CODEC_ID_MPEG2VIDEO:
-			{
-				const MpegEncContext* s = (MpegEncContext*)pAVCtx->priv_data;
-				const int is_field      = s->picture_structure != PICT_FRAME;
-				MBCount                 = s->mb_width * (s->mb_height >> is_field);
-			}
-			break;
-		case AV_CODEC_ID_VC1:
-		case AV_CODEC_ID_WMV3:
-			{
-				const VC1Context* v     = (VC1Context*)pAVCtx->priv_data;
-				const MpegEncContext* s = &v->s;
-				MBCount                 = s->mb_width * (s->mb_height >> v->field_mode);
-			}
-			break;
-	}
-
-	return MBCount;
 }
 
 void FillAVCodecProps(struct AVCodecContext* pAVCtx, int x264_build)

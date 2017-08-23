@@ -216,11 +216,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DXVADecoder\DXVA2Decoder.cpp" />
-    <ClCompile Include="DXVADecoder\DXVA2DecoderH264.cpp" />
-    <ClCompile Include="DXVADecoder\DXVA2DecoderHEVC.cpp" />
-    <ClCompile Include="DXVADecoder\DXVA2DecoderMPEG2.cpp" />
-    <ClCompile Include="DXVADecoder\DXVA2DecoderVC1.cpp" />
-    <ClCompile Include="DXVADecoder\DXVA2DecoderVP9.cpp" />
     <ClCompile Include="DXVADecoder\DXVAAllocator.cpp" />
     <ClCompile Include="DXVADecoder\MediaSampleSideData.cpp" />
     <ClCompile Include="ffmpegContext.cpp">
@@ -240,11 +235,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DXVADecoder\DXVA2Decoder.h" />
-    <ClInclude Include="DXVADecoder\DXVA2DecoderH264.h" />
-    <ClInclude Include="DXVADecoder\DXVA2DecoderHEVC.h" />
-    <ClInclude Include="DXVADecoder\DXVA2DecoderMPEG2.h" />
-    <ClInclude Include="DXVADecoder\DXVA2DecoderVC1.h" />
-    <ClInclude Include="DXVADecoder\DXVA2DecoderVP9.h" />
     <ClInclude Include="DXVADecoder\DXVAAllocator.h" />
     <ClInclude Include="DXVADecoder\MediaSampleSideData.h" />
     <ClInclude Include="DXVADecoder\stdafx.h" />

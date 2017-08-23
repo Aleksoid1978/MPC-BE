@@ -421,11 +421,7 @@ static int set_sps(HEVCContext *s, const HEVCSPS *sps,
         av_freep(&s->sao_pixel_buffer_v[i]);
     }
 
-    if (sps->sao_enabled &&
-        // ==> Start patch MPC
-        !s->avctx->using_dxva &&
-        // ==> End patch MPC
-        !s->avctx->hwaccel) {
+    if (sps->sao_enabled && !s->avctx->hwaccel) {
         int c_count = (sps->chroma_format_idc != 0) ? 3 : 1;
         int c_idx;
 
@@ -2786,11 +2782,7 @@ static int hevc_frame_start(HEVCContext *s)
     if (ret < 0)
         goto fail;
 
-    if (!s->avctx->hwaccel &&
-        // ==> Start patch MPC
-        !s->avctx->using_dxva
-        // ==> End patch MPC
-        )
+    if (!s->avctx->hwaccel)
         ff_thread_finish_setup(s->avctx);
 
     return 0;
@@ -2801,10 +2793,6 @@ fail:
     s->ref = NULL;
     return ret;
 }
-
-// ==> Start patch MPC
-#include "dxva_hevc.c"
-// ==> End patch MPC
 
 static int decode_nal_unit(HEVCContext *s, const H2645NAL *nal)
 {
@@ -2909,17 +2897,6 @@ static int decode_nal_unit(HEVCContext *s, const H2645NAL *nal)
                 goto fail;
         }
 
-        // ==> Start patch MPC
-        if (s->sh.first_slice_in_pic_flag && s->avctx->using_dxva && s->avctx->dxva_context) {
-            dxva_start_frame(s->avctx);
-        }
-
-        if (s->avctx->using_dxva && s->avctx->dxva_context) {
-            ret = dxva_decode_slice(s->avctx, nal->raw_data, nal->raw_size);
-            if (ret < 0)
-                goto fail;
-        } else
-        // ==> End patch MPC
         if (s->avctx->hwaccel) {
             ret = s->avctx->hwaccel->decode_slice(s->avctx, nal->raw_data, nal->raw_size);
             if (ret < 0)
@@ -3111,14 +3088,6 @@ static int hevc_decode_frame(AVCodecContext *avctx, void *data, int *got_output,
     uint8_t *new_extradata;
     HEVCContext *s = avctx->priv_data;
 
-    // ==> Start patch MPC
-    if (avctx->using_dxva && avctx->dxva_context) {
-        dxva_context* ctx = (dxva_context*)avctx->dxva_context;
-        DXVA_HEVC_Picture_Context* ctx_pic = (DXVA_HEVC_Picture_Context*)ctx->dxva_decoder_context;
-        memset(ctx_pic, 0, sizeof(*ctx_pic));
-    }
-    // ==> End patch MPC
-
     if (!avpkt->size) {
         ret = ff_hevc_output_frame(s, data, 1);
         if (ret < 0)
@@ -3151,9 +3120,6 @@ static int hevc_decode_frame(AVCodecContext *avctx, void *data, int *got_output,
     } else {
         /* verify the SEI checksum */
         if (avctx->err_recognition & AV_EF_CRCCHECK && s->is_decoded &&
-            // ==> Start patch MPC
-            !s->avctx->using_dxva &&
-            // ==> End patch MPC
             s->sei.picture_hash.is_md5) {
             ret = verify_md5(s, s->ref->frame);
             if (ret < 0 && avctx->err_recognition & AV_EF_EXPLODE) {

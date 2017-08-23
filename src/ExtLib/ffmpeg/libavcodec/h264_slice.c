@@ -207,11 +207,7 @@ static int alloc_picture(H264Context *h, H264Picture *pic)
             pic->hwaccel_picture_private = pic->hwaccel_priv_buf->data;
         }
     }
-    if (CONFIG_GRAY && !h->avctx->hwaccel &&
-        // ==> Start patch MPC
-        !h->avctx->using_dxva &&
-        // ==> End patch MPC
-        h->flags & AV_CODEC_FLAG_GRAY && pic->f->data[2]) {
+    if (CONFIG_GRAY && !h->avctx->hwaccel && h->flags & AV_CODEC_FLAG_GRAY && pic->f->data[2]) {
         int h_chroma_shift, v_chroma_shift;
         av_pix_fmt_get_chroma_sub_sample(pic->f->format,
                                          &h_chroma_shift, &v_chroma_shift);
@@ -502,9 +498,6 @@ static int h264_frame_start(H264Context *h)
     if ((ret = alloc_picture(h, pic)) < 0)
         return ret;
     if(!h->frame_recovered && !h->avctx->hwaccel
-       // ==> Start patch MPC
-       && !h->avctx->using_dxva
-       // ==> End patch MPC
 #if FF_API_CAP_VDPAU
        && !(h->avctx->codec->capabilities & AV_CODEC_CAP_HWACCEL_VDPAU)
 #endif
@@ -1567,9 +1560,6 @@ static int h264_field_start(H264Context *h, const H264SliceContext *sl,
                 ff_thread_await_progress(&prev->tf, INT_MAX, 0);
                 if (prev->field_picture)
                     ff_thread_await_progress(&prev->tf, INT_MAX, 1);
-                // ==> Start patch MPC
-                if (!h->avctx->using_dxva)
-                // ==> End patch MPC
                 av_image_copy(h->short_ref[0]->f->data,
                               h->short_ref[0]->f->linesize,
                               (const uint8_t **)prev->f->data,
@@ -2770,9 +2760,6 @@ int ff_h264_execute_decode_slices(H264Context *h)
     h->slice_ctx[0].next_slice_idx = INT_MAX;
 
     if (h->avctx->hwaccel || context_count < 1
-        // ==> Start patch MPC
-        || h->avctx->using_dxva
-        // ==> End patch MPC
 #if FF_API_CAP_VDPAU
         || h->avctx->codec->capabilities & AV_CODEC_CAP_HWACCEL_VDPAU
 #endif
