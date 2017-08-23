@@ -22,13 +22,20 @@
 #include "stdafx.h"
 #include "PPageAccelTbl.h"
 
+#define MASK_NUMBER  0xFFF
+#define DUP_KEY      (1<<12)
+#define DUP_MOUSE    (1<<13)
+#define DUP_MOUSE_FS (1<<14)
+#define DUP_APPCMD   (1<<15)
+#define DUP_RMCMD    (1<<16)
+#define MASK_DUP     (DUP_KEY|DUP_MOUSE|DUP_MOUSE_FS|DUP_APPCMD|DUP_RMCMD)
 
 struct APP_COMMAND {
 	UINT		appcmd;
 	LPCTSTR		cmdname;
 };
 
-APP_COMMAND	g_CommandList[] = {
+const APP_COMMAND g_CommandList[] = {
 	{0,									L""},
 	{APPCOMMAND_BROWSER_BACKWARD,		L"BROWSER_BACKWARD"},
 	{APPCOMMAND_BROWSER_FORWARD,		L"BROWSER_FORWARD"},
@@ -140,27 +147,49 @@ BOOL CPPageAccelTbl::PreTranslateMessage(MSG* pMsg)
 
 void CPPageAccelTbl::SetupList()
 {
-	for (int row = 0; row < m_list.GetItemCount(); row++) {
-		wmcmd& wc = m_wmcmds.at(m_list.GetItemData(row));
+	m_list.DeleteAllItems();
+
+	for (size_t i = 0; i < m_wmcmds.size(); i++) {
+		wmcmd& wc = m_wmcmds[i];
+
+		int row = m_list.InsertItem(m_list.GetItemCount(), wc.GetName(), COL_CMD);
+		ASSERT(row == int(i&MASK_NUMBER));
+
+		unsigned rowdata = i&MASK_NUMBER;
+		for (size_t j = 0; j < m_wmcmds.size(); j++) {
+			if (i == j) { continue; }
+
+			if (wc.key && wc.key == m_wmcmds[j].key && (wc.fVirt&(FCONTROL|FALT|FSHIFT)) == (m_wmcmds[j].fVirt&(FCONTROL|FALT|FSHIFT))) {
+				rowdata |= DUP_KEY;
+			}
+			if (wc.mouse && wc.mouse == m_wmcmds[j].mouse) {
+				rowdata |= DUP_MOUSE;
+			}
+			if (wc.mouseFS && wc.mouseFS == m_wmcmds[j].mouseFS) {
+				rowdata |= DUP_MOUSE_FS;
+			}
+			if (wc.appcmd && wc.appcmd == m_wmcmds[j].appcmd) {
+				rowdata |= DUP_APPCMD;
+			}
+			if (wc.rmcmd.GetLength() && wc.rmcmd.CompareNoCase(m_wmcmds[j].rmcmd) == 0) {
+				rowdata |= DUP_RMCMD;
+			}
+		}
+		m_list.SetItemData(row, rowdata);
 
 		CString hotkey;
 		HotkeyModToString(wc.key, wc.fVirt, hotkey);
-		m_list.SetItemText(row, COL_KEY, hotkey);
-
 		CString id;
 		id.Format(L"%d", wc.cmd);
-		m_list.SetItemText(row, COL_ID, id);
-
-		m_list.SetItemText(row, COL_MOUSE, MakeMouseButtonLabel(wc.mouse));
-
-		m_list.SetItemText(row, COL_MOUSE_FS, MakeMouseButtonLabel(wc.mouseFS));
-
-		m_list.SetItemText(row, COL_APPCMD, MakeAppCommandLabel(wc.appcmd));
-
-		m_list.SetItemText(row, COL_RMCMD, CString(wc.rmcmd));
-
 		CString repcnt;
 		repcnt.Format(L"%d", wc.rmrepcnt);
+
+		m_list.SetItemText(row, COL_KEY, hotkey);
+		m_list.SetItemText(row, COL_ID, id);
+		m_list.SetItemText(row, COL_MOUSE, MakeMouseButtonLabel(wc.mouse));
+		m_list.SetItemText(row, COL_MOUSE_FS, MakeMouseButtonLabel(wc.mouseFS));
+		m_list.SetItemText(row, COL_APPCMD, MakeAppCommandLabel(wc.appcmd));
+		m_list.SetItemText(row, COL_RMCMD, CString(wc.rmcmd));
 		m_list.SetItemText(row, COL_RMREPCNT, repcnt);
 	}
 
@@ -174,6 +203,116 @@ void CPPageAccelTbl::SetupList()
 				m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE);
 			}
 		}
+	}
+}
+
+void CPPageAccelTbl::UpdateKeyDupFlags()
+{
+	for (size_t i = 0; i < m_wmcmds.size(); i++) {
+		wmcmd& wc = m_wmcmds[i];
+		unsigned rowdata = m_list.GetItemData(i);
+		rowdata &= ~DUP_KEY;
+
+		if (wc.key) {
+			for (size_t j = 0; j < m_wmcmds.size(); j++) {
+				if (i == j) { continue; }
+
+				if (wc.key == m_wmcmds[j].key && (wc.fVirt&(FCONTROL|FALT|FSHIFT)) == (m_wmcmds[j].fVirt&(FCONTROL|FALT|FSHIFT))) {
+					rowdata |= DUP_KEY;
+					break;
+				}
+			}
+		}
+
+		m_list.SetItemData(i, rowdata);
+	}
+}
+
+void CPPageAccelTbl::UpdateMouseDupFlags()
+{
+	for (size_t i = 0; i < m_wmcmds.size(); i++) {
+		wmcmd& wc = m_wmcmds[i];
+		unsigned rowdata = m_list.GetItemData(i);
+		rowdata &= ~DUP_MOUSE;
+
+		if (wc.mouse) {
+			for (size_t j = 0; j < m_wmcmds.size(); j++) {
+				if (i == j) { continue; }
+
+				if (wc.mouse == m_wmcmds[j].mouse) {
+					rowdata |= DUP_MOUSE;
+					break;
+				}
+			}
+		}
+
+		m_list.SetItemData(i, rowdata);
+	}
+}
+
+void CPPageAccelTbl::UpdateMouseFSDupFlags()
+{
+	for (size_t i = 0; i < m_wmcmds.size(); i++) {
+		wmcmd& wc = m_wmcmds[i];
+		unsigned rowdata = m_list.GetItemData(i);
+		rowdata &= ~DUP_MOUSE_FS;
+
+		if (wc.mouseFS) {
+			for (size_t j = 0; j < m_wmcmds.size(); j++) {
+				if (i == j) { continue; }
+
+				if (wc.mouseFS == m_wmcmds[j].mouseFS) {
+					rowdata |= DUP_MOUSE_FS;
+					break;
+				}
+			}
+		}
+
+		m_list.SetItemData(i, rowdata);
+	}
+}
+
+void CPPageAccelTbl::UpdateAppcmdDupFlags()
+{
+	for (size_t i = 0; i < m_wmcmds.size(); i++) {
+		wmcmd& wc = m_wmcmds[i];
+		unsigned rowdata = m_list.GetItemData(i);
+		rowdata &= ~DUP_APPCMD;
+
+		if (wc.appcmd) {
+			for (size_t j = 0; j < m_wmcmds.size(); j++) {
+				if (i == j) { continue; }
+
+				if (wc.appcmd == m_wmcmds[j].appcmd) {
+					rowdata |= DUP_APPCMD;
+					break;
+				}
+			}
+		}
+
+		m_list.SetItemData(i, rowdata);
+	}
+}
+
+void CPPageAccelTbl::UpdateRmcmdDupFlags()
+{
+	for (size_t i = 0; i < m_wmcmds.size(); i++) {
+		wmcmd& wc = m_wmcmds[i];
+		unsigned rowdata = m_list.GetItemData(i);
+		rowdata &= ~DUP_RMCMD;
+
+		if (wc.rmcmd.GetLength()) {
+			for (size_t j = 0; i < m_wmcmds.size(); i++) {
+				if (i == j) { continue; }
+
+				if (wc.rmcmd.CompareNoCase(m_wmcmds[j].rmcmd) == 0) {
+					rowdata |= DUP_RMCMD;
+					break;
+				}
+			}
+		}
+
+		m_list.SetItemData(i, rowdata);
 	}
 }
 
@@ -497,9 +636,9 @@ CString CPPageAccelTbl::MakeMouseButtonLabel(UINT mouse)
 
 CString CPPageAccelTbl::MakeAppCommandLabel(UINT id)
 {
-	for (int i=0; i<_countof(g_CommandList); i++) {
-		if (g_CommandList[i].appcmd == id) {
-			return CString(g_CommandList[i].cmdname);
+	for (auto& command : g_CommandList) {
+		if (command.appcmd == id) {
+			return CString(command.cmdname);
 		}
 	}
 	return CString("");
@@ -525,6 +664,7 @@ BEGIN_MESSAGE_MAP(CPPageAccelTbl, CPPageBase)
 	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_LIST1, OnEndlabeleditList)
 	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedButton2)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST1, OnCustomdrawList)
 	ON_WM_TIMER()
 	ON_WM_CTLCOLOR()
 END_MESSAGE_MAP()
@@ -588,12 +728,6 @@ BOOL CPPageAccelTbl::OnInitDialog()
 	m_list.InsertColumn(COL_APPCMD, ResStr(IDS_AG_APP_COMMAND), LVCFMT_LEFT, s.AccelTblColWidth.appcmd);
 	m_list.InsertColumn(COL_RMCMD, L"RemoteCmd", LVCFMT_LEFT, s.AccelTblColWidth.remcmd);
 	m_list.InsertColumn(COL_RMREPCNT, L"RepCnt", LVCFMT_CENTER, s.AccelTblColWidth.repcnt);
-
-	for (size_t i = 0; i < m_wmcmds.size(); i++) {
-		wmcmd& wc = m_wmcmds[i];
-		int row = m_list.InsertItem(m_list.GetItemCount(), wc.GetName(), COL_CMD);
-		m_list.SetItemData(row, (DWORD_PTR)i);
-	}
 
 	SetupList();
 
@@ -671,7 +805,7 @@ void CPPageAccelTbl::OnBnClickedButton2()
 
 	while (pos) {
 		int ni = m_list.GetNextSelectedItem(pos);
-		wmcmd& wc = m_wmcmds.at(m_list.GetItemData(ni));
+		wmcmd& wc = m_wmcmds.at(m_list.GetItemData(ni)&MASK_NUMBER);
 		wc.Restore();
 	}
 	AfxGetAppSettings().AccelTblColWidth.bEnable = false;
@@ -712,7 +846,7 @@ void CPPageAccelTbl::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 	*pResult = TRUE;
 
-	wmcmd& wc = m_wmcmds.at(m_list.GetItemData(pItem->iItem));
+	wmcmd& wc = m_wmcmds.at(m_list.GetItemData(pItem->iItem)&MASK_NUMBER);
 
 	CAtlList<CString> sl;
 	int nSel = -1;
@@ -785,15 +919,16 @@ void CPPageAccelTbl::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 	*pResult = FALSE;
 
-	if (!m_list.m_fInPlaceDirty) {
+	if (!m_list.m_fInPlaceDirty || pItem->iItem < 0) {
 		return;
 	}
 
-	if (pItem->iItem < 0) {
-		return;
-	}
+	unsigned rowdata = m_list.GetItemData(pItem->iItem);
+	const unsigned num = rowdata&MASK_NUMBER;
+	ASSERT(num < m_wmcmds.size());
+	wmcmd& wc = m_wmcmds.at(num);
 
-	wmcmd& wc = m_wmcmds.at(m_list.GetItemData(pItem->iItem));
+	const wmcmd old = wc;
 
 	switch (pItem->iSubItem) {
 		case COL_KEY: {
@@ -801,49 +936,47 @@ void CPPageAccelTbl::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 			CWinHotkeyCtrl* pWinHotkey = (CWinHotkeyCtrl*)m_list.GetDlgItem(IDC_WINHOTKEY1);
 			pWinHotkey->GetWinHotkey(&cod, &mod);
 			wc.fVirt = 0;
-			if (mod & MOD_ALT) {
-				wc.fVirt |= FALT;
-			}
-			if (mod & MOD_CONTROL) {
-				wc.fVirt |= FCONTROL;
-			}
-			if (mod & MOD_SHIFT) {
-				wc.fVirt |= FSHIFT;
-			}
+			if (mod & MOD_ALT)     { wc.fVirt |= FALT; }
+			if (mod & MOD_CONTROL) { wc.fVirt |= FCONTROL; }
+			if (mod & MOD_SHIFT)   { wc.fVirt |= FSHIFT; }
 			wc.fVirt |= FVIRTKEY;
 			wc.key = cod;
-
 			CString str;
 			HotkeyToString(cod, mod, str);
 			m_list.SetItemText(pItem->iItem, COL_KEY, str);
-
 			*pResult = TRUE;
-		}
-		break;
-		case COL_APPCMD: {
-			int i = pItem->lParam;
-			if (i >= 0 && i < _countof(g_CommandList)) {
-				wc.appcmd = g_CommandList[i].appcmd;
-				m_list.SetItemText(pItem->iItem, COL_APPCMD, pItem->pszText);
-				*pResult = TRUE;
-			}
+			UpdateKeyDupFlags();
 		}
 		break;
 		case COL_MOUSE:
 			wc.mouse = pItem->lParam;
 			m_list.SetItemText(pItem->iItem, COL_MOUSE, pItem->pszText);
 			*pResult = TRUE;
+			UpdateMouseDupFlags();
 			break;
 		case COL_MOUSE_FS:
 			wc.mouseFS = pItem->lParam;
 			m_list.SetItemText(pItem->iItem, COL_MOUSE_FS, pItem->pszText);
 			*pResult = TRUE;
+			UpdateMouseFSDupFlags();
 			break;
+		case COL_APPCMD: {
+			unsigned k = pItem->lParam;
+			if (k >= _countof(g_CommandList)) {
+				break;
+			}
+			wc.appcmd = g_CommandList[k].appcmd;
+			m_list.SetItemText(pItem->iItem, COL_APPCMD, pItem->pszText);
+			*pResult = TRUE;
+			UpdateAppcmdDupFlags();
+		}
+		break;
 		case COL_RMCMD:
 			wc.rmcmd = CStringA(CString(pItem->pszText)).Trim();
 			wc.rmcmd.Replace(' ', '_');
 			m_list.SetItemText(pItem->iItem, COL_RMCMD, CString(wc.rmcmd));
 			*pResult = TRUE;
+			UpdateRmcmdDupFlags();
 			break;
 		case COL_RMREPCNT:
 			CString str = CString(pItem->pszText).Trim();
@@ -856,6 +989,37 @@ void CPPageAccelTbl::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 	if (*pResult) {
 		SetModified();
+	}
+}
+
+void CPPageAccelTbl::OnCustomdrawList ( NMHDR* pNMHDR, LRESULT* pResult )
+{
+	// https://www.codeproject.com/Articles/79/Neat-Stuff-to-Do-in-List-Controls-Using-Custom-Dra
+	NMLVCUSTOMDRAW* pLVCD = reinterpret_cast<NMLVCUSTOMDRAW*>( pNMHDR );
+	*pResult = CDRF_DODEFAULT;
+
+	if (CDDS_PREPAINT == pLVCD->nmcd.dwDrawStage) {
+		*pResult = CDRF_NOTIFYITEMDRAW;
+	}
+	else if (CDDS_ITEMPREPAINT == pLVCD->nmcd.dwDrawStage) {
+		*pResult = CDRF_NOTIFYSUBITEMDRAW;
+	}
+	else if ((CDDS_ITEMPREPAINT | CDDS_SUBITEM) == pLVCD->nmcd.dwDrawStage) {
+		const unsigned dup = m_list.GetItemData(pLVCD->nmcd.dwItemSpec) & MASK_DUP;
+
+		if (pLVCD->iSubItem == COL_CMD && dup
+				|| pLVCD->iSubItem == COL_KEY && (dup&DUP_KEY)
+				|| pLVCD->iSubItem == COL_MOUSE && (dup&DUP_MOUSE)
+				|| pLVCD->iSubItem == COL_MOUSE_FS && (dup&DUP_MOUSE_FS)
+				|| pLVCD->iSubItem == COL_APPCMD && (dup&DUP_APPCMD)
+				|| pLVCD->iSubItem == COL_RMCMD && (dup&DUP_RMCMD)) {
+			pLVCD->clrTextBk = RGB(255, 130, 120);
+		}
+		else {
+			pLVCD->clrTextBk = RGB(255, 255, 255);
+		}
+
+		*pResult = CDRF_DODEFAULT;
 	}
 }
 

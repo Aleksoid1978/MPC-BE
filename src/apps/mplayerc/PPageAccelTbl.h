@@ -39,6 +39,11 @@ private:
 	std::vector<wmcmd> m_wmcmds;
 
 	void SetupList();
+	void UpdateKeyDupFlags();
+	void UpdateMouseDupFlags();
+	void UpdateMouseFSDupFlags();
+	void UpdateAppcmdDupFlags();
+	void UpdateRmcmdDupFlags();
 
 	int m_counter;
 
@@ -83,6 +88,7 @@ public:
 	afx_msg void OnBnClickedButton1();
 	afx_msg void OnBnClickedButton2();
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	afx_msg void OnCustomdrawList(NMHDR*, LRESULT*);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 
 	virtual void OnCancel();
