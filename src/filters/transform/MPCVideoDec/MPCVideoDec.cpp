@@ -3844,15 +3844,15 @@ int CMPCVideoDecFilter::av_get_buffer(struct AVCodecContext *c, AVFrame *pic, in
 enum AVPixelFormat CMPCVideoDecFilter::av_get_format(struct AVCodecContext *c, const enum AVPixelFormat * pix_fmts)
 {
 	CMPCVideoDecFilter* pFilter = static_cast<CMPCVideoDecFilter*>(c->opaque);
-	if (pFilter->m_pDXVADecoder) {
-		const enum AVPixelFormat *p;
-		for (p = pix_fmts; *p != -1; p++) {
-			const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(*p);
+	const enum AVPixelFormat *p;
+	for (p = pix_fmts; *p != -1; p++) {
+		const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(*p);
 
-			if (!desc || !(desc->flags & AV_PIX_FMT_FLAG_HWACCEL))
-				break;
+		if (!desc || !(desc->flags & AV_PIX_FMT_FLAG_HWACCEL))
+			break;
 
-			if (*p == AV_PIX_FMT_DXVA2_VLD) {
+		if (*p == AV_PIX_FMT_DXVA2_VLD) {
+			if (pFilter->m_pDXVADecoder) {
 				if (pFilter->m_nSurfaceWidth != c->coded_width
 						|| pFilter->m_nSurfaceHeight != c->coded_height) {
 					avcodec_flush_buffers(c);
@@ -3863,14 +3863,12 @@ enum AVPixelFormat CMPCVideoDecFilter::av_get_format(struct AVCodecContext *c, c
 					pFilter->m_nSurfaceWidth  = c->coded_width;
 					pFilter->m_nSurfaceHeight = c->coded_height;
 				}
-				break;
 			}
+			break;
 		}
-
-		return *p;
 	}
 
-	return avcodec_default_get_format(c, pix_fmts);
+	return *p;
 }
 
 CVideoDecOutputPin::CVideoDecOutputPin(TCHAR* pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName)
