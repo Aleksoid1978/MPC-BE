@@ -125,16 +125,20 @@ HRESULT CDXVA2Decoder::DeliverFrame()
 int CDXVA2Decoder::get_buffer_dxva(AVFrame *pic)
 {
 	IMediaSample* pSample = NULL;
-	int nSurfaceIndex = -1;
-	if (SUCCEEDED(m_pFilter->m_pDXVA2Allocator->GetBuffer(&pSample, NULL, NULL, 0))) {
-		if (CComQIPtr<IMPCDXVA2Sample> pMPCDXVA2Sample = pSample) {
-			nSurfaceIndex = pMPCDXVA2Sample->GetDXSurfaceId();
-		} else {
-			SAFE_RELEASE(pSample);
-		}
+	HRESULT hr = m_pFilter->m_pDXVA2Allocator->GetBuffer(&pSample, NULL, NULL, 0);
+	if (FAILED(hr)) {
+		DLog(L"DXVA2Allocator->GetBuffer() failed: 0x%08x", hr);
+		return -1;
 	}
 
-	CheckPointer(pSample, -1);
+	CComQIPtr<IMPCDXVA2Sample> pMPCDXVA2Sample = pSample;
+	if (!pMPCDXVA2Sample) {
+		DLog(L"Something went wrong, it's not CDXVA2Sample");
+		SAFE_RELEASE(pSample);
+		return -1;
+	}
+
+	int nSurfaceIndex = pMPCDXVA2Sample->GetDXSurfaceId();
 
 	LPDIRECT3DSURFACE9 pSurface = m_pD3DSurface[nSurfaceIndex];
 
