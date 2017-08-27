@@ -350,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 16		"Opakovat donekonečna"
 18		"x"
 19		"Po přehrání přetočit"
-20		"Výstup"
+20		"Window size"
 21		"Výchozí velikost:"
 23		"Auto fit factor:"
 27		"Control"

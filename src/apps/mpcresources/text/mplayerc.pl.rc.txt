@@ -350,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 16		"Ciągłe"
 18		"raz(y)"
 19		"Przejście do początku po zakończeniu"
-20		"Strumień wyjściowy"
+20		"Window size"
 21		"Rozmiar okna:"
 23		"Współczynnik automatycznego dopasowania:"
 27		"Kontrola"

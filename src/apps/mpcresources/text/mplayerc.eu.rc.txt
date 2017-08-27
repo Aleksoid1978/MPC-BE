@@ -350,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 16		"Berregin etengabe"
 18		"denbora(k)"
 19		"Atzerabildu irakurketa egindakoan"
-20		"Irteera"
+20		"Window size"
 21		"Berez-zooma:"
 23		"Berez finkatze ezaugarria:"
 27		"Kontrola"

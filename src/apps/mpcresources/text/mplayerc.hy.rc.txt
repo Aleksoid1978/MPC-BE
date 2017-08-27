@@ -350,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 16		"Անվերջ կրկնել"
 18		"անգամ"
 19		"Վերափաթաթել վերջում"
-20		"Արտածում"
+20		"Window size"
 21		"Չափը."
 23		"Auto fit factor:"
 27		"Control"

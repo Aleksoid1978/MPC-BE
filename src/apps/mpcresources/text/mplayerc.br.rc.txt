@@ -350,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 16		"Repetir sempre"
 18		"vez (vezes)"
 19		"Voltar ao inicio quando terminar"
-20		"Saída"
+20		"Window size"
 21		"Zoom automático:"
 23		"Auto fit factor:"
 27		"Control"

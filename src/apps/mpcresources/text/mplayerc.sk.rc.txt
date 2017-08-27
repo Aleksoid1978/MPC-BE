@@ -350,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 16		"Opakovať dookola"
 18		"krát"
 19		"Po prehratí previnúť"
-20		"Výstup"
+20		"Window size"
 21		"Automatické priblíženie:"
 23		"Auto fit factor:"
 27		"Control"

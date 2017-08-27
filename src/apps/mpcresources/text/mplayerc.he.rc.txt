@@ -350,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 16		"חזרה ללא הפסק"
 18		"מספר פעמים"
 19		"החזר אחורה כאשר ניגון מסתיים"
-20		"פלט"
+20		"Window size"
 21		"זום אוטומטי:"
 23		"Auto fit factor:"
 27		"Control"

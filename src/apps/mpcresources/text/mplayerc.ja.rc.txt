@@ -350,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 16		"連続再生"
 18		"回"
 19		"再生後に巻き戻す"
-20		"出力"
+20		"Window size"
 21		"自動拡大:"
 23		"自動調整係数:"
 27		"コントロール"

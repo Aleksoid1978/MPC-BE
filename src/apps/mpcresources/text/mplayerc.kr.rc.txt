@@ -350,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 16		"계속 반복"
 18		"번 재생"
 19		"재생이 끝나면 처음으로 되감기"
-20		"출력"
+20		"Window size"
 21		"자동 확대:"
 23		"Auto fit factor:"
 27		"Control"
