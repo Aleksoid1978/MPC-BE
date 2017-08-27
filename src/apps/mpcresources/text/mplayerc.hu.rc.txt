@@ -350,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 16		"Végtelenített ismétlés"
 18		"alkalommal"
 19		"Lejátszás után visszatekerés"
-20		"Kép"
+20		"Window size"
 21		"Automatikus nagyítás:"
 23		"Auto fit factor:"
 27		"Control"

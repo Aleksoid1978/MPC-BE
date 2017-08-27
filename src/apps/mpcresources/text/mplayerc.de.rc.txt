@@ -350,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 16		"&Endlosschleife"
 18		"Mal ab"
 19		"Am Ende &zurückspringen"
-20		"Standardansicht"
+20		"Window size"
 21		"Z&oom verwenden:"
 23		"In Desktop einpassen mit:"
 27		"Steuerungskontrolle"

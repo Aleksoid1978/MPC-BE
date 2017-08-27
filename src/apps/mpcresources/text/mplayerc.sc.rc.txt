@@ -350,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 16		"循环播放"
 18		"次"
 19		"播放结束时返回至头部"
-20		"输出"
+20		"Window size"
 21		"自动缩放: "
 23		"自动适应因数:"
 27		"控制"

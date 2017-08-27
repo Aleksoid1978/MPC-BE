@@ -350,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 16		"Repetă la nesfârșit"
 18		"dată(ori)"
 19		"Derulează la început la terminarea redării"
-20		"Ieșire"
+20		"Window size"
 21		"Auto-zoom:"
 23		"Auto fit factor:"
 27		"Control"

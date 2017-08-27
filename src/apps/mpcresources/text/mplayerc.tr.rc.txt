@@ -350,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 16		"Sürekli tekrarla"
 18		"kez oynat"
 19		"Oynatma bitince geri sar"
-20		"Çıkış"
+20		"Window size"
 21		"Otomatik büyütme:"
 23		"Oto sığdırma faktörü:"
 27		"Kontrol"

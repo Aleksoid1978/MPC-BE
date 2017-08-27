@@ -350,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 16		"Паўтараць бясконца"
 18		"разоў"
 19		"Пераматаць у канцы"
-20		"Вывад"
+20		"Window size"
 21		"Аўтамаштаб:"
 23		"Auto fit factor:"
 27		"Control"

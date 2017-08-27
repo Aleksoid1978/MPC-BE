@@ -350,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 16		"Repeat forever"
 18		"time(s)"
 19		"Rewind when done playing"
-20		"Output"
+20		"Window size"
 21		"Auto-zoom:"
 23		"Auto fit factor:"
 27		"Control"
