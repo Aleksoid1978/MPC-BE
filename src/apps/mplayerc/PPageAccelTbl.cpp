@@ -1016,7 +1016,7 @@ void CPPageAccelTbl::OnCustomdrawList ( NMHDR* pNMHDR, LRESULT* pResult )
 			pLVCD->clrTextBk = RGB(255, 130, 120);
 		}
 		else {
-			pLVCD->clrTextBk = RGB(255, 255, 255);
+			pLVCD->clrTextBk = GetSysColor(COLOR_WINDOW);
 		}
 
 		*pResult = CDRF_DODEFAULT;
