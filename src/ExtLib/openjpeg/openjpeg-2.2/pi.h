@@ -35,8 +35,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __PI_H
-#define __PI_H
+#ifndef OPJ_PI_H
+#define OPJ_PI_H
 /**
 @file pi.h
 @brief Implementation of a packet iterator (PI)
@@ -75,6 +75,8 @@ typedef struct opj_pi_iterator {
     OPJ_BYTE tp_on;
     /** precise if the packet has been already used (useful for progression order change) */
     OPJ_INT16 *include;
+    /** Number of elements in include array */
+    OPJ_UINT32 include_size;
     /** layer step used to localize the packet in the include vector */
     OPJ_UINT32 step_l;
     /** resolution step used to localize the packet in the include vector */
@@ -185,4 +187,4 @@ OPJ_BOOL opj_pi_next(opj_pi_iterator_t * pi);
 
 /*@}*/
 
-#endif /* __PI_H */
+#endif /* OPJ_PI_H */

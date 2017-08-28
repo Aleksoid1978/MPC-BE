@@ -11,7 +11,7 @@ Updated libraries:
 	libpng git-v1.6.31beta04-5-gcd3721018;
 	Little-CMS git-lcms2.8-86-gd1652a0;
 	MediaInfo git-v0.7.98-2-g3436139b;
-	openjpeg 2.2.0 git-6239ed7b;
+	openjpeg git-v2.2.0-53-g4776b15f;
 	Speex-1.2.0-1-gcae5026;
 	rapidjson git-v1.1.0-199-g6a8f672c;
 	ZenLib git-v0.4.36;

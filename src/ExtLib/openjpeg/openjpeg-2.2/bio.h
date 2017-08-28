@@ -35,8 +35,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __BIO_H
-#define __BIO_H
+#ifndef OPJ_BIO_H
+#define OPJ_BIO_H
 
 #include <stddef.h> /* ptrdiff_t */
 
@@ -130,5 +130,5 @@ OPJ_BOOL opj_bio_inalign(opj_bio_t *bio);
 
 /*@}*/
 
-#endif /* __BIO_H */
+#endif /* OPJ_BIO_H */
 

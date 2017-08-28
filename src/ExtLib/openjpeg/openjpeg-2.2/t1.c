@@ -184,12 +184,18 @@ Decode 1 code-block
 @param orient
 @param roishift Region of interest shifting value
 @param cblksty Code-block style
+@param p_manager the event manager
+@param p_manager_mutex mutex for the event manager
+@param check_pterm whether PTERM correct termination should be checked
 */
 static OPJ_BOOL opj_t1_decode_cblk(opj_t1_t *t1,
                                    opj_tcd_cblk_dec_t* cblk,
                                    OPJ_UINT32 orient,
                                    OPJ_UINT32 roishift,
-                                   OPJ_UINT32 cblksty);
+                                   OPJ_UINT32 cblksty,
+                                   opj_event_mgr_t *p_manager,
+                                   opj_mutex_t* p_manager_mutex,
+                                   OPJ_BOOL check_pterm);
 
 static OPJ_BOOL opj_t1_allocate_buffers(opj_t1_t *t1,
                                         OPJ_UINT32 w,
@@ -1598,6 +1604,8 @@ void opj_t1_destroy(opj_t1_t *p_t1)
         p_t1->flags = 00;
     }
 
+    opj_free(p_t1->cblkdatabuffer);
+
     opj_free(p_t1);
 }
 
@@ -1607,7 +1615,11 @@ typedef struct {
     opj_tcd_band_t* band;
     opj_tcd_tilecomp_t* tilec;
     opj_tccp_t* tccp;
+    OPJ_BOOL mustuse_cblkdatabuffer;
     volatile OPJ_BOOL* pret;
+    opj_event_mgr_t *p_manager;
+    opj_mutex_t* p_manager_mutex;
+    OPJ_BOOL check_pterm;
 } opj_t1_cblk_decode_processing_job_t;
 
 static void opj_t1_destroy_wrapper(void* t1)
@@ -1648,13 +1660,17 @@ static void opj_t1_clbl_decode_processor(void* user_data, opj_tls_t* tls)
         t1 = opj_t1_create(OPJ_FALSE);
         opj_tls_set(tls, OPJ_TLS_KEY_T1, t1, opj_t1_destroy_wrapper);
     }
+    t1->mustuse_cblkdatabuffer = job->mustuse_cblkdatabuffer;
 
     if (OPJ_FALSE == opj_t1_decode_cblk(
                 t1,
                 cblk,
                 band->bandno,
                 (OPJ_UINT32)tccp->roishift,
-                tccp->cblksty)) {
+                tccp->cblksty,
+                job->p_manager,
+                job->p_manager_mutex,
+                job->check_pterm)) {
         *(job->pret) = OPJ_FALSE;
         opj_free(job);
         return;
@@ -1676,14 +1692,22 @@ static void opj_t1_clbl_decode_processor(void* user_data, opj_tls_t* tls)
     cblk_h = t1->h;
 
     if (tccp->roishift) {
-        OPJ_INT32 thresh = 1 << tccp->roishift;
-        for (j = 0; j < cblk_h; ++j) {
-            for (i = 0; i < cblk_w; ++i) {
-                OPJ_INT32 val = datap[(j * cblk_w) + i];
-                OPJ_INT32 mag = abs(val);
-                if (mag >= thresh) {
-                    mag >>= tccp->roishift;
-                    datap[(j * cblk_w) + i] = val < 0 ? -mag : mag;
+        if (tccp->roishift >= 31) {
+            for (j = 0; j < cblk_h; ++j) {
+                for (i = 0; i < cblk_w; ++i) {
+                    datap[(j * cblk_w) + i] = 0;
+                }
+            }
+        } else {
+            OPJ_INT32 thresh = 1 << tccp->roishift;
+            for (j = 0; j < cblk_h; ++j) {
+                for (i = 0; i < cblk_w; ++i) {
+                    OPJ_INT32 val = datap[(j * cblk_w) + i];
+                    OPJ_INT32 mag = abs(val);
+                    if (mag >= thresh) {
+                        mag >>= tccp->roishift;
+                        datap[(j * cblk_w) + i] = val < 0 ? -mag : mag;
+                    }
                 }
             }
         }
@@ -1727,12 +1751,16 @@ static void opj_t1_clbl_decode_processor(void* user_data, opj_tls_t* tls)
 }
 
 
-void opj_t1_decode_cblks(opj_thread_pool_t* tp,
+void opj_t1_decode_cblks(opj_tcd_t* tcd,
                          volatile OPJ_BOOL* pret,
                          opj_tcd_tilecomp_t* tilec,
-                         opj_tccp_t* tccp
+                         opj_tccp_t* tccp,
+                         opj_event_mgr_t *p_manager,
+                         opj_mutex_t* p_manager_mutex,
+                         OPJ_BOOL check_pterm
                         )
 {
+    opj_thread_pool_t* tp = tcd->thread_pool;
     OPJ_UINT32 resno, bandno, precno, cblkno;
 
     for (resno = 0; resno < tilec->minimum_num_resolutions; ++resno) {
@@ -1743,10 +1771,62 @@ void opj_t1_decode_cblks(opj_thread_pool_t* tp,
 
             for (precno = 0; precno < res->pw * res->ph; ++precno) {
                 opj_tcd_precinct_t* precinct = &band->precincts[precno];
+                OPJ_BOOL skip_precinct = OPJ_FALSE;
+
+                if (!opj_tcd_is_subband_area_of_interest(tcd,
+                        tilec->compno,
+                        resno,
+                        band->bandno,
+                        (OPJ_UINT32)precinct->x0,
+                        (OPJ_UINT32)precinct->y0,
+                        (OPJ_UINT32)precinct->x1,
+                        (OPJ_UINT32)precinct->y1)) {
+                    skip_precinct = OPJ_TRUE;
+                    /* TODO: do a continue here once the below 0 initialization */
+                    /* of tiledp is removed */
+                }
 
                 for (cblkno = 0; cblkno < precinct->cw * precinct->ch; ++cblkno) {
                     opj_tcd_cblk_dec_t* cblk = &precinct->cblks.dec[cblkno];
                     opj_t1_cblk_decode_processing_job_t* job;
+
+                    if (skip_precinct ||
+                            !opj_tcd_is_subband_area_of_interest(tcd,
+                                    tilec->compno,
+                                    resno,
+                                    band->bandno,
+                                    (OPJ_UINT32)cblk->x0,
+                                    (OPJ_UINT32)cblk->y0,
+                                    (OPJ_UINT32)cblk->x1,
+                                    (OPJ_UINT32)cblk->y1)) {
+
+                        /* TODO: remove this once we don't iterate over */
+                        /* tile pixels that are not in the subwindow of interest */
+                        OPJ_UINT32 j;
+                        OPJ_INT32 x = cblk->x0 - band->x0;
+                        OPJ_INT32 y = cblk->y0 - band->y0;
+                        OPJ_INT32* OPJ_RESTRICT tiledp;
+                        OPJ_UINT32 tile_w = (OPJ_UINT32)(tilec->x1 - tilec->x0);
+                        OPJ_UINT32 cblk_w = (OPJ_UINT32)(cblk->x1 - cblk->x0);
+                        OPJ_UINT32 cblk_h = (OPJ_UINT32)(cblk->y1 - cblk->y0);
+
+                        if (band->bandno & 1) {
+                            opj_tcd_resolution_t* pres = &tilec->resolutions[resno - 1];
+                            x += pres->x1 - pres->x0;
+                        }
+                        if (band->bandno & 2) {
+                            opj_tcd_resolution_t* pres = &tilec->resolutions[resno - 1];
+                            y += pres->y1 - pres->y0;
+                        }
+
+                        tiledp = &tilec->data[(OPJ_UINT32)y * tile_w +
+                                                            (OPJ_UINT32)x];
+
+                        for (j = 0; j < cblk_h; ++j) {
+                            memset(tiledp + j * tile_w, 0, cblk_w * sizeof(OPJ_INT32));
+                        }
+                        continue;
+                    }
 
                     job = (opj_t1_cblk_decode_processing_job_t*) opj_calloc(1,
                             sizeof(opj_t1_cblk_decode_processing_job_t));
@@ -1760,6 +1840,10 @@ void opj_t1_decode_cblks(opj_thread_pool_t* tp,
                     job->tilec = tilec;
                     job->tccp = tccp;
                     job->pret = pret;
+                    job->p_manager_mutex = p_manager_mutex;
+                    job->p_manager = p_manager;
+                    job->check_pterm = check_pterm;
+                    job->mustuse_cblkdatabuffer = opj_thread_pool_get_thread_count(tp) > 1;
                     opj_thread_pool_submit_job(tp, opj_t1_clbl_decode_processor, job);
                     if (!(*pret)) {
                         return;
@@ -1777,13 +1861,18 @@ static OPJ_BOOL opj_t1_decode_cblk(opj_t1_t *t1,
                                    opj_tcd_cblk_dec_t* cblk,
                                    OPJ_UINT32 orient,
                                    OPJ_UINT32 roishift,
-                                   OPJ_UINT32 cblksty)
+                                   OPJ_UINT32 cblksty,
+                                   opj_event_mgr_t *p_manager,
+                                   opj_mutex_t* p_manager_mutex,
+                                   OPJ_BOOL check_pterm)
 {
     opj_mqc_t *mqc = &(t1->mqc);   /* MQC component */
 
     OPJ_INT32 bpno_plus_one;
     OPJ_UINT32 passtype;
     OPJ_UINT32 segno, passno;
+    OPJ_BYTE* cblkdata = NULL;
+    OPJ_UINT32 cblkdataindex = 0;
     OPJ_BYTE type = T1_TYPE_MQ; /* BYPASS mode */
 
     mqc->lut_ctxno_zc_orient = lut_ctxno_zc + (orient << 9);
@@ -1796,6 +1885,18 @@ static OPJ_BOOL opj_t1_decode_cblk(opj_t1_t *t1,
     }
 
     bpno_plus_one = (OPJ_INT32)(roishift + cblk->numbps);
+    if (bpno_plus_one >= 31) {
+        if (p_manager_mutex) {
+            opj_mutex_lock(p_manager_mutex);
+        }
+        opj_event_msg(p_manager, EVT_WARNING,
+                      "opj_t1_decode_cblk(): unsupported bpno_plus_one = %d >= 31\n",
+                      bpno_plus_one);
+        if (p_manager_mutex) {
+            opj_mutex_unlock(p_manager_mutex);
+        }
+        return OPJ_FALSE;
+    }
     passtype = 2;
 
     opj_mqc_resetstates(mqc);
@@ -1803,23 +1904,57 @@ static OPJ_BOOL opj_t1_decode_cblk(opj_t1_t *t1,
     opj_mqc_setstate(mqc, T1_CTXNO_AGG, 0, 3);
     opj_mqc_setstate(mqc, T1_CTXNO_ZC, 0, 4);
 
+    /* Even if we have a single chunk, in multi-threaded decoding */
+    /* the insertion of our synthetic marker might potentially override */
+    /* valid codestream of other codeblocks decoded in parallel. */
+    if (cblk->numchunks > 1 || t1->mustuse_cblkdatabuffer) {
+        OPJ_UINT32 i;
+        OPJ_UINT32 cblk_len;
+
+        /* Compute whole codeblock length from chunk lengths */
+        cblk_len = 0;
+        for (i = 0; i < cblk->numchunks; i++) {
+            cblk_len += cblk->chunks[i].len;
+        }
+
+        /* Allocate temporary memory if needed */
+        if (cblk_len + OPJ_COMMON_CBLK_DATA_EXTRA > t1->cblkdatabuffersize) {
+            cblkdata = (OPJ_BYTE*)opj_realloc(t1->cblkdatabuffer,
+                                              cblk_len + OPJ_COMMON_CBLK_DATA_EXTRA);
+            if (cblkdata == NULL) {
+                return OPJ_FALSE;
+            }
+            t1->cblkdatabuffer = cblkdata;
+            memset(t1->cblkdatabuffer + cblk_len, 0, OPJ_COMMON_CBLK_DATA_EXTRA);
+            t1->cblkdatabuffersize = cblk_len + OPJ_COMMON_CBLK_DATA_EXTRA;
+        }
+
+        /* Concatenate all chunks */
+        cblkdata = t1->cblkdatabuffer;
+        cblk_len = 0;
+        for (i = 0; i < cblk->numchunks; i++) {
+            memcpy(cblkdata + cblk_len, cblk->chunks[i].data, cblk->chunks[i].len);
+            cblk_len += cblk->chunks[i].len;
+        }
+    } else if (cblk->numchunks == 1) {
+        cblkdata = cblk->chunks[0].data;
+    }
+
     for (segno = 0; segno < cblk->real_num_segs; ++segno) {
         opj_tcd_seg_t *seg = &cblk->segs[segno];
 
         /* BYPASS mode */
         type = ((bpno_plus_one <= ((OPJ_INT32)(cblk->numbps)) - 4) && (passtype < 2) &&
                 (cblksty & J2K_CCP_CBLKSTY_LAZY)) ? T1_TYPE_RAW : T1_TYPE_MQ;
-        /* FIXME: slviewer gets here with a null pointer. Why? Partially downloaded and/or corrupt textures? */
-        if (seg->data == 00) {
-            continue;
-        }
+
         if (type == T1_TYPE_RAW) {
-            opj_mqc_raw_init_dec(mqc, (*seg->data) + seg->dataindex, seg->len,
+            opj_mqc_raw_init_dec(mqc, cblkdata + cblkdataindex, seg->len,
                                  OPJ_COMMON_CBLK_DATA_EXTRA);
         } else {
-            opj_mqc_init_dec(mqc, (*seg->data) + seg->dataindex, seg->len,
+            opj_mqc_init_dec(mqc, cblkdata + cblkdataindex, seg->len,
                              OPJ_COMMON_CBLK_DATA_EXTRA);
         }
+        cblkdataindex += seg->len;
 
         for (passno = 0; (passno < seg->real_num_passes) &&
                 (bpno_plus_one >= 1); ++passno) {
@@ -1856,6 +1991,32 @@ static OPJ_BOOL opj_t1_decode_cblk(opj_t1_t *t1,
         }
 
         opq_mqc_finish_dec(mqc);
+    }
+
+    if (check_pterm) {
+        if (mqc->bp + 2 < mqc->end) {
+            if (p_manager_mutex) {
+                opj_mutex_lock(p_manager_mutex);
+            }
+            opj_event_msg(p_manager, EVT_WARNING,
+                          "PTERM check failure: %d remaining bytes in code block (%d used / %d)\n",
+                          (int)(mqc->end - mqc->bp) - 2,
+                          (int)(mqc->bp - mqc->start),
+                          (int)(mqc->end - mqc->start));
+            if (p_manager_mutex) {
+                opj_mutex_unlock(p_manager_mutex);
+            }
+        } else if (mqc->end_of_byte_stream_counter > 2) {
+            if (p_manager_mutex) {
+                opj_mutex_lock(p_manager_mutex);
+            }
+            opj_event_msg(p_manager, EVT_WARNING,
+                          "PTERM check failure: %d synthetized 0xFF markers read\n",
+                          mqc->end_of_byte_stream_counter);
+            if (p_manager_mutex) {
+                opj_mutex_unlock(p_manager_mutex);
+            }
+        }
     }
 
     return OPJ_TRUE;
@@ -2047,6 +2208,10 @@ static void opj_t1_encode_cblk(opj_t1_t *t1,
 
     cblk->numbps = max ? (OPJ_UINT32)((opj_int_floorlog2(max) + 1) -
                                       T1_NMSEDEC_FRACBITS) : 0;
+    if (cblk->numbps == 0) {
+        cblk->totalpasses = 0;
+        return;
+    }
 
     bpno = (OPJ_INT32)(cblk->numbps - 1);
     passtype = 2;

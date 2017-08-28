@@ -37,8 +37,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MCT_H
-#define __MCT_H
+#ifndef OPJ_MCT_H
+#define OPJ_MCT_H
 /**
 @file mct.h
 @brief Implementation of a multi-component transforms (MCT)
@@ -156,4 +156,4 @@ const OPJ_FLOAT64 * opj_mct_get_mct_norms_real(void);
 
 /*@}*/
 
-#endif /* __MCT_H */
+#endif /* OPJ_MCT_H */

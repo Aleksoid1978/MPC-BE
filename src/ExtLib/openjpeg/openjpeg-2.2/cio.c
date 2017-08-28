@@ -496,6 +496,26 @@ OPJ_OFF_T opj_stream_read_skip(opj_stream_private_t * p_stream,
     }
 
     while (p_size > 0) {
+        /* Check if we are going beyond the end of file. Most skip_fn do not */
+        /* check that, but we must be careful not to advance m_byte_offset */
+        /* beyond m_user_data_length, otherwise */
+        /* opj_stream_get_number_byte_left() will assert. */
+        if ((OPJ_UINT64)(p_stream->m_byte_offset + l_skip_nb_bytes + p_size) >
+                p_stream->m_user_data_length) {
+            opj_event_msg(p_event_mgr, EVT_INFO, "Stream reached its end !\n");
+
+            p_stream->m_byte_offset += l_skip_nb_bytes;
+            l_skip_nb_bytes = (OPJ_OFF_T)(p_stream->m_user_data_length -
+                                          (OPJ_UINT64)p_stream->m_byte_offset);
+
+            opj_stream_read_seek(p_stream, (OPJ_OFF_T)p_stream->m_user_data_length,
+                                 p_event_mgr);
+            p_stream->m_status |= OPJ_STREAM_STATUS_END;
+
+            /* end if stream */
+            return l_skip_nb_bytes ? l_skip_nb_bytes : (OPJ_OFF_T) - 1;
+        }
+
         /* we should do an actual skip on the media */
         l_current_skip_nb_bytes = p_stream->m_skip_fn(p_size, p_stream->m_user_data);
         if (l_current_skip_nb_bytes == (OPJ_OFF_T) - 1) {

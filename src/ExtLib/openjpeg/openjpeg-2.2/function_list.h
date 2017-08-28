@@ -29,8 +29,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __FUNCTION_LIST_H
-#define __FUNCTION_LIST_H
+#ifndef OPJ_FUNCTION_LIST_H
+#define OPJ_FUNCTION_LIST_H
 
 /**
  * @file function_list.h
@@ -91,6 +91,7 @@ void  opj_procedure_list_destroy(opj_procedure_list_t * p_list);
  *
  * @param   p_validation_list the list of procedure to modify.
  * @param   p_procedure     the procedure to add.
+ * @param   p_manager the user event manager.
  *
  * @return  OPJ_TRUE if the procedure could be added.
  */
@@ -129,5 +130,5 @@ opj_procedure* opj_procedure_list_get_first_procedure(opj_procedure_list_t *
 void opj_procedure_list_clear(opj_procedure_list_t * p_validation_list);
 /*@}*/
 
-#endif /* __FUNCTION_LIST_H */
+#endif /* OPJ_FUNCTION_LIST_H */
 

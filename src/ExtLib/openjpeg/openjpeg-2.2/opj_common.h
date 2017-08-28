@@ -36,7 +36,6 @@
    Common constants shared among several modules
  ==========================================================
 */
-#define OPJ_COMMON_DEFAULT_CBLK_DATA_SIZE 8192
 #define OPJ_COMMON_CBLK_DATA_EXTRA        2    /**< Margin for a fake FFFF marker */
 
 #endif /* OPJ_COMMMON_H */

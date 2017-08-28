@@ -29,8 +29,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __INVERT_H
-#define __INVERT_H
+#ifndef OPJ_INVERT_H
+#define OPJ_INVERT_H
 /**
 @file invert.h
 @brief Implementation of the matrix inversion
@@ -50,7 +50,7 @@ The function in INVERT.H compute a matrix inversion with a LUP method
  *
  * @param pSrcMatrix    the matrix to invert.
  * @param pDestMatrix   data to store the inverted matrix.
- * @param n size of the matrix
+ * @param nb_compo      size of the matrix
  * @return OPJ_TRUE if the inversion is successful, OPJ_FALSE if the matrix is singular.
  */
 OPJ_BOOL opj_matrix_inversion_f(OPJ_FLOAT32 * pSrcMatrix,
@@ -61,4 +61,4 @@ OPJ_BOOL opj_matrix_inversion_f(OPJ_FLOAT32 * pSrcMatrix,
 
 /*@}*/
 
-#endif /* __INVERT_H */
+#endif /* OPJ_INVERT_H */

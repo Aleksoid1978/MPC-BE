@@ -1007,3 +1007,17 @@ opj_stream_t* OPJ_CALLCONV opj_stream_create_file_stream(
 
     return l_stream;
 }
+
+
+void* OPJ_CALLCONV opj_image_data_alloc(OPJ_SIZE_T size)
+{
+    void* ret = opj_aligned_malloc(size);
+    /* printf("opj_image_data_alloc %p\n", ret); */
+    return ret;
+}
+
+void OPJ_CALLCONV opj_image_data_free(void* ptr)
+{
+    /* printf("opj_image_data_free %p\n", ptr); */
+    opj_aligned_free(ptr);
+}

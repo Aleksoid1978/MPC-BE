@@ -29,8 +29,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __OPJ_CODEC_H
-#define __OPJ_CODEC_H
+#ifndef OPJ_CODEC_H
+#define OPJ_CODEC_H
 /**
 @file opj_codec.h
 */
@@ -162,5 +162,5 @@ typedef struct opj_codec_private {
 opj_codec_private_t;
 
 
-#endif /* __OPJ_CODEC_H */
+#endif /* OPJ_CODEC_H */
 

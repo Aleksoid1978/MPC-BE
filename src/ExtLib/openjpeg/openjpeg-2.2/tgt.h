@@ -38,8 +38,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __TGT_H
-#define __TGT_H
+#ifndef OPJ_TGT_H
+#define OPJ_TGT_H
 /**
 @file tgt.h
 @brief Implementation of a tag-tree coder (TGT)
@@ -80,10 +80,11 @@ typedef struct opj_tgt_tree {
 Create a tag-tree
 @param numleafsh Width of the array of leafs of the tree
 @param numleafsv Height of the array of leafs of the tree
+@param p_manager the event manager
 @return Returns a new tag-tree if successful, returns NULL otherwise
 */
 opj_tgt_tree_t *opj_tgt_create(OPJ_UINT32 numleafsh, OPJ_UINT32 numleafsv,
-                               opj_event_mgr_t *manager);
+                               opj_event_mgr_t *p_manager);
 
 /**
  * Reinitialises a tag-tree from an exixting one.
@@ -144,4 +145,4 @@ OPJ_UINT32 opj_tgt_decode(opj_bio_t *bio,
 
 /*@}*/
 
-#endif /* __TGT_H */
+#endif /* OPJ_TGT_H */

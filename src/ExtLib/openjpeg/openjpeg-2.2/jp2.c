@@ -268,10 +268,14 @@ static OPJ_BOOL opj_jp2_write_jp(opj_jp2_t *jp2,
 
 /**
 Apply collected palette data
-@param color Collector for profile, cdef and pclr data
-@param image
+@param image Image.
+@param color Collector for profile, cdef and pclr data.
+@param p_manager the user event manager.
+@return true in case of success
 */
-static void opj_jp2_apply_pclr(opj_image_t *image, opj_jp2_color_t *color);
+static OPJ_BOOL opj_jp2_apply_pclr(opj_image_t *image,
+                                   opj_jp2_color_t *color,
+                                   opj_event_mgr_t * p_manager);
 
 static void opj_jp2_free_pclr(opj_jp2_color_t *color);
 
@@ -353,7 +357,7 @@ static OPJ_BOOL opj_jp2_read_header_procedure(opj_jp2_t *jp2,
         opj_event_mgr_t * p_manager);
 
 /**
- * Excutes the given procedures on the given codec.
+ * Executes the given procedures on the given codec.
  *
  * @param   p_procedure_list    the list of procedures to execute
  * @param   jp2                 the jpeg2000 file codec to execute the procedures on.
@@ -383,7 +387,7 @@ static OPJ_BOOL opj_jp2_read_boxhdr(opj_jp2_box_t *box,
                                     opj_event_mgr_t * p_manager);
 
 /**
- * Sets up the validation ,i.e. adds the procedures to lauch to make sure the codec parameters
+ * Sets up the validation ,i.e. adds the procedures to launch to make sure the codec parameters
  * are valid. Developpers wanting to extend the library can add their own validation procedures.
  */
 static OPJ_BOOL opj_jp2_setup_encoding_validation(opj_jp2_t *jp2,
@@ -452,7 +456,7 @@ static OPJ_BOOL opj_jp2_read_boxhdr_char(opj_jp2_box_t *box,
         opj_event_mgr_t * p_manager);
 
 /**
- * Sets up the validation ,i.e. adds the procedures to lauch to make sure the codec parameters
+ * Sets up the validation ,i.e. adds the procedures to launch to make sure the codec parameters
  * are valid. Developpers wanting to extend the library can add their own validation procedures.
  */
 static OPJ_BOOL opj_jp2_setup_decoding_validation(opj_jp2_t *jp2,
@@ -614,6 +618,11 @@ static OPJ_BOOL opj_jp2_read_ihdr(opj_jp2_t *jp2,
     ++ p_image_header_data;
     opj_read_bytes(p_image_header_data, &(jp2->IPR), 1);        /* IPR */
     ++ p_image_header_data;
+
+    jp2->j2k->m_cp.allow_different_bit_depth_sign = (jp2->bpc == 255);
+    jp2->j2k->ihdr_w = jp2->w;
+    jp2->j2k->ihdr_h = jp2->h;
+    jp2->has_ihdr = 1;
 
     return OPJ_TRUE;
 }
@@ -949,20 +958,34 @@ static OPJ_BOOL opj_jp2_check_color(opj_image_t *image, opj_jp2_color_t *color,
         }
         /* verify that no component is targeted more than once */
         for (i = 0; i < nr_channels; i++) {
-            OPJ_UINT16 pcol = cmap[i].pcol;
-            assert(cmap[i].mtyp == 0 || cmap[i].mtyp == 1);
-            if (pcol >= nr_channels) {
+            OPJ_BYTE mtyp = cmap[i].mtyp;
+            OPJ_BYTE pcol = cmap[i].pcol;
+            /* See ISO 15444-1 Table I.14 – MTYPi field values */
+            if (mtyp != 0 && mtyp != 1) {
+                opj_event_msg(p_manager, EVT_ERROR,
+                              "Invalid value for cmap[%d].mtyp = %d.\n", i,
+                              mtyp);
+                is_sane = OPJ_FALSE;
+            } else if (pcol >= nr_channels) {
                 opj_event_msg(p_manager, EVT_ERROR,
                               "Invalid component/palette index for direct mapping %d.\n", pcol);
                 is_sane = OPJ_FALSE;
-            } else if (pcol_usage[pcol] && cmap[i].mtyp == 1) {
+            } else if (pcol_usage[pcol] && mtyp == 1) {
                 opj_event_msg(p_manager, EVT_ERROR, "Component %d is mapped twice.\n", pcol);
                 is_sane = OPJ_FALSE;
-            } else if (cmap[i].mtyp == 0 && cmap[i].pcol != 0) {
+            } else if (mtyp == 0 && pcol != 0) {
                 /* I.5.3.5 PCOL: If the value of the MTYP field for this channel is 0, then
                  * the value of this field shall be 0. */
                 opj_event_msg(p_manager, EVT_ERROR, "Direct use at #%d however pcol=%d.\n", i,
                               pcol);
+                is_sane = OPJ_FALSE;
+            } else if (mtyp == 1 && pcol != i) {
+                /* OpenJPEG implementation limitation. See assert(i == pcol); */
+                /* in opj_jp2_apply_pclr() */
+                opj_event_msg(p_manager, EVT_ERROR,
+                              "Implementation limitation: for palette mapping, "
+                              "pcol[%d] should be equal to %d, but is equal "
+                              "to %d.\n", i, i, pcol);
                 is_sane = OPJ_FALSE;
             } else {
                 pcol_usage[pcol] = OPJ_TRUE;
@@ -1004,7 +1027,9 @@ static OPJ_BOOL opj_jp2_check_color(opj_image_t *image, opj_jp2_color_t *color,
 }
 
 /* file9.jp2 */
-static void opj_jp2_apply_pclr(opj_image_t *image, opj_jp2_color_t *color)
+static OPJ_BOOL opj_jp2_apply_pclr(opj_image_t *image,
+                                   opj_jp2_color_t *color,
+                                   opj_event_mgr_t * p_manager)
 {
     opj_image_comp_t *old_comps, *new_comps;
     OPJ_BYTE *channel_size, *channel_sign;
@@ -1021,13 +1046,23 @@ static void opj_jp2_apply_pclr(opj_image_t *image, opj_jp2_color_t *color)
     cmap = color->jp2_pclr->cmap;
     nr_channels = color->jp2_pclr->nr_channels;
 
+    for (i = 0; i < nr_channels; ++i) {
+        /* Palette mapping: */
+        cmp = cmap[i].cmp;
+        if (image->comps[cmp].data == NULL) {
+            opj_event_msg(p_manager, EVT_ERROR,
+                          "image->comps[%d].data == NULL in opj_jp2_apply_pclr().\n", i);
+            return OPJ_FALSE;
+        }
+    }
+
     old_comps = image->comps;
     new_comps = (opj_image_comp_t*)
                 opj_malloc(nr_channels * sizeof(opj_image_comp_t));
     if (!new_comps) {
-        /* FIXME no error code for opj_jp2_apply_pclr */
-        /* FIXME event manager error callback */
-        return;
+        opj_event_msg(p_manager, EVT_ERROR,
+                      "Memory allocation failure in opj_jp2_apply_pclr().\n");
+        return OPJ_FALSE;
     }
     for (i = 0; i < nr_channels; ++i) {
         pcol = cmap[i].pcol;
@@ -1044,13 +1079,16 @@ static void opj_jp2_apply_pclr(opj_image_t *image, opj_jp2_color_t *color)
 
         /* Palette mapping: */
         new_comps[i].data = (OPJ_INT32*)
-                            opj_malloc(old_comps[cmp].w * old_comps[cmp].h * sizeof(OPJ_INT32));
+                            opj_image_data_alloc(old_comps[cmp].w * old_comps[cmp].h * sizeof(OPJ_INT32));
         if (!new_comps[i].data) {
+            while (i > 0) {
+                -- i;
+                opj_free(new_comps[i].data);
+            }
             opj_free(new_comps);
-            new_comps = NULL;
-            /* FIXME no error code for opj_jp2_apply_pclr */
-            /* FIXME event manager error callback */
-            return;
+            opj_event_msg(p_manager, EVT_ERROR,
+                          "Memory allocation failure in opj_jp2_apply_pclr().\n");
+            return OPJ_FALSE;
         }
         new_comps[i].prec = channel_size[i];
         new_comps[i].sgnd = channel_sign[i];
@@ -1063,7 +1101,7 @@ static void opj_jp2_apply_pclr(opj_image_t *image, opj_jp2_color_t *color)
         cmp = cmap[i].cmp;
         pcol = cmap[i].pcol;
         src = old_comps[cmp].data;
-        assert(src);
+        assert(src); /* verified above */
         max = new_comps[pcol].w * new_comps[pcol].h;
 
         /* Direct use: */
@@ -1095,7 +1133,7 @@ static void opj_jp2_apply_pclr(opj_image_t *image, opj_jp2_color_t *color)
     max = image->numcomps;
     for (i = 0; i < max; ++i) {
         if (old_comps[i].data) {
-            opj_free(old_comps[i].data);
+            opj_image_data_free(old_comps[i].data);
         }
     }
 
@@ -1105,6 +1143,7 @@ static void opj_jp2_apply_pclr(opj_image_t *image, opj_jp2_color_t *color)
 
     opj_jp2_free_pclr(color);
 
+    return OPJ_TRUE;
 }/* apply_pclr() */
 
 static OPJ_BOOL opj_jp2_read_pclr(opj_jp2_t *jp2,
@@ -1548,6 +1587,9 @@ static OPJ_BOOL opj_jp2_read_colr(opj_jp2_t *jp2,
                       "COLR BOX meth value is not a regular value (%d), "
                       "so we will ignore the entire Colour Specification box. \n", jp2->meth);
     }
+    if (jp2->color.jp2_has_colr) {
+        jp2->j2k->enumcs = jp2->enumcs;
+    }
     return OPJ_TRUE;
 }
 
@@ -1592,7 +1634,9 @@ OPJ_BOOL opj_jp2_decode(opj_jp2_t *jp2,
             if (!jp2->color.jp2_pclr->cmap) {
                 opj_jp2_free_pclr(&(jp2->color));
             } else {
-                opj_jp2_apply_pclr(p_image, &(jp2->color));
+                if (!opj_jp2_apply_pclr(p_image, &(jp2->color), p_manager)) {
+                    return OPJ_FALSE;
+                }
             }
         }
 
@@ -2341,10 +2385,19 @@ static OPJ_BOOL opj_jp2_read_header_procedure(opj_jp2_t *jp2,
             jp2->jp2_state |= JP2_STATE_UNKNOWN;
             if (opj_stream_skip(stream, l_current_data_size,
                                 p_manager) != l_current_data_size) {
-                opj_event_msg(p_manager, EVT_ERROR,
-                              "Problem with skipping JPEG2000 box, stream error\n");
-                opj_free(l_current_data);
-                return OPJ_FALSE;
+                if (jp2->jp2_state & JP2_STATE_CODESTREAM) {
+                    /* If we already read the codestream, do not error out */
+                    /* Needed for data/input/nonregression/issue254.jp2 */
+                    opj_event_msg(p_manager, EVT_WARNING,
+                                  "Problem with skipping JPEG2000 box, stream error\n");
+                    opj_free(l_current_data);
+                    return OPJ_TRUE;
+                } else {
+                    opj_event_msg(p_manager, EVT_ERROR,
+                                  "Problem with skipping JPEG2000 box, stream error\n");
+                    opj_free(l_current_data);
+                    return OPJ_FALSE;
+                }
             }
         }
     }
@@ -2355,7 +2408,7 @@ static OPJ_BOOL opj_jp2_read_header_procedure(opj_jp2_t *jp2,
 }
 
 /**
- * Excutes the given procedures on the given codec.
+ * Executes the given procedures on the given codec.
  *
  * @param   p_procedure_list    the list of procedures to execute
  * @param   jp2                 the jpeg2000 file codec to execute the procedures on.
@@ -2697,6 +2750,7 @@ static OPJ_BOOL opj_jp2_read_jp2h(opj_jp2_t *jp2,
     }
 
     jp2->jp2_state |= JP2_STATE_HEADER;
+    jp2->has_jp2h = 1;
 
     return OPJ_TRUE;
 }
@@ -2800,6 +2854,14 @@ OPJ_BOOL opj_jp2_read_header(opj_stream_private_t *p_stream,
 
     /* read header */
     if (! opj_jp2_exec(jp2, jp2->m_procedure_list, p_stream, p_manager)) {
+        return OPJ_FALSE;
+    }
+    if (jp2->has_jp2h == 0) {
+        opj_event_msg(p_manager, EVT_ERROR, "JP2H box missing. Required.\n");
+        return OPJ_FALSE;
+    }
+    if (jp2->has_ihdr == 0) {
+        opj_event_msg(p_manager, EVT_ERROR, "IHDR box_missing. Required.\n");
         return OPJ_FALSE;
     }
 
@@ -3064,7 +3126,9 @@ OPJ_BOOL opj_jp2_get_tile(opj_jp2_t *p_jp2,
         if (!p_jp2->color.jp2_pclr->cmap) {
             opj_jp2_free_pclr(&(p_jp2->color));
         } else {
-            opj_jp2_apply_pclr(p_image, &(p_jp2->color));
+            if (!opj_jp2_apply_pclr(p_image, &(p_jp2->color), p_manager)) {
+                return OPJ_FALSE;
+            }
         }
     }
 
@@ -3208,6 +3272,8 @@ static OPJ_BOOL opj_jpip_write_fidx(opj_jp2_t *jp2,
     OPJ_OFF_T j2k_codestream_exit;
     OPJ_BYTE l_data_header [24];
 
+    OPJ_UNUSED(jp2);
+
     /* preconditions */
     assert(jp2 != 00);
     assert(cio != 00);
@@ -3240,6 +3306,8 @@ static OPJ_BOOL opj_jpip_write_cidx(opj_jp2_t *jp2,
 {
     OPJ_OFF_T j2k_codestream_exit;
     OPJ_BYTE l_data_header [24];
+
+    OPJ_UNUSED(jp2);
 
     /* preconditions */
     assert(jp2 != 00);
