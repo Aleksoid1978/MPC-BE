@@ -68,13 +68,21 @@ opj_image_t* OPJ_CALLCONV opj_image_create(OPJ_UINT32 numcmpts,
             comp->prec = cmptparms[compno].prec;
             comp->bpp = cmptparms[compno].bpp;
             comp->sgnd = cmptparms[compno].sgnd;
-            comp->data = (OPJ_INT32*) opj_calloc(comp->w * comp->h, sizeof(OPJ_INT32));
+            if (comp->h != 0 &&
+                    (OPJ_SIZE_T)comp->w > SIZE_MAX / comp->h / sizeof(OPJ_INT32)) {
+                // TODO event manager
+                opj_image_destroy(image);
+                return NULL;
+            }
+            comp->data = (OPJ_INT32*) opj_image_data_alloc(
+                             (size_t)comp->w * comp->h * sizeof(OPJ_INT32));
             if (!comp->data) {
                 /* TODO replace with event manager, breaks API */
                 /* fprintf(stderr,"Unable to allocate memory for image.\n"); */
                 opj_image_destroy(image);
                 return NULL;
             }
+            memset(comp->data, 0, (size_t)comp->w * comp->h * sizeof(OPJ_INT32));
         }
     }
 
@@ -91,7 +99,7 @@ void OPJ_CALLCONV opj_image_destroy(opj_image_t *image)
             for (compno = 0; compno < image->numcomps; compno++) {
                 opj_image_comp_t *image_comp = &(image->comps[compno]);
                 if (image_comp->data) {
-                    opj_free(image_comp->data);
+                    opj_image_data_free(image_comp->data);
                 }
             }
             opj_free(image->comps);

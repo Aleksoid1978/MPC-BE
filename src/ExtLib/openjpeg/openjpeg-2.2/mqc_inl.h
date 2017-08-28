@@ -36,8 +36,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MQC_INL_H
-#define __MQC_INL_H
+#ifndef OPJ_MQC_INL_H
+#define OPJ_MQC_INL_H
 
 /* For internal use of opj_mqc_decode_macro() */
 #define opj_mqc_mpsexchange_macro(d, curctx, a) \
@@ -109,6 +109,7 @@ static INLINE OPJ_UINT32 opj_mqc_raw_decode(opj_mqc_t *mqc)
             if (l_c > 0x8f) { \
                 c += 0xff00; \
                 ct = 8; \
+                mqc->end_of_byte_stream_counter ++; \
             } else { \
                 mqc->bp++; \
                 c += l_c << 9; \
@@ -156,7 +157,7 @@ static INLINE OPJ_UINT32 opj_mqc_raw_decode(opj_mqc_t *mqc)
 }
 
 #define DOWNLOAD_MQC_VARIABLES(mqc, curctx, c, a, ct) \
-        register opj_mqc_state_t **curctx = mqc->curctx; \
+        register const opj_mqc_state_t **curctx = mqc->curctx; \
         register OPJ_UINT32 c = mqc->c; \
         register OPJ_UINT32 a = mqc->a; \
         register OPJ_UINT32 ct = mqc->ct
@@ -192,4 +193,4 @@ Decode a symbol
 #define opj_mqc_decode(d, mqc) \
     opj_mqc_decode_macro(d, mqc, mqc->curctx, mqc->a, mqc->c, mqc->ct)
 
-#endif /* __MQC_INL_H */
+#endif /* OPJ_MQC_INL_H */

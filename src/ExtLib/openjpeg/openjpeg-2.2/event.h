@@ -30,8 +30,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __EVENT_H
-#define __EVENT_H
+#ifndef OPJ_EVENT_H
+#define OPJ_EVENT_H
 /**
 @file event.h
 @brief Implementation of a event callback system
@@ -105,4 +105,4 @@ void opj_set_default_event_handler(opj_event_mgr_t * p_manager);
 
 /*@}*/
 
-#endif /* __EVENT_H */
+#endif /* OPJ_EVENT_H */

@@ -28,8 +28,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __IMAGE_H
-#define __IMAGE_H
+#ifndef OPJ_IMAGE_H
+#define OPJ_IMAGE_H
 /**
 @file image.h
 @brief Implementation of operations on images (IMAGE)
@@ -66,5 +66,5 @@ void opj_copy_image_header(const opj_image_t* p_image_src,
 
 /*@}*/
 
-#endif /* __IMAGE_H */
+#endif /* OPJ_IMAGE_H */
 

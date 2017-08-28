@@ -37,8 +37,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __CIO_H
-#define __CIO_H
+#ifndef OPJ_CIO_H
+#define OPJ_CIO_H
 /**
 @file cio.h
 @brief Implementation of a byte input-output process (CIO)
@@ -408,5 +408,5 @@ OPJ_BOOL opj_stream_default_seek(OPJ_OFF_T p_nb_bytes, void * p_user_data);
 /*@}*/
 
 
-#endif /* __CIO_H */
+#endif /* OPJ_CIO_H */
 

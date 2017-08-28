@@ -33,8 +33,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __JP2_H
-#define __JP2_H
+#ifndef OPJ_JP2_H
+#define OPJ_JP2_H
 /**
 @file jp2.h
 @brief The JPEG-2000 file format Reader/Writer (JP2)
@@ -174,7 +174,7 @@ typedef struct opj_jp2 {
     OPJ_UINT32 *cl;
     opj_jp2_comps_t *comps;
     /* FIXME: The following two variables are used to save offset
-      as we write out a JP2 file to disk. This mecanism is not flexible
+      as we write out a JP2 file to disk. This mechanism is not flexible
       as codec writers will need to extand those fields as new part
       of the standard are implemented.
     */
@@ -187,6 +187,8 @@ typedef struct opj_jp2 {
     opj_jp2_color_t color;
 
     OPJ_BOOL ignore_pclr_cmap_cdef;
+    OPJ_BYTE has_jp2h;
+    OPJ_BYTE has_ihdr;
 }
 opj_jp2_t;
 
@@ -442,7 +444,7 @@ OPJ_BOOL opj_jp2_set_decoded_resolution_factor(opj_jp2_t *p_jp2,
  * Dump some elements from the JP2 decompression structure .
  *
  *@param p_jp2        the jp2 codec.
- *@param flag        flag to describe what elments are dump.
+ *@param flag        flag to describe what elements are dump.
  *@param out_stream      output stream where dump the elements.
  *
 */
@@ -471,5 +473,5 @@ opj_codestream_index_t* jp2_get_cstr_index(opj_jp2_t* p_jp2);
 
 /*@}*/
 
-#endif /* __JP2_H */
+#endif /* OPJ_JP2_H */
 

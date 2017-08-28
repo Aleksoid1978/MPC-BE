@@ -35,8 +35,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __DWT_H
-#define __DWT_H
+#ifndef OPJ_DWT_H
+#define OPJ_DWT_H
 /**
 @file dwt.h
 @brief Implementation of a discrete wavelet transform (DWT)
@@ -63,11 +63,12 @@ OPJ_BOOL opj_dwt_encode(opj_tcd_tilecomp_t * tilec);
 /**
 Inverse 5-3 wavelet transform in 2-D.
 Apply a reversible inverse DWT transform to a component of an image.
-@param tp Thread pool
+@param tcd TCD handle
 @param tilec Tile component information (current tile)
 @param numres Number of resolution levels to decode
 */
-OPJ_BOOL opj_dwt_decode(opj_thread_pool_t* tp, opj_tcd_tilecomp_t* tilec,
+OPJ_BOOL opj_dwt_decode(opj_tcd_t *p_tcd,
+                        opj_tcd_tilecomp_t* tilec,
                         OPJ_UINT32 numres);
 
 /**
@@ -92,10 +93,12 @@ OPJ_BOOL opj_dwt_encode_real(opj_tcd_tilecomp_t * tilec);
 /**
 Inverse 9-7 wavelet transform in 2-D.
 Apply an irreversible inverse DWT transform to a component of an image.
+@param tcd TCD handle
 @param tilec Tile component information (current tile)
 @param numres Number of resolution levels to decode
 */
-OPJ_BOOL opj_dwt_decode_real(opj_tcd_tilecomp_t* OPJ_RESTRICT tilec,
+OPJ_BOOL opj_dwt_decode_real(opj_tcd_t *p_tcd,
+                             opj_tcd_tilecomp_t* OPJ_RESTRICT tilec,
                              OPJ_UINT32 numres);
 
 /**
@@ -122,4 +125,4 @@ void opj_dwt_calc_explicit_stepsizes(opj_tccp_t * tccp, OPJ_UINT32 prec);
 
 /*@}*/
 
-#endif /* __DWT_H */
+#endif /* OPJ_DWT_H */

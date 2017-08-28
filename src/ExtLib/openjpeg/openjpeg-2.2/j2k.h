@@ -39,8 +39,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __J2K_H
-#define __J2K_H
+#ifndef OPJ_J2K_H
+#define OPJ_J2K_H
 /**
 @file j2k.h
 @brief The JPEG-2000 Codestream Reader/Writer (J2K)
@@ -122,6 +122,7 @@ typedef enum J2K_STATUS {
     J2K_STATE_TPH    = 0x0010, /**< the decoding process is in a tile part header */
     J2K_STATE_MT     = 0x0020, /**< the EOC marker has just been read */
     J2K_STATE_NEOC   = 0x0040, /**< the decoding process must not expect a EOC marker because the codestream is truncated */
+    J2K_STATE_DATA   = 0x0080, /**< a tile header has been successfully read and codestream is expected */
 
     J2K_STATE_EOC    = 0x0100, /**< the decoding process has encountered the EOC marker */
     J2K_STATE_ERR    = 0x8000  /**< the decoding process has encountered an error (FIXME warning V1 = 0x0080)*/
@@ -269,6 +270,8 @@ typedef struct opj_tcp {
     OPJ_FLOAT32 distoratio[100];
     /** tile-component coding parameters */
     opj_tccp_t *tccps;
+    /** current tile part number or -1 if first time into this tile */
+    OPJ_INT32  m_current_tile_part_number;
     /** number of tile parts for the tile. */
     OPJ_UINT32 m_nb_tile_parts;
     /** data for the tile */
@@ -356,7 +359,7 @@ typedef struct opj_cp {
     OPJ_CHAR *comment;
     /** number of tiles in width */
     OPJ_UINT32 tw;
-    /** number of tiles in heigth */
+    /** number of tiles in height */
     OPJ_UINT32 th;
 
     /** number of ppm markers (reserved size) */
@@ -443,6 +446,8 @@ typedef struct opj_cp {
     OPJ_BITFIELD ppm : 1;
     /** tells if the parameter is a coding or decoding one */
     OPJ_BITFIELD m_is_decoder : 1;
+    /** whether different bit depth or sign per component is allowed. Decoder only for ow */
+    OPJ_BITFIELD allow_different_bit_depth_sign : 1;
     /* <<UniPG */
 } opj_cp_t;
 
@@ -463,13 +468,6 @@ typedef struct opj_j2k_dec {
     OPJ_UINT32 m_start_tile_y;
     OPJ_UINT32 m_end_tile_x;
     OPJ_UINT32 m_end_tile_y;
-    /**
-     * Decoded area set by the user
-     */
-    OPJ_UINT32 m_DA_x0;
-    OPJ_UINT32 m_DA_y0;
-    OPJ_UINT32 m_DA_x1;
-    OPJ_UINT32 m_DA_y1;
 
     /** Index of the tile to decode (used in get_tile) */
     OPJ_INT32 m_tile_ind_to_dec;
@@ -567,7 +565,7 @@ typedef struct opj_j2k {
     /** helper used to write the index file */
     opj_codestream_index_t *cstr_index;
 
-    /** number of the tile curently concern by coding/decoding */
+    /** number of the tile currently concern by coding/decoding */
     OPJ_UINT32 m_current_tile_number;
 
     /** the current tile coder/decoder **/
@@ -578,6 +576,11 @@ typedef struct opj_j2k {
 
     /** Thread pool */
     opj_thread_pool_t* m_tp;
+
+    OPJ_UINT32 ihdr_w;
+    OPJ_UINT32 ihdr_h;
+    OPJ_UINT32 enumcs;
+    unsigned int dump_state;
 }
 opj_j2k_t;
 
@@ -614,7 +617,7 @@ OPJ_BOOL opj_j2k_setup_encoder(opj_j2k_t *p_j2k,
 /**
 Converts an enum type progression order to string type
 */
-char *opj_j2k_convert_progression_order(OPJ_PROG_ORDER prg_order);
+const char *opj_j2k_convert_progression_order(OPJ_PROG_ORDER prg_order);
 
 /* ----------------------------------------------------------------------- */
 /*@}*/
@@ -733,7 +736,7 @@ opj_j2k_t* opj_j2k_create_decompress(void);
  * Dump some elements from the J2K decompression structure .
  *
  *@param p_j2k              the jpeg2000 codec.
- *@param flag               flag to describe what elments are dump.
+ *@param flag               flag to describe what elements are dump.
  *@param out_stream         output stream where dump the elements.
  *
 */
@@ -853,4 +856,4 @@ OPJ_BOOL opj_j2k_end_compress(opj_j2k_t *p_j2k,
 OPJ_BOOL opj_j2k_setup_mct_encoding(opj_tcp_t * p_tcp, opj_image_t * p_image);
 
 
-#endif /* __J2K_H */
+#endif /* OPJ_J2K_H */

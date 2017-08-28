@@ -29,9 +29,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef TLS_KEYS_H
-#define TLS_KEYS_H
+#ifndef OPJ_TLS_KEYS_H
+#define OPJ_TLS_KEYS_H
 
 #define OPJ_TLS_KEY_T1  0
 
-#endif
+#endif /* OPJ_TLS_KEY_H */

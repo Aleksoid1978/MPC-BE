@@ -79,7 +79,7 @@ static void opj_mqc_setbits(opj_mqc_t *mqc);
 /* <summary> */
 /* This array defines all the possible states for a context. */
 /* </summary> */
-static opj_mqc_state_t mqc_states[47 * 2] = {
+static const opj_mqc_state_t mqc_states[47 * 2] = {
     {0x5601, 0, &mqc_states[2], &mqc_states[3]},
     {0x5601, 1, &mqc_states[3], &mqc_states[2]},
     {0x3401, 0, &mqc_states[4], &mqc_states[12]},
@@ -300,6 +300,7 @@ void opj_mqc_init_enc(opj_mqc_t *mqc, OPJ_BYTE *bp)
     assert(*(mqc->bp) != 0xff);
 
     mqc->start = bp;
+    mqc->end_of_byte_stream_counter = 0;
 }
 
 void opj_mqc_encode(opj_mqc_t *mqc, OPJ_UINT32 d)
@@ -513,6 +514,7 @@ void opj_mqc_init_dec(opj_mqc_t *mqc, OPJ_BYTE *bp, OPJ_UINT32 len,
     /* See https://github.com/uclouvain/openjpeg/issues/921 */
     opj_mqc_init_dec_common(mqc, bp, len, extra_writable_bytes);
     opj_mqc_setcurctx(mqc, 0);
+    mqc->end_of_byte_stream_counter = 0;
     if (len == 0) {
         mqc->c = 0xff << 16;
     } else {

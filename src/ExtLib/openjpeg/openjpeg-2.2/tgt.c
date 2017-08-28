@@ -46,7 +46,7 @@
 */
 
 opj_tgt_tree_t *opj_tgt_create(OPJ_UINT32 numleafsh, OPJ_UINT32 numleafsv,
-                               opj_event_mgr_t *manager)
+                               opj_event_mgr_t *p_manager)
 {
     OPJ_INT32 nplh[32];
     OPJ_INT32 nplv[32];
@@ -61,7 +61,7 @@ opj_tgt_tree_t *opj_tgt_create(OPJ_UINT32 numleafsh, OPJ_UINT32 numleafsv,
 
     tree = (opj_tgt_tree_t *) opj_calloc(1, sizeof(opj_tgt_tree_t));
     if (!tree) {
-        opj_event_msg(manager, EVT_ERROR, "Not enough memory to create Tag-tree\n");
+        opj_event_msg(p_manager, EVT_ERROR, "Not enough memory to create Tag-tree\n");
         return 00;
     }
 
@@ -89,7 +89,7 @@ opj_tgt_tree_t *opj_tgt_create(OPJ_UINT32 numleafsh, OPJ_UINT32 numleafsv,
     tree->nodes = (opj_tgt_node_t*) opj_calloc(tree->numnodes,
                   sizeof(opj_tgt_node_t));
     if (!tree->nodes) {
-        opj_event_msg(manager, EVT_ERROR,
+        opj_event_msg(p_manager, EVT_ERROR,
                       "Not enough memory to create Tag-tree nodes\n");
         opj_free(tree);
         return 00;
