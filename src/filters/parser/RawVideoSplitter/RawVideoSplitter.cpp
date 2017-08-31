@@ -196,16 +196,16 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			return E_FAIL; // incorrect or unsuppurted YUV4MPEG2 file
 		}
 
-		int    width    = 0;
-		int    height   = 0;
-		int    fpsnum   = 24;
-		int    fpsden   = 1;
-		LONG   sar_x    = 1;
-		LONG   sar_y    = 1;
-		FOURCC fourcc   = FCC('I420'); // 4:2:0 - I420 by default
-		FOURCC fourcc_2 = 0;
-		WORD   bpp      = 12;
-		DWORD  interl   = 0;
+		int    width       = 0;
+		int    height      = 0;
+		int    fpsnum      = 24;
+		int    fpsden      = 1;
+		LONG   sar_x       = 1;
+		LONG   sar_y       = 1;
+		FOURCC fourcc      = FCC('I420'); // 4:2:0 - I420 by default
+		FOURCC fourcc_2    = 0;
+		WORD   bpp         = 12;
+		DWORD  interlFlags = 0;
 
 		int k;
 		CAtlList<CStringA> sl;
@@ -232,10 +232,21 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			case 'I':
 				if (str.GetLength() == 2) {
 					switch (str[1]) {
-					case 'p': interl = 0; break;
-					case 't': interl = 1; break;
-					case 'b': interl = 2; break;
-					case 'm': interl = 3; break;
+					default:
+						DLog(L"YUV4MPEG2: incorrect interlace flag, output as progressive");
+					case 'p': // progressive
+						interlFlags = 0;
+						break;
+					case 't': // top field first
+						interlFlags = AMINTERLACE_IsInterlaced|AMINTERLACE_Field1First|AMINTERLACE_DisplayModeBobOrWeave;
+						break;
+					case 'b': // bottom field first
+						interlFlags = AMINTERLACE_IsInterlaced|AMINTERLACE_DisplayModeBobOrWeave;
+						break;
+					case 'm': // mixed modes (detailed in FRAME headers, but not yet supported)
+						// tell DirectShow it's interlaced, actual flags for frames set in IMediaSample
+						interlFlags = AMINTERLACE_IsInterlaced|AMINTERLACE_DisplayModeBobOrWeave;;
+						break;
 					}
 				}
 				break;
@@ -311,8 +322,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		//vih2->rcSource = vih2->rcTarget = CRect(0, 0, width, height);
 		//vih2->dwBitRate = m_framesize * 8 * fpsnum / fpsden;
 		vih2->AvgTimePerFrame       = m_AvgTimePerFrame;
-		// always tell DirectShow it's interlaced (progressive flags set in IMediaSample struct)
-		vih2->dwInterlaceFlags      = AMINTERLACE_IsInterlaced | AMINTERLACE_DisplayModeBobOrWeave;
+		vih2->dwInterlaceFlags      = interlFlags;
 
 		sar_x *= width;
 		sar_y *= height;
