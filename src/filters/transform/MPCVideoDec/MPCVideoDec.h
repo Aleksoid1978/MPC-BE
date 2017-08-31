@@ -149,12 +149,18 @@ protected:
 		int                                profile              = -1;
 		int                                pix_fmt              = -1;
 
+		int                                interlaced           = -1;
+		int                                top_field_first      = -1;
+
 		void Clear() {
 			SAFE_DELETE(masterDataHDR);
 			SAFE_DELETE(HDRContentLightLevel)
 			SAFE_DELETE(colorSpace);
 			profile = -1;
 			pix_fmt = -1;
+
+			interlaced      = -1;
+			top_field_first = -1;
 		}
 
 	} m_FilterInfo;
