@@ -1862,9 +1862,6 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 			if (SUCCEEDED(pIExFilterInfo->GetInt("VIDEO_INTERLACED", &value))) {
 				m_FilterInfo.interlaced = value;
 			}
-			if (SUCCEEDED(pIExFilterInfo->GetInt("VIDEO_INTERLACED_TOP_FIELD_FIRST", &value))) {
-				m_FilterInfo.top_field_first = value;
-			}
 
 			unsigned size = 0;
 			LPVOID pData = NULL;
@@ -2561,7 +2558,7 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 					if (!m_pFrame->interlaced_frame && !m_FilterInfo.interlaced) {
 						props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
 					}
-					if (m_pFrame->top_field_first || m_FilterInfo.top_field_first) {
+					if (m_pFrame->top_field_first || m_FilterInfo.interlaced == 1) {
 						props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_FIELD1FIRST;
 					}
 					if (m_pFrame->repeat_pict) {
