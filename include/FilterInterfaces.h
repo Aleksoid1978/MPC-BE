@@ -29,6 +29,11 @@ interface __declspec(uuid("3F56FEBC-633C-4C76-8455-0787FC62C8F8")) IExFilterInfo
 	STDMETHOD(GetString)(LPCSTR field, LPWSTR *value, unsigned *chars) PURE;
 	STDMETHOD(GetBin   )(LPCSTR field, LPVOID *value, unsigned *size ) PURE;
 };
+// available info fields:
+// name               type   filter           valid values
+// VIDEO_PROFILE      int    MatroskaSplitter
+// VIDEO_PIXEL_FORMAT int    MatroskaSplitter
+// VIDEO_INTERLACED   int    MP4Splitter      0-progressive,1-tff,2-bff
 
 interface __declspec(uuid("37CBDF10-D65E-4E5A-8F37-40E0C8EA1695")) IExFilterConfig : public IUnknown
 {
@@ -49,3 +54,6 @@ interface __declspec(uuid("37CBDF10-D65E-4E5A-8F37-40E0C8EA1695")) IExFilterConf
 	STDMETHOD(SetString)(LPCSTR field, LPWSTR  value, int chars) PURE;
 	STDMETHOD(SetBin   )(LPCSTR field, LPVOID  value, int size ) PURE;
 };
+// available settings:
+// name          type   filter       mode    valid values
+// stereodownmix bool   MpaDecFilter set     true/false
