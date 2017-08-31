@@ -119,6 +119,15 @@ CMP4SplitterFilter::~CMP4SplitterFilter()
 {
 }
 
+STDMETHODIMP CMP4SplitterFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
+{
+	CheckPointer(ppv, E_POINTER);
+
+	return
+		QI(IExFilterInfo)
+		__super::NonDelegatingQueryInterface(riid, ppv);
+}
+
 STDMETHODIMP CMP4SplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 {
 	CheckPointer(pInfo, E_POINTER);
@@ -926,6 +935,20 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						if (vse->m_hasPalette) {
 							track->SetPalette(vse->GetPalette());
+						}
+
+						if (AP4_DataInfoAtom* fiel = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_FIEL))) {
+							const AP4_DataBuffer* ares_di = fiel->GetData();
+							if (ares_di->GetDataSize() >= 2) {
+								const BYTE fields = ares_di->GetData()[0];
+								const BYTE detail = ares_di->GetData()[1];
+								if (fields == 0x02) {
+									m_interlaced = 1;
+									if (detail == 1 || detail == 9) {
+										m_top_field_first = 1;
+									}
+								}
+							}
 						}
 
 						switch (type) {
@@ -2039,6 +2062,27 @@ STDMETHODIMP CMP4SplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENCE_TIM
 	}
 
 	return S_OK;
+}
+
+// IExFilterInfo
+
+STDMETHODIMP CMP4SplitterFilter::GetInt(LPCSTR field, int *value)
+{
+	CheckPointer(value, E_INVALIDARG);
+
+	if (!strcmp(field, "VIDEO_INTERLACED")) {
+		if (m_interlaced != -1) {
+			*value = m_interlaced;
+			return S_OK;
+		}
+	} else if (!strcmp(field, "VIDEO_INTERLACED_TOP_FIELD_FIRST")) {
+		if (m_interlaced == 1 && m_top_field_first != -1) {
+			*value = m_top_field_first;
+			return S_OK;
+		}
+	}
+
+	return E_INVALIDARG;
 }
 
 //

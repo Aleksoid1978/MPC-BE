@@ -25,12 +25,15 @@
 #include <atlcoll.h>
 #include "MP4SplitterFile.h"
 #include "../BaseSplitter/BaseSplitter.h"
+#include "../../filters/FilterInterfacesImpl.h"
 
 #define MP4SplitterName L"MPC MP4/MOV Splitter"
 #define MP4SourceName   L"MPC MP4/MOV Source"
 
 class __declspec(uuid("61F47056-E400-43d3-AF1E-AB7DFFD4C4AD"))
-	CMP4SplitterFilter : public CBaseSplitterFilter
+	CMP4SplitterFilter
+	: public CBaseSplitterFilter
+	, public CExFilterInfoImpl
 {
 	struct trackpos {
 		DWORD index;
@@ -42,6 +45,9 @@ class __declspec(uuid("61F47056-E400-43d3-AF1E-AB7DFFD4C4AD"))
 	CAtlArray<SyncPoint> m_sps;
 
 	BOOL bSelectMoofSuccessfully = TRUE;
+
+	int m_interlaced      = -1;
+	int m_top_field_first = -1;
 
 protected:
 	CAutoPtr<CMP4SplitterFile> m_pFile;
@@ -55,13 +61,18 @@ public:
 	CMP4SplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
 	virtual ~CMP4SplitterFilter();
 
+	DECLARE_IUNKNOWN;
+	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
+
 	// CBaseFilter
 	STDMETHODIMP_(HRESULT) QueryFilterInfo(FILTER_INFO* pInfo);
 
 	// IKeyFrameInfo
-
 	STDMETHODIMP_(HRESULT) GetKeyFrameCount(UINT& nKFs);
 	STDMETHODIMP_(HRESULT) GetKeyFrames(const GUID* pFormat, REFERENCE_TIME* pKFs, UINT& nKFs);
+
+	// IExFilterInfo
+	STDMETHODIMP GetInt(LPCSTR field, int *value) override;
 };
 
 class __declspec(uuid("3CCC052E-BDEE-408a-BEA7-90914EF2964B"))
