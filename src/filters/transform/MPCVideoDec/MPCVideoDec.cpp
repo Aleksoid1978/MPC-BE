@@ -2558,7 +2558,7 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 
 			switch (m_nDeinterlacing) {
 				case AUTO :
-					if (!m_pFrame->interlaced_frame && m_FilterInfo.interlaced != 1) {
+					if (!m_pFrame->interlaced_frame && !m_FilterInfo.interlaced) {
 						props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
 					}
 					if (m_pFrame->top_field_first || m_FilterInfo.top_field_first) {

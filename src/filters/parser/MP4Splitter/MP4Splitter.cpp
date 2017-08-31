@@ -2071,12 +2071,12 @@ STDMETHODIMP CMP4SplitterFilter::GetInt(LPCSTR field, int *value)
 	CheckPointer(value, E_INVALIDARG);
 
 	if (!strcmp(field, "VIDEO_INTERLACED")) {
-		if (m_interlaced != -1) {
+		if (m_interlaced) {
 			*value = m_interlaced;
 			return S_OK;
 		}
 	} else if (!strcmp(field, "VIDEO_INTERLACED_TOP_FIELD_FIRST")) {
-		if (m_interlaced == 1 && m_top_field_first != -1) {
+		if (m_interlaced && m_top_field_first) {
 			*value = m_top_field_first;
 			return S_OK;
 		}
