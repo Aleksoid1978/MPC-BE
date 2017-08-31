@@ -2370,16 +2370,20 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					CAppSettings& s = AfxGetAppSettings();
 					if (s.bKeepHistory && s.bRememberFilePos) {
 						if (FILE_POSITION* FilePosition = s.CurrentFilePosition()) {
-							REFERENCE_TIME rtNow;
-							m_pMS->GetCurrentPosition(&rtNow);
+							REFERENCE_TIME rtDur;
+							m_pMS->GetDuration(&rtDur);
+							if (rtDur > 0) {
+								REFERENCE_TIME rtNow;
+								m_pMS->GetCurrentPosition(&rtNow);
 
-							const bool bSave = llabs(FilePosition->llPosition - rtNow) > 300000000LL;
-							if (bSave) {
-								FilePosition->llPosition = rtNow;
-								FilePosition->nAudioTrack = GetAudioTrackIdx();
-								FilePosition->nSubtitleTrack = GetSubtitleTrackIdx();
+								const bool bSave = llabs(FilePosition->llPosition - rtNow) > 300000000LL;
+								if (bSave) {
+									FilePosition->llPosition = rtNow;
+									FilePosition->nAudioTrack = GetAudioTrackIdx();
+									FilePosition->nSubtitleTrack = GetSubtitleTrackIdx();
 
-								s.SaveCurrentFilePosition();
+									s.SaveCurrentFilePosition();
+								}
 							}
 						}
 					}
@@ -11872,9 +11876,13 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		if (fn.Find(L"pipe:") == -1
 				&& s.bKeepHistory && s.bRememberFilePos && !s.NewFile(fn)) {
 			const FILE_POSITION* FilePosition = s.CurrentFilePosition();
-			if (m_pMS) {
-				REFERENCE_TIME rtPos = FilePosition->llPosition;
-				m_pMS->SetPositions(&rtPos, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
+			if (m_pMS && FilePosition->llPosition > 0) {
+				REFERENCE_TIME rtDur;
+				m_pMS->GetDuration(&rtDur);
+				if (rtDur > 0) {
+					REFERENCE_TIME rtPos = FilePosition->llPosition;
+					m_pMS->SetPositions(&rtPos, AM_SEEKING_AbsolutePositioning, NULL, AM_SEEKING_NoPositioning);
+				}
 			}
 
 			if (m_nAudioTrackStored == -1) {
@@ -13760,10 +13768,11 @@ void CMainFrame::CloseMediaPrivate()
 		CAppSettings& s = AfxGetAppSettings();
 		if (s.bKeepHistory && s.bRememberFilePos) {
 			if (FILE_POSITION* FilePosition = s.CurrentFilePosition()) {
+				REFERENCE_TIME rtDur;
+				m_pMS->GetDuration(&rtDur);
 				REFERENCE_TIME rtNow;
 				m_pMS->GetCurrentPosition(&rtNow);
-
-				FilePosition->llPosition = rtNow;
+				FilePosition->llPosition = rtDur > 0 ? rtNow : 0;
 				FilePosition->nAudioTrack = GetAudioTrackIdx();
 				FilePosition->nSubtitleTrack = GetSubtitleTrackIdx();
 
