@@ -150,7 +150,6 @@ protected:
 		int                                pix_fmt              = -1;
 
 		int                                interlaced           = 0;
-		int                                top_field_first      = 0;
 
 		void Clear() {
 			SAFE_DELETE(masterDataHDR);
@@ -160,7 +159,6 @@ protected:
 			pix_fmt = -1;
 
 			interlaced      = 0;
-			top_field_first = 0;
 		}
 
 	} m_FilterInfo;

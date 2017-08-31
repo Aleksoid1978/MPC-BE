@@ -943,10 +943,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								const BYTE fields = ares_di->GetData()[0];
 								const BYTE detail = ares_di->GetData()[1];
 								if (fields == 0x02) {
-									m_interlaced = 1;
-									if (detail == 1 || detail == 9) {
-										m_top_field_first = 1;
-									}
+									m_interlaced = (detail == 1 || detail == 9) ? 1 : 2;
 								}
 							}
 						}
@@ -2073,11 +2070,6 @@ STDMETHODIMP CMP4SplitterFilter::GetInt(LPCSTR field, int *value)
 	if (!strcmp(field, "VIDEO_INTERLACED")) {
 		if (m_interlaced) {
 			*value = m_interlaced;
-			return S_OK;
-		}
-	} else if (!strcmp(field, "VIDEO_INTERLACED_TOP_FIELD_FIRST")) {
-		if (m_interlaced && m_top_field_first) {
-			*value = m_top_field_first;
 			return S_OK;
 		}
 	}
