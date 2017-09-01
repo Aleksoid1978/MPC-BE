@@ -332,7 +332,7 @@ namespace MatroskaReader
 	class Video
 	{
 	public:
-		CUInt FlagInterlaced, StereoMode;
+		CUInt FlagInterlaced, FieldOrder, StereoMode;
 		CUInt PixelWidth, PixelHeight, DisplayWidth, DisplayHeight, DisplayUnit;
 		CUInt VideoPixelCropBottom, VideoPixelCropTop, VideoPixelCropLeft, VideoPixelCropRight;
 		CUInt AspectRatioType;
@@ -344,6 +344,7 @@ namespace MatroskaReader
 
 		Video() {
 			FlagInterlaced.Set(0);
+			FieldOrder.Set(0);
 			StereoMode.Set(0);
 			DisplayUnit.Set(0);
 			AspectRatioType.Set(0);
