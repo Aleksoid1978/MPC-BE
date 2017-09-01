@@ -21,12 +21,15 @@
 #pragma once
 
 #include "../BaseSplitter/BaseSplitter.h"
+#include "../../filters/FilterInterfacesImpl.h"
 
 #define RawVideoSplitterName	L"MPC RAW Video Splitter"
 #define RawVideoSourceName		L"MPC RAW Video Source"
 
 class __declspec(uuid("486AA463-EE67-4F75-B941-F1FAB217B342"))
-	CRawVideoSplitterFilter : public CBaseSplitterFilter
+	CRawVideoSplitterFilter
+	: public CBaseSplitterFilter
+	, public CExFilterInfoImpl
 {
 	enum {
 		RAW_NONE,
@@ -38,6 +41,8 @@ class __declspec(uuid("486AA463-EE67-4F75-B941-F1FAB217B342"))
 		RAW_Y4M,
 		RAW_MPEG4,
 	} m_RAWType = RAW_NONE;
+
+	int y4m_interl = -1;
 
 	__int64			m_startpos			= 0;
 	REFERENCE_TIME	m_AvgTimePerFrame	= 0;
@@ -59,12 +64,13 @@ public:
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
 	// CBaseFilter
-
 	STDMETHODIMP QueryFilterInfo(FILTER_INFO* pInfo);
 
 	// IBufferControl
-
 	STDMETHODIMP SetBufferDuration(int duration);
+
+	// IExFilterInfo
+	STDMETHODIMP GetInt(LPCSTR field, int *value) override;
 };
 
 class __declspec(uuid("E32A3501-04A9-486B-898B-F5A4C8A4AAAC"))

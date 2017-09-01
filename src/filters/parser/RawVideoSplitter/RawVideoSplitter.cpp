@@ -105,6 +105,7 @@ STDMETHODIMP CRawVideoSplitterFilter::NonDelegatingQueryInterface(REFIID riid, v
 	CheckPointer(ppv, E_POINTER);
 
 	return
+		QI(IExFilterInfo)
 		__super::NonDelegatingQueryInterface(riid, ppv);
 }
 
@@ -137,6 +138,25 @@ STDMETHODIMP CRawVideoSplitterFilter::SetBufferDuration(int duration)
 
 	m_iBufferDuration = duration;
 	return S_OK;
+}
+
+STDMETHODIMP CRawVideoSplitterFilter::GetInt(LPCSTR field, int *value)
+{
+	if (y4m_interl == -1 || y4m_interl == 'm') {
+		return E_NOTIMPL;
+	}
+	CheckPointer(value, E_INVALIDARG);
+
+	if (!strcmp(field, "VIDEO_INTERLACED")) {
+		switch (y4m_interl) {
+		case 'p': *value = 0; break;
+		case 't': *value = 1; break;
+		case 'b': *value = 2; break;
+		}
+		return S_OK;
+	}
+
+	return E_INVALIDARG;
 }
 
 bool CRawVideoSplitterFilter::ReadGOP(REFERENCE_TIME& rt)
@@ -231,8 +251,10 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				break;
 			case 'I':
 				if (str.GetLength() == 2) {
-					switch (str[1]) {
+					y4m_interl = str[1];
+					switch (y4m_interl) {
 					default:
+						y4m_interl = 'p';
 						DLog(L"YUV4MPEG2: incorrect interlace flag, output as progressive");
 					case 'p': // progressive
 						interlFlags = 0;
