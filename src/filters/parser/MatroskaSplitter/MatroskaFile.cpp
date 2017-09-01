@@ -629,6 +629,9 @@ HRESULT Video::Parse(CMatroskaNode* pMN0)
 	case 0x9A:
 		FlagInterlaced.Parse(pMN);
 		break;
+	case 0x9D:
+		FieldOrder.Parse(pMN);
+		break;
 	case 0x53B8:
 		StereoMode.Parse(pMN);
 		break;
