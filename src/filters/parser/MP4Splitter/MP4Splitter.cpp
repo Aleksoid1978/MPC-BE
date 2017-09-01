@@ -2065,13 +2065,14 @@ STDMETHODIMP CMP4SplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENCE_TIM
 
 STDMETHODIMP CMP4SplitterFilter::GetInt(LPCSTR field, int *value)
 {
-	CheckPointer(value, E_INVALIDARG);
+	if (!m_interlaced) {
+		return E_NOTIMPL;
+	}
+	CheckPointer(value, E_POINTER);
 
 	if (!strcmp(field, "VIDEO_INTERLACED")) {
-		if (m_interlaced) {
-			*value = m_interlaced;
-			return S_OK;
-		}
+		*value = m_interlaced;
+		return S_OK;
 	}
 
 	return E_INVALIDARG;

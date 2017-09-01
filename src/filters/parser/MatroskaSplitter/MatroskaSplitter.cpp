@@ -2343,7 +2343,7 @@ STDMETHODIMP_(BOOL) CMatroskaSplitterFilter::GetCalcDuration()
 
 STDMETHODIMP CMatroskaSplitterFilter::GetInt(LPCSTR field, int *value)
 {
-	CheckPointer(value, E_INVALIDARG);
+	CheckPointer(value, E_POINTER);
 
 	if (!strcmp(field, "VIDEO_PROFILE")) {
 		if (m_profile != -1) {
@@ -2362,8 +2362,8 @@ STDMETHODIMP CMatroskaSplitterFilter::GetInt(LPCSTR field, int *value)
 
 STDMETHODIMP CMatroskaSplitterFilter::GetBin(LPCSTR field, LPVOID *value, unsigned *size)
 {
-	CheckPointer(value, E_INVALIDARG);
-	CheckPointer(size, E_INVALIDARG);
+	CheckPointer(value, E_POINTER);
+	CheckPointer(size, E_POINTER);
 
 	if (!strcmp(field, "HDR_MASTERING_METADATA")) {
 		if (m_MasterDataHDR) {
