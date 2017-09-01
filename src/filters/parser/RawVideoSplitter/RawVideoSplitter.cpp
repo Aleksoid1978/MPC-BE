@@ -145,7 +145,7 @@ STDMETHODIMP CRawVideoSplitterFilter::GetInt(LPCSTR field, int *value)
 	if (y4m_interl == -1 || y4m_interl == 'm') {
 		return E_NOTIMPL;
 	}
-	CheckPointer(value, E_INVALIDARG);
+	CheckPointer(value, E_POINTER);
 
 	if (!strcmp(field, "VIDEO_INTERLACED")) {
 		switch (y4m_interl) {
