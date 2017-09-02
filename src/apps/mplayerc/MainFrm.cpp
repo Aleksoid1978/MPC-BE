@@ -5191,6 +5191,7 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+ULONGLONG lastReceiveCmdLineTime = 0ULL;
 void CMainFrame::cmdLineThreadFunction()
 {
 	HANDLE handles[2] = {
@@ -5225,6 +5226,12 @@ void CMainFrame::cmdLineThreadFunction()
 							pBuff++;
 							cmdLine.AddTail(str);
 						}
+
+						const ULONGLONG now = GetTickCount64();
+						if ((now - lastReceiveCmdLineTime) <= 500ULL) {
+							cmdLine.AddTail(L"/add");
+						}
+						lastReceiveCmdLineTime = now;
 
 						m_cmdLineQueue.pop_front();
 						if (!m_cmdLineQueue.empty()) {
