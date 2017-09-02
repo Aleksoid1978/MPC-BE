@@ -298,7 +298,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CComPtr<ISubStream> m_pCurrentSubStream;
 
 	// windowing
-
+	int m_iVideoSize;
 	CRect m_lastWindowRect;
 	CPoint m_lastMouseMove, m_lastMouseMoveFullScreen;
 

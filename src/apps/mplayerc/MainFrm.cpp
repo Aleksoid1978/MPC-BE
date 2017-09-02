@@ -629,6 +629,7 @@ CMainFrame::CMainFrame() :
 	m_pLastBar(NULL),
 	m_nLoops(0),
 	m_iSubtitleSel(-1),
+	m_iVideoSize(DVS_FROMINSIDE),
 	m_ZoomX(1), m_ZoomY(1), m_PosX(0.5), m_PosY(0.5),
 	m_iDefRotation(0),
 	m_fCustomGraph(false),
@@ -839,6 +840,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		}
 	}
 
+	m_iVideoSize = s.iDefaultVideoSize;
 	m_bToggleShader = s.bToggleShader;
 	m_bToggleShaderScreenSpace = s.bToggleShaderScreenSpace;
 
@@ -1942,7 +1944,7 @@ void CMainFrame::OnSizing(UINT nSide, LPRECT pRect)
 	const bool bCtrl = !!(GetAsyncKeyState(VK_CONTROL) & 0x80000000);
 
 	if (m_eMediaLoadState != MLS_LOADED || m_bFullScreen
-			|| s.iDefaultVideoSize == DVS_STRETCH
+			|| m_iVideoSize == DVS_STRETCH
 			|| (bCtrl == s.bLimitWindowProportions)) {
 		return;
 	}
@@ -7006,7 +7008,7 @@ void CMainFrame::OnViewZoomAutoFit()
 
 void CMainFrame::OnViewDefaultVideoFrame(UINT nID)
 {
-	AfxGetAppSettings().iDefaultVideoSize = nID - ID_VIEW_VF_HALF;
+	m_iVideoSize = nID - ID_VIEW_VF_HALF;
 	m_ZoomX = m_ZoomY = 1;
 	m_PosX = m_PosY = 0.5;
 	MoveVideoWindow();
@@ -7014,15 +7016,14 @@ void CMainFrame::OnViewDefaultVideoFrame(UINT nID)
 
 void CMainFrame::OnUpdateViewDefaultVideoFrame(CCmdUI* pCmdUI)
 {
-	if (AfxGetAppSettings().iDefaultVideoSize == (pCmdUI->m_nID - ID_VIEW_VF_HALF)) {
+	if (m_iVideoSize == (pCmdUI->m_nID - ID_VIEW_VF_HALF)) {
 		CheckMenuRadioItem(ID_VIEW_VF_HALF, ID_VIEW_VF_ZOOM2, pCmdUI->m_nID);
 	}
 }
 
 void CMainFrame::OnViewSwitchVideoFrame()
 {
-	CAppSettings& s = AfxGetAppSettings();
-	int vs = s.iDefaultVideoSize;
+	int vs = m_iVideoSize;
 	if (vs <= DVS_DOUBLE || vs == DVS_FROMOUTSIDE) {
 		vs = DVS_STRETCH;
 	} else if (vs == DVS_FROMINSIDE) {
@@ -7049,7 +7050,7 @@ void CMainFrame::OnViewSwitchVideoFrame()
 			m_OSD.DisplayMessage(OSD_TOPLEFT, ResStr(IDS_TOUCH_WINDOW_FROM_OUTSIDE));
 			break;
 	}
-	s.iDefaultVideoSize = vs;
+	m_iVideoSize = vs;
 	m_ZoomX = m_ZoomY = 1;
 	m_PosX = m_PosY = 0.5;
 	MoveVideoWindow();
@@ -10750,9 +10751,7 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 			const long wy = wr.Width() * arxy.cy;
 			const long hx = wr.Height() * arxy.cx;
 
-			dvstype dvs = (dvstype)AfxGetAppSettings().iDefaultVideoSize;
-
-			switch (dvs) {
+			switch (m_iVideoSize) {
 			case DVS_HALF:
 				w = arxy.cx / 2;
 				h = arxy.cy / 2;
@@ -10988,7 +10987,7 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 		const CSize videoSpaceSize = workRect.Size() - controlsSize - decorationsRect.Size();
 
 		// Do not adjust window size for video frame aspect ratio when video size is independent from window size
-		const bool bAdjustWindowAR = !(s.iDefaultVideoSize == DVS_HALF || s.iDefaultVideoSize == DVS_NORMAL || s.iDefaultVideoSize == DVS_DOUBLE);
+		const bool bAdjustWindowAR = !(m_iVideoSize == DVS_HALF || m_iVideoSize == DVS_NORMAL || m_iVideoSize == DVS_DOUBLE);
 		const double videoAR = videoSize.cx / (double)videoSize.cy;
 
 		if (videoTargetSize.cx > videoSpaceSize.cx) {
