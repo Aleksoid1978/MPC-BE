@@ -18741,8 +18741,8 @@ const CString CMainFrame::GetStrForTitle()
 		}
 
 		CPlaylistItem pli;
-		if (m_wndPlaylistBar.GetCur(pli)) {
-			return pli.GetLabel();
+		if (m_wndPlaylistBar.GetCur(pli) && !pli.m_label.IsEmpty()) {
+			return pli.m_label;
 		}
 
 		return m_strPlaybackLabel;
