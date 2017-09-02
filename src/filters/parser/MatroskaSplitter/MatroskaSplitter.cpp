@@ -108,6 +108,7 @@ CMatroskaSplitterFilter::CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	, m_profile(-1)
 	, m_pix_fmt(-1)
 	, m_bits(8)
+	, m_interlaced(-1)
 {
 	m_nFlag |= SOURCE_SUPPORT_URL;
 #ifdef REGISTER_FILTER
@@ -854,6 +855,24 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							((MPEG2VIDEOINFO*)mts[i].Format())->hdr.dwPictAspectRatioX = aspect.cx;
 							((MPEG2VIDEOINFO*)mts[i].Format())->hdr.dwPictAspectRatioY = aspect.cy;
 						}
+					}
+				}
+
+				if (pTE->v.FlagInterlaced == 1) {
+					switch (pTE->v.FieldOrder) {
+					case 0: // progressive
+						m_interlaced = 0;
+						break;
+					case 1:
+					case 9: // top field stored first
+						m_interlaced = 1;
+						break;
+					case 6:
+					case 14: // bottom field stored first
+						m_interlaced = 2;
+						break;
+					default:
+						m_interlaced = -1; // not supported
 					}
 				}
 
@@ -2353,6 +2372,11 @@ STDMETHODIMP CMatroskaSplitterFilter::GetInt(LPCSTR field, int *value)
 	} else if (!strcmp(field, "VIDEO_PIXEL_FORMAT")) {
 		if (m_pix_fmt != -1) {
 			*value = m_pix_fmt;
+			return S_OK;
+		}
+	} else if (!strcmp(field, "VIDEO_INTERLACED")) {
+		if (m_interlaced != -1) {
+			*value = m_interlaced;
 			return S_OK;
 		}
 	}
