@@ -2369,16 +2369,23 @@ STDMETHODIMP CMatroskaSplitterFilter::GetInt(LPCSTR field, int *value)
 			*value = m_profile;
 			return S_OK;
 		}
-	} else if (!strcmp(field, "VIDEO_PIXEL_FORMAT")) {
+		return E_ABORT;
+	}
+
+	if (!strcmp(field, "VIDEO_PIXEL_FORMAT")) {
 		if (m_pix_fmt != -1) {
 			*value = m_pix_fmt;
 			return S_OK;
 		}
-	} else if (!strcmp(field, "VIDEO_INTERLACED")) {
+		return E_ABORT;
+	}
+
+	if (!strcmp(field, "VIDEO_INTERLACED")) {
 		if (m_interlaced != -1) {
 			*value = m_interlaced;
 			return S_OK;
 		}
+		return E_ABORT;
 	}
 
 	return E_INVALIDARG;
@@ -2397,7 +2404,10 @@ STDMETHODIMP CMatroskaSplitterFilter::GetBin(LPCSTR field, LPVOID *value, unsign
 
 			return S_OK;
 		}
-	} else if (!strcmp(field, "HDR_CONTENT_LIGHT_LEVEL")) {
+		return E_ABORT;
+	}
+
+	if (!strcmp(field, "HDR_CONTENT_LIGHT_LEVEL")) {
 		if (m_HDRContentLightLevel) {
 			*size = sizeof(*m_HDRContentLightLevel);
 			*value = (LPVOID)LocalAlloc(LPTR, *size);
@@ -2405,7 +2415,10 @@ STDMETHODIMP CMatroskaSplitterFilter::GetBin(LPCSTR field, LPVOID *value, unsign
 
 			return S_OK;
 		}
-	} else if (!strcmp(field, "VIDEO_COLOR_SPACE")) {
+		return E_ABORT;
+	}
+
+	if (!strcmp(field, "VIDEO_COLOR_SPACE")) {
 		if (m_ColorSpace) {
 			*size = sizeof(*m_ColorSpace);
 			*value = (LPVOID)LocalAlloc(LPTR, *size);
@@ -2413,6 +2426,7 @@ STDMETHODIMP CMatroskaSplitterFilter::GetBin(LPCSTR field, LPVOID *value, unsign
 
 			return S_OK;
 		}
+		return E_ABORT;
 	}
 
 	return E_INVALIDARG;

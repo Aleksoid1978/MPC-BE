@@ -29,6 +29,13 @@ interface __declspec(uuid("3F56FEBC-633C-4C76-8455-0787FC62C8F8")) IExFilterInfo
 	STDMETHOD(GetString)(LPCSTR field, LPWSTR *value, unsigned *chars) PURE;
 	STDMETHOD(GetBin   )(LPCSTR field, LPVOID *value, unsigned *size ) PURE;
 };
+// return values:
+// E_NOTIMPL    - method not implemented, any parameters will be ignored.
+// E_POINTER    - invalid pointer
+// E_INVALIDARG - wrong name or type of field
+// E_ABORT      - field is correct, but the value is undefined
+// S_OK         - operation successful
+//
 // available info fields:
 // name               type   filter           valid values
 // VIDEO_PROFILE      int    MatroskaSplitter
