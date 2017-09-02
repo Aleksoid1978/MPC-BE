@@ -140,11 +140,10 @@ STDMETHODIMP CRawVideoSplitterFilter::SetBufferDuration(int duration)
 	return S_OK;
 }
 
+// IExFilterInfo
+
 STDMETHODIMP CRawVideoSplitterFilter::GetInt(LPCSTR field, int *value)
 {
-	if (y4m_interl == -1 || y4m_interl == 'm') {
-		return E_NOTIMPL;
-	}
 	CheckPointer(value, E_POINTER);
 
 	if (!strcmp(field, "VIDEO_INTERLACED")) {
@@ -152,6 +151,7 @@ STDMETHODIMP CRawVideoSplitterFilter::GetInt(LPCSTR field, int *value)
 		case 'p': *value = 0; break;
 		case 't': *value = 1; break;
 		case 'b': *value = 2; break;
+		default: return E_ABORT;
 		}
 		return S_OK;
 	}
