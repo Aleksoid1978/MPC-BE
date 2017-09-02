@@ -319,7 +319,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Gözat..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
 5		"Atlama uzaklıkları (ms olarak kısa, orta, uzun)"
 9		"Varsayılan"
 10		"Hızlı atlama (karede)"
@@ -327,14 +327,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 13		"Varsayılan olmayan monitörde Tam Ekran olduğunda SİMGE DURUMUNA komutunu engelle"
 15		"Küçültüğünde video oynatmayı duraklat"
 17		"Logitech LCD desteğini kullan"
-19		"MiniDump etkinleştir"
-20		"Güncelleme kontrolü"
-21		"Otomatik güncelleme kontrolünü aç"
-22		"Her kontrol arasındaki gecikme:"
-25		"gün"
-26		"Ayar yönetimi"
-27		"Sıfırla"
-28		"Ver"
+18		"MiniDump etkinleştir"
+19		"Güncelleme kontrolü"
+20		"Otomatik güncelleme kontrolünü aç"
+21		"Her kontrol arasındaki gecikme:"
+24		"gün"
+25		"Ayar yönetimi"
+26		"Sıfırla"
+27		"Ver"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
@@ -515,7 +515,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 23		"GVİ Arabelleği:"
 26		"Varsayılan"
 27		"Framing"
-28		"Mode:"
+28		"Default mode:"
 30		"Do not scale at small frame size increases"
 END
 

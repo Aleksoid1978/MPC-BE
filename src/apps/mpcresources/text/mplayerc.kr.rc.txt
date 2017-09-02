@@ -319,7 +319,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"찾아보기..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
 5		"이동 간격 (최소/중간/최대 간격을 밀리초 단위로 입력)"
 9		"기본값"
 10		"빠른 탐색 (키프레임)"
@@ -327,14 +327,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 13		"전체화면시 최소화 예방"
 15		"Pause the video playback when minimized"
 17		"로지텍 LCD 지원 활성화(실험적)"
-19		"미니덤프 활성화"
-20		"Update check"
-21		"Enable automatic update check"
-22		"Delay between each check:"
-25		"day(s)"
-26		"설정 관리"
-27		"초기화"
-28		"내보내기"
+18		"미니덤프 활성화"
+19		"Update check"
+20		"Enable automatic update check"
+21		"Delay between each check:"
+24		"day(s)"
+25		"설정 관리"
+26		"초기화"
+27		"내보내기"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
@@ -515,7 +515,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 23		"EVR 버퍼:"
 26		"Default"
 27		"Framing"
-28		"Mode:"
+28		"Default mode:"
 30		"Do not scale at small frame size increases"
 END
 

@@ -319,7 +319,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Bilatu..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
 5		"Jauzi hurruntasunak (txikia, ertaina, handia sm-tan)"
 9		"Berezkoa"
 10		"Bilaketa azkarra (giltzaframean)"
@@ -327,14 +327,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 13		"Saihestu TXIKIENTZEA Ikusleiho-osoan ez berezko monitorean"
 15		"Pausatu bideo irakurketa txikiendutakoan"
 17		"Gaitu Logitech LCD sostengua"
-19		"Gaitu MiniDump"
-20		"Eguneraketa egiaztapena"
-21		"Gaitu berezgaitasunezko eguneraketa egiaztapena"
-22		"Egiaztapen bakoitzaren arteko aldea:"
-25		"egun"
-26		"Ezarpen kudeaketa"
-27		"Berrezarri"
-28		"Esportatu"
+18		"Gaitu MiniDump"
+19		"Eguneraketa egiaztapena"
+20		"Gaitu berezgaitasunezko eguneraketa egiaztapena"
+21		"Egiaztapen bakoitzaren arteko aldea:"
+24		"egun"
+25		"Ezarpen kudeaketa"
+26		"Berrezarri"
+27		"Esportatu"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
@@ -515,7 +515,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 23		"EVR Bufferrak:"
 26		"Berezkoa"
 27		"Framing"
-28		"Mode:"
+28		"Default mode:"
 30		"Do not scale at small frame size increases"
 END
 
