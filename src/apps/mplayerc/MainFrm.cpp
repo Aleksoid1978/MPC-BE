@@ -7500,8 +7500,25 @@ void CMainFrame::OnPlayPlay()
 			strOSD = m_youtubeFields.title;
 		} else if (::PathIsURL(GetCurFileName())) {
 			CPlaylistItem pli;
-			if (m_wndPlaylistBar.GetCur(pli)) {
-				strOSD = pli.GetLabel();
+			if (m_wndPlaylistBar.GetCur(pli) && !pli.m_label.IsEmpty()) {
+				strOSD = pli.m_label;
+			}
+
+			if (strOSD.IsEmpty()) {
+				BeginEnumFilters(m_pGB, pEF, pBF) {
+					if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
+						if (!CheckMainFilter(pBF)) {
+							continue;
+						}
+
+						CComBSTR bstr;
+						if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
+							strOSD = bstr.m_str;
+							break;
+						}
+					}
+				}
+				EndEnumFilters;
 			}
 		}
 
@@ -18723,11 +18740,9 @@ const CString CMainFrame::GetStrForTitle()
 			EndEnumFilters;
 		}
 
-		if (m_eMediaLoadState == MLS_LOADED) {
-			CPlaylistItem pli;
-			if (m_wndPlaylistBar.GetCur(pli)) {
-				return pli.GetLabel();
-			}
+		CPlaylistItem pli;
+		if (m_wndPlaylistBar.GetCur(pli)) {
+			return pli.GetLabel();
 		}
 
 		return m_strPlaybackLabel;
