@@ -319,7 +319,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Öffnen..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
 5		"Sprungintervalle (kurz, mittel, weit in ms)"
 9		"Standard"
 10		"Schnellen Suchlauf verwenden (Keyframes)"
@@ -327,14 +327,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 13		"Minimieren des Fensters auf sekundärem Anzeigegerät bei Vollbild verhindern"
 15		"Videowiedergabe pausieren, wenn minimiert"
 17		"LCD-Unterstützung für Logitech-Tastaturen aktivieren"
-19		"MiniDumps aktivieren"
-20		"Programm-Update"
-21		"Automatische Update-Prüfung aktivieren"
-22		"Nach Programm-Update alle"
-25		"Tag(e) suchen"
-26		"Programmeinstellungen verwalten"
-27		"Zurücksetzen"
-28		"Sichern..."
+18		"MiniDumps aktivieren"
+19		"Programm-Update"
+20		"Automatische Update-Prüfung aktivieren"
+21		"Nach Programm-Update alle"
+24		"Tag(e) suchen"
+25		"Programmeinstellungen verwalten"
+26		"Zurücksetzen"
+27		"Sichern..."
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
@@ -515,7 +515,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 23		"EVR-Puffer:"
 26		"Zurücksetzen"
 27		"Videobild"
-28		"Modus:"
+28		"Default mode:"
 30		"Bei kleiner Erhöhung der Bildgröße nicht skalieren"
 END
 

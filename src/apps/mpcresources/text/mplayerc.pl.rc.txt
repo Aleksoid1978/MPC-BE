@@ -319,7 +319,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"Przeglądaj..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
 5		"Odstepy skoków (mały, średni, duży w ms)"
 9		"Domyślne"
 10		"Szybkie przewijanie (na klatkę kluczową"
@@ -327,14 +327,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 13		"Zapobiegaj minimalizacji w trybie pełnoekranowym na dodatkowych wyświetlaczach"
 15		"Wstrzymaj odtwarzanie po minimalizacji"
 17		"Włącz wsparcie dla wyświetlacza LCD Logitech"
-19		"Włącz MiniDump"
-20		"Sprawdzanie aktualizacji"
-21		"Włącz automatyczne sprawdzanie aktualizacji"
-22		"Sprawdzaj co:"
-25		"dni"
-26		"Zarządzanie ustawieniami"
-27		"Resetuj"
-28		"Eksportuj"
+18		"Włącz MiniDump"
+19		"Sprawdzanie aktualizacji"
+20		"Włącz automatyczne sprawdzanie aktualizacji"
+21		"Sprawdzaj co:"
+24		"dni"
+25		"Zarządzanie ustawieniami"
+26		"Resetuj"
+27		"Eksportuj"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
@@ -515,7 +515,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 23		"Bufor EVR:"
 26		"Domyślne"
 27		"Framing"
-28		"Mode:"
+28		"Default mode:"
 30		"Do not scale at small frame size increases"
 END
 

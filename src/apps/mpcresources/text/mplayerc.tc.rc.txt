@@ -319,7 +319,7 @@ BEGIN DIALOGEX IDD_PPAGELOGO LINES 12
 11		"瀏覽..."
 END
 
-BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
+BEGIN DIALOGEX IDD_PPAGEMISC LINES 28
 5		"跳躍距離（小、中、大，以毫秒作單位）"
 9		"預設值"
 10		"快速搜尋（於關鍵影格）"
@@ -327,14 +327,14 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 29
 13		"避免於非預設顯示器全螢幕時最小化"
 15		"最小化時暫停播放"
 17		"啟用 Logitech LCD 支援"
-19		"啟用小型記憶體傾印 (MiniDump)"
-20		"檢查更新"
-21		"啟用更新檢查"
-22		"檢查間隔："
-25		"日"
-26		"設定管理"
-27		"重設"
-28		"匯出"
+18		"啟用小型記憶體傾印 (MiniDump)"
+19		"檢查更新"
+20		"啟用更新檢查"
+21		"檢查間隔："
+24		"日"
+25		"設定管理"
+26		"重設"
+27		"匯出"
 END
 
 BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
@@ -515,7 +515,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 23		"EVR 緩衝區："
 26		"預設值"
 27		"影格佈置"
-28		"模式："
+28		"Default mode:"
 30		"影格框輕微放大時不變更影片畫面大小"
 END
 
