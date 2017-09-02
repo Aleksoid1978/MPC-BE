@@ -7498,6 +7498,11 @@ void CMainFrame::OnPlayPlay()
 
 		if (!m_youtubeFields.title.IsEmpty()) {
 			strOSD = m_youtubeFields.title;
+		} else if (::PathIsURL(GetCurFileName())) {
+			CPlaylistItem pli;
+			if (m_wndPlaylistBar.GetCur(pli)) {
+				strOSD = pli.GetLabel();
+			}
 		}
 
 		if (strOSD.IsEmpty()) {
