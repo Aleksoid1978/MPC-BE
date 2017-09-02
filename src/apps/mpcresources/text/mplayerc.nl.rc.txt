@@ -350,7 +350,7 @@ BEGIN DIALOGEX IDD_PPAGEPLAYBACK LINES 46
 16		"Steeds herhalen"
 18		"keer"
 19		"Terugspoelen na afspelen"
-20		"Window size"
+20		"Venstergrootte"
 21		"Auto-zoom:"
 23		"Autom. aanpassingsfactor:"
 27		"Bediening"
