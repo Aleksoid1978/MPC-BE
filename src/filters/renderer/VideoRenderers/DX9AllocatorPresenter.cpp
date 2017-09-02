@@ -30,6 +30,7 @@
 #include "../DSUtil/WinAPIUtils.h"
 #include "../../transform/VSFilter/IDirectVobSub.h"
 #include "FocusThread.h"
+#include "D3DHook.h"
 
 #define FRAMERATE_MAX_DELTA 3000
 
@@ -122,6 +123,8 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 
 CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 {
+	// D3DHook::UnHook();
+
 	if (m_bDesktopCompositionDisabled) {
 		m_bDesktopCompositionDisabled = false;
 		if (m_pDwmEnableComposition) {
@@ -609,6 +612,8 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	GetMaxResolution(m_pD3DEx, backBufferSize);
 
 	ZeroMemory(&m_d3dpp, sizeof(m_d3dpp));
+	
+	// D3DHook::Hook(m_pD3DEx->GetAdapterMonitor(m_CurrentAdapter), d3ddmEx.RefreshRate);
 
 	if (m_bIsFullscreen) {
 		// detect 10-bit device support

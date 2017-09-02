@@ -22,7 +22,7 @@
 #pragma once
 
 #include <adl/adl_sdk.h>
-#include "d3dkmt.h"
+#include "include/d3dkmt.h"
 
 class CGPUUsage
 {
