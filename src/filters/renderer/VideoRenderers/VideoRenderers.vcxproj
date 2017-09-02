@@ -96,6 +96,7 @@
     <ClCompile Include="AllocatorCommon.cpp" />
     <ClCompile Include="CPUUsage.cpp" />
     <ClCompile Include="D3DFont.cpp" />
+    <ClCompile Include="D3DHook.cpp" />
     <ClCompile Include="Dither.cpp" />
     <ClCompile Include="DX9AllocatorPresenter.cpp" />
     <ClCompile Include="DX9RenderingEngine.cpp" />
@@ -120,6 +121,7 @@
     <ClInclude Include="AllocatorCommon.h" />
     <ClInclude Include="CPUUsage.h" />
     <ClInclude Include="D3DFont.h" />
+    <ClInclude Include="D3DHook.h" />
     <ClInclude Include="d3dkmt.h" />
     <ClInclude Include="Dither.h" />
     <ClInclude Include="DX9AllocatorPresenter.h" />
