@@ -5725,7 +5725,7 @@ HRESULT CMainFrame::RenderCurrentSubtitles(BYTE* pData)
 			const int height = bih->biHeight;
 
 			SubPicDesc spdRender;
-			spdRender.type    = MSP_RGB32;
+			spdRender.type    = MSP_RGBA;
 			spdRender.w       = width;
 			spdRender.h       = abs(height);
 			spdRender.bpp     = 32;
@@ -5733,17 +5733,17 @@ HRESULT CMainFrame::RenderCurrentSubtitles(BYTE* pData)
 			spdRender.vidrect = {0, 0, width, height};
 			spdRender.bits    = DNew BYTE[spdRender.pitch * spdRender.h];
 
-			CMemSubPic memSubPic(spdRender);
-			memSubPic.ClearDirtyRect(0xFF000000);
-
 			REFERENCE_TIME rtNow = 0;
 			m_pMS->GetCurrentPosition(&rtNow);
+
+			CMemSubPic memSubPic(spdRender);
+			memSubPic.ClearDirtyRect(0xFF000000);
 
 			RECT bbox = {};
 			hr = pSubPicProvider->Render(spdRender, rtNow, m_pCAP->GetFPS(), bbox);
 			if (S_OK == hr) {
 				SubPicDesc spdTarget;
-				spdTarget.type    = MSP_RGB32;
+				spdTarget.type    = MSP_RGBA;
 				spdTarget.w       = width;
 				spdTarget.h       = height;
 				spdTarget.bpp     = 32;

@@ -35,6 +35,7 @@
 #include <vd2/Kasumi/pixmap.h>
 #include <vd2/Kasumi/pixmaputils.h>
 #include <vd2/Kasumi/pixmapops.h>
+#include "vd2/Kasumi/resample.h"
 
 #pragma warning(disable : 4799) // no emms... blahblahblah
 
@@ -324,7 +325,7 @@ bool BitBltFromRGBToRGBStretch(int dstw, int dsth, BYTE* dst, int dstpitch, int 
 		VDASSERT(false);
 	}
 
-	return VDPixmapStretchBltBilinear(dstpxm, srcbm);
+	return VDPixmapResample(dstpxm, srcbm, IVDPixmapResampler::kFilterCubic);
 }
 
 bool BitBltFromYUY2ToRGB(int w, int h, BYTE* dst, int dstpitch, int dbpp, BYTE* src, int srcpitch)
