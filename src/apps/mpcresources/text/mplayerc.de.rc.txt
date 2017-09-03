@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Änderungen werden erst nach Neustart der Wiedergabe wirksam."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 34
 5		"Videorenderer"
 7		"Einstellungen für VMR-9 und EVR (custom presenter) "
 8		"Rendergerät verwenden:"
@@ -517,6 +517,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 27		"Videobild"
 28		"Default mode:"
 30		"Bei kleiner Erhöhung der Bildgröße nicht skalieren"
+32		"Do not scale at small frame size decreases"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

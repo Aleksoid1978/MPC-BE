@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Змены ўступяць у моц пасля перазагрузкі відэа."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 34
 5		"Video renderer"
 7		"VMR-9 and EVR-CP settings"
 8		"Select D3D9 Render Device"
@@ -517,6 +517,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 27		"Framing"
 28		"Default mode:"
 30		"Do not scale at small frame size increases"
+32		"Do not scale at small frame size decreases"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

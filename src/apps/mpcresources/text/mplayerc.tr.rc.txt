@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Değişiklikler, oynatma kapatıldıktan ve uygulama yeniden başlatıldıktan sonra uygulanacaktır."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 34
 5		"Video işleyicisi"
 7		"VKİ-9 ve GVİ-ÖS ayarları"
 8		"D3D9 Karıştırıcı aygıtı seçimi"
@@ -517,6 +517,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 27		"Framing"
 28		"Default mode:"
 30		"Do not scale at small frame size increases"
+32		"Do not scale at small frame size decreases"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

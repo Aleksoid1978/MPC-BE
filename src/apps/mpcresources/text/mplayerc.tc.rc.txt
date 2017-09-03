@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"要關閉或是重新啟動播放後，變更方會生效。"
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 34
 5		"視訊繪製器"
 7		"VMR-9 及 EVR 自訂呈現設定"
 8		"選擇 D3D9 繪製裝置"
@@ -517,6 +517,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 27		"影格佈置"
 28		"Default mode:"
 30		"影格框輕微放大時不變更影片畫面大小"
+32		"Do not scale at small frame size decreases"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
