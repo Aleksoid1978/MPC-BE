@@ -1683,8 +1683,10 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 {
 	DLog(L"CMPCVideoDecFilter::InitDecoder()");
 
-	const BOOL bReinit = (m_pAVCtx != NULL);
 	const BOOL bChangeType = (m_pCurrentMediaType != *pmt);
+
+redo:
+	const BOOL bReinit = (m_pAVCtx != NULL);
 
 	int x264_build = -1;
 	if (m_nCodecId == AV_CODEC_ID_H264 && bReinit && !bChangeType) {
@@ -1987,10 +1989,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 		} while (false);
 
 		if (!m_bDXVACompatible) {
-			HRESULT hr = ReopenVideo();
-			if FAILED(hr) {
-				return hr;
-			}
+			goto redo;
 		}
 	}
 
@@ -2406,7 +2405,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 
 			if (IsDXVASupported()) {
 				HRESULT hr;
-				if (FAILED(hr = ReopenVideo())) {
+				if (FAILED(hr = InitDecoder(&m_pInput->CurrentMediaType()))) {
 					return hr;
 				}
 
@@ -3032,29 +3031,6 @@ HRESULT CMPCVideoDecFilter::ChangeOutputMediaFormat(int nType)
 	}
 
 	return hr;
-}
-
-// reopen video codec - reset the threads count and dxva flag
-HRESULT CMPCVideoDecFilter::ReopenVideo()
-{
-	if (m_pAVCtx) {
-		m_bUseDXVA = false;
-		avcodec_close(m_pAVCtx);
-		av_freep(&m_pAVCtx->hwaccel_context);
-		m_pAVCtx->get_format = avcodec_default_get_format;
-		m_pAVCtx->get_buffer2 = avcodec_default_get_buffer2;
-
-		SetThreadCount();
-
-		avcodec_lock;
-		int ret = avcodec_open2(m_pAVCtx, m_pAVCodec, NULL);
-		avcodec_unlock;
-		if (ret < 0) {
-			return VFW_E_INVALIDMEDIATYPE;
-		}
-	}
-
-	return S_OK;
 }
 
 void CMPCVideoDecFilter::SetThreadCount()
