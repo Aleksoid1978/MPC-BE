@@ -47,6 +47,7 @@ private:
 	CButton   m_chkVMRMixerMode;
 	CButton   m_chkVMRMixerYUV;
 	CButton   m_chkNoSmallUpscale;
+	CButton   m_chkNoSmallDownscale;
 
 	int m_iEvrBuffers;
 	CSpinButtonCtrl m_spnEvrBuffers;

@@ -136,6 +136,7 @@
 #define IDS_RS_HIDENAVIGATION				L"HideNavigation"
 #define IDS_RS_DEFAULTVIDEOFRAME			L"DefaultVideoFrame"
 #define IDS_RS_NOSMALLUPSCALE				L"NoSmallUpscale"
+#define IDS_RS_NOSMALLDOWNSCALE				L"NoSmallDownscale"
 #define IDS_RS_REMEMBERWINDOWSIZE			L"RememberWindowSize"
 #define IDS_RS_PANSCANZOOM					L"PanScanZoom"
 #define IDS_RS_AUDIOTIMESHIFT				L"AudioTimeShift"
