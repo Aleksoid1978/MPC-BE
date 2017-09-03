@@ -515,9 +515,9 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 34
 23		"EVR-Puffer:"
 26		"Zurücksetzen"
 27		"Videobild"
-28		"Default mode:"
+28		"Standardmodus:"
 30		"Bei kleiner Erhöhung der Bildgröße nicht skalieren"
-32		"Do not scale at small frame size decreases"
+32		"Bei kleiner Verringerung der Bildgröße nicht skalieren"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
