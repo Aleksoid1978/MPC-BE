@@ -81,6 +81,7 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SPIN1, m_spnEvrBuffers);
 	DDX_Control(pDX, IDC_COMBO8, m_cbFrameMode);
 	DDX_Control(pDX, IDC_CHECK7, m_chkNoSmallUpscale);
+	DDX_Control(pDX, IDC_CHECK8, m_chkNoSmallDownscale);
 
 	m_iEvrBuffers = clamp(m_iEvrBuffers, RS_EVRBUFFERS_MIN, RS_EVRBUFFERS_MAX);
 }
@@ -270,6 +271,7 @@ BOOL CPPageVideo::OnInitDialog()
 	m_cbFrameMode.SetCurSel(s.iDefaultVideoSize);
 
 	m_chkNoSmallUpscale.SetCheck(s.bNoSmallUpscale);
+	m_chkNoSmallDownscale.SetCheck(s.bNoSmallDownscale);
 	OnFrameModeChange();
 
 	UpdateData(TRUE);
@@ -303,6 +305,7 @@ BOOL CPPageVideo::OnApply()
 
 	s.iDefaultVideoSize = m_cbFrameMode.GetCurSel();
 	s.bNoSmallUpscale = !!m_chkNoSmallUpscale.GetCheck();
+	s.bNoSmallDownscale = !!m_chkNoSmallDownscale.GetCheck();
 
 	return __super::OnApply();
 }
@@ -521,8 +524,10 @@ void CPPageVideo::OnFrameModeChange()
 {
 	if (m_cbFrameMode.GetCurSel() == ID_VIEW_VF_FROMINSIDE - ID_VIEW_VF_HALF) {
 		m_chkNoSmallUpscale.EnableWindow(TRUE);
+		m_chkNoSmallDownscale.EnableWindow(TRUE);
 	} else {
 		m_chkNoSmallUpscale.EnableWindow(FALSE);
+		m_chkNoSmallDownscale.EnableWindow(FALSE);
 	}
 
 	SetModified();
@@ -553,6 +558,8 @@ void CPPageVideo::OnBnClickedDefault()
 	m_cbFrameMode.SetCurSel(ID_VIEW_VF_FROMINSIDE - ID_VIEW_VF_HALF);
 	m_chkNoSmallUpscale.SetCheck(BST_UNCHECKED);
 	m_chkNoSmallUpscale.EnableWindow(TRUE);
+	m_chkNoSmallDownscale.SetCheck(BST_UNCHECKED);
+	m_chkNoSmallDownscale.EnableWindow(TRUE);
 
 	Invalidate();
 	SetModified();

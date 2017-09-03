@@ -10779,9 +10779,12 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 						h = (double)wy / arxy.cx;
 					}
 
-					if (m_bFullScreen && AfxGetAppSettings().bNoSmallUpscale) {
+					if (m_bFullScreen) {
+						CAppSettings& s = AfxGetAppSettings();
 						double factor = (wy > hx) ? w / arxy.cx : h / arxy.cy;
-						if (factor > 1.0 && factor < 1.02) {
+
+						if (s.bNoSmallUpscale && factor > 1.0 && factor < 1.02
+								|| s.bNoSmallDownscale && factor > 0.99 && factor < 1.0) {
 							w = arxy.cx;
 							h = arxy.cy;
 						}

@@ -751,6 +751,7 @@ public:
 	// Video Frame
 	int				iDefaultVideoSize;
 	bool			bNoSmallUpscale;
+	bool			bNoSmallDownscale;
 	bool			fKeepAspectRatio;
 	CSize			sizeAspectRatio;
 	bool			fCompMonDeskARDiff;

@@ -568,6 +568,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	iDefaultVideoSize = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DEFAULTVIDEOFRAME, DVS_FROMINSIDE);
 	bNoSmallUpscale = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_NOSMALLUPSCALE, FALSE);
+	bNoSmallDownscale = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_NOSMALLDOWNSCALE, FALSE);
 	fKeepAspectRatio = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_KEEPASPECTRATIO, TRUE);
 	fCompMonDeskARDiff = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_COMPMONDESKARDIFF, FALSE);
 
@@ -1192,6 +1193,7 @@ void CAppSettings::SaveSettings()
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DEFAULTVIDEOFRAME, iDefaultVideoSize);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_NOSMALLUPSCALE, bNoSmallUpscale);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_NOSMALLDOWNSCALE, bNoSmallDownscale);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_KEEPASPECTRATIO, fKeepAspectRatio);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_COMPMONDESKARDIFF, fCompMonDeskARDiff);
 
