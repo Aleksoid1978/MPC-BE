@@ -178,7 +178,6 @@ protected:
 	HRESULT			Decode(const BYTE *buffer, int buflen, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bSyncPoint = FALSE, BOOL bPreroll = FALSE);
 	HRESULT			ChangeOutputMediaFormat(int nType);
 
-	HRESULT			ReopenVideo();
 	void			SetThreadCount();
 	HRESULT			FindDecoderConfiguration();
 
