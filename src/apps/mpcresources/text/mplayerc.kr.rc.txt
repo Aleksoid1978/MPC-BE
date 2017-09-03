@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"현재 파일을 닫고 다시 시작해야만 설정이 적용됩니다."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 34
 5		"Video renderer"
 7		"VMR-9 와 EVR-CP 설정"
 8		"D3D9 렌더 장치를 선택"
@@ -517,6 +517,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 27		"Framing"
 28		"Default mode:"
 30		"Do not scale at small frame size increases"
+32		"Do not scale at small frame size decreases"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

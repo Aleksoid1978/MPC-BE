@@ -499,7 +499,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 36
 35		"Vereist heropenen van de video."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 34
 5		"Videorenderer"
 7		"Instellingen van VMR-9 en EVR-CP"
 8		"Kies D3D9-renderapparaat"
@@ -517,6 +517,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 32
 27		"Frameformaat"
 28		"Default mode:"
 30		"Herschaal de beeld niet bij het licht vergroten v/d kader"
+32		"Do not scale at small frame size decreases"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
