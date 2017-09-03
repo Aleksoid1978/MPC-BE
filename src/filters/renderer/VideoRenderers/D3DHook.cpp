@@ -136,12 +136,15 @@ namespace D3DHook {
 
 	const bool Hook(const HMONITOR& hMonitor, const UINT& refreshRate)
 	{
+		DLog(L"D3DHook::Hook() : refreshRate : %u", refreshRate);
+
 		MONITORINFOEX mi = {};
 		mi.cbSize = sizeof(mi);
 		GetMonitorInfo(hMonitor, &mi);
 
 		if (m_DeviceName == mi.szDevice) {
 			DLog(L"D3DHook::Hook() : already installed a hook for a device '%s'", m_DeviceName);
+			m_refreshRate = refreshRate;
 			return true;
 		}
 
