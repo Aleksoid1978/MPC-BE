@@ -28,7 +28,6 @@
 #include "../../../DSUtil/Log.h"
 
 namespace D3DHook {
-	HMODULE m_hDriver = nullptr;
 	UINT m_refreshRate = 0;
 	CString m_DeviceName;
 
@@ -72,7 +71,7 @@ namespace D3DHook {
 	}
 
 	PFND3DDDI_CREATERESOURCE pOrigCreateResource = nullptr;
-	HRESULT pNewCreateResource(HANDLE hDevice, D3DDDIARG_CREATERESOURCE *pResource)
+	HRESULT APIENTRY pNewCreateResource(HANDLE hDevice, D3DDDIARG_CREATERESOURCE *pResource)
 	{
 		if (pResource && pResource->RefreshRate.Denominator) {
 			const double refreshRate = (double)pResource->RefreshRate.Numerator / pResource->RefreshRate.Denominator;
@@ -85,7 +84,7 @@ namespace D3DHook {
 	}
 
 	PFND3DDDI_CREATERESOURCE2 pOrigCreateResource2 = nullptr;
-	HRESULT pNewCreateResource2(HANDLE hDevice, D3DDDIARG_CREATERESOURCE2 *pResource)
+	HRESULT APIENTRY pNewCreateResource2(HANDLE hDevice, D3DDDIARG_CREATERESOURCE2 *pResource)
 	{
 		if (pResource && pResource->RefreshRate.Denominator) {
 			const double refreshRate = (double)pResource->RefreshRate.Numerator / pResource->RefreshRate.Denominator;
@@ -101,16 +100,16 @@ namespace D3DHook {
 	HRESULT APIENTRY pNewCreateDevice(HANDLE hAdapter, D3DDDIARG_CREATEDEVICE* pCreateData)
 	{
 		const HRESULT hr = pOrigCreateDevice(hAdapter, pCreateData);
-		if (SUCCEEDED(hr) && pCreateData->Interface == 9) {
+		if (SUCCEEDED(hr) && pCreateData && pCreateData->Interface == 9) {
 			if (!pOrigCreateResource
-					&& pCreateData && pCreateData->pDeviceFuncs && pCreateData->pDeviceFuncs->pfnCreateResource) {
+					&& pCreateData->pDeviceFuncs && pCreateData->pDeviceFuncs->pfnCreateResource) {
 				pOrigCreateResource = pCreateData->pDeviceFuncs->pfnCreateResource;
 
 				HookFunc((PVOID&)pOrigCreateResource, &pNewCreateResource);
 			}
 
 			if (!pOrigCreateResource2
-					&& pCreateData && pCreateData->pDeviceFuncs && pCreateData->pDeviceFuncs->pfnCreateResource2) {
+					&& pCreateData->pDeviceFuncs && pCreateData->pDeviceFuncs->pfnCreateResource2) {
 				pOrigCreateResource2 = pCreateData->pDeviceFuncs->pfnCreateResource2;
 
 				HookFunc((PVOID&)pOrigCreateResource2, &pNewCreateResource2);
@@ -157,7 +156,7 @@ namespace D3DHook {
 			DISPLAY_DEVICE dd = { sizeof(DISPLAY_DEVICE) };
 			DWORD iDevNum = 0;
 			while (EnumDisplayDevices(0, iDevNum, &dd, 0)) {
-				DLog(L"D3DHook::Hook() : EnumDisplayDevices() : '%s'", dd.DeviceName);
+				DLog(L"D3DHook::Hook() : EnumDisplayDevices() : DeviceName - '%s', DeviceKey - '%s'", dd.DeviceName, dd.DeviceKey);
 				if (wcscmp(mi.szDevice, dd.DeviceName) == 0) {
 					CString lpszKeyName = dd.DeviceKey; lpszKeyName.Replace(L"\\Registry\\Machine\\", L""); lpszKeyName.Trim();
 					if (!lpszKeyName.IsEmpty()) {
@@ -194,22 +193,18 @@ namespace D3DHook {
 
 		if (!driverDll.IsEmpty()) {
 			DLog(L"D3DHook::Hook() : use the driver library '%s'", driverDll);
-			m_hDriver = LoadLibrary(driverDll);
-			if (m_hDriver) {
-				pOrigOpenAdapter = (PFND3DDDI_OPENADAPTER)GetProcAddress(m_hDriver, "OpenAdapter");
-				if (pOrigOpenAdapter) {
-					const bool ret = HookFunc((PVOID&)pOrigOpenAdapter, &pNewOpenAdapter);
-					if (ret) {
-						DLog(L"D3DHook::Hook() : successfully installed a hook for a device '%s'", mi.szDevice);
-						m_refreshRate = refreshRate;
-						m_DeviceName = mi.szDevice;
+			pOrigOpenAdapter = (PFND3DDDI_OPENADAPTER)GetProcAddress(GetModuleHandleW(driverDll), "OpenAdapter");
+			if (pOrigOpenAdapter) {
+				const bool ret = HookFunc((PVOID&)pOrigOpenAdapter, &pNewOpenAdapter);
+				if (ret) {
+					DLog(L"D3DHook::Hook() : successfully installed a hook for a device '%s'", mi.szDevice);
+					m_refreshRate = refreshRate;
+					m_DeviceName = mi.szDevice;
 
-						return true;
-					}
-					pOrigOpenAdapter = nullptr;
+					return true;
 				}
-				FreeLibrary(m_hDriver);
-				m_hDriver = nullptr;
+
+				pOrigOpenAdapter = nullptr;
 			}
 		}
 
@@ -239,9 +234,6 @@ namespace D3DHook {
 			pOrigCreateResource2 = nullptr;
 			pOrigCreateDevice = nullptr;
 			pOrigOpenAdapter = nullptr;
-
-			FreeLibrary(m_hDriver);
-			m_hDriver = nullptr;
 
 			m_DeviceName.Empty();
 			m_refreshRate = 0;
