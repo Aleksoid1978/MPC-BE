@@ -26,6 +26,7 @@
 #include "D3DHook.h"
 #include "include/d3dumddi.h"
 #include "../../../DSUtil/Log.h"
+#include "../../../DSUtil/SysVersion.h"
 
 namespace D3DHook {
 	UINT m_refreshRate = 0;
@@ -162,10 +163,11 @@ namespace D3DHook {
 					if (!lpszKeyName.IsEmpty()) {
 						CRegKey regkey;
 						if (ERROR_SUCCESS == regkey.Open(HKEY_LOCAL_MACHINE, lpszKeyName, KEY_READ)) {
-#ifdef _WIN64
-							const LPCTSTR pszValueName = L"UserModeDriverName";
-#else
-							const LPCTSTR pszValueName = L"UserModeDriverNameWow";
+							LPCTSTR pszValueName = L"UserModeDriverName";
+#ifndef _WIN64
+							if (SysVersion::IsW64()) {
+								pszValueName = L"UserModeDriverNameWoW";
+							}
 #endif
 							ULONG nChars = 0;
 							if (ERROR_SUCCESS == regkey.QueryMultiStringValue(pszValueName, NULL, &nChars) && nChars > 0) {
