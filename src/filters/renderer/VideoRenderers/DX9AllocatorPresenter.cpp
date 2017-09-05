@@ -27,6 +27,7 @@
 #include "../../../SubPic/DX9SubPic.h"
 #include "../../../SubPic/SubPicQueueImpl.h"
 #include "IPinHook.h"
+#include "../DSUtil/SysVersion.h"
 #include "../DSUtil/WinAPIUtils.h"
 #include "../../transform/VSFilter/IDirectVobSub.h"
 #include "FocusThread.h"
@@ -123,7 +124,9 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 
 CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 {
-	// D3DHook::UnHook();
+	if (SysVersion::IsWin81orLater()) {
+		D3DHook::UnHook();
+	}
 
 	if (m_bDesktopCompositionDisabled) {
 		m_bDesktopCompositionDisabled = false;
@@ -613,7 +616,9 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 	ZeroMemory(&m_d3dpp, sizeof(m_d3dpp));
 	
-	// D3DHook::Hook(m_pD3DEx->GetAdapterMonitor(m_CurrentAdapter), d3ddmEx.RefreshRate);
+	if (SysVersion::IsWin81orLater()) {
+		D3DHook::Hook(m_pD3DEx->GetAdapterMonitor(m_CurrentAdapter), d3ddmEx.RefreshRate);
+	}
 
 	if (m_bIsFullscreen) {
 		// detect 10-bit device support
