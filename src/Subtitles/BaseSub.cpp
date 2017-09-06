@@ -20,7 +20,6 @@
 
 #include "stdafx.h"
 #include "BaseSub.h"
-#include "../DSUtil/vd.h"
 #include "../DSUtil/ResampleARGB.h"
 
 CBaseSub::CBaseSub(SUBTITLE_TYPE nType)
