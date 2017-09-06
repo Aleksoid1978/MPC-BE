@@ -325,7 +325,7 @@ bool BitBltFromRGBToRGBStretch(int dstw, int dsth, BYTE* dst, int dstpitch, int 
 		VDASSERT(false);
 	}
 
-	return VDPixmapResample(dstpxm, srcbm, IVDPixmapResampler::kFilterCubic);
+	return VDPixmapResample(dstpxm, srcbm, IVDPixmapResampler::kFilterPoint);
 }
 
 bool BitBltFromYUY2ToRGB(int w, int h, BYTE* dst, int dstpitch, int dbpp, BYTE* src, int srcpitch)
