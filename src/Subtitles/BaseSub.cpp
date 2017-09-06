@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "BaseSub.h"
 #include "../DSUtil/vd.h"
+#include "../DSUtil/ResampleARGB.h"
 
 CBaseSub::CBaseSub(SUBTITLE_TYPE nType)
 	: m_nType(nType)
@@ -66,6 +67,9 @@ void CBaseSub::FinalizeRender(SubPicDesc& spd)
 		m_bResizedRender = FALSE;
 
 		// StretchBlt ...
-		BitBltFromRGBToRGBStretch(spd.w, spd.h, (BYTE*)spd.bits, spd.pitch, 32, m_spd.w, m_spd.h, (BYTE*)m_spd.bits, m_spd.pitch, 32);
+		int filter = (spd.w < m_spd.w && spd.h < m_spd.h) ? IMAGING_TRANSFORM_BOX : IMAGING_TRANSFORM_BILINEAR;
+
+		HRESULT hr = ResampleARGB((BYTE*)spd.bits, spd.w, spd.h, (BYTE*)m_spd.bits, m_spd.w, m_spd.h, filter);
+		ASSERT(hr == S_OK);
 	}
 }
