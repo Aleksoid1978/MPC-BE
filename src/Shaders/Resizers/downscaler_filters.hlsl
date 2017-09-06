@@ -38,6 +38,8 @@ inline float filter(float x)
         x = -x;
     if (x == 0.0)
         return 1.0;
+    if (x >= 1.0)
+        return 0.0;
     x *= PI;
     return sin(x) / x * (0.54 + 0.46 * cos(x));
 }
