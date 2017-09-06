@@ -3,6 +3,9 @@
 #include "ResampleARGB.h"
 
 // based on https://github.com/uploadcare/pillow-simd/blob/3.4.x/libImaging/Resample.c
+// and use same fixes from https://github.com/uploadcare/pillow-simd/blob/4.3-demo/libImaging/Resample.c
+
+#define MAKE_UINT32(u0, u1, u2, u3) (u0 | (u1<<8) | (u2<<16) | (u3<<24))
 
 struct filter_t {
 	double (*pfilter)(double x);
@@ -31,6 +34,8 @@ static inline double hamming_filter(double x)
 		x = -x;
 	if (x == 0.0)
 		return 1.0;
+	if (x >= 1.0)
+		return 0.0;
 	x = x * M_PI;
 	return sin(x) / x * (0.54f + 0.46f * cos(x));
 }
@@ -265,10 +270,8 @@ HRESULT ResampleHorizontal(BYTE* dest, int destW, int H, const BYTE* const src, 
 				ss2 += lineIn[(x + xmin)*4 + 2] * k[x];
 				ss3 += lineIn[(x + xmin)*4 + 3] * k[x];
 			}
-			lineOut[xx*4 + 0] = clip8(ss0);
-			lineOut[xx*4 + 1] = clip8(ss1);
-			lineOut[xx*4 + 2] = clip8(ss2);
-			lineOut[xx*4 + 3] = clip8(ss3);
+
+			((UINT32*)lineOut)[xx] = MAKE_UINT32(clip8(ss0), clip8(ss1), clip8(ss2), clip8(ss3));
 		}
 	}
 
@@ -311,10 +314,8 @@ HRESULT ResampleVertical(BYTE* dest, int W, int destH, const BYTE* const src, in
 				ss2 += lineIn[xx*4 + 2] * k[y];
 				ss3 += lineIn[xx*4 + 3] * k[y];
 			}
-			lineOut[xx*4 + 0] = clip8(ss0);
-			lineOut[xx*4 + 1] = clip8(ss1);
-			lineOut[xx*4 + 2] = clip8(ss2);
-			lineOut[xx*4 + 3] = clip8(ss3);
+
+			((UINT32*)lineOut)[xx] = MAKE_UINT32(clip8(ss0), clip8(ss1), clip8(ss2), clip8(ss3));
 		}
 	}
 
