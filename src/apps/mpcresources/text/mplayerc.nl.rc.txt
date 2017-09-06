@@ -515,9 +515,9 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 34
 23		"EVR-buffers:"
 26		"Standaard"
 27		"Frameformaat"
-28		"Default mode:"
+28		"Standaardmodus:"
 30		"Herschaal de beeld niet bij het licht vergroten v/d kader"
-32		"Do not scale at small frame size decreases"
+32		"Herschaal de beeld niet bij het licht verkleinen v/d kader"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

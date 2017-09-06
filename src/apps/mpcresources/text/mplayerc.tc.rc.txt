@@ -515,9 +515,9 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 34
 23		"EVR 緩衝區："
 26		"預設值"
 27		"影格佈置"
-28		"Default mode:"
+28		"預設模式："
 30		"影格框輕微放大時不變更影片畫面大小"
-32		"Do not scale at small frame size decreases"
+32		"影格框輕微縮小時不變更影片畫面大小"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

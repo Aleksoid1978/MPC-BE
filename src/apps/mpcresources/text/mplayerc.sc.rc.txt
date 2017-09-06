@@ -515,9 +515,9 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 34
 23		"EVR 缓冲:"
 26		"默认"
 27		"播放框布置"
-28		"Default mode:"
+28		"默认模式："
 30		"播放框轻微放大时不改变视频画面大小"
-32		"Do not scale at small frame size decreases"
+32		"播放框轻微缩小时不改变视频画面大小"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
