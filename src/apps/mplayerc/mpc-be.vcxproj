@@ -304,7 +304,6 @@
     <ClInclude Include="ShaderEditorDlg.h" />
     <ClInclude Include="ShaderNewDlg.h" />
     <ClInclude Include="ShockwaveGraph.h" />
-    <ClInclude Include="SmoothImageResampling.h" />
     <ClInclude Include="StaticLink.h" />
     <ClInclude Include="StatusLabel.h" />
     <ClInclude Include="stdafx.h" />
