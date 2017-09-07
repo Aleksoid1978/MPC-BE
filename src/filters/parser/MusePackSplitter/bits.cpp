@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2012-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include "bits.h"
 
-const int32 Bitstream::EXP_GOLOMB_MAP[2][48] =
+const int32_t Bitstream::EXP_GOLOMB_MAP[2][48] =
 {
 	{
 		47, 31, 15,  0, 23, 27, 29, 30,
@@ -41,7 +41,7 @@ const int32 Bitstream::EXP_GOLOMB_MAP[2][48] =
 	}
 };
 
-const int32 Bitstream::EXP_GOLOMB_MAP_INV[2][48] =
+const int32_t Bitstream::EXP_GOLOMB_MAP_INV[2][48] =
 {
 	{
 		 3, 29, 30, 17, 31, 18, 37,  8,
@@ -63,7 +63,7 @@ const int32 Bitstream::EXP_GOLOMB_MAP_INV[2][48] =
 
 // Exp-Golomb Codes
 
-const int32 Bitstream::EXP_GOLOMB_SIZE[255] =
+const int32_t Bitstream::EXP_GOLOMB_SIZE[255] =
 {
 	1, 3, 3, 5, 5, 5, 5, 7, 7, 7, 7, 7, 7, 7, 7,
 	9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
@@ -79,35 +79,35 @@ const int32 Bitstream::EXP_GOLOMB_SIZE[255] =
 	15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15
 };
 
-uint32 Bitstream::Get_UE()
+uint32_t Bitstream::Get_UE()
 {
-	int32 len = 0;
+	int32_t len = 0;
 	NeedBits24();
 	while (!UGetBits(1)) len++;
 	NeedBits24();
 	return (len == 0 ? 0 : (1<<len)-1 + UGetBits(len));
 }
 
-int32 Bitstream::Get_SE()
+int32_t Bitstream::Get_SE()
 {
-	int32 len = 0;
+	int32_t len = 0;
 	NeedBits24();
 	while (!UGetBits(1)) len++;
 	if (len == 0) return 0;
 	NeedBits24();
-	int32 val = (1 << len) | UGetBits(len);
+	int32_t val = (1 << len) | UGetBits(len);
 	return (val&1) ? -(val>>1) : (val>>1);
 }
 
-int32 Bitstream::Get_ME(int32 mode)
+int32_t Bitstream::Get_ME(int32_t mode)
 {
 	// nacitame UE a potom podla mapovacej tabulky
-	int32 codeNum = Get_UE();
+	int32_t codeNum = Get_UE();
 	if (codeNum >= 48) return -1;		// chyba
 	return EXP_GOLOMB_MAP[mode][codeNum];
 }
 
-int32 Bitstream::Get_TE(int32 range)
+int32_t Bitstream::Get_TE(int32_t range)
 {
 	/* ISO/IEC 14496-10 - Section 9.1 */
 	if (range > 1) {
@@ -117,9 +117,9 @@ int32 Bitstream::Get_TE(int32 range)
 	}
 }
 
-int32 Bitstream::Get_Golomb(int k)
+int32_t Bitstream::Get_Golomb(int k)
 {
-	int32 l=0;
+	int32_t l=0;
 	NeedBits();
 	while (UBits(8) == 0) {
 		l += 8;
