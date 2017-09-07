@@ -36,8 +36,8 @@ HRESULT DumpDX9Surface(IDirect3DDevice9* pD3DDev, IDirect3DSurface9* pSurface, w
 	};
 
 	CComPtr<IDirect3DSurface9> pTarget;
-	if (FAILED(hr = pD3DDev->CreateRenderTarget(desc.Width, desc.Height, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pTarget, NULL))
-		|| FAILED(hr = pD3DDev->StretchRect(pSurface, NULL, pTarget, NULL, D3DTEXF_NONE))) {
+	if (FAILED(hr = pD3DDev->CreateRenderTarget(desc.Width, desc.Height, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pTarget, nullptr))
+		|| FAILED(hr = pD3DDev->StretchRect(pSurface, nullptr, pTarget, nullptr, D3DTEXF_NONE))) {
 		return hr;
 	}
 
@@ -57,7 +57,7 @@ HRESULT DumpDX9Surface(IDirect3DDevice9* pD3DDev, IDirect3DSurface9* pSurface, w
 	bih->biSizeImage = DIBSIZE(*bih);
 
 	D3DLOCKED_RECT r;
-	hr = pTarget->LockRect(&r, NULL, D3DLOCK_READONLY);
+	hr = pTarget->LockRect(&r, nullptr, D3DLOCK_READONLY);
 
 	BitBltFromRGBToRGB(bih->biWidth, bih->biHeight,
 		(BYTE*)(bih + 1), bih->biWidth * 4, 32,

@@ -43,13 +43,13 @@
 #define LOG_FILE_BITSTREAM  L"bitstream.log"
 #endif
 
-IPinCVtbl*         g_pPinCVtbl         = NULL;
-IMemInputPinCVtbl* g_pMemInputPinCVtbl = NULL;
-IPinC*             g_pPinC             = NULL;
+IPinCVtbl*         g_pPinCVtbl         = nullptr;
+IMemInputPinCVtbl* g_pMemInputPinCVtbl = nullptr;
+IPinC*             g_pPinC             = nullptr;
 
 REFERENCE_TIME g_tSegmentStart    = 0;
 FRAME_TYPE     g_nFrameType       = PICT_NONE;
-HANDLE         g_hNewSegmentEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+HANDLE         g_hNewSegmentEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 
 namespace DXVAState {
 	BOOL m_bDXVActive      = FALSE;
@@ -190,12 +190,12 @@ void UnhookNewSegmentAndReceive()
 		}
 		res = VirtualProtect(g_pMemInputPinCVtbl, sizeof(IMemInputPinCVtbl), flOldProtect, &flOldProtect);
 
-		g_pPinCVtbl          = NULL;
-		g_pPinC              = NULL;
-		g_pMemInputPinCVtbl  = NULL;
-		NewSegmentOrg        = NULL;
-		ReceiveConnectionOrg = NULL;
-		ReceiveOrg           = NULL;
+		g_pPinCVtbl          = nullptr;
+		g_pPinC              = nullptr;
+		g_pMemInputPinCVtbl  = nullptr;
+		NewSegmentOrg        = nullptr;
+		ReceiveConnectionOrg = nullptr;
+		ReceiveOrg           = nullptr;
 	}
 }
 
@@ -218,12 +218,12 @@ bool HookNewSegmentAndReceive(IPin* pPin)
 
 	// Casimir666 : change sizeof(IPinC) to sizeof(IPinCVtbl) to fix crash with EVR hack on Vista!
 	res = VirtualProtect(pPinC->lpVtbl, sizeof(IPinCVtbl), PAGE_WRITECOPY, &flOldProtect);
-	if (NewSegmentOrg == NULL) {
+	if (NewSegmentOrg == nullptr) {
 		NewSegmentOrg = pPinC->lpVtbl->NewSegment;
 	}
 	pPinC->lpVtbl->NewSegment = NewSegmentMine;
 
-    if (ReceiveConnectionOrg == NULL) {
+    if (ReceiveConnectionOrg == nullptr) {
         ReceiveConnectionOrg = pPinC->lpVtbl->ReceiveConnection;
     }
     pPinC->lpVtbl->ReceiveConnection = ReceiveConnectionMine;
@@ -232,7 +232,7 @@ bool HookNewSegmentAndReceive(IPin* pPin)
 
 	// Casimir666 : change sizeof(IMemInputPinC) to sizeof(IMemInputPinCVtbl) to fix crash with EVR hack on Vista!
 	res = VirtualProtect(pMemInputPinC->lpVtbl, sizeof(IMemInputPinCVtbl), PAGE_WRITECOPY, &flOldProtect);
-	if (ReceiveOrg == NULL) {
+	if (ReceiveOrg == nullptr) {
 		ReceiveOrg = pMemInputPinC->lpVtbl->Receive;
 	}
 	pMemInputPinC->lpVtbl->Receive = ReceiveMine;
@@ -383,7 +383,7 @@ static void LogDXVA_PicParams_H264(DXVA_PicParams_H264* pPic)
 	//}
 
 	// === Dump PicParams!
-	//static FILE*	hPict = NULL;
+	//static FILE* hPict = nullptr;
 	//if (!hPict) hPict = fopen ("PicParam.bin", "wb");
 	//if (hPict)
 	//{
@@ -880,7 +880,7 @@ interface IDirectXVideoDecoderServiceC {
 	CONST_VTBL struct IDirectXVideoDecoderServiceCVtbl *lpVtbl;
 };
 
-IDirectXVideoDecoderServiceCVtbl* g_pIDirectXVideoDecoderServiceCVtbl = NULL;
+IDirectXVideoDecoderServiceCVtbl* g_pIDirectXVideoDecoderServiceCVtbl = nullptr;
 static HRESULT (STDMETHODCALLTYPE* CreateVideoDecoderOrg )(IDirectXVideoDecoderServiceC* pThis, __in  REFGUID Guid, __in  const DXVA2_VideoDesc* pVideoDesc, __in  const DXVA2_ConfigPictureDecode* pConfig, __in_ecount(NumRenderTargets)  IDirect3DSurface9 **ppDecoderRenderTargets, __in  UINT NumRenderTargets, __deref_out  IDirectXVideoDecoder** ppDecode) PURE;
 #ifdef _DEBUG
 static HRESULT (STDMETHODCALLTYPE* GetDecoderDeviceGuidsOrg)(IDirectXVideoDecoderServiceC* pThis, __out  UINT* pCount, __deref_out_ecount_opt(*pCount)  GUID** pGuids) PURE;
@@ -954,7 +954,7 @@ static HRESULT STDMETHODCALLTYPE CreateVideoDecoderMine(IDirectXVideoDecoderServ
 				(Guid == DXVA_Intel_VC1_ClearVideo) ||
 				(Guid == DXVA2_ModeVC1_D2010) ||
 				(Guid == DXVA2_ModeMPEG2_VLD)) {
-			*ppDecode = DNew CFakeDirectXVideoDecoder(NULL, *ppDecode);
+			*ppDecode = DNew CFakeDirectXVideoDecoder(nullptr, *ppDecode);
 			(*ppDecode)->AddRef();
 		}
 
@@ -1023,10 +1023,10 @@ void HookDirectXVideoDecoderService(void* pIDirectXVideoDecoderService)
 
 		res = VirtualProtect(g_pIDirectXVideoDecoderServiceCVtbl, sizeof(IDirectXVideoDecoderServiceCVtbl), flOldProtect, &flOldProtect);
 
-		g_pIDirectXVideoDecoderServiceCVtbl = NULL;
-		CreateVideoDecoderOrg               = NULL;
+		g_pIDirectXVideoDecoderServiceCVtbl = nullptr;
+		CreateVideoDecoderOrg               = nullptr;
 #ifdef _DEBUG
-		GetDecoderConfigurationsOrg         = NULL;
+		GetDecoderConfigurationsOrg         = nullptr;
 #endif
 		DXVAState::ClearState();
 	}

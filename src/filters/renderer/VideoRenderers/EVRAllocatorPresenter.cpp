@@ -60,12 +60,12 @@ using namespace DSObjects;
 CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	: CDX9AllocatorPresenter(hWnd, bFullscreen, hr, true, _Error)
 	, m_nResetToken(0)
-	, m_hRenderThread(NULL)
-	, m_hGetMixerThread(NULL)
-	, m_hVSyncThread(NULL)
-	, m_hEvtFlush(NULL)
-	, m_hEvtQuit(NULL)
-	, m_hEvtRenegotiate(NULL)
+	, m_hRenderThread(nullptr)
+	, m_hGetMixerThread(nullptr)
+	, m_hVSyncThread(nullptr)
+	, m_hEvtFlush(nullptr)
+	, m_hEvtQuit(nullptr)
+	, m_hEvtRenegotiate(nullptr)
 	, m_bEvtQuit(false)
 	, m_bEvtFlush(false)
 	, m_ModeratedTime(0)
@@ -78,14 +78,14 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_LastSetOutputRange(-1)
 	, m_bPendingMediaFinished(false)
 	, m_bWaitingSample(false)
-	, m_pCurrentDisplaydSample(NULL)
+	, m_pCurrentDisplaydSample(nullptr)
 	, m_nStepCount(0)
 	, m_dwVideoAspectRatioMode(MFVideoARMode_PreservePicture)
 	, m_dwVideoRenderPrefs((MFVideoRenderPrefs)0)
 	, m_BorderColor(RGB (0,0,0))
 	, m_bSignaledStarvation(false)
 	, m_StarvationClock(0)
-	, m_pOuterEVR(NULL)
+	, m_pOuterEVR(nullptr)
 	, m_LastScheduledSampleTime(-1)
 	, m_LastScheduledUncorrectedSampleTime(-1)
 	, m_MaxSampleDuration(0)
@@ -95,16 +95,16 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_bLastSampleOffsetValid(false)
 	, m_bChangeMT(false)
 	, m_LastScheduledSampleTimeFP(-1)
-	, pfDXVA2CreateDirect3DDeviceManager9(NULL)
-	, pfMFCreateVideoSampleFromSurface(NULL)
-	, pfMFCreateVideoMediaType(NULL)
-	, pfAvSetMmThreadCharacteristicsW(NULL)
-	, pfAvSetMmThreadPriority(NULL)
-	, pfAvRevertMmThreadCharacteristics(NULL)
-	, m_pMediaType(NULL)
+	, pfDXVA2CreateDirect3DDeviceManager9(nullptr)
+	, pfMFCreateVideoSampleFromSurface(nullptr)
+	, pfMFCreateVideoMediaType(nullptr)
+	, pfAvSetMmThreadCharacteristicsW(nullptr)
+	, pfAvSetMmThreadPriority(nullptr)
+	, pfAvRevertMmThreadCharacteristics(nullptr)
+	, m_pMediaType(nullptr)
 	, m_bStreamChanged(TRUE)
 {
-	HMODULE hLib = NULL;
+	HMODULE hLib = nullptr;
 	CRenderersSettings& rs = GetRenderersSettings();
 
 	ZeroMemory(m_VSyncOffsetHistory, sizeof(m_VSyncOffsetHistory));
@@ -117,12 +117,12 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 
 	// Load EVR specifics DLLs
 	hLib = LoadLibrary(L"dxva2.dll");
-	pfDXVA2CreateDirect3DDeviceManager9	= hLib ? (PTR_DXVA2CreateDirect3DDeviceManager9) GetProcAddress(hLib, "DXVA2CreateDirect3DDeviceManager9") : NULL;
+	pfDXVA2CreateDirect3DDeviceManager9	= hLib ? (PTR_DXVA2CreateDirect3DDeviceManager9) GetProcAddress(hLib, "DXVA2CreateDirect3DDeviceManager9") : nullptr;
 
 	// Load EVR functions
 	hLib = LoadLibrary(L"evr.dll");
-	pfMFCreateVideoSampleFromSurface	= hLib ? (PTR_MFCreateVideoSampleFromSurface)	GetProcAddress(hLib, "MFCreateVideoSampleFromSurface") : NULL;
-	pfMFCreateVideoMediaType			= hLib ? (PTR_MFCreateVideoMediaType)			GetProcAddress(hLib, "MFCreateVideoMediaType") : NULL;
+	pfMFCreateVideoSampleFromSurface	= hLib ? (PTR_MFCreateVideoSampleFromSurface)	GetProcAddress(hLib, "MFCreateVideoSampleFromSurface") : nullptr;
+	pfMFCreateVideoMediaType			= hLib ? (PTR_MFCreateVideoMediaType)			GetProcAddress(hLib, "MFCreateVideoMediaType") : nullptr;
 
 	if (!pfDXVA2CreateDirect3DDeviceManager9 || !pfMFCreateVideoSampleFromSurface || !pfMFCreateVideoMediaType) {
 		if (!pfDXVA2CreateDirect3DDeviceManager9) {
@@ -153,9 +153,9 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 
 	// Load Vista specifics DLLs
 	hLib = LoadLibrary(L"avrt.dll");
-	pfAvSetMmThreadCharacteristicsW		= hLib ? (PTR_AvSetMmThreadCharacteristicsW)	GetProcAddress(hLib, "AvSetMmThreadCharacteristicsW") : NULL;
-	pfAvSetMmThreadPriority				= hLib ? (PTR_AvSetMmThreadPriority)			GetProcAddress(hLib, "AvSetMmThreadPriority") : NULL;
-	pfAvRevertMmThreadCharacteristics	= hLib ? (PTR_AvRevertMmThreadCharacteristics)	GetProcAddress(hLib, "AvRevertMmThreadCharacteristics") : NULL;
+	pfAvSetMmThreadCharacteristicsW		= hLib ? (PTR_AvSetMmThreadCharacteristicsW)	GetProcAddress(hLib, "AvSetMmThreadCharacteristicsW") : nullptr;
+	pfAvSetMmThreadPriority				= hLib ? (PTR_AvSetMmThreadPriority)			GetProcAddress(hLib, "AvSetMmThreadPriority") : nullptr;
+	pfAvRevertMmThreadCharacteristics	= hLib ? (PTR_AvRevertMmThreadCharacteristics)	GetProcAddress(hLib, "AvRevertMmThreadCharacteristics") : nullptr;
 
 	// Init DXVA manager
 	hr = pfDXVA2CreateDirect3DDeviceManager9(&m_nResetToken, &m_pD3DManager);
@@ -175,10 +175,10 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 CEVRAllocatorPresenter::~CEVRAllocatorPresenter(void)
 {
 	StopWorkerThreads();	// If not already done...
-	m_pMediaType	= NULL;
-	m_pClock		= NULL;
+	m_pMediaType	= nullptr;
+	m_pClock		= nullptr;
 
-	m_pD3DManager	= NULL;
+	m_pD3DManager	= nullptr;
 }
 
 void CEVRAllocatorPresenter::ResetStats()
@@ -204,14 +204,14 @@ void CEVRAllocatorPresenter::StartWorkerThreads()
 	DWORD dwThreadId;
 
 	if (m_nRenderState == Shutdown) {
-		m_hEvtQuit			= CreateEvent (NULL, TRUE, FALSE, NULL);
-		m_hEvtFlush			= CreateEvent (NULL, TRUE, FALSE, NULL);
+		m_hEvtQuit			= CreateEvent (nullptr, TRUE, FALSE, nullptr);
+		m_hEvtFlush			= CreateEvent (nullptr, TRUE, FALSE, nullptr);
 
-		m_hRenderThread		= ::CreateThread(NULL, 0, PresentThread, (LPVOID)this, 0, &dwThreadId);
+		m_hRenderThread		= ::CreateThread(nullptr, 0, PresentThread, (LPVOID)this, 0, &dwThreadId);
 		SetThreadPriority(m_hRenderThread, THREAD_PRIORITY_TIME_CRITICAL);
-		m_hGetMixerThread	= ::CreateThread(NULL, 0, GetMixerThreadStatic, (LPVOID)this, 0, &dwThreadId);
+		m_hGetMixerThread	= ::CreateThread(nullptr, 0, GetMixerThreadStatic, (LPVOID)this, 0, &dwThreadId);
 		SetThreadPriority(m_hGetMixerThread, THREAD_PRIORITY_HIGHEST);
-		m_hVSyncThread		= ::CreateThread(NULL, 0, VSyncThreadStatic, (LPVOID)this, 0, &dwThreadId);
+		m_hVSyncThread		= ::CreateThread(nullptr, 0, VSyncThreadStatic, (LPVOID)this, 0, &dwThreadId);
 		SetThreadPriority(m_hVSyncThread, THREAD_PRIORITY_HIGHEST);
 
 		m_nRenderState		= Stopped;
@@ -261,12 +261,12 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 {
 	CheckPointer(ppRenderer, E_POINTER);
 
-	*ppRenderer = NULL;
+	*ppRenderer = nullptr;
 
 	HRESULT hr = E_FAIL;
 
 	do {
-		CMacrovisionKicker*	pMK  = DNew CMacrovisionKicker(NAME("CMacrovisionKicker"), NULL);
+		CMacrovisionKicker*	pMK  = DNew CMacrovisionKicker(NAME("CMacrovisionKicker"), nullptr);
 		CComPtr<IUnknown>	pUnk = (IUnknown*)(INonDelegatingUnknown*)pMK;
 
 		COuterEVR *pOuterEVR = DNew COuterEVR(NAME("COuterEVR"), pUnk, hr, &m_VMR9AlphaBitmap, this);
@@ -295,13 +295,13 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 			hr = QueryInterface(IID_PPV_ARGS(&pVP));
 		}
 		if (SUCCEEDED(hr)) {
-			hr = pMFVR->InitializeRenderer(NULL, pVP);
+			hr = pMFVR->InitializeRenderer(nullptr, pVP);
 		}
 
 		m_fUseInternalTimer = HookNewSegmentAndReceive(GetFirstPin(pBF));
 
 		if (FAILED(hr)) {
-			*ppRenderer = NULL;
+			*ppRenderer = nullptr;
 		} else {
 			*ppRenderer = pBF.Detach();
 		}
@@ -371,7 +371,7 @@ STDMETHODIMP CEVRAllocatorPresenter::OnClockStart(MFTIME hnsSystemTime,  LONGLON
 				DWORD dwFlags = DWORD_MAX;
 				DWORD dwGroup = DWORD_MAX;
 
-				if (FAILED(m_pSS->Info(i, NULL, &dwFlags, NULL, &dwGroup, NULL, NULL, NULL))) {
+				if (FAILED(m_pSS->Info(i, nullptr, &dwFlags, nullptr, &dwGroup, nullptr, nullptr, nullptr))) {
 					continue;
 				}
 
@@ -516,7 +516,7 @@ STDMETHODIMP CEVRAllocatorPresenter::GetFastestRate(MFRATE_DIRECTION eDirection,
 STDMETHODIMP CEVRAllocatorPresenter::IsRateSupported(BOOL fThin, float flRate, float *pflNearestSupportedRate)
 {
 	// fRate can be negative for reverse playback.
-	// pfNearestSupportedRate can be NULL.
+	// pfNearestSupportedRate can be nullptr.
 
 	CAutoLock lock(this);
 
@@ -542,7 +542,7 @@ STDMETHODIMP CEVRAllocatorPresenter::IsRateSupported(BOOL fThin, float flRate, f
 	}
 
 	// Return the nearest supported rate if the caller requested it.
-	if (pflNearestSupportedRate != NULL) {
+	if (pflNearestSupportedRate != nullptr) {
 		*pflNearestSupportedRate = fNearestRate;
 	}
 
@@ -554,7 +554,7 @@ float CEVRAllocatorPresenter::GetMaxRate(BOOL bThin)
 	float  fMaxRate     = FLT_MAX;  // Default.
 	UINT32 fpsNumerator = 0, fpsDenominator = 0;
 
-	if (!bThin && (m_pMediaType != NULL)) {
+	if (!bThin && (m_pMediaType != nullptr)) {
 		// Non-thinned: Use the frame rate and monitor refresh rate.
 
 		// Frame rate:
@@ -629,10 +629,10 @@ STDMETHODIMP CEVRAllocatorPresenter::ProcessMessage(MFVP_MESSAGE_TYPE eMessage, 
 				CAutoLock cRenderLock(&m_RenderLock);
 				RenegotiateMediaType();
 			} else {// leave it to the other thread
-				m_hEvtRenegotiate = CreateEvent(NULL, TRUE, FALSE, NULL);
+				m_hEvtRenegotiate = CreateEvent(nullptr, TRUE, FALSE, nullptr);
 				EXECUTE_ASSERT(WAIT_OBJECT_0 == WaitForSingleObject(m_hEvtRenegotiate, INFINITE));
 				EXECUTE_ASSERT(CloseHandle(m_hEvtRenegotiate));
-				m_hEvtRenegotiate = NULL;
+				m_hEvtRenegotiate = nullptr;
 			}
 
 			break;
@@ -692,7 +692,7 @@ HRESULT CEVRAllocatorPresenter::IsMediaTypeSupported(IMFMediaType* pMixerType)
 HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerType, IMFMediaType** pType)
 {
 	HRESULT        hr;
-	AM_MEDIA_TYPE* pAMMedia = NULL;
+	AM_MEDIA_TYPE* pAMMedia = nullptr;
 	MFVIDEOFORMAT* VideoFormat;
 
 	CHECK_HR(pMixerType->GetRepresentation(FORMAT_MFVideoFormat, (void**)&pAMMedia));
@@ -746,7 +746,7 @@ HRESULT CEVRAllocatorPresenter::SetMediaType(IMFMediaType* pType)
 	CheckPointer(pType, E_POINTER);
 
 	HRESULT hr;
-	AM_MEDIA_TYPE* pAMMedia = NULL;
+	AM_MEDIA_TYPE* pAMMedia = nullptr;
 
 	CHECK_HR(pType->GetRepresentation(FORMAT_VideoInfo2, (LPVOID*)&pAMMedia));
 
@@ -763,7 +763,7 @@ HRESULT CEVRAllocatorPresenter::SetMediaType(IMFMediaType* pType)
 
 HRESULT CEVRAllocatorPresenter::GetMediaTypeFourCC(IMFMediaType* pType, DWORD* pFourCC)
 {
-	if (pFourCC == NULL) {
+	if (pFourCC == nullptr) {
 		return E_POINTER;
 	}
 
@@ -959,7 +959,7 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 
 			// If something went wrong, clear the media type.
 			if (FAILED(hr)) {
-				SetMediaType(NULL);
+				SetMediaType(nullptr);
 			} else {
 				m_bStreamChanged = FALSE;
 				break;
@@ -1055,7 +1055,7 @@ STDMETHODIMP CEVRAllocatorPresenter::GetCurrentMediaType(__deref_out  IMFVideoMe
 	CheckPointer(ppMediaType, E_POINTER);
 	CHECK_HR(CheckShutdown());
 
-	if (m_pMediaType == NULL) {
+	if (m_pMediaType == nullptr) {
 		CHECK_HR(MF_E_NOT_INITIALIZED);
 	}
 
@@ -1263,9 +1263,9 @@ STDMETHODIMP CEVRAllocatorPresenter::GetCurrentImage(BITMAPINFOHEADER *pBih, BYT
 	CComPtr<IDirect3DSurface9> pDestSurface;
 	D3DLOCKED_RECT r;
 	if (FAILED(hr = m_pD3DDevEx->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer))
-			|| FAILED(hr = m_pD3DDevEx->CreateRenderTarget(width, height, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pDestSurface, NULL))
-			|| (FAILED(hr = m_pD3DDevEx->StretchRect(pBackBuffer, m_windowRect, pDestSurface, NULL, D3DTEXF_NONE)))
-			|| (FAILED(hr = pDestSurface->LockRect(&r, NULL, D3DLOCK_READONLY)))) {
+			|| FAILED(hr = m_pD3DDevEx->CreateRenderTarget(width, height, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pDestSurface, nullptr))
+			|| (FAILED(hr = m_pD3DDevEx->StretchRect(pBackBuffer, m_windowRect, pDestSurface, nullptr, D3DTEXF_NONE)))
+			|| (FAILED(hr = pDestSurface->LockRect(&r, nullptr, D3DLOCK_READONLY)))) {
 		DLog(L"CEVRAllocatorPresenter::GetCurrentImage filed : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
 		CoTaskMemFree(p);
 		return hr;
@@ -1497,19 +1497,19 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 			while (pBF = GetUpStreamFilter(pBF)) {
 				if (CComQIPtr<IPropertyBag> pPB = pBF) {
 					CComVariant var;
-					if (SUCCEEDED(pPB->Read(L"ROTATION", &var, NULL)) && var.vt == VT_BSTR) {
+					if (SUCCEEDED(pPB->Read(L"ROTATION", &var, nullptr)) && var.vt == VT_BSTR) {
 						const int rotation = _wtoi(var.bstrVal);
 						SetRotation(rotation);
 					}
 					var.Clear();
 
-					if (SUCCEEDED(pPB->Read(L"STEREOSCOPIC3DMODE", &var, NULL)) && var.vt == VT_BSTR) {
+					if (SUCCEEDED(pPB->Read(L"STEREOSCOPIC3DMODE", &var, nullptr)) && var.vt == VT_BSTR) {
 						CString mode(var.bstrVal); mode.MakeLower();
 						m_bMVC_Base_View_R_flag = mode == L"mvc_rl";
 					}
 					var.Clear();
 
-					if (SUCCEEDED(pPB->Read(L"stereo_subtitle_offset_ids", &var, NULL)) && var.vt == VT_BSTR) {
+					if (SUCCEEDED(pPB->Read(L"stereo_subtitle_offset_ids", &var, nullptr)) && var.vt == VT_BSTR) {
 						const CString offset_ids(var.bstrVal);
 						CAtlList<CString> list;
 						Explode(offset_ids, list, L',');
@@ -2219,7 +2219,7 @@ void CEVRAllocatorPresenter::RenderThread()
 								NextSleepTime = int(SampleDuration / 10000 - 2);
 							}
 
-						m_pCurrentDisplaydSample = NULL;
+						m_pCurrentDisplaydSample = nullptr;
 						if (bStepForward) {
 							MoveToFreeList(pMFSample, true);
 							CheckWaitingSampleFromMixer();
@@ -2490,7 +2490,7 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 		LONGLONG NewSampleTime;
 		pSample->GetSampleTime(&NewSampleTime);
 
-		while (Iterator != NULL)
+		while (Iterator != nullptr)
 		{
 			POSITION CurrentPos = Iterator;
 			IMFSample *pIter = m_ScheduledSamples.GetNext(Iterator);

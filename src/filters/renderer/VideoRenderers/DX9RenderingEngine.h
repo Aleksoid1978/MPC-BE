@@ -118,7 +118,7 @@ namespace DSObjects
 		LPCSTR						m_ShaderProfile; // for shader compiler
 
 #if DXVAVP
-		HMODULE m_hDxva2Lib = NULL;
+		HMODULE m_hDxva2Lib = nullptr;
 		CComPtr<IDirectXVideoProcessorService> m_pDXVAVPS;
 		CComPtr<IDirectXVideoProcessor> m_pDXVAVPD;
 

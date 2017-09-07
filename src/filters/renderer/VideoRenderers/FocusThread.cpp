@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2016 see Authors.txt
+ * (C) 2015-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,8 +35,8 @@ LRESULT CALLBACK FocusWndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 }
 
 CFocusThread::CFocusThread()
-	: m_hWnd(NULL)
-	, m_hEvtInit(NULL)
+	: m_hWnd(nullptr)
+	, m_hEvtInit(nullptr)
 {
 	WNDCLASS wndclass;
 
@@ -44,30 +44,30 @@ CFocusThread::CFocusThread()
 	wndclass.lpfnWndProc = FocusWndProc;
 	wndclass.cbClsExtra = 0;
 	wndclass.cbWndExtra = 0;
-	wndclass.hInstance = NULL;
-	wndclass.hIcon = NULL;
-	wndclass.hCursor = NULL;
-	wndclass.hbrBackground = NULL;
-	wndclass.lpszMenuName = NULL;
+	wndclass.hInstance = nullptr;
+	wndclass.hIcon = nullptr;
+	wndclass.hCursor = nullptr;
+	wndclass.hbrBackground = nullptr;
+	wndclass.lpszMenuName = nullptr;
 	wndclass.lpszClassName = L"D3DFocusClass";
 
 	if (!RegisterClass(&wndclass)) {
 		DLog(L"CFocusThread::CFocusThread() : Registering focus window failed");
 	}
 
-	m_hEvtInit = CreateEvent(NULL, TRUE, FALSE, NULL);
+	m_hEvtInit = CreateEvent(nullptr, TRUE, FALSE, nullptr);
 }
 
 CFocusThread::~CFocusThread()
 {
 	SAFE_CLOSE_HANDLE(m_hEvtInit);
-	UnregisterClass(L"D3DFocusClass", NULL);
+	UnregisterClass(L"D3DFocusClass", nullptr);
 }
 
 BOOL CFocusThread::InitInstance()
 {
 	SetThreadName(DWORD_MAX, "FocusThread");
-	m_hWnd = CreateWindow(L"D3DFocusClass", L"D3D Focus Window", WS_OVERLAPPED, 0, 0, 0, 0, NULL, NULL, NULL, NULL);
+	m_hWnd = CreateWindow(L"D3DFocusClass", L"D3D Focus Window", WS_OVERLAPPED, 0, 0, 0, 0, nullptr, nullptr, nullptr, nullptr);
 	SetEvent(m_hEvtInit);
 	if (!m_hWnd) {
 		DLog(L"CFocusThread::InitInstance() : Creating focus window failed");
@@ -80,7 +80,7 @@ int CFocusThread::ExitInstance()
 {
 	if (m_hWnd) {
 		DestroyWindow(m_hWnd);
-		m_hWnd = NULL;
+		m_hWnd = nullptr;
 	}
 	return __super::ExitInstance();
 }
