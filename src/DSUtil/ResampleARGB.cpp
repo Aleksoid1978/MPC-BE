@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include <math.h>
+#include <ppl.h>
 #include "ResampleARGB.h"
 
 // based on https://github.com/uploadcare/pillow-simd/blob/3.4.x/libImaging/Resample.c
@@ -236,13 +237,11 @@ int normalize_coeffs_8bpc(int outSize, int kmax, double *prekk, INT32 **kkp)
 
 HRESULT ResampleHorizontal(BYTE* dest, int destW, int H, const BYTE* const src, int srcW, filter_t* filterp)
 {
-	int ss0, ss1, ss2, ss3;
-	int xx, yy, x, kmax, xmin, xmax;
 	int *xbounds;
-	INT32 *k, *kk;
+	INT32 *kk;
 	double *prekk;
 
-	kmax = precompute_coeffs(srcW, destW, filterp, &xbounds, &prekk);
+	int kmax = precompute_coeffs(srcW, destW, filterp, &xbounds, &prekk);
 	if (!kmax) {
 		return E_OUTOFMEMORY;
 	}
@@ -254,17 +253,18 @@ HRESULT ResampleHorizontal(BYTE* dest, int destW, int H, const BYTE* const src, 
 		return E_OUTOFMEMORY;
 	}
 
-	for (yy = 0; yy < H; yy++) {
+	concurrency::parallel_for(0, H, [&](int yy) {
 		const BYTE* lineIn = src + yy * srcW * 4;
 		const BYTE* lineOut = dest + yy * destW * 4;
 
-		for (xx = 0; xx < destW; xx++) {
-			xmin = xbounds[xx * 2 + 0];
-			xmax = xbounds[xx * 2 + 1];
-			k = &kk[xx * kmax];
+		int ss0, ss1, ss2, ss3;
+		for (int xx = 0; xx < destW; xx++) {
+			const INT32* k = &kk[xx * kmax];
+			const int xmin = xbounds[xx * 2 + 0];
+			const int xmax = xbounds[xx * 2 + 1];
 			ss0 = ss1 = ss2 = ss3 = 1 << (PRECISION_BITS -1);
 
-			for (x = 0; x < xmax; x++) {
+			for (int x = 0; x < xmax; x++) {
 				ss0 += lineIn[(x + xmin)*4 + 0] * k[x];
 				ss1 += lineIn[(x + xmin)*4 + 1] * k[x];
 				ss2 += lineIn[(x + xmin)*4 + 2] * k[x];
@@ -273,7 +273,7 @@ HRESULT ResampleHorizontal(BYTE* dest, int destW, int H, const BYTE* const src, 
 
 			((UINT32*)lineOut)[xx] = MAKE_UINT32(clip8(ss0), clip8(ss1), clip8(ss2), clip8(ss3));
 		}
-	}
+	});
 
 	free(kk);
 	free(xbounds);
@@ -282,13 +282,11 @@ HRESULT ResampleHorizontal(BYTE* dest, int destW, int H, const BYTE* const src, 
 
 HRESULT ResampleVertical(BYTE* dest, int W, int destH, const BYTE* const src, int srcH, filter_t* filterp)
 {
-	int ss0, ss1, ss2, ss3;
-	int xx, yy, y, kmax, ymin, ymax;
 	int *xbounds;
-	INT32 *k, *kk;
+	INT32 *kk;
 	double *prekk;
 
-	kmax = precompute_coeffs(srcH, destH, filterp, &xbounds, &prekk);
+	int kmax = precompute_coeffs(srcH, destH, filterp, &xbounds, &prekk);
 	if (!kmax) {
 		return E_OUTOFMEMORY;
 	}
@@ -300,14 +298,15 @@ HRESULT ResampleVertical(BYTE* dest, int W, int destH, const BYTE* const src, in
 		return E_OUTOFMEMORY;
 	}
 
-	for (yy = 0; yy < destH; yy++) {
+	concurrency::parallel_for(0, destH, [&](int yy) {
 		const BYTE* lineOut = dest + yy * W * 4;
-		k = &kk[yy * kmax];
-		ymin = xbounds[yy * 2 + 0];
-		ymax = xbounds[yy * 2 + 1];
-		for (xx = 0; xx < W; xx++) {
+		const INT32* k = &kk[yy * kmax];
+		const int ymin = xbounds[yy * 2 + 0];
+		const int ymax = xbounds[yy * 2 + 1];
+		int ss0, ss1, ss2, ss3;
+		for (int xx = 0; xx < W; xx++) {
 			ss0 = ss1 = ss2 = ss3 = 1 << (PRECISION_BITS -1);
-			for (y = 0; y < ymax; y++) {
+			for (int y = 0; y < ymax; y++) {
 				const BYTE* lineIn = src + (y + ymin) * W * 4;
 				ss0 += lineIn[xx*4 + 0] * k[y];
 				ss1 += lineIn[xx*4 + 1] * k[y];
@@ -317,7 +316,7 @@ HRESULT ResampleVertical(BYTE* dest, int W, int destH, const BYTE* const src, in
 
 			((UINT32*)lineOut)[xx] = MAKE_UINT32(clip8(ss0), clip8(ss1), clip8(ss2), clip8(ss3));
 		}
-	}
+	});
 
 	free(kk);
 	free(xbounds);
