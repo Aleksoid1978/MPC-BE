@@ -2417,7 +2417,38 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 					}
 
 					if (m_bOSDFileName) {
-						str_temp.GetLength() > 0 ? str_temp += L"\n" + m_strPlaybackLabel : str_temp = m_strPlaybackLabel;
+						CString strOSD;
+						if (!m_youtubeFields.title.IsEmpty()) {
+							strOSD = m_youtubeFields.title;
+						} else if (::PathIsURL(GetCurFileName())) {
+							CPlaylistItem pli;
+							if (m_wndPlaylistBar.GetCur(pli) && !pli.m_label.IsEmpty()) {
+								strOSD = pli.m_label;
+							}
+
+							if (strOSD.IsEmpty()) {
+								BeginEnumFilters(m_pGB, pEF, pBF) {
+									if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
+										if (!CheckMainFilter(pBF)) {
+											continue;
+										}
+
+										CComBSTR bstr;
+										if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
+											strOSD = bstr.m_str;
+											break;
+										}
+									}
+								}
+								EndEnumFilters;
+							}
+						}
+
+						if (strOSD.IsEmpty()) {
+							strOSD = m_strPlaybackLabel;
+						}
+
+						str_temp.GetLength() > 0 ? str_temp += L"\n" + strOSD : str_temp = strOSD;
 					}
 
 					if (bmadvr) {
