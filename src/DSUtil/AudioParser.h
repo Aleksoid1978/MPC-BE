@@ -96,7 +96,7 @@ int CalcBitrate(const audioframe_t& audioframe);
 int ParseAC3IEC61937Header (const BYTE* buf);
 
 // need >= 4 bytes, param1 = bitrate, param2 = MP3 flag
-int ParseMPAHeader         (const BYTE* buf, audioframe_t* audioframe = NULL);
+int ParseMPAHeader         (const BYTE* buf, audioframe_t* audioframe = nullptr);
 
 // need >= 4 bytes
 int ParseMPEG1Header       (const BYTE* buf, MPEG1WAVEFORMAT* mpeg1wf);
@@ -105,25 +105,25 @@ int ParseMPEG1Header       (const BYTE* buf, MPEG1WAVEFORMAT* mpeg1wf);
 int ParseMP3Header         (const BYTE* buf, MPEGLAYER3WAVEFORMAT* mp3wf);
 
 // need >= 7 bytes, param1 = bitrate
-int ParseAC3Header         (const BYTE* buf, audioframe_t* audioframe = NULL);
+int ParseAC3Header         (const BYTE* buf, audioframe_t* audioframe = nullptr);
 
 // need >= 6 bytes, param1 = eac3 frame type
-int ParseEAC3Header        (const BYTE* buf, audioframe_t* audioframe = NULL);
+int ParseEAC3Header        (const BYTE* buf, audioframe_t* audioframe = nullptr);
 
 // need >= 12 bytes, param1 = bitdepth, param2 = TrueHD flag
-int ParseMLPHeader         (const BYTE* buf, audioframe_t* audioframe = NULL);
+int ParseMLPHeader         (const BYTE* buf, audioframe_t* audioframe = nullptr);
 
 // need >= 10 bytes, param2 = x96k extension flag
-int ParseDTSHeader         (const BYTE* buf, audioframe_t* audioframe = NULL);
+int ParseDTSHeader         (const BYTE* buf, audioframe_t* audioframe = nullptr);
 
 // need >= 40 bytes, param1 = bitdepth, param2 = profile
-int ParseDTSHDHeader       (const BYTE* buf, const int buffsize = 0, audioframe_t* audioframe = NULL);
+int ParseDTSHDHeader       (const BYTE* buf, const int buffsize = 0, audioframe_t* audioframe = nullptr);
 
 // need >= 4 bytes, param1 = bitdepth, param2 = bytes per frame
-int ParseHdmvLPCMHeader    (const BYTE* buf, audioframe_t* audioframe = NULL);
+int ParseHdmvLPCMHeader    (const BYTE* buf, audioframe_t* audioframe = nullptr);
 
 // need >= 7 bytes, param1 = header size, param2 = MPEG-4 Audio Object Type
-int ParseADTSAACHeader     (const BYTE* buf, audioframe_t* audioframe = NULL);
+int ParseADTSAACHeader     (const BYTE* buf, audioframe_t* audioframe = nullptr);
 
 bool ReadAudioConfig(CGolombBuffer& gb, int& samplingFrequency, int& channels);
 bool ParseAACLatmHeader(const BYTE* buf, int len, int& samplerate, int& channels, BYTE* extra, unsigned int& extralen);

@@ -33,7 +33,7 @@ public:
 	BOOL bSyncPoint        = FALSE;
 	REFERENCE_TIME rtStart = INVALID_TIME;
 	REFERENCE_TIME rtStop  = INVALID_TIME;
-	AM_MEDIA_TYPE* pmt     = NULL;
+	AM_MEDIA_TYPE* pmt     = nullptr;
 
 	DWORD Flag             = 0;
 

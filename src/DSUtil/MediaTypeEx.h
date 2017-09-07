@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,7 +28,7 @@ public:
 	CMediaTypeEx(const CMediaType& mt) {
 		CMediaType::operator = (mt);
 	}
-	CString ToString(IPin* pPin = NULL);
+	CString ToString(IPin* pPin = nullptr);
 	void Dump(CAtlList<CString>& sl);
 	bool ValidateSubtitle();
 

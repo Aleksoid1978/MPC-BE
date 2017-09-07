@@ -1,5 +1,5 @@
 /*
- * (C) 2016 see Authors.txt
+ * (C) 2016-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,7 +28,7 @@ UINT D3D9Helper::GetAdapter(IDirect3D9* pD3D, HWND hWnd)
 	CheckPointer(pD3D, D3DADAPTER_DEFAULT);
 
 	const HMONITOR hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
-	if (hMonitor == NULL) {
+	if (hMonitor == nullptr) {
 		return D3DADAPTER_DEFAULT;
 	}
 
@@ -47,7 +47,7 @@ IDirect3D9* D3D9Helper::Direct3DCreate9()
 	typedef IDirect3D9* (WINAPI *tpDirect3DCreate9)(__in UINT SDKVersion);
 
 	static HMODULE hModule = LoadLibrary(L"d3d9.dll");
-	static tpDirect3DCreate9 pDirect3DCreate9 = hModule ? (tpDirect3DCreate9)GetProcAddress(hModule, "Direct3DCreate9") : NULL;
+	static tpDirect3DCreate9 pDirect3DCreate9 = hModule ? (tpDirect3DCreate9)GetProcAddress(hModule, "Direct3DCreate9") : nullptr;
 	if (pDirect3DCreate9) {
 		IDirect3D9* pD3D9 = pDirect3DCreate9(D3D_SDK_VERSION);
 		if (!pD3D9) {
@@ -57,5 +57,5 @@ IDirect3D9* D3D9Helper::Direct3DCreate9()
 		return pD3D9;
 	}
 
-	return NULL;
+	return nullptr;
 }

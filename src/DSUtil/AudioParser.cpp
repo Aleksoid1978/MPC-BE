@@ -680,7 +680,7 @@ enum ExtensionMask {
 	EXSS_XLL  = 0x200,
 };
 
-int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t* audioframe /* = NULL*/)
+int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t* audioframe /* = nullptr*/)
 {
 	if (GETDWORD(buf) != DTS_SYNCWORD_SUBSTREAM) { // syncword
 		return 0;

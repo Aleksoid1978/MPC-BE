@@ -627,13 +627,13 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 			sl.AddTail(str);
 			if (vih2.dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT)) {
 				// http://msdn.microsoft.com/en-us/library/windows/desktop/ms698715%28v=vs.85%29.aspx
-				const LPCSTR nominalrange[] = { NULL, "0-255", "16-235", "48-208" };
-				const LPCSTR transfermatrix[] = { NULL, "BT.709", "BT.601", "SMPTE 240M", "BT.2020", NULL, NULL, "YCgCo" };
-				const LPCSTR lighting[] = { NULL, "bright", "office", "dim", "dark" };
-				const LPCSTR primaries[] = { NULL, "Reserved", "BT.709", "BT.470-4 System M", "BT.470-4 System B,G",
+				const LPCSTR nominalrange[] = { nullptr, "0-255", "16-235", "48-208" };
+				const LPCSTR transfermatrix[] = { nullptr, "BT.709", "BT.601", "SMPTE 240M", "BT.2020", nullptr, nullptr, "YCgCo" };
+				const LPCSTR lighting[] = { nullptr, "bright", "office", "dim", "dark" };
+				const LPCSTR primaries[] = { nullptr, "Reserved", "BT.709", "BT.470-4 System M", "BT.470-4 System B,G",
 					"SMPTE 170M", "SMPTE 240M", "EBU Tech. 3213", "SMPTE", "BT.2020" };
-				const LPCSTR transfunc[] = { NULL, "Linear RGB", "1.8 gamma", "2.0 gamma", "2.2 gamma", "BT.709", "SMPTE 240M",
-					"sRGB", "2.8 gamma", "Log100", "Log316", "Symmetric BT.709", NULL, NULL, NULL, NULL, "SMPTE ST 2084", NULL, "ARIB STD-B67 (HLG)" };
+				const LPCSTR transfunc[] = { nullptr, "Linear RGB", "1.8 gamma", "2.0 gamma", "2.2 gamma", "BT.709", "SMPTE 240M",
+					"sRGB", "2.8 gamma", "Log100", "Log316", "Symmetric BT.709", nullptr, nullptr, nullptr, nullptr, "SMPTE ST 2084", nullptr, "ARIB STD-B67 (HLG)" };
 
 #define ADD_PARAM_DESC(str, parameter, descs) if (parameter < _countof(descs) && descs[parameter]) str.AppendFormat(L" (%hS)", descs[parameter])
 
@@ -725,7 +725,7 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 		str.Format(L"biClrImportant: %u", bih->biClrImportant);
 		sl.AddTail(str);
 	} else if (formattype == FORMAT_WaveFormatEx || formattype == FORMAT_WaveFormatExFFMPEG) {
-		WAVEFORMATEX *pWfe = NULL;
+		WAVEFORMATEX *pWfe = nullptr;
 		if (formattype == FORMAT_WaveFormatExFFMPEG) {
 			fmtsize = sizeof(WAVEFORMATEXFFMPEG);
 

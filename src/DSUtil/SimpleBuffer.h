@@ -26,7 +26,7 @@
 template <typename T>
 class CSimpleBuffer
 {
-	T* m_data = NULL;
+	T* m_data = nullptr;
 	size_t m_size = 0;
 
 public:
@@ -57,7 +57,7 @@ public:
 		if (size) {
 			m_data = DNew T[size];
 		} else {
-			m_data = NULL;
+			m_data = nullptr;
 		}
 
 		m_size = size;

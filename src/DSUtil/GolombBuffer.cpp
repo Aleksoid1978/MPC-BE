@@ -1,5 +1,5 @@
 ﻿/*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -53,7 +53,7 @@ static void RemoveMpegEscapeCode(BYTE* dst, BYTE* src, int& length)
 
 CGolombBuffer::CGolombBuffer(BYTE* pBuffer, int nSize, bool bRemoveMpegEscapes/* = false*/)
 	: m_bRemoveMpegEscapes(bRemoveMpegEscapes)
-	, m_pTmpBuffer(NULL)
+	, m_pTmpBuffer(nullptr)
 {
 	Reset(pBuffer, nSize);
 }
