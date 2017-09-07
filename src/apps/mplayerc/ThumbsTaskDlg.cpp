@@ -23,7 +23,7 @@
 #include <afxwin.h>
 #include "MainFrm.h"
 #include "../../DSUtil/Filehandle.h"
-#include "SmoothImageResampling.h"
+#include "../../DSUtil/ResampleARGB.h"
 
 #include "ThumbsTaskDlg.h"
 
@@ -213,8 +213,11 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 
 		m_pMainFrm->RenderCurrentSubtitles(dib.data());
 
-		Resize_HQ_4ch((const BYTE*)(&bi->bmiHeader + 1), bi->bmiHeader.biWidth, abs(bi->bmiHeader.biHeight),
-					  thumb.get(), thumbsize.cx, thumbsize.cy);
+		ResampleARGB(
+			thumb.get(), thumbsize.cx, thumbsize.cy,
+			(const BYTE*)(&bi->bmiHeader + 1), bi->bmiHeader.biWidth, abs(bi->bmiHeader.biHeight),
+			IMAGING_TRANSFORM_HAMMING
+		);
 
 		const BYTE* src = thumb.get();
 		int srcPitch = thumbsize.cx * 4;
