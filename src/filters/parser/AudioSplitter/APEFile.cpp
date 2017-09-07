@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -75,7 +75,7 @@ struct APEContext {
 CAPEFile::CAPEFile()
 	: CAudioFile()
 	, m_curentframe(0)
-	, m_APETag(NULL)
+	, m_APETag(nullptr)
 {
 	m_subtype = MEDIASUBTYPE_APE;
 	m_wFormatTag = 0x5041;

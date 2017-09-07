@@ -33,7 +33,7 @@ class CDFFFile : public CAudioFile
 	int m_block_size	= 0;
 	int m_max_blocksize	= 0;
 
-	CID3Tag* m_ID3Tag	= NULL;
+	CID3Tag* m_ID3Tag	= nullptr;
 
 	bool ReadDFFChunk(dffchunk_t& chunk);
 	bool parse_dsd_prop(__int64 eof);
