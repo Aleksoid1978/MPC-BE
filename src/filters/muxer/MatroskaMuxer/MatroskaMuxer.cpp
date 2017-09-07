@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,8 +39,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 };
 
 const AMOVIESETUP_PIN sudpPins[] = {
-	{L"Input", FALSE, FALSE, FALSE, TRUE, &CLSID_NULL, NULL, 0, NULL},
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut), sudPinTypesOut}
+	{L"Input", FALSE, FALSE, FALSE, TRUE, &CLSID_NULL, nullptr, 0, nullptr},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesOut), sudPinTypesOut}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
@@ -48,7 +48,7 @@ const AMOVIESETUP_FILTER sudFilter[] = {
 };
 
 CFactoryTemplate g_Templates[] = {
-	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CMatroskaMuxerFilter>, NULL, &sudFilter[0]}
+	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CMatroskaMuxerFilter>, nullptr, &sudFilter[0]}
 };
 
 int g_cTemplates = _countof(g_Templates);
@@ -99,7 +99,7 @@ STDMETHODIMP CMatroskaMuxerFilter::NonDelegatingQueryInterface(REFIID riid, void
 {
 	CheckPointer(ppv, E_POINTER);
 
-	*ppv = NULL;
+	*ppv = nullptr;
 
 	return
 		//QI(IAMFilterMiscFlags)
@@ -160,7 +160,7 @@ CBasePin* CMatroskaMuxerFilter::GetPin(int n)
 		return m_pOutput;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 STDMETHODIMP CMatroskaMuxerFilter::Stop()
@@ -369,7 +369,7 @@ DWORD CMatroskaMuxerFilter::ThreadProc()
 		for (;;) {
 			DWORD cmd = GetRequest();
 			if (cmd == CMD_EXIT) {
-				CAMThread::m_hThread = NULL;
+				CAMThread::m_hThread = nullptr;
 			}
 			Reply(S_OK);
 			if (cmd == CMD_EXIT) {
@@ -427,7 +427,7 @@ DWORD CMatroskaMuxerFilter::ThreadProc()
 	info.TimeCodeScale.Set(1000000);
 	info.Duration.Set((float)rtDur / 10000);
 	struct tm _2001 = {0, 0, 0, 1, 0, 101, 0, 0, 1};
-	info.DateUTC.Set((_time64(NULL) - _mktime64(&_2001)) * 1000000000);
+	info.DateUTC.Set((_time64(nullptr) - _mktime64(&_2001)) * 1000000000);
 	info.Write(pStream);
 
 	// Tracks
@@ -484,7 +484,7 @@ DWORD CMatroskaMuxerFilter::ThreadProc()
 		switch (cmd) {
 			default:
 			case CMD_EXIT:
-				CAMThread::m_hThread = NULL;
+				CAMThread::m_hThread = nullptr;
 				Reply(S_OK);
 				return 0;
 
@@ -496,14 +496,14 @@ DWORD CMatroskaMuxerFilter::ThreadProc()
 				INT64 lastcuetimecode = (INT64) - 1;
 				UINT64 nBlocksInCueTrack = 0;
 
-				while (!CheckRequest(NULL)) {
+				while (!CheckRequest(nullptr)) {
 					if (m_State == State_Paused) {
 						Sleep(10);
 						continue;
 					}
 
 					int nPinsGotSomething = 0, nPinsNeeded = 0;
-					CMatroskaMuxerInputPin* pPin = NULL;
+					CMatroskaMuxerInputPin* pPin = nullptr;
 					REFERENCE_TIME rtMin = _I64_MAX;
 
 					pos = pActivePins.GetHeadPosition();
@@ -1223,7 +1223,7 @@ STDMETHODIMP CMatroskaMuxerInputPin::Receive(IMediaSample* pSample)
 		return hr;
 	}
 
-	BYTE* pData = NULL;
+	BYTE* pData = nullptr;
 	if (FAILED(hr = pSample->GetPointer(&pData)) || !pData) {
 		return hr;
 	}

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -78,12 +78,12 @@ BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRec
 			}
 		}
 
-		HDC hDC = ::GetDC(NULL);
+		HDC hDC = ::GetDC(nullptr);
 		HFONT hFontOld = (HFONT)SelectObject(hDC, m_font.m_hObject);
 		CSize size;
 		GetTextExtentPoint32(hDC, L"x", 1, &size);
 		SelectObject(hDC, hFontOld);
-		::ReleaseDC(NULL, hDC);
+		::ReleaseDC(nullptr, hDC);
 
 		m_fontheight = size.cy;
 	}
@@ -118,7 +118,7 @@ END_MESSAGE_MAP()
 
 CInternalPropertyPage::CInternalPropertyPage(LPUNKNOWN lpunk, HRESULT* phr)
 	: CUnknown(L"CInternalPropertyPage", lpunk)
-	, m_pWnd(NULL)
+	, m_pWnd(nullptr)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -133,7 +133,7 @@ CInternalPropertyPage::~CInternalPropertyPage()
 			m_pWnd->DestroyWindow();
 		}
 		delete m_pWnd;
-		m_pWnd = NULL;
+		m_pWnd = nullptr;
 	}
 }
 
@@ -218,8 +218,8 @@ STDMETHODIMP CInternalPropertyPage::GetPageInfo(PROPPAGEINFO* pPageInfo)
 
 	pPageInfo->cb = sizeof(PROPPAGEINFO);
 	pPageInfo->pszTitle = pszTitle;
-	pPageInfo->pszDocString = NULL;
-	pPageInfo->pszHelpFile = NULL;
+	pPageInfo->pszDocString = nullptr;
+	pPageInfo->pszHelpFile = nullptr;
 	pPageInfo->dwHelpContext = 0;
 	pPageInfo->size = GetWindowSize();
 
@@ -250,7 +250,7 @@ STDMETHODIMP CInternalPropertyPage::SetObjects(ULONG cObjects, LPUNKNOWN* ppUnk)
 
 		if (!m_pWnd->OnConnect(m_pUnks)) {
 			delete m_pWnd;
-			m_pWnd = NULL;
+			m_pWnd = nullptr;
 
 			return E_FAIL;
 		}
@@ -259,7 +259,7 @@ STDMETHODIMP CInternalPropertyPage::SetObjects(ULONG cObjects, LPUNKNOWN* ppUnk)
 
 		m_pWnd->DestroyWindow();
 		delete m_pWnd;
-		m_pWnd = NULL;
+		m_pWnd = nullptr;
 	}
 
 	return S_OK;
@@ -536,7 +536,7 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 					len = _countof(buff);
 					memset(buff, 0, len);
 					if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"CLSID\\" + clsid + L"\\InprocServer32", KEY_READ)
-							&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len)
+							&& ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len)
 							&& ::PathFileExists(buff)) {
 						module = CString(buff);
 						m_CachedRegistryFilters[FilterClsid] = module;

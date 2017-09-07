@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -174,7 +174,7 @@ HRESULT CBaseMuxerInputPin::CompleteConnect(IPin* pReceivePin)
 
 					HRESULT hr2;
 					CComVariant var;
-					if (SUCCEEDED(pPB->Read(1, &PropBag, NULL, &var, &hr2)) && SUCCEEDED(hr2)) {
+					if (SUCCEEDED(pPB->Read(1, &PropBag, nullptr, &var, &hr2)) && SUCCEEDED(hr2)) {
 						SetProperty(PropBag.pstrName, &var);
 					}
 
@@ -225,7 +225,7 @@ STDMETHODIMP CBaseMuxerInputPin::Receive(IMediaSample* pSample)
 
 	long len = pSample->GetActualDataLength();
 
-	BYTE* pData = NULL;
+	BYTE* pData = nullptr;
 	if (FAILED(pSample->GetPointer(&pData)) || !pData) {
 		return S_OK;
 	}
