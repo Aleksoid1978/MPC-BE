@@ -70,11 +70,11 @@ static inline double lanczos_filter(double x)
 	return 0.0;
 }
 
-static struct filter_t BOX      = { box_filter,      0.5 };
-static struct filter_t BILINEAR = { bilinear_filter, 1.0 };
-static struct filter_t HAMMING  = { hamming_filter,  1.0 };
-static struct filter_t BICUBIC  = { bicubic_filter,  2.0 };
-static struct filter_t LANCZOS  = { lanczos_filter,  3.0 };
+static filter_t BOX      = { box_filter,      0.5 };
+static filter_t BILINEAR = { bilinear_filter, 1.0 };
+static filter_t HAMMING  = { hamming_filter,  1.0 };
+static filter_t BICUBIC  = { bicubic_filter,  2.0 };
+static filter_t LANCZOS  = { lanczos_filter,  3.0 };
 
 // 8 bits for result. Filter can have negative areas.
 // In one cases the sum of the coefficients will be negative,
@@ -133,7 +133,7 @@ int precompute_coeffs(int inSize, int outSize, filter_t* filterp, int **xboundsp
 	double *kk, *k;
 
 	// prepare for horizontal stretch
-	filterscale = scale = (double) inSize / outSize;
+	filterscale = scale = (double)inSize / outSize;
 	if (filterscale < 1.0) {
 		filterscale = 1.0;
 	}
@@ -142,10 +142,10 @@ int precompute_coeffs(int inSize, int outSize, filter_t* filterp, int **xboundsp
 	support = filterp->support * filterscale;
 
 	// maximum number of coeffs
-	kmax = (int) ceil(support) * 2 + 1;
+	kmax = (int)ceil(support) * 2 + 1;
 
 	// check for overflow
-	if (outSize > INT_MAX / (kmax * sizeof(double))) {
+	if (outSize > INT_MAX / (kmax * (int)sizeof(double))) {
 		return 0;
 	}
 
@@ -249,14 +249,14 @@ HRESULT ResampleHorizontal(BYTE* dest, int destW, int H, const BYTE* const src, 
 
 	kmax = normalize_coeffs_8bpc(destW, kmax, prekk, &kk);
 	free(prekk);
-	if ( ! kmax) {
+	if (!kmax) {
 		free(xbounds);
 		return E_OUTOFMEMORY;
 	}
 
 	for (yy = 0; yy < H; yy++) {
 		const BYTE* lineIn = src + yy * srcW * 4;
-		BYTE* const lineOut = dest + yy * destW * 4;
+		const BYTE* lineOut = dest + yy * destW * 4;
 
 		for (xx = 0; xx < destW; xx++) {
 			xmin = xbounds[xx * 2 + 0];
@@ -295,13 +295,13 @@ HRESULT ResampleVertical(BYTE* dest, int W, int destH, const BYTE* const src, in
 
 	kmax = normalize_coeffs_8bpc(destH, kmax, prekk, &kk);
 	free(prekk);
-	if ( ! kmax) {
+	if (!kmax) {
 		free(xbounds);
 		return E_OUTOFMEMORY;
 	}
 
 	for (yy = 0; yy < destH; yy++) {
-		BYTE* const lineOut = dest + yy * W * 4;
+		const BYTE* lineOut = dest + yy * W * 4;
 		k = &kk[yy * kmax];
 		ymin = xbounds[yy * 2 + 0];
 		ymax = xbounds[yy * 2 + 1];
@@ -332,7 +332,7 @@ HRESULT ResampleARGB(BYTE* const dest, const int destW, const int destH, const B
 		return S_OK;
 	}
 
-	struct filter_t* filterp;
+	filter_t* filterp;
 
 	// check filter
 	switch (filter) {
