@@ -222,10 +222,10 @@ public:
 	void EndFlush() { if (reader) reader->EndFlush(); }
 
 	// reading syntax elements - in network byte order
-	int GetMagick(uint32 &elm);
-	int GetKey(uint16 &key);
-	int GetSizeElm(int64 &size, int32 &size_len);
-	bool KeyValid(uint16 key);
+	int GetMagick(uint32_t &elm);
+	int GetKey(uint16_t &key);
+	int GetSizeElm(int64_t &size, int32_t &size_len);
+	bool KeyValid(uint16_t key);
 };
 
 //-----------------------------------------------------------------------------

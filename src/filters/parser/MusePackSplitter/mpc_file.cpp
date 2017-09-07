@@ -1,8 +1,7 @@
 /*
+ * (C) 2012-2017 see Authors.txt
  *
- * Adaptation for MPC-BE (C) 2012 Dmitry "Vortex" Koteroff (vortex@light-alloy.ru, http://light-alloy.ru)
- *
- * This file is part of MPC-BE and Light Alloy.
+ * This file is part of MPC-BE.
  *
  * MPC-BE is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,8 +36,8 @@ static int freq[] = {44100, 48000, 37800, 32000};
 
 CMPCFile::CMPCFile() :
 	duration_10mhz(0),
-	reader(NULL),
-	seek_table(NULL),
+	reader(nullptr),
+	seek_table(nullptr),
 	seek_table_position(0)
 {
 	bits_to_skip		= 0;
@@ -53,7 +52,7 @@ CMPCFile::~CMPCFile()
 {
 	if (seek_table) {
 		free(seek_table);
-		seek_table = NULL;
+		seek_table = nullptr;
 	}
 }
 
@@ -103,7 +102,7 @@ int CMPCFile::Open_SV8()
 
 	// if there was a seek table, load it
 	if (seek_table_position != 0) {
-		int64 first_ap_pos, avail;
+		int64_t first_ap_pos, avail;
 		reader->GetPosition(&first_ap_pos, &avail);
 
 		reader->Seek(seek_table_position/8);
@@ -131,7 +130,7 @@ int CMPCFile::Open_SV7()
 	seek_table_position	= 0;
 	seek_table_size		= 0;
 
-	uint8 hdr[8*4];
+	uint8_t hdr[8*4];
 
 	__int64 c, a;
 	reader->GetPosition(&c, &a);
@@ -153,7 +152,7 @@ int CMPCFile::Open_SV7()
 	b.UGetBits(4);				// profile
 	b.UGetBits(2);				// link
 
-	uint8 samplerateidx = b.UGetBits(2);			// samplerate
+	uint8_t samplerateidx = b.UGetBits(2);			// samplerate
 	sample_rate = (samplerateidx <= 3) ? freq[samplerateidx] : 0;
 
 	channels	= 2;
@@ -161,7 +160,7 @@ int CMPCFile::Open_SV7()
 	b.UGetBits(16);				// max-level
 
 	b.NeedBits32();
-	gain_title_db	= ((int16)b.SGetBits(16)) / 100.0;		// title gain
+	gain_title_db	= ((int16_t)b.SGetBits(16)) / 100.0;		// title gain
 	int title_peak	= b.UGetBits(16);
 	if (title_peak != 0) {
 		gain_title_peak_db = (title_peak / 32767.0);
@@ -170,7 +169,7 @@ int CMPCFile::Open_SV7()
 	}
 
 	b.NeedBits32();
-	gain_album_db	= ((int16)b.SGetBits(16)) / 100.0;		// album gain
+	gain_album_db	= ((int16_t)b.SGetBits(16)) / 100.0;		// album gain
 	int album_peak	= b.UGetBits(16);
 	if (album_peak != 0) {
 		gain_album_peak_db = (album_peak / 32767.0);
@@ -203,25 +202,25 @@ int CMPCFile::Open_SV7()
 	}
 
 	// calculate size as seen in mpc_demux.c
-	int64 tmp = 2+total_samples / (1152 << seek_pwr);
+	int64_t tmp = 2+total_samples / (1152 << seek_pwr);
 	if (tmp < seek_table_size) {
 		tmp = seek_table_size;
 	}
 
 	// alloc memory for seek table
-	seek_table = (uint64*)malloc(tmp * sizeof(uint64));
+	seek_table = (uint64_t*)malloc(tmp * sizeof(uint64_t));
 	if (!seek_table) {
 		return -1;
 	}
 
-	int64 pos, av;
+	int64_t pos, av;
 	reader->GetPosition(&pos, &av);
 	seek_table[0] = pos*8 - b.BitsLeft();		// current position in bits
 	seek_table_size = 1;
 
 	// loop through file to get complete seeking table
 	CMPCPacket packet;
-	int64 seek_frames = 0;
+	int64_t seek_frames = 0;
 	Seek(0);
 	do {
 		if (seek_frames*1152 >= total_samples) {
@@ -264,7 +263,7 @@ int CMPCFile::Open(CMusePackReader *reader)
 	this->reader = reader;
 
 	// check ID3 tag
-	uint32 ID3size = 0;
+	uint32_t ID3size = 0;
 	reader->Seek(0);
 	char buf[3];
 	if (!reader->Read(buf, 3) && !strncmp(buf, "ID3", 3)) {
@@ -280,7 +279,7 @@ int CMPCFile::Open(CMusePackReader *reader)
 	reader->Seek(ID3size);
 
 	// According to stream specification the first 4 bytes should be 'MPCK'
-	uint32 magick;
+	uint32_t magick;
 	ret = reader->GetMagick(magick);
 	if (ret < 0) {
 		return ret;
@@ -311,7 +310,7 @@ int CMPCFile::ReadReplaygain(CMPCPacket *packet)
 	int version = b.UGetBits(8);
 	if (version != 1) return 0;		// unsupported RG version. not critical to us...
 
-	int16	val;
+	int16_t	val;
 	b.NeedBits();	val = b.SGetBits(16);	gain_title_db = val / 256.0;
 	b.NeedBits();	val = b.UGetBits(16);	gain_title_peak_db = val;
 	b.NeedBits();	val = b.SGetBits(16);	gain_album_db = val / 256.0;
@@ -349,7 +348,7 @@ int CMPCFile::ReadSeekTable(CMPCPacket *packet)
 	Bitstream b(packet->payload);
 
 	// calculate size as seen in mpc_demux.c
-	int64 tmp		= b.GetMpcSize();	b.NeedBits();
+	int64_t tmp		= b.GetMpcSize();	b.NeedBits();
 	seek_table_size	= tmp;
 	seek_pwr		= block_pwr + b.UGetBits(4);
 	tmp				= 2+total_samples / (1152 << seek_pwr);
@@ -358,18 +357,18 @@ int CMPCFile::ReadSeekTable(CMPCPacket *packet)
 	}
 
 	// alloc memory for seek table
-	seek_table = (uint64*)malloc(tmp * sizeof(uint64));
+	seek_table = (uint64_t*)malloc(tmp * sizeof(uint64_t));
 
-	uint64 *table = seek_table;
+	uint64_t *table = seek_table;
 
 	tmp			= b.GetMpcSize();
-	table[0]	= (uint32)(tmp*8 + header_position);
+	table[0]	= (uint32_t)(tmp*8 + header_position);
 	if (seek_table_size == 1) {
 		return 0;
 	}
 
 	tmp			= b.GetMpcSize();
-	table[1]	= (uint64)(tmp*8 + header_position);
+	table[1]	= (uint64_t)(tmp*8 + header_position);
 	for (int i=2; i<seek_table_size; i++) {
 		int code	= b.Get_Golomb(12);
 		if (code&1) {
@@ -388,7 +387,7 @@ int CMPCFile::ReadStreamHeader(CMPCPacket *packet)
 	b.NeedBits();
 
 	// let's do some reading
-	uint32 crc;
+	uint32_t crc;
 	crc	= b.UGetBits(16);
 	b.NeedBits();
 	crc	<<= 16;
@@ -402,13 +401,13 @@ int CMPCFile::ReadStreamHeader(CMPCPacket *packet)
 		case 8:
 			{
 				total_samples = b.GetMpcSize();
-				int64 silence = b.GetMpcSize();
+				int64_t silence = b.GetMpcSize();
 
 				memset(extradata, 0, 16);
 				Bitstream o(extradata);
 
 				b.NeedBits();
-				uint8 samplerateidx = b.UGetBits(3);
+				uint8_t samplerateidx = b.UGetBits(3);
 				o.PutBits(samplerateidx, 3);
 				sample_rate = (samplerateidx <= 3) ? freq[samplerateidx] : 0;
 
@@ -444,7 +443,7 @@ int CMPCFile::ReadStreamHeader(CMPCPacket *packet)
 }
 
 // parsing out packets
-int CMPCFile::ReadAudioPacket(CMPCPacket *packet, int64 *cur_sample)
+int CMPCFile::ReadAudioPacket(CMPCPacket *packet, int64_t *cur_sample)
 {
 	// we just load packets until we face the SE packet. Then we return -1
 	int ret;
@@ -494,10 +493,10 @@ int CMPCFile::ReadAudioPacket(CMPCPacket *packet, int64 *cur_sample)
 	return S_OK;
 }
 
-int CMPCFile::Seek(int64 seek_sample)
+int CMPCFile::Seek(int64_t seek_sample)
 {
 	// cannot seek
-	if (seek_table == NULL || seek_table_size == 0) {
+	if (seek_table == nullptr || seek_table_size == 0) {
 		return -1;
 	}
 
@@ -519,7 +518,7 @@ int CMPCFile::Seek(int64 seek_sample)
 
 
 	// seek to position
-	uint64 pos		= seek_table[i] >> 3;
+	uint64_t pos		= seek_table[i] >> 3;
 	bits_to_skip	= seek_table[i] & 0x07;
 	reader->Seek(pos);
 
@@ -538,8 +537,8 @@ int CMPCFile::Seek(int64 seek_sample)
 
 CMPCPacket::CMPCPacket() :
 	file_position(0),
-	packet(NULL),
-	payload(NULL),
+	packet(nullptr),
+	payload(nullptr),
 	packet_size(0),
 	payload_size(0),
 	key(0)
@@ -555,9 +554,9 @@ CMPCPacket::~CMPCPacket()
 void CMPCPacket::Release()
 {
 	if (packet) {
-		free(packet); packet = NULL;
+		free(packet); packet = nullptr;
 	}
-	payload			= NULL;
+	payload			= nullptr;
 	packet_size		= 0;
 	payload_size	= 0;
 	key				= 0;
@@ -566,8 +565,8 @@ void CMPCPacket::Release()
 
 int CMPCPacket::Load_SV7(CMusePackReader *reader, int &bits_to_skip, bool only_parse)
 {
-	uint8	temp[14*1024];
-	uint8	outtemp[14*1024];
+	uint8_t	temp[14*1024];
+	uint8_t	outtemp[14*1024];
 	__int64	cur, av;
 	int		t;
 	int		total_bits;
@@ -624,12 +623,12 @@ int CMPCPacket::Load_SV7(CMusePackReader *reader, int &bits_to_skip, bool only_p
 	if (!only_parse) {
 		packet_size		= total_bits >> 3;
 		payload_size	= packet_size;
-		packet			= (uint8*)malloc(packet_size);
+		packet			= (uint8_t*)malloc(packet_size);
 		payload			= packet;				// pointer to packet payload
 
 		// copy data
-		uint8 *src	= outtemp;
-		uint8 *dst	= packet;
+		uint8_t *src	= outtemp;
+		uint8_t *dst	= packet;
 		int left	= packet_size;
 		while (left > 3) {
 			dst[0] = src[3];
@@ -647,9 +646,9 @@ int CMPCPacket::Load_SV7(CMusePackReader *reader, int &bits_to_skip, bool only_p
 
 int CMPCPacket::Load(CMusePackReader *reader)
 {
-	uint16	key_val;
-	int64	size_val, avail;
-	int32	size_len;
+	uint16_t	key_val;
+	int64_t	size_val, avail;
+	int32_t	size_len;
 	int		ret;
 	Release();
 	reader->GetPosition(&file_position, &avail);
@@ -679,7 +678,7 @@ int CMPCPacket::Load(CMusePackReader *reader)
 	// now load the packet
 	packet_size		= size_val;
 	payload_size	= size_val - 2 - size_len;
-	packet			= (uint8*)malloc(packet_size);
+	packet			= (uint8_t*)malloc(packet_size);
 	payload			= packet + 2 + size_len;				// pointer to packet payload
 
 	// roll back the bytes

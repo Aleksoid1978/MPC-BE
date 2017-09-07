@@ -36,8 +36,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 };
 
 const AMOVIESETUP_PIN sudpPins[] = {
-	{L"Input", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn), sudPinTypesIn},
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, 0, NULL}
+	{L"Input", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn), sudPinTypesIn},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, 0, nullptr}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
@@ -45,7 +45,7 @@ const AMOVIESETUP_FILTER sudFilter[] = {
 };
 
 CFactoryTemplate g_Templates[] = {
-	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CMusePackSplitter>, NULL, &sudFilter[0]}
+	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CMusePackSplitter>, nullptr, &sudFilter[0]}
 };
 
 int g_cTemplates = _countof(g_Templates);
@@ -80,14 +80,14 @@ CUnknown *CMusePackSplitter::CreateInstance(LPUNKNOWN pUnk, HRESULT *phr)
 CMusePackSplitter::CMusePackSplitter(LPUNKNOWN pUnk, HRESULT *phr)
 	: CBaseFilter(L"Light Alloy/MPC MusePack Splitter", pUnk, &lock_filter, CLSID_MusePackSplitter, phr)
 	, CAMThread()
-	, reader(NULL)
-	, file(NULL)
-	, wnd_prop(NULL)
+	, reader(nullptr)
+	, file(nullptr)
+	, wnd_prop(nullptr)
 	, rtCurrent(0)
 	, rtStop(_I64_MAX)
 	, rate(1.0)
 	, ev_abort(TRUE)
-	, output(NULL)
+	, output(nullptr)
 {
 	input = DNew CMusePackInputPin(NAME("MPC Input Pin"), this, phr, L"In");
 	retired.RemoveAll();
@@ -99,12 +99,12 @@ CMusePackSplitter::~CMusePackSplitter()
 {
 	// just to be sure
 	if (reader) {
-		delete reader; reader = NULL;
+		delete reader; reader = nullptr;
 	}
 
 	if (output) {
 		delete output;
-		output = NULL;
+		output = nullptr;
 	}
 
 	for (size_t i = 0; i < retired.GetCount(); i++) {
@@ -117,7 +117,7 @@ CMusePackSplitter::~CMusePackSplitter()
 
 	if (input) {
 		delete input;
-		input = NULL;
+		input = nullptr;
 	}
 }
 
@@ -159,7 +159,7 @@ CBasePin *CMusePackSplitter::GetPin(int n)
 		return output;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 HRESULT CMusePackSplitter::CheckConnect(PIN_DIRECTION Dir, IPin *pPin)
@@ -206,9 +206,9 @@ HRESULT CMusePackSplitter::CompleteConnect(PIN_DIRECTION Dir, CBasePin *pCaller,
 		int ret = file->Open(reader);
 		if (ret < 0) {
 			delete file;
-			file = NULL;
+			file = nullptr;
 			delete reader;
-			reader = NULL;
+			reader = nullptr;
 			return E_FAIL;
 		}
 
@@ -263,7 +263,7 @@ HRESULT CMusePackSplitter::RemoveOutputPin()
 		}
 
 		retired.Add(output);
-		output = NULL;
+		output = nullptr;
 	}
 
 	return S_OK;
@@ -321,11 +321,11 @@ HRESULT CMusePackSplitter::BreakConnect(PIN_DIRECTION Dir, CBasePin *pCaller)
 		// destroy input file, reader and update property page
 		if (file) {
 			delete file;
-			file = NULL;
+			file = nullptr;
 		}
 		if (reader) {
 			delete reader;
-			reader = NULL;
+			reader = nullptr;
 		}
 
 		ev_abort.Reset();
@@ -574,7 +574,7 @@ HRESULT CMusePackSplitter::DoNewSeek()
 
 	// seek the file
 	if (file) {
-		int64 sample_pos = (rtCurrent * file->sample_rate) / 10000000;
+		int64_t sample_pos = (rtCurrent * file->sample_rate) / 10000000;
 		file->Seek(sample_pos);
 	}
 
@@ -614,10 +614,10 @@ DWORD CMusePackSplitter::ThreadProc()
 					}
 
 					CMPCPacket	packet;
-					int32		ret = 0;
+					int32_t		ret = 0;
 					bool		eos = false;
 					HRESULT		hr;
-					int64		current_sample;
+					int64_t		current_sample;
 
 					if (!output) {
 						break;
@@ -704,7 +704,7 @@ STDMETHODIMP CMusePackSplitter::get_Copyright(BSTR* pbstrCopyright)
 
 CMusePackInputPin::CMusePackInputPin(TCHAR *pObjectName, CMusePackSplitter *pDemux, HRESULT *phr, LPCWSTR pName) :
 	CBaseInputPin(pObjectName, pDemux, &pDemux->lock_filter, phr, pName),
-	reader(NULL)
+	reader(nullptr)
 {
 	// assign the splitter filter
 	demux = pDemux;
@@ -714,7 +714,7 @@ CMusePackInputPin::~CMusePackInputPin()
 {
 	if (reader) {
 		reader->Release();
-		reader = NULL;
+		reader = nullptr;
 	}
 }
 
@@ -749,7 +749,7 @@ HRESULT CMusePackInputPin::BreakConnect()
 	// release the reader
 	if (reader) {
 		reader->Release();
-		reader = NULL;
+		reader = nullptr;
 	}
 
 	return CBaseInputPin::BreakConnect();
@@ -760,7 +760,7 @@ HRESULT CMusePackInputPin::CompleteConnect(IPin *pReceivePin)
 	// make sure there is a pin
 	ASSERT(pReceivePin);
 
-	if (reader) reader->Release(); reader = NULL;
+	if (reader) reader->Release(); reader = nullptr;
 
 	// and make sure it supports IAsyncReader
 	HRESULT hr = pReceivePin->QueryInterface(IID_PPV_ARGS(&reader));
@@ -1068,7 +1068,7 @@ HRESULT CMusePackOutputPin::DeliverPacket(CMPCPacket &packet)
 	}
 
 	// ziskame novy packet na vystup
-	DataPacketMPC	*outp = NULL;
+	DataPacketMPC	*outp = nullptr;
 	int ret = GetDataPacketMPC(&outp);
 	if (ret < 0 || !outp) {
 		return E_FAIL;
@@ -1133,8 +1133,8 @@ void CMusePackOutputPin::FlushQueue()
 
 HRESULT CMusePackOutputPin::DeliverDataPacketMPC(DataPacketMPC &packet)
 {
-	IMediaSample	*sample;
-	HRESULT hr = GetDeliveryBuffer(&sample, NULL, NULL, 0);
+	IMediaSample *sample;
+	HRESULT hr = GetDeliveryBuffer(&sample, nullptr, nullptr, 0);
 	if (FAILED(hr)) {
 		return E_FAIL;
 	}
@@ -1304,7 +1304,7 @@ CMusePackReader::~CMusePackReader()
 {
 	if (reader) {
 		reader->Release();
-		reader = NULL;
+		reader = nullptr;
 	}
 }
 
@@ -1371,7 +1371,7 @@ int CMusePackReader::ReadSwapped(void *buf, int size)
 {
 	// this method should only be used to read smaller chunks of data - 
 	// one maximum MPC SV7 frame
-	uint8 temp[16*1024];
+	uint8_t temp[16*1024];
 
 	// 32-bit aligned words
 	__int64 cur, av;
@@ -1389,7 +1389,7 @@ int CMusePackReader::ReadSwapped(void *buf, int size)
 	}
 
 	// swap bytes
-	uint8 *bcur = temp;
+	uint8_t *bcur = temp;
 	while (read_size > 3) {
 		std::swap(bcur[0], bcur[3]);
 		std::swap(bcur[1], bcur[2]);
@@ -1408,9 +1408,9 @@ int CMusePackReader::ReadSwapped(void *buf, int size)
 }
 
 // reading syntax elements
-int CMusePackReader::GetMagick(uint32 &elm)
+int CMusePackReader::GetMagick(uint32_t &elm)
 {
-	uint8	buf[4];
+	uint8_t buf[4];
 	int ret = Read(buf, sizeof(buf));
 	if (ret < 0) {
 		return ret;
@@ -1421,9 +1421,9 @@ int CMusePackReader::GetMagick(uint32 &elm)
 	return 0;
 }
 
-int CMusePackReader::GetKey(uint16 &key)
+int CMusePackReader::GetKey(uint16_t &key)
 {
-	uint8	buf[2];
+	uint8_t buf[2];
 	int ret = Read(buf, sizeof(buf));
 	if (ret < 0) {
 		return ret;
@@ -1434,14 +1434,14 @@ int CMusePackReader::GetKey(uint16 &key)
 	return 0;
 }
 
-int CMusePackReader::GetSizeElm(int64 &size, int32 &size_len)
+int CMusePackReader::GetSizeElm(int64_t &size, int32_t &size_len)
 {
 	int	ret;
 	size = 0;
 	size_len = 1;
 
 	while (true) {
-		uint8 val;
+		uint8_t val;
 		ret = Read(&val, 1);
 		if (ret < 0) {
 			return ret;
@@ -1461,7 +1461,7 @@ int CMusePackReader::GetSizeElm(int64 &size, int32 &size_len)
 	return 0;
 }
 
-bool CMusePackReader::KeyValid(uint16 key)
+bool CMusePackReader::KeyValid(uint16_t key)
 {
 	// according to the specs keys can only take specific values.
 	if (((key>>8)&0xff) < 65 || ((key>>8)&0xff) > 90) {
@@ -1479,7 +1479,7 @@ DataPacketMPC::DataPacketMPC() :
 	rtStop(0),
 	sync_point(FALSE),
 	discontinuity(FALSE),
-	buf(NULL),
+	buf(nullptr),
 	size(0)
 {
 }
@@ -1488,6 +1488,6 @@ DataPacketMPC::~DataPacketMPC()
 {
 	if (buf) {
 		free(buf);
-		buf = NULL;
+		buf = nullptr;
 	}
 }
