@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -51,7 +51,7 @@ HRESULT CID::Write(IStream* pStream)
 	DWORD id = m_id;
 	bswap((BYTE*)&id, (int)len);
 	*(BYTE*)&id = ((*(BYTE*)&id) & (1 << (8 - len)) - 1) | (1 << (8 - len));
-	return pStream->Write(&id, (ULONG)len, NULL);
+	return pStream->Write(&id, (ULONG)len, nullptr);
 }
 
 QWORD CID::HeaderSize(QWORD len)
@@ -87,7 +87,7 @@ HRESULT CBinary::Write(IStream* pStream)
 	}
 
 	HeaderWrite(pStream);
-	return pStream->Write(GetData(), (ULONG)GetCount(), NULL);
+	return pStream->Write(GetData(), (ULONG)GetCount(), nullptr);
 }
 
 QWORD CANSI::Size(bool fWithHeader)
@@ -111,7 +111,7 @@ HRESULT CANSI::Write(IStream* pStream)
 	}
 
 	HeaderWrite(pStream);
-	return pStream->Write((LPCSTR) * this, GetLength(), NULL);
+	return pStream->Write((LPCSTR) * this, GetLength(), nullptr);
 }
 
 QWORD CUTF8::Size(bool fWithHeader)
@@ -136,7 +136,7 @@ HRESULT CUTF8::Write(IStream* pStream)
 
 	HeaderWrite(pStream);
 	CStringA str = UTF16To8(*this);
-	return pStream->Write((BYTE*)(LPCSTR)str, str.GetLength(), NULL);
+	return pStream->Write((BYTE*)(LPCSTR)str, str.GetLength(), nullptr);
 }
 
 template<class T, class BASE>
@@ -164,7 +164,7 @@ HRESULT CSimpleVar<T, BASE>::Write(IStream* pStream)
 	HeaderWrite(pStream);
 	T val = m_val;
 	bswap((BYTE*)&val, sizeof(T));
-	return pStream->Write(&val, sizeof(T), NULL);
+	return pStream->Write(&val, sizeof(T), nullptr);
 }
 
 QWORD CUInt::Size(bool fWithHeader)
@@ -202,7 +202,7 @@ HRESULT CUInt::Write(IStream* pStream)
 	l.Write(pStream);
 	UINT64 val = m_val;
 	bswap((BYTE*)&val, (int)l);
-	return pStream->Write(&val, (ULONG)l, NULL);
+	return pStream->Write(&val, (ULONG)l, nullptr);
 }
 
 QWORD CInt::Size(bool fWithHeader)
@@ -244,7 +244,7 @@ HRESULT CInt::Write(IStream* pStream)
 	l.Write(pStream);
 	UINT64 val = m_val;
 	bswap((BYTE*)&val, (int)l);
-	return pStream->Write(&val, (ULONG)l, NULL);
+	return pStream->Write(&val, (ULONG)l, nullptr);
 }
 
 QWORD CLength::Size(bool fWithHeader)
@@ -269,7 +269,7 @@ HRESULT CLength::Write(IStream* pStream)
 	UINT64 val = m_len;
 	bswap((BYTE*)&val, (int)len);
 	*(BYTE*)&val = ((*(BYTE*)&val) & (1 << (8 - len)) - 1) | (1 << (8 - len));
-	return pStream->Write(&val, (ULONG)len, NULL);
+	return pStream->Write(&val, (ULONG)len, nullptr);
 }
 
 //
@@ -700,15 +700,15 @@ HRESULT CBlock::Write(IStream* pStream)
 	TrackNumber.Write(pStream);
 	short t = (short)TimeCode;
 	bswap((BYTE*)&t, 2);
-	pStream->Write(&t, 2, NULL);
+	pStream->Write(&t, 2, nullptr);
 	BYTE Lacing = 0;
 	BYTE n = (BYTE)BlockData.GetCount();
 	if (n > 1) {
 		Lacing |= 2;
 	}
-	pStream->Write(&Lacing, 1, NULL);
+	pStream->Write(&Lacing, 1, nullptr);
 	if (n > 1) {
-		pStream->Write(&n, 1, NULL);
+		pStream->Write(&n, 1, nullptr);
 		POSITION pos = BlockData.GetHeadPosition();
 		while (pos) {
 			CBinary* b = BlockData.GetNext(pos);
@@ -716,7 +716,7 @@ HRESULT CBlock::Write(IStream* pStream)
 				INT_PTR len = b->GetCount();
 				while (len >= 0) {
 					n = (BYTE)std::min<INT_PTR>(len, 255);
-					pStream->Write(&n, 1, NULL);
+					pStream->Write(&n, 1, nullptr);
 					len -= 255;
 				}
 			}
@@ -725,7 +725,7 @@ HRESULT CBlock::Write(IStream* pStream)
 	POSITION pos = BlockData.GetHeadPosition();
 	while (pos) {
 		CBinary* b = BlockData.GetNext(pos);
-		pStream->Write(b->GetData(), (ULONG)b->GetCount(), NULL);
+		pStream->Write(b->GetData(), (ULONG)b->GetCount(), nullptr);
 	}
 	return S_OK;
 }
@@ -926,11 +926,11 @@ HRESULT Void::Write(IStream* pStream)
 	memset(buff, 0x80, sizeof(buff));
 	QWORD len = m_len;
 	for (; len >= sizeof(buff); len -= sizeof(buff)) {
-		pStream->Write(buff, sizeof(buff), NULL);
+		pStream->Write(buff, sizeof(buff), nullptr);
 	}
 
 	if (len > 0) {
-		pStream->Write(buff, (ULONG)len, NULL);
+		pStream->Write(buff, (ULONG)len, nullptr);
 	}
 
 	return S_OK;
