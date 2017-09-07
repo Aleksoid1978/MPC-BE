@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -47,13 +47,13 @@ CDXRAllocatorPresenter::~CDXRAllocatorPresenter()
 {
 	if (m_pSRCB) {
 		// nasty, but we have to let it know about our death somehow
-		((CSubRenderCallback*)(ISubRenderCallback*)m_pSRCB)->SetDXRAP(NULL);
+		((CSubRenderCallback*)(ISubRenderCallback*)m_pSRCB)->SetDXRAP(nullptr);
 	}
 
 	// the order is important here
-	m_pSubPicQueue = NULL;
-	m_pAllocator = NULL;
-	m_pDXR = NULL;
+	m_pSubPicQueue = nullptr;
+	m_pAllocator = nullptr;
+	m_pDXR = nullptr;
 }
 
 STDMETHODIMP CDXRAllocatorPresenter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -149,13 +149,13 @@ STDMETHODIMP CDXRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 
 	CComQIPtr<ISubRender> pSR = m_pDXR;
 	if (!pSR) {
-		m_pDXR = NULL;
+		m_pDXR = nullptr;
 		return E_FAIL;
 	}
 
 	m_pSRCB = DNew CSubRenderCallback(this);
 	if (FAILED(pSR->SetCallback(m_pSRCB))) {
-		m_pDXR = NULL;
+		m_pDXR = nullptr;
 		return E_FAIL;
 	}
 

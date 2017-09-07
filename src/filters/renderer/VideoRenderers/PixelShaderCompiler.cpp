@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,10 +29,10 @@ HINSTANCE GetD3dcompilerDll()
 	static HINSTANCE s_hD3dcompilerDll = LoadLibraryW(L"d3dcompiler_47.dll"); // Windows Kits\8.1\Redist\D3D\[x86|x64]\d3dcompiler_47.dll
 
 #ifdef _DEBUG
-	if (s_hD3dcompilerDll == NULL) {
+	if (s_hD3dcompilerDll == nullptr) {
 		// try an absolute path (needed when running the debug version outside of Visual Studio)
 		CString path;
-		SHGetFolderPath(NULL, CSIDL_PROGRAM_FILESX86, NULL, 0, path.GetBuffer(_MAX_PATH));
+		SHGetFolderPath(nullptr, CSIDL_PROGRAM_FILESX86, nullptr, 0, path.GetBuffer(_MAX_PATH));
 		path.ReleaseBuffer();
 	#ifdef _WIN64
 		path.Append(L"\\Windows Kits\\8.1\\bin\\x64\\d3dcompiler_47.dll");
@@ -50,8 +50,8 @@ HINSTANCE GetD3dcompilerDll()
 
 CPixelShaderCompiler::CPixelShaderCompiler(IDirect3DDevice9* pD3DDev, bool fStaySilent)
 	: m_pD3DDev(pD3DDev)
-	, m_fnD3DCompile(NULL)
-	, m_fnD3DDisassemble(NULL)
+	, m_fnD3DCompile(nullptr)
+	, m_fnD3DDisassemble(nullptr)
 {
 	HINSTANCE hDll;
 	hDll = GetD3dcompilerDll();
@@ -90,7 +90,7 @@ HRESULT CPixelShaderCompiler::CompileShader(
 
 	HRESULT hr;
 	ID3DBlob* pShader, *pErrorMsgs;
-	hr = m_fnD3DCompile(pSrcData, (SIZE_T)strlen(pSrcData), NULL, pDefines, NULL, pFunctionName, pProfile, Flags, 0, &pShader, &pErrorMsgs);
+	hr = m_fnD3DCompile(pSrcData, (SIZE_T)strlen(pSrcData), nullptr, pDefines, nullptr, pFunctionName, pProfile, Flags, 0, &pShader, &pErrorMsgs);
 
 	if (FAILED(hr)) {
 		if (errmsg) {
@@ -119,7 +119,7 @@ HRESULT CPixelShaderCompiler::CompileShader(
 
 	if (disasm) {
 		ID3DBlob* pDisAsm;
-		hr = m_fnD3DDisassemble(pShader->GetBufferPointer(), pShader->GetBufferSize(), 0, NULL, &pDisAsm);
+		hr = m_fnD3DDisassemble(pShader->GetBufferPointer(), pShader->GetBufferSize(), 0, nullptr, &pDisAsm);
 		if (SUCCEEDED(hr) && pDisAsm) {
 			*disasm = CString((LPCSTR)pDisAsm->GetBufferPointer());
 		}
@@ -132,7 +132,7 @@ HRESULT CPixelShaderCompiler::CompileShader(
 
 HRESULT CExternalPixelShader::Compile(CPixelShaderCompiler* pCompiler)
 {
-	HRESULT hr = pCompiler->CompileShader(m_SourceCode, "main", m_Profile, 0, NULL, &m_pPixelShader);
+	HRESULT hr = pCompiler->CompileShader(m_SourceCode, "main", m_Profile, 0, nullptr, &m_pPixelShader);
 	if (FAILED(hr)) {
 		return hr;
 	}

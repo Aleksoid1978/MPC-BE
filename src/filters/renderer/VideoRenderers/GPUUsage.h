@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2016 see Authors.txt
+ * (C) 2013-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -129,15 +129,15 @@ private:
 		NvAPI_GPU_GetAllClocks_t NvAPI_GPU_GetAllClocks;
 	} NVData;
 
-	HMODULE gdi32Handle = NULL;
-	PFND3DKMT_QUERYSTATISTICS pD3DKMTQueryStatistics = NULL;
+	HMODULE gdi32Handle = nullptr;
+	PFND3DKMT_QUERYSTATISTICS pD3DKMTQueryStatistics = nullptr;
 
-	HMODULE dxgiHandle = NULL;
+	HMODULE dxgiHandle = nullptr;
 	typedef HRESULT (WINAPI *CreateDXGIFactory_t)(REFIID riid, _Out_ void **ppFactory);
-	CreateDXGIFactory_t pCreateDXGIFactory = NULL;
+	CreateDXGIFactory_t pCreateDXGIFactory = nullptr;
 	DXGI_ADAPTER_DESC dxgiAdapterDesc = { 0 };
 
-	HANDLE processHandle = NULL;
+	HANDLE processHandle = nullptr;
 
 	void Clean();
 };

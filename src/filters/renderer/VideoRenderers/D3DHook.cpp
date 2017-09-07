@@ -170,7 +170,7 @@ namespace D3DHook {
 							}
 #endif
 							ULONG nChars = 0;
-							if (ERROR_SUCCESS == regkey.QueryMultiStringValue(pszValueName, NULL, &nChars) && nChars > 0) {
+							if (ERROR_SUCCESS == regkey.QueryMultiStringValue(pszValueName, nullptr, &nChars) && nChars > 0) {
 								LPTSTR pszValue = DNew WCHAR[nChars];
 								if (ERROR_SUCCESS == regkey.QueryMultiStringValue(pszValueName, pszValue, &nChars)) {
 									// we need only the first value

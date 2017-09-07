@@ -26,7 +26,7 @@
 #include "DX9RenderingEngine.h"
 #include "../../../apps/mplayerc/resource.h"
 
-#define NULL_PTR_ARRAY(a) for (size_t i = 0; i < _countof(a); i++) { a[i] = NULL; }
+#define NULL_PTR_ARRAY(a) for (size_t i = 0; i < _countof(a); i++) { a[i] = nullptr; }
 
 #pragma pack(push, 1)
 template<unsigned texcoords>
@@ -111,7 +111,7 @@ static HRESULT TextureBlt(IDirect3DDevice9* pD3DDev, MYD3DVERTEX<texcoords> v[4]
 	hr = pD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, v, sizeof(v[0]));
 
 	for (unsigned i = 0; i < texcoords; i++) {
-		pD3DDev->SetTexture(i, NULL);
+		pD3DDev->SetTexture(i, nullptr);
 	}
 
 	return S_OK;
@@ -132,10 +132,10 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_VideoBufferFmt(D3DFMT_X8R8G8B8)
 	, m_SurfaceFmt(D3DFMT_X8R8G8B8)
 	, m_inputExtFormat({})
-	, m_wsResizer(NULL)
-	, m_wsResizer2(NULL)
+	, m_wsResizer(nullptr)
+	, m_wsResizer2(nullptr)
 	, m_Caps({})
-	, m_ShaderProfile(NULL)
+	, m_ShaderProfile(nullptr)
 #if DXVAVP
 	, m_VideoDesc({})
 	, m_VPCaps({})
@@ -192,7 +192,7 @@ void CDX9RenderingEngine::InitRenderingEngine()
 			m_ShaderProfile = "ps_2_0";
 		}
 	} else {
-		m_ShaderProfile = NULL;
+		m_ShaderProfile = nullptr;
 	}
 
 	// Initialize the pixel shader compiler
@@ -210,18 +210,18 @@ void CDX9RenderingEngine::CleanupRenderingEngine()
 	POSITION pos = m_pCustomScreenSpacePixelShaders.GetHeadPosition();
 	while (pos) {
 		CExternalPixelShader &Shader = m_pCustomScreenSpacePixelShaders.GetNext(pos);
-		Shader.m_pPixelShader = NULL;
+		Shader.m_pPixelShader = nullptr;
 	}
 	pos = m_pCustomPixelShaders.GetHeadPosition();
 	while (pos) {
 		CExternalPixelShader &Shader = m_pCustomPixelShaders.GetNext(pos);
-		Shader.m_pPixelShader = NULL;
+		Shader.m_pPixelShader = nullptr;
 	}
 
-	m_pRotateTexture = NULL;
+	m_pRotateTexture = nullptr;
 	NULL_PTR_ARRAY(m_pFrameTextures)
 	NULL_PTR_ARRAY(m_pScreenSpaceTextures);
-	m_pResizeTexture = NULL;
+	m_pResizeTexture = nullptr;
 
 	m_pPSCorrection.Release();
 	m_pConvertToInterlacePixelShader.Release();
@@ -236,7 +236,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 
 	// Free previously allocated temporary video textures, because the native video size might have been changed!
 	NULL_PTR_ARRAY(m_pFrameTextures);
-	m_pRotateTexture = NULL;
+	m_pRotateTexture = nullptr;
 
 	if (m_D3D9VendorId == PCIV_Intel) {
 		// on Intel EVR-Mixer can work with X8R8G8B8 surface only
@@ -255,7 +255,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 		if (FAILED(hr = m_pD3DDevEx->CreateTexture(
 							m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1,
 							D3DUSAGE_RENDERTARGET, m_VideoBufferFmt,
-							D3DPOOL_DEFAULT, &m_pVideoTextures[i], NULL))) {
+							D3DPOOL_DEFAULT, &m_pVideoTextures[i], nullptr))) {
 			return hr;
 		}
 
@@ -264,7 +264,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 		}
 	}
 
-	hr = m_pD3DDevEx->Clear(0, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0);
+	hr = m_pD3DDevEx->Clear(0, nullptr, D3DCLEAR_TARGET, 0, 1.0f, 0);
 
 	return S_OK;
 }
@@ -272,8 +272,8 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 void CDX9RenderingEngine::FreeVideoSurfaces()
 {
 	for (unsigned i = 0; i < m_nSurfaces; i++) {
-		m_pVideoTextures[i] = NULL;
-		m_pVideoSurfaces[i] = NULL;
+		m_pVideoTextures[i] = nullptr;
+		m_pVideoSurfaces[i] = nullptr;
 	}
 }
 
@@ -289,7 +289,7 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 	}
 
 	// Return if the video texture is not initialized
-	if (m_pVideoTextures[m_iCurSurface] == NULL) {
+	if (m_pVideoTextures[m_iCurSurface] == nullptr) {
 		return E_ABORT;
 	}
 
@@ -466,7 +466,7 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 		};
 
 		hr = m_pD3DDevEx->SetTexture(0, pVideoTexture);
-		hr = m_pD3DDevEx->SetPixelShader(NULL);
+		hr = m_pD3DDevEx->SetPixelShader(nullptr);
 		hr = TextureBlt(m_pD3DDevEx, v, D3DTEXF_LINEAR);
 
 		if (iRotation == 90 || iRotation == 270) {
@@ -484,7 +484,7 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 
 		if (SUCCEEDED(hr)) {
 			hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
-			hr = m_pD3DDevEx->Clear(0, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0);
+			hr = m_pD3DDevEx->Clear(0, nullptr, D3DCLEAR_TARGET, 0, 1.0f, 0);
 		}
 	} else {
 		hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
@@ -556,7 +556,7 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 		hr = FinalPass(m_pScreenSpaceTextures[src]);
 		std::swap(src, dst);
 	}
-	hr = m_pD3DDevEx->SetPixelShader(NULL);
+	hr = m_pD3DDevEx->SetPixelShader(nullptr);
 
 	m_iScreenTex = src;
 
@@ -590,7 +590,7 @@ HRESULT CDX9RenderingEngine::Stereo3DTransform(IDirect3DSurface9* pRenderTarget,
 			hr = m_pD3DDevEx->SetPixelShader(m_pConvertToInterlacePixelShader);
 			hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
 			hr = TextureCopy(m_pScreenSpaceTextures[m_iScreenTex]);
-			m_pD3DDevEx->SetPixelShader(NULL);
+			m_pD3DDevEx->SetPixelShader(nullptr);
 		}
 	}
 
@@ -658,7 +658,7 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 
 	// Query the supported render target format.
 	UINT i, count;
-	D3DFORMAT* formats = NULL;
+	D3DFORMAT* formats = nullptr;
 	hr = m_pDXVAVPS->GetVideoProcessorRenderTargets(guid, &m_VideoDesc, &count, &formats);
 	if (FAILED(hr)) {
 		DLog(L"GetVideoProcessorRenderTargets failed with error 0x%x.", hr);
@@ -867,11 +867,11 @@ HRESULT CDX9RenderingEngine::TextureResizeDXVA(IDirect3DTexture9* pTexture, cons
 	CRect clientRect;
 	if (rDstRect.left > 0 || rDstRect.top > 0 ||
 			GetClientRect(m_hWnd, clientRect) && (rDstRect.right < clientRect.Width() || rDstRect.bottom < clientRect.Height())) {
-		//m_pD3DDevEx->Clear(0, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0); //  not worked
-		m_pD3DDevEx->ColorFill(pRenderTarget, NULL, 0);
+		//m_pD3DDevEx->Clear(0, nullptr, D3DCLEAR_TARGET, 0, 1.0f, 0); //  not worked
+		m_pD3DDevEx->ColorFill(pRenderTarget, nullptr, 0);
 	}
 
-	hr = m_pDXVAVPD->VideoProcessBlt(pRenderTarget, &blt, samples, 1, NULL);
+	hr = m_pDXVAVPD->VideoProcessBlt(pRenderTarget, &blt, samples, 1, nullptr);
 	if (FAILED(hr)) {
 		DLog(L"VideoProcessBlt failed with error 0x%x.", hr);
 	}
@@ -897,10 +897,10 @@ HRESULT CDX9RenderingEngine::InitVideoTextures()
 	}
 
 	for (size_t i = 0; i < count; i++) {
-		if (m_pFrameTextures[i] == NULL) {
+		if (m_pFrameTextures[i] == nullptr) {
 			hr = m_pD3DDevEx->CreateTexture(
 					 m_nativeVideoSize.cx, m_nativeVideoSize.cy, 1, D3DUSAGE_RENDERTARGET, m_SurfaceFmt,
-					 D3DPOOL_DEFAULT, &m_pFrameTextures[i], NULL);
+					 D3DPOOL_DEFAULT, &m_pFrameTextures[i], nullptr);
 
 			if (FAILED(hr)) {
 				// Free all textures
@@ -913,19 +913,19 @@ HRESULT CDX9RenderingEngine::InitVideoTextures()
 
 	// Free unnecessary textures
 	for (size_t i = count; i < _countof(m_pFrameTextures); i++) {
-		m_pFrameTextures[i] = NULL;
+		m_pFrameTextures[i] = nullptr;
 	}
 
 	if (m_iRotation == 90 || m_iRotation == 270) {
-		if (m_pRotateTexture == NULL) {
+		if (m_pRotateTexture == nullptr) {
 			UINT a = max(m_nativeVideoSize.cx, m_nativeVideoSize.cy);
 			hr = m_pD3DDevEx->CreateTexture(
 				 a, a, 1, D3DUSAGE_RENDERTARGET, m_SurfaceFmt,
-				 D3DPOOL_DEFAULT, &m_pRotateTexture, NULL);
+				 D3DPOOL_DEFAULT, &m_pRotateTexture, nullptr);
 		}
 	}
 	else {
-		m_pRotateTexture = NULL;
+		m_pRotateTexture = nullptr;
 	}
 
 	return hr;
@@ -942,10 +942,10 @@ HRESULT CDX9RenderingEngine::InitScreenSpaceTextures(unsigned count)
 	m_ScreenSpaceTexHeight = min(m_ScreenSize.cy, (int)m_Caps.MaxTextureHeight);
 
 	for (unsigned i = 0; i < count; i++) {
-		if (m_pScreenSpaceTextures[i] == NULL) {
+		if (m_pScreenSpaceTextures[i] == nullptr) {
 			hr = m_pD3DDevEx->CreateTexture(
 					m_ScreenSpaceTexWidth, m_ScreenSpaceTexHeight, 1, D3DUSAGE_RENDERTARGET, m_SurfaceFmt,
-					D3DPOOL_DEFAULT, &m_pScreenSpaceTextures[i], NULL);
+					D3DPOOL_DEFAULT, &m_pScreenSpaceTextures[i], nullptr);
 
 			if (FAILED(hr)) {
 				// Free all textures
@@ -958,7 +958,7 @@ HRESULT CDX9RenderingEngine::InitScreenSpaceTextures(unsigned count)
 
 	// Free unnecessary textures
 	for (unsigned i = count; i < _countof(m_pScreenSpaceTextures); i++) {
-		m_pScreenSpaceTextures[i] = NULL;
+		m_pScreenSpaceTextures[i] = nullptr;
 	}
 
 	return hr;
@@ -1043,8 +1043,8 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int resizer)
 	}
 	if (FAILED(hr)) {
 		ASSERT(0);
-		m_pResizerPixelShaders[iShader] = NULL;
-		m_pResizerPixelShaders[iShader + 1] = NULL;
+		m_pResizerPixelShaders[iShader] = nullptr;
+		m_pResizerPixelShaders[iShader + 1] = nullptr;
 		return hr;
 	}
 
@@ -1071,7 +1071,7 @@ HRESULT CDX9RenderingEngine::TextureResize(IDirect3DTexture9* pTexture, const CR
 	};
 
 	hr = m_pD3DDevEx->SetTexture(0, pTexture);
-	hr = m_pD3DDevEx->SetPixelShader(NULL);
+	hr = m_pD3DDevEx->SetPixelShader(nullptr);
 	hr = TextureBlt(m_pD3DDevEx, v, filter);
 
 	return hr;
@@ -1116,7 +1116,7 @@ HRESULT CDX9RenderingEngine::TextureResizeShader(IDirect3DTexture9* pTexture, co
 
 	hr = m_pD3DDevEx->SetTexture(0, pTexture);
 	hr = TextureBlt(m_pD3DDevEx, v, D3DTEXF_POINT);
-	m_pD3DDevEx->SetPixelShader(NULL);
+	m_pD3DDevEx->SetPixelShader(nullptr);
 
 	return hr;
 }
@@ -1211,8 +1211,8 @@ HRESULT CDX9RenderingEngine::ApplyResize(IDirect3DTexture9* pTexture, const CRec
 
 HRESULT CDX9RenderingEngine::Resize(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect)
 {
-	m_wsResizer = NULL;
-	m_wsResizer2 = NULL;
+	m_wsResizer = nullptr;
+	m_wsResizer2 = nullptr;
 
 	CRenderersSettings& rs = GetRenderersSettings();
 	int iResizer = rs.iResizer;
@@ -1253,7 +1253,7 @@ HRESULT CDX9RenderingEngine::Resize(IDirect3DTexture9* pTexture, const CRect& sr
 
 		if (m_pResizeTexture && m_pResizeTexture->GetLevelDesc(0, &desc) == D3D_OK) {
 			if (texWidth != desc.Width || texHeight != desc.Height) {
-				m_pResizeTexture = NULL; // need new texture
+				m_pResizeTexture = nullptr; // need new texture
 			}
 		}
 
@@ -1261,9 +1261,9 @@ HRESULT CDX9RenderingEngine::Resize(IDirect3DTexture9* pTexture, const CRect& sr
 			hr = m_pD3DDevEx->CreateTexture(
 				texWidth, texHeight, 1, D3DUSAGE_RENDERTARGET,
 				m_SurfaceFmt == D3DFMT_A32B32G32R32F ? D3DFMT_A32B32G32R32F : D3DFMT_A16B16G16R16F, // use only float textures here
-				D3DPOOL_DEFAULT, &m_pResizeTexture, NULL);
+				D3DPOOL_DEFAULT, &m_pResizeTexture, nullptr);
 			if (FAILED(hr) || FAILED(m_pResizeTexture->GetLevelDesc(0, &desc))) {
-				m_pResizeTexture = NULL;
+				m_pResizeTexture = nullptr;
 				return TextureResize(pTexture, srcRect, destRect, D3DTEXF_LINEAR);
 			}
 		}
@@ -1337,8 +1337,8 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	m_bDither = bDither;
 
 	// Initial cleanup
-	m_pLut3DTexture = NULL;
-	m_pFinalPixelShader = NULL;
+	m_pLut3DTexture = nullptr;
+	m_pFinalPixelShader = nullptr;
 
 	if (bDither && !m_pDitherTexture) {
 		// Create the dither texture
@@ -1348,7 +1348,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 									  D3DFMT_A16B16G16R16F,
 									  D3DPOOL_DEFAULT,
 									  &m_pDitherTexture,
-									  NULL);
+									  nullptr);
 
 		if (FAILED(hr)) {
 			CleanupFinalPass();
@@ -1356,7 +1356,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 		}
 
 		D3DLOCKED_RECT lockedRect;
-		hr = m_pDitherTexture->LockRect(0, &lockedRect, NULL, D3DLOCK_DISCARD);
+		hr = m_pDitherTexture->LockRect(0, &lockedRect, nullptr, D3DLOCK_DISCARD);
 		if (FAILED(hr)) {
 			CleanupFinalPass();
 			return hr;
@@ -1387,9 +1387,9 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 		CStringW iccProfilePath;
 		HDC hDC = GetDC(m_hWnd);
 
-		if (hDC != NULL) {
+		if (hDC != nullptr) {
 			DWORD icmProfilePathSize = 0;
-			GetICMProfileW(hDC, &icmProfilePathSize, NULL);
+			GetICMProfileW(hDC, &icmProfilePathSize, nullptr);
 
 			GetICMProfileW(hDC, &icmProfilePathSize, iccProfilePath.GetBuffer(icmProfilePathSize));
 			iccProfilePath.ReleaseBuffer();
@@ -1404,7 +1404,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 											D3DFMT_A16B16G16R16F,
 											D3DPOOL_DEFAULT,
 											&m_pLut3DTexture,
-											NULL);
+											nullptr);
 
 		if (FAILED(hr)) {
 			CleanupFinalPass();
@@ -1424,7 +1424,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 		DirectX::PackedVector::HALF oneFloat16 = DirectX::PackedVector::XMConvertFloatToHalf(1.0f);
 
 		D3DLOCKED_BOX lockedBox;
-		hr = m_pLut3DTexture->LockBox(0, &lockedBox, NULL, D3DLOCK_DISCARD);
+		hr = m_pLut3DTexture->LockBox(0, &lockedBox, nullptr, D3DLOCK_DISCARD);
 		if (FAILED(hr)) {
 			CleanupFinalPass();
 			return hr;
@@ -1493,9 +1493,9 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 void CDX9RenderingEngine::CleanupFinalPass()
 {
 	m_bFinalPass = false;
-	m_pDitherTexture = NULL;
-	m_pLut3DTexture = NULL;
-	m_pFinalPixelShader = NULL;
+	m_pDitherTexture = nullptr;
+	m_pLut3DTexture = nullptr;
+	m_pFinalPixelShader = nullptr;
 }
 
 HRESULT CDX9RenderingEngine::CreateIccProfileLut(wchar_t* profilePath, float* lut3D)
@@ -1609,7 +1609,7 @@ HRESULT CDX9RenderingEngine::CreateIccProfileLut(wchar_t* profilePath, float* lu
 	cmsHPROFILE hInputProfile = cmsCreateRGBProfile(&whitePoint, &primaries, transferFunctionRGB);
 	cmsFreeToneCurve(transferFunction);
 
-	if (hInputProfile == NULL) {
+	if (hInputProfile == nullptr) {
 		return E_FAIL;
 	}
 
@@ -1628,7 +1628,7 @@ HRESULT CDX9RenderingEngine::CreateIccProfileLut(wchar_t* profilePath, float* lu
 		hOutputProfile = cmsCreate_sRGBProfile();
 	}
 
-	if (hOutputProfile == NULL) {
+	if (hOutputProfile == nullptr) {
 		if (profilePath != 0) {
 			fclose(outputProfileStream);
 		}
@@ -1648,7 +1648,7 @@ HRESULT CDX9RenderingEngine::CreateIccProfileLut(wchar_t* profilePath, float* lu
 
 	cmsCloseProfile(hInputProfile);
 
-	if (hTransform == NULL) {
+	if (hTransform == nullptr) {
 		return E_FAIL;
 	}
 
@@ -1745,10 +1745,10 @@ HRESULT CDX9RenderingEngine::FinalPass(IDirect3DTexture9* pTexture)
 
 	hr = TextureBlt(m_pD3DDevEx, v, D3DTEXF_POINT);
 
-	hr = m_pD3DDevEx->SetTexture(1, NULL);
+	hr = m_pD3DDevEx->SetTexture(1, nullptr);
 
 	if (m_bColorManagement) {
-		hr = m_pD3DDevEx->SetTexture(2, NULL);
+		hr = m_pD3DDevEx->SetTexture(2, nullptr);
 	}
 
 	return hr;
@@ -1933,14 +1933,14 @@ HRESULT CDX9RenderingEngine::AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9*
 
 	*///
 
-	hr = m_pD3DDevEx->SetPixelShader(NULL);
+	hr = m_pD3DDevEx->SetPixelShader(nullptr);
 
 	hr = m_pD3DDevEx->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
 	hr = m_pD3DDevEx->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, pVertices, sizeof(pVertices[0]));
 
 	//
 
-	m_pD3DDevEx->SetTexture(0, NULL);
+	m_pD3DDevEx->SetTexture(0, nullptr);
 
 	m_pD3DDevEx->SetRenderState(D3DRS_ALPHABLENDENABLE, abe);
 	m_pD3DDevEx->SetRenderState(D3DRS_SRCBLEND, sb);
@@ -1958,7 +1958,7 @@ HRESULT CDX9RenderingEngine::ClearCustomPixelShaders(int target)
 	} else {
 		return E_INVALIDARG;
 	}
-	m_pD3DDevEx->SetPixelShader(NULL);
+	m_pD3DDevEx->SetPixelShader(nullptr);
 
 	return S_OK;
 }

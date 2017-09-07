@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -47,9 +47,9 @@ CmadVRAllocatorPresenter::CmadVRAllocatorPresenter(HWND hWnd, HRESULT& hr, CStri
 CmadVRAllocatorPresenter::~CmadVRAllocatorPresenter()
 {
 	// the order is important here
-	m_pSubPicQueue = NULL;
-	m_pAllocator = NULL;
-	m_pMVR = NULL;
+	m_pSubPicQueue = nullptr;
+	m_pAllocator = nullptr;
+	m_pMVR = nullptr;
 }
 
 STDMETHODIMP CmadVRAllocatorPresenter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -71,8 +71,8 @@ HRESULT CmadVRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
 {
 	if (!pD3DDev) {
 		// release all resources
-		m_pSubPicQueue = NULL;
-		m_pAllocator = NULL;
+		m_pSubPicQueue = nullptr;
+		m_pAllocator = nullptr;
 		return S_OK;
 	}
 
@@ -243,7 +243,7 @@ STDMETHODIMP CmadVRAllocatorPresenter::AddPixelShader(int target, LPCSTR sourceC
 	HRESULT hr = E_NOTIMPL;
 
 	if (CComQIPtr<IMadVRExternalPixelShaders> pMVREPS = m_pMVR) {
-		hr = pMVREPS->AddPixelShader(sourceCode, profile, target, NULL);
+		hr = pMVREPS->AddPixelShader(sourceCode, profile, target, nullptr);
 	}
 	return hr;
 }

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,7 +35,7 @@ namespace DSObjects
 
 		public:
 			CSubRenderCallback(CDXRAllocatorPresenter* pDXRAP)
-				: CUnknown(L"CSubRender", NULL)
+				: CUnknown(L"CSubRender", nullptr)
 				, m_pDXRAP(pDXRAP) {
 			}
 
