@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2016 see Authors.txt
+ * (C) 2011-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -63,7 +63,7 @@ bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, 
 	DisplayDevice.cb = sizeof(DISPLAY_DEVICEW);
 
 	DWORD dwDevNum = 0;
-	while (EnumDisplayDevices(NULL, dwDevNum++, &DisplayDevice, 0)) {
+	while (EnumDisplayDevices(nullptr, dwDevNum++, &DisplayDevice, 0)) {
 
 		if ((DisplayDevice.StateFlags & DISPLAY_DEVICE_ACTIVE)
 			&& !(DisplayDevice.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)
@@ -82,7 +82,7 @@ bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, 
 						DWORD i = 0;
 						for (;;) {// iterate over the child keys
 							DWORD cbName = _countof(DisplayDevice.DeviceKey);
-							ls = RegEnumKeyEx(hKey0, i, DisplayDevice.DeviceKey, &cbName, NULL, NULL, NULL, NULL);
+							ls = RegEnumKeyEx(hKey0, i, DisplayDevice.DeviceKey, &cbName, nullptr, nullptr, nullptr, nullptr);
 							if (ls == ERROR_NO_MORE_ITEMS) {
 								break;
 							}
@@ -99,7 +99,7 @@ bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, 
 									DWORD j = 0;
 									for (;;) {// iterate over the grandchild keys
 										cbName = _countof(DisplayDevice.DeviceKey);
-										ls = RegEnumKeyEx(hKey1, j, DisplayDevice.DeviceKey, &cbName, NULL, NULL, NULL, NULL);
+										ls = RegEnumKeyEx(hKey1, j, DisplayDevice.DeviceKey, &cbName, nullptr, nullptr, nullptr, nullptr);
 										if (ls == ERROR_NO_MORE_ITEMS) {
 											break;
 										}
@@ -115,7 +115,7 @@ bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, 
 
 												static wchar_t const szTDriverKeyN[] = L"Driver";
 												cbName = sizeof(DisplayDevice.DeviceKey);// re-use it here
-												ls = RegQueryValueEx(hKey2, szTDriverKeyN, NULL, NULL, (LPBYTE)DisplayDevice.DeviceKey, &cbName);
+												ls = RegQueryValueEx(hKey2, szTDriverKeyN, nullptr, nullptr, (LPBYTE)DisplayDevice.DeviceKey, &cbName);
 												if (ls == ERROR_SUCCESS) {
 													if (!wcscmp(szDeviceIDshort, DisplayDevice.DeviceKey)) {
 														static wchar_t const szTDevParKeyN[] = L"\\Device Parameters";
@@ -127,7 +127,7 @@ bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, 
 														ls = RegOpenKeyEx(HKEY_LOCAL_MACHINE, DeviceName, 0, KEY_ENUMERATE_SUB_KEYS | KEY_READ, &hKey3);
 														if (ls == ERROR_SUCCESS) {
 
-															ls = RegQueryValueEx(hKey3, szkEDIDKeyN, NULL, NULL, (LPBYTE)DisplayDevice.DeviceKey, &cbName);
+															ls = RegQueryValueEx(hKey3, szkEDIDKeyN, nullptr, nullptr, (LPBYTE)DisplayDevice.DeviceKey, &cbName);
 															if ((ls == ERROR_SUCCESS) && (cbName > 127)) {
 																UINT8* EDIDdata = (UINT8*)DisplayDevice.DeviceKey;
 																// memo: bytes 25 to 34 contain the default chromaticity coordinates

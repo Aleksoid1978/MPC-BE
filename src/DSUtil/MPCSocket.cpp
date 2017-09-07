@@ -1,5 +1,5 @@
 /*
-* (C) 2012-2016 see Authors.txt
+* (C) 2012-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -54,7 +54,7 @@ CMPCSocket::CMPCSocket()
 
 			m_sProxyServer = Explode(m_sProxyServer, sl, L':');
 			if (sl.GetCount() > 1) {
-				m_nProxyPort = _tcstol(sl.GetTail(), NULL, 10);
+				m_nProxyPort = _tcstol(sl.GetTail(), nullptr, 10);
 			}
 
 			m_bProxyEnable = (ProxyEnable && !m_sProxyServer.IsEmpty() && m_nProxyPort);
@@ -156,11 +156,11 @@ BOOL CMPCSocket::OnMessagePending()
 {
 	MSG msg;
 
-	if (::PeekMessage(&msg, NULL, WM_TIMER, WM_TIMER, PM_REMOVE)) {
+	if (::PeekMessage(&msg, nullptr, WM_TIMER, WM_TIMER, PM_REMOVE)) {
 		if (msg.wParam == (UINT) m_nTimerID) {
 			DLog(L"CMPCSocket::OnMessagePending(WM_TIMER) PASSED!");
 			// Remove the message and call CancelBlockingCall.
-			::PeekMessage(&msg, NULL, WM_TIMER, WM_TIMER, PM_REMOVE);
+			::PeekMessage(&msg, nullptr, WM_TIMER, WM_TIMER, PM_REMOVE);
 			CancelBlockingCall();
 			KillTimeOut();
 			return FALSE;  // No need for idle time processing.
@@ -178,13 +178,13 @@ void CMPCSocket::SetTimeOut(UINT uConnectTimeOut, UINT uReceiveTimeOut)
 
 BOOL CMPCSocket::SetTimeOut(UINT uTimeOut)
 {
-	m_nTimerID = SetTimer(NULL, 0, uTimeOut, NULL);
+	m_nTimerID = SetTimer(nullptr, 0, uTimeOut, nullptr);
 	return (m_nTimerID != 0);
 }
 
 BOOL CMPCSocket::KillTimeOut()
 {
-	return KillTimer(NULL, m_nTimerID);
+	return KillTimer(nullptr, m_nTimerID);
 }
 
 BOOL CMPCSocket::SendRequest()

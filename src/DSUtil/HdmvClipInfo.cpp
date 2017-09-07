@@ -47,7 +47,7 @@ HRESULT CHdmvClipInfo::CloseFile(HRESULT hr)
 void CHdmvClipInfo::ReadBuffer(BYTE* pBuff, DWORD nLen)
 {
 	DWORD dwRead;
-	ReadFile(m_hFile, pBuff, nLen, &dwRead, NULL);
+	ReadFile(m_hFile, pBuff, nLen, &dwRead, nullptr);
 }
 
 DWORD CHdmvClipInfo::ReadDword()
@@ -78,7 +78,7 @@ BOOL CHdmvClipInfo::Skip(LONGLONG nLen)
 {
 	LARGE_INTEGER newPos = {0, 0};
 	newPos.QuadPart = nLen;
-	return SetFilePointerEx(m_hFile, newPos, NULL, FILE_CURRENT);
+	return SetFilePointerEx(m_hFile, newPos, nullptr, FILE_CURRENT);
 }
 
 BOOL CHdmvClipInfo::GetPos(LONGLONG& Pos)
@@ -93,7 +93,7 @@ BOOL CHdmvClipInfo::SetPos(LONGLONG Pos, DWORD dwMoveMethod/* = FILE_BEGIN*/)
 {
 	LARGE_INTEGER newPos = {0, 0};
 	newPos.QuadPart = Pos;
-	return SetFilePointerEx(m_hFile, newPos, NULL, dwMoveMethod);
+	return SetFilePointerEx(m_hFile, newPos, nullptr, dwMoveMethod);
 }
 
 HRESULT CHdmvClipInfo::ReadLang(Stream& s)
@@ -308,8 +308,8 @@ HRESULT CHdmvClipInfo::ReadCpiInfo(CAtlArray<SyncPoint>* sps)
 
 HRESULT CHdmvClipInfo::ReadInfo(LPCTSTR strFile, CAtlArray<SyncPoint>* sps)
 {
-	m_hFile = CreateFile(strFile, GENERIC_READ, dwShareMode, NULL,
-						 OPEN_EXISTING, dwFlagsAndAttributes, NULL);
+	m_hFile = CreateFile(strFile, GENERIC_READ, dwShareMode, nullptr,
+						 OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
 	if (m_hFile != INVALID_HANDLE_VALUE) {
 		BYTE Buff[4] = { 0 };
 
@@ -372,7 +372,7 @@ CHdmvClipInfo::Stream* CHdmvClipInfo::FindStream(SHORT wPID)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 HRESULT CHdmvClipInfo::ReadStreamInfo()
@@ -540,7 +540,7 @@ HRESULT CHdmvClipInfo::ReadSTNInfo(BOOL bFullInfoRead)
 	return S_OK;
 }
 
-HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bReadMVCExtension/* = FALSE*/, BOOL bFullInfoRead/* = FALSE*/, BYTE* MVC_Base_View_R_flag/* = NULL*/)
+HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bReadMVCExtension/* = FALSE*/, BOOL bFullInfoRead/* = FALSE*/, BYTE* MVC_Base_View_R_flag/* = nullptr*/)
 {
 	CPath Path(strPlaylistFile);
 	rtDuration = 0;
@@ -551,8 +551,8 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 	Path.RemoveFileSpec();
 	Path.RemoveFileSpec();
 
-	m_hFile = CreateFile(strPlaylistFile, GENERIC_READ, dwShareMode, NULL,
-						 OPEN_EXISTING, dwFlagsAndAttributes, NULL);
+	m_hFile = CreateFile(strPlaylistFile, GENERIC_READ, dwShareMode, nullptr,
+						 OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
 	if (m_hFile != INVALID_HANDLE_VALUE) {
 		bool bDuplicate = false;
 		BYTE Buff[9] = { 0 };
@@ -737,8 +737,8 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 
 			if (bFullInfoRead) {
 				LARGE_INTEGER size = {0, 0};
-				HANDLE hFile = CreateFile(Item->m_strFileName, GENERIC_READ, dwShareMode, NULL,
-										  OPEN_EXISTING, dwFlagsAndAttributes, NULL);
+				HANDLE hFile = CreateFile(Item->m_strFileName, GENERIC_READ, dwShareMode, nullptr,
+										  OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
 				if (hFile != INVALID_HANDLE_VALUE) {
 					GetFileSizeEx(hFile, &size);
 					CloseHandle(hFile);
@@ -910,8 +910,8 @@ HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CPlaylist& Playlist
 	Path.RemoveFileSpec();
 	Path.RemoveFileSpec();
 
-	m_hFile = CreateFile(strPlaylistFile, GENERIC_READ, dwShareMode, NULL,
-						 OPEN_EXISTING, dwFlagsAndAttributes, NULL);
+	m_hFile = CreateFile(strPlaylistFile, GENERIC_READ, dwShareMode, nullptr,
+						 OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
 	if (m_hFile != INVALID_HANDLE_VALUE) {
 		BYTE Buff[4] = { 0 };
 

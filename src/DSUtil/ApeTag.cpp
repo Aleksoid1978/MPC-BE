@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2016 see Authors.txt
+ * (C) 2012-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -175,7 +175,7 @@ CApeTagItem* CAPETag::Find(CString key)
 		TagItems.GetNext(pos);
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 // additional functions

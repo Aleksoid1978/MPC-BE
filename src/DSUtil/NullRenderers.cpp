@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -54,10 +54,10 @@ public :
 				m_pD3DDeviceManager->CloseDeviceHandle(m_hDevice);
 				m_hDevice = INVALID_HANDLE_VALUE;
 			}
-			m_pD3DDeviceManager = NULL;
+			m_pD3DDeviceManager = nullptr;
 		}
 		if (m_pD3DDev) {
-			m_pD3DDev = NULL;
+			m_pD3DDev = nullptr;
 		}
 		if (m_hDXVA2Lib) {
 			FreeLibrary(m_hDXVA2Lib);
@@ -151,9 +151,9 @@ private :
 
 CNullVideoRendererInputPin::CNullVideoRendererInputPin(CBaseRenderer *pRenderer, HRESULT *phr, LPCWSTR Name)
 	: CRendererInputPin(pRenderer, phr, Name)
-	, m_hDXVA2Lib(NULL)
-	, m_pD3DDev(NULL)
-	, m_pD3DDeviceManager(NULL)
+	, m_hDXVA2Lib(nullptr)
+	, m_pD3DDev(nullptr)
+	, m_pD3DDeviceManager(nullptr)
 	, m_hDevice(INVALID_HANDLE_VALUE)
 {
 	CreateSurface();
@@ -177,7 +177,7 @@ void CNullVideoRendererInputPin::CreateSurface()
 {
 	m_pD3D.Attach(D3D9Helper::Direct3DCreate9());
 
-	m_hWnd = NULL;	// TODO : put true window
+	m_hWnd = nullptr;	// TODO : put true window
 
 	D3DDISPLAYMODE d3ddm;
 	ZeroMemory(&d3ddm, sizeof(d3ddm));
@@ -214,7 +214,7 @@ STDMETHODIMP CNullVideoRendererInputPin::NonDelegatingQueryInterface(REFIID riid
 
 STDMETHODIMP CNullVideoRendererInputPin::GetService(REFGUID guidService, REFIID riid, LPVOID *ppvObject)
 {
-	if (m_pD3DDeviceManager != NULL && guidService == MR_VIDEO_ACCELERATION_SERVICE) {
+	if (m_pD3DDeviceManager != nullptr && guidService == MR_VIDEO_ACCELERATION_SERVICE) {
 		if (riid == __uuidof(IDirect3DDeviceManager9)) {
 			return m_pD3DDeviceManager->QueryInterface (riid, ppvObject);
 		} else if (riid == __uuidof(IDirectXVideoDecoderService) || riid == __uuidof(IDirectXVideoProcessorService) ) {
@@ -299,7 +299,7 @@ HRESULT CNullVideoRenderer::DoRenderSample(IMediaSample* pSample)
 	static int nNb = 1;
 	if (nNb < 100) {
 		const long lSize = pSample->GetActualDataLength();
-		BYTE* pMediaBuffer = NULL;
+		BYTE* pMediaBuffer = nullptr;
 		HRESULT hr = pSample->GetPointer(&pMediaBuffer);
 		char strFile[MAX_PATH];
 
@@ -410,14 +410,14 @@ HRESULT CNullUVideoRenderer::DoRenderSample(IMediaSample* pSample)
 			D3DSURFACE_DESC desc = {};
 			D3DLOCKED_RECT r = {};
 
-			if (S_OK == pSurface->GetDesc(&desc) && S_OK == pSurface->LockRect(&r, NULL, D3DLOCK_READONLY)) {
+			if (S_OK == pSurface->GetDesc(&desc) && S_OK == pSurface->LockRect(&r, nullptr, D3DLOCK_READONLY)) {
 				SaveRAWVideoAsBMP((BYTE*)r.pBits, desc.Format, r.Pitch, desc.Width, desc.Height, strFile);
 				pSurface->UnlockRect();
 			};
 		}
 	}
 	else if (m_mt.formattype == FORMAT_VideoInfo2) {
-		BYTE* data = NULL;
+		BYTE* data = nullptr;
 		long size = pSample->GetActualDataLength();
 		if (size > 0 && S_OK == pSample->GetPointer(&data)) {
 			BITMAPINFOHEADER& bih = ((VIDEOINFOHEADER2*)m_mt.pbFormat)->bmiHeader;
@@ -491,7 +491,7 @@ HRESULT CNullUAudioRenderer::DoRenderSample(IMediaSample* pSample)
 	static int nNb = 1;
 	if (nNb < 100) {
 		const long lSize = pSample->GetActualDataLength();
-		BYTE* pMediaBuffer = NULL;
+		BYTE* pMediaBuffer = nullptr;
 		HRESULT hr = pSample->GetPointer(&pMediaBuffer);
 		char strFile[MAX_PATH];
 

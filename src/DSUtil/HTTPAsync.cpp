@@ -1,5 +1,5 @@
 /*
- * (C) 2016 see Authors.txt
+ * (C) 2016-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -84,7 +84,7 @@ CString CHTTPAsync::QueryInfoStr(DWORD dwInfoLevel) const
 
 	CString queryInfo;
 	DWORD   dwLen = 0;
-	if (!HttpQueryInfo(m_hRequest, dwInfoLevel, NULL, &dwLen, 0) && dwLen) {
+	if (!HttpQueryInfo(m_hRequest, dwInfoLevel, nullptr, &dwLen, 0) && dwLen) {
 		const DWORD dwError = GetLastError();
 		if (dwError == ERROR_INSUFFICIENT_BUFFER
 				&& HttpQueryInfo(m_hRequest, dwInfoLevel, (LPVOID)queryInfo.GetBuffer(dwLen), &dwLen, 0)) {
@@ -108,9 +108,9 @@ DWORD CHTTPAsync::QueryInfoDword(DWORD dwInfoLevel) const
 
 CHTTPAsync::CHTTPAsync()
 {
-	m_hConnectedEvent       = CreateEvent(NULL, FALSE, FALSE, NULL);
-	m_hRequestOpenedEvent   = CreateEvent(NULL, FALSE, FALSE, NULL);
-	m_hRequestCompleteEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	m_hConnectedEvent       = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	m_hRequestOpenedEvent   = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	m_hRequestCompleteEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 }
 
 CHTTPAsync::~CHTTPAsync()
@@ -132,12 +132,12 @@ static CString FormatErrorMessage(DWORD dwError)
 {
 	CString errMsg;
 
-	LPVOID lpMsgBuf = NULL;
+	LPVOID lpMsgBuf = nullptr;
 	if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS |
 					  FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_FROM_HMODULE,
 					  GetModuleHandle(L"wininet"), dwError,
 					  MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
-					  (LPTSTR)&lpMsgBuf, 0, NULL) > 0) {
+					  (LPTSTR)&lpMsgBuf, 0, nullptr) > 0) {
 		errMsg = (LPTSTR)lpMsgBuf;
 		errMsg.TrimRight(L"\r\n");
 		LocalFree(lpMsgBuf);
@@ -146,7 +146,7 @@ static CString FormatErrorMessage(DWORD dwError)
 	if (dwError == ERROR_INTERNET_EXTENDED_ERROR) {
 		CString internetInfo;
 		DWORD   dwLen = 0;
-		if (!InternetGetLastResponseInfo(&dwError, NULL, &dwLen) && dwLen) {
+		if (!InternetGetLastResponseInfo(&dwError, nullptr, &dwLen) && dwLen) {
 			const DWORD dwLastError = GetLastError();
 			if (dwLastError == ERROR_INSUFFICIENT_BUFFER
 					&& InternetGetLastResponseInfo(&dwError, internetInfo.GetBuffer(dwLen), &dwLen)) {
@@ -162,7 +162,7 @@ static CString FormatErrorMessage(DWORD dwError)
 	return errMsg;
 }
 
-#define SAFE_INTERNET_CLOSE_HANDLE(p) { if (p) { VERIFY(InternetCloseHandle(p)); (p) = NULL; } }
+#define SAFE_INTERNET_CLOSE_HANDLE(p) { if (p) { VERIFY(InternetCloseHandle(p)); (p) = nullptr; } }
 #define CheckLastError(lpszFunction, ret) \
 { \
 	const DWORD dwError = GetLastError(); \
@@ -179,7 +179,7 @@ void CHTTPAsync::Close()
 	ResetEvent(m_hRequestCompleteEvent);
 
 	if (m_hInstance) {
-		InternetSetStatusCallback(m_hInstance, NULL);
+		InternetSetStatusCallback(m_hInstance, nullptr);
 	}
 
 	SAFE_INTERNET_CLOSE_HANDLE(m_hRequest);
@@ -228,8 +228,8 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 
 	m_hInstance = InternetOpen(lpszAgent,
 							   INTERNET_OPEN_TYPE_PRECONFIG,
-							   NULL,
-							   NULL,
+							   nullptr,
+							   nullptr,
 							   INTERNET_FLAG_ASYNC);
 	CheckPointer(m_hInstance, E_FAIL);
 
@@ -247,7 +247,7 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 								 INTERNET_SERVICE_HTTP,
 								 INTERNET_FLAG_KEEP_CONNECTION | INTERNET_FLAG_NO_CACHE_WRITE,
 								 (DWORD_PTR)this);
-	if (m_hConnect == NULL) {
+	if (m_hConnect == nullptr) {
 		CheckLastError(L"InternetConnect()", E_FAIL);
 
 		if (WaitForSingleObject(m_hConnectedEvent, dwTimeOut) == WAIT_TIMEOUT) {
@@ -303,12 +303,12 @@ HRESULT CHTTPAsync::SendRequest(LPCTSTR lpszCustomHeader/* = L""*/, DWORD dwTime
 	m_hRequest = HttpOpenRequest(m_hConnect,
 								 L"GET",
 								 m_path,
-								 NULL,
-								 NULL,
-								 NULL,
+								 nullptr,
+								 nullptr,
+								 nullptr,
 								 dwFlags,
 								 (DWORD_PTR)this);
-	if (m_hRequest == NULL) {
+	if (m_hRequest == nullptr) {
 		CheckLastError(L"HttpOpenRequest()", E_FAIL);
 
 		if (WaitForSingleObject(m_hRequestOpenedEvent, dwTimeOut) == WAIT_TIMEOUT) {
@@ -326,7 +326,7 @@ HRESULT CHTTPAsync::SendRequest(LPCTSTR lpszCustomHeader/* = L""*/, DWORD dwTime
 		if (!HttpSendRequest(m_hRequest,
 							 lpszHeaders,
 							 lpszHeaders.GetLength(),
-							 NULL,
+							 nullptr,
 							 0)) {
 			CheckLastError(L"HttpSendRequest()", E_FAIL);
 
@@ -344,7 +344,7 @@ HRESULT CHTTPAsync::SendRequest(LPCTSTR lpszCustomHeader/* = L""*/, DWORD dwTime
 											   m_hRequest,
 											   ERROR_INTERNET_INCORRECT_PASSWORD,
 											   dwFlags,
-											   NULL);
+											   nullptr);
 			if (ret == ERROR_INTERNET_FORCE_RETRY) {
 				continue;
 			}

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -95,5 +95,5 @@ class __declspec(uuid("655D7613-C26C-4A25-BBBD-3C9C516122CC"))
 public:
 	CNullTextRenderer(LPUNKNOWN pUnk, HRESULT* phr);
 	int GetPinCount() { return (int)!!m_pInput; }
-	CBasePin* GetPin(int n) { return n == 0 ? (CBasePin*)m_pInput : NULL; }
+	CBasePin* GetPin(int n) { return n == 0 ? (CBasePin*)m_pInput : nullptr; }
 };

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -466,7 +466,7 @@ STDMETHODIMP IDSMChapterBagImpl::ChapSort()
 //
 
 CDSMChapterBag::CDSMChapterBag(LPUNKNOWN pUnk, HRESULT* phr)
-	: CUnknown(_T("CDSMChapterBag"), NULL)
+	: CUnknown(_T("CDSMChapterBag"), nullptr)
 {
 }
 

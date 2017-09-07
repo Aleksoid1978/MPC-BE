@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -48,8 +48,8 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 
 	CAtlList<CString> Infos;
 	if (pmt->majortype == MEDIATYPE_Video) {
-		const VIDEOINFOHEADER *pVideoInfo	= NULL;
-		const VIDEOINFOHEADER2 *pVideoInfo2	= NULL;
+		const VIDEOINFOHEADER *pVideoInfo	= nullptr;
+		const VIDEOINFOHEADER2 *pVideoInfo2	= nullptr;
 
 		BOOL bAdd = FALSE;
 

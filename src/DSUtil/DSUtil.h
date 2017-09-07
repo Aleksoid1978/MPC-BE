@@ -34,8 +34,8 @@
 
 #define LCID_NOSUBTITLES    -1
 
-#define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p) = NULL; } }
-#define SAFE_CLOSE_HANDLE(p) { if (p) { if ((p) != INVALID_HANDLE_VALUE) VERIFY(CloseHandle(p)); (p) = NULL; } }
+#define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p) = nullptr; } }
+#define SAFE_CLOSE_HANDLE(p) { if (p) { if ((p) != INVALID_HANDLE_VALUE) VERIFY(CloseHandle(p)); (p) = nullptr; } }
 
 #define EXIT_ON_ERROR(hres)  { if (FAILED(hres)) return hres; }
 
@@ -65,10 +65,10 @@ extern bool				IsVideoRenderer(IBaseFilter* pBF);
 extern bool				IsVideoRenderer(const CLSID clsid);
 extern bool				IsAudioWaveRenderer(IBaseFilter* pBF);
 
-extern IBaseFilter*		GetUpStreamFilter(IBaseFilter* pBF, IPin* pInputPin = NULL);
-extern IPin*			GetUpStreamPin(IBaseFilter* pBF, IPin* pInputPin = NULL);
-extern IBaseFilter*		GetDownStreamFilter(IBaseFilter* pBF, IPin* pInputPin = NULL);
-extern IPin*			GetDownStreamPin(IBaseFilter* pBF, IPin* pInputPin = NULL);
+extern IBaseFilter*		GetUpStreamFilter(IBaseFilter* pBF, IPin* pInputPin = nullptr);
+extern IPin*			GetUpStreamPin(IBaseFilter* pBF, IPin* pInputPin = nullptr);
+extern IBaseFilter*		GetDownStreamFilter(IBaseFilter* pBF, IPin* pInputPin = nullptr);
+extern IPin*			GetDownStreamPin(IBaseFilter* pBF, IPin* pInputPin = nullptr);
 extern IPin*			GetFirstPin(IBaseFilter* pBF, PIN_DIRECTION dir = PINDIR_INPUT);
 extern IPin*			GetFirstDisconnectedPin(IBaseFilter* pBF, PIN_DIRECTION dir);
 extern void				NukeDownstream(IBaseFilter* pBF, IFilterGraph* pFG);
@@ -162,8 +162,8 @@ extern bool				DeleteRegKey(LPCTSTR pszKey, LPCTSTR pszSubkey);
 extern bool				SetRegKeyValue(LPCTSTR pszKey, LPCTSTR pszSubkey, LPCTSTR pszValueName, LPCTSTR pszValue);
 extern bool				SetRegKeyValue(LPCTSTR pszKey, LPCTSTR pszSubkey, LPCTSTR pszValue);
 
-extern void				RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, LPCTSTR chkbytes, LPCTSTR ext = NULL, ...);
-extern void				RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, const CAtlList<CString>& chkbytes, LPCTSTR ext = NULL, ...);
+extern void				RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, LPCTSTR chkbytes, LPCTSTR ext = nullptr, ...);
+extern void				RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, const CAtlList<CString>& chkbytes, LPCTSTR ext = nullptr, ...);
 extern void				UnRegisterSourceFilter(const GUID& subtype);
 
 extern CString			GetDXVAMode(const GUID* guidDecoder);
@@ -192,14 +192,14 @@ extern inline const LONGLONG GetPerfCounter();
 class CPinInfo : public PIN_INFO
 {
 public:
-	CPinInfo() { pFilter = NULL; }
+	CPinInfo() { pFilter = nullptr; }
 	~CPinInfo() { if (pFilter) { pFilter->Release(); } }
 };
 
 class CFilterInfo : public FILTER_INFO
 {
 public:
-	CFilterInfo() { pGraph = NULL; }
+	CFilterInfo() { pGraph = nullptr; }
 	~CFilterInfo() { if (pGraph) { pGraph->Release(); } }
 };
 
@@ -207,7 +207,7 @@ public:
 	{CComPtr<IEnumFilters> pEnumFilters; \
 	if (pFilterGraph && SUCCEEDED(pFilterGraph->EnumFilters(&pEnumFilters))) \
 	{ \
-		for (CComPtr<IBaseFilter> pBaseFilter; S_OK == pEnumFilters->Next(1, &pBaseFilter, 0); pBaseFilter = NULL) \
+		for (CComPtr<IBaseFilter> pBaseFilter; S_OK == pEnumFilters->Next(1, &pBaseFilter, 0); pBaseFilter = nullptr) \
 		{ \
  
 #define EndEnumFilters }}}
@@ -216,7 +216,7 @@ public:
 	{CComPtr<IEnumFilters> pEnumFilters; \
 	if (pGraphConfig && SUCCEEDED(pGraphConfig->EnumCacheFilter(&pEnumFilters))) \
 	{ \
-		for (CComPtr<IBaseFilter> pBaseFilter; S_OK == pEnumFilters->Next(1, &pBaseFilter, 0); pBaseFilter = NULL) \
+		for (CComPtr<IBaseFilter> pBaseFilter; S_OK == pEnumFilters->Next(1, &pBaseFilter, 0); pBaseFilter = nullptr) \
 		{ \
  
 #define EndEnumCachedFilters }}}
@@ -225,7 +225,7 @@ public:
 	{CComPtr<IEnumPins> pEnumPins; \
 	if (pBaseFilter && SUCCEEDED(pBaseFilter->EnumPins(&pEnumPins))) \
 	{ \
-		for (CComPtr<IPin> pPin; S_OK == pEnumPins->Next(1, &pPin, 0); pPin = NULL) \
+		for (CComPtr<IPin> pPin; S_OK == pEnumPins->Next(1, &pPin, 0); pPin = nullptr) \
 		{ \
  
 #define EndEnumPins }}}
@@ -234,8 +234,8 @@ public:
 	{CComPtr<IEnumMediaTypes> pEnumMediaTypes; \
 	if (pPin && SUCCEEDED(pPin->EnumMediaTypes(&pEnumMediaTypes))) \
 	{ \
-		AM_MEDIA_TYPE* pMediaType = NULL; \
-		for (; S_OK == pEnumMediaTypes->Next(1, &pMediaType, NULL); DeleteMediaType(pMediaType), pMediaType = NULL) \
+		AM_MEDIA_TYPE* pMediaType = nullptr; \
+		for (; S_OK == pEnumMediaTypes->Next(1, &pMediaType, nullptr); DeleteMediaType(pMediaType), pMediaType = nullptr) \
 		{ \
  
 #define EndEnumMediaTypes(pMediaType) } if (pMediaType) DeleteMediaType(pMediaType); }}
@@ -247,7 +247,7 @@ public:
 	if (SUCCEEDED(pDevEnum4$##clsid->CreateClassEnumerator(clsid, &pClassEnum4$##clsid, 0)) \
 	&& pClassEnum4$##clsid) \
 	{ \
-		for (CComPtr<IMoniker> pMoniker; pClassEnum4$##clsid->Next(1, &pMoniker, 0) == S_OK; pMoniker = NULL) \
+		for (CComPtr<IMoniker> pMoniker; pClassEnum4$##clsid->Next(1, &pMoniker, 0) == S_OK; pMoniker = nullptr) \
 		{ \
  
 #define EndEnumSysDev }}}
@@ -263,7 +263,7 @@ static CUnknown* WINAPI CreateInstance(LPUNKNOWN lpunk, HRESULT* phr)
 {
 	*phr = S_OK;
 	CUnknown* punk = DNew T(lpunk, phr);
-	if (punk == NULL) {
+	if (punk == nullptr) {
 		*phr = E_OUTOFMEMORY;
 	}
 	return punk;

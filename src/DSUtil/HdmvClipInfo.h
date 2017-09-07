@@ -163,14 +163,14 @@ public:
 	CHdmvClipInfo();
 	~CHdmvClipInfo();
 
-	HRESULT ReadInfo(LPCTSTR strFile, CAtlArray<SyncPoint>* sps = NULL);
+	HRESULT ReadInfo(LPCTSTR strFile, CAtlArray<SyncPoint>* sps = nullptr);
 	bool    IsHdmv() const { return !m_Streams.IsEmpty(); }
 
 	Stream*  FindStream(SHORT wPID);
 	Streams& GetStreams() { return !stn.m_Streams.IsEmpty() ? stn.m_Streams : m_Streams; }
 
 	HRESULT FindMainMovie(LPCTSTR strFolder, CString& strPlaylistFile, CPlaylist& MainPlaylist, CPlaylist& MPLSPlaylists);
-	HRESULT ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bReadMVCExtension = FALSE, BOOL bFullInfoRead = FALSE, BYTE* MVC_Base_View_R_flag = NULL);
+	HRESULT ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bReadMVCExtension = FALSE, BOOL bFullInfoRead = FALSE, BYTE* MVC_Base_View_R_flag = nullptr);
 	HRESULT ReadChapters(CString strPlaylistFile, CPlaylist& PlaylistItems, CPlaylistChapter& Chapters);
 
 private :
@@ -232,7 +232,7 @@ private:
 		WORD  num_ep_fine              = 0;
 		DWORD ep_map_stream_start_addr = 0;
 
-		ClpiEpCoarse* coarse           = NULL;
-		ClpiEpFine*   fine             = NULL;
+		ClpiEpCoarse* coarse           = nullptr;
+		ClpiEpFine*   fine             = nullptr;
 	};
 };

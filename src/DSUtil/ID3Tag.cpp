@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2016 see Authors.txt
+ * (C) 2012-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -258,7 +258,7 @@ void CID3Tag::ReadChapter(CGolombBuffer& gbData, DWORD &size)
 		size -= len;
 
 		if (((char*)&tag)[3] == 'T') {
-			CID3TagItem* item = NULL;
+			CID3TagItem* item = nullptr;
 			ReadTag(tag, gbData, len, &item);
 			if (item && item->GetType() == ID3Type::ID3_TYPE_STRING) {
 				if (chapterName.IsEmpty()) {
@@ -365,7 +365,7 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 				|| tag == '\0TT2'
 				|| tag == '\0PIC' || tag == 'APIC'
 				|| tag == '\0ULT' || tag == 'USLT') {
-			CID3TagItem* item = NULL;
+			CID3TagItem* item = nullptr;
 			ReadTag(tag, gbData, size, &item);
 
 			if (item) {

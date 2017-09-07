@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2015 see Authors.txt
+ * (C) 2011-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -159,7 +159,7 @@ CString GetModulePath(HMODULE hModule)
 //
 CString GetProgramPath()
 {
-	return GetModulePath(NULL);
+	return GetModulePath(nullptr);
 }
 
 //
@@ -167,5 +167,5 @@ CString GetProgramPath()
 //
 CString GetProgramDir()
 {
-	return AddSlash(GetFolderOnly(GetModulePath(NULL)));
+	return AddSlash(GetFolderOnly(GetModulePath(nullptr)));
 }

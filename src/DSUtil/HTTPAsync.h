@@ -1,5 +1,5 @@
 /*
- * (C) 2016 see Authors.txt
+ * (C) 2016-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -42,9 +42,9 @@ protected:
 	HANDLE m_hRequestCompleteEvent = INVALID_HANDLE_VALUE;
 	BOOL m_bRequestComplete        = TRUE;
 
-	HINTERNET m_hInstance = NULL;
-	HINTERNET m_hConnect  = NULL;
-	HINTERNET m_hRequest  = NULL;
+	HINTERNET m_hInstance = nullptr;
+	HINTERNET m_hConnect  = nullptr;
+	HINTERNET m_hRequest  = nullptr;
 
 	CUrl m_url;
 	CString m_url_str;
