@@ -142,7 +142,7 @@ bool CDFFFile::parse_dsd_prop(__int64 eof)
 			m_samplerate = sample_rate = _byteswap_ulong(sample_rate);
 			break;
 		case FCC('ID3 '):
-			//    id3v2_extra_meta = NULL;
+			//    id3v2_extra_meta = nullptr;
 			//    ff_id3v2_read(s, ID3v2_DEFAULT_MAGIC, &id3v2_extra_meta, size);
 			//    if (id3v2_extra_meta) {
 			//        if ((ret = ff_id3v2_parse_apic(s, &id3v2_extra_meta)) < 0) {

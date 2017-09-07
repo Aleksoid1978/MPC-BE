@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -134,7 +134,7 @@ CTAKFile::CTAKFile()
 	, m_samples(0)
 	, m_framelen(0)
 	, m_totalframes(0)
-	, m_APETag(NULL)
+	, m_APETag(nullptr)
 {
 	m_subtype = MEDIASUBTYPE_TAK;
 }
@@ -261,7 +261,7 @@ HRESULT CTAKFile::Open(CBaseSplitterFile* pFile)
 
 		m_startpos				= min(m_pFile->GetPos() + size, m_pFile->GetLength());
 
-		BYTE* buffer			= NULL;
+		BYTE* buffer			= nullptr;
 
 		switch (type) {
 			case TAK_METADATA_STREAMINFO:

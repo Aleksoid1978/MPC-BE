@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,7 +40,7 @@ CTTAFile::CTTAFile()
 	, m_currentframe(0)
 	, m_framesamples(0)
 	, m_last_framesamples(0)
-	, m_APETag(NULL)
+	, m_APETag(nullptr)
 {
 	m_subtype = MEDIASUBTYPE_TTA1;
 	m_wFormatTag = 0x77a1;
@@ -65,7 +65,7 @@ HRESULT CTTAFile::Open(CBaseSplitterFile* pFile)
 
 	BYTE data[10];
 	if (m_pFile->ByteRead(data, sizeof(data)) != S_OK) {
-		return NULL;
+		return E_FAIL;
 	}
 	int start_offset = id3v2_match_len(data);
 	m_pFile->Seek(start_offset);

@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,7 +36,7 @@
 //
 
 CAudioFile::CAudioFile()
-	: m_pFile(NULL)
+	: m_pFile(nullptr)
 	, m_startpos(0)
 	, m_endpos(0)
 	, m_samplerate(0)
@@ -46,7 +46,7 @@ CAudioFile::CAudioFile()
 	, m_rtduration(0)
 	, m_subtype(GUID_NULL)
 	, m_wFormatTag(0)
-	, m_extradata(NULL)
+	, m_extradata(nullptr)
 	, m_extrasize(0)
 	, m_nAvgBytesPerSec(0)
 {
@@ -57,17 +57,17 @@ CAudioFile::~CAudioFile()
 	if (m_extradata) {
 		free(m_extradata);
 	}
-	m_pFile = NULL;
+	m_pFile = nullptr;
 }
 
 CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 {
-	CAudioFile* pAudioFile = NULL;
+	CAudioFile* pAudioFile = nullptr;
 	BYTE data[40];
 
 	m_pFile->Seek(0);
 	if (m_pFile->ByteRead(data, sizeof(data)) != S_OK) {
-		return NULL;
+		return nullptr;
 	}
 
 	DWORD* id = (DWORD*)data;
@@ -105,16 +105,16 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 		// skip ID3V2 metadata for formats that can contain it
 		m_pFile->Seek(id3v2_size);
 		if (m_pFile->ByteRead(data, 4) != S_OK) {
-			return NULL;
+			return nullptr;
 		}
 		if (*id == FCC('TTA1')) {
 			pAudioFile = DNew CTTAFile();
 		} else {
-			return NULL;
+			return nullptr;
 		}
 	}
 	else {
-		return NULL;
+		return nullptr;
 	}
 
 	if (FAILED(pAudioFile->Open(m_pFile))) {

@@ -40,18 +40,18 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 };
 
 const AMOVIESETUP_PIN sudpPins[] = {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn), sudPinTypesIn},
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut), sudPinTypesOut}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn), sudPinTypesIn},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesOut), sudPinTypesOut}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
 	{&__uuidof(CAudioSplitterFilter), AudioSplitterName, MERIT_NORMAL+1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CAudioSourceFilter), AudioSourceName, MERIT_NORMAL+1, 0, NULL, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CAudioSourceFilter), AudioSourceName, MERIT_NORMAL+1, 0, nullptr, CLSID_LegacyAmFilterCategory},
 };
 
 CFactoryTemplate g_Templates[] = {
-	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CAudioSplitterFilter>, NULL, &sudFilter[0]},
-	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CAudioSourceFilter>, NULL, &sudFilter[1]},
+	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CAudioSplitterFilter>, nullptr, &sudFilter[0]},
+	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CAudioSourceFilter>, nullptr, &sudFilter[1]},
 };
 
 int g_cTemplates = _countof(g_Templates);
@@ -76,7 +76,7 @@ STDAPI DllRegisterServer()
 		CLSID_AsyncReader,
 		MEDIASUBTYPE_WAVE,
 		chkbytes,
-		NULL);
+		nullptr);
 
 	return AMovieDllRegisterServer2(TRUE);
 }
@@ -100,7 +100,7 @@ CFilterApp theApp;
 
 CAudioSplitterFilter::CAudioSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(NAME("CAudioSplitterFilter"), pUnk, phr, __uuidof(this))
-	, m_pAudioFile(NULL)
+	, m_pAudioFile(nullptr)
 	, m_rtime(0)
 {
 	m_nFlag |= SOURCE_SUPPORT_URL;
@@ -244,7 +244,7 @@ bool CAudioSplitterFilter::DemuxLoop()
 {
 	HRESULT hr = S_OK;
 
-	while (m_pAudioFile && SUCCEEDED(hr) && !CheckRequest(NULL)) {
+	while (m_pAudioFile && SUCCEEDED(hr) && !CheckRequest(nullptr)) {
 		CAutoPtr<CPacket> p(DNew CPacket());
 		p->bSyncPoint = TRUE;
 

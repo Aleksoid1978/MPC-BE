@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,13 +27,13 @@ class CWAVFile : public CAudioFile
 protected:
 	__int64  m_length      = 0;
 
-	BYTE*    m_fmtdata     = NULL;
+	BYTE*    m_fmtdata     = nullptr;
 	DWORD    m_fmtsize     = 0;
 
 	WORD     m_nBlockAlign = 0;
 	int      m_blocksize   = 0;
 
-	CID3Tag* m_ID3Tag      = NULL;
+	CID3Tag* m_ID3Tag      = nullptr;
 
 	CAtlMap<DWORD, CStringA> m_info;
 

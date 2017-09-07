@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -239,7 +239,7 @@ CWavPackFile::CWavPackFile()
 	: CAudioFile()
 	, m_block_idx_start(0)
 	, m_block_idx_end(0)
-	, m_APETag(NULL)
+	, m_APETag(nullptr)
 {
 	m_subtype = MEDIASUBTYPE_WAVPACK4;
 	m_wFormatTag = 0x5756;
