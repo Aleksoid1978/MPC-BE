@@ -32,8 +32,8 @@ extern "C" {
 #pragma warning(default: 4005)
 
 CMixer::CMixer()
-	: m_pSWRCxt(NULL)
-	, m_matrix_dbl(NULL)
+	: m_pSWRCxt(nullptr)
+	, m_matrix_dbl(nullptr)
 	, m_normalize_matrix(false)
 	, m_ActualContext(false)
 	, m_in_sf(SAMPLE_FMT_NONE)
@@ -138,7 +138,7 @@ bool CMixer::Init()
 			center_mix_level, surround_mix_level, lfe_mix_level,
 			rematrix_maxval, rematrix_volume,
 			m_matrix_dbl, in_ch,
-			AV_MATRIX_ENCODING_NONE, NULL);
+			AV_MATRIX_ENCODING_NONE, nullptr);
 		if (ret < 0) {
 			DLog(L"CMixer::Init() : swr_build_matrix failed");
 			av_freep(&m_matrix_dbl);
@@ -259,7 +259,7 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 	const int in_ch  = av_popcount(m_in_layout);
 	const int out_ch = av_popcount(m_out_layout);
 
-	int32_t* buf1 = NULL;
+	int32_t* buf1 = nullptr;
 	if (m_in_sf == SAMPLE_FMT_S24) {
 		ASSERT(m_in_avsf == AV_SAMPLE_FMT_S32);
 		buf1 = DNew int32_t[in_samples * in_ch];
@@ -268,7 +268,7 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 	}
 
 	BYTE* output;
-	int32_t* buf2 = NULL;
+	int32_t* buf2 = nullptr;
 	if (m_out_sf == SAMPLE_FMT_S24) {
 		ASSERT(m_out_avsf == AV_SAMPLE_FMT_S32);
 		buf2 = DNew int32_t[out_samples * out_ch];
@@ -312,7 +312,7 @@ int CMixer::Receive(BYTE* pOutput, int out_samples)
 	const int out_ch = av_popcount(m_out_layout);
 
 	BYTE* output;
-	int32_t* buf = NULL;
+	int32_t* buf = nullptr;
 	if (m_out_sf == SAMPLE_FMT_S24) {
 		ASSERT(m_out_avsf == AV_SAMPLE_FMT_S32);
 		buf = DNew int32_t[out_samples * out_ch];
@@ -321,7 +321,7 @@ int CMixer::Receive(BYTE* pOutput, int out_samples)
 		output = pOutput;
 	}
 
-	out_samples = swr_convert(m_pSWRCxt, &output, out_samples, NULL, 0);
+	out_samples = swr_convert(m_pSWRCxt, &output, out_samples, nullptr, 0);
 	if (out_samples < 0) {
 		DLog(L"CMixer::Receive() : swr_convert failed");
 		out_samples = 0;

@@ -48,11 +48,11 @@ private:
 private:
     void Init()
     {
-        HDC hdc = GetDC(NULL);
+        HDC hdc = GetDC(nullptr);
         if (hdc) {
             m_dpiX = m_sdpiX = GetDeviceCaps(hdc, LOGPIXELSX);
             m_dpiY = m_sdpiY = GetDeviceCaps(hdc, LOGPIXELSY);
-            ReleaseDC(NULL, hdc);
+            ReleaseDC(nullptr, hdc);
         }
     }
 
