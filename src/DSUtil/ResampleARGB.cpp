@@ -255,7 +255,7 @@ HRESULT ResampleHorizontal(BYTE* dest, int destW, int H, const BYTE* const src, 
 
 	concurrency::parallel_for(0, H, [&](int yy) {
 		const BYTE* lineIn = src + yy * srcW * 4;
-		const BYTE* lineOut = dest + yy * destW * 4;
+		BYTE* const lineOut = dest + yy * destW * 4;
 
 		int ss0, ss1, ss2, ss3;
 		for (int xx = 0; xx < destW; xx++) {
@@ -299,7 +299,7 @@ HRESULT ResampleVertical(BYTE* dest, int W, int destH, const BYTE* const src, in
 	}
 
 	concurrency::parallel_for(0, destH, [&](int yy) {
-		const BYTE* lineOut = dest + yy * W * 4;
+		BYTE* const lineOut = dest + yy * W * 4;
 		const INT32* k = &kk[yy * kmax];
 		const int ymin = xbounds[yy * 2 + 0];
 		const int ymax = xbounds[yy * 2 + 1];
