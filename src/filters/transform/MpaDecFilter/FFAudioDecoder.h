@@ -65,7 +65,7 @@ public:
 	void    SetStereoDownmix(bool stereodownmix);
 
 	HRESULT RealPrepare(BYTE* p, int buffsize, CPaddedArray& BuffOut);
-	HRESULT SendData(BYTE* p, int size, int* out_size = NULL);
+	HRESULT SendData(BYTE* p, int size, int* out_size = nullptr);
 	HRESULT ReceiveData(CAtlArray<BYTE>& BuffOut, SampleFormat& samplefmt);
 	void    FlushBuffers();
 	void    StreamFinish();

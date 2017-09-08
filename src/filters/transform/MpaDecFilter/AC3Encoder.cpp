@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,10 +34,10 @@ extern "C" {
 // CFFAudioEncoder
 
 CAC3Encoder::CAC3Encoder()
-	: m_pAVCodec(NULL)
-	, m_pAVCtx(NULL)
-	, m_pFrame(NULL)
-	, m_pSamples(NULL)
+	: m_pAVCodec(nullptr)
+	, m_pAVCtx(nullptr)
+	, m_pFrame(nullptr)
+	, m_pSamples(nullptr)
 	, m_buffersize(0)
 	, m_framesize(0)
 {
@@ -60,7 +60,7 @@ bool CAC3Encoder::Init(int sample_rate, DWORD channel_layout)
 	m_pAVCtx->channels       = av_popcount(channel_layout);
 
 	avcodec_lock;
-	ret = avcodec_open2(m_pAVCtx, m_pAVCodec, NULL);
+	ret = avcodec_open2(m_pAVCtx, m_pAVCodec, nullptr);
 	avcodec_unlock;
 	if (ret < 0) {
 		DLog(L"CAC3Encoder::Init() : avcodec_open2() failed");
@@ -79,7 +79,7 @@ bool CAC3Encoder::Init(int sample_rate, DWORD channel_layout)
 	// the codec gives us the frame size, in samples,
 	// we calculate the size of the samples buffer in bytes
 	m_framesize  = m_pAVCtx->frame_size * m_pAVCtx->channels * sizeof(float);
-	m_buffersize = av_samples_get_buffer_size(NULL, m_pAVCtx->channels, m_pAVCtx->frame_size, m_pAVCtx->sample_fmt, 0);
+	m_buffersize = av_samples_get_buffer_size(nullptr, m_pAVCtx->channels, m_pAVCtx->frame_size, m_pAVCtx->sample_fmt, 0);
 
 	m_pSamples = (float*)av_malloc(m_buffersize);
 	if (!m_pSamples) {
@@ -140,7 +140,7 @@ HRESULT CAC3Encoder::Encode(CAtlArray<float>& BuffIn, CAtlArray<BYTE>& BuffOut)
 	int got_packet;
 
 	av_init_packet(&avpkt);
-	avpkt.data = NULL; // packet data will be allocated by the encoder
+	avpkt.data = nullptr; // packet data will be allocated by the encoder
 	avpkt.size = 0;
 
 	ret = encode(m_pAVCtx, m_pFrame, &got_packet, &avpkt);

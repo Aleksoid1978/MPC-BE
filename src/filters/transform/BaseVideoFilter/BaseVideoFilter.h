@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -67,7 +67,7 @@ protected:
 	DECODER_MODE m_nDecoderMode;
 	DXVA2_ExtendedFormat m_dxvaExtFormat;
 
-	HRESULT GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, REFERENCE_TIME AvgTimePerFrame = 0, DXVA2_ExtendedFormat* dxvaExtFormat = NULL);
+	HRESULT GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, REFERENCE_TIME AvgTimePerFrame = 0, DXVA2_ExtendedFormat* dxvaExtFormat = nullptr);
 	HRESULT CopyBuffer(BYTE* pOut, BYTE* pIn, int w, int h, int pitchIn, const GUID& subtype, bool fInterlaced = false);
 	HRESULT CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int pitchIn, const GUID& subtype, bool fInterlaced = false);
 
@@ -80,7 +80,7 @@ public:
 	CBaseVideoFilter(TCHAR* pName, LPUNKNOWN lpunk, HRESULT* phr, REFCLSID clsid, long cBuffers = 1);
 	virtual ~CBaseVideoFilter();
 
-	HRESULT ReconnectOutput(int width, int height, bool bForce = false, REFERENCE_TIME AvgTimePerFrame = 0, DXVA2_ExtendedFormat* dxvaExtFormat = NULL, int RealWidth = -1, int RealHeight = -1);
+	HRESULT ReconnectOutput(int width, int height, bool bForce = false, REFERENCE_TIME AvgTimePerFrame = 0, DXVA2_ExtendedFormat* dxvaExtFormat = nullptr, int RealWidth = -1, int RealHeight = -1);
 	int GetPinCount();
 	CBasePin* GetPin(int n);
 
