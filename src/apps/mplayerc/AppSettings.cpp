@@ -71,7 +71,7 @@ CAppSettings::CAppSettings()
 	, iRecentFilesNumber(20)
 	, MRU(0, L"Recent File List", L"File%d", iRecentFilesNumber)
 	, MRUDub(0, L"Recent Dub List", L"Dub%d", iRecentFilesNumber)
-	, hAccel(NULL)
+	, hAccel(nullptr)
 	, nCmdlnWebServerPort(-1)
 	, bShowDebugInfo(false)
 	, bResetSettings(false)
@@ -433,7 +433,7 @@ DVD_POSITION* CAppSettings::CurrentDVDPosition()
 	if (nCurrentDvdPosition != -1) {
 		return &DvdPosition[nCurrentDvdPosition];
 	} else {
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -461,7 +461,7 @@ FILE_POSITION* CAppSettings::CurrentFilePosition()
 	if (nCurrentFilePosition != -1) {
 		return &FilePosition[nCurrentFilePosition];
 	} else {
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -546,7 +546,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	ASSERT(pApp);
 
 	UINT len;
-	BYTE* ptr = NULL;
+	BYTE* ptr = nullptr;
 
 	if (fInitialized && !bForce) {
 		return;
@@ -806,7 +806,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 				f->name = pApp->GetProfileString(key, L"Name");
 				f->clsid = GUIDFromCString(pApp->GetProfileString(key, L"CLSID"));
 			} else {
-				pApp->WriteProfileString(key, NULL, 0);
+				pApp->WriteProfileString(key, nullptr, 0);
 				break;
 			}
 
@@ -982,7 +982,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	CString MyPictures;
 	WCHAR szPath[MAX_PATH] = { 0 };
-	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_MYPICTURES, NULL, 0, szPath))) {
+	if (SUCCEEDED(SHGetFolderPath(nullptr, CSIDL_MYPICTURES, nullptr, 0, szPath))) {
 		MyPictures = CString(szPath) + L"\\";
 	}
 
@@ -1227,7 +1227,7 @@ void CAppSettings::SaveSettings()
 		str.Format(L"%.3f,%.3f", dZoomX, dZoomY);
 		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM, str);
 	} else {
-		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM, NULL);
+		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM, nullptr);
 	}
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SNAPTODESKTOPEDGES, bSnapToDesktopEdges);
 	pApp->WriteProfileBinary(IDS_R_SETTINGS, IDS_RS_LASTWINDOWRECT, (BYTE*)&rcLastWindowPos, sizeof(rcLastWindowPos));
@@ -1436,13 +1436,13 @@ void CAppSettings::SaveSettings()
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_DVD_START_MAIN_TITLE, (int)bStartMainTitle);
 
-	pApp->WriteProfileString(IDS_R_PNSPRESETS, NULL, NULL);
+	pApp->WriteProfileString(IDS_R_PNSPRESETS, nullptr, nullptr);
 	for (int i = 0, j = m_pnspresets.GetCount(); i < j; i++) {
 		str.Format(L"Preset%d", i);
 		pApp->WriteProfileString(IDS_R_PNSPRESETS, str, m_pnspresets[i]);
 	}
 
-	pApp->WriteProfileString(IDS_R_COMMANDS, NULL, NULL);
+	pApp->WriteProfileString(IDS_R_COMMANDS, nullptr, nullptr);
 	unsigned n = 0;
 	for (const auto& wc : wmcmds) {
 		if (wc.IsModified()) {
@@ -1579,7 +1579,7 @@ void CAppSettings::SaveExternalFilters()
 		CString key;
 		key.Format(L"%s\\%04u", IDS_R_FILTERS, i);
 		int j = pApp->GetProfileInt(key, L"Enabled", -1);
-		pApp->WriteProfileString(key, NULL, NULL);
+		pApp->WriteProfileString(key, nullptr, nullptr);
 		if (j < 0) {
 			break;
 		}
@@ -1779,7 +1779,7 @@ CString CAppSettings::ParseFileName(const CString& param)
 
 	// Try to transform relative pathname into full pathname
 	if (param.Find(L":") < 0) {
-		fullPathName.ReleaseBuffer(GetFullPathName(param, MAX_PATH, fullPathName.GetBuffer(MAX_PATH), NULL));
+		fullPathName.ReleaseBuffer(GetFullPathName(param, MAX_PATH, fullPathName.GetBuffer(MAX_PATH), nullptr));
 
 		CFileStatus fs;
 		if (!fullPathName.IsEmpty() && CFileGetStatus(fullPathName, fs)) {
@@ -1866,7 +1866,7 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 			} else if (sw == L"unregaud") {
 				nCLSwitches |= CLSW_UNREGEXT;    /* keep for compatibility with old versions */
 			} else if (sw == L"start" && pos) {
-				rtStart = 10000i64 * wcstol(cmdln.GetNext(pos), NULL, 10);
+				rtStart = 10000i64 * wcstol(cmdln.GetNext(pos), nullptr, 10);
 				nCLSwitches |= CLSW_STARTVALID;
 			} else if (sw == L"startpos" && pos) {
 				rtStart = 10000i64 * ConvertTimeToMSec(cmdln.GetNext(pos));
@@ -1903,12 +1903,12 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 					}
 				}
 			} else if (sw == L"monitor" && pos) {
-				iMonitor = wcstol(cmdln.GetNext(pos), NULL, 10);
+				iMonitor = wcstol(cmdln.GetNext(pos), nullptr, 10);
 				nCLSwitches |= CLSW_MONITOR;
 			} else if (sw == L"pns") {
 				strPnSPreset = cmdln.GetNext(pos);
 			} else if (sw == L"webport" && pos) {
-				int tmpport = wcstol(cmdln.GetNext(pos), NULL, 10);
+				int tmpport = wcstol(cmdln.GetNext(pos), nullptr, 10);
 				if ( tmpport >= 0 && tmpport <= 65535 ) {
 					nCmdlnWebServerPort = tmpport;
 				}
@@ -1987,7 +1987,7 @@ void CAppSettings::SetFav(favtype ft, CAtlList<CString>& sl)
 			return;
 	}
 
-	AfxGetMyApp()->WriteProfileString(root, NULL, NULL);
+	AfxGetMyApp()->WriteProfileString(root, nullptr, nullptr);
 
 	int i = 0;
 	POSITION pos = sl.GetHeadPosition();
@@ -2019,7 +2019,7 @@ CDVBChannel* CAppSettings::FindChannelByPref(int nPrefNumber)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 bool CAppSettings::IsISRSelect() const
@@ -2052,8 +2052,8 @@ extern BOOL AFXAPI AfxComparePath(LPCTSTR lpszPath1, LPCTSTR lpszPath2);
 
 void CAppSettings::CRecentFileAndURLList::Add(LPCTSTR lpszPathName)
 {
-	ASSERT(m_arrNames != NULL);
-	ASSERT(lpszPathName != NULL);
+	ASSERT(m_arrNames != nullptr);
+	ASSERT(lpszPathName != nullptr);
 	ASSERT(AfxIsValidString(lpszPathName));
 
 	CString pathName = lpszPathName;

@@ -190,11 +190,11 @@ BOOL CMPlayerCApp::OnIdle(LONG lCount)
 bool CMPlayerCApp::ClearSettings()
 {
 	// We want the other instances to be closed before resetting the settings.
-	HWND hWnd = FindWindow(_T(MPC_WND_CLASS_NAME), NULL);
+	HWND hWnd = FindWindow(_T(MPC_WND_CLASS_NAME), nullptr);
 	while (hWnd) {
 		Sleep(500);
-		hWnd = FindWindow(_T(MPC_WND_CLASS_NAME), NULL);
-		if (hWnd && MessageBox(NULL, ResStr(IDS_RESET_SETTINGS_MUTEX), ResStr(IDS_RESET_SETTINGS), MB_ICONEXCLAMATION | MB_RETRYCANCEL) == IDCANCEL) {
+		hWnd = FindWindow(_T(MPC_WND_CLASS_NAME), nullptr);
+		if (hWnd && MessageBox(nullptr, ResStr(IDS_RESET_SETTINGS_MUTEX), ResStr(IDS_RESET_SETTINGS), MB_ICONEXCLAMATION | MB_RETRYCANCEL) == IDCANCEL) {
 			return false;
 		}
 	}
@@ -374,7 +374,7 @@ BOOL CMPlayerCApp::GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBY
 		BOOL ret = FALSE;
 		CRegKey regkey;
 		if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_READ)) {
-			if (ERROR_SUCCESS == regkey.QueryBinaryValue(lpszEntry, NULL, (ULONG*)pBytes)) {
+			if (ERROR_SUCCESS == regkey.QueryBinaryValue(lpszEntry, nullptr, (ULONG*)pBytes)) {
 				*ppData = new(std::nothrow) BYTE[*pBytes];
 				if (*ppData && ERROR_SUCCESS == regkey.QueryBinaryValue(lpszEntry, *ppData, (ULONG*)pBytes)) {
 					ret = TRUE;
@@ -464,7 +464,7 @@ UINT CMPlayerCApp::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDe
 	return res;
 }
 
-CString CMPlayerCApp::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszDefault/* = NULL*/)
+CString CMPlayerCApp::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszDefault/* = nullptr*/)
 {
 	CString res;
 	if (!lpszSection || !lpszEntry) {
@@ -479,7 +479,7 @@ CString CMPlayerCApp::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, L
 		CRegKey regkey;
 		if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_READ)) {
 			ULONG nChars = 0;
-			if (ERROR_SUCCESS == regkey.QueryStringValue(lpszEntry, NULL, &nChars) && nChars > 0) {
+			if (ERROR_SUCCESS == regkey.QueryStringValue(lpszEntry, nullptr, &nChars) && nChars > 0) {
 				if (ERROR_SUCCESS == regkey.QueryStringValue(lpszEntry, res.GetBufferSetLength(nChars-1), &nChars)) {
 					ok = true;
 				}
@@ -680,7 +680,7 @@ bool CMPlayerCApp::HasProfileEntry(LPCTSTR lpszSection, LPCTSTR lpszEntry)
 	if (m_pszRegistryKey) {
 		CRegKey regkey;
 		if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_READ)) {
-			if (ERROR_SUCCESS == regkey.QueryValue(lpszEntry, NULL, NULL, NULL)) {
+			if (ERROR_SUCCESS == regkey.QueryValue(lpszEntry, nullptr, nullptr, nullptr)) {
 				ret = true;
 			}
 			regkey.Close();
@@ -721,12 +721,12 @@ void CMPlayerCApp::ShowCmdlnSwitches() const
 
 CMPlayerCApp theApp;
 
-HWND g_hWnd = NULL;
+HWND g_hWnd = nullptr;
 
 bool CMPlayerCApp::StoreSettingsToIni()
 {
 	free((void*)m_pszRegistryKey);
-	m_pszRegistryKey = NULL;
+	m_pszRegistryKey = nullptr;
 	free((void*)m_pszProfileName);
 	m_pszProfileName = _wcsdup(GetIniPath());
 
@@ -785,7 +785,7 @@ bool CMPlayerCApp::GetAppSavePath(CString& path)
 	if (IsIniValid()) { // If settings ini file found, store stuff in the same folder as the exe file
 		path = GetProgramDir();
 	} else {
-		HRESULT hr = SHGetFolderPathW(NULL, CSIDL_APPDATA, NULL, 0, path.GetBuffer(_MAX_PATH));
+		HRESULT hr = SHGetFolderPathW(nullptr, CSIDL_APPDATA, nullptr, 0, path.GetBuffer(_MAX_PATH));
 		path.ReleaseBuffer();
 		if (FAILED(hr)) {
 			return false;
@@ -842,7 +842,7 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 			sf.pFrom = pathFrom;
 			sf.pTo = pathTo;
 			if (SHFileOperation(&sf) != 0) {
-				MessageBox(NULL, L"Moving shader files failed", ResStr(IDS_AG_ERROR), MB_OK);
+				MessageBox(nullptr, L"Moving shader files failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
 		}
 	}
@@ -889,14 +889,14 @@ static const CString GetHiveName(HKEY hive)
 
 static bool ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName)
 {
-	HKEY hKey = NULL;
+	HKEY hKey = nullptr;
 	if (RegOpenKeyEx(hKeyRoot, keyName, 0, KEY_READ, &hKey) != ERROR_SUCCESS) {
 		return false;
 	}
 
 	DWORD subKeysCount = 0, maxSubKeyLen = 0;
 	DWORD valuesCount = 0, maxValueNameLen = 0, maxValueDataLen = 0;
-	if (RegQueryInfoKey(hKey, NULL, NULL, NULL, &subKeysCount, &maxSubKeyLen, NULL, &valuesCount, &maxValueNameLen, &maxValueDataLen, NULL, NULL) != ERROR_SUCCESS) {
+	if (RegQueryInfoKey(hKey, nullptr, nullptr, nullptr, &subKeysCount, &maxSubKeyLen, nullptr, &valuesCount, &maxValueNameLen, &maxValueDataLen, nullptr, nullptr) != ERROR_SUCCESS) {
 		return false;
 	}
 	maxSubKeyLen += 1;
@@ -915,7 +915,7 @@ static bool ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName)
 		valueNameLen = maxValueNameLen;
 		valueDataLen = maxValueDataLen;
 
-		if (RegEnumValue(hKey, indexValue, valueName.GetBuffer(maxValueNameLen), &valueNameLen, NULL, &type, data, &valueDataLen) != ERROR_SUCCESS) {
+		if (RegEnumValue(hKey, indexValue, valueName.GetBuffer(maxValueNameLen), &valueNameLen, nullptr, &type, data, &valueDataLen) != ERROR_SUCCESS) {
 			delete [] data;
 			return false;
 		}
@@ -965,7 +965,7 @@ static bool ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName)
 	for (DWORD indexSubKey = 0; indexSubKey < subKeysCount; indexSubKey++) {
 		subKeyLen = maxSubKeyLen;
 
-		if (RegEnumKeyEx(hKey, indexSubKey, subKeyName.GetBuffer(maxSubKeyLen), &subKeyLen, NULL, NULL, NULL, NULL) != ERROR_SUCCESS) {
+		if (RegEnumKeyEx(hKey, indexSubKey, subKeyName.GetBuffer(maxSubKeyLen), &subKeyLen, nullptr, nullptr, nullptr, nullptr) != ERROR_SUCCESS) {
 			return false;
 		}
 
@@ -1074,7 +1074,7 @@ BOOL CMPlayerCApp::SendCommandLine(HWND hWnd)
 	cds.dwData = 0x6ABE51;
 	cds.cbData = bufflen;
 	cds.lpData = (void*)(BYTE*)buff;
-	return SendMessage(hWnd, WM_COPYDATA, (WPARAM)NULL, (LPARAM)&cds);
+	return SendMessage(hWnd, WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1131,7 +1131,7 @@ MMRESULT  (__stdcall * Real_mixerSetControlDetails)( HMIXEROBJ hmxobj,
 	= mixerSetControlDetails;
 
 typedef NTSTATUS (WINAPI *FUNC_NTQUERYINFORMATIONPROCESS)(HANDLE ProcessHandle, PROCESSINFOCLASS ProcessInformationClass, PVOID ProcessInformation, ULONG ProcessInformationLength, PULONG ReturnLength);
-static FUNC_NTQUERYINFORMATIONPROCESS		Real_NtQueryInformationProcess = NULL;
+static FUNC_NTQUERYINFORMATIONPROCESS		Real_NtQueryInformationProcess = nullptr;
 
 /*
 NTSTATUS (* Real_NtQueryInformationProcess) (HANDLE				ProcessHandle,
@@ -1139,7 +1139,7 @@ NTSTATUS (* Real_NtQueryInformationProcess) (HANDLE				ProcessHandle,
 											 PVOID				ProcessInformation,
 											 ULONG				ProcessInformationLength,
 											 PULONG				ReturnLength)
-	= NULL;
+	= nullptr;
 */
 
 BOOL WINAPI Mine_IsDebuggerPresent()
@@ -1160,9 +1160,9 @@ NTSTATUS WINAPI Mine_NtQueryInformationProcess(HANDLE ProcessHandle, PROCESSINFO
 		PEB_NT							PEB;
 
 		pPEB = (PEB_NT*)pbi->PebBaseAddress;
-		ReadProcessMemory(ProcessHandle, pPEB, &PEB, sizeof(PEB), NULL);
+		ReadProcessMemory(ProcessHandle, pPEB, &PEB, sizeof(PEB), nullptr);
 		PEB.BeingDebugged = 0;
-		WriteProcessMemory(ProcessHandle, pPEB, &PEB, sizeof(PEB), NULL);
+		WriteProcessMemory(ProcessHandle, pPEB, &PEB, sizeof(PEB), nullptr);
 	} else if (ProcessInformationClass == 7) { // ProcessDebugPort
 		BOOL*		pDebugPort = (BOOL*)ProcessInformation;
 		*pDebugPort = FALSE;
@@ -1233,7 +1233,7 @@ BOOL CreateFakeVideoTS(LPCWSTR strIFOPath, LPWSTR strFakeFile, size_t nFakeFileS
 		return FALSE;
 	}
 
-	_wsplitpath_s (strIFOPath, NULL, 0, NULL, 0, strFileName, _countof(strFileName), strExt, _countof(strExt));
+	_wsplitpath_s (strIFOPath, nullptr, 0, nullptr, 0, strFileName, _countof(strFileName), strExt, _countof(strExt));
 	_snwprintf_s  (strFakeFile, nFakeFileSize, _TRUNCATE, L"%sMPC%s%s", szTempPath, strFileName, strExt);
 
 	if (Ifo.OpenFile (strIFOPath) &&
@@ -1298,7 +1298,7 @@ BOOL WINAPI Mine_DeviceIoControl(HANDLE hDevice, DWORD dwIoControlCode, LPVOID l
 static BOOL SetHeapOptions()
 {
 	HMODULE hLib = LoadLibrary(L"kernel32.dll");
-	if (hLib == NULL) {
+	if (hLib == nullptr) {
 		return FALSE;
 	}
 
@@ -1313,7 +1313,7 @@ static BOOL SetHeapOptions()
 	#define HeapEnableTerminationOnCorruption (HEAP_INFORMATION_CLASS)1
 #endif
 
-	const BOOL fRet = (pHsi)(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
+	const BOOL fRet = (pHsi)(nullptr, HeapEnableTerminationOnCorruption, nullptr, 0);
 	if (hLib) {
 		FreeLibrary(hLib);
 	}
@@ -1380,7 +1380,7 @@ BOOL CMPlayerCApp::InitInstance()
 	wndcls.hIcon = LoadIcon(IDR_MAINFRAME);
 	wndcls.hCursor = LoadCursor(IDC_ARROW);
 	wndcls.hbrBackground = 0;//(HBRUSH)(COLOR_WINDOW + 1); // no bkg brush, the view and the bars should always fill the whole client area
-	wndcls.lpszMenuName = NULL;
+	wndcls.lpszMenuName = nullptr;
 	wndcls.lpszClassName = _T(MPC_WND_CLASS_NAME);
 
 	if (!AfxRegisterClass(&wndcls)) {
@@ -1388,7 +1388,7 @@ BOOL CMPlayerCApp::InitInstance()
 		return FALSE;
 	}
 
-	if (!AfxSocketInit(NULL)) {
+	if (!AfxSocketInit(nullptr)) {
 		AfxMessageBox(L"AfxSocketInit failed!");
 		return FALSE;
 	}
@@ -1459,7 +1459,7 @@ BOOL CMPlayerCApp::InitInstance()
 				CPPageFormats::RegisterUI();
 			}
 
-			SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+			SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
 		}
 		return FALSE;
 	}
@@ -1488,7 +1488,7 @@ BOOL CMPlayerCApp::InitInstance()
 				CPPageFormats::RegisterUI();
 			}
 
-			SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+			SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
 		}
 
 		return FALSE;
@@ -1500,7 +1500,7 @@ BOOL CMPlayerCApp::InitInstance()
 
 		switch (m_s.iAdminOption) {
 			case CPPageFormats::IDD : {
-				CPPageSheet options(ResStr(IDS_OPTIONS_CAPTION), NULL, m_s.iAdminOption);
+				CPPageSheet options(ResStr(IDS_OPTIONS_CAPTION), nullptr, m_s.iAdminOption);
 				options.LockPage();
 				options.DoModal();
 			}
@@ -1512,7 +1512,7 @@ BOOL CMPlayerCApp::InitInstance()
 		return FALSE;
 	}
 
-	m_mutexOneInstance.Create(NULL, TRUE, _T(MPC_WND_CLASS_NAME));
+	m_mutexOneInstance.Create(nullptr, TRUE, _T(MPC_WND_CLASS_NAME));
 
 	if (GetLastError() == ERROR_ALREADY_EXISTS
 			&& !(m_s.nCLSwitches & CLSW_NEW)
@@ -1522,7 +1522,7 @@ BOOL CMPlayerCApp::InitInstance()
 
 		const DWORD result = WaitForSingleObject(m_mutexOneInstance.m_h, 5000);
 		if (result == WAIT_OBJECT_0 || result == WAIT_ABANDONED) {
-			const HWND hWnd = ::FindWindow(_T(MPC_WND_CLASS_NAME), NULL);
+			const HWND hWnd = ::FindWindow(_T(MPC_WND_CLASS_NAME), nullptr);
 			if (hWnd) {
 				DWORD dwProcessId = 0;
 				if (GetWindowThreadProcessId(hWnd, &dwProcessId) && dwProcessId) {
@@ -1569,7 +1569,7 @@ BOOL CMPlayerCApp::InitInstance()
 	if (!::PathFileExistsW(shaderpath)) {
 		// restore shaders if the "Shaders" folder is missing only
 		CString shaderstorage;
-		SHGetFolderPathW(NULL, CSIDL_COMMON_APPDATA, NULL, 0, shaderstorage.GetBuffer(_MAX_PATH));
+		SHGetFolderPathW(nullptr, CSIDL_COMMON_APPDATA, nullptr, 0, shaderstorage.GetBuffer(_MAX_PATH));
 		shaderstorage.ReleaseBuffer();
 		shaderstorage.Append(L"\\MPC-BE\\Shaders");
 
@@ -1605,7 +1605,7 @@ BOOL CMPlayerCApp::InitInstance()
 
 	CMainFrame* pFrame = DNew CMainFrame;
 	m_pMainWnd = pFrame;
-	if (!pFrame->LoadFrame(IDR_MAINFRAME, WS_OVERLAPPEDWINDOW|FWS_ADDTOTITLE, NULL, NULL)) {
+	if (!pFrame->LoadFrame(IDR_MAINFRAME, WS_OVERLAPPEDWINDOW|FWS_ADDTOTITLE, nullptr, nullptr)) {
 		AfxMessageBox(L"CMainFrame::LoadFrame failed!");
 		return FALSE;
 	}
@@ -1650,7 +1650,7 @@ BOOL CMPlayerCApp::InitInstance()
 		}
 
 		FreeLibrary(hNTDLL);
-		hNTDLL = NULL;
+		hNTDLL = nullptr;
 	}
 
 	m_mutexOneInstance.Release();
@@ -1661,11 +1661,11 @@ BOOL CMPlayerCApp::InitInstance()
 UINT CMPlayerCApp::GetRemoteControlCodeMicrosoft(UINT nInputcode, HRAWINPUT hRawInput)
 {
 	UINT	dwSize		= 0;
-	BYTE*	pRawBuffer	= NULL;
+	BYTE*	pRawBuffer	= nullptr;
 	UINT	nMceCmd		= 0;
 
 	// Support for MCE remote control
-	GetRawInputData(hRawInput, RID_INPUT, NULL, &dwSize, sizeof(RAWINPUTHEADER));
+	GetRawInputData(hRawInput, RID_INPUT, nullptr, &dwSize, sizeof(RAWINPUTHEADER));
 	if (dwSize > 0) {
 		pRawBuffer = DNew BYTE[dwSize];
 		if (GetRawInputData(hRawInput, RID_INPUT, pRawBuffer, &dwSize, sizeof(RAWINPUTHEADER)) != -1) {
@@ -1683,10 +1683,10 @@ UINT CMPlayerCApp::GetRemoteControlCodeMicrosoft(UINT nInputcode, HRAWINPUT hRaw
 UINT CMPlayerCApp::GetRemoteControlCodeSRM7500(UINT nInputcode, HRAWINPUT hRawInput)
 {
 	UINT	dwSize		= 0;
-	BYTE*	pRawBuffer	= NULL;
+	BYTE*	pRawBuffer	= nullptr;
 	UINT	nMceCmd		= 0;
 
-	GetRawInputData(hRawInput, RID_INPUT, NULL, &dwSize, sizeof(RAWINPUTHEADER));
+	GetRawInputData(hRawInput, RID_INPUT, nullptr, &dwSize, sizeof(RAWINPUTHEADER));
 	if (dwSize > 21) {
 		pRawBuffer = DNew BYTE[dwSize];
 		if (GetRawInputData(hRawInput, RID_INPUT, pRawBuffer, &dwSize, sizeof(RAWINPUTHEADER)) != -1) {
@@ -1742,9 +1742,9 @@ void CMPlayerCApp::RegisterHotkeys()
 	RID_DEVICE_INFO deviceInfo;
 	RAWINPUTDEVICE MCEInputDevice[] = {
 		// usUsagePage  usUsage  dwFlags  hwndTarget
-		{  0xFFBC,      0x88,    0,       NULL},
-		{  0x000C,      0x01,    0,       NULL},
-		{  0x000C,      0x80,    0,       NULL}
+		{  0xFFBC,      0x88,    0,       nullptr},
+		{  0x000C,      0x01,    0,       nullptr},
+		{  0x000C,      0x80,    0,       nullptr}
 	};
 
 	// Register MCE Remote Control raw input
@@ -1753,7 +1753,7 @@ void CMPlayerCApp::RegisterHotkeys()
 	}
 
 	// Get the size of the device list
-	nErrCode = GetRawInputDeviceList(NULL, &nInputDeviceCount, sizeof(RAWINPUTDEVICELIST));
+	nErrCode = GetRawInputDeviceList(nullptr, &nInputDeviceCount, sizeof(RAWINPUTDEVICELIST));
 	inputDeviceList.Attach(new RAWINPUTDEVICELIST[nInputDeviceCount]);
 	if (nErrCode == UINT(-1) || !nInputDeviceCount || !inputDeviceList) {
 		ASSERT(nErrCode != UINT(-1));
@@ -1849,7 +1849,7 @@ int CMPlayerCApp::ExitInstance()
 {
 	if (m_s.bResetSettings) {
 		ClearSettings();
-		ShellExecuteW(NULL, L"open", GetProgramPath(), NULL, NULL, SW_SHOWNORMAL);
+		ShellExecuteW(nullptr, L"open", GetProgramPath(), nullptr, nullptr, SW_SHOWNORMAL);
 	} else {
 		m_s.SaveSettings();
 	}
@@ -1877,7 +1877,7 @@ void CMPlayerCApp::OnFileExit()
 // CRemoteCtrlClient
 
 CRemoteCtrlClient::CRemoteCtrlClient()
-	: m_pWnd(NULL)
+	: m_pWnd(nullptr)
 	, m_nStatus(DISCONNECTED)
 {
 }
@@ -1912,7 +1912,7 @@ void CRemoteCtrlClient::Connect(CString addr)
 	Create();
 
 	CString ip = addr.Left(addr.Find(':')+1).TrimRight(':');
-	int port = wcstol(addr.Mid(addr.Find(':')+1), NULL, 10);
+	int port = wcstol(addr.Mid(addr.Find(':')+1), nullptr, 10);
 
 	__super::Connect(ip, port);
 
@@ -1983,7 +1983,7 @@ void CRemoteCtrlClient::ExecuteCommand(CStringA cmd, int repcnt)
 		CStringA name = TToA(wc.GetName());
 		name.Replace(' ', '_');
 		if ((repcnt == 0 && wc.rmrepcnt == 0 || wc.rmrepcnt > 0 && (repcnt%wc.rmrepcnt) == 0)
-				&& (!name.CompareNoCase(cmd) || !wc.rmcmd.CompareNoCase(cmd) || wc.cmd == (WORD)strtol(cmd, NULL, 10))) {
+				&& (!name.CompareNoCase(cmd) || !wc.rmcmd.CompareNoCase(cmd) || wc.cmd == (WORD)strtol(cmd, nullptr, 10))) {
 			CAutoLock cAutoLock(&m_csLock);
 			DLog(L"CRemoteCtrlClient (calling command): %s", wc.GetName());
 			m_pWnd->SendMessage(WM_COMMAND, wc.cmd);
@@ -2007,7 +2007,7 @@ void CWinLircClient::OnCommand(CStringA str)
 			!token.IsEmpty();
 			token = str.Tokenize(" ", i), j++) {
 		if (j == 1) {
-			repcnt = strtol(token, NULL, 16);
+			repcnt = strtol(token, nullptr, 16);
 		} else if (j == 2) {
 			ExecuteCommand(token, repcnt);
 		}
@@ -2032,7 +2032,7 @@ void CUIceClient::OnCommand(CStringA str)
 		if (j == 0) {
 			cmd = token;
 		} else if (j == 1) {
-			ExecuteCommand(cmd, strtol(token, NULL, 16));
+			ExecuteCommand(cmd, strtol(token, nullptr, 16));
 		}
 	}
 }
@@ -2056,7 +2056,7 @@ LRESULT CALLBACK RTLWindowsLayoutCbtFilterHook(int code, WPARAM wParam, LPARAM l
 			SetWindowLongPtr(hWnd, GWL_EXSTYLE, GetWindowLongPtr(hWnd, GWL_EXSTYLE) | WS_EX_LAYOUTRTL);
 		}
 	}
-	return CallNextHookEx(NULL, code, wParam, lParam);
+	return CallNextHookEx(nullptr, code, wParam, lParam);
 }
 
 CString CMPlayerCApp::GetSatelliteDll(int nLanguage)
@@ -2106,7 +2106,7 @@ int CMPlayerCApp::GetDefLanguage()
 void CMPlayerCApp::SetLanguage(int nLanguage, bool bSave/* = true*/)
 {
 	CAppSettings& s = AfxGetAppSettings();
-	HMODULE hMod    = NULL;
+	HMODULE hMod    = nullptr;
 
 	const CString strSatellite = GetSatelliteDll(nLanguage);
 	if (!strSatellite.IsEmpty()) {
@@ -2119,7 +2119,7 @@ void CMPlayerCApp::SetLanguage(int nLanguage, bool bSave/* = true*/)
 				}
 			} else {
 				// This message should stay in English!
-				MessageBox(NULL, L"Your language pack will not work with this version. Please download a compatible one from the MPC-BE homepage.",
+				MessageBox(nullptr, L"Your language pack will not work with this version. Please download a compatible one from the MPC-BE homepage.",
 						   L"MPC-BE", MB_OK);
 			}
 		}
@@ -2128,14 +2128,14 @@ void CMPlayerCApp::SetLanguage(int nLanguage, bool bSave/* = true*/)
 	}
 
 	// In case no dll was loaded, load the English translation from the executable
-	if (hMod == NULL) {
+	if (hMod == nullptr) {
 		hMod = AfxGetApp()->m_hInstance;
 	}
 	// In case a dll was loaded, check if some special action is needed
 	else if (nLanguage == GetLanguageIndex(ID_LANGUAGE_HEBREW)) {
 		// Hebrew needs the RTL flag.
 		SetProcessDefaultLayout(LAYOUT_RTL);
-		SetWindowsHookEx(WH_CBT, RTLWindowsLayoutCbtFilterHook, NULL, GetCurrentThreadId());
+		SetWindowsHookEx(WH_CBT, RTLWindowsLayoutCbtFilterHook, nullptr, GetCurrentThreadId());
 	}
 
 	// Free the old resource if it was a dll

@@ -980,7 +980,7 @@ void CPPageAccelTbl::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 			break;
 		case COL_RMREPCNT:
 			CString str = CString(pItem->pszText).Trim();
-			wc.rmrepcnt = wcstol(str, NULL, 10);
+			wc.rmrepcnt = wcstol(str, nullptr, 10);
 			str.Format(L"%d", wc.rmrepcnt);
 			m_list.SetItemText(pItem->iItem, COL_RMREPCNT, str);
 			*pResult = TRUE;
@@ -1071,7 +1071,7 @@ HBRUSH CPPageAccelTbl::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 
 BOOL CPPageAccelTbl::OnSetActive()
 {
-	SetTimer(1, 1000, NULL);
+	SetTimer(1, 1000, nullptr);
 
 	return CPPageBase::OnSetActive();
 }

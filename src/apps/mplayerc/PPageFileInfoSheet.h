@@ -34,7 +34,7 @@ class CMPCPropertySheet: public CPropertySheet
 	DECLARE_DYNAMIC(CMPCPropertySheet)
 
 public:
-	CMPCPropertySheet(LPCTSTR pszCaption, CWnd* pParentWnd = NULL, UINT iSelectPage = 0);
+	CMPCPropertySheet(LPCTSTR pszCaption, CWnd* pParentWnd = nullptr, UINT iSelectPage = 0);
 
 	template <class T>
 	void AddPage(T* pPage) {

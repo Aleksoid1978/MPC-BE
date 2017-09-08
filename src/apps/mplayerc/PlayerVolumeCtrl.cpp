@@ -116,7 +116,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 	if (m_bSelfDrawn) {
 		switch (pNMCD->dwDrawStage) {
 			case CDDS_PREPAINT:
-				if (s.bUseDarkTheme && (m_bmUnderCtrl.GetSafeHandle() == NULL
+				if (s.bUseDarkTheme && (m_bmUnderCtrl.GetSafeHandle() == nullptr
 						|| m_nUseDarkTheme == 1
 						|| m_nThemeBrightness != s.nThemeBrightness
 						|| m_nThemeRed != s.nThemeRed
@@ -144,7 +144,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 					memdc.CreateCompatibleDC(&dc);
 
-					if (m_bmUnderCtrl.GetSafeHandle() != NULL) {
+					if (m_bmUnderCtrl.GetSafeHandle() != nullptr) {
 						m_bmUnderCtrl.DeleteObject();
 					}
 
@@ -172,7 +172,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 			case CDDS_ITEMPREPAINT:
 			case CDDS_POSTPAINT:
-				if (s.bUseDarkTheme && m_bmUnderCtrl.GetSafeHandle() != NULL) {
+				if (s.bUseDarkTheme && m_bmUnderCtrl.GetSafeHandle() != nullptr) {
 					CDC dc;
 					dc.Attach(pNMCD->hdc);
 					CRect rc;
@@ -269,7 +269,7 @@ void CVolumeCtrl::OnNMCustomdraw(NMHDR* pNMHDR, LRESULT* pResult)
 					lr = CDRF_SKIPDEFAULT;
 					m_bItemRedraw = false;
 				} else if (!s.bUseDarkTheme && pNMCD->dwItemSpec == TBCD_CHANNEL) {
-					if (m_bmUnderCtrl.GetSafeHandle() != NULL) {
+					if (m_bmUnderCtrl.GetSafeHandle() != nullptr) {
 						m_bmUnderCtrl.DeleteObject();
 					}
 
@@ -406,7 +406,7 @@ BOOL CVolumeCtrl::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 	}
 
 	wcscpy_s(pTTT->szText, str);
-	pTTT->hinst = NULL;
+	pTTT->hinst = nullptr;
 
 	*pResult = 0;
 

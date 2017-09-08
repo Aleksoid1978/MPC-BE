@@ -28,7 +28,7 @@
 
 CShaderEdit::CShaderEdit()
 {
-	m_acdlg.Create(CShaderAutoCompleteDlg::IDD, NULL);
+	m_acdlg.Create(CShaderAutoCompleteDlg::IDD, nullptr);
 
 	m_nEndChar = -1;
 	m_nIDEvent = (UINT_PTR)-1;
@@ -96,7 +96,7 @@ END_MESSAGE_MAP()
 void CShaderEdit::OnUpdate()
 {
 	if (m_nIDEvent == (UINT_PTR)-1) {
-		m_nIDEvent = SetTimer(1, 100, NULL);
+		m_nIDEvent = SetTimer(1, 100, nullptr);
 	}
 
 	CString text;
@@ -185,10 +185,10 @@ void CShaderEdit::OnTimer(UINT_PTR nIDEvent)
 // CShaderEditorDlg dialog
 
 CShaderEditorDlg::CShaderEditorDlg()
-	: CResizableDialog(CShaderEditorDlg::IDD, NULL)
+	: CResizableDialog(CShaderEditorDlg::IDD, nullptr)
 	, m_fSplitterGrabbed(false)
-	, m_pPSC(NULL)
-	, m_pShader(NULL)
+	, m_pPSC(nullptr)
+	, m_pShader(nullptr)
 {
 }
 
@@ -454,7 +454,7 @@ void CShaderEditorDlg::OnBnClickedMenu()
 			CString path;
 			if (AfxGetMyApp()->GetAppSavePath(path)) {
 				path.Append(L"Shaders");
-				ShellExecuteW(NULL, L"open", path, NULL, NULL, SW_RESTORE);
+				ShellExecuteW(nullptr, L"open", path, nullptr, nullptr, SW_RESTORE);
 			}
 		}
 		break;
@@ -478,11 +478,11 @@ void CShaderEditorDlg::OnBnClickedApply()
 
 		if (srcdata.GetLength() && profile.GetLength()) {
 			if (!m_pPSC) {
-				m_pPSC = DNew CPixelShaderCompiler(NULL);
+				m_pPSC = DNew CPixelShaderCompiler(nullptr);
 			}
 
 			CString disasm, errmsg;
-			HRESULT hr = m_pPSC->CompileShader(srcdata, "main", profile, D3DCOMPILE_DEBUG, NULL, NULL, &errmsg, &disasm);
+			HRESULT hr = m_pPSC->CompileShader(srcdata, "main", profile, D3DCOMPILE_DEBUG, nullptr, nullptr, &errmsg, &disasm);
 
 			if (SUCCEEDED(hr)) {
 				errmsg = L"D3DXCompileShader succeeded\n";

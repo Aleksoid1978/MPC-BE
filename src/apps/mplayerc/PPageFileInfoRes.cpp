@@ -29,7 +29,7 @@ IMPLEMENT_DYNAMIC(CPPageFileInfoRes, CPPageBase)
 CPPageFileInfoRes::CPPageFileInfoRes(CString fn, IFilterGraph* pFG)
 	: CPPageBase(CPPageFileInfoRes::IDD, CPPageFileInfoRes::IDD)
 	, m_fn(fn)
-	, m_hIcon(NULL)
+	, m_hIcon(nullptr)
 {
 	m_fn.TrimRight('/');
 	int i = max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
@@ -43,9 +43,9 @@ CPPageFileInfoRes::CPPageFileInfoRes(CString fn, IFilterGraph* pFG)
 		if (pRB && pRB->ResGetCount() > 0) {
 			for (DWORD i = 0; i < pRB->ResGetCount(); i++) {
 				CComBSTR name, desc, mime;
-				BYTE* pData = NULL;
+				BYTE* pData = nullptr;
 				DWORD len = 0;
-				if (SUCCEEDED(pRB->ResGet(i, &name, &desc, &mime, &pData, &len, NULL))) {
+				if (SUCCEEDED(pRB->ResGet(i, &name, &desc, &mime, &pData, &len, nullptr))) {
 					CDSMResource r;
 					r.name = name;
 					r.desc = desc;
@@ -154,11 +154,11 @@ void CPPageFileInfoRes::OnSaveAs()
 		}
 	}
 
-	CFileDialog fd(FALSE, NULL, fname,
+	CFileDialog fd(FALSE, nullptr, fname,
 				   OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_NOCHANGEDIR,
 				   ext_list, this, 0);
 	if (fd.DoModal() == IDOK) {
-		FILE* f = NULL;
+		FILE* f = nullptr;
 		if (_wfopen_s(&f, fd.GetPathName(), L"wb") == 0) {
 			fwrite(r.data.GetData(), 1, r.data.GetCount(), f);
 			fclose(f);
@@ -183,22 +183,22 @@ void CPPageFileInfoRes::OnSize(UINT nType, int cx, int cy)
 		r.right += dx;
 		r.bottom += dy;
 
-		m_list.SetWindowPos(NULL, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+		m_list.SetWindowPos(nullptr, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
 	}
 
 	HDWP hDWP = ::BeginDeferWindowPos(1);
-	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != NULL; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
+	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != nullptr; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
 		if (pChild->SendMessage(WM_GETDLGCODE) & DLGC_BUTTON) {
 			pChild->GetWindowRect(&r);
 			ScreenToClient(&r);
 			r.top += dy;
 			r.bottom += dy;
-			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, r.left, r.top, 0, 0, SWP_NOACTIVATE|SWP_NOSIZE|SWP_NOZORDER);
+			::DeferWindowPos(hDWP, pChild->m_hWnd, nullptr, r.left, r.top, 0, 0, SWP_NOACTIVATE|SWP_NOSIZE|SWP_NOZORDER);
 		} else if (pChild != GetDlgItem(IDC_LIST1) && pChild != GetDlgItem(IDC_DEFAULTICON)) {
 			pChild->GetWindowRect(&r);
 			ScreenToClient(&r);
 			r.right += dx;
-			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+			::DeferWindowPos(hDWP, pChild->m_hWnd, nullptr, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
 		}
 	}
 	::EndDeferWindowPos(hDWP);

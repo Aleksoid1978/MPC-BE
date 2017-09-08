@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,7 +31,7 @@ static bool GetProperty(IFilterGraph* pFG, LPCOLESTR propName, VARIANT* vt)
 {
 	BeginEnumFilters(pFG, pEF, pBF) {
 		if (CComQIPtr<IPropertyBag> pPB = pBF)
-			if (SUCCEEDED(pPB->Read(propName, vt, NULL))) {
+			if (SUCCEEDED(pPB->Read(propName, vt, nullptr))) {
 				return true;
 			}
 	}
@@ -45,10 +45,10 @@ static CString FormatDateTime(FILETIME tm)
 	SYSTEMTIME st;
 	FileTimeToSystemTime(&tm, &st);
 	WCHAR buff[256];
-	GetDateFormat(LOCALE_USER_DEFAULT, DATE_LONGDATE, &st, NULL, buff, 256);
+	GetDateFormat(LOCALE_USER_DEFAULT, DATE_LONGDATE, &st, nullptr, buff, 256);
 	CString ret(buff);
 	ret += L" ";
-	GetTimeFormat(LOCALE_USER_DEFAULT, 0, &st, NULL, buff, 256);
+	GetTimeFormat(LOCALE_USER_DEFAULT, 0, &st, nullptr, buff, 256);
 	ret += buff;
 	return ret;
 }
@@ -59,7 +59,7 @@ IMPLEMENT_DYNAMIC(CPPageFileInfoDetails, CPropertyPage)
 CPPageFileInfoDetails::CPPageFileInfoDetails(CString fn, IFilterGraph* pFG, ISubPicAllocatorPresenter3* pCAP, IDvdInfo2* pDVDI)
 	: CPropertyPage(CPPageFileInfoDetails::IDD, CPPageFileInfoDetails::IDD)
 	, m_fn(fn)
-	, m_hIcon(NULL)
+	, m_hIcon(nullptr)
 	, m_type(ResStr(IDS_AG_NOT_KNOWN))
 	, m_size(ResStr(IDS_AG_NOT_KNOWN))
 	, m_time(ResStr(IDS_AG_NOT_KNOWN))
@@ -287,9 +287,9 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 			}
 
 			for (DWORD i = 0; i < nCount; i++) {
-				AM_MEDIA_TYPE* pmt = NULL;
-				WCHAR* pszName = NULL;
-				if (SUCCEEDED(pSS->Info(i, &pmt, NULL, NULL, NULL, &pszName, NULL, NULL)) && pmt) {
+				AM_MEDIA_TYPE* pmt = nullptr;
+				WCHAR* pszName = nullptr;
+				if (SUCCEEDED(pSS->Info(i, &pmt, nullptr, nullptr, nullptr, &pszName, nullptr, nullptr)) && pmt) {
 					CMediaTypeEx mt(*pmt);
 					CString str = mt.ToString();
 					if (!str.IsEmpty()) {
@@ -476,16 +476,16 @@ void CPPageFileInfoDetails::OnSize(UINT nType, int cx, int cy)
 		r.right += dx;
 		r.bottom += dy;
 
-		m_encoding.SetWindowPos(NULL,0, 0, r.Width(), r.Height(),SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+		m_encoding.SetWindowPos(nullptr,0, 0, r.Width(), r.Height(),SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
 	}
 
 	HDWP hDWP = ::BeginDeferWindowPos(1);
-	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != NULL; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
+	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != nullptr; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
 		if (pChild != GetDlgItem(IDC_EDIT7) && pChild != GetDlgItem(IDC_DEFAULTICON)) {
 			pChild->GetWindowRect(&r);
 			ScreenToClient(&r);
 			r.right += dx;
-			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+			::DeferWindowPos(hDWP, pChild->m_hWnd, nullptr, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
 		}
 	}
 	::EndDeferWindowPos(hDWP);

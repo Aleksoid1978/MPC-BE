@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,7 +31,7 @@ CStatusLabel::CStatusLabel(bool fRightAlign, bool fAddEllipses)
 	: m_fRightAlign(fRightAlign)
 	, m_fAddEllipses(fAddEllipses)
 {
-	m_font.m_hObject = NULL;
+	m_font.m_hObject = nullptr;
 }
 
 CStatusLabel::~CStatusLabel()

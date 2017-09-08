@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -133,7 +133,7 @@ CString CMpeg2DataParser::ConvertString(BYTE* pBuffer, int nLength)
 		}
 	}
 
-	nDestSize = MultiByteToWideChar (cp, MB_PRECOMPOSED, (LPCSTR)pBuffer, nLength, NULL, 0);
+	nDestSize = MultiByteToWideChar (cp, MB_PRECOMPOSED, (LPCSTR)pBuffer, nLength, nullptr, 0);
 	if (nDestSize < 0) {
 		return strResult;
 	}
@@ -416,7 +416,7 @@ HRESULT CMpeg2DataParser::ParseEIT(ULONG ulSID, PresentFollowing &NowNext)
 	CString text;
 
 	do {
-		CheckNoLog (m_pData->GetSection (PID_EIT, SI_EIT_act, NULL, 5000, &pSectionList));
+		CheckNoLog (m_pData->GetSection (PID_EIT, SI_EIT_act, nullptr, 5000, &pSectionList));
 
 		CheckNoLog (pSectionList->GetSectionData (0, &dwLength, &data));
 		CGolombBuffer	gb ((BYTE*)data, dwLength);

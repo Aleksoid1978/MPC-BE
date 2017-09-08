@@ -290,8 +290,8 @@ BOOL CPPageFullscreen::OnApply()
 			m_AutoChangeFullscrRes.dmFullscreenRes[nItem].dmFSRes = m_dms[m_list.GetItemData(nItem)];
 			m_AutoChangeFullscrRes.dmFullscreenRes[nItem].bChecked = !!m_list.GetCheck(nItem);
 			m_AutoChangeFullscrRes.dmFullscreenRes[nItem].bValid = true;
-			m_AutoChangeFullscrRes.dmFullscreenRes[nItem].vfr_from = wcstod(m_list.GetItemText(nItem, COL_VFR_F), NULL);
-			m_AutoChangeFullscrRes.dmFullscreenRes[nItem].vfr_to = wcstod(m_list.GetItemText(nItem, COL_VFR_T), NULL);
+			m_AutoChangeFullscrRes.dmFullscreenRes[nItem].vfr_from = wcstod(m_list.GetItemText(nItem, COL_VFR_F), nullptr);
+			m_AutoChangeFullscrRes.dmFullscreenRes[nItem].vfr_to = wcstod(m_list.GetItemText(nItem, COL_VFR_T), nullptr);
 		} else {
 			m_AutoChangeFullscrRes.dmFullscreenRes[nItem].Empty();
 		}
@@ -391,7 +391,7 @@ void CPPageFullscreen::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 		case COL_VFR_T:
 			if (pItem->pszText) {
 				CString str = pItem->pszText;
-				double dFR = wcstod(str, NULL);
+				double dFR = wcstod(str, nullptr);
 				dFR = clamp(dFR, 1.0, 125.999);
 				str.Format(L"%.3f", dFR);
 				m_list.SetItemText(pItem->iItem, pItem->iSubItem, str);

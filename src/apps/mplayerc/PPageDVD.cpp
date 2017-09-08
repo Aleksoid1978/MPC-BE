@@ -284,7 +284,7 @@ void CPPageDVD::OnBnClickedButton1()
 		CFileDialog dlg(TRUE);
 		IFileOpenDialog *openDlgPtr = dlg.GetIFileOpenDialog();
 
-		if (openDlgPtr != NULL) {
+		if (openDlgPtr != nullptr) {
 			openDlgPtr->SetTitle(strTitle);
 			openDlgPtr->SetOptions(FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST);
 

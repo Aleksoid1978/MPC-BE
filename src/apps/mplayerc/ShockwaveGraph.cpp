@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,13 +38,13 @@ CShockwaveGraph::CShockwaveGraph(HWND hParent, HRESULT& hr)
 {
 	hr = S_OK;
 
-	if (!m_wndWindowFrame.Create(NULL, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-								 CRect(0, 0, 0, 0), CWnd::FromHandle(hParent), 0, NULL)) {
+	if (!m_wndWindowFrame.Create(nullptr, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
+								 CRect(0, 0, 0, 0), CWnd::FromHandle(hParent), 0, nullptr)) {
 		hr = E_FAIL;
 		return;
 	}
 
-	if (!m_wndDestFrame.Create(NULL, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
+	if (!m_wndDestFrame.Create(nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
 							   CRect(0, 0, 0, 0), &m_wndWindowFrame, 0)) {
 		hr = E_FAIL;
 		return;
@@ -79,7 +79,7 @@ CShockwaveGraph::~CShockwaveGraph()
 static DWORD ReadBuffer(HANDLE hFile, BYTE* pBuff, DWORD nLen)
 {
 	DWORD dwRead;
-	ReadFile(hFile, pBuff, nLen, &dwRead, NULL);
+	ReadFile(hFile, pBuff, nLen, &dwRead, nullptr);
 
 	return dwRead;
 }
@@ -96,14 +96,14 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 
 	if (!::PathIsURL(lpcwstrFile)) {
 		// handle only local files
-		HANDLE m_hFile = CreateFile(lpcwstrFile, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-												 OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+		HANDLE m_hFile = CreateFile(lpcwstrFile, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+												 OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
 
 		if (m_hFile != INVALID_HANDLE_VALUE) {
 			BYTE Buff[128] = {0};
 			ReadBuffer(m_hFile, Buff, 3);	// Signature
 			if (memcmp(Buff, "CWS", 3) == 0 || memcmp(Buff, "FWS", 3) == 0) {
-				CGolombBuffer gb(NULL, 0);
+				CGolombBuffer gb(nullptr, 0);
 
 				LARGE_INTEGER size = {0};
 				GetFileSizeEx(m_hFile, &size);
@@ -128,9 +128,9 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 								int res;
 								z_stream d_stream;
 
-								d_stream.zalloc	= (alloc_func)NULL;
-								d_stream.zfree	= (free_func)NULL;
-								d_stream.opaque	= (voidpf)NULL;
+								d_stream.zalloc	= (alloc_func)nullptr;
+								d_stream.zfree	= (free_func)nullptr;
+								d_stream.opaque	= (voidpf)nullptr;
 
 								if (Z_OK != (res = inflateInit(&d_stream))) {
 									DecompData.RemoveAll();
@@ -140,7 +140,7 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 								d_stream.next_in	= DecompData.GetData();
 								d_stream.avail_in	= (uInt)DecompData.GetCount();
 
-								BYTE* dst = NULL;
+								BYTE* dst = nullptr;
 								int n = 0;
 								do {
 									dst = (BYTE*)realloc(dst, ++n * 1000);

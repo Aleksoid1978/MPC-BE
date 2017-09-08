@@ -80,7 +80,7 @@ public:
 		CheckPointer(ppBF, E_POINTER);
 
 		HRESULT hr = S_OK;
-		CComPtr<CMPCVideoDecFilter> pBF = DNew CMPCVideoDecFilter(NULL, &hr);
+		CComPtr<CMPCVideoDecFilter> pBF = DNew CMPCVideoDecFilter(nullptr, &hr);
 		if (FAILED(hr)) {
 			return hr;
 		}
@@ -250,7 +250,7 @@ bool CFGManager::CheckBytes(HANDLE hFile, CString chkbytes)
 		for (size_t i = 0; i < val.GetCount(); i++) {
 			BYTE b;
 			DWORD r;
-			if (!ReadFile(hFile, &b, 1, &r, NULL) || (b & mask[i]) != val[i]) {
+			if (!ReadFile(hFile, &b, 1, &r, nullptr) || (b & mask[i]) != val[i]) {
 				return false;
 			}
 		}
@@ -316,7 +316,7 @@ bool CFGManager::CheckBytes(PBYTE buf, DWORD size, CString chkbytes)
 CFGFilter *LookupFilterRegistry(const GUID &guid, CAtlList<CFGFilter*> &list, UINT64 fallback_merit = MERIT64_DO_USE)
 {
 	POSITION pos = list.GetHeadPosition();
-	CFGFilter *pFilter = NULL;
+	CFGFilter *pFilter = nullptr;
 	while (pos) {
 		CFGFilter* pFGF = list.GetNext(pos);
 		if (pFGF->GetCLSID() == guid) {
@@ -350,7 +350,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 	std::vector<BYTE> httpbuf;
 
 	if ((protocol.GetLength() <= 1 || protocol == L"file") && (ext.Compare(L".cda") != 0)) {
-		hFile = CreateFile(CString(fn), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)NULL);
+		hFile = CreateFile(CString(fn), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)nullptr);
 
 		if (hFile == INVALID_HANDLE_VALUE) {
 			return VFW_E_NOT_FOUND;
@@ -659,7 +659,7 @@ HRESULT CFGManager::AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LP
 	CheckPointer(lpcwstrFileName, E_POINTER);
 	CheckPointer(ppBF, E_POINTER);
 
-	ASSERT(*ppBF == NULL);
+	ASSERT(*ppBF == nullptr);
 
 	HRESULT hr;
 
@@ -678,7 +678,7 @@ HRESULT CFGManager::AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LP
 		return hr;
 	}
 
-	const AM_MEDIA_TYPE* pmt = NULL;
+	const AM_MEDIA_TYPE* pmt = nullptr;
 
 	CMediaType mt;
 	const CAtlList<GUID>& types = pFGF->GetTypes();
@@ -738,7 +738,7 @@ STDMETHODIMP CFGManager::AddFilter(IBaseFilter* pFilter, LPCWSTR pName)
 	}
 
 	// TODO
-	hr = pFilter->JoinFilterGraph(NULL, NULL);
+	hr = pFilter->JoinFilterGraph(nullptr, nullptr);
 	hr = pFilter->JoinFilterGraph(this, pName);
 
 	return hr;
@@ -912,7 +912,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 	if (pPinIn) {
 		// 1. Try a direct connection between the filters, with no intermediate filters
 
-		if (SUCCEEDED(hr = ConnectDirect(pPinOut, pPinIn, NULL))) {
+		if (SUCCEEDED(hr = ConnectDirect(pPinOut, pPinIn, nullptr))) {
 			return hr;
 		}
 	} else {
@@ -939,7 +939,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 
 			// does RemoveFilterFromCache call AddFilter like AddFilterToCache calls RemoveFilter ?
 
-			if (SUCCEEDED(hr = ConnectFilterDirect(pPinOut, pBF, NULL))) {
+			if (SUCCEEDED(hr = ConnectFilterDirect(pPinOut, pBF, nullptr))) {
 				if (!IsStreamEnd(pBF)) {
 					fDeadEnd = false;
 				}
@@ -979,7 +979,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 		while (pos) {
 			IBaseFilter* pBF = pBFs.GetNext(pos);
 
-			if (SUCCEEDED(hr = ConnectFilterDirect(pPinOut, pBF, NULL))) {
+			if (SUCCEEDED(hr = ConnectFilterDirect(pPinOut, pBF, nullptr))) {
 				if (!IsStreamEnd(pBF)) {
 					fDeadEnd = false;
 				}
@@ -1021,9 +1021,9 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 		if (!types.IsEmpty()
 				&& SUCCEEDED(m_pFM->EnumMatchingFilters(
 								 &pEM, 0, FALSE, MERIT_DO_NOT_USE+1,
-								 TRUE, types.GetCount()/2, types.GetData(), NULL, NULL, FALSE,
-								 !!pPinIn, 0, NULL, NULL, NULL))) {
-			for (CComPtr<IMoniker> pMoniker; S_OK == pEM->Next(1, &pMoniker, NULL); pMoniker = NULL) {
+								 TRUE, types.GetCount()/2, types.GetData(), nullptr, nullptr, FALSE,
+								 !!pPinIn, 0, nullptr, nullptr, nullptr))) {
+			for (CComPtr<IMoniker> pMoniker; S_OK == pEM->Next(1, &pMoniker, nullptr); pMoniker = nullptr) {
 				CFGFilterRegistry* pFGF = DNew CFGFilterRegistry(pMoniker);
 				fl.Insert(pFGF, 0, pFGF->CheckTypes(types, true));
 			}
@@ -1031,7 +1031,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 
 		// let's check whether the madVR allocator presenter is in our list
 		// it should be if madVR is selected as the video renderer
-		CFGFilter* pMadVRAllocatorPresenter = NULL;
+		CFGFilter* pMadVRAllocatorPresenter = nullptr;
 		pos = fl.GetHeadPosition();
 		while (pos) {
 			CFGFilter* pFGF = fl.GetNext(pos);
@@ -1100,7 +1100,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 				}
 			}
 
-			hr = ConnectFilterDirect(pPinOut, pBF, NULL);
+			hr = ConnectFilterDirect(pPinOut, pBF, nullptr);
 
 			if (SUCCEEDED(hr)) {
 				if (!IsStreamEnd(pBF)) {
@@ -1209,7 +1209,7 @@ STDMETHODIMP CFGManager::Render(IPin* pPinOut)
 {
 	CAutoLock cAutoLock(this);
 
-	return RenderEx(pPinOut, 0, NULL);
+	return RenderEx(pPinOut, 0, nullptr);
 }
 
 STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlayList)
@@ -1227,7 +1227,7 @@ STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlay
 	if (FAILED(hr = AddSourceFilter(lpcwstrFile, lpcwstrFile, &pBF)))
 		return hr;
 
-	return ConnectFilter(pBF, NULL);
+	return ConnectFilter(pBF, nullptr);
 	*/
 
 	CFGFilterList fl;
@@ -1248,7 +1248,7 @@ STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlay
 			m_streampath.RemoveAll();
 			m_deadends.RemoveAll();
 
-			hr = ConnectFilter(pBF, NULL);
+			hr = ConnectFilter(pBF, nullptr);
 			if (hr == 0xDEAD) {
 				; // TODO
 			} else if (SUCCEEDED(hr)) {
@@ -1388,7 +1388,7 @@ STDMETHODIMP CFGManager::RenderEx(IPin* pPinOut, DWORD dwFlags, DWORD* pvContext
 		return VFW_E_CANNOT_RENDER;
 	}
 
-	return Connect(pPinOut, (IPin*)NULL);
+	return Connect(pPinOut, (IPin*)nullptr);
 }
 
 // IGraphBuilder2
@@ -1444,7 +1444,7 @@ HRESULT CFGManager::ConnectFilterDirect(IPin* pPinOut, CFGFilter* pFGF)
 		return hr;
 	}
 
-	hr = ConnectFilterDirect(pPinOut, pBF, NULL);
+	hr = ConnectFilterDirect(pPinOut, pBF, nullptr);
 
 	if (FAILED(hr)) {
 		EXECUTE_ASSERT(SUCCEEDED(RemoveFilter(pBF)));
@@ -1519,13 +1519,13 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 				if (CComQIPtr<IAudioSwitcherFilter> pASF = pBF) {
 					BeginEnumMediaTypes(pPin, pEM, pmt) {
 						// Find the Audio out pin
-						if (pmt->majortype == MEDIATYPE_Audio && pPinIn == NULL) {
+						if (pmt->majortype == MEDIATYPE_Audio && pPinIn == nullptr) {
 							// Add infinite Pin Tee Filter
 							CComPtr<IBaseFilter> pInfPinTee;
 							pInfPinTee.CoCreateInstance(CLSID_InfTee);
 							AddFilter(pInfPinTee, L"Infinite Pin Tee");
 
-							hr = ConnectFilterDirect(pPin, pInfPinTee, NULL);
+							hr = ConnectFilterDirect(pPin, pInfPinTee, nullptr);
 							if (SUCCEEDED(hr)) {
 								bInfPinTeeConnected = TRUE;
 								CString SelAudioRenderer = s.SelectedAudioRenderer();
@@ -1574,8 +1574,8 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 										GUID guids[] = {MEDIATYPE_Audio, MEDIASUBTYPE_NULL};
 
 										if (SUCCEEDED(m_pFM->EnumMatchingFilters(&pEM, 0, FALSE, MERIT_DO_NOT_USE+1,
-													  TRUE, 1, guids, NULL, NULL, TRUE, FALSE, 0, NULL, NULL, NULL))) {
-											for (CComPtr<IMoniker> pMoniker; S_OK == pEM->Next(1, &pMoniker, NULL); pMoniker = NULL) {
+													  TRUE, 1, guids, nullptr, nullptr, TRUE, FALSE, 0, nullptr, nullptr, nullptr))) {
+											for (CComPtr<IMoniker> pMoniker; S_OK == pEM->Next(1, &pMoniker, nullptr); pMoniker = nullptr) {
 												CFGFilterRegistry f(pMoniker);
 
 												if (f.GetName() == L"Default DirectSound Device") {
@@ -1844,7 +1844,7 @@ STDMETHODIMP CFGManager::RenderSubFile(LPCWSTR lpcwstrFileName)
 		m_streampath.RemoveAll();
 		m_deadends.RemoveAll();
 
-		hr = ConnectFilter(pBF, NULL);
+		hr = ConnectFilter(pBF, nullptr);
 	}
 	m_bOnlySub = FALSE;
 
@@ -1858,7 +1858,7 @@ STDMETHODIMP CFGManager::RenderSubFile(LPCWSTR lpcwstrFileName)
 STDMETHODIMP CFGManager::RenderAudioFile(LPCWSTR lpcwstrFileName)
 {
 	m_bOnlyAudio = TRUE;
-	HRESULT hr = RenderFile(lpcwstrFileName, NULL);
+	HRESULT hr = RenderFile(lpcwstrFileName, nullptr);
 	m_bOnlyAudio = FALSE;
 
 	return hr;
@@ -2667,7 +2667,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		CString clsid = L"{B38C58A0-1809-11D6-A458-EDAE78F1DF12}";
 
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"CLSID\\" + clsid + L"\\InprocServer32", KEY_READ)
-				&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len)
+				&& ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len)
 				&& CFileVersionInfo::GetFileVersion(buff) < 0x0001000000030000ui64) {
 			m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(clsid), MERIT64_DO_NOT_USE));
 		}
@@ -2746,7 +2746,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 			merit += merit_low++;
 		}
 
-		CFGFilter* pFGF = NULL;
+		CFGFilter* pFGF = nullptr;
 
 		if (fo->type == FilterOverride::REGISTERED) {
 			pFGF = DNew CFGFilterRegistry(fo->dispname, merit);
@@ -2821,8 +2821,8 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		GUID guids[] = {MEDIATYPE_Video, MEDIASUBTYPE_NULL};
 
 		if (SUCCEEDED(m_pFM->EnumMatchingFilters(&pEM, 0, FALSE, MERIT_DO_NOT_USE+1,
-					  TRUE, 1, guids, NULL, NULL, TRUE, FALSE, 0, NULL, NULL, NULL))) {
-			for (CComPtr<IMoniker> pMoniker; S_OK == pEM->Next(1, &pMoniker, NULL); pMoniker = NULL) {
+					  TRUE, 1, guids, nullptr, nullptr, TRUE, FALSE, 0, nullptr, nullptr, nullptr))) {
+			for (CComPtr<IMoniker> pMoniker; S_OK == pEM->Next(1, &pMoniker, nullptr); pMoniker = nullptr) {
 				CFGFilterRegistry f(pMoniker);
 				// RDP DShow Redirection Filter's merit is so high that it flaws the graph building process so we ignore it.
 				// Without doing that the renderer selected in MPC-HC is given a so high merit that filters that normally
@@ -2842,8 +2842,8 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		GUID guids[] = {MEDIATYPE_Audio, MEDIASUBTYPE_NULL};
 
 		if (SUCCEEDED(m_pFM->EnumMatchingFilters(&pEM, 0, FALSE, MERIT_DO_NOT_USE+1,
-					  TRUE, 1, guids, NULL, NULL, TRUE, FALSE, 0, NULL, NULL, NULL))) {
-			for (CComPtr<IMoniker> pMoniker; S_OK == pEM->Next(1, &pMoniker, NULL); pMoniker = NULL) {
+					  TRUE, 1, guids, nullptr, nullptr, TRUE, FALSE, 0, nullptr, nullptr, nullptr))) {
+			for (CComPtr<IMoniker> pMoniker; S_OK == pEM->Next(1, &pMoniker, nullptr); pMoniker = nullptr) {
 				CFGFilterRegistry f(pMoniker);
 				// RDP DShow Redirection Filter's merit is so high that it flaws the graph building process so we ignore it.
 				// Without doing that the renderer selected in MPC-HC is given a so high merit that filters that normally
@@ -2989,7 +2989,7 @@ STDMETHODIMP CFGManagerDVD::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPlayL
 		return hr;
 	}
 
-	return ConnectFilter(pBF, NULL);
+	return ConnectFilter(pBF, nullptr);
 }
 
 STDMETHODIMP CFGManagerDVD::AddSourceFilter(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrFilterName, IBaseFilter** ppFilter)

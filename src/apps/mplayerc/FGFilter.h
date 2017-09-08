@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -117,7 +117,7 @@ public:
 		CheckPointer(ppBF, E_POINTER);
 
 		HRESULT hr = S_OK;
-		CComPtr<IBaseFilter> pBF = DNew T(NULL, &hr);
+		CComPtr<IBaseFilter> pBF = DNew T(nullptr, &hr);
 		if (FAILED(hr)) {
 			return hr;
 		}

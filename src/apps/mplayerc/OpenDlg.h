@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,7 +31,7 @@ class COpenDlg : public CResizableDialog
 	//DECLARE_DYNAMIC(COpenDlg)
 
 public:
-	COpenDlg(CWnd* pParent = NULL);
+	COpenDlg(CWnd* pParent = nullptr);
 	virtual ~COpenDlg();
 
 	bool m_bMultipleFiles;
@@ -76,11 +76,11 @@ private:
 
 public:
 	COpenFileDlg(CAtlArray<CString>& mask, bool fAllowDirSelection,
-				 LPCWSTR lpszDefExt = NULL,
-				 LPCWSTR lpszFileName = NULL,
+				 LPCWSTR lpszDefExt = nullptr,
+				 LPCWSTR lpszFileName = nullptr,
 				 DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
-				 LPCWSTR lpszFilter = NULL,
-				 CWnd* pParentWnd = NULL);
+				 LPCWSTR lpszFilter = nullptr,
+				 CWnd* pParentWnd = nullptr);
 	virtual ~COpenFileDlg();
 
 	static bool m_fAllowDirSelection;

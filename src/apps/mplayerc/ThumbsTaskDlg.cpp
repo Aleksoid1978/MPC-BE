@@ -166,7 +166,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 		m_pMainFrm->m_fFrameSteppingActive = true;
 		// Number of steps you need to do more than one for some decoders.
 		// TODO - maybe need to find another way to get correct frame ???
-		HRESULT hr = m_pMainFrm->m_pFS->Step(2, NULL);
+		HRESULT hr = m_pMainFrm->m_pFS->Step(2, nullptr);
 		while (m_pMainFrm->m_fFrameSteppingActive) {
 			if (m_bAbort) {
 				return;
@@ -303,7 +303,7 @@ CThumbsTaskDlg::CThumbsTaskDlg(LPCWSTR filename)
 		TDCBF_CANCEL_BUTTON,
 		TDF_CALLBACK_TIMER | TDF_SHOW_PROGRESS_BAR | TDF_POSITION_RELATIVE_TO_WINDOW)
 	, m_filename(filename)
-	, m_pMainFrm(NULL)
+	, m_pMainFrm(nullptr)
 	, m_iProgress(0)
 	, m_bAbort(false)
 	, m_bSuccessfully(false)

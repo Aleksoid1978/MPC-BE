@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Sergey "Exodus8" (rusguy6@gmail.com)
+ * (C) 2013-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -63,7 +63,7 @@ class UpdateCheckerDlg : public CDialog
 	DECLARE_DYNAMIC(UpdateCheckerDlg)
 
 public:
-	UpdateCheckerDlg(Update_Status updateStatus, Version UpdateVersion, LPCSTR UpdateURL, CWnd* pParent = NULL);
+	UpdateCheckerDlg(Update_Status updateStatus, Version UpdateVersion, LPCSTR UpdateURL, CWnd* pParent = nullptr);
 	virtual ~UpdateCheckerDlg();
 
 	enum { IDD = IDD_UPDATE_DIALOG };

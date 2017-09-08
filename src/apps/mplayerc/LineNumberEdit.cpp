@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,8 +28,8 @@ UINT urm_SELECTLINE = ::RegisterWindowMessage( L"_LINE_NUMBER_EDIT_SELECTLINE_" 
 
 CLineNumberEdit::CLineNumberEdit()
 {
-	m_hWnd = NULL;
-	m_line.m_hWnd = NULL;
+	m_hWnd = nullptr;
+	m_line.m_hWnd = nullptr;
 	m_zero.cx = 0;
 	m_zero.cy = 0;
 	m_format = L"%03i";
@@ -215,7 +215,7 @@ void CLineNumberEdit::Prepare()
 	if( m_line.m_hWnd )
 		m_line.MoveWindow( 0, 0, width, rect.Height() );
 	else
-		m_line.Create(NULL,WS_CHILD | WS_VISIBLE | SS_NOTIFY, rect, this, 1 );
+		m_line.Create(nullptr,WS_CHILD | WS_VISIBLE | SS_NOTIFY, rect, this, 1 );
 
 	GetRect( &rectEdit );
 

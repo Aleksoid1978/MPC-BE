@@ -47,7 +47,7 @@ CSaveDlg::CSaveDlg(LPCWSTR in, LPCWSTR name, LPCWSTR out, HRESULT& hr)
 	, m_out(out)
 {
 	m_hIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
-	if (m_hIcon != NULL) {
+	if (m_hIcon != nullptr) {
 		SetMainIcon(m_hIcon);
 	}
 
@@ -72,7 +72,7 @@ CSaveDlg::~CSaveDlg()
 	}
 
 	if (m_protocol == protocol::PROTOCOL_UDP) {
-		if (m_WSAEvent != NULL) {
+		if (m_WSAEvent != nullptr) {
 			WSACloseEvent(m_WSAEvent);
 		}
 
@@ -101,17 +101,17 @@ static HRESULT CopyFiles(CString sourceFile, CString destFile)
 	HRESULT hr = S_OK;
 
 	CComPtr<IShellItem> psiItem;
-	hr = afxGlobalData.ShellCreateItemFromParsingName(sourceFile, NULL, IID_PPV_ARGS(&psiItem));
+	hr = afxGlobalData.ShellCreateItemFromParsingName(sourceFile, nullptr, IID_PPV_ARGS(&psiItem));
 	EXIT_ON_ERROR(hr);
 
 	CComPtr<IShellItem> psiDestinationFolder;
 	CString pszPath = AddSlash(GetFolderOnly(destFile));
-	hr = afxGlobalData.ShellCreateItemFromParsingName(pszPath, NULL, IID_PPV_ARGS(&psiDestinationFolder));
+	hr = afxGlobalData.ShellCreateItemFromParsingName(pszPath, nullptr, IID_PPV_ARGS(&psiDestinationFolder));
 	EXIT_ON_ERROR(hr);
 
 	CComPtr<IFileOperation> pFileOperation;
 	hr = CoCreateInstance(CLSID_FileOperation,
-						  NULL,
+						  nullptr,
 						  CLSCTX_INPROC_SERVER,
 						  IID_PPV_ARGS(&pFileOperation));
 	EXIT_ON_ERROR(hr);
@@ -120,7 +120,7 @@ static HRESULT CopyFiles(CString sourceFile, CString destFile)
 	EXIT_ON_ERROR(hr);
 
 	CString pszCopyName = GetFileOnly(destFile);
-	hr = pFileOperation->CopyItem(psiItem, psiDestinationFolder, pszCopyName, NULL);
+	hr = pFileOperation->CopyItem(psiItem, psiDestinationFolder, pszCopyName, nullptr);
 	EXIT_ON_ERROR(hr);
 
 	hr = pFileOperation->PerformOperations();
@@ -154,7 +154,7 @@ HRESULT CSaveDlg::InitFileCopy()
 			if (CComQIPtr<IBaseFilter> pSrc = pUnk) {
 				pGB->AddFilter(pSrc, fn);
 
-				if (!(pReader = pUnk) || FAILED(hr = pReader->Load(fn, NULL))) {
+				if (!(pReader = pUnk) || FAILED(hr = pReader->Load(fn, nullptr))) {
 					pReader.Release();
 					pGB->RemoveFilter(pSrc);
 				}
@@ -219,12 +219,12 @@ HRESULT CSaveDlg::InitFileCopy()
 		}
 
 		if (m_protocol != protocol::PROTOCOL_NONE) {
-			m_hFile = CreateFile(m_out, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+			m_hFile = CreateFile(m_out, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 			if (m_hFile != INVALID_HANDLE_VALUE) {
 				if (m_len) {
 					ULARGE_INTEGER usize = { 0 };
 					usize.QuadPart = m_len;
-					HANDLE hMapping = CreateFileMapping(m_hFile, NULL, PAGE_READWRITE, usize.HighPart, usize.LowPart, NULL);
+					HANDLE hMapping = CreateFileMapping(m_hFile, nullptr, PAGE_READWRITE, usize.HighPart, usize.LowPart, nullptr);
 					if (hMapping != INVALID_HANDLE_VALUE) {
 						CloseHandle(hMapping);
 					}
@@ -237,26 +237,26 @@ HRESULT CSaveDlg::InitFileCopy()
 		}
 	} else {
 		hr = S_OK;
-		CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew CCDDAReader(NULL, &hr);
+		CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew CCDDAReader(nullptr, &hr);
 
-		if (FAILED(hr) || !(pReader = pUnk) || FAILED(pReader->Load(fn, NULL))) {
+		if (FAILED(hr) || !(pReader = pUnk) || FAILED(pReader->Load(fn, nullptr))) {
 			pReader.Release();
 		}
 
 		if (!pReader) {
 			hr = S_OK;
-			CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew CCDXAReader(NULL, &hr);
+			CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew CCDXAReader(nullptr, &hr);
 
-			if (FAILED(hr) || !(pReader = pUnk) || FAILED(pReader->Load(fn, NULL))) {
+			if (FAILED(hr) || !(pReader = pUnk) || FAILED(pReader->Load(fn, nullptr))) {
 				pReader.Release();
 			}
 		}
 
 		if (!pReader) {
 			hr = S_OK;
-			CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew CVTSReader(NULL, &hr);
+			CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)DNew CVTSReader(nullptr, &hr);
 
-			if (FAILED(hr) || !(pReader = pUnk) || FAILED(pReader->Load(fn, NULL))) {
+			if (FAILED(hr) || !(pReader = pUnk) || FAILED(pReader->Load(fn, nullptr))) {
 				pReader.Release();
 			}
 		}
@@ -277,7 +277,7 @@ fail:
 		return S_FALSE;
 	}
 
-	CComQIPtr<IBaseFilter> pMid = DNew CStreamDriveThruFilter(NULL, &hr);
+	CComQIPtr<IBaseFilter> pMid = DNew CStreamDriveThruFilter(nullptr, &hr);
 	if (FAILED(pGB->AddFilter(pMid, L"StreamDriveThru"))) {
 		SetFooterIcon(MAKEINTRESOURCE(IDI_ERROR));
 		SetFooterText(ResStr(IDS_AG_ERROR));
@@ -288,7 +288,7 @@ fail:
 	CComQIPtr<IBaseFilter> pDst;
 	pDst.CoCreateInstance(CLSID_FileWriter);
 	CComQIPtr<IFileSinkFilter2> pFSF = pDst;
-	pFSF->SetFileName(CStringW(m_out), NULL);
+	pFSF->SetFileName(CStringW(m_out), nullptr);
 	pFSF->SetMode(AM_FILE_OVERWRITE);
 
 	if (FAILED(pGB->AddFilter(pDst, L"File Writer"))) {
@@ -363,7 +363,7 @@ void CSaveDlg::Save()
 			}
 
 			DWORD dwSizeWritten = 0;
-			if (FALSE == WriteFile(m_hFile, (LPCVOID)pBuffer, dwSizeRead, &dwSizeWritten, NULL) || dwSizeRead != dwSizeWritten) {
+			if (FALSE == WriteFile(m_hFile, (LPCVOID)pBuffer, dwSizeRead, &dwSizeWritten, nullptr) || dwSizeRead != dwSizeWritten) {
 				m_bAbort = true;
 				break;
 			}

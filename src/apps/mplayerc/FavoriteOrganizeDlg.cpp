@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -320,7 +320,7 @@ void CFavoriteOrganizeDlg::OnDeleteBnClicked()
 	POSITION pos;
 	int nItem = -1;
 
-	while ((pos = m_list.GetFirstSelectedItemPosition()) != NULL) {
+	while ((pos = m_list.GetFirstSelectedItemPosition()) != nullptr) {
 		nItem = m_list.GetNextSelectedItem(pos);
 
 		if (nItem < 0 || nItem >= m_list.GetItemCount()) {

@@ -185,7 +185,7 @@ CMediaFormats::~CMediaFormats()
 void CMediaFormats::UpdateData(bool fSave)
 {
 	if (fSave) {
-		AfxGetMyApp()->WriteProfileString(IDS_R_FILEFORMATS, NULL, NULL);
+		AfxGetMyApp()->WriteProfileString(IDS_R_FILEFORMATS, nullptr, nullptr);
 	} else {
 		RemoveAll();
 
@@ -255,7 +255,7 @@ void CMediaFormats::UpdateData(bool fSave)
 
 bool CMediaFormats::FindExt(CString ext)
 {
-	return (FindMediaByExt(ext) != NULL);
+	return (FindMediaByExt(ext) != nullptr);
 }
 
 bool CMediaFormats::FindAudioExt(CString ext)
@@ -277,7 +277,7 @@ CMediaFormatCategory* CMediaFormats::FindMediaByExt(CString ext)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)

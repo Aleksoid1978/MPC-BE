@@ -31,7 +31,7 @@
 
 //IMPLEMENT_DYNAMIC(COpenDlg, CResizableDialog)
 
-COpenDlg::COpenDlg(CWnd* pParent /*=NULL*/)
+COpenDlg::COpenDlg(CWnd* pParent /*=nullptr*/)
 	: CResizableDialog(COpenDlg::IDD, pParent)
 	, m_bMultipleFiles(false)
 	, m_bAppendPlaylist(FALSE)
@@ -141,7 +141,7 @@ BOOL COpenDlg::OnInitDialog()
 	SetMinTrackSize(r.Size());
 	SetMaxTrackSize({ 1000, r.Height() });
 
-	if (m_hIcon != NULL) {
+	if (m_hIcon != nullptr) {
 		CStatic *pStat = (CStatic*)GetDlgItem(IDC_MAINFRAME_ICON);
 		pStat->SetIcon(m_hIcon);
 	}
@@ -173,7 +173,7 @@ void COpenDlg::OnBnClickedBrowsebutton()
 		dwFlags |= OFN_DONTADDTORECENT;
 	}
 
-	COpenFileDlg fd(mask, true, NULL, m_path, dwFlags, filter, this);
+	COpenFileDlg fd(mask, true, nullptr, m_path, dwFlags, filter, this);
 
 	if (fd.DoModal() != IDOK) {
 		return;
@@ -222,7 +222,7 @@ void COpenDlg::OnBnClickedBrowsebutton2()
 		dwFlags |= OFN_DONTADDTORECENT;
 	}
 
-	COpenFileDlg fd(mask, false, NULL, m_path2, dwFlags, filter, this);
+	COpenFileDlg fd(mask, false, nullptr, m_path2, dwFlags, filter, this);
 
 	if (fd.DoModal() != IDOK) {
 		return;
@@ -280,7 +280,7 @@ void COpenDlg::OnUpdateOk(CCmdUI* pCmdUI)
 #define __DUMMY__ L"*.*"
 
 bool COpenFileDlg::m_fAllowDirSelection = false;
-WNDPROC COpenFileDlg::m_wndProc = NULL;
+WNDPROC COpenFileDlg::m_wndProc = nullptr;
 
 IMPLEMENT_DYNAMIC(COpenFileDlg, CFileDialog)
 COpenFileDlg::COpenFileDlg(CAtlArray<CString>& mask, bool fAllowDirSelection, LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
@@ -372,7 +372,7 @@ void COpenFileDlg::OnDestroy()
 
 BOOL COpenFileDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 {
-	ASSERT(pResult != NULL);
+	ASSERT(pResult != nullptr);
 
 	OFNOTIFY* pNotify = (OFNOTIFY*)lParam;
 

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,7 +29,7 @@ IMPLEMENT_DYNAMIC(CFullscreenWnd, CWnd)
 
 CFullscreenWnd::CFullscreenWnd(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
-	, m_hCursor(::LoadCursor(NULL, IDC_ARROW))
+	, m_hCursor(::LoadCursor(nullptr, IDC_ARROW))
 	, m_bCursorVisible(false)
 	, m_bTrackingMouseLeave(false)
 {
@@ -124,7 +124,7 @@ BOOL CFullscreenWnd::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	if (m_bCursorVisible) {
 		::SetCursor(m_hCursor);
 	} else {
-		::SetCursor(NULL);
+		::SetCursor(nullptr);
 	}
 
 	return FALSE;
@@ -141,7 +141,7 @@ void CFullscreenWnd::ShowCursor(bool bVisible)
 
 void CFullscreenWnd::SetCursor(LPCWSTR lpCursorName)
 {
-	m_hCursor = ::LoadCursor(NULL, lpCursorName);
+	m_hCursor = ::LoadCursor(nullptr, lpCursorName);
 	m_bCursorVisible = true;
 	PostMessage(WM_SETCURSOR, 0, 0);
 }
@@ -197,7 +197,7 @@ BOOL CFullscreenWnd::PreCreateWindow(CREATESTRUCT& cs)
 		return FALSE;
 	}
 
-	m_hCursor = ::LoadCursor(NULL, IDC_ARROW);
+	m_hCursor = ::LoadCursor(nullptr, IDC_ARROW);
 	m_bCursorVisible = false;
 	m_bTrackingMouseLeave = false;
 

@@ -124,7 +124,7 @@ void CWebClientSocket::Header()
 	// start new session
 
 	if (!m_cookie.Lookup(L"MPCSESSIONID", m_sessid)) {
-		srand((unsigned int)time(NULL));
+		srand((unsigned int)time(nullptr));
 		m_sessid.Format(L"%08x", rand()*0x12345678);
 		SetCookie(L"MPCSESSIONID", m_sessid);
 	} else {
@@ -137,7 +137,7 @@ void CWebClientSocket::Header()
 		CString str;
 		if (m_hdrlines.Lookup(L"content-length", str)) {
 
-			int len = wcstol(str, NULL, 10);
+			int len = wcstol(str, nullptr, 10);
 			str.Empty();
 
 			int err = 0;
@@ -341,7 +341,7 @@ bool CWebClientSocket::OnCommand(CStringA& hdr, CStringA& body, CStringA& mime)
 					m_pMainFrame->SeekTo((REFERENCE_TIME)(percent / 100 * m_pMainFrame->GetDur()));
 				}
 			} else if (arg == CMD_SETVOLUME && m_request.Lookup(L"volume", arg)) {
-				int volume = wcstol(arg, NULL, 10);
+				int volume = wcstol(arg, nullptr, 10);
 				m_pMainFrame->m_wndToolBar.Volume = clamp(volume, 0, 100);
 				m_pMainFrame->OnPlayVolume(0);
 			}
@@ -468,7 +468,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 				cds.dwData = 0x6ABE51;
 				cds.cbData = p - buff;
 				cds.lpData = (void*)(BYTE*)buff;
-				m_pMainFrame->SendMessage(WM_COPYDATA, (WPARAM)NULL, (LPARAM)&cds);
+				m_pMainFrame->SendMessage(WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
 			}
 
 			CPath p(path);
@@ -564,7 +564,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 
 				CString fullpath = path + fd.cFileName;
 				WCHAR *ext = wcsrchr(fd.cFileName, '.');
-				if (ext != NULL) {
+				if (ext != nullptr) {
 					ext++;
 				}
 
@@ -574,7 +574,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 				CString type(L"&nbsp;");
 				LoadType(fullpath, type);
 
-				if (ext != NULL) {
+				if (ext != nullptr) {
 					files += "<tr class=\"" + UTF8(ext) + "\">\r\n";
 				} else {
 					files += "<tr class=\"noext\">\r\n";
@@ -814,7 +814,7 @@ bool CWebClientSocket::OnSnapShotJpeg(CStringA& hdr, CStringA& body, CStringA& m
 {
 	bool fRet = false;
 
-	BYTE *jpeg = NULL;
+	BYTE *jpeg = nullptr;
 	long size = 0;
 	size_t jpeg_size = 0;
 

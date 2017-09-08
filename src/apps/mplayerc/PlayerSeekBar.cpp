@@ -58,7 +58,7 @@ BOOL CPlayerSeekBar::Create(CWnd* pParentWnd)
 	m_ti.uFlags   = TTF_IDISHWND | TTF_TRACK | TTF_ABSOLUTE;
 	m_ti.hwnd     = m_hWnd;
 	m_ti.hinst    = AfxGetInstanceHandle();
-	m_ti.lpszText = NULL;
+	m_ti.lpszText = nullptr;
 	m_ti.uId      = (UINT)m_hWnd;
 
 	m_tooltip.SendMessage(TTM_ADDTOOL, 0, (LPARAM)&m_ti);
@@ -388,7 +388,7 @@ void CPlayerSeekBar::OnPaint()
 						const CRect r = GetChannelRect();
 						REFERENCE_TIME rt;
 
-						if (FAILED(m_pChapterBag->ChapGet(idx, &rt, NULL))) {
+						if (FAILED(m_pChapterBag->ChapGet(idx, &rt, nullptr))) {
 							continue;
 						}
 
@@ -400,7 +400,7 @@ void CPlayerSeekBar::OnPaint()
 
 						// instead of drawing hands can be a marker icon
 						// HICON appIcon = (HICON)::LoadImage(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
-						// ::DrawIconEx(memdc, x, rc2.top + 10, appIcon, 0,0, 0, NULL, DI_NORMAL);
+						// ::DrawIconEx(memdc, x, rc2.top + 10, appIcon, 0,0, 0, nullptr, DI_NORMAL);
 						// ::DestroyIcon(appIcon);
 
 						ThemeRGB(255, 255, 255, R, G, B);
@@ -631,7 +631,7 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 			TrackMouseEvent(&tme);
 
 			m_tooltipState = TOOLTIP_TRIGGERED;
-			m_tooltipTimer = SetTimer(m_tooltipTimer, m_pMainFrame->m_wndPreView.IsWindowVisible() ? 10 : SHOW_DELAY, NULL);
+			m_tooltipTimer = SetTimer(m_tooltipTimer, m_pMainFrame->m_wndPreView.IsWindowVisible() ? 10 : SHOW_DELAY, nullptr);
 		}
 	} else {
 		HideToolTip();
@@ -643,7 +643,7 @@ void CPlayerSeekBar::UpdateTooltip(CPoint point)
 		if (!m_pMainFrame->CanPreviewUse()) {
 			UpdateToolTipPosition(point);
 		}
-		m_tooltipTimer = SetTimer(m_tooltipTimer, m_pMainFrame->CanPreviewUse() ? 10 : AUTOPOP_DELAY, NULL);
+		m_tooltipTimer = SetTimer(m_tooltipTimer, m_pMainFrame->CanPreviewUse() ? 10 : AUTOPOP_DELAY, nullptr);
 	}
 }
 
@@ -762,7 +762,7 @@ void CPlayerSeekBar::OnTimer(UINT_PTR nIDEvent)
 				ScreenToClient(&point);
 
 				if (m_bEnabled && m_stop > 0 && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
-					m_tooltipTimer = SetTimer(m_tooltipTimer, m_pMainFrame->CanPreviewUse() ? 10 : AUTOPOP_DELAY, NULL);
+					m_tooltipTimer = SetTimer(m_tooltipTimer, m_pMainFrame->CanPreviewUse() ? 10 : AUTOPOP_DELAY, nullptr);
 					m_tooltipPos = CalculatePosition(point);
 					UpdateToolTipText();
 
@@ -826,7 +826,7 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint point)
 			}
 		}
 
-		m_pMainFrame->m_wndPreView.SetWindowPos(NULL, point.x, point.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+		m_pMainFrame->m_wndPreView.SetWindowPos(nullptr, point.x, point.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
 	} else {
 		CSize size = m_tooltip.GetBubbleSize(&m_ti);
 		CRect r;

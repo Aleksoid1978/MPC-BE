@@ -100,7 +100,7 @@ namespace Content {
 		bool bGOTCt         = false;
 		bool bGOTRedir      = false;
 		std::vector<BYTE> raw;
-		std::shared_ptr<CHTTPAsync> HTTPAsync = NULL;
+		std::shared_ptr<CHTTPAsync> HTTPAsync = nullptr;
 		CString ct;
 		CString body;
 	};
@@ -407,7 +407,7 @@ namespace Content {
 		} else if (!fn.IsEmpty()) {
 			GetContentTypeByExt(fn, ct);
 
-			FILE* f = NULL;
+			FILE* f = nullptr;
 			if (_wfopen_s(&f, fn, L"rb") == 0) {
 				CStringA str;
 				str.ReleaseBufferSetLength(fread(str.GetBuffer(3), 1, 3, f));

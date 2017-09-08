@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2016 see Authors.txt
+ * (C) 2012-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,11 +41,11 @@ static const bool OpenImageCheck(CString fn)
 
 static HBITMAP OpenImage(CString fn)
 {
-	HBITMAP hB = NULL;
+	HBITMAP hB = nullptr;
 	if (OpenImageCheck(fn)) {
 		FILE *fp = _wfopen(fn, L"rb");
 		if (!fp) {
-			return NULL;
+			return nullptr;
 		}
 
 		fseek(fp, 0, SEEK_END);

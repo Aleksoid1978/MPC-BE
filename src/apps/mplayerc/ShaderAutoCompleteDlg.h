@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,7 +32,7 @@ class CShaderAutoCompleteDlg : public CResizableDialog
 	WCHAR m_text[1024];
 
 public:
-	CShaderAutoCompleteDlg(CWnd* pParent = NULL);
+	CShaderAutoCompleteDlg(CWnd* pParent = nullptr);
 	virtual ~CShaderAutoCompleteDlg();
 
 	CMap<CString, LPCTSTR, CString, CString> m_inst;

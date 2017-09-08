@@ -58,7 +58,7 @@ private:
 	void Save();
 
 	SOCKET m_UdpSocket     = INVALID_SOCKET;
-	WSAEVENT m_WSAEvent    = NULL;
+	WSAEVENT m_WSAEvent    = nullptr;
 	sockaddr_in m_addr;
 
 public:

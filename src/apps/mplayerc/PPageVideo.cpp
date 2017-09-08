@@ -493,7 +493,7 @@ void CPPageVideo::OnResetDevice()
 
 void CPPageVideo::OnFullscreenCheck()
 {
-	if (m_chkD3DFullscreen.GetCheck() == BST_CHECKED && (MessageBox(ResStr(IDS_D3DFS_WARNING), NULL, MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON2) == IDYES)) {
+	if (m_chkD3DFullscreen.GetCheck() == BST_CHECKED && (MessageBox(ResStr(IDS_D3DFS_WARNING), nullptr, MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON2) == IDYES)) {
 		m_chk10bitOutput.EnableWindow(TRUE);
 	} else {
 		m_chkD3DFullscreen.SetCheck(BST_UNCHECKED);

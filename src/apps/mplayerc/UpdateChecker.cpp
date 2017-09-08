@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2016 see Authors.txt
+ * (C) 2013-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,7 +40,7 @@ UpdateChecker::~UpdateChecker(void)
 
 bool UpdateChecker::IsTimeToAutoUpdate(int delay, time_t lastcheck)
 {
-	return (time(NULL) >= lastcheck + delay * 24 * 3600);
+	return (time(nullptr) >= lastcheck + delay * 24 * 3600);
 }
 
 void UpdateChecker::CheckForUpdate(bool autocheck)
@@ -62,9 +62,9 @@ Update_Status UpdateChecker::CheckNewVersion()
 	CStringA updateinfo;
 
 	HINTERNET hUrl;
-	HINTERNET hInet = InternetOpen(L"MPC-BE", 0, NULL, NULL, 0);
+	HINTERNET hInet = InternetOpen(L"MPC-BE", 0, nullptr, nullptr, 0);
 	if (hInet) {
-		hUrl = InternetOpenUrl(hInet, L"http://mpc-be.org/version.txt", NULL, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
+		hUrl = InternetOpenUrl(hInet, L"http://mpc-be.org/version.txt", nullptr, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 		if (hUrl) {
 			char buffer[1024] = { 0 }; // limit update file to 1024 bytes
 			DWORD dwBytesRead = 0;
@@ -109,7 +109,7 @@ UINT UpdateChecker::RunCheckForUpdateThread(LPVOID pParam)
 	}
 
 	if (autocheck && updatestatus != UPDATER_ERROR) {
-		AfxGetAppSettings().tUpdaterLastCheck = time(NULL);
+		AfxGetAppSettings().tUpdaterLastCheck = time(nullptr);
 	}
 
 	bUpdating = false;
@@ -168,11 +168,11 @@ BOOL UpdateCheckerDlg::OnInitDialog()
 
 	switch (m_updateStatus) {
 	case UPDATER_NEW_VERSION_IS_AVAILABLE:
-		m_icon.SetIcon(LoadIcon(NULL, IDI_QUESTION));
+		m_icon.SetIcon(LoadIcon(nullptr, IDI_QUESTION));
 		break;
 	case UPDATER_NO_NEW_VERSION:
 	case UPDATER_ERROR:
-		m_icon.SetIcon(LoadIcon(NULL, (m_updateStatus == UPDATER_ERROR) ? IDI_WARNING : IDI_INFORMATION));
+		m_icon.SetIcon(LoadIcon(nullptr, (m_updateStatus == UPDATER_ERROR) ? IDI_WARNING : IDI_INFORMATION));
 		m_okButton.ShowWindow(SW_HIDE);
 		m_cancelButton.SetWindowText(ResStr(IDS_UPDATE_CLOSE));
 		m_cancelButton.SetFocus();
@@ -187,7 +187,7 @@ BOOL UpdateCheckerDlg::OnInitDialog()
 void UpdateCheckerDlg::OnOK()
 {
 	if (m_updateStatus == UPDATER_NEW_VERSION_IS_AVAILABLE) {
-		ShellExecute(NULL, L"open", m_latestURL, NULL, NULL, SW_SHOWDEFAULT);
+		ShellExecute(nullptr, L"open", m_latestURL, nullptr, nullptr, SW_SHOWDEFAULT);
 	}
 
 	__super::OnOK();

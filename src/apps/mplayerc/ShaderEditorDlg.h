@@ -72,7 +72,7 @@ public:
 	CShaderEditorDlg();
 	virtual ~CShaderEditorDlg();
 
-	BOOL Create(CWnd* pParent = NULL);
+	BOOL Create(CWnd* pParent = nullptr);
 	void UpdateShaderList();
 
 protected:

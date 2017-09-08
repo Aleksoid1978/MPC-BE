@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -376,12 +376,12 @@ void CPPageCapture::FindAnalogDevices()
 		pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB);
 
 		CComVariant var;
-		pPB->Read(CComBSTR(L"FriendlyName"), &var, NULL);
+		pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr);
 		int i = m_cbAnalogVideo.AddString(CString(var.bstrVal));
 
-		LPOLESTR strName = NULL;
+		LPOLESTR strName = nullptr;
 
-		if (SUCCEEDED(pMoniker->GetDisplayName(NULL, NULL, &strName))) {
+		if (SUCCEEDED(pMoniker->GetDisplayName(nullptr, nullptr, &strName))) {
 			m_vidnames.Add(CString(strName));
 
 			if (s.strAnalogVideo == CString(strName)) {
@@ -413,12 +413,12 @@ void CPPageCapture::FindAnalogDevices()
 		pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB);
 
 		CComVariant var;
-		pPB->Read(CComBSTR(L"FriendlyName"), &var, NULL);
+		pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr);
 		int i = m_cbAnalogAudio.AddString(CString(var.bstrVal));
 
-		LPOLESTR strName = NULL;
+		LPOLESTR strName = nullptr;
 
-		if (SUCCEEDED(pMoniker->GetDisplayName(NULL, NULL, &strName))) {
+		if (SUCCEEDED(pMoniker->GetDisplayName(nullptr, nullptr, &strName))) {
 			m_audnames.Add(CString(strName));
 
 			if (s.strAnalogAudio == CString(strName)) {
@@ -487,12 +487,12 @@ void CPPageCapture::FindDigitalDevices()
 		pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB);
 
 		CComVariant var;
-		pPB->Read(CComBSTR(L"FriendlyName"), &var, NULL);
+		pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr);
 		int i = m_cbDigitalNetworkProvider.AddString(CString(var.bstrVal));
 
-		LPOLESTR strName = NULL;
+		LPOLESTR strName = nullptr;
 
-		if (SUCCEEDED(pMoniker->GetDisplayName(NULL, NULL, &strName))) {
+		if (SUCCEEDED(pMoniker->GetDisplayName(nullptr, nullptr, &strName))) {
 			m_providernames.Add(CString(strName));
 
 			if (s.strBDANetworkProvider == CString(strName)) {
@@ -514,12 +514,12 @@ void CPPageCapture::FindDigitalDevices()
 		pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB);
 
 		CComVariant var;
-		pPB->Read(CComBSTR(L"FriendlyName"), &var, NULL);
+		pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr);
 		int i = m_cbDigitalTuner.AddString(CString(var.bstrVal));
 
-		LPOLESTR strName = NULL;
+		LPOLESTR strName = nullptr;
 
-		if (SUCCEEDED(pMoniker->GetDisplayName(NULL, NULL, &strName))) {
+		if (SUCCEEDED(pMoniker->GetDisplayName(nullptr, nullptr, &strName))) {
 			m_tunernames.Add(CString(strName));
 
 			if (s.strBDATuner == CString(strName)) {
@@ -541,12 +541,12 @@ void CPPageCapture::FindDigitalDevices()
 		pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB);
 
 		CComVariant var;
-		pPB->Read(CComBSTR(L"FriendlyName"), &var, NULL);
+		pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr);
 		int i = m_cbDigitalReceiver.AddString(CString(var.bstrVal));
 
-		LPOLESTR strName = NULL;
+		LPOLESTR strName = nullptr;
 
-		if (SUCCEEDED(pMoniker->GetDisplayName(NULL, NULL, &strName))) {
+		if (SUCCEEDED(pMoniker->GetDisplayName(nullptr, nullptr, &strName))) {
 			m_receivernames.Add(CString(strName));
 
 			if (s.strBDAReceiver == CString(strName)) {

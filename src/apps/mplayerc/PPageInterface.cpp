@@ -150,9 +150,9 @@ BOOL CPPageInterface::OnInitDialog()
 	m_fFontAA			= m_fFontAA_Old		= s.fFontAA;
 	m_FontType.Clear();
 	m_FontSize.Clear();
-	HDC dc = CreateDC(L"DISPLAY", NULL, NULL, NULL);
+	HDC dc = CreateDC(L"DISPLAY", nullptr, nullptr, nullptr);
 	CAtlArray<CString> fntl;
-	EnumFontFamilies(dc, NULL, (FONTENUMPROC)EnumFontProc, (LPARAM)&fntl);
+	EnumFontFamilies(dc, nullptr, (FONTENUMPROC)EnumFontProc, (LPARAM)&fntl);
 	DeleteDC(dc);
 
 	for (size_t i = 0; i < fntl.GetCount(); ++i) {

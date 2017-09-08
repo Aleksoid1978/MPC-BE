@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,7 +26,7 @@
 // CPnSPresetsDlg dialog
 
 IMPLEMENT_DYNAMIC(CPnSPresetsDlg, CCmdUIDialog)
-CPnSPresetsDlg::CPnSPresetsDlg(CWnd* pParent /*=NULL*/)
+CPnSPresetsDlg::CPnSPresetsDlg(CWnd* pParent /*=nullptr*/)
 	: CCmdUIDialog(CPnSPresetsDlg::IDD, pParent)
 {
 }

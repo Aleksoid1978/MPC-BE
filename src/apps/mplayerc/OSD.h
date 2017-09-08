@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -171,7 +171,7 @@ private :
 	void UpdateSeekBarPos(CPoint point);
 	void DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPos);
 	void DrawFlyBar(CRect* rect);
-	void DrawRect(CRect* rect, CBrush* pBrush = NULL, CPen* pPen = NULL);
+	void DrawRect(CRect* rect, CBrush* pBrush = nullptr, CPen* pPen = nullptr);
 	void InvalidateVMROSD();
 	void DrawMessage();
 	void DrawDebug();

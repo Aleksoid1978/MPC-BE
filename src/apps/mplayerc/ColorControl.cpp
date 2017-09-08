@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -61,7 +61,7 @@ VMR9ProcAmpControlRange* CColorControl::GetVMR9ColorControl(ControlType nFlag)
 	case ProcAmp_Saturation:
 		return &m_VMR9ColorSat;
 	}
-	return NULL;
+	return nullptr;
 }
 
 DXVA2_ValueRange* CColorControl::GetEVRColorControl(ControlType nFlag)
@@ -76,7 +76,7 @@ DXVA2_ValueRange* CColorControl::GetEVRColorControl(ControlType nFlag)
 	case ProcAmp_Saturation:
 		return &m_EVRColorSat;
 	}
-	return NULL;
+	return nullptr;
 }
 
 void CColorControl::EnableVMR9ColorControl()

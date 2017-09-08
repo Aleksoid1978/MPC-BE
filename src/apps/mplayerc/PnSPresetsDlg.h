@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,7 +36,7 @@ private:
 	CString ParamsToString(CString label, double PosX, double PosY, double ZoomX, double ZoomY);
 
 public:
-	CPnSPresetsDlg(CWnd* pParent = NULL);
+	CPnSPresetsDlg(CWnd* pParent = nullptr);
 	virtual ~CPnSPresetsDlg();
 
 	CStringArray m_pnspresets;

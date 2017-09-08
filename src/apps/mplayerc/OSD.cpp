@@ -37,15 +37,15 @@ COSD::COSD(CMainFrame* pMainFrame)
 	, m_bSeekBarVisible(false)
 	, m_bFlyBarVisible(false)
 	, m_bCursorMoving(false)
-	, m_pVMB(NULL)
-	, m_pMVTO(NULL)
-	, m_pWnd(NULL)
+	, m_pVMB(nullptr)
+	, m_pMVTO(nullptr)
+	, m_pWnd(nullptr)
 	, m_FontSize(0)
 	, m_bMouseOverExitButton(false)
 	, m_bMouseOverCloseButton(false)
 	, m_bShowMessage(true)
 	, m_OSDType(OSD_TYPE_NONE)
-	, m_pChapterBag(NULL)
+	, m_pChapterBag(nullptr)
 	, m_pWndInsertAfter(&wndNoTopMost)
 	, m_nDEFFLAGS(SWP_NOACTIVATE | SWP_NOREDRAW | SWP_ASYNCWINDOWPOS | SWP_NOZORDER)
 {
@@ -82,7 +82,7 @@ COSD::COSD(CMainFrame* pMainFrame)
 		::GetObject(hBmp, sizeof(bm), &bm);
 	}
 
-	if (NULL != hBmp) {
+	if (nullptr != hBmp) {
 		CBitmap *bmp = DNew CBitmap();
 
 		if (bmp) {
@@ -103,7 +103,7 @@ COSD::COSD(CMainFrame* pMainFrame)
 	}
 
 	// GDI+ handling
-	// Gdiplus::GdiplusStartup(&m_gdiplusToken, &m_gdiplusStartupInput, NULL);
+	// Gdiplus::GdiplusStartup(&m_gdiplusToken, &m_gdiplusStartupInput, nullptr);
 }
 
 COSD::~COSD()
@@ -134,7 +134,7 @@ HRESULT COSD::Create(CWnd* pWnd)
 		dwStyleEx	|= WS_EX_TOPMOST;
 	}
 
-	if (!CreateEx(dwStyleEx, AfxRegisterWndClass(0), NULL, dwStyle, CRect(0, 0, 0, 0), pWnd, 0, NULL)) {
+	if (!CreateEx(dwStyleEx, AfxRegisterWndClass(0), nullptr, dwStyle, CRect(0, 0, 0, 0), pWnd, 0, nullptr)) {
 		DLog(L"Failed to create OSD Window");
 		return E_FAIL;
 	}
@@ -210,7 +210,7 @@ void COSD::UpdateBitmap()
 		bmi.bmiHeader.biBitCount	= 32;
 		bmi.bmiHeader.biCompression	= BI_RGB;
 
-		hbmpRender = CreateDIBSection(m_MemDC, &bmi, DIB_RGB_COLORS, NULL, NULL, NULL);
+		hbmpRender = CreateDIBSection(m_MemDC, &bmi, DIB_RGB_COLORS, nullptr, nullptr, 0);
 		m_MemDC.SelectObject(hbmpRender);
 
 		if (::GetObject(hbmpRender, sizeof(BITMAP), &m_BitmapInfo) != 0) {
@@ -252,7 +252,7 @@ void COSD::Reset()
 void COSD::Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB)
 {
 	m_pVMB		= pVMB;
-	m_pMVTO		= NULL;
+	m_pMVTO		= nullptr;
 	m_pWnd		= pWnd;
 	m_OSDType	= OSD_TYPE_BITMAP;
 
@@ -265,7 +265,7 @@ void COSD::Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB)
 
 void COSD::Start(CWnd* pWnd, IMadVRTextOsd* pMVTO)
 {
-	m_pVMB		= NULL;
+	m_pVMB		= nullptr;
 	m_pMVTO		= pMVTO;
 	m_pWnd		= pWnd;
 	m_OSDType	= OSD_TYPE_MADVR;
@@ -275,8 +275,8 @@ void COSD::Start(CWnd* pWnd, IMadVRTextOsd* pMVTO)
 
 void COSD::Start(CWnd* pWnd)
 {
-	m_pVMB		= NULL;
-	m_pMVTO		= NULL;
+	m_pVMB		= nullptr;
+	m_pMVTO		= nullptr;
 	m_pWnd		= pWnd;
 	m_OSDType	= OSD_TYPE_GDI;
 
@@ -299,7 +299,7 @@ void COSD::Stop()
 
 	m_pVMB.Release();
 	m_pMVTO.Release();
-	m_pWnd = NULL;
+	m_pWnd = nullptr;
 
 	Reset();
 }
@@ -381,7 +381,7 @@ void COSD::DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPos)
 		if (m_pChapterBag && m_pChapterBag->ChapGetCount() > 1 && llMax != llMin) {
 			REFERENCE_TIME rt;
 			for (DWORD i = 0; i < m_pChapterBag->ChapGetCount(); ++i) {
-				if (SUCCEEDED(m_pChapterBag->ChapGet(i, &rt, NULL))) {
+				if (SUCCEEDED(m_pChapterBag->ChapGet(i, &rt, nullptr))) {
 					__int64 pos = m_rectBar.Width() * rt / (llMax - llMin);
 					if (pos < 0) {
 						continue;
@@ -399,27 +399,27 @@ void COSD::DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPos)
 		}
 	}
 
-	DrawRect(&m_rectCursor, NULL, &m_penCursor);
+	DrawRect(&m_rectCursor, nullptr, &m_penCursor);
 }
 
 void COSD::DrawFlyBar(CRect* rect)
 {
 	icoExit = m_pButtonsImages->ExtractIcon(0);
-	DrawIconEx(m_MemDC, m_rectWnd.right - 34, 10, icoExit, 0, 0, 0, NULL, DI_NORMAL);
+	DrawIconEx(m_MemDC, m_rectWnd.right - 34, 10, icoExit, 0, 0, 0, nullptr, DI_NORMAL);
 	DestroyIcon(icoExit);
 
 	icoClose = m_pButtonsImages->ExtractIcon(23);
-	DrawIconEx(m_MemDC, m_rectWnd.right - 62, 10, icoClose, 0, 0, 0, NULL, DI_NORMAL);
+	DrawIconEx(m_MemDC, m_rectWnd.right - 62, 10, icoClose, 0, 0, 0, nullptr, DI_NORMAL);
 	DestroyIcon(icoClose);
 
 	if (m_bMouseOverExitButton) {
 		icoExit_a = m_pButtonsImages->ExtractIcon(1);
-		DrawIconEx(m_MemDC, m_rectWnd.right - 34, 10, icoExit_a, 0, 0, 0, NULL, DI_NORMAL);
+		DrawIconEx(m_MemDC, m_rectWnd.right - 34, 10, icoExit_a, 0, 0, 0, nullptr, DI_NORMAL);
 		DestroyIcon(icoExit_a);
 	}
 	if (m_bMouseOverCloseButton) {
 		icoClose_a = m_pButtonsImages->ExtractIcon(24);
-		DrawIconEx(m_MemDC, m_rectWnd.right - 62, 10, icoClose_a, 0, 0, 0, NULL, DI_NORMAL);
+		DrawIconEx(m_MemDC, m_rectWnd.right - 62, 10, icoClose_a, 0, 0, 0, nullptr, DI_NORMAL);
 		DestroyIcon(icoClose_a);
 	}
 }
@@ -951,7 +951,7 @@ void COSD::DrawWnd()
 		wr.left	-= m_MainWndRect.left;
 		wr.top	-= m_MainWndRect.top;
 	}
-	SetWindowPos(NULL, wr.left, wr.top, wr.right, wr.bottom, m_nDEFFLAGS | SWP_NOZORDER);
+	SetWindowPos(nullptr, wr.left, wr.top, wr.right, wr.bottom, m_nDEFFLAGS | SWP_NOZORDER);
 
 	CRect rcBar;
 	GetClientRect(&rcBar);
