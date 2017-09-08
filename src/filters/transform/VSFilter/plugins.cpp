@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -80,7 +80,7 @@ namespace Plugin
 
 				HRESULT hr;
 				if (!(m_pSubPicQueue = DNew CSubPicQueueNoThread(false, pAllocator, &hr)) || FAILED(hr)) {
-					m_pSubPicQueue = NULL;
+					m_pSubPicQueue = nullptr;
 					return false;
 				}
 			}
@@ -178,14 +178,14 @@ namespace Plugin
 
 		bool Open(CString fn) {
 			SetFileName(L"");
-			m_pSubPicProvider = NULL;
+			m_pSubPicProvider = nullptr;
 
 			if (CVobSubFile* vsf = DNew CVobSubFile(&m_csSubLock)) {
 				m_pSubPicProvider = (ISubPicProvider*)vsf;
 				if (vsf->Open(CString(fn))) {
 					SetFileName(fn);
 				} else {
-					m_pSubPicProvider = NULL;
+					m_pSubPicProvider = nullptr;
 				}
 			}
 
@@ -212,7 +212,7 @@ namespace Plugin
 
 		bool Open(CString fn, int CharSet = DEFAULT_CHARSET) {
 			SetFileName(L"");
-			m_pSubPicProvider = NULL;
+			m_pSubPicProvider = nullptr;
 
 			if (!m_pSubPicProvider) {
 				if (CRenderedTextSubtitle* rts = DNew CRenderedTextSubtitle(&m_csSubLock)) {
@@ -220,7 +220,7 @@ namespace Plugin
 					if (rts->Open(CString(fn), CharSet)) {
 						SetFileName(fn);
 					} else {
-						m_pSubPicProvider = NULL;
+						m_pSubPicProvider = nullptr;
 					}
 				}
 			}
@@ -280,7 +280,7 @@ namespace Plugin
 			int ConfigProc(FilterActivation* fa, const FilterFunctions* ff, HWND hwnd) {
 				AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-				CFileDialog fd(TRUE, NULL, GetFileName(), OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY,
+				CFileDialog fd(TRUE, nullptr, GetFileName(), OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY,
 							   L"VobSub files (*.idx;*.sub)|*.idx;*.sub||", CWnd::FromHandle(hwnd), 0);
 
 				if (fd.DoModal() != IDOK) {
@@ -312,7 +312,7 @@ namespace Plugin
 				AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 				const WCHAR formats[] = L"TextSub files (*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt)|*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt||";
-				CFileDialog fd(TRUE, NULL, GetFileName(), OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ENABLETEMPLATE|OFN_ENABLEHOOK,
+				CFileDialog fd(TRUE, nullptr, GetFileName(), OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ENABLETEMPLATE|OFN_ENABLEHOOK,
 							   formats, CWnd::FromHandle(hwnd), sizeof(OPENFILENAME));
 				UINT_PTR CALLBACK OpenHookProc(HWND hDlg, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 
@@ -360,7 +360,7 @@ namespace Plugin
 		{
 			CVirtualDubFilter* f = *(CVirtualDubFilter**)fa->filter_data;
 			if (f) {
-				delete f, f = NULL;
+				delete f, f = nullptr;
 			}
 		}
 
@@ -420,19 +420,19 @@ namespace Plugin
 
 		ScriptFunctionDef vobsub_func_defs[]= {
 			{ (ScriptFunctionPtr)vobsubScriptConfig, "Config", "0s" },
-			{ NULL },
+			{ nullptr },
 		};
 
 		CScriptObject vobsub_obj= {
-			NULL, vobsub_func_defs
+			nullptr, vobsub_func_defs
 		};
 
 		struct FilterDefinition filterDef_vobsub = {
-			NULL, NULL, NULL,			// next, prev, module
+			nullptr, nullptr, nullptr,	// next, prev, module
 			"VobSub",					// name
 			"Adds subtitles from a vob sequence.", // desc
 			"Gabest",					// maker
-			NULL,						// private_data
+			nullptr,					// private_data
 			sizeof(CVirtualDubFilter**), // inst_data_size
 			vobsubInitProc,				// initProc
 			baseDeinitProc,				// deinitProc
@@ -440,27 +440,27 @@ namespace Plugin
 			baseParamProc,				// paramProc
 			baseConfigProc,				// configProc
 			baseStringProc,				// stringProc
-			NULL,						// startProc
-			NULL,						// endProc
+			nullptr,					// startProc
+			nullptr,					// endProc
 			&vobsub_obj,				// script_obj
 			baseFssProc,				// fssProc
 		};
 
 		ScriptFunctionDef textsub_func_defs[]= {
 			{ (ScriptFunctionPtr)textsubScriptConfig, "Config", "0si" },
-			{ NULL },
+			{ nullptr },
 		};
 
 		CScriptObject textsub_obj= {
-			NULL, textsub_func_defs
+			nullptr, textsub_func_defs
 		};
 
 		struct FilterDefinition filterDef_textsub = {
-			NULL, NULL, NULL,			// next, prev, module
+			nullptr, nullptr, nullptr,	// next, prev, module
 			"TextSub",					// name
 			"Adds subtitles from srt, sub, psb, smi, ssa, ass file formats.", // desc
 			"Gabest",					// maker
-			NULL,						// private_data
+			nullptr,					// private_data
 			sizeof(CVirtualDubFilter**), // inst_data_size
 			textsubInitProc,			// initProc
 			baseDeinitProc,				// deinitProc
@@ -468,8 +468,8 @@ namespace Plugin
 			baseParamProc,				// paramProc
 			baseConfigProc,				// configProc
 			baseStringProc,				// stringProc
-			NULL,						// startProc
-			NULL,						// endProc
+			nullptr,					// startProc
+			nullptr,					// endProc
 			&textsub_obj,				// script_obj
 			baseFssProc,				// fssProc
 		};
@@ -552,7 +552,7 @@ namespace Plugin
 			int ConfigProc(VDXFilterActivation* fa, const VDXFilterFunctions* ff, VDXHWND hwnd) {
 				AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-				CFileDialog fd(TRUE, NULL, GetFileName(), OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY,
+				CFileDialog fd(TRUE, nullptr, GetFileName(), OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY,
 							   L"VobSub files (*.idx;*.sub)|*.idx;*.sub||", CWnd::FromHandle((HWND)hwnd), 0);
 
 				if (fd.DoModal() != IDOK) {
@@ -586,7 +586,7 @@ namespace Plugin
 				/* off encoding changing */
 #ifndef _DEBUG
 				const WCHAR formats[] = L"TextSub files (*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt)|*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt||";
-				CFileDialog fd(TRUE, NULL, GetFileName(), OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ENABLETEMPLATE|OFN_ENABLEHOOK,
+				CFileDialog fd(TRUE, nullptr, GetFileName(), OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ENABLETEMPLATE|OFN_ENABLEHOOK,
 							   formats, CWnd::FromHandle((HWND)hwnd), sizeof(OPENFILENAME));
 				UINT_PTR CALLBACK OpenHookProc(HWND hDlg, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 
@@ -596,7 +596,7 @@ namespace Plugin
 				fd.m_pOFN->lCustData = (LPARAM)DEFAULT_CHARSET;
 #else
 				const WCHAR formats[] = L"TextSub files (*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt)|*.sub;*.srt;*.smi;*.ssa;*.ass;*.xss;*.psb;*.txt||";
-				CFileDialog fd(TRUE, NULL, GetFileName(), OFN_ENABLESIZING|OFN_HIDEREADONLY,
+				CFileDialog fd(TRUE, nullptr, GetFileName(), OFN_ENABLESIZING|OFN_HIDEREADONLY,
 							   formats, CWnd::FromHandle((HWND)hwnd), sizeof(OPENFILENAME));
 #endif
 				if (fd.DoModal() != IDOK) {
@@ -636,7 +636,7 @@ namespace Plugin
 		{
 			CVirtualDubFilter* f = *(CVirtualDubFilter**)fa->filter_data;
 			if (f) {
-				delete f, f = NULL;
+				delete f, f = nullptr;
 			}
 		}
 
@@ -696,19 +696,19 @@ namespace Plugin
 
 		VDXScriptFunctionDef vobsub_func_defs[]= {
 			{ (VDXScriptFunctionPtr)vobsubScriptConfig, "Config", "0s" },
-			{ NULL },
+			{ nullptr },
 		};
 
 		VDXScriptObject vobsub_obj= {
-			NULL, vobsub_func_defs
+			nullptr, vobsub_func_defs
 		};
 
 		struct VDXFilterDefinition filterDef_vobsub = {
-			NULL, NULL, NULL,			// next, prev, module
+			nullptr, nullptr, nullptr,	// next, prev, module
 			"VobSub",					// name
 			"Adds subtitles from a vob sequence.", // desc
 			"Gabest",					// maker
-			NULL,						// private_data
+			nullptr,					// private_data
 			sizeof(CVirtualDubFilter**), // inst_data_size
 			vobsubInitProc,				// initProc
 			baseDeinitProc,				// deinitProc
@@ -716,27 +716,27 @@ namespace Plugin
 			baseParamProc,				// paramProc
 			baseConfigProc,				// configProc
 			baseStringProc,				// stringProc
-			NULL,						// startProc
-			NULL,						// endProc
+			nullptr,					// startProc
+			nullptr,					// endProc
 			&vobsub_obj,				// script_obj
 			baseFssProc,				// fssProc
 		};
 
 		VDXScriptFunctionDef textsub_func_defs[]= {
 			{ (VDXScriptFunctionPtr)textsubScriptConfig, "Config", "0si" },
-			{ NULL },
+			{ nullptr },
 		};
 
 		VDXScriptObject textsub_obj= {
-			NULL, textsub_func_defs
+			nullptr, textsub_func_defs
 		};
 
 		struct VDXFilterDefinition filterDef_textsub = {
-			NULL, NULL, NULL,			// next, prev, module
+			nullptr, nullptr, nullptr,	// next, prev, module
 			"TextSub",					// name
 			"Adds subtitles from srt, sub, psb, smi, ssa, ass file formats.", // desc
 			"Gabest",					// maker
-			NULL,						// private_data
+			nullptr,					// private_data
 			sizeof(CVirtualDubFilter**), // inst_data_size
 			textsubInitProc,			// initProc
 			baseDeinitProc,				// deinitProc
@@ -744,8 +744,8 @@ namespace Plugin
 			baseParamProc,				// paramProc
 			baseConfigProc,				// configProc
 			baseStringProc,				// stringProc
-			NULL,						// startProc
-			NULL,						// endProc
+			nullptr,					// startProc
+			nullptr,					// endProc
 			&textsub_obj,				// script_obj
 			baseFssProc,				// fssProc
 		};
@@ -885,7 +885,7 @@ namespace Plugin
 			env->AddFunction("TextSub", "csif", TextSubCreateSIF, 0);
 			env->AddFunction("MaskSub", "siifi", MaskSubCreateSIIFI, 0);
 			env->SetVar(env->SaveString("RGBA"),false);
-			return(NULL);
+			return(nullptr);
 		}
 	}
 
@@ -1039,7 +1039,7 @@ namespace Plugin
 			env->AddFunction("TextSubSwapUV", "b", TextSubSwapUV, 0);
 			env->AddFunction("MaskSub", "[file]s[width]i[height]i[fps]f[length]i[charset]i[vfr]s", MaskSubCreate, 0);
 			env->SetVar(env->SaveString("RGBA"),false);
-			return(NULL);
+			return(nullptr);
 		}
 	}
 
