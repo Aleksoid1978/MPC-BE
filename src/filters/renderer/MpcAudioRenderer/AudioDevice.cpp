@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2016 see Authors.txt
+ * (C) 2015-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,15 +32,15 @@ static BOOL CALLBACK DSEnumCallback(LPGUID lpGUID,
 	CStringArray* pArray = (CStringArray*)lpContext;
 	ASSERT(pArray);
 
-	if (lpGUID == NULL) { // add only "Primary Sound Driver"
+	if (lpGUID == nullptr) { // add only "Primary Sound Driver"
 		pArray->Add(lpszDesc);
 	}
 
 	return TRUE;
 }
 
-static HMODULE hModuleDSound = NULL;
-HRESULT(__stdcall * pDirectSoundEnumerate)(__in LPDSENUMCALLBACKW pDSEnumCallback, __in_opt LPVOID pContext) = NULL;
+static HMODULE hModuleDSound = nullptr;
+HRESULT(__stdcall * pDirectSoundEnumerate)(__in LPDSENUMCALLBACKW pDSEnumCallback, __in_opt LPVOID pContext) = nullptr;
 static void InitDSound()
 {
 	if (!hModuleDSound) {
@@ -88,9 +88,9 @@ namespace AudioDevices
 				break;
 			}
 
-			IMMDevice* endpoint = NULL;
-			IPropertyStore* pProps = NULL;
-			LPWSTR pwszID = NULL;
+			IMMDevice* endpoint = nullptr;
+			IPropertyStore* pProps = nullptr;
+			LPWSTR pwszID = nullptr;
 
 			for (UINT i = 0; i < count; i++) {
 				if (SUCCEEDED(hr = devices->Item(i, &endpoint))
@@ -110,7 +110,7 @@ namespace AudioDevices
 				SAFE_RELEASE(pProps);
 				if (pwszID) {
 					CoTaskMemFree(pwszID);
-					pwszID = NULL;
+					pwszID = nullptr;
 				}
 			}
 
@@ -178,7 +178,7 @@ namespace AudioDevices
 				break;
 			}
 
-			LPWSTR pwszID = NULL;
+			LPWSTR pwszID = nullptr;
 			if ((hr = pMMDevice->GetId(&pwszID)) == S_OK) {
 				deviceId = pwszID;
 

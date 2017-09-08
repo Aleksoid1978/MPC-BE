@@ -89,7 +89,7 @@ public:
 
 	CAMEvent m_eReleaseEvent{TRUE};
 	bool m_bReleased             = false;
-	HANDLE m_hReleaseTimerHandle = NULL;
+	HANDLE m_hReleaseTimerHandle = nullptr;
 
 	BOOL StartReleaseTimer();
 	void EndReleaseTimer();
@@ -195,7 +195,7 @@ private:
 	HRESULT					GetAudioDevice(const BOOL bForceUseDefaultDevice);
 	HRESULT					CreateAudioClient();
 	HRESULT					InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCheckFormat = TRUE);
-	HRESULT					CheckAudioClient(WAVEFORMATEX *pWaveFormatEx = NULL);
+	HRESULT					CheckAudioClient(WAVEFORMATEX *pWaveFormatEx = nullptr);
 	HRESULT					Transform(IMediaSample *pMediaSample);
 	HRESULT					PushToQueue(CAutoPtr<CPacket> p);
 
