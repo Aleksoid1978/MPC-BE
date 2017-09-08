@@ -416,25 +416,18 @@ HRESULT CResampleARGB::Process(BYTE* const dest, const BYTE* const src)
 		return S_OK;
 	}
 
-	BYTE* temp = nullptr;
-	int tempW = 0;
-	int tempH = 0;
-
 	// two-pass resize, first pass
 	if (m_bResampleHor) {
 		HRESULT hr = ResampleHorizontal(m_pTemp ? m_pTemp : dest, m_destW, m_srcH, src, m_srcW, m_pFilter);
 		if (hr != S_OK) {
-			free(temp);
 			return hr;
 		}
 	}
 
 	// second pass
 	if (m_bResampleVer) {
-		// imIn can be the original image or horizontally resampled one
+		// can be the original image or horizontally resampled one
 		HRESULT hr = ResampleVertical(dest, m_destW, m_destH, m_pTemp ? m_pTemp : src, m_srcH, m_pFilter);
-		// it's safe to call free with empty value if there was no previous step.
-		free(temp);
 		return hr;
 	}
 
