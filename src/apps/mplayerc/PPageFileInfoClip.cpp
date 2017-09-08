@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,7 +38,7 @@ CPPageFileInfoClip::CPPageFileInfoClip(CString fn, IFilterGraph* pFG)
 	, m_rating(ResStr(IDS_AG_NONE))
 	, m_location_str(ResStr(IDS_AG_NONE))
 	, m_album(ResStr(IDS_AG_NONE))
-	, m_hIcon(NULL)
+	, m_hIcon(nullptr)
 {
 	auto pFrame = AfxGetMainFrame();
 
@@ -49,12 +49,12 @@ CPPageFileInfoClip::CPPageFileInfoClip(CString fn, IFilterGraph* pFG)
 			}
 
 			CComVariant var;
-			if (SUCCEEDED(pPB->Read(CComBSTR(L"ALBUM"), &var, NULL))) {
+			if (SUCCEEDED(pPB->Read(CComBSTR(L"ALBUM"), &var, nullptr))) {
 				m_album = var.bstrVal;
 			}
 
 			var.Clear();
-			if (SUCCEEDED(pPB->Read(CComBSTR(L"LYRICS"), &var, NULL))) {
+			if (SUCCEEDED(pPB->Read(CComBSTR(L"LYRICS"), &var, nullptr))) {
 				m_descText = var.bstrVal;
 				if (m_descText.Find('\n') && m_descText.Find(L"\r\n") == -1) {
 					m_descText.Replace(L"\n", L"\r\n");
@@ -237,16 +237,16 @@ void CPPageFileInfoClip::OnSize(UINT nType, int cx, int cy)
 		r.right += dx;
 		r.bottom += dy;
 
-		m_desc.SetWindowPos(NULL, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+		m_desc.SetWindowPos(nullptr, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
 	}
 
 	HDWP hDWP = ::BeginDeferWindowPos(1);
-	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != NULL; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
+	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != nullptr; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
 		if (pChild != GetDlgItem(IDC_EDIT7) && pChild != GetDlgItem(IDC_DEFAULTICON)) {
 			pChild->GetWindowRect(&r);
 			ScreenToClient(&r);
 			r.right += dx;
-			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+			::DeferWindowPos(hDWP, pChild->m_hWnd, nullptr, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
 		}
 	}
 	::EndDeferWindowPos(hDWP);

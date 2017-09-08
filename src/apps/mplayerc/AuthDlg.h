@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,7 +34,7 @@ private:
 	CMapStringToString m_logins;
 
 public:
-	CAuthDlg(CWnd* pParent = NULL);
+	CAuthDlg(CWnd* pParent = nullptr);
 	virtual ~CAuthDlg();
 
 	enum { IDD = IDD_AUTH_DLG };

@@ -27,7 +27,7 @@
 CFlyBar::CFlyBar(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
 	, bt_idx(-1)
-	, m_pButtonsImages(NULL)
+	, m_pButtonsImages(nullptr)
 {
 	HBITMAP hBmp = CMPCPngImage::LoadExternalImage(L"flybar", IDB_PLAYERFLYBAR_PNG, IMG_TYPE::UNDEF);
 	BITMAP bm = { 0 };
@@ -38,7 +38,7 @@ CFlyBar::CFlyBar(CMainFrame* pMainFrame)
 		::GetObject(hBmp, sizeof(bm), &bm);
 	}
 
-	if (NULL != hBmp) {
+	if (nullptr != hBmp) {
 		CBitmap *bmp = DNew CBitmap();
 		bmp->Attach(hBmp);
 
@@ -64,7 +64,7 @@ CFlyBar::~CFlyBar()
 
 HRESULT CFlyBar::Create(CWnd* pWnd)
 {
-	if (!CreateEx(WS_EX_TOPMOST | WS_EX_LAYERED, AfxRegisterWndClass(0), NULL, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), pWnd, 0, NULL)) {
+	if (!CreateEx(WS_EX_TOPMOST | WS_EX_LAYERED, AfxRegisterWndClass(0), nullptr, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, CRect(0, 0, 0, 0), pWnd, 0, nullptr)) {
 		DLog(L"Failed to create Flybar Window");
 		return E_FAIL;
 	}
@@ -157,7 +157,7 @@ void CFlyBar::CalcButtonsRect()
 void CFlyBar::DrawButton(CDC *pDC, int x, int y, int z)
 {
 	HICON hIcon = m_pButtonsImages->ExtractIcon(y);
-	DrawIconEx(pDC->m_hDC, x - 5 - (iw * z), 5, hIcon, 0, 0, 0, NULL, DI_NORMAL);
+	DrawIconEx(pDC->m_hDC, x - 5 - (iw * z), 5, hIcon, 0, 0, 0, nullptr, DI_NORMAL);
 	DestroyIcon(hIcon);
 }
 
@@ -203,7 +203,7 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CFlyBar::OnMouseMove(UINT nFlags, CPoint point)
 {
-	SetCursor(LoadCursor(NULL, IDC_HAND));
+	SetCursor(LoadCursor(nullptr, IDC_HAND));
 
 	TRACKMOUSEEVENT tme;
 	tme.cbSize		= sizeof(tme);
@@ -273,7 +273,7 @@ void CFlyBar::UpdateWnd(CPoint point)
 		if (str.GetLength() > 0) {
 			m_tooltip.UpdateTipText(L"", this);
 		}
-		SetCursor(LoadCursor(NULL, IDC_ARROW));
+		SetCursor(LoadCursor(nullptr, IDC_ARROW));
 		bt_idx = -1;
 	}
 
@@ -285,7 +285,7 @@ void CFlyBar::UpdateWnd(CPoint point)
 	CPoint p;
 	p.x = max(0, min(point.x, mi.rcMonitor.right - r_tooltip.Width()));
 	int iCursorHeight = 24;
-	m_tooltip.SetWindowPos(NULL, p.x, point.y + iCursorHeight, r_tooltip.Width(), m_pMainFrame->ScaleY(iCursorHeight), SWP_NOACTIVATE | SWP_NOZORDER);
+	m_tooltip.SetWindowPos(nullptr, p.x, point.y + iCursorHeight, r_tooltip.Width(), m_pMainFrame->ScaleY(iCursorHeight), SWP_NOACTIVATE | SWP_NOZORDER);
 
 	Invalidate();
 }

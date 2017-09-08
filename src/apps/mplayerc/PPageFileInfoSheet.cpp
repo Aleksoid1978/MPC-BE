@@ -150,7 +150,7 @@ void CPPageFileInfoSheet::OnSaveAs()
 {
 	CFileDialog filedlg (FALSE, L"*.txt", m_fn,
 						 OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
-						 L"Text Files (*.txt)|*.txt|All Files (*.*)|*.*||", NULL);
+						 L"Text Files (*.txt)|*.txt|All Files (*.*)|*.*||", nullptr);
 
 	if (filedlg.DoModal() == IDOK) {
 		CFile mFile;
@@ -218,7 +218,7 @@ void CPPageFileInfoSheet::OnSize(UINT nType, int cx, int cy)
 	}
 
 	CTabCtrl *pTab = GetTabControl();
-	ASSERT(NULL != pTab && IsWindow(pTab->m_hWnd));
+	ASSERT(nullptr != pTab && IsWindow(pTab->m_hWnd));
 
 	int dx = cx - m_rCrt.Width();
 	int dy = cy - m_rCrt.Height();
@@ -231,9 +231,9 @@ void CPPageFileInfoSheet::OnSize(UINT nType, int cx, int cy)
 	pTab->GetClientRect(&r);
 	r.right += dx;
 	r.bottom += dy;
-	::DeferWindowPos(hDWP, pTab->m_hWnd, NULL, 0, 0, r.Width(), r.Height(), uDefFlags | SWP_NOMOVE);
+	::DeferWindowPos(hDWP, pTab->m_hWnd, nullptr, 0, 0, r.Width(), r.Height(), uDefFlags | SWP_NOMOVE);
 
-	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != NULL; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
+	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != nullptr; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
 		if ((pChild->SendMessage(WM_GETDLGCODE) & DLGC_BUTTON) && pChild == GetDlgItem(IDOK)) {
 			pChild->GetWindowRect(&r);
 			ScreenToClient(&r);
@@ -241,18 +241,18 @@ void CPPageFileInfoSheet::OnSize(UINT nType, int cx, int cy)
 			r.bottom += dy;
 			r.left+= dx;
 			r.right += dx;
-			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, r.left, r.top, 0, 0, uDefFlags | SWP_NOSIZE);
+			::DeferWindowPos(hDWP, pChild->m_hWnd, nullptr, r.left, r.top, 0, 0, uDefFlags | SWP_NOSIZE);
 		} else if ((pChild->SendMessage(WM_GETDLGCODE) & DLGC_BUTTON) && (pChild == GetDlgItem(IDC_BUTTON_MI_SAVEAS) || pChild == GetDlgItem(IDC_BUTTON_MI_CLIPBOARD))) {
 			pChild->GetWindowRect(&r);
 			ScreenToClient(&r);
 			r.top += dy;
 			r.bottom += dy;
-			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, r.left, r.top, 0, 0, uDefFlags | SWP_NOSIZE);
+			::DeferWindowPos(hDWP, pChild->m_hWnd, nullptr, r.left, r.top, 0, 0, uDefFlags | SWP_NOSIZE);
 		} else {
 			pChild->GetClientRect(&r);
 			r.right += dx;
 			r.bottom += dy;
-			::DeferWindowPos(hDWP, pChild->m_hWnd, NULL, 0, 0, r.Width(), r.Height(), uDefFlags | SWP_NOMOVE);
+			::DeferWindowPos(hDWP, pChild->m_hWnd, nullptr, 0, 0, r.Width(), r.Height(), uDefFlags | SWP_NOMOVE);
 		}
 	}
 

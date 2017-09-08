@@ -25,7 +25,7 @@
 
 static String mi_get_lang_file()
 {
-	HINSTANCE mpcres = NULL;
+	HINSTANCE mpcres = nullptr;
 	int lang = AfxGetAppSettings().iLanguage;
 
 	if (lang) {
@@ -42,10 +42,10 @@ static String mi_get_lang_file()
 				LPCSTR lpMultiByteStr = (LPCSTR)LockResource(lRes);
 
 				BOOL acp = FALSE;
-				int dstlen = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, lpMultiByteStr, -1, NULL, 0);
+				int dstlen = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, lpMultiByteStr, -1, nullptr, 0);
 				if (!dstlen) {
 					acp = TRUE;
-					dstlen = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpMultiByteStr, -1, NULL, 0);
+					dstlen = MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, lpMultiByteStr, -1, nullptr, 0);
 				}
 
 				if (dstlen) {
@@ -73,14 +73,14 @@ IMPLEMENT_DYNAMIC(CPPageFileMediaInfo, CPropertyPage)
 CPPageFileMediaInfo::CPPageFileMediaInfo(CString fn)
 	: CPropertyPage(CPPageFileMediaInfo::IDD, CPPageFileMediaInfo::IDD)
 	, m_fn(fn)
-	, m_pCFont(NULL)
+	, m_pCFont(nullptr)
 {
 }
 
 CPPageFileMediaInfo::~CPPageFileMediaInfo()
 {
 	delete m_pCFont;
-	m_pCFont = NULL;
+	m_pCFont = nullptr;
 }
 
 void CPPageFileMediaInfo::DoDataExchange(CDataExchange* pDX)
@@ -186,6 +186,6 @@ void CPPageFileMediaInfo::OnSize(UINT nType, int cx, int cy)
 		r.right += dx;
 		r.bottom += dy;
 
-		m_mediainfo.SetWindowPos(NULL, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
+		m_mediainfo.SetWindowPos(nullptr, 0, 0, r.Width(), r.Height(), SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOZORDER);
 	}
 }

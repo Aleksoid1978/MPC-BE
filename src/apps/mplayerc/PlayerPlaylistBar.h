@@ -245,8 +245,8 @@ public:
 	bool Empty();
 
 	void Open(CString fn);
-	void Open(CAtlList<CString>& fns, bool fMulti, CSubtitleItemList* subs = NULL, bool bCheck = true);
-	void Append(CAtlList<CString>& fns, bool fMulti, CSubtitleItemList* subs = NULL, bool bCheck = true);
+	void Open(CAtlList<CString>& fns, bool fMulti, CSubtitleItemList* subs = nullptr, bool bCheck = true);
+	void Append(CAtlList<CString>& fns, bool fMulti, CSubtitleItemList* subs = nullptr, bool bCheck = true);
 	void Append(CFileItemList& fis);
 	bool Replace(CString filename, CAtlList<CString>& fns);
 

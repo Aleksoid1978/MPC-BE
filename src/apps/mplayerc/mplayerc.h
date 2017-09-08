@@ -105,7 +105,7 @@ private:
 	bool ClearSettings();
 
 	std::recursive_mutex m_profileMutex;
-	HKEY m_hAppRegKey = NULL;
+	HKEY m_hAppRegKey = nullptr;
 	std::map<CString, std::map<CString, CString, CStringUtils::IgnoreCaseLess>, CStringUtils::IgnoreCaseLess> m_ProfileMap;
 	bool m_bProfileInitialized;
 	bool m_bQueuedProfileFlush;
@@ -126,7 +126,7 @@ public:
 	void			FlushProfile(bool bForce = true);
 	virtual BOOL	GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBYTE* ppData, UINT* pBytes) override;
 	virtual UINT	GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault) override;
-	virtual CString	GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszDefault = NULL) override;
+	virtual CString	GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszDefault = nullptr) override;
 	virtual BOOL	WriteProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBYTE pData, UINT nBytes) override;
 	virtual BOOL	WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nValue) override;
 	virtual BOOL	WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszValue) override;

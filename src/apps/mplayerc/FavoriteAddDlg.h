@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,7 +34,7 @@ private:
 	CAtlList<CString> m_shortnames;
 
 public:
-	CFavoriteAddDlg(CAtlList<CString>& shortnames, CString fullname, BOOL bShowRelativeDrive = TRUE, CWnd* pParent = NULL);
+	CFavoriteAddDlg(CAtlList<CString>& shortnames, CString fullname, BOOL bShowRelativeDrive = TRUE, CWnd* pParent = nullptr);
 	virtual ~CFavoriteAddDlg();
 
 	enum { IDD = IDD_FAVADD };

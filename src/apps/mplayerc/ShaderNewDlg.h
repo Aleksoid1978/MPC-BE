@@ -31,7 +31,7 @@ class CShaderNewDlg : public CCmdUIDialog
 private:
 
 public:
-	CShaderNewDlg(CWnd* pParent = NULL);
+	CShaderNewDlg(CWnd* pParent = nullptr);
 	virtual ~CShaderNewDlg();
 
 	enum { IDD = IDD_SHADERNEW_DLG };

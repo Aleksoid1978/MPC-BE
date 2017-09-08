@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -56,7 +56,7 @@ public:
 	void SetExts(CString exts);
 
 	bool FindExt(CString ext) {
-		return m_exts.Find(ext.TrimLeft('.').MakeLower()) != NULL;
+		return m_exts.Find(ext.TrimLeft('.').MakeLower()) != nullptr;
 	}
 
 	CString GetLabel() const {

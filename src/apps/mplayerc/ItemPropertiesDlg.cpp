@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2016 see Authors.txt
+ * (C) 2015-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,7 +26,7 @@
 
 //IMPLEMENT_DYNAMIC(CItemPropertiesDlg, CResizableDialog)
 
-CItemPropertiesDlg::CItemPropertiesDlg(LPCTSTR propName, LPCTSTR propPath, CWnd* pParent /*=NULL*/)
+CItemPropertiesDlg::CItemPropertiesDlg(LPCTSTR propName, LPCTSTR propPath, CWnd* pParent /*=nullptr*/)
 	: CResizableDialog(CItemPropertiesDlg::IDD, pParent)
 	, m_PropertyName(propName)
 	, m_PropertyPath(propPath)

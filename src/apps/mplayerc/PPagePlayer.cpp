@@ -140,8 +140,8 @@ BOOL CPPagePlayer::OnInitDialog()
 	m_RecentFilesCtrl.EnableWindow(s.bKeepHistory);
 
 	CString iniDirPath = GetProgramDir();
-	HANDLE hDir = CreateFile(iniDirPath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-							 OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	HANDLE hDir = CreateFile(iniDirPath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+							 OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
 	// gray-out "Store settings in the player folder" option when we don't have writing permissions in the target directory
 	GetDlgItem(IDC_CHECK8)->EnableWindow(hDir != INVALID_HANDLE_VALUE);
 	CloseHandle(hDir);
@@ -203,7 +203,7 @@ BOOL CPPagePlayer::OnApply()
 
 		// Empty the "Recent" jump list
 		CComPtr<IApplicationDestinations> pDests;
-		HRESULT hr = pDests.CoCreateInstance(CLSID_ApplicationDestinations, NULL, CLSCTX_INPROC_SERVER);
+		HRESULT hr = pDests.CoCreateInstance(CLSID_ApplicationDestinations, nullptr, CLSCTX_INPROC_SERVER);
 		if (SUCCEEDED(hr)) {
 			hr = pDests->RemoveAllDestinations();
 		}

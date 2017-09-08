@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,8 +38,8 @@ private:
 public:
 	CSaveTextFileDialog(
 		CTextFile::enc e,
-		LPCWSTR lpszDefExt = NULL, LPCWSTR lpszFileName = NULL,
-		LPCWSTR lpszFilter = NULL, CWnd* pParentWnd = NULL,
+		LPCWSTR lpszDefExt = nullptr, LPCWSTR lpszFileName = nullptr,
+		LPCWSTR lpszFilter = nullptr, CWnd* pParentWnd = nullptr,
 		BOOL bDisableExternalStyleCheckBox = TRUE, BOOL bSaveExternalStyleFile = FALSE);
 	virtual ~CSaveTextFileDialog();
 

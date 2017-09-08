@@ -149,7 +149,7 @@ class CGraphThread : public CWinThread
 	DECLARE_DYNCREATE(CGraphThread);
 
 public:
-	CGraphThread() : m_pMainFrame(NULL) {}
+	CGraphThread() : m_pMainFrame(nullptr) {}
 
 	void SetMainFrame(CMainFrame* pMainFrame) {
 		m_pMainFrame = pMainFrame;
@@ -712,10 +712,10 @@ public:
 	void SeekTo(REFERENCE_TIME rt, bool bShowOSD = true);
 	bool ValidateSeek(REFERENCE_TIME rtPos, REFERENCE_TIME rtStop);
 
-	bool GetBufferingProgress(int* Progress = NULL);
+	bool GetBufferingProgress(int* Progress = nullptr);
 
 	// subtitle streams order function
-	bool LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream = NULL);
+	bool LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream = nullptr);
 
 	void UpdateSubtitle(bool fDisplayMessage = false, bool fApplyDefStyle = false);
 	void SetSubtitle(ISubStream* pSubStream, int iSubtitleSel = -1, bool fApplyDefStyle = false);
@@ -1308,8 +1308,8 @@ public:
 	void		AddSubtitlePathsAddons(CString FileName);
 	void		AddAudioPathsAddons(CString FileName);
 
-	void		MakeBDLabel(CString path, CString& label, CString* pBDlabel = NULL);
-	void		MakeDVDLabel(CString path, CString& label, CString* pDVDlabel = NULL);
+	void		MakeBDLabel(CString path, CString& label, CString* pBDlabel = nullptr);
+	void		MakeDVDLabel(CString path, CString& label, CString* pDVDlabel = nullptr);
 
 	CString		GetCurFileName();
 	CString		GetCurDVDPath(BOOL bSelectCurTitle = FALSE);

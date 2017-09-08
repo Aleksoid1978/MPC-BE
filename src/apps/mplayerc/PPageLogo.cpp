@@ -167,7 +167,7 @@ void CPPageLogo::OnBnClickedButton2()
 {
 	CString formats = L"*.bmp;*.jpg;*.jpeg;*.png;*.gif";
 
-	CFileDialog dlg(TRUE, NULL, m_logofn,
+	CFileDialog dlg(TRUE, nullptr, m_logofn,
 					OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_NOCHANGEDIR,
 					L"Images (" + formats + L")|" + formats + L"||",
 					this, 0);

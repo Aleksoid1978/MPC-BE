@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -61,7 +61,7 @@ HRESULT CDeinterlacerFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 {
 	HRESULT hr;
 
-	AM_MEDIA_TYPE* pmt = NULL;
+	AM_MEDIA_TYPE* pmt = nullptr;
 
 	if (SUCCEEDED(pOut->GetMediaType(&pmt)) && pmt) {
 		CMediaType mt = *pmt;
@@ -69,13 +69,13 @@ HRESULT CDeinterlacerFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		DeleteMediaType(pmt);
 	}
 
-	BYTE* pDataIn = NULL;
+	BYTE* pDataIn = nullptr;
 
 	if (FAILED(pIn->GetPointer(&pDataIn)) || !pDataIn) {
 		return S_FALSE;
 	}
 
-	BYTE* pDataOut = NULL;
+	BYTE* pDataOut = nullptr;
 
 	if (FAILED(hr = pOut->GetPointer(&pDataOut)) || !pDataOut) {
 		return hr;

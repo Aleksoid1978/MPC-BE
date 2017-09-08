@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,7 +27,7 @@
 // CMediaTypesDlg dialog
 
 //IMPLEMENT_DYNAMIC(CMediaTypesDlg, CResizableDialog)
-CMediaTypesDlg::CMediaTypesDlg(IGraphBuilderDeadEnd* pGBDE, CWnd* pParent /*=NULL*/)
+CMediaTypesDlg::CMediaTypesDlg(IGraphBuilderDeadEnd* pGBDE, CWnd* pParent /*=nullptr*/)
 	: CResizableDialog(CMediaTypesDlg::IDD, pParent)
 	, m_pGBDE(pGBDE)
 	, m_type(UNKNOWN)

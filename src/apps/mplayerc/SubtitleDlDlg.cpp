@@ -59,7 +59,7 @@ CSubtitleDlDlg::CSubtitleDlDlg(CWnd* pParent, const CStringA& url, const CString
 	: CResizableDialog(CSubtitleDlDlg::IDD, pParent)
 	, m_ps(&m_list, 0, TRUE)
 	, m_defps(&m_list, filename)
-	, m_pTA(NULL)
+	, m_pTA(nullptr)
 	, m_url(url)
 	, m_bReplaceSubs(false)
 	, m_status()

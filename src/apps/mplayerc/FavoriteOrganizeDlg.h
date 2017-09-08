@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,7 +35,7 @@ private:
 	CAtlList<CString> m_sl[3];
 
 public:
-	CFavoriteOrganizeDlg(CWnd* pParent = NULL);
+	CFavoriteOrganizeDlg(CWnd* pParent = nullptr);
 	virtual ~CFavoriteOrganizeDlg();
 
 	virtual BOOL PreTranslateMessage(MSG* pMsg);

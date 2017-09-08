@@ -100,10 +100,10 @@ void CPlayerNavigationBar::OnSize(UINT nType, int cx, int cy)
 			separation = 0;
 		}
 
-		m_navdlg.m_ComboAudio.SetWindowPos(NULL, r.left, r.bottom+6, 0,0, SWP_NOSIZE | SWP_NOZORDER);
-		m_navdlg.m_ButtonInfo.SetWindowPos(NULL, r.left + sizeComboAudio + separation, r.bottom +5, 0,0, SWP_NOSIZE | SWP_NOZORDER);
-		m_navdlg.m_ButtonScan.SetWindowPos(NULL, r.left + sizeComboAudio + sizeButtonInfo + 2 * separation, r.bottom +5, 0,0, SWP_NOSIZE | SWP_NOZORDER);
-		m_navdlg.m_ButtonFilterStations.SetWindowPos(NULL, r.left,r.bottom +30, totalsize, 20, SWP_NOZORDER);
+		m_navdlg.m_ComboAudio.SetWindowPos(nullptr, r.left, r.bottom+6, 0,0, SWP_NOSIZE | SWP_NOZORDER);
+		m_navdlg.m_ButtonInfo.SetWindowPos(nullptr, r.left + sizeComboAudio + separation, r.bottom +5, 0,0, SWP_NOSIZE | SWP_NOZORDER);
+		m_navdlg.m_ButtonScan.SetWindowPos(nullptr, r.left + sizeComboAudio + sizeButtonInfo + 2 * separation, r.bottom +5, 0,0, SWP_NOSIZE | SWP_NOZORDER);
+		m_navdlg.m_ButtonFilterStations.SetWindowPos(nullptr, r.left,r.bottom +30, totalsize, 20, SWP_NOZORDER);
 	}
 }
 
@@ -132,7 +132,7 @@ void CPlayerNavigationBar::ShowControls(CWnd* pMainfrm, bool bShow)
 //IMPLEMENT_DYNAMIC(CPlayerNavigationDialog, CResizableDialog)
 
 CPlayerNavigationDialog::CPlayerNavigationDialog()
-	: CResizableDialog(CPlayerNavigationDialog::IDD, NULL)
+	: CResizableDialog(CPlayerNavigationDialog::IDD, nullptr)
 {
 }
 
@@ -219,7 +219,7 @@ void CPlayerNavigationDialog::OnChangeChannel()
 
 void CPlayerNavigationDialog::SetupAudioSwitcherSubMenu(CDVBChannel* pChannel)
 {
-	bool bFound = (pChannel != NULL);
+	bool bFound = (pChannel != nullptr);
 	int nCurrentChannel;
 	CAppSettings& s = AfxGetAppSettings();
 

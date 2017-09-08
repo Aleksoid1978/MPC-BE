@@ -33,13 +33,13 @@ bool SetPrivilege(LPCTSTR privilege, bool bEnable/* = true*/)
 
 	TOKEN_PRIVILEGES tkp;
 	// Get the LUID for the privilege.
-	LookupPrivilegeValue(NULL, privilege, &tkp.Privileges[0].Luid);
+	LookupPrivilegeValue(nullptr, privilege, &tkp.Privileges[0].Luid);
 
 	tkp.PrivilegeCount = 1;  // one privilege to set
 	tkp.Privileges[0].Attributes = bEnable ? SE_PRIVILEGE_ENABLED : 0;
 
 	// Set the privilege for this process.
-	AdjustTokenPrivileges(hToken, FALSE, &tkp, 0, (PTOKEN_PRIVILEGES)NULL, 0);
+	AdjustTokenPrivileges(hToken, FALSE, &tkp, 0, (PTOKEN_PRIVILEGES)nullptr, 0);
 
 	return (GetLastError() == ERROR_SUCCESS);
 }
@@ -47,13 +47,13 @@ bool SetPrivilege(LPCTSTR privilege, bool bEnable/* = true*/)
 bool ExploreToFile(CString path)
 {
 	bool success = false;
-	HRESULT res = CoInitialize(NULL);
+	HRESULT res = CoInitialize(nullptr);
 
 	if (res == S_OK || res == S_FALSE) {
 		PIDLIST_ABSOLUTE pidl;
 
-		if (SHParseDisplayName(path, NULL, &pidl, 0, NULL) == S_OK) {
-			success = SUCCEEDED(SHOpenFolderAndSelectItems(pidl, 0, NULL, 0));
+		if (SHParseDisplayName(path, nullptr, &pidl, 0, nullptr) == S_OK) {
+			success = SUCCEEDED(SHOpenFolderAndSelectItems(pidl, 0, nullptr, 0));
 			CoTaskMemFree(pidl);
 		}
 
@@ -88,7 +88,7 @@ from http://msdn.microsoft.com/en-us/library/windows/desktop/aa376389(v=vs.85).a
 		  0, 0, 0, 0, 0, 0,
 		  &AdministratorsGroup);
 	if (ret) {
-		if (!CheckTokenMembership(NULL, AdministratorsGroup, &ret)) {
+		if (!CheckTokenMembership(nullptr, AdministratorsGroup, &ret)) {
 			ret = FALSE;
 		}
 		FreeSid(AdministratorsGroup);
@@ -107,12 +107,12 @@ CString GetLastErrorMsg(LPTSTR lpszFunction, DWORD dw/* = GetLastError()*/)
 		FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_FROM_SYSTEM |
 		FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL,
+		nullptr,
 		dw,
 		MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
 		//MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // default system language
 		(LPTSTR)&lpMsgBuf,
-		0, NULL);
+		0, nullptr);
 
 	// Format the error message
 
@@ -134,7 +134,7 @@ CString GetLastErrorMsg(LPTSTR lpszFunction, DWORD dw/* = GetLastError()*/)
 HICON LoadIcon(CString fn, bool fSmall)
 {
 	if (fn.IsEmpty()) {
-		return NULL;
+		return nullptr;
 	}
 
 	CString ext = fn.Left(fn.Find(L"://")+1).TrimRight(':');
@@ -161,7 +161,7 @@ HICON LoadIcon(CString fn, bool fSmall)
 			return hIcon;
 		}
 
-		return NULL;
+		return nullptr;
 	}
 
 	WCHAR buff[MAX_PATH];
@@ -175,7 +175,7 @@ HICON LoadIcon(CString fn, bool fSmall)
 	}
 
 	ULONG len;
-	HICON hIcon = NULL;
+	HICON hIcon = nullptr;
 
 	do {
 		CRegKey key;
@@ -200,7 +200,7 @@ HICON LoadIcon(CString fn, bool fSmall)
 
 			len = _countof(buff);
 			memset(buff, 0, sizeof(buff));
-			if (ERROR_SUCCESS != key.QueryStringValue(NULL, buff, &len) || (ext = buff).Trim().IsEmpty()) {
+			if (ERROR_SUCCESS != key.QueryStringValue(nullptr, buff, &len) || (ext = buff).Trim().IsEmpty()) {
 				break;
 			}
 
@@ -213,7 +213,7 @@ HICON LoadIcon(CString fn, bool fSmall)
 
 		len = _countof(buff);
 		memset(buff, 0, sizeof(buff));
-		if (ERROR_SUCCESS != key.QueryStringValue(NULL, buff, &len) || (icon = buff).Trim().IsEmpty()) {
+		if (ERROR_SUCCESS != key.QueryStringValue(nullptr, buff, &len) || (icon = buff).Trim().IsEmpty()) {
 			break;
 		}
 
@@ -230,10 +230,10 @@ HICON LoadIcon(CString fn, bool fSmall)
 		icon = icon.Left(i);
 		icon.Replace(L"\"", L"");
 
-		hIcon = NULL;
+		hIcon = nullptr;
 		UINT cnt = fSmall
-				   ? ExtractIconEx(icon, id, NULL, &hIcon, 1)
-				   : ExtractIconEx(icon, id, &hIcon, NULL, 1);
+				   ? ExtractIconEx(icon, id, nullptr, &hIcon, 1)
+				   : ExtractIconEx(icon, id, &hIcon, nullptr, 1);
 		UNREFERENCED_PARAMETER(cnt);
 		if (hIcon) {
 			return hIcon;
@@ -256,7 +256,7 @@ bool LoadType(CString fn, CString& type)
 		// Try MPC-BE's internal formats list
 		CMediaFormatCategory* mfc = AfxGetAppSettings().m_Formats.FindMediaByExt(ext);
 
-		if (mfc != NULL) {
+		if (mfc != nullptr) {
 			found = true;
 			type = mfc->GetDescription();
 		} else { // Fallback to registry
@@ -283,7 +283,7 @@ bool LoadType(CString fn, CString& type)
 					len = _countof(buff);
 					memset(buff, 0, sizeof(buff));
 
-					if (ERROR_SUCCESS != key.QueryStringValue(NULL, buff, &len)) {
+					if (ERROR_SUCCESS != key.QueryStringValue(nullptr, buff, &len)) {
 						break;
 					}
 
@@ -355,7 +355,7 @@ void SetAudioRenderer(int AudioDevNo)
 	int i = 2;
 
 	BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
-		LPOLESTR olestr = NULL;
+		LPOLESTR olestr = nullptr;
 		if (FAILED(pMoniker->GetDisplayName(0, 0, &olestr))) {
 			continue;
 		}
@@ -363,15 +363,15 @@ void SetAudioRenderer(int AudioDevNo)
 		CComPtr<IPropertyBag> pPB;
 		if (SUCCEEDED(pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB))) {
 			CComVariant var;
-			if (pPB->Read(CComBSTR(L"FriendlyName"), &var, NULL) == S_OK) {
+			if (pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr) == S_OK) {
 				bool dev_enable = true;
 
 				var.Clear();
-				if (pPB->Read(CComBSTR(L"WaveOutId"), &var, NULL) == S_OK) {
+				if (pPB->Read(CComBSTR(L"WaveOutId"), &var, nullptr) == S_OK) {
 					//if (var.lVal >= 0) { fname.Insert(0, L"WaveOut: "); }
 					dev_enable = false; // skip WaveOut devices
 				}
-				else if (pPB->Read(CComBSTR(L"DSGuid"), &var, NULL) == S_OK) {
+				else if (pPB->Read(CComBSTR(L"DSGuid"), &var, nullptr) == S_OK) {
 					if (CString(var.bstrVal) == "{00000000-0000-0000-0000-000000000000}") {
 						dev_enable = false; // skip Default DirectSound Device
 					}
@@ -421,7 +421,7 @@ bool IsFontInstalled(LPCWSTR lpszFont)
 {
 	// Get the screen DC
 	CDC dc;
-	if (!dc.CreateCompatibleDC(NULL)) {
+	if (!dc.CreateCompatibleDC(nullptr)) {
 		return false;
 	}
 

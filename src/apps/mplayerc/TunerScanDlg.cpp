@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,7 +35,7 @@ enum TSC_COLUMN {
 
 IMPLEMENT_DYNAMIC(CTunerScanDlg, CDialog)
 
-CTunerScanDlg::CTunerScanDlg(CWnd* pParent /*=NULL*/)
+CTunerScanDlg::CTunerScanDlg(CWnd* pParent /*=nullptr*/)
 	: CDialog(CTunerScanDlg::IDD, pParent)
 	, m_bInProgress(false)
 {

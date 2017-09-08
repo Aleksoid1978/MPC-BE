@@ -34,10 +34,10 @@ CDiskImage::CDiskImage()
 	: m_DriveType(NONE)
 	, m_DriveLetter(0)
 	// Windows 8 VirtualDisk
-	, m_hVirtualDiskModule(NULL)
-	, m_OpenVirtualDiskFunc(NULL)
-	, m_AttachVirtualDiskFunc(NULL)
-	, m_GetVirtualDiskPhysicalPathFunc(NULL)
+	, m_hVirtualDiskModule(nullptr)
+	, m_OpenVirtualDiskFunc(nullptr)
+	, m_AttachVirtualDiskFunc(nullptr)
+	, m_GetVirtualDiskPhysicalPathFunc(nullptr)
 	, m_VHDHandle(INVALID_HANDLE_VALUE)
 	// DAEMON Tools Lite
 	, m_dtdrive(dt_none)
@@ -50,7 +50,7 @@ CDiskImage::~CDiskImage()
 
 	if (m_hVirtualDiskModule) {
 		FreeLibrary(m_hVirtualDiskModule);
-		m_hVirtualDiskModule = NULL;
+		m_hVirtualDiskModule = nullptr;
 	}
 }
 
@@ -64,8 +64,8 @@ void CDiskImage::Init()
 
 	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\DTLite.exe", KEY_READ)) {
 		ULONG nChars = 0;
-		if (ERROR_SUCCESS == key.QueryStringValue(NULL, NULL, &nChars)) {
-			if (ERROR_SUCCESS == key.QueryStringValue(NULL, m_dtlite_path.GetBuffer(nChars), &nChars)) {
+		if (ERROR_SUCCESS == key.QueryStringValue(nullptr, nullptr, &nChars)) {
+			if (ERROR_SUCCESS == key.QueryStringValue(nullptr, m_dtlite_path.GetBuffer(nChars), &nChars)) {
 				m_dtlite_path.ReleaseBuffer(nChars);
 			}
 		}
@@ -102,8 +102,8 @@ void CDiskImage::Init()
 
 	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\VCDMount.exe", KEY_READ)) {
 		ULONG nChars = 0;
-		if (ERROR_SUCCESS == key.QueryStringValue(NULL, NULL, &nChars)) {
-			if (ERROR_SUCCESS == key.QueryStringValue(NULL, m_vcd_path.GetBuffer(nChars), &nChars)) {
+		if (ERROR_SUCCESS == key.QueryStringValue(nullptr, nullptr, &nChars)) {
+			if (ERROR_SUCCESS == key.QueryStringValue(nullptr, m_vcd_path.GetBuffer(nChars), &nChars)) {
 				m_vcd_path.ReleaseBuffer(nChars);
 			}
 		}
@@ -133,7 +133,7 @@ void CDiskImage::Init()
 			}
 
 			FreeLibrary(m_hVirtualDiskModule);
-			m_hVirtualDiskModule = NULL;
+			m_hVirtualDiskModule = nullptr;
 		}
 	}
 #endif
@@ -161,7 +161,7 @@ const LPCWSTR CDiskImage::GetExts()
 		return L"*.iso";
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 bool CDiskImage::CheckExtension(LPCWSTR pathName)
@@ -298,7 +298,7 @@ WCHAR CDiskImage::MountWin8(LPCWSTR pathName)
 			ATTACH_VIRTUAL_DISK_PARAMETERS avdp;
 			memset(&avdp, 0, sizeof(ATTACH_VIRTUAL_DISK_PARAMETERS));
 			avdp.Version = ATTACH_VIRTUAL_DISK_VERSION_1;
-			ret_code = m_AttachVirtualDiskFunc(m_VHDHandle, NULL, ATTACH_VIRTUAL_DISK_FLAG_READ_ONLY, 0, &avdp, NULL);
+			ret_code = m_AttachVirtualDiskFunc(m_VHDHandle, nullptr, ATTACH_VIRTUAL_DISK_FLAG_READ_ONLY, 0, &avdp, nullptr);
 
 			if (ret_code == ERROR_SUCCESS) {
 				WCHAR physicalDriveName[MAX_PATH] = L"";
@@ -319,10 +319,10 @@ WCHAR CDiskImage::MountWin8(LPCWSTR pathName)
 							HANDLE volumeHandle = ::CreateFile(volumeNameBuffer,
 																GENERIC_READ,
 																FILE_SHARE_READ | FILE_SHARE_WRITE,
-																NULL,
+																nullptr,
 																OPEN_EXISTING,
 																FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
-																NULL);
+																nullptr);
 
 							if (volumeHandle != INVALID_HANDLE_VALUE) {
 								PSTORAGE_DEVICE_DESCRIPTOR	devDesc = {0};
@@ -343,7 +343,7 @@ WCHAR CDiskImage::MountWin8(LPCWSTR pathName)
 													  &outBuf,
 													  _countof(outBuf),
 													  &bytesUsed,
-													  NULL) && bytesUsed) {
+													  nullptr) && bytesUsed) {
 
 									devDesc = (PSTORAGE_DEVICE_DESCRIPTOR)outBuf;
 									if (devDesc->ProductIdOffset && outBuf[devDesc->ProductIdOffset]) {
@@ -359,12 +359,12 @@ WCHAR CDiskImage::MountWin8(LPCWSTR pathName)
 									STORAGE_DEVICE_NUMBER deviceInfo = {0};
 									if (::DeviceIoControl(volumeHandle,
 														  IOCTL_STORAGE_GET_DEVICE_NUMBER,
-														  NULL,
+														  nullptr,
 														  0,
 														  &deviceInfo,
 														  sizeof(deviceInfo),
 														  &bytesUsed,
-														  NULL)) {
+														  nullptr)) {
 
 										CString tmp_physicalDriveName;
 										tmp_physicalDriveName.Format(L"\\\\.\\CDROM%d", deviceInfo.DeviceNumber);

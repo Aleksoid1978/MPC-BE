@@ -1,5 +1,5 @@
 /*
- * (C) 2016 see Authors.txt
+ * (C) 2016-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,5 +34,5 @@ namespace Content {
 		void Disconnect(const CString fn);
 		void GetRaw(const CString fn, std::vector<BYTE>& raw);
 	}
-	const CString GetType(CString fn, CAtlList<CString>* redir = NULL);
+	const CString GetType(CString fn, CAtlList<CString>* redir = nullptr);
 }

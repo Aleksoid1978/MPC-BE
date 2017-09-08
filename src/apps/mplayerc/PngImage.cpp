@@ -31,8 +31,8 @@ static void read_data_fn(png_structp png_ptr, png_bytep data, png_size_t length)
 
 CMPCPngImage::CMPCPngImage()
 	: CImage()
-	, m_pExtGradientDATA(NULL)
-	, m_ExtGradientHB(NULL)
+	, m_pExtGradientDATA(nullptr)
+	, m_ExtGradientHB(nullptr)
 	, m_width(0)
 	, m_height(0)
 	, m_bpp(0)
@@ -63,7 +63,7 @@ bool CMPCPngImage::DecompressPNG(struct png_t* png)
 	png_infop info_ptr = png_create_info_struct(png_ptr);
 
 	if (!info_ptr) {
-		png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
+		png_destroy_read_struct(&png_ptr, (png_infopp)nullptr, (png_infopp)nullptr);
 		return 0;
 	}
 
@@ -197,7 +197,7 @@ BYTE* CMPCPngImage::BrightnessRGB(IMG_TYPE type, BYTE* lpBits, int width, int he
 
 HBITMAP CMPCPngImage::TypeLoadImage(IMG_TYPE type, BYTE** pData, int* width, int* height, int* bpp, FILE* fp, int resid, int br/* = -1*/, int rc/* = -1*/, int gc/* = -1*/, int bc/* = -1*/)
 {
-	HBITMAP hbm = NULL;
+	HBITMAP hbm = nullptr;
 	BYTE* bmp;
 
 	png_structp png_ptr;
@@ -227,12 +227,12 @@ HBITMAP CMPCPngImage::TypeLoadImage(IMG_TYPE type, BYTE** pData, int* width, int
 		if (fp) {
 			png_init_io(png_ptr, fp);
 		} else {
-			HRSRC hRes = FindResource(NULL, MAKEINTRESOURCE(resid), L"PNG");
-			HANDLE lRes = LoadResource(NULL, hRes);
+			HRSRC hRes = FindResource(nullptr, MAKEINTRESOURCE(resid), L"PNG");
+			HANDLE lRes = LoadResource(nullptr, hRes);
 
 			struct png_t png;
 			png.data = (unsigned char*)LockResource(lRes);
-			png.size = SizeofResource(NULL, hRes);
+			png.size = SizeofResource(nullptr, hRes);
 			png.pos = 8;
 			png_set_read_fn(png_ptr, (png_voidp)&png, read_data_fn);
 			png_set_sig_bytes(png_ptr, 8);
@@ -286,7 +286,7 @@ HBITMAP CMPCPngImage::LoadExternalImage(CString fn, int resid, IMG_TYPE type, in
 	BYTE* pData;
 	int width, height, bpp;
 
-	FILE* fp = NULL;
+	FILE* fp = nullptr;
 	errno_t error = -1;
 	if (!fn.IsEmpty()) {
 		error = _wfopen_s(&fp, path + fn + L".png", L"rb");
@@ -301,25 +301,25 @@ HBITMAP CMPCPngImage::LoadExternalImage(CString fn, int resid, IMG_TYPE type, in
 			return TypeLoadImage(IMG_TYPE::BMP, &pData, &width, &height, &bpp, fp, 0, br, rc, gc, bc);
 		} else {
 			if (resid && ((int)AfxGetAppSettings().bUseDarkTheme == !!type || type == IMG_TYPE::UNDEF)) {
-				return TypeLoadImage(IMG_TYPE::PNG, &pData, &width, &height, &bpp, NULL, resid, br, rc, gc, bc);
+				return TypeLoadImage(IMG_TYPE::PNG, &pData, &width, &height, &bpp, nullptr, resid, br, rc, gc, bc);
 			}
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 bool CMPCPngImage::LoadExternalGradient(CString fn)
 {
 	CString path = GetProgramDir();
 
-	FILE* fp = NULL;
+	FILE* fp = nullptr;
 	errno_t error = _wfopen_s(&fp, path + fn + L".png", L"rb");
 
 	if (m_ExtGradientHB) {
 		DeleteObject(m_ExtGradientHB);
 	}
-	m_ExtGradientHB = NULL;
+	m_ExtGradientHB = nullptr;
 
 	if (error == 0) {
 		m_ExtGradientHB = TypeLoadImage(IMG_TYPE::PNG, &m_pExtGradientDATA, &m_width, &m_height, &m_bpp, fp, 0);
@@ -336,7 +336,7 @@ bool CMPCPngImage::LoadExternalGradient(CString fn)
 		fclose(fp);
 	}
 
-	return m_ExtGradientHB != NULL;
+	return m_ExtGradientHB != nullptr;
 }
 
 bool CMPCPngImage::PaintExternalGradient(CDC* dc, CRect r, int ptop, int br/* = -1*/, int rc/* = -1*/, int gc/* = -1*/, int bc/* = -1*/)

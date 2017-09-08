@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,7 +36,7 @@ private:
 	CAtlArray<GUID>& m_guids;
 
 public:
-	CSelectMediaType(CAtlArray<GUID>& guids, GUID guid, CWnd* pParent = NULL);
+	CSelectMediaType(CAtlArray<GUID>& guids, GUID guid, CWnd* pParent = nullptr);
 	virtual ~CSelectMediaType();
 
 	GUID m_guid;

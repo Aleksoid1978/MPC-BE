@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -69,7 +69,7 @@ public:
 			return(tmp);
 		}
 
-		return(NULL);
+		return(nullptr);
 	}
 
 	bool FindFormat(AM_MEDIA_TYPE* pmt, CFormat<T>** ppf) {
@@ -122,11 +122,11 @@ public:
 			return false;
 		}
 
-		if (FindFormat(pmt, NULL, NULL, NULL)) {
+		if (FindFormat(pmt, nullptr, nullptr, nullptr)) {
 			DeleteMediaType(pmt);
 			return false;
 		}
-		//		if (pmt->formattype == FORMAT_VideoInfo2) {DeleteMediaType(pmt); return false;} // TODO
+		//if (pmt->formattype == FORMAT_VideoInfo2) {DeleteMediaType(pmt); return false;} // TODO
 
 		CFormat<T>* pf = Find(MakeFormatName(pmt), true);
 		if (!pf) {
@@ -171,7 +171,7 @@ public:
 								? &((VIDEOINFOHEADER*)pmt->pbFormat)->bmiHeader
 								: (pmt->formattype == FORMAT_VideoInfo2)
 								? &((VIDEOINFOHEADER2*)pmt->pbFormat)->bmiHeader
-								: NULL;
+								: nullptr;
 
 		if (!bih) {
 			// it may have a fourcc in the mediasubtype, let's check that
@@ -233,9 +233,9 @@ public:
 								? &((VIDEOINFOHEADER*)pfe->mt.pbFormat)->bmiHeader
 								: (pfe->mt.formattype == FORMAT_VideoInfo2)
 								? &((VIDEOINFOHEADER2*)pfe->mt.pbFormat)->bmiHeader
-								: NULL;
+								: nullptr;
 
-		if (bih == NULL) {
+		if (bih == nullptr) {
 			return(str);
 		}
 
@@ -267,7 +267,7 @@ public:
 
 		WAVEFORMATEX* wfe = (pmt->formattype == FORMAT_WaveFormatEx)
 							? (WAVEFORMATEX*)pmt->pbFormat
-							: NULL;
+							: nullptr;
 
 		if (!wfe) {
 			WCHAR guid[100];
@@ -302,7 +302,7 @@ public:
 
 		WAVEFORMATEX* wfe = (pfe->mt.formattype == FORMAT_WaveFormatEx)
 							? (WAVEFORMATEX*)pfe->mt.pbFormat
-							: NULL;
+							: nullptr;
 
 		if (!wfe) {
 			return(str);
@@ -402,7 +402,7 @@ public:
 	CPlayerCaptureDialog(CMainFrame* pMainFrame);
 	virtual ~CPlayerCaptureDialog();
 
-	BOOL Create(CWnd* pParent = NULL);
+	BOOL Create(CWnd* pParent = nullptr);
 
 	// Dialog Data
 	enum { IDD = IDD_CAPTURE_DLG };

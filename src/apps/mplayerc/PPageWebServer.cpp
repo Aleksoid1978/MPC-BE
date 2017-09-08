@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -186,12 +186,12 @@ bool CPPageWebServer::PickDir(CString& dir)
 		CFileDialog dlg(TRUE);
 		IFileOpenDialog *openDlgPtr = dlg.GetIFileOpenDialog();
 
-		if (openDlgPtr != NULL) {
+		if (openDlgPtr != nullptr) {
 			openDlgPtr->SetTitle(strTitle);
 			openDlgPtr->SetOptions(FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST);
 
 			CComPtr<IShellItem> psiFolder;
-			if (SUCCEEDED(afxGlobalData.ShellCreateItemFromParsingName(dir, NULL, IID_PPV_ARGS(&psiFolder)))) {
+			if (SUCCEEDED(afxGlobalData.ShellCreateItemFromParsingName(dir, nullptr, IID_PPV_ARGS(&psiFolder)))) {
 				openDlgPtr->SetFolder(psiFolder);
 			}
 

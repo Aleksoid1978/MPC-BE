@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -136,9 +136,9 @@ BOOL CShaderAutoCompleteDlg::OnInitDialog()
 	AddAnchor(IDC_LIST1, TOP_LEFT, BOTTOM_RIGHT);
 
 	m_hToolTipWnd = CreateWindowEx(
-						WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL, TTS_NOPREFIX | TTS_ALWAYSTIP,
+						WS_EX_TOPMOST, TOOLTIPS_CLASS, nullptr, TTS_NOPREFIX | TTS_ALWAYSTIP,
 						CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-						NULL, NULL, NULL, NULL);
+						nullptr, nullptr, nullptr, nullptr);
 
 	memset(&m_ti, 0, sizeof(m_ti));
 	m_ti.cbSize = sizeof(TOOLINFO);

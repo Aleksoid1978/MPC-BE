@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,7 +26,7 @@
 class CHyperlink : public CString
 {
 public:
-	CHyperlink(LPCTSTR lpLink = NULL) : CString(lpLink) { }
+	CHyperlink(LPCTSTR lpLink = nullptr) : CString(lpLink) { }
 	~CHyperlink() { }
 	const CHyperlink& operator=(LPCTSTR lpsz) {
 		CString::operator=(lpsz);
@@ -36,7 +36,7 @@ public:
 		return CString::operator LPCTSTR();
 	}
 	/*virtual*/ HINSTANCE Navigate() {
-		return IsEmpty() ? NULL :
+		return IsEmpty() ? nullptr :
 			   ShellExecute(0, L"open", *this, 0, 0, SW_SHOWNORMAL);
 	}
 };
@@ -47,7 +47,7 @@ class CStaticLink : public CStatic
 {
 public:
 	DECLARE_DYNAMIC(CStaticLink)
-	CStaticLink(LPCTSTR lpText = NULL, bool bDeleteOnDestroy = false);
+	CStaticLink(LPCTSTR lpText = nullptr, bool bDeleteOnDestroy = false);
 	~CStaticLink() { }
 
 	CHyperlink	m_link;

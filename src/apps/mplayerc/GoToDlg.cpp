@@ -27,7 +27,7 @@
 // CGoToDlg dialog
 
 IMPLEMENT_DYNAMIC(CGoToDlg, CDialog)
-CGoToDlg::CGoToDlg(REFERENCE_TIME time, REFERENCE_TIME maxTime, double fps, CWnd* pParent /*=NULL*/)
+CGoToDlg::CGoToDlg(REFERENCE_TIME time, REFERENCE_TIME maxTime, double fps, CWnd* pParent /*=nullptr*/)
 	: CDialog(CGoToDlg::IDD, pParent)
 	, m_time(time)
 	, m_maxTime(maxTime)

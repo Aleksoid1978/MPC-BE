@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,10 +39,10 @@ public:
 	CPlayerNavigationDialog();
 	virtual ~CPlayerNavigationDialog();
 
-	BOOL Create(CWnd* pParent = NULL);
+	BOOL Create(CWnd* pParent = nullptr);
 	void UpdateElementList();
 	void UpdatePos(int nID);
-	void SetupAudioSwitcherSubMenu(CDVBChannel* Channel = NULL);
+	void SetupAudioSwitcherSubMenu(CDVBChannel* Channel = nullptr);
 	int p_nItems[MAX_CHANNELS_ALLOWED];
 	DVBStreamInfo m_audios[DVB_MAX_AUDIO];
 	bool m_bTVStations;

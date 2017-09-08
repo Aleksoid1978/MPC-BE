@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -78,7 +78,7 @@ void CInPlaceWinHotkey::OnKillFocus(CWnd* pNewWnd)
 	dispinfo.item.mask = LVIF_TEXT;
 	dispinfo.item.iItem = m_iItem;
 	dispinfo.item.iSubItem = m_iSubItem;
-	dispinfo.item.pszText = m_bESC ? NULL : LPTSTR((LPCTSTR)str);
+	dispinfo.item.pszText = m_bESC ? nullptr : LPTSTR((LPCTSTR)str);
 	dispinfo.item.cchTextMax = str.GetLength();
 	GetParent()->GetParent()->SendMessage(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
 
@@ -177,7 +177,7 @@ void CInPlaceEdit::OnKillFocus(CWnd* pNewWnd)
 	dispinfo.item.mask = LVIF_TEXT;
 	dispinfo.item.iItem = m_iItem;
 	dispinfo.item.iSubItem = m_iSubItem;
-	dispinfo.item.pszText = m_bESC ? NULL : LPTSTR((LPCTSTR)str);
+	dispinfo.item.pszText = m_bESC ? nullptr : LPTSTR((LPCTSTR)str);
 	dispinfo.item.cchTextMax = str.GetLength();
 	GetParent()->GetParent()->SendMessage(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
 
@@ -308,7 +308,7 @@ int CInPlaceComboBox::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CFont* font = GetParent()->GetFont();
 	SetFont(font);
 
-	for (POSITION pos = m_lstItems.GetHeadPosition(); pos != NULL;) {
+	for (POSITION pos = m_lstItems.GetHeadPosition(); pos != nullptr;) {
 		AddString((LPCTSTR)(m_lstItems.GetNext(pos)));
 	}
 
@@ -345,7 +345,7 @@ void CInPlaceComboBox::OnKillFocus(CWnd* pNewWnd)
 	dispinfo.item.mask = LVIF_TEXT|LVIF_PARAM;
 	dispinfo.item.iItem = m_iItem;
 	dispinfo.item.iSubItem = m_iSubItem;
-	dispinfo.item.pszText = m_bESC ? NULL : LPTSTR((LPCTSTR)str);
+	dispinfo.item.pszText = m_bESC ? nullptr : LPTSTR((LPCTSTR)str);
 	dispinfo.item.cchTextMax = str.GetLength();
 	dispinfo.item.lParam = GetCurSel();
 	GetParent()->GetParent()->SendMessage(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
@@ -416,7 +416,7 @@ int CInPlaceListBox::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CFont* font = GetParent()->GetFont();
 	SetFont(font);
 
-	for (POSITION pos = m_lstItems.GetHeadPosition(); pos != NULL;) {
+	for (POSITION pos = m_lstItems.GetHeadPosition(); pos != nullptr;) {
 		AddString( (LPCTSTR) (m_lstItems.GetNext( pos )) );
 	}
 	SetCurSel( m_nSel );
@@ -452,7 +452,7 @@ void CInPlaceListBox::OnKillFocus(CWnd* pNewWnd)
 	dispinfo.item.mask = LVIF_TEXT|LVIF_PARAM;
 	dispinfo.item.iItem = m_iItem;
 	dispinfo.item.iSubItem = m_iSubItem;
-	dispinfo.item.pszText = m_bESC ? NULL : LPTSTR((LPCTSTR)str);
+	dispinfo.item.pszText = m_bESC ? nullptr : LPTSTR((LPCTSTR)str);
 	dispinfo.item.cchTextMax = str.GetLength();
 	dispinfo.item.lParam = GetCurSel();
 	GetParent()->GetParent()->SendMessage(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
@@ -510,7 +510,7 @@ int CPlayerListCtrl::HitTestEx(CPoint& point, int* col) const
 		*col = 0;
 	}
 
-	int row = HitTest(CPoint(0, point.y), NULL);
+	int row = HitTest(CPoint(0, point.y), nullptr);
 
 	if ((GetWindowLongPtr(m_hWnd, GWL_STYLE) & LVS_TYPEMASK) != LVS_REPORT) {
 		return row;
@@ -565,7 +565,7 @@ int CPlayerListCtrl::GetBottomIndex() const
 CImageList* CPlayerListCtrl::CreateDragImageEx(LPPOINT lpPoint)
 {
 	if (GetSelectedCount() <= 0) {
-		return NULL;
+		return nullptr;
 	}
 
 	CRect cSingleRect, cCompleteRect(0, 0, 0, 0);
@@ -603,11 +603,11 @@ CImageList* CPlayerListCtrl::CreateDragImageEx(LPPOINT lpPoint)
 	CBitmap cBitmap;
 
 	if (!cMemDC.CreateCompatibleDC(&cDc)) {
-		return NULL;
+		return nullptr;
 	}
 
 	if (!cBitmap.CreateCompatibleBitmap(&cDc, cCompleteRect.Width(), cCompleteRect.Height())) {
-		return NULL;
+		return nullptr;
 	}
 
 	CBitmap* pOldMemDCBitmap = cMemDC.SelectObject(&cBitmap);
@@ -707,7 +707,7 @@ CWinHotkeyCtrl* CPlayerListCtrl::ShowInPlaceWinHotkey(int nItem, int nCol)
 {
 	CRect rect;
 	if (!PrepareInPlaceControl(nItem, nCol, rect)) {
-		return(NULL);
+		return(nullptr);
 	}
 
 	DWORD dwStyle = /*WS_BORDER|*/WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_LEFT;
@@ -729,7 +729,7 @@ CEdit* CPlayerListCtrl::ShowInPlaceEdit(int nItem, int nCol)
 {
 	CRect rect;
 	if (!PrepareInPlaceControl(nItem, nCol, rect)) {
-		return(NULL);
+		return(nullptr);
 	}
 
 	DWORD dwStyle = /*WS_BORDER|*/WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL;
@@ -753,7 +753,7 @@ CEdit* CPlayerListCtrl::ShowInPlaceFloatEdit(int nItem, int nCol)
 {
 	CRect rect;
 	if (!PrepareInPlaceControl(nItem, nCol, rect)) {
-		return(NULL);
+		return(nullptr);
 	}
 
 	DWORD dwStyle = /*WS_BORDER|*/WS_CHILD | WS_VISIBLE|ES_AUTOHSCROLL|ES_RIGHT;
@@ -770,7 +770,7 @@ CComboBox* CPlayerListCtrl::ShowInPlaceComboBox(int nItem, int nCol, CAtlList<CS
 {
 	CRect rect;
 	if (!PrepareInPlaceControl(nItem, nCol, rect)) {
-		return(NULL);
+		return(nullptr);
 	}
 
 	DWORD dwStyle = /*WS_BORDER|*/WS_CHILD | WS_VISIBLE | WS_VSCROLL/* | WS_HSCROLL*/
@@ -798,7 +798,7 @@ CListBox* CPlayerListCtrl::ShowInPlaceListBox(int nItem, int nCol, CAtlList<CStr
 {
 	CRect rect;
 	if (!PrepareInPlaceControl(nItem, nCol, rect)) {
-		return(NULL);
+		return(nullptr);
 	}
 
 	DWORD dwStyle = WS_BORDER | WS_CHILD | WS_VISIBLE | WS_VSCROLL/* | WS_HSCROLL*/ | LBS_NOTIFY;
@@ -911,7 +911,7 @@ void CPlayerListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 		dispinfo.item.iSubItem = m_nSubItemClicked;
 		if (GetParent()->SendMessage(WM_NOTIFY, GetDlgCtrlID(), (LPARAM)&dispinfo)) {
 			if (m_tStartEditingDelay > 0) {
-				m_nTimerID = SetTimer(1, m_tStartEditingDelay, NULL);
+				m_nTimerID = SetTimer(1, m_tStartEditingDelay, nullptr);
 			} else {
 				dispinfo.hdr.code = LVN_DOLABELEDIT;
 				GetParent()->SendMessage(WM_NOTIFY, GetDlgCtrlID(), (LPARAM)&dispinfo);

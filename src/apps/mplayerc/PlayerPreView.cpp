@@ -106,7 +106,7 @@ int CPreView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_videorect.right  = rc.right  - (m_border + 1);
 	m_videorect.bottom = rc.bottom - (m_border + 1);
 
-	if (!m_view.Create(NULL, NULL, WS_CHILD | WS_VISIBLE, m_videorect, this, 0)) {
+	if (!m_view.Create(nullptr, nullptr, WS_CHILD | WS_VISIBLE, m_videorect, this, 0)) {
 		return -1;
 	}
 
@@ -310,12 +310,12 @@ void CPreView::SetWindowSize()
 	CRect rc;
 	GetClientRect(&rc);
 	if (rc.Width() != w || rc.Height() != h) {
-		SetWindowPos(NULL, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+		SetWindowPos(nullptr, 0, 0, w, h, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
 
 		GetClientRect(&rc);
 		m_videorect.right = rc.right - (m_border + 1);
 		m_videorect.bottom = rc.bottom - (m_border + 1);
 
-		m_view.SetWindowPos(NULL, 0, 0, m_videorect.Width(), m_videorect.Height(), SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+		m_view.SetWindowPos(nullptr, 0, 0, m_videorect.Width(), m_videorect.Height(), SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
 	}
 }

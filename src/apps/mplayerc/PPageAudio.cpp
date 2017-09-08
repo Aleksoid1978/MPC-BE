@@ -89,7 +89,7 @@ BOOL CPPageAudio::OnInitDialog()
 	int i = 2;
 
 	BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
-		LPOLESTR olestr = NULL;
+		LPOLESTR olestr = nullptr;
 		if (FAILED(pMoniker->GetDisplayName(0, 0, &olestr))) {
 			continue;
 		}
@@ -97,16 +97,16 @@ BOOL CPPageAudio::OnInitDialog()
 		CComPtr<IPropertyBag> pPB;
 		if (SUCCEEDED(pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB))) {
 			CComVariant var;
-			if (pPB->Read(CComBSTR(L"FriendlyName"), &var, NULL) == S_OK) {
+			if (pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr) == S_OK) {
 				CStringW fname = var.bstrVal;
 				bool dev_enable = true;
 
 				var.Clear();
-				if (pPB->Read(CComBSTR(L"WaveOutId"), &var, NULL) == S_OK) {
+				if (pPB->Read(CComBSTR(L"WaveOutId"), &var, nullptr) == S_OK) {
 					//if (var.lVal >= 0) { fname.Insert(0, L"WaveOut: "); }
 					dev_enable = false; // skip WaveOut devices
 				}
-				else if (pPB->Read(CComBSTR(L"DSGuid"), &var, NULL) == S_OK) {
+				else if (pPB->Read(CComBSTR(L"DSGuid"), &var, nullptr) == S_OK) {
 					if (CString(var.bstrVal) == "{00000000-0000-0000-0000-000000000000}") {
 						dev_enable = false; // skip Default DirectSound Device
 					}
@@ -203,7 +203,7 @@ void CPPageAudio::ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKNOWN lpunk,
 	}
 
 	HRESULT hr;
-	CUnknown* pObj = CreateInstance(NULL, &hr);
+	CUnknown* pObj = CreateInstance(nullptr, &hr);
 
 	if (!pObj) {
 		return;
@@ -230,7 +230,7 @@ void CPPageAudio::OnAudioRendererChange()
 		flag = TRUE;
 	} else {
 		BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
-			LPOLESTR olestr = NULL;
+			LPOLESTR olestr = nullptr;
 			if (FAILED(pMoniker->GetDisplayName(0, 0, &olestr))) {
 				continue;
 			}
@@ -240,7 +240,7 @@ void CPPageAudio::OnAudioRendererChange()
 
 			if (str == m_AudioRendererDisplayNames[m_iAudioRendererType]) {
 				CComPtr<IBaseFilter> pBF;
-				HRESULT hr = pMoniker->BindToObject(NULL, NULL, IID_PPV_ARGS(&pBF));
+				HRESULT hr = pMoniker->BindToObject(nullptr, nullptr, IID_PPV_ARGS(&pBF));
 				if (SUCCEEDED(hr)) {
 					if (CComQIPtr<ISpecifyPropertyPages> pSPP = pBF) {
 						flag = TRUE;
@@ -265,7 +265,7 @@ void CPPageAudio::OnAudioRenderPropClick()
 		ShowPPage(CreateInstance<CMpcAudioRenderer>);
 	} else {
 		BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
-			LPOLESTR olestr = NULL;
+			LPOLESTR olestr = nullptr;
 			if (FAILED(pMoniker->GetDisplayName(0, 0, &olestr))) {
 				continue;
 			}
@@ -275,9 +275,9 @@ void CPPageAudio::OnAudioRenderPropClick()
 
 			if (str == str_audio) {
 				CComPtr<IBaseFilter> pBF;
-				HRESULT hr = pMoniker->BindToObject(NULL, NULL, IID_PPV_ARGS(&pBF));
+				HRESULT hr = pMoniker->BindToObject(nullptr, nullptr, IID_PPV_ARGS(&pBF));
 				if (SUCCEEDED(hr)) {
-					ISpecifyPropertyPages *pProp = NULL;
+					ISpecifyPropertyPages *pProp = nullptr;
 					hr = pBF->QueryInterface(IID_PPV_ARGS(&pProp));
 					if (SUCCEEDED(hr)) {
 						// Get the filter's name and IUnknown pointer.
@@ -302,7 +302,7 @@ void CPPageAudio::OnAudioRenderPropClick()
 									caGUID.cElems,			// Number of property pages
 									caGUID.pElems,			// Array of property page CLSIDs
 									0,						// Locale identifier
-									0, NULL					// Reserved
+									0, nullptr				// Reserved
 								);
 
 								// Clean up.

@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2016 see Authors.txt
+ * (C) 2015-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,7 +29,7 @@ class CItemPropertiesDlg : public CResizableDialog
 	//DECLARE_DYNAMIC(CItemPropertiesDlg)
 
 public:
-	CItemPropertiesDlg(LPCTSTR propName, LPCTSTR propPath, CWnd* pParent = NULL);
+	CItemPropertiesDlg(LPCTSTR propName, LPCTSTR propPath, CWnd* pParent = nullptr);
 	virtual ~CItemPropertiesDlg();
 
 	LPCTSTR GetPropertyName() { return m_PropertyName; };

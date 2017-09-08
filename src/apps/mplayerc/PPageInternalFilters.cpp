@@ -427,7 +427,7 @@ BOOL CPPageInternalFilters::OnInitDialog()
 				checked = s.AudioFilters[s_filters[i].flag];
 				break;
 			default:
-				listbox = NULL;
+				listbox = nullptr;
 				checked = false;
 		}
 
@@ -526,7 +526,7 @@ void CPPageInternalFilters::ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKN
 	}
 
 	HRESULT hr;
-	CUnknown* pObj = CreateInstance(NULL, &hr);
+	CUnknown* pObj = CreateInstance(nullptr, &hr);
 
 	if (!pObj) {
 		return;

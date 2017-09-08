@@ -106,7 +106,7 @@ BOOL CAboutDlg::OnInitDialog()
 		m_Credits.Replace(L"Authors.txt", L"<a>Authors.txt</a>");
 	}
 
-	if (m_hIcon != NULL) {
+	if (m_hIcon != nullptr) {
 		static_cast<CStatic*>(GetDlgItem(IDC_MAINFRAME_ICON))->SetIcon(m_hIcon);
 	}
 
@@ -135,14 +135,14 @@ END_MESSAGE_MAP()
 
 void CAboutDlg::OnHomepage(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	ShellExecute(m_hWnd, L"open", _T(MPC_VERSION_COMMENTS), NULL, NULL, SW_SHOWDEFAULT);
+	ShellExecute(m_hWnd, L"open", _T(MPC_VERSION_COMMENTS), nullptr, nullptr, SW_SHOWDEFAULT);
 
 	*pResult = 0;
 }
 
 void CAboutDlg::OnAuthors(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	ShellExecute(m_hWnd, L"open", m_AuthorsPath, NULL, NULL, SW_SHOWDEFAULT);
+	ShellExecute(m_hWnd, L"open", m_AuthorsPath, nullptr, nullptr, SW_SHOWDEFAULT);
 
 	*pResult = 0;
 }

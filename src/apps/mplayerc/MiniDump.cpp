@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -47,18 +47,18 @@ CMiniDump::CMiniDump()
 
 LPTOP_LEVEL_EXCEPTION_FILTER WINAPI MyDummySetUnhandledExceptionFilter( LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter )
 {
-	return NULL;
+	return nullptr;
 }
 
 BOOL CMiniDump::PreventSetUnhandledExceptionFilter()
 {
 	HMODULE hKernel32 = LoadLibrary(L"kernel32.dll");
-	if (hKernel32 == NULL) {
+	if (hKernel32 == nullptr) {
 		return FALSE;
 	}
 
 	void *pOrgEntry = GetProcAddress(hKernel32, "SetUnhandledExceptionFilter");
-	if (pOrgEntry == NULL) {
+	if (pOrgEntry == nullptr) {
 		return FALSE;
 	}
 
@@ -81,7 +81,7 @@ BOOL CMiniDump::PreventSetUnhandledExceptionFilter()
 LONG WINAPI CMiniDump::UnhandledExceptionFilter( _EXCEPTION_POINTERS *lpTopLevelExceptionFilter )
 {
 	LONG	retval	= EXCEPTION_CONTINUE_SEARCH;
-	HMODULE	hDll	= NULL;
+	HMODULE	hDll	= nullptr;
 	WCHAR	szResult[800] = {0};
 	CString strDumpPath;
 
@@ -91,31 +91,31 @@ LONG WINAPI CMiniDump::UnhandledExceptionFilter( _EXCEPTION_POINTERS *lpTopLevel
 
 	hDll = ::LoadLibrary(GetProgramDir() + L"DBGHELP.DLL");
 
-	if (hDll == NULL) {
+	if (hDll == nullptr) {
 		hDll = ::LoadLibrary(L"DBGHELP.DLL");
 	}
 
-	if (hDll != NULL) {
+	if (hDll != nullptr) {
 		MINIDUMPWRITEDUMP pMiniDumpWriteDump = (MINIDUMPWRITEDUMP)::GetProcAddress(hDll, "MiniDumpWriteDump");
-		if (pMiniDumpWriteDump != NULL && AfxGetMyApp()->GetAppSavePath(strDumpPath)) {
+		if (pMiniDumpWriteDump != nullptr && AfxGetMyApp()->GetAppSavePath(strDumpPath)) {
 			// Check that the folder actually exists
 			if (!::PathFileExists(strDumpPath)) {
-				VERIFY(CreateDirectory(strDumpPath, NULL));
+				VERIFY(CreateDirectory(strDumpPath, nullptr));
 			}
 
 			strDumpPath.AppendFormat(L"%s.exe.%d.%d.%d.%d.dmp", AfxGetApp()->m_pszExeName, MPC_VERSION_NUM_SVN);
 
-			HANDLE hFile = ::CreateFile(strDumpPath, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS,
-										FILE_ATTRIBUTE_NORMAL, NULL);
+			HANDLE hFile = ::CreateFile(strDumpPath, GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS,
+										FILE_ATTRIBUTE_NORMAL, nullptr);
 
 			if (hFile != INVALID_HANDLE_VALUE) {
 				_MINIDUMP_EXCEPTION_INFORMATION ExInfo;
 
 				ExInfo.ThreadId = ::GetCurrentThreadId();
 				ExInfo.ExceptionPointers = lpTopLevelExceptionFilter;
-				ExInfo.ClientPointers = NULL;
+				ExInfo.ClientPointers = FALSE;
 
-				BOOL bDumpCreated = pMiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &ExInfo, NULL, NULL);
+				BOOL bDumpCreated = pMiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &ExInfo, nullptr, nullptr);
 				if (bDumpCreated) {
 					swprintf_s(szResult, _countof(szResult), ResStr(IDS_MPC_CRASH), strDumpPath);
 					retval = EXCEPTION_EXECUTE_HANDLER;
@@ -134,7 +134,7 @@ LONG WINAPI CMiniDump::UnhandledExceptionFilter( _EXCEPTION_POINTERS *lpTopLevel
 	if (szResult[0]) {
 		switch (MessageBox(AfxGetApp()->GetMainWnd()->m_hWnd, szResult, L"MPC-BE Mini Dump", retval ? MB_YESNO : MB_OK)) {
 			case IDYES:
-				ShellExecute(NULL, L"open", L"http://sourceforge.net/p/mpcbe/tickets/", NULL, NULL, SW_SHOWDEFAULT); // hmm
+				ShellExecute(nullptr, L"open", L"http://sourceforge.net/p/mpcbe/tickets/", nullptr, nullptr, SW_SHOWDEFAULT); // hmm
 				ExploreToFile(strDumpPath);
 				break;
 			case IDNO:

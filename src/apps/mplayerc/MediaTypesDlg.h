@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,7 +41,7 @@ private:
 	void AddMediaType(AM_MEDIA_TYPE* pmt);
 
 public:
-	CMediaTypesDlg(IGraphBuilderDeadEnd* pGBDE, CWnd* pParent = NULL);
+	CMediaTypesDlg(IGraphBuilderDeadEnd* pGBDE, CWnd* pParent = nullptr);
 	virtual ~CMediaTypesDlg();
 
 	enum { IDD = IDD_MEDIATYPES_DLG };

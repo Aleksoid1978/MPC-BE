@@ -60,7 +60,7 @@ CPPageFormats::CPPageFormats()
 	if (!m_pAAR && !SysVersion::IsWin10orLater()) {
 		// Default manager (requires at least Vista)
 		HRESULT hr = CoCreateInstance(CLSID_ApplicationAssociationRegistration,
-									  NULL,
+									  nullptr,
 									  CLSCTX_INPROC,
 									  IID_PPV_ARGS(&m_pAAR));
 		UNREFERENCED_PARAMETER(hr);
@@ -134,7 +134,7 @@ bool CPPageFormats::IsRegistered(CString ext, bool bCheckProgId/* = false*/)
 			return false;
 		}
 
-		if (ERROR_SUCCESS != key.QueryStringValue(NULL, buff, &len) && !CString(buff).Trim().IsEmpty()) {
+		if (ERROR_SUCCESS != key.QueryStringValue(nullptr, buff, &len) && !CString(buff).Trim().IsEmpty()) {
 			return false;
 		}
 
@@ -150,7 +150,7 @@ bool CPPageFormats::IsRegistered(CString ext, bool bCheckProgId/* = false*/)
 		bIsDefault = FALSE;
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, strProgID + L"\\shell\\open\\command", KEY_READ)) {
 			CString strCommand = GetOpenCommand();
-			if (ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len)) {
+			if (ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len)) {
 				bIsDefault = (strCommand.CompareNoCase(CString(buff)) == 0);
 			}
 		}
@@ -226,7 +226,7 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 	if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID)) {
 		return false;
 	}
-	if (ERROR_SUCCESS != key.SetStringValue(NULL, strLabel)) {
+	if (ERROR_SUCCESS != key.SetStringValue(nullptr, strLabel)) {
 		return false;
 	}
 
@@ -235,7 +235,7 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 		if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + L"\\shell\\enqueue")) {
 			return false;
 		}
-		if (ERROR_SUCCESS != key.SetStringValue(NULL, ResStr(IDS_ADD_TO_PLAYLIST))) {
+		if (ERROR_SUCCESS != key.SetStringValue(nullptr, ResStr(IDS_ADD_TO_PLAYLIST))) {
 			return false;
 		}
 		if (ERROR_SUCCESS != key.SetStringValue(L"Icon", L"\"" + GetProgramPath() + L"\",0")) {
@@ -245,7 +245,7 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 		if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + L"\\shell\\enqueue\\command")) {
 			return false;
 		}
-		if (bSetValue && (ERROR_SUCCESS != key.SetStringValue(NULL, GetEnqueueCommand()))) {
+		if (bSetValue && (ERROR_SUCCESS != key.SetStringValue(nullptr, GetEnqueueCommand()))) {
 			return false;
 		}
 	} else {
@@ -259,14 +259,14 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 		return false;
 	}
 	if (SetContextFiles && !ShellExtExists()) {
-		if (ERROR_SUCCESS != key.SetStringValue(NULL, ResStr(IDS_OPEN_WITH_MPC))) {
+		if (ERROR_SUCCESS != key.SetStringValue(nullptr, ResStr(IDS_OPEN_WITH_MPC))) {
 			return false;
 		}
 		if (ERROR_SUCCESS != key.SetStringValue(L"Icon", L"\"" + GetProgramPath() + L"\",0")) {
 			return false;
 		}
 	} else {
-		if (ERROR_SUCCESS != key.SetStringValue(NULL, L"")) {
+		if (ERROR_SUCCESS != key.SetStringValue(nullptr, L"")) {
 			return false;
 		}
 	}
@@ -274,7 +274,7 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 	if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + L"\\shell\\open\\command")) {
 		return false;
 	}
-	if (bSetValue && (ERROR_SUCCESS != key.SetStringValue(NULL, GetOpenCommand()))) {
+	if (bSetValue && (ERROR_SUCCESS != key.SetStringValue(nullptr, GetOpenCommand()))) {
 		return false;
 	}
 
@@ -325,7 +325,7 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 		if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strProgID + L"\\DefaultIcon")) {
 			return false;
 		}
-		if (bSetValue && (ERROR_SUCCESS != key.SetStringValue(NULL, AppIcon))) {
+		if (bSetValue && (ERROR_SUCCESS != key.SetStringValue(nullptr, AppIcon))) {
 			return false;
 		}
 	} else {
@@ -382,20 +382,20 @@ HRESULT CPPageFormats::RegisterUI()
 	HRESULT hr = E_FAIL;
 
 	if (SysVersion::IsWin10orLater()) {
-		IOpenControlPanel* pCP = NULL;
+		IOpenControlPanel* pCP = nullptr;
 		hr = CoCreateInstance(CLSID_OpenControlPanel,
-							  NULL,
+							  nullptr,
 							  CLSCTX_INPROC,
 							  IID_PPV_ARGS(&pCP));
 
 		if (SUCCEEDED(hr) && pCP) {
-			hr = pCP->Open(L"Microsoft.DefaultPrograms", L"pageDefaultProgram", NULL);
+			hr = pCP->Open(L"Microsoft.DefaultPrograms", L"pageDefaultProgram", nullptr);
 			pCP->Release();
 		}
 	} else if (SysVersion::IsWin8orLater()) {
-		IApplicationAssociationRegistrationUI* pUI = NULL;
+		IApplicationAssociationRegistrationUI* pUI = nullptr;
 		hr = CoCreateInstance(CLSID_ApplicationAssociationRegistrationUI,
-							  NULL,
+							  nullptr,
 							  CLSCTX_INPROC,
 							  IID_PPV_ARGS(&pUI));
 
@@ -413,13 +413,13 @@ void Execute(LPCTSTR lpszCommand, LPCTSTR lpszParameters)
 	SHELLEXECUTEINFO ShExecInfo = {0};
 	ShExecInfo.cbSize		= sizeof(SHELLEXECUTEINFO);
 	ShExecInfo.fMask		= SEE_MASK_NOCLOSEPROCESS;
-	ShExecInfo.hwnd			= NULL;
-	ShExecInfo.lpVerb		= NULL;
+	ShExecInfo.hwnd			= nullptr;
+	ShExecInfo.lpVerb		= nullptr;
 	ShExecInfo.lpFile		= lpszCommand;
 	ShExecInfo.lpParameters	= lpszParameters;
-	ShExecInfo.lpDirectory	= NULL;
+	ShExecInfo.lpDirectory	= nullptr;
 	ShExecInfo.nShow		= SWP_HIDEWINDOW;
-	ShExecInfo.hInstApp		= NULL;
+	ShExecInfo.hInstApp		= nullptr;
 
 	ShellExecuteEx(&ShExecInfo);
 	WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
@@ -431,7 +431,7 @@ typedef HRESULT (*_DllUnRegisterServer)(void);
 bool CPPageFormats::RegisterShellExt(LPCTSTR lpszLibrary)
 {
 	HINSTANCE hDLL = LoadLibrary(lpszLibrary);
-	if (hDLL == NULL) {
+	if (hDLL == nullptr) {
 		if (::PathFileExists(lpszLibrary)) {
 			CRegKey key;
 			if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
@@ -449,7 +449,7 @@ bool CPPageFormats::RegisterShellExt(LPCTSTR lpszLibrary)
 
 	_DllConfigFunc _dllConfigFunc         = (_DllConfigFunc)GetProcAddress(hDLL, "DllConfig");
 	_DllRegisterServer _dllRegisterServer = (_DllRegisterServer)GetProcAddress(hDLL, "DllRegisterServer");
-	if (_dllConfigFunc == NULL || _dllRegisterServer == NULL) {
+	if (_dllConfigFunc == nullptr || _dllRegisterServer == nullptr) {
 		FreeLibrary(hDLL);
 		return false;
 	}
@@ -470,7 +470,7 @@ bool CPPageFormats::RegisterShellExt(LPCTSTR lpszLibrary)
 bool CPPageFormats::UnRegisterShellExt(LPCTSTR lpszLibrary)
 {
 	HINSTANCE hDLL = LoadLibrary(lpszLibrary);
-	if (hDLL == NULL) {
+	if (hDLL == nullptr) {
 		if (::PathFileExists(lpszLibrary)) {
 			CString strParameters;
 			strParameters.Format(L" /s /u \"%s\"", lpszLibrary);
@@ -482,7 +482,7 @@ bool CPPageFormats::UnRegisterShellExt(LPCTSTR lpszLibrary)
 	}
 
 	_DllUnRegisterServer _dllUnRegisterServer = (_DllRegisterServer)GetProcAddress(hDLL, "DllUnregisterServer");
-	if (_dllUnRegisterServer == NULL) {
+	if (_dllUnRegisterServer == nullptr) {
 		FreeLibrary(hDLL);
 		return false;
 	}
@@ -526,7 +526,7 @@ void CPPageFormats::AddAutoPlayToRegistry(autoplay_t ap, bool fRegister)
 										CString(CStringA("MPCBE.Autorun\\Shell\\Play") + handlers[i].verb + "\\Command"))) {
 			return;
 		}
-		key.SetStringValue(NULL, L"\"" + exe + L"\"" + handlers[i].cmd);
+		key.SetStringValue(nullptr, L"\"" + exe + L"\"" + handlers[i].cmd);
 		key.Close();
 
 		if (ERROR_SUCCESS != key.Create(HKEY_LOCAL_MACHINE,
@@ -587,7 +587,7 @@ bool CPPageFormats::IsAutoPlayRegistered(autoplay_t ap)
 		return false;
 	}
 	len = _countof(buff);
-	if (ERROR_SUCCESS != key.QueryStringValue(NULL, buff, &len)) {
+	if (ERROR_SUCCESS != key.QueryStringValue(nullptr, buff, &len)) {
 		return false;
 	}
 	if (_wcsnicmp(L"\"" + exe, buff, exe.GetLength() + 1)) {
@@ -774,10 +774,10 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 				{
 					len = _countof(buff);
 					memset(buff, 0, len);
-					if (ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len) && !CString(buff).Trim().IsEmpty())
+					if (ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len) && !CString(buff).Trim().IsEmpty())
 					{
 						if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, strProgID + L"\\DefaultIcon"))
-							key.SetStringValue (NULL, buff);
+							key.SetStringValue (nullptr, buff);
 					}
 				}
 				*/
@@ -805,10 +805,10 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 				return false;
 			}
 
-			if (ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len) && !CString(buff).Trim().IsEmpty()) {
+			if (ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len) && !CString(buff).Trim().IsEmpty()) {
 				extoldreg = buff;
 			}
-			if (ERROR_SUCCESS != key.SetStringValue(NULL, strProgID)) {
+			if (ERROR_SUCCESS != key.SetStringValue(nullptr, strProgID)) {
 				return false;
 			}
 
@@ -820,7 +820,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 				{
 					len = _countof(buff);
 					memset(buff, 0, len);
-					if (ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len) && !CString(buff).Trim().IsEmpty())
+					if (ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len) && !CString(buff).Trim().IsEmpty())
 						extOldIcon = buff;
 				}
 			}
@@ -834,7 +834,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 
 			/*
 			if (!extOldIcon.IsEmpty() && (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, strProgID + L"\\DefaultIcon")))
-				key.SetStringValue (NULL, extOldIcon);
+				key.SetStringValue (nullptr, extOldIcon);
 			*/
 		} else {
 			// Get previous association
@@ -849,7 +849,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 			if (ERROR_SUCCESS != key.Create(HKEY_CLASSES_ROOT, strExt)) {
 				return false;
 			}
-			key.SetStringValue(NULL, extoldreg);
+			key.SetStringValue(nullptr, extoldreg);
 		}
 	}
 
@@ -973,21 +973,21 @@ BOOL CPPageFormats::OnApply()
 	CRegKey key;
 	if (m_chContextDir.GetCheck() && !ShellExtExists()) {
 		if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, L"Directory\\shell\\" PROGID L".enqueue")) {
-			key.SetStringValue(NULL, ResStr(IDS_ADD_TO_PLAYLIST));
+			key.SetStringValue(nullptr, ResStr(IDS_ADD_TO_PLAYLIST));
 			key.SetStringValue(L"Icon", L"\"" + GetProgramPath() + L"\",0");
 		}
 
 		if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, L"Directory\\shell\\" PROGID L".enqueue\\command")) {
-			key.SetStringValue(NULL, GetEnqueueCommand());
+			key.SetStringValue(nullptr, GetEnqueueCommand());
 		}
 
 		if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, L"Directory\\shell\\" PROGID L".play")) {
-			key.SetStringValue(NULL, ResStr(IDS_OPEN_WITH_MPC));
+			key.SetStringValue(nullptr, ResStr(IDS_OPEN_WITH_MPC));
 			key.SetStringValue(L"Icon", L"\"" + GetProgramPath() + L"\",0");
 		}
 
 		if (ERROR_SUCCESS == key.Create(HKEY_CLASSES_ROOT, L"Directory\\shell\\" PROGID L".play\\command")) {
-			key.SetStringValue(NULL, GetOpenCommand());
+			key.SetStringValue(nullptr, GetOpenCommand());
 		}
 	} else {
 		key.Attach(HKEY_CLASSES_ROOT);
@@ -1012,7 +1012,7 @@ BOOL CPPageFormats::OnApply()
 			RegisterUI();
 		}
 
-		SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+		SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, nullptr, nullptr);
 	}
 
 	m_bFileExtChanged = false;

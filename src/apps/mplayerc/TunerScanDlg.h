@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,7 +30,7 @@ class CTunerScanDlg : public CDialog
 	DECLARE_DYNAMIC(CTunerScanDlg)
 
 public:
-	CTunerScanDlg(CWnd* pParent = NULL);
+	CTunerScanDlg(CWnd* pParent = nullptr);
 	virtual ~CTunerScanDlg();
 
 	enum { IDD = IDD_TUNER_SCAN };

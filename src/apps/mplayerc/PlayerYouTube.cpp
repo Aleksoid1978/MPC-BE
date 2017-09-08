@@ -74,7 +74,7 @@ namespace Youtube
 			}
 		}
 
-		return NULL;
+		return nullptr;
 	}
 
 	const YoutubeProfile* GetAudioProfile(int iTag)
@@ -85,7 +85,7 @@ namespace Youtube
 			}
 		}
 
-		return NULL;
+		return nullptr;
 	}
 
 	static bool CompareProfile(const YoutubeProfile* a, const YoutubeProfile* b)
@@ -243,11 +243,11 @@ namespace Youtube
 		if (hInet && !videoId.IsEmpty()) {
 			CString link;
 			link.Format(L"https://www.googleapis.com/youtube/v3/videos?id=%s&key=%s&part=snippet,contentDetails&fields=items/snippet/title,items/snippet/publishedAt,items/snippet/channelTitle,items/snippet/description,items/contentDetails/duration", videoId, GOOGLE_API_KEY);
-			HINTERNET hUrl = InternetOpenUrl(hInet, link, NULL, 0, INTERNET_OPEN_FALGS, 0);
+			HINTERNET hUrl = InternetOpenUrl(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 			if (hUrl) {
-				char* data = NULL;
+				char* data = nullptr;
 				DWORD dataSize = 0;
-				InternetReadData(hUrl, &data, dataSize, NULL);
+				InternetReadData(hUrl, &data, dataSize, nullptr);
 				InternetCloseHandle(hUrl);
 
 				if (dataSize) {
@@ -329,13 +329,13 @@ namespace Youtube
 		if (CheckURL(url)) {
 			DLog(L"Youtube::Parse_URL() : \"%s\"", url);
 
-			char* data = NULL;
+			char* data = nullptr;
 			DWORD dataSize = 0;
 
 			CString videoId;
 
 			HINTERNET hUrl;
-			HINTERNET hInet = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
+			HINTERNET hInet = InternetOpen(L"Googlebot", 0, nullptr, nullptr, 0);
 			if (hInet) {
 				HandleURL(url);
 
@@ -376,9 +376,9 @@ namespace Youtube
 					}
 				}
 
-				hUrl = InternetOpenUrl(hInet, url, NULL, 0, INTERNET_OPEN_FALGS, 0);
+				hUrl = InternetOpenUrl(hInet, url, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 				if (hUrl) {
-					InternetReadData(hUrl, &data, dataSize, NULL);
+					InternetReadData(hUrl, &data, dataSize, nullptr);
 					InternetCloseHandle(hUrl);
 				}
 			}
@@ -413,12 +413,12 @@ namespace Youtube
 
 			if (strstr(data, MATCH_AGE_RESTRICTION)) {
 				free(data);
-				data = NULL;
+				data = nullptr;
 				dataSize = 0;
 				CString link; link.Format(L"https://www.youtube.com/get_video_info?video_id=%s&ps=default&eurl=&gl=US&hl=en&el=info", videoId);
-				hUrl = InternetOpenUrl(hInet, link, NULL, 0, INTERNET_OPEN_FALGS, 0);
+				hUrl = InternetOpenUrl(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 				if (hUrl) {
-					InternetReadData(hUrl, &data, dataSize, NULL);
+					InternetReadData(hUrl, &data, dataSize, nullptr);
 					InternetCloseHandle(hUrl);
 				}
 
@@ -513,11 +513,11 @@ namespace Youtube
 			CString dashmpdUrl = UTF8To16(GetEntry(data, MATCH_MPD_START, MATCH_END));
 			if (!dashmpdUrl.IsEmpty()) {
 				dashmpdUrl.Replace(L"\\/", L"/");
-				hUrl = InternetOpenUrl(hInet, dashmpdUrl, NULL, 0, INTERNET_OPEN_FALGS, 0);
+				hUrl = InternetOpenUrl(hInet, dashmpdUrl, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 				if (hUrl) {
-					char* dashmpd = NULL;
+					char* dashmpd = nullptr;
 					DWORD dashmpdSize = 0;
-					InternetReadData(hUrl, &dashmpd, dashmpdSize, NULL);
+					InternetReadData(hUrl, &dashmpd, dashmpdSize, nullptr);
 					InternetCloseHandle(hUrl);
 					if (dashmpdSize) {
 						CString xml = UTF8To16(dashmpd);
@@ -588,11 +588,11 @@ namespace Youtube
 						if (!signature.IsEmpty() && !JSUrl.IsEmpty()) {
 							if (!bJSParsed) {
 								bJSParsed = TRUE;
-								hUrl = InternetOpenUrl(hInet, JSUrl, NULL, 0, INTERNET_OPEN_FALGS, 0);
+								hUrl = InternetOpenUrl(hInet, JSUrl, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 								if (hUrl) {
-									char* data = NULL;
+									char* data = nullptr;
 									DWORD dataSize = 0;
-									InternetReadData(hUrl, &data, dataSize, NULL);
+									InternetReadData(hUrl, &data, dataSize, nullptr);
 									InternetCloseHandle(hUrl);
 									if (dataSize) {
 										const CStringA funcName = RegExpParseA(data, "\"signature\",([a-zA-Z0-9]+)\\(");
@@ -759,7 +759,7 @@ namespace Youtube
 			const CAppSettings& s = AfxGetAppSettings();
 
 			// select video stream
-			const YoutubeUrllistItem* final_item = NULL;
+			const YoutubeUrllistItem* final_item = nullptr;
 
 			if (s.iYoutubeTagSelected) {
 				for (auto item : youtubeUrllist) {
@@ -816,7 +816,7 @@ namespace Youtube
 			CString final_audio_url;
 			if (final_item->profile->type == y_video && !audioList.empty()) {
 				int fmt = final_item->profile->format;
-				final_item = NULL;
+				final_item = nullptr;
 
 				// select audio stream
 				for (auto item : audioList) {
@@ -893,11 +893,11 @@ namespace Youtube
 					// This code is deprecated
 					CString link;
 					link.Format(L"https://video.google.com/timedtext?hl=en&type=list&v=%s", videoId);
-					hUrl = InternetOpenUrl(hInet, link, NULL, 0, INTERNET_OPEN_FALGS, 0);
+					hUrl = InternetOpenUrl(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 					if (hUrl) {
-						char* data = NULL;
+						char* data = nullptr;
 						DWORD dataSize = 0;
-						InternetReadData(hUrl, &data, dataSize, NULL);
+						InternetReadData(hUrl, &data, dataSize, nullptr);
 						InternetCloseHandle(hUrl);
 
 						if (dataSize) {
@@ -963,14 +963,14 @@ namespace Youtube
 		idx_CurrentPlay = 0;
 		if (CheckPlaylist(url)) {
 
-			char* data = NULL;
+			char* data = nullptr;
 			DWORD dataSize = 0;
 
 			HINTERNET hUrl;
-			HINTERNET hInet = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
+			HINTERNET hInet = InternetOpen(L"Googlebot", 0, nullptr, nullptr, 0);
 			if (hInet) {
 				HandleURL(url);
-				hUrl = InternetOpenUrl(hInet, url, NULL, 0, INTERNET_OPEN_FALGS, 0);
+				hUrl = InternetOpenUrl(hInet, url, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 				if (hUrl) {
 					InternetReadData(hUrl, &data, dataSize, "id=\"footer\"");
 					InternetCloseHandle(hUrl);
@@ -982,7 +982,7 @@ namespace Youtube
 				return false;
 			}
 
-			LPCSTR sMatch = NULL;
+			LPCSTR sMatch = nullptr;
 			if (strstr(data, MATCH_PLAYLIST_ITEM_START)) {
 				sMatch = MATCH_PLAYLIST_ITEM_START;
 			} else if (strstr(data, MATCH_PLAYLIST_ITEM_START2)) {
@@ -993,7 +993,7 @@ namespace Youtube
 			}
 
 			LPCSTR block = data;
-			while ((block = strstr(block, sMatch)) != NULL) {
+			while ((block = strstr(block, sMatch)) != nullptr) {
 				const CStringA blockEntry = GetEntry(block, sMatch, ">");
 				if (blockEntry.IsEmpty()) {
 					break;
@@ -1054,7 +1054,7 @@ namespace Youtube
 	{
 		bool bRet = false;
 		if (CheckURL(url)) {
-			HINTERNET hInet = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
+			HINTERNET hInet = InternetOpen(L"Googlebot", 0, nullptr, nullptr, 0);
 			if (hInet) {
 				HandleURL(url);
 

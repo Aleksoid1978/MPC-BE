@@ -33,8 +33,8 @@ IMPLEMENT_DYNAMIC(CPlayerToolBar, CToolBar)
 CPlayerToolBar::CPlayerToolBar(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
 	, m_bDisableImgListRemap(false)
-	, m_pButtonsImages(NULL)
-	, m_hDXVAIcon(NULL)
+	, m_pButtonsImages(nullptr)
+	, m_hDXVAIcon(nullptr)
 	, m_nDXVAIconWidth(0)
 	, m_nDXVAIconHeight(0)
 {
@@ -113,7 +113,7 @@ void CPlayerToolBar::SwitchTheme()
 			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
 
 			if (f) {
-				f(m_hWnd, L"Explorer", NULL);
+				f(m_hWnd, L"Explorer", nullptr);
 			}
 
 			FreeLibrary(h);
@@ -159,7 +159,7 @@ void CPlayerToolBar::SwitchTheme()
 	}
 
 	// load toolbar image
-	HBITMAP hBmp = NULL;
+	HBITMAP hBmp = nullptr;
 	bool fp = CMPCPngImage::FileExists(CString(L"toolbar"));
 	if (s.bUseDarkTheme && !fp) {
 		/*
@@ -175,7 +175,7 @@ void CPlayerToolBar::SwitchTheme()
 	}
 
 	BITMAP bitmapBmp;
-	if (NULL != hBmp) {
+	if (nullptr != hBmp) {
 		::GetObject(hBmp, sizeof(bitmapBmp), &bitmapBmp);
 
 		if (fp && bitmapBmp.bmWidth != bitmapBmp.bmHeight * 15) {
@@ -184,12 +184,12 @@ void CPlayerToolBar::SwitchTheme()
 				::GetObject(hBmp, sizeof(bitmapBmp), &bitmapBmp);
 			} else {
 				DeleteObject(hBmp);
-				hBmp = NULL;
+				hBmp = nullptr;
 			}
 		}
 	}
 
-	if (NULL != hBmp) {
+	if (nullptr != hBmp) {
 		CBitmap *bmp = DNew CBitmap();
 		bmp->Attach(hBmp);
 
@@ -219,7 +219,7 @@ void CPlayerToolBar::SwitchTheme()
 	if (s.bUseDarkTheme) {
 		if (m_hDXVAIcon) {
 			DestroyIcon(m_hDXVAIcon);
-			m_hDXVAIcon = NULL;
+			m_hDXVAIcon = nullptr;
 		}
 		m_nDXVAIconWidth = m_nDXVAIconHeight = 0;
 
@@ -239,7 +239,7 @@ void CPlayerToolBar::SwitchTheme()
 			resid = gpuImageResId[imageDpiScalePercentIndex];
 		}
 
-		hBmp = NULL;
+		hBmp = nullptr;
 		fp = CMPCPngImage::FileExists(CString(L"gpu"));
 		BITMAP bm = { 0 };
 		if (fp) {
@@ -254,7 +254,7 @@ void CPlayerToolBar::SwitchTheme()
 				::GetObject(hBmp, sizeof(bm), &bm);
 				if (bm.bmHeight >= m_nButtonHeight) {
 					DeleteObject(hBmp);
-					hBmp = NULL;
+					hBmp = nullptr;
 
 					for (int i = 0; i < _countof(gpuImageResId); i++) {
 						const int gpuresid = gpuImageResId[i];
@@ -267,7 +267,7 @@ void CPlayerToolBar::SwitchTheme()
 								}
 
 								DeleteObject(hBmp);
-								hBmp = NULL;
+								hBmp = nullptr;
 							}
 						}
 					}
@@ -286,7 +286,7 @@ void CPlayerToolBar::SwitchTheme()
 
 			CImageList *pButtonDXVA = DNew CImageList();
 			pButtonDXVA->Create(bm.bmWidth, bm.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
-			pButtonDXVA->Add(bmp, static_cast<CBitmap*>(NULL));
+			pButtonDXVA->Add(bmp, static_cast<CBitmap*>(nullptr));
 
 			m_hDXVAIcon = pButtonDXVA->ExtractIcon(0);
 
@@ -308,7 +308,7 @@ void CPlayerToolBar::SwitchTheme()
 	} else {
 		m_bDisableImgListRemap = true;
 
-		if (NULL == fp) {
+		if (false == fp) {
 			SwitchRemmapedImgList(IDB_PLAYERTOOLBAR, 2);// 2 Undo  Active
 
 			if (!m_bDisableImgListRemap) {
@@ -679,7 +679,7 @@ void CPlayerToolBar::OnCustomDraw(NMHDR *pNMHDR, LRESULT *pResult)
 
 			if (bGPU && m_hDXVAIcon) {
 				if (r10.right < r12.left - m_nDXVAIconWidth) {
-					DrawIconEx(dc.m_hDC, r12.left - 8 - m_nDXVAIconWidth, r.CenterPoint().y - (m_nDXVAIconHeight / 2 + 1), m_hDXVAIcon, 0, 0, 0, NULL, DI_NORMAL);
+					DrawIconEx(dc.m_hDC, r12.left - 8 - m_nDXVAIconWidth, r.CenterPoint().y - (m_nDXVAIconHeight / 2 + 1), m_hDXVAIcon, 0, 0, 0, nullptr, DI_NORMAL);
 				}
 			}
 
