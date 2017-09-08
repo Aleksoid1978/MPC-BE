@@ -62,7 +62,7 @@ SW_OUT_FMT s_sw_formats[] = {
 const SW_OUT_FMT* GetSWOF(int pixfmt)
 {
 	if (pixfmt < 0 || pixfmt >= PixFmt_count) {
-		return NULL;
+		return nullptr;
 	}
 	return &s_sw_formats[pixfmt];
 }
@@ -175,17 +175,17 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 // CFormatConverter
 
 CFormatConverter::CFormatConverter()
-	: m_pSwsContext(NULL)
+	: m_pSwsContext(nullptr)
 	, m_out_pixfmt(PixFmt_None)
 	, m_dstRGBRange(0)
 	, m_dstStride(0)
 	, m_planeHeight(0)
 	, m_nAlignedBufferSize(0)
-	, m_pAlignedBuffer(NULL)
+	, m_pAlignedBuffer(nullptr)
 	, m_nCPUFlag(0)
 	, m_RequiredAlignment(0)
 	, m_NumThreads(1)
-	, pConvertFn(NULL)
+	, pConvertFn(nullptr)
 {
 	ASSERT(PixFmt_count == _countof(s_sw_formats));
 
@@ -219,7 +219,7 @@ bool CFormatConverter::InitSWSContext()
 	const SW_OUT_FMT& swof = s_sw_formats[m_out_pixfmt];
 
 	m_pSwsContext = sws_getCachedContext(
-						NULL,
+						nullptr,
 						m_FProps.width,
 						m_FProps.height,
 						m_FProps.avpixfmt,
@@ -227,11 +227,11 @@ bool CFormatConverter::InitSWSContext()
 						m_FProps.height,
 						swof.av_pix_fmt,
 						SWS_BILINEAR | SWS_ACCURATE_RND | SWS_FULL_CHR_H_INP | SWS_PRINT_INFO,
-						NULL,
-						NULL,
-						NULL);
+						nullptr,
+						nullptr,
+						nullptr);
 
-	if (m_pSwsContext == NULL) {
+	if (m_pSwsContext == nullptr) {
 		DLog(L"FormatConverter::InitSWSContext() - sws_getCachedContext() failed");
 		return false;
 	}
@@ -244,7 +244,7 @@ bool CFormatConverter::InitSWSContext()
 void CFormatConverter::UpdateSWSContext()
 {
 	if (m_pSwsContext) {
-		int *inv_tbl = NULL, *tbl = NULL;
+		int *inv_tbl = nullptr, *tbl = nullptr;
 		int srcRange, dstRange, brightness, contrast, saturation;
 		int ret = sws_getColorspaceDetails(m_pSwsContext, &inv_tbl, &srcRange, &tbl, &dstRange, &brightness, &contrast, &saturation);
 		if (ret >= 0) {
@@ -437,7 +437,7 @@ bool CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		out = m_pAlignedBuffer;
 	}
 
-	uint8_t*  dstArray[4]       = { NULL };
+	uint8_t*  dstArray[4]       = { nullptr };
 	ptrdiff_t dstStrideArray[4] = { 0 };
 	ptrdiff_t byteStride        = outStride * swof.codedbytes;
 
@@ -491,7 +491,7 @@ void CFormatConverter::Cleanup()
 {
 	if (m_pSwsContext) {
 		sws_freeContext(m_pSwsContext);
-		m_pSwsContext = NULL;
+		m_pSwsContext = nullptr;
 	}
 
 	av_freep(&m_pAlignedBuffer);
@@ -502,7 +502,7 @@ void CFormatConverter::Cleanup()
 		m_rgbCoeffs = nullptr;
 	}
 
-	pConvertFn = NULL;
+	pConvertFn = nullptr;
 }
 
 bool CFormatConverter::FormatChanged(AVPixelFormat* fmt1, AVPixelFormat* fmt2)

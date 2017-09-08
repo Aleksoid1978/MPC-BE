@@ -143,9 +143,9 @@ protected:
 	BOOL									m_MVC_Base_View_R_flag;
 
 	struct {
-		MediaSideDataHDR*                  masterDataHDR        = NULL;
-		MediaSideDataHDRContentLightLevel* HDRContentLightLevel = NULL;
-		ColorSpace*                        colorSpace           = NULL;
+		MediaSideDataHDR*                  masterDataHDR        = nullptr;
+		MediaSideDataHDRContentLightLevel* HDRContentLightLevel = nullptr;
+		ColorSpace*                        colorSpace           = nullptr;
 		int                                profile              = -1;
 		int                                pix_fmt              = -1;
 

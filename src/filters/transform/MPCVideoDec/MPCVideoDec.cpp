@@ -856,13 +856,13 @@ VIDEO_OUTPUT_FORMATS DXVAFormats10bit[]	= { // DXVA2 10bit
 #include "../../filters/ffmpeg_fix.cpp"
 
 const AMOVIESETUP_PIN sudpPins[] = {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn),  sudPinTypesIn},
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut), sudPinTypesOut}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn),  sudPinTypesIn},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesOut), sudPinTypesOut}
 };
 
 const AMOVIESETUP_PIN sudpPinsUncompressed[] = {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesInUncompressed),  sudPinTypesInUncompressed},
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut), sudPinTypesOut}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesInUncompressed),  sudPinTypesInUncompressed},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesOut), sudPinTypesOut}
 };
 
 CLSID Converter_clsID = GUIDFromCString(L"{0B7FA55E-FA38-4671-A2F2-B8F300C955C4}");
@@ -874,8 +874,8 @@ const AMOVIESETUP_FILTER sudFilters[] = {
 };
 
 CFactoryTemplate g_Templates[] = {
-	{sudFilters[0].strName, sudFilters[0].clsID, CreateInstance<CMPCVideoDecFilter>, NULL, &sudFilters[0]},
-	{sudFilters[1].strName, sudFilters[1].clsID, CreateInstance<CMPCVideoDecFilter>, NULL, &sudFilters[1]},
+	{sudFilters[0].strName, sudFilters[0].clsID, CreateInstance<CMPCVideoDecFilter>, nullptr, &sudFilters[0]},
+	{sudFilters[1].strName, sudFilters[1].clsID, CreateInstance<CMPCVideoDecFilter>, nullptr, &sudFilters[1]},
 	{L"CMPCVideoDecPropertyPage", &__uuidof(CMPCVideoDecSettingsWnd), CreateInstance<CInternalPropertyPageTempl<CMPCVideoDecSettingsWnd> >},
 	{L"CMPCVideoDecPropertyPage2", &__uuidof(CMPCVideoDecCodecWnd), CreateInstance<CInternalPropertyPageTempl<CMPCVideoDecCodecWnd> >},
 };
@@ -924,10 +924,10 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nDXVACheckCompatibility(1)
 	, m_nDXVA_SD(0)
 	, m_nSwRGBLevels(0)
-	, m_pAVCodec(NULL)
-	, m_pAVCtx(NULL)
-	, m_pFrame(NULL)
-	, m_pParser(NULL)
+	, m_pAVCodec(nullptr)
+	, m_pAVCtx(nullptr)
+	, m_pFrame(nullptr)
+	, m_pParser(nullptr)
 	, m_nCodecNb(-1)
 	, m_nCodecId(AV_CODEC_ID_NONE)
 	, m_bCalculateStopTime(false)
@@ -947,8 +947,8 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nARY(0)
 	, m_bUseDXVA(true)
 	, m_bUseFFmpeg(true)
-	, m_pDXVADecoder(NULL)
-	, m_pVideoOutputFormat(NULL)
+	, m_pDXVADecoder(nullptr)
+	, m_pVideoOutputFormat(nullptr)
 	, m_nVideoOutputCount(0)
 	, m_hDevice(INVALID_HANDLE_VALUE)
 	, m_bWaitingForKeyFrame(TRUE)
@@ -958,7 +958,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_bDecodingStart(FALSE)
 	, m_bHighBitdepth(FALSE)
 	, m_dRate(1.0)
-	, m_pMSDKDecoder(NULL)
+	, m_pMSDKDecoder(nullptr)
 	, m_iMvcOutputMode(MVC_OUTPUT_Auto)
 	, m_bMvcSwapLR(false)
 	, m_MVC_Base_View_R_flag(FALSE)
@@ -1065,7 +1065,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	av_log_set_callback(ff_log);
 	m_FormatConverter.SetOptions(m_nSwRGBLevels);
 
-	HWND hWnd = NULL;
+	HWND hWnd = nullptr;
 	EnumWindows(EnumFindProcessWnd, (LPARAM)&hWnd);
 	DetectVideoCard(hWnd);
 
@@ -1468,10 +1468,10 @@ void CMPCVideoDecFilter::Cleanup()
 
 void CMPCVideoDecFilter::ffmpegCleanup()
 {
-	m_pAVCodec = NULL;
+	m_pAVCodec = nullptr;
 
 	av_parser_close(m_pParser);
-	m_pParser = NULL;
+	m_pParser = nullptr;
 
 	if (m_pAVCtx) {
 		av_freep(&m_pAVCtx->hwaccel_context);
@@ -1532,7 +1532,7 @@ bool CMPCVideoDecFilter::IsAVI()
 	BeginEnumFilters(m_pGraph, pEF, pBF) {
 		CComQIPtr<IFileSourceFilter> pFSF = pBF;
 		if (pFSF) {
-			LPOLESTR pFN = NULL;
+			LPOLESTR pFN = nullptr;
 			AM_MEDIA_TYPE mt;
 			if (SUCCEEDED(pFSF->GetCurFile(&pFN, &mt)) && pFN && *pFN) {
 				fname = CString(pFN);
@@ -1625,7 +1625,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 
 	if (m_pDecoderService) {
 		UINT cDecoderGuids               = 0;
-		GUID* pDecoderGuids              = NULL;
+		GUID* pDecoderGuids              = nullptr;
 		GUID decoderGuid                 = GUID_NULL;
 		BOOL bFoundDXVA2Configuration    = FALSE;
 		DXVA2_ConfigPictureDecode config = { 0 };
@@ -1686,7 +1686,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	const BOOL bChangeType = (m_pCurrentMediaType != *pmt);
 
 redo:
-	const BOOL bReinit = (m_pAVCtx != NULL);
+	const BOOL bReinit = (m_pAVCtx != nullptr);
 
 	int x264_build = -1;
 	if (m_nCodecId == AV_CODEC_ID_H264 && bReinit && !bChangeType) {
@@ -1775,7 +1775,7 @@ redo:
 	m_pFrame = av_frame_alloc();
 	CheckPointer(m_pFrame, E_POINTER);
 
-	BITMAPINFOHEADER *pBMI = NULL;
+	BITMAPINFOHEADER *pBMI = nullptr;
 	if (pmt->formattype == FORMAT_VideoInfo) {
 		VIDEOINFOHEADER* vih	= (VIDEOINFOHEADER*)pmt->pbFormat;
 		pBMI					= &vih->bmiHeader;
@@ -1840,7 +1840,7 @@ redo:
 	}
 
 	avcodec_lock;
-	const int ret = avcodec_open2(m_pAVCtx, m_pAVCodec, NULL);
+	const int ret = avcodec_open2(m_pAVCtx, m_pAVCodec, nullptr);
 	avcodec_unlock;
 	if (ret < 0) {
 		return VFW_E_INVALIDMEDIATYPE;
@@ -1866,7 +1866,7 @@ redo:
 			}
 
 			unsigned size = 0;
-			LPVOID pData = NULL;
+			LPVOID pData = nullptr;
 			if (SUCCEEDED(pIExFilterInfo->GetBin("VIDEO_COLOR_SPACE", &pData, &size))) {
 				if (size == sizeof(ColorSpace)) {
 					m_FilterInfo.colorSpace = DNew ColorSpace;
@@ -2019,7 +2019,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 		if (av_pfdesc) {
 			int lumabits = av_pfdesc->comp->depth;
 
-			const MPCPixelFormat* OutList = NULL;
+			const MPCPixelFormat* OutList = nullptr;
 
 			if (av_pfdesc->nb_components <= 2) { // greyscale formats with and without alfa channel
 				if (lumabits <= 8) {
@@ -2076,7 +2076,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 				}
 			}
 
-			if (OutList == NULL) {
+			if (OutList == nullptr) {
 				OutList = YUV420_8;
 			}
 
@@ -2193,9 +2193,9 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 {
 	// code from LAV ...
 	// Process Extradata
-	BYTE *extra = NULL;
+	BYTE *extra = nullptr;
 	unsigned extralen = 0;
-	getExtraData((const BYTE *)pmt->Format(), pmt->FormatType(), pmt->FormatLength(), NULL, &extralen);
+	getExtraData((const BYTE *)pmt->Format(), pmt->FormatType(), pmt->FormatLength(), nullptr, &extralen);
 
 	BOOL bH264avc = FALSE;
 	if (pmt->formattype == FORMAT_MPEG2Video && (m_pAVCtx->codec_tag == MAKEFOURCC('a','v','c','1') || m_pAVCtx->codec_tag == MAKEFOURCC('A','V','C','1') || m_pAVCtx->codec_tag == MAKEFOURCC('C','C','V','1'))) {
@@ -2244,13 +2244,13 @@ void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType
 		DLog(L"CMPCVideoDecFilter::AllocExtradata() : processing extradata of %d bytes", extralen);
 		// Just copy extradata for other formats
 		extra = (uint8_t *)av_mallocz(extralen + AV_INPUT_BUFFER_PADDING_SIZE);
-		getExtraData((const BYTE *)pmt->Format(), pmt->FormatType(), pmt->FormatLength(), extra, NULL);
+		getExtraData((const BYTE *)pmt->Format(), pmt->FormatType(), pmt->FormatLength(), extra, nullptr);
 
 		if (m_nCodecId == AV_CODEC_ID_H264) {
 			ReconstructH264Extra(extra, extralen, 0);
 		} else if (m_nCodecId == AV_CODEC_ID_HEVC) {
 			// try Reconstruct NAL units sequence into NAL Units in Byte-Stream Format
-			BYTE* dst   = NULL;
+			BYTE* dst   = nullptr;
 			int dst_len = 0;
 			BOOL vps_present = FALSE, sps_present = FALSE, pps_present = FALSE;
 			CH265Nalu Nalu;
@@ -2369,7 +2369,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 						0,
 						DXVA2_VideoDecoderRenderTarget,
 						pSurfaces,
-						NULL);
+						nullptr);
 				if (FAILED(hr)) {
 					DLog(L"CMPCVideoDecFilter::CompleteConnect() : IDirectXVideoDecoderService::CreateSurface() - FAILED (0x%08x)", hr);
 					break;
@@ -2420,7 +2420,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 			BeginEnumFilters(m_pGraph, pEF, pBF) {
 				if (CComQIPtr<IPropertyBag> pPB = pBF) {
 					CComVariant var;
-					if (SUCCEEDED(pPB->Read(L"STEREOSCOPIC3DMODE", &var, NULL)) && var.vt == VT_BSTR) {
+					if (SUCCEEDED(pPB->Read(L"STEREOSCOPIC3DMODE", &var, nullptr)) && var.vt == VT_BSTR) {
 						CString mode(var.bstrVal); mode.MakeLower();
 						m_MVC_Base_View_R_flag = mode == L"mvc_rl";
 						break;
@@ -2531,7 +2531,7 @@ HRESULT CMPCVideoDecFilter::EndOfStream()
 	CAutoLock cAutoLock(&m_csReceive);
 	m_pMSDKDecoder
 		? m_pMSDKDecoder->EndOfStream()
-		: Decode(NULL, 0, INVALID_TIME, INVALID_TIME);
+		: Decode(nullptr, 0, INVALID_TIME, INVALID_TIME);
 
 	return __super::EndOfStream();
 }
@@ -2832,7 +2832,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 		}
 
 		CComPtr<IMediaSample> pOut;
-		BYTE* pDataOut = NULL;
+		BYTE* pDataOut = nullptr;
 		DXVA2_ExtendedFormat dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
 
 		if (FAILED(hr = GetDeliveryBuffer(m_pAVCtx->width, m_pAVCtx->height, &pOut, GetFrameDuration(), &dxvaExtFormat)) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
@@ -2840,7 +2840,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 		}
 
 		// Check alignment on rawvideo, which can be off depending on the source file
-		AVFrame* pTmpFrame = NULL;
+		AVFrame* pTmpFrame = nullptr;
 		if (m_nCodecId == AV_CODEC_ID_RAWVIDEO) {
 			for (size_t i = 0; i < 4; i++) {
 				if ((intptr_t)m_pFrame->data[i] % 16u || m_pFrame->linesize[i] % 16u) {
@@ -2865,7 +2865,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 		}
 
 		pOut->SetTime(&rtStartIn, &rtStopIn);
-		pOut->SetMediaTime(NULL, NULL);
+		pOut->SetMediaTime(nullptr, nullptr);
 		SetTypeSpecificFlags(pOut);
 
 		AddFrameSideData(pOut, m_pFrame);
@@ -2880,14 +2880,14 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 HRESULT CMPCVideoDecFilter::ParseInternal(const BYTE *buffer, int buflen, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bPreroll)
 {
-	BOOL bFlush = (buffer == NULL);
+	BOOL bFlush = (buffer == nullptr);
 	BYTE* pDataBuffer = (BYTE*)buffer;
 	HRESULT hr = S_OK;
 
 	while (buflen > 0 || bFlush) {
 		REFERENCE_TIME rtStart = rtStartIn, rtStop = rtStopIn;
 
-		BYTE *pOutBuffer = NULL;
+		BYTE *pOutBuffer = nullptr;
 		int pOutLen = 0;
 
 		int used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOutBuffer, &pOutLen, pDataBuffer, buflen, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
@@ -2938,7 +2938,7 @@ HRESULT CMPCVideoDecFilter::ParseInternal(const BYTE *buffer, int buflen, REFERE
 				break;
 			}
 		} else if (bFlush) {
-			hr = DecodeInternal(NULL, INVALID_TIME, INVALID_TIME);
+			hr = DecodeInternal(nullptr, INVALID_TIME, INVALID_TIME);
 			break;
 		}
 	}
@@ -2960,7 +2960,7 @@ HRESULT CMPCVideoDecFilter::Decode(const BYTE *buffer, int buflen, REFERENCE_TIM
 		hr = ParseInternal(buffer, buflen, rtStartIn, rtStopIn, bPreroll);
 	} else {
 		if (!buffer) {
-			return DecodeInternal(NULL, INVALID_TIME, INVALID_TIME);
+			return DecodeInternal(nullptr, INVALID_TIME, INVALID_TIME);
 		}
 
 		AVPacket *avpkt = av_packet_alloc();
@@ -3005,7 +3005,7 @@ HRESULT CMPCVideoDecFilter::ChangeOutputMediaFormat(int nType)
 
 		IPin* pPin = m_pOutput->GetConnected();
 		if (IsVideoRenderer(GetFilterFromPin(pPin))) {
-			hr = NotifyEvent(EC_DISPLAY_CHANGED, (LONG_PTR)pPin, NULL);
+			hr = NotifyEvent(EC_DISPLAY_CHANGED, (LONG_PTR)pPin, 0);
 			if (S_OK != hr) {
 				hr = E_FAIL;
 			}
@@ -3159,8 +3159,8 @@ HRESULT CMPCVideoDecFilter::FindDXVA2DecoderConfiguration(IDirectXVideoDecoderSe
 	UINT cConfigurations = 0;
 	bool bIsPrefered = false;
 
-	D3DFORMAT                   *pFormats	= NULL;			// size = cFormats
-	DXVA2_ConfigPictureDecode   *pConfig	= NULL;			// size = cConfigurations
+	D3DFORMAT                   *pFormats	= nullptr;			// size = cFormats
+	DXVA2_ConfigPictureDecode   *pConfig	= nullptr;			// size = cConfigurations
 
 	// Find the valid render target formats for this decoder GUID.
 	hr = pDecoderService->GetDecoderRenderTargets(guidDecoder, &cFormats, &pFormats);
@@ -3174,7 +3174,7 @@ HRESULT CMPCVideoDecFilter::FindDXVA2DecoderConfiguration(IDirectXVideoDecoderSe
 			FillInVideoDescription(VideoDesc, pFormats[iFormat]);
 
 			// Get the available configurations.
-			hr = pDecoderService->GetDecoderConfigurations(guidDecoder, &VideoDesc, NULL, &cConfigurations, &pConfig);
+			hr = pDecoderService->GetDecoderConfigurations(guidDecoder, &VideoDesc, nullptr, &cConfigurations, &pConfig);
 
 			if (FAILED(hr)) {
 				continue;
@@ -3245,8 +3245,8 @@ HRESULT CMPCVideoDecFilter::ConfigureDXVA2(IPin *pPin)
 		if (hDevice != INVALID_HANDLE_VALUE) {
 			pDeviceManager->CloseDeviceHandle(hDevice);
 		}
-		m_pDeviceManager	= NULL;
-		m_pDecoderService	= NULL;
+		m_pDeviceManager	= nullptr;
+		m_pDecoderService	= nullptr;
 		m_hDevice			= INVALID_HANDLE_VALUE;
 	}
 
@@ -3381,18 +3381,18 @@ STDMETHODIMP CMPCVideoDecFilter::CreatePage(const GUID& guid, IPropertyPage** pp
 {
 	CheckPointer(ppPage, E_POINTER);
 
-	if (*ppPage != NULL) {
+	if (*ppPage != nullptr) {
 		return E_INVALIDARG;
 	}
 
 	HRESULT hr;
 
 	if (guid == __uuidof(CMPCVideoDecSettingsWnd)) {
-		(*ppPage = DNew CInternalPropertyPageTempl<CMPCVideoDecSettingsWnd>(NULL, &hr))->AddRef();
+		(*ppPage = DNew CInternalPropertyPageTempl<CMPCVideoDecSettingsWnd>(nullptr, &hr))->AddRef();
 	}
 #ifdef REGISTER_FILTER
 	else if (guid == __uuidof(CMPCVideoDecCodecWnd)) {
-		(*ppPage = DNew CInternalPropertyPageTempl<CMPCVideoDecCodecWnd>(NULL, &hr))->AddRef();
+		(*ppPage = DNew CInternalPropertyPageTempl<CMPCVideoDecCodecWnd>(nullptr, &hr))->AddRef();
 	}
 #endif
 
@@ -3576,7 +3576,7 @@ STDMETHODIMP_(MPC_DEINTERLACING_FLAGS) CMPCVideoDecFilter::GetDeinterlacing()
 
 STDMETHODIMP_(GUID*) CMPCVideoDecFilter::GetDXVADecoderGuid()
 {
-	return m_pGraph && m_pDXVADecoder ? &m_DXVADecoderGUID : NULL;
+	return m_pGraph && m_pDXVADecoder ? &m_DXVADecoderGUID : nullptr;
 }
 
 STDMETHODIMP CMPCVideoDecFilter::SetActiveCodecs(ULONGLONG nValue)
@@ -3723,7 +3723,7 @@ STDMETHODIMP CMPCVideoDecFilter::SetMvcOutputMode(int nMode, bool bSwapLR)
 
 STDMETHODIMP_(int) CMPCVideoDecFilter::GetMvcActive()
 {
-	return m_pMSDKDecoder != NULL;
+	return m_pMSDKDecoder != nullptr;
 }
 
 STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)

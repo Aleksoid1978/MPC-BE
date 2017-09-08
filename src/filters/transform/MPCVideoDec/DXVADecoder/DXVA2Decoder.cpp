@@ -84,7 +84,7 @@ HRESULT CDXVA2Decoder::DeliverFrame()
 
 	m_pFilter->SetTypeSpecificFlags(pSample);
 	pSample->SetTime(&rtStart, &rtStop);
-	pSample->SetMediaTime(NULL, NULL);
+	pSample->SetMediaTime(nullptr, nullptr);
 
 	bool bSizeChanged = false;
 	LONG biWidth, biHeight = 0;
@@ -92,7 +92,7 @@ HRESULT CDXVA2Decoder::DeliverFrame()
 	CMediaType& mt = m_pFilter->GetOutputPin()->CurrentMediaType();
 	if (m_pFilter->GetSendMediaType()) {
 		AM_MEDIA_TYPE *sendmt = CreateMediaType(&mt);
-		BITMAPINFOHEADER *pBMI = NULL;
+		BITMAPINFOHEADER *pBMI = nullptr;
 		if (sendmt->formattype == FORMAT_VideoInfo) {
 			VIDEOINFOHEADER *vih   = (VIDEOINFOHEADER *)sendmt->pbFormat;
 			pBMI                   = &vih->bmiHeader;
@@ -124,8 +124,8 @@ HRESULT CDXVA2Decoder::DeliverFrame()
 
 int CDXVA2Decoder::get_buffer_dxva(AVFrame *pic)
 {
-	IMediaSample* pSample = NULL;
-	HRESULT hr = m_pFilter->m_pDXVA2Allocator->GetBuffer(&pSample, NULL, NULL, 0);
+	IMediaSample* pSample = nullptr;
+	HRESULT hr = m_pFilter->m_pDXVA2Allocator->GetBuffer(&pSample, nullptr, nullptr, 0);
 	if (FAILED(hr)) {
 		DLog(L"DXVA2Allocator->GetBuffer() failed: 0x%08x", hr);
 		return -1;
