@@ -328,7 +328,7 @@ public:
 				}
 			}
 
-			return NULL;
+			return nullptr;
 		}
 	};
 	typedef CStreamList CStreamsList[unknown];
@@ -369,7 +369,7 @@ public:
 			return cnt;
 		}
 
-		bool streamFind(WORD pid, int* pStream = NULL) {
+		bool streamFind(WORD pid, int* pStream = nullptr) {
 			for (size_t i = 0; i < streams.size(); i++) {
 				if (streams[i].pid == pid) {
 					if (pStream) {
@@ -409,7 +409,7 @@ public:
 				}
 			}
 
-			return NULL;
+			return nullptr;
 		}
 	} m_programs;
 
@@ -437,7 +437,7 @@ public:
 	void ReadSDT(CAtlArray<BYTE>& pData);
 	void ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id);
 
-	const program* FindProgram(WORD pid, int* pStream = NULL, const CHdmvClipInfo::Stream** pClipInfo = NULL);
+	const program* FindProgram(WORD pid, int* pStream = nullptr, const CHdmvClipInfo::Stream** pClipInfo = nullptr);
 
 	// program stream map - mpeg-ps
 	PES_STREAM_TYPE m_psm[256] = {};

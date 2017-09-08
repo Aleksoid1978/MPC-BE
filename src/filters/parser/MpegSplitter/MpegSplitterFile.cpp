@@ -1373,7 +1373,7 @@ CMpegSplitterFile::CStreamList* CMpegSplitterFile::GetMasterStream()
 		!m_streams[stream_type::video].IsEmpty()  ? &m_streams[stream_type::video]  :
 		!m_streams[stream_type::audio].IsEmpty()  ? &m_streams[stream_type::audio]  :
 		!m_streams[stream_type::subpic].IsEmpty() ? &m_streams[stream_type::subpic] :
-		NULL;
+		nullptr;
 }
 
 void CMpegSplitterFile::ReadPrograms(const trhdr& h)
@@ -1387,7 +1387,7 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 		return;
 	}
 
-	programData* ProgramData = (it != m_ProgramData.end()) ? &it->second : NULL;
+	programData* ProgramData = (it != m_ProgramData.end()) ? &it->second : nullptr;
 	if (h.payload && h.payloadstart) {
 		psihdr h2;
 		if (ReadPSI(h2)) {
@@ -2115,7 +2115,7 @@ CString ConvertDVBString(const BYTE* pBuffer, int nLength)
 			cp = codepages[0];
 		}
 
-		int nDestSize = MultiByteToWideChar(cp, MB_PRECOMPOSED, (LPCSTR)pBuffer, nLength, NULL, 0);
+		int nDestSize = MultiByteToWideChar(cp, MB_PRECOMPOSED, (LPCSTR)pBuffer, nLength, nullptr, 0);
 		if (nDestSize > 0) {
 			MultiByteToWideChar(cp, MB_PRECOMPOSED, (LPCSTR)pBuffer, nLength, strResult.GetBuffer(nLength), nDestSize);
 			strResult.ReleaseBuffer(nDestSize);
@@ -2311,13 +2311,13 @@ void CMpegSplitterFile::ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id)
 	}
 }
 
-const CMpegSplitterFile::program* CMpegSplitterFile::FindProgram(WORD pid, int* pStream/* = NULL*/, const CHdmvClipInfo::Stream** ppClipInfo/* = NULL*/)
+const CMpegSplitterFile::program* CMpegSplitterFile::FindProgram(WORD pid, int* pStream/* = nullptr*/, const CHdmvClipInfo::Stream** ppClipInfo/* = nullptr*/)
 {
 	if (pStream) {
 		*pStream = -1;
 	}
 	if (ppClipInfo) {
-		*ppClipInfo = NULL;
+		*ppClipInfo = nullptr;
 	}
 
 	if (m_type == MPEG_TYPES::mpeg_ts) {
@@ -2333,7 +2333,7 @@ const CMpegSplitterFile::program* CMpegSplitterFile::FindProgram(WORD pid, int* 
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 bool CMpegSplitterFile::GetStreamType(WORD pid, PES_STREAM_TYPE &stream_type)

@@ -55,18 +55,18 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 };
 
 const AMOVIESETUP_PIN sudpPins[] = {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn), sudPinTypesIn},
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, 0, NULL}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn), sudPinTypesIn},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, 0, nullptr}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
 	{&__uuidof(CMP4SplitterFilter), MP4SplitterName, MERIT_NORMAL, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CMP4SourceFilter), MP4SourceName, MERIT_NORMAL, 0, NULL, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CMP4SourceFilter), MP4SourceName, MERIT_NORMAL, 0, nullptr, CLSID_LegacyAmFilterCategory},
 };
 
 CFactoryTemplate g_Templates[] = {
-	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CMP4SplitterFilter>, NULL, &sudFilter[0]},
-	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CMP4SourceFilter>, NULL, &sudFilter[1]},
+	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CMP4SplitterFilter>, nullptr, &sudFilter[0]},
+	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CMP4SourceFilter>, nullptr, &sudFilter[1]},
 };
 
 int g_cTemplates = _countof(g_Templates);
@@ -87,7 +87,7 @@ STDAPI DllRegisterServer()
 	chkbytes.AddTail(L"4,4,,66726565"); // '....free'
 	chkbytes.AddTail(L"4,4,,706e6f74"); // '....pnot'
 
-	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_MP4, chkbytes, NULL);
+	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_MP4, chkbytes, nullptr);
 
 	return AMovieDllRegisterServer2(TRUE);
 }
@@ -435,13 +435,13 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			CMediaType mt;
 			mt.SetSampleSize(1);
 
-			VIDEOINFOHEADER2* vih2	= NULL;
-			WAVEFORMATEX* wfe		= NULL;
+			VIDEOINFOHEADER2* vih2	= nullptr;
+			WAVEFORMATEX* wfe		= nullptr;
 
 			AP4_DataBuffer empty;
 
 			if (AP4_SampleDescription* desc = track->GetSampleDescription(sample.GetDescriptionIndex())) {
-				AP4_MpegSampleDescription* mpeg_desc = NULL;
+				AP4_MpegSampleDescription* mpeg_desc = nullptr;
 
 				if (desc->GetType() == AP4_SampleDescription::TYPE_MPEG) {
 					mpeg_desc = dynamic_cast<AP4_MpegSampleDescription*>(desc);
@@ -974,7 +974,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								{
 									SetTrackName(&TrackName, L"MPEG4 Video (H264)");
 
-									const AP4_DataBuffer* di = NULL;
+									const AP4_DataBuffer* di = nullptr;
 									if (AP4_DataInfoAtom* avcC = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_AVCC))) {
 										di = avcC->GetData();
 									}
@@ -1136,7 +1136,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 														}
 													}
 
-													BYTE* data  = NULL;
+													BYTE* data  = nullptr;
 													size_t size = 0;
 													switch (width) {
 														case 1920:
@@ -1207,7 +1207,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								{
 									SetTrackName(&TrackName, L"HEVC Video (H.265)");
 
-									const AP4_DataBuffer* di = NULL;
+									const AP4_DataBuffer* di = nullptr;
 									if (AP4_DataInfoAtom* hvcC = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_HVCC))) {
 										di = hvcC->GetData();
 									}
@@ -1376,7 +1376,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							static ADPCMCOEFSET coef[] = { {256, 0}, {512, -256}, {0,0}, {192,64}, {240,0}, {460, -208}, {392,-232} };
 							const ULONG size = sizeof(ADPCMWAVEFORMAT) + (numcoef * sizeof(ADPCMCOEFSET));
 							ADPCMWAVEFORMAT* format = (ADPCMWAVEFORMAT*)mt.ReallocFormatBuffer(size);
-							if (format != NULL) {
+							if (format != nullptr) {
 								format->wfx.wFormatTag = WAVE_FORMAT_ADPCM;
 								format->wfx.wBitsPerSample = 4;
 								format->wfx.cbSize = (WORD)(size - sizeof(WAVEFORMATEX));
@@ -1386,7 +1386,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 						} else if (type == AP4_ATOM_TYPE('m', 's', 0x00, 0x11)) {
 							IMAADPCMWAVEFORMAT* format = (IMAADPCMWAVEFORMAT*)mt.ReallocFormatBuffer(sizeof(IMAADPCMWAVEFORMAT));
-							if (format != NULL) {
+							if (format != nullptr) {
 								format->wfx.wFormatTag = WAVE_FORMAT_IMA_ADPCM;
 								format->wfx.wBitsPerSample = 4;
 								format->wfx.cbSize = (WORD)(sizeof(IMAADPCMWAVEFORMAT) - sizeof(WAVEFORMATEX));
@@ -1415,7 +1415,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							mt.SetSampleSize(wfe->nBlockAlign);
 							if (channels > 2 || bitspersample > 16) {
 								WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEXTENSIBLE));
-								if (wfex != NULL) {
+								if (wfex != nullptr) {
 									wfex->Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
 									wfex->Format.cbSize = 22;
 									wfex->Samples.wValidBitsPerSample = bitspersample;
@@ -1427,7 +1427,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							mt.SetSampleSize(wfe->nBlockAlign);
 							if (channels > 2) {
 								WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEXTENSIBLE));
-								if (wfex != NULL) {
+								if (wfex != nullptr) {
 									wfex->Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
 									wfex->Format.cbSize = 22;
 									wfex->Samples.wValidBitsPerSample = bitspersample;
@@ -1609,7 +1609,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 
 				if (bFoundChapterTrack) {
-					char* buff = NULL;
+					char* buff = nullptr;
 					for (AP4_Cardinal i = 0; i < track->GetSampleCount(); i++) {
 						AP4_Sample sample;
 						AP4_DataBuffer data;
@@ -1890,10 +1890,10 @@ bool CMP4SplitterFilter::DemuxLoop()
 	m_pFile->Seek(0);
 	AP4_Movie* movie = m_pFile->GetMovie();
 
-	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
+	while (SUCCEEDED(hr) && !CheckRequest(nullptr)) {
 
 start:
-		CAtlMap<DWORD, trackpos>::CPair* pPairNext = NULL;
+		CAtlMap<DWORD, trackpos>::CPair* pPairNext = nullptr;
 		REFERENCE_TIME rtNext = _I64_MAX;
 		ULONGLONG nextOffset = 0;
 

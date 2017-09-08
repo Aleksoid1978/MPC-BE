@@ -51,18 +51,18 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 };
 
 const AMOVIESETUP_PIN sudpPins[] = {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn), sudPinTypesIn},
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, 0, NULL}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn), sudPinTypesIn},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, 0, nullptr}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
 	{&__uuidof(CMatroskaSplitterFilter), MatroskaSplitterName, MERIT_NORMAL, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CMatroskaSourceFilter), MatroskaSourceName, MERIT_NORMAL, 0, NULL, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CMatroskaSourceFilter), MatroskaSourceName, MERIT_NORMAL, 0, nullptr, CLSID_LegacyAmFilterCategory},
 };
 
 CFactoryTemplate g_Templates[] = {
-	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CMatroskaSplitterFilter>, NULL, &sudFilter[0]},
-	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CMatroskaSourceFilter>, NULL, &sudFilter[1]},
+	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CMatroskaSplitterFilter>, nullptr, &sudFilter[0]},
+	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CMatroskaSourceFilter>, nullptr, &sudFilter[1]},
 };
 
 int g_cTemplates = _countof(g_Templates);
@@ -73,7 +73,7 @@ STDAPI DllRegisterServer()
 		__uuidof(CMatroskaSourceFilter),
 		MEDIASUBTYPE_Matroska,
 		L"0,4,,1A45DFA3",
-		NULL);
+		nullptr);
 
 	return AMovieDllRegisterServer2(TRUE);
 }
@@ -102,9 +102,9 @@ CMatroskaSplitterFilter::CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	, m_hasHdmvDvbSubPin(false)
 	, m_Seek_rt(INVALID_TIME)
 	, m_bSupportCueDuration(FALSE)
-	, m_MasterDataHDR(NULL)
-	, m_HDRContentLightLevel(NULL)
-	, m_ColorSpace(NULL)
+	, m_MasterDataHDR(nullptr)
+	, m_HDRContentLightLevel(nullptr)
+	, m_ColorSpace(nullptr)
 	, m_profile(-1)
 	, m_pix_fmt(-1)
 	, m_bits(8)
@@ -273,7 +273,7 @@ bool CMatroskaSplitterFilter::ReadFirtsBlock(CAtlArray<byte>& pData, TrackEntry*
 
 			break;
 		}
-	} while (m_pBlock->NextBlock() && !CheckRequest(NULL) && pData.IsEmpty());
+	} while (m_pBlock->NextBlock() && !CheckRequest(nullptr) && pData.IsEmpty());
 
 	m_pBlock.Free();
 	m_pCluster.Free();
@@ -1089,7 +1089,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							bIsParse = TRUE;
 							break;
 						}
-					} while (m_pBlock->NextBlock() && SUCCEEDED(hr) && !CheckRequest(NULL) && !bIsParse);
+					} while (m_pBlock->NextBlock() && SUCCEEDED(hr) && !CheckRequest(nullptr) && !bIsParse);
 
 					m_pBlock.Free();
 					m_pCluster.Free();
@@ -1361,7 +1361,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		pPinOut.Attach(pinOut[i]);
 		TrackEntry* pTE = pinOutTE[i];
 
-		if (pTE != NULL) {
+		if (pTE != nullptr) {
 			AddOutputPin((DWORD)pTE->TrackNumber, pPinOut);
 			m_pTrackEntryMap[(DWORD)pTE->TrackNumber] = pTE;
 			m_pOrderedTrackArray.Add(pTE);
@@ -1425,7 +1425,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									BlockGroup* bg = bgn.GetNext(pos4);
 
 									if (bg->Block.TrackNumber == pCueTrackPositions->CueTrack) {
-										TrackEntry* pTE = NULL;
+										TrackEntry* pTE = nullptr;
 										if (!m_pTrackEntryMap.Lookup(TrackNumber, pTE) || !pTE) {
 											continue;
 										}
@@ -1572,7 +1572,7 @@ void CMatroskaSplitterFilter::SetupChapters(LPCSTR lng, ChapterAtom* parent, int
 	while (pos) {
 		// ChapUID zero not allow by Matroska specs
 		UINT64 ChapUID  = parent->ChapterAtoms.GetNext(pos)->ChapterUID;
-		ChapterAtom* ca = (ChapUID == 0) ? NULL : m_pFile->m_segment.FindChapterAtom(ChapUID);
+		ChapterAtom* ca = (ChapUID == 0) ? nullptr : m_pFile->m_segment.FindChapterAtom(ChapUID);
 
 		if (ca) {
 			CString name, first;
@@ -1636,7 +1636,7 @@ void CMatroskaSplitterFilter::SendVorbisHeaderSample()
 	POSITION pos = m_pTrackEntryMap.GetStartPosition();
 	while (pos) {
 		DWORD TrackNumber = 0;
-		TrackEntry* pTE = NULL;
+		TrackEntry* pTE = nullptr;
 		m_pTrackEntryMap.GetNextAssoc(pos, TrackNumber, pTE);
 
 		CBaseSplitterOutputPin* pPin = GetOutputPin(TrackNumber);
@@ -2012,7 +2012,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 									p->bSyncPoint = !p->bg->ReferenceBlock.IsValid();
 									p->TrackNumber = (DWORD)p->bg->Block.TrackNumber;
 
-									TrackEntry* pTE = NULL;
+									TrackEntry* pTE = nullptr;
 									if (!m_pTrackEntryMap.Lookup(p->TrackNumber, pTE) || !pTE) {
 										continue;
 									}
@@ -2071,7 +2071,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 				p->bSyncPoint = !p->bg->ReferenceBlock.IsValid();
 				p->TrackNumber = (DWORD)p->bg->Block.TrackNumber;
 
-				TrackEntry* pTE = NULL;
+				TrackEntry* pTE = nullptr;
 				if (!m_pTrackEntryMap.Lookup(p->TrackNumber, pTE) || !pTE) {
 					continue;
 				}
@@ -2086,11 +2086,11 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 
 				hr = DeliverPacket(p);
 			}
-		} while (m_pBlock->NextBlock() && SUCCEEDED(hr) && !CheckRequest(NULL));
+		} while (m_pBlock->NextBlock() && SUCCEEDED(hr) && !CheckRequest(nullptr));
 
 		m_pBlock.Free();
 	} while (m_pFile->GetPos() < (__int64)(m_pFile->m_segment.pos + m_pFile->m_segment.len)
-			 && m_pCluster->Next(true) && SUCCEEDED(hr) && !CheckRequest(NULL));
+			 && m_pCluster->Next(true) && SUCCEEDED(hr) && !CheckRequest(nullptr));
 
 	m_pCluster.Free();
 
@@ -2179,7 +2179,7 @@ CMatroskaSourceFilter::CMatroskaSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
 TrackEntry* CMatroskaSplitterFilter::GetTrackEntryAt(UINT aTrackIdx)
 {
 	if (aTrackIdx >= m_pOrderedTrackArray.GetCount()) {
-		return NULL;
+		return nullptr;
 	}
 	return m_pOrderedTrackArray[aTrackIdx];
 }
@@ -2192,7 +2192,7 @@ STDMETHODIMP_(UINT) CMatroskaSplitterFilter::GetTrackCount()
 STDMETHODIMP_(BOOL) CMatroskaSplitterFilter::GetTrackInfo(UINT aTrackIdx, struct TrackElement* pStructureToFill)
 {
 	TrackEntry* pTE = GetTrackEntryAt(aTrackIdx);
-	if (pTE == NULL) {
+	if (pTE == nullptr) {
 		return FALSE;
 	}
 
@@ -2213,7 +2213,7 @@ STDMETHODIMP_(BOOL) CMatroskaSplitterFilter::GetTrackInfo(UINT aTrackIdx, struct
 STDMETHODIMP_(BOOL) CMatroskaSplitterFilter::GetTrackExtendedInfo(UINT aTrackIdx, void* pStructureToFill)
 {
 	TrackEntry* pTE = GetTrackEntryAt(aTrackIdx);
-	if (pTE == NULL) {
+	if (pTE == nullptr) {
 		return FALSE;
 	}
 
@@ -2242,8 +2242,8 @@ STDMETHODIMP_(BOOL) CMatroskaSplitterFilter::GetTrackExtendedInfo(UINT aTrackIdx
 STDMETHODIMP_(BSTR) CMatroskaSplitterFilter::GetTrackName(UINT aTrackIdx)
 {
 	TrackEntry* pTE = GetTrackEntryAt(aTrackIdx);
-	if (pTE == NULL) {
-		return NULL;
+	if (pTE == nullptr) {
+		return nullptr;
 	}
 	return pTE->Name.AllocSysString();
 }
@@ -2251,8 +2251,8 @@ STDMETHODIMP_(BSTR) CMatroskaSplitterFilter::GetTrackName(UINT aTrackIdx)
 STDMETHODIMP_(BSTR) CMatroskaSplitterFilter::GetTrackCodecID(UINT aTrackIdx)
 {
 	TrackEntry* pTE = GetTrackEntryAt(aTrackIdx);
-	if (pTE == NULL) {
-		return NULL;
+	if (pTE == nullptr) {
+		return nullptr;
 	}
 	return pTE->CodecID.ToString().AllocSysString();
 }
@@ -2260,8 +2260,8 @@ STDMETHODIMP_(BSTR) CMatroskaSplitterFilter::GetTrackCodecID(UINT aTrackIdx)
 STDMETHODIMP_(BSTR) CMatroskaSplitterFilter::GetTrackCodecName(UINT aTrackIdx)
 {
 	TrackEntry* pTE = GetTrackEntryAt(aTrackIdx);
-	if (pTE == NULL) {
-		return NULL;
+	if (pTE == nullptr) {
+		return nullptr;
 	}
 	return pTE->CodecName.AllocSysString();
 }
@@ -2269,8 +2269,8 @@ STDMETHODIMP_(BSTR) CMatroskaSplitterFilter::GetTrackCodecName(UINT aTrackIdx)
 STDMETHODIMP_(BSTR) CMatroskaSplitterFilter::GetTrackCodecInfoURL(UINT aTrackIdx)
 {
 	TrackEntry* pTE = GetTrackEntryAt(aTrackIdx);
-	if (pTE == NULL) {
-		return NULL;
+	if (pTE == nullptr) {
+		return nullptr;
 	}
 	return pTE->CodecInfoURL.AllocSysString();
 }
@@ -2278,8 +2278,8 @@ STDMETHODIMP_(BSTR) CMatroskaSplitterFilter::GetTrackCodecInfoURL(UINT aTrackIdx
 STDMETHODIMP_(BSTR) CMatroskaSplitterFilter::GetTrackCodecDownloadURL(UINT aTrackIdx)
 {
 	TrackEntry* pTE = GetTrackEntryAt(aTrackIdx);
-	if (pTE == NULL) {
-		return NULL;
+	if (pTE == nullptr) {
+		return nullptr;
 	}
 	return pTE->CodecDownloadURL.AllocSysString();
 }
@@ -2301,14 +2301,14 @@ STDMETHODIMP CMatroskaSplitterFilter::CreatePage(const GUID& guid, IPropertyPage
 {
 	CheckPointer(ppPage, E_POINTER);
 
-	if (*ppPage != NULL) {
+	if (*ppPage != nullptr) {
 		return E_INVALIDARG;
 	}
 
 	HRESULT hr;
 
 	if (guid == __uuidof(CMatroskaSplitterSettingsWnd)) {
-		(*ppPage = DNew CInternalPropertyPageTempl<CMatroskaSplitterSettingsWnd>(NULL, &hr))->AddRef();
+		(*ppPage = DNew CInternalPropertyPageTempl<CMatroskaSplitterSettingsWnd>(nullptr, &hr))->AddRef();
 	}
 
 	return *ppPage ? S_OK : E_FAIL;
