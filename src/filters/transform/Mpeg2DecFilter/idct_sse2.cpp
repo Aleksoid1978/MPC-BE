@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,12 +29,12 @@
 // AP-945
 // http://cache-www.intel.com/cd/00/00/01/76/17680_w_idct.pdf
 
-static const int BITS_INV_ACC=4;
-static const int SHIFT_INV_ROW=16-BITS_INV_ACC;
-static const int SHIFT_INV_COL=1+BITS_INV_ACC;
-static const int RND_INV_ROW  =1024*(6-BITS_INV_ACC);
-static const int RND_INV_COL  =16*(BITS_INV_ACC-3);
-static const int RND_INV_CORR =RND_INV_COL-1;
+static const int BITS_INV_ACC  = 4;
+static const int SHIFT_INV_ROW = 16-BITS_INV_ACC;
+static const int SHIFT_INV_COL = 1+BITS_INV_ACC;
+static const int RND_INV_ROW   = 1024*(6-BITS_INV_ACC);
+static const int RND_INV_COL   = 16*(BITS_INV_ACC-3);
+static const int RND_INV_CORR  = RND_INV_COL-1;
 
 static __align16(const short,M128_round_inv_row[8]) = {RND_INV_ROW, 0, RND_INV_ROW, 0, RND_INV_ROW, 0, RND_INV_ROW, 0};
 static __align16(const short,M128_one_corr[8]) = {1,1,1,1,1,1,1,1};

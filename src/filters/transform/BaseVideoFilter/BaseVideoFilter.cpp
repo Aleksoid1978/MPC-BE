@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -77,7 +77,7 @@ CBaseVideoFilter::CBaseVideoFilter(TCHAR* pName, LPUNKNOWN lpunk, HRESULT* phr, 
 		*phr = E_OUTOFMEMORY;
 	}
 	if (FAILED(*phr))  {
-		delete m_pInput, m_pInput = NULL;
+		delete m_pInput, m_pInput = nullptr;
 		return;
 	}
 
@@ -114,7 +114,7 @@ CBasePin* CBaseVideoFilter::GetPin(int n)
 		case 1:
 			return m_pOutput;
 	}
-	return NULL;
+	return nullptr;
 }
 
 HRESULT CBaseVideoFilter::Receive(IMediaSample* pIn)
@@ -159,7 +159,7 @@ HRESULT CBaseVideoFilter::GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, 
 		return hr;
 	}
 
-	if (FAILED(hr = m_pOutput->GetDeliveryBuffer(ppOut, NULL, NULL, 0))) {
+	if (FAILED(hr = m_pOutput->GetDeliveryBuffer(ppOut, nullptr, nullptr, 0))) {
 		return hr;
 	}
 
@@ -182,7 +182,7 @@ HRESULT CBaseVideoFilter::GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, 
 	return S_OK;
 }
 
-HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* = false*/, REFERENCE_TIME AvgTimePerFrame/* = 0*/, DXVA2_ExtendedFormat* dxvaExtFormat/* = NULL*/, int RealWidth/* = -1*/, int RealHeight/* = -1*/)
+HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* = false*/, REFERENCE_TIME AvgTimePerFrame/* = 0*/, DXVA2_ExtendedFormat* dxvaExtFormat/* = nullptr*/, int RealWidth/* = -1*/, int RealHeight/* = -1*/)
 {
 	CMediaType& mt = m_pOutput->CurrentMediaType();
 
@@ -260,7 +260,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 
 		const bool bVideoSizeChanged = (m_w != m_wout || m_h != m_hout);
 
-		BITMAPINFOHEADER* pBMI = NULL;
+		BITMAPINFOHEADER* pBMI = nullptr;
 		if (mt.formattype == FORMAT_VideoInfo) {
 			VIDEOINFOHEADER* vih		= (VIDEOINFOHEADER*)mt.Format();
 			if (bVideoSizeChanged) {
@@ -307,7 +307,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 				hr = m_pOutput->GetConnected()->ReceiveConnection(m_pOutput, &mt);
 				if (SUCCEEDED(hr)) {
 					CComPtr<IMediaSample> pOut;
-					if (SUCCEEDED(hr = m_pOutput->GetDeliveryBuffer(&pOut, NULL, NULL, 0))) {
+					if (SUCCEEDED(hr = m_pOutput->GetDeliveryBuffer(&pOut, nullptr, nullptr, 0))) {
 						AM_MEDIA_TYPE* pmt;
 						if (SUCCEEDED(pOut->GetMediaType(&pmt)) && pmt) {
 							CMediaType mt = *pmt;
@@ -647,7 +647,7 @@ HRESULT CBaseVideoFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType* pmt)
 //
 
 CBaseVideoInputAllocator::CBaseVideoInputAllocator(HRESULT* phr)
-	: CMemAllocator(NAME("CBaseVideoInputAllocator"), NULL, phr)
+	: CMemAllocator(NAME("CBaseVideoInputAllocator"), nullptr, phr)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -681,7 +681,7 @@ STDMETHODIMP CBaseVideoInputAllocator::GetBuffer(IMediaSample** ppBuffer, REFERE
 
 CBaseVideoInputPin::CBaseVideoInputPin(TCHAR* pObjectName, CBaseVideoFilter* pFilter, HRESULT* phr, LPCWSTR pName)
 	: CTransformInputPin(pObjectName, pFilter, phr, pName)
-	, m_pAllocator(NULL)
+	, m_pAllocator(nullptr)
 {
 }
 
@@ -694,7 +694,7 @@ STDMETHODIMP CBaseVideoInputPin::GetAllocator(IMemAllocator** ppAllocator)
 {
 	CheckPointer(ppAllocator, E_POINTER);
 
-	if (m_pAllocator == NULL) {
+	if (m_pAllocator == nullptr) {
 		HRESULT hr = S_OK;
 		m_pAllocator = DNew CBaseVideoInputAllocator(&hr);
 		m_pAllocator->AddRef();

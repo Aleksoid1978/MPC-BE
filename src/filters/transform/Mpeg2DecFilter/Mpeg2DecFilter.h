@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -62,7 +62,7 @@ class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478"))
 		ditype di;
 		framebuf() {
 			w = h = pitch = 0;
-			buf_base = NULL;
+			buf_base = nullptr;
 			memset(&buf, 0, sizeof(buf));
 			rtStart = rtStop = 0;
 			flags = 0;
@@ -95,7 +95,7 @@ class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478"))
 			if (buf_base) {
 				_aligned_free(buf_base);
 			}
-			buf_base = NULL;
+			buf_base = nullptr;
 		}
 	} m_fb;
 

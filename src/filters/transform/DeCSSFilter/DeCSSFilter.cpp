@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -44,8 +44,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 };
 
 const AMOVIESETUP_PIN sudpPins[] = {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn), sudPinTypesIn},
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut), sudPinTypesOut}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn), sudPinTypesIn},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesOut), sudPinTypesOut}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
@@ -53,7 +53,7 @@ const AMOVIESETUP_FILTER sudFilter[] = {
 };
 
 CFactoryTemplate g_Templates[] = {
-	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CDeCSSFilter>, NULL, &sudFilter[0]},
+	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CDeCSSFilter>, nullptr, &sudFilter[0]},
 };
 
 int g_cTemplates = _countof(g_Templates);
@@ -126,7 +126,7 @@ CDeCSSFilter::CDeCSSFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		*phr = E_OUTOFMEMORY;
 	}
 	if (FAILED(*phr))  {
-		delete m_pInput, m_pInput = NULL;
+		delete m_pInput, m_pInput = nullptr;
 		return;
 	}
 }
@@ -147,8 +147,8 @@ HRESULT CDeCSSFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		DeleteMediaType(pmt);
 	}
 
-	BYTE* pDataIn = NULL;
-	BYTE* pDataOut = NULL;
+	BYTE* pDataIn = nullptr;
+	BYTE* pDataOut = nullptr;
 
 	pIn->GetPointer(&pDataIn);
 	pOut->GetPointer(&pDataOut);
@@ -156,7 +156,7 @@ HRESULT CDeCSSFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	long len = pIn->GetActualDataLength();
 	long size = pOut->GetSize();
 
-	if (len == 0 || pDataIn == NULL) { // format changes do not carry any data
+	if (len == 0 || pDataIn == nullptr) { // format changes do not carry any data
 		pOut->SetActualDataLength(0);
 		return S_OK;
 	}
@@ -285,7 +285,7 @@ STDMETHODIMP CDeCSSInputPin::Receive(IMediaSample* pSample)
 {
 	long len = pSample->GetActualDataLength();
 
-	BYTE* p = NULL;
+	BYTE* p = nullptr;
 	if(SUCCEEDED(pSample->GetPointer(&p)) && len > 0) {
 		if(m_mt.majortype == MEDIATYPE_DVD_ENCRYPTED_PACK && len == 2048 && (p[0x14]&0x30)) {
 			CSSdescramble(p, m_TitleKey);

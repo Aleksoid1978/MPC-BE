@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -49,5 +49,5 @@ public:
 	DWORD   SelectLayout(DWORD layout);
 	DWORD   SelectSamplerate(DWORD samplerate);
 
-	bool OK() { return (m_pAVCtx != NULL); }
+	bool OK() { return (m_pAVCtx != nullptr); }
 };

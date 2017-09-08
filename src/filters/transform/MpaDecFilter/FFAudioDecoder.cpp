@@ -172,7 +172,7 @@ const char* GetCodecDescriptorName(enum AVCodecID codec_id)
 		return codec_descriptor->name;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 static DWORD get_lav_channel_layout(uint64_t layout)
@@ -199,10 +199,10 @@ static DWORD get_lav_channel_layout(uint64_t layout)
 // CFFAudioDecoder
 
 CFFAudioDecoder::CFFAudioDecoder()
-	: m_pAVCodec(NULL)
-	, m_pAVCtx(NULL)
-	, m_pParser(NULL)
-	, m_pFrame(NULL)
+	: m_pAVCodec(nullptr)
+	, m_pAVCtx(nullptr)
+	, m_pParser(nullptr)
+	, m_pFrame(nullptr)
 	, m_bNeedSyncpoint(false)
 	, m_bStereoDownmix(false)
 	, m_bNeedReinit(false)
@@ -250,13 +250,13 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 	int bitdeph        = 0;
 	int block_align    = 0;
 	int64_t bitrate    = 0;
-	BYTE* extradata    = NULL;
+	BYTE* extradata    = nullptr;
 	unsigned extralen  = 0;
 
 	m_bNeedReinit      = false;
 
-	if (codecID == AV_CODEC_ID_NONE || mediaType == NULL) {
-		if (m_pAVCodec == NULL || m_pAVCtx == NULL || m_pAVCtx->codec_id == AV_CODEC_ID_NONE) {
+	if (codecID == AV_CODEC_ID_NONE || mediaType == nullptr) {
+		if (m_pAVCodec == nullptr || m_pAVCtx == nullptr || m_pAVCtx->codec_id == AV_CODEC_ID_NONE) {
 			return false;
 		}
 
@@ -303,10 +303,10 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 			samplerate = 16000;
 		}
 
-		getExtraData(mediaType->Format(), &mediaType->formattype, mediaType->cbFormat, NULL, &extralen);
+		getExtraData(mediaType->Format(), &mediaType->formattype, mediaType->cbFormat, nullptr, &extralen);
 		if (extralen) {
 			extradata = (uint8_t*)av_mallocz(extralen + AV_INPUT_BUFFER_PADDING_SIZE);
-			getExtraData(mediaType->Format(), &mediaType->formattype, mediaType->cbFormat, extradata, NULL);
+			getExtraData(mediaType->Format(), &mediaType->formattype, mediaType->cbFormat, extradata, nullptr);
 		}
 	}
 
@@ -373,7 +373,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		}
 
 		avcodec_lock;
-		if (avcodec_open2(m_pAVCtx, m_pAVCodec, NULL) >= 0) {
+		if (avcodec_open2(m_pAVCtx, m_pAVCodec, nullptr) >= 0) {
 			m_pFrame = av_frame_alloc();
 			CheckPointer(m_pFrame, false);
 			bRet = true;
@@ -403,7 +403,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 							delete [] comment;
 							CString tagValue;
 							if (!vorbisTag.IsEmpty() && ParseVorbisTag(L"WAVEFORMATEXTENSIBLE_CHANNEL_MASK", vorbisTag, tagValue)) {
-								uint64_t channel_layout = wcstol(tagValue, NULL, 0);
+								uint64_t channel_layout = wcstol(tagValue, nullptr, 0);
 								if (channel_layout && av_get_channel_layout_nb_channels(channel_layout) == m_pAVCtx->channels) {
 									m_pAVCtx->channel_layout = channel_layout;
 								}
@@ -468,7 +468,7 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 	av_init_packet(&avpkt);
 
 	if (m_pParser) {
-		BYTE* pOut = NULL;
+		BYTE* pOut = nullptr;
 		int pOut_size = 0;
 
 		int used_bytes = av_parser_parse2(m_pParser, m_pAVCtx, &pOut, &pOut_size, p, size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
@@ -506,7 +506,7 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 	}
 
 	if (hr == E_FAIL) {
-		Init(GetCodecId(), NULL);
+		Init(GetCodecId(), nullptr);
 	}
 
 	av_packet_unref(&avpkt);
@@ -562,10 +562,10 @@ void CFFAudioDecoder::FlushBuffers()
 
 void CFFAudioDecoder::StreamFinish()
 {
-	m_pAVCodec = NULL;
+	m_pAVCodec = nullptr;
 
 	av_parser_close(m_pParser);
-	m_pParser = NULL;
+	m_pParser = nullptr;
 
 	avcodec_free_context(&m_pAVCtx);
 

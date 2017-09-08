@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -121,8 +121,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 };
 
 const AMOVIESETUP_PIN sudpPins[] = {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn), sudPinTypesIn},
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut), sudPinTypesOut}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn), sudPinTypesIn},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesOut), sudPinTypesOut}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
@@ -130,7 +130,7 @@ const AMOVIESETUP_FILTER sudFilter[] = {
 };
 
 CFactoryTemplate g_Templates[] = {
-	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CMpeg2DecFilter>, NULL, &sudFilter[0]},
+	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CMpeg2DecFilter>, nullptr, &sudFilter[0]},
 	{L"CMpeg2DecPropertyPage", &__uuidof(CMpeg2DecSettingsWnd), CreateInstance<CInternalPropertyPageTempl<CMpeg2DecSettingsWnd> >},
 };
 
@@ -244,7 +244,7 @@ CMpeg2DecFilterApp theApp;
 CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CBaseVideoFilter(NAME("CMpeg2DecFilter"), lpunk, phr, __uuidof(this), 1)
 	, m_fWaitForKeyFrame(true)
-	, m_ControlThread(NULL)
+	, m_ControlThread(nullptr)
 	, m_ditype(DIAuto)
 	, m_llLastDecodeTime(0)
 {
@@ -424,7 +424,7 @@ CBasePin* CMpeg2DecFilter::GetPin(int n)
 		case 3:
 			return m_pClosedCaptionOutput;
 	}
-	return NULL;
+	return nullptr;
 }
 
 HRESULT CMpeg2DecFilter::EndOfStream()
@@ -482,7 +482,7 @@ void CMpeg2DecFilter::InputTypeChanged()
 
 	const CMediaType& mt = m_pInput->CurrentMediaType();
 
-	BYTE* pSequenceHeader = NULL;
+	BYTE* pSequenceHeader = nullptr;
 	DWORD cbSequenceHeader = 0;
 
 	if (mt.formattype == FORMAT_MPEGVideo) {
@@ -592,7 +592,7 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 {
 	HRESULT hr;
 
-	BYTE* pDataIn = NULL;
+	BYTE* pDataIn = nullptr;
 	if (FAILED(hr = pIn->GetPointer(&pDataIn))) {
 		return hr;
 	}
@@ -787,7 +787,7 @@ HRESULT CMpeg2DecFilter::DeliverToRenderer()
 	HRESULT hr;
 
 	CComPtr<IMediaSample> pOut;
-	BYTE* pDataOut = NULL;
+	BYTE* pDataOut = nullptr;
 	if (FAILED(hr = GetDeliveryBuffer(m_fb.w, m_fb.h, &pOut, m_AvgTimePerFrame))
 			|| FAILED(hr = pOut->GetPointer(&pDataOut))) {
 		return hr;
@@ -829,7 +829,7 @@ HRESULT CMpeg2DecFilter::DeliverToRenderer()
 	rtStop = m_rate.StartTime + (rtStop - m_rate.StartTime) * m_rate.Rate / 10000;
 
 	pOut->SetTime(&rtStart, &rtStop);
-	pOut->SetMediaTime(NULL, NULL);
+	pOut->SetMediaTime(nullptr, nullptr);
 
 	SetTypeSpecificFlags(pOut);
 
@@ -1008,14 +1008,14 @@ STDMETHODIMP CMpeg2DecFilter::CreatePage(const GUID& guid, IPropertyPage** ppPag
 {
 	CheckPointer(ppPage, E_POINTER);
 
-	if (*ppPage != NULL) {
+	if (*ppPage != nullptr) {
 		return E_INVALIDARG;
 	}
 
 	HRESULT hr;
 
 	if (guid == __uuidof(CMpeg2DecSettingsWnd)) {
-		(*ppPage = DNew CInternalPropertyPageTempl<CMpeg2DecSettingsWnd>(NULL, &hr))->AddRef();
+		(*ppPage = DNew CInternalPropertyPageTempl<CMpeg2DecSettingsWnd>(nullptr, &hr))->AddRef();
 	}
 
 	return *ppPage ? S_OK : E_FAIL;
@@ -1526,7 +1526,7 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 		DeleteMediaType(pmt);
 	}
 
-	BYTE* pDataIn = NULL;
+	BYTE* pDataIn = nullptr;
 	if (FAILED(hr = pSample->GetPointer(&pDataIn))) {
 		return hr;
 	}
@@ -2268,8 +2268,8 @@ HRESULT CClosedCaptionOutputPin::Deliver(const void* ptr, int len)
 
 	if (len > 4 && ptr && GETDWORD(ptr) == 0xf8014343 && IsConnected()) {
 		CComPtr<IMediaSample> pSample;
-		GetDeliveryBuffer(&pSample, NULL, NULL, 0);
-		BYTE* pData = NULL;
+		GetDeliveryBuffer(&pSample, nullptr, nullptr, 0);
+		BYTE* pData = nullptr;
 		pSample->GetPointer(&pData);
 		GETDWORD(pData) = 0xb2010000;
 		memcpy(pData + 4, ptr, len);
