@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -149,7 +149,7 @@ HRESULT CBaseStream::FillBuffer(IMediaSample* pSample)
 			return S_FALSE;
 		}
 
-		BYTE* pOut = NULL;
+		BYTE* pOut = nullptr;
 		if (FAILED(hr = pSample->GetPointer(&pOut)) || !pOut) {
 			return S_FALSE;
 		}

@@ -48,7 +48,7 @@ class CBaseSplitterFile
 
 	int     m_fmode           = 0;
 
-	HANDLE  m_hBreak          = NULL;
+	HANDLE  m_hBreak          = nullptr;
 
 	HRESULT m_hrLastReadError = S_OK;
 

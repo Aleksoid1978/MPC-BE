@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -271,7 +271,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 					if (!strm) {
 						strm.Attach(DNew strm_t());
 					}
-					ASSERT(strm->indx == NULL);
+					ASSERT(strm->indx == nullptr);
 					if (size < MAXDWORD-8) {
 						AVISUPERINDEX* pSuperIndex;
 						// Fix buffer overrun vulnerability : http://www.vulnhunt.com/advisories/CAL-20070912-1_Multiple_vendor_produce_handling_AVI_file_vulnerabilities.txt
@@ -279,7 +279,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 							pSuperIndex = (AVISUPERINDEX*)DNew unsigned char [(size_t)(size + 8)];
 						}
 						CATCH (CMemoryException, e) {
-							pSuperIndex = NULL;
+							pSuperIndex = nullptr;
 						}
 						END_CATCH
 						if (pSuperIndex) {
@@ -304,7 +304,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 					}
 					break;
 				case FCC('idx1'):
-					ASSERT(m_idx1 == NULL);
+					ASSERT(m_idx1 == nullptr);
 					m_idx1.Attach((AVIOLDINDEX*)DNew BYTE[size + 8]);
 					m_idx1->fcc = FCC('idx1');
 					m_idx1->cb = size;

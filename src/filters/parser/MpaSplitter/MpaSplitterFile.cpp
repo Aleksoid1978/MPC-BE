@@ -37,8 +37,8 @@ CMpaSplitterFile::CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr)
 	, m_procsize(0)
 	, m_coefficient(0.0)
 	, m_bIsVBR(false)
-	, m_pID3Tag(NULL)
-	, m_pAPETag(NULL)
+	, m_pID3Tag(nullptr)
+	, m_pAPETag(nullptr)
 {
 	if (SUCCEEDED(hr)) {
 		hr = Init();
@@ -338,14 +338,14 @@ bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limi
 		while (GetPos() <= endpos - MPA_HEADER_SIZE) {
 			mpahdr h;
 
-			if (Read(h, (int)(endpos - GetPos()), NULL, true, true)) {
+			if (Read(h, (int)(endpos - GetPos()), nullptr, true, true)) {
 				Seek(GetPos() - MPA_HEADER_SIZE);
 				if (bExtraCheck) {
 					__int64 pos = GetPos();
 					if (pos + h.FrameSize + MPA_HEADER_SIZE < GetLength()) {
 						Seek(pos + h.FrameSize);
 						mpahdr h2;
-						if (!Read(h2, MPA_HEADER_SIZE, NULL, true)) {
+						if (!Read(h2, MPA_HEADER_SIZE, nullptr, true)) {
 							Seek(pos + 1);
 							continue;
 						}

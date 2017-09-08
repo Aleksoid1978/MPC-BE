@@ -49,7 +49,7 @@ void CUDPStream::Clear()
 	}
 
 	if (m_protocol == protocol::PR_UDP) {
-		if (m_WSAEvent != NULL) {
+		if (m_WSAEvent != nullptr) {
 			WSACloseEvent(m_WSAEvent);
 		}
 
@@ -462,7 +462,7 @@ DWORD CUDPStream::ThreadProc()
 				int  len      = 0;
 
 				BOOL bEndOfStream = FALSE;
-				while (!CheckRequest(NULL)
+				while (!CheckRequest(nullptr)
 						&& attempts < 200 && !bEndOfStream) {
 
 					if (!m_SizeComplete && GetPacketsSize() > MAXSTORESIZE) {

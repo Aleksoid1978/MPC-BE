@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,7 +41,7 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 };
 
 const AMOVIESETUP_PIN sudOpPin[] = {
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut), sudPinTypesOut},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesOut), sudPinTypesOut},
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
@@ -49,7 +49,7 @@ const AMOVIESETUP_FILTER sudFilter[] = {
 };
 
 CFactoryTemplate g_Templates[] = {
-	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CCDDAReader>, NULL, &sudFilter[0]}
+	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CCDDAReader>, nullptr, &sudFilter[0]}
 };
 
 int g_cTemplates = _countof(g_Templates);
@@ -289,14 +289,14 @@ STDMETHODIMP CCDDAReader::CreatePage(const GUID& guid, IPropertyPage** ppPage)
 {
 	CheckPointer(ppPage, E_POINTER);
 
-	if (*ppPage != NULL) {
+	if (*ppPage != nullptr) {
 		return E_INVALIDARG;
 	}
 
 	HRESULT hr;
 
 	if (guid == __uuidof(CCDDAReaderSettingsWnd)) {
-		(*ppPage = DNew CInternalPropertyPageTempl<CCDDAReaderSettingsWnd>(NULL, &hr))->AddRef();
+		(*ppPage = DNew CInternalPropertyPageTempl<CCDDAReaderSettingsWnd>(nullptr, &hr))->AddRef();
 	}
 
 	return *ppPage ? S_OK : E_FAIL;
@@ -404,15 +404,15 @@ bool CCDDAStream::Load(const WCHAR* fnw, bool bReadTextInfo)
 
 	CString drive = CString(L"\\\\.\\") + path[iDriveLetter] + L":";
 
-	m_hDrive = CreateFile(drive, GENERIC_READ, FILE_SHARE_READ, NULL,
-						  OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+	m_hDrive = CreateFile(drive, GENERIC_READ, FILE_SHARE_READ, nullptr,
+						  OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
 	if (m_hDrive == INVALID_HANDLE_VALUE) {
 		return false;
 	}
 
 	CDROM_TOC cdrom_TOC = { 0 };
 	DWORD BytesReturned;
-	if (!DeviceIoControl(m_hDrive, IOCTL_CDROM_READ_TOC, NULL, 0, &cdrom_TOC, sizeof(cdrom_TOC), &BytesReturned, 0)
+	if (!DeviceIoControl(m_hDrive, IOCTL_CDROM_READ_TOC, nullptr, 0, &cdrom_TOC, sizeof(cdrom_TOC), &BytesReturned, 0)
 			|| !(cdrom_TOC.FirstTrack <= iTrackIndex && iTrackIndex <= cdrom_TOC.LastTrack)) {
 		CloseHandle(m_hDrive);
 		m_hDrive = INVALID_HANDLE_VALUE;
