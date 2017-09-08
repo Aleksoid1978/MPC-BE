@@ -46,7 +46,18 @@ private:
 	bool m_bResampleHor = false;
 	bool m_bResampleVer = false;
 
-	BYTE* m_pTemp = nullptr;
+	BYTE*  m_pTemp      = nullptr;
+
+	int*   m_xboundsHor = nullptr;
+	INT32* m_kkHor      = nullptr;
+	int    m_kmaxHor    = 0;
+
+	int*   m_xboundsVer = nullptr;
+	INT32* m_kkVer      = nullptr;
+	int    m_kmaxVer    = 0;
+
+	void ResampleHorizontal(BYTE* dest, int destW, int H, const BYTE* const src, int srcW);
+	void ResampleVertical(BYTE* dest, int W, int destH, const BYTE* const src, int srcH);
 
 	void FreeData();
 	HRESULT Init();

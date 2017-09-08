@@ -255,33 +255,17 @@ int normalize_coeffs_8bpc(int outSize, int kmax, double *prekk, INT32 **kkp)
 	return kmax;
 }
 
-HRESULT ResampleHorizontal(BYTE* dest, int destW, int H, const BYTE* const src, int srcW, filter_t* filterp)
+void CResampleARGB::ResampleHorizontal(BYTE* dest, int destW, int H, const BYTE* const src, int srcW)
 {
-	int *xbounds;
-	INT32 *kk;
-	double *prekk;
-
-	int kmax = precompute_coeffs(srcW, destW, filterp, &xbounds, &prekk);
-	if (!kmax) {
-		return E_OUTOFMEMORY;
-	}
-
-	kmax = normalize_coeffs_8bpc(destW, kmax, prekk, &kk);
-	free(prekk);
-	if (!kmax) {
-		free(xbounds);
-		return E_OUTOFMEMORY;
-	}
-
 	concurrency::parallel_for(0, H, [&](int yy) {
 		const BYTE* lineIn = src + yy * srcW * 4;
 		BYTE* const lineOut = dest + yy * destW * 4;
 
 		int ss0, ss1, ss2, ss3;
 		for (int xx = 0; xx < destW; xx++) {
-			const INT32* k = &kk[xx * kmax];
-			const int xmin = xbounds[xx * 2 + 0];
-			const int xmax = xbounds[xx * 2 + 1];
+			const INT32* k = &m_kkHor[xx * m_kmaxHor];
+			const int xmin = m_xboundsHor[xx * 2 + 0];
+			const int xmax = m_xboundsHor[xx * 2 + 1];
 			ss0 = ss1 = ss2 = ss3 = 1 << (PRECISION_BITS -1);
 
 			for (int x = 0; x < xmax; x++) {
@@ -294,35 +278,15 @@ HRESULT ResampleHorizontal(BYTE* dest, int destW, int H, const BYTE* const src, 
 			((UINT32*)lineOut)[xx] = MAKE_UINT32(clip8(ss0), clip8(ss1), clip8(ss2), clip8(ss3));
 		}
 	});
-
-	free(kk);
-	free(xbounds);
-	return S_OK;
 }
 
-HRESULT ResampleVertical(BYTE* dest, int W, int destH, const BYTE* const src, int srcH, filter_t* filterp)
+void CResampleARGB::ResampleVertical(BYTE* dest, int W, int destH, const BYTE* const src, int srcH)
 {
-	int *xbounds;
-	INT32 *kk;
-	double *prekk;
-
-	int kmax = precompute_coeffs(srcH, destH, filterp, &xbounds, &prekk);
-	if (!kmax) {
-		return E_OUTOFMEMORY;
-	}
-
-	kmax = normalize_coeffs_8bpc(destH, kmax, prekk, &kk);
-	free(prekk);
-	if (!kmax) {
-		free(xbounds);
-		return E_OUTOFMEMORY;
-	}
-
 	concurrency::parallel_for(0, destH, [&](int yy) {
 		BYTE* const lineOut = dest + yy * W * 4;
-		const INT32* k = &kk[yy * kmax];
-		const int ymin = xbounds[yy * 2 + 0];
-		const int ymax = xbounds[yy * 2 + 1];
+		const INT32* k = &m_kkVer[yy * m_kmaxVer];
+		const int ymin = m_xboundsVer[yy * 2 + 0];
+		const int ymax = m_xboundsVer[yy * 2 + 1];
 		int ss0, ss1, ss2, ss3;
 		for (int xx = 0; xx < W; xx++) {
 			ss0 = ss1 = ss2 = ss3 = 1 << (PRECISION_BITS -1);
@@ -337,16 +301,22 @@ HRESULT ResampleVertical(BYTE* dest, int W, int destH, const BYTE* const src, in
 			((UINT32*)lineOut)[xx] = MAKE_UINT32(clip8(ss0), clip8(ss1), clip8(ss2), clip8(ss3));
 		}
 	});
-
-	free(kk);
-	free(xbounds);
-	return S_OK;
 }
 
 void CResampleARGB::FreeData()
 {
 	free(m_pTemp);
 	m_pTemp = nullptr;
+
+	free(m_xboundsHor);
+	m_xboundsHor = nullptr;
+	free(m_kkHor);
+	m_kkHor  = nullptr;
+
+	free(m_xboundsVer);
+	m_xboundsVer = nullptr;
+	free(m_kkVer);
+	m_kkVer = nullptr;
 }
 
 HRESULT CResampleARGB::Init()
@@ -378,6 +348,36 @@ HRESULT CResampleARGB::Init()
 		}
 	}
 
+	if (m_bResampleHor) {
+		double *prekk;
+		m_kmaxHor = precompute_coeffs(m_srcW, m_destW, m_pFilter, &m_xboundsHor, &prekk);
+		if (!m_kmaxHor) {
+			FreeData();
+			return E_OUTOFMEMORY;
+		}
+		m_kmaxHor = normalize_coeffs_8bpc(m_destW, m_kmaxHor, prekk, &m_kkHor);
+		free(prekk);
+		if (!m_kmaxHor) {
+			FreeData();
+			return E_OUTOFMEMORY;
+		}
+	}
+
+	if (m_bResampleVer) {
+		double *prekk;
+		m_kmaxVer = precompute_coeffs(m_srcH, m_destH, m_pFilter, &m_xboundsVer, &prekk);
+		if (!m_kmaxVer) {
+			FreeData();
+			return E_OUTOFMEMORY;
+		}
+		m_kmaxVer = normalize_coeffs_8bpc(m_destH, m_kmaxVer, prekk, &m_kkVer);
+		free(prekk);
+		if (!m_kmaxVer) {
+			FreeData();
+			return E_OUTOFMEMORY;
+		}
+	}
+
 	m_actual = true;
 
 	return S_OK;
@@ -385,7 +385,7 @@ HRESULT CResampleARGB::Init()
 
 CResampleARGB::~CResampleARGB()
 {
-	free(m_pTemp);
+	FreeData();
 }
 
 HRESULT CResampleARGB::SetParameters(const int destW, const int destH, const int srcW, const int srcH, const int filter)
@@ -418,17 +418,13 @@ HRESULT CResampleARGB::Process(BYTE* const dest, const BYTE* const src)
 
 	// two-pass resize, first pass
 	if (m_bResampleHor) {
-		HRESULT hr = ResampleHorizontal(m_pTemp ? m_pTemp : dest, m_destW, m_srcH, src, m_srcW, m_pFilter);
-		if (hr != S_OK) {
-			return hr;
-		}
+		ResampleHorizontal(m_pTemp ? m_pTemp : dest, m_destW, m_srcH, src, m_srcW);
 	}
 
 	// second pass
 	if (m_bResampleVer) {
 		// can be the original image or horizontally resampled one
-		HRESULT hr = ResampleVertical(dest, m_destW, m_destH, m_pTemp ? m_pTemp : src, m_srcH, m_pFilter);
-		return hr;
+		ResampleVertical(dest, m_destW, m_destH, m_pTemp ? m_pTemp : src, m_srcH);
 	}
 
 	return S_OK;
