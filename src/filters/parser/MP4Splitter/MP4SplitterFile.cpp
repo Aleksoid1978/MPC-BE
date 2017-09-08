@@ -25,7 +25,7 @@
 
 CMP4SplitterFile::CMP4SplitterFile(IAsyncReader* pReader, HRESULT& hr)
 	: CBaseSplitterFileEx(pReader, hr, FM_FILE | FM_FILE_DL | FM_STREAM)
-	, m_pAp4File(NULL)
+	, m_pAp4File(nullptr)
 {
 	if (FAILED(hr)) {
 		return;
@@ -42,7 +42,7 @@ CMP4SplitterFile::~CMP4SplitterFile()
 AP4_Movie* CMP4SplitterFile::GetMovie()
 {
 	ASSERT(m_pAp4File);
-	return m_pAp4File ? m_pAp4File->GetMovie() : NULL;
+	return m_pAp4File ? m_pAp4File->GetMovie() : nullptr;
 }
 
 HRESULT CMP4SplitterFile::Init()
