@@ -85,12 +85,12 @@ static UINT64 GetFileVersion(LPCWSTR wstrFilename)
 {
 	UINT64 ret = 0;
 
-	const DWORD len = GetFileVersionInfoSizeW(wstrFilename, NULL);
+	const DWORD len = GetFileVersionInfoSizeW(wstrFilename, nullptr);
 	if (len) {
 		WCHAR* buf = new WCHAR[len];
 		if (buf) {
 			UINT uLen;
-			VS_FIXEDFILEINFO* pvsf = NULL;
+			VS_FIXEDFILEINFO* pvsf = nullptr;
 			if (GetFileVersionInfoW(wstrFilename, 0, len, buf) && VerQueryValueW(buf, L"\\", (LPVOID*)&pvsf, &uLen)) {
 				ret = ((UINT64)pvsf->dwFileVersionMS << 32) | pvsf->dwFileVersionLS;
 			}
@@ -351,7 +351,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx, int x264_build)
 
 		if (pAVCtx->pix_fmt == AV_PIX_FMT_NONE) {
 			pAVCtx->pix_fmt = AV_PIX_FMT_YUV420P; // most common format
-			av_log(NULL, AV_LOG_WARNING, "FillAVCodecProps: Unknown pixel format for %s, use AV_PIX_FMT_YUV420P.\n", pAVCtx->codec->name);
+			av_log(nullptr, AV_LOG_WARNING, "FillAVCodecProps: Unknown pixel format for %s, use AV_PIX_FMT_YUV420P.\n", pAVCtx->codec->name);
 		}
 	}
 }
