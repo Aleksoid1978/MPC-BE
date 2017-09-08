@@ -220,7 +220,7 @@ size_t CBaseSplitterOutputPin::QueueSize()
 
 HRESULT CBaseSplitterOutputPin::QueueEndOfStream()
 {
-	return QueuePacket(CAutoPtr<CPacket>()); // NULL means EndOfStream
+	return QueuePacket(CAutoPtr<CPacket>()); // nullptr means EndOfStream
 }
 
 HRESULT CBaseSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
@@ -282,7 +282,7 @@ DWORD CBaseSplitterOutputPin::ThreadProc()
 	bool iHaaliRenderConnect = false;
 	CComPtr<IPin> pPinTo = this, pTmp;
 	while (pPinTo && SUCCEEDED(pPinTo->ConnectedTo(&pTmp)) && (pPinTo = pTmp)) {
-		pTmp = NULL;
+		pTmp = nullptr;
 		CComPtr<IBaseFilter> pBF = GetFilterFromPin(pPinTo);
 		if (GetCLSID(pBF) == CLSID_DXR) { // Haali Renderer
 			iHaaliRenderConnect = true;
@@ -300,7 +300,7 @@ DWORD CBaseSplitterOutputPin::ThreadProc()
 
 		DWORD cmd;
 		if (CheckRequest(&cmd)) {
-			m_hThread = NULL;
+			m_hThread = nullptr;
 			cmd = GetRequest();
 			Reply(S_OK);
 			ASSERT(cmd == CMD_EXIT);
@@ -411,7 +411,7 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 
 	do {
 		CComPtr<IMediaSample> pSample;
-		if (S_OK != (hr = GetDeliveryBuffer(&pSample, NULL, NULL, 0))) {
+		if (S_OK != (hr = GetDeliveryBuffer(&pSample, nullptr, nullptr, 0))) {
 			break;
 		}
 
@@ -442,7 +442,7 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 			if (S_OK != (hr = m_pAllocator->Commit())) {
 				break;
 			}
-			if (S_OK != (hr = GetDeliveryBuffer(&pSample, NULL, NULL, 0))) {
+			if (S_OK != (hr = GetDeliveryBuffer(&pSample, nullptr, nullptr, 0))) {
 				break;
 			}
 		}
@@ -467,7 +467,7 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 
 		ASSERT(!p->bSyncPoint || fTimeValid);
 
-		BYTE* pData = NULL;
+		BYTE* pData = nullptr;
 		if (S_OK != (hr = pSample->GetPointer(&pData)) || !pData) {
 			break;
 		}
@@ -475,10 +475,10 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 		if (S_OK != (hr = pSample->SetActualDataLength(nBytes))) {
 			break;
 		}
-		if (S_OK != (hr = pSample->SetTime(fTimeValid ? &p->rtStart : NULL, fTimeValid ? &p->rtStop : NULL))) {
+		if (S_OK != (hr = pSample->SetTime(fTimeValid ? &p->rtStart : nullptr, fTimeValid ? &p->rtStop : nullptr))) {
 			break;
 		}
-		if (S_OK != (hr = pSample->SetMediaTime(NULL, NULL))) {
+		if (S_OK != (hr = pSample->SetMediaTime(nullptr, nullptr))) {
 			break;
 		}
 		if (S_OK != (hr = pSample->SetDiscontinuity(p->bDiscontinuity))) {
@@ -502,7 +502,7 @@ void CBaseSplitterOutputPin::MakeISCRHappy()
 {
 	CComPtr<IPin> pPinTo = this, pTmp;
 	while (pPinTo && SUCCEEDED(pPinTo->ConnectedTo(&pTmp)) && (pPinTo = pTmp)) {
-		pTmp = NULL;
+		pTmp = nullptr;
 
 		CComPtr<IBaseFilter> pBF = GetFilterFromPin(pPinTo);
 

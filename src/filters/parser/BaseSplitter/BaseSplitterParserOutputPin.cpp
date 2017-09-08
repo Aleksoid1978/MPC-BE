@@ -130,7 +130,7 @@ void CBaseSplitterParserOutputPin::InitPacket(CPacket* pSource)
 	m_p->rtStop		= INVALID_TIME;				\
 	\
 	p2->pmt		= m_p->pmt;						\
-	m_p->pmt	= NULL;							\
+	m_p->pmt	= nullptr;							\
 	\
 	p2->SetData(start + offset, size - offset);	\
 	\
@@ -162,7 +162,7 @@ void CBaseSplitterParserOutputPin::InitPacket(CPacket* pSource)
 			p->bSyncPoint	= FALSE;			\
 		}										\
 		m_p->pmt	= p->pmt;					\
-		p->pmt		= NULL;						\
+		p->pmt		= nullptr;						\
 	}
 
 
@@ -407,7 +407,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 				memcpy(p3->GetData(), Nalu.GetNALBuffer(), Nalu.GetLength());
 			}
 
-			if (p2 == NULL) {
+			if (p2 == nullptr) {
 				p2 = p3;
 			} else {
 				p2->Append(*p3);
@@ -437,7 +437,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 		m_p->rtStop		= INVALID_TIME;
 
 		p2->pmt		= m_p->pmt;
-		m_p->pmt	= NULL;
+		m_p->pmt	= nullptr;
 
 		m_pl.AddTail(p2);
 
@@ -461,7 +461,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 			}
 
 			m_p->pmt = p->pmt;
-			p->pmt = NULL;
+			p->pmt = nullptr;
 		}
 	}
 

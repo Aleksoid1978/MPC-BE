@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,18 +38,18 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 };
 
 const AMOVIESETUP_PIN sudpPins[] = {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn), sudPinTypesIn},
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, 0, NULL}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn), sudPinTypesIn},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, 0, nullptr}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
 	{&__uuidof(COggSplitterFilter), OggSplitterName, MERIT_NORMAL+1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(COggSourceFilter), OggSourceName, MERIT_NORMAL+1, 0, NULL, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(COggSourceFilter), OggSourceName, MERIT_NORMAL+1, 0, nullptr, CLSID_LegacyAmFilterCategory},
 };
 
 CFactoryTemplate g_Templates[] = {
-	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<COggSplitterFilter>, NULL, &sudFilter[0]},
-	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<COggSourceFilter>, NULL, &sudFilter[1]},
+	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<COggSplitterFilter>, nullptr, &sudFilter[0]},
+	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<COggSourceFilter>, nullptr, &sudFilter[1]},
 };
 
 int g_cTemplates = _countof(g_Templates);
@@ -60,7 +60,7 @@ STDAPI DllRegisterServer()
 		CLSID_AsyncReader,
 		MEDIASUBTYPE_Ogg,
 		L"0,4,,4F676753", // OggS
-		L".ogg", L".ogm", NULL);
+		L".ogg", L".ogm", nullptr);
 
 	return AMovieDllRegisterServer2(TRUE);
 }
@@ -590,7 +590,7 @@ bool COggSplitterFilter::DemuxLoop()
 	HRESULT hr = S_OK;
 
 	OggPage page;
-	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
+	while (SUCCEEDED(hr) && !CheckRequest(nullptr)) {
 
 		if(!m_pFile->Read(page, true, GetRequestHandle())) {
 			break;
@@ -614,7 +614,7 @@ bool COggSplitterFilter::DemuxLoop()
 		}
 
 		CAutoPtr<CPacket> p;
-		while (!CheckRequest(NULL) && SUCCEEDED(hr) && (p = pOggPin->GetPacket())) {
+		while (!CheckRequest(nullptr) && SUCCEEDED(hr) && (p = pOggPin->GetPacket())) {
 			hr = DeliverPacket(p);
 		}
 	}
@@ -1261,7 +1261,7 @@ COggAudioOutputPin::COggAudioOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseF
 
 	CMediaType mt;
 	mt.majortype	= MEDIATYPE_Audio;
-	mt.subtype		= FOURCCMap(strtol(CStringA(h->subtype, 4), NULL, 16));
+	mt.subtype		= FOURCCMap(strtol(CStringA(h->subtype, 4), nullptr, 16));
 	mt.formattype	= FORMAT_WaveFormatEx;
 
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + extra);

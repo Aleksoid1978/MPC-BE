@@ -82,18 +82,18 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 };
 
 const AMOVIESETUP_PIN sudpPins[] = {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn), sudPinTypesIn},
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, 0, NULL}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn), sudPinTypesIn},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, 0, nullptr}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
 	{&__uuidof(CFLVSplitterFilter), FlvSplitterName, MERIT_NORMAL, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CFLVSourceFilter), FlvSourceName, MERIT_NORMAL, 0, NULL, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CFLVSourceFilter), FlvSourceName, MERIT_NORMAL, 0, nullptr, CLSID_LegacyAmFilterCategory},
 };
 
 CFactoryTemplate g_Templates[] = {
-	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CFLVSplitterFilter>, NULL, &sudFilter[0]},
-	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CFLVSourceFilter>, NULL, &sudFilter[1]},
+	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CFLVSplitterFilter>, nullptr, &sudFilter[0]},
+	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CFLVSourceFilter>, nullptr, &sudFilter[1]},
 };
 
 int g_cTemplates = _countof(g_Templates);
@@ -102,7 +102,7 @@ STDAPI DllRegisterServer()
 {
 	DeleteRegKey(L"Media Type\\Extensions\\", L".flv");
 
-	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_FLV, L"0,4,,464C5601", NULL);
+	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_FLV, L"0,4,,464C5601", nullptr);
 
 	return AMovieDllRegisterServer2(TRUE);
 }
@@ -235,7 +235,7 @@ bool CFLVSplitterFilter::ParseAMF0(UINT64 end, const CString key, CAtlArray<AMF0
 							break;
 						}
 						WORD arraylen	= m_pFile->BitRead(32);
-						CAtlArray<double>* array = NULL;
+						CAtlArray<double>* array = nullptr;
 						if (name == KEYFRAMES_BYTEOFFSET_TAG) {
 							array		= &filepositions;
 						} else if (name == KEYFRAMES_TIMESTAMP_TAG) {
@@ -1079,7 +1079,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							Tag tag;
 							VideoTag vtag;
 
-							while (ReadTag(tag) && !CheckRequest(NULL) && m_pFile->GetRemaining()) {
+							while (ReadTag(tag) && !CheckRequest(nullptr) && m_pFile->GetRemaining()) {
 								__int64 _next = m_pFile->GetPos() + tag.DataSize;
 								if ((tag.DataSize > 0) && (tag.TagType == FLV_VIDEODATA && ReadTag(vtag) && tag.TimeStamp > 0)) {
 									if (IsAVCCodec(vtag.CodecID)) {
@@ -1296,7 +1296,7 @@ bool CFLVSplitterFilter::DemuxLoop()
 	AudioTag at;
 	VideoTag vt;
 
-	while (SUCCEEDED(hr) && !CheckRequest(NULL)) {
+	while (SUCCEEDED(hr) && !CheckRequest(nullptr)) {
 		if (!m_pFile->IsStreaming() && !m_pFile->GetRemaining()) {
 			break;
 		}

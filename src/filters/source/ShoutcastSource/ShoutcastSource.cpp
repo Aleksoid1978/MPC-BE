@@ -47,7 +47,7 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 };
 
 const AMOVIESETUP_PIN sudOpPin[] = {
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut), sudPinTypesOut}
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesOut), sudPinTypesOut}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] = {
@@ -55,7 +55,7 @@ const AMOVIESETUP_FILTER sudFilter[] = {
 };
 
 CFactoryTemplate g_Templates[] = {
-	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CShoutcastSource>, NULL, &sudFilter[0]}
+	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CShoutcastSource>, nullptr, &sudFilter[0]}
 };
 
 int g_cTemplates = _countof(g_Templates);
@@ -80,13 +80,13 @@ public:
 			return FALSE;
 		}
 		/*
-				if (!AfxWinInit(::GetModuleHandle(NULL), NULL, ::GetCommandLine(), 0))
+				if (!AfxWinInit(::GetModuleHandle(nullptr), nullptr, ::GetCommandLine(), 0))
 				{
 					AfxMessageBox(L"AfxWinInit failed!");
 					return FALSE;
 				}
 		*/
-		if (!AfxSocketInit(NULL)) {
+		if (!AfxSocketInit(nullptr)) {
 			AfxMessageBox(L"AfxSocketInit failed!");
 			return FALSE;
 		}
@@ -353,7 +353,7 @@ HRESULT CShoutcastStream::FillBuffer(IMediaSample* pSample)
 {
 	HRESULT hr;
 
-	BYTE* pData = NULL;
+	BYTE* pData = nullptr;
 	if (FAILED(hr = pSample->GetPointer(&pData)) || !pData) {
 		return S_FALSE;
 	}

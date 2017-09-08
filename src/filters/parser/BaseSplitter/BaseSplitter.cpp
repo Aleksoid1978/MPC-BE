@@ -72,7 +72,7 @@ STDMETHODIMP CBaseSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void*
 {
 	CheckPointer(ppv, E_POINTER);
 
-	*ppv = NULL;
+	*ppv = nullptr;
 
 	if (m_pInput && riid == __uuidof(IFileSourceFilter)) {
 		return E_NOINTERFACE;
@@ -99,7 +99,7 @@ CBaseSplitterOutputPin* CBaseSplitterFilter::GetOutputPin(DWORD TrackNum)
 {
 	CAutoLock cAutoLock(&m_csPinMap);
 
-	CBaseSplitterOutputPin* pPin = NULL;
+	CBaseSplitterOutputPin* pPin = nullptr;
 	m_pPinMap.Lookup(TrackNum, pPin);
 	return pPin;
 }
@@ -127,7 +127,7 @@ HRESULT CBaseSplitterFilter::RenameOutputPin(DWORD TrackNumSrc, DWORD TrackNumDs
 
 	CBaseSplitterOutputPin* pPin;
 	if (m_pPinMap.Lookup(TrackNumSrc, pPin)) {
-		AM_MEDIA_TYPE* pmt = NULL;
+		AM_MEDIA_TYPE* pmt = nullptr;
 		HRESULT hr = S_OK;
 
 		if (CComQIPtr<IPin> pPinTo = pPin->GetConnected()) {
@@ -240,7 +240,7 @@ DWORD CBaseSplitterFilter::ThreadProc()
 		for (;;) {
 			DWORD cmd = GetRequest();
 			if (cmd == CMD_EXIT) {
-				CAMThread::m_hThread = NULL;
+				CAMThread::m_hThread = nullptr;
 			}
 			Reply(S_OK);
 			if (cmd == CMD_EXIT) {
@@ -254,7 +254,7 @@ DWORD CBaseSplitterFilter::ThreadProc()
 
 	for (DWORD cmd = (DWORD)-1; ; cmd = GetRequest()) {
 		if (cmd == CMD_EXIT) {
-			m_hThread = NULL;
+			m_hThread = nullptr;
 			Reply(S_OK);
 			return 0;
 		}
@@ -295,7 +295,7 @@ DWORD CBaseSplitterFilter::ThreadProc()
 
 	ASSERT(0); // we should only exit via CMD_EXIT
 
-	m_hThread = NULL;
+	m_hThread = nullptr;
 	return 0;
 }
 
@@ -424,7 +424,7 @@ CBasePin* CBaseSplitterFilter::GetPin(int n)
 		return m_pInput;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 STDMETHODIMP CBaseSplitterFilter::Stop()
@@ -822,7 +822,7 @@ STDMETHODIMP CBaseSplitterFilter::GetMarkerTime(long MarkerNum, double* pMarkerT
 
 STDMETHODIMP CBaseSplitterFilter::GetMarkerName(long MarkerNum, BSTR* pbstrMarkerName)
 {
-	return ChapGet((int)MarkerNum-1, NULL, pbstrMarkerName);
+	return ChapGet((int)MarkerNum-1, nullptr, pbstrMarkerName);
 }
 
 // IKeyFrameInfo

@@ -279,7 +279,7 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt,
 		return false;				\
 	}								\
 
-bool CBaseSplitterFileEx::Read(mpahdr& h, int len, CMediaType* pmt/* = NULL*/, bool fAllowV25/* = false*/, bool find_sync/* = false*/)
+bool CBaseSplitterFileEx::Read(mpahdr& h, int len, CMediaType* pmt/* = nullptr*/, bool fAllowV25/* = false*/, bool find_sync/* = false*/)
 {
 	memset(&h, 0, sizeof(h));
 
@@ -1400,7 +1400,7 @@ bool CBaseSplitterFileEx::Read(teletextsubhdr& h, int len, CMediaType* pmt, LPCS
 	return false;
 }
 
-bool CBaseSplitterFileEx::Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt/* = NULL*/)
+bool CBaseSplitterFileEx::Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
 {
 	NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
 	CH264Nalu Nalu;
@@ -1454,7 +1454,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pm
 			CSize aspect(params.width * params.sar.num, params.height * params.sar.den);
 			ReduceDim(aspect);
 
-			BYTE* extradata  = NULL;
+			BYTE* extradata  = nullptr;
 			size_t extrasize = 0;
 
 			{
@@ -1508,7 +1508,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pm
 	return false;
 }
 
-bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt/* = NULL*/)
+bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt/* = nullptr*/)
 {
 	CAtlArray<BYTE> pData;
 	pData.SetCount(len);
@@ -1519,7 +1519,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt/* = NULL*/)
 	return Read(h, pData, pmt);
 }
 
-bool CBaseSplitterFileEx::Read(avchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt/* = NULL*/)
+bool CBaseSplitterFileEx::Read(avchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
 {
 	if (pData.IsEmpty()) {
 		CAtlArray<BYTE> pTmpData;
@@ -1549,7 +1549,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CAtlArray<BYTE>& pData, CMedi
 	return Read(h, pData, pmt);
 }
 
-bool CBaseSplitterFileEx::Read(hevchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt/* = NULL*/)
+bool CBaseSplitterFileEx::Read(hevchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
 {
 	NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
 	CH265Nalu Nalu;
@@ -1601,7 +1601,7 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, CAtlArray<BYTE>& pData, CMediaType* p
 			CSize aspect(params.width * params.sar.num, params.height * params.sar.den);
 			ReduceDim(aspect);
 
-			BYTE* extradata  = NULL;
+			BYTE* extradata  = nullptr;
 			size_t extrasize = 0;
 
 			{
@@ -1663,7 +1663,7 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, CAtlArray<BYTE>& pData, CMediaType* p
 	return false;
 }
 
-bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt/* = NULL*/)
+bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt/* = nullptr*/)
 {
 	CAtlArray<BYTE> pData;
 	pData.SetCount(len);
@@ -1674,7 +1674,7 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt/* = NULL*/)
 	return Read(h, pData, pmt);
 }
 
-bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt/* = NULL*/)
+bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
 {
 	if (pData.IsEmpty()) {
 		CAtlArray<BYTE> pTmpData;
@@ -1779,7 +1779,7 @@ bool CBaseSplitterFileEx::Read(pcm_law_hdr& h, int len, bool bAlaw, CMediaType* 
 	return true;
 }
 
-bool CBaseSplitterFileEx::Read(opus_ts_hdr& h, int len, CAtlArray<BYTE>& extradata, CMediaType* pmt/* = NULL*/)
+bool CBaseSplitterFileEx::Read(opus_ts_hdr& h, int len, CAtlArray<BYTE>& extradata, CMediaType* pmt/* = nullptr*/)
 {
 	if (len < 2 || extradata.GetCount() != 30) {
 		return false;

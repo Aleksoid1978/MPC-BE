@@ -35,7 +35,7 @@ protected:
 	LONGLONG                  m_llTotalLength     = 0;
 	HANDLE                    m_hFile             = INVALID_HANDLE_VALUE;
 	size_t                    m_nCurPart          = SIZE_T_MAX;
-	REFERENCE_TIME*           m_pCurrentPTSOffset = NULL;
+	REFERENCE_TIME*           m_pCurrentPTSOffset = nullptr;
 
 private:
 	BOOL     OpenPart(size_t nPart);

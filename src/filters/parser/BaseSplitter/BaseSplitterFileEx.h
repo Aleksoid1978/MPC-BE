@@ -325,39 +325,39 @@ public:
 
 #pragma pack(pop)
 
-	bool Read(seqhdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true);
-	bool Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt = NULL, bool find_sync = true);
-	bool Read(mpahdr& h, int len, CMediaType* pmt = NULL, bool fAllowV25 = false, bool find_sync = false);
-	bool Read(aachdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true);
-	bool Read(latm_aachdr& h, int len, CMediaType* pmt = NULL);
-	bool Read(ac3hdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true, bool AC3CoreOnly = true);
-	bool Read(dtshdr& h, int len, CMediaType* pmt = NULL, bool find_sync = true);
-	bool Read(dtslbr_hdr& h, int len, CMediaType* pmt = NULL);
-	bool Read(lpcmhdr& h, CMediaType* pmt = NULL);
-	bool Read(dvdalpcmhdr& h, int len, CMediaType* pmt = NULL);
-	bool Read(hdmvlpcmhdr& h, CMediaType* pmt = NULL);
-	bool Read(mlphdr& h, int len, CMediaType* pmt = NULL, bool find_sync = false);
-	bool Read(dvdspuhdr& h, CMediaType* pmt = NULL);
-	bool Read(svcdspuhdr& h, CMediaType* pmt = NULL);
-	bool Read(cvdspuhdr& h, CMediaType* pmt = NULL);
-	bool Read(ps2audhdr& h, CMediaType* pmt = NULL);
-	bool Read(ps2subhdr& h, CMediaType* pmt = NULL);
-	bool Read(vc1hdr& h, int len, CMediaType* pmt = NULL);
-	bool Read(dirachdr& h, int len, CMediaType* pmt = NULL);
+	bool Read(seqhdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = true);
+	bool Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt = nullptr, bool find_sync = true);
+	bool Read(mpahdr& h, int len, CMediaType* pmt = nullptr, bool fAllowV25 = false, bool find_sync = false);
+	bool Read(aachdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = true);
+	bool Read(latm_aachdr& h, int len, CMediaType* pmt = nullptr);
+	bool Read(ac3hdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = true, bool AC3CoreOnly = true);
+	bool Read(dtshdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = true);
+	bool Read(dtslbr_hdr& h, int len, CMediaType* pmt = nullptr);
+	bool Read(lpcmhdr& h, CMediaType* pmt = nullptr);
+	bool Read(dvdalpcmhdr& h, int len, CMediaType* pmt = nullptr);
+	bool Read(hdmvlpcmhdr& h, CMediaType* pmt = nullptr);
+	bool Read(mlphdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = false);
+	bool Read(dvdspuhdr& h, CMediaType* pmt = nullptr);
+	bool Read(svcdspuhdr& h, CMediaType* pmt = nullptr);
+	bool Read(cvdspuhdr& h, CMediaType* pmt = nullptr);
+	bool Read(ps2audhdr& h, CMediaType* pmt = nullptr);
+	bool Read(ps2subhdr& h, CMediaType* pmt = nullptr);
+	bool Read(vc1hdr& h, int len, CMediaType* pmt = nullptr);
+	bool Read(dirachdr& h, int len, CMediaType* pmt = nullptr);
 
 	bool Read(hdmvsubhdr& h, CMediaType* pmt, LPCSTR language_code);
 	bool Read(dvbsubhdr& h, int len, CMediaType* pmt, LPCSTR language_code, bool bCheckFormat = true);
 	bool Read(teletextsubhdr& h, int len, CMediaType* pmt, LPCSTR language_code, bool bCheckFormat = true);
 	
-	bool Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt = NULL);
-	bool Read(avchdr& h, int len, CMediaType* pmt = NULL);
-	bool Read(avchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt = NULL);
+	bool Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt = nullptr);
+	bool Read(avchdr& h, int len, CMediaType* pmt = nullptr);
+	bool Read(avchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt = nullptr);
 	
-	bool Read(hevchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt = NULL);
-	bool Read(hevchdr& h, int len, CMediaType* pmt = NULL);
-	bool Read(hevchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt = NULL);
+	bool Read(hevchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt = nullptr);
+	bool Read(hevchdr& h, int len, CMediaType* pmt = nullptr);
+	bool Read(hevchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt = nullptr);
 	
-	bool Read(adx_adpcm_hdr& h, int len, CMediaType* pmt = NULL);
-	bool Read(pcm_law_hdr& h, int len, bool bAlaw, CMediaType* pmt = NULL);
-	bool Read(opus_ts_hdr& h, int len, CAtlArray<BYTE>& extradata, CMediaType* pmt = NULL);
+	bool Read(adx_adpcm_hdr& h, int len, CMediaType* pmt = nullptr);
+	bool Read(pcm_law_hdr& h, int len, bool bAlaw, CMediaType* pmt = nullptr);
+	bool Read(opus_ts_hdr& h, int len, CAtlArray<BYTE>& extradata, CMediaType* pmt = nullptr);
 };

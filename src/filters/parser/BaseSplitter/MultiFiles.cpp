@@ -34,7 +34,7 @@ void CMultiFiles::Reset()
 	m_rtPtsOffsets.RemoveAll();
 	m_nCurPart = SIZE_T_MAX;
 	m_llTotalLength = 0;
-	m_pCurrentPTSOffset = NULL;
+	m_pCurrentPTSOffset = nullptr;
 }
 
 BOOL CMultiFiles::Open(LPCTSTR lpszFileName)
@@ -153,7 +153,7 @@ UINT CMultiFiles::Read(BYTE* lpBuf, UINT nCount, DWORD& dwError)
 
 again:
 		DWORD nNumberOfBytesRead = 0;
-		if (!ReadFile(m_hFile, lpBuf, nCount - dwRead, &nNumberOfBytesRead, NULL)) {
+		if (!ReadFile(m_hFile, lpBuf, nCount - dwRead, &nNumberOfBytesRead, nullptr)) {
 			const DWORD dwLastError = GetLastError();
 			if (dwLastError != ERROR_SUCCESS) {
 				// TODO - select only the necessary error codes : ERROR_INVALID_HANDLE, ERROR_BAD_NETPATH, ERROR_DEV_NOT_EXIST, ERROR_FILE_INVALID ...
@@ -202,7 +202,7 @@ BOOL CMultiFiles::OpenPart(size_t nPart)
 		ClosePart();
 
 		const CString& lpFileName = m_strFiles.GetAt(nPart);
-		m_hFile = CreateFile(lpFileName, GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+		m_hFile = CreateFile(lpFileName, GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
 		if (m_hFile != INVALID_HANDLE_VALUE) {
 			m_nCurPart = nPart;
 			if (m_pCurrentPTSOffset) {

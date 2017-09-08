@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,8 +34,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] =
 
 const AMOVIESETUP_PIN sudpPins[] =
 {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn), sudPinTypesIn},
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, 0, NULL}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn), sudPinTypesIn},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, 0, nullptr}
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn2[] =
@@ -50,8 +50,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut2[] =
 
 const AMOVIESETUP_PIN sudpPins2[] =
 {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn2), sudPinTypesIn2},
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut2), sudPinTypesOut2}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn2), sudPinTypesIn2},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesOut2), sudPinTypesOut2}
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn3[] =
@@ -66,24 +66,24 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut3[] =
 
 const AMOVIESETUP_PIN sudpPins3[] =
 {
-	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesIn3), sudPinTypesIn3},
-	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, NULL, _countof(sudPinTypesOut3), sudPinTypesOut3}
+	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn3), sudPinTypesIn3},
+	{L"Output", FALSE, TRUE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesOut3), sudPinTypesOut3}
 };
 
 const AMOVIESETUP_FILTER sudFilter[] =
 {
 	{&__uuidof(CRoQSplitterFilter), RoQSplitterName, MERIT_NORMAL+1, _countof(sudpPins), sudpPins, CLSID_LegacyAmFilterCategory},
-	{&__uuidof(CRoQSourceFilter), RoQSourceName, MERIT_NORMAL+1, 0, NULL, CLSID_LegacyAmFilterCategory},
+	{&__uuidof(CRoQSourceFilter), RoQSourceName, MERIT_NORMAL+1, 0, nullptr, CLSID_LegacyAmFilterCategory},
 	{&__uuidof(CRoQVideoDecoder), RoQVideoDecoderName, MERIT_NORMAL, _countof(sudpPins2), sudpPins2, CLSID_LegacyAmFilterCategory},
 	{&__uuidof(CRoQAudioDecoder), RoQAudioDecoderName, MERIT_NORMAL, _countof(sudpPins3), sudpPins3, CLSID_LegacyAmFilterCategory},
 };
 
 CFactoryTemplate g_Templates[] =
 {
-	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CRoQSplitterFilter>, NULL, &sudFilter[0]},
-	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CRoQSourceFilter>, NULL, &sudFilter[1]},
-	{sudFilter[2].strName, sudFilter[2].clsID, CreateInstance<CRoQVideoDecoder>, NULL, &sudFilter[2]},
-	{sudFilter[3].strName, sudFilter[3].clsID, CreateInstance<CRoQAudioDecoder>, NULL, &sudFilter[3]},
+	{sudFilter[0].strName, sudFilter[0].clsID, CreateInstance<CRoQSplitterFilter>, nullptr, &sudFilter[0]},
+	{sudFilter[1].strName, sudFilter[1].clsID, CreateInstance<CRoQSourceFilter>, nullptr, &sudFilter[1]},
+	{sudFilter[2].strName, sudFilter[2].clsID, CreateInstance<CRoQVideoDecoder>, nullptr, &sudFilter[2]},
+	{sudFilter[3].strName, sudFilter[3].clsID, CreateInstance<CRoQAudioDecoder>, nullptr, &sudFilter[3]},
 };
 
 int g_cTemplates = _countof(g_Templates);
@@ -294,7 +294,7 @@ bool CRoQSplitterFilter::DemuxLoop()
 
 	roq_chunk rc;
 	while(S_OK == (hr = m_pAsyncReader->SyncRead(pos, sizeof(rc), (BYTE*)&rc))
-		&& !CheckRequest(NULL))
+		&& !CheckRequest(nullptr))
 	{
 		pos += sizeof(rc);
 
@@ -553,7 +553,7 @@ HRESULT CRoQVideoDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		DeleteMediaType(pmt);
 	}
 
-	BYTE* pDataIn = NULL;
+	BYTE* pDataIn = nullptr;
 	if(FAILED(hr = pIn->GetPointer(&pDataIn))) return hr;
 
 	long len = pIn->GetActualDataLength();
@@ -565,7 +565,7 @@ HRESULT CRoQVideoDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	if(pIn->IsPreroll() == S_OK || rtStart < 0)
 		return S_OK;
 
-	BYTE* pDataOut = NULL;
+	BYTE* pDataOut = nullptr;
 	if(FAILED(hr = pOut->GetPointer(&pDataOut)))
 		return hr;
 
@@ -601,7 +601,7 @@ HRESULT CRoQVideoDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	{
 		int bpos = 0, xpos = 0, ypos = 0;
 		int vqflg = 0, vqflg_pos = -1, vqid;
-		roq_qcell* qcell = NULL;
+		roq_qcell* qcell = nullptr;
 
 		BYTE* buf = pDataIn;
 
@@ -874,8 +874,8 @@ HRESULT CRoQVideoDecoder::StartStreaming()
 
 HRESULT CRoQVideoDecoder::StopStreaming()
 {
-	delete [] m_y[0]; m_y[0] = NULL;
-	delete [] m_y[1]; m_y[1] = NULL;
+	delete [] m_y[0]; m_y[0] = nullptr;
+	delete [] m_y[1]; m_y[1] = nullptr;
 
 	return __super::StopStreaming();
 }
@@ -909,7 +909,7 @@ HRESULT CRoQAudioDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	WAVEFORMATEX* pwfe = (WAVEFORMATEX*)m_pOutput->CurrentMediaType().Format();
 	UNREFERENCED_PARAMETER(pwfe);
 
-	BYTE* pDataIn = NULL;
+	BYTE* pDataIn = nullptr;
 	if(FAILED(hr = pIn->GetPointer(&pDataIn)))
 		return hr;
 
@@ -922,7 +922,7 @@ HRESULT CRoQAudioDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	if(pIn->IsPreroll() == S_OK || rtStart < 0)
 		return S_OK;
 
-	BYTE* pDataOut = NULL;
+	BYTE* pDataOut = nullptr;
 	if(FAILED(hr = pOut->GetPointer(&pDataOut)))
 		return hr;
 

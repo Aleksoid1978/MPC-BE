@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,17 +27,17 @@
 //
 
 CAsyncFileReader::CAsyncFileReader(CString fn, HRESULT& hr, BOOL bSupportURL)
-	: CUnknown(NAME("CAsyncFileReader"), NULL, &hr)
+	: CUnknown(NAME("CAsyncFileReader"), nullptr, &hr)
 	, m_bSupportURL(bSupportURL)
-	, m_hBreakEvent(NULL)
+	, m_hBreakEvent(nullptr)
 	, m_lOsError(0)
 {
 	hr = Open(fn) ? S_OK : E_FAIL;
 }
 
 CAsyncFileReader::CAsyncFileReader(CHdmvClipInfo::CPlaylist& Items, HRESULT& hr)
-	: CUnknown(NAME("CAsyncFileReader"), NULL, &hr)
-	, m_hBreakEvent(NULL)
+	: CUnknown(NAME("CAsyncFileReader"), nullptr, &hr)
+	, m_hBreakEvent(nullptr)
 	, m_lOsError(0)
 {
 	hr = OpenFiles(Items) ? S_OK : E_FAIL;

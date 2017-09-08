@@ -62,7 +62,7 @@ private:
 	DWORD              m_RequestCmd = 0;
 
 	SOCKET             m_UdpSocket  = INVALID_SOCKET;
-	WSAEVENT           m_WSAEvent   = NULL;
+	WSAEVENT           m_WSAEvent   = nullptr;
 	sockaddr_in        m_addr;
 
 	CHTTPAsync         m_HTTPAsync;
