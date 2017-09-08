@@ -3,7 +3,7 @@
   <assemblyIdentity
     name="Gabest.VobSub.Filter"
     processorArchitecture="*"
-    version="2.45.0.0"
+    version="2.46.0.0"
     type="win32"
   />
   <description>DirectVobSub</description>
