@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,11 +33,11 @@ class CFilter final
 	CCritSec        m_csFilter;
 
 private:
-	AVFilterGraph   *m_pFilterGraph      = NULL;
-	AVFilterContext *m_pFilterBufferSrc  = NULL;
-	AVFilterContext *m_pFilterBufferSink = NULL;
+	AVFilterGraph   *m_pFilterGraph      = nullptr;
+	AVFilterContext *m_pFilterBufferSrc  = nullptr;
+	AVFilterContext *m_pFilterBufferSink = nullptr;
 
-	AVFrame         *m_pFrame            = NULL;
+	AVFrame         *m_pFrame            = nullptr;
 
 	AVSampleFormat  m_av_sample_fmt      = (AVSampleFormat)-1;
 	SampleFormat    m_sample_fmt         = SAMPLE_FMT_NONE;
@@ -56,7 +56,7 @@ public:
 	HRESULT Push(CAutoPtr<CPacket> p);
 	HRESULT Pull(CAutoPtr<CPacket>& p);
 
-	BOOL IsInitialized() const { return m_pFilterGraph != NULL; }
+	BOOL IsInitialized() const { return m_pFilterGraph != nullptr; }
 
 	void Flush();
 };

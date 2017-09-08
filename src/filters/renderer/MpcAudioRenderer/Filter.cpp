@@ -107,15 +107,15 @@ HRESULT CFilter::Init(double dRate, const WAVEFORMATEX* wfe)
 											buffersrc,
 											"in",
 											args,
-											NULL,
+											nullptr,
 											m_pFilterGraph);
 	CheckRet(ret);
 
 	ret = avfilter_graph_create_filter(&m_pFilterBufferSink,
 										buffersink,
 										"out",
-										NULL,
-										NULL,
+										nullptr,
+										nullptr,
 										m_pFilterGraph);
 	CheckRet(ret);
 
@@ -161,7 +161,7 @@ HRESULT CFilter::Init(double dRate, const WAVEFORMATEX* wfe)
 		CheckRet(ret);
 	}
 
-	ret = avfilter_graph_config(m_pFilterGraph, NULL);
+	ret = avfilter_graph_config(m_pFilterGraph, nullptr);
 	CheckRet(ret);
 
 	m_av_sample_fmt = av_sample_fmt;
@@ -182,7 +182,7 @@ HRESULT CFilter::Push(CAutoPtr<CPacket> p)
 	CheckPointer(m_pFrame, E_FAIL);
 
 	BYTE *pData   = p->GetData();
-	BYTE* pTmpBuf = NULL;
+	BYTE* pTmpBuf = nullptr;
 
 	int nSamples = p->GetCount() / (m_Channels * av_get_bytes_per_sample(m_av_sample_fmt));
 
@@ -200,7 +200,7 @@ HRESULT CFilter::Push(CAutoPtr<CPacket> p)
 	m_pFrame->sample_rate    = m_SamplesPerSec;
 	m_pFrame->pts            = p->rtStart;
 
-	int buffersize = av_samples_get_buffer_size(NULL, m_pFrame->channels, m_pFrame->nb_samples, m_av_sample_fmt, 1);
+	int buffersize = av_samples_get_buffer_size(nullptr, m_pFrame->channels, m_pFrame->nb_samples, m_av_sample_fmt, 1);
 	int ret = avcodec_fill_audio_frame(m_pFrame, m_pFrame->channels, m_av_sample_fmt, pData, buffersize, 1);
 	if (ret >= 0) {
 		ret = av_buffersrc_write_frame(m_pFilterBufferSrc, m_pFrame);
@@ -236,7 +236,7 @@ HRESULT CFilter::Pull(CAutoPtr<CPacket>& p)
 			p->SetData(pTmpBuf, pSize);
 			delete [] pTmpBuf;
 		} else {
-			int buffersize = av_samples_get_buffer_size(NULL, m_pFrame->channels, m_pFrame->nb_samples, m_av_sample_fmt, 1);
+			int buffersize = av_samples_get_buffer_size(nullptr, m_pFrame->channels, m_pFrame->nb_samples, m_av_sample_fmt, 1);
 			p->SetData(m_pFrame->data[0], buffersize);
 		}
 	}
@@ -251,6 +251,6 @@ void CFilter::Flush()
 	CAutoLock cAutoLock(&m_csFilter);
 
 	avfilter_graph_free(&m_pFilterGraph);
-	m_pFilterBufferSrc	= NULL;
-	m_pFilterBufferSink	= NULL;
+	m_pFilterBufferSrc	= nullptr;
+	m_pFilterBufferSink	= nullptr;
 }
