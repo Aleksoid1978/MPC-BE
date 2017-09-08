@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,7 +36,7 @@ BOOL WINAPI MyGetDialogSize(int iResourceID, DLGPROC pDlgProc, LPARAM lParam, SI
 								  pDlgProc,
 								  lParam);
 
-	if (hwnd == NULL) {
+	if (hwnd == nullptr) {
 		return FALSE;
 	}
 
@@ -75,8 +75,8 @@ STDMETHODIMP CDVSBasePPage::GetPageInfo(LPPROPPAGEINFO pPageInfo)
 
 	pPageInfo->cb               = sizeof(PROPPAGEINFO);
 	pPageInfo->pszTitle         = pszTitle;
-	pPageInfo->pszDocString     = NULL;
-	pPageInfo->pszHelpFile      = NULL;
+	pPageInfo->pszDocString     = nullptr;
+	pPageInfo->pszHelpFile      = nullptr;
 	pPageInfo->dwHelpContext    = 0;
 	// Set defaults in case GetDialogSize fails
 	pPageInfo->size.cx          = 340;
@@ -103,7 +103,7 @@ STDMETHODIMP CDVSBasePPage::Activate(HWND hwndParent, LPCRECT pRect, BOOL fModal
 	}
 
 	m_hwnd = CreateDialogParam(AfxGetResourceHandle(), MAKEINTRESOURCE(m_DialogId), hwndParent, DialogProc, (LPARAM)this);
-	if (m_hwnd == NULL) {
+	if (m_hwnd == nullptr) {
 		return E_OUTOFMEMORY;
 	}
 
@@ -182,7 +182,7 @@ HRESULT CDVSBasePPage::OnConnect(IUnknown* pUnknown)
 
 HRESULT CDVSBasePPage::OnDisconnect()
 {
-	if (m_pDirectVobSub == NULL) {
+	if (m_pDirectVobSub == nullptr) {
 		return E_UNEXPECTED;
 	}
 
@@ -297,7 +297,7 @@ void CDVSBasePPage::BindControl(UINT id, CWnd& control)
 CDVSMainPPage::CDVSMainPPage(LPUNKNOWN pUnk, HRESULT* phr) :
 	CDVSBasePPage(NAME("DirectVobSub Property Page (main)"), pUnk, IDD_DVSMAINPAGE, IDD_DVSMAINPAGE),
 	m_nLangs(0),
-	m_ppLangs(NULL)
+	m_ppLangs(nullptr)
 {
 	BindControl(IDC_FILENAME, m_fnedit);
 	BindControl(IDC_LANGCOMBO, m_langs);
@@ -322,7 +322,7 @@ void CDVSMainPPage::FreeLangs()
 		}
 		CoTaskMemFree(m_ppLangs);
 		m_nLangs = 0;
-		m_ppLangs = NULL;
+		m_ppLangs = nullptr;
 	}
 }
 
@@ -341,7 +341,7 @@ bool CDVSMainPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 					if (LOWORD(wParam) == IDC_OPEN) {
 						AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-						CFileDialog fd(TRUE, NULL, NULL,
+						CFileDialog fd(TRUE, nullptr, nullptr,
 									   OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_FILEMUSTEXIST|OFN_PATHMUSTEXIST,
 									   L".idx .smi .sub .srt .psb .ssa .ass .usf .sup|*.idx;*.smi;*.sub;*.srt;*.psb;*.ssa;*.ass;*.usf;*.sup|"
 									   L"All files (*.*)|*.*||",
@@ -421,7 +421,7 @@ void CDVSMainPPage::UpdateObjectData(bool fSave)
 		}
 		m_pDirectVobSub->get_SelectedLanguage(&m_iSelectedLanguage);
 		m_pDirectVobSub->get_Placement(&m_bOverridePlacement, &m_PlacementXperc, &m_PlacementYperc);
-		m_pDirectVobSub->get_VobSubSettings(NULL, &m_bOnlyShowForcedVobSubs, NULL);
+		m_pDirectVobSub->get_VobSubSettings(nullptr, &m_bOnlyShowForcedVobSubs, nullptr);
 		m_pDirectVobSub->get_TextSettings(&m_defStyle);
 		m_pDirectVobSub->get_AspectRatioSettings(&m_ePARCompensationType);
 	}
@@ -780,11 +780,11 @@ bool CDVSAboutPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				case BN_CLICKED: {
 					if (LOWORD(wParam) == IDC_HOMEPAGEBTN) {
 						AFX_MANAGE_STATE(AfxGetStaticModuleState());
-						ShellExecute(m_Dlg, L"open", ResStr(IDS_URL_HOMEPAGE), NULL, NULL, SW_SHOWNORMAL);
+						ShellExecute(m_Dlg, L"open", ResStr(IDS_URL_HOMEPAGE), nullptr, nullptr, SW_SHOWNORMAL);
 						return true;
 					} else if (LOWORD(wParam) == IDC_BUGREPORTBTN) {
 						AFX_MANAGE_STATE(AfxGetStaticModuleState());
-						ShellExecute(m_Dlg, L"open", ResStr(IDS_URL_EMAIL), NULL, NULL, SW_SHOWNORMAL);
+						ShellExecute(m_Dlg, L"open", ResStr(IDS_URL_EMAIL), nullptr, nullptr, SW_SHOWNORMAL);
 						return true;
 					}
 				}
@@ -974,13 +974,13 @@ void CDVSColorPPage::UpdateControlData(bool fSave)
 		m_preflist.ResetContent();
 		m_dynchglist.ResetContent();
 
-		BYTE* pData	= NULL;
+		BYTE* pData	= nullptr;
 		UINT nSize	= 0;
 
 		if (!theApp.GetProfileBinary(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_COLORFORMATS), &pData, &nSize)
 				|| !pData || nSize != nCountFmts) {
 			if (pData) {
-				delete [] pData, pData = NULL;
+				delete [] pData, pData = nullptr;
 			}
 
 			nSize = nCountFmts;
@@ -1058,11 +1058,11 @@ bool CDVSPathsPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 							BROWSEINFO bi;
 							bi.hwndOwner = m_Dlg;
-							bi.pidlRoot = NULL;
+							bi.pidlRoot = nullptr;
 							bi.pszDisplayName = pathbuff;
 							bi.lpszTitle = L"";
 							bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_EDITBOX | BIF_VALIDATE | BIF_USENEWUI;
-							bi.lpfn = NULL;
+							bi.lpfn = nullptr;
 							bi.lParam = 0;
 							bi.iImage = 0;
 
