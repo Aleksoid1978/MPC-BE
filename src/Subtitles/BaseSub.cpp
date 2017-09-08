@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,6 @@
 
 #include "stdafx.h"
 #include "BaseSub.h"
-#include "../DSUtil/ResampleARGB.h"
 
 CBaseSub::CBaseSub(SUBTITLE_TYPE nType)
 	: m_nType(nType)
@@ -66,9 +65,12 @@ void CBaseSub::FinalizeRender(SubPicDesc& spd)
 		m_bResizedRender = FALSE;
 
 		// StretchBlt ...
-		int filter = (spd.w < m_spd.w && spd.h < m_spd.h) ? IMAGING_TRANSFORM_BOX : IMAGING_TRANSFORM_BILINEAR;
+		int filter = (spd.w < m_spd.w && spd.h < m_spd.h) ? CResampleARGB::FILTER_BOX : CResampleARGB::FILTER_BILINEAR;
 
-		HRESULT hr = ResampleARGB((BYTE*)spd.bits, spd.w, spd.h, (BYTE*)m_spd.bits, m_spd.w, m_spd.h, filter);
+		HRESULT hr = m_resample.SetParameters(spd.w, spd.h, m_spd.w, m_spd.h, filter);
+		if (S_OK == hr) {
+			hr = m_resample.Process((BYTE*)spd.bits, (BYTE*)m_spd.bits);
+		}
 		ASSERT(hr == S_OK);
 	}
 }

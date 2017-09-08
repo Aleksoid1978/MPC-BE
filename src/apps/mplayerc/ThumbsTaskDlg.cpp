@@ -156,6 +156,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 
 	CCritSec csSubLock;
 	RECT bbox;
+	CResampleARGB Resample;
 
 	for (int i = 1, pics = cols * rows; i <= pics; i++) {
 		const REFERENCE_TIME rt = duration * i / (pics + 1);
@@ -213,11 +214,14 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 
 		m_pMainFrm->RenderCurrentSubtitles(dib.data());
 
-		ResampleARGB(
-			thumb.get(), thumbsize.cx, thumbsize.cy,
-			(const BYTE*)(&bi->bmiHeader + 1), bi->bmiHeader.biWidth, abs(bi->bmiHeader.biHeight),
-			IMAGING_TRANSFORM_HAMMING
-		);
+		hr = Resample.SetParameters(
+			thumbsize.cx, thumbsize.cy,
+			bi->bmiHeader.biWidth, abs(bi->bmiHeader.biHeight),
+			CResampleARGB::FILTER_HAMMING);
+		if (S_OK == hr) {
+			hr = Resample.Process(thumb.get(), (const BYTE*)(&bi->bmiHeader + 1));
+		}
+		ASSERT(hr == S_OK);
 
 		const BYTE* src = thumb.get();
 		int srcPitch = thumbsize.cx * 4;

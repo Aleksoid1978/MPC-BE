@@ -1,3 +1,23 @@
+/*
+* (C) 2017 see Authors.txt
+*
+* This file is part of MPC-BE.
+*
+* MPC-BE is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 3 of the License, or
+* (at your option) any later version.
+*
+* MPC-BE is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
+
 #include "stdafx.h"
 #include <math.h>
 #include <ppl.h>
@@ -323,54 +343,86 @@ HRESULT ResampleVertical(BYTE* dest, int W, int destH, const BYTE* const src, in
 	return S_OK;
 }
 
-HRESULT ResampleARGB(BYTE* const dest, const int destW, const int destH, const BYTE* const src, const int srcW, const int srcH, const int filter)
+void CResampleARGB::FreeData()
 {
-	if (srcW == destW && srcH == destH) {
-		memcpy((BYTE*)dest, src, srcW * srcH * 4);
+	free(m_pTemp);
+	m_pTemp = nullptr;
+}
 
+HRESULT CResampleARGB::Init()
+{
+	FreeData();
+
+	if (m_srcW <= 0 || m_srcH <= 0 || m_destW <= 0 || m_destH <= 0) {
+		return E_INVALIDARG;
+	}
+
+	switch (m_filter) {
+	case FILTER_BOX:      m_pFilter = &BOX;      break;
+	case FILTER_BILINEAR: m_pFilter = &BILINEAR; break;
+	case FILTER_HAMMING:  m_pFilter = &HAMMING;  break;
+	case FILTER_BICUBIC:  m_pFilter = &BICUBIC;  break;
+	case FILTER_LANCZOS:  m_pFilter = &LANCZOS;  break;
+	default:
+		return E_INVALIDARG;
+	}
+
+	m_bResampleHor = (m_srcW != m_destW);
+	m_bResampleVer = (m_srcH != m_destH);
+
+	if (m_bResampleHor && m_bResampleVer) {
+		m_pTemp = (BYTE*)malloc(m_destW * m_srcH * 4);
+		if (!m_pTemp) {
+			FreeData();
+			return E_OUTOFMEMORY;
+		}
+	}
+
+	m_actual = true;
+
+	return S_OK;
+}
+
+CResampleARGB::~CResampleARGB()
+{
+	free(m_pTemp);
+}
+
+HRESULT CResampleARGB::SetParameters(const int destW, const int destH, const int srcW, const int srcH, const int filter)
+{
+	if (m_actual && m_srcW == srcW && m_srcH == srcH && m_destW == destW && m_destH == destH && m_filter == filter) {
 		return S_OK;
 	}
 
-	filter_t* filterp;
+	m_actual = false;
+	m_srcW   = srcW;
+	m_srcH   = srcH;
+	m_destW  = destW;
+	m_destH  = destH;
+	m_filter = filter;
 
-	// check filter
-	switch (filter) {
-	case IMAGING_TRANSFORM_BOX:
-		filterp = &BOX;
-		break;
-	case IMAGING_TRANSFORM_BILINEAR:
-		filterp = &BILINEAR;
-		break;
-	case IMAGING_TRANSFORM_HAMMING:
-		filterp = &HAMMING;
-		break;
-	case IMAGING_TRANSFORM_BICUBIC:
-		filterp = &BICUBIC;
-		break;
-	case IMAGING_TRANSFORM_LANCZOS:
-		filterp = &LANCZOS;
-		break;
-	default:
-		return E_INVALIDARG;
+	return Init();
+}
+
+HRESULT CResampleARGB::Process(BYTE* const dest, const BYTE* const src)
+{
+	if (!m_actual) {
+		return E_ABORT;
+	}
+
+	if (m_srcW == m_destW && m_srcH == m_destH) {
+		memcpy((BYTE*)dest, src, m_srcW * m_srcH * 4);
+
+		return S_OK;
 	}
 
 	BYTE* temp = nullptr;
 	int tempW = 0;
 	int tempH = 0;
 
-	if (srcW != destW && srcH != destH) { // two-pass mode will be used
-		tempW = destW;
-		tempH = srcH;
-
-		temp = (BYTE*)malloc(tempW * tempH * 4);
-		if (!temp) {
-			return E_OUTOFMEMORY;
-		}
-	}
-
 	// two-pass resize, first pass
-	if (srcW != destW) {
-		HRESULT hr = ResampleHorizontal(temp ? temp : dest, destW, srcH, src, srcW, filterp);
+	if (m_bResampleHor) {
+		HRESULT hr = ResampleHorizontal(m_pTemp ? m_pTemp : dest, m_destW, m_srcH, src, m_srcW, m_pFilter);
 		if (hr != S_OK) {
 			free(temp);
 			return hr;
@@ -378,9 +430,9 @@ HRESULT ResampleARGB(BYTE* const dest, const int destW, const int destH, const B
 	}
 
 	// second pass
-	if (srcH != destH) {
+	if (m_bResampleVer) {
 		// imIn can be the original image or horizontally resampled one
-		HRESULT hr = ResampleVertical(dest, destW, destH, temp ? temp : src, srcH, filterp);
+		HRESULT hr = ResampleVertical(dest, m_destW, m_destH, m_pTemp ? m_pTemp : src, m_srcH, m_pFilter);
 		// it's safe to call free with empty value if there was no previous step.
 		free(temp);
 		return hr;

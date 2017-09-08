@@ -21,9 +21,12 @@
 #pragma once
 
 #include "CompositionObject.h"
+#include "../DSUtil/ResampleARGB.h"
 
 class CBaseSub
 {
+	CResampleARGB m_resample;
+
 public:
 	CBaseSub(SUBTITLE_TYPE nType);
 	virtual ~CBaseSub();
