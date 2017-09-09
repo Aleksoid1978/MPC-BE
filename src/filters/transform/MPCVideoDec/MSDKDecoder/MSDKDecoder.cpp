@@ -653,7 +653,7 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
       }
     }
 
-    if (m_iOutputMode == MVC_OUTPUT_TopBottom
+    if (m_iOutputMode == MVC_OUTPUT_HalfTopBottom
         || (m_iOutputMode == MVC_OUTPUT_Auto && !bMediaSample3DSupport)) {
       if (!m_pFrame->data[0] && av_frame_get_buffer(m_pFrame, 64) < 0) {
         hr = E_POINTER;
