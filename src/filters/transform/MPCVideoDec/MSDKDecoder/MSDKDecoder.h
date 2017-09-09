@@ -52,8 +52,9 @@ typedef struct _MVCGOP {
 
 enum {
   MVC_OUTPUT_Auto = 0,
-  MVC_OUTPUT_Mono,     // force mono frame (left)
-  MVC_OUTPUT_TopBottom // convert to stereoscopic half height anamorphic video
+  MVC_OUTPUT_Mono,          // force mono frame (left)
+  MVC_OUTPUT_HalfTopBottom, // convert to stereoscopic half height anamorphic video
+  MVC_OUTPUT_TopBottom      // convert to two images packed vertically (reserved)
 };
 
 class CMPCVideoDecFilter;

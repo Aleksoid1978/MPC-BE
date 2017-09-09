@@ -3708,7 +3708,7 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetColorSpaceConversion()
 STDMETHODIMP CMPCVideoDecFilter::SetMvcOutputMode(int nMode, bool bSwapLR)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	if (nMode < 0 || nMode > MVC_OUTPUT_TopBottom) {
+	if (nMode < 0 || nMode > MVC_OUTPUT_HalfTopBottom) {
 		return E_INVALIDARG;
 	}
 	m_iMvcOutputMode = nMode;
