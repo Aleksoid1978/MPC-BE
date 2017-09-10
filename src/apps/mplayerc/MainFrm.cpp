@@ -373,8 +373,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND_RANGE(ID_ASPECTRATIO_START, ID_ASPECTRATIO_END, OnViewAspectRatio)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_ASPECTRATIO_START, ID_ASPECTRATIO_END, OnUpdateViewAspectRatio)
 	ON_COMMAND(ID_ASPECTRATIO_NEXT, OnViewAspectRatioNext)
-	ON_COMMAND_RANGE(ID_STEREO3D_AUTO, ID_STEREO3D_ROW_INTERLEAVED, OnViewStereo3DMode)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_STEREO3D_AUTO, ID_STEREO3D_ROW_INTERLEAVED, OnUpdateViewStereo3DMode)
+	ON_COMMAND_RANGE(ID_STEREO3D_AUTO, ID_STEREO3D_HALFOVERUNDER, OnViewStereo3DMode) //TODO
+	ON_UPDATE_COMMAND_UI_RANGE(ID_STEREO3D_AUTO, ID_STEREO3D_HALFOVERUNDER, OnUpdateViewStereo3DMode) //TODO
 	ON_UPDATE_COMMAND_UI(ID_STEREO3D_SWAP_LEFTRIGHT, OnUpdateViewSwapLeftRight)
 	ON_COMMAND(ID_STEREO3D_SWAP_LEFTRIGHT, OnViewSwapLeftRight)
 	ON_COMMAND_RANGE(ID_ONTOP_NEVER, ID_ONTOP_WHILEPLAYINGVIDEO, OnViewOntop)
@@ -7384,7 +7384,7 @@ void CMainFrame::OnViewAspectRatioNext()
 void CMainFrame::OnUpdateViewStereo3DMode(CCmdUI* pCmdUI)
 {
 	if (AfxGetAppSettings().iStereo3DMode == (pCmdUI->m_nID - ID_STEREO3D_AUTO)) {
-		CheckMenuRadioItem(ID_STEREO3D_AUTO, ID_STEREO3D_ROW_INTERLEAVED, pCmdUI->m_nID);
+		CheckMenuRadioItem(ID_STEREO3D_AUTO, ID_STEREO3D_HALFOVERUNDER, pCmdUI->m_nID); //TODO
 	}
 }
 
@@ -7394,13 +7394,25 @@ void CMainFrame::OnViewStereo3DMode(UINT nID)
 
 	s.iStereo3DMode = nID - ID_STEREO3D_AUTO;
 
+	int iMvcOutputMode;
+	switch (s.iStereo3DMode) {
+	case STEREO3D_AUTO:           iMvcOutputMode = MVC_OUTPUT_Auto;          break;
+	case STEREO3D_MONO:           iMvcOutputMode = MVC_OUTPUT_Mono;          break;
+	case STEREO3D_ROWINTERLEAVED: iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
+	case STEREO3D_HALFOVERUNDER:  iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
+	case STEREO3D_OVERUNDER:      iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
+	default:
+		ASSERT(0);
+		return;
+	}
+
 	BOOL bMvcActive = FALSE;
 	if (CComQIPtr<IMPCVideoDecFilter> pVDF = FindFilter(__uuidof(CMPCVideoDecFilter), m_pGB)) {
-		pVDF->SetMvcOutputMode(s.iStereo3DMode == 3 ? 2 : s.iStereo3DMode, s.bStereo3DSwapLR);
+		pVDF->SetMvcOutputMode(iMvcOutputMode, s.bStereo3DSwapLR);
 		bMvcActive = pVDF->GetMvcActive();
 	}
 
-	if (nID == ID_STEREO3D_ROW_INTERLEAVED || (nID == ID_STEREO3D_AUTO && bMvcActive && !m_pBFmadVR)) {
+	if (s.iStereo3DMode == STEREO3D_ROWINTERLEAVED || (s.iStereo3DMode == STEREO3D_AUTO && bMvcActive && !m_pBFmadVR)) {
 		GetRenderersData()->m_iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
 	} else {
 		GetRenderersData()->m_iStereo3DTransform = STEREO3D_AsIs;
