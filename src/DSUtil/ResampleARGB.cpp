@@ -259,7 +259,7 @@ void CResampleARGB::ResampleHorizontal(BYTE* dest, int destW, int H, const BYTE*
 {
 	concurrency::parallel_for(0, H, [&](int yy) {
 		const BYTE* lineIn = src + yy * srcW * 4;
-		BYTE* const lineOut = dest + yy * destW * 4;
+		UINT32* const lineOut = (UINT32*)dest + yy * destW;
 
 		int ss0, ss1, ss2, ss3;
 		for (int xx = 0; xx < destW; xx++) {
@@ -275,7 +275,7 @@ void CResampleARGB::ResampleHorizontal(BYTE* dest, int destW, int H, const BYTE*
 				ss3 += lineIn[(x + xmin)*4 + 3] * k[x];
 			}
 
-			((UINT32*)lineOut)[xx] = MAKE_UINT32(clip8(ss0), clip8(ss1), clip8(ss2), clip8(ss3));
+			lineOut[xx] = MAKE_UINT32(clip8(ss0), clip8(ss1), clip8(ss2), clip8(ss3));
 		}
 	});
 }
@@ -283,7 +283,7 @@ void CResampleARGB::ResampleHorizontal(BYTE* dest, int destW, int H, const BYTE*
 void CResampleARGB::ResampleVertical(BYTE* dest, int W, int destH, const BYTE* const src, int srcH)
 {
 	concurrency::parallel_for(0, destH, [&](int yy) {
-		BYTE* const lineOut = dest + yy * W * 4;
+		UINT32* const lineOut = (UINT32*)dest + yy * W;
 		const INT32* k = &m_kkVer[yy * m_kmaxVer];
 		const int ymin = m_xboundsVer[yy * 2 + 0];
 		const int ymax = m_xboundsVer[yy * 2 + 1];
@@ -298,7 +298,7 @@ void CResampleARGB::ResampleVertical(BYTE* dest, int W, int destH, const BYTE* c
 				ss3 += lineIn[xx*4 + 3] * k[y];
 			}
 
-			((UINT32*)lineOut)[xx] = MAKE_UINT32(clip8(ss0), clip8(ss1), clip8(ss2), clip8(ss3));
+			lineOut[xx] = MAKE_UINT32(clip8(ss0), clip8(ss1), clip8(ss2), clip8(ss3));
 		}
 	});
 }
