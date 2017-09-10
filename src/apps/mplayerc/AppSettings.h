@@ -105,6 +105,14 @@ enum {
 	SUBRNDT_ASSFILTERMOD
 };
 
+enum : int {
+	STEREO3D_AUTO = 0,
+	STEREO3D_MONO,
+	STEREO3D_ROWINTERLEAVED,
+	STEREO3D_HALFOVERUNDER,
+	STEREO3D_OVERUNDER,
+};
+
 // Enumeration for MCE remote control (careful : add 0x010000 for all keys!)
 enum MCE_RAW_INPUT {
 	MCE_DETAILS				= 0x010209,

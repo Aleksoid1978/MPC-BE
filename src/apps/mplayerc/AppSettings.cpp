@@ -1004,8 +1004,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	fD3DFullscreen	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_D3DFULLSCREEN, FALSE);
 	//fMonitorAutoRefreshRate	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, FALSE);
-	iStereo3DMode	= discard(pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, 0), 0u, 3u, 0u);
-	if (iStereo3DMode == 3) {
+	iStereo3DMode	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, STEREO3D_AUTO);
+	iStereo3DMode = discard(iStereo3DMode, (int)STEREO3D_AUTO, (int)STEREO3D_HALFOVERUNDER, STEREO3D_AUTO); //TODO
+	if (iStereo3DMode == ID_STEREO3D_ROW_INTERLEAVED) {
 		GetRenderersData()->m_iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
 	} else {
 		GetRenderersData()->m_iStereo3DTransform = STEREO3D_AsIs;
