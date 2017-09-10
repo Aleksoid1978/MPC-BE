@@ -680,6 +680,37 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
 
       CopyEverySecondLineSSE2(dst, srcBase, srcExtra, linesize, height / 4);
     }
+#if 0 //TODO
+    else if (m_iOutputMode == MVC_OUTPUT_TopBottom) {
+      if (!m_pFrame->data[0] && av_frame_get_buffer(m_pFrame, 64) < 0) {
+        hr = E_POINTER;
+        goto error;
+      }
+
+      bool swapLR = !!m_pFilter->m_MVC_Base_View_R_flag;
+      if (m_bSwapLR) {
+        swapLR = !swapLR;
+      }
+
+      // luminance
+      uint8_t* dst = m_pFrame->data[0];
+      uint8_t* srcBase = swapLR ? pExtraView->surface.Data.Y : pBaseView->surface.Data.Y;
+      uint8_t* srcExtra = swapLR ? pBaseView->surface.Data.Y : pExtraView->surface.Data.Y;
+
+      size_t planesize = pBaseView->surface.Data.PitchLow * height;
+      memcpy(dst, srcBase, planesize);
+      memcpy(dst + planesize, srcExtra, planesize);
+
+      // color
+      dst  = m_pFrame->data[1];
+      srcBase  = swapLR ? pExtraView->surface.Data.UV : pBaseView->surface.Data.UV;
+      srcExtra = swapLR ? pBaseView->surface.Data.UV : pExtraView->surface.Data.UV;
+
+      planesize /= 2;
+      memcpy(dst, srcBase, planesize);
+      memcpy(dst + planesize, srcExtra, planesize);
+    }
+#endif
     else {
       allocateFrame(true);
     }
