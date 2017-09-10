@@ -2794,7 +2794,19 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 	}
 
 	if (CComQIPtr<IMPCVideoDecFilter> pVDF = pBF) {
-		pVDF->SetMvcOutputMode(s.iStereo3DMode == 3 ? 2 : s.iStereo3DMode, s.bStereo3DSwapLR);
+		int iMvcOutputMode;
+		switch (s.iStereo3DMode) {
+		case STEREO3D_AUTO:           iMvcOutputMode = MVC_OUTPUT_Auto;          break;
+		case STEREO3D_MONO:           iMvcOutputMode = MVC_OUTPUT_Mono;          break;
+		case STEREO3D_ROWINTERLEAVED: iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
+		case STEREO3D_HALFOVERUNDER:  iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
+		case STEREO3D_OVERUNDER:      iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
+		default:
+			ASSERT(FALSE);
+			return hr;
+		}
+
+		pVDF->SetMvcOutputMode(iMvcOutputMode, s.bStereo3DSwapLR);
 	}
 
 	return hr;
