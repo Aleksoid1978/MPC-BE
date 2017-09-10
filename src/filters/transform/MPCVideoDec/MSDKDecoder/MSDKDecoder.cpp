@@ -40,15 +40,15 @@ extern "C" {
 #include "../MPCVideoDec.h"
 #include "../pixconv_sse2_templates.h"
 
-inline void CopyEverySecondLineSSE2(uint8_t* dst, uint8_t* src1, uint8_t* src2, size_t linesize, unsigned lines)
+inline void CopyEverySecondLineSSE2(uint8_t* dst, uint8_t* src1, uint8_t* src2, ptrdiff_t linesize, unsigned lines)
 {
 	for (unsigned i = 0; i < lines; i++) {
-		PIXCONV_MEMCPY_ALIGNED(dst, src1, (ptrdiff_t)linesize)
+		PIXCONV_MEMCPY_ALIGNED(dst, src1, linesize)
 		dst += linesize;
 		src1 += linesize * 2;
 	}
 	for (unsigned i = 0; i < lines; i++) {
-		PIXCONV_MEMCPY_ALIGNED(dst, src2, (ptrdiff_t)linesize)
+		PIXCONV_MEMCPY_ALIGNED(dst, src2, linesize)
 		dst += linesize;
 		src2 += linesize * 2;
 	}
@@ -592,9 +592,6 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
 
   m_pFilter->UpdateFrameTime(rtStart, rtStop);
 
-  const int width  = pBaseView->surface.Info.CropW;
-  const int height = pBaseView->surface.Info.CropH;
-
   auto allocateFrame = [&](bool bMain) {
     if (bMain) {
       m_pFrame->data[0]   = pBaseView->surface.Data.Y;
@@ -616,6 +613,9 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
     av_frame_free(&m_pFrame);
     m_iOutputMode = m_iNewOutputMode;
   }
+
+  const int width  = pBaseView->surface.Info.CropW;
+  const int height = m_iOutputMode == MVC_OUTPUT_TopBottom ? pBaseView->surface.Info.CropH * 2 : pBaseView->surface.Info.CropH;
 
   if (m_pFrame && (m_pFrame->width != width || m_pFrame->height != height)) {
     av_frame_free(&m_pFrame);
@@ -660,7 +660,7 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
         goto error;
       }
 
-      const size_t linesize = pBaseView->surface.Data.PitchLow;
+      const ptrdiff_t linesize = pBaseView->surface.Data.PitchLow;
       bool swapLR = !!m_pFilter->m_MVC_Base_View_R_flag;
       if (m_bSwapLR) {
         swapLR = !swapLR;
@@ -680,7 +680,6 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
 
       CopyEverySecondLineSSE2(dst, srcBase, srcExtra, linesize, height / 4);
     }
-#if 0 //TODO
     else if (m_iOutputMode == MVC_OUTPUT_TopBottom) {
       if (!m_pFrame->data[0] && av_frame_get_buffer(m_pFrame, 64) < 0) {
         hr = E_POINTER;
@@ -697,9 +696,9 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
       uint8_t* srcBase = swapLR ? pExtraView->surface.Data.Y : pBaseView->surface.Data.Y;
       uint8_t* srcExtra = swapLR ? pBaseView->surface.Data.Y : pExtraView->surface.Data.Y;
 
-      size_t planesize = pBaseView->surface.Data.PitchLow * height;
-      memcpy(dst, srcBase, planesize);
-      memcpy(dst + planesize, srcExtra, planesize);
+      ptrdiff_t planesize = pBaseView->surface.Data.PitchLow * height / 2;
+      PIXCONV_MEMCPY_ALIGNED(dst, srcBase, planesize);
+      PIXCONV_MEMCPY_ALIGNED(dst + planesize, srcExtra, planesize);
 
       // color
       dst  = m_pFrame->data[1];
@@ -707,10 +706,9 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
       srcExtra = swapLR ? pBaseView->surface.Data.UV : pExtraView->surface.Data.UV;
 
       planesize /= 2;
-      memcpy(dst, srcBase, planesize);
-      memcpy(dst + planesize, srcExtra, planesize);
+      PIXCONV_MEMCPY_ALIGNED(dst, srcBase, planesize);
+      PIXCONV_MEMCPY_ALIGNED(dst + planesize, srcExtra, planesize);
     }
-#endif
     else {
       allocateFrame(true);
     }
