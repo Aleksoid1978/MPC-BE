@@ -617,6 +617,10 @@ HRESULT CMSDKDecoder::DeliverOutput(MVCBuffer * pBaseView, MVCBuffer * pExtraVie
   const int width  = pBaseView->surface.Info.CropW;
   const int height = m_iOutputMode == MVC_OUTPUT_TopBottom ? pBaseView->surface.Info.CropH * 2 : pBaseView->surface.Info.CropH;
 
+  CSize aspect(width, height);
+  ReduceDim(aspect);
+  m_pFilter->SetAspect(aspect);
+
   if (m_pFrame && (m_pFrame->width != width || m_pFrame->height != height)) {
     av_frame_free(&m_pFrame);
   }
