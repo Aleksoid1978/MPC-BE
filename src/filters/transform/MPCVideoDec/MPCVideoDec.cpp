@@ -2495,10 +2495,10 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 
 	m_bWaitingForKeyFrame = TRUE;
 
-	m_rtStartCache	= INVALID_TIME;
+	m_rtStartCache = INVALID_TIME;
 
-	m_rtLastStart	= INVALID_TIME;
-	m_rtLastStop	= 0;
+	m_rtLastStart = INVALID_TIME;
+	m_rtLastStop  = 0;
 
 	if (m_bReorderBFrame) {
 		m_nBFramePos = 0;
@@ -2506,7 +2506,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 		m_tBFrameDelay[1].rtStart = m_tBFrameDelay[1].rtStop = INVALID_TIME;
 	}
 
-	if (m_bDecodingStart) {
+	if (m_bDecodingStart && m_pAVCtx) {
 		if (m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_MPEG2VIDEO) {
 			InitDecoder(&m_pInput->CurrentMediaType());
 		}
