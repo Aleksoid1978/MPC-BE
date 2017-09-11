@@ -190,6 +190,10 @@ static OPJ_BOOL opj_tcd_rate_allocate_encode(opj_tcd_t *p_tcd,
         opj_codestream_info_t *p_cstr_info,
         opj_event_mgr_t *p_manager);
 
+
+static OPJ_BOOL opj_tcd_is_whole_tilecomp_decoding(opj_tcd_t *tcd,
+        OPJ_UINT32 compno);
+
 /* ----------------------------------------------------------------------- */
 
 /**
@@ -269,28 +273,33 @@ void opj_tcd_makelayer(opj_tcd_t *tcd,
 
                         n = cblk->numpassesinlayers;
 
-                        for (passno = cblk->numpassesinlayers; passno < cblk->totalpasses; passno++) {
-                            OPJ_UINT32 dr;
-                            OPJ_FLOAT64 dd;
-                            opj_tcd_pass_t *pass = &cblk->passes[passno];
+                        if (thresh < 0) {
+                            /* Special value to indicate to use all passes */
+                            n = cblk->totalpasses;
+                        } else {
+                            for (passno = cblk->numpassesinlayers; passno < cblk->totalpasses; passno++) {
+                                OPJ_UINT32 dr;
+                                OPJ_FLOAT64 dd;
+                                opj_tcd_pass_t *pass = &cblk->passes[passno];
 
-                            if (n == 0) {
-                                dr = pass->rate;
-                                dd = pass->distortiondec;
-                            } else {
-                                dr = pass->rate - cblk->passes[n - 1].rate;
-                                dd = pass->distortiondec - cblk->passes[n - 1].distortiondec;
-                            }
+                                if (n == 0) {
+                                    dr = pass->rate;
+                                    dd = pass->distortiondec;
+                                } else {
+                                    dr = pass->rate - cblk->passes[n - 1].rate;
+                                    dd = pass->distortiondec - cblk->passes[n - 1].distortiondec;
+                                }
 
-                            if (!dr) {
-                                if (dd != 0) {
+                                if (!dr) {
+                                    if (dd != 0) {
+                                        n = passno + 1;
+                                    }
+                                    continue;
+                                }
+                                if (thresh - (dd / dr) <
+                                        DBL_EPSILON) { /* do not rely on float equality, check with DBL_EPSILON margin */
                                     n = passno + 1;
                                 }
-                                continue;
-                            }
-                            if (thresh - (dd / dr) <
-                                    DBL_EPSILON) { /* do not rely on float equality, check with DBL_EPSILON margin */
-                                n = passno + 1;
                             }
                         }
 
@@ -613,7 +622,8 @@ OPJ_BOOL opj_tcd_rateallocate(opj_tcd_t *tcd,
 
             opj_t2_destroy(t2);
         } else {
-            goodthresh = min;
+            /* Special value to indicate to use all passes */
+            goodthresh = -1;
         }
 
         if (cstr_info) { /* Threshold for Marcela Index */
@@ -679,7 +689,7 @@ OPJ_BOOL opj_alloc_tile_component_data(opj_tcd_tilecomp_t *l_tilec)
             ((l_tilec->data_size_needed > l_tilec->data_size) &&
              (l_tilec->ownsData == OPJ_FALSE))) {
         l_tilec->data = (OPJ_INT32 *) opj_image_data_alloc(l_tilec->data_size_needed);
-        if (! l_tilec->data) {
+        if (!l_tilec->data && l_tilec->data_size_needed != 0) {
             return OPJ_FALSE;
         }
         /*fprintf(stderr, "tAllocate data of tilec (int): %d x OPJ_UINT32n",l_data_size);*/
@@ -794,22 +804,6 @@ static INLINE OPJ_BOOL opj_tcd_init_tile(opj_tcd_t *p_tcd, OPJ_UINT32 p_tile_no,
         l_tilec->compno = compno;
         /*fprintf(stderr, "\tTile compo border = %d,%d,%d,%d\n", l_tilec->x0, l_tilec->y0,l_tilec->x1,l_tilec->y1);*/
 
-        /* compute l_data_size with overflow check */
-        l_data_size = (OPJ_UINT32)(l_tilec->x1 - l_tilec->x0);
-        /* issue 733, l_data_size == 0U, probably something wrong should be checked before getting here */
-        if ((l_data_size > 0U) &&
-                ((((OPJ_UINT32) - 1) / l_data_size) < (OPJ_UINT32)(l_tilec->y1 -
-                        l_tilec->y0))) {
-            opj_event_msg(manager, EVT_ERROR, "Not enough memory for tile data\n");
-            return OPJ_FALSE;
-        }
-        l_data_size = l_data_size * (OPJ_UINT32)(l_tilec->y1 - l_tilec->y0);
-
-        if ((((OPJ_UINT32) - 1) / (OPJ_UINT32)sizeof(OPJ_UINT32)) < l_data_size) {
-            opj_event_msg(manager, EVT_ERROR, "Not enough memory for tile data\n");
-            return OPJ_FALSE;
-        }
-        l_data_size = l_data_size * (OPJ_UINT32)sizeof(OPJ_UINT32);
         l_tilec->numresolutions = l_tccp->numresolutions;
         if (l_tccp->numresolutions < l_cp->m_specific_param.m_dec.m_reduce) {
             l_tilec->minimum_num_resolutions = 1;
@@ -818,14 +812,38 @@ static INLINE OPJ_BOOL opj_tcd_init_tile(opj_tcd_t *p_tcd, OPJ_UINT32 p_tile_no,
                                                l_cp->m_specific_param.m_dec.m_reduce;
         }
 
-        l_tilec->data_size_needed = l_data_size;
-        if (p_tcd->m_is_decoder && !opj_alloc_tile_component_data(l_tilec)) {
-            opj_event_msg(manager, EVT_ERROR, "Not enough memory for tile data\n");
-            return OPJ_FALSE;
+        if (isEncoder) {
+            OPJ_SIZE_T l_tile_data_size;
+
+            /* compute l_data_size with overflow check */
+            OPJ_SIZE_T w = (OPJ_SIZE_T)(l_tilec->x1 - l_tilec->x0);
+            OPJ_SIZE_T h = (OPJ_SIZE_T)(l_tilec->y1 - l_tilec->y0);
+
+            /* issue 733, l_data_size == 0U, probably something wrong should be checked before getting here */
+            if (h > 0 && w > SIZE_MAX / h) {
+                opj_event_msg(manager, EVT_ERROR, "Size of tile data exceeds system limits\n");
+                return OPJ_FALSE;
+            }
+            l_tile_data_size = w * h;
+
+            if (SIZE_MAX / sizeof(OPJ_UINT32) < l_tile_data_size) {
+                opj_event_msg(manager, EVT_ERROR, "Size of tile data exceeds system limits\n");
+                return OPJ_FALSE;
+            }
+            l_tile_data_size = l_tile_data_size * sizeof(OPJ_UINT32);
+
+            l_tilec->data_size_needed = l_tile_data_size;
         }
 
         l_data_size = l_tilec->numresolutions * (OPJ_UINT32)sizeof(
                           opj_tcd_resolution_t);
+
+        opj_image_data_free(l_tilec->data_win);
+        l_tilec->data_win = NULL;
+        l_tilec->win_x0 = 0;
+        l_tilec->win_y0 = 0;
+        l_tilec->win_x1 = 0;
+        l_tilec->win_y1 = 0;
 
         if (l_tilec->resolutions == 00) {
             l_tilec->resolutions = (opj_tcd_resolution_t *) opj_malloc(l_data_size);
@@ -875,6 +893,7 @@ static INLINE OPJ_BOOL opj_tcd_init_tile(opj_tcd_t *p_tcd, OPJ_UINT32 p_tile_no,
             l_res->y0 = opj_int_ceildivpow2(l_tilec->y0, (OPJ_INT32)l_level_no);
             l_res->x1 = opj_int_ceildivpow2(l_tilec->x1, (OPJ_INT32)l_level_no);
             l_res->y1 = opj_int_ceildivpow2(l_tilec->y1, (OPJ_INT32)l_level_no);
+
             /*fprintf(stderr, "\t\t\tres_x0= %d, res_y0 =%d, res_x1=%d, res_y1=%d\n", l_res->x0, l_res->y0, l_res->x1, l_res->y1);*/
             /* p. 35, table A-23, ISO/IEC FDIS154444-1 : 2000 (18 august 2000) */
             l_pdx = l_tccp->prcw[resno];
@@ -894,14 +913,14 @@ static INLINE OPJ_BOOL opj_tcd_init_tile(opj_tcd_t *p_tcd, OPJ_UINT32 p_tile_no,
             /*fprintf(stderr, "\t\t\tres_pw=%d, res_ph=%d\n", l_res->pw, l_res->ph );*/
 
             if ((l_res->pw != 0U) && ((((OPJ_UINT32) - 1) / l_res->pw) < l_res->ph)) {
-                opj_event_msg(manager, EVT_ERROR, "Not enough memory for tile data\n");
+                opj_event_msg(manager, EVT_ERROR, "Size of tile data exceeds system limits\n");
                 return OPJ_FALSE;
             }
             l_nb_precincts = l_res->pw * l_res->ph;
 
             if ((((OPJ_UINT32) - 1) / (OPJ_UINT32)sizeof(opj_tcd_precinct_t)) <
                     l_nb_precincts) {
-                opj_event_msg(manager, EVT_ERROR, "Not enough memory for tile data\n");
+                opj_event_msg(manager, EVT_ERROR, "Size of tile data exceeds system limits\n");
                 return OPJ_FALSE;
             }
             l_nb_precinct_size = l_nb_precincts * (OPJ_UINT32)sizeof(opj_tcd_precinct_t);
@@ -1249,6 +1268,9 @@ static OPJ_BOOL opj_tcd_code_block_dec_allocate(opj_tcd_cblk_dec_t *
         OPJ_UINT32 l_numchunksalloc = p_code_block->numchunksalloc;
         OPJ_UINT32 i;
 
+        opj_aligned_free(p_code_block->decoded_data);
+        p_code_block->decoded_data = 00;
+
         memset(p_code_block, 0, sizeof(opj_tcd_cblk_dec_t));
         p_code_block->segs = l_segs;
         p_code_block->m_current_max_segs = l_current_max_segs;
@@ -1262,7 +1284,8 @@ static OPJ_BOOL opj_tcd_code_block_dec_allocate(opj_tcd_cblk_dec_t *
     return OPJ_TRUE;
 }
 
-OPJ_UINT32 opj_tcd_get_decoded_tile_size(opj_tcd_t *p_tcd)
+OPJ_UINT32 opj_tcd_get_decoded_tile_size(opj_tcd_t *p_tcd,
+        OPJ_BOOL take_into_account_partial_decoding)
 {
     OPJ_UINT32 i;
     OPJ_UINT32 l_data_size = 0;
@@ -1276,6 +1299,7 @@ OPJ_UINT32 opj_tcd_get_decoded_tile_size(opj_tcd_t *p_tcd)
     l_img_comp = p_tcd->image->comps;
 
     for (i = 0; i < p_tcd->image->numcomps; ++i) {
+        OPJ_UINT32 w, h;
         l_size_comp = l_img_comp->prec >> 3; /*(/ 8)*/
         l_remaining = l_img_comp->prec & 7;  /* (%8) */
 
@@ -1288,8 +1312,17 @@ OPJ_UINT32 opj_tcd_get_decoded_tile_size(opj_tcd_t *p_tcd)
         }
 
         l_res = l_tile_comp->resolutions + l_tile_comp->minimum_num_resolutions - 1;
-        l_temp = (OPJ_UINT32)((l_res->x1 - l_res->x0) * (l_res->y1 -
-                              l_res->y0)); /* x1*y1 can't overflow */
+        if (take_into_account_partial_decoding && !p_tcd->whole_tile_decoding) {
+            w = l_res->win_x1 - l_res->win_x0;
+            h = l_res->win_y1 - l_res->win_y0;
+        } else {
+            w = (OPJ_UINT32)(l_res->x1 - l_res->x0);
+            h = (OPJ_UINT32)(l_res->y1 - l_res->y0);
+        }
+        if (h > 0 && UINT_MAX / w < h) {
+            return UINT_MAX;
+        }
+        l_temp = w * h;
         if (l_size_comp && UINT_MAX / l_size_comp < l_temp) {
             return UINT_MAX;
         }
@@ -1339,7 +1372,8 @@ OPJ_BOOL opj_tcd_encode_tile(opj_tcd_t *p_tcd,
                 p_cstr_info->tile[p_tile_no].pdy[i] = (int)l_tccp->prch[i];
             }
             p_cstr_info->tile[p_tile_no].packet = (opj_packet_info_t*) opj_calloc((
-                    size_t)p_cstr_info->numcomps * (size_t)p_cstr_info->numlayers * l_num_packs,
+                    OPJ_SIZE_T)p_cstr_info->numcomps * (OPJ_SIZE_T)p_cstr_info->numlayers *
+                                                  l_num_packs,
                                                   sizeof(opj_packet_info_t));
             if (!p_cstr_info->tile[p_tile_no].packet) {
                 /* FIXME event manager error callback */
@@ -1401,10 +1435,10 @@ OPJ_BOOL opj_tcd_encode_tile(opj_tcd_t *p_tcd,
 }
 
 OPJ_BOOL opj_tcd_decode_tile(opj_tcd_t *p_tcd,
-                             OPJ_UINT32 decoded_x0,
-                             OPJ_UINT32 decoded_y0,
-                             OPJ_UINT32 decoded_x1,
-                             OPJ_UINT32 decoded_y1,
+                             OPJ_UINT32 win_x0,
+                             OPJ_UINT32 win_y0,
+                             OPJ_UINT32 win_x1,
+                             OPJ_UINT32 win_y1,
                              OPJ_BYTE *p_src,
                              OPJ_UINT32 p_max_length,
                              OPJ_UINT32 p_tile_no,
@@ -1413,12 +1447,102 @@ OPJ_BOOL opj_tcd_decode_tile(opj_tcd_t *p_tcd,
                             )
 {
     OPJ_UINT32 l_data_read;
+    OPJ_UINT32 compno;
+
     p_tcd->tcd_tileno = p_tile_no;
     p_tcd->tcp = &(p_tcd->cp->tcps[p_tile_no]);
-    p_tcd->decoded_x0 = decoded_x0;
-    p_tcd->decoded_y0 = decoded_y0;
-    p_tcd->decoded_x1 = decoded_x1;
-    p_tcd->decoded_y1 = decoded_y1;
+    p_tcd->win_x0 = win_x0;
+    p_tcd->win_y0 = win_y0;
+    p_tcd->win_x1 = win_x1;
+    p_tcd->win_y1 = win_y1;
+    p_tcd->whole_tile_decoding = OPJ_TRUE;
+
+    for (compno = 0; compno < p_tcd->image->numcomps; compno++) {
+        if (!opj_tcd_is_whole_tilecomp_decoding(p_tcd, compno)) {
+            p_tcd->whole_tile_decoding = OPJ_FALSE;
+            break;
+        }
+    }
+
+    if (p_tcd->whole_tile_decoding) {
+        for (compno = 0; compno < p_tcd->image->numcomps; compno++) {
+            opj_tcd_tilecomp_t* tilec = &(p_tcd->tcd_image->tiles->comps[compno]);
+            opj_tcd_resolution_t *l_res = &
+                                          (tilec->resolutions[tilec->minimum_num_resolutions - 1]);
+            OPJ_SIZE_T l_data_size;
+
+            /* compute l_data_size with overflow check */
+            OPJ_SIZE_T res_w = (OPJ_SIZE_T)(l_res->x1 - l_res->x0);
+            OPJ_SIZE_T res_h = (OPJ_SIZE_T)(l_res->y1 - l_res->y0);
+
+            /* issue 733, l_data_size == 0U, probably something wrong should be checked before getting here */
+            if (res_h > 0 && res_w > SIZE_MAX / res_h) {
+                opj_event_msg(p_manager, EVT_ERROR,
+                              "Size of tile data exceeds system limits\n");
+                return OPJ_FALSE;
+            }
+            l_data_size = res_w * res_h;
+
+            if (SIZE_MAX / sizeof(OPJ_UINT32) < l_data_size) {
+                opj_event_msg(p_manager, EVT_ERROR,
+                              "Size of tile data exceeds system limits\n");
+                return OPJ_FALSE;
+            }
+            l_data_size *= sizeof(OPJ_UINT32);
+
+            tilec->data_size_needed = l_data_size;
+
+            if (!opj_alloc_tile_component_data(tilec)) {
+                opj_event_msg(p_manager, EVT_ERROR,
+                              "Size of tile data exceeds system limits\n");
+                return OPJ_FALSE;
+            }
+        }
+    } else {
+        /* Compute restricted tile-component and tile-resolution coordinates */
+        /* of the window of interest, but defer the memory allocation until */
+        /* we know the resno_decoded */
+        for (compno = 0; compno < p_tcd->image->numcomps; compno++) {
+            OPJ_UINT32 resno;
+            opj_tcd_tilecomp_t* tilec = &(p_tcd->tcd_image->tiles->comps[compno]);
+            opj_image_comp_t* image_comp = &(p_tcd->image->comps[compno]);
+            /* Compute the intersection of the area of interest, expressed in tile coordinates */
+            /* with the tile coordinates */
+            tilec->win_x0 = opj_uint_max(
+                                (OPJ_UINT32)tilec->x0,
+                                opj_uint_ceildiv(p_tcd->win_x0, image_comp->dx));
+            tilec->win_y0 = opj_uint_max(
+                                (OPJ_UINT32)tilec->y0,
+                                opj_uint_ceildiv(p_tcd->win_y0, image_comp->dy));
+            tilec->win_x1 = opj_uint_min(
+                                (OPJ_UINT32)tilec->x1,
+                                opj_uint_ceildiv(p_tcd->win_x1, image_comp->dx));
+            tilec->win_y1 = opj_uint_min(
+                                (OPJ_UINT32)tilec->y1,
+                                opj_uint_ceildiv(p_tcd->win_y1, image_comp->dy));
+            if (tilec->win_x1 < tilec->win_x0 ||
+                    tilec->win_y1 < tilec->win_y0) {
+                /* We should not normally go there. The circumstance is when */
+                /* the tile coordinates do not intersect the area of interest */
+                /* Upper level logic should not even try to decode that tile */
+                opj_event_msg(p_manager, EVT_ERROR,
+                              "Invalid tilec->win_xxx values\n");
+                return OPJ_FALSE;
+            }
+
+            for (resno = 0; resno < tilec->numresolutions; ++resno) {
+                opj_tcd_resolution_t *res = tilec->resolutions + resno;
+                res->win_x0 = opj_uint_ceildivpow2(tilec->win_x0,
+                                                   tilec->numresolutions - 1 - resno);
+                res->win_y0 = opj_uint_ceildivpow2(tilec->win_y0,
+                                                   tilec->numresolutions - 1 - resno);
+                res->win_x1 = opj_uint_ceildivpow2(tilec->win_x1,
+                                                   tilec->numresolutions - 1 - resno);
+                res->win_y1 = opj_uint_ceildivpow2(tilec->win_y1,
+                                                   tilec->numresolutions - 1 - resno);
+            }
+        }
+    }
 
 #ifdef TODO_MSD /* FIXME */
     /* INDEX >>  */
@@ -1461,6 +1585,45 @@ OPJ_BOOL opj_tcd_decode_tile(opj_tcd_t *p_tcd,
     }
     /* FIXME _ProfStop(PGROUP_T1); */
 
+
+    /* For subtile decoding, now we know the resno_decoded, we can allocate */
+    /* the tile data buffer */
+    if (!p_tcd->whole_tile_decoding) {
+        for (compno = 0; compno < p_tcd->image->numcomps; compno++) {
+            opj_tcd_tilecomp_t* tilec = &(p_tcd->tcd_image->tiles->comps[compno]);
+            opj_image_comp_t* image_comp = &(p_tcd->image->comps[compno]);
+            opj_tcd_resolution_t *res = tilec->resolutions + image_comp->resno_decoded;
+            OPJ_SIZE_T w = res->win_x1 - res->win_x0;
+            OPJ_SIZE_T h = res->win_y1 - res->win_y0;
+            OPJ_SIZE_T l_data_size;
+
+            opj_image_data_free(tilec->data_win);
+            tilec->data_win = NULL;
+
+            if (w > 0 && h > 0) {
+                if (w > SIZE_MAX / h) {
+                    opj_event_msg(p_manager, EVT_ERROR,
+                                  "Size of tile data exceeds system limits\n");
+                    return OPJ_FALSE;
+                }
+                l_data_size = w * h;
+                if (l_data_size > SIZE_MAX / sizeof(OPJ_INT32)) {
+                    opj_event_msg(p_manager, EVT_ERROR,
+                                  "Size of tile data exceeds system limits\n");
+                    return OPJ_FALSE;
+                }
+                l_data_size *= sizeof(OPJ_INT32);
+
+                tilec->data_win = opj_image_data_alloc(l_data_size);
+                if (tilec->data_win == NULL) {
+                    opj_event_msg(p_manager, EVT_ERROR,
+                                  "Size of tile data exceeds system limits\n");
+                    return OPJ_FALSE;
+                }
+            }
+        }
+    }
+
     /*----------------DWT---------------------*/
 
     /* FIXME _ProfStart(PGROUP_DWT); */
@@ -1502,7 +1665,7 @@ OPJ_BOOL opj_tcd_update_tile_data(opj_tcd_t *p_tcd,
     OPJ_UINT32 l_size_comp, l_remaining;
     OPJ_UINT32 l_stride, l_width, l_height;
 
-    l_data_size = opj_tcd_get_decoded_tile_size(p_tcd);
+    l_data_size = opj_tcd_get_decoded_tile_size(p_tcd, OPJ_TRUE);
     if (l_data_size == UINT_MAX || l_data_size > p_dest_length) {
         return OPJ_FALSE;
     }
@@ -1511,12 +1674,23 @@ OPJ_BOOL opj_tcd_update_tile_data(opj_tcd_t *p_tcd,
     l_img_comp = p_tcd->image->comps;
 
     for (i = 0; i < p_tcd->image->numcomps; ++i) {
+        const OPJ_INT32* l_src_data;
         l_size_comp = l_img_comp->prec >> 3; /*(/ 8)*/
         l_remaining = l_img_comp->prec & 7;  /* (%8) */
         l_res = l_tilec->resolutions + l_img_comp->resno_decoded;
-        l_width = (OPJ_UINT32)(l_res->x1 - l_res->x0);
-        l_height = (OPJ_UINT32)(l_res->y1 - l_res->y0);
-        l_stride = (OPJ_UINT32)(l_tilec->x1 - l_tilec->x0) - l_width;
+        if (p_tcd->whole_tile_decoding) {
+            l_width = (OPJ_UINT32)(l_res->x1 - l_res->x0);
+            l_height = (OPJ_UINT32)(l_res->y1 - l_res->y0);
+            l_stride = (OPJ_UINT32)(l_tilec->resolutions[l_tilec->minimum_num_resolutions -
+                                                                     1].x1 -
+                                    l_tilec->resolutions[l_tilec->minimum_num_resolutions - 1].x0) - l_width;
+            l_src_data = l_tilec->data;
+        } else {
+            l_width = l_res->win_x1 - l_res->win_x0;
+            l_height = l_res->win_y1 - l_res->win_y0;
+            l_stride = 0;
+            l_src_data = l_tilec->data_win;
+        }
 
         if (l_remaining) {
             ++l_size_comp;
@@ -1529,7 +1703,7 @@ OPJ_BOOL opj_tcd_update_tile_data(opj_tcd_t *p_tcd,
         switch (l_size_comp) {
         case 1: {
             OPJ_CHAR * l_dest_ptr = (OPJ_CHAR *) p_dest;
-            const OPJ_INT32 * l_src_ptr = l_tilec->data;
+            const OPJ_INT32 * l_src_ptr = l_src_data;
 
             if (l_img_comp->sgnd) {
                 for (j = 0; j < l_height; ++j) {
@@ -1551,7 +1725,7 @@ OPJ_BOOL opj_tcd_update_tile_data(opj_tcd_t *p_tcd,
         }
         break;
         case 2: {
-            const OPJ_INT32 * l_src_ptr = l_tilec->data;
+            const OPJ_INT32 * l_src_ptr = l_src_data;
             OPJ_INT16 * l_dest_ptr = (OPJ_INT16 *) p_dest;
 
             if (l_img_comp->sgnd) {
@@ -1579,7 +1753,7 @@ OPJ_BOOL opj_tcd_update_tile_data(opj_tcd_t *p_tcd,
         break;
         case 4: {
             OPJ_INT32 * l_dest_ptr = (OPJ_INT32 *) p_dest;
-            OPJ_INT32 * l_src_ptr = l_tilec->data;
+            const OPJ_INT32 * l_src_ptr = l_src_data;
 
             for (j = 0; j < l_height; ++j) {
                 memcpy(l_dest_ptr, l_src_ptr, l_width * sizeof(OPJ_INT32));
@@ -1674,6 +1848,9 @@ static void opj_tcd_free_tile(opj_tcd_t *p_tcd)
             l_tile_comp->data_size = 0;
             l_tile_comp->data_size_needed = 0;
         }
+
+        opj_image_data_free(l_tile_comp->data_win);
+
         ++l_tile_comp;
     }
 
@@ -1764,18 +1941,6 @@ static OPJ_BOOL opj_tcd_dwt_decode(opj_tcd_t *p_tcd)
     opj_image_comp_t * l_img_comp = p_tcd->image->comps;
 
     for (compno = 0; compno < l_tile->numcomps; compno++) {
-        /*
-        if (tcd->cp->reduce != 0) {
-                tcd->image->comps[compno].resno_decoded =
-                        tile->comps[compno].numresolutions - tcd->cp->reduce - 1;
-                if (tcd->image->comps[compno].resno_decoded < 0)
-                {
-                        return false;
-                }
-        }
-        numres2decode = tcd->image->comps[compno].resno_decoded + 1;
-        if(numres2decode > 0){
-        */
 
         if (l_tccp->qmfbid == 1) {
             if (! opj_dwt_decode(p_tcd, l_tile_comp,
@@ -1796,6 +1961,7 @@ static OPJ_BOOL opj_tcd_dwt_decode(opj_tcd_t *p_tcd)
 
     return OPJ_TRUE;
 }
+
 static OPJ_BOOL opj_tcd_mct_decode(opj_tcd_t *p_tcd, opj_event_mgr_t *p_manager)
 {
     opj_tcd_tile_t * l_tile = p_tcd->tcd_image->tiles;
@@ -1807,21 +1973,73 @@ static OPJ_BOOL opj_tcd_mct_decode(opj_tcd_t *p_tcd, opj_event_mgr_t *p_manager)
         return OPJ_TRUE;
     }
 
-    l_samples = (OPJ_UINT32)((l_tile_comp->x1 - l_tile_comp->x0) *
-                             (l_tile_comp->y1 - l_tile_comp->y0));
+    if (p_tcd->whole_tile_decoding) {
+        opj_tcd_resolution_t* res_comp0 = l_tile->comps[0].resolutions +
+                                          l_tile_comp->minimum_num_resolutions - 1;
+
+        /* A bit inefficient: we process more data than needed if */
+        /* resno_decoded < l_tile_comp->minimum_num_resolutions-1, */
+        /* but we would need to take into account a stride then */
+        l_samples = (OPJ_UINT32)((res_comp0->x1 - res_comp0->x0) *
+                                 (res_comp0->y1 - res_comp0->y0));
+        if (l_tile->numcomps >= 3) {
+            if (l_tile_comp->minimum_num_resolutions !=
+                    l_tile->comps[1].minimum_num_resolutions ||
+                    l_tile_comp->minimum_num_resolutions !=
+                    l_tile->comps[2].minimum_num_resolutions) {
+                opj_event_msg(p_manager, EVT_ERROR,
+                              "Tiles don't all have the same dimension. Skip the MCT step.\n");
+                return OPJ_FALSE;
+            }
+        }
+        if (l_tile->numcomps >= 3) {
+            opj_tcd_resolution_t* res_comp1 = l_tile->comps[1].resolutions +
+                                              l_tile_comp->minimum_num_resolutions - 1;
+            opj_tcd_resolution_t* res_comp2 = l_tile->comps[2].resolutions +
+                                              l_tile_comp->minimum_num_resolutions - 1;
+            /* testcase 1336.pdf.asan.47.376 */
+            if (p_tcd->image->comps[0].resno_decoded !=
+                    p_tcd->image->comps[1].resno_decoded ||
+                    p_tcd->image->comps[0].resno_decoded !=
+                    p_tcd->image->comps[2].resno_decoded ||
+                    (OPJ_SIZE_T)(res_comp1->x1 - res_comp1->x0) *
+                    (OPJ_SIZE_T)(res_comp1->y1 - res_comp1->y0) != l_samples ||
+                    (OPJ_SIZE_T)(res_comp2->x1 - res_comp2->x0) *
+                    (OPJ_SIZE_T)(res_comp2->y1 - res_comp2->y0) != l_samples) {
+                opj_event_msg(p_manager, EVT_ERROR,
+                              "Tiles don't all have the same dimension. Skip the MCT step.\n");
+                return OPJ_FALSE;
+            }
+        }
+    } else {
+        opj_tcd_resolution_t* res_comp0 = l_tile->comps[0].resolutions +
+                                          p_tcd->image->comps[0].resno_decoded;
+
+        l_samples = (res_comp0->win_x1 - res_comp0->win_x0) *
+                    (res_comp0->win_y1 - res_comp0->win_y0);
+        if (l_tile->numcomps >= 3) {
+            opj_tcd_resolution_t* res_comp1 = l_tile->comps[1].resolutions +
+                                              p_tcd->image->comps[1].resno_decoded;
+            opj_tcd_resolution_t* res_comp2 = l_tile->comps[2].resolutions +
+                                              p_tcd->image->comps[2].resno_decoded;
+            /* testcase 1336.pdf.asan.47.376 */
+            if (p_tcd->image->comps[0].resno_decoded !=
+                    p_tcd->image->comps[1].resno_decoded ||
+                    p_tcd->image->comps[0].resno_decoded !=
+                    p_tcd->image->comps[2].resno_decoded ||
+                    (OPJ_SIZE_T)(res_comp1->win_x1 - res_comp1->win_x0) *
+                    (OPJ_SIZE_T)(res_comp1->win_y1 - res_comp1->win_y0) != l_samples ||
+                    (OPJ_SIZE_T)(res_comp2->win_x1 - res_comp2->win_x0) *
+                    (OPJ_SIZE_T)(res_comp2->win_y1 - res_comp2->win_y0) != l_samples) {
+                opj_event_msg(p_manager, EVT_ERROR,
+                              "Tiles don't all have the same dimension. Skip the MCT step.\n");
+                return OPJ_FALSE;
+            }
+        }
+    }
 
     if (l_tile->numcomps >= 3) {
-        /* testcase 1336.pdf.asan.47.376 */
-        if ((l_tile->comps[0].x1 - l_tile->comps[0].x0) * (l_tile->comps[0].y1 -
-                l_tile->comps[0].y0) < (OPJ_INT32)l_samples ||
-                (l_tile->comps[1].x1 - l_tile->comps[1].x0) * (l_tile->comps[1].y1 -
-                        l_tile->comps[1].y0) < (OPJ_INT32)l_samples ||
-                (l_tile->comps[2].x1 - l_tile->comps[2].x0) * (l_tile->comps[2].y1 -
-                        l_tile->comps[2].y0) < (OPJ_INT32)l_samples) {
-            opj_event_msg(p_manager, EVT_ERROR,
-                          "Tiles don't all have the same dimension. Skip the MCT step.\n");
-            return OPJ_FALSE;
-        } else if (l_tcp->mct == 2) {
+        if (l_tcp->mct == 2) {
             OPJ_BYTE ** l_data;
 
             if (! l_tcp->m_mct_decoding_matrix) {
@@ -1834,7 +2052,11 @@ static OPJ_BOOL opj_tcd_mct_decode(opj_tcd_t *p_tcd, opj_event_mgr_t *p_manager)
             }
 
             for (i = 0; i < l_tile->numcomps; ++i) {
-                l_data[i] = (OPJ_BYTE*) l_tile_comp->data;
+                if (p_tcd->whole_tile_decoding) {
+                    l_data[i] = (OPJ_BYTE*) l_tile_comp->data;
+                } else {
+                    l_data[i] = (OPJ_BYTE*) l_tile_comp->data_win;
+                }
                 ++l_tile_comp;
             }
 
@@ -1855,15 +2077,29 @@ static OPJ_BOOL opj_tcd_mct_decode(opj_tcd_t *p_tcd, opj_event_mgr_t *p_manager)
             opj_free(l_data);
         } else {
             if (l_tcp->tccps->qmfbid == 1) {
-                opj_mct_decode(l_tile->comps[0].data,
-                               l_tile->comps[1].data,
-                               l_tile->comps[2].data,
-                               l_samples);
+                if (p_tcd->whole_tile_decoding) {
+                    opj_mct_decode(l_tile->comps[0].data,
+                                   l_tile->comps[1].data,
+                                   l_tile->comps[2].data,
+                                   l_samples);
+                } else {
+                    opj_mct_decode(l_tile->comps[0].data_win,
+                                   l_tile->comps[1].data_win,
+                                   l_tile->comps[2].data_win,
+                                   l_samples);
+                }
             } else {
-                opj_mct_decode_real((OPJ_FLOAT32*)l_tile->comps[0].data,
-                                    (OPJ_FLOAT32*)l_tile->comps[1].data,
-                                    (OPJ_FLOAT32*)l_tile->comps[2].data,
-                                    l_samples);
+                if (p_tcd->whole_tile_decoding) {
+                    opj_mct_decode_real((OPJ_FLOAT32*)l_tile->comps[0].data,
+                                        (OPJ_FLOAT32*)l_tile->comps[1].data,
+                                        (OPJ_FLOAT32*)l_tile->comps[2].data,
+                                        l_samples);
+                } else {
+                    opj_mct_decode_real((OPJ_FLOAT32*)l_tile->comps[0].data_win,
+                                        (OPJ_FLOAT32*)l_tile->comps[1].data_win,
+                                        (OPJ_FLOAT32*)l_tile->comps[2].data_win,
+                                        l_samples);
+                }
             }
         }
     } else {
@@ -1896,12 +2132,24 @@ static OPJ_BOOL opj_tcd_dc_level_shift_decode(opj_tcd_t *p_tcd)
 
     for (compno = 0; compno < l_tile->numcomps; compno++) {
         l_res = l_tile_comp->resolutions + l_img_comp->resno_decoded;
-        l_width = (OPJ_UINT32)(l_res->x1 - l_res->x0);
-        l_height = (OPJ_UINT32)(l_res->y1 - l_res->y0);
-        l_stride = (OPJ_UINT32)(l_tile_comp->x1 - l_tile_comp->x0) - l_width;
 
-        assert(l_height == 0 ||
-               l_width + l_stride <= l_tile_comp->data_size / l_height); /*MUPDF*/
+        if (!p_tcd->whole_tile_decoding) {
+            l_width = l_res->win_x1 - l_res->win_x0;
+            l_height = l_res->win_y1 - l_res->win_y0;
+            l_stride = 0;
+            l_current_ptr = l_tile_comp->data_win;
+        } else {
+            l_width = (OPJ_UINT32)(l_res->x1 - l_res->x0);
+            l_height = (OPJ_UINT32)(l_res->y1 - l_res->y0);
+            l_stride = (OPJ_UINT32)(
+                           l_tile_comp->resolutions[l_tile_comp->minimum_num_resolutions - 1].x1 -
+                           l_tile_comp->resolutions[l_tile_comp->minimum_num_resolutions - 1].x0)
+                       - l_width;
+            l_current_ptr = l_tile_comp->data;
+
+            assert(l_height == 0 ||
+                   l_width + l_stride <= l_tile_comp->data_size / l_height); /*MUPDF*/
+        }
 
         if (l_img_comp->sgnd) {
             l_min = -(1 << (l_img_comp->prec - 1));
@@ -1911,11 +2159,11 @@ static OPJ_BOOL opj_tcd_dc_level_shift_decode(opj_tcd_t *p_tcd)
             l_max = (OPJ_INT32)((1U << l_img_comp->prec) - 1);
         }
 
-        l_current_ptr = l_tile_comp->data;
 
         if (l_tccp->qmfbid == 1) {
             for (j = 0; j < l_height; ++j) {
                 for (i = 0; i < l_width; ++i) {
+                    /* TODO: do addition on int64 ? */
                     *l_current_ptr = opj_int_clamp(*l_current_ptr + l_tccp->m_dc_level_shift, l_min,
                                                    l_max);
                     ++l_current_ptr;
@@ -1926,13 +2174,14 @@ static OPJ_BOOL opj_tcd_dc_level_shift_decode(opj_tcd_t *p_tcd)
             for (j = 0; j < l_height; ++j) {
                 for (i = 0; i < l_width; ++i) {
                     OPJ_FLOAT32 l_value = *((OPJ_FLOAT32 *) l_current_ptr);
-                    OPJ_INT32 l_value_int = (OPJ_INT32)opj_lrintf(l_value);
-                    if (l_value > INT_MAX ||
-                            (l_value_int > 0 && l_tccp->m_dc_level_shift > 0 &&
-                             l_value_int > INT_MAX - l_tccp->m_dc_level_shift)) {
+                    if (l_value > INT_MAX) {
                         *l_current_ptr = l_max;
+                    } else if (l_value < INT_MIN) {
+                        *l_current_ptr = l_min;
                     } else {
-                        *l_current_ptr = opj_int_clamp(
+                        /* Do addition on int64 to avoid overflows */
+                        OPJ_INT64 l_value_int = (OPJ_INT64)opj_lrintf(l_value);
+                        *l_current_ptr = (OPJ_INT32)opj_int64_clamp(
                                              l_value_int + l_tccp->m_dc_level_shift, l_min, l_max);
                     }
                     ++l_current_ptr;
@@ -1981,6 +2230,9 @@ static void opj_tcd_code_block_dec_deallocate(opj_tcd_precinct_t * p_precinct)
                 l_code_block->chunks = 00;
             }
 
+            opj_aligned_free(l_code_block->decoded_data);
+            l_code_block->decoded_data = NULL;
+
             ++l_code_block;
         }
 
@@ -2026,9 +2278,10 @@ static void opj_tcd_code_block_enc_deallocate(opj_tcd_precinct_t * p_precinct)
     }
 }
 
-OPJ_UINT32 opj_tcd_get_encoded_tile_size(opj_tcd_t *p_tcd)
+OPJ_SIZE_T opj_tcd_get_encoded_tile_size(opj_tcd_t *p_tcd)
 {
-    OPJ_UINT32 i, l_data_size = 0;
+    OPJ_UINT32 i;
+    OPJ_SIZE_T l_data_size = 0;
     opj_image_comp_t * l_img_comp = 00;
     opj_tcd_tilecomp_t * l_tilec = 00;
     OPJ_UINT32 l_size_comp, l_remaining;
@@ -2047,8 +2300,8 @@ OPJ_UINT32 opj_tcd_get_encoded_tile_size(opj_tcd_t *p_tcd)
             l_size_comp = 4;
         }
 
-        l_data_size += l_size_comp * (OPJ_UINT32)((l_tilec->x1 - l_tilec->x0) *
-                       (l_tilec->y1 - l_tilec->y0));
+        l_data_size += l_size_comp * ((OPJ_SIZE_T)(l_tilec->x1 - l_tilec->x0) *
+                                      (OPJ_SIZE_T)(l_tilec->y1 - l_tilec->y0));
         ++l_img_comp;
         ++l_tilec;
     }
@@ -2063,7 +2316,7 @@ static OPJ_BOOL opj_tcd_dc_level_shift_encode(opj_tcd_t *p_tcd)
     opj_tccp_t * l_tccp = 00;
     opj_image_comp_t * l_img_comp = 00;
     opj_tcd_tile_t * l_tile;
-    OPJ_UINT32 l_nb_elem, i;
+    OPJ_SIZE_T l_nb_elem, i;
     OPJ_INT32 * l_current_ptr;
 
     l_tile = p_tcd->tcd_image->tiles;
@@ -2073,8 +2326,8 @@ static OPJ_BOOL opj_tcd_dc_level_shift_encode(opj_tcd_t *p_tcd)
 
     for (compno = 0; compno < l_tile->numcomps; compno++) {
         l_current_ptr = l_tile_comp->data;
-        l_nb_elem = (OPJ_UINT32)((l_tile_comp->x1 - l_tile_comp->x0) *
-                                 (l_tile_comp->y1 - l_tile_comp->y0));
+        l_nb_elem = (OPJ_SIZE_T)(l_tile_comp->x1 - l_tile_comp->x0) *
+                    (OPJ_SIZE_T)(l_tile_comp->y1 - l_tile_comp->y0);
 
         if (l_tccp->qmfbid == 1) {
             for (i = 0; i < l_nb_elem; ++i) {
@@ -2100,8 +2353,8 @@ static OPJ_BOOL opj_tcd_mct_encode(opj_tcd_t *p_tcd)
 {
     opj_tcd_tile_t * l_tile = p_tcd->tcd_image->tiles;
     opj_tcd_tilecomp_t * l_tile_comp = p_tcd->tcd_image->tiles->comps;
-    OPJ_UINT32 samples = (OPJ_UINT32)((l_tile_comp->x1 - l_tile_comp->x0) *
-                                      (l_tile_comp->y1 - l_tile_comp->y0));
+    OPJ_SIZE_T samples = (OPJ_SIZE_T)(l_tile_comp->x1 - l_tile_comp->x0) *
+                         (OPJ_SIZE_T)(l_tile_comp->y1 - l_tile_comp->y0);
     OPJ_UINT32 i;
     OPJ_BYTE ** l_data = 00;
     opj_tcp_t * l_tcp = p_tcd->tcp;
@@ -2283,13 +2536,15 @@ static OPJ_BOOL opj_tcd_rate_allocate_encode(opj_tcd_t *p_tcd,
 
 OPJ_BOOL opj_tcd_copy_tile_data(opj_tcd_t *p_tcd,
                                 OPJ_BYTE * p_src,
-                                OPJ_UINT32 p_src_length)
+                                OPJ_SIZE_T p_src_length)
 {
-    OPJ_UINT32 i, j, l_data_size = 0;
+    OPJ_UINT32 i;
+    OPJ_SIZE_T j;
+    OPJ_SIZE_T l_data_size = 0;
     opj_image_comp_t * l_img_comp = 00;
     opj_tcd_tilecomp_t * l_tilec = 00;
     OPJ_UINT32 l_size_comp, l_remaining;
-    OPJ_UINT32 l_nb_elem;
+    OPJ_SIZE_T l_nb_elem;
 
     l_data_size = opj_tcd_get_encoded_tile_size(p_tcd);
     if (l_data_size != p_src_length) {
@@ -2301,8 +2556,8 @@ OPJ_BOOL opj_tcd_copy_tile_data(opj_tcd_t *p_tcd,
     for (i = 0; i < p_tcd->image->numcomps; ++i) {
         l_size_comp = l_img_comp->prec >> 3; /*(/ 8)*/
         l_remaining = l_img_comp->prec & 7;  /* (%8) */
-        l_nb_elem = (OPJ_UINT32)((l_tilec->x1 - l_tilec->x0) * (l_tilec->y1 -
-                                 l_tilec->y0));
+        l_nb_elem = (OPJ_SIZE_T)(l_tilec->x1 - l_tilec->x0) *
+                    (OPJ_SIZE_T)(l_tilec->y1 - l_tilec->y0);
 
         if (l_remaining) {
             ++l_size_comp;
@@ -2396,16 +2651,16 @@ OPJ_BOOL opj_tcd_is_subband_area_of_interest(opj_tcd_t *tcd,
     /* with the tile coordinates */
     OPJ_UINT32 tcx0 = opj_uint_max(
                           (OPJ_UINT32)tilec->x0,
-                          opj_uint_ceildiv(tcd->decoded_x0, image_comp->dx));
+                          opj_uint_ceildiv(tcd->win_x0, image_comp->dx));
     OPJ_UINT32 tcy0 = opj_uint_max(
                           (OPJ_UINT32)tilec->y0,
-                          opj_uint_ceildiv(tcd->decoded_y0, image_comp->dy));
+                          opj_uint_ceildiv(tcd->win_y0, image_comp->dy));
     OPJ_UINT32 tcx1 = opj_uint_min(
                           (OPJ_UINT32)tilec->x1,
-                          opj_uint_ceildiv(tcd->decoded_x1, image_comp->dx));
+                          opj_uint_ceildiv(tcd->win_x1, image_comp->dx));
     OPJ_UINT32 tcy1 = opj_uint_min(
                           (OPJ_UINT32)tilec->y1,
-                          opj_uint_ceildiv(tcd->decoded_y1, image_comp->dy));
+                          opj_uint_ceildiv(tcd->win_y1, image_comp->dy));
     /* Compute number of decomposition for this band. See table F-1 */
     OPJ_UINT32 nb = (resno == 0) ?
                     tilec->numresolutions - 1 :
@@ -2451,4 +2706,45 @@ OPJ_BOOL opj_tcd_is_subband_area_of_interest(opj_tcd_t *tcd,
            tbx0, tby0, tbx1, tby1, intersects);
 #endif
     return intersects;
+}
+
+/** Returns whether a tile componenent is fully decoded, taking into account
+ * p_tcd->win_* members.
+ *
+ * @param p_tcd    TCD handle.
+ * @param compno Component number
+ * @return OPJ_TRUE whether the tile componenent is fully decoded
+ */
+static OPJ_BOOL opj_tcd_is_whole_tilecomp_decoding(opj_tcd_t *p_tcd,
+        OPJ_UINT32 compno)
+{
+    opj_tcd_tilecomp_t* tilec = &(p_tcd->tcd_image->tiles->comps[compno]);
+    opj_image_comp_t* image_comp = &(p_tcd->image->comps[compno]);
+    /* Compute the intersection of the area of interest, expressed in tile coordinates */
+    /* with the tile coordinates */
+    OPJ_UINT32 tcx0 = opj_uint_max(
+                          (OPJ_UINT32)tilec->x0,
+                          opj_uint_ceildiv(p_tcd->win_x0, image_comp->dx));
+    OPJ_UINT32 tcy0 = opj_uint_max(
+                          (OPJ_UINT32)tilec->y0,
+                          opj_uint_ceildiv(p_tcd->win_y0, image_comp->dy));
+    OPJ_UINT32 tcx1 = opj_uint_min(
+                          (OPJ_UINT32)tilec->x1,
+                          opj_uint_ceildiv(p_tcd->win_x1, image_comp->dx));
+    OPJ_UINT32 tcy1 = opj_uint_min(
+                          (OPJ_UINT32)tilec->y1,
+                          opj_uint_ceildiv(p_tcd->win_y1, image_comp->dy));
+
+    OPJ_UINT32 shift = tilec->numresolutions - tilec->minimum_num_resolutions;
+    /* Tolerate small margin within the reduced resolution factor to consider if */
+    /* the whole tile path must be taken */
+    return (tcx0 >= (OPJ_UINT32)tilec->x0 &&
+            tcy0 >= (OPJ_UINT32)tilec->y0 &&
+            tcx1 <= (OPJ_UINT32)tilec->x1 &&
+            tcy1 <= (OPJ_UINT32)tilec->y1 &&
+            (shift >= 32 ||
+             (((tcx0 - (OPJ_UINT32)tilec->x0) >> shift) == 0 &&
+              ((tcy0 - (OPJ_UINT32)tilec->y0) >> shift) == 0 &&
+              (((OPJ_UINT32)tilec->x1 - tcx1) >> shift) == 0 &&
+              (((OPJ_UINT32)tilec->y1 - tcy1) >> shift) == 0)));
 }

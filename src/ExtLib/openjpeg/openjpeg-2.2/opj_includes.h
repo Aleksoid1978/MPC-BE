@@ -216,6 +216,8 @@ static INLINE long opj_lrintf(float f)
 /* Type to use for bit-fields in internal headers */
 typedef unsigned int OPJ_BITFIELD;
 
+#define OPJ_UNUSED(x) (void)x
+
 #include "opj_inttypes.h"
 #include "opj_clock.h"
 #include "opj_malloc.h"
@@ -243,6 +245,7 @@ typedef unsigned int OPJ_BITFIELD;
 #include "t2.h"
 #include "mct.h"
 #include "opj_intmath.h"
+#include "sparse_array.h"
 
 #ifdef USE_JPIP
 #include "cidx_manager.h"

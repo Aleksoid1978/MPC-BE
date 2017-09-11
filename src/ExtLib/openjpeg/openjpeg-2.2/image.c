@@ -180,7 +180,7 @@ void opj_copy_image_header(const opj_image_t* p_image_src,
         for (compno = 0; compno < p_image_dest->numcomps; compno++) {
             opj_image_comp_t *image_comp = &(p_image_dest->comps[compno]);
             if (image_comp->data) {
-                opj_free(image_comp->data);
+                opj_image_data_free(image_comp->data);
             }
         }
         opj_free(p_image_dest->comps);

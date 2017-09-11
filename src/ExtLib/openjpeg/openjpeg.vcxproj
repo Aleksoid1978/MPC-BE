@@ -34,6 +34,7 @@
     <ClCompile Include="openjpeg-2.2\opj_clock.c" />
     <ClCompile Include="openjpeg-2.2\opj_malloc.c" />
     <ClCompile Include="openjpeg-2.2\pi.c" />
+    <ClCompile Include="openjpeg-2.2\sparse_array.c" />
     <ClCompile Include="openjpeg-2.2\t1.c" />
     <ClCompile Include="openjpeg-2.2\t2.c" />
     <ClCompile Include="openjpeg-2.2\tcd.c" />
@@ -65,6 +66,7 @@
     <ClInclude Include="openjpeg-2.2\opj_malloc.h" />
     <ClInclude Include="openjpeg-2.2\opj_stdint.h" />
     <ClInclude Include="openjpeg-2.2\pi.h" />
+    <ClInclude Include="openjpeg-2.2\sparse_array.h" />
     <ClInclude Include="openjpeg-2.2\t1.h" />
     <ClInclude Include="openjpeg-2.2\t1_luts.h" />
     <ClInclude Include="openjpeg-2.2\t2.h" />

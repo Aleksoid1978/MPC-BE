@@ -61,7 +61,7 @@ Apply a reversible multi-component transform to an image
 @param n Number of samples for each component
 */
 void opj_mct_encode(OPJ_INT32* OPJ_RESTRICT c0, OPJ_INT32* OPJ_RESTRICT c1,
-                    OPJ_INT32* OPJ_RESTRICT c2, OPJ_UINT32 n);
+                    OPJ_INT32* OPJ_RESTRICT c2, OPJ_SIZE_T n);
 /**
 Apply a reversible multi-component inverse transform to an image
 @param c0 Samples for luminance component
@@ -70,7 +70,7 @@ Apply a reversible multi-component inverse transform to an image
 @param n Number of samples for each component
 */
 void opj_mct_decode(OPJ_INT32* OPJ_RESTRICT c0, OPJ_INT32* OPJ_RESTRICT c1,
-                    OPJ_INT32* OPJ_RESTRICT c2, OPJ_UINT32 n);
+                    OPJ_INT32* OPJ_RESTRICT c2, OPJ_SIZE_T n);
 /**
 Get norm of the basis function used for the reversible multi-component transform
 @param compno Number of the component (0->Y, 1->U, 2->V)
@@ -86,7 +86,7 @@ Apply an irreversible multi-component transform to an image
 @param n Number of samples for each component
 */
 void opj_mct_encode_real(OPJ_INT32* OPJ_RESTRICT c0, OPJ_INT32* OPJ_RESTRICT c1,
-                         OPJ_INT32* OPJ_RESTRICT c2, OPJ_UINT32 n);
+                         OPJ_INT32* OPJ_RESTRICT c2, OPJ_SIZE_T n);
 /**
 Apply an irreversible multi-component inverse transform to an image
 @param c0 Samples for luminance component
@@ -95,7 +95,7 @@ Apply an irreversible multi-component inverse transform to an image
 @param n Number of samples for each component
 */
 void opj_mct_decode_real(OPJ_FLOAT32* OPJ_RESTRICT c0,
-                         OPJ_FLOAT32* OPJ_RESTRICT c1, OPJ_FLOAT32* OPJ_RESTRICT c2, OPJ_UINT32 n);
+                         OPJ_FLOAT32* OPJ_RESTRICT c1, OPJ_FLOAT32* OPJ_RESTRICT c2, OPJ_SIZE_T n);
 /**
 Get norm of the basis function used for the irreversible multi-component transform
 @param compno Number of the component (0->Y, 1->U, 2->V)
@@ -114,7 +114,7 @@ FIXME DOC
 */
 OPJ_BOOL opj_mct_encode_custom(
     OPJ_BYTE * p_coding_data,
-    OPJ_UINT32 n,
+    OPJ_SIZE_T n,
     OPJ_BYTE ** p_data,
     OPJ_UINT32 p_nb_comp,
     OPJ_UINT32 is_signed);
@@ -129,7 +129,7 @@ FIXME DOC
 */
 OPJ_BOOL opj_mct_decode_custom(
     OPJ_BYTE * pDecodingData,
-    OPJ_UINT32 n,
+    OPJ_SIZE_T n,
     OPJ_BYTE ** pData,
     OPJ_UINT32 pNbComp,
     OPJ_UINT32 isSigned);

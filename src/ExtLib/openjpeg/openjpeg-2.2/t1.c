@@ -38,7 +38,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define OPJ_SKIP_POISON
 #include "opj_includes.h"
+
+#ifdef __SSE__
+#include <xmmintrin.h>
+#endif
+#ifdef __SSE2__
+#include <emmintrin.h>
+#endif
+
+#if defined(__GNUC__)
+#pragma GCC poison malloc calloc realloc free
+#endif
+
 #include "t1_luts.h"
 
 /** @defgroup T1 T1 - Implementation of the tier-1 coding */
@@ -1426,44 +1439,27 @@ static OPJ_BOOL opj_t1_allocate_buffers(
     OPJ_UINT32 w,
     OPJ_UINT32 h)
 {
-    size_t flagssize;
+    OPJ_UINT32 flagssize;
     OPJ_UINT32 flags_stride;
+
+    /* No risk of overflow. Prior checks ensure those assert are met */
+    /* They are per the specification */
+    assert(w <= 1024);
+    assert(h <= 1024);
+    assert(w * h <= 4096);
 
     /* encoder uses tile buffer, so no need to allocate */
     if (!t1->encoder) {
-        size_t datasize;
+        OPJ_UINT32 datasize = w * h;
 
-#if (SIZE_MAX / 0xFFFFFFFFU) < 0xFFFFFFFFU /* UINT32_MAX */
-        /* Overflow check */
-        if ((w > 0U) && ((size_t)h > (SIZE_MAX / (size_t)w))) {
-            /* FIXME event manager error callback */
-            return OPJ_FALSE;
-        }
-#endif
-        datasize = (size_t)w * h;
-
-        /* Overflow check */
-        if (datasize > (SIZE_MAX / sizeof(OPJ_INT32))) {
-            /* FIXME event manager error callback */
-            return OPJ_FALSE;
-        }
-
-        if (datasize > (size_t)t1->datasize) {
+        if (datasize > t1->datasize) {
             opj_aligned_free(t1->data);
             t1->data = (OPJ_INT32*) opj_aligned_malloc(datasize * sizeof(OPJ_INT32));
             if (!t1->data) {
                 /* FIXME event manager error callback */
                 return OPJ_FALSE;
             }
-#if SIZE_MAX > 0xFFFFFFFFU /* UINT32_MAX */
-            /* TODO remove this if t1->datasize type changes to size_t */
-            /* Overflow check */
-            if (datasize > (size_t)0xFFFFFFFFU /* UINT32_MAX */) {
-                /* FIXME event manager error callback */
-                return OPJ_FALSE;
-            }
-#endif
-            t1->datasize = (OPJ_UINT32)datasize;
+            t1->datasize = datasize;
         }
         /* memset first arg is declared to never be null by gcc */
         if (t1->data != NULL) {
@@ -1471,40 +1467,18 @@ static OPJ_BOOL opj_t1_allocate_buffers(
         }
     }
 
-    /* Overflow check */
-    if (w > (0xFFFFFFFFU /* UINT32_MAX */ - 2U)) {
-        /* FIXME event manager error callback */
-        return OPJ_FALSE;
-    }
     flags_stride = w + 2U; /* can't be 0U */
 
-#if (SIZE_MAX - 3U) < 0xFFFFFFFFU /* UINT32_MAX */
-    /* Overflow check */
-    if (h > (0xFFFFFFFFU /* UINT32_MAX */ - 3U)) {
-        /* FIXME event manager error callback */
-        return OPJ_FALSE;
-    }
-#endif
     flagssize = (h + 3U) / 4U + 2U;
 
-    /* Overflow check */
-    if (flagssize > (SIZE_MAX / (size_t)flags_stride)) {
-        /* FIXME event manager error callback */
-        return OPJ_FALSE;
-    }
-    flagssize *= (size_t)flags_stride;
+    flagssize *= flags_stride;
     {
-        /* BIG FAT XXX */
         opj_flag_t* p;
         OPJ_UINT32 x;
         OPJ_UINT32 flags_height = (h + 3U) / 4U;
 
-        if (flagssize > (size_t)t1->flagssize) {
-            /* Overflow check */
-            if (flagssize > (SIZE_MAX / sizeof(opj_flag_t))) {
-                /* FIXME event manager error callback */
-                return OPJ_FALSE;
-            }
+        if (flagssize > t1->flagssize) {
+
             opj_aligned_free(t1->flags);
             t1->flags = (opj_flag_t*) opj_aligned_malloc(flagssize * sizeof(
                             opj_flag_t));
@@ -1512,16 +1486,8 @@ static OPJ_BOOL opj_t1_allocate_buffers(
                 /* FIXME event manager error callback */
                 return OPJ_FALSE;
             }
-#if SIZE_MAX > 0xFFFFFFFFU /* UINT32_MAX */
-            /* TODO remove this if t1->flagssize type changes to size_t */
-            /* Overflow check */
-            if (flagssize > (size_t)0xFFFFFFFFU /* UINT32_MAX */) {
-                /* FIXME event manager error callback */
-                return OPJ_FALSE;
-            }
-#endif
         }
-        t1->flagssize = (OPJ_UINT32)flagssize;
+        t1->flagssize = flagssize;
 
         memset(t1->flags, 0, flagssize * sizeof(opj_flag_t));
 
@@ -1610,6 +1576,7 @@ void opj_t1_destroy(opj_t1_t *p_t1)
 }
 
 typedef struct {
+    OPJ_BOOL whole_tile_decoding;
     OPJ_UINT32 resno;
     opj_tcd_cblk_dec_t* cblk;
     opj_tcd_band_t* band;
@@ -1643,12 +1610,43 @@ static void opj_t1_clbl_decode_processor(void* user_data, opj_tls_t* tls)
     OPJ_UINT32 tile_w;
 
     job = (opj_t1_cblk_decode_processing_job_t*) user_data;
-    resno = job->resno;
+
     cblk = job->cblk;
+
+    if (!job->whole_tile_decoding) {
+        cblk_w = (OPJ_UINT32)(cblk->x1 - cblk->x0);
+        cblk_h = (OPJ_UINT32)(cblk->y1 - cblk->y0);
+
+        cblk->decoded_data = opj_aligned_malloc(cblk_w * cblk_h * sizeof(OPJ_INT32));
+        if (cblk->decoded_data == NULL) {
+            if (job->p_manager_mutex) {
+                opj_mutex_lock(job->p_manager_mutex);
+            }
+            opj_event_msg(job->p_manager, EVT_ERROR,
+                          "Cannot allocate cblk->decoded_data\n");
+            if (job->p_manager_mutex) {
+                opj_mutex_unlock(job->p_manager_mutex);
+            }
+            *(job->pret) = OPJ_FALSE;
+            opj_free(job);
+            return;
+        }
+        /* Zero-init required */
+        memset(cblk->decoded_data, 0, cblk_w * cblk_h * sizeof(OPJ_INT32));
+    } else if (cblk->decoded_data) {
+        /* Not sure if that code path can happen, but better be */
+        /* safe than sorry */
+        opj_aligned_free(cblk->decoded_data);
+        cblk->decoded_data = NULL;
+    }
+
+    resno = job->resno;
     band = job->band;
     tilec = job->tilec;
     tccp = job->tccp;
-    tile_w = (OPJ_UINT32)(tilec->x1 - tilec->x0);
+    tile_w = (OPJ_UINT32)(tilec->resolutions[tilec->minimum_num_resolutions - 1].x1
+                          -
+                          tilec->resolutions[tilec->minimum_num_resolutions - 1].x0);
 
     if (!*(job->pret)) {
         opj_free(job);
@@ -1687,7 +1685,7 @@ static void opj_t1_clbl_decode_processor(void* user_data, opj_tls_t* tls)
         y += pres->y1 - pres->y0;
     }
 
-    datap = t1->data;
+    datap = cblk->decoded_data ? cblk->decoded_data : t1->data;
     cblk_w = t1->w;
     cblk_h = t1->h;
 
@@ -1712,9 +1710,49 @@ static void opj_t1_clbl_decode_processor(void* user_data, opj_tls_t* tls)
             }
         }
     }
-    if (tccp->qmfbid == 1) {
-        OPJ_INT32* OPJ_RESTRICT tiledp = &tilec->data[(OPJ_UINT32)y * tile_w +
-                                                       (OPJ_UINT32)x];
+
+    /* Both can be non NULL if for example decoding a full tile and then */
+    /* partially a tile. In which case partial decoding should be the */
+    /* priority */
+    assert((cblk->decoded_data != NULL) || (tilec->data != NULL));
+
+    if (cblk->decoded_data) {
+        OPJ_UINT32 cblk_size = cblk_w * cblk_h;
+        if (tccp->qmfbid == 1) {
+            for (i = 0; i < cblk_size; ++i) {
+                datap[i] /= 2;
+            }
+        } else {        /* if (tccp->qmfbid == 0) */
+            i = 0;
+#ifdef __SSE2__
+            {
+                const __m128 xmm_stepsize = _mm_set1_ps(band->stepsize);
+                for (; i < (cblk_size & ~15U); i += 16) {
+                    __m128 xmm0_data = _mm_cvtepi32_ps(_mm_load_si128((__m128i * const)(
+                                                           datap + 0)));
+                    __m128 xmm1_data = _mm_cvtepi32_ps(_mm_load_si128((__m128i * const)(
+                                                           datap + 4)));
+                    __m128 xmm2_data = _mm_cvtepi32_ps(_mm_load_si128((__m128i * const)(
+                                                           datap + 8)));
+                    __m128 xmm3_data = _mm_cvtepi32_ps(_mm_load_si128((__m128i * const)(
+                                                           datap + 12)));
+                    _mm_store_ps((float*)(datap +  0), _mm_mul_ps(xmm0_data, xmm_stepsize));
+                    _mm_store_ps((float*)(datap +  4), _mm_mul_ps(xmm1_data, xmm_stepsize));
+                    _mm_store_ps((float*)(datap +  8), _mm_mul_ps(xmm2_data, xmm_stepsize));
+                    _mm_store_ps((float*)(datap + 12), _mm_mul_ps(xmm3_data, xmm_stepsize));
+                    datap += 16;
+                }
+            }
+#endif
+            for (; i < cblk_size; ++i) {
+                OPJ_FLOAT32 tmp = ((OPJ_FLOAT32)(*datap)) * band->stepsize;
+                memcpy(datap, &tmp, sizeof(tmp));
+                datap++;
+            }
+        }
+    } else if (tccp->qmfbid == 1) {
+        OPJ_INT32* OPJ_RESTRICT tiledp = &tilec->data[(OPJ_SIZE_T)y * tile_w +
+                                                       (OPJ_SIZE_T)x];
         for (j = 0; j < cblk_h; ++j) {
             i = 0;
             for (; i < (cblk_w & ~(OPJ_UINT32)3U); i += 4U) {
@@ -1722,19 +1760,19 @@ static void opj_t1_clbl_decode_processor(void* user_data, opj_tls_t* tls)
                 OPJ_INT32 tmp1 = datap[(j * cblk_w) + i + 1U];
                 OPJ_INT32 tmp2 = datap[(j * cblk_w) + i + 2U];
                 OPJ_INT32 tmp3 = datap[(j * cblk_w) + i + 3U];
-                ((OPJ_INT32*)tiledp)[(j * tile_w) + i + 0U] = tmp0 / 2;
-                ((OPJ_INT32*)tiledp)[(j * tile_w) + i + 1U] = tmp1 / 2;
-                ((OPJ_INT32*)tiledp)[(j * tile_w) + i + 2U] = tmp2 / 2;
-                ((OPJ_INT32*)tiledp)[(j * tile_w) + i + 3U] = tmp3 / 2;
+                ((OPJ_INT32*)tiledp)[(j * (OPJ_SIZE_T)tile_w) + i + 0U] = tmp0 / 2;
+                ((OPJ_INT32*)tiledp)[(j * (OPJ_SIZE_T)tile_w) + i + 1U] = tmp1 / 2;
+                ((OPJ_INT32*)tiledp)[(j * (OPJ_SIZE_T)tile_w) + i + 2U] = tmp2 / 2;
+                ((OPJ_INT32*)tiledp)[(j * (OPJ_SIZE_T)tile_w) + i + 3U] = tmp3 / 2;
             }
             for (; i < cblk_w; ++i) {
                 OPJ_INT32 tmp = datap[(j * cblk_w) + i];
-                ((OPJ_INT32*)tiledp)[(j * tile_w) + i] = tmp / 2;
+                ((OPJ_INT32*)tiledp)[(j * (OPJ_SIZE_T)tile_w) + i] = tmp / 2;
             }
         }
     } else {        /* if (tccp->qmfbid == 0) */
-        OPJ_FLOAT32* OPJ_RESTRICT tiledp = (OPJ_FLOAT32*) &tilec->data[(OPJ_UINT32)y *
-                                                         tile_w + (OPJ_UINT32)x];
+        OPJ_FLOAT32* OPJ_RESTRICT tiledp = (OPJ_FLOAT32*) &tilec->data[(OPJ_SIZE_T)y *
+                                                         tile_w + (OPJ_SIZE_T)x];
         for (j = 0; j < cblk_h; ++j) {
             OPJ_FLOAT32* OPJ_RESTRICT tiledp2 = tiledp;
             for (i = 0; i < cblk_w; ++i) {
@@ -1763,6 +1801,11 @@ void opj_t1_decode_cblks(opj_tcd_t* tcd,
     opj_thread_pool_t* tp = tcd->thread_pool;
     OPJ_UINT32 resno, bandno, precno, cblkno;
 
+#ifdef DEBUG_VERBOSE
+    OPJ_UINT32 codeblocks_decoded = 0;
+    printf("Enter opj_t1_decode_cblks()\n");
+#endif
+
     for (resno = 0; resno < tilec->minimum_num_resolutions; ++resno) {
         opj_tcd_resolution_t* res = &tilec->resolutions[resno];
 
@@ -1771,7 +1814,6 @@ void opj_t1_decode_cblks(opj_tcd_t* tcd,
 
             for (precno = 0; precno < res->pw * res->ph; ++precno) {
                 opj_tcd_precinct_t* precinct = &band->precincts[precno];
-                OPJ_BOOL skip_precinct = OPJ_FALSE;
 
                 if (!opj_tcd_is_subband_area_of_interest(tcd,
                         tilec->compno,
@@ -1781,51 +1823,60 @@ void opj_t1_decode_cblks(opj_tcd_t* tcd,
                         (OPJ_UINT32)precinct->y0,
                         (OPJ_UINT32)precinct->x1,
                         (OPJ_UINT32)precinct->y1)) {
-                    skip_precinct = OPJ_TRUE;
-                    /* TODO: do a continue here once the below 0 initialization */
-                    /* of tiledp is removed */
+                    for (cblkno = 0; cblkno < precinct->cw * precinct->ch; ++cblkno) {
+                        opj_tcd_cblk_dec_t* cblk = &precinct->cblks.dec[cblkno];
+                        if (cblk->decoded_data) {
+#ifdef DEBUG_VERBOSE
+                            printf("Discarding codeblock %d,%d at resno=%d, bandno=%d\n",
+                                   cblk->x0, cblk->y0, resno, bandno);
+#endif
+                            opj_aligned_free(cblk->decoded_data);
+                            cblk->decoded_data = NULL;
+                        }
+                    }
+                    continue;
                 }
 
                 for (cblkno = 0; cblkno < precinct->cw * precinct->ch; ++cblkno) {
                     opj_tcd_cblk_dec_t* cblk = &precinct->cblks.dec[cblkno];
                     opj_t1_cblk_decode_processing_job_t* job;
 
-                    if (skip_precinct ||
-                            !opj_tcd_is_subband_area_of_interest(tcd,
-                                    tilec->compno,
-                                    resno,
-                                    band->bandno,
-                                    (OPJ_UINT32)cblk->x0,
-                                    (OPJ_UINT32)cblk->y0,
-                                    (OPJ_UINT32)cblk->x1,
-                                    (OPJ_UINT32)cblk->y1)) {
-
-                        /* TODO: remove this once we don't iterate over */
-                        /* tile pixels that are not in the subwindow of interest */
-                        OPJ_UINT32 j;
-                        OPJ_INT32 x = cblk->x0 - band->x0;
-                        OPJ_INT32 y = cblk->y0 - band->y0;
-                        OPJ_INT32* OPJ_RESTRICT tiledp;
-                        OPJ_UINT32 tile_w = (OPJ_UINT32)(tilec->x1 - tilec->x0);
-                        OPJ_UINT32 cblk_w = (OPJ_UINT32)(cblk->x1 - cblk->x0);
-                        OPJ_UINT32 cblk_h = (OPJ_UINT32)(cblk->y1 - cblk->y0);
-
-                        if (band->bandno & 1) {
-                            opj_tcd_resolution_t* pres = &tilec->resolutions[resno - 1];
-                            x += pres->x1 - pres->x0;
-                        }
-                        if (band->bandno & 2) {
-                            opj_tcd_resolution_t* pres = &tilec->resolutions[resno - 1];
-                            y += pres->y1 - pres->y0;
-                        }
-
-                        tiledp = &tilec->data[(OPJ_UINT32)y * tile_w +
-                                                            (OPJ_UINT32)x];
-
-                        for (j = 0; j < cblk_h; ++j) {
-                            memset(tiledp + j * tile_w, 0, cblk_w * sizeof(OPJ_INT32));
+                    if (!opj_tcd_is_subband_area_of_interest(tcd,
+                            tilec->compno,
+                            resno,
+                            band->bandno,
+                            (OPJ_UINT32)cblk->x0,
+                            (OPJ_UINT32)cblk->y0,
+                            (OPJ_UINT32)cblk->x1,
+                            (OPJ_UINT32)cblk->y1)) {
+                        if (cblk->decoded_data) {
+#ifdef DEBUG_VERBOSE
+                            printf("Discarding codeblock %d,%d at resno=%d, bandno=%d\n",
+                                   cblk->x0, cblk->y0, resno, bandno);
+#endif
+                            opj_aligned_free(cblk->decoded_data);
+                            cblk->decoded_data = NULL;
                         }
                         continue;
+                    }
+
+                    if (!tcd->whole_tile_decoding) {
+                        OPJ_UINT32 cblk_w = (OPJ_UINT32)(cblk->x1 - cblk->x0);
+                        OPJ_UINT32 cblk_h = (OPJ_UINT32)(cblk->y1 - cblk->y0);
+                        if (cblk->decoded_data != NULL) {
+#ifdef DEBUG_VERBOSE
+                            printf("Reusing codeblock %d,%d at resno=%d, bandno=%d\n",
+                                   cblk->x0, cblk->y0, resno, bandno);
+#endif
+                            continue;
+                        }
+                        if (cblk_w == 0 || cblk_h == 0) {
+                            continue;
+                        }
+#ifdef DEBUG_VERBOSE
+                        printf("Decoding codeblock %d,%d at resno=%d, bandno=%d\n",
+                               cblk->x0, cblk->y0, resno, bandno);
+#endif
                     }
 
                     job = (opj_t1_cblk_decode_processing_job_t*) opj_calloc(1,
@@ -1834,6 +1885,7 @@ void opj_t1_decode_cblks(opj_tcd_t* tcd,
                         *pret = OPJ_FALSE;
                         return;
                     }
+                    job->whole_tile_decoding = tcd->whole_tile_decoding;
                     job->resno = resno;
                     job->cblk = cblk;
                     job->band = band;
@@ -1845,6 +1897,9 @@ void opj_t1_decode_cblks(opj_tcd_t* tcd,
                     job->check_pterm = check_pterm;
                     job->mustuse_cblkdatabuffer = opj_thread_pool_get_thread_count(tp) > 1;
                     opj_thread_pool_submit_job(tp, opj_t1_clbl_decode_processor, job);
+#ifdef DEBUG_VERBOSE
+                    codeblocks_decoded ++;
+#endif
                     if (!(*pret)) {
                         return;
                     }
@@ -1853,6 +1908,9 @@ void opj_t1_decode_cblks(opj_tcd_t* tcd,
         } /* bandno */
     } /* resno */
 
+#ifdef DEBUG_VERBOSE
+    printf("Leave opj_t1_decode_cblks(). Number decoded: %d\n", codeblocks_decoded);
+#endif
     return;
 }
 
@@ -1874,6 +1932,7 @@ static OPJ_BOOL opj_t1_decode_cblk(opj_t1_t *t1,
     OPJ_BYTE* cblkdata = NULL;
     OPJ_UINT32 cblkdataindex = 0;
     OPJ_BYTE type = T1_TYPE_MQ; /* BYPASS mode */
+    OPJ_INT32* original_t1_data = NULL;
 
     mqc->lut_ctxno_zc_orient = lut_ctxno_zc + (orient << 9);
 
@@ -1938,6 +1997,13 @@ static OPJ_BOOL opj_t1_decode_cblk(opj_t1_t *t1,
         }
     } else if (cblk->numchunks == 1) {
         cblkdata = cblk->chunks[0].data;
+    }
+
+    /* For subtile decoding, directly decode in the decoded_data buffer of */
+    /* the code-block. Hack t1->data to point to it, and restore it later */
+    if (cblk->decoded_data) {
+        original_t1_data = t1->data;
+        t1->data = cblk->decoded_data;
     }
 
     for (segno = 0; segno < cblk->real_num_segs; ++segno) {
@@ -2019,6 +2085,11 @@ static OPJ_BOOL opj_t1_decode_cblk(opj_t1_t *t1,
         }
     }
 
+    /* Restore original t1->data is needed */
+    if (cblk->decoded_data) {
+        t1->data = original_t1_data;
+    }
+
     return OPJ_TRUE;
 }
 
@@ -2062,7 +2133,8 @@ OPJ_BOOL opj_t1_encode_cblks(opj_t1_t *t1,
                         OPJ_INT32* OPJ_RESTRICT tiledp;
                         OPJ_UINT32 cblk_w;
                         OPJ_UINT32 cblk_h;
-                        OPJ_UINT32 i, j, tileIndex = 0, tileLineAdvance;
+                        OPJ_UINT32 i, j, tileLineAdvance;
+                        OPJ_SIZE_T tileIndex = 0;
 
                         OPJ_INT32 x = cblk->x0 - band->x0;
                         OPJ_INT32 y = cblk->y0 - band->y0;
@@ -2086,7 +2158,7 @@ OPJ_BOOL opj_t1_encode_cblks(opj_t1_t *t1,
                         cblk_h = t1->h;
                         tileLineAdvance = tile_w - cblk_w;
 
-                        tiledp = &tilec->data[(OPJ_UINT32)y * tile_w + (OPJ_UINT32)x];
+                        tiledp = &tilec->data[(OPJ_SIZE_T)y * tile_w + (OPJ_SIZE_T)x];
                         t1->data = tiledp;
                         t1->data_stride = tile_w;
                         if (tccp->qmfbid == 1) {
