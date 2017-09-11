@@ -151,9 +151,9 @@ Inverse wavelet transform in 2-D.
 static OPJ_BOOL opj_dwt_decode_tile(opj_thread_pool_t* tp,
                                     opj_tcd_tilecomp_t* tilec, OPJ_UINT32 i);
 
-static OPJ_BOOL opj_dwt_decode_partial_tile(opj_tcd_t *p_tcd,
-        opj_tcd_tilecomp_t* tilec,
-        OPJ_UINT32 numres);
+static OPJ_BOOL opj_dwt_decode_partial_tile(
+    opj_tcd_tilecomp_t* tilec,
+    OPJ_UINT32 numres);
 
 static OPJ_BOOL opj_dwt_encode_procedure(opj_tcd_tilecomp_t * tilec,
         void (*p_function)(OPJ_INT32 *, OPJ_INT32, OPJ_INT32, OPJ_INT32));
@@ -279,7 +279,7 @@ static void opj_dwt_deinterleave_v(OPJ_INT32 *a, OPJ_INT32 *b, OPJ_INT32 dn,
         l_src += 2;
     } /* b[i*x]=a[2*i+cas]; */
 
-    l_dest = b + sn * x;
+    l_dest = b + (OPJ_SIZE_T)sn * (OPJ_SIZE_T)x;
     l_src = a + 1 - cas;
 
     i = dn;
@@ -325,7 +325,7 @@ static void opj_dwt_interleave_v(const opj_dwt_t* v, OPJ_INT32 *a, OPJ_INT32 x)
         bi += 2;
         ai += x;
     }
-    ai = a + (v->sn * x);
+    ai = a + (v->sn * (OPJ_SIZE_T)x);
     bi = v->mem + 1 - v->cas;
     i = v->dn ;
     while (i--) {
@@ -616,7 +616,7 @@ static
 void opj_idwt53_v_final_memcpy(OPJ_INT32* tiledp_col,
                                const OPJ_INT32* tmp,
                                OPJ_INT32 len,
-                               OPJ_INT32 stride)
+                               OPJ_SIZE_T stride)
 {
     OPJ_INT32 i;
     for (i = 0; i < len; ++i) {
@@ -625,9 +625,9 @@ void opj_idwt53_v_final_memcpy(OPJ_INT32* tiledp_col,
                     PARALLEL_COLS_53 * sizeof(OPJ_INT32))
            would do but would be a tiny bit slower.
            We can take here advantage of our knowledge of alignment */
-        STOREU(&tiledp_col[i * stride + 0],
+        STOREU(&tiledp_col[(OPJ_SIZE_T)i * stride + 0],
                LOAD(&tmp[PARALLEL_COLS_53 * i + 0]));
-        STOREU(&tiledp_col[i * stride + VREG_INT_COUNT],
+        STOREU(&tiledp_col[(OPJ_SIZE_T)i * stride + VREG_INT_COUNT],
                LOAD(&tmp[PARALLEL_COLS_53 * i + VREG_INT_COUNT]));
     }
 }
@@ -639,12 +639,13 @@ static void opj_idwt53_v_cas0_mcols_SSE2_OR_AVX2(
     const OPJ_INT32 sn,
     const OPJ_INT32 len,
     OPJ_INT32* tiledp_col,
-    const OPJ_INT32 stride)
+    const OPJ_SIZE_T stride)
 {
     const OPJ_INT32* in_even = &tiledp_col[0];
-    const OPJ_INT32* in_odd = &tiledp_col[sn * stride];
+    const OPJ_INT32* in_odd = &tiledp_col[(OPJ_SIZE_T)sn * stride];
 
-    OPJ_INT32 i, j;
+    OPJ_INT32 i;
+    OPJ_SIZE_T j;
     VREG d1c_0, d1n_0, s1n_0, s0c_0, s0n_0;
     VREG d1c_1, d1n_1, s1n_1, s0c_1, s0n_1;
     const VREG two = LOAD_CST(2);
@@ -661,7 +662,7 @@ static void opj_idwt53_v_cas0_mcols_SSE2_OR_AVX2(
     /* Note: loads of input even/odd values must be done in a unaligned */
     /* fashion. But stores in tmp can be done with aligned store, since */
     /* the temporary buffer is properly aligned */
-    assert((size_t)tmp % (sizeof(OPJ_INT32) * VREG_INT_COUNT) == 0);
+    assert((OPJ_SIZE_T)tmp % (sizeof(OPJ_INT32) * VREG_INT_COUNT) == 0);
 
     s1n_0 = LOADU(in_even + 0);
     s1n_1 = LOADU(in_even + VREG_INT_COUNT);
@@ -703,7 +704,7 @@ static void opj_idwt53_v_cas0_mcols_SSE2_OR_AVX2(
 
     if (len & 1) {
         VREG tmp_len_minus_1;
-        s1n_0 = LOADU(in_even + ((len - 1) / 2) * stride);
+        s1n_0 = LOADU(in_even + (OPJ_SIZE_T)((len - 1) / 2) * stride);
         /* tmp_len_minus_1 = s1n - ((d1n + 1) >> 1); */
         tmp_len_minus_1 = SUB(s1n_0, SAR(ADD3(d1n_0, d1n_0, two), 2));
         STORE(tmp + PARALLEL_COLS_53 * (len - 1), tmp_len_minus_1);
@@ -711,7 +712,7 @@ static void opj_idwt53_v_cas0_mcols_SSE2_OR_AVX2(
         STORE(tmp + PARALLEL_COLS_53 * (len - 2),
               ADD(d1n_0, SAR(ADD(s0n_0, tmp_len_minus_1), 1)));
 
-        s1n_1 = LOADU(in_even + ((len - 1) / 2) * stride + VREG_INT_COUNT);
+        s1n_1 = LOADU(in_even + (OPJ_SIZE_T)((len - 1) / 2) * stride + VREG_INT_COUNT);
         /* tmp_len_minus_1 = s1n - ((d1n + 1) >> 1); */
         tmp_len_minus_1 = SUB(s1n_1, SAR(ADD3(d1n_1, d1n_1, two), 2));
         STORE(tmp + PARALLEL_COLS_53 * (len - 1) + VREG_INT_COUNT,
@@ -739,15 +740,16 @@ static void opj_idwt53_v_cas1_mcols_SSE2_OR_AVX2(
     const OPJ_INT32 sn,
     const OPJ_INT32 len,
     OPJ_INT32* tiledp_col,
-    const OPJ_INT32 stride)
+    const OPJ_SIZE_T stride)
 {
-    OPJ_INT32 i, j;
+    OPJ_INT32 i;
+    OPJ_SIZE_T j;
 
     VREG s1_0, s2_0, dc_0, dn_0;
     VREG s1_1, s2_1, dc_1, dn_1;
     const VREG two = LOAD_CST(2);
 
-    const OPJ_INT32* in_even = &tiledp_col[sn * stride];
+    const OPJ_INT32* in_even = &tiledp_col[(OPJ_SIZE_T)sn * stride];
     const OPJ_INT32* in_odd = &tiledp_col[0];
 
     assert(len > 2);
@@ -762,7 +764,7 @@ static void opj_idwt53_v_cas1_mcols_SSE2_OR_AVX2(
     /* Note: loads of input even/odd values must be done in a unaligned */
     /* fashion. But stores in tmp can be done with aligned store, since */
     /* the temporary buffer is properly aligned */
-    assert((size_t)tmp % (sizeof(OPJ_INT32) * VREG_INT_COUNT) == 0);
+    assert((OPJ_SIZE_T)tmp % (sizeof(OPJ_INT32) * VREG_INT_COUNT) == 0);
 
     s1_0 = LOADU(in_even + stride);
     /* in_odd[0] - ((in_even[0] + s1 + 2) >> 2); */
@@ -807,9 +809,9 @@ static void opj_idwt53_v_cas1_mcols_SSE2_OR_AVX2(
 
     if (!(len & 1)) {
         /*dn = in_odd[(len / 2 - 1) * stride] - ((s1 + 1) >> 1); */
-        dn_0 = SUB(LOADU(in_odd + (len / 2 - 1) * stride),
+        dn_0 = SUB(LOADU(in_odd + (OPJ_SIZE_T)(len / 2 - 1) * stride),
                    SAR(ADD3(s1_0, s1_0, two), 2));
-        dn_1 = SUB(LOADU(in_odd + (len / 2 - 1) * stride + VREG_INT_COUNT),
+        dn_1 = SUB(LOADU(in_odd + (OPJ_SIZE_T)(len / 2 - 1) * stride + VREG_INT_COUNT),
                    SAR(ADD3(s1_1, s1_1, two), 2));
 
         /* tmp[len - 2] = s1 + ((dn + dc) >> 1); */
@@ -849,7 +851,7 @@ static void opj_idwt3_v_cas0(OPJ_INT32* tmp,
                              const OPJ_INT32 sn,
                              const OPJ_INT32 len,
                              OPJ_INT32* tiledp_col,
-                             const OPJ_INT32 stride)
+                             const OPJ_SIZE_T stride)
 {
     OPJ_INT32 i, j;
     OPJ_INT32 d1c, d1n, s1n, s0c, s0n;
@@ -860,15 +862,15 @@ static void opj_idwt3_v_cas0(OPJ_INT32* tmp,
     /* accesses and explicit interleaving. */
 
     s1n = tiledp_col[0];
-    d1n = tiledp_col[sn * stride];
+    d1n = tiledp_col[(OPJ_SIZE_T)sn * stride];
     s0n = s1n - ((d1n + 1) >> 1);
 
     for (i = 0, j = 0; i < (len - 3); i += 2, j++) {
         d1c = d1n;
         s0c = s0n;
 
-        s1n = tiledp_col[(j + 1) * stride];
-        d1n = tiledp_col[(sn + j + 1) * stride];
+        s1n = tiledp_col[(OPJ_SIZE_T)(j + 1) * stride];
+        d1n = tiledp_col[(OPJ_SIZE_T)(sn + j + 1) * stride];
 
         s0n = s1n - ((d1c + d1n + 2) >> 2);
 
@@ -880,7 +882,7 @@ static void opj_idwt3_v_cas0(OPJ_INT32* tmp,
 
     if (len & 1) {
         tmp[len - 1] =
-            tiledp_col[((len - 1) / 2) * stride] -
+            tiledp_col[(OPJ_SIZE_T)((len - 1) / 2) * stride] -
             ((d1n + 1) >> 1);
         tmp[len - 2] = d1n + ((s0n + tmp[len - 1]) >> 1);
     } else {
@@ -888,7 +890,7 @@ static void opj_idwt3_v_cas0(OPJ_INT32* tmp,
     }
 
     for (i = 0; i < len; ++i) {
-        tiledp_col[i * stride] = tmp[i];
+        tiledp_col[(OPJ_SIZE_T)i * stride] = tmp[i];
     }
 }
 
@@ -899,11 +901,11 @@ static void opj_idwt3_v_cas1(OPJ_INT32* tmp,
                              const OPJ_INT32 sn,
                              const OPJ_INT32 len,
                              OPJ_INT32* tiledp_col,
-                             const OPJ_INT32 stride)
+                             const OPJ_SIZE_T stride)
 {
     OPJ_INT32 i, j;
     OPJ_INT32 s1, s2, dc, dn;
-    const OPJ_INT32* in_even = &tiledp_col[sn * stride];
+    const OPJ_INT32* in_even = &tiledp_col[(OPJ_SIZE_T)sn * stride];
     const OPJ_INT32* in_odd = &tiledp_col[0];
 
     assert(len > 2);
@@ -916,9 +918,9 @@ static void opj_idwt3_v_cas1(OPJ_INT32* tmp,
     tmp[0] = in_even[0] + dc;
     for (i = 1, j = 1; i < (len - 2 - !(len & 1)); i += 2, j++) {
 
-        s2 = in_even[(j + 1) * stride];
+        s2 = in_even[(OPJ_SIZE_T)(j + 1) * stride];
 
-        dn = in_odd[j * stride] - ((s1 + s2 + 2) >> 2);
+        dn = in_odd[(OPJ_SIZE_T)j * stride] - ((s1 + s2 + 2) >> 2);
         tmp[i  ] = dc;
         tmp[i + 1] = s1 + ((dn + dc) >> 1);
 
@@ -927,7 +929,7 @@ static void opj_idwt3_v_cas1(OPJ_INT32* tmp,
     }
     tmp[i] = dc;
     if (!(len & 1)) {
-        dn = in_odd[(len / 2 - 1) * stride] - ((s1 + 1) >> 1);
+        dn = in_odd[(OPJ_SIZE_T)(len / 2 - 1) * stride] - ((s1 + 1) >> 1);
         tmp[len - 2] = s1 + ((dn + dc) >> 1);
         tmp[len - 1] = dn;
     } else {
@@ -935,7 +937,7 @@ static void opj_idwt3_v_cas1(OPJ_INT32* tmp,
     }
 
     for (i = 0; i < len; ++i) {
-        tiledp_col[i * stride] = tmp[i];
+        tiledp_col[(OPJ_SIZE_T)i * stride] = tmp[i];
     }
 }
 #endif /* !defined(STANDARD_SLOW_VERSION) */
@@ -946,7 +948,7 @@ static void opj_idwt3_v_cas1(OPJ_INT32* tmp,
 /* Performs interleave, inverse wavelet transform and copy back to buffer */
 static void opj_idwt53_v(const opj_dwt_t *dwt,
                          OPJ_INT32* tiledp_col,
-                         OPJ_INT32 stride,
+                         OPJ_SIZE_T stride,
                          OPJ_INT32 nb_cols)
 {
 #ifdef STANDARD_SLOW_VERSION
@@ -994,14 +996,14 @@ static void opj_idwt53_v(const opj_dwt_t *dwt,
             OPJ_INT32* out = dwt->mem;
             for (c = 0; c < nb_cols; c++, tiledp_col++) {
                 OPJ_INT32 i;
-                const OPJ_INT32* in_even = &tiledp_col[sn * stride];
+                const OPJ_INT32* in_even = &tiledp_col[(OPJ_SIZE_T)sn * stride];
                 const OPJ_INT32* in_odd = &tiledp_col[0];
 
                 out[1] = in_odd[0] - ((in_even[0] + 1) >> 1);
                 out[0] = in_even[0] + out[1];
 
                 for (i = 0; i < len; ++i) {
-                    tiledp_col[i * stride] = out[i];
+                    tiledp_col[(OPJ_SIZE_T)i * stride] = out[i];
                 }
             }
 
@@ -1111,7 +1113,7 @@ static INLINE OPJ_BOOL opj_dwt_encode_procedure(opj_tcd_tilecomp_t * tilec,
 
     OPJ_INT32 rw;           /* width of the resolution level computed   */
     OPJ_INT32 rh;           /* height of the resolution level computed  */
-    size_t l_data_size;
+    OPJ_SIZE_T l_data_size;
 
     opj_tcd_resolution_t * l_cur_res = 0;
     opj_tcd_resolution_t * l_last_res = 0;
@@ -1194,40 +1196,16 @@ OPJ_BOOL opj_dwt_encode(opj_tcd_tilecomp_t * tilec)
     return opj_dwt_encode_procedure(tilec, opj_dwt_encode_1);
 }
 
-static OPJ_BOOL opj_dwt_is_whole_tile_decoding(opj_tcd_t *p_tcd,
-        opj_tcd_tilecomp_t* tilec)
-{
-    opj_image_comp_t* image_comp = &(p_tcd->image->comps[tilec->compno]);
-    /* Compute the intersection of the area of interest, expressed in tile coordinates */
-    /* with the tile coordinates */
-    OPJ_UINT32 tcx0 = opj_uint_max(
-                          (OPJ_UINT32)tilec->x0,
-                          opj_uint_ceildiv(p_tcd->decoded_x0, image_comp->dx));
-    OPJ_UINT32 tcy0 = opj_uint_max(
-                          (OPJ_UINT32)tilec->y0,
-                          opj_uint_ceildiv(p_tcd->decoded_y0, image_comp->dy));
-    OPJ_UINT32 tcx1 = opj_uint_min(
-                          (OPJ_UINT32)tilec->x1,
-                          opj_uint_ceildiv(p_tcd->decoded_x1, image_comp->dx));
-    OPJ_UINT32 tcy1 = opj_uint_min(
-                          (OPJ_UINT32)tilec->y1,
-                          opj_uint_ceildiv(p_tcd->decoded_y1, image_comp->dy));
-    return (tcx0 == (OPJ_UINT32)tilec->x0 &&
-            tcy0 == (OPJ_UINT32)tilec->y0 &&
-            tcx1 == (OPJ_UINT32)tilec->x1 &&
-            tcy1 == (OPJ_UINT32)tilec->y1);
-}
-
 /* <summary>                            */
 /* Inverse 5-3 wavelet transform in 2-D. */
 /* </summary>                           */
 OPJ_BOOL opj_dwt_decode(opj_tcd_t *p_tcd, opj_tcd_tilecomp_t* tilec,
                         OPJ_UINT32 numres)
 {
-    if (opj_dwt_is_whole_tile_decoding(p_tcd, tilec)) {
+    if (p_tcd->whole_tile_decoding) {
         return opj_dwt_decode_tile(p_tcd->thread_pool, tilec, numres);
     } else {
-        return opj_dwt_decode_partial_tile(p_tcd, tilec, numres);
+        return opj_dwt_decode_partial_tile(tilec, numres);
     }
 }
 
@@ -1365,11 +1343,11 @@ static void opj_dwt_decode_v_func(void* user_data, opj_tls_t* tls)
     job = (opj_dwd_decode_v_job_t*)user_data;
     for (j = job->min_j; j + PARALLEL_COLS_53 <= job->max_j;
             j += PARALLEL_COLS_53) {
-        opj_idwt53_v(&job->v, &job->tiledp[j], (OPJ_INT32)job->w,
+        opj_idwt53_v(&job->v, &job->tiledp[j], (OPJ_SIZE_T)job->w,
                      PARALLEL_COLS_53);
     }
     if (j < job->max_j)
-        opj_idwt53_v(&job->v, &job->tiledp[j], (OPJ_INT32)job->w,
+        opj_idwt53_v(&job->v, &job->tiledp[j], (OPJ_SIZE_T)job->w,
                      (OPJ_INT32)(job->max_j - j));
 
     opj_aligned_free(job->v.mem);
@@ -1393,8 +1371,10 @@ static OPJ_BOOL opj_dwt_decode_tile(opj_thread_pool_t* tp,
     OPJ_UINT32 rh = (OPJ_UINT32)(tr->y1 -
                                  tr->y0);  /* height of the resolution level computed */
 
-    OPJ_UINT32 w = (OPJ_UINT32)(tilec->x1 - tilec->x0);
-    size_t h_mem_size;
+    OPJ_UINT32 w = (OPJ_UINT32)(tilec->resolutions[tilec->minimum_num_resolutions -
+                                                               1].x1 -
+                                tilec->resolutions[tilec->minimum_num_resolutions - 1].x0);
+    OPJ_SIZE_T h_mem_size;
     int num_threads;
 
     if (numres == 1U) {
@@ -1435,7 +1415,7 @@ static OPJ_BOOL opj_dwt_decode_tile(opj_thread_pool_t* tp,
 
         if (num_threads <= 1 || rh <= 1) {
             for (j = 0; j < rh; ++j) {
-                opj_idwt53_h(&h, &tiledp[j * w]);
+                opj_idwt53_h(&h, &tiledp[(OPJ_SIZE_T)j * w]);
             }
         } else {
             OPJ_UINT32 num_jobs = (OPJ_UINT32)num_threads;
@@ -1487,10 +1467,10 @@ static OPJ_BOOL opj_dwt_decode_tile(opj_thread_pool_t* tp,
         if (num_threads <= 1 || rw <= 1) {
             for (j = 0; j + PARALLEL_COLS_53 <= rw;
                     j += PARALLEL_COLS_53) {
-                opj_idwt53_v(&v, &tiledp[j], (OPJ_INT32)w, PARALLEL_COLS_53);
+                opj_idwt53_v(&v, &tiledp[j], (OPJ_SIZE_T)w, PARALLEL_COLS_53);
             }
             if (j < rw) {
-                opj_idwt53_v(&v, &tiledp[j], (OPJ_INT32)w, (OPJ_INT32)(rw - j));
+                opj_idwt53_v(&v, &tiledp[j], (OPJ_SIZE_T)w, (OPJ_INT32)(rw - j));
             }
         } else {
             OPJ_UINT32 num_jobs = (OPJ_UINT32)num_threads;
@@ -1542,51 +1522,56 @@ static OPJ_BOOL opj_dwt_decode_tile(opj_thread_pool_t* tp,
 
 static void opj_dwt_interleave_partial_h(OPJ_INT32 *dest,
         OPJ_INT32 cas,
-        const OPJ_INT32* src,
-        OPJ_INT32 sn,
-        OPJ_INT32 win_l_x0,
-        OPJ_INT32 win_l_x1,
-        OPJ_INT32 win_h_x0,
-        OPJ_INT32 win_h_x1)
+        opj_sparse_array_int32_t* sa,
+        OPJ_UINT32 sa_line,
+        OPJ_UINT32 sn,
+        OPJ_UINT32 win_l_x0,
+        OPJ_UINT32 win_l_x1,
+        OPJ_UINT32 win_h_x0,
+        OPJ_UINT32 win_h_x1)
 {
-    const OPJ_INT32 *ai = src;
-    OPJ_INT32 *bi = dest + cas;
-    OPJ_INT32  i;
-
-    for (i = win_l_x0; i < win_l_x1; i++) {
-        bi[2 * i] = ai[i];
-    }
-
-    ai  = src + sn;
-    bi  = dest + 1 - cas;
-    for (i = win_h_x0; i < win_h_x1; i++) {
-        bi[2 * i] = ai[i];
-    }
+    OPJ_BOOL ret;
+    ret = opj_sparse_array_int32_read(sa,
+                                      win_l_x0, sa_line,
+                                      win_l_x1, sa_line + 1,
+                                      dest + cas + 2 * win_l_x0,
+                                      2, 0, OPJ_TRUE);
+    assert(ret);
+    ret = opj_sparse_array_int32_read(sa,
+                                      sn + win_h_x0, sa_line,
+                                      sn + win_h_x1, sa_line + 1,
+                                      dest + 1 - cas + 2 * win_h_x0,
+                                      2, 0, OPJ_TRUE);
+    assert(ret);
+    OPJ_UNUSED(ret);
 }
+
 
 static void opj_dwt_interleave_partial_v(OPJ_INT32 *dest,
         OPJ_INT32 cas,
-        const OPJ_INT32* src,
-        OPJ_INT32 sn,
-        OPJ_INT32 stride,
-        OPJ_INT32 win_l_y0,
-        OPJ_INT32 win_l_y1,
-        OPJ_INT32 win_h_y0,
-        OPJ_INT32 win_h_y1)
+        opj_sparse_array_int32_t* sa,
+        OPJ_UINT32 sa_col,
+        OPJ_UINT32 nb_cols,
+        OPJ_UINT32 sn,
+        OPJ_UINT32 win_l_y0,
+        OPJ_UINT32 win_l_y1,
+        OPJ_UINT32 win_h_y0,
+        OPJ_UINT32 win_h_y1)
 {
-    const OPJ_INT32 *ai = src;
-    OPJ_INT32 *bi = dest + cas;
-    OPJ_INT32  i;
-
-    for (i = win_l_y0; i < win_l_y1; i++) {
-        bi[2 * i] = ai[i * stride];
-    }
-
-    ai  = src + sn * stride;
-    bi  = dest + 1 - cas;
-    for (i = win_h_y0; i < win_h_y1; i++) {
-        bi[2 * i] = ai[i * stride];
-    }
+    OPJ_BOOL ret;
+    ret  = opj_sparse_array_int32_read(sa,
+                                       sa_col, win_l_y0,
+                                       sa_col + nb_cols, win_l_y1,
+                                       dest + cas * 4 + 2 * 4 * win_l_y0,
+                                       1, 2 * 4, OPJ_TRUE);
+    assert(ret);
+    ret = opj_sparse_array_int32_read(sa,
+                                      sa_col, sn + win_h_y0,
+                                      sa_col + nb_cols, sn + win_h_y1,
+                                      dest + (1 - cas) * 4 + 2 * 4 * win_h_y0,
+                                      1, 2 * 4, OPJ_TRUE);
+    assert(ret);
+    OPJ_UNUSED(ret);
 }
 
 static void opj_dwt_decode_partial_1(OPJ_INT32 *a, OPJ_INT32 dn, OPJ_INT32 sn,
@@ -1600,11 +1585,54 @@ static void opj_dwt_decode_partial_1(OPJ_INT32 *a, OPJ_INT32 dn, OPJ_INT32 sn,
 
     if (!cas) {
         if ((dn > 0) || (sn > 1)) { /* NEW :  CASE ONE ELEMENT */
-            for (i = win_l_x0; i < win_l_x1; i++) {
+
+            /* Naive version is :
+            for (i = win_l_x0; i < i_max; i++) {
                 OPJ_S(i) -= (OPJ_D_(i - 1) + OPJ_D_(i) + 2) >> 2;
             }
             for (i = win_h_x0; i < win_h_x1; i++) {
                 OPJ_D(i) += (OPJ_S_(i) + OPJ_S_(i + 1)) >> 1;
+            }
+            but the compiler doesn't manage to unroll it to avoid bound
+            checking in OPJ_S_ and OPJ_D_ macros
+            */
+
+            i = win_l_x0;
+            if (i < win_l_x1) {
+                OPJ_INT32 i_max;
+
+                /* Left-most case */
+                OPJ_S(i) -= (OPJ_D_(i - 1) + OPJ_D_(i) + 2) >> 2;
+                i ++;
+
+                i_max = win_l_x1;
+                if (i_max > dn) {
+                    i_max = dn;
+                }
+                for (; i < i_max; i++) {
+                    /* No bound checking */
+                    OPJ_S(i) -= (OPJ_D(i - 1) + OPJ_D(i) + 2) >> 2;
+                }
+                for (; i < win_l_x1; i++) {
+                    /* Right-most case */
+                    OPJ_S(i) -= (OPJ_D_(i - 1) + OPJ_D_(i) + 2) >> 2;
+                }
+            }
+
+            i = win_h_x0;
+            if (i < win_h_x1) {
+                OPJ_INT32 i_max = win_h_x1;
+                if (i_max >= sn) {
+                    i_max = sn - 1;
+                }
+                for (; i < i_max; i++) {
+                    /* No bound checking */
+                    OPJ_D(i) += (OPJ_S(i) + OPJ_S(i + 1)) >> 1;
+                }
+                for (; i < win_h_x1; i++) {
+                    /* Right-most case */
+                    OPJ_D(i) += (OPJ_S_(i) + OPJ_S_(i + 1)) >> 1;
+                }
             }
         }
     } else {
@@ -1616,6 +1644,150 @@ static void opj_dwt_decode_partial_1(OPJ_INT32 *a, OPJ_INT32 dn, OPJ_INT32 sn,
             }
             for (i = win_h_x0; i < win_h_x1; i++) {
                 OPJ_S(i) += (OPJ_DD_(i) + OPJ_DD_(i - 1)) >> 1;
+            }
+        }
+    }
+}
+
+#define OPJ_S_off(i,off) a[(OPJ_UINT32)(i)*2*4+off]
+#define OPJ_D_off(i,off) a[(1+(OPJ_UINT32)(i)*2)*4+off]
+#define OPJ_S__off(i,off) ((i)<0?OPJ_S_off(0,off):((i)>=sn?OPJ_S_off(sn-1,off):OPJ_S_off(i,off)))
+#define OPJ_D__off(i,off) ((i)<0?OPJ_D_off(0,off):((i)>=dn?OPJ_D_off(dn-1,off):OPJ_D_off(i,off)))
+#define OPJ_SS__off(i,off) ((i)<0?OPJ_S_off(0,off):((i)>=dn?OPJ_S_off(dn-1,off):OPJ_S_off(i,off)))
+#define OPJ_DD__off(i,off) ((i)<0?OPJ_D_off(0,off):((i)>=sn?OPJ_D_off(sn-1,off):OPJ_D_off(i,off)))
+
+static void opj_dwt_decode_partial_1_parallel(OPJ_INT32 *a,
+        OPJ_UINT32 nb_cols,
+        OPJ_INT32 dn, OPJ_INT32 sn,
+        OPJ_INT32 cas,
+        OPJ_INT32 win_l_x0,
+        OPJ_INT32 win_l_x1,
+        OPJ_INT32 win_h_x0,
+        OPJ_INT32 win_h_x1)
+{
+    OPJ_INT32 i;
+    OPJ_UINT32 off;
+
+    (void)nb_cols;
+
+    if (!cas) {
+        if ((dn > 0) || (sn > 1)) { /* NEW :  CASE ONE ELEMENT */
+
+            /* Naive version is :
+            for (i = win_l_x0; i < i_max; i++) {
+                OPJ_S(i) -= (OPJ_D_(i - 1) + OPJ_D_(i) + 2) >> 2;
+            }
+            for (i = win_h_x0; i < win_h_x1; i++) {
+                OPJ_D(i) += (OPJ_S_(i) + OPJ_S_(i + 1)) >> 1;
+            }
+            but the compiler doesn't manage to unroll it to avoid bound
+            checking in OPJ_S_ and OPJ_D_ macros
+            */
+
+            i = win_l_x0;
+            if (i < win_l_x1) {
+                OPJ_INT32 i_max;
+
+                /* Left-most case */
+                for (off = 0; off < 4; off++) {
+                    OPJ_S_off(i, off) -= (OPJ_D__off(i - 1, off) + OPJ_D__off(i, off) + 2) >> 2;
+                }
+                i ++;
+
+                i_max = win_l_x1;
+                if (i_max > dn) {
+                    i_max = dn;
+                }
+
+#ifdef __SSE2__
+                if (i + 1 < i_max) {
+                    const __m128i two = _mm_set1_epi32(2);
+                    __m128i Dm1 = _mm_load_si128((__m128i * const)(a + 4 + (i - 1) * 8));
+                    for (; i + 1 < i_max; i += 2) {
+                        /* No bound checking */
+                        __m128i S = _mm_load_si128((__m128i * const)(a + i * 8));
+                        __m128i D = _mm_load_si128((__m128i * const)(a + 4 + i * 8));
+                        __m128i S1 = _mm_load_si128((__m128i * const)(a + (i + 1) * 8));
+                        __m128i D1 = _mm_load_si128((__m128i * const)(a + 4 + (i + 1) * 8));
+                        S = _mm_sub_epi32(S,
+                                          _mm_srai_epi32(_mm_add_epi32(_mm_add_epi32(Dm1, D), two), 2));
+                        S1 = _mm_sub_epi32(S1,
+                                           _mm_srai_epi32(_mm_add_epi32(_mm_add_epi32(D, D1), two), 2));
+                        _mm_store_si128((__m128i*)(a + i * 8), S);
+                        _mm_store_si128((__m128i*)(a + (i + 1) * 8), S1);
+                        Dm1 = D1;
+                    }
+                }
+#endif
+
+                for (; i < i_max; i++) {
+                    /* No bound checking */
+                    for (off = 0; off < 4; off++) {
+                        OPJ_S_off(i, off) -= (OPJ_D_off(i - 1, off) + OPJ_D_off(i, off) + 2) >> 2;
+                    }
+                }
+                for (; i < win_l_x1; i++) {
+                    /* Right-most case */
+                    for (off = 0; off < 4; off++) {
+                        OPJ_S_off(i, off) -= (OPJ_D__off(i - 1, off) + OPJ_D__off(i, off) + 2) >> 2;
+                    }
+                }
+            }
+
+            i = win_h_x0;
+            if (i < win_h_x1) {
+                OPJ_INT32 i_max = win_h_x1;
+                if (i_max >= sn) {
+                    i_max = sn - 1;
+                }
+
+#ifdef __SSE2__
+                if (i + 1 < i_max) {
+                    __m128i S =  _mm_load_si128((__m128i * const)(a + i * 8));
+                    for (; i + 1 < i_max; i += 2) {
+                        /* No bound checking */
+                        __m128i D = _mm_load_si128((__m128i * const)(a + 4 + i * 8));
+                        __m128i S1 = _mm_load_si128((__m128i * const)(a + (i + 1) * 8));
+                        __m128i D1 = _mm_load_si128((__m128i * const)(a + 4 + (i + 1) * 8));
+                        __m128i S2 = _mm_load_si128((__m128i * const)(a + (i + 2) * 8));
+                        D = _mm_add_epi32(D, _mm_srai_epi32(_mm_add_epi32(S, S1), 1));
+                        D1 = _mm_add_epi32(D1, _mm_srai_epi32(_mm_add_epi32(S1, S2), 1));
+                        _mm_store_si128((__m128i*)(a + 4 + i * 8), D);
+                        _mm_store_si128((__m128i*)(a + 4 + (i + 1) * 8), D1);
+                        S = S2;
+                    }
+                }
+#endif
+
+                for (; i < i_max; i++) {
+                    /* No bound checking */
+                    for (off = 0; off < 4; off++) {
+                        OPJ_D_off(i, off) += (OPJ_S_off(i, off) + OPJ_S_off(i + 1, off)) >> 1;
+                    }
+                }
+                for (; i < win_h_x1; i++) {
+                    /* Right-most case */
+                    for (off = 0; off < 4; off++) {
+                        OPJ_D_off(i, off) += (OPJ_S__off(i, off) + OPJ_S__off(i + 1, off)) >> 1;
+                    }
+                }
+            }
+        }
+    } else {
+        if (!sn  && dn == 1) {        /* NEW :  CASE ONE ELEMENT */
+            for (off = 0; off < 4; off++) {
+                OPJ_S_off(0, off) /= 2;
+            }
+        } else {
+            for (i = win_l_x0; i < win_l_x1; i++) {
+                for (off = 0; off < 4; off++) {
+                    OPJ_D_off(i, off) -= (OPJ_SS__off(i, off) + OPJ_SS__off(i + 1, off) + 2) >> 2;
+                }
+            }
+            for (i = win_h_x0; i < win_h_x1; i++) {
+                for (off = 0; off < 4; off++) {
+                    OPJ_S_off(i, off) += (OPJ_DD__off(i, off) + OPJ_DD__off(i - 1, off)) >> 1;
+                }
             }
         }
     }
@@ -1673,10 +1845,68 @@ static void opj_dwt_segment_grow(OPJ_UINT32 filter_width,
     *end = opj_uint_min(*end, max_size);
 }
 
-static OPJ_BOOL opj_dwt_decode_partial_tile(opj_tcd_t *tcd,
-        opj_tcd_tilecomp_t* tilec,
-        OPJ_UINT32 numres)
+
+static opj_sparse_array_int32_t* opj_dwt_init_sparse_array(
+    opj_tcd_tilecomp_t* tilec,
+    OPJ_UINT32 numres)
 {
+    opj_tcd_resolution_t* tr_max = &(tilec->resolutions[numres - 1]);
+    OPJ_UINT32 w = (OPJ_UINT32)(tr_max->x1 - tr_max->x0);
+    OPJ_UINT32 h = (OPJ_UINT32)(tr_max->y1 - tr_max->y0);
+    OPJ_UINT32 resno, bandno, precno, cblkno;
+    opj_sparse_array_int32_t* sa = opj_sparse_array_int32_create(
+                                       w, h, opj_uint_min(w, 64), opj_uint_min(h, 64));
+    if (sa == NULL) {
+        return NULL;
+    }
+
+    for (resno = 0; resno < numres; ++resno) {
+        opj_tcd_resolution_t* res = &tilec->resolutions[resno];
+
+        for (bandno = 0; bandno < res->numbands; ++bandno) {
+            opj_tcd_band_t* band = &res->bands[bandno];
+
+            for (precno = 0; precno < res->pw * res->ph; ++precno) {
+                opj_tcd_precinct_t* precinct = &band->precincts[precno];
+                for (cblkno = 0; cblkno < precinct->cw * precinct->ch; ++cblkno) {
+                    opj_tcd_cblk_dec_t* cblk = &precinct->cblks.dec[cblkno];
+                    if (cblk->decoded_data != NULL) {
+                        OPJ_UINT32 x = (OPJ_UINT32)(cblk->x0 - band->x0);
+                        OPJ_UINT32 y = (OPJ_UINT32)(cblk->y0 - band->y0);
+                        OPJ_UINT32 cblk_w = (OPJ_UINT32)(cblk->x1 - cblk->x0);
+                        OPJ_UINT32 cblk_h = (OPJ_UINT32)(cblk->y1 - cblk->y0);
+
+                        if (band->bandno & 1) {
+                            opj_tcd_resolution_t* pres = &tilec->resolutions[resno - 1];
+                            x += (OPJ_UINT32)(pres->x1 - pres->x0);
+                        }
+                        if (band->bandno & 2) {
+                            opj_tcd_resolution_t* pres = &tilec->resolutions[resno - 1];
+                            y += (OPJ_UINT32)(pres->y1 - pres->y0);
+                        }
+
+                        if (!opj_sparse_array_int32_write(sa, x, y,
+                                                          x + cblk_w, y + cblk_h,
+                                                          cblk->decoded_data,
+                                                          1, cblk_w, OPJ_TRUE)) {
+                            opj_sparse_array_int32_free(sa);
+                            return NULL;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return sa;
+}
+
+
+static OPJ_BOOL opj_dwt_decode_partial_tile(
+    opj_tcd_tilecomp_t* tilec,
+    OPJ_UINT32 numres)
+{
+    opj_sparse_array_int32_t* sa;
     opj_dwt_t h;
     opj_dwt_t v;
     OPJ_UINT32 resno;
@@ -1685,52 +1915,65 @@ static OPJ_BOOL opj_dwt_decode_partial_tile(opj_tcd_t *tcd,
     const OPJ_UINT32 filter_width = 2U;
 
     opj_tcd_resolution_t* tr = tilec->resolutions;
+    opj_tcd_resolution_t* tr_max = &(tilec->resolutions[numres - 1]);
 
     OPJ_UINT32 rw = (OPJ_UINT32)(tr->x1 -
                                  tr->x0);  /* width of the resolution level computed */
     OPJ_UINT32 rh = (OPJ_UINT32)(tr->y1 -
                                  tr->y0);  /* height of the resolution level computed */
 
-    OPJ_UINT32 w = (OPJ_UINT32)(tilec->x1 - tilec->x0);
-    size_t h_mem_size;
+    OPJ_SIZE_T h_mem_size;
 
-    opj_image_comp_t* image_comp = &(tcd->image->comps[tilec->compno]);
     /* Compute the intersection of the area of interest, expressed in tile coordinates */
     /* with the tile coordinates */
-    OPJ_UINT32 win_tcx0 = opj_uint_max(
-                              (OPJ_UINT32)tilec->x0,
-                              opj_uint_ceildiv(tcd->decoded_x0, image_comp->dx));
-    OPJ_UINT32 win_tcy0 = opj_uint_max(
-                              (OPJ_UINT32)tilec->y0,
-                              opj_uint_ceildiv(tcd->decoded_y0, image_comp->dy));
-    OPJ_UINT32 win_tcx1 = opj_uint_min(
-                              (OPJ_UINT32)tilec->x1,
-                              opj_uint_ceildiv(tcd->decoded_x1, image_comp->dx));
-    OPJ_UINT32 win_tcy1 = opj_uint_min(
-                              (OPJ_UINT32)tilec->y1,
-                              opj_uint_ceildiv(tcd->decoded_y1, image_comp->dy));
+    OPJ_UINT32 win_tcx0 = tilec->win_x0;
+    OPJ_UINT32 win_tcy0 = tilec->win_y0;
+    OPJ_UINT32 win_tcx1 = tilec->win_x1;
+    OPJ_UINT32 win_tcy1 = tilec->win_y1;
+
+    if (tr_max->x0 == tr_max->x1 || tr_max->y0 == tr_max->y1) {
+        return OPJ_TRUE;
+    }
+
+    sa = opj_dwt_init_sparse_array(tilec, numres);
+    if (sa == NULL) {
+        return OPJ_FALSE;
+    }
 
     if (numres == 1U) {
+        OPJ_BOOL ret = opj_sparse_array_int32_read(sa,
+                       tr_max->win_x0 - (OPJ_UINT32)tr_max->x0,
+                       tr_max->win_y0 - (OPJ_UINT32)tr_max->y0,
+                       tr_max->win_x1 - (OPJ_UINT32)tr_max->x0,
+                       tr_max->win_y1 - (OPJ_UINT32)tr_max->y0,
+                       tilec->data_win,
+                       1, tr_max->win_x1 - tr_max->win_x0,
+                       OPJ_TRUE);
+        assert(ret);
+        OPJ_UNUSED(ret);
+        opj_sparse_array_int32_free(sa);
         return OPJ_TRUE;
     }
     h_mem_size = opj_dwt_max_resolution(tr, numres);
     /* overflow check */
-    if (h_mem_size > (SIZE_MAX / sizeof(OPJ_INT32))) {
+    /* in vertical pass, we process 4 columns at a time */
+    if (h_mem_size > (SIZE_MAX / (4 * sizeof(OPJ_INT32)))) {
         /* FIXME event manager error callback */
+        opj_sparse_array_int32_free(sa);
         return OPJ_FALSE;
     }
 
-    h_mem_size *= sizeof(OPJ_INT32);
+    h_mem_size *= 4 * sizeof(OPJ_INT32);
     h.mem = (OPJ_INT32*)opj_aligned_32_malloc(h_mem_size);
     if (! h.mem) {
         /* FIXME event manager error callback */
+        opj_sparse_array_int32_free(sa);
         return OPJ_FALSE;
     }
 
     v.mem = h.mem;
 
-    for (resno = 1; --numres > 0; resno ++) {
-        OPJ_INT32 * OPJ_RESTRICT tiledp = tilec->data;
+    for (resno = 1; resno < numres; resno ++) {
         OPJ_UINT32 i, j;
         /* Window of interest subband-based coordinates */
         OPJ_UINT32 win_ll_x0, win_ll_y0, win_ll_x1, win_ll_y1;
@@ -1816,47 +2059,92 @@ static OPJ_BOOL opj_dwt_decode_partial_tile(opj_tcd_t *tcd,
         for (j = 0; j < rh; ++j) {
             if ((j >= win_ll_y0 && j < win_ll_y1) ||
                     (j >= win_lh_y0 + (OPJ_UINT32)v.sn && j < win_lh_y1 + (OPJ_UINT32)v.sn)) {
-                memset(h.mem, 0, (OPJ_UINT32)(h.sn + h.dn) * sizeof(OPJ_INT32));
+
+                /* Avoids dwt.c:1584:44 (in opj_dwt_decode_partial_1): runtime error: */
+                /* signed integer overflow: -1094795586 + -1094795586 cannot be represented in type 'int' */
+                /* on opj_decompress -i  ../../openjpeg/MAPA.jp2 -o out.tif -d 0,0,256,256 */
+                /* This is less extreme than memsetting the whole buffer to 0 */
+                /* although we could potentially do better with better handling of edge conditions */
+                if (win_tr_x1 >= 1 && win_tr_x1 < rw) {
+                    h.mem[win_tr_x1 - 1] = 0;
+                }
+                if (win_tr_x1 < rw) {
+                    h.mem[win_tr_x1] = 0;
+                }
+
                 opj_dwt_interleave_partial_h(h.mem,
                                              h.cas,
-                                             &tiledp[j * w],
-                                             h.sn,
-                                             (OPJ_INT32)win_ll_x0,
-                                             (OPJ_INT32)win_ll_x1,
-                                             (OPJ_INT32)win_hl_x0,
-                                             (OPJ_INT32)win_hl_x1);
+                                             sa,
+                                             j,
+                                             (OPJ_UINT32)h.sn,
+                                             win_ll_x0,
+                                             win_ll_x1,
+                                             win_hl_x0,
+                                             win_hl_x1);
                 opj_dwt_decode_partial_1(h.mem, h.dn, h.sn, h.cas,
                                          (OPJ_INT32)win_ll_x0,
                                          (OPJ_INT32)win_ll_x1,
                                          (OPJ_INT32)win_hl_x0,
                                          (OPJ_INT32)win_hl_x1);
-                memcpy(&tiledp[j * w] + win_tr_x0, h.mem + win_tr_x0,
-                       (win_tr_x1 - win_tr_x0) * sizeof(OPJ_INT32));
+                if (!opj_sparse_array_int32_write(sa,
+                                                  win_tr_x0, j,
+                                                  win_tr_x1, j + 1,
+                                                  h.mem + win_tr_x0,
+                                                  1, 0, OPJ_TRUE)) {
+                    /* FIXME event manager error callback */
+                    opj_sparse_array_int32_free(sa);
+                    opj_aligned_free(h.mem);
+                    return OPJ_FALSE;
+                }
             }
         }
 
-        for (i = win_tr_x0; i < win_tr_x1; ++i) {
-            memset(v.mem, 0, (OPJ_UINT32)(v.sn + v.dn) * sizeof(OPJ_INT32));
+        for (i = win_tr_x0; i < win_tr_x1;) {
+            OPJ_UINT32 nb_cols = opj_uint_min(4U, win_tr_x1 - i);
             opj_dwt_interleave_partial_v(v.mem,
                                          v.cas,
-                                         tiledp + i,
-                                         v.sn,
-                                         (OPJ_INT32)w,
-                                         (OPJ_INT32)win_ll_y0,
-                                         (OPJ_INT32)win_ll_y1,
-                                         (OPJ_INT32)win_lh_y0,
-                                         (OPJ_INT32)win_lh_y1);
-            opj_dwt_decode_partial_1(v.mem, v.dn, v.sn, v.cas,
-                                     (OPJ_INT32)win_ll_y0,
-                                     (OPJ_INT32)win_ll_y1,
-                                     (OPJ_INT32)win_lh_y0,
-                                     (OPJ_INT32)win_lh_y1);
-            for (j = win_tr_y0; j < win_tr_y1; j++) {
-                tiledp[j * w + i] = v.mem[j];
+                                         sa,
+                                         i,
+                                         nb_cols,
+                                         (OPJ_UINT32)v.sn,
+                                         win_ll_y0,
+                                         win_ll_y1,
+                                         win_lh_y0,
+                                         win_lh_y1);
+            opj_dwt_decode_partial_1_parallel(v.mem, nb_cols, v.dn, v.sn, v.cas,
+                                              (OPJ_INT32)win_ll_y0,
+                                              (OPJ_INT32)win_ll_y1,
+                                              (OPJ_INT32)win_lh_y0,
+                                              (OPJ_INT32)win_lh_y1);
+            if (!opj_sparse_array_int32_write(sa,
+                                              i, win_tr_y0,
+                                              i + nb_cols, win_tr_y1,
+                                              v.mem + 4 * win_tr_y0,
+                                              1, 4, OPJ_TRUE)) {
+                /* FIXME event manager error callback */
+                opj_sparse_array_int32_free(sa);
+                opj_aligned_free(h.mem);
+                return OPJ_FALSE;
             }
+
+            i += nb_cols;
         }
     }
     opj_aligned_free(h.mem);
+
+    {
+        OPJ_BOOL ret = opj_sparse_array_int32_read(sa,
+                       tr_max->win_x0 - (OPJ_UINT32)tr_max->x0,
+                       tr_max->win_y0 - (OPJ_UINT32)tr_max->y0,
+                       tr_max->win_x1 - (OPJ_UINT32)tr_max->x0,
+                       tr_max->win_y1 - (OPJ_UINT32)tr_max->y0,
+                       tilec->data_win,
+                       1, tr_max->win_x1 - tr_max->win_x0,
+                       OPJ_TRUE);
+        assert(ret);
+        OPJ_UNUSED(ret);
+    }
+    opj_sparse_array_int32_free(sa);
     return OPJ_TRUE;
 }
 
@@ -1871,8 +2159,8 @@ static void opj_v4dwt_interleave_h(opj_v4dwt_t* OPJ_RESTRICT dwt,
     OPJ_UINT32 x1 = dwt->win_l_x1;
 
     for (k = 0; k < 2; ++k) {
-        if (remaining_height >= 4 && ((size_t) a & 0x0f) == 0 &&
-                ((size_t) bi & 0x0f) == 0 && (width & 0x0f) == 0) {
+        if (remaining_height >= 4 && ((OPJ_SIZE_T) a & 0x0f) == 0 &&
+                ((OPJ_SIZE_T) bi & 0x0f) == 0 && (width & 0x0f) == 0) {
             /* Fast code path */
             for (i = x0; i < x1; ++i) {
                 OPJ_UINT32 j = i;
@@ -1914,6 +2202,32 @@ static void opj_v4dwt_interleave_h(opj_v4dwt_t* OPJ_RESTRICT dwt,
     }
 }
 
+static void opj_v4dwt_interleave_partial_h(opj_v4dwt_t* dwt,
+        opj_sparse_array_int32_t* sa,
+        OPJ_UINT32 sa_line,
+        OPJ_UINT32 remaining_height)
+{
+    OPJ_UINT32 i;
+    for (i = 0; i < remaining_height; i++) {
+        OPJ_BOOL ret;
+        ret = opj_sparse_array_int32_read(sa,
+                                          dwt->win_l_x0, sa_line + i,
+                                          dwt->win_l_x1, sa_line + i + 1,
+                                          /* Nasty cast from float* to int32* */
+                                          (OPJ_INT32*)(dwt->wavelet + dwt->cas + 2 * dwt->win_l_x0) + i,
+                                          8, 0, OPJ_TRUE);
+        assert(ret);
+        ret = opj_sparse_array_int32_read(sa,
+                                          (OPJ_UINT32)dwt->sn + dwt->win_h_x0, sa_line + i,
+                                          (OPJ_UINT32)dwt->sn + dwt->win_h_x1, sa_line + i + 1,
+                                          /* Nasty cast from float* to int32* */
+                                          (OPJ_INT32*)(dwt->wavelet + 1 - dwt->cas + 2 * dwt->win_h_x0) + i,
+                                          8, 0, OPJ_TRUE);
+        assert(ret);
+        OPJ_UNUSED(ret);
+    }
+}
+
 static void opj_v4dwt_interleave_v(opj_v4dwt_t* OPJ_RESTRICT dwt,
                                    OPJ_FLOAT32* OPJ_RESTRICT a,
                                    OPJ_UINT32 width,
@@ -1923,15 +2237,38 @@ static void opj_v4dwt_interleave_v(opj_v4dwt_t* OPJ_RESTRICT dwt,
     OPJ_UINT32 i;
 
     for (i = dwt->win_l_x0; i < dwt->win_l_x1; ++i) {
-        memcpy(&bi[i * 2], &a[i * width], (size_t)nb_elts_read * sizeof(OPJ_FLOAT32));
+        memcpy(&bi[i * 2], &a[i * (OPJ_SIZE_T)width],
+               (OPJ_SIZE_T)nb_elts_read * sizeof(OPJ_FLOAT32));
     }
 
-    a += (OPJ_UINT32)dwt->sn * width;
+    a += (OPJ_UINT32)dwt->sn * (OPJ_SIZE_T)width;
     bi = dwt->wavelet + 1 - dwt->cas;
 
     for (i = dwt->win_h_x0; i < dwt->win_h_x1; ++i) {
-        memcpy(&bi[i * 2], &a[i * width], (size_t)nb_elts_read * sizeof(OPJ_FLOAT32));
+        memcpy(&bi[i * 2], &a[i * (OPJ_SIZE_T)width],
+               (OPJ_SIZE_T)nb_elts_read * sizeof(OPJ_FLOAT32));
     }
+}
+
+static void opj_v4dwt_interleave_partial_v(opj_v4dwt_t* OPJ_RESTRICT dwt,
+        opj_sparse_array_int32_t* sa,
+        OPJ_UINT32 sa_col,
+        OPJ_UINT32 nb_elts_read)
+{
+    OPJ_BOOL ret;
+    ret = opj_sparse_array_int32_read(sa,
+                                      sa_col, dwt->win_l_x0,
+                                      sa_col + nb_elts_read, dwt->win_l_x1,
+                                      (OPJ_INT32*)(dwt->wavelet + dwt->cas + 2 * dwt->win_l_x0),
+                                      1, 8, OPJ_TRUE);
+    assert(ret);
+    ret = opj_sparse_array_int32_read(sa,
+                                      sa_col, (OPJ_UINT32)dwt->sn + dwt->win_h_x0,
+                                      sa_col + nb_elts_read, (OPJ_UINT32)dwt->sn + dwt->win_h_x1,
+                                      (OPJ_INT32*)(dwt->wavelet + 1 - dwt->cas + 2 * dwt->win_h_x0),
+                                      1, 8, OPJ_TRUE);
+    assert(ret);
+    OPJ_UNUSED(ret);
 }
 
 #ifdef __SSE__
@@ -1944,14 +2281,19 @@ static void opj_v4dwt_decode_step1_sse(opj_v4_t* w,
     __m128* OPJ_RESTRICT vw = (__m128*) w;
     OPJ_UINT32 i;
     /* 4x unrolled loop */
-    for (i = start; i + 3 < end; i += 4) {
-        vw[2 * i] = _mm_mul_ps(vw[2 * i], c);
-        vw[2 * i + 2] = _mm_mul_ps(vw[2 * i + 2], c);
-        vw[2 * i + 4] = _mm_mul_ps(vw[2 * i + 4], c);
-        vw[2 * i + 6] = _mm_mul_ps(vw[2 * i + 6], c);
+    vw += 2 * start;
+    for (i = start; i + 3 < end; i += 4, vw += 8) {
+        __m128 xmm0 = _mm_mul_ps(vw[0], c);
+        __m128 xmm2 = _mm_mul_ps(vw[2], c);
+        __m128 xmm4 = _mm_mul_ps(vw[4], c);
+        __m128 xmm6 = _mm_mul_ps(vw[6], c);
+        vw[0] = xmm0;
+        vw[2] = xmm2;
+        vw[4] = xmm4;
+        vw[6] = xmm6;
     }
-    for (; i < end; ++i) {
-        vw[2 * i] = _mm_mul_ps(vw[2 * i], c);
+    for (; i < end; ++i, vw += 2) {
+        vw[0] = _mm_mul_ps(vw[0], c);
     }
 }
 
@@ -1972,7 +2314,29 @@ static void opj_v4dwt_decode_step2_sse(opj_v4_t* l, opj_v4_t* w,
         vw += start * 2;
         tmp1 = vw[-3];
     }
-    for (i = start; i < imax; ++i) {
+
+    i = start;
+
+    /* 4x loop unrolling */
+    for (; i + 3 < imax; i += 4) {
+        __m128 tmp4, tmp5, tmp6, tmp7, tmp8, tmp9;
+        tmp2 = vw[-1];
+        tmp3 = vw[ 0];
+        tmp4 = vw[ 1];
+        tmp5 = vw[ 2];
+        tmp6 = vw[ 3];
+        tmp7 = vw[ 4];
+        tmp8 = vw[ 5];
+        tmp9 = vw[ 6];
+        vw[-1] = _mm_add_ps(tmp2, _mm_mul_ps(_mm_add_ps(tmp1, tmp3), c));
+        vw[ 1] = _mm_add_ps(tmp4, _mm_mul_ps(_mm_add_ps(tmp3, tmp5), c));
+        vw[ 3] = _mm_add_ps(tmp6, _mm_mul_ps(_mm_add_ps(tmp5, tmp7), c));
+        vw[ 5] = _mm_add_ps(tmp8, _mm_mul_ps(_mm_add_ps(tmp7, tmp9), c));
+        tmp1 = tmp9;
+        vw += 8;
+    }
+
+    for (; i < imax; ++i) {
         tmp2 = vw[-1];
         tmp3 = vw[ 0];
         vw[-1] = _mm_add_ps(tmp2, _mm_mul_ps(_mm_add_ps(tmp1, tmp3), c));
@@ -2136,9 +2500,11 @@ OPJ_BOOL opj_dwt_decode_tile_97(opj_tcd_tilecomp_t* OPJ_RESTRICT tilec,
     OPJ_UINT32 rh = (OPJ_UINT32)(res->y1 -
                                  res->y0);    /* height of the resolution level computed */
 
-    OPJ_UINT32 w = (OPJ_UINT32)(tilec->x1 - tilec->x0);
+    OPJ_UINT32 w = (OPJ_UINT32)(tilec->resolutions[tilec->minimum_num_resolutions -
+                                                               1].x1 -
+                                tilec->resolutions[tilec->minimum_num_resolutions - 1].x0);
 
-    size_t l_data_size;
+    OPJ_SIZE_T l_data_size;
 
     l_data_size = opj_dwt_max_resolution(res, numres);
     /* overflow check */
@@ -2187,9 +2553,9 @@ OPJ_BOOL opj_dwt_decode_tile_97(opj_tcd_tilecomp_t* OPJ_RESTRICT tilec,
 
             for (k = 0; k < rw; k++) {
                 aj[k      ] = h.wavelet[k].f[0];
-                aj[k + w  ] = h.wavelet[k].f[1];
-                aj[k + w * 2] = h.wavelet[k].f[2];
-                aj[k + w * 3] = h.wavelet[k].f[3];
+                aj[k + (OPJ_SIZE_T)w  ] = h.wavelet[k].f[1];
+                aj[k + (OPJ_SIZE_T)w * 2] = h.wavelet[k].f[2];
+                aj[k + (OPJ_SIZE_T)w * 3] = h.wavelet[k].f[3];
             }
 
             aj += w * 4;
@@ -2202,10 +2568,10 @@ OPJ_BOOL opj_dwt_decode_tile_97(opj_tcd_tilecomp_t* OPJ_RESTRICT tilec,
             for (k = 0; k < rw; k++) {
                 switch (rh - j) {
                 case 3:
-                    aj[k + w * 2] = h.wavelet[k].f[2];
+                    aj[k + (OPJ_SIZE_T)w * 2] = h.wavelet[k].f[2];
                 /* FALLTHRU */
                 case 2:
-                    aj[k + w  ] = h.wavelet[k].f[1];
+                    aj[k + (OPJ_SIZE_T)w  ] = h.wavelet[k].f[1];
                 /* FALLTHRU */
                 case 1:
                     aj[k] = h.wavelet[k].f[0];
@@ -2228,7 +2594,7 @@ OPJ_BOOL opj_dwt_decode_tile_97(opj_tcd_tilecomp_t* OPJ_RESTRICT tilec,
             opj_v4dwt_decode(&v);
 
             for (k = 0; k < rh; ++k) {
-                memcpy(&aj[k * w], &v.wavelet[k], 4 * sizeof(OPJ_FLOAT32));
+                memcpy(&aj[k * (OPJ_SIZE_T)w], &v.wavelet[k], 4 * sizeof(OPJ_FLOAT32));
             }
             aj += 4;
         }
@@ -2242,7 +2608,8 @@ OPJ_BOOL opj_dwt_decode_tile_97(opj_tcd_tilecomp_t* OPJ_RESTRICT tilec,
             opj_v4dwt_decode(&v);
 
             for (k = 0; k < rh; ++k) {
-                memcpy(&aj[k * w], &v.wavelet[k], (size_t)j * sizeof(OPJ_FLOAT32));
+                memcpy(&aj[k * (OPJ_SIZE_T)w], &v.wavelet[k],
+                       (OPJ_SIZE_T)j * sizeof(OPJ_FLOAT32));
             }
         }
     }
@@ -2252,10 +2619,10 @@ OPJ_BOOL opj_dwt_decode_tile_97(opj_tcd_tilecomp_t* OPJ_RESTRICT tilec,
 }
 
 static
-OPJ_BOOL opj_dwt_decode_partial_97(opj_tcd_t *tcd,
-                                   opj_tcd_tilecomp_t* OPJ_RESTRICT tilec,
+OPJ_BOOL opj_dwt_decode_partial_97(opj_tcd_tilecomp_t* OPJ_RESTRICT tilec,
                                    OPJ_UINT32 numres)
 {
+    opj_sparse_array_int32_t* sa;
     opj_v4dwt_t h;
     opj_v4dwt_t v;
     OPJ_UINT32 resno;
@@ -2265,31 +2632,45 @@ OPJ_BOOL opj_dwt_decode_partial_97(opj_tcd_t *tcd,
     const OPJ_UINT32 filter_width = 4U;
 
     opj_tcd_resolution_t* tr = tilec->resolutions;
+    opj_tcd_resolution_t* tr_max = &(tilec->resolutions[numres - 1]);
 
     OPJ_UINT32 rw = (OPJ_UINT32)(tr->x1 -
                                  tr->x0);    /* width of the resolution level computed */
     OPJ_UINT32 rh = (OPJ_UINT32)(tr->y1 -
                                  tr->y0);    /* height of the resolution level computed */
 
-    OPJ_UINT32 w = (OPJ_UINT32)(tilec->x1 - tilec->x0);
+    OPJ_SIZE_T l_data_size;
 
-    size_t l_data_size;
-
-    opj_image_comp_t* image_comp = &(tcd->image->comps[tilec->compno]);
     /* Compute the intersection of the area of interest, expressed in tile coordinates */
     /* with the tile coordinates */
-    OPJ_UINT32 win_tcx0 = opj_uint_max(
-                              (OPJ_UINT32)tilec->x0,
-                              opj_uint_ceildiv(tcd->decoded_x0, image_comp->dx));
-    OPJ_UINT32 win_tcy0 = opj_uint_max(
-                              (OPJ_UINT32)tilec->y0,
-                              opj_uint_ceildiv(tcd->decoded_y0, image_comp->dy));
-    OPJ_UINT32 win_tcx1 = opj_uint_min(
-                              (OPJ_UINT32)tilec->x1,
-                              opj_uint_ceildiv(tcd->decoded_x1, image_comp->dx));
-    OPJ_UINT32 win_tcy1 = opj_uint_min(
-                              (OPJ_UINT32)tilec->y1,
-                              opj_uint_ceildiv(tcd->decoded_y1, image_comp->dy));
+    OPJ_UINT32 win_tcx0 = tilec->win_x0;
+    OPJ_UINT32 win_tcy0 = tilec->win_y0;
+    OPJ_UINT32 win_tcx1 = tilec->win_x1;
+    OPJ_UINT32 win_tcy1 = tilec->win_y1;
+
+    if (tr_max->x0 == tr_max->x1 || tr_max->y0 == tr_max->y1) {
+        return OPJ_TRUE;
+    }
+
+    sa = opj_dwt_init_sparse_array(tilec, numres);
+    if (sa == NULL) {
+        return OPJ_FALSE;
+    }
+
+    if (numres == 1U) {
+        OPJ_BOOL ret = opj_sparse_array_int32_read(sa,
+                       tr_max->win_x0 - (OPJ_UINT32)tr_max->x0,
+                       tr_max->win_y0 - (OPJ_UINT32)tr_max->y0,
+                       tr_max->win_x1 - (OPJ_UINT32)tr_max->x0,
+                       tr_max->win_y1 - (OPJ_UINT32)tr_max->y0,
+                       tilec->data_win,
+                       1, tr_max->win_x1 - tr_max->win_x0,
+                       OPJ_TRUE);
+        assert(ret);
+        OPJ_UNUSED(ret);
+        opj_sparse_array_int32_free(sa);
+        return OPJ_TRUE;
+    }
 
     l_data_size = opj_dwt_max_resolution(tr, numres);
     /* overflow check */
@@ -2310,8 +2691,7 @@ OPJ_BOOL opj_dwt_decode_partial_97(opj_tcd_t *tcd,
     }
     v.wavelet = h.wavelet;
 
-    for (resno = 1; --numres; resno++) {
-        OPJ_FLOAT32 * OPJ_RESTRICT aj = (OPJ_FLOAT32*) tilec->data;
+    for (resno = 1; resno < numres; resno ++) {
         OPJ_UINT32 j;
         /* Window of interest subband-based coordinates */
         OPJ_UINT32 win_ll_x0, win_ll_y0, win_ll_x1, win_ll_y1;
@@ -2398,19 +2778,21 @@ OPJ_BOOL opj_dwt_decode_partial_97(opj_tcd_t *tcd,
         h.win_l_x1 = win_ll_x1;
         h.win_h_x0 = win_hl_x0;
         h.win_h_x1 = win_hl_x1;
-        for (j = 0; j + 3 < rh; j += 4, aj += w * 4) {
+        for (j = 0; j + 3 < rh; j += 4) {
             if ((j + 3 >= win_ll_y0 && j < win_ll_y1) ||
                     (j + 3 >= win_lh_y0 + (OPJ_UINT32)v.sn &&
                      j < win_lh_y1 + (OPJ_UINT32)v.sn)) {
-                OPJ_UINT32 k;
-                opj_v4dwt_interleave_h(&h, aj, w, rh - j);
+                opj_v4dwt_interleave_partial_h(&h, sa, j, opj_uint_min(4U, rh - j));
                 opj_v4dwt_decode(&h);
-
-                for (k = win_tr_x0; k < win_tr_x1; k++) {
-                    aj[k        ] = h.wavelet[k].f[0];
-                    aj[k + w    ] = h.wavelet[k].f[1];
-                    aj[k + w * 2] = h.wavelet[k].f[2];
-                    aj[k + w * 3] = h.wavelet[k].f[3];
+                if (!opj_sparse_array_int32_write(sa,
+                                                  win_tr_x0, j,
+                                                  win_tr_x1, j + 4,
+                                                  (OPJ_INT32*)&h.wavelet[win_tr_x0].f[0],
+                                                  4, 1, OPJ_TRUE)) {
+                    /* FIXME event manager error callback */
+                    opj_sparse_array_int32_free(sa);
+                    opj_aligned_free(h.wavelet);
+                    return OPJ_FALSE;
                 }
             }
         }
@@ -2419,20 +2801,17 @@ OPJ_BOOL opj_dwt_decode_partial_97(opj_tcd_t *tcd,
                 ((j + 3 >= win_ll_y0 && j < win_ll_y1) ||
                  (j + 3 >= win_lh_y0 + (OPJ_UINT32)v.sn &&
                   j < win_lh_y1 + (OPJ_UINT32)v.sn))) {
-            OPJ_UINT32 k;
-            opj_v4dwt_interleave_h(&h, aj, w, rh - j);
+            opj_v4dwt_interleave_partial_h(&h, sa, j, rh - j);
             opj_v4dwt_decode(&h);
-            for (k = win_tr_x0; k < win_tr_x1; k++) {
-                switch (rh - j) {
-                case 3:
-                    aj[k + w * 2] = h.wavelet[k].f[2];
-                /* FALLTHRU */
-                case 2:
-                    aj[k + w    ] = h.wavelet[k].f[1];
-                /* FALLTHRU */
-                case 1:
-                    aj[k        ] = h.wavelet[k].f[0];
-                }
+            if (!opj_sparse_array_int32_write(sa,
+                                              win_tr_x0, j,
+                                              win_tr_x1, rh,
+                                              (OPJ_INT32*)&h.wavelet[win_tr_x0].f[0],
+                                              4, 1, OPJ_TRUE)) {
+                /* FIXME event manager error callback */
+                opj_sparse_array_int32_free(sa);
+                opj_aligned_free(h.wavelet);
+                return OPJ_FALSE;
             }
         }
 
@@ -2440,20 +2819,38 @@ OPJ_BOOL opj_dwt_decode_partial_97(opj_tcd_t *tcd,
         v.win_l_x1 = win_ll_y1;
         v.win_h_x0 = win_lh_y0;
         v.win_h_x1 = win_lh_y1;
-        aj = (OPJ_FLOAT32*) tilec->data;
-        aj += win_tr_x0;
-        for (j = win_tr_x0; j < win_tr_x1; j += 4, aj += 4) {
+        for (j = win_tr_x0; j < win_tr_x1; j += 4) {
             OPJ_UINT32 nb_elts = opj_uint_min(4U, win_tr_x1 - j);
-            OPJ_UINT32 k;
 
-            opj_v4dwt_interleave_v(&v, aj, w, nb_elts);
+            opj_v4dwt_interleave_partial_v(&v, sa, j, nb_elts);
             opj_v4dwt_decode(&v);
 
-            for (k = win_tr_y0; k < win_tr_y1; ++k) {
-                memcpy(&aj[k * w], &v.wavelet[k], nb_elts * sizeof(OPJ_FLOAT32));
+            if (!opj_sparse_array_int32_write(sa,
+                                              j, win_tr_y0,
+                                              j + nb_elts, win_tr_y1,
+                                              (OPJ_INT32*)&h.wavelet[win_tr_y0].f[0],
+                                              1, 4, OPJ_TRUE)) {
+                /* FIXME event manager error callback */
+                opj_sparse_array_int32_free(sa);
+                opj_aligned_free(h.wavelet);
+                return OPJ_FALSE;
             }
         }
     }
+
+    {
+        OPJ_BOOL ret = opj_sparse_array_int32_read(sa,
+                       tr_max->win_x0 - (OPJ_UINT32)tr_max->x0,
+                       tr_max->win_y0 - (OPJ_UINT32)tr_max->y0,
+                       tr_max->win_x1 - (OPJ_UINT32)tr_max->x0,
+                       tr_max->win_y1 - (OPJ_UINT32)tr_max->y0,
+                       tilec->data_win,
+                       1, tr_max->win_x1 - tr_max->win_x0,
+                       OPJ_TRUE);
+        assert(ret);
+        OPJ_UNUSED(ret);
+    }
+    opj_sparse_array_int32_free(sa);
 
     opj_aligned_free(h.wavelet);
     return OPJ_TRUE;
@@ -2464,9 +2861,9 @@ OPJ_BOOL opj_dwt_decode_real(opj_tcd_t *p_tcd,
                              opj_tcd_tilecomp_t* OPJ_RESTRICT tilec,
                              OPJ_UINT32 numres)
 {
-    if (opj_dwt_is_whole_tile_decoding(p_tcd, tilec)) {
+    if (p_tcd->whole_tile_decoding) {
         return opj_dwt_decode_tile_97(tilec, numres);
     } else {
-        return opj_dwt_decode_partial_97(p_tcd, tilec, numres);
+        return opj_dwt_decode_partial_97(tilec, numres);
     }
 }

@@ -124,6 +124,28 @@ static INLINE OPJ_INT32 opj_int_clamp(OPJ_INT32 a, OPJ_INT32 min,
     }
     return a;
 }
+
+/**
+Clamp an integer inside an interval
+@return
+<ul>
+<li>Returns a if (min < a < max)
+<li>Returns max if (a > max)
+<li>Returns min if (a < min)
+</ul>
+*/
+static INLINE OPJ_INT64 opj_int64_clamp(OPJ_INT64 a, OPJ_INT64 min,
+                                        OPJ_INT64 max)
+{
+    if (a < min) {
+        return min;
+    }
+    if (a > max) {
+        return max;
+    }
+    return a;
+}
+
 /**
 @return Get absolute value of integer
 */

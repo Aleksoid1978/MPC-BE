@@ -29,9 +29,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "opj_includes.h"
-
-#include "thread.h"
 #include <assert.h>
 
 #ifdef MUTEX_win32
@@ -45,6 +42,8 @@
 
 #include <windows.h>
 #include <process.h>
+
+#include "opj_includes.h"
 
 OPJ_BOOL OPJ_CALLCONV opj_has_thread_support(void)
 {
@@ -289,6 +288,10 @@ void opj_thread_join(opj_thread_t* thread)
 #include <stdlib.h>
 #include <unistd.h>
 
+/* Moved after all system includes, and in particular pthread.h, so as to */
+/* avoid poisoning issuing with malloc() use in pthread.h with ulibc (#1013) */
+#include "opj_includes.h"
+
 OPJ_BOOL OPJ_CALLCONV opj_has_thread_support(void)
 {
     return OPJ_TRUE;
@@ -424,6 +427,8 @@ void opj_thread_join(opj_thread_t* thread)
 
 #else
 /* Stub implementation */
+
+#include "opj_includes.h"
 
 OPJ_BOOL OPJ_CALLCONV opj_has_thread_support(void)
 {

@@ -134,6 +134,8 @@ typedef struct opj_tcd_cblk_dec {
     OPJ_UINT32 m_current_max_segs;  /* allocated number of segs[] items */
     OPJ_UINT32 numchunks;           /* Number of valid chunks items */
     OPJ_UINT32 numchunksalloc;      /* Number of chunks item allocated */
+    /* Decoded code-block. Only used for subtile decoding. Otherwise tilec->data is directly updated */
+    OPJ_INT32* decoded_data;
 } opj_tcd_cblk_dec_t;
 
 /** Precinct structure */
@@ -175,6 +177,12 @@ typedef struct opj_tcd_resolution {
     OPJ_UINT32 numbands;
     /* subband information */
     opj_tcd_band_t bands[3];
+
+    /* dimension of the resolution limited to window of interest. Only valid if tcd->whole_tile_decoding is set */
+    OPJ_UINT32 win_x0;
+    OPJ_UINT32 win_y0;
+    OPJ_UINT32 win_x1;
+    OPJ_UINT32 win_y1;
 } opj_tcd_resolution_t;
 
 /** Tile-component structure */
@@ -191,14 +199,24 @@ typedef struct opj_tcd_tilecomp {
     opj_tcd_resolution_t *resolutions;
     /* size of data for resolutions (in bytes) */
     OPJ_UINT32 resolutions_size;
-    /* data of the component */
+
+    /* data of the component. For decoding, only valid if tcd->whole_tile_decoding is set (so exclusive of data_win member) */
     OPJ_INT32 *data;
     /* if true, then need to free after usage, otherwise do not free */
     OPJ_BOOL  ownsData;
     /* we may either need to allocate this amount of data, or re-use image data and ignore this value */
-    OPJ_UINT32 data_size_needed;
+    size_t data_size_needed;
     /* size of the data of the component */
-    OPJ_UINT32 data_size;
+    size_t data_size;
+
+    /** data of the component limited to window of interest. Only valid for decoding and if tcd->whole_tile_decoding is NOT set (so exclusive of data member) */
+    OPJ_INT32 *data_win;
+    /* dimension of the component limited to window of interest. Only valid for decoding and  if tcd->whole_tile_decoding is NOT set */
+    OPJ_UINT32 win_x0;
+    OPJ_UINT32 win_y0;
+    OPJ_UINT32 win_x1;
+    OPJ_UINT32 win_y1;
+
     /* add fixed_quality */
     OPJ_INT32 numpix;
 } opj_tcd_tilecomp_t;
@@ -256,10 +274,12 @@ typedef struct opj_tcd {
     /** Thread pool */
     opj_thread_pool_t* thread_pool;
     /** Coordinates of the window of interest, in grid reference space */
-    OPJ_UINT32 decoded_x0;
-    OPJ_UINT32 decoded_y0;
-    OPJ_UINT32 decoded_x1;
-    OPJ_UINT32 decoded_y1;
+    OPJ_UINT32 win_x0;
+    OPJ_UINT32 win_y0;
+    OPJ_UINT32 win_x1;
+    OPJ_UINT32 win_y1;
+    /** Only valid for decoding. Whether the whole tile is decoded, or just the region in win_x0/win_y0/win_x1/win_y1 */
+    OPJ_BOOL   whole_tile_decoding;
 } opj_tcd_t;
 
 /** @name Exported functions */
@@ -331,7 +351,8 @@ OPJ_BOOL opj_tcd_rateallocate(opj_tcd_t *tcd,
 /**
  * Gets the maximum tile size that will be taken by the tile once decoded.
  */
-OPJ_UINT32 opj_tcd_get_decoded_tile_size(opj_tcd_t *p_tcd);
+OPJ_UINT32 opj_tcd_get_decoded_tile_size(opj_tcd_t *p_tcd,
+        OPJ_BOOL take_into_account_partial_decoding);
 
 /**
  * Encodes a tile from the raw image into the given buffer.
@@ -356,10 +377,10 @@ OPJ_BOOL opj_tcd_encode_tile(opj_tcd_t *p_tcd,
 /**
 Decode a tile from a buffer into a raw image
 @param tcd TCD handle
-@param decoded_x0 Upper left x of region to decode (in grid coordinates)
-@param decoded_y0 Upper left y of region to decode (in grid coordinates)
-@param decoded_x1 Lower right x of region to decode (in grid coordinates)
-@param decoded_y1 Lower right y of region to decode (in grid coordinates)
+@param win_x0 Upper left x of region to decode (in grid coordinates)
+@param win_y0 Upper left y of region to decode (in grid coordinates)
+@param win_x1 Lower right x of region to decode (in grid coordinates)
+@param win_y1 Lower right y of region to decode (in grid coordinates)
 @param src Source buffer
 @param len Length of source buffer
 @param tileno Number that identifies one of the tiles to be decoded
@@ -367,10 +388,10 @@ Decode a tile from a buffer into a raw image
 @param manager the event manager.
 */
 OPJ_BOOL opj_tcd_decode_tile(opj_tcd_t *tcd,
-                             OPJ_UINT32 decoded_x0,
-                             OPJ_UINT32 decoded_y0,
-                             OPJ_UINT32 decoded_x1,
-                             OPJ_UINT32 decoded_y1,
+                             OPJ_UINT32 win_x0,
+                             OPJ_UINT32 win_y0,
+                             OPJ_UINT32 win_x1,
+                             OPJ_UINT32 win_y1,
                              OPJ_BYTE *src,
                              OPJ_UINT32 len,
                              OPJ_UINT32 tileno,
@@ -388,7 +409,7 @@ OPJ_BOOL opj_tcd_update_tile_data(opj_tcd_t *p_tcd,
 /**
  *
  */
-OPJ_UINT32 opj_tcd_get_encoded_tile_size(opj_tcd_t *p_tcd);
+OPJ_SIZE_T opj_tcd_get_encoded_tile_size(opj_tcd_t *p_tcd);
 
 /**
  * Initialize the tile coder and may reuse some meory.
@@ -407,7 +428,7 @@ OPJ_BOOL opj_tcd_init_encode_tile(opj_tcd_t *p_tcd,
  */
 OPJ_BOOL opj_tcd_copy_tile_data(opj_tcd_t *p_tcd,
                                 OPJ_BYTE * p_src,
-                                OPJ_UINT32 p_src_length);
+                                OPJ_SIZE_T p_src_length);
 
 /**
  * Allocates tile component data
@@ -427,7 +448,7 @@ void opj_tcd_reinit_segment(opj_tcd_seg_t* seg);
 
 
 /** Returns whether a sub-band region contributes to the area of interest
- * tcd->decoded_x0,tcd->decoded_y0,tcd->decoded_x1,tcd->decoded_y1.
+ * tcd->win_x0,tcd->win_y0,tcd->win_x1,tcd->win_y1.
  *
  * @param tcd    TCD handle.
  * @param compno Component number
@@ -448,7 +469,6 @@ OPJ_BOOL opj_tcd_is_subband_area_of_interest(opj_tcd_t *tcd,
         OPJ_UINT32 y0,
         OPJ_UINT32 x1,
         OPJ_UINT32 y1);
-
 
 /* ----------------------------------------------------------------------- */
 /*@}*/

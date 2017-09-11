@@ -71,6 +71,9 @@
     <ClCompile Include="openjpeg-2.2\thread.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="openjpeg-2.2\sparse_array.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="openjpeg-2.2\bio.h">
@@ -164,6 +167,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="openjpeg-2.2\opj_common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="openjpeg-2.2\sparse_array.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
