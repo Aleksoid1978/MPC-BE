@@ -769,14 +769,15 @@ void CMSDKDecoder::Flush()
   m_GOPs.clear();
   memset(&m_PrevOffset, 0, sizeof(m_PrevOffset));
 
-  m_pMediaSideData.Release();
-  BeginEnumFilters(m_pFilter->m_pGraph, pEF, pBF) {
-    if (CComQIPtr<IMediaSideData> pFilter = pBF) {
-      m_pMediaSideData = pFilter;
-      break;
-    };
+  if (!m_pMediaSideData) {
+    BeginEnumFilters(m_pFilter->m_pGraph, pEF, pBF) {
+      if (CComQIPtr<IMediaSideData> pFilter = pBF) {
+        m_pMediaSideData = pFilter;
+        break;
+      };
+    }
+    EndEnumFilters
   }
-  EndEnumFilters
 }
 
 HRESULT CMSDKDecoder::EndOfStream()
