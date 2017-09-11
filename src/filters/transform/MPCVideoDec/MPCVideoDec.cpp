@@ -1708,6 +1708,7 @@ redo:
 
 	m_nCodecNb = nNewCodec;
 
+	m_bMVC_Output_TopBottom = FALSE;
 	if (pmt->subtype == MEDIASUBTYPE_AMVC || pmt->subtype == MEDIASUBTYPE_MVC1) {
 		if (!m_pMSDKDecoder) {
 			m_pMSDKDecoder = DNew CMSDKDecoder(this);
@@ -1719,11 +1720,7 @@ redo:
 		}
 
 		if (m_pMSDKDecoder) {
-			ExtractAvgTimePerFrame(&m_pInput->CurrentMediaType(), m_rtAvrTimePerFrame);
-			int wout, hout;
-			ExtractDim(&m_pInput->CurrentMediaType(), wout, hout, m_nARX, m_nARY);
-			UNREFERENCED_PARAMETER(wout);
-			UNREFERENCED_PARAMETER(hout);
+			m_bMVC_Output_TopBottom = m_iMvcOutputMode == MVC_OUTPUT_TopBottom;
 
 			BuildOutputFormat();
 			return S_OK;
@@ -3774,11 +3771,11 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 			}
 			break;
 		case INFO_FrameSize:
-			if (m_w && m_h) {
-				LONG sarx = m_arx * m_h;
-				LONG sary = m_ary * m_w;
+			if (m_win && m_hin) {
+				LONG sarx = m_arx * m_hin;
+				LONG sary = m_ary * m_win;
 				ReduceDim(sarx, sary);
-				infostr.Format(L"%dx%d, SAR %ld:%ld, DAR %d:%d", m_w, m_h, sarx, sary, m_arx, m_ary);
+				infostr.Format(L"%dx%d, SAR %ld:%ld, DAR %d:%d", m_win, m_hin, sarx, sary, m_arx, m_ary);
 			}
 			break;
 		case INFO_OutputFormat:

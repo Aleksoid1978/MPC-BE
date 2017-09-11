@@ -47,25 +47,25 @@ enum DECODER_MODE {
 
 class CBaseVideoFilter : public CTransformFilter
 {
-private:
+protected:
 	HRESULT Receive(IMediaSample* pIn);
 
 	// these are private for a reason, don't bother them
 	int m_win, m_hin, m_arxin, m_aryin;
 	int m_wout, m_hout, m_arxout, m_aryout;
+	int m_arx, m_ary;
 	bool m_bSendMediaType;
 
 	long m_cBuffers;
 
 	CLSID m_RenderClsid;
 
-protected:
 	CCritSec m_csReceive;
-
-	int m_w, m_h, m_arx, m_ary;
 
 	DECODER_MODE m_nDecoderMode;
 	DXVA2_ExtendedFormat m_dxvaExtFormat;
+
+	BOOL m_bMVC_Output_TopBottom = FALSE;
 
 	HRESULT GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, REFERENCE_TIME AvgTimePerFrame = 0, DXVA2_ExtendedFormat* dxvaExtFormat = nullptr);
 	HRESULT CopyBuffer(BYTE* pOut, BYTE* pIn, int w, int h, int pitchIn, const GUID& subtype, bool fInterlaced = false);
@@ -80,7 +80,7 @@ public:
 	CBaseVideoFilter(TCHAR* pName, LPUNKNOWN lpunk, HRESULT* phr, REFCLSID clsid, long cBuffers = 1);
 	virtual ~CBaseVideoFilter();
 
-	HRESULT ReconnectOutput(int width, int height, bool bForce = false, REFERENCE_TIME AvgTimePerFrame = 0, DXVA2_ExtendedFormat* dxvaExtFormat = nullptr, int RealWidth = -1, int RealHeight = -1);
+	HRESULT ReconnectOutput(int width, int height, bool bForce = false, REFERENCE_TIME AvgTimePerFrame = 0, DXVA2_ExtendedFormat* dxvaExtFormat = nullptr);
 	int GetPinCount();
 	CBasePin* GetPin(int n);
 

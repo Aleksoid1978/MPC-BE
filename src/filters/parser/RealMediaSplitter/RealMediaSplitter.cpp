@@ -1802,7 +1802,7 @@ HRESULT CRealVideoDecoder::Transform(IMediaSample* pIn)
 	CComPtr<IMediaSample> pOut;
 	BYTE* pDataOut = nullptr;
 	if (/*FAILED(hr = GetDeliveryBuffer(transform_out.w, transform_out.h, &pOut)) // TODO
-	&& */ FAILED(hr = GetDeliveryBuffer(m_w, m_h, &pOut))
+	&& */ FAILED(hr = GetDeliveryBuffer(m_wout, m_hout, &pOut))
 		|| FAILED(hr = pOut->GetPointer(&pDataOut))) {
 		return hr;
 	}
@@ -1810,22 +1810,22 @@ HRESULT CRealVideoDecoder::Transform(IMediaSample* pIn)
 	BYTE* pI420[3] = {m_pI420, m_pI420Tmp, nullptr};
 
 	if (interlaced) {
-		int size = m_w * m_h;
-		DeinterlaceBlend(pI420[1],                pI420[0],                m_w,     m_h,     m_w,     m_w);
-		DeinterlaceBlend(pI420[1] + size,         pI420[0] + size,         m_w / 2, m_h / 2, m_w / 2, m_w / 2);
-		DeinterlaceBlend(pI420[1] + size * 5 / 4, pI420[0] + size * 5 / 4, m_w / 2, m_h / 2, m_w / 2, m_w / 2);
+		int size = m_wout * m_hout;
+		DeinterlaceBlend(pI420[1],                pI420[0],                m_wout,     m_hout,     m_wout,     m_wout);
+		DeinterlaceBlend(pI420[1] + size,         pI420[0] + size,         m_wout / 2, m_hout / 2, m_wout / 2, m_wout / 2);
+		DeinterlaceBlend(pI420[1] + size * 5 / 4, pI420[0] + size * 5 / 4, m_wout / 2, m_hout / 2, m_wout / 2, m_wout / 2);
 		pI420[2] = pI420[1], pI420[1] = pI420[0], pI420[0] = pI420[2];
 	}
 
-	if (transform_out.w != m_w || transform_out.h != m_h) {
-		Resize(pI420[0], transform_out.w, transform_out.h, pI420[1], m_w, m_h);
+	if (transform_out.w != m_wout || transform_out.h != m_hout) {
+		Resize(pI420[0], transform_out.w, transform_out.h, pI420[1], m_wout, m_hout);
 		// only one of these can be true, and when it happens the result image must be in the tmp buffer
-		if (transform_out.w == m_w || transform_out.h == m_h) {
+		if (transform_out.w == m_wout || transform_out.h == m_hout) {
 			pI420[2] = pI420[1], pI420[1] = pI420[0], pI420[0] = pI420[2];
 		}
 	}
 
-	CopyBuffer(pDataOut, pI420[0], m_w, m_h, m_w, MEDIASUBTYPE_I420);
+	CopyBuffer(pDataOut, pI420[0], m_wout, m_hout, m_wout, MEDIASUBTYPE_I420);
 
 	rtStart = 10000i64 * transform_out.timestamp - m_tStart;
 	rtStop = rtStart + 1;
@@ -2091,7 +2091,7 @@ HRESULT CRealVideoDecoder::StartStreaming()
 		return E_FAIL;
 	}
 
-	int size = m_w * m_h;
+	int size = m_wout * m_hout;
 	m_lastBuffSizeDim = size;
 
 	m_pI420 = (BYTE*)_aligned_malloc(size * 3 / 2, 16);

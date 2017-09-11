@@ -81,8 +81,8 @@ CBaseVideoFilter::CBaseVideoFilter(TCHAR* pName, LPUNKNOWN lpunk, HRESULT* phr, 
 		return;
 	}
 
-	m_wout = m_win = m_w = 0;
-	m_hout = m_hin = m_h = 0;
+	m_wout = m_win = 0;
+	m_hout = m_hin = 0;
 	m_arxout = m_arxin = m_arx = 0;
 	m_aryout = m_aryin = m_ary = 0;
 
@@ -182,7 +182,7 @@ HRESULT CBaseVideoFilter::GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, 
 	return S_OK;
 }
 
-HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* = false*/, REFERENCE_TIME AvgTimePerFrame/* = 0*/, DXVA2_ExtendedFormat* dxvaExtFormat/* = nullptr*/, int RealWidth/* = -1*/, int RealHeight/* = -1*/)
+HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* = false*/, REFERENCE_TIME AvgTimePerFrame/* = 0*/, DXVA2_ExtendedFormat* dxvaExtFormat/* = nullptr*/)
 {
 	CMediaType& mt = m_pOutput->CurrentMediaType();
 
@@ -205,15 +205,6 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 		}
 	}
 
-	int w_org = m_w;
-	int h_org = m_h;
-
-	if (width != m_w || height != m_h) {
-		bNeedReconnect = true;
-		m_w = width;
-		m_h = height;
-	}
-
 	REFERENCE_TIME nAvgTimePerFrame = 0;
 	{
 		ExtractAvgTimePerFrame(&mt, nAvgTimePerFrame);
@@ -226,11 +217,11 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 		}
 	}
 
-	if (m_w != m_wout || m_h != m_hout || m_arx != m_arxout || m_ary != m_aryout) {
+	if (width != m_wout || height != m_hout || m_arx != m_arxout || m_ary != m_aryout) {
 		bNeedReconnect = true;
 	}
 
-	if (extformatsupport && dxvaExtFormat && mt.formattype == FORMAT_VideoInfo2) {
+	if (extformatsupport && dxvaExtFormat) {
 		VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.Format();
 		if (vih2->dwControlFlags != dxvaExtFormat->value) {
 			bNeedReconnect = true;
@@ -245,53 +236,32 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 		}
 		const bool m_bOverlayMixer = !!(clsid == CLSID_OverlayMixer);
 
-		CRect vih_rect(0, 0, RealWidth > 0 ? RealWidth : m_w, RealHeight > 0 ? RealHeight : m_h);
+		CRect vih_rect(0, 0, width, height);
 
 		DLog(L"CBaseVideoFilter::ReconnectOutput() : Performing reconnect");
-		if (m_w != vih_rect.Width() || m_h != vih_rect.Height()) {
-			DLog(L"    => SIZE  : %d:%d => %d:%d(%d:%d)", m_wout, m_hout, m_w, m_h, vih_rect.Width(), vih_rect.Height());
-		} else {
-			DLog(L"    => SIZE  : %d:%d => %d:%d", m_wout, m_hout, vih_rect.Width(), vih_rect.Height());
-		}
-		{
-			DLog(L"    => AR    : %d:%d => %d:%d", m_arxout, m_aryout, m_arx, m_ary);
-			DLog(L"    => FPS   : %I64d => %I64d", nAvgTimePerFrame, AvgTimePerFrame);
-		}
+		DLog(L"    => SIZE  : %d:%d => %d:%d", m_wout, m_hout, vih_rect.Width(), vih_rect.Height());
+		DLog(L"    => AR    : %d:%d => %d:%d", m_arxout, m_aryout, m_arx, m_ary);
+		DLog(L"    => FPS   : %I64d => %I64d", nAvgTimePerFrame, AvgTimePerFrame);
 
-		const bool bVideoSizeChanged = (m_w != m_wout || m_h != m_hout);
+		const bool bVideoSizeChanged = (width != m_wout || height != m_hout);
 
 		BITMAPINFOHEADER* pBMI = nullptr;
-		if (mt.formattype == FORMAT_VideoInfo) {
-			VIDEOINFOHEADER* vih		= (VIDEOINFOHEADER*)mt.Format();
-			if (bVideoSizeChanged) {
-				vih->rcSource			= vih->rcTarget = vih_rect;
-			}
-			vih->AvgTimePerFrame		= AvgTimePerFrame;
+		VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.Format();
+		if (bVideoSizeChanged) {
+			vih2->rcSource = vih2->rcTarget = vih_rect;
+		}
+		vih2->AvgTimePerFrame    = AvgTimePerFrame;
+		vih2->dwPictAspectRatioX = m_arx;
+		vih2->dwPictAspectRatioY = m_ary;
 
-			pBMI						= &vih->bmiHeader;
-			pBMI->biXPelsPerMeter		= m_w * m_ary;
-			pBMI->biYPelsPerMeter		= m_h * m_arx;
-		} else if (mt.formattype == FORMAT_VideoInfo2) {
-			VIDEOINFOHEADER2* vih2	= (VIDEOINFOHEADER2*)mt.Format();
-			if (bVideoSizeChanged) {
-				vih2->rcSource			= vih2->rcTarget = vih_rect;
-			}
-			vih2->AvgTimePerFrame		= AvgTimePerFrame;
-			vih2->dwPictAspectRatioX	= m_arx;
-			vih2->dwPictAspectRatioY	= m_ary;
-
-			DLog(L"    => FLAGS : 0x%0.8x -> 0x%0.8x", vih2->dwControlFlags, (extformatsupport && dxvaExtFormat) ? dxvaExtFormat->value : vih2->dwControlFlags);
-			if (extformatsupport && dxvaExtFormat) {
-				vih2->dwControlFlags	= dxvaExtFormat->value;
-			}
-
-			pBMI						= &vih2->bmiHeader;
-		} else {
-			return E_FAIL;	//should never be here? prevent null pointer refs for bmi
+		DLog(L"    => FLAGS : 0x%0.8x -> 0x%0.8x", vih2->dwControlFlags, (extformatsupport && dxvaExtFormat) ? dxvaExtFormat->value : vih2->dwControlFlags);
+		if (extformatsupport && dxvaExtFormat) {
+			vih2->dwControlFlags = dxvaExtFormat->value;
 		}
 
-		pBMI->biWidth     = m_w;
-		pBMI->biHeight    = m_h;
+		pBMI = &vih2->bmiHeader;
+		pBMI->biWidth     = width;
+		pBMI->biHeight    = height;
 		pBMI->biSizeImage = DIBSIZE(*pBMI);
 
 		HRESULT hrQA = m_pOutput->GetConnected()->QueryAccept(&mt);
@@ -322,8 +292,6 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 							m_pOutput->SetMediaType(&mt);
 						}
 					} else {
-						m_w = w_org;
-						m_h = h_org;
 						return E_FAIL;
 					}
 				} else if (hr == VFW_E_BUFFERS_OUTSTANDING && tryReceiveConnection) {
@@ -341,14 +309,14 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 			}
 		}
 
-		m_wout   = m_w;
-		m_hout   = m_h;
+		m_wout   = width;
+		m_hout   = height;
 		m_arxout = m_arx;
 		m_aryout = m_ary;
 
 		// some renderers don't send this
 		if (m_nDecoderMode != MODE_DXVA2) {
-			NotifyEvent(EC_VIDEO_SIZE_CHANGED, MAKELPARAM(m_w, m_h), 0);
+			NotifyEvent(EC_VIDEO_SIZE_CHANGED, MAKELPARAM(width, height), 0);
 		}
 
 		return S_OK;
@@ -506,9 +474,6 @@ HRESULT CBaseVideoFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_
 	BITMAPINFOHEADER bih;
 	ExtractBIH(&m_pOutput->CurrentMediaType(), &bih);
 
-	long cBuffers = m_pOutput->CurrentMediaType().formattype == FORMAT_VideoInfo ? 1 : m_cBuffers;
-	UNREFERENCED_PARAMETER(cBuffers);
-
 	pProperties->cBuffers	= m_cBuffers;
 	pProperties->cbBuffer	= bih.biSizeImage;
 	pProperties->cbAlign	= 1;
@@ -554,6 +519,17 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	m_arxout = m_arxin;
 	m_aryout = m_aryin;
 
+	if (m_bMVC_Output_TopBottom) {
+		h *= 2;
+		m_hout *= 2;
+
+		ary *= 2;
+		m_aryout *= 2;
+
+		ReduceDim((LONG&)arx, (LONG&)ary);
+		ReduceDim((LONG&)m_arxout, (LONG&)m_aryout);
+	}
+
 	BITMAPINFOHEADER bihOut = { 0 };
 	bihOut.biSize        = sizeof(bihOut);
 	bihOut.biWidth       = w;
@@ -563,20 +539,18 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	bihOut.biCompression = fmts[iPosition].biCompression;
 	bihOut.biSizeImage   = DIBSIZE(bihOut);
 
-	{
-		pmt->formattype = FORMAT_VideoInfo2;
-		VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)pmt->AllocFormatBuffer(sizeof(VIDEOINFOHEADER2));
-		memset(vih2, 0, sizeof(VIDEOINFOHEADER2));
-		vih2->bmiHeader = bihOut;
-		vih2->dwPictAspectRatioX = arx;
-		vih2->dwPictAspectRatioY = ary;
-		if (IsVideoInterlaced()) {
-			vih2->dwInterlaceFlags = AMINTERLACE_IsInterlaced | AMINTERLACE_DisplayModeBobOrWeave;
-		}
+	pmt->formattype = FORMAT_VideoInfo2;
+	VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)pmt->AllocFormatBuffer(sizeof(VIDEOINFOHEADER2));
+	memset(vih2, 0, sizeof(VIDEOINFOHEADER2));
+	vih2->bmiHeader = bihOut;
+	vih2->dwPictAspectRatioX = arx;
+	vih2->dwPictAspectRatioY = ary;
+	if (IsVideoInterlaced()) {
+		vih2->dwInterlaceFlags = AMINTERLACE_IsInterlaced | AMINTERLACE_DisplayModeBobOrWeave;
+	}
 
-		if (m_dxvaExtFormat.value && pmt->subtype != MEDIASUBTYPE_RGB32) {
-			vih2->dwControlFlags = m_dxvaExtFormat.value;
-		}
+	if (m_dxvaExtFormat.value && pmt->subtype != MEDIASUBTYPE_RGB32) {
+		vih2->dwControlFlags = m_dxvaExtFormat.value;
 	}
 
 	CMediaType& mt = m_pInput->CurrentMediaType();
@@ -610,33 +584,14 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 HRESULT CBaseVideoFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType* pmt)
 {
 	if (dir == PINDIR_INPUT) {
-		m_w = m_h = m_arx = m_ary = 0;
-		ExtractDim(pmt, m_w, m_h, m_arx, m_ary);
-		m_win = m_w;
-		m_hin = m_h;
+		m_arx = m_ary = 0;
+		ExtractDim(pmt, m_win, m_hin, m_arx, m_ary);
 		m_arxin = m_arx;
 		m_aryin = m_ary;
 		int vsfilter = 0;
-		GetOutputSize(m_w, m_h, m_arx, m_ary, vsfilter);
+		GetOutputSize(m_wout, m_hout, m_arx, m_ary, vsfilter);
 
-		DWORD a = m_arx, b = m_ary;
-		while (a) {
-			int tmp = a;
-			a = b % tmp;
-			b = tmp;
-		}
-		if (b) {
-			m_arx /= b, m_ary /= b;
-		}
-	} else if (dir == PINDIR_OUTPUT) {
-		int wout = 0, hout = 0, arxout = 0, aryout = 0;
-		ExtractDim(pmt, wout, hout, arxout, aryout);
-		if (m_w == wout && m_h == hout && m_arx == arxout && m_ary == aryout) {
-			m_wout = wout;
-			m_hout = hout;
-			m_arxout = arxout;
-			m_aryout = aryout;
-		}
+		ReduceDim((LONG&)m_arx, (LONG&)m_ary);
 	}
 
 	return __super::SetMediaType(dir, pmt);
