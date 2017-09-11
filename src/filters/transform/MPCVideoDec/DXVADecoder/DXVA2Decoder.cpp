@@ -90,7 +90,7 @@ HRESULT CDXVA2Decoder::DeliverFrame()
 	LONG biWidth, biHeight = 0;
 
 	CMediaType& mt = m_pFilter->GetOutputPin()->CurrentMediaType();
-	if (m_pFilter->GetSendMediaType()) {
+	if (m_pFilter->m_bSendMediaType) {
 		AM_MEDIA_TYPE *sendmt = CreateMediaType(&mt);
 		BITMAPINFOHEADER *pBMI = nullptr;
 		if (sendmt->formattype == FORMAT_VideoInfo) {
@@ -107,7 +107,7 @@ HRESULT CDXVA2Decoder::DeliverFrame()
 		biHeight = abs(pBMI->biHeight);
 		pSample->SetMediaType(sendmt);
 		DeleteMediaType(sendmt);
-		m_pFilter->SetSendMediaType(false);
+		m_pFilter->m_bSendMediaType = false;
 		bSizeChanged = true;
 	}
 

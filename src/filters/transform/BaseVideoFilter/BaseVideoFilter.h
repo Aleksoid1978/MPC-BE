@@ -48,12 +48,10 @@ enum DECODER_MODE {
 class CBaseVideoFilter : public CTransformFilter
 {
 protected:
-	HRESULT Receive(IMediaSample* pIn);
-
-	// these are private for a reason, don't bother them
 	int m_win, m_hin, m_arxin, m_aryin;
 	int m_wout, m_hout, m_arxout, m_aryout;
 	int m_arx, m_ary;
+
 	bool m_bSendMediaType;
 
 	long m_cBuffers;
@@ -66,6 +64,8 @@ protected:
 	DXVA2_ExtendedFormat m_dxvaExtFormat;
 
 	BOOL m_bMVC_Output_TopBottom = FALSE;
+
+	HRESULT Receive(IMediaSample* pIn);
 
 	HRESULT GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, REFERENCE_TIME AvgTimePerFrame = 0, DXVA2_ExtendedFormat* dxvaExtFormat = nullptr);
 	HRESULT CopyBuffer(BYTE* pOut, BYTE* pIn, int w, int h, int pitchIn, const GUID& subtype, bool fInterlaced = false);
@@ -92,9 +92,6 @@ public:
 	HRESULT SetMediaType(PIN_DIRECTION dir, const CMediaType* pmt);
 
 	void SetAspect(CSize aspect);
-
-	bool GetSendMediaType()				{ return m_bSendMediaType;  }
-	void SetSendMediaType(bool value)	{ m_bSendMediaType = value; }
 };
 
 class CBaseVideoInputAllocator : public CMemAllocator
