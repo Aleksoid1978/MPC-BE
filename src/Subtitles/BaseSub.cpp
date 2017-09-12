@@ -65,9 +65,9 @@ void CBaseSub::FinalizeRender(SubPicDesc& spd)
 		m_bResizedRender = FALSE;
 
 		// StretchBlt ...
-		int filter = (spd.w < m_spd.w && spd.h < m_spd.h) ? CResampleARGB::FILTER_BOX : CResampleARGB::FILTER_BILINEAR;
+		int filter = (spd.w < m_spd.w && spd.h < m_spd.h) ? CResampleRGB32::FILTER_BOX : CResampleRGB32::FILTER_BILINEAR;
 
-		HRESULT hr = m_resample.SetParameters(spd.w, spd.h, m_spd.w, m_spd.h, filter);
+		HRESULT hr = m_resample.SetParameters(spd.w, spd.h, m_spd.w, m_spd.h, filter, true);
 		if (S_OK == hr) {
 			hr = m_resample.Process((BYTE*)spd.bits, (BYTE*)m_spd.bits);
 		}

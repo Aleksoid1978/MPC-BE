@@ -104,7 +104,7 @@
     <ClCompile Include="Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ResampleARGB.cpp">
+    <ClCompile Include="ResampleRGB32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -217,7 +217,7 @@
     <ClInclude Include="SimpleBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ResampleARGB.h">
+    <ClInclude Include="ResampleRGB32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

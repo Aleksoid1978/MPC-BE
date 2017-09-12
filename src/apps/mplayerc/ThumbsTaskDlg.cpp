@@ -23,7 +23,7 @@
 #include <afxwin.h>
 #include "MainFrm.h"
 #include "../../DSUtil/Filehandle.h"
-#include "../../DSUtil/ResampleARGB.h"
+#include "../../DSUtil/ResampleRGB32.h"
 
 #include "ThumbsTaskDlg.h"
 
@@ -156,7 +156,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 
 	CCritSec csSubLock;
 	RECT bbox;
-	CResampleARGB Resample;
+	CResampleRGB32 Resample;
 
 	for (int i = 1, pics = cols * rows; i <= pics; i++) {
 		const REFERENCE_TIME rt = duration * i / (pics + 1);
@@ -217,7 +217,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 		hr = Resample.SetParameters(
 			thumbsize.cx, thumbsize.cy,
 			bi->bmiHeader.biWidth, abs(bi->bmiHeader.biHeight),
-			CResampleARGB::FILTER_HAMMING);
+			CResampleRGB32::FILTER_HAMMING, false);
 		if (S_OK == hr) {
 			hr = Resample.Process(thumb.get(), (const BYTE*)(&bi->bmiHeader + 1));
 		}
