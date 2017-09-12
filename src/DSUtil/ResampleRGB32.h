@@ -22,7 +22,7 @@
 
 struct filter_t;
 
-class CResampleARGB
+class CResampleRGB32
 {
 public:
 	enum : int {
@@ -40,6 +40,7 @@ private:
 	int  m_destW  = 0;
 	int  m_destH  = 0;
 	int  m_filter = 0;
+	bool m_alpha  = false;
 
 	filter_t* m_pFilter = nullptr;
 
@@ -63,8 +64,8 @@ private:
 	HRESULT Init();
 
 public:
-	~CResampleARGB();
+	~CResampleRGB32();
 
-	HRESULT SetParameters(const int destW, const int destH, const int srcW, const int srcH, const int filter);
+	HRESULT SetParameters(const int destW, const int destH, const int srcW, const int srcH, const int filter, const bool alpha);
 	HRESULT Process(BYTE* const dest, const BYTE* const src);
 };

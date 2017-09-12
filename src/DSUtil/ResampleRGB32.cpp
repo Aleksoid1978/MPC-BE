@@ -21,7 +21,7 @@
 #include "stdafx.h"
 #include <math.h>
 #include <ppl.h>
-#include "ResampleARGB.h"
+#include "ResampleRGB32.h"
 
 // based on https://github.com/uploadcare/pillow-simd/blob/3.4.x/libImaging/Resample.c
 // and use same fixes from https://github.com/uploadcare/pillow-simd/blob/4.3-demo/libImaging/Resample.c
@@ -255,55 +255,101 @@ int normalize_coeffs_8bpc(int outSize, int kmax, double *prekk, INT32 **kkp)
 	return kmax;
 }
 
-void CResampleARGB::ResampleHorizontal(BYTE* dest, int destW, int H, const BYTE* const src, int srcW)
+void CResampleRGB32::ResampleHorizontal(BYTE* dest, int destW, int H, const BYTE* const src, int srcW)
 {
-	concurrency::parallel_for(0, H, [&](int yy) {
-		const BYTE* lineIn = src + yy * srcW * 4;
-		UINT32* const lineOut = (UINT32*)dest + yy * destW;
+	if (m_alpha) {
+		concurrency::parallel_for(0, H, [&](int yy) {
+			const BYTE* lineIn = src + yy * srcW * 4;
+			UINT32* const lineOut = (UINT32*)dest + yy * destW;
 
-		int ss0, ss1, ss2, ss3;
-		for (int xx = 0; xx < destW; xx++) {
-			const INT32* k = &m_kkHor[xx * m_kmaxHor];
-			const int xmin = m_xboundsHor[xx * 2 + 0];
-			const int xmax = m_xboundsHor[xx * 2 + 1];
-			ss0 = ss1 = ss2 = ss3 = 1 << (PRECISION_BITS -1);
+			int ss0, ss1, ss2, ss3;
+			for (int xx = 0; xx < destW; xx++) {
+				const INT32* k = &m_kkHor[xx * m_kmaxHor];
+				const int xmin = m_xboundsHor[xx * 2 + 0];
+				const int xmax = m_xboundsHor[xx * 2 + 1];
+				ss0 = ss1 = ss2 = ss3 = 1 << (PRECISION_BITS - 1);
 
-			for (int x = 0; x < xmax; x++) {
-				ss0 += lineIn[(x + xmin)*4 + 0] * k[x];
-				ss1 += lineIn[(x + xmin)*4 + 1] * k[x];
-				ss2 += lineIn[(x + xmin)*4 + 2] * k[x];
-				ss3 += lineIn[(x + xmin)*4 + 3] * k[x];
+				for (int x = 0; x < xmax; x++) {
+					ss0 += lineIn[(x + xmin) * 4 + 0] * k[x];
+					ss1 += lineIn[(x + xmin) * 4 + 1] * k[x];
+					ss2 += lineIn[(x + xmin) * 4 + 2] * k[x];
+					ss3 += lineIn[(x + xmin) * 4 + 3] * k[x];
+				}
+
+				lineOut[xx] = MAKE_UINT32(clip8(ss0), clip8(ss1), clip8(ss2), clip8(ss3));
 			}
+		});
+	}
+	else {
+		concurrency::parallel_for(0, H, [&](int yy) {
+			const BYTE* lineIn = src + yy * srcW * 4;
+			UINT32* const lineOut = (UINT32*)dest + yy * destW;
 
-			lineOut[xx] = MAKE_UINT32(clip8(ss0), clip8(ss1), clip8(ss2), clip8(ss3));
-		}
-	});
+			int ss0, ss1, ss2;
+			for (int xx = 0; xx < destW; xx++) {
+				const INT32* k = &m_kkHor[xx * m_kmaxHor];
+				const int xmin = m_xboundsHor[xx * 2 + 0];
+				const int xmax = m_xboundsHor[xx * 2 + 1];
+				ss0 = ss1 = ss2 = 1 << (PRECISION_BITS - 1);
+
+				for (int x = 0; x < xmax; x++) {
+					ss0 += lineIn[(x + xmin) * 4 + 0] * k[x];
+					ss1 += lineIn[(x + xmin) * 4 + 1] * k[x];
+					ss2 += lineIn[(x + xmin) * 4 + 2] * k[x];
+				}
+
+				lineOut[xx] = MAKE_UINT32(clip8(ss0), clip8(ss1), clip8(ss2), 0);
+			}
+		});
+	}
 }
 
-void CResampleARGB::ResampleVertical(BYTE* dest, int W, int destH, const BYTE* const src, int srcH)
+void CResampleRGB32::ResampleVertical(BYTE* dest, int W, int destH, const BYTE* const src, int srcH)
 {
-	concurrency::parallel_for(0, destH, [&](int yy) {
-		UINT32* const lineOut = (UINT32*)dest + yy * W;
-		const INT32* k = &m_kkVer[yy * m_kmaxVer];
-		const int ymin = m_xboundsVer[yy * 2 + 0];
-		const int ymax = m_xboundsVer[yy * 2 + 1];
-		int ss0, ss1, ss2, ss3;
-		for (int xx = 0; xx < W; xx++) {
-			ss0 = ss1 = ss2 = ss3 = 1 << (PRECISION_BITS -1);
-			for (int y = 0; y < ymax; y++) {
-				const BYTE* lineIn = src + (y + ymin) * W * 4;
-				ss0 += lineIn[xx*4 + 0] * k[y];
-				ss1 += lineIn[xx*4 + 1] * k[y];
-				ss2 += lineIn[xx*4 + 2] * k[y];
-				ss3 += lineIn[xx*4 + 3] * k[y];
-			}
+	if (m_alpha) {
+		concurrency::parallel_for(0, destH, [&](int yy) {
+			UINT32* const lineOut = (UINT32*)dest + yy * W;
+			const INT32* k = &m_kkVer[yy * m_kmaxVer];
+			const int ymin = m_xboundsVer[yy * 2 + 0];
+			const int ymax = m_xboundsVer[yy * 2 + 1];
+			int ss0, ss1, ss2, ss3;
+			for (int xx = 0; xx < W; xx++) {
+				ss0 = ss1 = ss2 = ss3 = 1 << (PRECISION_BITS - 1);
+				for (int y = 0; y < ymax; y++) {
+					const BYTE* lineIn = src + (y + ymin) * W * 4;
+					ss0 += lineIn[xx * 4 + 0] * k[y];
+					ss1 += lineIn[xx * 4 + 1] * k[y];
+					ss2 += lineIn[xx * 4 + 2] * k[y];
+					ss3 += lineIn[xx * 4 + 3] * k[y];
+				}
 
-			lineOut[xx] = MAKE_UINT32(clip8(ss0), clip8(ss1), clip8(ss2), clip8(ss3));
-		}
-	});
+				lineOut[xx] = MAKE_UINT32(clip8(ss0), clip8(ss1), clip8(ss2), clip8(ss3));
+			}
+		});
+	}
+	else {
+		concurrency::parallel_for(0, destH, [&](int yy) {
+			UINT32* const lineOut = (UINT32*)dest + yy * W;
+			const INT32* k = &m_kkVer[yy * m_kmaxVer];
+			const int ymin = m_xboundsVer[yy * 2 + 0];
+			const int ymax = m_xboundsVer[yy * 2 + 1];
+			int ss0, ss1, ss2;
+			for (int xx = 0; xx < W; xx++) {
+				ss0 = ss1 = ss2 = 1 << (PRECISION_BITS - 1);
+				for (int y = 0; y < ymax; y++) {
+					const BYTE* lineIn = src + (y + ymin) * W * 4;
+					ss0 += lineIn[xx * 4 + 0] * k[y];
+					ss1 += lineIn[xx * 4 + 1] * k[y];
+					ss2 += lineIn[xx * 4 + 2] * k[y];
+				}
+
+				lineOut[xx] = MAKE_UINT32(clip8(ss0), clip8(ss1), clip8(ss2), 0);
+			}
+		});
+	}
 }
 
-void CResampleARGB::FreeData()
+void CResampleRGB32::FreeData()
 {
 	free(m_pTemp);
 	m_pTemp = nullptr;
@@ -319,7 +365,7 @@ void CResampleARGB::FreeData()
 	m_kkVer = nullptr;
 }
 
-HRESULT CResampleARGB::Init()
+HRESULT CResampleRGB32::Init()
 {
 	FreeData();
 
@@ -383,13 +429,15 @@ HRESULT CResampleARGB::Init()
 	return S_OK;
 }
 
-CResampleARGB::~CResampleARGB()
+CResampleRGB32::~CResampleRGB32()
 {
 	FreeData();
 }
 
-HRESULT CResampleARGB::SetParameters(const int destW, const int destH, const int srcW, const int srcH, const int filter)
+HRESULT CResampleRGB32::SetParameters(const int destW, const int destH, const int srcW, const int srcH, const int filter, const bool alpha)
 {
+	m_alpha = alpha; // does not affect initialization
+
 	if (m_actual && m_srcW == srcW && m_srcH == srcH && m_destW == destW && m_destH == destH && m_filter == filter) {
 		return S_OK;
 	}
@@ -404,7 +452,7 @@ HRESULT CResampleARGB::SetParameters(const int destW, const int destH, const int
 	return Init();
 }
 
-HRESULT CResampleARGB::Process(BYTE* const dest, const BYTE* const src)
+HRESULT CResampleRGB32::Process(BYTE* const dest, const BYTE* const src)
 {
 	if (!m_actual) {
 		return E_ABORT;
