@@ -201,7 +201,7 @@ void CDirectVobSubFilter::PrintMessages(BYTE* pOut)
 		}
 
 		tmp.Format(L"in: %dx%d %s\nout: %dx%d %s\n",
-				   m_w, m_h,
+				   m_win, m_hout,
 				   input,
 				   bihOut.biWidth, bihOut.biHeight,
 				   output);
@@ -276,7 +276,7 @@ void CDirectVobSubFilter::PrintMessages(BYTE* pOut)
 	pIn += pitchIn * r.top;
 	pOut += pitchOut * r.top;
 
-	for (ptrdiff_t w = min(r.right, m_w), h = r.Height(); h--; pIn += pitchIn, pOut += pitchOut) {
+	for (ptrdiff_t w = min(r.right, m_win), h = r.Height(); h--; pIn += pitchIn, pOut += pitchOut) {
 		BltLineRGB32((DWORD*)pOut, pIn, w, subtype);
 		memsetd(pIn, 0xff000000, r.right*4);
 	}

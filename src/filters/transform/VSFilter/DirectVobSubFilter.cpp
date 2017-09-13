@@ -243,7 +243,7 @@ HRESULT CDirectVobSubFilter::Transform(IMediaSample* pIn)
 		bpp = 8;
 		black = 0x10101010;
 	}
-	CSize sub(m_w, m_h);
+	CSize sub(m_wout, m_hout);
 	CSize in(bihIn.biWidth, bihIn.biHeight);
 
 	if (FAILED(Copy((BYTE*)m_pTempPicBuff, pDataIn, sub, in, bpp, mt.subtype, black))) {
@@ -671,7 +671,7 @@ HRESULT CDirectVobSubFilter::CheckOutputType(const CMediaType& mtOut)
 {
 	int wout = 0, hout = 0, arxout = 0, aryout = 0;
 	return ExtractDim(&mtOut, wout, hout, arxout, aryout)
-		   && m_h == abs((int)hout)
+		   && m_hin == abs((int)hout)
 		   && mtOut.subtype != MEDIASUBTYPE_ARGB32
 		   ? S_OK
 		   : VFW_E_TYPE_NOT_ACCEPTED;
@@ -781,8 +781,8 @@ void CDirectVobSubFilter::InitSubPicQueue()
 	} else if (subtype == MEDIASUBTYPE_RGB555) {
 		m_spd.type = MSP_RGB15;
 	}
-	m_spd.w = m_w;
-	m_spd.h = m_h;
+	m_spd.w = m_wout;
+	m_spd.h = m_hout;
 	m_spd.bpp = (m_spd.type == MSP_YV12 || m_spd.type == MSP_IYUV || m_spd.type == MSP_NV12) ? 8 : bihIn.biBitCount;
 	m_spd.bpp = (m_spd.type == MSP_P010 || m_spd.type == MSP_P016) ? 16 : m_spd.bpp;
 	m_spd.pitch = m_spd.w * m_spd.bpp >> 3;
@@ -797,13 +797,13 @@ void CDirectVobSubFilter::InitSubPicQueue()
 	}
 	m_spd.bits = (void*)m_pTempPicBuff;
 
-	CComPtr<ISubPicAllocator> pSubPicAllocator = DNew CMemSubPicAllocator(m_spd.type, CSize(m_w, m_h));
+	CComPtr<ISubPicAllocator> pSubPicAllocator = DNew CMemSubPicAllocator(m_spd.type, CSize(m_wout, m_hout));
 
 	CSize video(bihIn.biWidth, bihIn.biHeight), window = video;
 	if (AdjustFrameSize(window)) {
 		video += video;
 	}
-	ASSERT(window == CSize(m_w, m_h));
+	ASSERT(window == CSize(m_win, m_hin));
 
 	pSubPicAllocator->SetCurSize(window);
 	pSubPicAllocator->SetCurVidRect(CRect(CPoint((window.cx - video.cx) / 2, (window.cy - video.cy) / 2), video));
@@ -832,7 +832,7 @@ void CDirectVobSubFilter::InitSubPicQueue()
 	static struct {
 		BITMAPINFOHEADER bih;
 		DWORD mask[3];
-	} b = {{sizeof(BITMAPINFOHEADER), m_w, -(int)m_h, 1, 32, BI_BITFIELDS, 0, 0, 0, 0, 0}, 0xFF0000, 0x00FF00, 0x0000FF};
+	} b = {{sizeof(BITMAPINFOHEADER), m_win, -(int)m_hin, 1, 32, BI_BITFIELDS, 0, 0, 0, 0, 0}, 0xFF0000, 0x00FF00, 0x0000FF};
 	m_hdc = CreateCompatibleDC(nullptr);
 	m_hbm = CreateDIBSection(m_hdc, (BITMAPINFO*)&b, DIB_RGB_COLORS, nullptr, nullptr, 0);
 
