@@ -145,12 +145,12 @@ static inline UINT8 clip8(int in)
 	return lookups[in >> PRECISION_BITS];
 }
 
-int precompute_coeffs(int inSize, int outSize, filter_t* filterp, int **xboundsp, double **kkp)
+int precompute_coeffs(int inSize, int outSize, filter_t* filterp, int **boundsp, double **kkp)
 {
 	double support, scale, filterscale;
 	double center, ww, ss;
 	int xx, x, kmax, xmin, xmax;
-	int *xbounds;
+	int *bounds;
 	double *kk, *k;
 
 	// prepare for horizontal stretch
@@ -178,8 +178,8 @@ int precompute_coeffs(int inSize, int outSize, filter_t* filterp, int **xboundsp
 	}
 
 	// malloc check ok, kmax*sizeof(double) > 2*sizeof(int)
-	xbounds = (int*)malloc(outSize * 2 * sizeof(int));
-	if (!xbounds) {
+	bounds = (int*)malloc(outSize * 2 * sizeof(int));
+	if (!bounds) {
 		free(kk);
 		return 0;
 	}
@@ -224,10 +224,10 @@ int precompute_coeffs(int inSize, int outSize, filter_t* filterp, int **xboundsp
 		for (; x < kmax; x++) {
 			k[x] = 0;
 		}
-		xbounds[xx * 2 + 0] = xmin;
-		xbounds[xx * 2 + 1] = xmax;
+		bounds[xx * 2 + 0] = xmin;
+		bounds[xx * 2 + 1] = xmax;
 	}
-	*xboundsp = xbounds;
+	*boundsp = bounds;
 	*kkp = kk;
 	return kmax;
 }
@@ -265,8 +265,8 @@ void CResampleRGB32::ResampleHorizontal(BYTE* dest, int destW, int H, const BYTE
 			int ss0, ss1, ss2, ss3;
 			for (int xx = 0; xx < destW; xx++) {
 				const INT32* k = &m_kkHor[xx * m_kmaxHor];
-				const int xmin = m_xboundsHor[xx * 2 + 0];
-				const int xmax = m_xboundsHor[xx * 2 + 1];
+				const int xmin = m_boundsHor[xx * 2 + 0];
+				const int xmax = m_boundsHor[xx * 2 + 1];
 				ss0 = ss1 = ss2 = ss3 = 1 << (PRECISION_BITS - 1);
 
 				for (int x = 0; x < xmax; x++) {
@@ -288,8 +288,8 @@ void CResampleRGB32::ResampleHorizontal(BYTE* dest, int destW, int H, const BYTE
 			int ss0, ss1, ss2;
 			for (int xx = 0; xx < destW; xx++) {
 				const INT32* k = &m_kkHor[xx * m_kmaxHor];
-				const int xmin = m_xboundsHor[xx * 2 + 0];
-				const int xmax = m_xboundsHor[xx * 2 + 1];
+				const int xmin = m_boundsHor[xx * 2 + 0];
+				const int xmax = m_boundsHor[xx * 2 + 1];
 				ss0 = ss1 = ss2 = 1 << (PRECISION_BITS - 1);
 
 				for (int x = 0; x < xmax; x++) {
@@ -310,8 +310,8 @@ void CResampleRGB32::ResampleVertical(BYTE* dest, int W, int destH, const BYTE* 
 		concurrency::parallel_for(0, destH, [&](int yy) {
 			UINT32* const lineOut = (UINT32*)dest + yy * W;
 			const INT32* k = &m_kkVer[yy * m_kmaxVer];
-			const int ymin = m_xboundsVer[yy * 2 + 0];
-			const int ymax = m_xboundsVer[yy * 2 + 1];
+			const int ymin = m_boundsVer[yy * 2 + 0];
+			const int ymax = m_boundsVer[yy * 2 + 1];
 			int ss0, ss1, ss2, ss3;
 			for (int xx = 0; xx < W; xx++) {
 				ss0 = ss1 = ss2 = ss3 = 1 << (PRECISION_BITS - 1);
@@ -331,8 +331,8 @@ void CResampleRGB32::ResampleVertical(BYTE* dest, int W, int destH, const BYTE* 
 		concurrency::parallel_for(0, destH, [&](int yy) {
 			UINT32* const lineOut = (UINT32*)dest + yy * W;
 			const INT32* k = &m_kkVer[yy * m_kmaxVer];
-			const int ymin = m_xboundsVer[yy * 2 + 0];
-			const int ymax = m_xboundsVer[yy * 2 + 1];
+			const int ymin = m_boundsVer[yy * 2 + 0];
+			const int ymax = m_boundsVer[yy * 2 + 1];
 			int ss0, ss1, ss2;
 			for (int xx = 0; xx < W; xx++) {
 				ss0 = ss1 = ss2 = 1 << (PRECISION_BITS - 1);
@@ -354,13 +354,13 @@ void CResampleRGB32::FreeData()
 	free(m_pTemp);
 	m_pTemp = nullptr;
 
-	free(m_xboundsHor);
-	m_xboundsHor = nullptr;
+	free(m_boundsHor);
+	m_boundsHor = nullptr;
 	free(m_kkHor);
 	m_kkHor  = nullptr;
 
-	free(m_xboundsVer);
-	m_xboundsVer = nullptr;
+	free(m_boundsVer);
+	m_boundsVer = nullptr;
 	free(m_kkVer);
 	m_kkVer = nullptr;
 }
@@ -396,7 +396,7 @@ HRESULT CResampleRGB32::Init()
 
 	if (m_bResampleHor) {
 		double *prekk;
-		m_kmaxHor = precompute_coeffs(m_srcW, m_destW, m_pFilter, &m_xboundsHor, &prekk);
+		m_kmaxHor = precompute_coeffs(m_srcW, m_destW, m_pFilter, &m_boundsHor, &prekk);
 		if (!m_kmaxHor) {
 			FreeData();
 			return E_OUTOFMEMORY;
@@ -411,7 +411,7 @@ HRESULT CResampleRGB32::Init()
 
 	if (m_bResampleVer) {
 		double *prekk;
-		m_kmaxVer = precompute_coeffs(m_srcH, m_destH, m_pFilter, &m_xboundsVer, &prekk);
+		m_kmaxVer = precompute_coeffs(m_srcH, m_destH, m_pFilter, &m_boundsVer, &prekk);
 		if (!m_kmaxVer) {
 			FreeData();
 			return E_OUTOFMEMORY;
