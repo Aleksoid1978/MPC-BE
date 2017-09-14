@@ -434,8 +434,8 @@ void CSubtitleDlDlg::OnOK()
 		if (OpenUrl(is, CString(url), str)) {
 
 			if (pFrame->m_pDVS) {
-				WCHAR lpszTempPath[_MAX_PATH] = { 0 };
-				if (::GetTempPath(_MAX_PATH, lpszTempPath)) {
+				WCHAR lpszTempPath[MAX_PATH] = { 0 };
+				if (::GetTempPathW(MAX_PATH, lpszTempPath)) {
 					CString subFileName(lpszTempPath);
 					subFileName.Append(CString(sub.name));
 					if (::PathFileExists(subFileName)) {

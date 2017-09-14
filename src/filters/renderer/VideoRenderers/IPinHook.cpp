@@ -783,7 +783,7 @@ public :
 
 #if LOG_MATRIX
 			if (pExecuteParams->pCompressedBuffers[i].CompressedBufferType == DXVA2_InverseQuantizationMatrixBufferType) {
-				char strFile[_MAX_PATH];
+				char strFile[MAX_PATH];
 				static int nNb = 1;
 				sprintf_s(strFile, "Matrix%d.bin", nNb++);
 				FILE* hFile = fopen(strFile, "wb");
@@ -801,7 +801,7 @@ public :
 				LogDXVA_Bitstream(m_ppBuffer[pExecuteParams->pCompressedBuffers[i].CompressedBufferType], pExecuteParams->pCompressedBuffers[i].DataSize);
 
 #if LOG_BITSTREAM
-				char strFile[_MAX_PATH];
+				char strFile[MAX_PATH];
 				static int nNb = 1;
 				sprintf_s(strFile, "BitStream%d.bin", nNb++);
 				FILE* hFile = fopen(strFile, "wb");

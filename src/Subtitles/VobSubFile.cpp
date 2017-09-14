@@ -791,7 +791,7 @@ bool CVobSubFile::ReadRar(CString fn)
 	struct RAROpenArchiveDataEx ArchiveDataEx;
 	memset(&ArchiveDataEx, 0, sizeof(ArchiveDataEx));
 	ArchiveDataEx.ArcNameW = (LPTSTR)(LPCTSTR)fn;
-	char fnA[_MAX_PATH];
+	char fnA[MAX_PATH];
 	size_t size;
 	if (wcstombs_s(&size, fnA, fn, fn.GetLength())) {
 		fnA[0] = 0;

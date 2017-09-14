@@ -127,7 +127,7 @@ bool CPPageFormats::IsRegistered(CString ext, bool bCheckProgId/* = false*/)
 	} else {
 		// The 2000/XP/10 way
 		CRegKey key;
-		WCHAR   buff[_MAX_PATH] = { 0 };
+		WCHAR   buff[MAX_PATH] = { 0 };
 		ULONG   len = _countof(buff);
 
 		if (ERROR_SUCCESS != key.Open(HKEY_CLASSES_ROOT, ext, KEY_READ)) {
@@ -144,7 +144,7 @@ bool CPPageFormats::IsRegistered(CString ext, bool bCheckProgId/* = false*/)
 	// Check if association is for this instance of MPC
 	if (bIsDefault) {
 		CRegKey key;
-		WCHAR   buff[_MAX_PATH] = { 0 };
+		WCHAR   buff[MAX_PATH] = { 0 };
 		ULONG   len = _countof(buff);
 
 		bIsDefault = FALSE;
@@ -158,7 +158,7 @@ bool CPPageFormats::IsRegistered(CString ext, bool bCheckProgId/* = false*/)
 
 	if (bIsDefault && SysVersion::IsWin10orLater() && bCheckProgId) {
 		CRegKey key;
-		WCHAR   buff[_MAX_PATH] = { 0 };
+		WCHAR   buff[MAX_PATH] = { 0 };
 		ULONG   len = _countof(buff);
 
 		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, CString(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\" + ext + L"\\UserChoice"), KEY_READ)) {
@@ -569,7 +569,7 @@ bool CPPageFormats::IsAutoPlayRegistered(autoplay_t ap)
 		return false;
 	}
 
-	WCHAR buff[_MAX_PATH] = { 0 };
+	WCHAR buff[MAX_PATH] = { 0 };
 	ULONG len = _countof(buff);
 
 	CString exe = GetProgramPath();
@@ -746,7 +746,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 	CString extoldreg, extOldIcon;
 	CRegKey key;
 	HRESULT hr = S_OK;
-	WCHAR   buff[_MAX_PATH] = { 0 };
+	WCHAR   buff[MAX_PATH] = { 0 };
 	ULONG   len = _countof(buff);
 
 	if (m_pAAR) {
