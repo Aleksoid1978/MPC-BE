@@ -2269,14 +2269,14 @@ void CPlayerPlaylistBar::DropItemOnList()
 	m_ptDropPoint.y += 10;
 	m_nDropIndex = m_list.HitTest(CPoint(10, m_ptDropPoint.y));
 
-	WCHAR szLabel[_MAX_PATH];
+	WCHAR szLabel[MAX_PATH];
 	LV_ITEM lvi;
 	ZeroMemory(&lvi, sizeof(LV_ITEM));
 	lvi.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_STATE | LVIF_PARAM;
 	lvi.stateMask = LVIS_DROPHILITED | LVIS_FOCUSED | LVIS_SELECTED;
 	lvi.pszText = szLabel;
 	lvi.iItem = m_nDragIndex;
-	lvi.cchTextMax = _MAX_PATH;
+	lvi.cchTextMax = MAX_PATH;
 	m_list.GetItem(&lvi);
 
 	if (m_nDropIndex < 0) {
@@ -2294,7 +2294,7 @@ void CPlayerPlaylistBar::DropItemOnList()
 		m_nDragIndex++;
 	}
 	for (int col=1; col < nColumnCount; col++) {
-		wcscpy_s(lvi.pszText, _MAX_PATH, (LPCTSTR)(m_list.GetItemText(m_nDragIndex, col)));
+		wcscpy_s(lvi.pszText, MAX_PATH, (LPCTSTR)(m_list.GetItemText(m_nDragIndex, col)));
 		lvi.iSubItem = col;
 		m_list.SetItem(&lvi);
 	}

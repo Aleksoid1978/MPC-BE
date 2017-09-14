@@ -5146,7 +5146,7 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 			GetCDROMType(s.slFiles.GetHead()[0], sl);
 		} else {
 			CString dir;
-			dir.ReleaseBufferSetLength(GetCurrentDirectory(_MAX_PATH, dir.GetBuffer(_MAX_PATH)));
+			dir.ReleaseBufferSetLength(GetCurrentDirectoryW(MAX_PATH, dir.GetBuffer(MAX_PATH)));
 
 			GetCDROMType(dir[0], sl);
 			for (WCHAR drive = 'C'; sl.IsEmpty() && drive <= 'Z'; drive++) {

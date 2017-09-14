@@ -340,9 +340,9 @@ LRESULT CALLBACK COpenFileDlg::WindowProcNew(HWND hwnd, UINT message, WPARAM wPa
 	if (message ==  WM_COMMAND && HIWORD(wParam) == BN_CLICKED && LOWORD(wParam) == IDOK
 			&& m_fAllowDirSelection) {
 		CAutoVectorPtr<WCHAR> path;
-		path.Allocate(_MAX_PATH+1);
+		path.Allocate(MAX_PATH+1);
 
-		if (::GetDlgItemText(hwnd, cmb13, (WCHAR*)path, _MAX_PATH) == 0) {
+		if (::GetDlgItemText(hwnd, cmb13, (WCHAR*)path, MAX_PATH) == 0) {
 			::SendMessage(hwnd, CDM_SETCONTROLTEXT, edt1, (LPARAM)__DUMMY__);
 		}
 	}
@@ -395,7 +395,7 @@ BOOL COpenFileDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 
 BOOL COpenFileDlg::OnIncludeItem(OFNOTIFYEX* pOFNEx, LRESULT* pResult)
 {
-	WCHAR buff[_MAX_PATH];
+	WCHAR buff[MAX_PATH];
 
 	if (!SHGetPathFromIDList((PCIDLIST_ABSOLUTE)pOFNEx->pidl, buff)) {
 		STRRET s;

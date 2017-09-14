@@ -2916,7 +2916,7 @@ bool CSimpleTextSubtitle::Open(BYTE* data, int len, int CharSet, CString name)
 		return false;
 	}
 
-	TCHAR fn[_MAX_PATH];
+	TCHAR fn[MAX_PATH];
 	if (!GetTempFileName(path, _T("vs"), 0, fn)) {
 		return false;
 	}

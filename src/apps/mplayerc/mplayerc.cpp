@@ -785,7 +785,7 @@ bool CMPlayerCApp::GetAppSavePath(CString& path)
 	if (IsIniValid()) { // If settings ini file found, store stuff in the same folder as the exe file
 		path = GetProgramDir();
 	} else {
-		HRESULT hr = SHGetFolderPathW(nullptr, CSIDL_APPDATA, nullptr, 0, path.GetBuffer(_MAX_PATH));
+		HRESULT hr = SHGetFolderPathW(nullptr, CSIDL_APPDATA, nullptr, 0, path.GetBuffer(MAX_PATH));
 		path.ReleaseBuffer();
 		if (FAILED(hr)) {
 			return false;
@@ -1223,18 +1223,18 @@ HANDLE WINAPI Mine_CreateFileA(LPCSTR p1, DWORD p2, DWORD p3, LPSECURITY_ATTRIBU
 
 BOOL CreateFakeVideoTS(LPCWSTR strIFOPath, LPWSTR strFakeFile, size_t nFakeFileSize)
 {
-	BOOL		bRet = FALSE;
-	WCHAR		szTempPath[_MAX_PATH];
-	WCHAR		strFileName[_MAX_PATH];
-	WCHAR		strExt[_MAX_EXT];
-	CIfo		Ifo;
+	BOOL	bRet = FALSE;
+	WCHAR	szTempPath[MAX_PATH];
+	WCHAR	strFileName[_MAX_FNAME];
+	WCHAR	strExt[_MAX_EXT];
+	CIfo	Ifo;
 
-	if (!GetTempPathW(_MAX_PATH, szTempPath)) {
+	if (!GetTempPathW(MAX_PATH, szTempPath)) {
 		return FALSE;
 	}
 
-	_wsplitpath_s (strIFOPath, nullptr, 0, nullptr, 0, strFileName, _countof(strFileName), strExt, _countof(strExt));
-	_snwprintf_s  (strFakeFile, nFakeFileSize, _TRUNCATE, L"%sMPC%s%s", szTempPath, strFileName, strExt);
+	_wsplitpath_s(strIFOPath, nullptr, 0, nullptr, 0, strFileName, _countof(strFileName), strExt, _countof(strExt));
+	_snwprintf_s(strFakeFile, nFakeFileSize, _TRUNCATE, L"%sMPC%s%s", szTempPath, strFileName, strExt);
 
 	if (Ifo.OpenFile (strIFOPath) &&
 			Ifo.RemoveUOPs()  &&
@@ -1248,7 +1248,7 @@ BOOL CreateFakeVideoTS(LPCWSTR strIFOPath, LPWSTR strFakeFile, size_t nFakeFileS
 HANDLE WINAPI Mine_CreateFileW(LPCWSTR p1, DWORD p2, DWORD p3, LPSECURITY_ATTRIBUTES p4, DWORD p5, DWORD p6, HANDLE p7)
 {
 	HANDLE	hFile = INVALID_HANDLE_VALUE;
-	WCHAR	strFakeFile[_MAX_PATH];
+	WCHAR	strFakeFile[MAX_PATH];
 	int		nLen  = wcslen(p1);
 
 	p3 |= FILE_SHARE_WRITE;
@@ -1569,7 +1569,7 @@ BOOL CMPlayerCApp::InitInstance()
 	if (!::PathFileExistsW(shaderpath)) {
 		// restore shaders if the "Shaders" folder is missing only
 		CString shaderstorage;
-		SHGetFolderPathW(nullptr, CSIDL_COMMON_APPDATA, nullptr, 0, shaderstorage.GetBuffer(_MAX_PATH));
+		SHGetFolderPathW(nullptr, CSIDL_COMMON_APPDATA, nullptr, 0, shaderstorage.GetBuffer(MAX_PATH));
 		shaderstorage.ReleaseBuffer();
 		shaderstorage.Append(L"\\MPC-BE\\Shaders");
 

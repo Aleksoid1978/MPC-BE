@@ -51,7 +51,7 @@ CString GetFolderOnly(LPCTSTR Path)
 CString AddSlash(LPCTSTR Path)
 {
 	CString cs = Path;
-	::PathAddBackslash(cs.GetBuffer(_MAX_PATH));
+	::PathAddBackslash(cs.GetBuffer(MAX_PATH));
 	cs.ReleaseBuffer(-1);
 	if(cs.IsEmpty()) {
 		cs = _T("\\");
@@ -65,7 +65,7 @@ CString AddSlash(LPCTSTR Path)
 CString RemoveSlash(LPCTSTR Path)
 {
 	CString cs = Path;
-	::PathRemoveBackslash(cs.GetBuffer(_MAX_PATH));
+	::PathRemoveBackslash(cs.GetBuffer(MAX_PATH));
 	cs.ReleaseBuffer(-1);
 	return cs;
 }
@@ -86,7 +86,7 @@ CString GetFileExt(LPCTSTR Path)
 CString RenameFileExt(LPCTSTR Path, LPCTSTR Ext)
 {
 	CString cs = Path;
-	::PathRenameExtension(cs.GetBuffer(_MAX_PATH), Ext);
+	::PathRenameExtension(cs.GetBuffer(MAX_PATH), Ext);
 	return cs;
 }
 
@@ -95,12 +95,12 @@ CString RenameFileExt(LPCTSTR Path, LPCTSTR Ext)
 //
 BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName)
 {
-	TCHAR lpszTempPath[_MAX_PATH] = { 0 };
-	if (!GetTempPath(_MAX_PATH, lpszTempPath)) {
+	TCHAR lpszTempPath[MAX_PATH] = { 0 };
+	if (!GetTempPath(MAX_PATH, lpszTempPath)) {
 		return FALSE;
 	}
 
-	TCHAR lpszFilePath[_MAX_PATH] = { 0 };
+	TCHAR lpszFilePath[MAX_PATH] = { 0 };
 	do {
 		if (!GetTempFileName(lpszTempPath, _T("mpc"), 0, lpszFilePath)) {
 			return FALSE;
