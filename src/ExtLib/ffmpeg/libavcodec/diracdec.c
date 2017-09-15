@@ -442,7 +442,7 @@ static av_cold int dirac_decode_end(AVCodecContext *avctx)
 static inline int coeff_unpack_golomb(GetBitContext *gb, int qfactor, int qoffset)
 {
     int coeff = dirac_get_se_golomb(gb);
-    const int sign = FFSIGN(coeff);
+    const unsigned sign = FFSIGN(coeff);
     if (coeff)
         coeff = sign*((sign * coeff * qfactor + qoffset) >> 2);
     return coeff;
@@ -586,7 +586,7 @@ static inline void codeblock(DiracContext *s, SubBand *b,
     } \
 
 INTRA_DC_PRED(8, int16_t)
-INTRA_DC_PRED(10, int32_t)
+INTRA_DC_PRED(10, uint32_t)
 
 /**
  * Dirac Specification ->
@@ -1161,6 +1161,10 @@ static int dirac_unpack_prediction_parameters(DiracContext *s)
                 s->globalmc[ref].perspective[0]  = dirac_get_se_golomb(gb);
                 s->globalmc[ref].perspective[1]  = dirac_get_se_golomb(gb);
             }
+            if (s->globalmc[ref].perspective_exp + (uint64_t)s->globalmc[ref].zrs_exp > 30) {
+                return AVERROR_INVALIDDATA;
+            }
+
         }
     }
 
@@ -1417,7 +1421,7 @@ static void decode_block_params(DiracContext *s, DiracArith arith[8], DiracBlock
     if (!block->ref) {
         pred_block_dc(block, stride, x, y);
         for (i = 0; i < 3; i++)
-            block->u.dc[i] += dirac_get_arith_int(arith+1+i, CTX_DC_F1, CTX_DC_DATA);
+            block->u.dc[i] += (unsigned)dirac_get_arith_int(arith+1+i, CTX_DC_F1, CTX_DC_DATA);
         return;
     }
 

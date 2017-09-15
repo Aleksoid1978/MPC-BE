@@ -32,9 +32,6 @@ The following files are available only in MPC-BE (compared with ffmpeg):
 
 * config.c
 
-* compat/windows/dxva_hevc.h
-* compat/windows/dxva_vpx.h
-
 * libavcodec/x86/hevc_idct_intrinsic.c
 * libavcodec/x86/hevc_intra_intrinsic.c
 * libavcodec/x86/hevcpred.h

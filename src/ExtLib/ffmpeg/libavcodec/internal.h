@@ -64,6 +64,10 @@
  * dimensions to coded rather than display values.
  */
 #define FF_CODEC_CAP_EXPORTS_CROPPING       (1 << 4)
+/**
+ * Codec initializes slice-based threading with a main function
+ */
+#define FF_CODEC_CAP_SLICE_THREAD_HAS_MF    (1 << 5)
 
 #ifdef TRACE
 #   define ff_tlog(ctx, ...) av_log(ctx, AV_LOG_TRACE, __VA_ARGS__)
@@ -74,6 +78,13 @@
 
 #if !FF_API_QUANT_BIAS
 #define FF_DEFAULT_QUANT_BIAS 999999
+#endif
+
+#if !FF_API_QSCALE_TYPE
+#define FF_QSCALE_TYPE_MPEG1 0
+#define FF_QSCALE_TYPE_MPEG2 1
+#define FF_QSCALE_TYPE_H264  2
+#define FF_QSCALE_TYPE_VP56  3
 #endif
 
 #define FF_SANE_NB_CHANNELS 64U
