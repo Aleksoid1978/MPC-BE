@@ -329,6 +329,18 @@ enum AVPixelFormat {
     AV_PIX_FMT_GRAY9BE,   ///<        Y        , 9bpp, big-endian
     AV_PIX_FMT_GRAY9LE,   ///<        Y        , 9bpp, little-endian
 
+    AV_PIX_FMT_GBRPF32BE,  ///< IEEE-754 single precision planar GBR 4:4:4,     96bpp, big-endian
+    AV_PIX_FMT_GBRPF32LE,  ///< IEEE-754 single precision planar GBR 4:4:4,     96bpp, little-endian
+    AV_PIX_FMT_GBRAPF32BE, ///< IEEE-754 single precision planar GBRA 4:4:4:4, 128bpp, big-endian
+    AV_PIX_FMT_GBRAPF32LE, ///< IEEE-754 single precision planar GBRA 4:4:4:4, 128bpp, little-endian
+
+    /**
+     * DRM-managed buffers exposed through PRIME buffer sharing.
+     *
+     * data[0] points to an AVDRMFrameDescriptor.
+     */
+    AV_PIX_FMT_DRM_PRIME,
+
     AV_PIX_FMT_NB         ///< number of pixel formats, DO NOT USE THIS if you want to link with shared libav* because the number of formats might differ between versions
 };
 
@@ -393,6 +405,8 @@ enum AVPixelFormat {
 #define AV_PIX_FMT_BAYER_GBRG16 AV_PIX_FMT_NE(BAYER_GBRG16BE,    BAYER_GBRG16LE)
 #define AV_PIX_FMT_BAYER_GRBG16 AV_PIX_FMT_NE(BAYER_GRBG16BE,    BAYER_GRBG16LE)
 
+#define AV_PIX_FMT_GBRPF32    AV_PIX_FMT_NE(GBRPF32BE,  GBRPF32LE)
+#define AV_PIX_FMT_GBRAPF32   AV_PIX_FMT_NE(GBRAPF32BE, GBRAPF32LE)
 
 #define AV_PIX_FMT_YUVA420P9  AV_PIX_FMT_NE(YUVA420P9BE , YUVA420P9LE)
 #define AV_PIX_FMT_YUVA422P9  AV_PIX_FMT_NE(YUVA422P9BE , YUVA422P9LE)
@@ -412,7 +426,7 @@ enum AVPixelFormat {
 
 /**
   * Chromaticity coordinates of the source primaries.
-  * These values match the ones defined by ISO/IEC 23001-8_2013 ง 7.1.
+  * These values match the ones defined by ISO/IEC 23001-8_2013 ยง 7.1.
   */
 enum AVColorPrimaries {
     AVCOL_PRI_RESERVED0   = 0,
@@ -436,7 +450,7 @@ enum AVColorPrimaries {
 
 /**
  * Color Transfer Characteristic.
- * These values match the ones defined by ISO/IEC 23001-8_2013 ง 7.2.
+ * These values match the ones defined by ISO/IEC 23001-8_2013 ยง 7.2.
  */
 enum AVColorTransferCharacteristic {
     AVCOL_TRC_RESERVED0    = 0,
@@ -465,7 +479,7 @@ enum AVColorTransferCharacteristic {
 
 /**
  * YUV colorspace type.
- * These values match the ones defined by ISO/IEC 23001-8_2013 ง 7.3.
+ * These values match the ones defined by ISO/IEC 23001-8_2013 ยง 7.3.
  */
 enum AVColorSpace {
     AVCOL_SPC_RGB         = 0,  ///< order of coefficients is actually GBR, also IEC 61966-2-1 (sRGB)

@@ -545,6 +545,7 @@ SRCS_LC_B = \
 	libavcodec/x86/mpegvideo.c \
 	libavcodec/x86/mpegvideodsp.c \
 	libavcodec/x86/mpegvideoencdsp_init.c \
+	libavcodec/x86/opus_dsp_init.c \
 	libavcodec/x86/pixblockdsp_init.c \
 	libavcodec/x86/pngdsp_init.c \
 	libavcodec/x86/proresdsp_init.c \

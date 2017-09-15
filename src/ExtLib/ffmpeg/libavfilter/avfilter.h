@@ -195,6 +195,21 @@ typedef struct AVFilter {
      */
 
     /**
+     * Filter pre-initialization function
+     *
+     * This callback will be called immediately after the filter context is
+     * allocated, to allow allocating and initing sub-objects.
+     *
+     * If this callback is not NULL, the uninit callback will be called on
+     * allocation failure.
+     *
+     * @return 0 on success,
+     *         AVERROR code on failure (but the code will be
+     *           dropped and treated as ENOMEM by the calling code)
+     */
+    int (*preinit)(AVFilterContext *ctx);
+
+    /**
      * Filter initialization function.
      *
      * This callback will be called only once during the filter lifetime, after
@@ -267,6 +282,8 @@ typedef struct AVFilter {
     int (*query_formats)(AVFilterContext *);
 
     int priv_size;      ///< size of private data to allocate for the filter
+
+    int flags_internal; ///< Additional flags for avfilter internal use only.
 
     /**
      * Used by the filter registration system. Must not be touched by any other
@@ -841,7 +858,9 @@ typedef struct AVFilterGraph {
     unsigned nb_filters;
 
     char *scale_sws_opts; ///< sws options to use for the auto-inserted scale filters
-    char *resample_lavr_opts;   ///< libavresample options to use for the auto-inserted resample filters
+#if FF_API_LAVR_OPTS
+    attribute_deprecated char *resample_lavr_opts;   ///< libavresample options to use for the auto-inserted resample filters
+#endif
 
     /**
      * Type of multithreading allowed for filters in this graph. A combination
