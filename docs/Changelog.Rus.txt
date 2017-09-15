@@ -178,7 +178,7 @@ YouTube
 	MediaInfo git-v0.7.98-2-g3436139b;
 	openjpeg git-v2.2.0-102-g28094e1e;
 	Speex-1.2.0-1-gcae5026;
-	rapidjson git-v1.1.0-199-g6a8f672c;
+	rapidjson git-v1.1.0-242-g4c0f0036;
 	ZenLib git-v0.4.36;
 	zlib 1.2.11.
 
