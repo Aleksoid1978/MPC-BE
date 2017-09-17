@@ -81,6 +81,7 @@ using namespace MediaInfoLib;
 
 class CFullscreenWnd;
 struct ID3DFullscreenControl;
+struct TunerScanData;
 
 enum PMODE {
 	PM_NONE,
@@ -128,16 +129,6 @@ public:
 	int vinput = -1;
 	int vchannel = -1;
 	int ainput = -1;
-};
-
-class TunerScanData
-{
-public :
-	ULONG	FrequencyStart;
-	ULONG	FrequencyStop;
-	ULONG	Bandwidth;
-	LONG	Offset;
-	HWND	Hwnd;
 };
 
 class CMainFrame;
