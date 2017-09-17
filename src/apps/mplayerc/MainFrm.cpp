@@ -5681,6 +5681,33 @@ HRESULT GetVideoDisplayControlFrame(IMFVideoDisplayControl* pVideoDisplayControl
 	return hr;
 }
 
+HRESULT GetMadVRFrameGrabberFrame(IMadVRFrameGrabber* pMadVRFrameGrabber, std::vector<BYTE>& dib, bool displayed)
+{
+	LPVOID dibImage = nullptr;
+	HRESULT hr;
+
+	if (displayed) {
+		hr = pMadVRFrameGrabber->GrabFrame(ZOOM_PLAYBACK_SIZE, 0, 0, 0, 0, 0, &dibImage, 0);
+	} else {
+		hr = pMadVRFrameGrabber->GrabFrame(ZOOM_ENCODED_SIZE, 0, 0, 0, 0, 0, &dibImage, 0);
+	}
+
+	if (S_OK != hr) {
+		return hr;
+	}
+	if (!dibImage) {
+		return E_ABORT;
+	}
+
+	const BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)dibImage;
+
+	dib.resize(sizeof(BITMAPINFOHEADER) + bih->biSizeImage);
+	memcpy(dib.data(), dibImage, sizeof(BITMAPINFOHEADER) + bih->biSizeImage);
+	LocalFree(dibImage);
+
+	return hr;
+}
+
 HRESULT CMainFrame::GetDisplayedImage(std::vector<BYTE>& dib, CString& errmsg)
 {
 	errmsg.Empty();
@@ -5688,6 +5715,8 @@ HRESULT CMainFrame::GetDisplayedImage(std::vector<BYTE>& dib, CString& errmsg)
 
 	if (m_pMFVDC) {
 		hr = GetVideoDisplayControlFrame(m_pMFVDC, dib);
+	} else if (m_pMVRFG) {
+		hr = GetMadVRFrameGrabberFrame(m_pMVRFG, dib, true);
 	} else {
 		hr = E_NOINTERFACE;
 	}
@@ -5745,6 +5774,23 @@ HRESULT CMainFrame::GetCurrentFrame(std::vector<BYTE>& dib, CString& errmsg)
 
 	if (fs == State_Running && GetMediaState() != State_Running) {
 		m_pMC->Run();
+	}
+
+	return hr;
+}
+
+HRESULT CMainFrame::GetOriginalFrame(std::vector<BYTE>& dib, CString& errmsg)
+{
+	HRESULT hr = S_OK;
+	errmsg.Empty();
+
+	if (m_pMVRFG) {
+		hr = GetMadVRFrameGrabberFrame(m_pMVRFG, dib, false);
+		if (FAILED(hr)) {
+			errmsg.Format(L"IMadVRFrameGrabber::GrabFrame() failed, 0x%08x", hr);
+		}
+	} else {
+		hr = GetCurrentFrame(dib, errmsg);
 	}
 
 	return hr;
@@ -6055,7 +6101,7 @@ void CMainFrame::OnAutoSaveImage()
 void CMainFrame::OnAutoSaveDisplay()
 {
 	// Check if a compatible renderer is being used
-	if (!m_pMFVDC) {
+	if (!m_pMFVDC && !m_pMVRFG) {
 		return;
 	}
 
@@ -13684,15 +13730,16 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			BREAK(aborted)
 		}
 
-		m_pCAP	= nullptr;
+		m_pCAP = nullptr;
 
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pCAP), TRUE);
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRWC), FALSE); // might have IVMRMixerBitmap9, but not IVMRWindowlessControl9
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRMC9), TRUE);
 		m_pMVRSR = m_pCAP;
-		m_pMVRS = m_pCAP;
-		m_pMVRC = m_pCAP;
-		m_pMVRI = m_pCAP;
+		m_pMVRS  = m_pCAP;
+		m_pMVRC  = m_pCAP;
+		m_pMVRI  = m_pCAP;
+		m_pMVRFG = m_pCAP;
 
 		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMB), TRUE);
 		m_pMVTO = m_pCAP;
@@ -13909,6 +13956,7 @@ void CMainFrame::CloseMediaPrivate()
 	m_pMVRS.Release();
 	m_pMVRC.Release();
 	m_pMVRI.Release();
+	m_pMVRFG.Release();
 	m_pCAP.Release();
 	m_pVMRWC.Release();
 	m_pVMRMC9.Release();
