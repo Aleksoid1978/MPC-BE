@@ -23,6 +23,15 @@
 #include <afxcmn.h>
 #include <afxwin.h>
 
+struct TunerScanData
+{
+	ULONG	FrequencyStart;
+	ULONG	FrequencyStop;
+	ULONG	Bandwidth;
+	LONG	Offset;
+	HWND	Hwnd;
+};
+
 // CTunerScanDlg dialog
 
 class CTunerScanDlg : public CDialog
