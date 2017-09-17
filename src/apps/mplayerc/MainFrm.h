@@ -273,7 +273,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CComPtr<IMadVRSettings> m_pMVRS;
 	CComPtr<IMadVRCommand> m_pMVRC;
 	CComPtr<IMadVRInfo> m_pMVRI;
-;
+	CComPtr<IMadVRFrameGrabber> m_pMVRFG;
 
 	CComQIPtr<IBaseFilter>			m_pMainSourceFilter;
 	CComQIPtr<IBaseFilter>			m_pSwitcherFilter;
@@ -415,6 +415,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	HRESULT GetDisplayedImage(std::vector<BYTE>& dib, CString& errmsg);
 	HRESULT GetCurrentFrame(std::vector<BYTE>& dib, CString& errmsg);
+	HRESULT GetOriginalFrame(std::vector<BYTE>& dib, CString& errmsg);
 	HRESULT RenderCurrentSubtitles(BYTE* pData);
 	void SaveDIB(LPCWSTR fn, BYTE* pData, long size);
 	BOOL IsRendererCompatibleWithSaveImage();

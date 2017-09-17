@@ -200,7 +200,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 
 		std::vector<BYTE> dib;
 		CString errmsg;
-		if (S_OK != m_pMainFrm->GetCurrentFrame(dib, errmsg)) {
+		if (S_OK != m_pMainFrm->GetOriginalFrame(dib, errmsg)) {
 			m_iProgress = PROGRESS_E_FAIL;
 			return;
 		}
