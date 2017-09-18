@@ -1547,9 +1547,9 @@ void MatShaperEval16(register const cmsUInt16Number In[],
     l3 =  (p->Mat[2][0] * r + p->Mat[2][1] * g + p->Mat[2][2] * b + p->Off[2] + 0x2000) >> 14;
 
     // Now we have to clip to 0..1.0 range
-    ri = (l1 < 0) ? 0 : ((l1 > 16384) ? 16384U : l1);
-    gi = (l2 < 0) ? 0 : ((l2 > 16384) ? 16384U : l2);
-    bi = (l3 < 0) ? 0 : ((l3 > 16384) ? 16384U : l3);
+    ri = (l1 < 0) ? 0 : ((l1 > 16384) ? 16384U : (cmsUInt32Number) l1);
+    gi = (l2 < 0) ? 0 : ((l2 > 16384) ? 16384U : (cmsUInt32Number) l2);
+    bi = (l3 < 0) ? 0 : ((l3 > 16384) ? 16384U : (cmsUInt32Number) l3);
 
     // And across second shaper,
     Out[0] = p->Shaper2R[ri];

@@ -223,7 +223,7 @@ void LinLerp1D(register const cmsUInt16Number Value[],
 // To prevent out of bounds indexing
 cmsINLINE cmsFloat32Number fclamp(cmsFloat32Number v) 
 {
-    return ((v < 0.0f) || isnan(v)) ? 0.0f : (v > 1.0f ? 1.0f : v);
+    return ((v < 1.0e-9f) || isnan(v)) ? 0.0f : (v > 1.0f ? 1.0f : v);
 }
 
 // Floating-point version of 1D interpolation
@@ -472,9 +472,9 @@ void TrilinearInterpFloat(const cmsFloat32Number Input[],
     py = fclamp(Input[1]) * p->Domain[1];
     pz = fclamp(Input[2]) * p->Domain[2];
 
-    x0 = (int) _cmsQuickFloor(px); fx = px - (cmsFloat32Number) x0;
-    y0 = (int) _cmsQuickFloor(py); fy = py - (cmsFloat32Number) y0;
-    z0 = (int) _cmsQuickFloor(pz); fz = pz - (cmsFloat32Number) z0;
+    x0 = (int) floor(px); fx = px - (cmsFloat32Number) x0;  // We need full floor funcionality here
+    y0 = (int) floor(py); fy = py - (cmsFloat32Number) y0;
+    z0 = (int) floor(pz); fz = pz - (cmsFloat32Number) z0;
 
     X0 = p -> opta[2] * x0;
     X1 = X0 + (fclamp(Input[0]) >= 1.0 ? 0 : p->opta[2]);
@@ -616,9 +616,9 @@ void TetrahedralInterpFloat(const cmsFloat32Number Input[],
     py = fclamp(Input[1]) * p->Domain[1];
     pz = fclamp(Input[2]) * p->Domain[2];
 
-    x0 = (int) _cmsQuickFloor(px); rx = (px - (cmsFloat32Number) x0);
-    y0 = (int) _cmsQuickFloor(py); ry = (py - (cmsFloat32Number) y0);
-    z0 = (int) _cmsQuickFloor(pz); rz = (pz - (cmsFloat32Number) z0);
+    x0 = (int) floor(px); rx = (px - (cmsFloat32Number) x0);  // We need full floor functionality here
+    y0 = (int) floor(py); ry = (py - (cmsFloat32Number) y0);
+    z0 = (int) floor(pz); rz = (pz - (cmsFloat32Number) z0);
 
 
     X0 = p -> opta[2] * x0;
