@@ -2824,7 +2824,7 @@ bool CMainFrame::GraphEventComplete()
 			FilePosition->llPosition = 0;
 			FilePosition->nAudioTrack = -1;
 			FilePosition->nSubtitleTrack = -1;
-			
+
 			s.SaveCurrentFilePosition();
 		}
 	}

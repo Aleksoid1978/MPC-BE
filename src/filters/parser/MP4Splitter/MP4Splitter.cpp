@@ -1255,7 +1255,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										BYTE *extra = (BYTE*)(vih2 + 1);
 										memcpy(extra, "vpcC", 4);
 										memcpy(extra + 4, di->GetData(), di->GetDataSize());
-										
+
 										mts.RemoveAll();
 
 										mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = fourcc);

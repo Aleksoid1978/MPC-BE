@@ -497,7 +497,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, stream_codec codec, __
 										if (trhdr_2.payload && trhdr_2.pid == TrackNum) {
 											packet_pos = GetPos();
 											peshdr peshdr_2;
-											if (trhdr_2.payloadstart && 
+											if (trhdr_2.payloadstart &&
 													(!NextMpegStartCode(b, 4) || !ReadPES(peshdr_2, b))) {
 												Seek(trhdr_2.next);
 												continue;

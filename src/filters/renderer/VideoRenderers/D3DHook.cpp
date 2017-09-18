@@ -127,7 +127,7 @@ namespace D3DHook {
 		if (SUCCEEDED(hr) && !pOrigCreateDevice
 				&& pOpenData && pOpenData->pAdapterFuncs && pOpenData->pAdapterFuncs->pfnCreateDevice) {
 			pOrigCreateDevice = pOpenData->pAdapterFuncs->pfnCreateDevice;
-		
+
 			HookFunc((PVOID&)pOrigCreateDevice, &pNewCreateDevice);
 		}
 
@@ -183,7 +183,7 @@ namespace D3DHook {
 							regkey.Close();
 						}
 					}
-				
+
 					break;
 				}
 
@@ -228,7 +228,7 @@ namespace D3DHook {
 			if (pOrigCreateDevice) {
 				DetourDetach(&(PVOID&)pOrigCreateDevice, &pNewCreateDevice);
 			}
-			
+
 			DetourDetach(&(PVOID&)pOrigOpenAdapter, pNewOpenAdapter);
 			DetourTransactionCommit();
 
