@@ -101,7 +101,7 @@ typedef struct {
 
     } ISOTEMPERATURE;
 
-static ISOTEMPERATURE isotempdata[] = {
+static const ISOTEMPERATURE isotempdata[] = {
 //  {Mirek, Ut,       Vt,      Tt      }
     {0,     0.18006,  0.26352,  -0.24341},
     {10,    0.18066,  0.26589,  -0.25479},
