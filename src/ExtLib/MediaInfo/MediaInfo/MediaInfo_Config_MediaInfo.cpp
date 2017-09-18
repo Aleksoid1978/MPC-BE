@@ -2512,7 +2512,9 @@ void MediaInfo_Config_MediaInfo::Event_Send (File__Analyze* Source, const int8u*
                 for (size_t Pos=0; Pos<Events_TimestampShift_Delayed.size(); Pos++)
                     if (Events_TimestampShift_Delayed[Pos])
                     {
+                        CS.Leave();
                         Event_Send(NULL, Events_TimestampShift_Delayed[Pos]->Data_Content, Events_TimestampShift_Delayed[Pos]->Data_Size, Events_TimestampShift_Delayed[Pos]->File_Name);
+                        CS.Enter();
 
                         int32u EventCode=*((int32u*)Events_TimestampShift_Delayed[Pos]->Data_Content);
                         bool IsSimpleText=(EventCode&0x00FFFF00)==(MediaInfo_Event_Global_SimpleText<<8);

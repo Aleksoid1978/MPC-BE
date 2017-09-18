@@ -119,6 +119,16 @@ Ztring MediaInfo_Internal::Inform()
             return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_8, Export_EbuCore::AcquisitionDataOutputMode_parameterSegment);
         if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.8_segmentParameter") || MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.8_sp"))
             return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_8, Export_EbuCore::AcquisitionDataOutputMode_segmentParameter);
+        if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.5_JSON"))
+            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_5, Export_EbuCore::AcquisitionDataOutputMode_Default, Export_EbuCore::Format_JSON);
+        if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.6_JSON"))
+            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_6, Export_EbuCore::AcquisitionDataOutputMode_Default, Export_EbuCore::Format_JSON);
+        if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.8_JSON"))
+            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_8, (Export_EbuCore::acquisitiondataoutputmode)MediaInfoLib::Config.AcquisitionDataOutputMode_Get(), Export_EbuCore::Format_JSON);
+        if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.8_parameterSegment_JSON") || MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.8_ps_JSON"))
+            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_8, Export_EbuCore::AcquisitionDataOutputMode_parameterSegment, Export_EbuCore::Format_JSON);
+        if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.8_segmentParameter_JSON") || MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.8_sp_JSON"))
+            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_8, Export_EbuCore::AcquisitionDataOutputMode_segmentParameter, Export_EbuCore::Format_JSON);
         if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore"))
             return Export_EbuCore().Transform(*this);
     #endif //defined(MEDIAINFO_EBUCORE_YES)
@@ -437,13 +447,16 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
             #if defined(MEDIAINFO_XML_YES)
             if (XML_0_7_78)
             {
+                Ztring Options=Get((stream_t)StreamKind, StreamPos, Champ_Pos, Info_Options);
                 if (Champ_Pos>=Stream[StreamKind][StreamPos].size())
-                    Shouldshow=true;
+                {
+                    if (InfoOption_ShowInXml>=Options.size() || Options[InfoOption_ShowInXml]==__T('Y'))
+                        Shouldshow=true;
+                }
                 else
                 {
-                Ztring Options=Get((stream_t)StreamKind, StreamPos, Champ_Pos, Info_Options);
-                if (InfoOption_ShowInXml<Options.size() && Options[InfoOption_ShowInXml]==__T('Y'))
-                    Shouldshow=true;
+                    if (InfoOption_ShowInXml<Options.size() && Options[InfoOption_ShowInXml]==__T('Y'))
+                        Shouldshow=true;
                 }
             }
             else

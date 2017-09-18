@@ -329,6 +329,7 @@ void File_Aac::sbr_extension_data(size_t End, int8u id_aac, bool crc_flag)
                 Infos["Format_Profile"]+=__T(" / LC");
                 Infos["SamplingRate"]+=__T(" / ")+SamplingRate;
             }
+            Infos["Format_Settings"]=__T("Implicit");
             Infos["Format_Settings_SBR"]=__T("Yes (Implicit)");
             Infos["Codec"]=Ztring().From_Local(Aac_audioObjectType(audioObjectType))+__T("-SBR");
 

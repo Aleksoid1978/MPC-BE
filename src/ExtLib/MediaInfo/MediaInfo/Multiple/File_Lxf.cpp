@@ -217,6 +217,9 @@ void File_Lxf::Streams_Fill()
 //---------------------------------------------------------------------------
 void File_Lxf::Streams_Fill_PerStream(File__Analyze* Parser, stream_t Container_StreamKind, size_t Parser_Pos, int8u Format)
 {
+    if (Format!=(int8u)-1)
+        Fill(Container_StreamKind, Container_StreamKind==Stream_Video?0:Parser_Pos, Fill_Parameter(Container_StreamKind, Generic_CodecID), Format);
+
     if (Parser==NULL)
         return;
 
@@ -264,8 +267,6 @@ void File_Lxf::Streams_Fill_PerStream(File__Analyze* Parser, stream_t Container_
                     }
         #endif //MEDIAINFO_DEMUX
     }
-    if (Format!=(int8u)-1)
-        Fill(Container_StreamKind, Container_StreamKind==Stream_Video?0:Parser_Pos, Fill_Parameter(Container_StreamKind, Generic_CodecID), Format);
     if (Container_StreamKind==Stream_Video)
         for (size_t Pos=Count_Get(Stream_Audio)-Parser->Count_Get(Stream_Audio); Pos<Count_Get(Stream_Audio); Pos++)
             Fill(Stream_Audio, Pos, Audio_MuxingMode, Parser->Retrieve(Stream_General, 0, General_Format));

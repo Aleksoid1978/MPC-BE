@@ -9,7 +9,6 @@
 
 #include "MediaInfo/MediaInfo_Events.h"
 #include "MediaInfo/TimeCode.h"
-#include <cstring>
 using namespace MediaInfoLib;
 
 //---------------------------------------------------------------------------

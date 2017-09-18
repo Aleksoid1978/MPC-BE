@@ -113,6 +113,8 @@ ZtringList &ZtringList::operator+= (const ZtringList &Source)
 // Operator =
 ZtringList &ZtringList::operator= (const ZtringList &Source)
 {
+    if (this == &Source)
+       return *this;
     clear();
     Ztring C=Separator[0];
     Ztring Q=Quote;

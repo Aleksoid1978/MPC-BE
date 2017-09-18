@@ -890,7 +890,7 @@ void File_Ffv1::Read_Buffer_Continue()
         while (current_slice<Slice_Max)
         {
             if (current_slice->sample_buffer)
-                SlicesPlaces[current_slice->slice_y*num_v_slices+current_slice->slice_x]++;
+                SlicesPlaces[current_slice->slice_y*num_h_slices+current_slice->slice_x]++;
 
             current_slice++;
         }
@@ -1341,7 +1341,7 @@ bool File_Ffv1::SliceHeader(states &States)
 
     int32u slice_x, slice_y, slice_width_minus1, slice_height_minus1;
     Get_RU (States, slice_x,                                "slice_x");
-    if (slice_x >= num_v_slices)
+    if (slice_x >= num_h_slices)
     {
         Param_Error("FFV1-SLICE-slice_xywh:1");
         Element_End0();

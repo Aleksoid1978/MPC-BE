@@ -661,6 +661,7 @@ extern std::string ExtensibleWave_ChannelMask2 (int32u ChannelMask);
 const char* Mpegv_colour_primaries(int8u colour_primaries);
 const char* Mpegv_transfer_characteristics(int8u transfer_characteristics);
 const char* Mpegv_matrix_coefficients(int8u matrix_coefficients);
+const char* Mpegv_matrix_coefficients_ColorSpace(int8u matrix_coefficients);
 extern const char* Avc_video_full_range[];
 
 //***************************************************************************
@@ -3510,6 +3511,7 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_MatrixCoefficients()
             return; //First element has the priority
         Stream[TrackNumber].Infos["colour_description_present"]="Yes";
         Stream[TrackNumber].Infos["matrix_coefficients"]=Mpegv_matrix_coefficients(UInteger);
+        Stream[TrackNumber].Infos["ColorSpace"]=Mpegv_matrix_coefficients_ColorSpace(UInteger);
     FILLING_END();
 }
 

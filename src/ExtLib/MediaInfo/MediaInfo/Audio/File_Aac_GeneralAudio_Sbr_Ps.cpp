@@ -49,6 +49,12 @@ void File_Aac::ps_data(size_t End)
                 Infos["ChannelPositions"]+=__T(" / ")+ChannelPositions+__T(" / ")+ChannelPositions;
                 Infos["SamplingRate"]=Ztring().From_Number((extension_sampling_frequency_index==(int8u)-1)?(Frequency_b*2):extension_sampling_frequency, 10)+__T(" / ")+SamplingRate;
             }
+            if (Infos["Format_Settings"]!=__T("Implicit"))
+            {
+                if (!Infos["Format_Settings"].empty())
+                    Infos["Format_Settings"].insert(0, __T(" / "));
+                Infos["Format_Settings"].insert(0, __T("Implicit"));
+            }
             Infos["Format_Settings_PS"]=__T("Yes (Implicit)");
             Ztring Codec=Retrieve(Stream_Audio, StreamPos_Last, Audio_Codec);
             Infos["Codec"]=Ztring().From_Local(Aac_audioObjectType(audioObjectType))+__T("-SBR-PS");

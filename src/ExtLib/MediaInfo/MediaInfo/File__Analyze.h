@@ -23,7 +23,6 @@
     #include <aescpp.h>
 #endif //MEDIAINFO_AES
 #include "MediaInfo/HashWrapper.h"
-#include <cstring>
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib

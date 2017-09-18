@@ -43,9 +43,9 @@ extern const char* Mpegv_colour_primaries(int8u colour_primaries)
         case  8 : return "Generic film";
         case  9 : return "BT.2020";                                     //Added in HEVC
         case 10 : return "XYZ";                                         //Added in HEVC 2014
-        case 11 : return "SMPTE RP 431-2";                              //Added in ISO 23001-8:201x/PDAM1
-        case 12 : return "SMPTE EG 432-1";                              //Added in ISO 23001-8:201x/PDAM1
-        case 22 : return "EBU Tech 3213";                               //Added in ISO 23001-8:201x/PDAM1
+        case 11 : return "SMPTE RP 431-2";                              //Added in HEVC 2016
+        case 12 : return "SMPTE EG 432-1";                              //Added in HEVC 2016
+        case 22 : return "EBU Tech 3213";                               //Added in HEVC 2016
         default : return "";
     }
 }
@@ -68,9 +68,9 @@ extern const char* Mpegv_transfer_characteristics(int8u transfer_characteristics
         case 13 : return "sYCC";                                        //Added in HEVC
         case 14 : return "BT.2020 non-constant";                        //Added in HEVC
         case 15 : return "BT.2020 constant";                            //Added in HEVC
-        case 16 : return "SMPTE ST 2084";                               //Added in HEVC 2015
+        case 16 : return "PQ";                                          //Added in HEVC 2015
         case 17 : return "SMPTE ST 428-1";                              //Added in HEVC 2015
-        case 18 : return "HLG";                                         //Added in ISO 23001-8:201x/PDAM1
+        case 18 : return "HLG";                                         //Added in HEVC 2016
         default : return "";
     }
 }
@@ -89,9 +89,33 @@ extern const char* Mpegv_matrix_coefficients(int8u matrix_coefficients)
         case  8 : return "YCgCo";                                       //Added in AVC
         case  9 : return "BT.2020 non-constant";                        //Added in HEVC
         case 10 : return "BT.2020 constant";                            //Added in HEVC
-        case 11 : return "Chromaticity-derived non-constant";           //Added in ISO 23001-8:201x/PDAM1
-        case 12 : return "Chromaticity-derived constant";               //Added in ISO 23001-8:201x/PDAM1
+        case 11 : return "Y'D'zD'x";                                    //Added in HEVC 2016
+        case 12 : return "Chromaticity-derived non-constant";           //Added in HEVC 2016
+        case 13 : return "Chromaticity-derived constant";               //Added in HEVC 2016
         case 14 : return "ICtCp";                                       //Added in HEVC 2016
+        default : return "";
+    }
+}
+
+//---------------------------------------------------------------------------
+extern const char* Mpegv_matrix_coefficients_ColorSpace(int8u matrix_coefficients)
+{
+    switch (matrix_coefficients)
+    {
+        case  0 :
+                  return "RGB";
+        case  1 :
+        case  4 :
+        case  5 :
+        case  6 :
+        case  7 :
+        case  8 :
+        case  9 :
+        case 10 :
+        case 11 :
+        case 12 :
+        case 14 :
+                  return "YUV";
         default : return "";
     }
 }
@@ -144,6 +168,15 @@ const char* Mpegv_Colorimetry_format[4]=
     "4:2:0",
     "4:2:2",
     "4:4:4",
+};
+
+//---------------------------------------------------------------------------
+const char* Mpegv_Colorimetry_format_Colorspace[4] =
+{
+    "",
+    "YUV",
+    "YUV",
+    "",
 };
 
 //---------------------------------------------------------------------------
@@ -1241,7 +1274,7 @@ void File_Mpegv::Streams_Fill()
     Fill(Stream_Video, 0, Video_Width, 0x1000*horizontal_size_extension+horizontal_size_value);
     Fill(Stream_Video, 0, Video_Height, 0x1000*vertical_size_extension+vertical_size_value);
     Fill(Stream_Video, 0, Video_Colorimetry, Mpegv_Colorimetry_format[chroma_format]);
-    Fill(Stream_Video, 0, Video_ColorSpace, "YUV");
+    Fill(Stream_Video, 0, Video_ColorSpace, Mpegv_Colorimetry_format_Colorspace[chroma_format]);
     Fill(Stream_Video, 0, Video_BitDepth, 8);
 
     //AspectRatio
@@ -1358,6 +1391,8 @@ void File_Mpegv::Streams_Fill()
         Fill(Stream_Video, 0, Video_colour_primaries, Mpegv_colour_primaries(colour_primaries));
         Fill(Stream_Video, 0, Video_transfer_characteristics, Mpegv_transfer_characteristics(transfer_characteristics));
         Fill(Stream_Video, 0, Video_matrix_coefficients, Mpegv_matrix_coefficients(matrix_coefficients));
+        if (matrix_coefficients!=2)
+            Fill(Stream_Video, 0, Video_ColorSpace, Mpegv_matrix_coefficients_ColorSpace(matrix_coefficients), Unlimited, true, true);
     }
 
     //Matrix
