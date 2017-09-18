@@ -348,15 +348,15 @@ public:
 	bool Read(hdmvsubhdr& h, CMediaType* pmt, LPCSTR language_code);
 	bool Read(dvbsubhdr& h, int len, CMediaType* pmt, LPCSTR language_code, bool bCheckFormat = true);
 	bool Read(teletextsubhdr& h, int len, CMediaType* pmt, LPCSTR language_code, bool bCheckFormat = true);
-	
+
 	bool Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt = nullptr);
 	bool Read(avchdr& h, int len, CMediaType* pmt = nullptr);
 	bool Read(avchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt = nullptr);
-	
+
 	bool Read(hevchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt = nullptr);
 	bool Read(hevchdr& h, int len, CMediaType* pmt = nullptr);
 	bool Read(hevchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt = nullptr);
-	
+
 	bool Read(adx_adpcm_hdr& h, int len, CMediaType* pmt = nullptr);
 	bool Read(pcm_law_hdr& h, int len, bool bAlaw, CMediaType* pmt = nullptr);
 	bool Read(opus_ts_hdr& h, int len, CAtlArray<BYTE>& extradata, CMediaType* pmt = nullptr);

@@ -1454,7 +1454,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		const __int64 pos = SeekBD(rt);
 		if (pos >= 0 && pos < (m_pFile->GetLength() - 4)) {
 			m_pFile->Seek(pos + 4);
-			
+
 			DLog(L"CMpegSplitterFilter::DemuxSeek() : BD seek - %I64d, position - %I64d", rt, m_pFile->GetPos());
 			return;
 		}

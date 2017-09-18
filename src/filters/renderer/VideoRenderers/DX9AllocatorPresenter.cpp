@@ -615,7 +615,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	GetMaxResolution(m_pD3DEx, backBufferSize);
 
 	ZeroMemory(&m_d3dpp, sizeof(m_d3dpp));
-	
+
 	if (SysVersion::IsWin81orLater()) {
 		D3DHook::Hook(m_pD3DEx->GetAdapterMonitor(m_CurrentAdapter), d3ddmEx.RefreshRate);
 	}
