@@ -1132,6 +1132,7 @@ void File_Eia608::HasChanged()
                 Event.Field=1+cc_type;
                 Event.MuxingMode=MuxingMode;
                 Event.Service=1+(TextMode?1:0)*2+(DataChannelMode?1:0);
+                Event.StreamIDs[Event.StreamIDs_Size-1]=Event.Service;
                 for (size_t Pos_Y=0; Pos_Y<Streams[StreamPos]->CC_Displayed.size(); Pos_Y++)
                 {
                     for (size_t Pos_X=0; Pos_X<Streams[StreamPos]->CC_Displayed[Pos_Y].size(); Pos_X++)

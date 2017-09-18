@@ -88,11 +88,22 @@ static const char* Hevc_chroma_format_idc(int8u chroma_format_idc)
 {
     switch (chroma_format_idc)
     {
-        case   0 : return "monochrome";
-        case   1 : return "4:2:0";
-        case   2 : return "4:2:2";
-        case   3 : return "4:4:4";
-        default  : return "Unknown";
+        case 1: return "4:2:0";
+        case 2: return "4:2:2";
+        case 3: return "4:4:4";
+        default: return "";
+    }
+}
+
+//---------------------------------------------------------------------------
+static const char* Hevc_chroma_format_idc_ColorSpace(int8u chroma_format_idc)
+{
+    switch (chroma_format_idc)
+    {
+        case 0: return "Y";
+        case 1: return "YUV";
+        case 2: return "YUV";
+        default: return "";
     }
 }
 
@@ -127,6 +138,7 @@ static const char* Hevc_slice_type(int32u slice_type)
 extern const char* Mpegv_colour_primaries(int8u colour_primaries);
 extern const char* Mpegv_transfer_characteristics(int8u transfer_characteristics);
 extern const char* Mpegv_matrix_coefficients(int8u matrix_coefficients);
+const char* Mpegv_matrix_coefficients_ColorSpace(int8u matrix_coefficients);
 
 //---------------------------------------------------------------------------
 extern const int8u Avc_PixelAspectRatio_Size;
@@ -268,7 +280,7 @@ void File_Hevc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator se
     if ((*seq_parameter_set_Item)->conf_win_top_offset || (*seq_parameter_set_Item)->conf_win_bottom_offset)
         Fill(Stream_Video, StreamPos_Last, Video_Stored_Height, (*seq_parameter_set_Item)->pic_height_in_luma_samples);
 
-    Fill(Stream_Video, 0, Video_ColorSpace, "YUV");
+    Fill(Stream_Video, 0, Video_ColorSpace, Hevc_chroma_format_idc_ColorSpace((*seq_parameter_set_Item)->chroma_format_idc));
     Fill(Stream_Video, 0, Video_Colorimetry, Hevc_chroma_format_idc((*seq_parameter_set_Item)->chroma_format_idc));
     if ((*seq_parameter_set_Item)->bit_depth_luma_minus8==(*seq_parameter_set_Item)->bit_depth_chroma_minus8)
         Fill(Stream_Video, 0, Video_BitDepth, (*seq_parameter_set_Item)->bit_depth_luma_minus8+8);
@@ -306,6 +318,8 @@ void File_Hevc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator se
                 Fill(Stream_Video, 0, Video_colour_primaries, Mpegv_colour_primaries((*seq_parameter_set_Item)->vui_parameters->colour_primaries));
                 Fill(Stream_Video, 0, Video_transfer_characteristics, Mpegv_transfer_characteristics((*seq_parameter_set_Item)->vui_parameters->transfer_characteristics));
                 Fill(Stream_Video, 0, Video_matrix_coefficients, Mpegv_matrix_coefficients((*seq_parameter_set_Item)->vui_parameters->matrix_coefficients));
+                if ((*seq_parameter_set_Item)->vui_parameters->matrix_coefficients!=2)
+                    Fill(Stream_Video, 0, Video_ColorSpace, Mpegv_matrix_coefficients_ColorSpace((*seq_parameter_set_Item)->vui_parameters->matrix_coefficients), Unlimited, true, true);
             }
         }
     }

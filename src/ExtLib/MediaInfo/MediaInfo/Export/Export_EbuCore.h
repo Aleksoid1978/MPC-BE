@@ -42,8 +42,14 @@ public :
         AcquisitionDataOutputMode_segmentParameter,
         AcquisitionDataOutputMode_Max,
     };
+    enum format
+    {
+        Format_XML,
+        Format_JSON,
+        Format_Max,
+    };
 
-    ZenLib::Ztring Transform(MediaInfo_Internal &MI, version Version=version(Version_Max-1), acquisitiondataoutputmode AcquisitionDataOutputMode=AcquisitionDataOutputMode_Default);
+    ZenLib::Ztring Transform(MediaInfo_Internal &MI, version Version=version(Version_Max-1), acquisitiondataoutputmode AcquisitionDataOutputMode=AcquisitionDataOutputMode_Default, format Format=Format_XML);
 };
 
 } //NameSpace

@@ -35,6 +35,7 @@ namespace MediaInfoLib
 const char* Mpegv_colour_primaries(int8u colour_primaries);
 const char* Mpegv_transfer_characteristics(int8u transfer_characteristics);
 const char* Mpegv_matrix_coefficients(int8u matrix_coefficients);
+const char* Mpegv_matrix_coefficients_ColorSpace(int8u matrix_coefficients);
 
 //---------------------------------------------------------------------------
 static const char* ProRes_chrominance_factor(int8u chrominance_factor)
@@ -228,9 +229,16 @@ void File_ProRes::Read_Buffer_Continue()
             Fill(Stream_Video, 0, Video_ScanType, ProRes_frame_type_ScanType(frame_type));
             Fill(Stream_Video, 0, Video_ScanOrder, ProRes_frame_type_ScanOrder(frame_type));
             Fill(Stream_Video, 0, Video_colour_description_present, "Yes");
-            Fill(Stream_Video, 0, Video_colour_primaries, Mpegv_colour_primaries(primaries));
-            Fill(Stream_Video, 0, Video_transfer_characteristics, Mpegv_transfer_characteristics(transf_func));
-            Fill(Stream_Video, 0, Video_matrix_coefficients, Mpegv_matrix_coefficients(colorMatrix));
+            if (primaries || transf_func || colorMatrix) //Some streams have all 0 when it means unknwon, instead of assigned 2 for unknown
+            {
+                Fill(Stream_Video, 0, Video_colour_primaries, Mpegv_colour_primaries(primaries));
+                Fill(Stream_Video, 0, Video_transfer_characteristics, Mpegv_transfer_characteristics(transf_func));
+                Fill(Stream_Video, 0, Video_matrix_coefficients, Mpegv_matrix_coefficients(colorMatrix));
+                if (colorMatrix!=2)
+                    Fill(Stream_Video, 0, Video_ColorSpace, Mpegv_matrix_coefficients_ColorSpace(colorMatrix), Unlimited, true, true);
+            }
+            else if (chrominance_factor==2)
+                Fill(Stream_Video, 0, Video_ColorSpace, "YUV", Unlimited, true, true); //We are sure it is YUV as there is subsampling
 
             Finish();
         }

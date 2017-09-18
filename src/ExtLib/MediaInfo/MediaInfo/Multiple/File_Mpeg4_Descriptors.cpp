@@ -144,6 +144,7 @@ static const char* Mpeg4_Descriptors_ObjectTypeIndication(int8u ID)
         case 0xD4 : return "Private - DTS";
         case 0xDD : return "Private - Ogg";
         case 0xDE : return "Private - Ogg";
+        case 0xE0 : return "Private - VobSub";
         case 0xE1 : return "Private - QCELP";
         default   : return "";
     }
@@ -529,6 +530,7 @@ void File_Mpeg4_Descriptors::Descriptor_04()
                 case 0xE1 :
                             KindOfStream=Stream_Audio; break;
                 case 0x08 :
+                case 0xE0 :
                             KindOfStream=Stream_Text; break;
                 default: ;
             }
@@ -578,6 +580,7 @@ void File_Mpeg4_Descriptors::Descriptor_04()
             case 0xD4 : Fill(Stream_Audio   , StreamPos_Last, Audio_Format, "DTS", Error, false, true); break;
             case 0xDD : Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Format), "Ogg", Error, false, true); break;
             case 0xDE : Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Format), "Ogg", Error, false, true); break;
+            case 0xE0 : Fill(Stream_Text,     StreamPos_Last, Text_Format,  "VobSub", Error, false, true); CodecID_Fill(__T("subp"), Stream_Text, StreamPos_Last, InfoCodecID_Format_Mpeg4); break;
             case 0xE1 : Fill(Stream_Audio   , StreamPos_Last, Audio_Format, "QCELP", Error, false, true); Fill(Stream_Audio, StreamPos_Last, Audio_SamplingRate, 8000, 10, true); Fill(Stream_Audio, StreamPos_Last, Audio_Channel_s_, 1, 10, true);  break;
             default: ;
         }
@@ -619,10 +622,11 @@ void File_Mpeg4_Descriptors::Descriptor_04()
             case 0xD4 : Fill(Stream_Audio   , StreamPos_Last, Audio_Codec, "DTS", Error, false, true); break;
             case 0xDD : Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Codec), "Ogg", Error, false, true); break;
             case 0xDE : Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Codec), "Ogg", Error, false, true); break;
+            case 0xE0 : Fill(Stream_Text    , StreamPos_Last, Text_Codec,  "subp", Error, false, true); break;
             case 0xE1 : Fill(Stream_Audio   , StreamPos_Last, Audio_Codec, "QCELP", Error, false, true); break;
             default: ;
         }
-        Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_CodecID), ObjectTypeId, 16, true);
+        Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_CodecID), Ztring().From_CC1(ObjectTypeId), true);
         Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Codec_CC), ObjectTypeId, 16, true);
 
         //Bitrate mode

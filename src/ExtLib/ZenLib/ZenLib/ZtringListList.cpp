@@ -131,6 +131,8 @@ ZtringListList &ZtringListList::operator+= (const ZtringListList &Source)
 // Operator =
 ZtringListList &ZtringListList::operator= (const ZtringListList &Source)
 {
+    if (this == &Source)
+        return *this;
     clear();
 
     reserve(Source.size());
@@ -288,11 +290,34 @@ void ZtringListList::Write(const Ztring &ToWrite)
     if (ToWrite.empty())
         return;
 
+    //Detecting carriage return format
+    Ztring Separator0;
+    if (Separator[0]==EOL)
+    {
+        size_t CarriageReturn_Pos=ToWrite.find_first_of(__T("\r\n"));
+        if (CarriageReturn_Pos!=string::npos)
+        {
+            if (ToWrite[CarriageReturn_Pos]==__T('\r'))
+            {
+                if (CarriageReturn_Pos+1<ToWrite.size() && ToWrite[CarriageReturn_Pos+1]==__T('\n'))
+                    Separator0=__T("\r\n");
+                else
+                    Separator0=__T("\r");
+            }
+            else
+                Separator0=__T("\n");
+        }
+        else
+            Separator0=Separator[0];
+    }
+    else
+        Separator0=Separator[0];
+
     size_t l=ToWrite.size();
     size_t i=0;
     bool q=false; //In quotes
     size_t Quote_Size=Quote.size();
-    size_t Separator0_Size=Separator[0].size();
+    size_t Separator0_Size=Separator0.size();
     size_t Separator1_Size=Separator[1].size();
     size_t x=0, y=0;
     while (i<l)
@@ -343,7 +368,7 @@ void ZtringListList::Write(const Ztring &ToWrite)
                 bool IsSeparator0=true;
                 for (size_t j=0; j<Separator0_Size; j++)
                 {
-                    if (ToWrite[i+j]!= Separator[0][j])
+                    if (ToWrite[i+j]!= Separator0[j])
                     {
                         IsSeparator0=false;
                         break;

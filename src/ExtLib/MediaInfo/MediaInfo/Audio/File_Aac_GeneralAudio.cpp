@@ -278,6 +278,7 @@ void File_Aac::program_config_element()
 
         Infos_General["Comment"]=comment_field_data;
 
+        Infos["CodecID"].From_Number(audioObjectType);
         Infos["Format"].From_Local("AAC");
         Infos["Format_Profile"].From_Local(Aac_Format_Profile(audioObjectType));
         Infos["Codec"].From_Local(Aac_audioObjectType(audioObjectType));
@@ -297,7 +298,8 @@ void File_Aac::program_config_element()
                 Infos["Format_Profile"]+=__T(" / LC");
                 Infos["SamplingRate"]+=__T(" / ")+SamplingRate;
             }
-            Infos["Format_Settings_SBR"]=__T("Yes (Implicit)");
+            Infos["Format_Settings"]==__T("NBC"); // "Not Backward Compatible"
+            Infos["Format_Settings_SBR"]=__T("Yes (NBC)"); // "Not Backward Compatible"
             Infos["Codec"]=Ztring().From_Local(Aac_audioObjectType(audioObjectType))+__T("-SBR");
         }
 
@@ -316,7 +318,13 @@ void File_Aac::program_config_element()
                 Infos["ChannelPositions"]+=__T(" / ")+ChannelPositions+__T(" / ")+ChannelPositions;
                 Infos["SamplingRate"]=Ztring().From_Number((extension_sampling_frequency_index==(int8u)-1)?(Frequency_b*2):extension_sampling_frequency, 10)+__T(" / ")+SamplingRate;
             }
-            Infos["Format_Settings_PS"]=__T("Yes (Implicit)");
+            if (Infos["Format_Settings"]!=__T("NBC"))
+            {
+                if (!Infos["Format_Settings"].empty())
+                    Infos["Format_Settings"].insert(0, __T(" / "));
+                Infos["Format_Settings"].insert(0, __T("NBC")); // "Not Backward Compatible"
+            }
+            Infos["Format_Settings_PS"]=__T("Yes (NBC)"); // "Not Backward Compatible"
             Ztring Codec=Retrieve(Stream_Audio, StreamPos_Last, Audio_Codec);
             Infos["Codec"]=Ztring().From_Local(Aac_audioObjectType(audioObjectType))+__T("-SBR-PS");
         }

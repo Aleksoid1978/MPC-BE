@@ -477,19 +477,21 @@ Thread::returnvalue Thread::Run()
 
 Thread::returnvalue Thread::RunAgain()
 {
-    //Coherency
-    CriticalSectionLocker CSL(C);
-
-    //Coherency
-    if (State!=State_New
-     && State!=State_Terminated)
     {
-        return Incoherent;
-    }
+        //Coherency
+        CriticalSectionLocker CSL(C);
 
-    //Configuring
-    if (State==State_Terminated)
-        State=State_New;
+        //Coherency
+        if (State!=State_New
+        && State!=State_Terminated)
+        {
+            return Incoherent;
+        }
+
+        //Configuring
+        if (State==State_Terminated)
+            State=State_New;
+    }
 
     return Run();
 }

@@ -408,6 +408,7 @@ private :
     void sei_message_user_data_unregistered_bluray(int32u payloadSize);
     void sei_message_recovery_point();
     void sei_message_mainconcept(int32u payloadSize);
+    void sei_alternative_transfer_characteristics();
     void access_unit_delimiter();
     void filler_data();
     void prefix_nal_unit(bool svc_extension_flag);
@@ -534,6 +535,7 @@ private :
     int32u                              Firstpic_order_cnt_lsbInBlock;
     int8u                               nal_ref_idc;
     int8u                               FrameRate_Divider;
+    int8u                               preferred_transfer_characteristics;
     bool                                FirstPFrameInGop_IsParsed;
     bool                                Config_IsRepeated;
     #if MEDIAINFO_ADVANCED2

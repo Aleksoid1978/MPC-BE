@@ -251,17 +251,29 @@ const char* Avc_user_data_DTG1_active_format[]=
 const char* Mpegv_colour_primaries(int8u colour_primaries);
 const char* Mpegv_transfer_characteristics(int8u transfer_characteristics);
 const char* Mpegv_matrix_coefficients(int8u matrix_coefficients);
+const char* Mpegv_matrix_coefficients_ColorSpace(int8u matrix_coefficients);
 
 //---------------------------------------------------------------------------
 static const char* Avc_Colorimetry_format_idc(int8u chroma_format_idc)
 {
     switch (chroma_format_idc)
     {
-        case 0: return "monochrome";
         case 1: return "4:2:0";
         case 2: return "4:2:2";
         case 3: return "4:4:4";
-        default: return "Unknown";
+        default: return "";
+    }
+}
+
+//---------------------------------------------------------------------------
+static const char* Avc_Colorimetry_format_idc_ColorSpace(int8u chroma_format_idc)
+{
+    switch (chroma_format_idc)
+    {
+        case 0: return "Y";
+        case 1: return "YUV";
+        case 2: return "YUV";
+        default: return "";
     }
 }
 
@@ -413,6 +425,9 @@ File_Avc::File_Avc()
 
     //Temporal references
     TemporalReferences_DelayedElement=NULL;
+
+    //Temp
+    preferred_transfer_characteristics=2;
 
     //Text
     #if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
@@ -645,6 +660,8 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
         }
 
         //Colour description
+        if (preferred_transfer_characteristics!=2)
+            Fill(Stream_Video, 0, Video_transfer_characteristics, Mpegv_transfer_characteristics(preferred_transfer_characteristics));
         if ((*seq_parameter_set_Item)->vui_parameters->video_signal_type_present_flag)
         {
             Fill(Stream_Video, 0, Video_Standard, Avc_video_format[(*seq_parameter_set_Item)->vui_parameters->video_format]);
@@ -655,6 +672,8 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
                 Fill(Stream_Video, 0, Video_colour_primaries, Mpegv_colour_primaries((*seq_parameter_set_Item)->vui_parameters->colour_primaries));
                 Fill(Stream_Video, 0, Video_transfer_characteristics, Mpegv_transfer_characteristics((*seq_parameter_set_Item)->vui_parameters->transfer_characteristics));
                 Fill(Stream_Video, 0, Video_matrix_coefficients, Mpegv_matrix_coefficients((*seq_parameter_set_Item)->vui_parameters->matrix_coefficients));
+                if ((*seq_parameter_set_Item)->vui_parameters->matrix_coefficients!=2)
+                    Fill(Stream_Video, 0, Video_ColorSpace, Mpegv_matrix_coefficients_ColorSpace((*seq_parameter_set_Item)->vui_parameters->matrix_coefficients), Unlimited, true, true);
             }
         }
 
@@ -860,10 +879,8 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
         Fill(Stream_Video, 0, Video_Format_Settings_RefFrames, (*seq_parameter_set_Item)->max_num_ref_frames);
         Fill(Stream_Video, 0, Video_Codec_Settings_RefFrames, (*seq_parameter_set_Item)->max_num_ref_frames);
     }
-    if ((*seq_parameter_set_Item)->vui_parameters && (*seq_parameter_set_Item)->vui_parameters->matrix_coefficients == 0)
-        Fill(Stream_Video, 0, Video_ColorSpace, "RGB");
-    else
-        Fill(Stream_Video, 0, Video_ColorSpace, "YUV");
+    if (Retrieve(Stream_Video, 0, Video_ColorSpace).empty())
+        Fill(Stream_Video, 0, Video_ColorSpace, Avc_Colorimetry_format_idc_ColorSpace((*seq_parameter_set_Item)->chroma_format_idc));
     Fill(Stream_Video, 0, Video_Colorimetry, Avc_Colorimetry_format_idc((*seq_parameter_set_Item)->chroma_format_idc));
     if ((*seq_parameter_set_Item)->bit_depth_luma_minus8==(*seq_parameter_set_Item)->bit_depth_chroma_minus8)
         Fill(Stream_Video, 0, Video_BitDepth, (*seq_parameter_set_Item)->bit_depth_luma_minus8+8);
@@ -2659,6 +2676,7 @@ void File_Avc::sei_message(int32u &seq_parameter_set_id)
         case  5 :   sei_message_user_data_unregistered(payloadSize); break;
         case  6 :   sei_message_recovery_point(); break;
         case 32 :   sei_message_mainconcept(payloadSize); break;
+        case 147:   sei_alternative_transfer_characteristics(); break;
         default :
                     Element_Info1("unknown");
                     Skip_XX(payloadSize,                        "data");
@@ -3238,6 +3256,15 @@ void File_Avc::sei_message_mainconcept(int32u payloadSize)
         Encoded_Library_Version=Text.SubString(__T("produced by MainConcept H.264/AVC Codec v"), __T(" (c) "));
         Encoded_Library_Date=MediaInfoLib::Config.Library_Get(InfoLibrary_Format_MainConcept_Avc, Encoded_Library_Version, InfoLibrary_Date);
     }
+}
+
+//---------------------------------------------------------------------------
+void File_Avc::sei_alternative_transfer_characteristics()
+{
+    Element_Info1("alternative_transfer_characteristics");
+
+    //Parsing
+    Get_B1(preferred_transfer_characteristics, "preferred_transfer_characteristics"); Param_Info1(Mpegv_transfer_characteristics(preferred_transfer_characteristics));
 }
 
 //---------------------------------------------------------------------------

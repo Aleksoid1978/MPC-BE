@@ -484,17 +484,15 @@ void File_Flv::Streams_Fill()
     if (Stream[Stream_Video].Parser!=NULL)
     {
         Fill(Stream[Stream_Video].Parser);
-        Merge(*Stream[Stream_Video].Parser, Stream_Video, 0, 0);
     }
     if (Stream[Stream_Audio].Parser!=NULL)
     {
         Fill(Stream[Stream_Audio].Parser);
-        Merge(*Stream[Stream_Audio].Parser, Stream_Audio, 0, 0);
 
         //Special case: AAC
-        if (Retrieve(Stream_Audio, 0, Audio_Format)==__T("AAC")
-         || Retrieve(Stream_Audio, 0, Audio_Format)==__T("MPEG Audio")
-         || Retrieve(Stream_Audio, 0, Audio_Format)==__T("Vorbis"))
+        if (Stream[Stream_Audio].Parser->Retrieve(Stream_Audio, 0, Audio_Format)==__T("AAC")
+         || Stream[Stream_Audio].Parser->Retrieve(Stream_Audio, 0, Audio_Format)==__T("MPEG Audio")
+         || Stream[Stream_Audio].Parser->Retrieve(Stream_Audio, 0, Audio_Format)==__T("Vorbis"))
             Clear(Stream_Audio, 0, Audio_BitDepth); //Resolution is not valid for AAC / MPEG Audio / Vorbis
     }
 

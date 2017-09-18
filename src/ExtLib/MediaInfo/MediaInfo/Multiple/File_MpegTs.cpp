@@ -846,6 +846,10 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
                         Fill_SetOptions((stream_t)StreamKind, StreamPos, Info->first.c_str(), Info->second.To_UTF8().c_str());
                     }
                 }
+                else if (Info->first=="CodecID")
+                {
+                    Fill((stream_t)StreamKind, StreamPos, Info->first.c_str(), Info->second+__T('-')+Retrieve((stream_t)StreamKind, StreamPos, Info->first.c_str()), true);
+                }
             }
 
             //Common
