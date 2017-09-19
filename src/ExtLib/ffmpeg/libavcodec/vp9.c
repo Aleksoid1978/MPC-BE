@@ -1684,6 +1684,10 @@ static void vp9_decode_flush(AVCodecContext *avctx)
         vp9_frame_unref(avctx, &s->s.frames[i]);
     for (i = 0; i < 8; i++)
         ff_thread_release_buffer(avctx, &s->s.refs[i]);
+    // ==> Start patch MPC
+    for (i = 0; i < FF_ARRAY_ELEMS(s->next_refs); i++)
+        ff_thread_release_buffer(avctx, &s->next_refs[i]);
+    // ==> End patch MPC
 }
 
 static int init_frames(AVCodecContext *avctx)
