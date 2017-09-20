@@ -264,87 +264,44 @@ STDMETHODIMP CMemSubPic::Unlock(RECT* pDirtyRect)
 	return S_OK;
 }
 
-#ifdef _WIN64
-void AlphaBlt_YUY2_SSE2(int w, int h, BYTE* d, int dstpitch, BYTE* s, int srcpitch)
+static void AlphaBlt_YUY2_SSE2(int w, int h, BYTE* d, int dstpitch, BYTE* s, int srcpitch)
 {
 	unsigned int ia;
 	static const __int64 _8181 = 0x0080001000800010i64;
+	static const __m128i mm_zero = _mm_setzero_si128();
+	static const __m128i mm_8181 = _mm_loadl_epi64((const __m128i *)&_8181);
 
 	for (ptrdiff_t j = 0; j < h; j++, s += srcpitch, d += dstpitch) {
 		DWORD* d2 = (DWORD*)d;
 		BYTE* s2 = s;
-		BYTE* s2end = s2 + w*4;
+		BYTE* s2end = s2 + w * 4;
 
 		for (; s2 < s2end; s2 += 8, d2++) {
-			ia = (s2[3]+s2[7])>>1;
+			ia = (s2[3] + s2[7]) >> 1;
 			if (ia < 0xff) {
-				unsigned int c = (s2[4]<<24)|(s2[5]<<16)|(s2[0]<<8)|s2[1]; // (v<<24)|(y2<<16)|(u<<8)|y1;
+				const unsigned int c = (s2[4] << 24) | (s2[5] << 16) | (s2[0] << 8) | s2[1]; // (v << 24) | (y2 << 16) | (u << 8) | y1;
+				ia = (ia << 24) | (s2[7] << 16) | (ia << 8) | s2[3];
 
-				ia = (ia<<24)|(s2[7]<<16)|(ia<<8)|s2[3];
 				// SSE2
-				__m128i mm_zero = _mm_setzero_si128();
-				__m128i mm_8181 = _mm_move_epi64(_mm_cvtsi64_si128(_8181));
 				__m128i mm_c = _mm_cvtsi32_si128(c);
 				mm_c = _mm_unpacklo_epi8(mm_c, mm_zero);
 				__m128i mm_d = _mm_cvtsi32_si128(*d2);
 				mm_d = _mm_unpacklo_epi8(mm_d, mm_zero);
 				__m128i mm_a = _mm_cvtsi32_si128(ia);
 				mm_a = _mm_unpacklo_epi8(mm_a, mm_zero);
-				mm_a = _mm_srli_epi16(mm_a,1);
-				mm_d = _mm_sub_epi16(mm_d,mm_8181);
-				mm_d = _mm_mullo_epi16(mm_d,mm_a);
-				mm_d = _mm_srai_epi16(mm_d,7);
-				mm_d = _mm_adds_epi16(mm_d,mm_c);
-				mm_d = _mm_packus_epi16(mm_d,mm_d);
+				mm_a = _mm_srli_epi16(mm_a, 1);
+				mm_d = _mm_sub_epi16(mm_d, mm_8181);
+				mm_d = _mm_mullo_epi16(mm_d, mm_a);
+				mm_d = _mm_srai_epi16(mm_d, 7);
+				mm_d = _mm_adds_epi16(mm_d, mm_c);
+				mm_d = _mm_packus_epi16(mm_d, mm_d);
 				*d2 = (DWORD)_mm_cvtsi128_si32(mm_d);
 			}
 		}
 	}
 }
 
-#else
-
-void AlphaBlt_YUY2_MMX(int w, int h, BYTE* d, int dstpitch, BYTE* s, int srcpitch)
-{
-	unsigned int ia;
-	static const __int64 _8181 = 0x0080001000800010i64;
-
-	for (ptrdiff_t j = 0; j < h; j++, s += srcpitch, d += dstpitch) {
-		DWORD* d2 = (DWORD*)d;
-		BYTE* s2 = s;
-		BYTE* s2end = s2 + w*4;
-
-		for (; s2 < s2end; s2 += 8, d2++) {
-			ia = (s2[3]+s2[7])>>1;
-			if (ia < 0xff) {
-				unsigned int c = (s2[4]<<24)|(s2[5]<<16)|(s2[0]<<8)|s2[1]; // (v<<24)|(y2<<16)|(u<<8)|y1;
-				ia = (ia<<24)|(s2[7]<<16)|(ia<<8)|s2[3];
-				__asm {
-					mov			esi, s2
-					mov			edi, d2
-					pxor		mm0, mm0
-					movq		mm1, _8181
-					movd		mm2, c
-					punpcklbw	mm2, mm0
-					movd		mm3, [edi]
-					punpcklbw	mm3, mm0
-					movd		mm4, ia
-					punpcklbw	mm4, mm0
-					psrlw		mm4, 1
-					psubsw		mm3, mm1
-					pmullw		mm3, mm4
-					psraw		mm3, 7
-					paddsw		mm3, mm2
-					packuswb	mm3, mm3
-					movd		[edi], mm3
-				};
-			}
-		}
-	}
-	_mm_empty();
-}
-#endif
-
+/*
 void AlphaBlt_YUY2_C(int w, int h, BYTE* d, int dstpitch, BYTE* s, int srcpitch)
 {
 	unsigned int ia;
@@ -369,6 +326,7 @@ void AlphaBlt_YUY2_C(int w, int h, BYTE* d, int dstpitch, BYTE* s, int srcpitch)
 		}
 	}
 }
+*/
 
 STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 {
@@ -530,31 +488,22 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 					}
 				}
 			break;
-		case MSP_YUY2: {
-				void (*alphablt_func)(int w, int h, BYTE* d, int dstpitch, BYTE* s, int srcpitch);
-#ifdef _WIN64
-				alphablt_func = AlphaBlt_YUY2_SSE2;
-#else
-				alphablt_func = AlphaBlt_YUY2_MMX;
-#endif
-				//alphablt_func = AlphaBlt_YUY2_C;
-
-				alphablt_func(w, h, d, dst.pitch, s, src.pitch);
-			}
+		case MSP_YUY2:
+			AlphaBlt_YUY2_SSE2(w, h, d, dst.pitch, s, src.pitch);
 			break;
 		case MSP_YV12:
 		case MSP_NV12:
 		case MSP_IYUV:
-					for (ptrdiff_t j = 0; j < h; j++, s += src.pitch, d += dst.pitch) {
-						BYTE* s2 = s;
-						BYTE* s2end = s2 + w * 4;
-						BYTE* d2 = d;
-						for (; s2 < s2end; s2 += 4, d2++) {
-							if (s2[3] < 0xff) {
-								d2[0] = (((d2[0] - 0x10) * s2[3]) >> 8) + s2[1];
-							}
+				for (ptrdiff_t j = 0; j < h; j++, s += src.pitch, d += dst.pitch) {
+					BYTE* s2 = s;
+					BYTE* s2end = s2 + w * 4;
+					BYTE* d2 = d;
+					for (; s2 < s2end; s2 += 4, d2++) {
+						if (s2[3] < 0xff) {
+							d2[0] = (((d2[0] - 0x10) * s2[3]) >> 8) + s2[1];
 						}
 					}
+				}
 			break;
 		default:
 				return E_NOTIMPL;
@@ -693,10 +642,6 @@ STDMETHODIMP CMemSubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 			}
 		}
 	}
-
-#ifndef _WIN64
-	__asm emms;
-#endif
 
 	return S_OK;
 }
