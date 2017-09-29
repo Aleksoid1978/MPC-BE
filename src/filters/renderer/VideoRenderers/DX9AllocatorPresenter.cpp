@@ -24,6 +24,7 @@
 #include "DX9AllocatorPresenter.h"
 #include <InitGuid.h>
 #include <utility>
+#include <LAVVideoSettings.h>
 #include "../../../SubPic/DX9SubPic.h"
 #include "../../../SubPic/SubPicQueueImpl.h"
 #include "IPinHook.h"
@@ -2367,18 +2368,20 @@ void CDX9AllocatorPresenter::OnChangeInput(CComPtr<IPin> pPin)
 	CComPtr<IPin> pPinTo;
 	if (pPin && SUCCEEDED(pPin->ConnectedTo(&pPinTo)) && pPinTo) {
 		IBaseFilter* pBF = GetFilterFromPin(pPinTo);
+		
 		if (CComQIPtr<IDirectVobSub> pDVS = pBF) {
 			pPin = GetFirstPin(pBF);
 			pPin = GetUpStreamPin(pBF, pPin);
 			if (pPin) {
 				pBF = GetFilterFromPin(pPin);
-				if (pBF) {
-					m_Decoder = GetFilterName(pBF);
-				}
 			}
 		}
-		if (m_Decoder.IsEmpty()) {
-			m_Decoder = GetFilterName(GetFilterFromPin(pPinTo));
+
+		if (pBF) {
+			m_Decoder = GetFilterName(pBF);
+			if (CComQIPtr<ILAVVideoStatus> pLAVVideoStatus = pBF) {
+				m_Decoder.AppendFormat(L" (%s)", pLAVVideoStatus->GetActiveDecoderName());
+			}
 		}
 	}
 }
