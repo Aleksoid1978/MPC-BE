@@ -595,9 +595,9 @@ namespace Youtube
 									InternetReadData(hUrl, &data, dataSize, nullptr);
 									InternetCloseHandle(hUrl);
 									if (dataSize) {
-										const CStringA funcName = RegExpParseA(data, "\"signature\",([a-zA-Z0-9]+)\\(");
+										const CStringA funcName = RegExpParseA(data, "\"signature\",([a-zA-Z0-9$]+)\\(");
 										if (!funcName.IsEmpty()) {
-											const CStringA funcRegExp = funcName + "=function\\(a\\)\\{([^\\n]+)\\};";
+											CStringA funcRegExp = funcName + "=function\\(a\\)\\{([^\\n]+)\\};"; funcRegExp.Replace("$", "\\$");
 											const CStringA funcBody = RegExpParseA(data, funcRegExp);
 											if (!funcBody.IsEmpty()) {
 												CStringA funcGroup;
