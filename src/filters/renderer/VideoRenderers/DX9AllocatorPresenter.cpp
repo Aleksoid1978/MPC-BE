@@ -1852,7 +1852,7 @@ void CDX9AllocatorPresenter::DrawStats()
 	}
 
 	if (m_pFont && m_pSprite) {
-		auto drawText = [&](const CString& strText) {
+		auto drawText = [&](LPCWSTR strText) {
 			static const D3DXCOLOR ShadowColor(0.0f, 0.0f, 0.0f, 1.0f); // black
 			RECT rcShadow = rc;
 			OffsetRect(&rcShadow , 2, 2);
@@ -1965,9 +1965,7 @@ void CDX9AllocatorPresenter::DrawStats()
 
 			drawText(strText);
 
-			strText = L"Formats      | Input  | Mixer       | VideoBuffer   | Surface       | Backbuffer/Display |";
-			drawText(strText);
-
+			drawText(L"Formats      | Input  | Mixer       | VideoBuffer   | Surface       | Backbuffer/Display |");
 			ASSERT(m_BackbufferFmt == m_DisplayFmt);
 
 			strText.Format(L"             | %-6s | %-11s | %-13s | %-13s | %-18s |"
@@ -2076,18 +2074,6 @@ void CDX9AllocatorPresenter::DrawStats()
 		drawText(strText);
 
 		if (iDetailedStats > 1) {
-			strText.Format(L"Video size   : %d x %d (%d:%d)", m_nativeVideoSize.cx, m_nativeVideoSize.cy, m_aspectRatio.cx, m_aspectRatio.cy);
-			CSize videoSize = m_videoRect.Size();
-			if (m_nativeVideoSize != videoSize) {
-				strText.AppendFormat(L" -> %d x %d", videoSize.cx, videoSize.cy);
-				if (m_wsResizer) {
-					strText.AppendFormat(L" %s", m_wsResizer);
-					if (m_wsResizer2) {
-						strText.AppendFormat(L":Õ + %s:Y", m_wsResizer2);
-					}
-				}
-			}
-			drawText(strText);
 			if (m_pVideoTextures[0] || m_pVideoSurfaces[0]) {
 				D3DSURFACE_DESC desc;
 				if (m_pVideoTextures[0]) {
@@ -2102,23 +2088,34 @@ void CDX9AllocatorPresenter::DrawStats()
 				}
 			}
 
+			if (m_Decoder.GetLength()) {
+				drawText(L"Decoder      : " + m_Decoder);
+			}
+
 			strText.Format(L"%-13s: %s", DXVAState::GetShortDescription(), DXVAState::GetDescription());
 			drawText(strText);
 
-			if (!m_D3D9Device.IsEmpty()) {
-				strText = L"Render device: " + m_D3D9Device;
-				drawText(strText);
+			if (m_D3D9Device.GetLength()) {
+				drawText(L"Render device: " + m_D3D9Device);
 			}
 
-			if (!m_MonitorName.IsEmpty()) {
+			if (m_MonitorName.GetLength()) {
 				strText.Format(L"Monitor      : %s, Native resolution %ux%u", m_MonitorName, m_nMonitorHorRes, m_nMonitorVerRes);
 				drawText(strText);
 			}
 
-			if (!m_Decoder.IsEmpty()) {
-				strText = L"Decoder      : " + m_Decoder;
-				drawText(strText);
+			strText.Format(L"Video size   : %d x %d (%d:%d)", m_nativeVideoSize.cx, m_nativeVideoSize.cy, m_aspectRatio.cx, m_aspectRatio.cy);
+			CSize videoSize = m_videoRect.Size();
+			if (m_nativeVideoSize != videoSize) {
+				strText.AppendFormat(L" -> %d x %d", videoSize.cx, videoSize.cy);
+				if (m_wsResizer) {
+					strText.AppendFormat(L" %s", m_wsResizer);
+					if (m_wsResizer2) {
+						strText.AppendFormat(L":Õ + %s:Y", m_wsResizer2);
+					}
+				}
 			}
+			drawText(strText);
 
 			{
 				strText.Format(L"Performance  : CPU:%3d%%", m_CPUUsage.GetUsage());
