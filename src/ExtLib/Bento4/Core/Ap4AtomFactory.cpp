@@ -680,6 +680,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
             break;
 
         case AP4_ATOM_TYPE_WFEX:
+        case AP4_ATOM_TYPE_GLBL:
             atom = new AP4_DataInfoAtom(type, size, stream);
             break;
 
