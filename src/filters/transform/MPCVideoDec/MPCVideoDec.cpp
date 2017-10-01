@@ -141,7 +141,7 @@ struct {
 	// H.264
 	{ AV_CODEC_ID_H264, DXVA2_ModeH264_E, false },
 	{ AV_CODEC_ID_H264, DXVA2_ModeH264_F, false },
-	{ AV_CODEC_ID_H264, DXVA_Intel_H264_ClearVideo, false },
+	{ AV_CODEC_ID_H264, DXVA2_Intel_H264_ClearVideo, false },
 	// HEVC
 	{ AV_CODEC_ID_HEVC, DXVA2_ModeHEVC_VLD_Main10, true },
 	{ AV_CODEC_ID_HEVC, DXVA2_ModeHEVC_VLD_Main, false },
@@ -154,9 +154,9 @@ struct {
 	{ AV_CODEC_ID_WMV3, DXVA2_ModeVC1_D2010, false },
 	{ AV_CODEC_ID_WMV3, DXVA2_ModeVC1_D, false },
 	// VP9
-	{ AV_CODEC_ID_VP9, DXVA_ModeVP9_VLD_10bit_Profile2, true },
-	{ AV_CODEC_ID_VP9, DXVA_ModeVP9_VLD_Profile0, false },
-	{ AV_CODEC_ID_VP9, DXVA_VP9_VLD_Intel, false },
+	{ AV_CODEC_ID_VP9, DXVA2_ModeVP9_VLD_10bit_Profile2, true },
+	{ AV_CODEC_ID_VP9, DXVA2_ModeVP9_VLD_Profile0, false },
+	{ AV_CODEC_ID_VP9, DXVA2_VP9_VLD_Intel, false },
 };
 
 FFMPEG_CODECS ffCodecs[] = {

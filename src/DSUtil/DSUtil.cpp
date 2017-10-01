@@ -32,7 +32,6 @@
 #include <math.h>
 #include <InitGuid.h>
 #include <d3d9types.h>
-#include <dxva.h>
 #include <dxva2api.h>
 
 // flag for display only forced subtitles (PGS/VOBSUB)
@@ -2476,90 +2475,58 @@ void UnRegisterSourceFilter(const GUID& subtype)
 }
 
 static const struct {
-	const GUID*   Guid;
-	const LPCTSTR Description;
-} s_DXVADecoder[] = {
-	{&GUID_NULL,						_T("Unknown")},
-	{&GUID_NULL,						_T("Not using DXVA")},
-	{&DXVA_Intel_H264_ClearVideo,		_T("H.264 bitstream decoder, ClearVideo")},  // Intel ClearVideo H264 bitstream decoder
-	{&DXVA_Intel_VC1_ClearVideo,		_T("VC-1 bitstream decoder, ClearVideo")},   // Intel ClearVideo VC-1 bitstream decoder
-	{&DXVA_Intel_VC1_ClearVideo_2,		_T("VC-1 bitstream decoder 2, ClearVideo")}, // Intel ClearVideo VC-1 bitstream decoder 2
-	{&DXVA_MPEG4_ASP,					_T("MPEG-4 ASP bitstream decoder")},         // Nvidia MPEG-4 ASP bitstream decoder
-	{&DXVA_ModeNone,					_T("Mode none")},
-	{&DXVA_ModeH261_A,					_T("H.261 A, post processing")},
-	{&DXVA_ModeH261_B,					_T("H.261 B, deblocking")},
-	{&DXVA_ModeH263_A,					_T("H.263 A, motion compensation, no FGT")},
-	{&DXVA_ModeH263_B,					_T("H.263 B, motion compensation, FGT")},
-	{&DXVA_ModeH263_C,					_T("H.263 C, IDCT, no FGT")},
-	{&DXVA_ModeH263_D,					_T("H.263 D, IDCT, FGT")},
-	{&DXVA_ModeH263_E,					_T("H.263 E, bitstream decoder, no FGT")},
-	{&DXVA_ModeH263_F,					_T("H.263 F, bitstream decoder, FGT")},
-	{&DXVA_ModeMPEG1_A,					_T("MPEG-1 A, post processing")},
-	{&DXVA_ModeMPEG2_A,					_T("MPEG-2 A, motion compensation")},
-	{&DXVA_ModeMPEG2_B,					_T("MPEG-2 B, motion compensation + blending")},
-	{&DXVA_ModeMPEG2_C,					_T("MPEG-2 C, IDCT")},
-	{&DXVA_ModeMPEG2_D,					_T("MPEG-2 D, IDCT + blending")},
-	{&DXVA_ModeH264_A,					_T("H.264 A, motion compensation, no FGT")},
-	{&DXVA_ModeH264_B,					_T("H.264 B, motion compensation, FGT")},
-	{&DXVA_ModeH264_C,					_T("H.264 C, IDCT, no FGT")},
-	{&DXVA_ModeH264_D,					_T("H.264 D, IDCT, FGT")},
-	{&DXVA_ModeH264_E,					_T("H.264 E, bitstream decoder, no FGT")},
-	{&DXVA_ModeH264_F,					_T("H.264 F, bitstream decoder, FGT")},
-	{&DXVA_ModeWMV8_A,					_T("WMV8 A, post processing")},
-	{&DXVA_ModeWMV8_B,					_T("WMV8 B, motion compensation")},
-	{&DXVA_ModeWMV9_A,					_T("WMV9 A, post processing")},
-	{&DXVA_ModeWMV9_B,					_T("WMV9 B, motion compensation")},
-	{&DXVA_ModeWMV9_C,					_T("WMV9 C, IDCT")},
-	{&DXVA_ModeVC1_A,					_T("VC-1 A, post processing")},
-	{&DXVA_ModeVC1_B,					_T("VC-1 B, motion compensation")},
-	{&DXVA_ModeVC1_C,					_T("VC-1 C, IDCT")},
-	{&DXVA_ModeVC1_D,					_T("VC-1 D, bitstream decoder")},
-	{&DXVA_ModeVC1_D2010,				_T("VC-1 D, bitstream decoder (2010)")},
-	{&DXVA_NoEncrypt,					_T("No encryption")},
-	{&DXVA2_ModeMPEG2_MoComp,			_T("MPEG-2 motion compensation")},
-	{&DXVA2_ModeMPEG2_IDCT,				_T("MPEG-2 IDCT")},
-	{&DXVA2_ModeMPEG2_VLD,				_T("MPEG-2 variable-length decoder")},
-	{&DXVA_ModeMPEG2and1_VLD,			_T("MPEG-2 and MPEG-1 variable-length decoder")},
-	{&DXVA2_ModeH264_A,					_T("H.264 A, motion compensation, no FGT")},
-	{&DXVA2_ModeH264_B,					_T("H.264 B, motion compensation, FGT")},
-	{&DXVA2_ModeH264_C,					_T("H.264 C, IDCT, no FGT")},
-	{&DXVA2_ModeH264_D,					_T("H.264 D, IDCT, FGT")},
-	{&DXVA2_ModeH264_E,					_T("H.264 E, bitstream decoder, no FGT")},
-	{&DXVA2_ModeH264_F,					_T("H.264 F, bitstream decoder, FGT")},
-	{&DXVA_ModeH264_Flash,				_T("H.264 Flash, bitstream decoder")},
-	{&DXVA2_ModeWMV8_A,					_T("WMV8 A, post processing")},
-	{&DXVA2_ModeWMV8_B,					_T("WMV8 B, motion compensation")},
-	{&DXVA2_ModeWMV9_A,					_T("WMV9 A, post processing")},
-	{&DXVA2_ModeWMV9_B,					_T("WMV9 B, motion compensation")},
-	{&DXVA2_ModeWMV9_C,					_T("WMV9 C, IDCT")},
-	{&DXVA2_ModeVC1_A,					_T("VC-1 A, post processing")},
-	{&DXVA2_ModeVC1_B,					_T("VC-1 B, motion compensation")},
-	{&DXVA2_ModeVC1_C,					_T("VC-1 C, IDCT")},
-	{&DXVA2_ModeVC1_D,					_T("VC-1 D, bitstream decoder")},
-	{&DXVA2_NoEncrypt,					_T("No encryption")},
-	{&DXVA_ModeHEVC_VLD_Main,			_T("H.265, bitstream decoder, Main")},
-	{&DXVA_ModeHEVC_VLD_Main10,			_T("H.265, bitstream decoder, Main10")},
-	{&DXVA_ModeVP9_VLD_Profile0,		_T("VP9, bitstream decoder, profile 0")},
-	{&DXVA_ModeVP9_VLD_10bit_Profile2,	_T("VP9, bitstream decoder, profile 2 10 bit")},
-	{&DXVA_VP9_VLD_Intel,				_T("VP9, bitstream decoder, Intel")}
+	const GUID*  Guid;
+	const WCHAR* Description;
+} s_dxva2_vld_decoders[] = {
+	// MPEG1
+	{&DXVA2_ModeMPEG1_VLD,							L"MPEG-1"},
+	// MPEG2
+	{&DXVA2_ModeMPEG2_VLD,							L"MPEG-2"},
+	{&DXVA2_ModeMPEG2and1_VLD,						L"MPEG-2/MPEG-1"},
+	// MPEG4
+	{&DXVA2_ModeMPEG4pt2_VLD_Simple,				L"MPEG-4 Simple"},
+	{&DXVA2_ModeMPEG4pt2_VLD_AdvSimple_NoGMC,		L"MPEG-4 ASP, no GMC"},
+	{&DXVA2_ModeMPEG4pt2_VLD_AdvSimple_GMC,			L"MPEG-4 ASP, GMC"},
+	{&DXVA2_Nvidia_MPEG4_ASP,						L"MPEG-4 ASP (Nvidia)"},
+	// VC-1
+	{&DXVA2_ModeVC1_D,/*DXVA2_ModeVC1_VLD*/			L"VC-1"},
+	{&DXVA2_ModeVC1_D2010,							L"VC-1 (2010)"},
+	{&DXVA2_Intel_VC1_ClearVideo,					L"VC-1 (Intel ClearVideo)"},
+	{&DXVA2_Intel_VC1_ClearVideo_2,					L"VC-1 (Intel ClearVideo 2)"},
+	// H.264
+	{&DXVA2_ModeH264_E,/*DXVA2_ModeH264_VLD_NoFGT*/	L"H.264, no FGT"},
+	{&DXVA2_ModeH264_F,/*DXVA2_ModeH264_VLD_FGT*/	L"H.264, FGT"},
+	{&DXVA2_ModeH264_VLD_WithFMOASO_NoFGT,			L"H.264, no FGT, with FMOASO"},
+	{&DXVA2_Intel_H264_ClearVideo,					L"H.264 (Intel ClearVideo)"},
+	{&DXVA2_ModeH264_Flash,							L"H.264 Flash"},
+	// H.264 stereo
+	{&DXVA2_ModeH264_VLD_Stereo_Progressive_NoFGT,	L"H.264 stereo progressive, no FGT"},
+	{&DXVA2_ModeH264_VLD_Stereo_NoFGT,				L"H.264 stereo, no FGT"},
+	{&DXVA2_ModeH264_VLD_Multiview_NoFGT,			L"H.264 multiview, no FGT"},
+	// HEVC
+	{&DXVA2_ModeHEVC_VLD_Main,						L"HEVC"},
+	{&DXVA2_ModeHEVC_VLD_Main10,					L"HEVC 10-bit"},
+	// VP8
+	{&DXVA2_ModeVP8_VLD,							L"VP8"},
+	// VP9
+	{&DXVA2_ModeVP9_VLD_Profile0,					L"VP9"},
+	{&DXVA2_ModeVP9_VLD_10bit_Profile2,				L"VP9 10-bit"},
+	{&DXVA2_VP9_VLD_Intel,							L"VP9 Intel"}
 };
 
 CString GetDXVAMode(const GUID* guidDecoder)
 {
-	size_t nPos = 0;
+	if (*guidDecoder == GUID_NULL) {
+		return L"Not using DXVA";
+	}
 
-	for (size_t i = 1; i < _countof(s_DXVADecoder); i++) {
-		if (*guidDecoder == *s_DXVADecoder[i].Guid) {
-			nPos = i;
-			break;
+	for (const auto& decoder : s_dxva2_vld_decoders) {
+		if (*guidDecoder == *decoder.Guid) {
+			return decoder.Description;
 		}
 	}
 
-	if (nPos == 0 && *guidDecoder != GUID_NULL) {
-		return CStringFromGUID(*guidDecoder);
-	}
-
-	return s_DXVADecoder[nPos].Description;
+	return CStringFromGUID(*guidDecoder);
 }
 
 // hour, minute, second, millisec

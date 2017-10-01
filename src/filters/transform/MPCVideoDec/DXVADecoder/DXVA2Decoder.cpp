@@ -55,7 +55,7 @@ void CDXVA2Decoder::FillHWContext()
 	ctx->surface       = m_pD3DSurface;
 	ctx->surface_count = m_nNumSurfaces;
 
-	if (m_pFilter->m_nPCIVendor == PCIV_Intel && m_guidDecoder == DXVA_Intel_H264_ClearVideo) {
+	if (m_pFilter->m_nPCIVendor == PCIV_Intel && m_guidDecoder == DXVA2_Intel_H264_ClearVideo) {
 		ctx->workaround = FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO;
 	} else if (IsATIUVD(m_pFilter->m_nPCIVendor, m_pFilter->m_nPCIDevice)) {
 		ctx->workaround = FF_DXVA2_WORKAROUND_SCALING_LIST_ZIGZAG;

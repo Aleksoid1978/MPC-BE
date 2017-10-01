@@ -950,8 +950,8 @@ static HRESULT STDMETHODCALLTYPE CreateVideoDecoderMine(IDirectXVideoDecoderServ
 	else {
 		if ((Guid == DXVA2_ModeH264_E) ||
 				(Guid == DXVA2_ModeVC1_D)  ||
-				(Guid == DXVA_Intel_H264_ClearVideo) ||
-				(Guid == DXVA_Intel_VC1_ClearVideo) ||
+				(Guid == DXVA2_Intel_H264_ClearVideo) ||
+				(Guid == DXVA2_Intel_VC1_ClearVideo) ||
 				(Guid == DXVA2_ModeVC1_D2010) ||
 				(Guid == DXVA2_ModeMPEG2_VLD)) {
 			*ppDecode = DNew CFakeDirectXVideoDecoder(nullptr, *ppDecode);
