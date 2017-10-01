@@ -312,6 +312,8 @@ const AP4_Atom::Type AP4_ATOM_TYPE_WFEX = AP4_ATOM_TYPE('w','f','e','x');
 // FLAC
 const AP4_Atom::Type AP4_ATOM_TYPE_FLAC = AP4_ATOM_TYPE('f','L','a','C');
 
+const AP4_Atom::Type AP4_ATOM_TYPE_GLBL = AP4_ATOM_TYPE('g','l','b','l');
+
 /////////////////////////////// Video ///////////////////////////////////
 // MPEG 4 ASP
 const AP4_Atom::Type AP4_ATOM_TYPE_MP4V = AP4_ATOM_TYPE('m','p','4','v');

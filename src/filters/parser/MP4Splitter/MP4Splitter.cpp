@@ -1523,6 +1523,17 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 						}
 
+						if (AP4_DataInfoAtom* glblAtom = dynamic_cast<AP4_DataInfoAtom*>(ase->GetChild(AP4_ATOM_TYPE_GLBL))) {
+							const AP4_DataBuffer* di = glblAtom->GetData();
+							if (di && di->GetDataSize()) {
+								wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + di->GetDataSize());
+								wfe->cbSize = di->GetDataSize();
+								memcpy(wfe + 1, di->GetData(), di->GetDataSize());
+
+								mts.InsertAt(0, mt);
+							}
+						}
+
 						break;
 					} else {
 						DLog(L"Unknow MP4 Stream %x" , type);
