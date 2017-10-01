@@ -55,25 +55,33 @@ namespace DXVAState {
 	BOOL m_bDXVActive      = FALSE;
 	GUID m_guidDXVADecoder = GUID_NULL;
 
-	CString m_sDXVADecoderDescription      = L"Not using DXVA";
-	CString m_sDXVADecoderShortDescription = L"DXVA";
+	CString m_sDXVADecoderDescription = L"Software";
+	CString m_sDXVADecoderShortDescription;
 
 	void ClearState()
 	{
 		m_bDXVActive      = FALSE;
 		m_guidDXVADecoder = GUID_NULL;
 
-		m_sDXVADecoderDescription      = L"Not using DXVA";
-		m_sDXVADecoderShortDescription = L"DXVA";
+		m_sDXVADecoderDescription      = L"Software";
+		m_sDXVADecoderShortDescription = L"";
 	}
 
 	void SetActiveState(const GUID& guidDXVADecoder, const CString& customDescription/* = L""*/)
 	{
 		m_bDXVActive = TRUE;
-		m_guidDXVADecoder = guidDXVADecoder;
 
-		m_sDXVADecoderDescription = !customDescription.IsEmpty() ? customDescription : GetDXVAMode(&m_guidDXVADecoder);
-		m_sDXVADecoderShortDescription = (m_guidDXVADecoder != GUID_NULL) ? L"DXVA2" : L"H/W";
+		if (!customDescription.IsEmpty()) {
+			m_sDXVADecoderDescription = customDescription;
+			if (m_guidDXVADecoder != GUID_NULL) {
+				m_sDXVADecoderDescription.AppendFormat(L", %s", GetDXVACodec(m_guidDXVADecoder));
+			}
+			m_sDXVADecoderShortDescription = L"H/W";
+		} else if (guidDXVADecoder != GUID_NULL) {
+			m_sDXVADecoderDescription.Format(L"DXVA2 Native, %s", GetDXVACodec(m_guidDXVADecoder));
+			m_guidDXVADecoder = guidDXVADecoder;
+			m_sDXVADecoderShortDescription = L"DXVA2";
+		}
 	}
 
 	const BOOL GetState()

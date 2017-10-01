@@ -4316,28 +4316,27 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		}
 	}
 
-	if (!DXVAState::GetState()) {
-		// Trying to find LAV Video is in the graph
-		if (CComQIPtr<ILAVVideoStatus> pLAVVideoStatus = FindFilter(GUID_LAVVideoDecoder, m_pGB)) {
-			const CString decoderName = pLAVVideoStatus->GetActiveDecoderName();
-			if (decoderName != L"avcodec") {
-				static LPCTSTR FriendlyDecoderNames[][2] = {
-					{L"d3d11 cb", L"LAV Video, D3D11 Copy-back"},
-					{L"d3d11 cb direct", L"LAV Video, D3D11 Copy-back (Direct)"},
-					{L"cuvid", L"LAV Video, NVIDIA CUVID"},
-					{L"quicksync", L"LAV Video, Intel QuickSync"},
-				};
+	// Trying to find LAV Video is in the graph
+	if (CComQIPtr<ILAVVideoStatus> pLAVVideoStatus = FindFilter(GUID_LAVVideoDecoder, m_pGB)) {
+		const CString decoderName = pLAVVideoStatus->GetActiveDecoderName();
+		static LPCTSTR FriendlyDecoderNames[][2] = {
+			{L"dxva2cb", L"DXVA2 Copy-back"},
+			{L"dxva2cb direct", L"DXVA2 Copy-back (Direct)"},
+			{L"d3d11 cb", L"D3D11 Copy-back"},
+			{L"d3d11 cb direct", L"D3D11 Copy-back (Direct)"},
+			{L"cuvid", L"NVIDIA CUVID"},
+			{L"quicksync", L"Intel QuickSync"},
+		};
 
-				CString FriendlyDecoderName = decoderName;
-				for (size_t i = 0; i < _countof(FriendlyDecoderNames); i++) {
-					if (FriendlyDecoderNames[i][0] == decoderName) {
-						FriendlyDecoderName = FriendlyDecoderNames[i][1];
-						break;
-					}
-				}
-
-				DXVAState::SetActiveState(GUID_NULL, FriendlyDecoderName);
+		CString FriendlyDecoderName;
+		for (const auto &it : FriendlyDecoderNames) {
+			if (it[0] == decoderName) {
+				FriendlyDecoderName = it[1];
 			}
+		}
+
+		if (!FriendlyDecoderName.IsEmpty()) {
+			DXVAState::SetActiveState(GUID_NULL, FriendlyDecoderName);
 		}
 	}
 }
