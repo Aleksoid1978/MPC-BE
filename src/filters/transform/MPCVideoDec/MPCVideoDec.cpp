@@ -3780,10 +3780,8 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 			break;
 		case INFO_OutputFormat:
 			if (GUID* DxvaGuid = GetDXVADecoderGuid()) {
-				if (*DxvaGuid != GUID_NULL) {
-					infostr.Format(L"DXVA (%s)", GetDXVAMode(DxvaGuid));
-					break;
-				}
+				infostr.Format(L"DXVA (%s)", GetDXVAMode(*DxvaGuid));
+				break;
 			}
 			if (const SW_OUT_FMT* swof = GetSWOF(m_FormatConverter.GetOutPixFormat())) {
 				infostr.Format(L"%s (%d-bit %s)", swof->name, swof->luma_bits, GetChromaSubsamplingStr(swof->av_pix_fmt));

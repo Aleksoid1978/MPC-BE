@@ -2092,8 +2092,7 @@ void CDX9AllocatorPresenter::DrawStats()
 				drawText(L"Decoder      : " + m_Decoder);
 			}
 
-			strText.Format(L"%-13s: %s", DXVAState::GetShortDescription(), DXVAState::GetDescription());
-			drawText(strText);
+			drawText(L"Decoder info : " + DXVAState::GetDescription());
 
 			if (m_D3D9Device.GetLength()) {
 				drawText(L"Render device: " + m_D3D9Device);
@@ -2367,8 +2366,7 @@ void CDX9AllocatorPresenter::OnChangeInput(CComPtr<IPin> pPin)
 		IBaseFilter* pBF = GetFilterFromPin(pPinTo);
 		
 		if (CComQIPtr<IDirectVobSub> pDVS = pBF) {
-			pPin = GetFirstPin(pBF);
-			pPin = GetUpStreamPin(pBF, pPin);
+			pPin = GetUpStreamPin(pBF, GetFirstPin(pBF));
 			if (pPin) {
 				pBF = GetFilterFromPin(pPin);
 			}
@@ -2376,9 +2374,6 @@ void CDX9AllocatorPresenter::OnChangeInput(CComPtr<IPin> pPin)
 
 		if (pBF) {
 			m_Decoder = GetFilterName(pBF);
-			if (CComQIPtr<ILAVVideoStatus> pLAVVideoStatus = pBF) {
-				m_Decoder.AppendFormat(L" (%s)", pLAVVideoStatus->GetActiveDecoderName());
-			}
 		}
 	}
 }
