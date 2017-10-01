@@ -4319,19 +4319,23 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	// Trying to find LAV Video is in the graph
 	if (CComQIPtr<ILAVVideoStatus> pLAVVideoStatus = FindFilter(GUID_LAVVideoDecoder, m_pGB)) {
 		const CString decoderName = pLAVVideoStatus->GetActiveDecoderName();
-		static LPCTSTR FriendlyDecoderNames[][2] = {
-			{L"dxva2cb", L"DXVA2 Copy-back"},
-			{L"dxva2cb direct", L"DXVA2 Copy-back (Direct)"},
-			{L"d3d11 cb", L"D3D11 Copy-back"},
-			{L"d3d11 cb direct", L"D3D11 Copy-back (Direct)"},
-			{L"cuvid", L"NVIDIA CUVID"},
-			{L"quicksync", L"Intel QuickSync"},
+
+		static const struct {
+			const WCHAR* name;
+			const WCHAR* friendlyname;
+		} LAVDecoderNames[] = {
+			{L"dxva2cb",         L"DXVA2 Copy-back"},
+			{L"dxva2cb direct",  L"DXVA2 Copy-back (direct)"},
+			{L"d3d11 cb",        L"D3D11 Copy-back"},
+			{L"d3d11 cb direct", L"D3D11 Copy-back (direct)"},
+			{L"cuvid",           L"Nvidia CUVID"},
+			{L"quicksync",       L"Intel QuickSync"},
 		};
 
 		CString FriendlyDecoderName;
-		for (const auto &it : FriendlyDecoderNames) {
-			if (it[0] == decoderName) {
-				FriendlyDecoderName = it[1];
+		for (const auto &item : LAVDecoderNames) {
+			if (item.name == decoderName) {
+				FriendlyDecoderName = item.friendlyname;
 			}
 		}
 
