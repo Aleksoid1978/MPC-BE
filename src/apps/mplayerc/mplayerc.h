@@ -94,8 +94,6 @@ public:
 	static int		GetLanguageIndex(CString langcode);
 	static int		GetDefLanguage();
 
-	static bool		IsVSFilterInstalled();
-	static bool		HasEVR();
 	static void		RunAsAdministrator(LPCTSTR strCommand, LPCTSTR strArgs, bool bWaitProcess);
 
 	void			RegisterHotkeys();
