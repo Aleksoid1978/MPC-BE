@@ -24,6 +24,7 @@
 #include "DX9AllocatorPresenter.h"
 #include <InitGuid.h>
 #include <utility>
+#include <moreuuids.h>
 #include <LAVVideoSettings.h>
 #include "../../../SubPic/DX9SubPic.h"
 #include "../../../SubPic/SubPicQueueImpl.h"
@@ -2370,7 +2371,7 @@ void CDX9AllocatorPresenter::OnChangeInput(CComPtr<IPin> pPin)
 			CLSID clsid = GetCLSID(pBF);
 			CComQIPtr<IDirectVobSub> pDVS = pBF;
 
-			if (!pDVS && clsid != GUIDFromCString(L"{0B390488-D80F-4A68-8408-48DC199F0E97}")) {
+			if (!pDVS && clsid != CLSID_ffdshowRawVideoFilter) {
 				// simple check. Filter is a decoder if it is not VSFilter, xy-VSFilter or ffdshow raw video filter
 				break;
 			}
