@@ -74,11 +74,11 @@ namespace DXVAState {
 		if (!customDescription.IsEmpty()) {
 			m_sDXVADecoderDescription = customDescription;
 			if (m_guidDXVADecoder != GUID_NULL) {
-				m_sDXVADecoderDescription.AppendFormat(L", %s", GetDXVACodec(m_guidDXVADecoder));
+				m_sDXVADecoderDescription.AppendFormat(L", %s", GetDXVAMode(m_guidDXVADecoder));
 			}
 			m_sDXVADecoderShortDescription = L"H/W";
 		} else if (guidDXVADecoder != GUID_NULL) {
-			m_sDXVADecoderDescription.Format(L"DXVA2 Native, %s", GetDXVACodec(m_guidDXVADecoder));
+			m_sDXVADecoderDescription.Format(L"DXVA2 Native, %s", GetDXVAMode(m_guidDXVADecoder));
 			m_guidDXVADecoder = guidDXVADecoder;
 			m_sDXVADecoderShortDescription = L"DXVA2";
 		}
