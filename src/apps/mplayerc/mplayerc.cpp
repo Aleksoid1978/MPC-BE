@@ -34,7 +34,6 @@
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/FileHandle.h"
 #include "../../DSUtil/FileVersionInfo.h"
-#include <moreuuids.h>
 #include <winddk/ntddcdvd.h>
 #include <detours/detours.h>
 #include <afxsock.h>
@@ -2145,16 +2144,6 @@ void CMPlayerCApp::SetLanguage(int nLanguage, bool bSave/* = true*/)
 
 	// Set the new resource
 	AfxSetResourceHandle(hMod);
-}
-
-bool CMPlayerCApp::IsVSFilterInstalled()
-{
-	return IsCLSIDRegistered(CLSID_VSFilter_autoloading);
-}
-
-bool CMPlayerCApp::HasEVR()
-{
-	return IsCLSIDRegistered(CLSID_EnhancedVideoRenderer);
 }
 
 void CMPlayerCApp::RunAsAdministrator(LPCTSTR strCommand, LPCTSTR strArgs, bool bWaitProcess)
