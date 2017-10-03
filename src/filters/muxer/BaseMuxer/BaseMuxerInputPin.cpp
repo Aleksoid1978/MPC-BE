@@ -24,7 +24,7 @@
 #include <MMReg.h>
 #include "BaseMuxer.h"
 #include "../../../DSUtil/DSUtil.h"
-#include "moreuuids.h"
+#include <moreuuids.h>
 
 #define MAXQUEUESIZE 100
 

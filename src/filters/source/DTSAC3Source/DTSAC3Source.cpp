@@ -27,7 +27,7 @@
 #include <InitGuid.h>
 #endif
 #include <uuids.h>
-#include "moreuuids.h"
+#include <moreuuids.h>
 #include "DTSAC3Source.h"
 #include "../../../DSUtil/AudioParser.h"
 #include <atlpath.h>

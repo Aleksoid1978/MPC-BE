@@ -21,7 +21,7 @@
 
 #include <map>
 
-#include "IMediaSideData.h"
+#include <IMediaSideData.h>
 
 struct SideDataGUIDComparer
 {

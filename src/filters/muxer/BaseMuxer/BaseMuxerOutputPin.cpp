@@ -27,7 +27,7 @@
 #include <aviriff.h>
 #include <atlpath.h>
 
-#include "moreuuids.h"
+#include <moreuuids.h>
 
 //
 // CBaseMuxerOutputPin

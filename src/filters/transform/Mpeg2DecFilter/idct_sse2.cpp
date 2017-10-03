@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <inttypes.h>
 #include "libmpeg2.h"
 #include "attributes.h"
 #include "simd.h"

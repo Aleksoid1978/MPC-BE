@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,6 @@
 //  Based on Intel's AP-942
 
 #include "stdafx.h"
-#include <inttypes.h>
 #include "libmpeg2.h"
 #include "attributes.h"
 #include "simd.h"

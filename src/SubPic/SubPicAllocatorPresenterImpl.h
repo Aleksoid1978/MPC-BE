@@ -24,7 +24,7 @@
 #include <atlbase.h>
 #include <atlcoll.h>
 #include "ISubPic.h"
-#include "SubRenderIntf.h"
+#include <SubRenderIntf.h>
 
 class CSubPicAllocatorPresenterImpl
 	: public CUnknown
