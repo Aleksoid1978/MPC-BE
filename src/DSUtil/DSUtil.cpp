@@ -2476,55 +2476,43 @@ void UnRegisterSourceFilter(const GUID& subtype)
 
 static const struct {
 	const GUID*  Guid;
-	const WCHAR* Codec;
 	const WCHAR* Description;
 } s_dxva2_vld_decoders[] = {
 	// MPEG1
-	{&DXVA2_ModeMPEG1_VLD,							L"MPEG-1",			L"MPEG-1"},
+	{&DXVA2_ModeMPEG1_VLD,							L"MPEG-1"},
 	// MPEG2
-	{&DXVA2_ModeMPEG2_VLD,							L"MPEG-2",			L"MPEG-2"},
-	{&DXVA2_ModeMPEG2and1_VLD,						L"MPEG-2/1",		L"MPEG-2/MPEG-1"},
+	{&DXVA2_ModeMPEG2_VLD,							L"MPEG-2"},
+	{&DXVA2_ModeMPEG2and1_VLD,						L"MPEG-2/MPEG-1"},
 	// MPEG4
-	{&DXVA2_ModeMPEG4pt2_VLD_Simple,				L"MPEG-4 SP",		L"MPEG-4 SP"},
-	{&DXVA2_ModeMPEG4pt2_VLD_AdvSimple_NoGMC,		L"MPEG-4 ASP",		L"MPEG-4 ASP, no GMC"},
-	{&DXVA2_ModeMPEG4pt2_VLD_AdvSimple_GMC,			L"MPEG-4 ASP",		L"MPEG-4 ASP, GMC"},
-	{&DXVA2_Nvidia_MPEG4_ASP,						L"MPEG-4 ASP",		L"MPEG-4 ASP (Nvidia)"},
+	{&DXVA2_ModeMPEG4pt2_VLD_Simple,				L"MPEG-4 SP"},
+	{&DXVA2_ModeMPEG4pt2_VLD_AdvSimple_NoGMC,		L"MPEG-4 ASP, no GMC"},
+	{&DXVA2_ModeMPEG4pt2_VLD_AdvSimple_GMC,			L"MPEG-4 ASP, GMC"},
+	{&DXVA2_Nvidia_MPEG4_ASP,						L"MPEG-4 ASP (Nvidia)"},
 	// VC-1
-	{&DXVA2_ModeVC1_D,/*DXVA2_ModeVC1_VLD*/			L"VC-1",			L"VC-1"},
-	{&DXVA2_ModeVC1_D2010,							L"VC-1",			L"VC-1 (2010)"},
-	{&DXVA2_Intel_VC1_ClearVideo,					L"VC-1",			L"VC-1 (Intel ClearVideo)"},
-	{&DXVA2_Intel_VC1_ClearVideo_2,					L"VC-1",			L"VC-1 (Intel ClearVideo 2)"},
+	{&DXVA2_ModeVC1_D,/*DXVA2_ModeVC1_VLD*/			L"VC-1"},
+	{&DXVA2_ModeVC1_D2010,							L"VC-1 (2010)"},
+	{&DXVA2_Intel_VC1_ClearVideo,					L"VC-1 (Intel ClearVideo)"},
+	{&DXVA2_Intel_VC1_ClearVideo_2,					L"VC-1 (Intel ClearVideo 2)"},
 	// H.264
-	{&DXVA2_ModeH264_E,/*DXVA2_ModeH264_VLD_NoFGT*/	L"H.264,",			L"H.264, no FGT"},
-	{&DXVA2_ModeH264_F,/*DXVA2_ModeH264_VLD_FGT*/	L"H.264,",			L"H.264, FGT"},
-	{&DXVA2_ModeH264_VLD_WithFMOASO_NoFGT,			L"H.264,",			L"H.264, no FGT, with FMOASO"},
-	{&DXVA2_Intel_H264_ClearVideo,					L"H.264,",			L"H.264 (Intel ClearVideo)"},
-	{&DXVA2_ModeH264_Flash,							L"H.264,",			L"H.264 Flash"},
+	{&DXVA2_ModeH264_E,/*DXVA2_ModeH264_VLD_NoFGT*/	L"H.264, no FGT"},
+	{&DXVA2_ModeH264_F,/*DXVA2_ModeH264_VLD_FGT*/	L"H.264, FGT"},
+	{&DXVA2_ModeH264_VLD_WithFMOASO_NoFGT,			L"H.264, no FGT, with FMOASO"},
+	{&DXVA2_Intel_H264_ClearVideo,					L"H.264 (Intel ClearVideo)"},
+	{&DXVA2_ModeH264_Flash,							L"H.264 Flash"},
 	// H.264 stereo
-	{&DXVA2_ModeH264_VLD_Stereo_Progressive_NoFGT,	L"H.264 stereo",	L"H.264 stereo progressive, no FGT"},
-	{&DXVA2_ModeH264_VLD_Stereo_NoFGT,				L"H.264 stereo",	L"H.264 stereo, no FGT"},
-	{&DXVA2_ModeH264_VLD_Multiview_NoFGT,			L"H.264 multiview",	L"H.264 multiview, no FGT"},
+	{&DXVA2_ModeH264_VLD_Stereo_Progressive_NoFGT,	L"H.264 stereo progressive, no FGT"},
+	{&DXVA2_ModeH264_VLD_Stereo_NoFGT,				L"H.264 stereo, no FGT"},
+	{&DXVA2_ModeH264_VLD_Multiview_NoFGT,			L"H.264 multiview, no FGT"},
 	// HEVC
-	{&DXVA2_ModeHEVC_VLD_Main,						L"HEVC",			L"HEVC"},
-	{&DXVA2_ModeHEVC_VLD_Main10,					L"HEVC 10-bit",		L"HEVC 10-bit"},
+	{&DXVA2_ModeHEVC_VLD_Main,						L"HEVC"},
+	{&DXVA2_ModeHEVC_VLD_Main10,					L"HEVC 10-bit"},
 	// VP8
-	{&DXVA2_ModeVP8_VLD,							L"VP8",				L"VP8"},
+	{&DXVA2_ModeVP8_VLD,							L"VP8"},
 	// VP9
-	{&DXVA2_ModeVP9_VLD_Profile0,					L"VP9",				L"VP9"},
-	{&DXVA2_ModeVP9_VLD_10bit_Profile2,				L"VP9 10-bit",		L"VP9 10-bit"},
-	{&DXVA2_VP9_VLD_Intel,							L"VP9",				L"VP9 Intel"}
+	{&DXVA2_ModeVP9_VLD_Profile0,					L"VP9"},
+	{&DXVA2_ModeVP9_VLD_10bit_Profile2,				L"VP9 10-bit"},
+	{&DXVA2_VP9_VLD_Intel,							L"VP9 Intel"}
 };
-
-CString GetDXVACodec(const GUID& guidDecoder)
-{
-	for (const auto& decoder : s_dxva2_vld_decoders) {
-		if (guidDecoder == *decoder.Guid) {
-			return decoder.Codec;
-		}
-	}
-
-	return L"";
-}
 
 CString GetDXVAMode(const GUID& guidDecoder)
 {
