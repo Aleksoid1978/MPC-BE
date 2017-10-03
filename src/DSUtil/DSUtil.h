@@ -166,7 +166,6 @@ extern void				RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, LP
 extern void				RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, const CAtlList<CString>& chkbytes, LPCTSTR ext = nullptr, ...);
 extern void				UnRegisterSourceFilter(const GUID& subtype);
 
-extern CString			GetDXVACodec(const GUID& guidDecoder);
 extern CString			GetDXVAMode(const GUID& guidDecoder);
 
 extern void				TraceFilterInfo(IBaseFilter* pBF);
