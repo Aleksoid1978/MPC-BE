@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,7 +23,7 @@
 #include <atlbase.h>
 #include <afxinet.h>
 #include "TextFile.h"
-#include "Utf8.h"
+#include <Utf8.h>
 
 #define TEXTFILE_BUFFER_SIZE (64 * 1024)
 

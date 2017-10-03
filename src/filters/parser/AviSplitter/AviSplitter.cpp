@@ -23,7 +23,7 @@
 #include <MMReg.h>
 #include "AviFile.h"
 #include "AviSplitter.h"
-#include "moreuuids.h"
+#include <moreuuids.h>
 
 // option names
 #define OPT_REGKEY_AVISplit  L"Software\\MPC-BE Filters\\AVI Splitter"

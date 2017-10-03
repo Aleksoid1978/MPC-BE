@@ -1,6 +1,5 @@
 /*
- * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2015-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +21,7 @@
 #pragma once
 
 #include "ISubPic.h"
-#include "SubRenderIntf.h"
+#include <SubRenderIntf.h>
 
 
 interface __declspec(uuid("63679E0A-93AB-4656-AF40-589E4E985991"))
