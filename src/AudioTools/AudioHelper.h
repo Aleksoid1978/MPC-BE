@@ -21,7 +21,6 @@
 #pragma once
 
 #include <stdint.h>
-#include <math.h>
 #include "SampleFormat.h"
 
 #define INT8_PEAK  128

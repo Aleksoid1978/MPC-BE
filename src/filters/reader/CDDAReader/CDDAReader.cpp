@@ -20,6 +20,9 @@
  */
 
 #include "stdafx.h"
+#include <winddk/devioctl.h>
+#include <winddk/ntddcdrm.h>
+
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
 #endif

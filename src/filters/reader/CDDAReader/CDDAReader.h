@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,8 +22,6 @@
 #pragma once
 
 #include <atlbase.h>
-#include <winddk/devioctl.h>
-#include <winddk/ntddcdrm.h>
 #include <qnetwork.h>
 #include <vector>
 #include <AsyncReader/asyncio.h>
