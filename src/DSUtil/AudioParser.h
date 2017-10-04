@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <WinDef.h>
 #include <MMReg.h>
 #include "GolombBuffer.h"
 

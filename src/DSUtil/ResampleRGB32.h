@@ -49,11 +49,11 @@ private:
 
 	BYTE*  m_pTemp      = nullptr;
 
-	int*   m_boundsHor = nullptr;
+	int*   m_boundsHor  = nullptr;
 	INT32* m_kkHor      = nullptr;
 	int    m_kmaxHor    = 0;
 
-	int*   m_boundsVer = nullptr;
+	int*   m_boundsVer  = nullptr;
 	INT32* m_kkVer      = nullptr;
 	int    m_kmaxVer    = 0;
 
