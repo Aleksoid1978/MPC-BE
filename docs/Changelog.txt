@@ -2,8 +2,169 @@
 
 1.5.1 (beta)
 ==============================
+Requires an SSE2 capable CPU.
+Added archives with .pdb files, which are necessary for developers to work with dumps. Users do not need to download .pdb files.
 
-Requires an SSE2 capable CPU
+DTSAC3Source
+Added the ability to open TrueHD raw files (the duration may not be detected correctly).
+
+Splitters
+Added support for reading chapters from ID3v2 tags.
+Added the ability to open links with a user name and password (http: // user: pass @ url).
+Added the ability to transmit information about interlaced mode for MOV, MKV and YUV4MPEG2.
+
+AudioSplitter
+Added support for DST streams (Digital Stream Transfer).
+
+AviSplitter
+Expanded support for video MagicYUV format.
+More correctly determine the delta frames for Xvid and DivX 5 at rebuilding an index.
+
+MpegSplitter
+Improved work with AAC tracks.
+Improved support for teletext subtitles.
+Improved rewind for BD.
+
+FLVSplitter
+Improved opening of some files.
+Improved work with AAC tracks.
+Added support for reading meta-data.
+Use the list of key frames when rewinding.
+
+MP4Splitter
+Fixed rewind to the beginning on fragmented (DASH) files.
+Improved support of video in H. 264 format.
+Extended support video format MagicYUV.
+Improved support for DTS/DTS-HD, added support for DTS Express.
+Added support for forced flag for subtitles in tx3g.
+Fill the extradata of H. 264 and HEVC streams if it is not in the header.
+Added support for Apple ProRes 4444 XQ.
+Fixed opening of some old QT files.
+Added support for JPEG2000 video ID 'AVj2'.
+Added support for VP8 and VP9.
+
+MatroskaSplitter
+Improved detection of frame rate for MPEG-1 video.
+Fixed display of subtitles when rewinding on some files.
+Improved support for AC3.
+Added support for FFV1.
+Fill the extradata of H. 264 and HEVC streams if it is not in the header.
+Added support for reading and exporting additional HDR metadata.
+Improved support for WebVTT subtitles.
+
+RawVideoSplitter
+Added support for DAV format.
+
+MPCVideoDec
+Extended support for MagicYUV video.
+Fixed playback of streams VC-1 and MPEG2 with 3:2 pull-down flag.
+Fixed MPEG2 decoding in DXVA mode.
+Fixed synchronization after rewinding for MSDKDecoder.
+Added support GoToMeeting2 and GoToMeeting3.
+Added support for Apple ProRes 4444 XQ.
+Added support for retrieving and exporting additional HDR metadata.
+Automatically set unknown DXVA2_VideoTransferMatrix, do it more correctly than the system renderers.
+Improved support for Lagarith, Apple Prores, and FFV1.
+Fixed CFHD decoder.
+Fixed crash on some Apple ProRes.
+Added support for RGB48 output, which can make madVR. Disabled by default.
+Reduced memory usage for DXVA2 decoder.
+
+Mpeg2DecFilter
+Fixed crash on some DVDs.
+Fixed the scaling of setting window.
+
+MpaDecFilter
+Added support for decoding audio Based Music Codec (QDMC).
+Added support for decoding DST (Digital Stream Transfer).
+For the built-in decoder removed the format conversion sample.
+Improved working with AAC LATM.
+Added option to disable adjustment A/V sync.
+
+AudioSwitcher
+Audio delay now works in the SPDIF/HDMI passthrough.
+Fixed Bass Redirect for sound in Int24 format.
+The conversion of the sample format is added.
+
+MpcAudioRenderer
+Fixed loss of samples after pause.
+Added option "Release device when idle" for the exclusive mode after 3 seconds of inactivity. By default is off.
+
+VideoRenderers
+Fixed display of subtitles in stereo 3D.
+Fixed disable Aero option.
+Added P010 format for EVR-mixer.
+Added the ability to save the displayed frame (Shift+F5).
+Added HDR conversion in SDR.
+New interpolation methods have been added to reduce less than 50%.
+There have been marked methods for resizing the frame, which require the support of PixelShaders 3.0.
+Improved bug trail for Nvidia for video with a width of 1088 when using textures 16/32-bit floating.
+Considered the possibility of making UYVY input EVR-CP.
+Fixed problem with displaying YUV 4:2:2 (YUY2, UYVY) on Nvidia graphics cards (probably a bug of the driver).
+The texture format to "32-bit Floating Point" is marked as deprecated (generating a very large consumption of memory).
+Corrected explanations for video renderers.
+In statistics, the output information about the mode of operation of video decoders was changed, more detailed information was added for LAV Video Decoder.
+Added hack for correct setting of screen frequency for exclusive mode for Windows 8.1 and 10.
+
+DirectVobSubFilter
+Updated the black list of applications (the list is taken from MPC-HC).
+
+Subtitles
+Fixed crash on some animated subtitles.
+The mode "Only forced" now works with text subtitles.
+The command "Copy the displayed subtitles to the clipboard" is added.
+Send the information about the depth of 3D subtitles to the renderer.
+Automatic reopening of files with subtitles if they are changed.
+Optimizing the rendering of SSA / ASS subtitles.
+Correctly scale raster subtitles with transparency.
+
+YouTube
+Updated support for opening YouTube links.
+Added the ability to open links like www.youtube.com/embed/.
+Return support for opening video quality 240p.
+
+Player
+Various interface adjustments.
+Automatic insertion of links in the command "Open File/URL" is now optional.
+Improved work with CUE files.
+When you open the folder, we correctly ignore the playlists and clear the current one.
+Fixed reset settings (some settings might not reset).
+For the "Auto-zoom" option, the option "Auto fit (larger only)" is added.
+Fixed incorrect restore of the position and size of the window at startup, if the option "Tray icon" is turned on.
+In PinInfo for the parameter VIDEOINFOHEADER-> AvgTimePerFrame additionally show the equivalent FPS.
+Removed ability to upload subtitles on www.opensubtitles.org, which did not work.
+Changed the calculation of the window size when changing the scale for the case when the window does not fit on the screen.
+Improved hack for the "invisible borders" in Windows 10.
+Fixed positioning of the preview window.
+Fixed saving to playlist and bookmarks for BD, DVD and ISO.
+A complete overhaul of the Shader editor.
+Standard shaders are now available to all users.
+Fixed display of tooltips at large scale (DPI).
+Added saving thumbnails with captions.
+Added ability to open online playlists in different UTF encodings.
+Eliminated jitter of the frame width from the right side of the video area to ± 1 pixel when the window is changed and the option "Limit window proportions on resize" is on.
+Added support for opening UHD Blu-Ray.
+Increased maximum value of the history of open files to 100.
+Some settings transferred from "Audio" to "Sound processing" setting panel. Added option "Request stereo from the decoder".
+The optimization of resources.
+Added command "Jump to Beginning" (key "Home").
+Added remembering of the current item in the playlist.
+Remembering a position in a file now works not only for local files.
+Transfer the "Color Management" settings from the "Video" settings panel to the "Color Correction" settings panel.
+Improved HiDPI support.
+Added the ability to call the "Bookmarks" menu using the hotkey.
+The "Command Line Options" window has been changed.
+The framing mode can now only be saved from the "Video" settings panel. Changes to the mode from the menu only work for the current session. Added options "Do not scale at small frame size increases" and "Do not scale at small frame size decreases".
+The possibility of opening links "acestream://" is added.
+Added the ability to take the title from the playlist when the option "Replace file name with title".
+The scroll bar display title if it is missing then the file name.
+In the settings dialog "Keys", highlight the values that are duplicated.
+Added the ability to display the labels of the chapters for the light theme.
+Removed memorization of position for online broadcasts and sources with unknown duration.
+If possible, display the title instead of the link for YouTube and online links.
+Fixed saving of thumbnails when the thumbnail is larger than the original frame.
+Added mode "OverUnder" for stereo 3D output.
+Added the ability to get the displayed frame (command Shift+F5) for madVR v0.92.3.
 
 Updated libraries:
 	ffmpeg git-n3.4-dev-2207-geea64ef4cf;
