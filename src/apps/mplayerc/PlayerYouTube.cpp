@@ -415,7 +415,35 @@ namespace Youtube
 				free(data);
 				data = nullptr;
 				dataSize = 0;
-				CString link; link.Format(L"https://www.youtube.com/get_video_info?video_id=%s&ps=default&eurl=&gl=US&hl=en&el=info", videoId);
+
+				CString link; link.Format(L"https://www.youtube.com/embed/%s", videoId);
+				hUrl = InternetOpenUrl(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
+				if (hUrl) {
+					InternetReadData(hUrl, &data, dataSize, nullptr);
+					InternetCloseHandle(hUrl);
+				}
+
+				if (!data) {
+					if (hInet) {
+						InternetCloseHandle(hInet);
+					}
+					return false;
+				}
+
+				const CStringA sts = RegExpParseA(data, "\"sts\"\\s*:\\s*(\\d+)");
+
+				free(data);
+				data = nullptr;
+				dataSize = 0;
+
+				if (sts.IsEmpty()) {
+					if (hInet) {
+						InternetCloseHandle(hInet);
+					}
+					return false;
+				}
+
+				link.Format(L"https://www.youtube.com/get_video_info?video_id=%s&eurl=https://youtube.googleapis.com/v/%s&sts=%S", videoId, videoId, sts);
 				hUrl = InternetOpenUrl(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 				if (hUrl) {
 					InternetReadData(hUrl, &data, dataSize, nullptr);
