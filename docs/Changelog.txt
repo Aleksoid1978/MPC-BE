@@ -23,7 +23,7 @@ More correctly determine the delta frames for Xvid and DivX 5 at rebuilding an i
 MpegSplitter
 Improved work with AAC tracks.
 Improved support for teletext subtitles.
-Improved rewind for BD.
+Improved Blu-Ray rewind.
 
 FLVSplitter
 Improved opening of some files.
