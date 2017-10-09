@@ -412,9 +412,7 @@ namespace Youtube
 			CStringA strUrls;
 
 			if (strstr(data, MATCH_AGE_RESTRICTION)) {
-				free(data);
-				data = nullptr;
-				dataSize = 0;
+				free(data); data = nullptr; dataSize = 0;
 
 				CString link; link.Format(L"https://www.youtube.com/embed/%s", videoId);
 				hUrl = InternetOpenUrl(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
@@ -424,22 +422,16 @@ namespace Youtube
 				}
 
 				if (!data) {
-					if (hInet) {
-						InternetCloseHandle(hInet);
-					}
+					InternetCloseHandle(hInet);
 					return false;
 				}
 
 				const CStringA sts = RegExpParseA(data, "\"sts\"\\s*:\\s*(\\d+)");
 
-				free(data);
-				data = nullptr;
-				dataSize = 0;
+				free(data); data = nullptr; dataSize = 0;
 
 				if (sts.IsEmpty()) {
-					if (hInet) {
-						InternetCloseHandle(hInet);
-					}
+					InternetCloseHandle(hInet);
 					return false;
 				}
 
@@ -451,9 +443,7 @@ namespace Youtube
 				}
 
 				if (!data) {
-					if (hInet) {
-						InternetCloseHandle(hInet);
-					}
+					InternetCloseHandle(hInet);
 					return false;
 				}
 
@@ -480,8 +470,8 @@ namespace Youtube
 					url.Replace(L"\\/", L"/");
 					urls.AddHead(url);
 
-					InternetCloseHandle(hInet);
 					free(data);
+					InternetCloseHandle(hInet);
 					return true;
 				}
 
