@@ -10563,7 +10563,12 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 	m_bAudioOnly = fAudioOnly;
 
-	if (m_bFirstFSAfterLaunchOnFullScreen) { //Play started in Fullscreen
+	if (!m_bFullScreen) {
+		SetMenuBarVisibility(s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU ?
+							 AFX_MBV_KEEPVISIBLE : AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10);
+	}
+
+	if (m_bFirstFSAfterLaunchOnFullScreen) { // Play started in Fullscreen
 		if (s.bRememberWindowSize || s.bRememberWindowPos) {
 			r = s.rcLastWindowPos;
 			if (!s.bRememberWindowPos) {
@@ -10602,11 +10607,6 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	}
 
 	SetAlwaysOnTop(s.iOnTop);
-
-	if (!m_bFullScreen) {
-		SetMenuBarVisibility(s.iCaptionMenuMode == MODE_SHOWCAPTIONMENU ?
-							 AFX_MBV_KEEPVISIBLE : AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10);
-	}
 
 	MoveVideoWindow();
 
