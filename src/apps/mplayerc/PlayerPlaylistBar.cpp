@@ -1620,29 +1620,28 @@ void CPlayerPlaylistBar::EnsureVisible(POSITION pos, bool bMatchPos)
 
 int CPlayerPlaylistBar::FindItem(POSITION pos)
 {
-	for (int i = 0; i < m_list.GetItemCount(); i++)
+	for (int i = 0; i < m_list.GetItemCount(); i++) {
 		if ((POSITION)m_list.GetItemData(i) == pos) {
-			return(i);
+			return i;
 		}
-	return(-1);
+	}
+
+	return -1;
 }
 
 POSITION CPlayerPlaylistBar::FindPos(int i)
 {
-	if (i < 0) {
-		return(nullptr);
-	}
-	return((POSITION)m_list.GetItemData(i));
+	return i < 0 ? nullptr : (POSITION)m_list.GetItemData(i);
 }
 
 int CPlayerPlaylistBar::GetCount()
 {
-	return(m_pl.GetCount()); // TODO: n - .fInvalid
+	return m_pl.GetCount();
 }
 
 int CPlayerPlaylistBar::GetSelIdx()
 {
-	return(FindItem(m_pl.GetPos()));
+	return FindItem(m_pl.GetPos());
 }
 
 void CPlayerPlaylistBar::SetSelIdx(int i, bool bUpdatePos/* = false*/)
@@ -1680,10 +1679,7 @@ bool CPlayerPlaylistBar::GetCur(CPlaylistItem& pli)
 
 CPlaylistItem* CPlayerPlaylistBar::GetCur()
 {
-	if (!m_pl.GetPos()) {
-		return nullptr;
-	}
-	return &m_pl.GetAt(m_pl.GetPos());
+	return !m_pl.GetPos() ? nullptr : &m_pl.GetAt(m_pl.GetPos());
 }
 
 CString CPlayerPlaylistBar::GetCurFileName()
@@ -1693,7 +1689,7 @@ CString CPlayerPlaylistBar::GetCurFileName()
 	if (pli && !pli->m_fns.IsEmpty()) {
 		fn = pli->m_fns.GetHead().GetName();
 	}
-	return(fn);
+	return fn;
 }
 
 bool CPlayerPlaylistBar::SetNext()
