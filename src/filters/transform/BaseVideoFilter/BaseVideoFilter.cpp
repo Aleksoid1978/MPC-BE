@@ -553,20 +553,19 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 		vih2->dwControlFlags = m_dxvaExtFormat.value;
 	}
 
-	CMediaType& mt = m_pInput->CurrentMediaType();
+	const CMediaType& mtInput = m_pInput->CurrentMediaType();
 
 	// these fields have the same field offset in all four structs
-	((VIDEOINFOHEADER*)pmt->Format())->AvgTimePerFrame = ((VIDEOINFOHEADER*)mt.Format())->AvgTimePerFrame;
-	((VIDEOINFOHEADER*)pmt->Format())->dwBitRate       = ((VIDEOINFOHEADER*)mt.Format())->dwBitRate;
-	((VIDEOINFOHEADER*)pmt->Format())->dwBitErrorRate  = ((VIDEOINFOHEADER*)mt.Format())->dwBitErrorRate;
+	((VIDEOINFOHEADER*)pmt->Format())->AvgTimePerFrame = ((VIDEOINFOHEADER*)mtInput.Format())->AvgTimePerFrame;
+	((VIDEOINFOHEADER*)pmt->Format())->dwBitRate       = ((VIDEOINFOHEADER*)mtInput.Format())->dwBitRate;
+	((VIDEOINFOHEADER*)pmt->Format())->dwBitErrorRate  = ((VIDEOINFOHEADER*)mtInput.Format())->dwBitErrorRate;
 
 	pmt->SetSampleSize(bihOut.biSizeImage);
 
 	if (!vsfilter) {
 		// copy source and target rectangles from input pin
-		CMediaType&      pmtInput = m_pInput->CurrentMediaType();
 		VIDEOINFOHEADER* vih      = (VIDEOINFOHEADER*)pmt->Format();
-		VIDEOINFOHEADER* vihInput = (VIDEOINFOHEADER*)pmtInput.Format();
+		VIDEOINFOHEADER* vihInput = (VIDEOINFOHEADER*)mtInput.Format();
 
 		ASSERT(vih);
 		if (vihInput && (vihInput->rcSource.right != 0) && (vihInput->rcSource.bottom != 0)) {
