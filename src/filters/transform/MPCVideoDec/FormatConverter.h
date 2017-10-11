@@ -118,6 +118,7 @@ protected:
 
 	int					m_dstStride;
 	int					m_planeHeight;
+	int					m_OutHeight;
 
 	size_t				m_nAlignedBufferSize;
 	uint8_t*			m_pAlignedBuffer;
