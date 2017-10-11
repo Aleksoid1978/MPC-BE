@@ -487,27 +487,6 @@ bool CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		}
 	}
 
-	if (m_out_pixfmt == PixFmt_RGB32 && m_OutHeight > 0) {
-		// code from LAV ...
-		auto flip_plane = [](BYTE *buffer, const size_t stride, size_t height) {
-			BYTE *line_buffer = (BYTE *)av_malloc(stride);
-			BYTE *cur_front   = buffer;
-			BYTE *cur_back    = buffer + (stride * (height - 1));
-			height /= 2;
-			for (size_t i = 0; i < height; i++) {
-				memcpy(line_buffer, cur_front, stride);
-				memcpy(cur_front, cur_back, stride);
-				memcpy(cur_back, line_buffer, stride);
-				cur_front += stride;
-				cur_back -= stride;
-			}
-
-			av_freep(&line_buffer);
-		};
-
-		flip_plane(dst, m_dstStride * swof.codedbytes, m_FProps.height);
-	}
-
 	return true;
 }
 

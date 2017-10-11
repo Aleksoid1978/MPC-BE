@@ -1797,9 +1797,16 @@ HRESULT CFormatConverter::convert_yuv_rgb(const uint8_t* const src[4], const ptr
     return E_FAIL;
   }
 
+  ptrdiff_t n_dstStride = dstStride[0];
+  if (m_out_pixfmt == PixFmt_RGB32 && m_OutHeight > 0) {
+    // flip the image, if necessary
+    dst[0] += n_dstStride * (height - 1);
+    n_dstStride = -n_dstStride;
+  }
+
   // run conversion, threaded
   if (m_NumThreads <= 1) {
-    convFn(src[0], src[1], src[2], dst[0], width, height, srcStride[0], srcStride[1], dstStride[0], 0, height, coeffs, dithers);
+    convFn(src[0], src[1], src[2], dst[0], width, height, srcStride[0], srcStride[1], n_dstStride, 0, height, coeffs, dithers);
   } else {
     const int is_odd = (inputFormat == PFType_YUV420 || inputFormat == PFType_NV12 || inputFormat == PFType_P010);
     const ptrdiff_t lines_per_thread = (height / m_NumThreads)&~1;
@@ -1807,7 +1814,7 @@ HRESULT CFormatConverter::convert_yuv_rgb(const uint8_t* const src[4], const ptr
     Concurrency::parallel_for(0, m_NumThreads, [&](int i) {
       const ptrdiff_t starty = (i * lines_per_thread);
       const ptrdiff_t endy = (i == (m_NumThreads - 1)) ? height : starty + lines_per_thread + is_odd;
-      convFn(src[0], src[1], src[2], dst[0], width, height, srcStride[0], srcStride[1], dstStride[0], starty + (i ? is_odd : 0), endy, coeffs, dithers);
+      convFn(src[0], src[1], src[2], dst[0], width, height, srcStride[0], srcStride[1], n_dstStride, starty + (i ? is_odd : 0), endy, coeffs, dithers);
     });
   }
 
