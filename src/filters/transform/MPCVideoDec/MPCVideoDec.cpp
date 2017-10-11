@@ -2438,7 +2438,7 @@ HRESULT CMPCVideoDecFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATO
 			return E_UNEXPECTED;
 		}
 
-		pProperties->cBuffers = 20;
+		pProperties->cBuffers = 22;
 
 		HRESULT hr = S_OK;
 		ALLOCATOR_PROPERTIES Actual;
