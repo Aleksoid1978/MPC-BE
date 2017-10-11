@@ -1883,7 +1883,15 @@ const RGBCoeffs* CFormatConverter::getRGBCoeffs(int width, int height)
     }
 
     double Kr, Kg, Kb;
-    switch (m_FProps.colorspace) {
+    AVColorSpace colorspace = m_FProps.colorspace;
+    if (colorspace == AVCOL_SPC_UNSPECIFIED) {
+      if (width <= 1024 && height <= 576) { // SD
+        colorspace = AVCOL_SPC_BT470BG;
+      } else {
+        colorspace = AVCOL_SPC_BT709;
+      }
+    }
+    switch (colorspace) {
     case AVCOL_SPC_BT470BG:
     case AVCOL_SPC_SMPTE170M:
       Kr = 0.299;
@@ -1907,7 +1915,7 @@ const RGBCoeffs* CFormatConverter::getRGBCoeffs(int width, int height)
       Kb = 0.0593;
       break;
     default:
-      DLog(L"CFormatConverter()::getRGBCoeffs(): Unknown color space: %d - defaulting to BT709", m_FProps.colorspace);
+      DLog(L"CFormatConverter()::getRGBCoeffs(): Unknown color space: %d - defaulting to BT709", colorspace);
     case AVCOL_SPC_BT709:
       Kr = 0.2126;
       Kg = 0.7152;
