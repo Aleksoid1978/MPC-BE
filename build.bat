@@ -16,7 +16,7 @@ REM
 REM You should have received a copy of the GNU General Public License
 REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SETLOCAL
+SETLOCAL ENABLEDELAYEDEXPANSION
 CD /D %~dp0
 
 SET ARG=%*
@@ -317,9 +317,16 @@ REM %2 is mask of the files to sign
 
 PUSHD "%~1"
 
+SET FILES=
+
 FOR /F "delims=" %%A IN ('DIR "%2" /b') DO (
-  CALL "%~dp0contrib\sign.cmd" "%%A" || (CALL :SubMsg "ERROR" "Problem signing %%A" & GOTO Break)
+  IF "!FILES!" == "" (
+    SET FILES=%%A
+  ) ELSE (
+    SET FILES=!FILES! %%A
+  )
 )
+CALL "%~dp0contrib\sign.cmd" %FILES% || (CALL :SubMsg "ERROR" "Problem signing %FILES%" & GOTO Break)
 CALL :SubMsg "INFO" "%2 signed successfully."
 
 :Break
