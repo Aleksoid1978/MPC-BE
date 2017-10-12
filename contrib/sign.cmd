@@ -53,10 +53,10 @@ IF NOT DEFINED VCVARS (
 
 CALL "%VCVARS%" x86 > nul
 
-TITLE Signing "%~1"...
-ECHO. & ECHO Signing "%~1"...
+TITLE Signing "%*"...
+ECHO. & ECHO Signing "%*"...
 
-FOR /F "delims=" %%A IN (%~dp0signinfo.txt) DO (SET "SIGN_CMD=%%A" && CALL :SIGN %1)
+FOR /F "delims=" %%A IN (%~dp0signinfo.txt) DO (SET "SIGN_CMD=%%A" && CALL :SIGN %*)
 
 :END
 ENDLOCAL
@@ -65,6 +65,6 @@ EXIT /B %ERRORLEVEL%
 :SIGN
 FOR /L %%i IN (1,1,5) DO (
   IF %%i GTR 1 ECHO %%i attempt
-  signtool.exe sign %SIGN_CMD% "%~1"
+  signtool.exe sign %SIGN_CMD% %*
   IF %ERRORLEVEL% EQU 0 EXIT /B %ERRORLEVEL%
 )
