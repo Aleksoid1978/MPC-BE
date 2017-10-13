@@ -127,7 +127,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 				pshdr h;
 				if (ReadPS(h)) {
 					cnt++;
-					m_rate = int(h.bitrate/8);
+					m_rate = h.bitrate / 8;
 				}
 			} else if ((b & 0xe0) == 0xc0 // audio, 110xxxxx, mpeg1/2/3
 					   || (b & 0xf0) == 0xe0 // video, 1110xxxx, mpeg1/2
@@ -219,7 +219,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 
 			if (m_programs.size() > 1) {
 				const DWORD pid = pMasterStream->GetHead();
-				const auto program = FindProgram(pid);
+				auto program = FindProgram(pid);
 				if (program) {
 					main_program_number = program->program_number;
 
@@ -238,7 +238,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 
 		auto verifyProgram = [&](const stream& s) {
 			if (main_program_number != WORD_MAX) {
-				const auto program = FindProgram(s);
+				auto program = FindProgram(s);
 				if (!program || program->program_number != main_program_number) {
 					return false;
 				}
@@ -301,10 +301,9 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 				}
 			}
 
-			int indicated_rate = m_rate;
-			int detected_rate = int(m_rtMax > m_rtMin ? UNITS * (posMax - posMin) / (m_rtMax - m_rtMin) : 0);
-
-			m_rate = detected_rate ? detected_rate : m_rate;
+			if (m_rtMax > m_rtMin) {
+				m_rate = llMulDiv(posMax - posMin, UNITS, m_rtMax - m_rtMin, 0);
+			}
 		}
 	}
 

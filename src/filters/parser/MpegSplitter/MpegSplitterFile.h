@@ -227,7 +227,7 @@ public:
 
 	BOOL m_bPESPTSPresent;
 
-	int m_rate; // byte/sec
+	__int64 m_rate; // byte/sec
 
 	int m_AC3CoreOnly;
 	bool m_ForcedSub, m_SubEmptyPin;
