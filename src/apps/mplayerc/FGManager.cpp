@@ -26,7 +26,7 @@
 #include <madVRAllocatorPresenter.h>
 #include "DeinterlacerFilter.h"
 #include "../../DSUtil/SysVersion.h"
-#include "../../DSUtil/FileVersionInfo.h"
+#include "../../DSUtil/FileVersion.h"
 #include "../../filters/transform/DeCSSFilter/VobFile.h"
 #include <InitGuid.h>
 #include <dmodshow.h>
@@ -2668,7 +2668,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"CLSID\\" + clsid + L"\\InprocServer32", KEY_READ)
 				&& ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len)
-				&& CFileVersionInfo::GetFileVersion(buff) < 0x0001000000030000ui64) {
+				&& FileVersion::GetVer(buff).value < FileVersion::Ver(1,0,3,0).value) {
 			m_transform.AddTail(DNew CFGFilterRegistry(GUIDFromCString(clsid), MERIT64_DO_NOT_USE));
 		}
 	}

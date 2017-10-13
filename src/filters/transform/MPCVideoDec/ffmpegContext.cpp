@@ -23,6 +23,7 @@
 #include <Windows.h>
 #include <time.h> // for the _time64 workaround
 #include <mpc_defines.h>
+#include "../../../DSUtil/FileVersion.h"
 #include "ffmpegContext.h"
 
 extern "C" {
@@ -73,35 +74,6 @@ static bool CheckPCID(DWORD pcid, const WORD* pPCIDs, size_t count)
 	return false;
 }
 
-// returns 'true' if version is equal to or higher than A.B.C.D, returns 'false' otherwise
-static bool DriverVersionCheck(UINT64 VideoDriverVersion, UINT16 A, UINT16 B, UINT16 C, UINT16 D)
-{
-	LONGLONG ver = (UINT64)A << 48 | (UINT64)B << 32 | (UINT64)C << 16 | (UINT64)D;
-
-	return VideoDriverVersion >= ver;
-}
-
-static UINT64 GetFileVersion(LPCWSTR wstrFilename)
-{
-	UINT64 ret = 0;
-
-	const DWORD len = GetFileVersionInfoSizeW(wstrFilename, nullptr);
-	if (len) {
-		WCHAR* buf = new WCHAR[len];
-		if (buf) {
-			UINT uLen;
-			VS_FIXEDFILEINFO* pvsf = nullptr;
-			if (GetFileVersionInfoW(wstrFilename, 0, len, buf) && VerQueryValueW(buf, L"\\", (LPVOID*)&pvsf, &uLen)) {
-				ret = ((UINT64)pvsf->dwFileVersionMS << 32) | pvsf->dwFileVersionLS;
-			}
-
-			delete [] buf;
-		}
-	}
-
-	return ret;
-}
-
 // === H264 functions
 
 int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
@@ -129,7 +101,7 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 
 		if (nPCIVendor == PCIV_nVidia) {
 			// nVidia cards support level 5.1 since drivers v7.15.11.7800 for Vista/7
-			if (DriverVersionCheck(VideoDriverVersion, 7, 15, 11, 7800)) {
+			if (VideoDriverVersion >= FileVersion::Ver(7, 15, 11, 7800).value) {
 				no_level51_support = 0;
 				max_ref_frames = 16;
 			}
@@ -137,17 +109,17 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 			WCHAR path[MAX_PATH] = { 0 };
 			GetSystemDirectory(path, MAX_PATH);
 			wcscat(path, L"\\drivers\\atikmdag.sys\0");
-			UINT64 atikmdag_ver = GetFileVersion(path);
+			UINT64 atikmdag_ver = FileVersion::GetVer(path).value;
 
 			if (atikmdag_ver) {
 				// file version 8.1.1.1016 - Catalyst 10.4, WinVista & Win7
-				if (DriverVersionCheck(atikmdag_ver, 8, 1, 1, 1016)) {
+				if (atikmdag_ver >= FileVersion::Ver(8, 1, 1, 1016).value) {
 					no_level51_support = 0;
 					max_ref_frames = 16;
 				}
 			} else {
 				// driver version 8.14.1.6105 - Catalyst 10.4; TODO - verify this information
-				if (DriverVersionCheck(VideoDriverVersion, 8, 14, 1, 6105)) {
+				if (VideoDriverVersion >= FileVersion::Ver(8, 14, 1, 6105).value) {
 					no_level51_support = 0;
 					max_ref_frames = 16;
 				}
@@ -369,7 +341,7 @@ BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nP
 	height = (height + 15) & ~15; // (height + 15) / 16 * 16;
 
 	if (nPCIVendor == PCIV_nVidia) {
-		if (DriverVersionCheck(VideoDriverVersion, 9, 18, 13, 2018)) {
+		if (VideoDriverVersion >= FileVersion::Ver(9, 18, 13, 2018).value) {
 			// For Nvidia graphics cards with support for 4k, you must install the driver v320.18 or newer.
 			return TRUE;
 		}
@@ -379,7 +351,7 @@ BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nP
 		}
 	}
 	else if (nPCIVendor == PCIV_ATI) {
-		if (DriverVersionCheck(VideoDriverVersion, 8, 17, 10, 1404)) { // aticfx32.dll/aticfx64.dll (v8.17.10.1404)
+		if (VideoDriverVersion >= FileVersion::Ver(8, 17, 10, 1404).value) { // aticfx32.dll/aticfx64.dll (v8.17.10.1404)
 			// For AMD graphics cards with support for 4k, you must install the Catalyst v15.7.1 or newer
 			return TRUE;
 		}
@@ -389,7 +361,7 @@ BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nP
 			return TRUE;
 		}
 	}
-	else if (nPCIVendor == PCIV_Intel && DriverVersionCheck(VideoDriverVersion, 10, 18, 10, 4061)) {
+	else if (nPCIVendor == PCIV_Intel && VideoDriverVersion >= FileVersion::Ver(10, 18, 10, 4061).value) {
 		// For Intel graphics cards with support for 4k, you must install the driver v15.33.32.4061 or newer.
 		return TRUE;
 	}
