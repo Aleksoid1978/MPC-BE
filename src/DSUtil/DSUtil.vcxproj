@@ -141,6 +141,7 @@
     <ClInclude Include="DSUtil.h" />
     <ClInclude Include="ff_log.h" />
     <ClInclude Include="FileHandle.h" />
+    <ClInclude Include="FileVersion.h" />
     <ClInclude Include="FileVersionInfo.h" />
     <ClInclude Include="FontInstaller.h" />
     <ClInclude Include="GolombBuffer.h" />
