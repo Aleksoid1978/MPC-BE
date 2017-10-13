@@ -6318,7 +6318,7 @@ void CMainFrame::OnFileSaveSubtitle()
 		if (OpenFileData* pFileData = dynamic_cast<OpenFileData*>(pOMD)) {
 			// HACK: get the file name from the current playlist item
 			suggestedFileName = GetCurFileName();
-			if (IsLikelyPath(suggestedFileName)) {
+			if (IsLikelyFilePath(suggestedFileName)) {
 				suggestedFileName = suggestedFileName.Left(suggestedFileName.ReverseFind('.')); // exclude the extension, it will be auto completed
 			} else {
 				suggestedFileName = L"subtitle";
@@ -11906,9 +11906,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			pMRU->ReadList();
 			pMRU->Add(fn);
 			pMRU->WriteList();
-			if (IsLikelyPath(fn)) { // stupid path detector
+			if (IsLikelyFilePath(fn)) {
 				// there should not be a URL, otherwise explorer dirtied HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts
-				SHAddToRecentDocs(SHARD_PATH, fn);
+				SHAddToRecentDocs(SHARD_PATHW, fn);
 			}
 		}
 
@@ -13492,7 +13492,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	SetAudioPicture(FALSE);
 
-	m_fValidDVDOpen	= false;
+	m_fValidDVDOpen = false;
 
 	OpenFileData* pFileData		= dynamic_cast<OpenFileData*>(pOMD.m_p);
 	OpenDVDData* pDVDData		= dynamic_cast<OpenDVDData*>(pOMD.m_p);
@@ -19161,7 +19161,10 @@ void CMainFrame::AddRecent(CString pathName)
 		pMRU->ReadList();
 		pMRU->Add(pathName);
 		pMRU->WriteList();
-		SHAddToRecentDocs(SHARD_PATH, pathName);
+		if (IsLikelyFilePath(pathName)) {
+			// there should not be a URL, otherwise explorer dirtied HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts
+			SHAddToRecentDocs(SHARD_PATHW, pathName);
+		}
 	}
 }
 

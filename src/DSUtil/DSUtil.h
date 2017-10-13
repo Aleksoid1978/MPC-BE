@@ -136,7 +136,8 @@ extern HRESULT			LoadExternalPropertyPage(IPersist* pP, REFCLSID clsid, IPropert
 extern void				UnloadExternalObjects();
 
 extern CString			MakeFullPath(LPCTSTR path);
-extern bool				IsLikelyPath(LPCTSTR str); // stupid path detector
+// simple file system path detector
+extern bool				IsLikelyFilePath(const CString &str);
 
 extern GUID				GUIDFromCString(CString str);
 extern HRESULT			GUIDFromCString(CString str, GUID& guid);
