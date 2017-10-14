@@ -30,16 +30,17 @@ struct AVCodecContext;
 #define DXVA_HIGH_BIT					DXVA_UNSUPPORTED_LEVEL << 4
 
 // === H264 functions
-int		FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
-								 DWORD nPCIVendor, DWORD nPCIDevice, UINT64 VideoDriverVersion);
-void	FFH264GetParams(struct AVCodecContext* pAVCtx, int& x264_build);
+int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
+							 DWORD nPCIVendor, DWORD nPCIDevice, UINT64 VideoDriverVersion);
+void FFH264GetParams(struct AVCodecContext* pAVCtx, int& x264_build);
+void FFH264CalculateSize(struct AVCodecContext* pAVCtx);
 
 // === Mpeg2 functions
-int		MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx);
+int  MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx);
 
 // === Common functions
-void	FillAVCodecProps(struct AVCodecContext* pAVCtx, int x264_build);
+void FillAVCodecProps(struct AVCodecContext* pAVCtx, int x264_build);
 
-bool	IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice);
-BOOL	DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height,
-						   DWORD nPCIVendor, DWORD nPCIDevice, UINT64 VideoDriverVersion);
+bool IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice);
+BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height,
+						DWORD nPCIVendor, DWORD nPCIDevice, UINT64 VideoDriverVersion);

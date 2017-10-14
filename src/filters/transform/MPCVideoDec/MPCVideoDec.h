@@ -263,8 +263,6 @@ public:
 	BOOL						IsSupportedDecoderMode(const GUID& decoderGUID);
 	int							PictWidth();
 	int							PictHeight();
-	int							PictWidthAligned();
-	int							PictHeightAligned();
 
 	DXVA2_ExtendedFormat		GetDXVA2ExtendedFormat(AVCodecContext *ctx, AVFrame *frame);
 

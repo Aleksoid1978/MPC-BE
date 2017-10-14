@@ -1234,16 +1234,6 @@ int CMPCVideoDecFilter::PictHeight()
 	return m_pAVCtx->height ? m_pAVCtx->height : m_pAVCtx->coded_height;
 }
 
-int CMPCVideoDecFilter::PictWidthAligned()
-{
-	return FFALIGN(m_pAVCtx->coded_width, m_nAlign);
-}
-
-int CMPCVideoDecFilter::PictHeightAligned()
-{
-	return FFALIGN(m_pAVCtx->coded_height, m_nAlign);
-}
-
 static bool IsFFMPEGEnabled(FFMPEG_CODECS ffcodec, const bool FFmpegFilters[VDEC_LAST])
 {
 	if (ffcodec.FFMPEGCode < 0 || ffcodec.FFMPEGCode >= VDEC_LAST) {
@@ -1909,8 +1899,8 @@ redo:
 		m_nAlign = 128;
 	}
 
-	m_nSurfaceWidth  = m_pAVCtx->coded_width;
-	m_nSurfaceHeight = m_pAVCtx->coded_height;
+	m_nSurfaceWidth  = FFALIGN(m_pAVCtx->coded_width, m_nAlign);
+	m_nSurfaceHeight = FFALIGN(m_pAVCtx->coded_height, m_nAlign);
 
 	const int depth = GetLumaBits(m_pAVCtx->pix_fmt);
 	m_bHighBitdepth = (depth == 10) && ((m_nCodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10)
@@ -1927,11 +1917,11 @@ redo:
 			}
 
 			if (m_nCodecId == AV_CODEC_ID_H264) {
-				if (m_nDXVA_SD && PictWidthAligned() < 1280) { // check "Disable DXVA for SD" option
+				if (m_nDXVA_SD && m_nSurfaceWidth < 1280) { // check "Disable DXVA for SD" option
 					break;
 				}
 
-				const int nCompat = FFH264CheckCompatibility(PictWidthAligned(), PictHeightAligned(), m_pAVCtx, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion);
+				const int nCompat = FFH264CheckCompatibility(m_nSurfaceWidth, m_nSurfaceHeight, m_pAVCtx, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion);
 
 				if ((nCompat & DXVA_PROFILE_HIGHER_THAN_HIGH) || (nCompat & DXVA_HIGH_BIT)) { // DXVA unsupported
 					break;
@@ -2358,8 +2348,8 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 				UINT numSurfaces = max(m_DXVA2Config.ConfigMinRenderTargetBuffCount, 1);
 				LPDIRECT3DSURFACE9 pSurfaces[DXVA2_MAX_SURFACES] = { 0 };
 				hr = pDXVA2Service->CreateSurface(
-						PictWidthAligned(),
-						PictHeightAligned(),
+						m_nSurfaceWidth,
+						m_nSurfaceHeight,
 						numSurfaces,
 						m_VideoDesc.Format,
 						D3DPOOL_DEFAULT,
@@ -3118,8 +3108,8 @@ void CMPCVideoDecFilter::FlushDXVADecoder()	{
 void CMPCVideoDecFilter::FillInVideoDescription(DXVA2_VideoDesc& videoDesc, D3DFORMAT Format/* = D3DFMT_A8R8G8B8*/)
 {
 	memset(&videoDesc, 0, sizeof(videoDesc));
-	videoDesc.SampleWidth        = PictWidthAligned();
-	videoDesc.SampleHeight       = PictHeightAligned();
+	videoDesc.SampleWidth        = m_nSurfaceWidth;
+	videoDesc.SampleHeight       = m_nSurfaceHeight;
 	videoDesc.Format             = Format;
 	videoDesc.UABProtectionLevel = 1;
 }
@@ -3828,15 +3818,19 @@ enum AVPixelFormat CMPCVideoDecFilter::av_get_format(struct AVCodecContext *c, c
 
 		if (*p == AV_PIX_FMT_DXVA2_VLD) {
 			if (pFilter->m_pDXVADecoder) {
-				if (pFilter->m_nSurfaceWidth != c->coded_width
-						|| pFilter->m_nSurfaceHeight != c->coded_height) {
+				if (c->codec_id == AV_CODEC_ID_H264) {
+					FFH264CalculateSize(c);
+				}
+				if (pFilter->m_nSurfaceWidth != FFALIGN(c->coded_width, pFilter->m_nAlign)
+						|| pFilter->m_nSurfaceHeight != FFALIGN(c->coded_height, pFilter->m_nAlign)) {
 					avcodec_flush_buffers(c);
+
+					pFilter->m_nSurfaceWidth  = FFALIGN(c->coded_width, pFilter->m_nAlign);
+					pFilter->m_nSurfaceHeight = FFALIGN(c->coded_height, pFilter->m_nAlign);
+
 					if (SUCCEEDED(pFilter->FindDecoderConfiguration())) {
 						pFilter->RecommitAllocator();
 					}
-
-					pFilter->m_nSurfaceWidth  = c->coded_width;
-					pFilter->m_nSurfaceHeight = c->coded_height;
 				}
 			}
 			break;
