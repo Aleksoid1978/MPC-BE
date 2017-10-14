@@ -11906,6 +11906,10 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			pMRU->ReadList();
 			pMRU->Add(fn);
 			pMRU->WriteList();
+			if (IsLikelyFilePath(fn)) {
+				// there should not be a URL, otherwise explorer dirtied HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts
+				SHAddToRecentDocs(SHARD_PATHW, fn); // remember the last open files (system) through the drag-n-drop
+			}
 		}
 
 		if (bFirst) {
@@ -19157,6 +19161,10 @@ void CMainFrame::AddRecent(CString pathName)
 		pMRU->ReadList();
 		pMRU->Add(pathName);
 		pMRU->WriteList();
+		if (IsLikelyFilePath(pathName)) {
+			// there should not be a URL, otherwise explorer dirtied HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts
+			SHAddToRecentDocs(SHARD_PATHW, pathName); // remember the last open files (system) through the drag-n-drop
+		}
 	}
 }
 
