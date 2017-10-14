@@ -152,6 +152,16 @@ void FFH264GetParams(struct AVCodecContext* pAVCtx, int& x264_build)
 	x264_build = h->sei.unregistered.x264_build;
 }
 
+void FFH264CalculateSize(struct AVCodecContext* pAVCtx)
+{
+	H264Context* h = (H264Context*)pAVCtx->priv_data;
+	const SPS* sps = h264_getSPS(h);
+	if (sps && sps->mb_height > 0) {
+		// fill "Bitstream height" properties
+		pAVCtx->coded_height = sps->mb_height * 16;
+	}
+}
+
 // === Mpeg2 functions
 int MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx)
 {
@@ -161,15 +171,9 @@ int MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx)
 void FillAVCodecProps(struct AVCodecContext* pAVCtx, int x264_build)
 {
 	if (pAVCtx->codec_id == AV_CODEC_ID_H264) {
-		H264Context* h = (H264Context*)pAVCtx->priv_data;
-		const SPS* sps = h264_getSPS(h);
-		if (sps && sps->mb_height > 0) {
-			// fill "Bitstream height" properties
-			pAVCtx->coded_height = sps->mb_height * 16;
-		}
-
+		FFH264CalculateSize(pAVCtx);
 		if (x264_build != -1) {
-			h->sei.unregistered.x264_build = x264_build;
+			((H264Context*)pAVCtx->priv_data)->sei.unregistered.x264_build = x264_build;
 		}
 	}
 

@@ -141,8 +141,8 @@ HRESULT CVideoDecDXVAAllocator::Alloc()
 	D3DFORMAT dwFormat = m_pVideoDecFilter->m_VideoDesc.Format;
 	if (SUCCEEDED(hr)) {
 		hr = pDXVA2Service->CreateSurface(
-				m_pVideoDecFilter->PictWidthAligned(),
-				m_pVideoDecFilter->PictHeightAligned(),
+				m_pVideoDecFilter->m_nSurfaceWidth,
+				m_pVideoDecFilter->m_nSurfaceHeight,
 				m_lCount - 1,
 				dwFormat,
 				D3DPOOL_DEFAULT,
