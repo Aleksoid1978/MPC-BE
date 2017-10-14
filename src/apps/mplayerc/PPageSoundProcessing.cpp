@@ -231,6 +231,8 @@ void CPPageSoundProcessing::OnInt16Check()
 {
 	if (GetSampleFormats() == 0) {
 		m_chkInt16.SetCheck(BST_CHECKED);
+	} else {
+		SetModified();
 	}
 }
 
@@ -238,6 +240,8 @@ void CPPageSoundProcessing::OnInt24Check()
 {
 	if (GetSampleFormats() == 0) {
 		m_chkInt24.SetCheck(BST_CHECKED);
+	} else {
+		SetModified();
 	}
 }
 
@@ -245,6 +249,8 @@ void CPPageSoundProcessing::OnInt32Check()
 {
 	if (GetSampleFormats() == 0) {
 		m_chkInt32.SetCheck(BST_CHECKED);
+	} else {
+		SetModified();
 	}
 }
 
@@ -252,6 +258,8 @@ void CPPageSoundProcessing::OnFloatCheck()
 {
 	if (GetSampleFormats() == 0) {
 		m_chkFloat.SetCheck(BST_CHECKED);
+	} else {
+		SetModified();
 	}
 }
 
