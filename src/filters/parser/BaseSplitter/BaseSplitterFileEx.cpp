@@ -863,7 +863,7 @@ bool CBaseSplitterFileEx::Read(lpcmhdr& h, CMediaType* pmt)
 	if (pmt) {
 		WAVEFORMATEX wfe;
 		memset(&wfe, 0, sizeof(wfe));
-		wfe.wFormatTag = WAVE_FORMAT_PCM;
+		wfe.wFormatTag = WAVE_FORMAT_UNKNOWN;
 		wfe.nChannels = h.channels + 1;
 		static int freq[] = { 48000, 96000, 44100, 32000 };
 		wfe.nSamplesPerSec = freq[h.freq];
