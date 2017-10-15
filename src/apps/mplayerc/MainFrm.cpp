@@ -1820,7 +1820,7 @@ void CMainFrame::ClipRectToMonitor(LPRECT prc)
 void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 {
 	m_bWasSnapped = false;
-	bool fCtrl = !!(GetAsyncKeyState(VK_CONTROL)&0x80000000);
+	const bool bCtrl = !!(GetAsyncKeyState(VK_CONTROL) & 0x80000000);
 
 	POINT cur_pos;
 	GetCursorPos(&cur_pos);
@@ -1835,7 +1835,7 @@ void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 		return;
 	}
 
-	if (AfxGetAppSettings().bSnapToDesktopEdges && !fCtrl) {
+	if (AfxGetAppSettings().bSnapToDesktopEdges && !bCtrl) {
 
 		MONITORINFO mi = { sizeof(mi) };
 		GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
@@ -4298,7 +4298,12 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	SetToolBarSubtitleButton();
 
 	// correct window size if "Limit window proportions on resize" enable.
-	if (!s.bRememberZoomLevel) {
+	if (!s.bRememberZoomLevel && s.bLimitWindowProportions) {
+		const bool bCtrl = !!(GetAsyncKeyState(VK_CONTROL) & 0x80000000);
+		if (bCtrl) {
+			keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0);
+		}
+
 		CRect r;
 		GetWindowRect(&r);
 		OnSizing(WMSZ_LEFT, r);
