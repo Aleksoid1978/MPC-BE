@@ -57,6 +57,8 @@ protected:
 	virtual BOOL OnSetActive();
 	virtual BOOL OnApply();
 
+	void UpdateColorManagment();
+
 	DECLARE_MESSAGE_MAP()
 
 public:
