@@ -147,7 +147,7 @@ BOOL CPPageColor::OnSetActive()
 	if (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM && (rs.iSurfaceFormat == D3DFMT_A16B16G16R16F || rs.iSurfaceFormat == D3DFMT_A32B32G32R32F)) {
 		m_chkColorManagment.EnableWindow(TRUE);
 		GetDlgItem(IDC_STATIC6)->EnableWindow(TRUE);
-		OnColorManagmentCheck();
+		UpdateColorManagment();
 	} else {
 		m_chkColorManagment.EnableWindow(FALSE);
 		m_cbCMInputType.EnableWindow(FALSE);
@@ -184,6 +184,28 @@ BOOL CPPageColor::OnApply()
 	return __super::OnApply();
 }
 
+void CPPageColor::UpdateColorManagment()
+{
+	if (m_chkColorManagment.GetCheck() == BST_CHECKED) {
+		m_cbCMInputType.EnableWindow(TRUE);
+		m_cbCMAmbientLight.EnableWindow(TRUE);
+		m_cbCMRenderingIntent.EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC7)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC8)->EnableWindow(TRUE);
+		GetDlgItem(IDC_STATIC9)->EnableWindow(TRUE);
+	}
+	else {
+		m_cbCMInputType.EnableWindow(FALSE);
+		m_cbCMAmbientLight.EnableWindow(FALSE);
+		m_cbCMRenderingIntent.EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC7)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC8)->EnableWindow(FALSE);
+		GetDlgItem(IDC_STATIC9)->EnableWindow(FALSE);
+	}
+	// don't use SetModified() here
+}
+
+
 void CPPageColor::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	CMainFrame* pMainFrame = AfxGetMainFrame();
@@ -219,22 +241,7 @@ void CPPageColor::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 void CPPageColor::OnColorManagmentCheck()
 {
-	if (m_chkColorManagment.GetCheck() == BST_CHECKED) {
-		m_cbCMInputType.EnableWindow(TRUE);
-		m_cbCMAmbientLight.EnableWindow(TRUE);
-		m_cbCMRenderingIntent.EnableWindow(TRUE);
-		GetDlgItem(IDC_STATIC7)->EnableWindow(TRUE);
-		GetDlgItem(IDC_STATIC8)->EnableWindow(TRUE);
-		GetDlgItem(IDC_STATIC9)->EnableWindow(TRUE);
-	}
-	else {
-		m_cbCMInputType.EnableWindow(FALSE);
-		m_cbCMAmbientLight.EnableWindow(FALSE);
-		m_cbCMRenderingIntent.EnableWindow(FALSE);
-		GetDlgItem(IDC_STATIC7)->EnableWindow(FALSE);
-		GetDlgItem(IDC_STATIC8)->EnableWindow(FALSE);
-		GetDlgItem(IDC_STATIC9)->EnableWindow(FALSE);
-	}
+	UpdateColorManagment();
 
 	SetModified();
 }
@@ -263,7 +270,7 @@ void CPPageColor::OnBnClickedReset()
 	m_cbCMInputType.SetCurSel(0);
 	m_cbCMAmbientLight.SetCurSel(0);
 	m_cbCMRenderingIntent.SetCurSel(0);
-	OnColorManagmentCheck();
+	UpdateColorManagment();
 
 	UpdateData(FALSE);
 
