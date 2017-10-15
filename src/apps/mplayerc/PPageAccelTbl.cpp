@@ -316,6 +316,15 @@ void CPPageAccelTbl::UpdateRmcmdDupFlags()
 	}
 }
 
+void CPPageAccelTbl::UpdateAllDupFlags()
+{
+	UpdateKeyDupFlags();
+	UpdateMouseDupFlags();
+	UpdateMouseFSDupFlags();
+	UpdateAppcmdDupFlags();
+	UpdateRmcmdDupFlags();
+}
+
 CString CPPageAccelTbl::MakeAccelModLabel(BYTE fVirt)
 {
 	CString str;
@@ -662,8 +671,8 @@ BEGIN_MESSAGE_MAP(CPPageAccelTbl, CPPageBase)
 	ON_NOTIFY(LVN_BEGINLABELEDIT, IDC_LIST1, OnBeginlabeleditList)
 	ON_NOTIFY(LVN_DOLABELEDIT, IDC_LIST1, OnDolabeleditList)
 	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_LIST1, OnEndlabeleditList)
-	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedButton1)
-	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedButton2)
+	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedSelectAll)
+	ON_BN_CLICKED(IDC_BUTTON2, OnBnClickedResetSelected)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST1, OnCustomdrawList)
 	ON_WM_TIMER()
 	ON_WM_CTLCOLOR()
@@ -716,7 +725,7 @@ BOOL CPPageAccelTbl::OnInitDialog()
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER | LVS_EX_GRIDLINES);
 
-	for (int i = 0, j = m_list.GetHeaderCtrl()->GetItemCount(); i < j; i++) {
+	for (int i = 0, n = m_list.GetHeaderCtrl()->GetItemCount(); i < n; i++) {
 		m_list.DeleteColumn(0);
 	}
 
@@ -785,7 +794,7 @@ BOOL CPPageAccelTbl::OnApply()
 	return __super::OnApply();
 }
 
-void CPPageAccelTbl::OnBnClickedButton1()
+void CPPageAccelTbl::OnBnClickedSelectAll()
 {
 	m_list.SetFocus();
 
@@ -794,7 +803,7 @@ void CPPageAccelTbl::OnBnClickedButton1()
 	}
 }
 
-void CPPageAccelTbl::OnBnClickedButton2()
+void CPPageAccelTbl::OnBnClickedResetSelected()
 {
 	m_list.SetFocus();
 

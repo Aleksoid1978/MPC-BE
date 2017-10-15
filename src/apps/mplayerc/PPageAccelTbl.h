@@ -44,6 +44,7 @@ private:
 	void UpdateMouseFSDupFlags();
 	void UpdateAppcmdDupFlags();
 	void UpdateRmcmdDupFlags();
+	void UpdateAllDupFlags();
 
 	int m_counter;
 
@@ -85,8 +86,8 @@ public:
 	afx_msg void OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnBnClickedButton1();
-	afx_msg void OnBnClickedButton2();
+	afx_msg void OnBnClickedSelectAll();
+	afx_msg void OnBnClickedResetSelected();
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	afx_msg void OnCustomdrawList(NMHDR*, LRESULT*);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
