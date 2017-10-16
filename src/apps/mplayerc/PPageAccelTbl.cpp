@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include "PPageAccelTbl.h"
 
-#define MASK_NUMBER  0xFFF
+//#define MASK_NUMBER  0xFFF
 #define DUP_KEY      (1<<12)
 #define DUP_MOUSE    (1<<13)
 #define DUP_MOUSE_FS (1<<14)
@@ -142,68 +142,6 @@ BOOL CPPageAccelTbl::PreTranslateMessage(MSG* pMsg)
 	}
 
 	return __super::PreTranslateMessage(pMsg);
-}
-
-
-void CPPageAccelTbl::SetupList()
-{
-	m_list.DeleteAllItems();
-
-	for (size_t i = 0; i < m_wmcmds.size(); i++) {
-		wmcmd& wc = m_wmcmds[i];
-
-		int row = m_list.InsertItem(m_list.GetItemCount(), wc.GetName(), COL_CMD);
-		ASSERT(row == int(i&MASK_NUMBER));
-
-		unsigned rowdata = i&MASK_NUMBER;
-		for (size_t j = 0; j < m_wmcmds.size(); j++) {
-			if (i == j) { continue; }
-
-			if (wc.key && wc.key == m_wmcmds[j].key && (wc.fVirt&(FCONTROL|FALT|FSHIFT)) == (m_wmcmds[j].fVirt&(FCONTROL|FALT|FSHIFT))) {
-				rowdata |= DUP_KEY;
-			}
-			if (wc.mouse && wc.mouse == m_wmcmds[j].mouse) {
-				rowdata |= DUP_MOUSE;
-			}
-			if (wc.mouseFS && wc.mouseFS == m_wmcmds[j].mouseFS) {
-				rowdata |= DUP_MOUSE_FS;
-			}
-			if (wc.appcmd && wc.appcmd == m_wmcmds[j].appcmd) {
-				rowdata |= DUP_APPCMD;
-			}
-			if (wc.rmcmd.GetLength() && wc.rmcmd.CompareNoCase(m_wmcmds[j].rmcmd) == 0) {
-				rowdata |= DUP_RMCMD;
-			}
-		}
-		m_list.SetItemData(row, rowdata);
-
-		CString hotkey;
-		HotkeyModToString(wc.key, wc.fVirt, hotkey);
-		CString id;
-		id.Format(L"%d", wc.cmd);
-		CString repcnt;
-		repcnt.Format(L"%d", wc.rmrepcnt);
-
-		m_list.SetItemText(row, COL_KEY, hotkey);
-		m_list.SetItemText(row, COL_ID, id);
-		m_list.SetItemText(row, COL_MOUSE, MakeMouseButtonLabel(wc.mouse));
-		m_list.SetItemText(row, COL_MOUSE_FS, MakeMouseButtonLabel(wc.mouseFS));
-		m_list.SetItemText(row, COL_APPCMD, MakeAppCommandLabel(wc.appcmd));
-		m_list.SetItemText(row, COL_RMCMD, CString(wc.rmcmd));
-		m_list.SetItemText(row, COL_RMREPCNT, repcnt);
-	}
-
-	if (!AfxGetAppSettings().AccelTblColWidth.bEnable) {
-		int contentSize;
-		for (int nCol = COL_CMD; nCol <= COL_RMREPCNT; nCol++) {
-			m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE);
-			contentSize = m_list.GetColumnWidth(nCol);
-			m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE_USEHEADER);
-			if (contentSize > m_list.GetColumnWidth(nCol)) {
-				m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE);
-			}
-		}
-	}
 }
 
 void CPPageAccelTbl::UpdateKeyDupFlags()
@@ -714,31 +652,68 @@ BOOL CPPageAccelTbl::OnInitDialog()
 
 	UpdateData(FALSE);
 
-	CRect r;
-	GetDlgItem(IDC_PLACEHOLDER)->GetWindowRect(r);
-	ScreenToClient(r);
+	{
+		CRect r;
+		GetDlgItem(IDC_PLACEHOLDER)->GetWindowRect(r);
+		ScreenToClient(r);
 
-	m_list.CreateEx(
-		WS_EX_CLIENTEDGE,
-		WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_TABSTOP | LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOSORTHEADER,
-		r, this, IDC_LIST1);
+		m_list.CreateEx(
+			WS_EX_CLIENTEDGE,
+			WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_TABSTOP | LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOSORTHEADER,
+			r, this, IDC_LIST1);
 
-	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER | LVS_EX_GRIDLINES);
+		m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER | LVS_EX_GRIDLINES);
 
-	for (int i = 0, n = m_list.GetHeaderCtrl()->GetItemCount(); i < n; i++) {
-		m_list.DeleteColumn(0);
+		m_list.DeleteAllItems();
+		for (int i = 0, n = m_list.GetHeaderCtrl()->GetItemCount(); i < n; i++) {
+			m_list.DeleteColumn(0);
+		}
+
+		m_list.InsertColumn(COL_CMD, ResStr(IDS_AG_COMMAND), LVCFMT_LEFT, s.AccelTblColWidth.cmd);
+		m_list.InsertColumn(COL_KEY, ResStr(IDS_AG_KEY), LVCFMT_LEFT, s.AccelTblColWidth.key);
+		m_list.InsertColumn(COL_ID, L"ID", LVCFMT_LEFT, s.AccelTblColWidth.id);
+		m_list.InsertColumn(COL_MOUSE, ResStr(IDS_AG_MOUSE), LVCFMT_LEFT, s.AccelTblColWidth.mwnd);
+		m_list.InsertColumn(COL_MOUSE_FS, ResStr(IDS_AG_MOUSE_FS), LVCFMT_LEFT, s.AccelTblColWidth.mfs);
+		m_list.InsertColumn(COL_APPCMD, ResStr(IDS_AG_APP_COMMAND), LVCFMT_LEFT, s.AccelTblColWidth.appcmd);
+		m_list.InsertColumn(COL_RMCMD, L"RemoteCmd", LVCFMT_LEFT, s.AccelTblColWidth.remcmd);
+		m_list.InsertColumn(COL_RMREPCNT, L"RepCnt", LVCFMT_CENTER, s.AccelTblColWidth.repcnt);
+
+		for (size_t i = 0; i < m_wmcmds.size(); i++) {
+			wmcmd& wc = m_wmcmds[i];
+
+			int row = m_list.InsertItem(m_list.GetItemCount(), wc.GetName(), COL_CMD);
+			ASSERT(row == i);
+
+			CString hotkey;
+			HotkeyModToString(wc.key, wc.fVirt, hotkey);
+			CString id;
+			id.Format(L"%d", wc.cmd);
+			CString repcnt;
+			repcnt.Format(L"%d", wc.rmrepcnt);
+
+			m_list.SetItemText(row, COL_KEY, hotkey);
+			m_list.SetItemText(row, COL_ID, id);
+			m_list.SetItemText(row, COL_MOUSE, MakeMouseButtonLabel(wc.mouse));
+			m_list.SetItemText(row, COL_MOUSE_FS, MakeMouseButtonLabel(wc.mouseFS));
+			m_list.SetItemText(row, COL_APPCMD, MakeAppCommandLabel(wc.appcmd));
+			m_list.SetItemText(row, COL_RMCMD, CString(wc.rmcmd));
+			m_list.SetItemText(row, COL_RMREPCNT, repcnt);
+		}
+
+		UpdateAllDupFlags();
+
+		if (!AfxGetAppSettings().AccelTblColWidth.bEnable) {
+			int contentSize;
+			for (int nCol = COL_CMD; nCol <= COL_RMREPCNT; nCol++) {
+				m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE);
+				contentSize = m_list.GetColumnWidth(nCol);
+				m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE_USEHEADER);
+				if (contentSize > m_list.GetColumnWidth(nCol)) {
+					m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE);
+				}
+			}
+		}
 	}
-
-	m_list.InsertColumn(COL_CMD, ResStr(IDS_AG_COMMAND), LVCFMT_LEFT, s.AccelTblColWidth.cmd);
-	m_list.InsertColumn(COL_KEY, ResStr(IDS_AG_KEY), LVCFMT_LEFT, s.AccelTblColWidth.key);
-	m_list.InsertColumn(COL_ID, L"ID", LVCFMT_LEFT, s.AccelTblColWidth.id);
-	m_list.InsertColumn(COL_MOUSE, ResStr(IDS_AG_MOUSE), LVCFMT_LEFT, s.AccelTblColWidth.mwnd);
-	m_list.InsertColumn(COL_MOUSE_FS, ResStr(IDS_AG_MOUSE_FS), LVCFMT_LEFT, s.AccelTblColWidth.mfs);
-	m_list.InsertColumn(COL_APPCMD, ResStr(IDS_AG_APP_COMMAND), LVCFMT_LEFT, s.AccelTblColWidth.appcmd);
-	m_list.InsertColumn(COL_RMCMD, L"RemoteCmd", LVCFMT_LEFT, s.AccelTblColWidth.remcmd);
-	m_list.InsertColumn(COL_RMREPCNT, L"RepCnt", LVCFMT_CENTER, s.AccelTblColWidth.repcnt);
-
-	SetupList();
 
 	// subclass the keylist control
 	OldControlProc = (WNDPROC) SetWindowLongPtr(m_list.m_hWnd, GWLP_WNDPROC, (LONG_PTR) ControlProc);
@@ -814,11 +789,26 @@ void CPPageAccelTbl::OnBnClickedResetSelected()
 
 	while (pos) {
 		int ni = m_list.GetNextSelectedItem(pos);
-		wmcmd& wc = m_wmcmds.at(m_list.GetItemData(ni)&MASK_NUMBER);
+		wmcmd& wc = m_wmcmds.at(ni);
 		wc.Restore();
+
+		CString hotkey;
+		HotkeyModToString(wc.key, wc.fVirt, hotkey);
+		CString id;
+		id.Format(L"%d", wc.cmd);
+		CString repcnt;
+		repcnt.Format(L"%d", wc.rmrepcnt);
+
+		m_list.SetItemText(ni, COL_KEY, hotkey);
+		m_list.SetItemText(ni, COL_ID, id);
+		m_list.SetItemText(ni, COL_MOUSE, MakeMouseButtonLabel(wc.mouse));
+		m_list.SetItemText(ni, COL_MOUSE_FS, MakeMouseButtonLabel(wc.mouseFS));
+		m_list.SetItemText(ni, COL_APPCMD, MakeAppCommandLabel(wc.appcmd));
+		m_list.SetItemText(ni, COL_RMCMD, CString(wc.rmcmd));
+		m_list.SetItemText(ni, COL_RMREPCNT, repcnt);
 	}
 	AfxGetAppSettings().AccelTblColWidth.bEnable = false;
-	SetupList();
+	UpdateAllDupFlags();
 
 	SetModified();
 }
@@ -855,7 +845,7 @@ void CPPageAccelTbl::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 	*pResult = TRUE;
 
-	wmcmd& wc = m_wmcmds.at(m_list.GetItemData(pItem->iItem)&MASK_NUMBER);
+	wmcmd& wc = m_wmcmds.at(pItem->iItem);
 
 	CAtlList<CString> sl;
 	int nSel = -1;
@@ -928,15 +918,11 @@ void CPPageAccelTbl::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 	*pResult = FALSE;
 
-	if (!m_list.m_fInPlaceDirty || pItem->iItem < 0) {
+	if (!m_list.m_fInPlaceDirty || pItem->iItem < 0 || pItem->iItem >= m_wmcmds.size()) {
 		return;
 	}
 
-	unsigned rowdata = m_list.GetItemData(pItem->iItem);
-	const unsigned num = rowdata&MASK_NUMBER;
-	ASSERT(num < m_wmcmds.size());
-	wmcmd& wc = m_wmcmds.at(num);
-
+	wmcmd& wc = m_wmcmds.at(pItem->iItem);
 	const wmcmd old = wc;
 
 	switch (pItem->iSubItem) {
