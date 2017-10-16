@@ -147,7 +147,7 @@ void CWord::Paint(const CPoint& p, const CPoint& org)
 					return;
 				}
 
-				Transform_SSE2(CPoint((org.x - p.x) * 8, (org.y - p.y) * 8));
+				Transform(CPoint((org.x - p.x) * 8, (org.y - p.y) * 8));
 
 				if (!ScanConvert()) {
 					return;
@@ -231,8 +231,8 @@ bool CWord::CreateOpaqueBox()
 	return !!m_pOpaqueBox;
 }
 
-/*
-void CWord::Transform_C(const CPoint &org )
+#if (0)
+void CWord::Transform(const CPoint &org ) // Transform_C
 {
 	double scalex = m_style.fontScaleX / 100.0;
 	double scaley = m_style.fontScaleY / 100.0;
@@ -278,9 +278,8 @@ void CWord::Transform_C(const CPoint &org )
 		mpPathPoints[i].y = std::lround(y) + org.y;
 	}
 }
-*/
-
-void CWord::Transform_SSE2(const CPoint &org )
+#else
+void CWord::Transform(const CPoint &org ) // Transform_SSE2
 {
 	// SSE2 code
 	// speed up ~1.5-1.7x
@@ -420,6 +419,7 @@ void CWord::Transform_SSE2(const CPoint &org )
 		}
 	}
 }
+#endif
 
 // CText
 
