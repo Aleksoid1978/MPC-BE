@@ -117,6 +117,8 @@ BOOL CShaderCombineDlg::OnInitDialog()
 	}
 	m_list2.AddString(L"");
 
+	m_list1.SetFocus();
+
 	UpdateData(FALSE);
 
 	return TRUE;
