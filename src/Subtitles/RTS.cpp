@@ -234,17 +234,17 @@ bool CWord::CreateOpaqueBox()
 #if (0)
 void CWord::Transform(const CPoint &org ) // Transform_C
 {
-	double scalex = m_style.fontScaleX / 100.0;
-	double scaley = m_style.fontScaleY / 100.0;
-	double xzoomf = m_scalex * 20000.0;
-	double yzoomf = m_scaley * 20000.0;
+	const double scalex = m_style.fontScaleX / 100.0;
+	const double scaley = m_style.fontScaleY / 100.0;
+	const double xzoomf = m_scalex * 20000.0;
+	const double yzoomf = m_scaley * 20000.0;
 
-	double caz = cos((M_PI / 180.0) * m_style.fontAngleZ);
-	double saz = sin((M_PI / 180.0) * m_style.fontAngleZ);
-	double cax = cos((M_PI / 180.0) * m_style.fontAngleX);
-	double sax = sin((M_PI / 180.0) * m_style.fontAngleX);
-	double cay = cos((M_PI / 180.0) * m_style.fontAngleY);
-	double say = sin((M_PI / 180.0) * m_style.fontAngleY);
+	const double caz = cos((M_PI / 180.0) * m_style.fontAngleZ);
+	const double saz = sin((M_PI / 180.0) * m_style.fontAngleZ);
+	const double cax = cos((M_PI / 180.0) * m_style.fontAngleX);
+	const double sax = sin((M_PI / 180.0) * m_style.fontAngleX);
+	const double cay = cos((M_PI / 180.0) * m_style.fontAngleY);
+	const double say = sin((M_PI / 180.0) * m_style.fontAngleY);
 
 	double dOrgX = static_cast<double>(org.x), dOrgY = static_cast<double>(org.y);
 	for (ptrdiff_t i = 0; i < mPathPoints; i++) {
@@ -254,7 +254,7 @@ void CWord::Transform(const CPoint &org ) // Transform_C
 		y = mpPathPoints[i].y;
 		z = 0;
 
-		double dPPx = m_style.fontShiftX * y + x;
+		const double dPPx = m_style.fontShiftX * y + x;
 		y = scaley * (m_style.fontShiftY * x + y) - dOrgY;
 		x = scalex * dPPx - dOrgX;
 
@@ -270,8 +270,8 @@ void CWord::Transform(const CPoint &org ) // Transform_C
 		yy = y;
 		zz = x * say - z * cay;
 
-		x = xx * xzoomf / (zz + xzoomf);
-		y = yy * yzoomf / (zz + yzoomf);
+		x = xx * xzoomf / (std::max)((zz + xzoomf), 1000.0);
+		y = yy * yzoomf / (std::max)((zz + yzoomf), 1000.0);
 
 		// round to integer
 		mpPathPoints[i].x = std::lround(x) + org.x;
@@ -387,17 +387,17 @@ void CWord::Transform(const CPoint &org ) // Transform_SSE2
 		__zz     = _mm_mul_ps(__zz, __cay);          // z * cay
 		__zz     = _mm_sub_ps(__tmpx, __zz);         // zz = x * say - z * cay
 
-		// x = xx * xzoomf / (zz + xzoomf);
-		// y = yy * yzoomf / (zz + yzoomf);
+		// x = xx * xzoomf / std::max((zz + xzoomf), 1000.0);
+		// y = yy * yzoomf / std::max((zz + yzoomf), 1000.0);
 		__m128 __tmpzz = _mm_add_ps(__zz, __xzoomf); // zz + xzoomf
 
 		__xx     = _mm_mul_ps(__xx, __xzoomf);       // xx * xzoomf
-		__pointx = _mm_div_ps(__xx, __tmpzz);        // x = (xx * xzoomf) / (zz + xzoomf)
+		__pointx = _mm_div_ps(__xx, _mm_max_ps(__tmpzz, __1000)); // x = (xx * xzoomf) / std::max((zz + xzoomf), 1000.0)
 
 		__tmpzz  = _mm_add_ps(__zz, __yzoomf);       // zz + yzoomf
 
 		__yy     = _mm_mul_ps(__yy, __yzoomf);       // yy * yzoomf
-		__pointy = _mm_div_ps(__yy, __tmpzz);        // y = yy * yzoomf / (zz + yzoomf)
+		__pointy = _mm_div_ps(__yy, _mm_max_ps(__tmpzz, __1000)); // y = yy * yzoomf / std::max((zz + yzoomf), 1000.0);
 
 		__pointx = _mm_add_ps(__pointx, __xorg);     // x = x + org.x
 		__pointy = _mm_add_ps(__pointy, __yorg);     // y = y + org.y
