@@ -129,8 +129,7 @@ class CWord : public Rasterizer
 	bool m_fDrawn;
 	CPoint m_p;
 
-	//void Transform_C(const CPoint &org );
-	void Transform_SSE2(const CPoint &org );
+	void Transform(const CPoint &org );
 	bool CreateOpaqueBox();
 
 protected:
