@@ -547,11 +547,9 @@ namespace Youtube
 							if (match.size() == 2) {
 								const CString xmlElement(match[1].first, match[1].length());
 								const CString url = RegExpParse(xmlElement, L"<BaseURL>(.*?)</BaseURL>");
-								const int itag = _wtoi(RegExpParse(xmlElement, L"id=\"([0-9]+)\""));
-								const int fps = _wtoi(RegExpParse(xmlElement, L"frameRate=\"([0-9]+)\""));
-								const int width = _wtoi(RegExpParse(xmlElement, L"width=\"([0-9]+)\""));
-								if (!(itag == 135 && width > 640)) {
-									// TODO - understand what is wrong with the url with itag = 135 !!!
+								const int itag    = _wtoi(RegExpParse(xmlElement, L"id=\"([0-9]+)\""));
+								const int fps     = _wtoi(RegExpParse(xmlElement, L"frameRate=\"([0-9]+)\""));
+								if (url.Find(L"dur/") > 0) {
 									AddUrl(youtubeUrllist, audioList, url, itag, fps);
 								}
 							}
