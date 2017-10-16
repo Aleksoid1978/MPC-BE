@@ -38,7 +38,6 @@ private:
 
 	std::vector<wmcmd> m_wmcmds;
 
-	void SetupList();
 	void UpdateKeyDupFlags();
 	void UpdateMouseDupFlags();
 	void UpdateMouseFSDupFlags();
