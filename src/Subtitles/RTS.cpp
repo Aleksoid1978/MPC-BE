@@ -2662,7 +2662,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 
 	CStringW str = GetStrW(entry, true);
 
-	STSStyle stss, orgstss;
+	STSStyle stss;
 	if (m_bOverrideStyle) {
 		// this RTS has been signaled to ignore embedded styles, use the built-in one
 		stss = m_styleOverride;
@@ -2711,24 +2711,68 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 		}
 	}
 
-	orgstss = stss;
-
-	sub->m_clip.SetRect(0, 0, m_size.cx >> 3, m_size.cy >> 3);
-	sub->m_scrAlignment = -stss.scrAlignment;
-	sub->m_wrapStyle = m_defaultWrapStyle;
-	sub->m_fAnimated = false;
-	sub->m_relativeTo = stss.relativeTo;
 	// this whole conditional is a work-around for what happens in STS.cpp:
 	// in CSimpleTextSubtitle::Open, we have m_dstScreenSize = CSize(384, 288)
 	// now, files containing embedded subtitles (and with styles) set m_dstScreenSize to a correct value
 	// but where no style is given, those defaults are taken - 384, 288
-	CSize dstScreenSize(m_dstScreenSize);
-	if (m_bOverrideStyle) {
-		dstScreenSize = DEFSCREENSIZE;
-	}
+	const CSize dstScreenSize = m_bOverrideStyle ? DEFSCREENSIZE : m_dstScreenSize;
 
+	STSStyle orgstss = stss;
+
+	sub->m_scrAlignment = -stss.scrAlignment;
+	sub->m_wrapStyle = m_defaultWrapStyle;
+	sub->m_fAnimated = false;
+	sub->m_relativeTo = stss.relativeTo;
 	sub->m_scalex = dstScreenSize.cx > 0 ? 1.0 * (stss.relativeTo == 1 ? m_vidrect.Width() : m_size.cx) / (dstScreenSize.cx * 8) : 1.0;
 	sub->m_scaley = dstScreenSize.cy > 0 ? 1.0 * (stss.relativeTo == 1 ? m_vidrect.Height() : m_size.cy) / (dstScreenSize.cy * 8) : 1.0;
+
+	STSEntry stse = GetAt(entry);
+	CRect marginRect = stse.marginRect;
+	if (marginRect.left == 0) {
+		marginRect.left = orgstss.marginRect.left;
+	}
+	if (marginRect.top == 0) {
+		marginRect.top = orgstss.marginRect.top;
+	}
+	if (marginRect.right == 0) {
+		marginRect.right = orgstss.marginRect.right;
+	}
+	if (marginRect.bottom == 0) {
+		marginRect.bottom = orgstss.marginRect.bottom;
+	}
+
+	marginRect.left   = std::lround(sub->m_scalex * marginRect.left * 8.0);
+	marginRect.top    = std::lround(sub->m_scaley * marginRect.top * 8.0);
+	marginRect.right  = std::lround(sub->m_scalex * marginRect.right * 8.0);
+	marginRect.bottom = std::lround(sub->m_scaley * marginRect.bottom * 8.0);
+
+    if (sub->m_relativeTo == 1) {
+		// Account for the user trying to fool the renderer by setting negative margins
+		CRect clipRect = m_vidrect;
+		if (marginRect.left < 0) {
+			clipRect.left = (std::max)(0l, clipRect.left + marginRect.left);
+		}
+		if (marginRect.top < 0) {
+			clipRect.top = (std::max)(0l, clipRect.top + marginRect.top);
+		}
+		if (marginRect.right < 0) {
+			clipRect.right = (std::min)(m_size.cx, clipRect.right - marginRect.right);
+		}
+		if (marginRect.bottom < 0) {
+			clipRect.bottom = (std::min)(m_size.cy, clipRect.bottom - marginRect.bottom);
+		}
+
+		sub->m_clip.SetRect(clipRect.left >> 3, clipRect.top >> 3, clipRect.right >> 3, clipRect.bottom >> 3);
+	} else {
+		sub->m_clip.SetRect(0, 0, m_size.cx >> 3, m_size.cy >> 3);
+    }
+
+	if (stss.relativeTo == 1) {
+		marginRect.left   += m_vidrect.left;
+		marginRect.top    += m_vidrect.top;
+		marginRect.right  += m_size.cx - m_vidrect.right;
+		marginRect.bottom += m_size.cy - m_vidrect.bottom;
+	}
 
 	m_animStart = m_animEnd = 0;
 	m_animAccel = 1;
@@ -2804,37 +2848,12 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 	}
 
 	// just a "work-around" solution... in most cases nobody will want to use \org together with moving but without rotating the subs
-	if (sub->m_effects[EF_ORG] && (sub->m_effects[EF_MOVE] || sub->m_effects[EF_BANNER] || sub->m_effects[EF_SCROLL])) {
+	if (!m_bOverrideStyle &&
+			sub->m_effects[EF_ORG] && (sub->m_effects[EF_MOVE] || sub->m_effects[EF_BANNER] || sub->m_effects[EF_SCROLL])) {
 		sub->m_fAnimated = true;
 	}
 
 	sub->m_scrAlignment = abs(sub->m_scrAlignment);
-
-	STSEntry stse = GetAt(entry);
-	CRect marginRect = stse.marginRect;
-	if (marginRect.left == 0) {
-		marginRect.left = orgstss.marginRect.left;
-	}
-	if (marginRect.top == 0) {
-		marginRect.top = orgstss.marginRect.top;
-	}
-	if (marginRect.right == 0) {
-		marginRect.right = orgstss.marginRect.right;
-	}
-	if (marginRect.bottom == 0) {
-		marginRect.bottom = orgstss.marginRect.bottom;
-	}
-	marginRect.left   = std::lround(sub->m_scalex * marginRect.left * 8.0);
-	marginRect.top    = std::lround(sub->m_scaley * marginRect.top * 8.0);
-	marginRect.right  = std::lround(sub->m_scalex * marginRect.right * 8.0);
-	marginRect.bottom = std::lround(sub->m_scaley * marginRect.bottom * 8.0);
-
-	if (stss.relativeTo == 1) {
-		marginRect.left   += m_vidrect.left;
-		marginRect.top    += m_vidrect.top;
-		marginRect.right  += m_size.cx - m_vidrect.right;
-		marginRect.bottom += m_size.cy - m_vidrect.bottom;
-	}
 
 	sub->CreateClippers(m_size);
 
