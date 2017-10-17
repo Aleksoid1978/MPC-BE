@@ -918,7 +918,7 @@ void CPPageAccelTbl::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 	*pResult = FALSE;
 
-	if (!m_list.m_fInPlaceDirty || pItem->iItem < 0 || pItem->iItem >= m_wmcmds.size()) {
+	if (!m_list.m_fInPlaceDirty || pItem->iItem < 0 || pItem->iItem >= (int)m_wmcmds.size()) {
 		return;
 	}
 
