@@ -3817,20 +3817,16 @@ enum AVPixelFormat CMPCVideoDecFilter::av_get_format(struct AVCodecContext *c, c
 			break;
 
 		if (*p == AV_PIX_FMT_DXVA2_VLD) {
-			if (pFilter->m_pDXVADecoder) {
-				if (c->codec_id == AV_CODEC_ID_H264) {
-					FFH264CalculateSize(c);
-				}
-				if (pFilter->m_nSurfaceWidth != FFALIGN(c->coded_width, pFilter->m_nAlign)
-						|| pFilter->m_nSurfaceHeight != FFALIGN(c->coded_height, pFilter->m_nAlign)) {
-					avcodec_flush_buffers(c);
+			if (pFilter->m_pDXVADecoder &&
+					(pFilter->m_nSurfaceWidth != FFALIGN(c->coded_width, pFilter->m_nAlign)
+					|| pFilter->m_nSurfaceHeight != FFALIGN(c->coded_height, pFilter->m_nAlign))) {
+				avcodec_flush_buffers(c);
 
-					pFilter->m_nSurfaceWidth  = FFALIGN(c->coded_width, pFilter->m_nAlign);
-					pFilter->m_nSurfaceHeight = FFALIGN(c->coded_height, pFilter->m_nAlign);
+				pFilter->m_nSurfaceWidth  = FFALIGN(c->coded_width, pFilter->m_nAlign);
+				pFilter->m_nSurfaceHeight = FFALIGN(c->coded_height, pFilter->m_nAlign);
 
-					if (SUCCEEDED(pFilter->FindDecoderConfiguration())) {
-						pFilter->RecommitAllocator();
-					}
+				if (SUCCEEDED(pFilter->FindDecoderConfiguration())) {
+					pFilter->RecommitAllocator();
 				}
 			}
 			break;
