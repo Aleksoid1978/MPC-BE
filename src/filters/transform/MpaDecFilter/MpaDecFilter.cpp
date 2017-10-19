@@ -633,7 +633,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	}
 
 	if (subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
-		hr = ProcessLPCM();
+		hr = ProcessDvdLPCM();
 	} else if (subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
 		// TODO: check if the test is really correct
 		hr = ProcessHdmvLPCM(pIn->IsSyncPoint() == S_FALSE);
@@ -694,7 +694,7 @@ BOOL CMpaDecFilter::ProcessBitstream(enum AVCodecID nCodecId, HRESULT& hr, BOOL 
 	return FALSE;
 }
 
-HRESULT CMpaDecFilter::ProcessLPCM()
+HRESULT CMpaDecFilter::ProcessDvdLPCM()
 {
 	const WAVEFORMATEX* wfein = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
 	const WORD nChannels = wfein->nChannels;
@@ -2004,7 +2004,9 @@ HRESULT CMpaDecFilter::CheckInputType(const CMediaType* mtIn)
 {
 	if (mtIn->subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
 		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mtIn->Format();
-		if (wfe->nChannels < 1 || wfe->nChannels > 8 || (wfe->wBitsPerSample != 16 && wfe->wBitsPerSample != 20 && wfe->wBitsPerSample != 24)) {
+		if (wfe->nChannels < 1 || wfe->nChannels > 8
+			|| (wfe->wBitsPerSample != 16 && wfe->wBitsPerSample != 20 && wfe->wBitsPerSample != 24)
+			|| wfe->cbSize) {
 			return VFW_E_TYPE_NOT_ACCEPTED;
 		}
 	} else if (mtIn->subtype == MEDIASUBTYPE_PS2_ADPCM) {

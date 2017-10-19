@@ -1070,8 +1070,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len,
 				// LPCM Audio
 				if (type == stream_type::unknown && (stream_type & LPCM_AUDIO)) {
 					Seek(start);
-					hdmvlpcmhdr h;
-					if (Read(h, &s.mt)) {
+					if (ReadHDMVLPCMHdr(&s.mt)) {
 						type = stream_type::audio;
 					}
 				}
@@ -1155,8 +1154,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len,
 						BitRead(8); // Continuity Counter - counts from 0x00 to 0x1f and then wraps to 0x00.
 						DWORD headersize = (DWORD)BitRead(16); // LPCM_header_length
 						if (headersize >= 8 && headersize + 4 < len) {
-							dvdalpcmhdr h;
-							if (Read(h, len - 4, &s.mt)) {
+							if (ReadDVDALPCMHdr(&s.mt)) {
 								Seek(start + 4 + headersize);
 								type = stream_type::audio;
 								break;
@@ -1191,8 +1189,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len,
 						Seek(start + 7);
 					} else {
 						Seek(start + 4);
-						lpcmhdr h;
-						if (Read(h, &s.mt)) {
+						if (ReadDVDLPCMHdr(&s.mt)) {
 							type = stream_type::audio;
 						}
 					}
