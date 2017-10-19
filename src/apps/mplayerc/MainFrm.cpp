@@ -2976,6 +2976,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 						m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_DOMAIN), Domain);
 					}
 					SetupChapters();
+					SetToolBarSubtitleButton();
 				}
 				break;
 			case EC_DVD_DOMAIN_CHANGE:
@@ -3173,6 +3174,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 
 					MoveVideoWindow(); // AR might have changed
 					SetupChapters();
+					SetToolBarSubtitleButton();
 				}
 				break;
 			case EC_DVD_CURRENT_HMSF_TIME:
