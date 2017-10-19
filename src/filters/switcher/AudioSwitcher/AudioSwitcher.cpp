@@ -534,12 +534,17 @@ STDMETHODIMP CAudioSwitcherFilter::SetOutputFormats(int iSampleFormats)
 	CAutoLock cAutoLock(&m_csTransform);
 
 	if (iSampleFormats & SFMT_MASK) { // at least one format must be enabled
-		m_bInt16 = !!(iSampleFormats & SFMT_INT16);
-		m_bInt24 = !!(iSampleFormats & SFMT_INT24);
-		m_bInt32 = !!(iSampleFormats & SFMT_INT32);
-		m_bFloat = !!(iSampleFormats & SFMT_FLOAT);
+		const bool bInt16 = !!(iSampleFormats & SFMT_INT16);
+		const bool bInt24 = !!(iSampleFormats & SFMT_INT24);
+		const bool bInt32 = !!(iSampleFormats & SFMT_INT32);
+		const bool bFloat = !!(iSampleFormats & SFMT_FLOAT);
 
-		m_bOutputFormatChanged = true;
+		if (bInt16 != m_bInt16
+				|| bInt24 != m_bInt24
+				|| bInt32 != m_bInt32
+				|| bFloat != m_bFloat) {
+			m_bOutputFormatChanged = true;
+		}
 
 		return S_OK;
 	}
