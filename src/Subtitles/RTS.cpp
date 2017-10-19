@@ -579,11 +579,11 @@ bool CPolygon::GetPOINT(LPCWSTR& str, POINT& point) const
 	LPWSTR xEnd = nullptr;
 	LPWSTR yEnd = nullptr;
 
-	point.x = std::lround(wcstod(str, &xEnd) * m_scalex) * 64;
+	point.x = std::lround(wcstod(str, &xEnd) * m_scalex * 64.0);
 	if (xEnd <= str) {
 		return false;
 	}
-	point.y = std::lround(wcstod(xEnd, &yEnd) * m_scaley) * 64;
+	point.y = std::lround(wcstod(xEnd, &yEnd) * m_scaley * 64.0);
 
 	bool ret = yEnd > xEnd;
 	str = yEnd;
@@ -738,7 +738,7 @@ bool CPolygon::ParseStr()
 	m_width = m_pPolygonPath->size.cx;
 	m_ascent = m_pPolygonPath->size.cy;
 
-	int baseline = std::lround(m_scaley * m_baseline) * 64;
+	int baseline = std::lround(64.0 * m_scaley * m_baseline);
 	m_descent = baseline;
 	m_ascent -= baseline;
 
