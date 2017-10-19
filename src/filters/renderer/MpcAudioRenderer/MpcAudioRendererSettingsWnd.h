@@ -110,7 +110,7 @@ public:
 	void OnDeactivate();
 
 	static LPCWSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_ARS_WASAPI_MODE_STATUS); }
-	static CSize GetWindowSize() { return CSize(340, 211); }
+	static CSize GetWindowSize() { return CSize(392, 143); }
 
 	DECLARE_MESSAGE_MAP()
 };
