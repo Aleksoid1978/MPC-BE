@@ -209,41 +209,6 @@ public:
 	struct dtslbr_hdr {
 	};
 
-	struct lpcmhdr
-	{
-		BYTE emphasis:1;
-		BYTE mute:1;
-		BYTE reserved1:1;
-		BYTE framenum:5;
-		BYTE quantwordlen:2;
-		BYTE freq:2; // 48, 96, 44.1, 32
-		BYTE reserved2:1;
-		BYTE channels:3; // +1
-		BYTE drc; // 0x80: off
-	};
-
-	struct dvdalpcmhdr
-	{
-		// http://dvd-audio.sourceforge.net/spec/aob.shtml
-		WORD firstaudioframe;
-		BYTE unknown1;
-		BYTE bitpersample1:4;
-		BYTE bitpersample2:4;
-		BYTE samplerate1:4;
-		BYTE samplerate2:4;
-		BYTE unknown2;
-		BYTE groupassignment;
-		BYTE unknown3;
-	};
-
-	struct hdmvlpcmhdr
-	{
-		WORD size;
-		BYTE channels:4;
-		BYTE samplerate:4;
-		BYTE bitpersample:2;
-	};
-
 	struct mlphdr
 	{
 		DWORD size;
@@ -333,9 +298,6 @@ public:
 	bool Read(ac3hdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = true, bool AC3CoreOnly = true);
 	bool Read(dtshdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = true);
 	bool Read(dtslbr_hdr& h, int len, CMediaType* pmt = nullptr);
-	bool Read(lpcmhdr& h, CMediaType* pmt = nullptr);
-	bool Read(dvdalpcmhdr& h, int len, CMediaType* pmt = nullptr);
-	bool Read(hdmvlpcmhdr& h, CMediaType* pmt = nullptr);
 	bool Read(mlphdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = false);
 	bool Read(dvdspuhdr& h, CMediaType* pmt = nullptr);
 	bool Read(svcdspuhdr& h, CMediaType* pmt = nullptr);
@@ -360,4 +322,9 @@ public:
 	bool Read(adx_adpcm_hdr& h, int len, CMediaType* pmt = nullptr);
 	bool Read(pcm_law_hdr& h, int len, bool bAlaw, CMediaType* pmt = nullptr);
 	bool Read(opus_ts_hdr& h, int len, CAtlArray<BYTE>& extradata, CMediaType* pmt = nullptr);
+
+	// LPCM
+	bool ReadDVDLPCMHdr(CMediaType* pmt = nullptr);
+	bool ReadDVDALPCMHdr(CMediaType* pmt = nullptr);
+	bool ReadHDMVLPCMHdr(CMediaType* pmt = nullptr);
 };

@@ -71,6 +71,16 @@ struct WAVEFORMATEX_HDMV_LPCM : public WAVEFORMATEX {
 	}
 };
 
+#pragma pack(push, 1)
+struct DVDALPCMFORMAT
+{
+	WAVEFORMATEX wfe;
+	WORD  GroupAssignment;
+	DWORD nSamplesPerSec2;
+	WORD  wBitsPerSample2;
+};
+#pragma pack(pop)
+
 struct WAVEFORMATEXFFMPEG
 {
 	int nCodecId;
