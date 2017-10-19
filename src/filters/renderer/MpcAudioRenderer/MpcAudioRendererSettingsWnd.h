@@ -66,7 +66,7 @@ public:
 	bool OnApply();
 
 	static LPCWSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_FILTER_SETTINGS_CAPTION); }
-	static CSize GetWindowSize() { return CSize(340, 135); }
+	static CSize GetWindowSize() { return CSize(340, 211); }
 
 	DECLARE_MESSAGE_MAP()
 
@@ -110,7 +110,7 @@ public:
 	void OnDeactivate();
 
 	static LPCWSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_ARS_WASAPI_MODE_STATUS); }
-	static CSize GetWindowSize() { return CSize(340, 135); }
+	static CSize GetWindowSize() { return CSize(340, 211); }
 
 	DECLARE_MESSAGE_MAP()
 };
