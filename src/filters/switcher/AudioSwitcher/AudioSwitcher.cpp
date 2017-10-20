@@ -546,6 +546,11 @@ STDMETHODIMP CAudioSwitcherFilter::SetOutputFormats(int iSampleFormats)
 			m_bOutputFormatChanged = true;
 		}
 
+		m_bInt16 = bInt16;
+		m_bInt24 = bInt24;
+		m_bInt32 = bInt32;
+		m_bFloat = bFloat;
+
 		return S_OK;
 	}
 
