@@ -492,8 +492,8 @@ HRESULT CBaseVideoFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_
 
 HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 {
-	VIDEO_OUTPUT_FORMATS*	fmts;
-	int						nFormatCount;
+	VIDEO_OUTPUT_FORMATS* fmts;
+	int                   nFormatCount;
 
 	if (m_pInput->IsConnected() == FALSE) {
 		return E_UNEXPECTED;
@@ -571,6 +571,11 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 		if (vihInput && (vihInput->rcSource.right != 0) && (vihInput->rcSource.bottom != 0)) {
 			vih->rcSource = vihInput->rcSource;
 			vih->rcTarget = vihInput->rcTarget;
+
+			if (m_bMVC_Output_TopBottom) {
+				vih->rcSource.bottom *= 2;
+				vih->rcTarget.bottom *= 2;
+			}
 		} else {
 			vih->rcSource.right  = vih->rcTarget.right  = m_win;
 			vih->rcSource.bottom = vih->rcTarget.bottom = m_hin;
