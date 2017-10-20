@@ -2076,6 +2076,11 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 	int nItem = lpDrawItemStruct->itemID;
 	CRect rcItem = lpDrawItemStruct->rcItem;
 	POSITION pos = FindPos(nItem);
+	if (!pos) {
+		ASSERT(FALSE);
+		return;
+	}
+
 	bool fSelected = pos == m_pl.GetPos();
 	CPlaylistItem& pli = m_pl.GetAt(pos);
 
