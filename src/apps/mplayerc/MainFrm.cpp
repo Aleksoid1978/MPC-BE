@@ -11769,6 +11769,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 								item = fn;
 							}
 						}
+						youtubeUrl.Empty();
+						m_youtubeFields.Empty();
+						m_youtubeUrllist.clear();
 
 						m_wndPlaylistBar.SetLast();
 						pOFD->fns.GetHead() = m_wndPlaylistBar.GetCurFileName();
