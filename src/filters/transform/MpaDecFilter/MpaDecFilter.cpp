@@ -261,33 +261,6 @@ CFilterApp theApp;
 
 #endif
 
-#pragma warning(push)
-#pragma warning(disable : 4245)
-static struct scmap_t {
-	const WORD nChannels;
-	const BYTE ch[8];
-	const DWORD dwChannelMask;
-}
-// dshow: left, right, center, LFE, left surround, right surround
-// lets see how we can map these things to dshow (oh the joy!)
-
-s_scmap_hdmv[] = {
-	//   FL FR FC LFe BL BR FLC FRC
-	{0, {-1,-1,-1,-1,-1,-1,-1,-1 }, 0}, // INVALID
-	{1, { 0,-1,-1,-1,-1,-1,-1,-1 }, SPEAKER_FRONT_CENTER}, // Mono    M1, 0
-	{0, {-1,-1,-1,-1,-1,-1,-1,-1 }, 0}, // INVALID
-	{2, { 0, 1,-1,-1,-1,-1,-1,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT}, // Stereo  FL, FR
-	{4, { 0, 1, 2,-1,-1,-1,-1,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER},															// 3/0      FL, FR, FC
-	{4, { 0, 1, 2,-1,-1,-1,-1,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_BACK_CENTER},															// 2/1      FL, FR, Surround
-	{4, { 0, 1, 2, 3,-1,-1,-1,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_BACK_CENTER},										// 3/1      FL, FR, FC, Surround
-	{4, { 0, 1, 2, 3,-1,-1,-1,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT},											// 2/2      FL, FR, BL, BR
-	{6, { 0, 1, 2, 3, 4,-1,-1,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT},						// 3/2      FL, FR, FC, BL, BR
-	{6, { 0, 1, 2, 5, 3, 4,-1,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT},// 3/2+LFe  FL, FR, FC, BL, BR, LFe
-	{8, { 0, 1, 2, 3, 6, 4, 5,-1 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT|SPEAKER_SIDE_LEFT|SPEAKER_SIDE_RIGHT},// 3/4  FL, FR, FC, BL, Bls, Brs, BR
-	{8, { 0, 1, 2, 7, 4, 5, 3, 6 }, SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT|SPEAKER_SIDE_LEFT|SPEAKER_SIDE_RIGHT},// 3/4+LFe  FL, FR, FC, BL, Bls, Brs, BR, LFe
-};
-#pragma warning(pop)
-
 static const MPCSampleFormat SamplefmtToMPC[SAMPLE_FMT_NB] = {
 	SF_PCM16, // <-- SAMPLE_FMT_U8
 	SF_PCM16, // <-- SAMPLE_FMT_S16
@@ -700,7 +673,7 @@ HRESULT CMpaDecFilter::ProcessDvdLPCM()
 	const WAVEFORMATEX* wfein = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
 	const WORD nChannels = wfein->nChannels;
 	if (nChannels < 1 || nChannels > 8) {
-		return ERROR_NOT_SUPPORTED;
+		return E_FAIL;
 	}
 
 	unsigned src_size = m_buff.GetCount();
@@ -722,61 +695,33 @@ HRESULT CMpaDecFilter::ProcessDvdLPCM()
 HRESULT CMpaDecFilter::ProcessHdmvLPCM(bool bAlignOldBuffer) // Blu ray LPCM
 {
 	WAVEFORMATEX_HDMV_LPCM* wfein = (WAVEFORMATEX_HDMV_LPCM*)m_pInput->CurrentMediaType().Format();
+	if (wfein->channel_conf >= _countof(s_scmap_hdmv) || !s_scmap_hdmv[wfein->channel_conf].layout) {
+		return E_FAIL;
+	}
 
-	scmap_t* remap     = &s_scmap_hdmv [wfein->channel_conf];
-	int nChannels      = wfein->nChannels;
-	int xChannels      = nChannels + (nChannels & 1);
-	int BytesPerSample = (wfein->wBitsPerSample + 7) / 8;
-	int BytesPerFrame  = BytesPerSample * xChannels;
-
-	BYTE* pDataIn      = m_buff.GetData();
-	int len            = (int)m_buff.GetCount();
-	len -= len % BytesPerFrame;
-	if (bAlignOldBuffer) {
+	if (bAlignOldBuffer) { // TODO: check if the test is really correct
+		const unsigned framesize = ((wfein->nChannels + 1) & ~1) * ((wfein->wBitsPerSample + 7) / 8);
+		size_t len = m_buff.GetCount();
+		len -= len % framesize;
 		m_buff.SetCount(len);
 	}
-	int nFrames = len / BytesPerFrame;
 
+	unsigned src_size = m_buff.GetCount();
+	unsigned dst_size = 0;
 	SampleFormat out_sf = SAMPLE_FMT_NONE;
-	int outSize = nFrames * nChannels * (wfein->wBitsPerSample <= 16 ? 2 : 4); // convert to 16 and 32-bit
-	CAtlArray<BYTE> outBuff;
-	outBuff.SetCount(outSize);
-
-	switch (wfein->wBitsPerSample) {
-		case 16: {
-			out_sf = SAMPLE_FMT_S16;
-			int16_t* pDataOut = (int16_t*)outBuff.GetData();
-
-			for (int i = 0; i < nFrames; i++) {
-				for (int j = 0; j < nChannels; j++) {
-					BYTE nRemap = remap->ch[j];
-					*pDataOut = (int16_t)(pDataIn[nRemap * 2] << 8 | pDataIn[nRemap * 2 + 1]);
-					pDataOut++;
-				}
-				pDataIn += BytesPerFrame;
-			}
-		}
-		break;
-		case 24 :
-		case 20: {
-			out_sf = SAMPLE_FMT_S32; // convert to 32-bit
-			int32_t* pDataOut = (int32_t*)outBuff.GetData();
-
-			for (int i = 0; i < nFrames; i++) {
-				for (int j = 0; j < nChannels; j++) {
-					BYTE nRemap = remap->ch[j];
-					*pDataOut = (int32_t)(pDataIn[nRemap * 3] << 24 | pDataIn[nRemap * 3 + 1] << 16 | pDataIn[nRemap * 3 + 2] << 8);
-					pDataOut++;
-				}
-				pDataIn += BytesPerFrame;
-			}
-		}
-		break;
+	auto dst = DecodeHdmvLPCM(dst_size, out_sf, m_buff.GetData(), src_size, wfein->nChannels, wfein->wBitsPerSample, wfein->channel_conf);
+	if (out_sf == SAMPLE_FMT_NONE) {
+		return E_FAIL;
+	}
+	if (!dst) {
+		return S_FALSE;
 	}
 
-	m_buff.RemoveHead(len);
+	ASSERT(!src_size);
 
-	return Deliver(outBuff.GetData(), outSize, out_sf, wfein->nSamplesPerSec, wfein->nChannels, remap->dwChannelMask);
+	m_buff.RemoveHead(m_buff.GetCount() - src_size);
+
+	return Deliver(dst.get(), dst_size, out_sf, wfein->nSamplesPerSec, wfein->nChannels, s_scmap_hdmv[wfein->channel_conf].layout);
 }
 
 HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALSE*/)
@@ -2077,7 +2022,7 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 
 		if (mt.subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
 			WAVEFORMATEX_HDMV_LPCM* wfelpcm = (WAVEFORMATEX_HDMV_LPCM*)mt.Format();
-			out_layout = s_scmap_hdmv[wfelpcm->channel_conf].dwChannelMask;
+			out_layout = s_scmap_hdmv[wfelpcm->channel_conf].layout;
 		} else {
 			out_layout = GetDefChannelMask(wfe->nChannels);
 		}
