@@ -19,6 +19,7 @@
  */
 
 #include "stdafx.h"
+#include <MMReg.h>
 #include "SampleFormat.h"
 #include "AudioDecoders.h"
 
@@ -34,7 +35,6 @@ std::unique_ptr<uint8_t[]> DecodeDvdLPCM(unsigned& dst_size, SampleFormat& dst_s
 
 	dst_size = allsamples * (bitdepth <= 16 ? 2 : 4); // convert to 16 and 32-bit
 	std::unique_ptr<BYTE[]> dst(new(std::nothrow) BYTE[dst_size]);
-
 	if (!dst) {
 		return nullptr;
 	}
@@ -92,6 +92,52 @@ std::unique_ptr<uint8_t[]> DecodeDvdLPCM(unsigned& dst_size, SampleFormat& dst_s
 	}
 
 	src_size %= blocksize;
+
+	return dst;
+}
+
+std::unique_ptr<uint8_t[]> DecodeHdmvLPCM(unsigned& dst_size, SampleFormat& dst_sf, BYTE* src, unsigned& src_size, const unsigned channels, const unsigned bitdepth, const BYTE channel_conf)
+{
+	const unsigned framesize = ((channels + 1) & ~1) * ((bitdepth + 7) / 8);
+	if (!framesize) {
+		return nullptr;
+	}
+	const unsigned frames = src_size / framesize;
+
+	dst_size = frames * channels * (bitdepth <= 16 ? 2 : 4); // convert to 16 and 32-bit
+	std::unique_ptr<BYTE[]> dst(new(std::nothrow) BYTE[dst_size]);
+	if (!dst) {
+		return nullptr;
+	}
+
+	auto& remap = s_scmap_hdmv[channel_conf].ch;
+
+	if (bitdepth == 16) {
+		uint16_t* src16 = (uint16_t*)src;
+		uint16_t* dst16 = (uint16_t*)dst.get();
+
+		for (unsigned i = 0; i < frames; ++i) {
+			for (unsigned j = 0; j < channels; ++j) {
+				*(dst16++) = _byteswap_ushort(src16[remap[j]]);
+			}
+			src += framesize;
+		}
+		dst_sf = SAMPLE_FMT_S16;
+	}
+	else if (bitdepth == 20 || bitdepth == 24) {
+		uint32_t* dst32 = (uint32_t*)dst.get(); // convert to 32-bit
+
+		for (unsigned i = 0; i < frames; i++) {
+			for (unsigned j = 0; j < channels; j++) {
+				unsigned n = remap[j] * 3;
+				*(dst32++) = (src[n] << 24) | (src[n + 1] << 16) | (src[n + 2] << 8);
+			}
+			src += framesize;
+		}
+		dst_sf = SAMPLE_FMT_S32;
+	}
+
+	src_size %= framesize;
 
 	return dst;
 }
