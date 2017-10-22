@@ -43,6 +43,7 @@
 #include <vector>
 
 #include <ffmpeg/libavcodec/avcodec.h>
+#include "AudioDecoders.h"
 
 // option names
 #define OPT_REGKEY_MpaDec   L"Software\\MPC-BE Filters\\MPC Audio Decoder"
@@ -702,74 +703,20 @@ HRESULT CMpaDecFilter::ProcessDvdLPCM()
 		return ERROR_NOT_SUPPORTED;
 	}
 
-	BYTE* const base = m_buff.GetData();
-	BYTE* end = base + m_buff.GetCount();
-	BYTE* p = base;
-
-	unsigned int blocksize = nChannels * 2 * wfein->wBitsPerSample / 8;
-	size_t nSamples = (m_buff.GetCount() / blocksize) * 2 * nChannels;
-
+	unsigned src_size = m_buff.GetCount();
+	unsigned dst_size = 0;
 	SampleFormat out_sf = SAMPLE_FMT_NONE;
-	size_t outSize = nSamples * (wfein->wBitsPerSample <= 16 ? 2 : 4); // convert to 16 and 32-bit
-	CAtlArray<BYTE> outBuff;
-	outBuff.SetCount(outSize);
-
-	switch (wfein->wBitsPerSample) {
-		case 16: {
-			out_sf = SAMPLE_FMT_S16;
-			uint16_t* pDataOut = (uint16_t*)outBuff.GetData();
-
-			for (size_t i = 0; i < nSamples; i++) {
-				pDataOut[i] = (uint16_t)(*p) << 8 | (uint16_t)(*(p + 1));
-				p += 2;
-			}
-		}
-		break;
-		case 24 : {
-			out_sf = SAMPLE_FMT_S32;
-			uint32_t* pDataOut = (uint32_t*)outBuff.GetData();
-
-			size_t m = nChannels * 2;
-			for (size_t k = 0, n = nSamples / m; k < n; k++) {
-				BYTE* q = p + m * 2;
-				for (size_t i = 0; i < m; i++) {
-					pDataOut[i] = (uint32_t)(*p) << 24 | (uint32_t)(*(p + 1)) << 16 | (uint32_t)(*q) << 8;
-					p += 2;
-					q++;
-				}
-				p += m;
-				pDataOut += m;
-			}
-		}
-		break;
-		case 20 : {
-			out_sf = SAMPLE_FMT_S32;
-			uint32_t* pDataOut = (uint32_t*)outBuff.GetData();
-
-			size_t m = nChannels * 2;
-			for (size_t k = 0, n = nSamples / m; k < n; k++) {
-				BYTE* q = p + m * 2;
-				for (size_t i = 0; i < m; i++) {
-					uint32_t u32 = (uint32_t)(*p) << 24 | (uint32_t)(*(p+1)) << 16;
-					if (i & 1) {
-						u32 |= (*(uint8_t*)q & 0x0F) << 12;
-						q++;
-					} else {
-						u32 |= (*(uint8_t*)q & 0xF0) << 8;
-					}
-					pDataOut[i] = u32;
-					p += 2;
-				}
-				p += nChannels;
-				pDataOut += m;
-			}
-		}
-		break;
+	auto dst = DecodeDvdLPCM(dst_size, out_sf, m_buff.GetData(), src_size, wfein->nChannels, wfein->wBitsPerSample);
+	if (out_sf == SAMPLE_FMT_NONE) {
+		return E_FAIL;
+	}
+	if (!dst) {
+		return S_FALSE;
 	}
 
-	m_buff.RemoveHead(p - base);
+	m_buff.RemoveHead(m_buff.GetCount() - src_size);
 
-	return Deliver(outBuff.GetData(), outSize, out_sf, wfein->nSamplesPerSec, wfein->nChannels);
+	return Deliver(dst.get(), dst_size, out_sf, wfein->nSamplesPerSec, wfein->nChannels);
 }
 
 HRESULT CMpaDecFilter::ProcessHdmvLPCM(bool bAlignOldBuffer) // Blu ray LPCM

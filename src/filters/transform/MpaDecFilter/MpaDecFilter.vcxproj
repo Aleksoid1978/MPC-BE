@@ -213,6 +213,7 @@
     <ClCompile Include="FFAudioDecoder.cpp" />
     <ClCompile Include="MpaDecFilter.cpp" />
     <ClCompile Include="MpaDecFilterSettingsWnd.cpp" />
+    <ClCompile Include="AudioDecoders.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -224,6 +225,7 @@
     <ClInclude Include="MpaDecFilter.h" />
     <ClInclude Include="MpaDecFilterSettingsWnd.h" />
     <ClInclude Include="PaddedArray.h" />
+    <ClInclude Include="AudioDecoders.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
     </ClInclude>
