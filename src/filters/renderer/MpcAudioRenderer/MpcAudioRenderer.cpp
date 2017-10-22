@@ -1403,7 +1403,7 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 
 	if (m_dRate != 1.0
 			&& !m_bIsBitstream
-			&& (m_Filter.IsInitialized() || SUCCEEDED(m_Filter.Init(m_dRate, m_pWaveFormatExOutput)) )) {
+			&& (m_Filter.IsInitialized() || SUCCEEDED(m_Filter.Init(m_dRate, m_pWaveFormatExOutput, p->rtStart)) )) {
 		if (SUCCEEDED(m_Filter.Push(p))) {
 			while (SUCCEEDED(m_Filter.Pull(p))) {
 				PushToQueue(p);
@@ -2686,7 +2686,7 @@ void CMpcAudioRenderer::WaitFinish()
 					rtStart = p->rtStop;
 
 					if (m_dRate != 1.0
-							&& (m_Filter.IsInitialized() || SUCCEEDED(m_Filter.Init(m_dRate, m_pWaveFormatExOutput)) )) {
+							&& (m_Filter.IsInitialized() || SUCCEEDED(m_Filter.Init(m_dRate, m_pWaveFormatExOutput, p->rtStart)) )) {
 						if (SUCCEEDED(m_Filter.Push(p))) {
 							while (SUCCEEDED(m_Filter.Pull(p))) {
 								PushToQueue(p);
