@@ -47,12 +47,13 @@ private:
 	WORD            m_Channels           = 0;
 
 	double          m_dRate              = 1.0;
+	REFERENCE_TIME  m_rtStart            = 0;
 
 public:
 	CFilter();
 	~CFilter();
 
-	HRESULT Init(double dRate, const WAVEFORMATEX* wfe);
+	HRESULT Init(const double& dRate, const WAVEFORMATEX* wfe, const REFERENCE_TIME& rtStart);
 	HRESULT Push(CAutoPtr<CPacket> p);
 	HRESULT Pull(CAutoPtr<CPacket>& p);
 

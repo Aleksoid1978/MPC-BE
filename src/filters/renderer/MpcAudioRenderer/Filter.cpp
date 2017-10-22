@@ -46,7 +46,7 @@ CFilter::~CFilter()
 
 #define CheckRet(ret) if (ret < 0) { Flush(); return E_FAIL; }
 
-HRESULT CFilter::Init(double dRate, const WAVEFORMATEX* wfe)
+HRESULT CFilter::Init(const double& dRate, const WAVEFORMATEX* wfe, const REFERENCE_TIME& rtStart)
 {
 	CAutoLock cAutoLock(&m_csFilter);
 
@@ -172,6 +172,7 @@ HRESULT CFilter::Init(double dRate, const WAVEFORMATEX* wfe)
 	m_layout = layout;
 
 	m_dRate = dRate;
+	m_rtStart = rtStart;
 
 	return S_OK;
 }
@@ -184,7 +185,7 @@ HRESULT CFilter::Push(CAutoPtr<CPacket> p)
 	BYTE *pData   = p->GetData();
 	BYTE* pTmpBuf = nullptr;
 
-	int nSamples = p->GetCount() / (m_Channels * av_get_bytes_per_sample(m_av_sample_fmt));
+	const int nSamples = p->GetCount() / (m_Channels * av_get_bytes_per_sample(m_av_sample_fmt));
 
 	if (m_av_sample_fmt == AV_SAMPLE_FMT_S32 && m_sample_fmt == SAMPLE_FMT_S24) {
 		DWORD pSize = nSamples * m_Channels * sizeof(int32_t);
@@ -198,9 +199,8 @@ HRESULT CFilter::Push(CAutoPtr<CPacket> p)
 	m_pFrame->channels       = m_Channels;
 	m_pFrame->channel_layout = m_layout;
 	m_pFrame->sample_rate    = m_SamplesPerSec;
-	m_pFrame->pts            = p->rtStart;
 
-	int buffersize = av_samples_get_buffer_size(nullptr, m_pFrame->channels, m_pFrame->nb_samples, m_av_sample_fmt, 1);
+	const int buffersize = av_samples_get_buffer_size(nullptr, m_pFrame->channels, m_pFrame->nb_samples, m_av_sample_fmt, 1);
 	int ret = avcodec_fill_audio_frame(m_pFrame, m_pFrame->channels, m_av_sample_fmt, pData, buffersize, 1);
 	if (ret >= 0) {
 		ret = av_buffersrc_write_frame(m_pFilterBufferSrc, m_pFrame);
@@ -222,21 +222,21 @@ HRESULT CFilter::Pull(CAutoPtr<CPacket>& p)
 	}
 	CheckPointer(p, E_FAIL);
 
-	int ret = av_buffersink_get_frame(m_pFilterBufferSink, m_pFrame);
+	const int ret = av_buffersink_get_frame(m_pFilterBufferSink, m_pFrame);
 	if (ret >= 0) {
 		const AVRational time_base = av_buffersink_get_time_base(m_pFilterBufferSink);
-		p->rtStart = av_rescale(m_pFrame->pts, time_base.num * UNITS, time_base.den);
+		p->rtStart = m_rtStart + av_rescale(m_pFrame->pts, time_base.num * UNITS, time_base.den);
 		p->rtStop  = p->rtStart + llMulDiv(UNITS, m_pFrame->nb_samples, m_pFrame->sample_rate, 0);
 
 		if (m_av_sample_fmt == AV_SAMPLE_FMT_S32 && m_sample_fmt == SAMPLE_FMT_S24) {
-			DWORD pSize   = m_pFrame->nb_samples * m_pFrame->channels * sizeof(BYTE) * 3;
+			const DWORD pSize = m_pFrame->nb_samples * m_pFrame->channels * sizeof(BYTE) * 3;
 			BYTE* pTmpBuf = DNew BYTE[pSize];
 			convert_to_int24(SAMPLE_FMT_S32, m_Channels, m_pFrame->nb_samples, m_pFrame->data[0], pTmpBuf);
 
 			p->SetData(pTmpBuf, pSize);
 			delete [] pTmpBuf;
 		} else {
-			int buffersize = av_samples_get_buffer_size(nullptr, m_pFrame->channels, m_pFrame->nb_samples, m_av_sample_fmt, 1);
+			const int buffersize = av_samples_get_buffer_size(nullptr, m_pFrame->channels, m_pFrame->nb_samples, m_av_sample_fmt, 1);
 			p->SetData(m_pFrame->data[0], buffersize);
 		}
 	}
