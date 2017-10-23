@@ -609,8 +609,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	if (subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
 		hr = ProcessDvdLPCM();
 	} else if (subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
-		// TODO: check if the test is really correct
-		hr = ProcessHdmvLPCM(pIn->IsSyncPoint() == S_FALSE);
+		hr = ProcessHdmvLPCM();
 	} else if (subtype == MEDIASUBTYPE_PS2_PCM) {
 		hr = ProcessPS2PCM();
 	} else if (subtype == MEDIASUBTYPE_PS2_ADPCM) {
@@ -693,18 +692,11 @@ HRESULT CMpaDecFilter::ProcessDvdLPCM()
 	return Deliver(dst.get(), dst_size, out_sf, wfein->nSamplesPerSec, wfein->nChannels);
 }
 
-HRESULT CMpaDecFilter::ProcessHdmvLPCM(bool bAlignOldBuffer) // Blu ray LPCM
+HRESULT CMpaDecFilter::ProcessHdmvLPCM() // Blu ray LPCM
 {
 	WAVEFORMATEX_HDMV_LPCM* wfein = (WAVEFORMATEX_HDMV_LPCM*)m_pInput->CurrentMediaType().Format();
 	if (wfein->channel_conf >= _countof(s_scmap_hdmv) || !s_scmap_hdmv[wfein->channel_conf].layout) {
 		return E_FAIL;
-	}
-
-	if (bAlignOldBuffer) { // TODO: check if the test is really correct
-		const unsigned framesize = ((wfein->nChannels + 1) & ~1) * ((wfein->wBitsPerSample + 7) / 8);
-		size_t len = m_buff.GetCount();
-		len -= len % framesize;
-		m_buff.SetCount(len);
 	}
 
 	unsigned src_size = m_buff.GetCount();
