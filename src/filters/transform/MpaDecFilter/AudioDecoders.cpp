@@ -23,7 +23,7 @@
 #include "SampleFormat.h"
 #include "AudioDecoders.h"
 
-std::unique_ptr<uint8_t[]> DecodeDvdLPCM(unsigned& dst_size, SampleFormat& dst_sf, BYTE* src, unsigned& src_size, const unsigned channels, const unsigned bitdepth)
+std::unique_ptr<BYTE[]> DecodeDvdLPCM(unsigned& dst_size, SampleFormat& dst_sf, BYTE* src, unsigned& src_size, const unsigned channels, const unsigned bitdepth)
 {
 	// https://wiki.multimedia.cx/index.php/PCM#DVD_PCM
 
@@ -96,7 +96,7 @@ std::unique_ptr<uint8_t[]> DecodeDvdLPCM(unsigned& dst_size, SampleFormat& dst_s
 	return dst;
 }
 
-std::unique_ptr<uint8_t[]> DecodeHdmvLPCM(unsigned& dst_size, SampleFormat& dst_sf, BYTE* src, unsigned& src_size, const unsigned channels, const unsigned bitdepth, const BYTE channel_conf)
+std::unique_ptr<BYTE[]> DecodeHdmvLPCM(unsigned& dst_size, SampleFormat& dst_sf, BYTE* src, unsigned& src_size, const unsigned channels, const unsigned bitdepth, const BYTE channel_conf)
 {
 	const unsigned framesize = ((channels + 1) & ~1) * ((bitdepth + 7) / 8);
 	if (!framesize) {
