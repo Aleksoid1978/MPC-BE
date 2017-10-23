@@ -688,6 +688,7 @@ HRESULT CMpaDecFilter::ProcessDvdLPCM()
 	}
 
 	m_buff.RemoveHead(m_buff.GetCount() - src_size);
+	DLogIf(src_size > 0, L"ProcessDvdLPCM(): %u bytes not processed", src_size);
 
 	return Deliver(dst.get(), dst_size, out_sf, wfein->nSamplesPerSec, wfein->nChannels);
 }
@@ -717,9 +718,8 @@ HRESULT CMpaDecFilter::ProcessHdmvLPCM(bool bAlignOldBuffer) // Blu ray LPCM
 		return S_FALSE;
 	}
 
-	ASSERT(!src_size);
-
 	m_buff.RemoveHead(m_buff.GetCount() - src_size);
+	DLogIf(src_size > 0, L"ProcessHdmvLPCM(): %u bytes not processed", src_size);
 
 	return Deliver(dst.get(), dst_size, out_sf, wfein->nSamplesPerSec, wfein->nChannels, s_scmap_hdmv[wfein->channel_conf].layout);
 }
