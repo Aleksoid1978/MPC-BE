@@ -114,7 +114,7 @@ protected:
 	HRESULT ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF = FALSE);
 
 	HRESULT ProcessDvdLPCM();
-	HRESULT ProcessHdmvLPCM(bool bAlignOldBuffer);
+	HRESULT ProcessHdmvLPCM();
 	HRESULT ProcessAC3_SPDIF();
 	HRESULT ProcessEAC3_SPDIF();
 	HRESULT ProcessTrueHD_SPDIF();
