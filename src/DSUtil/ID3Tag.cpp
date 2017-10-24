@@ -286,8 +286,6 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 	CGolombBuffer gb(buf, len);
 	int pos = gb.GetPos();
 	while (!gb.IsEOF()) {
-		gb.Seek(pos);
-
 		DWORD tag;
 		DWORD size;
 		WORD flags;
@@ -317,7 +315,21 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 			break;
 		}
 
+		if (pos < gb.GetSize()) {
+			const int save_pos = gb.GetPos();
+
+			gb.Seek(pos);
+			while (!gb.IsEOF() && !gb.BitRead(8, true)) {
+				gb.SkipBytes(1);
+				pos++;
+				size++;
+			}
+
+			gb.Seek(save_pos);
+		}
+
 		if (!size) {
+			gb.Seek(pos);
 			continue;
 		}
 
@@ -374,6 +386,8 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 		} else if (tag == 'CHAP') {
 			ReadChapter(gbData, size);
 		}
+
+		gb.Seek(pos);
 	}
 
 	POSITION pos2 = TagItems.GetHeadPosition();
