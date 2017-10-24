@@ -105,6 +105,7 @@ namespace Logger
 
 #ifdef _DEBUG_LOGFILE
 	#define DLog(...) Logger::Log2File(__VA_ARGS__)
+	#define DLogIf(f,...) {if (f) Logger::Log2File(__VA_ARGS__);}
 	#define DLogError(...) Logger::Log2File(__VA_ARGS__)
 #elif _DEBUG
 	#define DLog(...) DbgLogInfo(LOG_TRACE, 3, __VA_ARGS__)
