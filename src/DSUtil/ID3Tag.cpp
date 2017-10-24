@@ -145,6 +145,12 @@ CString CID3Tag::ReadField(CGolombBuffer& gb, DWORD &size, BYTE encoding)
 		str = ReadText(gb, fieldSize, encoding);
 	};
 
+	while (size >= fieldseparatorSize
+			&& gb.BitRead(8 * fieldseparatorSize, true) == 0) {
+		size -= fieldseparatorSize;
+		gb.SkipBytes(fieldseparatorSize);
+	}
+
 	return str;
 }
 
