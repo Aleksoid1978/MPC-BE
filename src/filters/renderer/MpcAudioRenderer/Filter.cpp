@@ -185,7 +185,7 @@ HRESULT CFilter::Push(CAutoPtr<CPacket> p)
 	BYTE *pData   = p->GetData();
 	BYTE* pTmpBuf = nullptr;
 
-	const int nSamples = p->GetCount() / (m_Channels * av_get_bytes_per_sample(m_av_sample_fmt));
+	const int nSamples = p->GetCount() / (m_Channels * get_bytes_per_sample(m_sample_fmt));
 
 	if (m_av_sample_fmt == AV_SAMPLE_FMT_S32 && m_sample_fmt == SAMPLE_FMT_S24) {
 		DWORD pSize = nSamples * m_Channels * sizeof(int32_t);
