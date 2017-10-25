@@ -425,14 +425,14 @@ static av_cold int h264_decode_init(AVCodecContext *avctx)
     // ==> Start patch MPC
     const SPS *sps = h264_getSPS(h);
     if (sps) {
+        if (sps->mb_height > 0)
+            h->avctx->coded_height = 16 * sps->mb_height;
+
         h->avctx->colorspace = sps->colorspace;
         h->avctx->level      = sps->level_idc;
         h->avctx->pix_fmt    = ff_h264_get_pixel_format(h, sps);
         h->avctx->profile    = ff_h264_get_profile(sps);
         h->avctx->refs       = sps->ref_frame_count;
-
-        if (sps->mb_height > 0)
-            h->avctx->coded_height = 16 * sps->mb_height;
     }
     // ==> End patch MPC
 
