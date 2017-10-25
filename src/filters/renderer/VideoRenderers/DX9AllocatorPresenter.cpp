@@ -1386,7 +1386,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 
 		xOffsetInPixels = (m_bMVC_Base_View_R_flag != rd->m_bStereo3DSwapLR) ? -m_nStereoOffsetInPixels : m_nStereoOffsetInPixels;
 	}
-	AlphaBltSubPic(rDstPri, rDstVid, xOffsetInPixels);
+	AlphaBltSubPic(rSrcPri, rDstVid, xOffsetInPixels);
 
 	// Casimir666 : show OSD
 	if (m_VMR9AlphaBitmap.dwFlags & VMRBITMAP_UPDATE) {
@@ -1425,7 +1425,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	if (m_pOSDTexture) {
 		const int xOffsetInPixels = 4;
 
-		CRect rcDst(rDstPri);
+		CRect rcDst(rSrcPri);
 		if (rs.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE) {
 			CRect rcTemp(rcDst);
 			rcTemp.right -= rcTemp.Width() / 2;
