@@ -447,11 +447,11 @@ DWORD CUDPStream::ThreadProc()
 					fclose(dump);
 				}
 #endif
+				m_bEndOfStream = TRUE;
+				EmptyBuffer();
 				return 0;
 			case CMD::CMD_STOP:
 				Reply(S_OK);
-				m_bEndOfStream = TRUE;
-				EmptyBuffer();
 				break;
 			case CMD::CMD_INIT:
 			case CMD::CMD_RUN:
