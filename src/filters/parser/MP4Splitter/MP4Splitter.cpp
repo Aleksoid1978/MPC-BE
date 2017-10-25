@@ -1965,6 +1965,7 @@ start:
 
 			if (track->GetType() == AP4_Track::TYPE_AUDIO
 					&& mt.subtype != MEDIASUBTYPE_RAW_AAC1
+					&& mt.subtype != MEDIASUBTYPE_Vorbis2
 					&& duration < 100000) { // duration < 10 ms (hack for PCM, ADPCM, Law and other)
 
 				p->SetCount(0, (500000 / duration + 1) * data.GetDataSize()); // grouping > 50 ms
