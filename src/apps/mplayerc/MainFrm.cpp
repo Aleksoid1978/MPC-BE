@@ -10840,17 +10840,16 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 
 		if (IsD3DFullScreenMode()) {
 			m_pFullscreenWnd->GetClientRect(&wr);
-		} else if (!m_bFullScreen) {
-			m_wndView.GetClientRect(&wr);
-		} else {
+		} else if (m_bFullScreen) {
 			GetWindowRect(&wr);
-			// it's code need for work in fullscreen on secondary monitor;
 			CRect r;
 			m_wndView.GetWindowRect(&r);
 			wr -= r.TopLeft();
+		} else {
+			m_wndView.GetClientRect(&wr);
 		}
 
-		CRect vr; // {0,0,0,0}
+		CRect vr;
 
 		OAFilterState fs = GetMediaState();
 		if (fs != State_Stopped || bForcedSetVideoRect || (fs == State_Stopped && m_fShockwaveGraph)) {
@@ -10883,8 +10882,8 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 					}
 
 					if (m_bFullScreen) {
-						CAppSettings& s = AfxGetAppSettings();
-						double factor = (wy > hx) ? w / arxy.cx : h / arxy.cy;
+						const CAppSettings& s = AfxGetAppSettings();
+						const double factor = (wy > hx) ? w / arxy.cx : h / arxy.cy;
 
 						if (s.bNoSmallUpscale && factor > 1.0 && factor < 1.02
 								|| s.bNoSmallDownscale && factor > 0.99 && factor < 1.0) {
@@ -10906,10 +10905,10 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 			case DVS_ZOOM1:
 				if (!m_fShockwaveGraph) {
 					if (wy > hx) {
-						w = ((double)hx + (wy - hx)*0.333) / arxy.cy;
+						w = ((double)hx + (wy - hx) * 0.333) / arxy.cy;
 						h = w * arxy.cy / arxy.cx;
 					} else {
-						h = ((double)wy + (hx - wy)*0.333)/ arxy.cx;
+						h = ((double)wy + (hx - wy) * 0.333) / arxy.cx;
 						w = h * arxy.cx / arxy.cy;
 					}
 				}
@@ -10917,26 +10916,25 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 			case DVS_ZOOM2:
 				if (!m_fShockwaveGraph) {
 					if (wy > hx) {
-						w = ((double)hx + (wy - hx)*0.667) / arxy.cy;
+						w = ((double)hx + (wy - hx) * 0.667) / arxy.cy;
 						h = w * arxy.cy / arxy.cx;
 					} else {
-						h = ((double)wy + (hx - wy)*0.667)/ arxy.cx;
+						h = ((double)wy + (hx - wy) * 0.667) / arxy.cx;
 						w = h * arxy.cx / arxy.cy;
 					}
 				}
 				break;
 			}
 
-			CSize size((int)(m_ZoomX*w + 0.5), (int)(m_ZoomY*h + 0.5));
+			CSize size(m_ZoomX * w + 0.5, m_ZoomY * h + 0.5);
 
 			// HACK: remove jitter of frame width
 			if (abs(wr.Width() - size.cx) == 1) {
 				size.cx = wr.Width();
 			}
 
-			CPoint pos(
-				(int)(m_PosX*(wr.Width()*3.0 - m_ZoomX*w) - wr.Width()),
-				(int)(m_PosY*(wr.Height()*3.0 - m_ZoomY*h) - wr.Height()));
+			CPoint pos(m_PosX * (wr.Width() * 3.0 - m_ZoomX * w) - wr.Width(),
+					   m_PosY * (wr.Height() * 3.0 - m_ZoomY * h) - wr.Height());
 
 			vr = CRect(pos, size);
 		}
@@ -10951,7 +10949,7 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 			hr = m_pVW->SetWindowPosition(wr.left, wr.top, wr.Width(), wr.Height());
 
 			if (m_pMFVDC) {
-				m_pMFVDC->SetVideoPosition (nullptr, wr);
+				m_pMFVDC->SetVideoPosition(nullptr, wr);
 			}
 		}
 
@@ -10959,7 +10957,7 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 
 		if (bShowStats && vr.Height() > 0) {
 			CString info;
-			info.Format(L"Pos %.2f %.2f, Zoom %.2f %.2f, AR %.2f", m_PosX, m_PosY, m_ZoomX, m_ZoomY, (float)vr.Width()/vr.Height());
+			info.Format(L"Pos %.2f %.2f, Zoom %.2f %.2f, AR %.2f", m_PosX, m_PosY, m_ZoomX, m_ZoomY, (float)vr.Width() / vr.Height());
 			SendStatusMessage(info, 3000);
 		}
 	} else {
@@ -11018,23 +11016,20 @@ void CMainFrame::HideVideoWindow(bool fHide)
 	CRect wr;
 	if (IsD3DFullScreenMode()) {
 		m_pFullscreenWnd->GetClientRect(&wr);
-	} else if (!m_bFullScreen) {
-		m_wndView.GetClientRect(&wr);
-	} else {
+	} else if (m_bFullScreen) {
 		GetWindowRect(&wr);
-
-		// this code is needed to work in fullscreen on secondary monitor
 		CRect r;
 		m_wndView.GetWindowRect(&r);
 		wr -= r.TopLeft();
+	} else {
+		m_wndView.GetClientRect(&wr);
 	}
 
-	CRect vr = CRect(0,0,0,0);
 	if (m_pCAP) {
 		if (fHide) {
-			m_pCAP->SetPosition(wr, vr);    // hide
+			m_pCAP->SetPosition(wr, RECT{0, 0, 0, 0});
 		} else {
-			m_pCAP->SetPosition(wr, wr);    // show
+			m_pCAP->SetPosition(wr, wr);
 		}
 	}
 }
