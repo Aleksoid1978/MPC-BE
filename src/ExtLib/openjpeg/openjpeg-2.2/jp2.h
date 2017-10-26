@@ -235,6 +235,12 @@ Decoding parameters are returned in jp2->j2k->cp.
 */
 void opj_jp2_setup_decoder(opj_jp2_t *jp2, opj_dparameters_t *parameters);
 
+/** Allocates worker threads for the compressor/decompressor.
+ *
+ * @param jp2 JP2 decompressor handle
+ * @param num_threads Number of threads.
+ * @return OPJ_TRUE in case of success.
+ */
 OPJ_BOOL opj_jp2_set_threads(opj_jp2_t *jp2, OPJ_UINT32 num_threads);
 
 /**
@@ -326,6 +332,21 @@ OPJ_BOOL opj_jp2_read_header(opj_stream_private_t *p_stream,
                              opj_jp2_t *jp2,
                              opj_image_t ** p_image,
                              opj_event_mgr_t * p_manager);
+
+/** Sets the indices of the components to decode.
+ *
+ * @param jp2 JP2 decompressor handle
+ * @param numcomps Number of components to decode.
+ * @param comps_indices Array of num_compts indices (numbering starting at 0)
+ *                     corresponding to the components to decode.
+ * @param p_manager Event manager;
+ *
+ * @return OPJ_TRUE in case of success.
+ */
+OPJ_BOOL opj_jp2_set_decoded_components(opj_jp2_t *jp2,
+                                        OPJ_UINT32 numcomps,
+                                        const OPJ_UINT32* comps_indices,
+                                        opj_event_mgr_t * p_manager);
 
 /**
  * Reads a tile header.

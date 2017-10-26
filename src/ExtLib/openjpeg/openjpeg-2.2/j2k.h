@@ -107,6 +107,8 @@ The functions in J2K.C have for goal to read/write the several parts of the code
 #endif /* USE_JPSEC */
 /* <<UniPG */
 
+#define J2K_MAX_POCS    32      /**< Maximum number of POCs */
+
 /* ----------------------------------------------------------------------- */
 
 /**
@@ -251,7 +253,7 @@ typedef struct opj_tcp {
     /** number of progression order changes */
     OPJ_UINT32 numpocs;
     /** progression order changes */
-    opj_poc_t pocs[32];
+    opj_poc_t pocs[J2K_MAX_POCS];
 
     /** number of ppt markers (reserved size) */
     OPJ_UINT32 ppt_markers_count;
@@ -480,6 +482,10 @@ typedef struct opj_j2k_dec {
      * SOD reader function. FIXME NOT USED for the moment
      */
     OPJ_BOOL   m_last_tile_part;
+
+    OPJ_UINT32   m_numcomps_to_decode;
+    OPJ_UINT32  *m_comps_indices_to_decode;
+
     /** to tell that a tile can be decoded. */
     OPJ_BITFIELD m_can_decode : 1;
     OPJ_BITFIELD m_discard_tiles : 1;
@@ -704,6 +710,21 @@ OPJ_BOOL opj_j2k_read_tile_header(opj_j2k_t * p_j2k,
                                   opj_stream_private_t *p_stream,
                                   opj_event_mgr_t * p_manager);
 
+
+/** Sets the indices of the components to decode.
+ *
+ * @param p_j2k         the jpeg2000 codec.
+ * @param numcomps      Number of components to decode.
+ * @param comps_indices Array of num_compts indices (numbering starting at 0)
+ *                      corresponding to the components to decode.
+ * @param p_manager     Event manager
+ *
+ * @return OPJ_TRUE in case of success.
+ */
+OPJ_BOOL opj_j2k_set_decoded_components(opj_j2k_t *p_j2k,
+                                        OPJ_UINT32 numcomps,
+                                        const OPJ_UINT32* comps_indices,
+                                        opj_event_mgr_t * p_manager);
 
 /**
  * Sets the given area to be decoded. This function should be called right after opj_read_header and before any tile header reading.

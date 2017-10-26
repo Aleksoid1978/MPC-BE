@@ -70,7 +70,7 @@ opj_image_t* OPJ_CALLCONV opj_image_create(OPJ_UINT32 numcmpts,
             comp->sgnd = cmptparms[compno].sgnd;
             if (comp->h != 0 &&
                     (OPJ_SIZE_T)comp->w > SIZE_MAX / comp->h / sizeof(OPJ_INT32)) {
-                // TODO event manager
+                /* TODO event manager */
                 opj_image_destroy(image);
                 return NULL;
             }
