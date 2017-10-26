@@ -587,7 +587,6 @@ int     av_frame_get_decode_error_flags   (const AVFrame *frame);
 void    av_frame_set_decode_error_flags   (AVFrame *frame, int     val);
 int     av_frame_get_pkt_size(const AVFrame *frame);
 void    av_frame_set_pkt_size(AVFrame *frame, int val);
-AVDictionary **avpriv_frame_get_metadatap(AVFrame *frame);
 #if FF_API_FRAME_QP
 int8_t *av_frame_get_qp_table(AVFrame *f, int *stride, int *type);
 int av_frame_set_qp_table(AVFrame *f, AVBufferRef *buf, int stride, int type);
@@ -681,7 +680,9 @@ void av_frame_move_ref(AVFrame *dst, AVFrame *src);
  *           cases.
  *
  * @param frame frame in which to store the new buffers.
- * @param align required buffer size alignment
+ * @param align Required buffer size alignment. If equal to 0, alignment will be
+ *              chosen automatically for the current CPU. It is highly
+ *              recommended to pass 0 here unless you know what you are doing.
  *
  * @return 0 on success, a negative AVERROR on error.
  */
@@ -781,8 +782,8 @@ enum {
     /**
      * Apply the maximum possible cropping, even if it requires setting the
      * AVFrame.data[] entries to unaligned pointers. Passing unaligned data
-     * to Libav API is generally not allowed, and causes undefined behavior
-     * (such as crashes). You can pass unaligned data only to Libav APIs that
+     * to FFmpeg API is generally not allowed, and causes undefined behavior
+     * (such as crashes). You can pass unaligned data only to FFmpeg APIs that
      * are explicitly documented to accept it. Use this flag only if you
      * absolutely know what you are doing.
      */

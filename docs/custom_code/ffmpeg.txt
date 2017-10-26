@@ -9,6 +9,7 @@
 
 * libavcodec/aacdec_template.c
 * libavcodec/allcodecs.c
+* libavcodec/decode.c
 * libavcodec/dxva2.c
 * libavcodec/h264_slice.c
 * libavcodec/h264dec.c

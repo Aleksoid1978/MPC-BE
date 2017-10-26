@@ -244,7 +244,6 @@ Codecs:
   txd.c                                 Ivo van Poorten
   vc2*                                  Rostislav Pehlivanov
   vcr1.c                                Michael Niedermayer
-  vda_h264_dec.c                        Xidorn Quan
   videotoolboxenc.c                     Rick Kern
   vima.c                                Paul B Mahol
   vorbisdec.c                           Denes Balatoni, David Conrad
@@ -282,7 +281,7 @@ libavdevice
 
 
   avfoundation.m                        Thilo Borgmann
-  decklink*                             Deti Fliegl
+  decklink*                             Marton Balint
   dshow.c                               Roger Pack (CC rogerdpack@gmail.com)
   fbdev_enc.c                           Lukasz Marek
   gdigrab.c                             Roger Pack (CC rogerdpack@gmail.com)
@@ -291,7 +290,6 @@ libavdevice
   libdc1394.c                           Roman Shaposhnik
   opengl_enc.c                          Lukasz Marek
   pulse_audio_enc.c                     Lukasz Marek
-  qtkit.m                               Thilo Borgmann
   sdl                                   Stefano Sabatini
   sdl2.c                                Josh de Kock
   v4l2.c                                Giorgio Vazzana
@@ -330,6 +328,7 @@ Filters:
   avf_avectorscope.c                    Paul B Mahol
   avf_showcqt.c                         Muhammad Faiz
   vf_blend.c                            Paul B Mahol
+  vf_bwdif                              Thomas Mundt (CC <thomas.mundt@hr.de>)
   vf_chromakey.c                        Timo Rothenpieler
   vf_colorchannelmixer.c                Paul B Mahol
   vf_colorbalance.c                     Paul B Mahol
@@ -345,6 +344,7 @@ Filters:
   vf_hqx.c                              Clément Bœsch
   vf_idet.c                             Pascal Massimino
   vf_il.c                               Paul B Mahol
+  vf_(t)interlace                       Thomas Mundt (CC <thomas.mundt@hr.de>)
   vf_lenscorrection.c                   Daniel Oberhoff
   vf_mergeplanes.c                      Paul B Mahol
   vf_mestimate.c                        Davinder Singh
@@ -395,6 +395,7 @@ Muxers/Demuxers:
   caf*                                  Peter Ross
   cdxl.c                                Paul B Mahol
   crc.c                                 Michael Niedermayer
+  dashdec.c                             Steven Liu
   daud.c                                Reimar Doeffinger
   dss.c                                 Oleksij Rempel
   dtsdec.c                              foo86
@@ -409,7 +410,7 @@ Muxers/Demuxers:
   gxf.c                                 Reimar Doeffinger
   gxfenc.c                              Baptiste Coudurier
   hls.c                                 Anssi Hannula
-  hls encryption (hlsenc.c)             Christian Suloway, Steven Liu
+  hlsenc.c                              Christian Suloway, Steven Liu
   idcin.c                               Mike Melanson
   idroqdec.c                            Mike Melanson
   iff.c                                 Jaikrishnan Menon
@@ -545,6 +546,7 @@ Ganesh Ajjanagadde
 Henrik Gramner
 Ivan Uskov
 James Darnley
+Jan Ekström
 Joakim Plate
 Kieran Kunhya
 Kirill Gavrilov

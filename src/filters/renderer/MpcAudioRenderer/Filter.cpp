@@ -57,9 +57,9 @@ HRESULT CFilter::Init(const double& dRate, const WAVEFORMATEX* wfe, const REFERE
 		return E_FAIL;
 	}
 
-	AVFilter *buffersrc = avfilter_get_by_name("abuffer");
+	const AVFilter *buffersrc = avfilter_get_by_name("abuffer");
 	CheckPointer(buffersrc, E_FAIL);
-	AVFilter *buffersink = avfilter_get_by_name("abuffersink");
+	const AVFilter *buffersink = avfilter_get_by_name("abuffersink");
 	CheckPointer(buffersink, E_FAIL);
 
 	m_pFilterGraph = avfilter_graph_alloc();
@@ -122,19 +122,14 @@ HRESULT CFilter::Init(const double& dRate, const WAVEFORMATEX* wfe, const REFERE
 	if (dRate < 0.5 || dRate > 2.0) {
 		double _dRate = sqrt(dRate);
 
-		AVFilterContext	*atempo_ctx;
-		AVFilter		*atempo;
-		AVFilterContext	*atempo_ctx2;
-		AVFilter		*atempo2;
-
-		atempo = avfilter_get_by_name("atempo");
-		atempo_ctx = avfilter_graph_alloc_filter(m_pFilterGraph, atempo, "atempo");
+		const AVFilter* atempo = avfilter_get_by_name("atempo");
+		AVFilterContext* atempo_ctx = avfilter_graph_alloc_filter(m_pFilterGraph, atempo, "atempo");
 		_snprintf_s(args, sizeof(args), "tempo=%f", _dRate);
 		ret = avfilter_init_str(atempo_ctx, args);
 		CheckRet(ret);
 
-		atempo2 = avfilter_get_by_name("atempo");
-		atempo_ctx2 = avfilter_graph_alloc_filter(m_pFilterGraph, atempo2, "atempo");
+		const AVFilter* atempo2 = avfilter_get_by_name("atempo");
+		AVFilterContext* atempo_ctx2 = avfilter_graph_alloc_filter(m_pFilterGraph, atempo2, "atempo");
 		_snprintf_s(args, sizeof(args), "tempo=%f", _dRate);
 		ret = avfilter_init_str(atempo_ctx2, args);
 		CheckRet(ret);
@@ -146,11 +141,8 @@ HRESULT CFilter::Init(const double& dRate, const WAVEFORMATEX* wfe, const REFERE
 		ret = avfilter_link(atempo_ctx2, 0, m_pFilterBufferSink, 0);
 		CheckRet(ret);
 	} else {
-		AVFilterContext	*atempo_ctx;
-		AVFilter		*atempo;
-
-		atempo = avfilter_get_by_name("atempo");
-		atempo_ctx = avfilter_graph_alloc_filter(m_pFilterGraph, atempo, "atempo");
+		const AVFilter* atempo = avfilter_get_by_name("atempo");
+		AVFilterContext* atempo_ctx = avfilter_graph_alloc_filter(m_pFilterGraph, atempo, "atempo");
 		_snprintf_s(args, sizeof(args), "tempo=%f", dRate);
 		ret = avfilter_init_str(atempo_ctx, args);
 		CheckRet(ret);

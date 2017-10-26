@@ -375,8 +375,7 @@ static int decode_simple_internal(AVCodecContext *avctx, AVFrame *frame)
     DecodeSimpleContext *ds = &avci->ds;
     AVPacket           *pkt = ds->in_pkt;
     // copy to ensure we do not change pkt
-    AVPacket tmp;
-    int got_frame, actual_got_frame, did_split;
+    int got_frame, actual_got_frame;
     int ret;
 
     if (!pkt->data && !avci->draining) {
@@ -396,31 +395,12 @@ static int decode_simple_internal(AVCodecContext *avctx, AVFrame *frame)
           avctx->active_thread_type & FF_THREAD_FRAME))
         return AVERROR_EOF;
 
-    tmp = *pkt;
-#if FF_API_MERGE_SD
-FF_DISABLE_DEPRECATION_WARNINGS
-    did_split = avci->compat_decode_partial_size ?
-                ff_packet_split_and_drop_side_data(&tmp) :
-                av_packet_split_side_data(&tmp);
-
-    if (did_split) {
-        ret = extract_packet_props(avctx->internal, &tmp);
-        if (ret < 0)
-            return ret;
-
-        ret = apply_param_change(avctx, &tmp);
-        if (ret < 0)
-            return ret;
-    }
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-
     got_frame = 0;
 
     if (HAVE_THREADS && avctx->active_thread_type & FF_THREAD_FRAME) {
-        ret = ff_thread_decode_frame(avctx, frame, &got_frame, &tmp);
+        ret = ff_thread_decode_frame(avctx, frame, &got_frame, pkt);
     } else {
-        ret = avctx->codec->decode(avctx, frame, &got_frame, &tmp);
+        ret = avctx->codec->decode(avctx, frame, &got_frame, pkt);
 
         if (!(avctx->codec->caps_internal & FF_CODEC_CAP_SETS_PKT_DTS))
             frame->pkt_dts = pkt->dts;
@@ -550,13 +530,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
             }
         }
     }
-#if FF_API_MERGE_SD
-    if (did_split) {
-        av_packet_free_side_data(&tmp);
-        if(ret == tmp.size)
-            ret = pkt->size;
-    }
-#endif
 
     if (avctx->codec->type == AVMEDIA_TYPE_AUDIO &&
         !avci->showed_multi_packet_warning &&
@@ -1005,7 +978,6 @@ int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
                              AVPacket *avpkt)
 {
     int i, ret = 0;
-    AVCodecInternal *avci = avctx->internal;
 
     if (!avpkt->data && avpkt->size) {
         av_log(avctx, AV_LOG_ERROR, "invalid packet: NULL data, size != 0\n");
@@ -1022,29 +994,9 @@ int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
     get_subtitle_defaults(sub);
 
     if ((avctx->codec->capabilities & AV_CODEC_CAP_DELAY) || avpkt->size) {
-        AVPacket pkt_recoded;
-        AVPacket tmp = *avpkt;
-#if FF_API_MERGE_SD
-FF_DISABLE_DEPRECATION_WARNINGS
-        int did_split = avci->compat_decode_partial_size ?
-                        ff_packet_split_and_drop_side_data(&tmp) :
-                        av_packet_split_side_data(&tmp);
-        //apply_param_change(avctx, &tmp);
+        AVPacket pkt_recoded = *avpkt;
 
-        if (did_split) {
-            /* FFMIN() prevents overflow in case the packet wasn't allocated with
-             * proper padding.
-             * If the side data is smaller than the buffer padding size, the
-             * remaining bytes should have already been filled with zeros by the
-             * original packet allocation anyway. */
-            memset(tmp.data + tmp.size, 0,
-                   FFMIN(avpkt->size - tmp.size, AV_INPUT_BUFFER_PADDING_SIZE));
-        }
-FF_ENABLE_DEPRECATION_WARNINGS
-#endif
-
-        pkt_recoded = tmp;
-        ret = recode_subtitle(avctx, &pkt_recoded, &tmp);
+        ret = recode_subtitle(avctx, &pkt_recoded, avpkt);
         if (ret < 0) {
             *got_sub_ptr = 0;
         } else {
@@ -1093,7 +1045,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
                 }
             }
 
-            if (tmp.data != pkt_recoded.data) { // did we recode?
+            if (avpkt->data != pkt_recoded.data) { // did we recode?
                 /* prevent from destroying side data from original packet */
                 pkt_recoded.side_data = NULL;
                 pkt_recoded.side_data_elems = 0;
@@ -1101,14 +1053,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
                 av_packet_unref(&pkt_recoded);
             }
         }
-
-#if FF_API_MERGE_SD
-        if (did_split) {
-            av_packet_free_side_data(&tmp);
-            if(ret == tmp.size)
-                ret = avpkt->size;
-        }
-#endif
 
         if (*got_sub_ptr)
             avctx->frame_number++;
@@ -1156,7 +1100,7 @@ static int setup_hwaccel(AVCodecContext *avctx,
         return AVERROR(ENOENT);
     }
 
-    if (hwa->capabilities & HWACCEL_CODEC_CAP_EXPERIMENTAL &&
+    if (hwa->capabilities & AV_HWACCEL_CODEC_CAP_EXPERIMENTAL &&
         avctx->strict_std_compliance > FF_COMPLIANCE_EXPERIMENTAL) {
         av_log(avctx, AV_LOG_WARNING, "Ignoring experimental hwaccel: %s\n",
                hwa->name);
@@ -1220,10 +1164,6 @@ int ff_get_format(AVCodecContext *avctx, const enum AVPixelFormat *fmt)
 
         if (!(desc->flags & AV_PIX_FMT_FLAG_HWACCEL))
             break;
-#if FF_API_CAP_VDPAU
-        if (avctx->codec->capabilities&AV_CODEC_CAP_HWACCEL_VDPAU)
-            break;
-#endif
 
         if (avctx->hw_frames_ctx) {
             AVHWFramesContext *hw_frames_ctx = (AVHWFramesContext*)avctx->hw_frames_ctx->data;
@@ -1496,6 +1436,7 @@ int ff_init_buffer_info(AVCodecContext *avctx, AVFrame *frame)
         { AV_PKT_DATA_AUDIO_SERVICE_TYPE,         AV_FRAME_DATA_AUDIO_SERVICE_TYPE },
         { AV_PKT_DATA_MASTERING_DISPLAY_METADATA, AV_FRAME_DATA_MASTERING_DISPLAY_METADATA },
         { AV_PKT_DATA_CONTENT_LIGHT_LEVEL,        AV_FRAME_DATA_CONTENT_LIGHT_LEVEL },
+        { AV_PKT_DATA_A53_CC,                     AV_FRAME_DATA_A53_CC },
     };
 
     if (pkt) {

@@ -893,7 +893,7 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
         return AVERROR_INVALIDDATA;
     }
 
-    skip_bits1(gb); // temporal_id_nesting_flag
+    sps->temporal_id_nesting_flag = get_bits(gb, 1);
 
     if ((ret = parse_ptl(gb, avctx, &sps->ptl, sps->max_sub_layers)) < 0)
         return ret;
@@ -956,6 +956,7 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
                sps->bit_depth, bit_depth_chroma);
         return AVERROR_INVALIDDATA;
     }
+    sps->bit_depth_chroma = bit_depth_chroma;
 
     ret = map_pixel_format(avctx, sps);
     if (ret < 0)
@@ -1060,7 +1061,7 @@ int ff_hevc_parse_sps(HEVCSPS *sps, GetBitContext *gb, unsigned int *sps_id,
     }
 
     sps->nb_st_rps = get_ue_golomb_long(gb);
-    if (sps->nb_st_rps > HEVC_MAX_SHORT_TERM_RPS_COUNT) {
+    if (sps->nb_st_rps > HEVC_MAX_SHORT_TERM_REF_PIC_SETS) {
         av_log(avctx, AV_LOG_ERROR, "Too many short term RPS: %d.\n",
                sps->nb_st_rps);
         return AVERROR_INVALIDDATA;

@@ -3,6 +3,7 @@
 1.5.2 (beta)
 ==============================
 Обновлены библиотеки:
+	ffmpeg git-n3.4-dev-3045-g953d55f443;
 	openjpeg git-v2.3.0-9-gd9f8f7ba;
 	rapidjson git-v1.1.0-269-g7dddd054;
 
