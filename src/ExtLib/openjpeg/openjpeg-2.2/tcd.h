@@ -280,6 +280,8 @@ typedef struct opj_tcd {
     OPJ_UINT32 win_y1;
     /** Only valid for decoding. Whether the whole tile is decoded, or just the region in win_x0/win_y0/win_x1/win_y1 */
     OPJ_BOOL   whole_tile_decoding;
+    /* Array of size image->numcomps indicating if a component must be decoded. NULL if all components must be decoded */
+    OPJ_BOOL* used_component;
 } opj_tcd_t;
 
 /** @name Exported functions */
@@ -381,6 +383,10 @@ Decode a tile from a buffer into a raw image
 @param win_y0 Upper left y of region to decode (in grid coordinates)
 @param win_x1 Lower right x of region to decode (in grid coordinates)
 @param win_y1 Lower right y of region to decode (in grid coordinates)
+@param numcomps_to_decode  Size of the comps_indices array, or 0 if decoding all components.
+@param comps_indices   Array of numcomps values representing the indices
+                       of the components to decode (relative to the
+                       codestream, starting at 0). Or NULL if decoding all components.
 @param src Source buffer
 @param len Length of source buffer
 @param tileno Number that identifies one of the tiles to be decoded
@@ -392,6 +398,8 @@ OPJ_BOOL opj_tcd_decode_tile(opj_tcd_t *tcd,
                              OPJ_UINT32 win_y0,
                              OPJ_UINT32 win_x1,
                              OPJ_UINT32 win_y1,
+                             OPJ_UINT32 numcomps_to_decode,
+                             const OPJ_UINT32 *comps_indices,
                              OPJ_BYTE *src,
                              OPJ_UINT32 len,
                              OPJ_UINT32 tileno,

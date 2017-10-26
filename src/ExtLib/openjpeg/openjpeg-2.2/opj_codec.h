@@ -111,6 +111,11 @@ typedef struct opj_codec_private {
                     OPJ_UINT32 res_factor,
                     opj_event_mgr_t * p_manager);
 
+            /** Set the decoded components */
+            OPJ_BOOL(*opj_set_decoded_components)(void * p_codec,
+                                                  OPJ_UINT32 num_comps,
+                                                  const OPJ_UINT32* comps_indices,
+                                                  opj_event_mgr_t * p_manager);
         } m_decompression;
 
         /**

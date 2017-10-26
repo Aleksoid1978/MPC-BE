@@ -348,7 +348,7 @@ static INLINE void opj_t1_enc_sigpass_step(opj_t1_t *t1,
     if ((flags & ((T1_SIGMA_THIS | T1_PI_THIS) << (ci * 3U))) == 0U &&
             (flags & (T1_SIGMA_NEIGHBOURS << (ci * 3U))) != 0U) {
         OPJ_UINT32 ctxt1 = opj_t1_getctxno_zc(mqc, flags >> (ci * 3U));
-        v = opj_int_abs(*datap) & one ? 1 : 0;
+        v = (opj_int_abs(*datap) & one) ? 1 : 0;
 #ifdef DEBUG_ENC_SIG
         fprintf(stderr, "   ctxt1=%d\n", ctxt1);
 #endif
@@ -735,7 +735,7 @@ static INLINE void opj_t1_enc_refpass_step(opj_t1_t *t1,
         OPJ_UINT32 ctxt = opj_t1_getctxno_mag(shift_flags);
         *nmsedec += opj_t1_getnmsedec_ref((OPJ_UINT32)opj_int_abs(*datap),
                                           (OPJ_UINT32)bpno);
-        v = opj_int_abs(*datap) & one ? 1 : 0;
+        v = (opj_int_abs(*datap) & one) ? 1 : 0;
 #ifdef DEBUG_ENC_REF
         fprintf(stderr, "  ctxt=%d\n", ctxt);
 #endif
@@ -1065,6 +1065,7 @@ static void opj_t1_enc_clnpass_step(
     for (ci = runlen; ci < lim; ++ci) {
         OPJ_UINT32 vsc;
         opj_flag_t flags;
+        OPJ_UINT32 ctxt1;
 
         flags = *flagsp;
 
@@ -1073,12 +1074,12 @@ static void opj_t1_enc_clnpass_step(
         }
 
         if (!(flags & ((T1_SIGMA_THIS | T1_PI_THIS) << (ci * 3U)))) {
-            OPJ_UINT32 ctxt1 = opj_t1_getctxno_zc(mqc, flags >> (ci * 3U));
+            ctxt1 = opj_t1_getctxno_zc(mqc, flags >> (ci * 3U));
 #ifdef DEBUG_ENC_CLN
             printf("   ctxt1=%d\n", ctxt1);
 #endif
             opj_mqc_setcurctx(mqc, ctxt1);
-            v = opj_int_abs(*datap) & one ? 1 : 0;
+            v = (opj_int_abs(*datap) & one) ? 1 : 0;
             opj_mqc_encode(mqc, v);
             if (v) {
                 OPJ_UINT32 ctxt2, spb;
@@ -1617,7 +1618,8 @@ static void opj_t1_clbl_decode_processor(void* user_data, opj_tls_t* tls)
         cblk_w = (OPJ_UINT32)(cblk->x1 - cblk->x0);
         cblk_h = (OPJ_UINT32)(cblk->y1 - cblk->y0);
 
-        cblk->decoded_data = opj_aligned_malloc(cblk_w * cblk_h * sizeof(OPJ_INT32));
+        cblk->decoded_data = (OPJ_INT32*)opj_aligned_malloc(cblk_w * cblk_h * sizeof(
+                                 OPJ_INT32));
         if (cblk->decoded_data == NULL) {
             if (job->p_manager_mutex) {
                 opj_mutex_lock(job->p_manager_mutex);
@@ -1997,6 +1999,10 @@ static OPJ_BOOL opj_t1_decode_cblk(opj_t1_t *t1,
         }
     } else if (cblk->numchunks == 1) {
         cblkdata = cblk->chunks[0].data;
+    } else {
+        /* Not sure if that can happen in practice, but avoid Coverity to */
+        /* think we will dereference a null cblkdta pointer */
+        return OPJ_TRUE;
     }
 
     /* For subtile decoding, directly decode in the decoded_data buffer of */

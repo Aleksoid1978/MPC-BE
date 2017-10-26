@@ -56,7 +56,8 @@ opj_sparse_array_int32_t* opj_sparse_array_int32_create(OPJ_UINT32 width,
         return NULL;
     }
 
-    sa = opj_calloc(1, sizeof(opj_sparse_array_int32_t));
+    sa = (opj_sparse_array_int32_t*) opj_calloc(1,
+            sizeof(opj_sparse_array_int32_t));
     sa->width = width;
     sa->height = height;
     sa->block_width = block_width;
@@ -67,8 +68,8 @@ opj_sparse_array_int32_t* opj_sparse_array_int32_create(OPJ_UINT32 width,
         opj_free(sa);
         return NULL;
     }
-    sa->data_blocks = opj_calloc(sizeof(OPJ_INT32*),
-                                 sa->block_count_hor * sa->block_count_ver);
+    sa->data_blocks = (OPJ_INT32**) opj_calloc(sizeof(OPJ_INT32*),
+                      sa->block_count_hor * sa->block_count_ver);
     if (sa->data_blocks == NULL) {
         opj_free(sa);
         return NULL;
@@ -167,8 +168,9 @@ static OPJ_BOOL opj_sparse_array_int32_read_or_write(
                                                            +
                                                            (x - x0) * buf_col_stride;
                         if (x_incr == 4) {
-                            // Same code as general branch, but the compiler
-                            // can have an efficient memcpy()
+                            /* Same code as general branch, but the compiler */
+                            /* can have an efficient memcpy() */
+                            (void)(x_incr); /* trick to silent cppcheck duplicateBranch warning */
                             for (j = 0; j < y_incr; j++) {
                                 memcpy(dest_ptr, src_ptr, sizeof(OPJ_INT32) * x_incr);
                                 dest_ptr += buf_line_stride;
@@ -232,8 +234,8 @@ static OPJ_BOOL opj_sparse_array_int32_read_or_write(
                 }
             } else {
                 if (src_block == NULL) {
-                    src_block = opj_calloc(1,
-                                           sa->block_width * sa->block_height * sizeof(OPJ_INT32));
+                    src_block = (OPJ_INT32*) opj_calloc(1,
+                                                        sa->block_width * sa->block_height * sizeof(OPJ_INT32));
                     if (src_block == NULL) {
                         return OPJ_FALSE;
                     }
@@ -246,8 +248,9 @@ static OPJ_BOOL opj_sparse_array_int32_read_or_write(
                     const OPJ_INT32* OPJ_RESTRICT src_ptr = buf + (y - y0) *
                                                             (OPJ_SIZE_T)buf_line_stride + (x - x0) * buf_col_stride;
                     if (x_incr == 4) {
-                        // Same code as general branch, but the compiler
-                        // can have an efficient memcpy()
+                        /* Same code as general branch, but the compiler */
+                        /* can have an efficient memcpy() */
+                        (void)(x_incr); /* trick to silent cppcheck duplicateBranch warning */
                         for (j = 0; j < y_incr; j++) {
                             memcpy(dest_ptr, src_ptr, sizeof(OPJ_INT32) * x_incr);
                             dest_ptr += block_width;

@@ -245,6 +245,12 @@ opj_codec_t* OPJ_CALLCONV opj_create_decompress(OPJ_CODEC_FORMAT p_format)
                          OPJ_UINT32 res_factor,
                          struct opj_event_mgr * p_manager)) opj_j2k_set_decoded_resolution_factor;
 
+        l_codec->m_codec_data.m_decompression.opj_set_decoded_components =
+            (OPJ_BOOL(*)(void * p_codec,
+                         OPJ_UINT32 numcomps,
+                         const OPJ_UINT32 * comps_indices,
+                         struct opj_event_mgr * p_manager)) opj_j2k_set_decoded_components;
+
         l_codec->opj_set_threads =
             (OPJ_BOOL(*)(void * p_codec, OPJ_UINT32 num_threads)) opj_j2k_set_threads;
 
@@ -326,6 +332,12 @@ opj_codec_t* OPJ_CALLCONV opj_create_decompress(OPJ_CODEC_FORMAT p_format)
             (OPJ_BOOL(*)(void * p_codec,
                          OPJ_UINT32 res_factor,
                          opj_event_mgr_t * p_manager)) opj_jp2_set_decoded_resolution_factor;
+
+        l_codec->m_codec_data.m_decompression.opj_set_decoded_components =
+            (OPJ_BOOL(*)(void * p_codec,
+                         OPJ_UINT32 numcomps,
+                         const OPJ_UINT32 * comps_indices,
+                         struct opj_event_mgr * p_manager)) opj_jp2_set_decoded_components;
 
         l_codec->opj_set_threads =
             (OPJ_BOOL(*)(void * p_codec, OPJ_UINT32 num_threads)) opj_jp2_set_threads;
@@ -423,6 +435,36 @@ OPJ_BOOL OPJ_CALLCONV opj_read_header(opj_stream_t *p_stream,
                 &(l_codec->m_event_mgr));
     }
 
+    return OPJ_FALSE;
+}
+
+
+OPJ_BOOL OPJ_CALLCONV opj_set_decoded_components(opj_codec_t *p_codec,
+        OPJ_UINT32 numcomps,
+        const OPJ_UINT32* comps_indices,
+        OPJ_BOOL apply_color_transforms)
+{
+    if (p_codec) {
+        opj_codec_private_t * l_codec = (opj_codec_private_t *) p_codec;
+
+        if (! l_codec->is_decompressor) {
+            opj_event_msg(&(l_codec->m_event_mgr), EVT_ERROR,
+                          "Codec provided to the opj_set_decoded_components function is not a decompressor handler.\n");
+            return OPJ_FALSE;
+        }
+
+        if (apply_color_transforms) {
+            opj_event_msg(&(l_codec->m_event_mgr), EVT_ERROR,
+                          "apply_color_transforms = OPJ_TRUE is not supported.\n");
+            return OPJ_FALSE;
+        }
+
+        return  l_codec->m_codec_data.m_decompression.opj_set_decoded_components(
+                    l_codec->m_codec,
+                    numcomps,
+                    comps_indices,
+                    &(l_codec->m_event_mgr));
+    }
     return OPJ_FALSE;
 }
 

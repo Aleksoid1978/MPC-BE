@@ -2,6 +2,9 @@
 
 1.5.2 (beta)
 ==============================
+Updated libraries:
+	openjpeg git-v2.3.0-9-gd9f8f7ba;
+	rapidjson git-v1.1.0-269-g7dddd054;
 
 1.5.1
 ==============================
