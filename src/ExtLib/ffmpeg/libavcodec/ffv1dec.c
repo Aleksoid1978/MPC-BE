@@ -372,7 +372,7 @@ static int read_quant_table(RangeCoder *c, int16_t *quant_table, int scale)
     memset(state, 128, sizeof(state));
 
     for (v = 0; i < 128; v++) {
-        unsigned len = get_symbol(c, state, 0) + 1;
+        unsigned len = get_symbol(c, state, 0) + 1U;
 
         if (len > 128 - i || !len)
             return AVERROR_INVALIDDATA;
@@ -717,7 +717,7 @@ static int read_header(FFV1Context *f)
     } else {
         const uint8_t *p = c->bytestream_end;
         for (f->slice_count = 0;
-             f->slice_count < MAX_SLICES && 3 < p - c->bytestream_start;
+             f->slice_count < MAX_SLICES && 3 + 5*!!f->ec < p - c->bytestream_start;
              f->slice_count++) {
             int trailer = 3 + 5*!!f->ec;
             int size = AV_RB24(p-trailer);

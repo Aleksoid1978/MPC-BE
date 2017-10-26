@@ -48,8 +48,6 @@ MAKE_ACCESSORS(AVFrame, frame, enum AVColorRange, color_range)
                (frame)->channels == \
                av_get_channel_layout_nb_channels((frame)->channel_layout))
 
-AVDictionary **avpriv_frame_get_metadatap(AVFrame *frame) {return &frame->metadata;};
-
 #if FF_API_FRAME_QP
 int av_frame_set_qp_table(AVFrame *f, AVBufferRef *buf, int stride, int qp_type)
 {
@@ -181,6 +179,9 @@ static int get_video_buffer(AVFrame *frame, int align)
         return ret;
 
     if (!frame->linesize[0]) {
+        if (align <= 0)
+            align = 32; /* STRIDE_ALIGN. Should be av_cpu_max_align() */
+
         for(i=1; i<=align; i+=i) {
             ret = av_image_fill_linesizes(frame->linesize, frame->format,
                                           FFALIGN(frame->width, i));

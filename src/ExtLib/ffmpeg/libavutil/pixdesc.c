@@ -326,22 +326,10 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR,
     },
-#if FF_API_XVMC
-    [AV_PIX_FMT_XVMC_MPEG2_MC] = {
-        .name = "xvmcmc",
-        .flags = AV_PIX_FMT_FLAG_HWACCEL,
-    },
-    [AV_PIX_FMT_XVMC_MPEG2_IDCT] = {
-        .name = "xvmcidct",
-        .flags = AV_PIX_FMT_FLAG_HWACCEL,
-    },
-#endif /* FF_API_XVMC */
-#if !FF_API_XVMC
     [AV_PIX_FMT_XVMC] = {
         .name = "xvmc",
         .flags = AV_PIX_FMT_FLAG_HWACCEL,
     },
-#endif /* !FF_API_XVMC */
     [AV_PIX_FMT_UYVY422] = {
         .name = "uyvy422",
         .nb_components = 3,
@@ -989,44 +977,6 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_ALPHA,
     },
-#if FF_API_VDPAU
-    [AV_PIX_FMT_VDPAU_H264] = {
-        .name = "vdpau_h264",
-        .log2_chroma_w = 1,
-        .log2_chroma_h = 1,
-        .flags = AV_PIX_FMT_FLAG_HWACCEL,
-    },
-    [AV_PIX_FMT_VDPAU_MPEG1] = {
-        .name = "vdpau_mpeg1",
-        .log2_chroma_w = 1,
-        .log2_chroma_h = 1,
-        .flags = AV_PIX_FMT_FLAG_HWACCEL,
-    },
-    [AV_PIX_FMT_VDPAU_MPEG2] = {
-        .name = "vdpau_mpeg2",
-        .log2_chroma_w = 1,
-        .log2_chroma_h = 1,
-        .flags = AV_PIX_FMT_FLAG_HWACCEL,
-    },
-    [AV_PIX_FMT_VDPAU_WMV3] = {
-        .name = "vdpau_wmv3",
-        .log2_chroma_w = 1,
-        .log2_chroma_h = 1,
-        .flags = AV_PIX_FMT_FLAG_HWACCEL,
-    },
-    [AV_PIX_FMT_VDPAU_VC1] = {
-        .name = "vdpau_vc1",
-        .log2_chroma_w = 1,
-        .log2_chroma_h = 1,
-        .flags = AV_PIX_FMT_FLAG_HWACCEL,
-    },
-    [AV_PIX_FMT_VDPAU_MPEG4] = {
-        .name = "vdpau_mpeg4",
-        .log2_chroma_w = 1,
-        .log2_chroma_h = 1,
-        .flags = AV_PIX_FMT_FLAG_HWACCEL,
-    },
-#endif
     [AV_PIX_FMT_RGB48BE] = {
         .name = "rgb48be",
         .nb_components = 3,
@@ -1670,12 +1620,6 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         .log2_chroma_h = 1,
         .flags = AV_PIX_FMT_FLAG_HWACCEL,
     },
-    [AV_PIX_FMT_VDA_VLD] = {
-        .name = "vda_vld",
-        .log2_chroma_w = 1,
-        .log2_chroma_h = 1,
-        .flags = AV_PIX_FMT_FLAG_HWACCEL,
-    },
     [AV_PIX_FMT_YA8] = {
         .name = "ya8",
         .nb_components = 2,
@@ -2029,10 +1973,6 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
         },
         .flags = AV_PIX_FMT_FLAG_PLANAR | AV_PIX_FMT_FLAG_BE,
     },
-    [AV_PIX_FMT_VDA] = {
-        .name = "vda",
-        .flags = AV_PIX_FMT_FLAG_HWACCEL,
-    },
     [AV_PIX_FMT_QSV] = {
         .name = "qsv",
         .flags = AV_PIX_FMT_FLAG_HWACCEL,
@@ -2246,13 +2186,13 @@ static const AVPixFmtDescriptor av_pix_fmt_descriptors[AV_PIX_FMT_NB] = {
 FF_ENABLE_DEPRECATION_WARNINGS
 #endif
 
-static const char *color_range_names[] = {
+static const char * const color_range_names[] = {
     [AVCOL_RANGE_UNSPECIFIED] = "unknown",
     [AVCOL_RANGE_MPEG] = "tv",
     [AVCOL_RANGE_JPEG] = "pc",
 };
 
-static const char *color_primaries_names[AVCOL_PRI_NB] = {
+static const char * const color_primaries_names[AVCOL_PRI_NB] = {
     [AVCOL_PRI_RESERVED0] = "reserved",
     [AVCOL_PRI_BT709] = "bt709",
     [AVCOL_PRI_UNSPECIFIED] = "unknown",
@@ -2269,7 +2209,7 @@ static const char *color_primaries_names[AVCOL_PRI_NB] = {
     [AVCOL_PRI_JEDEC_P22] = "jedec-p22",
 };
 
-static const char *color_transfer_names[] = {
+static const char * const color_transfer_names[] = {
     [AVCOL_TRC_RESERVED0] = "reserved",
     [AVCOL_TRC_BT709] = "bt709",
     [AVCOL_TRC_UNSPECIFIED] = "unknown",
@@ -2291,7 +2231,7 @@ static const char *color_transfer_names[] = {
     [AVCOL_TRC_ARIB_STD_B67] = "arib-std-b67",
 };
 
-static const char *color_space_names[] = {
+static const char * const color_space_names[] = {
     [AVCOL_SPC_RGB] = "gbr",
     [AVCOL_SPC_BT709] = "bt709",
     [AVCOL_SPC_UNSPECIFIED] = "unknown",
@@ -2309,7 +2249,7 @@ static const char *color_space_names[] = {
     [AVCOL_SPC_ICTCP] = "ictcp",
 };
 
-static const char *chroma_location_names[] = {
+static const char * const chroma_location_names[] = {
     [AVCHROMA_LOC_UNSPECIFIED] = "unspecified",
     [AVCHROMA_LOC_LEFT] = "left",
     [AVCHROMA_LOC_CENTER] = "center",
@@ -2749,10 +2689,36 @@ const char *av_color_range_name(enum AVColorRange range)
         color_range_names[range] : NULL;
 }
 
+int av_color_range_from_name(const char *name)
+{
+    int i;
+
+    for (i = 0; i < FF_ARRAY_ELEMS(color_range_names); i++) {
+        size_t len = strlen(color_range_names[i]);
+        if (!strncmp(color_range_names[i], name, len))
+            return i;
+    }
+
+    return AVERROR(EINVAL);
+}
+
 const char *av_color_primaries_name(enum AVColorPrimaries primaries)
 {
     return (unsigned) primaries < AVCOL_PRI_NB ?
         color_primaries_names[primaries] : NULL;
+}
+
+int av_color_primaries_from_name(const char *name)
+{
+    int i;
+
+    for (i = 0; i < FF_ARRAY_ELEMS(color_primaries_names); i++) {
+        size_t len = strlen(color_primaries_names[i]);
+        if (!strncmp(color_primaries_names[i], name, len))
+            return i;
+    }
+
+    return AVERROR(EINVAL);
 }
 
 const char *av_color_transfer_name(enum AVColorTransferCharacteristic transfer)
@@ -2761,14 +2727,53 @@ const char *av_color_transfer_name(enum AVColorTransferCharacteristic transfer)
         color_transfer_names[transfer] : NULL;
 }
 
+int av_color_transfer_from_name(const char *name)
+{
+    int i;
+
+    for (i = 0; i < FF_ARRAY_ELEMS(color_transfer_names); i++) {
+        size_t len = strlen(color_transfer_names[i]);
+        if (!strncmp(color_transfer_names[i], name, len))
+            return i;
+    }
+
+    return AVERROR(EINVAL);
+}
+
 const char *av_color_space_name(enum AVColorSpace space)
 {
     return (unsigned) space < AVCOL_SPC_NB ?
         color_space_names[space] : NULL;
 }
 
+int av_color_space_from_name(const char *name)
+{
+    int i;
+
+    for (i = 0; i < FF_ARRAY_ELEMS(color_space_names); i++) {
+        size_t len = strlen(color_space_names[i]);
+        if (!strncmp(color_space_names[i], name, len))
+            return i;
+    }
+
+    return AVERROR(EINVAL);
+}
+
 const char *av_chroma_location_name(enum AVChromaLocation location)
 {
     return (unsigned) location < AVCHROMA_LOC_NB ?
         chroma_location_names[location] : NULL;
+}
+
+int av_chroma_location_from_name(const char *name)
+{
+    int i;
+
+    for (i = 0; i < FF_ARRAY_ELEMS(chroma_location_names); i++) {
+        size_t len = strlen(chroma_location_names[i]);
+        if (!strncmp(chroma_location_names[i], name, len))
+            return i;
+    }
+
+    return AVERROR(EINVAL);
 }

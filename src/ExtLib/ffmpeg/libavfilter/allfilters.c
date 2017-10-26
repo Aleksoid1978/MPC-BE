@@ -21,6 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/thread.h"
 #include "avfilter.h"
 #include "config.h"
 
@@ -38,14 +39,8 @@
         avfilter_register(&ff_##x);                                     \
     }
 
-void avfilter_register_all(void)
+static void register_all(void)
 {
-    static int initialized;
-
-    if (initialized)
-        return;
-    initialized = 1;
-
     REGISTER_FILTER(ARESAMPLE,      aresample,      af);
     REGISTER_FILTER(ATEMPO,         atempo,         af);
     //REGISTER_FILTER(LOWPASS,        lowpass,        af);
@@ -54,4 +49,11 @@ void avfilter_register_all(void)
      * unconditionally */
     REGISTER_FILTER_UNCONDITIONAL(asrc_abuffer);
     REGISTER_FILTER_UNCONDITIONAL(asink_abuffer);
+}
+
+void avfilter_register_all(void)
+{
+    static AVOnce control = AV_ONCE_INIT;
+
+    ff_thread_once(&control, register_all);
 }

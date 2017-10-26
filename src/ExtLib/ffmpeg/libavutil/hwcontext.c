@@ -28,7 +28,7 @@
 #include "pixdesc.h"
 #include "pixfmt.h"
 
-static const HWContextType *const hw_table[] = {
+static const HWContextType * const hw_table[] = {
 #if CONFIG_CUDA
     &ff_hwcontext_type_cuda,
 #endif
@@ -79,7 +79,8 @@ enum AVHWDeviceType av_hwdevice_find_type_by_name(const char *name)
 
 const char *av_hwdevice_get_type_name(enum AVHWDeviceType type)
 {
-    if (type >= 0 && type < FF_ARRAY_ELEMS(hw_type_names))
+    if (type > AV_HWDEVICE_TYPE_NONE &&
+        type < FF_ARRAY_ELEMS(hw_type_names))
         return hw_type_names[type];
     else
         return NULL;
@@ -650,6 +651,10 @@ int av_hwdevice_ctx_create_derived(AVBufferRef **dst_ref_ptr,
     goto fail;
 
 done:
+    ret = av_hwdevice_ctx_init(dst_ref);
+    if (ret < 0)
+        goto fail;
+
     *dst_ref_ptr = dst_ref;
     return 0;
 

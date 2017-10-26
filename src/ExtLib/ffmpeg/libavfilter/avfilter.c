@@ -427,19 +427,19 @@ int ff_request_frame(AVFilterLink *link)
     return 0;
 }
 
-static int64_t guess_status_pts(AVFilterContext *ctx, int status)
+static int64_t guess_status_pts(AVFilterContext *ctx, int status, AVRational link_time_base)
 {
     unsigned i;
     int64_t r = INT64_MAX;
 
     for (i = 0; i < ctx->nb_inputs; i++)
         if (ctx->inputs[i]->status_out == status)
-            r = FFMIN(r, ctx->inputs[i]->current_pts);
+            r = FFMIN(r, av_rescale_q(ctx->inputs[i]->current_pts, ctx->inputs[i]->time_base, link_time_base));
     if (r < INT64_MAX)
         return r;
     av_log(ctx, AV_LOG_WARNING, "EOF timestamp not reliable\n");
     for (i = 0; i < ctx->nb_inputs; i++)
-        r = FFMIN(r, ctx->inputs[i]->status_in_pts);
+        r = FFMIN(r, av_rescale_q(ctx->inputs[i]->status_in_pts, ctx->inputs[i]->time_base, link_time_base));
     if (r < INT64_MAX)
         return r;
     return AV_NOPTS_VALUE;
@@ -458,7 +458,7 @@ static int ff_request_frame_to_filter(AVFilterLink *link)
         ret = ff_request_frame(link->src->inputs[0]);
     if (ret < 0) {
         if (ret != AVERROR(EAGAIN) && ret != link->status_in)
-            ff_avfilter_link_set_in_status(link, ret, guess_status_pts(link->src, ret));
+            ff_avfilter_link_set_in_status(link, ret, guess_status_pts(link->src, ret, link->time_base));
         if (ret == AVERROR_EOF)
             ret = 0;
     }
@@ -576,10 +576,7 @@ int avfilter_process_command(AVFilterContext *filter, const char *cmd, const cha
 static AVFilter *first_filter;
 static AVFilter **last_filter = &first_filter;
 
-#if !FF_API_NOCONST_GET_NAME
-const
-#endif
-AVFilter *avfilter_get_by_name(const char *name)
+const AVFilter *avfilter_get_by_name(const char *name)
 {
     const AVFilter *f = NULL;
 
@@ -613,17 +610,6 @@ const AVFilter *avfilter_next(const AVFilter *prev)
 {
     return prev ? prev->next : first_filter;
 }
-
-#if FF_API_OLD_FILTER_REGISTER
-AVFilter **av_filter_next(AVFilter **filter)
-{
-    return filter ? &(*filter)->next : &first_filter;
-}
-
-void avfilter_uninit(void)
-{
-}
-#endif
 
 int avfilter_pad_count(const AVFilterPad *pads)
 {
@@ -783,14 +769,6 @@ err:
     return NULL;
 }
 
-#if FF_API_AVFILTER_OPEN
-int avfilter_open(AVFilterContext **filter_ctx, AVFilter *filter, const char *inst_name)
-{
-    *filter_ctx = ff_filter_alloc(filter, inst_name);
-    return *filter_ctx ? 0 : AVERROR(ENOMEM);
-}
-#endif
-
 static void free_link(AVFilterLink *link)
 {
     if (!link)
@@ -939,13 +917,6 @@ static int process_options(AVFilterContext *ctx, AVDictionary **options,
     return count;
 }
 
-#if FF_API_AVFILTER_INIT_FILTER
-int avfilter_init_filter(AVFilterContext *filter, const char *args, void *opaque)
-{
-    return avfilter_init_str(filter, args);
-}
-#endif
-
 int avfilter_init_dict(AVFilterContext *ctx, AVDictionary **options)
 {
     int ret = 0;
@@ -996,7 +967,7 @@ int avfilter_init_str(AVFilterContext *filter, const char *args)
             return AVERROR(EINVAL);
         }
 
-#if FF_API_OLD_FILTER_OPTS || FF_API_OLD_FILTER_OPTS_ERROR
+#if FF_API_OLD_FILTER_OPTS_ERROR
             if (   !strcmp(filter->filter->name, "format")     ||
                    !strcmp(filter->filter->name, "noformat")   ||
                    !strcmp(filter->filter->name, "frei0r")     ||
@@ -1056,14 +1027,6 @@ int avfilter_init_str(AVFilterContext *filter, const char *args)
             while ((p = strchr(p, ':')))
                 *p++ = '|';
 
-#if FF_API_OLD_FILTER_OPTS
-            if (deprecated)
-                av_log(filter, AV_LOG_WARNING, "This syntax is deprecated. Use "
-                       "'|' to separate the list items.\n");
-
-            av_log(filter, AV_LOG_DEBUG, "compat: called with args=[%s]\n", copy);
-            ret = process_options(filter, &options, copy);
-#else
             if (deprecated) {
                 av_log(filter, AV_LOG_ERROR, "This syntax is deprecated. Use "
                        "'|' to separate the list items ('%s' instead of '%s')\n",
@@ -1072,7 +1035,6 @@ int avfilter_init_str(AVFilterContext *filter, const char *args)
             } else {
                 ret = process_options(filter, &options, copy);
             }
-#endif
             av_freep(&copy);
 
             if (ret < 0)
