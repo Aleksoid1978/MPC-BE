@@ -1782,7 +1782,7 @@ bool CBaseSplitterFileEx::ReadDVDALPCMHdr(CMediaType* pmt)
 		pmt->subtype    = MEDIASUBTYPE_DVD_LPCM_AUDIO;
 		pmt->formattype = FORMAT_WaveFormatEx;
 
-		if (group2 && (h.bitpersample2 != h.bitpersample1 || h.samplerate2 != h.samplerate1)) {
+		if (group2) {
 			fmt.wfe.cbSize = sizeof(DVDALPCMFORMAT) - sizeof(WAVEFORMATEX);
 			pmt->SetFormat((BYTE*)&fmt, sizeof(DVDALPCMFORMAT));
 		} else {
