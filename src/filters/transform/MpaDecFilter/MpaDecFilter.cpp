@@ -670,26 +670,58 @@ BOOL CMpaDecFilter::ProcessBitstream(enum AVCodecID nCodecId, HRESULT& hr, BOOL 
 HRESULT CMpaDecFilter::ProcessDvdLPCM()
 {
 	const WAVEFORMATEX* wfein = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
-	const WORD nChannels = wfein->nChannels;
-	if (nChannels < 1 || nChannels > 8) {
+	unsigned channels = wfein->nChannels;
+	if (channels < 1 || channels > 8) {
 		return E_FAIL;
 	}
 
 	unsigned src_size = m_buff.GetCount();
 	unsigned dst_size = 0;
 	SampleFormat out_sf = SAMPLE_FMT_NONE;
-	auto dst = DecodeDvdLPCM(dst_size, out_sf, m_buff.GetData(), src_size, wfein->nChannels, wfein->wBitsPerSample);
-	if (out_sf == SAMPLE_FMT_NONE) {
-		return E_FAIL;
-	}
-	if (!dst) {
-		return S_FALSE;
-	}
 
-	m_buff.RemoveHead(m_buff.GetCount() - src_size);
-	DLogIf(src_size > 0, L"ProcessDvdLPCM(): %u bytes not processed", src_size);
+	if (wfein->cbSize == 8) {
+		const DVDALPCMFORMAT* fmt = (DVDALPCMFORMAT*)wfein;
+		if (fmt->GroupAssignment > 20) {
+			return E_FAIL;
+		}
+		DVDA_INFO a;
+		a.channels1   = CountBits(s_scmap_dvda[fmt->GroupAssignment].layout1);
+		a.samplerate1 = fmt->wfe.nSamplesPerSec;
+		a.bitdepth1   = fmt->wfe.wBitsPerSample;
+		a.channels2   = CountBits(s_scmap_dvda[fmt->GroupAssignment].layout2);
+		a.samplerate2 = fmt->nSamplesPerSec2;
+		a.bitdepth2   = fmt->wBitsPerSample2;
+		ASSERT(a.channels1 + a.channels2 == channels);
 
-	return Deliver(dst.get(), dst_size, out_sf, wfein->nSamplesPerSec, wfein->nChannels);
+		auto dst = DecodeDvdaLPCM(dst_size, out_sf, m_buff.GetData(), src_size, a);
+		if (out_sf == SAMPLE_FMT_NONE) {
+			return E_FAIL;
+		}
+		if (!dst) {
+			return S_FALSE;
+		}
+
+		channels = a.channels1;
+
+		m_buff.RemoveHead(m_buff.GetCount() - src_size);
+		DLogIf(src_size > 0, L"ProcessDvdLPCM(): %u bytes not processed", src_size);
+
+		return Deliver(dst.get(), dst_size, out_sf, wfein->nSamplesPerSec, channels, s_scmap_dvda[fmt->GroupAssignment].layout1);
+	}
+	else {
+		auto dst = DecodeDvdLPCM(dst_size, out_sf, m_buff.GetData(), src_size, channels, wfein->wBitsPerSample);
+		if (out_sf == SAMPLE_FMT_NONE) {
+			return E_FAIL;
+		}
+		if (!dst) {
+			return S_FALSE;
+		}
+
+		m_buff.RemoveHead(m_buff.GetCount() - src_size);
+		DLogIf(src_size > 0, L"ProcessDvdLPCM(): %u bytes not processed", src_size);
+
+		return Deliver(dst.get(), dst_size, out_sf, wfein->nSamplesPerSec, channels);
+	}
 }
 
 HRESULT CMpaDecFilter::ProcessHdmvLPCM() // Blu ray LPCM
@@ -1887,11 +1919,18 @@ MPCSampleFormat CMpaDecFilter::SelectOutputFormat(MPCSampleFormat mpcsf)
 HRESULT CMpaDecFilter::CheckInputType(const CMediaType* mtIn)
 {
 	if (mtIn->subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
-		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mtIn->Format();
-		if (wfe->nChannels < 1 || wfe->nChannels > 8
-			|| (wfe->wBitsPerSample != 16 && wfe->wBitsPerSample != 20 && wfe->wBitsPerSample != 24)
-			|| wfe->cbSize) {
-			return VFW_E_TYPE_NOT_ACCEPTED;
+		if (mtIn->FormatLength() >= sizeof(WAVEFORMATEX)) {
+			WAVEFORMATEX* wfe = (WAVEFORMATEX*)mtIn->Format();
+			if (wfe->nChannels < 1 || wfe->nChannels > 8
+				|| (wfe->wBitsPerSample != 16 && wfe->wBitsPerSample != 20 && wfe->wBitsPerSample != 24)) {
+				return VFW_E_TYPE_NOT_ACCEPTED;
+			}
+			if (mtIn->FormatLength() == sizeof(DVDALPCMFORMAT)) {
+				auto fmt = (DVDALPCMFORMAT*)mtIn->Format();
+				if (fmt->GroupAssignment >12) {
+					return VFW_E_TYPE_NOT_ACCEPTED;
+				}
+			}
 		}
 	} else if (mtIn->subtype == MEDIASUBTYPE_PS2_ADPCM) {
 		WAVEFORMATEXPS2* wfe = (WAVEFORMATEXPS2*)mtIn->Format();
@@ -1991,7 +2030,7 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 	MPCSampleFormat out_mpcsf;
 	DWORD out_samplerate;
 	WORD  out_channels;
-	DWORD out_layout;
+	DWORD out_layout = 0;
 
 	AVCodecID codecID = m_FFAudioDec.GetCodecId();
 	if (codecID != AV_CODEC_ID_NONE) {
@@ -2012,11 +2051,21 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 		out_samplerate = wfe->nSamplesPerSec;
 		out_channels   = wfe->nChannels;
 
-		if (mt.subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
+		if (mt.subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO && wfe->cbSize == 8) {
+			const DVDALPCMFORMAT* fmt = (DVDALPCMFORMAT*)wfe;
+			if (fmt->GroupAssignment > 20) {
+				return E_FAIL;
+			}
+			out_layout = s_scmap_dvda[fmt->GroupAssignment].layout1;
+			out_channels = CountBits(out_layout);
+		}
+		else if (mt.subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
 			WAVEFORMATEX_HDMV_LPCM* wfelpcm = (WAVEFORMATEX_HDMV_LPCM*)mt.Format();
 			out_layout = s_scmap_hdmv[wfelpcm->channel_conf].layout;
-		} else {
-			out_layout = GetDefChannelMask(wfe->nChannels);
+		}
+		
+		if (!out_layout) {
+			out_layout = GetDefChannelMask(out_channels);
 		}
 	}
 

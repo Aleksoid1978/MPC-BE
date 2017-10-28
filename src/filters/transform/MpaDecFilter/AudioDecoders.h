@@ -69,5 +69,15 @@ static const struct {
 	{SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_SIDE_LEFT|SPEAKER_SIDE_RIGHT,	SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY},
 };
 
+struct DVDA_INFO {
+	unsigned channels1;
+	unsigned samplerate1;
+	unsigned bitdepth1;
+	unsigned channels2;
+	unsigned samplerate2;
+	unsigned bitdepth2;
+};
+
 std::unique_ptr<BYTE[]> DecodeDvdLPCM(unsigned& dst_size, SampleFormat& dst_sf, BYTE* src, unsigned& src_size, const unsigned channels, const unsigned bitdepth);
 std::unique_ptr<BYTE[]> DecodeHdmvLPCM(unsigned& dst_size, SampleFormat& dst_sf, BYTE* src, unsigned& src_size, const unsigned channels, const unsigned bitdepth, const BYTE channel_conf);
+std::unique_ptr<BYTE[]> DecodeDvdaLPCM(unsigned& dst_size, SampleFormat& dst_sf, BYTE* src, unsigned& src_size, const DVDA_INFO& a);
