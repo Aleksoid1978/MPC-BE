@@ -20,10 +20,13 @@
 
 #pragma once
 
+#include <vector>
+
 namespace AudioDevices
 {
-	HRESULT GetActiveAudioDevices(CStringArray& deviceNameList, CStringArray& deviceIdList, BOOL bIncludeDefault = TRUE);
-	HRESULT GetActiveAudioDevicesCount(UINT& deviceCount, BOOL bIncludeDefault = TRUE);
+	typedef std::pair<CString, CString> device;
+	typedef std::vector<device> devicesList;
 
-	HRESULT GetDefaultAudioDevice(CString& deviceName, CString& deviceId);
+	HRESULT GetActiveAudioDevices(devicesList* devicesList = NULL, UINT* devicesCount = NULL, BOOL bIncludeDefault = TRUE);
+	HRESULT GetDefaultAudioDevice(device& device);
 }
