@@ -24,7 +24,6 @@
 #include <ks.h>
 #include <ksmedia.h>
 #include "MpcAudioRendererSettingsWnd.h"
-#include "AudioDevice.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
 
@@ -85,18 +84,17 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	m_cbSyncMethod.AddString(ResStr(IDS_ARS_SYNC_BY_TIMESTAMPS));
 	m_cbSyncMethod.AddString(ResStr(IDS_ARS_SYNC_BY_DURATION));
 
-	CStringArray deviceNameList;
-	AudioDevices::GetActiveAudioDevices(deviceNameList, m_deviceIdList);
-	for (INT_PTR i = 0; i < deviceNameList.GetCount(); i++) {
-		m_cbSoundDevice.AddString(deviceNameList[i]);
+	AudioDevices::GetActiveAudioDevices(&m_devicesList, NULL, TRUE);
+	for (const auto& device : m_devicesList) {
+		m_cbSoundDevice.AddString(device.first);
 	}
 
 	if (m_pMAR) {
 		if (m_cbSoundDevice.GetCount() > 0) {
 			int idx = 0;
 			CString soundDeviceId = m_pMAR->GetDeviceId();
-			for (INT_PTR i = 0; i < m_deviceIdList.GetCount(); i++) {
-				if (m_deviceIdList[i] == soundDeviceId) {
+			for (size_t i = 0; i < m_devicesList.size(); i++) {
+				if (m_devicesList[i].second == soundDeviceId) {
 					idx = i;
 					break;
 				}
@@ -142,7 +140,7 @@ bool CMpcAudioRendererSettingsWnd::OnApply()
 		m_pMAR->SetSyncMethod(m_cbSyncMethod.GetCurSel());
 		int idx = m_cbSoundDevice.GetCurSel();
 		if (idx >= 0) {
-			m_pMAR->SetDeviceId(m_deviceIdList[idx]);
+			m_pMAR->SetDeviceId(m_devicesList[idx].second);
 		}
 		m_pMAR->Apply();
 	}
