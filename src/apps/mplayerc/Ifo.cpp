@@ -162,7 +162,7 @@ bool CIfo::OpenFile (LPCWSTR strFile)
 	HANDLE	hFile;
 	LARGE_INTEGER size;
 
-	hFile	 = Real_CreateFileW((LPTSTR) strFile, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+	hFile	 = Real_CreateFileW(strFile, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 	ASSERT (hFile != INVALID_HANDLE_VALUE);
 
 	if (hFile != INVALID_HANDLE_VALUE && GetFileSizeEx(hFile, &size) &&
@@ -221,7 +221,7 @@ bool CIfo::SaveFile (LPCWSTR strFile)
 	HANDLE	m_hFile;
 
 	if (m_pBuffer) {
-		m_hFile	 = Real_CreateFileW((LPTSTR) strFile, GENERIC_WRITE|GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
+		m_hFile	 = Real_CreateFileW(strFile, GENERIC_WRITE|GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
 									nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 		ASSERT (m_hFile != INVALID_HANDLE_VALUE);
 
