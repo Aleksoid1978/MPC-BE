@@ -23,6 +23,40 @@
 #include "SampleFormat.h"
 #include "AudioDecoders.h"
 
+void bswap16_buf(uint16_t* dst16, const uint16_t* src16, unsigned len)
+{
+	while (len--) {
+		*dst16++ = _byteswap_ushort(*src16++);
+	}
+}
+
+void dvdlpcm20_to_pcm32(uint32_t* dst32, const uint8_t* src, unsigned blocks, const unsigned channels)
+{
+	while (blocks--) {
+		const uint8_t* b = src + channels * 4;
+		for (unsigned i = 0; i < channels; ++i) {
+			*dst32++ = (src[0] << 24) | (src[1] << 16) | ((*b & 0xF0) << 8);
+			*dst32++ = (src[2] << 24) | (src[3] << 16) | ((*b & 0x0F) << 12);
+			src += 4;
+			b++;
+		}
+		src = b;
+	}
+}
+
+void dvdlpcm24_to_pcm32(uint32_t* dst32, const uint8_t* src, unsigned blocks, const unsigned channels)
+{
+	while (blocks--) {
+		const uint8_t* b = src + channels * 4;
+		for (unsigned i = 0; i < channels; ++i) {
+			*dst32++ = (src[0] << 24) | (src[1] << 16) | (*b++ << 8);
+			*dst32++ = (src[2] << 24) | (src[3] << 16) | (*b++ << 8);
+			src += 4;
+		}
+		src = b;
+	}
+}
+
 std::unique_ptr<BYTE[]> DecodeDvdLPCM(unsigned& dst_size, SampleFormat& dst_sf, BYTE* src, unsigned& src_size, const unsigned channels, const unsigned bitdepth)
 {
 	// https://wiki.multimedia.cx/index.php/PCM#DVD_PCM
@@ -31,7 +65,9 @@ std::unique_ptr<BYTE[]> DecodeDvdLPCM(unsigned& dst_size, SampleFormat& dst_sf, 
 	if (!blocksize || blocksize > src_size) {
 		return nullptr;
 	}
-	const unsigned allsamples = (src_size / blocksize) * 2 * channels;
+
+	const unsigned blocks = src_size / blocksize;
+	const unsigned allsamples = blocks * 2 * channels;
 
 	dst_size = allsamples * (bitdepth <= 16 ? 2 : 4); // convert to 16 and 32-bit
 	std::unique_ptr<BYTE[]> dst(new(std::nothrow) BYTE[dst_size]);
@@ -40,54 +76,15 @@ std::unique_ptr<BYTE[]> DecodeDvdLPCM(unsigned& dst_size, SampleFormat& dst_sf, 
 	}
 
 	if (bitdepth == 16) {
-		uint16_t* src16 = (uint16_t*)src;
-		uint16_t* dst16 = (uint16_t*)dst.get();
-
-		for (unsigned i = 0; i < allsamples; ++i) {
-			*(dst16++) = _byteswap_ushort(*src16++);
-		}
+		bswap16_buf((uint16_t*)dst.get(), (uint16_t*)src, allsamples);
 		dst_sf = SAMPLE_FMT_S16;
 	}
 	else if (bitdepth == 20) {
-		uint32_t* dst32 = (uint32_t*)dst.get(); // convert to 32-bit
-
-		if (channels == 1) {
-			for (unsigned i = 0; i < allsamples; i += 2) {
-				*(dst32++) = (src[0] << 24) | (src[1] << 16) | ((src[4] & 0xF0) << 8);
-				*(dst32++) = (src[2] << 24) | (src[3] << 16) | ((src[4] & 0x0F) << 12);
-				src += 5;
-			}
-		}
-		else {
-			for (unsigned i = 0; i < allsamples; i += 4) {
-				*(dst32++) = (src[0] << 24) | (src[1] << 16) | ((src[8] & 0xF0) << 8);
-				*(dst32++) = (src[2] << 24) | (src[3] << 16) | ((src[8] & 0x0F) << 12);
-				*(dst32++) = (src[4] << 24) | (src[5] << 16) | ((src[9] & 0xF0) << 8);
-				*(dst32++) = (src[6] << 24) | (src[7] << 16) | ((src[9] & 0x0F) << 12);
-				src += 10;
-			}
-		}
+		dvdlpcm20_to_pcm32((uint32_t*)dst.get(), src, blocks, channels);
 		dst_sf = SAMPLE_FMT_S32;
 	}
 	else if (bitdepth == 24) {
-		uint32_t* dst32 = (uint32_t*)dst.get(); // convert to 32-bit
-
-		if (channels == 1) {
-			for (unsigned i = 0; i < allsamples; i += 2) {
-				*(dst32++) = (src[0] << 24) | (src[1] << 16) | (src[4] << 8); // Sample 1
-				*(dst32++) = (src[2] << 24) | (src[3] << 16) | (src[5] << 8); // Sample 2
-				src += 6;
-			}
-		}
-		else {
-			for (unsigned i = 0; i < allsamples; i += 4) {
-				*(dst32++) = (src[0] << 24) | (src[1] << 16) | (src[8] << 8); // Sample 1
-				*(dst32++) = (src[2] << 24) | (src[3] << 16) | (src[9] << 8); // Sample 2
-				*(dst32++) = (src[4] << 24) | (src[5] << 16) | (src[10] << 8); // Sample 3
-				*(dst32++) = (src[6] << 24) | (src[7] << 16) | (src[11] << 8); // Sample 4
-				src += 12;
-			}
-		}
+		dvdlpcm24_to_pcm32((uint32_t*)dst.get(), src, blocks, channels);
 		dst_sf = SAMPLE_FMT_S32;
 	}
 
