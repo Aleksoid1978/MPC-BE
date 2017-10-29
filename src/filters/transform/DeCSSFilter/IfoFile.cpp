@@ -445,6 +445,9 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 
 		for (int i = 0; i < nb_titles; i++) {
 			title_info_t& title = titles_info[i];
+			if (title.nb_tracks == 0) {
+				continue;
+			}
 			m_pChapters[chapter_idx].title = i;
 
 			for (int j = 0; j < title.nb_tracks; j++) {
