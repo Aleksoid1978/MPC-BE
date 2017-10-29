@@ -880,6 +880,11 @@ namespace Youtube
 									const auto& captionTracks = iter->value.FindMember("captionTracks");
 									if (captionTracks != iter->value.MemberEnd() && captionTracks->value.IsArray()) {
 										for (auto elem = captionTracks->value.Begin(); elem != captionTracks->value.End(); ++elem) {
+											const CStringA kind = elem->FindMember("kind")->value.GetString();
+											if (kind == "asr") {
+												continue;
+											}
+
 											CString url, name;
 
 											CStringA urlA = elem->FindMember("baseUrl")->value.GetString();
@@ -890,7 +895,7 @@ namespace Youtube
 
 											const auto& nameObject = elem->FindMember("name");
 											if (nameObject != elem->MemberEnd()) {
-												CStringA nameA = nameObject->value.FindMember("simpleText")->value.GetString();
+												const CStringA nameA = nameObject->value.FindMember("simpleText")->value.GetString();
 												if (!nameA.IsEmpty()) {
 													name = UTF8To16(nameA);
 												}
