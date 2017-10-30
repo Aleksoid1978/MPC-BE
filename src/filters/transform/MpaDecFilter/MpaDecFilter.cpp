@@ -692,6 +692,7 @@ HRESULT CMpaDecFilter::ProcessDvdLPCM()
 		a.samplerate2 = fmt->nSamplesPerSec2;
 		a.bitdepth2   = fmt->wBitsPerSample2;
 		ASSERT(a.channels1 + a.channels2 == channels);
+		DWORD layout = s_scmap_dvda[fmt->GroupAssignment].layout1 | s_scmap_dvda[fmt->GroupAssignment].layout2;
 
 		auto dst = DecodeDvdaLPCM(dst_size, out_sf, m_buff.GetData(), src_size, a);
 		if (out_sf == SAMPLE_FMT_NONE) {
@@ -701,12 +702,10 @@ HRESULT CMpaDecFilter::ProcessDvdLPCM()
 			return S_FALSE;
 		}
 
-		channels = a.channels1;
-
 		m_buff.RemoveHead(m_buff.GetCount() - src_size);
 		DLogIf(src_size > 0, L"ProcessDvdLPCM(): %u bytes not processed", src_size);
 
-		return Deliver(dst.get(), dst_size, out_sf, wfein->nSamplesPerSec, channels, s_scmap_dvda[fmt->GroupAssignment].layout1);
+		return Deliver(dst.get(), dst_size, out_sf, wfein->nSamplesPerSec, channels, layout);
 	}
 	else {
 		auto dst = DecodeDvdLPCM(dst_size, out_sf, m_buff.GetData(), src_size, channels, wfein->wBitsPerSample);
@@ -2061,7 +2060,7 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 			if (fmt->GroupAssignment > 20) {
 				return E_FAIL;
 			}
-			out_layout = s_scmap_dvda[fmt->GroupAssignment].layout1;
+			out_layout = s_scmap_dvda[fmt->GroupAssignment].layout1 | s_scmap_dvda[fmt->GroupAssignment].layout2;
 			out_channels = CountBits(out_layout);
 		}
 		else if (mt.subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
