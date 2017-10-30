@@ -1167,9 +1167,8 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len,
 						BitRead(8); // some unknown data
 						const BYTE headersize = (BYTE)BitRead(8); // MLP_header_length (always equal 6?)
 						BitRead(32); // some unknown data
-						const WORD unknown = (WORD)BitRead(16); // 0x0000/0xC000/0x0400
-						if (headersize == 6
-								&& (unknown == 0x0000 || unknown == 0xC000 || unknown == 0x0400)) { // Maybe it's MLP?
+						BitRead(16); // some unknown data
+						if (headersize == 6) { // MLP?
 							// MLP header may be missing in the first package
 							if (!m_streams[stream_type::audio].Find(s)) {
 								mlphdr h;
