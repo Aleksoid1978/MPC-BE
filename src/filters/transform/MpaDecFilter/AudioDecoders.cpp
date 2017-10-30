@@ -99,58 +99,81 @@ std::unique_ptr<BYTE[]> DecodeDvdaLPCM(unsigned& dst_size, SampleFormat& dst_sf,
 	const unsigned blocksize2 = 2 * a.channels2 * a.bitdepth2 / 8;
 	const unsigned blocksize = blocksize1 + blocksize2;
 
-	if (blocksize > src_size) {
+	if (!blocksize || blocksize > src_size) {
 		return nullptr;
 	}
 
 	unsigned blocks = src_size / blocksize;
-	const unsigned allsamples1 = blocks * 2 * a.channels1;
+	const unsigned channels = a.channels1 + a.channels2;
+	const unsigned allsamples = blocks * 2 * channels;
 
-	dst_size = allsamples1 * (a.bitdepth1 <= 16 ? 2 : 4); // convert to 16 and 32-bit
+	dst_size = allsamples * (a.bitdepth1 <= 16 ? 2 : 4); // convert to 16 and 32-bit
 	std::unique_ptr<BYTE[]> dst(new(std::nothrow) BYTE[dst_size]);
 	if (!dst) {
 		return nullptr;
 	}
 
 	if (a.bitdepth1 == 16) {
-		uint16_t* dst16 = (uint16_t*)dst.get();
+		uint16_t* dst_1 = (uint16_t*)dst.get();
+		uint16_t* dst_2 = dst_1 + a.channels1;
 
 		while (blocks--) {
-			src += blocksize2; // skip group 2
-			bswap16_buf(dst16, (uint16_t*)src, a.channels1 * 2);
+			bswap16_buf(dst_2, (uint16_t*)src, a.channels2 * 2);
+			src += blocksize2;
+			bswap16_buf(dst_1, (uint16_t*)src, a.channels1 * 2);
 			src += blocksize1;
-			dst16 += a.channels1 * 2;
+			dst_1 += 2 * channels;
+			dst_2 = dst_1 + a.channels1;
 		}
 		dst_sf = SAMPLE_FMT_S16;
 	}
 	else if (a.bitdepth1 == 20) {
-		uint32_t* dst32 = (uint32_t*)dst.get();
+		uint32_t* dst_1 = (uint32_t*)dst.get();
+		uint32_t* dst_2 = dst_1 + a.channels1;
 
 		while (blocks--) {
-			src += blocksize2; // skip group 2
-			uint8_t* b = src + a.channels1 * 4;
-			for (unsigned i = 0; i < a.channels1; ++i) {
-				*dst32++ = (src[0] << 24) | (src[1] << 16) | ((*b & 0xF0) << 8);
-				*dst32++ = (src[2] << 24) | (src[3] << 16) | ((*b & 0x0F) << 12);
+			uint8_t* b = src + a.channels2 * 4;
+			for (unsigned i = 0; i < a.channels2; ++i) {
+				dst_2[i]            = (src[0] << 24) | (src[1] << 16) | ((*b & 0xF0) << 8);
+				dst_2[i + channels] = (src[2] << 24) | (src[3] << 16) | ((*b & 0x0F) << 12);
 				src += 4;
 				b++;
 			}
 			src = b;
+			b = src + a.channels1 * 4;
+			for (unsigned i = 0; i < a.channels1; ++i) {
+				dst_1[i]            = (src[0] << 24) | (src[1] << 16) | ((*b & 0xF0) << 8);
+				dst_2[i + channels] = (src[2] << 24) | (src[3] << 16) | ((*b & 0x0F) << 12);
+				src += 4;
+				b++;
+			}
+			src = b;
+			dst_1 += 2 * channels;
+			dst_2 = dst_1 + a.channels1;
 		}
 		dst_sf = SAMPLE_FMT_S32;
 	}
 	else if (a.bitdepth1 == 24) {
-		uint32_t* dst32 = (uint32_t*)dst.get();
+		uint32_t* dst_1 = (uint32_t*)dst.get();
+		uint32_t* dst_2 = dst_1 + a.channels1;
 
 		while (blocks--) {
-			src += blocksize2; // skip group 2
-			uint8_t* b = src + a.channels1 * 4;
-			for (unsigned i = 0; i < a.channels1; ++i) {
-				*dst32++ = (src[0] << 24) | (src[1] << 16) | (*b++ << 8);
-				*dst32++ = (src[2] << 24) | (src[3] << 16) | (*b++ << 8);
+			uint8_t* b = src + a.channels2 * 4;
+			for (unsigned i = 0; i < a.channels2; ++i) {
+				dst_2[i] = (src[0] << 24) | (src[1] << 16) | (*b++ << 8);
+				dst_2[i + channels] = (src[2] << 24) | (src[3] << 16) | (*b++ << 8);
 				src += 4;
 			}
 			src = b;
+			b = src + a.channels1 * 4;
+			for (unsigned i = 0; i < a.channels1; ++i) {
+				dst_1[i] = (src[0] << 24) | (src[1] << 16) | (*b++ << 8);
+				dst_2[i + channels] = (src[2] << 24) | (src[3] << 16) | (*b++ << 8);
+				src += 4;
+			}
+			src = b;
+			dst_1 += 2 * channels;
+			dst_2 = dst_1 + a.channels1;
 		}
 		dst_sf = SAMPLE_FMT_S32;
 	}
