@@ -76,6 +76,7 @@ struct DVDA_INFO {
 	unsigned channels2;
 	unsigned samplerate2;
 	unsigned bitdepth2;
+	unsigned groupassign;
 };
 
 std::unique_ptr<BYTE[]> DecodeDvdLPCM(unsigned& dst_size, SampleFormat& dst_sf, BYTE* src, unsigned& src_size, const unsigned channels, const unsigned bitdepth);

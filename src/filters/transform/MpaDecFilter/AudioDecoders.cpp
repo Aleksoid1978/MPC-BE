@@ -131,6 +131,15 @@ std::unique_ptr<BYTE[]> DecodeDvdaLPCM(unsigned& dst_size, SampleFormat& dst_sf,
 			dst_2 = dst_1 + a.channels1;
 		}
 		dst_sf = SAMPLE_FMT_S16;
+
+		if (a.groupassign >= 18) {
+			uint16_t* dst16 = (uint16_t*)dst.get();
+			unsigned last = (a.groupassign == 20) ? 5 : 4;
+			for (unsigned i = 0; i < allsamples; i += channels) {
+				std::swap(dst16[i + 2], dst16[i + 4]);
+				std::swap(dst16[i + 3], dst16[i + last]);
+			}
+		}
 	}
 	else {
 		uint32_t* dst_1 = (uint32_t*)dst.get();
@@ -180,6 +189,15 @@ std::unique_ptr<BYTE[]> DecodeDvdaLPCM(unsigned& dst_size, SampleFormat& dst_sf,
 			
 		}
 		dst_sf = SAMPLE_FMT_S32;
+
+		if (a.groupassign >= 18) {
+			uint32_t* dst32 = (uint32_t*)dst.get();
+			unsigned last = (a.groupassign == 20) ? 5 : 4;
+			for (unsigned i = 0; i < allsamples; i += channels) {
+				std::swap(dst32[i + 2], dst32[i + 4]);
+				std::swap(dst32[i + 3], dst32[i + last]);
+			}
+		}
 	}
 
 	src_size %= blocksize;

@@ -685,14 +685,15 @@ HRESULT CMpaDecFilter::ProcessDvdLPCM()
 			return E_FAIL;
 		}
 		DVDA_INFO a;
-		a.channels1   = CountBits(s_scmap_dvda[fmt->GroupAssignment].layout1);
+		a.groupassign = fmt->GroupAssignment;
+		a.channels1   = CountBits(s_scmap_dvda[a.groupassign].layout1);
 		a.samplerate1 = fmt->wfe.nSamplesPerSec;
 		a.bitdepth1   = fmt->wfe.wBitsPerSample;
-		a.channels2   = CountBits(s_scmap_dvda[fmt->GroupAssignment].layout2);
+		a.channels2   = CountBits(s_scmap_dvda[a.groupassign].layout2);
 		a.samplerate2 = fmt->nSamplesPerSec2;
 		a.bitdepth2   = fmt->wBitsPerSample2;
 		ASSERT(a.channels1 + a.channels2 == channels);
-		DWORD layout = s_scmap_dvda[fmt->GroupAssignment].layout1 | s_scmap_dvda[fmt->GroupAssignment].layout2;
+		DWORD layout = s_scmap_dvda[a.groupassign].layout1 | s_scmap_dvda[a.groupassign].layout2;
 
 		auto dst = DecodeDvdaLPCM(dst_size, out_sf, m_buff.GetData(), src_size, a);
 		if (out_sf == SAMPLE_FMT_NONE) {
