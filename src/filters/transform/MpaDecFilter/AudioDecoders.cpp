@@ -158,7 +158,7 @@ std::unique_ptr<BYTE[]> DecodeDvdaLPCM(unsigned& dst_size, SampleFormat& dst_sf,
 				b = src + a.channels1 * 4;
 				for (unsigned i = 0; i < a.channels1; ++i) {
 					dst_1[i]            = (src[0] << 24) | (src[1] << 16) | ((*b & 0xF0) << 8);
-					dst_2[i + channels] = (src[2] << 24) | (src[3] << 16) | ((*b & 0x0F) << 12);
+					dst_1[i + channels] = (src[2] << 24) | (src[3] << 16) | ((*b & 0x0F) << 12);
 					src += 4;
 					b++;
 				}
@@ -179,7 +179,7 @@ std::unique_ptr<BYTE[]> DecodeDvdaLPCM(unsigned& dst_size, SampleFormat& dst_sf,
 				b = src + a.channels1 * 4;
 				for (unsigned i = 0; i < a.channels1; ++i) {
 					dst_1[i]            = (src[0] << 24) | (src[1] << 16) | (*b++ << 8);
-					dst_2[i + channels] = (src[2] << 24) | (src[3] << 16) | (*b++ << 8);
+					dst_1[i + channels] = (src[2] << 24) | (src[3] << 16) | (*b++ << 8);
 					src += 4;
 				}
 				src = b;
