@@ -1148,51 +1148,65 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len,
 			} else if (b >= 0xa0 && b < 0xa8) { // lpcm
 				s.ps1id = (BYTE)BitRead(8);
 
-				do {
-					// DVD-Audio LPCM
-					if (b == 0xa0) {
-						BitRead(8); // Continuity Counter - counts from 0x00 to 0x1f and then wraps to 0x00.
-						DWORD headersize = (DWORD)BitRead(16); // LPCM_header_length
-						if (headersize >= 8 && headersize + 4 < len) {
-							if (ReadDVDALPCMHdr(&s.mt)) {
+				if (auto stream = m_streams[stream_type::audio].FindStream(s)) {
+					switch (stream->codec) {
+						case stream_codec::DVDAudio: {
+								BitRead(8);
+								const WORD headersize = (WORD)BitRead(16);
 								Seek(start + 4 + headersize);
-								type = stream_type::audio;
-								break;
+							}
+							break;
+						case stream_codec::MLP:
+							Seek(start + 10);
+							break;
+						case stream_codec::DVDLPCM:
+							Seek(start + 7);
+							break;
+					}
+				} else {
+					do {
+						// DVD-Audio LPCM
+						if (b == 0xa0) {
+							BitRead(8); // Continuity Counter - counts from 0x00 to 0x1f and then wraps to 0x00.
+							const DWORD headersize = (DWORD)BitRead(16); // LPCM_header_length
+							if (headersize >= 8 && headersize + 4 < len) {
+								if (ReadDVDALPCMHdr(&s.mt)) {
+									Seek(start + 4 + headersize);
+									s.codec = stream_codec::DVDAudio;
+									type = stream_type::audio;
+									break;
+								}
 							}
 						}
-					}
-					// DVD-Audio MLP
-					else if (b == 0xa1 && len > 10) {
-						BitRead(8); // Continuity Counter: 0x00..0x1f or 0x20..0x3f or 0x40..0x5f or 0x80..0x9f
-						BitRead(8); // some unknown data
-						const BYTE headersize = (BYTE)BitRead(8); // MLP_header_length (always equal 6?)
-						BitRead(32); // some unknown data
-						BitRead(16); // some unknown data
-						if (headersize == 6) { // MLP?
-							// MLP header may be missing in the first package
-							if (!m_streams[stream_type::audio].Find(s)) {
+						// DVD-Audio MLP
+						else if (b == 0xa1 && len > 10) {
+							BitRead(8); // Continuity Counter: 0x00..0x1f or 0x20..0x3f or 0x40..0x5f or 0x80..0x9f
+							BitRead(8); // some unknown data
+							const BYTE headersize = (BYTE)BitRead(8); // MLP_header_length (always equal 6?)
+							BitRead(32); // some unknown data
+							BitRead(16); // some unknown data
+							if (headersize == 6) { // MLP?
+								// MLP header may be missing in the first package
 								mlphdr h;
 								if (Read(h, len - 10, &s.mt, true)) {
 									// This is exactly the MLP.
+									s.codec = stream_codec::MLP;
 									type = stream_type::audio;
 								}
+								
+								Seek(start + 10);
+								break;
 							}
-
-							Seek(start + 10);
-							break;
 						}
-					}
 
-					// DVD LPCM
-					if (m_streams[stream_type::audio].Find(s)) {
-						Seek(start + 7);
-					} else {
+						// DVD LPCM
 						Seek(start + 4);
 						if (ReadDVDLPCMHdr(&s.mt)) {
+							s.codec = stream_codec::DVDLPCM;
 							type = stream_type::audio;
 						}
-					}
-				} while (false);
+					} while (false);
+				}
 			} else if (b >= 0x20 && b < 0x40) { // DVD subpic
 				s.ps1id = (BYTE)BitRead(8);
 

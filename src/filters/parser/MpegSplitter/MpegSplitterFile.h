@@ -205,7 +205,10 @@ public:
 		ARIB,
 		PGS,
 		DVB,
-		TELETEXT
+		TELETEXT,
+		DVDAudio,
+		MLP,
+		DVDLPCM
 	};
 
 	enum stream_type {
