@@ -880,24 +880,32 @@ namespace Youtube
 									const auto& captionTracks = iter->value.FindMember("captionTracks");
 									if (captionTracks != iter->value.MemberEnd() && captionTracks->value.IsArray()) {
 										for (auto elem = captionTracks->value.Begin(); elem != captionTracks->value.End(); ++elem) {
-											const CStringA kind = elem->FindMember("kind")->value.GetString();
-											if (kind == "asr") {
-												continue;
+											const auto& kind = elem->FindMember("kind");
+											if (kind != elem->MemberEnd() && kind->value.IsString()) {
+												const CStringA kind_value = kind->value.GetString();
+												if (kind_value == "asr") {
+													continue;
+												}
 											}
 
 											CString url, name;
 
-											CStringA urlA = elem->FindMember("baseUrl")->value.GetString();
-											if (!urlA.IsEmpty()) {
-												urlA += "&fmt=vtt";
-												url = UTF8To16(urlA);
+											const auto& baseUrl = elem->FindMember("baseUrl");
+											if (baseUrl != elem->MemberEnd() && baseUrl->value.IsString()) {
+												const CStringA urlA = baseUrl->value.GetString();
+												if (!urlA.IsEmpty()) {
+													url = UTF8To16(urlA) + L"&fmt=vtt";
+												}
 											}
 
 											const auto& nameObject = elem->FindMember("name");
 											if (nameObject != elem->MemberEnd()) {
-												const CStringA nameA = nameObject->value.FindMember("simpleText")->value.GetString();
-												if (!nameA.IsEmpty()) {
-													name = UTF8To16(nameA);
+												const auto& simpleText = nameObject->value.FindMember("simpleText");
+												if (simpleText != nameObject->value.MemberEnd() && simpleText->value.IsString()) {
+													const CStringA nameA = simpleText->value.GetString();
+													if (!nameA.IsEmpty()) {
+														name = UTF8To16(nameA);
+													}
 												}
 											}
 
