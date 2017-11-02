@@ -2544,7 +2544,8 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 					if (!m_pFrame->interlaced_frame && !m_FilterInfo.interlaced) {
 						props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
 					}
-					if (m_pFrame->top_field_first || m_FilterInfo.interlaced == 1) {
+					if ((m_pFrame->top_field_first && m_FilterInfo.interlaced != 2)
+							|| m_FilterInfo.interlaced == 1) {
 						props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_FIELD1FIRST;
 					}
 					if (m_pFrame->repeat_pict) {
