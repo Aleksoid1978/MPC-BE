@@ -104,7 +104,7 @@ redo:
 			if (predict <= 7 && m_vol > 1) {
 				m_vol--;
 			}
-		} else if (highest <= t) {
+		} else { // highest <= t
 			if (m_prediction[m_predictor] < 15) {
 				m_prediction[m_predictor] = m_prediction[m_predictor] + 1;
 			} else {
