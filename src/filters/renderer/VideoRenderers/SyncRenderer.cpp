@@ -2198,11 +2198,12 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	m_nResetToken   = 0;
 	m_hRenderThread = nullptr;
 	m_hMixerThread  = nullptr;
-	m_hEvtFlush     = nullptr;
 	m_hEvtQuit      = nullptr;
+	m_hEvtFlush     = nullptr;
 	m_hEvtSkip      = nullptr;
-	m_bEvtQuit      = 0;
-	m_bEvtFlush     = 0;
+	m_bEvtQuit      = false;
+	m_bEvtFlush     = false;
+	m_bEvtSkip      = false;
 
 	if (FAILED (hr)) {
 		_Error += L"SyncAP failed\n";
