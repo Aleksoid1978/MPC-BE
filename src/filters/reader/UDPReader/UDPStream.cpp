@@ -339,17 +339,10 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 	while (it != m_packets.cend() && len > 0) {
 		const CPacket* p = *it++;
 
+		DLogIf(m_pos < p->m_start, L"CUDPStream::Read(): requested data is no longer available");
 		if (p->m_start <= m_pos && m_pos < p->m_end) {
-			size_t size;
-
-			if (m_pos < p->m_start) {
-				ASSERT(0);
-				size = min(len, p->m_start - m_pos);
-				memset(ptr, 0, size);
-			} else {
-				size = min(len, p->m_end - m_pos);
-				memcpy(ptr, &p->m_buff[m_pos - p->m_start], size);
-			}
+			size_t size = min(len, p->m_end - m_pos);
+			memcpy(ptr, &p->m_buff[m_pos - p->m_start], size);
 
 			m_pos += size;
 
