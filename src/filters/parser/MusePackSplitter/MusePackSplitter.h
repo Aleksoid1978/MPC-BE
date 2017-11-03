@@ -77,11 +77,11 @@ public:
 class DataPacketMPC
 {
 public:
-	int		type;
+	int type;
 
 	enum {
-		PACKET_TYPE_EOS	= 0,
-		PACKET_TYPE_DATA = 1,
+		PACKET_TYPE_EOS         = 0,
+		PACKET_TYPE_DATA        = 1,
 		PACKET_TYPE_NEW_SEGMENT = 2
 	};
 
@@ -113,7 +113,6 @@ public:
 
 	// parser
 	CMusePackSplitter		*demux;
-	int						stream_index;
 	CAtlArray<CMediaType>	mt_types;
 
 	// buffer queue
