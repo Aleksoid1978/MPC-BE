@@ -411,10 +411,11 @@ STDMETHODIMP CMusePackSplitter::GetPreroll(LONGLONG* pllPreroll) {return pllPrer
 STDMETHODIMP CMusePackSplitter::GetDuration(LONGLONG* pDuration)
 {
 	CheckPointer(pDuration, E_POINTER);
-	*pDuration = 0;
 
-	if (file && pDuration) {
+	if (file) {
 		*pDuration = file->duration_10mhz;
+	} else {
+		*pDuration = 0;
 	}
 	return S_OK;
 }
@@ -817,18 +818,18 @@ HRESULT CMusePackInputPin::Inactive()
 //
 //-----------------------------------------------------------------------------
 
-CMusePackOutputPin::CMusePackOutputPin(TCHAR *pObjectName, CMusePackSplitter *pDemux, HRESULT *phr, LPCWSTR pName, int iBuffers) :
-	CBaseOutputPin(pObjectName, pDemux, &pDemux->lock_filter, phr, pName),
-	CAMThread(),
-	demux(pDemux),
-	buffers(iBuffers),
-	active(false),
-	rtStart(0),
-	rtStop(0xffffffffffff),
-	rate(1.0),
-	ev_can_read(TRUE),
-	ev_can_write(TRUE),
-	ev_abort(TRUE)
+CMusePackOutputPin::CMusePackOutputPin(TCHAR *pObjectName, CMusePackSplitter *pDemux, HRESULT *phr, LPCWSTR pName, int iBuffers)
+	: CBaseOutputPin(pObjectName, pDemux, &pDemux->lock_filter, phr, pName)
+	, CAMThread()
+	, demux(pDemux)
+	, buffers(iBuffers)
+	, active(false)
+	, rtStart(0)
+	, rtStop(0xffffffffffff)
+	, rate(1.0)
+	, ev_can_read(TRUE)
+	, ev_can_write(TRUE)
+	, ev_abort(TRUE)
 {
 	discontinuity = true;
 	eos_delivered = false;
@@ -1001,6 +1002,7 @@ HRESULT CMusePackOutputPin::DoNewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME 
 			packet->type = DataPacketMPC::PACKET_TYPE_NEW_SEGMENT;
 			packet->rtStart = rtStart;
 			packet->rtStop = rtStop;
+			packet->has_time = true;
 			packet->rate = rate;
 			queue.AddTail(packet);
 			ev_can_read.Set();
@@ -1336,7 +1338,7 @@ int CMusePackReader::GetPosition(__int64 *pos, __int64 *avail)
 
 int CMusePackReader::Seek(__int64 pos)
 {
-	__int64	avail, total;
+	__int64 avail, total;
 	GetSize(&avail, &total);
 	if (pos < 0 || pos >= total) {
 		return -1;
@@ -1348,7 +1350,7 @@ int CMusePackReader::Seek(__int64 pos)
 
 int CMusePackReader::Read(void *buf, int size)
 {
-	__int64	avail, total;
+	__int64 avail, total;
 	GetSize(&avail, &total);
 	if (position + size > avail) {
 		return -1;
@@ -1436,7 +1438,7 @@ int CMusePackReader::GetKey(uint16_t &key)
 
 int CMusePackReader::GetSizeElm(int64_t &size, int32_t &size_len)
 {
-	int	ret;
+	int ret;
 	size = 0;
 	size_len = 1;
 
@@ -1473,14 +1475,16 @@ bool CMusePackReader::KeyValid(uint16_t key)
 	return true;
 }
 
-DataPacketMPC::DataPacketMPC() :
-	type(PACKET_TYPE_EOS),
-	rtStart(0),
-	rtStop(0),
-	sync_point(FALSE),
-	discontinuity(FALSE),
-	buf(nullptr),
-	size(0)
+DataPacketMPC::DataPacketMPC()
+	: type(PACKET_TYPE_EOS)
+	, rtStart(0)
+	, rtStop(0)
+	, rate(1.0)
+	, has_time(false)
+	, sync_point(FALSE)
+	, discontinuity(FALSE)
+	, buf(nullptr)
+	, size(0)
 {
 }
 
