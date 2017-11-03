@@ -85,7 +85,7 @@ namespace DSObjects
 		HRESULT SetDevice(IDirect3DDevice9* pD3DDev);
 		HRESULT Render(
 			REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, REFERENCE_TIME atpf,
-			int left, int top, int bottom, int right, int width, int height);
+			int left, int top, int right, int bottom, int width, int height);
 
 		// ISubPicAllocatorPresenter3
 		STDMETHODIMP CreateRenderer(IUnknown** ppRenderer);

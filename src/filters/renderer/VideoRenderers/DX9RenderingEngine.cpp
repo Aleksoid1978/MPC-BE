@@ -1311,7 +1311,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 
 	const bool bDither = (m_bFP16Support && m_SurfaceFmt != D3DFMT_X8R8G8B8 && m_SurfaceFmt != m_DisplayFmt);
 
-	if (!bColorManagement & !bDither) {
+	if (!bColorManagement && !bDither) {
 		m_bFinalPass = false;
 		return S_FALSE;
 	}
