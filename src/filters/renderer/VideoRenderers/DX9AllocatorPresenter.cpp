@@ -2371,8 +2371,11 @@ void CDX9AllocatorPresenter::OnChangeInput(CComPtr<IPin> pPin)
 			CLSID clsid = GetCLSID(pBF);
 			CComQIPtr<IDirectVobSub> pDVS = pBF;
 
-			if (!pDVS && clsid != CLSID_ffdshowRawVideoFilter) {
-				// simple check. Filter is a decoder if it is not VSFilter, xy-VSFilter or ffdshow raw video filter
+			if (!pDVS // VSFilter, xy-VSFilter
+				&& clsid != CLSID_ffdshowRawVideoFilter // ffdshow raw video filter
+				&& clsid != GUIDFromCString(L"{FCC4769C-1E45-4E60-8CBF-B159B2584587}") // Bluesky Frame Rate Converter
+				&& clsid != GUIDFromCString(L"{848E3162-C71A-4191-A0BE-0FFC449A7A35}")) { // DmitriRender
+				// skip some filters (not decoders)
 				break;
 			}
 
