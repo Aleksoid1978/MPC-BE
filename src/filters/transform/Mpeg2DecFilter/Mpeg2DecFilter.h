@@ -66,6 +66,7 @@ class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478"))
 			memset(&buf, 0, sizeof(buf));
 			rtStart = rtStop = 0;
 			flags = 0;
+			di = DIAuto;
 		}
 		~framebuf() {
 			Free();
@@ -245,9 +246,10 @@ class CSubpicInputPin : public CMpeg2DecInputPin
 		AM_PROPERTY_SPHLI m_sphli; // parsed
 		CAutoPtr<AM_PROPERTY_SPHLI> m_psphli; // for the menu (optional)
 		spu() {
-			memset(&m_sphli, 0, sizeof(m_sphli));
 			m_fForced = false;
 			m_rtStart = m_rtStop = 0;
+			memset(&m_offset, 0, sizeof(m_offset));
+			memset(&m_sphli, 0, sizeof(m_sphli));
 		}
 		virtual ~spu() {}
 		virtual bool Parse() PURE;
