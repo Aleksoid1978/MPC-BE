@@ -222,10 +222,10 @@ std::unique_ptr<BYTE[]> DecodeHdmvLPCM(unsigned& dst_size, SampleFormat& dst_sf,
 	auto& remap = s_scmap_hdmv[channel_conf].ch;
 
 	if (bitdepth == 16) {
-		uint16_t* src16 = (uint16_t*)src;
 		uint16_t* dst16 = (uint16_t*)dst.get();
 
 		for (unsigned i = 0; i < frames; ++i) {
+			uint16_t* src16 = (uint16_t*)src;
 			for (unsigned j = 0; j < channels; ++j) {
 				*(dst16++) = _byteswap_ushort(src16[remap[j]]);
 			}
