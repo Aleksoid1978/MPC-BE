@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include <MMReg.h>
+#include <list>
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
 #endif
@@ -203,6 +204,32 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		if (!pMasterStream) {
 			ASSERT(0);
 			return E_FAIL;
+		}
+
+		for (auto& it : m_SyncPoints) {
+			auto& sps = it.second;
+			std::list<REFERENCE_TIME> duplicates;
+			for (size_t i = 0; i < sps.GetCount() - 1; i++) {
+				for (size_t j = i + 1; j < sps.GetCount(); j++) {
+					if (sps[i].rt == sps[j].rt) {
+						duplicates.emplace_back(sps[i].rt);
+					}
+				}
+			}
+
+			if (!duplicates.empty()) {
+				duplicates.sort();
+				duplicates.unique();
+				for (const auto& dup : duplicates) {
+					for (size_t i = 0; i < sps.GetCount();) {
+						if (sps[i].rt == dup) {
+							sps.RemoveAt(i);
+						} else {
+							i++;
+						}
+					}
+				}
+			}
 		}
 
 		WORD main_program_number = WORD_MAX;
