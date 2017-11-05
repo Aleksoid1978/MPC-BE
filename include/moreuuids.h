@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <ntverp.h>
+
 #ifndef MPC_GUID_ENTRY
 	#define MPC_GUID_ENTRY(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
 	DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8);
@@ -1550,20 +1552,26 @@ MPC_GUID_ENTRY(DXVA2_ModeH264_Flash,
 			0x4245F676, 0x2BBC, 0x4166, 0xA0, 0xBB, 0x54, 0xE7, 0xB8, 0x49, 0xC3, 0x80)
 
 // {463707F8-A1D0-4585-876D-83AA6D60B89E}
+#if VER_PRODUCTBUILD <= 9600
 MPC_GUID_ENTRY(DXVA2_ModeVP9_VLD_Profile0,
 			0x463707F8, 0xA1D0, 0x4585, 0x87, 0x6D, 0x83, 0xAA, 0x6D, 0x60, 0xB8, 0x9E)
+#endif
 
 // {A4C749EF-6ECF-48AA-8448-50A7A1165FF7}
+#if VER_PRODUCTBUILD <= 9600
 MPC_GUID_ENTRY(DXVA2_ModeVP9_VLD_10bit_Profile2,
 			0xa4c749ef, 0x6ecf, 0x48aa, 0x84, 0x48, 0x50, 0xa7, 0xa1, 0x16, 0x5f, 0xf7)
+#endif
 
 // {76988A52-DF13-419A-8E64-FFCF4A336CF5}
 MPC_GUID_ENTRY(DXVA2_VP9_VLD_Intel,
 			0x76988A52, 0xDF13, 0x419A, 0x8E, 0x64, 0xFF, 0xCF, 0x4A, 0x33, 0x6C, 0xF5)
 
 // {90B899EA-3A62-4705-88B3-8DF04B2744E7}
+#if VER_PRODUCTBUILD <= 9600
 MPC_GUID_ENTRY(DXVA2_ModeVP8_VLD,
 			0x90b899ea, 0x3a62, 0x4705, 0x88, 0xb3, 0x8d, 0xf0, 0x4b, 0x27, 0x44, 0xe7)
+#endif
 
 // uncompressed
 
