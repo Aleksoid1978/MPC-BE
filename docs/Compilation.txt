@@ -21,6 +21,9 @@ Part B: Preparing the GCC environment
     MINGW64     C:\MSYS\mingw
     YASM        C:\MSYS\bin
 
+    Optional, If you want to customize the Windows SDK version used, set the variable (the default version is 8.1)
+    WINSDK_VER  8.1
+
 Part C: Downloading and compiling the MPC-BE source
 
 1. Use a subversion client to checkout MPC-BE's trunk to "C:\mpc-be" (or anywhere else you like)
