@@ -1586,7 +1586,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	// Check how well audio is matching rate (if at all)
 	DWORD tmp;
 	if (m_pAudioStats != nullptr) {
-		m_pAudioStats->GetStatParam(AM_AUDREND_STAT_PARAM_SLAVE_ACCUMERROR, &m_lAudioLag, &tmp);
+		m_pAudioStats->GetStatParam(AM_AUDREND_STAT_PARAM_SLAVE_ACCUMERROR, (DWORD*)&m_lAudioLag, &tmp);
 		expand_range((long)m_lAudioLag, m_lAudioLagMin, m_lAudioLagMax);
 		m_pAudioStats->GetStatParam(AM_AUDREND_STAT_PARAM_SLAVE_MODE, &m_lAudioSlaveMode, &tmp);
 	}
@@ -1743,7 +1743,7 @@ void CBaseAP::DrawStats()
 		CString strText;
 		int TextHeight = (int)(25.0*m_TextScale + 0.5);
 
-		strText.Format(L"Frames drawn from stream start: %d | Sample time stamp: %d ms", m_pcFramesDrawn, (LONG)(m_llSampleTime / 10000));
+		strText.Format(L"Frames drawn from stream start: %u | Sample time stamp: %d ms", m_pcFramesDrawn, (int)(m_llSampleTime / 10000));
 		DrawText(rc, strText, 1);
 		OffsetRect(&rc, 0, TextHeight);
 
@@ -1760,7 +1760,7 @@ void CBaseAP::DrawStats()
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
-			strText.Format(L"Display      : %d x %d, %d Hz  Cycle %.3f ms", m_ScreenSize.cx, m_ScreenSize.cy, m_refreshRate, m_dD3DRefreshCycle);
+			strText.Format(L"Display      : %d x %d, %u Hz  Cycle %.3f ms", m_ScreenSize.cx, m_ScreenSize.cy, m_refreshRate, m_dD3DRefreshCycle);
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
@@ -1835,7 +1835,7 @@ void CBaseAP::DrawStats()
 		DrawText(rc, strText, 1);
 		OffsetRect(&rc, 0, TextHeight);
 
-		strText.Format(L"Sync status  : glitches %d,  display-frame cycle mismatch: %7.3f %%,  dropped frames %d", m_uSyncGlitches, 100 * m_dCycleDifference, m_pcFramesDropped);
+		strText.Format(L"Sync status  : glitches %u,  display-frame cycle mismatch: %7.3f %%,  dropped frames %u", m_uSyncGlitches, 100 * m_dCycleDifference, m_pcFramesDropped);
 		DrawText(rc, strText, 1);
 		OffsetRect(&rc, 0, TextHeight);
 
@@ -1849,13 +1849,13 @@ void CBaseAP::DrawStats()
 			strText.Format(L"Sample time  : waiting %3d ms", m_lNextSampleWait);
 			if (rs.iSynchronizeMode == SYNCHRONIZE_NEAREST) {
 				CString temp;
-				temp.Format(L"  paint time correction: %3d ms  Hysteresis: %d", m_lShiftToNearest, m_llHysteresis /10000);
+				temp.Format(L"  paint time correction: %3d ms  Hysteresis: %d", m_lShiftToNearest, (int)(m_llHysteresis / 10000));
 				strText += temp;
 			}
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
-			strText.Format(L"Buffering    : Buffered %3d    Free %3d    Current Surface %3d", m_nUsedBuffer, m_nSurfaces - m_nUsedBuffer, m_iCurSurface);
+			strText.Format(L"Buffering    : Buffered %3d    Free %3d    Current Surface %3u", m_nUsedBuffer, m_nSurfaces - m_nUsedBuffer, m_iCurSurface);
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 

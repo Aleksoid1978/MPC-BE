@@ -249,7 +249,7 @@ namespace GothSync
 		DXVA2_ExtendedFormat m_inputExtFormat;
 		const wchar_t* m_wsResizer;
 
-		LONG m_lNextSampleWait; // Waiting time for next sample in EVR
+		long m_lNextSampleWait; // Waiting time for next sample in EVR
 		bool m_bSnapToVSync; // True if framerate is low enough so that snap to vsync makes sense
 
 		UINT m_uScanLineEnteringPaint; // The active scan line when entering Paint()
@@ -276,9 +276,8 @@ namespace GothSync
 		double m_dOptimumDisplayCycle; // The display cycle that is closest to the frame rate. A multiple of the actual display cycle
 		double m_dCycleDifference; // Difference in video and display cycle time relative to the video cycle time
 
-		UINT m_pcFramesDropped;
-		UINT m_pcFramesDuplicated;
-		UINT m_pcFramesDrawn;
+		unsigned m_pcFramesDropped;
+		unsigned m_pcFramesDrawn;
 
 		LONGLONG m_pllJitter [NB_JITTER]; // Vertical sync time stats
 		LONGLONG m_pllSyncOffset [NB_JITTER]; // Sync offset time stats
@@ -292,14 +291,13 @@ namespace GothSync
 		LONGLONG m_MinJitter;
 		LONGLONG m_MaxSyncOffset;
 		LONGLONG m_MinSyncOffset;
-		UINT m_uSyncGlitches;
+		unsigned m_uSyncGlitches;
 
 		LONGLONG m_llSampleTime, m_llLastSampleTime; // Present time for the current sample
-		LONG m_lSampleLatency, m_lLastSampleLatency; // Time between intended and actual presentation time
-		LONG m_lMinSampleLatency, m_lLastMinSampleLatency;
+		long m_lSampleLatency, m_lLastSampleLatency; // Time between intended and actual presentation time
+		long m_lMinSampleLatency, m_lLastMinSampleLatency;
 		LONGLONG m_llHysteresis;
-		LONG m_lHysteresis;
-		LONG m_lShiftToNearest, m_lShiftToNearestPrev;
+		long m_lShiftToNearest, m_lShiftToNearestPrev;
 		bool m_bVideoSlowerThanDisplay;
 
 		double m_TextScale;
@@ -309,7 +307,7 @@ namespace GothSync
 		CGenlock *m_pGenlock; // The video - display synchronizer class
 		CComPtr<IReferenceClock> m_pRefClock; // The reference clock. Used in Paint()
 		CComPtr<IAMAudioRendererStats> m_pAudioStats; // Audio statistics from audio renderer. To check so that audio is in sync
-		DWORD m_lAudioLag; // Time difference between audio and video when the audio renderer is matching rate to the external reference clock
+		long m_lAudioLag; // Time difference between audio and video when the audio renderer is matching rate to the external reference clock
 		long m_lAudioLagMin, m_lAudioLagMax; // The accumulated difference between the audio renderer and the master clock
 		DWORD m_lAudioSlaveMode; // To check whether the audio renderer matches rate with SyncClock (returns the value 4 if it does)
 
