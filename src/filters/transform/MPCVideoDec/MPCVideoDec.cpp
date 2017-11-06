@@ -1803,7 +1803,6 @@ redo:
 	m_pAVCtx->err_recognition       = AV_EF_CAREFUL;
 	m_pAVCtx->idct_algo             = FF_IDCT_AUTO;
 	m_pAVCtx->skip_loop_filter      = (AVDiscard)m_nDiscardMode;
-	m_pAVCtx->refcounted_frames		= 1;
 	m_pAVCtx->opaque				= this;
 	if (m_pAVCtx->codec_tag == MAKEFOURCC('m','p','g','2')) {
 		m_pAVCtx->codec_tag = MAKEFOURCC('M','P','E','G');

@@ -331,7 +331,6 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		m_pAVCtx->err_recognition		= AV_EF_CAREFUL;
 		m_pAVCtx->thread_count			= 1;
 		m_pAVCtx->thread_type			= 0;
-		m_pAVCtx->refcounted_frames		= 1;
 		if (m_pAVCodec->capabilities & AV_CODEC_CAP_TRUNCATED) {
 			m_pAVCtx->flags				|= AV_CODEC_FLAG_TRUNCATED;
 		}
