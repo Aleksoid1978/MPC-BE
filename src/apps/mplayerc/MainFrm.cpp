@@ -18646,8 +18646,8 @@ LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 
-	int nWidth	= HIWORD(lParam);
-	int nHeight	= LOWORD(lParam);
+	long nWidth  = HIWORD(lParam);
+	long nHeight = LOWORD(lParam);
 
 	if (m_ThumbCashedBitmap && m_ThumbCashedSize != CSize(nWidth, nHeight)) {
 		::DeleteObject(m_ThumbCashedBitmap);
