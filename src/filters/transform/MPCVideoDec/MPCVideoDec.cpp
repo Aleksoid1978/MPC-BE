@@ -1800,7 +1800,7 @@ redo:
 	m_pAVCtx->bits_per_coded_sample = pBMI->biBitCount;
 	m_pAVCtx->workaround_bugs       = m_nWorkaroundBug;
 	m_pAVCtx->error_concealment     = m_nErrorConcealment;
-	m_pAVCtx->err_recognition       = AV_EF_CAREFUL;
+	m_pAVCtx->err_recognition       = 0;
 	m_pAVCtx->idct_algo             = FF_IDCT_AUTO;
 	m_pAVCtx->skip_loop_filter      = (AVDiscard)m_nDiscardMode;
 	m_pAVCtx->opaque				= this;
