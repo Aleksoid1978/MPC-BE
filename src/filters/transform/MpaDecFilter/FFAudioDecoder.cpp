@@ -328,12 +328,9 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		m_pAVCtx->bits_per_coded_sample	= bitdeph;
 		m_pAVCtx->block_align			= block_align;
 		m_pAVCtx->bit_rate				= bitrate;
-		m_pAVCtx->err_recognition		= AV_EF_CAREFUL;
+		m_pAVCtx->err_recognition		= 0;
 		m_pAVCtx->thread_count			= 1;
 		m_pAVCtx->thread_type			= 0;
-		if (m_pAVCodec->capabilities & AV_CODEC_CAP_TRUNCATED) {
-			m_pAVCtx->flags				|= AV_CODEC_FLAG_TRUNCATED;
-		}
 
 		if (m_bStereoDownmix) { // works to AC3, TrueHD, DTS
 			m_pAVCtx->request_channel_layout = AV_CH_LAYOUT_STEREO;
