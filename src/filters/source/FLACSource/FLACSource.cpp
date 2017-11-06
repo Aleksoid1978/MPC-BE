@@ -545,7 +545,7 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 
 		const FLAC__StreamMetadata_CueSheet *cs = &pMetadata->data.cue_sheet;
 
-		for(size_t i = 0; i < cs->num_tracks; ++i) {
+		for(uint32_t i = 0; i < cs->num_tracks; ++i) {
 			FLAC__StreamMetadata_CueSheet_Track *track = &cs->tracks[i];
 			if (track->type || track->offset >= (FLAC__uint64)m_i64TotalNumSamples) {
 				continue;
@@ -553,7 +553,7 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 
 			REFERENCE_TIME rt = MILLISECONDS_TO_100NS_UNITS(1000*track->offset/m_nSamplesPerSec);
 			CString s;
-			s.Format(L"Track %02d", i+1);
+			s.Format(L"Track %02u", i+1);
 			((CFLACSource*)m_pFilter)->ChapAppend(rt, s);
 
 			if (track->num_indices > 1) {
