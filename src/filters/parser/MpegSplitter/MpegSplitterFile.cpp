@@ -2428,14 +2428,14 @@ void CMpegSplitterFile::UpdatePSM()
 
 static UINT64 ReadPTS(CBaseSplitterFile* pFile)
 {
-	#define MARKER if (pFile->BitRead(1) != 1) { DEBUG_ASSERT(FALSE); };
+	#define MARKER(f) if (f->BitRead(1) != 1) { DEBUG_ASSERT(FALSE); };
 
 	UINT64 pts = pFile->BitRead(3) << 30;
-	MARKER // 32..30
+	MARKER(pFile) // 32..30
 	pts |= pFile->BitRead(15) << 15;
-	MARKER // 29..15
+	MARKER(pFile) // 29..15
 	pts |= pFile->BitRead(15);
-	MARKER // 14..0
+	MARKER(pFile) // 14..0
 
 	return pts;
 }
