@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <algorithm>
 #include <MMReg.h>
 #include "BaseMuxer.h"
 #include "../../../DSUtil/DSUtil.h"

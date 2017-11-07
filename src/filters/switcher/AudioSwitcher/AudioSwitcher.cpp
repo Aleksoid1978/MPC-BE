@@ -24,7 +24,6 @@
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
 #endif
-#include <algorithm>
 #include <math.h>
 #include <MMReg.h>
 #include <Ks.h>

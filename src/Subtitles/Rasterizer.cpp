@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <algorithm>
 #include <cmath>
 #include <intrin.h>
 #include <vector>

@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <algorithm>
 #include <chrono>
 #include <intsafe.h>
 #include "SubPicQueueImpl.h"

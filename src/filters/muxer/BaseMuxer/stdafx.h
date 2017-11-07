@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,6 +34,7 @@
 #include <afxwin.h>			// MFC core and standard components
 #include <atlbase.h>
 #include <atlcoll.h>
+#include <algorithm>
 
 #include "stdafx_common.h"
 #include "../../../DSUtil/DSUtil.h"

@@ -20,7 +20,6 @@
 
 #include "stdafx.h"
 #include <math.h>
-#include <algorithm>
 #include "AudioNormalizer.h"
 
 //
