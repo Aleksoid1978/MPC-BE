@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <algorithm>
 #include "MatroskaFile.h"
 #include "../../../DSUtil/DSUtil.h"
 

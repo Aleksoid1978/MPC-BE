@@ -19,7 +19,6 @@
  */
 
 #include "stdafx.h"
-#include <algorithm>
 #include <vector>
 #include "FrameDuration.h"
 

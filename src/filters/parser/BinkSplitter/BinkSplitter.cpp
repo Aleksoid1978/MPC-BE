@@ -20,7 +20,6 @@
 
 #include "stdafx.h"
 #include <initguid.h>
-#include <algorithm>
 #include "BinkSplitter.h"
 #include <moreuuids.h>
 

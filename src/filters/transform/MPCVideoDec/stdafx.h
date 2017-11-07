@@ -1,5 +1,5 @@
 /*
- * (C) 2007-2016 see Authors.txt
+ * (C) 2007-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,6 +29,7 @@
 #include <evr.h>
 #include <mfapi.h>
 #include <Mferror.h>
+#include <algorithm>
 #include <vector>
 
 #pragma warning(disable:4005)

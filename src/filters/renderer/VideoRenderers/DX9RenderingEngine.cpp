@@ -19,7 +19,6 @@
  */
 
 #include "stdafx.h"
-#include <algorithm>
 #include <lcms2/include/lcms2.h>
 #include <DirectXPackedVector.h>
 #include "Dither.h"

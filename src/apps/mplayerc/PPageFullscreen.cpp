@@ -25,7 +25,6 @@
 #include "../../DSUtil/WinAPIUtils.h"
 #include "../../DSUtil/SysVersion.h"
 #include "MultiMonitor.h"
-#include <algorithm>
 
 static CString FormatModeString(dispmode dmod)
 {
