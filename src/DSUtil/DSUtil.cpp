@@ -2724,11 +2724,11 @@ unsigned int lav_xiphlacing(unsigned char *s, unsigned int v)
 	return n;
 }
 
-void getExtraData(const BYTE *format, const GUID *formattype, const size_t formatlen, BYTE *extra, unsigned int *extralen)
+void getExtraData(const BYTE *format, const GUID *formattype, const ULONG formatlen, BYTE *extra, unsigned int *extralen)
 {
 	// code from LAV ...
 	const BYTE *extraposition = nullptr;
-	size_t extralength = 0;
+	ULONG extralength = 0;
 	if (*formattype == FORMAT_WaveFormatEx) {
 		//WAVEFORMATEX *wfex = (WAVEFORMATEX *)format;
 		extraposition = format + sizeof(WAVEFORMATEX);
@@ -2747,7 +2747,7 @@ void getExtraData(const BYTE *format, const GUID *formattype, const size_t forma
 			offset += vf2->HeaderSize[1] / 255 + 1;
 		}
 		extralength = vf2->HeaderSize[0] + vf2->HeaderSize[1] + vf2->HeaderSize[2];
-		extralength = min(extralength, formatlen - sizeof(VORBISFORMAT2));
+		extralength = std::min(extralength, formatlen - (ULONG)sizeof(VORBISFORMAT2));
 
 		if (extra && extralength)
 			memcpy(extra, format + sizeof(VORBISFORMAT2), extralength);
@@ -2764,17 +2764,17 @@ void getExtraData(const BYTE *format, const GUID *formattype, const size_t forma
 	} else if (*formattype == FORMAT_MPEGVideo) {
 		MPEG1VIDEOINFO *mp1vi = (MPEG1VIDEOINFO *)format;
 		extraposition = (BYTE *)mp1vi->bSequenceHeader;
-		extralength   =  min(mp1vi->cbSequenceHeader, formatlen - FIELD_OFFSET(MPEG1VIDEOINFO, bSequenceHeader[0]));
+		extralength   =  std::min(mp1vi->cbSequenceHeader, formatlen - FIELD_OFFSET(MPEG1VIDEOINFO, bSequenceHeader[0]));
 	} else if (*formattype == FORMAT_MPEG2Video) {
 		MPEG2VIDEOINFO *mp2vi = (MPEG2VIDEOINFO *)format;
 		extraposition = (BYTE *)mp2vi->dwSequenceHeader;
-		extralength   = min(mp2vi->cbSequenceHeader, formatlen - FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader[0]));
+		extralength   = std::min(mp2vi->cbSequenceHeader, formatlen - FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader[0]));
 	}
 
 	if (extra && extralength)
 		memcpy(extra, extraposition, extralength);
 	if (extralen)
-		*extralen = (unsigned int)extralength;
+		*extralen = extralength;
 }
 
 HRESULT CreateMPEG2VIfromAVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_TIME AvgTimePerFrame, CSize aspect, BYTE* extra, size_t extralen)

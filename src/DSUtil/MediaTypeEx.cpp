@@ -852,7 +852,7 @@ void CMediaTypeEx::Dump(CAtlList<CString>& sl)
 		sl.AddTail(str);
 		for (ULONG i = 0, j = (extrasize + 15) & ~15; i < j; i += 16) {
 			str.Format(L"%04x:", i);
-			ULONG line_end = min(i + 16, extrasize);
+			ULONG line_end = std::min(i + 16, extrasize);
 
 			for (ULONG k = i; k < line_end; k++) {
 				str.AppendFormat(L" %02x", pbFormat[fmtsize + k]);

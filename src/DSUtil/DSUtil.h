@@ -174,7 +174,7 @@ extern void				TracePinInfo(IPin* pPin);
 
 extern void				SetThreadName(DWORD dwThreadID, LPCSTR szThreadName);
 
-extern void				getExtraData(const BYTE *format, const GUID *formattype, const size_t formatlen, BYTE *extra, unsigned int *extralen);
+extern void				getExtraData(const BYTE *format, const GUID *formattype, const ULONG formatlen, BYTE *extra, unsigned int *extralen);
 
 extern int				MakeAACInitData(BYTE* pData, int profile, int freq, int channels);
 extern bool				MakeMPEG2MediaType(CMediaType& mt, BYTE* seqhdr, DWORD len, int w, int h);
