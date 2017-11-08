@@ -503,7 +503,7 @@ REFERENCE_TIME CSubPicQueue::GetCurrentRenderingTime()
 		}
 	}
 
-	return max(rtNow, m_rtNow);
+	return std::max(rtNow, m_rtNow);
 }
 
 // overrides
@@ -547,7 +547,7 @@ DWORD CSubPicQueue::ThreadProc()
 					break;
 				}
 
-				REFERENCE_TIME rtCurrent = max(rtStart, rtStartRendering);
+				REFERENCE_TIME rtCurrent = std::max(rtStart, rtStartRendering);
 				if (rtCurrent > m_rtNow) {
 					// Round current time to the next estimated video frame timing
 					REFERENCE_TIME rtCurrentRounded = (rtCurrent / rtTimePerFrame) * rtTimePerFrame;
@@ -589,7 +589,7 @@ DWORD CSubPicQueue::ThreadProc()
 						if (bIsAnimated) {
 							// 3/4 is a magic number we use to avoid reusing the wrong frame due to slight
 							// misprediction of the frame end time
-							hr = RenderTo(pStatic, rtCurrent, min(rtCurrent + rtTimePerFrame * 3 / 4, rtStopReal), fps, bIsAnimated);
+							hr = RenderTo(pStatic, rtCurrent, std::min(rtCurrent + rtTimePerFrame * 3 / 4, rtStopReal), fps, bIsAnimated);
 							// Set the segment start and stop timings
 							pStatic->SetSegmentStart(rtStart);
 							// The stop timing can be moved so that the duration from the current start time
@@ -597,8 +597,8 @@ DWORD CSubPicQueue::ThreadProc()
 							// avoids missing subtitle frame due to rounding errors in the timings.
 							// At worst this can cause a segment to be displayed for one more frame than expected
 							// but it's much less annoying than having the subtitle disappearing for one frame
-							pStatic->SetSegmentStop(max(rtCurrent + rtTimePerFrame, rtStopReal));
-							rtCurrent = min(rtCurrent + rtTimePerFrame, rtStopReal);
+							pStatic->SetSegmentStop(std::max(rtCurrent + rtTimePerFrame, rtStopReal));
+							rtCurrent = std::min(rtCurrent + rtTimePerFrame, rtStopReal);
 						} else {
 							hr = RenderTo(pStatic, rtStart, rtStopReal, fps, bIsAnimated);
 							// Non-animated subtitles aren't part of a segment
@@ -738,7 +738,7 @@ STDMETHODIMP_(bool) CSubPicQueueNoThread::LookupSubPic(REFERENCE_TIME rtNow, boo
 
 				if (bAnimated) {
 					rtStart = rtNow;
-					rtStop = min(rtNow + 1, rtStop);
+					rtStop = std::min(rtNow + 1, rtStop);
 				} else {
 					rtStart = pSubPicProvider->GetStart(pos, fps);
 				}

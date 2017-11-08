@@ -119,7 +119,7 @@ STDMETHODIMP CDX9SubPic::CopyTo(ISubPic* pSubPic)
 	pDstSurf->GetDesc(&dstDesc);
 
 	RECT r;
-	SetRect(&r, 0, 0, min(srcDesc.Width, dstDesc.Width), min(srcDesc.Height, dstDesc.Height));
+	SetRect(&r, 0, 0, std::min(srcDesc.Width, dstDesc.Width), std::min(srcDesc.Height, dstDesc.Height));
 	POINT p = { 0, 0 };
 	hr = pD3DDev->UpdateSurface(pSrcSurf, &r, pDstSurf, &p);
 
