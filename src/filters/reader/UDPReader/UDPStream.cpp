@@ -341,7 +341,7 @@ HRESULT CUDPStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 
 		DLogIf(m_pos < p->m_start, L"CUDPStream::Read(): requested data is no longer available");
 		if (p->m_start <= m_pos && m_pos < p->m_end) {
-			size_t size = min(len, p->m_end - m_pos);
+			const DWORD size = (DWORD)std::min((ULONGLONG)len, p->m_end - m_pos);
 			memcpy(ptr, &p->m_buff[m_pos - p->m_start], size);
 
 			m_pos += size;
