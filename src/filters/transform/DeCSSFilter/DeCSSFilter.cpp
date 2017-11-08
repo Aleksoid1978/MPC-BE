@@ -189,8 +189,8 @@ HRESULT CDeCSSFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		return S_FALSE;
 	}
 
-	memcpy(pDataOut, pDataIn, min(len, size));
-	pOut->SetActualDataLength(min(len, size));
+	memcpy(pDataOut, pDataIn, std::min(len, size));
+	pOut->SetActualDataLength(std::min(len, size));
 
 	return S_OK;
 }
@@ -342,7 +342,7 @@ void CDeCSSInputPin::StripPacket(BYTE*& p, long& len)
 
 			len -= 4;
 			p += 4;
-			int expected = ((p[0]<<8)|p[1]);
+			long expected = ((p[0]<<8)|p[1]);
 			len -= 2;
 			p += 2;
 			BYTE* p0 = p;
@@ -394,7 +394,7 @@ void CDeCSSInputPin::StripPacket(BYTE*& p, long& len)
 
 			if(expected > 0) {
 				expected -= (int)(p - p0);
-				len = min(expected, len);
+				len = std::min(expected, len);
 			}
 		}
 

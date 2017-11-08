@@ -483,8 +483,8 @@ bool CVobFile::SetOffsets(int start_sector, int end_sector)
 		length += m_files[i].size;
 	}
 
-	m_offset = max(0, start_sector);
-	m_size = end_sector > 0 ? min(end_sector, length) : length;
+	m_offset = std::max(0, start_sector);
+	m_size = end_sector > 0 ? std::min(end_sector, length) : length;
 
 	if (start_sector < 0 || start_sector >= length || end_sector > length) {
 		return false; // offset assigned, but there were problems.
@@ -515,7 +515,7 @@ int CVobFile::GetPosition() const
 
 int CVobFile::Seek(int pos)
 {
-	pos = min(max(pos + m_offset, m_offset), m_size - 1);
+	pos = std::min(std::max(pos + m_offset, m_offset), m_size - 1);
 
 	int i = -1;
 	int size = 0;
