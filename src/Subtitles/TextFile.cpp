@@ -158,8 +158,8 @@ ULONGLONG CTextFile::Seek(LONGLONG lOff, UINT nFrom)
 
 	// Try to reuse the buffer if any
 	if (m_nInBuffer > 0) {
-		ULONGLONG pos = GetPosition();
-		ULONGLONG len = GetLength();
+		const LONGLONG pos = GetPosition();
+		const LONGLONG len = GetLength();
 
 		switch (nFrom) {
 			default:
@@ -173,9 +173,9 @@ ULONGLONG CTextFile::Seek(LONGLONG lOff, UINT nFrom)
 				break;
 		}
 
-		lOff = max((LONGLONG)min((ULONGLONG)lOff, len), 0ll);
+		lOff = clamp(lOff, 0ll, len);
 
-		m_posInBuffer += LONGLONG(ULONGLONG(lOff) - pos);
+		m_posInBuffer += lOff - pos;
 		if (m_posInBuffer < 0 || m_posInBuffer >= m_nInBuffer) {
 			// If we would have to end up out of the buffer, we just reset it and seek normally
 			m_nInBuffer = m_posInBuffer = 0;

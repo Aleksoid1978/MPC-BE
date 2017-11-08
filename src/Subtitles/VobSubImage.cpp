@@ -144,7 +144,7 @@ bool CVobSubImage::Decode(BYTE* lpData, int packetsize, int datasize, int t,
 		nPlane = 1 - nPlane;
 	}
 
-	rect.bottom = min(p.y, rect.bottom);
+	rect.bottom = std::min(p.y, rect.bottom);
 
 	if (fTrim) {
 		TrimSubImage();
