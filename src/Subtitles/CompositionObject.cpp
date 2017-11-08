@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -52,9 +52,9 @@ void CompositionObject::SetRLEData(const BYTE* pBuffer, int nSize, int nTotalSiz
 
 	m_pRLEData		= DNew BYTE[nTotalSize];
 	m_nRLEDataSize	= nTotalSize;
-	m_nRLEPos		= min(nSize, nTotalSize);
+	m_nRLEPos		= std::min(nSize, nTotalSize);
 
-	memcpy(m_pRLEData, pBuffer, min(nSize, nTotalSize));
+	memcpy(m_pRLEData, pBuffer, std::min(nSize, nTotalSize));
 }
 
 void CompositionObject::AppendRLEData(const BYTE* pBuffer, int nSize)
@@ -343,11 +343,11 @@ void CompositionObject::RenderXSUB(SubPicDesc& spd)
 		return;
 	}
 
-	CGolombBuffer	gb(m_pRLEData, m_nRLEDataSize);
-	BYTE			nPaletteIndex = 0;
-	SHORT			nCount;
-	SHORT			nX = m_horizontal_position;
-	SHORT			nY = m_vertical_position;
+	CGolombBuffer gb(m_pRLEData, m_nRLEDataSize);
+	BYTE nPaletteIndex = 0;
+	int  nCount;
+	int  nX = m_horizontal_position;
+	int  nY = m_vertical_position;
 
 	for (SHORT y = 0; y < m_height; y++) {
 		if (gb.IsEOF()) {
@@ -355,13 +355,13 @@ void CompositionObject::RenderXSUB(SubPicDesc& spd)
 		}
 		if (y == (m_height + 1) / 2) {
 			// interlaced: do odd lines
-			nY	= m_vertical_position + 1;
+			nY = m_vertical_position + 1;
 		}
-		nX	= m_horizontal_position;
+		nX = m_horizontal_position;
 		while (nX < (m_horizontal_position + m_width)) {
 			int log2		= ff_log2_tab[gb.BitRead(8, true)];
 			nCount			= gb.BitRead(14 - 4 * (log2 >> 1));
-			nCount			= min(nCount, m_width - (nX - m_horizontal_position));
+			nCount			= std::min(nCount, m_width - (nX - m_horizontal_position));
 			nPaletteIndex	= gb.BitRead(2);
 			// count 0 - means till end of row
 			if (!nCount) {

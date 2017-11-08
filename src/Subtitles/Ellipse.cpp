@@ -58,7 +58,7 @@ int CEllipse::GetLeftIntersect(int dx, int dy)
 			if (C >= 0.0) {
 				double sqrtC = std::sqrt(C);
 				// Make sure that we are on the left for real
-				if (m_rx * (dx_2rx - dy_2ry * sqrtC) < min(0, dx)) {
+				if (m_rx * (dx_2rx - dy_2ry * sqrtC) < std::min(0, dx)) {
 					iRes = int(std::floor(m_ry * (dy_2ry + dx_2rx * sqrtC)));
 					// Account for possible rounding
 					if (GetArc(iRes) < GetArc(iRes - dy) - dx) {

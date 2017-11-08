@@ -564,7 +564,7 @@ void Rasterizer::_OverlapRegion(tSpanBuffer& dst, const tSpanBuffer& src, int dx
 
 			for (;;) {
 				while (itA != itAE && itA->first <= x2) {
-					x2 = max(x2, itA->second);
+					x2 = std::max(x2, itA->second);
 					++itA;
 				}
 
@@ -577,7 +577,7 @@ void Rasterizer::_OverlapRegion(tSpanBuffer& dst, const tSpanBuffer& src, int dx
 				}
 
 				do {
-					x2 = max(x2, itB->second + offset2);
+					x2 = std::max(x2, itB->second + offset2);
 					++itB;
 				} while (itB != itBE && itB->first + offset1 <= x2);
 
@@ -605,7 +605,7 @@ void Rasterizer::_OverlapRegion(tSpanBuffer& dst, const tSpanBuffer& src, int dx
 
 			for (;;) {
 				while (itB != itBE && itB->first + offset1 <= x2) {
-					x2 = max(x2, itB->second + offset2);
+					x2 = std::max(x2, itB->second + offset2);
 					++itB;
 				}
 
@@ -618,7 +618,7 @@ void Rasterizer::_OverlapRegion(tSpanBuffer& dst, const tSpanBuffer& src, int dx
 				}
 
 				do {
-					x2 = max(x2, itA->second);
+					x2 = std::max(x2, itA->second);
 					++itA;
 				} while (itA != itAE && itA->first <= x2);
 
@@ -649,7 +649,7 @@ void Rasterizer::_OverlapRegion(tSpanBuffer& dst, const tSpanBuffer& src, int dx
 		unsigned __int64 x2 = itB->second + offset2;
 		++itB;
 		while (itB != itBE && itB->first + offset1 <= x2) {
-			x2 = max(x2, itB->second + offset2);
+			x2 = std::max(x2, itB->second + offset2);
 			++itB;
 		}
 		dst.emplace_back(x1, x2);
@@ -669,7 +669,7 @@ bool Rasterizer::CreateWidenedRegion(int rx, int ry)
 		ry = 0;
 	}
 
-	m_pOutlineData->mWideBorder = max(rx, ry);
+	m_pOutlineData->mWideBorder = std::max(rx, ry);
 
 	if (m_pEllipse) {
 		CreateWidenedRegionFast(rx, ry);
@@ -1553,7 +1553,7 @@ namespace
 		// xo is the offset (usually negative) we have moved into the image
 		// So if we have passed the switchpoint (?) switch to another color
 		// (So switchpts stores both colours *and* coordinates?)
-		const int len = (std::max)(0, (std::min)(int(switchpts[3]) - xo, width));
+		const int len = std::max(0, std::min(int(switchpts[3]) - xo, width));
 		const int len1 = width - len;
 		const int len_bytes = len * sizeof(DWORD);
 
@@ -1573,7 +1573,7 @@ namespace
 					  int height, const DWORD* __restrict switchpts, const BYTE* __restrict srcBorder,
 					  const BYTE* __restrict srcBody, int xo)
 	{
-		const int len = (std::max)(0, (std::min)(int(switchpts[3]) - xo, width));
+		const int len = std::max(0, std::min(int(switchpts[3]) - xo, width));
 		const int len1 = width - len;
 		const int len_bytes = len * sizeof(DWORD);
 
@@ -1627,7 +1627,7 @@ namespace
 					  int height, const DWORD* __restrict switchpts, const BYTE* __restrict srcBorder,
 					  const BYTE* __restrict srcBody, const BYTE* __restrict alpha_mask, int alpha_pitch, int xo)
 	{
-		const int len = (std::max)(0, (std::min)(int(switchpts[3]) - xo, width));
+		const int len = std::max(0, std::min(int(switchpts[3]) - xo, width));
 		const int len1 = width - len;
 		const int len_bytes = len * sizeof(DWORD);
 
@@ -1649,7 +1649,7 @@ namespace
 					  int height, const DWORD* __restrict switchpts, const BYTE* __restrict alpha_mask, int alpha_pitch,
 					  int xo)
 	{
-		const int len = (std::max)(0, (std::min)(int(switchpts[3]) - xo, width));
+		const int len = std::max(0, std::min(int(switchpts[3]) - xo, width));
 		const int len1 = width - len;
 		const int len_bytes = len * sizeof(DWORD);
 

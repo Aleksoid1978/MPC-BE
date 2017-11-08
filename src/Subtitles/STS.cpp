@@ -1060,7 +1060,7 @@ static bool OpenMicroDVD(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 		if (c == 2) {
 			if (fCheck2 && ret.GetCount()) {
 				STSEntry& stse = ret[ret.GetCount()-1];
-				stse.end = min(stse.end, start);
+				stse.end = std::min(stse.end, start);
 				fCheck2 = false;
 			}
 
@@ -1563,7 +1563,7 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 					}
 
 					CString Effect = GetStrW(pszBuff, nBuffLength);
-					int len = min(Effect.GetLength(), nBuffLength);
+					int len = std::min(Effect.GetLength(), nBuffLength);
 					if (Effect.Left(len) == CString(pszBuff, len)) {
 						Effect.Empty();
 					}
@@ -1632,7 +1632,7 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 
 					if (sver <= 4)	{
 						style->colors[2] = style->colors[3];	// style->colors[2] is used for drawing the outline
-						alpha = max(min(alpha, 0xff), 0);
+						alpha = clamp(alpha, 0, 0xff);
 						for (size_t i = 0; i < 3; i++) {
 							style->alpha[i] = alpha;
 						}
@@ -1643,15 +1643,15 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 							style->alpha[i] = (BYTE)(style->colors[i] >> 24);
 							style->colors[i] &= 0xffffff;
 						}
-						style->fontScaleX = max(style->fontScaleX, 0.0);
-						style->fontScaleY = max(style->fontScaleY, 0.0);
+						style->fontScaleX = std::max(style->fontScaleX, 0.0);
+						style->fontScaleY = std::max(style->fontScaleY, 0.0);
 					}
 					style->fontAngleX = style->fontAngleY = 0;
 					style->borderStyle = style->borderStyle == 1 ? 0 : style->borderStyle == 3 ? 1 : 0;
-					style->outlineWidthX = max(style->outlineWidthX, 0.0);
-					style->outlineWidthY = max(style->outlineWidthY, 0.0);
-					style->shadowDepthX = max(style->shadowDepthX, 0.0);
-					style->shadowDepthY = max(style->shadowDepthY, 0.0);
+					style->outlineWidthX = std::max(style->outlineWidthX, 0.0);
+					style->outlineWidthY = std::max(style->outlineWidthY, 0.0);
+					style->shadowDepthX = std::max(style->shadowDepthX, 0.0);
+					style->shadowDepthY = std::max(style->shadowDepthY, 0.0);
 					if (sver <= 4)	{
 						style->scrAlignment = (style->scrAlignment & 4) ? ((style->scrAlignment & 3) + 6) // top
 											: (style->scrAlignment & 8) ? ((style->scrAlignment & 3) + 3) // mid
@@ -1842,14 +1842,14 @@ static bool OpenXombieSub(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 				style->marginRect.top = style->marginRect.bottom = GetInt(pszBuff, nBuffLength);
 				style->charSet = GetInt(pszBuff, nBuffLength);
 
-				style->fontScaleX = max(style->fontScaleX, 0.0);
-				style->fontScaleY = max(style->fontScaleY, 0.0);
-				style->fontSpacing = max(style->fontSpacing, 0.0);
+				style->fontScaleX = std::max(style->fontScaleX, 0.0);
+				style->fontScaleY = std::max(style->fontScaleY, 0.0);
+				style->fontSpacing = std::max(style->fontSpacing, 0.0);
 				style->borderStyle = style->borderStyle == 1 ? 0 : style->borderStyle == 3 ? 1 : 0;
-				style->outlineWidthX = max(style->outlineWidthX, 0.0);
-				style->outlineWidthY = max(style->outlineWidthY, 0.0);
-				style->shadowDepthX = max(style->shadowDepthX, 0.0);
-				style->shadowDepthY = max(style->shadowDepthY, 0.0);
+				style->outlineWidthX = std::max(style->outlineWidthX, 0.0);
+				style->outlineWidthY = std::max(style->outlineWidthY, 0.0);
+				style->shadowDepthX = std::max(style->shadowDepthX, 0.0);
+				style->shadowDepthY = std::max(style->shadowDepthY, 0.0);
 
 				ret.AddStyle(StyleName, style);
 			} catch (...) {
@@ -2183,7 +2183,7 @@ void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, int start, int end, C
 		} else if (i < segmentsCount && start < m_segments[i].start) {
 			// The new entry doesn't start in an existing segment.
 			// It might even not overlap with any segment at all
-			STSSegment stss(start, min(end, m_segments[i].start));
+			STSSegment stss(start, std::min(end, m_segments[i].start));
 			stss.subs.Add(n);
 			m_segments.InsertAt(i, stss);
 			i++;
@@ -2234,7 +2234,7 @@ void CSimpleTextSubtitle::Add(CStringW str, bool fUnicode, int start, int end, C
 		if (end > m_segments[i - 1].end) {
 			// The new entry ends after the last overlapping segment.
 			// It might even not overlap with any segment at all
-			STSSegment stss(max(start, m_segments[i - 1].end), end);
+			STSSegment stss(std::max(start, m_segments[i - 1].end), end);
 			stss.subs.Add(n);
 			m_segments.InsertAt(i, stss);
 		}

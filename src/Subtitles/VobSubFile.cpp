@@ -259,7 +259,7 @@ bool CVobSubFile::Copy(CVobSubFile& vsf)
 					k < packetsize - 4;
 					k += size, sizeleft -= size) {
 				int hsize = buff[0x16]+0x18 + ((buff[0x15]&0x80) ? 4 : 0);
-				size = min(sizeleft, 2048 - hsize);
+				size = std::min(sizeleft, 2048 - hsize);
 
 				if (size != sizeleft) {
 					while (vsf.m_sub.Read(buff, 2048)) {
@@ -334,7 +334,7 @@ bool CVobSubFile::Open(CString fn)
 				m_img.delay = j + 1 < sp.GetCount() ? sp[j + 1].start - sp[j].start : 3000;
 				m_img.GetPacketInfo(buff, packetsize, datasize);
 				if (j + 1 < sp.GetCount()) {
-					m_img.delay = min(m_img.delay, sp[j + 1].start - sp[j].start);
+					m_img.delay = std::min(m_img.delay, sp[j + 1].start - sp[j].start);
 				}
 
 				sp[j].stop = sp[j].start + m_img.delay;
@@ -884,9 +884,9 @@ bool CVobSubFile::ReadIfo(CString fn)
 
 		y = (y - 16) * 255 / 219;
 
-		m_orgpal[i].rgbRed = (BYTE)min(max(1.0 * y + 1.4022 * (u - 128), 0), 255);
-		m_orgpal[i].rgbGreen = (BYTE)min(max(1.0 * y - 0.3456 * (u - 128) - 0.7145 * (v - 128), 0), 255);
-		m_orgpal[i].rgbBlue = (BYTE)min(max(1.0 * y + 1.7710 * (v - 128), 0) , 255);
+		m_orgpal[i].rgbRed   = (BYTE)clamp(1.0 * y + 1.4022 * (u - 128), 0.0, 255.0);
+		m_orgpal[i].rgbGreen = (BYTE)clamp(1.0 * y - 0.3456 * (u - 128) - 0.7145 * (v - 128), 0.0, 255.0);
+		m_orgpal[i].rgbBlue  = (BYTE)clamp(1.0 * y + 1.7710 * (v - 128), 0.0, 255.0);
 	}
 
 	return true;
@@ -1128,7 +1128,7 @@ BYTE* CVobSubFile::GetPacket(int idx, int& packetsize, int& datasize, int iLang)
 		int i = 0, sizeleft = packetsize;
 		for (int size; i < packetsize; i += size, sizeleft -= size) {
 			int hsize = 0x18 + buff[0x16];
-			size = min(sizeleft, 0x800 - hsize);
+			size = std::min(sizeleft, 0x800 - hsize);
 			memcpy(&ret[i], &buff[hsize], size);
 
 			if (size != sizeleft) {
@@ -1425,8 +1425,10 @@ static void PixelAtBiLinear(RGBQUAD& c, int x, int y, CVobSubImage& src)
 	int w = src.rect.Width(),
 		h = src.rect.Height();
 
-	int x1 = (x >> 16), y1 = (y >> 16) * w,
-		x2 = min(x1 + 1, w - 1), y2 = min(y1 + w, (h - 1) * w);
+	int x1 = (x >> 16),
+		y1 = (y >> 16) * w,
+		x2 = std::min(x1 + 1, w - 1),
+		y2 = std::min(y1 + w, (h - 1) * w);
 
 	RGBQUAD* ptr = src.lpPixels;
 
@@ -1628,8 +1630,8 @@ void CVobSubSettings::SetAlignment(bool fAlign, int x, int y, int hor, int ver)
 	if (fAlign) {
 		m_org.x = MulDiv(m_size.cx, x, 100);
 		m_org.y = MulDiv(m_size.cy, y, 100);
-		m_alignhor = min(max(hor, 0), 2);
-		m_alignver = min(max(ver, 0), 2);
+		m_alignhor = clamp(hor, 0, 2);
+		m_alignver = clamp(ver, 0, 2);
 	} else {
 		m_org.x = m_x;
 		m_org.y = m_y;
@@ -1944,7 +1946,7 @@ bool CVobSubFile::SaveScenarist(CString fn)
 			}
 		}
 
-		for (ptrdiff_t y = max(m_img.rect.top + 1, 2l); y < m_img.rect.bottom - 1; y++) {
+		for (ptrdiff_t y = std::max(m_img.rect.top + 1, 2l); y < m_img.rect.bottom - 1; y++) {
 			ASSERT(m_size.cy-y-1 >= 0);
 			if (m_size.cy-y-1 < 0) {
 				break;
@@ -2174,7 +2176,7 @@ bool CVobSubFile::SaveMaestro(CString fn)
 			}
 		}
 
-		for (ptrdiff_t y = max(m_img.rect.top+1, 2); y < m_img.rect.bottom-1; y++) {
+		for (ptrdiff_t y = std::max(m_img.rect.top+1, 2l); y < m_img.rect.bottom-1; y++) {
 			ASSERT(m_size.cy-y-1 >= 0);
 			if (m_size.cy-y-1 < 0) {
 				break;

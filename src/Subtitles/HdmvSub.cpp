@@ -118,7 +118,7 @@ HRESULT CHdmvSub::ParseSample(BYTE* pData, long nLen, REFERENCE_TIME rtStart, RE
 
 		if (m_nCurSegment != NO_SEGMENT) {
 			if (m_nSegBufferPos < m_nSegSize) {
-				int nSize = min(m_nSegSize - m_nSegBufferPos, nLen);
+				int nSize = std::min(m_nSegSize - m_nSegBufferPos, (int)nLen);
 				SampleBuffer.ReadBuffer(m_pSegBuffer + m_nSegBufferPos, nSize);
 				m_nSegBufferPos += nSize;
 			}
@@ -189,10 +189,10 @@ HRESULT CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 					continue;
 				}
 
-				bbox.left	= min(pObject->m_horizontal_position, bbox.left);
-				bbox.top	= min(pObject->m_vertical_position, bbox.top);
-				bbox.right	= max(pObject->m_horizontal_position + pObject->m_width, bbox.right);
-				bbox.bottom	= max(pObject->m_vertical_position + pObject->m_height, bbox.bottom);
+				bbox.left	= std::min((LONG)pObject->m_horizontal_position, bbox.left);
+				bbox.top	= std::min((LONG)pObject->m_vertical_position, bbox.top);
+				bbox.right	= std::max((LONG)pObject->m_horizontal_position + pObject->m_width, bbox.right);
+				bbox.bottom	= std::max((LONG)pObject->m_vertical_position + pObject->m_height, bbox.bottom);
 
 				bbox.left	= bbox.left > 0 ? bbox.left : 0;
 				bbox.top	= bbox.top > 0 ? bbox.top : 0;
