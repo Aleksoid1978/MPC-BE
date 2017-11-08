@@ -357,8 +357,8 @@ static void GetMaxResolution(IDirect3D9Ex* pD3DEx, CSize& size)
 	for (UINT adp = 0, num_adp = pD3DEx->GetAdapterCount(); adp < num_adp; ++adp) {
 		D3DDISPLAYMODE d3ddm = { sizeof(d3ddm) };
 		if (SUCCEEDED(pD3DEx->GetAdapterDisplayMode(adp, &d3ddm))) {
-			cx = max(cx, d3ddm.Width);
-			cy = max(cy, d3ddm.Height);
+			cx = std::max(cx, d3ddm.Width);
+			cy = std::max(cy, d3ddm.Height);
 		}
 	}
 
@@ -595,8 +595,8 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 	}
 
 	if (m_pD3DXCreateFontW) {
-		int MinSize = 1600;
-		int CurrentSize = min(m_ScreenSize.cx, MinSize);
+		const long MinSize = 1600;
+		int CurrentSize = std::min(m_ScreenSize.cx, MinSize);
 		double Scale = double(CurrentSize) / double(MinSize);
 		m_TextScale = Scale;
 		m_pD3DXCreateFontW(m_pD3DDevEx, (int)(-24.0*Scale), (UINT)(-11.0*Scale), CurrentSize < 800 ? FW_NORMAL : FW_BOLD, 0, FALSE,
@@ -644,7 +644,7 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 		}
 	}
 
-	UINT a = max(m_nativeVideoSize.cx, m_nativeVideoSize.cy);
+	UINT a = std::max(m_nativeVideoSize.cx, m_nativeVideoSize.cy);
 	if (FAILED(hr = m_pD3DDevEx->CreateTexture(
 		a, a, 1, D3DUSAGE_RENDERTARGET, Format, D3DPOOL_DEFAULT, &m_pRotateTexture, nullptr))) {
 		return hr;
@@ -962,8 +962,8 @@ HRESULT CBaseAP::TextureResizeShader2pass(IDirect3DTexture9* pTexture, const CRe
 	if (w1 != w2 && h1 != h2) { // need two pass
 		D3DSURFACE_DESC desc;
 
-		UINT texWidth = min((UINT)w2, m_Caps.MaxTextureWidth);
-		UINT texHeight = min((UINT)m_nativeVideoSize.cy, m_Caps.MaxTextureHeight);
+		UINT texWidth = std::min((DWORD)w2, m_Caps.MaxTextureWidth);
+		UINT texHeight = std::min((DWORD)m_nativeVideoSize.cy, m_Caps.MaxTextureHeight);
 
 		if (m_pResizeTexture && m_pResizeTexture->GetLevelDesc(0, &desc) == D3D_OK) {
 			if (texWidth != desc.Width || texHeight != desc.Height) {
@@ -1198,7 +1198,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	if (m_pRefClock) {
 		m_pRefClock->GetTime(&llCurRefTime);
 	}
-	int dScanLines = max((int)m_ScreenSize.cy - m_uScanLineEnteringPaint, 0);
+	int dScanLines = std::max(m_ScreenSize.cy - (LONG)m_uScanLineEnteringPaint, 0l);
 	dSyncOffset = dScanLines * m_dDetectedScanlineTime; // ms
 	llSyncOffset = REFERENCE_TIME(10000.0 * dSyncOffset); // Reference time units (100 ns)
 	m_llEstVBlankTime = llCurRefTime + llSyncOffset; // Estimated time for the start of next vblank
@@ -1362,8 +1362,8 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			// init post-resize pixel shaders
 			bool bScreenSpacePixelShaders = m_pPixelShadersScreenSpace.GetCount() > 0;
 			if (bScreenSpacePixelShaders && (!m_pScreenSizeTextures[0] || !m_pScreenSizeTextures[1])) {
-				UINT texWidth = min((DWORD)m_ScreenSize.cx, m_Caps.MaxTextureWidth);
-				UINT texHeight = min((DWORD)m_ScreenSize.cy, m_Caps.MaxTextureHeight);
+				UINT texWidth = std::min((DWORD)m_ScreenSize.cx, m_Caps.MaxTextureWidth);
+				UINT texHeight = std::min((DWORD)m_ScreenSize.cy, m_Caps.MaxTextureHeight);
 
 				if (D3D_OK != m_pD3DDevEx->CreateTexture(
 							texWidth, texHeight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
@@ -1550,7 +1550,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	if (m_pRefClock) {
 		m_pRefClock->GetTime(&llCurRefTime);    // To check if we called Present too late to hit the right vsync
 	}
-	m_llEstVBlankTime = max(m_llEstVBlankTime, llCurRefTime); // Sometimes the real value is larger than the estimated value (but never smaller)
+	m_llEstVBlankTime = std::max(m_llEstVBlankTime, llCurRefTime); // Sometimes the real value is larger than the estimated value (but never smaller)
 	if (rd->m_iDisplayStats < 3) { // Partial on-screen statistics
 		SyncStats(m_llEstVBlankTime);    // Max of estimate and real. Sometimes Present may actually return immediately so we need the estimate as a lower bound
 	}
@@ -3359,7 +3359,7 @@ void CSyncAP::MixerThread()
 	DWORD dwUser = 0;
 
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
-	dwResolution = min(tc.wPeriodMin, tc.wPeriodMax); // hmm
+	dwResolution = std::min(tc.wPeriodMin, tc.wPeriodMax); // hmm
 	dwUser = timeBeginPeriod(dwResolution);
 
 	while (!bQuit) {
@@ -3418,7 +3418,7 @@ void CSyncAP::RenderThread()
 
 	// Set timer resolution
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
-	dwResolution = min(tc.wPeriodMin, tc.wPeriodMax); // hmm
+	dwResolution = std::min(tc.wPeriodMin, tc.wPeriodMax); // hmm
 	dwUser = timeBeginPeriod(dwResolution);
 	pNewSample = nullptr;
 

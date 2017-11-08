@@ -446,8 +446,8 @@ static void GetMaxResolution(IDirect3D9Ex* pD3DEx, CSize& size)
 	for (UINT adp = 0, num_adp = pD3DEx->GetAdapterCount(); adp < num_adp; ++adp) {
 		D3DDISPLAYMODE d3ddm = { sizeof(d3ddm) };
 		if (SUCCEEDED(pD3DEx->GetAdapterDisplayMode(adp, &d3ddm))) {
-			cx = max(cx, d3ddm.Width);
-			cy = max(cy, d3ddm.Height);
+			cx = std::max(cx, d3ddm.Width);
+			cy = std::max(cy, d3ddm.Height);
 		}
 	}
 
@@ -1012,9 +1012,9 @@ bool CDX9AllocatorPresenter::GetVBlank(int &_ScanLine, int &_bInVBlank, bool _bM
 		_bInVBlank = RasterStatus.InVBlank;
 	}
 	if (_bMeasureTime) {
-		m_VBlankMax = max(m_VBlankMax, ScanLine);
+		m_VBlankMax = std::max(m_VBlankMax, ScanLine);
 		if (ScanLine != 0 && !_bInVBlank) {
-			m_VBlankMinCalc = min(m_VBlankMinCalc, ScanLine);
+			m_VBlankMinCalc = std::min(m_VBlankMinCalc, ScanLine);
 		}
 		m_VBlankMin = m_VBlankMax - m_ScreenSize.cy;
 	}
@@ -1031,7 +1031,7 @@ bool CDX9AllocatorPresenter::GetVBlank(int &_ScanLine, int &_bInVBlank, bool _bM
 		if (Time > 5000000) { // 0.5 sec
 			DLog(L"GetVBlank too long (%f sec)", Time / 10000000.0);
 		}
-		m_RasterStatusWaitTimeMaxCalc = max(m_RasterStatusWaitTimeMaxCalc, Time);
+		m_RasterStatusWaitTimeMaxCalc = std::max(m_RasterStatusWaitTimeMaxCalc, Time);
 	}
 
 	return true;
@@ -1220,7 +1220,7 @@ int CDX9AllocatorPresenter::GetVBlackPos()
 	CRenderersSettings& rs = GetRenderersSettings();
 	BOOL bCompositionEnabled = m_bCompositionEnabled;
 
-	int WaitRange = max(m_ScreenSize.cy / 40, 5);
+	int WaitRange = std::max(m_ScreenSize.cy / 40, 5l);
 	if (!bCompositionEnabled) {
 		if (m_bAlternativeVSync) {
 			return rs.iVSyncOffset;
@@ -1821,8 +1821,8 @@ void CDX9AllocatorPresenter::DrawStats()
 	WindowRect = m_windowRect;
 
 	if (!m_pFont && m_pD3DXCreateFontW) {
-		int  FontHeight = max(m_windowRect.Height() / 35, 6); // must be equal to 5 or more
-		UINT FontWidth  = max(m_windowRect.Width() / 130, 4); // 0 = auto
+		int  FontHeight = std::max(m_windowRect.Height() / 35, 6); // must be equal to 5 or more
+		UINT FontWidth  = std::max(m_windowRect.Width() / 130, 4); // 0 = auto
 		UINT FontWeight = FW_BOLD;
 		if ((m_rcMonitor.Width() - m_windowRect.Width()) > 100) {
 			FontWeight  = FW_NORMAL;

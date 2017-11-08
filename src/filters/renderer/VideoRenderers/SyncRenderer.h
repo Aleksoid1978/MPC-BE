@@ -608,7 +608,7 @@ namespace GothSync
 
 		public:
 			MovingAverage(int size)
-				: fifoSize(max(size, MAX_FIFO_SIZE))
+				: fifoSize(std::max(size, MAX_FIFO_SIZE))
 				, oldestSample(0)
 				, sum(0)
 			{
