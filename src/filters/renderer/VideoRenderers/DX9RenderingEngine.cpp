@@ -917,7 +917,7 @@ HRESULT CDX9RenderingEngine::InitVideoTextures()
 
 	if (m_iRotation == 90 || m_iRotation == 270) {
 		if (m_pRotateTexture == nullptr) {
-			UINT a = max(m_nativeVideoSize.cx, m_nativeVideoSize.cy);
+			UINT a = std::max(m_nativeVideoSize.cx, m_nativeVideoSize.cy);
 			hr = m_pD3DDevEx->CreateTexture(
 				 a, a, 1, D3DUSAGE_RENDERTARGET, m_SurfaceFmt,
 				 D3DPOOL_DEFAULT, &m_pRotateTexture, nullptr);
@@ -937,8 +937,8 @@ HRESULT CDX9RenderingEngine::InitScreenSpaceTextures(unsigned count)
 		count = _countof(m_pScreenSpaceTextures);
 	}
 
-	m_ScreenSpaceTexWidth = min(m_ScreenSize.cx, (int)m_Caps.MaxTextureWidth);
-	m_ScreenSpaceTexHeight = min(m_ScreenSize.cy, (int)m_Caps.MaxTextureHeight);
+	m_ScreenSpaceTexWidth = std::min(m_ScreenSize.cx, (LONG)m_Caps.MaxTextureWidth);
+	m_ScreenSpaceTexHeight = std::min(m_ScreenSize.cy, (LONG)m_Caps.MaxTextureHeight);
 
 	for (unsigned i = 0; i < count; i++) {
 		if (m_pScreenSpaceTextures[i] == nullptr) {
@@ -1246,8 +1246,8 @@ HRESULT CDX9RenderingEngine::Resize(IDirect3DTexture9* pTexture, const CRect& sr
 		// two pass resize
 
 		// check intermediate texture
-		UINT texWidth = min((UINT)w2, m_Caps.MaxTextureWidth);
-		UINT texHeight = min((UINT)m_nativeVideoSize.cy, m_Caps.MaxTextureHeight);
+		UINT texWidth = std::min((DWORD)w2, m_Caps.MaxTextureWidth);
+		UINT texHeight = std::min((DWORD)m_nativeVideoSize.cy, m_Caps.MaxTextureHeight);
 		D3DSURFACE_DESC desc;
 
 		if (m_pResizeTexture && m_pResizeTexture->GetLevelDesc(0, &desc) == D3D_OK) {
