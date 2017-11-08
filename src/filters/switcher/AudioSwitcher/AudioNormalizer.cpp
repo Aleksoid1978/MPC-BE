@@ -72,7 +72,7 @@ redo:
 
 	double highest = 0.0;
 	for (k = 0; k < allsamples; k++) {
-		highest = (std::max)(highest, fabs(bufHQ[k]));
+		highest = std::max(highest, fabs(bufHQ[k]));
 	}
 
 	if (highest > 30000.0) {
@@ -134,7 +134,7 @@ int CAudioNormalizer::Process(float *samples, unsigned numsamples, unsigned nch)
 	int ret = 0;
 
 	while (numsamples > 0) {
-		const unsigned process = min(numsamples, 512);
+		const unsigned process = std::min(numsamples, 512u);
 
 		ret += ProcessInternal(samples, process, nch);
 		numsamples -= process;
