@@ -22,6 +22,8 @@
 #include "../../../DSUtil/AudioParser.h"
 #include "DTSHDFile.h"
 
+// ATSC A/103:2014 Non-Real-Time Content Delivery, Annex E: DTS-HD File Structure
+
 const uint8_t chk_FILEINFO[8] = {'F', 'I', 'L', 'E', 'I', 'N', 'F', 'O'};
 const uint8_t chk_CORESSMD[8] = {'C', 'O', 'R', 'E', 'S', 'S', 'M', 'D'};
 const uint8_t chk_EXTSS_MD[8] = {'E', 'X', 'T', 'S', 'S', '_', 'M', 'D'};
