@@ -62,8 +62,6 @@
     <Import Project="..\..\common.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>.;ThirdParty/base64;ThirdParty/tinyxml2;ThirdParty/MD5;../ZenLib;../zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
