@@ -529,10 +529,10 @@ HRESULT CCDDAStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDW
 
 	const PBYTE pbBufferOrg = pbBuffer;
 	LONGLONG pos = m_llPosition;
-	size_t len = dwBytesToRead;
+	DWORD len = dwBytesToRead;
 
 	if (pos < sizeof(m_header) && len > 0) {
-		size_t size = min(len, (size_t)(sizeof(m_header) - pos));
+		const DWORD size = std::min(len, (DWORD)(sizeof(m_header) - pos));
 		memcpy(pbBuffer, &((BYTE*)&m_header)[pos], size);
 		pbBuffer += size;
 		pos += size;
@@ -541,7 +541,7 @@ HRESULT CCDDAStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDW
 	pos -= sizeof(m_header);
 
 	if (m_buff_pos && m_buff_pos < m_buff.size()) {
-		size_t size = min(len, m_buff.size() - m_buff_pos);
+		const DWORD size = std::min(len, (DWORD)(m_buff.size() - m_buff_pos));
 		memcpy(pbBuffer, &m_buff[m_buff_pos], size);
 
 		m_buff_pos += size;
@@ -558,7 +558,7 @@ HRESULT CCDDAStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDW
 		const UINT offset = pos % RAW_SECTOR_SIZE;
 
 		// Reading 20 sectors at once seems to be a good trade-off between performance and compatibility
-		rawreadinfo.SectorCount = min(20u, m_nStopSector - sector);
+		rawreadinfo.SectorCount = std::min(20u, m_nStopSector - sector);
 
 		if (m_buff.size() != rawreadinfo.SectorCount * RAW_SECTOR_SIZE) {
 			m_buff.resize(rawreadinfo.SectorCount * RAW_SECTOR_SIZE);
@@ -571,7 +571,7 @@ HRESULT CCDDAStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDW
 							   m_buff.data(), m_buff.size(),
 							   &dwBytesReturned, 0));
 
-		const size_t size = min(min(len, dwBytesReturned - offset), size_t(m_llLength - pos));
+		const DWORD size = (DWORD)std::min((LONGLONG)std::min(len, (dwBytesReturned - offset)), m_llLength - pos);
 		memcpy(pbBuffer, &m_buff[offset], size);
 
 		pbBuffer += size;

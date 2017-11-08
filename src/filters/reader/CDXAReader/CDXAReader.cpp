@@ -334,7 +334,7 @@ HRESULT CCDXAStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDW
 			m_nBufferedSector = sector;
 		}
 
-		DWORD l = (DWORD)min(dwBytesToRead, min(RAW_DATA_SIZE - offset, m_llLength - pos));
+		DWORD l = (DWORD)std::min((LONGLONG)dwBytesToRead, std::min(RAW_DATA_SIZE - offset, m_llLength - pos));
 		memcpy(pbBuffer, &m_sector[RAW_SYNC_SIZE + RAW_HEADER_SIZE + RAW_SUBHEADER_SIZE + offset], l);
 
 		pbBuffer += l;
@@ -428,7 +428,7 @@ bool CCDXAStream::LookForMediaSubType()
 			return true;
 		} else if (*((DWORD*)&buff[0]) == 'FFIR' && *((DWORD*)&buff[8]) == ' IVA') {
 			m_llPosition = 0;
-			m_llLength = min(m_llLength, *((DWORD*)&buff[4])+8);
+			m_llLength = std::min(m_llLength, (LONGLONG)(*((DWORD*)&buff[4])+8));
 			m_nFirstSector = iSectorsRead;
 
 			m_subtype = MEDIASUBTYPE_Avi;
