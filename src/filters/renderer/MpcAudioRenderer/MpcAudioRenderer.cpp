@@ -204,7 +204,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	m_SyncMethod				= (SYNC_METHOD)AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_SyncMethod, m_SyncMethod);
 #endif
 
-	m_WASAPIMode				= min(max(m_WASAPIMode, MODE_WASAPI_EXCLUSIVE), MODE_WASAPI_SHARED);
+	m_WASAPIMode				= clamp(m_WASAPIMode, MODE_WASAPI_EXCLUSIVE, MODE_WASAPI_SHARED);
 
 	if (phr) {
 		*phr = E_FAIL;
@@ -2215,7 +2215,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 						&& rtWaitRenderTime > rtRefClock) {
 					const REFERENCE_TIME rtSilenceDuration = rtWaitRenderTime - rtRefClock;
 					const UINT32 nSilenceFrames = TimeToSamples(rtSilenceDuration, m_pWaveFormatExOutput);
-					const UINT32 nSilenceBytes  = min(nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign, nAvailableBytes - nWritenBytes);
+					const UINT32 nSilenceBytes  = std::min(nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign, nAvailableBytes - nWritenBytes);
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL
 					DLog(L"CMpcAudioRenderer::RenderWasapiBuffer() - Pad silence %.2f ms [%u/%u (frames/bytes)] for clock matching at %I64d/%I64d",
 							rtSilenceDuration / 10000.0, nSilenceFrames, nSilenceBytes, rtRefClock, rtWaitRenderTime);
@@ -2228,7 +2228,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 					}
 					nWritenBytes += nSilenceBytes;
 				} else {
-					const UINT32 nFilledBytes = min(m_CurrentPacket->GetCount(), nAvailableBytes - nWritenBytes);
+					const UINT32 nFilledBytes = std::min((UINT32)m_CurrentPacket->GetCount(), nAvailableBytes - nWritenBytes);
 					memcpy(&pData[nWritenBytes], m_CurrentPacket->GetData(), nFilledBytes);
 					if (nFilledBytes == m_CurrentPacket->GetCount()) {
 						m_CurrentPacket.Free();
@@ -2332,7 +2332,7 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCh
 		DLog(L"CMpcAudioRenderer::InitAudioClient() - DefaultDevicePeriod = %dms, MinimumDevicePeriod = %dms", int(hnsDefaultDevicePeriod / 10000), int(hnsMinimumDevicePeriod / 10000));
 		m_hnsPeriod = IsExclusive(pWaveFormatEx) ? hnsMinimumDevicePeriod : hnsDefaultDevicePeriod;
 	}
-	m_hnsPeriod = max(500000, m_hnsPeriod); // 50 ms - minimal duration of buffer, TODO - optional ???
+	m_hnsPeriod = std::max(500000ll, m_hnsPeriod); // 50 ms - minimal duration of buffer, TODO - optional ???
 
 	const AUDCLNT_SHAREMODE ShareMode = IsExclusive(pWaveFormatEx) ? AUDCLNT_SHAREMODE_EXCLUSIVE : AUDCLNT_SHAREMODE_SHARED;
 
@@ -2769,7 +2769,7 @@ inline REFERENCE_TIME CMpcAudioRenderer::GetRefClockTime()
 	if (m_pReferenceClock) {
 		m_pReferenceClock->GetTime(&rt);
 		rt -= m_rtStartTime;
-		rt = max(0, rt);
+		rt = std::max(0ll, rt);
 	}
 
 	return rt;
