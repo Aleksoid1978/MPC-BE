@@ -79,8 +79,8 @@ int av_reduce(int *dst_num, int *dst_den,
 		int64_t a2d      = x * a1.den + a0.den;
 
 		if (a2n > max || a2d > max) {
-			if (a1.num) x =        (max - a0.num) / a1.num;
-			if (a1.den) x = min(x, (max - a0.den) / a1.den);
+			if (a1.num) x =             (max - a0.num) / a1.num;
+			if (a1.den) x = std::min(x, (max - a0.den) / a1.den);
 
 			if (den * (2 * x * a1.den + a0.den) > num * a1.den)
 				a1 = { int(x * a1.num + a0.num), int(x * a1.den + a0.den) };
@@ -110,7 +110,7 @@ fraction_t av_d2q(double d, int max)
 		return { 0,0 };
 	if (fabs(d) > INT_MAX + 3LL)
 		return{ d < 0 ? -1 : 1, 0 };
-	exponent = max((int)(log(fabs(d) + 1e-20) / LOG2), 0);
+	exponent = std::max((int)(log(fabs(d) + 1e-20) / LOG2), 0);
 	den = 1LL << (61 - exponent);
 	// (int64_t)rint() and llrint() do not work with gcc on ia64 and sparc64
 	av_reduce(&a.num, &a.den, floor(d * den + 0.5), den, max);

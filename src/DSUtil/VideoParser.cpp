@@ -392,11 +392,11 @@ namespace AVCParser {
 		unsigned int mb_Height = ((unsigned int)pic_height_in_map_units_minus1 + 1) * (2 - !params.interlaced);
 		BYTE CHROMA444 = (chroma_format_idc == 3);
 
-		params.width = 16 * mb_Width - (2u >> CHROMA444) * min(crop_right, (8u << CHROMA444) - 1);
+		params.width = 16 * mb_Width - (2u >> CHROMA444) * std::min(crop_right, (8u << CHROMA444) - 1);
 		if (!params.interlaced) {
-			params.height = 16 * mb_Height - (2u >> CHROMA444) * min(crop_bottom, (8u << CHROMA444) - 1);
+			params.height = 16 * mb_Height - (2u >> CHROMA444) * std::min(crop_bottom, (8u << CHROMA444) - 1);
 		} else {
-			params.height = 16 * mb_Height - (4u >> CHROMA444) * min(crop_bottom, (8u << CHROMA444) - 1);
+			params.height = 16 * mb_Height - (4u >> CHROMA444) * std::min(crop_bottom, (8u << CHROMA444) - 1);
 		}
 
 		if (params.height < 100 || params.width < 100) {
@@ -791,7 +791,7 @@ namespace HEVCParser {
 								return false;
 							}
 						} else {
-							coef_num = min(64, 1 << (4 + (size_id << 1)));
+							coef_num = std::min(64, 1 << (4 + (size_id << 1)));
 							if (size_id > 1) {
 								gb.SExpGolombRead();
 							}
