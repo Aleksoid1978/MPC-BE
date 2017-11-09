@@ -12,15 +12,13 @@ Part B: Preparing the GCC environment
  NOTES:
   * If you installed the MSYS/MinGW package in an other directory you will have to use that path in the following steps.
 
- 1. Download and extract MSYS_MinGW-w64_GCC_720_x86-x64.7z to "C:\MSYS" -> http://mpc-be.org/MSYS/MSYS_MinGW-w64_GCC_720_x86-x64.7z
- 2. Add the following environment variables (in System Properties->Advanced->Environment Variables):
-
-    Variable          Value
-    MPCBE_MSYS        C:\MSYS
-    MPCBE_MINGW       C:\MSYS\mingw
-
-    Optional, If you want to customize the Windows SDK version used, set the variable (the default version is 8.1)
-    MPCBE_WINSDK_VER  8.1
+ 1. Download and extract "MSYS_MinGW-w64_GCC_720_x86-x64.7z" to "C:\MSYS" -> http://mpc-be.org/MSYS/MSYS_MinGW-w64_GCC_720_x86-x64.7z
+ 2. Create a file named "environments.bat" in "C:\mpc-be\" containing the following entries:
+    @ECHO OFF
+    SET "MPCBE_MSYS=C:\MSYS"
+    SET "MPCBE_MINGW=C:\MSYS\mingw"
+    REM Optional, If you want to customize the Windows SDK version used, set the variable (the default version is 8.1)
+    SET "MPCBE_WINSDK_VER=8.1"
 
 Part C: Downloading and compiling the MPC-BE source
 
