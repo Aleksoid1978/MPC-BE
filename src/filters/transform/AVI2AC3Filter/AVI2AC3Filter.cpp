@@ -141,7 +141,7 @@ HRESULT CAVI2AC3Filter::Transform(IMediaSample* pSample, IMediaSample* pOutSampl
 
 			int pos = 0;
 			while (pos < len) {
-				int curlen = min(len - pos, 2013);
+				int curlen = std::min(len - pos, 2013L);
 				pos += 2013;
 
 				CComPtr<IMediaSample> pOutSample;
@@ -391,7 +391,7 @@ HRESULT CAVI2AC3Filter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_PR
 	pAllocatorIn->GetProperties(pProperties);
 
 	pProperties->cBuffers = 2;
-	pProperties->cbBuffer = max(pProperties->cbBuffer, 1024*1024); // this should be enough...
+	pProperties->cbBuffer = std::max(pProperties->cbBuffer, 1024L*1024); // this should be enough...
 	pProperties->cbAlign = 1;
 	pProperties->cbPrefix = 0;
 
