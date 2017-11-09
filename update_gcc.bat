@@ -1,5 +1,5 @@
 @ECHO OFF
-REM (C) 2009-2015 see Authors.txt
+REM (C) 2009-2017 see Authors.txt
 REM
 REM This file is part of MPC-BE.
 REM
@@ -16,17 +16,24 @@ REM
 REM You should have received a copy of the GNU General Public License
 REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+IF DEFINED MPCBE_MINGW GOTO VarOk
+ECHO ERROR: Please define MPCBE_MINGW environment variable(s)
+ENDLOCAL
+EXIT /B
+
+:VarOk
+
 FOR /f "tokens=1,2 delims=" %%K IN (
-  '%MINGW32%\bin\gcc -dumpversion'
+  '%MPCBE_MINGW%\bin\gcc -dumpversion'
 ) DO (
   SET "gccver=%%K" & Call :SubGCCVer %%gccver:*Z=%%
 )
 
-COPY /V /Y "%MINGW32%\i686-w64-mingw32\lib\libmingwex.a" "lib\"
-COPY /V /Y "%MINGW32%\lib\gcc\i686-w64-mingw32\%gccver%\libgcc.a" "lib\"
+COPY /V /Y "%MPCBE_MINGW%\i686-w64-mingw32\lib\libmingwex.a" "lib\"
+COPY /V /Y "%MPCBE_MINGW%\lib\gcc\i686-w64-mingw32\%gccver%\libgcc.a" "lib\"
 
-COPY /V /Y "%MINGW32%\x86_64-w64-mingw32\lib\libmingwex.a" "lib64\"
-COPY /V /Y "%MINGW32%\lib\gcc\x86_64-w64-mingw32\%gccver%\libgcc.a" "lib64\"
+COPY /V /Y "%MPCBE_MINGW%\x86_64-w64-mingw32\lib\libmingwex.a" "lib64\"
+COPY /V /Y "%MPCBE_MINGW%\lib\gcc\x86_64-w64-mingw32\%gccver%\libgcc.a" "lib64\"
 
 PAUSE
 EXIT /B

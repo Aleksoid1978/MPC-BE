@@ -1,5 +1,5 @@
 @ECHO OFF
-REM (C) 2009-2016 see Authors.txt
+REM (C) 2009-2017 see Authors.txt
 REM
 REM This file is part of MPC-BE.
 REM
@@ -19,12 +19,12 @@ REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 SETLOCAL
 CD /D %~dp0
 
-IF EXIST "..\build.user.bat" (
-  CALL ..\build.user.bat
-) ELSE (
-  IF DEFINED MSYS SET MPCBE_MSYS=%MSYS%
-)
+IF DEFINED MPCBE_MSYS GOTO VarOk
+ECHO ERROR: Please define MPCBE_MSYS environment variable(s)
+ENDLOCAL
+EXIT /B
 
+:VarOk
 SET PATH=%PATH%;%MPCBE_MSYS%\bin
 
 yasm.exe %*

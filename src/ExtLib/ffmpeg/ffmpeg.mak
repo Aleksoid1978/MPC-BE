@@ -1,57 +1,58 @@
-BIN_DIR  = ../../../bin
-ZLIB_DIR = ../zlib
+BIN_DIR      = ../../../bin
+ZLIB_DIR     = ../zlib
 OPENJPEG_DIR = ../openjpeg
-SPEEX_DIR = ../speex
-SOXR_DIR = ../soxr
+SPEEX_DIR    = ../speex
+SOXR_DIR     = ../soxr
 
 ifeq ($(64BIT),yes)
-	MY_ARCH = x64
+	PLATFORM = x64
 else
-	MY_ARCH = Win32
+	PLATFORM = Win32
 endif
 
 ifeq ($(DEBUG),yes)
-	MY_DIR_PREFIX = Debug
+	CONFIGURATION = Debug
 else
-	MY_DIR_PREFIX = Release
+	CONFIGURATION = Release
 endif
 
-OBJ_DIR		= $(BIN_DIR)/obj/$(MY_DIR_PREFIX)_$(MY_ARCH)/ffmpeg/
-TARGET_LIB_DIR = $(BIN_DIR)/lib/$(MY_DIR_PREFIX)_$(MY_ARCH)
-LIB_LIBAVCODEC = $(OBJ_DIR)libavcodec.a
-LIB_LIBAVCODEC_B = $(OBJ_DIR)libavcodec_b.a
-LIB_LIBAVFILTER = $(OBJ_DIR)libavfilter.a
-LIB_LIBAVUTIL = $(OBJ_DIR)libavutil.a
+OBJ_DIR	          = $(BIN_DIR)/obj/$(CONFIGURATION)_$(PLATFORM)/ffmpeg/
+TARGET_LIB_DIR    = $(BIN_DIR)/lib/$(CONFIGURATION)_$(PLATFORM)
+LIB_LIBAVCODEC    = $(OBJ_DIR)libavcodec.a
+LIB_LIBAVCODEC_B  = $(OBJ_DIR)libavcodec_b.a
+LIB_LIBAVFILTER   = $(OBJ_DIR)libavfilter.a
+LIB_LIBAVUTIL     = $(OBJ_DIR)libavutil.a
 LIB_LIBSWRESAMPLE = $(OBJ_DIR)libswresample.a
-LIB_LIBSWSCALE = $(OBJ_DIR)libswscale.a
-TARGET_LIB	 = $(TARGET_LIB_DIR)/ffmpeg.lib
+LIB_LIBSWSCALE    = $(OBJ_DIR)libswscale.a
+TARGET_LIB        = $(TARGET_LIB_DIR)/ffmpeg.lib
+ARSCRIPT          = $(OBJ_DIR)script.ar
 
 # Compiler and yasm flags
-CFLAGS	= -I. -I.. -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I$(SPEEX_DIR) -I$(SOXR_DIR)\
-		-DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
-		-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DOPJ_STATIC \
-		-D_WIN32_WINNT=0x0600 -DWINVER=0x0600 \
-		-fomit-frame-pointer -std=gnu99 \
-		-fno-common -fno-ident -mthreads
+CFLAGS = -I. -I.. -I$(ZLIB_DIR) -I$(OPENJPEG_DIR) -I$(SPEEX_DIR) -I$(SOXR_DIR)\
+	   -DHAVE_AV_CONFIG_H -D_ISOC99_SOURCE -D_XOPEN_SOURCE=600 \
+	   -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DOPJ_STATIC \
+	   -D_WIN32_WINNT=0x0600 -DWINVER=0x0600 \
+	   -fomit-frame-pointer -std=gnu99 \
+	   -fno-common -fno-ident -mthreads
 YASMFLAGS = -I. -Pconfig.asm
 
 ifeq ($(64BIT),yes)
-	FFMPEG_PREFIX = x86_64-w64-mingw32-
-	TARGET_OS	 = x86_64-w64-mingw32
-	CFLAGS		+= -DWIN64 -D_WIN64 -DARCH_X86_64 -DPIC
-	OPTFLAGS	 = -m64 -fno-leading-underscore
-	YASMFLAGS	+= -f win32 -m amd64 -DWIN64=1 -DARCH_X86_32=0 -DARCH_X86_64=1 -DPIC
+	GCC_PREFIX  = x86_64-w64-mingw32-
+	TARGET_OS   = x86_64-w64-mingw32
+	CFLAGS     += -DWIN64 -D_WIN64 -DARCH_X86_64 -DPIC
+	OPTFLAGS    = -m64 -fno-leading-underscore
+	YASMFLAGS  += -f win32 -m amd64 -DWIN64=1 -DARCH_X86_32=0 -DARCH_X86_64=1 -DPIC
 else
-	TARGET_OS	 = i686-w64-mingw32
-	CFLAGS		+= -DWIN32 -D_WIN32 -DARCH_X86_32
-	OPTFLAGS	 = -m32 -march=i686 -msse -msse2 -mfpmath=sse -mstackrealign
-	YASMFLAGS	+= -f win32 -m x86 -DWIN32=1 -DARCH_X86_32=1 -DARCH_X86_64=0 -DPREFIX
+	TARGET_OS   = i686-w64-mingw32
+	CFLAGS     += -DWIN32 -D_WIN32 -DARCH_X86_32
+	OPTFLAGS    = -m32 -march=i686 -msse -msse2 -mfpmath=sse -mstackrealign
+	YASMFLAGS  += -f win32 -m x86 -DWIN32=1 -DARCH_X86_32=1 -DARCH_X86_64=0 -DPREFIX
 endif
 
 ifeq ($(DEBUG),yes)
-	CFLAGS		+= -DDEBUG -D_DEBUG -g -Og
+	CFLAGS     += -DDEBUG -D_DEBUG -g -Og
 else
-	CFLAGS		+= -DNDEBUG -UDEBUG -U_DEBUG -O3 -fno-tree-vectorize
+	CFLAGS     += -DNDEBUG -UDEBUG -U_DEBUG -O3 -fno-tree-vectorize
 endif
 
 # Object directories
@@ -70,15 +71,15 @@ OBJ_DIRS = $(OBJ_DIR) \
 	$(TARGET_LIB_DIR)
 
 # Targets
-all: make_objdirs $(LIB_LIBAVCODEC) $(LIB_LIBAVCODEC_B) $(LIB_LIBAVFILTER) $(LIB_LIBSWSCALE) $(LIB_LIBAVUTIL) $(LIB_LIBSWRESAMPLE)
+all: make_objdirs $(LIB_LIBAVCODEC) $(LIB_LIBAVCODEC_B) $(LIB_LIBAVFILTER) $(LIB_LIBAVUTIL) $(LIB_LIBSWRESAMPLE) $(LIB_LIBSWSCALE) $(TARGET_LIB)
 
 make_objdirs: $(OBJ_DIRS)
 $(OBJ_DIRS):
 	$(shell test -d $(@) || mkdir -p $(@))
 
 clean:
-	rm -f $(TARGET_LIB)
-	rm -rf $(OBJ_DIR)
+	@rm -f $(TARGET_LIB)
+	@rm -rf $(OBJ_DIR)
 
 # Objects
 SRCS_LC = \
@@ -805,7 +806,7 @@ OBJS_LS = \
 # Commands
 $(OBJ_DIR)%.o: %.c
 	@echo $<
-	@$(FFMPEG_PREFIX)gcc -c $(CFLAGS) $(OPTFLAGS) -MMD -Wno-deprecated-declarations -Wno-pointer-to-int-cast -o $@ $<
+	@$(GCC_PREFIX)gcc -c $(CFLAGS) $(OPTFLAGS) -MMD -Wno-deprecated-declarations -Wno-pointer-to-int-cast -o $@ $<
 
 $(OBJ_DIR)%.o: %.asm
 	@echo $<
@@ -813,27 +814,40 @@ $(OBJ_DIR)%.o: %.asm
 
 $(LIB_LIBAVCODEC): $(OBJS_LC)
 	@echo $@
-	@$(FFMPEG_PREFIX)ar rc $@ $(OBJS_LC)
+	@$(GCC_PREFIX)ar rc $@ $(OBJS_LC)
 
 $(LIB_LIBAVCODEC_B): $(OBJS_LC_B)
 	@echo $@
-	@$(FFMPEG_PREFIX)ar rc $@ $(OBJS_LC_B)
+	@$(GCC_PREFIX)ar rc $@ $(OBJS_LC_B)
 
 $(LIB_LIBAVFILTER): $(OBJS_LF)
 	@echo $@
-	@$(FFMPEG_PREFIX)ar rc $@ $(OBJS_LF)
+	@$(GCC_PREFIX)ar rc $@ $(OBJS_LF)
 
 $(LIB_LIBAVUTIL): $(OBJS_LU)
 	@echo $@
-	@$(FFMPEG_PREFIX)ar rc $@ $(OBJS_LU)
+	@$(GCC_PREFIX)ar rc $@ $(OBJS_LU)
 
 $(LIB_LIBSWSCALE): $(OBJS_LS)
 	@echo $@
-	@$(FFMPEG_PREFIX)ar rc $@ $(OBJS_LS)
+	@$(GCC_PREFIX)ar rc $@ $(OBJS_LS)
 
 $(LIB_LIBSWRESAMPLE): $(OBJS_LR)
 	@echo $@
-	@$(FFMPEG_PREFIX)ar rc $@ $(OBJS_LR)
+	@$(GCC_PREFIX)ar rc $@ $(OBJS_LR)
+
+$(TARGET_LIB): $(LIB_LIBAVCODEC) $(LIB_LIBAVCODEC_B) $(LIB_LIBAVFILTER) $(LIB_LIBAVUTIL) $(LIB_LIBSWRESAMPLE) $(LIB_LIBSWSCALE)
+	@rm -f $(ARSCRIPT)
+	@echo "CREATE $@"                   >> $(ARSCRIPT)
+	@echo "ADDLIB $(LIB_LIBAVCODEC)"    >> $(ARSCRIPT)
+	@echo "ADDLIB $(LIB_LIBAVCODEC_B)"  >> $(ARSCRIPT)
+	@echo "ADDLIB $(LIB_LIBAVFILTER)"   >> $(ARSCRIPT)
+	@echo "ADDLIB $(LIB_LIBSWSCALE)"    >> $(ARSCRIPT)
+	@echo "ADDLIB $(LIB_LIBAVUTIL)"     >> $(ARSCRIPT)
+	@echo "ADDLIB $(LIB_LIBSWRESAMPLE)" >> $(ARSCRIPT)
+	@echo "SAVE"                        >> $(ARSCRIPT)
+	@echo "END"                         >> $(ARSCRIPT)
+	@$(GCC_PREFIX)ar -M < $(ARSCRIPT)
 
 -include $(SRCS_LC:%.c=$(OBJ_DIR)%.d)
 -include $(SRCS_LC_B:%.c=$(OBJ_DIR)%.d)
