@@ -18,6 +18,9 @@ REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 PUSHD %~dp0
 
+where /q fxc.exe
+IF %ERRORLEVEL% EQU 0 goto fxc_Ok
+
 IF NOT DEFINED VS150COMNTOOLS (
   FOR /F "tokens=2*" %%A IN (
     'REG QUERY "HKLM\SOFTWARE\Microsoft\VisualStudio\SxS\VS7" /v "15.0" 2^>NUL ^| FIND "REG_SZ" ^|^|
@@ -40,6 +43,8 @@ IF NOT DEFINED VCVARS (
 )
 
 CALL "%VCVARS%" x86 > nul
+
+:fxc_Ok
 
 CALL :SubColorText "0A" "=== Compiling downscaler shaders ===" & ECHO.
 fxc /nologo /T ps_3_0 /Fo "..\..\bin\shaders\downscaler_simple_x.cso" "Resizers\downscaler_simple.hlsl" /DAXIS=0
