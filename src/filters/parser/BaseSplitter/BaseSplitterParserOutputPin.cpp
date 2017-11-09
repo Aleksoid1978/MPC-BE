@@ -609,7 +609,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseHEVC(CAutoPtr<CPacket> p)
 	if (start <= end - 4) {
 		if (start > base) {
 			m_ParseContext.state64 = 0;
-			nBufferPos = max(0, nBufferPos - (start - base));
+			nBufferPos = std::max(0, nBufferPos - (int)(start - base));
 		}
 
 		for (;;) {

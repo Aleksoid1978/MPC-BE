@@ -150,7 +150,7 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt,
 		struct {
 			DWORD x, y;
 		} ar[] = {{h.width, h.height}, {4, 3}, {16, 9}, {221, 100}, {h.width, h.height}};
-		int i = min(max(h.ar, 1), 5) - 1;
+		int i = clamp((int)h.ar, 1, 5) - 1;
 		h.arx = ar[i].x;
 		h.ary = ar[i].y;
 
@@ -449,11 +449,11 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 	}
 
 	BYTE buffer[64] = { 0 };
-	ByteRead(buffer, min(len, 64));
+	ByteRead(buffer, std::min(len, 64));
 
 	BYTE extra[64] = { 0 };
 	unsigned int extralen = 0;
-	if (!ParseAACLatmHeader(buffer, min(len, 64), h.samplerate, h.channels, extra, extralen)) {
+	if (!ParseAACLatmHeader(buffer, std::min(len, 64), h.samplerate, h.channels, extra, extralen)) {
 		return false;
 	}
 
@@ -639,7 +639,7 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 			h.surmixlev = BitRead(2);
 		}
 		h.lfeon = BitRead(1);
-		h.sr_shift = max(h.bsid, 8) - 8;
+		h.sr_shift = std::max(h.bsid, 8ui8) - 8;
 	} else {
 		/* Enhanced AC-3 */
 		e_ac3 = true;
