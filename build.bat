@@ -67,6 +67,8 @@ REM pre-build checks
 
 IF NOT EXIST "include\version_rev.h" CALL "update_version.bat"
 
+IF EXIST "environments.bat" CALL "environments.bat"
+
 IF NOT DEFINED MPCBE_MINGW GOTO MissingVar
 IF NOT DEFINED MPCBE_MSYS  GOTO MissingVar
 

@@ -16,12 +16,10 @@ REM
 REM You should have received a copy of the GNU General Public License
 REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SETLOCAL
-CD /D %~dp0
+IF EXIST "%~dp0..\environments.bat" CALL "%~dp0..\environments.bat"
 
 IF DEFINED MPCBE_MSYS GOTO VarOk
 ECHO ERROR: Please define MPCBE_MSYS environment variable(s)
-ENDLOCAL
 EXIT /B
 
 :VarOk
