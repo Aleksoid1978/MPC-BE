@@ -108,7 +108,7 @@ bool CMpeg2DecSettingsWnd::OnActivate()
 	p.y += h25;
 
 	{
-		int h = max(21, m_fontheight); // special size for sliders
+		int h = std::max(21, m_fontheight); // special size for sliders
 		static const WCHAR* labels[] = {m_strBrightness, m_strContrast, m_strHue, m_strSaturation};
 		for (int i = 0; i < _countof(m_procamp_slider); i++) {
 			m_procamp_static[i].Create(labels[i], WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(80), m_fontheight)), this);
