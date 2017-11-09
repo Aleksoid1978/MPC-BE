@@ -311,7 +311,7 @@ LONGLONG CShoutcastStream::GetBufferFullness()
 		return 0;
 	}
 	LONGLONG ret = 100i64*(m_queue.GetDuration()) / AVGBUFFERLENGTH;
-	return min(ret, 100);
+	return std::min(ret, 100LL);
 }
 
 CString CShoutcastStream::GetTitle()
@@ -399,7 +399,7 @@ HRESULT CShoutcastStream::FillBuffer(IMediaSample* pSample)
 		ASSERT(!m_queue.IsEmpty());
 		if (!m_queue.IsEmpty()) {
 			CAutoPtr<CShoutCastPacket> p = m_queue.RemoveHead();
-			DWORD len = min((DWORD)pSample->GetSize(), p->GetCount());
+			long len = std::min(pSample->GetSize(), (long)p->GetCount());
 			memcpy(pData, p->GetData(), len);
 			pSample->SetActualDataLength(len);
 			pSample->SetTime(&p->rtStart, &p->rtStop);
@@ -491,7 +491,7 @@ UINT CShoutcastStream::SocketThreadProc()
 	CShoutcastSocket soc;
 
 	CAutoVectorPtr<BYTE> pData;
-	size_t nSize = max(m_socket.m_metaint, MAXFRAMESIZE);
+	int nSize = std::max((int)m_socket.m_metaint, MAXFRAMESIZE);
 	if (!pData.Allocate(nSize) || !soc.Create()) {
 		return 1;
 	}

@@ -425,7 +425,7 @@ HRESULT CFLICStream::FillBuffer(IMediaSample* pSample)
 				ExtractFrame(++m_nLastFrameNum);
 			}
 
-			for (int y = 0, p = min(pitchIn, pitchOut);
+			for (int y = 0, p = std::min(pitchIn, pitchOut);
 					y < h;
 					y++, pDataIn += pitchIn, pDataOut += pitchOut) {
 				BYTE* src = pDataIn;
@@ -524,7 +524,7 @@ void CFLICStream::SeekToNearestKeyFrame(int nFrame)
 		m_nLastFrameNum = -1;
 	}
 
-	for (int i = m_nLastFrameNum+1, j = min((int)m_frames.GetCount(), nFrame); i < j; i++) {
+	for (int i = m_nLastFrameNum+1, j = std::min((int)m_frames.GetCount(), nFrame); i < j; i++) {
 		FLIC_FRAME_ENTRY& ffe = m_frames[i];
 		if (ffe.fKeyframe) {
 			m_nLastFrameNum = i-1;
