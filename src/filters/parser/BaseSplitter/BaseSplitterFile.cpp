@@ -269,7 +269,7 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, int len)
 	BYTE* pCache = m_pCache;
 
 	if (m_cachepos <= m_pos && m_pos < m_cachepos + m_cachelen) {
-		int minlen = min(len, m_cachelen - (int)(m_pos - m_cachepos));
+		int minlen = std::min(len, m_cachelen - (int)(m_pos - m_cachepos));
 
 		memcpy(pData, &pCache[m_pos - m_cachepos], minlen);
 
@@ -290,9 +290,9 @@ HRESULT CBaseSplitterFile::Read(BYTE* pData, int len)
 	}
 
 	while (len > 0) {
-		__int64 tmplen = IsStreaming() ? m_cachetotal: m_available - m_pos;
-		int maxlen = min(tmplen, m_cachetotal);
-		int minlen = min(len, maxlen);
+		const __int64 tmplen = IsStreaming() ? m_cachetotal: m_available - m_pos;
+		int maxlen = (int)std::min(tmplen, (__int64)m_cachetotal);
+		int minlen = std::min(len, maxlen);
 		if (minlen <= 0) {
 			Exit(S_FALSE);
 		}
