@@ -247,7 +247,7 @@ CSubtitleStream::CSubtitleStream(const WCHAR* wfn, CSubtitleSource* pParent, HRE
 
 	m_rtDuration = 0;
 	for (size_t i = 0, cnt = m_rts.GetCount(); i < cnt; i++) {
-		m_rtDuration = max(m_rtDuration, 10000i64*m_rts[i].end);
+		m_rtDuration = std::max(m_rtDuration.GetUnits(), 10000i64*m_rts[i].end);
 	}
 
 	m_rtStop = m_rtDuration;
@@ -487,7 +487,7 @@ HRESULT CSubtitleStream::FillBuffer(IMediaSample* pSample)
 				}
 				DWORD* p = (DWORD*)(pData + spd.pitch*y);
 				for (int x = 0; x < spd.w; x+=32, p+=32) {
-					memsetd(p, (x&32) ? c1 : c2, min(spd.w-x,32)*4);
+					memsetd(p, (x&32) ? c1 : c2, std::min(spd.w-x, 32) * 4);
 				}
 			}
 

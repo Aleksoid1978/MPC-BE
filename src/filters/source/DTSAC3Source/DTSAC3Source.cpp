@@ -219,7 +219,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 				deepsearch = true; // deep search for specific extensions only
 			}
 
-			UINT buflen = min(64 * 1024, (UINT)(m_dataEnd - m_dataStart));
+			UINT buflen = (UINT)std::min(64ll * 1024, m_dataEnd - m_dataStart);
 			buflen -= (UINT)(m_dataStart % 4096); // tiny optimization
 			BYTE* buffer = DNew BYTE[buflen];
 
@@ -382,7 +382,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		}
 		// MLP
 		else if (m_streamtype == MLP && ParseMLPHeader(buf, &aframe)) {
-			m_framesize   = max(aframe.size, 1024);
+			m_framesize   = std::max(aframe.size, 1024);
 			m_samplerate  = aframe.samplerate;
 			m_channels    = aframe.channels;
 			m_framelength = aframe.samples;
