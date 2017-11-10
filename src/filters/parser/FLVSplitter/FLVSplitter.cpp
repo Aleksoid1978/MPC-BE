@@ -401,10 +401,10 @@ bool CFLVSplitterFilter::Sync(__int64& pos)
 
 			if (i > 22) {
 				UINT32 lsize2 = AV_RB32(resync_buffer + j1 - 4);
-				if (lsize2 >= 11 && lsize2 + 8LL < min(i, RESYNC_BUFFER_SIZE)) {
+				if (lsize2 >= 11 && lsize2 + 8LL < std::min(i, (UINT32)RESYNC_BUFFER_SIZE)) {
 					UINT32  size2 = AV_RB24(resync_buffer + j1 - lsize2 + 1 - 4);
 					UINT32 lsize1 = AV_RB32(resync_buffer + j1 - lsize2 - 8);
-					if (lsize1 >= 11 && lsize1 + 8LL + lsize2 < min(i, RESYNC_BUFFER_SIZE)) {
+					if (lsize1 >= 11 && lsize1 + 8LL + lsize2 < std::min(i, (UINT32)RESYNC_BUFFER_SIZE)) {
 						UINT32 size1 = AV_RB24(resync_buffer + j1 - lsize1 + 1 - lsize2 - 8);
 						if (size1 == lsize1 - 11 && size2  == lsize2 - 11) {
 							pos = pos + i - lsize1 - lsize2 - 8 - 4;
@@ -1172,7 +1172,7 @@ bool CFLVSplitterFilter::DemuxInit()
 	SetThreadName((DWORD)-1, "CFLVSplitterFilter");
 
 	if (m_pFile->IsRandomAccess()) {
-		__int64 pos = max(m_DataOffset, m_pFile->GetAvailable() - 256 * KILOBYTE);
+		__int64 pos = std::max((__int64)m_DataOffset, m_pFile->GetAvailable() - 256 * KILOBYTE);
 
 		if (Sync(pos)) {
 			Tag t;
@@ -1189,7 +1189,7 @@ bool CFLVSplitterFilter::DemuxInit()
 				}
 
 				if ((t.TagType == FLV_AUDIODATA && ReadTag(at)) || (t.TagType == FLV_VIDEODATA && ReadTag(vt))) {
-					m_rtDuration = max(m_rtDuration, 10000i64 * t.TimeStamp + pOutPin->GetOffset());
+					m_rtDuration = std::max(m_rtDuration, 10000i64 * t.TimeStamp + pOutPin->GetOffset());
 				}
 
 				m_pFile->Seek(next);
