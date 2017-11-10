@@ -193,7 +193,7 @@ bool CMpaSplitterFilter::DemuxLoop()
 
 		CAutoPtr<CPacket> p(DNew CPacket());
 
-		FrameSize = min(FrameSize, m_pFile->GetRemaining());
+		FrameSize = (int)std::min((__int64)FrameSize, m_pFile->GetRemaining());
 		p->SetCount(FrameSize);
 		m_pFile->ByteRead(p->GetData(), FrameSize);
 

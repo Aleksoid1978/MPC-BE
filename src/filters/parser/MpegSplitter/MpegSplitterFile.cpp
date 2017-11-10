@@ -162,10 +162,10 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	if (IsRandomAccess()) {
 		const __int64 len = GetLength();
 
-		__int64 stop = min(10 * MEGABYTE, len);
+		__int64 stop = std::min(10LL * MEGABYTE, len);
 		__int64 steps = 20;
 		if (IsURL()) {
-			stop = min(2 * MEGABYTE, len);
+			stop = std::min(2LL * MEGABYTE, len);
 			steps = 2;
 		}
 
@@ -174,24 +174,24 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 
 		const int step_size = 512 * KILOBYTE;
 
-		int num = min(steps, (len - stop) / step_size);
+		int num = std::min(steps, (len - stop) / step_size);
 		if (num > 0) {
 			__int64 step = (len - stop) / num;
 			for (int i = 0; i < num; i++) {
 				stop += step;
-				const __int64 start = stop - min(step_size, step);
+				const __int64 start = stop - std::min((__int64)step_size, step);
 				SearchPrograms(start, stop);
 				SearchStreams(start, stop);
 			}
 		}
 	} else {
 		__int64 stop = GetAvailable();
-		const __int64 hi = IsStreaming() ? MEGABYTE : min(MEGABYTE, GetLength());
-		const __int64 lo = IsStreaming() ? 64 * KILOBYTE : min(64 * KILOBYTE, GetLength());
+		const __int64 hi = IsStreaming() ? MEGABYTE : std::min((__int64)MEGABYTE, GetLength());
+		const __int64 lo = IsStreaming() ? 64 * KILOBYTE : std::min(64LL * KILOBYTE, GetLength());
 		stop = clamp(stop, lo, hi);
 		SearchPrograms(0, stop);
 
-		stop = IsStreaming() ? 5 * MEGABYTE : min(10 * MEGABYTE, GetLength());
+		stop = IsStreaming() ? 5 * MEGABYTE : std::min(10LL * MEGABYTE, GetLength());
 		SearchStreams(0, stop, 2000);
 	}
 
@@ -1458,7 +1458,7 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 			}
 
 			const int packet_len = h.bytes - h2.hdr_size;
-			const int max_len    = min(packet_len, h2.section_length);
+			const int max_len    = std::min(packet_len, h2.section_length);
 
 			if (max_len > 0) {
 				ProgramData = &m_ProgramData[h.pid];
@@ -1472,7 +1472,7 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 		}
 	} else if (ProgramData && !ProgramData->pData.IsEmpty()) {
 		const size_t data_len = ProgramData->pData.GetCount();
-		const size_t max_len  = min((size_t)h.bytes, ProgramData->section_length - data_len);
+		const size_t max_len  = std::min((size_t)h.bytes, ProgramData->section_length - data_len);
 
 		ProgramData->pData.SetCount(data_len + max_len);
 		ByteRead(ProgramData->pData.GetData() + data_len, max_len);
@@ -2833,7 +2833,7 @@ bool CMpegSplitterFile::ReadTR(trhdr& h, bool fSync)
 				i += 6;
 			}
 
-			h.length = min(h.length, h.bytes-1);
+			h.length = (BYTE)std::min((int)h.length, h.bytes-1);
 			for (; i < h.length; i++) {
 				BitRead(8);
 			}
