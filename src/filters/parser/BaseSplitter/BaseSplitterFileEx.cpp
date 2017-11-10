@@ -1244,6 +1244,7 @@ bool CBaseSplitterFileEx::Read(teletextsubhdr& h, int len, CMediaType* pmt, LPCS
 	return false;
 }
 
+#define IS_SPS(nalu) (nalu == NALU_TYPE_SPS || nalu == NALU_TYPE_SUBSET_SPS)
 bool CBaseSplitterFileEx::Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
 {
 	NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
@@ -1278,7 +1279,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pm
 
 	Nalu.SetBuffer(pData.GetData(), pData.GetCount());
 	nalu_type = NALU_TYPE_UNKNOWN;
-	while (!(nalu_type == NALU_TYPE_SPS || nalu_type == NALU_TYPE_SUBSET_SPS)
+	while (!IS_SPS(nalu_type)
 			&& Nalu.ReadNext()) {
 		nalu_type = Nalu.GetType();
 	}
@@ -1298,8 +1299,8 @@ bool CBaseSplitterFileEx::Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pm
 			CSize aspect(params.width * params.sar.num, params.height * params.sar.den);
 			ReduceDim(aspect);
 
-			BYTE* extradata  = nullptr;
-			size_t extrasize = 0;
+
+			std::vector<BYTE> nalu_data[2];
 
 			{
 				int sps_present = 0;
@@ -1313,7 +1314,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pm
 						case NALU_TYPE_SPS:
 						case NALU_TYPE_SUBSET_SPS:
 						case NALU_TYPE_PPS:
-							if (nalu_type == NALU_TYPE_SPS || nalu_type == NALU_TYPE_SUBSET_SPS) {
+							if (IS_SPS(nalu_type)) {
 								if (sps_present) continue;
 								sps_present++;
 							} else if (nalu_type == NALU_TYPE_PPS) {
@@ -1321,28 +1322,25 @@ bool CBaseSplitterFileEx::Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pm
 								pps_present++;
 							}
 
-							BYTE* new_extradata = (BYTE*)realloc(extradata, extrasize + Nalu.GetLength());
-							ASSERT(new_extradata);
-							if (new_extradata) {
-								extradata = new_extradata;
-								if ((nalu_type == NALU_TYPE_SPS || nalu_type == NALU_TYPE_SUBSET_SPS) && pps_present) {
-									memmove(extradata + Nalu.GetLength(), extradata, extrasize);
-									memcpy(extradata, Nalu.GetNALBuffer(), Nalu.GetLength());
-									extrasize += Nalu.GetLength();
-								} else {
-									memcpy(extradata + extrasize, Nalu.GetNALBuffer(), Nalu.GetLength());
-									extrasize += Nalu.GetLength();
-								}
-							}
+							auto& data = nalu_data[IS_SPS(nalu_type) ? 0 : 1];
+							data.resize(Nalu.GetLength());
+							memcpy(data.data(), Nalu.GetNALBuffer(), Nalu.GetLength());
 					}
 				}
 			}
 
-			CreateMPEG2VISimple(pmt, &bmi, params.AvgTimePerFrame, aspect, extradata, extrasize, params.profile, params.level, 4);
+			std::vector<BYTE> extradata;
+			for (const auto& data : nalu_data) {
+				if (data.empty()) {
+					continue;
+				}
+
+				extradata.insert(extradata.end(), data.begin(), data.end());
+			}
+
+			CreateMPEG2VISimple(pmt, &bmi, params.AvgTimePerFrame, aspect, extradata.data(), extradata.size(), params.profile, params.level, 4);
 			pmt->SetTemporalCompression(TRUE);
 			pmt->SetVariableSize();
-
-			free(extradata);
 		}
 
 		return true;
@@ -1445,8 +1443,7 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, CAtlArray<BYTE>& pData, CMediaType* p
 			CSize aspect(params.width * params.sar.num, params.height * params.sar.den);
 			ReduceDim(aspect);
 
-			BYTE* extradata  = nullptr;
-			size_t extrasize = 0;
+			std::vector<BYTE> nalu_data[3];
 
 			{
 				int vps_present = 0;
@@ -1475,13 +1472,9 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, CAtlArray<BYTE>& pData, CMediaType* p
 								pps_present++;
 							}
 
-							BYTE* new_extradata = (BYTE*)realloc(extradata, extrasize + Nalu.GetLength());
-							ASSERT(new_extradata);
-							if (new_extradata) {
-								extradata = new_extradata;
-								memcpy(extradata + extrasize, Nalu.GetNALBuffer(), Nalu.GetLength());
-								extrasize += Nalu.GetLength();
-							}
+							auto& data = nalu_data[nalu_type - NALU_TYPE_HEVC_VPS];
+							data.resize(Nalu.GetLength());
+							memcpy(data.data(), Nalu.GetNALBuffer(), Nalu.GetLength());
 					}
 				}
 			}
@@ -1493,11 +1486,18 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, CAtlArray<BYTE>& pData, CMediaType* p
 				AvgTimePerFrame = (REFERENCE_TIME)(10000000.0 * params.vui_timing.num_units_in_tick / params.vui_timing.time_scale);
 			}
 
-			CreateMPEG2VISimple(pmt, &bmi, AvgTimePerFrame, aspect, extradata, extrasize, params.profile, params.level, params.nal_length_size);
+			std::vector<BYTE> extradata;
+			for (const auto& data : nalu_data) {
+				if (data.empty()) {
+					continue;
+				}
+
+				extradata.insert(extradata.end(), data.begin(), data.end());
+			}
+
+			CreateMPEG2VISimple(pmt, &bmi, AvgTimePerFrame, aspect, extradata.data(), extradata.size(), params.profile, params.level, params.nal_length_size);
 			pmt->SetTemporalCompression(TRUE);
 			pmt->SetVariableSize();
-
-			free(extradata);
 		}
 
 		return true;
