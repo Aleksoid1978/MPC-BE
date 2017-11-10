@@ -1220,7 +1220,7 @@ int CDX9AllocatorPresenter::GetVBlackPos()
 	CRenderersSettings& rs = GetRenderersSettings();
 	BOOL bCompositionEnabled = m_bCompositionEnabled;
 
-	int WaitRange = std::max(m_ScreenSize.cy / 40, 5l);
+	int WaitRange = std::max(m_ScreenSize.cy / 40, 5L);
 	if (!bCompositionEnabled) {
 		if (m_bAlternativeVSync) {
 			return rs.iVSyncOffset;

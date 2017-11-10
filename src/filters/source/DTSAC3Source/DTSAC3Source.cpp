@@ -219,7 +219,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 				deepsearch = true; // deep search for specific extensions only
 			}
 
-			UINT buflen = (UINT)std::min(64ll * 1024, m_dataEnd - m_dataStart);
+			UINT buflen = (UINT)std::min(64LL * 1024, m_dataEnd - m_dataStart);
 			buflen -= (UINT)(m_dataStart % 4096); // tiny optimization
 			BYTE* buffer = DNew BYTE[buflen];
 

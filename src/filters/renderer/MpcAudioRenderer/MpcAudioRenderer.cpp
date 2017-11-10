@@ -2332,7 +2332,7 @@ HRESULT CMpcAudioRenderer::InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCh
 		DLog(L"CMpcAudioRenderer::InitAudioClient() - DefaultDevicePeriod = %dms, MinimumDevicePeriod = %dms", int(hnsDefaultDevicePeriod / 10000), int(hnsMinimumDevicePeriod / 10000));
 		m_hnsPeriod = IsExclusive(pWaveFormatEx) ? hnsMinimumDevicePeriod : hnsDefaultDevicePeriod;
 	}
-	m_hnsPeriod = std::max(500000ll, m_hnsPeriod); // 50 ms - minimal duration of buffer, TODO - optional ???
+	m_hnsPeriod = std::max(500000LL, m_hnsPeriod); // 50 ms - minimal duration of buffer, TODO - optional ???
 
 	const AUDCLNT_SHAREMODE ShareMode = IsExclusive(pWaveFormatEx) ? AUDCLNT_SHAREMODE_EXCLUSIVE : AUDCLNT_SHAREMODE_SHARED;
 
@@ -2769,7 +2769,7 @@ inline REFERENCE_TIME CMpcAudioRenderer::GetRefClockTime()
 	if (m_pReferenceClock) {
 		m_pReferenceClock->GetTime(&rt);
 		rt -= m_rtStartTime;
-		rt = std::max(0ll, rt);
+		rt = std::max(0LL, rt);
 	}
 
 	return rt;

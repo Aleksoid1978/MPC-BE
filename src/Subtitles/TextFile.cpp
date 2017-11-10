@@ -173,7 +173,7 @@ ULONGLONG CTextFile::Seek(LONGLONG lOff, UINT nFrom)
 				break;
 		}
 
-		lOff = clamp(lOff, 0ll, len);
+		lOff = clamp(lOff, 0LL, len);
 
 		m_posInBuffer += lOff - pos;
 		if (m_posInBuffer < 0 || m_posInBuffer >= m_nInBuffer) {

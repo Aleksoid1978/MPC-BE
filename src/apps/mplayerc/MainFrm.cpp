@@ -9942,7 +9942,7 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 	args.RemoveHeadNoReturn();								// desc / name
 	swscanf_s(args.RemoveHead(), L"%I64d", &rtStart);		// pos
 	swscanf_s(args.RemoveHead(), L"%d", &bRelativeDrive);	// relative drive
-	rtStart = max(rtStart, 0ll);
+	rtStart = max(rtStart, 0LL);
 
 	m_nAudioTrackStored    = -1;
 	m_nSubtitleTrackStored = -1;

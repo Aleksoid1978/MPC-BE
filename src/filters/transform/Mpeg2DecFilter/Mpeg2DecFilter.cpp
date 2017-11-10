@@ -1926,6 +1926,8 @@ bool CSubpicInputPin::dvdspu::Parse()
 		m_offsets.AddTail(o); // is it always going to be sorted?
 	} while (i <= next && i < packetsize);
 
+#undef GetWORD
+
 	return true;
 }
 
