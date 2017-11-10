@@ -64,7 +64,7 @@ HRESULT CWave64File::Open(CBaseSplitterFile* pFile)
 			|| memcmp(data+24, w64_guid_wave, 16) != 0) {
 		return E_FAIL;
 	}
-	__int64 end = min((__int64)*(LONGLONG*)(data + 16), m_pFile->GetLength());
+	__int64 end = std::min((__int64)*(LONGLONG*)(data + 16), m_pFile->GetLength());
 
 	chunk64_t Chunk64;
 
@@ -82,7 +82,7 @@ HRESULT CWave64File::Open(CBaseSplitterFile* pFile)
 				DLog(L"CWave64File::Open() : bad format");
 				return E_FAIL;
 			}
-			m_fmtsize = max(Chunk64.size, sizeof(WAVEFORMATEX)); // PCMWAVEFORMAT to WAVEFORMATEX
+			m_fmtsize = std::max(Chunk64.size, (__int64)sizeof(WAVEFORMATEX)); // PCMWAVEFORMAT to WAVEFORMATEX
 			m_fmtdata = DNew BYTE[m_fmtsize];
 			memset(m_fmtdata, 0, m_fmtsize);
 			if (m_pFile->ByteRead(m_fmtdata, Chunk64.size) != S_OK) {
@@ -92,7 +92,7 @@ HRESULT CWave64File::Open(CBaseSplitterFile* pFile)
 		}
 		else if (memcmp(Chunk64.guid, w64_guid_data, 16) == 0) {
 			m_startpos	= m_pFile->GetPos();
-			m_length	= min(Chunk64.size, m_pFile->GetLength() - m_startpos);
+			m_length	= std::min(Chunk64.size, m_pFile->GetLength() - m_startpos);
 		}
 		else if (memcmp(Chunk64.guid, w64_guid_list, 16) != 0
 				&& memcmp(Chunk64.guid, w64_guid_fact, 16) != 0

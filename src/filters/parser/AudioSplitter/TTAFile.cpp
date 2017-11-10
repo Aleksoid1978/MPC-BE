@@ -125,7 +125,7 @@ HRESULT CTTAFile::Open(CBaseSplitterFile* pFile)
 	}
 
 	m_startpos = m_pFile->GetPos();
-	m_endpos   = min(m_index[m_totalframes - 1], m_pFile->GetLength());
+	m_endpos   = std::min(m_index[m_totalframes - 1], m_pFile->GetLength());
 
 	const __int64 file_size = m_pFile->GetLength();
 	if (m_endpos + APE_TAG_FOOTER_BYTES < file_size) {
