@@ -1130,7 +1130,7 @@ HRESULT CFormatConverter::convert_nv12_yv12_direct_sse4(const uint8_t* const src
   const ptrdiff_t outChromaStride = dstStride[1];
   const ptrdiff_t chromaHeight = (height >> 1);
 
-  const ptrdiff_t stride = min(FFALIGN(width, 64), min(inStride, outStride));
+  const ptrdiff_t stride = std::min((ptrdiff_t)FFALIGN(width, 64), std::min(inStride, outStride));
 
   __m128i xmm0, xmm1, xmm2, xmm3, xmm4, xmm5, xmm7;
   xmm7 = _mm_set1_epi16(0x00FF);
@@ -1221,7 +1221,7 @@ HRESULT CFormatConverter::plane_copy_sse2(const uint8_t* const src[4], const ptr
   const SW_OUT_FMT& swof = s_sw_formats[m_out_pixfmt];
 
   const int widthBytes = width * swof.codedbytes;
-  const int planes = max(swof.planes, 1);
+  const int planes = std::max(swof.planes, 1);
 
   ptrdiff_t line, plane;
 
@@ -1255,7 +1255,7 @@ HRESULT CFormatConverter::plane_copy_direct_sse4(const uint8_t* const src[4], co
   const ptrdiff_t chromaHeight = (height >> 1);
 
   const ptrdiff_t byteWidth    = (m_out_pixfmt == PixFmt_P010 || m_out_pixfmt == PixFmt_P016) ? width << 1 : width;
-  const ptrdiff_t stride       = min(FFALIGN(byteWidth, 64), min(inStride, outStride));
+  const ptrdiff_t stride       = std::min(FFALIGN(byteWidth, 64), std::min(inStride, outStride));
 
   __m128i xmm0,xmm1,xmm2,xmm3;
 
@@ -1767,7 +1767,7 @@ HRESULT CFormatConverter::convert_yuv_rgb(const uint8_t* const src[4], const ptr
   }
 
   BOOL bYCgCo = m_FProps.colorspace == AVCOL_SPC_YCGCO;
-  int shift = max(m_FProps.lumabits - 8, 0);
+  int shift = std::max(m_FProps.lumabits - 8, 0);
   ASSERT(shift >= 0 && shift <= 8);
 
   const int outFmt = 1; // RGB32
@@ -1941,7 +1941,7 @@ const RGBCoeffs* CFormatConverter::getRGBCoeffs(int width, int height)
     ug_mul = (cspOptionsRGBrange / chr_range) * (1.0 - Kb) * Kb / Kg;
     vg_mul = (cspOptionsRGBrange / chr_range) * (1.0 - Kr) * Kr / Kg;
     ub_mul = (cspOptionsRGBrange / chr_range) * (1.0 - Kb);
-    short sub = min(outputBlack, inputBlack);
+    short sub = std::min(outputBlack, inputBlack);
     short Ysub = inputBlack - sub;
     short RGB_add1 = outputBlack - sub;
 

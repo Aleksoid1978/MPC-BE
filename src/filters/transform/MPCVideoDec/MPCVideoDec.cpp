@@ -1052,7 +1052,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_nSwRGBLevels				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
 #endif
 
-	m_nDXVACheckCompatibility = max(0, min(m_nDXVACheckCompatibility, 3));
+	m_nDXVACheckCompatibility = clamp(m_nDXVACheckCompatibility, 0, 3);
 
 	if (m_nDeinterlacing > PROGRESSIVE) {
 		m_nDeinterlacing = AUTO;
@@ -2344,7 +2344,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 					break;
 				}
 
-				UINT numSurfaces = max(m_DXVA2Config.ConfigMinRenderTargetBuffCount, 1);
+				UINT numSurfaces = std::max(m_DXVA2Config.ConfigMinRenderTargetBuffCount, 1ui16);
 				LPDIRECT3DSURFACE9 pSurfaces[DXVA2_MAX_SURFACES] = { 0 };
 				hr = pDXVA2Service->CreateSurface(
 						m_nSurfaceWidth,
@@ -3023,8 +3023,12 @@ HRESULT CMPCVideoDecFilter::ChangeOutputMediaFormat(int nType)
 void CMPCVideoDecFilter::SetThreadCount()
 {
 	if (m_pAVCtx) {
-		int nThreadNumber = m_nThreadNumber ? m_nThreadNumber : CPUInfo::GetProcessorNumber() * 3/2;
-		m_pAVCtx->thread_count = max(1, min((IsDXVASupported() || m_nCodecId == AV_CODEC_ID_MPEG4) ? 1 : nThreadNumber, MAX_AUTO_THREADS));
+		if (IsDXVASupported() || m_nCodecId == AV_CODEC_ID_MPEG4) {
+			m_pAVCtx->thread_count = 1;
+		} else {
+			int nThreadNumber = (m_nThreadNumber > 0) ? m_nThreadNumber : CPUInfo::GetProcessorNumber() * 3 / 2;
+			m_pAVCtx->thread_count = clamp(nThreadNumber, 1, MAX_AUTO_THREADS);
+		}
 	}
 }
 

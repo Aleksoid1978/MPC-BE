@@ -22,6 +22,7 @@
 #include <moreuuids.h>
 #include "FormatConverter.h"
 #include "../../../DSUtil/CPUInfo.h"
+#include "../../../DSUtil/Utils.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4005)
@@ -198,7 +199,7 @@ CFormatConverter::CFormatConverter()
 	m_FProps.colorspace	= AVCOL_SPC_UNSPECIFIED;
 	m_FProps.colorrange	= AVCOL_RANGE_UNSPECIFIED;
 
-	m_NumThreads		= min(8, max(1, CPUInfo::GetProcessorNumber() / 2));
+	m_NumThreads		= clamp(CPUInfo::GetProcessorNumber() / 2, 1uL, 8uL);
 }
 
 CFormatConverter::~CFormatConverter()

@@ -99,7 +99,7 @@ public:
   }
 
   void Consume(size_t count) {
-    m_nConsumed += min(count, GetBufferSize());
+    m_nConsumed += std::min(count, GetBufferSize());
   }
 
   void Clear() {
