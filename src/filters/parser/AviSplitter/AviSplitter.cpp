@@ -477,7 +477,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				mt.subtype = FOURCCMap(pwfe->wFormatTag);
 			}
 			mt.formattype = FORMAT_WaveFormatEx;
-			if (nullptr == mt.AllocFormatBuffer(max((ULONG)s->strf.GetCount(), sizeof(WAVEFORMATEX)))) {
+			if (nullptr == mt.AllocFormatBuffer(std::max(s->strf.GetCount(), sizeof(WAVEFORMATEX)))) {
 				continue;
 			}
 			memcpy(mt.Format(), s->strf.GetData(), s->strf.GetCount());
@@ -533,7 +533,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			mt.majortype = MEDIATYPE_Interleaved;
 			mt.subtype = FOURCCMap(s->strh.fccHandler);
 			mt.formattype = FORMAT_DvInfo;
-			mt.SetFormat(s->strf.GetData(), max((ULONG)s->strf.GetCount(), sizeof(DVINFO)));
+			mt.SetFormat(s->strf.GetData(), std::max((ULONG)s->strf.GetCount(), (ULONG)sizeof(DVINFO)));
 			mt.SetSampleSize(s->strh.dwSuggestedBufferSize > 0
 							 ? s->strh.dwSuggestedBufferSize*3/2
 							 : (1024*1024));
@@ -671,7 +671,7 @@ HRESULT CAviSplitterFilter::ReIndex(__int64 end, UINT64& Size, DWORD TrackNumber
 					s->totalsize = Size;
 
 					REFERENCE_TIME rt	= s->GetRefTime((DWORD)s->cs.GetCount()-1, Size);
-					m_rtDuration		= max(rt, m_rtDuration);
+					m_rtDuration		= std::max(rt, m_rtDuration);
 				}
 			}
 
@@ -801,7 +801,7 @@ bool CAviSplitterFilter::DemuxLoop()
 					(p->rtStart - m_rtStart) / 10000, (p->rtStop - m_rtStart) / 10000,
 					size);
 #endif
-			m_maxTimeStamp = max(m_maxTimeStamp, p->rtStart);
+			m_maxTimeStamp = std::max(m_maxTimeStamp, p->rtStart);
 
 			hr = DeliverPacket(p);
 

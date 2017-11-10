@@ -142,7 +142,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 			}
 
 			if (m_isamv) {
-				size = (DWORD)(min(end, DWORD_MAX) - GetPos() - 8);    // No size set in AVM : guess end of file...
+				size = (DWORD)(std::min(end, (__int64)DWORD_MAX) - GetPos() - 8); // No size set in AVM : guess end of file...
 			}
 			size += (size&1) + 8;
 
@@ -167,7 +167,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 
 			DWORD cur_pos = GetPos();
 			if (cur_pos < end) {
-				size = min(size, end - cur_pos);
+				size = (DWORD)std::min((__int64)size, end - cur_pos);
 			} else if (cur_pos + size > end) {
 				return E_FAIL; // broken chunk
 			}
@@ -347,7 +347,7 @@ REFERENCE_TIME CAviFile::GetTotalTime()
 			BITMAPINFOHEADER* pbmi = &((BITMAPINFO*)s->strf.GetData())->bmiHeader;
 			if (pbmi->biCompression != FCC('DXSB') && pbmi->biCompression != FCC('DXSA')) { // skip XSUB subtitle
 				REFERENCE_TIME t = s->GetRefTime((DWORD)s->cs.GetCount(), s->totalsize);
-				total = max(total, t);
+				total = std::max(total, t);
 			}
 		}
 	}
@@ -358,7 +358,7 @@ REFERENCE_TIME CAviFile::GetTotalTime()
 			strm_t* s = m_strms[i];
 			if (s->strh.fccType == FCC('auds') || s->strh.fccType == FCC('amva')) {
 				REFERENCE_TIME t = s->GetRefTime((DWORD)s->cs.GetCount(), s->totalsize);
-				total = max(total, t);
+				total = std::max(total, t);
 			}
 		}
 	}
