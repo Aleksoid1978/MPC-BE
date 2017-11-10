@@ -259,7 +259,7 @@ HRESULT CTAKFile::Open(CBaseSplitterFile* pFile)
 		int size				= m_pFile->BitRead(24);
 		BSWAP24(size);
 
-		m_startpos				= min(m_pFile->GetPos() + size, m_pFile->GetLength());
+		m_startpos				= std::min(m_pFile->GetPos() + size, m_pFile->GetLength());
 
 		BYTE* buffer			= nullptr;
 
@@ -405,13 +405,13 @@ REFERENCE_TIME CTAKFile::Seek(REFERENCE_TIME rt)
 				if (direction <= 0 && CurFrmNum > FrameNumber) {
 					direction = -1;
 					end = start;
-					start = max(m_startpos, start - BACKSTEP);
+					start = std::max(m_startpos, start - BACKSTEP);
 					pos = start;
 					continue;
 				}
 				if (direction >= 0 && CurFrmNum < FrameNumber) {
 					direction = +1;
-					pos = min(end, pos + 32 * (FrameNumber - CurFrmNum));
+					pos = std::min(end, pos + 32 * (FrameNumber - CurFrmNum));
 					continue;
 				}
 				break; // CurFrmNum == FrameNumber or direction changed
@@ -420,7 +420,7 @@ REFERENCE_TIME CTAKFile::Seek(REFERENCE_TIME rt)
 		pos++;
 		if (pos == end && direction == -1) {
 			end = start;
-			start = max(m_startpos, start - BACKSTEP);
+			start = std::max(m_startpos, start - BACKSTEP);
 			pos = start;
 		}
 	}
@@ -445,7 +445,7 @@ int CTAKFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 	bool syncfound = false;
 
 	while (!syncfound) {
-		int len = (int)min(1024, m_endpos - m_pFile->GetPos());
+		int len = (int)std::min(1024LL, m_endpos - m_pFile->GetPos());
 
 		if (len <= 0 || size + len >= _countof(buffer) || m_pFile->ByteRead(buffer + size, len) != S_OK) {
 			break;

@@ -253,7 +253,7 @@ HRESULT CDFFFile::Open(CBaseSplitterFile* pFile)
 		return E_FAIL;
 	}
 
-	__int64 end = min((__int64)Chunk.size + 12, m_pFile->GetLength());
+	__int64 end = std::min((__int64)Chunk.size + 12, m_pFile->GetLength());
 
 	m_samplerate = 0;
 	m_channels = 1;
@@ -481,7 +481,7 @@ int CDFFFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 		return 0;
 	}
 
-	int size = min(m_max_blocksize, m_endpos - m_pFile->GetPos());
+	int size = (int)std::min((__int64)m_max_blocksize, m_endpos - m_pFile->GetPos());
 	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->GetData(), size) != S_OK) {
 		return 0;
 	}

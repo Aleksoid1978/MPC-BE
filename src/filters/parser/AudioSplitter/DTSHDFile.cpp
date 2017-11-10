@@ -178,7 +178,7 @@ int CDTSHDFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 		return 0;
 	}
 
-	int size = (int)min(1024, m_endpos - m_pFile->GetPos());
+	int size = (int)std::min(1024LL, m_endpos - m_pFile->GetPos());
 
 	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->GetData(), size) != S_OK) {
 		return 0;

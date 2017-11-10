@@ -220,7 +220,7 @@ int CDSFFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 		return 0;
 	}
 
-	int size = min(m_block_size, m_endpos - m_pFile->GetPos());
+	int size = (int)std::min((__int64)m_block_size, m_endpos - m_pFile->GetPos());
 	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->GetData(), size) != S_OK) {
 		return 0;
 	}

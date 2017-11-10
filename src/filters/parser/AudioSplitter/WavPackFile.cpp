@@ -321,7 +321,7 @@ HRESULT CWavPackFile::Open(CBaseSplitterFile* pFile)
 			}
 		}
 
-		m_pFile->Seek(max(m_startpos + WV_HEADER_SIZE, m_endpos - WV_BLOCK_LIMIT));
+		m_pFile->Seek(std::max(m_startpos + WV_HEADER_SIZE, m_endpos - WV_BLOCK_LIMIT));
 
 		wv_header_t wv_header;
 		uint8_t block_header[WV_HEADER_SIZE];
@@ -399,13 +399,13 @@ REFERENCE_TIME CWavPackFile::Seek(REFERENCE_TIME rt)
 				if (direction <= 0 && wv_header.block_idx > BlockIndex) {
 					direction = -1;
 					end = start;
-					start = max(m_startpos, start - BACKSTEP);
+					start = std::max(m_startpos, start - BACKSTEP);
 					pos = start;
 					continue;
 				}
 				if (direction >= 0 && (wv_header.block_idx + wv_header.samples) < BlockIndex) {
 					direction = +1;
-					pos = min(end, pos + WV_HEADER_SIZE + wv_header.blocksize);
+					pos = std::min(end, pos + WV_HEADER_SIZE + wv_header.blocksize);
 					continue;
 				}
 				CurBlockIdx = wv_header.block_idx;
@@ -415,7 +415,7 @@ REFERENCE_TIME CWavPackFile::Seek(REFERENCE_TIME rt)
 		pos++;
 		if (pos == end && direction == -1) {
 			end = start;
-			start = max(m_startpos, start - BACKSTEP);
+			start = std::max(m_startpos, start - BACKSTEP);
 			pos = start;
 		}
 	}

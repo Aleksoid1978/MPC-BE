@@ -99,7 +99,7 @@ bool CWAVFile::ProcessWAVEFORMATEX()
 	m_nAvgBytesPerSec	= wfe->nAvgBytesPerSec;
 	m_nBlockAlign		= wfe->nBlockAlign;
 
-	m_blocksize			= max(m_nBlockAlign, m_nAvgBytesPerSec / 16); // 62.5 ms
+	m_blocksize			= std::max((DWORD)m_nBlockAlign, m_nAvgBytesPerSec / 16); // 62.5 ms
 	m_blocksize			-= m_blocksize % m_nBlockAlign;
 
 	return true;
@@ -119,7 +119,7 @@ bool CWAVFile::CheckDTSAC3CD()
 		return false;
 	}
 
-	size_t buflen = min(64 * 1024, m_length);
+	size_t buflen = std::min(64LL * 1024, m_length);
 	BYTE* buffer = DNew BYTE[buflen];
 
 	m_pFile->Seek(m_startpos);
@@ -221,7 +221,7 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 			|| GETDWORD(data+8) != FCC('WAVE')) {
 		return E_FAIL;
 	}
-	__int64 end = min((__int64)GETDWORD(data + 4) + 8, m_pFile->GetLength());
+	__int64 end = std::min((__int64)GETDWORD(data + 4) + 8, m_pFile->GetLength());
 
 	chunk_t Chunk;
 
@@ -240,7 +240,7 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 				DLog(L"CWAVFile::Open() : bad format");
 				return E_FAIL;
 			}
-			m_fmtsize = max(Chunk.size, sizeof(WAVEFORMATEX)); // PCMWAVEFORMAT to WAVEFORMATEX
+			m_fmtsize = std::max(Chunk.size, (DWORD)sizeof(WAVEFORMATEX)); // PCMWAVEFORMAT to WAVEFORMATEX
 			m_fmtdata = DNew BYTE[m_fmtsize];
 			memset(m_fmtdata, 0, m_fmtsize);
 			if (m_pFile->ByteRead(m_fmtdata, Chunk.size) != S_OK) {
@@ -254,7 +254,7 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 				return E_FAIL;
 			}
 			m_startpos	= pos;
-			m_length	= min(Chunk.size, m_pFile->GetLength() - m_startpos);
+			m_length	= std::min((__int64)Chunk.size, m_pFile->GetLength() - m_startpos);
 			if (!m_pFile->IsRandomAccess()) {
 				goto stop;
 			}
@@ -342,7 +342,7 @@ int CWAVFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 		return 0;
 	}
 
-	int size = min(m_blocksize, m_endpos - m_pFile->GetPos());
+	int size = (int)std::min((__int64)m_blocksize, m_endpos - m_pFile->GetPos());
 	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->GetData(), size) != S_OK) {
 		return 0;
 	}
