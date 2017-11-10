@@ -164,7 +164,7 @@ HRESULT CMpaSplitterFile::Init()
 	__int64 startpos = 0;
 
 	const __int64 limit = IsRandomAccess() ? MEGABYTE : 64 * KILOBYTE;
-	const __int64 endDataPos = min(endpos / 2, limit + m_startpos);
+	const __int64 endDataPos = std::min(endpos / 2, limit + m_startpos);
 	const __int64 size = endDataPos - m_startpos;
 	BYTE* buffer = DNew BYTE[size];
 
@@ -332,7 +332,7 @@ bool CMpaSplitterFile::Sync(int limit/* = DEF_SYNC_SIZE*/)
 
 bool CMpaSplitterFile::Sync(int& FrameSize, REFERENCE_TIME& rtDuration, int limit/* = DEF_SYNC_SIZE*/, BOOL bExtraCheck/* = FALSE*/)
 {
-	__int64 endpos = min(GetLength(), GetPos() + limit);
+	__int64 endpos = std::min(GetLength(), GetPos() + limit);
 
 	if (m_mode == mode::mpa) {
 		while (GetPos() <= endpos - MPA_HEADER_SIZE) {

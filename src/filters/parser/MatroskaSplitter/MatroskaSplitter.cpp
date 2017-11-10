@@ -1438,7 +1438,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										}
 
 										REFERENCE_TIME rt = s.GetRefTime((INT64)c.TimeCode + bg->Block.TimeCode) + duration;
-										rtDur = max(rtDur, rt);
+										rtDur = std::max(rtDur, rt);
 									}
 								}
 							} while (pBlock->NextBlock());
@@ -1451,7 +1451,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_pBlock.Free();
 
 		if (rtDur != INVALID_TIME) {
-			m_rtDuration = min(m_rtDuration, rtDur);
+			m_rtDuration = std::min(m_rtDuration, rtDur);
 		}
 	}
 
