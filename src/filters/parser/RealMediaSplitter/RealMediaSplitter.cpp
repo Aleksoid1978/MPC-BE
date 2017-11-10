@@ -252,7 +252,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		CAtlArray<CMediaType> mts;
 
 		CMediaType mt;
-		mt.SetSampleSize(max(pmp->maxPacketSize*16/**/, 1));
+		mt.SetSampleSize(std::max(pmp->maxPacketSize*16, 1u));
 
 		if (pmp->mime == "video/x-pn-realvideo") {
 			mt.majortype = MEDIATYPE_Video;
@@ -520,7 +520,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CRealMediaSplitterOutputPin(mts, name, this, this, &hr));
 		if (SUCCEEDED(AddOutputPin((DWORD)pmp->stream, pPinOut))) {
 			if (!m_rtStop) {
-				m_pFile->m_p.tDuration = max(m_pFile->m_p.tDuration, pmp->tDuration);
+				m_pFile->m_p.tDuration = std::max(m_pFile->m_p.tDuration, pmp->tDuration);
 			}
 		}
 	}
@@ -592,7 +592,7 @@ bool CRealMediaSplitterFilter::DemuxInit()
 				}
 
 				if (mph.stream == stream) {
-					m_rtDuration = max((__int64)(10000i64*mph.tStart), m_rtDuration);
+					m_rtDuration = std::max((__int64)(10000i64*mph.tStart), m_rtDuration);
 
 					if (mph.flags&MediaPacketHeader::PN_KEYFRAME_FLAG && tLastStart != mph.tStart) {
 						CAutoPtr<IndexRecord> pir(DNew IndexRecord);
@@ -857,7 +857,7 @@ HRESULT CRealMediaSplitterOutputPin::DeliverSegments()
 	POSITION pos = m_segments.GetHeadPosition();
 	while (pos) {
 		const segment* s = m_segments.GetNext(pos);
-		len = max(len, s->offset + s->data.GetCount());
+		len = std::max(len, s->offset + (DWORD)s->data.GetCount());
 		total += s->data.GetCount();
 	}
 	ASSERT(len == total);
@@ -943,10 +943,8 @@ HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 					pIn++; //BYTE subseq = (*pIn++)&0x7f;
 				}
 
-#define GetWORD(var) \
-					var = (var<<8)|(*pIn++); \
-					var = (var<<8)|(*pIn++); \
- 
+#define GetWORD(var) var = (var<<8)|(*pIn++); var = (var<<8)|(*pIn++);
+
 				GetWORD(packetlen);
 				if (packetlen & 0x8000) {
 					m_segments.fMerged = true;
@@ -977,7 +975,7 @@ HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 				pIn++; //BYTE seqnum = *pIn++;
 			}
 
-			int len2 = min(len - (pIn - pInOrg), int(packetlen - packetoffset));
+			int len2 = std::min(len - (int)(pIn - pInOrg), (int)packetlen - (int)packetoffset);
 			if (len2 <= 0) {
 				return E_FAIL;
 			}
@@ -1123,7 +1121,7 @@ HRESULT CRMFile::Read(MediaPacketHeader& mph, bool fFull)
 	len -= FIELD_OFFSET(MediaPacketHeader, flags);
 	len -= sizeof(flags);
 	ASSERT(len >= 0);
-	len = max(len, 0);
+	len = std::max(len, 0L);
 
 	if (fFull) {
 		mph.pData.SetCount(len);
@@ -1556,10 +1554,8 @@ void CRMFile::GetDimensions()
 						p++;
 					}
 
-#define GetWORD(var) \
-						var = (var<<8)|(*p++); \
-						var = (var<<8)|(*p++); \
- 
+#define GetWORD(var) var = (var<<8)|(*p++); var = (var<<8)|(*p++);
+
 					GetWORD(packetlen);
 					if ((packetlen&0x4000) == 0) {
 						GetWORD(packetlen);
@@ -1587,7 +1583,7 @@ void CRMFile::GetDimensions()
 					p++;
 				}
 
-				len = min(len - (p - p0), int(packetlen - packetoffset));
+				len = std::min(len - (int)(p - p0), (int)packetlen - (int)packetoffset);
 
 				if (len > 0) {
 					bool repeat_field;
@@ -2258,7 +2254,7 @@ HRESULT CRealAudioDecoder::InitRA(const CMediaType* pmt)
 
 		initdata.bpframe = m_rai.sub_packet_size;
 		initdata.packetsize = m_rai.coded_frame_size;
-		initdata.extralen = min((pmt->Format() + pmt->FormatLength()) - (p + 4), (LONG)*(DWORD*)p);
+		initdata.extralen = std::min(DWORD(pmt->Format() + pmt->FormatLength() - (p + 4)), *(DWORD*)p);
 		initdata.extra = p + 4;
 	}
 
