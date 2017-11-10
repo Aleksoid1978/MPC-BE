@@ -898,8 +898,8 @@ HRESULT CMusePackOutputPin::DecideBufferSize(IMemAllocator *pAlloc, ALLOCATOR_PR
 	ASSERT(pProp);
 	HRESULT hr = S_OK;
 
-	pProp->cBuffers = max(buffers, 1);
-	pProp->cbBuffer = max(m_mt.lSampleSize, 1);
+	pProp->cBuffers = std::max(buffers, 1);
+	pProp->cbBuffer = std::max(m_mt.lSampleSize, 1uL);
 	ALLOCATOR_PROPERTIES Actual;
 	hr = pAlloc->SetProperties(pProp, &Actual);
 	if (FAILED(hr)) {

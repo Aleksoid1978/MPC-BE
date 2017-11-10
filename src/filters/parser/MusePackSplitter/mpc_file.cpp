@@ -574,7 +574,7 @@ int CMPCPacket::Load_SV7(CMusePackReader *reader, int &bits_to_skip, bool only_p
 	Release();
 
 	reader->GetPosition(&cur, &av);
-	int ret = reader->ReadSwapped(temp, min(sizeof(temp), (av-cur)));
+	int ret = reader->ReadSwapped(temp, std::min((__int64)sizeof(temp), (av-cur)));
 	if (ret < 0) {
 		return 0;
 	}

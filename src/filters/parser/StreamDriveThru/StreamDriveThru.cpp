@@ -163,7 +163,7 @@ DWORD CStreamDriveThruFilter::ThreadProc()
 								break;
 							}
 
-							LONG size = (LONG)min(PACKETSIZE, total - m_position);
+							LONG size = (LONG)std::min((LONGLONG)PACKETSIZE, total - m_position);
 							if (FAILED(pAsyncReader->SyncRead(m_position, size, buff))) {
 								cmd = CMD_STOP;
 								break;
