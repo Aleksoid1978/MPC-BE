@@ -1946,7 +1946,7 @@ bool CVobSubFile::SaveScenarist(CString fn)
 			}
 		}
 
-		for (ptrdiff_t y = std::max(m_img.rect.top + 1, 2l); y < m_img.rect.bottom - 1; y++) {
+		for (LONG y = std::max(m_img.rect.top + 1, 2L); y < m_img.rect.bottom - 1; y++) {
 			ASSERT(m_size.cy-y-1 >= 0);
 			if (m_size.cy-y-1 < 0) {
 				break;
@@ -1954,7 +1954,7 @@ bool CVobSubFile::SaveScenarist(CString fn)
 
 			DWORD* p = (DWORD*)&m_img.lpPixels[(y-m_img.rect.top)*m_img.rect.Width()+1];
 
-			for (ptrdiff_t x = m_img.rect.left+1; x < m_img.rect.right-1; x++, p++) {
+			for (LONG x = m_img.rect.left+1; x < m_img.rect.right-1; x++, p++) {
 				DWORD rgb = *p&0xffffff;
 				BYTE c = rgb == 0x0000ff ? 0 : rgb == 0xff0000 ? 1 : rgb == 0x000000 ? 2 : 3;
 				BYTE& c4bpp = p4bpp[(m_size.cy-y-1)*360+(x>>1)];
@@ -2176,7 +2176,7 @@ bool CVobSubFile::SaveMaestro(CString fn)
 			}
 		}
 
-		for (ptrdiff_t y = std::max(m_img.rect.top+1, 2l); y < m_img.rect.bottom-1; y++) {
+		for (LONG y = std::max(m_img.rect.top+1, 2L); y < m_img.rect.bottom-1; y++) {
 			ASSERT(m_size.cy-y-1 >= 0);
 			if (m_size.cy-y-1 < 0) {
 				break;
@@ -2184,7 +2184,7 @@ bool CVobSubFile::SaveMaestro(CString fn)
 
 			DWORD* p = (DWORD*)&m_img.lpPixels[(y-m_img.rect.top)*m_img.rect.Width()+1];
 
-			for (ptrdiff_t x = m_img.rect.left+1; x < m_img.rect.right-1; x++, p++) {
+			for (LONG x = m_img.rect.left+1; x < m_img.rect.right-1; x++, p++) {
 				DWORD rgb = *p&0xffffff;
 				BYTE c = rgb == 0x0000ff ? 0 : rgb == 0xff0000 ? 1 : rgb == 0x000000 ? 2 : 3;
 				BYTE& c4bpp = p4bpp[(m_size.cy-y-1)*360+(x>>1)];

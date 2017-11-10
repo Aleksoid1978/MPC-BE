@@ -327,7 +327,7 @@ HRESULT CVTSStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDWO
 			break;
 		}
 
-		int size = std::min(2048 - m_off, (int)std::min(len, 2048ul));
+		int size = std::min(2048 - m_off, (int)std::min(len, 2048uL));
 
 		memcpy(ptr, &buff[m_off], size);
 

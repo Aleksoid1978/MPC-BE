@@ -125,7 +125,7 @@ void CPlayerSeekBar::SetPos(const REFERENCE_TIME pos)
 
 	if (HasDuration() && AfxGetAppSettings().fUseWin7TaskBar) {
 		if (m_pMainFrame->m_pTaskbarList) {
-			VERIFY(S_OK == m_pMainFrame->m_pTaskbarList->SetProgressValue(m_pMainFrame->m_hWnd, max(pos, 1ll), m_stop));
+			VERIFY(S_OK == m_pMainFrame->m_pTaskbarList->SetProgressValue(m_pMainFrame->m_hWnd, max(pos, 1LL), m_stop));
 		}
 	}
 }

@@ -1198,7 +1198,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 	if (m_pRefClock) {
 		m_pRefClock->GetTime(&llCurRefTime);
 	}
-	int dScanLines = std::max(m_ScreenSize.cy - (LONG)m_uScanLineEnteringPaint, 0l);
+	int dScanLines = std::max(m_ScreenSize.cy - (LONG)m_uScanLineEnteringPaint, 0L);
 	dSyncOffset = dScanLines * m_dDetectedScanlineTime; // ms
 	llSyncOffset = REFERENCE_TIME(10000.0 * dSyncOffset); // Reference time units (100 ns)
 	m_llEstVBlankTime = llCurRefTime + llSyncOffset; // Estimated time for the start of next vblank

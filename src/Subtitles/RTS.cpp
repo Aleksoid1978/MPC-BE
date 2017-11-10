@@ -154,8 +154,8 @@ void CWord::Paint(const CPoint& p, const CPoint& org)
 				}
 
 				if (m_style.borderStyle == 0 && (m_style.outlineWidthX + m_style.outlineWidthY > 0)) {
-					int rx = std::max(1l, std::lround(m_style.outlineWidthX));
-					int ry = std::max(1l, std::lround(m_style.outlineWidthY));
+					int rx = std::max(1L, std::lround(m_style.outlineWidthX));
+					int ry = std::max(1L, std::lround(m_style.outlineWidthY));
 
 					if (!m_pEllipse || m_pEllipse->GetXRadius() != rx || m_pEllipse->GetYRadius() != ry) {
 						CEllipseKey ellipseKey(rx, ry);
@@ -2750,10 +2750,10 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 		// Account for the user trying to fool the renderer by setting negative margins
 		CRect clipRect = m_vidrect;
 		if (marginRect.left < 0) {
-			clipRect.left = std::max(0l, clipRect.left + marginRect.left);
+			clipRect.left = std::max(0L, clipRect.left + marginRect.left);
 		}
 		if (marginRect.top < 0) {
-			clipRect.top = std::max(0l, clipRect.top + marginRect.top);
+			clipRect.top = std::max(0L, clipRect.top + marginRect.top);
 		}
 		if (marginRect.right < 0) {
 			clipRect.right = std::min(m_size.cx, clipRect.right - marginRect.right);
