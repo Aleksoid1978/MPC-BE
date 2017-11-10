@@ -111,12 +111,12 @@ public:
 		} else {
 			p += m_pos>>3;
 			off = m_pos&7;
-			ret = (*p++>>off)&((1<<min(cnt,8))-1);
+			ret = (*p++>>off)&((1<<std::min(cnt, 8))-1);
 			off = 0;
 			cnt -= 8 - off;
 		}
 		while (cnt > 0) {
-			ret |= (*p++&((1<<min(cnt,8))-1)) << off;
+			ret |= (*p++&((1<<std::min(cnt, 8))-1)) << off;
 			off += 8;
 			cnt -= 8;
 		}
@@ -400,7 +400,7 @@ start:
 
 	// get max pts to calculate duration
 	if (m_pFile->IsRandomAccess()) {
-		m_pFile->Seek(max(m_pFile->GetLength() - MAX_PAGE_SIZE, 0));
+		m_pFile->Seek(std::max(m_pFile->GetLength() - MAX_PAGE_SIZE, 0LL));
 
 		OggPage page2;
 		while (m_pFile->Read(page2)) {
@@ -409,7 +409,7 @@ start:
 				continue;
 			}
 			REFERENCE_TIME rt = pOggPin->GetRefTime(page2.m_hdr.granule_position);
-			m_rtDuration = max(rt, m_rtDuration);
+			m_rtDuration = std::max(rt, m_rtDuration);
 		}
 
 		// get min pts to calculate duration
@@ -430,8 +430,8 @@ start:
 			}
 		}
 
-		m_rtDuration	-= rtMin;
-		m_rtDuration	= max(0, m_rtDuration);
+		m_rtDuration -= rtMin;
+		m_rtDuration = std::max(0LL, m_rtDuration);
 
 	}
 
@@ -1203,7 +1203,7 @@ COggVideoOutputPin::COggVideoOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseF
 	: COggStreamOutputPin(h, pName, pFilter, pLock, phr)
 {
 	int extra = (int)h->size - sizeof(OggStreamHeader);
-	extra = max(extra, 0);
+	extra = std::max(extra, 0);
 
 	CMediaType mt;
 	mt.majortype	= MEDIATYPE_Video;
@@ -1243,7 +1243,7 @@ COggVideoOutputPin::COggVideoOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseF
 			mt.subtype = MEDIASUBTYPE_MPEG1Payload;
 			break;
 	}
-	mt.SetSampleSize(max(h->buffersize, 1));
+	mt.SetSampleSize(std::max(h->buffersize, 1uL));
 	m_mts.Add(mt);
 
 	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
@@ -1257,7 +1257,7 @@ COggAudioOutputPin::COggAudioOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseF
 	: COggStreamOutputPin(h, pName, pFilter, pLock, phr)
 {
 	int extra = (int)h->size - sizeof(OggStreamHeader);
-	extra = max(extra, 0);
+	extra = std::max(extra, 0);
 
 	CMediaType mt;
 	mt.majortype	= MEDIATYPE_Audio;
@@ -1275,7 +1275,7 @@ COggAudioOutputPin::COggAudioOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseF
 	wfe->wBitsPerSample		= (WORD)h->bps;
 	wfe->nAvgBytesPerSec	= h->a.nAvgBytesPerSec; // TODO: verify for PCM
 	wfe->nBlockAlign		= h->a.nBlockAlign; // TODO: verify for PCM
-	mt.SetSampleSize(max(h->buffersize, 1));
+	mt.SetSampleSize(std::max(h->buffersize, 1uL));
 	m_mts.Add(mt);
 
 	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
@@ -1532,7 +1532,7 @@ HRESULT COggDiracOutputPin::InitDirac(BYTE* p, int nCount)
 		return S_FALSE;
 	}
 
-	m_rtAvgTimePerFrame = max(1, params.AvgTimePerFrame);
+	m_rtAvgTimePerFrame = std::max(1LL, params.AvgTimePerFrame);
 
 	CMediaType mt;
 
@@ -1656,12 +1656,12 @@ HRESULT COggOpusOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int l
 
 	// code from ffmpeg
 	// calculate packet duration
-    unsigned int toc, toc_config, toc_count, frame_size, nb_frames = 1;
+	unsigned int toc, toc_config, toc_count, frame_size, nb_frames = 1;
 
 	toc = *pData;
 	toc_config = toc >> 3;
 	toc_count  = toc & 3;
-	frame_size = toc_config < 12 ? max(480, 960 * (toc_config & 3)) :
+	frame_size = toc_config < 12 ? std::max(480u, 960u * (toc_config & 3)) :
 				 toc_config < 16 ? 480 << (toc_config & 1) :
 								   120 << (toc_config & 3);
 	if (toc_count == 3) {

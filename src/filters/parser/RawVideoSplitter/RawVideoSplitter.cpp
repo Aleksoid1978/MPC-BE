@@ -421,7 +421,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	if (m_RAWType == RAW_NONE && COMPARE(SYNC_MPEG1)) {
 		m_pFile->Seek(0);
 		CBaseSplitterFileEx::seqhdr h;
-		if (m_pFile->Read(h, min(KILOBYTE, m_pFile->GetLength()), &mt, false)) {
+		if (m_pFile->Read(h, (int)std::min((__int64)KILOBYTE, m_pFile->GetLength()), &mt, false)) {
 			mts.Add(mt);
 
 			if (mt.subtype == MEDIASUBTYPE_MPEG1Payload) {
@@ -443,7 +443,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				{
 					BYTE id = 0x00;
 					m_pFile->Seek(0);
-					while (m_pFile->GetPos() < min(MEGABYTE, m_pFile->GetLength()) && rtStart == INVALID_TIME) {
+					while (m_pFile->GetPos() < std::min((__int64)MEGABYTE, m_pFile->GetLength()) && rtStart == INVALID_TIME) {
 						if (!m_pFile->NextMpegStartCode(id)) {
 							continue;
 						}
@@ -466,7 +466,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				// find end PTS
 				{
 					BYTE id = 0x00;
-					m_pFile->Seek(m_pFile->GetLength() - min(MEGABYTE, m_pFile->GetLength()));
+					m_pFile->Seek(m_pFile->GetLength() - std::min((__int64)MEGABYTE, m_pFile->GetLength()));
 					while (m_pFile->GetPos() < m_pFile->GetLength()) {
 						if (!m_pFile->NextMpegStartCode(id)) {
 							continue;
@@ -493,7 +493,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_pFile->Seek(m_startpos);
 
 		CBaseSplitterFileEx::avchdr h;
-		if (m_pFile->Read(h, min(MEGABYTE, m_pFile->GetLength()), &mt)) {
+		if (m_pFile->Read(h, (int)std::min((__int64)MEGABYTE, m_pFile->GetLength()), &mt)) {
 			mts.Add(mt);
 			if (mt.subtype == MEDIASUBTYPE_H264 && SUCCEEDED(CreateAVCfromH264(&mt))) {
 				mts.Add(mt);
@@ -508,7 +508,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			&& (COMPARE(SYNC_VC1_F) || COMPARE(SYNC_VC1_D))) {
 		BYTE id = 0x00;
 		m_pFile->Seek(0);
-		while (m_pFile->GetPos() < min(MEGABYTE, m_pFile->GetLength()) && m_RAWType == RAW_NONE) {
+		while (m_pFile->GetPos() < std::min((__int64)MEGABYTE, m_pFile->GetLength()) && m_RAWType == RAW_NONE) {
 			if (!m_pFile->NextMpegStartCode(id)) {
 				continue;
 			}
@@ -517,7 +517,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				m_pFile->Seek(m_pFile->GetPos() - 4);
 
 				CBaseSplitterFileEx::vc1hdr h;
-				if (m_pFile->Read(h, min(KILOBYTE, m_pFile->GetRemaining()), &mt)) {
+				if (m_pFile->Read(h, (int)std::min((__int64)KILOBYTE, m_pFile->GetRemaining()), &mt)) {
 					mts.Add(mt);
 					mt.subtype = MEDIASUBTYPE_WVC1_CYBERLINK;
 					mts.Add(mt);
@@ -536,7 +536,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_pFile->Seek(0);
 
 		CBaseSplitterFileEx::hevchdr h;
-		if (m_pFile->Read(h, min(MEGABYTE, m_pFile->GetLength()), &mt)) {
+		if (m_pFile->Read(h, (int)std::min((__int64)MEGABYTE, m_pFile->GetLength()), &mt)) {
 			mts.Add(mt);
 			m_RAWType = RAW_HEVC;
 			pName = L"H.265/HEVC Video Output";
@@ -884,7 +884,7 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 		}
 
 
-		if (const size_t size = min(64 * KILOBYTE, m_pFile->GetRemaining())) {
+		if (const size_t size = std::min(64LL * KILOBYTE, m_pFile->GetRemaining())) {
 			CAutoPtr<CPacket> p(DNew CPacket());
 			p->SetCount(size);
 			if ((hr = m_pFile->ByteRead(p->GetData(), size)) != S_OK) {
