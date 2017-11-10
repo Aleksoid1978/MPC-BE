@@ -178,6 +178,7 @@ bool CRawVideoSplitterFilter::ReadGOP(REFERENCE_TIME& rt)
 	return true;
 }
 
+#define COMPARE(V) (memcmp(buf, V, sizeof(V)) == 0) 
 HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
@@ -207,7 +208,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	CMediaType mt;
 	CString pName;
 
-	if (memcmp(buf, YUV4MPEG2_, sizeof(YUV4MPEG2_)) == 0) {
+	if (COMPARE(YUV4MPEG2_)) {
 		CStringA params = CStringA(buf + sizeof(YUV4MPEG2_));
 		params.Truncate(params.Find(0x0A));
 
@@ -417,7 +418,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	if (m_RAWType == RAW_NONE && memcmp(buf, SYNC_MPEG1, sizeof(SYNC_MPEG1)) == 0) {
+	if (m_RAWType == RAW_NONE && COMPARE(SYNC_MPEG1)) {
 		m_pFile->Seek(0);
 		CBaseSplitterFileEx::seqhdr h;
 		if (m_pFile->Read(h, min(KILOBYTE, m_pFile->GetLength()), &mt, false)) {
@@ -488,7 +489,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	if (m_RAWType == RAW_NONE && memcmp(buf, SYNC_H264, sizeof(SYNC_H264)) == 0) {
+	if (m_RAWType == RAW_NONE && COMPARE(SYNC_H264)) {
 		m_pFile->Seek(m_startpos);
 
 		CBaseSplitterFileEx::avchdr h;
@@ -504,7 +505,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 
 	if (m_RAWType == RAW_NONE
-			&& (memcmp(buf, SYNC_VC1_F, sizeof(SYNC_VC1_F)) == 0 || memcmp(buf, SYNC_VC1_D, sizeof(SYNC_VC1_D)) == 0)) {
+			&& (COMPARE(SYNC_VC1_F) || COMPARE(SYNC_VC1_D))) {
 		BYTE id = 0x00;
 		m_pFile->Seek(0);
 		while (m_pFile->GetPos() < min(MEGABYTE, m_pFile->GetLength()) && m_RAWType == RAW_NONE) {
@@ -531,7 +532,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 
 	if (m_RAWType == RAW_NONE
-			&& (memcmp(buf, SYNC_HEVC_VPS, sizeof(SYNC_HEVC_VPS)) == 0 || memcmp(buf, SYNC_HEVC_AUD, sizeof(SYNC_HEVC_AUD)) == 0)) {
+			&& (COMPARE(SYNC_HEVC_VPS) || COMPARE(SYNC_HEVC_AUD))) {
 		m_pFile->Seek(0);
 
 		CBaseSplitterFileEx::hevchdr h;
@@ -542,7 +543,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	if (m_RAWType == RAW_NONE && memcmp(buf, SYNC_MPEG4, sizeof(SYNC_MPEG4)) == 0) {
+	if (m_RAWType == RAW_NONE && COMPARE(SYNC_MPEG4)) {
 		m_pFile->Seek(0);
 
 		DWORD width = 0;
@@ -836,7 +837,7 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 
 		if (m_RAWType == RAW_Y4M) {
 			static BYTE buf[sizeof(FRAME_)];
-			if ((hr = m_pFile->ByteRead(buf, sizeof(FRAME_))) != S_OK || memcmp(buf, FRAME_, sizeof(FRAME_)) != 0) {
+			if ((hr = m_pFile->ByteRead(buf, sizeof(FRAME_))) != S_OK || !COMPARE(FRAME_)) {
 				break;
 			}
 			const __int64 framenum = (m_pFile->GetPos() - m_startpos) / (sizeof(FRAME_) + m_framesize);
