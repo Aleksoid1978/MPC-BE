@@ -22,6 +22,7 @@
 
 #include <Windows.h>
 #include <time.h> // for the _time64 workaround
+#include <algorithm>
 #include <mpc_defines.h>
 #include "../../../DSUtil/FileVersion.h"
 #include "ffmpegContext.h"
@@ -85,7 +86,7 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 	int video_is_level51           = 0;
 	int no_level51_support         = 1;
 	int too_much_ref_frames        = 0;
-	const int max_ref_frames_dpb41 = min(11, 8388608/(nWidth * nHeight));
+	const int max_ref_frames_dpb41 = std::min(11, 8388608/(nWidth * nHeight));
 
 	if (sps) {
 		if (sps->bit_depth_luma > 8 || sps->chroma_format_idc > 1) {
