@@ -19,7 +19,7 @@ REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 IF EXIST "%~dp0..\environments.bat" CALL "%~dp0..\environments.bat"
 
 IF DEFINED MPCBE_MSYS GOTO VarOk
-ECHO ERROR: Please define MPCBE_MSYS environment variable(s)
+ECHO ERROR: Please define MPCBE_MSYS environment variable
 EXIT /B
 
 :VarOk
