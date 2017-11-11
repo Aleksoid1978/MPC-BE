@@ -78,9 +78,9 @@ namespace DXVAState {
 			}
 			m_sDXVADecoderShortDescription = L"H/W";
 		} else if (guidDXVADecoder != GUID_NULL) {
-			m_sDXVADecoderDescription.Format(L"DXVA2 Native, %s", GetDXVAMode(m_guidDXVADecoder));
 			m_guidDXVADecoder = guidDXVADecoder;
 			m_sDXVADecoderShortDescription = L"DXVA2";
+			m_sDXVADecoderDescription.Format(L"DXVA2 Native, %s", GetDXVAMode(m_guidDXVADecoder));
 		}
 	}
 
