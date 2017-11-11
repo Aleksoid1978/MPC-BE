@@ -241,8 +241,8 @@ bool CComPropertySheet::AddPage(IPropertyPage* pPage, IUnknown* pUnk)
 	hr = pPage->SetObjects(1, &pUnk);
 	PROPPAGEINFO ppi;
 	hr = pPage->GetPageInfo(&ppi);
-	m_size.cx = max(m_size.cx, ppi.size.cx);
-	m_size.cy = max(m_size.cy, ppi.size.cy);
+	m_size.cx = std::max(m_size.cx, ppi.size.cx);
+	m_size.cy = std::max(m_size.cy, ppi.size.cy);
 	CAutoPtr<CComPropertyPage> p(DNew CComPropertyPage(pPage));
 	__super::AddPage(p);
 	m_pages.AddTail(p);
@@ -286,7 +286,7 @@ void CComPropertySheet::OnActivated(CPropertyPage* pPage)
 	}
 
 	bounds |= CRect(0,0,0,0);
-	bounds.SetRect(0, 0, bounds.right + max(bounds.left, 4), bounds.bottom + max(bounds.top, 4));
+	bounds.SetRect(0, 0, bounds.right + std::max(bounds.left, 4L), bounds.bottom + std::max(bounds.top, 4L));
 
 	CRect r = CRect(CPoint(0,0), bounds.Size());
 	pTC->AdjustRect(TRUE, r);

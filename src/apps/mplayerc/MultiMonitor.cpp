@@ -193,9 +193,9 @@ void CMonitor::ClipRectToMonitor( LPRECT lprc, const BOOL UseWorkAreaRect ) cons
 		GetMonitorRect( &rect );
 	}
 
-	lprc->left = max( rect.left, min( rect.right - w, lprc->left ) );
-	lprc->top = max( rect.top, min( rect.bottom - h, lprc->top ) );
-	lprc->right = lprc->left + w;
+	lprc->left   = std::max(rect.left, std::min(rect.right - w, lprc->left));
+	lprc->top    = std::max(rect.top,  std::min(rect.bottom - h, lprc->top));
+	lprc->right  = lprc->left + w;
 	lprc->bottom = lprc->top  + h;
 }
 

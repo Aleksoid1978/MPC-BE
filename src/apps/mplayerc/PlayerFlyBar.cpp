@@ -283,7 +283,7 @@ void CFlyBar::UpdateWnd(CPoint point)
 	MONITORINFO mi = { sizeof(mi) };
 	GetMonitorInfo(MonitorFromWindow(this->m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 	CPoint p;
-	p.x = max(0, min(point.x, mi.rcMonitor.right - r_tooltip.Width()));
+	p.x = std::max(0L, std::min(point.x, mi.rcMonitor.right - r_tooltip.Width()));
 	int iCursorHeight = 24;
 	m_tooltip.SetWindowPos(nullptr, p.x, point.y + iCursorHeight, r_tooltip.Width(), m_pMainFrame->ScaleY(iCursorHeight), SWP_NOACTIVATE | SWP_NOZORDER);
 

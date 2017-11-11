@@ -32,7 +32,7 @@ CPPageFileInfoRes::CPPageFileInfoRes(CString fn, IFilterGraph* pFG)
 	, m_hIcon(nullptr)
 {
 	m_fn.TrimRight('/');
-	int i = max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
+	int i = std::max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
 
 	if (i >= 0 && i < m_fn.GetLength() - 1) {
 		m_fn = m_fn.Mid(i + 1);

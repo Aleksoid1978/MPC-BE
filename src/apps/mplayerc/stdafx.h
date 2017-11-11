@@ -41,6 +41,13 @@
 
 #include <algorithm>
 
+ // Workaround compilation errors when including GDI+ with NOMINMAX defined
+namespace Gdiplus
+{
+	using std::min;
+	using std::max;
+};
+
 #include "../../DSUtil/DSUtil.h"
 #include "mplayerc.h"
 

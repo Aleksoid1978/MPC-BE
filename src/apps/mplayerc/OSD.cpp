@@ -442,7 +442,7 @@ void COSD::DrawMessage()
 				break;
 			case OSD_TOPRIGHT :
 			default :
-				rectMessages = CRect(max(10, m_rectWnd.right - 10 - rectText.Width()), 10, m_rectWnd.right-10, rectText.bottom + 10);
+				rectMessages = CRect(std::max(10L, m_rectWnd.right - 10 - rectText.Width()), 10, m_rectWnd.right-10, rectText.bottom + 10);
 				break;
 		}
 
@@ -933,12 +933,12 @@ void COSD::DrawWnd()
 
 	switch (m_nMessagePos) {
 		case OSD_TOPLEFT :
-			rectMessages = CRect(0, 0, min((rectText.right + 10), m_MainWndRect.Width() - 20), min((rectText.bottom + 2), m_MainWndRect.Height() - 20));
+			rectMessages = CRect(0, 0, std::min((rectText.right + 10), (LONG)m_MainWndRect.Width() - 20), std::min((rectText.bottom + 2), (LONG)m_MainWndRect.Height() - 20));
 			break;
 		case OSD_TOPRIGHT :
 		default :
 			int imax = max(0, m_MainWndRect.Width() - rectText.Width() - 30);
-			rectMessages = CRect(imax, 0, (m_MainWndRect.Width() - 20) + imax, min((rectText.bottom + 2), m_MainWndRect.Height() - 20));
+			rectMessages = CRect(imax, 0, (m_MainWndRect.Width() - 20) + imax, std::min((rectText.bottom + 2), (LONG)m_MainWndRect.Height() - 20));
 			break;
 	}
 

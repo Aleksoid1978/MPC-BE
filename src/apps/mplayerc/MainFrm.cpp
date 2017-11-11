@@ -1552,7 +1552,7 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 	}
 
 	if (IsWindow(m_wndToolBar.m_hWnd) && m_wndToolBar.IsVisible()) {
-		lpMMI->ptMinTrackSize.x = max(m_wndToolBar.GetMinWidth(), lpMMI->ptMinTrackSize.x);
+		lpMMI->ptMinTrackSize.x = std::max((LONG)m_wndToolBar.GetMinWidth(), lpMMI->ptMinTrackSize.x);
 	}
 
 	// Ensure that window decorations will fit
@@ -1562,8 +1562,8 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 	lpMMI->ptMinTrackSize.y += decorationsRect.Height();
 
 	// Final phase
-	lpMMI->ptMinTrackSize.x = max(lpMMI->ptMinTrackSize.x, GetSystemMetrics(SM_CXMIN));
-	lpMMI->ptMinTrackSize.y = max(lpMMI->ptMinTrackSize.y, GetSystemMetrics(SM_CYMIN));
+	lpMMI->ptMinTrackSize.x = std::max(lpMMI->ptMinTrackSize.x, (LONG)GetSystemMetrics(SM_CXMIN));
+	lpMMI->ptMinTrackSize.y = std::max(lpMMI->ptMinTrackSize.y, (LONG)GetSystemMetrics(SM_CYMIN));
 
 	lpMMI->ptMaxTrackSize.x = GetSystemMetrics(SM_CXVIRTUALSCREEN) + decorationsRect.Width();
 	lpMMI->ptMaxTrackSize.y = GetSystemMetrics(SM_CYVIRTUALSCREEN)
@@ -7259,15 +7259,15 @@ void CMainFrame::OnViewPanNScan(UINT nID)
 	}
 
 	if (dx < 0 && m_PosX > 0) {
-		m_PosX = max(m_PosX - 0.005*m_ZoomX, 0);
+		m_PosX = std::max(m_PosX - 0.005*m_ZoomX, 0.0);
 	} else if (dx > 0 && m_PosX < 1) {
-		m_PosX = min(m_PosX + 0.005*m_ZoomX, 1);
+		m_PosX = std::min(m_PosX + 0.005*m_ZoomX, 1.0);
 	}
 
 	if (dy < 0 && m_PosY > 0) {
-		m_PosY = max(m_PosY - 0.005*m_ZoomY, 0);
+		m_PosY = std::max(m_PosY - 0.005*m_ZoomY, 0.0);
 	} else if (dy > 0 && m_PosY < 1) {
-		m_PosY = min(m_PosY + 0.005*m_ZoomY, 1);
+		m_PosY = std::min(m_PosY + 0.005*m_ZoomY, 1.0);
 	}
 
 	MoveVideoWindow(true);
@@ -9677,7 +9677,7 @@ public:
 	// ISequentialStream
 	STDMETHODIMP Read(void* pv, ULONG cb, ULONG* pcbRead) {
 		__int64 cbRead = min((__int64)(m_data.GetCount() - m_pos), (__int64)cb);
-		cbRead = max(cbRead, 0);
+		cbRead = std::max(cbRead, 0LL);
 		memcpy(pv, &m_data[(INT_PTR)m_pos], (int)cbRead);
 		if (pcbRead) {
 			*pcbRead = (ULONG)cbRead;
@@ -10232,8 +10232,8 @@ void CMainFrame::SetDefaultWindowRect(int iMonitor)
 		GetClientRect(&clientRect);
 
 		CSize logoSize = m_wndView.GetLogoSize();
-		logoSize.cx = max(logoSize.cx, DEFCLIENTW);
-		logoSize.cy = max(logoSize.cy, DEFCLIENTH);
+		logoSize.cx = std::max(logoSize.cx, (LONG)DEFCLIENTW);
+		logoSize.cy = std::max(logoSize.cy, (LONG)DEFCLIENTH);
 
 		windowSize.cx = windowRect.Width() - clientRect.Width() + logoSize.cx;
 		windowSize.cy = windowRect.Height() - clientRect.Height() + logoSize.cy;
@@ -10321,8 +10321,8 @@ void CMainFrame::RestoreDefaultWindowRect()
 			GetClientRect(&clientRect);
 
 			CSize logoSize = m_wndView.GetLogoSize();
-			logoSize.cx = max(logoSize.cx, DEFCLIENTW);
-			logoSize.cy = max(logoSize.cy, DEFCLIENTH);
+			logoSize.cx = std::max(logoSize.cx, (LONG)DEFCLIENTW);
+			logoSize.cy = std::max(logoSize.cy, (LONG)DEFCLIENTH);
 
 			windowSize.cx = windowRect.Width() - clientRect.Width() + logoSize.cx;
 			windowSize.cy = windowRect.Height() - clientRect.Height() + logoSize.cy;
@@ -11065,8 +11065,8 @@ void CMainFrame::ZoomVideoWindow(bool snap, double scale)
 	if (m_bAudioOnly) {
 		scale = 1.0;
 		videoSize = m_wndView.GetLogoSize();
-		videoSize.cx = max(videoSize.cx, DEFCLIENTW);
-		videoSize.cy = max(videoSize.cy, DEFCLIENTH);
+		videoSize.cx = std::max(videoSize.cx, (LONG)DEFCLIENTW);
+		videoSize.cy = std::max(videoSize.cy, (LONG)DEFCLIENTH);
 	}
 
 	CSize videoTargetSize(int(videoSize.cx * scale + 0.5), int(videoSize.cy * scale + 0.5));
@@ -14418,7 +14418,7 @@ void CMainFrame::SetupFiltersSubMenu()
 						CStringW stream(ResStr(IDS_AG_UNKNOWN_STREAM));
 						size_t count = stream.GetLength() + 3 + 1;
 						wname = (WCHAR*)CoTaskMemAlloc(count * sizeof(WCHAR));
-						swprintf_s(wname, count, L"%s %d", stream, min(i + 1,999));
+						swprintf_s(wname, count, L"%s %d", stream, std::min(i + 1, 999uL));
 					}
 
 					CString name(wname);
@@ -18608,7 +18608,7 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 				} else {
 					// Resize image to improve speed of show TaskBar preview
 
-					int h = min(abs(bm.bmHeight), nWidth);
+					int h = std::min(abs(bm.bmHeight), (long)nWidth);
 					int w = MulDiv(h, bm.bmWidth, abs(bm.bmHeight));
 					h     = MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
 

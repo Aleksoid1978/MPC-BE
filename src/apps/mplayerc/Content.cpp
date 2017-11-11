@@ -124,7 +124,7 @@ namespace Content {
 					size_t nMinSize = KILOBYTE;
 					const QWORD ContentLength = content.HTTPAsync->GetLenght();
 					if (ContentLength) {
-						nMinSize = min(nMinSize, ContentLength);
+						nMinSize = std::min((QWORD)nMinSize, ContentLength);
 					}
 
 					content.raw.resize(nMinSize);
@@ -169,7 +169,7 @@ namespace Content {
 					size_t nMaxSize = 16 * KILOBYTE;
 					const QWORD ContentLength = content.HTTPAsync->GetLenght();
 					if (ContentLength) {
-						nMaxSize = min(ContentLength, nMaxSize);
+						nMaxSize = std::min(ContentLength, (QWORD)nMaxSize);
 					}
 
 					if (nMaxSize > content.raw.size()) {
@@ -325,7 +325,7 @@ namespace Content {
 			for (CString tmp; f.ReadString(tmp); body += tmp + '\n');
 		}
 
-		CString dir = fn.Left(max(fn.ReverseFind('/'), fn.ReverseFind('\\')) + 1);
+		CString dir = fn.Left(std::max(fn.ReverseFind('/'), fn.ReverseFind('\\')) + 1);
 
 		std::wregex rgx;
 

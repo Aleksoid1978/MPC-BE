@@ -165,12 +165,12 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 						}
 
 						if (flen == DecompData.GetCount()) {
-							gb.Reset(DecompData.GetData(), min(_countof(Buff), DecompData.GetCount()));
+							gb.Reset(DecompData.GetData(), std::min(_countof(Buff), DecompData.GetCount()));
 						}
 					}
 
 				} else if (memcmp(Buff, "FWS", 3) == 0) {
-					DWORD dwRead = ReadBuffer(m_hFile, Buff, min(_countof(Buff), size.QuadPart));
+					DWORD dwRead = ReadBuffer(m_hFile, Buff, std::min((LONGLONG)_countof(Buff), size.QuadPart));
 					if (dwRead) {
 						gb.Reset(Buff, dwRead);
 					}
@@ -424,7 +424,7 @@ STDMETHODIMP CShockwaveGraph::get_Volume(long* plVolume)
 		waveOutGetVolume(0, (DWORD*)plVolume);
 		*plVolume = (*plVolume & 0xffff + ((*plVolume >> 16) & 0xffff)) / 2 * 100 / 0x10000;
 		if (*plVolume > 0) {
-			*plVolume = min((long)(4000 * log10(*plVolume / 100.0f)), 0);
+			*plVolume = std::min((long)(4000 * log10(*plVolume / 100.0f)), 0L);
 		}
 		else {
 			*plVolume = -10000;
