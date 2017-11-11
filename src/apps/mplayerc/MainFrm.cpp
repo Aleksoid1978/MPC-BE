@@ -11176,7 +11176,7 @@ double CMainFrame::GetZoomAutoFitScale()
 	const CAppSettings& s = AfxGetAppSettings();
 	CSize arxy = GetVideoSize();
 
-	double fitscale = s.nAutoFitFactor / 100.0 * (std::min)((double)m_rcDesktop.Width() / arxy.cx, (double)m_rcDesktop.Height() / arxy.cy);
+	double fitscale = s.nAutoFitFactor / 100.0 * std::min((double)m_rcDesktop.Width() / arxy.cx, (double)m_rcDesktop.Height() / arxy.cy);
 
 	if (s.iZoomLevel == 4 && fitscale > 1.0) {
 		fitscale = 1.0;
