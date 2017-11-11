@@ -44,7 +44,7 @@ bool mpc_filehash(LPCTSTR fn, filehash& fh)
 		;
 	}
 
-	f.Seek(max(0, (INT64)fh.size - 65536), CFile::begin);
+	f.Seek(std::max(0LL, (INT64)fh.size - 65536), CFile::begin);
 
 	for (UINT64 tmp = 0, i = 0; i < 65536/sizeof(tmp) && f.Read(&tmp, sizeof(tmp)); fh.mpc_filehash += tmp, i++) {
 		;

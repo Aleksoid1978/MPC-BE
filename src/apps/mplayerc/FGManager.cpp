@@ -2844,7 +2844,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 				// Without doing that the renderer selected in MPC-HC is given a so high merit that filters that normally
 				// should connect between the video decoder and the renderer can't (e.g. VSFilter). - from MPC-HC
 				if (f.GetCLSID() != CLSID_RDPDShowRedirectionFilter) {
-					m_vrmerit = max(m_vrmerit, f.GetMerit());
+					m_vrmerit = std::max(m_vrmerit, f.GetMerit());
 				}
 			}
 		}
@@ -2865,14 +2865,14 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 				// Without doing that the renderer selected in MPC-HC is given a so high merit that filters that normally
 				// should connect between the video decoder and the renderer can't (e.g. VSFilter). - from MPC-HC
 				if (f.GetCLSID() != CLSID_RDPDShowRedirectionFilter) {
-					m_armerit = max(m_armerit, f.GetMerit());
+					m_armerit = std::max(m_armerit, f.GetMerit());
 				}
 			}
 		}
 
 		BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
 			CFGFilterRegistry f(pMoniker);
-			m_armerit = max(m_armerit, f.GetMerit());
+			m_armerit = std::max(m_armerit, f.GetMerit());
 		}
 		EndEnumSysDev
 

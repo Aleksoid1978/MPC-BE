@@ -430,7 +430,7 @@ void CEditListEditor::OnLvnKeyDown(NMHDR* pNMHDR, LRESULT* pResult)
 		}
 
 		if (nItem != -1) {
-			m_list.SetItemState (min (nItem, m_list.GetItemCount()-1), LVIS_SELECTED, LVIS_SELECTED);
+			m_list.SetItemState(std::min(nItem, m_list.GetItemCount()-1), LVIS_SELECTED, LVIS_SELECTED);
 		}
 
 		m_list.Invalidate();

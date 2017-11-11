@@ -440,7 +440,7 @@ DVD_POSITION* CAppSettings::CurrentDVDPosition()
 bool CAppSettings::NewDvd(ULONGLONG llDVDGuid)
 {
 	// Look for the DVD position
-	for (int i = 0; i < min(iRecentFilesNumber, MAX_DVD_POSITION); i++) {
+	for (int i = 0; i < std::min(iRecentFilesNumber, MAX_DVD_POSITION); i++) {
 		if (DvdPosition[i].llDVDGuid == llDVDGuid) {
 			nCurrentDvdPosition = i;
 			return false;
@@ -448,7 +448,7 @@ bool CAppSettings::NewDvd(ULONGLONG llDVDGuid)
 	}
 
 	// If DVD is unknown, we put it first
-	for (int i = min(iRecentFilesNumber, MAX_DVD_POSITION) - 1; i > 0; i--) {
+	for (int i = std::min(iRecentFilesNumber, MAX_DVD_POSITION) - 1; i > 0; i--) {
 		memcpy(&DvdPosition[i], &DvdPosition[i - 1], sizeof(DVD_POSITION));
 	}
 	DvdPosition[0].llDVDGuid = llDVDGuid;
@@ -468,7 +468,7 @@ FILE_POSITION* CAppSettings::CurrentFilePosition()
 bool CAppSettings::NewFile(LPCTSTR strFileName)
 {
 	// Look for the file position
-	for (int i = 0; i < min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
+	for (int i = 0; i < std::min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
 		if (FilePosition[i].strFile == strFileName) {
 			nCurrentFilePosition = i;
 			return false;
@@ -476,7 +476,7 @@ bool CAppSettings::NewFile(LPCTSTR strFileName)
 	}
 
 	// If it is unknown, we put it first
-	for (int i = min(iRecentFilesNumber, MAX_FILE_POSITION) - 1; i > 0; i--) {
+	for (int i = std::min(iRecentFilesNumber, MAX_FILE_POSITION) - 1; i > 0; i--) {
 		FilePosition[i].strFile        = FilePosition[i - 1].strFile;
 		FilePosition[i].llPosition     = FilePosition[i - 1].llPosition;
 		FilePosition[i].nAudioTrack    = FilePosition[i - 1].nAudioTrack;
@@ -496,7 +496,7 @@ bool CAppSettings::RemoveFile(LPCTSTR strFileName)
 	// Look for the file position
 	int idx = -1;
 
-	for (int i = 0; i < min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
+	for (int i = 0; i < std::min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
 		if (FilePosition[i].strFile == strFileName) {
 			idx = i;
 			break;
@@ -1093,7 +1093,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	bRememberDVDPos     = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DVDPOS, 0);
 	nCurrentDvdPosition = -1;
 	memset(DvdPosition, 0, sizeof(DvdPosition));
-	for (int i = 0; i < min(iRecentFilesNumber, MAX_DVD_POSITION); i++) {
+	for (int i = 0; i < std::min(iRecentFilesNumber, MAX_DVD_POSITION); i++) {
 		CString	lpKeyName;
 		CString	lpString;
 
@@ -1107,7 +1107,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	// playback positions for last played files
 	bRememberFilePos     = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_FILEPOS, 0);
 	nCurrentFilePosition = -1;
-	for (int i = 0; i < min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
+	for (int i = 0; i < std::min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
 		CString lpKeyName;
 		CString lpString;
 
@@ -1413,7 +1413,7 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FILEPOS, (int)bRememberFilePos);
 	if (bKeepHistory) {
 		if (bRememberDVDPos) {
-			for (int i = 0; i < min(iRecentFilesNumber, MAX_DVD_POSITION); i++) {
+			for (int i = 0; i < std::min(iRecentFilesNumber, MAX_DVD_POSITION); i++) {
 				CString strDVDPos;
 				CString strValue;
 
@@ -1424,7 +1424,7 @@ void CAppSettings::SaveSettings()
 		}
 
 		if (bRememberFilePos) {
-			for (int i = 0; i < min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
+			for (int i = 0; i < std::min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
 				CString lpKeyName;
 				CString lpString;
 
@@ -2094,7 +2094,7 @@ void CAppSettings::CRecentFileAndURLList::SetSize(int nSize)
 
 	if (m_nSize != nSize) {
 		CString* arrNames = DNew CString[nSize];
-		int nSizeToCopy = min(m_nSize, nSize);
+		int nSizeToCopy = std::min(m_nSize, nSize);
 		for (int i = 0; i < nSizeToCopy; i++) {
 			arrNames[i] = m_arrNames[i];
 		}

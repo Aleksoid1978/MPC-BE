@@ -191,7 +191,7 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 			bf.BlendOp = AC_SRC_OVER;
 			bf.SourceConstantAlpha = 0xFF;
 
-			int h = min(abs(bm.bmHeight), r.Height());
+			int h = std::min(abs(bm.bmHeight), (LONG)r.Height());
 			int w = min(r.Width(), MulDiv(h, bm.bmWidth, abs(bm.bmHeight)));
 			h = MulDiv(w, abs(bm.bmHeight), bm.bmWidth);
 			int x = (r.Width() - w) / 2;

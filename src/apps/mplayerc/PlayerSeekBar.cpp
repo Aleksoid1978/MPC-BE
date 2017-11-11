@@ -840,7 +840,7 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint point)
 			point.y += 20;
 		}
 
-		point.x = max(0, min(point.x, r.Width() - size.cx));
+		point.x = std::max(0L, std::min(point.x, r.Width() - size.cx));
 		ClientToScreen(&point);
 
 		m_tooltip.SendMessage(TTM_TRACKPOSITION, 0, MAKELPARAM(point.x, point.y));
