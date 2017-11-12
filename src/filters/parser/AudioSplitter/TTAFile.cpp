@@ -102,10 +102,6 @@ HRESULT CTTAFile::Open(CBaseSplitterFile* pFile)
 		return E_FAIL;
 	}
 
-	if (!m_index.SetCount(m_totalframes)) {
-		return E_OUTOFMEMORY;
-	}
-
 	__int64 framepos = m_pFile->GetPos() + 4 * m_totalframes + 4;
 
 	m_extrasize = m_pFile->GetPos() - start_offset;
@@ -113,6 +109,12 @@ HRESULT CTTAFile::Open(CBaseSplitterFile* pFile)
 	m_pFile->Seek(start_offset);
 	if (m_pFile->ByteRead(m_extradata, m_extrasize) != S_OK) {
 		return E_FAIL;
+	}
+
+	try {
+		m_index.resize(m_totalframes);
+	} catch(...) {
+		return E_OUTOFMEMORY;
 	}
 
 	for (int i = 0; i < m_totalframes; i++) {

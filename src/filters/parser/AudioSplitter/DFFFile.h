@@ -53,5 +53,5 @@ public:
 	CString GetName() const { return m_subtype == MEDIASUBTYPE_DSDM ? L"DSD-IFF" : L"DST-IFF"; };
 
 protected:
-	CAtlMap<DWORD, CStringA> m_info;
+	std::map<DWORD, CStringA> m_info;
 };

@@ -29,7 +29,7 @@ class CTTAFile : public CAudioFile
 	int m_framesamples;
 	int m_last_framesamples;
 
-	CAtlArray<__int64> m_index;
+	std::vector<__int64> m_index;
 
 	CAPETag* m_APETag;
 

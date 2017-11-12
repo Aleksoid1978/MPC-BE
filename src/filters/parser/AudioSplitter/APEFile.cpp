@@ -202,9 +202,7 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 		DLog(L"CAPEFile::Open() : Number of seek entries is less than number of frames: %u vs. %u", ape.seektablelength / sizeof(*ape.seektable), ape.totalframes);
 		return E_FAIL;
 	}
-	if (!m_frames.SetCount(ape.totalframes)) {
-		return E_OUTOFMEMORY;
-	}
+
 	ape.firstframe = ape.junklength + ape.descriptorlength + ape.headerlength + ape.seektablelength + ape.wavheaderlength;
 	if (ape.fileversion < 3810)
 		ape.firstframe += ape.totalframes;
@@ -240,6 +238,12 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 		if (!m_pFile->GetRemaining()) {
 			DLog(L"CAPEFile::Open() : File truncated");
 		}
+	}
+
+	try {
+		m_frames.resize(ape.totalframes);
+	} catch(...) {
+		return E_OUTOFMEMORY;
 	}
 
 	m_frames[0].pos     = ape.firstframe;
@@ -377,7 +381,7 @@ REFERENCE_TIME CAPEFile::Seek(REFERENCE_TIME rt)
 	int64_t pts = rt * m_samplerate / 10000000;
 
 	size_t i;
-	for (i = 1; i < m_frames.GetCount(); i++) {
+	for (i = 1; i < m_frames.size(); i++) {
 		if (m_frames[i].pts > pts) {
 			break;
 		}
@@ -392,7 +396,7 @@ REFERENCE_TIME CAPEFile::Seek(REFERENCE_TIME rt)
 
 int CAPEFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 {
-	if (m_curentframe >= m_frames.GetCount()) {
+	if (m_curentframe >= m_frames.size()) {
 		return 0;
 	}
 	int size = m_frames[m_curentframe].size + 8;
