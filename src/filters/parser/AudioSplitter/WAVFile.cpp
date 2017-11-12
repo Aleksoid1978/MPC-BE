@@ -177,26 +177,21 @@ bool CWAVFile::SetMediaType(CMediaType& mt)
 
 void CWAVFile::SetProperties(IBaseFilter* pBF)
 {
-	if (m_info.GetCount() > 0) {
+	if (m_info.size() > 0) {
 		if (CComQIPtr<IDSMPropertyBag> pPB = pBF) {
-			POSITION pos = m_info.GetStartPosition();
-			while (pos) {
-				DWORD fcc;
-				CStringA value;
-				m_info.GetNextAssoc(pos, fcc, value);
-
-				switch (fcc) {
+			for (const auto& info : m_info) {
+				switch (info.first) {
 				case FCC('INAM'):
-					pPB->SetProperty(L"TITL", CStringW(value));
+					pPB->SetProperty(L"TITL", CStringW(info.second));
 					break;
 				case FCC('IART'):
-					pPB->SetProperty(L"AUTH", CStringW(value));
+					pPB->SetProperty(L"AUTH", CStringW(info.second));
 					break;
 				case FCC('ICOP'):
-					pPB->SetProperty(L"CPYR", CStringW(value));
+					pPB->SetProperty(L"CPYR", CStringW(info.second));
 					break;
 				case FCC('ISBJ'):
-					pPB->SetProperty(L"DESC", CStringW(value));
+					pPB->SetProperty(L"DESC", CStringW(info.second));
 					break;
 				}
 			}
@@ -356,7 +351,7 @@ int CWAVFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 
 HRESULT CWAVFile::ReadRIFFINFO(const DWORD chunk_size)
 {
-	m_info.RemoveAll();
+	m_info.clear();
 	DWORD id = 0;
 
 	const __int64 chunk_pos = m_pFile->GetPos();

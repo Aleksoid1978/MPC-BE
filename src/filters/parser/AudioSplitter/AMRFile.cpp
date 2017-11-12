@@ -71,7 +71,8 @@ HRESULT CAMRFile::Open(CBaseSplitterFile* pFile)
 	m_channels = 1;
 	m_layout   = SPEAKER_FRONT_CENTER;
 
-	m_seek_table.SetCount(0, 512);
+	m_seek_table.clear();
+	m_seek_table.reserve(512);
 	BYTE toc = 0;
 	while (m_pFile->ByteRead(&toc, 1) == S_OK) {
 		frame_t frame;
@@ -87,20 +88,20 @@ HRESULT CAMRFile::Open(CBaseSplitterFile* pFile)
 			break;
 		}
 
-		m_seek_table.Add(frame);
+		m_seek_table.push_back(frame);
 		m_pFile->Seek(frame.pos + frame.size);
 	}
-	if (m_seek_table.IsEmpty()) {
+	if (m_seek_table.empty()) {
 		return E_FAIL;
 	}
 
 	m_startpos = m_seek_table[0].pos;
-	frame_t lastframe = m_seek_table[m_seek_table.GetCount() - 1];
+	frame_t lastframe = m_seek_table[m_seek_table.size() - 1];
 	m_endpos = lastframe.pos + lastframe.size;
 
 	m_pFile->Seek(m_startpos);
 	m_currentframe = 0;
-	m_rtduration = 10000000i64 * m_framelen * m_seek_table.GetCount() / m_samplerate;
+	m_rtduration = 10000000i64 * m_framelen * m_seek_table.size() / m_samplerate;
 
 	return S_OK;
 }
@@ -116,8 +117,8 @@ REFERENCE_TIME CAMRFile::Seek(REFERENCE_TIME rt)
 	__int64 samples = rt * m_samplerate / 10000000;
 	m_currentframe = samples / m_framelen;
 
-	if (m_currentframe >= m_seek_table.GetCount()) {
-		m_currentframe = m_seek_table.GetCount();
+	if (m_currentframe >= m_seek_table.size()) {
+		m_currentframe = m_seek_table.size();
 		return m_rtduration;
 	}
 
@@ -129,7 +130,7 @@ REFERENCE_TIME CAMRFile::Seek(REFERENCE_TIME rt)
 
 int CAMRFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 {
-	if (m_currentframe >= m_seek_table.GetCount()) {
+	if (m_currentframe >= m_seek_table.size()) {
 		return 0;
 	}
 

@@ -258,6 +258,7 @@ HRESULT CDFFFile::Open(CBaseSplitterFile* pFile)
 	m_samplerate = 0;
 	m_channels = 1;
 	m_layout   = SPEAKER_FRONT_CENTER;
+	m_info.clear();
 
 	while (ReadDFFChunk(Chunk) && m_pFile->GetPos() < end) {
 		__int64 pos = m_pFile->GetPos();
@@ -396,23 +397,18 @@ bool CDFFFile::SetMediaType(CMediaType& mt)
 
 void CDFFFile::SetProperties(IBaseFilter* pBF)
 {
-	if (m_info.GetCount() > 0) {
+	if (m_info.size() > 0) {
 		if (CComQIPtr<IDSMPropertyBag> pPB = pBF) {
-			POSITION pos = m_info.GetStartPosition();
-			while (pos) {
-				DWORD fcc;
-				CStringA value;
-				m_info.GetNextAssoc(pos, fcc, value);
-
-				switch (fcc) {
+			for (const auto& info : m_info) {
+				switch (info.first) {
 				case FCC('DITI'):
-					pPB->SetProperty(L"TITL", CString(value));
+					pPB->SetProperty(L"TITL", CString(info.second));
 					break;
 				case FCC('DIAR'):
-					pPB->SetProperty(L"AUTH", CString(value));
+					pPB->SetProperty(L"AUTH", CString(info.second));
 					break;
 				case FCC('COMT'):
-					pPB->SetProperty(L"DESC", CString(value));
+					pPB->SetProperty(L"DESC", CString(info.second));
 				}
 			}
 		}

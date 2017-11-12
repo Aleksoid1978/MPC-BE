@@ -35,7 +35,7 @@ protected:
 
 	CID3Tag* m_ID3Tag      = nullptr;
 
-	CAtlMap<DWORD, CStringA> m_info;
+	std::map<DWORD, CStringA> m_info;
 
 	bool ProcessWAVEFORMATEX();
 	HRESULT ReadRIFFINFO(const DWORD chunk_size);

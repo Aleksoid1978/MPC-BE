@@ -296,10 +296,6 @@ HRESULT CTAKFile::Open(CBaseSplitterFile* pFile)
 					__int64 cur_pos = m_pFile->GetPos();
 					__int64 file_size = m_pFile->GetLength();
 
-					CAtlArray<BYTE>		CoverData;
-					CString				CoverMime;
-					CString				CoverFileName;
-
 					if (cur_pos + APE_TAG_FOOTER_BYTES <= file_size) {
 						m_pFile->Seek(file_size - APE_TAG_FOOTER_BYTES);
 						if (m_pFile->ByteRead(buf, APE_TAG_FOOTER_BYTES) == S_OK) {

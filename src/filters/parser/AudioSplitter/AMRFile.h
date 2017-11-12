@@ -31,10 +31,10 @@ class CAMRFile : public CAudioFile
 		UINT64 size : 8, pos : 54;
 	};
 
-	int                m_framelen;
-	bool               m_isAMRWB;
-	unsigned           m_currentframe;
-	CAtlArray<frame_t> m_seek_table;
+	int                  m_framelen;
+	bool                 m_isAMRWB;
+	unsigned             m_currentframe;
+	std::vector<frame_t> m_seek_table;
 
 public:
 	CAMRFile();

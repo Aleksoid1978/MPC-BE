@@ -32,10 +32,10 @@ class CAPEFile : public CAudioFile
 		int64_t pts;
 	};
 
-	size_t				m_curentframe;
-	CAtlArray<APEFrame>	m_frames;
+	size_t m_curentframe;
+	std::vector<APEFrame> m_frames;
 
-	CAPETag*			m_APETag;
+	CAPETag* m_APETag;
 
 public:
 	CAPEFile();
