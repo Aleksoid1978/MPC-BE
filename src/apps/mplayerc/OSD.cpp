@@ -438,7 +438,7 @@ void COSD::DrawMessage()
 		rectText.InflateRect(20, 10);
 		switch (m_nMessagePos) {
 			case OSD_TOPLEFT :
-				rectMessages = CRect(10, 10, min((rectText.right + 10), (m_rectWnd.right - 10)), (rectText.bottom + 12));
+				rectMessages = CRect(10, 10, std::min((rectText.right + 10), (m_rectWnd.right - 10)), (rectText.bottom + 12));
 				break;
 			case OSD_TOPRIGHT :
 			default :
@@ -538,8 +538,8 @@ void COSD::InvalidateVMROSD()
 void COSD::UpdateSeekBarPos(CPoint point)
 {
 	m_llSeekPos = (point.x - m_rectBar.left) * (m_llSeekMax - m_llSeekMin) / (m_rectBar.Width() - SliderCursorWidth);
-	m_llSeekPos = max (m_llSeekPos, m_llSeekMin);
-	m_llSeekPos = min (m_llSeekPos, m_llSeekMax);
+	m_llSeekPos = std::max(m_llSeekPos, m_llSeekMin);
+	m_llSeekPos = std::min(m_llSeekPos, m_llSeekMax);
 
 	if (AfxGetAppSettings().fFastSeek ^ (GetKeyState(VK_SHIFT) < 0)) {
 		m_pMainFrame->GetClosestKeyFrame(m_llSeekPos);
@@ -937,7 +937,7 @@ void COSD::DrawWnd()
 			break;
 		case OSD_TOPRIGHT :
 		default :
-			int imax = max(0, m_MainWndRect.Width() - rectText.Width() - 30);
+			int imax = std::max(0, m_MainWndRect.Width() - rectText.Width() - 30);
 			rectMessages = CRect(imax, 0, (m_MainWndRect.Width() - 20) + imax, std::min((rectText.bottom + 2), (LONG)m_MainWndRect.Height() - 20));
 			break;
 	}
@@ -1059,18 +1059,18 @@ void COSD::GradientFill(CDC* pDc, CRect* rc)
 	const CAppSettings& s = AfxGetAppSettings();
 
 	int R, G, B, R1, G1, B1, R_, G_, B_, R1_, G1_, B1_;
-	R	= GetRValue(s.clrGrad1ABGR);
-	G	= GetGValue(s.clrGrad1ABGR);
-	B	= GetBValue(s.clrGrad1ABGR);
-	R1	= GetRValue(s.clrGrad2ABGR);
-	G1	= GetGValue(s.clrGrad2ABGR);
-	B1	= GetBValue(s.clrGrad2ABGR);
-	R_	= min(R + 32, 255);
-	R1_	= min(R1 + 32, 255);
-	G_	= min(G + 32, 255);
-	G1_	= min(G1 + 32, 255);
-	B_	= min(B + 32, 255);
-	B1_	= min(B1 + 32, 255);
+	R   = GetRValue(s.clrGrad1ABGR);
+	G   = GetGValue(s.clrGrad1ABGR);
+	B   = GetBValue(s.clrGrad1ABGR);
+	R1  = GetRValue(s.clrGrad2ABGR);
+	G1  = GetGValue(s.clrGrad2ABGR);
+	B1  = GetBValue(s.clrGrad2ABGR);
+	R_  = std::min(R + 32, 255);
+	R1_ = std::min(R1 + 32, 255);
+	G_  = std::min(G + 32, 255);
+	G1_ = std::min(G1 + 32, 255);
+	B_  = std::min(B + 32, 255);
+	B1_ = std::min(B1 + 32, 255);
 
 	int nOSDTransparent	= s.nOSDTransparent;
 	int nOSDBorder		= s.nOSDBorder;

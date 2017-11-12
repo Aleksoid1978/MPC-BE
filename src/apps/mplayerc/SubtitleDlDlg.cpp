@@ -212,7 +212,7 @@ bool CSubtitleDlDlg::Parse()
 	while (pos) {
 		str = sl.GetNext(pos);
 
-		CStringA param = str.Left(max(0, str.Find('=')));
+		CStringA param = str.Left(std::max(0, str.Find('=')));
 		CStringA value = str.Mid(str.Find('=')+1);
 
 		if (param == "ticket") {

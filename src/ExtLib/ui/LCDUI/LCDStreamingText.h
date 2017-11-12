@@ -27,7 +27,8 @@
 #include "LCDText.h"
 
 #include <string>
-using namespace std;
+// MPC-BE patch. disable global inclusion std namespace
+//using namespace std;
 
 class CLCDStreamingText: public CLCDCollection
 {

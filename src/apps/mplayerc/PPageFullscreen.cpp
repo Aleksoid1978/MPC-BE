@@ -634,7 +634,7 @@ void CPPageFullscreen::ModesUpdate()
 		int nColumnWidth = m_list.GetColumnWidth(nCol);
 		m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE_USEHEADER);
 		int nHeaderWidth = m_list.GetColumnWidth(nCol);
-		int nNewWidth = max(nColumnWidth, nHeaderWidth);
+		int nNewWidth = std::max(nColumnWidth, nHeaderWidth);
 		m_list.SetColumnWidth(nCol, nNewWidth);
 		{
 			LVCOLUMN col;
@@ -656,7 +656,7 @@ void CPPageFullscreen::OnRemove()
 			return;
 		}
 		m_list.DeleteItem(nItem);
-		nItem = min(nItem, m_list.GetItemCount() - 1);
+		nItem = std::min(nItem, m_list.GetItemCount() - 1);
 		m_list.SetSelectionMark(nItem);
 		m_list.SetFocus();
 		m_list.SetItemState(nItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);

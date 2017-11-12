@@ -485,7 +485,7 @@ int CPlayerToolBar::GetVolume()
 	if (IsMuted() || volume < 1) {
 		volume = -10000;
 	} else {
-		volume = min((int)(4000 * log10(volume / 100.0f)), 0);
+		volume = std::min((int)(4000 * log10(volume / 100.0f)), 0);
 	}
 
 	return volume;

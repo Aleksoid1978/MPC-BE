@@ -199,8 +199,8 @@ void CPPageSubStyle::Init()
 
 
 	m_borderstyle = m_stss->borderStyle;
-	m_borderwidth = (int)min(m_stss->outlineWidthX, m_stss->outlineWidthY);
-	m_shadowdepth = (int)min(m_stss->shadowDepthX, m_stss->shadowDepthY);
+	m_borderwidth = (int)std::min(m_stss->outlineWidthX, m_stss->outlineWidthY);
+	m_shadowdepth = (int)std::min(m_stss->shadowDepthX, m_stss->shadowDepthY);
 
 	m_screenalignment = m_stss->scrAlignment-1;
 	m_marginleft = m_stss->marginRect.left;

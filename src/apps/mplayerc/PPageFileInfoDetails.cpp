@@ -356,7 +356,7 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 					CString str;
 					if (Language) {
 						int len = GetLocaleInfo(Language, LOCALE_SENGLANGUAGE, str.GetBuffer(256), 256);
-						str.ReleaseBufferSetLength(max(len-1, 0));
+						str.ReleaseBufferSetLength(std::max(len-1, 0));
 					} else {
 						str.Format(ResStr(IDS_AG_UNKNOWN), i+1);
 					}
@@ -414,7 +414,7 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 					CString str;
 					if (Language) {
 						int len = GetLocaleInfo(Language, LOCALE_SENGLANGUAGE, str.GetBuffer(256), 256);
-						str.ReleaseBufferSetLength(max(len - 1, 0));
+						str.ReleaseBufferSetLength(std::max(len - 1, 0));
 					} else {
 						str.Format(ResStr(IDS_AG_UNKNOWN), i + 1);
 					}

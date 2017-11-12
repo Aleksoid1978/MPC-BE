@@ -161,7 +161,7 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 	}
 
 	if (m_location_str.IsEmpty() || m_location_str == ResStr(IDS_AG_NONE)) {
-		int i = max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
+		int i = std::max(m_fn.ReverseFind('\\'), m_fn.ReverseFind('/'));
 
 		if (i >= 0 && i < m_fn.GetLength() - 1) {
 			m_location_str = m_fn.Left(i);

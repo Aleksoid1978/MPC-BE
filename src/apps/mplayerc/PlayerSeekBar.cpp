@@ -125,7 +125,7 @@ void CPlayerSeekBar::SetPos(const REFERENCE_TIME pos)
 
 	if (HasDuration() && AfxGetAppSettings().fUseWin7TaskBar) {
 		if (m_pMainFrame->m_pTaskbarList) {
-			VERIFY(S_OK == m_pMainFrame->m_pTaskbarList->SetProgressValue(m_pMainFrame->m_hWnd, max(pos, 1LL), m_stop));
+			VERIFY(S_OK == m_pMainFrame->m_pTaskbarList->SetProgressValue(m_pMainFrame->m_hWnd, std::max(pos, 1LL), m_stop));
 		}
 	}
 }
@@ -813,7 +813,7 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint point)
 		point.x -= r_width / 2 - 2;
 		point.y = GetChannelRect().TopLeft().y - (r_height + 13);
 		ClientToScreen(&point);
-		point.x = max(mi.rcWork.left + 5, min(point.x, mi.rcWork.right - r_width - 5));
+		point.x = std::max(mi.rcWork.left + 5, std::min(point.x, mi.rcWork.right - r_width - 5));
 
 		if (point.y <= 5) {
 			const CRect r = mi.rcWork;
