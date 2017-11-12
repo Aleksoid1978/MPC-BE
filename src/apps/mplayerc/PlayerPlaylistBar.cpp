@@ -570,7 +570,7 @@ void CPlaylist::SortByName()
 	POSITION pos = GetHeadPosition();
 	for (int i = 0; pos; i++, GetNext(pos)) {
 		CString fn = GetAt(pos).m_fns.GetHead();
-		a[i].str = (LPCTSTR)fn + max(fn.ReverseFind('/'), fn.ReverseFind('\\')) + 1;
+		a[i].str = (LPCTSTR)fn + std::max(fn.ReverseFind('/'), fn.ReverseFind('\\')) + 1;
 		a[i].pos = pos;
 	}
 	qsort(a.GetData(), a.GetCount(), sizeof(plsort2_t), compare2);
@@ -925,7 +925,7 @@ static bool SearchFiles(CString mask, CAtlList<CString>& sl)
 	}
 
 	{
-		CString dir = mask.Left(max(mask.ReverseFind('\\'), mask.ReverseFind('/'))+1);
+		CString dir = mask.Left(std::max(mask.ReverseFind('\\'), mask.ReverseFind('/'))+1);
 
 		WIN32_FIND_DATA fd;
 		HANDLE h = FindFirstFile(mask, &fd);
@@ -1965,7 +1965,7 @@ void CPlayerPlaylistBar::OnLvnKeyDown(NMHDR* pNMHDR, LRESULT* pResult)
 
 		m_list.SetItemState(-1, 0, LVIS_SELECTED);
 		m_list.SetItemState(
-			max(min(items.GetTail(), m_list.GetItemCount()-1), 0),
+			std::max(std::min(items.GetTail(), m_list.GetItemCount()-1), 0),
 			LVIS_SELECTED, LVIS_SELECTED);
 
 		ResizeListColumn();
@@ -2474,7 +2474,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 
 				m_list.SetItemState(-1, 0, LVIS_SELECTED);
 				m_list.SetItemState(
-					max(min(items.GetTail(), m_list.GetItemCount()-1), 0),
+					std::max(std::min(items.GetTail(), m_list.GetItemCount()-1), 0),
 					LVIS_SELECTED, LVIS_SELECTED);
 
 				ResizeListColumn();

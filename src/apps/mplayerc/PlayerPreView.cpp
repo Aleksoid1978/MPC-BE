@@ -301,7 +301,7 @@ void CPreView::SetWindowSize()
 
 	int w = (mi.rcWork.right - mi.rcWork.left) * m_relativeSize / 100;
 	// the preview size should not be larger than half size of the main window, but not less than 160
-	w = max(160, min(w, wr.Width() / 2));
+	w = std::max(160, std::min(w, wr.Width() / 2));
 
 	int h = (w - ((m_border + 1) * 2)) * 9 / 16;
 	h += (m_caption + 1);

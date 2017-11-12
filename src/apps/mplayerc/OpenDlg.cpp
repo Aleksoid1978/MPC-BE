@@ -310,7 +310,7 @@ COpenFileDlg::COpenFileDlg(CAtlArray<CString>& mask, bool fAllowDirSelection, LP
 
 	str = GetFolderOnly(str);
 
-	int size = max(1000, str.GetLength() + 1);
+	int size = std::max(1000, str.GetLength() + 1);
 	m_InitialDir = DNew WCHAR[size];
 	memset(m_InitialDir, 0, size * sizeof(WCHAR));
 	wcscpy(m_InitialDir, str);

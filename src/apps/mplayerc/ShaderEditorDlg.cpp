@@ -535,7 +535,7 @@ void CShaderEditorDlg::OnMouseMove(UINT nFlags, CPoint point)
 
 		auto pFrame = AfxGetMainFrame();
 
-		rs.bottom = min(max(point.y, rs.top + pFrame->ScaleY(40)), ro.bottom - pFrame->ScaleY(48)) - avgdist;
+		rs.bottom = std::min(std::max(point.y, rs.top + pFrame->ScaleY(40)), ro.bottom - pFrame->ScaleY(48)) - avgdist;
 		ro.top = rs.bottom + dist;
 		m_edSrcdata.MoveWindow(&rs);
 		m_edOutput.MoveWindow(&ro);
