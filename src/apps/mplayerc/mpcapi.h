@@ -221,7 +221,7 @@ enum MPCAPI_COMMAND : unsigned int {
 	// return a CMD_PLAYLIST
 	CMD_GETPLAYLIST         = 0xA0003003,
 
-		// Ask for the current playback position,
+	// Ask for the current playback position,
 	// see CMD_CURRENTPOSITION.
 	// Parameter 1 : current position in seconds
 	CMD_GETCURRENTPOSITION  = 0xA0003004,
