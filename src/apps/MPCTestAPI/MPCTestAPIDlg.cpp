@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "MPCTestAPI.h"
 #include "MPCTestAPIDlg.h"
+#include <algorithm>
 #include <psapi.h>
 
 struct MPCCommandInfo {
@@ -324,7 +325,7 @@ HCURSOR CRegisterCopyDataDlg::OnQueryDragIcon()
 void CRegisterCopyDataDlg::OnButtonFindwindow()
 {
 	CString				strExec;
-	STARTUPINFO			StartupInfo;
+	STARTUPINFOW		StartupInfo;
 	PROCESS_INFORMATION	ProcessInfo;
 
 	strExec.Format(L"%s /slave %d", m_strMPCPath, GetSafeHwnd());
@@ -336,14 +337,27 @@ void CRegisterCopyDataDlg::OnButtonFindwindow()
 	CreateProcessW(nullptr, (LPWSTR)(LPCWSTR)strExec, nullptr, nullptr, FALSE, 0, nullptr, nullptr, &StartupInfo, &ProcessInfo);
 }
 
-void CRegisterCopyDataDlg::Senddata(MPCAPI_COMMAND nCmd, LPCWSTR strCommand)
+void CRegisterCopyDataDlg::SendData(MPCAPI_COMMAND nCmd, LPCWSTR strCommand)
 {
 	if (m_hWndMPC) {
 		COPYDATASTRUCT MyCDS;
 
 		MyCDS.dwData = nCmd;
-		MyCDS.cbData = (DWORD)(wcslen(strCommand) + 1) * sizeof(WCHAR);
-		MyCDS.lpData = (LPVOID)strCommand;
+		if (nCmd == CMD_OSDSHOWMESSAGE) {
+			size_t len = std::min(wcslen(strCommand), (size_t)127) * sizeof(WCHAR);
+
+			MPC_OSDDATA osddata;
+			osddata.nMsgPos = 1;
+			memset(osddata.strMsg, 0, sizeof(osddata.strMsg));
+			memcpy(osddata.strMsg, strCommand, len);
+
+			MyCDS.cbData = sizeof(osddata);
+			MyCDS.lpData = (LPVOID)&osddata;
+		}
+		else {
+			MyCDS.cbData = (DWORD)(wcslen(strCommand) + 1) * sizeof(WCHAR);
+			MyCDS.lpData = (LPVOID)strCommand;
+		}
 
 		::SendMessageW(m_hWndMPC, WM_COPYDATA, (WPARAM)GetSafeHwnd(), (LPARAM)&MyCDS);
 	}
@@ -364,7 +378,6 @@ BOOL CRegisterCopyDataDlg::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruc
 
 void CRegisterCopyDataDlg::OnBnClickedButtonSendcommand()
 {
-	CString strEmpty(L"");
 	UpdateData(TRUE);
 
 	auto cmdInfo = GetMPCCommandInfo((MPCAPI_COMMAND)GetCurItemData(m_cbCommand));
@@ -379,23 +392,29 @@ void CRegisterCopyDataDlg::OnBnClickedButtonSendcommand()
 		case CMD_SETAUDIOTRACK:
 		case CMD_SETSUBTITLETRACK:
 		case CMD_TOGGLEFULLSCREEN:
-		case CMD_JUMPFORWARDMED:
-		case CMD_JUMPBACKWARDMED:
 		case CMD_INCREASEVOLUME:
 		case CMD_DECREASEVOLUME:
 		case CMD_SHADER_TOGGLE:
 		case CMD_CLOSEAPP:
-			Senddata(cmdInfo.id, m_txtCommand);
+		case CMD_OSDSHOWMESSAGE:
+			SendData(cmdInfo.id, m_txtCommand);
 			break;
 		case CMD_STOP:
 		case CMD_CLOSEFILE:
 		case CMD_PLAYPAUSE:
-		case CMD_STARTPLAYLIST:
+		case CMD_PLAY:
+		case CMD_PAUSE:
 		case CMD_CLEARPLAYLIST:
-		case CMD_GETAUDIOTRACKS:
+		case CMD_STARTPLAYLIST:
 		case CMD_GETSUBTITLETRACKS:
+		case CMD_GETAUDIOTRACKS:
+		case CMD_GETNOWPLAYING:
 		case CMD_GETPLAYLIST:
-			Senddata(cmdInfo.id, strEmpty);
+		case CMD_GETCURRENTPOSITION:
+		case CMD_GETVERSION:
+		case CMD_JUMPFORWARDMED:
+		case CMD_JUMPBACKWARDMED:
+			SendData(cmdInfo.id, L"");
 			break;
 	}
 }

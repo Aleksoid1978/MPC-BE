@@ -65,5 +65,5 @@ public:
 	CString		m_txtCommand;
 	CComboBox	m_cbCommand;
 	afx_msg		void OnBnClickedButtonSendcommand();
-	void		Senddata(MPCAPI_COMMAND nCmd, LPCWSTR strCommand);
+	void		SendData(MPCAPI_COMMAND nCmd, LPCWSTR strCommand);
 };
