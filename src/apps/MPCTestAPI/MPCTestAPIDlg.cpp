@@ -1,5 +1,5 @@
 /*
- * (C) 2008-2014 see Authors.txt
+ * (C) 2008-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,26 +23,95 @@
 #include "MPCTestAPIDlg.h"
 #include <psapi.h>
 
-LPCTSTR GetMPCCommandName(MPCAPI_COMMAND nCmd)
+struct MPCCommandInfo {
+	MPCAPI_COMMAND id;
+	LPCWSTR name;
+	LPCWSTR desc;
+};
+
+static const MPCCommandInfo s_UnknownCmd = {(MPCAPI_COMMAND)0, L"CMD_UNKNOWN", L""};
+
+#define ADD_CMD(ID, DESC) {ID, L#ID, DESC},
+static const MPCCommandInfo s_ReceivedCmds[] = {
+	ADD_CMD(CMD_CONNECT,            L"")
+	ADD_CMD(CMD_STATE,              L"")
+	ADD_CMD(CMD_PLAYMODE,           L"")
+	ADD_CMD(CMD_NOWPLAYING,         L"")
+	ADD_CMD(CMD_LISTSUBTITLETRACKS, L"")
+	ADD_CMD(CMD_LISTAUDIOTRACKS,    L"")
+	ADD_CMD(CMD_PLAYLIST,           L"")
+	ADD_CMD(CMD_CURRENTPOSITION,    L"")
+	ADD_CMD(CMD_NOTIFYSEEK,         L"")
+	ADD_CMD(CMD_NOTIFYENDOFSTREAM,  L"")
+	ADD_CMD(CMD_VERSION,            L"")
+	ADD_CMD(CMD_DISCONNECT,         L"")
+};
+
+static const MPCCommandInfo s_SentCmds[] = {
+	ADD_CMD(CMD_OPENFILE,           L"Open file")
+	ADD_CMD(CMD_STOP,               L"Stop")
+	ADD_CMD(CMD_CLOSEFILE,          L"Close")
+	ADD_CMD(CMD_PLAYPAUSE,          L"Play-Pause")
+	ADD_CMD(CMD_PLAY,               L"")
+	ADD_CMD(CMD_PAUSE,              L"")
+	ADD_CMD(CMD_ADDTOPLAYLIST,      L"Add to playlist")
+	ADD_CMD(CMD_CLEARPLAYLIST,      L"Clear playlist")
+	ADD_CMD(CMD_STARTPLAYLIST,      L"Start playlist")
+	ADD_CMD(CMD_REMOVEFROMPLAYLIST, L"")
+	ADD_CMD(CMD_SETPOSITION,        L"Set position")
+	ADD_CMD(CMD_SETAUDIODELAY,      L"Set audio delay")
+	ADD_CMD(CMD_SETSUBTITLEDELAY,   L"Set subtitle delay")
+	ADD_CMD(CMD_SETINDEXPLAYLIST,   L"Set position in playlist")
+	ADD_CMD(CMD_SETAUDIOTRACK,      L"Set audio track")
+	ADD_CMD(CMD_SETSUBTITLETRACK,   L"Set subtitle track")
+	ADD_CMD(CMD_GETSUBTITLETRACKS,  L"Get subtitle tracks")
+	ADD_CMD(CMD_GETAUDIOTRACKS,     L"Get audio tracks")
+	ADD_CMD(CMD_GETNOWPLAYING,      L"")
+	ADD_CMD(CMD_GETPLAYLIST,        L"Get playlist")
+	ADD_CMD(CMD_GETCURRENTPOSITION, L"")
+	ADD_CMD(CMD_JUMPOFNSECONDS,     L"")
+	ADD_CMD(CMD_GETVERSION,         L"")
+	ADD_CMD(CMD_TOGGLEFULLSCREEN,   L"FullScreen")
+	ADD_CMD(CMD_JUMPFORWARDMED,     L"")
+	ADD_CMD(CMD_JUMPBACKWARDMED,    L"")
+	ADD_CMD(CMD_INCREASEVOLUME,     L"")
+	ADD_CMD(CMD_DECREASEVOLUME,     L"")
+	ADD_CMD(CMD_SHADER_TOGGLE,      L"")
+	ADD_CMD(CMD_CLOSEAPP,           L"")
+	ADD_CMD(CMD_SETSPEED,           L"")
+	ADD_CMD(CMD_OSDSHOWMESSAGE,     L"")
+};
+#undef ADD_CMD
+
+const MPCCommandInfo& GetMPCCommandInfo(MPCAPI_COMMAND nCmd)
 {
-	switch (nCmd) {
-		case CMD_CONNECT :
-			return _T("CMD_CONNECT");
-		case CMD_STATE :
-			return _T("CMD_STATE");
-		case CMD_PLAYMODE :
-			return _T("CMD_PLAYMODE");
-		case CMD_NOWPLAYING :
-			return _T("CMD_NOWPLAYING");
-		case CMD_LISTSUBTITLETRACKS :
-			return _T("CMD_LISTSUBTITLETRACKS");
-		case CMD_LISTAUDIOTRACKS :
-			return _T("CMD_LISTAUDIOTRACKS");
-		case CMD_PLAYLIST :
-			return _T("CMD_PLAYLIST");
-		default :
-			return _T("CMD_UNK");
+	if (nCmd >> 16 == 0x5000) {
+		for (const auto& cmdinfo : s_ReceivedCmds) {
+			if (cmdinfo.id == nCmd) {
+				return cmdinfo;
+			}
+		}
 	}
+
+	if (nCmd >> 16 == 0xA000) {
+		for (const auto& cmdinfo : s_SentCmds) {
+			if (cmdinfo.id == nCmd) {
+				return cmdinfo;
+			}
+		}
+	}
+
+	return s_UnknownCmd;
+}
+
+inline void AddStringData(CComboBox& ComboBox, LPCTSTR str, DWORD_PTR data)
+{
+	ComboBox.SetItemData(ComboBox.AddString(str), data);
+}
+
+inline DWORD_PTR GetCurItemData(CComboBox& ComboBox)
+{
+	return ComboBox.GetItemData(ComboBox.GetCurSel());
 }
 
 // CAboutDlg dialog used for App About
@@ -95,17 +164,14 @@ END_MESSAGE_MAP()
 
 CRegisterCopyDataDlg::CRegisterCopyDataDlg(CWnd* pParent)
 	: CDialog(CRegisterCopyDataDlg::IDD, pParent)
-	, m_strMPCPath(_T(""))
-	, m_txtCommand(_T(""))
-	, m_nCommandType(0)
-	, m_hWndMPC(NULL)
-	, m_RemoteWindow(NULL)
+	, m_hWndMPC(nullptr)
+	, m_RemoteWindow(nullptr)
 {
 	//{{AFX_DATA_INIT(CRegisterCopyDataDlg)
 	// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
 	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	m_hIcon = AfxGetApp()->LoadIconW(IDR_MAINFRAME);
 }
 
 
@@ -118,7 +184,7 @@ void CRegisterCopyDataDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT1, m_strMPCPath);
 	DDX_Control(pDX, IDC_LOGLIST, m_listBox);
 	DDX_Text(pDX, IDC_EDIT2, m_txtCommand);
-	DDX_CBIndex(pDX, IDC_COMBO1, m_nCommandType);
+	DDX_Control(pDX, IDC_COMBO1, m_cbCommand);
 }
 
 BEGIN_MESSAGE_MAP(CRegisterCopyDataDlg, CDialog)
@@ -138,6 +204,22 @@ BOOL CRegisterCopyDataDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
+	{ // set programm dir as current dir 
+		CString progpath;
+		DWORD bufsize = MAX_PATH;
+		DWORD len = 0;
+		do {
+			len = GetModuleFileNameW(nullptr, progpath.GetBuffer(bufsize), bufsize);
+			if (len >= bufsize) {
+				bufsize *= 2;
+				continue;
+			}
+		} while (0);
+		PathRemoveFileSpecW(progpath.GetBuffer());
+		progpath.ReleaseBuffer();
+		SetCurrentDirectoryW(progpath);
+	}
+
 	// Add "About..." menu item to system menu.
 
 	// IDM_ABOUTBOX must be in the system command range.
@@ -145,12 +227,12 @@ BOOL CRegisterCopyDataDlg::OnInitDialog()
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
-	if (pSysMenu != NULL) {
+	if (pSysMenu != nullptr) {
 		CString strAboutMenu;
-		strAboutMenu.LoadString(IDS_ABOUTBOX);
+		strAboutMenu.LoadStringW(IDS_ABOUTBOX);
 		if (!strAboutMenu.IsEmpty()) {
-			pSysMenu->AppendMenu(MF_SEPARATOR);
-			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
+			pSysMenu->AppendMenuW(MF_SEPARATOR);
+			pSysMenu->AppendMenuW(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
 		}
 	}
 
@@ -160,25 +242,35 @@ BOOL CRegisterCopyDataDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
-	m_strMPCPath = _T("..\\..\\..\\..\\..\\bin\\");
+	m_strMPCPath = L"..\\";
 
 #if defined (_WIN64)
-	m_strMPCPath += _T("mpc-be_x64");
+	m_strMPCPath += L"mpc-be_x64";
 #else
-	m_strMPCPath += _T("mpc-be_x86");
+	m_strMPCPath += L"mpc-be_x86";
 #endif // _WIN64
 
 #if defined (_DEBUG)
-	m_strMPCPath += _T("_Debug\\");
+	m_strMPCPath += L"_Debug\\";
 #else
-	m_strMPCPath += _T("\\");
+	m_strMPCPath += L"\\";
 #endif // _DEBUG
 
 #if defined (_WIN64)
-	m_strMPCPath += _T("mpc-be64.exe");
+	m_strMPCPath += L"mpc-be64.exe";
 #else
-	m_strMPCPath += _T("mpc-be.exe");
+	m_strMPCPath += L"mpc-be.exe";
 #endif // _WIN64
+
+	m_cbCommand.Clear();
+	for (const auto& cmdinfo : s_SentCmds) {
+		if (cmdinfo.desc[0] == 0) {
+			AddStringData(m_cbCommand, cmdinfo.name, cmdinfo.id);
+		}
+		else {
+			AddStringData(m_cbCommand, cmdinfo.desc, cmdinfo.id);
+		}
+	}
 
 	UpdateData(FALSE);
 
@@ -204,7 +296,7 @@ void CRegisterCopyDataDlg::OnPaint()
 	if (IsIconic()) {
 		CPaintDC dc(this); // device context for painting
 
-		SendMessage(WM_ICONERASEBKGND, (WPARAM)dc.GetSafeHdc(), 0);
+		SendMessageW(WM_ICONERASEBKGND, (WPARAM)dc.GetSafeHdc(), 0);
 
 		// Center icon in client rectangle
 		int cxIcon = GetSystemMetrics(SM_CXICON);
@@ -235,25 +327,25 @@ void CRegisterCopyDataDlg::OnButtonFindwindow()
 	STARTUPINFO			StartupInfo;
 	PROCESS_INFORMATION	ProcessInfo;
 
-	strExec.Format(_T("%s /slave %d"), m_strMPCPath, GetSafeHwnd());
+	strExec.Format(L"%s /slave %d", m_strMPCPath, GetSafeHwnd());
 	UpdateData(TRUE);
 
 	memset(&StartupInfo, 0, sizeof(StartupInfo));
 	StartupInfo.cb = sizeof(StartupInfo);
-	GetStartupInfo(&StartupInfo);
-	CreateProcess(NULL, (LPTSTR)(LPCTSTR)strExec, NULL, NULL, FALSE, 0, NULL, NULL, &StartupInfo, &ProcessInfo);
+	GetStartupInfoW(&StartupInfo);
+	CreateProcessW(nullptr, (LPWSTR)(LPCWSTR)strExec, nullptr, nullptr, FALSE, 0, nullptr, nullptr, &StartupInfo, &ProcessInfo);
 }
 
-void CRegisterCopyDataDlg::Senddata(MPCAPI_COMMAND nCmd, LPCTSTR strCommand)
+void CRegisterCopyDataDlg::Senddata(MPCAPI_COMMAND nCmd, LPCWSTR strCommand)
 {
 	if (m_hWndMPC) {
 		COPYDATASTRUCT MyCDS;
 
 		MyCDS.dwData = nCmd;
-		MyCDS.cbData = (DWORD)(_tcslen(strCommand) + 1) * sizeof(TCHAR);
-		MyCDS.lpData = (LPVOID) strCommand;
+		MyCDS.cbData = (DWORD)(wcslen(strCommand) + 1) * sizeof(WCHAR);
+		MyCDS.lpData = (LPVOID)strCommand;
 
-		::SendMessage(m_hWndMPC, WM_COPYDATA, (WPARAM)GetSafeHwnd(), (LPARAM)&MyCDS);
+		::SendMessageW(m_hWndMPC, WM_COPYDATA, (WPARAM)GetSafeHwnd(), (LPARAM)&MyCDS);
 	}
 }
 
@@ -262,88 +354,48 @@ BOOL CRegisterCopyDataDlg::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruc
 	CString strMsg;
 
 	if (pCopyDataStruct->dwData == CMD_CONNECT) {
-		m_hWndMPC = (HWND)IntToPtr(_ttoi((LPCTSTR)pCopyDataStruct->lpData));
+		m_hWndMPC = (HWND)IntToPtr(_wtoi((LPCWSTR)pCopyDataStruct->lpData));
 	}
 
-	strMsg.Format(_T("%s : %s"), GetMPCCommandName((MPCAPI_COMMAND)pCopyDataStruct->dwData), (LPCTSTR)pCopyDataStruct->lpData);
+	strMsg.Format(L"%s : %s", GetMPCCommandInfo((MPCAPI_COMMAND)pCopyDataStruct->dwData).name, (LPCWSTR)pCopyDataStruct->lpData);
 	m_listBox.InsertString(0, strMsg);
 	return CDialog::OnCopyData(pWnd, pCopyDataStruct);
 }
 
 void CRegisterCopyDataDlg::OnBnClickedButtonSendcommand()
 {
-	CString strEmpty(_T(""));
+	CString strEmpty(L"");
 	UpdateData(TRUE);
 
-	switch (m_nCommandType) {
-		case 0 :
-			Senddata(CMD_OPENFILE, m_txtCommand);
+	auto cmdInfo = GetMPCCommandInfo((MPCAPI_COMMAND)GetCurItemData(m_cbCommand));
+
+	switch (cmdInfo.id) {
+		case CMD_OPENFILE:
+		case CMD_ADDTOPLAYLIST:
+		case CMD_SETPOSITION:
+		case CMD_SETAUDIODELAY:
+		case CMD_SETSUBTITLEDELAY:
+		case CMD_SETINDEXPLAYLIST:
+		case CMD_SETAUDIOTRACK:
+		case CMD_SETSUBTITLETRACK:
+		case CMD_TOGGLEFULLSCREEN:
+		case CMD_JUMPFORWARDMED:
+		case CMD_JUMPBACKWARDMED:
+		case CMD_INCREASEVOLUME:
+		case CMD_DECREASEVOLUME:
+		case CMD_SHADER_TOGGLE:
+		case CMD_CLOSEAPP:
+			Senddata(cmdInfo.id, m_txtCommand);
 			break;
-		case 1 :
-			Senddata(CMD_STOP, strEmpty);
-			break;
-		case 2 :
-			Senddata(CMD_CLOSEFILE, strEmpty);
-			break;
-		case 3 :
-			Senddata(CMD_PLAYPAUSE, strEmpty);
-			break;
-		case 4 :
-			Senddata(CMD_ADDTOPLAYLIST, m_txtCommand);
-			break;
-		case 5 :
-			Senddata(CMD_STARTPLAYLIST, strEmpty);
-			break;
-		case 6 :
-			Senddata(CMD_CLEARPLAYLIST, strEmpty);
-			break;
-		case 7 :
-			Senddata(CMD_SETPOSITION, m_txtCommand);
-			break;
-		case 8 :
-			Senddata(CMD_SETAUDIODELAY, m_txtCommand);
-			break;
-		case 9 :
-			Senddata(CMD_SETSUBTITLEDELAY, m_txtCommand);
-			break;
-		case 10 :
-			Senddata(CMD_GETAUDIOTRACKS, strEmpty);
-			break;
-		case 11 :
-			Senddata(CMD_GETSUBTITLETRACKS, strEmpty);
-			break;
-		case 12 :
-			Senddata(CMD_GETPLAYLIST, strEmpty);
-			break;
-		case 13 :
-			Senddata(CMD_SETINDEXPLAYLIST, m_txtCommand);
-			break;
-		case 14 :
-			Senddata(CMD_SETAUDIOTRACK, m_txtCommand);
-			break;
-		case 15 :
-			Senddata(CMD_SETSUBTITLETRACK, m_txtCommand);
-			break;
-		case 16 :
-			Senddata(CMD_TOGGLEFULLSCREEN, m_txtCommand);
-			break;
-		case 17 :
-			Senddata(CMD_JUMPFORWARDMED, m_txtCommand);
-			break;
-		case 18 :
-			Senddata(CMD_JUMPBACKWARDMED, m_txtCommand);
-			break;
-		case 19 :
-			Senddata(CMD_INCREASEVOLUME, m_txtCommand);
-			break;
-		case 20 :
-			Senddata(CMD_DECREASEVOLUME, m_txtCommand);
-			break;
-		case 21 :
-			Senddata(CMD_SHADER_TOGGLE, m_txtCommand);
-			break;
-		case 22 :
-			Senddata(CMD_CLOSEAPP, m_txtCommand);
+		case CMD_STOP:
+		case CMD_CLOSEFILE:
+		case CMD_PLAYPAUSE:
+		case CMD_STARTPLAYLIST:
+		case CMD_CLEARPLAYLIST:
+		case CMD_GETAUDIOTRACKS:
+		case CMD_GETSUBTITLETRACKS:
+		case CMD_GETPLAYLIST:
+			Senddata(cmdInfo.id, strEmpty);
 			break;
 	}
 }
