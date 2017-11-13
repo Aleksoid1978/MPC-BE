@@ -1,5 +1,5 @@
 /*
- * (C) 2008-2014 see Authors.txt
+ * (C) 2008-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -58,7 +58,7 @@ void CHScrollListBox::PreSubclassWindow()
 
 // CHScrollListBox message handlers
 
-int CHScrollListBox::GetTextLen(LPCTSTR lpszText)
+int CHScrollListBox::GetTextLen(LPCWSTR lpszText)
 {
 	ASSERT(AfxIsValidString(lpszText));
 
@@ -68,11 +68,11 @@ int CHScrollListBox::GetTextLen(LPCTSTR lpszText)
 	CSize size;
 	CFont* pOldFont = pDC->SelectObject(GetFont());
 	if ((GetStyle() & LBS_USETABSTOPS) == 0) {
-		size = pDC->GetTextExtent(lpszText, (int) _tcslen(lpszText));
+		size = pDC->GetTextExtent(lpszText, (int) wcslen(lpszText));
 		size.cx += 3;
 	} else {
 		// Expand tabs as well
-		size = pDC->GetTabbedTextExtent(lpszText, (int) _tcslen(lpszText), 0, NULL);
+		size = pDC->GetTabbedTextExtentW(lpszText, (int) wcslen(lpszText), 0, nullptr);
 		size.cx += 2;
 	}
 	pDC->SelectObject(pOldFont);
@@ -101,7 +101,7 @@ void CHScrollListBox::ResetHExtent()
 	SetHorizontalExtent(iMaxHExtent);
 }
 
-void CHScrollListBox::SetNewHExtent(LPCTSTR lpszNewString)
+void CHScrollListBox::SetNewHExtent(LPCWSTR lpszNewString)
 {
 	int iExt = GetTextLen(lpszNewString);
 	if (iExt > GetHorizontalExtent()) {
@@ -115,7 +115,7 @@ LRESULT CHScrollListBox::OnAddString(WPARAM /*wParam*/, LPARAM lParam)
 {
 	LRESULT lResult = Default();
 	if (!((lResult == LB_ERR) || (lResult == LB_ERRSPACE))) {
-		SetNewHExtent((LPCTSTR) lParam);
+		SetNewHExtent((LPCWSTR) lParam);
 	}
 	return lResult;
 }
@@ -126,7 +126,7 @@ LRESULT CHScrollListBox::OnInsertString(WPARAM /*wParam*/, LPARAM lParam)
 {
 	LRESULT lResult = Default();
 	if (!((lResult == LB_ERR) || (lResult == LB_ERRSPACE))) {
-		SetNewHExtent((LPCTSTR) lParam);
+		SetNewHExtent((LPCWSTR) lParam);
 	}
 	return lResult;
 }

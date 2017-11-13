@@ -58,4 +58,9 @@
       <Filter>Resource Files</Filter>
     </Manifest>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\mplayerc\res\icon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

@@ -125,6 +125,9 @@
   <ItemGroup>
     <Manifest Include="MPCTestAPI.exe.manifest" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\mplayerc\res\icon.ico" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

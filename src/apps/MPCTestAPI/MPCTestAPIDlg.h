@@ -1,5 +1,5 @@
 /*
- * (C) 2008-2014 see Authors.txt
+ * (C) 2008-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,7 +30,7 @@ class CRegisterCopyDataDlg : public CDialog
 	// Construction
 public:
 	HWND m_RemoteWindow;
-	CRegisterCopyDataDlg(CWnd* pParent = NULL);
+	CRegisterCopyDataDlg(CWnd* pParent = nullptr);
 
 	// Dialog Data
 	//{{AFX_DATA(CRegisterCopyDataDlg)
@@ -63,7 +63,7 @@ public:
 	CString		m_strMPCPath;
 	CHScrollListBox m_listBox;
 	CString		m_txtCommand;
-	int			m_nCommandType;
+	CComboBox	m_cbCommand;
 	afx_msg		void OnBnClickedButtonSendcommand();
-	void		Senddata(MPCAPI_COMMAND nCmd, LPCTSTR strCommand);
+	void		Senddata(MPCAPI_COMMAND nCmd, LPCWSTR strCommand);
 };

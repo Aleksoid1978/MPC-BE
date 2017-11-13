@@ -1,5 +1,5 @@
 /*
- * (C) 2008-2014 see Authors.txt
+ * (C) 2008-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -61,6 +61,6 @@ protected:
 
 private:
 	void ResetHExtent();
-	void SetNewHExtent(LPCTSTR lpszNewString);
-	int GetTextLen(LPCTSTR lpszText);
+	void SetNewHExtent(LPCWSTR lpszNewString);
+	int GetTextLen(LPCWSTR lpszText);
 };
