@@ -17412,15 +17412,23 @@ void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)
 		case CMD_PLAYPAUSE :
 			OnPlayPlayPause();
 			break;
+		case CMD_PLAY :
+			OnPlayPlay();
+			break;
+		case CMD_PAUSE :
+			OnPlayPause();
+			break;
 		case CMD_ADDTOPLAYLIST :
 			fns.AddHead((LPCWSTR)pCDS->lpData);
 			m_wndPlaylistBar.Append(fns, true);
 			break;
+		case CMD_CLEARPLAYLIST :
+			m_wndPlaylistBar.Empty();
+			break;
 		case CMD_STARTPLAYLIST :
 			OpenCurPlaylistItem();
 			break;
-		case CMD_CLEARPLAYLIST :
-			m_wndPlaylistBar.Empty();
+		case CMD_REMOVEFROMPLAYLIST: // TODO
 			break;
 		case CMD_SETPOSITION :
 			rtPos = 10000i64 * REFERENCE_TIME(_wtof((LPCWSTR)pCDS->lpData) * 1000); //with accuracy of 1 ms
@@ -17459,26 +17467,29 @@ void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)
 		case CMD_GETAUDIOTRACKS :
 			SendAudioTracksToApi();
 			break;
-		case CMD_GETCURRENTPOSITION :
-			SendCurrentPositionToApi();
-			break;
 		case CMD_GETNOWPLAYING:
 			SendNowPlayingToApi();
+			break;
+		case CMD_GETPLAYLIST :
+			SendPlaylistToApi();
+			break;
+		case CMD_GETCURRENTPOSITION :
+			SendCurrentPositionToApi();
 			break;
 		case CMD_JUMPOFNSECONDS :
 			JumpOfNSeconds(_wtoi((LPCWSTR)pCDS->lpData));
 			break;
-		case CMD_GETPLAYLIST :
-			SendPlaylistToApi();
+		case CMD_GETVERSION:
+			SendAPICommand(CMD_VERSION, CStringW(MPC_VERSION_STR_SVN));
+			break;
+		case CMD_TOGGLEFULLSCREEN :
+			OnViewFullscreen();
 			break;
 		case CMD_JUMPFORWARDMED :
 			OnPlaySeek(ID_PLAY_SEEKFORWARDMED);
 			break;
 		case CMD_JUMPBACKWARDMED :
 			OnPlaySeek(ID_PLAY_SEEKBACKWARDMED);
-			break;
-		case CMD_TOGGLEFULLSCREEN :
-			OnViewFullscreen();
 			break;
 		case CMD_INCREASEVOLUME :
 			m_wndToolBar.m_volctrl.IncreaseVolume();
@@ -17491,6 +17502,8 @@ void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)
 			break;
 		case CMD_CLOSEAPP :
 			PostMessage(WM_CLOSE);
+			break;
+		case CMD_SETSPEED: // TODO
 			break;
 		case CMD_OSDSHOWMESSAGE:
 			ShowOSDCustomMessageApi((MPC_OSDDATA *)pCDS->lpData);
