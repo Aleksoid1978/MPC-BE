@@ -344,10 +344,10 @@ void CRegisterCopyDataDlg::SendData(MPCAPI_COMMAND nCmd, LPCWSTR strCommand)
 
 		MyCDS.dwData = nCmd;
 		if (nCmd == CMD_OSDSHOWMESSAGE) {
-			size_t len = std::min(wcslen(strCommand), (size_t)127) * sizeof(WCHAR);
-
 			MPC_OSDDATA osddata;
 			osddata.nMsgPos = 1;
+			osddata.nDurationMS = 3000;
+			size_t len = std::min(wcslen(strCommand), _countof(osddata.strMsg)-1) * sizeof(WCHAR);
 			memset(osddata.strMsg, 0, sizeof(osddata.strMsg));
 			memcpy(osddata.strMsg, strCommand, len);
 
