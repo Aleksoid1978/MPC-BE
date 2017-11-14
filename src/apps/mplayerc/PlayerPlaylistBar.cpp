@@ -1460,6 +1460,13 @@ void CPlayerPlaylistBar::Open(CAtlList<CString>& fns, bool fMulti, CSubtitleItem
 	Append(fns, fMulti, subs, bCheck);
 }
 
+void CPlayerPlaylistBar::Append(CString fn)
+{
+	CAtlList<CString> fns;
+	fns.AddHead(fn);
+	Append(fns, false);
+}
+
 void CPlayerPlaylistBar::Append(CAtlList<CString>& fns, bool fMulti, CSubtitleItemList* subs/* = nullptr*/, bool bCheck/* = true*/)
 {
 	INT_PTR idx = -1;

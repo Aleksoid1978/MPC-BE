@@ -334,7 +334,10 @@ void CRegisterCopyDataDlg::OnButtonFindwindow()
 	memset(&StartupInfo, 0, sizeof(StartupInfo));
 	StartupInfo.cb = sizeof(StartupInfo);
 	GetStartupInfoW(&StartupInfo);
-	CreateProcessW(nullptr, (LPWSTR)(LPCWSTR)strExec, nullptr, nullptr, FALSE, 0, nullptr, nullptr, &StartupInfo, &ProcessInfo);
+	if (CreateProcessW(nullptr, (LPWSTR)(LPCWSTR)strExec, nullptr, nullptr, FALSE, 0, nullptr, nullptr, &StartupInfo, &ProcessInfo)) {
+		CloseHandle(ProcessInfo.hProcess);
+		CloseHandle(ProcessInfo.hThread);
+	}
 }
 
 void CRegisterCopyDataDlg::SendData(MPCAPI_COMMAND nCmd, LPCWSTR strCommand)
@@ -385,18 +388,16 @@ void CRegisterCopyDataDlg::OnBnClickedButtonSendcommand()
 	switch (cmdInfo.id) {
 		case CMD_OPENFILE:
 		case CMD_ADDTOPLAYLIST:
+		case CMD_REMOVEFROMPLAYLIST: // TODO
 		case CMD_SETPOSITION:
 		case CMD_SETAUDIODELAY:
 		case CMD_SETSUBTITLEDELAY:
 		case CMD_SETINDEXPLAYLIST:
 		case CMD_SETAUDIOTRACK:
 		case CMD_SETSUBTITLETRACK:
-		case CMD_TOGGLEFULLSCREEN:
-		case CMD_INCREASEVOLUME:
-		case CMD_DECREASEVOLUME:
-		case CMD_SHADER_TOGGLE:
-		case CMD_OSDSHOWMESSAGE:
+		case CMD_JUMPOFNSECONDS:
 		case CMD_SETSPEED:
+		case CMD_OSDSHOWMESSAGE:
 			SendData(cmdInfo.id, m_txtCommand);
 			break;
 		case CMD_STOP:
@@ -412,10 +413,16 @@ void CRegisterCopyDataDlg::OnBnClickedButtonSendcommand()
 		case CMD_GETPLAYLIST:
 		case CMD_GETCURRENTPOSITION:
 		case CMD_GETVERSION:
+		case CMD_TOGGLEFULLSCREEN:
 		case CMD_JUMPFORWARDMED:
 		case CMD_JUMPBACKWARDMED:
+		case CMD_INCREASEVOLUME:
+		case CMD_DECREASEVOLUME:
+		case CMD_SHADER_TOGGLE:
 		case CMD_CLOSEAPP:
 			SendData(cmdInfo.id, L"");
 			break;
+		default:
+			ASSERT(0);
 	}
 }

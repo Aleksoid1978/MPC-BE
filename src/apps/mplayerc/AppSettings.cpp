@@ -1834,8 +1834,8 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 			} else if (sw == L"dub" && pos) {
 				slDubs.AddTail(ParseFileName(cmdln.GetNext(pos)));
 			} else if (sw == L"dubdelay" && pos) {
-				CString strFile	= ParseFileName(cmdln.GetNext(pos));
-				int nPos		= strFile.Find (L"DELAY");
+				CString strFile = ParseFileName(cmdln.GetNext(pos));
+				int nPos = strFile.Find (L"DELAY");
 				if (nPos != -1) {
 					rtShift = 10000 * _wtol(strFile.Mid(nPos + 6));
 				}
