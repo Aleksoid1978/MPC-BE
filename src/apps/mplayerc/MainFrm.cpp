@@ -17433,14 +17433,22 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 
 void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)
 {
-	CAtlList<CString> fns;
-	REFERENCE_TIME    rtPos = 0;
+	if (pCDS->lpData && (pCDS->cbData < 2 || ((LPWSTR)pCDS->lpData)[pCDS->cbData/sizeof(WCHAR) - 1] != 0)) {
+		DLog(L"ProcessAPICommand: possibly incorrect data! prevent possible crash");
+		return;
+	}
+
+	CString fn;
+	REFERENCE_TIME rtPos = 0;
 
 	switch (pCDS->dwData) {
-		case CMD_OPENFILE :
-			fns.AddHead((LPCWSTR)pCDS->lpData);
-			m_wndPlaylistBar.Open(fns, false);
-			OpenCurPlaylistItem();
+		case CMD_OPENFILE:
+			fn = (LPCWSTR)pCDS->lpData;
+			fn.Trim();
+			if (fn.GetLength()) {
+				m_wndPlaylistBar.Open(fn);
+				OpenCurPlaylistItem();
+			}
 			break;
 		case CMD_STOP :
 			OnPlayStop();
@@ -17458,8 +17466,11 @@ void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)
 			OnPlayPause();
 			break;
 		case CMD_ADDTOPLAYLIST :
-			fns.AddHead((LPCWSTR)pCDS->lpData);
-			m_wndPlaylistBar.Append(fns, true);
+			fn = (LPCWSTR)pCDS->lpData;
+			fn.Trim();
+			if (fn.GetLength()) {
+				m_wndPlaylistBar.Append(fn);
+			}
 			break;
 		case CMD_CLEARPLAYLIST :
 			m_wndPlaylistBar.Empty();
