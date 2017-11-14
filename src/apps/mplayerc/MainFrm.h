@@ -1055,6 +1055,7 @@ public:
 	afx_msg void OnUpdatePlaySeek(CCmdUI* pCmdUI);
 	afx_msg void OnPlayGoto();
 	afx_msg void OnUpdateGoto(CCmdUI* pCmdUI);
+	afx_msg void SetPlayingRate(double rate);
 	afx_msg void OnPlayChangeRate(UINT nID);
 	afx_msg void OnUpdatePlayChangeRate(CCmdUI* pCmdUI);
 	afx_msg void OnPlayResetRate();
