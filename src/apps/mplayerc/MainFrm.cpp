@@ -8130,6 +8130,46 @@ void CMainFrame::OnUpdateGoto(CCmdUI* pCmdUI)
 	pCmdUI->Enable(fEnable);
 }
 
+
+void CMainFrame::SetPlayingRate(double rate)
+{
+	if (m_eMediaLoadState != MLS_LOADED) {
+		return;
+	}
+	HRESULT hr = E_FAIL;
+
+	if (GetPlaybackMode() == PM_FILE) {
+		if (rate < 0.125) {
+			if (GetMediaState() != State_Paused) {
+				SendMessage(WM_COMMAND, ID_PLAY_PAUSE);
+			}
+			return;
+		} else {
+			if (GetMediaState() != State_Running) {
+				SendMessage(WM_COMMAND, ID_PLAY_PLAY);
+			}
+			hr = m_pMS->SetRate(rate);
+		}
+	} else if (GetPlaybackMode() == PM_DVD) {
+		if (GetMediaState() != State_Running) {
+			SendMessage(WM_COMMAND, ID_PLAY_PLAY);
+		}
+		if (rate > 0) {
+			hr = m_pDVDC->PlayForwards(rate, DVD_CMD_FLAG_Block, nullptr);
+		} else {
+			hr = m_pDVDC->PlayBackwards(-rate, DVD_CMD_FLAG_Block, nullptr);
+		}
+	}
+
+	if (SUCCEEDED(hr)) {
+		m_PlaybackRate = rate;
+
+		CString strODSMessage;
+		strODSMessage.Format(ResStr(IDS_OSD_SPEED), Rate2String(m_PlaybackRate));
+		m_OSD.DisplayMessage(OSD_TOPRIGHT, strODSMessage);
+	}
+}
+
 void CMainFrame::OnPlayChangeRate(UINT nID)
 {
 	if (m_eMediaLoadState != MLS_LOADED) {
@@ -8171,7 +8211,6 @@ void CMainFrame::OnPlayChangeRate(UINT nID)
 		CString strODSMessage;
 		strODSMessage.Format(ResStr(IDS_OSD_SPEED), Rate2String(m_PlaybackRate));
 		m_OSD.DisplayMessage(OSD_TOPRIGHT, strODSMessage);
-
 	}
 }
 
@@ -17452,7 +17491,7 @@ void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)
 		case CMD_SETSUBTITLEDELAY :
 			SetSubtitleDelay(_wtoi((LPCWSTR)pCDS->lpData));
 			break;
-		case CMD_SETINDEXPLAYLIST :
+		case CMD_SETINDEXPLAYLIST : // DOESN'T WORK
 			//m_wndPlaylistBar.SetSelIdx(_wtoi((LPCWSTR)pCDS->lpData));
 			break;
 		case CMD_SETAUDIOTRACK :
@@ -17503,7 +17542,8 @@ void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)
 		case CMD_CLOSEAPP :
 			PostMessage(WM_CLOSE);
 			break;
-		case CMD_SETSPEED: // TODO
+		case CMD_SETSPEED:
+			SetPlayingRate(_wtof((LPCWSTR)pCDS->lpData));
 			break;
 		case CMD_OSDSHOWMESSAGE:
 			ShowOSDCustomMessageApi((MPC_OSDDATA *)pCDS->lpData);

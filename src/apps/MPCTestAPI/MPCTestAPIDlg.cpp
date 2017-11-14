@@ -395,8 +395,8 @@ void CRegisterCopyDataDlg::OnBnClickedButtonSendcommand()
 		case CMD_INCREASEVOLUME:
 		case CMD_DECREASEVOLUME:
 		case CMD_SHADER_TOGGLE:
-		case CMD_CLOSEAPP:
 		case CMD_OSDSHOWMESSAGE:
+		case CMD_SETSPEED:
 			SendData(cmdInfo.id, m_txtCommand);
 			break;
 		case CMD_STOP:
@@ -414,6 +414,7 @@ void CRegisterCopyDataDlg::OnBnClickedButtonSendcommand()
 		case CMD_GETVERSION:
 		case CMD_JUMPFORWARDMED:
 		case CMD_JUMPBACKWARDMED:
+		case CMD_CLOSEAPP:
 			SendData(cmdInfo.id, L"");
 			break;
 	}
