@@ -980,6 +980,8 @@ void CMainFrame::OnClose()
 	s.WinLircClient.DisConnect();
 	s.UIceClient.DisConnect();
 
+	SendAPICommand(CMD_DISCONNECT, L"\0"); // according to CMD_NOTIFYENDOFSTREAM (ctrl+f it here), you're not supposed to send NULL here
+
 	if (s.AutoChangeFullscrRes.bEnabled && s.fRestoreResAfterExit) {
 		SetDispMode(s.dm_def, s.strFullScreenMonitor, TRUE);
 	}
@@ -17151,7 +17153,7 @@ void CMainFrame::SetPlayState(MPC_PLAYSTATE iState)
 	SendAPICommand(CMD_PLAYMODE, L"%d", iState);
 
 	if (m_bEndOfStream) {
-		SendAPICommand(CMD_NOTIFYENDOFSTREAM, L"\0");    // do not pass nullptr here!
+		SendAPICommand(CMD_NOTIFYENDOFSTREAM, L"\0"); // do not pass nullptr here!
 	}
 
 	// Prevent sleep when playing audio and/or video, but allow screensaver when only audio
