@@ -689,7 +689,7 @@ HRESULT CEVRAllocatorPresenter::IsMediaTypeSupported(IMFMediaType* pMixerType)
 	return hr;
 }
 
-HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerType, IMFMediaType** pType)
+HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerType, IMFMediaType* pMixerInputType, IMFMediaType** pType)
 {
 	HRESULT        hr;
 	AM_MEDIA_TYPE* pAMMedia = nullptr;
@@ -702,8 +702,11 @@ HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerTyp
 
 	m_pMediaType->SetUINT32(MF_MT_PAN_SCAN_ENABLED, 0);
 
-	int iOutputRange = GetRenderersSettings().iEVROutputRange;
-	if (m_inputExtFormat.NominalRange == MFNominalRange_0_255) {
+	UINT32 nominalRange;
+	pMixerInputType->GetUINT32(MF_MT_VIDEO_NOMINAL_RANGE, &nominalRange);
+
+	const int iOutputRange = GetRenderersSettings().iEVROutputRange;
+	if (nominalRange == MFNominalRange_0_255) {
 		m_pMediaType->SetUINT32(MF_MT_VIDEO_NOMINAL_RANGE, iOutputRange == 1 ? MFNominalRange_48_208 : MFNominalRange_16_235); // fix EVR bug
 	} else {
 		m_pMediaType->SetUINT32(MF_MT_VIDEO_NOMINAL_RANGE, iOutputRange == 1 ? MFNominalRange_16_235 : MFNominalRange_0_255);
@@ -869,19 +872,20 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 		return MF_E_INVALIDREQUEST;
 	}
 
-	CComPtr<IMFMediaType> pMixerType;
 	CComPtr<IMFMediaType> pType;
+	CComPtr<IMFMediaType> pMixerType;
+	CComPtr<IMFMediaType> pMixerInputType;
 
 	CInterfaceArray<IMFMediaType> ValidMixerTypes;
 
 	// Get the mixer's input type
-	HRESULT hr = m_pMixer->GetInputCurrentType(0, &pType);
+	HRESULT hr = m_pMixer->GetInputCurrentType(0, &pMixerInputType);
 	if (SUCCEEDED(hr)) {
 		AM_MEDIA_TYPE* pMT;
-		hr = pType->GetRepresentation(FORMAT_VideoInfo2, (LPVOID*)&pMT);
+		hr = pMixerInputType->GetRepresentation(FORMAT_VideoInfo2, (LPVOID*)&pMT);
 		if (SUCCEEDED(hr)) {
 			m_inputMediaType = *pMT;
-			pType->FreeRepresentation(FORMAT_VideoInfo2, (LPVOID)pMT);
+			pMixerInputType->FreeRepresentation(FORMAT_VideoInfo2, (LPVOID)pMT);
 		}
 	}
 
@@ -904,7 +908,7 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 		}
 
 		if (SUCCEEDED(hr)) {
-			hr = CreateProposedOutputType(pMixerType, &pType);
+			hr = CreateProposedOutputType(pMixerType, pMixerInputType, &pType);
 		}
 
 		// Step 4. Check if the mixer will accept this media type.

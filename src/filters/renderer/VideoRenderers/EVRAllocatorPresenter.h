@@ -261,7 +261,7 @@ namespace DSObjects
 		// === Media type negotiation functions
 		HRESULT									RenegotiateMediaType();
 		HRESULT									IsMediaTypeSupported(IMFMediaType* pMixerType);
-		HRESULT									CreateProposedOutputType(IMFMediaType* pMixerType, IMFMediaType** pType);
+		HRESULT									CreateProposedOutputType(IMFMediaType* pMixerType, IMFMediaType* pMixerInputType, IMFMediaType** pType);
 		HRESULT									SetMediaType(IMFMediaType* pType);
 		HRESULT									GetMediaTypeFourCC(IMFMediaType* pType, DWORD* pFourCC);
 		HRESULT									GetMixerMediaTypeMerit(IMFMediaType* pType, int *pMerit);
