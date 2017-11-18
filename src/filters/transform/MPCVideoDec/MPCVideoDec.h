@@ -188,6 +188,8 @@ protected:
 	int				m_nSurfaceWidth  = 0;
 	int				m_nSurfaceHeight = 0;
 
+	AVPixelFormat	m_dxva_pix_fmt;
+
 	static int					av_get_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
 	static enum AVPixelFormat	av_get_format(struct AVCodecContext *s, const enum AVPixelFormat * pix_fmts);
 

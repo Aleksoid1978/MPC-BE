@@ -38,6 +38,7 @@
 #include "../../../DSUtil/SysVersion.h"
 #include "../../parser/AviSplitter/AviSplitter.h"
 #include "../../Lock.h"
+#include "../../renderer/VideoRenderers/IPinHook.h"
 #include <moreuuids.h>
 #include <FilterInterfaces.h>
 
@@ -959,6 +960,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_iMvcOutputMode(MVC_OUTPUT_Auto)
 	, m_bMvcSwapLR(false)
 	, m_MVC_Base_View_R_flag(FALSE)
+	, m_dxva_pix_fmt(AV_PIX_FMT_NONE)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -1903,6 +1905,7 @@ redo:
 										|| (m_nCodecId == AV_CODEC_ID_VP9 && m_pAVCtx->profile == FF_PROFILE_VP9_2));
 
 	m_dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
+	m_dxva_pix_fmt = m_pAVCtx->pix_fmt;
 
 	if (bChangeType && IsDXVASupported()) {
 		do {
@@ -2002,7 +2005,7 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	int nSwIndex[PixFmt_count] = { 0 };
 	int nSwCount = 0;
 
-	const enum AVPixelFormat pix_fmt = m_pMSDKDecoder ? AV_PIX_FMT_NV12 : m_pAVCtx->pix_fmt;
+	const enum AVPixelFormat pix_fmt = m_pMSDKDecoder ? AV_PIX_FMT_NV12 : (m_pAVCtx->sw_pix_fmt != AV_PIX_FMT_NONE ? m_pAVCtx->sw_pix_fmt : m_pAVCtx->pix_fmt);
 
 	if (pix_fmt != AV_PIX_FMT_NONE) {
 		const AVPixFmtDescriptor* av_pfdesc = av_pix_fmt_desc_get(pix_fmt);
@@ -2394,7 +2397,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 
 			if (IsDXVASupported()) {
 				HRESULT hr;
-				if (FAILED(hr = InitDecoder(&m_pInput->CurrentMediaType()))) {
+				if (FAILED(hr = InitDecoder(&m_pCurrentMediaType))) {
 					return hr;
 				}
 
@@ -2500,7 +2503,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 
 	if (m_bDecodingStart && m_pAVCtx) {
 		if (m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_MPEG2VIDEO) {
-			InitDecoder(&m_pInput->CurrentMediaType());
+			InitDecoder(&m_pCurrentMediaType);
 		}
 
 		if (UseDXVA2()
@@ -2805,6 +2808,34 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 		UpdateAspectRatio();
 
 		if (UseDXVA2()) {
+			if ((m_nCodecId == AV_CODEC_ID_HEVC || m_nCodecId == AV_CODEC_ID_VP9)
+					&& m_dxva_pix_fmt != m_pAVCtx->sw_pix_fmt) {
+				const int depth = GetLumaBits(m_pAVCtx->sw_pix_fmt);
+				const BOOL bHighBitdepth = (depth == 10) && ((m_nCodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10)
+															 || (m_nCodecId == AV_CODEC_ID_VP9 && m_pAVCtx->profile == FF_PROFILE_VP9_2));
+
+				if (bHighBitdepth != m_bHighBitdepth) {
+					m_bHighBitdepth = bHighBitdepth;
+					if (SUCCEEDED(FindDecoderConfiguration())) {
+						ChangeOutputMediaFormat(2);
+						RecommitAllocator();
+					} else {
+						SAFE_DELETE(m_pDXVADecoder);
+						m_nDecoderMode = MODE_SOFTWARE;
+						DXVAState::ClearState();
+
+						HRESULT hr;
+						if (FAILED(hr = InitDecoder(&m_pCurrentMediaType))) {
+							return hr;
+						}
+
+						ChangeOutputMediaFormat(2);
+						return hr;
+					}
+				}
+			}
+			m_dxva_pix_fmt = m_pAVCtx->sw_pix_fmt;
+
 			hr = m_pDXVADecoder->DeliverFrame();
 			Continue;
 		}
