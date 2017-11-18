@@ -134,6 +134,8 @@ IF /I "%BUILDPLATFORM%" == "Win32" (GOTO Win32) ELSE IF /I "%BUILDPLATFORM%" == 
 
 :Win32
 CALL "%VCVARS%" x86 > nul
+REM again set the source directory (fix possible bug in VS2017)
+CD /D %~dp0
 
 IF /I "%CONFIG%" == "Filters" (
   CALL :SubFilters Win32
@@ -161,6 +163,8 @@ IF /I "%CONFIG%" == "All" (
 IF /I "%BUILDPLATFORM%" == "Win32" GOTO End
 
 CALL "%VCVARS%" %x64_type% > nul
+REM again set the source directory (fix possible bug in VS2017)
+CD /D %~dp0
 
 IF /I "%CONFIG%" == "Filters" (
   CALL :SubFilters x64
