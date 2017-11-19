@@ -36,9 +36,9 @@
 #include "../../../DSUtil/ff_log.h"
 #include "../../../DSUtil/GolombBuffer.h"
 #include "../../../DSUtil/SysVersion.h"
+#include "../../../DSUtil/DXVAState.h"
 #include "../../parser/AviSplitter/AviSplitter.h"
 #include "../../Lock.h"
-#include "../../renderer/VideoRenderers/IPinHook.h"
 #include <moreuuids.h>
 #include <FilterInterfaces.h>
 

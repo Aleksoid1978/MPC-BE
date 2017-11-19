@@ -223,5 +223,8 @@
     <ClInclude Include="FileVersion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DXVAState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

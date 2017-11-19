@@ -29,6 +29,7 @@
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/Filehandle.h"
 #include "../../DSUtil/FileVersionInfo.h"
+#include "../../DSUtil/DXVAState.h"
 #include "OpenDlg.h"
 #include "SaveDlg.h"
 #include "GoToDlg.h"

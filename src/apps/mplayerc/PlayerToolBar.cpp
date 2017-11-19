@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PlayerToolBar.h"
-#include <IPinHook.h>
+#include "../../DSUtil/DXVAState.h"
 
 // CPlayerToolBar
 
