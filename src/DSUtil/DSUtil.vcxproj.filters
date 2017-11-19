@@ -107,6 +107,9 @@
     <ClCompile Include="ResampleRGB32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DXVAState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DSMPropertyBag.h">
