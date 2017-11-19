@@ -1805,8 +1805,6 @@ redo:
 		m_bUseDXVA = false;
 	}
 
-	m_bCompatibleDXVA = m_bUseDXVA;
-
 	SetThreadCount();
 
 	m_pFrame = av_frame_alloc();
@@ -2805,7 +2803,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 	int ret = avcodec_send_packet(m_pAVCtx, avpkt);
 	if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF) {
-		if (UseDXVA2() && !m_bCompatibleDXVA) {
+		if (UseDXVA2() && !m_bDXVACompatible) {
 			SAFE_DELETE(m_pDXVADecoder);
 			m_nDecoderMode = MODE_SOFTWARE;
 			DXVAState::ClearState();
@@ -3856,8 +3854,8 @@ int CMPCVideoDecFilter::av_get_buffer(struct AVCodecContext *c, AVFrame *pic, in
 {
 	CMPCVideoDecFilter* pFilter = static_cast<CMPCVideoDecFilter*>(c->opaque);
 	CheckPointer(pFilter->m_pDXVADecoder, -1);
-	if (!check_dxva_compatible(c->codec_id, c->pix_fmt, c->profile)) {
-		pFilter->m_bCompatibleDXVA = false;
+	if (!check_dxva_compatible(c->codec_id, c->sw_pix_fmt, c->profile)) {
+		pFilter->m_bDXVACompatible = false;
 		return -1;
 	}
 
