@@ -137,6 +137,7 @@
     <ClInclude Include="D3D9Helper.h" />
     <ClInclude Include="DSMPropertyBag.h" />
     <ClInclude Include="DSUtil.h" />
+    <ClInclude Include="DXVAState.h" />
     <ClInclude Include="ff_log.h" />
     <ClInclude Include="FileHandle.h" />
     <ClInclude Include="FileVersion.h" />

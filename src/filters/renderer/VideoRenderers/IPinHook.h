@@ -79,12 +79,3 @@ extern HANDLE         g_hNewSegmentEvent;
 
 // DXVA2 hooks
 void HookDirectXVideoDecoderService(void* pIDirectXVideoDecoderService);
-
-namespace DXVAState
-{
-	void ClearState();
-	void SetActiveState(const GUID& guidDXVADecoder, const CString& customDescription = L"");
-	const BOOL GetState();
-	const CString GetDescription();
-	const CString GetShortDescription();
-}

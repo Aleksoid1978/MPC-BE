@@ -29,6 +29,7 @@
 #include "IPinHook.h"
 #include "AllocatorCommon.h"
 #include "../../../DSUtil/SysVersion.h"
+#include "../../../DSUtil/DXVAState.h"
 
 #define DXVA_LOGFILE_A 0 // set to 1 for logging DXVA data to a file
 #define LOG_BITSTREAM  0 // set to 1 for logging DXVA bistream data to a file
@@ -50,55 +51,6 @@ IPinC*             g_pPinC             = nullptr;
 REFERENCE_TIME g_tSegmentStart    = 0;
 FRAME_TYPE     g_nFrameType       = PICT_NONE;
 HANDLE         g_hNewSegmentEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-
-namespace DXVAState {
-	BOOL m_bDXVActive      = FALSE;
-	GUID m_guidDXVADecoder = GUID_NULL;
-
-	CString m_sDXVADecoderDescription = L"Software";
-	CString m_sDXVADecoderShortDescription;
-
-	void ClearState()
-	{
-		m_bDXVActive      = FALSE;
-		m_guidDXVADecoder = GUID_NULL;
-
-		m_sDXVADecoderDescription      = L"Software";
-		m_sDXVADecoderShortDescription = L"";
-	}
-
-	void SetActiveState(const GUID& guidDXVADecoder, const CString& customDescription/* = L""*/)
-	{
-		m_bDXVActive = TRUE;
-
-		if (!customDescription.IsEmpty()) {
-			m_sDXVADecoderDescription = customDescription;
-			if (m_guidDXVADecoder != GUID_NULL) {
-				m_sDXVADecoderDescription.AppendFormat(L", %s", GetDXVAMode(m_guidDXVADecoder));
-			}
-			m_sDXVADecoderShortDescription = L"H/W";
-		} else if (guidDXVADecoder != GUID_NULL) {
-			m_guidDXVADecoder = guidDXVADecoder;
-			m_sDXVADecoderShortDescription = L"DXVA2";
-			m_sDXVADecoderDescription.Format(L"DXVA2 Native, %s", GetDXVAMode(m_guidDXVADecoder));
-		}
-	}
-
-	const BOOL GetState()
-	{
-		return m_bDXVActive;
-	}
-
-	const CString GetDescription()
-	{
-		return m_sDXVADecoderDescription;
-	}
-
-	const CString GetShortDescription()
-	{
-		return m_sDXVADecoderShortDescription;
-	}
-}
 
 // DirectShow hooks
 static HRESULT (STDMETHODCALLTYPE* NewSegmentOrg)(IPinC * This, /* [in] */ REFERENCE_TIME tStart, /* [in] */ REFERENCE_TIME tStop, /* [in] */ double dRate) PURE;
