@@ -98,7 +98,6 @@ protected:
 	double									m_dRate;
 
 	bool									m_bUseDXVA;
-	bool									m_bCompatibleDXVA;
 	bool									m_bUseFFmpeg;
 	CFormatConverter						m_FormatConverter;
 	CSize									m_pOutSize;				// Picture size on output pin
