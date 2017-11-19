@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include <mmreg.h>
 #include "OggSplitter.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/GolombBuffer.h"

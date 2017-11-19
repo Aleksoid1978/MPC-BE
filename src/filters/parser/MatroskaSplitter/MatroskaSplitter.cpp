@@ -1249,6 +1249,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 					mts.Add(mt);
 				} else if (CodecID == "A_ALAC") {
+					wfe->wFormatTag = WAVE_FORMAT_ALAC;
 					mt.subtype = MEDIASUBTYPE_ALAC;
 					WORD cbSize = (WORD)pTE->CodecPrivate.GetCount() + 12;
 					wfe->cbSize = cbSize;
