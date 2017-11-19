@@ -31,6 +31,7 @@
 #include "IPinHook.h"
 #include "../DSUtil/SysVersion.h"
 #include "../DSUtil/WinAPIUtils.h"
+#include "../DSUtil/DXVAState.h"
 #include "../../transform/VSFilter/IDirectVobSub.h"
 #include "FocusThread.h"
 #include "D3DHook.h"

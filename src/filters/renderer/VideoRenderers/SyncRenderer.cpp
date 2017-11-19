@@ -42,6 +42,7 @@
 #include "SyncRenderer.h"
 #include "FocusThread.h"
 #include "../DSUtil/D3D9Helper.h"
+#include "../DSUtil/DXVAState.h"
 #include "../../../apps/mplayerc/resource.h"
 
 using namespace GothSync;
