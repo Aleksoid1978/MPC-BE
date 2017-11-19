@@ -153,12 +153,6 @@ void FFH264GetParams(struct AVCodecContext* pAVCtx, int& x264_build)
 	x264_build = h->sei.unregistered.x264_build;
 }
 
-// === Mpeg2 functions
-int MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx)
-{
-	return (((MpegEncContext*)pAVCtx->priv_data)->chroma_format < 2);
-}
-
 void FillAVCodecProps(struct AVCodecContext* pAVCtx, int x264_build)
 {
 	if (pAVCtx->codec_id == AV_CODEC_ID_H264 && x264_build != -1) {

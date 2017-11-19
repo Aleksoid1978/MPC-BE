@@ -34,9 +34,6 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 							 DWORD nPCIVendor, DWORD nPCIDevice, UINT64 VideoDriverVersion);
 void FFH264GetParams(struct AVCodecContext* pAVCtx, int& x264_build);
 
-// === Mpeg2 functions
-int  MPEG2CheckCompatibility(struct AVCodecContext* pAVCtx);
-
 // === Common functions
 void FillAVCodecProps(struct AVCodecContext* pAVCtx, int x264_build);
 
