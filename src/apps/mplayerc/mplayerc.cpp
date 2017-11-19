@@ -427,7 +427,7 @@ BOOL CMPlayerCApp::GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBY
 	}
 }
 
-UINT CMPlayerCApp::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault)
+UINT CMPlayerCApp::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, INT nDefault)
 {
 	if (!lpszSection || !lpszEntry) {
 		ASSERT(FALSE);
@@ -436,7 +436,7 @@ UINT CMPlayerCApp::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDe
 
 	std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
 
-	int res = nDefault;
+	INT res = nDefault;
 	if (m_pszRegistryKey) {
 		CRegKey regkey;
 		if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_READ)) {
@@ -558,7 +558,7 @@ BOOL CMPlayerCApp::WriteProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LP
 	}
 }
 
-BOOL CMPlayerCApp::WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nValue)
+BOOL CMPlayerCApp::WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, INT nValue)
 {
 	if (!lpszSection || !lpszEntry) {
 		ASSERT(FALSE);
@@ -666,6 +666,81 @@ BOOL CMPlayerCApp::WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LP
 			if (m_ProfileMap.erase(sectionStr)) {
 				m_bQueuedProfileFlush = true;
 			}
+		}
+		return TRUE;
+	}
+}
+
+INT64 CMPlayerCApp::GetProfileInt64(LPCTSTR lpszSection, LPCTSTR lpszEntry, INT64 nDefault)
+{
+	if (!lpszSection || !lpszEntry) {
+		ASSERT(FALSE);
+		return nDefault;
+	}
+
+	std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
+
+	INT64 res = nDefault;
+	if (m_pszRegistryKey) {
+		CRegKey regkey;
+		if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_READ)) {
+			regkey.QueryQWORDValue(lpszEntry, *(QWORD*)&res);
+			regkey.Close();
+		}
+	} else {
+		CString sectionStr(lpszSection);
+		CString keyStr(lpszEntry);
+		if (sectionStr.IsEmpty() || keyStr.IsEmpty()) {
+			ASSERT(FALSE);
+			return res;
+		}
+
+		InitProfile();
+		auto it1 = m_ProfileMap.find(sectionStr);
+		if (it1 != m_ProfileMap.end()) {
+			auto it2 = it1->second.find(keyStr);
+			if (it2 != it1->second.end()) {
+				res = _wtoi64(it2->second);
+			}
+		}
+	}
+	return res;
+}
+
+BOOL CMPlayerCApp::WriteProfileInt64(LPCTSTR lpszSection, LPCTSTR lpszEntry, INT64 nValue)
+{
+	if (!lpszSection || !lpszEntry) {
+		ASSERT(FALSE);
+		return FALSE;
+	}
+
+	std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
+
+	if (m_pszRegistryKey) {
+		BOOL ret = FALSE;
+		CRegKey regkey;
+		if (ERROR_SUCCESS == regkey.Create(m_hAppRegKey, lpszSection)) {
+			if (ERROR_SUCCESS == regkey.SetQWORDValue(lpszEntry, (QWORD)nValue)) {
+				ret = TRUE;
+			}
+			regkey.Close();
+		}
+		return ret;
+	} else {
+		CString sectionStr(lpszSection);
+		CString keyStr(lpszEntry);
+		if (sectionStr.IsEmpty() || keyStr.IsEmpty()) {
+			ASSERT(FALSE);
+			return FALSE;
+		}
+		CString valueStr;
+		valueStr.Format(L"%I64d", nValue);
+
+		InitProfile();
+		CString& old = m_ProfileMap[sectionStr][keyStr];
+		if (old != valueStr) {
+			old = valueStr;
+			m_bQueuedProfileFlush = true;
 		}
 		return TRUE;
 	}

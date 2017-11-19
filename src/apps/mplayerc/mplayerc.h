@@ -123,11 +123,13 @@ public:
 
 	void			FlushProfile(bool bForce = true);
 	virtual BOOL	GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBYTE* ppData, UINT* pBytes) override;
-	virtual UINT	GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault) override;
+	virtual UINT	GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, INT nDefault) override;
 	virtual CString	GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszDefault = nullptr) override;
 	virtual BOOL	WriteProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBYTE pData, UINT nBytes) override;
-	virtual BOOL	WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nValue) override;
+	virtual BOOL	WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, INT nValue) override;
 	virtual BOOL	WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszValue) override;
+	virtual INT64	GetProfileInt64(LPCTSTR lpszSection, LPCTSTR lpszEntry, INT64 nDefault);
+	virtual BOOL	WriteProfileInt64(LPCTSTR lpszSection, LPCTSTR lpszEntry, INT64 nValue);
 	bool			HasProfileEntry(LPCTSTR lpszSection, LPCTSTR lpszEntry);
 
 public:
