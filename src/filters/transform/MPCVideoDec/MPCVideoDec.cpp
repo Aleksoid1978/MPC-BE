@@ -1563,6 +1563,8 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaTy
 			return hr;
 		}
 
+		BuildOutputFormat();
+
 		if (UseDXVA2()
 				&& (m_pCurrentMediaType != *pmt)) {
 			hr = ReinitDXVA2Decoder();
@@ -1759,8 +1761,6 @@ redo:
 
 		if (m_pMSDKDecoder) {
 			m_bMVC_Output_TopBottom = m_iMvcOutputMode == MVC_OUTPUT_TopBottom;
-
-			BuildOutputFormat();
 			return S_OK;
 		}
 
@@ -2005,8 +2005,6 @@ redo:
 	}
 
 	av_frame_unref(m_pFrame);
-
-	BuildOutputFormat();
 
 	if (UseDXVA2() && m_pDXVADecoder) {
 		m_pDXVADecoder->FillHWContext();
