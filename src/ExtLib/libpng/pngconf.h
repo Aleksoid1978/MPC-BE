@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.6.31beta06, July 13, 2017
+ * libpng version 1.6.35beta01, September 29, 2017
  *
  * Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -127,7 +127,7 @@
  *
  * These cases only differ if the operating system does not use the C
  * calling convention, at present this just means the above cases
- * (x86 DOS/Windows sytems) and, even then, this does not apply to
+ * (x86 DOS/Windows systems) and, even then, this does not apply to
  * Cygwin running on those systems.
  *
  * Note that the value must be defined in pnglibconf.h so that what

@@ -1,4 +1,4 @@
-Libpng 1.6.31beta06 - July 16, 2017
+Libpng 1.6.35beta01 - November 3, 2017
 
 This is not intended to be a public release. It will be replaced
 within a few weeks by a public version or by another test version.
@@ -8,62 +8,29 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.31beta06.tar.xz (LZMA-compressed, recommended)
-   1.6.31beta06.tar.gz
+   1.6.35beta01.tar.xz (LZMA-compressed, recommended)
+   1.6.35beta01.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1631b06.7z  (LZMA-compressed, recommended)
-   lp1631b06.zip
+   lp1635b01.7z  (LZMA-compressed, recommended)
+   lp1635b01.zip
 
 Other information:
 
-   1.6.31beta06-README.txt
-   1.6.31beta06-LICENSE.txt
-   libpng-1.6.31beta06-*.asc (armored detached GPG signatures)
+   1.6.35beta01-README.txt
+   1.6.35beta01-LICENSE.txt
 
-Changes since the last public release (1.6.30):
+Changes since the last public release (1.6.34):
 
-Version 1.6.31beta01 [July 5, 2017]
-  Guard the definition of _POSIX_SOURCE in pngpriv.h (AIX already defines it;
-    bug report by Michael Felt).
-  Revised pngpriv.h to work around failure to compile arm/filter_neon.S
-    ("typedef" directive is unrecognized by the assembler). The problem
-    was introduced in libpng-1.6.30beta01.
-  Added "Requires: zlib" to libpng.pc.in (Pieter Neerincx).
-  Added special case for FreeBSD in arm/filter_neon.S (Maya Rashish).
-
-Version 1.6.31beta02 [July 8, 2017]
-  Added instructions for disabling hardware optimizations in INSTALL.
-  Added "--enable-hardware-optimizations" configuration flag to enable
-    or disable all hardware optimizations with one flag.
-
-Version 1.6.31beta03 [July 9, 2017]
-  Updated CMakeLists.txt to add INTEL_SSE and MIPS_MSA platforms.
-  Changed "int" to "png_size_t" in intel/filter_sse2.c to prevent
-    possible integer overflow (Bug report by John Bowler).
-  Quieted "declaration after statement" warnings in intel/filter_sse2.c.
-  Added scripts/makefile-linux-opt, which has hardware optimizations enabled.
-
-Version 1.6.31beta04 [July 11, 2017]
-  Removed one of the GCC-7.1.0 'strict-overflow' warnings that result when
-    integers appear on both sides of a compare.  Worked around the others by
-    forcing the strict-overflow setting in the relevant functions to a level
-    where they are not reported (John Bowler).
-  Changed "FALL THROUGH" comments to "FALLTHROUGH" because GCC doesn't like
-    the space.
-  Worked around some C-style casts from (void*) because g++ 5.4.0 objects
-    to them.
-  Increased the buffer size for 'sprint' to pass the gcc 7.1.0 'sprint
-    overflow' check that is on by default with -Wall -Wextra.
-
-Version 1.6.31beta05 [July 13, 2017]
-  Added eXIf chunk support.
-
-Version 1.6.31beta06 [July 16, 2017]
-  Added a minimal eXIf chunk (with Orientation and FocalLengthIn35mmFilm
-    tags) to pngtest.png.
+Version 1.6.35beta01 [November 3, 2017]
+  Restored 21 of the contrib/pngsuite/i*.png, which do not cause test
+    failures. Placed the remainder in contrib/pngsuite/interlaced/i*.png.
+  Added calls to png_set_*() transforms commonly used by browsers to
+    the fuzzer.
+  Removed some unnecessary brackets in pngrtran.c
+  Fixed miscellaneous typos (Patch by github user "luzpaz").
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

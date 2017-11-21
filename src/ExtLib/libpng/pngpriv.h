@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * Last changed in libpng 1.6.31 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.32 [August 24, 2017]
  * Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -917,7 +917,7 @@
     * PNG files the -I directives must match.
     *
     * The most likely explanation is that you passed a -I in CFLAGS. This will
-    * not work; all the preprocessor directories and in particular all the -I
+    * not work; all the preprocessor directives and in particular all the -I
     * directives must be in CPPFLAGS.
     */
 #endif
@@ -1141,6 +1141,11 @@ PNG_INTERNAL_FUNCTION(void,png_write_cHRM_fixed,(png_structrp png_ptr,
 #ifdef PNG_WRITE_sRGB_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_write_sRGB,(png_structrp png_ptr,
     int intent),PNG_EMPTY);
+#endif
+
+#ifdef PNG_WRITE_eXIf_SUPPORTED
+PNG_INTERNAL_FUNCTION(void,png_write_eXIf,(png_structrp png_ptr,
+    png_bytep exif, int num_exif),PNG_EMPTY);
 #endif
 
 #ifdef PNG_WRITE_iCCP_SUPPORTED
@@ -1522,8 +1527,11 @@ PNG_INTERNAL_FUNCTION(void,png_handle_zTXt,(png_structrp png_ptr,
     png_inforp info_ptr, png_uint_32 length),PNG_EMPTY);
 #endif
 
-PNG_INTERNAL_FUNCTION(void,png_check_chunk_name,(png_structrp png_ptr,
-    png_uint_32 chunk_name),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_check_chunk_name,(png_const_structrp png_ptr,
+    const png_uint_32 chunk_name),PNG_EMPTY);
+
+PNG_INTERNAL_FUNCTION(void,png_check_chunk_length,(png_const_structrp png_ptr,
+    const png_uint_32 chunk_length),PNG_EMPTY);
 
 PNG_INTERNAL_FUNCTION(void,png_handle_unknown,(png_structrp png_ptr,
     png_inforp info_ptr, png_uint_32 length, int keep),PNG_EMPTY);
