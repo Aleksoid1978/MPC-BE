@@ -238,9 +238,9 @@ void File_Hevc::Streams_Fill()
         Fill(Stream_Video, 0, "MaxFALL", Ztring::ToZtring(maximum_frame_average_light_level) + __T(" cd/m2"));
     if (chroma_sample_loc_type_top_field != (int32u)-1)
     {
-	Fill(Stream_Video, 0, "ChromaSubsampling_Position", __T("Type ") + Ztring::ToZtring(chroma_sample_loc_type_top_field));
-	if (chroma_sample_loc_type_bottom_field != (int32u)-1 && chroma_sample_loc_type_bottom_field != chroma_sample_loc_type_top_field)
-		Fill(Stream_Video, 0, "ChromaSubsampling_Position", __T("Type ") + Ztring::ToZtring(chroma_sample_loc_type_bottom_field));
+    Fill(Stream_Video, 0, "ChromaSubsampling_Position", __T("Type ") + Ztring::ToZtring(chroma_sample_loc_type_top_field));
+    if (chroma_sample_loc_type_bottom_field != (int32u)-1 && chroma_sample_loc_type_bottom_field != chroma_sample_loc_type_top_field)
+        Fill(Stream_Video, 0, "ChromaSubsampling_Position", __T("Type ") + Ztring::ToZtring(chroma_sample_loc_type_bottom_field));
     }
 }
 
@@ -1986,13 +1986,13 @@ void File_Hevc::sei_message_user_data_unregistered(int32u payloadSize)
 
     //Parsing
     int128u uuid_iso_iec_11578;
-    Get_GUID(uuid_iso_iec_11578,                                "uuid_iso_iec_11578");
+    Get_UUID(uuid_iso_iec_11578,                                "uuid_iso_iec_11578");
 
     switch (uuid_iso_iec_11578.hi)
     {
-        case 0x214892b89bCC7f42LL : Element_Info1("Ateme");
+        case 0x427FCC9BB8924821LL : Element_Info1("Ateme");
                                      sei_message_user_data_unregistered_Ateme(payloadSize-16); break;
-        case 0xDB4717b509DEA22CLL : Element_Info1("x265");
+        case 0x2CA2DE09B51747DBLL : Element_Info1("x265");
                                      sei_message_user_data_unregistered_x265(payloadSize-16); break;
         default :
                     Element_Info1("unknown");
@@ -2187,34 +2187,7 @@ void File_Hevc::sei_message_mastering_display_colour_volume()
 {
     Element_Info1("mastering_display_colour_volume");
 
-    //Parsing
-    int32u max, min;
-    int16u x[4];
-    int16u y[4];
-    for (size_t c = 0; c < 3; c++)
-    {
-        Get_B2(x[c],                                            "display_primaries_x");
-        Get_B2(y[c],                                            "display_primaries_y");
-    }
-    Get_B2(x[3],                                                "white_point_x");
-    Get_B2(y[3],                                                "white_point_y");
-    Get_B4(max,                                                 "max_display_mastering_luminance");
-    Get_B4(min,                                                 "min_display_mastering_luminance");
-
-    if (MasteringDisplay_ColorPrimaries.empty())
-    {
-        MasteringDisplay_ColorPrimaries=__T("R: x=")+Ztring::ToZtring(((float64)x[2])/50000, 6)
-                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[2])/50000, 6)
-                                     +__T(", G: x=")+Ztring::ToZtring(((float64)x[0])/50000, 6)
-                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[0])/50000, 6)
-                                     +__T(", B: x=")+Ztring::ToZtring(((float64)x[1])/50000, 6)
-                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[1])/50000, 6)
-                           +__T(", White point: x=")+Ztring::ToZtring(((float64)x[3])/50000, 6)
-                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[3])/50000, 6);
-        MasteringDisplay_Luminance=__T("min: ")+Ztring::ToZtring(((float64)min)/10000, 4)
-                          +__T(" cd/m2, max: ")+Ztring::ToZtring(((float64)max)/10000, 4)
-                          +__T(" cd/m2");
-    }
+    Get_MasteringDisplayColorVolume(MasteringDisplay_ColorPrimaries, MasteringDisplay_Luminance);
 }
 
 //---------------------------------------------------------------------------

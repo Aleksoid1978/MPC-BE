@@ -1621,10 +1621,10 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version, acquis
     }
     else if (Version==Version_1_8)
     {
-        Node_CoreMain.Add_Attribute("xmlns:ebucore", "urn:ebu:metadata-schema:ebuCore_2017");
+        Node_CoreMain.Add_Attribute("xmlns:ebucore", "urn:ebu:metadata-schema:ebucore");
         Node_CoreMain.Add_Attribute("xmlns:xalan", "http://xml.apache.org/xalan");
         Node_CoreMain.Add_Attribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-        Node_CoreMain.Add_Attribute("xsi:schemaLocation", string("urn:ebu:metadata-schema:ebuCore_2017 http")+string(MediaInfoLib::Config.Https_Get()?"s":"")+"://raw.githubusercontent.com/ebu/ebucore/master/ebucore.xsd");
+        Node_CoreMain.Add_Attribute("xsi:schemaLocation", string("urn:ebu:metadata-schema:ebucore http")+string(MediaInfoLib::Config.Https_Get()?"s":"")+"://www.ebu.ch/metadata/schemas/EBUCore/20171009/ebucore.xsd");
         Node_CoreMain.Add_Attribute("version", "1.8");
         Node_CoreMain.Add_Attribute("writingLibraryName", "MediaInfoLib");
         Node_CoreMain.Add_Attribute("writingLibraryVersion", MediaInfoLib::Config.Info_Version_Get().SubString(__T(" - v"), Ztring()));

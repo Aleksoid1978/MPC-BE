@@ -698,6 +698,7 @@ namespace Elements
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_btrt=0x62747274;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_clap=0x636C6170;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_chan=0x6368616E;
+    const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_clli=0x636C6C69;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_colr=0x636F6C72;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_colr_clcn=0x636C636E;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_colr_nclc=0x6E636C63;
@@ -722,6 +723,7 @@ namespace Elements
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_jp2h=0x6A703268;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_jp2h_colr=0x636F6C72;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_jp2h_ihdr=0x69686472;
+    const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_mdcv=0x6D646376;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_pasp=0x70617370;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_sinf=0x73696E66;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_sinf_frma=0x66726D61;
@@ -1034,6 +1036,8 @@ void File_Mpeg4::Data_Parse()
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_btrt)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_chan)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_clap)
+                                ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_clli)
+                                ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_mdcv)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_colr)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_d263)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_dac3)
@@ -2751,7 +2755,9 @@ void File_Mpeg4::moov_meta_ilst_xxxx_data()
             {
                 FILLING_BEGIN();
                     std::string Parameter;
-                    Metadata_Get(Parameter, moov_udta_meta_keys_List[moov_udta_meta_keys_ilst_Pos<moov_udta_meta_keys_List.size()?moov_udta_meta_keys_ilst_Pos:moov_udta_meta_keys_List.size()-1]);
+                    int32u keys_Pos=Element_Code_Get(Element_Level-1);
+                    if (keys_Pos && keys_Pos<=moov_udta_meta_keys_List.size())
+                        Metadata_Get(Parameter, moov_udta_meta_keys_List[keys_Pos-1]);
                     if (Parameter=="com.apple.quicktime.version")
                         Vendor_Version=Value.SubString(__T(""), __T(" "));
                     else if (Parameter=="com.apple.quicktime.player.version")
@@ -2766,22 +2772,22 @@ void File_Mpeg4::moov_meta_ilst_xxxx_data()
                         Fill(Stream_General, 0, "Media/History/UUID", Value);
                     else if (Parameter=="com.universaladid.idregistry")
                     {
-                        Fill(Stream_General, 0, "AdID_Registry", Value);
-                        Fill_SetOptions(Stream_General, 0, "AdID_Registry", "N NTY");
-                        if (!Retrieve(Stream_General, 0, "AdID_Value").empty())
+                        Fill(Stream_General, 0, "UniversalAdID_Registry", Value);
+                        Fill_SetOptions(Stream_General, 0, "UniversalAdID_Registry", "N NTY");
+                        if (!Retrieve(Stream_General, 0, "UniversalAdID_Value").empty())
                         {
-                            Fill(Stream_General, 0, "AdID/String", Value+__T(" (")+Retrieve(Stream_General, 0, "AdID_Registry")+__T(")"), true);
-                            Fill_SetOptions(Stream_General, 0, "AdID/String", "Y NTN");
+                            Fill(Stream_General, 0, "UniversalAdID/String", Value+__T(" (")+Retrieve(Stream_General, 0, "UniversalAdID_Registry")+__T(")"), true);
+                            Fill_SetOptions(Stream_General, 0, "UniversalAdID/String", "Y NTN");
                         }
                     }
                     else if (Parameter=="com.universaladid.idvalue")
                     {
-                        Fill(Stream_General, 0, "AdID_Value", Value);
-                        Fill_SetOptions(Stream_General, 0, "AdID_Value", "N NTY");
-                        if (!Retrieve(Stream_General, 0, "AdID_Registry").empty())
+                        Fill(Stream_General, 0, "UniversalAdID_Value", Value);
+                        Fill_SetOptions(Stream_General, 0, "UniversalAdID_Value", "N NTY");
+                        if (!Retrieve(Stream_General, 0, "UniversalAdID_Registry").empty())
                         {
-                            Fill(Stream_General, 0, "AdID/String", Value+__T(" (")+Retrieve(Stream_General, 0, "AdID_Registry")+__T(")"), true);
-                            Fill_SetOptions(Stream_General, 0, "AdID/String", "Y NTN");
+                            Fill(Stream_General, 0, "UniversalAdID/String", Value+__T(" (")+Retrieve(Stream_General, 0, "UniversalAdID_Registry")+__T(")"), true);
+                            Fill_SetOptions(Stream_General, 0, "UniversalAdID/String", "Y NTN");
                         }
                     }
                     else if (!Parameter.empty())
@@ -4898,6 +4904,14 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxVideo()
                 if (MediaInfoLib::Config.CodecID_Get(Stream_Video, InfoCodecID_Format_Mpeg4, Ztring().From_CC4((int32u)Element_Code), InfoCodecID_Format)==__T("VC-3"))
                 {
                     File_Vc3* Parser=new File_Vc3;
+                    #if MEDIAINFO_DEMUX
+                        if (Config->Demux_Unpacketize_Get())
+                        {
+                            Streams[moov_trak_tkhd_TrackID].Demux_Level=4; //Intermediate
+                            Parser->Demux_Level=2; //Container
+                            Parser->Demux_UnpacketizeContainer=true;
+                        }
+                    #endif //MEDIAINFO_DEMUX
                     Streams[moov_trak_tkhd_TrackID].Parsers.push_back(Parser);
                 }
             #endif
@@ -5308,6 +5322,22 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_clap()
             Streams[moov_trak_tkhd_TrackID].CleanAperture_Width=((float)apertureWidth_N)/apertureWidth_D;
             Streams[moov_trak_tkhd_TrackID].CleanAperture_Height=((float)apertureHeight_N)/apertureHeight_D;
         }
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_clli()
+{
+    Element_Name("Content Light Level Info");
+
+    //Parsing
+    int16u  maximum_content_light_level, maximum_frame_average_light_level;
+    Get_B2(maximum_content_light_level,                         "maximum_content_light_level");
+    Get_B2(maximum_frame_average_light_level,                   "maximum_frame_average_light_level");
+
+    FILLING_BEGIN();
+        Fill(Stream_Video, 0, "MaxCLL", Ztring::ToZtring(maximum_content_light_level) + __T(" cd/m2"));
+        Fill(Stream_Video, 0, "MaxFALL", Ztring::ToZtring(maximum_frame_average_light_level) + __T(" cd/m2"));
     FILLING_END();
 }
 
@@ -5911,6 +5941,21 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_idfm()
     Element_Name("Description");
 
     Info_C4(Description,                                        "Description"); Param_Info1(Mpeg4_Description(Description));
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_mdcv()
+{
+    Element_Name("Mastering Display Color Volume");
+
+    Ztring MasteringDisplay_ColorPrimaries, MasteringDisplay_Luminance;
+
+    Get_MasteringDisplayColorVolume(MasteringDisplay_ColorPrimaries, MasteringDisplay_Luminance);
+
+    FILLING_BEGIN();
+        Fill(StreamKind_Last, StreamPos_Last, "MasteringDisplay_ColorPrimaries", MasteringDisplay_ColorPrimaries);
+        Fill(StreamKind_Last, StreamPos_Last, "MasteringDisplay_Luminance", MasteringDisplay_Luminance);
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------

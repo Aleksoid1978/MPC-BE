@@ -365,6 +365,7 @@ size_t MediaInfo_Internal::Open(const String &File_Name_)
         return 0;
     }
     Config.File_Names_Pos=1;
+    Config.IsFinishing=false;
     }
 
     //Parsing
@@ -806,6 +807,8 @@ size_t MediaInfo_Internal::Open_Buffer_SegmentChange ()
 {
     MEDIAINFO_DEBUG_CONFIG_TEXT(Debug+=__T("Open_Buffer_SegmentChange"))
 
+    if (Info == NULL)
+        return 0;
     Info->Open_Buffer_SegmentChange();
 
     return 1;

@@ -74,7 +74,7 @@ void Reader_File_Thread::Entry()
             ToRead=Base->Buffer_Max-Base->Buffer_End;
             Buffer_ToReadOffset=Base->Buffer_End;
         }
-		}
+        }
         if (ToRead)
         {
             if (ToRead>ReadSize_Max)
@@ -97,7 +97,7 @@ void Reader_File_Thread::Entry()
                     Base->IsLooping=true;
                 }
             }
-			}
+            }
             #ifdef WINDOWS
                 SetEvent(Base->Condition_WaitingForMoreData);
             #endif //WINDOWS
@@ -663,6 +663,7 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                 #if MEDIAINFO_READTHREAD
                     && (!ThreadInstance || (!IsLooping && Buffer_Begin+MI->Config.File_Buffer_Size>=Buffer_End))    //File buffer hit the end of buffer
                 #endif //MEDIAINFO_READTHREAD
+             && F.Opened_Get()                                                                                      //File must be still open
              && MI->Config.File_Current_Offset+F.Position_Get()>=MI->Config.File_Size                               //File read hit the end of file
              && MI->Config.File_Names.size()==1) //TODO: fix about sequences of files
             {

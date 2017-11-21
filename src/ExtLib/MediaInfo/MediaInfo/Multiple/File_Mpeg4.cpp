@@ -282,6 +282,21 @@ void File_Mpeg4::Streams_Accept()
 //---------------------------------------------------------------------------
 void File_Mpeg4::Streams_Finish()
 {
+    #if MEDIAINFO_DEMUX
+                //Handling of multiple frames in one block
+        if (Config->Demux_Unpacketize_Get())
+         {
+        streams::iterator Stream_Temp = Streams.find((int32u)Element_Code);
+        if (Stream_Temp != Streams.end() && Stream_Temp->second.Demux_EventWasSent)
+             {
+            Frame_Count_NotParsedIncluded = (int64u)-1;
+            Open_Buffer_Continue(Stream_Temp->second.Parsers[0], Buffer + Buffer_Offset, 0);
+            if (Config->Demux_EventWasSent)
+                 return;
+            Stream_Temp->second.Demux_EventWasSent = false;
+            }
+        }
+    #endif //MEDIAINFO_DEMUX
     #if defined(MEDIAINFO_REFERENCES_YES) && MEDIAINFO_NEXTPACKET
         //Locators only
         if (ReferenceFiles_IsParsing)
@@ -1706,6 +1721,7 @@ bool File_Mpeg4::Header_Begin()
             stream &Stream_Temp=Streams[(int32u)Element_Code];
             if (Stream_Temp.Demux_EventWasSent)
             {
+                Frame_Count_NotParsedIncluded=(int64u)-1;
                 Open_Buffer_Continue(Stream_Temp.Parsers[0], Buffer+Buffer_Offset, 0);
                 if (Config->Demux_EventWasSent)
                     return false;
@@ -2305,10 +2321,10 @@ bool File_Mpeg4::BookMark_Needed()
                         Muxing[Temp->first].MaximalOffset=MaximalOffset;
                     #endif //MEDIAINFO_DEMUX
                     for (size_t Pos=0; Pos<Temp->second.Parsers.size(); Pos++)
-						{
-						if(Temp->second.stts_Duration && Temp->second.mdhd_TimeScale)
-						   Temp->second.Parsers[Pos]->Stream_BitRateFromContainer=Temp->second.stsz_StreamSize*8/(((float64)Temp->second.stts_Duration)/Temp->second.mdhd_TimeScale);
-						}
+                        {
+                        if(Temp->second.stts_Duration && Temp->second.mdhd_TimeScale)
+                           Temp->second.Parsers[Pos]->Stream_BitRateFromContainer=Temp->second.stsz_StreamSize*8/(((float64)Temp->second.stts_Duration)/Temp->second.mdhd_TimeScale);
+                        }
                     #if MEDIAINFO_DEMUX
                         if (FrameCount_MaxPerStream==(int32u)-1 && !Temp_stts_Durations.empty())
                         {

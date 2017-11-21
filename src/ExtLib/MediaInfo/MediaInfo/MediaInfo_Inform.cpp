@@ -272,11 +272,11 @@ Ztring MediaInfo_Internal::Inform()
         HTML=true;
     #endif //defined(MEDIAINFO_HTML_YES)
     #if defined(MEDIAINFO_XML_YES)
-    if (MediaInfoLib::Config.Inform_Get()==__T("XML"))
+    if (MediaInfoLib::Config.Inform_Get()==__T("OLDXML"))
         XML=true;
     if (MediaInfoLib::Config.Inform_Get()==__T("MAXML"))
         XML_0_7_78_MA=true;
-    if (MediaInfoLib::Config.Inform_Get()==__T("MIXML"))
+    if (MediaInfoLib::Config.Inform_Get()==__T("MIXML") || MediaInfoLib::Config.Inform_Get()==__T("XML"))
         XML_0_7_78_MI=true;
     #endif //defined(MEDIAINFO_XML_YES)
     #if defined(MEDIAINFO_CSV_YES)
@@ -296,7 +296,7 @@ Ztring MediaInfo_Internal::Inform()
         Retour+= __T(">\n");
     }
     if (XML_0_7_78_MA)
-        Retour+=__T("<MediaInfo xmlns=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediainfo\" version=\"2.0beta1\">\n");
+        Retour+=__T("<MediaInfo xmlns=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediainfo\" version=\"2.0\">\n");
     if (XML)
         Retour+=__T("<File>\n");
     #endif //defined(MEDIAINFO_XML_YES)
@@ -413,8 +413,8 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
         bool HTML=MediaInfoLib::Config.Inform_Get()==__T("HTML")?true:false;
         #endif //defined(MEDIAINFO_HTML_YES)
         #if defined(MEDIAINFO_XML_YES)
-        bool XML=MediaInfoLib::Config.Inform_Get()==__T("XML")?true:false;
-        bool XML_0_7_78=(MediaInfoLib::Config.Inform_Get()==__T("MAXML") || MediaInfoLib::Config.Inform_Get()==__T("MIXML"))?true:false;
+        bool XML=MediaInfoLib::Config.Inform_Get()==__T("OLDXML")?true:false;
+        bool XML_0_7_78=(MediaInfoLib::Config.Inform_Get()==__T("MAXML") || MediaInfoLib::Config.Inform_Get()==__T("MIXML") || MediaInfoLib::Config.Inform_Get() == __T("XML"))?true:false;
         if (XML_0_7_78)
             XML=true;
         #endif //defined(MEDIAINFO_XML_YES)

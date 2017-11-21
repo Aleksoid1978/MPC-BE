@@ -662,7 +662,16 @@ const char* Mpegv_colour_primaries(int8u colour_primaries);
 const char* Mpegv_transfer_characteristics(int8u transfer_characteristics);
 const char* Mpegv_matrix_coefficients(int8u matrix_coefficients);
 const char* Mpegv_matrix_coefficients_ColorSpace(int8u matrix_coefficients);
-extern const char* Avc_video_full_range[];
+
+const char* Mk_Video_Colour_Range(int8u range)
+{
+    switch (range)
+    {
+        case 1: return "Limited";
+        case 2: return "Full";
+        default: return "";
+    }
+}
 
 //***************************************************************************
 // Constructor/Destructor
@@ -703,6 +712,7 @@ File_Mk::File_Mk()
         Demux_EventWasSent=(int64u)-1;
     #endif //MEDIAINFO_DEMUX
     CRC32Compute_SkipUpTo=0;
+    Stream_Count=0;
 
     //Hints
     File_Buffer_Size_Hint_Pointer=NULL;
@@ -976,7 +986,7 @@ void File_Mk::Streams_Finish()
                                         + (s[ 6]-'0')      *10
                                         + (s[ 7]-'0')         ;
                                 for (size_t i=9; i<s_size; i++)
-                                    d+=(s[i]-'0')/pow(10.0, i-8);
+                                    d+=(s[i]-'0')/std::pow(10.0, double(i)-8);
                                 Fill(StreamKind_Last, StreamPos_Last, "Duration", d*1000, s.size()-12);
                                 continue;
                             }
@@ -1014,6 +1024,7 @@ void File_Mk::Streams_Finish()
         {
             //FrameRate
             bool IsVfr=false;
+            bool RelyOnParser=false;
             if (Temp->second.Segment_Cluster_BlockGroup_BlockDuration_Counts.size()>2)
                 IsVfr=true;
             else if (Temp->second.TimeCodes.size()>1)
@@ -1077,13 +1088,17 @@ void File_Mk::Streams_Finish()
                              && FrameRate_FromParser*2>FrameRate_FromCluster*0.9
                              && FrameRate_FromParser*2<FrameRate_FromCluster*1.1) //TODO: awfull method to detect interlaced content with one field per block
                                 FrameRate_FromCluster/=2;
+                            if (FrameRate_FromParser
+                             && FrameRate_FromParser>FrameRate_FromCluster*0.99
+                             && FrameRate_FromParser<FrameRate_FromCluster*1.01)
+                                RelyOnParser=true; //Disabling frame rate guess, relying on parser precision
                         }
                         if (FrameRate_FromTags)
                         {
                                 if (FrameRate_FromCluster < FrameRate_FromTags - (FrameRate_FromTags*(TimecodeScale*0.0000000010021)) || FrameRate_FromCluster > FrameRate_FromTags + (FrameRate_FromTags*(TimecodeScale*0.0000000010021)))
                                     IsVfr=true;
                         }
-                        else
+                        else if (!RelyOnParser)
                             Fill(Stream_Video, StreamPos_Last, Video_FrameRate, FrameRate_FromCluster);
                     }
                 }
@@ -1091,7 +1106,12 @@ void File_Mk::Streams_Finish()
                     IsVfr=true;
             }
 
-            else if (Temp->second.TrackDefaultDuration)
+            // In case there are not enough frames for computing frame rate, trying to rely on TrackDefaultDuration as a fallback
+            if (!IsVfr && !RelyOnParser && Retrieve(Stream_Video, StreamPos_Last, Video_FrameRate).empty() && Temp->second.TrackDefaultDuration
+             && Temp->second.TrackDefaultDuration!=32999999 // Seen in some 30 fps stream, not the one for all frames
+             && Temp->second.TrackDefaultDuration!=41999998 // Seen in some 24 fps stream, not the one for all frames
+             && Temp->second.TrackDefaultDuration!=41999999 // Seen in some 24 fps stream, not the one for all frames
+                )
             {
                 float32 FrameRate_FromCluster=1000000000/(float32)Temp->second.TrackDefaultDuration;
                 if (Retrieve(Stream_Video, StreamPos_Last, Video_FrameRate).empty())
@@ -1459,15 +1479,15 @@ void File_Mk::Header_Parse()
             Fill(Stream_General, 0, "IsTruncated", "Yes");
     }
 
-	//Should we parse Cluster?
-	if (Element_Level==3 && Name==Elements::Segment_Cluster && !Segment_Tracks_Count)
+    //Should we parse Cluster?
+    if (Element_Level==3 && Name==Elements::Segment_Cluster && !Segment_Tracks_Count)
     {
         //Jumping
         for (size_t Pos=0; Pos<Segment_Seeks.size(); Pos++)
             if (Segment_Seeks[Pos].SeekID==Elements::Segment_Tracks)
             {
                 Fill(Stream_General, 0, General_IsStreamable, "No");
-				Element_DoNotShow();
+                Element_DoNotShow();
                 IsParsingSegmentTrack_SeekBackTo=File_Offset+Buffer_Offset;
 
                 JumpTo(Segment_Seeks[Pos].SeekPosition);
@@ -2237,8 +2257,8 @@ void File_Mk::Segment_Cluster()
         
         for (std::map<int64u, stream>::iterator Temp=Stream.begin(); Temp!=Stream.end(); ++Temp)
         {
-            if (Temp->second.Parser)
-                Temp->second.Searching_Payload=true;
+            if (!Temp->second.Parser)
+                Temp->second.Searching_Payload=false;
             if (Temp->second.StreamKind==Stream_Video || Temp->second.StreamKind==Stream_Audio)
                 Temp->second.Searching_TimeStamp_Start=true;
             if (Temp->second.StreamKind==Stream_Video)
@@ -2488,7 +2508,9 @@ void File_Mk::Segment_Cluster_BlockGroup_Block_Lace()
         #endif //MEDIAINFO_DEMUX
             Open_Buffer_Continue(streamItem.Parser, (size_t)(Element_Size-Element_Offset));
         if (streamItem.Parser->Status[IsFinished]
-            || (streamItem.PacketCount>=300 && Config->ParseSpeed<1.0))
+            || (streamItem.PacketCount>=300 && Config->ParseSpeed<1.0)
+            || (streamItem.PacketCount>=3 && Config->ParseSpeed==0)
+            )
         {
             streamItem.Searching_Payload=false;
             if (!streamItem.Searching_TimeStamps && !streamItem.Searching_TimeStamp_Start)
@@ -2517,7 +2539,7 @@ void File_Mk::Segment_Cluster_BlockGroup_Block_Lace()
 
     //Filling
     Frame_Count++;
-    if (!Status[IsFilled] && ((Frame_Count>6 && (Stream_Count==0 ||Config->ParseSpeed==0.0)) || Frame_Count>512*Stream.size()))
+    if (!Status[IsFilled] && (Stream_Count==0 || Frame_Count>(Config->ParseSpeed?512:3)*Stream.size()))
     {
         Fill();
         if (Config->ParseSpeed<1.0)
@@ -3106,11 +3128,8 @@ void File_Mk::Segment_Tracks_TrackEntry_CodecPrivate__Parse()
     Open_Buffer_OutOfBand(streamItem.Parser);
 
     //Filling
-    if (streamItem.Parser->Status[IsFinished]) //Can be finnished here...
-    {
-        streamItem.Searching_Payload=false;
-        Stream_Count--;
-    }
+    if (!streamItem.Parser->Status[IsFinished]) //Can be finnished here...
+        streamItem.Searching_Payload=true;
 
     //In case of problem
     Element_Show();
@@ -3161,36 +3180,42 @@ void File_Mk::Segment_Tracks_TrackEntry_CodecPrivate_auds()
     if (Option_Size>0)
     {
              if (FormatTag==0xFFFE) //Extensible Wave
-            Segment_Tracks_TrackEntry_CodecPrivate_auds_ExtensibleWave();
+            Segment_Tracks_TrackEntry_CodecPrivate_auds_ExtensibleWave(BitsPerSample);
         else Skip_XX(Option_Size,                               "Unknown");
     }
 }
 
 //---------------------------------------------------------------------------
-void File_Mk::Segment_Tracks_TrackEntry_CodecPrivate_auds_ExtensibleWave()
+void File_Mk::Segment_Tracks_TrackEntry_CodecPrivate_auds_ExtensibleWave(int16u BitsPerSample)
 {
     //Parsing
     int128u SubFormat;
     int32u ChannelMask;
-    Skip_L2(                                                    "ValidBitsPerSample / SamplesPerBlock");
+    int16u ValidBitsPerSample;
+    Get_L2 (ValidBitsPerSample,                                 "ValidBitsPerSample / SamplesPerBlock");
     Get_L4 (ChannelMask,                                        "ChannelMask");
     Get_GUID(SubFormat,                                         "SubFormat");
 
     FILLING_BEGIN();
-        if ((SubFormat.hi&0xFFFFFFFFFFFF0000LL)==0x0010000000000000LL && SubFormat.lo==0x800000AA00389B71LL)
+        if ((SubFormat.hi&0x0000FFFFFFFFFFFFLL)==0x0000000000001000LL && SubFormat.lo==0x800000AA00389B71LL)
         {
-            CodecID_Fill(Ztring().From_Number((int16u)SubFormat.hi, 16), Stream_Audio, StreamPos_Last, InfoCodecID_Format_Riff);
-            Fill(Stream_Audio, StreamPos_Last, Audio_CodecID, Ztring().From_GUID(SubFormat), true);
-            Fill(Stream_Audio, StreamPos_Last, Audio_Codec, MediaInfoLib::Config.Codec_Get(Ztring().From_Number((int16u)SubFormat.hi, 16)), true);
+            int16u LegacyCodecID=(int16u)((((SubFormat.hi>>48)&0xFF)<<8) | (SubFormat.hi>>56)); // It is Little Endian
+            CodecID_Fill(Ztring().From_Number(LegacyCodecID, 16), Stream_Audio, StreamPos_Last, InfoCodecID_Format_Riff);
+            Ztring CodecID_New=Retrieve(Stream_Audio, StreamPos_Last, Audio_CodecID);
+            Fill(Stream_Audio, StreamPos_Last, Audio_CodecID, __T("A_MS/ACM / ")+Ztring().From_GUID(SubFormat), true);
+            Fill(Stream_Audio, StreamPos_Last, Audio_Codec, MediaInfoLib::Config.Codec_Get(Ztring().From_Number(LegacyCodecID, 16)), true);
 
             //Creating the parser
             #if defined(MEDIAINFO_PCM_YES)
-            if (MediaInfoLib::Config.CodecID_Get(Stream_Audio, InfoCodecID_Format_Riff, Ztring().From_Number((int16u)SubFormat.hi, 16))==__T("PCM"))
+            if (MediaInfoLib::Config.CodecID_Get(Stream_Audio, InfoCodecID_Format_Riff, Ztring().From_Number(LegacyCodecID, 16))==__T("PCM"))
             {
                 //Creating the parser
                 File_Pcm MI;
                 MI.Frame_Count_Valid=0;
-                MI.Codec=Ztring().From_Number((int16u)SubFormat.hi, 16);
+                MI.Codec=Ztring().From_GUID(SubFormat);
+                MI.BitDepth=(int8u)BitsPerSample;
+                if (ValidBitsPerSample!=BitsPerSample)
+                    MI.BitDepth_Significant=(int8u)ValidBitsPerSample;
 
                 //Parsing
                 Open_Buffer_Init(&MI);
@@ -3526,15 +3551,14 @@ void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_BitsPerChannel()
 void File_Mk::Segment_Tracks_TrackEntry_Video_Colour_Range()
 {
     //Parsing
-    int64u UInteger=UInteger_Get(); Element_Info1C(UInteger<2, Avc_video_full_range[UInteger]);
+    int64u UInteger=UInteger_Get(); Element_Info1(Mk_Video_Colour_Range(UInteger));
 
     //Filling
     FILLING_BEGIN();
         if (Segment_Info_Count>1)
             return; //First element has the priority
         Stream[TrackNumber].Infos["colour_description_present"]="Yes";
-        if (UInteger<2)
-            Stream[TrackNumber].Infos["colour_range"]=Avc_video_full_range[UInteger];
+        Stream[TrackNumber].Infos["colour_range"]=Mk_Video_Colour_Range(UInteger);
     FILLING_END();
 }
 

@@ -304,7 +304,7 @@ enum Elements
 //***************************************************************************
 
 //
-string DPX_DateTime2Iso(const string &FromDpx)
+bool DPX_DateTime_Valid(const string &FromDpx)
 {
     if (FromDpx.size()<19
      || FromDpx[ 0]<'0' || FromDpx[ 0]>'9'
@@ -312,22 +312,30 @@ string DPX_DateTime2Iso(const string &FromDpx)
      || FromDpx[ 2]<'0' || FromDpx[ 2]>'9'
      || FromDpx[ 3]<'0' || FromDpx[ 3]>'9'
      || FromDpx[ 4] != ':'
-     || FromDpx[ 5]<'0' || FromDpx[ 5]>'9'
+     || FromDpx[ 5]<'0' || FromDpx[ 5]>'1'
      || FromDpx[ 6]<'0' || FromDpx[ 6]>'9'
      || FromDpx[ 7] != ':'
-     || FromDpx[ 8]<'0' || FromDpx[ 8]>'9'
+     || FromDpx[ 8]<'0' || FromDpx[ 8]>'3'
      || FromDpx[ 9]<'0' || FromDpx[ 9]>'9'
      || FromDpx[10] != ':'
-     || FromDpx[11]<'0' || FromDpx[11]>'9'
+     || FromDpx[11]<'0' || FromDpx[11]>'2'
      || FromDpx[12]<'0' || FromDpx[12]>'9'
      || FromDpx[13] != ':'
-     || FromDpx[14]<'0' || FromDpx[14]>'9'
+     || FromDpx[14]<'0' || FromDpx[14]>'5'
      || FromDpx[15]<'0' || FromDpx[15]>'9'
      || FromDpx[16] != ':'
-     || FromDpx[17]<'0' || FromDpx[17]>'9'
+     || FromDpx[17]<'0' || FromDpx[17]>'5'
      || FromDpx[18]<'0' || FromDpx[18]>'9'
      )
-        return FromDpx; //Invalid, returning the value in the file
+        return false;
+
+    return true;
+}
+
+string DPX_DateTime2Iso(const string &FromDpx)
+{
+    if (!DPX_DateTime_Valid(FromDpx))
+        return string();
 
     // Date/Time
     string ToReturn(FromDpx.substr(0, 19));

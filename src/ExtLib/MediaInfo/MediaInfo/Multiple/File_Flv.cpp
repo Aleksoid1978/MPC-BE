@@ -1122,10 +1122,37 @@ void File_Flv::video_AVC()
                         ((File_Avc*)Stream[Stream_Video].Parser)->MustParse_SPS_PPS=true;
                         ((File_Avc*)Stream[Stream_Video].Parser)->SizedBlocks=true;
                         ((File_Avc*)Stream[Stream_Video].Parser)->MustSynchronize=false;
+                        #if MEDIAINFO_DEMUX
+                            if (Config->Demux_Avc_Transcode_Iso14496_15_to_Iso14496_10_Get())
+                            {
+                                Stream[Stream_Video].Parser->Demux_Level=2; //Container
+                                Stream[Stream_Video].Parser->Demux_UnpacketizeContainer=true;
+                            }
+                        #endif //MEDIAINFO_DEMUX
                     }
 
                     //Parsing
                     Open_Buffer_Continue(Stream[Stream_Video].Parser);
+
+                    //Demux
+                    #if MEDIAINFO_DEMUX
+                        switch (Config->Demux_InitData_Get())
+                        {
+                            case 0 :    //In demux event
+                                        Demux_Level=2; //Container
+                                        Demux(Buffer+Buffer_Offset+2, (size_t)(Element_Size-2), ContentType_Header);
+                                        break;
+                            case 1 :    //In field
+                                        {
+                                        std::string Data_Raw((const char*)(Buffer+Buffer_Offset+2), (size_t)(Element_Size-2));
+                                        std::string Data_Base64(Base64::encode(Data_Raw));
+                                        Fill(Stream_Video, StreamPos_Last, "Demux_InitBytes", Data_Base64);
+                                        Fill_SetOptions(Stream_Video, StreamPos_Last, "Demux_InitBytes", "N NT");
+                                        }
+                                        break;
+                            default :   ;
+                        }
+                    #endif //MEDIAINFO_DEMUX
                 #else
                     Skip_XX(Element_Size-Element_Offset,        "AVC Data");
                     video_stream_Count=false; //Unable to parse it

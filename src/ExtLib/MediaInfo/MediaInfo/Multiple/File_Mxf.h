@@ -1140,6 +1140,7 @@ protected :
     void           ChooseParser_Jpeg2000(const essences::iterator &Essence, const descriptors::iterator &Descriptor);
 
     //Helpers
+    int32u Vector(int32u ExpectedLength=(int32u)-1);
     void Subsampling_Compute(descriptors::iterator Descriptor);
     #if defined(MEDIAINFO_REFERENCES_YES)
         void Locators_CleanUp();

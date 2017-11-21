@@ -660,7 +660,7 @@ void File__Analyze::Peek_D8(int64u &Info)
 void File__Analyze::Get_GUID(int128u &Info)
 {
     INTEGRITY_SIZE_ATLEAST_INT(16);
-    Info.hi=LittleEndian2int64u(Buffer+Buffer_Offset+(size_t)Element_Offset);
+    Info.hi=BigEndian2int64u   (Buffer+Buffer_Offset+(size_t)Element_Offset);
     Info.lo=BigEndian2int64u   (Buffer+Buffer_Offset+(size_t)Element_Offset+8);
     Element_Offset+=16;
 }

@@ -160,6 +160,7 @@
     <ClInclude Include="MediaInfo\Multiple\File_DcpCpl.h" />
     <ClInclude Include="MediaInfo\Multiple\File_DcpPkl.h" />
     <ClInclude Include="MediaInfo\Multiple\File_HdsF4m.h" />
+    <ClInclude Include="MediaInfo\Multiple\File_MiXml.h" />
     <ClInclude Include="MediaInfo\Multiple\File_Pmp.h" />
     <ClInclude Include="MediaInfo\Multiple\File_Ptx.h" />
     <ClInclude Include="MediaInfo\Multiple\File_Vbi.h" />
@@ -420,6 +421,7 @@
     <ClCompile Include="MediaInfo\Multiple\File_DcpCpl.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File_DcpPkl.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File_HdsF4m.cpp" />
+    <ClCompile Include="MediaInfo\Multiple\File_MiXml.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File_Pmp.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File_Ptx.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File_Vbi.cpp" />

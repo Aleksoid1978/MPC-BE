@@ -864,6 +864,12 @@ public :
     #define Info_PA(_INFO, _NAME) Ztring _INFO; Get_PA (_INFO, _NAME)
 
     //***************************************************************************
+    // Others, specialized
+    //***************************************************************************
+
+    void Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance);
+
+    //***************************************************************************
     // Unknown
     //***************************************************************************
 
