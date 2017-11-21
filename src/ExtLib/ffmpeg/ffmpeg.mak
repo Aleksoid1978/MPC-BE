@@ -110,6 +110,8 @@ SRCS_LC = \
 	libavcodec/adpcm.c \
 	libavcodec/aic.c \
 	libavcodec/adpcm_data.c \
+	libavcodec/adts_header.c \
+	libavcodec/adts_parser.c \
 	libavcodec/adx.c \
 	libavcodec/adx_parser.c \
 	libavcodec/adxdec.c \

@@ -552,6 +552,7 @@ enum AVPixelFormat avpriv_find_pix_fmt(const PixelFormatTag *tags,
     return AV_PIX_FMT_NONE;
 }
 
+#if FF_API_CODEC_GET_SET
 MAKE_ACCESSORS(AVCodecContext, codec, AVRational, pkt_timebase)
 MAKE_ACCESSORS(AVCodecContext, codec, const AVCodecDescriptor *, codec_descriptor)
 MAKE_ACCESSORS(AVCodecContext, codec, int, lowres)
@@ -567,6 +568,7 @@ int av_codec_get_max_lowres(const AVCodec *codec)
 {
     return codec->max_lowres;
 }
+#endif
 
 int avpriv_codec_get_cap_skip_frame_fill_param(const AVCodec *codec){
     return !!(codec->caps_internal & FF_CODEC_CAP_SKIP_FRAME_FILL_PARAM);
@@ -1808,13 +1810,13 @@ static int get_audio_frame_duration(enum AVCodecID id, int sr, int ch, int ba,
                 /* calc from frame_bytes, channels, and bits_per_coded_sample */
                 switch (id) {
                 case AV_CODEC_ID_PCM_DVD:
-                    if(bps<4)
+                    if(bps<4 || frame_bytes<3)
                         return 0;
-                    return 2 * (frame_bytes / ((bps * 2 / 8) * ch));
+                    return 2 * ((frame_bytes - 3) / ((bps * 2 / 8) * ch));
                 case AV_CODEC_ID_PCM_BLURAY:
-                    if(bps<4)
+                    if(bps<4 || frame_bytes<4)
                         return 0;
-                    return frame_bytes / ((FFALIGN(ch, 2) * bps) / 8);
+                    return (frame_bytes - 4) / ((FFALIGN(ch, 2) * bps) / 8);
                 case AV_CODEC_ID_S302M:
                     return 2 * (frame_bytes / ((bps + 4) / 4)) / ch;
                 }

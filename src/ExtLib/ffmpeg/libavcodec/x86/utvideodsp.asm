@@ -1,6 +1,7 @@
 ;******************************************************************************
 ;* SIMD-optimized UTVideo functions
 ;* Copyright (c) 2017 Paul B Mahol
+;* Copyright (c) 2017 Jokyo Images
 ;*
 ;* This file is part of FFmpeg.
 ;*
@@ -29,11 +30,12 @@ pw_1023: times 8  dw 1023
 
 SECTION .text
 
-INIT_XMM sse2
-
+;-------------------------------------------------------------------------------------------
 ; void restore_rgb_planes(uint8_t *src_r, uint8_t *src_g, uint8_t *src_b,
 ;                         ptrdiff_t linesize_r, ptrdiff_t linesize_g, ptrdiff_t linesize_b,
 ;                         int width, int height)
+;-------------------------------------------------------------------------------------------
+%macro RESTORE_RGB_PLANES 0
 cglobal restore_rgb_planes, 7 + ARCH_X86_64, 7 + ARCH_X86_64 * 2, 4, src_r, src_g, src_b, linesize_r, linesize_g, linesize_b, w, h, x
     movsxdifnidn wq, wd
     add      src_rq, wq
@@ -46,7 +48,11 @@ DEFINE_ARGS src_r, src_g, src_b, linesize_r, linesize_g, linesize_b, x
 %define wq r6m
 %define hd r7mp
 %endif
+%if mmsize == 32
+    vbroadcasti128 m3, [pb_128]
+%else
     mova         m3, [pb_128]
+%endif
 .nextrow:
     mov          xq, wq
 
@@ -68,7 +74,22 @@ DEFINE_ARGS src_r, src_g, src_b, linesize_r, linesize_g, linesize_b, x
     sub        hd, 1
     jg .nextrow
     REP_RET
+%endmacro
 
+INIT_XMM sse2
+RESTORE_RGB_PLANES
+
+%if HAVE_AVX2_EXTERNAL
+INIT_YMM avx2
+RESTORE_RGB_PLANES
+%endif
+
+;-------------------------------------------------------------------------------------------
+; void restore_rgb_planes10(uint16_t *src_r, uint16_t *src_g, uint16_t *src_b,
+;                         ptrdiff_t linesize_r, ptrdiff_t linesize_g, ptrdiff_t linesize_b,
+;                         int width, int height)
+;-------------------------------------------------------------------------------------------
+%macro RESTORE_RGB_PLANES10 0
 cglobal restore_rgb_planes10, 7 + ARCH_X86_64, 7 + ARCH_X86_64 * 2, 5, src_r, src_g, src_b, linesize_r, linesize_g, linesize_b, w, h, x
     shl          wd, 1
     shl linesize_rq, 1
@@ -77,8 +98,13 @@ cglobal restore_rgb_planes10, 7 + ARCH_X86_64, 7 + ARCH_X86_64 * 2, 5, src_r, sr
     add      src_rq, wq
     add      src_gq, wq
     add      src_bq, wq
+%if mmsize == 32
+    vbroadcasti128 m3, [pw_512]
+    vbroadcasti128 m4, [pw_1023]
+%else
     mova         m3, [pw_512]
     mova         m4, [pw_1023]
+%endif
     neg          wq
 %if ARCH_X86_64 == 0
     mov          wm, wq
@@ -109,3 +135,12 @@ DEFINE_ARGS src_r, src_g, src_b, linesize_r, linesize_g, linesize_b, x
     sub        hd, 1
     jg .nextrow
     REP_RET
+%endmacro
+
+INIT_XMM sse2
+RESTORE_RGB_PLANES10
+
+%if HAVE_AVX2_EXTERNAL
+INIT_YMM avx2
+RESTORE_RGB_PLANES10
+%endif
