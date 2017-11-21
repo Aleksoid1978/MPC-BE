@@ -183,27 +183,19 @@ cmsBool AddMLUBlock(cmsMLU* mlu, cmsUInt32Number size, const wchar_t *Block,
 
 static
 cmsUInt16Number strTo16(const char str[3])
-{
+{   
     const cmsUInt8Number* ptr8 = (const cmsUInt8Number*)str;
-    cmsUInt16Number n = (cmsUInt16Number) (((cmsUInt16Number) ptr8[1] << 8) | ptr8[0]);
+    cmsUInt16Number n = (cmsUInt16Number)(((cmsUInt16Number)ptr8[0] << 8) | ptr8[1]);
 
-    return _cmsAdjustEndianess16(n);
+    return n;
 }
 
 static
 void strFrom16(char str[3], cmsUInt16Number n)
 {
-    // Assuming this would be aligned
-    union {
-
-       cmsUInt16Number n;
-       cmsUInt8Number str[2];
-       
-    } c;
-
-    c.n = _cmsAdjustEndianess16(n);  
-
-    str[0] = (char) c.str[0]; str[1] = (char) c.str[1]; str[2] = (char) 0;
+    str[0] = (char)(n >> 8);
+    str[1] = (char)n;
+    str[2] = (char)0;
 
 }
 
@@ -730,7 +722,7 @@ void EvalNamedColor(const cmsFloat32Number In[], cmsFloat32Number Out[], const c
 
 
 // Named color lookup element
-cmsStage* _cmsStageAllocNamedColor(cmsNAMEDCOLORLIST* NamedColorList, cmsBool UsePCS)
+cmsStage* CMSEXPORT _cmsStageAllocNamedColor(cmsNAMEDCOLORLIST* NamedColorList, cmsBool UsePCS)
 {
     return _cmsStageAllocPlaceholder(NamedColorList ->ContextID,
                                    cmsSigNamedColorElemType,
