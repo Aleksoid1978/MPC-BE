@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,7 +30,7 @@ IMPLEMENT_DYNAMIC(CFloatEdit, CEdit)
 bool CFloatEdit::GetFloat(float& f)
 {
 	CString s;
-	GetWindowText(s);
+	GetWindowTextW(s);
 
 	return (swscanf_s(s, L"%f", &f) == 1);
 }
@@ -49,7 +49,7 @@ double CFloatEdit::operator = (double d)
 CFloatEdit::operator double()
 {
 	CString s;
-	GetWindowText(s);
+	GetWindowTextW(s);
 	float f = 0;
 
 	return (swscanf_s(s, L"%f", &f) == 1 ? f : 0);
@@ -64,14 +64,14 @@ void CFloatEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	if (nChar >= '0' && nChar <= '9' || nChar == '-' || nChar == '.') {
 		CString str;
-		GetWindowText(str);
+		GetWindowTextW(str);
 		int nStartChar, nEndChar;
 		GetSel(nStartChar, nEndChar);
 
 		CEdit::OnChar(nChar, nRepCnt, nFlags);
 
 		CString s;
-		GetWindowText(s);
+		GetWindowTextW(s);
 		float f = 0;
 		wchar_t ch;
 		if (swscanf_s(s, L"%f%c", &f, &ch) != 1 && s != "-") {
@@ -91,7 +91,7 @@ void CFloatEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 LRESULT CFloatEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 {
 	CString str;
-	GetWindowText(str);
+	GetWindowTextW(str);
 	int nStartChar, nEndChar;
 	GetSel(nStartChar, nEndChar);
 
@@ -99,7 +99,7 @@ LRESULT CFloatEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 
 	if (lr == 1) {
 		CString s;
-		GetWindowText(s);
+		GetWindowTextW(s);
 		float f = 0;
 		wchar_t ch;
 		if (swscanf_s(s, L"%f%c", &f, &ch) != 1) {
@@ -118,7 +118,7 @@ IMPLEMENT_DYNAMIC(CIntEdit, CEdit)
 bool CIntEdit::GetInt(int& integer)
 {
 	CString s;
-	GetWindowText(s);
+	GetWindowTextW(s);
 
 	return (swscanf_s(s, L"%d", &integer) == 1);
 }
@@ -135,7 +135,7 @@ int CIntEdit::operator = (int integer)
 CIntEdit::operator int()
 {
 	CString s;
-	GetWindowText(s);
+	GetWindowTextW(s);
 	int integer;
 	if (swscanf_s(s, L"%d", &integer) != 1) {
 		integer = 0;
@@ -162,14 +162,14 @@ void CIntEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	if (nChar >= '0' && nChar <= '9' || nChar == '-') {
 		CString str;
-		GetWindowText(str);
+		GetWindowTextW(str);
 		int nStartChar, nEndChar;
 		GetSel(nStartChar, nEndChar);
 
 		CEdit::OnChar(nChar, nRepCnt, nFlags);
 
 		CString s;
-		GetWindowText(s);
+		GetWindowTextW(s);
 		int d = 0;
 		wchar_t ch;
 		if (swscanf_s(s, L"%d%c", &d, &ch) != 1 && s != "-") {
@@ -189,7 +189,7 @@ void CIntEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 LRESULT CIntEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 {
 	CString str;
-	GetWindowText(str);
+	GetWindowTextW(str);
 	int nStartChar, nEndChar;
 	GetSel(nStartChar, nEndChar);
 
@@ -197,7 +197,7 @@ LRESULT CIntEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 
 	if (lr == 1) {
 		CString s;
-		GetWindowText(s);
+		GetWindowTextW(s);
 		int d = 0;
 		wchar_t ch;
 		if (swscanf_s(s, L"%d%c", &d, &ch) != 1) {
@@ -212,7 +212,7 @@ LRESULT CIntEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 void CIntEdit::OnKillFocus (CWnd* pNewWnd)
 {
 	CString s;
-	GetWindowText(s);
+	GetWindowTextW(s);
 	int integer;
 
 	if (swscanf_s(s, L"%d", &integer) != 1) {
@@ -233,7 +233,7 @@ IMPLEMENT_DYNAMIC(CHexEdit, CEdit)
 bool CHexEdit::GetDWORD(DWORD& dw)
 {
 	CString s;
-	GetWindowText(s);
+	GetWindowTextW(s);
 
 	return (swscanf_s(s, L"%x", &dw) == 1);
 }
@@ -250,7 +250,7 @@ DWORD CHexEdit::operator = (DWORD dw)
 CHexEdit::operator DWORD()
 {
 	CString s;
-	GetWindowText(s);
+	GetWindowTextW(s);
 	DWORD dw;
 
 	return (swscanf_s(s, L"%x", &dw) == 1 ? dw : 0);
@@ -267,14 +267,14 @@ void CHexEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 			|| nChar >= 'A' && nChar <= 'F'
 			|| nChar >= 'a' && nChar <= 'f') {
 		CString str;
-		GetWindowText(str);
+		GetWindowTextW(str);
 		int nStartChar, nEndChar;
 		GetSel(nStartChar, nEndChar);
 
 		CEdit::OnChar(nChar, nRepCnt, nFlags);
 
 		CString s;
-		GetWindowText(s);
+		GetWindowTextW(s);
 		DWORD x = 0;
 		wchar_t ch;
 		if (swscanf_s(s, L"%x%c", &x, &ch) != 1) {
@@ -294,7 +294,7 @@ void CHexEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 LRESULT CHexEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 {
 	CString str;
-	GetWindowText(str);
+	GetWindowTextW(str);
 	int nStartChar, nEndChar;
 	GetSel(nStartChar, nEndChar);
 
@@ -302,7 +302,7 @@ LRESULT CHexEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 
 	if (lr == 1) {
 		CString s;
-		GetWindowText(s);
+		GetWindowTextW(s);
 		DWORD x = 0;
 		wchar_t ch;
 		if (swscanf_s(s, L"%x%c", &x, &ch) != 1) {

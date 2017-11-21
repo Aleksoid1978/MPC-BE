@@ -317,9 +317,9 @@ bool CWebClientSocket::OnCommand(CStringA& hdr, CStringA& body, CStringA& mime)
 
 		if (id > 0) {
 			if (id == ID_FILE_EXIT) {
-				m_pMainFrame->PostMessage(WM_COMMAND, id);
+				m_pMainFrame->PostMessageW(WM_COMMAND, id);
 			} else {
-				m_pMainFrame->SendMessage(WM_COMMAND, id);
+				m_pMainFrame->SendMessageW(WM_COMMAND, id);
 			}
 		} else {
 			if (arg == CMD_SETPOS && m_request.Lookup(L"position", arg)) {
@@ -396,8 +396,8 @@ bool CWebClientSocket::OnInfo(CStringA& hdr, CStringA& body, CStringA& mime)
 	positionstring.Format(L"%02d:%02d:%02d", (pos/3600000), (pos/60000)%60, (pos/1000)%60);
 	durationstring.Format(L"%02d:%02d:%02d", (dur/3600000), (dur/60000)%60, (dur/1000)%60);
 
-	WIN32_FIND_DATA wfd;
-	HANDLE hFind = FindFirstFile(m_pMainFrame->m_wndPlaylistBar.GetCurFileName(), &wfd);
+	WIN32_FIND_DATAW wfd;
+	HANDLE hFind = FindFirstFileW(m_pMainFrame->m_wndPlaylistBar.GetCurFileName(), &wfd);
 	if (hFind != INVALID_HANDLE_VALUE) {
 		FindClose(hFind);
 		__int64 size = (__int64(wfd.nFileSizeHigh)<<32)|wfd.nFileSizeLow;
@@ -468,7 +468,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 				cds.dwData = 0x6ABE51;
 				cds.cbData = p - buff;
 				cds.lpData = (void*)(BYTE*)buff;
-				m_pMainFrame->SendMessage(WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
+				m_pMainFrame->SendMessageW(WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
 			}
 
 			CPath p(path);
@@ -532,9 +532,9 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 			"<td class=\"dirdate\">&nbsp;</td>";
 		files += "</tr>\r\n";
 
-		WIN32_FIND_DATA fd = {0};
+		WIN32_FIND_DATAW fd = {0};
 
-		HANDLE hFind = FindFirstFile(path + "*.*", &fd);
+		HANDLE hFind = FindFirstFileW(path + "*.*", &fd);
 		if (hFind != INVALID_HANDLE_VALUE) {
 			do {
 				if (!(fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) || fd.cFileName[0] == '.') {
@@ -550,12 +550,12 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 					"<td class=\"dirsize\">&nbsp;</td>\r\n"
 					"<td class=\"dirdate\"><span class=\"nobr\">" + CStringA(CTime(fd.ftLastWriteTime).Format(L"%Y.%m.%d %H:%M")) + "</span></td>";
 				files += "</tr>\r\n";
-			} while (FindNextFile(hFind, &fd));
+			} while (FindNextFileW(hFind, &fd));
 
 			FindClose(hFind);
 		}
 
-		hFind = FindFirstFile(path + "*.*", &fd);
+		hFind = FindFirstFileW(path + "*.*", &fd);
 		if (hFind != INVALID_HANDLE_VALUE) {
 			do {
 				if (fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
@@ -585,7 +585,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 					"<td class=\"filesize\" align=\"right\"><span class=\"nobr\">" + size + "</span></td>\r\n"
 					"<td class=\"filedate\"><span class=\"nobr\">" + CStringA(CTime(fd.ftLastWriteTime).Format(L"%Y.%m.%d %H:%M")) + "</span></td>";
 				files += "</tr>\r\n";
-			} while (FindNextFile(hFind, &fd));
+			} while (FindNextFileW(hFind, &fd));
 
 			FindClose(hFind);
 		}
@@ -756,7 +756,7 @@ bool CWebClientSocket::OnStatus(CStringA& hdr, CStringA& body, CStringA& mime)
 	*/
 
 	CString title;
-	m_pMainFrame->GetWindowText(title);
+	m_pMainFrame->GetWindowTextW(title);
 
 	CPath file(m_pMainFrame->m_wndPlaylistBar.GetCurFileName());
 

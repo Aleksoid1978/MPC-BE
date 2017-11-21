@@ -146,8 +146,8 @@ BOOL CShaderAutoCompleteDlg::OnInitDialog()
 	m_ti.hwnd = m_hWnd;
 	m_ti.lpszText = m_text;
 
-	::SendMessage(m_hToolTipWnd, TTM_ADDTOOL, 0, (LPARAM)&m_ti);
-	::SendMessage(m_hToolTipWnd, TTM_SETMAXTIPWIDTH, 0, (LPARAM)400);
+	::SendMessageW(m_hToolTipWnd, TTM_ADDTOOL, 0, (LPARAM)&m_ti);
+	::SendMessageW(m_hToolTipWnd, TTM_SETMAXTIPWIDTH, 0, (LPARAM)400);
 
 	return TRUE;
 }
@@ -161,7 +161,7 @@ void CShaderAutoCompleteDlg::OnSetFocus(CWnd* pOldWnd)
 
 void CShaderAutoCompleteDlg::OnLbnSelchangeList1()
 {
-	::SendMessage(m_hToolTipWnd, TTM_TRACKACTIVATE, FALSE, (LPARAM)&m_ti);
+	::SendMessageW(m_hToolTipWnd, TTM_TRACKACTIVATE, FALSE, (LPARAM)&m_ti);
 
 	int i = m_list.GetCurSel();
 
@@ -182,9 +182,9 @@ void CShaderAutoCompleteDlg::OnLbnSelchangeList1()
 		wcscpy_s(m_ti.lpszText, _countof(m_text), sl.RemoveTail());
 		CRect r;
 		GetWindowRect(r);
-		::SendMessage(m_hToolTipWnd, TTM_UPDATETIPTEXT, 0, (LPARAM)&m_ti);
-		::SendMessage(m_hToolTipWnd, TTM_TRACKPOSITION, 0, (LPARAM)MAKELONG(r.left, r.bottom+1));
-		::SendMessage(m_hToolTipWnd, TTM_TRACKACTIVATE, TRUE, (LPARAM)&m_ti);
+		::SendMessageW(m_hToolTipWnd, TTM_UPDATETIPTEXT, 0, (LPARAM)&m_ti);
+		::SendMessageW(m_hToolTipWnd, TTM_TRACKPOSITION, 0, (LPARAM)MAKELONG(r.left, r.bottom+1));
+		::SendMessageW(m_hToolTipWnd, TTM_TRACKACTIVATE, TRUE, (LPARAM)&m_ti);
 	}
 }
 
@@ -193,6 +193,6 @@ void CShaderAutoCompleteDlg::OnShowWindow(BOOL bShow, UINT nStatus)
 	CResizableDialog::OnShowWindow(bShow, nStatus);
 
 	if (!bShow) {
-		::SendMessage(m_hToolTipWnd, TTM_TRACKACTIVATE, FALSE, (LPARAM)&m_ti);
+		::SendMessageW(m_hToolTipWnd, TTM_TRACKACTIVATE, FALSE, (LPARAM)&m_ti);
 	}
 }

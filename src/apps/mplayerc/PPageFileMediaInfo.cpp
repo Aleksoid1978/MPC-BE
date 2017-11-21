@@ -29,12 +29,12 @@ static String mi_get_lang_file()
 	int lang = AfxGetAppSettings().iLanguage;
 
 	if (lang) {
-		mpcres = LoadLibrary(CMPlayerCApp::GetSatelliteDll(lang));
+		mpcres = LoadLibraryW(CMPlayerCApp::GetSatelliteDll(lang));
 	}
 
 	String str = L"  Config_Text_ColumnSize;30";
 	if (mpcres) {
-		HRSRC hRes = FindResource(mpcres, MAKEINTRESOURCE(IDB_MEDIAINFO_LANGUAGE), L"FILE");
+		HRSRC hRes = FindResourceW(mpcres, MAKEINTRESOURCEW(IDB_MEDIAINFO_LANGUAGE), L"FILE");
 
 		if (hRes) {
 			HANDLE lRes = ::LoadResource(mpcres, hRes);

@@ -69,7 +69,7 @@ void CVolumeCtrl::SetPosInternal(int pos)
 {
 	SetPos(pos);
 
-	GetParent()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
+	GetParent()->PostMessageW(WM_HSCROLL, MAKEWPARAM((short)pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
 }
 
 void CVolumeCtrl::IncreaseVolume()
@@ -365,7 +365,7 @@ void CVolumeCtrl::HScroll(UINT nSBCode, UINT nPos)
 	CFrameWnd* pFrame = GetParentFrame();
 
 	if (pFrame && pFrame != GetParent()) {
-		pFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)nPos, nSBCode), (LPARAM)m_hWnd);
+		pFrame->PostMessageW(WM_HSCROLL, MAKEWPARAM((short)nPos, nSBCode), (LPARAM)m_hWnd);
 	}
 }
 

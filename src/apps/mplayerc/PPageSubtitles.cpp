@@ -203,7 +203,7 @@ void CPPageSubtitles::OnBnClickedButton2()
 {
 	CString ISDb, ver, msg, str;
 
-	m_ISDbCombo.GetWindowText(ISDb);
+	m_ISDbCombo.GetWindowTextW(ISDb);
 	ISDb.TrimRight('/');
 
 	ver.Format(L"ISDb v%d", ISDb_PROTOCOL_VERSION);

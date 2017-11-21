@@ -181,7 +181,7 @@ void COSD::OnSize(UINT nType, int cx, int cy)
 		InvalidateVMROSD();
 		UpdateBitmap();
 	} else if (m_pWnd) {
-		//PostMessage(WM_OSD_DRAW);
+		//PostMessageW(WM_OSD_DRAW);
 		DrawWnd();
 	}
 }
@@ -546,7 +546,7 @@ void COSD::UpdateSeekBarPos(CPoint point)
 	}
 
 	if (m_pWnd) {
-		m_pMainFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_llSeekPos, SB_THUMBTRACK), (LPARAM)m_pWnd->m_hWnd);
+		m_pMainFrame->PostMessageW(WM_HSCROLL, MAKEWPARAM((short)m_llSeekPos, SB_THUMBTRACK), (LPARAM)m_pWnd->m_hWnd);
 	}
 }
 
@@ -653,11 +653,11 @@ bool COSD::OnLButtonUp(UINT nFlags, CPoint point)
 
 		if (m_rectFlyBar.PtInRect(point)) {
 			if (m_rectExitButton.PtInRect(point)) {
-				m_pMainFrame->PostMessage(WM_COMMAND, ID_FILE_EXIT);
+				m_pMainFrame->PostMessageW(WM_COMMAND, ID_FILE_EXIT);
 			}
 
 			if (m_rectCloseButton.PtInRect(point)) {
-				m_pMainFrame->PostMessage(WM_COMMAND, ID_FILE_CLOSEPLAYLIST);
+				m_pMainFrame->PostMessageW(WM_COMMAND, ID_FILE_CLOSEPLAYLIST);
 			}
 		}
 
@@ -724,7 +724,7 @@ void COSD::ClearMessage(bool hide)
 	} else if (m_pMVTO) {
 		m_pMVTO->OsdClearMessage();
 	} else if (::IsWindow(m_hWnd) && IsWindowVisible()) {
-		PostMessage(WM_HIDE);
+		PostMessageW(WM_HIDE);
 	}
 
 	if (bRepaint) {
@@ -805,7 +805,7 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 			}
 
 			SetWindowPos(m_pWndInsertAfter, 0, 0, 0, 0, m_nDEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-			//PostMessage(WM_OSD_DRAW);
+			//PostMessageW(WM_OSD_DRAW);
 			DrawWnd();
 		}
 	}
@@ -837,7 +837,7 @@ void COSD::HideMessage(bool hide)
 			if (!m_strMessage.IsEmpty()) {
 				SetWindowPos(m_pWndInsertAfter, 0, 0, 0, 0, m_nDEFFLAGS | SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 			}
-			//PostMessage(WM_OSD_DRAW);
+			//PostMessageW(WM_OSD_DRAW);
 			DrawWnd();
 		}
 	}
@@ -883,7 +883,7 @@ void COSD::OnPaint()
 {
 	CPaintDC dc(this);
 
-	//PostMessage(WM_OSD_DRAW);
+	//PostMessageW(WM_OSD_DRAW);
 	DrawWnd();
 }
 

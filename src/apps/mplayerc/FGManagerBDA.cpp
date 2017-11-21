@@ -517,7 +517,7 @@ STDMETHODIMP CFGManagerBDA::SetFrequency(ULONG freq)
 
 STDMETHODIMP CFGManagerBDA::Scan(ULONG ulFrequency, HWND hWnd)
 {
-	CMpeg2DataParser		Parser (m_DVBStreams[DVB_PSI].GetFilter());
+	CMpeg2DataParser Parser (m_DVBStreams[DVB_PSI].GetFilter());
 
 	Parser.ParseSDT(ulFrequency);
 	Parser.ParsePAT();
@@ -525,9 +525,9 @@ STDMETHODIMP CFGManagerBDA::Scan(ULONG ulFrequency, HWND hWnd)
 
 	POSITION pos = Parser.Channels.GetStartPosition();
 	while (pos) {
-		CDVBChannel&		Channel = Parser.Channels.GetNextValue(pos);
+		CDVBChannel& Channel = Parser.Channels.GetNextValue(pos);
 		if (Channel.HasName()) {
-			::SendMessage (hWnd, WM_TUNER_NEW_CHANNEL, 0, (LPARAM)(LPCTSTR)Channel.ToString());
+			::SendMessageW(hWnd, WM_TUNER_NEW_CHANNEL, 0, (LPARAM)(LPCTSTR)Channel.ToString());
 		}
 	}
 

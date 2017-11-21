@@ -210,7 +210,7 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 BOOL CPPageFileInfoClip::OnSetActive()
 {
 	BOOL ret = __super::OnSetActive();
-	PostMessage(SETPAGEFOCUS, 0, 0L);
+	PostMessageW(SETPAGEFOCUS, 0, 0L);
 
 	return ret;
 }

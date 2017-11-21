@@ -78,7 +78,7 @@ CPPageSheet::CPPageSheet(LPCTSTR pszCaption, CWnd* pParentWnd, UINT idPage)
 
 	if (idPage) {
 		for (int i = 0; i < GetPageCount(); i++) {
-			if (GetPage(i)->m_pPSP->pszTemplate == MAKEINTRESOURCE(idPage)) {
+			if (GetPage(i)->m_pPSP->pszTemplate == MAKEINTRESOURCEW(idPage)) {
 				SetActivePage(i);
 
 				break;

@@ -285,8 +285,8 @@ static void StringToPaths(const CString& curentdir, const CString& str, CAtlArra
 			continue;
 		}
 
-		WIN32_FIND_DATA fd = { 0 };
-		HANDLE hFind = FindFirstFile(path, &fd);
+		WIN32_FIND_DATAW fd = { 0 };
+		HANDLE hFind = FindFirstFileW(path, &fd);
 		if (hFind == INVALID_HANDLE_VALUE) {
 			continue;
 		} else {
@@ -308,7 +308,7 @@ static void StringToPaths(const CString& curentdir, const CString& str, CAtlArra
 						paths.Add(folder);
 					}
 				}
-			} while (FindNextFile(hFind, &fd));
+			} while (FindNextFileW(hFind, &fd));
 			FindClose(hFind);
 		}
 	} while (pos > 0);
@@ -353,7 +353,7 @@ void CPlaylistItem::AutoLoadFiles()
 		CMediaFormats& mf = s.m_Formats;
 		if (!mf.FindAudioExt(ext)) {
 			for (size_t i = 0; i < paths.GetCount(); i++) {
-				WIN32_FIND_DATA fd = {0};
+				WIN32_FIND_DATAW fd = {0};
 
 				HANDLE hFind;
 				CAtlArray<CString> searchPattern;
@@ -362,7 +362,7 @@ void CPlaylistItem::AutoLoadFiles()
 					searchPattern.Add(paths[i] + BDLabel + L"*.*");
 				}
 				for (size_t j = 0; j < searchPattern.GetCount(); j++) {
-					hFind = FindFirstFile(searchPattern[j], &fd);
+					hFind = FindFirstFileW(searchPattern[j], &fd);
 
 					if (hFind != INVALID_HANDLE_VALUE) {
 						do {
@@ -384,7 +384,7 @@ void CPlaylistItem::AutoLoadFiles()
 									&& s.GetFileEngine(fullpath) == DirectShow) {
 								m_fns.AddTail(fullpath);
 							}
-						} while (FindNextFile(hFind, &fd));
+						} while (FindNextFileW(hFind, &fd));
 
 						FindClose(hFind);
 					}
@@ -427,7 +427,7 @@ void CPlaylistItem::AutoLoadFiles()
 	// cue-sheet file auto-load
 	CString cuefn(fn);
 	cuefn.Replace(ext, L"cue");
-	if (::PathFileExists(cuefn)) {
+	if (::PathFileExistsW(cuefn)) {
 		CString filter;
 		CAtlArray<CString> mask;
 		AfxGetAppSettings().m_Formats.GetAudioFilter(filter, mask);
@@ -927,8 +927,8 @@ static bool SearchFiles(CString mask, CAtlList<CString>& sl)
 	{
 		CString dir = mask.Left(std::max(mask.ReverseFind('\\'), mask.ReverseFind('/'))+1);
 
-		WIN32_FIND_DATA fd;
-		HANDLE h = FindFirstFile(mask, &fd);
+		WIN32_FIND_DATAW fd;
+		HANDLE h = FindFirstFileW(mask, &fd);
 		if (h != INVALID_HANDLE_VALUE) {
 			do {
 				if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
@@ -955,7 +955,7 @@ static bool SearchFiles(CString mask, CAtlList<CString>& sl)
 					}
 				}
 
-			} while (FindNextFile(h, &fd));
+			} while (FindNextFileW(h, &fd));
 
 			FindClose(h);
 
@@ -1358,7 +1358,7 @@ bool CPlayerPlaylistBar::ParseCUEPlayList(CString fn)
 		CString fName = fileNames.GetNext(pos);
 		CString fullPath = MakePath(CombinePath(base, fName));
 		BOOL bExists = TRUE;
-		if (!::PathFileExists(fullPath)) {
+		if (!::PathFileExistsW(fullPath)) {
 			CString ext = GetFileExt(fullPath);
 			bExists = FALSE;
 
@@ -1376,7 +1376,7 @@ bool CPlayerPlaylistBar::ParseCUEPlayList(CString fn)
 				CString newPath = fullPath;
 				newPath.Replace(ext, _mask);
 
-				if (::PathFileExists(newPath)) {
+				if (::PathFileExistsW(newPath)) {
 					fullPath = newPath;
 					bExists = TRUE;
 					break;
@@ -1859,7 +1859,7 @@ void CPlayerPlaylistBar::LoadPlaylist(CString filename)
 	if (AfxGetMyApp()->GetAppSavePath(base)) {
 		base.Append(L"default.mpcpl");
 
-		if (::PathFileExists(base)) {
+		if (::PathFileExistsW(base)) {
 			if (AfxGetAppSettings().bRememberPlaylistItems) {
 				ParseMPCPlayList(base);
 				Refresh();
@@ -1869,7 +1869,7 @@ void CPlayerPlaylistBar::LoadPlaylist(CString filename)
 					SelectFileInPlaylist(filename);
 				}
 			} else {
-				::DeleteFile(base);
+				::DeleteFileW(base);
 			}
 		}
 	}
@@ -1884,13 +1884,13 @@ void CPlayerPlaylistBar::SavePlaylist()
 
 		if (AfxGetAppSettings().bRememberPlaylistItems) {
 			// Only create this folder when needed
-			if (!::PathFileExists(base)) {
-				::CreateDirectory(base, nullptr);
+			if (!::PathFileExistsW(base)) {
+				::CreateDirectoryW(base, nullptr);
 			}
 
 			SaveMPCPlayList(file, CTextFile::UTF8, false);
-		} else if (::PathFileExists(file)) {
-			::DeleteFile(file);
+		} else if (::PathFileExistsW(file)) {
+			::DeleteFileW(file);
 		}
 	}
 }
@@ -1965,7 +1965,7 @@ void CPlayerPlaylistBar::OnLvnKeyDown(NMHDR* pNMHDR, LRESULT* pResult)
 		while (pos) {
 			int i = items.GetNext(pos);
 			if (m_pl.RemoveAt(FindPos(i))) {
-				m_pMainFrame->SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+				m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 			}
 			m_list.DeleteItem(i);
 		}
@@ -2372,7 +2372,7 @@ BOOL CPlayerPlaylistBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResul
 			}
 		}
 
-		::SendMessage(pNMHDR->hwndFrom, TTM_SETMAXTIPWIDTH, 0, (LPARAM)(INT)1000);
+		::SendMessageW(pNMHDR->hwndFrom, TTM_SETMAXTIPWIDTH, 0, (LPARAM)(INT)1000);
 	} else if (col == COL_TIME) {
 		return FALSE;
 	}
@@ -2474,7 +2474,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 				while (pos) {
 					int i = items.GetNext(pos);
 					if (m_pl.RemoveAt(FindPos(i))) {
-						m_pMainFrame->SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+						m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 					}
 					m_list.DeleteItem(i);
 				}
@@ -2491,7 +2491,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			break;
 		case M_CLEAR:
 			if (Empty()) {
-				m_pMainFrame->SendMessage(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+				m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 			}
 			break;
 		case M_SORTBYID:

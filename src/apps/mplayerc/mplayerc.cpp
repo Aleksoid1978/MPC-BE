@@ -189,10 +189,10 @@ BOOL CMPlayerCApp::OnIdle(LONG lCount)
 bool CMPlayerCApp::ClearSettings()
 {
 	// We want the other instances to be closed before resetting the settings.
-	HWND hWnd = FindWindow(_T(MPC_WND_CLASS_NAME), nullptr);
+	HWND hWnd = FindWindowW(_T(MPC_WND_CLASS_NAME), nullptr);
 	while (hWnd) {
 		Sleep(500);
-		hWnd = FindWindow(_T(MPC_WND_CLASS_NAME), nullptr);
+		hWnd = FindWindowW(_T(MPC_WND_CLASS_NAME), nullptr);
 		if (hWnd && MessageBox(nullptr, ResStr(IDS_RESET_SETTINGS_MUTEX), ResStr(IDS_RESET_SETTINGS), MB_ICONEXCLAMATION | MB_RETRYCANCEL) == IDCANCEL) {
 			return false;
 		}
@@ -239,7 +239,7 @@ void CMPlayerCApp::InitProfile()
 		m_dwProfileLastAccessTick = GetTickCount();
 
 		ASSERT(m_pszProfileName);
-		if (!::PathFileExists(m_pszProfileName)) {
+		if (!::PathFileExistsW(m_pszProfileName)) {
 			return;
 		}
 
@@ -804,7 +804,7 @@ bool CMPlayerCApp::StoreSettingsToIni()
 	free((void*)m_pszProfileName);
 	m_pszProfileName = _wcsdup(GetIniPath());
 
-	if (!::PathFileExists(m_pszProfileName)) {
+	if (!::PathFileExistsW(m_pszProfileName)) {
 		// Create an empty mpc-be.ini file to be sure that the function IsIniValid() works correctly
 		FILE* fp;
 		int fpStatus;
@@ -849,7 +849,7 @@ CString CMPlayerCApp::GetIniPath() const
 
 bool CMPlayerCApp::IsIniValid() const
 {
-	return !!::PathFileExists(GetIniPath());
+	return !!::PathFileExistsW(GetIniPath());
 }
 
 bool CMPlayerCApp::GetAppSavePath(CString& path)
@@ -1148,7 +1148,7 @@ BOOL CMPlayerCApp::SendCommandLine(HWND hWnd)
 	cds.dwData = 0x6ABE51;
 	cds.cbData = bufflen;
 	cds.lpData = (void*)(BYTE*)buff;
-	return SendMessage(hWnd, WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
+	return SendMessageW(hWnd, WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1371,7 +1371,7 @@ BOOL WINAPI Mine_DeviceIoControl(HANDLE hDevice, DWORD dwIoControlCode, LPVOID l
 
 static BOOL SetHeapOptions()
 {
-	HMODULE hLib = LoadLibrary(L"kernel32.dll");
+	HMODULE hLib = LoadLibraryW(L"kernel32.dll");
 	if (hLib == nullptr) {
 		return FALSE;
 	}
@@ -1423,7 +1423,7 @@ BOOL CMPlayerCApp::InitInstance()
 	DetourAttach(&(PVOID&)Real_mixerSetControlDetails, (PVOID)Mine_mixerSetControlDetails);
 	DetourAttach(&(PVOID&)Real_DeviceIoControl, (PVOID)Mine_DeviceIoControl);
 
-	HMODULE hNTDLL = LoadLibrary(L"ntdll.dll");
+	HMODULE hNTDLL = LoadLibraryW(L"ntdll.dll");
 
 #ifndef _DEBUG	// Disable NtQueryInformationProcess in debug (prevent VS debugger to stop on crash address)
 	if (hNTDLL) {
@@ -1596,7 +1596,7 @@ BOOL CMPlayerCApp::InitInstance()
 
 		const DWORD result = WaitForSingleObject(m_mutexOneInstance.m_h, 5000);
 		if (result == WAIT_OBJECT_0 || result == WAIT_ABANDONED) {
-			const HWND hWnd = ::FindWindow(_T(MPC_WND_CLASS_NAME), nullptr);
+			const HWND hWnd = ::FindWindowW(_T(MPC_WND_CLASS_NAME), nullptr);
 			if (hWnd) {
 				DWORD dwProcessId = 0;
 				if (GetWindowThreadProcessId(hWnd, &dwProcessId) && dwProcessId) {
@@ -1843,7 +1843,7 @@ void CMPlayerCApp::RegisterHotkeys()
 	for (UINT i=0; i<nInputDeviceCount; i++) {
 		UINT nTemp = deviceInfo.cbSize = sizeof(deviceInfo);
 
-		if (GetRawInputDeviceInfo(inputDeviceList[i].hDevice, RIDI_DEVICEINFO, &deviceInfo, &nTemp) > 0) {
+		if (GetRawInputDeviceInfoW(inputDeviceList[i].hDevice, RIDI_DEVICEINFO, &deviceInfo, &nTemp) > 0) {
 			if (deviceInfo.hid.dwVendorId == 0x00000471 &&  // Philips HID vendor id
 				deviceInfo.hid.dwProductId == 0x00000617) { // IEEE802.15.4 RF Dongle (SRM 7500)
 				MCEInputDevice[0].usUsagePage = deviceInfo.hid.usUsagePage;
@@ -2060,7 +2060,7 @@ void CRemoteCtrlClient::ExecuteCommand(CStringA cmd, int repcnt)
 				&& (!name.CompareNoCase(cmd) || !wc.rmcmd.CompareNoCase(cmd) || wc.cmd == (WORD)strtol(cmd, nullptr, 10))) {
 			CAutoLock cAutoLock(&m_csLock);
 			DLog(L"CRemoteCtrlClient (calling command): %s", wc.GetName());
-			m_pWnd->SendMessage(WM_COMMAND, wc.cmd);
+			m_pWnd->SendMessageW(WM_COMMAND, wc.cmd);
 			break;
 		}
 	}
@@ -2187,7 +2187,7 @@ void CMPlayerCApp::SetLanguage(int nLanguage, bool bSave/* = true*/)
 		const CString strSatVersion = CFileVersionInfo::GetFileVersionExShort(strSatellite);
 		if (!strSatVersion.IsEmpty()) {
 			if (strSatVersion == _T(MPC_VERSION_STR)) {
-				hMod = LoadLibrary(strSatellite);
+				hMod = LoadLibraryW(strSatellite);
 				if (bSave) {
 					s.iLanguage = nLanguage;
 				}

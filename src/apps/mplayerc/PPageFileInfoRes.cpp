@@ -188,7 +188,7 @@ void CPPageFileInfoRes::OnSize(UINT nType, int cx, int cy)
 
 	HDWP hDWP = ::BeginDeferWindowPos(1);
 	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != nullptr; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
-		if (pChild->SendMessage(WM_GETDLGCODE) & DLGC_BUTTON) {
+		if (pChild->SendMessageW(WM_GETDLGCODE) & DLGC_BUTTON) {
 			pChild->GetWindowRect(&r);
 			ScreenToClient(&r);
 			r.top += dy;
@@ -207,7 +207,7 @@ void CPPageFileInfoRes::OnSize(UINT nType, int cx, int cy)
 BOOL CPPageFileInfoRes::OnSetActive()
 {
 	BOOL ret = __super::OnSetActive();
-	PostMessage(SETPAGEFOCUS, 0, 0L);
+	PostMessageW(SETPAGEFOCUS, 0, 0L);
 
 	return ret;
 }

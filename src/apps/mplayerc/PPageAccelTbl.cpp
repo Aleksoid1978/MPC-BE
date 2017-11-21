@@ -1024,7 +1024,7 @@ void CPPageAccelTbl::OnTimer(UINT_PTR nIDEvent)
 
 	if (m_bWinLirc) {
 		CString addr;
-		m_WinLircEdit.GetWindowText(addr);
+		m_WinLircEdit.GetWindowTextW(addr);
 		AfxGetAppSettings().WinLircClient.Connect(addr);
 	}
 
@@ -1032,7 +1032,7 @@ void CPPageAccelTbl::OnTimer(UINT_PTR nIDEvent)
 
 	if (m_bUIce) {
 		CString addr;
-		m_UIceEdit.GetWindowText(addr);
+		m_UIceEdit.GetWindowTextW(addr);
 		AfxGetAppSettings().UIceClient.Connect(addr);
 	}
 

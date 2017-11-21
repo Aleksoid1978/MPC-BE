@@ -36,7 +36,7 @@ COpenDlg::COpenDlg(CWnd* pParent /*=nullptr*/)
 	, m_bMultipleFiles(false)
 	, m_bAppendPlaylist(FALSE)
 {
-	m_hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
+	m_hIcon = (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 }
 
 COpenDlg::~COpenDlg()
@@ -241,7 +241,7 @@ void COpenDlg::OnBnClickedOk()
 	if (m_mrucombo2.IsWindowEnabled() && !m_path2.IsEmpty()) {
 		m_fns.AddTail(m_path2);
 
-		if (::PathFileExists(m_path2)) {
+		if (::PathFileExistsW(m_path2)) {
 			AfxGetMainFrame()->AddAudioPathsAddons(m_path2);
 		}
 	}
@@ -343,7 +343,7 @@ LRESULT CALLBACK COpenFileDlg::WindowProcNew(HWND hwnd, UINT message, WPARAM wPa
 		path.Allocate(MAX_PATH+1);
 
 		if (::GetDlgItemText(hwnd, cmb13, (WCHAR*)path, MAX_PATH) == 0) {
-			::SendMessage(hwnd, CDM_SETCONTROLTEXT, edt1, (LPARAM)__DUMMY__);
+			::SendMessageW(hwnd, CDM_SETCONTROLTEXT, edt1, (LPARAM)__DUMMY__);
 		}
 	}
 

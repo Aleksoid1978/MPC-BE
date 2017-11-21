@@ -982,7 +982,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	CString MyPictures;
 	WCHAR szPath[MAX_PATH] = { 0 };
-	if (SUCCEEDED(SHGetFolderPath(nullptr, CSIDL_MYPICTURES, nullptr, 0, szPath))) {
+	if (SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_MYPICTURES, nullptr, 0, szPath))) {
 		MyPictures = CString(szPath) + L"\\";
 	}
 

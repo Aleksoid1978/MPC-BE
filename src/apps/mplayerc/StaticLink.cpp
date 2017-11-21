@@ -77,7 +77,7 @@ void CStaticLink::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	if (m_link.IsEmpty()) {
 
-		m_link.LoadString(GetDlgCtrlID()) || (GetWindowText(m_link),1);
+		m_link.LoadString(GetDlgCtrlID()) || (GetWindowTextW(m_link),1);
 		if (m_link.IsEmpty()) {
 			return;
 		}

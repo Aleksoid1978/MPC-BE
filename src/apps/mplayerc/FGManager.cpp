@@ -350,7 +350,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 	std::vector<BYTE> httpbuf;
 
 	if ((protocol.GetLength() <= 1 || protocol == L"file") && (ext.Compare(L".cda") != 0)) {
-		hFile = CreateFile(CString(fn), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)nullptr);
+		hFile = CreateFileW(CString(fn), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)nullptr);
 
 		if (hFile == INVALID_HANDLE_VALUE) {
 			return VFW_E_NOT_FOUND;

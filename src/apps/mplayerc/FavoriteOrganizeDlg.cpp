@@ -442,7 +442,7 @@ void CFavoriteOrganizeDlg::OnSize(UINT nType, int cx, int cy)
 
 void CFavoriteOrganizeDlg::OnLvnGetInfoTipList(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LPNMLVGETINFOTIP pGetInfoTip = reinterpret_cast<LPNMLVGETINFOTIP>(pNMHDR);
+	LPNMLVGETINFOTIPW pGetInfoTip = reinterpret_cast<LPNMLVGETINFOTIPW>(pNMHDR);
 
 	CAtlList<CString> args;
 	ExplodeEsc(m_sl[m_tab.GetCurSel()].GetAt((POSITION)m_list.GetItemData(pGetInfoTip->iItem)), args, L';');
@@ -453,6 +453,6 @@ void CFavoriteOrganizeDlg::OnLvnGetInfoTipList(NMHDR* pNMHDR, LRESULT* pResult)
 	// Relative to drive value is always third. If less args are available that means it is not included.
 	const int rootLength = (m_tab.GetCurSel() == 0 && GET_BY_INDEX(args, 2) != L"0") ? CPath(path).SkipRoot() : 0;
 
-	StringCchCopy(pGetInfoTip->pszText, pGetInfoTip->cchTextMax, path.Mid(rootLength));
+	StringCchCopyW(pGetInfoTip->pszText, pGetInfoTip->cchTextMax, path.Mid(rootLength));
 	*pResult = 0;
 }

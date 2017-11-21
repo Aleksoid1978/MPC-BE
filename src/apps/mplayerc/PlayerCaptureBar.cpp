@@ -432,7 +432,7 @@ template<class T>
 static bool SetupDimension(CFormatArray<T>& tfa, CComboBox& type, CComboBox& dim)
 {
 	CString str;
-	dim.GetWindowText(str);
+	dim.GetWindowTextW(str);
 
 	dim.ResetContent();
 	dim.EnableWindow(FALSE);
@@ -715,7 +715,7 @@ void CPlayerCaptureDialog::UpdateMediaTypes()
 	// fps
 
 	CString fps;
-	m_vidfpsedit.GetWindowText(fps);
+	m_vidfpsedit.GetWindowTextW(fps);
 	if (!fps.IsEmpty()) {
 		float ffps;
 		swscanf_s(fps, L"%f", &ffps);
@@ -1436,9 +1436,9 @@ void CPlayerCaptureDialog::OnVideoInput()
 			HRESULT hr = m_pAMVfwCD->ShowDialog(iSel, m_hWnd);
 
 			if (VFW_E_NOT_STOPPED == hr) {
-				m_pMainFrame->SendMessage(WM_COMMAND, ID_PLAY_STOP);
+				m_pMainFrame->SendMessageW(WM_COMMAND, ID_PLAY_STOP);
 				hr = m_pAMVfwCD->ShowDialog(iSel, m_hWnd);
-				m_pMainFrame->SendMessage(WM_COMMAND, ID_PLAY_PLAY);
+				m_pMainFrame->SendMessageW(WM_COMMAND, ID_PLAY_PLAY);
 			}
 
 			if (VFW_E_CANNOT_CONNECT == hr) {

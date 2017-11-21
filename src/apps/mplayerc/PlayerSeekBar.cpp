@@ -61,7 +61,7 @@ BOOL CPlayerSeekBar::Create(CWnd* pParentWnd)
 	m_ti.lpszText = nullptr;
 	m_ti.uId      = (UINT)m_hWnd;
 
-	m_tooltip.SendMessage(TTM_ADDTOOL, 0, (LPARAM)&m_ti);
+	m_tooltip.SendMessageW(TTM_ADDTOOL, 0, (LPARAM)&m_ti);
 
 	if (m_BackGroundbm.FileExists(CString(L"background"))) {
 		m_BackGroundbm.LoadExternalGradient(L"background");
@@ -399,7 +399,7 @@ void CPlayerSeekBar::OnPaint()
 						const int x = r.left + (int)((m_stop > 0) ? (REFERENCE_TIME)r.Width() * rt / m_stop : 0);
 
 						// instead of drawing hands can be a marker icon
-						// HICON appIcon = (HICON)::LoadImage(AfxGetResourceHandle(), MAKEINTRESOURCE(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+						// HICON appIcon = (HICON)::LoadImageW(AfxGetResourceHandle(), MAKEINTRESOURCEW(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 						// ::DrawIconEx(memdc, x, rc2.top + 10, appIcon, 0,0, 0, nullptr, DI_NORMAL);
 						// ::DestroyIcon(appIcon);
 
@@ -578,11 +578,11 @@ void CPlayerSeekBar::OnLButtonDown(UINT nFlags, CPoint point)
 		if (m_bEnabled && (GetChannelRect() | GetThumbRect()).PtInRect(point)) {
 			SetCapture();
 			MoveThumb(point);
-			m_pMainFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
+			m_pMainFrame->PostMessageW(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
 		} else {
 			if (!m_pMainFrame->m_bFullScreen) {
 				MapWindowPoints(m_pMainFrame, &point, 1);
-				m_pMainFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
+				m_pMainFrame->PostMessageW(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 			}
 		}
 	}
@@ -668,7 +668,7 @@ void CPlayerSeekBar::OnMouseMove(UINT nFlags, CPoint point)
 		if (m_pMainFrame->ValidateSeek(pos, m_stop)) {
 			MoveThumb(point);
 
-			m_pMainFrame->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
+			m_pMainFrame->PostMessageW(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBPOSITION), (LPARAM)m_hWnd);
 
 			Invalidate();
 			UpdateWindow();
@@ -767,7 +767,7 @@ void CPlayerSeekBar::OnTimer(UINT_PTR nIDEvent)
 					UpdateToolTipText();
 
 					if (!m_pMainFrame->CanPreviewUse()) {
-						m_tooltip.SendMessage(TTM_TRACKACTIVATE, TRUE, (LPARAM)&m_ti);
+						m_tooltip.SendMessageW(TTM_TRACKACTIVATE, TRUE, (LPARAM)&m_ti);
 					}
 
 					m_tooltipState = TOOLTIP_VISIBLE;
@@ -790,7 +790,7 @@ void CPlayerSeekBar::HideToolTip()
 {
 	if (m_tooltipState > TOOLTIP_HIDDEN) {
 		KillTimer(m_tooltipTimer);
-		m_tooltip.SendMessage(TTM_TRACKACTIVATE, FALSE, (LPARAM)&m_ti);
+		m_tooltip.SendMessageW(TTM_TRACKACTIVATE, FALSE, (LPARAM)&m_ti);
 		m_tooltipState = TOOLTIP_HIDDEN;
 	}
 }
@@ -843,7 +843,7 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint point)
 		point.x = std::max(0L, std::min(point.x, r.Width() - size.cx));
 		ClientToScreen(&point);
 
-		m_tooltip.SendMessage(TTM_TRACKPOSITION, 0, MAKELPARAM(point.x, point.y));
+		m_tooltip.SendMessageW(TTM_TRACKPOSITION, 0, MAKELPARAM(point.x, point.y));
 	}
 
 	m_tooltipLastPos = m_tooltipPos;
@@ -864,7 +864,7 @@ void CPlayerSeekBar::UpdateToolTipText()
 
 	if (!m_pMainFrame->CanPreviewUse()) {
 		m_ti.lpszText = (LPTSTR)(LPCTSTR)tooltipText;
-		m_tooltip.SendMessage(TTM_SETTOOLINFO, 0, (LPARAM)&m_ti);
+		m_tooltip.SendMessageW(TTM_SETTOOLINFO, 0, (LPARAM)&m_ti);
 	} else {
 		m_pMainFrame->m_wndPreView.SetWindowText(tooltipText);
 	}

@@ -83,15 +83,15 @@ BOOL CShaderCombineDlg::OnInitDialog()
 	CString path;
 	if (AfxGetMyApp()->GetAppSavePath(path)) {
 		path += L"Shaders\\";
-		if (::PathFileExists(path)) {
-			WIN32_FIND_DATA wfd;
-			HANDLE hFile = FindFirstFile(path + L"*.hlsl", &wfd);
+		if (::PathFileExistsW(path)) {
+			WIN32_FIND_DATAW wfd;
+			HANDLE hFile = FindFirstFileW(path + L"*.hlsl", &wfd);
 			if (hFile != INVALID_HANDLE_VALUE) {
 				do {
 					CString filename(wfd.cFileName);
 					filename.Truncate(filename.GetLength() - 5);
 					m_combo.AddString(filename);
-				} while (FindNextFile(hFile, &wfd));
+				} while (FindNextFileW(hFile, &wfd));
 				FindClose(hFile);
 			}
 		}

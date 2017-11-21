@@ -73,7 +73,7 @@ BOOL CShaderEdit::PreTranslateMessage(MSG* pMsg)
 			return GetParent()->PreTranslateMessage(pMsg);
 		}
 		else {
-			m_acdlg.m_list.SendMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
+			m_acdlg.m_list.SendMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
 		}
 
 		return TRUE;
@@ -246,7 +246,7 @@ void CShaderEditorDlg::UpdateShaderList()
 	if (AfxGetMyApp()->GetAppSavePath(path)) {
 		path += L"Shaders\\";
 		if (::PathFileExistsW(path)) {
-			WIN32_FIND_DATA wfd;
+			WIN32_FIND_DATAW wfd;
 			HANDLE hFile = FindFirstFileW(path + L"*.hlsl", &wfd);
 			if (hFile != INVALID_HANDLE_VALUE) {
 				do {

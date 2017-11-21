@@ -234,7 +234,7 @@ void CPPageFileInfoSheet::OnSize(UINT nType, int cx, int cy)
 	::DeferWindowPos(hDWP, pTab->m_hWnd, nullptr, 0, 0, r.Width(), r.Height(), uDefFlags | SWP_NOMOVE);
 
 	for (CWnd *pChild = GetWindow(GW_CHILD); pChild != nullptr; pChild = pChild->GetWindow(GW_HWNDNEXT)) {
-		if ((pChild->SendMessage(WM_GETDLGCODE) & DLGC_BUTTON) && pChild == GetDlgItem(IDOK)) {
+		if ((pChild->SendMessageW(WM_GETDLGCODE) & DLGC_BUTTON) && pChild == GetDlgItem(IDOK)) {
 			pChild->GetWindowRect(&r);
 			ScreenToClient(&r);
 			r.top += dy;
@@ -242,7 +242,7 @@ void CPPageFileInfoSheet::OnSize(UINT nType, int cx, int cy)
 			r.left+= dx;
 			r.right += dx;
 			::DeferWindowPos(hDWP, pChild->m_hWnd, nullptr, r.left, r.top, 0, 0, uDefFlags | SWP_NOSIZE);
-		} else if ((pChild->SendMessage(WM_GETDLGCODE) & DLGC_BUTTON) && (pChild == GetDlgItem(IDC_BUTTON_MI_SAVEAS) || pChild == GetDlgItem(IDC_BUTTON_MI_CLIPBOARD))) {
+		} else if ((pChild->SendMessageW(WM_GETDLGCODE) & DLGC_BUTTON) && (pChild == GetDlgItem(IDC_BUTTON_MI_SAVEAS) || pChild == GetDlgItem(IDC_BUTTON_MI_CLIPBOARD))) {
 			pChild->GetWindowRect(&r);
 			ScreenToClient(&r);
 			r.top += dy;

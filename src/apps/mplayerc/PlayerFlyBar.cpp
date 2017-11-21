@@ -173,9 +173,9 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 
 	if (r_ExitIcon.PtInRect(p)) {
 		ShowWindow(SW_HIDE);
-		m_pMainFrame->PostMessage(WM_COMMAND, ID_FILE_EXIT);
+		m_pMainFrame->PostMessageW(WM_COMMAND, ID_FILE_EXIT);
 	} else if (r_MinIcon.PtInRect(p)) {
-		m_pMainFrame->m_bTrayIcon ? m_pMainFrame->SendMessage(WM_SYSCOMMAND, SC_MINIMIZE, -1) : m_pMainFrame->ShowWindow(SW_SHOWMINIMIZED);
+		m_pMainFrame->m_bTrayIcon ? m_pMainFrame->SendMessageW(WM_SYSCOMMAND, SC_MINIMIZE, -1) : m_pMainFrame->ShowWindow(SW_SHOWMINIMIZED);
 	} else if (r_RestoreIcon.PtInRect(p)) {
 		if (m_pMainFrame->m_bFullScreen) {
 			m_pMainFrame->ToggleFullscreen(true, true);
@@ -183,12 +183,12 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 		m_pMainFrame->ShowWindow(m_pMainFrame->IsZoomed() ? SW_SHOWNORMAL : SW_SHOWMAXIMIZED);
 		Invalidate();
 	} else if (r_SettingsIcon.PtInRect(p)) {
-		m_pMainFrame->PostMessage(WM_COMMAND, ID_VIEW_OPTIONS);
+		m_pMainFrame->PostMessageW(WM_COMMAND, ID_VIEW_OPTIONS);
 		Invalidate();
 	} else if (r_InfoIcon.PtInRect(p)) {
 		OAFilterState fs = m_pMainFrame->GetMediaState();
 		if (fs != -1) {
-			m_pMainFrame->PostMessage(WM_COMMAND, ID_FILE_PROPERTIES);
+			m_pMainFrame->PostMessageW(WM_COMMAND, ID_FILE_PROPERTIES);
 		}
 		Invalidate();
 	} else if (r_FSIcon.PtInRect(p)) {

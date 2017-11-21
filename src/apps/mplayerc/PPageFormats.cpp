@@ -35,10 +35,10 @@
 static BOOL ShellExtExists()
 {
 	if (SysVersion::IsW64()) {
-		return ::PathFileExists(ShellExt64);
+		return ::PathFileExistsW(ShellExt64);
 	}
 
-	return ::PathFileExists(ShellExt);
+	return ::PathFileExistsW(ShellExt);
 }
 
 CComPtr<IApplicationAssociationRegistration> CPPageFormats::m_pAAR;
@@ -176,7 +176,7 @@ static int GetIconIndex(LPCTSTR ext)
 {
 	int iconindex = -1;
 
-	static HMODULE mpciconlib = LoadLibrary(L"mpciconlib.dll");
+	static HMODULE mpciconlib = LoadLibraryW(L"mpciconlib.dll");
 	if (mpciconlib) {
 		static GetIconIndexFunc pGetIconIndexFunc = (GetIconIndexFunc)GetProcAddress(mpciconlib, "get_icon_index");
 		if (pGetIconIndexFunc) {
@@ -291,12 +291,12 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 		// first look for the icon
 		CString ext_icon = GetProgramDir();
 		ext_icon.AppendFormat(L"icons\\%s.ico", CString(ext).TrimLeft('.'));
-		if (::PathFileExists(ext_icon)) {
+		if (::PathFileExistsW(ext_icon)) {
 			AppIcon.Format(L"\"%s\",0", ext_icon);
 		} else {
 			// then look for the iconlib
 			CString mpciconlib = GetProgramDir() + L"mpciconlib.dll";
-			if (::PathFileExists(mpciconlib)) {
+			if (::PathFileExistsW(mpciconlib)) {
 				int icon_index = GetIconIndex(ext);
 				if (icon_index < 0) {
 					if (filetype == TAudio) {
@@ -430,9 +430,9 @@ typedef HRESULT (*_DllRegisterServer)(void);
 typedef HRESULT (*_DllUnRegisterServer)(void);
 bool CPPageFormats::RegisterShellExt(LPCTSTR lpszLibrary)
 {
-	HINSTANCE hDLL = LoadLibrary(lpszLibrary);
+	HINSTANCE hDLL = LoadLibraryW(lpszLibrary);
 	if (hDLL == nullptr) {
-		if (::PathFileExists(lpszLibrary)) {
+		if (::PathFileExistsW(lpszLibrary)) {
 			CRegKey key;
 			if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
 				key.SetStringValue(L"MpcPath", GetProgramPath());
@@ -469,9 +469,9 @@ bool CPPageFormats::RegisterShellExt(LPCTSTR lpszLibrary)
 
 bool CPPageFormats::UnRegisterShellExt(LPCTSTR lpszLibrary)
 {
-	HINSTANCE hDLL = LoadLibrary(lpszLibrary);
+	HINSTANCE hDLL = LoadLibraryW(lpszLibrary);
 	if (hDLL == nullptr) {
-		if (::PathFileExists(lpszLibrary)) {
+		if (::PathFileExistsW(lpszLibrary)) {
 			CString strParameters;
 			strParameters.Format(L" /s /u \"%s\"", lpszLibrary);
 			Execute(L"regsvr32.exe", strParameters);
@@ -728,7 +728,7 @@ BOOL CPPageFormats::OnInitDialog()
 		GetDlgItem(IDC_CHECK8)->EnableWindow(FALSE);
 
 		GetDlgItem(IDC_BUTTON5)->ShowWindow(SW_SHOW);
-		GetDlgItem(IDC_BUTTON5)->SendMessage(BCM_SETSHIELD, 0, 1);
+		GetDlgItem(IDC_BUTTON5)->SendMessageW(BCM_SETSHIELD, 0, 1);
 
 		m_bInsufficientPrivileges = true;
 	} else {
@@ -1238,7 +1238,7 @@ void CPPageFormats::OnUpdateButtonDefault(CCmdUI* pCmdUI)
 	i = (int)m_list.GetItemData(i);
 
 	CString orgexts, newexts;
-	GetDlgItem(IDC_EDIT1)->GetWindowText(newexts);
+	GetDlgItem(IDC_EDIT1)->GetWindowTextW(newexts);
 	newexts.Trim();
 	orgexts = AfxGetAppSettings().m_Formats[i].GetBackupExtsWithPeriod();
 
@@ -1255,7 +1255,7 @@ void CPPageFormats::OnUpdateButtonSet(CCmdUI* pCmdUI)
 	i = (int)m_list.GetItemData(i);
 
 	CString orgexts, newexts;
-	GetDlgItem(IDC_EDIT1)->GetWindowText(newexts);
+	GetDlgItem(IDC_EDIT1)->GetWindowTextW(newexts);
 	newexts.Trim();
 	orgexts = AfxGetAppSettings().m_Formats[i].GetExtsWithPeriod();
 

@@ -160,7 +160,7 @@ BOOL CPPageWebServer::OnApply()
 CString CPPageWebServer::GetCurWebRoot()
 {
 	CString WebRoot;
-	GetDlgItem(IDC_EDIT2)->GetWindowText(WebRoot);
+	GetDlgItem(IDC_EDIT2)->GetWindowTextW(WebRoot);
 	WebRoot.Replace('/', '\\');
 
 	CPath path;
@@ -171,7 +171,7 @@ CString CPPageWebServer::GetCurWebRoot()
 static int __stdcall BrowseCtrlCallback(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
 {
 	if (uMsg == BFFM_INITIALIZED && lpData) {
-		::SendMessage(hwnd, BFFM_SETSELECTION, TRUE, lpData);
+		::SendMessageW(hwnd, BFFM_SETSELECTION, TRUE, lpData);
 	}
 
 	return 0;
