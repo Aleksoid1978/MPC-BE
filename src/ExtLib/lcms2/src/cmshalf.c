@@ -503,7 +503,7 @@ static cmsUInt8Number  Shift[512] = {
 0x18, 0x18, 0x18, 0x18, 0x0d
 };
 
-cmsFloat32Number _cmsHalf2Float(cmsUInt16Number h)
+cmsFloat32Number CMSEXPORT _cmsHalf2Float(cmsUInt16Number h)
 {
     union {
         cmsFloat32Number flt;
@@ -516,7 +516,7 @@ cmsFloat32Number _cmsHalf2Float(cmsUInt16Number h)
     return out.flt;
 }
 
-cmsUInt16Number _cmsFloat2Half(cmsFloat32Number flt)
+cmsUInt16Number CMSEXPORT _cmsFloat2Half(cmsFloat32Number flt)
 {
     union {
         cmsFloat32Number flt;

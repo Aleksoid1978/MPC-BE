@@ -5,6 +5,7 @@
 Обновлены библиотеки:
 	ffmpeg git-n3.4-dev-3045-g953d55f443;
 	libpng git-v1.6.34-35-gfc32eb166;
+	Little-CMS git-lcms2.9rc1-16-g8aca404;
 	openjpeg git-v2.3.0-9-gd9f8f7ba;
 	rapidjson git-v1.1.0-269-g7dddd054;
 

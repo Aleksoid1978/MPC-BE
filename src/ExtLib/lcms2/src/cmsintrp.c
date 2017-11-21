@@ -158,8 +158,8 @@ cmsInterpParams* _cmsComputeInterpParamsEx(cmsContext ContextID,
 
 
 // This one is a wrapper on the anterior, but assuming all directions have same number of nodes
-cmsInterpParams* _cmsComputeInterpParams(cmsContext ContextID, cmsUInt32Number nSamples, 
-                                         cmsUInt32Number InputChan, cmsUInt32Number OutputChan, const void* Table, cmsUInt32Number dwFlags)
+cmsInterpParams* CMSEXPORT _cmsComputeInterpParams(cmsContext ContextID, cmsUInt32Number nSamples, 
+                                                   cmsUInt32Number InputChan, cmsUInt32Number OutputChan, const void* Table, cmsUInt32Number dwFlags)
 {
     int i;
     cmsUInt32Number Samples[MAX_INPUT_DIMENSIONS];
@@ -174,7 +174,7 @@ cmsInterpParams* _cmsComputeInterpParams(cmsContext ContextID, cmsUInt32Number n
 
 
 // Free all associated memory
-void _cmsFreeInterpParams(cmsInterpParams* p)
+void CMSEXPORT _cmsFreeInterpParams(cmsInterpParams* p)
 {
     if (p != NULL) _cmsFree(p ->ContextID, p);
 }
