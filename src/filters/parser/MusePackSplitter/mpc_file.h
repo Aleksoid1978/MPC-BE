@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <vector>
 #include "bits.h"
 
 class CMusePackReader;

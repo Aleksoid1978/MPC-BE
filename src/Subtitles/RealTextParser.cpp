@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,6 +20,12 @@
 
 #include "stdafx.h"
 #include "RealTextParser.h"
+
+using std::wostringstream;
+using std::endl;
+
+#include <vector>
+using std::vector;
 
 CRealTextParser::CRealTextParser(void):
 	m_bIgnoreFont(false),
