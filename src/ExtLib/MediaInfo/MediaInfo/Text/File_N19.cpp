@@ -358,7 +358,7 @@ void File_N19::FileHeader_Parse()
                 Fill(Stream_Text, 0, "TimeCode_First", TCP);
 
 #if MEDIAINFO_DEMUX
-				TCP_Offset=Delay;
+                TCP_Offset=Delay;
 #endif
             }
         }
@@ -446,9 +446,9 @@ void File_N19::Data_Parse()
     Get_B1    (VP,                                              "VP - Vertical Position");
     if (VP 
 #if MEDIAINFO_DEMUX
-		&& IsTeletext
+        && IsTeletext
 #endif
-		)
+        )
         VP--; //1-Based
     Get_B1    (JC,                                              "JC - Justification Code");
     Skip_B1   (                                                 "CF - Comment Flag");

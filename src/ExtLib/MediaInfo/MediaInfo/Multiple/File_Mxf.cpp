@@ -2483,6 +2483,7 @@ void File_Mxf::Streams_Finish()
     {
         if (!SystemScheme->second.IsTimeCode) //Already done somewhere else
         {
+            Fill_Flush(); //TODO: remove it there is a refactoring
             Stream_Prepare(Stream_Other);
             Fill(Stream_Other, StreamPos_Last, "ID", __T("System scheme 1-")+Ztring().From_Number((int8u)(SystemScheme->first>8))+__T('-')+Ztring().From_Number((int8u)(SystemScheme->first&0xFF)));
             Fill(Stream_Other, StreamPos_Last, "MuxingMode", "System scheme 1");
@@ -3278,7 +3279,12 @@ void File_Mxf::Streams_Finish_Descriptor(const int128u DescriptorUID, const int1
     if (StreamPos_Last==(size_t)-1)
     {
         if (Descriptors.size()==1)
-            StreamPos_Last=0;
+        {
+            if (Count_Get(Descriptor->second.StreamKind)==0)
+                Stream_Prepare(Descriptor->second.StreamKind);
+            else
+                StreamPos_Last=0;
+        }
         else if (Descriptor->second.LinkedTrackID!=(int32u)-1)
         {
             //Workaround for a specific file with same ID
@@ -5900,7 +5906,10 @@ void File_Mxf::Data_Parse()
                 std::map<std::string, Ztring>::iterator i=SingleDescriptor->second.Infos.find("Format_Settings_Wrapping");
                 if ((i==SingleDescriptor->second.Infos.end() || i->second.empty()) && (Buffer_End?(Buffer_End-Buffer_Begin):Element_Size)>File_Size/2) //Divided by 2 for testing if this is a big chunk = Clip based and not frames.
                 {
-                    i->second=__T("Clip"); //By default, not sure about it, should be from descriptor
+                    if (i==SingleDescriptor->second.Infos.end())
+                        SingleDescriptor->second.Infos["Format_Settings_Wrapping"]=__T("Clip");
+                    else
+                        i->second=__T("Clip"); //By default, not sure about it, should be from descriptor
                 }
             }
 
@@ -6407,7 +6416,15 @@ void File_Mxf::Data_Parse()
 
 #undef ELEMENT
 #define ELEMENT(_CODE, _CALL, _NAME) \
-    case 0x##_CODE :   Element_Name(_NAME); _CALL(); break; \
+    case 0x##_CODE :   { \
+                       Element_Name(_NAME); \
+                       int64u Element_Size_Save=Element_Size; \
+                       Element_Size=Element_Offset+Length2; \
+                       _CALL(); \
+                       Element_Offset=Element_Size; \
+                       Element_Size=Element_Size_Save; \
+                       } \
+                       break; \
 
 #define ELEMENT_UUID(_ELEMENT, _NAME) \
 else if (Code_Compare1==Elements::_ELEMENT##1 \
@@ -6416,7 +6433,11 @@ else if (Code_Compare1==Elements::_ELEMENT##1 \
       && Code_Compare4==Elements::_ELEMENT##4) \
 { \
     Element_Name(_NAME); \
+    int64u Element_Size_Save=Element_Size; \
+    Element_Size=Element_Offset+Length2; \
     _ELEMENT(); \
+    Element_Offset=Element_Size; \
+    Element_Size=Element_Size_Save; \
 }
 
 //---------------------------------------------------------------------------
@@ -7116,11 +7137,9 @@ void File_Mxf::Preface()
 void File_Mxf::Primer()
 {
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(2+16)==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         Element_Begin1("LocalTagEntryBatch");
         int16u LocalTag;
@@ -8044,11 +8063,9 @@ void File_Mxf::GroupOfSoundfieldGroupsLinkID()
         return;
 
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(16)==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         int128u Data;
         Get_UUID(Data,                                          "Value");
@@ -8238,11 +8255,9 @@ void File_Mxf::SubDescriptors()
     Descriptors[InstanceUID].SubDescriptors.clear();
 
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(16)==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         int128u Data;
         Get_UUID(Data,                                          "Sub Descriptor");
@@ -8856,11 +8871,9 @@ void File_Mxf::ContentStorage_Packages()
     ContentStorages[InstanceUID].Packages.clear();
 
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(16)==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         int128u Data;
         Get_UUID(Data,                                          "Package");
@@ -8877,11 +8890,9 @@ void File_Mxf::ContentStorage_Packages()
 void File_Mxf::ContentStorage_EssenceContainerData()
 {
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(16)==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         Skip_UUID(                                              "EssenceContainer");
     }
@@ -8918,11 +8929,9 @@ void File_Mxf::DMSegment_DMFramework()
 void File_Mxf::DMSegment_TrackIDs()
 {
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(4)==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         int32u Data;
         Get_B4 (Data,                                           "Track ID");
@@ -9132,11 +9141,9 @@ void File_Mxf::GenericDescriptor_Locators()
     Descriptors[InstanceUID].Locators.clear();
 
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(16)==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         Element_Begin1("Locator");
         int128u UUID;
@@ -9182,11 +9189,9 @@ void File_Mxf::GenericPackage_Name()
 void File_Mxf::GenericPackage_Tracks()
 {
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(16)==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         int128u Data;
         Get_UUID(Data,                                          "Track");
@@ -9239,7 +9244,7 @@ void File_Mxf::GenericPictureEssenceDescriptor_StoredHeight()
     Get_B4 (Data,                                                "Data"); Element_Info1(Data);
 
     FILLING_BEGIN();
-        if (!Partitions_IsFooter || Descriptors[InstanceUID].Height==(int32u)-1)
+        if (Descriptors[InstanceUID].Height==(int32u)-1)
         {
             if (Descriptors[InstanceUID].ScanType==__T("Interlaced"))
                 Data*=2; //This is per field
@@ -9258,7 +9263,7 @@ void File_Mxf::GenericPictureEssenceDescriptor_StoredWidth()
     Get_B4 (Data,                                                "Data"); Element_Info1(Data);
 
     FILLING_BEGIN();
-        if (!Partitions_IsFooter || Descriptors[InstanceUID].Width==(int32u)-1)
+        if (Descriptors[InstanceUID].Width==(int32u)-1)
         {
             if (Descriptors[InstanceUID].Width==(int32u)-1)
                 Descriptors[InstanceUID].Width=Data;
@@ -9275,12 +9280,9 @@ void File_Mxf::GenericPictureEssenceDescriptor_SampledHeight()
     Get_B4 (Data,                                                "Data"); Element_Info1(Data);
 
     FILLING_BEGIN();
-        if (!Partitions_IsFooter || Descriptors[InstanceUID].Height==(int32u)-1)
-        {
-            if (Descriptors[InstanceUID].ScanType==__T("Interlaced"))
-                Data*=2; //This is per field
-            Descriptors[InstanceUID].Height=Data;
-        }
+        if (Descriptors[InstanceUID].ScanType==__T("Interlaced"))
+            Data*=2; //This is per field
+        Descriptors[InstanceUID].Height=Data;
     FILLING_END();
 }
 
@@ -9322,12 +9324,9 @@ void File_Mxf::GenericPictureEssenceDescriptor_DisplayHeight()
     Get_B4 (Data,                                                "Data"); Element_Info1(Data);
 
     FILLING_BEGIN();
-        if (!Partitions_IsFooter || Descriptors[InstanceUID].Height_Display!=(int32u)-1)
-        {
-            if (Descriptors[InstanceUID].ScanType==__T("Interlaced"))
-                Data*=2; //This is per field
-            Descriptors[InstanceUID].Height_Display=Data;
-        }
+        if (Descriptors[InstanceUID].ScanType==__T("Interlaced"))
+            Data*=2; //This is per field
+        Descriptors[InstanceUID].Height_Display=Data;
     FILLING_END();
 }
 
@@ -9366,12 +9365,9 @@ void File_Mxf::GenericPictureEssenceDescriptor_DisplayYOffset()
     Get_B4 (Data,                                               "Data"); Element_Info1(Data);
 
     FILLING_BEGIN();
-        if (!Partitions_IsFooter || Descriptors[InstanceUID].Height_Display_Offset==(int32u)-1)
-        {
-            if (Descriptors[InstanceUID].ScanType==__T("Interlaced"))
-                Data*=2; //This is per field
-            Descriptors[InstanceUID].Height_Display_Offset=Data;
-        }
+        if (Descriptors[InstanceUID].ScanType==__T("Interlaced"))
+            Data*=2; //This is per field
+        Descriptors[InstanceUID].Height_Display_Offset=Data;
     FILLING_END();
 }
 
@@ -9384,16 +9380,13 @@ void File_Mxf::GenericPictureEssenceDescriptor_FrameLayout()
     Get_B1 (Data,                                               "Data"); Element_Info1(Data); Param_Info1(Mxf_FrameLayout(Data)); Element_Info1(Mxf_FrameLayout(Data));
 
     FILLING_BEGIN();
-        if (!Partitions_IsFooter || Descriptors[InstanceUID].ScanType.empty())
+        if (Descriptors[InstanceUID].ScanType.empty())
         {
-            if (Descriptors[InstanceUID].ScanType.empty())
-            {
-                if (Descriptors[InstanceUID].Height!=(int32u)-1) Descriptors[InstanceUID].Height*=Mxf_FrameLayout_Multiplier(Data);
-                if (Descriptors[InstanceUID].Height_Display!=(int32u)-1) Descriptors[InstanceUID].Height_Display*=Mxf_FrameLayout_Multiplier(Data);
-                if (Descriptors[InstanceUID].Height_Display_Offset!=(int32u)-1) Descriptors[InstanceUID].Height_Display_Offset*=Mxf_FrameLayout_Multiplier(Data);
-            }
-            Descriptors[InstanceUID].ScanType.From_UTF8(Mxf_FrameLayout_ScanType(Data));
+            if (Descriptors[InstanceUID].Height!=(int32u)-1) Descriptors[InstanceUID].Height*=Mxf_FrameLayout_Multiplier(Data);
+            if (Descriptors[InstanceUID].Height_Display!=(int32u)-1) Descriptors[InstanceUID].Height_Display*=Mxf_FrameLayout_Multiplier(Data);
+            if (Descriptors[InstanceUID].Height_Display_Offset!=(int32u)-1) Descriptors[InstanceUID].Height_Display_Offset*=Mxf_FrameLayout_Multiplier(Data);
         }
+        Descriptors[InstanceUID].ScanType.From_UTF8(Mxf_FrameLayout_ScanType(Data));
     FILLING_END();
 }
 
@@ -9405,10 +9398,9 @@ void File_Mxf::GenericPictureEssenceDescriptor_VideoLineMap()
     bool   VideoLineMapEntry_IsZero=false;
 
     //Parsing
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(4)==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         int32u VideoLineMapEntry;
         Get_B4 (VideoLineMapEntry,                              "VideoLineMapEntry");
@@ -9425,7 +9417,7 @@ void File_Mxf::GenericPictureEssenceDescriptor_VideoLineMap()
         //    odd even field 1 upper
         //    even odd field 1 upper
         //    even even field 2 upper
-        if (Count==2 && !VideoLineMapEntry_IsZero)
+        if (Length2==8+2*4 && !VideoLineMapEntry_IsZero) //2 values
             Descriptors[InstanceUID].FieldTopness=(VideoLineMapEntries_Total%2)?1:2;
     FILLING_END();
 }
@@ -9838,7 +9830,14 @@ void File_Mxf::Identification_ToolkitVersion()
     Get_B2 (Minor,                                              "Minor");
     Get_B2 (Patch,                                              "Patch");
     Get_B2 (Build,                                              "Build");
-    Get_B2 (Release,                                            "Release");
+    if (Element_Size-Element_Offset==1)
+    {
+        int8u t;
+        Get_B1 (t,                                              "Release"); Param_Error("Identification ToolkitVersion is 9 byte long (should be 10)");
+        Release=t;
+    }
+    else
+        Get_B2 (Release,                                        "Release");
     Ztring Version=Ztring::ToZtring(Major)+__T('.')
                   +Ztring::ToZtring(Minor)+__T('.')
                   +Ztring::ToZtring(Patch)+__T('.')
@@ -10158,10 +10157,9 @@ void File_Mxf::JPEG2000PictureSubDescriptor_Csiz()
 void File_Mxf::JPEG2000PictureSubDescriptor_PictureComponentSizing()
 {
     //Parsing
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(3)==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         Element_Begin1("PictureComponentSize");
         Info_B1(Ssiz,                                           "Component sample precision"); Element_Info1(Ssiz);
@@ -10292,7 +10290,7 @@ void File_Mxf::MPEG2VideoDescriptor_CodedContentType()
     Get_B1 (Data,                                               "Data"); Element_Info1(Mxf_MPEG2_CodedContentType(Data));
 
     FILLING_BEGIN();
-        if (!Partitions_IsFooter || Descriptors[InstanceUID].ScanType.empty())
+        if (Descriptors[InstanceUID].ScanType.empty())
         {
             if (Data==2 && Descriptors[InstanceUID].ScanType.empty())
             {
@@ -10539,11 +10537,10 @@ void File_Mxf::MultipleDescriptor_FileDescriptors()
     Descriptors[InstanceUID].SubDescriptors.clear();
 
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(16)==(int32u)-1)
+        return;
+    size_t StreamOrder=0;
+    while (Element_Offset<Element_Size)
     {
         //Parsing
         int128u Data;
@@ -10551,7 +10548,8 @@ void File_Mxf::MultipleDescriptor_FileDescriptors()
 
         FILLING_BEGIN();
             Descriptors[InstanceUID].SubDescriptors.push_back(Data);
-            Descriptors[Data].Infos["StreamOrder"].From_Number(Pos);
+            Descriptors[Data].Infos["StreamOrder"].From_Number(StreamOrder);
+            StreamOrder++;
         FILLING_END();
     }
 }
@@ -10578,10 +10576,13 @@ void File_Mxf::PartitionMetadata()
     Get_UL (OperationalPattern,                                 "OperationalPattern", Mxf_OperationalPattern);
 
     Element_Begin1("EssenceContainers"); //Vector
-        int32u Count, Length;
-        Get_B4 (Count,                                          "Count");
-        Get_B4 (Length,                                         "Length");
-        for (int32u Pos=0; Pos<Count; Pos++)
+        if (Vector(16)==(int32u)-1)
+        {
+            Element_End0();
+            return;
+        }
+        int32u Count=(Element_Size-Element_Offset)/16;
+        while (Element_Offset<Element_Size)
         {
             int128u EssenceContainer;
             Get_UL (EssenceContainer,                           "EssenceContainer", Mxf_EssenceContainer);
@@ -10745,11 +10746,9 @@ void File_Mxf::Preface_Version()
 void File_Mxf::Preface_Identifications()
 {
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(16)==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         Element_Begin1("Identification");
         int128u Data;
@@ -10796,11 +10795,9 @@ void File_Mxf::Preface_OperationalPattern()
 void File_Mxf::Preface_EssenceContainers()
 {
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(16)==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         Info_UL(EssenceContainer,                               "EssenceContainer", Mxf_EssenceContainer);
     }
@@ -10811,11 +10808,10 @@ void File_Mxf::Preface_EssenceContainers()
 void File_Mxf::Preface_DMSchemes()
 {
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    int32u Length;
+    if ((Length=Vector())==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
         if (Length==16)
         {
             Info_UL(Data,                                       "DMScheme", NULL); Element_Info1(Ztring().From_UUID(Data));
@@ -10895,11 +10891,9 @@ void File_Mxf::Sequence_StructuralComponents()
     Components[InstanceUID].StructuralComponents.clear();
 
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(16)==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         int128u Data;
         Get_UUID (Data,                                         "StructuralComponent");
@@ -10993,11 +10987,9 @@ void File_Mxf::SystemScheme1_FrameCount()
 void File_Mxf::SystemScheme1_TimeCodeArray()
 {
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(8)==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         Element_Begin1("TimeCode");
         int8u Frames_Units, Frames_Tens, Seconds_Units, Seconds_Tens, Minutes_Units, Minutes_Tens, Hours_Units, Hours_Tens;
@@ -11075,11 +11067,9 @@ void File_Mxf::SystemScheme1_TimeCodeArray()
 void File_Mxf::SystemScheme1_ClipIDArray()
 {
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(32)==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         Skip_UMID(                                              );
     }
@@ -11090,11 +11080,9 @@ void File_Mxf::SystemScheme1_ClipIDArray()
 void File_Mxf::SystemScheme1_ExtendedClipIDArray()
 {
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(64)==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         Skip_UMID(                                              ); //ExtUMID (ToDo: merge)
         Skip_UMID(                                              );
@@ -11106,11 +11094,10 @@ void File_Mxf::SystemScheme1_ExtendedClipIDArray()
 void File_Mxf::SystemScheme1_VideoIndexArray()
 {
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    int32u Length;
+    if ((Length=Vector())==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         Skip_XX(Length,                                         "Video Index");
     }
@@ -11144,11 +11131,9 @@ void File_Mxf::SystemScheme1_EssenceTrackNumber()
 void File_Mxf::SystemScheme1_EssenceTrackNumberBatch()
 {
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(4)==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         Skip_B4(                                                "Track Number");
     }
@@ -11159,11 +11144,10 @@ void File_Mxf::SystemScheme1_EssenceTrackNumberBatch()
 void File_Mxf::SystemScheme1_ContentPackageIndexArray()
 {
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    int32u Length;
+    if ((Length=Vector())==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         Skip_XX(Length,                                         "Index Entry");
     }
@@ -13059,11 +13043,9 @@ void File_Mxf::AS11_UKDPP_ContactTelephoneNumber()
 void File_Mxf::Omneon_010201010100_8001()
 {
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(16)==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         Skip_UUID(                                              "UUID Omneon_010201020100");
     }
@@ -13074,11 +13056,9 @@ void File_Mxf::Omneon_010201010100_8001()
 void File_Mxf::Omneon_010201010100_8003()
 {
     //Parsing
-    //Vector
-    int32u Count, Length;
-    Get_B4 (Count,                                              "Count");
-    Get_B4 (Length,                                             "Length");
-    for (int32u Pos=0; Pos<Count; Pos++)
+    if (Vector(16)==(int32u)-1)
+        return;
+    while (Element_Offset<Element_Size)
     {
         Skip_UUID(                                              "UUID Omneon_010201020100");
     }
@@ -17031,6 +17011,34 @@ void File_Mxf::ChooseParser_Jpeg2000(const essences::iterator &Essence, const de
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+int32u File_Mxf::Vector(int32u ExpectedLength)
+{
+    if (Element_Offset+8>Element_Size)
+    {
+        Element_Error("Incoherent element size");
+        return (int32u)-1;
+    }
+
+    int32u Count, Length;
+    Get_B4 (Count,                                              "Count");
+    Get_B4 (Length,                                             "Length");
+
+    if (Count*Length!=Element_Size-Element_Offset)
+    {
+        Param_Error("Incoherent Count*Length");
+        return (int32u)-1;
+    }
+
+    if (Count && ExpectedLength!=(int32u)-1 && Length!=ExpectedLength)
+    {
+        Param_Error("Unexpected item length");
+        return (int32u)-1;
+    }
+
+    return Length;
+}
+
+//---------------------------------------------------------------------------
 void File_Mxf::Subsampling_Compute(descriptors::iterator Descriptor)
 {
     if (Descriptor==Descriptors.end() || (Descriptor->second.SubSampling_Horizontal==(int32u)-1 || Descriptor->second.SubSampling_Vertical==(int32u)-1))
@@ -17062,8 +17070,8 @@ void File_Mxf::Subsampling_Compute(descriptors::iterator Descriptor)
 #if defined(MEDIAINFO_REFERENCES_YES)
 void File_Mxf::Locators_CleanUp()
 {
-    //Testing locators (TODO: check if this is still useful)
-    if (Locators.size()==1)
+    //Testing locators (TODO: check if this is still useful after refactoring, with MXF having essence and locators)
+    if (Locators.size()==1 && !Essences.empty())
     {
         Locators.clear();
         return;

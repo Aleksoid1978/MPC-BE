@@ -78,7 +78,7 @@ static const char* Wm_BannerImageData_Type(int32u Type)
 }
 
 #define UUID(NAME, PART1, PART2, PART3, PART4, PART5) \
-    const int64u NAME   =0x##PART3##PART2##PART1##ULL; \
+    const int64u NAME   =((int64u(0x##PART1))&0xFF)<<56 | ((int64u(0x##PART1)>>8)&0xFF)<<48 | ((int64u(0x##PART1)>>16)&0xFF)<<40 | ((int64u(0x##PART1)>>24)&0xFF)<<32 | ((int64u(0x##PART2))&0xFF)<<24 | ((int64u(0x##PART2)>>8)&0xFF)<<16 | ((int64u(0x##PART3))&0xFF)<<8 | ((int64u(0x##PART3)>>8)&0xFF); \
     const int64u NAME##2=0x##PART4##PART5##ULL; \
 
 namespace Elements

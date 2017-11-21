@@ -39,6 +39,14 @@ using std::make_pair;
 namespace MediaInfoLib
 {
 
+enum basicformat
+{
+    BasicFormat_Text,
+    BasicFormat_CSV,
+    BasicFormat_XML,
+    BasicFormat_JSON,
+};
+
 //***************************************************************************
 // Class MediaInfo_Config
 //***************************************************************************
@@ -179,6 +187,7 @@ public :
     const ZtringListList &Info_Get(stream_t KindOfStream); //Should not be, but too difficult to hide it
 
           Ztring    Info_Parameters_Get (bool Complete=false);
+          Ztring    Info_OutputFormats_Get(basicformat Format);
           Ztring    Info_Tags_Get       () const;
           Ztring    Info_CodecsID_Get   ();
           Ztring    Info_Codecs_Get     ();

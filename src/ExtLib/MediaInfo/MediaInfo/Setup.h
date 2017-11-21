@@ -493,6 +493,9 @@
 #if !defined(MEDIAINFO_MULTI_NO) && !defined(MEDIAINFO_MK_NO) && !defined(MEDIAINFO_MK_YES)
     #define MEDIAINFO_MK_YES
 #endif
+#if !defined(MEDIAINFO_MULTI_NO) && !defined(MEDIAINFO_MIXML_NO) && !defined(MEDIAINFO_MIXML_YES)
+    #define MEDIAINFO_MIXML_YES
+#endif
 #if !defined(MEDIAINFO_MULTI_NO) && !defined(MEDIAINFO_MPEG4_NO) && !defined(MEDIAINFO_MPEG4_YES)
     #define MEDIAINFO_MPEG4_YES
 #endif

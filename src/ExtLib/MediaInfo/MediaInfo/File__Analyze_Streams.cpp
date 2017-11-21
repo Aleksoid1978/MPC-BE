@@ -37,6 +37,43 @@ extern MediaInfo_Config Config;
 //---------------------------------------------------------------------------
 
 //***************************************************************************
+// Others, specialized, parsing
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance)
+{
+    //Parsing
+    int32u max, min;
+    int16u x[4];
+    int16u y[4];
+    for (size_t c = 0; c < 3; c++)
+    {
+        Get_B2(x[c],                                            "display_primaries_x");
+        Get_B2(y[c],                                            "display_primaries_y");
+    }
+    Get_B2(x[3],                                                "white_point_x");
+    Get_B2(y[3],                                                "white_point_y");
+    Get_B4(max,                                                 "max_display_mastering_luminance");
+    Get_B4(min,                                                 "min_display_mastering_luminance");
+
+    if (MasteringDisplay_ColorPrimaries.empty())
+    {
+        MasteringDisplay_ColorPrimaries=__T("R: x=")+Ztring::ToZtring(((float64)x[2])/50000, 6)
+                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[2])/50000, 6)
+                                     +__T(", G: x=")+Ztring::ToZtring(((float64)x[0])/50000, 6)
+                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[0])/50000, 6)
+                                     +__T(", B: x=")+Ztring::ToZtring(((float64)x[1])/50000, 6)
+                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[1])/50000, 6)
+                           +__T(", White point: x=")+Ztring::ToZtring(((float64)x[3])/50000, 6)
+                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[3])/50000, 6);
+        MasteringDisplay_Luminance=     __T("min: ")+Ztring::ToZtring(((float64)min)/10000, 4)
+                               +__T(" cd/m2, max: ")+Ztring::ToZtring(((float64)max)/10000, 4)
+                               +__T(" cd/m2");
+    }
+}
+
+//***************************************************************************
 // Preparation des streams
 //***************************************************************************
 
@@ -1009,7 +1046,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, const char* Par
         if (Target.empty() || Replace)
         {
             Target=Value; //First value
-			Stream_More_Item(Parameter_ISO, Info_Name_Text)=MediaInfoLib::Config.Language_Get(Parameter_Local);
+            Stream_More_Item(Parameter_ISO, Info_Name_Text)=MediaInfoLib::Config.Language_Get(Parameter_Local);
             Fill_SetOptions(StreamKind, StreamPos, Parameter, "Y NT");
         }
         else
@@ -1833,7 +1870,8 @@ void File__Analyze::Tags()
 //Duration
 void File__Analyze::Duration_Duration123(stream_t StreamKind, size_t StreamPos, size_t Parameter)
 {
-    if (Retrieve(StreamKind, StreamPos, Parameter).empty())
+    if (Retrieve(StreamKind, StreamPos, Parameter).empty()
+     || (StreamKind==Stream_Audio && (Parameter==Audio_Interleave_Duration || Parameter==Audio_Interleave_Preload))) //Exception: string is built also from frame rate, already computed. TODO: check behavior with MIXML input
         return;
 
     //Clearing old data

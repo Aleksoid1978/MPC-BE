@@ -390,7 +390,7 @@ String MediaInfoList_Internal::Inform(size_t FilePos, size_t)
             return Result;
         }
 
-        if (MediaInfoLib::Config.Inform_Get()==__T("MIXML"))
+        if (MediaInfoLib::Config.Inform_Get()==__T("XML") || MediaInfoLib::Config.Inform_Get()==__T("MIXML"))
         {
             Ztring Result;
             Result+=__T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")+MediaInfoLib::Config.LineSeparator_Get();
@@ -403,9 +403,8 @@ String MediaInfoList_Internal::Inform(size_t FilePos, size_t)
             Result+=MediaInfoLib::Config.LineSeparator_Get();
             Result+=__T("    xsi:schemaLocation=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediainfo http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediainfo/mediainfo_2_0.xsd\"");
             Result+=MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("    version=\"2.0beta1\"");
+            Result+=__T("    version=\"2.0\"");
             Result+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("<!-- Work in progress, not for production -->")+MediaInfoLib::Config.LineSeparator_Get();
             Result+=__T("<creatingLibrary version=\"")+Ztring(MediaInfo_Version).SubString(__T(" - v"), Ztring())+__T("\" url=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>");
             Result+=MediaInfoLib::Config.LineSeparator_Get();
 
@@ -426,7 +425,7 @@ String MediaInfoList_Internal::Inform(size_t FilePos, size_t)
         ZtringListList MediaInfo_Custom_View; MediaInfo_Custom_View.Write(Option(__T("Inform_Get")));
         #if defined(MEDIAINFO_XML_YES)
         bool XML=false;
-        if (MediaInfoLib::Config.Inform_Get()==__T("XML"))
+        if (MediaInfoLib::Config.Inform_Get()==__T("OLDXML"))
             XML=true;
         if (XML)
         {

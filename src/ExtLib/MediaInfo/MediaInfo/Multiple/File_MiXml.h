@@ -6,13 +6,13 @@
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-// Information about VBI data (SMPTE ST436M),Teletext (ETSI EN300 706)
+// Information about MediaInfo XML files
 //
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 //---------------------------------------------------------------------------
-#ifndef MediaInfo_VbiH
-#define MediaInfo_VbiH
+#ifndef MediaInfo_File_MiXmlH
+#define MediaInfo_File_MiXmlH
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -23,29 +23,21 @@
 namespace MediaInfoLib
 {
 
+class File__ReferenceFilesHelper;
+
 //***************************************************************************
-// Class File_Vbi
+// Class File_MiXml
 //***************************************************************************
 
-class File_Vbi : public File__Analyze
+class File_MiXml : public File__Analyze
 {
 public :
-
-    #if defined(MEDIAINFO_TELETEXT_YES)
-        File__Analyze*  Teletext_Parser;
-    #endif //defined(MEDIAINFO_TELETEXT_YES)
-    
     //Constructor/Destructor
-    File_Vbi();
-    ~File_Vbi();
+    File_MiXml();
 
 private :
-    //Streams management
-    void Streams_Finish();
-
-    //Buffer - Global
-    void Read_Buffer_Continue();
-    void Read_Buffer_Unsynched();
+    //Buffer - File header
+    bool FileHeader_Begin();
 };
 
 } //NameSpace

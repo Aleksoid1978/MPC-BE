@@ -3079,15 +3079,15 @@ void File_Avc::sei_message_user_data_unregistered(int32u payloadSize)
 
     //Parsing
     int128u uuid_iso_iec_11578;
-    Get_GUID(uuid_iso_iec_11578,                                "uuid_iso_iec_11578");
+    Get_UUID(uuid_iso_iec_11578,                                "uuid_iso_iec_11578");
 
     switch (uuid_iso_iec_11578.hi)
     {
-        case 0xB748D9E6BDE945DCLL : Element_Info1("x264");
+        case 0xDC45E9BDE6D948B7LL : Element_Info1("x264");
                                      sei_message_user_data_unregistered_x264(payloadSize-16); break;
-        case 0x684E92AC604A57FBLL : Element_Info1("eavc");
+        case 0xFB574A60AC924E68LL : Element_Info1("eavc");
                                      sei_message_user_data_unregistered_x264(payloadSize-16); break;
-        case 0xD9114Df8608CEE17LL : Element_Info1("Blu-ray");
+        case 0x17EE8C60F84D11D9LL : Element_Info1("Blu-ray");
                                     sei_message_user_data_unregistered_bluray(payloadSize-16); break;
         default :
                     Element_Info1("unknown");

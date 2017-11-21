@@ -511,9 +511,9 @@ void File_Mpega::Streams_Finish()
 
     if (FrameCount==0 && VBR_FileSize && Retrieve(Stream_Audio, 0, Audio_BitRate_Mode)==__T("CBR") && ID<4 && layer<4 && sampling_frequency<4 && bitrate_index<16 && Mpega_SamplingRate[ID][sampling_frequency])
     {
-        size_t Size=(Mpega_Coefficient[ID][layer]*Mpega_BitRate[ID][layer][bitrate_index]*1000/Mpega_SamplingRate[ID][sampling_frequency])*Mpega_SlotSize[layer];
+        float64 Size=((float64)Mpega_Coefficient[ID][layer]*Mpega_BitRate[ID][layer][bitrate_index]*1000/Mpega_SamplingRate[ID][sampling_frequency])*Mpega_SlotSize[layer];
         if (Size)
-            FrameCount=float64_int64s(((float64)VBR_FileSize)/Size);
+            FrameCount=float64_int64s(VBR_FileSize/Size);
     }
 
     if (FrameCount)
@@ -527,6 +527,8 @@ void File_Mpega::Streams_Finish()
             Samples=1152;
         Fill(Stream_Audio, 0, Audio_FrameCount, FrameCount, 10, true);
         Fill(Stream_Audio, 0, Audio_SamplingCount, FrameCount*Samples, 10, true);
+        float64 audio_fps = (float64)((float64)Mpega_SamplingRate[ID][sampling_frequency] / (float64)Samples);
+        Fill(Stream_Audio, 0, Audio_FrameRate, audio_fps, 3, true);
     }
 
     File__Tags_Helper::Streams_Finish();
@@ -1411,10 +1413,25 @@ bool File_Mpega::Header_Encoders()
 
 void File_Mpega::Header_Encoders_Lame()
 {
-    Peek_Local(8, Encoded_Library);
-    if (Encoded_Library.find(__T("L3.99"))==0)
-        Encoded_Library.insert(1, __T("AME")); //Ugly version string in Lame 3.99.1 "L3.99r1\0"
-    if ((Encoded_Library>=__T("LAME3.90")) && Element_IsNotFinished())
+    bool HasInfoTag=false;
+    if (Element_Offset+9<=Element_Size)
+    {
+        const int8u* Tag=Buffer+Buffer_Offset+(size_t)Element_Offset;
+        int32u Name=BigEndian2int32u(Tag);
+        if (Name==0x4C414D45   // "LAME"
+         && Tag[5]=='.')
+        {
+            //Needs addtional tests, as v3.89 and less have no Lame Info tag, but v3.100 exists too
+            if ( Tag[4]> '3'                                                                                    // v4 or more
+             || (Tag[4]=='3' && Tag[6]=='9')                                                                    // v3.9yz-v3.9yz
+             ||  Tag[4]=='3' && Tag[8]>='0' && Tag[8]<='9')                                                     // v3.xy0-v3.xy9
+                HasInfoTag=true;
+        }
+        if (Name==0x4C332E39   // "L3.9"
+         && Tag[4]=='9')
+            HasInfoTag=true; //Form old code, to be confirmed: Ugly version string in Lame 3.99.1 "L3.99r1\0".
+    }
+    if (HasInfoTag)
     {
         int8u Flags, lowpass, EncodingFlags, BitRate, StereoMode;
         Param_Info1(Ztring(__T("V "))+Ztring::ToZtring((100-Xing_Scale)/10));

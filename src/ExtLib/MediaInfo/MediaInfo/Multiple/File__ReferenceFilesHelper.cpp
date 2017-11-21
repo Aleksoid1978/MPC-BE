@@ -809,6 +809,9 @@ void File__ReferenceFilesHelper::ParseReferences()
                     return;
 
                 Sequences_Current++;
+
+                if (Demux_Interleave && Sequences_Current == Sequences.size() && Config->NextPacket_Get() && CountOfReferencesToParse)
+                    Sequences_Current = 0;
             }
         #else //MEDIAINFO_DEMUX && MEDIAINFO_NEXTPACKET
             Sequences_Current++;
