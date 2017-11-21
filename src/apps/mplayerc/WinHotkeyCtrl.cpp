@@ -70,7 +70,7 @@ LRESULT CALLBACK CWinHotkeyCtrl::LowLevelKeyboardProc(int nCode, WPARAM wParam, 
 
 	if (nCode == HC_ACTION && (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN ||
 							   wParam == WM_KEYUP || wParam == WM_SYSKEYUP) && sm_pwhcFocus) {
-		sm_pwhcFocus->PostMessage(WM_KEY, ((PKBDLLHOOKSTRUCT)lParam)->vkCode, (wParam & 1));
+		sm_pwhcFocus->PostMessageW(WM_KEY, ((PKBDLLHOOKSTRUCT)lParam)->vkCode, (wParam & 1));
 	}
 
 	return(lResult);

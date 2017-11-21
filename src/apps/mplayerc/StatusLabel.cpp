@@ -73,7 +73,7 @@ END_MESSAGE_MAP()
 BOOL CStatusLabel::PreTranslateMessage(MSG* pMsg)
 {
 	if (pMsg->message == WM_LBUTTONDOWN) {
-		GetParent()->SendMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
+		GetParent()->SendMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
 	}
 
 	return __super::PreTranslateMessage(pMsg);
@@ -84,7 +84,7 @@ void CStatusLabel::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	CDC dc;
 	dc.Attach(lpDrawItemStruct->hDC);
 	CString str;
-	GetWindowText(str);
+	GetWindowTextW(str);
 	CRect r;
 	int R, G, B;
 	GetClientRect(&r);

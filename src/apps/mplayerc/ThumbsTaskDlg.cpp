@@ -270,8 +270,8 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 			const CString filepath = m_pMainFrm->GetCurFileName();
 			filename = GetFileOnly(filepath);
 
-			WIN32_FIND_DATA wfd;
-			HANDLE hFind = FindFirstFile(filepath, &wfd);
+			WIN32_FIND_DATAW wfd;
+			HANDLE hFind = FindFirstFileW(filepath, &wfd);
 			if (hFind != INVALID_HANDLE_VALUE) {
 				FindClose(hFind);
 

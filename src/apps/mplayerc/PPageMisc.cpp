@@ -147,7 +147,7 @@ void CPPageMisc::OnResetSettings()
 {
 	if (MessageBox(ResStr(IDS_RESET_SETTINGS_WARNING), ResStr(IDS_RESET_SETTINGS), MB_ICONEXCLAMATION | MB_YESNO | MB_DEFBUTTON2) == IDYES) {
 		AfxGetAppSettings().bResetSettings = true;
-		GetParent()->PostMessage(WM_CLOSE);
+		GetParent()->PostMessageW(WM_CLOSE);
 	}
 }
 
@@ -159,7 +159,7 @@ void CPPageMisc::OnExportSettings()
 		if (ret == IDCANCEL) {
 			return;
 		} else if (ret == IDYES) {
-			GetParent()->PostMessage(PSM_APPLY);
+			GetParent()->PostMessageW(PSM_APPLY);
 		}
 	}
 

@@ -221,8 +221,8 @@ BOOL CPPageInterface::OnApply()
 	BOOL bUseDarkTheme	= s.bUseDarkTheme;
 	s.bUseDarkTheme	= !!m_bUseDarkTheme;
 	if (::IsWindow(pFrame->m_hWnd_toolbar) && (s.bUseDarkTheme != !!bUseDarkTheme)) {
-		::PostMessage(pFrame->m_hWnd_toolbar, WM_SIZE, s.nLastWindowType, MAKELPARAM(s.rcLastWindowPos.Width(), s.rcLastWindowPos.Height()));
-		::PostMessage(pFrame->m_hWnd,         WM_SIZE, s.nLastWindowType, MAKELPARAM(s.rcLastWindowPos.Width(), s.rcLastWindowPos.Height()));
+		::PostMessageW(pFrame->m_hWnd_toolbar, WM_SIZE, s.nLastWindowType, MAKELPARAM(s.rcLastWindowPos.Width(), s.rcLastWindowPos.Height()));
+		::PostMessageW(pFrame->m_hWnd,         WM_SIZE, s.nLastWindowType, MAKELPARAM(s.rcLastWindowPos.Width(), s.rcLastWindowPos.Height()));
 	}
 
 	s.fUseWin7TaskBar		= !!m_fUseWin7TaskBar;
@@ -312,7 +312,7 @@ void CPPageInterface::OnThemeChange()
 	HWND wndToolBar	= AfxGetMainFrame()->m_hWnd_toolbar;
 
 	if (::IsWindow(wndToolBar)) {
-		::PostMessage(wndToolBar, WM_SIZE, SIZE_RESTORED, MAKELPARAM(320, 240));
+		::PostMessageW(wndToolBar, WM_SIZE, SIZE_RESTORED, MAKELPARAM(320, 240));
 	}
 
 	pFrame->Invalidate();
@@ -411,7 +411,7 @@ void CPPageInterface::OnClickClrDefault()
 	GetDlgItem(IDC_BUTTON_CLRFONT)->Invalidate();
 	GetDlgItem(IDC_BUTTON_CLRGRAD1)->Invalidate();
 	GetDlgItem(IDC_BUTTON_CLRGRAD2)->Invalidate();
-	PostMessage(WM_COMMAND, IDC_CHECK3);
+	PostMessageW(WM_COMMAND, IDC_CHECK3);
 
 	s.nThemeBrightness		= m_nThemeBrightness	= 15;
 	s.nThemeRed				= m_nThemeRed			= 255;
@@ -451,7 +451,7 @@ void CPPageInterface::OnClickClrFace()
 	if (clrpicker.DoModal() == IDOK) {
 		if (m_clrFaceABGR != clrpicker.GetColor()) {
 			UpdateData(FALSE);
-			PostMessage(WM_COMMAND, IDC_CHECK3);
+			PostMessageW(WM_COMMAND, IDC_CHECK3);
 		}
 		m_clrFaceABGR = clrpicker.GetColor();
 	}
@@ -466,7 +466,7 @@ void CPPageInterface::OnClickClrOutline()
 	if (clrpicker.DoModal() == IDOK) {
 		if (m_clrOutlineABGR != clrpicker.GetColor()) {
 			UpdateData(FALSE);
-			PostMessage(WM_COMMAND, IDC_CHECK3);
+			PostMessageW(WM_COMMAND, IDC_CHECK3);
 		}
 		m_clrOutlineABGR = clrpicker.GetColor();
 	}

@@ -52,7 +52,7 @@ LPTOP_LEVEL_EXCEPTION_FILTER WINAPI MyDummySetUnhandledExceptionFilter( LPTOP_LE
 
 BOOL CMiniDump::PreventSetUnhandledExceptionFilter()
 {
-	HMODULE hKernel32 = LoadLibrary(L"kernel32.dll");
+	HMODULE hKernel32 = LoadLibraryW(L"kernel32.dll");
 	if (hKernel32 == nullptr) {
 		return FALSE;
 	}
@@ -89,23 +89,23 @@ LONG WINAPI CMiniDump::UnhandledExceptionFilter( _EXCEPTION_POINTERS *lpTopLevel
 		return retval;
 	}
 
-	hDll = ::LoadLibrary(GetProgramDir() + L"DBGHELP.DLL");
+	hDll = ::LoadLibraryW(GetProgramDir() + L"DBGHELP.DLL");
 
 	if (hDll == nullptr) {
-		hDll = ::LoadLibrary(L"DBGHELP.DLL");
+		hDll = ::LoadLibraryW(L"DBGHELP.DLL");
 	}
 
 	if (hDll != nullptr) {
 		MINIDUMPWRITEDUMP pMiniDumpWriteDump = (MINIDUMPWRITEDUMP)::GetProcAddress(hDll, "MiniDumpWriteDump");
 		if (pMiniDumpWriteDump != nullptr && AfxGetMyApp()->GetAppSavePath(strDumpPath)) {
 			// Check that the folder actually exists
-			if (!::PathFileExists(strDumpPath)) {
-				VERIFY(CreateDirectory(strDumpPath, nullptr));
+			if (!::PathFileExistsW(strDumpPath)) {
+				VERIFY(CreateDirectoryW(strDumpPath, nullptr));
 			}
 
 			strDumpPath.AppendFormat(L"%s.exe.%d.%d.%d.%d.dmp", AfxGetApp()->m_pszExeName, MPC_VERSION_NUM_SVN);
 
-			HANDLE hFile = ::CreateFile(strDumpPath, GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS,
+			HANDLE hFile = ::CreateFileW(strDumpPath, GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS,
 										FILE_ATTRIBUTE_NORMAL, nullptr);
 
 			if (hFile != INVALID_HANDLE_VALUE) {

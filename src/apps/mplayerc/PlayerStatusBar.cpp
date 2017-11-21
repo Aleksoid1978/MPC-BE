@@ -134,7 +134,7 @@ void CPlayerStatusBar::Relayout()
 		int div = r.right - (m_time.IsWindowVisible() ? 140 : 0);
 
 		CString str;
-		m_time.GetWindowText(str);
+		m_time.GetWindowTextW(str);
 		if (CDC* pDC = m_time.GetDC()) {
 			CFont* pOld = pDC->SelectObject(&m_time.GetFont());
 			div = r.right - pDC->GetTextExtent(str).cx;
@@ -213,7 +213,7 @@ void CPlayerStatusBar::SetStatusMessage(CString str)
 CString CPlayerStatusBar::GetStatusTimer()
 {
 	CString strResult;
-	m_time.GetWindowText(strResult);
+	m_time.GetWindowTextW(strResult);
 
 	return strResult;
 }
@@ -221,7 +221,7 @@ CString CPlayerStatusBar::GetStatusTimer()
 CString CPlayerStatusBar::GetStatusMessage()
 {
 	CString strResult;
-	m_status.GetWindowText(strResult);
+	m_status.GetWindowTextW(strResult);
 
 	return strResult;
 }
@@ -493,7 +493,7 @@ void CPlayerStatusBar::OnLButtonDown(UINT nFlags, CPoint point)
 
 		MapWindowPoints(m_pMainFrame, &point, 1);
 
-		m_pMainFrame->PostMessage(WM_NCLBUTTONDOWN,
+		m_pMainFrame->PostMessageW(WM_NCLBUTTONDOWN,
 							(p.x >= r.Width()-r.Height() && !m_pMainFrame->IsCaptionHidden()) ? HTBOTTOMRIGHT :
 							HTCAPTION,
 							MAKELPARAM(point.x, point.y));

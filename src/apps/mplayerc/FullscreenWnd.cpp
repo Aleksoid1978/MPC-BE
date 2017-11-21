@@ -61,7 +61,7 @@ void CFullscreenWnd::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	if (m_pMainFrame) {
 		if (!(m_pMainFrame->IsD3DFullScreenMode() && m_pMainFrame->m_OSD.OnLButtonDown(nFlags, point))) {
-			m_pMainFrame->PostMessage(WM_LBUTTONDOWN, nFlags, MAKELPARAM(point.x, point.y));
+			m_pMainFrame->PostMessageW(WM_LBUTTONDOWN, nFlags, MAKELPARAM(point.x, point.y));
 		}
 		return;
 	}
@@ -73,7 +73,7 @@ void CFullscreenWnd::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	if (m_pMainFrame) {
 		if (!(m_pMainFrame->IsD3DFullScreenMode() && m_pMainFrame->m_OSD.OnLButtonUp(nFlags, point))) {
-			m_pMainFrame->PostMessage(WM_RBUTTONDOWN, nFlags, MAKELPARAM(point.x, point.y));
+			m_pMainFrame->PostMessageW(WM_RBUTTONDOWN, nFlags, MAKELPARAM(point.x, point.y));
 		}
 		return;
 	}
@@ -94,7 +94,7 @@ void CFullscreenWnd::OnMouseMove(UINT nFlags, CPoint point)
 		if (m_pMainFrame->IsD3DFullScreenMode() && m_pMainFrame->m_OSD.OnMouseMove(nFlags, point)) {
 			m_pMainFrame->KillTimer(CMainFrame::TIMER_FULLSCREENMOUSEHIDER);
 		} else {
-			m_pMainFrame->PostMessage(WM_MOUSEMOVE, nFlags, MAKELPARAM(point.x, point.y));
+			m_pMainFrame->PostMessageW(WM_MOUSEMOVE, nFlags, MAKELPARAM(point.x, point.y));
 		}
 		return;
 	}
@@ -135,7 +135,7 @@ void CFullscreenWnd::ShowCursor(bool bVisible)
 {
 	if (m_bCursorVisible != bVisible) {
 		m_bCursorVisible = bVisible;
-		PostMessage(WM_SETCURSOR, 0, 0);
+		PostMessageW(WM_SETCURSOR, 0, 0);
 	}
 }
 
@@ -143,7 +143,7 @@ void CFullscreenWnd::SetCursor(LPCWSTR lpCursorName)
 {
 	m_hCursor = ::LoadCursor(nullptr, lpCursorName);
 	m_bCursorVisible = true;
-	PostMessage(WM_SETCURSOR, 0, 0);
+	PostMessageW(WM_SETCURSOR, 0, 0);
 }
 
 bool CFullscreenWnd::IsWindow() const
@@ -184,7 +184,7 @@ BOOL CFullscreenWnd::PreTranslateMessage(MSG* pMsg)
 
 		case WM_MOUSEWHEEL :
 
-			m_pMainFrame->PostMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
+			m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
 			return TRUE;
 	}
 
@@ -212,7 +212,7 @@ LRESULT CFullscreenWnd::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message) {
 		case WM_COMMAND :
-			m_pMainFrame->PostMessage(message, wParam, lParam);
+			m_pMainFrame->PostMessageW(message, wParam, lParam);
 			break;
 	}
 

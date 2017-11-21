@@ -72,7 +72,7 @@ void CDiskImage::Init()
 		key.Close();
 	}
 
-	if (::PathFileExists(m_dtlite_path)) {
+	if (::PathFileExistsW(m_dtlite_path)) {
 		// simple check
 		m_DriveType = DTLITE;
 		return;
@@ -110,7 +110,7 @@ void CDiskImage::Init()
 		key.Close();
 	}
 
-	if (::PathFileExists(m_vcd_path)) {
+	if (::PathFileExistsW(m_vcd_path)) {
 		// simple check
 		m_DriveType = VCD;
 		return;
@@ -120,7 +120,7 @@ void CDiskImage::Init()
 #if ENABLE_WIN8VIRTUALDISK
 	// Windows 8 VirtualDisk
 	if (SysVersion::IsWin8orLater()) {
-		m_hVirtualDiskModule = LoadLibrary(L"VirtDisk.dll");
+		m_hVirtualDiskModule = LoadLibraryW(L"VirtDisk.dll");
 
 		if (m_hVirtualDiskModule) {
 			(FARPROC &)m_OpenVirtualDiskFunc			= GetProcAddress(m_hVirtualDiskModule, "OpenVirtualDisk");
@@ -194,7 +194,7 @@ WCHAR CDiskImage::MountDiskImage(LPCWSTR pathName)
 {
 	UnmountDiskImage();
 
-	if (::PathFileExists(pathName)) {
+	if (::PathFileExistsW(pathName)) {
 		// DAEMON Tools Lite
 		if (m_DriveType == DTLITE) {
 			m_DriveLetter = MountDTLite(pathName);
@@ -211,8 +211,8 @@ WCHAR CDiskImage::MountDiskImage(LPCWSTR pathName)
 		if (m_DriveLetter) {
 			// check for supported disc format
 			CString anyfiles = CString(m_DriveLetter) + L":\\*.*";
-			WIN32_FIND_DATA fd = { 0 };
-			HANDLE hFind = FindFirstFile(anyfiles, &fd);
+			WIN32_FIND_DATAW fd = { 0 };
+			HANDLE hFind = FindFirstFileW(anyfiles, &fd);
 			if (hFind == INVALID_HANDLE_VALUE) {
 				UnmountDiskImage();
 			} else {
@@ -316,7 +316,7 @@ WCHAR CDiskImage::MountWin8(LPCWSTR pathName)
 								volumeNameBuffer[len - 1] = 0;
 							}
 
-							HANDLE volumeHandle = ::CreateFile(volumeNameBuffer,
+							HANDLE volumeHandle = ::CreateFileW(volumeNameBuffer,
 																GENERIC_READ,
 																FILE_SHARE_READ | FILE_SHARE_WRITE,
 																nullptr,
@@ -495,10 +495,10 @@ WCHAR CDiskImage::MountVCD(LPCWSTR pathName)
 		if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec == 0) {
 			// wait until Virtual CloneDrive initialized.
 			CString anyfiles = CString(letter) + L":\\*.*";
-			WIN32_FIND_DATA fd = {0};
+			WIN32_FIND_DATAW fd = {0};
 			HANDLE hFind;
 			for (int i = 0; i < 100; i++) {
-				hFind = FindFirstFile(anyfiles, &fd);
+				hFind = FindFirstFileW(anyfiles, &fd);
 				if (hFind != INVALID_HANDLE_VALUE) {
 					FindClose(hFind);
 					Sleep(500); // sometimes Virtual CloneDrive need to give a little more time

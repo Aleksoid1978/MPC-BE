@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -46,10 +46,10 @@ void CPlayerInfoBar::SetLine(CString label, CString info)
 
 	for (size_t idx = 0; idx < m_labels.GetCount(); idx++) {
 		CString tmp;
-		m_labels[idx]->GetWindowText(tmp);
+		m_labels[idx]->GetWindowTextW(tmp);
 
 		if (label == tmp) {
-			m_infos[idx]->GetWindowText(tmp);
+			m_infos[idx]->GetWindowTextW(tmp);
 
 			if (info != tmp) {
 				m_infos[idx]->SetWindowText(info);
@@ -76,10 +76,10 @@ void CPlayerInfoBar::GetLine(CString label, CString& info)
 
 	for (size_t idx = 0; idx < m_labels.GetCount(); idx++) {
 		CString tmp;
-		m_labels[idx]->GetWindowText(tmp);
+		m_labels[idx]->GetWindowTextW(tmp);
 
 		if (label == tmp) {
-			m_infos[idx]->GetWindowText(tmp);
+			m_infos[idx]->GetWindowTextW(tmp);
 			info = tmp;
 
 			return;
@@ -91,7 +91,7 @@ void CPlayerInfoBar::RemoveLine(CString label)
 {
 	for (size_t i = 0; i < m_labels.GetCount(); i++) {
 		CString tmp;
-		m_labels[i]->GetWindowText(tmp);
+		m_labels[i]->GetWindowTextW(tmp);
 
 		if (label == tmp) {
 			m_labels.RemoveAt(i);
@@ -161,7 +161,7 @@ void CPlayerInfoBar::Relayout()
 	for (size_t i = 0; i < m_labels.GetCount(); i++) {
 		CDC* pDC = m_labels[i]->GetDC();
 		CString str;
-		m_labels[i]->GetWindowText(str);
+		m_labels[i]->GetWindowTextW(str);
 		w = std::max(w, (int)pDC->GetTextExtent(str).cx);
 		m_labels[i]->ReleaseDC(pDC);
 	}
@@ -236,6 +236,6 @@ void CPlayerInfoBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	if (!m_pMainFrame->m_bFullScreen) {
 		MapWindowPoints(m_pMainFrame, &point, 1);
-		m_pMainFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
+		m_pMainFrame->PostMessageW(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 	}
 }

@@ -117,7 +117,7 @@ void CBaseGraph::NotifyEvent(long lEventCode, LONG_PTR lParam1, LONG_PTR lParam2
 	msg.m_lParam2 = lParam2;
 	m_msgqueue.AddTail(msg);
 
-	PostMessage((HWND)m_hNotifyWnd, m_lNotifyMsg, 0, m_lNotifyInstData);
+	PostMessageW((HWND)m_hNotifyWnd, m_lNotifyMsg, 0, m_lNotifyInstData);
 }
 
 // IDispatch

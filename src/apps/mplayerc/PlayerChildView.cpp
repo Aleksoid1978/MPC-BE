@@ -80,10 +80,10 @@ BOOL CChildView::PreTranslateMessage(MSG* pMsg)
 		if (fInteractiveVideo &&
 				(pMsg->message == WM_LBUTTONDOWN || pMsg->message == WM_LBUTTONUP || pMsg->message == WM_MOUSEMOVE)) {
 			if (pMsg->message == WM_MOUSEMOVE) {
-				VERIFY(pParent->PostMessage(pMsg->message, pMsg->wParam, MAKELPARAM(point.x, point.y)));
+				VERIFY(pParent->PostMessageW(pMsg->message, pMsg->wParam, MAKELPARAM(point.x, point.y)));
 			}
 		} else {
-			VERIFY(pParent->PostMessage(pMsg->message, pMsg->wParam, MAKELPARAM(point.x, point.y)));
+			VERIFY(pParent->PostMessageW(pMsg->message, pMsg->wParam, MAKELPARAM(point.x, point.y)));
 			return TRUE;
 		}
 	}
@@ -327,7 +327,7 @@ void CChildView::OnNcLButtonDown(UINT nHitTest, CPoint point)
 		}
 
 		if (bFlag) {
-			pFrame->PostMessage(WM_SYSCOMMAND, (SC_SIZE | bFlag), (LPARAM)POINTTOPOINTS(point));
+			pFrame->PostMessageW(WM_SYSCOMMAND, (SC_SIZE | bFlag), (LPARAM)POINTTOPOINTS(point));
 		} else {
 			CWnd::OnNcLButtonDown(nHitTest, point);
 		}

@@ -89,7 +89,7 @@ void CPlayerToolBar::SwitchTheme()
 	}
 
 	if (s.bUseDarkTheme) {
-		if (HMODULE h = LoadLibrary(L"uxtheme.dll")) {
+		if (HMODULE h = LoadLibraryW(L"uxtheme.dll")) {
 			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
 
 			if (f) {
@@ -109,7 +109,7 @@ void CPlayerToolBar::SwitchTheme()
 		tb.SetColorScheme(&cs);
 		tb.SetIndent(5);
 	} else {
-		if (HMODULE h = LoadLibrary(L"uxtheme.dll")) {
+		if (HMODULE h = LoadLibraryW(L"uxtheme.dll")) {
 			SetWindowThemeFunct f = (SetWindowThemeFunct)GetProcAddress(h, "SetWindowTheme");
 
 			if (f) {
@@ -478,7 +478,7 @@ int CPlayerToolBar::GetVolume()
 	/*
 	if (type) {
 		OnVolumeMute(0);
-		SendMessage(WM_COMMAND, ID_VOLUME_MUTE);
+		SendMessageW(WM_COMMAND, ID_VOLUME_MUTE);
 	}
 	*/
 
@@ -901,11 +901,11 @@ void CPlayerToolBar::OnLButtonDown(UINT nFlags, CPoint point)
 	int i = getHitButtonIdx(point);
 
 	if (i == 0 && fs != -1) {
-		m_pMainFrame->PostMessage(WM_COMMAND, ID_PLAY_PLAYPAUSE);
+		m_pMainFrame->PostMessageW(WM_COMMAND, ID_PLAY_PLAYPAUSE);
 	} else if (i == -1 || (GetButtonStyle(i) & (TBBS_SEPARATOR | TBBS_DISABLED))) {
 		if (!m_pMainFrame->m_bFullScreen) {
 			MapWindowPoints(m_pMainFrame, &point, 1);
-			m_pMainFrame->PostMessage(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
+			m_pMainFrame->PostMessageW(WM_NCLBUTTONDOWN, HTCAPTION, MAKELPARAM(point.x, point.y));
 		}
 	} else {
 		if (i > 10 || (i < 10 && (m_pMainFrame->IsSomethingLoaded() || m_pMainFrame->IsD3DFullScreenMode()))) {
@@ -940,7 +940,7 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 
 	OAFilterState fs = m_pMainFrame->GetMediaState();
 
-	::SendMessage(pNMHDR->hwndFrom, TTM_SETMAXTIPWIDTH, 0, (LPARAM)(INT)1000);
+	::SendMessageW(pNMHDR->hwndFrom, TTM_SETMAXTIPWIDTH, 0, (LPARAM)(INT)1000);
 
 	if (pNMHDR->idFrom == ID_PLAY_PLAY) {
 		(fs == State_Running) ? m_strTipText = ResStr(IDS_AG_PAUSE) : m_strTipText = ResStr(IDS_AG_PLAY);
@@ -1000,7 +1000,7 @@ void CPlayerToolBar::OnRButtonDown(UINT nFlags, CPoint point)
 	int Idx = getHitButtonIdx(point);
 
 	if (Idx == 1) {
-		m_pMainFrame->PostMessage(WM_COMMAND, ID_FILE_CLOSEPLAYLIST);
+		m_pMainFrame->PostMessageW(WM_COMMAND, ID_FILE_CLOSEPLAYLIST);
 	} else if (Idx == 5) {
 		m_pMainFrame->OnMenuNavJumpTo();
 	} else if (Idx == 6) {

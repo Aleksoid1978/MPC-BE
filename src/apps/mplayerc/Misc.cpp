@@ -145,19 +145,19 @@ HICON LoadIcon(CString fn, bool fSmall)
 	CSize size(fSmall?16:32, fSmall?16:32);
 
 	if (!ext.CompareNoCase(L".ifo")) {
-		if (HICON hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_DVD), IMAGE_ICON, size.cx, size.cy, 0)) {
+		if (HICON hIcon = (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDI_DVD), IMAGE_ICON, size.cx, size.cy, 0)) {
 			return hIcon;
 		}
 	}
 
 	if (!ext.CompareNoCase(L".cda")) {
-		if (HICON hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_AUDIOCD), IMAGE_ICON, size.cx, size.cy, 0)) {
+		if (HICON hIcon = (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDI_AUDIOCD), IMAGE_ICON, size.cx, size.cy, 0)) {
 			return hIcon;
 		}
 	}
 
 	if ((CString(fn).MakeLower().Find(L"://")) >= 0) {
-		if (HICON hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, size.cx, size.cy, 0)) {
+		if (HICON hIcon = (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDR_MAINFRAME), IMAGE_ICON, size.cx, size.cy, 0)) {
 			return hIcon;
 		}
 
@@ -240,7 +240,7 @@ HICON LoadIcon(CString fn, bool fSmall)
 		}
 	} while (0);
 
-	return (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_UNKNOWN), IMAGE_ICON, size.cx, size.cy, 0);
+	return (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDI_UNKNOWN), IMAGE_ICON, size.cx, size.cy, 0);
 }
 
 bool LoadType(CString fn, CString& type)
@@ -308,7 +308,7 @@ bool LoadType(CString fn, CString& type)
 bool LoadResource(UINT resid, CStringA& str, LPCTSTR restype)
 {
 	str.Empty();
-	HRSRC hrsrc = FindResource(AfxGetApp()->m_hInstance, MAKEINTRESOURCE(resid), restype);
+	HRSRC hrsrc = FindResourceW(AfxGetApp()->m_hInstance, MAKEINTRESOURCEW(resid), restype);
 	if (!hrsrc) {
 		return false;
 	}

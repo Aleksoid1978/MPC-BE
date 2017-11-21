@@ -103,7 +103,7 @@ BOOL CRegFilterChooserDlg::OnInitDialog()
 
 void CRegFilterChooserDlg::OnLbnDblclkList1()
 {
-	SendMessage(WM_COMMAND, IDOK);
+	SendMessageW(WM_COMMAND, IDOK);
 }
 
 void CRegFilterChooserDlg::OnUpdateOK(CCmdUI* pCmdUI)

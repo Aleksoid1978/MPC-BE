@@ -28,7 +28,7 @@ extern "C" char *GetlibavcodecVersion();
 CAboutDlg::CAboutDlg()
 	: CDialog(CAboutDlg::IDD)
 {
-	m_hIcon = (HICON)LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
+	m_hIcon = (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 }
 
 CAboutDlg::~CAboutDlg()
@@ -102,7 +102,7 @@ BOOL CAboutDlg::OnInitDialog()
 
 	m_AuthorsPath = GetProgramDir() + L"Authors.txt";
 
-	if (::PathFileExists(m_AuthorsPath)) {
+	if (::PathFileExistsW(m_AuthorsPath)) {
 		m_Credits.Replace(L"Authors.txt", L"<a>Authors.txt</a>");
 	}
 

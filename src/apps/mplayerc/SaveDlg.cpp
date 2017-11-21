@@ -46,7 +46,7 @@ CSaveDlg::CSaveDlg(LPCWSTR in, LPCWSTR name, LPCWSTR out, HRESULT& hr)
 	, m_in(in)
 	, m_out(out)
 {
-	m_hIcon = (HICON)LoadImage(AfxGetInstanceHandle(),  MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
+	m_hIcon = (HICON)LoadImageW(AfxGetInstanceHandle(), MAKEINTRESOURCEW(IDR_MAINFRAME), IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
 	if (m_hIcon != nullptr) {
 		SetMainIcon(m_hIcon);
 	}
@@ -131,7 +131,7 @@ static HRESULT CopyFiles(CString sourceFile, CString destFile)
 HRESULT CSaveDlg::InitFileCopy()
 {
 	if (FAILED(pGB.CoCreateInstance(CLSID_FilterGraph)) || !(pMC = pGB) || !(pMS = pGB)) {
-		SetFooterIcon(MAKEINTRESOURCE(IDI_ERROR));
+		SetFooterIcon(MAKEINTRESOURCEW(IDI_ERROR));
 		SetFooterText(ResStr(IDS_AG_ERROR));
 
 		return S_FALSE;
@@ -219,7 +219,7 @@ HRESULT CSaveDlg::InitFileCopy()
 		}
 
 		if (m_protocol != protocol::PROTOCOL_NONE) {
-			m_hFile = CreateFile(m_out, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+			m_hFile = CreateFileW(m_out, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 			if (m_hFile != INVALID_HANDLE_VALUE) {
 				if (m_len) {
 					ULARGE_INTEGER usize = { 0 };
@@ -271,7 +271,7 @@ fail:
 
 	CComQIPtr<IBaseFilter> pSrc = pReader;
 	if (FAILED(pGB->AddFilter(pSrc, fn))) {
-		SetFooterIcon(MAKEINTRESOURCE(IDI_ERROR));
+		SetFooterIcon(MAKEINTRESOURCEW(IDI_ERROR));
 		SetFooterText(L"Sorry, can't save this file, press \"Cancel\"");
 
 		return S_FALSE;
@@ -279,7 +279,7 @@ fail:
 
 	CComQIPtr<IBaseFilter> pMid = DNew CStreamDriveThruFilter(nullptr, &hr);
 	if (FAILED(pGB->AddFilter(pMid, L"StreamDriveThru"))) {
-		SetFooterIcon(MAKEINTRESOURCE(IDI_ERROR));
+		SetFooterIcon(MAKEINTRESOURCEW(IDI_ERROR));
 		SetFooterText(ResStr(IDS_AG_ERROR));
 
 		return S_FALSE;
@@ -292,7 +292,7 @@ fail:
 	pFSF->SetMode(AM_FILE_OVERWRITE);
 
 	if (FAILED(pGB->AddFilter(pDst, L"File Writer"))) {
-		SetFooterIcon(MAKEINTRESOURCE(IDI_ERROR));
+		SetFooterIcon(MAKEINTRESOURCEW(IDI_ERROR));
 		SetFooterText(ResStr(IDS_AG_ERROR));
 
 		return S_FALSE;
@@ -302,7 +302,7 @@ fail:
 		GetFirstPin((pSrc), PINDIR_OUTPUT),
 		GetFirstPin((pMid), PINDIR_INPUT));
 	if (FAILED(hr)) {
-		SetFooterIcon(MAKEINTRESOURCE(IDI_ERROR));
+		SetFooterIcon(MAKEINTRESOURCEW(IDI_ERROR));
 		SetFooterText(L"Error Connect pSrc / pMid");
 
 		return S_FALSE;
@@ -312,7 +312,7 @@ fail:
 		GetFirstPin((pMid), PINDIR_OUTPUT),
 		GetFirstPin((pDst), PINDIR_INPUT));
 	if (FAILED(hr)) {
-		SetFooterIcon(MAKEINTRESOURCE(IDI_ERROR));
+		SetFooterIcon(MAKEINTRESOURCEW(IDI_ERROR));
 		SetFooterText(L"Error Connect pMid / pDst");
 
 		return S_FALSE;

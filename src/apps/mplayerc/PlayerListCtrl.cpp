@@ -69,7 +69,7 @@ void CInPlaceWinHotkey::OnKillFocus(CWnd* pNewWnd)
 	CWinHotkeyCtrl::OnKillFocus(pNewWnd);
 
 	CString str;
-	GetWindowText(str);
+	GetWindowTextW(str);
 
 	LV_DISPINFO dispinfo;
 	dispinfo.hdr.hwndFrom = GetParent()->m_hWnd;
@@ -80,7 +80,7 @@ void CInPlaceWinHotkey::OnKillFocus(CWnd* pNewWnd)
 	dispinfo.item.iSubItem = m_iSubItem;
 	dispinfo.item.pszText = m_bESC ? nullptr : LPTSTR((LPCTSTR)str);
 	dispinfo.item.cchTextMax = str.GetLength();
-	GetParent()->GetParent()->SendMessage(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
+	GetParent()->GetParent()->SendMessageW(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
 
 	DestroyWindow();
 }
@@ -168,7 +168,7 @@ void CInPlaceEdit::OnKillFocus(CWnd* pNewWnd)
 	CEdit::OnKillFocus(pNewWnd);
 
 	CString str;
-	GetWindowText(str);
+	GetWindowTextW(str);
 
 	LV_DISPINFO dispinfo;
 	dispinfo.hdr.hwndFrom = GetParent()->m_hWnd;
@@ -179,7 +179,7 @@ void CInPlaceEdit::OnKillFocus(CWnd* pNewWnd)
 	dispinfo.item.iSubItem = m_iSubItem;
 	dispinfo.item.pszText = m_bESC ? nullptr : LPTSTR((LPCTSTR)str);
 	dispinfo.item.cchTextMax = str.GetLength();
-	GetParent()->GetParent()->SendMessage(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
+	GetParent()->GetParent()->SendMessageW(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
 
 	DestroyWindow();
 }
@@ -255,7 +255,7 @@ void CInPlaceFloatEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 
 	CString str;
-	GetWindowText(str);
+	GetWindowTextW(str);
 
 	if ((nChar == '.')  && str.Find('.') >= 0) {
 		int nStartChar, nEndChar;
@@ -336,7 +336,7 @@ void CInPlaceComboBox::OnKillFocus(CWnd* pNewWnd)
 	CComboBox::OnKillFocus(pNewWnd);
 
 	CString str;
-	GetWindowText(str);
+	GetWindowTextW(str);
 
 	LV_DISPINFO dispinfo;
 	dispinfo.hdr.hwndFrom = GetParent()->m_hWnd;
@@ -348,9 +348,9 @@ void CInPlaceComboBox::OnKillFocus(CWnd* pNewWnd)
 	dispinfo.item.pszText = m_bESC ? nullptr : LPTSTR((LPCTSTR)str);
 	dispinfo.item.cchTextMax = str.GetLength();
 	dispinfo.item.lParam = GetCurSel();
-	GetParent()->GetParent()->SendMessage(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
+	GetParent()->GetParent()->SendMessageW(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
 
-	PostMessage(WM_CLOSE);
+	PostMessageW(WM_CLOSE);
 }
 
 void CInPlaceComboBox::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -443,7 +443,7 @@ void CInPlaceListBox::OnKillFocus(CWnd* pNewWnd)
 	CListBox::OnKillFocus(pNewWnd);
 
 	CString str;
-	GetWindowText(str);
+	GetWindowTextW(str);
 
 	LV_DISPINFO dispinfo;
 	dispinfo.hdr.hwndFrom = GetParent()->m_hWnd;
@@ -455,9 +455,9 @@ void CInPlaceListBox::OnKillFocus(CWnd* pNewWnd)
 	dispinfo.item.pszText = m_bESC ? nullptr : LPTSTR((LPCTSTR)str);
 	dispinfo.item.cchTextMax = str.GetLength();
 	dispinfo.item.lParam = GetCurSel();
-	GetParent()->GetParent()->SendMessage(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
+	GetParent()->GetParent()->SendMessageW(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
 
-	PostMessage(WM_CLOSE);
+	PostMessageW(WM_CLOSE);
 }
 
 void CInPlaceListBox::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -909,12 +909,12 @@ void CPlayerListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 		dispinfo.item.mask = 0;
 		dispinfo.item.iItem = m_nItemClicked;
 		dispinfo.item.iSubItem = m_nSubItemClicked;
-		if (GetParent()->SendMessage(WM_NOTIFY, GetDlgCtrlID(), (LPARAM)&dispinfo)) {
+		if (GetParent()->SendMessageW(WM_NOTIFY, GetDlgCtrlID(), (LPARAM)&dispinfo)) {
 			if (m_tStartEditingDelay > 0) {
 				m_nTimerID = SetTimer(1, m_tStartEditingDelay, nullptr);
 			} else {
 				dispinfo.hdr.code = LVN_DOLABELEDIT;
-				GetParent()->SendMessage(WM_NOTIFY, GetDlgCtrlID(), (LPARAM)&dispinfo);
+				GetParent()->SendMessageW(WM_NOTIFY, GetDlgCtrlID(), (LPARAM)&dispinfo);
 			}
 		}
 	} else {
@@ -940,7 +940,7 @@ void CPlayerListCtrl::OnTimer(UINT_PTR nIDEvent)
 			dispinfo.item.mask = 0;
 			dispinfo.item.iItem = m_nItemClicked;
 			dispinfo.item.iSubItem = m_nSubItemClicked;
-			GetParent()->SendMessage(WM_NOTIFY, GetDlgCtrlID(), (LPARAM)&dispinfo);
+			GetParent()->SendMessageW(WM_NOTIFY, GetDlgCtrlID(), (LPARAM)&dispinfo);
 		}
 	} else if (nIDEvent == 43) {
 		// CListCtrl does really strange things on this timer.
@@ -1074,7 +1074,7 @@ BOOL CPlayerListCtrl::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 
 	*pResult = 0;
 
-	return GetParent()->SendMessage(WM_NOTIFY, id, (LPARAM)pNMHDR);
+	return GetParent()->SendMessageW(WM_NOTIFY, id, (LPARAM)pNMHDR);
 }
 
 int CPlayerListCtrl::InsertColumn(_In_ int nCol, _In_z_ LPCTSTR lpszColumnHeading,

@@ -190,7 +190,7 @@ BOOL CPPageInternalFiltersListBox::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESU
 		return FALSE;
 	}
 
-	::SendMessage(pNMHDR->hwndFrom, TTM_SETMAXTIPWIDTH, 0, (LPARAM)(INT)1000);
+	::SendMessageW(pNMHDR->hwndFrom, TTM_SETMAXTIPWIDTH, 0, (LPARAM)(INT)1000);
 
 	static CString m_strTipText;
 
@@ -337,7 +337,7 @@ void CPPageInternalFiltersListBox::OnRButtonDown(UINT nFlags, CPoint point)
 		index++;
 	}
 
-	GetParent()->SendMessage(WM_COMMAND, MAKEWPARAM(GetDlgCtrlID(), CLBN_CHKCHANGE), (LPARAM)m_hWnd);
+	GetParent()->SendMessageW(WM_COMMAND, MAKEWPARAM(GetDlgCtrlID(), CLBN_CHKCHANGE), (LPARAM)m_hWnd);
 }
 
 // CPPageInternalFilters dialog
@@ -467,7 +467,7 @@ BOOL CPPageInternalFilters::OnInitDialog()
 	hdr.code		= TCN_SELCHANGE;
 	hdr.hwndFrom	= m_Tab.m_hWnd;
 
-	SendMessage(WM_NOTIFY, m_Tab.GetDlgCtrlID(), (LPARAM)&hdr);
+	SendMessageW(WM_NOTIFY, m_Tab.GetDlgCtrlID(), (LPARAM)&hdr);
 
 	SetCursor(m_hWnd, IDC_BUTTON1, IDC_HAND);
 	SetCursor(m_hWnd, IDC_BUTTON2, IDC_HAND);

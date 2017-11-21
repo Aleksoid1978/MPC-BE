@@ -406,7 +406,7 @@ void CLineNumberStatic::OnLButtonDown( UINT nFlags, CPoint point )
 	int lineno = ( int ) ( ( double ) point.y / ( double ) lineheight );
 
 	// Select this line in the edit control
-	GetParent()->SendMessage( urm_SELECTLINE, lineno );
+	GetParent()->SendMessageW( urm_SELECTLINE, lineno );
 
 	CStatic::OnLButtonDown( nFlags, point );
 }

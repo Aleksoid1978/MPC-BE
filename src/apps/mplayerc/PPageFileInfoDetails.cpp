@@ -82,8 +82,8 @@ CPPageFileInfoDetails::CPPageFileInfoDetails(CString fn, IFilterGraph* pFG, ISub
 		}
 	}
 
-	WIN32_FIND_DATA wfd;
-	HANDLE hFind = FindFirstFile(m_fn, &wfd);
+	WIN32_FIND_DATAW wfd;
+	HANDLE hFind = FindFirstFileW(m_fn, &wfd);
 
 	if (hFind != INVALID_HANDLE_VALUE) {
 		FindClose(hFind);
@@ -238,7 +238,7 @@ BOOL CPPageFileInfoDetails::OnInitDialog()
 BOOL CPPageFileInfoDetails::OnSetActive()
 {
 	BOOL ret = __super::OnSetActive();
-	PostMessage(SETPAGEFOCUS, 0, 0L);
+	PostMessageW(SETPAGEFOCUS, 0, 0L);
 
 	return ret;
 }
@@ -355,7 +355,7 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 
 					CString str;
 					if (Language) {
-						int len = GetLocaleInfo(Language, LOCALE_SENGLANGUAGE, str.GetBuffer(256), 256);
+						int len = GetLocaleInfoW(Language, LOCALE_SENGLANGUAGE, str.GetBuffer(256), 256);
 						str.ReleaseBufferSetLength(std::max(len-1, 0));
 					} else {
 						str.Format(ResStr(IDS_AG_UNKNOWN), i+1);
@@ -413,7 +413,7 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 
 					CString str;
 					if (Language) {
-						int len = GetLocaleInfo(Language, LOCALE_SENGLANGUAGE, str.GetBuffer(256), 256);
+						int len = GetLocaleInfoW(Language, LOCALE_SENGLANGUAGE, str.GetBuffer(256), 256);
 						str.ReleaseBufferSetLength(std::max(len - 1, 0));
 					} else {
 						str.Format(ResStr(IDS_AG_UNKNOWN), i + 1);

@@ -162,7 +162,7 @@ void CPPageFiltersPriority::Init()
 				continue;
 			}
 
-			if (!::PathFileExists(MakeFullPath(f->path))) {
+			if (!::PathFileExistsW(MakeFullPath(f->path))) {
 				continue;
 			}
 		}

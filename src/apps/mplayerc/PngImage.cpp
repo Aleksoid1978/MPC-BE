@@ -117,13 +117,13 @@ bool CMPCPngImage::FileExists(CString& fn, bool bInclJPEG)
 {
 	CString path = GetProgramDir();
 
-	if (::PathFileExists(path + fn + L".png")) {
+	if (::PathFileExistsW(path + fn + L".png")) {
 		fn = path + fn + L".png";
 		return true;
-	} else if (::PathFileExists(path + fn + L".bmp")) {
+	} else if (::PathFileExistsW(path + fn + L".bmp")) {
 		fn = path + fn + L".bmp";
 		return true;
-	} else if (bInclJPEG && ::PathFileExists(path + fn + L".jpg")) {
+	} else if (bInclJPEG && ::PathFileExistsW(path + fn + L".jpg")) {
 		fn = path + fn + L".jpg";
 		return true;
 	}
@@ -227,7 +227,7 @@ HBITMAP CMPCPngImage::TypeLoadImage(IMG_TYPE type, BYTE** pData, int* width, int
 		if (fp) {
 			png_init_io(png_ptr, fp);
 		} else {
-			HRSRC hRes = FindResource(nullptr, MAKEINTRESOURCE(resid), L"PNG");
+			HRSRC hRes = FindResourceW(nullptr, MAKEINTRESOURCEW(resid), L"PNG");
 			HANDLE lRes = LoadResource(nullptr, hRes);
 
 			struct png_t png;

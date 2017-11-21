@@ -289,11 +289,11 @@ UINT CSubtitleDlDlg::RunThread(LPVOID pParam)
 	PTHREADSTRUCT pTA = reinterpret_cast<PTHREADSTRUCT>(pParam);
 
 	if (!OpenUrl(pTA->is, CString(pTA->url), pTA->raw_list)) {
-		::PostMessage(pTA->hWND, UWM_FAILED, (WPARAM)0, (LPARAM)0);
+		::PostMessageW(pTA->hWND, UWM_FAILED, (WPARAM)0, (LPARAM)0);
 		AfxEndThread(1, TRUE);
 	}
 
-	::PostMessage(pTA->hWND, UWM_PARSE, (WPARAM)0, (LPARAM)0);
+	::PostMessageW(pTA->hWND, UWM_PARSE, (WPARAM)0, (LPARAM)0);
 
 	return 0;
 };
@@ -438,8 +438,8 @@ void CSubtitleDlDlg::OnOK()
 				if (::GetTempPathW(MAX_PATH, lpszTempPath)) {
 					CString subFileName(lpszTempPath);
 					subFileName.Append(CString(sub.name));
-					if (::PathFileExists(subFileName)) {
-						::DeleteFile(subFileName);
+					if (::PathFileExistsW(subFileName)) {
+						::DeleteFileW(subFileName);
 					}
 
 					CFile cf;
@@ -453,7 +453,7 @@ void CSubtitleDlDlg::OnOK()
 							pFrame->m_pDVS->put_HideSubtitles(false);
 						}
 
-						::DeleteFile(subFileName);
+						::DeleteFileW(subFileName);
 					}
 				}
 

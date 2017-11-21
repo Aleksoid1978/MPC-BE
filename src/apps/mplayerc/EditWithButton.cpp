@@ -292,7 +292,7 @@ void CEditWithButton_Base::PreSubclassWindow()
 	CEdit::PreSubclassWindow();
 
 	// Because our WindowProc is not yet in place, we need to post a message
-	PostMessage(WM_EDITWITHBUTTON_RECALCNCSIZE);
+	PostMessageW(WM_EDITWITHBUTTON_RECALCNCSIZE);
 }
 
 LRESULT CEditWithButton_Base::OnRecalcNcSize(WPARAM wParam, LPARAM lParam)
@@ -325,7 +325,7 @@ LRESULT CEditWithButton_Base::OnSetReadOnly(WPARAM wParam, LPARAM lParam)
 
 void CEditWithButton_Base::OnLeftClick()
 {
-	PostMessage(EDIT_BUTTON_LEFTCLICKED);
+	PostMessageW(EDIT_BUTTON_LEFTCLICKED);
 }
 
 // CEditWithButton

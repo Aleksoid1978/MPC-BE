@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -100,7 +100,7 @@ void CPPageBase::OnDestroy()
 BOOL CPPageBase::OnApply()
 {
 	if (auto pMainFrame = AfxFindMainFrame()) { // need dynamic_cast, because CPPageFormats can be run in a separate process without CMainFrame.
-		pMainFrame->PostMessage(WM_SAVESETTINGS);
+		pMainFrame->PostMessageW(WM_SAVESETTINGS);
 	}
 
 	return __super::OnApply();
