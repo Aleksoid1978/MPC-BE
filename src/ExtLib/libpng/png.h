@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.31beta06, July 13, 2017
+ * libpng version 1.6.35beta01, September 29, 2017
  *
  * Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.31beta06, July 13, 2017:
+ *   libpng versions 0.97, January 1998, through 1.6.35beta01, September 29, 2017:
  *     Glenn Randers-Pehrson.
  *   See also "Contributing Authors", below.
  */
@@ -25,7 +25,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.0.7, July 1, 2000 through 1.6.31beta06, July 13, 2017 are
+ * libpng versions 1.0.7, July 1, 2000 through 1.6.35beta01, September 29, 2017 are
  * Copyright (c) 2000-2002, 2004, 2006-2017 Glenn Randers-Pehrson, are
  * derived from libpng-1.0.6, and are distributed according to the same
  * disclaimer and license as libpng-1.0.6 with the following individuals
@@ -209,11 +209,11 @@
  *    ...
  *    1.0.19                  10    10019  10.so.0.19[.0]
  *    ...
- *    1.2.57                  13    10257  12.so.0.57[.0]
+ *    1.2.59                  13    10257  12.so.0.59[.0]
  *    ...
- *    1.5.28                  15    10527  15.so.15.28[.0]
+ *    1.5.30                  15    10527  15.so.15.30[.0]
  *    ...
- *    1.6.31                  16    10631  16.so.16.31[.0]
+ *    1.6.35                  16    10635  16.so.16.35[.0]
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
@@ -241,13 +241,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    July 13, 2017
+ *    September 29, 2017
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.6.31beta06 are Y2K compliant.  It is my belief that
+ *    upward through 1.6.35beta01 are Y2K compliant.  It is my belief that
  *    earlier versions were also Y2K compliant.
  *
  *    Libpng only has two year fields.  One is a 2-byte unsigned integer
@@ -309,8 +309,8 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.6.31beta06"
-#define PNG_HEADER_VERSION_STRING " libpng version 1.6.31beta06 - July 13, 2017\n"
+#define PNG_LIBPNG_VER_STRING "1.6.35beta01"
+#define PNG_HEADER_VERSION_STRING " libpng version 1.6.35beta01 - September 29, 2017\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -318,13 +318,13 @@
 /* These should match the first 3 components of PNG_LIBPNG_VER_STRING: */
 #define PNG_LIBPNG_VER_MAJOR   1
 #define PNG_LIBPNG_VER_MINOR   6
-#define PNG_LIBPNG_VER_RELEASE 31
+#define PNG_LIBPNG_VER_RELEASE 35
 
 /* This should match the numeric part of the final component of
  * PNG_LIBPNG_VER_STRING, omitting any leading zero:
  */
 
-#define PNG_LIBPNG_VER_BUILD  06
+#define PNG_LIBPNG_VER_BUILD  01
 
 /* Release Status */
 #define PNG_LIBPNG_BUILD_ALPHA    1
@@ -349,7 +349,7 @@
  * version 1.0.0 was mis-numbered 100 instead of 10000).  From
  * version 1.0.1 it's    xxyyzz, where x=major, y=minor, z=release
  */
-#define PNG_LIBPNG_VER 10631 /* 1.6.31 */
+#define PNG_LIBPNG_VER 10635 /* 1.6.35 */
 
 /* Library configuration: these options cannot be changed after
  * the library has been built.
@@ -459,7 +459,7 @@ extern "C" {
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef char* png_libpng_version_1_6_31beta06;
+typedef char* png_libpng_version_1_6_35beta01;
 
 /* Basic control structions.  Read libpng-manual.txt or libpng.3 for more info.
  *
@@ -1193,7 +1193,7 @@ PNG_FIXED_EXPORT(228, void, png_set_alpha_mode_fixed, (png_structrp png_ptr,
  *
  * png_set_alpha_mode(pp, PNG_ALPHA_PNG, PNG_GAMMA_MAC);
  *    In this case the output is assumed to be something like an sRGB conformant
- *    display preceeded by a power-law lookup table of power 1.45.  This is how
+ *    display preceded by a power-law lookup table of power 1.45.  This is how
  *    early Mac systems behaved.
  *
  * png_set_alpha_mode(pp, PNG_ALPHA_STANDARD, PNG_GAMMA_LINEAR);
@@ -1240,7 +1240,7 @@ PNG_FIXED_EXPORT(228, void, png_set_alpha_mode_fixed, (png_structrp png_ptr,
  *
  * When the default gamma of PNG files doesn't match the output gamma.
  *    If you have PNG files with no gamma information png_set_alpha_mode allows
- *    you to provide a default gamma, but it also sets the ouput gamma to the
+ *    you to provide a default gamma, but it also sets the output gamma to the
  *    matching value.  If you know your PNG files have a gamma that doesn't
  *    match the output you can take advantage of the fact that
  *    png_set_alpha_mode always sets the output gamma but only sets the PNG
@@ -1691,7 +1691,7 @@ PNG_EXPORT(218, png_byte, png_get_current_pass_number, (png_const_structrp));
  *           chunk will cause an error at this point unless it is to be saved.
  * positive: The chunk was handled, libpng will ignore/discard it.
  *
- * See "INTERACTION WTIH USER CHUNK CALLBACKS" below for important notes about
+ * See "INTERACTION WITH USER CHUNK CALLBACKS" below for important notes about
  * how this behavior will change in libpng 1.7
  */
 PNG_EXPORT(88, void, png_set_read_user_chunk_fn, (png_structrp png_ptr,
@@ -2014,6 +2014,11 @@ PNG_EXPORT(246, png_uint_32, png_get_eXIf, (png_const_structrp png_ptr,
     png_inforp info_ptr, png_bytep *exif));
 PNG_EXPORT(247, void, png_set_eXIf, (png_const_structrp png_ptr,
     png_inforp info_ptr, const png_bytep exif));
+
+PNG_EXPORT(248, png_uint_32, png_get_eXIf_1, (png_const_structrp png_ptr,
+    png_const_inforp info_ptr, png_uint_32 *num_exif, png_bytep *exif));
+PNG_EXPORT(249, void, png_set_eXIf_1, (png_const_structrp png_ptr,
+    png_inforp info_ptr, const png_uint_32 num_exif, const png_bytep exif));
 #endif
 
 #ifdef PNG_gAMA_SUPPORTED
@@ -2234,7 +2239,7 @@ PNG_EXPORT(171, void, png_set_sCAL_s, (png_const_structrp png_ptr,
  * to specifying "NEVER", however when "AS_DEFAULT" is used for specific chunks
  * it simply resets the behavior to the libpng default.
  *
- * INTERACTION WTIH USER CHUNK CALLBACKS:
+ * INTERACTION WITH USER CHUNK CALLBACKS:
  * The per-chunk handling is always used when there is a png_user_chunk_ptr
  * callback and the callback returns 0; the chunk is then always stored *unless*
  * it is critical and the per-chunk setting is other than ALWAYS.  Notice that
@@ -2653,7 +2658,7 @@ PNG_EXPORT(243, int, png_get_palette_max, (png_const_structp png_ptr,
  * The simplified API hides the details of both libpng and the PNG file format
  * itself.  It allows PNG files to be read into a very limited number of
  * in-memory bitmap formats or to be written from the same formats.  If these
- * formats do not accomodate your needs then you can, and should, use the more
+ * formats do not accommodate your needs then you can, and should, use the more
  * sophisticated APIs above - these support a wide variety of in-memory formats
  * and a wide variety of sophisticated transformations to those formats as well
  * as a wide variety of APIs to manipulate ancillary information.
@@ -2813,6 +2818,8 @@ typedef struct
 #ifdef PNG_FORMAT_AFIRST_SUPPORTED
 #  define PNG_FORMAT_FLAG_AFIRST 0x20U /* alpha channel comes first */
 #endif
+
+#define PNG_FORMAT_FLAG_ASSOCIATED_ALPHA 0x40U /* alpha channel is associated */
 
 /* Commonly used formats have predefined macros.
  *
@@ -3126,7 +3133,7 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
     * than or equal to the original value.
     *
     * If the function returns false and *memory_bytes was not changed an error
-    * occured during write.  If *memory_bytes was changed, or is not 0 if
+    * occurred during write.  If *memory_bytes was changed, or is not 0 if
     * 'memory' was NULL, the write would have succeeded but for the memory
     * buffer being too small.  *memory_bytes contains the required number of
     * bytes and will be bigger that the original value.
@@ -3259,7 +3266,7 @@ PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
  * one to use is one more than this.)
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(247);
+  PNG_EXPORT_LAST_ORDINAL(249);
 #endif
 
 #ifdef __cplusplus

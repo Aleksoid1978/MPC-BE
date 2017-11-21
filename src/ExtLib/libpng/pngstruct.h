@@ -1,7 +1,7 @@
 
 /* pngstruct.h - header file for PNG reference library
  *
- * Last changed in libpng 1.6.28 [January 5, 2017]
+ * Last changed in libpng 1.6.32 [August 24, 2017]
  * Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -47,7 +47,7 @@
 /* zlib.h declares a magic type 'uInt' that limits the amount of data that zlib
  * can handle at once.  This type need be no larger than 16 bits (so maximum of
  * 65535), this define allows us to discover how big it is, but limited by the
- * maximuum for png_size_t.  The value can be overriden in a library build
+ * maximuum for png_size_t.  The value can be overridden in a library build
  * (pngusr.h, or set it in CPPFLAGS) and it works to set it to a considerably
  * lower value (e.g. 255 works).  A lower value may help memory usage (slightly)
  * and may even improve performance on some systems (and degrade it on others.)
@@ -479,8 +479,5 @@ struct png_struct_def
    png_colorspace   colorspace;
 #endif
 #endif
-
-/* New member added in libpng-1.6.30 */
-   int num_exif;
 };
 #endif /* PNGSTRUCT_H */

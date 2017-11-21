@@ -186,8 +186,11 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
 #endif
 
 #ifdef PNG_eXIf_SUPPORTED
-   int num_exif;
+   int num_exif;  /* Added at libpng-1.6.31 */
    png_bytep exif;
+# ifdef PNG_READ_eXIf_SUPPORTED
+   png_bytep eXIf_buf;  /* Added at libpng-1.6.32 */
+# endif
 #endif
 
 #ifdef PNG_hIST_SUPPORTED
@@ -244,7 +247,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
    /* The sCAL chunk describes the actual physical dimensions of the
     * subject matter of the graphic.  The chunk contains a unit specification
     * a byte value, and two ASCII strings representing floating-point
-    * values.  The values are width and height corresponsing to one pixel
+    * values.  The values are width and height corresponding to one pixel
     * in the image.  Data values are valid if (valid & PNG_INFO_sCAL) is
     * non-zero.
     */
