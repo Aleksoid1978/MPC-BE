@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,8 +22,6 @@
 
 #include <sstream>
 using std::wostream;
-using std::wostringstream;
-using std::endl;
 
 #include <string>
 using std::wstring;
@@ -32,14 +30,8 @@ using std::wstring;
 using std::map;
 using std::pair;
 
-#include <vector>
-using std::vector;
-
 #include <list>
 using std::list;
-
-#include <cwctype>
-using std::towlower;
 
 class CRealTextParser
 {
