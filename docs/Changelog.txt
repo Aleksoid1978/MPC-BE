@@ -3,7 +3,7 @@
 1.5.2 (beta)
 ==============================
 Updated libraries:
-	ffmpeg git-n3.4-dev-3045-g953d55f443;
+	ffmpeg git-n3.5-dev-1384-gafd2bf54c3;
 	libpng git-v1.6.34-35-gfc32eb166;
 	Little-CMS git-lcms2.9rc1-16-g8aca404;
 	MediaInfo git-v7.10-8-g0a90b039;

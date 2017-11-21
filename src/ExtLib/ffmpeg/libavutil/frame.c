@@ -31,6 +31,7 @@ static AVFrameSideData *frame_new_side_data(AVFrame *frame,
                                             enum AVFrameSideDataType type,
                                             AVBufferRef *buf);
 
+#if FF_API_FRAME_GET_SET
 MAKE_ACCESSORS(AVFrame, frame, int64_t, best_effort_timestamp)
 MAKE_ACCESSORS(AVFrame, frame, int64_t, pkt_duration)
 MAKE_ACCESSORS(AVFrame, frame, int64_t, pkt_pos)
@@ -42,6 +43,7 @@ MAKE_ACCESSORS(AVFrame, frame, int,     decode_error_flags)
 MAKE_ACCESSORS(AVFrame, frame, int,     pkt_size)
 MAKE_ACCESSORS(AVFrame, frame, enum AVColorSpace, colorspace)
 MAKE_ACCESSORS(AVFrame, frame, enum AVColorRange, color_range)
+#endif
 
 #define CHECK_CHANNELS_CONSISTENCY(frame) \
     av_assert2(!(frame)->channel_layout || \
@@ -381,12 +383,17 @@ FF_ENABLE_DEPRECATION_WARNINGS
 #endif
 
     av_buffer_unref(&dst->opaque_ref);
+    av_buffer_unref(&dst->private_ref);
     if (src->opaque_ref) {
         dst->opaque_ref = av_buffer_ref(src->opaque_ref);
         if (!dst->opaque_ref)
             return AVERROR(ENOMEM);
     }
-
+    if (src->private_ref) {
+        dst->private_ref = av_buffer_ref(src->private_ref);
+        if (!dst->private_ref)
+            return AVERROR(ENOMEM);
+    }
     return 0;
 }
 
@@ -522,6 +529,7 @@ void av_frame_unref(AVFrame *frame)
     av_buffer_unref(&frame->hw_frames_ctx);
 
     av_buffer_unref(&frame->opaque_ref);
+    av_buffer_unref(&frame->private_ref);
 
     get_frame_defaults(frame);
 }

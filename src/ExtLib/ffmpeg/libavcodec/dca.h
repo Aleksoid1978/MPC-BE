@@ -29,10 +29,10 @@
 #include <stdint.h>
 
 #include "libavutil/common.h"
-#include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
 
 #include "get_bits.h"
+#include "internal.h"
 
 #define DCA_CORE_FRAME_HEADER_SIZE      18
 
@@ -46,7 +46,6 @@ enum DCAParseError {
     DCA_PARSE_ERROR_RESERVED_BIT    = -7,
     DCA_PARSE_ERROR_LFE_FLAG        = -8,
     DCA_PARSE_ERROR_PCM_RES         = -9,
-    DCA_PARSE_ERROR_INVALIDDATA     = -10,
 };
 
 typedef struct DCACoreFrameHeader {
@@ -196,7 +195,7 @@ enum DCADownMixType {
     DCA_DMIX_TYPE_COUNT
 };
 
-extern av_export const uint32_t avpriv_dca_sample_rates[16];
+extern av_export_avcodec const uint32_t avpriv_dca_sample_rates[16];
 
 extern const uint32_t ff_dca_sampling_freqs[16];
 extern const uint8_t ff_dca_freq_ranges[16];
@@ -211,10 +210,19 @@ int avpriv_dca_convert_bitstream(const uint8_t *src, int src_size, uint8_t *dst,
 
 /**
  * Parse and validate core frame header
- * @return 0 on success, negative DCA_PARSE_ERROR_ code on failure
+ * @param[out] h    Pointer to struct where header info is written.
+ * @param[in]  buf  Pointer to the data buffer
+ * @param[in]  size Size of the data buffer
+ * @return 0 on success, negative AVERROR code on failure
  */
 int avpriv_dca_parse_core_frame_header(DCACoreFrameHeader *h, const uint8_t *buf, int size);
 
+/**
+ * Parse and validate core frame header
+ * @param[out] h   Pointer to struct where header info is written.
+ * @param[in]  gbc BitContext containing the first 120 bits of the frame.
+ * @return 0 on success, negative DCA_PARSE_ERROR_ code on failure
+ */
 int ff_dca_parse_core_frame_header(DCACoreFrameHeader *h, GetBitContext *gb);
 
 #endif /* AVCODEC_DCA_H */
