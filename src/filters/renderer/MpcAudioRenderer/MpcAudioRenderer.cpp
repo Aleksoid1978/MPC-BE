@@ -2051,6 +2051,8 @@ HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = 
 {
 	DLog(L"CMpcAudioRenderer::ReinitializeAudioDevice()");
 
+	PauseRendererThread();
+
 	CAutoLock cRenderLock(&m_csRender);
 
 	WAVEFORMATEX* pWaveFormatEx = nullptr;
