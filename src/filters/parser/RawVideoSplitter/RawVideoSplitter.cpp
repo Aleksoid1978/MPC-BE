@@ -83,13 +83,8 @@ CFilterApp theApp;
 static const BYTE YUV4MPEG2_[10]	= {'Y', 'U', 'V', '4', 'M', 'P', 'E', 'G', '2', 0x20};
 static const BYTE FRAME_[6]			= {'F', 'R', 'A', 'M', 'E', 0x0A};
 
-static const BYTE SYNC_MPEG1[4]		= {0x00, 0x00, 0x01, 0xB3};
-static const BYTE SYNC_H264[4]		= {0x00, 0x00, 0x00, 0x01};
-static const BYTE SYNC_VC1_F[4]		= {0x00, 0x00, 0x01, 0x0F};
-static const BYTE SYNC_VC1_D[4]		= {0x00, 0x00, 0x01, 0x0D};
-static const BYTE SYNC_HEVC_VPS[5]	= {0x00, 0x00, 0x00, 0x01, 0x40};
-static const BYTE SYNC_HEVC_AUD[5]	= {0x00, 0x00, 0x00, 0x01, 0x46};
-static const BYTE SYNC_MPEG4[4]		= {0x00, 0x00, 0x01, 0xB0};
+static const BYTE SHORT_START_CODE[3] = {0x00, 0x00, 0x01};
+static const BYTE LONG_START_CODE[4]  = {0x00, 0x00, 0x00, 0x01};
 
 //
 // CRawVideoSplitterFilter
@@ -401,11 +396,11 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		if (maxpos) {
-			// simple search for the beginning of H.264 packet
+			// simple search first AnnexB Nal
 			// TODO: to alter in accordance with the specification
 			__int64 pos = m_pFile->GetPos();
 			while (pos < maxpos && S_OK == m_pFile->ByteRead((BYTE*)&value, 4)) {
-				if (value == 0x01000000) {
+				if ((value & 0x00FFFFFF) == 0x00010000) {
 					m_pFile->Seek(pos);
 					if (S_OK != m_pFile->ByteRead(buf, 255)) {
 						return E_FAIL;
@@ -418,7 +413,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	if (m_RAWType == RAW_NONE && COMPARE(SYNC_MPEG1)) {
+	if (m_RAWType == RAW_NONE && COMPARE(SHORT_START_CODE)) {
 		m_pFile->Seek(0);
 		CBaseSplitterFileEx::seqhdr h;
 		if (m_pFile->Read(h, (int)std::min((__int64)KILOBYTE, m_pFile->GetLength()), &mt, false)) {
@@ -489,23 +484,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	if (m_RAWType == RAW_NONE && COMPARE(SYNC_H264)) {
-		m_pFile->Seek(m_startpos);
-
-		CBaseSplitterFileEx::avchdr h;
-		if (m_pFile->Read(h, (int)std::min((__int64)MEGABYTE, m_pFile->GetLength()), &mt)) {
-			mts.Add(mt);
-			if (mt.subtype == MEDIASUBTYPE_H264 && SUCCEEDED(CreateAVCfromH264(&mt))) {
-				mts.Add(mt);
-			}
-
-			m_RAWType = RAW_H264;
-			pName = L"H.264/AVC1 Video Output";
-		}
-	}
-
-	if (m_RAWType == RAW_NONE
-			&& (COMPARE(SYNC_VC1_F) || COMPARE(SYNC_VC1_D))) {
+	if (m_RAWType == RAW_NONE && COMPARE(SHORT_START_CODE)) {
 		BYTE id = 0x00;
 		m_pFile->Seek(0);
 		while (m_pFile->GetPos() < std::min((__int64)MEGABYTE, m_pFile->GetLength()) && m_RAWType == RAW_NONE) {
@@ -531,19 +510,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	if (m_RAWType == RAW_NONE
-			&& (COMPARE(SYNC_HEVC_VPS) || COMPARE(SYNC_HEVC_AUD))) {
-		m_pFile->Seek(0);
-
-		CBaseSplitterFileEx::hevchdr h;
-		if (m_pFile->Read(h, (int)std::min((__int64)MEGABYTE, m_pFile->GetLength()), &mt)) {
-			mts.Add(mt);
-			m_RAWType = RAW_HEVC;
-			pName = L"H.265/HEVC Video Output";
-		}
-	}
-
-	if (m_RAWType == RAW_NONE && COMPARE(SYNC_MPEG4)) {
+	if (m_RAWType == RAW_NONE && COMPARE(SHORT_START_CODE)) {
 		m_pFile->Seek(0);
 
 		DWORD width = 0;
@@ -773,6 +740,34 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			m_RAWType = RAW_MPEG4;
 			pName = L"MPEG-4 Visual Video Output";
+		}
+	}
+
+	if (m_RAWType == RAW_NONE
+			&& (COMPARE(SHORT_START_CODE) || COMPARE(LONG_START_CODE))) {
+		m_pFile->Seek(m_startpos);
+
+		CBaseSplitterFileEx::avchdr h;
+		if (m_pFile->Read(h, (int)std::min((__int64)MEGABYTE, m_pFile->GetLength()), &mt)) {
+			mts.Add(mt);
+			if (mt.subtype == MEDIASUBTYPE_H264 && SUCCEEDED(CreateAVCfromH264(&mt))) {
+				mts.Add(mt);
+			}
+
+			m_RAWType = RAW_H264;
+			pName = L"H.264/AVC1 Video Output";
+		}
+	}
+
+	if (m_RAWType == RAW_NONE
+			&& (COMPARE(SHORT_START_CODE) || COMPARE(LONG_START_CODE))) {
+		m_pFile->Seek(0);
+
+		CBaseSplitterFileEx::hevchdr h;
+		if (m_pFile->Read(h, (int)std::min((__int64)MEGABYTE, m_pFile->GetLength()), &mt)) {
+			mts.Add(mt);
+			m_RAWType = RAW_HEVC;
+			pName = L"H.265/HEVC Video Output";
 		}
 	}
 
