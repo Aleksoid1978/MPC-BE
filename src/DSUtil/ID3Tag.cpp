@@ -151,6 +151,11 @@ CString CID3Tag::ReadField(CGolombBuffer& gb, DWORD &size, BYTE encoding)
 		gb.SkipBytes(fieldseparatorSize);
 	}
 
+	if (size && size < fieldseparatorSize) {
+		size = 0;
+		gb.SkipBytes(size);
+	}
+
 	return str;
 }
 
