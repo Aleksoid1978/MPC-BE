@@ -29,6 +29,9 @@ CString RenameFileExt(LPCTSTR Path, LPCTSTR Ext);
 BOOL	GetTemporaryFilePath(CString strExtension, CString& strFileName);
 CString CompactPath(LPCTSTR Path, UINT cchMax);
 
-CString GetModulePath(HMODULE hModule);
-CString GetProgramPath();
-CString GetProgramDir();
+// Get path of specified module
+CStringW GetModulePath(HMODULE hModule);
+// Get path of the executable file of the current process
+CStringW GetProgramPath();
+// Get programm directory with slash
+CStringW GetProgramDir();

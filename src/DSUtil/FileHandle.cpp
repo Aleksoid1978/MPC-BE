@@ -132,40 +132,41 @@ CString CompactPath(LPCTSTR Path, UINT cchMax)
 }
 
 //
-// Get Module Path
+// Get path of specified module
 //
-CString GetModulePath(HMODULE hModule)
+CStringW GetModulePath(HMODULE hModule)
 {
-	CString ret;
-	int pos, len = MAX_PATH - 1;
-	for (;;) {
-		pos = GetModuleFileName(hModule, ret.GetBuffer(len), len);
-		if (pos == len) {
-			// buffer was too small, enlarge it and try again
-			len *= 2;
-			ret.ReleaseBuffer(0);
-			continue;
+	CStringW path;
+	DWORD bufsize = MAX_PATH;
+	DWORD len = 0;
+	while (1) {
+		len = GetModuleFileNameW(hModule, path.GetBuffer(bufsize), bufsize);
+		if (len < bufsize) {
+			break;
 		}
-		ret.ReleaseBuffer(pos);
-		break;
+		bufsize *= 2;
 	}
+	path.ReleaseBufferSetLength(len);
 
-	ASSERT(!ret.IsEmpty());
-	return ret;
+	ASSERT(path.GetLength());
+	return path;
 }
 
 //
 // Get path of the executable file of the current process.
 //
-CString GetProgramPath()
+CStringW GetProgramPath()
 {
 	return GetModulePath(nullptr);
 }
 
 //
-// Get program directory
+// Get program directory with backslash
 //
-CString GetProgramDir()
+CStringW GetProgramDir()
 {
-	return AddSlash(GetFolderOnly(GetModulePath(nullptr)));
+	CStringW path = GetModulePath(nullptr);
+	path.Truncate(path.ReverseFind('\\') + 1); // do not use this method for random paths
+
+	return path;
 }
