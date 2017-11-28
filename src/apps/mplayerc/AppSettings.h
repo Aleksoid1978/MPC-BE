@@ -856,10 +856,10 @@ private :
 	FILE_POSITION	FilePosition[MAX_FILE_POSITION];
 	int				nCurrentFilePosition;
 
-	CString			SrcFiltersKeys[SRC_LAST];
-	CString			DXVAFiltersKeys[VDEC_DXVA_LAST];
-	CString			VideoFiltersKeys[VDEC_LAST];
-	CString			AudioFiltersKeys[ADEC_LAST];
+	LPCWSTR			SrcFiltersKeys[SRC_LAST];
+	LPCWSTR			DXVAFiltersKeys[VDEC_DXVA_LAST];
+	LPCWSTR			VideoFiltersKeys[VDEC_LAST];
+	LPCWSTR			AudioFiltersKeys[ADEC_LAST];
 
 	__int64			ConvertTimeToMSec(CString& time) const;
 	void			ExtractDVDStartPos(CString& strParam);
