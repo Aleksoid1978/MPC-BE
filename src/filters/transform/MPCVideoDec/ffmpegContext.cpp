@@ -351,7 +351,8 @@ BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height, DWORD nP
 		// For Intel graphics cards with support for 4k, you must install the driver v15.33.32.4061 or newer.
 		return TRUE;
 	}
-	else if (width <= 1920 && height <= 1088) {
+	else if ((width <= 1920 && height <= 1088)
+			|| (width <= 720 && height <= 1280)) {
 		return TRUE;
 	}
 
