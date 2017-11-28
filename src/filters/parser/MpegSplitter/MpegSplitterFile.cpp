@@ -159,6 +159,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		}
 	}
 
+	m_pmt_streams.clear();
 	if (IsRandomAccess()) {
 		const __int64 len = GetLength();
 
@@ -191,8 +192,16 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		stop = clamp(stop, lo, hi);
 		SearchPrograms(0, stop);
 
+		if (IsStreaming()) {
+			for (const auto& pr : m_programs) {
+				for (const auto& stream : pr.second.streams) {
+					m_pmt_streams.emplace_back(stream);
+				}
+			}
+		}
+
 		stop = IsStreaming() ? 5 * MEGABYTE : std::min(10LL * MEGABYTE, GetLength());
-		SearchStreams(0, stop, 2000);
+		SearchStreams(0, stop, m_pmt_streams.empty() ? 2000 : 5000);
 	}
 
 	if (!m_bIsBD) {
@@ -373,6 +382,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		}
 	}
 
+	m_pmt_streams.clear();
 	m_ProgramData.clear();
 	avch.clear();
 	hevch.clear();
@@ -615,6 +625,23 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, DWORD msTimeO
 	Seek(start);
 
 	for (;;) {
+		if (!m_pmt_streams.empty()) {
+			size_t streams_cnt = 0;
+			for (const auto& stream : m_pmt_streams) {
+				for (int type = stream_type::video; type < stream_type::subpic; type++) {
+					if (m_streams[type].FindStream(stream.pid)) {
+						streams_cnt++;
+						break;
+					}
+				}
+			}
+
+			if (streams_cnt == m_pmt_streams.size()) {
+				DLog(L"CMpegSplitterFile::SearchStreams() : all sreams from PMT is parsed, was used %I64d bytes, %llu ms", GetPos() - start, (GetPerfCounter() - startTime) / 10000ULL);
+				break;
+			}
+		}
+
 		if (msTimeOut != INFINITE) {
 			const ULONGLONG endTime = GetPerfCounter();
 			const DWORD deltaTime = (endTime - startTime) / 10000;
