@@ -135,14 +135,14 @@ END_MESSAGE_MAP()
 
 void CAboutDlg::OnHomepage(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	ShellExecute(m_hWnd, L"open", _T(MPC_VERSION_COMMENTS), nullptr, nullptr, SW_SHOWDEFAULT);
+	ShellExecuteW(m_hWnd, L"open", _T(MPC_VERSION_COMMENTS), nullptr, nullptr, SW_SHOWDEFAULT);
 
 	*pResult = 0;
 }
 
 void CAboutDlg::OnAuthors(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	ShellExecute(m_hWnd, L"open", m_AuthorsPath, nullptr, nullptr, SW_SHOWDEFAULT);
+	ShellExecuteW(m_hWnd, L"open", m_AuthorsPath, nullptr, nullptr, SW_SHOWDEFAULT);
 
 	*pResult = 0;
 }

@@ -193,7 +193,7 @@ BOOL CPlayerNavigationDialog::OnInitDialog()
 	__super::OnInitDialog();
 
 	m_bTVStations = true;
-	m_ButtonFilterStations.SetWindowText(ResStr(IDS_DVB_TVNAV_SEERADIO));
+	m_ButtonFilterStations.SetWindowTextW(ResStr(IDS_DVB_TVNAV_SEERADIO));
 
 	return TRUE;
 }
@@ -334,8 +334,8 @@ void CPlayerNavigationDialog::OnTvRadioStations()
 	UpdateElementList();
 
 	if (m_bTVStations) {
-		m_ButtonFilterStations.SetWindowText(ResStr(IDS_DVB_TVNAV_SEERADIO));
+		m_ButtonFilterStations.SetWindowTextW(ResStr(IDS_DVB_TVNAV_SEERADIO));
 	} else {
-		m_ButtonFilterStations.SetWindowText(ResStr(IDS_DVB_TVNAV_SEETV));
+		m_ButtonFilterStations.SetWindowTextW(ResStr(IDS_DVB_TVNAV_SEETV));
 	}
 }

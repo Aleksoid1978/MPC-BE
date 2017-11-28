@@ -115,7 +115,7 @@ int CInPlaceWinHotkey::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CFont* font = GetParent()->GetFont();
 	SetFont(font);
 
-	SetWindowText(m_sInitText);
+	SetWindowTextW(m_sInitText);
 	SetFocus();
 	SetSel(0, -1);
 	return 0;
@@ -214,7 +214,7 @@ int CInPlaceEdit::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CFont* font = GetParent()->GetFont();
 	SetFont(font);
 
-	SetWindowText(m_sInitText);
+	SetWindowTextW(m_sInitText);
 	SetFocus();
 	SetSel(0, -1);
 	return 0;

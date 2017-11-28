@@ -1031,7 +1031,7 @@ void CPPageFormats::OnNMClickList1(NMHDR* pNMHDR, LRESULT* pResult)
 		m_list.GetItemRect(lpnmlv->iItem, r, LVIR_ICON);
 		if (r.PtInRect(lpnmlv->ptAction)) {
 			if (m_bInsufficientPrivileges) {
-				MessageBox (ResStr (IDS_CANNOT_CHANGE_FORMAT));
+				MessageBoxW(ResStr (IDS_CANNOT_CHANGE_FORMAT));
 			} else {
 				SetChecked(lpnmlv->iItem, (GetChecked(lpnmlv->iItem)&1) == 0 ? 1 : 0);
 				m_bFileExtChanged = true;

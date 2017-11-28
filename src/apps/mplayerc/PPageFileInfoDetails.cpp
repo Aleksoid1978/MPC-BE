@@ -230,7 +230,7 @@ BOOL CPPageFileInfoDetails::OnInitDialog()
 
 	UpdateData(FALSE);
 
-	m_encoding.SetWindowText(m_encodingText);
+	m_encoding.SetWindowTextW(m_encodingText);
 
 	return TRUE;
 }

@@ -866,7 +866,7 @@ void CPlayerSeekBar::UpdateToolTipText()
 		m_ti.lpszText = (LPTSTR)(LPCTSTR)tooltipText;
 		m_tooltip.SendMessageW(TTM_SETTOOLINFO, 0, (LPARAM)&m_ti);
 	} else {
-		m_pMainFrame->m_wndPreView.SetWindowText(tooltipText);
+		m_pMainFrame->m_wndPreView.SetWindowTextW(tooltipText);
 	}
 
 	{

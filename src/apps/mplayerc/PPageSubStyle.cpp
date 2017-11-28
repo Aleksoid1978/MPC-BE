@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -171,7 +171,7 @@ BOOL CPPageSubStyle::OnInitDialog()
 
 void CPPageSubStyle::Init()
 {
-	m_font.SetWindowText(m_stss->fontName);
+	m_font.SetWindowTextW(m_stss->fontName);
 	m_iCharset = -1;
 
 	for (int i = 0; i < CharSetLen; i++) {
@@ -268,7 +268,7 @@ void CPPageSubStyle::OnBnClickedButton1()
 			str = str.Left(14) + L"...";
 		}
 
-		m_font.SetWindowText(str);
+		m_font.SetWindowTextW(str);
 
 		SelectByItemData(m_charset, lf.lfCharSet);
 

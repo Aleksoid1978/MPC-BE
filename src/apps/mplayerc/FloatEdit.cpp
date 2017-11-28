@@ -41,7 +41,7 @@ double CFloatEdit::operator = (double d)
 	s.Format(L"%.4f", d);
 	s.TrimRight('0');
 	if (s[s.GetLength() - 1] == '.') s.Truncate(s.GetLength() - 1);
-	SetWindowText(s);
+	SetWindowTextW(s);
 
 	return d;
 }
@@ -75,7 +75,7 @@ void CFloatEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		float f = 0;
 		wchar_t ch;
 		if (swscanf_s(s, L"%f%c", &f, &ch) != 1 && s != "-") {
-			SetWindowText(str);
+			SetWindowTextW(str);
 			SetSel(nStartChar, nEndChar);
 		};
 	}
@@ -103,7 +103,7 @@ LRESULT CFloatEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 		float f = 0;
 		wchar_t ch;
 		if (swscanf_s(s, L"%f%c", &f, &ch) != 1) {
-			SetWindowText(str);
+			SetWindowTextW(str);
 			SetSel(nStartChar, nEndChar);
 		};
 	}
@@ -127,7 +127,7 @@ int CIntEdit::operator = (int integer)
 {
 	CString s;
 	s.Format(L"%d", integer);
-	SetWindowText(s);
+	SetWindowTextW(s);
 
 	return integer;
 }
@@ -173,7 +173,7 @@ void CIntEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		int d = 0;
 		wchar_t ch;
 		if (swscanf_s(s, L"%d%c", &d, &ch) != 1 && s != "-") {
-			SetWindowText(str);
+			SetWindowTextW(str);
 			SetSel(nStartChar, nEndChar);
 		};
 	}
@@ -201,7 +201,7 @@ LRESULT CIntEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 		int d = 0;
 		wchar_t ch;
 		if (swscanf_s(s, L"%d%c", &d, &ch) != 1) {
-			SetWindowText(str);
+			SetWindowTextW(str);
 			SetSel(nStartChar, nEndChar);
 		};
 	}
@@ -221,7 +221,7 @@ void CIntEdit::OnKillFocus (CWnd* pNewWnd)
 	integer = clamp(integer, m_lower, m_upper);
 
 	s.Format(L"%d", integer);
-	SetWindowText(s);
+	SetWindowTextW(s);
 
 	CEdit::OnKillFocus(pNewWnd);
 }
@@ -242,7 +242,7 @@ DWORD CHexEdit::operator = (DWORD dw)
 {
 	CString s;
 	s.Format(L"%08lx", dw);
-	SetWindowText(s);
+	SetWindowTextW(s);
 
 	return dw;
 }
@@ -278,7 +278,7 @@ void CHexEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		DWORD x = 0;
 		wchar_t ch;
 		if (swscanf_s(s, L"%x%c", &x, &ch) != 1) {
-			SetWindowText(str);
+			SetWindowTextW(str);
 			SetSel(nStartChar, nEndChar);
 		};
 	}
@@ -306,7 +306,7 @@ LRESULT CHexEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 		DWORD x = 0;
 		wchar_t ch;
 		if (swscanf_s(s, L"%x%c", &x, &ch) != 1) {
-			SetWindowText(str);
+			SetWindowTextW(str);
 			SetSel(nStartChar, nEndChar);
 		};
 	}

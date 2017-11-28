@@ -199,8 +199,8 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 		}
 	}
 
-	m_location.SetWindowText(m_location_str);
-	m_desc.SetWindowText(m_descText);
+	m_location.SetWindowTextW(m_location_str);
+	m_desc.SetWindowTextW(m_descText);
 
 	UpdateData(FALSE);
 

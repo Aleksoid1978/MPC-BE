@@ -113,7 +113,7 @@ BOOL CMediaTypesDlg::OnInitDialog()
 
 void CMediaTypesDlg::OnCbnSelchangeCombo1()
 {
-	m_report.SetWindowText(L"");
+	m_report.SetWindowTextW(L"");
 
 	int i = m_pins.GetCurSel();
 

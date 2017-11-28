@@ -174,7 +174,7 @@ BOOL UpdateCheckerDlg::OnInitDialog()
 	case UPDATER_ERROR:
 		m_icon.SetIcon(LoadIcon(nullptr, (m_updateStatus == UPDATER_ERROR) ? IDI_WARNING : IDI_INFORMATION));
 		m_okButton.ShowWindow(SW_HIDE);
-		m_cancelButton.SetWindowText(ResStr(IDS_UPDATE_CLOSE));
+		m_cancelButton.SetWindowTextW(ResStr(IDS_UPDATE_CLOSE));
 		m_cancelButton.SetFocus();
 		break;
 	default:
@@ -187,7 +187,7 @@ BOOL UpdateCheckerDlg::OnInitDialog()
 void UpdateCheckerDlg::OnOK()
 {
 	if (m_updateStatus == UPDATER_NEW_VERSION_IS_AVAILABLE) {
-		ShellExecute(nullptr, L"open", m_latestURL, nullptr, nullptr, SW_SHOWDEFAULT);
+		ShellExecuteW(nullptr, L"open", m_latestURL, nullptr, nullptr, SW_SHOWDEFAULT);
 	}
 
 	__super::OnOK();

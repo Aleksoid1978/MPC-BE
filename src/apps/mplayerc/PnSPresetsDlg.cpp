@@ -138,10 +138,10 @@ void CPnSPresetsDlg::OnLbnSelchangeList1()
 		m_ZoomY = ZoomY;
 	} else {
 		m_label.Empty();
-		m_PosX.SetWindowText(L"");
-		m_PosY.SetWindowText(L"");
-		m_ZoomX.SetWindowText(L"");
-		m_ZoomY.SetWindowText(L"");
+		m_PosX.SetWindowTextW(L"");
+		m_PosY.SetWindowTextW(L"");
+		m_ZoomX.SetWindowTextW(L"");
+		m_ZoomY.SetWindowTextW(L"");
 	}
 
 	UpdateData(FALSE);

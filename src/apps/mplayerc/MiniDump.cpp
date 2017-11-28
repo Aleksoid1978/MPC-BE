@@ -132,9 +132,9 @@ LONG WINAPI CMiniDump::UnhandledExceptionFilter( _EXCEPTION_POINTERS *lpTopLevel
 	}
 
 	if (szResult[0]) {
-		switch (MessageBox(AfxGetApp()->GetMainWnd()->m_hWnd, szResult, L"MPC-BE Mini Dump", retval ? MB_YESNO : MB_OK)) {
+		switch (MessageBoxW(AfxGetApp()->GetMainWnd()->m_hWnd, szResult, L"MPC-BE Mini Dump", retval ? MB_YESNO : MB_OK)) {
 			case IDYES:
-				ShellExecute(nullptr, L"open", L"http://sourceforge.net/p/mpcbe/tickets/", nullptr, nullptr, SW_SHOWDEFAULT); // hmm
+				ShellExecuteW(nullptr, L"open", L"http://sourceforge.net/p/mpcbe/tickets/", nullptr, nullptr, SW_SHOWDEFAULT); // hmm
 				ExploreToFile(strDumpPath);
 				break;
 			case IDNO:

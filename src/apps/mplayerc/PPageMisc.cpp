@@ -145,7 +145,7 @@ void CPPageMisc::OnUpdateDelayEditBox(CCmdUI* pCmdUI)
 
 void CPPageMisc::OnResetSettings()
 {
-	if (MessageBox(ResStr(IDS_RESET_SETTINGS_WARNING), ResStr(IDS_RESET_SETTINGS), MB_ICONEXCLAMATION | MB_YESNO | MB_DEFBUTTON2) == IDYES) {
+	if (MessageBoxW(ResStr(IDS_RESET_SETTINGS_WARNING), ResStr(IDS_RESET_SETTINGS), MB_ICONEXCLAMATION | MB_YESNO | MB_DEFBUTTON2) == IDYES) {
 		AfxGetAppSettings().bResetSettings = true;
 		GetParent()->PostMessageW(WM_CLOSE);
 	}
@@ -154,7 +154,7 @@ void CPPageMisc::OnResetSettings()
 void CPPageMisc::OnExportSettings()
 {
 	if (GetParent()->GetDlgItem(ID_APPLY_NOW)->IsWindowEnabled()) {
-		int ret = MessageBox(ResStr(IDS_EXPORT_SETTINGS_WARNING), ResStr(IDS_EXPORT_SETTINGS), MB_ICONEXCLAMATION | MB_YESNOCANCEL);
+		int ret = MessageBoxW(ResStr(IDS_EXPORT_SETTINGS_WARNING), ResStr(IDS_EXPORT_SETTINGS), MB_ICONEXCLAMATION | MB_YESNOCANCEL);
 
 		if (ret == IDCANCEL) {
 			return;

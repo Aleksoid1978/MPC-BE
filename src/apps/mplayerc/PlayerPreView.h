@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2016 see Authors.txt
+ * (C) 2012-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -44,7 +44,7 @@ public:
 	CPreView(CMainFrame* pMainFrame);
 	virtual ~CPreView();
 
-	virtual BOOL SetWindowText(LPCWSTR lpString);
+	virtual BOOL SetWindowTextW(LPCWSTR lpString);
 
 	void SetRelativeSize(int relativesize) { m_relativeSize = relativesize; }
 	void GetVideoRect(LPRECT lpRect);

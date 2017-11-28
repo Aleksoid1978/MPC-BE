@@ -107,7 +107,7 @@ void CWinHotkeyCtrl::UpdateText()
 {
 	CString sText;
 	HotkeyToString(m_vkCode, m_fModSet, sText);
-	SetWindowText((LPCTSTR)sText);
+	SetWindowTextW((LPCTSTR)sText);
 	SetSel(0x8fffffff, 0x8fffffff, FALSE);
 }
 
