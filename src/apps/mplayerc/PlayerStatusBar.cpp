@@ -166,8 +166,8 @@ void CPlayerStatusBar::Relayout()
 
 void CPlayerStatusBar::Clear()
 {
-	m_status.SetWindowText(L"");
-	m_time.SetWindowText(L"");
+	m_status.SetWindowTextW(L"");
+	m_time.SetWindowTextW(L"");
 
 	SetStatusBitmap(0);
 
@@ -203,7 +203,7 @@ void CPlayerStatusBar::SetStatusMessage(CString str)
 {
 	str.Trim();
 	str.Replace(L"&", L"&&");
-	m_status.SetWindowText(str);
+	m_status.SetWindowTextW(str);
 
 	Relayout();
 
@@ -231,7 +231,7 @@ void CPlayerStatusBar::SetStatusTimer(CString str)
 	if (GetStatusTimer() != str) {
 		m_time.SetRedraw(FALSE);
 		str.Trim();
-		m_time.SetWindowText(str);
+		m_time.SetWindowTextW(str);
 		m_time.SetRedraw(TRUE);
 
 		Relayout();

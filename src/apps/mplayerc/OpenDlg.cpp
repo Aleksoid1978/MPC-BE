@@ -203,7 +203,7 @@ void COpenDlg::OnBnClickedBrowsebutton()
 		return;
 	}
 
-	m_mrucombo.SetWindowText(fd.GetPathName());
+	m_mrucombo.SetWindowTextW(fd.GetPathName());
 }
 
 void COpenDlg::OnBnClickedBrowsebutton2()
@@ -228,7 +228,7 @@ void COpenDlg::OnBnClickedBrowsebutton2()
 		return;
 	}
 
-	m_mrucombo2.SetWindowText(fd.GetPathName());
+	m_mrucombo2.SetWindowTextW(fd.GetPathName());
 }
 
 void COpenDlg::OnBnClickedOk()

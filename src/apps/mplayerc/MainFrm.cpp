@@ -854,7 +854,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_strTitle.AppendFormat(L" (build %d) beta",  MPC_VERSION_REV);
 #endif
 
-	SetWindowText(m_strTitle);
+	SetWindowTextW(m_strTitle);
 	m_Lcd.SetMediaTitle(m_strTitle);
 
 	m_hWnd_toolbar = m_wndToolBar.GetSafeHwnd();
@@ -4417,7 +4417,7 @@ void CMainFrame::OnFilePostCloseMedia()
 	RecalcLayout();
 	UpdateWindow();
 
-	SetWindowText(m_strTitle);
+	SetWindowTextW(m_strTitle);
 	m_Lcd.SetMediaTitle(m_strTitle);
 
 	SetAlwaysOnTop(s.iOnTop);
@@ -6405,7 +6405,7 @@ void CMainFrame::OnFileISDBSearch()
 {
 	CStringA url = "http://" + AfxGetAppSettings().strISDb + "/index.php?";
 	CStringA args = makeargs(m_wndPlaylistBar.m_pl);
-	ShellExecute(m_hWnd, L"open", CString(url+args), nullptr, nullptr, SW_SHOWDEFAULT);
+	ShellExecuteW(m_hWnd, L"open", CString(url+args), nullptr, nullptr, SW_SHOWDEFAULT);
 }
 
 void CMainFrame::OnUpdateFileISDBSearch(CCmdUI *pCmdUI)
@@ -10148,7 +10148,7 @@ void CMainFrame::OnUpdateFavoritesDevice(CCmdUI* pCmdUI)
 
 void CMainFrame::OnHelpHomepage()
 {
-	ShellExecute(m_hWnd, L"open", _T(MPC_VERSION_COMMENTS), nullptr, nullptr, SW_SHOWDEFAULT);
+	ShellExecuteW(m_hWnd, L"open", _T(MPC_VERSION_COMMENTS), nullptr, nullptr, SW_SHOWDEFAULT);
 }
 
 void CMainFrame::OnHelpCheckForUpdate()
@@ -10160,19 +10160,19 @@ void CMainFrame::OnHelpCheckForUpdate()
 /*
 void CMainFrame::OnHelpDocumentation()
 {
-	ShellExecute(m_hWnd, L"open", L"", nullptr, nullptr, SW_SHOWDEFAULT);
+	ShellExecuteW(m_hWnd, L"open", L"", nullptr, nullptr, SW_SHOWDEFAULT);
 }
 */
 
 void CMainFrame::OnHelpToolbarImages()
 {
-	ShellExecute(m_hWnd, L"open", L"http://sourceforge.net/projects/mpcbe/files/Toolbars/", nullptr, nullptr, SW_SHOWDEFAULT);
+	ShellExecuteW(m_hWnd, L"open", L"http://sourceforge.net/projects/mpcbe/files/Toolbars/", nullptr, nullptr, SW_SHOWDEFAULT);
 }
 
 /*
 void CMainFrame::OnHelpDonate()
 {
-	ShellExecute(m_hWnd, L"open", L"", nullptr, nullptr, SW_SHOWDEFAULT);
+	ShellExecuteW(m_hWnd, L"open", L"", nullptr, nullptr, SW_SHOWDEFAULT);
 }
 */
 
@@ -12987,7 +12987,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 	CString curTitle;
 	GetWindowTextW(curTitle);
 	if (curTitle != title) {
-		SetWindowText(title);
+		SetWindowTextW(title);
 	}
 
 	m_Lcd.SetMediaTitle(fn);
@@ -16468,14 +16468,14 @@ HRESULT CMainFrame::BuildCapture(IPin* pPin, IBaseFilter* pBF[3], const GUID& ma
 		hr = m_pGB->AddFilter(pBuff, prefix + L"Buffer");
 		if (FAILED(hr)) {
 			err.Format(ResStr(IDS_CAPTURE_ERROR_ADD_BUFFER), type);
-			MessageBox(err, ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
+			MessageBoxW(err, ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
 			return hr;
 		}
 
 		hr = m_pGB->ConnectFilter(pPin, pBuff);
 		if (FAILED(hr)) {
 			err.Format(ResStr(IDS_CAPTURE_ERROR_CONNECT_BUFF), type);
-			MessageBox(err, ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
+			MessageBoxW(err, ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
 			return hr;
 		}
 
@@ -16486,14 +16486,14 @@ HRESULT CMainFrame::BuildCapture(IPin* pPin, IBaseFilter* pBF[3], const GUID& ma
 		hr = m_pGB->AddFilter(pEnc, prefix + L"Encoder");
 		if (FAILED(hr)) {
 			err.Format(ResStr(IDS_CAPTURE_ERROR_ADD_ENCODER), type);
-			MessageBox(err, ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
+			MessageBoxW(err, ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
 			return hr;
 		}
 
 		hr = m_pGB->ConnectFilter(pPin, pEnc);
 		if (FAILED(hr)) {
 			err.Format(ResStr(IDS_CAPTURE_ERROR_CONNECT_ENC), type);
-			MessageBox(err, ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
+			MessageBoxW(err, ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
 			return hr;
 		}
 
@@ -16504,7 +16504,7 @@ HRESULT CMainFrame::BuildCapture(IPin* pPin, IBaseFilter* pBF[3], const GUID& ma
 				hr = pAMSC->SetFormat(pmt);
 				if (FAILED(hr)) {
 					err.Format(ResStr(IDS_CAPTURE_ERROR_COMPRESSION), type);
-					MessageBox(err, ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
+					MessageBoxW(err, ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
 					return hr;
 				}
 			}
@@ -16517,7 +16517,7 @@ HRESULT CMainFrame::BuildCapture(IPin* pPin, IBaseFilter* pBF[3], const GUID& ma
 		hr = m_pGB->ConnectFilter(pPin, pMux);
 		if (FAILED(hr)) {
 			err.Format(ResStr(IDS_CAPTURE_ERROR_MULTIPLEXER), type);
-			MessageBox(err, ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
+			MessageBoxW(err, ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
 			return hr;
 		}
 	}
@@ -16561,7 +16561,7 @@ bool CMainFrame::BuildToCapturePreviewPin(
 			pPin = nullptr;
 			hr = pCGB->FindPin(pDVDec, PINDIR_OUTPUT, nullptr, &MEDIATYPE_Video, TRUE, 0, &pPin);
 		} else if (FAILED(pCGB->FindPin(pVidCap, PINDIR_OUTPUT, &PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, TRUE, 0, &pPin))) {
-			MessageBox(ResStr(IDS_CAPTURE_ERROR_VID_CAPT_PIN), ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
+			MessageBoxW(ResStr(IDS_CAPTURE_ERROR_VID_CAPT_PIN), ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
 			return false;
 		}
 
@@ -16580,7 +16580,7 @@ bool CMainFrame::BuildToCapturePreviewPin(
 		if (pDVAudPin) {
 			pPin = pDVAudPin;
 		} else if (FAILED(pCGB->FindPin(pAudCap, PINDIR_OUTPUT, &PIN_CATEGORY_CAPTURE, &MEDIATYPE_Audio, TRUE, 0, &pPin))) {
-			MessageBox(ResStr(IDS_CAPTURE_ERROR_AUD_CAPT_PIN), ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
+			MessageBoxW(ResStr(IDS_CAPTURE_ERROR_AUD_CAPT_PIN), ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
 			return false;
 		}
 
@@ -17391,8 +17391,8 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	nID -= ID_LANGUAGE_ENGLISH; // resource ID to index
 
 	if (nID == CMPlayerCApp::GetLanguageIndex(ID_LANGUAGE_HEBREW)) { // Show a warning when switching to Hebrew (must not be translated)
-		MessageBox(L"The Hebrew translation will be correctly displayed (with a right-to-left layout) after restarting the application.\n",
-				   L"MPC-BE", MB_ICONINFORMATION | MB_OK);
+		MessageBoxW(L"The Hebrew translation will be correctly displayed (with a right-to-left layout) after restarting the application.\n",
+					L"MPC-BE", MB_ICONINFORMATION | MB_OK);
 	}
 
 	CMPlayerCApp::SetLanguage(nID);

@@ -59,9 +59,9 @@ public:
 	CIntEdit	m_edtTimeShift;
 	CSpinButtonCtrl m_spnTimeShift;
 
-	void UpdateGainInfo() { CString str; str.Format(ResStr(IDS_AUDIO_GAIN), m_sldGain.GetPos() / 10.0f); m_stcGain.SetWindowText(str); };
-	void UpdateNormLevelInfo() { CString str; str.Format(ResStr(IDS_AUDIO_LEVEL), m_sldNormLevel.GetPos()); m_stcNormLevel.SetWindowText(str); };
-	void UpdateNormRealeaseTimeInfo() { CString str; str.Format(ResStr(IDS_AUDIO_RELEASETIME), m_sldNormRealeaseTime.GetPos()); m_stcNormRealeaseTime.SetWindowText(str); };
+	void UpdateGainInfo() { CString str; str.Format(ResStr(IDS_AUDIO_GAIN), m_sldGain.GetPos() / 10.0f); m_stcGain.SetWindowTextW(str); };
+	void UpdateNormLevelInfo() { CString str; str.Format(ResStr(IDS_AUDIO_LEVEL), m_sldNormLevel.GetPos()); m_stcNormLevel.SetWindowTextW(str); };
+	void UpdateNormRealeaseTimeInfo() { CString str; str.Format(ResStr(IDS_AUDIO_RELEASETIME), m_sldNormRealeaseTime.GetPos()); m_stcNormRealeaseTime.SetWindowTextW(str); };
 
 	int GetSampleFormats();
 

@@ -97,7 +97,7 @@ BOOL CPPageFileInfoSheet::OnInitDialog()
 
 	GetDlgItem(IDCANCEL)->ShowWindow(SW_HIDE);
 	GetDlgItem(ID_APPLY_NOW)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDOK)->SetWindowText(ResStr(IDS_AG_CLOSE));
+	GetDlgItem(IDOK)->SetWindowTextW(ResStr(IDS_AG_CLOSE));
 
 	CRect r;
 	GetDlgItem(ID_APPLY_NOW)->GetWindowRect(&r);

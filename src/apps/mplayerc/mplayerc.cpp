@@ -193,7 +193,7 @@ bool CMPlayerCApp::ClearSettings()
 	while (hWnd) {
 		Sleep(500);
 		hWnd = FindWindowW(_T(MPC_WND_CLASS_NAME), nullptr);
-		if (hWnd && MessageBox(nullptr, ResStr(IDS_RESET_SETTINGS_MUTEX), ResStr(IDS_RESET_SETTINGS), MB_ICONEXCLAMATION | MB_RETRYCANCEL) == IDCANCEL) {
+		if (hWnd && MessageBoxW(nullptr, ResStr(IDS_RESET_SETTINGS_MUTEX), ResStr(IDS_RESET_SETTINGS), MB_ICONEXCLAMATION | MB_RETRYCANCEL) == IDCANCEL) {
 			return false;
 		}
 	}
@@ -909,14 +909,14 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 			WCHAR pathTo[MAX_PATH] = { 0 }; // for double null-terminated string
 			wcscpy(pathTo, newpath);
 
-			SHFILEOPSTRUCT sf = { 0 };
+			SHFILEOPSTRUCTW sf = { 0 };
 			sf.wFunc = FO_MOVE;
 			sf.hwnd = 0;
 			sf.fFlags = FOF_NOCONFIRMATION | FOF_NOCONFIRMMKDIR | FOF_NOERRORUI;
 			sf.pFrom = pathFrom;
 			sf.pTo = pathTo;
-			if (SHFileOperation(&sf) != 0) {
-				MessageBox(nullptr, L"Moving shader files failed", ResStr(IDS_AG_ERROR), MB_OK);
+			if (SHFileOperationW(&sf) != 0) {
+				MessageBoxW(nullptr, L"Moving shader files failed", ResStr(IDS_AG_ERROR), MB_OK);
 			}
 		}
 	}
@@ -1097,9 +1097,9 @@ void CMPlayerCApp::ExportSettings()
 		s.nLastUsedPage = nLastUsedPage;
 
 		if (success) {
-			MessageBox(GetMainWnd()->m_hWnd, ResStr(IDS_EXPORT_SETTINGS_SUCCESS), ResStr(IDS_EXPORT_SETTINGS), MB_ICONINFORMATION | MB_OK);
+			MessageBoxW(GetMainWnd()->m_hWnd, ResStr(IDS_EXPORT_SETTINGS_SUCCESS), ResStr(IDS_EXPORT_SETTINGS), MB_ICONINFORMATION | MB_OK);
 		} else {
-			MessageBox(GetMainWnd()->m_hWnd, ResStr(IDS_EXPORT_SETTINGS_FAILED), ResStr(IDS_EXPORT_SETTINGS), MB_ICONERROR | MB_OK);
+			MessageBoxW(GetMainWnd()->m_hWnd, ResStr(IDS_EXPORT_SETTINGS_FAILED), ResStr(IDS_EXPORT_SETTINGS), MB_ICONERROR | MB_OK);
 		}
 	}
 }
@@ -1654,7 +1654,7 @@ BOOL CMPlayerCApp::InitInstance()
 			WCHAR pathTo[MAX_PATH] = { 0 }; // for double null-terminated string
 			wcscpy(pathTo, shaderpath);
 
-			SHFILEOPSTRUCT sf = { 0 };
+			SHFILEOPSTRUCTW sf = { 0 };
 			sf.wFunc = FO_COPY;
 			sf.hwnd = 0;
 			sf.fFlags = FOF_NOCONFIRMATION | FOF_NOCONFIRMMKDIR | FOF_NOERRORUI;
@@ -2193,8 +2193,8 @@ void CMPlayerCApp::SetLanguage(int nLanguage, bool bSave/* = true*/)
 				}
 			} else {
 				// This message should stay in English!
-				MessageBox(nullptr, L"Your language pack will not work with this version. Please download a compatible one from the MPC-BE homepage.",
-						   L"MPC-BE", MB_OK);
+				MessageBoxW(nullptr, L"Your language pack will not work with this version. Please download a compatible one from the MPC-BE homepage.",
+							L"MPC-BE", MB_OK);
 			}
 		}
 	} else if (bSave && nLanguage == GetLanguageIndex(ID_LANGUAGE_ENGLISH)) {

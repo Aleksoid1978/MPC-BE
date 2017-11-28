@@ -37,7 +37,7 @@ public:
 	}
 	/*virtual*/ HINSTANCE Navigate() {
 		return IsEmpty() ? nullptr :
-			   ShellExecute(0, L"open", *this, 0, 0, SW_SHOWNORMAL);
+			   ShellExecuteW(0, L"open", *this, 0, 0, SW_SHOWNORMAL);
 	}
 };
 

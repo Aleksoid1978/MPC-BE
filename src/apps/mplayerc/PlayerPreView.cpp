@@ -43,7 +43,7 @@ CPreView::~CPreView()
 {
 }
 
-BOOL CPreView::SetWindowText(LPCWSTR lpString)
+BOOL CPreView::SetWindowTextW(LPCWSTR lpString)
 {
 	m_tooltipstr = lpString;
 
@@ -56,7 +56,7 @@ BOOL CPreView::SetWindowText(LPCWSTR lpString)
 
 	InvalidateRect(rect);
 
-	return ::SetWindowText(m_hWnd, lpString);
+	return ::SetWindowTextW(m_hWnd, lpString);
 }
 
 void CPreView::GetVideoRect(LPRECT lpRect)

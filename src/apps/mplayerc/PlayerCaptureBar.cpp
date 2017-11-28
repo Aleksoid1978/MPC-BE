@@ -852,7 +852,7 @@ void CPlayerCaptureDialog::UpdateUserDefinableControls()
 
 	CString fps;
 	fps.Format(L"%.4f", (float)(10000000.0 / ((VIDEOINFOHEADER*)pmt->pbFormat)->AvgTimePerFrame));
-	m_vidfpsedit.SetWindowText(fps);
+	m_vidfpsedit.SetWindowTextW(fps);
 
 	DeleteMediaType(pmt);
 }
@@ -958,7 +958,7 @@ void CPlayerCaptureDialog::EnableControls(CWnd* pWnd, bool fEnable)
 			m_wndenabledmap.RemoveAll();
 		}
 
-		m_recordbtn.SetWindowText(L"Record");
+		m_recordbtn.SetWindowTextW(L"Record");
 	} else {
 		if (pWnd->m_hWnd == m_hWnd) {
 			m_wndenabledmap.RemoveAll();
@@ -971,7 +971,7 @@ void CPlayerCaptureDialog::EnableControls(CWnd* pWnd, bool fEnable)
 		}
 
 		m_recordbtn.EnableWindow(TRUE);
-		m_recordbtn.SetWindowText(L"Stop");
+		m_recordbtn.SetWindowTextW(L"Stop");
 	}
 }
 
@@ -1482,7 +1482,7 @@ void CPlayerCaptureDialog::OnVideoDimension()
 	m_vidver.SetPos(abs(bih->biHeight));
 	CString fps;
 	fps.Format(L"%.4f", (float)(10000000.0 / ((VIDEOINFOHEADER*)pvfe->mt.pbFormat)->AvgTimePerFrame));
-	m_vidfpsedit.SetWindowText(fps);
+	m_vidfpsedit.SetWindowTextW(fps);
 
 	UpdateGraph();
 }
@@ -1635,7 +1635,7 @@ void CPlayerCaptureDialog::OnRecord()
 		if (!pFSF
 				|| FAILED(pFSF->SetFileName(CStringW(m_file), nullptr))
 				|| FAILED(pFSF->SetMode(AM_FILE_OVERWRITE))) {
-			MessageBox(ResStr(IDS_CAPTURE_ERROR_OUT_FILE), ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
+			MessageBoxW(ResStr(IDS_CAPTURE_ERROR_OUT_FILE), ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
 			return;
 		}
 
@@ -1655,7 +1655,7 @@ void CPlayerCaptureDialog::OnRecord()
 			if (!pFSF
 					|| FAILED(pFSF->SetFileName(CStringW(audfn), nullptr))
 					|| FAILED(pFSF->SetMode(AM_FILE_OVERWRITE))) {
-				MessageBox(ResStr(IDS_CAPTURE_ERROR_AUD_OUT_FILE), ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
+				MessageBoxW(ResStr(IDS_CAPTURE_ERROR_AUD_OUT_FILE), ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
 				return;
 			}
 		}

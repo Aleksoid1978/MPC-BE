@@ -154,7 +154,7 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 	} while (!success && i < _countof(MonospaceFonts));
 
 	m_mediainfo.SetFont(m_pCFont);
-	m_mediainfo.SetWindowText(MI_Text);
+	m_mediainfo.SetWindowTextW(MI_Text);
 
 	m_mediainfo.EndPaint(&ps);
 

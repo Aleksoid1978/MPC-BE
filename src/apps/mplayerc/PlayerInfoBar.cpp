@@ -52,7 +52,7 @@ void CPlayerInfoBar::SetLine(CString label, CString info)
 			m_infos[idx]->GetWindowTextW(tmp);
 
 			if (info != tmp) {
-				m_infos[idx]->SetWindowText(info);
+				m_infos[idx]->SetWindowTextW(info);
 			}
 
 			return;
