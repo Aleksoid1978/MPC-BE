@@ -483,4 +483,6 @@ public:
 		}
 	};
 	std::map<WORD, streamData> m_streamData;
+
+	std::vector<program::stream> m_pmt_streams;
 };
