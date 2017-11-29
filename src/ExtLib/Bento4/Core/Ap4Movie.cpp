@@ -443,7 +443,7 @@ AP4_Movie::SelectMoof(const REFERENCE_TIME rt)
         const AP4_TimeStamp ts = (AP4_TimeStamp)((double(rt) * m_SidxAtom->GetTimeScale() + 5000000) / 10000000);
         AP4_Array<AP4_SidxAtom::Fragments>& fragments = m_SidxAtom->GetSampleTable();
         for (AP4_Cardinal index = fragments.ItemCount() - 1; index >= 0; index--) {
-            if (fragments[index].m_StartTime <= ts) {
+            if (fragments[index].m_StartTime <= ts || index == 0) {
                 if (m_CurrentMoof == index) {
                     return AP4_SUCCESS;
                 }
