@@ -80,7 +80,7 @@ BOOL CAuthDlg::OnInitDialog()
 				DWORD pwlen = sizeof(password);
 				DWORD type = REG_SZ;
 
-				if (ERROR_SUCCESS == RegEnumValue(hSecKey, i++, username, &unlen, 0, &type, (BYTE*)password, &pwlen)) {
+				if (ERROR_SUCCESS == RegEnumValueW(hSecKey, i++, username, &unlen, 0, &type, (BYTE*)password, &pwlen)) {
 					m_logins[username] = DEncrypt(password);
 					m_usernamectrl.AddString(username);
 				} else {
@@ -92,7 +92,7 @@ BOOL CAuthDlg::OnInitDialog()
 		CAutoVectorPtr<WCHAR> buff;
 		buff.Allocate(32767/sizeof(WCHAR));
 
-		DWORD len = GetPrivateProfileSection(IDS_R_LOGINS, buff, 32767/sizeof(WCHAR), pApp->m_pszProfileName);
+		DWORD len = GetPrivateProfileSectionW(IDS_R_LOGINS, buff, 32767/sizeof(WCHAR), pApp->m_pszProfileName);
 
 		WCHAR* p = buff;
 		while (*p && len > 0) {
