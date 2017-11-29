@@ -989,7 +989,7 @@ static bool ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName)
 		valueNameLen = maxValueNameLen;
 		valueDataLen = maxValueDataLen;
 
-		if (RegEnumValue(hKey, indexValue, valueName.GetBuffer(maxValueNameLen), &valueNameLen, nullptr, &type, data, &valueDataLen) != ERROR_SUCCESS) {
+		if (RegEnumValueW(hKey, indexValue, valueName.GetBuffer(maxValueNameLen), &valueNameLen, nullptr, &type, data, &valueDataLen) != ERROR_SUCCESS) {
 			delete [] data;
 			return false;
 		}
@@ -2223,7 +2223,7 @@ void CMPlayerCApp::SetLanguage(int nLanguage, bool bSave/* = true*/)
 
 void CMPlayerCApp::RunAsAdministrator(LPCTSTR strCommand, LPCTSTR strArgs, bool bWaitProcess)
 {
-	SHELLEXECUTEINFO execinfo;
+	SHELLEXECUTEINFOW execinfo;
 	memset(&execinfo, 0, sizeof(execinfo));
 	execinfo.lpFile			= strCommand;
 	execinfo.cbSize			= sizeof(execinfo);
@@ -2232,7 +2232,7 @@ void CMPlayerCApp::RunAsAdministrator(LPCTSTR strCommand, LPCTSTR strArgs, bool 
 	execinfo.nShow			= SW_SHOWDEFAULT;
 	execinfo.lpParameters	= strArgs;
 
-	ShellExecuteEx(&execinfo);
+	ShellExecuteExW(&execinfo);
 
 	if (bWaitProcess) {
 		WaitForSingleObject(execinfo.hProcess, INFINITE);

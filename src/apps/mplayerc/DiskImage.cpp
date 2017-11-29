@@ -78,7 +78,7 @@ void CDiskImage::Init()
 		return;
 
 		// detailed checking
-		//SHELLEXECUTEINFO execinfo;
+		//SHELLEXECUTEINFOW execinfo;
 		//memset(&execinfo, 0, sizeof(execinfo));
 		//execinfo.lpFile = m_dtlite_path;
 		//execinfo.lpParameters = L"-get_count";
@@ -86,7 +86,7 @@ void CDiskImage::Init()
 		//execinfo.nShow = SW_HIDE;
 		//execinfo.cbSize = sizeof(execinfo);
 		//DWORD ec = 0;
-		//if (ShellExecuteEx(&execinfo)) {
+		//if (ShellExecuteExW(&execinfo)) {
 		//	WaitForSingleObject(execinfo.hProcess, INFINITE);
 		//	if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec != (DWORD)-1 && ec != 0) {
 		//		m_DriveType = DTLITE;
@@ -232,7 +232,7 @@ void CDiskImage::UnmountDiskImage()
 
 	// DAEMON Tools Lite
 	if (m_DriveType == DTLITE && m_dtdrive > dt_none) {
-		SHELLEXECUTEINFO execinfo;
+		SHELLEXECUTEINFOW execinfo;
 		memset(&execinfo, 0, sizeof(execinfo));
 		execinfo.lpFile = m_dtlite_path;
 		execinfo.fMask = SEE_MASK_NOCLOSEPROCESS;
@@ -247,7 +247,7 @@ void CDiskImage::UnmountDiskImage()
 		}
 		execinfo.lpParameters = parameters;
 
-		if (ShellExecuteEx(&execinfo)) {
+		if (ShellExecuteExW(&execinfo)) {
 			// do not wait for execution result
 			m_dtdrive = dt_none;
 		}
@@ -255,7 +255,7 @@ void CDiskImage::UnmountDiskImage()
 
 	// Virtual CloneDrive
 	if (m_DriveType == VCD) {
-		SHELLEXECUTEINFO execinfo;
+		SHELLEXECUTEINFOW execinfo;
 		memset(&execinfo, 0, sizeof(execinfo));
 		execinfo.lpFile = m_vcd_path;
 		execinfo.fMask = SEE_MASK_NOCLOSEPROCESS;
@@ -263,7 +263,7 @@ void CDiskImage::UnmountDiskImage()
 		execinfo.cbSize = sizeof(execinfo);
 		execinfo.lpParameters = L"/d=0 /u";
 
-		if (ShellExecuteEx(&execinfo)) {
+		if (ShellExecuteExW(&execinfo)) {
 			WaitForSingleObject(execinfo.hProcess, INFINITE);
 		}
 	}
@@ -402,7 +402,7 @@ WCHAR CDiskImage::MountDTLite(LPCWSTR pathName)
 {
 	m_dtdrive = dt_none;
 
-	SHELLEXECUTEINFO execinfo;
+	SHELLEXECUTEINFOW execinfo;
 	memset(&execinfo, 0, sizeof(execinfo));
 	execinfo.lpFile			= m_dtlite_path;
 	execinfo.fMask			= SEE_MASK_NOCLOSEPROCESS;
@@ -411,7 +411,7 @@ WCHAR CDiskImage::MountDTLite(LPCWSTR pathName)
 
 	DWORD ec = (DWORD)-1;
 	execinfo.lpParameters = L"-get_letter dt, 0";
-	if (!ShellExecuteEx(&execinfo)) {
+	if (!ShellExecuteExW(&execinfo)) {
 		return 0;
 	}
 	WaitForSingleObject(execinfo.hProcess, INFINITE);
@@ -420,7 +420,7 @@ WCHAR CDiskImage::MountDTLite(LPCWSTR pathName)
 	} else {
 		ec = (DWORD)-1;
 		execinfo.lpParameters = L"-get_letter scsi, 0";
-		if (!ShellExecuteEx(&execinfo)) {
+		if (!ShellExecuteExW(&execinfo)) {
 			return 0;
 		}
 		WaitForSingleObject(execinfo.hProcess, INFINITE);
@@ -441,7 +441,7 @@ WCHAR CDiskImage::MountDTLite(LPCWSTR pathName)
 	execinfo.lpParameters = parameters;
 
 	ec = (DWORD)-1;
-	if (ShellExecuteEx(&execinfo)) {
+	if (ShellExecuteExW(&execinfo)) {
 		WaitForSingleObject(execinfo.hProcess, INFINITE);
 		if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec == 0) {
 			return letter;
@@ -478,7 +478,7 @@ WCHAR CDiskImage::MountVCD(LPCWSTR pathName)
 		return 0;
 	}
 
-	SHELLEXECUTEINFO execinfo;
+	SHELLEXECUTEINFOW execinfo;
 	memset(&execinfo, 0, sizeof(execinfo));
 	execinfo.lpFile			= m_vcd_path;
 	execinfo.fMask			= SEE_MASK_NOCLOSEPROCESS;
@@ -490,7 +490,7 @@ WCHAR CDiskImage::MountVCD(LPCWSTR pathName)
 	execinfo.lpParameters = parameters;
 
 	DWORD ec = (DWORD)-1;
-	if (ShellExecuteEx(&execinfo)) {
+	if (ShellExecuteExW(&execinfo)) {
 		WaitForSingleObject(execinfo.hProcess, INFINITE);
 		if (GetExitCodeProcess(execinfo.hProcess, &ec) && ec == 0) {
 			// wait until Virtual CloneDrive initialized.

@@ -410,8 +410,8 @@ HRESULT CPPageFormats::RegisterUI()
 
 void Execute(LPCTSTR lpszCommand, LPCTSTR lpszParameters)
 {
-	SHELLEXECUTEINFO ShExecInfo = {0};
-	ShExecInfo.cbSize		= sizeof(SHELLEXECUTEINFO);
+	SHELLEXECUTEINFOW ShExecInfo = {0};
+	ShExecInfo.cbSize		= sizeof(SHELLEXECUTEINFOW);
 	ShExecInfo.fMask		= SEE_MASK_NOCLOSEPROCESS;
 	ShExecInfo.hwnd			= nullptr;
 	ShExecInfo.lpVerb		= nullptr;
@@ -421,7 +421,7 @@ void Execute(LPCTSTR lpszCommand, LPCTSTR lpszParameters)
 	ShExecInfo.nShow		= SWP_HIDEWINDOW;
 	ShExecInfo.hInstApp		= nullptr;
 
-	ShellExecuteEx(&ShExecInfo);
+	ShellExecuteExW(&ShExecInfo);
 	WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
 }
 
