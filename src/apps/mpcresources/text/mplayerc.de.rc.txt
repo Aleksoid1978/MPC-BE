@@ -59,11 +59,11 @@ END
 
 BEGIN DIALOGEX IDD_FAVORGANIZE LINES 13
 3		"Favoriten verwalten"
-8		"Edit"
-9		"Hoch"
-10		"Runter"
-11		"Löschen"
-12		"Schließen"
+8		"&Umbenennen"
+9		"&Höher"
+10		"&Tiefer"
+11		"&Löschen"
+12		"&OK"
 END
 
 BEGIN DIALOGEX IDD_FILEPROPCLIP LINES 24
@@ -134,11 +134,11 @@ BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 3		"Pan&&Scan Profile"
 12		"&Neu"
 13		"&Löschen"
-14		"&Hoch"
-15		"&Runter"
-16		"Set&zen"
+14		"&Höher"
+15		"&Tiefer"
+16		"&Setzen"
 18		"&Abbrechen"
-19		"&Speichern"
+19		"&OK"
 20		"Pos.: 0.0 -> 1.0"
 21		"Zoom: 0.2 -> 3.0"
 END
@@ -207,8 +207,8 @@ BEGIN DIALOGEX IDD_PPAGEEXTERNALFILTERS LINES 20
 8		"Bevorzugen"
 9		"Blockieren"
 10		"Priorität setzen:"
-12		"&Hoch"
-13		"&Runter"
+12		"&Höher"
+13		"&Tiefer"
 16		"&Medientyp..."
 17		"&Subtyp..."
 18		"E&ntfernen"
@@ -572,8 +572,8 @@ BEGIN DIALOGEX IDD_SHADERCOMBINE_DLG LINES 18
 9		"Pre-Resize Shader aktivieren"
 11		"Post-Resize Shader aktivieren"
 13		"&Löschen"
-14		"&Hoch"
-15		"&Runter"
+14		"&Höher"
+15		"&Tiefer"
 16		"&OK"
 17		"&Abbrechen"
 END
