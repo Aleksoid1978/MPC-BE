@@ -149,7 +149,7 @@ protected:
 		int                                profile              = -1;
 		int                                pix_fmt              = -1;
 
-		int                                interlaced           = 0;
+		int                                interlaced           = -1; // 0 - Progressive, 1 - Interlaced TFF, 2 - Interlaced BFF
 
 		void Clear() {
 			SAFE_DELETE(masterDataHDR);
@@ -158,7 +158,7 @@ protected:
 			profile = -1;
 			pix_fmt = -1;
 
-			interlaced      = 0;
+			interlaced = -1;
 		}
 
 	} m_FilterInfo;

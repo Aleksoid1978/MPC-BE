@@ -2569,15 +2569,25 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 
 			switch (m_nDeinterlacing) {
 				case AUTO :
-					if (!m_pFrame->interlaced_frame && !m_FilterInfo.interlaced) {
-						props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
-					}
-					if ((m_pFrame->top_field_first && m_FilterInfo.interlaced != 2)
-							|| m_FilterInfo.interlaced == 1) {
-						props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_FIELD1FIRST;
-					}
-					if (m_pFrame->repeat_pict) {
-						props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_REPEAT_FIELD;
+					if (m_FilterInfo.interlaced != -1) {
+						switch (m_FilterInfo.interlaced) {
+							case 0 :
+								props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
+								break;
+							case 1 :
+								props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_FIELD1FIRST;
+								break;
+						}
+					} else {
+						if (!m_pFrame->interlaced_frame) {
+							props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
+						}
+						if (m_pFrame->top_field_first) {
+							props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_FIELD1FIRST;
+						}
+						if (m_pFrame->repeat_pict) {
+							props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_REPEAT_FIELD;
+						}
 					}
 					break;
 				case PROGRESSIVE :

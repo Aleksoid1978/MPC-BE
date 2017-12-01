@@ -938,11 +938,13 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 
 						if (AP4_DataInfoAtom* fiel = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_FIEL))) {
-							const AP4_DataBuffer* ares_di = fiel->GetData();
-							if (ares_di->GetDataSize() >= 2) {
-								const BYTE fields = ares_di->GetData()[0];
-								const BYTE detail = ares_di->GetData()[1];
-								if (fields == 0x02) {
+							const AP4_DataBuffer* fiel_data = fiel->GetData();
+							if (fiel_data->GetDataSize() >= 2) {
+								const BYTE fields = fiel_data->GetData()[0];
+								const BYTE detail = fiel_data->GetData()[1];
+								if (fields == 0x01) {
+									m_interlaced = 0;
+								} else if (fields == 0x02) {
 									m_interlaced = (detail == 1 || detail == 9) ? 1 : 2;
 								}
 							}
@@ -1127,9 +1129,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 													AP4_UI16 width = vse->GetWidth();
 
 													if (AP4_DataInfoAtom* ares = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_ARES))) {
-														const AP4_DataBuffer* ares_di = ares->GetData();
-														if (ares_di->GetDataSize() > 11) {
-															const WORD cid = _byteswap_ushort(GETWORD(ares_di->GetData() + 10));
+														const AP4_DataBuffer* ares_data = ares->GetData();
+														if (ares_data->GetDataSize() > 11) {
+															const WORD cid = _byteswap_ushort(GETWORD(ares_data->GetData() + 10));
 															if (cid == 0xd4d || cid == 0xd4e) {
 																width = 1440;
 															}
