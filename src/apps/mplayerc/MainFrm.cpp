@@ -259,6 +259,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_MESSAGE(WM_XBUTTONUP, OnXButtonUp)
 	ON_MESSAGE(WM_XBUTTONDBLCLK, OnXButtonDblClk)
 	ON_WM_MOUSEWHEEL()
+	ON_WM_MOUSEHWHEEL()
 	ON_WM_MOUSEMOVE()
 
 	ON_WM_NCHITTEST()
@@ -3612,6 +3613,14 @@ BOOL CMainFrame::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
 		FALSE;
 
 	return fRet;
+}
+
+void CMainFrame::OnMouseHWheel(UINT nFlags, short zDelta, CPoint pt)
+{
+	if (zDelta) {
+		ScreenToClient(&pt);
+		OnButton((zDelta < 0) ? wmcmd::WLEFT : wmcmd::WRIGHT, nFlags, pt);
+	}
 }
 
 void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)

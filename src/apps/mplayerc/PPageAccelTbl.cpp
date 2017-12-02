@@ -577,6 +577,8 @@ CString CPPageAccelTbl::MakeMouseButtonLabel(UINT mouse)
 		case wmcmd::X2DBLCLK: ret = L"X2 DblClk";     break;
 		case wmcmd::WUP:      ret = L"Wheel Up";      break;
 		case wmcmd::WDOWN:    ret = L"Wheel Down";    break;
+		case wmcmd::WLEFT:    ret = L"Wheel Left";    break;
+		case wmcmd::WRIGHT:   ret = L"Wheel Right";   break;
 	}
 	return ret;
 }
