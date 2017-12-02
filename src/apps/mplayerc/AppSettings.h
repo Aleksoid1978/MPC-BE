@@ -300,6 +300,8 @@ public:
 		X2DBLCLK,
 		WUP,
 		WDOWN,
+		WLEFT,
+		WRIGHT,
 		LAST
 	};
 	UINT mouse;
