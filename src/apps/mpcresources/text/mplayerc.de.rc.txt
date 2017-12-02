@@ -131,7 +131,7 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 END
 
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
-3		"Pan&&Scan Profile"
+3		"Pan&Scan-Profil bearbeiten"
 12		"&Neu"
 13		"&Löschen"
 14		"&Höher"
