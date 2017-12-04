@@ -275,7 +275,7 @@ Type: files; Name: {app}\{#msdk_dll}
 ;Root: "HKCU"; Subkey: "Software\{#app_name}\ShellExt"; ValueType: string; ValueName: "MpcPath"; ValueData: "{app}\{#mpcbe_exe}"; Flags: uninsdeletekey; Components: mpcbeshellext
 
 [Code]
-#if defined(sse_required) || defined(sse2_required)
+#if defined(sse2_required)
 function IsProcessorFeaturePresent(Feature: Integer): Boolean;
 external 'IsProcessorFeaturePresent@kernel32.dll stdcall';
 #endif
@@ -391,21 +391,12 @@ begin
     Result := False;
 end;
 
-#if defined(sse_required)
-function Is_SSE_Supported(): Boolean;
-begin
-  // PF_XMMI_INSTRUCTIONS_AVAILABLE
-  Result := IsProcessorFeaturePresent(6);
-end;
-
-#elif defined(sse2_required)
-
+#if defined(sse2_required)
 function Is_SSE2_Supported(): Boolean;
 begin
   // PF_XMMI64_INSTRUCTIONS_AVAILABLE
   Result := IsProcessorFeaturePresent(10);
 end;
-
 #endif
 
 function IsUpgrade(): Boolean;
@@ -457,6 +448,7 @@ end;
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   sLanguage: String;
+  sRegParams: String;
   resCode: integer;
 begin
   if CurStep = ssPostInstall then begin
@@ -475,14 +467,15 @@ begin
     else
       RegWriteStringValue(HKCU, 'Software\{#app_name}\Settings', 'Language', sLanguage);
 
-    if IsComponentSelected('mpcberegvid') then
-      Exec(ExpandConstant('{app}\{#mpcbe_exe}'), ' /regvid', ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, resCode);
-
-    if IsComponentSelected('mpcberegaud') then
-      Exec(ExpandConstant('{app}\{#mpcbe_exe}'), ' /regaud', ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, resCode);
-
-    if IsComponentSelected('mpcberegpl') then
-      Exec(ExpandConstant('{app}\{#mpcbe_exe}'), ' /regpl', ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, resCode);
+    if IsComponentSelected('mpcberegvid') or IsComponentSelected('mpcberegaud') or IsComponentSelected('mpcberegpl') then begin
+      if IsComponentSelected('mpcberegvid') then
+        sRegParams := sRegParams + ' /regvid';
+      if IsComponentSelected('mpcberegaud') then 
+        sRegParams := sRegParams + ' /regaud';
+      if IsComponentSelected('mpcberegpl') then
+        sRegParams := sRegParams + ' /regpl';
+      Exec(ExpandConstant('{app}\{#mpcbe_exe}'), sRegParams, ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, resCode);
+    end;
 
     if IsComponentSelected('intel_msdk') then
       Unzip(ExpandConstant('{tmp}\{#msdk_dll_zip}'), ExpandConstant('{app}'));
@@ -534,11 +527,6 @@ begin
 #if defined(sse2_required)
     if not Is_SSE2_Supported() then begin
       SuppressibleMsgBox(CustomMessage('msg_simd_sse2'), mbCriticalError, MB_OK, MB_OK);
-      Result := False;
-    end;
-#elif defined(sse_required)
-    if not Is_SSE_Supported() then begin
-      SuppressibleMsgBox(CustomMessage('msg_simd_sse'), mbCriticalError, MB_OK, MB_OK);
       Result := False;
     end;
 #endif
