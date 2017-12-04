@@ -2453,6 +2453,10 @@ void File_Mk::Segment_Cluster_BlockGroup_Block()
 void File_Mk::Segment_Cluster_BlockGroup_Block_Lace()
 {
     stream& streamItem=Stream[TrackNumber];
+    // ==> Start patch MPC
+    if (!streamItem.Parser)
+        return;
+    // ==> End patch MPC
 
     //Content compression
     if (streamItem.ContentCompAlgo!=(int32u)-1 && streamItem.ContentCompAlgo!=3)
