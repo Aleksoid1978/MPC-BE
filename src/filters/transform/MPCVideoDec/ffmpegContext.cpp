@@ -27,6 +27,8 @@
 #include "../../../DSUtil/FileVersion.h"
 #include "ffmpegContext.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4005)
 extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
 // This is kind of an hack but it avoids using a C++ keyword as a struct member name
@@ -36,6 +38,7 @@ extern "C" {
 	#include <ffmpeg/libavcodec/ffv1.h>
 #undef class
 }
+#pragma warning(pop)
 
 static const WORD PCID_ATI_UVD [] = {
 	0x94C7, // ATI Radeon HD 2350

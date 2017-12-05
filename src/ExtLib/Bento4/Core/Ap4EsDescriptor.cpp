@@ -133,7 +133,7 @@ AP4_EsDescriptor::WriteFields(AP4_ByteStream& stream)
         if (AP4_FAILED(result)) return result;
     }
     if (m_Flags & AP4_ES_DESCRIPTOR_FLAG_URL) {
-        result = stream.WriteUI08(m_Url.length());
+        result = stream.WriteUI08((AP4_UI08)m_Url.length());
         if (AP4_FAILED(result)) return result;
         result = stream.WriteString(m_Url.c_str());
         if (AP4_FAILED(result)) return result;

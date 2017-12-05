@@ -406,7 +406,7 @@ HRESULT CFLACStream::GetMediaType(int iPosition, CMediaType* pmt)
 		wfe->nAvgBytesPerSec	= m_nAvgBytesPerSec;
 		wfe->nBlockAlign		= 1;
 		wfe->wBitsPerSample		= m_wBitsPerSample;
-		wfe->cbSize				= m_extradata.GetCount();
+		wfe->cbSize				= (WORD)m_extradata.GetCount();
 		memcpy(wfe + 1, m_extradata.GetData(), m_extradata.GetCount());
 	} else {
 		return VFW_S_NO_MORE_ITEMS;

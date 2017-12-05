@@ -74,7 +74,7 @@ void CFloatEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		GetWindowTextW(s);
 		float f = 0;
 		wchar_t ch;
-		if (swscanf_s(s, L"%f%c", &f, &ch) != 1 && s != "-") {
+		if (swscanf_s(s, L"%f%c", &f, &ch, 1) != 1 && s != "-") {
 			SetWindowTextW(str);
 			SetSel(nStartChar, nEndChar);
 		};
@@ -102,7 +102,7 @@ LRESULT CFloatEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 		GetWindowTextW(s);
 		float f = 0;
 		wchar_t ch;
-		if (swscanf_s(s, L"%f%c", &f, &ch) != 1) {
+		if (swscanf_s(s, L"%f%c", &f, &ch, 1) != 1) {
 			SetWindowTextW(str);
 			SetSel(nStartChar, nEndChar);
 		};
@@ -172,7 +172,7 @@ void CIntEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		GetWindowTextW(s);
 		int d = 0;
 		wchar_t ch;
-		if (swscanf_s(s, L"%d%c", &d, &ch) != 1 && s != "-") {
+		if (swscanf_s(s, L"%d%c", &d, &ch, 1) != 1 && s != "-") {
 			SetWindowTextW(str);
 			SetSel(nStartChar, nEndChar);
 		};
@@ -200,7 +200,7 @@ LRESULT CIntEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 		GetWindowTextW(s);
 		int d = 0;
 		wchar_t ch;
-		if (swscanf_s(s, L"%d%c", &d, &ch) != 1) {
+		if (swscanf_s(s, L"%d%c", &d, &ch, 1) != 1) {
 			SetWindowTextW(str);
 			SetSel(nStartChar, nEndChar);
 		};
@@ -277,7 +277,7 @@ void CHexEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		GetWindowTextW(s);
 		DWORD x = 0;
 		wchar_t ch;
-		if (swscanf_s(s, L"%x%c", &x, &ch) != 1) {
+		if (swscanf_s(s, L"%x%c", &x, &ch, 1) != 1) {
 			SetWindowTextW(str);
 			SetSel(nStartChar, nEndChar);
 		};
@@ -305,7 +305,7 @@ LRESULT CHexEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 		GetWindowTextW(s);
 		DWORD x = 0;
 		wchar_t ch;
-		if (swscanf_s(s, L"%x%c", &x, &ch) != 1) {
+		if (swscanf_s(s, L"%x%c", &x, &ch, 1) != 1) {
 			SetWindowTextW(str);
 			SetSel(nStartChar, nEndChar);
 		};
