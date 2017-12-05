@@ -39,6 +39,8 @@ enum MPEG_TYPES {
 
 class CMpegSplitterFile : public CBaseSplitterFileEx
 {
+	std::map<WORD, BYTE> m_pid2pes;
+
 	std::map<DWORD, seqhdr> seqh;
 	std::map<DWORD, CAtlArray<BYTE>> avch;
 	std::map<DWORD, CAtlArray<BYTE>> hevch;
