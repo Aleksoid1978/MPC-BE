@@ -828,6 +828,17 @@ static const struct {
 
 DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len, BOOL bAddStream/* = TRUE*/)
 {
+	if (pid) {
+		if (pesid) {
+			m_pid2pes[pid] = pesid;
+		} else {
+			const auto& it = m_pid2pes.find(pid);
+			if (it != m_pid2pes.end()) {
+				pesid = it->second;
+			}
+		}
+	}
+
 	stream s;
 	s.pid   = pid;
 	s.pesid = pesid;
