@@ -1371,12 +1371,12 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CAtlArray<BYTE>& pData, CMedi
 		NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
 		CH264Nalu Nalu;
 		Nalu.SetBuffer(pTmpData.GetData(), pTmpData.GetCount());
-		while (!(nalu_type == NALU_TYPE_SPS || nalu_type == NALU_TYPE_SUBSET_SPS)
+		while (!IS_SPS(nalu_type)
 				&& Nalu.ReadNext()) {
 			nalu_type = Nalu.GetType();
 		}
 
-		if (nalu_type != NALU_TYPE_SPS && nalu_type != NALU_TYPE_SUBSET_SPS) {
+		if (!IS_SPS(nalu_type)) {
 			return false;
 		}
 
