@@ -2925,7 +2925,7 @@ HRESULT CreateAVCfromH264(CMediaType* mt)
 	while (Nalu.ReadNext()) {
 		if (Nalu.GetType() == NALU_TYPE_SPS || Nalu.GetType() == NALU_TYPE_PPS) {
 			size_t nalLength = Nalu.GetDataLength();
-			*(dst + dstSize++) = nalLength >> 8;
+			*(dst + dstSize++) = (BYTE)(nalLength >> 8);
 			*(dst + dstSize++) = nalLength & 0xff;
 
 			memcpy(dst + dstSize, Nalu.GetDataBuffer(), Nalu.GetDataLength());

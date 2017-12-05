@@ -1656,7 +1656,7 @@ bool CBaseSplitterFileEx::Read(opus_ts_hdr& h, int len, CAtlArray<BYTE>& extrada
 		wfe->wBitsPerSample  = 16;
 		wfe->nBlockAlign     = 1;
 		wfe->nAvgBytesPerSec = 0;
-		wfe->cbSize          = nCount;
+		wfe->cbSize          = (WORD)nCount;
 		memcpy((BYTE*)(wfe + 1), buf, nCount);
 	}
 
