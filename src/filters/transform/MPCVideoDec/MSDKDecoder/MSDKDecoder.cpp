@@ -21,13 +21,14 @@
 
 #include "stdafx.h"
 
-#pragma warning(disable: 4005 4244)
+#pragma warning(push)
+#pragma warning(disable: 4005)
 extern "C" {
   #include <ffmpeg/libavcodec/avcodec.h>
   #include <ffmpeg/libavutil/imgutils.h>
   #include <ffmpeg/libavutil/intreadwrite.h>
 }
-#pragma warning(default: 4005 4244)
+#pragma warning(pop)
 
 #include "MSDKDecoder.h"
 #include <moreuuids.h>

@@ -22,6 +22,7 @@
 #include "AudioHelper.h"
 #include "Mixer.h"
 
+#pragma warning(push)
 #pragma warning(disable: 4005)
 extern "C" {
 	#include "ffmpeg/libswresample/swresample.h"
@@ -29,7 +30,7 @@ extern "C" {
 	#include "ffmpeg/libavutil/samplefmt.h"
 	#include "ffmpeg/libavutil/opt.h"
 }
-#pragma warning(default: 4005)
+#pragma warning(pop)
 
 CMixer::CMixer()
 	: m_pSWRCxt(nullptr)
