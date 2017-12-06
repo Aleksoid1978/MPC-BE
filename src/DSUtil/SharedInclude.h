@@ -20,10 +20,8 @@
 
 #pragma once
 
-#pragma warning(disable:4244)
-#pragma warning(disable:4995)
 #ifdef _WIN64
-	#pragma warning(disable:4267)
+	#pragma warning(disable:4267) // hide warning C4267: conversion from 'size_t' to 'type', possible loss of data
 #endif
 
 #ifdef _DEBUG

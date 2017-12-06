@@ -1473,7 +1473,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	ShaderMacros[i++] = { "QUANTIZATION", m_DisplayFmt == D3DFMT_A2R10G10B10 ? "1023.0" : "255.0" }; // 10-bit or 8-bit
 	ShaderMacros[i++] = { "LUT3D_ENABLED", bColorManagement ? "1" : "0" };
 	static char lut3DSizeStr[8];
-	sprintf(lut3DSizeStr, "%u", m_Lut3DSize);
+	sprintf_s(lut3DSizeStr, "%u", m_Lut3DSize);
 	ShaderMacros[i++] = { "LUT3D_SIZE", lut3DSizeStr };
 	ShaderMacros[i++] = { "DITHER_ENABLED", bDither ? "1" : "0" };
 

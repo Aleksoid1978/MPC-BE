@@ -20,12 +20,13 @@
 #include "stdafx.h"
 #include "AnnexBConverter.h"
 
-#pragma warning(disable: 4005 4244)
+#pragma warning(push)
+#pragma warning(disable: 4005)
 extern "C" {
 	#include <ffmpeg/libavutil/intreadwrite.h>
 	#include <ffmpeg/libavutil/mem.h>
 }
-#pragma warning(default: 4005 4244)
+#pragma warning(pop)
 
 CAnnexBConverter::CAnnexBConverter(void)
 {

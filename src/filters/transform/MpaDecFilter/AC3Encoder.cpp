@@ -21,11 +21,12 @@
 #include "stdafx.h"
 #include "AC3Encoder.h"
 
-#pragma warning(disable: 4005 4244)
+#pragma warning(push)
+#pragma warning(disable: 4005)
 extern "C" {
 #include "ffmpeg/libavcodec/avcodec.h"
 }
-#pragma warning(default: 4005 4244)
+#pragma warning(pop)
 
 #include "../../../DSUtil/ff_log.h"
 
