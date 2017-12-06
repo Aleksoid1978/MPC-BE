@@ -37,8 +37,6 @@
 #include <vd2/Kasumi/pixmapops.h>
 #include "vd2/Kasumi/resample.h"
 
-#pragma warning(disable : 4799) // no emms... blahblahblah
-
 void VDCPUTest() {
 	SYSTEM_INFO si;
 

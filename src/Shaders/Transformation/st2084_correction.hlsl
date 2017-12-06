@@ -14,7 +14,7 @@ sampler image : register(s0);
 #include "hdr_tone_mapping.hlsl"
 #include "colorspace_gamut_conversion.hlsl"
 
-#pragma warning( disable : 3571) // fix warning X3571 in pow().
+#pragma warning(disable: 3571) // fix warning X3571 in pow().
 
 float4 main(float2 tex : TEXCOORD0) : COLOR
 {

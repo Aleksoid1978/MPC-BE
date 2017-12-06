@@ -112,6 +112,8 @@ HRESULT CFormatConverter::ConvertToAYUV(const uint8_t* const src[4], const ptrdi
     out += dstStride[0];
   }
 
+#undef YUV444_PACK_AYUV
+
   av_freep(&pTmpBuffer);
 
   return S_OK;
