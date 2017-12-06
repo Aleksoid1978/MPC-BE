@@ -280,7 +280,7 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 	if (HWND hWnd = ::FindWindow(MPC_WND_CLASS_NAME, NULL)) {
 		COPYDATASTRUCT cds;
 		cds.dwData = 0x6ABE51;
-		cds.cbData = bufflen;
+		cds.cbData = (DWORD)bufflen;
 		cds.lpData = (void*)(BYTE*)buff;
 		SendMessage(hWnd, WM_COPYDATA, NULL, (LPARAM)&cds);
 	} else {
@@ -333,7 +333,7 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 				if (hWnd && (wait_count < 200)) {
 					COPYDATASTRUCT cds;
 					cds.dwData = 0x6ABE51;
-					cds.cbData = bufflen;
+					cds.cbData = (DWORD)bufflen;
 					cds.lpData = (void*)(BYTE*)buff;
 					SendMessage(hWnd, WM_COPYDATA, NULL, (LPARAM)&cds);
 				} 
