@@ -1748,6 +1748,14 @@ redo:
 
 	m_nCodecNb = nNewCodec;
 
+	if (bChangeType) {
+		ExtractAvgTimePerFrame(pmt, m_rtAvrTimePerFrame);
+		int wout, hout;
+		ExtractDim(pmt, wout, hout, m_nARX, m_nARY);
+		UNREFERENCED_PARAMETER(wout);
+		UNREFERENCED_PARAMETER(hout);
+	}
+
 	m_bMVC_Output_TopBottom = FALSE;
 	if (pmt->subtype == MEDIASUBTYPE_AMVC || pmt->subtype == MEDIASUBTYPE_MVC1) {
 		if (!m_pMSDKDecoder) {
@@ -1864,14 +1872,6 @@ redo:
 	}
 
 	AllocExtradata(m_pAVCtx, pmt);
-
-	if (bChangeType) {
-		ExtractAvgTimePerFrame(&m_pInput->CurrentMediaType(), m_rtAvrTimePerFrame);
-		int wout, hout;
-		ExtractDim(&m_pInput->CurrentMediaType(), wout, hout, m_nARX, m_nARY);
-		UNREFERENCED_PARAMETER(wout);
-		UNREFERENCED_PARAMETER(hout);
-	}
 
 	avcodec_lock;
 	const int ret = avcodec_open2(m_pAVCtx, m_pAVCodec, nullptr);
