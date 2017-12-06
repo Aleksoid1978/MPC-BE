@@ -88,7 +88,9 @@ public:
 		BDVM_ChannelLayout m_ChannelLayout = BDVM_ChannelLayout_Unknown;
 		BDVM_SampleRate    m_SampleRate    = BDVM_SampleRate_Unknown;
 	};
-	typedef CAtlArray<Stream> Streams;
+	typedef std::vector<Stream> Streams;
+
+	typedef std::vector<SyncPoint> SyncPoints;
 
 	struct PlaylistItem {
 		PlaylistItem() {}
@@ -97,21 +99,21 @@ public:
 			*this = pi;
 		}
 
-		CString              m_strFileName;
+		CString           m_strFileName;
 
-		REFERENCE_TIME       m_rtIn        = 0;
-		REFERENCE_TIME       m_rtOut       = 0;
-		REFERENCE_TIME       m_rtStartTime = 0;
+		REFERENCE_TIME    m_rtIn        = 0;
+		REFERENCE_TIME    m_rtOut       = 0;
+		REFERENCE_TIME    m_rtStartTime = 0;
 
-		__int64              m_SizeIn      = 0;
-		__int64              m_SizeOut     = 0;
+		__int64           m_SizeIn      = 0;
+		__int64           m_SizeOut     = 0;
 
-		BYTE                 m_num_video   = 0;
+		BYTE              m_num_video   = 0;
 
-		std::vector<BYTE>    m_pg_offset_sequence_id;
-		std::vector<BYTE>    m_ig_offset_sequence_id;
+		std::vector<BYTE> m_pg_offset_sequence_id;
+		std::vector<BYTE> m_ig_offset_sequence_id;
 
-		CAtlArray<SyncPoint> m_sps;
+		SyncPoints m_sps;
 
 		REFERENCE_TIME Duration() const {
 			return m_rtOut - m_rtIn;
@@ -137,7 +139,7 @@ public:
 			m_pg_offset_sequence_id = pi.m_pg_offset_sequence_id;
 			m_ig_offset_sequence_id = pi.m_ig_offset_sequence_id;
 
-			m_sps.Copy(pi.m_sps);
+			m_sps = pi.m_sps;
 
 			return *this;
 		}
@@ -157,19 +159,19 @@ public:
 		REFERENCE_TIME   m_rtDuration  = 0;
 	};
 
-	typedef CAutoPtrList<PlaylistItem> CPlaylist;
-	typedef CAtlList<PlaylistChapter>  CPlaylistChapter;
+	typedef std::vector<PlaylistItem> CPlaylist;
+	typedef std::vector<PlaylistChapter> CPlaylistChapter;
 
 	CHdmvClipInfo();
 	~CHdmvClipInfo();
 
-	HRESULT ReadInfo(LPCTSTR strFile, CAtlArray<SyncPoint>* sps = nullptr);
-	bool    IsHdmv() const { return !m_Streams.IsEmpty(); }
+	HRESULT ReadInfo(LPCTSTR strFile, SyncPoints* sps = nullptr);
+	bool    IsHdmv() const { return !m_Streams.empty(); }
 
 	Stream*  FindStream(SHORT wPID);
-	Streams& GetStreams() { return !stn.m_Streams.IsEmpty() ? stn.m_Streams : m_Streams; }
+	Streams& GetStreams() { return !stn.m_Streams.empty() ? stn.m_Streams : m_Streams; }
 
-	HRESULT FindMainMovie(LPCTSTR strFolder, CString& strPlaylistFile, CPlaylist& MainPlaylist, CPlaylist& MPLSPlaylists);
+	HRESULT FindMainMovie(LPCTSTR strFolder, CString& strPlaylistFile, CPlaylist& MainPlaylist, CPlaylist& Playlists);
 	HRESULT ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtDuration, CPlaylist& Playlist, BOOL bReadMVCExtension = FALSE, BOOL bFullInfoRead = FALSE, BYTE* MVC_Base_View_R_flag = nullptr);
 	HRESULT ReadChapters(CString strPlaylistFile, CPlaylist& PlaylistItems, CPlaylistChapter& Chapters);
 
@@ -205,7 +207,7 @@ private :
 
 	HRESULT ReadLang(Stream& s);
 	HRESULT ReadProgramInfo();
-	HRESULT ReadCpiInfo(CAtlArray<SyncPoint>* sps);
+	HRESULT ReadCpiInfo(SyncPoints& sps);
 	HRESULT CloseFile(HRESULT hr);
 
 	HRESULT ReadStreamInfo();

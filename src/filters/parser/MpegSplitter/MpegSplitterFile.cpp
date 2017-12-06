@@ -150,9 +150,8 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	}
 
 	if (m_ClipInfo.IsHdmv()) {
-		CHdmvClipInfo::Streams& streams = m_ClipInfo.GetStreams();
-		for (size_t i = 0; i < streams.GetCount(); i++) {
-			CHdmvClipInfo::Stream& stream = streams[i];
+		const auto& streams = m_ClipInfo.GetStreams();
+		for (const auto& stream : streams) {
 			if (stream.m_Type == PRESENTATION_GRAPHICS_STREAM) {
 				AddHdmvPGStream(stream.m_PID, stream.m_LanguageCode);
 			}

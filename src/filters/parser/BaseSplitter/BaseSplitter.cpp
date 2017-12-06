@@ -500,11 +500,9 @@ STDMETHODIMP CBaseSplitterFilter::Load(LPCOLESTR pszFileName, const AM_MEDIA_TYP
 	SortOutputPin();
 
 	if (BuildChapters(pszFileName, m_Items, Chapters)) {
-		POSITION pos = Chapters.GetHeadPosition();
 		int i = 1;
-		while (pos) {
+		for (const auto& chap : Chapters) {
 			CString str;
-			CHdmvClipInfo::PlaylistChapter& chap = Chapters.GetNext(pos);
 			if (chap.m_nMarkType == CHdmvClipInfo::EntryMark) {
 				str.Format (L"Chapter %d", i);
 				ChapAppend (chap.m_rtTimestamp, str);

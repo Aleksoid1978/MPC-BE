@@ -1053,20 +1053,18 @@ CString CMpegSplitterFilter::FormatStreamName(CMpegSplitterFile::stream& s, CMpe
 
 __int64 CMpegSplitterFilter::SeekBD(REFERENCE_TIME rt)
 {
-	if (m_Items.GetCount()) {
-		POSITION pos = m_Items.GetHeadPosition();
-		while (pos) {
-			CHdmvClipInfo::PlaylistItem* Item = m_Items.GetNext(pos);
-			if (Item->m_sps.GetCount()
-					&& rt >= Item->m_rtStartTime && rt <= (Item->m_rtStartTime + Item->Duration())) {
-				REFERENCE_TIME _rt = rt - Item->m_rtStartTime + Item->m_rtIn;
-				for (size_t idx = 0; idx < Item->m_sps.GetCount() - 1; idx++) {
-					if (_rt < Item->m_sps[idx].rt) {
+	if (!m_Items.empty()) {
+		for (const auto& Item : m_Items) {
+			if (Item.m_sps.size()
+					&& rt >= Item.m_rtStartTime && rt <= (Item.m_rtStartTime + Item.Duration())) {
+				REFERENCE_TIME _rt = rt - Item.m_rtStartTime + Item.m_rtIn;
+				for (size_t idx = 0; idx < Item.m_sps.size() - 1; idx++) {
+					if (_rt < Item.m_sps[idx].rt) {
 						if (idx > 0) {
 							idx--;
 						}
 
-						return Item->m_sps[idx].fp + Item->m_SizeIn;
+						return Item.m_sps[idx].fp + Item.m_SizeIn;
 					}
 				}
 			}
@@ -1296,11 +1294,11 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_rtNewStop = m_rtStop = m_rtDuration;
 
-	if (m_bUseMVCExtension && !m_Items.IsEmpty()) {
+	if (m_bUseMVCExtension && !m_Items.empty()) {
 		SetProperty(L"STEREOSCOPIC3DMODE", m_MVC_Base_View_R_flag ? L"mvc_rl" : L"mvc_lr");
 
 		// PG offsets
-		const CHdmvClipInfo::PlaylistItem* Item = m_Items.GetHead();
+		const auto& Item = m_Items.begin();
 		if (Item->m_pg_offset_sequence_id.size()) {
 			std::list<BYTE> pg_offsets;
 			for (auto it = Item->m_pg_offset_sequence_id.begin(); it != Item->m_pg_offset_sequence_id.end(); it++) {
@@ -1393,16 +1391,15 @@ bool CMpegSplitterFilter::DemuxInit()
 			}
 		}
 
-		if (m_Items.GetCount()) {
+		if (!m_Items.empty()) {
 			if (m_bUseMVCExtension) {
-				POSITION pos = m_Items.GetHeadPosition();
-				while (pos) {
-					CHdmvClipInfo::PlaylistItem* Item = m_Items.GetNext(pos);
-					Item->m_sps.RemoveAll();
+
+				for (auto& Item : m_Items) {
+					Item.m_sps.clear();
 				}
 			} else {
 				if (m_pSyncReader) {
-					m_Items.RemoveAll();
+					m_Items.clear();
 					BuildPlaylist(m_fn, m_Items, FALSE);
 					m_pSyncReader->ReOpen(m_Items);
 					m_pSyncReader->SetPTSOffset(&m_pFile->m_rtPTSOffset);
@@ -1593,13 +1590,12 @@ bool CMpegSplitterFilter::BuildPlaylist(LPCTSTR pszFileName, CHdmvClipInfo::CPla
 	m_rtPlaylistDuration = 0;
 
 	const bool res = SUCCEEDED(m_ClipInfo.ReadPlaylist(pszFileName, m_rtPlaylistDuration, Items, bReadMVCExtension, TRUE, &m_MVC_Base_View_R_flag));
-	if (res) {
-		m_rtMin = Items.GetHead()->m_rtIn;
+	if (res && !Items.empty()) {
+		m_rtMin = Items.begin()->m_rtIn;
 		REFERENCE_TIME rtDur = 0;
 
-		POSITION pos = Items.GetHeadPosition();
-		while (pos) {
-			rtDur += Items.GetNext(pos)->Duration();
+		for (const auto& Item : Items) {
+			rtDur += Item.Duration();
 		}
 
 		m_rtMax = m_rtMin + rtDur;

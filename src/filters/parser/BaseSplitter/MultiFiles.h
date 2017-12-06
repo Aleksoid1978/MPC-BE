@@ -28,14 +28,14 @@ class CMultiFiles : public CObject
 	DECLARE_DYNAMIC(CMultiFiles)
 
 protected:
-	CAtlArray<CString>        m_strFiles;
-	CAtlArray<LONGLONG>       m_FilesSize;
-	CAtlArray<REFERENCE_TIME> m_rtPtsOffsets;
+	std::vector<CString>        m_strFiles;
+	std::vector<LONGLONG>       m_FilesSize;
+	std::vector<REFERENCE_TIME> m_rtPtsOffsets;
 
-	LONGLONG                  m_llTotalLength     = 0;
-	HANDLE                    m_hFile             = INVALID_HANDLE_VALUE;
-	size_t                    m_nCurPart          = SIZE_T_MAX;
-	REFERENCE_TIME*           m_pCurrentPTSOffset = nullptr;
+	LONGLONG                    m_llTotalLength     = 0;
+	HANDLE                      m_hFile             = INVALID_HANDLE_VALUE;
+	size_t                      m_nCurPart          = SIZE_T_MAX;
+	REFERENCE_TIME*             m_pCurrentPTSOffset = nullptr;
 
 private:
 	BOOL     OpenPart(size_t nPart);
