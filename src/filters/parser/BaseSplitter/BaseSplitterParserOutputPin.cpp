@@ -502,7 +502,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 			CH264Packet* pPacket = m_pl.GetAt(pos);
 			const BYTE* pData = pPacket->GetData();
 
-			BYTE nut = pData[4] & 0x1f;
+			BYTE nut = pData[3 + bConvertToAVCC] & 0x1f;
 			if (nut == NALU_TYPE_AUD) {
 				m_bHasAccessUnitDelimiters = true;
 			}
