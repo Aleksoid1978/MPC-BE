@@ -4134,7 +4134,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	m_lastOMD.Attach(pOMD.Detach());
 
 	if (m_bIsBDPlay == FALSE) {
-		m_MPLSPlaylist.RemoveAll();
+		m_BDPlaylists.clear();
 		m_LastOpenBDPath.Empty();
 	}
 
@@ -9514,17 +9514,15 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 	if (GetPlaybackMode() == PM_FILE) {
 		UINT id = nID - ID_NAVIGATE_CHAP_SUBITEM_START;
 
-		if (m_MPLSPlaylist.GetCount() > 1 && id < m_MPLSPlaylist.GetCount()) {
-			POSITION pos = m_MPLSPlaylist.GetHeadPosition();
+		if (m_BDPlaylists.size() > 1 && id < m_BDPlaylists.size()) {
 			UINT idx = 0;
-			while (pos) {
-				CHdmvClipInfo::PlaylistItem* Item = m_MPLSPlaylist.GetNext(pos);
+			for (const auto& Item : m_BDPlaylists) {
 				if (idx == id) {
 					m_bNeedUnmountImage = FALSE;
 					SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 					m_bIsBDPlay = TRUE;
 
-					OpenFile(Item->m_strFileName, INVALID_TIME, FALSE);
+					OpenFile(Item.m_strFileName, INVALID_TIME, FALSE);
 
 					return;
 				}
@@ -9532,8 +9530,8 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 			}
 		}
 
-		if (m_MPLSPlaylist.GetCount() > 1) {
-			id -= m_MPLSPlaylist.GetCount();
+		if (m_BDPlaylists.size() > 1) {
+			id -= m_BDPlaylists.size();
 		}
 
 		if (m_youtubeUrllist.size() > 1 && id < m_youtubeUrllist.size()) {
@@ -13652,8 +13650,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 					CHdmvClipInfo ClipInfo;
 					CHdmvClipInfo::CPlaylist CurPlaylist;
 					REFERENCE_TIME rtDuration;
-					if (SUCCEEDED(ClipInfo.ReadPlaylist(mi_fn, rtDuration, CurPlaylist))) {
-						mi_fn = CurPlaylist.GetHead()->m_strFileName;
+					if (SUCCEEDED(ClipInfo.ReadPlaylist(mi_fn, rtDuration, CurPlaylist)) && !CurPlaylist.empty()) {
+						mi_fn = CurPlaylist.begin()->m_strFileName;
 					}
 				} else if (ext == L".IFO") {
 					// DVD structure
@@ -14973,10 +14971,9 @@ void CMainFrame::SetupNavChaptersSubMenu()
 	UINT id = ID_NAVIGATE_CHAP_SUBITEM_START;
 
 	if (GetPlaybackMode() == PM_FILE) {
-		if (m_MPLSPlaylist.GetCount() > 1) {
+		if (m_BDPlaylists.size() > 1) {
 			DWORD idx = 1;
-			POSITION pos = m_MPLSPlaylist.GetHeadPosition();
-			while (pos) {
+			for (const auto& Item : m_BDPlaylists) {
 				UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 				if (idx == MENUBARBREAK) {
 					flags |= MF_MENUBARBREAK;
@@ -14984,9 +14981,8 @@ void CMainFrame::SetupNavChaptersSubMenu()
 				}
 				idx++;
 
-				CHdmvClipInfo::PlaylistItem* Item = m_MPLSPlaylist.GetNext(pos);
-				CString time = L"[" + ReftimeToString2(Item->Duration()) + L"]";
-				CString name = StripPath(Item->m_strFileName);
+				CString time = L"[" + ReftimeToString2(Item.Duration()) + L"]";
+				CString name = StripPath(Item.m_strFileName);
 
 				if (name == GetFileOnly(m_strPlaybackRenderedPath)) {
 					flags |= MF_CHECKED | MFT_RADIOCHECK;
@@ -15042,7 +15038,7 @@ void CMainFrame::SetupNavChaptersSubMenu()
 
 				if (id != ID_NAVIGATE_CHAP_SUBITEM_START && i == 0) {
 					//pSub->AppendMenu(MF_SEPARATOR | MF_ENABLED);
-					if (m_MPLSPlaylist.GetCount() > 1 || m_youtubeUrllist.size() > 1) {
+					if (m_BDPlaylists.size() > 1 || m_youtubeUrllist.size() > 1) {
 						flags |= MF_MENUBARBREAK;
 					}
 				}
@@ -18337,7 +18333,7 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/,
 		CString			strPlaylistFile;
 		CHdmvClipInfo::CPlaylist MainPlaylist;
 
-		if (SUCCEEDED(ClipInfo.FindMainMovie(path, strPlaylistFile, MainPlaylist, m_MPLSPlaylist))) {
+		if (SUCCEEDED(ClipInfo.FindMainMovie(path, strPlaylistFile, MainPlaylist, m_BDPlaylists))) {
 			if (path.Right(5).MakeUpper() == L"\\BDMV") {
 				path.Truncate(path.GetLength() - 5);
 				CString infFile = path + L"\\disc.inf";

@@ -95,5 +95,5 @@ public:
 	// IFileHandle
 	STDMETHODIMP_(HANDLE) GetFileHandle() { return m_hFile; }
 	STDMETHODIMP_(LPCTSTR) GetFileName() { return !m_url.IsEmpty() ? m_url : (m_nCurPart != -1 ? m_strFiles[m_nCurPart] : m_strFiles[0]); }
-	STDMETHODIMP_(BOOL) IsValidFileName() { return !m_url.IsEmpty() || !m_strFiles.IsEmpty(); }
+	STDMETHODIMP_(BOOL) IsValidFileName() { return !m_url.IsEmpty() || !m_strFiles.empty(); }
 };
