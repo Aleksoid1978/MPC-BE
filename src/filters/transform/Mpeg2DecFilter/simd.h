@@ -24,11 +24,6 @@
 
 #include "simd_common.h"
 
-#pragma warning(push)
-#pragma warning(disable:4799)
-#pragma warning(disable:4309)
-#pragma warning(disable:4700)
-
 #define SSE2I_INSTRUCTION(instruction,function) \
  static __forceinline void instruction(__m128i &dst,const __m128i &src) {dst=function(dst,		   src);} \
  static __forceinline void instruction(__m128i &dst,const void	*src) {dst=function(dst,*(__m128i*)src);}
@@ -363,5 +358,3 @@ struct Tsse2 {
 		_mm_stream_si128((__m128i*)ptr,m);
 	}
 };
-
-#pragma warning(pop)

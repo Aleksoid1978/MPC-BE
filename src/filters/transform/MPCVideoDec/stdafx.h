@@ -31,5 +31,3 @@
 #include <Mferror.h>
 #include <algorithm>
 #include <vector>
-
-#pragma warning(disable:4005)

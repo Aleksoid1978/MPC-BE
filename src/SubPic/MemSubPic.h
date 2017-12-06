@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,7 +29,6 @@ enum {MSP_P010,MSP_P016,MSP_RGB32,MSP_RGB24,MSP_RGB16,MSP_RGB15,MSP_YUY2,MSP_NV1
 
 class CMemSubPic : public CSubPicImpl
 {
-#pragma warning(disable: 4799)
 	SubPicDesc m_spd;
 
 protected:
