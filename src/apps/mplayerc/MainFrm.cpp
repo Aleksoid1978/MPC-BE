@@ -5209,7 +5209,7 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 			if ((s.nCLSwitches & CLSW_ADD) && m_wndPlaylistBar.GetCount() > 0) {
 				m_wndPlaylistBar.Append(sl, fMulti, &s.slSubs);
 
-				if (s.nCLSwitches&(CLSW_OPEN | CLSW_PLAY)) {
+				if (s.nCLSwitches & (CLSW_OPEN | CLSW_PLAY)) {
 					m_wndPlaylistBar.SetLast();
 					OpenCurPlaylistItem();
 				}
@@ -5232,10 +5232,12 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 			}
 		}
 	} else {
-		if ((s.nCLSwitches & CLSW_PLAY) && m_wndPlaylistBar.GetCount() > 0) {
+		if ((s.nCLSwitches & (CLSW_OPEN | CLSW_PLAY)) && m_wndPlaylistBar.GetCount() > 0) {
 			OpenCurPlaylistItem();
 		}
-		s.nCLSwitches = CLSW_NONE;
+
+		// leave only CLSW_OPEN, if present
+		s.nCLSwitches = (s.nCLSwitches & CLSW_OPEN) ? CLSW_OPEN : CLSW_NONE;
 	}
 
 	if (fSetForegroundWindow && !(s.nCLSwitches & CLSW_NOFOCUS)) {
