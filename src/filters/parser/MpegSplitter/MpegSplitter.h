@@ -26,6 +26,7 @@
 #include "MpegSplitterSettingsWnd.h"
 #include "../../../DSUtil/AudioParser.h"
 #include <ITrackInfo.h>
+#include <deque>
 
 #define MpegSplitterName L"MPC MPEG Splitter"
 #define MpegSourceName   L"MPC MPEG Source"
@@ -66,8 +67,8 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 	int m_AC3CoreOnly;
 	CCritSec m_csProps;
 
-	CAutoPtrList<CPacket> m_MVCExtensionQueue;
-	CAutoPtrList<CPacket> m_MVCBaseQueue;
+	std::deque<CAutoPtr<CPacket>> m_MVCExtensionQueue;
+	std::deque<CAutoPtr<CPacket>> m_MVCBaseQueue;
 	BOOL  m_bUseMVCExtension          = FALSE;
 	DWORD m_dwMasterH264TrackNumber   = DWORD_MAX;
 	DWORD m_dwMVCExtensionTrackNumber = DWORD_MAX;
