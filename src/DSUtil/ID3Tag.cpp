@@ -295,22 +295,47 @@ void CID3Tag::ReadChapter(CGolombBuffer& gbData, DWORD &size)
 BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 {
 	CGolombBuffer gb(buf, len);
+
+	DWORD tag;
+	DWORD size;
+	WORD flags;
+	int tagsize;
+	if (m_major == 2) {
+		if (m_flags & 0x40) {
+			return FALSE;
+		}
+		flags   = 0;
+		tagsize = 6;
+	} else {
+		if (m_flags & 0x40) {
+			// Extended header present, skip it
+			DWORD extlen = gb.BitRead(32);
+			extlen = hexdec2uint(extlen);
+			if (m_major == 4) {
+				if (extlen < 4) {
+					return FALSE;
+				}
+				extlen -= 4;
+			}
+			if (extlen + 4 > len) {
+				return FALSE;
+			}
+
+			gb.SkipBytes(extlen);
+			len -= extlen + 4;
+		}
+		tagsize = 10;
+	}
 	int pos = gb.GetPos();
+
 	while (!gb.IsEOF()) {
-		DWORD tag;
-		DWORD size;
-		WORD flags;
-		int tagsize;
 		if (m_major == 2) {
-			tag		= (DWORD)gb.BitRead(24);
-			size	= (DWORD)gb.BitRead(24);
-			flags	= 0;
-			tagsize = 6;
+			tag   = (DWORD)gb.BitRead(24);
+			size  = (DWORD)gb.BitRead(24);
 		} else {
-			tag		= (DWORD)gb.BitRead(32);
-			size	= (DWORD)gb.BitRead(32);
-			flags	= (WORD)gb.BitRead(16);
-			tagsize = 10;
+			tag   = (DWORD)gb.BitRead(32);
+			size  = (DWORD)gb.BitRead(32);
+			flags = (WORD)gb.BitRead(16);
 			if (m_major == 4) {
 				size = hexdec2uint(size);
 			}
