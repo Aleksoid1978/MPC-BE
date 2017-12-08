@@ -174,21 +174,21 @@ public:
 		m_Seed = 12164;
 	}
 
-	void f_SetSeed(int32 _Seed) {
+	void f_SetSeed(int32_t _Seed) {
 		m_Seed = _Seed;
 	}
-	int32 f_GetSeed() {
+	int32_t f_GetSeed() {
 		return m_Seed;
 	}
 	/*
 	Park and Miller's psuedo-random number generator.
 	*/
-	int32 m_Seed;
-	int32 f_Get() {
-		static const int32 A = 16807;
-		static const int32 M = 2147483647;		// 2^31 - 1
-		static const int32 q = M / A;			// M / A
-		static const int32 r = M % A;			// M % A
+	int32_t m_Seed;
+	int32_t f_Get() {
+		static const int32_t A = 16807;
+		static const int32_t M = 2147483647; // 2^31 - 1
+		static const int32_t q = M / A;      // M / A
+		static const int32_t r = M % A;      // M % A
 		m_Seed = A * (m_Seed % q) - r * (m_Seed / q);
 		if (m_Seed < 0) {
 			m_Seed += M;
@@ -196,7 +196,7 @@ public:
 		return m_Seed;
 	}
 
-	static int32 fs_Max() {
+	static int32_t fs_Max() {
 		return 2147483646;
 	}
 
@@ -239,7 +239,7 @@ private:
 			}
 
 			m_ScanLines = m_ScanLines * (1.0 + (_Random.f_GetFloat() * _Amount) - _Amount * 0.5);
-			m_ScanLines = max(m_ScanLines, _MinScans);
+			m_ScanLines = std::max(m_ScanLines, _MinScans);
 
 			if (ToDo == 2) {
 				m_ScanLinesPerSecond /= (_Random.f_Get() % 4) + 1;
@@ -265,36 +265,31 @@ private:
 			}
 			return 0;
 		}
-
-
 	};
 
-	enum {
-		ENumHistory = 128
-	};
+	const static int NumHistory = 128;
 
-	CHistoryEntry m_History[ENumHistory];
+	CHistoryEntry m_History[NumHistory];
 	int m_iHistory;
 	CSolution m_OldSolutions[2];
 
 	CRandom31 m_Random;
 
-
 	double fp_GetSquareSum(double _ScansPerSecond, double _ScanLines) {
 		double SquareSum = 0;
-		int nHistory = min(m_nHistory, ENumHistory);
+		int nHistory = std::min(m_nHistory, NumHistory);
 		int iHistory = m_iHistory - nHistory;
 		if (iHistory < 0) {
-			iHistory += ENumHistory;
+			iHistory += NumHistory;
 		}
 		for (int i = 1; i < nHistory; ++i) {
 			int iHistory0 = iHistory + i - 1;
 			int iHistory1 = iHistory + i;
 			if (iHistory0 < 0) {
-				iHistory0 += ENumHistory;
+				iHistory0 += NumHistory;
 			}
-			iHistory0 = iHistory0 % ENumHistory;
-			iHistory1 = iHistory1 % ENumHistory;
+			iHistory0 = iHistory0 % NumHistory;
+			iHistory1 = iHistory1 % NumHistory;
 			ASSERT(m_History[iHistory0].m_Time != 0);
 			ASSERT(m_History[iHistory1].m_Time != 0);
 
@@ -320,7 +315,7 @@ public:
 		m_History[m_iHistory].m_ScanLine = _ScanLine;
 		m_History[m_iHistory].m_Time = _Time;
 		++m_nHistory;
-		m_iHistory = (m_iHistory + 1) % ENumHistory;
+		m_iHistory = (m_iHistory + 1) % NumHistory;
 	}
 
 	void f_GetEstimation(double &_RefreshRate, int &_ScanLines, int _ScreenSizeY, int _WindowsRefreshRate) {
