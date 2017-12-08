@@ -110,11 +110,6 @@ STDMETHODIMP CDSMSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 	return S_OK;
 }
 
-static int compare_id(const void* id1, const void* id2)
-{
-	return (int)*(BYTE*)id1 - (int)*(BYTE*)id2;
-}
-
 HRESULT CDSMSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
@@ -135,19 +130,20 @@ HRESULT CDSMSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = m_pFile->m_rtDuration;
 
-	CAtlArray<BYTE> ids;
+	std::vector<BYTE> ids;
+	ids.reserve(m_pFile->m_mts.GetCount());
 
 	POSITION pos = m_pFile->m_mts.GetStartPosition();
 	while (pos) {
 		BYTE id;
 		CMediaType mt;
 		m_pFile->m_mts.GetNextAssoc(pos, id, mt);
-		ids.Add(id);
+		ids.push_back(id);
 	}
 
-	qsort(ids.GetData(), ids.GetCount(), sizeof(BYTE), compare_id);
+	std::sort(ids.begin(), ids.end());
 
-	for (size_t i = 0; i < ids.GetCount(); i++) {
+	for (size_t i = 0; i < ids.size(); i++) {
 		BYTE id = ids[i];
 		CMediaType& mt = m_pFile->m_mts[id];
 
