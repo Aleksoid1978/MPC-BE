@@ -5642,6 +5642,23 @@ void CMainFrame::OnFileSaveAs()
 	CSaveDlg dlg(in, name, p, hr);
 	if (SUCCEEDED(hr)) {
 		dlg.DoModal();
+		if (!m_youtubeFields.fname.IsEmpty()) {
+			const auto pFileData = dynamic_cast<OpenFileData*>(m_lastOMD.m_p);
+			if (pFileData && pFileData->fns.GetCount() == 2) {
+				ext = p.GetExtension().MakeLower();
+				if (ext == L".mp4") {
+					p.RenameExtension(L".audio.m4a");
+				} else {
+					p.RenameExtension(L".audio.mka");
+				}
+
+				in = pFileData->fns.GetAt(pFileData->fns.FindIndex(1)).GetName();
+				CSaveDlg dlg_second(in, name, p, hr);
+				if (SUCCEEDED(hr)) {
+					dlg_second.DoModal();
+				}
+			}
+		}
 	}
 
 	if (fs == State_Running) {
