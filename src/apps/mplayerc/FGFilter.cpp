@@ -629,28 +629,33 @@ void CFGFilterList::Insert(CFGFilter* pFGF, int group, bool exactmatch, bool aut
 POSITION CFGFilterList::GetHeadPosition()
 {
 	if (m_sortedfilters.IsEmpty()) {
-		CAtlArray<filter_t> sort;
-		sort.SetCount(m_filters.GetCount());
+		std::vector<filter_t> flts;
+		flts.reserve(m_filters.GetCount());
+
 		POSITION pos = m_filters.GetHeadPosition();
-		for (size_t i = 0; pos; i++) {
-			sort[i] = m_filters.GetNext(pos);
-		}
-		qsort(&sort[0], sort.GetCount(), sizeof(sort[0]), filter_cmp);
-		for (size_t i = 0; i < sort.GetCount(); i++) {
-			if (sort[i].pFGF->GetMerit() >= MERIT64_DO_USE) {
-				m_sortedfilters.AddTail(sort[i].pFGF);
+		while (pos) {
+			const filter_t& flt = m_filters.GetNext(pos);
+			if (flt.pFGF->GetMerit() >= MERIT64_DO_USE) {
+				flts.emplace_back(flt);
 			}
 		}
+		qsort(flts.data(), flts.size(), sizeof(flts[0]), filter_cmp);
+
+		for (const auto& flt : flts) {
+			m_sortedfilters.AddTail(flt.pFGF);
+		}
+
 #ifdef DEBUG_OR_LOG
 		DLog(L"FGM: Sorting filters");
-
 		pos = m_sortedfilters.GetHeadPosition();
 		while (pos) {
 			CFGFilter* pFGF = m_sortedfilters.GetNext(pos);
-			DLog(L"FGM:    %016I64x '%s', type = '%s'", pFGF->GetMerit(), pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName()), pFGF->GetType());
+			DLog(L"FGM:    %016I64x '%s', type = '%s'",
+				pFGF->GetMerit(),
+				pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName()),
+				pFGF->GetType());
 		}
 #endif
-
 	}
 
 	return m_sortedfilters.GetHeadPosition();

@@ -14172,19 +14172,12 @@ void CMainFrame::ParseDirs(CAtlList<CString>& sl)
 	}
 }
 
-struct fileName {
-	CString fn;
-};
-static int compare(const void* arg1, const void* arg2)
-{
-	return StrCmpLogicalW(((fileName*)arg1)->fn, ((fileName*)arg2)->fn);
-}
-
 int CMainFrame::SearchInDir(bool DirForward)
 {
 	// Use CStringElementTraitsI so that the search is case insensitive
 	CAtlList<CString, CStringElementTraitsI<CString>> sl;
-	CAtlArray<fileName> f_array;
+
+	std::vector<CStringW> f_array;
 
 	CAppSettings& s = AfxGetAppSettings();
 	CMediaFormats& mf = s.m_Formats;
@@ -14202,22 +14195,24 @@ int CMainFrame::SearchInDir(bool DirForward)
 			CString fn		= fd.cFileName;
 			CString ext		= fn.Mid(fn.ReverseFind('.')).MakeLower();
 			CString path	= dir + fd.cFileName;
+
 			if (mf.FindExt(ext) && mf.GetCount() > 0) {
-				fileName f_name;
-				f_name.fn = path;
-				f_array.Add(f_name);
+				f_array.emplace_back(path);
 			}
 		} while (FindNextFileW(h, &fd));
 		FindClose(h);
 	}
 
-	if (f_array.GetCount() == 1) {
+	if (f_array.size() == 1) {
 		return 1;
 	}
 
-	qsort(f_array.GetData(), f_array.GetCount(), sizeof(fileName), compare);
-	for (size_t i = 0; i < f_array.GetCount(); i++) {
-		sl.AddTail(f_array[i].fn);
+	std::sort(f_array.begin(), f_array.end(), [](const CStringW& a, const CStringW& b) {
+		return (StrCmpLogicalW(a, b) < 0);
+	});
+
+	for (size_t i = 0; i < f_array.size(); i++) {
+		sl.AddTail(f_array[i]);
 	}
 
 	POSITION Pos = sl.Find(m_LastOpenFile);
