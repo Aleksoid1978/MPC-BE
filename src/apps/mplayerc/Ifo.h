@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,31 +28,31 @@ class CIfo
 public:
 	CIfo();
 
-	bool OpenFile (LPCWSTR strFile);
-	bool SaveFile (LPCWSTR strFile);
+	bool OpenFile(LPCWSTR strFile);
+	bool SaveFile(LPCWSTR strFile);
 	bool RemoveUOPs();
 
 	~CIfo(void);
 
 private :
 #pragma pack(push, 1)
-	typedef struct {
-		uint16_t id		: 16;	// Language
-		uint16_t		: 16;	// don't know
-		uint32_t start	: 32;	// Start of unit
-	} pgci_sub_t;
+	struct pgci_sub_t {
+		uint16_t id    : 16; // Language
+		uint16_t       : 16; // don't know
+		uint32_t start : 32; // Start of unit
+	};
 
-	typedef struct {
+	struct dvd_time_t {
 		uint8_t hour;
 		uint8_t minute;
 		uint8_t second;
-		uint8_t frame_u;		// The two high bits are the frame rate.
-	} dvd_time_t;
+		uint8_t frame_u; // The two high bits are the frame rate.
+	};
 
-	typedef uint8_t  command_data_t[8];
+	typedef uint8_t command_data_t[8];
 #define COMMAND_DATA_SIZE 8
 
-	typedef struct {			// PGC Command Table
+	struct pgc_command_tbl_t { // PGC Command Table
 		uint16_t nr_of_pre;
 		uint16_t nr_of_post;
 		uint16_t nr_of_cell;
@@ -60,71 +60,71 @@ private :
 		command_data_t *pre_commands;
 		command_data_t *post_commands;
 		command_data_t *cell_commands;
-	} pgc_command_tbl_t;
+	};
 #define PGC_COMMAND_TBL_SIZE 8
 
-	typedef uint8_t  pgc_program_map_t;
+	typedef uint8_t pgc_program_map_t;
 
-	typedef struct {			// Cell Playback Information
-		uint8_t	chain_info	: 8; // 0x5e 0xde(2 angles, no overlay), 0x5f 0x9f 0x9f 0xdf(4 angles overlay), 0x2 0xa 0x8(1 angle)
-		uint8_t foo;				// parental control ??
+	struct ifo_pgci_caddr_t { // Cell Playback Information
+		uint8_t chain_info:8; // 0x5e 0xde(2 angles, no overlay), 0x5f 0x9f 0x9f 0xdf(4 angles overlay), 0x2 0xa 0x8(1 angle)
+		uint8_t foo;          // parental control ??
 		uint8_t still_time;
 		uint8_t cell_cmd;
 
 		dvd_time_t playback_time;
-		uint32_t vobu_start;			// 1st vobu start
+		uint32_t vobu_start;  // 1st vobu start
 		uint32_t ilvu_end;
 		uint32_t vobu_last_start;
 		uint32_t vobu_last_end;
-	} ifo_pgci_caddr_t;
+	};
 
-	typedef struct {			// Cell Position Information
-		uint16_t vob_id		: 16;	// Video Object Identifier
-		uint8_t  foo		: 8;	// Unknown
-		uint8_t  cell_id	: 8;	// Cell Identifier
-	} ifo_pgc_cpos_t;
+	struct ifo_pgc_cpos_t { // Cell Position Information
+		uint16_t vob_id  : 16; // Video Object Identifier
+		uint8_t  foo     : 8;  // Unknown
+		uint8_t  cell_id : 8;  // Cell Identifier
+	};
 
 #ifndef CLUT_T
 #define CLUT_T
 
-	typedef struct {		// CLUT == Color LookUp Table
-		uint8_t foo		: 8;    // UNKNOWN: 0x00?
-		uint8_t y		: 8;
-		uint8_t cr		: 8;
-		uint8_t cb		: 8;
-	} clut_t;
+	struct clut_t { // CLUT == Color LookUp Table
+		uint8_t foo : 8;    // UNKNOWN: 0x00?
+		uint8_t y   : 8;
+		uint8_t cr  : 8;
+		uint8_t cb  : 8;
+	};
 #endif
 
-	typedef struct {		// Audio Status
+	struct audio_status_t { // Audio Status
 #if BYTE_ORDER == BIG_ENDIAN
-		uint8_t available	: 1;
-		uint8_t link		: 7;
+		uint8_t available : 1;
+		uint8_t link      : 7;
 #else
-		uint8_t link		: 7;
-		uint8_t available	: 1;
+		uint8_t link      : 7;
+		uint8_t available : 1;
 #endif
-		uint8_t foo		: 8; // UNKNOWN
-	} audio_status_t;
+		uint8_t foo       : 8; // UNKNOWN
+	};
 
-	typedef struct {		// Subpicture status
+	struct subp_status_t { // Subpicture status
 #if BYTE_ORDER == BIG_ENDIAN
-		uint8_t available	: 1;
-		uint8_t format4_3	: 7;
+		uint8_t available : 1;
+		uint8_t format4_3 : 7;
 #else
-		uint8_t format4_3	: 7;
-		uint8_t available	: 1;
+		uint8_t format4_3 : 7;
+		uint8_t available : 1;
 #endif
-		uint8_t wide		: 8;
-		uint8_t letter		: 8;
-		uint8_t pan			: 8;
-	} subp_status_t;
+		uint8_t wide      : 8;
+		uint8_t letter    : 8;
+		uint8_t pan       : 8;
+	};
 
-	typedef struct {		// Program Chain Information
+	struct pgc_t { // Program Chain Information
 		uint16_t zero_1;
 		uint8_t  nr_of_programs;
 		uint8_t  nr_of_cells;
 		dvd_time_t playback_time;
-		uint32_t prohibited_ops;	// New type?
+		uint32_t prohibited_ops;    // New type?
 		audio_status_t audio_status[8];
 		subp_status_t subp_status[32];
 		uint16_t next_pgc_nr;
@@ -137,33 +137,31 @@ private :
 		uint16_t pgc_program_map_offset;
 		uint16_t cell_playback_tbl_offset;
 		uint16_t cell_position_tbl_offset;
-		pgc_command_tbl_t	*pgc_command_tbl;
-		pgc_program_map_t	*pgc_program_map;
-		ifo_pgci_caddr_t	*cell_playback_tbl;
-		ifo_pgc_cpos_t		*cell_position_tbl;
-	} pgc_t;
+		pgc_command_tbl_t *pgc_command_tbl;
+		pgc_program_map_t *pgc_program_map;
+		ifo_pgci_caddr_t  *cell_playback_tbl;
+		ifo_pgc_cpos_t    *cell_position_tbl;
+	};
 #define PGC_SIZE 236
 
-	typedef struct {
-		uint16_t num	: 16;   // number of entries
-		uint16_t		: 16;   // UNKNOWN
-		uint32_t len	: 32;   // length of table
-	} ifo_hdr_t;
+	struct ifo_hdr_t {
+		uint16_t num : 16; // number of entries
+		uint16_t     : 16; // UNKNOWN
+		uint32_t len : 32; // length of table
+	};
 
-	typedef struct {
+	struct lu_sub_t {
 #if BYTE_ORDER == BIG_ENDIAN
-		uint16_t foo1		: 4;		// don't know
-		uint8_t menu_id		: 4;		// 0=off, 3=root, 4=spu,
-		// 5=audio, 6=angle, 7=ptt
+		uint16_t foo1   : 4;  // don't know
+		uint8_t menu_id : 4;  // 0=off, 3=root, 4=spu, 5=audio, 6=angle, 7=ptt
 #else
-		uint8_t menu_id		: 4;		// 0=off, 3=root, 4=spu,
-		// 5=audio, 6=angle, 7=ptt
-		uint16_t foo1		: 4;	// don't know
+		uint8_t menu_id : 4;  // 0=off, 3=root, 4=spu, 5=audio, 6=angle, 7=ptt
+		uint16_t foo1   : 4;  // don't know
 #endif
-		uint16_t foo2		: 8;	// don't know
-		uint16_t bar		: 16;	// don't know
-		uint32_t start		: 32;	// Start of unit
-	} lu_sub_t;
+		uint16_t foo2   : 8;  // don't know
+		uint16_t bar    : 16; // don't know
+		uint32_t start  : 32; // Start of unit
+	};
 #pragma pack(pop)
 
 	BYTE*       m_pBuffer;
@@ -177,6 +175,6 @@ private :
 
 	pgc_t*      GetFirstPGC();
 	pgc_t*      GetPGCI(const int title, const ifo_hdr_t* hdr);
-	int         GetMiscPGCI (ifo_hdr_t *hdr, int title, uint8_t **ptr);
-	void        RemovePgciUOPs (uint8_t *ptr);
+	int         GetMiscPGCI(ifo_hdr_t *hdr, int title, uint8_t **ptr);
+	void        RemovePgciUOPs(uint8_t *ptr);
 };

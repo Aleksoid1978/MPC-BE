@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include "Ifo.h"
 
-#if 0 // stupid warning LNK4006 and LNK4088
+#ifdef _MSC_VER
 inline uint16_t bswap_16(uint16_t value) { return (uint16_t)_byteswap_ushort((unsigned short)value); }
 inline uint32_t bswap_32(uint32_t value) { return (uint32_t)_byteswap_ulong((unsigned long)value); }
 inline uint64_t bswap_64(uint64_t value) { return (uint64_t)_byteswap_uint64((unsigned __int64)value); }
@@ -67,28 +67,28 @@ uint32_t get4bytes (const BYTE* buf)
 
 CIfo::CIfo()
 {
-	m_pBuffer	= nullptr;
-	m_pPGCI		= nullptr;
-	m_pPGCIT	= nullptr;
-	m_dwSize	= 0;
+	m_pBuffer = nullptr;
+	m_pPGCI   = nullptr;
+	m_pPGCIT  = nullptr;
+	m_dwSize  = 0;
 }
 
 int CIfo::GetMiscPGCI (CIfo::ifo_hdr_t *hdr, int title, uint8_t **ptr)
 {
 	pgci_sub_t *pgci_sub;
 
-	*ptr	  = (uint8_t *) hdr;
-	*ptr	 += IFO_HDR_LEN;
-	pgci_sub  = (pgci_sub_t *) *ptr + title;
+	*ptr  = (uint8_t *) hdr;
+	*ptr += IFO_HDR_LEN;
+	pgci_sub = (pgci_sub_t*)*ptr + title;
 
-	*ptr = (uint8_t *) hdr + bswap_32(pgci_sub->start);
+	*ptr = (uint8_t*)hdr + bswap_32(pgci_sub->start);
 
 	return 0;
 }
 
 void CIfo::RemovePgciUOPs (uint8_t *ptr)
 {
-	ifo_hdr_t*	hdr = (ifo_hdr_t *) ptr;
+	ifo_hdr_t* hdr = (ifo_hdr_t *) ptr;
 
 	ptr += IFO_HDR_LEN;
 	int num = bswap_16(hdr->num);
@@ -158,17 +158,17 @@ bool CIfo::IsVMG()
 
 bool CIfo::OpenFile (LPCWSTR strFile)
 {
-	bool	bRet = false;
-	HANDLE	hFile;
+	bool bRet = false;
+	HANDLE hFile;
 	LARGE_INTEGER size;
 
-	hFile	 = Real_CreateFileW(strFile, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+	hFile = Real_CreateFileW(strFile, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 	ASSERT (hFile != INVALID_HANDLE_VALUE);
 
 	if (hFile != INVALID_HANDLE_VALUE && GetFileSizeEx(hFile, &size) &&
 			size.QuadPart <= 0x800000) { // max size of the ifo file = 8 MB (taken with reserve. need a more correct info)
 		m_pBuffer = DNew BYTE [size.QuadPart];
-		ReadFile (hFile, m_pBuffer, size.QuadPart, &m_dwSize, nullptr);
+		ReadFile(hFile, m_pBuffer, size.QuadPart, &m_dwSize, nullptr);
 		CloseHandle (hFile);
 
 		if (IsVTS() && (OFF_VTSM_PGCI_UT(m_pBuffer)!=0)) {
@@ -217,17 +217,17 @@ bool CIfo::RemoveUOPs()
 
 bool CIfo::SaveFile (LPCWSTR strFile)
 {
-	bool	bRet = false;
-	HANDLE	m_hFile;
+	bool bRet = false;
+	HANDLE m_hFile;
 
 	if (m_pBuffer) {
-		m_hFile	 = Real_CreateFileW(strFile, GENERIC_WRITE|GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
+		m_hFile = Real_CreateFileW(strFile, GENERIC_WRITE|GENERIC_READ, FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
 									nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-		ASSERT (m_hFile != INVALID_HANDLE_VALUE);
+		ASSERT(m_hFile != INVALID_HANDLE_VALUE);
 
 		if (m_hFile != INVALID_HANDLE_VALUE) {
-			DWORD		dwSize;
-			WriteFile (m_hFile, m_pBuffer, m_dwSize, &dwSize, nullptr);
+			DWORD dwSize;
+			WriteFile(m_hFile, m_pBuffer, m_dwSize, &dwSize, nullptr);
 			CloseHandle(m_hFile);
 			bRet = true;
 		}
