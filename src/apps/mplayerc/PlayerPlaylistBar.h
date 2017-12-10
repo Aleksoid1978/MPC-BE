@@ -147,7 +147,10 @@ public:
 	bool RemoveAll();
 	bool RemoveAt(POSITION pos);
 
-	void SortById(), SortByName(), SortByPath(), Randomize();
+	void SortByName();
+	void SortByPath();
+	void SortById();
+	void Randomize();
 
 	POSITION GetPos() const;
 	void SetPos(POSITION pos);

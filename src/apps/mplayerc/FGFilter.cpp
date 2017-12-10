@@ -639,7 +639,10 @@ POSITION CFGFilterList::GetHeadPosition()
 				flts.emplace_back(flt);
 			}
 		}
-		qsort(flts.data(), flts.size(), sizeof(flts[0]), filter_cmp);
+
+		std::sort(flts.begin(), flts.end(), [](const filter_t& a, const filter_t& b) {
+			return (filter_cmp(a, b) < 0);
+		});
 
 		for (const auto& flt : flts) {
 			m_sortedfilters.AddTail(flt.pFGF);
@@ -666,28 +669,25 @@ CFGFilter* CFGFilterList::GetNext(POSITION& pos)
 	return m_sortedfilters.GetNext(pos);
 }
 
-int CFGFilterList::filter_cmp(const void* a, const void* b)
+int CFGFilterList::filter_cmp(const filter_t& fa, const filter_t& fb)
 {
-	filter_t* fa = (filter_t*)a;
-	filter_t* fb = (filter_t*)b;
-
-	if (fa->group < fb->group) {
+	if (fa.group < fb.group) {
 		return -1;
 	}
-	if (fa->group > fb->group) {
+	if (fa.group > fb.group) {
 		return +1;
 	}
 
-	if (fa->pFGF->GetMerit() > fb->pFGF->GetMerit()) {
+	if (fa.pFGF->GetMerit() > fb.pFGF->GetMerit()) {
 		return -1;
 	}
-	if (fa->pFGF->GetMerit() < fb->pFGF->GetMerit()) {
+	if (fa.pFGF->GetMerit() < fb.pFGF->GetMerit()) {
 		return +1;
 	}
 
-	if (fa->pFGF->GetCLSID() == fb->pFGF->GetCLSID()) {
-		CFGFilterFile* fgfa = dynamic_cast<CFGFilterFile*>(fa->pFGF);
-		CFGFilterFile* fgfb = dynamic_cast<CFGFilterFile*>(fb->pFGF);
+	if (fa.pFGF->GetCLSID() == fb.pFGF->GetCLSID()) {
+		CFGFilterFile* fgfa = dynamic_cast<CFGFilterFile*>(fa.pFGF);
+		CFGFilterFile* fgfb = dynamic_cast<CFGFilterFile*>(fb.pFGF);
 
 		if (fgfa && !fgfb) {
 			return -1;
@@ -697,17 +697,17 @@ int CFGFilterList::filter_cmp(const void* a, const void* b)
 		}
 	}
 
-	if (fa->exactmatch && !fb->exactmatch) {
+	if (fa.exactmatch && !fb.exactmatch) {
 		return -1;
 	}
-	if (!fa->exactmatch && fb->exactmatch) {
+	if (!fa.exactmatch && fb.exactmatch) {
 		return +1;
 	}
 
-	if (fa->index < fb->index) {
+	if (fa.index < fb.index) {
 		return -1;
 	}
-	if (fa->index > fb->index) {
+	if (fa.index > fb.index) {
 		return +1;
 	}
 
