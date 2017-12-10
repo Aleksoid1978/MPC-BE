@@ -149,10 +149,10 @@ static bool ParseCUESheetFile(CString fn, CAtlList<CUETrack> &CUETrackList, CStr
 				sFileName2 = cueLine;
 			}
 		} else if (cmd == L"INDEX") {
-			int mm, ss, ff;
-			if (3 == swscanf_s(cueLine, L"01 %d:%d:%d", &mm, &ss, &ff) && fAudioTrack) {
+			unsigned mm, ss, ff;
+			if (3 == swscanf_s(cueLine, L"01 %u:%u:%u", &mm, &ss, &ff) && fAudioTrack) {
 				// "INDEX 01" is required and denotes the start of the track
-				rt = MILLISECONDS_TO_100NS_UNITS((mm * 60 + ss) * 1000);
+				rt = UNITS * (mm*60 + ss) + UNITS * ff / 75;
 			}
 		}
 	}
