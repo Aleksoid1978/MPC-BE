@@ -523,58 +523,28 @@ bool CPlaylist::RemoveAt(POSITION pos)
 	return false;
 }
 
-struct plsort_t {
-	UINT n;
+struct plsort_str_t {
+	CString str;
 	POSITION pos;
 };
-
-static int compare(const void* arg1, const void* arg2)
-{
-	UINT a1 = ((plsort_t*)arg1)->n;
-	UINT a2 = ((plsort_t*)arg2)->n;
-	return a1 > a2 ? 1 : a1 < a2 ? -1 : 0;
-}
-
-struct plsort2_t {
-	LPCTSTR str;
-	POSITION pos;
-};
-
-int compare2(const void* arg1, const void* arg2)
-{
-	return StrCmpLogicalW(((plsort2_t*)arg1)->str, ((plsort2_t*)arg2)->str);
-}
-
-void CPlaylist::SortById()
-{
-	CAtlArray<plsort_t> a;
-	a.SetCount(GetCount());
-	POSITION pos = GetHeadPosition();
-	for (int i = 0; pos; i++, GetNext(pos)) {
-		a[i].n = GetAt(pos).m_id, a[i].pos = pos;
-	}
-	qsort(a.GetData(), a.GetCount(), sizeof(plsort_t), compare);
-	for (size_t i = 0; i < a.GetCount(); i++) {
-		AddTail(GetAt(a[i].pos));
-		__super::RemoveAt(a[i].pos);
-		if (m_pos == a[i].pos) {
-			m_pos = GetTailPosition();
-		}
-	}
-}
 
 void CPlaylist::SortByName()
 {
-	CAtlArray<plsort2_t> a;
-	a.SetCount(GetCount());
+	std::vector<plsort_str_t> a;
+	a.reserve(GetCount());
+
 	POSITION pos = GetHeadPosition();
 	for (int i = 0; pos; i++, GetNext(pos)) {
 		CString fn = GetAt(pos).m_fns.GetHead();
-		a[i].str = (LPCTSTR)fn + std::max(fn.ReverseFind('/'), fn.ReverseFind('\\')) + 1;
-		a[i].pos = pos;
+		plsort_str_t item = { fn.Mid(std::max(fn.ReverseFind('/'), fn.ReverseFind('\\')) + 1), pos };
+		a.emplace_back(item);
 	}
-	qsort(a.GetData(), a.GetCount(), sizeof(plsort2_t), compare2);
-	for (size_t i = 0; i < a.GetCount(); i++) {
+
+	std::sort(a.begin(), a.end(), [](const plsort_str_t& a, const plsort_str_t& b) {
+		return (StrCmpLogicalW(a.str, b.str) < 0);
+	});
+
+	for (size_t i = 0; i < a.size(); i++) {
 		AddTail(GetAt(a[i].pos));
 		__super::RemoveAt(a[i].pos);
 		if (m_pos == a[i].pos) {
@@ -585,14 +555,49 @@ void CPlaylist::SortByName()
 
 void CPlaylist::SortByPath()
 {
-	CAtlArray<plsort2_t> a;
-	a.SetCount(GetCount());
+	std::vector<plsort_str_t> a;
+	a.reserve(GetCount());
+
 	POSITION pos = GetHeadPosition();
 	for (int i = 0; pos; i++, GetNext(pos)) {
-		a[i].str = GetAt(pos).m_fns.GetHead(), a[i].pos = pos;
+		plsort_str_t item = { GetAt(pos).m_fns.GetHead(), pos };
+		a.emplace_back(item);
 	}
-	qsort(a.GetData(), a.GetCount(), sizeof(plsort2_t), compare2);
-	for (size_t i = 0; i < a.GetCount(); i++) {
+
+	std::sort(a.begin(), a.end(), [](const plsort_str_t& a, const plsort_str_t& b) {
+		return (StrCmpLogicalW(a.str, b.str) < 0);
+	});
+
+	for (size_t i = 0; i < a.size(); i++) {
+		AddTail(GetAt(a[i].pos));
+		__super::RemoveAt(a[i].pos);
+		if (m_pos == a[i].pos) {
+			m_pos = GetTailPosition();
+		}
+	}
+}
+
+struct plsort_t {
+	UINT n;
+	POSITION pos;
+};
+
+void CPlaylist::SortById()
+{
+	std::vector<plsort_t> a;
+	a.reserve(GetCount());
+
+	POSITION pos = GetHeadPosition();
+	for (int i = 0; pos; i++, GetNext(pos)) {
+		plsort_t item = { GetAt(pos).m_id, pos };
+		a.emplace_back(item);
+	}
+
+	std::sort(a.begin(), a.end(), [](const plsort_t& a, const plsort_t& b) {
+		return a.n < b.n;
+	});
+
+	for (size_t i = 0; i < a.size(); i++) {
 		AddTail(GetAt(a[i].pos));
 		__super::RemoveAt(a[i].pos);
 		if (m_pos == a[i].pos) {
@@ -603,15 +608,21 @@ void CPlaylist::SortByPath()
 
 void CPlaylist::Randomize()
 {
-	CAtlArray<plsort_t> a;
-	a.SetCount(GetCount());
+	std::vector<plsort_t> a;
+	a.reserve(GetCount());
+
 	srand((unsigned int)time(nullptr));
 	POSITION pos = GetHeadPosition();
 	for (int i = 0; pos; i++, GetNext(pos)) {
-		a[i].n = rand(), a[i].pos = pos;
+		plsort_t item = { rand(), pos };
+		a.emplace_back(item);
 	}
-	qsort(a.GetData(), a.GetCount(), sizeof(plsort_t), compare);
-	for (size_t i = 0; i < a.GetCount(); i++) {
+
+	std::sort(a.begin(), a.end(), [](const plsort_t& a, const plsort_t& b) {
+		return a.n < b.n;
+	});
+
+	for (size_t i = 0; i < a.size(); i++) {
 		AddTail(GetAt(a[i].pos));
 		__super::RemoveAt(a[i].pos);
 		if (m_pos == a[i].pos) {
@@ -634,31 +645,29 @@ POSITION CPlaylist::Shuffle()
 {
 	static INT_PTR idx = 0;
 	static INT_PTR count = 0;
-	static CAtlArray<plsort_t> a;
+	static std::vector<POSITION> a;
 
 	ASSERT(GetCount() > 2);
 	// insert or remove items in playlist, or index out of bounds then recalculate
 	if ((count != GetCount()) || (idx >= GetCount())) {
-		a.RemoveAll();
+		a.clear();
 		idx = 0;
-		a.SetCount(count = GetCount());
+		a.reserve(count = GetCount());
 
 		POSITION pos = GetHeadPosition();
 		for (INT_PTR i = 0; pos; i++, GetNext(pos)) {
-			a[i].pos = pos;    // initialize position array
+			a.emplace_back(pos); // initialize position array
 		}
 
 		//Use Fisher-Yates shuffle algorithm
 		srand((unsigned)time(nullptr));
 		for (INT_PTR i=0; i<(count-1); i++) {
 			INT_PTR r = i + (rand() % (count-i));
-			POSITION temp = a[i].pos;
-			a[i].pos = a[r].pos;
-			a[r].pos = temp;
+			std::swap(a[i], a[r]);
 		}
 	}
 
-	return a[idx++].pos;
+	return a[idx++];
 }
 
 CPlaylistItem& CPlaylist::GetNextWrap(POSITION& pos)
@@ -1085,11 +1094,6 @@ void CPlayerPlaylistBar::ParsePlayList(CAtlList<CString>& fns, CSubtitleItemList
 	AddItem(fns, subs);
 }
 
-static int s_int_comp(const void* i1, const void* i2)
-{
-	return (int)i1 - (int)i2;
-}
-
 static CString CombinePath(CPath p, CString fn)
 {
 	if (fn.Find(':') >= 0 || fn.Find(L"\\") == 0) {
@@ -1110,7 +1114,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 
 	CString str;
 	CAtlMap<int, CPlaylistItem> pli;
-	CAtlArray<int> idx;
+	std::vector<int> idx;
 	int selected_idx = -1;
 
 	CWebTextFile f(CTextFile::UTF8, CTextFile::ANSI);
@@ -1134,7 +1138,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 
 			if (key == L"type") {
 				pli[i].m_type = (CPlaylistItem::type_t)_wtol(value);
-				idx.Add(i);
+				idx.push_back(i);
 			} else if (key == L"label") {
 				pli[i].m_label = value;
 			} else if (key == L"time") {
@@ -1173,8 +1177,9 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 
 	const BOOL bIsEmpty = m_pl.IsEmpty();
 
-	qsort(idx.GetData(), idx.GetCount(), sizeof(int), s_int_comp);
-	for (size_t i = 0; i < idx.GetCount(); i++) {
+	std::sort(idx.begin(), idx.end());
+
+	for (size_t i = 0; i < idx.size(); i++) {
 		m_pl.AddTail(pli[idx[i]]);
 	}
 

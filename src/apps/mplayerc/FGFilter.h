@@ -171,7 +171,7 @@ class CFGFilterList
 		int group;
 		bool exactmatch, autodelete;
 	};
-	static int filter_cmp(const void* a, const void* b);
+	static int filter_cmp(const filter_t& fa, const filter_t& fb);
 	CAtlList<filter_t> m_filters;
 	CAtlList<CFGFilter*> m_sortedfilters;
 
