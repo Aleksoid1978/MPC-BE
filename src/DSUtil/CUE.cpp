@@ -104,12 +104,12 @@ bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList, CString& T
 				Performer = performer;
 			}
 		} else if (cmd == _T("INDEX")) {
-			int mm, ss, ff;
-			if (3 == swscanf_s(cueLine, _T("01 %d:%d:%d"), &mm, &ss, &ff)) {
+			unsigned mm, ss, ff;
+			if (3 == swscanf_s(cueLine, _T("01 %u:%u:%u"), &mm, &ss, &ff)) {
 				// "INDEX 01" is required and denotes the start of the track
 				if (fAudioTrack) {
 					index_cnt++;
-					rt = MILLISECONDS_TO_100NS_UNITS((mm * 60 + ss) * 1000);
+					rt = UNITS * (mm*60 + ss) + UNITS * ff / 75;
 				}
 			}
 		}
