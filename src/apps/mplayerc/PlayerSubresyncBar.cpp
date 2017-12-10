@@ -773,11 +773,6 @@ void CPlayerSubresyncBar::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 	}
 }
 
-static int uintcomp(const void* i1, const void* i2)
-{
-	return (*((UINT*)i2) - * ((UINT*)i1));
-}
-
 void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMLISTVIEW lpnmlv = (LPNMLISTVIEW)pNMHDR;
@@ -940,15 +935,15 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 					fNeedsUpdate = true;
 					break;
 				case DUPITEM: {
-					CUIntArray items;
+					std::vector<int> items;
 					pos = m_list.GetFirstSelectedItemPosition();
 					while (pos) {
-						items.Add(m_list.GetNextSelectedItem(pos));
+						items.push_back(m_list.GetNextSelectedItem(pos));
 					}
 
-					qsort(items.GetData(), items.GetCount(), sizeof(UINT), uintcomp);
+					std::sort(items.begin(), items.end(), std::greater<int>());
 
-					for (INT_PTR i = 0, l = items.GetCount(); i < l; i++) {
+					for (INT_PTR i = 0, l = items.size(); i < l; i++) {
 						iItem = items[i];
 
 						STSEntry stse = m_sts[iItem];
@@ -978,22 +973,22 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 				fNeedsUpdate = true;
 				break;
 				case DELITEM: {
-					CUIntArray items;
+					std::vector<int> items;
 					pos = m_list.GetFirstSelectedItemPosition();
 					while (pos) {
-						items.Add(m_list.GetNextSelectedItem(pos));
+						items.push_back(m_list.GetNextSelectedItem(pos));
 					}
 
-					qsort(items.GetData(), items.GetCount(), sizeof(UINT), uintcomp);
+					std::sort(items.begin(), items.end(), std::greater<int>());
 
-					for (INT_PTR i = 0, l = items.GetCount(); i < l; i++) {
+					for (INT_PTR i = 0, l = items.size(); i < l; i++) {
 						iItem = items[i];
 						m_sts.RemoveAt(iItem);
 						m_subtimes.RemoveAt(iItem);
 						m_list.DeleteItem(iItem);
 					}
 
-					iItem = items[items.GetCount() - 1];
+					iItem = items[items.size() - 1];
 					if (iItem >= m_list.GetItemCount()) {
 						iItem = m_list.GetItemCount() - 1;
 					}
