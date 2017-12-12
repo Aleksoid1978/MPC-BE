@@ -146,7 +146,7 @@ public:
 	CStringW name;
 	CDSMChapter();
 	CDSMChapter(REFERENCE_TIME rt, LPCWSTR name);
-	CDSMChapter& operator = (const CDSMChapter& c);
+	//CDSMChapter& operator = (const CDSMChapter& c);
 	static int Compare(const void* a, const void* b);
 };
 

@@ -332,15 +332,15 @@ CDSMChapter::CDSMChapter(REFERENCE_TIME rt, LPCWSTR name)
 	this->name = name;
 }
 
-CDSMChapter& CDSMChapter::operator = (const CDSMChapter& c)
-{
-	if ( this != &c ) {
-		order = c.counter;
-		rt = c.rt;
-		name = c.name;
-	}
-	return *this;
-}
+//CDSMChapter& CDSMChapter::operator = (const CDSMChapter& c)
+//{
+//	if ( this != &c ) {
+//		order = c.counter;
+//		rt = c.rt;
+//		name = c.name;
+//	}
+//	return *this;
+//}
 
 int CDSMChapter::counter = 0;
 
