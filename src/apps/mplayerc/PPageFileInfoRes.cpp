@@ -50,8 +50,8 @@ CPPageFileInfoRes::CPPageFileInfoRes(CString fn, IFilterGraph* pFG)
 					r.name = name;
 					r.desc = desc;
 					r.mime = mime;
-					r.data.SetCount(len);
-					memcpy(r.data.GetData(), pData, r.data.GetCount());
+					r.data.resize(len);
+					memcpy(r.data.data(), pData, r.data.size());
 					CoTaskMemFree(pData);
 					m_res.AddTail(r);
 				}
@@ -160,7 +160,7 @@ void CPPageFileInfoRes::OnSaveAs()
 	if (fd.DoModal() == IDOK) {
 		FILE* f = nullptr;
 		if (_wfopen_s(&f, fd.GetPathName(), L"wb") == 0) {
-			fwrite(r.data.GetData(), 1, r.data.GetCount(), f);
+			fwrite(r.data.data(), 1, r.data.size(), f);
 			fclose(f);
 		}
 	}

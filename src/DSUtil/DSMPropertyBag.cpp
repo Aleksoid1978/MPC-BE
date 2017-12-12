@@ -157,15 +157,16 @@ HRESULT IDSMPropertyBagImpl::DelProperty(LPCWSTR key)
 // CDSMResource
 //
 
+// global access to all resources
 CCritSec CDSMResource::m_csResources;
-CAtlMap<uintptr_t, CDSMResource*> CDSMResource::m_resources;
+std::map<uintptr_t, CDSMResource*> CDSMResource::m_resources;
 
 CDSMResource::CDSMResource()
-	: mime(_T("application/octet-stream"))
+	: mime(L"application/octet-stream")
 	, tag(0)
 {
 	CAutoLock cAutoLock(&m_csResources);
-	m_resources.SetAt(reinterpret_cast<uintptr_t>(this), this);
+	m_resources[reinterpret_cast<uintptr_t>(this)] = this;
 }
 
 CDSMResource::CDSMResource(const CDSMResource& r)
@@ -173,7 +174,7 @@ CDSMResource::CDSMResource(const CDSMResource& r)
 	*this = r;
 
 	CAutoLock cAutoLock(&m_csResources);
-	m_resources.SetAt(reinterpret_cast<uintptr_t>(this), this);
+	m_resources[reinterpret_cast<uintptr_t>(this)] = this;
 }
 
 CDSMResource::CDSMResource(LPCWSTR name, LPCWSTR desc, LPCWSTR mime, BYTE* pData, int len, DWORD_PTR tag)
@@ -181,18 +182,18 @@ CDSMResource::CDSMResource(LPCWSTR name, LPCWSTR desc, LPCWSTR mime, BYTE* pData
 	this->name = name;
 	this->desc = desc;
 	this->mime = mime;
-	data.SetCount(len);
-	memcpy(data.GetData(), pData, data.GetCount());
+	data.resize(len);
+	memcpy(data.data(), pData, data.size());
 	this->tag = tag;
 
 	CAutoLock cAutoLock(&m_csResources);
-	m_resources.SetAt(reinterpret_cast<uintptr_t>(this), this);
+	m_resources[reinterpret_cast<uintptr_t>(this)] = this;
 }
 
 CDSMResource::~CDSMResource()
 {
 	CAutoLock cAutoLock(&m_csResources);
-	m_resources.RemoveKey(reinterpret_cast<uintptr_t>(this));
+	m_resources.erase(reinterpret_cast<uintptr_t>(this));
 }
 
 CDSMResource& CDSMResource::operator = (const CDSMResource& r)
@@ -202,7 +203,7 @@ CDSMResource& CDSMResource::operator = (const CDSMResource& r)
 		name = r.name;
 		desc = r.desc;
 		mime = r.mime;
-		data.Copy(r.data);
+		data = r.data;
 	}
 	return *this;
 }
@@ -219,7 +220,7 @@ IDSMResourceBagImpl::IDSMResourceBagImpl()
 
 STDMETHODIMP_(DWORD) IDSMResourceBagImpl::ResGetCount()
 {
-	return (DWORD)m_resources.GetCount();
+	return (DWORD)m_resources.size();
 }
 
 STDMETHODIMP IDSMResourceBagImpl::ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDesc, BSTR* ppMime, BYTE** ppData, DWORD* pDataLen, DWORD_PTR* pTag)
@@ -228,7 +229,7 @@ STDMETHODIMP IDSMResourceBagImpl::ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDes
 		CheckPointer(pDataLen, E_POINTER);
 	}
 
-	if (iIndex >= m_resources.GetCount()) {
+	if (iIndex >= m_resources.size()) {
 		return E_INVALIDARG;
 	}
 
@@ -244,8 +245,8 @@ STDMETHODIMP IDSMResourceBagImpl::ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDes
 		*ppMime = r.mime.AllocSysString();
 	}
 	if (ppData) {
-		*pDataLen = (DWORD)r.data.GetCount();
-		memcpy(*ppData = (BYTE*)CoTaskMemAlloc(*pDataLen), r.data.GetData(), *pDataLen);
+		*pDataLen = (DWORD)r.data.size();
+		memcpy(*ppData = (BYTE*)CoTaskMemAlloc(*pDataLen), r.data.data(), *pDataLen);
 	}
 	if (pTag) {
 		*pTag = r.tag;
@@ -256,7 +257,7 @@ STDMETHODIMP IDSMResourceBagImpl::ResGet(DWORD iIndex, BSTR* ppName, BSTR* ppDes
 
 STDMETHODIMP IDSMResourceBagImpl::ResSet(DWORD iIndex, LPCWSTR pName, LPCWSTR pDesc, LPCWSTR pMime, BYTE* pData, DWORD len, DWORD_PTR tag)
 {
-	if (iIndex >= m_resources.GetCount()) {
+	if (iIndex >= m_resources.size()) {
 		return E_INVALIDARG;
 	}
 
@@ -272,9 +273,9 @@ STDMETHODIMP IDSMResourceBagImpl::ResSet(DWORD iIndex, LPCWSTR pName, LPCWSTR pD
 		r.mime = pMime;
 	}
 	if (pData || len == 0) {
-		r.data.SetCount(len);
+		r.data.resize(len);
 		if (pData) {
-			memcpy(r.data.GetData(), pData, r.data.GetCount());
+			memcpy(r.data.data(), pData, r.data.size());
 		}
 	}
 	r.tag = tag;
@@ -284,16 +285,18 @@ STDMETHODIMP IDSMResourceBagImpl::ResSet(DWORD iIndex, LPCWSTR pName, LPCWSTR pD
 
 STDMETHODIMP IDSMResourceBagImpl::ResAppend(LPCWSTR pName, LPCWSTR pDesc, LPCWSTR pMime, BYTE* pData, DWORD len, DWORD_PTR tag)
 {
-	return ResSet((DWORD)m_resources.Add(CDSMResource()), pName, pDesc, pMime, pData, len, tag);
+	m_resources.emplace_back(CDSMResource());
+
+	return ResSet((DWORD)m_resources.size() - 1, pName, pDesc, pMime, pData, len, tag);
 }
 
 STDMETHODIMP IDSMResourceBagImpl::ResRemoveAt(DWORD iIndex)
 {
-	if (iIndex >= m_resources.GetCount()) {
+	if (iIndex >= m_resources.size()) {
 		return E_INVALIDARG;
 	}
 
-	m_resources.RemoveAt(iIndex);
+	m_resources.erase(m_resources.begin() + iIndex);
 
 	return S_OK;
 }
@@ -301,12 +304,12 @@ STDMETHODIMP IDSMResourceBagImpl::ResRemoveAt(DWORD iIndex)
 STDMETHODIMP IDSMResourceBagImpl::ResRemoveAll(DWORD_PTR tag)
 {
 	if (tag) {
-		for (ptrdiff_t i = m_resources.GetCount() - 1; i >= 0; i--)
+		for (ptrdiff_t i = m_resources.size() - 1; i >= 0; i--)
 			if (m_resources[i].tag == tag) {
-				m_resources.RemoveAt(i);
+				m_resources.erase(m_resources.begin() + i);
 			}
 	} else {
-		m_resources.RemoveAll();
+		m_resources.clear();
 	}
 
 	return S_OK;
@@ -368,12 +371,12 @@ IDSMChapterBagImpl::IDSMChapterBagImpl()
 
 STDMETHODIMP_(DWORD) IDSMChapterBagImpl::ChapGetCount()
 {
-	return (DWORD)m_chapters.GetCount();
+	return (DWORD)m_chapters.size();
 }
 
 STDMETHODIMP IDSMChapterBagImpl::ChapGet(DWORD iIndex, REFERENCE_TIME* prt, BSTR* ppName)
 {
-	if (iIndex >= m_chapters.GetCount()) {
+	if (iIndex >= m_chapters.size()) {
 		return E_INVALIDARG;
 	}
 
@@ -391,7 +394,7 @@ STDMETHODIMP IDSMChapterBagImpl::ChapGet(DWORD iIndex, REFERENCE_TIME* prt, BSTR
 
 STDMETHODIMP IDSMChapterBagImpl::ChapSet(DWORD iIndex, REFERENCE_TIME rt, LPCWSTR pName)
 {
-	if (iIndex >= m_chapters.GetCount()) {
+	if (iIndex >= m_chapters.size()) {
 		return E_INVALIDARG;
 	}
 
@@ -409,23 +412,25 @@ STDMETHODIMP IDSMChapterBagImpl::ChapSet(DWORD iIndex, REFERENCE_TIME rt, LPCWST
 
 STDMETHODIMP IDSMChapterBagImpl::ChapAppend(REFERENCE_TIME rt, LPCWSTR pName)
 {
-	return ChapSet((DWORD)m_chapters.Add(CDSMChapter()), rt, pName);
+	m_chapters.emplace_back(CDSMChapter());
+
+	return ChapSet((DWORD)m_chapters.size() - 1, rt, pName);
 }
 
 STDMETHODIMP IDSMChapterBagImpl::ChapRemoveAt(DWORD iIndex)
 {
-	if (iIndex >= m_chapters.GetCount()) {
+	if (iIndex >= m_chapters.size()) {
 		return E_INVALIDARG;
 	}
 
-	m_chapters.RemoveAt(iIndex);
+	m_chapters.erase(m_chapters.begin() + iIndex);
 
 	return S_OK;
 }
 
 STDMETHODIMP IDSMChapterBagImpl::ChapRemoveAll()
 {
-	m_chapters.RemoveAll();
+	m_chapters.clear();
 
 	m_fSorted = false;
 
@@ -456,7 +461,9 @@ STDMETHODIMP IDSMChapterBagImpl::ChapSort()
 	if (m_fSorted) {
 		return S_FALSE;
 	}
-	qsort(m_chapters.GetData(), m_chapters.GetCount(), sizeof(CDSMChapter), CDSMChapter::Compare);
+
+	qsort(m_chapters.data(), m_chapters.size(), sizeof(CDSMChapter), CDSMChapter::Compare); // std::sort corrupts the value "order"
+
 	m_fSorted = true;
 	return S_OK;
 }
@@ -466,7 +473,7 @@ STDMETHODIMP IDSMChapterBagImpl::ChapSort()
 //
 
 CDSMChapterBag::CDSMChapterBag(LPUNKNOWN pUnk, HRESULT* phr)
-	: CUnknown(_T("CDSMChapterBag"), nullptr)
+	: CUnknown(L"CDSMChapterBag", nullptr)
 {
 }
 
