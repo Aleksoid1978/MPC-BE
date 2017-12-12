@@ -21,8 +21,8 @@
 
 #pragma once
 
-#include <atlcoll.h>
-#include <atlsimpcoll.h>
+#include <vector>
+#include <map>
 
 // IDSMPropertyBag
 
@@ -89,7 +89,7 @@ class CDSMResource
 public:
 	DWORD_PTR tag;
 	CStringW name, desc, mime;
-	CAtlArray<BYTE> data;
+	std::vector<BYTE> data;
 	CDSMResource();
 	CDSMResource(const CDSMResource& r);
 	CDSMResource(LPCWSTR name, LPCWSTR desc, LPCWSTR mime, BYTE* pData, int len, DWORD_PTR tag = 0);
@@ -98,18 +98,18 @@ public:
 
 	// global access to all resources
 	static CCritSec m_csResources;
-	static CAtlMap<uintptr_t, CDSMResource*> m_resources;
+	static std::map<uintptr_t, CDSMResource*> m_resources;
 };
 
 class IDSMResourceBagImpl : public IDSMResourceBag
 {
 protected:
-	CAtlArray<CDSMResource> m_resources;
+	std::vector<CDSMResource> m_resources;
 
 public:
 	IDSMResourceBagImpl();
 
-	void operator += (const CDSMResource& r) { m_resources.Add(r); }
+	void operator += (const CDSMResource& r) { m_resources.emplace_back(r); }
 
 	// IDSMResourceBag
 
@@ -153,13 +153,13 @@ public:
 class IDSMChapterBagImpl : public IDSMChapterBag
 {
 protected:
-	CAtlArray<CDSMChapter> m_chapters;
+	std::vector<CDSMChapter> m_chapters;
 	bool m_fSorted;
 
 public:
 	IDSMChapterBagImpl();
 
-	void operator += (const CDSMChapter& c) { m_chapters.Add(c); m_fSorted = false; }
+	void operator += (const CDSMChapter& c) { m_chapters.emplace_back(c); m_fSorted = false; }
 
 	// IDSMChapterBag
 
@@ -186,6 +186,36 @@ template<class T>
 int range_bsearch(const CAtlArray<T>& array, REFERENCE_TIME rt)
 {
 	int i = 0, j = array.GetCount() - 1, ret = -1;
+	if (j >= 0 && rt >= array[j].rt) {
+		return j;
+	}
+	while (i < j) {
+		int mid = (i + j) >> 1;
+		REFERENCE_TIME midrt = array[mid].rt;
+		if (rt == midrt) {
+			ret = mid;
+			break;
+		} else if (rt < midrt) {
+			ret = -1;
+			if (j == mid) {
+				mid--;
+			}
+			j = mid;
+		} else if (rt > midrt) {
+			ret = mid;
+			if (i == mid) {
+				mid++;
+			}
+			i = mid;
+		}
+	}
+	return ret;
+}
+
+template<class T>
+int range_bsearch(const std::vector<T>& array, REFERENCE_TIME rt)
+{
+	int i = 0, j = array.size() - 1, ret = -1;
 	if (j >= 0 && rt >= array[j].rt) {
 		return j;
 	}

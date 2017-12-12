@@ -194,12 +194,12 @@ HRESULT CDSMSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		SetProperty(CStringW(key), value);
 	}
 
-	for (size_t i = 0; i < m_resources.GetCount(); i++) {
+	for (size_t i = 0; i < m_resources.size(); i++) {
 		const CDSMResource& r = m_resources[i];
 		if (r.mime == L"application/x-truetype-font" ||
 				r.mime == L"application/x-font-ttf" ||
 				r.mime == L"application/vnd.ms-opentype") {
-			m_fontinst.InstallFontMemory(r.data.GetData(), r.data.GetCount());
+			m_fontinst.InstallFontMemory(r.data.data(), r.data.size());
 		}
 	}
 
