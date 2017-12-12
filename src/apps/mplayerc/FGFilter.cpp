@@ -669,25 +669,25 @@ CFGFilter* CFGFilterList::GetNext(POSITION& pos)
 	return m_sortedfilters.GetNext(pos);
 }
 
-int CFGFilterList::filter_cmp(const filter_t& fa, const filter_t& fb)
+int CFGFilterList::filter_cmp(const filter_t& a, const filter_t& b)
 {
-	if (fa.group < fb.group) {
+	if (a.group < b.group) {
 		return -1;
 	}
-	if (fa.group > fb.group) {
+	if (a.group > b.group) {
 		return +1;
 	}
 
-	if (fa.pFGF->GetMerit() > fb.pFGF->GetMerit()) {
+	if (a.pFGF->GetMerit() > b.pFGF->GetMerit()) {
 		return -1;
 	}
-	if (fa.pFGF->GetMerit() < fb.pFGF->GetMerit()) {
+	if (a.pFGF->GetMerit() < b.pFGF->GetMerit()) {
 		return +1;
 	}
 
-	if (fa.pFGF->GetCLSID() == fb.pFGF->GetCLSID()) {
-		CFGFilterFile* fgfa = dynamic_cast<CFGFilterFile*>(fa.pFGF);
-		CFGFilterFile* fgfb = dynamic_cast<CFGFilterFile*>(fb.pFGF);
+	if (a.pFGF->GetCLSID() == b.pFGF->GetCLSID()) {
+		CFGFilterFile* fgfa = dynamic_cast<CFGFilterFile*>(a.pFGF);
+		CFGFilterFile* fgfb = dynamic_cast<CFGFilterFile*>(b.pFGF);
 
 		if (fgfa && !fgfb) {
 			return -1;
@@ -697,17 +697,17 @@ int CFGFilterList::filter_cmp(const filter_t& fa, const filter_t& fb)
 		}
 	}
 
-	if (fa.exactmatch && !fb.exactmatch) {
+	if (a.exactmatch && !b.exactmatch) {
 		return -1;
 	}
-	if (!fa.exactmatch && fb.exactmatch) {
+	if (!a.exactmatch && b.exactmatch) {
 		return +1;
 	}
 
-	if (fa.index < fb.index) {
+	if (a.index < b.index) {
 		return -1;
 	}
-	if (fa.index > fb.index) {
+	if (a.index > b.index) {
 		return +1;
 	}
 
