@@ -156,8 +156,7 @@ struct {
 	{ AV_CODEC_ID_WMV3, DXVA2_ModeVC1_D, false },
 	// VP9
 	{ AV_CODEC_ID_VP9, DXVA2_ModeVP9_VLD_10bit_Profile2, true },
-	{ AV_CODEC_ID_VP9, DXVA2_ModeVP9_VLD_Profile0, false },
-	{ AV_CODEC_ID_VP9, DXVA2_VP9_VLD_Intel, false },
+	{ AV_CODEC_ID_VP9, DXVA2_ModeVP9_VLD_Profile0, false }
 };
 
 FFMPEG_CODECS ffCodecs[] = {
