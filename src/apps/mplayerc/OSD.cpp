@@ -764,12 +764,11 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 			m_MainFont.DeleteObject();
 		}
 
-		LOGFONT lf;
-		ZeroMemory(&lf, sizeof(lf));
+		LOGFONT lf = {};
 		lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
-		lf.lfHeight			= ScaleY(m_FontSize) * 10;
-		lf.lfQuality		= s.fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
-		wcscpy_s(lf.lfFaceName, LF_FACESIZE, m_OSD_Font.GetBuffer(0));
+		lf.lfHeight         = ScaleY(m_FontSize) * 10;
+		lf.lfQuality        = s.fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
+		wcscpy_s(lf.lfFaceName, LF_FACESIZE, m_OSD_Font);
 
 		m_MainFont.CreatePointFontIndirect(&lf, &m_MemDC);
 		m_MemDC.SelectObject(m_MainFont);
@@ -902,6 +901,24 @@ void COSD::DrawWnd()
 		return;
 	}
 
+	const CAppSettings& s = AfxGetAppSettings();
+
+	if (m_MainWndRectCashed == m_MainWndRect
+			&& m_strMessageCashed == m_strMessage
+			&& m_nMessagePosCashed == m_nMessagePos
+			&& m_OSD_FontCashed == m_OSD_Font
+			&& m_FontSizeCashed == m_FontSize
+			&& m_bFontAACashed == s.fFontAA) {
+		return;
+	}
+
+	m_MainWndRectCashed = m_MainWndRect;
+	m_strMessageCashed  = m_strMessage;
+	m_nMessagePosCashed = m_nMessagePos;
+	m_OSD_FontCashed    = m_OSD_Font;
+	m_FontSizeCashed    = m_FontSize;
+	m_bFontAACashed     = s.fFontAA;
+
 	CClientDC dc(this);
 
 	CDC temp_DC;
@@ -914,14 +931,11 @@ void COSD::DrawWnd()
 		m_MainFont.DeleteObject();
 	}
 
-	const CAppSettings& s = AfxGetAppSettings();
-
-	LOGFONT lf;
-	ZeroMemory(&lf, sizeof(lf));
+	LOGFONT lf = {};
 	lf.lfPitchAndFamily = DEFAULT_PITCH | FF_MODERN;
-	lf.lfHeight			= m_pMainFrame->ScaleY(m_FontSize) * 10;
-	lf.lfQuality		= s.fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
-	wcscpy_s(lf.lfFaceName, LF_FACESIZE, m_OSD_Font.GetBuffer(0));
+	lf.lfHeight         = ScaleY(m_FontSize) * 10;
+	lf.lfQuality        = s.fFontAA ? ANTIALIASED_QUALITY : NONANTIALIASED_QUALITY;
+	wcscpy_s(lf.lfFaceName, LF_FACESIZE, m_OSD_Font);
 
 	m_MainFont.CreatePointFontIndirect(&lf, &temp_DC);
 	temp_DC.SelectObject(m_MainFont);

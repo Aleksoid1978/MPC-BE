@@ -166,6 +166,13 @@ private :
 
 	UINT m_nDEFFLAGS;
 
+	CRect          m_MainWndRectCashed;
+	CString        m_strMessageCashed;
+	OSD_MESSAGEPOS m_nMessagePosCashed = OSD_NOMESSAGE;
+	CString        m_OSD_FontCashed;
+	int            m_FontSizeCashed = 0;
+	bool           m_bFontAACashed = false;
+
 	void UpdateBitmap();
 	void CalcRect();
 	void UpdateSeekBarPos(CPoint point);
