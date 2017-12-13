@@ -940,8 +940,23 @@ void COSD::DrawWnd()
 	m_MainFont.CreatePointFontIndirect(&lf, &temp_DC);
 	temp_DC.SelectObject(m_MainFont);
 
-	const CSize cSize = temp_DC.GetTextExtent(m_strMessage);
-	const CRect rectText(0, 0, cSize.cx + 10, cSize.cy + 10);
+	LONG messageWidth = 0;
+	if (m_strMessage.Find(L'\n') == -1) {
+		messageWidth = temp_DC.GetTextExtent(m_strMessage).cx;
+	} else {
+		CAtlList<CString> args;
+		ExplodeEsc(m_strMessage, args, L'\n');
+		POSITION pos = args.GetHeadPosition();
+		while (pos) {
+			const CString& str = args.GetNext(pos);
+			messageWidth = std::max(messageWidth, temp_DC.GetTextExtent(str).cx);
+		}
+	}
+
+	CRect rectText;
+	temp_DC.DrawText(m_strMessage, &rectText, DT_CALCRECT);
+	rectText.right = messageWidth;
+	rectText.InflateRect(0, 0, 10, 10);
 
 	CRect rectMessages;
 	switch (m_nMessagePos) {
