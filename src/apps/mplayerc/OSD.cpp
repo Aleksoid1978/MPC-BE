@@ -926,18 +926,17 @@ void COSD::DrawWnd()
 	m_MainFont.CreatePointFontIndirect(&lf, &temp_DC);
 	temp_DC.SelectObject(m_MainFont);
 
-	CRect rectText;
-	CRect rectMessages;
-	temp_DC.DrawText(m_strMessage, &rectText, DT_CALCRECT);
-	rectText.InflateRect(0, 0, 10, 10);
+	const CSize cSize = temp_DC.GetTextExtent(m_strMessage);
+	const CRect rectText(0, 0, cSize.cx + 10, cSize.cy + 10);
 
+	CRect rectMessages;
 	switch (m_nMessagePos) {
 		case OSD_TOPLEFT :
 			rectMessages = CRect(0, 0, std::min((rectText.right + 10), (LONG)m_MainWndRect.Width() - 20), std::min((rectText.bottom + 2), (LONG)m_MainWndRect.Height() - 20));
 			break;
 		case OSD_TOPRIGHT :
 		default :
-			int imax = std::max(0, m_MainWndRect.Width() - rectText.Width() - 30);
+			const int imax = std::max(0, m_MainWndRect.Width() - rectText.Width() - 30);
 			rectMessages = CRect(imax, 0, (m_MainWndRect.Width() - 20) + imax, std::min((rectText.bottom + 2), (LONG)m_MainWndRect.Height() - 20));
 			break;
 	}
@@ -946,7 +945,7 @@ void COSD::DrawWnd()
 	temp_BM.DeleteObject();
 	temp_DC.DeleteDC();
 
-	CRect wr(m_MainWndRect.left + 10 + rectMessages.left, m_MainWndRect.top + 10, rectMessages.Width() - rectMessages.left, rectMessages.Height());
+	CRect wr(m_MainWndRect.left + 10 + rectMessages.left, m_MainWndRect.top + 10, rectMessages.right, rectMessages.Height());
 	if (SysVersion::IsWin8orLater()) {
 		wr.left	-= m_MainWndRect.left;
 		wr.top	-= m_MainWndRect.top;
@@ -983,7 +982,7 @@ void COSD::DrawWnd()
 		r.bottom	+= rectText.Height();
 
 		mdc.SetTextColor(RGB(16, 24, 32));
-		mdc.DrawText(m_strMessage, &r, uFormat);
+		mdc.DrawTextW(m_strMessage, &r, uFormat);
 	}
 
 	r			= rcBar;
@@ -992,7 +991,7 @@ void COSD::DrawWnd()
 	r.bottom	+= rectText.Height();
 
 	mdc.SetTextColor(s.clrFontABGR);
-	mdc.DrawText(m_strMessage, m_strMessage.GetLength(), &r, uFormat);
+	mdc.DrawTextW(m_strMessage, &r, uFormat);
 
 	/*
 	// GDI+ handling
