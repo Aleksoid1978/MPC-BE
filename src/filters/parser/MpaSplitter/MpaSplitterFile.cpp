@@ -129,10 +129,10 @@ HRESULT CMpaSplitterFile::Init()
 					m_pID3Tag = DNew CID3Tag();
 				}
 
-				size_t size = 128 - 3;
-				BYTE* buf = DNew BYTE[size];
-				ByteRead(buf, size);
-				m_pID3Tag->ReadTagsV1(buf, size);
+				const size_t tag_size = ID3v1_TAG_SIZE - 3;
+				BYTE* buf = DNew BYTE[tag_size];
+				ByteRead(buf, tag_size);
+				m_pID3Tag->ReadTagsV1(buf, tag_size);
 
 				delete [] buf;
 			}
@@ -161,11 +161,10 @@ HRESULT CMpaSplitterFile::Init()
 
 	Seek(m_startpos);
 
-	__int64 startpos = 0;
+	__int64 startpos = m_startpos;
 
 	const __int64 limit = IsRandomAccess() ? MEGABYTE : 64 * KILOBYTE;
-	const __int64 endDataPos = std::min(endpos / 2, limit + m_startpos);
-	const __int64 size = endDataPos - m_startpos;
+	const __int64 size = std::min(endpos - m_startpos, limit);
 	BYTE* buffer = DNew BYTE[size];
 
 	int valid_cnt = 0;
