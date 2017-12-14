@@ -10587,25 +10587,22 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	ModifyStyle(dwRemove, dwAdd, SWP_NOZORDER);
 	ModifyStyleEx(dwRemoveEx, dwAddEx, SWP_NOZORDER);
 
-	static bool change_monitor = false;
+	static bool bChangeMonitor = false;
 	// try disable shader when move from one monitor to other ...
 	if (m_bFullScreen) {
-		change_monitor = (hm != hm_cur);
-		if (change_monitor && (!m_bToggleShader)) {
-			if (m_pCAP) {
+		bChangeMonitor = (hm != hm_cur);
+		if (bChangeMonitor && m_pCAP) {
+			if (!m_bToggleShader) {
 				m_pCAP->ClearPixelShaders(TARGET_FRAME);
 			}
-		}
-		if (change_monitor && m_bToggleShaderScreenSpace) {
-			if (m_pCAP) {
+
+			if (m_bToggleShaderScreenSpace) {
 				m_pCAP->ClearPixelShaders(TARGET_SCREEN);
 			}
 		}
 	} else {
-		if (change_monitor && m_bToggleShader) { // ???
-			if (m_pCAP) {
-				m_pCAP->ClearPixelShaders(TARGET_FRAME);
-			}
+		if (bChangeMonitor && m_pCAP && m_bToggleShader) { // ???
+			m_pCAP->ClearPixelShaders(TARGET_FRAME);
 		}
 	}
 
@@ -10676,7 +10673,13 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 				ShowWindow(SW_HIDE);
 				SetWindowPos(nullptr, r.left, r.top, r.Width(), r.Height(), SWP_NOZORDER | SWP_NOSENDCHANGING);
 			}
-			ZoomVideoWindow();
+
+			if (m_eMediaLoadState == MLS_LOADED) {
+				ZoomVideoWindow();
+			} else {
+				RestoreDefaultWindowRect();
+			}
+
 			if (m_LastWindow_HM != hm_cur) {
 				ShowWindow(SW_SHOW);
 			}
@@ -10690,7 +10693,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 	MoveVideoWindow();
 
-	if ((change_monitor) && (!m_bToggleShader || !m_bToggleShaderScreenSpace)) { // Enabled shader ...
+	if (bChangeMonitor && (!m_bToggleShader || !m_bToggleShaderScreenSpace)) { // Enabled shader ...
 		SetShaders();
 	}
 
