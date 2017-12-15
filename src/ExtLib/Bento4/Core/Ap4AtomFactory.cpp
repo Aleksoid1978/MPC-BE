@@ -598,6 +598,12 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         // VP8/VP9
         case AP4_ATOM_TYPE_VP80:
         case AP4_ATOM_TYPE_VP90:
+        // Vidvox Hap
+        case AP4_ATOM_TYPE_Hap1:
+        case AP4_ATOM_TYPE_Hap5:
+        case AP4_ATOM_TYPE_HapA:
+        case AP4_ATOM_TYPE_HapM:
+        case AP4_ATOM_TYPE_HapY:
             atom = new AP4_VisualSampleEntry(type, size, stream, *this);
             break;
 

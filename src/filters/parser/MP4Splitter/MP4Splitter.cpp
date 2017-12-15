@@ -838,6 +838,12 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							FormatTrackName(L"VP8", 0);
 						} else if (type == AP4_ATOM_TYPE_VP90) {
 							FormatTrackName(L"VP9", 0);
+						} else if (type == AP4_ATOM_TYPE_Hap1 ||
+								type == AP4_ATOM_TYPE_Hap5 ||
+								type == AP4_ATOM_TYPE_HapA ||
+								type == AP4_ATOM_TYPE_HapM ||
+								type == AP4_ATOM_TYPE_HapY) {
+							FormatTrackName(L"Vidvox Hap", 0);
 						} else if (fourcc == FCC('WVC1')) {
 							FormatTrackName(L"VC-1", 0);
 							if (AP4_Dvc1Atom* Dvc1 = dynamic_cast<AP4_Dvc1Atom*>(vse->GetChild(AP4_ATOM_TYPE_DVC1))) {
@@ -893,7 +899,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							} else if (bitcount == 32) {
 								mt.subtype = MEDIASUBTYPE_ARGB32;
 							} else {
-								break; // incorect or unsuported
+								break; // incorrect or unsupported
 							}
 							mts.Add(mt);
 							break;

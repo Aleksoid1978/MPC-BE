@@ -97,6 +97,7 @@ static filter_t s_filters[] = {
 	{L"Theora",						VIDEO_DECODER, VDEC_THEORA,			0},
 	{L"Ut Video",					VIDEO_DECODER, VDEC_UT,				0},
 	{L"VC-1 (FFmpeg)",				VIDEO_DECODER, VDEC_VC1,			0},
+	{L"Vidvox Hap",					VIDEO_DECODER, VDEC_HAP,			0},
 	{L"VP3/5/6",					VIDEO_DECODER, VDEC_VP356,			0},
 	{L"VP7/8/9",					VIDEO_DECODER, VDEC_VP789,			0},
 	{L"WMV1/2/3",					VIDEO_DECODER, VDEC_WMV,			0},

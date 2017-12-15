@@ -472,6 +472,7 @@ static const struct {
 	{CODEC_THEORA,		L"Theora"},
 	{CODEC_UTVD,		L"Ut video"},
 	{CODEC_VC1,			L"VC-1 (FFmpeg)"},
+	{CODEC_HAP,			L"Vidvox Hap"},
 	{CODEC_VP356,		L"VP3/5/6"},
 	{CODEC_VP89,		L"VP7/8/9"},
 	{CODEC_WMV,			L"WMV1/2/3"},

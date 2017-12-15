@@ -116,6 +116,7 @@ vcodecs[] = {
 	{L"cinepak",		CODEC_CINEPAK	},
 	{L"quicktime",		CODEC_QT		},
 	{L"cineform",		CODEC_CINEFORM	},
+	{L"hap",			CODEC_HAP		},
 	// dxva codecs
 	{L"h264_dxva",		CODEC_H264_DXVA	},
 	{L"hevc_dxva",		CODEC_HEVC_DXVA	},
@@ -461,6 +462,13 @@ FFMPEG_CODECS ffCodecs[] = {
 	{ &MEDIASUBTYPE_WV1F, AV_CODEC_ID_MPEG4, VDEC_XVID, -1 },
 	{ &MEDIASUBTYPE_wv1f, AV_CODEC_ID_MPEG4, VDEC_XVID, -1 },
 
+	// Vidvox Hap
+	{ &MEDIASUBTYPE_Hap1, AV_CODEC_ID_HAP, VDEC_HAP, -1 },
+	{ &MEDIASUBTYPE_Hap5, AV_CODEC_ID_HAP, VDEC_HAP, -1 },
+	{ &MEDIASUBTYPE_HapA, AV_CODEC_ID_HAP, VDEC_HAP, -1 },
+	{ &MEDIASUBTYPE_HapM, AV_CODEC_ID_HAP, VDEC_HAP, -1 },
+	{ &MEDIASUBTYPE_HapY, AV_CODEC_ID_HAP, VDEC_HAP, -1 },
+
 	// uncompressed video
 	{ &MEDIASUBTYPE_v210, AV_CODEC_ID_V210, VDEC_UNCOMPRESSED, -1 },
 	{ &MEDIASUBTYPE_V410, AV_CODEC_ID_V410, VDEC_UNCOMPRESSED, -1 },
@@ -793,6 +801,13 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_ump4 },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_WV1F },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_wv1f },
+
+	// Vidvox Hap
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_Hap1 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_Hap5 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HapA },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HapM },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HapY },
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesInUncompressed[] = {
@@ -1420,6 +1435,9 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 				case AV_CODEC_ID_QTRLE :
 				case AV_CODEC_ID_RPZA  :
 					bCodecActivated = (m_nActiveCodecs & CODEC_QT) != 0;
+					break;
+				case AV_CODEC_ID_HAP :
+					bCodecActivated = (m_nActiveCodecs & CODEC_HAP) != 0;
 					break;
 			}
 

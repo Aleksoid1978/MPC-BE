@@ -242,13 +242,15 @@ SRCS_LC = \
 	libavcodec/h264_sei.c \
 	libavcodec/h264_slice.c \
 	libavcodec/h264dec.c \
-	libavcodec/h2645_parse.c \
 	libavcodec/h264chroma.c \
 	libavcodec/h264data.c \
 	libavcodec/h264dsp.c \
 	libavcodec/h264idct.c \
 	libavcodec/h264pred.c \
 	libavcodec/h264qpel.c \
+	libavcodec/h2645_parse.c \
+	libavcodec/hap.c \
+	libavcodec/hapdec.c \
 	libavcodec/hevc_cabac.c \
 	libavcodec/hevc_data.c \
 	libavcodec/hevc_filter.c \
@@ -421,6 +423,7 @@ SRCS_LC_B = \
 	libavcodec/sinewin.c \
 	libavcodec/sipr.c \
 	libavcodec/sipr16k.c \
+	libavcodec/snappy.c \
 	libavcodec/snow_dwt.c \
 	libavcodec/snow.c \
 	libavcodec/sp5xdec.c \
@@ -434,6 +437,7 @@ SRCS_LC_B = \
 	libavcodec/tak_parser.c \
 	libavcodec/takdec.c \
 	libavcodec/takdsp.c \
+	libavcodec/texturedsp.c \
 	libavcodec/tiff.c \
 	libavcodec/tiff_common.c \
 	libavcodec/tiff_data.c \
