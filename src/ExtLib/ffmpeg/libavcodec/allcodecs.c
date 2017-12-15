@@ -151,6 +151,7 @@ static void register_all(void)
     REGISTER_DECODER(V210,              v210);
     REGISTER_DECODER(V410,              v410);
     REGISTER_DECODER(RAWVIDEO,          rawvideo);
+    REGISTER_DECODER(HAP,               hap);
 
     /* audio codecs */
     REGISTER_DECODER(AAC,               aac);

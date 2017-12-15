@@ -491,6 +491,12 @@ const AP4_Atom::Type AP4_ATOM_TYPE_M2RA = AP4_ATOM_TYPE('M','2','R','A');
 // VP8/VP9
 const AP4_Atom::Type AP4_ATOM_TYPE_VP80 = AP4_ATOM_TYPE('v','p','0','8');
 const AP4_Atom::Type AP4_ATOM_TYPE_VP90 = AP4_ATOM_TYPE('v','p','0','9');
+// Vidvox Hap
+const AP4_Atom::Type AP4_ATOM_TYPE_Hap1 = AP4_ATOM_TYPE('H','a','p','1');
+const AP4_Atom::Type AP4_ATOM_TYPE_Hap5 = AP4_ATOM_TYPE('H','a','p','5');
+const AP4_Atom::Type AP4_ATOM_TYPE_HapA = AP4_ATOM_TYPE('H','a','p','A');
+const AP4_Atom::Type AP4_ATOM_TYPE_HapM = AP4_ATOM_TYPE('H','a','p','M');
+const AP4_Atom::Type AP4_ATOM_TYPE_HapY = AP4_ATOM_TYPE('H','a','p','Y');
 
 const AP4_Atom::Type AP4_ATOM_TYPE_VPCC = AP4_ATOM_TYPE('v','p','c','C');
 // fragmented atom ...
