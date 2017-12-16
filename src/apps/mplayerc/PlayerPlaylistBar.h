@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <afxcoll.h>
 #include "PlayerBar.h"
 #include "PlayerListCtrl.h"
 #include "../../DSUtil/CUE.h"

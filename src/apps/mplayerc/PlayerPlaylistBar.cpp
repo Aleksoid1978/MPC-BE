@@ -340,10 +340,8 @@ void CPlaylistItem::AutoLoadFiles()
 		std::vector<CString> paths;
 		StringToPaths(curdir, s.strAudioPaths, paths);
 
-		CAtlList<CString>* sl = &s.slAudioPathsAddons;
-		POSITION pos = sl->GetHeadPosition();
-		while (pos) {
-			paths.push_back(sl->GetNext(pos));
+		for (const auto& apa : s.slAudioPathsAddons) {
+			paths.push_back(apa);
 		}
 
 		CMediaFormats& mf = s.m_Formats;
@@ -352,12 +350,12 @@ void CPlaylistItem::AutoLoadFiles()
 				WIN32_FIND_DATAW fd = {0};
 
 				HANDLE hFind;
-				CAtlArray<CString> searchPattern;
-				searchPattern.Add(path + name + L"*.*");
+				std::vector<CString> searchPattern;
+				searchPattern.push_back(path + name + L"*.*");
 				if (!BDLabel.IsEmpty()) {
-					searchPattern.Add(path + BDLabel + L"*.*");
+					searchPattern.push_back(path + BDLabel + L"*.*");
 				}
-				for (size_t j = 0; j < searchPattern.GetCount(); j++) {
+				for (size_t j = 0; j < searchPattern.size(); j++) {
 					hFind = FindFirstFileW(searchPattern[j], &fd);
 
 					if (hFind != INVALID_HANDLE_VALUE) {
@@ -393,10 +391,8 @@ void CPlaylistItem::AutoLoadFiles()
 		std::vector<CString> paths;
 		StringToPaths(curdir, s.strSubtitlePaths, paths);
 
-		CAtlList<CString>* sl = &s.slSubtitlePathsAddons;
-		POSITION pos = sl->GetHeadPosition();
-		while (pos) {
-			paths.push_back(sl->GetNext(pos));
+		for (const auto& spa : s.slSubtitlePathsAddons) {
+			paths.push_back(spa);
 		}
 
 		std::vector<Subtitle::SubFile> ret;
