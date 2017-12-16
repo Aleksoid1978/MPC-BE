@@ -60,7 +60,7 @@ void mpc_filehash(CPlaylist& pl, CList<filehash>& fhs)
 	POSITION pos = pl.GetHeadPosition();
 
 	while (pos) {
-		CString fn = pl.GetNext(pos).m_fns.GetHead();
+		CString fn = pl.GetNext(pos).m_fns.front();
 
 		if (AfxGetAppSettings().m_Formats.FindAudioExt(CPath(fn).GetExtension().MakeLower())) {
 			continue;

@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <list>
 #include "SettingsDefines.h"
 #include "FilterEnum.h"
 #include "../../filters/renderer/VideoRenderers/RenderersSettings.h"
@@ -466,7 +467,7 @@ public:
 		return m_title;
 	};
 };
-typedef CAtlList<CSubtitleItem> CSubtitleItemList;
+typedef std::list<CSubtitleItem> CSubtitleItemList;
 
 typedef CAtlList<CString> cmdLine;
 

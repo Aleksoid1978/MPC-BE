@@ -743,7 +743,7 @@ public:
 	bool DoCapture(), StartCapture(), StopCapture();
 
 	bool DoAfterPlaybackEvent();
-	void ParseDirs(CAtlList<CString>& sl);
+	void ParseDirs(std::list<CString>& sl);
 	int SearchInDir(bool DirForward);
 
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
@@ -792,7 +792,7 @@ protected:  // control bar embedded members
 
 	const UINT CF_URLA = RegisterClipboardFormat(CFSTR_INETURLA);
 	const UINT CF_URLW = RegisterClipboardFormat(CFSTR_INETURLW);
-	void DropFiles(CAtlList<CString>& slFiles);
+	void DropFiles(std::list<CString>& slFiles);
 
 	LPCTSTR GetRecentFile();
 
@@ -1325,7 +1325,7 @@ protected:
 
 	BOOL		OpenYoutubePlaylist(CString url, BOOL bOnlyParse = FALSE);
 
-	BOOL		AddSimilarFiles(CAtlList<CString>& fns);
+	BOOL		AddSimilarFiles(std::list<CString>& fns);
 
 	void		SetToolBarAudioButton();
 	void		SetToolBarSubtitleButton();

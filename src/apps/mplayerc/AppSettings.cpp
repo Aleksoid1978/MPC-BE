@@ -1797,7 +1797,7 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 	nCLSwitches = 0;
 	slFiles.RemoveAll();
 	slDubs.RemoveAll();
-	slSubs.RemoveAll();
+	slSubs.clear();
 	slFilters.RemoveAll();
 	rtStart = INVALID_TIME;
 	rtShift = 0;
@@ -1842,7 +1842,7 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 				}
 				slDubs.AddTail(strFile);
 			} else if (sw == L"sub" && pos) {
-				slSubs.AddTail(ParseFileName(cmdln.GetNext(pos)));
+				slSubs.push_back(ParseFileName(cmdln.GetNext(pos)));
 			} else if (sw == L"filter" && pos) {
 				slFilters.AddTail(cmdln.GetNext(pos));
 			} else if (sw == L"dvd") {
