@@ -44,6 +44,25 @@ T Explode(const T& str, CAtlList<T>& sl, SEP sep, size_t limit = 0)
 }
 
 template<class T, typename SEP>
+T Explode(const T& str, std::list<T>& sl, SEP sep, size_t limit = 0)
+{
+	sl.clear();
+
+	for (int i = 0, j = 0; ; i = j+1) {
+		j = str.Find(sep, i);
+
+		if (j < 0 || sl.size() == limit-1) {
+			sl.push_back(str.Mid(i).Trim());
+			break;
+		} else {
+			sl.push_back(str.Mid(i, j-i).Trim());
+		}
+	}
+
+	return sl.front();
+}
+
+template<class T, typename SEP>
 T ExplodeMin(const T& str, CAtlList<T>& sl, SEP sep, size_t limit = 0)
 {
 	Explode(str, sl, sep, limit);
@@ -131,6 +150,20 @@ T Implode(const CAtlList<T>& sl, SEP sep)
 	while (pos) {
 		ret += sl.GetNext(pos);
 		if (pos) {
+			ret += sep;
+		}
+	}
+	return ret;
+}
+
+template<class T, typename SEP>
+T Implode(const std::list<T>& sl, SEP sep)
+{
+	T ret;
+	auto it = sl.begin();
+	while (it != sl.end()) {
+		ret += *it++;
+		if (it != sl.end()) {
 			ret += sep;
 		}
 	}

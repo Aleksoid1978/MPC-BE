@@ -246,7 +246,7 @@ namespace Content {
 	const std::wregex ref_qtl(L"src[ \\t]*=[ \\t]*\"([^\"\\n]+)\"");                                    // src="..."
 	const std::wregex ref_wpl(L"<media src=\"([^\"\\n]+)\"");                                           // <media src="..."
 
-	static const bool FindRedir(CUrl& src, CString ct, CString& body, CAtlList<CString>& urls, int playlist_type)
+	static const bool FindRedir(CUrl& src, CString ct, CString& body, std::list<CString>& urls, int playlist_type)
 	{
 		std::wregex rgx;
 
@@ -305,18 +305,18 @@ namespace Content {
 			if (_wcsicmp(src.GetSchemeName(), dst.GetSchemeName())
 					|| _wcsicmp(src.GetHostName(), dst.GetHostName())
 					|| _wcsicmp(src.GetUrlPath(), dst.GetUrlPath())) {
-				urls.AddTail(url);
+				urls.push_back(url);
 			} else {
 				// recursive
-				urls.RemoveAll();
+				urls.clear();
 				break;
 			}
 		}
 
-		return urls.GetCount() > 0;
+		return urls.size() > 0;
 	}
 
-	static const bool FindRedir(CString& fn, CString ct, CAtlList<CString>& fns, int playlist_type)
+	static const bool FindRedir(CString& fn, CString ct, std::list<CString>& fns, int playlist_type)
 	{
 		CString body;
 
@@ -366,13 +366,13 @@ namespace Content {
 				continue;
 			}
 
-			fns.AddTail(fn2);
+			fns.push_back(fn2);
 		}
 
-		return fns.GetCount() > 0;
+		return fns.size() > 0;
 	}
 
-	const CString GetType(CString fn, CAtlList<CString>* redir)
+	const CString GetType(CString fn, std::list<CString>* redir)
 	{
 		CUrl url;
 		CString ct, body;

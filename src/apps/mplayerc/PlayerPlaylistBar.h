@@ -252,7 +252,7 @@ public:
 	void Append(CString fn);
 	void Append(std::list<CString>& fns, bool fMulti, CSubtitleItemList* subs = nullptr, bool bCheck = true);
 	void Append(CFileItemList& fis);
-	bool Replace(CString filename, CAtlList<CString>& fns);
+	bool Replace(CString filename, std::list<CString>& fns);
 
 	void Open(CStringW vdn, CStringW adn, int vinput, int vchannel, int ainput);
 	void Append(CStringW vdn, CStringW adn, int vinput, int vchannel, int ainput);
