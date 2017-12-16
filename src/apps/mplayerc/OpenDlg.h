@@ -35,7 +35,7 @@ public:
 	virtual ~COpenDlg();
 
 	bool m_bMultipleFiles;
-	CAtlList<CString> m_fns;
+	std::list<CString> m_fns;
 
 	enum { IDD = IDD_OPEN_DLG };
 	BOOL m_bPasteClipboardURL;

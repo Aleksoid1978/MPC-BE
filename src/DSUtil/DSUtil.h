@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <list>
 #include "NullRenderers.h"
 #include "H264Nalu.h"
 #include "MediaTypeEx.h"
@@ -114,7 +115,7 @@ enum cdrom_t {
 	CDROM_BDVideo,
 	CDROM_Unknown
 };
-extern cdrom_t			GetCDROMType(TCHAR drive, CAtlList<CString>& files);
+extern cdrom_t			GetCDROMType(TCHAR drive, std::list<CString>& files);
 extern CString			GetDriveLabel(TCHAR drive);
 
 extern DVD_HMSF_TIMECODE	RT2HMSF(REFERENCE_TIME rt, double fps = 0); // use to remember the current position

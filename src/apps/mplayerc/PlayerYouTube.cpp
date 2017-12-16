@@ -910,7 +910,7 @@ namespace Youtube
 											}
 
 											if (!url.IsEmpty() && !name.IsEmpty()) {
-												subs.AddTail(CSubtitleItem(url, name));
+												subs.push_back(CSubtitleItem(url, name));
 											}
 										}
 									}

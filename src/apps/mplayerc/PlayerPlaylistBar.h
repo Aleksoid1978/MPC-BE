@@ -98,7 +98,7 @@ public:
 		chaplist.assign(m_ChaptersList.begin(), m_ChaptersList.end());
 	}
 };
-typedef CAtlList<CFileItem> CFileItemList;
+typedef std::list<CFileItem> CFileItemList;
 
 class CPlaylistItem
 {
@@ -129,7 +129,7 @@ public:
 	CPlaylistItem(const CPlaylistItem& pli);
 	CPlaylistItem& operator = (const CPlaylistItem& pli);
 
-	POSITION FindFile(LPCTSTR path);
+	bool FindFile(LPCTSTR path);
 	void AutoLoadFiles();
 
 	CString GetLabel(int i = 0);
@@ -179,10 +179,10 @@ private:
 	void ResizeListColumn();
 
 	void AddItem(CString fn, CSubtitleItemList* subs);
-	void AddItem(CAtlList<CString>& fns, CSubtitleItemList* subs);
+	void AddItem(std::list<CString>& fns, CSubtitleItemList* subs);
 	void ParsePlayList(CString fn, CSubtitleItemList* subs, bool bCheck = true);
-	void ParsePlayList(CAtlList<CString>& fns, CSubtitleItemList* subs, bool bCheck = true);
-	void ResolveLinkFiles(CAtlList<CString> &fns);
+	void ParsePlayList(std::list<CString>& fns, CSubtitleItemList* subs, bool bCheck = true);
+	void ResolveLinkFiles(std::list<CString> &fns);
 
 	bool ParseMPCPlayList(CString fn);
 	bool SaveMPCPlayList(CString fn, CTextFile::enc e, bool fRemovePath);
@@ -248,9 +248,9 @@ public:
 	bool Empty();
 
 	void Open(CString fn);
-	void Open(CAtlList<CString>& fns, bool fMulti, CSubtitleItemList* subs = nullptr, bool bCheck = true);
+	void Open(std::list<CString>& fns, bool fMulti, CSubtitleItemList* subs = nullptr, bool bCheck = true);
 	void Append(CString fn);
-	void Append(CAtlList<CString>& fns, bool fMulti, CSubtitleItemList* subs = nullptr, bool bCheck = true);
+	void Append(std::list<CString>& fns, bool fMulti, CSubtitleItemList* subs = nullptr, bool bCheck = true);
 	void Append(CFileItemList& fis);
 	bool Replace(CString filename, CAtlList<CString>& fns);
 
@@ -264,7 +264,7 @@ public:
 
 	bool SelectFileInPlaylist(CString filename);
 
-	void DropFiles(CAtlList<CString>& slFiles);
+	void DropFiles(std::list<CString>& slFiles);
 
 	bool IsPlaylistVisible() const { return IsWindowVisible() || m_bVisible; }
 

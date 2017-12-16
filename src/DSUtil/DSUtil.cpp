@@ -830,7 +830,7 @@ CString BinToCString(const BYTE* ptr, size_t len)
 	return ret;
 }
 
-static void FindFiles(CString fn, CAtlList<CString>& files)
+static void FindFiles(CString fn, std::list<CString>& files)
 {
 	CString path = fn;
 	path.Replace('/', '\\');
@@ -840,16 +840,16 @@ static void FindFiles(CString fn, CAtlList<CString>& files)
 	HANDLE h = FindFirstFile(fn, &findData);
 	if (h != INVALID_HANDLE_VALUE) {
 		do {
-			files.AddTail(path + findData.cFileName);
+			files.push_back(path + findData.cFileName);
 		} while (FindNextFile(h, &findData));
 
 		FindClose(h);
 	}
 }
 
-cdrom_t GetCDROMType(TCHAR drive, CAtlList<CString>& files)
+cdrom_t GetCDROMType(TCHAR drive, std::list<CString>& files)
 {
-	files.RemoveAll();
+	files.clear();
 
 	CString path;
 	path.Format(_T("%c:"), drive);
@@ -857,13 +857,13 @@ cdrom_t GetCDROMType(TCHAR drive, CAtlList<CString>& files)
 	if (GetDriveType(path + _T("\\")) == DRIVE_CDROM) {
 		// CDROM_DVDVideo
 		FindFiles(path + _T("\\VIDEO_TS\\video_ts.ifo"), files);
-		if (files.GetCount() > 0) {
+		if (files.size() > 0) {
 			return CDROM_DVDVideo;
 		}
 
         // CDROM_BD
         FindFiles(path + _T("\\BDMV\\index.bdmv"), files);
-        if (!files.IsEmpty()) {
+        if (!files.empty()) {
             return CDROM_BDVideo;
         }
 
@@ -876,7 +876,7 @@ cdrom_t GetCDROMType(TCHAR drive, CAtlList<CString>& files)
 		FindFiles(path + _T("\\mpegav\\music??.mpg"),	files);
 		FindFiles(path + _T("\\mpeg2\\music??.dat"),	files);
 		FindFiles(path + _T("\\mpeg2\\music??.mpg"),	files);
-		if (files.GetCount() > 0) {
+		if (files.size() > 0) {
 			return CDROM_VideoCD;
 		}
 
@@ -893,14 +893,14 @@ cdrom_t GetCDROMType(TCHAR drive, CAtlList<CString>& files)
 					if (TOC.TrackData[i-1].Control == 0 || TOC.TrackData[i-1].Control == 1) {
 						CString fn;
 						fn.Format(_T("%s\\track%02d.cda"), path, i);
-						files.AddTail(fn);
+						files.push_back(fn);
 					}
 				}
 			}
 
 			CloseHandle(hDrive);
 		}
-		if (files.GetCount() > 0) {
+		if (files.size() > 0) {
 			return CDROM_Audio;
 		}
 

@@ -122,7 +122,7 @@ BOOL COpenDlg::OnInitDialog()
 		CloseClipboard();
 	}
 
-	m_fns.RemoveAll();
+	m_fns.clear();
 	m_path.Empty();
 	m_path2.Empty();
 	m_bMultipleFiles = false;
@@ -179,7 +179,7 @@ void COpenDlg::OnBnClickedBrowsebutton()
 		return;
 	}
 
-	m_fns.RemoveAll();
+	m_fns.clear();
 
 	POSITION pos = fd.GetStartPosition();
 	while (pos) {
@@ -191,13 +191,13 @@ void COpenDlg::OnBnClickedBrowsebutton()
 		if (!insertpos) m_fns.AddHead(str);
 		else m_fns.InsertAfter(insertpos, str);
 		*/
-		m_fns.AddTail(fd.GetNextPathName(pos));
+		m_fns.push_back(fd.GetNextPathName(pos));
 	}
 
-	if (m_fns.GetCount() > 1
-			|| m_fns.GetCount() == 1
-			&& (m_fns.GetHead()[m_fns.GetHead().GetLength()-1] == '\\'
-				|| m_fns.GetHead()[m_fns.GetHead().GetLength()-1] == '*')) {
+	if (m_fns.size() > 1
+			|| m_fns.size() == 1
+			&& (m_fns.front()[m_fns.front().GetLength()-1] == '\\'
+				|| m_fns.front()[m_fns.front().GetLength()-1] == '*')) {
 		m_bMultipleFiles = true;
 		EndDialog(IDOK);
 		return;
@@ -235,11 +235,11 @@ void COpenDlg::OnBnClickedOk()
 {
 	UpdateData();
 
-	m_fns.RemoveAll();
-	m_fns.AddTail(m_path);
+	m_fns.clear();
+	m_fns.push_back(m_path);
 
 	if (m_mrucombo2.IsWindowEnabled() && !m_path2.IsEmpty()) {
-		m_fns.AddTail(m_path2);
+		m_fns.push_back(m_path2);
 
 		if (::PathFileExistsW(m_path2)) {
 			AfxGetMainFrame()->AddAudioPathsAddons(m_path2);

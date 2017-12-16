@@ -22,6 +22,7 @@
 #pragma once
 
 #include <atlcoll.h>
+#include <list>
 
 template<class T, typename SEP>
 T Explode(const T& str, CAtlList<T>& sl, SEP sep, size_t limit = 0)
@@ -89,6 +90,37 @@ T ExplodeEsc(T str, CAtlList<T>& sl, SEP sep, size_t limit = 0, SEP esc = _T('\\
 	sl.AddTail(str.Mid(split).Trim());
 
 	return sl.GetHead();
+}
+
+template<class T, typename SEP>
+T ExplodeEsc(T str,std::list<T>& sl, SEP sep, size_t limit = 0, SEP esc = _T('\\'))
+{
+	sl.clear();
+
+	int split = 0;
+	for (int i = 0, j = 0; ; i = j + 1) {
+		j = str.Find(sep, i);
+		if (j < 0) {
+			break;
+		}
+
+		// Skip this separator if it is escaped
+		if (j > 0 && str.GetAt(j - 1) == esc) {
+			// Delete the escape character
+			str.Delete(j - 1);
+			continue;
+		}
+
+		if (sl.size() < limit - 1) {
+			sl.push_back(str.Mid(split, j - split).Trim());
+
+			// Save new splitting position
+			split = j + 1;
+		}
+	}
+	sl.push_back(str.Mid(split).Trim());
+
+	return sl.front();
 }
 
 template<class T, typename SEP>

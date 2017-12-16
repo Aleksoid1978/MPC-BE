@@ -1022,16 +1022,16 @@ DROPEFFECT CMainFrame::OnDragOver(COleDataObject* pDataObject, DWORD dwKeyState,
 BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point)
 {
 	BOOL bResult = FALSE;
-	CAtlList<CString> slFiles;
+	std::list<CString> slFiles;
 
-    if (pDataObject->IsDataAvailable(CF_HDROP)) {
+	if (pDataObject->IsDataAvailable(CF_HDROP)) {
 		if (HGLOBAL hGlobal = pDataObject->GetGlobalData(CF_HDROP)) {
 			if (HDROP hDrop = (HDROP)GlobalLock(hGlobal)) {
 				UINT nFiles = ::DragQueryFile(hDrop, UINT_MAX, nullptr, 0);
 				for (UINT iFile = 0; iFile < nFiles; iFile++) {
 					CString fn;
 					fn.ReleaseBuffer(::DragQueryFile(hDrop, iFile, fn.GetBuffer(MAX_PATH), MAX_PATH));
-					slFiles.AddTail(fn);
+					slFiles.push_back(fn);
 				}
 				::DragFinish(hDrop);
 				DropFiles(slFiles);
@@ -1044,8 +1044,8 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 		if (HGLOBAL hGlobal = pDataObject->GetGlobalData(CF_URLA, &fmt)) {
 			LPCSTR pText = (LPCSTR)GlobalLock(hGlobal);
 			if (AfxIsValidString(pText)) {
-				CAtlList<CString> sl;
-				sl.AddTail(pText);
+				std::list<CString> sl;
+				sl.push_back(pText);
 				DropFiles(sl);
 				GlobalUnlock(hGlobal);
 				bResult = TRUE;
@@ -1056,8 +1056,8 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 		if (HGLOBAL hGlobal = pDataObject->GetGlobalData(CF_URLW, &fmt)) {
 			LPCTSTR pText = (LPCTSTR)GlobalLock(hGlobal);
 			if (AfxIsValidString(pText)) {
-				CAtlList<CString> sl;
-				sl.AddTail(pText);
+				std::list<CString> sl;
+				sl.push_back(pText);
 				DropFiles(sl);
 				GlobalUnlock(hGlobal);
 				bResult = TRUE;
@@ -5009,19 +5009,19 @@ void CMainFrame::OnFileOpenQuick()
 		return;
 	}
 
-	CAtlList<CString> fns;
+	std::list<CString> fns;
 
 	POSITION pos = fd.GetStartPosition();
 	while (pos) {
-		fns.AddTail(fd.GetNextPathName(pos));
+		fns.push_back(fd.GetNextPathName(pos));
 	}
 
 	bool bMultipleFiles = false;
 
-	if (fns.GetCount() > 1
-			|| fns.GetCount() == 1
-			&& (fns.GetHead()[fns.GetHead().GetLength()-1] == '\\'
-				|| fns.GetHead()[fns.GetHead().GetLength()-1] == '*')) {
+	if (fns.size() > 1
+			|| fns.size() == 1
+			&& (fns.front()[fns.front().GetLength()-1] == '\\'
+				|| fns.front()[fns.front().GetLength()-1] == '*')) {
 		bMultipleFiles = true;
 	}
 
@@ -5054,7 +5054,7 @@ void CMainFrame::OnFileOpenMedia()
 		dlg.SetForegroundWindow();
 		return;
 	}
-	if (dlg.DoModal() != IDOK || dlg.m_fns.GetCount() == 0) {
+	if (dlg.DoModal() != IDOK || dlg.m_fns.size() == 0) {
 		return;
 	}
 
@@ -5065,7 +5065,7 @@ void CMainFrame::OnFileOpenMedia()
 	ShowWindow(SW_SHOW);
 	SetForegroundWindow();
 
-	CString fn = dlg.m_fns.GetHead();
+	CString fn = dlg.m_fns.front();
 	if (OpenYoutubePlaylist(fn)) {
 		return;
 	}
@@ -5159,14 +5159,14 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 		CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
 		if (p) {
 			p->path = s.slFiles.GetHead();
-			p->subs.AddTailList(&s.slSubs);
+			p->subs = s.slSubs;
 		}
 		OpenMedia(p);
 	} else if (s.nCLSwitches & CLSW_CD) {
 		SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 		fSetForegroundWindow = true;
 
-		CAtlList<CString> sl;
+		std::list<CString> sl;
 
 		if (!s.slFiles.IsEmpty()) {
 			GetCDROMType(s.slFiles.GetHead()[0], sl);
@@ -5175,7 +5175,7 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 			dir.ReleaseBufferSetLength(GetCurrentDirectoryW(MAX_PATH, dir.GetBuffer(MAX_PATH)));
 
 			GetCDROMType(dir[0], sl);
-			for (WCHAR drive = 'C'; sl.IsEmpty() && drive <= 'Z'; drive++) {
+			for (WCHAR drive = 'C'; sl.empty() && drive <= 'Z'; drive++) {
 				GetCDROMType(drive, sl);
 			}
 		}
@@ -5192,18 +5192,25 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 			CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
 			if (p) {
 				p->path = s.slFiles.GetHead();
-				p->subs.AddTailList(&s.slSubs);
+				p->subs = s.slSubs;
 			}
 			OpenMedia(p);
 		} else {
-			CAtlList<CString> sl;
-			sl.AddTailList(&s.slFiles);
+			std::list<CString> sl;
+
+			POSITION pos1 = s.slFiles.GetHeadPosition();
+			while (pos1) {
+				sl.push_back(s.slFiles.GetNext(pos1));
+			}
 
 			ParseDirs(sl);
-			bool fMulti = sl.GetCount() > 1;
+			bool fMulti = sl.size() > 1;
 
 			if (!fMulti) {
-				sl.AddTailList(&s.slDubs);
+				POSITION pos2 = s.slDubs.GetHeadPosition();
+				while (pos2) {
+					sl.push_back(s.slDubs.GetNext(pos2));
+				}
 			}
 
 			if ((s.nCLSwitches & CLSW_ADD) && m_wndPlaylistBar.GetCount() > 0) {
@@ -5434,7 +5441,7 @@ void CMainFrame::OnFileOpenCD(UINT nID)
 
 	nID++;
 	for (WCHAR drive = 'C'; drive <= 'Z'; drive++) {
-		CAtlList<CString> sl;
+		std::list<CString> sl;
 
 		cdrom_t CDRom_t = GetCDROMType(drive, sl);
 
@@ -5471,17 +5478,17 @@ void CMainFrame::OnFileReOpen()
 	OpenCurPlaylistItem();
 }
 
-void CMainFrame::DropFiles(CAtlList<CString>& slFiles)
+void CMainFrame::DropFiles(std::list<CString>& slFiles)
 {
 	SetForegroundWindow();
 
-	if (slFiles.IsEmpty()) {
+	if (slFiles.empty()) {
 		return;
 	}
 
 	if (m_wndPlaylistBar.IsWindowVisible()) {
-		if (slFiles.GetCount() == 1) {
-			const CString& path = slFiles.GetHead();
+		if (slFiles.size() == 1) {
+			const CString& path = slFiles.front();
 			if (OpenYoutubePlaylist(path, TRUE)) {
 				return;
 			}
@@ -5494,9 +5501,8 @@ void CMainFrame::DropFiles(CAtlList<CString>& slFiles)
 
 	BOOL bIsValidSubExtAll = TRUE;
 
-	POSITION pos = slFiles.GetHeadPosition();
-	while (pos) {
-		CString ext = GetFileExt(slFiles.GetNext(pos)).Mid(1); // extension without a dot
+	for (const auto& fname : slFiles) {
+		CString ext = GetFileExt(fname).Mid(1); // extension without a dot
 		ext.MakeLower();
 
 		bool validate_ext = false;
@@ -5516,9 +5522,7 @@ void CMainFrame::DropFiles(CAtlList<CString>& slFiles)
 
 	if (bIsValidSubExtAll && m_eMediaLoadState == MLS_LOADED && (m_pCAP || m_pDVS)) {
 
-		POSITION pos = slFiles.GetHeadPosition();
-		while (pos) {
-			CString fname = slFiles.GetNext(pos);
+		for (const auto& fname : slFiles) {
 			BOOL b_SubLoaded = FALSE;
 
 			if (m_pDVS) {
@@ -5556,8 +5560,8 @@ void CMainFrame::DropFiles(CAtlList<CString>& slFiles)
 		return;
 	}
 
-	if (slFiles.GetCount() == 1
-			&& OpenYoutubePlaylist(slFiles.GetHead())) {
+	if (slFiles.size() == 1
+			&& OpenYoutubePlaylist(slFiles.front())) {
 		return;
 	}
 
@@ -5644,7 +5648,7 @@ void CMainFrame::OnFileSaveAs()
 		dlg.DoModal();
 		if (!m_youtubeFields.fname.IsEmpty()) {
 			const auto pFileData = dynamic_cast<OpenFileData*>(m_lastOMD.m_p);
-			if (pFileData && pFileData->fns.GetCount() == 2) {
+			if (pFileData && pFileData->fns.size() == 2) {
 				ext = p.GetExtension().MakeLower();
 				if (ext == L".mp4") {
 					p.RenameExtension(L".audio.m4a");
@@ -5652,10 +5656,15 @@ void CMainFrame::OnFileSaveAs()
 					p.RenameExtension(L".audio.mka");
 				}
 
-				in = pFileData->fns.GetAt(pFileData->fns.FindIndex(1)).GetName();
-				CSaveDlg dlg_second(in, name, p, hr);
-				if (SUCCEEDED(hr)) {
-					dlg_second.DoModal();
+				if (pFileData->fns.size() >= 2) {
+					auto it = pFileData->fns.begin();
+					++it;
+					in = (*it).GetName();
+
+					CSaveDlg dlg_second(in, name, p, hr);
+					if (SUCCEEDED(hr)) {
+						dlg_second.DoModal();
+					}
 				}
 			}
 		}
@@ -6323,7 +6332,7 @@ void CMainFrame::OnFileLoadAudio()
 	}
 
 	CPlaylistItem* pli = m_wndPlaylistBar.GetCur();
-	if (pli && pli->m_fns.GetCount()) {
+	if (pli && pli->m_fns.size()) {
 		POSITION pos = fd.GetStartPosition();
 		while (pos) {
 			CString fname = fd.GetNextPathName(pos);
@@ -6331,7 +6340,7 @@ void CMainFrame::OnFileLoadAudio()
 			if (CComQIPtr<IGraphBuilderAudio> pGBA = m_pGB) {
 				HRESULT hr = pGBA->RenderAudioFile(fname);
 				if (SUCCEEDED(hr)) {
-					pli->m_fns.AddTail(fname);
+					pli->m_fns.push_back(fname);
 					AddAudioPathsAddons(fname);
 
 					CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
@@ -9872,9 +9881,8 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 		} else {
 			CPlaylistItem pli;
 			if (m_wndPlaylistBar.GetCur(pli)) {
-				POSITION pos = pli.m_fns.GetHeadPosition();
-				while (pos) {
-					str += L";" + pli.m_fns.GetNext(pos).GetName();
+				for (const auto& fi : pli.m_fns) {
+					str += L";" + fi.GetName();
 				}
 			}
 		}
@@ -10003,24 +10011,26 @@ void CMainFrame::OnFavoritesFile(UINT nID)
 
 void CMainFrame::PlayFavoriteFile(CString fav)
 {
-	CAtlList<CString> args;
+	std::list<CString> args;
 	REFERENCE_TIME rtStart = 0;
 	BOOL bRelativeDrive = FALSE;
 
 	ExplodeEsc(fav, args, L';');
-	args.RemoveHeadNoReturn();								// desc / name
-	swscanf_s(args.RemoveHead(), L"%I64d", &rtStart);		// pos
-	swscanf_s(args.RemoveHead(), L"%d", &bRelativeDrive);	// relative drive
+	args.pop_front();									// desc / name
+	swscanf_s(args.front(), L"%I64d", &rtStart);		// pos
+	args.pop_front();
+	swscanf_s(args.front(), L"%d", &bRelativeDrive);	// relative drive
+	args.pop_front();
 	rtStart = max(rtStart, 0LL);
 
 	m_nAudioTrackStored    = -1;
 	m_nSubtitleTrackStored = -1;
-	if (args.GetCount() > 2) {
-		if (swscanf_s(args.GetTail(), L"%d", &m_nSubtitleTrackStored) == 1) {
-			args.RemoveTailNoReturn();
+	if (args.size() > 2) {
+		if (swscanf_s(args.back(), L"%d", &m_nSubtitleTrackStored) == 1) {
+			args.pop_back();
 		}
-		if (swscanf_s(args.GetTail(), L"%d", &m_nAudioTrackStored) == 1) {
-			args.RemoveTailNoReturn();
+		if (swscanf_s(args.back(), L"%d", &m_nAudioTrackStored) == 1) {
+			args.pop_back();
 		}
 	}
 
@@ -10031,10 +10041,7 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 		CPath exeDrive(GetProgramPath());
 
 		if (exeDrive.StripToRoot()) {
-			POSITION pos = args.GetHeadPosition();
-
-			while (pos) {
-				CString &stringPath = args.GetNext(pos);
+			for (auto& stringPath : args) {
 				CPath path(stringPath);
 				const int rootLength = path.SkipRoot();
 
@@ -10051,15 +10058,15 @@ void CMainFrame::PlayFavoriteFile(CString fav)
 		}
 	}
 
-	if (!m_wndPlaylistBar.SelectFileInPlaylist(args.GetHead())) {
+	if (!m_wndPlaylistBar.SelectFileInPlaylist(args.front())) {
 		m_wndPlaylistBar.Open(args, false);
 	}
-	if (GetPlaybackMode() == PM_FILE && args.GetHead() == m_lastOMD->title && !m_bEndOfStream) {
+	if (GetPlaybackMode() == PM_FILE && args.front() == m_lastOMD->title && !m_bEndOfStream) {
 		m_wndPlaylistBar.SetFirstSelected();
 		m_pMS->SetPositions(&rtStart, AM_SEEKING_AbsolutePositioning, nullptr, AM_SEEKING_NoPositioning);
-	    OnPlayPlay();
+		OnPlayPlay();
 	} else {
-	    OpenCurPlaylistItem(rtStart);
+		OpenCurPlaylistItem(rtStart);
 	}
 }
 
@@ -11562,16 +11569,16 @@ CString CMainFrame::OpenCreateGraphObject(OpenMediaData* pOMD)
 
 	m_bUseSmartSeek = s.fSmartSeek;
 	if (OpenFileData* pFileData = dynamic_cast<OpenFileData*>(pOMD)) {
-		CString fn = pFileData->fns.GetHead();
+		CString fn = pFileData->fns.front();
 		if (!fn.IsEmpty() && (fn.Find(L"://") >= 0)) { // disable SmartSeek for streaming data.
 			m_bUseSmartSeek = false;
 		}
 	}
 
 	if (OpenFileData* pFileData = dynamic_cast<OpenFileData*>(pOMD)) {
-		engine_t engine = s.GetFileEngine(pFileData->fns.GetHead());
+		engine_t engine = s.GetFileEngine(pFileData->fns.front());
 
-		const CString ct = Content::GetType(pFileData->fns.GetHead());
+		const CString ct = Content::GetType(pFileData->fns.front());
 
 		if (ct == L"video/x-ms-asf") {
 			// TODO: put something here to make the windows media source filter load later
@@ -11789,7 +11796,7 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 
 CString CMainFrame::OpenFile(OpenFileData* pOFD)
 {
-	if (pOFD->fns.IsEmpty()) {
+	if (pOFD->fns.empty()) {
 		return ResStr(IDS_MAINFRM_81);
 	}
 
@@ -11802,25 +11809,25 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	m_strPlaybackRenderedPath.Empty();
 
 	CString youtubeUrl;
-	if (s.bYoutubePageParser && pOFD->fns.GetCount() == 1) {
-		CString fn = (CString)pOFD->fns.GetHead();
+	if (s.bYoutubePageParser && pOFD->fns.size() == 1) {
+		CString fn = (CString)pOFD->fns.front();
 		if (Youtube::CheckURL(fn)) {
 			youtubeUrl = fn;
 			CAtlList<CString> urls;
 			if (Youtube::Parse_URL(fn, urls, m_youtubeFields, m_youtubeUrllist, pOFD->subs, pOFD->rtStart)) {
 				Content::Online::Disconnect(fn);
 
-				pOFD->fns.RemoveAll();
+				pOFD->fns.clear();
 				POSITION pos = urls.GetHeadPosition();
 				while (pos) {
-					pOFD->fns.AddTail(urls.GetNext(pos));
+					pOFD->fns.push_back(urls.GetNext(pos));
 				}
 
-				m_strPlaybackRenderedPath = pOFD->fns.GetHead().GetName();
+				m_strPlaybackRenderedPath = pOFD->fns.front().GetName();
 				m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
 
-				if (pOFD->fns.GetCount() == 1) {
-					fn = (CString)pOFD->fns.GetHead();
+				if (pOFD->fns.size() == 1) {
+					fn = (CString)pOFD->fns.front();
 					CString tmp(fn); tmp.MakeLower();
 					if (tmp.Find(L".m3u8") > 0) {
 						m_wndPlaylistBar.Open(fn);
@@ -11828,8 +11835,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 						POSITION pos = m_wndPlaylistBar.m_pl.GetHeadPosition();
 						while (pos) {
 							auto& listItem = m_wndPlaylistBar.m_pl.GetNext(pos);
-							if (!listItem.m_fns.IsEmpty()) {
-								auto& item = listItem.m_fns.GetHead();
+							if (!listItem.m_fns.empty()) {
+								auto& item = listItem.m_fns.front();
 								CString fn = item;
 								fn.Replace(L"/keepalive/yes/", L"/");
 
@@ -11841,17 +11848,15 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 						m_youtubeUrllist.clear();
 
 						m_wndPlaylistBar.SetLast();
-						pOFD->fns.GetHead() = m_wndPlaylistBar.GetCurFileName();
+						pOFD->fns.front() = m_wndPlaylistBar.GetCurFileName();
 					}
 				}
 			}
 		}
 	}
 
-	POSITION pos = pOFD->fns.GetHeadPosition();
-	while (pos) {
-		CFileItem fi = pOFD->fns.GetNext(pos);
-		CString fn = fi;
+	for (auto& fi : pOFD->fns) {
+		CString fn = fi.GetName();
 
 		fn.Trim();
 		if (fn.IsEmpty() && !bFirst) {
@@ -12075,8 +12080,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		}
 	}
 
-	if (!pOFD->fns.IsEmpty()) {
-		const CString fn = !youtubeUrl.IsEmpty() ? youtubeUrl : pOFD->fns.GetHead();
+	if (!pOFD->fns.empty()) {
+		const CString fn = !youtubeUrl.IsEmpty() ? youtubeUrl : pOFD->fns.front();
 		if (fn.Find(L"pipe:") == -1
 				&& s.bKeepHistory && s.bRememberFilePos && !s.NewFile(fn)) {
 			const FILE_POSITION* FilePosition = s.CurrentFilePosition();
@@ -13003,7 +13008,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 
 			if (!bGetTitle) {
 				CPlaylistItem pli;
-				if (m_wndPlaylistBar.GetCur(pli) && !pli.m_fns.IsEmpty() && !pli.m_label.IsEmpty()) {
+				if (m_wndPlaylistBar.GetCur(pli) && !pli.m_fns.empty() && !pli.m_label.IsEmpty()) {
 					fn = pli.m_label;
 				}
 			}
@@ -13096,11 +13101,10 @@ void CMainFrame::OpenSetupAudioStream()
 	CAtlList<CString> extAudioList;
 	CPlaylistItem pli;
 	if (m_wndPlaylistBar.GetCur(pli)) {
-		POSITION pos = pli.m_fns.GetHeadPosition();
-		// skip main file
-		pli.m_fns.GetNext(pos);
-		while (pos) {
-			CString str = pli.m_fns.GetNext(pos);
+		auto it = pli.m_fns.begin();
+		++it; // skip main file
+		for (; it != pli.m_fns.end(); ++it) {
+			CString str = *it;
 			extAudioList.AddTail(GetFileOnly(str));
 		}
 	}
@@ -13462,12 +13466,11 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 
 		int iInternalSub = subs.GetCount();
 
-		POSITION pos = pOMD->subs.GetHeadPosition();
-		while (pos) {
-			LoadSubtitle(pOMD->subs.GetNext(pos));
+		for (const auto& si : pOMD->subs) {
+			LoadSubtitle(si);
 		}
 
-		pos = m_pSubStreams.GetHeadPosition();
+		POSITION pos = m_pSubStreams.GetHeadPosition();
 		CComPtr<ISubStream> pSubStream;
 		int tPos = -1;
 		int extcnt = -1;
@@ -13594,16 +13597,14 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	m_bWasPausedOnMinimizedVideo = false;
 
 	if (pFileData) {
-		POSITION pos = pFileData->fns.GetHeadPosition();
 		UINT index = 0;
-		while (pos) {
-			CFileItem& fileItem = pFileData->fns.GetNext(pos);
-			if (::PathIsURL(fileItem) && fileItem.GetName().Find(L"://") <= 0) {
-				fileItem = L"http://" + fileItem.GetName();
+		for (auto& fi : pFileData->fns) {
+			if (::PathIsURL(fi) && fi.GetName().Find(L"://") <= 0) {
+				fi = L"http://" + fi.GetName();
 			}
 
 			DLog(L"--> CMainFrame::OpenMediaPrivate() - pFileData->fns[%d]:", index++);
-			DLog(L"    %s", fileItem.GetName());
+			DLog(L"    %s", fi.GetName());
 		}
 	}
 
@@ -13612,18 +13613,18 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	CString mi_fn;
 	for (;;) {
 		if (pFileData) {
-			if (pFileData->fns.IsEmpty()) {
+			if (pFileData->fns.empty()) {
 				ASSERT(FALSE);
 				break;
 			}
 
-			CString fn = pFileData->fns.GetHead();
+			CString fn = pFileData->fns.front();
 
 			int i = fn.Find(L":\\");
 			if (i > 0) {
 				CString drive = fn.Left(i+2);
 				UINT type = GetDriveType(drive);
-				CAtlList<CString> sl;
+				std::list<CString> sl;
 				if (type == DRIVE_REMOVABLE || (type == DRIVE_CDROM && GetCDROMType(drive[0], sl) != CDROM_Audio)) {
 					int ret = IDRETRY;
 					while (ret == IDRETRY) {
@@ -13743,7 +13744,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	// load fonts from 'fonts' folder
 	if (pFileData) {
-		const CString path =  GetFolderOnly(pFileData->fns.GetHead()) + L"\\fonts\\";
+		const CString path =  GetFolderOnly(pFileData->fns.front()) + L"\\fonts\\";
 
 		if (::PathIsDirectoryW(path)) {
 			WIN32_FIND_DATAW fd = { 0 };
@@ -14123,7 +14124,7 @@ void CMainFrame::CloseMediaPrivate()
 	DLog(L"CMainFrame::CloseMediaPrivate() : end");
 }
 
-static void RecurseAddDir(CString path, CAtlList<CString>* sl)
+static void RecurseAddDir(CString path, std::list<CString>* sl)
 {
 	WIN32_FIND_DATAW fd = {0};
 
@@ -14139,7 +14140,7 @@ static void RecurseAddDir(CString path, CAtlList<CString>* sl)
 					fullpath += '\\';
 				}
 
-				sl->AddTail(fullpath);
+				sl->push_back(fullpath);
 				RecurseAddDir(fullpath, sl);
 			} else {
 				continue;
@@ -14150,11 +14151,9 @@ static void RecurseAddDir(CString path, CAtlList<CString>* sl)
 	}
 }
 
-void CMainFrame::ParseDirs(CAtlList<CString>& sl)
+void CMainFrame::ParseDirs(std::list<CString>& sl)
 {
-	POSITION pos = sl.GetHeadPosition();
-	while (pos) {
-		CString fn = sl.GetNext(pos);
+	for (CString fn : sl) {
 		WIN32_FIND_DATAW fd = {0};
 		HANDLE hFind = FindFirstFileW(fn, &fd);
 		if (hFind != INVALID_HANDLE_VALUE) {
@@ -14309,7 +14308,7 @@ void CMainFrame::SetupOpenCDSubMenu()
 	UINT id = ID_FILE_OPEN_CD_START;
 
 	for (WCHAR drive = 'C'; drive <= 'Z'; drive++) {
-		CAtlList<CString> files;
+		std::list<CString> files;
 		cdrom_t CDrom_t = GetCDROMType(drive, files);
 		if (CDrom_t != CDROM_NotFound && CDrom_t != CDROM_Unknown) {
 			CString label = GetDriveLabel(drive);
@@ -15289,12 +15288,10 @@ void CMainFrame::SetupAudioSubMenu()
 				bool fExternal = false;
 				CPlaylistItem pli;
 				if (m_wndPlaylistBar.GetCur(pli)) {
-					CString str;
-					POSITION pos = pli.m_fns.GetHeadPosition();
-					// skip main file
-					pli.m_fns.GetNext(pos);
-					while (pos) {
-						str = pli.m_fns.GetNext(pos).GetName();
+					auto it = pli.m_fns.begin();
+					++it; // skip main file
+					for (; it != pli.m_fns.end(); ++it) {
+						CString str = (*it).GetName();
 						if (!str.IsEmpty() && name == GetFileOnly(str)) {
 							fExternal = true;
 							break;
@@ -16904,8 +16901,8 @@ BOOL CMainFrame::OpenCurPlaylistItem(REFERENCE_TIME rtStart/* = INVALID_TIME*/, 
 		return FALSE;
 	}
 
-	if (pli.m_fns.GetCount()
-			&& (OpenIso(pli.m_fns.GetHead(), rtStart) || OpenBD(pli.m_fns.GetHead(), rtStart, bAddRecent))) {
+	if (pli.m_fns.size()
+			&& (OpenIso(pli.m_fns.front(), rtStart) || OpenBD(pli.m_fns.front(), rtStart, bAddRecent))) {
 		return TRUE;
 	}
 
@@ -16923,10 +16920,10 @@ BOOL CMainFrame::OpenFile(const CString fname, REFERENCE_TIME rtStart/* = INVALI
 	CAutoPtr<OpenMediaData> p(m_wndPlaylistBar.GetCurOMD(rtStart));
 	if (p) {
 		auto pFileData = dynamic_cast<OpenFileData*>(p.m_p);
-		if (pFileData->fns.IsEmpty()) {
-			pFileData->fns.AddHead(fname);
+		if (pFileData->fns.empty()) {
+			pFileData->fns.push_front(fname);
 		} else {
-			pFileData->fns.GetHead() = fname;
+			pFileData->fns.front() = fname;
 		}
 		p->bAddRecent = bAddRecent;
 		OpenMedia(p);
@@ -16971,7 +16968,7 @@ void CMainFrame::OpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	bool bDirectShow	= pFileData && !pFileData->fns.IsEmpty() && s.GetFileEngine(pFileData->fns.GetHead()) == DirectShow;
+	bool bDirectShow	= pFileData && !pFileData->fns.empty() && s.GetFileEngine(pFileData->fns.front()) == DirectShow;
 	bool bUseThread		= m_pGraphThread && s.fEnableWorkerThreadForOpening && (bDirectShow || !pFileData) && !pDeviceData;
 
 	// create d3dfs window if launching in fullscreen and d3dfs is enabled
@@ -17629,8 +17626,8 @@ void CMainFrame::SendNowPlayingToApi()
 			m_wndInfoBar.GetLine(ResStr(IDS_INFOBAR_DESCRIPTION), description);
 
 			m_wndPlaylistBar.GetCur(pli);
-			if (!pli.m_fns.IsEmpty()) {
-				label = !pli.m_label.IsEmpty() ? pli.m_label : pli.m_fns.GetHead().GetName();
+			if (!pli.m_fns.empty()) {
+				label = !pli.m_label.IsEmpty() ? pli.m_label : pli.m_fns.front().GetName();
 
 				m_pMS->GetDuration(&rtDur);
 				DVD_HMSF_TIMECODE tcDur = RT2HMSF(rtDur);
@@ -17788,14 +17785,13 @@ void CMainFrame::SendPlaylistToApi()
 {
 	CString strPlaylist;
 
-	POSITION pos = m_wndPlaylistBar.m_pl.GetHeadPosition(), pos2;
+	POSITION pos = m_wndPlaylistBar.m_pl.GetHeadPosition();
 	while (pos) {
 		CPlaylistItem& pli = m_wndPlaylistBar.m_pl.GetNext(pos);
 
 		if (pli.m_type == CPlaylistItem::file) {
-			pos2 = pli.m_fns.GetHeadPosition();
-			while (pos2) {
-				CString fn = pli.m_fns.GetNext(pos2);
+			for (const auto& fi : pli.m_fns) {
+				CString fn = fi.GetName();
 				if (!strPlaylist.IsEmpty()) {
 					strPlaylist.Append (L"|");
 				}
@@ -17920,10 +17916,9 @@ void CMainFrame::OnFileOpenDirectory()
 		path = AddSlash(path);
 		s.strLastOpenDir = path;
 
-		CAtlList<CString> sl;
-		sl.AddTail(path);
-		if (recur
-				&& !(CheckBD(path) || CheckDVD(path))) {
+		std::list<CString> sl;
+		sl.push_back(path);
+		if (recur && !(CheckBD(path) || CheckDVD(path))) {
 			RecurseAddDir(path, &sl);
 		}
 
@@ -19095,7 +19090,7 @@ void CMainFrame::MakeBDLabel(CString path, CString& label, CString* pBDlabel)
 
 		if (fn2.GetLength() == 2 && fn2[fn2.GetLength() - 1] == ':') {
 			WCHAR drive = fn2[0];
-			CAtlList<CString> sl;
+			std::list<CString> sl;
 			cdrom_t CDRom_t = GetCDROMType(drive, sl);
 			if (CDRom_t == CDROM_BDVideo) {
 				CString BDLabel = GetDriveLabel(drive);
@@ -19137,7 +19132,7 @@ void CMainFrame::MakeDVDLabel(CString path, CString& label, CString* pDVDlabel)
 
 			if (DVDPath.GetLength() == 2 && DVDPath[DVDPath.GetLength() - 1] == ':') {
 				WCHAR drive = DVDPath[0];
-				CAtlList<CString> sl;
+				std::list<CString> sl;
 				cdrom_t CDRom_t = GetCDROMType(drive, sl);
 				if (CDRom_t == CDROM_DVDVideo) {
 					const CString DVDLabel = GetDriveLabel(drive);
@@ -19347,7 +19342,7 @@ BOOL CMainFrame::OpenYoutubePlaylist(CString url, BOOL bOnlyParse/* = FALSE*/)
 			CFileItemList fis;
 			for(auto item = youtubePlaylist.begin(); item != youtubePlaylist.end(); ++item) {
 				CFileItem fi(item->url, item->title);
-				fis.AddTail(fi);
+				fis.push_back(fi);
 			}
 			m_wndPlaylistBar.Append(fis);
 
@@ -19362,16 +19357,16 @@ BOOL CMainFrame::OpenYoutubePlaylist(CString url, BOOL bOnlyParse/* = FALSE*/)
 	return FALSE;
 }
 
-BOOL CMainFrame::AddSimilarFiles(CAtlList<CString>& fns)
+BOOL CMainFrame::AddSimilarFiles(std::list<CString>& fns)
 {
 	if (!AfxGetAppSettings().bAddSimilarFiles
-			|| fns.GetCount() != 1
-			|| !::PathFileExistsW(fns.GetHead())
-			|| ::PathIsDirectoryW(fns.GetHead())) {
+			|| fns.size() != 1
+			|| !::PathFileExistsW(fns.front())
+			|| ::PathIsDirectoryW(fns.front())) {
 		return FALSE;
 	}
 
-	CString fname = fns.GetHead();
+	CString fname = fns.front();
 	const CString path = AddSlash(GetFolderOnly(fname));
 	fname = GetFileOnly(fname);
 	CString name(fname);
@@ -19456,14 +19451,14 @@ BOOL CMainFrame::AddSimilarFiles(CAtlList<CString>& fns)
 		for (size_t i = 0; i < files.size(); i++) {
 			const CString& fn = files[i];
 			if (bFoundCurFile) {
-				fns.AddTail(path + fn);
+				fns.push_back(path + fn);
 			} else {
 				bFoundCurFile = (fn == fname);
 			}
 		}
 	}
 
-	return (fns.GetCount() > 1);
+	return (fns.size() > 1);
 }
 
 void CMainFrame::SetToolBarAudioButton()
