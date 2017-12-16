@@ -427,13 +427,11 @@ void CPlaylistItem::AutoLoadFiles()
 		CString filter;
 		CAtlArray<CString> mask;
 		AfxGetAppSettings().m_Formats.GetAudioFilter(filter, mask);
-		CAtlList<CString> sl;
+		std::list<CString> sl;
 		Explode(mask[0], sl, L';');
 
 		BOOL bExists = false;
-		POSITION pos = sl.GetHeadPosition();
-		while (pos) {
-			CString _mask = sl.GetNext(pos);
+		for (CString _mask : sl) {
 			_mask.Delete(0, 2);
 			_mask.MakeLower();
 			if (_mask == ext) {
@@ -1040,12 +1038,11 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 		const CString fn = fns.front();
 		Content::Online::Clear(fn);
 
-		CAtlList<CString> redir;
+		std::list<CString> redir;
 		const CString ct = Content::GetType(fn, &redir);
-		if (!redir.IsEmpty()) {
-			POSITION pos = redir.GetHeadPosition();
-			while (pos) {
-				ParsePlayList(redir.GetNext(pos), subs);
+		if (!redir.empty()) {
+			for (const auto& r : redir) {
+				ParsePlayList(r, subs);
 			}
 			return;
 		}
@@ -1111,15 +1108,18 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 	base.RemoveFileSpec();
 
 	while (f.ReadString(str)) {
-		CAtlList<CString> sl;
+		std::list<CString> sl;
 		Explode(str, sl, L',', 3);
-		if (sl.GetCount() != 3) {
+		if (sl.size() != 3) {
 			continue;
 		}
 
-		if (int i = _wtoi(sl.RemoveHead())) {
-			CString key = sl.RemoveHead();
-			CString value = sl.RemoveHead();
+		if (int i = _wtoi(sl.front())) {
+			sl.pop_front();
+			CString key = sl.front();
+			sl.pop_front();
+			CString value = sl.front();
+			sl.pop_front();
 
 			if (key == L"type") {
 				pli[i].m_type = (CPlaylistItem::type_t)_wtol(value);
@@ -1349,12 +1349,10 @@ bool CPlayerPlaylistBar::ParseCUEPlayList(CString fn)
 			CString filter;
 			CAtlArray<CString> mask;
 			AfxGetAppSettings().m_Formats.GetAudioFilter(filter, mask);
-			CAtlList<CString> sl;
+			std::list<CString> sl;
 			Explode(mask[0], sl, L';');
 
-			POSITION pos = sl.GetHeadPosition();
-			while (pos) {
-				CString _mask = sl.GetNext(pos);
+			for (CString _mask : sl) {
 				_mask.Delete(0, 1);
 
 				CString newPath = fullPath;
@@ -1500,23 +1498,21 @@ void CPlayerPlaylistBar::Append(CFileItemList& fis)
 	UpdateList();
 }
 
-bool CPlayerPlaylistBar::Replace(CString filename, CAtlList<CString>& fns)
+bool CPlayerPlaylistBar::Replace(CString filename, std::list<CString>& fns)
 {
 	if (filename.IsEmpty()) {
 		return false;
 	}
 
 	CPlaylistItem pli;
-	POSITION pos = fns.GetHeadPosition();
-	while (pos) {
-		CString fn = fns.GetNext(pos);
+	for (CString fn : fns) {
 		if (!fn.Trim().IsEmpty()) {
 			pli.m_fns.push_back(MakePath(fn));
 		}
 	}
 	pli.AutoLoadFiles();
 
-	pos = m_pl.GetHeadPosition();
+	POSITION pos = m_pl.GetHeadPosition();
 	while (pos) {
 		CPlaylistItem& pli2 = m_pl.GetAt(pos);
 		if (pli2.FindFile(filename)) {
@@ -1545,14 +1541,14 @@ void CPlayerPlaylistBar::Append(CStringW vdn, CStringW adn, int vinput, int vcha
 	pli.m_vinput = vinput;
 	pli.m_vchannel = vchannel;
 	pli.m_ainput = ainput;
-	CAtlList<CStringW> sl;
+	std::list<CStringW> sl;
 	CStringW vfn = GetFriendlyName(vdn);
 	CStringW afn = GetFriendlyName(adn);
 	if (!vfn.IsEmpty()) {
-		sl.AddTail(vfn);
+		sl.push_back(vfn);
 	}
 	if (!afn.IsEmpty()) {
-		sl.AddTail(afn);
+		sl.push_back(afn);
 	}
 	CStringW label = Implode(sl, '|');
 	label.Replace(L"|", L" - ");

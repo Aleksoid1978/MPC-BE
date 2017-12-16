@@ -34,5 +34,5 @@ namespace Content {
 		void Disconnect(const CString fn);
 		void GetRaw(const CString fn, std::vector<BYTE>& raw);
 	}
-	const CString GetType(CString fn, CAtlList<CString>* redir = nullptr);
+	const CString GetType(CString fn, std::list<CString>* redir = nullptr);
 }
