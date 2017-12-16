@@ -1976,7 +1976,6 @@ start:
 					&& mt.subtype != MEDIASUBTYPE_Vorbis2
 					&& duration < 100000) { // duration < 10 ms (hack for PCM, ADPCM, Law and other)
 
-				p->SetCount(0, (500000 / duration + 1) * data.GetDataSize()); // grouping > 50 ms
 				p->SetData(data.GetData(), data.GetDataSize());
 
 				while (duration < 500000 && AP4_SUCCEEDED(track->ReadSample(pPairNext->m_value.index + 1, sample, data))) {
