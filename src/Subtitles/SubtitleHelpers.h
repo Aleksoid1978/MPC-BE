@@ -27,11 +27,10 @@
 
 namespace Subtitle
 {
-	static const std::vector<LPCTSTR> subTypesExt = {
-		_T("srt"), _T("sub"), _T("smi"), _T("psb"),
-		_T("ssa"), _T("ass"), _T("idx"), _T("usf"),
-		_T("xss"), _T("txt"), _T("rt"),  _T("sup"),
-		_T("vtt"), _T("mks")
+	static const std::vector<LPCWSTR> subTypesExt = {
+		L"srt", L"ass", L"ssa", L"sub", L"idx",
+		L"smi", L"sup", L"usf", L"mks", L"vtt",
+		L"psb", L"xss", L"rt"
 	};
 
 	enum SubType {
@@ -50,13 +49,13 @@ namespace Subtitle
 		VTT
 	};
 
-	LPCTSTR GetSubtitleFileExt(SubType type);
+	LPCWSTR GetSubtitleFileExt(SubType type);
 
 	struct SubFile {
 		CString fn; /*SubType type;*/
 	};
 
-	void GetSubFileNames(CString fn, const CAtlArray<CString>& paths, CAtlArray<SubFile>& ret);
+	void GetSubFileNames(CString fn, const std::vector<CString>& paths, std::vector<SubFile>& ret);
 
 	CString GuessSubtitleName(CString fn, CString videoName);
 };

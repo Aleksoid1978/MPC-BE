@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,10 +25,10 @@
 #include "TextFile.h"
 #include "SubtitleHelpers.h"
 
-static LPCTSTR separators = _T(".\\-_");
-static LPCTSTR extListVid = _T("(avi)|(mkv)|(mp4)|((m2)?ts)");
+static LPCWSTR separators = L".\\-_";
+static LPCWSTR extListVid = L"(avi)|(mkv)|(mp4)|((m2)?ts)";
 
-LPCTSTR Subtitle::GetSubtitleFileExt(SubType type)
+LPCWSTR Subtitle::GetSubtitleFileExt(SubType type)
 {
 	return (type >= 0 && size_t(type) < subTypesExt.size()) ? subTypesExt[type] : nullptr;
 }
@@ -38,18 +38,17 @@ static int SubFileCompare(const void* elem1, const void* elem2)
 	return ((Subtitle::SubFile*)elem1)->fn.CompareNoCase(((Subtitle::SubFile*)elem2)->fn);
 }
 
-void Subtitle::GetSubFileNames(CString fn, const CAtlArray<CString>& paths, CAtlArray<SubFile>& ret)
+void Subtitle::GetSubFileNames(CString fn, const std::vector<CString>& paths, std::vector<SubFile>& ret)
 {
-	ret.RemoveAll();
+	ret.clear();
 
 	fn.Replace('\\', '/');
 
 	bool fWeb = false;
 	{
-		//int i = fn.Find(_T("://"));
-		int i = fn.Find(_T("http://"));
+		int i = fn.Find(L"http://");
 		if (i > 0) {
-			fn = _T("http") + fn.Mid(i);
+			fn = L"http" + fn.Mid(i);
 			fWeb = true;
 		}
 	}
@@ -63,25 +62,25 @@ void Subtitle::GetSubFileNames(CString fn, const CAtlArray<CString>& paths, CAtl
 	CString orgpath = fn.Left(l);
 	CString title = fn.Mid(l, l2 - l);
 	int titleLength = title.GetLength();
-	//CString filename = title + _T(".nooneexpectsthespanishinquisition");
+	//CString filename = title + L".nooneexpectsthespanishinquisition";
 
 	if (!fWeb) {
 		WIN32_FIND_DATA wfd;
 
 		CString extListSub, regExpSub, regExpVid;
 		for (size_t i = 0; i < subTypesExt.size(); i++) {
-			extListSub.AppendFormat(_T("(%s)"), subTypesExt[i]);
+			extListSub.AppendFormat(L"(%s)", subTypesExt[i]);
 			if (i < subTypesExt.size() - 1) {
-				extListSub.AppendChar(_T('|'));
+				extListSub.AppendChar(L'|');
 			}
 		}
-		regExpSub.Format(_T("([%s]+.+)?\\.(%s)$"), separators, extListSub);
-		regExpVid.Format(_T(".+\\.(%s)$"), extListVid);
+		regExpSub.Format(L"([%s]+.+)?\\.(%s)$", separators, extListSub);
+		regExpVid.Format(L".+\\.(%s)$", extListVid);
 
 		const std::wregex::flag_type reFlags = std::wregex::icase | std::wregex::optimize;
 		std::wregex reSub(regExpSub, reFlags), reVid(regExpVid, reFlags);
 
-		for (size_t k = 0; k < paths.GetCount(); k++) {
+		for (size_t k = 0; k < paths.size(); k++) {
 			CString path = paths[k];
 			path.Replace(L'\\', L'/');
 
@@ -90,41 +89,38 @@ void Subtitle::GetSubFileNames(CString fn, const CAtlArray<CString>& paths, CAtl
 				path += L'/';
 			}
 
-			if (path.Find(':') == -1 && path.Find(_T("//")) != 0) {
+			if (path.Find(':') == -1 && path.Find(L"//") != 0) {
 				path = orgpath + path;
 			}
 
-			path.Replace(_T("/./"), _T("/"));
+			path.Replace(L"/./", L"/");
 			path.Replace(L'/', L'\\');
 
-			CAtlList<CString> subs, vids;
+			std::list<CString> subs, vids;
 
-			HANDLE hFile = FindFirstFile(path + title + _T("*"), &wfd);
+			HANDLE hFile = FindFirstFileW(path + title + L"*", &wfd);
 			if (hFile != INVALID_HANDLE_VALUE) {
 				do {
 					CString fn = path + wfd.cFileName;
 					if (std::regex_match(&wfd.cFileName[titleLength], reSub)) {
-						subs.AddTail(fn);
+						subs.push_back(fn);
 					} else if (std::regex_match(&wfd.cFileName[titleLength], reVid)) {
 						// Convert to lower-case and cut the extension for easier matching
-						vids.AddTail(fn.Left(fn.ReverseFind(_T('.'))).MakeLower());
+						vids.push_back(fn.Left(fn.ReverseFind('.')).MakeLower());
 					}
-				} while (FindNextFile(hFile, &wfd));
+				} while (FindNextFileW(hFile, &wfd));
 
 				FindClose(hFile);
 			}
 
-			POSITION posSub = subs.GetHeadPosition();
-			while (posSub) {
-				CString& fn = subs.GetNext(posSub);
-				CString fnlower = fn;
+			for (const auto& sub : subs) {
+				CString fnlower = sub;
 				fnlower.MakeLower();
 
 				// Check if there is an exact match for another video file
 				bool bMatchAnotherVid = false;
-				POSITION posVid = vids.GetHeadPosition();
-				while (posVid) {
-					if (fnlower.Find(vids.GetNext(posVid)) == 0) {
+				for (const auto& vid : vids) {
+					if (fnlower.Find(vid) == 0) {
 						bMatchAnotherVid = true;
 						break;
 					}
@@ -133,25 +129,25 @@ void Subtitle::GetSubFileNames(CString fn, const CAtlArray<CString>& paths, CAtl
 				if (!bMatchAnotherVid) {
 					SubFile f;
 					f.fn = fn;
-					ret.Add(f);
+					ret.push_back(f);
 				}
 			}
 		}
 	} else if (l > 7) {
 		CWebTextFile wtf; // :)
-		if (wtf.Open(orgpath + title + _T(".wse"))) {
+		if (wtf.Open(orgpath + title + L".wse")) {
 			CString fn2;
-			while (wtf.ReadString(fn2) && fn2.Find(_T("://")) >= 0) {
+			while (wtf.ReadString(fn2) && fn2.Find(L"://") >= 0) {
 				SubFile f;
 				f.fn = fn2;
-				ret.Add(f);
+				ret.push_back(f);
 			}
 		}
 	}
 
 	// sort files, this way the user can define the order (movie.00.English.srt, movie.01.Hungarian.srt, etc)
 
-	qsort(ret.GetData(), ret.GetCount(), sizeof(SubFile), SubFileCompare);
+	qsort(ret.data(), ret.size(), sizeof(SubFile), SubFileCompare);
 }
 
 CString Subtitle::GuessSubtitleName(CString fn, CString videoName)
@@ -188,15 +184,15 @@ CString Subtitle::GuessSubtitleName(CString fn, CString videoName)
 			}
 			subName = subName.Mid(iVideoNameEnd);
 
-			std::wregex re(_T("^[.\\-_ ]+([^.\\-_ ]+)(?:[.\\-_ ]+([^.\\-_ ]+))?"), std::wregex::icase);
+			std::wregex re(L"^[.\\-_ ]+([^.\\-_ ]+)(?:[.\\-_ ]+([^.\\-_ ]+))?", std::wregex::icase);
 			std::wcmatch mc;
-			if (std::regex_search((LPCTSTR)subName, mc, re)) {
+			if (std::regex_search((LPCWSTR)subName, mc, re)) {
 				ASSERT(mc.size() == 3);
 				ASSERT(mc[1].matched);
 				lang = ISO639XToLanguage(CStringA(mc[1].str().c_str()), true);
 
 				if (!lang.IsEmpty() && mc[2].matched) {
-					bHearingImpaired = (CString(mc[2].str().c_str()).CompareNoCase(_T("hi")) == 0);
+					bHearingImpaired = (CString(mc[2].str().c_str()).CompareNoCase(L"hi") == 0);
 				}
 			}
 		}
@@ -204,9 +200,9 @@ CString Subtitle::GuessSubtitleName(CString fn, CString videoName)
 
 	// If we couldn't find any info yet, we try to find the language at the end of the filename
 	if (lang.IsEmpty()) {
-		std::wregex re(_T(".*?[.\\-_ ]+([^.\\-_ ]+)(?:[.\\-_ ]+([^.\\-_ ]+))?$"), std::wregex::icase);
+		std::wregex re(L".*?[.\\-_ ]+([^.\\-_ ]+)(?:[.\\-_ ]+([^.\\-_ ]+))?$", std::wregex::icase);
 		std::wcmatch mc;
-		if (std::regex_search((LPCTSTR)subName, mc, re)) {
+		if (std::regex_search((LPCWSTR)subName, mc, re)) {
 			ASSERT(mc.size() == 3);
 			ASSERT(mc[1].matched);
 			lang = ISO639XToLanguage(CStringA(mc[1].str().c_str()), true);
@@ -226,12 +222,12 @@ CString Subtitle::GuessSubtitleName(CString fn, CString videoName)
 
 	name = fn.Mid(fn.ReverseFind('\\') + 1);
 	if (name.GetLength() > 100) { // Cut some part of the filename if it's too long
-		name.Format(_T("%s...%s"), name.Left(50).TrimRight(_T(".-_ ")), name.Right(50).TrimLeft(_T(".-_ ")));
+		name.Format(L"%s...%s", name.Left(50).TrimRight(L".-_ "), name.Right(50).TrimLeft(L".-_ "));
 	}
 	if (!lang.IsEmpty()) {
-		name.AppendFormat(_T(" [%s]"), lang);
+		name.AppendFormat(L" [%s]", lang);
 		if (bHearingImpaired) {
-			name.Append(_T(" [hearing impaired]"));
+			name.Append(L" [hearing impaired]");
 		}
 	}
 

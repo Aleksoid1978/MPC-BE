@@ -259,7 +259,7 @@ static bool FindFileInList(std::list<T>& sl, CString fn)
 	return false;
 }
 
-static void StringToPaths(const CString& curentdir, const CString& str, CAtlArray<CString>& paths)
+static void StringToPaths(const CString& curentdir, const CString& str, std::vector<CString>& paths)
 {
 	int pos = 0;
 	do {
@@ -277,7 +277,7 @@ static void StringToPaths(const CString& curentdir, const CString& str, CAtlArra
 		path.Append(s);
 
 		if (path.IsRoot() && path.FileExists()) {
-			paths.Add(path);
+			paths.push_back(path);
 			continue;
 		}
 
@@ -294,14 +294,14 @@ static void StringToPaths(const CString& curentdir, const CString& str, CAtlArra
 					CString folder = parentdir + '\\' + fd.cFileName + '\\';
 
 					size_t index = 0;
-					size_t count = paths.GetCount();
+					size_t count = paths.size();
 					for (; index < count; index++) {
 						if (folder.CompareNoCase(paths[index]) == 0) {
 							break;
 						}
 					}
 					if (index == count) {
-						paths.Add(folder);
+						paths.push_back(folder);
 					}
 				}
 			} while (FindNextFileW(hFind, &fd));
@@ -337,25 +337,25 @@ void CPlaylistItem::AutoLoadFiles()
 	CAppSettings& s = AfxGetAppSettings();
 
 	if (s.fAutoloadAudio) {
-		CAtlArray<CString> paths;
+		std::vector<CString> paths;
 		StringToPaths(curdir, s.strAudioPaths, paths);
 
 		CAtlList<CString>* sl = &s.slAudioPathsAddons;
 		POSITION pos = sl->GetHeadPosition();
 		while (pos) {
-			paths.Add(sl->GetNext(pos));
+			paths.push_back(sl->GetNext(pos));
 		}
 
 		CMediaFormats& mf = s.m_Formats;
 		if (!mf.FindAudioExt(ext)) {
-			for (size_t i = 0; i < paths.GetCount(); i++) {
+			for (const auto& path : paths) {
 				WIN32_FIND_DATAW fd = {0};
 
 				HANDLE hFind;
 				CAtlArray<CString> searchPattern;
-				searchPattern.Add(paths[i] + name + L"*.*");
+				searchPattern.Add(path + name + L"*.*");
 				if (!BDLabel.IsEmpty()) {
-					searchPattern.Add(paths[i] + BDLabel + L"*.*");
+					searchPattern.Add(path + BDLabel + L"*.*");
 				}
 				for (size_t j = 0; j < searchPattern.GetCount(); j++) {
 					hFind = FindFirstFileW(searchPattern[j], &fd);
@@ -372,7 +372,7 @@ void CPlaylistItem::AutoLoadFiles()
 								continue;
 							}
 							ext2 = ext2.Mid(n + 1).MakeLower();
-							CString fullpath = paths[i] + fd.cFileName;
+							CString fullpath = path + fd.cFileName;
 
 							if (ext != ext2
 									&& mf.FindAudioExt(ext2)
@@ -390,31 +390,31 @@ void CPlaylistItem::AutoLoadFiles()
 	}
 
 	if (s.IsISRAutoLoadEnabled()) {
-		CAtlArray<CString> paths;
+		std::vector<CString> paths;
 		StringToPaths(curdir, s.strSubtitlePaths, paths);
 
 		CAtlList<CString>* sl = &s.slSubtitlePathsAddons;
 		POSITION pos = sl->GetHeadPosition();
 		while (pos) {
-			paths.Add(sl->GetNext(pos));
+			paths.push_back(sl->GetNext(pos));
 		}
 
-		CAtlArray<Subtitle::SubFile> ret;
+		std::vector<Subtitle::SubFile> ret;
 		Subtitle::GetSubFileNames(fn, paths, ret);
 
-		for (size_t i = 0; i < ret.GetCount(); i++) {
-			if (!FindFileInList(m_subs, ret[i].fn)) {
-				m_subs.push_back(ret[i].fn);
+		for (const auto& r : ret) {
+			if (!FindFileInList(m_subs, r.fn)) {
+				m_subs.push_back(r.fn);
 			}
 		}
 
 		if (!BDLabel.IsEmpty()) {
-			ret.RemoveAll();
+			ret.clear();
 			Subtitle::GetSubFileNames(BDLabel, paths, ret);
 
-			for (size_t i = 0; i < ret.GetCount(); i++) {
-				if (!FindFileInList(m_subs, ret[i].fn)) {
-					m_subs.push_back(ret[i].fn);
+			for (const auto& r : ret) {
+				if (!FindFileInList(m_subs, r.fn)) {
+					m_subs.push_back(r.fn);
 				}
 			}
 		}
