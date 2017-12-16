@@ -887,6 +887,6 @@ public:
 public:
 	CFiltersPrioritySettings	FiltersPrioritySettings;
 
-	CAtlList<CString>			slSubtitlePathsAddons;
-	CAtlList<CString>			slAudioPathsAddons;
+	std::list<CString>			slSubtitlePathsAddons;
+	std::list<CString>			slAudioPathsAddons;
 };

@@ -19040,9 +19040,8 @@ void CMainFrame::AddSubtitlePathsAddons(CString FileName)
 	CString tmp(AddSlash(GetFolderOnly(FileName)).MakeUpper());
 	CAppSettings& s = AfxGetAppSettings();
 
-	POSITION pos = s.slSubtitlePathsAddons.Find(tmp);
-	if (!pos) {
-		s.slSubtitlePathsAddons.AddTail(tmp);
+	if (std::find(s.slSubtitlePathsAddons.begin(), s.slSubtitlePathsAddons.end(), tmp) == s.slSubtitlePathsAddons.end()) {
+		s.slSubtitlePathsAddons.push_back(tmp);
 	}
 }
 
@@ -19051,9 +19050,8 @@ void CMainFrame::AddAudioPathsAddons(CString FileName)
 	CString tmp(AddSlash(GetFolderOnly(FileName)).MakeUpper());
 	CAppSettings& s = AfxGetAppSettings();
 
-	POSITION pos = s.slAudioPathsAddons.Find(tmp);
-	if (!pos) {
-		s.slAudioPathsAddons.AddTail(tmp);
+	if (std::find(s.slAudioPathsAddons.begin(), s.slAudioPathsAddons.end(), tmp) == s.slAudioPathsAddons.end()) {
+		s.slAudioPathsAddons.push_back(tmp);
 	}
 }
 
