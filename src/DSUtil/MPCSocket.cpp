@@ -79,7 +79,7 @@ BOOL CMPCSocket::Connect(CUrl url, BOOL bConnectOnly)
 		return FALSE;
 	}
 	if (url.GetUrlPathLength() == 0) {
-		url.SetUrlPath(_T("/"));
+		url.SetUrlPath(L"/");
 	}
 	if (url.GetPortNumber() == ATL_URL_INVALID_PORT_NUMBER) {
 		url.SetPortNumber(ATL_URL_DEFAULT_HTTP_PORT);
@@ -114,7 +114,7 @@ BOOL CMPCSocket::Connect(CUrl url, BOOL bConnectOnly)
 
 	if (m_bProxyEnable) {
 		DWORD dwUrlLen	= url.GetUrlLength() + 1;
-		TCHAR* szUrl	= new TCHAR[dwUrlLen];
+		WCHAR* szUrl	= new WCHAR[dwUrlLen];
 
 		// Retrieve the contents of the CUrl object
 		url.CreateUrl(szUrl, &dwUrlLen);
@@ -156,11 +156,11 @@ BOOL CMPCSocket::OnMessagePending()
 {
 	MSG msg;
 
-	if (::PeekMessage(&msg, nullptr, WM_TIMER, WM_TIMER, PM_REMOVE)) {
+	if (::PeekMessageW(&msg, nullptr, WM_TIMER, WM_TIMER, PM_REMOVE)) {
 		if (msg.wParam == (UINT) m_nTimerID) {
 			DLog(L"CMPCSocket::OnMessagePending(WM_TIMER) PASSED!");
 			// Remove the message and call CancelBlockingCall.
-			::PeekMessage(&msg, nullptr, WM_TIMER, WM_TIMER, PM_REMOVE);
+			::PeekMessageW(&msg, nullptr, WM_TIMER, WM_TIMER, PM_REMOVE);
 			CancelBlockingCall();
 			KillTimeOut();
 			return FALSE;  // No need for idle time processing.
@@ -212,7 +212,7 @@ BOOL CMPCSocket::SendRequest()
 #if (SOCKET_DUMPLOGFILE)
 	{
 		DWORD dwUrlLen	= m_url.GetUrlLength() + 1;
-		TCHAR* szUrl	= new TCHAR[dwUrlLen];
+		WCHAR* szUrl	= new WCHAR[dwUrlLen];
 		// Retrieve the contents of the CUrl object
 		m_url.CreateUrl(szUrl, &dwUrlLen);
 		CString path = szUrl;

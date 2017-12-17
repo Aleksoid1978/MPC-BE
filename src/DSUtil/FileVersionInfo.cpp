@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -55,17 +55,17 @@ BOOL CFileVersionInfo::GetTranslationId(LPVOID lpData, UINT unBlockSize, WORD wL
 	return FALSE;
 }
 
-BOOL CFileVersionInfo::Create(LPCTSTR lpszFileName, VS_FIXEDFILEINFO& FileInfo)
+BOOL CFileVersionInfo::Create(LPCWSTR lpszFileName, VS_FIXEDFILEINFO& FileInfo)
 {
 	FullFileInfo fullFileInfo;
 
 	return Create(lpszFileName, FileInfo, fullFileInfo);
 }
 
-BOOL CFileVersionInfo::Create(LPCTSTR lpszFileName, VS_FIXEDFILEINFO& FileInfo, FullFileInfo& fullFileInfo)
+BOOL CFileVersionInfo::Create(LPCWSTR lpszFileName, VS_FIXEDFILEINFO& FileInfo, FullFileInfo& fullFileInfo)
 {
 	DWORD dwHandle;
-	DWORD dwFileVersionInfoSize = GetFileVersionInfoSize((LPTSTR)lpszFileName, &dwHandle);
+	DWORD dwFileVersionInfoSize = GetFileVersionInfoSizeW(lpszFileName, &dwHandle);
 
 	ZeroMemory(&FileInfo, sizeof(FileInfo));
 
@@ -81,22 +81,22 @@ BOOL CFileVersionInfo::Create(LPCTSTR lpszFileName, VS_FIXEDFILEINFO& FileInfo, 
 
 	try
 	{
-		if (!GetFileVersionInfo((LPTSTR)lpszFileName, dwHandle, dwFileVersionInfoSize, lpData)) {
+		if (!GetFileVersionInfoW(lpszFileName, dwHandle, dwFileVersionInfoSize, lpData)) {
 			throw FALSE;
 		}
 
-		LPVOID	lpInfo;
-		UINT	unInfoLen;
-		if (VerQueryValue(lpData, _T("\\"), &lpInfo, &unInfoLen)) {
+		LPVOID lpInfo;
+		UINT   unInfoLen;
+		if (VerQueryValueW(lpData, L"\\", &lpInfo, &unInfoLen)) {
 			ASSERT(unInfoLen == sizeof(FileInfo));
 			if (unInfoLen == sizeof(FileInfo)) {
 				memcpy(&FileInfo, lpInfo, unInfoLen);
 			}
 		}
 
-		VerQueryValue(lpData, _T("\\VarFileInfo\\Translation"), &lpInfo, &unInfoLen);
+		VerQueryValueW(lpData, L"\\VarFileInfo\\Translation", &lpInfo, &unInfoLen);
 
-		DWORD	dwLangCode = 0;
+		DWORD dwLangCode = 0;
 		if (!GetTranslationId(lpInfo, unInfoLen, GetUserDefaultLangID(), dwLangCode, FALSE)) {
 			if (!GetTranslationId(lpInfo, unInfoLen, GetUserDefaultLangID(), dwLangCode, TRUE)) {
 				if (!GetTranslationId(lpInfo, unInfoLen, MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL), dwLangCode, TRUE)) {
@@ -107,44 +107,44 @@ BOOL CFileVersionInfo::Create(LPCTSTR lpszFileName, VS_FIXEDFILEINFO& FileInfo, 
 			}
 		}
 
-		CString	strSubBlock;
-		strSubBlock.Format(_T("\\StringFileInfo\\%04X%04X\\"), dwLangCode&0x0000FFFF, (dwLangCode&0xFFFF0000)>>16);
+		CString strSubBlock;
+		strSubBlock.Format(L"\\StringFileInfo\\%04X%04X\\", dwLangCode&0x0000FFFF, (dwLangCode&0xFFFF0000)>>16);
 
-		if (VerQueryValue(lpData, (LPTSTR)(LPCTSTR)(strSubBlock+_T("CompanyName")), &lpInfo, &unInfoLen)) {
-			fullFileInfo.strCompanyName = CString((LPCTSTR)lpInfo);
+		if (VerQueryValueW(lpData, strSubBlock + L"CompanyName", &lpInfo, &unInfoLen)) {
+			fullFileInfo.strCompanyName = CString((LPCWSTR)lpInfo);
 		}
-		if (VerQueryValue(lpData, (LPTSTR)(LPCTSTR)(strSubBlock+_T("FileDescription")), &lpInfo, &unInfoLen)) {
-			fullFileInfo.strFileDescription = CString((LPCTSTR)lpInfo);
+		if (VerQueryValueW(lpData, strSubBlock + L"FileDescription", &lpInfo, &unInfoLen)) {
+			fullFileInfo.strFileDescription = CString((LPCWSTR)lpInfo);
 		}
-		if (VerQueryValue(lpData, (LPTSTR)(LPCTSTR)(strSubBlock+_T("FileVersion")), &lpInfo, &unInfoLen)) {
-			fullFileInfo.strFileVersion = CString((LPCTSTR)lpInfo);
+		if (VerQueryValueW(lpData, strSubBlock + L"FileVersion", &lpInfo, &unInfoLen)) {
+			fullFileInfo.strFileVersion = CString((LPCWSTR)lpInfo);
 		}
-		if (VerQueryValue(lpData, (LPTSTR)(LPCTSTR)(strSubBlock+_T("InternalName")), &lpInfo, &unInfoLen)) {
-			fullFileInfo.strInternalName = CString((LPCTSTR)lpInfo);
+		if (VerQueryValueW(lpData, strSubBlock + L"InternalName", &lpInfo, &unInfoLen)) {
+			fullFileInfo.strInternalName = CString((LPCWSTR)lpInfo);
 		}
-		if (VerQueryValue(lpData, (LPTSTR)(LPCTSTR)(strSubBlock+_T("LegalCopyright")), &lpInfo, &unInfoLen)) {
-			fullFileInfo.strLegalCopyright = CString((LPCTSTR)lpInfo);
+		if (VerQueryValueW(lpData, strSubBlock + L"LegalCopyright", &lpInfo, &unInfoLen)) {
+			fullFileInfo.strLegalCopyright = CString((LPCWSTR)lpInfo);
 		}
-		if (VerQueryValue(lpData, (LPTSTR)(LPCTSTR)(strSubBlock+_T("OriginalFileName")), &lpInfo, &unInfoLen)) {
-			fullFileInfo.strOriginalFileName = CString((LPCTSTR)lpInfo);
+		if (VerQueryValueW(lpData, strSubBlock + L"OriginalFileName", &lpInfo, &unInfoLen)) {
+			fullFileInfo.strOriginalFileName = CString((LPCWSTR)lpInfo);
 		}
-		if (VerQueryValue(lpData, (LPTSTR)(LPCTSTR)(strSubBlock+_T("ProductName")), &lpInfo, &unInfoLen)) {
-			fullFileInfo.strProductName = CString((LPCTSTR)lpInfo);
+		if (VerQueryValueW(lpData, strSubBlock + L"ProductName", &lpInfo, &unInfoLen)) {
+			fullFileInfo.strProductName = CString((LPCWSTR)lpInfo);
 		}
-		if (VerQueryValue(lpData, (LPTSTR)(LPCTSTR)(strSubBlock+_T("ProductVersion")), &lpInfo, &unInfoLen)) {
-			fullFileInfo.strProductVersion = CString((LPCTSTR)lpInfo);
+		if (VerQueryValueW(lpData, strSubBlock + L"ProductVersion", &lpInfo, &unInfoLen)) {
+			fullFileInfo.strProductVersion = CString((LPCWSTR)lpInfo);
 		}
-		if (VerQueryValue(lpData, (LPTSTR)(LPCTSTR)(strSubBlock+_T("Comments")), &lpInfo, &unInfoLen)) {
-			fullFileInfo.strComments = CString((LPCTSTR)lpInfo);
+		if (VerQueryValueW(lpData, strSubBlock + L"Comments", &lpInfo, &unInfoLen)) {
+			fullFileInfo.strComments = CString((LPCWSTR)lpInfo);
 		}
-		if (VerQueryValue(lpData, (LPTSTR)(LPCTSTR)(strSubBlock+_T("LegalTrademarks")), &lpInfo, &unInfoLen)) {
-			fullFileInfo.strLegalTrademarks = CString((LPCTSTR)lpInfo);
+		if (VerQueryValueW(lpData, strSubBlock + L"LegalTrademarks", &lpInfo, &unInfoLen)) {
+			fullFileInfo.strLegalTrademarks = CString((LPCWSTR)lpInfo);
 		}
-		if (VerQueryValue(lpData, (LPTSTR)(LPCTSTR)(strSubBlock+_T("PrivateBuild")), &lpInfo, &unInfoLen)) {
-			fullFileInfo.strPrivateBuild = CString((LPCTSTR)lpInfo);
+		if (VerQueryValueW(lpData, strSubBlock + L"PrivateBuild", &lpInfo, &unInfoLen)) {
+			fullFileInfo.strPrivateBuild = CString((LPCWSTR)lpInfo);
 		}
-		if (VerQueryValue(lpData, (LPTSTR)(LPCTSTR)(strSubBlock+_T("SpecialBuild")), &lpInfo, &unInfoLen)) {
-			fullFileInfo.strSpecialBuild = CString((LPCTSTR)lpInfo);
+		if (VerQueryValueW(lpData, strSubBlock + L"SpecialBuild", &lpInfo, &unInfoLen)) {
+			fullFileInfo.strSpecialBuild = CString((LPCWSTR)lpInfo);
 		}
 
 		delete[] lpData;
@@ -191,10 +191,10 @@ WORD CFileVersionInfo::GetProductVersion(int nIndex)
 }
 */
 
-CString CFileVersionInfo::GetFileVersionEx(LPCTSTR lpszFileName)
+CString CFileVersionInfo::GetFileVersionEx(LPCWSTR lpszFileName)
 {
-	CString				strFileVersion;
-	VS_FIXEDFILEINFO	FileInfo;
+	CString          strFileVersion;
+	VS_FIXEDFILEINFO FileInfo;
 	if (Create(lpszFileName, FileInfo)) {
 		strFileVersion.Format(L"%d.%d.%d.%d",
 							 (FileInfo.dwFileVersionMS & 0xFFFF0000) >> 16,
@@ -206,10 +206,10 @@ CString CFileVersionInfo::GetFileVersionEx(LPCTSTR lpszFileName)
 	return strFileVersion;
 }
 
-CString CFileVersionInfo::GetFileVersionExShort(LPCTSTR lpszFileName)
+CString CFileVersionInfo::GetFileVersionExShort(LPCWSTR lpszFileName)
 {
-	CString				strFileVersion;
-	VS_FIXEDFILEINFO	FileInfo;
+	CString          strFileVersion;
+	VS_FIXEDFILEINFO FileInfo;
 	if (Create(lpszFileName, FileInfo)) {
 		strFileVersion.Format(L"%d.%d.%d",
 							 (FileInfo.dwFileVersionMS & 0xFFFF0000) >> 16,
@@ -220,10 +220,10 @@ CString CFileVersionInfo::GetFileVersionExShort(LPCTSTR lpszFileName)
 	return strFileVersion;
 }
 
-QWORD CFileVersionInfo::GetFileVersion(LPCTSTR lpszFileName)
+QWORD CFileVersionInfo::GetFileVersion(LPCWSTR lpszFileName)
 {
-	QWORD				qwFileVersion = 0;
-	VS_FIXEDFILEINFO	FileInfo;
+	QWORD            qwFileVersion = 0;
+	VS_FIXEDFILEINFO FileInfo;
 	if (Create(lpszFileName, FileInfo)) {
 		qwFileVersion = ((QWORD)FileInfo.dwFileVersionMS << 32) | FileInfo.dwFileVersionLS;
 	}
