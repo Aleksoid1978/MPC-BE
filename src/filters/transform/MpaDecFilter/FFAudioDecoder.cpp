@@ -145,6 +145,9 @@ static const struct {
 	{ &MEDIASUBTYPE_DSD8,              AV_CODEC_ID_DSD_MSBF_PLANAR },
 	// DST
 	{ &MEDIASUBTYPE_DST,               AV_CODEC_ID_DST },
+	// A-law/mu-law
+	{ &MEDIASUBTYPE_ALAW,              AV_CODEC_ID_PCM_ALAW  },
+	{ &MEDIASUBTYPE_MULAW,             AV_CODEC_ID_PCM_MULAW },
 
 	{ &MEDIASUBTYPE_None,              AV_CODEC_ID_NONE },
 };

@@ -2416,6 +2416,8 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_PCM_FL32);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_PCM_FL64);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_IEEE_FLOAT); // only for 64-bit float PCM
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ALAW);
+		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_MULAW);
 		/* todo: this should not depend on PCM */
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_IMA4);
 		pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ADPCM_SWF);
