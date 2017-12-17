@@ -56,7 +56,7 @@ BOOL CInPlaceWinHotkey::PreTranslateMessage(MSG* pMsg)
 				|| pMsg->wParam == VK_ESCAPE
 				|| GetKeyState(VK_CONTROL)) {
 			::TranslateMessage(pMsg);
-			::DispatchMessage(pMsg);
+			::DispatchMessageW(pMsg);
 			return TRUE;				// DO NOT process further
 		}
 	}
@@ -155,7 +155,7 @@ BOOL CInPlaceEdit::PreTranslateMessage(MSG* pMsg)
 				|| pMsg->wParam == VK_ESCAPE
 				|| GetKeyState(VK_CONTROL)) {
 			::TranslateMessage(pMsg);
-			::DispatchMessage(pMsg);
+			::DispatchMessageW(pMsg);
 			return TRUE;				// DO NOT process further
 		}
 	}
@@ -266,7 +266,7 @@ void CInPlaceFloatEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 
 	//CEdit::OnChar(nChar, nRepCnt, nFlags);
-	DefWindowProc(WM_CHAR, nChar, MAKELONG(nRepCnt, nFlags));
+	DefWindowProcW(WM_CHAR, nChar, MAKELONG(nRepCnt, nFlags));
 }
 
 // CInPlaceComboBox
@@ -323,7 +323,7 @@ BOOL CInPlaceComboBox::PreTranslateMessage(MSG* pMsg)
 		if (pMsg->wParam == VK_RETURN
 				|| pMsg->wParam == VK_ESCAPE) {
 			::TranslateMessage(pMsg);
-			::DispatchMessage(pMsg);
+			::DispatchMessageW(pMsg);
 			return TRUE;				// DO NOT process further
 		}
 	}
@@ -430,7 +430,7 @@ BOOL CInPlaceListBox::PreTranslateMessage(MSG* pMsg)
 		if (pMsg->wParam == VK_RETURN
 				|| pMsg->wParam == VK_ESCAPE) {
 			::TranslateMessage(pMsg);
-			::DispatchMessage(pMsg);
+			::DispatchMessageW(pMsg);
 			return TRUE;				// DO NOT process further
 		}
 	}
@@ -512,7 +512,7 @@ int CPlayerListCtrl::HitTestEx(CPoint& point, int* col) const
 
 	int row = HitTest(CPoint(0, point.y), nullptr);
 
-	if ((GetWindowLongPtr(m_hWnd, GWL_STYLE) & LVS_TYPEMASK) != LVS_REPORT) {
+	if ((GetWindowLongPtrW(m_hWnd, GWL_STYLE) & LVS_TYPEMASK) != LVS_REPORT) {
 		return row;
 	}
 

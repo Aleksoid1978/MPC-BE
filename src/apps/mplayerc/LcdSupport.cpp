@@ -257,7 +257,7 @@ HRESULT CLCDMyMonoPage::Initialize()
 	m_Text[0].SetText(L"");
 	m_Text[0].SetFontPointSize(7);
 	hFont = m_Text[0].GetFont();
-	GetObject(hFont, sizeof(LOGFONT), &lf);
+	GetObjectW(hFont, sizeof(LOGFONT), &lf);
 	wcscpy_s(lf.lfFaceName, LF_FACESIZE, L"Microsoft Sans Serif");
 	m_Text[0].SetFont(lf);
 
@@ -270,7 +270,7 @@ HRESULT CLCDMyMonoPage::Initialize()
 	m_Text[1].SetText(L"");
 	m_Text[1].SetFontPointSize(7);
 	hFont = m_Text[1].GetFont();
-	GetObject(hFont, sizeof(LOGFONT), &lf);
+	GetObjectW(hFont, sizeof(LOGFONT), &lf);
 	wcscpy_s(lf.lfFaceName, LF_FACESIZE, L"Microsoft Sans Serif");
 	m_Text[1].SetFont(lf);
 
@@ -299,7 +299,7 @@ void CLCDMyMonoPage::OnLCDButtonUp(int nButton)
 			/*LOGFONT lf;
 			HFONT hFont = m_Text1.GetFont();
 
-			GetObject(hFont, sizeof(LOGFONT), &lf);
+			GetObjectW(hFont, sizeof(LOGFONT), &lf);
 
 			CFontDialog cfd(&lf);
 			if (cfd.DoModal() == IDOK) {
@@ -450,7 +450,7 @@ HRESULT CLCDMyColorPage::Initialize()
 	m_Text[0].SetText(L"");
 	m_Text[0].SetFontPointSize(14);
 	hFont = m_Text[0].GetFont();
-	GetObject(hFont, sizeof(LOGFONT), &lf);
+	GetObjectW(hFont, sizeof(LOGFONT), &lf);
 	wcscpy_s(lf.lfFaceName, LF_FACESIZE, L"Microsoft Sans Serif");
 	m_Text[0].SetFont(lf);
 
@@ -463,7 +463,7 @@ HRESULT CLCDMyColorPage::Initialize()
 	m_Text[1].SetText(L"");
 	m_Text[1].SetFontPointSize(14);
 	hFont = m_Text[1].GetFont();
-	GetObject(hFont, sizeof(LOGFONT), &lf);
+	GetObjectW(hFont, sizeof(LOGFONT), &lf);
 	wcscpy_s(lf.lfFaceName, LF_FACESIZE, L"Microsoft Sans Serif");
 	m_Text[1].SetFont(lf);
 
@@ -492,7 +492,7 @@ void CLCDMyColorPage::OnLCDButtonUp(int nButton)
 			/*LOGFONT lf;
 			HFONT hFont = m_Text1.GetFont();
 
-			GetObject(hFont, sizeof(LOGFONT), &lf);
+			GetObjectW(hFont, sizeof(LOGFONT), &lf);
 
 			CFontDialog cfd(&lf);
 			if (cfd.DoModal() == IDOK) {

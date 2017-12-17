@@ -59,7 +59,7 @@ BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
 	}
 
 	cs.style &= ~WS_BORDER;
-	cs.lpszClass = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, ::LoadCursor(nullptr, IDC_ARROW), HBRUSH(COLOR_WINDOW + 1), nullptr);
+	cs.lpszClass = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, ::LoadCursorW(nullptr, IDC_ARROW), HBRUSH(COLOR_WINDOW + 1), nullptr);
 
 	return TRUE;
 }
@@ -184,7 +184,7 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 
 	if (!img.IsNull()) {
 		BITMAP bm = { 0 };
-		if (GetObject(img, sizeof(bm), &bm)) {
+		if (GetObjectW(img, sizeof(bm), &bm)) {
 			BLENDFUNCTION bf;
 			bf.AlphaFormat = AC_SRC_ALPHA;
 			bf.BlendFlags = 0;

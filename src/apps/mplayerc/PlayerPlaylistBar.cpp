@@ -746,7 +746,7 @@ void CPlayerPlaylistBar::ScaleFontInternal()
 	lf.lfHeight = m_pMainFrame->ScaleSystemToMonitorY(lf.lfHeight);
 
 	m_font.DeleteObject();
-	if (m_font.CreateFontIndirect(&lf)) {
+	if (m_font.CreateFontIndirectW(&lf)) {
 		m_list.SetFont(&m_font);
 	}
 

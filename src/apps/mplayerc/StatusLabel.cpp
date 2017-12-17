@@ -54,11 +54,11 @@ void CStatusLabel::ScaleFont()
 	m_font.DeleteObject();
 
 	if (AfxGetAppSettings().bUseDarkTheme) {
-		m_font.CreateFont(AfxGetMainFrame()->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
+		m_font.CreateFontW(AfxGetMainFrame()->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
 						  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
 						  L"Tahoma");
 	} else {
-		m_font.CreateFont(AfxGetMainFrame()->ScaleY(16), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
+		m_font.CreateFontW(AfxGetMainFrame()->ScaleY(16), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
 						  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
 						  L"Segoe UI");
 	}

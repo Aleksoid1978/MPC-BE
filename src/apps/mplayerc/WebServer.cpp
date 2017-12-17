@@ -190,7 +190,7 @@ DWORD CWebServer::ThreadProc()
 	MSG msg;
 	while ((int)GetMessage(&msg, nullptr, 0, 0) > 0) {
 		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		DispatchMessageW(&msg);
 	}
 
 	return 0;

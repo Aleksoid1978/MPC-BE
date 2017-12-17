@@ -75,11 +75,11 @@ COSD::COSD(CMainFrame* pMainFrame)
 
 	HBITMAP hBmp = CMPCPngImage::LoadExternalImage(L"flybar", IDB_PLAYERFLYBAR_PNG, IMG_TYPE::UNDEF);
 	BITMAP bm = { 0 };
-	::GetObject(hBmp, sizeof(bm), &bm);
+	::GetObjectW(hBmp, sizeof(bm), &bm);
 
 	if (CMPCPngImage::FileExists(CString(L"flybar")) && bm.bmWidth != bm.bmHeight * 25) {
 		hBmp = CMPCPngImage::LoadExternalImage("", IDB_PLAYERFLYBAR_PNG, IMG_TYPE::UNDEF);
-		::GetObject(hBmp, sizeof(bm), &bm);
+		::GetObjectW(hBmp, sizeof(bm), &bm);
 	}
 
 	if (nullptr != hBmp) {
@@ -213,7 +213,7 @@ void COSD::UpdateBitmap()
 		hbmpRender = CreateDIBSection(m_MemDC, &bmi, DIB_RGB_COLORS, nullptr, nullptr, 0);
 		m_MemDC.SelectObject(hbmpRender);
 
-		if (::GetObject(hbmpRender, sizeof(BITMAP), &m_BitmapInfo) != 0) {
+		if (::GetObjectW(hbmpRender, sizeof(BITMAP), &m_BitmapInfo) != 0) {
 			// Configure the VMR's bitmap structure
 			if (m_pVMB) {
 				ZeroMemory(&m_VMR9AlphaBitmap, sizeof(m_VMR9AlphaBitmap));
@@ -404,21 +404,21 @@ void COSD::DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPos)
 
 void COSD::DrawFlyBar(CRect* rect)
 {
-	icoExit = m_pButtonsImages->ExtractIcon(0);
+	icoExit = m_pButtonsImages->ExtractIconW(0);
 	DrawIconEx(m_MemDC, m_rectWnd.right - 34, 10, icoExit, 0, 0, 0, nullptr, DI_NORMAL);
 	DestroyIcon(icoExit);
 
-	icoClose = m_pButtonsImages->ExtractIcon(23);
+	icoClose = m_pButtonsImages->ExtractIconW(23);
 	DrawIconEx(m_MemDC, m_rectWnd.right - 62, 10, icoClose, 0, 0, 0, nullptr, DI_NORMAL);
 	DestroyIcon(icoClose);
 
 	if (m_bMouseOverExitButton) {
-		icoExit_a = m_pButtonsImages->ExtractIcon(1);
+		icoExit_a = m_pButtonsImages->ExtractIconW(1);
 		DrawIconEx(m_MemDC, m_rectWnd.right - 34, 10, icoExit_a, 0, 0, 0, nullptr, DI_NORMAL);
 		DestroyIcon(icoExit_a);
 	}
 	if (m_bMouseOverCloseButton) {
-		icoClose_a = m_pButtonsImages->ExtractIcon(24);
+		icoClose_a = m_pButtonsImages->ExtractIconW(24);
 		DrawIconEx(m_MemDC, m_rectWnd.right - 62, 10, icoClose_a, 0, 0, 0, nullptr, DI_NORMAL);
 		DestroyIcon(icoClose_a);
 	}

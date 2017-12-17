@@ -168,11 +168,11 @@ BOOL UpdateCheckerDlg::OnInitDialog()
 
 	switch (m_updateStatus) {
 	case UPDATER_NEW_VERSION_IS_AVAILABLE:
-		m_icon.SetIcon(LoadIcon(nullptr, IDI_QUESTION));
+		m_icon.SetIcon(LoadIconW(nullptr, IDI_QUESTION));
 		break;
 	case UPDATER_NO_NEW_VERSION:
 	case UPDATER_ERROR:
-		m_icon.SetIcon(LoadIcon(nullptr, (m_updateStatus == UPDATER_ERROR) ? IDI_WARNING : IDI_INFORMATION));
+		m_icon.SetIcon(LoadIconW(nullptr, (m_updateStatus == UPDATER_ERROR) ? IDI_WARNING : IDI_INFORMATION));
 		m_okButton.ShowWindow(SW_HIDE);
 		m_cancelButton.SetWindowTextW(ResStr(IDS_UPDATE_CLOSE));
 		m_cancelButton.SetFocus();

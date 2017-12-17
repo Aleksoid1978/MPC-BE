@@ -342,19 +342,19 @@ LRESULT CALLBACK COpenFileDlg::WindowProcNew(HWND hwnd, UINT message, WPARAM wPa
 		CAutoVectorPtr<WCHAR> path;
 		path.Allocate(MAX_PATH+1);
 
-		if (::GetDlgItemText(hwnd, cmb13, (WCHAR*)path, MAX_PATH) == 0) {
+		if (::GetDlgItemTextW(hwnd, cmb13, (WCHAR*)path, MAX_PATH) == 0) {
 			::SendMessageW(hwnd, CDM_SETCONTROLTEXT, edt1, (LPARAM)__DUMMY__);
 		}
 	}
 
-	return CallWindowProc(COpenFileDlg::m_wndProc, hwnd, message, wParam, lParam);
+	return CallWindowProcW(COpenFileDlg::m_wndProc, hwnd, message, wParam, lParam);
 }
 
 BOOL COpenFileDlg::OnInitDialog()
 {
 	CFileDialog::OnInitDialog();
 
-	m_wndProc = (WNDPROC)SetWindowLongPtr(GetParent()->m_hWnd, GWLP_WNDPROC , (LONG_PTR)WindowProcNew);
+	m_wndProc = (WNDPROC)SetWindowLongPtrW(GetParent()->m_hWnd, GWLP_WNDPROC , (LONG_PTR)WindowProcNew);
 
 	return TRUE;
 }

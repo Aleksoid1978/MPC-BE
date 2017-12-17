@@ -3659,7 +3659,7 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 		ULONG pulButtonIndex;
 
 		if (!m_bHideCursor) {
-			SetCursor(LoadCursor(nullptr, SUCCEEDED(m_pDVDI->GetButtonAtPosition(vp, &pulButtonIndex)) ? IDC_HAND : IDC_ARROW));
+			SetCursor(LoadCursorW(nullptr, SUCCEEDED(m_pDVDI->GetButtonAtPosition(vp, &pulButtonIndex)) ? IDC_HAND : IDC_ARROW));
 		}
 		m_pDVDC->SelectAtPosition(vp);
 	}
@@ -15670,7 +15670,7 @@ void CMainFrame::SetAlwaysOnTop(int i)
 		if (pInsertAfter) {
 			SetWindowPos(pInsertAfter, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 		}
-	} else if (m_bFullScreen && !(GetWindowLongPtr(m_hWnd, GWL_EXSTYLE) & WS_EX_TOPMOST)) {
+	} else if (m_bFullScreen && !(GetWindowLongPtrW(m_hWnd, GWL_EXSTYLE) & WS_EX_TOPMOST)) {
 		SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 	}
 }
@@ -17942,7 +17942,7 @@ HRESULT CMainFrame::CreateThumbnailToolbar()
 
 		// Check dimensions
 		BITMAP bi = {0};
-		GetObject((HANDLE)hB, sizeof(bi), &bi);
+		GetObjectW((HANDLE)hB, sizeof(bi), &bi);
 		if (bi.bmHeight == 0) {
 			DeleteObject(hB);
 			m_pTaskbarList->Release();
@@ -18677,7 +18677,7 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 			m_InternalImageSmall.Attach(m_InternalImage);
 		} else {
 			BITMAP bm;
-			if (GetObject(m_InternalImage, sizeof(bm), &bm) && bm.bmWidth) {
+			if (GetObjectW(m_InternalImage, sizeof(bm), &bm) && bm.bmWidth) {
 				const int nWidth = 256;
 				if ((abs(bm.bmHeight) <= nWidth) && (bm.bmWidth <= nWidth)) {
 					m_InternalImageSmall.Attach(m_InternalImage);
@@ -18735,7 +18735,7 @@ LRESULT CMainFrame::OnDwmSendIconicThumbnail(WPARAM wParam, LPARAM lParam)
 
 		if (hdcMem) {
 			BITMAP bm;
-			GetObject(m_InternalImageSmall, sizeof(bm), &bm);
+			GetObjectW(m_InternalImageSmall, sizeof(bm), &bm);
 
 			int h = min(abs(bm.bmHeight), nHeight);
 			int w = MulDiv(h, bm.bmWidth, abs(bm.bmHeight));

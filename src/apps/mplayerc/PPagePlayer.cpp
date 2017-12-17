@@ -266,7 +266,7 @@ void CPPagePlayer::OnKillFocusEdit1()
 void CPPagePlayer::OnChangeEdit1()
 {
 	CString rString;
-	GetDlgItemText(IDC_EDIT1, rString);
+	GetDlgItemTextW(IDC_EDIT1, rString);
 	if (rString.IsEmpty()) {
 		OnKillFocusEdit1();
 	}

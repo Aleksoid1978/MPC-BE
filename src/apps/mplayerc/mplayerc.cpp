@@ -964,13 +964,13 @@ static const CString GetHiveName(HKEY hive)
 static bool ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName)
 {
 	HKEY hKey = nullptr;
-	if (RegOpenKeyEx(hKeyRoot, keyName, 0, KEY_READ, &hKey) != ERROR_SUCCESS) {
+	if (RegOpenKeyExW(hKeyRoot, keyName, 0, KEY_READ, &hKey) != ERROR_SUCCESS) {
 		return false;
 	}
 
 	DWORD subKeysCount = 0, maxSubKeyLen = 0;
 	DWORD valuesCount = 0, maxValueNameLen = 0, maxValueDataLen = 0;
-	if (RegQueryInfoKey(hKey, nullptr, nullptr, nullptr, &subKeysCount, &maxSubKeyLen, nullptr, &valuesCount, &maxValueNameLen, &maxValueDataLen, nullptr, nullptr) != ERROR_SUCCESS) {
+	if (RegQueryInfoKeyW(hKey, nullptr, nullptr, nullptr, &subKeysCount, &maxSubKeyLen, nullptr, &valuesCount, &maxValueNameLen, &maxValueDataLen, nullptr, nullptr) != ERROR_SUCCESS) {
 		return false;
 	}
 	maxSubKeyLen += 1;
@@ -1039,7 +1039,7 @@ static bool ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName)
 	for (DWORD indexSubKey = 0; indexSubKey < subKeysCount; indexSubKey++) {
 		subKeyLen = maxSubKeyLen;
 
-		if (RegEnumKeyEx(hKey, indexSubKey, subKeyName.GetBuffer(maxSubKeyLen), &subKeyLen, nullptr, nullptr, nullptr, nullptr) != ERROR_SUCCESS) {
+		if (RegEnumKeyExW(hKey, indexSubKey, subKeyName.GetBuffer(maxSubKeyLen), &subKeyLen, nullptr, nullptr, nullptr, nullptr) != ERROR_SUCCESS) {
 			return false;
 		}
 
@@ -1449,10 +1449,10 @@ BOOL CMPlayerCApp::InitInstance()
 	WNDCLASS wndcls;
 	memset(&wndcls, 0, sizeof(WNDCLASS));
 	wndcls.style = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW;
-	wndcls.lpfnWndProc = ::DefWindowProc;
+	wndcls.lpfnWndProc = ::DefWindowProcW;
 	wndcls.hInstance = AfxGetInstanceHandle();
-	wndcls.hIcon = LoadIcon(IDR_MAINFRAME);
-	wndcls.hCursor = LoadCursor(IDC_ARROW);
+	wndcls.hIcon = LoadIconW(IDR_MAINFRAME);
+	wndcls.hCursor = LoadCursorW(IDC_ARROW);
 	wndcls.hbrBackground = 0;//(HBRUSH)(COLOR_WINDOW + 1); // no bkg brush, the view and the bars should always fill the whole client area
 	wndcls.lpszMenuName = nullptr;
 	wndcls.lpszClassName = _T(MPC_WND_CLASS_NAME);
@@ -1686,7 +1686,7 @@ BOOL CMPlayerCApp::InitInstance()
 	pFrame->RestoreControlBars();
 	pFrame->SetDefaultWindowRect((m_s.nCLSwitches & CLSW_MONITOR) ? m_s.iMonitor : 0);
 	pFrame->SetDefaultFullscreenState();
-	pFrame->SetIcon(AfxGetApp()->LoadIcon(IDR_MAINFRAME), TRUE);
+	pFrame->SetIcon(AfxGetApp()->LoadIconW(IDR_MAINFRAME), TRUE);
 	pFrame->DragAcceptFiles();
 	pFrame->ShowWindow((m_s.nCLSwitches & CLSW_MINIMIZED) ? SW_SHOWMINIMIZED : SW_SHOW);
 	pFrame->UpdateWindow();
@@ -2126,8 +2126,8 @@ LRESULT CALLBACK RTLWindowsLayoutCbtFilterHook(int code, WPARAM wParam, LPARAM l
 		//	lpcs->dwExStyle |= WS_EX_LAYOUTRTL;	// doesn't seem to have any effect, but shouldn't hurt
 
 		HWND hWnd = (HWND)wParam;
-		if ((GetWindowLongPtr(hWnd, GWL_STYLE) & WS_CHILD) == 0) {
-			SetWindowLongPtr(hWnd, GWL_EXSTYLE, GetWindowLongPtr(hWnd, GWL_EXSTYLE) | WS_EX_LAYOUTRTL);
+		if ((GetWindowLongPtrW(hWnd, GWL_STYLE) & WS_CHILD) == 0) {
+			SetWindowLongPtrW(hWnd, GWL_EXSTYLE, GetWindowLongPtrW(hWnd, GWL_EXSTYLE) | WS_EX_LAYOUTRTL);
 		}
 	}
 	return CallNextHookEx(nullptr, code, wParam, lParam);
@@ -2184,10 +2184,9 @@ void CMPlayerCApp::SetLanguage(int nLanguage, bool bSave/* = true*/)
 
 	const CString strSatellite = GetSatelliteDll(nLanguage);
 	if (!strSatellite.IsEmpty()) {
-		FileVersion::Ver SatVersion = FileVersion::GetVer(strSatellite);
-		SatVersion.revision = 0;
+		const FileVersion::Ver SatVersion = FileVersion::GetVer(strSatellite);
 
-		if (SatVersion.value == FileVersion::Ver(MPC_VERSION_NUM, 0).value) {
+		if (SatVersion.value == FileVersion::Ver(MPC_VERSION_NUM_SVN).value) {
 			hMod = LoadLibraryW(strSatellite);
 			if (bSave) {
 				s.iLanguage = nLanguage;
@@ -2209,7 +2208,7 @@ void CMPlayerCApp::SetLanguage(int nLanguage, bool bSave/* = true*/)
 	else if (nLanguage == GetLanguageIndex(ID_LANGUAGE_HEBREW)) {
 		// Hebrew needs the RTL flag.
 		SetProcessDefaultLayout(LAYOUT_RTL);
-		SetWindowsHookEx(WH_CBT, RTLWindowsLayoutCbtFilterHook, nullptr, GetCurrentThreadId());
+		SetWindowsHookExW(WH_CBT, RTLWindowsLayoutCbtFilterHook, nullptr, GetCurrentThreadId());
 	}
 
 	// Free the old resource if it was a dll

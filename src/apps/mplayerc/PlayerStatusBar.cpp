@@ -84,7 +84,7 @@ void CPlayerStatusBar::ScaleFontInternal()
 {
 	m_font.DeleteObject();
 
-	m_font.CreateFont(m_pMainFrame->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
+	m_font.CreateFontW(m_pMainFrame->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
 					  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,
 					  L"Tahoma");
 }
@@ -511,7 +511,7 @@ BOOL CPlayerStatusBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	ScreenToClient(&p);
 
 	if (m_time_rect.PtInRect(p) || m_time_rect2.PtInRect(p)) {
-		SetCursor(LoadCursor(nullptr, IDC_HAND));
+		SetCursor(LoadCursorW(nullptr, IDC_HAND));
 		return TRUE;
 	}
 
@@ -519,7 +519,7 @@ BOOL CPlayerStatusBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 		CRect r;
 		GetClientRect(r);
 		if (p.x >= r.Width()-r.Height() && !m_pMainFrame->IsCaptionHidden()) {
-			SetCursor(LoadCursor(nullptr, IDC_SIZENWSE));
+			SetCursor(LoadCursorW(nullptr, IDC_SIZENWSE));
 			return TRUE;
 		}
 	}

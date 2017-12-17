@@ -49,7 +49,7 @@ BOOL CmdLineHelpDlg::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	m_icon.SetIcon(LoadIcon(nullptr, IDI_INFORMATION));
+	m_icon.SetIcon(LoadIconW(nullptr, IDI_INFORMATION));
 
 	m_text = m_cmdLine;
 

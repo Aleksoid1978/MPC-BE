@@ -59,9 +59,9 @@ HBRUSH CStaticLink::CtlColor(CDC* pDC, UINT nCtlColor)
 		if (!(HFONT)m_font) {
 
 			LOGFONT lf;
-			GetFont()->GetObject(sizeof(lf), &lf);
+			GetFont()->GetObjectW(sizeof(lf), &lf);
 			lf.lfUnderline = TRUE;
-			m_font.CreateFontIndirect(&lf);
+			m_font.CreateFontIndirectW(&lf);
 		}
 
 		pDC->SelectObject(&m_font);

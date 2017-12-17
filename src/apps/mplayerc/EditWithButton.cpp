@@ -315,7 +315,7 @@ void CEditWithButton_Base::OnEnable(BOOL bEnable)
 LRESULT CEditWithButton_Base::OnSetReadOnly(WPARAM wParam, LPARAM lParam)
 {
 	// Let all the default handling happen.
-	LRESULT r = DefWindowProc(EM_SETREADONLY, wParam, lParam);
+	LRESULT r = DefWindowProcW(EM_SETREADONLY, wParam, lParam);
 
 	// Prompt the button area to redraw.
 	SetWindowPos(nullptr, 0, 0, 0, 0, SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOZORDER);

@@ -31,11 +31,11 @@ CFlyBar::CFlyBar(CMainFrame* pMainFrame)
 {
 	HBITMAP hBmp = CMPCPngImage::LoadExternalImage(L"flybar", IDB_PLAYERFLYBAR_PNG, IMG_TYPE::UNDEF);
 	BITMAP bm = { 0 };
-	::GetObject(hBmp, sizeof(bm), &bm);
+	::GetObjectW(hBmp, sizeof(bm), &bm);
 
 	if (CMPCPngImage::FileExists(CString(L"flybar")) && bm.bmWidth != bm.bmHeight * 25) {
 		hBmp = CMPCPngImage::LoadExternalImage("", IDB_PLAYERFLYBAR_PNG, IMG_TYPE::UNDEF);
-		::GetObject(hBmp, sizeof(bm), &bm);
+		::GetObjectW(hBmp, sizeof(bm), &bm);
 	}
 
 	if (nullptr != hBmp) {
@@ -156,7 +156,7 @@ void CFlyBar::CalcButtonsRect()
 
 void CFlyBar::DrawButton(CDC *pDC, int x, int y, int z)
 {
-	HICON hIcon = m_pButtonsImages->ExtractIcon(y);
+	HICON hIcon = m_pButtonsImages->ExtractIconW(y);
 	DrawIconEx(pDC->m_hDC, x - 5 - (iw * z), 5, hIcon, 0, 0, 0, nullptr, DI_NORMAL);
 	DestroyIcon(hIcon);
 }
@@ -203,7 +203,7 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CFlyBar::OnMouseMove(UINT nFlags, CPoint point)
 {
-	SetCursor(LoadCursor(nullptr, IDC_HAND));
+	SetCursor(LoadCursorW(nullptr, IDC_HAND));
 
 	TRACKMOUSEEVENT tme;
 	tme.cbSize		= sizeof(tme);
@@ -273,7 +273,7 @@ void CFlyBar::UpdateWnd(CPoint point)
 		if (str.GetLength() > 0) {
 			m_tooltip.UpdateTipText(L"", this);
 		}
-		SetCursor(LoadCursor(nullptr, IDC_ARROW));
+		SetCursor(LoadCursorW(nullptr, IDC_ARROW));
 		bt_idx = -1;
 	}
 

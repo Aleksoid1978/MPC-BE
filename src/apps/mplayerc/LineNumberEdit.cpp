@@ -92,7 +92,7 @@ void CLineNumberEdit::OnSysColorChange()
 LRESULT CLineNumberEdit::OnSetText( WPARAM wParam, LPARAM lParam )
 {
 	// Default processing
-	LRESULT retval = DefWindowProc( WM_SETTEXT, wParam, lParam );
+	LRESULT retval = DefWindowProcW( WM_SETTEXT, wParam, lParam );
 	UpdateTopAndBottom();
 	return retval;
 }
@@ -116,14 +116,14 @@ void CLineNumberEdit::OnVScroll( UINT nSBCode, UINT nPos, CScrollBar* pScrollBar
 LRESULT CLineNumberEdit::OnLineScroll( WPARAM wParam, LPARAM lParam )
 {
 	// Default processing
-	LRESULT retval = DefWindowProc( EM_LINESCROLL, wParam, lParam );
+	LRESULT retval = DefWindowProcW( EM_LINESCROLL, wParam, lParam );
 	UpdateTopAndBottom();
 	return retval;
 }
 
 LRESULT CLineNumberEdit::OnSetFont( WPARAM wParam, LPARAM lParam )
 {
-	DefWindowProc( WM_SETFONT, wParam, lParam );
+	DefWindowProcW( WM_SETFONT, wParam, lParam );
 	// We resize the line-number
 	// field
 	Prepare();
