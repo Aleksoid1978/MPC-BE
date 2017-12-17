@@ -1756,21 +1756,21 @@ bool CDirectVobSubFilter::Open()
 
 	m_frd.files.RemoveAll();
 
-	CAtlArray<CString> paths;
+	std::vector<CString> paths;
 
 	for (int i = 0; i < 10; i++) {
 		CString tmp;
 		tmp.Format(IDS_RP_PATH, i);
 		CString path = theApp.GetProfileString(ResStr(IDS_R_DEFTEXTPATHES), tmp);
 		if (!path.IsEmpty()) {
-			paths.Add(path);
+			paths.push_back(path);
 		}
 	}
 
-    CAtlArray<Subtitle::SubFile> ret;
-    Subtitle::GetSubFileNames(m_FileName, paths, ret);
+	std::vector<Subtitle::SubFile> ret;
+	Subtitle::GetSubFileNames(m_FileName, paths, ret);
 
-	for (size_t i = 0; i < ret.GetCount(); i++) {
+	for (size_t i = 0; i < ret.size(); i++) {
 		if (m_frd.files.Find(ret[i].fn)) {
 			continue;
 		}
