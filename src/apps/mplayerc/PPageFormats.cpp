@@ -309,7 +309,7 @@ bool CPPageFormats::RegisterExt(CString ext, CString strLabel, filetype_t filety
 						icon_index = GetIconIndex(L":video");
 					}
 				}
-				if (icon_index >= 0 && ExtractIcon(AfxGetApp()->m_hInstance,(LPCWSTR)mpciconlib, icon_index)) {
+				if (icon_index >= 0 && ExtractIconW(AfxGetApp()->m_hInstance,(LPCWSTR)mpciconlib, icon_index)) {
 					AppIcon.Format(L"\"%s\",%d", mpciconlib, icon_index);
 				}
 			}

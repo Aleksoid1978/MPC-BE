@@ -29,7 +29,7 @@ IMPLEMENT_DYNAMIC(CFullscreenWnd, CWnd)
 
 CFullscreenWnd::CFullscreenWnd(CMainFrame* pMainFrame)
 	: m_pMainFrame(pMainFrame)
-	, m_hCursor(::LoadCursor(nullptr, IDC_ARROW))
+	, m_hCursor(::LoadCursorW(nullptr, IDC_ARROW))
 	, m_bCursorVisible(false)
 	, m_bTrackingMouseLeave(false)
 {
@@ -141,7 +141,7 @@ void CFullscreenWnd::ShowCursor(bool bVisible)
 
 void CFullscreenWnd::SetCursor(LPCWSTR lpCursorName)
 {
-	m_hCursor = ::LoadCursor(nullptr, lpCursorName);
+	m_hCursor = ::LoadCursorW(nullptr, lpCursorName);
 	m_bCursorVisible = true;
 	PostMessageW(WM_SETCURSOR, 0, 0);
 }
@@ -197,7 +197,7 @@ BOOL CFullscreenWnd::PreCreateWindow(CREATESTRUCT& cs)
 		return FALSE;
 	}
 
-	m_hCursor = ::LoadCursor(nullptr, IDC_ARROW);
+	m_hCursor = ::LoadCursorW(nullptr, IDC_ARROW);
 	m_bCursorVisible = false;
 	m_bTrackingMouseLeave = false;
 

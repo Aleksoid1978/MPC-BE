@@ -636,7 +636,7 @@ static LRESULT CALLBACK ControlProc(HWND control, UINT message, WPARAM wParam, L
 		}
 	}
 
-	return CallWindowProc(OldControlProc, control, message, wParam, lParam); // call control's own windowproc
+	return CallWindowProcW(OldControlProc, control, message, wParam, lParam); // call control's own windowproc
 }
 
 BOOL CPPageAccelTbl::OnInitDialog()
@@ -718,7 +718,7 @@ BOOL CPPageAccelTbl::OnInitDialog()
 	}
 
 	// subclass the keylist control
-	OldControlProc = (WNDPROC) SetWindowLongPtr(m_list.m_hWnd, GWLP_WNDPROC, (LONG_PTR) ControlProc);
+	OldControlProc = (WNDPROC) SetWindowLongPtrW(m_list.m_hWnd, GWLP_WNDPROC, (LONG_PTR) ControlProc);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE

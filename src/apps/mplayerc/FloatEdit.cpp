@@ -95,7 +95,7 @@ LRESULT CFloatEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 	int nStartChar, nEndChar;
 	GetSel(nStartChar, nEndChar);
 
-	LRESULT lr = DefWindowProc(WM_PASTE, wParam, lParam);
+	LRESULT lr = DefWindowProcW(WM_PASTE, wParam, lParam);
 
 	if (lr == 1) {
 		CString s;
@@ -193,7 +193,7 @@ LRESULT CIntEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 	int nStartChar, nEndChar;
 	GetSel(nStartChar, nEndChar);
 
-	LRESULT lr = DefWindowProc(WM_PASTE, wParam, lParam);
+	LRESULT lr = DefWindowProcW(WM_PASTE, wParam, lParam);
 
 	if (lr == 1) {
 		CString s;
@@ -298,7 +298,7 @@ LRESULT CHexEdit::OnPaste(WPARAM wParam, LPARAM lParam)
 	int nStartChar, nEndChar;
 	GetSel(nStartChar, nEndChar);
 
-	LRESULT lr = DefWindowProc(WM_PASTE, wParam, lParam);
+	LRESULT lr = DefWindowProcW(WM_PASTE, wParam, lParam);
 
 	if (lr == 1) {
 		CString s;

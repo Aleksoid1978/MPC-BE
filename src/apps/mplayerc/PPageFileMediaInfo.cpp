@@ -149,7 +149,7 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 	do {
 		wcscpy_s(lf.lfFaceName, LF_FACESIZE, MonospaceFonts[i]);
 		lf.lfHeight = -MulDiv(8, cDC->GetDeviceCaps(LOGPIXELSY), 72);
-		success = IsFontInstalled(MonospaceFonts[i]) && m_pCFont->CreateFontIndirect(&lf);
+		success = IsFontInstalled(MonospaceFonts[i]) && m_pCFont->CreateFontIndirectW(&lf);
 		i++;
 	} while (!success && i < _countof(MonospaceFonts));
 

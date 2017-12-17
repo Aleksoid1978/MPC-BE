@@ -265,7 +265,7 @@ void CPreView::OnPaint()
 
 	mdc.SetTextColor(RGB(r1,g1,b1));
 
-	font.CreateFont(m_pMainFrame->ScaleY(13), 0, 0, 0, FW_SEMIBOLD, 0, 0, 0, DEFAULT_CHARSET,
+	font.CreateFontW(m_pMainFrame->ScaleY(13), 0, 0, 0, FW_SEMIBOLD, 0, 0, 0, DEFAULT_CHARSET,
 					OUT_RASTER_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH | FF_MODERN, L"Tahoma");
 
 	mdc.SelectObject(&font);

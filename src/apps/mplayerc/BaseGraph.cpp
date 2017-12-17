@@ -33,7 +33,7 @@ BOOL CPlayerWindow::PreCreateWindow(CREATESTRUCT& cs)
 	}
 
 	cs.style &= ~WS_BORDER;
-	cs.lpszClass = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, ::LoadCursor(nullptr, IDC_HAND), nullptr, nullptr);
+	cs.lpszClass = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, ::LoadCursorW(nullptr, IDC_HAND), nullptr, nullptr);
 
 	return TRUE;
 }

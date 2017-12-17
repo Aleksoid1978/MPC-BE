@@ -176,12 +176,12 @@ void CPlayerToolBar::SwitchTheme()
 
 	BITMAP bitmapBmp;
 	if (nullptr != hBmp) {
-		::GetObject(hBmp, sizeof(bitmapBmp), &bitmapBmp);
+		::GetObjectW(hBmp, sizeof(bitmapBmp), &bitmapBmp);
 
 		if (fp && bitmapBmp.bmWidth != bitmapBmp.bmHeight * 15) {
 			if (s.bUseDarkTheme) {
 				hBmp = CMPCPngImage::LoadExternalImage(L"", resid, IMG_TYPE::PNG, s.nThemeBrightness, s.nThemeRed, s.nThemeGreen, s.nThemeBlue);
-				::GetObject(hBmp, sizeof(bitmapBmp), &bitmapBmp);
+				::GetObjectW(hBmp, sizeof(bitmapBmp), &bitmapBmp);
 			} else {
 				DeleteObject(hBmp);
 				hBmp = nullptr;
@@ -245,13 +245,13 @@ void CPlayerToolBar::SwitchTheme()
 		if (fp) {
 			hBmp = CMPCPngImage::LoadExternalImage(L"gpu", 0, IMG_TYPE::UNDEF);
 			if (hBmp) {
-				::GetObject(hBmp, sizeof(bm), &bm);
+				::GetObjectW(hBmp, sizeof(bm), &bm);
 			}
 		}
 		if (!hBmp || bm.bmHeight >= m_nButtonHeight) {
 			hBmp = CMPCPngImage::LoadExternalImage(L"", resid, IMG_TYPE::PNG);
 			if (hBmp) {
-				::GetObject(hBmp, sizeof(bm), &bm);
+				::GetObjectW(hBmp, sizeof(bm), &bm);
 				if (bm.bmHeight >= m_nButtonHeight) {
 					DeleteObject(hBmp);
 					hBmp = nullptr;
@@ -261,7 +261,7 @@ void CPlayerToolBar::SwitchTheme()
 						if (gpuresid < resid) {
 							hBmp = CMPCPngImage::LoadExternalImage(L"", gpuresid, IMG_TYPE::PNG);
 							if (hBmp) {
-								::GetObject(hBmp, sizeof(bm), &bm);
+								::GetObjectW(hBmp, sizeof(bm), &bm);
 								if (bm.bmHeight < m_nButtonHeight) {
 									break;
 								}
@@ -279,7 +279,7 @@ void CPlayerToolBar::SwitchTheme()
 			}
 		}
 		if (hBmp) {
-			::GetObject(hBmp, sizeof(bm), &bm);
+			::GetObjectW(hBmp, sizeof(bm), &bm);
 
 			CBitmap *bmp = DNew CBitmap();
 			bmp->Attach(hBmp);
@@ -288,7 +288,7 @@ void CPlayerToolBar::SwitchTheme()
 			pButtonDXVA->Create(bm.bmWidth, bm.bmHeight, ILC_COLOR32 | ILC_MASK, 1, 0);
 			pButtonDXVA->Add(bmp, static_cast<CBitmap*>(nullptr));
 
-			m_hDXVAIcon = pButtonDXVA->ExtractIcon(0);
+			m_hDXVAIcon = pButtonDXVA->ExtractIconW(0);
 
 			delete pButtonDXVA;
 			delete bmp;
