@@ -5152,13 +5152,13 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 
 	bool fSetForegroundWindow = false;
 
-	if ((s.nCLSwitches & CLSW_DVD) && !s.slFiles.IsEmpty()) {
+	if ((s.nCLSwitches & CLSW_DVD) && !s.slFiles.empty()) {
 		SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 		fSetForegroundWindow = true;
 
 		CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
 		if (p) {
-			p->path = s.slFiles.GetHead();
+			p->path = s.slFiles.front();
 			p->subs = s.slSubs;
 		}
 		OpenMedia(p);
@@ -5168,8 +5168,8 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 
 		std::list<CString> sl;
 
-		if (!s.slFiles.IsEmpty()) {
-			GetCDROMType(s.slFiles.GetHead()[0], sl);
+		if (!s.slFiles.empty()) {
+			GetCDROMType(s.slFiles.front()[0], sl);
 		} else {
 			CString dir;
 			dir.ReleaseBufferSetLength(GetCurrentDirectoryW(MAX_PATH, dir.GetBuffer(MAX_PATH)));
@@ -5182,34 +5182,29 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 
 		m_wndPlaylistBar.Open(sl, true);
 		OpenCurPlaylistItem();
-	} else if (!s.slFiles.IsEmpty()) {
-		if (s.slFiles.GetCount() == 1 && OpenYoutubePlaylist(s.slFiles.GetHead())) {
+	} else if (!s.slFiles.empty()) {
+		if (s.slFiles.size() == 1 && OpenYoutubePlaylist(s.slFiles.front())) {
 			;
-		} else if (s.slFiles.GetCount() == 1 && ::PathIsDirectoryW(s.slFiles.GetHead() + L"\\VIDEO_TS")) {
+		} else if (s.slFiles.size() == 1 && ::PathIsDirectoryW(s.slFiles.front() + L"\\VIDEO_TS")) {
 			SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 			fSetForegroundWindow = true;
 
 			CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
 			if (p) {
-				p->path = s.slFiles.GetHead();
+				p->path = s.slFiles.front();
 				p->subs = s.slSubs;
 			}
 			OpenMedia(p);
 		} else {
 			std::list<CString> sl;
-
-			POSITION pos1 = s.slFiles.GetHeadPosition();
-			while (pos1) {
-				sl.push_back(s.slFiles.GetNext(pos1));
-			}
+			sl = s.slFiles;
 
 			ParseDirs(sl);
 			bool fMulti = sl.size() > 1;
 
 			if (!fMulti) {
-				POSITION pos2 = s.slDubs.GetHeadPosition();
-				while (pos2) {
-					sl.push_back(s.slDubs.GetNext(pos2));
+				for (const auto& dub : s.slDubs) {
+					sl.push_back(dub);
 				}
 			}
 
@@ -10366,7 +10361,7 @@ void CMainFrame::SetDefaultFullscreenState()
 	CAppSettings& s = AfxGetAppSettings();
 
 	// Waffs : fullscreen command line
-	if (!(s.nCLSwitches & CLSW_ADD) && (s.nCLSwitches & CLSW_FULLSCREEN) && !s.slFiles.IsEmpty()) {
+	if (!(s.nCLSwitches & CLSW_ADD) && (s.nCLSwitches & CLSW_FULLSCREEN) && !s.slFiles.empty()) {
 		if (s.IsD3DFullscreen()) {
 			m_bStartInD3DFullscreen = true;
 		} else {

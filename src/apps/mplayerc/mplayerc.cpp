@@ -1490,7 +1490,7 @@ BOOL CMPlayerCApp::InitInstance()
 		}
 	}
 
-	if ((m_s.nCLSwitches & CLSW_CLOSE) && m_s.slFiles.IsEmpty()) { // "/close" switch and empty file list
+	if ((m_s.nCLSwitches & CLSW_CLOSE) && m_s.slFiles.empty()) { // "/close" switch and empty file list
 		return FALSE;
 	}
 
