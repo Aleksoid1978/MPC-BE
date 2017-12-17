@@ -25,9 +25,9 @@ class CFontInstaller
 {
 	HANDLE (WINAPI *pAddFontMemResourceEx)(PVOID,DWORD,PVOID,DWORD*);
 	BOOL (WINAPI *pRemoveFontMemResourceEx)(HANDLE);
-	int (WINAPI *pAddFontResourceEx)(LPCTSTR,DWORD,PVOID);
-	BOOL (WINAPI *pRemoveFontResourceEx)(LPCTSTR,DWORD,PVOID);
-	BOOL (WINAPI *pMoveFileEx)(LPCTSTR, LPCTSTR,DWORD);
+	int (WINAPI *pAddFontResourceEx)(LPCWSTR,DWORD,PVOID);
+	BOOL (WINAPI *pRemoveFontResourceEx)(LPCWSTR,DWORD,PVOID);
+	BOOL (WINAPI *pMoveFileEx)(LPCWSTR, LPCWSTR,DWORD);
 
 	CAtlList<HANDLE> m_fonts;
 	CAtlList<CString> m_files;
@@ -38,7 +38,7 @@ public:
 	virtual ~CFontInstaller();
 
 	bool InstallFontMemory(const void* pData, UINT len);
-	bool InstallFontFile(LPCTSTR filename);
+	bool InstallFontFile(LPCWSTR filename);
 	bool InstallFontTempFile(const void* pData, UINT len);
 
 	void UninstallFonts();

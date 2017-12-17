@@ -24,15 +24,15 @@
 
 CFontInstaller::CFontInstaller()
 {
-	if (HMODULE hGdi = GetModuleHandle(_T("gdi32.dll"))) {
+	if (HMODULE hGdi = GetModuleHandleW(L"gdi32.dll")) {
 		pAddFontMemResourceEx = (HANDLE (WINAPI *)(PVOID,DWORD,PVOID,DWORD*))GetProcAddress(hGdi, "AddFontMemResourceEx");
-		pAddFontResourceEx = (int (WINAPI *)(LPCTSTR,DWORD,PVOID))GetProcAddress(hGdi, "AddFontResourceExW");
+		pAddFontResourceEx = (int (WINAPI *)(LPCWSTR,DWORD,PVOID))GetProcAddress(hGdi, "AddFontResourceExW");
 		pRemoveFontMemResourceEx = (BOOL (WINAPI *)(HANDLE))GetProcAddress(hGdi, "RemoveFontMemResourceEx");
-		pRemoveFontResourceEx = (BOOL (WINAPI *)(LPCTSTR,DWORD,PVOID))GetProcAddress(hGdi, "RemoveFontResourceExW");
+		pRemoveFontResourceEx = (BOOL (WINAPI *)(LPCWSTR,DWORD,PVOID))GetProcAddress(hGdi, "RemoveFontResourceExW");
 	}
 
-	if (HMODULE hGdi = GetModuleHandle(_T("kernel32.dll"))) {
-		pMoveFileEx = (BOOL (WINAPI *)(LPCTSTR, LPCTSTR, DWORD))GetProcAddress(hGdi, "MoveFileExW");
+	if (HMODULE hGdi = GetModuleHandleW(L"kernel32.dll")) {
+		pMoveFileEx = (BOOL (WINAPI *)(LPCWSTR, LPCWSTR, DWORD))GetProcAddress(hGdi, "MoveFileExW");
 	}
 }
 
@@ -63,7 +63,7 @@ void CFontInstaller::UninstallFonts()
 		while (pos) {
 			CString fn = m_tempfiles.GetNext(pos);
 			pRemoveFontResourceEx(fn, FR_PRIVATE, 0);
-			if (!DeleteFile(fn) && pMoveFileEx) {
+			if (!DeleteFileW(fn) && pMoveFileEx) {
 				pMoveFileEx(fn, nullptr, MOVEFILE_DELAY_UNTIL_REBOOT);
 			}
 		}
@@ -85,7 +85,7 @@ bool CFontInstaller::InstallFontMemory(const void* pData, UINT len)
 	return hFont && nFonts > 0;
 }
 
-bool CFontInstaller::InstallFontFile(LPCTSTR filename)
+bool CFontInstaller::InstallFontFile(LPCWSTR filename)
 {
 	if (pAddFontResourceEx && pAddFontResourceEx(filename, FR_PRIVATE, 0) > 0) {
 		m_files.AddTail(filename);
@@ -102,8 +102,8 @@ bool CFontInstaller::InstallFontTempFile(const void* pData, UINT len)
 	}
 
 	CFile f;
-	TCHAR path[MAX_PATH], fn[MAX_PATH];
-	if (!GetTempPath(MAX_PATH, path) || !GetTempFileName(path, _T("g_font"), 0, fn)) {
+	WCHAR path[MAX_PATH], fn[MAX_PATH];
+	if (!GetTempPathW(MAX_PATH, path) || !GetTempFileNameW(path, L"g_font", 0, fn)) {
 		return false;
 	}
 
@@ -117,6 +117,6 @@ bool CFontInstaller::InstallFontTempFile(const void* pData, UINT len)
 		}
 	}
 
-	DeleteFile(fn);
+	DeleteFileW(fn);
 	return false;
 }
