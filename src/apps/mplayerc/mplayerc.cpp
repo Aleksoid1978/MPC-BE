@@ -33,7 +33,7 @@
 #include "../../DSUtil/WinAPIUtils.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/FileHandle.h"
-#include "../../DSUtil/FileVersionInfo.h"
+#include "../../DSUtil/FileVersion.h"
 #include <winddk/ntddcdvd.h>
 #include <detours/detours.h>
 #include <afxsock.h>
@@ -2184,18 +2184,18 @@ void CMPlayerCApp::SetLanguage(int nLanguage, bool bSave/* = true*/)
 
 	const CString strSatellite = GetSatelliteDll(nLanguage);
 	if (!strSatellite.IsEmpty()) {
-		const CString strSatVersion = CFileVersionInfo::GetFileVersionExShort(strSatellite);
-		if (!strSatVersion.IsEmpty()) {
-			if (strSatVersion == _T(MPC_VERSION_STR)) {
-				hMod = LoadLibraryW(strSatellite);
-				if (bSave) {
-					s.iLanguage = nLanguage;
-				}
-			} else {
-				// This message should stay in English!
-				MessageBoxW(nullptr, L"Your language pack will not work with this version. Please download a compatible one from the MPC-BE homepage.",
-							L"MPC-BE", MB_OK);
+		FileVersion::Ver SatVersion = FileVersion::GetVer(strSatellite);
+		SatVersion.revision = 0;
+
+		if (SatVersion.value == FileVersion::Ver(MPC_VERSION_NUM, 0).value) {
+			hMod = LoadLibraryW(strSatellite);
+			if (bSave) {
+				s.iLanguage = nLanguage;
 			}
+		} else {
+			// This message should stay in English!
+			MessageBoxW(nullptr, L"Your language pack will not work with this version. Please download a compatible one from the MPC-BE homepage.",
+				L"MPC-BE", MB_OK);
 		}
 	} else if (bSave && nLanguage == GetLanguageIndex(ID_LANGUAGE_ENGLISH)) {
 		s.iLanguage = nLanguage;

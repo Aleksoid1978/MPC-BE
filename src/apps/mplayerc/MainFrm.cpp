@@ -28,7 +28,7 @@
 #include "../../DSUtil/WinAPIUtils.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/Filehandle.h"
-#include "../../DSUtil/FileVersionInfo.h"
+#include "../../DSUtil/FileVersion.h"
 #include "../../DSUtil/DXVAState.h"
 #include "OpenDlg.h"
 #include "SaveDlg.h"
@@ -6013,16 +6013,12 @@ BOOL CMainFrame::IsRendererCompatibleWithSaveImage()
 
 		if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"CLSID\\" + clsid + L"\\InprocServer32", KEY_READ)
 				&& ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len)) {
-			VS_FIXEDFILEINFO	FileInfo;
-			FullFileInfo		fullFileInfo;
-			if (CFileVersionInfo::Create(buff, FileInfo)) {
+
+			const FileVersion::Ver madVR_ver = FileVersion::GetVer(buff);
+			if (madVR_ver.value < FileVersion::Ver(0, 84, 0, 0).value) {
 				result = FALSE;
-				WORD versionLS = (WORD)FileInfo.dwFileVersionLS & 0x0000FFFF;
-				WORD versionMS = (WORD)FileInfo.dwFileVersionMS & 0x0000FFFF;
-				if ((versionLS == 0 && versionMS >= 84) || (versionLS > 1)) {
-					result = TRUE;
-				}
 			}
+
 			key.Close();
 		}
 
