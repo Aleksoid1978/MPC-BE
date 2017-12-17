@@ -53,7 +53,7 @@ void MakeCUETitle(CString &Title, CString title, CString performer, UINT trackNu
 	}
 }
 
-bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList, CString& Title, CString& Performer)
+bool ParseCUESheet(CString cueData, std::list<Chapters> &ChaptersList, CString& Title, CString& Performer)
 {
 	BOOL fAudioTrack;
 	int track_no = -1, /*index, */index_cnt = 0;
@@ -64,22 +64,23 @@ bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList, CString& T
 	Title.Empty();
 	Performer.Empty();
 
-	CAtlList<CString> cuelines;
+	std::list<CString> cuelines;
 	Explode(cueData, cuelines, L'\n');
 
-	if (cuelines.GetCount() <= 1) {
+	if (cuelines.size() <= 1) {
 		return false;
 	}
 
-	while (cuelines.GetCount()) {
-		CString cueLine	= cuelines.RemoveHead().Trim();
-		CString cmd		= GetCUECommand(cueLine);
+	for (CString cueLine : cuelines) {
+		cueLine.Trim();
+
+		CString cmd = GetCUECommand(cueLine);
 
 		if (cmd == _T("TRACK")) {
 			if (rt != _I64_MIN && track_no != -1 && index_cnt) {
 				MakeCUETitle(TrackTitle, title, performer, track_no);
 				if (!TrackTitle.IsEmpty()) {
-					ChaptersList.AddTail(Chapters(TrackTitle, rt));
+					ChaptersList.push_back(Chapters(TrackTitle, rt));
 				}
 			}
 			rt = _I64_MIN;
@@ -118,11 +119,11 @@ bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList, CString& T
 	if (rt != _I64_MAX && track_no != -1 && index_cnt) {
 		MakeCUETitle(TrackTitle, title, performer, track_no);
 		if (!TrackTitle.IsEmpty()) {
-			ChaptersList.AddTail(Chapters(TrackTitle, rt));
+			ChaptersList.push_back(Chapters(TrackTitle, rt));
 		}
 	}
 
-	if (ChaptersList.GetCount()) {
+	if (ChaptersList.size()) {
 		return true;
 	} else {
 		return false;

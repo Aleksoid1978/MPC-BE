@@ -218,7 +218,7 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* apetag)
 
 			CString TagValue = item->GetValue();
 			if (TagKey == L"cuesheet") {
-				CAtlList<Chapters> ChaptersList;
+				std::list<Chapters> ChaptersList;
 				if (ParseCUESheet(TagValue, ChaptersList, sTitle, sPerformer)) {
 					if (sTitle.GetLength() > 0 && Title.IsEmpty()) {
 						Title = sTitle;
@@ -229,8 +229,7 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* apetag)
 
 					if (CComQIPtr<IDSMChapterBag> pCB = pBF) {
 						pCB->ChapRemoveAll();
-						while (ChaptersList.GetCount()) {
-							Chapters cp = ChaptersList.RemoveHead();
+						for (const auto& cp : ChaptersList) {
 							pCB->ChapAppend(cp.rt, cp.name);
 						}
 					}
