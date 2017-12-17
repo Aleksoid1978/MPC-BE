@@ -1795,8 +1795,8 @@ CString CAppSettings::ParseFileName(const CString& param)
 void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 {
 	nCLSwitches = 0;
-	slFiles.RemoveAll();
-	slDubs.RemoveAll();
+	slFiles.clear();
+	slDubs.clear();
 	slSubs.clear();
 	slFilters.RemoveAll();
 	rtStart = INVALID_TIME;
@@ -1833,14 +1833,14 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 			} else if (sw == L"help" || sw == L"h" || sw == L"?") {
 				nCLSwitches |= CLSW_HELP;
 			} else if (sw == L"dub" && pos) {
-				slDubs.AddTail(ParseFileName(cmdln.GetNext(pos)));
+				slDubs.push_back(ParseFileName(cmdln.GetNext(pos)));
 			} else if (sw == L"dubdelay" && pos) {
 				CString strFile = ParseFileName(cmdln.GetNext(pos));
 				int nPos = strFile.Find (L"DELAY");
 				if (nPos != -1) {
 					rtShift = 10000 * _wtol(strFile.Mid(nPos + 6));
 				}
-				slDubs.AddTail(strFile);
+				slDubs.push_back(strFile);
 			} else if (sw == L"sub" && pos) {
 				slSubs.push_back(ParseFileName(cmdln.GetNext(pos)));
 			} else if (sw == L"filter" && pos) {
@@ -1926,9 +1926,9 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 				nCLSwitches |= CLSW_HELP|CLSW_UNRECOGNIZEDSWITCH;
 			}
 		} else if (param == L"-") { // Special case: standard input
-			slFiles.AddTail(L"pipe://stdin");
+			slFiles.push_back(L"pipe://stdin");
 		} else {
-			slFiles.AddTail(ParseFileName(param));
+			slFiles.push_back(ParseFileName(param));
 		}
 	}
 }

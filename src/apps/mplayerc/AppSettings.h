@@ -492,7 +492,8 @@ public:
 
 	// cmdline params
 	UINT nCLSwitches;
-	CAtlList<CString>	slFiles, slDubs, slFilters;
+	CAtlList<CString>	slFilters;
+	std::list<CString>	slFiles, slDubs;
 	CSubtitleItemList	slSubs;
 
 	// Initial position (used by command line flags)
