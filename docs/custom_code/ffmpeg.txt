@@ -21,6 +21,7 @@
 * libavcodec/mpeg4audio.h
 * libavcodec/mpeg12dec.c
 * libavcodec/mpegaudio_parser.c
+* libavcodec/pcm.c
 * libavcodec/vc1.h
 * libavcodec/vc1dec.c
 * libavcodec/vp9.c

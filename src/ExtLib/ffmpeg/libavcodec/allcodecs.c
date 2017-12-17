@@ -200,6 +200,9 @@ static void register_all(void)
     REGISTER_ENCDEC (AC3,               ac3);
     REGISTER_ENCDEC (EAC3,              eac3);
 
+    REGISTER_DECODER(PCM_ALAW,          pcm_alaw);
+    REGISTER_DECODER(PCM_MULAW,         pcm_mulaw);
+
     /* ADPCM codecs */
     REGISTER_DECODER(ADPCM_ADX,         adpcm_adx);
     REGISTER_DECODER(ADPCM_4XM,         adpcm_4xm);

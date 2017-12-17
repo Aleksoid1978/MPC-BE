@@ -383,6 +383,7 @@ SRCS_LC_B = \
 	libavcodec/opusdec.c \
 	libavcodec/opustab.c \
 	libavcodec/parser.c \
+	libavcodec/pcm.c \
 	libavcodec/pixblockdsp.c \
 	libavcodec/png.c \
 	libavcodec/pngdec.c \
