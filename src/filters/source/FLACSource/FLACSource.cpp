@@ -511,7 +511,7 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 				} else if (ParseVorbisTag(L"album", VorbisTag, &TagValue)) {
 					file_info.album = TagValue;
 				} else if (ParseVorbisTag(L"cuesheet", VorbisTag, &TagValue)) {
-					CAtlList<Chapters> ChaptersList;
+					std::list<Chapters> ChaptersList;
 					CString Title, Performer;
 					if (ParseCUESheet(TagValue, ChaptersList, Title, Performer)) {
 						if (Title.GetLength() > 0 && file_info.title.IsEmpty()) {
@@ -522,8 +522,7 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 						}
 
 						((CFLACSource*)m_pFilter)->ChapRemoveAll();
-						while (ChaptersList.GetCount()) {
-							Chapters cp = ChaptersList.RemoveHead();
+						for (const auto& cp : ChaptersList) {
 							((CFLACSource*)m_pFilter)->ChapAppend(cp.rt, cp.name);
 						}
 					}

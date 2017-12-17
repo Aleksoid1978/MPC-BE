@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <atlcoll.h>
+#include <list>
 
 struct Chapters {
 	REFERENCE_TIME	rt;
@@ -38,5 +38,4 @@ struct Chapters {
 
 CString GetCUECommand(CString& ln);
 void MakeCUETitle(CString &Title, CString title, CString performer, UINT trackNum = UINT_MAX);
-bool ParseCUESheet(CString cueData, CAtlList<Chapters> &ChaptersList, CString& Title, CString& Performer);
-
+bool ParseCUESheet(CString cueData, std::list<Chapters> &ChaptersList, CString& Title, CString& Performer);
