@@ -20,14 +20,14 @@
 
 #pragma once
 
-CString GetFileOnly(LPCTSTR Path);
-CString GetFolderOnly(LPCTSTR Path);
-CString AddSlash(LPCTSTR Path);
-CString RemoveSlash(LPCTSTR Path);
-CString GetFileExt(LPCTSTR Path);
-CString RenameFileExt(LPCTSTR Path, LPCTSTR Ext);
-BOOL	GetTemporaryFilePath(CString strExtension, CString& strFileName);
-CString CompactPath(LPCTSTR Path, UINT cchMax);
+CStringW GetFileOnly(LPCWSTR Path);
+CStringW GetFolderOnly(LPCWSTR Path);
+CStringW AddSlash(LPCWSTR Path);
+CStringW RemoveSlash(LPCWSTR Path);
+CStringW GetFileExt(LPCWSTR Path);
+CStringW RenameFileExt(LPCWSTR Path, LPCWSTR Ext);
+BOOL     GetTemporaryFilePath(CStringW strExtension, CStringW& strFileName);
+CStringW CompactPath(LPCWSTR Path, UINT cchMax);
 
 // Get path of specified module
 CStringW GetModulePath(HMODULE hModule);

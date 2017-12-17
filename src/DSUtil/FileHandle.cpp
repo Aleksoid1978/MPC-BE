@@ -24,11 +24,11 @@
 //
 // Returns the file portion from a path
 //
-CString GetFileOnly(LPCTSTR Path)
+CStringW GetFileOnly(LPCWSTR Path)
 {
 	// Strip off the path and return just the filename part
-	CString temp = (LPCTSTR) Path; // Force CString to make a copy
-	::PathStripPath(temp.GetBuffer(0));
+	CStringW temp = (LPCWSTR)Path; // Force CStringW to make a copy
+	::PathStripPathW(temp.GetBuffer(0));
 	temp.ReleaseBuffer(-1);
 	return temp;
 }
@@ -36,11 +36,11 @@ CString GetFileOnly(LPCTSTR Path)
 //
 // Returns the folder portion from a path
 //
-CString GetFolderOnly(LPCTSTR Path)
+CStringW GetFolderOnly(LPCWSTR Path)
 {
 	// Strip off the filename and return only path part
-	CString temp = (LPCTSTR) Path; // Force CString to make a copy
-	::PathRemoveFileSpec(temp.GetBuffer(0));
+	CStringW temp = (LPCWSTR)Path; // Force CStringW to make a copy
+	::PathRemoveFileSpecW(temp.GetBuffer(0));
 	temp.ReleaseBuffer(-1);
 	return temp;
 }
@@ -48,13 +48,13 @@ CString GetFolderOnly(LPCTSTR Path)
 //
 // Adds a backslash to the end of a path if it is needed
 //
-CString AddSlash(LPCTSTR Path)
+CStringW AddSlash(LPCWSTR Path)
 {
-	CString cs = Path;
-	::PathAddBackslash(cs.GetBuffer(MAX_PATH));
+	CStringW cs = Path;
+	::PathAddBackslashW(cs.GetBuffer(MAX_PATH));
 	cs.ReleaseBuffer(-1);
 	if(cs.IsEmpty()) {
-		cs = _T("\\");
+		cs = L"\\";
 	}
 	return cs;
 }
@@ -62,10 +62,10 @@ CString AddSlash(LPCTSTR Path)
 //
 // Removes a backslash from the end of a path if it is there
 //
-CString RemoveSlash(LPCTSTR Path)
+CStringW RemoveSlash(LPCWSTR Path)
 {
 	CString cs = Path;
-	::PathRemoveBackslash(cs.GetBuffer(MAX_PATH));
+	::PathRemoveBackslashW(cs.GetBuffer(MAX_PATH));
 	cs.ReleaseBuffer(-1);
 	return cs;
 }
@@ -73,46 +73,46 @@ CString RemoveSlash(LPCTSTR Path)
 //
 // Returns just the .ext part of the file path
 //
-CString GetFileExt(LPCTSTR Path)
+CStringW GetFileExt(LPCWSTR Path)
 {
-	CString cs;
-	cs = ::PathFindExtension(Path);
+	CStringW cs;
+	cs = ::PathFindExtensionW(Path);
 	return cs;
 }
 
 //
 // Exchanges one file extension for another and returns the new fiel path
 //
-CString RenameFileExt(LPCTSTR Path, LPCTSTR Ext)
+CStringW RenameFileExt(LPCWSTR Path, LPCWSTR Ext)
 {
-	CString cs = Path;
-	::PathRenameExtension(cs.GetBuffer(MAX_PATH), Ext);
+	CStringW cs = Path;
+	::PathRenameExtensionW(cs.GetBuffer(MAX_PATH), Ext);
 	return cs;
 }
 
 //
 // Generate temporary files with any extension
 //
-BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName)
+BOOL GetTemporaryFilePath(CStringW strExtension, CStringW& strFileName)
 {
-	TCHAR lpszTempPath[MAX_PATH] = { 0 };
-	if (!GetTempPath(MAX_PATH, lpszTempPath)) {
+	WCHAR lpszTempPath[MAX_PATH] = { 0 };
+	if (!GetTempPathW(MAX_PATH, lpszTempPath)) {
 		return FALSE;
 	}
 
-	TCHAR lpszFilePath[MAX_PATH] = { 0 };
+	WCHAR lpszFilePath[MAX_PATH] = { 0 };
 	do {
-		if (!GetTempFileName(lpszTempPath, _T("mpc"), 0, lpszFilePath)) {
+		if (!GetTempFileNameW(lpszTempPath, L"mpc", 0, lpszFilePath)) {
 			return FALSE;
 		}
 
 		DeleteFile(lpszFilePath);
 
 		strFileName = lpszFilePath;
-		strFileName.Replace(_T(".tmp"), strExtension);
+		strFileName.Replace(L".tmp", strExtension);
 
 		DeleteFile(strFileName);
-	} while (_taccess(strFileName, 00) != -1);
+	} while (_waccess(strFileName, 00) != -1);
 
 	return TRUE;
 }
@@ -120,11 +120,11 @@ BOOL GetTemporaryFilePath(CString strExtension, CString& strFileName)
 //
 // Compact Path
 //
-CString CompactPath(LPCTSTR Path, UINT cchMax)
+CStringW CompactPath(LPCWSTR Path, UINT cchMax)
 {
-	CString cs = Path;
+	CStringW cs = Path;
 	WCHAR pathbuf[MAX_PATH] = { 0 };
-	if (::PathCompactPathEx(pathbuf, cs, cchMax, 0)) {
+	if (::PathCompactPathExW(pathbuf, cs, cchMax, 0)) {
 		cs = pathbuf;
 	}
 
