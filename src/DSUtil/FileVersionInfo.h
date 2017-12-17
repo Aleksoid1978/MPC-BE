@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -44,12 +44,12 @@ public:
 	CFileVersionInfo();
 	virtual ~CFileVersionInfo();
 
-	static BOOL		Create(LPCTSTR lpszFileName, VS_FIXEDFILEINFO& FileInfo);
-	static BOOL		Create(LPCTSTR lpszFileName, VS_FIXEDFILEINFO& FileInfo, FullFileInfo& fullFileInfo);
+	static BOOL		Create(LPCWSTR lpszFileName, VS_FIXEDFILEINFO& FileInfo);
+	static BOOL		Create(LPCWSTR lpszFileName, VS_FIXEDFILEINFO& FileInfo, FullFileInfo& fullFileInfo);
 
-	static CString	GetFileVersionEx(LPCTSTR lpszFileName);
-	static CString	GetFileVersionExShort(LPCTSTR lpszFileName);
-	static QWORD	GetFileVersion(LPCTSTR lpszFileName);
+	static CString	GetFileVersionEx(LPCWSTR lpszFileName);
+	static CString	GetFileVersionExShort(LPCWSTR lpszFileName);
+	static QWORD	GetFileVersion(LPCWSTR lpszFileName);
 
 protected:
 	static BOOL	GetTranslationId(LPVOID lpData, UINT unBlockSize, WORD wLangId, DWORD &dwId, BOOL bPrimaryEnough = FALSE);
