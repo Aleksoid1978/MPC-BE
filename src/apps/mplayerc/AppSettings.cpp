@@ -1076,7 +1076,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	nDVBLastChannel			= pApp->GetProfileInt(IDS_R_DVB, IDS_RS_DVB_LAST_CHANNEL, 1);
 	fBDAIgnoreEncryptedChannels = !!pApp->GetProfileInt(IDS_R_DVB, IDS_RS_BDA_IGNORE_ENCRYPTEDCHANNELS, 0);
 
-	m_DVBChannels.RemoveAll();
+	m_DVBChannels.clear();
 	for (int iChannel = 0; ; iChannel++) {
 		CString strTemp;
 		CString strChannel;
@@ -1087,7 +1087,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 			break;
 		}
 		Channel.FromString(strChannel);
-		m_DVBChannels.AddTail(Channel);
+		m_DVBChannels.push_back(Channel);
 	}
 
 	// playback positions for last played DVDs
@@ -1115,18 +1115,21 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		lpKeyName.Format(L"File%d", i + 1);
 		lpString = pApp->GetProfileString(IDS_R_RECENTFILES, lpKeyName);
 
-		CAtlList<CString> args;
+		std::list<CString> args;
 		ExplodeEsc(lpString, args, L'|');
-		if (!args.IsEmpty()) {
-			FilePosition[i].strFile = args.RemoveHead();
-			if (!args.IsEmpty()) {
-				FilePosition[i].llPosition = _wtoi64(args.RemoveHead());
+		auto it = args.begin();
 
-				if (!args.IsEmpty()) {
-					swscanf_s(args.RemoveHead(), L"%d", &FilePosition[i].nAudioTrack);
+		if (it != args.end()) {
+			FilePosition[i].strFile = *it++;
 
-					if (!args.IsEmpty()) {
-						swscanf_s(args.RemoveHead(), L"%d", &FilePosition[i].nSubtitleTrack);
+			if (it != args.end()) {
+				FilePosition[i].llPosition = _wtoi64(*it++);
+
+				if (it != args.end()) {
+					swscanf_s(*it++, L"%d", &FilePosition[i].nAudioTrack);
+
+					if (it != args.end()) {
+						swscanf_s(*it++, L"%d", &FilePosition[i].nSubtitleTrack);
 					}
 				}
 			}
@@ -1399,11 +1402,9 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_DVB, IDS_RS_BDA_IGNORE_ENCRYPTEDCHANNELS, fBDAIgnoreEncryptedChannels);
 	pApp->WriteProfileInt(IDS_R_DVB, IDS_RS_DVB_LAST_CHANNEL, nDVBLastChannel);
 
-	int			iChannel = 0;
-	POSITION	pos = m_DVBChannels.GetHeadPosition();
-	while (pos) {
-		CString			strTemp;
-		CDVBChannel&	Channel = m_DVBChannels.GetNext(pos);
+	int iChannel = 0;
+	for (auto& Channel : m_DVBChannels) {
+		CString strTemp;
 		strTemp.Format(L"%d", iChannel);
 		pApp->WriteProfileString(IDS_R_DVB, strTemp, Channel.ToString());
 		iChannel++;
@@ -1795,10 +1796,10 @@ CString CAppSettings::ParseFileName(const CString& param)
 void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 {
 	nCLSwitches = 0;
+	slFilters.clear();
 	slFiles.clear();
 	slDubs.clear();
 	slSubs.clear();
-	slFilters.RemoveAll();
 	rtStart = INVALID_TIME;
 	rtShift = 0;
 	lDVDTitle = 0;
@@ -1844,7 +1845,7 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 			} else if (sw == L"sub" && pos) {
 				slSubs.push_back(ParseFileName(cmdln.GetNext(pos)));
 			} else if (sw == L"filter" && pos) {
-				slFilters.AddTail(cmdln.GetNext(pos));
+				slFilters.push_back(cmdln.GetNext(pos));
 			} else if (sw == L"dvd") {
 				nCLSwitches |= CLSW_DVD;
 			} else if (sw == L"dvdpos") {
@@ -1896,10 +1897,10 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 				nCLSwitches |= CLSW_SLAVE;
 				hMasterWnd = (HWND)IntToPtr(_wtoi(cmdln.GetNext(pos)));
 			} else if (sw == L"fixedsize" && pos) {
-				CAtlList<CString> sl;
+				std::list<CString> sl;
 				Explode(cmdln.GetNext(pos), sl, L',', 2);
-				if (sl.GetCount() == 2) {
-					sizeFixedWindow.SetSize(_wtol(sl.GetHead()), _wtol(sl.GetTail()));
+				if (sl.size() == 2) {
+					sizeFixedWindow.SetSize(_wtol(sl.front()), _wtol(sl.back()));
 					if (sizeFixedWindow.cx > 0 && sizeFixedWindow.cy > 0) {
 						nCLSwitches |= CLSW_FIXEDSIZE;
 					}
@@ -2013,9 +2014,7 @@ void CAppSettings::AddFav(favtype ft, CString s)
 
 CDVBChannel* CAppSettings::FindChannelByPref(int nPrefNumber)
 {
-	POSITION	pos = m_DVBChannels.GetHeadPosition();
-	while (pos) {
-		CDVBChannel&	Channel = m_DVBChannels.GetNext (pos);
+	for (auto& Channel : m_DVBChannels) {
 		if (Channel.GetPrefNumber() == nPrefNumber) {
 			return &Channel;
 		}

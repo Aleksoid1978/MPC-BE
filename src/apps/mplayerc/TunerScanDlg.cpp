@@ -108,13 +108,13 @@ END_MESSAGE_MAP()
 void CTunerScanDlg::OnBnClickedSave()
 {
 	CAppSettings& s = AfxGetAppSettings();
-	s.m_DVBChannels.RemoveAll();
+	s.m_DVBChannels.clear();
 
 	for (int i = 0; i < m_ChannelList.GetItemCount(); i++) {
 		CDVBChannel		Channel;
 		Channel.FromString (m_ChannelList.GetItemText (i, TSCC_CHANNEL));
 		Channel.SetPrefNumber(i);
-		s.m_DVBChannels.AddTail (Channel);
+		s.m_DVBChannels.push_back(Channel);
 	}
 
 	OnOK();

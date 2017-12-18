@@ -225,13 +225,13 @@ void CPlayerNavigationDialog::SetupAudioSwitcherSubMenu(CDVBChannel* pChannel)
 
 	if (!bFound) {
 		nCurrentChannel = s.nDVBLastChannel;
-		POSITION	pos = s.m_DVBChannels.GetHeadPosition();
 
-		while (pos && !bFound) {
-			pChannel = &s.m_DVBChannels.GetNext(pos);
+		for (auto& Channel : s.m_DVBChannels) {
+			pChannel = &Channel;
 
 			if (nCurrentChannel == pChannel->GetPrefNumber()) {
 				bFound = true;
+				break;
 			}
 		}
 	}
@@ -261,10 +261,7 @@ void CPlayerNavigationDialog::UpdateElementList()
 
 		int nCurrentChannel = s.nDVBLastChannel;
 
-		POSITION	pos = s.m_DVBChannels.GetHeadPosition();
-
-		while (pos) {
-			CDVBChannel&	Channel = s.m_DVBChannels.GetNext(pos);
+		for (auto& Channel : s.m_DVBChannels) {
 
 			if ((m_bTVStations && (Channel.GetVideoPID() != 0)) ||
 					(!m_bTVStations && (Channel.GetAudioCount() > 0)) && (Channel.GetVideoPID() == 0)) {
