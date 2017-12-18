@@ -492,7 +492,7 @@ public:
 
 	// cmdline params
 	UINT nCLSwitches;
-	CAtlList<CString>	slFilters;
+	std::list<CString>	slFilters;
 	std::list<CString>	slFiles, slDubs;
 	CSubtitleItemList	slSubs;
 
@@ -660,7 +660,7 @@ public:
 	int				iBDAOffset;
 	bool			fBDAIgnoreEncryptedChannels;
 	UINT			nDVBLastChannel;
-	CAtlList<CDVBChannel> m_DVBChannels;
+	std::list<CDVBChannel> m_DVBChannels;
 
 	// Internal Filters
 	bool			SrcFilters[SRC_LAST];
@@ -832,7 +832,7 @@ public:
 	CString			SerializeHex(BYTE* pBuffer, int nBufSize) const;
 
 	// list of temporary files
-	CAtlList<CString> slTMPFilesList;
+	std::list<CString> slTMPFilesList;
 
 	CString			strLastOpenFilterDir;
 

@@ -998,12 +998,12 @@ void CMainFrame::OnClose()
 		::DeleteObject(m_ThumbCashedBitmap);
 	}
 
-	while (s.slTMPFilesList.GetCount()) {
-		CString tmpFileName = s.slTMPFilesList.RemoveHead();
-		if (::PathFileExistsW(tmpFileName)) {
-			DeleteFileW(tmpFileName);
+	for (const auto& tmpFile : s.slTMPFilesList) {
+		if (::PathFileExistsW(tmpFile)) {
+			DeleteFileW(tmpFile);
 		}
 	}
+	s.slTMPFilesList.clear();
 
 	DLog(L"CMainFrame::OnClose() : end");
 	__super::OnClose();
@@ -5107,9 +5107,8 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 		SendAPICommand(CMD_CONNECT, L"%d", PtrToInt(GetSafeHwnd()));
 	}
 
-	POSITION pos = s.slFilters.GetHeadPosition();
-	while (pos) {
-		CString fullpath = MakeFullPath(s.slFilters.GetNext(pos));
+	for (const auto& filter : s.slFilters) {
+		CString fullpath = MakeFullPath(filter);
 
 		CString path = AddSlash(GetFolderOnly(fullpath));
 
@@ -15127,9 +15126,7 @@ void CMainFrame::SetupNavChaptersSubMenu()
 	} else if (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1) {
 		CAppSettings& s = AfxGetAppSettings();
 
-		POSITION pos = s.m_DVBChannels.GetHeadPosition();
-		while (pos) {
-			CDVBChannel& Channel = s.m_DVBChannels.GetNext(pos);
+		for (auto& Channel : s.m_DVBChannels) {
 			UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 
 			if ((UINT)Channel.GetPrefNumber() == s.nDVBLastChannel) {

@@ -1333,9 +1333,10 @@ HANDLE WINAPI Mine_CreateFileW(LPCWSTR p1, DWORD p2, DWORD p3, LPSECURITY_ATTRIB
 
 			if (hFile != INVALID_HANDLE_VALUE) {
 				CAppSettings& s = AfxGetAppSettings();
-				POSITION pos = s.slTMPFilesList.Find(CString(strFakeFile).MakeUpper());
-				if (!pos) {
-					s.slTMPFilesList.AddTail(CString(strFakeFile).MakeUpper());
+				CString tmpFile = CString(strFakeFile).MakeUpper();
+
+				if (std::find(s.slTMPFilesList.begin(), s.slTMPFilesList.end(), tmpFile) == s.slTMPFilesList.end()) {
+					s.slTMPFilesList.push_back(tmpFile);
 				}
 			}
 		}
