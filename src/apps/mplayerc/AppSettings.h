@@ -469,7 +469,7 @@ public:
 };
 typedef std::list<CSubtitleItem> CSubtitleItemList;
 
-typedef CAtlList<CString> cmdLine;
+typedef std::list<CString> cmdLine;
 
 class CAppSettings
 {

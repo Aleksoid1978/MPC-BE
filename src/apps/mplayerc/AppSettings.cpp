@@ -1811,122 +1811,166 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 	hMasterWnd = 0;
 	strPnSPreset.Empty();
 
-	POSITION pos = cmdln.GetHeadPosition();
-	while (pos) {
-		CString param = cmdln.GetNext(pos);
+	auto it = cmdln.begin();
+
+	while (it != cmdln.end()) {
+		CString param = *it++;
 		if (param.IsEmpty()) {
 			continue;
 		}
 
 		if ((param[0] == '-' || param[0] == '/') && param.GetLength() > 1) {
 			CString sw = param.Mid(1).MakeLower();
+			bool next_available = (it != cmdln.end());
 
 			if (sw == L"open") {
 				nCLSwitches |= CLSW_OPEN;
-			} else if (sw == L"play") {
+			}
+			else if (sw == L"play") {
 				nCLSwitches |= CLSW_PLAY;
-			} else if (sw == L"fullscreen") {
+			}
+			else if (sw == L"fullscreen") {
 				nCLSwitches |= CLSW_FULLSCREEN;
-			} else if (sw == L"minimized") {
+			}
+			else if (sw == L"minimized") {
 				nCLSwitches |= CLSW_MINIMIZED;
-			} else if (sw == L"new") {
+			}
+			else if (sw == L"new") {
 				nCLSwitches |= CLSW_NEW;
-			} else if (sw == L"help" || sw == L"h" || sw == L"?") {
+			}
+			else if (sw == L"help" || sw == L"h" || sw == L"?") {
 				nCLSwitches |= CLSW_HELP;
-			} else if (sw == L"dub" && pos) {
-				slDubs.push_back(ParseFileName(cmdln.GetNext(pos)));
-			} else if (sw == L"dubdelay" && pos) {
-				CString strFile = ParseFileName(cmdln.GetNext(pos));
+			}
+			else if (sw == L"dub" && next_available) {
+				slDubs.push_back(ParseFileName(*it++));
+			}
+			else if (sw == L"dubdelay" && next_available) {
+				CString strFile = ParseFileName(*it++);
 				int nPos = strFile.Find (L"DELAY");
 				if (nPos != -1) {
 					rtShift = 10000 * _wtol(strFile.Mid(nPos + 6));
 				}
 				slDubs.push_back(strFile);
-			} else if (sw == L"sub" && pos) {
-				slSubs.push_back(ParseFileName(cmdln.GetNext(pos)));
-			} else if (sw == L"filter" && pos) {
-				slFilters.push_back(cmdln.GetNext(pos));
-			} else if (sw == L"dvd") {
+			}
+			else if (sw == L"sub" && next_available) {
+				slSubs.push_back(ParseFileName(*it++));
+			}
+			else if (sw == L"filter" && next_available) {
+				slFilters.push_back(*it++);
+			}
+			else if (sw == L"dvd") {
 				nCLSwitches |= CLSW_DVD;
-			} else if (sw == L"dvdpos") {
-				ExtractDVDStartPos(cmdln.GetNext(pos));
-			} else if (sw == L"cd") {
+			}
+			else if (sw == L"dvdpos" && next_available) {
+				ExtractDVDStartPos(*it++);
+			}
+			else if (sw == L"cd") {
 				nCLSwitches |= CLSW_CD;
-			} else if (sw == L"add") {
+			}
+			else if (sw == L"add") {
 				nCLSwitches |= CLSW_ADD;
-			} else if (sw == L"regvid") {
+			}
+			else if (sw == L"regvid") {
 				nCLSwitches |= CLSW_REGEXTVID;
-			} else if (sw == L"regaud") {
+			}
+			else if (sw == L"regaud") {
 				nCLSwitches |= CLSW_REGEXTAUD;
-			} else if (sw == L"regpl") {
+			}
+			else if (sw == L"regpl") {
 				nCLSwitches |= CLSW_REGEXTPL;
-			} else if (sw == L"regall") {
+			}
+			else if (sw == L"regall") {
 				nCLSwitches |= (CLSW_REGEXTVID | CLSW_REGEXTAUD | CLSW_REGEXTPL);
-			} else if (sw == L"unregall") {
+			}
+			else if (sw == L"unregall") {
 				nCLSwitches |= CLSW_UNREGEXT;
-			} else if (sw == L"unregvid") {
+			}
+			else if (sw == L"unregvid") {
 				nCLSwitches |= CLSW_UNREGEXT;    /* keep for compatibility with old versions */
-			} else if (sw == L"unregaud") {
+			}
+			else if (sw == L"unregaud") {
 				nCLSwitches |= CLSW_UNREGEXT;    /* keep for compatibility with old versions */
-			} else if (sw == L"start" && pos) {
-				rtStart = 10000i64 * wcstol(cmdln.GetNext(pos), nullptr, 10);
+			}
+			else if (sw == L"start" && next_available) {
+				rtStart = 10000i64 * wcstol(*it++, nullptr, 10);
 				nCLSwitches |= CLSW_STARTVALID;
-			} else if (sw == L"startpos" && pos) {
-				rtStart = 10000i64 * ConvertTimeToMSec(cmdln.GetNext(pos));
+			}
+			else if (sw == L"startpos" && next_available) {
+				rtStart = 10000i64 * ConvertTimeToMSec(*it++);
 				nCLSwitches |= CLSW_STARTVALID;
-			} else if (sw == L"nofocus") {
+			}
+			else if (sw == L"nofocus") {
 				nCLSwitches |= CLSW_NOFOCUS;
-			} else if (sw == L"close") {
+			}
+			else if (sw == L"close") {
 				nCLSwitches |= CLSW_CLOSE;
-			} else if (sw == L"standby") {
+			}
+			else if (sw == L"standby") {
 				nCLSwitches |= CLSW_STANDBY;
-			} else if (sw == L"hibernate") {
+			}
+			else if (sw == L"hibernate") {
 				nCLSwitches |= CLSW_HIBERNATE;
-			} else if (sw == L"shutdown") {
+			}
+			else if (sw == L"shutdown") {
 				nCLSwitches |= CLSW_SHUTDOWN;
-			} else if (sw == L"logoff") {
+			}
+			else if (sw == L"logoff") {
 				nCLSwitches |= CLSW_LOGOFF;
-			} else if (sw == L"lock") {
+			}
+			else if (sw == L"lock") {
 				nCLSwitches |= CLSW_LOCK;
-			} else if (sw == L"d3dfs") {
+			}
+			else if (sw == L"d3dfs") {
 				nCLSwitches |= CLSW_D3DFULLSCREEN;
-			} else if (sw == L"adminoption") {
+			}
+			else if (sw == L"adminoption" && next_available) {
 				nCLSwitches |= CLSW_ADMINOPTION;
-				iAdminOption = _wtoi(cmdln.GetNext(pos));
-			} else if (sw == L"slave" && pos) {
+				iAdminOption = _wtoi(*it++);
+			}
+			else if (sw == L"slave" && next_available) {
 				nCLSwitches |= CLSW_SLAVE;
-				hMasterWnd = (HWND)IntToPtr(_wtoi(cmdln.GetNext(pos)));
-			} else if (sw == L"fixedsize" && pos) {
+				hMasterWnd = (HWND)IntToPtr(_wtoi(*it++));
+			}
+			else if (sw == L"fixedsize" && next_available) {
 				std::list<CString> sl;
-				Explode(cmdln.GetNext(pos), sl, L',', 2);
+				Explode(*it++, sl, L',', 2);
 				if (sl.size() == 2) {
 					sizeFixedWindow.SetSize(_wtol(sl.front()), _wtol(sl.back()));
 					if (sizeFixedWindow.cx > 0 && sizeFixedWindow.cy > 0) {
 						nCLSwitches |= CLSW_FIXEDSIZE;
 					}
 				}
-			} else if (sw == L"monitor" && pos) {
-				iMonitor = wcstol(cmdln.GetNext(pos), nullptr, 10);
+			}
+			else if (sw == L"monitor" && next_available) {
+				iMonitor = wcstol(*it++, nullptr, 10);
 				nCLSwitches |= CLSW_MONITOR;
-			} else if (sw == L"pns") {
-				strPnSPreset = cmdln.GetNext(pos);
-			} else if (sw == L"webport" && pos) {
-				int tmpport = wcstol(cmdln.GetNext(pos), nullptr, 10);
+			}
+			else if (sw == L"pns" && next_available) {
+				strPnSPreset = *it++;
+			}
+			else if (sw == L"webport" && next_available) {
+				int tmpport = wcstol(*it++, nullptr, 10);
 				if ( tmpport >= 0 && tmpport <= 65535 ) {
 					nCmdlnWebServerPort = tmpport;
 				}
-			} else if (sw == L"debug") {
+			}
+			else if (sw == L"debug") {
 				bShowDebugInfo = true;
-			} else if (sw == L"nominidump") {
+			}
+			else if (sw == L"nominidump") {
 				CMiniDump::SetState(false);
-			} else if (sw == L"audiorenderer" && pos) {
-				SetAudioRenderer(_wtoi(cmdln.GetNext(pos)));
-			} else if (sw == L"reset") {
+			}
+			else if (sw == L"audiorenderer" && next_available) {
+				SetAudioRenderer(_wtoi(*it++));
+			}
+			else if (sw == L"reset") {
 				nCLSwitches |= CLSW_RESET;
-			} else {
+			}
+			else {
 				nCLSwitches |= CLSW_HELP|CLSW_UNRECOGNIZEDSWITCH;
 			}
-		} else if (param == L"-") { // Special case: standard input
+		}
+		else if (param == L"-") { // Special case: standard input
 			slFiles.push_back(L"pipe://stdin");
 		} else {
 			slFiles.push_back(ParseFileName(param));
