@@ -1106,24 +1106,23 @@ void CMPlayerCApp::ExportSettings()
 
 void CMPlayerCApp::PreProcessCommandLine()
 {
-	m_cmdln.RemoveAll();
+	m_cmdln.clear();
 
 	for (int i = 1; i < __argc; i++) {
-		m_cmdln.AddTail(CString(__targv[i]).Trim(L" \""));
+		m_cmdln.push_back(CString(__wargv[i]).Trim(L" \""));
 	}
 }
 
 BOOL CMPlayerCApp::SendCommandLine(HWND hWnd)
 {
-	if (m_cmdln.IsEmpty()) {
+	if (m_cmdln.empty()) {
 		return FALSE;
 	}
 
 	int bufflen = sizeof(DWORD);
 
-	POSITION pos = m_cmdln.GetHeadPosition();
-	while (pos) {
-		bufflen += (m_cmdln.GetNext(pos).GetLength()+1)*sizeof(WCHAR);
+	for (const auto& item : m_cmdln) {
+		bufflen += (item.GetLength()+1)*sizeof(WCHAR);
 	}
 
 	CAutoVectorPtr<BYTE> buff;
@@ -1133,14 +1132,12 @@ BOOL CMPlayerCApp::SendCommandLine(HWND hWnd)
 
 	BYTE* p = buff;
 
-	*(DWORD*)p = m_cmdln.GetCount();
+	*(DWORD*)p = m_cmdln.size();
 	p += sizeof(DWORD);
 
-	pos = m_cmdln.GetHeadPosition();
-	while (pos) {
-		CString s = m_cmdln.GetNext(pos);
-		int len = (s.GetLength()+1)*sizeof(WCHAR);
-		memcpy(p, s, len);
+	for (const auto& item : m_cmdln) {
+		int len = (item.GetLength()+1)*sizeof(WCHAR);
+		memcpy(p, item, len);
 		p += len;
 	}
 
@@ -1592,7 +1589,7 @@ BOOL CMPlayerCApp::InitInstance()
 	if (GetLastError() == ERROR_ALREADY_EXISTS
 			&& !(m_s.nCLSwitches & CLSW_NEW)
 			&& (m_s.nCLSwitches & CLSW_ADD ||
-				(m_s.GetMultiInst() == 1 && !m_cmdln.IsEmpty()) ||
+				(m_s.GetMultiInst() == 1 && !m_cmdln.empty()) ||
 				m_s.GetMultiInst() == 0)) {
 
 		const DWORD result = WaitForSingleObject(m_mutexOneInstance.m_h, 5000);

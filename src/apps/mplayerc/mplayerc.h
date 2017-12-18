@@ -61,7 +61,7 @@ class CMPlayerCApp : public CWinApp
 {
 	ATL::CMutex m_mutexOneInstance;
 
-	CAtlList<CString> m_cmdln;
+	std::list<CString> m_cmdln;
 	void PreProcessCommandLine();
 	BOOL SendCommandLine(HWND hWnd);
 	UINT GetVKFromAppCommand(UINT nAppCommand);

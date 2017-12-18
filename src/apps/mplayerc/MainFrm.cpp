@@ -5284,12 +5284,12 @@ void CMainFrame::cmdLineThreadFunction()
 								str += *pBuff++;
 							}
 							pBuff++;
-							cmdLine.AddTail(str);
+							cmdLine.push_back(str);
 						}
 
 						const ULONGLONG now = GetTickCount64();
 						if ((now - lastReceiveCmdLineTime) <= 500ULL) {
-							cmdLine.AddTail(L"/add");
+							cmdLine.push_back(L"/add");
 						}
 						lastReceiveCmdLineTime = now;
 
@@ -5300,7 +5300,7 @@ void CMainFrame::cmdLineThreadFunction()
 					}
 					lock.unlock();
 
-					if (!cmdLine.IsEmpty()) {
+					if (!cmdLine.empty()) {
 						SendMessageW(WM_HANDLE_CMDLINE, 0, LPARAM(&cmdLine));
 					}
 				}
