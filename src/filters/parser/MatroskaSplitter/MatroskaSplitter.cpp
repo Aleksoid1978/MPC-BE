@@ -1898,7 +1898,7 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		duration = 1;																				\
 	}																								\
 	\
-	p->rtStart = m_pFile->m_segment.GetRefTime((INT64)c.TimeCode + p->bg->Block.TimeCode);	\
+	p->rtStart = m_pFile->m_segment.GetRefTime((INT64)c.TimeCode + p->bg->Block.TimeCode);			\
 	p->rtStop = p->rtStart + duration;																\
 	\
 	p->rtStart -= m_pFile->m_rtOffset;																\
