@@ -1018,7 +1018,7 @@ STDMETHODIMP CMpcAudioRenderer::SetDeviceId(CString pDeviceId)
 	CAutoLock cAutoLock(&m_csProps);
 
 	if (m_pAudioClient) {
-		CString deviceIdSrc = m_DeviceId;
+		CString deviceIdSrc = m_strCurrentDeviceId;
 		CString deviceIdDst = pDeviceId;
 
 		if (deviceIdSrc != deviceIdDst
