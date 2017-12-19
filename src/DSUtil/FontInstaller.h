@@ -27,7 +27,6 @@ class CFontInstaller
 	BOOL (WINAPI *pRemoveFontMemResourceEx)(HANDLE);
 	int (WINAPI *pAddFontResourceEx)(LPCWSTR,DWORD,PVOID);
 	BOOL (WINAPI *pRemoveFontResourceEx)(LPCWSTR,DWORD,PVOID);
-	BOOL (WINAPI *pMoveFileEx)(LPCWSTR, LPCWSTR,DWORD);
 
 	CAtlList<HANDLE> m_fonts;
 	CAtlList<CString> m_files;
