@@ -51,11 +51,7 @@ namespace Subtitle
 
 	LPCWSTR GetSubtitleFileExt(SubType type);
 
-	struct SubFile {
-		CString fn; /*SubType type;*/
-	};
-
-	void GetSubFileNames(CString fn, const std::vector<CString>& paths, std::vector<SubFile>& ret);
+	void GetSubFileNames(CString fn, const std::vector<CString>& paths, std::vector<CString>& ret);
 
 	CString GuessSubtitleName(CString fn, CString videoName);
 };

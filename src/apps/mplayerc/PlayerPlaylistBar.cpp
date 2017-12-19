@@ -395,12 +395,12 @@ void CPlaylistItem::AutoLoadFiles()
 			paths.push_back(spa);
 		}
 
-		std::vector<Subtitle::SubFile> ret;
+		std::vector<CString> ret;
 		Subtitle::GetSubFileNames(fn, paths, ret);
 
-		for (const auto& r : ret) {
-			if (!FindFileInList(m_subs, r.fn)) {
-				m_subs.push_back(r.fn);
+		for (const auto& sub_fn : ret) {
+			if (!FindFileInList(m_subs, sub_fn)) {
+				m_subs.push_back(sub_fn);
 			}
 		}
 
@@ -408,9 +408,9 @@ void CPlaylistItem::AutoLoadFiles()
 			ret.clear();
 			Subtitle::GetSubFileNames(BDLabel, paths, ret);
 
-			for (const auto& r : ret) {
-				if (!FindFileInList(m_subs, r.fn)) {
-					m_subs.push_back(r.fn);
+			for (const auto& sub_fn : ret) {
+				if (!FindFileInList(m_subs, sub_fn)) {
+					m_subs.push_back(sub_fn);
 				}
 			}
 		}
