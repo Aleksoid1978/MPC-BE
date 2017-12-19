@@ -6730,7 +6730,7 @@ void CMainFrame::OnViewOSDFileName()
 
 void CMainFrame::OnUpdateShaderToggle1(CCmdUI* pCmdUI)
 {
-	if (AfxGetAppSettings().ShaderList.IsEmpty()) {
+	if (AfxGetAppSettings().ShaderList.empty()) {
 		pCmdUI->Enable(FALSE);
 		m_bToggleShader = false;
 		pCmdUI->SetCheck (0);
@@ -6742,7 +6742,7 @@ void CMainFrame::OnUpdateShaderToggle1(CCmdUI* pCmdUI)
 
 void CMainFrame::OnUpdateShaderToggle2(CCmdUI* pCmdUI)
 {
-	if (AfxGetAppSettings().ShaderListScreenSpace.IsEmpty()) {
+	if (AfxGetAppSettings().ShaderListScreenSpace.empty()) {
 		pCmdUI->Enable(FALSE);
 		m_bToggleShaderScreenSpace = false;
 		pCmdUI->SetCheck(0);
@@ -11435,9 +11435,8 @@ void CMainFrame::SetShaders()
 	m_pCAP->ClearPixelShaders(TARGET_SCREEN);
 
 	if (m_bToggleShader) {
-		POSITION pos = s.ShaderList.GetHeadPosition();
-		while (pos) {
-			ShaderC* pShader = GetShader(s.ShaderList.GetNext(pos));
+		for (const auto& shader : s.ShaderList) {
+			ShaderC* pShader = GetShader(shader);
 			if (pShader) {
 				CStringA profile = pShader->profile;
 				CStringA srcdata = pShader->srcdata;
@@ -11453,9 +11452,8 @@ void CMainFrame::SetShaders()
 	}
 
 	if (m_bToggleShaderScreenSpace) {
-		POSITION pos = s.ShaderListScreenSpace.GetHeadPosition();
-		while (pos) {
-			ShaderC* pShader = GetShader(s.ShaderListScreenSpace.GetNext(pos));
+		for (const auto& shader : s.ShaderListScreenSpace) {
+			ShaderC* pShader = GetShader(shader);
 			if (pShader) {
 				CStringA profile = pShader->profile;
 				CStringA srcdata = pShader->srcdata;
@@ -11479,19 +11477,18 @@ void CMainFrame::UpdateShaders(CString label)
 		return;
 	}
 
-	if (shaders.GetCount() <= 1) {
-		shaders.RemoveAll();
+	if (shaders.size() <= 1) {
+		shaders.clear();
 	}
 
-	if (shaders.IsEmpty() && !label.IsEmpty()) {
-		shaders.AddTail(label);
+	if (shaders.empty() && !label.IsEmpty()) {
+		shaders.push_back(label);
 	}
 
-	bool fUpdate = shaders.IsEmpty();
+	bool fUpdate = shaders.empty();
 
-	POSITION pos = shaders.GetHeadPosition();
-	while (pos) {
-		if (label == shaders.GetNext(pos)) {
+	for (const auto& shader : shaders) {
+		if (label == shader) {
 			fUpdate = true;
 			break;
 		}
@@ -18288,7 +18285,7 @@ void CMainFrame::WTSUnRegisterSessionNotification()
 
 void CMainFrame::EnableShaders1(bool enable)
 {
-	if (enable && !AfxGetAppSettings().ShaderList.IsEmpty()) {
+	if (enable && !AfxGetAppSettings().ShaderList.empty()) {
 		m_bToggleShader = true;
 		SetShaders();
 	} else {
@@ -18301,7 +18298,7 @@ void CMainFrame::EnableShaders1(bool enable)
 
 void CMainFrame::EnableShaders2(bool enable)
 {
-	if (enable && !AfxGetAppSettings().ShaderListScreenSpace.IsEmpty()) {
+	if (enable && !AfxGetAppSettings().ShaderListScreenSpace.empty()) {
 		m_bToggleShaderScreenSpace = true;
 		SetShaders();
 	} else {

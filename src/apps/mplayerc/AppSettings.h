@@ -791,8 +791,8 @@ public:
 	// Shader Combiner
 	bool			bToggleShader;
 	bool			bToggleShaderScreenSpace;
-	CAtlList<CString> ShaderList;
-	CAtlList<CString> ShaderListScreenSpace;
+	std::list<CString> ShaderList;
+	std::list<CString> ShaderListScreenSpace;
 	// Playlist (contex menu)
 	bool			bShufflePlaylistItems;
 	bool			bHidePlaylistFullScreen;

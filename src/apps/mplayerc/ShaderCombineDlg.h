@@ -39,8 +39,8 @@ class CShaderCombineDlg : public CCmdUIDialog
 
 	bool m_oldcheck1;
 	bool m_oldcheck2;
-	CAtlList<CString> m_oldlabels1;
-	CAtlList<CString> m_oldlabels2;
+	std::list<CString> m_oldlabels1;
+	std::list<CString> m_oldlabels2;
 
 	void UpdateShaders(unsigned char type = SHADERS);
 
