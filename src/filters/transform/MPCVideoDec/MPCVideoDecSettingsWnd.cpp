@@ -75,10 +75,10 @@ void CMPCVideoDecSettingsWnd::OnDisconnect()
 void CMPCVideoDecSettingsWnd::UpdateStatusInfo()
 {
 	CString str;
-	m_edtInputFormat.SetWindowText(m_pMDF->GetInformation(INFO_InputFormat));
-	m_edtFrameSize.SetWindowText(m_pMDF->GetInformation(INFO_FrameSize));
-	m_edtOutputFormat.SetWindowText(m_pMDF->GetInformation(INFO_OutputFormat));
-	m_edtGraphicsAdapter.SetWindowText(m_pMDF->GetInformation(INFO_GraphicsAdapter));
+	m_edtInputFormat.SetWindowTextW(m_pMDF->GetInformation(INFO_InputFormat));
+	m_edtFrameSize.SetWindowTextW(m_pMDF->GetInformation(INFO_FrameSize));
+	m_edtOutputFormat.SetWindowTextW(m_pMDF->GetInformation(INFO_OutputFormat));
+	m_edtGraphicsAdapter.SetWindowTextW(m_pMDF->GetInformation(INFO_GraphicsAdapter));
 }
 
 bool CMPCVideoDecSettingsWnd::OnActivate()
@@ -252,7 +252,7 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 			m_cbSwRGBLevels.EnableWindow(FALSE);
 		}
 
-		m_txtMPCVersion.SetWindowText(m_pMDF->GetInformation(INFO_MPCVersion));
+		m_txtMPCVersion.SetWindowTextW(m_pMDF->GetInformation(INFO_MPCVersion));
 
 		UpdateStatusInfo();
 	}

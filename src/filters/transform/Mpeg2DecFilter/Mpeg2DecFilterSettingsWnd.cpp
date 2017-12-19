@@ -188,13 +188,13 @@ void CMpeg2DecSettingsWnd::UpdateProcampValues()
 	CString str;
 
 	str.Format(L"%d", m_procamp_slider[0].GetPos() - 128);
-	m_procamp_value[0].SetWindowText(str);
+	m_procamp_value[0].SetWindowTextW(str);
 	str.Format(L"%d%%", m_procamp_slider[1].GetPos());
-	m_procamp_value[1].SetWindowText(str);
+	m_procamp_value[1].SetWindowTextW(str);
 	str.Format(L"%d", m_procamp_slider[2].GetPos() - 180);
-	m_procamp_value[2].SetWindowText(str);
+	m_procamp_value[2].SetWindowTextW(str);
 	str.Format(L"%d%%", m_procamp_slider[3].GetPos());
-	m_procamp_value[3].SetWindowText(str);
+	m_procamp_value[3].SetWindowTextW(str);
 }
 
 BEGIN_MESSAGE_MAP(CMpeg2DecSettingsWnd, CInternalPropertyPageWnd)

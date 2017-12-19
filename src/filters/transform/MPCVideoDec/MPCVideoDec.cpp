@@ -1549,7 +1549,7 @@ bool CMPCVideoDecFilter::IsAVI()
 	}
 	EndEnumFilters
 
-	if (!fname.IsEmpty() && ::PathFileExists(fname)) {
+	if (!fname.IsEmpty() && ::PathFileExistsW(fname)) {
 		CFile f;
 		CFileException fileException;
 		if (!f.Open(fname, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone, &fileException)) {

@@ -264,10 +264,10 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 			default:
 				break;
 			case MODE_WASAPI_EXCLUSIVE:
-				m_ModeText.SetWindowText(ResStr(IDS_ARS_WASAPI_MODE_STATUS_2));
+				m_ModeText.SetWindowTextW(ResStr(IDS_ARS_WASAPI_MODE_STATUS_2));
 				break;
 			case MODE_WASAPI_SHARED:
-				m_ModeText.SetWindowText(ResStr(IDS_ARS_WASAPI_MODE_STATUS_3));
+				m_ModeText.SetWindowTextW(ResStr(IDS_ARS_WASAPI_MODE_STATUS_3));
 				break;
 			case MODE_WASAPI_EXCLUSIVE_BITSTREAM:
 				CString btMode_str;
@@ -295,13 +295,13 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 				if (!btMode_str.IsEmpty()) {
 					msg.AppendFormat(L" [%s]", btMode_str);
 				}
-				m_ModeText.SetWindowText(msg);
+				m_ModeText.SetWindowTextW(msg);
 				break;
 		}
 
 		if (status == MODE_WASAPI_EXCLUSIVE_BITSTREAM) {
-			m_InputFormatText.SetWindowText(L"Bitstream");
-			m_OutputFormatText.SetWindowText(L"Bitstream");
+			m_InputFormatText.SetWindowTextW(L"Bitstream");
+			m_OutputFormatText.SetWindowTextW(L"Bitstream");
 		} else {
 			WAVEFORMATEX *pWfxIn, *pWfxOut;
 			m_pMAR->GetStatus(&pWfxIn, &pWfxOut);
@@ -347,9 +347,9 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 					CString sSampleRate;
 					sSampleRate.Format(L"%d", pwfex->nSamplesPerSec);
 
-					formatText.SetWindowText(sFormat);
-					channelText.SetWindowText(sChannel);
-					rateText.SetWindowText(sSampleRate);
+					formatText.SetWindowTextW(sFormat);
+					channelText.SetWindowTextW(sChannel);
+					rateText.SetWindowTextW(sSampleRate);
 				};
 
 				SetText(pWfxIn, m_InputFormatText, m_InputChannelText, m_InputRateText);
@@ -357,7 +357,7 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 			}
 		}
 
-		m_CurrentDeviceText.SetWindowText(m_pMAR->GetCurrentDeviceName());
+		m_CurrentDeviceText.SetWindowTextW(m_pMAR->GetCurrentDeviceName());
 	}
 
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {

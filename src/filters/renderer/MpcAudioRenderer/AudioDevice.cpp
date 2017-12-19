@@ -44,7 +44,7 @@ HRESULT(__stdcall * pDirectSoundEnumerate)(__in LPDSENUMCALLBACKW pDSEnumCallbac
 static void InitDSound()
 {
 	if (!hModuleDSound) {
-		hModuleDSound = LoadLibrary(L"dsound.dll");
+		hModuleDSound = LoadLibraryW(L"dsound.dll");
 	}
 
 	if (hModuleDSound && !pDirectSoundEnumerate) {

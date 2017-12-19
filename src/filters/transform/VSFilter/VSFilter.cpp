@@ -73,7 +73,7 @@ HINSTANCE CVSFilterApp::LoadAppLangResourceDLL()
 	fn = fn.Mid(fn.ReverseFind('\\')+1);
 	fn = fn.Left(fn.ReverseFind('.')+1);
 	fn = fn + L"lang";
-	return ::LoadLibrary(fn);
+	return ::LoadLibraryW(fn);
 }
 
 CVSFilterApp theApp;

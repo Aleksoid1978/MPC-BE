@@ -892,14 +892,14 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 	if (mt.subtype == MEDIASUBTYPE_DVD_SUBPICTURE) {
 		if (palette.IsEmpty()) {
 			for (;;) {
-				if (::PathFileExists(fName)) {
+				if (::PathFileExistsW(fName)) {
 					CPath fname(fName);
 					fname.StripPath();
 					if (!CString(fname).Find(L"VTS_")) {
 						fName = fName.Left(fName.ReverseFind('.') + 1);
 						fName.TrimRight(L".0123456789") += L"0.ifo";
 
-						if (::PathFileExists(fName)) {
+						if (::PathFileExistsW(fName)) {
 							// read palette from .ifo file, code from CVobSubFile::ReadIfo()
 							CFile f;
 							if (!f.Open(fName, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone)) {

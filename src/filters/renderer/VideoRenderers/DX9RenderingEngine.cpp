@@ -152,7 +152,7 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_bDither(false)
 {
 #if DXVAVP
-	m_hDxva2Lib = LoadLibrary(L"dxva2.dll");
+	m_hDxva2Lib = LoadLibraryW(L"dxva2.dll");
 	ZeroMemory(m_ProcAmpValues, sizeof(m_ProcAmpValues));
 	ZeroMemory(m_NFilterValues, sizeof(m_NFilterValues));
 	ZeroMemory(m_DFilterValues, sizeof(m_DFilterValues));

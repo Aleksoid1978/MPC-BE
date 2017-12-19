@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -83,8 +83,8 @@ bool CMpegSplitterSettingsWnd::OnActivate()
 	if (m_pMSF) {
 		m_cbForcedSub.SetCheck(m_pMSF->GetForcedSub());
 #ifdef REGISTER_FILTER
-		m_edtAudioLanguageOrder.SetWindowText(m_pMSF->GetAudioLanguageOrder());
-		m_edtSubtitlesLanguageOrder.SetWindowText(m_pMSF->GetSubtitlesLanguageOrder());
+		m_edtAudioLanguageOrder.SetWindowTextW(m_pMSF->GetAudioLanguageOrder());
+		m_edtSubtitlesLanguageOrder.SetWindowTextW(m_pMSF->GetSubtitlesLanguageOrder());
 #endif
 		m_cbTrueHD.SetCheck(m_pMSF->GetTrueHD() == 0);
 		m_cbAC3Core.SetCheck(!m_cbTrueHD.GetCheck());
@@ -118,9 +118,9 @@ bool CMpegSplitterSettingsWnd::OnApply()
 
 #ifdef REGISTER_FILTER
 		CString str;
-		m_edtAudioLanguageOrder.GetWindowText(str);
+		m_edtAudioLanguageOrder.GetWindowTextW(str);
 		m_pMSF->SetAudioLanguageOrder(str.GetBuffer());
-		m_edtSubtitlesLanguageOrder.GetWindowText(str);
+		m_edtSubtitlesLanguageOrder.GetWindowTextW(str);
 		m_pMSF->SetSubtitlesLanguageOrder(str.GetBuffer());
 #endif
 		m_pMSF->Apply();
