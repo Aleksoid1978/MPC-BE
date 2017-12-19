@@ -89,14 +89,14 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 
 	m_pDwmIsCompositionEnabled = nullptr;
 	m_pDwmEnableComposition = nullptr;
-	m_hDWMAPI = LoadLibrary(L"dwmapi.dll");
+	m_hDWMAPI = LoadLibraryW(L"dwmapi.dll");
 	if (m_hDWMAPI) {
 		(FARPROC &)m_pDwmIsCompositionEnabled = GetProcAddress(m_hDWMAPI, "DwmIsCompositionEnabled");
 		(FARPROC &)m_pDwmEnableComposition = GetProcAddress(m_hDWMAPI, "DwmEnableComposition");
 	}
 
 	m_pDirect3DCreate9Ex = nullptr;
-	m_hD3D9 = LoadLibrary(L"d3d9.dll");
+	m_hD3D9 = LoadLibraryW(L"d3d9.dll");
 	if (m_hD3D9) {
 		(FARPROC &)m_pDirect3DCreate9Ex = GetProcAddress(m_hD3D9, "Direct3DCreate9Ex");
 	}

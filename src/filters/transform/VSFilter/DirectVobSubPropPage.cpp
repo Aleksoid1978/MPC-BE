@@ -348,7 +348,7 @@ bool CDVSMainPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 									   CDialog::FromHandle(m_Dlg), 0);
 
 						if (fd.DoModal() == IDOK) {
-							m_fnedit.SetWindowText(fd.GetPathName());
+							m_fnedit.SetWindowTextW(fd.GetPathName());
 						}
 
 						return true;
@@ -366,7 +366,7 @@ bool CDVSMainPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 							if (str.GetLength() > 18) {
 								str = str.Left(16).TrimRight() + L"...";
 							}
-							m_font.SetWindowText(str);
+							m_font.SetWindowTextW(str);
 
 							if (bStyleChanged) {
 								m_bDirty = TRUE;
@@ -431,7 +431,7 @@ void CDVSMainPPage::UpdateControlData(bool fSave)
 {
 	if (fSave) {
 		CString fn;
-		m_fnedit.GetWindowText(fn);
+		m_fnedit.GetWindowTextW(fn);
 		wcscpy_s(m_fn, fn);
 
 		m_iSelectedLanguage = m_langs.GetCurSel();
@@ -445,7 +445,7 @@ void CDVSMainPPage::UpdateControlData(bool fSave)
 			m_ePARCompensationType = CSimpleTextSubtitle::EPCTDisabled;
 		}
 	} else {
-		m_fnedit.SetWindowText(CString(m_fn));
+		m_fnedit.SetWindowTextW(CString(m_fn));
 		m_oplacement.SetCheck(m_bOverridePlacement);
 		m_subposx.SetRange(-20, 120);
 		m_subposx.SetPos(m_PlacementXperc);
@@ -453,7 +453,7 @@ void CDVSMainPPage::UpdateControlData(bool fSave)
 		m_subposy.SetRange(-20, 120);
 		m_subposy.SetPos(m_PlacementYperc);
 		m_subposy.EnableWindow(m_bOverridePlacement);
-		m_font.SetWindowText(m_defStyle.fontName);
+		m_font.SetWindowTextW(m_defStyle.fontName);
 		m_forcedsubs.SetCheck(m_bOnlyShowForcedVobSubs);
 		m_langs.ResetContent();
 		m_langs.EnableWindow(m_nLangs > 0);
@@ -737,7 +737,7 @@ void CDVSTimingPPage::UpdateControlData(bool fSave)
 	if (fSave) {
 		m_bMediaFPSEnabled = !!m_modfps.GetCheck();
 		CString fpsstr;
-		m_fps.GetWindowText(fpsstr);
+		m_fps.GetWindowTextW(fpsstr);
 		float fps;
 		if (swscanf_s(fpsstr, L"%f", &fps) == 1) {
 			m_MediaFPS = fps;
@@ -749,7 +749,7 @@ void CDVSTimingPPage::UpdateControlData(bool fSave)
 		m_modfps.SetCheck(m_bMediaFPSEnabled);
 		CString fpsstr;
 		fpsstr.Format(L"%.4f", m_MediaFPS);
-		m_fps.SetWindowText(fpsstr);
+		m_fps.SetWindowTextW(fpsstr);
 		m_fps.EnableWindow(m_bMediaFPSEnabled);
 		m_subdelay.SetRange32(-180*60*1000, 180*60*1000);
 		m_subspeedmul.SetRange32(0, 1000000);
@@ -772,7 +772,7 @@ bool CDVSAboutPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg) {
 		case WM_INITDIALOG: {
-			SetDlgItemText(m_Dlg, IDC_VERSION, L"DirectVobSub 2.46." _T(MAKE_STR(MPC_VERSION_REV)) L" " _T(MPC_VERSION_ARCH) L"\nCopyright 2001-2017 MPC-BE Team");
+			SetDlgItemTextW(m_Dlg, IDC_VERSION, L"DirectVobSub 2.46." _T(MAKE_STR(MPC_VERSION_REV)) L" " _T(MPC_VERSION_ARCH) L"\nCopyright 2001-2017 MPC-BE Team");
 		}
 		break;
 		case WM_COMMAND: {
@@ -780,11 +780,11 @@ bool CDVSAboutPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				case BN_CLICKED: {
 					if (LOWORD(wParam) == IDC_HOMEPAGEBTN) {
 						AFX_MANAGE_STATE(AfxGetStaticModuleState());
-						ShellExecute(m_Dlg, L"open", ResStr(IDS_URL_HOMEPAGE), nullptr, nullptr, SW_SHOWNORMAL);
+						ShellExecuteW(m_Dlg, L"open", ResStr(IDS_URL_HOMEPAGE), nullptr, nullptr, SW_SHOWNORMAL);
 						return true;
 					} else if (LOWORD(wParam) == IDC_BUGREPORTBTN) {
 						AFX_MANAGE_STATE(AfxGetStaticModuleState());
-						ShellExecute(m_Dlg, L"open", ResStr(IDS_URL_EMAIL), nullptr, nullptr, SW_SHOWNORMAL);
+						ShellExecuteW(m_Dlg, L"open", ResStr(IDS_URL_EMAIL), nullptr, nullptr, SW_SHOWNORMAL);
 						return true;
 					}
 				}
@@ -1038,7 +1038,7 @@ bool CDVSPathsPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 						if (i >= 0) {
 							CString path;
 							m_pathlist.GetText(i, path);
-							m_path.SetWindowText(path);
+							m_path.SetWindowTextW(path);
 						}
 						return true;
 					}
@@ -1066,10 +1066,10 @@ bool CDVSPathsPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 							bi.lParam = 0;
 							bi.iImage = 0;
 
-							LPITEMIDLIST iil = SHBrowseForFolder(&bi);
+							LPITEMIDLIST iil = SHBrowseForFolderW(&bi);
 							if (iil) {
-								SHGetPathFromIDList(iil, pathbuff);
-								m_path.SetWindowText(pathbuff);
+								SHGetPathFromIDListW(iil, pathbuff);
+								m_path.SetWindowTextW(pathbuff);
 							}
 
 							return true;
@@ -1093,7 +1093,7 @@ bool CDVSPathsPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 						case IDC_ADD: {
 							CString path;
-							m_path.GetWindowText(path);
+							m_path.GetWindowTextW(path);
 							if (!path.IsEmpty() && m_pathlist.FindString(-1, path) < 0) {
 								m_pathlist.AddString(path);
 							}

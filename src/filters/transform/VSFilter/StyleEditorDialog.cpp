@@ -126,7 +126,7 @@ void CStyleEditorDialog::UpdateControlData(bool fSave)
 			m_stss.alpha[i] = 255-m_alpha[i];
 		}
 	} else {
-		m_font.SetWindowText(m_stss.fontName);
+		m_font.SetWindowTextW(m_stss.fontName);
 		m_iCharset = -1;
 		for (int i = 0; i < CharSetLen; i++) {
 			CString str;
@@ -200,7 +200,7 @@ BOOL CStyleEditorDialog::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	SetWindowText(L"Style Editor - \"" + m_title + L"\"");
+	SetWindowTextW(L"Style Editor - \"" + m_title + L"\"");
 
 	UpdateControlData(false);
 
@@ -226,7 +226,7 @@ void CStyleEditorDialog::OnBnClickedButton1()
 		if (str.GetLength() > 16) {
 			str = str.Left(14) + L"...";
 		}
-		m_font.SetWindowText(str);
+		m_font.SetWindowTextW(str);
 
 		SelectByItemData(m_charset, lf.lfCharSet);
 

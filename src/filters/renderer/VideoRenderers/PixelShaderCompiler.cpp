@@ -39,7 +39,7 @@ HINSTANCE GetD3dcompilerDll()
 	#else
 		path.Append(L"\\Windows Kits\\8.1\\bin\\x86\\d3dcompiler_47.dll");
 	#endif
-		s_hD3dcompilerDll = LoadLibrary(path);
+		s_hD3dcompilerDll = LoadLibraryW(path);
 	}
 #endif
 

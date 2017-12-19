@@ -1429,7 +1429,7 @@ static bool LoadFont(const CString& font)
 
 	HANDLE hFont = INVALID_HANDLE_VALUE;
 
-	if (HMODULE hModule = LoadLibrary(L"gdi32.dll")) {
+	if (HMODULE hModule = LoadLibraryW(L"gdi32.dll")) {
 		typedef HANDLE (WINAPI *PAddFontMemResourceEx)(IN PVOID, IN DWORD, IN PVOID , IN DWORD*);
 		if (PAddFontMemResourceEx f = (PAddFontMemResourceEx)GetProcAddress(hModule, "AddFontMemResourceEx")) {
 			DWORD cFonts;

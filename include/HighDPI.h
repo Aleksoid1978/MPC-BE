@@ -93,7 +93,7 @@ protected:
     void UseCurentMonitorDPI(HWND hWindow)
     {
         if (SysVersion::IsWin8orLater()) {
-            static HMODULE hShcore = LoadLibrary(L"Shcore.dll");
+            static HMODULE hShcore = LoadLibraryW(L"Shcore.dll");
             if (hShcore) {
                 static tpGetDpiForMonitor pGetDpiForMonitor = (tpGetDpiForMonitor)GetProcAddress(hShcore, "GetDpiForMonitor");
                 if (pGetDpiForMonitor) {

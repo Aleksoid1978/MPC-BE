@@ -112,14 +112,14 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 
 	m_pDwmIsCompositionEnabled = nullptr;
 	m_pDwmEnableComposition = nullptr;
-	m_hDWMAPI = LoadLibrary(L"dwmapi.dll");
+	m_hDWMAPI = LoadLibraryW(L"dwmapi.dll");
 	if (m_hDWMAPI) {
 		(FARPROC &)m_pDwmIsCompositionEnabled = GetProcAddress(m_hDWMAPI, "DwmIsCompositionEnabled");
 		(FARPROC &)m_pDwmEnableComposition = GetProcAddress(m_hDWMAPI, "DwmEnableComposition");
 	}
 
 	m_pDirect3DCreate9Ex = nullptr;
-	m_hD3D9 = LoadLibrary(L"d3d9.dll");
+	m_hD3D9 = LoadLibraryW(L"d3d9.dll");
 	if (m_hD3D9) {
 		(FARPROC &)m_pDirect3DCreate9Ex = GetProcAddress(m_hD3D9, "Direct3DCreate9Ex");
 	}
@@ -2212,11 +2212,11 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	}
 
 	// Load EVR specifics DLLs
-	hLib = LoadLibrary (L"dxva2.dll");
+	hLib = LoadLibraryW(L"dxva2.dll");
 	pfDXVA2CreateDirect3DDeviceManager9	= hLib ? (PTR_DXVA2CreateDirect3DDeviceManager9) GetProcAddress (hLib, "DXVA2CreateDirect3DDeviceManager9") : nullptr;
 
 	// Load EVR functions
-	hLib = LoadLibrary (L"evr.dll");
+	hLib = LoadLibraryW(L"evr.dll");
 	pfMFCreateVideoSampleFromSurface = hLib ? (PTR_MFCreateVideoSampleFromSurface)GetProcAddress (hLib, "MFCreateVideoSampleFromSurface") : nullptr;
 	pfMFCreateVideoMediaType = hLib ? (PTR_MFCreateVideoMediaType)GetProcAddress (hLib, "MFCreateVideoMediaType") : nullptr;
 
@@ -2235,7 +2235,7 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	}
 
 	// Load Vista specific DLLs
-	hLib = LoadLibrary (L"avrt.dll");
+	hLib = LoadLibraryW(L"avrt.dll");
 	pfAvSetMmThreadCharacteristicsW = hLib ? (PTR_AvSetMmThreadCharacteristicsW) GetProcAddress (hLib, "AvSetMmThreadCharacteristicsW") : nullptr;
 	pfAvSetMmThreadPriority = hLib ? (PTR_AvSetMmThreadPriority) GetProcAddress (hLib, "AvSetMmThreadPriority") : nullptr;
 	pfAvRevertMmThreadCharacteristics = hLib ? (PTR_AvRevertMmThreadCharacteristics) GetProcAddress (hLib, "AvRevertMmThreadCharacteristics") : nullptr;
@@ -4018,8 +4018,8 @@ HRESULT CGenlock::GetTiming()
 		return E_FAIL;
 	}
 
-	getTiming = static_cast<ATOM>(SendMessage(psWnd, UM_GETTIMING, wParam, lParam));
-	GlobalGetAtomName(getTiming, savedTiming, MAX_LOADSTRING);
+	getTiming = static_cast<ATOM>(SendMessageW(psWnd, UM_GETTIMING, wParam, lParam));
+	GlobalGetAtomNameW(getTiming, savedTiming, MAX_LOADSTRING);
 
 	while (params < TIMING_PARAM_CNT) {
 		while (savedTiming[i] != ',' && savedTiming[i] != '\0') {
@@ -4105,9 +4105,9 @@ HRESULT CGenlock::ResetTiming()
 	}
 
 	if (displayAdjustmentsMade > 0) {
-		setTiming = GlobalAddAtom(cruise);
+		setTiming = GlobalAddAtomW(cruise);
 		lParam = setTiming;
-		ret = SendMessage(psWnd, UM_SETCUSTOMTIMINGFAST, wParam, lParam);
+		ret = SendMessageW(psWnd, UM_SETCUSTOMTIMINGFAST, wParam, lParam);
 		GlobalDeleteAtom(setTiming);
 		curDisplayFreq = displayFreqCruise;
 	}
@@ -4216,9 +4216,9 @@ HRESULT CGenlock::ControlDisplay(double syncOffset, double frameCycle)
 	{
 		adjDelta = 1; // Increase refresh rate
 		curDisplayFreq = displayFreqFaster;
-		setTiming = GlobalAddAtom(faster);
+		setTiming = GlobalAddAtomW(faster);
 		lParam = setTiming;
-		SendMessage(psWnd, UM_SETCUSTOMTIMINGFAST, wParam, lParam);
+		SendMessageW(psWnd, UM_SETCUSTOMTIMINGFAST, wParam, lParam);
 		GlobalDeleteAtom(setTiming);
 		displayAdjustmentsMade++;
 	} else
@@ -4226,9 +4226,9 @@ HRESULT CGenlock::ControlDisplay(double syncOffset, double frameCycle)
 		if ((syncOffsetAvg < lowSyncOffset) && (adjDelta != -1)) {
 			adjDelta = -1;
 			curDisplayFreq = displayFreqSlower;
-			setTiming = GlobalAddAtom(slower);
+			setTiming = GlobalAddAtomW(slower);
 			lParam = setTiming;
-			SendMessage(psWnd, UM_SETCUSTOMTIMINGFAST, wParam, lParam);
+			SendMessageW(psWnd, UM_SETCUSTOMTIMINGFAST, wParam, lParam);
 			GlobalDeleteAtom(setTiming);
 			displayAdjustmentsMade++;
 		} else
@@ -4236,17 +4236,17 @@ HRESULT CGenlock::ControlDisplay(double syncOffset, double frameCycle)
 			if ((syncOffsetAvg < targetSyncOffset) && (adjDelta == 1)) {
 				adjDelta = 0;
 				curDisplayFreq = displayFreqCruise;
-				setTiming = GlobalAddAtom(cruise);
+				setTiming = GlobalAddAtomW(cruise);
 				lParam = setTiming;
-				SendMessage(psWnd, UM_SETCUSTOMTIMINGFAST, wParam, lParam);
+				SendMessageW(psWnd, UM_SETCUSTOMTIMINGFAST, wParam, lParam);
 				GlobalDeleteAtom(setTiming);
 				displayAdjustmentsMade++;
 			} else if ((syncOffsetAvg > targetSyncOffset) && (adjDelta == -1)) {
 				adjDelta = 0;
 				curDisplayFreq = displayFreqCruise;
-				setTiming = GlobalAddAtom(cruise);
+				setTiming = GlobalAddAtomW(cruise);
 				lParam = setTiming;
-				SendMessage(psWnd, UM_SETCUSTOMTIMINGFAST, wParam, lParam);
+				SendMessageW(psWnd, UM_SETCUSTOMTIMINGFAST, wParam, lParam);
 				GlobalDeleteAtom(setTiming);
 				displayAdjustmentsMade++;
 			}

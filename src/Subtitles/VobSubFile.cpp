@@ -766,9 +766,9 @@ static int PASCAL MyProcessDataProc(unsigned char* Addr, int Size)
 bool CVobSubFile::ReadRar(CString fn)
 {
 #ifdef _WIN64
-	HMODULE h = LoadLibrary(_T("unrar64.dll"));
+	HMODULE h = LoadLibraryW(L"unrar64.dll");
 #else
-	HMODULE h = LoadLibrary(_T("unrar.dll"));
+	HMODULE h = LoadLibraryW(L"unrar.dll");
 #endif
 	if (!h) {
 		return false;

@@ -1052,21 +1052,21 @@ UINT_PTR CALLBACK OpenHookProc(HWND hDlg, UINT uiMsg, WPARAM wParam, LPARAM lPar
 			OPENFILENAME* ofn = ((OFNOTIFY *)lParam)->lpOFN;
 
 			if (((NMHDR *)lParam)->code == CDN_FILEOK) {
-				ofn->lCustData = (LPARAM)CharSetList[SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_GETCURSEL, 0, 0)];
+				ofn->lCustData = (LPARAM)CharSetList[SendMessageW(GetDlgItem(hDlg, IDC_COMBO1), CB_GETCURSEL, 0, 0)];
 			}
 
 			break;
 		}
 
 		case WM_INITDIALOG: {
-			SetWindowLongPtr(hDlg, GWLP_USERDATA, lParam);
+			SetWindowLongPtrW(hDlg, GWLP_USERDATA, lParam);
 
 			for (ptrdiff_t i = 0; i < CharSetLen; i++) {
 				CString s;
 				s.Format(L"%s (%d)", CharSetNames[i], CharSetList[i]);
-				SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_ADDSTRING, 0, (LONG)(LPCTSTR)s);
+				SendMessageW(GetDlgItem(hDlg, IDC_COMBO1), CB_ADDSTRING, 0, (LONG)(LPCTSTR)s);
 				if (CharSetList[i] == (int)((OPENFILENAME*)lParam)->lCustData) {
-					SendMessage(GetDlgItem(hDlg, IDC_COMBO1), CB_SETCURSEL, i, 0);
+					SendMessageW(GetDlgItem(hDlg, IDC_COMBO1), CB_SETCURSEL, i, 0);
 				}
 			}
 

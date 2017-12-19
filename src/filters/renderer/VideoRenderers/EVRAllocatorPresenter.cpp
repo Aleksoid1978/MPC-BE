@@ -116,11 +116,11 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	}
 
 	// Load EVR specifics DLLs
-	hLib = LoadLibrary(L"dxva2.dll");
+	hLib = LoadLibraryW(L"dxva2.dll");
 	pfDXVA2CreateDirect3DDeviceManager9	= hLib ? (PTR_DXVA2CreateDirect3DDeviceManager9) GetProcAddress(hLib, "DXVA2CreateDirect3DDeviceManager9") : nullptr;
 
 	// Load EVR functions
-	hLib = LoadLibrary(L"evr.dll");
+	hLib = LoadLibraryW(L"evr.dll");
 	pfMFCreateVideoSampleFromSurface	= hLib ? (PTR_MFCreateVideoSampleFromSurface)	GetProcAddress(hLib, "MFCreateVideoSampleFromSurface") : nullptr;
 	pfMFCreateVideoMediaType			= hLib ? (PTR_MFCreateVideoMediaType)			GetProcAddress(hLib, "MFCreateVideoMediaType") : nullptr;
 
@@ -140,7 +140,7 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 
 	// Load mfplat fuctions
 #if 0
-	hLib = LoadLibrary (L"mfplat.dll");
+	hLib = LoadLibraryW(L"mfplat.dll");
 	(FARPROC &)pMFCreateMediaType = GetProcAddress(hLib, "MFCreateMediaType");
 	(FARPROC &)pMFInitMediaTypeFromAMMediaType = GetProcAddress(hLib, "MFInitMediaTypeFromAMMediaType");
 	(FARPROC &)pMFInitAMMediaTypeFromMFMediaType = GetProcAddress(hLib, "MFInitAMMediaTypeFromMFMediaType");
@@ -152,7 +152,7 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 #endif
 
 	// Load Vista specifics DLLs
-	hLib = LoadLibrary(L"avrt.dll");
+	hLib = LoadLibraryW(L"avrt.dll");
 	pfAvSetMmThreadCharacteristicsW		= hLib ? (PTR_AvSetMmThreadCharacteristicsW)	GetProcAddress(hLib, "AvSetMmThreadCharacteristicsW") : nullptr;
 	pfAvSetMmThreadPriority				= hLib ? (PTR_AvSetMmThreadPriority)			GetProcAddress(hLib, "AvSetMmThreadPriority") : nullptr;
 	pfAvRevertMmThreadCharacteristics	= hLib ? (PTR_AvRevertMmThreadCharacteristics)	GetProcAddress(hLib, "AvRevertMmThreadCharacteristics") : nullptr;

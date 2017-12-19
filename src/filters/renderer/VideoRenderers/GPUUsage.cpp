@@ -41,11 +41,11 @@ CGPUUsage::CGPUUsage()
 	Clean();
 
 	if (SysVersion::IsWin7orLater()) {
-		gdi32Handle = LoadLibrary(L"gdi32.dll");
+		gdi32Handle = LoadLibraryW(L"gdi32.dll");
 		if (gdi32Handle) {
 			pD3DKMTQueryStatistics = (PFND3DKMT_QUERYSTATISTICS)GetProcAddress(gdi32Handle, "D3DKMTQueryStatistics");
 
-			dxgiHandle = LoadLibrary(L"dxgi.dll");
+			dxgiHandle = LoadLibraryW(L"dxgi.dll");
 			if (dxgiHandle) {
 				pCreateDXGIFactory = (CreateDXGIFactory_t)GetProcAddress(dxgiHandle, "CreateDXGIFactory");
 			}
@@ -124,9 +124,9 @@ HRESULT CGPUUsage::Init(CString DeviceName, CString Device)
 
 	{
 		// ATI OverDrive
-		ATIData.hAtiADL = LoadLibrary(L"atiadlxx.dll");
+		ATIData.hAtiADL = LoadLibraryW(L"atiadlxx.dll");
 		if (ATIData.hAtiADL == nullptr) {
-			ATIData.hAtiADL = LoadLibrary(L"atiadlxy.dll");
+			ATIData.hAtiADL = LoadLibraryW(L"atiadlxy.dll");
 		}
 
 		if (ATIData.hAtiADL) {
@@ -265,9 +265,9 @@ HRESULT CGPUUsage::Init(CString DeviceName, CString Device)
 
 	if (m_GPUType == UNKNOWN_GPU && Device.Find(L"NVIDIA") == 0) {
 		// NVApi
-		NVData.hNVApi = LoadLibrary(L"nvapi64.dll");
+		NVData.hNVApi = LoadLibraryW(L"nvapi64.dll");
 		if (NVData.hNVApi == nullptr) {
-			NVData.hNVApi = LoadLibrary(L"nvapi.dll");
+			NVData.hNVApi = LoadLibraryW(L"nvapi.dll");
 		}
 
 		if (NVData.hNVApi) {

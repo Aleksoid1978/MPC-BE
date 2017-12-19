@@ -73,7 +73,7 @@ void CMpaDecSettingsWnd::OnDisconnect()
 void CMpaDecSettingsWnd::UpdateStatusInfo()
 {
 	CString str = m_pMDF->GetInformation(AINFO_DecoderInfo);
-	m_edtStatus.SetWindowText(str);
+	m_edtStatus.SetWindowTextW(str);
 }
 
 static WNDPROC OldControlProc;
@@ -163,7 +163,7 @@ bool CMpaDecSettingsWnd::OnActivate()
 	SetCursor(m_hWnd, IDC_PP_CHECK_AV_SYNC, IDC_HAND);
 
 	// subclass the edit control
-	OldControlProc = (WNDPROC)SetWindowLongPtr(m_edtStatus.m_hWnd, GWLP_WNDPROC, (LONG_PTR)ControlProc);
+	OldControlProc = (WNDPROC)SetWindowLongPtrW(m_edtStatus.m_hWnd, GWLP_WNDPROC, (LONG_PTR)ControlProc);
 
 	return true;
 }

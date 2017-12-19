@@ -46,7 +46,7 @@ IDirect3D9* D3D9Helper::Direct3DCreate9()
 {
 	typedef IDirect3D9* (WINAPI *tpDirect3DCreate9)(__in UINT SDKVersion);
 
-	static HMODULE hModule = LoadLibrary(L"d3d9.dll");
+	static HMODULE hModule = LoadLibraryW(L"d3d9.dll");
 	static tpDirect3DCreate9 pDirect3DCreate9 = hModule ? (tpDirect3DCreate9)GetProcAddress(hModule, "Direct3DCreate9") : nullptr;
 	if (pDirect3DCreate9) {
 		IDirect3D9* pD3D9 = pDirect3DCreate9(D3D_SDK_VERSION);

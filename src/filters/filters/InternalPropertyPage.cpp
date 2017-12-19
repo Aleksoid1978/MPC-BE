@@ -352,7 +352,7 @@ CPinInfoWnd::CPinInfoWnd()
 	POSITION pos = s.m_filters.GetHeadPosition();
 	while (pos) {
 		CAutoPtr<FilterOverride> f(DNew FilterOverride(s.m_filters.GetNext(pos)));
-		if (::PathFileExists(f->path)) {
+		if (::PathFileExistsW(f->path)) {
 			m_CachedExternalFilters[f->clsid] = f->path;
 		}
 	}
@@ -452,7 +452,7 @@ bool CPinInfoWnd::OnActivate()
 	m_info_edit.SetFont(&m_monospacefont);
 
 	// subclass the edit control
-	OldControlProc = (WNDPROC)SetWindowLongPtr(m_info_edit.m_hWnd, GWLP_WNDPROC, (LONG_PTR)ControlProc);
+	OldControlProc = (WNDPROC)SetWindowLongPtrW(m_info_edit.m_hWnd, GWLP_WNDPROC, (LONG_PTR)ControlProc);
 
 	OnCbnSelchangeCombo1();
 
@@ -489,7 +489,7 @@ END_MESSAGE_MAP()
 
 void CPinInfoWnd::OnCbnSelchangeCombo1()
 {
-	m_info_edit.SetWindowText(L"");
+	m_info_edit.SetWindowTextW(L"");
 	CString infoStr;
 
 	int i = m_pin_combo.GetCurSel();
@@ -530,14 +530,14 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 				CString module;
 
 				CachedFilters::CPair* pRegPair = m_CachedRegistryFilters.Lookup(FilterClsid);
-				if (pRegPair && ::PathFileExists(pRegPair->m_value)) {
+				if (pRegPair && ::PathFileExistsW(pRegPair->m_value)) {
 					module = pRegPair->m_value;
 				} else {
 					len = _countof(buff);
 					memset(buff, 0, len);
 					if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, L"CLSID\\" + clsid + L"\\InprocServer32", KEY_READ)
 							&& ERROR_SUCCESS == key.QueryStringValue(nullptr, buff, &len)
-							&& ::PathFileExists(buff)) {
+							&& ::PathFileExistsW(buff)) {
 						module = CString(buff);
 						m_CachedRegistryFilters[FilterClsid] = module;
 						key.Close();
@@ -599,5 +599,5 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 	}
 	EndEnumMediaTypes(pmt);
 
-	m_info_edit.SetWindowText(infoStr);
+	m_info_edit.SetWindowTextW(infoStr);
 }

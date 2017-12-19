@@ -2025,7 +2025,7 @@ HRESULT CRealVideoDecoder::CheckInputType(const CMediaType* mtIn)
 		POSITION pos = paths.GetHeadPosition();
 		do {
 			if (pos) {
-				m_hDrvDll = LoadLibrary(paths.GetNext(pos));
+				m_hDrvDll = LoadLibraryW(paths.GetNext(pos));
 			}
 		} while (pos && !m_hDrvDll);
 
@@ -2530,7 +2530,7 @@ HRESULT CRealAudioDecoder::CheckInputType(const CMediaType* mtIn)
 		POSITION pos = paths.GetHeadPosition();
 		do {
 			if (pos) {
-				m_hDrvDll = LoadLibrary(paths.GetNext(pos));
+				m_hDrvDll = LoadLibraryW(paths.GetNext(pos));
 			}
 		} while (pos && !m_hDrvDll);
 

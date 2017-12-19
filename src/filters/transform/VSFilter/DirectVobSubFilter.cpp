@@ -415,7 +415,7 @@ HRESULT CDirectVobSubFilter::JoinFilterGraph(IFilterGraph* pGraph, LPCWSTR pName
 		}
 	} else {
 		if (m_hSystrayThread) {
-			SendMessage(m_tbid.hSystrayWnd, WM_CLOSE, 0, 0);
+			SendMessageW(m_tbid.hSystrayWnd, WM_CLOSE, 0, 0);
 
 			if (WaitForSingleObject(m_hSystrayThread, 10000) != WAIT_OBJECT_0) {
 				DLog(L"CALL THE AMBULANCE!!!");

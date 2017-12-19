@@ -158,7 +158,7 @@ CNullVideoRendererInputPin::CNullVideoRendererInputPin(CBaseRenderer *pRenderer,
 {
 	CreateSurface();
 
-	m_hDXVA2Lib = LoadLibrary(L"dxva2.dll");
+	m_hDXVA2Lib = LoadLibraryW(L"dxva2.dll");
 	if (m_hDXVA2Lib) {
 		pfDXVA2CreateDirect3DDeviceManager9 = reinterpret_cast<PTR_DXVA2CreateDirect3DDeviceManager9>(GetProcAddress(m_hDXVA2Lib, "DXVA2CreateDirect3DDeviceManager9"));
 		pfDXVA2CreateVideoService = reinterpret_cast<PTR_DXVA2CreateVideoService>(GetProcAddress(m_hDXVA2Lib, "DXVA2CreateVideoService"));
