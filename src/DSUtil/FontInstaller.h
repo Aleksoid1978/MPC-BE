@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <list>
+
 class CFontInstaller
 {
 	HANDLE (WINAPI *pAddFontMemResourceEx)(PVOID,DWORD,PVOID,DWORD*);
@@ -28,9 +30,9 @@ class CFontInstaller
 	int (WINAPI *pAddFontResourceEx)(LPCWSTR,DWORD,PVOID);
 	BOOL (WINAPI *pRemoveFontResourceEx)(LPCWSTR,DWORD,PVOID);
 
-	CAtlList<HANDLE> m_fonts;
-	CAtlList<CString> m_files;
-	CAtlList<CString> m_tempfiles;
+	std::list<HANDLE> m_fonts;
+	std::list<CString> m_files;
+	std::list<CString> m_tempfiles;
 
 public:
 	CFontInstaller();
