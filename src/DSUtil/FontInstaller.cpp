@@ -30,10 +30,6 @@ CFontInstaller::CFontInstaller()
 		pRemoveFontMemResourceEx = (BOOL (WINAPI *)(HANDLE))GetProcAddress(hGdi, "RemoveFontMemResourceEx");
 		pRemoveFontResourceEx = (BOOL (WINAPI *)(LPCWSTR,DWORD,PVOID))GetProcAddress(hGdi, "RemoveFontResourceExW");
 	}
-
-	if (HMODULE hGdi = GetModuleHandleW(L"kernel32.dll")) {
-		pMoveFileEx = (BOOL (WINAPI *)(LPCWSTR, LPCWSTR, DWORD))GetProcAddress(hGdi, "MoveFileExW");
-	}
 }
 
 CFontInstaller::~CFontInstaller()
@@ -63,8 +59,9 @@ void CFontInstaller::UninstallFonts()
 		while (pos) {
 			CString fn = m_tempfiles.GetNext(pos);
 			pRemoveFontResourceEx(fn, FR_PRIVATE, 0);
-			if (!DeleteFileW(fn) && pMoveFileEx) {
-				pMoveFileEx(fn, nullptr, MOVEFILE_DELAY_UNTIL_REBOOT);
+			if (!DeleteFileW(fn)) {
+				// Temp file can not be deleted now, it will be deleted after the reboot.
+				MoveFileExW(fn, nullptr, MOVEFILE_DELAY_UNTIL_REBOOT);
 			}
 		}
 		m_tempfiles.RemoveAll();
