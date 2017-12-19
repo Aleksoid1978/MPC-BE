@@ -53,9 +53,11 @@ int g_cTemplates = _countof(g_Templates);
 
 STDAPI DllRegisterServer()
 {
-	CAtlList<CString> chkbytes;
-	chkbytes.AddTail(L"0,2,FFE0,FFE0");
-	chkbytes.AddTail(L"0,10,FFFFFF00000080808080,49443300000000000000");
+	const std::list<CString> chkbytes = {
+		L"0,2,FFE0,FFE0",
+		L"0,10,FFFFFF00000080808080,49443300000000000000",
+	};
+
 	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_MPEG1Audio, chkbytes, nullptr);
 
 	return AMovieDllRegisterServer2(TRUE);
