@@ -77,8 +77,8 @@ BOOL CShaderCombineDlg::OnInitDialog()
 	auto pFrame = AfxGetMainFrame();
 	m_fcheck1 = m_oldcheck1 = pFrame->m_bToggleShader;
 	m_fcheck2 = m_oldcheck2 = pFrame->m_bToggleShaderScreenSpace;
-	m_oldlabels1.AddTailList(&s.ShaderList);
-	m_oldlabels2.AddTailList(&s.ShaderListScreenSpace);
+	m_oldlabels1 = s.ShaderList;
+	m_oldlabels2 = s.ShaderListScreenSpace;
 
 	CString path;
 	if (AfxGetMyApp()->GetAppSavePath(path)) {
@@ -102,18 +102,13 @@ BOOL CShaderCombineDlg::OnInitDialog()
 		CorrectComboListWidth(m_combo);
 	}
 
-
-	POSITION pos;
-
-	pos = s.ShaderList.GetHeadPosition();
-	while (pos) {
-		m_list1.AddString(s.ShaderList.GetNext(pos));
+	for (const auto& shader : s.ShaderList) {
+		m_list1.AddString(shader);
 	}
 	m_list1.AddString(L"");
 
-	pos = s.ShaderListScreenSpace.GetHeadPosition();
-	while (pos) {
-		m_list2.AddString(s.ShaderListScreenSpace.GetNext(pos));
+	for (const auto& shader : s.ShaderListScreenSpace) {
+		m_list2.AddString(shader);
 	}
 	m_list2.AddString(L"");
 
@@ -134,12 +129,10 @@ void CShaderCombineDlg::OnCancel()
 	auto pFrame = AfxGetMainFrame();
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.ShaderList.RemoveAll();
-	s.ShaderList.AddTailList(&m_oldlabels1);
+	s.ShaderList = m_oldlabels1;
 	pFrame->EnableShaders1(m_oldcheck1);
 
-	s.ShaderListScreenSpace.RemoveAll();
-	s.ShaderListScreenSpace.AddTailList(&m_oldlabels2);
+	s.ShaderListScreenSpace = m_oldlabels2;
 	pFrame->EnableShaders2(m_oldcheck2);
 
 	__super::OnCancel();
@@ -308,24 +301,24 @@ void CShaderCombineDlg::UpdateShaders(unsigned char type)
 	CAppSettings& s = AfxGetAppSettings();
 
 	if (type & SHADER1) {
-		s.ShaderList.RemoveAll();
+		s.ShaderList.clear();
 
 		for (int i = 0, j = m_list1.GetCount()-1; i < j; i++) {
 			CString label;
 			m_list1.GetText(i, label);
-			s.ShaderList.AddTail(label);
+			s.ShaderList.push_back(label);
 		}
 
 		pFrame->EnableShaders1(!!m_fcheck1);
 	}
 
 	if (type & SHADER2) {
-		s.ShaderListScreenSpace.RemoveAll();
+		s.ShaderListScreenSpace.clear();
 
 		for (int m = 0, n = m_list2.GetCount()-1; m < n; m++) {
 			CString label;
 			m_list2.GetText(m, label);
-			s.ShaderListScreenSpace.AddTail(label);
+			s.ShaderListScreenSpace.push_back(label);
 		}
 
 		pFrame->EnableShaders2(!!m_fcheck2);

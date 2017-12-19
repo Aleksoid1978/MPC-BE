@@ -1027,7 +1027,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		curPos = 0;
 		token = str.Tokenize(L"|", curPos);
 		while (token.GetLength()) {
-			ShaderList.AddTail(token);
+			ShaderList.push_back(token);
 			token = str.Tokenize(L"|", curPos);
 		}
 
@@ -1035,7 +1035,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		curPos = 0;
 		token = str.Tokenize(L"|", curPos);
 		while (token.GetLength()) {
-			ShaderListScreenSpace.AddTail(token);
+			ShaderListScreenSpace.push_back(token);
 			token = str.Tokenize(L"|", curPos);
 		}
 	}
@@ -1348,19 +1348,15 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_SATURATION, iSaturation);
 
 	{ // save shader list
-		POSITION pos;
-
 		str.Empty();
-		pos = ShaderList.GetHeadPosition();
-		while (pos) {
-			str += ShaderList.GetNext(pos) + "|";
+		for (const auto& shader : ShaderList) {
+			str += shader + "|";
 		}
 		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLIST, str);
 
 		str.Empty();
-		pos = ShaderListScreenSpace.GetHeadPosition();
-		while (pos) {
-			str += ShaderListScreenSpace.GetNext(pos) + "|";
+		for (const auto& shader : ShaderListScreenSpace) {
+			str += shader + "|";
 		}
 		pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLISTSCREENSPACE, str);
 	}
