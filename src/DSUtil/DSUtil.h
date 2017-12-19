@@ -160,12 +160,12 @@ extern CString			ISO6391To6392(LPCSTR code);
 extern CString			ISO6392To6391(LPCSTR code);
 extern CString			LanguageToISO6392(LPCTSTR lang);
 
-extern bool				DeleteRegKey(LPCTSTR pszKey, LPCTSTR pszSubkey);
-extern bool				SetRegKeyValue(LPCTSTR pszKey, LPCTSTR pszSubkey, LPCTSTR pszValueName, LPCTSTR pszValue);
-extern bool				SetRegKeyValue(LPCTSTR pszKey, LPCTSTR pszSubkey, LPCTSTR pszValue);
+extern bool				DeleteRegKey(LPCWSTR pszKey, LPCWSTR pszSubkey);
+extern bool				SetRegKeyValue(LPCWSTR pszKey, LPCWSTR pszSubkey, LPCWSTR pszValueName, LPCWSTR pszValue);
+extern bool				SetRegKeyValue(LPCWSTR pszKey, LPCWSTR pszSubkey, LPCWSTR pszValue);
 
-extern void				RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, LPCTSTR chkbytes, LPCTSTR ext = nullptr, ...);
-extern void				RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, const CAtlList<CString>& chkbytes, LPCTSTR ext = nullptr, ...);
+extern void				RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, LPCWSTR chkbytes, LPCWSTR ext = nullptr, ...);
+extern void				RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, const std::list<CString>& chkbytes, LPCWSTR ext = nullptr, ...);
 extern void				UnRegisterSourceFilter(const GUID& subtype);
 
 extern CString			GetDXVAMode(const GUID& guidDecoder);

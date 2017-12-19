@@ -76,16 +76,15 @@ STDAPI DllRegisterServer()
 	DeleteRegKey(L"Media Type\\Extensions\\", L".mp4");
 	DeleteRegKey(L"Media Type\\Extensions\\", L".mov");
 
-	CAtlList<CString> chkbytes;
-
-	// mov, mp4
-	chkbytes.AddTail(L"4,4,,66747970"); // '....ftyp'
-	chkbytes.AddTail(L"4,4,,6d6f6f76"); // '....moov'
-	chkbytes.AddTail(L"4,4,,6d646174"); // '....mdat'
-	chkbytes.AddTail(L"4,4,,77696465"); // '....wide'
-	chkbytes.AddTail(L"4,4,,736b6970"); // '....skip'
-	chkbytes.AddTail(L"4,4,,66726565"); // '....free'
-	chkbytes.AddTail(L"4,4,,706e6f74"); // '....pnot'
+	const std::list<CString> chkbytes = {
+		L"4,4,,66747970", // '....ftyp'
+		L"4,4,,6d6f6f76", // '....moov'
+		L"4,4,,6d646174", // '....mdat'
+		L"4,4,,77696465", // '....wide'
+		L"4,4,,736b6970", // '....skip'
+		L"4,4,,66726565", // '....free'
+		L"4,4,,706e6f74", // '....pnot'
+	};
 
 	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_MP4, chkbytes, nullptr);
 
