@@ -33,12 +33,7 @@ LPCWSTR Subtitle::GetSubtitleFileExt(SubType type)
 	return (type >= 0 && size_t(type) < subTypesExt.size()) ? subTypesExt[type] : nullptr;
 }
 
-static int SubFileCompare(const void* elem1, const void* elem2)
-{
-	return ((Subtitle::SubFile*)elem1)->fn.CompareNoCase(((Subtitle::SubFile*)elem2)->fn);
-}
-
-void Subtitle::GetSubFileNames(CString fn, const std::vector<CString>& paths, std::vector<SubFile>& ret)
+void Subtitle::GetSubFileNames(CString fn, const std::vector<CString>& paths, std::vector<CString>& ret)
 {
 	ret.clear();
 
@@ -127,9 +122,7 @@ void Subtitle::GetSubFileNames(CString fn, const std::vector<CString>& paths, st
 				}
 
 				if (!bMatchAnotherVid) {
-					SubFile f;
-					f.fn = fn;
-					ret.push_back(f);
+					ret.push_back(sub);
 				}
 			}
 		}
@@ -138,16 +131,16 @@ void Subtitle::GetSubFileNames(CString fn, const std::vector<CString>& paths, st
 		if (wtf.Open(orgpath + title + L".wse")) {
 			CString fn2;
 			while (wtf.ReadString(fn2) && fn2.Find(L"://") >= 0) {
-				SubFile f;
-				f.fn = fn2;
-				ret.push_back(f);
+				ret.push_back(fn2);
 			}
 		}
 	}
 
 	// sort files, this way the user can define the order (movie.00.English.srt, movie.01.Hungarian.srt, etc)
+	std::sort(ret.begin(), ret.end(), [](const CString& a, const CString& b) {
+		return a.CompareNoCase(b) < 0;
 
-	qsort(ret.data(), ret.size(), sizeof(SubFile), SubFileCompare);
+	});
 }
 
 CString Subtitle::GuessSubtitleName(CString fn, CString videoName)

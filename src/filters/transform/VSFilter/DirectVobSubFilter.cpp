@@ -1767,11 +1767,11 @@ bool CDirectVobSubFilter::Open()
 		}
 	}
 
-	std::vector<Subtitle::SubFile> ret;
+	std::vector<CString> ret;
 	Subtitle::GetSubFileNames(m_FileName, paths, ret);
 
-	for (size_t i = 0; i < ret.size(); i++) {
-		if (m_frd.files.Find(ret[i].fn)) {
+	for (const auto& sub_fn : ret) {
+		if (m_frd.files.Find(sub_fn)) {
 			continue;
 		}
 
@@ -1779,11 +1779,8 @@ bool CDirectVobSubFilter::Open()
 
 		if (!pSubStream) {
 			CAutoPtr<CSupSubFile> pSSF(DNew CSupSubFile(&m_csSubLock));
-			CPath fn(ret[i].fn);
-			if (pSSF && CString(fn.GetExtension()).MakeLower() == L".sup") {
-				fn.StripPath();
-				CString fname(fn);
-				if (pSSF->Open(ret[i].fn, L"", m_videoFileName)) {
+			if (pSSF && GetFileExt(sub_fn).MakeLower() == L".sup") {
+				if (pSSF->Open(sub_fn, L"", m_videoFileName)) {
 					pSubStream = pSSF.Detach();
 				}
 			}
@@ -1791,23 +1788,23 @@ bool CDirectVobSubFilter::Open()
 
 		if (!pSubStream) {
 			CAutoPtr<CVobSubFile> pVSF(DNew CVobSubFile(&m_csSubLock));
-			if (pVSF && pVSF->Open(ret[i].fn) && pVSF->GetStreamCount() > 0) {
+			if (pVSF && pVSF->Open(sub_fn) && pVSF->GetStreamCount() > 0) {
 				pSubStream = pVSF.Detach();
-				m_frd.files.AddTail(ret[i].fn.Left(ret[i].fn.GetLength() - 4) + L".sub");
+				m_frd.files.AddTail(sub_fn.Left(sub_fn.GetLength() - 4) + L".sub");
 			}
 		}
 
 		if (!pSubStream) {
 			CAutoPtr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&m_csSubLock));
-			if (pRTS && pRTS->Open(ret[i].fn, DEFAULT_CHARSET, L"", m_videoFileName) && pRTS->GetStreamCount() > 0) {
+			if (pRTS && pRTS->Open(sub_fn, DEFAULT_CHARSET, L"", m_videoFileName) && pRTS->GetStreamCount() > 0) {
 				pSubStream = pRTS.Detach();
-				m_frd.files.AddTail(ret[i].fn + L".style");
+				m_frd.files.AddTail(sub_fn + L".style");
 			}
 		}
 
 		if (pSubStream) {
 			m_pSubStreams.AddTail(pSubStream);
-			m_frd.files.AddTail(ret[i].fn);
+			m_frd.files.AddTail(sub_fn);
 		}
 	}
 
