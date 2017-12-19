@@ -40,31 +40,26 @@ CFontInstaller::~CFontInstaller()
 void CFontInstaller::UninstallFonts()
 {
 	if (pRemoveFontMemResourceEx) {
-		POSITION pos = m_fonts.GetHeadPosition();
-		while (pos) {
-			pRemoveFontMemResourceEx(m_fonts.GetNext(pos));
+		for (const auto& font : m_fonts) {
+			pRemoveFontMemResourceEx(font);
 		}
-		m_fonts.RemoveAll();
+		m_fonts.clear();
 	}
 
 	if (pRemoveFontResourceEx) {
-		POSITION pos = m_files.GetHeadPosition();
-		while (pos) {
-			CString fn = m_files.GetNext(pos);
+		for (const auto& fn : m_files) {
 			pRemoveFontResourceEx(fn, FR_PRIVATE, 0);
 		}
-		m_files.RemoveAll();
+		m_files.clear();
 
-		pos = m_tempfiles.GetHeadPosition();
-		while (pos) {
-			CString fn = m_tempfiles.GetNext(pos);
+		for (const auto& fn : m_tempfiles) {
 			pRemoveFontResourceEx(fn, FR_PRIVATE, 0);
 			if (!DeleteFileW(fn)) {
 				// Temp file can not be deleted now, it will be deleted after the reboot.
 				MoveFileExW(fn, nullptr, MOVEFILE_DELAY_UNTIL_REBOOT);
 			}
 		}
-		m_tempfiles.RemoveAll();
+		m_tempfiles.clear();
 	}
 }
 
@@ -77,7 +72,7 @@ bool CFontInstaller::InstallFontMemory(const void* pData, UINT len)
 	DWORD nFonts = 0;
 	HANDLE hFont = pAddFontMemResourceEx((PVOID)pData, len, nullptr, &nFonts);
 	if (hFont && nFonts > 0) {
-		m_fonts.AddTail(hFont);
+		m_fonts.push_back(hFont);
 	}
 	return hFont && nFonts > 0;
 }
@@ -85,7 +80,7 @@ bool CFontInstaller::InstallFontMemory(const void* pData, UINT len)
 bool CFontInstaller::InstallFontFile(LPCWSTR filename)
 {
 	if (pAddFontResourceEx && pAddFontResourceEx(filename, FR_PRIVATE, 0) > 0) {
-		m_files.AddTail(filename);
+		m_files.push_back(filename);
 		return true;
 	}
 
@@ -109,7 +104,7 @@ bool CFontInstaller::InstallFontTempFile(const void* pData, UINT len)
 		f.Close();
 
 		if (pAddFontResourceEx(fn, FR_PRIVATE, 0) > 0) {
-			m_tempfiles.AddTail(fn);
+			m_tempfiles.push_back(fn);
 			return true;
 		}
 	}
