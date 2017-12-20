@@ -397,7 +397,7 @@ BOOL COpenFileDlg::OnIncludeItem(OFNOTIFYEX* pOFNEx, LRESULT* pResult)
 {
 	WCHAR buff[MAX_PATH];
 
-	if (!SHGetPathFromIDList((PCIDLIST_ABSOLUTE)pOFNEx->pidl, buff)) {
+	if (!SHGetPathFromIDListW((PCIDLIST_ABSOLUTE)pOFNEx->pidl, buff)) {
 		STRRET s;
 		HRESULT hr = ((IShellFolder*)pOFNEx->psf)->GetDisplayNameOf((PCUITEMID_CHILD)pOFNEx->pidl, SHGDN_NORMAL|SHGDN_FORPARSING, &s);
 

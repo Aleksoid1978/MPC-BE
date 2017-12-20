@@ -170,7 +170,7 @@ HICON LoadIcon(CString fn, bool fSmall)
 	SHFILEINFO sfi;
 	ZeroMemory(&sfi, sizeof(sfi));
 
-	if (SUCCEEDED(SHGetFileInfo(buff, 0, &sfi, sizeof(sfi), (fSmall ? SHGFI_SMALLICON : SHGFI_LARGEICON) |SHGFI_ICON)) && sfi.hIcon) {
+	if (SUCCEEDED(SHGetFileInfoW(buff, 0, &sfi, sizeof(sfi), (fSmall ? SHGFI_SMALLICON : SHGFI_LARGEICON) |SHGFI_ICON)) && sfi.hIcon) {
 		return sfi.hIcon;
 	}
 

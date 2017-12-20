@@ -28,7 +28,7 @@ static const CString GetLogFileName()
 	CString ret = L"mpc-be.log";
 
 	TCHAR szPath[MAX_PATH] = {};
-	if(SUCCEEDED(SHGetFolderPath(nullptr, CSIDL_DESKTOP, nullptr, 0, szPath))) {
+	if(SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_DESKTOP, nullptr, 0, szPath))) {
 		ret = CString(szPath) + L"\\mpc-be.log";
 	}
 
