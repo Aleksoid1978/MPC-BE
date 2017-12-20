@@ -32,7 +32,7 @@ HINSTANCE GetD3dcompilerDll()
 	if (s_hD3dcompilerDll == nullptr) {
 		// try an absolute path (needed when running the debug version outside of Visual Studio)
 		CString path;
-		SHGetFolderPath(nullptr, CSIDL_PROGRAM_FILESX86, nullptr, 0, path.GetBuffer(MAX_PATH));
+		SHGetFolderPathW(nullptr, CSIDL_PROGRAM_FILESX86, nullptr, 0, path.GetBuffer(MAX_PATH));
 		path.ReleaseBuffer();
 	#ifdef _WIN64
 		path.Append(L"\\Windows Kits\\8.1\\bin\\x64\\d3dcompiler_47.dll");
