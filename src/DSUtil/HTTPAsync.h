@@ -73,8 +73,8 @@ public:
 
 	void Close();
 
-	HRESULT Connect(LPCTSTR lpszURL, DWORD dwTimeOut = INFINITE, LPCTSTR lpszAgent = L"MPC-BE", LPCTSTR lpszCustomHeader = L"", BOOL bSendRequest = TRUE);
-	HRESULT SendRequest(LPCTSTR lpszCustomHeader = L"", DWORD dwTimeOut = INFINITE);
+	HRESULT Connect(LPCWSTR lpszURL, DWORD dwTimeOut = INFINITE, LPCWSTR lpszAgent = L"MPC-BE", LPCWSTR lpszCustomHeader = L"", BOOL bSendRequest = TRUE);
+	HRESULT SendRequest(LPCWSTR lpszCustomHeader = L"", DWORD dwTimeOut = INFINITE);
 	HRESULT Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut = INFINITE);
 
 	CString GetHeader() const;

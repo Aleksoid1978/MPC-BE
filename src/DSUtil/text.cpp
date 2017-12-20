@@ -142,7 +142,7 @@ CString ExtractTag(CString tag, CMapStringToString& attribs, bool& fClosing)
 		for (i = 0; i < tag.GetLength() && _istspace(tag[i]); i++) {
 			;
 		}
-		tag = i < tag.GetLength() ? tag.Mid(i) : _T("");
+		tag = i < tag.GetLength() ? tag.Mid(i) : L"";
 		if (!tag.IsEmpty() && tag[0] == '\"') {
 			tag = tag.Mid(1);
 			i = tag.Find('\"');
@@ -156,7 +156,7 @@ CString ExtractTag(CString tag, CMapStringToString& attribs, bool& fClosing)
 		if (!param.IsEmpty()) {
 			attribs[attrib] = param;
 		}
-		tag = i+1 < tag.GetLength() ? tag.Mid(i+1) : _T("");
+		tag = i+1 < tag.GetLength() ? tag.Mid(i+1) : L"";
 	}
 
 	return type;
@@ -193,7 +193,7 @@ CAtlList<CString>& MakeUpper(CAtlList<CString>& sl)
 	return sl;
 }
 
-void FixFilename(CString& str)
+void FixFilename(CStringW& str)
 {
 	str.Trim();
 
@@ -216,15 +216,15 @@ void FixFilename(CString& str)
 	// not support the following file names: "con", "con.txt" "con.name.txt". But supported "name.con" and "name.con.txt".
 	if (str.GetLength() == 3 || str.Find('.') == 3) {
 		tmp = str.Left(3).MakeUpper();
-		if (tmp == _T("CON") || tmp == _T("AUX") || tmp == _T("PRN") || tmp == _T("NUL")) {
-			str = _T("___") + str.Mid(3);
+		if (tmp == L"CON" || tmp == L"AUX" || tmp == L"PRN" || tmp == L"NUL") {
+			str = L"___" + str.Mid(3);
 		}
 	}
 	if (str.GetLength() == 4 || str.Find('.') == 4) {
 		tmp = str.Left(4).MakeUpper();
-		if (tmp == _T("COM1") || tmp == _T("COM2") || tmp == _T("COM3") || tmp == _T("COM4") ||
-				tmp == _T("LPT1") || tmp == _T("LPT2") || tmp == _T("LPT3")) {
-			str = _T("____") + str.Mid(4);
+		if (tmp == L"COM1" || tmp == L"COM2" || tmp == L"COM3" || tmp == L"COM4" ||
+				tmp == L"LPT1" || tmp == L"LPT2" || tmp == L"LPT3") {
+			str = L"____" + str.Mid(4);
 		}
 	}
 }
@@ -233,14 +233,14 @@ CString FormatNumber(CString szNumber, bool bNoFractionalDigits /*= true*/)
 {
 	CString ret;
 
-	int nChars = GetNumberFormat(LOCALE_USER_DEFAULT, 0, szNumber, nullptr, nullptr, 0);
-	GetNumberFormat(LOCALE_USER_DEFAULT, 0, szNumber, nullptr, ret.GetBuffer(nChars), nChars);
+	int nChars = GetNumberFormatW(LOCALE_USER_DEFAULT, 0, szNumber, nullptr, nullptr, 0);
+	GetNumberFormatW(LOCALE_USER_DEFAULT, 0, szNumber, nullptr, ret.GetBuffer(nChars), nChars);
 	ret.ReleaseBuffer();
 
 	if (bNoFractionalDigits) {
-		TCHAR szNumberFractionalDigits[2] = {0};
-		GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_IDIGITS, szNumberFractionalDigits, _countof(szNumberFractionalDigits));
-		int nNumberFractionalDigits = _tcstol(szNumberFractionalDigits, nullptr, 10);
+		WCHAR szNumberFractionalDigits[2] = {0};
+		GetLocaleInfoW(LOCALE_USER_DEFAULT, LOCALE_IDIGITS, szNumberFractionalDigits, _countof(szNumberFractionalDigits));
+		int nNumberFractionalDigits = wcstol(szNumberFractionalDigits, nullptr, 10);
 		if (nNumberFractionalDigits) {
 			ret.Truncate(ret.GetLength() - nNumberFractionalDigits - 1);
 		}

@@ -230,9 +230,9 @@ bool IsAudioWaveRenderer(IBaseFilter* pBF)
 			// external
 			clsid == CLSID_ReClock ||
 			clsid == CLSID_SanearAudioRenderer ||
-			clsid == GUIDFromCString(_T("{EC9ED6FC-7B03-4cb6-8C01-4EABE109F26B")) ||  // MediaPortal Audio Renderer
-			clsid == GUIDFromCString(_T("{50063380-2B2F-4855-9A1E-40FCA344C7AC}")) || // Surodev ASIO Renderer
-			clsid == GUIDFromCString(_T("{8DE31E85-10FC-4088-8861-E0EC8E70744A}"))    // MultiChannel ASIO Renderer
+			clsid == GUIDFromCString(L"{EC9ED6FC-7B03-4cb6-8C01-4EABE109F26B}") ||  // MediaPortal Audio Renderer
+			clsid == GUIDFromCString(L"{50063380-2B2F-4855-9A1E-40FCA344C7AC}") || // Surodev ASIO Renderer
+			clsid == GUIDFromCString(L"{8DE31E85-10FC-4088-8861-E0EC8E70744A}")    // MultiChannel ASIO Renderer
 	);
 }
 
@@ -484,7 +484,7 @@ IPin* AppendFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB)
 		}
 
 		CComVariant var;
-		if (FAILED(pPB->Read(CComBSTR(_T("FriendlyName")), &var, nullptr))) {
+		if (FAILED(pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr))) {
 			break;
 		}
 
@@ -579,7 +579,7 @@ IPin* InsertFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB)
 		}
 
 		CComVariant var;
-		if (FAILED(pPB->Read(CComBSTR(_T("FriendlyName")), &var, nullptr))) {
+		if (FAILED(pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr))) {
 			break;
 		}
 
@@ -671,7 +671,7 @@ void ExtractMediaTypes(IPin* pPin, CAtlList<CMediaType>& mts)
 int Eval_Exception(int n_except)
 {
 	if (n_except == STATUS_ACCESS_VIOLATION) {
-		AfxMessageBox(_T("The property page of this filter has just caused a\nmemory access violation. The application will gently die now :)"));
+		AfxMessageBox(L"The property page of this filter has just caused a\nmemory access violation. The application will gently die now :)");
 	}
 
 	return EXCEPTION_CONTINUE_SEARCH;
@@ -757,10 +757,10 @@ CLSID GetCLSID(IPin* pPin)
 	return GetCLSID(GetFilterFromPin(pPin));
 }
 
-bool IsCLSIDRegistered(LPCTSTR clsid)
+bool IsCLSIDRegistered(LPCWSTR clsid)
 {
-	CString rootkey1(_T("CLSID\\"));
-	CString rootkey2(_T("CLSID\\{083863F1-70DE-11d0-BD40-00A0C911CE86}\\Instance\\"));
+	CString rootkey1(L"CLSID\\");
+	CString rootkey2(L"CLSID\\{083863F1-70DE-11d0-BD40-00A0C911CE86}\\Instance\\");
 
 	return ERROR_SUCCESS == CRegKey().Open(HKEY_CLASSES_ROOT, rootkey1 + clsid, KEY_READ)
 		   || ERROR_SUCCESS == CRegKey().Open(HKEY_CLASSES_ROOT, rootkey2 + clsid, KEY_READ);
@@ -789,7 +789,7 @@ void CStringToBin(CString str, CAtlArray<BYTE>& data)
 
 	str.MakeUpper();
 	for (int i = 0, j = str.GetLength(); i < j; i++) {
-		TCHAR c = str[i];
+		WCHAR c = str[i];
 		if (c >= '0' && c <= '9') {
 			if (!(i&1)) {
 				b = ((char(c-'0')<<4)&0xf0)|(b&0x0f);
@@ -816,13 +816,13 @@ void CStringToBin(CString str, CAtlArray<BYTE>& data)
 CString BinToCString(const BYTE* ptr, size_t len)
 {
 	CString ret;
-	TCHAR high, low;
+	WCHAR high, low;
 
 	while (len-- > 0) {
 		high = (*ptr>>4) >= 10 ? (*ptr>>4)-10 + 'A' : (*ptr>>4) + '0';
 		low = (*ptr&0xf) >= 10 ? (*ptr&0xf)-10 + 'A' : (*ptr&0xf) + '0';
 
-		ret.AppendFormat(_T("%c%c"), high, low);
+		ret.AppendFormat(L"%c%c", high, low);
 
 		ptr++;
 	}
@@ -837,51 +837,51 @@ static void FindFiles(CString fn, std::list<CString>& files)
 	path = path.Left(path.ReverseFind('\\')+1);
 
 	WIN32_FIND_DATA findData;
-	HANDLE h = FindFirstFile(fn, &findData);
+	HANDLE h = FindFirstFileW(fn, &findData);
 	if (h != INVALID_HANDLE_VALUE) {
 		do {
 			files.push_back(path + findData.cFileName);
-		} while (FindNextFile(h, &findData));
+		} while (FindNextFileW(h, &findData));
 
 		FindClose(h);
 	}
 }
 
-cdrom_t GetCDROMType(TCHAR drive, std::list<CString>& files)
+cdrom_t GetCDROMType(WCHAR drive, std::list<CString>& files)
 {
 	files.clear();
 
 	CString path;
-	path.Format(_T("%c:"), drive);
+	path.Format(L"%c:", drive);
 
-	if (GetDriveType(path + _T("\\")) == DRIVE_CDROM) {
+	if (GetDriveTypeW(path + L"\\") == DRIVE_CDROM) {
 		// CDROM_DVDVideo
-		FindFiles(path + _T("\\VIDEO_TS\\video_ts.ifo"), files);
+		FindFiles(path + L"\\VIDEO_TS\\video_ts.ifo", files);
 		if (files.size() > 0) {
 			return CDROM_DVDVideo;
 		}
 
         // CDROM_BD
-        FindFiles(path + _T("\\BDMV\\index.bdmv"), files);
+        FindFiles(path + L"\\BDMV\\index.bdmv", files);
         if (!files.empty()) {
             return CDROM_BDVideo;
         }
 
 		// CDROM_VideoCD
-		FindFiles(path + _T("\\mpegav\\avseq??.dat"),	files);
-		FindFiles(path + _T("\\mpegav\\avseq??.mpg"),	files);
-		FindFiles(path + _T("\\mpeg2\\avseq??.dat"),	files);
-		FindFiles(path + _T("\\mpeg2\\avseq??.mpg"),	files);
-		FindFiles(path + _T("\\mpegav\\music??.dat"),	files);
-		FindFiles(path + _T("\\mpegav\\music??.mpg"),	files);
-		FindFiles(path + _T("\\mpeg2\\music??.dat"),	files);
-		FindFiles(path + _T("\\mpeg2\\music??.mpg"),	files);
+		FindFiles(path + L"\\mpegav\\avseq??.dat", files);
+		FindFiles(path + L"\\mpegav\\avseq??.mpg", files);
+		FindFiles(path + L"\\mpeg2\\avseq??.dat",  files);
+		FindFiles(path + L"\\mpeg2\\avseq??.mpg",  files);
+		FindFiles(path + L"\\mpegav\\music??.dat", files);
+		FindFiles(path + L"\\mpegav\\music??.mpg", files);
+		FindFiles(path + L"\\mpeg2\\music??.dat",  files);
+		FindFiles(path + L"\\mpeg2\\music??.mpg",  files);
 		if (files.size() > 0) {
 			return CDROM_VideoCD;
 		}
 
 		// CDROM_Audio
-		HANDLE hDrive = CreateFile(CString(_T("\\\\.\\")) + path, GENERIC_READ, FILE_SHARE_READ, nullptr,
+		HANDLE hDrive = CreateFileW(CString(L"\\\\.\\") + path, GENERIC_READ, FILE_SHARE_READ, nullptr,
 								   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, (HANDLE)nullptr);
 		if (hDrive != INVALID_HANDLE_VALUE) {
 			DWORD BytesReturned;
@@ -892,7 +892,7 @@ cdrom_t GetCDROMType(TCHAR drive, std::list<CString>& files)
 					TOC.TrackData[i-1].Control &= 5;
 					if (TOC.TrackData[i-1].Control == 0 || TOC.TrackData[i-1].Control == 1) {
 						CString fn;
-						fn.Format(_T("%s\\track%02d.cda"), path, i);
+						fn.Format(L"%s\\track%02d.cda", path, i);
 						files.push_back(fn);
 					}
 				}
@@ -911,15 +911,15 @@ cdrom_t GetCDROMType(TCHAR drive, std::list<CString>& files)
 	return CDROM_NotFound;
 }
 
-CString GetDriveLabel(TCHAR drive)
+CString GetDriveLabel(WCHAR drive)
 {
 	CString label;
 
 	CString path;
-	path.Format(_T("%c:\\"), drive);
-	TCHAR VolumeNameBuffer[MAX_PATH], FileSystemNameBuffer[MAX_PATH];
+	path.Format(L"%c:\\", drive);
+	WCHAR VolumeNameBuffer[MAX_PATH], FileSystemNameBuffer[MAX_PATH];
 	DWORD VolumeSerialNumber, MaximumComponentLength, FileSystemFlags;
-	if (GetVolumeInformation(path,
+	if (GetVolumeInformationW(path,
 							 VolumeNameBuffer, MAX_PATH, &VolumeSerialNumber, &MaximumComponentLength,
 							 &FileSystemFlags, FileSystemNameBuffer, MAX_PATH)) {
 		label = VolumeNameBuffer;
@@ -1249,7 +1249,7 @@ bool CreateFilter(CString DisplayName, IBaseFilter** ppBF, CString& FriendlyName
 	CComPtr<IPropertyBag> pPB;
 	CComVariant var;
 	if (SUCCEEDED(pMoniker->BindToStorage(pBindCtx, 0, IID_IPropertyBag, (void**)&pPB))
-			&& SUCCEEDED(pPB->Read(CComBSTR(_T("FriendlyName")), &var, nullptr))) {
+			&& SUCCEEDED(pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr))) {
 		FriendlyName = var.bstrVal;
 	}
 
@@ -1311,7 +1311,7 @@ IBaseFilter* AppendFilter(IPin* pPin, IMoniker* pMoniker, IGraphBuilder* pGB)
 		}
 
 		CComVariant var;
-		if (FAILED(pPB->Read(CComBSTR(_T("FriendlyName")), &var, nullptr))) {
+		if (FAILED(pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr))) {
 			break;
 		}
 
@@ -1358,7 +1358,7 @@ CString GetFriendlyName(CString DisplayName)
 	CComPtr<IPropertyBag> pPB;
 	CComVariant var;
 	if (SUCCEEDED(pMoniker->BindToStorage(pBindCtx, 0, IID_IPropertyBag, (void**)&pPB))
-			&& SUCCEEDED(pPB->Read(CComBSTR(_T("FriendlyName")), &var, nullptr))) {
+			&& SUCCEEDED(pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr))) {
 		FriendlyName = var.bstrVal;
 	}
 
@@ -1373,7 +1373,7 @@ struct ExternalObject {
 
 static CAtlList<ExternalObject> s_extobjs;
 
-HRESULT LoadExternalObject(LPCTSTR path, REFCLSID clsid, REFIID iid, void** ppv)
+HRESULT LoadExternalObject(LPCWSTR path, REFCLSID clsid, REFIID iid, void** ppv)
 {
 	CheckPointer(ppv, E_POINTER);
 
@@ -1425,7 +1425,7 @@ HRESULT LoadExternalObject(LPCTSTR path, REFCLSID clsid, REFIID iid, void** ppv)
 	return hr;
 }
 
-HRESULT LoadExternalFilter(LPCTSTR path, REFCLSID clsid, IBaseFilter** ppBF)
+HRESULT LoadExternalFilter(LPCWSTR path, REFCLSID clsid, IBaseFilter** ppBF)
 {
 	return LoadExternalObject(path, clsid, __uuidof(IBaseFilter), (void**)ppBF);
 }
@@ -1458,19 +1458,19 @@ void UnloadExternalObjects()
 	s_extobjs.RemoveAll();
 }
 
-CString MakeFullPath(LPCTSTR path)
+CString MakeFullPath(LPCWSTR path)
 {
 	CString full(path);
 	full.Replace('/', '\\');
 
 	CString fn;
-	fn.ReleaseBuffer(GetModuleFileName(AfxGetInstanceHandle(), fn.GetBuffer(MAX_PATH), MAX_PATH));
+	fn.ReleaseBuffer(GetModuleFileNameW(AfxGetInstanceHandle(), fn.GetBuffer(MAX_PATH), MAX_PATH));
 	CPath p(fn);
 
 	if (full.GetLength() >= 2 && full[0] == '\\' && full[1] != '\\') {
 		p.StripToRoot();
 		full = CString(p) + full.Mid(1);
-	} else if (full.Find(_T(":\\")) < 0) {
+	} else if (full.Find(L":\\") < 0) {
 		p.RemoveFileSpec();
 		p.AddBackslash();
 		full = CString(p) + full;
@@ -2283,7 +2283,7 @@ CString ISO6392To6391(LPCSTR code)
 	return L"";
 }
 
-CString LanguageToISO6392(LPCTSTR lang)
+CString LanguageToISO6392(LPCWSTR lang)
 {
 	CString str = lang;
 	str.MakeLower();
@@ -2401,7 +2401,7 @@ bool SetRegKeyValue(LPCWSTR pszKey, LPCWSTR pszSubkey, LPCWSTR pszValueName, LPC
 
 	CString szKey(pszKey);
 	if (pszSubkey != 0) {
-		szKey += CString(_T("\\")) + pszSubkey;
+		szKey += CString(L"\\") + pszSubkey;
 	}
 
 	HKEY hKey;
@@ -2545,7 +2545,7 @@ CString ReftimeToString(const REFERENCE_TIME& rtVal)
 	int			lSecond   = (llTotalMs /  1000) % 60;
 	int			lMillisec = llTotalMs  %  1000;
 
-	strTemp.Format(_T("%02d:%02d:%02d,%03d"), lHour, lMinute, lSecond, lMillisec);
+	strTemp.Format(L"%02d:%02d:%02d,%03d", lHour, lMinute, lSecond, lMillisec);
 	return strTemp;
 }
 
@@ -2562,7 +2562,7 @@ CString ReftimeToString2(const REFERENCE_TIME& rtVal)
 	int			lMinute = (int)(seconds / 60 % 60);
 	int			lSecond = (int)(seconds % 60);
 
-	strTemp.Format(_T("%02d:%02d:%02d"), lHour, lMinute, lSecond);
+	strTemp.Format(L"%02d:%02d:%02d", lHour, lMinute, lSecond);
 	return strTemp;
 }
 
@@ -2570,14 +2570,14 @@ CString DVDtimeToString(const DVD_HMSF_TIMECODE& rtVal, bool bAlwaysShowHours)
 {
 	CString	strTemp;
 	if (rtVal.bHours > 0 || bAlwaysShowHours) {
-		strTemp.Format(_T("%02d:%02d:%02d"), rtVal.bHours, rtVal.bMinutes, rtVal.bSeconds);
+		strTemp.Format(L"%02d:%02d:%02d", rtVal.bHours, rtVal.bMinutes, rtVal.bSeconds);
 	} else {
-		strTemp.Format(_T("%02d:%02d"), rtVal.bMinutes, rtVal.bSeconds);
+		strTemp.Format(L"%02d:%02d", rtVal.bMinutes, rtVal.bSeconds);
 	}
 	return strTemp;
 }
 
-REFERENCE_TIME StringToReftime(LPCTSTR strVal)
+REFERENCE_TIME StringToReftime(LPCWSTR strVal)
 {
 	REFERENCE_TIME	rt			= 0;
 	int				lHour		= 0;
@@ -2585,22 +2585,22 @@ REFERENCE_TIME StringToReftime(LPCTSTR strVal)
 	int				lSecond		= 0;
 	int				lMillisec	= 0;
 
-	if (_stscanf_s(strVal, _T("%02d:%02d:%02d.%03d"), &lHour, &lMinute, &lSecond, &lMillisec) == 4
-			|| _stscanf_s(strVal, _T("%02d:%02d:%02d,%03d"), &lHour, &lMinute, &lSecond, &lMillisec) == 4) {
+	if (swscanf_s(strVal, L"%02d:%02d:%02d.%03d", &lHour, &lMinute, &lSecond, &lMillisec) == 4
+			|| swscanf_s(strVal, L"%02d:%02d:%02d,%03d", &lHour, &lMinute, &lSecond, &lMillisec) == 4) {
 		rt = ((((lHour * 60) + lMinute) * 60 + lSecond) * MILLISECONDS + lMillisec) * (UNITS/MILLISECONDS);
 	}
 
 	return rt;
 }
 
-REFERENCE_TIME StringToReftime2(LPCTSTR strVal)
+REFERENCE_TIME StringToReftime2(LPCWSTR strVal)
 {
 	REFERENCE_TIME	rt			= 0;
 	int				lHour		= 0;
 	int				lMinute		= 0;
 	int				lSecond		= 0;
 
-	if (_stscanf_s (strVal, _T("%02d:%02d:%02d"), &lHour, &lMinute, &lSecond) == 3) {
+	if (swscanf_s (strVal, L"%02d:%02d:%02d", &lHour, &lMinute, &lSecond) == 3) {
 		rt = (((lHour * 60) + lMinute) * 60 + lSecond) * UNITS;
 	}
 

@@ -27,7 +27,7 @@ static const CString GetLogFileName()
 {
 	CString ret = L"mpc-be.log";
 
-	TCHAR szPath[MAX_PATH] = {};
+	WCHAR szPath[MAX_PATH] = {};
 	if(SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_DESKTOP, nullptr, 0, szPath))) {
 		ret = CString(szPath) + L"\\mpc-be.log";
 	}
@@ -52,7 +52,7 @@ namespace Logger
 
 	static const CString logFileName = GetLogFileName();
 
-	inline void Log2File(LPCTSTR fmt, ...)
+	inline void Log2File(LPCWSTR fmt, ...)
 	{
 		std::unique_lock<std::mutex> lock(log_mutex);
 		FILE* f = nullptr;
@@ -61,7 +61,7 @@ namespace Logger
 			va_list args;
 			va_start(args, fmt);
 			size_t len = _vscwprintf(fmt, args) + 1;
-			TCHAR* buff = DNew TCHAR[len];
+			WCHAR* buff = DNew WCHAR[len];
 			vswprintf_s(buff, len, fmt, args);
 
 			fwprintf_s(f, L"%s : %s\n", GetLocalTime(), buff);

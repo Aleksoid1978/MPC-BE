@@ -1,5 +1,5 @@
 /*
- * (C) 2016 see Authors.txt
+ * (C) 2016-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,14 +22,14 @@
 
 extern CString ResStr(UINT nID);
 
-extern void SetCursor(HWND m_hWnd, LPCTSTR lpCursorName);
-extern void SetCursor(HWND m_hWnd, UINT nID, LPCTSTR lpCursorName);
+extern void SetCursor(HWND m_hWnd, LPCWSTR lpCursorName);
+extern void SetCursor(HWND m_hWnd, UINT nID, LPCWSTR lpCursorName);
 
 extern void CorrectComboListWidth(CComboBox& ComboBox);
 extern void CorrectCWndWidth(CWnd* pWnd);
 
-extern inline void AddStringData(CComboBox& ComboBox, LPCTSTR str, DWORD_PTR data);
-extern inline void AddStringData(CListBox& ListBox, LPCTSTR str, DWORD_PTR data);
+extern inline void AddStringData(CComboBox& ComboBox, LPCWSTR str, DWORD_PTR data);
+extern inline void AddStringData(CListBox& ListBox, LPCWSTR str, DWORD_PTR data);
 extern inline DWORD_PTR GetCurItemData(CComboBox& ComboBox);
 extern inline DWORD_PTR GetCurItemData(CListBox& ListBox);
 extern void SelectByItemData(CComboBox& ComboBox, DWORD_PTR data);

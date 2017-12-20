@@ -302,9 +302,9 @@ HRESULT CHdmvClipInfo::ReadCpiInfo(SyncPoints& sps)
 
 #define CheckVer() (!(memcmp(Buff, "0300", 4)) || (!memcmp(Buff, "0200", 4)) || (!memcmp(Buff, "0100", 4)))
 
-HRESULT CHdmvClipInfo::ReadInfo(LPCTSTR strFile, SyncPoints* sps/* = nullprt*/)
+HRESULT CHdmvClipInfo::ReadInfo(LPCWSTR strFile, SyncPoints* sps/* = nullprt*/)
 {
-	m_hFile = CreateFile(strFile, GENERIC_READ, dwShareMode, nullptr,
+	m_hFile = CreateFileW(strFile, GENERIC_READ, dwShareMode, nullptr,
 						 OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
 	if (m_hFile != INVALID_HANDLE_VALUE) {
 		BYTE Buff[4] = { 0 };
@@ -546,7 +546,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 	Path.RemoveFileSpec();
 	Path.RemoveFileSpec();
 
-	m_hFile = CreateFile(strPlaylistFile, GENERIC_READ, dwShareMode, nullptr,
+	m_hFile = CreateFileW(strPlaylistFile, GENERIC_READ, dwShareMode, nullptr,
 						 OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
 	if (m_hFile != INVALID_HANDLE_VALUE) {
 		bool bDuplicate = false;
@@ -732,7 +732,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 
 			if (bFullInfoRead) {
 				LARGE_INTEGER size = {0, 0};
-				HANDLE hFile = CreateFile(Item.m_strFileName, GENERIC_READ, dwShareMode, nullptr,
+				HANDLE hFile = CreateFileW(Item.m_strFileName, GENERIC_READ, dwShareMode, nullptr,
 										  OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
 				if (hFile != INVALID_HANDLE_VALUE) {
 					GetFileSizeEx(hFile, &size);
@@ -896,7 +896,7 @@ HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CPlaylist& Playlist
 	Path.RemoveFileSpec();
 	Path.RemoveFileSpec();
 
-	m_hFile = CreateFile(strPlaylistFile, GENERIC_READ, dwShareMode, nullptr,
+	m_hFile = CreateFileW(strPlaylistFile, GENERIC_READ, dwShareMode, nullptr,
 						 OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
 	if (m_hFile != INVALID_HANDLE_VALUE) {
 		BYTE Buff[4] = { 0 };
@@ -954,7 +954,7 @@ HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CPlaylist& Playlist
 
 #define MIN_LIMIT 3
 
-HRESULT CHdmvClipInfo::FindMainMovie(LPCTSTR strFolder, CString& strPlaylistFile, CPlaylist& MainPlaylist, CPlaylist& Playlists)
+HRESULT CHdmvClipInfo::FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile, CPlaylist& MainPlaylist, CPlaylist& Playlists)
 {
 	HRESULT hr = E_FAIL;
 	CString strPath(strFolder);
@@ -963,7 +963,7 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCTSTR strFolder, CString& strPlaylistFile
 	Playlists.clear();
 
 	WIN32_FIND_DATA fd = {0};
-	HANDLE hFind = FindFirstFile(strPath + L"\\PLAYLIST\\*.mpls", &fd);
+	HANDLE hFind = FindFirstFileW(strPath + L"\\PLAYLIST\\*.mpls", &fd);
 	if (hFind != INVALID_HANDLE_VALUE) {
 		CPlaylist              Playlist;
 		std::vector<CPlaylist> PlaylistArray;
@@ -1015,7 +1015,7 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCTSTR strFolder, CString& strPlaylistFile
 					PlaylistArray.emplace_back(Playlist);
 				}
 			}
-		} while (FindNextFile(hFind, &fd));
+		} while (FindNextFileW(hFind, &fd));
 
 		FindClose(hFind);
 	}

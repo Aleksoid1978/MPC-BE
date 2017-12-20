@@ -271,7 +271,7 @@ STDMETHODIMP CNullVideoRendererInputPin::GetVideoWindow(HWND *phwndVideo)
 // CNullRenderer
 //
 
-CNullRenderer::CNullRenderer(REFCLSID clsid, TCHAR* pName, LPUNKNOWN pUnk, HRESULT* phr)
+CNullRenderer::CNullRenderer(REFCLSID clsid, WCHAR* pName, LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseRenderer(clsid, pName, pUnk, phr)
 {
 }
