@@ -177,7 +177,7 @@ void CID3Tag::ReadTag(DWORD tag, CGolombBuffer& gbData, DWORD &size, CID3TagItem
 	size--;
 
 	if (tag == 'APIC' || tag == '\0PIC') {
-		TCHAR mime[64];
+		WCHAR mime[64];
 		memset(&mime, 0 ,64);
 
 		int mime_len = 0;
@@ -437,44 +437,44 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 	return TagItems.GetCount() ? TRUE : FALSE;
 }
 
-static const LPCTSTR s_genre[] = {
-	_T("Blues"), _T("Classic Rock"), _T("Country"), _T("Dance"),
-	_T("Disco"), _T("Funk"), _T("Grunge"), _T("Hip-Hop"),
-	_T("Jazz"), _T("Metal"), _T("New Age"), _T("Oldies"),
-	_T("Other"), _T("Pop"), _T("R&B"), _T("Rap"),
-	_T("Reggae"), _T("Rock"), _T("Techno"), _T("Industrial"),
-	_T("Alternative"), _T("Ska"), _T("Death Metal"), _T("Pranks"),
-	_T("Soundtrack"), _T("Euro-Techno"), _T("Ambient"), _T("Trip-Hop"),
-	_T("Vocal"), _T("Jazz+Funk"), _T("Fusion"), _T("Trance"),
-	_T("Classical"), _T("Instrumental"), _T("Acid"), _T("House"),
-	_T("Game"), _T("Sound Clip"), _T("Gospel"), _T("Noise"),
-	_T("Alternative Rock"), _T("Bass"), _T("Soul"), _T("Punk"),
-	_T("Space"), _T("Meditative"), _T("Instrumental Pop"), _T("Instrumental Rock"),
-	_T("Ethnic"), _T("Gothic"), _T("Darkwave"), _T("Techno-Industrial"),
-	_T("Electronic"), _T("Pop-Folk"), _T("Eurodance"), _T("Dream"),
-	_T("Southern Rock"), _T("Comedy"), _T("Cult"), _T("Gangsta"),
-	_T("Top 40"), _T("Christian Rap"), _T("Pop/Funk"), _T("Jungle"),
-	_T("Native US"), _T("Cabaret"), _T("New Wave"), _T("Psychadelic"),
-	_T("Rave"), _T("Showtunes"), _T("Trailer"), _T("Lo-Fi"),
-	_T("Tribal"), _T("Acid Punk"), _T("Acid Jazz"), _T("Polka"),
-	_T("Retro"), _T("Musical"), _T("Rock & Roll"), _T("Hard Rock"),
-	_T("Folk"), _T("Folk-Rock"), _T("National Folk"), _T("Swing"),
-	_T("Fast Fusion"), _T("Bebob"), _T("Latin"), _T("Revival"),
-	_T("Celtic"), _T("Bluegrass"), _T("Avantgarde"), _T("Gothic Rock"),
-	_T("Progressive Rock"), _T("Psychedelic Rock"), _T("Symphonic Rock"), _T("Slow Rock"),
-	_T("Big Band"), _T("Chorus"), _T("Easy Listening"), _T("Acoustic"),
-	_T("Humour"), _T("Speech"), _T("Chanson"), _T("Opera"),
-	_T("Chamber Music"), _T("Sonata"), _T("Symphony"), _T("Booty Bass"),
-	_T("Primus"), _T("Porn Groove"), _T("Satire"), _T("Slow Jam"),
-	_T("Club"), _T("Tango"), _T("Samba"), _T("Folklore"),
-	_T("Ballad"), _T("Power Ballad"), _T("Rhytmic Soul"), _T("Freestyle"),
-	_T("Duet"), _T("Punk Rock"), _T("Drum Solo"), _T("Acapella"),
-	_T("Euro-House"), _T("Dance Hall"), _T("Goa"), _T("Drum & Bass"),
-	_T("Club-House"), _T("Hardcore"), _T("Terror"), _T("Indie"),
-	_T("BritPop"), _T("Negerpunk"), _T("Polsk Punk"), _T("Beat"),
-	_T("Christian Gangsta"), _T("Heavy Metal"), _T("Black Metal"),
-	_T("Crossover"), _T("Contemporary C"), _T("Christian Rock"), _T("Merengue"), _T("Salsa"),
-	_T("Thrash Metal"), _T("Anime"), _T("JPop"), _T("SynthPop"),
+static const LPCSTR s_genre[] = {
+	"Blues", "Classic Rock", "Country", "Dance",
+	"Disco", "Funk", "Grunge", "Hip-Hop",
+	"Jazz", "Metal", "New Age", "Oldies",
+	"Other", "Pop", "R&B", "Rap",
+	"Reggae", "Rock", "Techno", "Industrial",
+	"Alternative", "Ska", "Death Metal", "Pranks",
+	"Soundtrack", "Euro-Techno", "Ambient", "Trip-Hop",
+	"Vocal", "Jazz+Funk", "Fusion", "Trance",
+	"Classical", "Instrumental", "Acid", "House",
+	"Game", "Sound Clip", "Gospel", "Noise",
+	"Alternative Rock", "Bass", "Soul", "Punk",
+	"Space", "Meditative", "Instrumental Pop", "Instrumental Rock",
+	"Ethnic", "Gothic", "Darkwave", "Techno-Industrial",
+	"Electronic", "Pop-Folk", "Eurodance", "Dream",
+	"Southern Rock", "Comedy", "Cult", "Gangsta",
+	"Top 40", "Christian Rap", "Pop/Funk", "Jungle",
+	"Native US", "Cabaret", "New Wave", "Psychadelic",
+	"Rave", "Showtunes", "Trailer", "Lo-Fi",
+	"Tribal", "Acid Punk", "Acid Jazz", "Polka",
+	"Retro", "Musical", "Rock & Roll", "Hard Rock",
+	"Folk", "Folk-Rock", "National Folk", "Swing",
+	"Fast Fusion", "Bebob", "Latin", "Revival",
+	"Celtic", "Bluegrass", "Avantgarde", "Gothic Rock",
+	"Progressive Rock", "Psychedelic Rock", "Symphonic Rock", "Slow Rock",
+	"Big Band", "Chorus", "Easy Listening", "Acoustic",
+	"Humour", "Speech", "Chanson", "Opera",
+	"Chamber Music", "Sonata", "Symphony", "Booty Bass",
+	"Primus", "Porn Groove", "Satire", "Slow Jam",
+	"Club", "Tango", "Samba", "Folklore",
+	"Ballad", "Power Ballad", "Rhytmic Soul", "Freestyle",
+	"Duet", "Punk Rock", "Drum Solo", "Acapella",
+	"Euro-House", "Dance Hall", "Goa", "Drum & Bass",
+	"Club-House", "Hardcore", "Terror", "Indie",
+	"BritPop", "Negerpunk", "Polsk Punk", "Beat",
+	"Christian Gangsta", "Heavy Metal", "Black Metal",
+	"Crossover", "Contemporary C", "Christian Rock", "Merengue", "Salsa",
+	"Thrash Metal", "Anime", "JPop", "SynthPop",
 };
 
 BOOL CID3Tag::ReadTagsV1(BYTE *buf, size_t len)

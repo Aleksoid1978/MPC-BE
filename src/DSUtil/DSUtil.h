@@ -101,7 +101,7 @@ extern CLSID			GetCLSID(IPin* pPin);
 extern void				ShowPPage(CString DisplayName, HWND hParentWnd);
 extern void				ShowPPage(IUnknown* pUnknown, HWND hParentWnd);
 
-extern bool				IsCLSIDRegistered(LPCTSTR clsid);
+extern bool				IsCLSIDRegistered(LPCWSTR clsid);
 extern bool				IsCLSIDRegistered(const CLSID& clsid);
 
 extern void				CStringToBin(CString str, CAtlArray<BYTE>& data);
@@ -115,8 +115,8 @@ enum cdrom_t {
 	CDROM_BDVideo,
 	CDROM_Unknown
 };
-extern cdrom_t			GetCDROMType(TCHAR drive, std::list<CString>& files);
-extern CString			GetDriveLabel(TCHAR drive);
+extern cdrom_t			GetCDROMType(WCHAR drive, std::list<CString>& files);
+extern CString			GetDriveLabel(WCHAR drive);
 
 extern DVD_HMSF_TIMECODE	RT2HMSF(REFERENCE_TIME rt, double fps = 0); // use to remember the current position
 extern DVD_HMSF_TIMECODE	RT2HMS_r(REFERENCE_TIME rt);                // use only for information (for display on the screen)
@@ -124,19 +124,19 @@ extern REFERENCE_TIME		HMSF2RT(DVD_HMSF_TIMECODE hmsf, double fps = 0);
 extern CString				ReftimeToString(const REFERENCE_TIME& rtVal);
 extern CString				ReftimeToString2(const REFERENCE_TIME& rtVal);
 extern CString				DVDtimeToString(const DVD_HMSF_TIMECODE& rtVal, bool bAlwaysShowHours=false);
-extern REFERENCE_TIME		StringToReftime(LPCTSTR strVal);
-extern REFERENCE_TIME		StringToReftime2(LPCTSTR strVal);
+extern REFERENCE_TIME		StringToReftime(LPCWSTR strVal);
+extern REFERENCE_TIME		StringToReftime2(LPCWSTR strVal);
 
 extern void				memsetd(void* dst, unsigned int c, size_t nbytes);
 extern void				memsetw(void* dst, unsigned short c, size_t nbytes);
 
 extern CString			GetFriendlyName(CString DisplayName);
-extern HRESULT			LoadExternalObject(LPCTSTR path, REFCLSID clsid, REFIID iid, void** ppv);
-extern HRESULT			LoadExternalFilter(LPCTSTR path, REFCLSID clsid, IBaseFilter** ppBF);
+extern HRESULT			LoadExternalObject(LPCWSTR path, REFCLSID clsid, REFIID iid, void** ppv);
+extern HRESULT			LoadExternalFilter(LPCWSTR path, REFCLSID clsid, IBaseFilter** ppBF);
 extern HRESULT			LoadExternalPropertyPage(IPersist* pP, REFCLSID clsid, IPropertyPage** ppPP);
 extern void				UnloadExternalObjects();
 
-extern CString			MakeFullPath(LPCTSTR path);
+extern CString			MakeFullPath(LPCWSTR path);
 // simple file system path detector
 extern bool				IsLikelyFilePath(const CString &str);
 
@@ -158,7 +158,7 @@ extern LCID				ISO6391ToLcid(LPCSTR code);
 extern LCID				ISO6392ToLcid(LPCSTR code);
 extern CString			ISO6391To6392(LPCSTR code);
 extern CString			ISO6392To6391(LPCSTR code);
-extern CString			LanguageToISO6392(LPCTSTR lang);
+extern CString			LanguageToISO6392(LPCWSTR lang);
 
 extern bool				DeleteRegKey(LPCWSTR pszKey, LPCWSTR pszSubkey);
 extern bool				SetRegKeyValue(LPCWSTR pszKey, LPCWSTR pszSubkey, LPCWSTR pszValueName, LPCWSTR pszValue);

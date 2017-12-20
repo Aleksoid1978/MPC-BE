@@ -63,7 +63,7 @@ void CALLBACK CHTTPAsync::Callback(_In_ HINTERNET hInternet,
 						break;
 					case INTERNET_STATUS_REDIRECT:
 						{
-							CString strNewAddr = (LPCTSTR)lpvStatusInformation;
+							CString strNewAddr = (LPCWSTR)lpvStatusInformation;
 							UNREFERENCED_PARAMETER(strNewAddr);
 						}
 						break;
@@ -201,7 +201,7 @@ void CHTTPAsync::Close()
 	m_bRequestComplete = TRUE;
 }
 
-HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPCTSTR lpszAgent/* = L"MPC-BE"*/, LPCTSTR lpszCustomHeader/* = L""*/, BOOL bSendRequest/* = TRUE*/)
+HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPCWSTR lpszAgent/* = L"MPC-BE"*/, LPCWSTR lpszCustomHeader/* = L""*/, BOOL bSendRequest/* = TRUE*/)
 {
 	Close();
 
@@ -277,7 +277,7 @@ HRESULT CHTTPAsync::Connect(LPCTSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	return S_OK;
 }
 
-HRESULT CHTTPAsync::SendRequest(LPCTSTR lpszCustomHeader/* = L""*/, DWORD dwTimeOut/* = INFINITE*/)
+HRESULT CHTTPAsync::SendRequest(LPCWSTR lpszCustomHeader/* = L""*/, DWORD dwTimeOut/* = INFINITE*/)
 {
 	CheckPointer(m_hConnect, E_FAIL);
 

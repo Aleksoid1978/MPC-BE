@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,7 @@
 
 #include <atlcoll.h>
 
-static const TCHAR* MPEG2_Profile[]=
+static const WCHAR* MPEG2_Profile[]=
 {
 	L"4:2:2",
 	L"High Profile",
@@ -34,7 +34,7 @@ static const TCHAR* MPEG2_Profile[]=
 	L"7",
 };
 
-static const TCHAR* MPEG2_Level[]=
+static const WCHAR* MPEG2_Level[]=
 {
 	L"0",
 	L"1",

@@ -54,7 +54,7 @@ CMPCSocket::CMPCSocket()
 
 			m_sProxyServer = Explode(m_sProxyServer, sl, L':');
 			if (sl.GetCount() > 1) {
-				m_nProxyPort = _tcstol(sl.GetTail(), nullptr, 10);
+				m_nProxyPort = wcstol(sl.GetTail(), nullptr, 10);
 			}
 
 			m_bProxyEnable = (ProxyEnable && !m_sProxyServer.IsEmpty() && m_nProxyPort);

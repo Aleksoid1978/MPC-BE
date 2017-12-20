@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -81,7 +81,7 @@ T ExplodeMin(const T& str, CAtlList<T>& sl, SEP sep, size_t limit = 0)
 }
 
 template<class T, typename SEP>
-T ExplodeEsc(T str, CAtlList<T>& sl, SEP sep, size_t limit = 0, SEP esc = _T('\\'))
+T ExplodeEsc(T str, CAtlList<T>& sl, SEP sep, size_t limit = 0, SEP esc = '\\')
 {
 	sl.RemoveAll();
 
@@ -112,7 +112,7 @@ T ExplodeEsc(T str, CAtlList<T>& sl, SEP sep, size_t limit = 0, SEP esc = _T('\\
 }
 
 template<class T, typename SEP>
-T ExplodeEsc(T str,std::list<T>& sl, SEP sep, size_t limit = 0, SEP esc = _T('\\'))
+T ExplodeEsc(T str,std::list<T>& sl, SEP sep, size_t limit = 0, SEP esc = '\\')
 {
 	sl.clear();
 
@@ -171,7 +171,7 @@ T Implode(const std::list<T>& sl, SEP sep)
 }
 
 template<class T, typename SEP>
-T ImplodeEsc(const CAtlList<T>& sl, SEP sep, SEP esc = _T('\\'))
+T ImplodeEsc(const CAtlList<T>& sl, SEP sep, SEP esc = '\\')
 {
 	T ret;
 	T escsep = T(esc) + T(sep);
@@ -196,7 +196,7 @@ extern DWORD CharSetToCodePage(DWORD dwCharSet);
 extern CAtlList<CString>& MakeLower(CAtlList<CString>& sl);
 extern CAtlList<CString>& MakeUpper(CAtlList<CString>& sl);
 
-void FixFilename(CString& str);
+void FixFilename(CStringW& str);
 
 CString FormatNumber(CString szNumber, bool bNoFractionalDigits = true);
 

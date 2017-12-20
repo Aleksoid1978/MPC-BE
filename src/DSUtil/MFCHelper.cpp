@@ -1,5 +1,5 @@
 /*
- * (C) 2016 see Authors.txt
+ * (C) 2016-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,12 +31,12 @@ CString ResStr(UINT nID)
 	return id;
 }
 
-void SetCursor(HWND m_hWnd, LPCTSTR lpCursorName)
+void SetCursor(HWND m_hWnd, LPCWSTR lpCursorName)
 {
-	SetClassLongPtr(m_hWnd, GCLP_HCURSOR, (LONG_PTR)AfxGetApp()->LoadStandardCursor(lpCursorName));
+	SetClassLongPtrW(m_hWnd, GCLP_HCURSOR, (LONG_PTR)AfxGetApp()->LoadStandardCursor(lpCursorName));
 }
 
-void SetCursor(HWND m_hWnd, UINT nID, LPCTSTR lpCursorName)
+void SetCursor(HWND m_hWnd, UINT nID, LPCWSTR lpCursorName)
 {
 	SetCursor(::GetDlgItem(m_hWnd, nID), lpCursorName);
 }
@@ -56,7 +56,7 @@ void CorrectComboListWidth(CComboBox& ComboBox)
 	// Select the listbox font, save the old font
 	CFont* pOldFont = pDC->SelectObject(pFont);
 	// Get the text metrics for avg char width
-	pDC->GetTextMetrics(&tm);
+	pDC->GetTextMetricsW(&tm);
 
 	// Find the longest string in the combo box.
 	for (int i = 0; i < ComboBox.GetCount(); i++) {
@@ -97,11 +97,11 @@ void CorrectCWndWidth(CWnd* pWnd)
 	CFont* pOldFont = pDC->SelectObject(pFont);
 
 	CString str;
-	pWnd->GetWindowText(str);
+	pWnd->GetWindowTextW(str);
 	CSize szText = pDC->GetTextExtent(str);
 
 	TEXTMETRIC tm;
-	pDC->GetTextMetrics(&tm);
+	pDC->GetTextMetricsW(&tm);
 	pDC->SelectObject(pOldFont);
 	pWnd->ReleaseDC(pDC);
 
@@ -113,12 +113,12 @@ void CorrectCWndWidth(CWnd* pWnd)
 	pWnd->MoveWindow(r);
 }
 
-inline void AddStringData(CComboBox& ComboBox, LPCTSTR str, DWORD_PTR data)
+inline void AddStringData(CComboBox& ComboBox, LPCWSTR str, DWORD_PTR data)
 {
 	ComboBox.SetItemData(ComboBox.AddString(str), data);
 }
 
-inline void AddStringData(CListBox& ListBox, LPCTSTR str, DWORD_PTR data)
+inline void AddStringData(CListBox& ListBox, LPCWSTR str, DWORD_PTR data)
 {
 	ListBox.SetItemData(ListBox.AddString(str), data);
 }
