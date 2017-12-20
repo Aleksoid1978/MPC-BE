@@ -1255,13 +1255,6 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 		return S_FALSE;
 	}
 
-	CheckPointer(m_pWaveFormatExInput, S_FALSE);
-	CheckPointer(m_pWaveFormatExOutput, S_FALSE);
-
-	if (m_input_params.sf == SAMPLE_FMT_NONE || m_output_params.sf == SAMPLE_FMT_NONE) {
-		return S_FALSE;
-	}
-
 	long lSize = pMediaSample->GetActualDataLength();
 	if (!lSize) {
 		return S_FALSE;
@@ -1276,10 +1269,29 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 		return S_FALSE;
 	}
 
+	if (!m_pRenderClient && !m_pWaveFormatExOutput) {
+		if (rtStop != INVALID_TIME && m_pReferenceClock) {
+			const REFERENCE_TIME rtRefClock = GetRefClockTime();
+			if (rtStop > rtRefClock) {
+				const DWORD dwMilliseconds = (rtStop - rtRefClock) / (UNITS / MILLISECONDS);
+				WaitForSingleObject(m_hStopRenderThreadEvent, dwMilliseconds);
+			}
+		}
+
+		return S_FALSE;
+	}
+
 	BYTE *pMediaBuffer = nullptr;
 	HRESULT hr = pMediaSample->GetPointer(&pMediaBuffer);
 	if (FAILED(hr)) {
 		return hr;
+	}
+
+	CheckPointer(m_pWaveFormatExInput, S_FALSE);
+	CheckPointer(m_pWaveFormatExOutput, S_FALSE);
+
+	if (m_input_params.sf == SAMPLE_FMT_NONE || m_output_params.sf == SAMPLE_FMT_NONE) {
+		return S_FALSE;
 	}
 
 	BYTE *pInputBufferPointer = nullptr;
@@ -1432,21 +1444,13 @@ HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 		}
 
 		if (!m_pRenderClient) {
-			if (p->rtStart != INVALID_TIME) {
+			if (p->rtStart != INVALID_TIME && m_pReferenceClock) {
 				const REFERENCE_TIME rtDuration = SamplesToTime(p->GetCount() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
 				const REFERENCE_TIME rtStop = p->rtStart + rtDuration;
-				REFERENCE_TIME rtRefClock = INVALID_TIME;
-
-				for (;;) {
-					if (WaitForSingleObject(m_hStopRenderThreadEvent, 1) == WAIT_OBJECT_0) {
-						break;
-					}
-
-					rtRefClock = GetRefClockTime();
-					if (rtRefClock != INVALID_TIME
-							&& rtRefClock - m_hnsPeriod > rtStop) {
-						break;
-					}
+				const REFERENCE_TIME rtRefClock = GetRefClockTime() - m_hnsPeriod;
+				if (rtStop > rtRefClock) {
+					const DWORD dwMilliseconds = (rtStop - rtRefClock) / (UNITS / MILLISECONDS);
+					WaitForSingleObject(m_hStopRenderThreadEvent, dwMilliseconds);
 				}
 			}
 
