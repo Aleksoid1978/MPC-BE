@@ -1270,7 +1270,14 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 	}
 
 	if (!m_pRenderClient && !m_pWaveFormatExOutput) {
-		if (rtStop != INVALID_TIME && m_pReferenceClock) {
+		if (!m_pAudioClient) {
+			CreateAudioClient();
+		}
+		if (!m_pRenderClient && m_pAudioClient) {
+			CheckAudioClient(m_pWaveFormatExInput);
+		}
+
+		if (!m_pRenderClient && rtStop != INVALID_TIME && m_pReferenceClock) {
 			const REFERENCE_TIME rtRefClock = GetRefClockTime();
 			if (rtStop > rtRefClock) {
 				const DWORD dwMilliseconds = (rtStop - rtRefClock) / (UNITS / MILLISECONDS);
@@ -1509,7 +1516,7 @@ again:
 		return false;
 	};
 
-	// Compare the exisiting WAVEFORMATEX with the one provided
+	// Compare the existing WAVEFORMATEX with the one provided
 	if (CheckFormatChanged(pWaveFormatEx, &m_pWaveFormatExInput) || !m_pWaveFormatExOutput) {
 
 		// Format has changed, audio client has to be reinitialized
