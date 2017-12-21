@@ -193,17 +193,19 @@ private:
 
 	// CMpcAudioRenderer WASAPI methods
 	HRESULT					GetAudioDevice(const BOOL bForceUseDefaultDevice);
-	HRESULT					CreateAudioClient();
-	HRESULT					InitAudioClient(WAVEFORMATEX *pWaveFormatEx, BOOL bCheckFormat = TRUE);
-	HRESULT					CheckAudioClient(WAVEFORMATEX *pWaveFormatEx = nullptr);
+	HRESULT					InitAudioClient();
+	HRESULT					CreateAudioClient(const BOOL bForceUseDefaultDevice = FALSE);
+	HRESULT					CheckAudioClient(const WAVEFORMATEX *pWaveFormatEx);
+	HRESULT					CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const BOOL bCheckFormat = TRUE);
+
 	HRESULT					Transform(IMediaSample *pMediaSample);
 	HRESULT					PushToQueue(CAutoPtr<CPacket> p);
 
 	bool					IsFormatChanged(const WAVEFORMATEX *pWaveFormatEx, const WAVEFORMATEX *pNewWaveFormatEx);
-	bool					CopyWaveFormat(WAVEFORMATEX *pSrcWaveFormatEx, WAVEFORMATEX **ppDestWaveFormatEx);
+	bool					CopyWaveFormat(const WAVEFORMATEX *pSrcWaveFormatEx, WAVEFORMATEX **ppDestWaveFormatEx);
 
-	BOOL					IsBitstream(WAVEFORMATEX *pWaveFormatEx);
-	HRESULT					SelectFormat(WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex);
+	BOOL					IsBitstream(const WAVEFORMATEX *pWaveFormatEx);
+	HRESULT					SelectFormat(const WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex);
 	void					CreateFormat(WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSample, WORD nChannels, DWORD dwChannelMask, DWORD nSamplesPerSec, WORD wValidBitsPerSample = 0);
 
 	HRESULT					StartAudioClient();
