@@ -34,8 +34,8 @@ CRoQSplitterFilter : public CBaseSplitterFilter
 	CComPtr<IAsyncReader> m_pAsyncReader;
 
 	struct index {REFERENCE_TIME rtv, rta; __int64 fp;};
-	CAtlList<index> m_index;
-	POSITION m_indexpos;
+	std::list<index> m_index;
+	std::list<index>::const_iterator m_indexpos;
 
 protected:
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);

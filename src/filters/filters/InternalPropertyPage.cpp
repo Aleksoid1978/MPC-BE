@@ -568,11 +568,10 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 		infoStr.Append(L"- Connection media type:\r\n\r\n");
 
 		if (SUCCEEDED(pPin->ConnectionMediaType(&cmt))) {
-			CAtlList<CString> sl;
+			std::list<CString> sl;
 			cmt.Dump(sl);
-			POSITION pos = sl.GetHeadPosition();
-			while (pos) {
-				infoStr.Append(sl.GetNext(pos) + L"\r\n");
+			for (const auto& line : sl) {
+				infoStr.Append(line + L"\r\n");
 			}
 		}
 	} else {
@@ -589,11 +588,10 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 		if (cmt.majortype != GUID_NULL && mt == cmt) {
 			infoStr.AppendFormat(L"Set as the current media type\r\n\r\n");
 		} else {
-			CAtlList<CString> sl;
+			std::list<CString> sl;
 			mt.Dump(sl);
-			POSITION pos = sl.GetHeadPosition();
-			while (pos) {
-				infoStr.Append(sl.GetNext(pos) + L"\r\n");
+			for (const auto& line : sl) {
+				infoStr.Append(line + L"\r\n");
 			}
 		}
 	}

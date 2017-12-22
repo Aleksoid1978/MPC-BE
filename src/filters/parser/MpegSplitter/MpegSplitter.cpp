@@ -1102,34 +1102,34 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 #ifdef REGISTER_FILTER
 	CString lang;
-	CAtlList<CString> audioLangList;
-	CAtlList<CString> subpicLangList;
+	std::list<CString> audioLangList;
+	std::list<CString> subpicLangList;
 
 	if (!m_AudioLanguageOrder.IsEmpty()) {
 		int tPos = 0;
-		lang = m_AudioLanguageOrder.Tokenize(L",; ", tPos);
+		lang = m_AudioLanguageOrder.Tokenize(L",; ", tPos).MakeLower();
 		while (tPos != -1) {
 			if (!lang.IsEmpty()) {
-				audioLangList.AddTail(lang);
+				audioLangList.push_back(lang);
 			}
-			lang = m_AudioLanguageOrder.Tokenize(L",; ", tPos);
+			lang = m_AudioLanguageOrder.Tokenize(L",; ", tPos).MakeLower();
 		}
 		if (!lang.IsEmpty()) {
-			audioLangList.AddTail(lang);
+			audioLangList.push_back(lang);
 		}
 	}
 
 	if (!m_SubtitlesLanguageOrder.IsEmpty()) {
 		int tPos = 0;
-		lang = m_SubtitlesLanguageOrder.Tokenize(L",; ", tPos);
+		lang = m_SubtitlesLanguageOrder.Tokenize(L",; ", tPos).MakeLower();
 		while (tPos != -1) {
 			if (!lang.IsEmpty()) {
-				subpicLangList.AddTail(lang);
+				subpicLangList.push_back(lang);
 			}
-			lang = m_SubtitlesLanguageOrder.Tokenize(L",; ", tPos);
+			lang = m_SubtitlesLanguageOrder.Tokenize(L",; ", tPos).MakeLower();
 		}
 		if (!lang.IsEmpty()) {
-			subpicLangList.AddTail(lang);
+			subpicLangList.push_back(lang);
 		}
 	}
 
@@ -1150,12 +1150,10 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			str_tmp.MakeLower();
 			if (type == CMpegSplitterFile::stream_type::audio) {
 				CString audioStreamSelected;
-				if (!audioLangList.IsEmpty()) {
+				if (!audioLangList.empty()) {
 					int idx = 0;
-					POSITION pos = audioLangList.GetHeadPosition();
-					while (pos) {
-						lang = audioLangList.GetNext(pos).MakeLower();
-						if (-1 != str_tmp.Find(lang)) {
+					for (const auto& audioLang : audioLangList) {
+						if (-1 != str_tmp.Find(audioLang)) {
 							if (idx < Idx_audio) {
 								audioStreamSelected	= str;
 								Idx_audio			= idx;
@@ -1171,12 +1169,10 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			} else if (type == CMpegSplitterFile::stream_type::subpic) {
 				CString subpicStreamSelected;
-				if (!subpicLangList.IsEmpty()) {
+				if (!subpicLangList.empty()) {
 					int idx = 0;
-					POSITION pos = subpicLangList.GetHeadPosition();
-					while (pos) {
-						lang = subpicLangList.GetNext(pos).MakeLower();
-						if (-1 != str_tmp.Find(lang)) {
+					for (const auto& subpicLang : subpicLangList) {
+						if (-1 != str_tmp.Find(subpicLang)) {
 							if (idx < Idx_subpic) {
 								subpicStreamSelected	= str;
 								Idx_subpic				= idx;
