@@ -67,12 +67,11 @@ void CMediaTypesDlg::AddMediaType(AM_MEDIA_TYPE* pmt)
 		m_type = UNKNOWN;
 	}
 
-	CAtlList<CString> sl;
+	std::list<CString> sl;
 	CMediaTypeEx(*pmt).Dump(sl);
-	POSITION pos = sl.GetHeadPosition();
 
-	while (pos) {
-		AddLine(sl.GetNext(pos));
+	for (const auto& line : sl) {
+		AddLine(line);
 	}
 }
 

@@ -164,7 +164,7 @@ HRESULT CRoQSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	int iHasVideo = 0;
 	int iHasAudio = 0;
 
-	m_index.RemoveAll();
+	m_index.clear();
 	__int64 audiosamples = 0;
 
 	roq_info ri;
@@ -214,10 +214,10 @@ HRESULT CRoQSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				iHasVideo++;
 
 				index i;
-				i.rtv = 10000000i64*m_index.GetCount()/30;
+				i.rtv = 10000000i64*m_index.size()/30;
 				i.rta = 10000000i64*audiosamples/22050;
 				i.fp = pos - sizeof(rc);
-				m_index.AddTail(i);
+				m_index.push_back(i);
 			}
 		}
 		else if(rc.id == 0x1020 || rc.id == 0x1021)
@@ -262,7 +262,7 @@ HRESULT CRoQSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 bool CRoQSplitterFilter::DemuxInit()
 {
 	SetThreadName((DWORD)-1, "CRoQSplitterFilter");
-	m_indexpos = m_index.GetHeadPosition();
+	m_indexpos = m_index.cbegin();
 
 	return(true);
 }
@@ -271,20 +271,20 @@ void CRoQSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
 	if(rt <= 0)
 	{
-		m_indexpos = m_index.GetHeadPosition();
+		m_indexpos = m_index.cbegin();
 	}
 	else
 	{
-		m_indexpos = m_index.GetTailPosition();
-		while(m_indexpos && m_index.GetPrev(m_indexpos).rtv > rt);
+		m_indexpos = m_index.cend();
+		while(m_indexpos != m_index.cbegin() && (*m_indexpos--).rtv > rt);
 	}
 }
 
 bool CRoQSplitterFilter::DemuxLoop()
 {
-	if(!m_indexpos) return(true);
+	if(m_indexpos == m_index.cend()) return(true);
 
-	index& i = m_index.GetAt(m_indexpos);
+	const index& i = *m_indexpos;
 
 	REFERENCE_TIME rtVideo = i.rtv, rtAudio = i.rta;
 

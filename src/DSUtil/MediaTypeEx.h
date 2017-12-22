@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <list>
+
 class CMediaTypeEx : public CMediaType
 {
 public:
@@ -29,7 +31,7 @@ public:
 		CMediaType::operator = (mt);
 	}
 	CString ToString(IPin* pPin = nullptr);
-	void Dump(CAtlList<CString>& sl);
+	void Dump(std::list<CString>& sl);
 	bool ValidateSubtitle();
 
 	static CString GetVideoCodecName(const GUID& subtype, DWORD biCompression);
