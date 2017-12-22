@@ -1652,23 +1652,21 @@ void CMatroskaSplitterFilter::SendVorbisHeaderSample()
 				&& pTE->CodecPrivate.GetCount() > 0) {
 			BYTE* ptr = pTE->CodecPrivate.GetData();
 
-			CAtlList<int> sizes;
+			std::list<int> sizes;
 			long last = 0;
 			for (BYTE n = *ptr++; n > 0; n--) {
 				int size = 0;
 				do {
 					size += *ptr;
 				} while (*ptr++ == 0xff);
-				sizes.AddTail(size);
+				sizes.push_back(size);
 				last += size;
 			}
-			sizes.AddTail(pTE->CodecPrivate.GetCount() - (ptr - pTE->CodecPrivate.GetData()) - last);
+			sizes.push_back(pTE->CodecPrivate.GetCount() - (ptr - pTE->CodecPrivate.GetData()) - last);
 
 			hr = S_OK;
 
-			POSITION pos = sizes.GetHeadPosition();
-			while (pos && SUCCEEDED(hr)) {
-				long len = sizes.GetNext(pos);
+			for (const long len : sizes) {
 
 				CAutoPtr<CPacket> p(DNew CPacket());
 				p->TrackNumber	= (DWORD)pTE->TrackNumber;

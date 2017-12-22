@@ -302,7 +302,6 @@ CVTSStream::~CVTSStream()
 bool CVTSStream::Load(const WCHAR* fnw, bool bEnableTitleSelection)
 {
 	// TODO bEnableTitleSelection
-	CAtlList<CString> sl;
 	return (m_ifo && m_vob && m_ifo->OpenIFO(fnw, m_vob, 0));
 }
 

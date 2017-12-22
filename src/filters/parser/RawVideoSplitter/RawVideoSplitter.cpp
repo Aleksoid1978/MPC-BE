@@ -225,11 +225,9 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		DWORD  interlFlags = 0;
 
 		int k;
-		CAtlList<CStringA> sl;
+		std::list<CStringA> sl;
 		Explode(params, sl, 0x20);
-		POSITION pos = sl.GetHeadPosition();
-		while (pos) {
-			CStringA& str = sl.GetNext(pos);
+		for (const auto& str : sl) {
 			if (str.GetLength() < 2) {
 				continue;
 			}
@@ -278,31 +276,31 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 				break;
 			case 'C':
-				str = str.Mid(1);
+				CStringA cs = str.Mid(1);
 				// 8-bit
-				if (str == "mono") {
+				if (cs == "mono") {
 					fourcc		= FCC('Y800');
 					bpp			= 8;
 				}
-				else if (str == "420" || str == "420jpeg" || str == "420mpeg2" || str == "420paldv") {
+				else if (cs == "420" || cs == "420jpeg" || cs == "420mpeg2" || cs == "420paldv") {
 					fourcc		= FCC('I420');
 					bpp			= 12;
 				}
-				else if (str == "411") {
+				else if (cs == "411") {
 					fourcc		= FCC('Y41B');
 					bpp			= 12;
 				}
-				else if (str == "422") {
+				else if (cs == "422") {
 					fourcc		= FCC('Y42B');
 					bpp			= 16;
 				}
-				else if (str == "444") {
+				else if (cs == "444") {
 					fourcc		= FCC('444P'); // for libavcodec
 					fourcc_2	= FCC('I444'); // for madVR
 					bpp			= 24;
 				}
 				// 10-bit
-				else if (str == "420p10") {
+				else if (cs == "420p10") {
 					fourcc		= MAKEFOURCC('Y', '3', 11 , 10 );
 					bpp			= 24;
 					mt.subtype	= MEDIASUBTYPE_LAV_RAWVIDEO;

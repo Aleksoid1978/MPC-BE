@@ -825,11 +825,9 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 		CStringA hdr = GetHeader();
 		DLog(L"CShoutcastSocket::Connect() - HTTP hdr:\n%S", hdr);
 
-		CAtlList<CStringA> sl;
+		std::list<CStringA> sl;
 		Explode(hdr, sl, '\n');
-		POSITION pos = sl.GetHeadPosition();
-		while (pos) {
-			CStringA& hdrline = sl.GetNext(pos);
+		for (auto& hdrline : sl) {
 
 			CStringA param, value;
 			int k = hdrline.Find(':');

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -87,8 +87,8 @@ public:
 	CAtlMap<DWORD, CStringA> m_info;
 	CAutoPtr<AVIOLDINDEX> m_idx1;
 
-	CAtlList<UINT64> m_movis;
-	bool			 m_isamv;
+	std::list<UINT64> m_movis;
+	bool m_isamv;
 
 	REFERENCE_TIME GetTotalTime();
 	HRESULT BuildIndex();
