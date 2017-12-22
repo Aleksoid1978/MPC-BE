@@ -859,7 +859,7 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 		return S_OK;
 	}
 
-	CAtlList<QWORD> lens;
+	std::list<QWORD> lens;
 	QWORD tlen = 0;
 	QWORD FrameSize;
 	BYTE FramesInLaceLessOne;
@@ -867,7 +867,7 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 	switch ((Lacing & 0x06) >> 1) {
 		case 0:
 			// No lacing
-			lens.AddTail((pMN->m_start + pMN->m_len) - (pMN->GetPos() + tlen));
+			lens.push_back((pMN->m_start + pMN->m_len) - (pMN->GetPos() + tlen));
 			break;
 		case 1:
 			// Xiph lacing
@@ -880,10 +880,10 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 					pMN->Read(b);
 					len += b;
 				} while (b == 0xff);
-				lens.AddTail(len);
+				lens.push_back(len);
 				tlen += len;
 			}
-			lens.AddTail((pMN->m_start + pMN->m_len) - (pMN->GetPos() + tlen));
+			lens.push_back((pMN->m_start + pMN->m_len) - (pMN->GetPos() + tlen));
 			break;
 		case 2:
 			// Fixed-size lacing
@@ -891,7 +891,7 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 			FramesInLaceLessOne++;
 			FrameSize = ((pMN->m_start + pMN->m_len) - (pMN->GetPos() + tlen)) / FramesInLaceLessOne;
 			while (FramesInLaceLessOne-- > 0) {
-				lens.AddTail(FrameSize);
+				lens.push_back(FrameSize);
 			}
 			break;
 		case 3:
@@ -900,7 +900,7 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 
 			CLength FirstFrameSize;
 			FirstFrameSize.Parse(pMN);
-			lens.AddTail(FirstFrameSize);
+			lens.push_back(FirstFrameSize);
 			FramesInLaceLessOne--;
 			tlen = FirstFrameSize;
 
@@ -909,16 +909,14 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 			while (FramesInLaceLessOne--) {
 				DiffSize.Parse(pMN);
 				FrameSize += DiffSize;
-				lens.AddTail(FrameSize);
+				lens.push_back(FrameSize);
 				tlen += FrameSize;
 			}
-			lens.AddTail((pMN->m_start + pMN->m_len) - (pMN->GetPos() + tlen));
+			lens.push_back((pMN->m_start + pMN->m_len) - (pMN->GetPos() + tlen));
 			break;
 	}
 
-	POSITION pos = lens.GetHeadPosition();
-	while (pos) {
-		QWORD len = lens.GetNext(pos);
+	for (const QWORD len : lens) {
 		if ((__int64)len < 0) {
 			continue;
 		}

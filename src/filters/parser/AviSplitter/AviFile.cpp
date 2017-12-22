@@ -52,7 +52,7 @@ HRESULT CAviFile::Init()
 	Seek(0);
 	HRESULT hr = Parse(0, GetLength());
 	UNREFERENCED_PARAMETER(hr);
-	if (m_movis.GetCount() == 0) { // FAILED(hr) is allowed as long as there was a movi chunk found
+	if (m_movis.size() == 0) { // FAILED(hr) is allowed as long as there was a movi chunk found
 		return E_FAIL;
 	}
 
@@ -153,7 +153,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 					WCHAR((id>>24)&0xff));
 
 			if (id == FCC('movi')) {
-				m_movis.AddTail(pos);
+				m_movis.push_back(pos);
 				if (m_isamv) {
 					BuildAMVIndex();
 				}
@@ -452,7 +452,7 @@ HRESULT CAviFile::BuildIndex()
 	} else if (AVIOLDINDEX* idx = m_idx1) {
 		size_t len    = idx->cb / sizeof(idx->aIndex[0]);
 
-		UINT64 offset = m_movis.GetHead() + 8;
+		UINT64 offset = m_movis.front() + 8;
 
 		//detect absolute chunk addressing (TODO: read AVI specification and make it better)
 		if (idx->aIndex[0].dwOffset > offset) {

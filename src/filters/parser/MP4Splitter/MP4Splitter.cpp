@@ -717,7 +717,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 
 								const AP4_Byte* pal = di->GetData();
-								CAtlList<CStringA> sl;
+								std::list<CStringA> sl;
 								for (int i = 0; i < 16 * 4; i += 4) {
 									BYTE y = (pal[i + 1] - 16) * 255 / 219;
 									BYTE u = pal[i + 2];
@@ -727,7 +727,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									BYTE b = (BYTE)clamp(1.0 * y + 1.7710 * (u - 128), 0.0, 255.0);
 									CStringA str;
 									str.Format("%02x%02x%02x", r, g, b);
-									sl.AddTail(str);
+									sl.push_back(str);
 								}
 
 								CStringA hdr;

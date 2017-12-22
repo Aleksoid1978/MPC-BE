@@ -198,7 +198,7 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			cuefile.Read(cuetextA.GetBufferSetLength(size), size);
 
 			CStringW cuetextW = UTF8To16(cuetextA);
-			CAtlList<Chapters> ChaptersList;
+			std::list<Chapters> ChaptersList;
 			CString sTitle, sPerformer;
 
 			if (ParseCUESheet(cuetextW, ChaptersList, sTitle, sPerformer)) {
@@ -213,9 +213,8 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				if (CComQIPtr<IDSMChapterBag> pCB = this) {
 					pCB->ChapRemoveAll();
-					while (ChaptersList.GetCount()) {
-						Chapters cp = ChaptersList.RemoveHead();
-						pCB->ChapAppend(cp.rt, cp.name);
+					for (const auto& chap : ChaptersList) {
+						pCB->ChapAppend(chap.rt, chap.name);
 					}
 				}
 			}
