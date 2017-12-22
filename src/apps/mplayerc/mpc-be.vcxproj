@@ -56,7 +56,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/ignore:4049 /ignore:4099 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libgcc.a;libmingwex.a;UxTheme.lib;comsuppw.lib;Delayimp.lib;detours.lib;gdiplus.lib;lgLcd.lib;Psapi.lib;SetupAPI.lib;vfw32.lib;Version.lib;libspeex.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;comsuppw.lib;Delayimp.lib;detours.lib;lgLcd.lib;Psapi.lib;SetupAPI.lib;Version.lib;libspeex.a;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>gdiplus.dll;psapi.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <SupportUnloadOfDelayLoadedDLL>true</SupportUnloadOfDelayLoadedDLL>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
