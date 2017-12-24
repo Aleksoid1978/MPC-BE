@@ -11800,14 +11800,14 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		CString fn = (CString)pOFD->fns.front();
 		if (Youtube::CheckURL(fn)) {
 			youtubeUrl = fn;
-			CAtlList<CString> urls;
+			std::list<CString> urls;
 			if (Youtube::Parse_URL(fn, urls, m_youtubeFields, m_youtubeUrllist, pOFD->subs, pOFD->rtStart)) {
 				Content::Online::Disconnect(fn);
 
 				pOFD->fns.clear();
-				POSITION pos = urls.GetHeadPosition();
-				while (pos) {
-					pOFD->fns.push_back(urls.GetNext(pos));
+
+				for (const auto& url : urls) {
+					pOFD->fns.push_back(url);
 				}
 
 				m_strPlaybackRenderedPath = pOFD->fns.front().GetName();
