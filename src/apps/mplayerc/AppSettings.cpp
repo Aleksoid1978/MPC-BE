@@ -66,7 +66,7 @@ void CFiltersPrioritySettings::LoadSettings()
 // CAppSettings
 
 CAppSettings::CAppSettings()
-	: fInitialized(false)
+	: bInitialized(false)
 	, bKeepHistory(true)
 	, iRecentFilesNumber(20)
 	, MRU(0, L"Recent File List", L"File%d", iRecentFilesNumber)
@@ -549,7 +549,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	UINT len;
 	BYTE* ptr = nullptr;
 
-	if (fInitialized && !bForce) {
+	if (bInitialized && !bForce) {
 		return;
 	}
 
@@ -1176,7 +1176,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		nCLSwitches |= CLSW_FULLSCREEN;
 	}
 
-	fInitialized = true;
+	bInitialized = true;
 }
 
 void CAppSettings::SaveSettings()
@@ -1184,7 +1184,7 @@ void CAppSettings::SaveSettings()
 	CMPlayerCApp* pApp = AfxGetMyApp();
 	ASSERT(pApp);
 
-	if (!fInitialized) {
+	if (!bInitialized) {
 		return;
 	}
 
@@ -1570,7 +1570,7 @@ void CAppSettings::SaveExternalFilters()
 	CMPlayerCApp* pApp = AfxGetMyApp();
 	ASSERT(pApp);
 
-	if (!fInitialized) {
+	if (!bInitialized) {
 		return;
 	}
 
@@ -2102,10 +2102,10 @@ void CAppSettings::CRecentFileAndURLList::Add(LPCTSTR lpszPathName)
 		return;
 	}
 
-	bool fURL = (pathName.Find(L"://") >= 0 || Youtube::CheckURL(lpszPathName));
+	bool isURL = (pathName.Find(L"://") >= 0 || Youtube::CheckURL(lpszPathName));
 
 	// fully qualify the path name
-	if (!fURL) {
+	if (!isURL) {
 		AfxFullPath(pathName.GetBuffer(pathName.GetLength() + 1024), lpszPathName);
 		pathName.ReleaseBuffer();
 	}
@@ -2113,7 +2113,7 @@ void CAppSettings::CRecentFileAndURLList::Add(LPCTSTR lpszPathName)
 	// update the MRU list, if an existing MRU string matches file name
 	int iMRU;
 	for (iMRU = 0; iMRU < m_nSize-1; iMRU++) {
-		if ((fURL && !wcscmp(m_arrNames[iMRU], pathName))
+		if ((isURL && !wcscmp(m_arrNames[iMRU], pathName))
 				|| AfxComparePath(m_arrNames[iMRU], pathName)) {
 			break;    // iMRU will point to matching entry
 		}
