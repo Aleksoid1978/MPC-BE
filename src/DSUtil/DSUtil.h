@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <vector>
 #include <list>
 #include "NullRenderers.h"
 #include "H264Nalu.h"
@@ -104,7 +105,7 @@ extern void				ShowPPage(IUnknown* pUnknown, HWND hParentWnd);
 extern bool				IsCLSIDRegistered(LPCWSTR clsid);
 extern bool				IsCLSIDRegistered(const CLSID& clsid);
 
-extern void				CStringToBin(CString str, CAtlArray<BYTE>& data);
+extern void				CStringToBin(CString str, std::vector<BYTE>& data);
 extern CString			BinToCString(const BYTE* ptr, size_t len);
 
 enum cdrom_t {

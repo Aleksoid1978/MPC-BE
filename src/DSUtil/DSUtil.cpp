@@ -779,11 +779,11 @@ bool IsCLSIDRegistered(const CLSID& clsid)
 	return fRet;
 }
 
-void CStringToBin(CString str, CAtlArray<BYTE>& data)
+void CStringToBin(CString str, std::vector<BYTE>& data)
 {
 	str.Trim();
 	ASSERT((str.GetLength()&1) == 0);
-	data.SetCount(str.GetLength()/2);
+	data.reserve(str.GetLength()/2);
 
 	BYTE b = 0;
 
@@ -807,7 +807,7 @@ void CStringToBin(CString str, CAtlArray<BYTE>& data)
 		}
 
 		if (i&1) {
-			data[i>>1] = b;
+			data.push_back(b);
 			b = 0;
 		}
 	}
