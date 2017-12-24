@@ -446,7 +446,7 @@ void CPlaylistItem::AutoLoadFiles()
 					std::list<CStringW> fileNames;
 
 					for (const auto& cueTrack : CUETrackList) {
-						if (std::find(fileNames.cbegin(), fileNames.cend(), cueTrack.m_fn) == fileNames.end()) {
+						if (std::find(fileNames.cbegin(), fileNames.cend(), cueTrack.m_fn) == fileNames.cend()) {
 							fileNames.push_back(cueTrack.m_fn);
 						}
 					}
@@ -1325,7 +1325,7 @@ bool CPlayerPlaylistBar::ParseCUEPlayList(CString fn)
 
 	std::list<CString> fileNames;
 	for (const auto& cueTrack : CUETrackList) {
-		if (std::find(fileNames.cbegin(), fileNames.cend(), cueTrack.m_fn) == fileNames.end()) {
+		if (std::find(fileNames.cbegin(), fileNames.cend(), cueTrack.m_fn) == fileNames.cend()) {
 			fileNames.push_back(cueTrack.m_fn);
 		}
 	}

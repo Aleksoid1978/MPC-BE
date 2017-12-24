@@ -1594,7 +1594,7 @@ static void Descriptor_56(CGolombBuffer& gb, int descriptor_length, LPSTR ISO_63
 		tlxPage.page = (teletext_magazine_number << 8) | (teletext_page_number_1 << 4) | teletext_page_number_2;
 		strcpy_s(tlxPage.lang, ch);
 
-		if (std::find(tlxPages.begin(), tlxPages.end(), tlxPage) == tlxPages.end()) {
+		if (std::find(tlxPages.cbegin(), tlxPages.cend(), tlxPage) == tlxPages.cend()) {
 			tlxPages.emplace_back(tlxPage);
 		}
 

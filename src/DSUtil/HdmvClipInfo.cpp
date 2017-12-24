@@ -744,7 +744,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 				Item.m_SizeOut = TotalSize;
 			}
 
-			if (std::find(Playlist.begin(), Playlist.end(), Item) != Playlist.end()) {
+			if (std::find(Playlist.cbegin(), Playlist.cend(), Item) != Playlist.cend()) {
 				bDuplicate = true;
 			}
 

@@ -473,7 +473,7 @@ typedef std::list<CString> cmdLine;
 
 class CAppSettings
 {
-	bool	fInitialized;
+	bool bInitialized;
 
 	class CRecentFileAndURLList : public CRecentFileList
 	{
