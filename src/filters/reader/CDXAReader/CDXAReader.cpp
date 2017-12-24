@@ -474,7 +474,7 @@ bool CCDXAStream::LookForMediaSubType()
 
 				__int64 offset = 0;
 				DWORD cb = 0;
-				CAtlArray<BYTE> mask, val;
+				std::vector<BYTE> mask, val;
 
 				int nMatches = 0, nTries = 0;
 
@@ -503,16 +503,16 @@ bool CCDXAStream::LookForMediaSubType()
 					}
 
 					if (nTries >= 0 && (nTries&3) == 3) {
-						if (cb > 0 && val.GetCount() > 0 && cb == val.GetCount()) {
+						if (cb > 0 && val.size() > 0 && cb == val.size()) {
 							if (offset >= 0 && S_OK == SetPointer(offset)
 									|| S_OK == SetPointer(m_llLength + offset)) {
 								CAutoVectorPtr<BYTE> pData;
 								if (pData.Allocate(cb)) {
 									DWORD BytesRead = 0;
 									if (S_OK == Read(pData, cb, 1, &BytesRead) && cb == BytesRead) {
-										if (mask.GetCount() < cb) {
-											size_t x = mask.GetCount();
-											mask.SetCount(cb);
+										if (mask.size() < cb) {
+											size_t x = mask.size();
+											mask.resize(cb);
 											for (; x < cb; x++) {
 												mask[x] = 0xff;
 											}
@@ -522,7 +522,7 @@ bool CCDXAStream::LookForMediaSubType()
 											pData[x] &= (BYTE)mask[x];
 										}
 
-										if (memcmp(pData, val.GetData(), cb) == 0) {
+										if (memcmp(pData, val.data(), cb) == 0) {
 											nMatches++;
 										}
 									}
@@ -531,8 +531,8 @@ bool CCDXAStream::LookForMediaSubType()
 
 							offset = 0;
 							cb = 0;
-							mask.RemoveAll();
-							val.RemoveAll();
+							mask.clear();
+							val.clear();
 						}
 					}
 				}

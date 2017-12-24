@@ -205,23 +205,27 @@ bool CFGManager::CStreamPath::Compare(const CStreamPath& path)
 
 bool CFGManager::CheckBytes(HANDLE hFile, CString chkbytes)
 {
-	CAtlList<CString> sl;
+	std::list<CString> sl;
 	Explode(chkbytes, sl, L',');
 
-	if (sl.GetCount() < 4) {
+	if (sl.size() < 4) {
 		return false;
 	}
 
-	ASSERT(!(sl.GetCount()&3));
+	ASSERT(!(sl.size()&3));
 
 	LARGE_INTEGER size = {0, 0};
 	GetFileSizeEx(hFile, &size);
 
-	while (sl.GetCount() >= 4) {
-		CString offsetstr = sl.RemoveHead();
-		CString cbstr = sl.RemoveHead();
-		CString maskstr = sl.RemoveHead();
-		CString valstr = sl.RemoveHead();
+	while (sl.size() >= 4) {
+		CString offsetstr = sl.front();
+		sl.pop_front();
+		CString cbstr = sl.front();
+		sl.pop_front();
+		CString maskstr = sl.front();
+		sl.pop_front();
+		CString valstr = sl.front();
+		sl.pop_front();
 
 		long cb = _wtol(cbstr);
 
@@ -243,11 +247,11 @@ bool CFGManager::CheckBytes(HANDLE hFile, CString chkbytes)
 			maskstr += 'F';
 		}
 
-		CAtlArray<BYTE> mask, val;
+		std::vector<BYTE> mask, val;
 		CStringToBin(maskstr, mask);
 		CStringToBin(valstr, val);
 
-		for (size_t i = 0; i < val.GetCount(); i++) {
+		for (size_t i = 0; i < val.size(); i++) {
 			BYTE b;
 			DWORD r;
 			if (!ReadFile(hFile, &b, 1, &r, nullptr) || (b & mask[i]) != val[i]) {
@@ -256,27 +260,31 @@ bool CFGManager::CheckBytes(HANDLE hFile, CString chkbytes)
 		}
 	}
 
-	return sl.IsEmpty();
+	return sl.empty();
 }
 
 bool CFGManager::CheckBytes(PBYTE buf, DWORD size, CString chkbytes)
 {
-	CAtlList<CString> sl;
+	std::list<CString> sl;
 	Explode(chkbytes, sl, L',');
 
-	if (sl.GetCount() < 4) {
+	if (sl.size() < 4) {
 		return false;
 	}
 
-	ASSERT(!(sl.GetCount()&3));
+	ASSERT(!(sl.size()&3));
 
 	CGolombBuffer gb(buf, size);
 
-	while (sl.GetCount() >= 4) {
-		CString offsetstr = sl.RemoveHead();
-		CString cbstr = sl.RemoveHead();
-		CString maskstr = sl.RemoveHead();
-		CString valstr = sl.RemoveHead();
+	while (sl.size() >= 4) {
+		CString offsetstr = sl.front();
+		sl.pop_front();
+		CString cbstr = sl.front();
+		sl.pop_front();
+		CString maskstr = sl.front();
+		sl.pop_front();
+		CString valstr = sl.front();
+		sl.pop_front();
 
 		long cb = _wtol(cbstr);
 
@@ -298,11 +306,11 @@ bool CFGManager::CheckBytes(PBYTE buf, DWORD size, CString chkbytes)
 			maskstr += 'F';
 		}
 
-		CAtlArray<BYTE> mask, val;
+		std::vector<BYTE> mask, val;
 		CStringToBin(maskstr, mask);
 		CStringToBin(valstr, val);
 
-		for (size_t i = 0; i < val.GetCount(); i++) {
+		for (size_t i = 0; i < val.size(); i++) {
 			BYTE b = gb.ReadByte();
 			if ((b & mask[i]) != val[i]) {
 				return false;
@@ -310,7 +318,7 @@ bool CFGManager::CheckBytes(PBYTE buf, DWORD size, CString chkbytes)
 		}
 	}
 
-	return sl.IsEmpty();
+	return sl.empty();
 }
 
 CFGFilter *LookupFilterRegistry(const GUID &guid, CAtlList<CFGFilter*> &list, UINT64 fallback_merit = MERIT64_DO_USE)

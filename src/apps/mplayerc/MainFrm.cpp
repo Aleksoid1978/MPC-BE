@@ -9740,11 +9740,11 @@ public:
 
 	DECLARE_IUNKNOWN;
 
-	CAtlArray<BYTE> m_data;
+	std::vector<BYTE> m_data;
 
 	// ISequentialStream
 	STDMETHODIMP Read(void* pv, ULONG cb, ULONG* pcbRead) {
-		__int64 cbRead = min((__int64)(m_data.GetCount() - m_pos), (__int64)cb);
+		__int64 cbRead = std::min((__int64)(m_data.size() - m_pos), (__int64)cb);
 		cbRead = std::max(cbRead, 0LL);
 		memcpy(pv, &m_data[(INT_PTR)m_pos], (int)cbRead);
 		if (pcbRead) {
@@ -9757,7 +9757,7 @@ public:
 		BYTE* p = (BYTE*)pv;
 		ULONG cbWritten = (ULONG)-1;
 		while (++cbWritten < cb) {
-			m_data.Add(*p++);
+			m_data.push_back(*p++);
 		}
 		if (pcbWritten) {
 			*pcbWritten = cbWritten;
@@ -9925,7 +9925,7 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 				if (SUCCEEDED(m_pDVDI->GetState(&pStateData))
 						&& (pPersistStream = pStateData)
 						&& SUCCEEDED(OleSaveToStream(pPersistStream, (IStream*)&stream))) {
-					pos = BinToCString(stream.m_data.GetData(), stream.m_data.GetCount());
+					pos = BinToCString(stream.m_data.data(), stream.m_data.size());
 				}
 			}
 
@@ -10114,28 +10114,28 @@ void CMainFrame::OnFavoritesDVD(UINT nID)
 
 void CMainFrame::PlayFavoriteDVD(CString fav)
 {
-	CAtlList<CString> args;
 	CString fn;
 	CDVDStateStream stream;
-
 	stream.AddRef();
 
+	std::list<CString> args;
 	ExplodeEsc(fav, args, L';', 4);
-	size_t cnt = args.GetCount();
-	args.RemoveHeadNoReturn();			// desc / name
-	if (cnt == 4) {
-		args.RemoveHeadNoReturn();		// pos
+
+	auto it = args.cbegin();
+	++it; // desc / name
+	if (args.size() == 4) {
+		++it; // pos
 	}
-	CString state = args.RemoveHead();	// state
+	CString state = *it++; // state
 	if (state != L"0") {
-	    CStringToBin(state, stream.m_data);
+		CStringToBin(state, stream.m_data);
 	}
-	fn = args.RemoveHead();				// path
+	fn = *it++; // path
 
 	SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 
 	CComPtr<IDvdState> pDvdState;
-	if (stream.m_data.GetCount()) {
+	if (stream.m_data.size()) {
 		HRESULT hr = OleLoadFromStream((IStream*)&stream, IID_PPV_ARGS(&pDvdState));
 		UNREFERENCED_PARAMETER(hr);
 	}
