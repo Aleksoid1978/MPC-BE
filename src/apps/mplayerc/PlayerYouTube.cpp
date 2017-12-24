@@ -324,7 +324,7 @@ namespace Youtube
 		funcSWAP
 	};
 
-	bool Parse_URL(CString url, CAtlList<CString>& urls, YoutubeFields& y_fields, YoutubeUrllist& youtubeUrllist, CSubtitleItemList& subs, REFERENCE_TIME& rtStart)
+	bool Parse_URL(CString url, std::list<CString>& urls, YoutubeFields& y_fields, YoutubeUrllist& youtubeUrllist, CSubtitleItemList& subs, REFERENCE_TIME& rtStart)
 	{
 		if (CheckURL(url)) {
 			DLog(L"Youtube::Parse_URL() : \"%s\"", url);
@@ -394,8 +394,8 @@ namespace Youtube
 			const CString Title = UTF8To16(GetEntry(data, "<title>", "</title>"));
 			y_fields.title = FixHtmlSymbols(Title);
 
-			CAtlArray<youtubeFuncType> JSFuncs;
-			CAtlArray<int> JSFuncArgs;
+			std::vector<youtubeFuncType> JSFuncs;
+			std::vector<int> JSFuncArgs;
 			BOOL bJSParsed = FALSE;
 			CString JSUrl = UTF8To16(GetEntry(data, MATCH_JS_START, MATCH_END));
 			if (JSUrl.IsEmpty()) {
@@ -468,7 +468,7 @@ namespace Youtube
 				if (!hlspv_url.IsEmpty()) {
 					url = UrlDecode(UrlDecode(hlspv_url));
 					url.Replace(L"\\/", L"/");
-					urls.AddHead(url);
+					urls.push_front(url);
 
 					free(data);
 					InternetCloseHandle(hInet);
@@ -564,24 +564,18 @@ namespace Youtube
 
 			free(data);
 
-			CAtlList<CStringA> linesA;
+			std::list<CStringA> linesA;
 			Explode(strUrls, linesA, ',');
-			POSITION posLine = linesA.GetHeadPosition();
 
-			while (posLine) {
-				const CStringA &lineA = linesA.GetNext(posLine);
-
+			for (const auto& lineA : linesA) {
 				int itag = 0;
 				CStringA url;
 				CStringA signature;
 
-				CAtlList<CStringA> paramsA;
+				std::list<CStringA> paramsA;
 				Explode(lineA, paramsA, '&');
 
-				POSITION posParam = paramsA.GetHeadPosition();
-				while (posParam) {
-					const CStringA &paramA = paramsA.GetNext(posParam);
-
+				for (const auto& paramA : paramsA) {
 					int k = paramA.Find('=');
 					if (k > 0) {
 						const CStringA paramHeader = paramA.Left(k);
@@ -617,21 +611,19 @@ namespace Youtube
 											const CStringA funcBody = RegExpParseA(data, funcRegExp);
 											if (!funcBody.IsEmpty()) {
 												CStringA funcGroup;
-												CAtlList<CStringA> funcList;
-												CAtlList<CStringA> funcCodeList;
+												std::list<CStringA> funcList;
+												std::list<CStringA> funcCodeList;
 
-												CAtlList<CStringA> code;
+												std::list<CStringA> code;
 												Explode(funcBody, code, ';');
 
-												POSITION pos = code.GetHeadPosition();
-												while (pos) {
-													const CStringA &line = code.GetNext(pos);
+												for (const auto& line : code) {
 
 													if (line.Find("split") >= 0 || line.Find("return") >= 0) {
 														continue;
 													}
 
-													funcList.AddTail(line);
+													funcList.push_back(line);
 
 													if (funcGroup.IsEmpty()) {
 														const int k = line.Find('.');
@@ -650,19 +642,17 @@ namespace Youtube
 													}
 												}
 
-												if (!funcList.IsEmpty() && !funcCodeList.IsEmpty()) {
+												if (!funcList.empty() && !funcCodeList.empty()) {
 													funcGroup += '.';
 
-													POSITION pos = funcList.GetHeadPosition();
-													while (pos) {
-														const CStringA& func = funcList.GetNext(pos);
-
+													for (const auto& func : funcList) {
 														int funcArg = 0;
 														const CStringA funcArgs = GetEntry(func, "(", ")");
-														CAtlList<CStringA> args;
+
+														std::list<CStringA> args;
 														Explode(funcArgs, args, ',');
-														if (args.GetCount() >= 1) {
-															CStringA& arg = args.GetTail();
+														if (args.size() >= 1) {
+															CStringA& arg = args.back();
 															int value = 0;
 															if (sscanf_s(arg, "%d", &value) == 1) {
 																funcArg = value;
@@ -674,9 +664,7 @@ namespace Youtube
 
 														youtubeFuncType funcType = youtubeFuncType::funcNONE;
 
-														POSITION pos2 = funcCodeList.GetHeadPosition();
-														while (pos2) {
-															const CStringA& funcCode = funcCodeList.GetNext(pos2);
+														for (const auto& funcCode : funcCodeList) {
 															if (funcCode.Find(funcName) >= 0) {
 																if (funcCode.Find("splice") > 0) {
 																	funcType = youtubeFuncType::funcDELETE;
@@ -690,8 +678,8 @@ namespace Youtube
 														}
 
 														if (funcType != youtubeFuncType::funcNONE) {
-															JSFuncs.Add(funcType);
-															JSFuncArgs.Add(funcArg);
+															JSFuncs.push_back(funcType);
+															JSFuncArgs.push_back(funcArg);
 														}
 													}
 												}
@@ -704,7 +692,7 @@ namespace Youtube
 							}
 						}
 
-						if (!JSFuncs.IsEmpty()) {
+						if (!JSFuncs.empty()) {
 							auto Delete = [](CStringA& a, int b) {
 								a.Delete(0, b);
 							};
@@ -725,7 +713,7 @@ namespace Youtube
 								}
 							};
 
-							for (size_t i = 0; i < JSFuncs.GetCount(); i++) {
+							for (size_t i = 0; i < JSFuncs.size(); i++) {
 								const youtubeFuncType func = JSFuncs[i];
 								const int arg = JSFuncArgs[i];
 								switch (func) {
@@ -973,14 +961,14 @@ namespace Youtube
 				InternetCloseHandle(hInet);
 
 				if (!final_video_url.IsEmpty()) {
-					urls.AddHead(final_video_url);
+					urls.push_front(final_video_url);
 
 					if (!final_audio_url.IsEmpty()) {
-						urls.AddTail(final_audio_url);
+						urls.push_back(final_audio_url);
 					}
 				}
 
-				return !urls.IsEmpty();
+				return !urls.empty();
 			}
 		}
 
