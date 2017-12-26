@@ -214,7 +214,7 @@ class CStreamSwitcherFilter : public CBaseFilter, public IAMStreamSelect
 	friend class CStreamSwitcherOutputPin;
 	friend class CStreamSwitcherPassThru;
 
-	CAtlList<CStreamSwitcherInputPin*> m_pInputs;
+	std::list<CStreamSwitcherInputPin*> m_pInputs;
 	CStreamSwitcherInputPin* m_pInput;
 	CStreamSwitcherOutputPin* m_pOutput;
 
