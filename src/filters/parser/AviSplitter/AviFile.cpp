@@ -52,7 +52,7 @@ HRESULT CAviFile::Init()
 	Seek(0);
 	HRESULT hr = Parse(0, GetLength());
 	UNREFERENCED_PARAMETER(hr);
-	if (m_movis.size() == 0) { // FAILED(hr) is allowed as long as there was a movi chunk found
+	if (m_movis.empty()) { // FAILED(hr) is allowed as long as there was a movi chunk found
 		return E_FAIL;
 	}
 

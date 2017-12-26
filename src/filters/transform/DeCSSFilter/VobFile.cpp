@@ -384,7 +384,7 @@ bool CVobFile::OpenVOBs(const std::list<CString>& vobs)
 {
 	Close();
 
-	if (vobs.size() == 0) {
+	if (vobs.empty()) {
 		return false;
 	}
 

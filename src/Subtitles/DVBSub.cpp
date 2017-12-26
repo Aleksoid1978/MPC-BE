@@ -190,11 +190,11 @@ HRESULT CDVBSub::ParseSample(BYTE* pData, long nLen, REFERENCE_TIME rtStart, REF
 			pts = 10000*pts / 90;
 
 			TRACE_DVB(_T("DVB - Received a packet with a presentation timestamp PTS = %i64d[%s]"), pts, ReftimeToString(pts));
-            if (pts != rtStart) {
+			if (pts != rtStart) {
 				TRACE_DVB(_T("DVB - WARNING: The parsed PTS doesn't match the sample start time (%i64d[%s])"), rtStart, ReftimeToString(rtStart));
 				ASSERT(FALSE);
 				rtStart = pts;
-            }
+			}
 
 			headerSize	+= 5;
 		}

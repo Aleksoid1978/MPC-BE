@@ -861,11 +861,11 @@ cdrom_t GetCDROMType(WCHAR drive, std::list<CString>& files)
 			return CDROM_DVDVideo;
 		}
 
-        // CDROM_BD
-        FindFiles(path + L"\\BDMV\\index.bdmv", files);
-        if (!files.empty()) {
-            return CDROM_BDVideo;
-        }
+		// CDROM_BD
+		FindFiles(path + L"\\BDMV\\index.bdmv", files);
+		if (!files.empty()) {
+			return CDROM_BDVideo;
+		}
 
 		// CDROM_VideoCD
 		FindFiles(path + L"\\mpegav\\avseq??.dat", files);
