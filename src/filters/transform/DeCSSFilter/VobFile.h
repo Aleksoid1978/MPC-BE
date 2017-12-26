@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,8 @@
 
 #pragma once
 
-#include <atlcoll.h>
+#include <vector>
+#include <list>
 #include <winddk/ntddcdvd.h>
 
 // CDVDSession
@@ -85,7 +86,7 @@ class CVobFile : public CDVDSession
 	};
 
 	// all files
-	CAtlArray<file_t> m_files;	// group of vob files
+	std::vector<file_t> m_files;	// group of vob files
 	int m_offset;				// first sector for group of vob files
 	int m_size;					// last sector for group of vob files
 	int m_pos;					// current sector for group of vob files
@@ -101,7 +102,7 @@ public:
 	CVobFile();
 	virtual ~CVobFile();
 
-	bool OpenVOBs(const CAtlList<CString>& files); // vts vobs
+	bool OpenVOBs(const std::list<CString>& files); // vts vobs
 	bool SetOffsets(int start_sector, int end_sector = -1); // video vob offset in lba
 	void Close();
 
