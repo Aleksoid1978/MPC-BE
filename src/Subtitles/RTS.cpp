@@ -2746,7 +2746,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 	marginRect.right  = std::lround(sub->m_scalex * marginRect.right * 8.0);
 	marginRect.bottom = std::lround(sub->m_scaley * marginRect.bottom * 8.0);
 
-    if (sub->m_relativeTo == 1) {
+	if (sub->m_relativeTo == 1) {
 		// Account for the user trying to fool the renderer by setting negative margins
 		CRect clipRect = m_vidrect;
 		if (marginRect.left < 0) {
@@ -2765,7 +2765,7 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 		sub->m_clip.SetRect(clipRect.left >> 3, clipRect.top >> 3, clipRect.right >> 3, clipRect.bottom >> 3);
 	} else {
 		sub->m_clip.SetRect(0, 0, m_size.cx >> 3, m_size.cy >> 3);
-    }
+	}
 
 	if (stss.relativeTo == 1) {
 		marginRect.left   += m_vidrect.left;

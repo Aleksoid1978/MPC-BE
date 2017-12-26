@@ -144,7 +144,7 @@ CString CMpeg2DataParser::ConvertString(BYTE* pBuffer, int nLength)
 	return strResult;
 }
 
-DVB_STREAM_TYPE	CMpeg2DataParser::ConvertToDVBType(PES_STREAM_TYPE nType)
+DVB_STREAM_TYPE CMpeg2DataParser::ConvertToDVBType(PES_STREAM_TYPE nType)
 {
 	switch (nType) {
 		case VIDEO_STREAM_MPEG1 :
@@ -268,7 +268,7 @@ HRESULT CMpeg2DataParser::ParsePAT()
 		WORD program_number = (WORD)gb.BitRead(16);			// program_number
 		gb.BitRead(3);										// reserved
 		if (program_number == 0) {
-			gb.BitRead(13);    // network_PID
+			gb.BitRead(13);									// network_PID
 		} else {
 			WORD program_map_PID = (WORD)gb.BitRead(13);	// program_map_PID
 			if (Channels.Lookup(program_number)) {
@@ -301,8 +301,8 @@ HRESULT CMpeg2DataParser::ParsePMT(CDVBChannel& Channel)
 	gb.BitRead(3);												// reserved
 	Channel.SetPCR((ULONG)gb.BitRead(13));						// PCR_PID
 	gb.BitRead(4);												// reserved
-	BeginEnumDescriptors(gb, nType, nLength) {				// for (i=0;i<N;i++) {
-		SkipDescriptor (gb, nType, nLength);					//		descriptor()
+	BeginEnumDescriptors(gb, nType, nLength) {					// for (i=0;i<N;i++) {
+		SkipDescriptor (gb, nType, nLength);					//   descriptor()
 	}
 	EndEnumDescriptors
 
@@ -536,8 +536,8 @@ HRESULT CMpeg2DataParser::ParseNIT()
 	CheckNoLog (ParseSIHeader (gb, SI_NIT, wSectionLength, wTSID));
 
 	gb.BitRead(4);												// reserved_future_use
-	BeginEnumDescriptors(gb, nType, nLength) {				// for (i=0;i<N;i++) {
-		SkipDescriptor (gb, nType, nLength);					//		descriptor()
+	BeginEnumDescriptors(gb, nType, nLength) {					// for (i=0;i<N;i++) {
+		SkipDescriptor (gb, nType, nLength);					//   descriptor()
 	}
 	EndEnumDescriptors
 

@@ -5054,7 +5054,7 @@ void CMainFrame::OnFileOpenMedia()
 		dlg.SetForegroundWindow();
 		return;
 	}
-	if (dlg.DoModal() != IDOK || dlg.m_fns.size() == 0) {
+	if (dlg.DoModal() != IDOK || dlg.m_fns.empty()) {
 		return;
 	}
 
@@ -6818,14 +6818,14 @@ void CMainFrame::OnViewCaptionmenu()
 	CRect windowRect;
 	GetWindowRect(&windowRect);
 	const CRect oldwindowRect(windowRect);
-    if (!bZoomed) {
+	if (!bZoomed) {
 		CRect decorationsRect;
 		VERIFY(AdjustWindowRectEx(decorationsRect, GetWindowStyle(m_hWnd), dwMenuFlags == AFX_MBV_KEEPVISIBLE, GetWindowExStyle(m_hWnd)));
 		windowRect.bottom -= decorationsRect.bottom;
 		windowRect.right  -= decorationsRect.right;
 		windowRect.top    -= decorationsRect.top;
 		windowRect.left   -= decorationsRect.left;
-    }
+	}
 
 	switch (s.iCaptionMenuMode) {
 		case MODE_SHOWCAPTIONMENU:	// borderless -> normal

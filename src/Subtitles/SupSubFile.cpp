@@ -85,13 +85,13 @@ bool CSupSubFile::Open(CString fn, CString name/* = L""*/, CString videoName/* =
 		return false;
 	}
 
-	m_fname			= fn;
-    if (name.IsEmpty()) {
-        m_Subname	= Subtitle::GuessSubtitleName(fn, videoName);
-    } else {
-        m_Subname	= name;
-    }
-	m_pSub			= DNew CHdmvSub();
+	m_fname = fn;
+	if (name.IsEmpty()) {
+		m_Subname = Subtitle::GuessSubtitleName(fn, videoName);
+	} else {
+		m_Subname = name;
+	}
+	m_pSub = DNew CHdmvSub();
 
 	m_Thread = AfxBeginThread(::ThreadProc, static_cast<LPVOID>(this));
 

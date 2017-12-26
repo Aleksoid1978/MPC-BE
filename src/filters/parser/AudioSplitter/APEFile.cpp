@@ -35,37 +35,37 @@
 #define APE_EXTRADATA_SIZE 6
 
 struct APEContext {
-    /* Derived fields */
-    uint32_t junklength;
-    uint32_t firstframe;
-    uint32_t totalsamples;
-    int currentframe;
+	/* Derived fields */
+	uint32_t junklength;
+	uint32_t firstframe;
+	uint32_t totalsamples;
+	int currentframe;
 
-    /* Info from Descriptor Block */
-    int16_t fileversion;
-    int16_t padding1;
-    uint32_t descriptorlength;
-    uint32_t headerlength;
-    uint32_t seektablelength;
-    uint32_t wavheaderlength;
-    uint32_t audiodatalength;
-    uint32_t audiodatalength_high;
-    uint32_t wavtaillength;
-    uint8_t md5[16];
+	/* Info from Descriptor Block */
+	int16_t fileversion;
+	int16_t padding1;
+	uint32_t descriptorlength;
+	uint32_t headerlength;
+	uint32_t seektablelength;
+	uint32_t wavheaderlength;
+	uint32_t audiodatalength;
+	uint32_t audiodatalength_high;
+	uint32_t wavtaillength;
+	uint8_t md5[16];
 
-    /* Info from Header Block */
-    uint16_t compressiontype;
-    uint16_t formatflags;
-    uint32_t blocksperframe;
-    uint32_t finalframeblocks;
-    uint32_t totalframes;
-    uint16_t bps;
-    uint16_t channels;
-    uint32_t samplerate;
+	/* Info from Header Block */
+	uint16_t compressiontype;
+	uint16_t formatflags;
+	uint32_t blocksperframe;
+	uint32_t finalframeblocks;
+	uint32_t totalframes;
+	uint16_t bps;
+	uint16_t channels;
+	uint32_t samplerate;
 
-    /* Seektable */
-    uint32_t* seektable;
-    uint8_t*  bittable;
+	/* Seektable */
+	uint32_t* seektable;
+	uint8_t*  bittable;
 };
 
 //
