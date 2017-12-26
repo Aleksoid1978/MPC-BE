@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -475,7 +475,7 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 	}
 
 	fn.Truncate(fn.GetLength() - 5);
-	CAtlList<CString> vobs;
+	std::list<CString> vobs;
 	for(int i = 1; i < 9; i++) { // skip VTS_xx_0.VOB
 		CString vob;
 		if (isAob) {
@@ -490,12 +490,12 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 		}
 
 		if (status.m_size & 0x7ff) {
-			vobs.RemoveAll();
+			vobs.clear();
 			break;
 		}
 
 		if (status.m_size > 0) {
-			vobs.AddTail(vob);
+			vobs.push_back(vob);
 		}
 	}
 

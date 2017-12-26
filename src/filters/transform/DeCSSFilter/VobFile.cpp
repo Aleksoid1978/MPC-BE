@@ -51,7 +51,7 @@ bool CDVDSession::Open(LPCWSTR path)
 	CString fn = path;
 	CString drive = L"\\\\.\\" + fn.Left(fn.Find(':')+1);
 
-	m_hDrive = CreateFile(drive, GENERIC_READ, FILE_SHARE_READ, nullptr,
+	m_hDrive = CreateFileW(drive, GENERIC_READ, FILE_SHARE_READ, nullptr,
 						  OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_SEQUENTIAL_SCAN, (HANDLE)nullptr);
 	if (m_hDrive == INVALID_HANDLE_VALUE) {
 		return false;
@@ -380,22 +380,20 @@ CVobFile::~CVobFile()
 	Close();
 }
 
-bool CVobFile::OpenVOBs(const CAtlList<CString>& vobs)
+bool CVobFile::OpenVOBs(const std::list<CString>& vobs)
 {
 	Close();
 
-	if (vobs.GetCount() == 0) {
+	if (vobs.size() == 0) {
 		return false;
 	}
 
-	POSITION pos = vobs.GetHeadPosition();
-	while(pos) {
-		CString fn = vobs.GetNext(pos);
+	for (const auto& fn : vobs) {
 
 		WIN32_FIND_DATA fd;
-		HANDLE h = FindFirstFile(fn, &fd);
+		HANDLE h = FindFirstFileW(fn, &fd);
 		if (h == INVALID_HANDLE_VALUE) {
-			m_files.RemoveAll();
+			m_files.clear();
 			return false;
 		}
 		FindClose(h);
@@ -403,13 +401,13 @@ bool CVobFile::OpenVOBs(const CAtlList<CString>& vobs)
 		file_t f;
 		f.fn = fn;
 		f.size = (int)(((__int64(fd.nFileSizeHigh) << 32) | fd.nFileSizeLow) / 2048);
-		m_files.Add(f);
+		m_files.push_back(f);
 
 		m_size += f.size;
 	}
 
-	if (m_files.GetCount() > 0 && CDVDSession::Open(m_files[0].fn)) {
-		for (size_t i = 0; !m_fHasTitleKey && i < m_files.GetCount(); i++) {
+	if (m_files.size() > 0 && CDVDSession::Open(m_files[0].fn)) {
+		for (size_t i = 0; !m_fHasTitleKey && i < m_files.size(); i++) {
 			if (BeginSession()) {
 				m_fDVD = true;
 				Authenticate();
@@ -479,7 +477,7 @@ bool CVobFile::OpenVOBs(const CAtlList<CString>& vobs)
 bool CVobFile::SetOffsets(int start_sector, int end_sector)
 {
 	int length = 0;
-	for (size_t i = 0; i < m_files.GetCount(); i++) {
+	for (size_t i = 0; i < m_files.size(); i++) {
 		length += m_files[i].size;
 	}
 
@@ -496,7 +494,7 @@ bool CVobFile::SetOffsets(int start_sector, int end_sector)
 void CVobFile::Close()
 {
 	CDVDSession::Close();
-	m_files.RemoveAll();
+	m_files.clear();
 	m_iFile = -1;
 	m_pos = m_size = m_offset = 0;
 	m_file.Close();
@@ -523,9 +521,9 @@ int CVobFile::Seek(int pos)
 	// this suxx, but won't take long
 	do {
 		size += m_files[++i].size;
-	} while(i < (int)m_files.GetCount() && pos >= size);
+	} while(i < (int)m_files.size() && pos >= size);
 
-	if (i != m_iFile && i < (int)m_files.GetCount()) {
+	if (i != m_iFile && i < (int)m_files.size()) {
 		if (!m_file.Open(m_files[i].fn)) {
 			return(m_pos);
 		}
@@ -552,7 +550,7 @@ bool CVobFile::Read(BYTE* buff)
 	}
 
 	if (!m_file.IsOpen()) {
-		if (m_iFile >= (int)m_files.GetCount() - 1) {
+		if (m_iFile >= (int)m_files.size() - 1) {
 			return false;
 		}
 

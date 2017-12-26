@@ -372,7 +372,7 @@ bool CVobSubFileRipper::LoadVob(CString fn)
 {
 	Log(LOG_INFO, _T("Searching vobs..."));
 
-	CAtlList<CString> vobs;
+	std::list<CString> vobs;
 
 	fn = fn.Left(fn.ReverseFind('.')+1);
 	fn.TrimRight(_T(".0123456789"));
@@ -391,7 +391,7 @@ bool CVobSubFileRipper::LoadVob(CString fn)
 		if (status.m_size&0x7ff)
 		{
 			Log(LOG_ERROR, _T("Length of %s is not n*2048!"), vob);
-			vobs.RemoveAll();
+			vobs.clear();
 			break;
 		}
 
@@ -403,13 +403,13 @@ bool CVobSubFileRipper::LoadVob(CString fn)
 		}
 		else
 		{
-			vobs.AddTail(vob);
+			vobs.push_back(vob);
 		}
 
 		Log(LOG_INFO, str);
 	}
 
-	if (vobs.GetCount() <= 0)
+	if (vobs.size() <= 0)
 	{
 		Log(LOG_ERROR, _T("Nothing found! (%s*.vob)"), fn);
 		return false;
@@ -420,14 +420,13 @@ bool CVobSubFileRipper::LoadVob(CString fn)
 		return false;
 	}
 
-	if (vobs.GetCount() <= 0) {
+	if (vobs.size() <= 0) {
 		Log(LOG_ERROR, _T("Nothing found! (%s*.vob)"), fn);
 		return false;
 	}
 
-	POSITION pos = vobs.GetHeadPosition();
-	while (pos) {
-		Log(LOG_INFO, _T("Found ") + vobs.GetNext(pos));
+	for (const auto& vob : vobs) {
+		Log(LOG_INFO, _T("Found ") + vob);
 	}
 
 	if (m_vob.IsDVD()) {
