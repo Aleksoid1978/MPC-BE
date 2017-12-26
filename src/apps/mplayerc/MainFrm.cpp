@@ -11284,9 +11284,9 @@ ShaderC* CMainFrame::GetShader(LPCWSTR label)
 {
 	ShaderC* pShader = nullptr;
 
-	for (POSITION pos = m_ShaderCashe.GetHeadPosition(); pos; m_ShaderCashe.GetNext(pos)) {
-		if (m_ShaderCashe.GetAt(pos).label.CompareNoCase(label) == 0) {
-			pShader = &m_ShaderCashe.GetAt(pos);
+	for (auto& shader : m_ShaderCashe) {
+		if (shader.label.CompareNoCase(label) == 0) {
+			pShader = &shader;
 			break;
 		}
 	}
@@ -11333,8 +11333,8 @@ ShaderC* CMainFrame::GetShader(LPCWSTR label)
 
 					file.Close();
 
-					m_ShaderCashe.AddTail(shader);
-					pShader = &m_ShaderCashe.GetTail();
+					m_ShaderCashe.push_back(shader);
+					pShader = &m_ShaderCashe.back();
 				}
 			}
 		}
@@ -11361,9 +11361,9 @@ bool CMainFrame::SaveShaderFile(ShaderC* shader)
 			file.Close();
 
 			// delete out-of-date data from the cache
-			for (POSITION pos = m_ShaderCashe.GetHeadPosition(); pos; m_ShaderCashe.GetNext(pos)) {
-				if (m_ShaderCashe.GetAt(pos).label.CompareNoCase(shader->label) == 0) {
-					m_ShaderCashe.RemoveAt(pos);
+			for (auto it = m_ShaderCashe.begin(), end = m_ShaderCashe.end(); it != end; ++it) {
+				if ((*it).label.CompareNoCase(shader->label) == 0) {
+					m_ShaderCashe.erase(it);
 					break;
 				}
 			}
@@ -11382,9 +11382,9 @@ bool CMainFrame::DeleteShaderFile(LPCWSTR label)
 
 		if (!::PathFileExistsW(path) || ::DeleteFileW(path)) {
 			// if the file is missing or deleted successfully, then remove it from the cache
-			for (POSITION pos = m_ShaderCashe.GetHeadPosition(); pos; m_ShaderCashe.GetNext(pos)) {
-				if (m_ShaderCashe.GetAt(pos).label.CompareNoCase(label) == 0) {
-					m_ShaderCashe.RemoveAt(pos);
+			for (auto it = m_ShaderCashe.begin(), end = m_ShaderCashe.end(); it != end; ++it) {
+				if ((*it).label.CompareNoCase(label) == 0) {
+					m_ShaderCashe.erase(it);
 					return true;
 				}
 			}
@@ -11401,9 +11401,9 @@ void CMainFrame::TidyShaderCashe()
 		return;
 	}
 
-	for (POSITION pos = m_ShaderCashe.GetHeadPosition(); pos; m_ShaderCashe.GetNext(pos)) {
-		ShaderC* shader = &m_ShaderCashe.GetAt(pos);
-		CString path (appsavepath + L"Shaders\\" + shader->label + L".hlsl");
+	for (auto it = m_ShaderCashe.cbegin(); it != m_ShaderCashe.cend(); ++it) {
+
+		CString path (appsavepath + L"Shaders\\" + (*it).label + L".hlsl");
 
 		CFile file;
 		if (file.Open(path, CFile::modeRead | CFile::modeCreate | CFile::shareDenyNone)) {
@@ -11413,13 +11413,12 @@ void CMainFrame::TidyShaderCashe()
 
 			file.Close();
 
-			if (shader->length == length && CompareFileTime(&shader->ftwrite, &ftWrite) == 0) {
+			if ((*it).length == length && CompareFileTime(&(*it).ftwrite, &ftWrite) == 0) {
 				continue; // actual shader
 			}
 		}
 
-		shader = nullptr;
-		m_ShaderCashe.RemoveAt(pos); // outdated shader
+		m_ShaderCashe.erase(it); // outdated shader
 	}
 }
 
