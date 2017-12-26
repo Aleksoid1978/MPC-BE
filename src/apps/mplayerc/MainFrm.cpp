@@ -11401,8 +11401,7 @@ void CMainFrame::TidyShaderCashe()
 		return;
 	}
 
-	for (auto it = m_ShaderCashe.cbegin(); it != m_ShaderCashe.cend(); ++it) {
-
+	for (auto it = m_ShaderCashe.cbegin(); it != m_ShaderCashe.cend(); ) {
 		CString path (appsavepath + L"Shaders\\" + (*it).label + L".hlsl");
 
 		CFile file;
@@ -11414,11 +11413,12 @@ void CMainFrame::TidyShaderCashe()
 			file.Close();
 
 			if ((*it).length == length && CompareFileTime(&(*it).ftwrite, &ftWrite) == 0) {
+				it++;
 				continue; // actual shader
 			}
 		}
 
-		m_ShaderCashe.erase(it); // outdated shader
+		m_ShaderCashe.erase(it++); // outdated shader
 	}
 }
 
