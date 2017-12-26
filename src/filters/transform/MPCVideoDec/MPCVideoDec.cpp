@@ -3939,11 +3939,11 @@ HRESULT CVideoDecOutputPin::InitAllocator(IMemAllocator **ppAlloc)
 namespace MPCVideoDec {
 	void GetSupportedFormatList(FORMATS& fmts)
 	{
-		fmts.RemoveAll();
+		fmts.clear();
 
 		for (size_t i = 0; i < _countof(sudPinTypesIn); i++) {
 			FORMAT fmt = { sudPinTypesIn[i].clsMajorType, ffCodecs[i].clsMinorType, ffCodecs[i].FFMPEGCode, ffCodecs[i].DXVACode };
-			fmts.AddTail(fmt);
+			fmts.push_back(fmt);
 		}
 	}
 } // namespace MPCVideoDec
