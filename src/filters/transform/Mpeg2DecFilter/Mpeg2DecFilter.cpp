@@ -1808,7 +1808,7 @@ static __inline void DrawPixels(BYTE** yuv, int pitch, CPoint pt, int len, AM_DV
 
 bool CSubpicInputPin::dvdspu::Parse()
 {
-	m_offsets.RemoveAll();
+	m_offsets.clear();
 
 	BYTE* p = GetData();
 
@@ -1923,7 +1923,7 @@ bool CSubpicInputPin::dvdspu::Parse()
 		}
 
 		offset_t o = {rt, m_sphli};
-		m_offsets.AddTail(o); // is it always going to be sorted?
+		m_offsets.push_back(o); // is it always going to be sorted?
 	} while (i <= next && i < packetsize);
 
 #undef GetWORD
@@ -1946,10 +1946,8 @@ void CSubpicInputPin::dvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h
 	if (m_psphli) {
 		rcclip &= CRect(m_psphli->StartX, m_psphli->StartY, m_psphli->StopX, m_psphli->StopY);
 		sphli = *m_psphli;
-	} else if (m_offsets.GetCount() > 1) {
-		POSITION pos = m_offsets.GetTailPosition();
-		while (pos) {
-			const offset_t& o = m_offsets.GetPrev(pos);
+	} else if (m_offsets.size() > 1) {
+		for (const auto& o : m_offsets) {
 			if (rt >= o.rt) {
 				sphli = o.sphli;
 				break;

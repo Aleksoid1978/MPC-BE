@@ -59,18 +59,14 @@ public:
 
 		if (m_merit >= MERIT64_ABOVE_DSHOW) {
 			// High merit MPC Video Decoder
-			POSITION pos = fmts.GetHeadPosition();
-			while (pos) {
-				MPCVideoDec::FORMAT& fmt = fmts.GetNext(pos);
+			for (const auto& fmt : fmts) {
 				if (m_bIsPreview || s.VideoFilters[fmt.FFMPEGCode] || s.DXVAFilters[fmt.DXVACode]) {
 					AddType(*fmt.clsMajorType, *fmt.clsMinorType);
 				}
 			}
 		} else if (!m_bIsPreview) {
 			// Low merit MPC Video Decoder
-			POSITION pos = fmts.GetHeadPosition();
-			while (pos) {
-				MPCVideoDec::FORMAT& fmt = fmts.GetNext(pos);
+			for (const auto& fmt : fmts) {
 				AddType(*fmt.clsMajorType, *fmt.clsMinorType);
 			}
 		}

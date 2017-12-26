@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <list>
 #include "../BaseVideoFilter/BaseVideoFilter.h"
 #include "IMPCVideoDec.h"
 #include "MPCVideoDecSettingsWnd.h"
@@ -327,7 +328,7 @@ namespace MPCVideoDec {
 		const int    FFMPEGCode;
 		const int    DXVACode;
 	};
-	typedef CAtlList<FORMAT> FORMATS;
+	typedef std::list<FORMAT> FORMATS;
 
 	void GetSupportedFormatList(FORMATS& fmts);
 } // namespace MPCVideoDec

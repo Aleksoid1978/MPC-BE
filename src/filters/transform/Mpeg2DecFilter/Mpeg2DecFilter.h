@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <atlcoll.h>
+#include <list>
 #include <videoacc.h>
 #include "../DeCSSFilter/DeCSSFilter.h"
 #include "../BaseVideoFilter/BaseVideoFilter.h"
@@ -263,7 +263,7 @@ class CSubpicInputPin : public CMpeg2DecInputPin
 			REFERENCE_TIME rt;
 			AM_PROPERTY_SPHLI sphli;
 		};
-		CAtlList<offset_t> m_offsets;
+		std::list<offset_t> m_offsets;
 		bool Parse();
 		void Render(REFERENCE_TIME rt, BYTE** p, int w, int h, AM_DVD_YUV* sppal, bool fsppal);
 	};
