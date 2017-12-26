@@ -725,7 +725,7 @@ public:
 
 	bool m_bToggleShader;
 	bool m_bToggleShaderScreenSpace;
-	CAtlList<ShaderC> m_ShaderCashe;
+	std::list<ShaderC> m_ShaderCashe;
 	ShaderC* GetShader(LPCWSTR label);
 	bool SaveShaderFile(ShaderC* shader);
 	bool DeleteShaderFile(LPCWSTR label);
