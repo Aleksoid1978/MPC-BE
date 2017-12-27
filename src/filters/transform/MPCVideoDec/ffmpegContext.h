@@ -32,10 +32,9 @@ struct AVCodecContext;
 // === H264 functions
 int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
 							 DWORD nPCIVendor, DWORD nPCIDevice, UINT64 VideoDriverVersion);
-void FFH264GetParams(struct AVCodecContext* pAVCtx, int& x264_build);
 
 // === Common functions
-void FillAVCodecProps(struct AVCodecContext* pAVCtx, int x264_build);
+void FillAVCodecProps(struct AVCodecContext* pAVCtx);
 
 bool IsATIUVD(DWORD nPCIVendor, DWORD nPCIDevice);
 BOOL DXVACheckFramesize(enum AVCodecID nCodecId, int width, int height,

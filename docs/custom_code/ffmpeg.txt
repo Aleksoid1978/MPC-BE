@@ -9,8 +9,10 @@
 
 * libavcodec/aacdec_template.c
 * libavcodec/allcodecs.c
+* libavcodec/bsf_list.c
 * libavcodec/decode.c
 * libavcodec/dxva2.c
+* libavcodec/error_resilience.h
 * libavcodec/h264_slice.c
 * libavcodec/h264dec.c
 * libavcodec/h264dec.h
