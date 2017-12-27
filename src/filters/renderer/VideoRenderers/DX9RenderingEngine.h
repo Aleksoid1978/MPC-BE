@@ -151,7 +151,7 @@ namespace DSObjects
 
 		// Custom pixel shaders
 		CComPtr<IDirect3DPixelShader9>	m_pPSCorrection;
-		CAtlList<CExternalPixelShader>	m_pCustomPixelShaders;
+		std::list<CExternalPixelShader>	m_pCustomPixelShaders;
 
 		// Resizers
 		CComPtr<IDirect3DPixelShader9>	m_pResizerPixelShaders[shader_count];
@@ -165,7 +165,7 @@ namespace DSObjects
 		CComPtr<IDirect3DPixelShader9>	m_pFinalPixelShader;
 
 		// Custom screen space pixel shaders
-		CAtlList<CExternalPixelShader>	m_pCustomScreenSpacePixelShaders;
+		std::list<CExternalPixelShader>	m_pCustomScreenSpacePixelShaders;
 		CComPtr<IDirect3DPixelShader9>	m_pConvertToInterlacePixelShader;
 
 #if DXVAVP
