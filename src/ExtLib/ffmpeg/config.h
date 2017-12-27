@@ -11,6 +11,7 @@
 	#define HAVE_AMD3DNOWEXT 1
 	#define HAVE_AVX 1
 	#define HAVE_AVX2 1
+	#define HAVE_AVX512 1
 	#define HAVE_FMA3 1
 	#define HAVE_FMA4 1
 	#define HAVE_MMX 1
@@ -90,6 +91,7 @@
 	#define HAVE_AMD3DNOWEXT 0
 	#define HAVE_AVX 0
 	#define HAVE_AVX2 0
+	#define HAVE_AVX512 0
 	#define HAVE_FMA3 0
 	#define HAVE_FMA4 0
 	#define HAVE_MMX 0

@@ -48,11 +48,12 @@
 #pragma warning(disable: 4005)
 extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
-	#include <ffmpeg/libavutil/mastering_display_metadata.h>
-	#include <ffmpeg/libavutil/pixdesc.h>
+	#include <ffmpeg/libavcodec/dxva2.h>
 	#include <ffmpeg/libavutil/intreadwrite.h>
 	#include <ffmpeg/libavutil/imgutils.h>
-	#include <ffmpeg/libavcodec/dxva2.h>
+	#include <ffmpeg/libavutil/mastering_display_metadata.h>
+	#include <ffmpeg/libavutil/opt.h>
+	#include <ffmpeg/libavutil/pixdesc.h>
 }
 #pragma warning(pop)
 
@@ -1741,15 +1742,17 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	DLog(L"CMPCVideoDecFilter::InitDecoder()");
 
 	const BOOL bChangeType = (m_pCurrentMediaType != *pmt);
-
-redo:
 	const BOOL bReinit = (m_pAVCtx != nullptr);
 
-	int x264_build = -1;
+	int64_t x264_build = -1;
 	if (m_nCodecId == AV_CODEC_ID_H264 && bReinit && !bChangeType) {
-		FFH264GetParams(m_pAVCtx, x264_build);
+		int64_t val = -1;
+		if (av_opt_get_int(m_pAVCtx->priv_data, "x264_build", 0, &val) >= 0) {
+			x264_build = val;
+		}
 	}
 
+redo:
 	ffmpegCleanup();
 
 	const int nNewCodec = FindCodec(pmt, bReinit);
@@ -1897,7 +1900,11 @@ redo:
 		return VFW_E_INVALIDMEDIATYPE;
 	}
 
-	FillAVCodecProps(m_pAVCtx, x264_build);
+	if (m_nCodecId == AV_CODEC_ID_H264 && x264_build != -1) {
+		av_opt_set_int(m_pAVCtx->priv_data, "x264_build", x264_build, 0);
+	}
+
+	FillAVCodecProps(m_pAVCtx);
 
 	if (bChangeType && pFilter) {
 		m_FilterInfo.Clear();
