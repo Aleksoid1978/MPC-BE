@@ -22,7 +22,6 @@
 #include "stdafx.h"
 #include "../SyncClock/ISyncClock.h"
 #include <atlbase.h>
-#include <atlcoll.h>
 #include <strsafe.h> // Required in CGenlock
 #include <videoacc.h>
 #include <InitGuid.h>
@@ -387,14 +386,11 @@ HRESULT CBaseAP::CreateDXDevice(CString &_Error)
 		m_pResizerPixelShaders[i] = nullptr;
 	}
 
-	POSITION pos = m_pPixelShadersScreenSpace.GetHeadPosition();
-	while (pos) {
-		CExternalPixelShader &Shader = m_pPixelShadersScreenSpace.GetNext(pos);
+	for (auto& Shader : m_pPixelShadersScreenSpace) {
 		Shader.m_pPixelShader = nullptr;
 	}
-	pos = m_pPixelShaders.GetHeadPosition();
-	while (pos) {
-		CExternalPixelShader &Shader = m_pPixelShaders.GetNext(pos);
+
+	for (auto& Shader : m_pPixelShaders) {
 		Shader.m_pPixelShader = nullptr;
 	}
 
@@ -1254,7 +1250,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			}
 
 			// pre-resize pixel shaders
-			if (m_pPixelShaders.GetCount()) {
+			if (m_pPixelShaders.size()) {
 				static __int64 counter = 0;
 				static long start = clock();
 
@@ -1274,10 +1270,8 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				};
 				hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 
-				POSITION pos = m_pPixelShaders.GetHeadPosition();
-				while (pos) {
+				for (auto& Shader : m_pPixelShaders) {
 					hr = m_pD3DDevEx->SetRenderTarget(0, m_pVideoSurfaces[dst]);
-					CExternalPixelShader &Shader = m_pPixelShaders.GetNext(pos);
 					if (!Shader.m_pPixelShader) {
 						Shader.Compile(m_pPSC);
 					}
@@ -1361,7 +1355,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			}
 
 			// init post-resize pixel shaders
-			bool bScreenSpacePixelShaders = m_pPixelShadersScreenSpace.GetCount() > 0;
+			bool bScreenSpacePixelShaders = m_pPixelShadersScreenSpace.size() > 0;
 			if (bScreenSpacePixelShaders && (!m_pScreenSizeTextures[0] || !m_pScreenSizeTextures[1])) {
 				UINT texWidth = std::min((DWORD)m_ScreenSize.cx, m_Caps.MaxTextureWidth);
 				UINT texHeight = std::min((DWORD)m_ScreenSize.cy, m_Caps.MaxTextureHeight);
@@ -1467,24 +1461,28 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 				int src = 1, dst = 0;
 
-				POSITION pos = m_pPixelShadersScreenSpace.GetHeadPosition();
-				while (pos) {
-					if (m_pPixelShadersScreenSpace.GetTailPosition() == pos) {
-						m_pD3DDevEx->SetRenderTarget(0, pBackBuffer);
-					} else {
-						CComPtr<IDirect3DSurface9> pRT;
-						hr = m_pScreenSizeTextures[dst]->GetSurfaceLevel(0, &pRT);
-						m_pD3DDevEx->SetRenderTarget(0, pRT);
-					}
+				if (m_pPixelShadersScreenSpace.size()) {
+					const auto it_last = --m_pPixelShadersScreenSpace.end();
 
-					CExternalPixelShader &Shader = m_pPixelShadersScreenSpace.GetNext(pos);
-					if (!Shader.m_pPixelShader) {
-						Shader.Compile(m_pPSC);
-					}
-					hr = m_pD3DDevEx->SetPixelShader(Shader.m_pPixelShader);
-					TextureCopy(m_pScreenSizeTextures[src]);
+					for (auto it = m_pPixelShadersScreenSpace.begin(), end = m_pPixelShadersScreenSpace.end(); it != end; ++it) {
+						if (it == it_last) {
+							m_pD3DDevEx->SetRenderTarget(0, pBackBuffer);
+						}
+						else {
+							CComPtr<IDirect3DSurface9> pRT;
+							hr = m_pScreenSizeTextures[dst]->GetSurfaceLevel(0, &pRT);
+							m_pD3DDevEx->SetRenderTarget(0, pRT);
+						}
 
-					std::swap(src, dst);
+						auto& Shader = (*it);
+						if (!Shader.m_pPixelShader) {
+							Shader.Compile(m_pPSC);
+						}
+						hr = m_pD3DDevEx->SetPixelShader(Shader.m_pPixelShader);
+						TextureCopy(m_pScreenSizeTextures[src]);
+
+						std::swap(src, dst);
+					}
 				}
 
 				hr = m_pD3DDevEx->SetPixelShader(nullptr);
@@ -2144,9 +2142,9 @@ STDMETHODIMP CBaseAP::ClearPixelShaders(int target)
 	CAutoLock cRenderLock(&m_allocatorLock);
 
 	if (target == TARGET_FRAME) {
-		m_pPixelShaders.RemoveAll();
+		m_pPixelShaders.clear();
 	} else if (target == TARGET_SCREEN) {
-		m_pPixelShadersScreenSpace.RemoveAll();
+		m_pPixelShadersScreenSpace.clear();
 	} else {
 		return E_INVALIDARG;
 	}
@@ -2159,7 +2157,7 @@ STDMETHODIMP CBaseAP::AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profi
 {
 	CAutoLock cRenderLock(&m_allocatorLock);
 
-	CAtlList<CExternalPixelShader> *pPixelShaders;
+	std::list<CExternalPixelShader> *pPixelShaders;
 	if (target == TARGET_FRAME) {
 		pPixelShaders = &m_pPixelShaders;
 	} else if (target == TARGET_SCREEN) {
@@ -2183,7 +2181,7 @@ STDMETHODIMP CBaseAP::AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profi
 		return hr;
 	}
 
-	pPixelShaders->AddTail(Shader);
+	pPixelShaders->push_back(Shader);
 	Paint(true);
 	return S_OK;
 }

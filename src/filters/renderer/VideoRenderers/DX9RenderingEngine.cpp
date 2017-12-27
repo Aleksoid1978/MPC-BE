@@ -206,14 +206,11 @@ void CDX9RenderingEngine::CleanupRenderingEngine()
 
 	CleanupFinalPass();
 
-	POSITION pos = m_pCustomScreenSpacePixelShaders.GetHeadPosition();
-	while (pos) {
-		CExternalPixelShader &Shader = m_pCustomScreenSpacePixelShaders.GetNext(pos);
+	for (auto& Shader : m_pCustomScreenSpacePixelShaders) {
 		Shader.m_pPixelShader = nullptr;
 	}
-	pos = m_pCustomPixelShaders.GetHeadPosition();
-	while (pos) {
-		CExternalPixelShader &Shader = m_pCustomPixelShaders.GetNext(pos);
+
+	for (auto& Shader : m_pCustomPixelShaders) {
 		Shader.m_pPixelShader = nullptr;
 	}
 
@@ -322,13 +319,13 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 		screenSpacePassCount++; // currently all resizers are 1-pass
 
 		// Custom screen space pixel shaders
-		bCustomScreenSpacePixelShaders = !m_pCustomScreenSpacePixelShaders.IsEmpty();
+		bCustomScreenSpacePixelShaders = !m_pCustomScreenSpacePixelShaders.empty();
 		if (bCustomScreenSpacePixelShaders) {
-			screenSpacePassCount += m_pCustomScreenSpacePixelShaders.GetCount();
+			screenSpacePassCount += m_pCustomScreenSpacePixelShaders.size();
 		}
 
 		// Custom pixel shaders
-		bCustomPixelShaders = !m_pCustomPixelShaders.IsEmpty();
+		bCustomPixelShaders = !m_pCustomPixelShaders.empty();
 		hr = InitVideoTextures();
 		if (FAILED(hr)) {
 			bCustomPixelShaders = false;
@@ -392,13 +389,11 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 #endif
 		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 
-		POSITION pos = m_pCustomPixelShaders.GetHeadPosition();
-		while (pos) {
+		for (auto& Shader : m_pCustomPixelShaders) {
 			CComPtr<IDirect3DSurface9> pTemporarySurface;
 			hr = m_pFrameTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
 			hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
 
-			CExternalPixelShader &Shader = m_pCustomPixelShaders.GetNext(pos);
 			if (!Shader.m_pPixelShader) {
 				Shader.Compile(m_pPSC);
 			}
@@ -517,26 +512,30 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 
 		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 
-		POSITION pos = m_pCustomScreenSpacePixelShaders.GetHeadPosition();
-		while (pos) {
-			CExternalPixelShader &Shader = m_pCustomScreenSpacePixelShaders.GetNext(pos);
-			if (!Shader.m_pPixelShader) {
-				Shader.Compile(m_pPSC);
-			}
+		if (m_pCustomScreenSpacePixelShaders.size()) {
+			const auto it_last = --m_pCustomScreenSpacePixelShaders.end();
 
-			if (pos || bFinalPass || !pRenderTarget) {
-				CComPtr<IDirect3DSurface9> pTemporarySurface;
-				hr = m_pScreenSpaceTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
-				if (SUCCEEDED(hr)) {
-					hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
+			for (auto it = m_pCustomScreenSpacePixelShaders.begin(), end = m_pCustomScreenSpacePixelShaders.end(); it != end; ++it) {
+
+				if (it != it_last || bFinalPass || !pRenderTarget) {
+					CComPtr<IDirect3DSurface9> pTemporarySurface;
+					hr = m_pScreenSpaceTextures[dst]->GetSurfaceLevel(0, &pTemporarySurface);
+					if (SUCCEEDED(hr)) {
+						hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
+					}
 				}
-			} else {
-				hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
-			}
+				else {
+					hr = m_pD3DDevEx->SetRenderTarget(0, pRenderTarget);
+				}
 
-			hr = m_pD3DDevEx->SetPixelShader(Shader.m_pPixelShader);
-			TextureCopy(m_pScreenSpaceTextures[src]);
-			std::swap(src, dst);
+				auto& Shader = *it;
+				if (!Shader.m_pPixelShader) {
+					Shader.Compile(m_pPSC);
+				}
+				hr = m_pD3DDevEx->SetPixelShader(Shader.m_pPixelShader);
+				TextureCopy(m_pScreenSpaceTextures[src]);
+				std::swap(src, dst);
+			}
 		}
 	}
 
@@ -883,7 +882,7 @@ HRESULT CDX9RenderingEngine::InitVideoTextures()
 {
 	HRESULT hr = S_OK;
 
-	size_t count = m_pCustomPixelShaders.GetCount();
+	size_t count = m_pCustomPixelShaders.size();
 
 	if (m_pPSCorrection) {
 		count++;
@@ -1951,9 +1950,9 @@ HRESULT CDX9RenderingEngine::AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9*
 HRESULT CDX9RenderingEngine::ClearCustomPixelShaders(int target)
 {
 	if (target == TARGET_FRAME) {
-		m_pCustomPixelShaders.RemoveAll();
+		m_pCustomPixelShaders.clear();
 	} else if (target == TARGET_SCREEN) {
-		m_pCustomScreenSpacePixelShaders.RemoveAll();
+		m_pCustomScreenSpacePixelShaders.clear();
 	} else {
 		return E_INVALIDARG;
 	}
@@ -1964,7 +1963,7 @@ HRESULT CDX9RenderingEngine::ClearCustomPixelShaders(int target)
 
 HRESULT CDX9RenderingEngine::AddCustomPixelShader(int target, LPCSTR sourceCode, LPCSTR profile)
 {
-	CAtlList<CExternalPixelShader> *pPixelShaders;
+	std::list<CExternalPixelShader> *pPixelShaders;
 	if (target == TARGET_FRAME) {
 		pPixelShaders = &m_pCustomPixelShaders;
 	} else if (target == TARGET_SCREEN) {
@@ -1993,7 +1992,7 @@ HRESULT CDX9RenderingEngine::AddCustomPixelShader(int target, LPCSTR sourceCode,
 		return hr;
 	}
 
-	pPixelShaders->AddTail(Shader);
+	pPixelShaders->push_back(Shader);
 
 	Paint(false);
 

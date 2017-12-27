@@ -1515,11 +1515,10 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 
 					if (SUCCEEDED(pPB->Read(L"stereo_subtitle_offset_ids", &var, nullptr)) && var.vt == VT_BSTR) {
 						const CString offset_ids(var.bstrVal);
-						CAtlList<CString> list;
+						std::list<CString> list;
 						Explode(offset_ids, list, L',');
-						POSITION pos = list.GetHeadPosition();
-						while (pos) {
-							const int value = _wtoi(list.GetNext(pos));
+						for (const auto& str : list) {
+							const int value = _wtoi(str);
 							m_stereo_subtitle_offset_ids.emplace_back(value);
 						}
 					}
