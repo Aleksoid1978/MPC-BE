@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,11 +20,11 @@
 
 #pragma once
 
-#include <atlcoll.h>
+#include <vector>
 
-class CPaddedArray : public CAtlArray<BYTE>
+class CPaddedArray : private std::vector<BYTE>
 {
-protected:
+private:
 	size_t m_padsize;
 
 public:
@@ -33,25 +33,38 @@ public:
 	{
 	}
 
+	BYTE* GetData()
+	{
+		return __super::data();
+	}
+
 	size_t GetCount()
 	{
-		const size_t count = __super::GetCount();
+		const size_t count = __super::size();
 		return (count > m_padsize) ? count - m_padsize : 0;
 	}
 
-	bool SetCount(size_t nNewSize, int nGrowBy = - 1)
+	bool SetCount(size_t nNewSize)
 	{
-		if (__super::SetCount(nNewSize + m_padsize, nGrowBy)) {
-			memset(GetData() + nNewSize, 0, m_padsize);
-			return true;
+		try {
+			__super::resize(nNewSize + m_padsize);
 		}
-		return false;
+		catch (...) {
+			return false;
+		}
+		memset(GetData() + nNewSize, 0, m_padsize);
+		return true;
 	}
 
-	bool Append(BYTE* p, size_t nSize, int nGrowBy = - 1)
+	void RemoveAll()
+	{
+		__super::clear();
+	}
+
+	bool Append(BYTE* p, size_t nSize)
 	{
 		const size_t oldSize = GetCount();
-		if (SetCount(oldSize + nSize, nGrowBy)) {
+		if (SetCount(oldSize + nSize)) {
 			memcpy(GetData() + oldSize, p, nSize);
 			return true;
 		}

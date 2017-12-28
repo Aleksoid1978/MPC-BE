@@ -514,7 +514,7 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 	return hr;
 }
 
-HRESULT CFFAudioDecoder::ReceiveData(CAtlArray<BYTE>& BuffOut, SampleFormat& samplefmt)
+HRESULT CFFAudioDecoder::ReceiveData(std::vector<BYTE>& BuffOut, SampleFormat& samplefmt)
 {
 	HRESULT hr = E_FAIL;
 	const int ret = avcodec_receive_frame(m_pAVCtx, m_pFrame);
@@ -528,16 +528,16 @@ HRESULT CFFAudioDecoder::ReceiveData(CAtlArray<BYTE>& BuffOut, SampleFormat& sam
 			const WORD nChannels = m_pAVCtx->channels;
 			samplefmt = (SampleFormat)m_pAVCtx->sample_fmt;
 			const size_t monosize = nSamples * av_get_bytes_per_sample(m_pAVCtx->sample_fmt);
-			BuffOut.SetCount(monosize * nChannels);
+			BuffOut.resize(monosize * nChannels);
 
 			if (av_sample_fmt_is_planar(m_pAVCtx->sample_fmt)) {
-				BYTE* pOut = BuffOut.GetData();
+				BYTE* pOut = BuffOut.data();
 				for (int ch = 0; ch < nChannels; ++ch) {
 					memcpy(pOut, m_pFrame->extended_data[ch], monosize);
 					pOut += monosize;
 				}
 			} else {
-				memcpy(BuffOut.GetData(), m_pFrame->data[0], BuffOut.GetCount());
+				memcpy(BuffOut.data(), m_pFrame->data[0], BuffOut.size());
 			}
 		}
 
