@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <atlcoll.h>
 #include "PaddedArray.h"
 
 struct AVCodec;
@@ -42,7 +41,7 @@ public:
 	CAC3Encoder();
 
 	bool    Init(int sample_rate, DWORD channel_layout);
-	HRESULT Encode(CAtlArray<float>& BuffIn, CAtlArray<BYTE>& BuffOut);
+	HRESULT Encode(std::vector<float>& BuffIn, std::vector<BYTE>& BuffOut);
 	void    FlushBuffers();
 	void    StreamFinish();
 

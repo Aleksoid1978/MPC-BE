@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <atlcoll.h>
 #include <stdint.h>
 #include "../../filters/FilterInterfacesImpl.h"
 #include "SampleFormat.h"
@@ -105,7 +104,7 @@ protected:
 	BOOL            m_bBitstreamSupported[BTCOUNT];
 
 	CMixer m_Mixer;
-	CAtlArray<float> m_encbuff;
+	std::vector<float> m_encbuff;
 	CAC3Encoder m_AC3Enc;
 	HRESULT AC3Encode(BYTE* pBuff, int size, SampleFormat sfmt, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
 

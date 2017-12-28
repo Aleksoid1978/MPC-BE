@@ -118,15 +118,15 @@ static inline int encode(AVCodecContext *avctx, AVFrame *frame, int *got_packet,
 	return ret;
 }
 
-HRESULT CAC3Encoder::Encode(CAtlArray<float>& BuffIn, CAtlArray<BYTE>& BuffOut)
+HRESULT CAC3Encoder::Encode(std::vector<float>& BuffIn, std::vector<BYTE>& BuffOut)
 {
-	int buffsamples = BuffIn.GetCount() / m_pAVCtx->channels;
+	int buffsamples = BuffIn.size() / m_pAVCtx->channels;
 	if (buffsamples < m_pAVCtx->frame_size) {
 		return E_ABORT;
 	}
 
 	float* pEnc  = m_pSamples;
-	float* pIn   = BuffIn.GetData();
+	float* pIn   = BuffIn.data();
 	int channels = m_pAVCtx->channels;
 	int samples  = m_pAVCtx->frame_size;
 
@@ -150,17 +150,17 @@ HRESULT CAC3Encoder::Encode(CAtlArray<float>& BuffIn, CAtlArray<BYTE>& BuffOut)
 		return E_FAIL;
 	}
 	if (got_packet) {
-		BuffOut.SetCount(avpkt.size);
-		memcpy(BuffOut.GetData(), avpkt.data, avpkt.size);
+		BuffOut.resize(avpkt.size);
+		memcpy(BuffOut.data(), avpkt.data, avpkt.size);
 	}
 	av_packet_unref(&avpkt);
 
-	size_t old_size  = BuffIn.GetCount() * sizeof(float);
+	size_t old_size  = BuffIn.size() * sizeof(float);
 	size_t new_size  = old_size - m_framesize;
 	size_t new_count = new_size / sizeof(float);
 
 	memmove(pIn, (BYTE*)pIn + m_framesize, new_size);
-	BuffIn.SetCount(new_count);
+	BuffIn.resize(new_count);
 
 	return S_OK;
 }
