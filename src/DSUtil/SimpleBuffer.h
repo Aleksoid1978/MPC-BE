@@ -38,16 +38,16 @@ public:
 		}
 	}
 
-	// returns pointer to the data
+	// Returns pointer to the data.
 	T* Data() { return m_data; }
 
-	// returns the number of elements
+	// Returns the number of elements.
 	size_t Size() { return m_size; }
 
-	// returns allocated size in bytes
+	// Returns allocated size in bytes.
 	size_t Bytes() { return m_size * sizeof(T); }
 
-	// set new size. old data will be lost
+	// Set new size. Old data will be lost.
 	void SetSize(const size_t size)
 	{
 		if (m_data) {
@@ -63,7 +63,7 @@ public:
 		m_size = size;
 	}
 
-	// increase the size if necessary. old data may be lost
+	// Increase the size if necessary. Old data may be lost.
 	void ExpandSize(const size_t size)
 	{
 		if (size > m_size) {
@@ -71,7 +71,8 @@ public:
 		}
 	}
 
-	void InsertData(size_t pos, const T* data, const size_t size)
+	// Write to the buffer from the specified position. The data before the specified position will be saved.
+	void WriteData(size_t pos, const T* data, const size_t size)
 	{
 		size_t required_size = pos + size;
 
