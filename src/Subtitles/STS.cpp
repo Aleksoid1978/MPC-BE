@@ -27,6 +27,8 @@
 #include "USFSubtitles.h"
 #include "../DSUtil/WinAPIUtils.h"
 
+using std::wstring;
+
 static struct htmlcolor {
 	TCHAR* name;
 	DWORD color;
