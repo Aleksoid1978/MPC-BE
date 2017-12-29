@@ -22,7 +22,18 @@
 
 #include <vector>
 
-class CPaddedArray : private std::vector<BYTE>
+struct NoInitByte
+{
+	uint8_t value;
+	NoInitByte() {
+		// do nothing
+		static_assert(sizeof(*this) == sizeof (value), "invalid size");
+		//static_assert(__alignof(*this) == __alignof(value), "invalid alignment");
+	}
+};
+
+// A dynamic byte array with a guaranteed padded block at the end and no member initialization.
+class CPaddedArray : private std::vector<NoInitByte>
 {
 private:
 	size_t m_padsize;
@@ -33,9 +44,9 @@ public:
 	{
 	}
 
-	BYTE* GetData()
+	uint8_t* GetData()
 	{
-		return __super::data();
+		return &__super::front().value;
 	}
 
 	size_t GetCount()
@@ -61,7 +72,7 @@ public:
 		__super::clear();
 	}
 
-	bool Append(BYTE* p, size_t nSize)
+	bool Append(uint8_t* p, size_t nSize)
 	{
 		const size_t oldSize = GetCount();
 		if (SetCount(oldSize + nSize)) {
