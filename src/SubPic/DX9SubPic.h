@@ -62,8 +62,8 @@ class CDX9SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 
 public:
 	static CCritSec ms_SurfaceQueueLock;
-	CAtlList<CComPtr<IDirect3DSurface9> > m_FreeSurfaces;
-	CAtlList<CDX9SubPic *> m_AllocatedSurfaces;
+	std::list<CComPtr<IDirect3DSurface9> > m_FreeSurfaces;
+	std::list<CDX9SubPic*> m_AllocatedSurfaces;
 
 	void GetStats(int &_nFree, int &_nAlloc);
 

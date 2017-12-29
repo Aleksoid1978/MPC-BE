@@ -22,7 +22,6 @@
 #pragma once
 
 #include <atlbase.h>
-#include <atlcoll.h>
 #include "CoordGeom.h"
 
 enum SUBTITLE_TYPE {
