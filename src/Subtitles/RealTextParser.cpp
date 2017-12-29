@@ -19,13 +19,17 @@
  */
 
 #include "stdafx.h"
+#include <vector>
 #include "RealTextParser.h"
 
+using std::vector;
+using std::list;
+using std::map;
+using std::pair;
+using std::wstring;
+using std::wostream;
 using std::wostringstream;
 using std::endl;
-
-#include <vector>
-using std::vector;
 
 CRealTextParser::CRealTextParser(void):
 	m_bIgnoreFont(false),
