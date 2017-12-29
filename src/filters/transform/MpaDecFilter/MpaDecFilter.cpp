@@ -1095,7 +1095,7 @@ HRESULT CMpaDecFilter::ProcessPCMraw() //'raw '
 	size_t nSamples   = size * 8 / wfe->wBitsPerSample;
 
 	SampleFormat out_sf = SAMPLE_FMT_NONE;
-	std::vector<BYTE> outBuff;
+	std::vector<NoInitByte> outBuff;
 	outBuff.resize(size);
 
 	switch (wfe->wBitsPerSample) {
@@ -1116,7 +1116,7 @@ HRESULT CMpaDecFilter::ProcessPCMraw() //'raw '
 	}
 
 	HRESULT hr;
-	if (S_OK != (hr = Deliver(outBuff.data(), size, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
+	if (S_OK != (hr = Deliver(&outBuff.front().value, size, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
 		return hr;
 	}
 
@@ -1131,7 +1131,7 @@ HRESULT CMpaDecFilter::ProcessPCMintBE() // 'twos', big-endian 'in24' and 'in32'
 
 	SampleFormat out_sf = SAMPLE_FMT_NONE;
 	size_t outSize = nSamples * (wfe->wBitsPerSample <= 16 ? 2 : 4); // convert to 16 and 32-bit
-	std::vector<BYTE> outBuff;
+	std::vector<NoInitByte> outBuff;
 	outBuff.resize(outSize);
 
 	switch (wfe->wBitsPerSample) {
@@ -1180,7 +1180,7 @@ HRESULT CMpaDecFilter::ProcessPCMintBE() // 'twos', big-endian 'in24' and 'in32'
 	}
 
 	HRESULT hr;
-	if (S_OK != (hr = Deliver(outBuff.data(), outSize, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
+	if (S_OK != (hr = Deliver(&outBuff.front().value, outSize, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
 		return hr;
 	}
 
@@ -1195,7 +1195,7 @@ HRESULT CMpaDecFilter::ProcessPCMintLE() // 'sowt', little-endian 'in24' and 'in
 
 	SampleFormat out_sf = SAMPLE_FMT_NONE;
 	size_t outSize = nSamples * (wfe->wBitsPerSample <= 16 ? 2 : 4); // convert to 16 and 32-bit
-	std::vector<BYTE> outBuff;
+	std::vector<NoInitByte> outBuff;
 	outBuff.resize(outSize);
 
 	switch (wfe->wBitsPerSample) {
@@ -1224,7 +1224,7 @@ HRESULT CMpaDecFilter::ProcessPCMintLE() // 'sowt', little-endian 'in24' and 'in
 	}
 
 	HRESULT hr;
-	if (S_OK != (hr = Deliver(outBuff.data(), outSize, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
+	if (S_OK != (hr = Deliver(&outBuff.front().value, outSize, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
 		return hr;
 	}
 
@@ -1239,7 +1239,7 @@ HRESULT CMpaDecFilter::ProcessPCMfloatBE() // big-endian 'fl32' and 'fl64'
 	size_t nSamples   = size * 8 / wfe->wBitsPerSample;
 
 	SampleFormat out_sf = SAMPLE_FMT_NONE;
-	std::vector<BYTE> outBuff;
+	std::vector<NoInitByte> outBuff;
 	outBuff.resize(size);
 
 	switch (wfe->wBitsPerSample) {
@@ -1264,7 +1264,7 @@ HRESULT CMpaDecFilter::ProcessPCMfloatBE() // big-endian 'fl32' and 'fl64'
 	}
 
 	HRESULT hr;
-	if (S_OK != (hr = Deliver(outBuff.data(), size, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
+	if (S_OK != (hr = Deliver(&outBuff.front().value, size, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
 		return hr;
 	}
 
@@ -1278,7 +1278,7 @@ HRESULT CMpaDecFilter::ProcessPCMfloatLE() // little-endian 'fl32' and 'fl64'
 	size_t size = m_buff.GetCount();
 
 	SampleFormat out_sf = SAMPLE_FMT_NONE;
-	std::vector<BYTE> outBuff;
+	std::vector<NoInitByte> outBuff;
 	outBuff.resize(size);
 
 	switch (wfe->wBitsPerSample) {
@@ -1292,7 +1292,7 @@ HRESULT CMpaDecFilter::ProcessPCMfloatLE() // little-endian 'fl32' and 'fl64'
 	memcpy(outBuff.data(), m_buff.GetData(), size);
 
 	HRESULT hr;
-	if (S_OK != (hr = Deliver(outBuff.data(), size, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
+	if (S_OK != (hr = Deliver(&outBuff.front().value, size, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
 		return hr;
 	}
 
@@ -1310,7 +1310,7 @@ HRESULT CMpaDecFilter::ProcessPS2PCM()
 	size_t size = wfe->dwInterleave * wfe->nChannels;
 
 	SampleFormat out_sf = SAMPLE_FMT_S16P;
-	std::vector<BYTE> outBuff;
+	std::vector<NoInitByte> outBuff;
 	outBuff.resize(size);
 
 	while (p + size <= end) {
@@ -1329,7 +1329,7 @@ HRESULT CMpaDecFilter::ProcessPS2PCM()
 			}
 
 			HRESULT hr;
-			if (S_OK != (hr = Deliver(outBuff.data(), size, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
+			if (S_OK != (hr = Deliver(&outBuff.front().value, size, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
 				return hr;
 			}
 
@@ -1388,7 +1388,7 @@ HRESULT CMpaDecFilter::ProcessPS2ADPCM()
 
 	SampleFormat out_sf = SAMPLE_FMT_S16P;
 	size_t outSize = samples * channels * sizeof(int16_t);
-	std::vector<BYTE> outBuff;
+	std::vector<NoInitByte> outBuff;
 	outBuff.resize(outSize);
 	int16_t* pOut = (int16_t*)outBuff.data();
 
@@ -1412,7 +1412,7 @@ HRESULT CMpaDecFilter::ProcessPS2ADPCM()
 			}
 
 			HRESULT hr;
-			if (S_OK != (hr = Deliver(outBuff.data(), outSize, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
+			if (S_OK != (hr = Deliver(&outBuff.front().value, outSize, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
 				return hr;
 			}
 
@@ -1476,7 +1476,6 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, size_t size, SampleFormat sfmt, DWOR
 	const SampleFormat out_sf = MPCtoSamplefmt[out_mpcsf];
 
 	BYTE*  pDataIn  = pBuff;
-	std::vector<float> mixData;
 
 	CMediaType mt = CreateMediaType(out_mpcsf, nSamplesPerSec, nChannels, dwChannelMask);
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.Format();
