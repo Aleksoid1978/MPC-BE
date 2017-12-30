@@ -649,8 +649,8 @@ HRESULT CFFAudioDecoder::RealPrepare(BYTE* p, int buffsize, CPaddedArray& BuffOu
 		int len = w * h;
 
 		if (buffsize >= len) {
-			BuffOut.SetCount(len);
-			BYTE* dest = BuffOut.GetData();
+			BuffOut.Resize(len);
+			BYTE* dest = BuffOut.Data();
 
 			int sps = m_raData.sub_packet_size;
 			if (sps > 0 && m_raData.deint_id == MAKEFOURCC('r', 'n', 'e', 'g')) { // COOK and ATRAC codec
