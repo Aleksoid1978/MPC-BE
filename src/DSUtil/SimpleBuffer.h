@@ -47,9 +47,15 @@ public:
 	// Returns allocated size in bytes.
 	size_t Bytes() { return m_size * sizeof(T); }
 
-	// Set new size. Old data will be lost.
-	void SetSize(const size_t size)
+	// Set new size. Old data will be lost. The size will be rounded up to a multiple of 256.
+	void SetSize(size_t size)
 	{
+		size = (size + 255) & ~(size_t)255; // rounded up a multiple of 256
+
+		if (size == m_size) {
+			return;
+		}
+
 		if (m_data) {
 			delete[] m_data;
 		}
