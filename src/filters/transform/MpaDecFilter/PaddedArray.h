@@ -35,18 +35,18 @@ public:
 	{
 	}
 
-	uint8_t* GetData()
+	uint8_t* Data()
 	{
 		return &__super::front().value;
 	}
 
-	size_t GetCount()
+	size_t Size()
 	{
 		const size_t count = __super::size();
 		return (count > m_padsize) ? count - m_padsize : 0;
 	}
 
-	bool SetCount(size_t nNewSize)
+	bool Resize(size_t nNewSize)
 	{
 		try {
 			__super::resize(nNewSize + m_padsize);
@@ -54,20 +54,20 @@ public:
 		catch (...) {
 			return false;
 		}
-		memset(GetData() + nNewSize, 0, m_padsize);
+		memset(Data() + nNewSize, 0, m_padsize);
 		return true;
 	}
 
-	void RemoveAll()
+	void Clear()
 	{
 		__super::clear();
 	}
 
 	bool Append(uint8_t* p, size_t nSize)
 	{
-		const size_t oldSize = GetCount();
-		if (SetCount(oldSize + nSize)) {
-			memcpy(GetData() + oldSize, p, nSize);
+		const size_t oldSize = Size();
+		if (Resize(oldSize + nSize)) {
+			memcpy(Data() + oldSize, p, nSize);
 			return true;
 		}
 		return false;
@@ -75,12 +75,12 @@ public:
 
 	void RemoveHead(size_t nSize)
 	{
-		const size_t count = GetCount();
+		const size_t count = Size();
 		if (nSize >= count) {
-			RemoveAll();
+			Clear();
 		} else {
-			memmove(GetData(), GetData() + nSize, count - nSize);
-			SetCount(count - nSize);
+			memmove(Data(), Data() + nSize, count - nSize);
+			Resize(count - nSize);
 		}
 	}
 };
