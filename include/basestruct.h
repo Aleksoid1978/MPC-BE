@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -116,4 +116,15 @@ struct ColorSpace {
 	BYTE Range;
 	BYTE TransferCharacteristics;
 	BYTE ChromaLocation;
+};
+
+// A byte that is not initialized to std::vector when using the resize method.
+struct NoInitByte
+{
+	uint8_t value;
+	NoInitByte() {
+		// do nothing
+		static_assert(sizeof(*this) == sizeof (value), "invalid size");
+		//static_assert(__alignof(*this) == __alignof(value), "invalid alignment");
+	}
 };

@@ -20,17 +20,8 @@
 
 #pragma once
 
+#include <basestruct.h>
 #include <vector>
-
-struct NoInitByte
-{
-	uint8_t value;
-	NoInitByte() {
-		// do nothing
-		static_assert(sizeof(*this) == sizeof (value), "invalid size");
-		//static_assert(__alignof(*this) == __alignof(value), "invalid alignment");
-	}
-};
 
 // A dynamic byte array with a guaranteed padded block at the end and no member initialization.
 class CPaddedArray : private std::vector<NoInitByte>
