@@ -81,6 +81,24 @@ T ExplodeMin(const T& str, CAtlList<T>& sl, SEP sep, size_t limit = 0)
 }
 
 template<class T, typename SEP>
+T ExplodeMin(const T& str, std::list<T>& sl, SEP sep, size_t limit = 0)
+{
+	Explode(str, sl, sep, limit);
+	for (auto it = sl.cbegin(); it != sl.cend(); ) {
+		if ((*it).IsEmpty()) {
+			sl.erase(it++);
+		} else {
+			it++;
+		}
+	}
+	if (sl.empty()) {
+		sl.push_back(T());    // eh
+	}
+
+	return sl.front();
+}
+
+template<class T, typename SEP>
 T ExplodeEsc(T str, CAtlList<T>& sl, SEP sep, size_t limit = 0, SEP esc = '\\')
 {
 	sl.RemoveAll();

@@ -605,20 +605,19 @@ void CPPageFormats::SetListItemState(int nItem)
 
 	CString str = AfxGetAppSettings().m_Formats[(int)m_list.GetItemData(nItem)].GetExtsWithPeriod();
 
-	CAtlList<CString> exts;
+	std::list<CString> exts;
 	ExplodeMin(str, exts, ' ');
 
 	int cnt = 0;
 
-	POSITION pos = exts.GetHeadPosition();
-	while (pos) {
-		if (IsRegistered(exts.GetNext(pos), true)) {
+	for (const auto ext : exts) {
+		if (IsRegistered(ext, true)) {
 			cnt++;
 		}
 	}
 
 	if (cnt != 0) {
-		cnt = (cnt == (int)exts.GetCount() ? 1 : 2);
+		cnt = (cnt == (int)exts.size() ? 1 : 2);
 	}
 
 	SetChecked(nItem, cnt);
