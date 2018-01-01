@@ -1,7 +1,7 @@
 BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"關於"
 7		"MPC-BE"
-8		"Copyright © 2002-2017 詳見 Authors.txt 檔案"
+8		"Copyright © 2002-2018 詳見 Authors.txt 檔案"
 10		"版本："
 11		"SVN 組建版本："
 12		"MPC-BE 編譯器："

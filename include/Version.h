@@ -1,7 +1,7 @@
 #ifndef ISPP_INVOKED
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,13 +41,13 @@
 // MPC_VERSION_STATUS: 0 - beta; 1 - stable
 
 #define MPC_WND_CLASS_NAME      "MPC-BE"
-#define MPC_YEAR_COMMENTS       "2002-2017"
+#define MPC_YEAR_COMMENTS       "2002-2018"
 #define MPC_VERSION_COMMENTS    "http://sourceforge.net/projects/mpcbe/"
 
 #ifndef ISPP_INVOKED
 
 #define MPC_COMP_NAME_STR       L"MPC-BE Team"
-#define MPC_COPYRIGHT_STR       L"Copyright © 2002-2017 all contributors, see Authors.txt"
+#define MPC_COPYRIGHT_STR       L"Copyright © 2002-2018 all contributors, see Authors.txt"
 
 #define MPC_VERSION_NUM         MPC_VERSION_MAJOR,MPC_VERSION_MINOR,MPC_VERSION_PATCH
 #define MPC_VERSION_STR         MAKE_STR(MPC_VERSION_MAJOR) "." \
