@@ -53,9 +53,9 @@ bool mpc_filehash(LPCTSTR fn, filehash& fh)
 	return true;
 }
 
-void mpc_filehash(CPlaylist& pl, CList<filehash>& fhs)
+void mpc_filehash(CPlaylist& pl, std::list<filehash>& fhs)
 {
-	fhs.RemoveAll();
+	fhs.clear();
 
 	POSITION pos = pl.GetHeadPosition();
 
@@ -72,29 +72,27 @@ void mpc_filehash(CPlaylist& pl, CList<filehash>& fhs)
 			continue;
 		}
 
-		fhs.AddTail(fh);
+		fhs.push_back(fh);
 	}
 }
 
 CStringA makeargs(CPlaylist& pl)
 {
-	CList<filehash> fhs;
+	std::list<filehash> fhs;
 	mpc_filehash(pl, fhs);
 
-	CAtlList<CStringA> args;
+	std::list<CStringA> args;
 
-	POSITION pos = fhs.GetHeadPosition();
-
-	for (int i = 0; pos; i++) {
-		filehash& fh = fhs.GetNext(pos);
-
+	int i = 0;
+	for (const auto& fh : fhs) {
 		CStringA str;
 		str.Format("name[%d]=%s&size[%d]=%016I64x&hash[%d]=%016I64x",
 				   i, UrlEncode(CStringA(fh.name), true),
 				   i, fh.size,
 				   i, fh.mpc_filehash);
 
-		args.AddTail(str);
+		args.push_back(str);
+		i++;
 	}
 
 	return Implode(args, '&');

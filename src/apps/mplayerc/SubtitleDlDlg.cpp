@@ -177,10 +177,10 @@ void CSubtitleDlDlg::LoadList()
 {
 	m_list.SetRedraw(FALSE);
 
-	for (int i = 0; i < m_parsed_movies.GetCount(); ++i) {
+	for (size_t i = 0; i < m_parsed_movies.size(); ++i) {
 		isdb_movie_parsed& m = m_parsed_movies[i];
 
-		int iItem = m_list.InsertItem(i, L"");
+		int iItem = m_list.InsertItem((int)i, L"");
 		m_list.SetItemData(iItem, m.ptr);
 		m_list.SetItemText(iItem, COL_FILENAME, m.name);
 		m_list.SetItemText(iItem, COL_LANGUAGE, m.language);
@@ -203,15 +203,10 @@ bool CSubtitleDlDlg::Parse()
 	isdb_movie m;
 	isdb_subtitle sub;
 
-	CAtlList<CStringA> sl;
+	std::list<CStringA> sl;
 	Explode(m_pTA->raw_list, sl, '\n');
-	CString str;
 
-	POSITION pos = sl.GetHeadPosition();
-
-	while (pos) {
-		str = sl.GetNext(pos);
-
+	for (const auto& str : sl) {
 		CStringA param = str.Left(std::max(0, str.Find('=')));
 		CStringA value = str.Mid(str.Find('=')+1);
 
@@ -240,17 +235,15 @@ bool CSubtitleDlDlg::Parse()
 		} else if (param == "email") {
 			sub.email = value;
 		} else if (param.IsEmpty() && value == "endsubtitle") {
-			m.subs.AddTail(sub);
+			m.subs.push_back(sub);
 		} else if (param.IsEmpty() && value == "endmovie") {
-			m_pTA->raw_movies.AddTail(m);
+			m_pTA->raw_movies.push_back(m);
 		} else if (param.IsEmpty() && value == "end") {
 			break;
 		}
 	}
 
-	pos = m_pTA->raw_movies.GetHeadPosition();
-	while (pos) {
-		isdb_movie& raw_movie = m_pTA->raw_movies.GetNext(pos);
+	for (const auto& raw_movie : m_pTA->raw_movies) {
 		isdb_movie_parsed p;
 
 		CStringA titlesA = Implode(raw_movie.titles, '|');
@@ -258,21 +251,19 @@ bool CSubtitleDlDlg::Parse()
 		p.titles = UTF8To16(titlesA);
 		p.checked = false;
 
-		POSITION pos2 = raw_movie.subs.GetHeadPosition();
-		while (pos2) {
-			const isdb_subtitle& s = raw_movie.subs.GetNext(pos2);
+		for (const auto& s : raw_movie.subs) {
 			p.name = UTF8To16(s.name);
 			p.language = s.language;
 			p.format = s.format;
 			p.disc.Format(L"%d/%d", s.disc_no, s.discs);
 			p.ptr = reinterpret_cast<DWORD_PTR>(&s);
 
-			m_parsed_movies.Add(p);
+			m_parsed_movies.push_back(p);
 		}
 	}
 
 	bool ret = true;
-	if (m_parsed_movies.IsEmpty()) {
+	if (m_parsed_movies.empty()) {
 		ret = false;
 	}
 
@@ -315,14 +306,14 @@ BOOL CSubtitleDlDlg::OnInitDialog()
 	m_status.Create(WS_CHILD | WS_VISIBLE | CCS_BOTTOM, CRect(0,0,0,0), this, IDC_STATUSBAR);
 
 	int n, curPos = 0;
-	CArray<int> columnWidth;
+	std::vector<int> columnWidth;
 
 	CString strColumnWidth = AfxGetMyApp()->GetProfileString(IDS_R_DLG_SUBTITLEDL, IDS_RS_DLG_SUBTITLEDL_COLWIDTH);
 	CString token = strColumnWidth.Tokenize(L",", curPos);
 
 	while (!token.IsEmpty()) {
 		if (swscanf_s(token, L"%d", &n) == 1) {
-			columnWidth.Add(n);
+			columnWidth.push_back(n);
 			token = strColumnWidth.Tokenize(L",", curPos);
 		} else {
 			throw 1;
@@ -333,13 +324,13 @@ BOOL CSubtitleDlDlg::OnInitDialog()
 							| LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT
 							| LVS_EX_CHECKBOXES   | LVS_EX_LABELTIP);
 
-	if (columnWidth.GetCount() != 5) {
-		columnWidth.RemoveAll();
-		columnWidth.Add(290);
-		columnWidth.Add(70);
-		columnWidth.Add(50);
-		columnWidth.Add(50);
-		columnWidth.Add(270);
+	if (columnWidth.size() != 5) {
+		columnWidth.clear();
+		columnWidth.push_back(290);
+		columnWidth.push_back(70);
+		columnWidth.push_back(50);
+		columnWidth.push_back(50);
+		columnWidth.push_back(270);
 	}
 
 	m_list.InsertColumn(COL_FILENAME, ResStr(IDS_SUBDL_DLG_FILENAME_COL), LVCFMT_LEFT, columnWidth[0]);
@@ -401,11 +392,13 @@ BOOL CSubtitleDlDlg::PreTranslateMessage(MSG* pMsg)
 
 void CSubtitleDlDlg::OnOK()
 {
+	CAppSettings& s = AfxGetAppSettings();
+
 	SetStatus(ResStr(IDS_SUBDL_DLG_DOWNLOADING));
 
 	for (int i = 0; i < m_list.GetItemCount(); ++i) {
 		if (m_list.GetCheck(i)) {
-			m_selsubs.AddTail(*reinterpret_cast<isdb_subtitle*>(m_list.GetItemData(i)));
+			m_selsubs.push_back(*reinterpret_cast<isdb_subtitle*>(m_list.GetItemData(i)));
 		}
 	}
 
@@ -419,11 +412,7 @@ void CSubtitleDlDlg::OnOK()
 
 	CComPtr<ISubStream> pSubStreamToSet;
 
-	POSITION pos = m_selsubs.GetHeadPosition();
-
-	while (pos) {
-		const isdb_subtitle& sub = m_selsubs.GetNext(pos);
-		CAppSettings& s = AfxGetAppSettings();
+	for (const auto& sub : m_selsubs) {
 		CInternetSession is;
 		CStringA url = "http://" + s.strISDb + "/dl.php?";
 		CStringA ticket = UrlEncode(m_pTA->ticket);
@@ -474,7 +463,7 @@ void CSubtitleDlDlg::OnOK()
 
 	if (pSubStreamToSet) {
 		pFrame->SetSubtitle(pSubStreamToSet);
-		AfxGetAppSettings().fEnableSubtitles = true;
+		s.fEnableSubtitles = true;
 	}
 
 	__super::OnOK();
