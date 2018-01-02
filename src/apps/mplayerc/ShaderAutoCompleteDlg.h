@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,7 +35,12 @@ public:
 	CShaderAutoCompleteDlg(CWnd* pParent = nullptr);
 	virtual ~CShaderAutoCompleteDlg();
 
-	CMap<CString, LPCTSTR, CString, CString> m_inst;
+	struct hlslfunc_t {
+		LPCWSTR str;
+		LPCWSTR name;
+		LPCWSTR desc;
+	};
+	static const std::vector<hlslfunc_t> m_HLSLFuncs;
 
 	enum { IDD = IDD_SHADERAUTOCOMPLETE_DLG };
 
