@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -117,23 +117,10 @@ void CShaderEdit::OnUpdate()
 
 		m_acdlg.m_list.ResetContent();
 
-		CString key, value;
-		POSITION pos = m_acdlg.m_inst.GetStartPosition();
-
-		while (pos) {
-			POSITION cur = pos;
-			m_acdlg.m_inst.GetNextAssoc(pos, key, value);
-
-			if (key.Find(text) == 0) {
-				CAtlList<CString> sl;
-				Explode(value, sl, L'|', 2);
-				if (sl.GetCount() != 2) {
-					continue;
-				}
-				CString name = sl.RemoveHead();
-				CString description = sl.RemoveHead();
-				int i = m_acdlg.m_list.AddString(name);
-				m_acdlg.m_list.SetItemDataPtr(i, cur);
+		for (auto& hlslfunc : m_acdlg.m_HLSLFuncs) {
+			if (CString(hlslfunc.str).Find(text) == 0) {
+				int i = m_acdlg.m_list.AddString(hlslfunc.name);
+				m_acdlg.m_list.SetItemDataPtr(i, (void*)&hlslfunc);
 			}
 		}
 

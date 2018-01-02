@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,90 +24,103 @@
 
 // CShaderAutoCompleteDlg dialog
 
+const std::vector<CShaderAutoCompleteDlg::hlslfunc_t> CShaderAutoCompleteDlg::m_HLSLFuncs = {
+	hlslfunc_t{L"abs",         L"abs(x)",                    L"Absolute value (per component). "},
+	hlslfunc_t{L"acos",        L"acos(x)",                   L"Returns the arccosine of each component of x. Each component should be in the range [-1, 1]. "},
+	hlslfunc_t{L"all",         L"all(x)",                    L"Test if all components of x are nonzero. "},
+	hlslfunc_t{L"any",         L"any(x)",                    L"Test is any component of x is nonzero. "},
+	hlslfunc_t{L"asin",        L"asin(x)",                   L"Returns the arcsine of each component of x. Each component should be in the range [-pi/2, pi/2]. "},
+	hlslfunc_t{L"atan",        L"atan(x)",                   L"Returns the arctangent of x. The return values are in the range [-pi/2, pi/2]. "},
+	hlslfunc_t{L"atan2",       L"atan2(y, x)",               L"Returns the arctangent of y/x. The signs of y and x are used to determine the quadrant of the return values in the range [-pi, pi]. atan2 is well-defined for every point other than the origin, even if x equals 0 and y does not equal 0. "},
+	hlslfunc_t{L"ceil",        L"ceil(x)",                   L"Returns the smallest integer which is greater than or equal to x. "},
+	hlslfunc_t{L"clamp",       L"clamp(x, min, max)",        L"Clamps x to the range [min, max]. "},
+	hlslfunc_t{L"clip",        L"clip(x)",                   L"Discards the current pixel, if any component of x is less than zero. This can be used to simulate clip planes, if each component of x represents the distance from a plane. "},
+	hlslfunc_t{L"cos",         L"cos(x)",                    L"Returns the cosine of x. "},
+	hlslfunc_t{L"cosh",        L"cosh(x)",                   L"Returns the hyperbolic cosine of x. "},
+	hlslfunc_t{L"cross",       L"cross(a, b)",               L"Returns the cross product of two 3-D vectors a and b. "},
+	hlslfunc_t{L"d3dcolortoubyte4", L"D3DCOLORtoUBYTE4(x)",  L"Swizzles and scales components of the 4-D vector x to compensate for the lack of UBYTE4 support in some hardware. "},
+	hlslfunc_t{L"ddx",         L"ddx(x)",                    L"Returns the partial derivative of x with respect to the screen-space x-coordinate. "},
+	hlslfunc_t{L"ddy",         L"ddy(x)",                    L"Returns the partial derivative of x with respect to the screen-space y-coordinate. "},
+	hlslfunc_t{L"degrees",     L"degrees(x)",                L"Converts x from radians to degrees. "},
+	hlslfunc_t{L"determinant", L"determinant(m)",            L"Returns the determinant of the square matrix m. "},
+	hlslfunc_t{L"distance",    L"distance(a, b)",            L"Returns the distance between two points a and b. "},
+	hlslfunc_t{L"dot",         L"dot(a, b)",                 L"Returns the dot product of two vectors a and b. "},
+	hlslfunc_t{L"exp",         L"exp(x)",                    L"Returns the base-e exponent ex. "},
+	hlslfunc_t{L"exp2",        L"exp2(value a)",             L"Base 2 Exp (per component). "},
+	hlslfunc_t{L"faceforward", L"faceforward(n, i, ng)",     L"Returns -n * sign(dot(i, ng)). "},
+	hlslfunc_t{L"floor",       L"floor(x)",                  L"Returns the greatest integer which is less than or equal to x. "},
+	hlslfunc_t{L"fmod",        L"fmod(a, b)",                L"Returns the floating point remainder f of a / b such that a = i * b + f, where i is an integer, f has the same sign as x, and the absolute value of f is less than the absolute value of b. "},
+	hlslfunc_t{L"frac",        L"frac(x)",                   L"Returns the fractional part f of x, such that f is a value greater than or equal to 0, and less than 1. "},
+	hlslfunc_t{L"frc",         L"frc(value a)",              L"Fractional part (per component). "},
+	hlslfunc_t{L"frexp",       L"frexp(x, out exp)",         L"Returns the mantissa and exponent of x. frexp returns the mantissa, and the exponent is stored in the output parameter exp. If x is 0, the function returns 0 for both the mantissa and the exponent. "},
+	hlslfunc_t{L"fwidth",      L"fwidth(x)",                 L"Returns abs(ddx(x))+abs(ddy(x)). "},
+	hlslfunc_t{L"isfinite",    L"isfinite(x)",               L"Returns true if x is finite, false otherwise. "},
+	hlslfunc_t{L"isinf",       L"isinf(x)",                  L"Returns true if x is +INF or -INF, false otherwise. "},
+	hlslfunc_t{L"isnan",       L"isnan(x)",                  L"Returns true if x is NAN or QNAN, false otherwise. "},
+	hlslfunc_t{L"ldexp",       L"ldexp(x, exp)",             L"Returns x * 2exp. "},
+	hlslfunc_t{L"len",         L"len(value a)",              L"Vector length. "},
+	hlslfunc_t{L"length",      L"length(v)",                 L"Returns the length of the vector v. "},
+	hlslfunc_t{L"lerp",        L"lerp(a, b, s)",             L"Returns a + s(b - a). This linearly interpolates between a and b, such that the return value is a when s is 0, and b when s is 1. "},
+	hlslfunc_t{L"lit",         L"lit(ndotl, ndoth, m)",      L"Returns a lighting vector (ambient, diffuse, specular, 1): ambient = 1; diffuse = (ndotl < 0) ? 0 : ndotl; specular = (ndotl < 0) || (ndoth < 0) ? 0 : (ndoth * m); "},
+	hlslfunc_t{L"log",         L"log(x)",                    L"Returns the base-e logarithm of x. If x is negative, the function returns indefinite. If x is 0, the function returns +INF. "},
+	hlslfunc_t{L"log10",       L"log10(x)",                  L"Returns the base-10 logarithm of x. If x is negative, the function returns indefinite. If x is 0, the function returns +INF. "},
+	hlslfunc_t{L"log2",        L"log2(x)",                   L"Returns the base-2 logarithm of x. If x is negative, the function returns indefinite. If x is 0, the function returns +INF. "},
+	hlslfunc_t{L"max",         L"max(a, b)",                 L"Selects the greater of a and b. "},
+	hlslfunc_t{L"min",         L"min(a, b)",                 L"Selects the lesser of a and b. "},
+	hlslfunc_t{L"modf",        L"modf(x, out ip)",           L"Splits the value x into fractional and integer parts, each of which has the same sign and x. The signed fractional portion of x is returned. The integer portion is stored in the output parameter ip. "},
+	hlslfunc_t{L"mul",         L"mul(a, b)",                 L"Performs matrix multiplication between a and b. If a is a vector, it treated as a row vector. If b is a vector, it is treated as a column vector. The inner dimension acolumns and brows must be equal. The result has the dimension arows x bcolumns. "},
+	hlslfunc_t{L"noise",       L"noise(x)",                  L"Not yet implemented. "},
+	hlslfunc_t{L"normalize",   L"normalize(v)",              L"Returns the normalized vector v / length(v). If the length of v is 0, the result is indefinite. "},
+	hlslfunc_t{L"pow",         L"pow(x, y)",                 L"Returns x^y. "},
+	hlslfunc_t{L"radians",     L"radians(x)",                L"Converts x from degrees to radians. "},
+	hlslfunc_t{L"reflect",     L"reflect(i, n)",             L"Returns the reflection vector v, given the entering ray direction i, and the surface normal n. Such that v = i - 2 * dot(i, n) * n "},
+	hlslfunc_t{L"refract",     L"refract(i, n, eta)",        L"Returns the refraction vector v, given the entering ray direction i, the surface normal n, and the relative index of refraction eta. If the angle between i and n is too great for a given eta, refract returns (0,0,0). "},
+	hlslfunc_t{L"round",       L"round(x)",                  L"Rounds x to the nearest integer. "},
+	hlslfunc_t{L"rsqrt",       L"rsqrt(x)",                  L"Returns 1 / sqrt(x). "},
+	hlslfunc_t{L"saturate",    L"saturate(x)",               L"Clamps x to the range [0, 1]. "},
+	hlslfunc_t{L"sign",        L"sign(x)",                   L"Computes the sign of x. Returns -1 if x is less than 0, 0 if x equals 0, and 1 if x is greater than zero. "},
+	hlslfunc_t{L"sin",         L"sin(x)",                    L"Returns the sine of x. "},
+	hlslfunc_t{L"sincos",      L"sincos(x, out s, out c)",   L"Returns the sine and cosine of x. sin(x) is stored in the output parameter s. cos(x) is stored in the output parameter c. "},
+	hlslfunc_t{L"sinh",        L"sinh(x)",                   L"Returns the hyperbolic sine of x. "},
+	hlslfunc_t{L"smoothstep",  L"smoothstep(min, max, x)",   L"Returns 0 if x < min. Returns 1 if x > max. Returns a smooth Hermite interpolation between 0 and 1, if x is in the range [min, max]. "},
+	hlslfunc_t{L"sqrt",        L"sqrt(value a)",             L"Square root (per component). "},
+	hlslfunc_t{L"step",        L"step(a, x)",                L"Returns (x >= a) ? 1 : 0. "},
+	hlslfunc_t{L"tan",         L"tan(x)",                    L"Returns the tangent of x. "},
+	hlslfunc_t{L"tanh",        L"tanh(x)",                   L"Returns the hyperbolic tangent of x. "},
+	hlslfunc_t{L"tex1d",       L"tex1D(s, t)",               L"1-D texture lookup. s is a sampler or a sampler1D object. t is a scalar. "},
+	hlslfunc_t{L"tex1d(",      L"tex1D(s, t, ddx, ddy)",     L"1-D texture lookup, with derivatives. s is a sampler or sampler1D object. t, ddx, and ddy are scalars. "},
+	hlslfunc_t{L"tex1dbias",   L"tex1Dbias(s, t)",           L"1-D biased texture lookup. s is a sampler or sampler1D object. t is a 4-D vector. The mip level is biased by t.w before the lookup takes place. "},
+	hlslfunc_t{L"tex1dgrad",   L"tex1Dgrad(s, t, ddx, ddy)", L" "},
+	hlslfunc_t{L"tex1dlod",    L"tex1Dlod(s, t)",            L" "},
+	hlslfunc_t{L"tex1dproj",   L"tex1Dproj(s, t)",           L"1-D projective texture lookup. s is a sampler or sampler1D object. t is a 4-D vector. t is divided by its last component before the lookup takes place. "},
+	hlslfunc_t{L"tex2d",       L"tex2D(s, t)",               L"2-D texture lookup. s is a sampler or a sampler2D object. t is a 2-D texture coordinate. "},
+	hlslfunc_t{L"tex2d(",      L"tex2D(s, t, ddx, ddy)",     L"2-D texture lookup, with derivatives. s is a sampler or sampler2D object. t, ddx, and ddy are 2-D vectors. "},
+	hlslfunc_t{L"tex2dbias",   L"tex2Dbias(s, t)",           L"2-D biased texture lookup. s is a sampler or sampler2D object. t is a 4-D vector. The mip level is biased by t.w before the lookup takes place. "},
+	hlslfunc_t{L"tex2dgrad",   L"tex2Dgrad(s, t, ddx, ddy)", L" "},
+	hlslfunc_t{L"tex2dlod",    L"tex2Dlod(s, t)",            L" "},
+	hlslfunc_t{L"tex2dproj",   L"tex2Dproj(s, t)",           L"2-D projective texture lookup. s is a sampler or sampler2D object. t is a 4-D vector. t is divided by its last component before the lookup takes place. "},
+	hlslfunc_t{L"tex3d",       L"tex3D(s, t)",               L"3-D volume texture lookup. s is a sampler or a sampler3D object. t is a 3-D texture coordinate. "},
+	hlslfunc_t{L"tex3d(",      L"tex3D(s, t, ddx, ddy)",     L"3-D volume texture lookup, with derivatives. s is a sampler or sampler3D object. t, ddx, and ddy are 3-D vectors. "},
+	hlslfunc_t{L"tex3dbias",   L"tex3Dbias(s, t)",           L"3-D biased texture lookup. s is a sampler or sampler3D object. t is a 4-D vector. The mip level is biased by t.w before the lookup takes place. "},
+	hlslfunc_t{L"tex3dgrad",   L"tex3Dgrad(s, t, ddx, ddy)", L" "},
+	hlslfunc_t{L"tex3dlod",    L"tex3Dlod(s, t)",            L" "},
+	hlslfunc_t{L"tex3dproj",   L"tex3Dproj(s, t)",           L"3-D projective volume texture lookup. s is a sampler or sampler3D object. t is a 4-D vector. t is divided by its last component before the lookup takes place. "},
+	hlslfunc_t{L"texcube",     L"texCUBE(s, t)",             L"3-D cube texture lookup. s is a sampler or a samplerCUBE object. t is a 3-D texture coordinate. "},
+	hlslfunc_t{L"texcube(",    L"texCUBE(s, t, ddx, ddy)",   L"3-D cube texture lookup, with derivatives. s is a sampler or samplerCUBE object. t, ddx, and ddy are 3-D vectors. "},
+	hlslfunc_t{L"texcubebias", L"texCUBEbias(s, t)",         L"3-D biased cube texture lookup. s is a sampler or samplerCUBE object. t is a 4-dimensional vector. The mip level is biased by t.w before the lookup takes place.  "},
+	hlslfunc_t{L"texcubegrad", L"texCUBEgrad(s, t, ddx, ddy)", L" "},
+	hlslfunc_t{L"texcubelod",  L"texCUBElod(s, t)",          L" "},
+	hlslfunc_t{L"texcubeproj", L"texCUBEproj(s, t)",         L"3-D projective cube texture lookup. s is a sampler or samplerCUBE object. t is a 4-D vector. t is divided by its last component before the lookup takes place. "},
+	hlslfunc_t{L"transpose",   L"transpose(m)",              L"Returns the transpose of the matrix m. If the source is dimension mrows x mcolumns, the result is dimension mcolumns x mrows. "},
+	hlslfunc_t{L"trunc",       L"trunc(x)",                  L" "}
+};
+
+//const std::vector<CShaderAutoCompleteDlg::hlslfunc_t>* CShaderAutoCompleteDlg::m_pHLSLFuncs = s_HLSLFuncs;
+
 CShaderAutoCompleteDlg::CShaderAutoCompleteDlg(CWnd* pParent)
 	: CResizableDialog(CShaderAutoCompleteDlg::IDD, pParent)
 {
 	m_text[0] = 0;
-
-	m_inst[L"abs"] = L"abs(value a)|Absolute value (per component). ";
-	m_inst[L"acos"] = L"acos(x)|Returns the arccosine of each component of x. Each component should be in the range [-1, 1]. ";
-	m_inst[L"all"] = L"all(x)|Test if all components of x are nonzero. ";
-	m_inst[L"any"] = L"any(x)|Test is any component of x is nonzero. ";
-	m_inst[L"asin"] = L"asin(x)|Returns the arcsine of each component of x. Each component should be in the range [-pi/2, pi/2]. ";
-	m_inst[L"atan"] = L"atan(x)|Returns the arctangent of x. The return values are in the range [-pi/2, pi/2]. ";
-	m_inst[L"atan2"] = L"atan2(y, x)|Returns the arctangent of y/x. The signs of y and x are used to determine the quadrant of the return values in the range [-pi, pi]. atan2 is well-defined for every point other than the origin, even if x equals 0 and y does not equal 0. ";
-	m_inst[L"ceil"] = L"ceil(x)|Returns the smallest integer which is greater than or equal to x. ";
-	m_inst[L"clamp"] = L"clamp(x, min, max)|Clamps x to the range [min, max]. ";
-	m_inst[L"clip"] = L"clip(x)|Discards the current pixel, if any component of x is less than zero. This can be used to simulate clip planes, if each component of x represents the distance from a plane. ";
-	m_inst[L"cos"] = L"cos(x)|Returns the cosine of x. ";
-	m_inst[L"cosh"] = L"cosh(x)|Returns the hyperbolic cosine of x. ";
-	m_inst[L"cross"] = L"cross(a, b)|Returns the cross product of two 3-D vectors a and b. ";
-	m_inst[L"d3dcolortoubyte4"] = L"D3DCOLORtoUBYTE4(x)|Swizzles and scales components of the 4-D vector x to compensate for the lack of UBYTE4 support in some hardware. ";
-	m_inst[L"ddx"] = L"ddx(x)|Returns the partial derivative of x with respect to the screen-space x-coordinate. ";
-	m_inst[L"ddy"] = L"ddy(x)|Returns the partial derivative of x with respect to the screen-space y-coordinate. ";
-	m_inst[L"degrees"] = L"degrees(x)|Converts x from radians to degrees. ";
-	m_inst[L"determinant"] = L"determinant(m)|Returns the determinant of the square matrix m. ";
-	m_inst[L"distance"] = L"distance(a, b)|Returns the distance between two points a and b. ";
-	m_inst[L"dot"] = L"dot(a, b)|Returns the dot product of two vectors a and b. ";
-	m_inst[L"exp"] = L"exp(x)|Returns the base-e exponent ex. ";
-	m_inst[L"exp2"] = L"exp2(value a)|Base 2 Exp (per component). ";
-	m_inst[L"faceforward"] = L"faceforward(n, i, ng)|Returns -n * sign(dot(i, ng)). ";
-	m_inst[L"floor"] = L"floor(x)|Returns the greatest integer which is less than or equal to x. ";
-	m_inst[L"fmod"] = L"fmod(a, b)|Returns the floating point remainder f of a / b such that a = i * b + f, where i is an integer, f has the same sign as x, and the absolute value of f is less than the absolute value of b. ";
-	m_inst[L"frac"] = L"frac(x)|Returns the fractional part f of x, such that f is a value greater than or equal to 0, and less than 1. ";
-	m_inst[L"frc"] = L"frc(value a)|Fractional part (per component). ";
-	m_inst[L"frexp"] = L"frexp(x, out exp)|Returns the mantissa and exponent of x. frexp returns the mantissa, and the exponent is stored in the output parameter exp. If x is 0, the function returns 0 for both the mantissa and the exponent. ";
-	m_inst[L"fwidth"] = L"fwidth(x)|Returns abs(ddx(x))+abs(ddy(x)). ";
-	m_inst[L"isfinite"] = L"isfinite(x)|Returns true if x is finite, false otherwise. ";
-	m_inst[L"isinf"] = L"isinf(x)|Returns true if x is +INF or -INF, false otherwise. ";
-	m_inst[L"isnan"] = L"isnan(x)|Returns true if x is NAN or QNAN, false otherwise. ";
-	m_inst[L"ldexp"] = L"ldexp(x, exp)|Returns x * 2exp. ";
-	m_inst[L"len"] = L"len(value a)|Vector length. ";
-	m_inst[L"length"] = L"length(v)|Returns the length of the vector v. ";
-	m_inst[L"lerp"] = L"lerp(a, b, s)|Returns a + s(b - a). This linearly interpolates between a and b, such that the return value is a when s is 0, and b when s is 1. ";
-	m_inst[L"lit"] = L"lit(ndotl, ndoth, m)|Returns a lighting vector (ambient, diffuse, specular, 1): ambient = 1; diffuse = (ndotl < 0) ? 0 : ndotl; specular = (ndotl < 0) || (ndoth < 0) ? 0 : (ndoth * m); ";
-	m_inst[L"log"] = L"log(x)|Returns the base-e logarithm of x. If x is negative, the function returns indefinite. If x is 0, the function returns +INF. ";
-	m_inst[L"log10"] = L"log10(x)|Returns the base-10 logarithm of x. If x is negative, the function returns indefinite. If x is 0, the function returns +INF. ";
-	m_inst[L"log2"] = L"log2(x)|Returns the base-2 logarithm of x. If x is negative, the function returns indefinite. If x is 0, the function returns +INF. ";
-	m_inst[L"max"] = L"max(a, b)|Selects the greater of a and b. ";
-	m_inst[L"min"] = L"min(a, b)|Selects the lesser of a and b. ";
-	m_inst[L"modf"] = L"modf(x, out ip)|Splits the value x into fractional and integer parts, each of which has the same sign and x. The signed fractional portion of x is returned. The integer portion is stored in the output parameter ip. ";
-	m_inst[L"mul"] = L"mul(a, b)|Performs matrix multiplication between a and b. If a is a vector, it treated as a row vector. If b is a vector, it is treated as a column vector. The inner dimension acolumns and brows must be equal. The result has the dimension arows x bcolumns. ";
-	m_inst[L"noise"] = L"noise(x)|Not yet implemented. ";
-	m_inst[L"normalize"] = L"normalize(v)|Returns the normalized vector v / length(v). If the length of v is 0, the result is indefinite. ";
-	m_inst[L"pow"] = L"pow(x, y)|Returns xy. ";
-	m_inst[L"radians"] = L"radians(x)|Converts x from degrees to radians. ";
-	m_inst[L"reflect"] = L"reflect(i, n)|Returns the reflection vector v, given the entering ray direction i, and the surface normal n. Such that v = i - 2 * dot(i, n) * n ";
-	m_inst[L"refract"] = L"refract(i, n, eta)|Returns the refraction vector v, given the entering ray direction i, the surface normal n, and the relative index of refraction eta. If the angle between i and n is too great for a given eta, refract returns (0,0,0). ";
-	m_inst[L"round"] = L"round(x)|Rounds x to the nearest integer. ";
-	m_inst[L"rsqrt"] = L"rsqrt(x)|Returns 1 / sqrt(x). ";
-	m_inst[L"saturate"] = L"saturate(x)|Clamps x to the range [0, 1]. ";
-	m_inst[L"sign"] = L"sign(x)|Computes the sign of x. Returns -1 if x is less than 0, 0 if x equals 0, and 1 if x is greater than zero. ";
-	m_inst[L"sin"] = L"sin(x)|Returns the sine of x. ";
-	m_inst[L"sincos"] = L"sincos(x, out s, out c)|Returns the sine and cosine of x. sin(x) is stored in the output parameter s. cos(x) is stored in the output parameter c. ";
-	m_inst[L"sinh"] = L"sinh(x)|Returns the hyperbolic sine of x. ";
-	m_inst[L"smoothstep"] = L"smoothstep(min, max, x)|Returns 0 if x < min. Returns 1 if x > max. Returns a smooth Hermite interpolation between 0 and 1, if x is in the range [min, max]. ";
-	m_inst[L"sqrt"] = L"sqrt(value a)|Square root (per component). ";
-	m_inst[L"step"] = L"step(a, x)|Returns (x >= a) ? 1 : 0. ";
-	m_inst[L"tan"] = L"tan(x)|Returns the tangent of x. ";
-	m_inst[L"tanh"] = L"tanh(x)|Returns the hyperbolic tangent of x. ";
-	m_inst[L"tex1d"] = L"tex1D(s, t)|1-D texture lookup. s is a sampler or a sampler1D object. t is a scalar. ";
-	m_inst[L"tex1d("] = L"tex1D(s, t, ddx, ddy)|1-D texture lookup, with derivatives. s is a sampler or sampler1D object. t, ddx, and ddy are scalars. ";
-	m_inst[L"tex1dproj"] = L"tex1Dproj(s, t)|1-D projective texture lookup. s is a sampler or sampler1D object. t is a 4-D vector. t is divided by its last component before the lookup takes place. ";
-	m_inst[L"tex1dbias"] = L"tex1Dbias(s, t)|1-D biased texture lookup. s is a sampler or sampler1D object. t is a 4-D vector. The mip level is biased by t.w before the lookup takes place. ";
-	m_inst[L"tex2d"] = L"tex2D(s, t)|2-D texture lookup. s is a sampler or a sampler2D object. t is a 2-D texture coordinate. ";
-	m_inst[L"tex2d("] = L"tex2D(s, t, ddx, ddy)|2-D texture lookup, with derivatives. s is a sampler or sampler2D object. t, ddx, and ddy are 2-D vectors. ";
-	m_inst[L"tex2dproj"] = L"tex2Dproj(s, t)|2-D projective texture lookup. s is a sampler or sampler2D object. t is a 4-D vector. t is divided by its last component before the lookup takes place. ";
-	m_inst[L"tex2dbias"] = L"tex2Dbias(s, t)|2-D biased texture lookup. s is a sampler or sampler2D object. t is a 4-D vector. The mip level is biased by t.w before the lookup takes place. ";
-	m_inst[L"tex3d"] = L"tex3D(s, t)|3-D volume texture lookup. s is a sampler or a sampler3D object. t is a 3-D texture coordinate. ";
-	m_inst[L"tex3d("] = L"tex3D(s, t, ddx, ddy)|3-D volume texture lookup, with derivatives. s is a sampler or sampler3D object. t, ddx, and ddy are 3-D vectors. ";
-	m_inst[L"tex3dproj"] = L"tex3Dproj(s, t)|3-D projective volume texture lookup. s is a sampler or sampler3D object. t is a 4-D vector. t is divided by its last component before the lookup takes place. ";
-	m_inst[L"tex3dbias"] = L"tex3Dbias(s, t)|3-D biased texture lookup. s is a sampler or sampler3D object. t is a 4-D vector. The mip level is biased by t.w before the lookup takes place. ";
-	m_inst[L"texcube"] = L"texCUBE(s, t)|3-D cube texture lookup. s is a sampler or a samplerCUBE object. t is a 3-D texture coordinate. ";
-	m_inst[L"texcube("] = L"texCUBE(s, t, ddx, ddy)|3-D cube texture lookup, with derivatives. s is a sampler or samplerCUBE object. t, ddx, and ddy are 3-D vectors. ";
-	m_inst[L"texcubeproj"] = L"texCUBEproj(s, t)|3-D projective cube texture lookup. s is a sampler or samplerCUBE object. t is a 4-D vector. t is divided by its last component before the lookup takes place. ";
-	m_inst[L"texcubebias"] = L"texCUBEbias(s, t)|3-D biased cube texture lookup. s is a sampler or samplerCUBE object. t is a 4-dimensional vector. The mip level is biased by t.w before the lookup takes place.  ";
-	m_inst[L"transpose"] = L"transpose(m)|Returns the transpose of the matrix m. If the source is dimension mrows x mcolumns, the result is dimension mcolumns x mrows. ";
 }
 
 CShaderAutoCompleteDlg::~CShaderAutoCompleteDlg()
@@ -169,20 +182,12 @@ void CShaderAutoCompleteDlg::OnLbnSelchangeList1()
 		return;
 	}
 
-	if (POSITION pos = (POSITION)m_list.GetItemData(i)) {
-		CString str, desc;
-		m_inst.GetNextAssoc(pos, str, desc);
-		CAtlList<CString> sl;
-		Explode(desc, sl, L'|', 2);
+	if (auto hlslfunc = (hlslfunc_t*)m_list.GetItemData(i)) {
 
-		if (sl.GetCount() != 2) {
-			return;
-		}
-
-		wcscpy_s(m_ti.lpszText, _countof(m_text), sl.RemoveTail());
+		wcscpy_s(m_ti.lpszText, _countof(m_text), hlslfunc->desc);
 		CRect r;
 		GetWindowRect(r);
-		::SendMessageW(m_hToolTipWnd, TTM_UPDATETIPTEXT, 0, (LPARAM)&m_ti);
+		::SendMessageW(m_hToolTipWnd, TTM_UPDATETIPTEXTW, 0, (LPARAM)&m_ti);
 		::SendMessageW(m_hToolTipWnd, TTM_TRACKPOSITION, 0, (LPARAM)MAKELONG(r.left, r.bottom+1));
 		::SendMessageW(m_hToolTipWnd, TTM_TRACKACTIVATE, TRUE, (LPARAM)&m_ti);
 	}
