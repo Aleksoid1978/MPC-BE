@@ -45,7 +45,7 @@ private:
 		CStringA url;
 		CStringA raw_list;
 		CStringA ticket;
-		CList<isdb_movie> raw_movies;
+		std::list<isdb_movie> raw_movies;
 	};
 	typedef THREADSTRUCT* PTHREADSTRUCT;
 
@@ -83,12 +83,12 @@ private:
 	DEFPARAMSORT m_defps;
 	PTHREADSTRUCT m_pTA;
 
-	CArray<isdb_movie_parsed> m_parsed_movies;
+	std::vector<isdb_movie_parsed> m_parsed_movies;
 	CString m_url;
 	bool m_bReplaceSubs;
 
 	CPlayerListCtrl m_list;
-	CList<isdb_subtitle> m_selsubs;
+	std::list<isdb_subtitle> m_selsubs;
 	CStatusBarCtrl m_status;
 
 	void SetStatus(const CString& status);

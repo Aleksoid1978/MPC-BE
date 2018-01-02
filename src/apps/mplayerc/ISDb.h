@@ -40,18 +40,16 @@ struct isdb_subtitle {
 };
 
 struct isdb_movie {
-	CAtlList<CStringA> titles;
-	CAtlList<isdb_subtitle> subs;
+	std::list<CStringA> titles;
+	std::list<isdb_subtitle> subs;
 	void reset() {
-		titles.RemoveAll();
-		subs.RemoveAll();
+		titles.clear();
+		subs.clear();
 	}
 	isdb_movie& operator = (const struct isdb_movie& m) {
 		if (this != &m) {
-			titles.RemoveAll();
-			titles.AddTailList(&m.titles);
-			subs.RemoveAll();
-			subs.AddTailList(&m.subs);
+			titles = m.titles;
+			subs = m.subs;
 		}
 		return *this;
 	}
@@ -63,6 +61,6 @@ struct filehash {
 };
 
 extern bool mpc_filehash(LPCTSTR fn, filehash& fh);
-extern void mpc_filehash(CPlaylist& pl, CList<filehash>& fhs);
+extern void mpc_filehash(CPlaylist& pl, std::list<filehash>& fhs);
 extern CStringA makeargs(CPlaylist& pl);
 extern bool OpenUrl(CInternetSession& is, CString url, CStringA& str);
