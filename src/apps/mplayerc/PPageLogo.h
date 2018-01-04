@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,8 +31,8 @@ class CPPageLogo : public CPPageBase
 	DECLARE_DYNAMIC(CPPageLogo)
 
 private:
-	CList<UINT> m_logoids;
-	POSITION m_logoidpos;
+	std::vector<UINT> m_logoids;
+	int m_logoidpos;
 	CMPCPngImage m_logobm;
 	void GetDataFromRes();
 
