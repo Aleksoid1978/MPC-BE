@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -571,9 +571,8 @@ CFilterMapper2::CFilterMapper2(bool fRefCounted, bool fAllowUnreg, LPUNKNOWN pUn
 
 CFilterMapper2::~CFilterMapper2()
 {
-	POSITION pos = m_filters.GetHeadPosition();
-	while (pos) {
-		delete m_filters.GetNext(pos);
+	for (const auto& filter : m_filters) {
+		delete filter;
 	}
 }
 
@@ -593,7 +592,7 @@ STDMETHODIMP CFilterMapper2::NonDelegatingQueryInterface(REFIID riid, void** ppv
 void CFilterMapper2::Register(CString path)
 {
 	// Load filter
-	if (HMODULE h = LoadLibraryEx(path, nullptr, LOAD_WITH_ALTERED_SEARCH_PATH)) {
+	if (HMODULE h = LoadLibraryExW(path, nullptr, LOAD_WITH_ALTERED_SEARCH_PATH)) {
 		typedef HRESULT (__stdcall * PDllRegisterServer)();
 		if (PDllRegisterServer p = (PDllRegisterServer)GetProcAddress(h, "DllRegisterServer")) {
 			ASSERT(CFilterMapper2::m_pFilterMapper2 == nullptr);
@@ -681,7 +680,7 @@ STDMETHODIMP CFilterMapper2::RegisterFilter(REFCLSID clsidFilter, LPCWSTR Name, 
 
 			f->backup.AddTailList(&f->guids);
 
-			m_filters.AddTail(f);
+			m_filters.push_back(f);
 		}
 
 		return S_OK;

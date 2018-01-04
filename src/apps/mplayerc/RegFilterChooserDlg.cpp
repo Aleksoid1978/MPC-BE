@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,10 +34,8 @@ CRegFilterChooserDlg::CRegFilterChooserDlg(CWnd* pParent)
 
 CRegFilterChooserDlg::~CRegFilterChooserDlg()
 {
-	POSITION pos = m_filters.GetHeadPosition();
-
-	while (pos) {
-		delete m_filters.GetNext(pos);
+	for (auto& filter : m_filters) {
+		delete filter;
 	}
 }
 
@@ -134,7 +132,7 @@ void CRegFilterChooserDlg::OnBnClickedOk()
 		f->backup.AddTailList(&fgf.GetTypes());
 		f->dwMerit = fgf.GetMeritForDirectShow();
 		f->iLoadType = FilterOverride::MERIT;
-		m_filters.AddTail(f);
+		m_filters.push_back(f);
 	}
 
 	__super::OnOK();
@@ -155,8 +153,7 @@ void CRegFilterChooserDlg::OnBnClickedButton1()
 
 		CFilterMapper2 fm2(false);
 		fm2.Register(fname);
-		m_filters.AddTail(&fm2.m_filters);
-		fm2.m_filters.RemoveAll();
+		m_filters.splice(m_filters.cend(), fm2.m_filters); // transfer elements from fm2.m_filters to the end of m_filters
 
 		__super::OnOK();
 	}

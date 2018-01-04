@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -366,8 +366,11 @@ void CPPageExternalFilters::OnAddRegistered()
 {
 	CRegFilterChooserDlg dlg(this);
 	if (dlg.DoModal() == IDOK) {
-		while (!dlg.m_filters.IsEmpty()) {
-			if (FilterOverride* f = dlg.m_filters.RemoveHead()) {
+		while (!dlg.m_filters.empty()) {
+			FilterOverride* f = dlg.m_filters.front();
+			dlg.m_filters.pop_front();
+
+			if (f) {
 				CAutoPtr<FilterOverride> p(f);
 
 				if (f->name.IsEmpty() && !f->guids.GetCount() && !f->dwMerit) {
@@ -387,7 +390,7 @@ void CPPageExternalFilters::OnAddRegistered()
 				m_filters.SetItemDataPtr(i, m_pFilters.AddTail(p));
 				m_filters.SetCheck(i, 1);
 
-				if (dlg.m_filters.IsEmpty()) {
+				if (dlg.m_filters.empty()) {
 					m_filters.SetCurSel(i);
 					OnLbnSelchangeList1();
 				}
@@ -768,14 +771,17 @@ void CPPageExternalFilters::OnDropFiles(HDROP hDropInfo)
 		CFilterMapper2 fm2(false);
 		fm2.Register(szFileName);
 
-		while (!fm2.m_filters.IsEmpty()) {
-			if (FilterOverride* f = fm2.m_filters.RemoveHead()) {
+		while (!fm2.m_filters.empty()) {
+			FilterOverride* f = fm2.m_filters.front();
+			fm2.m_filters.pop_front();
+
+			if (f) {
 				CAutoPtr<FilterOverride> p(f);
 				int i = m_filters.AddString(f->name);
 				m_filters.SetItemDataPtr(i, m_pFilters.AddTail(p));
 				m_filters.SetCheck(i, 1);
 
-				if (fm2.m_filters.IsEmpty()) {
+				if (fm2.m_filters.empty()) {
 					m_filters.SetCurSel(i);
 					OnLbnSelchangeList1();
 				}

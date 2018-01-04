@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -90,7 +90,7 @@ public:
 	static void Init();
 
 	static IFilterMapper2* m_pFilterMapper2;
-	CList<Filter*> m_filters;
+	std::list<Filter*> m_filters;
 	void Register(CString path);
 };
 */
@@ -128,6 +128,6 @@ public:
 	static void Init();
 
 	static IFilterMapper2* m_pFilterMapper2;
-	CList<FilterOverride*> m_filters;
+	std::list<FilterOverride*> m_filters;
 	void Register(CString path);
 };
