@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,7 +28,7 @@
 
 class CRegFilterChooserDlg : public CResizableDialog
 {
-	//	DECLARE_DYNAMIC(CRegFilterChooserDlg)
+	// DECLARE_DYNAMIC(CRegFilterChooserDlg)
 
 	CInterfaceList<IMoniker> m_monikers;
 	void AddToList(IMoniker* pMoniker);
@@ -37,7 +37,7 @@ public:
 	CRegFilterChooserDlg(CWnd* pParent = nullptr);
 	virtual ~CRegFilterChooserDlg();
 
-	CList<FilterOverride*> m_filters;
+	std::list<FilterOverride*> m_filters;
 
 	enum { IDD = IDD_ADDREGFILTER };
 	CListCtrl m_list;

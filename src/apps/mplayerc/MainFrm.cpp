@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -5122,22 +5122,26 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 
 				CFilterMapper2 fm2(false);
 				fm2.Register(path + fd.cFileName);
-				while (!fm2.m_filters.IsEmpty()) {
-					if (FilterOverride* f = fm2.m_filters.RemoveTail()) {
-						f->fTemporary = true;
 
-						bool fFound = false;
+				while (!fm2.m_filters.empty()) {
+					FilterOverride* f = fm2.m_filters.back();
+					fm2.m_filters.pop_back();
+
+					if (f) {
+						f->fTemporary = true;
+						bool bFound = false;
 
 						POSITION pos2 = s.m_filters.GetHeadPosition();
 						while (pos2) {
 							FilterOverride* f2 = s.m_filters.GetNext(pos2);
 							if (f2->type == FilterOverride::EXTERNAL && !f2->path.CompareNoCase(f->path)) {
-								fFound = true;
+								bFound = true;
+								delete f;
 								break;
 							}
 						}
 
-						if (!fFound) {
+						if (!bFound) {
 							CAutoPtr<FilterOverride> p(f);
 							s.m_filters.AddHead(p);
 						}
