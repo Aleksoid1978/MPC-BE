@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,9 +30,10 @@ IMPLEMENT_DYNAMIC(CPPageLogo, CPPageBase)
 CPPageLogo::CPPageLogo()
 	: CPPageBase(CPPageLogo::IDD, CPPageLogo::IDD)
 	, m_intext(0)
+	, m_logoidpos(0)
 {
-	m_logoids.AddTail(IDF_LOGO0);
-	m_logoids.AddTail(IDF_LOGO1);
+	m_logoids.push_back(IDF_LOGO0);
+	m_logoids.push_back(IDF_LOGO1);
 }
 
 CPPageLogo::~CPPageLogo()
@@ -69,12 +70,9 @@ BOOL CPPageLogo::OnInitDialog()
 
 	UpdateData(FALSE);
 
-	m_logoidpos = m_logoids.GetHeadPosition();
-
-	for (POSITION pos = m_logoids.GetHeadPosition(); pos; m_logoids.GetNext(pos)) {
-		if (m_logoids.GetAt(pos) == s.nLogoId) {
-			m_logoidpos = pos;
-
+	for (unsigned i = 0; i < m_logoids.size(); ++i) {
+		if (m_logoids[i] == s.nLogoId) {
+			m_logoidpos = i;
 			break;
 		}
 	}
@@ -96,7 +94,7 @@ BOOL CPPageLogo::OnApply()
 
 	s.bLogoExternal = !!m_intext;
 	s.strLogoFileName = m_logofn;
-	s.nLogoId = m_logoids.GetAt(m_logoidpos);
+	s.nLogoId = m_logoids[m_logoidpos];
 
 	AfxGetMainFrame()->m_wndView.LoadLogo();
 
@@ -105,8 +103,6 @@ BOOL CPPageLogo::OnApply()
 
 void CPPageLogo::OnBnClickedRadio1()
 {
-	ASSERT(m_logoidpos);
-
 	GetDataFromRes();
 	Invalidate();
 
@@ -123,9 +119,11 @@ void CPPageLogo::OnBnClickedRadio2()
 	m_author.Empty();
 	m_logobm.Destroy();
 
-	m_logobm.Attach(OpenImage(m_logofn));
-	if (m_logobm) {
-		m_logopreview.SetBitmap(m_logobm);
+	if (m_logofn.GetLength()) {
+		m_logobm.Attach(OpenImage(m_logofn));
+		if (m_logobm) {
+			m_logopreview.SetBitmap(m_logobm);
+		}
 	}
 
 	Invalidate();
@@ -141,16 +139,12 @@ void CPPageLogo::OnDeltaposSpin1(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 
 	if (pNMUpDown->iDelta < 0) {
-		m_logoids.GetNext(m_logoidpos);
-
-		if (!m_logoidpos) {
-			m_logoidpos = m_logoids.GetHeadPosition();
+		if (++m_logoidpos >= m_logoids.size()) {
+			m_logoidpos = 0;
 		}
 	} else {
-		m_logoids.GetPrev(m_logoidpos);
-
-		if (!m_logoidpos) {
-			m_logoidpos = m_logoids.GetTailPosition();
+		if (--m_logoidpos < 0) {
+			m_logoidpos = m_logoids.size() - 1;
 		}
 	}
 
@@ -184,7 +178,7 @@ void CPPageLogo::GetDataFromRes()
 	m_author.Empty();
 
 	m_logobm.Destroy();
-	UINT id = m_logoids.GetAt(m_logoidpos);
+	UINT id = m_logoids[m_logoidpos];
 
 	if (IDF_LOGO0 != id) {
 		m_logobm.LoadFromResource(id);
