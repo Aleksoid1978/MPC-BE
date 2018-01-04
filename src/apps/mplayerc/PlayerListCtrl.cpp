@@ -308,7 +308,7 @@ int CInPlaceComboBox::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CFont* font = GetParent()->GetFont();
 	SetFont(font);
 
-	for (const auto lstItem : m_lstItems) {
+	for (const auto& lstItem : m_lstItems) {
 		AddString(lstItem);
 	}
 
@@ -380,12 +380,12 @@ void CInPlaceComboBox::OnCloseup()
 
 // CInPlaceListBox
 
-CInPlaceListBox::CInPlaceListBox(int iItem, int iSubItem, CAtlList<CString>& lstItems, int nSel)
+CInPlaceListBox::CInPlaceListBox(int iItem, int iSubItem, std::list<CString>& lstItems, int nSel)
 {
 	m_iItem = iItem;
 	m_iSubItem = iSubItem;
 
-	m_lstItems.AddTailList(&lstItems);
+	m_lstItems = lstItems;
 	m_nSel = nSel;
 	m_bESC = FALSE;
 }
@@ -416,8 +416,8 @@ int CInPlaceListBox::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CFont* font = GetParent()->GetFont();
 	SetFont(font);
 
-	for (POSITION pos = m_lstItems.GetHeadPosition(); pos != nullptr;) {
-		AddString( (LPCTSTR) (m_lstItems.GetNext( pos )) );
+	for (const auto& lstItem : m_lstItems) {
+		AddString(lstItem);
 	}
 	SetCurSel( m_nSel );
 	SetFocus();
@@ -794,7 +794,7 @@ CComboBox* CPlayerListCtrl::ShowInPlaceComboBox(int nItem, int nCol, std::list<C
 	return pComboBox;
 }
 
-CListBox* CPlayerListCtrl::ShowInPlaceListBox(int nItem, int nCol, CAtlList<CString>& lstItems, int nSel)
+CListBox* CPlayerListCtrl::ShowInPlaceListBox(int nItem, int nCol, std::list<CString>& lstItems, int nSel)
 {
 	CRect rect;
 	if (!PrepareInPlaceControl(nItem, nCol, rect)) {
@@ -814,9 +814,9 @@ CListBox* CPlayerListCtrl::ShowInPlaceListBox(int nItem, int nCol, CAtlList<CStr
 	CFont* pWndFont = GetFont();
 	pDC->SelectObject(pWndFont);
 	int width = GetColumnWidth(nCol);
-	POSITION pos = lstItems.GetHeadPosition();
-	while (pos) {
-		int w = pDC->GetTextExtent(lstItems.GetNext(pos)).cx + 16;
+
+	for (const auto& lstItem : lstItems) {
+		int w = pDC->GetTextExtent(lstItem).cx + 16;
 		if (width < w) {
 			width = w;
 		}
