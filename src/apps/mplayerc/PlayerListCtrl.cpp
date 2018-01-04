@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -271,12 +271,12 @@ void CInPlaceFloatEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 // CInPlaceComboBox
 
-CInPlaceComboBox::CInPlaceComboBox(int iItem, int iSubItem, CAtlList<CString>& lstItems, int nSel)
+CInPlaceComboBox::CInPlaceComboBox(int iItem, int iSubItem, std::list<CString>& lstItems, int nSel)
 {
 	m_iItem = iItem;
 	m_iSubItem = iSubItem;
 
-	m_lstItems.AddTailList(&lstItems);
+	m_lstItems = lstItems;
 	m_nSel = nSel;
 	m_bESC = FALSE;
 }
@@ -308,8 +308,8 @@ int CInPlaceComboBox::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CFont* font = GetParent()->GetFont();
 	SetFont(font);
 
-	for (POSITION pos = m_lstItems.GetHeadPosition(); pos != nullptr;) {
-		AddString((LPCTSTR)(m_lstItems.GetNext(pos)));
+	for (const auto lstItem : m_lstItems) {
+		AddString(lstItem);
 	}
 
 	SetFocus();
@@ -766,7 +766,7 @@ CEdit* CPlayerListCtrl::ShowInPlaceFloatEdit(int nItem, int nCol)
 	return pFloatEdit;
 }
 
-CComboBox* CPlayerListCtrl::ShowInPlaceComboBox(int nItem, int nCol, CAtlList<CString>& lstItems, int nSel, bool bShowDropDown)
+CComboBox* CPlayerListCtrl::ShowInPlaceComboBox(int nItem, int nCol, std::list<CString>& lstItems, int nSel, bool bShowDropDown)
 {
 	CRect rect;
 	if (!PrepareInPlaceControl(nItem, nCol, rect)) {

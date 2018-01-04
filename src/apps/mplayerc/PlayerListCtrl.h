@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -91,12 +91,12 @@ class CInPlaceComboBox : public CComboBox
 private:
 	int m_iItem;
 	int m_iSubItem;
-	CAtlList<CString> m_lstItems;
+	std::list<CString> m_lstItems;
 	int m_nSel;
 	BOOL m_bESC; // To indicate whether ESC key was pressed
 
 public:
-	CInPlaceComboBox(int iItem, int iSubItem, CAtlList<CString>& plstItems, int nSel);
+	CInPlaceComboBox(int iItem, int iSubItem, std::list<CString>& plstItems, int nSel);
 	virtual ~CInPlaceComboBox();
 
 protected:
@@ -162,7 +162,7 @@ public:
 	CWinHotkeyCtrl* ShowInPlaceWinHotkey(int nItem, int nCol);
 	CEdit* ShowInPlaceEdit(int nItem, int nCol);
 	CEdit* ShowInPlaceFloatEdit(int nItem, int nCol);
-	CComboBox* ShowInPlaceComboBox(int nItem, int nCol, CAtlList<CString>& lstItems, int nSel, bool bShowDropDown=false);
+	CComboBox* ShowInPlaceComboBox(int nItem, int nCol, std::list<CString>& lstItems, int nSel, bool bShowDropDown=false);
 	CListBox* ShowInPlaceListBox(int nItem, int nCol, CAtlList<CString>& lstItems, int nSel);
 
 	bool m_fInPlaceDirty;
