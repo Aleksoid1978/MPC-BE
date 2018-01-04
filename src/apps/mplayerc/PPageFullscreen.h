@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,7 +33,7 @@ class CPPageFullscreen : public CPPageBase
 
 private:
 	CAtlArray<dispmode> m_dms;
-	CAtlList<CString> m_displayModesString;
+	std::list<CString> m_displayModesString;
 	CStringArray m_MonitorDisplayNames, m_MonitorDeviceName;
 
 	BOOL m_bLaunchFullScreen;

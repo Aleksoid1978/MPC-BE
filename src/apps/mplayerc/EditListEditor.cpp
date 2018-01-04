@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -597,10 +597,9 @@ void CEditListEditor::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 		CClip& CurClip = m_EditList.GetAt (m_CurPos);
 		int nSel = FindNameIndex (CurClip.GetName());
 
-		CAtlList<CString> sl;
-
+		std::list<CString> sl;
 		for (int i=0; i<m_NameList.GetCount(); i++) {
-			sl.AddTail(m_NameList.GetAt(i));
+			sl.push_back(m_NameList.GetAt(i));
 		}
 
 		m_list.ShowInPlaceComboBox(pItem->iItem, pItem->iSubItem, sl, nSel, true);

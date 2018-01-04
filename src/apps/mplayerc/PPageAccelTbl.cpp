@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -849,7 +849,7 @@ void CPPageAccelTbl::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 
 	wmcmd& wc = m_wmcmds.at(pItem->iItem);
 
-	CAtlList<CString> sl;
+	std::list<CString> sl;
 	int nSel = -1;
 
 	switch (pItem->iSubItem) {
@@ -873,7 +873,7 @@ void CPPageAccelTbl::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 		}
 		case COL_MOUSE:
 			for (UINT i = 0; i < wmcmd::LAST; i++) {
-				sl.AddTail(MakeMouseButtonLabel(i));
+				sl.push_back(MakeMouseButtonLabel(i));
 				if (wc.mouse == i) {
 					nSel = i;
 				}
@@ -883,7 +883,7 @@ void CPPageAccelTbl::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 			break;
 		case COL_MOUSE_FS:
 			for (UINT i = 0; i < wmcmd::LAST; i++) {
-				sl.AddTail(MakeMouseButtonLabel(i));
+				sl.push_back(MakeMouseButtonLabel(i));
 				if (wc.mouseFS == i) {
 					nSel = i;
 				}
@@ -893,7 +893,7 @@ void CPPageAccelTbl::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 			break;
 		case COL_APPCMD:
 			for (int i = 0; i < _countof(g_CommandList); i++) {
-				sl.AddTail(g_CommandList[i].cmdname);
+				sl.push_back(g_CommandList[i].cmdname);
 				if (wc.appcmd == g_CommandList[i].appcmd) {
 					nSel = i;
 				}

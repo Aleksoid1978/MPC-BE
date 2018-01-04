@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -510,7 +510,7 @@ void CPPageFullscreen::ModesUpdate()
 
 	m_list.DeleteAllItems();
 	m_dms.RemoveAll();
-	m_displayModesString.RemoveAll();
+	m_displayModesString.clear();
 
 	dispmode dm;
 	for (int i = 0, m = 0, ModeExist = true;  ; i++) {
@@ -546,7 +546,7 @@ void CPPageFullscreen::ModesUpdate()
 
 	int curModeIdx = m_dms.GetCount() - 1;
 	for (size_t i = 0; i < m_dms.GetCount(); i++) {
-		m_displayModesString.AddTail(FormatModeString(m_dms[i]));
+		m_displayModesString.push_back(FormatModeString(m_dms[i]));
 		if (dCurMod == m_dms[i]) {
 			curModeIdx = i;
 		}
