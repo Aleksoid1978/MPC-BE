@@ -196,10 +196,6 @@
 #define ID_VIEW_VF_SWITCHZOOM           843
 #define ID_VIEW_VF_KEEPASPECTRATIO      844
 #define ID_VIEW_VF_COMPMONDESKARDIFF    845
-#define ID_VIEW_EDITLISTEDITOR          846
-#define ID_EDL_IN                       847
-#define ID_EDL_OUT                      848
-#define ID_EDL_NEWCLIP                  849
 #define ID_ASPECTRATIO_START            850
 #define ID_ASPECTRATIO_SOURCE           850
 #define ID_ASPECTRATIO_4_3              851
@@ -209,7 +205,6 @@
 #define ID_ASPECTRATIO_185_100          855
 #define ID_ASPECTRATIO_END              858
 #define ID_ASPECTRATIO_NEXT             859
-#define ID_EDL_SAVE                     860
 #define ID_VIEW_RESET                   861
 #define ID_VIEW_INCSIZE                 862
 #define ID_VIEW_DECSIZE                 863
@@ -1265,14 +1260,9 @@
 #define IDS_AG_VSYNCACCURATE            33261
 #define IDS_AG_FULLSCREENGUISUPPORT     33266
 #define IDS_AG_ENABLEFRAMETIMECORRECTION 33275
-#define IDS_AG_TOGGLE_EDITLISTEDITOR    33277
-#define IDS_AG_EDL_IN                   33278
-#define IDS_AG_EDL_OUT                  33279
-#define IDS_AG_EDL_NEW_CLIP             33280
 #define IDS_RECENT_FILES_CLEAR          33283
 #define IDS_RECENT_FILES                33284
 #define IDS_RECENT_FILES_QUESTION       33285
-#define IDS_AG_EDL_SAVE                 33294
 #define IDC_RESETDEVICE                 33400
 #define IDS_NAVIGATE_TUNERSCAN          33401
 #define IDS_SUBTITLES_ERROR             33402

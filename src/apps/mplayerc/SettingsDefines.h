@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -200,7 +200,6 @@
 #define IDS_RS_THUMBCOLS					L"ThumbCols"
 #define IDS_RS_THUMBQUALITY					L"ThumbQuality"
 #define IDS_RS_THUMBLEVELPNG				L"ThumbLevelPNG"
-#define IDS_RS_ENABLEEDLEDITOR				L"EnableEDLEditor"
 #define IDS_RS_MPC_PREVENT_MINIMIZE			L"PreventMinimize"
 #define IDS_RS_PAUSEMINIMIZEDVIDEO			L"PauseMinimizedVideo"
 #define IDS_RS_MPC_WIN7TASKBAR				L"UseWin7TaskBar"

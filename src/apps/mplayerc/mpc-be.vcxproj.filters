@@ -42,9 +42,6 @@
     <ClCompile Include="DVBChannel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EditListEditor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FakeFilterMapper2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -375,9 +372,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DVBChannel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EditListEditor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FakeFilterMapper2.h">

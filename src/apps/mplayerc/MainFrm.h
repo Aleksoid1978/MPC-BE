@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,7 +37,6 @@
 #include "PlayerCaptureBar.h"
 #include "PlayerNavigationBar.h"
 #include "PlayerShaderEditorBar.h"
-#include "EditListEditor.h"
 #include "PPageSheet.h"
 #include "PPageFileInfoSheet.h"
 #include "FileDropTarget.h"
@@ -778,7 +777,6 @@ protected:  // control bar embedded members
 	CPlayerCaptureBar m_wndCaptureBar;
 	CPlayerNavigationBar m_wndNavigationBar;
 	CPlayerShaderEditorBar m_wndShaderEditorBar;
-	CEditListEditor m_wndEditListEditor;
 	CList<CSizingControlBar*> m_dockingbars;
 
 	CFileDropTarget m_fileDropTarget;
@@ -954,15 +952,6 @@ public:
 	afx_msg void OnUpdateViewSubresync(CCmdUI* pCmdUI);
 	afx_msg void OnViewPlaylist();
 	afx_msg void OnUpdateViewPlaylist(CCmdUI* pCmdUI);
-	afx_msg void OnViewEditListEditor();
-	afx_msg void OnEDLIn();
-	afx_msg void OnUpdateEDLIn(CCmdUI* pCmdUI);
-	afx_msg void OnEDLOut();
-	afx_msg void OnUpdateEDLOut(CCmdUI* pCmdUI);
-	afx_msg void OnEDLNewClip();
-	afx_msg void OnUpdateEDLNewClip(CCmdUI* pCmdUI);
-	afx_msg void OnEDLSave();
-	afx_msg void OnUpdateEDLSave(CCmdUI* pCmdUI);
 	afx_msg void OnViewCapture();
 	afx_msg void OnUpdateViewCapture(CCmdUI* pCmdUI);
 	afx_msg void OnViewShaderEditor();
