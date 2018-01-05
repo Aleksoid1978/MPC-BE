@@ -378,21 +378,20 @@ void CFavoriteOrganizeDlg::OnUpdateUpBn(CCmdUI* pCmdUI)
 
 void CFavoriteOrganizeDlg::OnDownBnClicked()
 {
-	CArray<int> selectedItems;
-	POSITION pos = m_list.GetFirstSelectedItemPosition();
-	int nItem;
+	std::vector<int> selectedItems;
 
+	POSITION pos = m_list.GetFirstSelectedItemPosition();
 	while (pos) {
-		nItem = m_list.GetNextSelectedItem(pos);
+		int nItem = m_list.GetNextSelectedItem(pos);
 
 		if (nItem < 0 || nItem >= m_list.GetItemCount() - 1) {
 			return;
 		}
 
-		selectedItems.Add(nItem);
+		selectedItems.push_back(nItem);
 	}
 
-	for (int i = selectedItems.GetSize() - 1; i >= 0; i--) {
+	for (int i = selectedItems.size() - 1; i >= 0; i--) {
 		MoveItem(selectedItems[i], +1);
 	}
 }

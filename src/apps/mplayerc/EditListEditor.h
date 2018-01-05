@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -78,7 +78,7 @@ class CEditListEditor :	public CPlayerBar
 	CString			m_strFileName;
 	bool			m_bFileOpen;
 	CList<CClip>	m_EditList;
-	CArray<CString>	m_NameList;
+	std::vector<CString> m_NameList;
 
 	void			SaveEditListToFile();
 	void			ResizeListColumn();
