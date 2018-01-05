@@ -139,7 +139,7 @@ void CPPageLogo::OnDeltaposSpin1(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMUPDOWN pNMUpDown = reinterpret_cast<LPNMUPDOWN>(pNMHDR);
 
 	if (pNMUpDown->iDelta < 0) {
-		if (++m_logoidpos >= m_logoids.size()) {
+		if (++m_logoidpos >= (int)m_logoids.size()) {
 			m_logoidpos = 0;
 		}
 	} else {
