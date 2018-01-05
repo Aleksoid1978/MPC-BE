@@ -106,7 +106,6 @@
     <ClCompile Include="PPageYouTube.cpp" />
     <ClCompile Include="DeinterlacerFilter.cpp" />
     <ClCompile Include="DVBChannel.cpp" />
-    <ClCompile Include="EditListEditor.cpp" />
     <ClCompile Include="EditWithButton.cpp" />
     <ClCompile Include="FakeFilterMapper2.cpp" />
     <ClCompile Include="FavoriteAddDlg.cpp" />
@@ -223,7 +222,6 @@
     <ClInclude Include="PPageYouTube.h" />
     <ClInclude Include="DeinterlacerFilter.h" />
     <ClInclude Include="DVBChannel.h" />
-    <ClInclude Include="EditListEditor.h" />
     <ClInclude Include="EditWithButton.h" />
     <ClInclude Include="FakeFilterMapper2.h" />
     <ClInclude Include="FavoriteAddDlg.h" />

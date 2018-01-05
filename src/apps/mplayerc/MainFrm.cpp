@@ -330,15 +330,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_SUBRESYNC, OnUpdateViewSubresync)
 	ON_COMMAND(ID_VIEW_PLAYLIST, OnViewPlaylist)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_PLAYLIST, OnUpdateViewPlaylist)
-	ON_COMMAND(ID_VIEW_EDITLISTEDITOR, OnViewEditListEditor)
-	ON_COMMAND(ID_EDL_IN, OnEDLIn)
-	ON_UPDATE_COMMAND_UI(ID_EDL_IN, OnUpdateEDLIn)
-	ON_COMMAND(ID_EDL_OUT, OnEDLOut)
-	ON_UPDATE_COMMAND_UI(ID_EDL_OUT, OnUpdateEDLOut)
-	ON_COMMAND(ID_EDL_NEWCLIP, OnEDLNewClip)
-	ON_UPDATE_COMMAND_UI(ID_EDL_NEWCLIP, OnUpdateEDLNewClip)
-	ON_COMMAND(ID_EDL_SAVE, OnEDLSave)
-	ON_UPDATE_COMMAND_UI(ID_EDL_SAVE, OnUpdateEDLSave)
 	ON_COMMAND(ID_VIEW_CAPTURE, OnViewCapture)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_CAPTURE, OnUpdateViewCapture)
 	ON_COMMAND(ID_VIEW_SHADEREDITOR, OnViewShaderEditor)
@@ -789,12 +780,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndPlaylistBar.SetHeight(100);
 	m_dockingbars.AddTail(&m_wndPlaylistBar);
 	m_wndPlaylistBar.LoadPlaylist(GetRecentFile());
-
-	m_wndEditListEditor.Create(this, AFX_IDW_DOCKBAR_RIGHT);
-	m_wndEditListEditor.SetBarStyle(m_wndEditListEditor.GetBarStyle() | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC);
-	m_wndEditListEditor.EnableDocking(CBRS_ALIGN_ANY);
-	m_dockingbars.AddTail(&m_wndEditListEditor);
-	m_wndEditListEditor.SetHeight(100);
 
 	m_wndCaptureBar.Create(this, AFX_IDW_DOCKBAR_LEFT);
 	m_wndCaptureBar.SetBarStyle(m_wndCaptureBar.GetBarStyle() | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC);
@@ -4155,10 +4140,6 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	rd->m_bStereo3DSwapLR = s.bStereo3DSwapLR;
 
-	if (s.fEnableEDLEditor) {
-		m_wndEditListEditor.OpenFile(m_lastOMD->title);
-	}
-
 	if (OpenDeviceData *pDeviceData = dynamic_cast<OpenDeviceData*>(m_lastOMD.m_p)) {
 		m_wndCaptureBar.m_capdlg.SetVideoInput(pDeviceData->vinput);
 		m_wndCaptureBar.m_capdlg.SetVideoChannel(pDeviceData->vchannel);
@@ -4407,10 +4388,6 @@ void CMainFrame::OnFilePostCloseMedia()
 	m_wndStatusBar.Clear();
 	m_wndStatusBar.ShowTimer(false);
 	m_wndStatusBar.Relayout();
-
-	if (s.fEnableEDLEditor) {
-		m_wndEditListEditor.CloseFile();
-	}
 
 	if (IsWindow(m_wndSubresyncBar.m_hWnd)) {
 		ShowControlBar(&m_wndSubresyncBar, FALSE, TRUE);
@@ -6914,73 +6891,6 @@ void CMainFrame::OnViewPlaylist()
 void CMainFrame::OnUpdateViewPlaylist(CCmdUI* pCmdUI)
 {
 	pCmdUI->SetCheck(m_wndPlaylistBar.IsWindowVisible());
-}
-
-void CMainFrame::OnViewEditListEditor()
-{
-	CAppSettings& s = AfxGetAppSettings();
-
-	if (s.fEnableEDLEditor || (AfxMessageBox(ResStr(IDS_MB_SHOW_EDL_EDITOR), MB_ICONQUESTION | MB_YESNO) == IDYES)) {
-		s.fEnableEDLEditor = true;
-		ShowControlBar(&m_wndEditListEditor, !m_wndEditListEditor.IsWindowVisible(), TRUE);
-	}
-}
-
-void CMainFrame::OnEDLIn()
-{
-	if (AfxGetAppSettings().fEnableEDLEditor && (m_eMediaLoadState == MLS_LOADED) && (GetPlaybackMode() == PM_FILE)) {
-		REFERENCE_TIME		rt;
-
-		m_pMS->GetCurrentPosition(&rt);
-		m_wndEditListEditor.SetIn(rt);
-	}
-}
-
-void CMainFrame::OnUpdateEDLIn(CCmdUI* pCmdUI)
-{
-	pCmdUI->Enable(m_wndEditListEditor.IsWindowVisible());
-}
-
-void CMainFrame::OnEDLOut()
-{
-	if (AfxGetAppSettings().fEnableEDLEditor && (m_eMediaLoadState == MLS_LOADED) && (GetPlaybackMode() == PM_FILE)) {
-		REFERENCE_TIME		rt;
-
-		m_pMS->GetCurrentPosition(&rt);
-		m_wndEditListEditor.SetOut(rt);
-	}
-}
-
-void CMainFrame::OnUpdateEDLOut(CCmdUI* pCmdUI)
-{
-	pCmdUI->Enable(m_wndEditListEditor.IsWindowVisible());
-}
-
-void CMainFrame::OnEDLNewClip()
-{
-	if (AfxGetAppSettings().fEnableEDLEditor && (m_eMediaLoadState == MLS_LOADED) && (GetPlaybackMode() == PM_FILE)) {
-		REFERENCE_TIME		rt;
-
-		m_pMS->GetCurrentPosition(&rt);
-		m_wndEditListEditor.NewClip(rt);
-	}
-}
-
-void CMainFrame::OnUpdateEDLNewClip(CCmdUI* pCmdUI)
-{
-	pCmdUI->Enable(m_wndEditListEditor.IsWindowVisible());
-}
-
-void CMainFrame::OnEDLSave()
-{
-	if (AfxGetAppSettings().fEnableEDLEditor && (m_eMediaLoadState == MLS_LOADED) && (GetPlaybackMode() == PM_FILE)) {
-		m_wndEditListEditor.Save();
-	}
-}
-
-void CMainFrame::OnUpdateEDLSave(CCmdUI* pCmdUI)
-{
-	pCmdUI->Enable(m_wndEditListEditor.IsWindowVisible());
 }
 
 // Navigation menu
