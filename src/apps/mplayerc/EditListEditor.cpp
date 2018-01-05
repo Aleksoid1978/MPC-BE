@@ -254,13 +254,13 @@ void CEditListEditor::OpenFile(LPCTSTR lpFileName)
 		m_bFileOpen = false;
 	}
 
-	if (m_NameList.GetCount() == 0) {
-		CStdioFile 	NameFile;
-		CString		str;
+	if (m_NameList.empty()) {
+		CStdioFile NameFile;
+		CString str;
 
 		if (NameFile.Open (L"EditListNames.txt", CFile::modeRead)) {
 			while (NameFile.ReadString(str)) {
-				m_NameList.Add(str);
+				m_NameList.push_back(str);
 			}
 
 			NameFile.Close();
@@ -598,8 +598,8 @@ void CEditListEditor::OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 		int nSel = FindNameIndex (CurClip.GetName());
 
 		std::list<CString> sl;
-		for (int i=0; i<m_NameList.GetCount(); i++) {
-			sl.push_back(m_NameList.GetAt(i));
+		for (unsigned i = 0; i < m_NameList.size(); i++) {
+			sl.push_back(m_NameList[i]);
 		}
 
 		m_list.ShowInPlaceComboBox(pItem->iItem, pItem->iSubItem, sl, nSel, true);
@@ -623,11 +623,11 @@ void CEditListEditor::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 		return;
 	}
 
-	CString& CurName = m_NameList.GetAt(pItem->lParam);
+	size_t i = pItem->lParam;
 
-	if (m_CurPos != nullptr && pItem->iSubItem == COL_NAME) {
+	if (i < m_NameList.size() && m_CurPos != nullptr && pItem->iSubItem == COL_NAME) {
 		CClip& CurClip = m_EditList.GetAt (m_CurPos);
-		CurClip.SetName(CurName);
+		CurClip.SetName(m_NameList[i]);
 
 		*pResult = TRUE;
 	}
@@ -637,8 +637,8 @@ int CEditListEditor::FindNameIndex(LPCTSTR strName)
 {
 	int nResult = -1;
 
-	for (int i = 0; i<m_NameList.GetCount(); i++) {
-		CString& CurName = m_NameList.GetAt(i);
+	for (unsigned i = 0; i < m_NameList.size(); i++) {
+		CString& CurName = m_NameList[i];
 
 		if (CurName == strName) {
 			nResult = i;
