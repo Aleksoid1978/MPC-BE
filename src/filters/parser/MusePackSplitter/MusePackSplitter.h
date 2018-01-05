@@ -1,5 +1,5 @@
 /*
-* (C) 2012-2017 see Authors.txt
+* (C) 2012-2018 see Authors.txt
 *
 * This file is part of MPC-BE.
 *
@@ -21,6 +21,7 @@
 #pragma once
 
 #include "../../parser/BaseSplitter/BaseSplitter.h"
+#include <deque>
 
 #include "mpc_file.h"
 
@@ -34,15 +35,15 @@ class CMusePackSplitter;
 
 //-----------------------------------------------------------------------------
 //
-//	CMusePackInputPin class
+//  CMusePackInputPin class
 //
 //-----------------------------------------------------------------------------
 class CMusePackInputPin : public CBaseInputPin
 {
 public:
 	// parent splitter
-	CMusePackSplitter	*demux;
-	IAsyncReader		*reader;
+	CMusePackSplitter *demux;
+	IAsyncReader      *reader;
 
 public:
 	CMusePackInputPin(TCHAR *pObjectName, CMusePackSplitter *pDemux, HRESULT *phr, LPCWSTR pName);
@@ -71,7 +72,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //
-//	DataPacketMPC class
+//  DataPacketMPC class
 //
 //-----------------------------------------------------------------------------
 class DataPacketMPC
@@ -85,13 +86,13 @@ public:
 		PACKET_TYPE_NEW_SEGMENT = 2
 	};
 
-	REFERENCE_TIME	rtStart, rtStop;
-	double			rate;
-	bool			has_time;
-	BOOL			sync_point;
-	BOOL			discontinuity;
-	BYTE			*buf;
-	int				size;
+	REFERENCE_TIME  rtStart, rtStop;
+	double          rate;
+	bool            has_time;
+	BOOL            sync_point;
+	BOOL            discontinuity;
+	BYTE            *buf;
+	int             size;
 
 public:
 	DataPacketMPC();
@@ -100,7 +101,7 @@ public:
 
 //-----------------------------------------------------------------------------
 //
-//	CMusePackOutputPin class
+//  CMusePackOutputPin class
 //
 //-----------------------------------------------------------------------------
 class CMusePackOutputPin :
@@ -113,11 +114,11 @@ public:
 
 	// parser
 	CMusePackSplitter		*demux;
-	CAtlArray<CMediaType>	mt_types;
+	std::vector<CMediaType>	mt_types;
 
 	// buffer queue
 	int						buffers;
-	CList<DataPacketMPC*>	queue;
+	std::deque<DataPacketMPC*> queue;
 	CCritSec				lock_queue;
 	CAMEvent				ev_can_read;
 	CAMEvent				ev_can_write;
@@ -195,9 +196,9 @@ public:
 
 //-----------------------------------------------------------------------------
 //
-//	CMusePackReader class
+//  CMusePackReader class
 //
-//	Todo: caching...
+//  Todo: caching...
 //
 //-----------------------------------------------------------------------------
 
@@ -229,11 +230,11 @@ public:
 
 //-----------------------------------------------------------------------------
 //
-//	CMusePackSplitter class
+//  CMusePackSplitter class
 //
 //-----------------------------------------------------------------------------
 class __declspec(uuid("47A759C8-CCD7-471A-81D3-A92870431979"))
-    CMusePackSplitter
+	CMusePackSplitter
 	: public CBaseFilter
 	, public CAMThread
 	, public IMediaSeeking
@@ -248,7 +249,7 @@ public:
 	CCritSec						lock_filter;
 	CMusePackInputPin				*input;
 	CMusePackOutputPin*				output;
-	CAtlArray<CMusePackOutputPin*>	retired;
+	std::vector<CMusePackOutputPin*> retired;
 	CMusePackReader					*reader;
 	CMPCFile						*file;
 

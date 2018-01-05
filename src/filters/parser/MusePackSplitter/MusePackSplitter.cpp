@@ -1,5 +1,5 @@
 /*
-* (C) 2012-2017 see Authors.txt
+* (C) 2012-2018 see Authors.txt
 *
 * This file is part of MPC-BE.
 *
@@ -90,7 +90,7 @@ CMusePackSplitter::CMusePackSplitter(LPUNKNOWN pUnk, HRESULT *phr)
 	, output(nullptr)
 {
 	input = DNew CMusePackInputPin(NAME("MPC Input Pin"), this, phr, L"In");
-	retired.RemoveAll();
+	retired.clear();
 
 	ev_abort.Reset();
 }
@@ -107,13 +107,13 @@ CMusePackSplitter::~CMusePackSplitter()
 		output = nullptr;
 	}
 
-	for (size_t i = 0; i < retired.GetCount(); i++) {
-		CMusePackOutputPin	*pin = retired[i];
+	for (size_t i = 0; i < retired.size(); i++) {
+		CMusePackOutputPin *pin = retired[i];
 		if (pin) {
 			delete pin;
 		}
 	}
-	retired.RemoveAll();
+	retired.clear();
 
 	if (input) {
 		delete input;
@@ -262,7 +262,7 @@ HRESULT CMusePackSplitter::RemoveOutputPin()
 			output->Disconnect();
 		}
 
-		retired.Add(output);
+		retired.push_back(output);
 		output = nullptr;
 	}
 
@@ -300,7 +300,7 @@ HRESULT CMusePackSplitter::ConfigureMediaType(CMusePackOutputPin *pin)
 	delete [] wfe;
 
 	// the one and only type
-	pin->mt_types.Add(mt);
+	pin->mt_types.push_back(mt);
 	return S_OK;
 }
 
@@ -858,7 +858,7 @@ STDMETHODIMP CMusePackOutputPin::NonDelegatingQueryInterface(REFIID riid, void *
 
 HRESULT CMusePackOutputPin::CheckMediaType(const CMediaType *mtOut)
 {
-	for (size_t i = 0; i < mt_types.GetCount(); i++) {
+	for (size_t i = 0; i < mt_types.size(); i++) {
 		if (mt_types[i] == *mtOut) {
 			return S_OK;
 		}
@@ -884,7 +884,7 @@ HRESULT CMusePackOutputPin::GetMediaType(int iPosition, CMediaType *pmt)
 	if (iPosition < 0) {
 		return E_INVALIDARG;
 	}
-	if (iPosition >= (int)mt_types.GetCount()) {
+	if (iPosition >= (int)mt_types.size()) {
 		return VFW_S_NO_MORE_ITEMS;
 	}
 
@@ -1004,7 +1004,7 @@ HRESULT CMusePackOutputPin::DoNewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME 
 			packet->rtStop = rtStop;
 			packet->has_time = true;
 			packet->rate = rate;
-			queue.AddTail(packet);
+			queue.push_back(packet);
 			ev_can_read.Set();
 		}
 	}
@@ -1092,7 +1092,7 @@ HRESULT CMusePackOutputPin::DeliverPacket(CMPCPacket &packet)
 	{
 		// insert into queue
 		CAutoLock lck(&lock_queue);
-		queue.AddTail(outp);
+		queue.push_back(outp);
 		ev_can_read.Set();
 
 		// we allow buffering for a few seconds (might be usefull for network playback)
@@ -1113,7 +1113,7 @@ HRESULT CMusePackOutputPin::DoEndOfStream()
 		CAutoLock lck(&lock_queue);
 
 		packet->type = DataPacketMPC::PACKET_TYPE_EOS;
-		queue.AddTail(packet);
+		queue.push_back(packet);
 		ev_can_read.Set();
 	}
 	eos_delivered = true;
@@ -1125,8 +1125,9 @@ void CMusePackOutputPin::FlushQueue()
 {
 	CAutoLock lck(&lock_queue);
 
-	while (queue.GetCount() > 0) {
-		DataPacketMPC *packet = queue.RemoveHead();
+	while (queue.size()) {
+		DataPacketMPC *packet = queue.front();
+		queue.pop_front();
 		if (packet) delete packet;
 	}
 	ev_can_read.Reset();
@@ -1177,34 +1178,31 @@ HRESULT CMusePackOutputPin::DeliverDataPacketMPC(DataPacketMPC &packet)
 
 __int64 CMusePackOutputPin::GetBufferTime_MS()
 {
-	CAutoLock	lck(&lock_queue);
-	if (queue.IsEmpty()) return 0;
+	CAutoLock lck(&lock_queue);
+	if (queue.empty()) return 0;
 
-	DataPacketMPC	*pfirst;
-	DataPacketMPC	*plast;
-	__int64		tstart, tstop;
-	POSITION	posf, posl;
+	DataPacketMPC *pfirst;
+	DataPacketMPC *plast;
+	__int64 tstart = -1;
+	__int64 tstop  = -1;
 
-	tstart	= -1;
-	tstop	= -1;
-
-	posf = queue.GetHeadPosition();
-	while (posf) {
-		pfirst = queue.GetNext(posf);
+	auto it = queue.begin();
+	while (it != queue.end()) {
+		pfirst = *it++;
 		if (pfirst->type == DataPacketMPC::PACKET_TYPE_DATA && pfirst->rtStart != -1) {
 			tstart = pfirst->rtStart;
 			break;
 		}
 	}
 
-	posl = queue.GetTailPosition();
-	while (posl) {
-		plast = queue.GetPrev(posl);
+	it = queue.end();
+	do {
+		plast = *(--it);
 		if (plast->type == DataPacketMPC::PACKET_TYPE_DATA && plast->rtStart != -1) {
 			tstop = plast->rtStart;
 			break;
 		}
-	}
+	} while (it != queue.begin());
 
 	if (tstart == -1 || tstop == -1) {
 		return 0;
@@ -1253,8 +1251,9 @@ DWORD CMusePackOutputPin::ThreadProc()
 							{
 								CAutoLock lck(&lock_queue);
 
-								packet = queue.RemoveHead();
-								if (queue.IsEmpty()) ev_can_read.Reset();
+								packet = queue.front();
+								queue.pop_front();
+								if (queue.empty()) ev_can_read.Reset();
 
 								// allow buffering
 								if (GetBufferTime_MS() < buffer_time_ms) {
