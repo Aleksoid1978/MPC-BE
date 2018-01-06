@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,6 +19,7 @@
  */
 
 #include "stdafx.h"
+#include <unordered_map>
 #include "EVRAllocatorPresenter.h"
 #include "OuterEVR.h"
 #include <Mferror.h>
@@ -1662,14 +1663,11 @@ LONGLONG CEVRAllocatorPresenter::GetClockTime(LONGLONG PerformanceCounter)
 		m_ClockTimeChangeHistoryPos = 0;
 	}
 	if (TimeChangeM) {
-		int Pos = m_ClockTimeChangeHistoryPos % 100;
-		int nHistory = std::min(m_ClockTimeChangeHistoryPos, 100);
+		unsigned Pos = m_ClockTimeChangeHistoryPos % 100u;
+		unsigned nHistory = std::min(m_ClockTimeChangeHistoryPos, 100u);
 		++m_ClockTimeChangeHistoryPos;
 		if (nHistory > 50) {
-			int iLastPos = (Pos - (nHistory)) % 100;
-			if (iLastPos < 0) {
-				iLastPos += 100;
-			}
+			unsigned iLastPos = (nHistory < 100) ? 0 : Pos;
 
 			double TimeChange = llPerf - m_TimeChangeHistory[iLastPos];
 			double ClockChange = llClockTime - m_ClockChangeHistory[iLastPos];
@@ -1789,8 +1787,8 @@ void CEVRAllocatorPresenter::OnVBlankFinished(bool fAll, LONGLONG PerformanceCou
 		return;
 	}
 
-	LONGLONG			llClockTime;
-	LONGLONG			nsSampleTime;
+	LONGLONG llClockTime;
+	LONGLONG nsSampleTime;
 	LONGLONG SampleDuration = 0;
 	if (!m_bSignaledStarvation) {
 		llClockTime = GetClockTime(PerformanceCounter);
@@ -2037,7 +2035,7 @@ void CEVRAllocatorPresenter::RenderThread()
 								double DetectedRefreshTime;
 								double DetectedScanlinesPerFrame;
 								double DetectedScanlineTime;
-								int DetectedRefreshRatePos;
+								unsigned DetectedRefreshRatePos;
 								{
 									CAutoLock Lock(&m_RefreshRateLock);
 									DetectedRefreshTime = m_DetectedRefreshTime;
@@ -2184,7 +2182,7 @@ void CEVRAllocatorPresenter::RenderThread()
 									}
 
 									m_VSyncOffsetHistory[m_VSyncOffsetHistoryPos] = VSyncOffset0;
-									m_VSyncOffsetHistoryPos = (m_VSyncOffsetHistoryPos + 1) % 5;
+									m_VSyncOffsetHistoryPos = (m_VSyncOffsetHistoryPos + 1) % 5u;
 
 									//LONGLONG VSyncTime2 = VSyncTime2 + (VSyncOffsetMax - VSyncOffsetMin);
 									//VSyncOffsetMin; = (((VSyncOffsetMin) % VSyncTime) + VSyncTime) % VSyncTime;
@@ -2332,7 +2330,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 
 							double ScanLineTime = ScanLineSeconds / nScanLines;
 
-							int iPos = m_DetectedRefreshRatePos % 100;
+							unsigned iPos = m_DetectedRefreshRatePos % 100u;
 							m_ldDetectedScanlineRateList[iPos] = ScanLineTime;
 							if (m_DetectedScanlineTime && ScanlineStart != ScanlineEnd) {
 								int Diff = ScanlineEnd - ScanlineStart;
@@ -2341,19 +2339,14 @@ void CEVRAllocatorPresenter::VSyncThread()
 							m_ldDetectedRefreshRateList[iPos] = nSeconds;
 							double Average = 0;
 							double AverageScanline = 0;
-							int nPos = std::min(iPos + 1, 100);
-							for (int i = 0; i < nPos; ++i) {
+							unsigned nPos = std::min(iPos + 1, 100u);
+							for (unsigned i = 0; i < nPos; ++i) {
 								Average += m_ldDetectedRefreshRateList[i];
 								AverageScanline += m_ldDetectedScanlineRateList[i];
 							}
 
-							if (nPos) {
-								Average /= double(nPos);
-								AverageScanline /= double(nPos);
-							} else {
-								Average = 0;
-								AverageScanline = 0;
-							}
+							Average /= double(nPos);
+							AverageScanline /= double(nPos);
 
 							double ThisValue = Average;
 
@@ -2541,7 +2534,7 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 			Diff2 = -Diff2;
 		}
 		if (Diff < m_rtTimePerFrame*8 && m_rtTimePerFrame && Diff2 < m_rtTimePerFrame*8) { // Detect seeking
-			int iPos = (m_DetectedFrameTimePos++) % 60;
+			int iPos = (m_DetectedFrameTimePos++) % 60u;
 			LONGLONG Diff = Time - PrevTime;
 			if (PrevTime == -1) {
 				Diff = 0;
@@ -2549,53 +2542,44 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 			m_DetectedFrameTimeHistory[iPos] = Diff;
 
 			if (m_DetectedFrameTimePos >= 10) {
-				int nFrames = std::min(m_DetectedFrameTimePos, 60);
+				const unsigned nFrames = std::min(m_DetectedFrameTimePos, 60u);
 				LONGLONG DectedSum = 0;
-				for (int i = 0; i < nFrames; ++i) {
+				for (unsigned i = 0; i < nFrames; ++i) {
 					DectedSum += m_DetectedFrameTimeHistory[i];
 				}
 
-				double Average = double(DectedSum) / double(nFrames);
+				const double Average = double(DectedSum) / nFrames;
 				double DeviationSum = 0.0;
-				for (int i = 0; i < nFrames; ++i) {
+				for (unsigned i = 0; i < nFrames; ++i) {
 					double Deviation = m_DetectedFrameTimeHistory[i] - Average;
 					DeviationSum += Deviation*Deviation;
 				}
 
-				double StdDev = sqrt(DeviationSum/double(nFrames));
+				m_DetectedFrameTimeStdDev = sqrt(DeviationSum / nFrames);
 
-				m_DetectedFrameTimeStdDev = StdDev;
-
-				double DetectedRate = 1.0/ (double(DectedSum) / (nFrames * 10000000.0) );
+				double DetectedRate = 1.0 / (double(DectedSum) / (nFrames * 10000000.0) );
 
 				const double AllowedError = 0.0003;
-				static double AllowedValues[] = {60.0, 60/1.001, 50.0, 48.0, 48/1.001, 30.0, 30/1.001, 25.0, 24.0, 24/1.001};
+				static const double AllowedValues[] = {60.0, 60/1.001, 50.0, 48.0, 48/1.001, 30.0, 30/1.001, 25.0, 24.0, 24/1.001};
 
-				for (unsigned i = 0; i < _countof(AllowedValues); ++i) {
-					if (fabs(1.0 - DetectedRate / AllowedValues[i]) < AllowedError) {
-						DetectedRate = AllowedValues[i];
+				for (const auto& AllowedValue : AllowedValues) {
+					if (fabs(1.0 - DetectedRate / AllowedValue) < AllowedError) {
+						DetectedRate = AllowedValue;
 						break;
 					}
 				}
 
-				m_DetectedFrameTimeHistoryHistory[m_DetectedFrameTimePos % 500] = DetectedRate;
+				m_DetectedFrameTimeHistoryHistory[m_DetectedFrameTimePos % 500u] = DetectedRate;
 
 				class CAutoInt
 				{
 				public:
-
 					int m_Int;
 
-					CAutoInt() {
-						m_Int = 0;
-					}
-					CAutoInt(int _Other) {
-						m_Int = _Other;
-					}
+					CAutoInt() { m_Int = 0; }
+					CAutoInt(int _Other) { m_Int = _Other; }
 
-					operator int () const {
-						return m_Int;
-					}
+					operator int () const { return m_Int; }
 
 					CAutoInt &operator ++ () {
 						++m_Int;
@@ -2603,29 +2587,26 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 					}
 				};
 
-
-				CMap<double, double, CAutoInt, CAutoInt> Map;
+				std::unordered_map<double, CAutoInt> Map;
 
 				for (int i = 0; i < 500; ++i) {
 					++Map[m_DetectedFrameTimeHistoryHistory[i]];
 				}
 
-				POSITION Pos = Map.GetStartPosition();
 				double BestVal = 0.0;
 				int BestNum = 5;
-				while (Pos) {
-					double Key;
-					CAutoInt Value;
-					Map.GetNextAssoc(Pos, Key, Value);
-					if (Value.m_Int > BestNum && Key != 0.0) {
-						BestNum = Value.m_Int;
+				for (const auto& item : Map) {
+					auto Key = item.first;
+					auto Value = item.second.m_Int;
+					if (Value > BestNum && Key != 0.0) {
+						BestNum = Value;
 						BestVal = Key;
 					}
 				}
 
 				m_DetectedLock = false;
-				for (unsigned i = 0; i < _countof(AllowedValues); ++i) {
-					if (BestVal == AllowedValues[i]) {
+				for (const auto& AllowedValue : AllowedValues) {
+					if (BestVal == AllowedValue) {
 						m_DetectedLock = true;
 						break;
 					}
