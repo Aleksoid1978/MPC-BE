@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -183,10 +183,10 @@ bool HookNewSegmentAndReceive(IPin* pPin)
 	}
 	pPinC->lpVtbl->NewSegment = NewSegmentMine;
 
-    if (ReceiveConnectionOrg == nullptr) {
-        ReceiveConnectionOrg = pPinC->lpVtbl->ReceiveConnection;
-    }
-    pPinC->lpVtbl->ReceiveConnection = ReceiveConnectionMine;
+	if (ReceiveConnectionOrg == nullptr) {
+		ReceiveConnectionOrg = pPinC->lpVtbl->ReceiveConnection;
+	}
+	pPinC->lpVtbl->ReceiveConnection = ReceiveConnectionMine;
 
 	res = VirtualProtect(pPinC->lpVtbl, sizeof(IPinCVtbl), flOldProtect, &flOldProtect);
 
