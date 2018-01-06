@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -108,9 +108,9 @@ public:
 	HRESULT CheckInputType(const CMediaType* mtIn);
 	HRESULT CheckOutputType(const CMediaType& mtOut);
 	HRESULT CheckTransform(const CMediaType* mtIn, const CMediaType* mtOut);
-	HRESULT	DoCheckTransform(const CMediaType* mtIn, const CMediaType* mtOut, bool checkReconnection);
+	HRESULT DoCheckTransform(const CMediaType* mtIn, const CMediaType* mtOut, bool checkReconnection);
 
-	CAtlArray<CTextInputPin*> m_pTextInput;
+	std::vector<CTextInputPin*> m_pTextInputs;
 
 	// IDirectVobSub
 	STDMETHODIMP put_FileName(WCHAR* fn);
@@ -200,8 +200,8 @@ private:
 	{
 	public:
 		ATL::CEvent EndThreadEvent, RefreshEvent;
-		CAtlList<CString> files;
-		CAtlArray<CTime> mtime;
+		std::list<CString> files;
+		std::vector<CTime> mtime;
 	} m_frd;
 
 	void SetupFRD(CStringArray& paths, CAtlArray<HANDLE>& handles);

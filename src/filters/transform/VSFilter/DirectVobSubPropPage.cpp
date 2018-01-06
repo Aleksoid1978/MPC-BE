@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -252,11 +252,9 @@ void CDVSBasePPage::AttachControls()
 
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	POSITION pos = m_controls.GetStartPosition();
-	while (pos) {
-		UINT id;
-		CWnd* pControl;
-		m_controls.GetNextAssoc(pos, id, pControl);
+	for (const auto& control : m_controls) {
+		UINT id = control.first;
+		CWnd* pControl = control.second;
 		if (pControl) {
 			BOOL fRet = pControl->Attach(GetDlgItem(m_Dlg, id));
 			ASSERT(fRet);
@@ -274,11 +272,8 @@ void CDVSBasePPage::DetachControls()
 
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	POSITION pos = m_controls.GetStartPosition();
-	while (pos) {
-		UINT id;
-		CWnd* pControl;
-		m_controls.GetNextAssoc(pos, id, pControl);
+	for (const auto& control : m_controls) {
+		CWnd* pControl = control.second;
 		if (pControl) {
 			pControl->Detach();
 		}
