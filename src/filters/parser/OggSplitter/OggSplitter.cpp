@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1336,16 +1336,16 @@ COggTheoraOutputPin::COggTheoraOutputPin(OggPage& page, LPCWSTR pName, CBaseFilt
 		gb.BitRead(50); gb.BitRead(50);
 	}
 
-    if (m_nVersion >= 0x030200) {
-        LONG visible_width	= gb.BitRead(24);
-        LONG visible_height	= gb.BitRead(24);
-        if (visible_width <= width && visible_width > width - 16
+	if (m_nVersion >= 0x030200) {
+		LONG visible_width	= gb.BitRead(24);
+		LONG visible_height	= gb.BitRead(24);
+		if (visible_width <= width && visible_width > width - 16
 				&& visible_height <= height && visible_height > height - 16) {
 			width	= visible_width;
-            height	= visible_height;
-        }
+			height	= visible_height;
+		}
 		gb.BitRead(16);
-    }
+	}
 
 	int nFpsNum	= gb.ReadDword();
 	int nFpsDen	= gb.ReadDword();
@@ -1440,7 +1440,7 @@ HRESULT COggTheoraOutputPin::UnpackInitPage(OggPage& page)
 REFERENCE_TIME COggTheoraOutputPin::GetRefTime(__int64 granule_position)
 {
 	LONGLONG iframe = (granule_position >> m_KfgShift);
-    if (m_nVersion < 0x030201) {
+	if (m_nVersion < 0x030201) {
 		iframe++;
 	}
 

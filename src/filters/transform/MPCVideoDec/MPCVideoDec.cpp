@@ -3357,8 +3357,8 @@ HRESULT CMPCVideoDecFilter::ConfigureDXVA2(IPin *pPin)
 
 HRESULT CMPCVideoDecFilter::SetEVRForDXVA2(IPin *pPin)
 {
-    CComPtr<IMFGetService> pGetService;
-    HRESULT hr = pPin->QueryInterface(IID_PPV_ARGS(&pGetService));
+	CComPtr<IMFGetService> pGetService;
+	HRESULT hr = pPin->QueryInterface(IID_PPV_ARGS(&pGetService));
 	if (SUCCEEDED(hr)) {
 		CComPtr<IDirectXVideoMemoryConfiguration> pVideoConfig;
 		hr = pGetService->GetService(MR_VIDEO_ACCELERATION_SERVICE, IID_PPV_ARGS(&pVideoConfig));
@@ -3378,7 +3378,7 @@ HRESULT CMPCVideoDecFilter::SetEVRForDXVA2(IPin *pPin)
 				++dwTypeIndex;
 			}
 		}
-    }
+	}
 
 	return hr;
 }

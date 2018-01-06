@@ -518,8 +518,6 @@ public:
 	// Added a Debug display to the screen (/debug option)
 	bool			bShowDebugInfo;
 	int				iAdminOption;
-	int				iDXVer;
-
 
 	// Player
 	int				iMultipleInst;
@@ -645,14 +643,14 @@ public:
 
 	// Capture (BDA configuration)
 	// BDA configuration
-	int				iDefaultCaptureDevice;		// Default capture device (analog=0, 1=digital)
+	int				iDefaultCaptureDevice; // Default capture device (analog=0, 1=digital)
 	CString			strAnalogVideo;
 	CString			strAnalogAudio;
 	int				iAnalogCountry;
 	CString			strBDANetworkProvider;
 	CString			strBDATuner;
 	CString			strBDAReceiver;
-	//CString			strBDAStandard;
+	//CString		strBDAStandard;
 	int				iBDAScanFreqStart;
 	int				iBDAScanFreqEnd;
 	int				iBDABandwidth;
