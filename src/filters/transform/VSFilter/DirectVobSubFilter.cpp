@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -90,7 +90,7 @@ CDirectVobSubFilter::CDirectVobSubFilter(LPUNKNOWN punk, HRESULT* phr, const GUI
 	m_tbid.fShowIcon = (theApp.m_AppName.Find(L"zplayer", 0) < 0 || !!theApp.GetProfileInt(ResStr(IDS_R_GENERAL), ResStr(IDS_RG_ENABLEZPICON), 0));
 
 	HRESULT hr = S_OK;
-	m_pTextInput.Add(DNew CTextInputPin(this, m_pLock, &m_csSubLock, &hr));
+	m_pTextInputs.push_back(DNew CTextInputPin(this, m_pLock, &m_csSubLock, &hr));
 	ASSERT(SUCCEEDED(hr));
 
 	CAMThread::Create();
@@ -123,8 +123,8 @@ CDirectVobSubFilter::~CDirectVobSubFilter()
 		m_hdc = 0;
 	}
 
-	for (size_t i = 0; i < m_pTextInput.GetCount(); i++) {
-		delete m_pTextInput[i];
+	for (auto& pTextInput : m_pTextInputs) {
+		delete pTextInput;
 	}
 
 	SAFE_DELETE_ARRAY(m_pVideoOutputFormat);
@@ -381,18 +381,18 @@ CBasePin* CDirectVobSubFilter::GetPin(int n)
 
 	n -= __super::GetPinCount();
 
-	if (n >= 0 && (size_t)n < m_pTextInput.GetCount()) {
-		return m_pTextInput[n];
+	if (n >= 0 && n < (int)m_pTextInputs.size()) {
+		return m_pTextInputs[n];
 	}
 
-	n -= m_pTextInput.GetCount();
+	n -= m_pTextInputs.size();
 
 	return nullptr;
 }
 
 int CDirectVobSubFilter::GetPinCount()
 {
-	return __super::GetPinCount() + m_pTextInput.GetCount();
+	return __super::GetPinCount() + m_pTextInputs.size();
 }
 
 HRESULT CDirectVobSubFilter::JoinFilterGraph(IFilterGraph* pGraph, LPCWSTR pName)
@@ -1422,9 +1422,9 @@ STDMETHODIMP CDirectVobSubFilter::get_LanguageType(int iLanguage, int* pType)
 		get_LanguageCount(&nLangs);
 
 		int nEmbeddedCount = 0;
-		for (size_t i = 0; i < m_pTextInput.GetCount(); i++) {
-			if (m_pTextInput[i]->IsConnected()) {
-				CComPtr<ISubStream> pSubStream = m_pTextInput[i]->GetSubStream();
+		for (const auto& pTextInput : m_pTextInputs) {
+			if (pTextInput->IsConnected()) {
+				CComPtr<ISubStream> pSubStream = pTextInput->GetSubStream();
 				nEmbeddedCount += pSubStream->GetStreamCount();
 			}
 		}
@@ -1607,26 +1607,26 @@ bool CDirectVobSubFilter2::ShouldWeAutoload(IFilterGraph* pGraph)
 {
 	// all entries must be lowercase!
 	TCHAR* blacklistedapps[] = {
-		_T("wm8eutil."),        // wmp8 encoder's dummy renderer releases the outputted media sample after calling Receive on its input pin (yes, even when dvobsub isn't registered at all)
-		_T("explorer."),        // as some users reported thumbnail preview loads dvobsub, I've never experienced this yet...
-		_T("producer."),        // this is real's producer
-		_T("googledesktop"),    // Google Desktop
-		_T("subtitleworkshop"), // Subtitle Workshop
-		_T("darksouls."),       // Dark Souls (Game)
-		_T("rometw."),          // Rome Total War (Game)
-		_T("everquest2."),      // EverQuest II (Game)
-		_T("yso_win."),         // Ys Origin (Game)
-		_T("launcher_main."),   // Logitech WebCam Software
-		_T("webcamdell"),       // Dell WebCam Software
-		_T("data."),            // Dark Souls 1 (Game)
-		_T("unravel"),          // Unravel (Game)
-		_T("mshta"),            // MS Scripting Host
-		_T("origin.exe"),       // Origin
-		_T("train.exe"),        // Train Simulator (Game)
+		L"wm8eutil.",        // wmp8 encoder's dummy renderer releases the outputted media sample after calling Receive on its input pin (yes, even when dvobsub isn't registered at all)
+		L"explorer.",        // as some users reported thumbnail preview loads dvobsub, I've never experienced this yet...
+		L"producer.",        // this is real's producer
+		L"googledesktop",    // Google Desktop
+		L"subtitleworkshop", // Subtitle Workshop
+		L"darksouls.",       // Dark Souls (Game)
+		L"rometw.",          // Rome Total War (Game)
+		L"everquest2.",      // EverQuest II (Game)
+		L"yso_win.",         // Ys Origin (Game)
+		L"launcher_main.",   // Logitech WebCam Software
+		L"webcamdell",       // Dell WebCam Software
+		L"data.",            // Dark Souls 1 (Game)
+		L"unravel",          // Unravel (Game)
+		L"mshta",            // MS Scripting Host
+		L"origin.exe",       // Origin
+		L"train.exe",        // Train Simulator (Game)
 #if WIN64
-		_T("ridex64.exe"),      // Ride (Game)
+		L"ridex64.exe",      // Ride (Game)
 #else
-		_T("ride.exe"),         // Ride (Game)
+		L"ride.exe",         // Ride (Game)
 #endif
 	};
 
@@ -1733,7 +1733,7 @@ void CDirectVobSubFilter2::GetRidOfInternalScriptRenderer()
 					&& SUCCEEDED(pPin->ConnectedTo(&pPinTo))) {
 				m_pGraph->Disconnect(pPinTo);
 				m_pGraph->Disconnect(pPin);
-				m_pGraph->ConnectDirect(pPinTo, GetPin(2 + m_pTextInput.GetCount()-1), nullptr);
+				m_pGraph->ConnectDirect(pPinTo, GetPin(2 + m_pTextInputs.size()-1), nullptr);
 			}
 		}
 		EndEnumPins
@@ -1754,7 +1754,7 @@ bool CDirectVobSubFilter::Open()
 
 	m_pSubStreams.RemoveAll();
 
-	m_frd.files.RemoveAll();
+	m_frd.files.clear();
 
 	std::vector<CString> paths;
 
@@ -1771,7 +1771,7 @@ bool CDirectVobSubFilter::Open()
 	Subtitle::GetSubFileNames(m_FileName, paths, ret);
 
 	for (const auto& sub_fn : ret) {
-		if (m_frd.files.Find(sub_fn)) {
+		if (std::find(m_frd.files.cbegin(), m_frd.files.cend(), sub_fn) != m_frd.files.cend()) {
 			continue;
 		}
 
@@ -1790,7 +1790,7 @@ bool CDirectVobSubFilter::Open()
 			CAutoPtr<CVobSubFile> pVSF(DNew CVobSubFile(&m_csSubLock));
 			if (pVSF && pVSF->Open(sub_fn) && pVSF->GetStreamCount() > 0) {
 				pSubStream = pVSF.Detach();
-				m_frd.files.AddTail(sub_fn.Left(sub_fn.GetLength() - 4) + L".sub");
+				m_frd.files.push_back(sub_fn.Left(sub_fn.GetLength() - 4) + L".sub");
 			}
 		}
 
@@ -1798,19 +1798,19 @@ bool CDirectVobSubFilter::Open()
 			CAutoPtr<CRenderedTextSubtitle> pRTS(DNew CRenderedTextSubtitle(&m_csSubLock));
 			if (pRTS && pRTS->Open(sub_fn, DEFAULT_CHARSET, L"", m_videoFileName) && pRTS->GetStreamCount() > 0) {
 				pSubStream = pRTS.Detach();
-				m_frd.files.AddTail(sub_fn + L".style");
+				m_frd.files.push_back(sub_fn + L".style");
 			}
 		}
 
 		if (pSubStream) {
 			m_pSubStreams.AddTail(pSubStream);
-			m_frd.files.AddTail(sub_fn);
+			m_frd.files.push_back(sub_fn);
 		}
 	}
 
-	for (size_t i = 0; i < m_pTextInput.GetCount(); i++) {
-		if (m_pTextInput[i]->IsConnected()) {
-			m_pSubStreams.AddTail(m_pTextInput[i]->GetSubStream());
+	for (const auto& pTextInput : m_pTextInputs) {
+		if (pTextInput->IsConnected()) {
+			m_pSubStreams.AddTail(pTextInput->GetSubStream());
 		}
 	}
 
@@ -1957,15 +1957,16 @@ void CDirectVobSubFilter::AddSubStream(ISubStream* pSubStream)
 		m_pSubStreams.AddTail(pSubStream);
 	}
 
-	int len = m_pTextInput.GetCount();
-	for (size_t i = 0; i < m_pTextInput.GetCount(); i++)
-		if (m_pTextInput[i]->IsConnected()) {
+	int len = m_pTextInputs.size();
+	for (const auto& pTextInput : m_pTextInputs) {
+		if (pTextInput->IsConnected()) {
 			len--;
 		}
+	}
 
 	if (len == 0) {
 		HRESULT hr = S_OK;
-		m_pTextInput.Add(DNew CTextInputPin(this, m_pLock, &m_csSubLock, &hr));
+		m_pTextInputs.push_back(DNew CTextInputPin(this, m_pLock, &m_csSubLock, &hr));
 	}
 }
 
@@ -2016,11 +2017,11 @@ void CDirectVobSubFilter::SetupFRD(CStringArray& paths, CAtlArray<HANDLE>& handl
 	handles.Add(m_frd.EndThreadEvent);
 	handles.Add(m_frd.RefreshEvent);
 
-	m_frd.mtime.SetCount(m_frd.files.GetCount());
+	m_frd.mtime.resize(m_frd.files.size());
 
-	POSITION pos = m_frd.files.GetHeadPosition();
-	for (size_t i = 0; pos; i++) {
-		CString fn = m_frd.files.GetNext(pos);
+	auto it = m_frd.files.begin();
+	for (size_t i = 0; it != m_frd.files.end(); i++) {
+		CString fn = *it++;
 
 		CFileStatus status;
 		if (CFileGetStatus(fn, status)) {
@@ -2079,9 +2080,9 @@ DWORD CDirectVobSubFilter::ThreadProc()
 
 			int j = 0;
 
-			POSITION pos = m_frd.files.GetHeadPosition();
-			for (size_t i = 0; pos && j == 0; i++) {
-				CString fn = m_frd.files.GetNext(pos);
+			auto it = m_frd.files.begin();
+			for (size_t i = 0; it != m_frd.files.end() && j == 0; i++) {
+				CString fn = *it++;
 
 				CFileStatus status;
 				if (CFileGetStatus(fn, status) && m_frd.mtime[i] != status.m_mtime) {
@@ -2104,10 +2105,10 @@ DWORD CDirectVobSubFilter::ThreadProc()
 			} else {
 				Sleep(500);
 
-				POSITION pos = m_frd.files.GetHeadPosition();
-				for (size_t i = 0; pos; i++) {
+				auto it = m_frd.files.begin();
+				for (size_t i = 0; it != m_frd.files.end(); i++) {
 					CFileStatus status;
-					if (CFileGetStatus(m_frd.files.GetNext(pos), status)
+					if (CFileGetStatus(*it++, status)
 							&& m_frd.mtime[i] != status.m_mtime) {
 						Open();
 						SetupFRD(paths, handles);

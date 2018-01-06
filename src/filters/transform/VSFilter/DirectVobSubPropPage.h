@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,6 +22,7 @@
 #pragma once
 
 #include "IDirectVobSub.h"
+#include <unordered_map>
 
 class CDVSBasePPage : public CBasePropertyPage
 {
@@ -55,7 +56,7 @@ private:
 	bool m_bAttached;
 	void AttachControls(), DetachControls();
 
-	CMap<UINT, UINT&, CWnd*, CWnd*> m_controls;
+	std::unordered_map<UINT, CWnd*> m_controls;
 
 protected:
 	void BindControl(UINT id, CWnd& control);
