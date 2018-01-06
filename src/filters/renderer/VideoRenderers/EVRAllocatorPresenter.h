@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 #pragma once
 
 #include "DX9AllocatorPresenter.h"
-#include <mfapi.h>	// API Media Foundation
+#include <mfapi.h> // API Media Foundation
 #include <evr9.h>
 
 namespace DSObjects
@@ -204,8 +204,8 @@ namespace DSObjects
 		CCritSec								m_SampleQueueLock;
 		CCritSec								m_ImageProcessingLock;
 
-		CInterfaceList<IMFSample, &IID_IMFSample>		m_FreeSamples;
-		CInterfaceList<IMFSample, &IID_IMFSample>		m_ScheduledSamples;
+		CInterfaceList<IMFSample, &IID_IMFSample> m_FreeSamples;
+		CInterfaceList<IMFSample, &IID_IMFSample> m_ScheduledSamples;
 		IMFSample *								m_pCurrentDisplaydSample;
 		bool									m_bWaitingSample;
 		bool									m_bLastSampleOffsetValid;
@@ -216,7 +216,7 @@ namespace DSObjects
 		LONGLONG								m_LastSampleOffset;
 		LONGLONG								m_VSyncOffsetHistory[5];
 		LONGLONG								m_LastPredictedSync;
-		int										m_VSyncOffsetHistoryPos;
+		unsigned								m_VSyncOffsetHistoryPos;
 
 		UINT									m_nResetToken;
 		int										m_nStepCount;

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -114,7 +114,7 @@ namespace DSObjects
 		double GetFrameTime();
 		double GetFrameRate();
 
-		int						m_nTearingPos;
+		long					m_nTearingPos;
 		VMR9AlphaBitmap			m_VMR9AlphaBitmap;
 		CAutoVectorPtr<BYTE>	m_VMR9AlphaBitmapData;
 		CRect					m_VMR9AlphaBitmapRect;
@@ -187,7 +187,7 @@ namespace DSObjects
 
 		double					m_ldDetectedRefreshRateList[100];
 		double					m_ldDetectedScanlineRateList[100];
-		int						m_DetectedRefreshRatePos;
+		unsigned				m_DetectedRefreshRatePos;
 		bool					m_bSyncStatsAvailable;
 		int						m_pJitter [NB_JITTER];			// Jitter buffer for stats
 		LONGLONG				m_pllSyncOffset [NB_JITTER];	// Sync offset time stats
@@ -206,7 +206,7 @@ namespace DSObjects
 		bool					m_DetectedLock;
 		LONGLONG				m_DetectedFrameTimeHistory[60];
 		double					m_DetectedFrameTimeHistoryHistory[500];
-		int						m_DetectedFrameTimePos;
+		unsigned				m_DetectedFrameTimePos;
 
 		double					m_TextScale;
 
@@ -242,7 +242,7 @@ namespace DSObjects
 
 		double					m_TimeChangeHistory[100];
 		double					m_ClockChangeHistory[100];
-		int						m_ClockTimeChangeHistoryPos;
+		unsigned				m_ClockTimeChangeHistoryPos;
 		double					m_ModeratedTimeSpeed;
 		double					m_ModeratedTimeSpeedPrim;
 		double					m_ModeratedTimeSpeedDiff;
