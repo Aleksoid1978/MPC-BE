@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -480,14 +480,13 @@ void COSD::DrawMessage()
 
 void COSD::DrawDebug()
 {
-	if (!m_debugMessages.IsEmpty()) {
-		CString msg, tmp;
-		POSITION pos;
-		pos = m_debugMessages.GetHeadPosition();
-		msg.Format(L"%s", m_debugMessages.GetNext(pos));
+	if (!m_debugMessages.empty()) {
+		CString msg;
+		auto it = m_debugMessages.cbegin();
+		msg.Format(L"%s", *it++);
 
-		while (pos) {
-			tmp = m_debugMessages.GetNext(pos);
+		while (it != m_debugMessages.cend()) {
+			const CString& tmp = *it++;
 			if (!tmp.IsEmpty()) {
 				msg.AppendFormat(L"\r\n%s", tmp);
 			}
@@ -745,9 +744,9 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 			m_nMessagePos	= nPos;
 			m_strMessage	= strMsg;
 		} else {
-			m_debugMessages.AddTail(strMsg);
-			if (m_debugMessages.GetCount() > 20) {
-				m_debugMessages.RemoveHead();
+			m_debugMessages.emplace_back(strMsg);
+			if (m_debugMessages.size() > 20) {
+				m_debugMessages.pop_front();
 			}
 			nDuration = -1;
 		}

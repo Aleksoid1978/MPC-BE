@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -99,8 +99,9 @@ STDMETHODIMP CBaseGraph::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 
 void CBaseGraph::ClearMessageQueue()
 {
-	while (!m_msgqueue.IsEmpty()) {
-		GMSG msg = m_msgqueue.RemoveHead();
+	while (!m_msgqueue.empty()) {
+		GMSG msg = m_msgqueue.front();
+		m_msgqueue.pop_front();
 		FreeEventParams(msg.m_lEventCode, msg.m_lParam1, msg.m_lParam2);
 	}
 }
@@ -115,7 +116,7 @@ void CBaseGraph::NotifyEvent(long lEventCode, LONG_PTR lParam1, LONG_PTR lParam2
 	msg.m_lEventCode = lEventCode;
 	msg.m_lParam1 = lParam1;
 	msg.m_lParam2 = lParam2;
-	m_msgqueue.AddTail(msg);
+	m_msgqueue.push_back(msg);
 
 	PostMessageW((HWND)m_hNotifyWnd, m_lNotifyMsg, 0, m_lNotifyInstData);
 }
@@ -335,11 +336,12 @@ STDMETHODIMP CBaseGraph::GetEventHandle(OAEVENT* hEvent)
 
 STDMETHODIMP CBaseGraph::GetEvent(long* lEventCode, LONG_PTR* lParam1, LONG_PTR* lParam2, long msTimeout)
 {
-	if (m_msgqueue.IsEmpty()) {
+	if (m_msgqueue.empty()) {
 		return E_FAIL;
 	}
 
-	GMSG msg = m_msgqueue.RemoveHead();
+	GMSG msg = m_msgqueue.front();
+	m_msgqueue.pop_front();
 	if (lEventCode) {
 		*lEventCode = msg.m_lEventCode;
 	}

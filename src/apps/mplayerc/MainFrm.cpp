@@ -754,11 +754,11 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	m_pFullscreenWnd = DNew CFullscreenWnd(this);
 
-	m_bars.AddTail(&m_wndSeekBar);
-	m_bars.AddTail(&m_wndToolBar);
-	m_bars.AddTail(&m_wndInfoBar);
-	m_bars.AddTail(&m_wndStatsBar);
-	m_bars.AddTail(&m_wndStatusBar);
+	m_bars.push_back(&m_wndSeekBar);
+	m_bars.push_back(&m_wndToolBar);
+	m_bars.push_back(&m_wndInfoBar);
+	m_bars.push_back(&m_wndStatsBar);
+	m_bars.push_back(&m_wndStatusBar);
 
 	m_wndSeekBar.Enable(false);
 
@@ -766,40 +766,39 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	EnableDocking(CBRS_ALIGN_ANY);
 
-	m_dockingbars.RemoveAll();
+	m_dockingbars.clear();
 
 	m_wndSubresyncBar.Create(this, AFX_IDW_DOCKBAR_TOP, &m_csSubLock);
 	m_wndSubresyncBar.SetBarStyle(m_wndSubresyncBar.GetBarStyle() | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC);
 	m_wndSubresyncBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_wndSubresyncBar.SetHeight(200);
-	m_dockingbars.AddTail(&m_wndSubresyncBar);
+	m_dockingbars.push_back(&m_wndSubresyncBar);
 
 	m_wndPlaylistBar.Create(this, AFX_IDW_DOCKBAR_BOTTOM);
 	m_wndPlaylistBar.SetBarStyle(m_wndPlaylistBar.GetBarStyle() | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC);
 	m_wndPlaylistBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_wndPlaylistBar.SetHeight(100);
-	m_dockingbars.AddTail(&m_wndPlaylistBar);
+	m_dockingbars.push_back(&m_wndPlaylistBar);
 	m_wndPlaylistBar.LoadPlaylist(GetRecentFile());
 
 	m_wndCaptureBar.Create(this, AFX_IDW_DOCKBAR_LEFT);
 	m_wndCaptureBar.SetBarStyle(m_wndCaptureBar.GetBarStyle() | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC);
 	m_wndCaptureBar.EnableDocking(CBRS_ALIGN_LEFT|CBRS_ALIGN_RIGHT);
-	m_dockingbars.AddTail(&m_wndCaptureBar);
+	m_dockingbars.push_back(&m_wndCaptureBar);
 
 	m_wndNavigationBar.Create(this, AFX_IDW_DOCKBAR_LEFT);
 	m_wndNavigationBar.SetBarStyle(m_wndNavigationBar.GetBarStyle() | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC);
 	m_wndNavigationBar.EnableDocking(CBRS_ALIGN_LEFT|CBRS_ALIGN_RIGHT);
-	m_dockingbars.AddTail(&m_wndNavigationBar);
+	m_dockingbars.push_back(&m_wndNavigationBar);
 
 	m_wndShaderEditorBar.Create(this, AFX_IDW_DOCKBAR_TOP);
 	m_wndShaderEditorBar.SetBarStyle(m_wndShaderEditorBar.GetBarStyle() | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC);
 	m_wndShaderEditorBar.EnableDocking(CBRS_ALIGN_ANY);
-	m_dockingbars.AddTail(&m_wndShaderEditorBar);
+	m_dockingbars.push_back(&m_wndShaderEditorBar);
 
 	// Hide all dockable bars by default
-	POSITION pos = m_dockingbars.GetHeadPosition();
-	while (pos) {
-		m_dockingbars.GetNext(pos)->ShowWindow(SW_HIDE);
+	for (const auto& pDockingBar : m_dockingbars) {
+		pDockingBar->ShowWindow(SW_HIDE);
 	}
 
 	m_fileDropTarget.Register(this);
@@ -1085,9 +1084,8 @@ LPCTSTR CMainFrame::GetRecentFile()
 
 void CMainFrame::RestoreControlBars()
 {
-	POSITION pos = m_dockingbars.GetHeadPosition();
-	while (pos) {
-		CPlayerBar* pBar = dynamic_cast<CPlayerBar*>(m_dockingbars.GetNext(pos));
+	for (const auto& pDockingBar : m_dockingbars) {
+		CPlayerBar* pBar = dynamic_cast<CPlayerBar*>(pDockingBar);
 
 		if (pBar) {
 			pBar->LoadState(this);
@@ -1097,9 +1095,8 @@ void CMainFrame::RestoreControlBars()
 
 void CMainFrame::SaveControlBars()
 {
-	POSITION pos = m_dockingbars.GetHeadPosition();
-	while (pos) {
-		CPlayerBar* pBar = dynamic_cast<CPlayerBar*>(m_dockingbars.GetNext(pos));
+	for (const auto& pDockingBar : m_dockingbars) {
+		CPlayerBar* pBar = dynamic_cast<CPlayerBar*>(pDockingBar);
 
 		if (pBar) {
 			pBar->SaveState();
@@ -1501,16 +1498,14 @@ BOOL CMainFrame::OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDLERINFO*
 		return TRUE;
 	}
 
-	POSITION pos = m_bars.GetHeadPosition();
-	while (pos) {
-		if (m_bars.GetNext(pos)->OnCmdMsg(nID, nCode, pExtra, pHandlerInfo)) {
+	for (const auto& pBar : m_bars) {
+		if (pBar->OnCmdMsg(nID, nCode, pExtra, pHandlerInfo)) {
 			return TRUE;
 		}
 	}
 
-	pos = m_dockingbars.GetHeadPosition();
-	while (pos) {
-		if (m_dockingbars.GetNext(pos)->OnCmdMsg(nID, nCode, pExtra, pHandlerInfo)) {
+	for (const auto& pDockingBar : m_dockingbars) {
+		if (pDockingBar->OnCmdMsg(nID, nCode, pExtra, pHandlerInfo)) {
 			return TRUE;
 		}
 	}
@@ -3677,13 +3672,13 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 			GetClientRect(r);
 			r.top = r.bottom;
 
-			POSITION pos = m_bars.GetHeadPosition();
-			for (int i = 1; pos; i <<= 1) {
-				CControlBar* pNext = m_bars.GetNext(pos);
-				CSize size = pNext->CalcFixedLayout(FALSE, TRUE);
+			int i = 1;
+			for (const auto& pBar : m_bars) {
+				CSize size = pBar->CalcFixedLayout(FALSE, TRUE);
 				if (s.nCS&i) {
 					r.top -= size.cy;
 				}
+				i <<= 1;
 			}
 
 			// HACK: the controls would cover the menu too early hiding some buttons
@@ -15491,21 +15486,21 @@ void CMainFrame::ShowControls(int nCS, bool fSave)
 
 	m_pLastBar = nullptr;
 
-	POSITION pos = m_bars.GetHeadPosition();
-	for (int i = 1; pos; i <<= 1) {
-		CControlBar* pNext = m_bars.GetNext(pos);
-		ShowControlBar(pNext, !!(nCS&i), TRUE);
+	int i = 1;
+	for (const auto& pBar : m_bars) {
+		ShowControlBar(pBar, !!(nCS&i), TRUE);
 		if (nCS&i) {
-			m_pLastBar = pNext;
+			m_pLastBar = pBar;
 		}
 
-		CSize s = pNext->CalcFixedLayout(FALSE, TRUE);
+		CSize s = pBar->CalcFixedLayout(FALSE, TRUE);
 		if (nCSprev&i) {
 			hbefore += s.cy;
 		}
 		if (nCS&i) {
 			hafter += s.cy;
 		}
+		i <<= 1;
 	}
 
 	WINDOWPLACEMENT wp;
@@ -15529,28 +15524,24 @@ void CMainFrame::CalcControlsSize(CSize& cSize)
 {
 	cSize.SetSize(0, 0);
 
-	POSITION pos = m_bars.GetHeadPosition();
-	while (pos) {
-		CControlBar *pCB = m_bars.GetNext(pos);
-		if (IsWindow(pCB->m_hWnd) && pCB->IsVisible()) {
-			cSize.cy += pCB->CalcFixedLayout(TRUE, TRUE).cy;
+	for (const auto& pBar : m_bars) {
+		if (IsWindow(pBar->m_hWnd) && pBar->IsVisible()) {
+			cSize.cy += pBar->CalcFixedLayout(TRUE, TRUE).cy;
 		}
 	}
 
-	pos = m_dockingbars.GetHeadPosition();
-	while (pos) {
-		CSizingControlBar *pCB = m_dockingbars.GetNext(pos);
-		if (IsWindow(pCB->m_hWnd)) {
-			BOOL bIsWindowVisible = pCB->IsWindowVisible();
-			if (auto* playlistBar = dynamic_cast<CPlayerPlaylistBar*>(pCB)) {
+	for (const auto& pDockingBar : m_dockingbars) {
+		if (IsWindow(pDockingBar->m_hWnd)) {
+			BOOL bIsWindowVisible = pDockingBar->IsWindowVisible();
+			if (auto* playlistBar = dynamic_cast<CPlayerPlaylistBar*>(pDockingBar)) {
 				bIsWindowVisible = playlistBar->IsPlaylistVisible();
 			}
 
-			if (bIsWindowVisible && !pCB->IsFloating()) {
-				if (pCB->IsHorzDocked()) {
-					cSize.cy += pCB->CalcFixedLayout(TRUE, TRUE).cy - GetSystemMetrics(SM_CYBORDER);
-				} else if (pCB->IsVertDocked()) {
-					cSize.cx += pCB->CalcFixedLayout(TRUE, FALSE).cx;
+			if (bIsWindowVisible && !pDockingBar->IsFloating()) {
+				if (pDockingBar->IsHorzDocked()) {
+					cSize.cy += pDockingBar->CalcFixedLayout(TRUE, TRUE).cy - GetSystemMetrics(SM_CYBORDER);
+				} else if (pDockingBar->IsVertDocked()) {
+					cSize.cx += pDockingBar->CalcFixedLayout(TRUE, FALSE).cx;
 				}
 			}
 		}
