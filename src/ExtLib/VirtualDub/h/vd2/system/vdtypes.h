@@ -312,7 +312,7 @@ extern void VDDebugPrint(const char *format, ...);
 		template<int lineno>
 		bool VDAssertHelper<lineno>::sbAssertDisabled;
 
-		// ==> Start patch MPC DXVA
+		// Start patch MPC-BE
 		/*
 		template<int lineno>
 		struct VDAssertHelper2 { static bool sDisabled; };
@@ -320,21 +320,24 @@ extern void VDDebugPrint(const char *format, ...);
 		template<int lineno>
 		bool VDAssertHelper2<lineno>::sDisabled;
 		*/
-		// <== End patch MPC DXVA
+		// End patch MPC-BE
 	}
 
-	// ==> Start patch MPC DXVA
-	/*
+// Start patch MPC-BE
+// We use the old code since the new templated code isn't compatible with MSVC "Edit and continue" feature 
+// because __LINE__ can't be known at compile time.
+#if !defined(VD_COMPILER_MSVC) || defined(__INTEL_COMPILER)
 	#define VDASSERT(exp)		if (!VDAssertHelper2<__LINE__>::sDisabled) if (exp); else switch(VDAssert   (#exp, __FILE__, __LINE__)) { case kVDAssertBreak: VDBREAK; break; case kVDAssertIgnore: VDAssertHelper2<__LINE__>::sDisabled = true; } else ((void)0)
 	#define VDASSERTPTR(exp) 	if (!VDAssertHelper2<__LINE__>::sDisabled) if (exp); else switch(VDAssertPtr(#exp, __FILE__, __LINE__)) { case kVDAssertBreak: VDBREAK; break; case kVDAssertIgnore: VDAssertHelper2<__LINE__>::sDisabled = true; } else ((void)0)
 	#define VDVERIFY(exp)		if (exp); else if (!VDAssertHelper2<__LINE__>::sDisabled) switch(VDAssert   (#exp, __FILE__, __LINE__)) { case kVDAssertBreak: VDBREAK; break; case kVDAssertIgnore: VDAssertHelper2<__LINE__>::sDisabled = true; } else ((void)0)
 	#define VDVERIFYPTR(exp) 	if (exp); else if (!VDAssertHelper2<__LINE__>::sDisabled) switch(VDAssertPtr(#exp, __FILE__, __LINE__)) { case kVDAssertBreak: VDBREAK; break; case kVDAssertIgnore: VDAssertHelper2<__LINE__>::sDisabled = true; } else ((void)0)
-	*/
-	#define VDASSERT(exp)		if (static bool active = true) if (exp); else switch(VDAssert   (#exp, __FILE__, __LINE__)) { case kVDAssertBreak: VDBREAK; break; case kVDAssertIgnore: active = false; } else ((void)0)
-	#define VDASSERTPTR(exp)	if (static bool active = true) if (exp); else switch(VDAssertPtr(#exp, __FILE__, __LINE__)) { case kVDAssertBreak: VDBREAK; break; case kVDAssertIgnore: active = false; } else ((void)0)
-	#define VDVERIFY(exp)		if (exp); else if (static bool active = true) switch(VDAssert   (#exp, __FILE__, __LINE__)) { case kVDAssertBreak: VDBREAK; break; case kVDAssertIgnore: active = false; } else ((void)0)
-	#define VDVERIFYPTR(exp)	if (exp); else if (static bool active = true) switch(VDAssertPtr(#exp, __FILE__, __LINE__)) { case kVDAssertBreak: VDBREAK; break; case kVDAssertIgnore: active = false; } else ((void)0)
-	// <== End patch MPC DXVA
+#else
+	#define VDASSERT(exp)		do 	{ } while (0)
+	#define VDASSERTPTR(exp) 	do 	{ } while (0)
+	#define VDVERIFY(exp)		do 	{ } while (0)
+	#define VDVERIFYPTR(exp) 	do 	{ } while (0)
+#endif
+// <== End patch MPC-BE
 	#define VDASSERTCT(exp)		(void)sizeof(int[(exp)?1:-1])
 
 	#define VDINLINEASSERT(exp)			((exp)||(VDAssertHelper<__LINE__>(#exp, __FILE__),false))
