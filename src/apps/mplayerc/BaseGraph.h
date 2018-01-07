@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,13 +22,13 @@
 #pragma once
 
 struct PresentFollowing {
-	CString	cPresent;
+	CString cPresent;
 	CString SummaryDesc;
-	CString	StartTime;
-	CString	Duration;
+	CString StartTime;
+	CString Duration;
 	CMapStringToString ExtendedDescriptorsItems;
 	CStringList ExtendedDescriptorsTexts;
-	CString	cFollowing;
+	CString cFollowing;
 };
 
 interface __declspec(uuid("165BE9D6-0929-4363-9BA3-580D735AA0F6"))
@@ -114,7 +114,7 @@ class CBaseGraph
 		long m_lEventCode;
 		LONG_PTR m_lParam1, m_lParam2;
 	};
-	CList<GMSG> m_msgqueue;
+	std::list<GMSG> m_msgqueue;
 
 protected:
 	void ClearMessageQueue();

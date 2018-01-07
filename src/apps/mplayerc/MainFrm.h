@@ -767,17 +767,18 @@ public:
 protected:  // control bar embedded members
 
 	CChildView m_wndView;
+
 	CPlayerSeekBar m_wndSeekBar;
 	CPlayerInfoBar m_wndInfoBar;
 	CPlayerInfoBar m_wndStatsBar;
 	CPlayerStatusBar m_wndStatusBar;
-	CList<CControlBar*> m_bars;
+	std::vector<CControlBar*> m_bars;
 
 	CPlayerSubresyncBar m_wndSubresyncBar;
 	CPlayerCaptureBar m_wndCaptureBar;
 	CPlayerNavigationBar m_wndNavigationBar;
 	CPlayerShaderEditorBar m_wndShaderEditorBar;
-	CList<CSizingControlBar*> m_dockingbars;
+	std::vector<CSizingControlBar*> m_dockingbars;
 
 	CFileDropTarget m_fileDropTarget;
 	// TODO
