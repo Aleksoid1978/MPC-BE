@@ -528,9 +528,158 @@ namespace Youtube
 				}
 			};
 
+			auto SignatureDecode = [&](CStringA& url, CStringA signature, LPCSTR format) {
+				if (!signature.IsEmpty() && !JSUrl.IsEmpty()) {
+					if (!bJSParsed) {
+						bJSParsed = TRUE;
+						hUrl = InternetOpenUrl(hInet, JSUrl, nullptr, 0, INTERNET_OPEN_FALGS, 0);
+						if (hUrl) {
+							char* data = nullptr;
+							DWORD dataSize = 0;
+							InternetReadData(hUrl, &data, dataSize, nullptr);
+							InternetCloseHandle(hUrl);
+							if (dataSize) {
+								const CStringA funcName = RegExpParseA(data, "\"signature\",([a-zA-Z0-9$]+)\\(");
+								if (!funcName.IsEmpty()) {
+									CStringA funcRegExp = funcName + "=function\\(a\\)\\{([^\\n]+)\\};"; funcRegExp.Replace("$", "\\$");
+									const CStringA funcBody = RegExpParseA(data, funcRegExp);
+									if (!funcBody.IsEmpty()) {
+										CStringA funcGroup;
+										std::list<CStringA> funcList;
+										std::list<CStringA> funcCodeList;
+
+										std::list<CStringA> code;
+										Explode(funcBody, code, ';');
+
+										for (const auto& line : code) {
+
+											if (line.Find("split") >= 0 || line.Find("return") >= 0) {
+												continue;
+											}
+
+											funcList.push_back(line);
+
+											if (funcGroup.IsEmpty()) {
+												const int k = line.Find('.');
+												if (k > 0) {
+													funcGroup = line.Left(k);
+												}
+											}
+										}
+
+										if (!funcGroup.IsEmpty()) {
+											CStringA tmp; tmp.Format("var %s={", funcGroup);
+											tmp = GetEntry(data, tmp, "};");
+											if (!tmp.IsEmpty()) {
+												tmp.Remove('\n');
+												Explode(tmp, funcCodeList, "},");
+											}
+										}
+
+										if (!funcList.empty() && !funcCodeList.empty()) {
+											funcGroup += '.';
+
+											for (const auto& func : funcList) {
+												int funcArg = 0;
+												const CStringA funcArgs = GetEntry(func, "(", ")");
+
+												std::list<CStringA> args;
+												Explode(funcArgs, args, ',');
+												if (args.size() >= 1) {
+													CStringA& arg = args.back();
+													int value = 0;
+													if (sscanf_s(arg, "%d", &value) == 1) {
+														funcArg = value;
+													}
+												}
+
+												CStringA funcName = GetEntry(func, funcGroup, "(");
+												funcName += ":function";
+
+												youtubeFuncType funcType = youtubeFuncType::funcNONE;
+
+												for (const auto& funcCode : funcCodeList) {
+													if (funcCode.Find(funcName) >= 0) {
+														if (funcCode.Find("splice") > 0) {
+															funcType = youtubeFuncType::funcDELETE;
+														} else if (funcCode.Find("reverse") > 0) {
+															funcType = youtubeFuncType::funcREVERSE;
+														} else if (funcCode.Find(".length]") > 0) {
+															funcType = youtubeFuncType::funcSWAP;
+														}
+														break;
+													}
+												}
+
+												if (funcType != youtubeFuncType::funcNONE) {
+													JSFuncs.push_back(funcType);
+													JSFuncArgs.push_back(funcArg);
+												}
+											}
+										}
+									}
+								}
+
+								free(data);
+							}
+						}
+					}
+				}
+
+				if (!JSFuncs.empty()) {
+					auto Delete = [](CStringA& a, const int b) {
+						a.Delete(0, b);
+					};
+					auto Swap = [](CStringA& a, int b) {
+						const CHAR c = a[0];
+						b %= a.GetLength();
+						a.SetAt(0, a[b]);
+						a.SetAt(b, c);
+					};
+					auto Reverse = [](CStringA& a) {
+						CHAR c;
+						const int len = a.GetLength();
+
+						for (int i = 0; i < len / 2; ++i) {
+							c = a[i];
+							a.SetAt(i, a[len - i - 1]);
+							a.SetAt(len - i - 1, c);
+						}
+					};
+
+					for (size_t i = 0; i < JSFuncs.size(); i++) {
+						const youtubeFuncType func = JSFuncs[i];
+						const int arg = JSFuncArgs[i];
+						switch (func) {
+							case youtubeFuncType::funcDELETE:
+								Delete(signature, arg);
+								break;
+							case youtubeFuncType::funcSWAP:
+								Swap(signature, arg);
+								break;
+							case youtubeFuncType::funcREVERSE:
+								Reverse(signature);
+								break;
+						}
+					}
+
+					url.AppendFormat(format, signature);
+				}
+			};
+
 			CString dashmpdUrl = UTF8To16(GetEntry(data, MATCH_MPD_START, MATCH_END));
 			if (!dashmpdUrl.IsEmpty()) {
 				dashmpdUrl.Replace(L"\\/", L"/");
+				if (dashmpdUrl.Find(L"/s/") > 0) {
+					CStringA url(dashmpdUrl);
+					CStringA signature = RegExpParseA(url, "/s/([0-9A-Z]+.[0-9A-Z]+)");
+					if (!signature.IsEmpty()) {
+						SignatureDecode(url, signature, "/signature/%s");
+						dashmpdUrl = url;
+					}
+				}
+
+				DLog(L"Youtube::Parse_URL() : Downloading MPD manifest \"%s\"", dashmpdUrl);
 				hUrl = InternetOpenUrl(hInet, dashmpdUrl, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 				if (hUrl) {
 					char* dashmpd = nullptr;
@@ -594,146 +743,7 @@ namespace Youtube
 				}
 
 				if (itag) {
-					auto SignatureDecode = [&](CStringA& final_url) {
-						if (!signature.IsEmpty() && !JSUrl.IsEmpty()) {
-							if (!bJSParsed) {
-								bJSParsed = TRUE;
-								hUrl = InternetOpenUrl(hInet, JSUrl, nullptr, 0, INTERNET_OPEN_FALGS, 0);
-								if (hUrl) {
-									char* data = nullptr;
-									DWORD dataSize = 0;
-									InternetReadData(hUrl, &data, dataSize, nullptr);
-									InternetCloseHandle(hUrl);
-									if (dataSize) {
-										const CStringA funcName = RegExpParseA(data, "\"signature\",([a-zA-Z0-9$]+)\\(");
-										if (!funcName.IsEmpty()) {
-											CStringA funcRegExp = funcName + "=function\\(a\\)\\{([^\\n]+)\\};"; funcRegExp.Replace("$", "\\$");
-											const CStringA funcBody = RegExpParseA(data, funcRegExp);
-											if (!funcBody.IsEmpty()) {
-												CStringA funcGroup;
-												std::list<CStringA> funcList;
-												std::list<CStringA> funcCodeList;
-
-												std::list<CStringA> code;
-												Explode(funcBody, code, ';');
-
-												for (const auto& line : code) {
-
-													if (line.Find("split") >= 0 || line.Find("return") >= 0) {
-														continue;
-													}
-
-													funcList.push_back(line);
-
-													if (funcGroup.IsEmpty()) {
-														const int k = line.Find('.');
-														if (k > 0) {
-															funcGroup = line.Left(k);
-														}
-													}
-												}
-
-												if (!funcGroup.IsEmpty()) {
-													CStringA tmp; tmp.Format("var %s={", funcGroup);
-													tmp = GetEntry(data, tmp, "};");
-													if (!tmp.IsEmpty()) {
-														tmp.Remove('\n');
-														Explode(tmp, funcCodeList, "},");
-													}
-												}
-
-												if (!funcList.empty() && !funcCodeList.empty()) {
-													funcGroup += '.';
-
-													for (const auto& func : funcList) {
-														int funcArg = 0;
-														const CStringA funcArgs = GetEntry(func, "(", ")");
-
-														std::list<CStringA> args;
-														Explode(funcArgs, args, ',');
-														if (args.size() >= 1) {
-															CStringA& arg = args.back();
-															int value = 0;
-															if (sscanf_s(arg, "%d", &value) == 1) {
-																funcArg = value;
-															}
-														}
-
-														CStringA funcName = GetEntry(func, funcGroup, "(");
-														funcName += ":function";
-
-														youtubeFuncType funcType = youtubeFuncType::funcNONE;
-
-														for (const auto& funcCode : funcCodeList) {
-															if (funcCode.Find(funcName) >= 0) {
-																if (funcCode.Find("splice") > 0) {
-																	funcType = youtubeFuncType::funcDELETE;
-																} else if (funcCode.Find("reverse") > 0) {
-																	funcType = youtubeFuncType::funcREVERSE;
-																} else if (funcCode.Find(".length]") > 0) {
-																	funcType = youtubeFuncType::funcSWAP;
-																}
-																break;
-															}
-														}
-
-														if (funcType != youtubeFuncType::funcNONE) {
-															JSFuncs.push_back(funcType);
-															JSFuncArgs.push_back(funcArg);
-														}
-													}
-												}
-											}
-										}
-
-										free(data);
-									}
-								}
-							}
-						}
-
-						if (!JSFuncs.empty()) {
-							auto Delete = [](CStringA& a, int b) {
-								a.Delete(0, b);
-							};
-							auto Swap = [](CStringA& a, int b) {
-								const CHAR c = a[0];
-								b %= a.GetLength();
-								a.SetAt(0, a[b]);
-								a.SetAt(b, c);
-							};
-							auto Reverse = [](CStringA& a) {
-								CHAR c;
-								const int len = a.GetLength();
-
-								for (int i = 0; i < len / 2; ++i) {
-									c = a[i];
-									a.SetAt(i, a[len - i - 1]);
-									a.SetAt(len - i - 1, c);
-								}
-							};
-
-							for (size_t i = 0; i < JSFuncs.size(); i++) {
-								const youtubeFuncType func = JSFuncs[i];
-								const int arg = JSFuncArgs[i];
-								switch (func) {
-									case youtubeFuncType::funcDELETE:
-										Delete(signature, arg);
-										break;
-									case youtubeFuncType::funcSWAP:
-										Swap(signature, arg);
-										break;
-									case youtubeFuncType::funcREVERSE:
-										Reverse(signature);
-										break;
-								}
-							}
-
-							final_url.AppendFormat("&signature=%s", signature);
-						}
-					};
-
-					SignatureDecode(url);
+					SignatureDecode(url, signature, "&signature=%s");
 
 					AddUrl(youtubeUrllist, audioList, CString(url), itag);
 				}
