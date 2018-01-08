@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2017 see Authors.txt
+ * (C) 2012-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,7 +26,10 @@
 
 #define RAPIDJSON_ASSERT(x) ASSERT(x)
 #define RAPIDJSON_SSE2
+#pragma warning(push)
+#pragma warning(disable: 4996)
 #include <rapidjson/include/rapidjson/document.h>
+#pragma warning(pop)
 
 #define YOUTUBE_PL_URL              L"youtube.com/playlist?"
 #define YOUTUBE_URL                 L"youtube.com/watch?"

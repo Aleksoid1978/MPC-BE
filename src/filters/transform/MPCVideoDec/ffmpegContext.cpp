@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,6 +29,7 @@
 
 #pragma warning(push)
 #pragma warning(disable: 4005)
+#pragma warning(disable: 5033)
 extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
 // This is kind of an hack but it avoids using a C++ keyword as a struct member name

@@ -1,10 +1,12 @@
-﻿Part A: Preparing the Visual Studio 2015/2017 environment
+﻿Part A: Preparing the Visual Studio 2017 environment
 
- Visual Studio 2015
-  1. Install Visual Studio 2015 with Update 3 (any edition will work fine). During installation, you must select "Visual C ++" in the "Programming Languages" group.
-  2. Install Visual C++ Optimizer fixes for Visual Studio 2015 Update 3 (https://support.microsoft.com/en-us/help/3207317/visual-c-optimizer-fixes-for-visual-studio-2015-update-3)
  Visual Studio 2017
-  1. Install Visual Studio 2017 (any edition will work fine). During installation, you must select "Visual C ++" in the "Programming Languages" group.
+  1. Install Visual Studio 2017 (any edition will work fine). During installation, you must select the following components: 
+   * Desktop development with C++
+     * VC++ 2017 v141 toolset
+     * Visual C++ ATL support
+     * MFC and ATL support
+     * Windows 8.1 SDK".
 
   Download URL: http://www.visualstudio.com/downloads/download-visual-studio-vs
 
