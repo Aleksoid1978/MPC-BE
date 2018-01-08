@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -252,8 +252,8 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			char* begin = strstr(data, "fLaC");
 			if (begin) {
 				size_t size = end - begin;
-				m_extradata.SetCount(size);
-				memcpy(m_extradata.GetData(), begin, size);
+				m_extradata.resize(size);
+				memcpy(m_extradata.data(), begin, size);
 			}
 			delete [] data;
 		}
@@ -273,8 +273,8 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			((CFLACSource*)m_pFilter)->SetProperty(L"ALBUM", file_info.album);
 		}
 
-		if (m_Cover.GetCount()) {
-			((CFLACSource*)m_pFilter)->ResAppend(L"cover.jpg", L"cover", m_CoverMime, m_Cover.GetData(), (DWORD)m_Cover.GetCount(), 0);
+		if (m_Cover.size()) {
+			((CFLACSource*)m_pFilter)->ResAppend(L"cover.jpg", L"cover", m_CoverMime, m_Cover.data(), (DWORD)m_Cover.size(), 0);
 		} else if (pID3Tag) {
 			BOOL bResAppend = FALSE;
 
@@ -398,7 +398,7 @@ HRESULT CFLACStream::GetMediaType(int iPosition, CMediaType* pmt)
 		pmt->majortype			= MEDIATYPE_Audio;
 		pmt->subtype			= MEDIASUBTYPE_FLAC_FRAMED;
 		pmt->formattype			= FORMAT_WaveFormatEx;
-		WAVEFORMATEX* wfe		= (WAVEFORMATEX*)pmt->AllocFormatBuffer(sizeof(WAVEFORMATEX) + m_extradata.GetCount());
+		WAVEFORMATEX* wfe		= (WAVEFORMATEX*)pmt->AllocFormatBuffer(sizeof(WAVEFORMATEX) + m_extradata.size());
 		memset(wfe, 0, sizeof(WAVEFORMATEX));
 		wfe->wFormatTag			= WAVE_FORMAT_FLAC;
 		wfe->nChannels			= m_nChannels;
@@ -406,8 +406,8 @@ HRESULT CFLACStream::GetMediaType(int iPosition, CMediaType* pmt)
 		wfe->nAvgBytesPerSec	= m_nAvgBytesPerSec;
 		wfe->nBlockAlign		= 1;
 		wfe->wBitsPerSample		= m_wBitsPerSample;
-		wfe->cbSize				= (WORD)m_extradata.GetCount();
-		memcpy(wfe + 1, m_extradata.GetData(), m_extradata.GetCount());
+		wfe->cbSize				= (WORD)m_extradata.size();
+		memcpy(wfe + 1, m_extradata.data(), m_extradata.size());
 	} else {
 		return VFW_S_NO_MORE_ITEMS;
 	}
@@ -532,10 +532,10 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 	} else if (pMetadata->type == FLAC__METADATA_TYPE_PICTURE) {
 		const FLAC__StreamMetadata_Picture *pic = &pMetadata->data.picture;
 
-		if (!m_Cover.GetCount() && pic->data_length) {
+		if (m_Cover.empty() && pic->data_length) {
 			m_CoverMime = pic->mime_type;
-			m_Cover.SetCount(pic->data_length);
-			memcpy(m_Cover.GetData(), pic->data, pic->data_length);
+			m_Cover.resize(pic->data_length);
+			memcpy(m_Cover.data(), pic->data, pic->data_length);
 		}
 	} else if (pMetadata->type == FLAC__METADATA_TYPE_CUESHEET) {
 		if (((CFLACSource*)m_pFilter)->ChapGetCount()) {
