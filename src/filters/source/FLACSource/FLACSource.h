@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <atlbase.h>
 #include "../BaseSource/BaseSource.h"
 #include <qnetwork.h>
 #include "../../../DSUtil/DSMPropertyBag.h"
@@ -34,7 +33,7 @@ struct file_info_struct {
 	CString comment;
 	CString year;
 	CString album;
-	bool	got_vorbis_comments;
+	bool    got_vorbis_comments;
 };
 
 class CFLACStream;
@@ -96,7 +95,10 @@ class CFLACStream : public CBaseStream
 
 	file_info_struct	file_info;
 
-	CAtlArray<BYTE> m_extradata;
+	std::vector<BYTE>	m_extradata;
+	std::vector<BYTE>	m_Cover;
+	CString				m_CoverMime;
+
 
 public:
 	CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr);
@@ -114,8 +116,5 @@ public:
 	file_info_struct	GetInfo();
 
 	bool				m_bIsEOF;
-
-	CAtlArray<BYTE>		m_Cover;
-	CString				m_CoverMime;
 };
 

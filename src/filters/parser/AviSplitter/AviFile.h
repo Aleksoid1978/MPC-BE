@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -59,7 +59,7 @@ public:
 	} m_vprp;
 	struct strm_t {
 		AVISTREAMHEADER strh;
-		CAtlArray<BYTE> strf;
+		std::vector<BYTE> strf;
 		CStringA strn;
 		CAutoPtr<AVISUPERINDEX> indx;
 		struct chunk {
@@ -67,7 +67,7 @@ public:
 			UINT64 filepos;
 			DWORD orgsize;
 		};
-		CAtlArray<chunk> cs;
+		std::vector<chunk> cs;
 		UINT64 totalsize;
 		REFERENCE_TIME GetRefTime(DWORD frame, UINT64 size);
 		int GetTime(DWORD frame, UINT64 size);
@@ -81,7 +81,7 @@ public:
 			DWORD t;
 			DWORD n;
 		};
-		CAtlArray<chunk2> cs2;
+		std::vector<chunk2> cs2;
 	};
 	CAutoPtrArray<strm_t> m_strms;
 	CAtlMap<DWORD, CStringA> m_info;
