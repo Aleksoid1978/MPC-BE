@@ -29,15 +29,7 @@ IF NOT DEFINED VS150COMNTOOLS (
 
 IF DEFINED VS150COMNTOOLS (
   SET "VCVARS=%VS150COMNTOOLS%..\..\VC\Auxiliary\Build\vcvarsall.bat"
-)
-
-IF NOT DEFINED VCVARS (
-  IF DEFINED VS140COMNTOOLS (
-    SET "VCVARS=%VS140COMNTOOLS%..\..\VC\vcvarsall.bat"
-  )
-)
-
-IF NOT DEFINED VCVARS (
+) ELSE (
   ECHO ERROR: "Visual Studio environment variable(s) is missing - possible it's not installed on your PC"
   EXIT /B
 )
