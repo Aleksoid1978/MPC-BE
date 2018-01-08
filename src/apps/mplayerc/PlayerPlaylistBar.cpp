@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -785,13 +785,11 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 
 				return TRUE;
 			} else if (pMsg->wParam == VK_RETURN) {
-				CList<int> items;
-				POSITION pos = m_list.GetFirstSelectedItemPosition();
-				while (pos) {
-					items.AddHead(m_list.GetNextSelectedItem(pos));
-				}
-				if (items.GetCount() == 1) {
-					m_pl.SetPos(FindPos(items.GetHead()));
+				if (m_list.GetSelectedCount() == 1) {
+					POSITION pos = m_list.GetFirstSelectedItemPosition();
+					int item = m_list.GetNextSelectedItem(pos);
+
+					m_pl.SetPos(FindPos(item));
 					m_pMainFrame->OpenCurPlaylistItem();
 					AfxGetMainWnd()->SetFocus();
 
@@ -1925,32 +1923,31 @@ void CPlayerPlaylistBar::OnLvnKeyDown(NMHDR* pNMHDR, LRESULT* pResult)
 
 	*pResult = FALSE;
 
-	CList<int> items;
+	std::vector<int> items;
+	items.reserve(m_list.GetSelectedCount());
 	POSITION pos = m_list.GetFirstSelectedItemPosition();
 	while (pos) {
-		items.AddHead(m_list.GetNextSelectedItem(pos));
+		items.push_back(m_list.GetNextSelectedItem(pos));
 	}
 
-	if (pLVKeyDown->wVKey == VK_DELETE && items.GetCount() > 0) {
-		pos = items.GetHeadPosition();
-		while (pos) {
-			int i = items.GetNext(pos);
-			if (m_pl.RemoveAt(FindPos(i))) {
+	if (pLVKeyDown->wVKey == VK_DELETE && items.size() > 0) {
+		for (const auto& item : items) {
+			if (m_pl.RemoveAt(FindPos(item))) {
 				m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 			}
-			m_list.DeleteItem(i);
+			m_list.DeleteItem(item);
 		}
 
 		m_list.SetItemState(-1, 0, LVIS_SELECTED);
 		m_list.SetItemState(
-			std::max(std::min(items.GetTail(), m_list.GetItemCount()-1), 0),
+			std::max(std::min(items.back(), m_list.GetItemCount()-1), 0),
 			LVIS_SELECTED, LVIS_SELECTED);
 
 		ResizeListColumn();
 
 		*pResult = TRUE;
-	} else if (pLVKeyDown->wVKey == VK_SPACE && items.GetCount() == 1) {
-		m_pl.SetPos(FindPos(items.GetHead()));
+	} else if (pLVKeyDown->wVKey == VK_SPACE && items.size() == 1) {
+		m_pl.SetPos(FindPos(items.front()));
 		m_pMainFrame->OpenCurPlaylistItem();
 		AfxGetMainWnd()->SetFocus();
 
@@ -2280,20 +2277,20 @@ void CPlayerPlaylistBar::DropItemOnList()
 
 	m_list.DeleteItem(m_nDragIndex);
 
-	CList<CPlaylistItem> tmp;
+	std::list<CPlaylistItem> tmp;
 	UINT id = (UINT)-1;
 	for (int i = 0; i < m_list.GetItemCount(); i++) {
 		POSITION pos = (POSITION)m_list.GetItemData(i);
 		CPlaylistItem& pli = m_pl.GetAt(pos);
-		tmp.AddTail(pli);
+		tmp.push_back(pli);
 		if (pos == m_pl.GetPos()) {
 			id = pli.m_id;
 		}
 	}
 	m_pl.RemoveAll();
-	POSITION pos = tmp.GetHeadPosition();
-	for (int i = 0; pos; i++) {
-		CPlaylistItem& pli = tmp.GetNext(pos);
+	auto it = tmp.begin();
+	for (int i = 0; it != tmp.end(); i++) {
+		CPlaylistItem& pli = *it++;
 		m_pl.AddTail(pli);
 		if (pli.m_id == id) {
 			m_pl.SetPos(m_pl.GetTailPosition());
@@ -2434,24 +2431,23 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			break;
 		case M_REMOVE:
 			{
-				CList<int> items;
+				std::vector<int> items;
+				items.reserve(m_list.GetSelectedCount());
 				POSITION pos = m_list.GetFirstSelectedItemPosition();
 				while (pos) {
-					items.AddHead(m_list.GetNextSelectedItem(pos));
+					items.push_back(m_list.GetNextSelectedItem(pos));
 				}
 
-				pos = items.GetHeadPosition();
-				while (pos) {
-					int i = items.GetNext(pos);
-					if (m_pl.RemoveAt(FindPos(i))) {
+				for (const auto& item : items) {
+					if (m_pl.RemoveAt(FindPos(item))) {
 						m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 					}
-					m_list.DeleteItem(i);
+					m_list.DeleteItem(item);
 				}
 
 				m_list.SetItemState(-1, 0, LVIS_SELECTED);
 				m_list.SetItemState(
-					std::max(std::min(items.GetTail(), m_list.GetItemCount()-1), 0),
+					std::max(std::min(items.back(), m_list.GetItemCount()-1), 0),
 					LVIS_SELECTED, LVIS_SELECTED);
 
 				ResizeListColumn();
@@ -2488,16 +2484,15 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			if (OpenClipboard() && EmptyClipboard()) {
 				CString str;
 
-				CList<int> items;
+				std::vector<int> items;
+				items.reserve(m_list.GetSelectedCount());
 				POSITION pos = m_list.GetFirstSelectedItemPosition();
 				while (pos) {
-					items.AddHead(m_list.GetNextSelectedItem(pos));
+					items.push_back(m_list.GetNextSelectedItem(pos));
 				}
 
-				pos = items.GetHeadPosition();
-				while (pos) {
-					int i = items.GetNext(pos);
-					CPlaylistItem &pli = m_pl.GetAt(FindPos(i));
+				for (const auto& item : items) {
+					CPlaylistItem &pli = m_pl.GetAt(FindPos(item));
 					for (const auto& fi : pli.m_fns) {
 						str += L"\r\n" + fi.GetName();
 					}
