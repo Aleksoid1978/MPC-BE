@@ -1,5 +1,5 @@
 @ECHO OFF
-REM (C) 2009-2017 see Authors.txt
+REM (C) 2009-2018 see Authors.txt
 REM
 REM This file is part of MPC-BE.
 REM
@@ -99,15 +99,9 @@ IF NOT DEFINED VS150COMNTOOLS (
 
 IF DEFINED VS150COMNTOOLS (
   SET "VCVARS=%VS150COMNTOOLS%..\..\VC\Auxiliary\Build\vcvarsall.bat"
+) ELSE (
+  GOTO MissingVar
 )
-
-IF NOT DEFINED VCVARS (
-  IF DEFINED VS140COMNTOOLS (
-    SET "VCVARS=%VS140COMNTOOLS%..\..\VC\vcvarsall.bat"
-  )
-)
-
-IF NOT DEFINED VCVARS GOTO MissingVar
 
 SET "BIN=bin"
 
