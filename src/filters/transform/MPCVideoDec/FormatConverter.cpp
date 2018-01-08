@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,6 +26,7 @@
 
 #pragma warning(push)
 #pragma warning(disable: 4005)
+#pragma warning(disable: 5033)
 extern "C" {
 	#include <ffmpeg/libavcodec/avcodec.h>
 	#include <ffmpeg/libswscale/swscale.h>

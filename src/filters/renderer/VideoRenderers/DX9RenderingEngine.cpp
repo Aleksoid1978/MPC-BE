@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,7 +19,10 @@
  */
 
 #include "stdafx.h"
+#pragma warning(push)
+#pragma warning(disable: 5033) // warning C5033: 'register' is no longer a supported storage class
 #include <lcms2/include/lcms2.h>
+#pragma warning(pop)
 #include <DirectXPackedVector.h>
 #include "Dither.h"
 #include "DX9RenderingEngine.h"

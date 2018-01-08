@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -394,7 +394,7 @@ void CRoQVideoDecoder::apply_vector_2x2(int x, int y, roq_cell* cell)
 void CRoQVideoDecoder::apply_vector_4x4(int x, int y, roq_cell* cell)
 {
 	unsigned long row_inc, c_row_inc;
-	register unsigned char y0, y1, u, v;
+	unsigned char y0, y1, u, v;
 	unsigned char *yptr, *uptr, *vptr;
 
 	yptr = m_y[0] + (y * m_pitch) + x;

@@ -13,7 +13,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalOptions>/wd4091 /wd4244 /wd4302 /wd4311 /wd4312 /wd4477 /wd4838 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalOptions>/Zo /Zc:throwingNew /Zc:rvalueCast %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zo /std:c++17 /Zc:throwingNew /Zc:rvalueCast %(AdditionalOptions)</AdditionalOptions>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <ExceptionHandling>Sync</ExceptionHandling>
       <FunctionLevelLinking>true</FunctionLevelLinking>
