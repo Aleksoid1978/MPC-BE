@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -342,7 +342,7 @@ bool CWebClientSocket::OnCommand(CStringA& hdr, CStringA& body, CStringA& mime)
 				}
 			} else if (arg == CMD_SETVOLUME && m_request.Lookup(L"volume", arg)) {
 				int volume = wcstol(arg, nullptr, 10);
-				m_pMainFrame->m_wndToolBar.Volume = clamp(volume, 0, 100);
+				m_pMainFrame->m_wndToolBar.Volume = std::clamp(volume, 0, 100);
 				m_pMainFrame->OnPlayVolume(0);
 			}
 		}

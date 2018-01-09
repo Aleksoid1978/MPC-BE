@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -177,7 +177,7 @@ BOOL CPPagePlayback::OnApply()
 	s.fRewind = !!m_fRewind;
 	s.iZoomLevel = m_cmbZoomLevel.GetCurSel();
 	s.bRememberZoomLevel = !!m_chkRememberZoomLevel.GetCheck();
-	s.nAutoFitFactor = m_nAutoFitFactor = clamp(m_nAutoFitFactor, 20, 80);
+	s.nAutoFitFactor = m_nAutoFitFactor = std::clamp(m_nAutoFitFactor, 20, 80);
 	s.nAudioWindowMode = m_cbAudioWindowMode.GetCurSel();
 	s.bAddSimilarFiles = !!m_bAddSimilarFiles;
 	s.fEnableWorkerThreadForOpening = !!m_fEnableWorkerThreadForOpening;

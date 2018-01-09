@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -745,7 +745,7 @@ void CPlayerCaptureDialog::UpdateMediaTypes()
 
 				if (pcaps) {
 					// FIXME: some drivers do not set the interval right and they still accept the preferable but unfortunately out-of-range fps
-					//atpf = clamp(atpf, pcaps->MinFrameInterval, pcaps->MaxFrameInterval);
+					//atpf = std::clamp(atpf, pcaps->MinFrameInterval, pcaps->MaxFrameInterval);
 				}
 
 				if (pmt->formattype == FORMAT_VideoInfo) {

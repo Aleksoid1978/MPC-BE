@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -121,7 +121,7 @@ BOOL CPPageMisc::OnApply()
 	CMiniDump::SetState(s.fMiniDump);
 
 	s.bUpdaterAutoCheck	= !!m_updaterAutoCheckCtrl.GetCheck();
-	m_nUpdaterDelay		= clamp(m_nUpdaterDelay, 1, 365);
+	m_nUpdaterDelay		= std::clamp(m_nUpdaterDelay, 1, 365);
 	s.nUpdaterDelay		= m_nUpdaterDelay;
 
 	return __super::OnApply();

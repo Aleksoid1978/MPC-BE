@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -167,7 +167,7 @@ void CPlayerSeekBar::SetPosInternal(const REFERENCE_TIME pos)
 	}
 
 	const CRect before = GetThumbRect();
-	m_pos = clamp(pos, 0LL, m_stop);
+	m_pos = std::clamp(pos, 0LL, m_stop);
 	m_posreal = pos;
 	const CRect after = GetThumbRect();
 
@@ -195,7 +195,7 @@ void CPlayerSeekBar::SetPosInternalPreview(const REFERENCE_TIME pos)
 		return;
 	}
 
-	m_pos_preview = clamp(pos, 0LL, m_stop);
+	m_pos_preview = std::clamp(pos, 0LL, m_stop);
 }
 
 CRect CPlayerSeekBar::GetChannelRect()

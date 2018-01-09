@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -57,7 +57,7 @@ void CPPageSubRend::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_ALLOW_DROPPING_SUBPIC, m_bbSPAllowDropSubPic);
 	DDX_Text(pDX, IDC_EDIT4, m_nSubDelayInterval);
 
-	m_nSPCSize = clamp(m_nSPCSize, RS_SPCSIZE_MIN, RS_SPCSIZE_MAX);
+	m_nSPCSize = std::clamp(m_nSPCSize, RS_SPCSIZE_MIN, RS_SPCSIZE_MAX);
 }
 
 BEGIN_MESSAGE_MAP(CPPageSubRend, CPPageBase)

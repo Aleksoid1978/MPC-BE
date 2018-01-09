@@ -391,7 +391,7 @@ void CPPageFullscreen::OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 			if (pItem->pszText) {
 				CString str = pItem->pszText;
 				double dFR = wcstod(str, nullptr);
-				dFR = clamp(dFR, 1.0, 125.999);
+				dFR = std::clamp(dFR, 1.0, 125.999);
 				str.Format(L"%.3f", dFR);
 				m_list.SetItemText(pItem->iItem, pItem->iSubItem, str);
 			}

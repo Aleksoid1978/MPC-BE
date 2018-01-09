@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -82,7 +82,7 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT1, m_nRecentFiles);
 	DDX_Control(pDX, IDC_SPIN1, m_RecentFilesCtrl);
 
-	m_nRecentFiles = clamp(m_nRecentFiles, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
+	m_nRecentFiles = std::clamp(m_nRecentFiles, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
 }
 
 BEGIN_MESSAGE_MAP(CPPagePlayer, CPPageBase)
@@ -258,7 +258,7 @@ void CPPagePlayer::OnUpdateOSD(CCmdUI* pCmdUI)
 
 void CPPagePlayer::OnKillFocusEdit1()
 {
-	m_nRecentFiles = clamp(m_nRecentFiles, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX); // CSpinButtonCtrl.SetRange() does not affect the manual input
+	m_nRecentFiles = std::clamp(m_nRecentFiles, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX); // CSpinButtonCtrl.SetRange() does not affect the manual input
 
 	UpdateData(FALSE);
 }

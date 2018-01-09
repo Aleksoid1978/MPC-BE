@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -402,7 +402,7 @@ STDMETHODIMP CShockwaveGraph::put_Volume(long lVolume)
 	} else {
 		lVolume = (lVolume <= -10000) ? 0 : (long)(pow(10.0, lVolume / 4000.0) * 100);
 		lVolume = lVolume * 0x10000 / 100;
-		lVolume = clamp(lVolume, 0L, 0xffffL);
+		lVolume = std::clamp(lVolume, 0L, 0xffffL);
 		waveOutSetVolume(0, (lVolume << 16) | lVolume);
 	}
 

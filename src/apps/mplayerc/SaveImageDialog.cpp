@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -42,11 +42,11 @@ CSaveImageDialog::CSaveImageDialog(
 
 		pfdc->StartVisualGroup(IDS_THUMB_IMAGE_QUALITY, ResStr(IDS_THUMB_IMAGE_QUALITY));
 		pfdc->AddText(IDS_THUMB_QUALITY, ResStr(IDS_THUMB_QUALITY));
-		str.Format(L"%d", clamp(m_quality, 70, 100));
+		str.Format(L"%d", std::clamp(m_quality, 70, 100));
 		pfdc->AddEditBox(IDC_EDIT1, str);
 
 		pfdc->AddText(IDS_THUMB_LEVEL, ResStr(IDS_THUMB_LEVEL));
-		str.Format(L"%d", clamp(m_levelPNG, 1, 9));
+		str.Format(L"%d", std::clamp(m_levelPNG, 1, 9));
 		pfdc->AddEditBox(IDC_EDIT5, str);
 		pfdc->EndVisualGroup();
 
@@ -92,8 +92,8 @@ BOOL CSaveImageDialog::OnFileNameOK()
 		pfdc->Release();
 	}
 
-	m_levelPNG = clamp(m_levelPNG, 1, 9);
-	m_quality = clamp(m_quality, 70, 100);
+	m_levelPNG = std::clamp(m_levelPNG, 1, 9);
+	m_quality = std::clamp(m_quality, 70, 100);
 
 	return __super::OnFileNameOK();
 }
@@ -157,17 +157,17 @@ CSaveThumbnailsDialog::CSaveThumbnailsDialog(
 
 		pfdc->StartVisualGroup(IDS_THUMB_THUMBNAILS, ResStr(IDS_THUMB_THUMBNAILS));
 		pfdc->AddText(IDS_THUMB_ROWNUMBER, ResStr(IDS_THUMB_ROWNUMBER));
-		str.Format(L"%d", clamp(m_rows, 1, 20));
+		str.Format(L"%d", std::clamp(m_rows, 1, 20));
 		pfdc->AddEditBox(IDC_EDIT4, str);
 
 		pfdc->AddText(IDS_THUMB_COLNUMBER, ResStr(IDS_THUMB_COLNUMBER));
-		str.Format(L"%d", clamp(m_cols, 1, 10));
+		str.Format(L"%d", std::clamp(m_cols, 1, 10));
 		pfdc->AddEditBox(IDC_EDIT2, str);
 		pfdc->EndVisualGroup();
 
 		pfdc->StartVisualGroup(IDS_THUMB_IMAGE_WIDTH, ResStr(IDS_THUMB_IMAGE_WIDTH));
 		pfdc->AddText(IDS_THUMB_PIXELS, ResStr(IDS_THUMB_PIXELS));
-		str.Format(L"%d", clamp(m_width, 256, 2560));
+		str.Format(L"%d", std::clamp(m_width, 256, 2560));
 		pfdc->AddEditBox(IDC_EDIT3, str);
 		pfdc->EndVisualGroup();
 
