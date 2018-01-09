@@ -38,14 +38,18 @@
 |       AP4_FtypAtom::AP4_FtypAtom
 +---------------------------------------------------------------------*/
 AP4_FtypAtom::AP4_FtypAtom(AP4_Size size, AP4_ByteStream& stream) :
-    AP4_Atom(AP4_ATOM_TYPE_FTYP, size, false, stream)
+    AP4_Atom(AP4_ATOM_TYPE_FTYP, size),
+    m_MajorBrand(0),
+    m_MinorVersion(0)
 {
+    if (size < 16) return;
     stream.ReadUI32(m_MajorBrand);
     stream.ReadUI32(m_MinorVersion);
     size -= 16;
-    while (size) {
+    while (size >= 4) {
         AP4_UI32 compatible_brand;
-        stream.ReadUI32(compatible_brand);
+        AP4_Result result = stream.ReadUI32(compatible_brand);
+        if (AP4_FAILED(result)) return;
         m_CompatibleBrands.Append(compatible_brand);
         size -= 4;
     }
