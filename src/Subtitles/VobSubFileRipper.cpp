@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -237,9 +237,9 @@ bool CVobSubFileRipper::LoadIfo(CString fn)
 
 				y = (y-16)*255/219;
 
-				pgc.pal[j].rgbRed   = (BYTE)clamp(1.0*y + 1.4022*(u-128), 0.0, 255.0);
-				pgc.pal[j].rgbGreen = (BYTE)clamp(1.0*y - 0.3456*(u-128) - 0.7145*(v-128), 0.0, 255.0);
-				pgc.pal[j].rgbBlue  = (BYTE)clamp(1.0*y + 1.7710*(v-128), 0.0, 255.0);
+				pgc.pal[j].rgbRed   = (BYTE)std::clamp(1.0*y + 1.4022*(u-128), 0.0, 255.0);
+				pgc.pal[j].rgbGreen = (BYTE)std::clamp(1.0*y - 0.3456*(u-128) - 0.7145*(v-128), 0.0, 255.0);
+				pgc.pal[j].rgbBlue  = (BYTE)std::clamp(1.0*y + 1.7710*(v-128), 0.0, 255.0);
 			}
 
 			//

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -188,7 +188,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		__int64 stop = GetAvailable();
 		const __int64 hi = IsStreaming() ? MEGABYTE : std::min((__int64)MEGABYTE, GetLength());
 		const __int64 lo = IsStreaming() ? 64 * KILOBYTE : std::min(64LL * KILOBYTE, GetLength());
-		stop = clamp(stop, lo, hi);
+		stop = std::clamp(stop, lo, hi);
 		SearchPrograms(0, stop);
 
 		if (IsStreaming()) {

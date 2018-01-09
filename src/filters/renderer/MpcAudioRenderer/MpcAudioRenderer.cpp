@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2017 see Authors.txt
+ * (C) 2009-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -204,7 +204,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	m_SyncMethod				= (SYNC_METHOD)AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_SyncMethod, m_SyncMethod);
 #endif
 
-	m_WASAPIMode				= clamp(m_WASAPIMode, MODE_WASAPI_EXCLUSIVE, MODE_WASAPI_SHARED);
+	m_WASAPIMode				= std::clamp(m_WASAPIMode, MODE_WASAPI_EXCLUSIVE, MODE_WASAPI_SHARED);
 
 	if (phr) {
 		*phr = E_FAIL;

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -884,9 +884,9 @@ bool CVobSubFile::ReadIfo(CString fn)
 
 		y = (y - 16) * 255 / 219;
 
-		m_orgpal[i].rgbRed   = (BYTE)clamp(1.0 * y + 1.4022 * (u - 128), 0.0, 255.0);
-		m_orgpal[i].rgbGreen = (BYTE)clamp(1.0 * y - 0.3456 * (u - 128) - 0.7145 * (v - 128), 0.0, 255.0);
-		m_orgpal[i].rgbBlue  = (BYTE)clamp(1.0 * y + 1.7710 * (v - 128), 0.0, 255.0);
+		m_orgpal[i].rgbRed   = (BYTE)std::clamp(1.0 * y + 1.4022 * (u - 128), 0.0, 255.0);
+		m_orgpal[i].rgbGreen = (BYTE)std::clamp(1.0 * y - 0.3456 * (u - 128) - 0.7145 * (v - 128), 0.0, 255.0);
+		m_orgpal[i].rgbBlue  = (BYTE)std::clamp(1.0 * y + 1.7710 * (v - 128), 0.0, 255.0);
 	}
 
 	return true;
@@ -1630,8 +1630,8 @@ void CVobSubSettings::SetAlignment(bool fAlign, int x, int y, int hor, int ver)
 	if (fAlign) {
 		m_org.x = MulDiv(m_size.cx, x, 100);
 		m_org.y = MulDiv(m_size.cy, y, 100);
-		m_alignhor = clamp(hor, 0, 2);
-		m_alignver = clamp(ver, 0, 2);
+		m_alignhor = std::clamp(hor, 0, 2);
+		m_alignver = std::clamp(ver, 0, 2);
 	} else {
 		m_org.x = m_x;
 		m_org.y = m_y;

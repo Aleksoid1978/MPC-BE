@@ -200,7 +200,7 @@ CFormatConverter::CFormatConverter()
 	m_FProps.colorspace	= AVCOL_SPC_UNSPECIFIED;
 	m_FProps.colorrange	= AVCOL_RANGE_UNSPECIFIED;
 
-	m_NumThreads		= clamp(CPUInfo::GetProcessorNumber() / 2, 1uL, 8uL);
+	m_NumThreads		= std::clamp(CPUInfo::GetProcessorNumber() / 2, 1uL, 8uL);
 }
 
 CFormatConverter::~CFormatConverter()

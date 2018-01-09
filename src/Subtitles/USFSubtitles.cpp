@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -350,7 +350,7 @@ bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
 			stss->colors[i] = color & 0xffffff;
 			stss->alpha[i] = (BYTE)(color>>24);
 
-			stss->alpha[i] = stss->alpha[i] + (255 - stss->alpha[i]) * clamp(alpha, 0, 100) / 100;
+			stss->alpha[i] = stss->alpha[i] + (255 - stss->alpha[i]) * std::clamp(alpha, 0, 100) / 100;
 		}
 
 		if (!s->fontstyle.face.IsEmpty()) {

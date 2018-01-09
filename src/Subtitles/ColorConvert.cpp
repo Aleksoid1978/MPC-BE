@@ -1,5 +1,5 @@
 /*
- * (C) 2016 see Authors.txt
+ * (C) 2016-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -48,9 +48,9 @@ namespace ColorConvert {
 		g = Y * coeff - 2 * (Cb - 128) * (1.0 - Kb) * Kb / Kg - 2 * (Cr - 128) * (1.0 - Kr) * Kr / Kg;
 		b = Y * coeff + 2 * (Cb - 128) * (1.0 - Kb);
 
-		r = clamp(fabs(r), 0.0, rgb_high);
-		g = clamp(fabs(g), 0.0, rgb_high);
-		b = clamp(fabs(b), 0.0, rgb_high);
+		r = std::clamp(fabs(r), 0.0, rgb_high);
+		g = std::clamp(fabs(g), 0.0, rgb_high);
+		b = std::clamp(fabs(b), 0.0, rgb_high);
 
 		r += rgb_low;
 		g += rgb_low;

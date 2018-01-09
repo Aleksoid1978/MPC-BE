@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1634,7 +1634,7 @@ static bool OpenSubStationAlpha(CTextFile* file, CSimpleTextSubtitle& ret, int C
 
 					if (sver <= 4)	{
 						style->colors[2] = style->colors[3];	// style->colors[2] is used for drawing the outline
-						alpha = clamp(alpha, 0, 0xff);
+						alpha = std::clamp(alpha, 0, 0xff);
 						for (size_t i = 0; i < 3; i++) {
 							style->alpha[i] = alpha;
 						}

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1048,8 +1048,8 @@ static void CalcBrCont(BYTE* YTbl, float bright, float cont)
 
 	for (int i = 0; i < 256; i++) {
 		int y = ((Cont * (i - 16)) >> 9) + Bright + 16;
-		YTbl[i] = clamp(y, 0, 255);
-		//YTbl[i] = clamp(y, 16, 235);
+		YTbl[i] = std::clamp(y, 0, 255);
+		//YTbl[i] = std::clamp(y, 16, 235);
 	}
 }
 
@@ -1068,8 +1068,8 @@ static void CalcHueSat(BYTE* UTbl, BYTE* VTbl, float hue, float sat)
 			v = (v * Cos - u * Sin) >> 12;
 			u = ((ux * Sat) >> 9) + 128;
 			v = ((v * Sat) >> 9) + 128;
-			u = clamp(u, 16, 235);
-			v = clamp(v, 16, 235);
+			u = std::clamp(u, 16, 235);
+			v = std::clamp(v, 16, 235);
 			UTbl[(y << 8) | x] = u;
 			VTbl[(y << 8) | x] = v;
 		}
@@ -1084,7 +1084,7 @@ void CMpeg2DecFilter::ApplyBrContHueSat(BYTE* srcy, BYTE* srcu, BYTE* srcv, int 
 		int size = pitch*h;
 
 		if (((DWORD_PTR)srcy & 15) == 0) {
-			short Cont = (short)clamp((int)(m_cont * 512), 0, (1 << 16) - 1);
+			short Cont = (short)std::clamp((int)(m_cont * 512), 0, (1 << 16) - 1);
 			short Bright = (short)(m_bright + 16);
 
 			__m128i bc = _mm_set_epi16(Bright, Cont, Bright, Cont, Bright, Cont, Bright, Cont);
