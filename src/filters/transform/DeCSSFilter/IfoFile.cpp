@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -93,7 +93,7 @@ struct pgc_t {
 	REFERENCE_TIME duration;
 	stream_t audios[8];
 	stream_t subtitles[32];
-	CAtlArray<cell_info_t> chapters;
+	std::vector<cell_info_t> chapters;
 
 	pgc_t() {
 		duration = 0;
@@ -115,8 +115,8 @@ CIfoFile::CIfoFile()
 
 bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 {
-	m_pStream_Lang.RemoveAll();
-	m_pChapters.RemoveAll();
+	m_pStream_Lang.clear();
+	m_pChapters.clear();
 	m_rtDuration = 0;
 	m_Aspect = { 0, 0 };
 
@@ -139,8 +139,8 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 
 		BYTE buf[8];
 
-		CAtlArray<pgc_t> programs;
-		programs.Add();
+		std::vector<pgc_t> programs;
+		programs.emplace_back();
 
 		// Video Attributes (0x0200)
 		m_ifoFile.Seek(0x200, CFile::begin);
@@ -188,13 +188,13 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 		nb_cells = (ReadDword() - 7) / 12; // actual number of cells
 		m_ifoFile.Seek(posCADT + 8, CFile::begin);
 		for (int i = 0; i < nb_cells; i++) {
-			programs[0].chapters.Add();
+			auto& cell_info = programs[0].chapters.emplace_back();
 
-			programs[0].chapters[i].VOB_id = ReadWord();
-			programs[0].chapters[i].Cell_id = ReadByte();
+			cell_info.VOB_id = ReadWord();
+			cell_info.Cell_id = ReadByte();
 			ReadByte();
-			programs[0].chapters[i].first_sector = ReadDword();
-			programs[0].chapters[i].last_sector = ReadDword();
+			cell_info.first_sector = ReadDword();
+			cell_info.last_sector = ReadDword();
 		}
 
 		// Chapters & duration ...
@@ -208,7 +208,7 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 			DWORD offsetPGC = ReadDword();
 			m_ifoFile.Seek(posPGCI + offsetPGC, CFile::begin);
 
-			programs.Add();
+			programs.emplace_back();
 
 			// PGC header
 			m_ifoFile.Seek(2, CFile::current);
@@ -286,7 +286,7 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 					DLog(L"CVobFile::OpenIFO() - PGS : %2d, Pg : %2d, Cell : %2d, VOB id : %2d, Cell id : %2d, first sector : %10lu, last sector : %10lu, duration = %s",
 							prog, chap, cell, chapter.VOB_id, chapter.Cell_id, firstVOBUStartSector, lastVOBUEndSector, ReftimeToString(duration));
 
-					for (size_t i = 0; i < programs[0].chapters.GetCount(); i++) {
+					for (size_t i = 0; i < programs[0].chapters.size(); i++) {
 						if (chapter.VOB_id == programs[0].chapters[i].VOB_id && chapter.Cell_id == programs[0].chapters[i].Cell_id) {
 							if (programs[0].chapters[i].duration == 0) {
 								programs[0].chapters[i].duration = duration;
@@ -306,17 +306,17 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 					}
 				}
 
-				CAtlArray<cell_info_t>& chapters = programs[prog].chapters;
-				if (chapters.GetCount() && chapters[chapters.GetCount() - 1].last_sector + 1 != chapter.first_sector) {
+				auto& chapters = programs[prog].chapters;
+				if (chapters.size() && chapters[chapters.size() - 1].last_sector + 1 != chapter.first_sector) {
 					continue; // ignore jumps for program
 				}
 
-				programs[prog].chapters.Add(chapter);
+				programs[prog].chapters.push_back(chapter);
 				programs[prog].duration += chapter.duration;
 			}
 		}
 
-		for (size_t i = 0; i < programs[0].chapters.GetCount(); i++) {
+		for (size_t i = 0; i < programs[0].chapters.size(); i++) {
 			if (programs[0].chapters[i].duration == 0) {
 				programs[0].chapters[i].duration = 10000000i64;
 			}
@@ -324,7 +324,7 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 		}
 
 		int selected_prog = 0;
-		if (nProgNum < programs.GetCount()) {
+		if (nProgNum < programs.size()) {
 			selected_prog = nProgNum;
 		}
 
@@ -343,16 +343,16 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 
 		m_rtDuration = programs[selected_prog].duration;
 
-		CAtlArray<cell_info_t>& chapters = programs[selected_prog].chapters;
+		auto& chapters = programs[selected_prog].chapters;
 		REFERENCE_TIME time = 0;
-		for (size_t i = 0; i < chapters.GetCount(); i++) {
+		for (size_t i = 0; i < chapters.size(); i++) {
 			chapter_t chapter;
 			chapter.first_sector = chapters[i].first_sector;
 			chapter.last_sector = chapters[i].last_sector;
 			chapter.title = chapter.track = 0;
 			chapter.rtime = time;
 
-			m_pChapters.Add(chapter);
+			m_pChapters.push_back(chapter);
 			time += chapters[i].duration;
 		}
 		ASSERT(time == m_rtDuration);
@@ -391,11 +391,11 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 			UINT32 info_offset;
 			int nb_tracks;
 			UINT32 length_PTS;
-			CAtlArray<track_info_t> tracks_info;
+			std::vector<track_info_t> tracks_info;
 		};
 
-		CAtlArray<title_info_t> titles_info;
-		titles_info.SetCount(nb_titles);
+		std::vector<title_info_t> titles_info;
+		titles_info.resize(nb_titles);
 		for (int i = 0; i < nb_titles; i++) {
 			int title_idx = gb.BitRead(8) - 0x81;
 			//ASSERT(i == title_idx);
@@ -410,7 +410,7 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 			gb.Seek(title.info_offset);
 			gb.SkipBytes(2);
 			title.nb_tracks = gb.BitRead(8);
-			title.tracks_info.SetCount(title.nb_tracks);
+			title.tracks_info.resize(title.nb_tracks);
 			gb.SkipBytes(1);
 			title.length_PTS = gb.BitRead(32);
 			DLog(L"ATS_XX_0.IFO paser: Title #%d, %u seconds (%u PTS)", i, title.length_PTS / 90000, title.length_PTS);
@@ -439,7 +439,7 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 			}
 		}
 
-		m_pChapters.SetCount(nb_chapters);
+		m_pChapters.resize(nb_chapters);
 		int chapter_idx = 0;
 		__int64 pts = 0;
 
@@ -470,7 +470,7 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 
 	m_ifoFile.Close();
 
-	if (m_pChapters.IsEmpty()) {
+	if (m_pChapters.empty()) {
 		return false;
 	}
 
@@ -509,7 +509,7 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 		int first_substreamID = 0;
 		int first_channelgroup = 0;
 
-		for (; i < m_pChapters.GetCount(); i++) {
+		for (; i < m_pChapters.size(); i++) {
 			if (m_pChapters[i].track == 0) { // optimization. check only the beginning Title, not all the tracks.
 				int pos = vobfile->Seek(m_pChapters[i].first_sector);
 
@@ -561,14 +561,14 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 			}
 		}
 
-		if (i < m_pChapters.GetCount()) {
+		if (i < m_pChapters.size()) {
 			m_rtDuration = m_pChapters[i].rtime;
-			m_pChapters.SetCount(i);
+			m_pChapters.resize(i);
 		}
 	}
 
 	int start_sector = m_pChapters[0].first_sector;
-	int end_sector = m_pChapters[m_pChapters.GetCount() - 1].last_sector;
+	int end_sector = m_pChapters[m_pChapters.size() - 1].last_sector;
 	vobfile->SetOffsets(start_sector, end_sector);
 
 	return true;
@@ -577,13 +577,16 @@ bool CIfoFile::OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum /*= 0*/)
 BSTR CIfoFile::GetTrackName(UINT aTrackIdx) const
 {
 	CString TrackName;
-	m_pStream_Lang.Lookup(aTrackIdx, TrackName);
+	auto it = m_pStream_Lang.find(aTrackIdx);
+	if (it != m_pStream_Lang.cend()) {
+		TrackName = (*it).second;
+	}
 	return TrackName.AllocSysString();
 }
 
 REFERENCE_TIME CIfoFile::GetChapterTime(UINT ChapterNumber) const
 {
-	if (ChapterNumber >= m_pChapters.GetCount()) {
+	if (ChapterNumber >= m_pChapters.size()) {
 		return 0;
 	}
 
@@ -592,7 +595,7 @@ REFERENCE_TIME CIfoFile::GetChapterTime(UINT ChapterNumber) const
 
 __int64 CIfoFile::GetChapterPos(UINT ChapterNumber) const
 {
-	if (ChapterNumber >= m_pChapters.GetCount()) {
+	if (ChapterNumber >= m_pChapters.size()) {
 		return 0;
 	}
 

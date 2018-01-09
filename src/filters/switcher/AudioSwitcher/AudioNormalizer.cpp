@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -50,12 +50,12 @@ int CAudioNormalizer::ProcessInternal(float *samples, unsigned numsamples, unsig
 	}
 
 	const size_t allsamples = numsamples * nch;
-	if (allsamples > m_bufHQ.GetCount()) {
-		m_bufHQ.SetCount(allsamples);
-		m_smpHQ.SetCount(allsamples);
+	if (allsamples > m_bufHQ.size()) {
+		m_bufHQ.resize(allsamples);
+		m_smpHQ.resize(allsamples);
 	}
-	double *bufHQ = m_bufHQ.GetData();
-	double *smpHQ = m_smpHQ.GetData();
+	double *bufHQ = m_bufHQ.data();
+	double *smpHQ = m_smpHQ.data();
 
 	size_t k;
 	for (k = 0; k < allsamples; k++) {

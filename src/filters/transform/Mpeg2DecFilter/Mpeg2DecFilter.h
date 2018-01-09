@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <vector>
 #include <list>
 #include <videoacc.h>
 #include "../DeCSSFilter/DeCSSFilter.h"
@@ -237,7 +238,7 @@ class CSubpicInputPin : public CMpeg2DecInputPin
 	bool m_fsppal;
 	CAutoPtr<AM_PROPERTY_SPHLI> m_sphli; // temp
 
-	class spu : public CAtlArray<BYTE>
+	class spu : public std::vector<BYTE>
 	{
 	public:
 		bool m_fForced;
