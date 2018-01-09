@@ -170,7 +170,7 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	}
 
 	// Bufferize frame only with 3D texture!
-	m_nSurfaces = clamp(rs.nEVRBuffers, 4, MAX_VIDEO_SURFACES);
+	m_nSurfaces = std::clamp(rs.nEVRBuffers, 4, MAX_VIDEO_SURFACES);
 }
 
 CEVRAllocatorPresenter::~CEVRAllocatorPresenter(void)
@@ -2094,7 +2094,7 @@ void CEVRAllocatorPresenter::RenderThread()
 								} else {
 									MinMargin = MIN_FRAME_TIME + std::min(LONGLONG(m_DetectedFrameTimeStdDev), 20000LL);
 								}
-								LONGLONG TimePerFrameMargin = clamp(TimePerFrame*2/100, MinMargin, TimePerFrame*11/100); // (0.02..0.11)TimePerFrame
+								LONGLONG TimePerFrameMargin = std::clamp(TimePerFrame*2/100, MinMargin, TimePerFrame*11/100); // (0.02..0.11)TimePerFrame
 								LONGLONG TimePerFrameMargin0 = TimePerFrameMargin/2;
 								LONGLONG TimePerFrameMargin1 = 0;
 
@@ -2277,7 +2277,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 					if (m_nRenderState == Started) {
 						int VSyncPos = GetVBlackPos();
 						int WaitRange = std::max(m_ScreenSize.cy / 40, 5L);
-						int MinRange = clamp(long(0.003 * double(m_ScreenSize.cy) * double(m_refreshRate) + 0.5), 5L, m_ScreenSize.cy/3); // 1.8  ms or max 33 % of Time
+						int MinRange = std::clamp(long(0.003 * double(m_ScreenSize.cy) * double(m_refreshRate) + 0.5), 5L, m_ScreenSize.cy/3); // 1.8  ms or max 33 % of Time
 
 						VSyncPos += MinRange + WaitRange;
 

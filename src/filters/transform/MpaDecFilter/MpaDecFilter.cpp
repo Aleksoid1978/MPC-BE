@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1371,7 +1371,7 @@ static void decodeps2adpcm(ps2_state_t& s, int channel, BYTE* pin, int16_t* pout
 		a = b;
 		b = output;
 
-		*pout++ = (int16_t)clamp(output, INT16_MIN, (int)INT16_MAX);
+		*pout++ = (int16_t)std::clamp(output, INT16_MIN, (int)INT16_MAX);
 	}
 }
 

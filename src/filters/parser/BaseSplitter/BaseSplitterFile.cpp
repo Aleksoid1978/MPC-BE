@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -208,7 +208,7 @@ void CBaseSplitterFile::Seek(__int64 pos)
 		if (IsStreaming()) {
 			m_pos = pos;
 		} else {
-			m_pos = clamp(pos, 0LL, m_len);
+			m_pos = std::clamp(pos, 0LL, m_len);
 		}
 	}
 

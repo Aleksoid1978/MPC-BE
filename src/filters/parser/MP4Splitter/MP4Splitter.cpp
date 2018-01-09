@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -722,9 +722,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									BYTE y = (pal[i + 1] - 16) * 255 / 219;
 									BYTE u = pal[i + 2];
 									BYTE v = pal[i + 3];
-									BYTE r = (BYTE)clamp(1.0 * y + 1.4022 * (v - 128), 0.0, 255.0);
-									BYTE g = (BYTE)clamp(1.0 * y - 0.3456 * (u - 128) - 0.7145 * (v - 128), 0.0, 255.0);
-									BYTE b = (BYTE)clamp(1.0 * y + 1.7710 * (u - 128), 0.0, 255.0);
+									BYTE r = (BYTE)std::clamp(1.0 * y + 1.4022 * (v - 128), 0.0, 255.0);
+									BYTE g = (BYTE)std::clamp(1.0 * y - 0.3456 * (u - 128) - 0.7145 * (v - 128), 0.0, 255.0);
+									BYTE b = (BYTE)std::clamp(1.0 * y + 1.7710 * (u - 128), 0.0, 255.0);
 									CStringA str;
 									str.Format("%02x%02x%02x", r, g, b);
 									sl.push_back(str);

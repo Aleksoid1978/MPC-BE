@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -510,7 +510,7 @@ STDMETHODIMP CAudioSwitcherFilter::SetBassRedirect(bool bBassRedirect)
 
 STDMETHODIMP CAudioSwitcherFilter::SetAudioGain(float fGain_dB)
 {
-	m_fGain_dB = clamp(fGain_dB, -3.0f, 10.0f);
+	m_fGain_dB = std::clamp(fGain_dB, -3.0f, 10.0f);
 	m_fGainFactor = pow(10.0f, m_fGain_dB/20.0f);
 
 	return S_OK;
@@ -520,8 +520,8 @@ STDMETHODIMP CAudioSwitcherFilter::SetAutoVolumeControl(bool bAutoVolumeControl,
 {
 	m_bAutoVolumeControl	= bAutoVolumeControl;
 	m_bNormBoost			= bNormBoost;
-	m_iNormLevel			= clamp(iNormLevel, 0, 100);
-	m_iNormRealeaseTime		= clamp(iNormRealeaseTime, 5, 10);
+	m_iNormLevel			= std::clamp(iNormLevel, 0, 100);
+	m_iNormRealeaseTime		= std::clamp(iNormRealeaseTime, 5, 10);
 
 	m_AudioNormalizer.SetParam(m_iNormLevel, bNormBoost, m_iNormRealeaseTime);
 

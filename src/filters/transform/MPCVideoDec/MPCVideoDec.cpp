@@ -1083,7 +1083,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_nSwRGBLevels				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
 #endif
 
-	m_nDXVACheckCompatibility = clamp(m_nDXVACheckCompatibility, 0, 3);
+	m_nDXVACheckCompatibility = std::clamp(m_nDXVACheckCompatibility, 0, 3);
 
 	if (m_nDeinterlacing > PROGRESSIVE) {
 		m_nDeinterlacing = AUTO;
@@ -3140,7 +3140,7 @@ void CMPCVideoDecFilter::SetThreadCount()
 			m_pAVCtx->thread_count = 1;
 		} else {
 			int nThreadNumber = (m_nThreadNumber > 0) ? m_nThreadNumber : CPUInfo::GetProcessorNumber() * 3 / 2;
-			m_pAVCtx->thread_count = clamp(nThreadNumber, 1, MAX_AUTO_THREADS);
+			m_pAVCtx->thread_count = std::clamp(nThreadNumber, 1, MAX_AUTO_THREADS);
 		}
 	}
 }

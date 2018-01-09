@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1125,7 +1125,7 @@ bool ExtractDim(const AM_MEDIA_TYPE* pmt, int& w, int& h, int& arx, int& ary)
 				struct {
 					int x, y;
 				} ar[] = {{w,h},{4,3},{16,9},{221,100},{w,h}};
-				int i = clamp(ptr[7]>>4, 1, 5) - 1;
+				int i = std::clamp(ptr[7]>>4, 1, 5) - 1;
 				arx = ar[i].x;
 				ary = ar[i].y;
 			}

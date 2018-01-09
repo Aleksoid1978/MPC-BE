@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -173,7 +173,7 @@ ULONGLONG CTextFile::Seek(LONGLONG lOff, UINT nFrom)
 				break;
 		}
 
-		lOff = clamp(lOff, 0LL, len);
+		lOff = std::clamp(lOff, 0LL, len);
 
 		m_posInBuffer += lOff - pos;
 		if (m_posInBuffer < 0 || m_posInBuffer >= m_nInBuffer) {

@@ -2248,7 +2248,7 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	}
 
 	// Bufferize frame only with 3D texture
-	m_nSurfaces = clamp(rs.nEVRBuffers, 4, MAX_PICTURE_SLOTS-2);
+	m_nSurfaces = std::clamp(rs.nEVRBuffers, 4, MAX_PICTURE_SLOTS-2);
 
 	m_nRenderState = Shutdown;
 	m_bStepping = false;
