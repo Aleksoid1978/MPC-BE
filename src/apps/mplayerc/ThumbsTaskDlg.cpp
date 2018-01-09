@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2017 see Authors.txt
+ * (C) 2016-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -98,9 +98,9 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 	const int infoheight = 70;
 	const int margin = 10;
 
-	const int width = clamp(s.iThumbWidth, 256, 2560);
-	const int cols  = clamp(s.iThumbCols, 1, 10);
-	const int rows  = clamp(s.iThumbRows, 1, 20);
+	const int width = std::clamp(s.iThumbWidth, 256, 2560);
+	const int cols  = std::clamp(s.iThumbCols, 1, 10);
+	const int rows  = std::clamp(s.iThumbRows, 1, 20);
 
 	CSize thumbsize;
 	thumbsize.cx = (width - margin) / cols - margin;
@@ -333,7 +333,7 @@ HRESULT CThumbsTaskDlg::OnInit()
 	m_pMainFrm = AfxGetMainFrame();
 
 	const CAppSettings& s = AfxGetAppSettings();
-	int n = 1 + clamp(s.iThumbCols, 1, 10) * clamp(s.iThumbRows, 1, 20) + 1;
+	int n = 1 + std::clamp(s.iThumbCols, 1, 10) * std::clamp(s.iThumbRows, 1, 20) + 1;
 
 	SetProgressBarRange(0, n);
 	SetProgressBarPosition(0);

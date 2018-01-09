@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -140,7 +140,7 @@ CIntEdit::operator int()
 	if (swscanf_s(s, L"%d", &integer) != 1) {
 		integer = 0;
 	}
-	integer = clamp(integer, m_lower, m_upper); // correction value after the simultaneous input and closing
+	integer = std::clamp(integer, m_lower, m_upper); // correction value after the simultaneous input and closing
 
 	return integer;
 }
@@ -218,7 +218,7 @@ void CIntEdit::OnKillFocus (CWnd* pNewWnd)
 	if (swscanf_s(s, L"%d", &integer) != 1) {
 		integer = 0;
 	}
-	integer = clamp(integer, m_lower, m_upper);
+	integer = std::clamp(integer, m_lower, m_upper);
 
 	s.Format(L"%d", integer);
 	SetWindowTextW(s);

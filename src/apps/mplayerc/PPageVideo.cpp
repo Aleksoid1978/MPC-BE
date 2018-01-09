@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -83,7 +83,7 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK7, m_chkNoSmallUpscale);
 	DDX_Control(pDX, IDC_CHECK8, m_chkNoSmallDownscale);
 
-	m_iEvrBuffers = clamp(m_iEvrBuffers, RS_EVRBUFFERS_MIN, RS_EVRBUFFERS_MAX);
+	m_iEvrBuffers = std::clamp(m_iEvrBuffers, RS_EVRBUFFERS_MIN, RS_EVRBUFFERS_MAX);
 }
 
 BEGIN_MESSAGE_MAP(CPPageVideo, CPPageBase)

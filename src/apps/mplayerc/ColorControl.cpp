@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -99,10 +99,10 @@ VMR9ProcAmpControl CColorControl::GetVMR9ProcAmpControl(DWORD flags, int brightn
 	VMR9ProcAmpControl procAmpControl;
 	procAmpControl.dwSize     = sizeof(VMR9ProcAmpControl);
 	procAmpControl.dwFlags    = flags;
-	procAmpControl.Brightness = clamp((float)brightness,               m_VMR9ColorBri.MinValue, m_VMR9ColorBri.MaxValue);
-	procAmpControl.Contrast   = clamp((float)(contrast + 100) / 100,   m_VMR9ColorCon.MinValue, m_VMR9ColorCon.MaxValue);
-	procAmpControl.Hue        = clamp((float)hue,                      m_VMR9ColorHue.MinValue, m_VMR9ColorHue.MaxValue);
-	procAmpControl.Saturation = clamp((float)(saturation + 100) / 100, m_VMR9ColorSat.MinValue, m_VMR9ColorSat.MaxValue);
+	procAmpControl.Brightness = std::clamp((float)brightness,               m_VMR9ColorBri.MinValue, m_VMR9ColorBri.MaxValue);
+	procAmpControl.Contrast   = std::clamp((float)(contrast + 100) / 100,   m_VMR9ColorCon.MinValue, m_VMR9ColorCon.MaxValue);
+	procAmpControl.Hue        = std::clamp((float)hue,                      m_VMR9ColorHue.MinValue, m_VMR9ColorHue.MaxValue);
+	procAmpControl.Saturation = std::clamp((float)(saturation + 100) / 100, m_VMR9ColorSat.MinValue, m_VMR9ColorSat.MaxValue);
 
 	return procAmpControl;
 }
@@ -110,10 +110,10 @@ VMR9ProcAmpControl CColorControl::GetVMR9ProcAmpControl(DWORD flags, int brightn
 DXVA2_ProcAmpValues CColorControl::GetEVRProcAmpValues(int brightness, int contrast, int hue, int saturation)
 {
 	DXVA2_ProcAmpValues procAmpValues;
-	procAmpValues.Brightness.ll = clamp(IntToFixed(brightness).ll,            m_EVRColorBri.MinValue.ll, m_EVRColorBri.MaxValue.ll);
-	procAmpValues.Contrast.ll   = clamp(IntToFixed(contrast + 100, 100).ll,   m_EVRColorCon.MinValue.ll, m_EVRColorCon.MaxValue.ll);
-	procAmpValues.Hue.ll        = clamp(IntToFixed(hue).ll,                   m_EVRColorHue.MinValue.ll, m_EVRColorHue.MaxValue.ll);
-	procAmpValues.Saturation.ll = clamp(IntToFixed(saturation + 100, 100).ll, m_EVRColorSat.MinValue.ll, m_EVRColorSat.MaxValue.ll);
+	procAmpValues.Brightness.ll = std::clamp(IntToFixed(brightness).ll,            m_EVRColorBri.MinValue.ll, m_EVRColorBri.MaxValue.ll);
+	procAmpValues.Contrast.ll   = std::clamp(IntToFixed(contrast + 100, 100).ll,   m_EVRColorCon.MinValue.ll, m_EVRColorCon.MaxValue.ll);
+	procAmpValues.Hue.ll        = std::clamp(IntToFixed(hue).ll,                   m_EVRColorHue.MinValue.ll, m_EVRColorHue.MaxValue.ll);
+	procAmpValues.Saturation.ll = std::clamp(IntToFixed(saturation + 100, 100).ll, m_EVRColorSat.MinValue.ll, m_EVRColorSat.MaxValue.ll);
 
 	return procAmpValues;
 }

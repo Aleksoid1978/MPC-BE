@@ -1353,7 +1353,7 @@ BOOL CMainFrame::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTO
 								if (abs(rtDiff) >= UNITS) {
 									const REFERENCE_TIME rtPos = m_wndSeekBar.GetPos();
 									REFERENCE_TIME rtNewPos = rtPos + rtDiff;
-									rtNewPos = clamp(rtNewPos, 0LL, stop);
+									rtNewPos = std::clamp(rtNewPos, 0LL, stop);
 									const bool bHighPrecision = !!m_wndSubresyncBar.IsWindowVisible();
 
 									m_wndStatusBar.SetStatusTimer(rtNewPos, stop, bHighPrecision, GetTimeFormat());
@@ -5875,7 +5875,7 @@ void CMainFrame::SaveDIB(LPCWSTR fn, BYTE* pData, long size)
 	if (ext == L".bmp") {
 		BMPDIB(fn, pData, L"", 0, 0, 0, 0);
 	} else if (ext == L".png") {
-		PNGDIB(fn, pData, clamp(s.iThumbLevelPNG, 1, 9));
+		PNGDIB(fn, pData, std::clamp(s.iThumbLevelPNG, 1, 9));
 	} else if (ext == L".jpg") {
 		BMPDIB(fn, pData, L"image/jpeg", s.iThumbQuality, 0, 0, 0);
 	}
@@ -7276,10 +7276,10 @@ void CMainFrame::OnViewPanNScanPresets(UINT nID)
 		return;
 	}
 
-	m_PosX = clamp(m_PosX, 0.0, 1.0);
-	m_PosY = clamp(m_PosY, 0.0, 1.0);
-	m_ZoomX = clamp(m_ZoomX, 0.2, 3.0);
-	m_ZoomY = clamp(m_ZoomY, 0.2, 3.0);
+	m_PosX  = std::clamp(m_PosX, 0.0, 1.0);
+	m_PosY  = std::clamp(m_PosY, 0.0, 1.0);
+	m_ZoomX = std::clamp(m_ZoomX, 0.2, 3.0);
+	m_ZoomY = std::clamp(m_ZoomY, 0.2, 3.0);
 
 	MoveVideoWindow(true);
 }
@@ -17173,16 +17173,16 @@ void CMainFrame::SetupVMR9ColorControl()
 void CMainFrame::SetColorControl(DWORD flags, int& brightness, int& contrast, int& hue, int& saturation)
 {
 	if (flags & ProcAmp_Brightness) {
-		brightness = clamp(brightness, -100, 100);
+		brightness = std::clamp(brightness, -100, 100);
 	}
 	if (flags & ProcAmp_Contrast) {
-		contrast = clamp(contrast, -100, 100);
+		contrast = std::clamp(contrast, -100, 100);
 	}
 	if (flags & ProcAmp_Hue) {
-		hue = clamp(hue, -180, 180);
+		hue = std::clamp(hue, -180, 180);
 	}
 	if (flags & ProcAmp_Saturation) {
-		saturation = clamp(saturation, -100, 100);
+		saturation = std::clamp(saturation, -100, 100);
 	}
 
 	if (m_pVMRMC9) {

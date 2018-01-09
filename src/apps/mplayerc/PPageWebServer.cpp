@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -63,8 +63,8 @@ void CPPageWebServer::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT3, m_WebServerCGI);
 	DDX_Text(pDX, IDC_EDIT9, m_WebDefIndex);
 
-	m_nWebServerPort = clamp(m_nWebServerPort, APP_WEBSRVPORT_MIN, APP_WEBSRVPORT_MAX);
-	m_nWebServerQuality = clamp(m_nWebServerQuality, APP_WEBSRVQUALITY_MIN, APP_WEBSRVQUALITY_MAX);
+	m_nWebServerPort = std::clamp(m_nWebServerPort, APP_WEBSRVPORT_MIN, APP_WEBSRVPORT_MAX);
+	m_nWebServerQuality = std::clamp(m_nWebServerQuality, APP_WEBSRVQUALITY_MIN, APP_WEBSRVQUALITY_MAX);
 }
 
 BOOL CPPageWebServer::PreTranslateMessage(MSG* pMsg)
@@ -264,7 +264,7 @@ void CPPageWebServer::OnUpdateButton2(CCmdUI* pCmdUI)
 
 void CPPageWebServer::OnKillFocusEdit1()
 {
-	m_nWebServerPort = clamp(m_nWebServerPort, APP_WEBSRVPORT_MIN, APP_WEBSRVPORT_MAX);
+	m_nWebServerPort = std::clamp(m_nWebServerPort, APP_WEBSRVPORT_MIN, APP_WEBSRVPORT_MAX);
 
 	UpdateData(FALSE);
 }

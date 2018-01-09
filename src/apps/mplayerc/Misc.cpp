@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2017 see Authors.txt
+ * (C) 2016-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -404,9 +404,9 @@ void ThemeRGB(int iR, int iG, int iB, int& iRed, int& iGreen, int& iBlue)
 	iGreen = (s.nThemeBrightness + iG) * s.nThemeGreen / 256;
 	iBlue  = (s.nThemeBrightness + iB) * s.nThemeBlue  / 256;
 
-	iRed   = clamp(iRed,   0, 255);
-	iGreen = clamp(iGreen, 0, 255);
-	iBlue  = clamp(iBlue,  0, 255);
+	iRed   = std::clamp(iRed,   0, 255);
+	iGreen = std::clamp(iGreen, 0, 255);
+	iBlue  = std::clamp(iBlue,  0, 255);
 }
 
 

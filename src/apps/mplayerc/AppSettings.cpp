@@ -576,9 +576,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fRewind = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REWIND, FALSE);
 	iZoomLevel = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ZOOM, 1);
 	nAutoFitFactor = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOFITFACTOR, 50);
-	nAutoFitFactor = clamp(nAutoFitFactor, 20, 80);
+	nAutoFitFactor = std::clamp(nAutoFitFactor, 20, 80);
 	nVolumeStep = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, 5);
-	nVolumeStep = clamp(nVolumeStep, 1, 10);
+	nVolumeStep = std::clamp(nVolumeStep, 1, 10);
 	nSpeedStep = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPEED_STEP, 0);
 	if (nSpeedStep != 10 && nSpeedStep != 20 && nSpeedStep != 25 && nSpeedStep != 50 && nSpeedStep != 100) {
 		nSpeedStep = 0;
@@ -693,7 +693,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	sizeAspectRatio.cy = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_Y, 0);
 	bKeepHistory = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, 1);
 	iRecentFilesNumber = (int)pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, APP_RECENTFILES_DEF);
-	iRecentFilesNumber = clamp(iRecentFilesNumber, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
+	iRecentFilesNumber = std::clamp(iRecentFilesNumber, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
 	MRU.SetSize(iRecentFilesNumber);
 	MRUDub.SetSize(iRecentFilesNumber);
 
@@ -1045,7 +1045,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fLCDSupport		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LCD_SUPPORT, FALSE);
 	fSmartSeek		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK, FALSE);
 	iSmartSeekSize	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK_SIZE, 15);
-	iSmartSeekSize	= clamp(iSmartSeekSize, 10, 30);
+	iSmartSeekSize	= std::clamp(iSmartSeekSize, 10, 30);
 	fChapterMarker	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CHAPTER_MARKER, FALSE);
 	fFlybar			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR, TRUE);
 	fFlybarOnTop	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR_ONTOP, FALSE);
@@ -1153,7 +1153,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	bUpdaterAutoCheck		= !!pApp->GetProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_AUTO_CHECK, 0);
 	nUpdaterDelay			= pApp->GetProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_DELAY, 7);
-	nUpdaterDelay			= clamp(nUpdaterDelay, 1, 365);
+	nUpdaterDelay			= std::clamp(nUpdaterDelay, 1, 365);
 
 	tUpdaterLastCheck		= 0; // force check if the previous check undefined
 	if (pApp->GetProfileBinary(IDS_R_UPDATER, IDS_RS_UPDATER_LAST_CHECK, &ptr, &len)) {
