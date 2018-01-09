@@ -1556,8 +1556,8 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 	if (FAILED(hr)) {
 		if (!m_sps.IsEmpty()) {
 			spu* sp = m_sps.GetTail();
-			sp->SetCount(sp->GetCount() + len);
-			memcpy(sp->GetData() + sp->GetCount() - len, pDataIn, len);
+			sp->resize(sp->size() + len);
+			memcpy(sp->data() + sp->size() - len, pDataIn, len);
 		}
 	} else {
 		POSITION pos = m_sps.GetTailPosition();
@@ -1584,8 +1584,8 @@ HRESULT CSubpicInputPin::Transform(IMediaSample* pSample)
 		p->m_rtStart = rtStart;
 		p->m_rtStop = _I64_MAX;
 
-		p->SetCount(len);
-		memcpy(p->GetData(), pDataIn, len);
+		p->resize(len);
+		memcpy(p->data(), pDataIn, len);
 
 		if (m_sphli && p->m_rtStart == PTS2RT(m_sphli->StartPTM)) {
 			p->m_psphli = m_sphli;
@@ -1810,12 +1810,12 @@ bool CSubpicInputPin::dvdspu::Parse()
 {
 	m_offsets.clear();
 
-	BYTE* p = GetData();
+	BYTE* p = data();
 
 	WORD packetsize = (p[0] << 8) | p[1];
 	WORD datasize = (p[2] << 8) | p[3];
 
-	if (packetsize > GetCount() || datasize > packetsize) {
+	if (packetsize > size() || datasize > packetsize) {
 		return false;
 	}
 
@@ -1933,7 +1933,7 @@ bool CSubpicInputPin::dvdspu::Parse()
 
 void CSubpicInputPin::dvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h, AM_DVD_YUV* sppal, bool fsppal)
 {
-	BYTE* p = GetData();
+	BYTE* p = data();
 	DWORD offset[2] = {m_offset[0], m_offset[1]};
 
 	AM_PROPERTY_SPHLI sphli = m_sphli;
@@ -2003,16 +2003,16 @@ void CSubpicInputPin::dvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h
 
 bool CSubpicInputPin::cvdspu::Parse()
 {
-	BYTE* p = GetData();
+	BYTE* p = data();
 
 	WORD packetsize = (p[0] << 8) | p[1];
 	WORD datasize = (p[2] << 8) | p[3];
 
-	if (packetsize > GetCount() || datasize > packetsize) {
+	if (packetsize > size() || datasize > packetsize) {
 		return false;
 	}
 
-	p = GetData() + datasize;
+	p = data() + datasize;
 
 	for (int i = datasize, j = packetsize-4; i <= j; i += 4, p += 4) {
 		switch (p[0]) {
@@ -2073,7 +2073,7 @@ bool CSubpicInputPin::cvdspu::Parse()
 
 void CSubpicInputPin::cvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h, AM_DVD_YUV* sppal, bool fsppal)
 {
-	BYTE* p = GetData();
+	BYTE* p = data();
 	DWORD offset[2] = {m_offset[0], m_offset[1]};
 
 	CRect rcclip(0, 0, w, h);
@@ -2118,17 +2118,17 @@ void CSubpicInputPin::cvdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h
 
 bool CSubpicInputPin::svcdspu::Parse()
 {
-	BYTE* p = GetData();
+	BYTE* p = data();
 	BYTE* p0 = p;
 
-	if (GetCount() < 2) {
+	if (size() < 2) {
 		return false;
 	}
 
 	WORD packetsize = (p[0] << 8) | p[1];
 	p += 2;
 
-	if (packetsize > GetCount()) {
+	if (packetsize > size()) {
 		return false;
 	}
 
@@ -2172,7 +2172,7 @@ bool CSubpicInputPin::svcdspu::Parse()
 
 void CSubpicInputPin::svcdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int h, AM_DVD_YUV* sppal, bool fsppal)
 {
-	BYTE* p = GetData();
+	BYTE* p = data();
 	DWORD offset[2] = {m_offset[0], m_offset[1]};
 
 	CRect rcclip(0, 0, w, h);

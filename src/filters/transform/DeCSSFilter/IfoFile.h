@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <atlcoll.h>
+#include <unordered_map>
 #include <basestruct.h>
 #include "VobFile.h"
 
@@ -36,8 +36,8 @@ class CIfoFile
 		UINT32 title:16, track:8;
 	};
 
-	CAtlMap<DWORD, CString> m_pStream_Lang;
-	CAtlArray<chapter_t> m_pChapters;
+	std::unordered_map<DWORD, CString> m_pStream_Lang;
+	std::vector<chapter_t> m_pChapters;
 
 	REFERENCE_TIME	m_rtDuration;
 	fraction_t		m_Aspect;
@@ -48,7 +48,7 @@ public:
 	bool OpenIFO(CString fn, CVobFile* vobfile, ULONG nProgNum = 0); // vts ifo
 
 	BSTR			GetTrackName(UINT aTrackIdx) const;
-	UINT			GetChaptersCount() const { return (UINT)m_pChapters.GetCount(); }
+	UINT			GetChaptersCount() const { return (UINT)m_pChapters.size(); }
 	REFERENCE_TIME	GetChapterTime(UINT ChapterNumber) const;
 	__int64			GetChapterPos(UINT ChapterNumber) const;
 	REFERENCE_TIME	GetDuration() const { return m_rtDuration; }

@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <atlcoll.h>
+#include <vector>
 
 class CAudioNormalizer
 {
@@ -30,8 +30,8 @@ protected:
 	int m_stepping, m_stepping_vol;
 	int m_rising;
 
-	CAtlArray<double> m_bufHQ;
-	CAtlArray<double> m_smpHQ;
+	std::vector<double> m_bufHQ;
+	std::vector<double> m_smpHQ;
 
 	DWORD m_predictor;
 	BYTE m_prediction[4096];
