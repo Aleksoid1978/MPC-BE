@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -834,21 +834,19 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				if (pTE->v.DisplayWidth && pTE->v.DisplayHeight) {
 					for (size_t i = 0; i < mts.GetCount(); i++) {
 						if (mts[i].formattype == FORMAT_VideoInfo) {
-							mt = mts[i];
 							DWORD vih1 = FIELD_OFFSET(VIDEOINFOHEADER, bmiHeader);
 							DWORD vih2 = FIELD_OFFSET(VIDEOINFOHEADER2, bmiHeader);
 							DWORD bmi = mts[i].FormatLength() - FIELD_OFFSET(VIDEOINFOHEADER, bmiHeader);
-							mt.formattype = FORMAT_VideoInfo2;
-							mt.AllocFormatBuffer(vih2 + bmi);
-							memcpy(mt.Format(), mts[i].Format(), vih1);
-							memset(mt.Format() + vih1, 0, vih2 - vih1);
-							memcpy(mt.Format() + vih2, mts[i].Format() + vih1, bmi);
+
+							mts[i].formattype = FORMAT_VideoInfo2;
+							mts[i].ReallocFormatBuffer(vih2 + bmi);
+							memmove(mts[i].Format() + vih2, mts[i].Format() + vih1, bmi);
+							memset(mts[i].Format() + vih1, 0, vih2 - vih1);
 
 							CSize aspect((int)pTE->v.DisplayWidth, (int)pTE->v.DisplayHeight);
 							ReduceDim(aspect);
-							((VIDEOINFOHEADER2*)mt.Format())->dwPictAspectRatioX = aspect.cx;
-							((VIDEOINFOHEADER2*)mt.Format())->dwPictAspectRatioY = aspect.cy;
-							mts.InsertAt(i++, mt);
+							((VIDEOINFOHEADER2*)mts[i].Format())->dwPictAspectRatioX = aspect.cx;
+							((VIDEOINFOHEADER2*)mts[i].Format())->dwPictAspectRatioY = aspect.cy;
 						} else if (mts[i].formattype == FORMAT_MPEG2Video) {
 							CSize aspect((int)pTE->v.DisplayWidth, (int)pTE->v.DisplayHeight);
 							ReduceDim(aspect);
