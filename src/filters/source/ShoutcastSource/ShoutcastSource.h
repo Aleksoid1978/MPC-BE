@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -123,15 +123,15 @@ public:
 
 class CShoutcastStream : public CSourceStream
 {
-	class CShoutCastPacket : public CAtlArray < BYTE >
+	class CShoutCastPacket : public std::vector<NoInitByte>
 	{
 	public:
 		CString title;
 		REFERENCE_TIME rtStart = INVALID_TIME;
 		REFERENCE_TIME rtStop = INVALID_TIME;
 		void SetData(const void* ptr, DWORD len) {
-			SetCount(len);
-			memcpy(GetData(), ptr, len);
+			resize(len);
+			memcpy(data(), ptr, len);
 		}
 	};
 
