@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -128,8 +128,8 @@ HRESULT CMpaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 	m_pFile->SetBreakHandle(GetRequestHandle());
 
-	CAtlArray<CMediaType> mts;
-	mts.Add(m_pFile->GetMediaType());
+	std::vector<CMediaType> mts;
+	mts.push_back(m_pFile->GetMediaType());
 
 	CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio", this, this, &hr));
 	AddOutputPin(0, pPinOut);

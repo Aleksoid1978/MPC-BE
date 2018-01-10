@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,7 @@
 #pragma once
 
 #include <atlcoll.h>
+#include <vector>
 
 static const WCHAR* MPEG2_Profile[]=
 {
@@ -99,5 +100,5 @@ static CString FormatString(const wchar_t *pszFormat, ...)
 	return Temp;
 }
 
-CString GetMediaTypeDesc(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter);
+CString GetMediaTypeDesc(std::vector<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter);
 CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName);

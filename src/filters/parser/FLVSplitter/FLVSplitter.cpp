@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1120,8 +1120,8 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		if (mt.subtype != GUID_NULL) {
-			CAtlArray<CMediaType> mts;
-			mts.Add(mt);
+			std::vector<CMediaType> mts;
+			mts.push_back(mt);
 			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, name, this, this, &hr));
 			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(t.TagType, pPinOut)));
 		}
@@ -1130,8 +1130,8 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 
 	if (mtAAC.subtype != GUID_NULL) {
-		CAtlArray<CMediaType> mts;
-		mts.Add(mtAAC);
+		std::vector<CMediaType> mts;
+		mts.push_back(mtAAC);
 		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio AAC", this, this, &hr));
 		EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(FLV_AUDIODATA, pPinOut)));
 	}

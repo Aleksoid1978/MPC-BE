@@ -159,7 +159,7 @@ HRESULT CRoQSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	// pins
 
 	CMediaType mt;
-	CAtlArray<CMediaType> mts;
+	std::vector<CMediaType> mts;
 
 	int iHasVideo = 0;
 	int iHasAudio = 0;
@@ -187,7 +187,7 @@ HRESULT CRoQSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		{
 			if(!iHasVideo && ri.w > 0 && ri.h > 0)
 			{
-				mts.RemoveAll();
+				mts.clear();
 
 				mt.InitMediaType();
 				mt.majortype = MEDIATYPE_Video;
@@ -203,7 +203,7 @@ HRESULT CRoQSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				mt.SetFormat((BYTE*)&vih, sizeof(vih));
 				mt.lSampleSize = 1;
 
-				mts.Add(mt);
+				mts.push_back(mt);
 
 				CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Video", this, this, &hr));
 				AddOutputPin(0, pPinOut);
@@ -224,7 +224,7 @@ HRESULT CRoQSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		{
 			if(!iHasAudio)
 			{
-				mts.RemoveAll();
+				mts.clear();
 
 				mt.InitMediaType();
 				mt.majortype = MEDIATYPE_Audio;
@@ -238,7 +238,7 @@ HRESULT CRoQSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				wfe.wBitsPerSample = 16;
 				mt.SetFormat((BYTE*)&wfe, sizeof(wfe));
 				mt.lSampleSize = 1;
-				mts.Add(mt);
+				mts.push_back(mt);
 
 				CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio", this, this, &hr));
 				AddOutputPin(1, pPinOut);

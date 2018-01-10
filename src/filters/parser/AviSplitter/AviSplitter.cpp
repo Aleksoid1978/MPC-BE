@@ -149,7 +149,7 @@ STDMETHODIMP CAviSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 }
 
 template<typename T>
-static void ParseHeader(T& var, CAutoPtr<CAviFile>& pFile, CAviFile::strm_t* s, CAtlArray<CMediaType>& mts, REFERENCE_TIME AvgTimePerFrame, CSize headerAspect)
+static void ParseHeader(T& var, CAutoPtr<CAviFile>& pFile, CAviFile::strm_t* s, std::vector<CMediaType>& mts, REFERENCE_TIME AvgTimePerFrame, CSize headerAspect)
 {
 	if (s->cs.size()) {
 		__int64 pos = pFile->GetPos();
@@ -165,7 +165,7 @@ static void ParseHeader(T& var, CAutoPtr<CAviFile>& pFile, CAviFile::strm_t* s, 
 						pvih2->dwPictAspectRatioX = headerAspect.cx;
 						pvih2->dwPictAspectRatioY = headerAspect.cy;
 					}
-					mts.InsertAt(0, mt2);
+					mts.insert(mts.cbegin(), mt2);
 				}
 				break;
 			}
@@ -256,7 +256,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		CMediaType mt;
-		CAtlArray<CMediaType> mts;
+		std::vector<CMediaType> mts;
 
 		CStringW name, label;
 
@@ -396,7 +396,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			mt.SetSampleSize(s->strh.dwSuggestedBufferSize > 0
 							 ? s->strh.dwSuggestedBufferSize*3/2
 							 : (pvih->bmiHeader.biWidth*pvih->bmiHeader.biHeight*4));
-			mts.Add(mt);
+			mts.push_back(mt);
 
 			// building a special media type
 			switch (pbmi->biCompression) {
@@ -446,10 +446,10 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						pbmi->biCompression = FCC('AVC1');
 						CMediaType mt2;
 						if (SUCCEEDED(CreateMPEG2VIfromAVC(&mt2, pbmi, AvgTimePerFrame, aspect, extra, extralen))) {
-							mts.InsertAt(0, mt2);
+							mts.insert(mts.cbegin(), mt2);
 						}
 					}
-					if (mts.GetCount() == 1) {
+					if (mts.size() == 1) {
 						CBaseSplitterFileEx::avchdr h;
 						ParseHeader(h, m_pFile, s, mts, AvgTimePerFrame, headerAspect);
 					}
@@ -505,7 +505,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			mt.SetSampleSize(s->strh.dwSuggestedBufferSize > 0
 							 ? s->strh.dwSuggestedBufferSize*3/2
 							 : (pwfe->nChannels*pwfe->nSamplesPerSec*32>>3));
-			mts.Add(mt);
+			mts.push_back(mt);
 		} else if (s->strh.fccType == FCC('mids')) {
 			label = L"Midi";
 
@@ -515,7 +515,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			mt.SetSampleSize(s->strh.dwSuggestedBufferSize > 0
 							 ? s->strh.dwSuggestedBufferSize*3/2
 							 : (1024*1024));
-			mts.Add(mt);
+			mts.push_back(mt);
 		} else if (s->strh.fccType == FCC('txts')) {
 			label = L"Text";
 
@@ -525,7 +525,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			mt.SetSampleSize(s->strh.dwSuggestedBufferSize > 0
 							 ? s->strh.dwSuggestedBufferSize*3/2
 							 : (1024*1024));
-			mts.Add(mt);
+			mts.push_back(mt);
 		} else if (s->strh.fccType == FCC('iavs')) {
 			label = L"Interleaved";
 
@@ -538,10 +538,10 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			mt.SetSampleSize(s->strh.dwSuggestedBufferSize > 0
 							 ? s->strh.dwSuggestedBufferSize*3/2
 							 : (1024*1024));
-			mts.Add(mt);
+			mts.push_back(mt);
 		}
 
-		if (mts.IsEmpty()) {
+		if (mts.empty()) {
 			DLog(L"CAviSourceFilter: Unsupported stream (%d)", i);
 			continue;
 		}
@@ -974,7 +974,7 @@ CAviSourceFilter::CAviSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
 // CAviSplitterOutputPin
 //
 
-CAviSplitterOutputPin::CAviSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
+CAviSplitterOutputPin::CAviSplitterOutputPin(std::vector<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr)
 {
 }

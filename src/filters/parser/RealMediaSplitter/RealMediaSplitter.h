@@ -211,7 +211,7 @@ protected:
 	HRESULT DeliverPacket(CAutoPtr<CPacket> p);
 
 public:
-	CRealMediaSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
+	CRealMediaSplitterOutputPin(std::vector<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 	virtual ~CRealMediaSplitterOutputPin();
 
 	HRESULT DeliverEndFlush();

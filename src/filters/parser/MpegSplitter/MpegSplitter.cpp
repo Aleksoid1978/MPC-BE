@@ -1235,9 +1235,9 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				str = FormatStreamName(s, (CMpegSplitterFile::stream_type)type);
 			}
 
-			CAtlArray<CMediaType> mts;
+			std::vector<CMediaType> mts;
 			for(size_t i = 0; i < s.mts.size(); i++) {
-				mts.Add(s.mts[i]);
+				mts.push_back(s.mts[i]);
 			}
 			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CMpegSplitterOutputPin(mts, (CMpegSplitterFile::stream_type)type, str, this, this, &hr));
 
@@ -2013,7 +2013,7 @@ CMpegSourceFilter::CMpegSourceFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLSID& 
 // CMpegSplitterOutputPin
 //
 
-CMpegSplitterOutputPin::CMpegSplitterOutputPin(CAtlArray<CMediaType>& mts, CMpegSplitterFile::stream_type type, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
+CMpegSplitterOutputPin::CMpegSplitterOutputPin(std::vector<CMediaType>& mts, CMpegSplitterFile::stream_type type, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseSplitterParserOutputPin(mts, pName, pFilter, pLock, phr)
 	, m_type(type)
 {

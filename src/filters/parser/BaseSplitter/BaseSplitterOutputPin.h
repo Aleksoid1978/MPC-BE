@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -74,7 +74,7 @@ private:
 
 protected:
 	CBaseSplitterFilter* pSplitter;
-	CAtlArray<CMediaType> m_mts;
+	std::vector<CMediaType> m_mts;
 	CPacketQueue m_queue;
 
 	HRESULT			m_hrDeliver	= S_OK;
@@ -105,7 +105,7 @@ protected:
 	STDMETHODIMP GetPreroll(LONGLONG* pllPreroll);
 
 public:
-	CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
+	CBaseSplitterOutputPin(std::vector<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 	CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 	virtual ~CBaseSplitterOutputPin();
 

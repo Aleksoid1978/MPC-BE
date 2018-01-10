@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,9 +24,9 @@
 #include "MediaDescription.h"
 #include "DSUtil.h"
 
-CString GetMediaTypeDesc(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter)
+CString GetMediaTypeDesc(std::vector<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter)
 {
-	if (mts.IsEmpty()) {
+	if (mts.empty()) {
 		return pName;
 	}
 

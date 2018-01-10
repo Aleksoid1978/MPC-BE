@@ -2949,7 +2949,7 @@ HRESULT CreateAVCfromH264(CMediaType* mt)
 	return dstSize ? S_OK : E_FAIL;
 }
 
-void CreateVorbisMediaType(CMediaType& mt, CAtlArray<CMediaType>& mts, DWORD Channels, DWORD SamplesPerSec, DWORD BitsPerSample, const BYTE* pData, size_t Count)
+void CreateVorbisMediaType(CMediaType& mt, std::vector<CMediaType>& mts, DWORD Channels, DWORD SamplesPerSec, DWORD BitsPerSample, const BYTE* pData, size_t Count)
 {
 	const BYTE* p = pData;
 	CAtlArray<int> sizes;
@@ -2978,7 +2978,7 @@ void CreateVorbisMediaType(CMediaType& mt, CAtlArray<CMediaType>& mts, DWORD Cha
 			memcpy(p2, p, pvf2->HeaderSize[i] = sizes[i]);
 		}
 
-		mts.Add(mt);
+		mts.push_back(mt);
 	}
 
 	mt.subtype = MEDIASUBTYPE_Vorbis;
@@ -2988,7 +2988,7 @@ void CreateVorbisMediaType(CMediaType& mt, CAtlArray<CMediaType>& mts, DWORD Cha
 	vf->nChannels		= Channels;
 	vf->nSamplesPerSec	= SamplesPerSec;
 	vf->nMinBitsPerSec	= vf->nMaxBitsPerSec = vf->nAvgBitsPerSec = DWORD_MAX;
-	mts.Add(mt);
+	mts.push_back(mt);
 }
 
 CStringA VobSubDefHeader(int w, int h, CStringA palette)
