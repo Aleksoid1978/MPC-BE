@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -399,8 +399,8 @@ HRESULT CShoutcastStream::FillBuffer(IMediaSample* pSample)
 		ASSERT(!m_queue.IsEmpty());
 		if (!m_queue.IsEmpty()) {
 			CAutoPtr<CShoutCastPacket> p = m_queue.RemoveHead();
-			long len = std::min(pSample->GetSize(), (long)p->GetCount());
-			memcpy(pData, p->GetData(), len);
+			long len = std::min(pSample->GetSize(), (long)p->size());
+			memcpy(pData, p->data(), len);
 			pSample->SetActualDataLength(len);
 			pSample->SetTime(&p->rtStart, &p->rtStop);
 			m_title = p->title;
@@ -477,9 +477,6 @@ static UINT SocketThreadProc(LPVOID pParam)
 	return (static_cast<CShoutcastStream*>(pParam))->SocketThreadProc();
 }
 
-#define MOVE_TO_MPA_START_CODE(b, e) while(b <= e - MPA_HEADER_SIZE  && ((GETWORD(b) & MPA_SYNCWORD) != MPA_SYNCWORD)) b++;
-#define MOVE_TO_AAC_START_CODE(b, e) while(b <= e - ADTS_HEADER_SIZE && ((GETWORD(b) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD)) b++;
-
 UINT CShoutcastStream::SocketThreadProc()
 {
 	fExitThread = false;
@@ -512,8 +509,8 @@ UINT CShoutcastStream::SocketThreadProc()
 	m_description	= soc.m_description;
 
 	REFERENCE_TIME m_rtSampleTime = 0;
+	std::vector<NoInitByte> buffer;
 
-	CAtlArray<BYTE> m_p;
 	while (!fExitThread) {
 		{
 			if (m_queue.GetDuration() > MAXBUFFERLENGTH || m_queue.GetCount() >= 500) {
@@ -540,109 +537,107 @@ UINT CShoutcastStream::SocketThreadProc()
 			}
 		}
 
+		if (m_socket.m_Format != AUDIO_MPEG && m_socket.m_Format != AUDIO_AAC) {
+			continue; // Hmm.
+		}
+
+		size_t old_size = buffer.size();
+		buffer.resize(old_size + len);
+		memcpy(buffer.data() + old_size, pData, (size_t)len);
+
+		BYTE* pos = &buffer.front().value;
+		const BYTE* end = pos + buffer.size();
+
 		if (m_socket.m_Format == AUDIO_MPEG) {
-			size_t nSize = m_p.GetCount();
-			m_p.SetCount(nSize + len, 1024);
-			memcpy(m_p.GetData() + nSize, pData, (size_t)len);
+			for(;;) {
+				while (pos + 2 <= end && ((GETWORD(pos) & MPA_SYNCWORD) != MPA_SYNCWORD)) {
+					pos++;
+				}
 
-			if (m_p.GetCount() > MPA_HEADER_SIZE) {
-				BYTE* start	= m_p.GetData();
-				BYTE* end	= start + m_p.GetCount();
+				if (pos + MPA_HEADER_SIZE > end) {
+					break;
+				}
 
-				for(;;) {
-					MOVE_TO_MPA_START_CODE(start, end);
-					if (start <= end - MPA_HEADER_SIZE) {
-						int size = ParseMPAHeader(start);
-						if (size == 0) {
-							start++;
-							continue;
-						}
-						if (start + size > end) {
-							break;
-						}
+				int size = ParseMPAHeader(pos);
+				if (size == 0) {
+					pos++;
+					continue;
+				}
+				if (pos + size > end) {
+					break;
+				}
 
-						if (start + size + MPA_HEADER_SIZE <= end) {
-							int size2 = ParseMPAHeader(start + size);
-							if (size2 == 0) {
-								start++;
-								continue;
-							}
-						}
-
-						CAutoPtr<CShoutCastPacket> p2(DNew CShoutCastPacket());
-						p2->SetData(start, size);
-						p2->rtStart = m_rtSampleTime;
-						p2->rtStop  = m_rtSampleTime + (10000000i64 * size * 8/soc.m_bitrate);
-						m_rtSampleTime = p2->rtStop;
-						p2->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
-
-						{
-							CAutoLock cAutoLock(&m_queue);
-							m_queue.AddTail(p2);
-						}
-
-						start += size;
-					} else {
-						break;
+				if (pos + size + MPA_HEADER_SIZE <= end) {
+					int size2 = ParseMPAHeader(pos + size);
+					if (size2 == 0) {
+						pos++;
+						continue;
 					}
 				}
 
-				if (start > m_p.GetData()) {
-					m_p.RemoveAt(0, start - m_p.GetData());
+				CAutoPtr<CShoutCastPacket> p2(DNew CShoutCastPacket());
+				p2->SetData(pos, size);
+				p2->rtStart = m_rtSampleTime;
+				p2->rtStop  = m_rtSampleTime + (10000000i64 * size * 8/soc.m_bitrate);
+				m_rtSampleTime = p2->rtStop;
+				p2->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
+
+				{
+					CAutoLock cAutoLock(&m_queue);
+					m_queue.AddTail(p2);
 				}
+
+				pos += size;
 			}
-		} else if (m_socket.m_Format == AUDIO_AAC) {
-			size_t nSize = m_p.GetCount();
-			m_p.SetCount(nSize + len, 1024);
-			memcpy(m_p.GetData() + nSize, pData, (size_t)len);
+		}
+		else if (m_socket.m_Format == AUDIO_AAC) {
+			for(;;) {
+				while (pos + 2 <= end && ((GETWORD(pos) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD)) {
+					pos++;
+				}
+				
+				if (pos + ADTS_HEADER_SIZE > end) {
+					break;
+				}
 
-			if (m_p.GetCount() > ADTS_HEADER_SIZE) {
-				BYTE* start	= m_p.GetData();
-				BYTE* end	= start + m_p.GetCount();
+				audioframe_t aframe;
+				int size = ParseADTSAACHeader(pos, &aframe);
+				if (size == 0) {
+					pos++;
+					continue;
+				}
+				if (pos + size > end) {
+					break;
+				}
 
-				for(;;) {
-					MOVE_TO_AAC_START_CODE(start, end);
-					if (start <= end - ADTS_HEADER_SIZE) {
-						audioframe_t aframe;
-						int size = ParseADTSAACHeader(start, &aframe);
-						if (size == 0) {
-							start++;
-							continue;
-						}
-						if (start + size > end) {
-							break;
-						}
-
-						if (start + size + ADTS_HEADER_SIZE <= end) {
-							int size2 = ParseADTSAACHeader(start + size, &aframe);
-							if (size2 == 0) {
-								start++;
-								continue;
-							}
-						}
-
-						CAutoPtr<CShoutCastPacket> p2(DNew CShoutCastPacket());
-						p2->SetData(start + aframe.param1, size - aframe.param1);
-						p2->rtStart = m_rtSampleTime;
-						p2->rtStop  = m_rtSampleTime + (10000000i64 * size * 8/soc.m_bitrate);
-						m_rtSampleTime = p2->rtStop;
-						p2->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
-
-						{
-							CAutoLock cAutoLock(&m_queue);
-							m_queue.AddTail(p2);
-						}
-
-						start += size;
-					} else {
-						break;
+				if (pos + size + ADTS_HEADER_SIZE <= end) {
+					int size2 = ParseADTSAACHeader(pos + size, &aframe);
+					if (size2 == 0) {
+						pos++;
+						continue;
 					}
 				}
 
-				if (start > m_p.GetData()) {
-					m_p.RemoveAt(0, start - m_p.GetData());
+				CAutoPtr<CShoutCastPacket> p2(DNew CShoutCastPacket());
+				p2->SetData(pos + aframe.param1, size - aframe.param1);
+				p2->rtStart = m_rtSampleTime;
+				p2->rtStop  = m_rtSampleTime + (10000000i64 * size * 8/soc.m_bitrate);
+				m_rtSampleTime = p2->rtStop;
+				p2->title = !soc.m_title.IsEmpty() ? soc.m_title : soc.m_url;
+
+				{
+					CAutoLock cAutoLock(&m_queue);
+					m_queue.AddTail(p2);
 				}
+
+				pos += size;
 			}
+		}
+
+		if (pos > &buffer.front().value) {
+			size_t unused_size = end - pos;
+			memmove(buffer.data(), pos, unused_size);
+			buffer.resize(unused_size);
 		}
 	}
 
