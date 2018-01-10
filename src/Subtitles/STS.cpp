@@ -23,6 +23,7 @@
 #include "STS.h"
 #include <atlbase.h>
 #include <fstream>
+#include <regex>
 #include "RealTextParser.h"
 #include "USFSubtitles.h"
 #include "../DSUtil/WinAPIUtils.h"
@@ -642,21 +643,18 @@ static bool OpenWebVTT(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 			continue;
 		}
 
-		WCHAR sep;
-		int hh1, mm1, ss1, ms1, hh2, mm2, ss2, ms2;
-		WCHAR msStr1[5] = { 0 }, msStr2[5] = { 0 };
-		int c = swscanf_s(buff, L"%d%c%d%c%d%4[^-] --> %d%c%d%c%d%4s",
-						  &hh1, &sep, 1, &mm1, &sep, 1, &ss1, msStr1, _countof(msStr1),
-						  &hh2, &sep, 1, &mm2, &sep, 1, &ss2, msStr2, _countof(msStr2));
+		const std::wregex regex(L"^(?:(\\d+):)?(\\d{2}):(\\d{2})(?:[\\.,](\\d{1,3}))? --> (?:(\\d+):)?(\\d{2}):(\\d{2})(?:[\\.,](\\d{1,3}))?");
+		std::wcmatch match;
+		if (std::regex_search(buff.GetBuffer(), match, regex) && match.size() == 9) {
+			int hh1 = match[1].matched ? _wtoi(match[1].first) : 0;
+			int mm1 = match[2].matched ? _wtoi(match[2].first) : 0;
+			int ss1 = match[3].matched ? _wtoi(match[3].first) : 0;
+			int ms1 = match[4].matched ? _wtoi(match[4].first) : 0;
 
-		if (c >= 11) {
-			// Parse ms if present
-			if (2 != swscanf_s(msStr1, L"%c%d", &sep, 1, &ms1)) {
-				ms1 = 0;
-			}
-			if (2 != swscanf_s(msStr2, L"%c%d", &sep, 1, &ms2)) {
-				ms2 = 0;
-			}
+			int hh2 = match[5].matched ? _wtoi(match[5].first) : 0;
+			int mm2 = match[6].matched ? _wtoi(match[6].first) : 0;
+			int ss2 = match[7].matched ? _wtoi(match[7].first) : 0;
+			int ms2 = match[8].matched ? _wtoi(match[8].first) : 0;
 
 			CString subStr, tmp;
 			while (file->ReadString(tmp)) {
