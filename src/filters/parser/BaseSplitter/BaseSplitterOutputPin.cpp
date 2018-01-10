@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,11 +29,11 @@
 // CBaseSplitterOutputPin
 //
 
-CBaseSplitterOutputPin::CBaseSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
+CBaseSplitterOutputPin::CBaseSplitterOutputPin(std::vector<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseOutputPin(NAME("CBaseSplitterOutputPin"), pFilter, pLock, phr, GetMediaTypeDesc(mts, pName, pFilter))
 	, pSplitter(static_cast<CBaseSplitterFilter*>(m_pFilter))
 {
-	m_mts.Copy(mts);
+	m_mts = mts;
 	memset(&m_brs, 0, sizeof(m_brs));
 	m_brs.rtLastDeliverTime = INVALID_TIME;
 }
@@ -106,7 +106,7 @@ HRESULT CBaseSplitterOutputPin::DecideBufferSize(IMemAllocator* pAlloc, ALLOCATO
 
 HRESULT CBaseSplitterOutputPin::CheckMediaType(const CMediaType* pmt)
 {
-	for (size_t i = 0; i < m_mts.GetCount(); i++) {
+	for (size_t i = 0; i < m_mts.size(); i++) {
 		if (*pmt == m_mts[i]) {
 			return S_OK;
 		}
@@ -122,7 +122,7 @@ HRESULT CBaseSplitterOutputPin::GetMediaType(int iPosition, CMediaType* pmt)
 	if (iPosition < 0) {
 		return E_INVALIDARG;
 	}
-	if ((size_t)iPosition >= m_mts.GetCount()) {
+	if ((size_t)iPosition >= m_mts.size()) {
 		return VFW_S_NO_MORE_ITEMS;
 	}
 
@@ -452,8 +452,8 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 			p->bDiscontinuity = true;
 
 			// CAutoLock cAutoLock(m_pLock); // this can cause the lock
-			m_mts.RemoveAll();
-			m_mts.Add(*p->pmt);
+			m_mts.clear();
+			m_mts.emplace_back(*p->pmt);
 		}
 
 		bool fTimeValid = p->rtStart != INVALID_TIME;

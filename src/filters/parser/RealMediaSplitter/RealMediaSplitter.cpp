@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -249,7 +249,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			name += L" (" + CStringW(pmp->name) + L')';
 		}
 
-		CAtlArray<CMediaType> mts;
+		std::vector<CMediaType> mts;
 
 		CMediaType mt;
 		mt.SetSampleSize(std::max(pmp->maxPacketSize*16, 1u));
@@ -280,7 +280,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			pvih->bmiHeader.biBitCount = rvi.bpp;
 			pvih->bmiHeader.biCompression = rvi.fcc2;
 			pvih->bmiHeader.biSizeImage = rvi.w*rvi.h*3/2;
-			mts.Add(mt);
+			mts.push_back(mt);
 
 			BYTE* extra		= pmp->typeSpecData.GetData();
 			int extralen	= pmp->typeSpecData.GetCount();
@@ -290,7 +290,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				extralen	-= 26;
 				VIDEOINFOHEADER* pvih2 = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + extralen);
 				memcpy(pvih2 + 1, extra, extralen);
-				mts.InsertAt(0, mt);
+				mts.insert(mts.cbegin(), mt);
 			}
 
 			if (pmp->width > 0 && pmp->height > 0) {
@@ -305,7 +305,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				pvih2->dwPictAspectRatioX = rvi.w;
 				pvih2->dwPictAspectRatioY = rvi.h;
 
-				mts.InsertAt(0, mt);
+				mts.insert(mts.cbegin(), mt);
 			}
 		} else if (pmp->mime == "audio/x-pn-realaudio") {
 			mt.majortype = MEDIATYPE_Audio;
@@ -412,11 +412,11 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 
 			if (pwfe->wFormatTag) {
-				mts.Add(mt);
+				mts.push_back(mt);
 
 				if (fcc == 'DNET') {
 					mt.subtype = FOURCCMap(pwfe->wFormatTag = WAVE_FORMAT_DOLBY_AC3);
-					mts.InsertAt(0, mt);
+					mts.insert(mts.cbegin(), mt);
 				} else if (fcc == 'RAAC' || fcc == 'RACP') {
 					mt.subtype = FOURCCMap(pwfe->wFormatTag = WAVE_FORMAT_RAW_AAC1);
 					int extralen = *(DWORD*)extra;
@@ -433,7 +433,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						WAVEFORMATEX* pwfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 5);
 						pwfe->cbSize = MakeAACInitData((BYTE*)(pwfe+1), 0, pwfe->nSamplesPerSec, pwfe->nChannels);
 					}
-					mts.InsertAt(0, mt);
+					mts.insert(mts.cbegin(), mt);
 				}
 			}
 		} else if (pmp->mime == "logical-fileinfo") {
@@ -510,7 +510,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 		}
 
-		if (mts.IsEmpty()) {
+		if (mts.empty()) {
 			DLog(L"Unsupported RealMedia stream (%u): %S", (UINT32)pmp->stream, pmp->mime);
 			continue;
 		}
@@ -539,8 +539,8 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		mt.SetSampleSize(1);
 		mt.majortype = MEDIATYPE_Text;
 
-		CAtlArray<CMediaType> mts;
-		mts.Add(mt);
+		std::vector<CMediaType> mts;
+		mts.push_back(mt);
 
 		HRESULT hr;
 
@@ -819,7 +819,7 @@ STDMETHODIMP CRealMediaSplitterFilter::GetKeyFrames(const GUID* pFormat, REFEREN
 // CRealMediaSplitterOutputPin
 //
 
-CRealMediaSplitterOutputPin::CRealMediaSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
+CRealMediaSplitterOutputPin::CRealMediaSplitterOutputPin(std::vector<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr)
 {
 }

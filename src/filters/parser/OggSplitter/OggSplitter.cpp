@@ -841,7 +841,7 @@ COggVorbisOutputPin::COggVorbisOutputPin(OggVorbisIdHeader* h, LPCWSTR pName, CB
 	vf->nMaxBitsPerSec	= h->bitrate_maximum;
 	vf->fQuality		= -1;
 	mt.SetSampleSize(8192);
-	m_mts.Add(mt);
+	m_mts.push_back(mt);
 
 	mt.InitMediaType();
 	mt.majortype	= MEDIATYPE_Audio;
@@ -854,7 +854,7 @@ COggVorbisOutputPin::COggVorbisOutputPin(OggVorbisIdHeader* h, LPCWSTR pName, CB
 	vf2->Channels		= h->audio_channels;
 	vf2->SamplesPerSec	= h->audio_sample_rate;
 	mt.SetSampleSize(8192);
-	m_mts.InsertAt(0, mt);
+	m_mts.insert(m_mts.cbegin(), mt);
 
 	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
 }
@@ -1018,7 +1018,7 @@ COggFlacOutputPin::COggFlacOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFi
 	wfe->nBlockAlign		= 1;
 	wfe->wBitsPerSample		= m_wBitsPerSample;
 
-	m_mts.InsertAt(0, mt);
+	m_mts.insert(m_mts.cbegin(), mt);
 
 	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
 	*phr = S_OK;
@@ -1077,7 +1077,7 @@ COggDirectShowOutputPin::COggDirectShowOutputPin(AM_MEDIA_TYPE* pmt, LPCWSTR pNa
 	mt.SetFormat((BYTE*)(pmt + 1), pmt->cbFormat);
 	mt.SetSampleSize(1);
 	if (mt.majortype == MEDIATYPE_Video) { // TODO: find samples for audio and find out what to return in GetRefTime...
-		m_mts.Add(mt);
+		m_mts.push_back(mt);
 	}
 
 	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
@@ -1245,7 +1245,7 @@ COggVideoOutputPin::COggVideoOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseF
 			break;
 	}
 	mt.SetSampleSize(std::max(h->buffersize, 1uL));
-	m_mts.Add(mt);
+	m_mts.push_back(mt);
 
 	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
 }
@@ -1277,7 +1277,7 @@ COggAudioOutputPin::COggAudioOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseF
 	wfe->nAvgBytesPerSec	= h->a.nAvgBytesPerSec; // TODO: verify for PCM
 	wfe->nBlockAlign		= h->a.nBlockAlign; // TODO: verify for PCM
 	mt.SetSampleSize(std::max(h->buffersize, 1uL));
-	m_mts.Add(mt);
+	m_mts.push_back(mt);
 
 	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
 }
@@ -1294,7 +1294,7 @@ COggTextOutputPin::COggTextOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseFil
 	mt.subtype		= MEDIASUBTYPE_NULL;
 	mt.formattype	= FORMAT_None;
 	mt.SetSampleSize(1);
-	m_mts.Add(mt);
+	m_mts.push_back(mt);
 }
 
 //
@@ -1312,7 +1312,7 @@ COggKateOutputPin::COggKateOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseFil
 	SUBTITLEINFO* psi = (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO));
 	memset(psi, 0, mt.FormatLength());
 
-	m_mts.Add(mt);
+	m_mts.push_back(mt);
 }
 
 //
@@ -1395,7 +1395,7 @@ COggTheoraOutputPin::COggTheoraOutputPin(OggPage& page, LPCWSTR pName, CBaseFilt
 	vih->hdr.dwPictAspectRatioY			= Aspect.cy;
 
 	mt.bFixedSizeSamples = 0;
-	m_mts.Add(mt);
+	m_mts.push_back(mt);
 
 	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
 }
@@ -1553,7 +1553,7 @@ HRESULT COggDiracOutputPin::InitDirac(BYTE* p, int nCount)
 	pvih->bmiHeader.biSizeImage		= DIBSIZE(pvih->bmiHeader);
 
 	mt.bFixedSizeSamples = 0;
-	m_mts.Add(mt);
+	m_mts.push_back(mt);
 
 	SetName(GetMediaTypeDesc(m_mts, m_pName, m_pFilter));
 
@@ -1636,7 +1636,7 @@ COggOpusOutputPin::COggOpusOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFi
 
 	delete [] wfe;
 
-	m_mts.InsertAt(0, mt);
+	m_mts.insert(m_mts.cbegin(), mt);
 
 	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
 
@@ -1731,7 +1731,7 @@ COggSpeexOutputPin::COggSpeexOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBase
 
 	delete [] wfe;
 
-	m_mts.InsertAt(0, mt);
+	m_mts.insert(m_mts.cbegin(), mt);
 
 	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
 
@@ -1800,7 +1800,7 @@ COggVP8OutputPin::COggVP8OutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFilt
 	vih2->bmiHeader.biSizeImage		= DIBSIZE(vih2->bmiHeader);
 
 	mt.bFixedSizeSamples = 0;
-	m_mts.Add(mt);
+	m_mts.push_back(mt);
 
 	SetName(GetMediaTypeDesc(m_mts, pName, pFilter));
 

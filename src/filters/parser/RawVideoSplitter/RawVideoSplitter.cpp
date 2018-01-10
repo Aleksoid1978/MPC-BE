@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -200,7 +200,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
 
-	CAtlArray<CMediaType> mts;
+	std::vector<CMediaType> mts;
 	CMediaType mt;
 	CString pName;
 
@@ -356,12 +356,12 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		if (mt.subtype != MEDIASUBTYPE_LAV_RAWVIDEO) {
 			mt.subtype = FOURCCMap(fourcc);
 		}
-		mts.Add(mt);
+		mts.push_back(mt);
 
 		if (fourcc_2) {
 			vih2->bmiHeader.biCompression = fourcc_2;
 			mt.subtype = FOURCCMap(fourcc_2);
-			mts.Add(mt);
+			mts.push_back(mt);
 		}
 
 		m_RAWType   = RAW_Y4M;
@@ -416,7 +416,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_pFile->Seek(0);
 		CBaseSplitterFileEx::seqhdr h;
 		if (m_pFile->Read(h, (int)std::min((__int64)KILOBYTE, m_pFile->GetLength()), &mt, false)) {
-			mts.Add(mt);
+			mts.push_back(mt);
 
 			if (mt.subtype == MEDIASUBTYPE_MPEG1Payload) {
 				m_RAWType = RAW_MPEG1;
@@ -496,11 +496,11 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				CBaseSplitterFileEx::vc1hdr h;
 				if (m_pFile->Read(h, (int)std::min((__int64)KILOBYTE, m_pFile->GetRemaining()), &mt)) {
-					mts.Add(mt);
+					mts.push_back(mt);
 					mt.subtype = MEDIASUBTYPE_WVC1_CYBERLINK;
-					mts.Add(mt);
+					mts.push_back(mt);
 					mt.subtype = MEDIASUBTYPE_WVC1_ARCSOFT;
-					mts.Add(mt);
+					mts.push_back(mt);
 
 					m_RAWType = RAW_VC1;
 					pName = L"VC-1 Video Output";
@@ -731,9 +731,9 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			mvih->cbSequenceHeader = seqhdrsize;
 			m_pFile->Seek(0);
 			m_pFile->ByteRead((BYTE*)mvih->dwSequenceHeader, seqhdrsize);
-			mts.Add(mt);
+			mts.push_back(mt);
 			mt.subtype = FOURCCMap(mvih->hdr.bmiHeader.biCompression = 'V4PM');
-			mts.Add(mt);
+			mts.push_back(mt);
 
 			m_startpos = seqhdrsize;
 
@@ -748,9 +748,9 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		CBaseSplitterFileEx::avchdr h;
 		if (m_pFile->Read(h, (int)std::min((__int64)MEGABYTE, m_pFile->GetLength()), &mt)) {
-			mts.Add(mt);
+			mts.push_back(mt);
 			if (mt.subtype == MEDIASUBTYPE_H264 && SUCCEEDED(CreateAVCfromH264(&mt))) {
-				mts.Add(mt);
+				mts.push_back(mt);
 			}
 
 			m_RAWType = RAW_H264;
@@ -764,14 +764,14 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		CBaseSplitterFileEx::hevchdr h;
 		if (m_pFile->Read(h, (int)std::min((__int64)MEGABYTE, m_pFile->GetLength()), &mt)) {
-			mts.Add(mt);
+			mts.push_back(mt);
 			m_RAWType = RAW_HEVC;
 			pName = L"H.265/HEVC Video Output";
 		}
 	}
 
 	if (m_RAWType != RAW_NONE) {
-		for (size_t i = 0; i < mts.GetCount(); i++) {
+		for (size_t i = 0; i < mts.size(); i++) {
 			VIDEOINFOHEADER *vih = (VIDEOINFOHEADER*)mts[i].Format();
 			if (!vih->AvgTimePerFrame) {
 				// set 25 fps as default value.

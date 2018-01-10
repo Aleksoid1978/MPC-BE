@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2017 see Authors.txt
+ * (C) 2016-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -155,7 +155,7 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_fps.num = fps_num;
 	m_fps.den = fps_den;
 
-	CAtlArray<CMediaType> mts;
+	std::vector<CMediaType> mts;
 	CMediaType mt;
 	{
 		mt.InitMediaType();
@@ -175,7 +175,7 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		memcpy(pvih + 1, &video_flags, sizeof(video_flags));
 		mt.SetSampleSize(0);
 		mt.SetTemporalCompression(FALSE);
-		mts.Add(mt);
+		mts.push_back(mt);
 		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Video", this, this, &hr));
 		AddOutputPin(0, pPinOut);
 	}
@@ -194,7 +194,7 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			m_pFile->ByteRead((BYTE*)&audiotracks[i].sample_rate, 2);
 			m_pFile->ByteRead((BYTE*)&audiotracks[i].audio_flags, 2);
 
-			mts.RemoveAll();
+			mts.clear();
 			mt.InitMediaType();
 			mt.majortype = MEDIATYPE_Audio;
 			mt.subtype = (audiotracks[i].audio_flags & BINK_AUD_USEDCT) ? MEDIASUBTYPE_BINKA_DCT : MEDIASUBTYPE_BINKA_RDFT;
@@ -207,7 +207,7 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			wfe.wBitsPerSample = 16;
 			mt.SetFormat((BYTE*)&wfe, sizeof(wfe));
 			mt.lSampleSize = 1;
-			mts.Add(mt);
+			mts.push_back(mt);
 			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio", this, this, &hr));
 			AddOutputPin(i + 1, pPinOut);
 		}

@@ -342,7 +342,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			Name.Format(L"Output %I64u", (UINT64)pTE->TrackNumber);
 
 			CMediaType mt;
-			CAtlArray<CMediaType> mts;
+			std::vector<CMediaType> mts;
 
 			if (pTE->TrackType == TrackEntry::TypeVideo) {
 				Name.Format(L"Video %d", iVideo++);
@@ -384,10 +384,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mt.SetSampleSize(pvih->bmiHeader.biSizeImage); // fixed frame size
 
 					if (!bHasVideo) {
-						mts.Add(mt);
+						mts.push_back(mt);
 						if (mt.subtype == MEDIASUBTYPE_WVC1) {
 							mt.subtype = MEDIASUBTYPE_WVC1_CYBERLINK;
-							mts.InsertAt(0, mt);
+							mts.insert(mts.cbegin(), mt);
 						}
 
 						if (mt.subtype == MEDIASUBTYPE_HM10) {
@@ -396,7 +396,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								CBaseSplitterFileEx::hevchdr h;
 								CMediaType mt2;
 								if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
-									mts.InsertAt(0, mt2);
+									mts.insert(mts.cbegin(), mt2);
 								}
 							}
 						}
@@ -425,17 +425,17 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					CreateMPEG2VIfromAVC(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 
 					if (!bHasVideo) {
-						mts.Add(mt);
+						mts.push_back(mt);
 
 						if (SUCCEEDED(CreateMPEG2VIfromMVC(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount()))) {
-							mts.InsertAt(0, mt);
+							mts.insert(mts.cbegin(), mt);
 						} else if (pTE->CodecPrivate.IsEmpty()) {
 							CAtlArray<BYTE> pData;
 							if (ReadFirtsBlock(pData, pTE)) {
 								CBaseSplitterFileEx::avchdr h;
 								CMediaType mt2;
 								if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
-									mts.InsertAt(0, mt2);
+									mts.insert(mts.cbegin(), mt2);
 								}
 							}
 						}
@@ -456,7 +456,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					ReduceDim(aspect);
 					CreateMPEG2VISimple(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 					if (!bHasVideo)
-						mts.Add(mt);
+						mts.push_back(mt);
 					bHasVideo = true;
 				} else if (CodecID == "V_DIRAC") {
 					mt.subtype = MEDIASUBTYPE_DiracVideo;
@@ -477,7 +477,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					dvih->cbSequenceHeader = (DWORD)pTE->CodecPrivate.GetCount();
 
 					if (!bHasVideo)
-						mts.Add(mt);
+						mts.push_back(mt);
 					bHasVideo = true;
 				} else if (CodecID == "V_MPEG2") {
 					BYTE* seqhdr = pTE->CodecPrivate.GetData();
@@ -487,7 +487,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					if (MakeMPEG2MediaType(mt, seqhdr, len, w, h)) {
 						if (!bHasVideo)
-							mts.Add(mt);
+							mts.push_back(mt);
 						bHasVideo = true;
 
 						CAtlArray<BYTE> buf;
@@ -516,7 +516,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					mt.SetSampleSize(pm1vi->hdr.bmiHeader.biWidth * pm1vi->hdr.bmiHeader.biHeight * 4);
 					if (!bHasVideo)
-						mts.Add(mt);
+						mts.push_back(mt);
 					bHasVideo = true;
 				} else if (CodecID == "V_MPEGH/ISO/HEVC") {
 					BITMAPINFOHEADER pbmi;
@@ -548,14 +548,14 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 
 					if (!bHasVideo) {
-						mts.Add(mt);
+						mts.push_back(mt);
 						if (pTE->CodecPrivate.IsEmpty()) {
 							CAtlArray<BYTE> pData;
 							if (ReadFirtsBlock(pData, pTE)) {
 								CBaseSplitterFileEx::hevchdr h;
 								CMediaType mt2;
 								if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
-									mts.InsertAt(0, mt2);
+									mts.insert(mts.cbegin(), mt2);
 								}
 							}
 						}
@@ -642,7 +642,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						pvih->bmiHeader.biSizeImage = DIBSIZE(pvih->bmiHeader);
 
 						if (!bHasVideo) {
-							mts.Add(mt);
+							mts.push_back(mt);
 
 							if (CodecID.Left(9) == "V_REAL/RV" && pTE->CodecPrivate.GetCount() > 26) {
 								const BYTE* extra = pTE->CodecPrivate.GetData() + 26;
@@ -650,7 +650,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 								VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + extralen);
 								memcpy(pvih + 1, extra, extralen);
-								mts.InsertAt(0, mt);
+								mts.insert(mts.cbegin(), mt);
 							}
 
 							if (mt.subtype == MEDIASUBTYPE_VP90) {
@@ -810,7 +810,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					pTE->DefaultDuration.Set(AvgTimePerFrame * 100);
 				}
 
-				for (size_t i = 0; i < mts.GetCount(); i++) {
+				for (size_t i = 0; i < mts.size(); i++) {
 					if (mts[i].formattype == FORMAT_VideoInfo
 							|| mts[i].formattype == FORMAT_VideoInfo2
 							|| mts[i].formattype == FORMAT_MPEG2Video
@@ -832,7 +832,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 
 				if (pTE->v.DisplayWidth && pTE->v.DisplayHeight) {
-					for (size_t i = 0; i < mts.GetCount(); i++) {
+					for (size_t i = 0; i < mts.size(); i++) {
 						if (mts[i].formattype == FORMAT_VideoInfo) {
 							DWORD vih1 = FIELD_OFFSET(VIDEOINFOHEADER, bmiHeader);
 							DWORD vih2 = FIELD_OFFSET(VIDEOINFOHEADER2, bmiHeader);
@@ -965,7 +965,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					AV_WB8 (extra + 13, m_ColorSpace ? m_ColorSpace->MatrixCoefficients : AVCOL_SPC_UNSPECIFIED);
 					AV_WB16(extra + 14, 0); // no codec init data
 
-					mts.InsertAt(0, mt);
+					mts.insert(mts.cbegin(), mt);
 				}
 			} else if (pTE->TrackType == TrackEntry::TypeAudio) {
 				Name.Format(L"Audio %d", iAudio++);
@@ -983,7 +983,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				if (CodecID == "A_MPEG/L3") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_MPEGLAYER3);
-					mts.Add(mt);
+					mts.push_back(mt);
 				} else if (CodecID == "A_MPEG/L2" ||
 						   CodecID == "A_MPEG/L1") {
 					WORD layer = CodecID == "A_MPEG/L1" ? 1 : 2;
@@ -1002,17 +1002,17 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					f->fwHeadModeExt	= 0;
 					f->wHeadEmphasis	= 0;
 
-					mts.Add(mt);
+					mts.push_back(mt);
 				} else if (CodecID.Left(5) == "A_AC3") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_DOLBY_AC3);
-					mts.Add(mt);
+					mts.push_back(mt);
 				} else if (CodecID == "A_EAC3") {
 					mt.subtype = MEDIASUBTYPE_DOLBY_DDPLUS;
-					mts.Add(mt);
+					mts.push_back(mt);
 				} else if (CodecID == "A_TRUEHD" ||
 						   CodecID == "A_MLP") {
 					mt.subtype = MEDIASUBTYPE_DOLBY_TRUEHD;
-					mts.Add(mt);
+					mts.push_back(mt);
 				} else if (CodecID == "A_DTS") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_DTS2);
 
@@ -1094,7 +1094,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					m_pFile->Seek(pos);
 
-					mts.Add(mt);
+					mts.push_back(mt);
 				} else if (CodecID == "A_TTA1") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_TTA1);
 					wfe->cbSize = 30;
@@ -1105,13 +1105,13 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					memcpy(p + 8,  &wfe->wBitsPerSample, 2);
 					memcpy(p + 10, &wfe->nSamplesPerSec, 4);
 					memset(p + 14, 0, 30 - 14);
-					mts.Add(mt);
+					mts.push_back(mt);
 				} else if (CodecID == "A_AAC") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_RAW_AAC1);
 					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
 					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
-					mts.Add(mt);
+					mts.push_back(mt);
 				} else if (CodecID.Left(6) == "A_AAC/") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_RAW_AAC1);
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 5);
@@ -1133,21 +1133,21 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 
 					WORD cbSize = MakeAACInitData((BYTE*)(wfe + 1), profile, wfe->nSamplesPerSec, (int)pTE->a.Channels);
-					mts.Add(mt);
+					mts.push_back(mt);
 
 					if (profile < 0) {
 						wfe->cbSize = cbSize;
 						wfe->nSamplesPerSec *= 2;
 						wfe->nAvgBytesPerSec *= 2;
 
-						mts.InsertAt(0, mt);
+						mts.insert(mts.cbegin(), mt);
 					}
 				} else if (CodecID == "A_WAVPACK4") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_WAVPACK4);
 					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
 					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
-					mts.Add(mt);
+					mts.push_back(mt);
 				} else if (CodecID == "A_FLAC") {
 					wfe->wFormatTag = WAVE_FORMAT_FLAC;
 					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
@@ -1155,9 +1155,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 
 					mt.subtype = MEDIASUBTYPE_FLAC_FRAMED;
-					mts.Add(mt);
+					mts.push_back(mt);
 					mt.subtype = MEDIASUBTYPE_FLAC;
-					mts.Add(mt);
+					mts.push_back(mt);
 				} else if (CodecID == "A_PCM/INT/LIT") {
 					mt.subtype = MEDIASUBTYPE_PCM;
 					mt.SetSampleSize(wfe->nBlockAlign);
@@ -1177,7 +1177,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						wfex->dwChannelMask = GetDefChannelMask(wfex->Format.nChannels);
 						wfex->SubFormat = MEDIASUBTYPE_PCM;
 					}
-					mts.Add(mt);
+					mts.push_back(mt);
 				} else if (CodecID == "A_PCM/INT/BIG") {
 					switch (pTE->a.BitDepth) {
 					case 16: mt.subtype = MEDIASUBTYPE_PCM_TWOS; break;
@@ -1188,7 +1188,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						break;
 					}
 					mt.SetSampleSize(wfe->nBlockAlign);
-					mts.Add(mt);
+					mts.push_back(mt);
 				} else if (CodecID == "A_PCM/FLOAT/IEEE") {
 					mt.subtype = MEDIASUBTYPE_IEEE_FLOAT;
 					mt.SetSampleSize(wfe->nBlockAlign);
@@ -1202,7 +1202,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						wfex->dwChannelMask = GetDefChannelMask(wfex->Format.nChannels);
 						wfex->SubFormat = MEDIASUBTYPE_IEEE_FLOAT;
 					}
-					mts.Add(mt);
+					mts.push_back(mt);
 				} else if (CodecID == "A_MS/ACM") {
 					wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(pTE->CodecPrivate.GetCount());
 					memcpy(wfe, (WAVEFORMATEX*)pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
@@ -1210,7 +1210,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mt.subtype = ((WAVEFORMATEXTENSIBLE*)wfe)->SubFormat;
 					}
 					else mt.subtype = FOURCCMap(wfe->wFormatTag);
-					mts.Add(mt);
+					mts.push_back(mt);
 				} else if (CodecID == "A_VORBIS") {
 					CreateVorbisMediaType(mt, mts,
 										  (DWORD)pTE->a.Channels,
@@ -1224,7 +1224,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
 					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
 					wfe->cbSize = 0; // IMPORTANT: this is screwed, but cbSize has to be 0 and the extra data from codec priv must be after WAVEFORMATEX
-					mts.Add(mt);
+					mts.push_back(mt);
 				} else if (CodecID == "A_QUICKTIME" && pTE->CodecPrivate.GetCount() >= 8) {
 					DWORD type = GETDWORD(pTE->CodecPrivate.GetData() + 4);
 					// 'QDM2', 'QDMC', 'ima4'
@@ -1232,20 +1232,20 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
 					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
-					mts.Add(mt);
+					mts.push_back(mt);
 				} else if (CodecID == "A_QUICKTIME/QDM2") {
 					mt.subtype = MEDIASUBTYPE_QDM2;
 					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
 					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
-					mts.Add(mt);
+					mts.push_back(mt);
 				} else if (CodecID.Left(6) == "A_OPUS") {
 					wfe->wFormatTag = WAVE_FORMAT_OPUS;
 					mt.subtype = MEDIASUBTYPE_OPUS;
 					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
 					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
-					mts.Add(mt);
+					mts.push_back(mt);
 				} else if (CodecID == "A_ALAC") {
 					wfe->wFormatTag = WAVE_FORMAT_ALAC;
 					mt.subtype = MEDIASUBTYPE_ALAC;
@@ -1258,7 +1258,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					memcpy(p + 3, &cbSize, 1);
 					memcpy(p + 4, (const unsigned char *)"alac", 4);
 					memcpy(p + 12, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
-					mts.Add(mt);
+					mts.push_back(mt);
 				}
 			} else if (pTE->TrackType == TrackEntry::TypeSubtitle) {
 				Name.Format(L"Subtitle %d", iSubtitle++);
@@ -1269,7 +1269,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mt.majortype = MEDIATYPE_Text;
 					mt.subtype = MEDIASUBTYPE_NULL;
 					mt.formattype = FORMAT_None;
-					mts.Add(mt);
+					mts.push_back(mt);
 					isSub = true;
 				} else {
 					if (CodecID == "S_TEXT/WEBVTT") {
@@ -1306,7 +1306,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						MEDIASUBTYPE_NULL;
 
 					if (mt.subtype != MEDIASUBTYPE_NULL) {
-						mts.Add(mt);
+						mts.push_back(mt);
 						isSub = true;
 
 						if (mt.subtype == MEDIASUBTYPE_HDMVSUB || mt.subtype == MEDIASUBTYPE_DVB_SUBTITLES) {
@@ -1316,7 +1316,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 
-			if (mts.IsEmpty()) {
+			if (mts.empty()) {
 				DLog(L"CMatroskaSplitterFilter::CreateOutputs() : Unsupported TrackType '%S' (%I64u)", CodecID, (UINT64)pTE->TrackType);
 				continue;
 			}
@@ -2435,7 +2435,7 @@ STDMETHODIMP CMatroskaSplitterFilter::GetBin(LPCSTR field, LPVOID *value, unsign
 // CMatroskaSplitterOutputPin
 //
 
-CMatroskaSplitterOutputPin::CMatroskaSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
+CMatroskaSplitterOutputPin::CMatroskaSplitterOutputPin(std::vector<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr)
 {
 	if (mts[0].subtype == MEDIASUBTYPE_HDMVSUB) {

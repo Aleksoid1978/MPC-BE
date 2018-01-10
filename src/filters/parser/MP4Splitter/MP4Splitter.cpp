@@ -429,7 +429,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 
-			CAtlArray<CMediaType> mts;
+			std::vector<CMediaType> mts;
 
 			CMediaType mt;
 			mt.SetSampleSize(1);
@@ -509,11 +509,11 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size);
 								mt.SetSampleSize(pbmi.biSizeImage);
-								mts.Add(mt);
+								mts.push_back(mt);
 
 								MPEG2VIDEOINFO* mvih	= (MPEG2VIDEOINFO*)mt.pbFormat;
 								mt.subtype				= FOURCCMap(mvih->hdr.bmiHeader.biCompression = 'V4PM');
-								mts.Add(mt);
+								mts.push_back(mt);
 							}
 							break;
 						case AP4_JPEG_OTI:
@@ -533,7 +533,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 								CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size);
 								mt.SetSampleSize(pbmi.biSizeImage);
-								mts.Add(mt);
+								mts.push_back(mt);
 							}
 							break;
 						case AP4_MPEG2_VISUAL_SIMPLE_OTI:
@@ -551,7 +551,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									mt = mt2;
 								}
 							}
-							mts.Add(mt);
+							mts.push_back(mt);
 							break;
 						case AP4_MPEG1_VISUAL_OTI:
 							mt.subtype = MEDIASUBTYPE_MPEG1Payload;
@@ -563,7 +563,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									mt = mt2;
 								}
 							}
-							mts.Add(mt);
+							mts.push_back(mt);
 							break;
 					}
 
@@ -615,7 +615,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							if (Mpeg4AudioObjectType == 36) { // ALS Lossless Coding
 								wfe->wFormatTag = WAVE_FORMAT_UNKNOWN;
 								mt.subtype = MEDIASUBTYPE_ALS;
-								mts.Add(mt);
+								mts.push_back(mt);
 								break;
 							}
 
@@ -627,7 +627,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									wfe->nBlockAlign = (WORD)((wfe->nChannels * wfe->wBitsPerSample) / 8);
 								}
 							}
-							mts.Add(mt);
+							mts.push_back(mt);
 							break;
 						case AP4_MPEG2_PART3_AUDIO_OTI:
 						case AP4_MPEG1_AUDIO_OTI:
@@ -640,7 +640,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									mt = mt2;
 								}
 							}
-							mts.Add(mt);
+							mts.push_back(mt);
 							break;
 						case AP4_DTSC_AUDIO_OTI:
 						case AP4_DTSH_AUDIO_OTI:
@@ -681,7 +681,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									}
 								}
 							}
-							mts.Add(mt);
+							mts.push_back(mt);
 							break;
 						case AP4_VORBIS_OTI:
 							CreateVorbisMediaType(mt, mts,
@@ -748,7 +748,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								strncpy_s(psi->IsoLang, TrackLanguage, _countof(psi->IsoLang) - 1);
 								wcsncpy_s(psi->TrackName, TrackName, _countof(psi->TrackName) - 1);
 								memcpy(psi + 1, (LPCSTR)hdr, hdr.GetLength());
-								mts.Add(mt);
+								mts.push_back(mt);
 							}
 							break;
 					}
@@ -776,7 +776,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 						}
 						wcscpy_s(si->TrackName, _countof(si->TrackName), TrackName);
-						mts.Add(mt);
+						mts.push_back(mt);
 					}
 				}
 			} else if (AP4_StsdAtom* stsd = dynamic_cast<AP4_StsdAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stsd"))) {
@@ -812,7 +812,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							if (m_pFile->Read(h, sample.GetSize(), &mt2)) {
 								mt = mt2;
 							}
-							mts.Add(mt);
+							mts.push_back(mt);
 							break;
 						}
 
@@ -900,12 +900,12 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							} else {
 								break; // incorrect or unsupported
 							}
-							mts.Add(mt);
+							mts.push_back(mt);
 							break;
 						}
 
 						mt.subtype = FOURCCMap(fourcc);
-						mts.Add(mt);
+						mts.push_back(mt);
 
 						if (fourcc == FCC('yuv2')
 								|| fourcc == FCC('b16g')
@@ -913,20 +913,20 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								|| fourcc == FCC('b64a')
 							) {
 							mt.subtype = MEDIASUBTYPE_LAV_RAWVIDEO;
-							mts.Add(mt);
+							mts.push_back(mt);
 							break;
 						}
 
 						if (mt.subtype == MEDIASUBTYPE_WVC1) {
 							mt.subtype = MEDIASUBTYPE_WVC1_CYBERLINK;
-							mts.InsertAt(0, mt);
+							mts.insert(mts.cbegin(), mt);
 						}
 
 						_strlwr_s(buff);
 						DWORD typelwr = GETDWORD(buff);
 						if (typelwr != fourcc) {
 							mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = typelwr);
-							mts.Add(mt);
+							mts.push_back(mt);
 							//b_HasVideo = true;
 						}
 
@@ -934,7 +934,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						DWORD typeupr = GETDWORD(buff);
 						if (typeupr != fourcc) {
 							mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = typeupr);
-							mts.Add(mt);
+							mts.push_back(mt);
 							//b_HasVideo = true;
 						}
 
@@ -1005,8 +1005,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size);
 									mt.SetSampleSize(pbmi.biSizeImage);
 
-									mts.RemoveAll();
-									mts.Add(mt);
+									mts.clear();
+									mts.push_back(mt);
 
 									if (!di->GetDataSize()) {
 										switch (type) {
@@ -1191,8 +1191,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 													CreateMPEG2VIfromAVC(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size);
 													mt.SetSampleSize(pbmi.biSizeImage);
 
-													mts.RemoveAll();
-													mts.Add(mt);
+													mts.clear();
+													mts.push_back(mt);
 												}
 												break;
 											default: {
@@ -1200,7 +1200,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 													CBaseSplitterFileEx::avchdr h;
 													CMediaType mt2;
 													if (m_pFile->Read(h, sample.GetSize(), &mt2)) {
-														mts.InsertAt(0, mt2);
+														mts.insert(mts.cbegin(), mt2);
 													}
 												}
 										}
@@ -1241,15 +1241,15 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									CreateMPEG2VISimple(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size, params.profile, params.level, params.nal_length_size);
 									mt.SetSampleSize(pbmi.biSizeImage);
 
-									mts.RemoveAll();
-									mts.Add(mt);
+									mts.clear();
+									mts.push_back(mt);
 
 									if (!di->GetDataSize()) {
 										m_pFile->Seek(sample.GetOffset());
 										CBaseSplitterFileEx::hevchdr h;
 										CMediaType mt2;
 										if (m_pFile->Read(h, sample.GetSize(), &mt2)) {
-											mts.InsertAt(0, mt2);
+											mts.insert(mts.cbegin(), mt2);
 										}
 									}
 								}
@@ -1263,10 +1263,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										memcpy(extra, "vpcC", 4);
 										memcpy(extra + 4, di->GetData(), di->GetDataSize());
 
-										mts.RemoveAll();
+										mts.clear();
 
 										mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = fourcc);
-										mts.Add(mt);
+										mts.push_back(mt);
 									}
 								}
 								break;
@@ -1464,7 +1464,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								wfe->cbSize = extraData->GetDataSize();
 								memcpy(wfe + 1, extraData->GetData(), extraData->GetDataSize());
 							}
-							mts.Add(mt);
+							mts.push_back(mt);
 
 							mt.subtype = MEDIASUBTYPE_FLAC;
 						} else if (type == WAVE_FORMAT_DTS2) {
@@ -1517,7 +1517,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							memcpy(wfe + 1, db.GetData(), db.GetDataSize());
 						}
 
-						mts.Add(mt);
+						mts.push_back(mt);
 
 						if (AP4_DataInfoAtom* WfexAtom = dynamic_cast<AP4_DataInfoAtom*>(ase->GetChild(AP4_ATOM_TYPE_WFEX))) {
 							const AP4_DataBuffer* di = WfexAtom->GetData();
@@ -1526,7 +1526,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								memcpy(wfe, di->GetData(), di->GetDataSize());
 
 								mt.subtype = FOURCCMap(wfe->wFormatTag);
-								mts.InsertAt(0, mt);
+								mts.insert(mts.cbegin(), mt);
 							}
 						}
 
@@ -1537,7 +1537,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								wfe->cbSize = di->GetDataSize();
 								memcpy(wfe + 1, di->GetData(), di->GetDataSize());
 
-								mts.InsertAt(0, mt);
+								mts.insert(mts.cbegin(), mt);
 							}
 						}
 
@@ -1548,7 +1548,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 
-			if (mts.IsEmpty()) {
+			if (mts.empty()) {
 				continue;
 			}
 
@@ -1575,7 +1575,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 
 			if (AP4_Track::TYPE_VIDEO == track->GetType() && videoSize == CSize(0, 0)) {
-				for (int i = 0, j = mts.GetCount(); i < j; ++i) {
+				for (int i = 0, j = mts.size(); i < j; ++i) {
 					BITMAPINFOHEADER bih;
 					if (ExtractBIH(&mts[i], &bih)) {
 						videoSize.cx = bih.biWidth;
@@ -2111,7 +2111,7 @@ CMP4SourceFilter::CMP4SourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
 // CMP4SplitterOutputPin
 //
 
-CMP4SplitterOutputPin::CMP4SplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
+CMP4SplitterOutputPin::CMP4SplitterOutputPin(std::vector<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseSplitterOutputPin(mts, pName, pFilter, pLock, phr)
 {
 }
