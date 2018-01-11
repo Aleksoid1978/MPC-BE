@@ -550,7 +550,7 @@ void CPPageVideo::OnBnClickedDefault()
 
 	SelectByItemData(m_cbDX9SurfaceFormat, D3DFMT_X8R8G8B8);
 	UpdateResizerList(RESIZER_BILINEAR);
-	UpdateDownscalerList(RESIZER_BILINEAR);
+	UpdateDownscalerList(DOWNSCALER_SIMPLE);
 
 	OnFullscreenCheck();
 	OnSurfaceFormatChange();
