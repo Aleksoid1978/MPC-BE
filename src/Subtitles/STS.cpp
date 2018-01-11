@@ -643,7 +643,7 @@ static bool OpenWebVTT(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 			continue;
 		}
 
-		const std::wregex regex(L"^(?:(\\d+):)?(\\d{2}):(\\d{2})(?:[\\.,](\\d{1,3}))? --> (?:(\\d+):)?(\\d{2}):(\\d{2})(?:[\\.,](\\d{1,3}))?");
+		const std::wregex regex(L"^(?:(\\d+):)?(\\d{2}):(\\d{2})(?:[\\.,](\\d{3}))? --> (?:(\\d+):)?(\\d{2}):(\\d{2})(?:[\\.,](\\d{3}))?");
 		std::wcmatch match;
 		if (std::regex_search(buff.GetBuffer(), match, regex) && match.size() == 9) {
 			int hh1 = match[1].matched ? _wtoi(match[1].first) : 0;
