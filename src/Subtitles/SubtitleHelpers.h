@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,24 +29,25 @@ namespace Subtitle
 {
 	static const std::vector<LPCWSTR> subTypesExt = {
 		L"srt", L"ass", L"ssa", L"sub", L"idx",
-		L"smi", L"sup", L"usf", L"mks", L"vtt",
-		L"psb", L"xss", L"rt"
+		L"smi", L"sup", L"usf", L"vtt", L"psb",
+		L"xss", L"txt", L"rt",  L"mks"
 	};
 
 	enum SubType {
 		SRT = 0,
-		SUB,
-		SMI,
-		PSB,
-		SSA,
 		ASS,
+		SSA,
+		SUB,
 		IDX,
+		SMI,
+		SUP,
 		USF,
+		VTT,
+		PSB,
 		XSS,
 		TXT,
 		RT,
-		SUP,
-		VTT
+		MKS
 	};
 
 	LPCWSTR GetSubtitleFileExt(SubType type);
