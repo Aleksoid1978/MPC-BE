@@ -84,7 +84,7 @@ void CRenderersSettings::SetDefault()
 	iSurfaceFormat					= D3DFMT_X8R8G8B8;
 	b10BitOutput					= false;
 	iResizer						= RESIZER_BILINEAR;
-	iDownscaler						= RESIZER_BILINEAR;
+	iDownscaler						= DOWNSCALER_SIMPLE;
 
 	bVSync							= false;
 	bVSyncAccurate					= false;

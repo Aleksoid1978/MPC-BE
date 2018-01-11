@@ -1222,7 +1222,7 @@ HRESULT CDX9RenderingEngine::Resize(IDirect3DTexture9* pTexture, const CRect& sr
 		iResizer = RESIZER_BILINEAR;
 	}
 	if (FAILED(InitShaderResizer(iDownscaler))) {
-		iResizer = RESIZER_BILINEAR;
+		iDownscaler = RESIZER_BILINEAR;
 	}
 
 	const int w1 = srcRect.Width();
