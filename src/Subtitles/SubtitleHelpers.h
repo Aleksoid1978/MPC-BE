@@ -30,7 +30,7 @@ namespace Subtitle
 	static const std::vector<LPCWSTR> subTypesExt = {
 		L"srt", L"ass", L"ssa", L"sub", L"idx",
 		L"smi", L"sup", L"usf", L"vtt", L"psb",
-		L"xss", L"txt", L"rt",  L"mks"
+		L"xss", L"txt", L"rt",  L"mks", L"lrc"
 	};
 
 	enum SubType {
@@ -47,7 +47,8 @@ namespace Subtitle
 		XSS,
 		TXT,
 		RT,
-		MKS
+		MKS,
+		LRC
 	};
 
 	LPCWSTR GetSubtitleFileExt(SubType type);

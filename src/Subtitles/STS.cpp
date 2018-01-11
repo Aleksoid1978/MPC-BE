@@ -683,6 +683,86 @@ static bool OpenWebVTT(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 	return !ret.IsEmpty();
 }
 
+static bool OpenLRC(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
+{
+	CString buff;
+
+	struct lrc {
+		CString text;
+		int start, end;
+	};
+	std::list<lrc> lrc_lines;
+
+	while (file->ReadString(buff)) {
+		FastTrim(buff);
+		if (buff.IsEmpty()) {
+			continue;
+		}
+
+		const std::wregex regex(L"\\[(\\d{2}):(\\d{2})(?:\\.(\\d{2}))?\\]");
+		std::wcmatch match;
+
+		std::vector<int> times;
+		LPCWSTR text = buff.GetBuffer();
+		while (std::regex_search(text, match, regex)) {
+			if (match.size() == 4) {
+				int mm = match[1].matched ? _wtoi(match[1].first) : 0;
+				int ss = match[2].matched ? _wtoi(match[2].first) : 0;
+				int ms = match[3].matched ? _wtoi(match[3].first) : 0;
+
+				times.push_back(((mm * 60) + ss) * 1000 + ms);
+			}
+
+			text = match[0].second;
+		}
+
+		if (times.empty()) {
+			continue;
+		}
+
+		CString txt(text);
+		FastTrim(txt);
+
+		for (const auto& it : times) {
+			lrc_lines.emplace_back(lrc{txt, it, INT_MAX});
+		}
+	}
+
+	if (!lrc_lines.empty()) {
+		lrc_lines.sort([](const lrc& a, const lrc& b) {
+			return a.start < b.start;
+		});
+
+		for (auto it = lrc_lines.begin(); it != lrc_lines.end();) {
+			if (it->text.IsEmpty()) {
+				lrc_lines.erase(it++);
+			} else {
+				if (it != lrc_lines.cend()) {
+					for (auto it2 = it; ++it2 != lrc_lines.cend();) {
+						if (it2->start > it->start
+								|| (it->start == it2->start && it2->text.IsEmpty())) {
+							it->end = it2->start;
+							break;
+						}
+					}
+
+					if (it->end == it->start) {
+						lrc_lines.erase(it++);
+					} else {
+						it++;
+					}
+				}
+			}
+		}
+	}
+
+	for (const auto& it : lrc_lines) {
+		ret.Add(it.text, file->IsUnicode(), it.start, it.end);
+	}
+
+	return !ret.IsEmpty();
+}
+
 static bool OpenSubViewer(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 {
 	STSStyle def;
@@ -1971,6 +2051,7 @@ static OpenFunctStruct OpenFuncts[] = {
 	OpenSubRipper, TIME, Subtitle::SRT,
 	OpenOldSubRipper, TIME, Subtitle::SRT,
 	OpenWebVTT, TIME, Subtitle::SRT,
+	OpenLRC, TIME, Subtitle::SRT,
 	OpenSubViewer, TIME, Subtitle::SUB,
 	OpenMicroDVD, FRAME, Subtitle::SSA,
 	OpenSami, TIME, Subtitle::SMI,
