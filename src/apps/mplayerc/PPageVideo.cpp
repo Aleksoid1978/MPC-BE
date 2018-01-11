@@ -549,7 +549,7 @@ void CPPageVideo::OnBnClickedDefault()
 	m_chk10bitOutput.SetCheck(BST_UNCHECKED);
 
 	SelectByItemData(m_cbDX9SurfaceFormat, D3DFMT_X8R8G8B8);
-	UpdateResizerList(RESIZER_BILINEAR);
+	UpdateResizerList(RESIZER_SHADER_CATMULL4);
 	UpdateDownscalerList(DOWNSCALER_SIMPLE);
 
 	OnFullscreenCheck();
