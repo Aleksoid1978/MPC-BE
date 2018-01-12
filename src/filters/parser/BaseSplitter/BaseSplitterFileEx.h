@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -70,7 +70,7 @@ public:
 		// misc
 		LONG arx, ary;
 		//
-		CAtlArray<BYTE> data;
+		std::vector<BYTE> data;
 
 		seqhdr() {
 			memset(this, 0, sizeof(*this));
@@ -291,7 +291,7 @@ public:
 #pragma pack(pop)
 
 	bool Read(seqhdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = true);
-	bool Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt = nullptr, bool find_sync = true);
+	bool Read(seqhdr& h, std::vector<BYTE>& buf, CMediaType* pmt = nullptr, bool find_sync = true);
 	bool Read(mpahdr& h, int len, CMediaType* pmt = nullptr, bool fAllowV25 = false, bool find_sync = false);
 	bool Read(aachdr& h, int len, CMediaType* pmt = nullptr, bool find_sync = true);
 	bool Read(latm_aachdr& h, int len, CMediaType* pmt = nullptr);
@@ -311,17 +311,17 @@ public:
 	bool Read(dvbsubhdr& h, int len, CMediaType* pmt, LPCSTR language_code, bool bCheckFormat = true);
 	bool Read(teletextsubhdr& h, int len, CMediaType* pmt, LPCSTR language_code, bool bCheckFormat = true);
 
-	bool Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt = nullptr);
+	bool Read(avchdr& h, std::vector<BYTE>& pData, CMediaType* pmt = nullptr);
 	bool Read(avchdr& h, int len, CMediaType* pmt = nullptr);
-	bool Read(avchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt = nullptr);
+	bool Read(avchdr& h, int len, std::vector<BYTE>& pData, CMediaType* pmt = nullptr);
 
-	bool Read(hevchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt = nullptr);
+	bool Read(hevchdr& h, std::vector<BYTE>& pData, CMediaType* pmt = nullptr);
 	bool Read(hevchdr& h, int len, CMediaType* pmt = nullptr);
-	bool Read(hevchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt = nullptr);
+	bool Read(hevchdr& h, int len, std::vector<BYTE>& pData, CMediaType* pmt = nullptr);
 
 	bool Read(adx_adpcm_hdr& h, int len, CMediaType* pmt = nullptr);
 	bool Read(pcm_law_hdr& h, int len, bool bAlaw, CMediaType* pmt = nullptr);
-	bool Read(opus_ts_hdr& h, int len, CAtlArray<BYTE>& extradata, CMediaType* pmt = nullptr);
+	bool Read(opus_ts_hdr& h, int len, std::vector<BYTE>& extradata, CMediaType* pmt = nullptr);
 
 	// LPCM
 	bool ReadDVDLPCMHdr(CMediaType* pmt = nullptr);

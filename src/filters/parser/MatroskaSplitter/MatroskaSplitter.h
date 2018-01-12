@@ -108,7 +108,7 @@ private:
 protected:
 	CAutoPtr<MatroskaReader::CMatroskaFile> m_pFile;
 
-	bool ReadFirtsBlock(CAtlArray<byte>& pData, TrackEntry* pTE);
+	bool ReadFirtsBlock(std::vector<byte>& pData, TrackEntry* pTE);
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 
 	CAtlMap<DWORD, MatroskaReader::TrackEntry*> m_pTrackEntryMap;
