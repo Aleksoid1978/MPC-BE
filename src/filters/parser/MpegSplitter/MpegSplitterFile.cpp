@@ -890,13 +890,13 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len,
 			// Sequence/extension header can be split into multiple packets
 			if (!m_streams[stream_type::video].Find(s)) {
 				seqhdr& h = seqh[s];
-				if (h.data.GetCount()) {
-					if (h.data.GetCount() < 512) {
-						const size_t size = h.data.GetCount();
-						h.data.SetCount(size + (size_t)len);
-						ByteRead(h.data.GetData() + size, len);
+				if (h.data.size()) {
+					if (h.data.size() < 512) {
+						const size_t size = h.data.size();
+						h.data.resize(size + (size_t)len);
+						ByteRead(h.data.data() + size, len);
 					}
-					if (h.data.GetCount() >= 512) {
+					if (h.data.size() >= 512) {
 						if (Read(h, h.data, &s.mt)) {
 							s.codec = stream_codec::MPEG;
 							type = stream_type::video;
@@ -907,8 +907,8 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len,
 					if (Read(h, len, &mt)) {
 						if (m_type == MPEG_TYPES::mpeg_ts) {
 							Seek(start);
-							h.data.SetCount((size_t)len);
-							ByteRead(h.data.GetData(), len);
+							h.data.resize((size_t)len);
+							ByteRead(h.data.data(), len);
 						} else {
 							s.mt = mt;
 							s.codec = stream_codec::MPEG;
@@ -1992,10 +1992,10 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 						if (ext_desc_tag == 0x80) {
 							int channel_config_code = gb.BitRead(8); descriptor_length -= 1;
 							if (channel_config_code >= 0 && channel_config_code <= 0x8) {
-								CAtlArray<BYTE>& extradata = _streamData.pmt.extraData;
-								if (extradata.GetCount() != sizeof(opus_default_extradata)) {
-									extradata.SetCount(sizeof(opus_default_extradata));
-									memcpy(extradata.GetData(), &opus_default_extradata, sizeof(opus_default_extradata));
+								std::vector<BYTE>& extradata = _streamData.pmt.extraData;
+								if (extradata.size() != sizeof(opus_default_extradata)) {
+									extradata.resize(sizeof(opus_default_extradata));
+									memcpy(extradata.data(), &opus_default_extradata, sizeof(opus_default_extradata));
 
 									BYTE channels = 0;
 									extradata[9]  = channels = channel_config_code ? channel_config_code : 2;

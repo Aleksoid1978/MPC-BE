@@ -42,8 +42,8 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 	std::map<WORD, BYTE> m_pid2pes;
 
 	std::map<DWORD, seqhdr> seqh;
-	std::map<DWORD, CAtlArray<BYTE>> avch;
-	std::map<DWORD, CAtlArray<BYTE>> hevch;
+	std::map<DWORD, std::vector<BYTE>> avch;
+	std::map<DWORD, std::vector<BYTE>> hevch;
 
 	template<class T, int validCount = 5>
 	class CValidStream {
@@ -466,7 +466,7 @@ public:
 	struct streamData {
 		struct {
 			char            lang[4] = {};
-			CAtlArray<BYTE> extraData;
+			std::vector<BYTE> extraData;
 			teletextPages   tlxPages;
 		} pmt;
 
@@ -475,7 +475,7 @@ public:
 
 		streamData& operator = (const streamData& src) {
 			strcpy_s(pmt.lang, src.pmt.lang);
-			pmt.extraData.Append(src.pmt.extraData);
+			pmt.extraData.insert(pmt.extraData.end(), src.pmt.extraData.begin(), src.pmt.extraData.end());
 			pmt.tlxPages = src.pmt.tlxPages;
 
 			usePTS = src.usePTS;

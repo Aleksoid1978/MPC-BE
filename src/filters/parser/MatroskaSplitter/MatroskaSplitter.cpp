@@ -226,7 +226,7 @@ static int chroma_pos_to_enum(int xpos, int ypos)
 	return AVCHROMA_LOC_UNSPECIFIED;
 }
 
-bool CMatroskaSplitterFilter::ReadFirtsBlock(CAtlArray<byte>& pData, TrackEntry* pTE)
+bool CMatroskaSplitterFilter::ReadFirtsBlock(std::vector<byte>& pData, TrackEntry* pTE)
 {
 	const __int64 pos = m_pFile->GetPos();
 
@@ -268,19 +268,21 @@ bool CMatroskaSplitterFilter::ReadFirtsBlock(CAtlArray<byte>& pData, TrackEntry*
 				CBinary* pb = bg->Block.BlockData.GetNext(pos2);
 				pTE->Expand(*pb, ContentEncoding::AllFrameContents);
 
-				pData.Copy(*pb);
+				//pData.Copy(*pb); // old code. is it correct?
+				pData.resize((*pb).GetCount());
+				memcpy(pData.data(), (*pb).GetData(), (*pb).GetCount());
 			}
 
 			break;
 		}
-	} while (m_pBlock->NextBlock() && !CheckRequest(nullptr) && pData.IsEmpty());
+	} while (m_pBlock->NextBlock() && !CheckRequest(nullptr) && pData.empty());
 
 	m_pBlock.Free();
 	m_pCluster.Free();
 
 	m_pFile->Seek(pos);
 
-	return !pData.IsEmpty();
+	return !pData.empty();
 }
 
 HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
@@ -391,7 +393,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 
 						if (mt.subtype == MEDIASUBTYPE_HM10) {
-							CAtlArray<BYTE> pData;
+							std::vector<BYTE> pData;
 							if (ReadFirtsBlock(pData, pTE)) {
 								CBaseSplitterFileEx::hevchdr h;
 								CMediaType mt2;
@@ -430,7 +432,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						if (SUCCEEDED(CreateMPEG2VIfromMVC(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount()))) {
 							mts.insert(mts.cbegin(), mt);
 						} else if (pTE->CodecPrivate.IsEmpty()) {
-							CAtlArray<BYTE> pData;
+							std::vector<BYTE> pData;
 							if (ReadFirtsBlock(pData, pTE)) {
 								CBaseSplitterFileEx::avchdr h;
 								CMediaType mt2;
@@ -490,9 +492,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							mts.push_back(mt);
 						bHasVideo = true;
 
-						CAtlArray<BYTE> buf;
-						buf.SetCount(len);
-						memcpy(buf.GetData(), seqhdr, len);
+						std::vector<BYTE> buf;
+						buf.resize(len);
+						memcpy(buf.data(), seqhdr, len);
 						CBaseSplitterFileEx::seqhdr h;
 						if (m_pFile->CBaseSplitterFileEx::Read(h, buf)) {
 							codecAvgTimePerFrame = h.ifps;
@@ -550,7 +552,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (!bHasVideo) {
 						mts.push_back(mt);
 						if (pTE->CodecPrivate.IsEmpty()) {
-							CAtlArray<BYTE> pData;
+							std::vector<BYTE> pData;
 							if (ReadFirtsBlock(pData, pTE)) {
 								CBaseSplitterFileEx::hevchdr h;
 								CMediaType mt2;
@@ -654,9 +656,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 
 							if (mt.subtype == MEDIASUBTYPE_VP90) {
-								CAtlArray<BYTE> pData;
+								std::vector<BYTE> pData;
 								if (ReadFirtsBlock(pData, pTE)) {
-									CGolombBuffer gb(pData.GetData(), pData.GetCount());
+									CGolombBuffer gb(pData.data(), pData.size());
 									const BYTE marker = gb.BitRead(2);
 									if (marker == 0x2) {
 										BYTE profile = gb.BitRead(1);

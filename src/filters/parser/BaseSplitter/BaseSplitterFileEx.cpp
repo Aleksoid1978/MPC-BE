@@ -61,9 +61,9 @@ bool CBaseSplitterFileEx::NextMpegStartCode(BYTE& code, __int64 len)
 
 bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt, bool find_sync)
 {
-	CAtlArray<BYTE> pData;
-	pData.SetCount(len);
-	if (S_OK != ByteRead(pData.GetData(), len)) {
+	std::vector<BYTE> pData;
+	pData.resize(len);
+	if (S_OK != ByteRead(pData.data(), len)) {
 		return false;
 	}
 
@@ -71,11 +71,11 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, int len, CMediaType* pmt, bool find_sy
 }
 
 #define MARKERGB if (gb.BitRead(1) != 1) {DEBUG_ASSERT(0);/* return false;*/}
-bool CBaseSplitterFileEx::Read(seqhdr& h, CAtlArray<BYTE>& buf, CMediaType* pmt, bool find_sync)
+bool CBaseSplitterFileEx::Read(seqhdr& h, std::vector<BYTE>& buf, CMediaType* pmt, bool find_sync)
 {
 	BYTE id = 0;
 
-	CGolombBuffer gb(buf.GetData(), buf.GetCount());
+	CGolombBuffer gb(buf.data(), buf.size());
 	while (!gb.IsEOF() && id != 0xb3) {
 		if (!gb.NextMpegStartCode(id)) {
 			return false;
@@ -1137,11 +1137,11 @@ bool CBaseSplitterFileEx::Read(dirachdr& h, int len, CMediaType* pmt)
 		if ((int)unit_size <= len) {
 			Skip(8);
 			unit_size -= 8;
-			CAtlArray<BYTE> pData;
-			pData.SetCount(unit_size);
-			if (S_OK == ByteRead(pData.GetData(), unit_size)) {
+			std::vector<BYTE> pData;
+			pData.resize(unit_size);
+			if (S_OK == ByteRead(pData.data(), unit_size)) {
 				vc_params_t params;
-				if (!ParseDiracHeader(pData.GetData(), unit_size, params)) {
+				if (!ParseDiracHeader(pData.data(), unit_size, params)) {
 					return false;
 				}
 
@@ -1245,7 +1245,7 @@ bool CBaseSplitterFileEx::Read(teletextsubhdr& h, int len, CMediaType* pmt, LPCS
 }
 
 #define IS_SPS(nalu) (nalu == NALU_TYPE_SPS || nalu == NALU_TYPE_SUBSET_SPS)
-bool CBaseSplitterFileEx::Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
+bool CBaseSplitterFileEx::Read(avchdr& h, std::vector<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
 {
 	NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
 	CH264Nalu Nalu;
@@ -1254,7 +1254,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pm
 		int sps_present = 0;
 		int pps_present = 0;
 
-		Nalu.SetBuffer(pData.GetData(), pData.GetCount());
+		Nalu.SetBuffer(pData.data(), pData.size());
 		Nalu.ReadNext();
 		while (!(sps_present && pps_present)) {
 			NALU_TYPE nalu_type = Nalu.GetType();
@@ -1277,7 +1277,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pm
 		}
 	}
 
-	Nalu.SetBuffer(pData.GetData(), pData.GetCount());
+	Nalu.SetBuffer(pData.data(), pData.size());
 	nalu_type = NALU_TYPE_UNKNOWN;
 	while (!IS_SPS(nalu_type)
 			&& Nalu.ReadNext()) {
@@ -1306,7 +1306,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pm
 				int sps_present = 0;
 				int pps_present = 0;
 
-				Nalu.SetBuffer(pData.GetData(), pData.GetCount());
+				Nalu.SetBuffer(pData.data(), pData.size());
 				while (!(sps_present && pps_present)
 						&& Nalu.ReadNext()) {
 					nalu_type = Nalu.GetType();
@@ -1346,31 +1346,31 @@ bool CBaseSplitterFileEx::Read(avchdr& h, CAtlArray<BYTE>& pData, CMediaType* pm
 		return true;
 	}
 
-	pData.RemoveAll();
+	pData.clear();
 	return false;
 }
 
 bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt/* = nullptr*/)
 {
-	CAtlArray<BYTE> pData;
-	pData.SetCount(len);
-	if (S_OK != ByteRead(pData.GetData(), len)) {
+	std::vector<BYTE> pData;
+	pData.resize(len);
+	if (S_OK != ByteRead(pData.data(), len)) {
 		return false;
 	}
 
 	return Read(h, pData, pmt);
 }
 
-bool CBaseSplitterFileEx::Read(avchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
+bool CBaseSplitterFileEx::Read(avchdr& h, int len, std::vector<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
 {
-	if (pData.IsEmpty()) {
-		CAtlArray<BYTE> pTmpData;
-		pTmpData.SetCount(len);
-		ByteRead(pTmpData.GetData(), len);
+	if (pData.empty()) {
+		std::vector<BYTE> pTmpData;
+		pTmpData.resize(len);
+		ByteRead(pTmpData.data(), len);
 
 		NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
 		CH264Nalu Nalu;
-		Nalu.SetBuffer(pTmpData.GetData(), pTmpData.GetCount());
+		Nalu.SetBuffer(pTmpData.data(), pTmpData.size());
 		while (!IS_SPS(nalu_type)
 				&& Nalu.ReadNext()) {
 			nalu_type = Nalu.GetType();
@@ -1380,18 +1380,18 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CAtlArray<BYTE>& pData, CMedi
 			return false;
 		}
 
-		pData.SetCount(len);
-		memcpy(pData.GetData(), pTmpData.GetData(), len);
+		pData.resize(len);
+		memcpy(pData.data(), pTmpData.data(), len);
 	} else {
-		size_t dataLen = pData.GetCount();
-		pData.SetCount(dataLen + len);
-		ByteRead(pData.GetData() + dataLen, len);
+		size_t dataLen = pData.size();
+		pData.resize(dataLen + len);
+		ByteRead(pData.data() + dataLen, len);
 	}
 
 	return Read(h, pData, pmt);
 }
 
-bool CBaseSplitterFileEx::Read(hevchdr& h, CAtlArray<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
+bool CBaseSplitterFileEx::Read(hevchdr& h, std::vector<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
 {
 	NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
 	CH265Nalu Nalu;
@@ -1400,7 +1400,7 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, CAtlArray<BYTE>& pData, CMediaType* p
 		int vps_present = 0;
 		int sps_present = 0;
 
-		Nalu.SetBuffer(pData.GetData(), pData.GetCount());
+		Nalu.SetBuffer(pData.data(), pData.size());
 		Nalu.ReadNext();
 		while (!(vps_present && sps_present)) {
 			NALU_TYPE nalu_type = Nalu.GetType();
@@ -1422,7 +1422,7 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, CAtlArray<BYTE>& pData, CMediaType* p
 		}
 	}
 
-	Nalu.SetBuffer(pData.GetData(), pData.GetCount());
+	Nalu.SetBuffer(pData.data(), pData.size());
 	nalu_type = NALU_TYPE_UNKNOWN;
 	while (nalu_type != NALU_TYPE_HEVC_SPS && Nalu.ReadNext()) {
 		nalu_type = Nalu.GetType();
@@ -1450,7 +1450,7 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, CAtlArray<BYTE>& pData, CMediaType* p
 				int sps_present = 0;
 				int pps_present = 0;
 
-				Nalu.SetBuffer(pData.GetData(), pData.GetCount());
+				Nalu.SetBuffer(pData.data(), pData.size());
 				while (!(vps_present && sps_present && pps_present)
 						&& Nalu.ReadNext()) {
 					nalu_type = Nalu.GetType();
@@ -1503,31 +1503,31 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, CAtlArray<BYTE>& pData, CMediaType* p
 		return true;
 	}
 
-	pData.RemoveAll();
+	pData.clear();
 	return false;
 }
 
 bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt/* = nullptr*/)
 {
-	CAtlArray<BYTE> pData;
-	pData.SetCount(len);
-	if (S_OK != ByteRead(pData.GetData(), len)) {
+	std::vector<BYTE> pData;
+	pData.resize(len);
+	if (S_OK != ByteRead(pData.data(), len)) {
 		return false;
 	}
 
 	return Read(h, pData, pmt);
 }
 
-bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CAtlArray<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
+bool CBaseSplitterFileEx::Read(hevchdr& h, int len, std::vector<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
 {
-	if (pData.IsEmpty()) {
-		CAtlArray<BYTE> pTmpData;
-		pTmpData.SetCount(len);
-		ByteRead(pTmpData.GetData(), len);
+	if (pData.empty()) {
+		std::vector<BYTE> pTmpData;
+		pTmpData.resize(len);
+		ByteRead(pTmpData.data(), len);
 
 		NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
 		CH265Nalu Nalu;
-		Nalu.SetBuffer(pTmpData.GetData(), pTmpData.GetCount());
+		Nalu.SetBuffer(pTmpData.data(), pTmpData.size());
 		while (nalu_type != NALU_TYPE_HEVC_VPS && Nalu.ReadNext()) {
 			nalu_type = Nalu.GetType();
 		}
@@ -1536,12 +1536,12 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CAtlArray<BYTE>& pData, CMed
 			return false;
 		}
 
-		pData.SetCount(len);
-		memcpy(pData.GetData(), pTmpData.GetData(), len);
+		pData.resize(len);
+		memcpy(pData.data(), pTmpData.data(), len);
 	} else {
-		size_t dataLen = pData.GetCount();
-		pData.SetCount(dataLen + len);
-		ByteRead(pData.GetData() + dataLen, len);
+		size_t dataLen = pData.size();
+		pData.resize(dataLen + len);
+		ByteRead(pData.data() + dataLen, len);
 	}
 
 	return Read(h, pData, pmt);
@@ -1623,9 +1623,9 @@ bool CBaseSplitterFileEx::Read(pcm_law_hdr& h, int len, bool bAlaw, CMediaType* 
 	return true;
 }
 
-bool CBaseSplitterFileEx::Read(opus_ts_hdr& h, int len, CAtlArray<BYTE>& extradata, CMediaType* pmt/* = nullptr*/)
+bool CBaseSplitterFileEx::Read(opus_ts_hdr& h, int len, std::vector<BYTE>& extradata, CMediaType* pmt/* = nullptr*/)
 {
-	if (len < 2 || extradata.GetCount() != 30) {
+	if (len < 2 || extradata.size() != 30) {
 		return false;
 	}
 
@@ -1634,8 +1634,8 @@ bool CBaseSplitterFileEx::Read(opus_ts_hdr& h, int len, CAtlArray<BYTE>& extrada
 	}
 
 	if (pmt) {
-		BYTE* buf = extradata.GetData();
-		const size_t nCount = extradata.GetCount();
+		BYTE* buf = extradata.data();
+		const size_t nCount = extradata.size();
 		CGolombBuffer Buffer(buf + 8, nCount - 8); // skip "OpusHead"
 
 		Buffer.ReadByte();
