@@ -691,7 +691,7 @@ static bool OpenLRC(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 		CString text;
 		int start, end;
 	};
-	std::list<lrc> lrc_lines;
+	std::vector<lrc> lrc_lines;
 
 	while (file->ReadString(buff)) {
 		FastTrim(buff);
@@ -729,31 +729,21 @@ static bool OpenLRC(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 	}
 
 	if (!lrc_lines.empty()) {
-		lrc_lines.sort([](const lrc& a, const lrc& b) {
+		std::sort(lrc_lines.begin(), lrc_lines.end(), [](const lrc& a, const lrc& b) {
 			return a.start < b.start;
 		});
 
-		for (auto it = lrc_lines.begin(); it != lrc_lines.end();) {
-			if (it->text.IsEmpty()) {
-				lrc_lines.erase(it++);
-			} else {
-				if (it != lrc_lines.cend()) {
-					for (auto it2 = it; ++it2 != lrc_lines.cend();) {
-						if (it2->start > it->start
-								|| (it->start == it2->start && it2->text.IsEmpty())) {
-							it->end = it2->start;
-							break;
-						}
-					}
-
-					if (it->end == it->start) {
-						lrc_lines.erase(it++);
-					} else {
-						it++;
-					}
-				}
+		for (size_t i = 0; i < lrc_lines.size() - 1; i++) {
+			if (lrc_lines[i].text.IsEmpty()) {
+				continue;
 			}
+
+			lrc_lines[i].end = lrc_lines[i + 1].start;
 		}
+
+		lrc_lines.erase(std::remove_if(lrc_lines.begin(), lrc_lines.end(), [](const lrc& a) {
+			return (a.text.IsEmpty() || a.start == a.end);
+		}), lrc_lines.end());
 	}
 
 	for (const auto& it : lrc_lines) {
