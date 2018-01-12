@@ -42,7 +42,7 @@ class __declspec(uuid("61F47056-E400-43d3-AF1E-AB7DFFD4C4AD"))
 	};
 	CAtlMap<DWORD, trackpos> m_trackpos;
 
-	CAtlArray<SyncPoint> m_sps;
+	std::vector<SyncPoint> m_sps;
 
 	BOOL bSelectMoofSuccessfully = TRUE;
 

@@ -222,7 +222,7 @@ bool CFLVSplitterFilter::ParseAMF0(UINT64 end, const CString key, CAtlArray<AMF0
 			break;
 		case AMF_DATA_TYPE_OBJECT:
 			{
-				if (key == KEYFRAMES_TAG && m_sps.GetCount() == 0) {
+				if (key == KEYFRAMES_TAG && m_sps.empty()) {
 					CAtlArray<double> times;
 					CAtlArray<double> filepositions;
 					for (;;) {
@@ -256,7 +256,7 @@ bool CFLVSplitterFilter::ParseAMF0(UINT64 end, const CString key, CAtlArray<AMF0
 					if (times.GetCount() && times.GetCount() == filepositions.GetCount()) {
 						for (size_t i = 0; i < times.GetCount(); i++) {
 							SyncPoint sp = {REFERENCE_TIME(times[i] * UNITS), __int64(filepositions[i])};
-							m_sps.Add(sp);
+							m_sps.push_back(sp);
 						}
 					}
 				}
@@ -508,7 +508,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	LONG vHeight  = 0;
 	BYTE vCodecId = 0;
 
-	m_sps.RemoveAll();
+	m_sps.clear();
 
 	BOOL bVideoMetadataExists = FALSE;
 	BOOL bAudioMetadataExists = FALSE;
@@ -1217,7 +1217,7 @@ void CFLVSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 	__int64 estimPos = 0;
 
-	if (m_sps.GetCount() > 1 && rt <= m_sps[m_sps.GetCount() - 1].rt) {
+	if (m_sps.size() > 1 && rt <= m_sps.back().rt) {
 		const int i = range_bsearch(m_sps, rt);
 		if (i >= 0) {
 			estimPos = m_sps[i].fp - 4;
@@ -1367,7 +1367,7 @@ NextTag:
 STDMETHODIMP CFLVSplitterFilter::GetKeyFrameCount(UINT& nKFs)
 {
 	CheckPointer(m_pFile, E_UNEXPECTED);
-	nKFs = m_sps.GetCount();
+	nKFs = m_sps.size();
 	return S_OK;
 }
 
@@ -1381,7 +1381,7 @@ STDMETHODIMP CFLVSplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENCE_TIM
 		return E_INVALIDARG;
 	}
 
-	for (nKFs = 0; nKFs < m_sps.GetCount(); nKFs++) {
+	for (nKFs = 0; nKFs < m_sps.size(); nKFs++) {
 		pKFs[nKFs] = m_sps[nKFs].rt;
 	}
 

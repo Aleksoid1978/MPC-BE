@@ -254,7 +254,7 @@ bool CDSMSplitterFilter::DemuxLoop()
 STDMETHODIMP CDSMSplitterFilter::GetKeyFrameCount(UINT& nKFs)
 {
 	CheckPointer(m_pFile, E_UNEXPECTED);
-	nKFs = m_pFile->m_sps.GetCount();
+	nKFs = m_pFile->m_sps.size();
 	return S_OK;
 }
 
@@ -269,7 +269,7 @@ STDMETHODIMP CDSMSplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENCE_TIM
 	}
 
 	// these aren't really the keyframes, but quicky accessable points in the stream
-	for (nKFs = 0; nKFs < m_pFile->m_sps.GetCount(); nKFs++) {
+	for (nKFs = 0; nKFs < m_pFile->m_sps.size(); nKFs++) {
 		pKFs[nKFs] = m_pFile->m_sps[nKFs].rt;
 	}
 

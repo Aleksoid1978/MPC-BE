@@ -112,7 +112,7 @@ protected:
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 
 	CAtlMap<DWORD, MatroskaReader::TrackEntry*> m_pTrackEntryMap;
-	CAtlArray<MatroskaReader::TrackEntry* > m_pOrderedTrackArray;
+	std::vector<MatroskaReader::TrackEntry* > m_pOrderedTrackArray;
 	MatroskaReader::TrackEntry* GetTrackEntryAt(UINT aTrackIdx);
 
 	bool DemuxInit();

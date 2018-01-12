@@ -1804,7 +1804,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			const AP4_Array<AP4_IndexTableEntry>& entries = movie->GetFragmentsIndexEntries();
 			for (AP4_Cardinal i = 0; i < entries.ItemCount(); ++i) {
 				SyncPoint sp = { entries[i].m_rt, __int64(entries[i].m_offset) };
-				m_sps.Add(sp);
+				m_sps.push_back(sp);
 			}
 		} else {
 			POSITION pos = m_trackpos.GetStartPosition();
@@ -1819,7 +1819,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				const AP4_Array<AP4_IndexTableEntry>& entries = track->GetIndexEntries();
 				for (AP4_Cardinal i = 0; i < entries.ItemCount(); ++i) {
 					SyncPoint sp = { entries[i].m_rt, __int64(entries[i].m_offset) };
-					m_sps.Add(sp);
+					m_sps.push_back(sp);
 				}
 
 				break;
@@ -2058,7 +2058,7 @@ STDMETHODIMP CMP4SplitterFilter::GetKeyFrameCount(UINT& nKFs)
 {
 	CheckPointer(m_pFile, E_UNEXPECTED);
 
-	nKFs = m_sps.GetCount();
+	nKFs = m_sps.size();
 	return S_OK;
 }
 
@@ -2072,7 +2072,7 @@ STDMETHODIMP CMP4SplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENCE_TIM
 		return E_INVALIDARG;
 	}
 
-	for (nKFs = 0; nKFs < m_sps.GetCount(); nKFs++) {
+	for (nKFs = 0; nKFs < m_sps.size(); nKFs++) {
 		pKFs[nKFs] = m_sps[nKFs].rt;
 	}
 
