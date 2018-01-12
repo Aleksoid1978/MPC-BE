@@ -293,7 +293,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_pFile.Free();
 	m_pTrackEntryMap.RemoveAll();
-	m_pOrderedTrackArray.RemoveAll();
+	m_pOrderedTrackArray.clear();
 
 	CAtlArray<CMatroskaSplitterOutputPin*> pinOut;
 	CAtlArray<TrackEntry*> pinOutTE;
@@ -1365,7 +1365,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		if (pTE != nullptr) {
 			AddOutputPin((DWORD)pTE->TrackNumber, pPinOut);
 			m_pTrackEntryMap[(DWORD)pTE->TrackNumber] = pTE;
-			m_pOrderedTrackArray.Add(pTE);
+			m_pOrderedTrackArray.push_back(pTE);
 		}
 	}
 
@@ -1472,11 +1472,11 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		while (pos2) {
 			AttachedFile* pF = pA->AttachedFiles.GetNext(pos2);
 
-			CAtlArray<BYTE> pData;
-			pData.SetCount((size_t)pF->FileDataLen);
+			std::vector<BYTE> pData;
+			pData.resize((size_t)pF->FileDataLen);
 			m_pFile->Seek(pF->FileDataPos);
-			if (SUCCEEDED(m_pFile->ByteRead(pData.GetData(), pData.GetCount()))) {
-				ResAppend(pF->FileName, pF->FileDescription, CString(pF->FileMimeType), pData.GetData(), (DWORD)pData.GetCount());
+			if (SUCCEEDED(m_pFile->ByteRead(pData.data(), pData.size()))) {
+				ResAppend(pF->FileName, pF->FileDescription, CString(pF->FileMimeType), pData.data(), (DWORD)pData.size());
 			}
 		}
 	}
@@ -2179,7 +2179,7 @@ CMatroskaSourceFilter::CMatroskaSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
 
 TrackEntry* CMatroskaSplitterFilter::GetTrackEntryAt(UINT aTrackIdx)
 {
-	if (aTrackIdx >= m_pOrderedTrackArray.GetCount()) {
+	if (aTrackIdx >= m_pOrderedTrackArray.size()) {
 		return nullptr;
 	}
 	return m_pOrderedTrackArray[aTrackIdx];

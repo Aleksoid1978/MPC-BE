@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -206,10 +206,10 @@ bool CDSMSplitterFile::Read(__int64 len, CPacket* p, bool fData)
 	return true;
 }
 
-bool CDSMSplitterFile::Read(__int64 len, CAtlArray<SyncPoint>& sps)
+bool CDSMSplitterFile::Read(__int64 len, std::vector<SyncPoint>& sps)
 {
 	SyncPoint sp = {0, 0};
-	sps.RemoveAll();
+	sps.clear();
 
 	while (len > 0) {
 		bool fSign = !!BitRead(1);
@@ -219,13 +219,13 @@ bool CDSMSplitterFile::Read(__int64 len, CAtlArray<SyncPoint>& sps)
 
 		sp.rt += (REFERENCE_TIME)BitRead(iTimeStamp<<3) * (fSign ? -1 : 1);
 		sp.fp += BitRead(iFilePos<<3);
-		sps.Add(sp);
+		sps.push_back(sp);
 
 		len -= 1 + iTimeStamp + iFilePos;
 	}
 
 	if (len != 0) {
-		sps.RemoveAll();
+		sps.clear();
 		return false;
 	}
 
@@ -306,7 +306,7 @@ __int64 CDSMSplitterFile::Read(__int64 len, CStringW& str)
 
 __int64 CDSMSplitterFile::FindSyncPoint(REFERENCE_TIME rt)
 {
-	if (/*!m_sps.IsEmpty()*/ m_sps.GetCount() > 1) {
+	if (/*!m_sps.IsEmpty()*/ m_sps.size() > 1) {
 		int i = range_bsearch(m_sps, m_rtFirst + rt);
 		return i >= 0 ? m_sps[i].fp : 0;
 	}

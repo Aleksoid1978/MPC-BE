@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -124,7 +124,7 @@ class __declspec(uuid("47E792CF-0BBE-4F7A-859C-194B0768650A"))
 		}
 	};
 
-	CAtlArray<SyncPoint> m_sps;
+	std::vector<SyncPoint> m_sps;
 
 	CString AMF0GetString(UINT64 end);
 	bool ParseAMF0(UINT64 end, const CString key, CAtlArray<AMF0> &AMF0Array);

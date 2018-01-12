@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -509,14 +509,14 @@ bool TrackEntry::Expand(CBinary& data, UINT64 Scope)
 		return true;
 	}
 
-	CAtlArray<ContentEncoding*> cearray;
+	std::vector<ContentEncoding*> cearray;
 	POSITION pos = ces.ce.GetHeadPosition();
 	while (pos) {
-		cearray.Add(ces.ce.GetNext(pos));
+		cearray.push_back(ces.ce.GetNext(pos));
 	}
-	qsort(cearray.GetData(), cearray.GetCount(), sizeof(ContentEncoding*), cesort);
+	qsort(cearray.data(), cearray.size(), sizeof(ContentEncoding*), cesort);
 
-	for (int i = (int)cearray.GetCount()-1; i >= 0; i--) {
+	for (int i = (int)cearray.size()-1; i >= 0; i--) {
 		ContentEncoding* ce = cearray[i];
 
 		if (!(ce->ContentEncodingScope & Scope)) {
