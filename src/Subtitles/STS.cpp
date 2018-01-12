@@ -723,8 +723,8 @@ static bool OpenLRC(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 		CString txt(text);
 		FastTrim(txt);
 
-		for (const auto& it : times) {
-			lrc_lines.emplace_back(lrc{txt, it, INT_MAX});
+		for (const auto& time : times) {
+			lrc_lines.emplace_back(lrc{ txt, time, time });
 		}
 	}
 
@@ -734,20 +734,15 @@ static bool OpenLRC(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 		});
 
 		for (size_t i = 0; i < lrc_lines.size() - 1; i++) {
-			if (lrc_lines[i].text.IsEmpty()) {
-				continue;
-			}
-
 			lrc_lines[i].end = lrc_lines[i + 1].start;
 		}
-
-		lrc_lines.erase(std::remove_if(lrc_lines.begin(), lrc_lines.end(), [](const lrc& a) {
-			return (a.text.IsEmpty() || a.start == a.end);
-		}), lrc_lines.end());
+		lrc_lines.back().end = lrc_lines.back().start + 10000; // 10 seconds
 	}
 
-	for (const auto& it : lrc_lines) {
-		ret.Add(it.text, file->IsUnicode(), it.start, it.end);
+	for (const auto& line : lrc_lines) {
+		if (line.text.GetLength() && line.start < line.end) {
+			ret.Add(line.text, file->IsUnicode(), line.start, line.end);
+		}
 	}
 
 	return !ret.IsEmpty();
