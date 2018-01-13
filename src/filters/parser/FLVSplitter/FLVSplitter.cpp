@@ -184,7 +184,7 @@ CString CFLVSplitterFilter::AMF0GetString(UINT64 end)
 	return CString(name);
 }
 
-bool CFLVSplitterFilter::ParseAMF0(UINT64 end, const CString key, CAtlArray<AMF0> &AMF0Array)
+bool CFLVSplitterFilter::ParseAMF0(UINT64 end, const CString key, std::vector<AMF0> &AMF0Array)
 {
 	if (UINT64(m_pFile->GetPos()) >= (end - 2)) {
 		return false;
@@ -223,38 +223,43 @@ bool CFLVSplitterFilter::ParseAMF0(UINT64 end, const CString key, CAtlArray<AMF0
 		case AMF_DATA_TYPE_OBJECT:
 			{
 				if (key == KEYFRAMES_TAG && m_sps.empty()) {
-					CAtlArray<double> times;
-					CAtlArray<double> filepositions;
+					std::vector<double> times;
+					std::vector<double> filepositions;
+
 					for (;;) {
-						CString name	= AMF0GetString(end);
+						CString name = AMF0GetString(end);
 						if (name.IsEmpty()) {
 							break;
 						}
-						BYTE value		= m_pFile->BitRead(8);
+						BYTE value = m_pFile->BitRead(8);
 						if (value != AMF_DATA_TYPE_ARRAY) {
 							break;
 						}
-						WORD arraylen	= m_pFile->BitRead(32);
-						CAtlArray<double>* array = nullptr;
+						unsigned arraylen = m_pFile->BitRead(32);
+						if (arraylen >> 28) {
+							break;
+						}
+						std::vector<double>* array = nullptr;
+
 						if (name == KEYFRAMES_BYTEOFFSET_TAG) {
-							array		= &filepositions;
+							array = &filepositions;
 						} else if (name == KEYFRAMES_TIMESTAMP_TAG) {
-							array		= &times;
+							array = &times;
 						} else {
 							break;
 						}
 
-						for (int i = 0; i < arraylen; i++) {
+						for (unsigned i = 0; i < arraylen; i++) {
 							BYTE value = m_pFile->BitRead(8);
 							if (value != AMF_DATA_TYPE_NUMBER) {
 								break;
 							}
-							array->Add(int64toDouble(m_pFile->BitRead(64)));
+							array->push_back(int64toDouble(m_pFile->BitRead(64)));
 						}
 					}
 
-					if (times.GetCount() && times.GetCount() == filepositions.GetCount()) {
-						for (size_t i = 0; i < times.GetCount(); i++) {
+					if (times.size() == filepositions.size()) {
+						for (size_t i = 0; i < times.size(); i++) {
 							SyncPoint sp = {REFERENCE_TIME(times[i] * UNITS), __int64(filepositions[i])};
 							m_sps.push_back(sp);
 						}
@@ -297,7 +302,7 @@ bool CFLVSplitterFilter::ParseAMF0(UINT64 end, const CString key, CAtlArray<AMF0
 	}
 
 	if (amf0.type != AMF_DATA_TYPE_EMPTY) {
-		AMF0Array.Add(amf0);
+		AMF0Array.push_back(amf0);
 	}
 
 	return true;
@@ -557,10 +562,10 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				memset(name, 0, 11);
 				m_pFile->ByteRead((BYTE*)name, length);
 				if (!strncmp(name, "onTextData", length) || (!strncmp(name, "onMetaData", length))) {
-					CAtlArray<AMF0> AMF0Array;
+					std::vector<AMF0> AMF0Array;
 					ParseAMF0(next, CString(name), AMF0Array);
 
-					for (size_t i = 0; i < AMF0Array.GetCount(); i++) {
+					for (size_t i = 0; i < AMF0Array.size(); i++) {
 						if (AMF0Array[i].type == AMF_DATA_TYPE_NUMBER) {
 							if (AMF0Array[i].name == L"width") {
 								vWidth = (LONG)((double)AMF0Array[i]);

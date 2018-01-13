@@ -127,7 +127,7 @@ class __declspec(uuid("47E792CF-0BBE-4F7A-859C-194B0768650A"))
 	std::vector<SyncPoint> m_sps;
 
 	CString AMF0GetString(UINT64 end);
-	bool ParseAMF0(UINT64 end, const CString key, CAtlArray<AMF0> &AMF0Array);
+	bool ParseAMF0(UINT64 end, const CString key, std::vector<AMF0> &AMF0Array);
 
 protected:
 	CAutoPtr<CBaseSplitterFileEx> m_pFile;
