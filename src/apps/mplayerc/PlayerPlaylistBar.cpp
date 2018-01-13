@@ -1931,16 +1931,16 @@ void CPlayerPlaylistBar::OnLvnKeyDown(NMHDR* pNMHDR, LRESULT* pResult)
 	}
 
 	if (pLVKeyDown->wVKey == VK_DELETE && items.size() > 0) {
-		for (const auto& item : items) {
-			if (m_pl.RemoveAt(FindPos(item))) {
+		for (int i = (int)items.size() - 1; i >= 0; --i) {
+			if (m_pl.RemoveAt(FindPos(items[i]))) {
 				m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 			}
-			m_list.DeleteItem(item);
+			m_list.DeleteItem(items[i]);
 		}
 
 		m_list.SetItemState(-1, 0, LVIS_SELECTED);
 		m_list.SetItemState(
-			std::max(std::min(items.back(), m_list.GetItemCount()-1), 0),
+			std::max(std::min(items.front(), m_list.GetItemCount() - 1), 0),
 			LVIS_SELECTED, LVIS_SELECTED);
 
 		ResizeListColumn();
@@ -2438,7 +2438,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 					items.push_back(m_list.GetNextSelectedItem(pos));
 				}
 
-				for (int i = (int)items.size()-1; i >= 0; --i) {
+				for (int i = (int)items.size() - 1; i >= 0; --i) {
 					if (m_pl.RemoveAt(FindPos(items[i]))) {
 						m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 					}
@@ -2447,7 +2447,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 
 				m_list.SetItemState(-1, 0, LVIS_SELECTED);
 				m_list.SetItemState(
-					std::max(std::min(items.back(), m_list.GetItemCount()-1), 0),
+					std::max(std::min(items.front(), m_list.GetItemCount() - 1), 0),
 					LVIS_SELECTED, LVIS_SELECTED);
 
 				ResizeListColumn();
