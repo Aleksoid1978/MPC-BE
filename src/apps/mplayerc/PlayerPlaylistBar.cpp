@@ -2438,11 +2438,11 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 					items.push_back(m_list.GetNextSelectedItem(pos));
 				}
 
-				for (const auto& item : items) {
-					if (m_pl.RemoveAt(FindPos(item))) {
+				for (int i = (int)items.size()-1; i >= 0; --i) {
+					if (m_pl.RemoveAt(FindPos(items[i]))) {
 						m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 					}
-					m_list.DeleteItem(item);
+					m_list.DeleteItem(items[i]);
 				}
 
 				m_list.SetItemState(-1, 0, LVIS_SELECTED);
