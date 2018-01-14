@@ -2280,6 +2280,7 @@ void CPlayerPlaylistBar::DropItemOnList()
 	const int nColumnCount = ((CHeaderCtrl*)m_list.GetDlgItem(0))->GetItemCount();
 
 	int dropIdx = m_nDropIndex;
+	// copy dragged items to new positions
 	for (const auto& dragIdx : m_DragIndexes) {
 		lvi.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_STATE | LVIF_PARAM;
 		lvi.iItem = dragIdx;
@@ -2296,6 +2297,7 @@ void CPlayerPlaylistBar::DropItemOnList()
 			}
 		}
 
+		// copy data from other columns
 		for (int col = 1; col < nColumnCount; col++) {
 			lvi.mask = LVIF_TEXT;
 			wcscpy_s(lvi.pszText, MAX_PATH, (LPCTSTR)(m_list.GetItemText(dragIdx, col)));
@@ -2306,6 +2308,7 @@ void CPlayerPlaylistBar::DropItemOnList()
 		dropIdx++;
 	}
 
+	// delete dragged items in old positions
 	for (int i = (int)m_DragIndexes.size()-1; i >= 0; --i) {
 		m_list.DeleteItem(m_DragIndexes[i]);
 	}

@@ -197,9 +197,9 @@ private:
 
 	CImageList* m_pDragImage;
 	BOOL m_bDragging;
-	int m_nDragIndex;
-	std::vector<int> m_DragIndexes;
-	int m_nDropIndex;
+	int m_nDragIndex;               // dragged item for which the mouse is dragged
+	std::vector<int> m_DragIndexes; // all selected dragged items
+	int m_nDropIndex;               // the position where dragged items will be moved
 
 	CPoint m_ptDropPoint;
 
