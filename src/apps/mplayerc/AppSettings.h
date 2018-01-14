@@ -22,6 +22,7 @@
 #pragma once
 
 #include <list>
+#include <map>
 #include "SettingsDefines.h"
 #include "FilterEnum.h"
 #include "../../filters/renderer/VideoRenderers/RenderersSettings.h"
@@ -398,21 +399,18 @@ public:
 
 
 class CFiltersPrioritySettings {
-	template <class T = CString, class S = CString>
-	class CAtlStringMap : public CAtlMap<S, T, CStringElementTraits<S> > {};
-
 public:
-	CAtlStringMap<CLSID> values;
+	std::map<CString, CLSID> values;
 
 	CFiltersPrioritySettings() {
 		SetDefault();
 	}
 	void SetDefault() {
-		static CString formats[] = {L"http", L"avi", L"mkv", L"mpegts", L"mpeg", L"mp4", L"flv", L"wmv"};
+		static LPCWSTR formats[] = {L"http", L"avi", L"mkv", L"mpegts", L"mpeg", L"mp4", L"flv", L"wmv"};
 
-		values.RemoveAll();
-		for (size_t i = 0; i < _countof(formats); i++) {
-			values[formats[i]] = CLSID_NULL;
+		values.clear();
+		for (const auto& format : formats) {
+			values[format] = CLSID_NULL;
 		}
 	};
 

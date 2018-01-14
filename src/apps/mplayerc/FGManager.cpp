@@ -451,8 +451,8 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 		CMediaFormatCategory* mfc = s.m_Formats.FindMediaByExt(ext);
 		if (mfc || httpbuf.size()) {
 			CString type = httpbuf.size() ? L"http" : mfc->GetLabel();
-			CLSID clsid_value = CLSID_NULL;
-			if (s.FiltersPrioritySettings.values.Lookup(type, clsid_value) && clsid_value != CLSID_NULL) {
+			if (const auto& it = s.FiltersPrioritySettings.values.find(type); it != s.FiltersPrioritySettings.values.cend() && it->second != CLSID_NULL) {
+				const auto& clsid_value = it->second;
 				POSITION pos = m_override.GetHeadPosition();
 				while (pos) {
 					CFGFilter* pFGF = m_override.GetNext(pos);
