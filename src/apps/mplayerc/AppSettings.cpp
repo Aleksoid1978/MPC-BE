@@ -45,10 +45,8 @@ const LPCWSTR channel_mode_sets[] = {
 
 void CFiltersPrioritySettings::SaveSettings()
 {
-	POSITION pos = values.GetStartPosition();
-	while (pos) {
-		CAtlStringMap<CLSID>::CPair* pPair = values.GetNext(pos);
-		AfxGetMyApp()->WriteProfileString(IDS_R_FILTERS_PRIORITY, pPair->m_key, CStringFromGUID(pPair->m_value));
+	for (const auto& [format, guid] : values) {
+		AfxGetMyApp()->WriteProfileString(IDS_R_FILTERS_PRIORITY, format, CStringFromGUID(guid));
 	}
 };
 
@@ -56,10 +54,8 @@ void CFiltersPrioritySettings::LoadSettings()
 {
 	SetDefault();
 
-	POSITION pos = values.GetStartPosition();
-	while (pos) {
-		CAtlStringMap<CLSID>::CPair* pPair = values.GetNext(pos);
-		pPair->m_value = GUIDFromCString(AfxGetMyApp()->GetProfileString(IDS_R_FILTERS_PRIORITY, pPair->m_key, CStringFromGUID(pPair->m_value)));
+	for (auto& [format, guid] : values) {
+		guid = GUIDFromCString(AfxGetMyApp()->GetProfileString(IDS_R_FILTERS_PRIORITY, format, CStringFromGUID(guid)));
 	}
 };
 
