@@ -179,19 +179,19 @@ void CWAVFile::SetProperties(IBaseFilter* pBF)
 {
 	if (m_info.size() > 0) {
 		if (CComQIPtr<IDSMPropertyBag> pPB = pBF) {
-			for (const auto& info : m_info) {
-				switch (info.first) {
+			for (const auto& [tag, value] : m_info) {
+				switch (tag) {
 				case FCC('INAM'):
-					pPB->SetProperty(L"TITL", CStringW(info.second));
+					pPB->SetProperty(L"TITL", CString(value));
 					break;
 				case FCC('IART'):
-					pPB->SetProperty(L"AUTH", CStringW(info.second));
+					pPB->SetProperty(L"AUTH", CString(value));
 					break;
 				case FCC('ICOP'):
-					pPB->SetProperty(L"CPYR", CStringW(info.second));
+					pPB->SetProperty(L"CPYR", CString(value));
 					break;
 				case FCC('ISBJ'):
-					pPB->SetProperty(L"DESC", CStringW(info.second));
+					pPB->SetProperty(L"DESC", CString(value));
 					break;
 				}
 			}
