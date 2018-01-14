@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -258,15 +258,12 @@ CFGManagerBDA::CFGManagerBDA(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd)
 	m_fHideWindow = false;
 
 	// Hack : remove audio switcher !
-	POSITION pos = m_transform.GetHeadPosition();
-	while (pos) {
-		CFGFilter* pFGF = m_transform.GetAt(pos);
-		if (pFGF->GetCLSID() == __uuidof(CAudioSwitcherFilter)) {
-			m_transform.RemoveAt (pos);
-			delete pFGF;
+	for (auto it = m_transform.cbegin(); it != m_transform.cend(); ++it) {
+		if ((*it)->GetCLSID() == __uuidof(CAudioSwitcherFilter)) {
+			delete *it;
+			m_transform.erase(it);
 			break;
 		}
-		m_transform.GetNext(pos);
 	}
 	LOG (L"CFGManagerBDA object created.");
 }
