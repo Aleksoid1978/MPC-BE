@@ -786,8 +786,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 				return TRUE;
 			} else if (pMsg->wParam == VK_RETURN) {
 				if (m_list.GetSelectedCount() == 1) {
-					POSITION pos = m_list.GetFirstSelectedItemPosition();
-					int item = m_list.GetNextSelectedItem(pos);
+					const int item = m_list.GetNextItem(-1, LVNI_SELECTED);
 
 					m_pl.SetPos(FindPos(item));
 					m_pMainFrame->OpenCurPlaylistItem();
@@ -2135,6 +2134,26 @@ void CPlayerPlaylistBar::OnBeginDrag(NMHDR* pNMHDR, LRESULT* pResult)
 
 	m_nDragIndex = ((LPNMLISTVIEW)pNMHDR)->iItem;
 
+	UINT nSelected = m_list.GetSelectedCount();
+	m_DragIndexes.clear();
+	m_DragIndexes.reserve(nSelected);
+
+	int nItem = -1;
+	bool valid = false;
+	for (UINT i = 0; i < nSelected; i++) {
+		nItem = m_list.GetNextItem(nItem, LVNI_SELECTED);
+		m_DragIndexes.push_back(nItem);
+		if (nItem == m_nDragIndex) {
+			valid = true;
+		}
+	}
+
+	if (!valid) {
+		ASSERT(0);
+		m_DragIndexes.resize(1);
+		m_DragIndexes.front() = m_nDragIndex;
+	}
+
 	CPoint p(0, 0);
 	m_pDragImage = m_list.CreateDragImageEx(&p);
 
@@ -2245,37 +2264,51 @@ void CPlayerPlaylistBar::DropItemOnList()
 	m_ptDropPoint.y += 10;
 	m_nDropIndex = m_list.HitTest(CPoint(10, m_ptDropPoint.y));
 
-	WCHAR szLabel[MAX_PATH];
-	LV_ITEM lvi;
-	ZeroMemory(&lvi, sizeof(LV_ITEM));
-	lvi.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_STATE | LVIF_PARAM;
-	lvi.stateMask = LVIS_DROPHILITED | LVIS_FOCUSED | LVIS_SELECTED;
-	lvi.pszText = szLabel;
-	lvi.iItem = m_nDragIndex;
-	lvi.cchTextMax = MAX_PATH;
-	m_list.GetItem(&lvi);
-
+	if (m_nDropIndex == m_nDragIndex || m_DragIndexes.empty()) {
+		return;
+	}
 	if (m_nDropIndex < 0) {
 		m_nDropIndex = m_list.GetItemCount();
 	}
-	lvi.iItem = m_nDropIndex;
-	m_list.InsertItem(&lvi);
 
-	CHeaderCtrl* pHeader = (CHeaderCtrl*)m_list.GetDlgItem(0);
-	int nColumnCount = pHeader->GetItemCount();
-	lvi.mask = LVIF_TEXT;
-	lvi.iItem = m_nDropIndex;
-	//INDEX OF DRAGGED ITEM WILL CHANGE IF ITEM IS DROPPED ABOVE ITSELF
-	if (m_nDropIndex < m_nDragIndex) {
-		m_nDragIndex++;
-	}
-	for (int col=1; col < nColumnCount; col++) {
-		wcscpy_s(lvi.pszText, MAX_PATH, (LPCTSTR)(m_list.GetItemText(m_nDragIndex, col)));
-		lvi.iSubItem = col;
-		m_list.SetItem(&lvi);
+	WCHAR szLabel[MAX_PATH];
+	LV_ITEM lvi = {};
+	lvi.stateMask = LVIS_DROPHILITED | LVIS_FOCUSED | LVIS_SELECTED;
+	lvi.pszText = szLabel;
+	lvi.cchTextMax = MAX_PATH;
+
+	const int nColumnCount = ((CHeaderCtrl*)m_list.GetDlgItem(0))->GetItemCount();
+
+	int dropIdx = m_nDropIndex;
+	for (const auto& dragIdx : m_DragIndexes) {
+		lvi.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_STATE | LVIF_PARAM;
+		lvi.iItem = dragIdx;
+		lvi.iSubItem = 0;
+		m_list.GetItem(&lvi);
+
+		lvi.iItem = dropIdx;
+		m_list.InsertItem(&lvi);
+
+		// update m_DragIndexes
+		for (auto& idx : m_DragIndexes) {
+			if (idx >= dropIdx) {
+				idx += 1;
+			}
+		}
+
+		for (int col = 1; col < nColumnCount; col++) {
+			lvi.mask = LVIF_TEXT;
+			wcscpy_s(lvi.pszText, MAX_PATH, (LPCTSTR)(m_list.GetItemText(dragIdx, col)));
+			lvi.iSubItem = col;
+			m_list.SetItem(&lvi);
+		}
+
+		dropIdx++;
 	}
 
-	m_list.DeleteItem(m_nDragIndex);
+	for (int i = (int)m_DragIndexes.size()-1; i >= 0; --i) {
+		m_list.DeleteItem(m_DragIndexes[i]);
+	}
 
 	std::list<CPlaylistItem> tmp;
 	UINT id = (UINT)-1;
