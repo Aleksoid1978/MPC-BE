@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -197,7 +197,10 @@ private:
 
 	CImageList* m_pDragImage;
 	BOOL m_bDragging;
-	int m_nDragIndex, m_nDropIndex;
+	int m_nDragIndex;
+	std::vector<int> m_DragIndexes;
+	int m_nDropIndex;
+
 	CPoint m_ptDropPoint;
 
 	void DropItemOnList();
