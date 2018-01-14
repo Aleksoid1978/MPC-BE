@@ -399,16 +399,16 @@ void CDFFFile::SetProperties(IBaseFilter* pBF)
 {
 	if (m_info.size() > 0) {
 		if (CComQIPtr<IDSMPropertyBag> pPB = pBF) {
-			for (const auto& info : m_info) {
-				switch (info.first) {
+			for (const auto& [tag, value] : m_info) {
+				switch (tag) {
 				case FCC('DITI'):
-					pPB->SetProperty(L"TITL", CString(info.second));
+					pPB->SetProperty(L"TITL", CString(value));
 					break;
 				case FCC('DIAR'):
-					pPB->SetProperty(L"AUTH", CString(info.second));
+					pPB->SetProperty(L"AUTH", CString(value));
 					break;
 				case FCC('COMT'):
-					pPB->SetProperty(L"DESC", CString(info.second));
+					pPB->SetProperty(L"DESC", CString(value));
 				}
 			}
 		}

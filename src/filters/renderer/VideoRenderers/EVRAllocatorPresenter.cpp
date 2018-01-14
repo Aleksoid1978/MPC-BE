@@ -2595,9 +2595,7 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 
 				double BestVal = 0.0;
 				int BestNum = 5;
-				for (const auto& item : Map) {
-					auto Key = item.first;
-					auto Value = item.second.m_Int;
+				for (const auto& [Key, Value] : Map) {
 					if (Value > BestNum && Key != 0.0) {
 						BestNum = Value;
 						BestVal = Key;

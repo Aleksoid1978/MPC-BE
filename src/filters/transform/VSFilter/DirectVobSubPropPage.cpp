@@ -252,9 +252,7 @@ void CDVSBasePPage::AttachControls()
 
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	for (const auto& control : m_controls) {
-		UINT id = control.first;
-		CWnd* pControl = control.second;
+	for (const auto& [id, pControl] : m_controls) {
 		if (pControl) {
 			BOOL fRet = pControl->Attach(GetDlgItem(m_Dlg, id));
 			ASSERT(fRet);

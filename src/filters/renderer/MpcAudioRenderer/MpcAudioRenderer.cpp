@@ -867,7 +867,7 @@ STDMETHODIMP CMpcAudioRenderer::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD* p
 		return S_FALSE;
 	}
 
-	const auto& device = devicesList[lIndex];
+	const auto& [deviceName, deviceId] = devicesList[lIndex];
 
 	if (ppmt) {
 		*ppmt = nullptr;
@@ -886,7 +886,7 @@ STDMETHODIMP CMpcAudioRenderer::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD* p
 	}
 
 	if (pdwFlags) {
-		if (device.second == GetCurrentDeviceId()) {
+		if (deviceId == GetCurrentDeviceId()) {
 			*pdwFlags = AMSTREAMSELECTINFO_ENABLED;
 		} else {
 			*pdwFlags = 0;
@@ -894,9 +894,9 @@ STDMETHODIMP CMpcAudioRenderer::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD* p
 	}
 
 	if (ppszName) {
-		*ppszName = (WCHAR*)CoTaskMemAlloc((device.first.GetLength() + 1) * sizeof(WCHAR));
+		*ppszName = (WCHAR*)CoTaskMemAlloc((deviceName.GetLength() + 1) * sizeof(WCHAR));
 		if (*ppszName) {
-			wcscpy_s(*ppszName, device.first.GetLength() + 1, device.first);
+			wcscpy_s(*ppszName, deviceName.GetLength() + 1, deviceName);
 		}
 	}
 
