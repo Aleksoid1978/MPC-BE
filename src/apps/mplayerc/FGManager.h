@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -63,7 +63,7 @@ private:
 protected:
 	CComPtr<IFilterMapper2> m_pFM;
 	CInterfaceList<IUnknown, &IID_IUnknown> m_pUnks;
-	CAtlList<CFGFilter*> m_source, m_transform, m_override;
+	std::list<CFGFilter*> m_source, m_transform, m_override;
 
 	bool CheckBytes(HANDLE hFile, CString chkbytes);
 	bool CheckBytes(PBYTE buf, DWORD size, CString chkbytes);
