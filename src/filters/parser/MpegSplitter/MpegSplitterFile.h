@@ -25,7 +25,7 @@
 #include "../BaseSplitter/BaseSplitter.h"
 #include "../../../DSUtil/GolombBuffer.h"
 
-#define NO_SUBTITLE_PID  1 // Fake PID use for the "No subtitle" entry
+#define NO_SUBTITLE_PID  WORD_MAX // Fake PID use for the "No subtitle" entry
 #define NO_SUBTITLE_NAME L"No subtitle"
 
 #define ISVALIDPID(pid)  (pid >= 0x1 && pid < 0x1fff)
@@ -76,7 +76,7 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 
 	BOOL m_bIMKH_CCTV;
 
-	typedef CAtlArray<SyncPoint> SyncPoints;
+	typedef std::vector<SyncPoint> SyncPoints;
 	std::map<DWORD, SyncPoints> m_SyncPoints;
 
 	int m_tslen = 0; // transport stream packet length (188 or 192 bytes, auto-detected)
@@ -225,7 +225,7 @@ public:
 	CHdmvClipInfo &m_ClipInfo;
 	CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin);
 
-	BOOL CheckKeyFrame(CAtlArray<BYTE>& pData, stream_codec codec);
+	BOOL CheckKeyFrame(std::vector<BYTE>& pData, stream_codec codec);
 	REFERENCE_TIME NextPTS(DWORD TrackNum, stream_codec codec, __int64& nextPos, BOOL bKeyFrameOnly = FALSE, REFERENCE_TIME rtLimit = _I64_MAX);
 
 	MPEG_TYPES m_type;
@@ -269,65 +269,21 @@ public:
 		bool operator == (const stream& s) const {
 			return (DWORD)*this == (DWORD)s;
 		}
+
+		bool operator < (const stream& s) const {
+			return (DWORD)*this < (DWORD)s;
+		}
 	};
 
-	class CStreamList : public CAtlList<stream>
-	{
+	class CStreamList : public std::list<stream> {
 	public:
-		void Insert(stream& s, int type) {
-			if (type == stream_type::subpic) {
-				if (s.pid == NO_SUBTITLE_PID) {
-					AddTail(s);
-					return;
-				}
-				for (POSITION pos = GetHeadPosition(); pos; GetNext(pos)) {
-					stream& s2 = GetAt(pos);
-					if (s.pid < s2.pid || s2.pid == NO_SUBTITLE_PID) {
-						InsertBefore(pos, s);
-						return;
-					}
-				}
-				AddTail(s);
-			} else {
-				Insert(s);
-			}
+		void Insert(const stream& s) {
+			emplace_back(s);
+			sort();
 		}
 
-		void Insert(stream& s) {
-			AddTail(s);
-			if (GetCount() > 1) {
-				for (size_t j = 0; j < GetCount(); j++) {
-					for (size_t i = 0; i < GetCount() - 1; i++) {
-						if (GetAt(FindIndex(i)) > GetAt(FindIndex(i+1))) {
-							SwapElements(FindIndex(i), FindIndex(i+1));
-						}
-					}
-				}
-			}
-		}
-
-		void Replace(stream& source, stream& dest) {
-			for (POSITION pos = GetHeadPosition(); pos; GetNext(pos)) {
-				stream& s = GetAt(pos);
-				if (source == s) {
-					SetAt(pos, dest);
-					return;
-				}
-			}
-		}
-
-		static CString ToString(int type) {
-			return
-				type == video	? L"Video" :
-				type == audio	? L"Audio" :
-				type == subpic	? L"Subtitle" :
-				type == stereo	? L"Stereo" :
-								  L"Unknown";
-		}
-
-		const stream* FindStream(DWORD pid) {
-			for (POSITION pos = GetHeadPosition(); pos; GetNext(pos)) {
-				const stream& s = GetAt(pos);
+		const stream* GetStream(DWORD pid) {
+			for (const auto& s : (*this)) {
 				if (s == pid) {
 					return &s;
 				}
@@ -335,7 +291,28 @@ public:
 
 			return nullptr;
 		}
+
+		const bool Find(const stream& s) {
+			const auto it = std::find(cbegin(), cend(), s);
+			return (it != cend());
+		}
+
+		const bool Find(const WORD& pid) {
+			stream s; s.pid = pid;
+			const auto it = std::find(cbegin(), cend(), s);
+			return (it != cend());
+		}
+
+		static const CString ToString(const int& type) {
+			return
+				type == video  ? L"Video" :
+				type == audio  ? L"Audio" :
+				type == subpic ? L"Subtitle" :
+				type == stereo ? L"Stereo" :
+								 L"Unknown";
+		}
 	};
+
 	typedef CStreamList CStreamsList[unknown];
 	CStreamsList m_streams;
 
@@ -360,13 +337,11 @@ public:
 
 		size_t streamCount(CStreamsList s) {
 			size_t cnt = 0;
-			for (auto stream = streams.begin(); stream != streams.end(); stream++) {
-				if (stream->pid) {
-					for (int type = stream_type::video; type <= stream_type::subpic; type++) {
-						if (s[type].FindStream(stream->pid)) {
-							cnt++;
-							break;
-						}
+			for (const auto& stream : streams) {
+				for (int type = stream_type::video; type <= stream_type::subpic; type++) {
+					if (s[type].Find(stream.pid)) {
+						cnt++;
+						break;
 					}
 				}
 			}
@@ -397,8 +372,8 @@ public:
 		}
 		size_t GetValidCount() {
 			size_t cnt = 0;
-			for (auto it = begin(); it != end(); it++) {
-				if (it->second.streamCount(*s)) {
+			for (auto item : (*this)) {
+				if (item.second.streamCount(*s)) {
 					cnt++;
 				}
 			}
@@ -407,8 +382,8 @@ public:
 		}
 
 		program* FindProgram(const WORD program_number) {
-			for (auto it = begin(); it != end(); it++) {
-				auto p = &it->second;
+			for (auto& item : (*this)) {
+				auto p = &item.second;
 				if (p->program_number == program_number) {
 					return p;
 				}
@@ -422,25 +397,25 @@ public:
 		BYTE table_id      = 0;
 		int section_length = 0;
 		bool bFinished     = false;
-		CAtlArray<BYTE> pData;
+		std::vector<BYTE> pData;
 
 		void Finish() {
 			table_id       = 0;
 			section_length = 0;
 			bFinished      = true;
-			pData.RemoveAll();
+			pData.clear();
 		}
 
-		bool IsFull() { return !pData.IsEmpty() && pData.GetCount() == section_length; }
+		bool IsFull() { return !pData.empty() && pData.size() == section_length; }
 	};
 	std::map<WORD, programData> m_ProgramData;
 
 	void SearchPrograms(__int64 start, __int64 stop);
 	void ReadPrograms(const trhdr& h);
-	void ReadPAT(CAtlArray<BYTE>& pData);
-	void ReadPMT(CAtlArray<BYTE>& pData, WORD pid);
-	void ReadSDT(CAtlArray<BYTE>& pData);
-	void ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id);
+	void ReadPAT(std::vector<BYTE>& pData);
+	void ReadPMT(std::vector<BYTE>& pData, WORD pid);
+	void ReadSDT(std::vector<BYTE>& pData);
+	void ReadVCT(std::vector<BYTE>& pData, BYTE table_id);
 
 	const program* FindProgram(WORD pid, int* pStream = nullptr, const CHdmvClipInfo::Stream** pClipInfo = nullptr);
 

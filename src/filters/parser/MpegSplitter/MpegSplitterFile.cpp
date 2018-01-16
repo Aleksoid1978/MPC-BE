@@ -217,8 +217,8 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		for (auto& it : m_SyncPoints) {
 			auto& sps = it.second;
 			std::list<REFERENCE_TIME> duplicates;
-			for (size_t i = 0; i < sps.GetCount() - 1; i++) {
-				for (size_t j = i + 1; j < sps.GetCount(); j++) {
+			for (size_t i = 0; i < sps.size() - 1; i++) {
+				for (size_t j = i + 1; j < sps.size(); j++) {
 					if (sps[i].rt == sps[j].rt) {
 						duplicates.emplace_back(sps[i].rt);
 					}
@@ -229,13 +229,10 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 				duplicates.sort();
 				duplicates.unique();
 				for (const auto& dup : duplicates) {
-					for (size_t i = 0; i < sps.GetCount();) {
-						if (sps[i].rt == dup) {
-							sps.RemoveAt(i);
-						} else {
-							i++;
-						}
-					}
+					sps.erase(
+						std::remove_if(sps.begin(), sps.end(), [dup](const SyncPoint& elem){
+							return elem.rt == dup;
+					}), sps.end());
 				}
 			}
 		}
@@ -253,7 +250,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			}
 
 			if (m_programs.size() > 1) {
-				const DWORD pid = pMasterStream->GetHead();
+				const DWORD pid = pMasterStream->front();
 				auto program = FindProgram(pid);
 				if (program) {
 					main_program_number = program->program_number;
@@ -287,15 +284,13 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 				continue;
 			}
 			const CStreamList& streams = m_streams[type];
-			POSITION pos = streams.GetHeadPosition();
-			while (pos) {
-				const stream& s = streams.GetNext(pos);
+			for (const auto& s : streams) {
 				if (!verifyProgram(s)) {
 					continue;
 				}
 
 				const SyncPoints& sps = m_SyncPoints[s];
-				if (sps.GetCount()
+				if (!sps.empty()
 						&& (sps[0].rt < rtMin || (sps[0].rt == rtMin && sps[0].fp < posMin))) {
 					rtMin = sps[0].rt;
 					posMin = posMax = sps[0].fp;
@@ -313,22 +308,20 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 					continue;
 				}
 				const CStreamList& streams = m_streams[type];
-				POSITION pos = streams.GetHeadPosition();
-				while (pos) {
-					const stream& s = streams.GetNext(pos);
+				for (const auto& s : streams) {
 					if (!verifyProgram(s)) {
 						continue;
 					}
 
 					const SyncPoints& sps = m_SyncPoints[s];
-					for (size_t i = 1; i < sps.GetCount(); i++) {
-						if (sps[i].rt > m_rtMax && sps[i].fp > posMax) {
-							m_rtMax	= sps[i].rt;
-							posMax	= sps[i].fp;
+					for (const auto& sps : sps) {
+						if (sps.rt > m_rtMax && sps.fp > posMax) {
+							m_rtMax	= sps.rt;
+							posMax	= sps.fp;
 						}
 					}
 
-					for (size_t i = 0; i < sps.GetCount() && sps[i].fp < m_posMin; i++) {
+					for (size_t i = 0; i < sps.size() && sps[i].fp < m_posMin; i++) {
 						if (llabs(rtMin - sps[i].rt) < maxStartDelta) {
 							m_posMin = sps[i].fp;
 						}
@@ -344,11 +337,9 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 
 	for (int type = stream_type::video; type < stream_type::unknown; type++) {
 		const CStreamList& streams = m_streams[type];
-		POSITION pos = streams.GetHeadPosition();
-		while (pos) {
-			const stream& s = streams.GetNext(pos);
+		for (const auto& s : streams) {
 			const SyncPoints& sps = m_SyncPoints[s];
-			m_streamData[s].usePTS = sps.GetCount() > 1;
+			m_streamData[s].usePTS = sps.size() > 1;
 		}
 	}
 
@@ -357,26 +348,32 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	if (m_SubEmptyPin) {
 		// Add fake Subtitle stream ...
 		if (m_type == MPEG_TYPES::mpeg_ts) {
-			if (m_streams[stream_type::video].GetCount()) {
-				if (!m_ClipInfo.IsHdmv() && m_streams[stream_type::subpic].GetCount()) {
+			if (!m_streams[stream_type::video].empty()) {
+				if (!m_ClipInfo.IsHdmv() && !m_streams[stream_type::subpic].empty()) {
 					stream s;
 					s.pid = NO_SUBTITLE_PID;
-					s.mt.majortype	= m_streams[stream_type::subpic].GetHead().mt.majortype;
-					s.mt.subtype	= m_streams[stream_type::subpic].GetHead().mt.subtype;
-					s.mt.formattype	= m_streams[stream_type::subpic].GetHead().mt.formattype;
-					m_streams[stream_type::subpic].AddTail(s);
+					s.mt.majortype	= m_streams[stream_type::subpic].front().mt.majortype;
+					s.mt.subtype	= m_streams[stream_type::subpic].front().mt.subtype;
+					s.mt.formattype	= m_streams[stream_type::subpic].front().mt.formattype;
+					m_streams[stream_type::subpic].emplace_back(s);
 				} else {
 					AddHdmvPGStream(NO_SUBTITLE_PID, "---");
 				}
 			}
 		} else {
-			if (m_streams[stream_type::video].GetCount()) {
+			if (!m_streams[stream_type::video].empty()) {
 				stream s;
 				s.pid = NO_SUBTITLE_PID;
-				s.mt.majortype	= m_streams[stream_type::subpic].GetCount() ? m_streams[stream_type::subpic].GetHead().mt.majortype  : MEDIATYPE_Video;
-				s.mt.subtype	= m_streams[stream_type::subpic].GetCount() ? m_streams[stream_type::subpic].GetHead().mt.subtype    : MEDIASUBTYPE_DVD_SUBPICTURE;
-				s.mt.formattype	= m_streams[stream_type::subpic].GetCount() ? m_streams[stream_type::subpic].GetHead().mt.formattype : FORMAT_None;
-				m_streams[stream_type::subpic].AddTail(s);
+				if (m_streams[stream_type::subpic].empty()) {
+					s.mt.majortype	= MEDIATYPE_Video;
+					s.mt.subtype	= MEDIASUBTYPE_DVD_SUBPICTURE;
+					s.mt.formattype	= FORMAT_None;
+				} else {
+					s.mt.majortype	= m_streams[stream_type::subpic].front().mt.majortype;
+					s.mt.subtype	= m_streams[stream_type::subpic].front().mt.subtype;
+					s.mt.formattype	= m_streams[stream_type::subpic].front().mt.formattype;
+				}
+				m_streams[stream_type::subpic].emplace_back(s);
 			}
 		}
 	}
@@ -386,17 +383,18 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	avch.clear();
 	hevch.clear();
 	seqh.clear();
+	m_SyncPoints.clear();
 
 	Seek(m_posMin);
 
 	return S_OK;
 }
 
-BOOL CMpegSplitterFile::CheckKeyFrame(CAtlArray<BYTE>& pData, stream_codec codec)
+BOOL CMpegSplitterFile::CheckKeyFrame(std::vector<BYTE>& pData, stream_codec codec)
 {
 	if (codec == stream_codec::H264) {
 		CH264Nalu Nalu;
-		Nalu.SetBuffer(pData.GetData(), pData.GetCount());
+		Nalu.SetBuffer(pData.data(), pData.size());
 		while (Nalu.ReadNext()) {
 			NALU_TYPE nalu_type = Nalu.GetType();
 			if (nalu_type == NALU_TYPE_IDR) {
@@ -409,7 +407,7 @@ BOOL CMpegSplitterFile::CheckKeyFrame(CAtlArray<BYTE>& pData, stream_codec codec
 	} else if (codec == stream_codec::MPEG) {
 		BYTE id = 0;
 
-		CGolombBuffer gb(pData.GetData(), pData.GetCount());
+		CGolombBuffer gb(pData.data(), pData.size());
 		while (!gb.IsEOF()) {
 			if (!gb.NextMpegStartCode(id)) {
 				break;
@@ -472,9 +470,8 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, stream_codec codec, __
 						bKeyFrame = FALSE;
 						__int64 nBytes = h.len - (GetPos() - pos2);
 						if (nBytes > 0) {
-							CAtlArray<BYTE> p;
-							p.SetCount((size_t)nBytes);
-							ByteRead(p.GetData(), nBytes);
+							std::vector<BYTE> p((size_t)nBytes);
+							ByteRead(p.data(), nBytes);
 
 							bKeyFrame = CheckKeyFrame(p, codec);
 						}
@@ -514,9 +511,8 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, stream_codec codec, __
 
 							if (h.bytes > (GetPos() - packet_pos)) {
 								size_t size = h.bytes - (GetPos() - packet_pos);
-								CAtlArray<BYTE> p;
-								p.SetCount(size);
-								ByteRead(p.GetData(), size);
+								std::vector<BYTE> p(size);
+								ByteRead(p.data(), size);
 
 								// collect solid data packet
 								{
@@ -545,9 +541,9 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, stream_codec codec, __
 
 											if (trhdr_2.bytes > (GetPos() - packet_pos)) {
 												size = trhdr_2.bytes - (GetPos() - packet_pos);
-												const size_t old_size = p.GetCount();
-												p.SetCount(old_size + size);
-												ByteRead(p.GetData() + old_size, size);
+												const size_t old_size = p.size();
+												p.resize(old_size + size);
+												ByteRead(p.data() + old_size, size);
 											}
 										}
 
@@ -628,7 +624,7 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, DWORD msTimeO
 			size_t streams_cnt = 0;
 			for (const auto& stream : m_pmt_streams) {
 				for (int type = stream_type::video; type < stream_type::subpic; type++) {
-					if (m_streams[type].FindStream(stream.pid)) {
+					if (m_streams[type].Find(stream.pid)) {
 						streams_cnt++;
 						break;
 					}
@@ -686,7 +682,7 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, DWORD msTimeO
 
 				if (h.fpts) {
 					SyncPoints& sps = m_SyncPoints[TrackNum];
-					sps.Add({ h.pts, packet_start_pos });
+					sps.emplace_back(SyncPoint{ h.pts, packet_start_pos });
 				}
 
 				Seek(pos + h.len);
@@ -711,7 +707,7 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, DWORD msTimeO
 
 					if (h2.fpts) {
 						SyncPoints& sps = m_SyncPoints[TrackNum];
-						sps.Add({ h2.pts, h.hdrpos });
+						sps.emplace_back(SyncPoint{ h2.pts, h.hdrpos });
 					}
 				}
 			}
@@ -734,7 +730,7 @@ void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, DWORD msTimeO
 
 			if (h.fpts && TrackNum) {
 				SyncPoints& sps = m_SyncPoints[TrackNum];
-				sps.Add({ h.pts, h.hdrpos });
+				sps.emplace_back(SyncPoint{ h.pts, h.hdrpos });
 			}
 
 			Seek(pos + h.length);
@@ -863,18 +859,18 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len,
 
 		stream_type = 0ULL;
 
-		for (size_t i = 0; i < _countof(PES_types); i++) {
-			if (PES_types[i].pes_stream_type == pes_stream_type) {
-				stream_type |= PES_types[i].stream_type;
+		for (const auto& pes : PES_types) {
+			if (pes.pes_stream_type == pes_stream_type) {
+				stream_type |= pes.stream_type;
 			}
 		}
 	}
 
 	streamData& _streamData = m_streamData[s];
 	if (_streamData.codec != stream_codec::NONE) {
-		for (size_t i = 0; i < _countof(StreamDesc); i++) {
-			if (StreamDesc[i].codec == _streamData.codec) {
-				stream_type = StreamDesc[i].stream_type;
+		for (const auto& streamDesc : StreamDesc) {
+			if (streamDesc.codec == _streamData.codec) {
+				stream_type = streamDesc.stream_type;
 				break;
 			}
 		}
@@ -1154,7 +1150,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len,
 					}
 				}
 			} else if (!m_bOpeningCompleted && type == stream_type::unknown && (pes_stream_type == AUDIO_STREAM_DTS_HD || pes_stream_type == AUDIO_STREAM_DTS_HD_MASTER_AUDIO)) {
-				stream* source = (stream*)m_streams[stream_type::audio].FindStream(s);
+				stream* source = (stream*)m_streams[stream_type::audio].GetStream(s);
 				if (source && source->dts.bDTSCore && !source->dts.bDTSHD && source->mt.pbFormat) {
 					Seek(start);
 					if (BitRead(32, true) == FCC(DTS_SYNCWORD_SUBSTREAM)) {
@@ -1212,7 +1208,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len,
 			} else if (b >= 0xa0 && b < 0xa8) { // lpcm
 				s.ps1id = (BYTE)BitRead(8);
 
-				if (auto stream = m_streams[stream_type::audio].FindStream(s)) {
+				if (auto stream = m_streams[stream_type::audio].GetStream(s)) {
 					switch (stream->codec) {
 						case stream_codec::DVDAudio: {
 								BitRead(8);
@@ -1402,7 +1398,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len,
 			s.mts.push_back(s.mt);
 		}
 
-		if (!m_bOpeningCompleted || m_streams[type].GetCount() > 0) {
+		if (!m_bOpeningCompleted || !m_streams[type].empty()) {
 			BOOL bAdded = FALSE;
 			if (_streamData.codec == stream_codec::TELETEXT && !_streamData.pmt.tlxPages.empty()) {
 				for (auto& tlxPage : _streamData.pmt.tlxPages) {
@@ -1415,13 +1411,13 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len,
 						teletextsubhdr hdr;
 						Read(hdr, 0, &s.mt, tlxPage.lang, false);
 
-						m_streams[type].Insert(s, type);
+						m_streams[type].Insert(s);
 						bAdded = TRUE;
 					}
 				}
 			}
 			if (!bAdded) {
-				m_streams[type].Insert(s, type);
+				m_streams[type].Insert(s);
 			}
 		}
 	}
@@ -1437,16 +1433,16 @@ void CMpegSplitterFile::AddHdmvPGStream(WORD pid, LPCSTR language_code)
 
 	hdmvsubhdr h;
 	if (!m_streams[stream_type::subpic].Find(s) && Read(h, &s.mt, language_code)) {
-		m_streams[stream_type::subpic].Insert(s, subpic);
+		m_streams[stream_type::subpic].Insert(s);
 	}
 }
 
 CMpegSplitterFile::CStreamList* CMpegSplitterFile::GetMasterStream()
 {
 	return
-		!m_streams[stream_type::video].IsEmpty()  ? &m_streams[stream_type::video]  :
-		!m_streams[stream_type::audio].IsEmpty()  ? &m_streams[stream_type::audio]  :
-		!m_streams[stream_type::subpic].IsEmpty() ? &m_streams[stream_type::subpic] :
+		!m_streams[stream_type::video].empty()  ? &m_streams[stream_type::video]  :
+		!m_streams[stream_type::audio].empty()  ? &m_streams[stream_type::audio]  :
+		!m_streams[stream_type::subpic].empty() ? &m_streams[stream_type::subpic] :
 		nullptr;
 }
 
@@ -1503,16 +1499,16 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 				ProgramData->table_id       = h2.table_id;
 				ProgramData->section_length = h2.section_length;
 
-				ProgramData->pData.SetCount(max_len);
-				ByteRead(ProgramData->pData.GetData(), max_len);
+				ProgramData->pData.resize(max_len);
+				ByteRead(ProgramData->pData.data(), max_len);
 			}
 		}
-	} else if (ProgramData && !ProgramData->pData.IsEmpty()) {
-		const size_t data_len = ProgramData->pData.GetCount();
+	} else if (ProgramData && !ProgramData->pData.empty()) {
+		const size_t data_len = ProgramData->pData.size();
 		const size_t max_len  = std::min((size_t)h.bytes, ProgramData->section_length - data_len);
 
-		ProgramData->pData.SetCount(data_len + max_len);
-		ByteRead(ProgramData->pData.GetData() + data_len, max_len);
+		ProgramData->pData.resize(data_len + max_len);
+		ByteRead(ProgramData->pData.data() + data_len, max_len);
 	}
 
 	if (ProgramData && ProgramData->IsFull()) {
@@ -1538,9 +1534,9 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 	}
 }
 
-void CMpegSplitterFile::ReadPAT(CAtlArray<BYTE>& pData)
+void CMpegSplitterFile::ReadPAT(std::vector<BYTE>& pData)
 {
-	CGolombBuffer gb(pData.GetData(), pData.GetCount());
+	CGolombBuffer gb(pData.data(), pData.size());
 	int len = gb.GetSize();
 
 	for (int i = len/4; i > 0; i--) {
@@ -1658,11 +1654,11 @@ static const BYTE opus_channel_map[8][8] = {
 
 struct MP4Descr {
 	WORD active_es_id = 0;
-	CAtlMap<WORD, CAtlArray<BYTE>> dec_config_descr;
+	std::map<WORD, std::vector<BYTE>> dec_config_descr;
 
 	void Clear() {
 		active_es_id = 0;
-		dec_config_descr.RemoveAll();
+		dec_config_descr.clear();
 	}
 };
 
@@ -1751,9 +1747,9 @@ static int parse_MP4ESDescrTag(CGolombBuffer& gb, int& len)
 
 static int parse_MP4DecConfigDescrTag(CGolombBuffer& gb, int& len)
 {
-	CAtlArray<BYTE>& pData = mp4_descr.dec_config_descr[mp4_descr.active_es_id];
-	pData.SetCount(len);
-	gb.ReadBuffer(pData.GetData(), len);
+	std::vector<BYTE>& pData = mp4_descr.dec_config_descr[mp4_descr.active_es_id];
+	pData.resize(len);
+	gb.ReadBuffer(pData.data(), len);
 	len = 0;
 
 	return 0;
@@ -1804,9 +1800,9 @@ static int parse_mp4_descr(CGolombBuffer& gb, int& len, int target_tag)
 	return ret;
 }
 
-static int mp4_read_dec_config_descr(CAtlArray<BYTE>& dec_config_descr, CMpegSplitterFile::stream& s)
+static int mp4_read_dec_config_descr(std::vector<BYTE>& dec_config_descr, CMpegSplitterFile::stream& s)
 {
-	CGolombBuffer gb(dec_config_descr.GetData(), dec_config_descr.GetCount());
+	CGolombBuffer gb(dec_config_descr.data(), dec_config_descr.size());
 
 	const int object_type_id = gb.BitRead(8);
 	if (object_type_id == 0x40 || object_type_id == 0x66 || object_type_id == 0x67 || object_type_id == 0x68) { // AAC codec
@@ -1854,13 +1850,13 @@ static int mp4_read_dec_config_descr(CAtlArray<BYTE>& dec_config_descr, CMpegSpl
 	return -1;
 }
 
-void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
+void CMpegSplitterFile::ReadPMT(std::vector<BYTE>& pData, WORD pid)
 {
 	mp4_descr.Clear();
 
 	auto& pr = m_programs[pid];
 
-	CGolombBuffer gb(pData.GetData(), pData.GetCount());
+	CGolombBuffer gb(pData.data(), pData.size());
 	int len = gb.GetSize();
 
 	BYTE reserved1           = (BYTE)gb.BitRead(3);
@@ -1965,9 +1961,9 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 						if (descriptor_length) {
 							gb.SkipBytes(descriptor_length);
 						}
-						if (es_id && !mp4_descr.dec_config_descr.IsEmpty()) {
-							CAtlArray<BYTE>& dec_config_descr = mp4_descr.dec_config_descr[es_id];
-							if (!dec_config_descr.IsEmpty()) {
+						if (es_id && !mp4_descr.dec_config_descr.empty()) {
+							std::vector<BYTE>& dec_config_descr = mp4_descr.dec_config_descr[es_id];
+							if (!dec_config_descr.empty()) {
 								s_aac_mp4.pid = pid;
 								if (!m_streams[stream_type::audio].Find(s_aac_mp4)) {
 									if (mp4_read_dec_config_descr(dec_config_descr, s_aac_mp4) == 0) {
@@ -2049,7 +2045,7 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 				strcpy_s(s_aac_mp4.lang, _streamData.pmt.lang);
 				s_aac_mp4.lang_set = true;
 			}
-			m_streams[stream_type::audio].Insert(s_aac_mp4, stream_type::audio);
+			m_streams[stream_type::audio].Insert(s_aac_mp4);
 		}
 
 		if (m_ForcedSub) {
@@ -2069,13 +2065,13 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 					if (stream_type == PRESENTATION_GRAPHICS_STREAM) {
 						hdmvsubhdr hdr;
 						if (Read(hdr, &s.mt, _streamData.pmt.lang)) {
-							m_streams[stream_type::subpic].Insert(s, stream_type::subpic);
+							m_streams[stream_type::subpic].Insert(s);
 							s.codec = _streamData.codec = stream_codec::PGS;
 						}
 					} else if (_streamData.codec == stream_codec::DVB) {
 						dvbsubhdr hdr;
 						if (Read(hdr, 0, &s.mt, _streamData.pmt.lang, false)) {
-							m_streams[stream_type::subpic].Insert(s, stream_type::subpic);
+							m_streams[stream_type::subpic].Insert(s);
 						}
 					} else if (_streamData.codec == stream_codec::TELETEXT) {
 						BOOL bAdded = FALSE;
@@ -2089,7 +2085,7 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 									s.mt.InitMediaType();
 
 									Read(hdr, 0, &s.mt, _streamData.pmt.lang, false);
-									m_streams[stream_type::subpic].Insert(s, stream_type::subpic);
+									m_streams[stream_type::subpic].Insert(s);
 
 									bAdded = TRUE;
 								}
@@ -2097,7 +2093,7 @@ void CMpegSplitterFile::ReadPMT(CAtlArray<BYTE>& pData, WORD pid)
 						}
 						if (!bAdded) {
 							Read(hdr, 0, &s.mt, _streamData.pmt.lang, false);
-							m_streams[stream_type::subpic].Insert(s, stream_type::subpic);
+							m_streams[stream_type::subpic].Insert(s);
 						}
 					}
 				}
@@ -2199,13 +2195,13 @@ CString ConvertDVBString(const BYTE* pBuffer, int nLength)
 	return strResult;
 }
 
-void CMpegSplitterFile::ReadSDT(CAtlArray<BYTE>& pData)
+void CMpegSplitterFile::ReadSDT(std::vector<BYTE>& pData)
 {
-	if (pData.GetCount() < 3) {
+	if (pData.size() < 3) {
 		return;
 	}
 
-	CGolombBuffer gb(pData.GetData(), pData.GetCount());
+	CGolombBuffer gb(pData.data(), pData.size());
 
 	gb.BitRead(16); // original_network_id
 	gb.BitRead(8);  // reserved_future_use
@@ -2264,7 +2260,7 @@ void CMpegSplitterFile::ReadSDT(CAtlArray<BYTE>& pData)
 }
 
 // ATSC - service location
-static void Descriptor_A1(CGolombBuffer& gb, int descriptor_length, CAtlMap<WORD, char[4]>& ISO_639_languages)
+static void Descriptor_A1(CGolombBuffer& gb, int descriptor_length, std::map<WORD, char[4]>& ISO_639_languages)
 {
 	BYTE reserved        = (BYTE)gb.BitRead(3);
 	WORD PCR_PID         = (WORD)gb.BitRead(13);
@@ -2293,9 +2289,9 @@ static void Descriptor_A1(CGolombBuffer& gb, int descriptor_length, CAtlMap<WORD
 	}
 }
 
-void CMpegSplitterFile::ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id)
+void CMpegSplitterFile::ReadVCT(std::vector<BYTE>& pData, BYTE table_id)
 {
-	CGolombBuffer gb(pData.GetData(), pData.GetCount());
+	CGolombBuffer gb(pData.data(), pData.size());
 
 	gb.BitRead(8); // protocol_version
 	BYTE num_channels_in_section = (BYTE)gb.BitRead(8);
@@ -2359,7 +2355,7 @@ void CMpegSplitterFile::ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id)
 					break;
 				}
 
-				CAtlMap<WORD, char[4]> ISO_639_languages;
+				std::map<WORD, char[4]> ISO_639_languages;
 
 				switch (descriptor_tag) {
 					case 0xA1: // ATSC - service location
@@ -2370,14 +2366,9 @@ void CMpegSplitterFile::ReadVCT(CAtlArray<BYTE>& pData, BYTE table_id)
 						break;
 				}
 
-				if (!ISO_639_languages.IsEmpty()) {
-					POSITION pos = ISO_639_languages.GetStartPosition();
-					while (pos) {
-						CAtlMap<USHORT, char[4]>::CPair* pPair = ISO_639_languages.GetNext(pos);
-						const WORD& pid = pPair->m_key;
-						if (!m_streamData[pid].pmt.lang[0]) {
-							strcpy_s(m_streamData[pid].pmt.lang, pPair->m_value);
-						}
+				for (const auto& [pid, lang] : ISO_639_languages) {
+					if (!m_streamData[pid].pmt.lang[0]) {
+						strcpy_s(m_streamData[pid].pmt.lang, lang);
 					}
 				}
 			}
@@ -2399,8 +2390,8 @@ const CMpegSplitterFile::program* CMpegSplitterFile::FindProgram(WORD pid, int* 
 			*ppClipInfo = m_ClipInfo.FindStream(pid);
 		}
 
-		for (auto it = m_programs.begin(); it != m_programs.end(); it++) {
-			auto p = &it->second;
+		for (auto& programs : m_programs) {
+			auto p = &programs.second;
 			if (p->streamFind(pid, pStream)) {
 				return p;
 			}
