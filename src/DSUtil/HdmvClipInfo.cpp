@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -869,8 +869,8 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 
 			if (!ext_sub_paths.empty()) {
 				for (auto& ext_sub : ext_sub_paths) {
-					for (auto& it : ext_sub.extFileNames) {
-						CString fname = it;
+					for (auto& extFileName : ext_sub.extFileNames) {
+						CString fname = extFileName;
 						fname.Replace(L"\\STREAM\\", L"\\CLIPINF\\");
 						fname.Replace(L".M2TS", L".CLPI");
 

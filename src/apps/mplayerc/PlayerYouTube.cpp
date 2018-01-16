@@ -761,14 +761,14 @@ namespace Youtube
 
 #ifdef DEBUG_OR_LOG
 			DLog(L"Youtube::Parse_URL() : parsed video formats list:");
-			for (const auto& it : youtubeUrllist) {
-				DLog(L"    %-35s, \"%s\"", it.title, it.url);
+			for (const auto& item : youtubeUrllist) {
+				DLog(L"    %-35s, \"%s\"", item.title, item.url);
 			}
 
 			if (!audioList.empty()) {
 				DLog(L"Youtube::Parse_URL() : parsed audio formats list:");
-				for (const auto& it : audioList) {
-					DLog(L"    %-35s, \"%s\"", it.title, it.url);
+				for (const auto& item : audioList) {
+					DLog(L"    %-35s, \"%s\"", item.title, item.url);
 				}
 			}
 #endif
