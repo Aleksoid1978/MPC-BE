@@ -214,8 +214,8 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			return E_FAIL;
 		}
 
-		for (auto& it : m_SyncPoints) {
-			auto& sps = it.second;
+		for (auto& syncPoint : m_SyncPoints) {
+			auto& sps = syncPoint.second;
 			std::list<REFERENCE_TIME> duplicates;
 			for (size_t i = 0; i < sps.size() - 1; i++) {
 				for (size_t j = i + 1; j < sps.size(); j++) {
