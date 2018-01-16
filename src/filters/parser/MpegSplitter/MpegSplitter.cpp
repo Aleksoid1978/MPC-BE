@@ -1129,9 +1129,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		int Idx_audio	= 99;
 		int Idx_subpic	= 99;
 
-		POSITION pos = m_pFile->m_streams[type].GetHeadPosition();
-		while (pos) {
-			CMpegSplitterFile::stream& s = m_pFile->m_streams[type].GetNext(pos);
+		for (const auto& s : m_pFile->m_streams[type]) {
 			if (type == CMpegSplitterFile::stream_type::subpic && s.pid == NO_SUBTITLE_PID) {
 				continue;
 			};
