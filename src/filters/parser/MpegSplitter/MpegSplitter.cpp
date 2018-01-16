@@ -540,19 +540,11 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 #endif
 }
 
-void CMpegSplitterFilter::GetMediaTypes(CMpegSplitterFile::stream_type sType, CAtlArray<CMediaType>& mts)
+void CMpegSplitterFilter::GetMediaTypes(CMpegSplitterFile::stream_type sType, std::vector<CMediaType>& mts)
 {
-	for (int type = CMpegSplitterFile::stream_type::video; type <= CMpegSplitterFile::stream_type::subpic; type++) {
-		if (type == sType) {
-			POSITION pos = m_pFile->m_streams[type].GetHeadPosition();
-			while (pos) {
-				CMpegSplitterFile::stream& s = m_pFile->m_streams[type].GetNext(pos);
-				for(size_t i = 0; i < s.mts.size(); i++) {
-					mts.Add(s.mts[i]);
-				}
-			}
-
-			return;
+	if (sType >= CMpegSplitterFile::stream_type::video && sType <= CMpegSplitterFile::stream_type::subpic) {
+		for (const auto& s : m_pFile->m_streams[sType]) {
+			mts.insert(mts.end(), s.mts.begin(), s.mts.end());
 		}
 	}
 }
@@ -824,11 +816,11 @@ HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
 
 				if (h.bytes > (m_pFile->GetPos() - pos)) {
 					DWORD Flag = 0;
-					if (auto s = m_pFile->m_streams[CMpegSplitterFile::stream_type::audio].FindStream(TrackNumber)) {
+					if (auto s = m_pFile->m_streams[CMpegSplitterFile::stream_type::audio].GetStream(TrackNumber)) {
 						if (s->codec == CMpegSplitterFile::stream_codec::AAC_RAW) {
 							Flag = PACKET_AAC_RAW;
 						}
-					} else if (auto s = m_pFile->m_streams[CMpegSplitterFile::stream_type::subpic].FindStream(TrackNumber)) {
+					} else if (auto s = m_pFile->m_streams[CMpegSplitterFile::stream_type::subpic].GetStream(TrackNumber)) {
 						if (s->codec == CMpegSplitterFile::stream_codec::TELETEXT) {
 							Flag = m_tlxCurrentPage;
 						}
@@ -950,9 +942,8 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 		// Get resolution for first video track
 		int vid_width = 0;
 		int vid_height = 0;
-		POSITION pos = m_pFile->m_streams[CMpegSplitterFile::stream_type::video].GetHeadPosition();
-		if (pos) {
-			CMpegSplitterFile::stream& sVideo = m_pFile->m_streams[CMpegSplitterFile::stream_type::video].GetHead();
+		if (!m_pFile->m_streams[CMpegSplitterFile::stream_type::video].empty()) {
+			const auto& sVideo = m_pFile->m_streams[CMpegSplitterFile::stream_type::video].front();
 			int arx, ary;
 			ExtractDim(&sVideo.mt, vid_width, vid_height, arx, ary);
 			UNREFERENCED_PARAMETER(arx);
@@ -974,9 +965,9 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 	}
 
 	if (mt.subtype == MEDIASUBTYPE_H264) {
-		if (m_pFile->m_streams[CMpegSplitterFile::stream_type::video].GetCount() == 1
-				&& m_pFile->m_streams[CMpegSplitterFile::stream_type::stereo].GetCount() == 1) {
-			CMpegSplitterFile::stream& stereo = m_pFile->m_streams[CMpegSplitterFile::stream_type::stereo].GetHead();
+		if (m_pFile->m_streams[CMpegSplitterFile::stream_type::video].size() == 1
+				&& m_pFile->m_streams[CMpegSplitterFile::stream_type::stereo].size() == 1) {
+			const auto& stereo = m_pFile->m_streams[CMpegSplitterFile::stream_type::stereo].front();
 			s.mts.push_back(stereo.mt);
 
 			m_bUseMVCExtension          = TRUE;
@@ -992,7 +983,7 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 	s.mts.push_back(s.mt);
 }
 
-CString CMpegSplitterFilter::FormatStreamName(CMpegSplitterFile::stream& s, CMpegSplitterFile::stream_type type)
+CString CMpegSplitterFilter::FormatStreamName(const CMpegSplitterFile::stream& s, CMpegSplitterFile::stream_type type)
 {
 	int nStream;
 	const CHdmvClipInfo::Stream *pClipInfo;
@@ -1213,9 +1204,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	CStringA palette;
 	for (int type = CMpegSplitterFile::stream_type::video; type <= CMpegSplitterFile::stream_type::subpic; type++) {
-		POSITION pos = m_pFile->m_streams[type].GetHeadPosition();
-		while (pos) {
-			CMpegSplitterFile::stream& s = m_pFile->m_streams[type].GetNext(pos);
+		for (auto& s : m_pFile->m_streams[type]) {
 			HandleStream(s, fullName, IfoASpect.num, IfoASpect.den, palette);
 		}
 	}
@@ -1223,10 +1212,7 @@ HRESULT CMpegSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	for (int type = CMpegSplitterFile::stream_type::video; type <= CMpegSplitterFile::stream_type::subpic; type++) {
 		int stream_idx = 0;
 
-		POSITION pos = m_pFile->m_streams[type].GetHeadPosition();
-		while (pos) {
-			CMpegSplitterFile::stream& s = m_pFile->m_streams[type].GetNext(pos);
-
+		for (const auto& s : m_pFile->m_streams[type]) {
 			CString str;
 
 			if (type == CMpegSplitterFile::stream_type::subpic && s.pid == NO_SUBTITLE_PID) {
@@ -1410,7 +1396,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		return;
 	}
 
-	CMpegSplitterFile::CStreamList* pMasterStream = m_pFile->GetMasterStream();
+	auto* pMasterStream = m_pFile->GetMasterStream();
 	if (!pMasterStream) {
 		ASSERT(0);
 		return;
@@ -1422,7 +1408,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	m_MVCExtensionQueue.clear();
 	m_MVCBaseQueue.clear();
 
-	CMpegSplitterFile::stream& masterStream = pMasterStream->GetHead();
+	const auto& masterStream = pMasterStream->front();
 	DWORD TrackNum = masterStream;
 
 	if (rt == 0) {
@@ -1445,9 +1431,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		const REFERENCE_TIME rtmin = rtmax - UNITS/2;
 
 		if (m_pFile->m_bPESPTSPresent) {
-			POSITION pos = pMasterStream->GetHeadPosition();
-			while (pos) {
-				CMpegSplitterFile::stream& stream = pMasterStream->GetNext(pos);
+			for (const auto& stream : *pMasterStream) {
 				CMpegSplitterFile::stream_codec codec = stream.codec;
 				TrackNum = stream;
 
@@ -1551,16 +1535,13 @@ bool CMpegSplitterFilter::DemuxLoop()
 		}
 	}
 
-	POSITION pos = pPackets.GetStartPosition();
-	while (pos) {
-		if (CAutoPtr<CPacket>& p = pPackets.GetNextValue(pos)) {
-			if (p->bSyncPoint && GetOutputPin(p->TrackNumber)) {
-				DeliverPacket(p);
-			}
-			p.Free();
+	for (auto& it : pPackets) {
+		auto& p = it.second;
+		if (p->bSyncPoint && GetOutputPin(p->TrackNumber)) {
+			DeliverPacket(p);
 		}
 	}
-	pPackets.RemoveAll();
+	pPackets.clear();
 
 	return true;
 }
@@ -1598,7 +1579,7 @@ STDMETHODIMP CMpegSplitterFilter::Count(DWORD* pcStreams)
 	*pcStreams = 0;
 
 	for (int i = CMpegSplitterFile::stream_type::video; i <= CMpegSplitterFile::stream_type::subpic; i++) {
-		(*pcStreams) += m_pFile->m_streams[i].GetCount();
+		(*pcStreams) += m_pFile->m_streams[i].size();
 	}
 
 	if (m_pFile->m_programs.GetValidCount() > 1) {
@@ -1619,22 +1600,18 @@ STDMETHODIMP CMpegSplitterFilter::Enable(long lIndex, DWORD dwFlags)
 
 		if (lIndex < (long)programs.GetValidCount()) {
 			int j = 0;
-			for (auto it = programs.begin(); it != programs.end(); it++) {
-				auto p = &it->second;
+			for (const auto& program : programs) {
+				const auto& streams = program.second.streams;
 
 				if (j == lIndex) {
-					for (auto stream = p->streams.begin(); stream != p->streams.end(); stream++) {
-						if (stream->pid) {
-							long index = programs.GetValidCount();
-							for (int type = CMpegSplitterFile::stream_type::video; type < CMpegSplitterFile::stream_type::subpic; type++) {
-								POSITION pos2 = m_pFile->m_streams[type].GetHeadPosition();
-								while (pos2) {
-									CMpegSplitterFile::stream& s = m_pFile->m_streams[type].GetNext(pos2);
-									if (s.pid == stream->pid) {
-										Enable(index, dwFlags);
-									}
-									index++;
+					for (const auto& stream : streams) {
+						long index = programs.GetValidCount();
+						for (int type = CMpegSplitterFile::stream_type::video; type < CMpegSplitterFile::stream_type::subpic; type++) {
+							for (const auto& s : m_pFile->m_streams[type]) {
+								if (s.pid == stream.pid) {
+									Enable(index, dwFlags);
 								}
+								index++;
 							}
 						}
 					}
@@ -1652,21 +1629,19 @@ STDMETHODIMP CMpegSplitterFilter::Enable(long lIndex, DWORD dwFlags)
 	for (int type = CMpegSplitterFile::stream_type::video, j = 0; type <= CMpegSplitterFile::stream_type::subpic; type++) {
 		auto& streams = m_pFile->m_streams[type];
 
-		const int cnt = streams.GetCount();
+		const int cnt = streams.size();
 
 		if (lIndex >= j && lIndex < j + cnt) {
 			lIndex -= j;
 
-			POSITION pos = streams.FindIndex(lIndex);
-			if (!pos) {
+			const auto& it = std::next(streams.cbegin(), lIndex);
+			if (it == streams.cend()) {
 				return E_UNEXPECTED;
 			}
 
-			CMpegSplitterFile::stream& to = streams.GetAt(pos);
+			CMpegSplitterFile::stream to = *it;
 
-			pos = streams.GetHeadPosition();
-			while (pos) {
-				CMpegSplitterFile::stream& from = streams.GetNext(pos);
+			for (const auto& from : streams) {
 				if (!GetOutputPin(from)
 						|| (from.codec == CMpegSplitterFile::stream_codec::TELETEXT && from.tlxPage != m_tlxCurrentPage)) {
 					continue;
@@ -1685,9 +1660,7 @@ STDMETHODIMP CMpegSplitterFilter::Enable(long lIndex, DWORD dwFlags)
 				Lock();
 
 				if (type == CMpegSplitterFile::stream_type::subpic && to.mts.size() == 1 && to.mts[0].subtype == MEDIASUBTYPE_DVD_SUBPICTURE) {
-					POSITION pos2 = streams.GetHeadPosition();
-					while (pos2) {
-						CMpegSplitterFile::stream& s_src = streams.GetNext(pos2);
+					for (const auto& s_src : streams) {
 						if (s_src != to && s_src.mts.size() == 2 && s_src.mts[0].subtype == MEDIASUBTYPE_VOBSUB) {
 							to.mts.insert(to.mts.begin(), s_src.mts[0]);
 							break;
@@ -1734,7 +1707,7 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 		if (lIndex < (long)programs.GetValidCount()) {
 			int type = -1;
 			for (type = CMpegSplitterFile::stream_type::video; type <= CMpegSplitterFile::stream_type::subpic; type++) {
-				if (m_pFile->m_streams[type].GetCount()) {
+				if (m_pFile->m_streams[type].size()) {
 					break;
 				}
 			}
@@ -1742,10 +1715,8 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 			WORD pidEnabled = -1;
 			if (type == CMpegSplitterFile::stream_type::video
 					|| type == CMpegSplitterFile::stream_type::audio) {
-				auto& streams = m_pFile->m_streams[type];
-				POSITION pos = streams.GetHeadPosition();
-				while (pos) {
-					CMpegSplitterFile::stream& s = streams.GetNext(pos);
+				const auto& streams = m_pFile->m_streams[type];
+				for (const auto& s : streams) {
 					if (GetOutputPin(s)) {
 						if (s.codec == CMpegSplitterFile::stream_codec::TELETEXT
 							&& s.tlxPage != m_tlxCurrentPage) {
@@ -1758,8 +1729,8 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 			}
 
 			int j = 0;
-			for (auto it = programs.begin(); it != programs.end(); it++) {
-				auto p = &it->second;
+			for (const auto& program : programs) {
+				const auto& p = program.second;
 
 				if (j == lIndex) {
 					if (ppmt) {
@@ -1768,8 +1739,8 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 					if (pdwFlags) {
 						*pdwFlags = 0;
 
-						for (auto stream = p->streams.begin(); stream != p->streams.end(); stream++) {
-							if (stream->pid == pidEnabled) {
+						for (const auto& stream : p.streams) {
+							if (stream.pid == pidEnabled) {
 								*pdwFlags = AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE;
 								break;
 							}
@@ -1789,10 +1760,10 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 					}
 					if (ppszName) {
 						CString str;
-						if (p->name.IsEmpty()) {
-							str.Format(L"Program - %u", p->program_number);
+						if (p.name.IsEmpty()) {
+							str.Format(L"Program - %u", p.program_number);
 						} else {
-							str = p->name;
+							str = p.name;
 						}
 
 						*ppszName = (WCHAR*)CoTaskMemAlloc((str.GetLength() + 1) * sizeof(WCHAR));
@@ -1815,17 +1786,17 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 	for (int type = CMpegSplitterFile::stream_type::video, j = 0; type <= CMpegSplitterFile::stream_type::subpic; type++) {
 		auto& streams = m_pFile->m_streams[type];
 
-		const int cnt = streams.GetCount();
+		const int cnt = streams.size();
 
-		if (lIndex >= j && lIndex < j+cnt) {
+		if (lIndex >= j && lIndex < j + cnt) {
 			lIndex -= j;
 
-			POSITION pos = streams.FindIndex(lIndex);
-			if (!pos) {
+			const auto& it = std::next(streams.cbegin(), lIndex);
+			if (it == streams.cend()) {
 				return E_UNEXPECTED;
 			}
 
-			CMpegSplitterFile::stream& s   = streams.GetAt(pos);
+			CMpegSplitterFile::stream s = *it;
 			CHdmvClipInfo::Stream* pStream = m_ClipInfo.FindStream(s.pid);
 
 			if (ppmt) {
@@ -2021,12 +1992,11 @@ CMpegSplitterOutputPin::CMpegSplitterOutputPin(std::vector<CMediaType>& mts, CMp
 
 HRESULT CMpegSplitterOutputPin::CheckMediaType(const CMediaType* pmt)
 {
-	CAtlArray<CMediaType> mts;
+	std::vector<CMediaType> mts;
 	(static_cast<CMpegSplitterFilter*>(m_pFilter))->GetMediaTypes(m_type, mts);
-	for (size_t i = 0; i < mts.GetCount(); i++) {
-		if (mts[i] == *pmt) {
-			return S_OK;
-		}
+	const auto& it = std::find(mts.cbegin(), mts.cend(), *pmt);
+	if (it != mts.cend()) {
+		return S_OK;
 	}
 
 	return E_INVALIDARG;

@@ -55,7 +55,7 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 
 	BYTE m_MVC_Base_View_R_flag = 0;
 
-	CAtlMap<DWORD, CAutoPtr<CPacket>> pPackets;
+	std::map<DWORD, CAutoPtr<CPacket>> pPackets;
 
 	bool m_bIsBD;
 	WORD m_tlxCurrentPage = 0;
@@ -92,7 +92,7 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 
 	void HandleStream(CMpegSplitterFile::stream& s, CString fName, DWORD dwPictAspectRatioX, DWORD dwPictAspectRatioY, CStringA& palette);
 
-	CString FormatStreamName(CMpegSplitterFile::stream& s, CMpegSplitterFile::stream_type type);
+	CString FormatStreamName(const CMpegSplitterFile::stream& s, CMpegSplitterFile::stream_type type);
 
 	__int64 SeekBD(REFERENCE_TIME rt);
 
@@ -102,7 +102,7 @@ public:
 		m_pPipoBimbo = bPipo;
 	};
 
-	void GetMediaTypes(CMpegSplitterFile::stream_type sType, CAtlArray<CMediaType>& mts);
+	void GetMediaTypes(CMpegSplitterFile::stream_type sType, std::vector<CMediaType>& mts);
 
 	bool m_hasHdmvDvbSubPin;
 	bool IsHdmvDvbSubPinDrying();
