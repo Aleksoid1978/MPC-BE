@@ -265,9 +265,8 @@ bool CMatroskaSplitterFilter::ReadFirtsBlock(std::vector<byte>& pData, TrackEntr
 				CBinary* pb = bg->Block.BlockData.GetNext(pos2);
 				pTE->Expand(*pb, ContentEncoding::AllFrameContents);
 
-				//pData.Copy(*pb); // old code. is it correct?
-				pData.resize((*pb).GetCount());
-				memcpy(pData.data(), (*pb).GetData(), (*pb).GetCount());
+				const auto input = (*pb).GetData();
+				pData.insert(pData.end(), input, input + (*pb).GetCount());
 			}
 
 			break;
