@@ -244,8 +244,6 @@ bool CMatroskaSplitterFilter::ReadFirtsBlock(std::vector<byte>& pData, TrackEntr
 	do {
 		CBlockGroupNode bgn;
 
-		const __int64 startpos = m_pFile->GetPos();
-
 		if (m_pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
 			bgn.Parse(m_pBlock, true);
 		}
@@ -254,7 +252,6 @@ bool CMatroskaSplitterFilter::ReadFirtsBlock(std::vector<byte>& pData, TrackEntr
 			bg->Block.Parse(m_pBlock, true);
 			bgn.AddTail(bg);
 		}
-		__int64 endpos = m_pFile->GetPos();
 
 		POSITION pos = bgn.GetHeadPosition();
 		while (pos) {
