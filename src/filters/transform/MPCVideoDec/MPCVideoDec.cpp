@@ -1972,13 +1972,6 @@ redo:
 	if (m_FilterInfo.pix_fmt != AV_PIX_FMT_NONE) {
 		m_pAVCtx->pix_fmt = (AVPixelFormat)m_FilterInfo.pix_fmt;
 	}
-	if (m_FilterInfo.colorSpace) {
-		m_pAVCtx->colorspace             = (AVColorSpace)m_FilterInfo.colorSpace->MatrixCoefficients;
-		m_pAVCtx->color_primaries        = (AVColorPrimaries)m_FilterInfo.colorSpace->Primaries;
-		m_pAVCtx->color_range            = (AVColorRange)m_FilterInfo.colorSpace->Range;
-		m_pAVCtx->color_trc              = (AVColorTransferCharacteristic)m_FilterInfo.colorSpace->TransferCharacteristics;
-		m_pAVCtx->chroma_sample_location = (AVChromaLocation)m_FilterInfo.colorSpace->ChromaLocation;
-	}
 
 	m_nAlign = 16;
 	if (m_nCodecId == AV_CODEC_ID_MPEG2VIDEO) {
@@ -2667,6 +2660,14 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 
 	if (m_FormatConverter.GetOutPixFormat() == PixFmt_RGB32 || m_FormatConverter.GetOutPixFormat() == PixFmt_RGB48) {
 		return fmt;
+	}
+
+	if (m_FilterInfo.colorSpace) {
+		ctx->colorspace             = (AVColorSpace)m_FilterInfo.colorSpace->MatrixCoefficients;
+		ctx->color_primaries        = (AVColorPrimaries)m_FilterInfo.colorSpace->Primaries;
+		ctx->color_range            = (AVColorRange)m_FilterInfo.colorSpace->Range;
+		ctx->color_trc              = (AVColorTransferCharacteristic)m_FilterInfo.colorSpace->TransferCharacteristics;
+		ctx->chroma_sample_location = (AVChromaLocation)m_FilterInfo.colorSpace->ChromaLocation;
 	}
 
 	// Color Primaries
