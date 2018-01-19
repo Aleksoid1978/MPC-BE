@@ -423,9 +423,10 @@ CString CMediaTypeEx::GetAudioCodecName(const GUID& subtype, WORD wFormatTag)
 			guidnames[MEDIASUBTYPE_DSDM]			= L"DSD";
 			guidnames[MEDIASUBTYPE_DST]				= L"DST";
 			guidnames[MEDIASUBTYPE_NELLYMOSER]		= L"Nelly Moser";
+			guidnames[MEDIASUBTYPE_TAK]				= L"TAK";
 		}
 
-		if (!guidnames.Lookup(subtype, str)) {
+		if (!guidnames.Lookup(subtype, str) && !wFormatTag) {
 			str.Format(L"0x%04x", wFormatTag);
 		}
 	}
