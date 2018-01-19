@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+ * (C) 2012-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,14 +20,15 @@
 
 #pragma once
 
-#include <atlcoll.h>
+#include <list>
+#include <vector>
 #include "GolombBuffer.h"
 
-#define APE_TAG_FOOTER_BYTES		32
-#define APE_TAG_VERSION				2000
+#define APE_TAG_FOOTER_BYTES   32
+#define APE_TAG_VERSION        2000
 
-#define APE_TAG_FLAG_IS_HEADER		(1 << 29)
-#define APE_TAG_FLAG_IS_BINARY		(1 << 1)
+#define APE_TAG_FLAG_IS_HEADER (1 << 29)
+#define APE_TAG_FLAG_IS_BINARY (1 << 1)
 
 //
 // ApeTagItem class
@@ -37,8 +38,8 @@ class CApeTagItem
 {
 public:
 	enum ApeType {
-		APE_TYPE_STRING	= 0,
-		APE_TYPE_BINARY	= 1,
+		APE_TYPE_STRING,
+		APE_TYPE_BINARY
 	};
 
 	CApeTagItem();
@@ -46,22 +47,22 @@ public:
 	// load
 	bool Load(CGolombBuffer &gb);
 
-	CString GetKey()		const { return m_key; }
-	CString GetValue()		const { return m_value; }
-	const BYTE* GetData()	const { return m_Data.GetData(); }
-	size_t GetDataLen()		const { return m_Data.GetCount(); }
-	ApeType GetType()		const { return m_type; }
+	CString GetKey()      const { return m_key; }
+	CString GetValue()    const { return m_value; }
+	const BYTE* GetData() const { return m_Data.data(); }
+	size_t GetDataLen()   const { return m_Data.size(); }
+	ApeType GetType()     const { return m_type; }
 
 protected:
-	CString			m_key;
+	CString           m_key;
 
 	// text value
-	CString			m_value;
+	CString           m_value;
 
 	// binary value
-	CAtlArray<BYTE>	m_Data;
+	std::vector<BYTE> m_Data;
 
-	ApeType			m_type;
+	ApeType           m_type;
 };
 
 //
@@ -75,7 +76,7 @@ protected:
 	size_t m_TagFields;
 
 public:
-	CAtlList<CApeTagItem*>	TagItems;
+	std::list<CApeTagItem*> TagItems;
 
 	CAPETag();
 	virtual ~CAPETag();
@@ -83,19 +84,13 @@ public:
 	void Clear();
 
 	// tag reading
-	bool ReadFooter(BYTE *buf, size_t len);
-	bool ReadTags(BYTE *buf, size_t len);
+	bool ReadFooter(BYTE *buf, const size_t& len);
+	bool ReadTags(BYTE *buf, const size_t& len);
 
 	size_t GetTagSize() const { return m_TagSize; }
-	CApeTagItem* Find(CString key);
+	//const CApeTagItem* Find(const CString& key);
 };
 
 // additional functions
-void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* apetag);
+void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* pAPETag);
 
-
-// ID3v2
-// TODO: remove it from here
-#define ID3v2_HEADER_SIZE 10
-
-int id3v2_match_len(const unsigned char *buf);

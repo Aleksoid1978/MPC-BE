@@ -148,7 +148,7 @@ HRESULT CTTAFile::Open(CBaseSplitterFile* pFile)
 				delete [] p;
 			}
 
-			if (m_APETag->TagItems.IsEmpty()) {
+			if (m_APETag->TagItems.empty()) {
 				SAFE_DELETE(m_APETag);
 			}
 		}
