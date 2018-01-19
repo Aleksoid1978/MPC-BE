@@ -8,7 +8,7 @@
 	Little-CMS git-lcms2.9rc1-16-g8aca404;
 	MediaInfo git-v7.10-8-g0a90b039;
 	openjpeg git-v2.3.0-9-gd9f8f7ba;
-	rapidjson git-v1.1.0-269-g7dddd054;
+	rapidjson git-v1.1.0-301-gfc7cda78;
 
 1.5.1
 ==============================
