@@ -315,7 +315,7 @@ HRESULT CWavPackFile::Open(CBaseSplitterFile* pFile)
 
 				m_endpos -= tag_size;
 
-				if (m_APETag->TagItems.IsEmpty()) {
+				if (m_APETag->TagItems.empty()) {
 					SAFE_DELETE(m_APETag);
 				}
 			}

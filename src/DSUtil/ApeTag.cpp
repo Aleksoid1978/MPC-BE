@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2017 see Authors.txt
+ * (C) 2012-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -62,8 +62,8 @@ bool CApeTagItem::Load(CGolombBuffer &gb){
 
 		if (tag_size) {
 			m_key = key;
-			m_Data.SetCount(tag_size);
-			gb.ReadBuffer(m_Data.GetData(), tag_size);
+			m_Data.resize(tag_size);
+			gb.ReadBuffer(m_Data.data(), tag_size);
 		}
 	} else {
 		BYTE* value = DNew BYTE[tag_size + 1];
@@ -94,18 +94,15 @@ CAPETag::~CAPETag()
 
 void CAPETag::Clear()
 {
-	CApeTagItem* item;
-	while (!TagItems.IsEmpty()) {
-		item = TagItems.RemoveHead();
-		if (item) {
-			delete item;
-		}
+	for (auto& item : TagItems) {
+		SAFE_DELETE(item);
 	}
+	TagItems.clear();
 
 	m_TagSize = m_TagFields = 0;
 }
 
-bool CAPETag::ReadFooter(BYTE *buf, size_t len)
+bool CAPETag::ReadFooter(BYTE *buf, const size_t& len)
 {
 	m_TagSize = m_TagFields = 0;
 
@@ -137,7 +134,7 @@ bool CAPETag::ReadFooter(BYTE *buf, size_t len)
 	return true;
 }
 
-bool CAPETag::ReadTags(BYTE *buf, size_t len)
+bool CAPETag::ReadTags(BYTE *buf, const size_t& len)
 {
 	if (!m_TagSize || m_TagSize != len) {
 		return false;
@@ -152,37 +149,28 @@ bool CAPETag::ReadTags(BYTE *buf, size_t len)
 			return false;
 		}
 
-		TagItems.AddTail(item);
+		TagItems.emplace_back(item);
 	}
 
 	return true;
 }
 
-CApeTagItem* CAPETag::Find(CString key)
+/*
+const CApeTagItem* CAPETag::Find(const CString& key)
 {
-	CString key_lc = key;
-	key_lc.MakeLower();
+	auto it = std::find_if(TagItems.begin(), TagItems.end(), [&](const CApeTagItem* item){
+		return (key.CompareNoCase(item->GetKey()) == 0);
+	});
 
-	POSITION pos = TagItems.GetHeadPosition();
-	while (pos) {
-		CApeTagItem* item = TagItems.GetAt(pos);
-		CString TagKey    = item->GetKey();
-		TagKey.MakeLower();
-		if (TagKey == key_lc) {
-			return item;
-		}
-
-		TagItems.GetNext(pos);
-	}
-
-	return nullptr;
+	return it != TagItems.end() ? *it : nullptr;
 }
+*/
 
 // additional functions
 
-void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* apetag)
+void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* pAPETag)
 {
-	if (!apetag || apetag->TagItems.IsEmpty()) {
+	if (!pAPETag || pAPETag->TagItems.empty()) {
 		return;
 	}
 
@@ -191,11 +179,8 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* apetag)
 
 	CString Artist, Comment, Title, Year, Album;
 
-	POSITION pos = apetag->TagItems.GetHeadPosition();
-	while (pos) {
-		CApeTagItem* item = apetag->TagItems.GetAt(pos);
-		CString TagKey    = item->GetKey();
-		TagKey.MakeLower();
+	for (const auto& item : pAPETag->TagItems) {
+		CString TagKey = item->GetKey().MakeLower();
 
 		if (item->GetType() == CApeTagItem::APE_TYPE_BINARY) {
 			CoverMime.Empty();
@@ -250,8 +235,6 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* apetag)
 				}
 			}
 		}
-
-		apetag->TagItems.GetNext(pos);
 	}
 
 	if (CComQIPtr<IDSMPropertyBag> pPB = pBF) {
@@ -267,29 +250,4 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* apetag)
 			pRB->ResAppend(CoverFileName, L"cover", CoverMime, CoverData.GetData(), (DWORD)CoverData.GetCount(), 0);
 		}
 	}
-}
-
-
-// ID3v2
-// TODO: remove it from here
-
-int id3v2_match_len(const unsigned char *buf)
-{
-	if (buf[0] == 'I' && buf[1] == 'D' && buf[2] == '3'
-			&& buf[3] != 0xff && buf[4] != 0xff
-			&& (buf[6] & 0x80) == 0
-			&& (buf[7] & 0x80) == 0
-			&& (buf[8] & 0x80) == 0
-			&& (buf[9] & 0x80) == 0) {
-		int len = ((buf[6] & 0x7f) << 21) +
-			((buf[7] & 0x7f) << 14) +
-			((buf[8] & 0x7f) << 7) +
-			(buf[9] & 0x7f) + ID3v2_HEADER_SIZE;
-
-		if (buf[5] & 0x10) {
-			len += ID3v2_HEADER_SIZE;
-		}
-		return len;
-	}
-	return 0;
 }
