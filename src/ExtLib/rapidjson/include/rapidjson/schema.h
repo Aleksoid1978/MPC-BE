@@ -25,7 +25,7 @@
 #define RAPIDJSON_SCHEMA_USE_INTERNALREGEX 0
 #endif
 
-#if !RAPIDJSON_SCHEMA_USE_INTERNALREGEX && !defined(RAPIDJSON_SCHEMA_USE_STDREGEX) && (__cplusplus >=201103L || (defined(_MSC_VER) && _MSC_VER >= 1800))
+#if !RAPIDJSON_SCHEMA_USE_INTERNALREGEX && defined(RAPIDJSON_SCHEMA_USE_STDREGEX) && (__cplusplus >=201103L || (defined(_MSC_VER) && _MSC_VER >= 1800))
 #define RAPIDJSON_SCHEMA_USE_STDREGEX 1
 #else
 #define RAPIDJSON_SCHEMA_USE_STDREGEX 0
@@ -349,6 +349,7 @@ public:
 
     Schema(SchemaDocumentType* schemaDocument, const PointerType& p, const ValueType& value, const ValueType& document, AllocatorType* allocator) :
         allocator_(allocator),
+        pointer_(p),
         typeless_(schemaDocument->GetTypeless()),
         enum_(),
         enumCount_(),
@@ -595,6 +596,10 @@ public:
             AllocatorType::Free(pattern_);
         }
 #endif
+    }
+
+    const PointerType& GetPointer() const {
+        return pointer_;
     }
 
     bool BeginValue(Context& context) const {
@@ -1216,6 +1221,7 @@ private:
     };
 
     AllocatorType* allocator_;
+    PointerType pointer_;
     const SchemaType* typeless_;
     uint64_t* enum_;
     SizeType enumCount_;
@@ -1651,7 +1657,7 @@ public:
 
     //! Gets the JSON pointer pointed to the invalid schema.
     PointerType GetInvalidSchemaPointer() const {
-        return schemaStack_.Empty() ? PointerType() : schemaDocument_->GetPointer(&CurrentSchema());
+        return schemaStack_.Empty() ? PointerType() : CurrentSchema().GetPointer();
     }
 
     //! Gets the keyword of invalid schema.
