@@ -458,7 +458,7 @@ void CPlaylistItem::AutoLoadFiles()
 						for (const auto& cueTrack : CUETrackList) {
 							CString cueTrackTitle;
 							MakeCUETitle(cueTrackTitle, cueTrack.m_Title, cueTrack.m_Performer, cueTrack.m_trackNum);
-							fi->AddChapter(Chapters(cueTrackTitle, cueTrack.m_rt));
+							fi->AddChapter(Chapters{cueTrackTitle, cueTrack.m_rt});
 						}
 						fi->SetTitle(m_label);
 
@@ -1369,7 +1369,7 @@ bool CPlayerPlaylistBar::ParseCUEPlayList(CString fn)
 				if (cueTrack.m_fn == fName) {
 					CString cueTrackTitle;
 					MakeCUETitle(cueTrackTitle, cueTrack.m_Title, cueTrack.m_Performer, cueTrack.m_trackNum);
-					fi.AddChapter(Chapters(cueTrackTitle, cueTrack.m_rt));
+					fi.AddChapter(Chapters{cueTrackTitle, cueTrack.m_rt});
 
 					if (bFirst && fileNames.size() > 1) {
 						MakeCUETitle(pli.m_label, cueTrack.m_Title, cueTrack.m_Performer);

@@ -72,7 +72,7 @@ public:
 	};
 
 	// Title
-	void SetTitle(CString Title) {
+	void SetTitle(const CString& Title) {
 		m_Title = Title;
 	}
 
@@ -81,7 +81,7 @@ public:
 	};
 
 	// Chapters
-	void AddChapter(Chapters chap) {
+	void AddChapter(const Chapters& chap) {
 		m_ChaptersList.push_back(chap);
 	}
 
@@ -94,7 +94,7 @@ public:
 	}
 
 	void GetChapters(ChaptersList& chaplist) {
-		chaplist.assign(m_ChaptersList.begin(), m_ChaptersList.end());
+		chaplist = m_ChaptersList;
 	}
 };
 typedef std::list<CFileItem> CFileItemList;

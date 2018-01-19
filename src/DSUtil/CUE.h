@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2014 see Authors.txt
+ * (C) 2011-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,19 +23,10 @@
 #include <list>
 
 struct Chapters {
-	REFERENCE_TIME	rt;
-	CString			name;
-
-	Chapters() {
-		rt		= 0;
-	}
-
-	Chapters(CString s, REFERENCE_TIME t) {
-		rt		= t;
-		name	= s;
-	}
+	CString        name;
+	REFERENCE_TIME rt = 0;
 };
 
 CString GetCUECommand(CString& ln);
-void MakeCUETitle(CString &Title, CString title, CString performer, UINT trackNum = UINT_MAX);
+void MakeCUETitle(CString &Title, const CString& title, const CString& performer, const UINT& trackNum = UINT_MAX);
 bool ParseCUESheet(CString cueData, std::list<Chapters> &ChaptersList, CString& Title, CString& Performer);

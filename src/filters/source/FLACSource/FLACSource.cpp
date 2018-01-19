@@ -276,24 +276,22 @@ CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		if (m_Cover.size()) {
 			((CFLACSource*)m_pFilter)->ResAppend(L"cover.jpg", L"cover", m_CoverMime, m_Cover.data(), (DWORD)m_Cover.size(), 0);
 		} else if (pID3Tag) {
-			BOOL bResAppend = FALSE;
-
-			POSITION pos = pID3Tag->TagItems.GetHeadPosition();
-			while (pos && !bResAppend) {
-				CID3TagItem* item = pID3Tag->TagItems.GetNext(pos);
+			for (const auto& item : pID3Tag->TagItems) {
 				if (item->GetType() == ID3Type::ID3_TYPE_BINARY && item->GetDataLen()) {
 					CString mime = item->GetMime();
 					CString fname;
-					if (mime == L"image/jpeg") {
+					if (mime == L"image/jpeg" || mime == L"image/jpg") {
 						fname = L"cover.jpg";
 					} else if (mime == L"image/png") {
 						fname = L"cover.png";
 					} else {
+						fname = mime;
 						fname.Replace(L"image/", L"cover.");
 					}
 
-					HRESULT hr2 = ((CFLACSource*)m_pFilter)->ResAppend(fname, L"cover", mime, (BYTE*)item->GetData(), (DWORD)item->GetDataLen(), 0);
-					bResAppend = SUCCEEDED(hr2);
+					if (SUCCEEDED(((CFLACSource*)m_pFilter)->ResAppend(fname, L"cover", mime, (BYTE*)item->GetData(), (DWORD)item->GetDataLen(), 0))) {
+						break;
+					}
 				}
 			}
 		}

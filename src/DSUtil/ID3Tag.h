@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2016 see Authors.txt
+ * (C) 2012-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,8 @@
 
 #pragma once
 
-#include <atlcoll.h>
+#include <map>
+#include <vector>
 #include "CUE.h"
 #include "GolombBuffer.h"
 
@@ -37,27 +38,35 @@ class CID3TagItem
 {
 public:
 
-	CID3TagItem(DWORD tag, CString value);
-	CID3TagItem(DWORD tag, CAtlArray<BYTE>& data, CString mime);
+	CID3TagItem(const DWORD& tag, const CString& value)
+		: m_type(ID3_TYPE_STRING)
+		, m_tag(tag)
+		, m_value(value) {}
 
-	DWORD GetTag()			const { return m_tag; }
-	CString GetValue()		const { return m_value; }
-	CString GetMime()		const { return m_Mime; }
-	const BYTE* GetData()	const { return m_Data.GetData(); }
-	size_t GetDataLen()		const { return m_Data.GetCount(); }
-	ID3Type GetType()		const { return m_type; }
+	CID3TagItem(const DWORD& tag, const std::vector<BYTE>& data, const CString& mime)
+		: m_type(ID3_TYPE_BINARY)
+		, m_tag(tag)
+		, m_Mime(mime)
+		, m_Data(data) {}
+
+	DWORD GetTag()        const { return m_tag; }
+	CString GetValue()    const { return m_value; }
+	CString GetMime()     const { return m_Mime; }
+	const BYTE* GetData() const { return m_Data.data(); }
+	size_t GetDataLen()   const { return m_Data.size(); }
+	ID3Type GetType()     const { return m_type; }
 
 protected:
-	DWORD			m_tag;
+	DWORD             m_tag;
 
 	// text value
-	CString			m_value;
+	CString           m_value;
 
 	// binary value
-	CAtlArray<BYTE>	m_Data;
-	CString			m_Mime;
+	std::vector<BYTE> m_Data;
+	CString           m_Mime;
 
-	ID3Type			m_type;
+	ID3Type           m_type;
 };
 
 //
@@ -70,16 +79,16 @@ protected:
 	BYTE m_major;
 	BYTE m_flags;
 
-	CString ReadText(CGolombBuffer& gb, DWORD size, BYTE encoding);
-	CString ReadField(CGolombBuffer& gb, DWORD &size, BYTE encoding);
+	CString ReadText(CGolombBuffer& gb, DWORD size, const BYTE& encoding);
+	CString ReadField(CGolombBuffer& gb, DWORD &size, const BYTE& encoding);
 
-	void ReadTag(DWORD tag, CGolombBuffer& gbData, DWORD &size, CID3TagItem** item);
+	void ReadTag(const DWORD& tag, CGolombBuffer& gbData, DWORD &size, CID3TagItem** item);
 	void ReadChapter(CGolombBuffer& gbData, DWORD &size);
 
 public:
-	CAtlMap<DWORD, CString>	Tags;
-	CAtlList<CID3TagItem*>	TagItems;
-	CAtlList<Chapters>		ChaptersList;
+	std::map<DWORD, CString> Tags;
+	std::list<CID3TagItem*>  TagItems;
+	std::list<Chapters>      ChaptersList;
 
 	CID3Tag(BYTE major = 0, BYTE flags = 0);
 	virtual ~CID3Tag();
@@ -92,7 +101,7 @@ public:
 };
 
 // additional functions
-void SetID3TagProperties(IBaseFilter* pBF, const CID3Tag* apetag);
+void SetID3TagProperties(IBaseFilter* pBF, const CID3Tag* pID3tag);
 
 static unsigned int hexdec2uint(unsigned int size)
 {
