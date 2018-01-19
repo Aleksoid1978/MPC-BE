@@ -88,7 +88,6 @@ public:
 	bool ReadTags(BYTE *buf, const size_t& len);
 
 	size_t GetTagSize() const { return m_TagSize; }
-	//const CApeTagItem* Find(const CString& key);
 };
 
 // additional functions

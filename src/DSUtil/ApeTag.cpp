@@ -155,17 +155,6 @@ bool CAPETag::ReadTags(BYTE *buf, const size_t& len)
 	return true;
 }
 
-/*
-const CApeTagItem* CAPETag::Find(const CString& key)
-{
-	auto it = std::find_if(TagItems.begin(), TagItems.end(), [&](const CApeTagItem* item){
-		return (key.CompareNoCase(item->GetKey()) == 0);
-	});
-
-	return it != TagItems.end() ? *it : nullptr;
-}
-*/
-
 // additional functions
 
 void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* pAPETag)
