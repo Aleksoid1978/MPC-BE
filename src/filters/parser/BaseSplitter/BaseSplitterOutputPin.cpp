@@ -310,12 +310,8 @@ DWORD CBaseSplitterOutputPin::ThreadProc()
 		int cnt = 0;
 		do {
 			CAutoPtr<CPacket> p;
-
-			{
-				CAutoLock cAutoLock(&m_queue);
-				if ((cnt = m_queue.GetCount()) > 0) {
-					p = m_queue.Remove();
-				}
+			if (cnt = m_queue.GetCount()) {
+				p = m_queue.Remove();
 			}
 
 			if (S_OK == m_hrDeliver && cnt > 0) {
