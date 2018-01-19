@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2017 see Authors.txt
+ * (C) 2012-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,27 +24,6 @@
 #include "DSMPropertyBag.h"
 
 //
-// ID3TagItem class
-//
-
-CID3TagItem::CID3TagItem(DWORD tag, CString value)
-	: m_type(ID3_TYPE_STRING)
-	, m_tag(tag)
-	, m_value(value)
-{
-}
-
-CID3TagItem::CID3TagItem(DWORD tag, CAtlArray<BYTE>& data, CString mime)
-	: m_type(ID3_TYPE_BINARY)
-	, m_tag(tag)
-	, m_Mime(mime)
-{
-	m_Data.SetCount(data.GetCount());
-	memcpy(m_Data.GetData(), data.GetData(), data.GetCount());
-}
-
-
-//
 // ID3Tag class
 //
 CID3Tag::CID3Tag(BYTE major/* = 0*/, BYTE flags/* = 0*/)
@@ -60,11 +39,10 @@ CID3Tag::~CID3Tag()
 
 void CID3Tag::Clear()
 {
-	CID3TagItem* item;
-	while (!TagItems.IsEmpty()) {
-		item = TagItems.RemoveHead();
+	for (auto& item : TagItems) {
 		SAFE_DELETE(item);
 	}
+	TagItems.clear();
 }
 
 // text encoding:
@@ -80,7 +58,7 @@ enum ID3v2Encoding {
 	UTF8     = 3,
 };
 
-CString CID3Tag::ReadText(CGolombBuffer& gb, DWORD size, BYTE encoding)
+CString CID3Tag::ReadText(CGolombBuffer& gb, DWORD size, const BYTE& encoding)
 {
 	CString  str;
 	CStringA strA;
@@ -125,7 +103,7 @@ CString CID3Tag::ReadText(CGolombBuffer& gb, DWORD size, BYTE encoding)
 	return str.Trim();
 }
 
-CString CID3Tag::ReadField(CGolombBuffer& gb, DWORD &size, BYTE encoding)
+CString CID3Tag::ReadField(CGolombBuffer& gb, DWORD &size, const BYTE& encoding)
 {
 	int pos = gb.GetPos();
 
@@ -171,7 +149,7 @@ static void ReadLang(CGolombBuffer &gb, DWORD &size)
 	size -= 3;
 }
 
-void CID3Tag::ReadTag(DWORD tag, CGolombBuffer& gbData, DWORD &size, CID3TagItem** item)
+void CID3Tag::ReadTag(const DWORD& tag, CGolombBuffer& gbData, DWORD &size, CID3TagItem** item)
 {
 	BYTE encoding = (BYTE)gbData.BitRead(8);
 	size--;
@@ -202,9 +180,9 @@ void CID3Tag::ReadTag(DWORD tag, CGolombBuffer& gbData, DWORD &size, CID3TagItem
 			}
 		}
 
-		CAtlArray<BYTE> data;
-		data.SetCount(size);
-		gbData.ReadBuffer(data.GetData(), size);
+		std::vector<BYTE> data;
+		data.resize(size);
+		gbData.ReadBuffer(data.data(), size);
 
 		*item = DNew CID3TagItem(tag, data, mimeStr);
 	} else {
@@ -286,7 +264,7 @@ void CID3Tag::ReadChapter(CGolombBuffer& gbData, DWORD &size)
 		chapterName = element;
 	}
 
-	ChaptersList.AddTail(Chapters(chapterName, MILLISECONDS_TO_100NS_UNITS(start)));
+	ChaptersList.emplace_back(Chapters{chapterName, MILLISECONDS_TO_100NS_UNITS(start)});
 }
 
 #define ID3v2_FLAG_DATALEN 0x0001
@@ -417,7 +395,7 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 			ReadTag(tag, gbData, size, &item);
 
 			if (item) {
-				TagItems.AddTail(item);
+				TagItems.emplace_back(item);
 			}
 		} else if (tag == 'CHAP') {
 			ReadChapter(gbData, size);
@@ -426,15 +404,13 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 		gb.Seek(pos);
 	}
 
-	POSITION pos2 = TagItems.GetHeadPosition();
-	while (pos2) {
-		CID3TagItem* item = TagItems.GetNext(pos2);
+	for (const auto& item : TagItems) {
 		if (item->GetType() == ID3Type::ID3_TYPE_STRING && item->GetTag()) {
 			Tags[item->GetTag()] = item->GetValue();
 		}
 	}
 
-	return TagItems.GetCount() ? TRUE : FALSE;
+	return !TagItems.empty() ? TRUE : FALSE;
 }
 
 static const LPCSTR s_genre[] = {
@@ -489,9 +465,9 @@ BOOL CID3Tag::ReadTagsV1(BYTE *buf, size_t len)
 	// title
 	gb.ReadBuffer((BYTE*)str.GetBufferSetLength(30), 30);
 	tag = 'TIT2';
-	if (!Tags.Lookup(tag, value)) {
+	if (Tags.find(tag) == Tags.cend()) {
 		CID3TagItem* item = DNew CID3TagItem(tag, CString(str).Trim());
-		TagItems.AddTail(item);
+		TagItems.emplace_back(item);
 
 		Tags[tag] = CString(str).Trim();
 	}
@@ -499,10 +475,10 @@ BOOL CID3Tag::ReadTagsV1(BYTE *buf, size_t len)
 	// artist
 	gb.ReadBuffer((BYTE*)str.GetBufferSetLength(30), 30);
 	tag = 'TPE1';
-	if (!Tags.Lookup(tag, value)) {
+	if (Tags.find(tag) == Tags.cend()) {
 		value = CString(str).Trim();
 		CID3TagItem* item = DNew CID3TagItem(tag, value);
-		TagItems.AddTail(item);
+		TagItems.emplace_back(item);
 
 		Tags[tag] = value;
 	}
@@ -510,10 +486,10 @@ BOOL CID3Tag::ReadTagsV1(BYTE *buf, size_t len)
 	// album
 	gb.ReadBuffer((BYTE*)str.GetBufferSetLength(30), 30);
 	tag = 'TALB';
-	if (!Tags.Lookup(tag, value)) {
+	if (Tags.find(tag) == Tags.cend()) {
 		value = CString(str).Trim();
 		CID3TagItem* item = DNew CID3TagItem(tag, value);
-		TagItems.AddTail(item);
+		TagItems.emplace_back(item);
 
 		Tags[tag] = value;
 	}
@@ -521,10 +497,10 @@ BOOL CID3Tag::ReadTagsV1(BYTE *buf, size_t len)
 	// year
 	gb.ReadBuffer((BYTE*)str.GetBufferSetLength(4), 4);
 	tag = 'TYER';
-	if (!Tags.Lookup(tag, value)) {
+	if (Tags.find(tag) == Tags.cend()) {
 		value = CString(str).Trim();
 		CID3TagItem* item = DNew CID3TagItem(tag, value);
-		TagItems.AddTail(item);
+		TagItems.emplace_back(item);
 
 		Tags[tag] = value;
 	}
@@ -532,10 +508,10 @@ BOOL CID3Tag::ReadTagsV1(BYTE *buf, size_t len)
 	// comment
 	gb.ReadBuffer((BYTE*)str.GetBufferSetLength(30), 30);
 	tag = 'COMM';
-	if (!Tags.Lookup(tag, value)) {
+	if (Tags.find(tag) == Tags.cend()) {
 		value = CString(str).Trim();
 		CID3TagItem* item = DNew CID3TagItem(tag, value);
-		TagItems.AddTail(item);
+		TagItems.emplace_back(item);
 
 		Tags[tag] = value;
 	}
@@ -544,10 +520,10 @@ BOOL CID3Tag::ReadTagsV1(BYTE *buf, size_t len)
 	LPCSTR s = str;
 	if (s[28] == 0 && s[29] != 0) {
 		tag = 'TRCK';
-		if (!Tags.Lookup(tag, value)) {
+		if (Tags.find(tag) == Tags.cend()) {
 			value.Format(L"%d", s[29]);
 			CID3TagItem* item = DNew CID3TagItem(tag, value);
-			TagItems.AddTail(item);
+			TagItems.emplace_back(item);
 
 			Tags[tag] = value;
 		}
@@ -557,10 +533,10 @@ BOOL CID3Tag::ReadTagsV1(BYTE *buf, size_t len)
 	BYTE genre = (BYTE)gb.BitRead(8);
 	if (genre < _countof(s_genre)) {
 		tag = 'TCON';
-		if (!Tags.Lookup(tag, value)) {
+		if (Tags.find(tag) == Tags.cend()) {
 			value = s_genre[genre];
 			CID3TagItem* item = DNew CID3TagItem(tag, value);
-			TagItems.AddTail(item);
+			TagItems.emplace_back(item);
 
 			Tags[tag] = value;
 		}
@@ -570,69 +546,73 @@ BOOL CID3Tag::ReadTagsV1(BYTE *buf, size_t len)
 }
 
 // additional functions
-void SetID3TagProperties(IBaseFilter* pBF, const CID3Tag* ID3tag)
+void SetID3TagProperties(IBaseFilter* pBF, const CID3Tag* pID3tag)
 {
-	if (!ID3tag || ID3tag->Tags.IsEmpty()) {
+	if (!pID3tag || pID3tag->Tags.empty()) {
 		return;
 	}
 
+	const auto Lookup = [&](const DWORD& tag, CString& str) {
+		if (const auto& it = pID3tag->Tags.find(tag); it != pID3tag->Tags.cend()) {
+			str = it->second;
+			return true;
+		}
+		return false;
+	};
+
 	if (CComQIPtr<IDSMPropertyBag> pPB = pBF) {
-		CStringW str, title;
-		if (ID3tag->Tags.Lookup('TIT2', str) || ID3tag->Tags.Lookup('\0TT2', str)) {
+		CString str, title;
+		if (Lookup('TIT2', str) || Lookup('\0TT2', str)) {
 			title = str;
 		}
-		if (ID3tag->Tags.Lookup('TYER', str) && !title.IsEmpty() && !str.IsEmpty()) {
+		if (Lookup('TYER', str) && !title.IsEmpty() && !str.IsEmpty()) {
 			title += L" (" + str + L")";
 		}
 		if (!title.IsEmpty()) {
 			pPB->SetProperty(L"TITL", title);
 		}
-		if (ID3tag->Tags.Lookup('TPE1', str) || ID3tag->Tags.Lookup('\0TP1', str)) {
+		if (Lookup('TPE1', str) || Lookup('\0TP1', str)) {
 			pPB->SetProperty(L"AUTH", str);
 		}
-		if (ID3tag->Tags.Lookup('TCOP', str)) {
+		if (Lookup('TCOP', str)) {
 			pPB->SetProperty(L"CPYR", str);
 		}
-		if (ID3tag->Tags.Lookup('COMM', str)) {
+		if (Lookup('COMM', str)) {
 			pPB->SetProperty(L"DESC", str);
 		}
-		if (ID3tag->Tags.Lookup('USLT', str) || ID3tag->Tags.Lookup('\0ULT', str)) {
+		if (Lookup('USLT', str) || Lookup('\0ULT', str)) {
 			pPB->SetProperty(L"LYRICS", str);
 		}
-		if (ID3tag->Tags.Lookup('TALB', str) || ID3tag->Tags.Lookup('\0TAL', str)) {
+		if (Lookup('TALB', str) || Lookup('\0TAL', str)) {
 			pPB->SetProperty(L"ALBUM", str);
 		}
 	}
 
-
 	if (CComQIPtr<IDSMResourceBag> pRB = pBF) {
-		BOOL bResAppend = FALSE;
-
-		POSITION pos = ID3tag->TagItems.GetHeadPosition();
-		while (pos && !bResAppend) {
-			CID3TagItem* item = ID3tag->TagItems.GetNext(pos);
+		for (const auto& item : pID3tag->TagItems) {
 			if (item->GetType() == ID3Type::ID3_TYPE_BINARY && item->GetDataLen()) {
 				CString mime = item->GetMime();
 				CString fname;
 				if (mime == L"image/jpeg" || mime == L"image/jpg") {
 					fname = L"cover.jpg";
+				} else if (mime == L"image/png") {
+					fname = L"cover.png";
 				} else {
 					fname = mime;
 					fname.Replace(L"image/", L"cover.");
 				}
 
-				HRESULT hr = pRB->ResAppend(fname, L"cover", mime, (BYTE*)item->GetData(), (DWORD)item->GetDataLen(), 0);
-				bResAppend = SUCCEEDED(hr);
+				if (SUCCEEDED(pRB->ResAppend(fname, L"cover", mime, (BYTE*)item->GetData(), (DWORD)item->GetDataLen(), 0))) {
+					break;
+				}
 			}
 		}
 	}
 
 	if (CComQIPtr<IDSMChapterBag> pCB = pBF) {
-		if (!ID3tag->ChaptersList.IsEmpty()) {
+		if (!pID3tag->ChaptersList.empty()) {
 			pCB->ChapRemoveAll();
-			POSITION pos = ID3tag->ChaptersList.GetHeadPosition();
-			while (pos) {
-				const Chapters& cp = ID3tag->ChaptersList.GetNext(pos);
+			for (const auto& cp : pID3tag->ChaptersList) {
 				pCB->ChapAppend(cp.rt, cp.name);
 			}
 		}

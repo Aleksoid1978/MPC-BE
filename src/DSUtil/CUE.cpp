@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2017 see Authors.txt
+ * (C) 2011-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,7 +38,7 @@ CString GetCUECommand(CString& ln)
 	return c;
 }
 
-void MakeCUETitle(CString &Title, CString title, CString performer, UINT trackNum)
+void MakeCUETitle(CString &Title, const CString& title, const CString& performer, const UINT& trackNum/* = UINT_MAX*/)
 {
 	if (performer.GetLength() > 0 && title.GetLength() > 0) {
 		Title.Format(L"%02u. %s - %s", trackNum, performer, title);
@@ -80,7 +80,7 @@ bool ParseCUESheet(CString cueData, std::list<Chapters> &ChaptersList, CString& 
 			if (rt != _I64_MIN && track_no != -1 && index_cnt) {
 				MakeCUETitle(TrackTitle, title, performer, track_no);
 				if (!TrackTitle.IsEmpty()) {
-					ChaptersList.push_back(Chapters(TrackTitle, rt));
+					ChaptersList.push_back(Chapters{TrackTitle, rt});
 				}
 			}
 			rt = _I64_MIN;
@@ -119,7 +119,7 @@ bool ParseCUESheet(CString cueData, std::list<Chapters> &ChaptersList, CString& 
 	if (rt != _I64_MAX && track_no != -1 && index_cnt) {
 		MakeCUETitle(TrackTitle, title, performer, track_no);
 		if (!TrackTitle.IsEmpty()) {
-			ChaptersList.push_back(Chapters(TrackTitle, rt));
+			ChaptersList.push_back(Chapters{TrackTitle, rt});
 		}
 	}
 
