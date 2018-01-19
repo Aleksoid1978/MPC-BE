@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,8 @@
 #pragma once
 
 #include <atlcoll.h>
+#include <deque>
+#include <mutex>
 #include <mpc_defines.h>
 
 #define PACKET_AAC_RAW 0x0001
@@ -46,18 +48,16 @@ public:
 	}
 };
 
-class CPacketQueue
-	: public CCritSec
-	, protected CAutoPtrList<CPacket>
+class CPacketQueue : protected std::deque<CAutoPtr<CPacket>>
 {
 	size_t m_size = 0;
+	std::mutex m_mutex;
 
 public:
-	CPacketQueue();
 	void Add(CAutoPtr<CPacket> p);
 	CAutoPtr<CPacket> Remove();
 	void RemoveAll();
-	size_t GetCount();
-	size_t GetSize();
-	REFERENCE_TIME GetDuration();
+	const size_t GetCount();
+	const size_t GetSize();
+	const REFERENCE_TIME GetDuration();
 };

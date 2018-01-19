@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,26 +25,20 @@
 // CPacketQueue
 //
 
-CPacketQueue::CPacketQueue()
-{
-}
-
 void CPacketQueue::Add(CAutoPtr<CPacket> p)
 {
-	CAutoLock cAutoLock(this);
-
+	std::unique_lock<std::mutex> lock(m_mutex);
 	if (p) {
 		m_size += p->GetCount();
 	}
-
-	AddTail(p);
+	emplace_back(p);
 }
 
 CAutoPtr<CPacket> CPacketQueue::Remove()
 {
-	CAutoLock cAutoLock(this);
-	ASSERT(__super::GetCount() > 0);
-	CAutoPtr<CPacket> p = RemoveHead();
+	std::unique_lock<std::mutex> lock(m_mutex);
+	ASSERT(!empty());
+	CAutoPtr<CPacket> p = front(); pop_front();
 	if (p) {
 		m_size -= p->GetCount();
 	}
@@ -53,25 +47,25 @@ CAutoPtr<CPacket> CPacketQueue::Remove()
 
 void CPacketQueue::RemoveAll()
 {
-	CAutoLock cAutoLock(this);
+	std::unique_lock<std::mutex> lock(m_mutex);
 	m_size = 0;
-	__super::RemoveAll();
+	clear();
 }
 
-size_t CPacketQueue::GetCount()
+const size_t CPacketQueue::GetCount()
 {
-	CAutoLock cAutoLock(this);
-	return __super::GetCount();
+	std::unique_lock<std::mutex> lock(m_mutex);
+	return size();
 }
 
-size_t CPacketQueue::GetSize()
+const size_t CPacketQueue::GetSize()
 {
-	CAutoLock cAutoLock(this);
+	std::unique_lock<std::mutex> lock(m_mutex);
 	return m_size;
 }
 
-REFERENCE_TIME CPacketQueue::GetDuration()
+const REFERENCE_TIME CPacketQueue::GetDuration()
 {
-	CAutoLock cAutoLock(this);
-	return GetCount() ? (GetTail()->rtStop - GetHead()->rtStart) : 0;
+	std::unique_lock<std::mutex> lock(m_mutex);
+	return !empty() ? (back()->rtStop - front()->rtStart) : 0;
 }
