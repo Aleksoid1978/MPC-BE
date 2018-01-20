@@ -1,5 +1,5 @@
 /*
- * (C) 2017 see Authors.txt
+ * (C) 2017-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,15 +36,15 @@ namespace DXVAState {
 		m_bDXVActive      = FALSE;
 		m_guidDXVADecoder = GUID_NULL;
 
-		m_sDXVADecoderDescription      = L"Software";
-		m_sDXVADecoderShortDescription = L"";
+		m_sDXVADecoderDescription = L"Software";
+		m_sDXVADecoderShortDescription.Empty();
 	}
 
-	void SetActiveState(const GUID& guidDXVADecoder, const CString& customDescription/* = L""*/)
+	void SetActiveState(const GUID& guidDXVADecoder, LPCWSTR customDescription/* = nullptr*/)
 	{
 		m_bDXVActive = TRUE;
 
-		if (!customDescription.IsEmpty()) {
+		if (customDescription) {
 			m_sDXVADecoderDescription = customDescription;
 			if (m_guidDXVADecoder != GUID_NULL) {
 				m_sDXVADecoderDescription.AppendFormat(L", %s", GetDXVAMode(m_guidDXVADecoder));
@@ -62,13 +62,13 @@ namespace DXVAState {
 		return m_bDXVActive;
 	}
 
-	const CString GetDescription()
+	LPCWSTR GetDescription()
 	{
-		return m_sDXVADecoderDescription;
+		return m_sDXVADecoderDescription.GetString();
 	}
 
-	const CString GetShortDescription()
+	LPCWSTR GetShortDescription()
 	{
-		return m_sDXVADecoderShortDescription;
+		return m_sDXVADecoderShortDescription.GetString();
 	}
 }

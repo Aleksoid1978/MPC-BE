@@ -4317,7 +4317,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	// Trying to find LAV Video is in the graph
 	if (CComQIPtr<ILAVVideoStatus> pLAVVideoStatus = FindFilter(GUID_LAVVideoDecoder, m_pGB)) {
-		const CString decoderName = pLAVVideoStatus->GetActiveDecoderName();
+		LPCWSTR decoderName = pLAVVideoStatus->GetActiveDecoderName();
 
 		static const struct {
 			const WCHAR* name;
@@ -4331,15 +4331,11 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 			{L"quicksync",       L"Intel QuickSync"},
 		};
 
-		CString FriendlyDecoderName;
 		for (const auto &item : LAVDecoderNames) {
-			if (item.name == decoderName) {
-				FriendlyDecoderName = item.friendlyname;
+			if (wcscmp(item.name, decoderName) == 0) {
+				DXVAState::SetActiveState(GUID_NULL, item.friendlyname);
+				break;
 			}
-		}
-
-		if (!FriendlyDecoderName.IsEmpty()) {
-			DXVAState::SetActiveState(GUID_NULL, FriendlyDecoderName);
 		}
 	}
 }

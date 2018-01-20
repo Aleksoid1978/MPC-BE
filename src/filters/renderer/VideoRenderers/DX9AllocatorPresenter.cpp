@@ -2089,7 +2089,8 @@ void CDX9AllocatorPresenter::DrawStats()
 				drawText(L"Decoder      : " + m_Decoder);
 			}
 
-			drawText(L"Decoder info : " + DXVAState::GetDescription());
+			strText.Format(L"Decoder info : %s", DXVAState::GetDescription());
+			drawText(strText);
 
 			if (m_D3D9Device.GetLength()) {
 				drawText(L"Render device: " + m_D3D9Device);
