@@ -26,10 +26,7 @@
 
 #define RAPIDJSON_ASSERT(x) ASSERT(x)
 #define RAPIDJSON_SSE2
-#pragma warning(push)
-#pragma warning(disable: 4996)
 #include <rapidjson/include/rapidjson/document.h>
-#pragma warning(pop)
 
 #define YOUTUBE_PL_URL              L"youtube.com/playlist?"
 #define YOUTUBE_URL                 L"youtube.com/watch?"
