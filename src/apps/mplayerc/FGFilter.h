@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -44,7 +44,7 @@ protected:
 			};
 		};
 	} m_merit;
-	CAtlList<GUID> m_types;
+	std::list<GUID> m_types;
 
 public:
 	CFGFilter(const CLSID& clsid, CStringW name = L"", UINT64 merit = MERIT64_DO_USE);
@@ -62,8 +62,8 @@ public:
 	DWORD GetMeritForDirectShow() const {
 		return m_merit.mid;
 	}
-	const CAtlList<GUID>& GetTypes() const;
-	void SetTypes(const CAtlList<GUID>& types);
+	const std::list<GUID>& GetTypes() const;
+	void SetTypes(const std::list<GUID>& types);
 	void SetMerit(UINT64 merit);
 	void SetName(CString name);
 	void AddType(const GUID& majortype, const GUID& subtype);

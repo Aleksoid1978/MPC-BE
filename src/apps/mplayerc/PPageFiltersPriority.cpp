@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -173,13 +173,13 @@ void CPPageFiltersPriority::Init()
 
 		CAtlList<CLSID> CLSID_List;
 
-		const bool bIsSource = (f->guids.GetCount() == 0);
+		const bool bIsSource = f->guids.empty();
 		bool bIsSplitter     = false;
 		if (!bIsSource) {
-			POSITION pos = f->guids.GetHeadPosition();
-			while (pos) {
-				CLSID major = f->guids.GetNext(pos);
-				CLSID sub   = f->guids.GetNext(pos);
+			auto it = f->guids.cbegin();
+			while (it != f->guids.cend() && std::next(it) != f->guids.cend()) {
+				CLSID major = *it++;
+				CLSID sub   = *it++;
 
 				if (major == MEDIATYPE_Stream) {
 					bIsSplitter = true;

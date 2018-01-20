@@ -442,20 +442,20 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 				for (const auto& pFGF : m_override) {
 					if (pFGF->GetCLSID() == clsid_value) {
-						const CAtlList<GUID>& types = pFGF->GetTypes();
-						if (types.GetCount() && !httpbuf.size()) {
+						const std::list<GUID>& types = pFGF->GetTypes();
+						if (types.size() && !httpbuf.size()) {
 							bool bIsSplitter = false;
-							POSITION pos = types.GetHeadPosition();
-							while (pos) {
-								CLSID major = types.GetNext(pos);
-								CLSID sub   = types.GetNext(pos);
+							auto it = types.cbegin();
+							while (it != types.cend() && std::next(it) != types.cend()) {
+								CLSID major = *it++;
+								CLSID sub   = *it++;
 
 								if (major == MEDIATYPE_Stream) {
 									bIsSplitter = true;
 
-									CAtlList<GUID> typesNew;
-									typesNew.AddTail(major);
-									typesNew.AddTail(sub);
+									std::list<GUID> typesNew;
+									typesNew.push_back(major);
+									typesNew.push_back(sub);
 									pFGF->SetTypes(typesNew);
 
 									break;
@@ -664,10 +664,10 @@ HRESULT CFGManager::AddSourceFilter(CFGFilter* pFGF, LPCWSTR lpcwstrFileName, LP
 	const AM_MEDIA_TYPE* pmt = nullptr;
 
 	CMediaType mt;
-	const CAtlList<GUID>& types = pFGF->GetTypes();
-	if (types.GetCount() == 2 && (types.GetHead() != GUID_NULL || types.GetTail() != GUID_NULL)) {
-		mt.majortype = types.GetHead();
-		mt.subtype = types.GetTail();
+	const std::list<GUID>& types = pFGF->GetTypes();
+	if (types.size() == 2 && (types.front() != GUID_NULL || types.back() != GUID_NULL)) {
+		mt.majortype = types.front();
+		mt.subtype = types.back();
 		pmt = &mt;
 	}
 

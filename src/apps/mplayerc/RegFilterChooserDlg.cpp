@@ -124,13 +124,13 @@ void CRegFilterChooserDlg::OnBnClickedOk()
 		CFGFilterRegistry fgf(pMoniker);
 		FilterOverride* f = DNew FilterOverride;
 		f->fDisabled = false;
-		f->type = FilterOverride::REGISTERED;
-		f->name = fgf.GetName();
-		f->dispname = fgf.GetDisplayName();
-		f->clsid = fgf.GetCLSID();
-		f->guids.AddTailList(&fgf.GetTypes());
-		f->backup.AddTailList(&fgf.GetTypes());
-		f->dwMerit = fgf.GetMeritForDirectShow();
+		f->type      = FilterOverride::REGISTERED;
+		f->name      = fgf.GetName();
+		f->dispname  = fgf.GetDisplayName();
+		f->clsid     = fgf.GetCLSID();
+		f->guids     = fgf.GetTypes();
+		f->backup    = fgf.GetTypes();
+		f->dwMerit   = fgf.GetMeritForDirectShow();
 		f->iLoadType = FilterOverride::MERIT;
 		m_filters.push_back(f);
 	}

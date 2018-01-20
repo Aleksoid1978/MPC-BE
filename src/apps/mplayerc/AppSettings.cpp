@@ -802,7 +802,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 				break;
 			}
 
-			f->backup.RemoveAll();
+			f->backup.clear();
 			for (unsigned int i = 0; ; i++) {
 				CString val;
 				val.Format(L"org%04u", i);
@@ -810,10 +810,13 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 				if (guid.IsEmpty()) {
 					break;
 				}
-				f->backup.AddTail(GUIDFromCString(guid));
+				f->backup.push_back(GUIDFromCString(guid));
+			}
+			if (f->backup.size() & 1) {
+				f->backup.pop_back();
 			}
 
-			f->guids.RemoveAll();
+			f->guids.clear();
 			for (unsigned int i = 0; ; i++) {
 				CString val;
 				val.Format(L"mod%04u", i);
@@ -821,7 +824,10 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 				if (guid.IsEmpty()) {
 					break;
 				}
-				f->guids.AddTail(GUIDFromCString(guid));
+				f->guids.push_back(GUIDFromCString(guid));
+			}
+			if (f->guids.size() & 1) {
+				f->guids.pop_back();
 			}
 
 			f->iLoadType = (int)pApp->GetProfileInt(key, L"LoadType", -1);
@@ -1602,17 +1608,17 @@ void CAppSettings::SaveExternalFilters()
 			pApp->WriteProfileString(key, L"Name", f->name);
 			pApp->WriteProfileString(key, L"CLSID", CStringFromGUID(f->clsid));
 		}
-		POSITION pos2 = f->backup.GetHeadPosition();
-		for (unsigned int i = 0; pos2; i++) {
+		unsigned i = 0;
+		for (const auto& item : f->backup) {
 			CString val;
-			val.Format(L"org%04u", i);
-			pApp->WriteProfileString(key, val, CStringFromGUID(f->backup.GetNext(pos2)));
+			val.Format(L"org%04u", i++);
+			pApp->WriteProfileString(key, val, CStringFromGUID(item));
 		}
-		pos2 = f->guids.GetHeadPosition();
-		for (unsigned int i = 0; pos2; i++) {
+		i = 0;
+		for (const auto& item : f->guids) {
 			CString val;
-			val.Format(L"mod%04u", i);
-			pApp->WriteProfileString(key, val, CStringFromGUID(f->guids.GetNext(pos2)));
+			val.Format(L"mod%04u", i++);
+			pApp->WriteProfileString(key, val, CStringFromGUID(item));
 		}
 		pApp->WriteProfileInt(key, L"LoadType", f->iLoadType);
 		pApp->WriteProfileInt(key, L"Merit", f->dwMerit);
