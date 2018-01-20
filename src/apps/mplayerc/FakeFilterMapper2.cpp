@@ -657,8 +657,8 @@ STDMETHODIMP CFilterMapper2::RegisterFilter(REFCLSID clsidFilter, LPCWSTR Name, 
 						if (!rgPin.lpMediaType[i].clsMajorType || !rgPin.lpMediaType[i].clsMinorType) {
 							break;
 						}
-						f->guids.AddTail(*rgPin.lpMediaType[i].clsMajorType);
-						f->guids.AddTail(*rgPin.lpMediaType[i].clsMinorType);
+						f->guids.push_back(*rgPin.lpMediaType[i].clsMajorType);
+						f->guids.push_back(*rgPin.lpMediaType[i].clsMinorType);
 					}
 				}
 			} else if (prf2->dwVersion == 2) {
@@ -672,13 +672,13 @@ STDMETHODIMP CFilterMapper2::RegisterFilter(REFCLSID clsidFilter, LPCWSTR Name, 
 						if (!rgPin.lpMediaType[i].clsMajorType || !rgPin.lpMediaType[i].clsMinorType) {
 							break;
 						}
-						f->guids.AddTail(*rgPin.lpMediaType[i].clsMajorType);
-						f->guids.AddTail(*rgPin.lpMediaType[i].clsMinorType);
+						f->guids.push_back(*rgPin.lpMediaType[i].clsMajorType);
+						f->guids.push_back(*rgPin.lpMediaType[i].clsMinorType);
 					}
 				}
 			}
 
-			f->backup.AddTailList(&f->guids);
+			f->backup = f->guids;
 
 			m_filters.push_back(f);
 		}

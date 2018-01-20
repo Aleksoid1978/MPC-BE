@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,15 +38,15 @@ CFGFilter::CFGFilter(const CLSID& clsid, CStringW name, UINT64 merit)
 	m_merit.val = merit;
 }
 
-const CAtlList<GUID>& CFGFilter::GetTypes() const
+const std::list<GUID>& CFGFilter::GetTypes() const
 {
 	return m_types;
 }
 
-void CFGFilter::SetTypes(const CAtlList<GUID>& types)
+void CFGFilter::SetTypes(const std::list<GUID>& types)
 {
-	m_types.RemoveAll();
-	m_types.AddTailList(&types);
+	//m_types.clear();
+	m_types = types;
 }
 
 void CFGFilter::SetMerit(UINT64 merit)
@@ -61,20 +61,16 @@ void CFGFilter::SetName(CString name)
 
 void CFGFilter::AddType(const GUID& majortype, const GUID& subtype)
 {
-	m_types.AddTail(majortype);
-	m_types.AddTail(subtype);
+	m_types.push_back(majortype);
+	m_types.push_back(subtype);
 }
 
 bool CFGFilter::CheckTypes(const CAtlArray<GUID>& types, bool fExactMatch)
 {
-	POSITION pos = m_types.GetHeadPosition();
-	while (pos) {
-		const GUID& majortype = m_types.GetNext(pos);
-		if (!pos) {
-			ASSERT(0);
-			break;
-		}
-		const GUID& subtype = m_types.GetNext(pos);
+	auto it = m_types.cbegin();
+	while (it != m_types.cend() && std::next(it) != m_types.cend()) {
+		const GUID& majortype = *it++;
+		const GUID& subtype   = *it++;
 
 		for (int i = 0, len = types.GetCount() & ~1; i < len; i += 2) {
 			if (fExactMatch) {
@@ -335,7 +331,7 @@ void CFGFilterRegistry::ExtractFilterData(BYTE* p, UINT len)
 		m_merit.mid = *(DWORD*)p;
 		p += 4;
 
-		m_types.RemoveAll();
+		m_types.clear();
 
 		ChkLen(8)
 		DWORD nPins = *(DWORD*)p;

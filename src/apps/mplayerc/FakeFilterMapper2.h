@@ -34,7 +34,7 @@ public:
 	CString path, name;
 	CLSID clsid;
 	// props
-	CAtlList<GUID> guids, backup;
+	std::list<GUID> guids, backup;
 	enum { PREFERRED, BLOCK, MERIT };
 	int iLoadType;
 	DWORD dwMerit;
@@ -55,8 +55,8 @@ public:
 		path		= f->path;
 		name		= f->name;
 		clsid		= f->clsid;
-		guids.AddTailList(&f->guids);
-		backup.AddTailList(&f->backup);
+		guids		= f->guids;
+		backup		= f->backup;
 		iLoadType	= f->iLoadType;
 		dwMerit		= f->dwMerit;
 	}

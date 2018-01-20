@@ -30,6 +30,19 @@
 #include "FGFilter.h"
 #include <moreuuids.h>
 
+// returns an iterator on the found element, or last if nothing is found
+template <class T>
+auto FindInListByPointer(std::list<T>& list, const T* p)
+{
+	auto it = list.begin();
+	for (; it != list.end(); ++it) {
+		if (&*it == p) {
+			break;
+		}
+	}
+
+	return it;
+}
 
 // CPPageExternalFilters dialog
 
@@ -373,7 +386,7 @@ void CPPageExternalFilters::OnAddRegistered()
 			if (f) {
 				CAutoPtr<FilterOverride> p(f);
 
-				if (f->name.IsEmpty() && !f->guids.GetCount() && !f->dwMerit) {
+				if (f->name.IsEmpty() && !f->guids.size() && !f->dwMerit) {
 					// skip something strange
 					continue;
 				}
@@ -479,18 +492,18 @@ void CPPageExternalFilters::OnAddMajorType()
 
 	CSelectMediaType dlg(guids, MEDIATYPE_NULL, this);
 	if (dlg.DoModal() == IDOK) {
-		POSITION pos = f->guids.GetHeadPosition();
-		while (pos) {
-			if (f->guids.GetNext(pos) == dlg.m_guid) {
+		auto it = f->guids.begin();
+		while (it != f->guids.end() && std::next(it) != f->guids.end()) {
+			if (*it++ == dlg.m_guid) {
 				AfxMessageBox(ResStr(IDS_EXTERNAL_FILTERS_ERROR_MT), MB_ICONEXCLAMATION | MB_OK);
 				return;
 			}
-			f->guids.GetNext(pos);
+			it++;
 		}
 
-		f->guids.AddTail(dlg.m_guid);
-		pos = f->guids.GetTailPosition();
-		f->guids.AddTail(GUID_NULL);
+		f->guids.push_back(dlg.m_guid);
+		it = --f->guids.end();
+		f->guids.push_back(GUID_NULL);
 
 		CString major = GetMediaTypeName(dlg.m_guid);
 		CString sub = GetMediaTypeName(GUID_NULL);
@@ -499,7 +512,7 @@ void CPPageExternalFilters::OnAddMajorType()
 		m_tree.SetItemData(node, NULL);
 
 		node = m_tree.InsertItem(sub, node);
-		m_tree.SetItemData(node, (DWORD_PTR)pos);
+		m_tree.SetItemData(node, (DWORD_PTR)&*it);
 
 		SetModified();
 	}
@@ -522,8 +535,13 @@ void CPPageExternalFilters::OnAddSubType()
 		return;
 	}
 
-	POSITION pos = (POSITION)m_tree.GetItemData(child);
-	GUID major = f->guids.GetAt(pos);
+	auto it = FindInListByPointer(f->guids, (GUID*)m_tree.GetItemData(child));
+	if (it == f->guids.end()) {
+		ASSERT(0);
+		return;
+	}
+
+	GUID major = *it;
 
 	CAtlArray<GUID> guids;
 	SetupSubTypes(guids);
@@ -531,22 +549,22 @@ void CPPageExternalFilters::OnAddSubType()
 	CSelectMediaType dlg(guids, MEDIASUBTYPE_NULL, this);
 	if (dlg.DoModal() == IDOK) {
 		for (child = m_tree.GetChildItem(node); child; child = m_tree.GetNextSiblingItem(child)) {
-			pos = (POSITION)m_tree.GetItemData(child);
-			f->guids.GetNext(pos);
-			if (f->guids.GetAt(pos) == dlg.m_guid) {
+			it = FindInListByPointer(f->guids, (GUID*)m_tree.GetItemData(child));
+			it++;
+			if (*it == dlg.m_guid) {
 				AfxMessageBox(ResStr(IDS_EXTERNAL_FILTERS_ERROR_MT), MB_ICONEXCLAMATION | MB_OK);
 				return;
 			}
 		}
 
-		f->guids.AddTail(major);
-		pos = f->guids.GetTailPosition();
-		f->guids.AddTail(dlg.m_guid);
+		f->guids.push_back(major);
+		it = --f->guids.end(); // iterator for major
+		f->guids.push_back(dlg.m_guid);
 
 		CString sub = GetMediaTypeName(dlg.m_guid);
 
 		node = m_tree.InsertItem(sub, node);
-		m_tree.SetItemData(node, (DWORD_PTR)pos);
+		m_tree.SetItemData(node, (DWORD_PTR)&*it);
 
 		SetModified();
 	}
@@ -560,39 +578,30 @@ void CPPageExternalFilters::OnDeleteType()
 			return;
 		}
 
-		POSITION pos = (POSITION)m_tree.GetItemData(node);
+		auto it = FindInListByPointer(f->guids, (GUID*)m_tree.GetItemData(node));
 
-		if (pos == nullptr) {
+		if (it == f->guids.end()) {
 			for (HTREEITEM child = m_tree.GetChildItem(node); child; child = m_tree.GetNextSiblingItem(child)) {
-				pos = (POSITION)m_tree.GetItemData(child);
+				it = FindInListByPointer(f->guids, (GUID*)m_tree.GetItemData(child));
 
-				POSITION pos1 = pos;
-				f->guids.GetNext(pos);
-				POSITION pos2 = pos;
-				f->guids.GetNext(pos);
-
-				f->guids.RemoveAt(pos1);
-				f->guids.RemoveAt(pos2);
+				f->guids.erase(it++);
+				f->guids.erase(it++);
 			}
 
 			m_tree.DeleteItem(node);
 		} else {
 			HTREEITEM parent = m_tree.GetParentItem(node);
 
-			POSITION pos1 = pos;
-			f->guids.GetNext(pos);
-			POSITION pos2 = pos;
-			f->guids.GetNext(pos);
-
 			m_tree.DeleteItem(node);
 
 			if (!m_tree.ItemHasChildren(parent)) {
-				f->guids.SetAt(pos2, GUID_NULL);
+				auto it1 = it++;
+				*it = GUID_NULL;
 				node = m_tree.InsertItem(GetMediaTypeName(GUID_NULL), parent);
-				m_tree.SetItemData(node, (DWORD_PTR)pos1);
+				m_tree.SetItemData(node, (DWORD_PTR)&*it1);
 			} else {
-				f->guids.RemoveAt(pos1);
-				f->guids.RemoveAt(pos2);
+				f->guids.erase(it++);
+				f->guids.erase(it++);
 			}
 		}
 
@@ -606,18 +615,17 @@ void CPPageExternalFilters::OnResetTypes()
 		if (f->type == FilterOverride::REGISTERED) {
 			CFGFilterRegistry fgf(f->dispname);
 			if (!fgf.GetName().IsEmpty()) {
-				f->guids.RemoveAll();
-				f->backup.RemoveAll();
-
-				f->guids.AddTailList(&fgf.GetTypes());
-				f->backup.AddTailList(&fgf.GetTypes());
+				//f->guids.clear();
+				//f->backup.clear();
+				f->guids = fgf.GetTypes();
+				f->backup = fgf.GetTypes();
 			} else {
-				f->guids.RemoveAll();
-				f->guids.AddTailList(&f->backup);
+				//f->guids.clear();
+				f->guids = f->backup;
 			}
 		} else {
-			f->guids.RemoveAll();
-			f->guids.AddTailList(&f->backup);
+			//f->guids.clear();
+			f->guids = f->backup;
 		}
 
 		m_pLastSelFilter = nullptr;
@@ -647,11 +655,11 @@ void CPPageExternalFilters::OnLbnSelchangeList1()
 
 		CMapStringToPtr map;
 
-		POSITION pos = f->guids.GetHeadPosition();
-		while (pos) {
-			POSITION tmp = pos;
-			CString major = GetMediaTypeName(f->guids.GetNext(pos));
-			CString sub = GetMediaTypeName(f->guids.GetNext(pos));
+		auto it = f->guids.begin();
+		while (it != f->guids.end() && std::next(it) != f->guids.end()) {
+			GUID* tmp = &*it;
+			CString major = GetMediaTypeName(*it++);
+			CString sub = GetMediaTypeName(*it++);
 
 			HTREEITEM node = nullptr;
 
@@ -725,22 +733,23 @@ void CPPageExternalFilters::OnNMDblclkTree2(NMHDR *pNMHDR, LRESULT *pResult)
 			return;
 		}
 
-		POSITION pos = (POSITION)m_tree.GetItemData(node);
-		if (!pos) {
+		auto it = FindInListByPointer(f->guids, (GUID*)m_tree.GetItemData(node));
+		if (it == f->guids.end()) {
+			ASSERT(0);
 			return;
 		}
 
-		f->guids.GetNext(pos);
-		if (!pos) {
+		it++;
+		if (it == f->guids.end()) {
 			return;
 		}
 
 		CAtlArray<GUID> guids;
 		SetupSubTypes(guids);
 
-		CSelectMediaType dlg(guids, f->guids.GetAt(pos), this);
+		CSelectMediaType dlg(guids, *it, this);
 		if (dlg.DoModal() == IDOK) {
-			f->guids.SetAt(pos, dlg.m_guid);
+			*it = dlg.m_guid;
 			m_tree.SetItemText(node, GetMediaTypeName(dlg.m_guid));
 
 			SetModified();
