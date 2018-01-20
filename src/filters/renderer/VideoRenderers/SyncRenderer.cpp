@@ -1883,7 +1883,7 @@ void CBaseAP::DrawStats()
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
-			strText = L"Decoder info : " + DXVAState::GetDescription();
+			strText.Format(L"Decoder info : %s", DXVAState::GetDescription());
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 

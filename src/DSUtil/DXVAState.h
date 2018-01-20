@@ -1,5 +1,5 @@
 /*
- * (C) 2017 see Authors.txt
+ * (C) 2017-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,8 +24,8 @@
 
 namespace DXVAState {
 	void ClearState();
-	void SetActiveState(const GUID& guidDXVADecoder, const CString& customDescription = L"");
+	void SetActiveState(const GUID& guidDXVADecoder, LPCWSTR customDescription = nullptr);
 	const BOOL GetState();
-	const CString GetDescription();
-	const CString GetShortDescription();
+	LPCWSTR GetDescription();
+	LPCWSTR GetShortDescription();
 }
