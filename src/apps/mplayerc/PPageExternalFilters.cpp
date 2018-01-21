@@ -36,7 +36,7 @@ auto FindInListByPointer(std::list<T>& list, const T* p)
 {
 	auto it = list.begin();
 	for (; it != list.end(); ++it) {
-		if (&*it == p) {
+		if (&(*it) == p) {
 			break;
 		}
 	}
@@ -512,7 +512,7 @@ void CPPageExternalFilters::OnAddMajorType()
 		m_tree.SetItemData(node, NULL);
 
 		node = m_tree.InsertItem(sub, node);
-		m_tree.SetItemData(node, (DWORD_PTR)&*it);
+		m_tree.SetItemData(node, (DWORD_PTR)&(*it));
 
 		SetModified();
 	}
@@ -564,7 +564,7 @@ void CPPageExternalFilters::OnAddSubType()
 		CString sub = GetMediaTypeName(dlg.m_guid);
 
 		node = m_tree.InsertItem(sub, node);
-		m_tree.SetItemData(node, (DWORD_PTR)&*it);
+		m_tree.SetItemData(node, (DWORD_PTR)&(*it));
 
 		SetModified();
 	}
@@ -598,7 +598,7 @@ void CPPageExternalFilters::OnDeleteType()
 				auto it1 = it++;
 				*it = GUID_NULL;
 				node = m_tree.InsertItem(GetMediaTypeName(GUID_NULL), parent);
-				m_tree.SetItemData(node, (DWORD_PTR)&*it1);
+				m_tree.SetItemData(node, (DWORD_PTR)&(*it1));
 			} else {
 				f->guids.erase(it++);
 				f->guids.erase(it++);
@@ -657,7 +657,7 @@ void CPPageExternalFilters::OnLbnSelchangeList1()
 
 		auto it = f->guids.begin();
 		while (it != f->guids.end() && std::next(it) != f->guids.end()) {
-			GUID* tmp = &*it;
+			GUID* tmp = &(*it);
 			CString major = GetMediaTypeName(*it++);
 			CString sub = GetMediaTypeName(*it++);
 
