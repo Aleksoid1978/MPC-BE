@@ -283,24 +283,16 @@ public:
 		}
 
 		const stream* GetStream(DWORD pid) {
-			for (const auto& s : (*this)) {
-				if (s == pid) {
-					return &s;
-				}
-			}
-
-			return nullptr;
+			const auto it = std::find(cbegin(), cend(), pid);
+			return (it != cend()) ? &(*it) : nullptr;
 		}
 
 		const bool Find(const stream& s) {
-			const auto it = std::find(cbegin(), cend(), s);
-			return (it != cend());
+			return (std::find(cbegin(), cend(), s) != cend());
 		}
 
 		const bool Find(const WORD& pid) {
-			stream s; s.pid = pid;
-			const auto it = std::find(cbegin(), cend(), s);
-			return (it != cend());
+			return (std::find(cbegin(), cend(), pid) != cend());
 		}
 
 		static const CString ToString(const int& type) {
