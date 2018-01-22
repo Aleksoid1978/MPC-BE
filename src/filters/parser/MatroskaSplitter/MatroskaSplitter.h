@@ -101,6 +101,8 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 	int m_bits;
 	int m_interlaced;
 
+	std::vector<SyncPoint> m_sps;
+
 private:
 	CCritSec m_csProps;
 	bool m_bLoadEmbeddedFonts, m_bCalcDuration;
