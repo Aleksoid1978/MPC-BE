@@ -1556,7 +1556,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		SetProperty(L"TITL", Title);
 	}
 
-	if (!m_pOutputs.IsEmpty()) {
+	if (!m_pOutputs.IsEmpty() && !m_pFile->m_segment.Cues.IsEmpty()) {
 		auto& s = m_pFile->m_segment;
 		const UINT64 TrackNumber = s.GetMasterTrack();
 		QWORD lastCueClusterPosition = ULONGLONG_MAX;
@@ -1725,7 +1725,7 @@ bool CMatroskaSplitterFilter::DemuxInit()
 	}
 
 	// reindex if needed
-	if (m_pFile->IsRandomAccess() && m_pFile->m_segment.Cues.GetCount() == 0) {
+	if (m_pFile->IsRandomAccess() && m_pFile->m_segment.Cues.IsEmpty()) {
 		m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
 		m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 
