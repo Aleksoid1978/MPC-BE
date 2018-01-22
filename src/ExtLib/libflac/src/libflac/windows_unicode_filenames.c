@@ -185,6 +185,16 @@ int flac_internal_rename_utf8(const char *oldname, const char *newname)
 
 HANDLE WINAPI flac_internal_CreateFile_utf8(const char *lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)
 {
+#if _MSC_VER > 1900 && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
+	wchar_t *wname;
+	HANDLE handle = INVALID_HANDLE_VALUE;
+
+	if ((wname = wchar_from_utf8(lpFileName)) != NULL) {
+
+		handle = CreateFile2(wname, dwDesiredAccess, dwShareMode, CREATE_ALWAYS, NULL);
+		free(wname);
+	}
+#else
 	if (!utf8_filenames) {
 		return CreateFileA(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
 	} else {
@@ -198,4 +208,5 @@ HANDLE WINAPI flac_internal_CreateFile_utf8(const char *lpFileName, DWORD dwDesi
 
 		return handle;
 	}
+#endif
 }
