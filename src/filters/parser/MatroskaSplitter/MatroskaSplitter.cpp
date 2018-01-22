@@ -808,48 +808,48 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					pTE->DefaultDuration.Set(AvgTimePerFrame * 100);
 				}
 
-				for (size_t i = 0; i < mts.size(); i++) {
-					if (mts[i].formattype == FORMAT_VideoInfo
-							|| mts[i].formattype == FORMAT_VideoInfo2
-							|| mts[i].formattype == FORMAT_MPEG2Video
-							|| mts[i].formattype == FORMAT_MPEGVideo) {
+				for (auto& item : mts) {
+					if (item.formattype == FORMAT_VideoInfo
+							|| item.formattype == FORMAT_VideoInfo2
+							|| item.formattype == FORMAT_MPEG2Video
+							|| item.formattype == FORMAT_MPEGVideo) {
 						if (pTE->v.PixelWidth && pTE->v.PixelHeight) {
 							RECT rect = {(LONG)pTE->v.VideoPixelCropLeft,
 										 (LONG)pTE->v.VideoPixelCropTop,
 										 (LONG)(pTE->v.PixelWidth - pTE->v.VideoPixelCropRight),
 										 (LONG)(pTE->v.PixelHeight - pTE->v.VideoPixelCropBottom)
 										};
-							VIDEOINFOHEADER *vih = (VIDEOINFOHEADER*)mts[i].Format();
+							VIDEOINFOHEADER *vih = (VIDEOINFOHEADER*)item.Format();
 							vih->rcSource = vih->rcTarget = rect;
 						}
 
 						if (AvgTimePerFrame) {
-							((VIDEOINFOHEADER*)mts[i].Format())->AvgTimePerFrame = AvgTimePerFrame;
+							((VIDEOINFOHEADER*)item.Format())->AvgTimePerFrame = AvgTimePerFrame;
 						}
 					}
 				}
 
 				if (pTE->v.DisplayWidth && pTE->v.DisplayHeight) {
-					for (size_t i = 0; i < mts.size(); i++) {
-						if (mts[i].formattype == FORMAT_VideoInfo) {
+					for (auto& item : mts) {
+						if (item.formattype == FORMAT_VideoInfo) {
 							DWORD vih1 = FIELD_OFFSET(VIDEOINFOHEADER, bmiHeader);
 							DWORD vih2 = FIELD_OFFSET(VIDEOINFOHEADER2, bmiHeader);
-							DWORD bmi = mts[i].FormatLength() - FIELD_OFFSET(VIDEOINFOHEADER, bmiHeader);
+							DWORD bmi = item.FormatLength() - FIELD_OFFSET(VIDEOINFOHEADER, bmiHeader);
 
-							mts[i].formattype = FORMAT_VideoInfo2;
-							mts[i].ReallocFormatBuffer(vih2 + bmi);
-							memmove(mts[i].Format() + vih2, mts[i].Format() + vih1, bmi);
-							memset(mts[i].Format() + vih1, 0, vih2 - vih1);
+							item.formattype = FORMAT_VideoInfo2;
+							item.ReallocFormatBuffer(vih2 + bmi);
+							memmove(item.Format() + vih2, item.Format() + vih1, bmi);
+							memset(item.Format() + vih1, 0, vih2 - vih1);
 
 							CSize aspect((int)pTE->v.DisplayWidth, (int)pTE->v.DisplayHeight);
 							ReduceDim(aspect);
-							((VIDEOINFOHEADER2*)mts[i].Format())->dwPictAspectRatioX = aspect.cx;
-							((VIDEOINFOHEADER2*)mts[i].Format())->dwPictAspectRatioY = aspect.cy;
-						} else if (mts[i].formattype == FORMAT_MPEG2Video) {
+							((VIDEOINFOHEADER2*)item.Format())->dwPictAspectRatioX = aspect.cx;
+							((VIDEOINFOHEADER2*)item.Format())->dwPictAspectRatioY = aspect.cy;
+						} else if (item.formattype == FORMAT_MPEG2Video) {
 							CSize aspect((int)pTE->v.DisplayWidth, (int)pTE->v.DisplayHeight);
 							ReduceDim(aspect);
-							((MPEG2VIDEOINFO*)mts[i].Format())->hdr.dwPictAspectRatioX = aspect.cx;
-							((MPEG2VIDEOINFO*)mts[i].Format())->hdr.dwPictAspectRatioY = aspect.cy;
+							((MPEG2VIDEOINFO*)item.Format())->hdr.dwPictAspectRatioX = aspect.cx;
+							((MPEG2VIDEOINFO*)item.Format())->hdr.dwPictAspectRatioY = aspect.cy;
 						}
 					}
 				}
@@ -949,21 +949,27 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 
 				if (mt.subtype == MEDIASUBTYPE_VP90 && m_profile != -1 && m_pix_fmt != -1) {
-					VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + 16);
-					BYTE *extra = (BYTE*)(vih2 + 1);
-					memcpy(extra, "vpcC", 4);
-					// use code from LAV
-					AV_WB8 (extra +  4, 1); // version
-					AV_WB24(extra +  5, 0); // flags
-					AV_WB8 (extra +  8, m_profile);
-					AV_WB8 (extra +  9, 0);
-					AV_WB8 (extra + 10, m_bits << 4 | (m_ColorSpace ? m_ColorSpace->ChromaLocation : 0 ) << 1 | (m_ColorSpace ? m_ColorSpace->Range == AVCOL_RANGE_JPEG : 0));
-					AV_WB8 (extra + 11, m_ColorSpace ? m_ColorSpace->Primaries : AVCOL_PRI_UNSPECIFIED);
-					AV_WB8 (extra + 12, m_ColorSpace ? m_ColorSpace->TransferCharacteristics : AVCOL_TRC_UNSPECIFIED);
-					AV_WB8 (extra + 13, m_ColorSpace ? m_ColorSpace->MatrixCoefficients : AVCOL_SPC_UNSPECIFIED);
-					AV_WB16(extra + 14, 0); // no codec init data
+					for (const auto& item : mts) {
+						if (item.formattype == FORMAT_VideoInfo2) {
+							mt = item;
+							VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + 16);
+							BYTE *extra = (BYTE*)(vih2 + 1);
+							memcpy(extra, "vpcC", 4);
+							// use code from LAV
+							AV_WB8 (extra +  4, 1); // version
+							AV_WB24(extra +  5, 0); // flags
+							AV_WB8 (extra +  8, m_profile);
+							AV_WB8 (extra +  9, 0);
+							AV_WB8 (extra + 10, m_bits << 4 | (m_ColorSpace ? m_ColorSpace->ChromaLocation : 0 ) << 1 | (m_ColorSpace ? m_ColorSpace->Range == AVCOL_RANGE_JPEG : 0));
+							AV_WB8 (extra + 11, m_ColorSpace ? m_ColorSpace->Primaries : AVCOL_PRI_UNSPECIFIED);
+							AV_WB8 (extra + 12, m_ColorSpace ? m_ColorSpace->TransferCharacteristics : AVCOL_TRC_UNSPECIFIED);
+							AV_WB8 (extra + 13, m_ColorSpace ? m_ColorSpace->MatrixCoefficients : AVCOL_SPC_UNSPECIFIED);
+							AV_WB16(extra + 14, 0); // no codec init data
 
-					mts.insert(mts.cbegin(), mt);
+							mts.insert(mts.cbegin(), mt);
+							break;
+						}
+					}
 				}
 			} else if (pTE->TrackType == TrackEntry::TypeAudio) {
 				Name.Format(L"Audio %d", iAudio++);
