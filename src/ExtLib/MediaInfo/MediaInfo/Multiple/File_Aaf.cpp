@@ -25,7 +25,9 @@
 #include "MediaInfo/Multiple/File__ReferenceFilesHelper.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #include "ZenLib/FileName.h"
+#if defined(MEDIAINFO_REFERENCES_YES)
 #include "ZenLib/File.h"
+#endif //defined(MEDIAINFO_REFERENCES_YES)
 #include "tinyxml2.h"
 using namespace ZenLib;
 using namespace tinyxml2;
@@ -68,15 +70,12 @@ static const char* AAf_tagDECOLOR (int8u tagDECOLOR)
 
 //---------------------------------------------------------------------------
 File_Aaf::File_Aaf()
-:File__Analyze()
+:File__Analyze(), File__HasReferences()
 {
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_Aaf;
         StreamIDs_Width[0]=16;
     #endif //MEDIAINFO_EVENTS
-
-    //Temp
-    ReferenceFiles=NULL;
 }
 
 //---------------------------------------------------------------------------
@@ -84,37 +83,7 @@ File_Aaf::~File_Aaf()
 {
     for (size_t Pos=0; Pos<Streams.size(); Pos++)
         delete Streams[Pos];
-
-    delete ReferenceFiles; //ReferenceFiles=NULL;
 }
-
-//***************************************************************************
-// Streams management
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-void File_Aaf::Streams_Finish()
-{
-    if (ReferenceFiles==NULL)
-        return;
-
-    ReferenceFiles->ParseReferences();
-}
-
-//***************************************************************************
-// Buffer - Global
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-#if MEDIAINFO_SEEK
-size_t File_Aaf::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
-{
-    if (ReferenceFiles==NULL)
-        return 0;
-
-    return ReferenceFiles->Seek(Method, Value, ID);
-}
-#endif //MEDIAINFO_SEEK
 
 //***************************************************************************
 // Buffer - File header
@@ -171,7 +140,7 @@ bool File_Aaf::FileHeader_Begin()
     Fill(Stream_General, 0, General_Format, "AAF");
 
     Step=Step_None;
-    ReferenceFiles=new File__ReferenceFilesHelper(this, Config);
+    ReferenceFiles_Accept(this, Config);
 
     //All should be OK...
     return true;
@@ -644,9 +613,11 @@ void File_Aaf::NetworkLocator()
     Ztring Data;
     Get_UTF16L(xxxSize, Data,                                   "Data");
 
+    #if defined(MEDIAINFO_REFERENCES_YES)
     sequence* Sequence=new sequence;
     Sequence->AddFileName(Data);
     ReferenceFiles->AddSequence(Sequence);
+    #endif //MEDIAINFO_REFERENCES_YES
 
     //Locators[Streams[Streams_Pos]->Directory_Pos].EssenceLocator=Data;
 }

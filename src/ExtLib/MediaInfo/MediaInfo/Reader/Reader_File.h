@@ -17,6 +17,7 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
+#if defined(MEDIAINFO_FILE_YES)
 #include "MediaInfo/Reader/Reader__Base.h"
 #include "ZenLib/File.h"
 #include "ZenLib/Thread.h"
@@ -84,4 +85,6 @@ public :
 };
 
 } //NameSpace
+#endif //defined(MEDIAINFO_FILE_YES)
+
 #endif

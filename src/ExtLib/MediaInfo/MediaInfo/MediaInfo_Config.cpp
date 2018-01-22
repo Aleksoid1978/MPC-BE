@@ -115,7 +115,9 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/MediaInfo_Config.h"
 #include "ZenLib/ZtringListListF.h"
+#if defined(MEDIAINFO_FILE_YES)
 #include "ZenLib/File.h"
+#endif //defined(MEDIAINFO_REFERENCES_YES)
 #include <algorithm>
 #if defined(MEDIAINFO_LIBCURL_YES)
     #include "MediaInfo/Reader/Reader_libcurl.h"
@@ -131,7 +133,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=__T("MediaInfoLib - v17.10");
+const Char*  MediaInfo_Version=__T("MediaInfoLib - v17.12");
 const Char*  MediaInfo_Url=__T("http://MediaArea.net/MediaInfo");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
@@ -184,7 +186,7 @@ static const char* OutputFormats_JSONFields[output_formats_item_size] =
     "mime",
 };
 typedef const char* output_formats_item[output_formats_item_size];
-static const size_t output_formats_size = 12;
+static const size_t output_formats_size = 13;
 static output_formats_item OutputFormats[output_formats_size] =
 {
     { "Text",                   "Text",                                                         "text/plain",       },
@@ -197,6 +199,7 @@ static output_formats_item OutputFormats[output_formats_size] =
     { "EBUCore_1.6",            "EBUCore 1.6",                                                  "text/xml",         },
     { "FIMS_1.3",               "FIMS 1.3",                                                     "text/xml",         },
     { "MPEG-7",                 "MPEG-7",                                                       "text/xml",         },
+    { "PBCore_2.1",             "PBCore 2.1",                                                   "text/xml",         },
     { "PBCore_2.0",             "PBCore 2.0",                                                   "text/xml",         },
     { "PBCore_1.2",             "PBCore 1.2",                                                   "text/xml",         },
 };
@@ -244,6 +247,8 @@ void MediaInfo_Config::Init()
     #endif //MEDIAINFO_ADVANCED
     #if defined(MEDIAINFO_EBUCORE_YES)
         AcquisitionDataOutputMode=Export_EbuCore::AcquisitionDataOutputMode_Default;
+        ExternalMetadata=Ztring();
+        ExternalMetaDataConfig=Ztring();
     #endif //defined(MEDIAINFO_EBUCORE_YES)
     Complete=0;
     BlockMethod=0;
@@ -443,6 +448,7 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
 
     //Parsing pointer to a file
     Ztring Value;
+    #if defined(MEDIAINFO_FILE_YES)
     if (Value_Raw.find(__T("file://"))==0)
     {
         //Open
@@ -465,7 +471,9 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
         //Merge
         Value=FromFile;
     }
-    else if (Value_Raw.substr(0, 7)==__T("cstr://"))
+    else
+    #endif //defined(MEDIAINFO_FILE_YES)
+    if (Value_Raw.substr(0, 7)==__T("cstr://"))
     {
         Value=_DecodeEscapeC(Value_Raw.begin() + 7, Value_Raw.end());
     }
@@ -1119,6 +1127,24 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
                 AcquisitionDataOutputMode_Set(Export_EbuCore::AcquisitionDataOutputMode_segmentParameter);
             else
                 return __T("Invalid value");
+            return Ztring();
+        #else // MEDIAINFO_EBUCORE_YES
+            return __T("EBUCore features are disabled due to compilation options");
+        #endif // MEDIAINFO_EBUCORE_YES
+    }
+    if (Option_Lower==__T("externalmetadata"))
+    {
+        #if defined(MEDIAINFO_EBUCORE_YES)
+            ExternalMetadata_Set(Value);
+            return Ztring();
+        #else // MEDIAINFO_EBUCORE_YES
+            return __T("EBUCore features are disabled due to compilation options");
+        #endif // MEDIAINFO_EBUCORE_YES
+    }
+    if (Option_Lower==__T("externalmetadataconfig"))
+    {
+        #if defined(MEDIAINFO_EBUCORE_YES)
+            ExternalMetaDataConfig_Set(Value);
             return Ztring();
         #else // MEDIAINFO_EBUCORE_YES
             return __T("EBUCore features are disabled due to compilation options");
@@ -1792,6 +1818,12 @@ Ztring MediaInfo_Config::Language_Get ()
     return ToReturn;
 }
 
+Ztring MediaInfo_Config::Language_Get_Translate(const Ztring &Par, const Ztring &Value)
+{
+    const Ztring Translated = Language_Get(Par + Value);
+    return Translated.find(Par.c_str()) ? Translated : Value;
+}
+
 Ztring MediaInfo_Config::Language_Get (const Ztring &Value)
 {
     CriticalSectionLocker CSL(CS);
@@ -1951,6 +1983,7 @@ void MediaInfo_Config::Inform_Set (const ZtringListList &NewValue)
     CriticalSectionLocker CSL(CS);
 
     //Parsing pointers to files in streams
+    #if defined(MEDIAINFO_FILE_YES)
     for (size_t Pos=0; Pos<Custom_View.size(); Pos++)
     {
         if (Custom_View[Pos].size()>1 && Custom_View(Pos, 1).find(__T("file://"))==0)
@@ -1976,6 +2009,7 @@ void MediaInfo_Config::Inform_Set (const ZtringListList &NewValue)
             Custom_View(Pos, 1)=FromFile;
         }
     }
+    #endif //defined(MEDIAINFO_FILE_YES)
 }
 
 Ztring MediaInfo_Config::Inform_Get ()
@@ -2754,6 +2788,30 @@ size_t MediaInfo_Config::AcquisitionDataOutputMode_Get ()
 {
     CriticalSectionLocker CSL(CS);
     return AcquisitionDataOutputMode;
+}
+
+void MediaInfo_Config::ExternalMetadata_Set(Ztring Value)
+{
+    CriticalSectionLocker CSL(CS);
+    ExternalMetadata=Value;
+}
+
+Ztring MediaInfo_Config::ExternalMetadata_Get ()
+{
+    CriticalSectionLocker CSL(CS);
+    return ExternalMetadata;
+}
+
+void MediaInfo_Config::ExternalMetaDataConfig_Set(Ztring Value)
+{
+    CriticalSectionLocker CSL(CS);
+    ExternalMetaDataConfig=Value;
+}
+
+Ztring MediaInfo_Config::ExternalMetaDataConfig_Get ()
+{
+    CriticalSectionLocker CSL(CS);
+    return ExternalMetaDataConfig;
 }
 #endif // MEDIAINFO_EBUCORE_YES
 

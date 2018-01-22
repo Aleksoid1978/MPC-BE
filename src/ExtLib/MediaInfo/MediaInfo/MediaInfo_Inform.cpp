@@ -88,6 +88,16 @@ extern MediaInfo_Config Config;
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
+void MediaInfo_Internal::ConvertRetour(Ztring& Retour)
+{
+    Retour.FindAndReplace(__T("\\r\\n"), __T("\n"), 0, Ztring_Recursive);
+    Retour.FindAndReplace(__T("\\r"), __T("\n"), 0, Ztring_Recursive);
+    Retour.FindAndReplace(__T("\\n"), __T("\n"), 0, Ztring_Recursive);
+    Retour.FindAndReplace(__T("\r\n"), __T("\n"), 0, Ztring_Recursive);
+    Retour.FindAndReplace(__T("\r"), __T("\n"), 0, Ztring_Recursive);
+    Retour.FindAndReplace(__T("\n"), MediaInfoLib::Config.LineSeparator_Get(), 0, Ztring_Recursive);
+}
+//---------------------------------------------------------------------------
 Ztring MediaInfo_Internal::Inform()
 {
     {
@@ -110,27 +120,38 @@ Ztring MediaInfo_Internal::Inform()
 
     #if defined(MEDIAINFO_EBUCORE_YES)
         if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.5"))
-            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_5);
+            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_5, Export_EbuCore::AcquisitionDataOutputMode_Default,
+            Export_EbuCore::Format_XML, MediaInfoLib::Config.ExternalMetadata_Get(), MediaInfoLib::Config.ExternalMetaDataConfig_Get());
         if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.6"))
-            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_6);
+            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_6, Export_EbuCore::AcquisitionDataOutputMode_Default,
+            Export_EbuCore::Format_XML, MediaInfoLib::Config.ExternalMetadata_Get(), MediaInfoLib::Config.ExternalMetaDataConfig_Get());
         if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.8"))
-            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_8, (Export_EbuCore::acquisitiondataoutputmode)MediaInfoLib::Config.AcquisitionDataOutputMode_Get());
+            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_8, (Export_EbuCore::acquisitiondataoutputmode)MediaInfoLib::Config.AcquisitionDataOutputMode_Get(),
+            Export_EbuCore::Format_XML, MediaInfoLib::Config.ExternalMetadata_Get(), MediaInfoLib::Config.ExternalMetaDataConfig_Get());
         if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.8_parameterSegment") || MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.8_ps"))
-            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_8, Export_EbuCore::AcquisitionDataOutputMode_parameterSegment);
+            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_8, Export_EbuCore::AcquisitionDataOutputMode_parameterSegment,
+            Export_EbuCore::Format_XML, MediaInfoLib::Config.ExternalMetadata_Get(), MediaInfoLib::Config.ExternalMetaDataConfig_Get());
         if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.8_segmentParameter") || MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.8_sp"))
-            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_8, Export_EbuCore::AcquisitionDataOutputMode_segmentParameter);
+            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_8, Export_EbuCore::AcquisitionDataOutputMode_segmentParameter,
+            Export_EbuCore::Format_XML, MediaInfoLib::Config.ExternalMetadata_Get(), MediaInfoLib::Config.ExternalMetaDataConfig_Get());
         if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.5_JSON"))
-            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_5, Export_EbuCore::AcquisitionDataOutputMode_Default, Export_EbuCore::Format_JSON);
+            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_5, Export_EbuCore::AcquisitionDataOutputMode_Default,
+            Export_EbuCore::Format_JSON, MediaInfoLib::Config.ExternalMetadata_Get(), MediaInfoLib::Config.ExternalMetaDataConfig_Get());
         if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.6_JSON"))
-            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_6, Export_EbuCore::AcquisitionDataOutputMode_Default, Export_EbuCore::Format_JSON);
+            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_6, Export_EbuCore::AcquisitionDataOutputMode_Default,
+            Export_EbuCore::Format_JSON, MediaInfoLib::Config.ExternalMetadata_Get(), MediaInfoLib::Config.ExternalMetaDataConfig_Get());
         if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.8_JSON"))
-            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_8, (Export_EbuCore::acquisitiondataoutputmode)MediaInfoLib::Config.AcquisitionDataOutputMode_Get(), Export_EbuCore::Format_JSON);
+            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_8, (Export_EbuCore::acquisitiondataoutputmode)MediaInfoLib::Config.AcquisitionDataOutputMode_Get(),
+            Export_EbuCore::Format_JSON, MediaInfoLib::Config.ExternalMetadata_Get(), MediaInfoLib::Config.ExternalMetaDataConfig_Get());
         if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.8_parameterSegment_JSON") || MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.8_ps_JSON"))
-            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_8, Export_EbuCore::AcquisitionDataOutputMode_parameterSegment, Export_EbuCore::Format_JSON);
+            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_8, Export_EbuCore::AcquisitionDataOutputMode_parameterSegment,
+            Export_EbuCore::Format_JSON, MediaInfoLib::Config.ExternalMetadata_Get(), MediaInfoLib::Config.ExternalMetaDataConfig_Get());
         if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.8_segmentParameter_JSON") || MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.8_sp_JSON"))
-            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_8, Export_EbuCore::AcquisitionDataOutputMode_segmentParameter, Export_EbuCore::Format_JSON);
+            return Export_EbuCore().Transform(*this, Export_EbuCore::Version_1_8, Export_EbuCore::AcquisitionDataOutputMode_segmentParameter,
+            Export_EbuCore::Format_JSON, MediaInfoLib::Config.ExternalMetadata_Get(), MediaInfoLib::Config.ExternalMetaDataConfig_Get());
         if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore"))
-            return Export_EbuCore().Transform(*this);
+            return Export_EbuCore().Transform(*this, Export_EbuCore::version(Export_EbuCore::Version_Max-1), (Export_EbuCore::acquisitiondataoutputmode)MediaInfoLib::Config.AcquisitionDataOutputMode_Get(),
+            Export_EbuCore::Format_XML, MediaInfoLib::Config.ExternalMetadata_Get(), MediaInfoLib::Config.ExternalMetaDataConfig_Get());
     #endif //defined(MEDIAINFO_EBUCORE_YES)
     #if defined(MEDIAINFO_EBUCORE_YES)
         if (MediaInfoLib::Config.Inform_Get()==__T("FIMS_1.1"))
@@ -147,9 +168,17 @@ Ztring MediaInfo_Internal::Inform()
             return Export_Mpeg7().Transform(*this);
     #endif //defined(MEDIAINFO_MPEG7_YES)
     #if defined(MEDIAINFO_PBCORE_YES)
-        if (MediaInfoLib::Config.Inform_Get()==__T("PBCore") || MediaInfoLib::Config.Inform_Get()==__T("PBCore_1.2"))
+        if (MediaInfoLib::Config.Inform_Get()==__T("PBCore_1") || MediaInfoLib::Config.Inform_Get()==__T("PBCore1")) // 1.x
             return Export_PBCore().Transform(*this);
-        if (MediaInfoLib::Config.Inform_Get()==__T("PBCore2") || MediaInfoLib::Config.Inform_Get()==__T("PBCore_2.0"))
+        if (MediaInfoLib::Config.Inform_Get()==__T("PBCore_1.2"))
+            return Export_PBCore().Transform(*this);
+        if (MediaInfoLib::Config.Inform_Get()==__T("PBCore_2") ||MediaInfoLib::Config.Inform_Get()==__T("PBCore2")) //2.x
+            return Export_PBCore2().Transform(*this);
+        if (MediaInfoLib::Config.Inform_Get()==__T("PBCore_2.0"))
+            return Export_PBCore2().Transform(*this, Export_PBCore2::Version_2_0);
+        if (MediaInfoLib::Config.Inform_Get()==__T("PBCore_2.1"))
+            return Export_PBCore2().Transform(*this, Export_PBCore2::Version_2_1);
+        if (MediaInfoLib::Config.Inform_Get()==__T("PBCore")) //x.x
             return Export_PBCore2().Transform(*this);
     #endif //defined(MEDIAINFO_PBCORE_YES)
     #if defined(MEDIAINFO_REVTMD_YES)
@@ -236,12 +265,7 @@ Ztring MediaInfo_Internal::Inform()
             Retour+=MediaInfoLib::Config.Inform_Get(__T("Menu_End"));
         Retour+=MediaInfoLib::Config.Inform_Get(__T("File_End"));
 
-        Retour.FindAndReplace(__T("\\r\\n"), __T("\n"), 0, Ztring_Recursive);
-        Retour.FindAndReplace(__T("\\r"), __T("\n"), 0, Ztring_Recursive);
-        Retour.FindAndReplace(__T("\\n"), __T("\n"), 0, Ztring_Recursive);
-        Retour.FindAndReplace(__T("\r\n"), __T("\n"), 0, Ztring_Recursive);
-        Retour.FindAndReplace(__T("\r"), __T("\n"), 0, Ztring_Recursive);
-        Retour.FindAndReplace(__T("\n"), MediaInfoLib::Config.LineSeparator_Get(), 0, Ztring_Recursive);
+        ConvertRetour(Retour);
 
         //Special characters
         Retour.FindAndReplace(__T("|SC1|"), __T("\\"), 0, Ztring_Recursive);
@@ -344,12 +368,7 @@ Ztring MediaInfo_Internal::Inform()
     if (HTML) Retour+=__T("\n</body>\n</html>\n");
     if (XML_0_7_78_MA)  Retour+=__T("</MediaInfo>\n");
 
-    Retour.FindAndReplace(__T("\\r\\n"), __T("\n"), 0, Ztring_Recursive);
-    Retour.FindAndReplace(__T("\\r"), __T("\n"), 0, Ztring_Recursive);
-    Retour.FindAndReplace(__T("\\n"), __T("\n"), 0, Ztring_Recursive);
-    Retour.FindAndReplace(__T("\r\n"), __T("\n"), 0, Ztring_Recursive);
-    Retour.FindAndReplace(__T("\r"), __T("\n"), 0, Ztring_Recursive);
-    Retour.FindAndReplace(__T("\n"), MediaInfoLib::Config.LineSeparator_Get(), 0, Ztring_Recursive);
+    ConvertRetour(Retour);
 
     //Special characters
     Retour.FindAndReplace(__T("|SC1|"), __T("\\"), 0, Ztring_Recursive);
@@ -614,12 +633,8 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
             Retour+=__T("</extra>\n");
         }
 
-        Retour.FindAndReplace(__T("\\r\\n"), __T("\n"), 0, Ztring_Recursive);
-        Retour.FindAndReplace(__T("\\r"), __T("\n"), 0, Ztring_Recursive);
-        Retour.FindAndReplace(__T("\\n"), __T("\n"), 0, Ztring_Recursive);
-        Retour.FindAndReplace(__T("\r\n"), __T("\n"), 0, Ztring_Recursive);
-        Retour.FindAndReplace(__T("\r"), __T("\n"), 0, Ztring_Recursive);
-        Retour.FindAndReplace(__T("\n"), MediaInfoLib::Config.LineSeparator_Get(), 0, Ztring_Recursive);
+        ConvertRetour(Retour);
+
         Retour.FindAndReplace(__T("|SC1|"), __T("\\"), 0, Ztring_Recursive);
         return Retour;
     }
@@ -740,12 +755,7 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
     }
 
     //Retour=__T("<table width=\"100%\" border=\"0\" cellpadding=\"1\" cellspacing=\"2\" style=\"border:1px solid Navy\">\n<tr>\n    <td width=\"150\">Video #0</td>\n  </tr>\r\n  <tr>\n    <td><i>Codec :</i></td>\n    <td colspan=\"3\">WMV1</td>\n  </tr>\r\n  <tr>\n    <td><i>Codec/Info :</i></td>\n    <td colspan=\"3\">Windows Media Video 7</td>\n  </tr>\r\n  <tr>\n    <td><i>Width :</i></td>\n    <td colspan=\"3\">200 pixels</td>\n  </tr>\r\n  <tr>\n    <td><i>Height :</i></td>\n    <td colspan=\"3\">150 pixels</td>\n  </tr>\r\n  <tr>\n    <td><i>Aspect ratio :</i></td>\n    <td colspan=\"3\">4/3</td>\n  </tr>\r\n  <tr>\n    <td><i>Resolution :</i></td>\n    <td colspan=\"3\">24 bits</td>\n  </tr>\r\n</table>\n");
-    Retour.FindAndReplace(__T("\\r\\n"), __T("\n"), 0, Ztring_Recursive);
-    Retour.FindAndReplace(__T("\\r"), __T("\n"), 0, Ztring_Recursive);
-    Retour.FindAndReplace(__T("\\n"), __T("\n"), 0, Ztring_Recursive);
-    Retour.FindAndReplace(__T("\r\n"), __T("\n"), 0, Ztring_Recursive);
-    Retour.FindAndReplace(__T("\r"), __T("\n"), 0, Ztring_Recursive);
-    Retour.FindAndReplace(__T("\n"), MediaInfoLib::Config.LineSeparator_Get(), 0, Ztring_Recursive);
+    ConvertRetour(Retour);
 
     //Special characters
     if (IsDirect)

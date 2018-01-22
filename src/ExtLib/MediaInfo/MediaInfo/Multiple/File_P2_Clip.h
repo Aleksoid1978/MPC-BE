@@ -17,40 +17,34 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
-#include <vector>
+#include "MediaInfo/File__HasReferences.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
 {
 
-class File__ReferenceFilesHelper;
-
 //***************************************************************************
 // Class File_P2_Clip
 //***************************************************************************
-class File_P2_Clip : public File__Analyze
+class File_P2_Clip : public File__Analyze, File__HasReferences
 {
 public :
     //Constructor/Destructor
     File_P2_Clip();
-    ~File_P2_Clip();
 
 private :
     //Streams management
-    void Streams_Finish ();
+    void Streams_Finish() {ReferenceFiles_Finish();}
 
     //Buffer - Global
     #if MEDIAINFO_SEEK
-    size_t Read_Buffer_Seek (size_t Method, int64u Value, int64u ID);
+    size_t Read_Buffer_Seek (size_t Method, int64u Value, int64u ID) {return ReferenceFiles_Seek(Method, Value, ID);}
     #endif //MEDIAINFO_SEEK
 
     //Buffer - File header
     bool FileHeader_Begin();
 
     void FillContentDate(tinyxml2::XMLElement* Access, const char* Node, general Parameter);
-
-    //Temp
-    File__ReferenceFilesHelper*     ReferenceFiles;
 };
 
 } //NameSpace

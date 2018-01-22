@@ -199,7 +199,7 @@ extern const char* Mpeg4_chan_Layout(int16u Ordering);
 
 //---------------------------------------------------------------------------
 File_Mpeg4::File_Mpeg4()
-:File__Analyze()
+:File__Analyze(), File__HasReferences()
 {
     //Configuration
     ParserName="MPEG-4";
@@ -229,9 +229,6 @@ File_Mpeg4::File_Mpeg4()
     IsFragmented=false;
     StreamOrder=0;
     moov_trak_tkhd_TrackID=(int32u)-1;
-    #if defined(MEDIAINFO_REFERENCES_YES)
-        ReferenceFiles=NULL;
-    #endif //defined(MEDIAINFO_REFERENCES_YES)
     mdat_Pos_NormalParsing=false;
     moof_traf_base_data_offset=(int64u)-1;
     data_offset_present=true;
@@ -1046,8 +1043,7 @@ void File_Mpeg4::Streams_Finish()
 
             //Hacks - Before
             Ztring CodecID=Retrieve(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_CodecID));
-            Ztring Source=Retrieve(StreamKind_Last, StreamPos_Last, "Source");
-            Ztring Source_Info=Retrieve(StreamKind_Last, StreamPos_Last, "Source_Info");
+            const Ztring Source=Retrieve(StreamKind_Last, StreamPos_Last, "Source");
 
             Merge(*Temp->second.MI->Info, Temp->second.StreamKind, 0, Temp->second.StreamPos);
             File_Size_Total+=Ztring(Temp->second.MI->Get(Stream_General, 0, General_FileSize)).To_int64u();
@@ -1062,8 +1058,9 @@ void File_Mpeg4::Streams_Finish()
             }
             if (Source!=Retrieve(StreamKind_Last, StreamPos_Last, "Source"))
             {
-                Ztring Source_Original=Retrieve(StreamKind_Last, StreamPos_Last, "Source");
-                Ztring Source_Original_Info=Retrieve(StreamKind_Last, StreamPos_Last, "Source_Info");
+                const Ztring Source_Original=Retrieve(StreamKind_Last, StreamPos_Last, "Source");
+                const Ztring Source_Original_Info=Retrieve(StreamKind_Last, StreamPos_Last, "Source_Info");
+                const Ztring Source_Info = Retrieve(StreamKind_Last, StreamPos_Last, "Source_Info");
                 Fill(StreamKind_Last, StreamPos_Last, "Source", Source, true);
                 Fill(StreamKind_Last, StreamPos_Last, "Source_Info", Source_Info, true);
                 Fill(StreamKind_Last, StreamPos_Last, "Source_Original", Source_Original, true);
@@ -1200,9 +1197,23 @@ void File_Mpeg4::Streams_Finish()
             if (!Stream->second.File_Name.empty())
             {
                 if (ReferenceFiles==NULL)
-                    ReferenceFiles=new File__ReferenceFilesHelper(this, Config);
+                    ReferenceFiles_Accept(this, Config);
 
                 sequence* Sequence=new sequence;
+                const Ztring& Format=Retrieve(Stream->second.StreamKind, Stream->second.StreamPos, Fill_Parameter(Stream->second.StreamKind, Generic_Format));
+                if (Format==__T("QuickTime TC"))
+                {
+                    Sequence->Config["File_ForceParser"]=Format;
+                    if (Stream->second.Parsers.size()==1)
+                    {
+                        File_Mpeg4_TimeCode* Parser=(File_Mpeg4_TimeCode*)Stream->second.Parsers[0];
+                        ZtringListList Parser_Config;
+                        Parser_Config(__T("NumberOfFrames")).From_Number(Parser->NumberOfFrames);
+                        Parser_Config(__T("DropFrame")).From_Number(Parser->DropFrame?1:0);
+                        Parser_Config(__T("NegativeTimes")).From_Number(Parser->NegativeTimes?1:0);
+                        Sequence->Config["File_ForceParser_Config"]=Parser_Config.Read();
+                    }
+                }
                 Sequence->AddFileName(Stream->second.File_Name);
                 Sequence->StreamKind=Stream->second.StreamKind;
                 Sequence->StreamPos=Stream->second.StreamPos;
@@ -1251,7 +1262,7 @@ void File_Mpeg4::Streams_Finish()
         {
             ReferenceFiles->ParseReferences();
             #if MEDIAINFO_NEXTPACKET
-                if (Config->NextPacket_Get() && ReferenceFiles && ReferenceFiles->Sequences_Size())
+                if (Config->NextPacket_Get() && ReferenceFiles->Sequences_Size())
                 {
                     ReferenceFiles_IsParsing=true;
                     return;
@@ -2688,6 +2699,15 @@ File_Mpeg4::method File_Mpeg4::Metadata_Get(std::string &Parameter, int64u Meta)
     Value.append(1, (Char)((Meta&0x000000FF)>> 0));
     if (MediaInfoLib::Config.CustomMapping_IsPresent(__T("MP4"), Value))
         Parameter=MediaInfoLib::Config.CustomMapping_Get(__T("MP4"), Value).To_Local();
+    
+    //Cleanup of the parameter, removing anything not ANSI 7-bit
+    for (size_t i=0; i<Parameter.size();)
+    {
+        if (((int8s)Parameter[i])<0)
+            Parameter.erase(i, 1);
+        else
+            i++;
+    }
 
     return Method;
 }
@@ -2744,7 +2764,7 @@ void File_Mpeg4::Descriptors()
     {
         for (size_t Pos=0; Pos<Streams[moov_trak_tkhd_TrackID].Parsers.size(); Pos++)
             delete Streams[moov_trak_tkhd_TrackID].Parsers[Pos];
-        Streams[moov_trak_tkhd_TrackID].Parsers.clear();
+        Streams[moov_trak_tkhd_TrackID].Parsers_Clear();
         Streams[moov_trak_tkhd_TrackID].Parsers.push_back(MI.Parser);
         mdat_MustParse=true;
     }

@@ -22,6 +22,7 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
+#if defined(MEDIAINFO_FILE_YES)
 #include "MediaInfo/Reader/Reader_File.h"
 #include "MediaInfo/File__Analyze.h"
 #include "ZenLib/FileName.h"
@@ -863,3 +864,5 @@ size_t Reader_File::Format_Test_PerParser_Seek (MediaInfo_Internal* MI, size_t M
 #endif //MEDIAINFO_SEEK
 
 } //NameSpace
+
+#endif //MEDIAINFO_FILE_YES

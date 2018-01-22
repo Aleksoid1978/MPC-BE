@@ -640,6 +640,11 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
     {
         return File_ForceParser_Get();
     }
+    else if (Option_Lower==__T("file_forceparser_config"))
+    {
+        File_ForceParser_Config_Set(Value);
+        return __T("");
+    }
     else if (Option_Lower==__T("file_buffer_size_hint_pointer"))
     {
         File_Buffer_Size_Hint_Pointer_Set((size_t*)Ztring(Value).To_int64u());
@@ -1693,6 +1698,19 @@ Ztring MediaInfo_Config_MediaInfo::File_ForceParser_Get ()
 }
 
 //---------------------------------------------------------------------------
+void MediaInfo_Config_MediaInfo::File_ForceParser_Config_Set (const Ztring &NewValue)
+{
+    CriticalSectionLocker CSL(CS);
+    File_ForceParser_Config=NewValue;
+}
+
+Ztring MediaInfo_Config_MediaInfo::File_ForceParser_Config_Get ()
+{
+    CriticalSectionLocker CSL(CS);
+    return File_ForceParser_Config;
+}
+
+//---------------------------------------------------------------------------
 void MediaInfo_Config_MediaInfo::File_Buffer_Size_Hint_Pointer_Set (size_t* NewValue)
 {
     CriticalSectionLocker CSL(CS);
@@ -2434,6 +2452,7 @@ void MediaInfo_Config_MediaInfo::Event_Send (File__Analyze* Source, const int8u*
     {
         MediaInfo_Event_Generic* Temp=(MediaInfo_Event_Generic*)Data_Content;
 
+        #if MEDIAINFO_DEMUX
         if (Demux_Offset_Frame!=(int64u)-1)
         {
             if (Temp->FrameNumber!=(int64u)-1)
@@ -2455,6 +2474,8 @@ void MediaInfo_Config_MediaInfo::Event_Send (File__Analyze* Source, const int8u*
                     Temp->PTS-=Demux_Offset_DTS_FromStream;
             }
         }
+        #endif //MEDIAINFO_DEMUX
+
         if (File_IgnoreEditsBefore)
         {
             if (Temp->FrameNumber!=(int64u)-1)
@@ -2466,7 +2487,7 @@ void MediaInfo_Config_MediaInfo::Event_Send (File__Analyze* Source, const int8u*
             }
             if (Temp->DTS!=(int64u)-1)
             {
-                if (File_IgnoreEditsBefore && File_EditRate)
+                if (File_EditRate)
                 {
                     int64u TimeOffset=float64_int64s(((float64)File_IgnoreEditsBefore)/File_EditRate*1000000000);
                     if (Temp->DTS>TimeOffset)

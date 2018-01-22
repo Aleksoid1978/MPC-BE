@@ -525,6 +525,7 @@ size_t File_Lxf::Read_Buffer_Seek (size_t Method, int64u Value, int64u)
                         float64 TimeStamp=((float64)Value)/FrameRate;
                         Value=float64_int64s(TimeStamp*1000000000); // In nanoseconds
                     }
+                    return 1;
         case 2  :   //Timestamp
                     {
                     if (Value!=(int64u)-1)

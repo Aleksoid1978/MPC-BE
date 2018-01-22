@@ -228,6 +228,9 @@ File_MpegPs::File_MpegPs()
         Duration_Detected=false;
     #endif //MEDIAINFO_SEEK
 
+    //StreamOrder
+    StreamOrder_CountOfPrivateStreams_Minus1=0;
+
     //From packets
     program_mux_rate=(int32u)-1;
 
@@ -488,17 +491,7 @@ void File_MpegPs::Streams_Fill_PerStream_PerKind(size_t StreamID, ps_stream &Tem
             Fill(StreamKind_Last, StreamPos, Fill_Parameter(StreamKind_Last, Generic_Delay_Source), "Container");
         }
 
-        //Bitrate calculation
-        if (FrameInfo.PTS!=(int64u)-1 && (StreamKind_Last==Stream_Video || StreamKind_Last==Stream_Audio))
-        {
-            int64u BitRate=Retrieve(StreamKind_Last, StreamPos, "BitRate").To_int64u();
-            if (BitRate==0)
-                BitRate=Retrieve(StreamKind_Last, StreamPos, "BitRate_Nominal").To_int64u();
-            if (BitRate==0)
-                FrameInfo.PTS=(int64u)-1;
-            else
-                FrameInfo.PTS+=BitRate; //Saving global BitRate
-        }
+        Bitrate_Calc();
     }
 }
 
@@ -507,18 +500,15 @@ void File_MpegPs::Streams_Update()
 {
     //For each Streams
     for (size_t StreamID=0; StreamID<0x100; StreamID++)
-        for (size_t Pos=0; Pos<Streams[StreamID].Parsers.size(); Pos++)
-            Streams[StreamID].Parsers[Pos]->Open_Buffer_Update();
+        Streams[StreamID].Streams_Update();
 
     //For each private Streams
     for (size_t StreamID=0; StreamID<0x100; StreamID++)
-        for (size_t Pos=0; Pos<Streams_Private1[StreamID].Parsers.size(); Pos++)
-            Streams_Private1[StreamID].Parsers[Pos]->Open_Buffer_Update();
+            Streams_Private1[StreamID].Streams_Update();
 
     //For each extension Streams
     for (size_t StreamID=0; StreamID<0x100; StreamID++)
-        for (size_t Pos=0; Pos<Streams_Extension[StreamID].Parsers.size(); Pos++)
-            Streams_Extension[StreamID].Parsers[Pos]->Open_Buffer_Update();
+        Streams_Extension[StreamID].Streams_Update();
 }
 
 //---------------------------------------------------------------------------
@@ -764,7 +754,12 @@ void File_MpegPs::Streams_Finish_PerStream(size_t StreamID, ps_stream &Temp, kin
                     Fill((stream_t)StreamKind, StreamPos, Fill_Parameter((stream_t)StreamKind, Generic_Duration), Duration);
     }
 
-    //Bitrate calculation
+    Bitrate_Calc();
+}
+
+//---------------------------------------------------------------------------
+void File_MpegPs::Bitrate_Calc()
+{
     if (FrameInfo.PTS!=(int64u)-1 && (StreamKind_Last==Stream_Video || StreamKind_Last==Stream_Audio))
     {
         int64u BitRate=Retrieve(StreamKind_Last, StreamPos_Last, "BitRate").To_int64u();
@@ -966,46 +961,9 @@ void File_MpegPs::Read_Buffer_Unsynched()
     for (size_t StreamID=0; StreamID<0x100; StreamID++)
     {
         //End timestamp is out of date
-        Streams[StreamID].TimeStamp_End.PTS.File_Pos=(int64u)-1;
-        Streams[StreamID].TimeStamp_End.DTS.File_Pos=(int64u)-1;
-        Streams[StreamID].TimeStamp_End.PTS.TimeStamp=(int64u)-1;
-        Streams[StreamID].TimeStamp_End.DTS.TimeStamp=(int64u)-1;
-        Streams[StreamID].Searching_TimeStamp_Start=false;
-        for (size_t Pos=0; Pos<Streams[StreamID].Parsers.size(); Pos++)
-            if (Streams[StreamID].Parsers[Pos])
-            {
-                #if MEDIAINFO_SEEK
-                    if (IsSub)
-                        Streams[StreamID].Parsers[Pos]->Unsynch_Frame_Count=Frame_Count_NotParsedIncluded;
-                #endif //MEDIAINFO_SEEK
-                Streams[StreamID].Parsers[Pos]->Open_Buffer_Unsynch();
-            }
-        Streams_Private1[StreamID].TimeStamp_End.PTS.File_Pos=(int64u)-1;
-        Streams_Private1[StreamID].TimeStamp_End.DTS.File_Pos=(int64u)-1;
-        Streams_Private1[StreamID].TimeStamp_End.PTS.TimeStamp=(int64u)-1;
-        Streams_Private1[StreamID].TimeStamp_End.DTS.TimeStamp=(int64u)-1;
-        Streams_Private1[StreamID].Searching_TimeStamp_Start=false;
-        for (size_t Pos=0; Pos<Streams_Private1[StreamID].Parsers.size(); Pos++)
-            if (Streams_Private1[StreamID].Parsers[Pos])
-            {
-                #if MEDIAINFO_SEEK
-                    Streams_Private1[StreamID].Parsers[Pos]->Unsynch_Frame_Count=Unsynch_Frame_Count;
-                #endif //MEDIAINFO_SEEK
-                Streams_Private1[StreamID].Parsers[Pos]->Open_Buffer_Unsynch();
-            }
-        Streams_Extension[StreamID].TimeStamp_End.PTS.File_Pos=(int64u)-1;
-        Streams_Extension[StreamID].TimeStamp_End.DTS.File_Pos=(int64u)-1;
-        Streams_Extension[StreamID].TimeStamp_End.PTS.TimeStamp=(int64u)-1;
-        Streams_Extension[StreamID].TimeStamp_End.DTS.TimeStamp=(int64u)-1;
-        Streams_Extension[StreamID].Searching_TimeStamp_Start=false;
-        for (size_t Pos=0; Pos<Streams_Extension[StreamID].Parsers.size(); Pos++)
-            if (Streams_Extension[StreamID].Parsers[Pos])
-            {
-                #if MEDIAINFO_SEEK
-                    Streams_Extension[StreamID].Parsers[Pos]->Unsynch_Frame_Count=Unsynch_Frame_Count;
-                #endif //MEDIAINFO_SEEK
-                Streams_Extension[StreamID].Parsers[Pos]->Open_Buffer_Unsynch();
-            }
+        Streams[StreamID].Set_Unsynch_Frame_Count(Frame_Count_NotParsedIncluded, IsSub);
+        Streams_Private1[StreamID].Set_Unsynch_Frame_Count(Unsynch_Frame_Count,true);
+        Streams_Extension[StreamID].Set_Unsynch_Frame_Count(Unsynch_Frame_Count,true);
     }
     #if MEDIAINFO_SEEK
         Unsynch_Frame_Count=(int64u)-1; //We do not use it
@@ -2205,7 +2163,7 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG2(int8u stream_id)
                     Open_Buffer_Init(Streams_Private1[private_stream_1_ID].Parsers[0]);
                     Streams_Private1[private_stream_1_ID].StreamRegistration_Count++;
                 }
-
+#if defined(MEDIAINFO_ARIBSTDB24B37_YES)
                 if (Streams_Private1[private_stream_1_ID].Parsers.size()==1)
                 {
                     File_AribStdB24B37* Parser=(File_AribStdB24B37*)Streams_Private1[private_stream_1_ID].Parsers[0];
@@ -2213,6 +2171,7 @@ void File_MpegPs::Header_Parse_PES_packet_MPEG2(int8u stream_id)
                     Open_Buffer_Continue(Parser, Buffer+Buffer_Offset+(size_t)Element_Offset, 16);
                 }
                 else
+#endif
                     Skip_B16(                                   "PES_private_data");
            }
             else
@@ -2570,9 +2529,6 @@ void File_MpegPs::system_header_start()
     private_stream_1_Count=0;
     private_stream_2_Count=0;
     SL_packetized_stream_Count=0;
-
-    //StreamOrder
-    StreamOrder_CountOfPrivateStreams_Minus1=0;
 
     //Parsing
     int32u rate_bound;
@@ -3823,7 +3779,7 @@ void File_MpegPs::extension_stream()
                                                                 Streams_Extension[stream_id_extension].Parsers.push_back(ChooseParser_DTS());
                                                                 Streams_Extension[stream_id_extension].Parsers.push_back(ChooseParser_AC3());
                                                             }
-                                                            else if (stream_id_extension==0x75 && stream_id_extension<=0x7F)
+                                                            else if (stream_id_extension==0x75)
                                                                  Streams_Extension[stream_id_extension].Parsers.push_back(ChooseParser_VC1());
                                                       }
             }
@@ -3969,7 +3925,7 @@ const ZenLib::Char* File_MpegPs::extension_stream_ChooseExtension()
 {
     //AC3
         if ((stream_id_extension>=0x55 && stream_id_extension<=0x5F)
-         || (stream_id_extension==0x75 && stream_id_extension<=0x7F))
+         || (stream_id_extension==0x75))
         return __T(".vc1");
     //AC3+
     else if (stream_id_extension>=0x60 && stream_id_extension<=0x6F)

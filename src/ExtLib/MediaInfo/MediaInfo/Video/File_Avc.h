@@ -362,6 +362,7 @@ private :
     #if MEDIAINFO_DEMUX
     bool Demux_UnpacketizeContainer_Test();
     bool Demux_Avc_Transcode_Iso14496_15_to_Iso14496_10;
+    void Data_Parse_Iso14496();
     #endif //MEDIAINFO_DEMUX
 
     //Buffer - Global

@@ -99,7 +99,7 @@ const Ztring &InfoMap::Get (const Ztring &Value, size_t Pos, const Ztring &WithV
         else
         {
             ++List; //The second one, this is a stupid hack for a 2 value, should be changed later...
-            if (Pos<List->second.size())
+            if (List!=end() && Pos<List->second.size())
             {
                 if (List->second[WithValue_Pos]==WithValue)
                     return List->second[Pos];

@@ -158,6 +158,7 @@ public :
           void      Language_Set (const ZtringListList &NewLanguage);
           Ztring    Language_Get ();
           Ztring    Language_Get (const Ztring &Value);
+          Ztring    Language_Get_Translate(const Ztring &Par, const Ztring &Value);
           Ztring    Language_Get (const Ztring &Count, const Ztring &Value, bool ValueIsAlwaysSame=false);
 
           void      Inform_Set (const ZtringListList &NewInform);
@@ -241,6 +242,10 @@ public :
     #if defined(MEDIAINFO_EBUCORE_YES)
           void        AcquisitionDataOutputMode_Set (size_t Value);
           size_t      AcquisitionDataOutputMode_Get ();
+          void        ExternalMetadata_Set (Ztring Value);
+          Ztring      ExternalMetadata_Get ();
+          void        ExternalMetaDataConfig_Set (Ztring Value);
+          Ztring      ExternalMetaDataConfig_Get ();
     #endif //MEDIAINFO_EBUCORE_YES
 
     ZtringListList  SubFile_Config_Get ();
@@ -327,6 +332,8 @@ private :
     #endif //MEDIAINFO_ADVANCED
     #if defined(MEDIAINFO_EBUCORE_YES)
         size_t      AcquisitionDataOutputMode;
+        Ztring      ExternalMetadata;
+        Ztring      ExternalMetaDataConfig;
     #endif //defined(MEDIAINFO_EBUCORE_YES)
     size_t          Complete;
     size_t          BlockMethod;
@@ -342,7 +349,7 @@ private :
     float32         Verbosity;
     float32         Trace_Level;
     int64u          Compat;
-    int64u          Https;
+    bool            Https;
     bool            Trace_TimeSection_OnlyFirstOccurrence;
     std::bitset<32> Trace_Layers; //0-7: Container, 8: Stream
     std::map<Ztring, bool> Trace_Modificators; //If we want to add/remove some details

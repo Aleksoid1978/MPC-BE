@@ -132,7 +132,7 @@ void File_Exr::FileHeader_Parse()
         Fill(StreamKind_Last, 0, "Format_Profile", (Flags&0x02)?"Tile":"Line");
         if (Deep)
             Fill(Stream_General, 0, "Deep", "Yes");
-        if (Deep)
+        if (Multipart)
             Fill(Stream_General, 0, "Multipart", "Yes");
     }
     Frame_Count++;

@@ -21,7 +21,9 @@
 #include "MediaInfo/MediaInfo_Internal.h"
 #include "MediaInfo/MediaInfo_Config.h"
 #include "MediaInfo/TimeCode.h"
+#if defined(MEDIAINFO_FILE_YES)
 #include "ZenLib/File.h"
+#endif //defined(MEDIAINFO_REFERENCES_YES)
 #include "ZenLib/FileName.h"
 #include "ZenLib/BitStream_LE.h"
 #include <cmath>
@@ -34,6 +36,7 @@ namespace MediaInfoLib
 
 //---------------------------------------------------------------------------
 extern MediaInfo_Config Config;
+const char* Mpegv_colour_primaries(int8u colour_primaries);
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -59,6 +62,16 @@ void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_Col
 
     if (MasteringDisplay_ColorPrimaries.empty())
     {
+             if (x[0]==15000 && x[1]== 7500 && x[2]==32000 && x[3]==15635
+              && y[0]==30000 && y[1]== 3000 && y[2]==16500 && y[3]==16450)
+            MasteringDisplay_ColorPrimaries=Mpegv_colour_primaries(1); // BT.709
+        else if (x[0]== 8500 && x[1]== 6550 && x[2]==35400 && x[3]==15635
+              && y[0]==39850 && y[1]== 2300 && y[2]==14600 && y[3]==16450)
+            MasteringDisplay_ColorPrimaries=Mpegv_colour_primaries(9); // BT.2020
+        else if (x[0]==13250 && x[1]== 7500 && x[2]==34000 && x[3]==15635
+              && y[0]==34500 && y[1]== 3000 && y[2]==16000 && y[3]==16450)
+            MasteringDisplay_ColorPrimaries=Mpegv_colour_primaries(12); // Display P3
+        else
         MasteringDisplay_ColorPrimaries=__T("R: x=")+Ztring::ToZtring(((float64)x[2])/50000, 6)
                                        +__T(  " y=")+Ztring::ToZtring(((float64)y[2])/50000, 6)
                                      +__T(", G: x=")+Ztring::ToZtring(((float64)x[0])/50000, 6)
@@ -68,7 +81,7 @@ void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_Col
                            +__T(", White point: x=")+Ztring::ToZtring(((float64)x[3])/50000, 6)
                                        +__T(  " y=")+Ztring::ToZtring(((float64)y[3])/50000, 6);
         MasteringDisplay_Luminance=     __T("min: ")+Ztring::ToZtring(((float64)min)/10000, 4)
-                               +__T(" cd/m2, max: ")+Ztring::ToZtring(((float64)max)/10000, 4)
+                               +__T(" cd/m2, max: ")+Ztring::ToZtring(((float64)max)/10000, (max-((int)max)==0)?0:4)
                                +__T(" cd/m2");
     }
 }
@@ -194,11 +207,13 @@ size_t File__Analyze::Stream_Prepare (stream_t KindOfStream, size_t StreamPos)
         }
 
         //File dates
+        #if defined(MEDIAINFO_FILE_YES)
         File F(File_Name);
         Fill (Stream_General, 0, General_File_Created_Date, F.Created_Get());
         Fill (Stream_General, 0, General_File_Created_Date_Local, F.Created_Local_Get());
         Fill (Stream_General, 0, General_File_Modified_Date, F.Modified_Get());
         Fill (Stream_General, 0, General_File_Modified_Date_Local, F.Modified_Local_Get());
+        #endif //defined(MEDIAINFO_FILE_YES)
     }
 
     //File size
@@ -1443,7 +1458,6 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
     Ztring CodecID_Temp=Retrieve(StreamKind, StreamPos_To, "CodecID");
 
     //Merging
-    size_t Count=0;
     size_t Size=ToAdd.Count_Get(StreamKind, StreamPos_From);
     for (size_t Pos=General_Inform; Pos<Size; Pos++)
     {
@@ -1457,7 +1471,6 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
                 Fill(StreamKind, StreamPos_To, ToAdd.Get(StreamKind, StreamPos_From, Pos, Info_Name).To_UTF8().c_str(), ToFill_Value, true);
                 Fill_SetOptions(StreamKind, StreamPos_To, ToAdd.Get(StreamKind, StreamPos_From, Pos, Info_Name).To_UTF8().c_str(), ToAdd.Get(StreamKind, StreamPos_From, Pos, Info_Options).To_UTF8().c_str());
             }
-            Count++;
         }
     }
 
@@ -1487,6 +1500,12 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
         {
             Fill(Stream_Video, StreamPos_To, Video_DisplayAspectRatio_Original, DisplayAspectRatio_Original, true);
             Fill(Stream_Video, StreamPos_To, Video_DisplayAspectRatio, DisplayAspectRatio_Temp, true);
+        }
+        if (!FrameRate_Temp.empty())
+        {
+            const Ztring& FramesPerContainerBlock=Retrieve(Stream_Video, StreamPos_To, "FramesPerContainerBlock");
+            if (!FramesPerContainerBlock.empty())
+                FrameRate_Temp.From_Number(FrameRate_Temp.To_float64()*FramesPerContainerBlock.To_float64());
         }
         if ((!FrameRate_Temp.empty() && FrameRate_Temp!=Retrieve(Stream_Video, StreamPos_To, Video_FrameRate))
          || (!FrameRate_Num_Temp.empty() && FrameRate_Num_Temp!=Retrieve(Stream_Video, StreamPos_To, Video_FrameRate_Num))

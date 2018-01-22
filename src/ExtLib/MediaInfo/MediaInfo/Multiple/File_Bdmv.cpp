@@ -24,7 +24,9 @@
 #include "MediaInfo/Multiple/File_Bdmv.h"
 #include "MediaInfo/MediaInfo.h"
 #include "MediaInfo/MediaInfo_Internal.h"
+#if defined(MEDIAINFO_DIRECTORY_YES)
 #include "ZenLib/Dir.h"
+#endif //defined(MEDIAINFO_DIRECTORY_YES)
 #include "ZenLib/FileName.h"
 using namespace ZenLib;
 //---------------------------------------------------------------------------
@@ -517,7 +519,7 @@ void File_Bdmv::Read_Buffer_Continue()
         }
     FILLING_END();
 
-    if (version_numberH==0x3031 || version_numberH==0x3032) //Version 1 or 2
+    if (version_numberH==0x3031 || version_numberH==0x3032 || version_numberH==0x3033) //Version 1, 2 or 3 (3 = UHD Blu-ray)
     {
         Element_Begin1("Offsets");
         Types[0x28]=0; //First object
@@ -602,6 +604,7 @@ void File_Bdmv::BDMV()
     Accept("BDMV");
 
     //Searching the longest playlist
+    #if defined(MEDIAINFO_DIRECTORY_YES)
     ZtringList List=Dir::GetAllFileNames(File_Name+PathSeparator+__T("PLAYLIST")+PathSeparator+__T("*.mpls"), Dir::Include_Files);
     std::vector<MediaInfo_Internal*> MIs;
     MIs.resize(List.size());
@@ -655,6 +658,7 @@ void File_Bdmv::BDMV()
         Fill(Stream_General, 0, General_Format_Profile, "BD+");
     if (Dir::Exists(File_Name+PathSeparator+__T("BDJO")) && !Dir::GetAllFileNames(File_Name+PathSeparator+__T("BDJO")).empty())
         Fill(Stream_General, 0, General_Format_Profile, "BD-Java");
+    #endif //defined(MEDIAINFO_DIRECTORY_YES)
 
     //Filling
     File_Name.resize(File_Name.size()-5); //Removing "/BDMV"

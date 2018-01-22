@@ -23,7 +23,6 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Multiple/File__ReferenceFilesHelper.h"
 #include "MediaInfo/MediaInfo_Internal.h"
-#include "ZenLib/Dir.h"
 #include "ZenLib/File.h"
 #include "ZenLib/FileName.h"
 #include "ZenLib/Format/Http/Http_Utils.h"
@@ -348,7 +347,6 @@ void File__ReferenceFilesHelper::ParseReferences()
                         Sequences.erase(Sequences.begin()+Pos);
                         Pos--;
                     }
-                CountOfReferencesToParse=Sequences.size();
             }
         #endif //MEDIAINFO_FILTER
 
@@ -655,13 +653,14 @@ void File__ReferenceFilesHelper::ParseReferences()
             Sequences_Current++;
         }
 
+        CountOfReferencesToParse=Sequences.size();
+
         #if MEDIAINFO_DEMUX && MEDIAINFO_NEXTPACKET
             if (Config->NextPacket_Get())
             {
                 Demux_Interleave=Config->File_Demux_Interleave_Get();
                 if (Demux_Interleave)
                 {
-                    CountOfReferencesToParse=Sequences.size();
                     for (sequences::iterator ReferenceSource=Sequences.begin(); ReferenceSource!=Sequences.end(); ++ReferenceSource)
                         if ((*ReferenceSource)->FileNames.empty())
                             CountOfReferencesToParse--;
@@ -750,7 +749,7 @@ void File__ReferenceFilesHelper::ParseReferences()
                 else
                     FileSize_Parsed+=(*ReferenceTemp)->MI->Config.File_Size;
 
-                #if MEDIAINFO_NEXTPACKET
+                #if MEDIAINFO_DEMUX && MEDIAINFO_NEXTPACKET
                     //Minimal DTS
                     if (DTS_Interval!=(int64u)-1 && !Sequences[Sequences_Current]->Status[File__Analyze::IsFinished] && ((*ReferenceTemp)->Resources.empty() || (*ReferenceTemp)->Resources_Current<(*ReferenceTemp)->Resources.size()))
                     {
@@ -774,7 +773,7 @@ void File__ReferenceFilesHelper::ParseReferences()
                         if (DTS_Minimal>DTS_Temp)
                             DTS_Minimal=DTS_Temp;
                     }
-                #endif //MEDIAINFO_NEXTPACKET
+                #endif //MEDIAINFO_DEMUX &&  MEDIAINFO_NEXTPACKET
             }
             else
                 FileSize_Parsed+=(*ReferenceTemp)->FileSize;
@@ -999,21 +998,20 @@ void File__ReferenceFilesHelper::ParseReference()
         #if MEDIAINFO_EVENTS && MEDIAINFO_NEXTPACKET
             if (DTS_Interval!=(int64u)-1 && !Sequences[Sequences_Current]->Status[File__Analyze::IsFinished] && Sequences[Sequences_Current]->MI->Info->FrameInfo.DTS!=(int64u)-1 && DTS_Minimal!=(int64u)-1 && (Sequences[Sequences_Current]->Resources.empty() || Sequences[Sequences_Current]->Resources_Current<Sequences[Sequences_Current]->Resources.size()))
             {
-                int64u DTS_Temp;
-                if (!Sequences[Sequences_Current]->Resources.empty() && Sequences[Sequences_Current]->Resources_Current)
-                {
-                    if (Sequences[Sequences_Current]->Resources[Sequences[Sequences_Current]->Resources_Current]->MI->Info->FrameInfo.DTS!=(int64u)-1)
-                        DTS_Temp=Sequences[Sequences_Current]->Resources[Sequences[Sequences_Current]->Resources_Current]->MI->Info->FrameInfo.DTS-Sequences[Sequences_Current]->Resources[Sequences[Sequences_Current]->Resources_Current]->MI->Info->Config->Demux_Offset_DTS_FromStream;
+                int64u DTS_Temp = 0;
+                #if MEDIAINFO_DEMUX
+                    if (!Sequences[Sequences_Current]->Resources.empty() && Sequences[Sequences_Current]->Resources_Current)
+                    {
+                        if (Sequences[Sequences_Current]->Resources[Sequences[Sequences_Current]->Resources_Current]->MI->Info->FrameInfo.DTS!=(int64u)-1)
+                            DTS_Temp=Sequences[Sequences_Current]->Resources[Sequences[Sequences_Current]->Resources_Current]->MI->Info->FrameInfo.DTS-Sequences[Sequences_Current]->Resources[Sequences[Sequences_Current]->Resources_Current]->MI->Info->Config->Demux_Offset_DTS_FromStream;;
+                    }
                     else
-                        DTS_Temp=0;
-                }
-                else
-                {
-                    if (Sequences[Sequences_Current]->MI->Info->FrameInfo.DTS!=(int64u)-1)
-                        DTS_Temp=Sequences[Sequences_Current]->MI->Info->FrameInfo.DTS-Sequences[Sequences_Current]->MI->Info->Config->Demux_Offset_DTS_FromStream;
-                    else
-                        DTS_Temp=0;
-                }
+                    {
+                        if (Sequences[Sequences_Current]->MI->Info->FrameInfo.DTS!=(int64u)-1)
+                            DTS_Temp=Sequences[Sequences_Current]->MI->Info->FrameInfo.DTS-Sequences[Sequences_Current]->MI->Info->Config->Demux_Offset_DTS_FromStream;
+                    }
+                #endif MEDIAINFO_DEMUX
+
                 DTS_Temp+=Sequences[Sequences_Current]->Resources[Sequences[Sequences_Current]->Resources_Current]->Demux_Offset_DTS;
                 if (!Sequences[Sequences_Current]->Resources.empty() && Sequences[Sequences_Current]->Resources_Current<Sequences[Sequences_Current]->Resources.size() && Sequences[Sequences_Current]->Resources[Sequences[Sequences_Current]->Resources_Current]->EditRate && Sequences[Sequences_Current]->Resources[Sequences[Sequences_Current]->Resources_Current]->IgnoreEditsBefore)
                 {
@@ -1564,7 +1562,9 @@ MediaInfo_Internal* File__ReferenceFilesHelper::MI_Create()
     MI_Temp->Option(__T("File_FileNameFormat"), __T("CSV"));
     MI_Temp->Option(__T("File_KeepInfo"), __T("1"));
     MI_Temp->Option(__T("File_ID_OnlyRoot"), Config->File_ID_OnlyRoot_Get()?__T("1"):__T("0"));
+    #if defined(MEDIAINFO_DVDIF_YES)
     MI_Temp->Option(__T("File_DvDif_DisableAudioIfIsInContainer"), Config->File_DvDif_DisableAudioIfIsInContainer_Get()?__T("1"):__T("0"));
+    #endif
     if ((Sequences.size()>1 || Config->File_MpegTs_ForceMenu_Get()) && !Sequences[Sequences_Current]->IsMain && !HasMainFile)
         MI_Temp->Option(__T("File_MpegTs_ForceMenu"), __T("1"));
     #if MEDIAINFO_AES

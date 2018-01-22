@@ -35,7 +35,9 @@
 #include "MediaInfo/Multiple/File__ReferenceFilesHelper.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #include "ZenLib/FileName.h"
+#if defined(MEDIAINFO_REFERENCES_YES)
 #include "ZenLib/File.h"
+#endif //defined(MEDIAINFO_REFERENCES_YES)
 #include "tinyxml2.h"
 using namespace ZenLib;
 using namespace tinyxml2;
@@ -44,6 +46,7 @@ using namespace tinyxml2;
 namespace MediaInfoLib
 {
 
+#if defined(MEDIAINFO_REFERENCES_YES)
 //---------------------------------------------------------------------------
 static void DashMpd_Transform (Ztring &Value, std::map<Ztring, Ztring> &Attributes)
 {
@@ -424,6 +427,7 @@ void template_generic::Decode()
             Sequence->AddFileName(BaseURL+media);
     }
 }
+#endif //MEDIAINFO_REFERENCES_YES
 
 //***************************************************************************
 // Constructor/Destructor
@@ -437,44 +441,7 @@ File_DashMpd::File_DashMpd()
         ParserIDs[0]=MediaInfo_Parser_DashMpd;
         StreamIDs_Width[0]=16;
     #endif //MEDIAINFO_EVENTS
-
-    //Temp
-    ReferenceFiles=NULL;
 }
-
-//---------------------------------------------------------------------------
-File_DashMpd::~File_DashMpd()
-{
-    delete ReferenceFiles; //ReferenceFiles=NULL;
-}
-
-//***************************************************************************
-// Streams management
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-void File_DashMpd::Streams_Finish()
-{
-    if (ReferenceFiles==NULL)
-        return;
-
-    ReferenceFiles->ParseReferences();
-}
-
-//***************************************************************************
-// Buffer - Global
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-#if MEDIAINFO_SEEK
-size_t File_DashMpd::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
-{
-    if (ReferenceFiles==NULL)
-        return 0;
-
-    return ReferenceFiles->Seek(Method, Value, ID);
-}
-#endif //MEDIAINFO_SEEK
 
 //***************************************************************************
 // Buffer - File header
@@ -505,8 +472,9 @@ bool File_DashMpd::FileHeader_Begin()
             Fill(Stream_General, 0, General_Format, "DASH MPD");
             Config->File_ID_OnlyRoot_Set(false);
 
-            ReferenceFiles=new File__ReferenceFilesHelper(this, Config);
+            ReferenceFiles_Accept(this, Config);
 
+            #if defined(MEDIAINFO_REFERENCES_YES)
             //Parsing main elements
             Ztring BaseURL;
 
@@ -691,6 +659,7 @@ bool File_DashMpd::FileHeader_Begin()
                     }
                 }
             }
+            #endif //MEDIAINFO_REFERENCES_YES
         }
         else
         {

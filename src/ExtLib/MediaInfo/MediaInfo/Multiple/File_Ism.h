@@ -17,39 +17,34 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
+#include "MediaInfo/File__HasReferences.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
 {
 
-class File__ReferenceFilesHelper;
-
 //***************************************************************************
 // Class File_Ism
 //***************************************************************************
 
-class File_Ism : public File__Analyze
+class File_Ism : public File__Analyze, File__HasReferences
 {
 public :
     //Constructor/Destructor
     File_Ism();
-    ~File_Ism();
 
 private :
     //Streams management
     void Streams_Accept ();
-    void Streams_Finish ();
+    void Streams_Finish() {ReferenceFiles_Finish();}
 
     //Buffer - Global
     #if MEDIAINFO_SEEK
-    size_t Read_Buffer_Seek (size_t Method, int64u Value, int64u ID);
+    size_t Read_Buffer_Seek (size_t Method, int64u Value, int64u ID) {return ReferenceFiles_Seek(Method, Value, ID);}
     #endif //MEDIAINFO_SEEK
 
     //Buffer - File header
     bool FileHeader_Begin();
-
-    //Temp
-    File__ReferenceFilesHelper*     ReferenceFiles;
 };
 
 } //NameSpace

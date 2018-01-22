@@ -26,7 +26,9 @@
 #include <ctime>
 #include <zlib.h>
 #include "ThirdParty/base64/base64.h"
+#if defined(MEDIAINFO_REFERENCES_YES)
 #include "ZenLib/File.h"
+#endif //defined(MEDIAINFO_REFERENCES_YES)
 #include "ZenLib/OS_Utils.h"
 #ifdef WINDOWS
     #undef __TEXT

@@ -1,3 +1,0 @@
-﻿The following files have MPC-BE specific custom code (compared to MediaInfo):
-
-* MediaInfo/Multiple/File_Mk.cpp

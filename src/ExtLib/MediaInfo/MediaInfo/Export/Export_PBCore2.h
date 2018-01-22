@@ -28,7 +28,13 @@ public :
     ~Export_PBCore2 ();
 
     //Input
-    Ztring Transform(MediaInfo_Internal &MI);
+    enum version
+    {
+        Version_2_0,
+        Version_2_1,
+        Version_Max
+    };
+    Ztring Transform(MediaInfo_Internal &MI, version Version=version(Version_Max-1));
 };
 
 } //NameSpace

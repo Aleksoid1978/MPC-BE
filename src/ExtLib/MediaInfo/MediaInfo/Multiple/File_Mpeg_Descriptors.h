@@ -22,6 +22,7 @@
     #include "MediaInfo/File__Analyze.h"
 #endif
 #include <cfloat>
+#include <set>
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -42,17 +43,51 @@ struct complete_stream
     Ztring Duration_End;
     bool   Duration_End_IsUpdated;
     std::map<Ztring, Ztring> TimeZones; //Key is country code
-
+#if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
+    class service_desc_holder
+    {
+    public:
+        File__Analyze::servicedescriptors* ServiceDescriptors;
+        service_desc_holder() : ServiceDescriptors(NULL)
+        {
+        }
+        ~service_desc_holder()
+        {
+            reset();
+        }
+        void Clone_Desc(File__Analyze::servicedescriptors* src)
+        {
+            if (src)
+            {
+                reset(new File__Analyze::servicedescriptors);
+                *ServiceDescriptors = *src;
+            }
+            else
+            {
+                reset();
+            }
+        }
+        void reset(File__Analyze::servicedescriptors* new_ptr = NULL)
+        {
+            if(ServiceDescriptors)
+               delete ServiceDescriptors;
+            ServiceDescriptors = new_ptr;
+        }
+    };
+#endif
     //Per transport_stream
     struct transport_stream
+#if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
+        : public service_desc_holder
+#endif
     {
         bool HasChanged;
         std::map<std::string, Ztring> Infos;
-        struct program
+        struct program 
+#if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
+            : public service_desc_holder
+#endif
         {
-            #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
-                File__Analyze::servicedescriptors* ServiceDescriptors;
-            #endif
             bool HasChanged;
             std::map<std::string, Ztring> Infos;
             std::map<std::string, Ztring> ExtraInfos_Content;
@@ -131,9 +166,6 @@ struct complete_stream
             //Constructor/Destructor
             program()
             :
-                #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
-                    ServiceDescriptors(NULL),
-                #endif
                 HasChanged(false),
                 StreamPos((size_t)-1),
                 registration_format_identifier(0x00000000),
@@ -177,26 +209,14 @@ struct complete_stream
                 Scte35(p.Scte35)
             {
                 #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
-                    if (p.ServiceDescriptors)
-                    {
-                        ServiceDescriptors=new File__Analyze::servicedescriptors;
-                        *ServiceDescriptors=*p.ServiceDescriptors;
-                    }
-                    else
-                        ServiceDescriptors=NULL;
+                Clone_Desc(p.ServiceDescriptors);
                 #endif
             }
 
             program& operator=(const program& p)
             {
                 #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
-                    if (p.ServiceDescriptors)
-                    {
-                        ServiceDescriptors=new File__Analyze::servicedescriptors;
-                        *ServiceDescriptors=*p.ServiceDescriptors;
-                    }
-                    else
-                        ServiceDescriptors=NULL;
+                Clone_Desc(p.ServiceDescriptors);
                 #endif
                 HasChanged=p.HasChanged;
                 Infos=p.Infos;
@@ -221,13 +241,6 @@ struct complete_stream
                 Scte35=p.Scte35;
 
                 return *this;
-            }
-
-            ~program()
-            {
-                #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
-                    delete ServiceDescriptors;
-                #endif
             }
         };
         typedef std::map<int16u, program> programs; //Key is program_number
@@ -510,6 +523,13 @@ struct complete_stream
                     #endif //MEDIAINFO_MPEGTS_PESTIMESTAMP_YES
                     ;
         }
+        void init(const size_t ID)
+        {
+            Searching_Payload_Start_Set(true);
+            Kind = complete_stream::stream::psi;
+            Table_IDs.resize(0x100);
+            Table_IDs[ID] = new complete_stream::stream::table_id;
+        }
     };
     typedef std::vector<stream*> streams;
     streams Streams; //Key is pid
@@ -519,27 +539,22 @@ struct complete_stream
 
     //ATSC
     int8u GPS_UTC_offset;
-    struct source
+    struct source 
     {
         std::map<int16u, Ztring> texts;
         struct atsc_epg_block
         {
-            struct event
+            struct event 
+#if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
+                : public service_desc_holder
+#endif
             {
-                #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
-                    File__Analyze::servicedescriptors* ServiceDescriptors;
-                #endif
                 int32u  start_time;
                 Ztring  duration;
                 Ztring  title;
                 std::map<int16u, Ztring> texts;
 
-                event()
-                :
-                    #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
-                        ServiceDescriptors(NULL),
-                    #endif
-                    start_time((int32u)-1)
+                event() : start_time((int32u)-1)
                 {}
 
                 event(const event& e)
@@ -547,37 +562,17 @@ struct complete_stream
                     start_time(e.start_time)
                 {
                     #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
-                        if (e.ServiceDescriptors)
-                        {
-                            ServiceDescriptors=new File__Analyze::servicedescriptors;
-                            *ServiceDescriptors=*e.ServiceDescriptors;
-                        }
-                        else
-                            ServiceDescriptors=NULL;
+                    Clone_Desc(e.ServiceDescriptors);
                     #endif
                 }
-
                 event& operator=(const event& e)
                 {
                     #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
-                        if (e.ServiceDescriptors)
-                        {
-                            ServiceDescriptors=new File__Analyze::servicedescriptors;
-                            *ServiceDescriptors=*e.ServiceDescriptors;
-                        }
-                        else
-                            ServiceDescriptors=NULL;
+                    Clone_Desc(e.ServiceDescriptors);
                     #endif
                     start_time=e.start_time;
 
                     return *this;
-                }
-
-                ~event()
-                {
-                    #if defined(MEDIAINFO_EIA608_YES) || defined(MEDIAINFO_EIA708_YES)
-                        delete ServiceDescriptors;
-                    #endif
                 }
             };
 
@@ -599,6 +594,7 @@ struct complete_stream
     bool Programs_IsUpdated; //For EPG DVB
 
     //File__Duplicate
+    #if MEDIAINFO_DUPLICATE
     bool                                                File__Duplicate_HasChanged_;
     size_t                                              Config_File_Duplicate_Get_AlwaysNeeded_Count;
     std::vector<File__Duplicate_MpegTs*>                Duplicates_Speed;
@@ -610,6 +606,7 @@ struct complete_stream
             return false;
         return !Duplicates_Speed_FromPID[pid].empty();
     }
+    #endif //MEDIAINFO_DUPLICATE
 
     //SpeedUp information
     std::vector<std::vector<size_t> >   StreamPos_ToRemove;
@@ -630,8 +627,10 @@ struct complete_stream
         Sources_IsUpdated=false;
         Programs_IsUpdated=false;
         StreamPos_ToRemove.resize(Stream_Max);
+        #if MEDIAINFO_DUPLICATE
         File__Duplicate_HasChanged_ = false;
         Config_File_Duplicate_Get_AlwaysNeeded_Count = 0;
+        #endif //MEDIAINFO_DUPLICATE
     }
 
     ~complete_stream()
@@ -639,12 +638,14 @@ struct complete_stream
         for (size_t StreamID=0; StreamID<Streams.size(); StreamID++)
             delete Streams[StreamID]; //Streams[StreamID]=NULL;
 
+        #if MEDIAINFO_DUPLICATE
         std::map<const String, File__Duplicate_MpegTs*>::iterator Duplicates_Temp=Duplicates.begin();
         while (Duplicates_Temp!=Duplicates.end())
         {
             delete Duplicates_Temp->second; //Duplicates_Temp->second=NULL
             ++Duplicates_Temp;
         }
+        #endif //MEDIAINFO_DUPLICATE
     }
 };
 
@@ -744,10 +745,25 @@ private :
     void Descriptor_35() {Skip_XX(Element_Size, "Data");};
     void Descriptor_36() {Skip_XX(Element_Size, "Data");};
     void Descriptor_37() {Skip_XX(Element_Size, "Data");};
-    void Descriptor_38() {Skip_XX(Element_Size, "Data");};
-    void Descriptor_39() {Skip_XX(Element_Size, "Data");};
-    void Descriptor_3A() {Skip_XX(Element_Size, "Data");};
-    void Descriptor_3F() {Skip_XX(Element_Size, "Data");};
+    void Descriptor_38();
+    void Descriptor_3F();
+    void Descriptor_3F_00() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_01() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_02() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_03();
+    void Descriptor_3F_04() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_05() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_06() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_07() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_08() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_09() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_0A() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_0B() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_0C() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_0D() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_0E() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_0F() {Skip_XX(Element_Size-Element_Offset, "Data");};
+    void Descriptor_3F_10() {Skip_XX(Element_Size-Element_Offset, "Data");};
     void Descriptor_40();
     void Descriptor_41();
     void Descriptor_42() {Skip_XX(Element_Size, "Data");};
@@ -825,6 +841,7 @@ private :
     void Descriptor_A9() {Skip_XX(Element_Size, "Data");};
     void Descriptor_AA();
     void Descriptor_AB() {Skip_XX(Element_Size, "Data");};
+    void Descriptor_B0();
     void Descriptor_C1();
     void Descriptor_C4() {Skip_XX(Element_Size, "Data");};
     void Descriptor_C8();

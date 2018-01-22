@@ -23,6 +23,7 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Multiple/File_Mpeg4_TimeCode.h"
 #include "MediaInfo/TimeCode.h"
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -77,6 +78,18 @@ void File_Mpeg4_TimeCode::Streams_Fill()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+void File_Mpeg4_TimeCode::Read_Buffer_Init()
+{
+    ZtringListList Map=Config->File_ForceParser_Config_Get();
+    if (!Map.empty())
+    {
+        NumberOfFrames=Map(__T("NumberOfFrames")).To_int8u();
+        DropFrame=Map(__T("DropFrame")).To_int8u()?true:false;
+        NegativeTimes=Map(__T("NegativeTimes")).To_int8u()?true:false;
+    }
+}
+
+//---------------------------------------------------------------------------
 void File_Mpeg4_TimeCode::Read_Buffer_Continue()
 {
     //Parsing
@@ -89,6 +102,8 @@ void File_Mpeg4_TimeCode::Read_Buffer_Continue()
             Pos=Position;
             if (NegativeTimes)
                 Pos=(int32s)Position;
+            if (Config->ParseSpeed<=1.0 && Element_Offset!=Element_Size)
+                Skip_XX(Element_Size-Element_Offset,            "Other positions");
         }
     }
 

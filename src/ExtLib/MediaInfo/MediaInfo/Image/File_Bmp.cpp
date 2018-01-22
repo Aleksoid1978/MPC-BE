@@ -201,7 +201,7 @@ void File_Bmp::BitmapInfoHeader(int8u Version)
     #endif //MEDIAINFO_TRACE
 
     //Parsing
-    int32u Width, Height, CompressionMethod;
+    int32u Width, Height, CompressionMethod, Palette;
     int16u BitsPerPixel;
     Skip_L4(                                                    "Size");
     Get_L4 (Width,                                              "Width");
@@ -212,11 +212,11 @@ void File_Bmp::BitmapInfoHeader(int8u Version)
     Skip_L4(                                                    "Image size");
     Skip_L4(                                                    "Horizontal resolution");
     Skip_L4(                                                    "Vertical resolution");
-    Skip_L4(                                                    "Number of colors in the color palette");
+    Get_L4 (Palette,                                            "Number of colors in the color palette");
     Skip_L4(                                                    "Number of important colors used");
 
     FILLING_BEGIN();
-        if (BitsPerPixel<8)
+        if (BitsPerPixel<8 && Palette)
             BitsPerPixel=8; //It is a palette
 
         Fill(Stream_Image, 0, Image_Width, Width);

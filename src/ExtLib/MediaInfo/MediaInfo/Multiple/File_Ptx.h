@@ -17,41 +17,34 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
-#include <vector>
+#include "MediaInfo/File__HasReferences.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
 {
 
-class File__ReferenceFilesHelper;
-
 //***************************************************************************
 // Class File_Ptx
 //***************************************************************************
 
-class File_Ptx : public File__Analyze
+class File_Ptx : public File__Analyze, File__HasReferences
 {
 public :
     //Constructor/Destructor
     File_Ptx();
-    ~File_Ptx();
 
 private :
     //Streams management
-    void Streams_Finish ();
+    void Streams_Finish() {ReferenceFiles_Finish();}
 
     //Buffer - Global
     #if MEDIAINFO_SEEK
-    size_t Read_Buffer_Seek (size_t Method, int64u Value, int64u ID);
+    size_t Read_Buffer_Seek (size_t Method, int64u Value, int64u ID) {return ReferenceFiles_Seek(Method, Value, ID);}
     #endif //MEDIAINFO_SEEK
     void Read_Buffer_Continue ();
 
     //Buffer - File header
     bool FileHeader_Begin();
-
-    //Temp
-    File__ReferenceFilesHelper*     ReferenceFiles;
-    friend class File_DpcCpl;   //Theses classes need access to internal structure for optimization. There is recursivity with theses formats
 };
 
 } //NameSpace

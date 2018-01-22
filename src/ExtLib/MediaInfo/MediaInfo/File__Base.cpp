@@ -19,7 +19,9 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Base.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
+#if defined(MEDIAINFO_REFERENCES_YES)
 #include "ZenLib/File.h"
+#endif //defined(MEDIAINFO_REFERENCES_YES)
 #include <cstring>
 //---------------------------------------------------------------------------
 
