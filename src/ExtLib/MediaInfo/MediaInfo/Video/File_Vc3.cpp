@@ -539,7 +539,16 @@ void File_Vc3::Streams_Finish()
 #if MEDIAINFO_DEMUX
 bool File_Vc3::Demux_UnpacketizeContainer_Test()
 {
-    //TODO: handling of the extra 4 bytes in a MOV container having 2 frames in a sample (see "Frame size?" part)
+    //Handling of the extra 4 bytes in a MOV container having 2 frames in a sample (see "Frame size?" part)
+    if (IsSub && Buffer_Offset+4==Buffer_Size)
+    {
+        int32u FrameSize=BigEndian2int32u(Buffer+Buffer_Offset);
+        if (FrameSize && (Buffer_Offset%FrameSize)==0) //Checking coherency with last frame size
+        {
+            Skip_B4(                                            "Frame size?");
+            Buffer_Offset+=4;
+        }
+    }
 
     if (Buffer_Offset+0x2C>Buffer_Size)
         return false;
@@ -589,10 +598,28 @@ void File_Vc3::Read_Buffer_Unsynched()
 //---------------------------------------------------------------------------
 bool File_Vc3::Header_Begin()
 {
-    if (IsSub && Buffer_Offset+4==Buffer_Size && BigEndian2int32u(Buffer+Buffer_Offset)*Frame_Count_InThisBlock==Buffer_Offset)
+    //Handling of the extra 4 bytes in a MOV container having 2 frames in a sample
+    if (IsSub && Buffer_Offset+4==Buffer_Size)
     {
-        Skip_B4(                                                "Frame size?");
-        Buffer_Offset+=4;
+        int32u FrameSize=BigEndian2int32u(Buffer+Buffer_Offset);
+        if (FrameSize && (Buffer_Offset%FrameSize)==0)
+        {
+            Skip_B4(                                                "Frame size?");
+            Buffer_Offset+=4;
+
+            if (Frame_Count_InThisBlock==Frame_Count)
+            {
+                Fill(Stream_Video, 0, "FramesPerContainerBlock", Frame_Count_InThisBlock);
+            }
+
+            if (!Status[IsFilled] && Frame_Count>=Frame_Count_Valid && Buffer_Offset+Element_Size>=Buffer_Size)
+            {
+                Fill("VC-3");
+
+                if (!IsSub && Config->ParseSpeed<1.0)
+                    Finish("VC-3");
+            }
+        }
     }
 
     if (Buffer_Offset+0x00000280>Buffer_Size)
@@ -687,7 +714,7 @@ void File_Vc3::Data_Parse()
         }
         if (!Status[IsAccepted])
             Accept("VC-3");
-        if (!Status[IsFilled] && Frame_Count>=Frame_Count_Valid)
+        if (!Status[IsFilled] && Frame_Count>=Frame_Count_Valid && Buffer_Offset+Element_Size>=Buffer_Size)
         {
             Fill("VC-3");
 
@@ -968,7 +995,7 @@ void File_Vc3::UserData_8()
             Element_Offset+=0x49;
             Skip_B1(                                            "Nexio private data?");
         #else //MEDIAINFO_CDP_YES
-            Skip_XX(0x4A                                        "CDP data");
+            Skip_XX(0x4A,                                       "CDP data");
         #endif //MEDIAINFO_CDP_YES
     }
     else

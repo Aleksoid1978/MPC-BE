@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
+#if MEDIAINFO_DUPLICATE
 #include "MediaInfo/Duplicate/File__Duplicate__Base.h"
 #include "MediaInfo/Duplicate/File__Duplicate__Writer.h"
 #include <set>
@@ -139,7 +140,7 @@ private:
     int16u StreamID;
 };
 
-
 } //NameSpace
+#endif //MEDIAINFO_DUPLICATE
 
 #endif

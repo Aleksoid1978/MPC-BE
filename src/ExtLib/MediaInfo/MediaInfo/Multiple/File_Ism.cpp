@@ -25,7 +25,6 @@
 #include <set>
 #include "MediaInfo/MediaInfo.h"
 #include "MediaInfo/Multiple/File__ReferenceFilesHelper.h"
-#include "ZenLib/Dir.h"
 #include "ZenLib/FileName.h"
 #include "ZenLib/Format/Http/Http_Utils.h"
 #include "tinyxml2.h"
@@ -41,7 +40,7 @@ namespace MediaInfoLib
 
 //---------------------------------------------------------------------------
 File_Ism::File_Ism()
-:File__Analyze()
+:File__Analyze(), File__HasReferences()
 {
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_Ism;
@@ -50,15 +49,6 @@ File_Ism::File_Ism()
     #if MEDIAINFO_DEMUX
         Demux_EventWasSent_Accept_Specific=true;
     #endif //MEDIAINFO_DEMUX
-
-    //Temp
-    ReferenceFiles=NULL;
-}
-
-//---------------------------------------------------------------------------
-File_Ism::~File_Ism()
-{
-    delete ReferenceFiles; //ReferenceFiles=NULL;
 }
 
 //***************************************************************************
@@ -69,31 +59,8 @@ File_Ism::~File_Ism()
 void File_Ism::Streams_Accept()
 {
     Fill(Stream_General, 0, General_Format, "ISM");
+    ReferenceFiles_Accept(this, Config);
 }
-
-//---------------------------------------------------------------------------
-void File_Ism::Streams_Finish()
-{
-    if (ReferenceFiles==NULL)
-        return;
-
-    ReferenceFiles->ParseReferences();
-}
-
-//***************************************************************************
-// Buffer - Global
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-#if MEDIAINFO_SEEK
-size_t File_Ism::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
-{
-    if (ReferenceFiles==NULL)
-        return 0;
-
-    return ReferenceFiles->Seek(Method, Value, ID);
-}
-#endif //MEDIAINFO_SEEK
 
 //***************************************************************************
 // Buffer - File header
@@ -110,9 +77,9 @@ bool File_Ism::FileHeader_Begin()
         XMLElement* Root=document.FirstChildElement("smil");
         if (Root)
         {
-            ReferenceFiles=new File__ReferenceFilesHelper(this, Config);
-
+            #if defined(MEDIAINFO_REFERENCES_YES)
             std::set<Ztring> FileNames;
+            #endif //MEDIAINFO_REFERENCES_YES
 
             XMLElement* Body=Root->FirstChildElement();
             while (Body)
@@ -126,6 +93,7 @@ bool File_Ism::FileHeader_Begin()
                         {
                             Accept("ISM");
 
+                            #if defined(MEDIAINFO_REFERENCES_YES)
                             XMLElement* Stream=Switch->FirstChildElement();
                             while (Stream)
                             {
@@ -170,6 +138,7 @@ bool File_Ism::FileHeader_Begin()
 
                                 Stream=Stream->NextSiblingElement();
                             }
+                            #endif //MEDIAINFO_REFERENCES_YES
                         }
 
                         Switch=Switch->NextSiblingElement();

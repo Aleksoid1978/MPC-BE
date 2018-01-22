@@ -144,6 +144,34 @@ struct Jpeg_samplingfactor
 };
 
 //---------------------------------------------------------------------------
+void Jpeg_AddDec(string& Current, int8u Value)
+{
+    if (Value < 10)
+        Current += '0' + Value;
+    else
+    {
+        Current += '1';
+        Current += '0' - 10 + Value;
+    }
+}
+
+//---------------------------------------------------------------------------
+string Jpeg_WithLevel(string Profile, int8u Level, bool HasSubLevel=false)
+{
+    Profile += '@';
+    if (HasSubLevel)
+        Profile += 'M'; // Has Mainlevel
+    Profile += 'L';
+    Jpeg_AddDec(Profile, Level & 0xF);
+    if (HasSubLevel)
+    {
+        Profile += 'S'; // Has Sublevel
+        Profile += 'L';
+        Jpeg_AddDec(Profile, Level >> 4);
+    }
+    return Profile;
+}
+
 string Jpeg2000_Rsiz(int16u Rsiz)
 {
     switch (Rsiz)
@@ -156,15 +184,26 @@ string Jpeg2000_Rsiz(int16u Rsiz)
         case 0x0005: return "D-Cinema 2k Scalable";
         case 0x0006: return "D-Cinema 4k Scalable";
         case 0x0007: return "Long-term storage";
-        case 0x0101: return "BCS@L1"; //Broadcast Contribution Single Tile
-        case 0x0102: return "BCS@L2"; //Broadcast Contribution Single Tile
-        case 0x0103: return "BCS@L3"; //Broadcast Contribution Single Tile
-        case 0x0104: return "BCS@L4"; //Broadcast Contribution Single Tile
-        case 0x0105: return "BCS@L5"; //Broadcast Contribution Single Tile
-        case 0x0205: return "BCM@L5"; //Broadcast Contribution Multi-tile
         case 0x0306: return "BCMR@L6"; //Broadcast Contribution Multi-tile Reversible
         case 0x0307: return "BCMR@L7"; //Broadcast Contribution Multi-tile Reversible
-        default: return Ztring::ToZtring(Rsiz, 16).To_UTF8();
+        default:
+            switch ((Rsiz & 0xFFF0))
+            {
+                case 0x0100: return Jpeg_WithLevel("BCS", (int8u)Rsiz); //Broadcast Contribution Single-tile 
+                case 0x0200: return Jpeg_WithLevel("BCM", (int8u)Rsiz); //Broadcast Contribution Multi-tile
+                default:;
+            }
+            switch ((Rsiz & 0xFF00))
+            {
+                case 0x0400: return Jpeg_WithLevel("IMFS2k", (int8u)Rsiz, true); // IMF Single-tile 2k
+                case 0x0500: return Jpeg_WithLevel("IMFS4k", (int8u)Rsiz, true); // IMF Single-tile 4k
+                case 0x0600: return Jpeg_WithLevel("IMFS8k", (int8u)Rsiz, true); // IMF Single-tile 8k
+                case 0x0700: return Jpeg_WithLevel("IMFMR2k", (int8u)Rsiz, true); // IMF Single/Multi-tile 2k
+                case 0x0800: return Jpeg_WithLevel("IMFMR4k", (int8u)Rsiz, true); // IMF Single/Multi-tile 4k
+                case 0x0900: return Jpeg_WithLevel("IMFMR8k", (int8u)Rsiz, true); // IMF Single/Multi-tile 8k
+                default:;
+            }
+            return Ztring::ToZtring(Rsiz, 16).To_UTF8();
     }
 }
 

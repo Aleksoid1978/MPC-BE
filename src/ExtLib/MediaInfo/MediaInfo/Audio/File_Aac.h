@@ -362,6 +362,9 @@ protected :
     std::map<std::string, Ztring>   Infos_General;
     std::map<std::string, Ztring>   Infos;
     bool                            CanFill;
+
+private :
+    void FillInfosHEAACv2(const Ztring& Format_Settings);
 };
 
 } //NameSpace

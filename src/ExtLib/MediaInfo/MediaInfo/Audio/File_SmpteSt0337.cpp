@@ -1235,7 +1235,17 @@ void File_SmpteSt0337::Data_Parse()
                         #endif //defined(MEDIAINFO_AAC_YES)
                         break;
             case 28 :   // Dolby E
+                        #if defined(MEDIAINFO_DOLBYE_YES)
                         Parser=new File_DolbyE();
+                        #else
+                        {
+                            //Filling
+                            File__Analyze* Parser=new File_Unknown();
+                            Open_Buffer_Init(Parser);
+                            Parser->Stream_Prepare(Stream_Audio);
+                            Parser->Fill(Stream_Audio, 0, Audio_Format, "DDE");
+                        }
+                        #endif
                         break;
             default : ;
         }
@@ -1312,6 +1322,7 @@ void File_SmpteSt0337::Data_Parse()
 
     if (Parser && !Parser->Status[IsFinished])
     {
+        #if defined(MEDIAINFO_DOLBYE_YES)
         switch(data_type)
         {
             case 28 :
@@ -1321,6 +1332,7 @@ void File_SmpteSt0337::Data_Parse()
                         break;
             default : ;
         }
+        #endif
 
         Parser->FrameInfo=FrameInfo;
         Open_Buffer_Continue(Parser, Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset));
@@ -1341,6 +1353,7 @@ void File_SmpteSt0337::Data_Parse()
             }
         #endif // MEDIAINFO_DEMUX
 
+        #if defined(MEDIAINFO_DOLBYE_YES)
         switch (data_type)
         {
             case 28 :
@@ -1350,6 +1363,7 @@ void File_SmpteSt0337::Data_Parse()
                         break;
             default : ;
         }
+        #endif
     }
     else
     {

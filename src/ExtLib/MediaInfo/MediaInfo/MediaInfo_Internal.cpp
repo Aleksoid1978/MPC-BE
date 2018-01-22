@@ -21,8 +21,12 @@
 #include "MediaInfo/MediaInfo_Config.h"
 #include "MediaInfo/File__Analyze.h"
 #include "MediaInfo/File__MultipleParsing.h"
-#include "ZenLib/Dir.h"
+#if defined(MEDIAINFO_FILE_YES)
 #include "ZenLib/File.h"
+#endif //defined(MEDIAINFO_DIRECTORY_YES)
+#if defined(MEDIAINFO_DIRECTORY_YES)
+#include "ZenLib/Dir.h"
+#endif //defined(MEDIAINFO_DIRECTORY_YES)
 #include "ZenLib/FileName.h"
 #if defined(MEDIAINFO_DIRECTORY_YES)
     #include "MediaInfo/Reader/Reader_Directory.h"
@@ -388,11 +392,8 @@ size_t MediaInfo_Internal::Open(const String &File_Name_)
 //---------------------------------------------------------------------------
 void MediaInfo_Internal::Entry()
 {
-    {
-    CriticalSectionLocker CSL(CS);
     MEDIAINFO_DEBUG_CONFIG_TEXT(Debug+=__T("Entry");)
     Config.State_Set(0);
-    }
 
     if ((Config.File_Names[0].size()>=6
         && Config.File_Names[0][0]==__T('m')
@@ -570,6 +571,7 @@ void MediaInfo_Internal::Entry()
                         }
                     }
 
+                    #if defined(MEDIAINFO_DIRECTORY_YES)
                     Ztring Name=Test.Name_Get();
                     Ztring BaseName=Name.SubString(Ztring(), __T("_"));
                     if (!BaseName.empty())
@@ -603,6 +605,7 @@ void MediaInfo_Internal::Entry()
                         for (size_t Pos=0; Pos<List.size(); Pos++)
                             Dxw+=" <clip file=\""+List[Pos].To_UTF8()+"\" />\r\n";
                     }
+                    #endif //defined(MEDIAINFO_DIRECTORY_YES)
 
                     if (!Dxw.empty())
                     {
@@ -656,10 +659,7 @@ void MediaInfo_Internal::Entry()
         }
     #endif //MEDIAINFO_FILE_YES
 
-    {
-    CriticalSectionLocker CSL(CS);
     Config.State_Set(1);
-    }
 }
 
 //---------------------------------------------------------------------------
@@ -911,7 +911,7 @@ size_t MediaInfo_Internal::Open_Buffer_Seek (size_t Method, int64u Value, int64u
 {
     CriticalSectionLocker CSL(CS);
     if (Info==NULL)
-        return false;
+        return 0;
 
     return Info->Open_Buffer_Seek(Method, Value, ID);
 }
@@ -971,17 +971,17 @@ std::bitset<32> MediaInfo_Internal::Open_NextPacket ()
             else
         #endif //defined(MEDIAINFO_READER_NO)
             {
-                #if MEDIAINFO_NEXTPACKET
+                #if MEDIAINFO_DEMUX && MEDIAINFO_NEXTPACKET
                     Config.Demux_EventWasSent=false;
-                #endif //MEDIAINFO_NEXTPACKET
+                #endif //MEDIAINFO_DEMUX && MEDIAINFO_NEXTPACKET
                 Open_Buffer_Continue(NULL, 0);
-                #if MEDIAINFO_NEXTPACKET
+                #if MEDIAINFO_DEMUX && MEDIAINFO_NEXTPACKET
                     if (!Config.Demux_EventWasSent)
-                #endif //MEDIAINFO_NEXTPACKET
+                #endif //MEDIAINFO_DEMUX && MEDIAINFO_NEXTPACKET
                         Open_Buffer_Finalize();
-                #if MEDIAINFO_NEXTPACKET
+                #if MEDIAINFO_DEMUX && MEDIAINFO_NEXTPACKET
                     Demux_EventWasSent=Config.Demux_EventWasSent;
-                #endif //MEDIAINFO_NEXTPACKET
+                #endif //MEDIAINFO_DEMUX && MEDIAINFO_NEXTPACKET
             }
     }
 
@@ -1146,15 +1146,17 @@ Ztring MediaInfo_Internal::Get(stream_t StreamKind, size_t StreamPos, const Stri
 
     //Special cases
     //-Inform for a stream
+#if defined(MEDIAINFO_TEXT_YES) || defined(MEDIAINFO_HTML_YES) || defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_CSV_YES) || defined(MEDIAINFO_CUSTOM_YES)
     if (Parameter==__T("Inform"))
     {
         CS.Leave();
-        Ztring InformZtring=Inform(StreamKind, StreamPos, true);
+        const Ztring InformZtring=Inform(StreamKind, StreamPos, true);
         CS.Enter();
         size_t Pos=MediaInfoLib::Config.Info_Get(StreamKind).Find(__T("Inform"));
         if (Pos!=Error)
             Stream[StreamKind][StreamPos](Pos)=InformZtring;
     }
+#endif
 
     //Case of specific info
     size_t ParameterI=MediaInfoLib::Config.Info_Get(StreamKind).Find(Parameter, KindOfSearch);
@@ -1278,8 +1280,10 @@ String MediaInfo_Internal::Option (const String &Option, const String &Value)
     else if (OptionLower.find(__T("file_seek"))==0)
     {
         #if MEDIAINFO_SEEK
-            if (Reader==NULL && Info==NULL)
-                return __T("Error: Reader pointer is empty");
+            #if !defined(MEDIAINFO_READER_NO)
+                if (Reader==NULL && Info==NULL)
+                    return __T("Error: Reader pointer is empty");
+            #endif //MEDIAINFO_READER_NO
 
             size_t Method=(size_t)-1;
             int64u SeekValue=(int64u)-1;
@@ -1337,10 +1341,12 @@ String MediaInfo_Internal::Option (const String &Option, const String &Value)
 
             CS.Leave();
             size_t Result;
-            if (Reader)
-                Result=Reader->Format_Test_PerParser_Seek(this, Method, SeekValue, ID);
-            else
-                Result=Open_Buffer_Seek(Method, SeekValue, ID);
+            #if !defined(MEDIAINFO_READER_NO)
+                if (Reader)
+                    Result=Reader->Format_Test_PerParser_Seek(this, Method, SeekValue, ID);
+                else
+            #endif //MEDIAINFO_READER_NO
+                    Result=Open_Buffer_Seek(Method, SeekValue, ID);
             CS.Enter();
             switch (Result)
             {
@@ -1412,17 +1418,18 @@ size_t MediaInfo_Internal::Count_Get (stream_t StreamKind, size_t StreamPos)
 //---------------------------------------------------------------------------
 size_t MediaInfo_Internal::State_Get ()
 {
-    CriticalSectionLocker CSL(CS);
     return (size_t)(Config.State_Get()*10000);
 }
 
 //---------------------------------------------------------------------------
+#if defined(MEDIAINFO_FILE_YES)
 void MediaInfo_Internal::TestContinuousFileNames ()
 {
     CriticalSectionLocker CSL(CS);
     if (Info)
         Info->TestContinuousFileNames();
 }
+#endif //defined(MEDIAINFO_FILE_YES)
 
 //---------------------------------------------------------------------------
 #if MEDIAINFO_EVENTS

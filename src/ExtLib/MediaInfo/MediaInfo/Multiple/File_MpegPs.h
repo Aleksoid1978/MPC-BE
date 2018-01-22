@@ -104,6 +104,8 @@ private :
     //Buffer - File header
     bool FileHeader_Begin() {return FileHeader_Begin_0x000001();}
 
+    void Bitrate_Calc();
+
     //Buffer - Synchro
     bool Synchronize();
     bool Synched_Test();
@@ -181,11 +183,14 @@ private :
             {
                 int64u File_Pos;
                 int64u TimeStamp;
-
+                void Reset()
+                {
+                    File_Pos = (int64u)-1;
+                    TimeStamp = (int64u)-1;
+                }
                 Mpeg_TimeStamp_TS()
                 {
-                    File_Pos=(int64u)-1;
-                    TimeStamp=(int64u)-1;
+                    Reset();
                 }
             };
 
@@ -212,6 +217,26 @@ private :
         bool           Searching_TimeStamp_End;
         bool           IsFilled;
 
+        void Streams_Update()
+        {
+             for (size_t Pos = 0; Pos<Parsers.size(); Pos++)
+                  Parsers[Pos]->Open_Buffer_Update();
+        }
+        void Set_Unsynch_Frame_Count(const int64u Count, const bool IsSub)
+        {
+            TimeStamp_End.PTS.Reset();
+            TimeStamp_End.DTS.Reset();
+            Searching_TimeStamp_Start = false;
+            for (size_t Pos = 0; Pos<Parsers.size(); Pos++)
+                if (Parsers[Pos])
+                {
+#if MEDIAINFO_SEEK
+                    if(IsSub)
+                       Parsers[Pos]->Unsynch_Frame_Count = Count;
+#endif //MEDIAINFO_SEEK
+                    Parsers[Pos]->Open_Buffer_Unsynch();
+                }
+        }
         ps_stream()
         {
             StreamKind=Stream_Max;

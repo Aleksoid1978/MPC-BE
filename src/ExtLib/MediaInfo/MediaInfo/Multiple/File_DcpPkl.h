@@ -17,24 +17,21 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
-#include <vector>
+#include "MediaInfo/File__HasReferences.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
 {
 
-class File__ReferenceFilesHelper;
-
 //***************************************************************************
 // Class File_DcpPkl
 //***************************************************************************
 
-class File_DcpPkl : public File__Analyze
+class File_DcpPkl : public File__Analyze, File__HasReferences
 {
 public :
     //Constructor/Destructor
     File_DcpPkl();
-    ~File_DcpPkl();
 
     //Streams
     struct stream
@@ -73,9 +70,6 @@ private :
 
     //AM
     void MergeFromAm (File_DcpPkl::streams &StreamsToMerge);
-
-    //Temp
-    File__ReferenceFilesHelper*     ReferenceFiles;
 };
 
 } //NameSpace

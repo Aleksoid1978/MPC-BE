@@ -23,13 +23,12 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#if defined(MEDIAINFO_MPEGPS_YES) || defined(MEDIAINFO_MPEGTS_YES)
+#if MEDIAINFO_DUPLICATE && (defined(MEDIAINFO_MPEGPS_YES) || defined(MEDIAINFO_MPEGTS_YES))
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Duplicate/File__Duplicate_MpegTs.h"
 #include "MediaInfo/MediaInfo_Config.h"
-#include "ZenLib/File.h"
 #include <cstring>
 using namespace ZenLib;
 //---------------------------------------------------------------------------

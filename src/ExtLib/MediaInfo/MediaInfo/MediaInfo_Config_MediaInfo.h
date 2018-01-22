@@ -32,6 +32,7 @@
 #include "ZenLib/Translation.h"
 #include "ZenLib/InfoMap.h"
 using namespace ZenLib;
+using std::string;
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -187,6 +188,8 @@ public :
 
     void          File_ForceParser_Set (const Ztring &NewValue);
     Ztring        File_ForceParser_Get ();
+    void          File_ForceParser_Config_Set (const Ztring &NewValue);
+    Ztring        File_ForceParser_Config_Get ();
 
     void          File_Buffer_Size_Hint_Pointer_Set (size_t* NewValue);
     size_t*       File_Buffer_Size_Hint_Pointer_Get ();
@@ -454,6 +457,7 @@ private :
     Ztring                  File_Partial_Begin;
     Ztring                  File_Partial_End;
     Ztring                  File_ForceParser;
+    Ztring                  File_ForceParser_Config;
     size_t*                 File_Buffer_Size_Hint_Pointer;
     size_t                  File_Buffer_Read_Size;
 

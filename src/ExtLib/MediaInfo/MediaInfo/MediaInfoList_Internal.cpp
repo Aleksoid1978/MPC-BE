@@ -18,8 +18,12 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/MediaInfoList_Internal.h"
 #include "MediaInfo/MediaInfo_Config.h"
+#if defined(MEDIAINFO_FILE_YES)
 #include "ZenLib/File.h"
+#endif //defined(MEDIAINFO_FILE_YES)
+#if defined(MEDIAINFO_DIRECTORY_YES)
 #include "ZenLib/Dir.h"
+#endif //defined(MEDIAINFO_DIRECTORY_YES)
 #include "MediaInfo/Reader/Reader_Directory.h"
 #include "MediaInfo/File__Analyse_Automatic.h"
 using namespace ZenLib;
@@ -85,10 +89,14 @@ size_t MediaInfoList_Internal::Open(const String &File_Name, const fileoptions_t
     size_t Pos=File_Name.find(__T(':'));
     if (Pos!=string::npos && Pos!=1)
         List.push_back(File_Name);
+    #if defined(MEDIAINFO_FILE_YES)
     else if (File::Exists(File_Name))
         List.push_back(File_Name);
+    #endif //defined(MEDIAINFO_FILE_YES)
+    #if defined(MEDIAINFO_DIRECTORY_YES)
     else
         List=Dir::GetAllFileNames(File_Name, (Options&FileOption_NoRecursive)?Dir::Include_Files:((Dir::dirlist_t)(Dir::Include_Files|Dir::Parse_SubDirs)));
+    #endif //defined(MEDIAINFO_DIRECTORY_YES)
 
     #if defined(MEDIAINFO_DIRECTORY_YES)
         Reader_Directory().Directory_Cleanup(List);

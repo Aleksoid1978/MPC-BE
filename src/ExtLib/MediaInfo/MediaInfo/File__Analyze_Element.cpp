@@ -20,7 +20,6 @@
 #include "MediaInfo/File__Analyze.h"
 #include "MediaInfo/File__Analyze_Element.h"
 #include "MediaInfo/MediaInfo_Internal.h"
-#include <iostream>
 #include <iomanip>
 #include <cstring>
 #include "ThirdParty/base64/base64.h"
@@ -388,6 +387,8 @@ static void Xml_Content_Escape(const char* Content, size_t Size, std::string& To
         return;
     }
 
+    size_t Content_Size = Size;
+
     for (; Pos<Size; Pos++)
     {
         const char C = ToReturn[Pos];
@@ -447,7 +448,7 @@ static void Xml_Content_Escape(const char* Content, size_t Size, std::string& To
             default:
                 if (C<0x20)
                 {
-                    ToReturn = Base64::encode(Content);
+                    ToReturn = Base64::encode(std::string(Content, Content_Size));
                     return; //End
                 }
         }
@@ -746,7 +747,7 @@ print_children:
     if (!IsCat && !Name_Is_Empty())
     {
         s.level -= 4;
-        
+
         //end tag
         if (Value.empty())
         {

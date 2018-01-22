@@ -22,6 +22,7 @@
 #include "MediaInfo/Setup.h"
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
+#if MEDIAINFO_DUPLICATE
 #include "MediaInfo/Duplicate/File__Duplicate__Writer.h"
 #include "MediaInfo/MediaInfo_Config.h"
 #include "ZenLib/File.h"
@@ -152,4 +153,5 @@ size_t File__Duplicate__Writer::Output_Buffer_Get (unsigned char** Output_Buffer
 }
 
 } //NameSpace
+#endif //MEDIAINFO_DUPLICATE
 

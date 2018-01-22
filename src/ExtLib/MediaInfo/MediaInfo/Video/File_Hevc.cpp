@@ -20,6 +20,39 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Setup.h"
+using namespace ZenLib;
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+#if defined(MEDIAINFO_MPEGPS_YES) || defined(MEDIAINFO_MPEGTS_YES) || defined(MEDIAINFO_HEVC_YES)
+//---------------------------------------------------------------------------
+
+namespace MediaInfoLib
+{
+
+//---------------------------------------------------------------------------
+extern const char* Hevc_tier_flag(bool tier_flag)
+{
+    return tier_flag ? "High" : "Main";
+}
+
+//---------------------------------------------------------------------------
+extern const char* Hevc_profile_idc(int32u profile_idc)
+{
+    switch (profile_idc)
+    {
+        case   0 : return "No profile";
+        case   1 : return "Main";
+        case   2 : return "Main 10";
+        case   3 : return "Main Still";
+        default  : return "";
+    }
+}
+
+} //NameSpace
+
+//---------------------------------------------------------------------------
+#endif //...
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -63,25 +96,6 @@ static const int8u Hevc_SubHeightC[]=
     1,
     1,
 };
-
-//---------------------------------------------------------------------------
-static const char* Hevc_tier_flag(bool tier_flag)
-{
-    return tier_flag ? "High" : "Main";
-}
-
-//---------------------------------------------------------------------------
-static const char* Hevc_profile_idc(int32u profile_idc)
-{
-    switch (profile_idc)
-    {
-        case   0 : return "No profile";
-        case   1 : return "Main";
-        case   2 : return "Main 10";
-        case   3 : return "Main Still";
-        default  : return "";
-    }
-}
 
 //---------------------------------------------------------------------------
 static const char* Hevc_chroma_format_idc(int8u chroma_format_idc)
@@ -1339,9 +1353,9 @@ void File_Hevc::video_parameter_set()
             else
                 cprms_present_flag=true;
             hrd_parameters(cprms_present_flag, vps_max_sub_layers_minus1, xxL_Common, NAL, VCL);
-            delete xxL_Common; //TODO: keep VPS hrd_parameters
-            delete NAL;
-            delete VCL;
+            delete xxL_Common; xxL_Common=NULL; //TODO: keep VPS hrd_parameters
+            delete NAL; NAL=NULL;
+            delete VCL; VCL=NULL;
         }
     TEST_SB_END();
     TESTELSE_SB_SKIP(                                           "vps_extension_flag");
@@ -2491,9 +2505,9 @@ void File_Hevc::vui_parameters(std::vector<video_parameter_set_struct*>::iterato
                                                                                     timing_info_present_flag
                                                                                   );
     FILLING_ELSE();
-    delete xxL_Common;
-    delete NAL;
-    delete VCL;
+    delete xxL_Common; xxL_Common=NULL;
+    delete NAL; NAL=NULL;
+    delete VCL; VCL=NULL;
     FILLING_END();
 }
 

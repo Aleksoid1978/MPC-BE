@@ -24,9 +24,9 @@
 #include "MediaInfo/Multiple/File_Xdcam_Clip.h"
 #include "MediaInfo/MediaInfo.h"
 #include "MediaInfo/MediaInfo_Internal.h"
-#include "ZenLib/Dir.h"
+#if defined(MEDIAINFO_REFERENCES_YES)
 #include "ZenLib/File.h"
-#include "ZenLib/FileName.h"
+#endif //defined(MEDIAINFO_REFERENCES_YES)
 #include "tinyxml2.h"
 using namespace tinyxml2;
 //---------------------------------------------------------------------------
@@ -79,7 +79,7 @@ bool File_Xdcam_Clip::FileHeader_Begin()
 
             int64u File_Size_Total=File_Size;
 
-            #if defined(MEDIAINFO_MXF_YES)
+            #if defined(MEDIAINFO_REFERENCES_YES)
                 if (File_Name.size()>12
                  && File_Name[File_Name.size()-7]==__T('M')
                  && File_Name[File_Name.size()-6]==__T('0')

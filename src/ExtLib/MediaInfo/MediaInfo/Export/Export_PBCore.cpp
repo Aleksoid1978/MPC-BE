@@ -307,7 +307,8 @@ Ztring Export_PBCore::Transform(MediaInfo_Internal &MI)
         ToReturn.insert(Pos, __T("<!-- Warning: MediaInfo outputs only pbcoreInstantiation, other mandatory PBCore data is junk -->\n"));
 
     //Carriage return
-    ToReturn.FindAndReplace(__T("\n"), EOL, 0, Ztring_Recursive);
+    if (MediaInfoLib::Config.LineSeparator_Get()!=__T("\n"))
+        ToReturn.FindAndReplace(__T("\n"), MediaInfoLib::Config.LineSeparator_Get(), 0, Ztring_Recursive);
 
     return ToReturn;
 }

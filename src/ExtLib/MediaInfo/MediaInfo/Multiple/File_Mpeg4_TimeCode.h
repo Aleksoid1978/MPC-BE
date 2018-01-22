@@ -39,6 +39,7 @@ protected :
     void Streams_Fill();
 
     //Buffer - Global
+    void Read_Buffer_Init();
     void Read_Buffer_Continue();
 };
 

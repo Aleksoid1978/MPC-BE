@@ -93,6 +93,7 @@ private :
 
     std::vector<std::vector<perid> > Unknown;
     bool TestAndPrepare(const string* Unique=NULL);
+    void SetDefaultFormat();
 
     //Temp
     int8u DataID;

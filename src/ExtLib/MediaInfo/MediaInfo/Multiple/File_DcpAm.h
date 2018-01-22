@@ -17,24 +17,22 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
+#include "MediaInfo/File__HasReferences.h"
 #include "MediaInfo/Multiple/File_DcpPkl.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
 {
 
-class File__ReferenceFilesHelper;
-
 //***************************************************************************
 // Class File_DcpAm
 //***************************************************************************
 
-class File_DcpAm : public File__Analyze
+class File_DcpAm : public File__Analyze, File__HasReferences
 {
 public :
     //Constructor/Destructor
     File_DcpAm();
-    ~File_DcpAm();
 
     //Streams
     File_DcpPkl::streams Streams;
@@ -45,7 +43,7 @@ private :
 
     //Buffer - Global
     #if MEDIAINFO_SEEK
-    size_t Read_Buffer_Seek (size_t Method, int64u Value, int64u ID);
+    size_t Read_Buffer_Seek (size_t Method, int64u Value, int64u ID) {return ReferenceFiles_Seek(Method, Value, ID);}
     #endif //MEDIAINFO_SEEK
 
     //Buffer - File header
@@ -54,9 +52,6 @@ private :
     //PKL
     size_t PKL_Pos;
     void MergeFromPkl (File_DcpPkl::streams &StreamsToMerge);
-
-    //Temp
-    File__ReferenceFilesHelper*     ReferenceFiles;
 };
 
 } //NameSpace

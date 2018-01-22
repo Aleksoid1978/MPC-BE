@@ -1104,32 +1104,27 @@ void File_Mpega::Data_Parse()
 //---------------------------------------------------------------------------
 void File_Mpega::audio_data_Layer3()
 {
+    if (mode>=4)
+        return;
+    const bool mono=(mode==3);
+    const bool mpeg1=(ID==3);
     int16u main_data_end;
     BS_Begin();
-    if (ID==3) //MPEG-1
-        Get_S2 (9, main_data_end,                               "main_data_end");
-    else
-        Get_S2 (8, main_data_end,                               "main_data_end");
+    Get_S2 (mpeg1?9:8, main_data_end,                               "main_data_end");
     if ((int32u)main_data_end>Reservoir_Max)
         Reservoir_Max=main_data_end;
     Reservoir+=main_data_end;
-    if (ID==3) //MPEG-1
+    if (mpeg1) //MPEG-1
     {
-        if (mode==3) //Mono
-            Skip_S1(5,                                          "private_bits");
-        else
-            Skip_S1(3,                                          "private_bits");
+            Skip_S1(mono?5:3,                                          "private_bits");
     }
     else
     {
-        if (mode==3) //Mono
-            Skip_S1(1,                                          "private_bits");
-        else
-            Skip_S1(2,                                          "private_bits");
+            Skip_S1(mono?1:2,                                          "private_bits");
     }
-    if (ID==3) //MPEG-1
+    if (mpeg1) //MPEG-1
     {
-    Element_Begin1("scfsi");
+        Element_Begin1("scfsi");
         for(int8u ch=0; ch<Mpega_Channels[mode]; ch++)
             for(int8u scfsi_band=0; scfsi_band<4; scfsi_band++)
             {
@@ -1143,15 +1138,13 @@ void File_Mpega::audio_data_Layer3()
     for(int8u gr=0; gr<(ID==3?2:1); gr++)
     {
         Element_Begin1("granule");
-        if (mode>=4)
-            return;
         for(int8u ch=0; ch<Mpega_Channels[mode]; ch++)
         {
             Element_Begin1("channel");
             Skip_S2(12,                                         "part2_3_length");
             Skip_S2(9,                                          "big_values");
             Skip_S1(8,                                          "global_gain");
-            if (ID==3) //MPEG-1
+            if (mpeg1) //MPEG-1
                 Skip_S1(4,                                      "scalefac_compress");
             else
                 Skip_S2(9,                                      "scalefac_compress");
@@ -1195,7 +1188,7 @@ void File_Mpega::audio_data_Layer3()
                 Param_Info1("Long");
                 Block_Count[0]++; //Long
             }
-            if (ID==3) //MPEG-1
+            if (mpeg1) //MPEG-1
                 Skip_SB(                                        "preflag");
             bool scalefac;
             Get_SB (   scalefac,                                "scalefac_scale");

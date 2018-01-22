@@ -17,19 +17,17 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
-#include <vector>
+#include "MediaInfo/File__HasReferences.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
 {
 
-class File__ReferenceFilesHelper;
-
 //***************************************************************************
 // Class File_Aaf
 //***************************************************************************
 
-class File_Aaf : public File__Analyze
+class File_Aaf : public File__Analyze, File__HasReferences
 {
 public :
     //Constructor/Destructor
@@ -38,11 +36,11 @@ public :
 
 private :
     //Streams management
-    void Streams_Finish ();
+    void Streams_Finish() {ReferenceFiles_Finish();}
 
     //Buffer - Global
     #if MEDIAINFO_SEEK
-    size_t Read_Buffer_Seek (size_t Method, int64u Value, int64u ID);
+    size_t Read_Buffer_Seek (size_t Method, int64u Value, int64u ID) {return ReferenceFiles_Seek(Method, Value, ID);}
     #endif //MEDIAINFO_SEEK
     void Read_Buffer_Continue ();
 
@@ -129,7 +127,6 @@ private :
     size_t Streams_Pos;
     size_t Streams_Pos2;
     size_t Directory_Pos;
-    File__ReferenceFilesHelper*     ReferenceFiles;
 
     //Descriptor
     /*

@@ -147,6 +147,7 @@
     <ClInclude Include="MediaInfo\Export\Export_Fims.h" />
     <ClInclude Include="MediaInfo\Export\Export_PBCore2.h" />
     <ClInclude Include="MediaInfo\File__Analyze_Element.h" />
+    <ClInclude Include="MediaInfo\File__HasReferences.h" />
     <ClInclude Include="MediaInfo\HashWrapper.h" />
     <ClInclude Include="MediaInfo\Image\File_ArriRaw.h" />
     <ClInclude Include="MediaInfo\Image\File_Bpg.h" />
@@ -388,6 +389,7 @@
     <ClCompile Include="MediaInfo\File__Analyze_Streams_Finish.cpp" />
     <ClCompile Include="MediaInfo\File__Base.cpp" />
     <ClCompile Include="MediaInfo\File__Duplicate.cpp" />
+    <ClCompile Include="MediaInfo\File__HasReferences.cpp" />
     <ClCompile Include="MediaInfo\File__MultipleParsing.cpp" />
     <ClCompile Include="MediaInfo\HashWrapper.cpp" />
     <ClCompile Include="MediaInfo\Image\File_ArriRaw.cpp" />

@@ -24,10 +24,12 @@
 #include "MediaInfo/Multiple/File_DcpCpl.h"
 #include "MediaInfo/Multiple/File_DcpAm.h"
 #include "MediaInfo/MediaInfo.h"
+#include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #include "MediaInfo/Multiple/File__ReferenceFilesHelper.h"
 #include "MediaInfo/XmlUtils.h"
-#include "ZenLib/Dir.h"
+#if defined(MEDIAINFO_REFERENCES_YES)
 #include "ZenLib/File.h"
+#endif //defined(MEDIAINFO_REFERENCES_YES)
 #include "ZenLib/FileName.h"
 #include "tinyxml2.h"
 #include <list>
@@ -58,45 +60,9 @@ File_DcpCpl::File_DcpCpl()
         Demux_EventWasSent_Accept_Specific=true;
     #endif //MEDIAINFO_DEMUX
 
-    //Temp
-    ReferenceFiles=NULL;
     //PKL
     PKL_Pos = (size_t)-1;
 }
-
-//---------------------------------------------------------------------------
-File_DcpCpl::~File_DcpCpl()
-{
-    delete ReferenceFiles; //ReferenceFiles=NULL;
-}
-
-//***************************************************************************
-// Streams management
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-void File_DcpCpl::Streams_Finish()
-{
-    if (ReferenceFiles==NULL)
-        return;
-
-    ReferenceFiles->ParseReferences();
-}
-
-//***************************************************************************
-// Buffer - Global
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-#if MEDIAINFO_SEEK
-size_t File_DcpCpl::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
-{
-    if (ReferenceFiles==NULL)
-        return 0;
-
-    return ReferenceFiles->Seek(Method, Value, ID);
-}
-#endif //MEDIAINFO_SEEK
 
 //---------------------------------------------------------------------------
 
@@ -156,9 +122,10 @@ bool File_DcpCpl::FileHeader_Begin()
 
     Accept("DcpCpl");
     Fill(Stream_General, 0, General_Format, IsDcp?"DCP CPL":"IMF CPL");
+    #if defined(MEDIAINFO_REFERENCES_YES)
     Config->File_ID_OnlyRoot_Set(false);
 
-    ReferenceFiles=new File__ReferenceFilesHelper(this, Config);
+    ReferenceFiles_Accept(this, Config);
 
     //Parsing main elements
     for (XMLElement* CompositionPlaylist_Item=Root->FirstChildElement(); CompositionPlaylist_Item; CompositionPlaylist_Item=CompositionPlaylist_Item->NextSiblingElement())
@@ -432,8 +399,6 @@ bool File_DcpCpl::FileHeader_Begin()
         }
     }
 
-    Element_Offset=File_Size;
-
     //Getting files names
     FileName Directory(File_Name);
     Ztring DirPath = Directory.Path_Get();
@@ -477,7 +442,10 @@ bool File_DcpCpl::FileHeader_Begin()
                 ReferenceFiles->UpdateMetaDataFromSourceEncoding(EssenceDescriptor->first, "Format_Profile", Jpeg2000_Rsiz((*SubDescriptor)->Jpeg2000_Rsiz));
     #endif //MEDIAINFO_ADVANCED
 
+    #endif //MEDIAINFO_REFERENCES_YES
+
     //All should be OK...
+    Element_Offset=File_Size;
     return true;
 }
 
@@ -486,12 +454,14 @@ bool File_DcpCpl::FileHeader_Begin()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+#if defined(MEDIAINFO_REFERENCES_YES)
 void File_DcpCpl::MergeFromAm (File_DcpPkl::streams &StreamsToMerge)
 {
     for (File_DcpPkl::streams::iterator StreamToMerge=StreamsToMerge.begin(); StreamToMerge!=StreamsToMerge.end(); ++StreamToMerge)
         if (!StreamToMerge->ChunkList.empty()) // Note: ChunkLists with more than 1 file are not yet supported)
             ReferenceFiles->UpdateFileName(Ztring().From_UTF8(StreamToMerge->Id), Ztring().From_UTF8(StreamToMerge->ChunkList[0].Path));
 }
+#endif //MEDIAINFO_REFERENCES_YES
 
 } //NameSpace
 

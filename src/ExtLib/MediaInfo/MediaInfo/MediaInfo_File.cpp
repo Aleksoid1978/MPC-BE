@@ -95,6 +95,9 @@
 #if defined(MEDIAINFO_MPEG4_YES)
     #include "MediaInfo/Multiple/File_Mpeg4.h"
 #endif
+#if defined(MEDIAINFO_MPEG4_YES)
+    #include "MediaInfo/Multiple/File_Mpeg4_TimeCode.h"
+#endif
 #if defined(MEDIAINFO_MPEGPS_YES)
     #include "MediaInfo/Multiple/File_MpegPs.h"
 #endif
@@ -470,6 +473,9 @@ bool MediaInfo_Internal::SelectFromExtension (const String &Parser)
     #if defined(MEDIAINFO_MPEG4_YES)
         else if (Parser==__T("Mpeg4"))       Info=new File_Mpeg4();
     #endif
+    #if defined(MEDIAINFO_MPEG4_YES)
+        else if (Parser==__T("QuickTimeTC")) Info=new File_Mpeg4_TimeCode();
+    #endif
     #if defined(MEDIAINFO_MPEGPS_YES)
         else if (Parser==__T("MpegPs"))      Info=new File_MpegPs();
     #endif
@@ -512,7 +518,7 @@ bool MediaInfo_Internal::SelectFromExtension (const String &Parser)
     #if defined(MEDIAINFO_WM_YES)
         else if (Parser==__T("Wm"))          Info=new File_Wm();
     #endif
-    #if defined(MEDIAINFO_WM_YES)
+    #if defined(MEDIAINFO_WTV_YES)
         else if (Parser==__T("Wtv"))         Info=new File_Wtv();
     #endif
     #if defined(MEDIAINFO_XDCAM_YES)
@@ -607,7 +613,7 @@ bool MediaInfo_Internal::SelectFromExtension (const String &Parser)
         else if (Parser==__T("Mpc"))         Info=new File_Mpc();
     #endif
     #if defined(MEDIAINFO_MPCSV8_YES)
-        else if (Parser==__T("Mpc"))         Info=new File_MpcSv8();
+        else if (Parser==__T("MpcSv8"))      Info=new File_MpcSv8();
     #endif
     #if defined(MEDIAINFO_MPEGA_YES)
         else if (Parser==__T("Mpega"))       Info=new File_Mpega();
@@ -757,7 +763,7 @@ bool MediaInfo_Internal::SelectFromExtension (const String &Parser)
 }
 
 //---------------------------------------------------------------------------
-#if !defined(MEDIAINFO_READER_NO)
+#if defined(MEDIAINFO_FILE_YES)
 int MediaInfo_Internal::ListFormats(const String &File_Name)
 {
     // Multiple
@@ -1123,7 +1129,7 @@ int MediaInfo_Internal::ListFormats(const String &File_Name)
         delete Info; Info=new File_Unknown();            if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     return 0;
 }
-#endif //!defined(MEDIAINFO_READER_NO)
+#endif //!defined(MEDIAINFO_FILE_YES)
 
 //---------------------------------------------------------------------------
 bool MediaInfo_Internal::LibraryIsModified ()

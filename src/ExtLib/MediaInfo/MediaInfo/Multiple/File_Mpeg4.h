@@ -11,6 +11,7 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
+#include "MediaInfo/File__HasReferences.h"
 #include "MediaInfo/MediaInfo_Internal.h"
 class File_MpegPs;
 //---------------------------------------------------------------------------
@@ -18,13 +19,11 @@ class File_MpegPs;
 namespace MediaInfoLib
 {
 
-class File__ReferenceFilesHelper;
-
 //***************************************************************************
 // Class File_Mpeg4
 //***************************************************************************
 
-class File_Mpeg4 : public File__Analyze
+class File_Mpeg4 : public File__Analyze, File__HasReferences
 {
 protected :
     //Streams management
@@ -161,6 +160,7 @@ private :
     void moov_trak_mdia_minf_stbl_stsd_xxxx_ARES();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_AORD();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_avcC();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_avcE();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_bitr();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_btrt();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_chan();
@@ -175,10 +175,12 @@ private :
     void moov_trak_mdia_minf_stbl_stsd_xxxx_dec3();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_ddts();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_dvc1();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_dvcC();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_esds();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_fiel();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_glbl();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_hvcC();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_hvcE();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_idfm();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_jp2h() {jp2h();}
     void moov_trak_mdia_minf_stbl_stsd_xxxx_jp2h_colr() {jp2h_colr();}
@@ -233,6 +235,7 @@ private :
     void moov_trak_tref_ssrc();
     void moov_trak_tref_sync();
     void moov_trak_tref_tmcd();
+    void moov_trak_tref_vdep();
     void moov_trak_udta();
     void moov_trak_udta_xxxx();
     void moov_udta();
@@ -409,6 +412,9 @@ private :
         bool                    TimeCode_IsVisual;
         bool                    IsPcm;
         bool                    IsPcmMono;
+        #ifdef MEDIAINFO_DVDIF_ANALYZE_YES
+            bool                IsDvDif;
+        #endif //MEDIAINFO_DVDIF_ANALYZE_YES
         bool                    IsPriorityStream;
         bool                    IsFilled;
         bool                    IsChapter;
@@ -483,6 +489,9 @@ private :
             TimeCode_IsVisual=false;
             IsPcm=false;
             IsPcmMono=false;
+            #ifdef MEDIAINFO_DVDIF_ANALYZE_YES
+                IsDvDif=false;
+            #endif //MEDIAINFO_DVDIF_ANALYZE_YES
             IsPriorityStream=false;
             IsFilled=false;
             IsChapter=false;
@@ -513,13 +522,18 @@ private :
             delete MI; //MI=NULL;
             delete TimeCode; //TimeCode=NULL;
         }
+
+        void Parsers_Clear()
+        {
+            Parsers.clear();
+            #ifdef MEDIAINFO_DVDIF_ANALYZE_YES
+                IsDvDif=false;
+            #endif //MEDIAINFO_DVDIF_ANALYZE_YES
+        }
     };
     typedef std::map<int32u, stream> streams;
     streams             Streams;
     streams::iterator   Stream;
-    #if defined(MEDIAINFO_REFERENCES_YES)
-        File__ReferenceFilesHelper* ReferenceFiles;
-    #endif //defined(MEDIAINFO_REFERENCES_YES)
     #if MEDIAINFO_NEXTPACKET
         bool                    ReferenceFiles_IsParsing;
     #endif //MEDIAINFO_NEXTPACKET

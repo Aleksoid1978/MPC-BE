@@ -400,6 +400,7 @@ private :
     infocodecid_format_t InfoCodecID_Format_Type;
     void     CodecID_Manage();
     int64u   TrackType;
+    int64u   AudioBitDepth;
 
     //Temp
     int8u   InvalidByteMax;

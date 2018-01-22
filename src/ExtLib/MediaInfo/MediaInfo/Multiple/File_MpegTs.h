@@ -119,6 +119,7 @@ private :
         inline void Header_Parse_Events() {}
         inline void Header_Parse_Events_Duration(int64u) {}
     #endif //MEDIAINFO_EVENTS
+     void Header_Parse_Events_Duration_Helper(int64u& program_clock_reference, const bool discontinuity_indicator);
 
     //Helpers
     void Streams_Update_Programs();

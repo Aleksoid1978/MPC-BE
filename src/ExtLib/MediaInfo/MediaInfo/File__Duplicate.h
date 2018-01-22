@@ -11,6 +11,9 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Duplicate/File__Duplicate__Writer.h"
+#include "MediaInfo/File__Analyze.h"
+#include "ZenLib/Ztring.h"
+using namespace ZenLib;
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib

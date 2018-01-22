@@ -28,8 +28,9 @@
 #include "MediaInfo/MediaInfo_Internal.h"
 #include "MediaInfo/Multiple/File__ReferenceFilesHelper.h"
 #include "MediaInfo/XmlUtils.h"
-#include "ZenLib/Dir.h"
+#if defined(MEDIAINFO_REFERENCES_YES)
 #include "ZenLib/File.h"
+#endif //defined(MEDIAINFO_REFERENCES_YES)
 #include "ZenLib/FileName.h"
 #include "tinyxml2.h"
 using namespace tinyxml2;
@@ -44,7 +45,7 @@ namespace MediaInfoLib
 
 //---------------------------------------------------------------------------
 File_DcpPkl::File_DcpPkl()
-:File__Analyze()
+:File__Analyze(), File__HasReferences()
 {
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_DcpPkl;
@@ -53,15 +54,6 @@ File_DcpPkl::File_DcpPkl()
     #if MEDIAINFO_DEMUX
         Demux_EventWasSent_Accept_Specific=true;
     #endif //MEDIAINFO_DEMUX
-
-    //Temp
-    ReferenceFiles=NULL;
-}
-
-//---------------------------------------------------------------------------
-File_DcpPkl::~File_DcpPkl()
-{
-    delete ReferenceFiles; //ReferenceFiles=NULL;
 }
 
 //***************************************************************************
@@ -71,10 +63,10 @@ File_DcpPkl::~File_DcpPkl()
 //---------------------------------------------------------------------------
 void File_DcpPkl::Streams_Finish()
 {
-    if (Config->File_IsReferenced_Get() || ReferenceFiles==NULL)
+    if (Config->File_IsReferenced_Get())
         return;
 
-    ReferenceFiles->ParseReferences();
+    ReferenceFiles_Finish();
 
     // Detection of IMF CPL
     bool IsImf=false;
@@ -97,10 +89,10 @@ void File_DcpPkl::Streams_Finish()
 #if MEDIAINFO_SEEK
 size_t File_DcpPkl::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
 {
-    if (Config->File_IsReferenced_Get() || ReferenceFiles==NULL)
+    if (Config->File_IsReferenced_Get())
         return 0;
 
-    return ReferenceFiles->Seek(Method, Value, ID);
+    return ReferenceFiles_Seek(Method, Value, ID);
 }
 #endif //MEDIAINFO_SEEK
 
@@ -132,6 +124,7 @@ bool File_DcpPkl::FileHeader_Begin()
 
     Accept("DcpPkl");
     Fill(Stream_General, 0, General_Format, "DCP PKL");
+    #if defined(MEDIAINFO_REFERENCES_YES)
     Config->File_ID_OnlyRoot_Set(false);
 
     //Parsing main elements
@@ -186,7 +179,6 @@ bool File_DcpPkl::FileHeader_Begin()
             }
         }
     }
-    Element_Offset=File_Size;
 
     //Merging with Assetmap
     if (!Config->File_IsReferenced_Get())
@@ -229,7 +221,7 @@ bool File_DcpPkl::FileHeader_Begin()
     //Creating the playlist
     if (!Config->File_IsReferenced_Get())
     {
-        ReferenceFiles=new File__ReferenceFilesHelper(this, Config);
+        ReferenceFiles_Accept(this, Config);
 
         for (File_DcpPkl::streams::iterator Stream=Streams.begin(); Stream!=Streams.end(); ++Stream)
             if (Stream->StreamKind==(stream_t)(Stream_Max+1) && Stream->ChunkList.size()==1) // Means CPL
@@ -243,8 +235,10 @@ bool File_DcpPkl::FileHeader_Begin()
 
         ReferenceFiles->FilesForStorage=true;
     }
+    #endif //MEDIAINFO_REFERENCES_YES
 
     //All should be OK...
+    Element_Offset=File_Size;
     return true;
 }
 

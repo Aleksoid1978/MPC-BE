@@ -131,7 +131,7 @@
 #if defined(MEDIAINFO_WM_YES)
     #include "MediaInfo/Multiple/File_Wm.h"
 #endif
-#if defined(MEDIAINFO_WM_YES)
+#if defined(MEDIAINFO_WTV_YES)
     #include "MediaInfo/Multiple/File_Wtv.h"
 #endif
 #if defined(MEDIAINFO_XDCAM_YES)

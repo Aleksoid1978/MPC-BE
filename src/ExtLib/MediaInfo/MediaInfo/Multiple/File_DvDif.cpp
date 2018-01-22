@@ -1626,9 +1626,7 @@ void File_DvDif::video_recdate()
 
     Element_Name("video_recdate");
 
-    Ztring Date=recdate();
-    if (Recorded_Date_Date.empty())
-        Recorded_Date_Date=Date;
+    recdate(true);
 }
 
 //---------------------------------------------------------------------------
@@ -1642,9 +1640,7 @@ void File_DvDif::video_rectime()
 
     Element_Name("video_rectime");
 
-    Ztring Date=rectime();
-    if (Recorded_Date_Time.empty())
-        Recorded_Date_Time=Date;
+    rectime(true);
 }
 
 //---------------------------------------------------------------------------
@@ -1731,7 +1727,7 @@ void File_DvDif::consumer_camera_2()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-Ztring File_DvDif::recdate()
+void File_DvDif::recdate(bool FromVideo)
 {
     BS_Begin();
 
@@ -1761,26 +1757,27 @@ Ztring File_DvDif::recdate()
 
     BS_End();
 
-    if (Month>12 || Day>31)
-        return Ztring(); //If all bits are set to 1, this is invalid
-    Ztring MonthString;
-    if (Month<10)
-        MonthString=__T("0");
-    MonthString+=Ztring::ToZtring(Month);
-    Ztring DayString;
-    if (Day<10)
-        DayString=__T("0");
-    DayString+=Ztring::ToZtring(Day);
-    return Ztring::ToZtring(Year)+__T("-")+MonthString+__T("-")+DayString;
+    if (FromVideo && Frame_Count==1 && Month<=12 && Day<=31 && Recorded_Date_Date.empty())
+    {
+        Ztring MonthString;
+        if (Month<10)
+            MonthString.assign(1, __T('0'));
+        MonthString+=Ztring::ToZtring(Month);
+        Ztring DayString;
+        if (Day<10)
+            DayString.assign(1, __T('0'));
+        DayString+=Ztring::ToZtring(Day);
+        Recorded_Date_Date=Ztring::ToZtring(Year)+__T('-')+MonthString+__T('-')+DayString;
+    }
 }
 
 //---------------------------------------------------------------------------
-Ztring File_DvDif::rectime()
+void File_DvDif::rectime(bool FromVideo)
 {
     if (!DSF_IsValid)
     {
         Trusted_IsNot("Not in right order");
-        return Ztring();
+        return;
     }
 
     BS_Begin();
@@ -1792,7 +1789,7 @@ Ztring File_DvDif::rectime()
     )
     {
         Skip_XX(4,                                              "All zero");
-        return Ztring();
+        return;
     }
 
     int8u Temp;
@@ -1826,10 +1823,8 @@ Ztring File_DvDif::rectime()
 
     BS_End();
 
-    if (Time!=167185000)
-        return Ztring().Duration_From_Milliseconds(Time);
-    else
-        return Ztring(); //If all bits are set to 1, this is invalid
+    if (FromVideo && Frame_Count==1 && Time!=167185000 && Recorded_Date_Time.empty()) //If all bits are set to 1, this is invalid
+        Recorded_Date_Time.Duration_From_Milliseconds(Time);
 }
 
 } //NameSpace

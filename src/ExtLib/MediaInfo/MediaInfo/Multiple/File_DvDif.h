@@ -95,8 +95,8 @@ protected :
     void consumer_camera_2();
 
     //Helpers
-    Ztring recdate();
-    Ztring rectime();
+    void recdate(bool FromVideo=false);
+    void rectime(bool FromVideo=false);
 
     //Streams
     struct stream
@@ -244,7 +244,7 @@ protected :
     std::vector<size_t> Video_STA_Errors; //Per STA type
     std::vector<size_t> Video_STA_Errors_Total; //Per STA type
     std::vector<size_t> Audio_Errors; //Per Dseq
-    std::vector<size_t> audio_source_IsPresent;
+    std::vector<bool> audio_source_IsPresent;
     std::vector<bool>   CH_IsPresent;
     std::vector<std::vector<size_t> > Audio_Errors_Total; //Per Channel and Dseq
     std::vector<std::vector<size_t> > Audio_Invalids; //Per Channel and Dseq

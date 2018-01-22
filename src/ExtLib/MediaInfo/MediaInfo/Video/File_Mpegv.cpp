@@ -43,8 +43,8 @@ extern const char* Mpegv_colour_primaries(int8u colour_primaries)
         case  8 : return "Generic film";
         case  9 : return "BT.2020";                                     //Added in HEVC
         case 10 : return "XYZ";                                         //Added in HEVC 2014
-        case 11 : return "SMPTE RP 431-2";                              //Added in HEVC 2016
-        case 12 : return "SMPTE EG 432-1";                              //Added in HEVC 2016
+        case 11 : return "DCI P3";                                      //Added in HEVC 2016
+        case 12 : return "Display P3";                                  //Added in HEVC 2016
         case 22 : return "EBU Tech 3213";                               //Added in HEVC 2016
         default : return "";
     }
@@ -63,11 +63,11 @@ extern const char* Mpegv_transfer_characteristics(int8u transfer_characteristics
         case  8 : return "Linear";
         case  9 : return "Logarithmic (100:1)";                         //Added in MPEG-4 Visual
         case 10 : return "Logarithmic (316.22777:1)";                   //Added in MPEG-4 Visual
-        case 11 : return "IEC 61966-2-4";                               //Added in AVC
+        case 11 : return "sRGB";                                        //Added in AVC
         case 12 : return "BT.1361 extended colour gamut system";        //Added in AVC
         case 13 : return "sYCC";                                        //Added in HEVC
-        case 14 : return "BT.2020 non-constant";                        //Added in HEVC
-        case 15 : return "BT.2020 constant";                            //Added in HEVC
+        case 14 : return "BT.2020 (10-bit)";                            //Added in HEVC, 10/12-bit difference is in ISO 23001-8
+        case 15 : return "BT.2020 (12-bit)";                            //Added in HEVC, 10/12-bit difference is in ISO 23001-8
         case 16 : return "PQ";                                          //Added in HEVC 2015
         case 17 : return "SMPTE ST 428-1";                              //Added in HEVC 2015
         case 18 : return "HLG";                                         //Added in HEVC 2016
@@ -1584,14 +1584,15 @@ void File_Mpegv::Streams_Finish()
     else if (!TimeCodeIsNotTrustable && Time_End_Seconds!=Error && FrameRate)
     {
         TimeCode Time_Begin_TC;
-        Time_Begin_TC.FramesPerSecond=(int8u)ceil(FrameRate);
-        Time_Begin_TC.DropFrame=group_start_IsParsed?group_start_drop_frame_flag:((FrameRate-ceil(FrameRate))?true:false);
+        const int8u ceilFrameRate=(int8u)ceil(FrameRate);
+        Time_Begin_TC.FramesPerSecond=ceilFrameRate;
+        Time_Begin_TC.DropFrame=group_start_IsParsed?group_start_drop_frame_flag:((FrameRate-ceilFrameRate)?true:false);
         Time_Begin_TC.Hours=(int8u)(Time_Begin_Seconds/3600);
         Time_Begin_TC.Minutes=(int8u)((Time_Begin_Seconds%3600)/60);
         Time_Begin_TC.Seconds=(int8u)(Time_Begin_Seconds%60);
         Time_Begin_TC.Frames=(int8u)Time_Begin_Frames;
         TimeCode Time_End_TC;
-        Time_End_TC.FramesPerSecond=(int8u)ceil(FrameRate);
+        Time_End_TC.FramesPerSecond=ceilFrameRate;
         Time_End_TC.DropFrame=Time_Begin_TC.DropFrame;
         Time_End_TC.Hours=(int8u)(Time_End_Seconds/3600);
         Time_End_TC.Minutes=(int8u)((Time_End_Seconds%3600)/60);
@@ -2056,7 +2057,7 @@ void File_Mpegv::Read_Buffer_Unsynched()
             AfdBarData_Parser->Open_Buffer_Unsynch();
     #endif //defined(MEDIAINFO_AFDBARDATA_YES)
 
-    #if defined(MEDIAINFO_ANCILLARY_YES)
+    #if defined(MEDIAINFO_ANCILLARY_YES) && defined(MEDIAINFO_CDP_YES)
         if (Ancillary && *Ancillary && (*Ancillary)->Cdp_Data.empty())
             (*Ancillary)->AspectRatio=0;
     #endif //defined(MEDIAINFO_ANCILLARY_YES)
@@ -2632,7 +2633,7 @@ void File_Mpegv::slice_start()
         #endif //defined(MEDIAINFO_CDP_YES)
 
         //Active Format Description & Bar Data
-        #if defined(MEDIAINFO_AFDBARDATA_YES)
+        #if defined(MEDIAINFO_AFDBARDATA_YES) && defined(MEDIAINFO_ANCILLARY_YES)
             if (Ancillary && *Ancillary && !(*Ancillary)->AfdBarData_Data.empty())
             {
                 Element_Trace_Begin1("Active Format Description & Bar Data");
@@ -3106,6 +3107,7 @@ void File_Mpegv::slice_start_macroblock_block(int8u i)
                         }
                         Skip_SB(                                "dct_coefficient sign");
                     }
+                    break;
             default:
                     Element_Info1(Mpegv_dct_coefficients[dct_coefficient].mapped_to2);
                     Element_Info1(Mpegv_dct_coefficients[dct_coefficient].mapped_to3);

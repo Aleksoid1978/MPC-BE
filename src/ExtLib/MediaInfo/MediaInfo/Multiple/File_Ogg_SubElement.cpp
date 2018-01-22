@@ -845,6 +845,7 @@ void File_Ogg_SubElement::Comment()
     else
         return; //Not a comment
 
+    #if defined(MEDIAINFO_VORBISCOM_YES)
     Element_Name("Comment");
 
     Skip_Local(ID_Identification_Size,                          "ID");
@@ -864,6 +865,12 @@ void File_Ogg_SubElement::Comment()
     Merge(Vorbis, Stream_General,  0, 0);
     Merge(Vorbis, StreamKind,      0, 0);
     Merge(Vorbis, Stream_Menu,     0, 0);
+    #else
+    if (Element_Offset<Element_Size)
+    {
+        Skip_XX(Element_Size-Element_Offset,                                 "Data");
+    }
+    #endif //MEDIAINFO_VORBISCOM_YES
 
     //Testing if we must continue
     if (Identified && (Parser==NULL || Parser->Status[IsFinished]))

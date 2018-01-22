@@ -290,44 +290,21 @@ void File_Aac::program_config_element()
 
         if (!Infos["Format_Settings_SBR"].empty())
         {
+            const Ztring SamplingRate=Infos["SamplingRate"];
             Infos["Format_Profile"]=__T("HE-AAC");
-            Ztring SamplingRate=Infos["SamplingRate"];
             Infos["SamplingRate"].From_Number((extension_sampling_frequency_index==(int8u)-1)?(Frequency_b*2):extension_sampling_frequency, 10);
             if (MediaInfoLib::Config.LegacyStreamDisplay_Get())
             {
                 Infos["Format_Profile"]+=__T(" / LC");
                 Infos["SamplingRate"]+=__T(" / ")+SamplingRate;
             }
-            Infos["Format_Settings"]==__T("NBC"); // "Not Backward Compatible"
+            Infos["Format_Settings"]=__T("NBC"); // "Not Backward Compatible"
             Infos["Format_Settings_SBR"]=__T("Yes (NBC)"); // "Not Backward Compatible"
             Infos["Codec"]=Ztring().From_Local(Aac_audioObjectType(audioObjectType))+__T("-SBR");
         }
 
         if (!Infos["Format_Settings_PS"].empty())
-        {
-            Infos["Format_Profile"]=__T("HE-AACv2");
-            Ztring Channels=Infos["Channel(s)"];
-            Ztring ChannelPositions=Infos["ChannelPositions"];
-            Ztring SamplingRate=Infos["SamplingRate"];
-            Infos["Channel(s)"]=__T("2");
-            Infos["ChannelPositions"]=__T("Front: L R");
-            if (MediaInfoLib::Config.LegacyStreamDisplay_Get())
-            {
-                Infos["Format_Profile"]+=__T(" / HE-AAC / LC");
-                Infos["Channel(s)"]+=__T(" / ")+Channels+__T(" / ")+Channels;
-                Infos["ChannelPositions"]+=__T(" / ")+ChannelPositions+__T(" / ")+ChannelPositions;
-                Infos["SamplingRate"]=Ztring().From_Number((extension_sampling_frequency_index==(int8u)-1)?(Frequency_b*2):extension_sampling_frequency, 10)+__T(" / ")+SamplingRate;
-            }
-            if (Infos["Format_Settings"]!=__T("NBC"))
-            {
-                if (!Infos["Format_Settings"].empty())
-                    Infos["Format_Settings"].insert(0, __T(" / "));
-                Infos["Format_Settings"].insert(0, __T("NBC")); // "Not Backward Compatible"
-            }
-            Infos["Format_Settings_PS"]=__T("Yes (NBC)"); // "Not Backward Compatible"
-            Ztring Codec=Retrieve(Stream_Audio, StreamPos_Last, Audio_Codec);
-            Infos["Codec"]=Ztring().From_Local(Aac_audioObjectType(audioObjectType))+__T("-SBR-PS");
-        }
+            FillInfosHEAACv2(__T("NBC"));
     FILLING_END();
 }
 
@@ -1429,6 +1406,33 @@ void File_Aac::hcod(int8u sect_cb, const char* Name)
 }
 
 
+//---------------------------------------------------------------------------
+void File_Aac::FillInfosHEAACv2(const Ztring& Format_Settings)
+{
+    Infos["Format_Profile"] = __T("HE-AACv2");
+    const Ztring Channels = Infos["Channel(s)"];
+    const Ztring ChannelPositions = Infos["ChannelPositions"];
+    Infos["Channel(s)"] = __T("2");
+    Infos["ChannelPositions"] = __T("Front: L R");
+    if (MediaInfoLib::Config.LegacyStreamDisplay_Get())
+    {
+        const Ztring SamplingRate_Previous = Infos["SamplingRate"];
+        Infos["Format_Profile"] += __T(" / HE-AAC / LC");
+        Infos["Channel(s)"] += __T(" / ") + Channels + __T(" / ") + Channels;
+        Infos["ChannelPositions"] += __T(" / ") + ChannelPositions + __T(" / ") + ChannelPositions;
+        const int32u SamplingRate = (extension_sampling_frequency_index == (int8u)-1) ? (((int32u)Frequency_b) * 2) : extension_sampling_frequency;
+        if (SamplingRate)
+            Infos["SamplingRate"] = Ztring().From_Number(SamplingRate, 10) + __T(" / ") + SamplingRate_Previous;
+    }
+    if (Infos["Format_Settings"] != Format_Settings)
+    {
+        if (!Infos["Format_Settings"].empty())
+            Infos["Format_Settings"].insert(0, __T(" / "));
+        Infos["Format_Settings"].insert(0, Format_Settings);
+    }
+    Infos["Format_Settings_PS"] = __T("Yes (") + Format_Settings + __T(")");
+    Infos["Codec"] = Ztring().From_Local(Aac_audioObjectType(audioObjectType)) + __T("-SBR-PS");
+}
 
 //***************************************************************************
 // C++

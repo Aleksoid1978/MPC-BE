@@ -49,7 +49,7 @@ public :
         Format_Max,
     };
 
-    ZenLib::Ztring Transform(MediaInfo_Internal &MI, version Version=version(Version_Max-1), acquisitiondataoutputmode AcquisitionDataOutputMode=AcquisitionDataOutputMode_Default, format Format=Format_XML);
+    ZenLib::Ztring Transform(MediaInfo_Internal &MI, version Version=version(Version_Max-1), acquisitiondataoutputmode AcquisitionDataOutputMode=AcquisitionDataOutputMode_Default, format Format=Format_XML, Ztring ExternalMetadataValues=Ztring(), Ztring ExternalMetaDataConfig=Ztring());
 };
 
 } //NameSpace

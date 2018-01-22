@@ -35,44 +35,13 @@ namespace MediaInfoLib
 
 //---------------------------------------------------------------------------
 File_Ptx::File_Ptx()
-:File__Analyze()
+:File__Analyze(), File__HasReferences()
 {
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_Ptx;
         StreamIDs_Width[0]=sizeof(size_t);
     #endif //MEDIAINFO_EVENTS
-
-    //Temp
-    ReferenceFiles=NULL;
 }
-
-//---------------------------------------------------------------------------
-File_Ptx::~File_Ptx()
-{
-    delete ReferenceFiles; //ReferenceFiles=NULL;
-}
-
-//***************************************************************************
-// Streams management
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-void File_Ptx::Streams_Finish()
-{
-    ReferenceFiles->ParseReferences();
-}
-
-//***************************************************************************
-// Buffer - Global
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-#if MEDIAINFO_SEEK
-size_t File_Ptx::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
-{
-    return ReferenceFiles->Seek(Method, Value, ID);
-}
-#endif //MEDIAINFO_SEEK
 
 //***************************************************************************
 // Buffer - File header
@@ -117,7 +86,7 @@ bool File_Ptx::FileHeader_Begin()
     if (Buffer_Size<File_Size)
         return false; //Must wait for more data
 
-    ReferenceFiles=new File__ReferenceFilesHelper(this, Config);
+    ReferenceFiles_Accept(this, Config);
 
     //All should be OK...
     return true;
@@ -489,6 +458,7 @@ void File_Ptx::Read_Buffer_Continue()
         Fill(Stream_General, 0, General_Encoded_Library_Name, LibraryName);
         Fill(Stream_General, 0, General_Encoded_Library_Version, LibraryVersion);
 
+        #if defined(MEDIAINFO_REFERENCES_YES)
         // Role==2 + Purpose==EWAV + listed
         if (Names.size()>1 || FileNames.size()==1)
         {
@@ -632,6 +602,7 @@ void File_Ptx::Read_Buffer_Continue()
                 }
             }
         }
+        #endif //MEDIAINFO_REFERENCES_YES
     FILLING_END();
 }
 

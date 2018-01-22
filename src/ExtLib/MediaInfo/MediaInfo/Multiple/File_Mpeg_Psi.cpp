@@ -25,7 +25,9 @@
 #include "MediaInfo/Multiple/File_Mpeg_Descriptors.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #include "MediaInfo/MediaInfo_Internal.h"
+#if defined(MEDIAINFO_DIRECTORY_YES)
 #include "ZenLib/Dir.h"
+#endif //defined(MEDIAINFO_DIRECTORY_YES)
 #include <memory>
 #include <algorithm>
 using namespace std;
@@ -1227,6 +1229,7 @@ void File_Mpeg_Psi::Table_02()
 
         FILLING_BEGIN();
             //Searching for hidden Stereoscopic stream
+            #if defined(MEDIAINFO_DIRECTORY_YES)
             if (stream_type==0x20 && File_Name_WithoutDemux.size()>=4+1+6+1+4+1+10 && Config->File_Bdmv_ParseTargetedFile_Get())
             {
                 //Searching the playlist with the pid
@@ -1294,8 +1297,10 @@ void File_Mpeg_Psi::Table_02()
                             #if MEDIAINFO_TRACE
                                 Complete_Stream->Streams[elementary_PID]->Element_Info1="PES";
                             #endif //MEDIAINFO_TRACE
-                            if (Complete_Stream->File__Duplicate_Get_From_PID(elementary_PID))
+                            #if MEDIAINFO_DUPLICATE
+                                if (Complete_Stream->File__Duplicate_Get_From_PID(elementary_PID))
                                 Complete_Stream->Streams[elementary_PID]->ShouldDuplicate=true;
+                            #endif //MEDIAINFO_DUPLICATE
                         }
                     }
 
@@ -1304,6 +1309,7 @@ void File_Mpeg_Psi::Table_02()
                 for (size_t Pos=0; Pos<MIs.size(); Pos++)
                     delete MIs[Pos]; //MIs[Pos]=NULL;
             }
+            #endif //defined(MEDIAINFO_DIRECTORY_YES)
 
             if (elementary_PID)
             {
@@ -1360,10 +1366,7 @@ void File_Mpeg_Psi::Table_02()
                 for (size_t pid=0x10; pid<0x1FFF; pid++) //Wanting 0x10-->0x2F (DVB), 0x1ABC (cea_osd), 0x1FF7-->0x1FFF (ATSC)
                     for (size_t Table_ID=0x00; Table_ID<0xFF; Table_ID++)
                     {
-                        Complete_Stream->Streams[pid]->Searching_Payload_Start_Set(true);
-                        Complete_Stream->Streams[pid]->Kind=complete_stream::stream::psi;
-                        Complete_Stream->Streams[pid]->Table_IDs.resize(0x100);
-                        Complete_Stream->Streams[pid]->Table_IDs[Table_ID]=new complete_stream::stream::table_id; //event_information_section - actual_transport_stream, schedule
+                        Complete_Stream->Streams[pid]->init(Table_ID); //event_information_section - actual_transport_stream, schedule
 
                         if (Pos==0x001F)
                             Pos=0x1ABB; //Skipping normal data
@@ -1373,41 +1376,26 @@ void File_Mpeg_Psi::Table_02()
             #else //MEDIAINFO_MPEGTS_ALLSTREAMS_YES
                 if (Complete_Stream->Streams[0x0010]->Kind==complete_stream::stream::unknown)
                 {
-                    Complete_Stream->Streams[0x0010]->Searching_Payload_Start_Set(true);
-                    Complete_Stream->Streams[0x0010]->Kind=complete_stream::stream::psi;
-                    Complete_Stream->Streams[0x0010]->Table_IDs.resize(0x100);
-                    Complete_Stream->Streams[0x0010]->Table_IDs[0x40]=new complete_stream::stream::table_id; //network_information_section - actual_network
+                    Complete_Stream->Streams[0x0010]->init(0x40); //network_information_section - actual_network
                 }
                 if (Complete_Stream->Streams[0x0011]->Kind==complete_stream::stream::unknown)
                 {
-                    Complete_Stream->Streams[0x0011]->Searching_Payload_Start_Set(true);
-                    Complete_Stream->Streams[0x0011]->Kind=complete_stream::stream::psi;
-                    Complete_Stream->Streams[0x0011]->Table_IDs.resize(0x100);
-                    Complete_Stream->Streams[0x0011]->Table_IDs[0x42]=new complete_stream::stream::table_id; //service_description_section - actual_transport_stream
+                    Complete_Stream->Streams[0x0011]->init(0x42); //service_description_section - actual_transport_stream
                 }
                 if (Complete_Stream->Streams[0x0012]->Kind==complete_stream::stream::unknown)
                 {
-                    Complete_Stream->Streams[0x0012]->Searching_Payload_Start_Set(true);
-                    Complete_Stream->Streams[0x0012]->Kind=complete_stream::stream::psi;
-                    Complete_Stream->Streams[0x0012]->Table_IDs.resize(0x100);
-                    Complete_Stream->Streams[0x0012]->Table_IDs[0x4E]=new complete_stream::stream::table_id; //event_information_section - actual_transport_stream, present/following
+                    Complete_Stream->Streams[0x0012]->init(0x4E); //event_information_section - actual_transport_stream, present/following
                     for (size_t Table_ID=0x50; Table_ID<0x60; Table_ID++)
                         Complete_Stream->Streams[0x0012]->Table_IDs[Table_ID]=new complete_stream::stream::table_id; //event_information_section - actual_transport_stream, schedule
                 }
                 if (Complete_Stream->Streams[0x0014]->Kind==complete_stream::stream::unknown)
                 {
-                    Complete_Stream->Streams[0x0014]->Searching_Payload_Start_Set(true);
-                    Complete_Stream->Streams[0x0014]->Kind=complete_stream::stream::psi;
-                    Complete_Stream->Streams[0x0014]->Table_IDs.resize(0x100);
-                    Complete_Stream->Streams[0x0014]->Table_IDs[0x70]=new complete_stream::stream::table_id; //time_date_section
+                    Complete_Stream->Streams[0x0014]->init(0x70); //time_date_section
                     Complete_Stream->Streams[0x0014]->Table_IDs[0x73]=new complete_stream::stream::table_id; //time_offset_section
                 }
                 if (Complete_Stream->Streams[0x1FFB]->Kind==complete_stream::stream::unknown)
                 {
-                    Complete_Stream->Streams[0x1FFB]->Searching_Payload_Start_Set(true);
-                    Complete_Stream->Streams[0x1FFB]->Kind=complete_stream::stream::psi;
-                    Complete_Stream->Streams[0x1FFB]->Table_IDs.resize(0x100);
-                    Complete_Stream->Streams[0x1FFB]->Table_IDs[0xC7]=new complete_stream::stream::table_id; //Master Guide Table
+                    Complete_Stream->Streams[0x1FFB]->init(0xC7); //Master Guide Table
                     Complete_Stream->Streams[0x1FFB]->Table_IDs[0xCD]=new complete_stream::stream::table_id; //System Time Table
                 }
             #endif //MEDIAINFO_MPEGTS_ALLSTREAMS_YES
@@ -2140,11 +2128,11 @@ void File_Mpeg_Psi::Table_FC()
         case 0x##_NAME : Element_Name(_DETAIL); Table_FC_##_NAME(); break;
     switch (splice_command_type)
     {
-        ELEMENT_CASE (00, "splice_null"); break;
-        ELEMENT_CASE (04, "splice_schedule"); break;
-        ELEMENT_CASE (05, "splice_insert"); break;
-        ELEMENT_CASE (06, "time_signal"); break;
-        ELEMENT_CASE (07, "bandwidth_reservation"); break;
+        ELEMENT_CASE (00, "splice_null");
+        ELEMENT_CASE (04, "splice_schedule");
+        ELEMENT_CASE (05, "splice_insert");
+        ELEMENT_CASE (06, "time_signal");
+        ELEMENT_CASE (07, "bandwidth_reservation");
         default   : Skip_XX(splice_command_length,              "Unknown");
     }
     Element_End0();
@@ -2454,8 +2442,10 @@ void File_Mpeg_Psi::program_number_Update()
         if (program_number)
             Complete_Stream->Streams[elementary_PID]->Table_IDs[0x02]=new complete_stream::stream::table_id; //program_map_section
     }
+    #if MEDIAINFO_DUPLICATE
     if (Complete_Stream->File__Duplicate_Get_From_PID(elementary_PID))
         Complete_Stream->Streams[elementary_PID]->ShouldDuplicate=true;
+    #endif //MEDIAINFO_DUPLICATE
 
     //Handling a program
     if (program_number)
@@ -2606,8 +2596,10 @@ void File_Mpeg_Psi::elementary_PID_Update(int16u PCR_PID)
         #ifdef MEDIAINFO_MPEGTS_PESTIMESTAMP_YES
             //Complete_Stream->Streams[elementary_PID]->Searching_ParserTimeStamp_Start_Set(true);
         #endif //MEDIAINFO_MPEGTS_PESTIMESTAMP_YES
+        #if MEDIAINFO_DUPLICATE
         if (Complete_Stream->File__Duplicate_Get_From_PID(elementary_PID))
             Complete_Stream->Streams[elementary_PID]->ShouldDuplicate=true;
+        #endif //MEDIAINFO_DUPLICATE
     }
 
     //Program information

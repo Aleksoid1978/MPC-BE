@@ -980,7 +980,7 @@ void File_Id3v2::COMM()
     else if (Element_Values(0)==__T("MusicMatch_Mood"))
     {
         if (Retrieve(Stream_General, 0, General_Mood).empty())
-            Element_Values(0)==__T("Mood");
+            Element_Values(0)=__T("Mood");
         else
             return;
     }
@@ -1203,8 +1203,9 @@ void File_Id3v2::Fill_Name()
         case Elements::TDAT : if (Element_Value.size()==4)
                          {
                             Month.assign(Element_Value.c_str(), 0, 2);
-                            Day.assign  (Element_Value.c_str(), 2, 2); break;
+                            Day.assign  (Element_Value.c_str(), 2, 2);
                          }
+                         break;
         case Elements::TDEN : Normalize_Date(Element_Value); Fill(Stream_General, 0, "Encoded_Date", Element_Value); break;
         case Elements::TDLY : break;
         case Elements::TDOR : Normalize_Date(Element_Value); Fill(Stream_General, 0, "Original/Released_Date", Element_Value); break;
@@ -1218,8 +1219,9 @@ void File_Id3v2::Fill_Name()
         case Elements::TIME : if (Element_Value.size()==4)
                          {
                             Hour.assign  (Element_Value.c_str(), 0, 2);
-                            Minute.assign(Element_Value.c_str(), 2, 2); break;
+                            Minute.assign(Element_Value.c_str(), 2, 2);
                          }
+                         break;
         case Elements::TIPL : Fill(Stream_General, 0, General_ThanksTo, Element_Value); break;
         case Elements::TIT1 : Fill(Stream_General, 0, General_Grouping, Element_Value); break;
         case Elements::TIT2 : Fill(Stream_General, 0, General_Track, Element_Value); break;

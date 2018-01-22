@@ -24,7 +24,9 @@
 #include "MediaInfo/Multiple/File_P2_Clip.h"
 #include "MediaInfo/MediaInfo.h"
 #include "MediaInfo/Multiple/File__ReferenceFilesHelper.h"
+#if defined(MEDIAINFO_REFERENCES_YES) && defined(MEDIAINFO_FILE_YES) && defined(MEDIAINFO_DIRECTORY_YES)
 #include "ZenLib/Dir.h"
+#endif //defined(MEDIAINFO_REFERENCES_YES) && defined(MEDIAINFO_FILE_YES) && defined(MEDIAINFO_DIRECTORY_YES)
 #include "ZenLib/FileName.h"
 #include "tinyxml2.h"
 using namespace tinyxml2;
@@ -39,7 +41,7 @@ namespace MediaInfoLib
 
 //---------------------------------------------------------------------------
 File_P2_Clip::File_P2_Clip()
-:File__Analyze()
+:File__Analyze(), File__HasReferences()
 {
     #if MEDIAINFO_EVENTS
         ParserIDs[0]=MediaInfo_Parser_None; //TODO
@@ -48,44 +50,7 @@ File_P2_Clip::File_P2_Clip()
     #if MEDIAINFO_DEMUX
         Demux_EventWasSent_Accept_Specific=true;
     #endif //MEDIAINFO_DEMUX
-
-    //Temp
-    ReferenceFiles=NULL;
 }
-
-//---------------------------------------------------------------------------
-File_P2_Clip::~File_P2_Clip()
-{
-    delete ReferenceFiles; //ReferenceFiles=NULL;
-}
-
-//***************************************************************************
-// Streams management
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-void File_P2_Clip::Streams_Finish()
-{
-    if (ReferenceFiles==NULL)
-        return;
-
-    ReferenceFiles->ParseReferences();
-}
-
-//***************************************************************************
-// Buffer - Global
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-#if MEDIAINFO_SEEK
-size_t File_P2_Clip::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
-{
-    if (ReferenceFiles==NULL)
-        return 0;
-
-    return ReferenceFiles->Seek(Method, Value, ID);
-}
-#endif //MEDIAINFO_SEEK
 
 //***************************************************************************
 // Buffer - File header
@@ -123,8 +88,9 @@ bool File_P2_Clip::FileHeader_Begin()
             Accept("P2_Clip");
             Fill(Stream_General, 0, General_Format, "P2 Clip");
 
-            ReferenceFiles=new File__ReferenceFilesHelper(this, Config);
+            ReferenceFiles_Accept(this, Config);
 
+            #if defined(MEDIAINFO_REFERENCES_YES) && defined(MEDIAINFO_FILE_YES) && defined(MEDIAINFO_DIRECTORY_YES)
             XMLElement* ClipContent=Root->FirstChildElement("ClipContent");
             if (ClipContent)
             {
@@ -417,6 +383,7 @@ bool File_P2_Clip::FileHeader_Begin()
                     }
                 }
             }
+            #endif //defined(MEDIAINFO_REFERENCES_YES) && defined(MEDIAINFO_FILE_YES) && defined(MEDIAINFO_DIRECTORY_YES)
         }
         else
         {

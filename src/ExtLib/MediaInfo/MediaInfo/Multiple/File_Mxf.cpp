@@ -40,6 +40,9 @@
 #if defined(MEDIAINFO_MPEGV_YES)
     #include "MediaInfo/Video/File_Mpegv.h"
 #endif
+#if defined(MEDIAINFO_PRORES_YES)
+    #include "MediaInfo/Video/File_ProRes.h"
+#endif
 #if defined(MEDIAINFO_VC3_YES)
     #include "MediaInfo/Video/File_Vc3.h"
 #endif
@@ -73,9 +76,10 @@
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
 #include "MediaInfo/TimeCode.h"
 #include "MediaInfo/File_Unknown.h"
+#if defined(MEDIAINFO_FILE_YES)
 #include "ZenLib/File.h"
+#endif //defined(MEDIAINFO_REFERENCES_YES)
 #include "ZenLib/FileName.h"
-#include "ZenLib/Dir.h"
 #include "MediaInfo/MediaInfo_Internal.h"
 #if defined(MEDIAINFO_REFERENCES_YES)
     #include "MediaInfo/Multiple/File__ReferenceFilesHelper.h"
@@ -665,6 +669,7 @@ static const char* Mxf_EssenceElement(const int128u EssenceElement)
                         case 0x06 : return "MPEG stream (Clip)";
                         case 0x07 : return "MPEG stream (Custom)";
                         case 0x08 : return "JPEG 2000";
+                        case 0x17 : return "ProRes";
                         default   : return "Unknown stream";
                     }
         case 0x16 : //GC Sound
@@ -738,6 +743,7 @@ static const char* Mxf_EssenceContainer(const int128u EssenceContainer)
                                                                                         case 0x10 : return "AVC";
                                                                                         case 0x11 : return "VC-3";
                                                                                         case 0x13 : return "Timed Text";
+                                                                                        case 0x1C : return "ProRes";
                                                                                         default   : return "";
                                                                                     }
                                                                         default   : return "";
@@ -881,6 +887,12 @@ static const char* Mxf_EssenceContainer_Mapping(int8u Code6, int8u Code7, int8u 
                     }
         case 0x13 : //Timed Text
                     return "Clip";
+        case 0x1C : //ProRes
+                    switch (Code7)
+                    {
+                        case 0x01 : return "Frame";
+                        default   : return "";
+                    }
         default   : return "";
     }
 }
@@ -953,6 +965,7 @@ static const char* Mxf_EssenceCompression(const int128u EssenceCompression)
                                                                                     switch (Code6)
                                                                                     {
                                                                                         case 0x01 : return "JPEG 2000";
+                                                                                        case 0x06 : return "ProRes";
                                                                                         default   : return "";
                                                                                     }
                                                                         case 0x71 : return "VC-3";
@@ -1495,24 +1508,24 @@ static string MXF_MCALabelDictionaryID_ChannelPositions(const std::vector<int128
                 LfeS+="LFE";
         }
         if (!FrontS.empty())
-            ToReturn+=FrontS.c_str();
+            ToReturn+=FrontS;
         if (!SideS.empty())
         {
             if (!ToReturn.empty())
                 ToReturn+=", ";
-            ToReturn+=SideS.c_str();
+            ToReturn+=SideS;
         }
         if (!BackS.empty())
         {
             if (!ToReturn.empty())
                 ToReturn+=", ";
-            ToReturn+=BackS.c_str();
+            ToReturn+=BackS;
         }
         if (!LfeS.empty())
         {
             if (!ToReturn.empty())
                 ToReturn+=", ";
-            ToReturn+=LfeS.c_str();
+            ToReturn+=LfeS;
         }
     }
 
@@ -2136,7 +2149,7 @@ static string Mxf_AcquisitionMetadata_Sony_MonitoringBaseCurve(int128u Value)
 
 //---------------------------------------------------------------------------
 File_Mxf::File_Mxf()
-:File__Analyze()
+:File__Analyze(), File__HasReferences()
 {
     //Configuration
     ParserName="MXF";
@@ -2203,7 +2216,6 @@ File_Mxf::File_Mxf()
     #if MEDIAINFO_ADVANCED
         Footer_Position=(int64u)-1;
     #endif //MEDIAINFO_ADVANCED
-    ReferenceFiles=NULL;
     #if MEDIAINFO_NEXTPACKET
         ReferenceFiles_IsParsing=false;
     #endif //MEDIAINFO_NEXTPACKET
@@ -2240,9 +2252,6 @@ File_Mxf::File_Mxf()
 //---------------------------------------------------------------------------
 File_Mxf::~File_Mxf()
 {
-    #if defined(MEDIAINFO_REFERENCES_YES)
-        delete ReferenceFiles;
-    #endif //defined(MEDIAINFO_REFERENCES_YES)
     #if defined(MEDIAINFO_ANCILLARY_YES)
         if (!Ancillary_IsBinded)
             delete Ancillary;
@@ -2415,7 +2424,7 @@ void File_Mxf::Streams_Finish()
 
     //Parsing locators
     Locators_Test();
-    #if MEDIAINFO_NEXTPACKET
+    #if defined(MEDIAINFO_REFERENCES_YES) && MEDIAINFO_NEXTPACKET
         if (Config->NextPacket_Get() && ReferenceFiles)
         {
             ReferenceFiles_IsParsing=true;
@@ -3380,7 +3389,7 @@ void File_Mxf::Streams_Finish_Descriptor(const int128u DescriptorUID, const int1
     if (StreamKind_Last!=Stream_Max && StreamPos_Last!=(size_t)-1)
     {
         //Handling buggy files
-        if (Descriptor->second.ScanType==__T("Interlaced") && Descriptor->second.Height==1152 && Descriptor->second.Height_Display==1152 && Descriptor->second.Width==720) //Height value is height of the frame instead of the field
+        if (Descriptor->second.Is_Interlaced() && Descriptor->second.Height==1152 && Descriptor->second.Height_Display==1152 && Descriptor->second.Width==720) //Height value is height of the frame instead of the field
             Descriptor->second.Height_Display/=2;
 
         //ID
@@ -3591,7 +3600,7 @@ void File_Mxf::Streams_Finish_Descriptor(const int128u DescriptorUID, const int1
         if (StreamKind_Last==Stream_Video && Retrieve(Stream_Video, StreamPos_Last, Video_ScanType_Original).empty())
         {
             //ScanType
-            if (!Descriptor->second.ScanType.empty() && (Descriptor->second.ScanType!=Retrieve(Stream_Video, StreamPos_Last, Video_ScanType) && !(Descriptor->second.ScanType==__T("Interlaced") && Retrieve(Stream_Video, StreamPos_Last, Video_ScanType)==__T("MBAFF"))))
+            if (!Descriptor->second.ScanType.empty() && (Descriptor->second.ScanType!=Retrieve(Stream_Video, StreamPos_Last, Video_ScanType) && !(Descriptor->second.Is_Interlaced() && Retrieve(Stream_Video, StreamPos_Last, Video_ScanType)==__T("MBAFF"))))
             {
                 Fill(Stream_Video, StreamPos_Last, Video_ScanType_Original, Retrieve(Stream_Video, StreamPos_Last, Video_ScanType));
                 Fill(Stream_Video, StreamPos_Last, Video_ScanType, Descriptor->second.ScanType, true);
@@ -4378,6 +4387,7 @@ void File_Mxf::Read_Buffer_Continue()
 }
 
 //---------------------------------------------------------------------------
+#if defined(MEDIAINFO_FILE_YES)
 void File_Mxf::Read_Buffer_CheckFileModifications()
 {
     if (!IsSub)
@@ -4434,6 +4444,7 @@ void File_Mxf::Read_Buffer_CheckFileModifications()
                                                 Buffer_End=MI.Get(Stream_General, 0, General_FileSize).To_int64u()-MI.Get(Stream_General, 0, General_FooterSize).To_int64u();
                                                 Buffer_End_IsUpdated=true;
                                             }
+                                            #if defined(MEDIAINFO_REFERENCES_YES)
                                             if (!Config->File_IsReferenced_Get() && ReferenceFiles && Retrieve(Stream_General, 0, General_StreamSize).To_int64u())
                                             {
                                                 //Playlist file size is not correctly modified
@@ -4441,6 +4452,7 @@ void File_Mxf::Read_Buffer_CheckFileModifications()
                                                 File_Size=Retrieve(Stream_General, 0, General_StreamSize).To_int64u();
                                                 Config->File_Size+=File_Size;
                                             }
+                                            #endif //MEDIAINFO_REFERENCES_YES
                                         }
                                         }
                                         break;
@@ -4456,6 +4468,7 @@ void File_Mxf::Read_Buffer_CheckFileModifications()
         }
     }
 }
+#endif //defined(MEDIAINFO_FILE_YES)
 
 //---------------------------------------------------------------------------
 void File_Mxf::Read_Buffer_AfterParsing()
@@ -4559,7 +4572,9 @@ void File_Mxf::Read_Buffer_Unsynched()
                 FrameInfo.DUR=float64_int64s(1000000000/IndexTables[0].IndexEditRate);
             else
                 FrameInfo.DUR=float64_int64s(1000000000/Descriptors.begin()->second.SampleRate);
-            Demux_random_access=true;
+            #if MEDIAINFO_DEMUX
+                Demux_random_access=true;
+            #endif //MEDIAINFO_DEMUX
         }
         else if (!IndexTables.empty() && IndexTables[0].EditUnitByteCount)
         {
@@ -4596,7 +4611,9 @@ void File_Mxf::Read_Buffer_Unsynched()
                     }
                     else
                         FrameInfo.PTS=FrameInfo.DTS=(int64u)-1;
-                    Demux_random_access=true;
+                    #if MEDIAINFO_DEMUX
+                        Demux_random_access=true;
+                    #endif //MEDIAINFO_DEMUX
 
                     break;
                 }
@@ -4642,7 +4659,11 @@ void File_Mxf::Read_Buffer_Unsynched()
                             Frame_Count_NotParsedIncluded=IndexTables[Pos].IndexStartPosition+EntryPos;
                             if (IndexTables[Pos].IndexEditRate)
                                 FrameInfo.DTS=float64_int64s(DTS_Delay*1000000000+((float64)Frame_Count_NotParsedIncluded)/IndexTables[Pos].IndexEditRate*1000000000);
-                            Demux_random_access=IndexTables[Pos].Entries[EntryPos].Type?false:true;
+
+
+                            #if MEDIAINFO_DEMUX
+                                Demux_random_access=IndexTables[Pos].Entries[EntryPos].Type?false:true;
+                            #endif //MEDIAINFO_DEMUX
                             break;
                         }
                     }
@@ -4693,7 +4714,7 @@ void File_Mxf::Read_Buffer_Unsynched()
 }
 
 //---------------------------------------------------------------------------
-#if MEDIAINFO_DEMUX || MEDIAINFO_SEEK
+#if (MEDIAINFO_DEMUX || MEDIAINFO_SEEK) && defined(MEDIAINFO_FILE_YES)
 bool File_Mxf::DetectDuration ()
 {
     if (Duration_Detected)
@@ -4753,7 +4774,7 @@ bool File_Mxf::DetectDuration ()
 
     return true;
 }
-#endif //MEDIAINFO_DEMUX || MEDIAINFO_SEEK
+#endif //(MEDIAINFO_DEMUX || MEDIAINFO_SEEK) && defined(MEDIAINFO_FILE_YES)
 
 #if MEDIAINFO_SEEK
 size_t File_Mxf::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
@@ -5129,10 +5150,6 @@ bool File_Mxf::FileHeader_Begin()
         Reject("Mxf");
         return false;
     }
-
-    //In case of buffer interface without filename
-    if (File_Name.empty())
-        File_Name=Config->File_FileName_Get();
 
     return true;
 }
@@ -6100,7 +6117,7 @@ void File_Mxf::Data_Parse()
         }
 
         //Frame info is specific to the container, and it is not updated
-        frame_info FrameInfo_Temp=FrameInfo;
+        const frame_info FrameInfo_Temp=FrameInfo;
         int64u Frame_Count_NotParsedIncluded_Temp=Frame_Count_NotParsedIncluded;
         if (!IsSub) //Updating for MXF only if MXF is not embedded in another container
         {
@@ -9246,7 +9263,7 @@ void File_Mxf::GenericPictureEssenceDescriptor_StoredHeight()
     FILLING_BEGIN();
         if (Descriptors[InstanceUID].Height==(int32u)-1)
         {
-            if (Descriptors[InstanceUID].ScanType==__T("Interlaced"))
+            if (Descriptors[InstanceUID].Is_Interlaced())
                 Data*=2; //This is per field
             if (Descriptors[InstanceUID].Height==(int32u)-1)
                 Descriptors[InstanceUID].Height=Data;
@@ -9265,7 +9282,6 @@ void File_Mxf::GenericPictureEssenceDescriptor_StoredWidth()
     FILLING_BEGIN();
         if (Descriptors[InstanceUID].Width==(int32u)-1)
         {
-            if (Descriptors[InstanceUID].Width==(int32u)-1)
                 Descriptors[InstanceUID].Width=Data;
         }
     FILLING_END();
@@ -9280,7 +9296,7 @@ void File_Mxf::GenericPictureEssenceDescriptor_SampledHeight()
     Get_B4 (Data,                                                "Data"); Element_Info1(Data);
 
     FILLING_BEGIN();
-        if (Descriptors[InstanceUID].ScanType==__T("Interlaced"))
+        if (Descriptors[InstanceUID].Is_Interlaced())
             Data*=2; //This is per field
         Descriptors[InstanceUID].Height=Data;
     FILLING_END();
@@ -9324,7 +9340,7 @@ void File_Mxf::GenericPictureEssenceDescriptor_DisplayHeight()
     Get_B4 (Data,                                                "Data"); Element_Info1(Data);
 
     FILLING_BEGIN();
-        if (Descriptors[InstanceUID].ScanType==__T("Interlaced"))
+        if (Descriptors[InstanceUID].Is_Interlaced())
             Data*=2; //This is per field
         Descriptors[InstanceUID].Height_Display=Data;
     FILLING_END();
@@ -9365,7 +9381,7 @@ void File_Mxf::GenericPictureEssenceDescriptor_DisplayYOffset()
     Get_B4 (Data,                                               "Data"); Element_Info1(Data);
 
     FILLING_BEGIN();
-        if (Descriptors[InstanceUID].ScanType==__T("Interlaced"))
+        if (Descriptors[InstanceUID].Is_Interlaced())
             Data*=2; //This is per field
         Descriptors[InstanceUID].Height_Display_Offset=Data;
     FILLING_END();
@@ -10290,15 +10306,16 @@ void File_Mxf::MPEG2VideoDescriptor_CodedContentType()
     Get_B1 (Data,                                               "Data"); Element_Info1(Mxf_MPEG2_CodedContentType(Data));
 
     FILLING_BEGIN();
-        if (Descriptors[InstanceUID].ScanType.empty())
+        descriptor& desc_item = Descriptors[InstanceUID];
+        if (desc_item.ScanType.empty())
         {
-            if (Data==2 && Descriptors[InstanceUID].ScanType.empty())
+            if (Data==2)
             {
-                if (Descriptors[InstanceUID].Height!=(int32u)-1) Descriptors[InstanceUID].Height*=2;
-                if (Descriptors[InstanceUID].Height_Display!=(int32u)-1) Descriptors[InstanceUID].Height_Display*=2;
-                if (Descriptors[InstanceUID].Height_Display_Offset!=(int32u)-1) Descriptors[InstanceUID].Height_Display_Offset*=2;
+                if (desc_item.Height!=(int32u)-1) desc_item.Height*=2;
+                if (desc_item.Height_Display!=(int32u)-1) desc_item.Height_Display*=2;
+                if (desc_item.Height_Display_Offset!=(int32u)-1) desc_item.Height_Display_Offset*=2;
             }
-            Descriptors[InstanceUID].ScanType.From_UTF8(Mxf_MPEG2_CodedContentType(Data));
+            desc_item.ScanType.From_UTF8(Mxf_MPEG2_CodedContentType(Data));
         }
     FILLING_END();
 }
@@ -10485,7 +10502,6 @@ void File_Mxf::AVCDescriptor_SequenceParameterSetFlag()
 {
     //Parsing
     BS_Begin();
-    bool constraint_set3_flag;
     Info_SB(   Constancy,                                       "Constancy");
     Info_BS(3, Location,                                        "In-band location"); Element_Info1(Mxf_AVC_SequenceParameterSetFlag_Constancy(Constancy));
     Skip_BS(4,                                                  "reserved"); Element_Info1(Mxf_AVC_SequenceParameterSetFlag_Constancy(Location));
@@ -15043,6 +15059,11 @@ void File_Mxf::Info_UL_040101_Values()
                                                     Skip_B1(    "Unused");
                                                     Skip_B1(    "Unused");
                                                     break;
+                                                case 0x06 :
+                                                    Param_Info1("ProRes");
+                                                    Skip_B1(    "Profile");
+                                                    Skip_B1(    "Unused");
+                                                    break;
                                                 default   :
                                                     Skip_B2(    "Unknown");
                                             }
@@ -15479,6 +15500,13 @@ void File_Mxf::Info_UL_040101_Values()
                                                     {
                                                     Param_Info1("AVC Picture Element");
                                                     Skip_B1(            "Unknown");
+                                                    Skip_B1(            "Unknown");
+                                                    }
+                                                    break;
+                                                case 0x1C :
+                                                    {
+                                                    Param_Info1("ProRes");
+                                                    Info_B1(Code7,      "Content Kind"); Param_Info1(Mxf_EssenceContainer_Mapping(Code6, Code7, 0xFF));
                                                     Skip_B1(            "Unknown");
                                                     }
                                                     break;
@@ -16036,6 +16064,7 @@ void File_Mxf::ChooseParser(const essences::iterator &Essence, const descriptors
                                                                     switch (Code6)
                                                                     {
                                                                         case 0x01 : return ChooseParser_Jpeg2000(Essence, Descriptor);
+                                                                        case 0x06 : return ChooseParser_ProRes(Essence, Descriptor);
                                                                         default   : return;
                                                                     }
                                                         case 0x71 : return ChooseParser_Vc3(Essence, Descriptor);
@@ -16398,6 +16427,9 @@ void File_Mxf::ChooseParser__Aaf_GC_Picture(const essences::iterator &Essence, c
                     break;
         case 0x0D : //VC-3
                     ChooseParser_Vc3(Essence, Descriptor);
+                    break;
+        case 0x17 : //ProRes
+                    ChooseParser_ProRes(Essence, Descriptor);
                     break;
         default   : //Unknown
                     ;
@@ -16986,7 +17018,7 @@ void File_Mxf::ChooseParser_Jpeg2000(const essences::iterator &Essence, const de
         Parser->StreamKind=Stream_Video;
         if (Descriptor!=Descriptors.end())
         {
-            Parser->Interlaced=Descriptor->second.ScanType==__T("Interlaced");
+            Parser->Interlaced=Descriptor->second.Is_Interlaced();
             #if MEDIAINFO_DEMUX
                 if (Parser->Interlaced)
                 {
@@ -17002,6 +17034,24 @@ void File_Mxf::ChooseParser_Jpeg2000(const essences::iterator &Essence, const de
         Open_Buffer_Init(Parser);
         Parser->Stream_Prepare(Stream_Video);
         Parser->Fill(Stream_Video, 0, Video_Format, "JPEG 2000");
+    #endif
+    Essence->second.Parsers.push_back(Parser);
+}
+
+//---------------------------------------------------------------------------
+void File_Mxf::ChooseParser_ProRes(const essences::iterator &Essence, const descriptors::iterator &Descriptor)
+{
+    Essence->second.StreamKind=Stream_Video;
+
+    //Filling
+    #if defined(MEDIAINFO_PRORES_YES)
+        File_ProRes* Parser=new File_ProRes;
+    #else
+        //Filling
+        File__Analyze* Parser=new File_Unknown();
+        Open_Buffer_Init(Parser);
+        Parser->Stream_Prepare(Stream_Video);
+        Parser->Fill(Stream_Video, 0, Video_Format, "ProRes");
     #endif
     Essence->second.Parsers.push_back(Parser);
 }
@@ -17107,7 +17157,7 @@ void File_Mxf::Locators_Test()
 
     if (!Locators.empty() && ReferenceFiles==NULL)
     {
-        ReferenceFiles=new File__ReferenceFilesHelper(this, Config);
+        ReferenceFiles_Accept(this, Config);
 
         for (locators::iterator Locator=Locators.begin(); Locator!=Locators.end(); ++Locator)
             if (!Locator->second.IsTextLocator && !Locator->second.EssenceLocator.empty())

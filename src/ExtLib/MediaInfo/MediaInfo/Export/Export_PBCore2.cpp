@@ -251,12 +251,15 @@ Ztring ToReturn;
 }
 
 //---------------------------------------------------------------------------
-Ztring Export_PBCore2::Transform(MediaInfo_Internal &MI)
+Ztring Export_PBCore2::Transform(MediaInfo_Internal &MI, version Version)
 {
     Ztring ToReturn;
 
     Node Node_Main("pbcoreInstantiationDocument");
-    Node_Main.Add_Attribute("xsi:schemaLocation", "http://www.pbcore.org/PBCore/PBCoreNamespace.html http://pbcore.org/xsd/pbcore-2.0.xsd");
+    if (Version==Version_2_0)
+        Node_Main.Add_Attribute("xsi:schemaLocation", "http://www.pbcore.org/PBCore/PBCoreNamespace.html http://pbcore.org/xsd/pbcore-2.0.xsd");
+    else
+        Node_Main.Add_Attribute("xsi:schemaLocation", "http://www.pbcore.org/PBCore/PBCoreNamespace.html https://raw.githubusercontent.com/WGBH/PBCore_2.1/master/pbcore-2.1.xsd"); //TODO: better URL
     Node_Main.Add_Attribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
     Node_Main.Add_Attribute("xmlns", "http://www.pbcore.org/PBCore/PBCoreNamespace.html");
 
@@ -420,7 +423,8 @@ Ztring Export_PBCore2::Transform(MediaInfo_Internal &MI)
     ToReturn+=Ztring().From_UTF8(To_XML(Node_Main, 0).c_str());
 
     //Carriage return
-    ToReturn.FindAndReplace(__T("\n"), EOL, 0, Ztring_Recursive);
+    if (MediaInfoLib::Config.LineSeparator_Get()!=__T("\n"))
+        ToReturn.FindAndReplace(__T("\n"), MediaInfoLib::Config.LineSeparator_Get(), 0, Ztring_Recursive);
 
     return ToReturn;
 }

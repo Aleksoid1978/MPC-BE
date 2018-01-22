@@ -9,6 +9,8 @@
 #define File__ReferenceFilesHelperH
 //---------------------------------------------------------------------------
 
+#if defined(MEDIAINFO_REFERENCES_YES)
+
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
 #include "MediaInfo/MediaInfo_Internal.h"
@@ -104,5 +106,7 @@ private :
 };
 
 } //NameSpace
+
+#endif //MEDIAINFO_REFERENCES_YES
 
 #endif

@@ -25,8 +25,10 @@
 #include "MediaInfo/MediaInfo.h"
 #include "MediaInfo/MediaInfo_Internal.h"
 #include "MediaInfo/Multiple/File__ReferenceFilesHelper.h"
+#if defined(MEDIAINFO_REFERENCES_YES) && defined(MEDIAINFO_FILE_YES) && defined(MEDIAINFO_DIRECTORY_YES)
 #include "ZenLib/File.h"
 #include "ZenLib/Dir.h"
+#endif //defined(MEDIAINFO_REFERENCES_YES) && defined(MEDIAINFO_FILE_YES) && defined(MEDIAINFO_DIRECTORY_YES)
 #include "ZenLib/FileName.h"
 #include "ZenLib/Format/Http/Http_Utils.h"
 #include "tinyxml2.h"
@@ -42,49 +44,12 @@ namespace MediaInfoLib
 
 //---------------------------------------------------------------------------
 File_SequenceInfo::File_SequenceInfo()
-:File__Analyze()
+:File__Analyze(), File__HasReferences()
 {
     #if MEDIAINFO_DEMUX
         Demux_EventWasSent_Accept_Specific=true;
     #endif //MEDIAINFO_DEMUX
-
-    //Temp
-    ReferenceFiles=NULL;
 }
-
-//---------------------------------------------------------------------------
-File_SequenceInfo::~File_SequenceInfo()
-{
-    delete ReferenceFiles; //ReferenceFiles=NULL;
-}
-
-//***************************************************************************
-// Streams management
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-void File_SequenceInfo::Streams_Finish()
-{
-    if (ReferenceFiles==NULL)
-        return;
-
-    ReferenceFiles->ParseReferences();
-}
-
-//***************************************************************************
-// Buffer - Global
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-#if MEDIAINFO_SEEK
-size_t File_SequenceInfo::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
-{
-    if (ReferenceFiles==NULL)
-        return 0;
-
-    return ReferenceFiles->Seek(Method, Value, ID);
-}
-#endif //MEDIAINFO_SEEK
 
 //***************************************************************************
 // Buffer - File header
@@ -104,8 +69,9 @@ bool File_SequenceInfo::FileHeader_Begin()
             Accept("SequenceInfo");
             Fill(Stream_General, 0, General_Format, "SequenceInfo");
 
-            ReferenceFiles=new File__ReferenceFilesHelper(this, Config);
+            ReferenceFiles_Accept(this, Config);
 
+            #if defined(MEDIAINFO_REFERENCES_YES) && defined(MEDIAINFO_FILE_YES) && defined(MEDIAINFO_DIRECTORY_YES)
             sequence* Sequence=new sequence;
             Sequence->StreamKind=Stream_Video;
 
@@ -227,6 +193,7 @@ bool File_SequenceInfo::FileHeader_Begin()
                         ReferenceFiles->AddSequence(Sequence);
                 }
             }
+            #endif //defined(MEDIAINFO_REFERENCES_YES) && defined(MEDIAINFO_FILE_YES) && defined(MEDIAINFO_DIRECTORY_YES)
         }
         else
         {
