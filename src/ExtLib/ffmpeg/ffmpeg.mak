@@ -598,7 +598,6 @@ SRCS_LF = \
 	libavfilter/video.c
 
 SRCS_LU = \
-	libavutil/atomic.c \
 	libavutil/audio_fifo.c \
 	libavutil/avstring.c \
 	libavutil/bprint.c \
