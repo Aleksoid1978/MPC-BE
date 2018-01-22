@@ -6040,13 +6040,15 @@ Version 1.6.33 [September 28, 2017]
 Version 1.6.34 [September 29, 2017]
   Removed contrib/pngsuite/i*.png; some of them caused test failures.
 
-Version 1.6.35beta01 [November 3, 2017]
+Version 1.6.35beta01 [January 8, 2018]
   Restored 21 of the contrib/pngsuite/i*.png, which do not cause test
     failures. Placed the remainder in contrib/pngsuite/interlaced/i*.png.
   Added calls to png_set_*() transforms commonly used by browsers to
     the fuzzer.
   Removed some unnecessary brackets in pngrtran.c
   Fixed miscellaneous typos (Patch by github user "luzpaz").
+  Change "ASM C" to "C ASM" in CMakeLists.txt
+  Fixed incorrect handling of bKGD chunk in sub-8-bit files (Cosmin)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
