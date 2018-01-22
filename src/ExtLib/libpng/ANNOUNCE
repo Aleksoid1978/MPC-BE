@@ -1,4 +1,4 @@
-Libpng 1.6.35beta01 - November 3, 2017
+Libpng 1.6.35beta01 - January 8, 2018
 
 This is not intended to be a public release. It will be replaced
 within a few weeks by a public version or by another test version.
@@ -24,13 +24,15 @@ Other information:
 
 Changes since the last public release (1.6.34):
 
-Version 1.6.35beta01 [November 3, 2017]
+Version 1.6.35beta01 [January 8, 2018]
   Restored 21 of the contrib/pngsuite/i*.png, which do not cause test
     failures. Placed the remainder in contrib/pngsuite/interlaced/i*.png.
   Added calls to png_set_*() transforms commonly used by browsers to
     the fuzzer.
   Removed some unnecessary brackets in pngrtran.c
-  Fixed miscellaneous typos (Patch by github user "luzpaz").
+  Fixed miscellaneous typos (Patch by github user "luzpaz")
+  Change "ASM C" to "C ASM" in CMakeLists.txt
+  Fixed incorrect handling of bKGD chunk in sub-8-bit files (Cosmin)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

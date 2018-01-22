@@ -210,7 +210,11 @@
        defined(__SSE2__) || defined(_M_X64) || defined(_M_AMD64) || \
        (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
 #         define PNG_INTEL_SSE_OPT 1
+#      else
+#         define PNG_INTEL_SSE_OPT 0
 #      endif
+#   else
+#      define PNG_INTEL_SSE_OPT 0
 #   endif
 #endif
 
@@ -234,6 +238,8 @@
 #   if PNG_INTEL_SSE_IMPLEMENTATION > 0
 #      define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_sse2
 #   endif
+#else
+#   define PNG_INTEL_SSE_IMPLEMENTATION 0
 #endif
 
 #if PNG_MIPS_MSA_OPT > 0
