@@ -702,6 +702,7 @@ public:
 	REFERENCE_TIME const GetClosestKeyFrame(REFERENCE_TIME rtTarget);
 	void SeekTo(REFERENCE_TIME rt, bool bShowOSD = true);
 	bool ValidateSeek(REFERENCE_TIME rtPos, REFERENCE_TIME rtStop);
+	void MatroskaLoadKeyFrames();
 
 	bool GetBufferingProgress(int* Progress = nullptr);
 

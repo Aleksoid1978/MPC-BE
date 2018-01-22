@@ -7892,6 +7892,10 @@ void CMainFrame::OnPlaySeek(UINT nID)
 	const REFERENCE_TIME rtPos = m_wndSeekBar.GetPos();
 	rtSeekTo += rtPos;
 
+	if (s.fFastSeek) {
+		MatroskaLoadKeyFrames();
+	}
+
 	if (s.fFastSeek && !m_kfs.empty()) {
 		// seek to the closest keyframe, but never in the opposite direction
 		rtSeekTo = GetClosestKeyFrame(rtSeekTo);
@@ -7963,6 +7967,8 @@ static int rangebsearch(REFERENCE_TIME val, CAtlArray<REFERENCE_TIME>& rta)
 
 void CMainFrame::OnPlaySeekKey(UINT nID)
 {
+	MatroskaLoadKeyFrames();
+
 	if (!m_kfs.empty()) {
 		bool bSeekingForward = (nID == ID_PLAY_SEEKKEYFORWARD);
 		const REFERENCE_TIME rtPos = m_wndSeekBar.GetPos();
@@ -16135,6 +16141,8 @@ REFERENCE_TIME const CMainFrame::GetClosestKeyFrame(REFERENCE_TIME rtTarget)
 		return rtDuration;
 	}
 
+	MatroskaLoadKeyFrames();
+
 	REFERENCE_TIME ret = rtTarget;
 	std::pair<REFERENCE_TIME, REFERENCE_TIME> keyframes;
 	if (GetNeighbouringKeyFrames(rtTarget, keyframes)) {
@@ -16244,6 +16252,15 @@ bool CMainFrame::ValidateSeek(REFERENCE_TIME rtPos, REFERENCE_TIME rtStop)
 	}
 
 	return true;
+}
+
+void CMainFrame::MatroskaLoadKeyFrames()
+{
+	if (m_pKFI && m_kfs.empty()) {
+		if (CComQIPtr<IMatroskaSplitterFilter> pMatroskaSplitterFilter = m_pKFI) {
+			LoadKeyFrames();
+		}
+	}
 }
 
 bool CMainFrame::GetBufferingProgress(int* iProgress/* = nullptr*/)
