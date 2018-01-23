@@ -181,7 +181,7 @@ CString CFLVSplitterFilter::AMF0GetString(UINT64 end)
 
 	m_pFile->ByteRead((BYTE*)name, length);
 
-	return CString(name);
+	return MultiByteToUTF16(name);
 }
 
 bool CFLVSplitterFilter::ParseAMF0(UINT64 end, const CString key, std::vector<AMF0> &AMF0Array)
@@ -531,6 +531,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		CString title, name;
 		CString album;
 		CString artist;
+		CString author;
 		CString comment;
 		CString date;
 	} metaData;
@@ -605,6 +606,8 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								metaData.album = AMF0Array[i];
 							} else if (AMF0Array[i].name.CompareNoCase(L"artist") == 0) {
 								metaData.artist = AMF0Array[i];
+							} else if (AMF0Array[i].name.CompareNoCase(L"author") == 0) {
+								metaData.author = AMF0Array[i];
 							} else if (AMF0Array[i].name.CompareNoCase(L"comment") == 0) {
 								metaData.comment = AMF0Array[i];
 							} else if (AMF0Array[i].name.CompareNoCase(L"date") == 0) {
@@ -1159,6 +1162,8 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 	if (!metaData.artist.IsEmpty()){
 		SetProperty(L"AUTH", metaData.artist);
+	} else if (!metaData.author.IsEmpty()){
+		SetProperty(L"AUTH", metaData.author);
 	}
 	if (!metaData.comment.IsEmpty()){
 		SetProperty(L"DESC", metaData.comment);
