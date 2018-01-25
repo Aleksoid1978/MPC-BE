@@ -5468,19 +5468,14 @@ void CMainFrame::DropFiles(std::list<CString>& slFiles)
 	BOOL bIsValidSubExtAll = TRUE;
 
 	for (const auto& fname : slFiles) {
-		CString ext = GetFileExt(fname).Mid(1); // extension without a dot
-		ext.MakeLower();
+		const CString ext = GetFileExt(fname).Mid(1).MakeLower(); // extension without a dot
 
-		bool validate_ext = false;
-		for (size_t i = 0; i < Subtitle::subTypesExt.size(); i++) {
-			if (ext == Subtitle::subTypesExt[i] &&
-					!(m_pDVS && ext == "mks")) {
-				validate_ext = true;
-				break;
-			}
-		}
+		const bool validate_ext = std::any_of(Subtitle::subTypesExt.cbegin(), Subtitle::subTypesExt.cend(), [&](LPCWSTR subExt) {
+			return ext == subExt;
+		});
 
-		if (!validate_ext) {
+		if (!validate_ext
+				|| (m_pDVS && ext == "mks")) {
 			bIsValidSubExtAll = FALSE;
 			break;
 		}
@@ -5531,6 +5526,7 @@ void CMainFrame::DropFiles(std::list<CString>& slFiles)
 		return;
 	}
 
+	ParseDirs(slFiles);
 	AddSimilarFiles(slFiles);
 
 	m_wndPlaylistBar.Open(slFiles, true);
@@ -14021,7 +14017,7 @@ void CMainFrame::CloseMediaPrivate()
 	DLog(L"CMainFrame::CloseMediaPrivate() : end");
 }
 
-static void RecurseAddDir(CString path, std::list<CString>* sl)
+static void RecurseAddDir(CString path, std::list<CString>& sl)
 {
 	WIN32_FIND_DATAW fd = {0};
 
@@ -14031,13 +14027,9 @@ static void RecurseAddDir(CString path, std::list<CString>* sl)
 			CString f_name = fd.cFileName;
 
 			if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && (f_name != L".") && (f_name != L"..")) {
-				CString fullpath = path + f_name;
+				const CString fullpath = AddSlash(path + f_name);
 
-				if (fullpath[fullpath.GetLength() - 1] != '\\') {
-					fullpath += '\\';
-				}
-
-				sl->push_back(fullpath);
+				sl.push_back(fullpath);
 				RecurseAddDir(fullpath, sl);
 			} else {
 				continue;
@@ -14055,15 +14047,13 @@ void CMainFrame::ParseDirs(std::list<CString>& sl)
 		HANDLE hFind = FindFirstFileW(fn, &fd);
 		if (hFind != INVALID_HANDLE_VALUE) {
 			if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-				if (fn[fn.GetLength() - 1] != '\\') {
-					fn += '\\';
-				}
+				fn = AddSlash(fn);
 
 				if (CheckBD(fn) || CheckDVD(fn)) {
 					continue;
 				}
 
-				RecurseAddDir(fn, &sl);
+				RecurseAddDir(fn, sl);
 			}
 
 			FindClose(hFind);
@@ -17821,7 +17811,7 @@ void CMainFrame::OnFileOpenDirectory()
 		std::list<CString> sl;
 		sl.push_back(path);
 		if (recur && !(CheckBD(path) || CheckDVD(path))) {
-			RecurseAddDir(path, &sl);
+			RecurseAddDir(path, sl);
 		}
 
 		m_wndPlaylistBar.Open(sl, true);
