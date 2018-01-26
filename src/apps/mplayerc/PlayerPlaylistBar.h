@@ -216,6 +216,8 @@ private:
 
 	int m_nSelected_idx = INT_MAX;
 
+	bool m_bSingleElement = false;
+
 public:
 	CPlayerPlaylistBar(CMainFrame* pMainFrame);
 	virtual ~CPlayerPlaylistBar();

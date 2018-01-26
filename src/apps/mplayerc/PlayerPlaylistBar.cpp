@@ -896,7 +896,7 @@ void CPlayerPlaylistBar::AddItem(std::list<CString>& fns, CSubtitleItemList* sub
 	m_pl.AddTail(pli);
 }
 
-static bool SearchFiles(CString mask, std::list<CString>& sl)
+static bool SearchFiles(CString mask, std::list<CString>& sl, bool bSingleElement)
 {
 	if (mask.Find(L"://") >= 0) {
 		return false;
@@ -922,6 +922,10 @@ static bool SearchFiles(CString mask, std::list<CString>& sl)
 		if (h != INVALID_HANDLE_VALUE) {
 			do {
 				if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+					if (bSingleElement
+							&& (_wcsicmp(fd.cFileName, L"VIDEO_TS") == 0 || _wcsicmp(fd.cFileName, L"BDMV") == 0)) {
+						SearchFiles(dir + fd.cFileName, sl, bSingleElement);
+					}
 					continue;
 				}
 
@@ -1002,7 +1006,7 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 
 	if (bCheck && !Youtube::CheckURL(fns.front())) {
 		std::list<CString> sl;
-		if (SearchFiles(fns.front(), sl)) {
+		if (SearchFiles(fns.front(), sl, m_bSingleElement)) {
 			bool bDVD_BD = false;
 			for (const auto& fn : sl) {
 				if (m_pMainFrame->CheckBD(fn) || m_pMainFrame->CheckDVD(fn)) {
@@ -1417,7 +1421,10 @@ void CPlayerPlaylistBar::Open(CString fn)
 {
 	std::list<CString> fns;
 	fns.push_front(fn);
+
+	m_bSingleElement = true;
 	Open(fns, false);
+	m_bSingleElement = false;
 }
 
 void CPlayerPlaylistBar::Open(std::list<CString>& fns, bool fMulti, CSubtitleItemList* subs/* = nullptr*/, bool bCheck/* = true*/)
