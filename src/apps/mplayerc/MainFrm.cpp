@@ -9898,11 +9898,12 @@ void CMainFrame::OnFavoritesFile(UINT nID)
 {
 	nID -= ID_FAVORITES_FILE_START;
 
-	CAtlList<CString> sl;
+	std::list<CString> sl;
 	AfxGetAppSettings().GetFav(FAV_FILE, sl);
 
-	if (POSITION pos = sl.FindIndex(nID)) {
-		PlayFavoriteFile(sl.GetAt(pos));
+	if (nID < sl.size()) {
+		auto it = std::next(sl.begin(), nID);
+		PlayFavoriteFile(*it);
 	}
 }
 
@@ -10011,11 +10012,12 @@ void CMainFrame::OnFavoritesDVD(UINT nID)
 {
 	nID -= ID_FAVORITES_DVD_START;
 
-	CAtlList<CString> sl;
+	std::list<CString> sl;
 	AfxGetAppSettings().GetFav(FAV_DVD, sl);
 
-	if (POSITION pos = sl.FindIndex(nID)) {
-		PlayFavoriteDVD(sl.GetAt(pos));
+	if (nID < sl.size()) {
+		auto it = std::next(sl.begin(), nID);
+		PlayFavoriteDVD(*it);
 	}
 }
 
@@ -15320,14 +15322,13 @@ void CMainFrame::SetupFavoritesSubMenu()
 
 	UINT id = ID_FAVORITES_FILE_START;
 
-	CAtlList<CString> sl;
+	std::list<CString> sl;
 	AfxGetAppSettings().GetFav(FAV_FILE, sl);
 
-	POSITION pos = sl.GetHeadPosition();
-	while (pos) {
+	for (const auto& item : sl) {
 		UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 
-		CString f_str = sl.GetNext(pos);
+		CString f_str = item;
 		f_str.Replace(L"&", L"&&");
 		f_str.Replace(L"\t", L" ");
 
@@ -15379,11 +15380,10 @@ void CMainFrame::SetupFavoritesSubMenu()
 
 	s.GetFav(FAV_DVD, sl);
 
-	pos = sl.GetHeadPosition();
-	while (pos) {
+	for (const auto& item : sl) {
 		UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 
-		CString str = sl.GetNext(pos);
+		CString str = item;
 		str.Replace(L"&", L"&&");
 
 		CAtlList<CString> sl;
@@ -15423,11 +15423,10 @@ void CMainFrame::SetupFavoritesSubMenu()
 
 	s.GetFav(FAV_DEVICE, sl);
 
-	pos = sl.GetHeadPosition();
-	while (pos) {
+	for (const auto& item : sl) {
 		UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 
-		CString str = sl.GetNext(pos);
+		CString str = item;
 		str.Replace(L"&", L"&&");
 
 		CAtlList<CString> sl;

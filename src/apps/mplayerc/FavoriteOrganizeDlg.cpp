@@ -24,6 +24,20 @@
 #include "ItemPropertiesDlg.h"
 #include "FavoriteOrganizeDlg.h"
 
+// returns an iterator on the found element, or last if nothing is found
+template <class T>
+auto FindInListByPointer(std::list<T>& list, const T* p)
+{
+	auto it = list.begin();
+	for (; it != list.end(); ++it) {
+		if (&(*it) == p) {
+			break;
+		}
+	}
+
+	return it;
+}
+
 #define GET_BY_INDEX(arg, index) (arg.GetAt(arg.FindIndex(index)))
 
 // CFavoriteOrganizeDlg dialog
@@ -44,30 +58,32 @@ void CFavoriteOrganizeDlg::SetupList(bool fSave)
 	int i = m_tab.GetCurSel();
 
 	if (fSave) {
-		CAtlList<CString> sl;
+		std::list<CString> sl;
 
 		for (int j = 0; j < m_list.GetItemCount(); j++) {
+			auto it = FindInListByPointer(m_sl[i], (CString*)m_list.GetItemData(j));
+			if (it == m_sl[i].end()) {
+				ASSERT(0);
+				break;
+			}
+
 			CAtlList<CString> args;
-			ExplodeEsc(m_sl[i].GetAt((POSITION)m_list.GetItemData(j)), args, L';');
+			ExplodeEsc(*it, args, L';');
 			args.RemoveHeadNoReturn();
 			args.AddHead(m_list.GetItemText(j, 0));
-			sl.AddTail(ImplodeEsc(args, L';'));
+			sl.push_back(ImplodeEsc(args, L';'));
 		}
 
-		m_sl[i].RemoveAll();
-		m_sl[i].AddTailList(&sl);
+		m_sl[i] = sl;
 	} else {
 		m_list.DeleteAllItems();
 
-		POSITION pos = m_sl[i].GetHeadPosition(), tmp;
-		while (pos) {
-			tmp = pos;
-
+		for (auto it = m_sl[i].begin(); it != m_sl[i].end(); ++it) {
 			CAtlList<CString> sl;
-			ExplodeEsc(m_sl[i].GetNext(pos), sl, L';', 3);
+			ExplodeEsc(*it, sl, L';', 3);
 
 			int n = m_list.InsertItem(m_list.GetItemCount(), sl.RemoveHead());
-			m_list.SetItemData(n, (DWORD_PTR)tmp);
+			m_list.SetItemData(n, (DWORD_PTR)&(*it));
 
 			if (!sl.IsEmpty()) {
 				REFERENCE_TIME rt = 0;
@@ -218,8 +234,14 @@ void CFavoriteOrganizeDlg::OnEditBnClicked()
 	if (POSITION pos = m_list.GetFirstSelectedItemPosition()) {
 		int nItem = m_list.GetNextSelectedItem(pos);
 
+		auto it = FindInListByPointer(m_sl[m_tab.GetCurSel()], (CString*)m_list.GetItemData(nItem));
+		if (it == m_sl[m_tab.GetCurSel()].end()) {
+			ASSERT(0);
+			return;
+		}
+
 		CAtlList<CString> args;
-		ExplodeEsc(m_sl[m_tab.GetCurSel()].GetAt((POSITION)m_list.GetItemData(nItem)), args, L';');
+		ExplodeEsc(*it, args, L';');
 
 		ASSERT(args.GetCount() >= 4);
 		CString& name = GET_BY_INDEX(args, 0);
@@ -231,7 +253,7 @@ void CFavoriteOrganizeDlg::OnEditBnClicked()
 			name = ipd.GetPropertyName();
 			path = ipd.GetPropertyPath();
 			const CString str = ImplodeEsc(args, L';');
-			m_sl[m_tab.GetCurSel()].SetAt((POSITION)m_list.GetItemData(nItem), str);
+			*it = str;
 		}
 	}
 }
@@ -259,10 +281,16 @@ void CFavoriteOrganizeDlg::PlayFavorite(int nItem)
 	auto pFrame = AfxGetMainFrame();
 	switch (m_tab.GetCurSel()) {
 		case 0: // Files
-			pFrame->PlayFavoriteFile(m_sl[0].GetAt((POSITION)m_list.GetItemData(nItem)));
+		{
+			auto it = FindInListByPointer(m_sl[0], (CString*)m_list.GetItemData(nItem));
+			pFrame->PlayFavoriteFile(*it);
+		}
 			break;
 		case 1: // DVDs
-			pFrame->PlayFavoriteDVD(m_sl[1].GetAt((POSITION)m_list.GetItemData(nItem)));
+		{
+			auto it = FindInListByPointer(m_sl[1], (CString*)m_list.GetItemData(nItem));
+			pFrame->PlayFavoriteDVD(*it);
+		}
 			break;
 		case 2: // Devices
 			break;
@@ -443,14 +471,21 @@ void CFavoriteOrganizeDlg::OnLvnGetInfoTipList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMLVGETINFOTIPW pGetInfoTip = reinterpret_cast<LPNMLVGETINFOTIPW>(pNMHDR);
 
+	const int tab = m_tab.GetCurSel();
+	auto it = FindInListByPointer(m_sl[tab], (CString*)m_list.GetItemData(pGetInfoTip->iItem));
+	if (it == m_sl[tab].end()) {
+		ASSERT(0);
+		return;
+	}
+
 	CAtlList<CString> args;
-	ExplodeEsc(m_sl[m_tab.GetCurSel()].GetAt((POSITION)m_list.GetItemData(pGetInfoTip->iItem)), args, L';');
+	ExplodeEsc(*it, args, L';');
 
 	ASSERT(args.GetCount() >= 4);
 	const CString& path = GET_BY_INDEX(args, 3);
 
 	// Relative to drive value is always third. If less args are available that means it is not included.
-	const int rootLength = (m_tab.GetCurSel() == 0 && GET_BY_INDEX(args, 2) != L"0") ? CPath(path).SkipRoot() : 0;
+	const int rootLength = (tab == 0 && GET_BY_INDEX(args, 2) != L"0") ? CPath(path).SkipRoot() : 0;
 
 	StringCchCopyW(pGetInfoTip->pszText, pGetInfoTip->cchTextMax, path.Mid(rootLength));
 	*pResult = 0;
