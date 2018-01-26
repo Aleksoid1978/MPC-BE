@@ -19284,10 +19284,10 @@ BOOL CMainFrame::AddSimilarFiles(std::list<CString>& fns)
 	}
 
 	const std::wregex replace_spec(LR"([\.\(\)\[\]\{\}\+])", std::wregex::icase);
-	std::wstring regExp = std::regex_replace((LPCTSTR)name, replace_spec, L"\\$&");
+	std::wstring regExp = std::regex_replace(name.GetString(), replace_spec, L"\\$&");
 
-	const std::wregex replace_digit(L"\\d+", std::wregex::icase);
-	regExp = std::regex_replace(regExp, replace_digit, L"\\d+");
+	const std::wregex replace_digit(LR"((\d+ *- *\d+|\d+))", std::wregex::icase);
+	regExp = std::regex_replace(regExp, replace_digit, L"(\\d+ *- *\\d+|\\d+)");
 
 	if (excludeWordsNum != -1) {
 		const auto& words = excludeWords[excludeWordsNum];
