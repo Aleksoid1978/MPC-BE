@@ -23,20 +23,7 @@
 #include "MainFrm.h"
 #include "ItemPropertiesDlg.h"
 #include "FavoriteOrganizeDlg.h"
-
-// returns an iterator on the found element, or last if nothing is found
-template <class T>
-auto FindInListByPointer(std::list<T>& list, const T* p)
-{
-	auto it = list.begin();
-	for (; it != list.end(); ++it) {
-		if (&(*it) == p) {
-			break;
-		}
-	}
-
-	return it;
-}
+#include "../../DSUtil/std_helper.h"
 
 #define GET_BY_INDEX(arg, index) (arg.GetAt(arg.FindIndex(index)))
 
