@@ -1968,9 +1968,9 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 	}
 }
 
-void CAppSettings::GetFav(favtype ft, CAtlList<CString>& sl)
+void CAppSettings::GetFav(favtype ft, std::list<CString>& sl)
 {
-	sl.RemoveAll();
+	sl.clear();
 
 	CString root;
 
@@ -1996,17 +1996,17 @@ void CAppSettings::GetFav(favtype ft, CAtlList<CString>& sl)
 			break;
 		}
 
-		CAtlList<CString> args;
+		std::list<CString> args;
 		ExplodeEsc(s, args, L';');
-		if (args.GetCount() < 4) {
+		if (args.size() < 4) {
 			ASSERT(FALSE);
 			continue;
 		}
-		sl.AddTail(s);
+		sl.push_back(s);
 	}
 }
 
-void CAppSettings::SetFav(favtype ft, CAtlList<CString>& sl)
+void CAppSettings::SetFav(favtype ft, std::list<CString>& sl)
 {
 	CString root;
 
@@ -2027,22 +2027,21 @@ void CAppSettings::SetFav(favtype ft, CAtlList<CString>& sl)
 	AfxGetMyApp()->WriteProfileString(root, nullptr, nullptr);
 
 	int i = 0;
-	POSITION pos = sl.GetHeadPosition();
-	while (pos) {
+	for (const auto& item : sl) {
 		CString s;
 		s.Format(L"Name%d", i++);
-		AfxGetMyApp()->WriteProfileString(root, s, sl.GetNext(pos));
+		AfxGetMyApp()->WriteProfileString(root, s, item);
 	}
 }
 
 void CAppSettings::AddFav(favtype ft, CString s)
 {
-	CAtlList<CString> sl;
+	std::list<CString> sl;
 	GetFav(ft, sl);
-	if (sl.Find(s)) {
+	if (std::find(sl.cbegin(), sl.cend(), s) != sl.cend()) {
 		return;
 	}
-	sl.AddTail(s);
+	sl.push_back(s);
 	SetFav(ft, sl);
 }
 

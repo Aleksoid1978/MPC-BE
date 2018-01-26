@@ -872,8 +872,8 @@ public:
 	void			SaveSettings();
 	void			SaveExternalFilters();
 
-	void			GetFav(favtype ft, CAtlList<CString>& sl);
-	void			SetFav(favtype ft, CAtlList<CString>& sl);
+	void			GetFav(favtype ft, std::list<CString>& sl);
+	void			SetFav(favtype ft, std::list<CString>& sl);
 	void			AddFav(favtype ft, CString s);
 	CDVBChannel*	FindChannelByPref(int nPrefNumber);
 
