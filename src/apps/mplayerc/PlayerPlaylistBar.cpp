@@ -896,27 +896,22 @@ void CPlayerPlaylistBar::AddItem(std::list<CString>& fns, CSubtitleItemList* sub
 	m_pl.AddTail(pli);
 }
 
-static bool SearchFiles(CString mask, std::list<CString>& sl, bool bSingleElement)
+static bool SearchFiles(CString path, std::list<CString>& sl, bool bSingleElement)
 {
-	if (mask.Find(L"://") >= 0) {
+	if (path.Find(L"://") >= 0
+			|| !::PathIsDirectoryW(path)) {
 		return false;
 	}
 
-	mask.Trim();
 	sl.clear();
 
 	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
 
-	WIN32_FILE_ATTRIBUTE_DATA fad;
-	const bool fFilterKnownExts = (GetFileAttributesEx(mask, GetFileExInfoStandard, &fad)
-								   && (fad.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
-	if (fFilterKnownExts) {
-		mask = CString(mask).TrimRight(L"\\/") + L"\\*.*";
-	}
+	path.Trim();
+	path = AddSlash(path);
+	const CString mask = path + L"*.*";
 
 	{
-		const CString dir = mask.Left(std::max(mask.ReverseFind('\\'), mask.ReverseFind('/')) + 1);
-
 		WIN32_FIND_DATAW fd;
 		HANDLE h = FindFirstFileW(mask, &fd);
 		if (h != INVALID_HANDLE_VALUE) {
@@ -924,18 +919,18 @@ static bool SearchFiles(CString mask, std::list<CString>& sl, bool bSingleElemen
 				if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 					if (bSingleElement
 							&& (_wcsicmp(fd.cFileName, L"VIDEO_TS") == 0 || _wcsicmp(fd.cFileName, L"BDMV") == 0)) {
-						SearchFiles(dir + fd.cFileName, sl, bSingleElement);
+						SearchFiles(path + fd.cFileName, sl, bSingleElement);
 					}
 					continue;
 				}
 
 				const CString ext = GetFileExt(fd.cFileName).MakeLower();
-				if (!fFilterKnownExts || mf.FindExt(ext)) {
+				if (mf.FindExt(ext)) {
 					for (size_t i = 0; i < mf.GetCount(); i++) {
 						CMediaFormatCategory& mfc = mf.GetAt(i);
 						/* playlist files are skipped when playing the contents of an entire directory */
 						if (mfc.FindExt(ext) && mf[i].GetFileType() != TPlaylist) {
-							sl.push_back(dir + fd.cFileName);
+							sl.push_back(path + fd.cFileName);
 							break;
 						}
 					}
