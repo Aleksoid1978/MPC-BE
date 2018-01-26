@@ -229,5 +229,8 @@
     <ClInclude Include="DXVAState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="std_helper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
