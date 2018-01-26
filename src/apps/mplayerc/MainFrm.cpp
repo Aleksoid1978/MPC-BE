@@ -14017,7 +14017,9 @@ void CMainFrame::CloseMediaPrivate()
 	DLog(L"CMainFrame::CloseMediaPrivate() : end");
 }
 
-static void RecurseAddDir(CString path, std::list<CString>& sl)
+#define Check_BD_DVD_Path(path) (::PathFileExistsW(path + L"index.bdmv") || ::PathFileExistsW(path + L"VIDEO_TS.IFO"))
+
+static void RecurseAddDir(const CString& path, std::list<CString>& sl)
 {
 	WIN32_FIND_DATAW fd = {0};
 
@@ -14030,6 +14032,9 @@ static void RecurseAddDir(CString path, std::list<CString>& sl)
 				const CString fullpath = AddSlash(path + f_name);
 
 				sl.push_back(fullpath);
+				if (Check_BD_DVD_Path(fullpath)) {
+					break;
+				}
 				RecurseAddDir(fullpath, sl);
 			} else {
 				continue;
@@ -14042,15 +14047,15 @@ static void RecurseAddDir(CString path, std::list<CString>& sl)
 
 void CMainFrame::ParseDirs(std::list<CString>& sl)
 {
-	for (auto fn : sl) {
+	std::list<CString> tmp(sl);
+	for (auto fn : tmp) {
 		if (::PathIsDirectoryW(fn) && ::PathFileExistsW(fn)) {
 			fn = AddSlash(fn);
-
-			if (CheckBD(fn) || CheckDVD(fn)) {
+			if (Check_BD_DVD_Path(fn)) {
 				continue;
 			}
 
-			RecurseAddDir(fn, sl);
+			RecurseAddDir(AddSlash(fn), sl);
 		}
 	}
 }
@@ -17794,7 +17799,7 @@ void CMainFrame::OnFileOpenDirectory()
 
 		std::list<CString> sl;
 		sl.push_back(path);
-		if (recur && !(CheckBD(path) || CheckDVD(path))) {
+		if (recur) {
 			RecurseAddDir(path, sl);
 		}
 
