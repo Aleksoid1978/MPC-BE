@@ -908,38 +908,30 @@ static bool SearchFiles(CString mask, std::list<CString>& sl)
 	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
 
 	WIN32_FILE_ATTRIBUTE_DATA fad;
-	bool fFilterKnownExts = (GetFileAttributesEx(mask, GetFileExInfoStandard, &fad)
-							 && (fad.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
+	const bool fFilterKnownExts = (GetFileAttributesEx(mask, GetFileExInfoStandard, &fad)
+								   && (fad.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
 	if (fFilterKnownExts) {
 		mask = CString(mask).TrimRight(L"\\/") + L"\\*.*";
 	}
 
 	{
-		CString dir = mask.Left(std::max(mask.ReverseFind('\\'), mask.ReverseFind('/'))+1);
+		const CString dir = mask.Left(std::max(mask.ReverseFind('\\'), mask.ReverseFind('/')) + 1);
 
 		WIN32_FIND_DATAW fd;
 		HANDLE h = FindFirstFileW(mask, &fd);
 		if (h != INVALID_HANDLE_VALUE) {
 			do {
 				if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-					if (CString(fd.cFileName).MakeUpper() == L"VIDEO_TS"
-						|| CString(fd.cFileName).MakeUpper() == L"BDMV") {
-						SearchFiles(dir + fd.cFileName, sl);
-					}
 					continue;
 				}
 
-				CString fn = fd.cFileName;
-				//CString ext = fn.Mid(fn.ReverseFind('.')+1).MakeLower();
-				CString ext = fn.Mid(fn.ReverseFind('.')).MakeLower();
-				CString path = dir + fd.cFileName;
-
+				const CString ext = GetFileExt(fd.cFileName).MakeLower();
 				if (!fFilterKnownExts || mf.FindExt(ext)) {
 					for (size_t i = 0; i < mf.GetCount(); i++) {
 						CMediaFormatCategory& mfc = mf.GetAt(i);
 						/* playlist files are skipped when playing the contents of an entire directory */
 						if (mfc.FindExt(ext) && mf[i].GetFileType() != TPlaylist) {
-							sl.push_back(path);
+							sl.push_back(dir + fd.cFileName);
 							break;
 						}
 					}
@@ -956,6 +948,10 @@ static bool SearchFiles(CString mask, std::list<CString>& sl)
 			}
 		}
 	}
+
+	sl.sort([](const CString& a, const CString& b) {
+		return (StrCmpLogicalW(a, b) < 0);
+	});
 
 	return(sl.size() > 1
 		   || sl.size() == 1 && sl.front().CompareNoCase(mask)
