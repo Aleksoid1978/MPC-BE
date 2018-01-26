@@ -45,6 +45,19 @@ CAutoPtr<CPacket> CPacketQueue::Remove()
 	return p;
 }
 
+void CPacketQueue::RemoveSafe(CAutoPtr<CPacket>& p, size_t& count)
+{
+	std::unique_lock<std::mutex> lock(m_mutex);
+	count = size();
+
+	if (count) {
+		p = front(); pop_front();
+		if (p) {
+			m_size -= p->GetCount();
+		}
+	}
+}
+
 void CPacketQueue::RemoveAll()
 {
 	std::unique_lock<std::mutex> lock(m_mutex);

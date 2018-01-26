@@ -56,6 +56,7 @@ class CPacketQueue : protected std::deque<CAutoPtr<CPacket>>
 public:
 	void Add(CAutoPtr<CPacket> p);
 	CAutoPtr<CPacket> Remove();
+	void RemoveSafe(CAutoPtr<CPacket>& p, size_t& count);
 	void RemoveAll();
 	const size_t GetCount();
 	const size_t GetSize();

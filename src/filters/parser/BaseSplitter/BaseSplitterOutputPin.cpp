@@ -307,12 +307,10 @@ DWORD CBaseSplitterOutputPin::ThreadProc()
 			return 0;
 		}
 
-		int cnt = 0;
+		size_t cnt = 0;
 		do {
 			CAutoPtr<CPacket> p;
-			if (cnt = m_queue.GetCount()) {
-				p = m_queue.Remove();
-			}
+			m_queue.RemoveSafe(p, cnt);
 
 			if (S_OK == m_hrDeliver && cnt > 0) {
 				ASSERT(!m_fFlushing);
@@ -333,7 +331,7 @@ DWORD CBaseSplitterOutputPin::ThreadProc()
 					break;
 				}
 			}
-		} while (--cnt > 0);
+		} while (cnt > 1);
 	}
 }
 
