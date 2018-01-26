@@ -14042,99 +14042,83 @@ static void RecurseAddDir(CString path, std::list<CString>& sl)
 
 void CMainFrame::ParseDirs(std::list<CString>& sl)
 {
-	for (CString fn : sl) {
-		WIN32_FIND_DATAW fd = {0};
-		HANDLE hFind = FindFirstFileW(fn, &fd);
-		if (hFind != INVALID_HANDLE_VALUE) {
-			if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-				fn = AddSlash(fn);
+	for (auto fn : sl) {
+		if (::PathIsDirectoryW(fn) && ::PathFileExistsW(fn)) {
+			fn = AddSlash(fn);
 
-				if (CheckBD(fn) || CheckDVD(fn)) {
-					continue;
-				}
-
-				RecurseAddDir(fn, sl);
+			if (CheckBD(fn) || CheckDVD(fn)) {
+				continue;
 			}
 
-			FindClose(hFind);
+			RecurseAddDir(fn, sl);
 		}
 	}
 }
 
-int CMainFrame::SearchInDir(bool DirForward)
+int CMainFrame::SearchInDir(const bool& bForward)
 {
-	// Use CStringElementTraitsI so that the search is case insensitive
-	CAtlList<CString, CStringElementTraitsI<CString>> sl;
-
-	std::vector<CStringW> f_array;
+	std::list<CString> sl;
 
 	CAppSettings& s = AfxGetAppSettings();
 	CMediaFormats& mf = s.m_Formats;
 
-	CString dir		= AddSlash(GetFolderOnly(m_LastOpenFile));
-	CString mask	= dir + L"*.*";
+	const CString dir  = AddSlash(GetFolderOnly(m_LastOpenFile));
+	const CString mask = dir + L"*.*";
 	WIN32_FIND_DATAW fd;
 	HANDLE h = FindFirstFileW(mask, &fd);
 	if (h != INVALID_HANDLE_VALUE) {
 		do {
-			if (fd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) {
+			if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 				continue;
 			}
 
-			CString fn		= fd.cFileName;
-			CString ext		= fn.Mid(fn.ReverseFind('.')).MakeLower();
-			CString path	= dir + fd.cFileName;
-
-			if (mf.FindExt(ext) && mf.GetCount() > 0) {
-				f_array.emplace_back(path);
+			const CString ext = GetFileExt(fd.cFileName).MakeLower();
+			if (mf.FindExt(ext)) {
+				sl.emplace_back(dir + fd.cFileName);
 			}
 		} while (FindNextFileW(h, &fd));
 		FindClose(h);
 	}
 
-	if (f_array.size() == 1) {
+	if (sl.size() == 1) {
 		return 1;
 	}
 
-	std::sort(f_array.begin(), f_array.end(), [](const CStringW& a, const CStringW& b) {
+	sl.sort([](const CString& a, const CString& b) {
 		return (StrCmpLogicalW(a, b) < 0);
 	});
 
-	for (size_t i = 0; i < f_array.size(); i++) {
-		sl.AddTail(f_array[i]);
-	}
-
-	POSITION Pos = sl.Find(m_LastOpenFile);
-	if (Pos == nullptr) {
+	auto it = std::find(sl.cbegin(), sl.cend(), m_LastOpenFile);
+	if (it == sl.cend()) {
 		return 0;
 	}
 
-	if (DirForward) {
-		if (Pos == sl.GetTailPosition()) {
+	if (bForward) {
+		if (it == std::prev(sl.cend())) {
 			if (s.fNextInDirAfterPlaybackLooped) {
-				Pos = sl.GetHeadPosition();
+				it = sl.cbegin();
 			} else {
 				return 0;
 			}
 		} else {
-			sl.GetNext(Pos);
+			it++;
 		}
 	} else {
-		if (Pos == sl.GetHeadPosition()) {
+		if (it == sl.cbegin()) {
 			if (s.fNextInDirAfterPlaybackLooped) {
-				Pos = sl.GetTailPosition();
+				it = sl.cend();
 			} else {
 				return 0;
 			}
 		} else {
-			sl.GetPrev(Pos);
+			it--;
 		}
 	}
 
-	m_wndPlaylistBar.Open(sl.GetAt(Pos));
+	m_wndPlaylistBar.Open(*it);
 	OpenCurPlaylistItem();
 
-	return (sl.GetCount());
+	return sl.size();
 }
 
 void CMainFrame::DoTunerScan(TunerScanData* pTSD)
