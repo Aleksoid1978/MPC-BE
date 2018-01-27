@@ -943,11 +943,9 @@ void COSD::DrawWnd()
 	if (m_strMessage.Find(L'\n') == -1) {
 		messageWidth = temp_DC.GetTextExtent(m_strMessage).cx;
 	} else {
-		CAtlList<CString> args;
-		ExplodeEsc(m_strMessage, args, L'\n');
-		POSITION pos = args.GetHeadPosition();
-		while (pos) {
-			const CString& str = args.GetNext(pos);
+		std::list<CString> strings;
+		ExplodeEsc(m_strMessage, strings, L'\n');
+		for (const auto& str : strings) {
 			messageWidth = std::max(messageWidth, temp_DC.GetTextExtent(str).cx);
 		}
 	}
@@ -973,7 +971,7 @@ void COSD::DrawWnd()
 	temp_BM.DeleteObject();
 	temp_DC.DeleteDC();
 
-	CRect wr(m_MainWndRect.left + 10 + rectMessages.left, m_MainWndRect.top + 10, rectMessages.right, rectMessages.Height());
+	CRect wr(m_MainWndRect.left + 10 + rectMessages.left, m_MainWndRect.top + 10, rectMessages.Width() - rectMessages.left, rectMessages.Height());
 	if (SysVersion::IsWin8orLater()) {
 		wr.left	-= m_MainWndRect.left;
 		wr.top	-= m_MainWndRect.top;
