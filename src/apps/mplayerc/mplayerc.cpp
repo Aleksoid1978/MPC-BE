@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -776,9 +776,9 @@ void CMPlayerCApp::ShowCmdlnSwitches() const
 	CString s;
 
 	if (m_s.nCLSwitches&CLSW_UNRECOGNIZEDSWITCH) {
-		std::list<CString> sl;
+		CAtlList<CString> sl;
 		for (int i = 0; i < __argc; i++) {
-			sl.emplace_back(__wargv[i]);
+			sl.AddTail(__targv[i]);
 		}
 		s += ResStr(IDS_UNKNOWN_SWITCH) + Implode(sl, ' ') + L"\n\n";
 	}

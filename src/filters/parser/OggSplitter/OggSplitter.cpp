@@ -689,12 +689,12 @@ void COggSplitterOutputPin::AddComment(BYTE* p, int len)
 CStringW COggSplitterOutputPin::GetComment(CStringW key)
 {
 	key.MakeUpper();
-	std::list<CStringW> sl;
+	CAtlList<CStringW> sl;
 	POSITION pos = m_pComments.GetHeadPosition();
 	while (pos) {
 		CComment* p = m_pComments.GetNext(pos);
 		if (key == p->m_key) {
-			sl.push_back(p->m_value);
+			sl.AddTail(p->m_value);
 		}
 	}
 	return Implode(sl, ';');
