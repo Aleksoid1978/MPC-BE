@@ -2512,18 +2512,18 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 			}
 
 			if (m_pBI) {
-				CAtlList<CString> sl;
+				std::list<CString> sl;
 
 				for (int i = 0, j = m_pBI->GetCount(); i < j; i++) {
 					int samples, size;
 					if (S_OK == m_pBI->GetStatus(i, samples, size)) {
 						CString str;
 						str.Format(L"[%d]: %03d/%d KB", i, samples, size / 1024);
-						sl.AddTail(str);
+						sl.push_back(str);
 					}
 				}
 
-				if (!sl.IsEmpty()) {
+				if (!sl.empty()) {
 					CString str;
 					str.Format(L"%s (p%d)", Implode(sl, ' '), m_pBI->GetPriority());
 
@@ -2542,7 +2542,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				EndEnumPins;
 
 				if (!pBRIs.IsEmpty()) {
-					CAtlList<CString> sl;
+					std::list<CString> sl;
 
 					POSITION pos = pBRIs.GetHeadPosition();
 					for (int i = 0; pos; i++) {
@@ -2561,10 +2561,10 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 						} else {
 							str.Format(L"[%d]: %u Kb/s", i, avg);
 						}
-						sl.AddTail(str);
+						sl.push_back(str);
 					}
 
-					if (!sl.IsEmpty()) {
+					if (!sl.empty()) {
 						m_wndStatsBar.SetLine(ResStr(IDS_STATSBAR_BITRATE), Implode(sl, ' ') + ResStr(IDS_STATSBAR_BITRATE_AVG_CUR));
 					}
 

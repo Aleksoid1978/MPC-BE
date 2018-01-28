@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -255,8 +255,8 @@ LRESULT CPPageFileInfoDetails::OnSetPageFocus(WPARAM wParam, LPARAM lParam)
 
 void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 {
-	CAtlList<CString> videoStreams;
-	CAtlList<CString> otherStreams;
+	std::list<CString> videoStreams;
+	std::list<CString> otherStreams;
 
 	BeginEnumFilters(pFG, pEF, pBF) {
 		CComPtr<IBaseFilter> pUSBF = GetUpStreamFilter(pBF);
@@ -297,9 +297,9 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 							str.AppendFormat(L" [%s]", pszName);
 						}
 						if (mt.majortype == MEDIATYPE_Video || mt.subtype == MEDIASUBTYPE_MPEG2_VIDEO) {
-							videoStreams.AddTail(str);
+							videoStreams.push_back(str);
 						} else if (!pDVDI) {
-							otherStreams.AddTail(str);
+							otherStreams.push_back(str);
 						}
 
 						bUsePins = FALSE;
@@ -323,9 +323,9 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 				if (!str.IsEmpty()) {
 					str.AppendFormat(L" [%s]", GetPinName(pPin));
 					if (mt.majortype == MEDIATYPE_Video || mt.subtype == MEDIASUBTYPE_MPEG2_VIDEO) {
-						videoStreams.AddTail(str);
+						videoStreams.push_back(str);
 					} else if (!pDVDI) {
-						otherStreams.AddTail(str);
+						otherStreams.push_back(str);
 					}
 				}
 
@@ -394,7 +394,7 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 						}
 					}
 
-					otherStreams.AddTail(L"Audio: " + str);
+					otherStreams.push_back(L"Audio: " + str);
 				}
 			}
 		}
@@ -456,7 +456,7 @@ void CPPageFileInfoDetails::InitEncoding(IFilterGraph* pFG, IDvdInfo2* pDVDI)
 						}
 					}
 
-					otherStreams.AddTail(L"Subtitle: " + str + L" [DVD Subtitles]");
+					otherStreams.push_back(L"Subtitle: " + str + L" [DVD Subtitles]");
 				}
 			}
 		}

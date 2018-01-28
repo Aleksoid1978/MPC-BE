@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,14 +33,14 @@ CMediaFormatCategory::CMediaFormatCategory()
 {
 }
 
-CMediaFormatCategory::CMediaFormatCategory(CString label, CString description, CAtlList<CString>& exts, filetype_t filetype, CString specreqnote)
+CMediaFormatCategory::CMediaFormatCategory(CString label, CString description, std::list<CString>& exts, filetype_t filetype, CString specreqnote)
 	: m_label(label)
 	, m_description(description)
 	, m_specreqnote(specreqnote)
 	, m_filetype(filetype)
 {
-	m_exts.AddTailList(&exts);
-	m_backupexts.AddTailList(&m_exts);
+	m_exts = exts;
+	m_backupexts = m_exts;
 }
 
 CMediaFormatCategory::CMediaFormatCategory(CString label, CString description, CString exts, filetype_t filetype, CString specreqnote)
@@ -50,12 +50,12 @@ CMediaFormatCategory::CMediaFormatCategory(CString label, CString description, C
 	, m_filetype(filetype)
 {
 	ExplodeMin(exts, m_exts, ' ');
-	POSITION pos = m_exts.GetHeadPosition();
-	while (pos) {
-		m_exts.GetNext(pos).TrimLeft('.');
+
+	for (auto& ext : m_exts) {
+		ext.TrimLeft('.');
 	}
 
-	m_backupexts.AddTailList(&m_exts);
+	m_backupexts = m_exts;
 }
 
 CMediaFormatCategory::~CMediaFormatCategory()
@@ -79,14 +79,12 @@ CMediaFormatCategory::CMediaFormatCategory(const CMediaFormatCategory& mfc)
 CMediaFormatCategory& CMediaFormatCategory::operator = (const CMediaFormatCategory& mfc)
 {
 	if (this != &mfc) {
-		m_label			= mfc.m_label;
-		m_description	= mfc.m_description;
-		m_specreqnote	= mfc.m_specreqnote;
-		m_filetype		= mfc.m_filetype;
-		m_exts.RemoveAll();
-		m_exts.AddTailList(&mfc.m_exts);
-		m_backupexts.RemoveAll();
-		m_backupexts.AddTailList(&mfc.m_backupexts);
+		m_label       = mfc.m_label;
+		m_description = mfc.m_description;
+		m_specreqnote = mfc.m_specreqnote;
+		m_filetype    = mfc.m_filetype;
+		m_exts        = mfc.m_exts;
+		m_backupexts  = mfc.m_backupexts;
 	}
 
 	return *this;
@@ -94,28 +92,25 @@ CMediaFormatCategory& CMediaFormatCategory::operator = (const CMediaFormatCatego
 
 void CMediaFormatCategory::RestoreDefaultExts()
 {
-	m_exts.RemoveAll();
-	m_exts.AddTailList(&m_backupexts);
+	m_exts = m_backupexts;
 }
 
-void CMediaFormatCategory::SetExts(CAtlList<CString>& exts)
+void CMediaFormatCategory::SetExts(std::list<CString>& exts)
 {
-	m_exts.RemoveAll();
-	m_exts.AddTailList(&exts);
+	m_exts = exts;
 }
 
 void CMediaFormatCategory::SetExts(CString exts)
 {
-	m_exts.RemoveAll();
+	m_exts.clear();
 	ExplodeMin(exts, m_exts, ' ');
-	POSITION pos = m_exts.GetHeadPosition();
 
-	while (pos) {
-		POSITION cur = pos;
-		CString& ext = m_exts.GetNext(pos);
+	for (auto it = m_exts.begin(); it != m_exts.end();) {
+		auto cur = it++;
+		CString& ext = *cur;
 
 		if (ext[0] == '\\') {
-			m_exts.RemoveAt(cur);
+			m_exts.erase(cur);
 		} else {
 			ext.TrimLeft('.');
 		}
@@ -125,10 +120,9 @@ void CMediaFormatCategory::SetExts(CString exts)
 CString CMediaFormatCategory::GetFilter()
 {
 	CString filter;
-	POSITION pos = m_exts.GetHeadPosition();
 
-	while (pos) {
-		filter += L"*." + m_exts.GetNext(pos) + L";";
+	for (const auto& ext : m_exts) {
+		filter += L"*." + ext + L";";
 	}
 
 	filter.TrimRight(';'); // cheap...
@@ -145,10 +139,9 @@ CString CMediaFormatCategory::GetExts()
 CString CMediaFormatCategory::GetExtsWithPeriod()
 {
 	CString exts;
-	POSITION pos = m_exts.GetHeadPosition();
 
-	while (pos) {
-		exts += L"." + m_exts.GetNext(pos) + L" ";
+	for (const auto& ext : m_exts) {
+		exts += L"." + ext + L" ";
 	}
 
 	exts.TrimRight(' ');
@@ -159,10 +152,9 @@ CString CMediaFormatCategory::GetExtsWithPeriod()
 CString CMediaFormatCategory::GetBackupExtsWithPeriod()
 {
 	CString exts;
-	POSITION pos = m_backupexts.GetHeadPosition();
 
-	while (pos) {
-		exts += L"." + m_backupexts.GetNext(pos) + L" ";
+	for (const auto& backupext : m_backupexts) {
+		exts += L"." + backupext + L" ";
 	}
 
 	exts.TrimRight(' ');
