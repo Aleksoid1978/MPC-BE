@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -347,22 +347,22 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 
 		if (fHandled) {
 			tmphdr.Replace("\r\n", "\n");
-			std::list<CStringA> hdrlines;
+			CAtlList<CStringA> hdrlines;
 			ExplodeMin(tmphdr, hdrlines, '\n');
-
-			for (auto it = hdrlines.begin(); it != hdrlines.end();) {
-				auto cur = it++;
-				std::list<CStringA> sl;
-				CStringA key = Explode(*cur, sl, ':', 2);
-				if (sl.size() < 2) {
+			POSITION pos = hdrlines.GetHeadPosition();
+			while (pos) {
+				POSITION cur = pos;
+				CAtlList<CStringA> sl;
+				CStringA key = Explode(hdrlines.GetNext(pos), sl, ':', 2);
+				if (sl.GetCount() < 2) {
 					continue;
 				}
 				key.Trim().MakeLower();
 				if (key == "content-type") {
-					mime = sl.back().Trim();
-					hdrlines.erase(cur);
+					mime = sl.GetTail().Trim();
+					hdrlines.RemoveAt(cur);
 				} else if (key == "content-length") {
-					hdrlines.erase(cur);
+					hdrlines.RemoveAt(cur);
 				}
 			}
 			tmphdr = Implode(hdrlines, "\r\n");
@@ -586,26 +586,26 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 	if (lpvEnv) {
 		CString str;
 
-		std::list<CString> env;
+		CAtlList<CString> env;
 		for (LPTSTR lpszVariable = (LPTSTR)lpvEnv; *lpszVariable; lpszVariable += wcslen(lpszVariable)+1)
 			if (lpszVariable != (LPTSTR)lpvEnv) {
-				env.emplace_back(lpszVariable);
+				env.AddTail(lpszVariable);
 			}
 
-		env.emplace_back(L"GATEWAY_INTERFACE=CGI/1.1");
-		env.emplace_back(L"SERVER_SOFTWARE=MPC-BE/6.4.x.y");
-		env.emplace_back(L"SERVER_PROTOCOL=" + pClient->m_ver);
-		env.emplace_back(L"REQUEST_METHOD=" + pClient->m_cmd);
-		env.emplace_back(L"PATH_INFO=" + redir);
-		env.emplace_back(L"PATH_TRANSLATED=" + path);
-		env.emplace_back(L"SCRIPT_NAME=" + redir);
-		env.emplace_back(L"QUERY_STRING=" + pClient->m_query);
+		env.AddTail(L"GATEWAY_INTERFACE=CGI/1.1");
+		env.AddTail(L"SERVER_SOFTWARE=MPC-BE/6.4.x.y");
+		env.AddTail(L"SERVER_PROTOCOL=" + pClient->m_ver);
+		env.AddTail(L"REQUEST_METHOD=" + pClient->m_cmd);
+		env.AddTail(L"PATH_INFO=" + redir);
+		env.AddTail(L"PATH_TRANSLATED=" + path);
+		env.AddTail(L"SCRIPT_NAME=" + redir);
+		env.AddTail(L"QUERY_STRING=" + pClient->m_query);
 
 		if (pClient->m_hdrlines.Lookup(L"content-type", str)) {
-			env.emplace_back(L"CONTENT_TYPE=" + str);
+			env.AddTail(L"CONTENT_TYPE=" + str);
 		}
 		if (pClient->m_hdrlines.Lookup(L"content-length", str)) {
-			env.emplace_back(L"CONTENT_LENGTH=" + str);
+			env.AddTail(L"CONTENT_LENGTH=" + str);
 		}
 
 		POSITION pos = pClient->m_hdrlines.GetStartPosition();
@@ -614,7 +614,7 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 			CString value = pClient->m_hdrlines.GetNextValue(pos);
 			key.Replace(L"-", L"_");
 			key.MakeUpper();
-			env.emplace_back(L"HTTP_" + key + L"=" + value);
+			env.AddTail(L"HTTP_" + key + L"=" + value);
 		}
 
 		CString name;
@@ -622,18 +622,18 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 
 		if (pClient->GetPeerName(name, port)) {
 			str.Format(L"%u", port);
-			env.emplace_back(L"REMOTE_ADDR=" + name);
-			env.emplace_back(L"REMOTE_HOST=" + name);
-			env.emplace_back(L"REMOTE_PORT=" + str);
+			env.AddTail(L"REMOTE_ADDR=" + name);
+			env.AddTail(L"REMOTE_HOST=" + name);
+			env.AddTail(L"REMOTE_PORT=" + str);
 		}
 
 		if (pClient->GetSockName(name, port)) {
 			str.Format(L"%u", port);
-			env.emplace_back(L"SERVER_NAME=" + name);
-			env.emplace_back(L"SERVER_PORT=" + str);
+			env.AddTail(L"SERVER_NAME=" + name);
+			env.AddTail(L"SERVER_PORT=" + str);
 		}
 
-		env.emplace_back(L"\0");
+		env.AddTail(L"\0");
 
 		str = Implode(env, '\0');
 		envstr = CStringA(str, str.GetLength());

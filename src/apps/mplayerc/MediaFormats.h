@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,13 +33,13 @@ class CMediaFormatCategory
 {
 protected:
 	CString m_label, m_description, m_specreqnote;
-	std::list<CString> m_exts, m_backupexts;
+	CAtlList<CString> m_exts, m_backupexts;
 	filetype_t	m_filetype;
 
 public:
 	CMediaFormatCategory();
 	CMediaFormatCategory(
-		CString label, CString description, std::list<CString>& exts, filetype_t filetype = TVideo,
+		CString label, CString description, CAtlList<CString>& exts, filetype_t filetype = TVideo,
 		CString specreqnote = L"");
 	CMediaFormatCategory(
 		CString label, CString description, CString exts, filetype_t filetype = TVideo,
@@ -52,11 +52,11 @@ public:
 	CMediaFormatCategory& operator = (const CMediaFormatCategory& mfc);
 
 	void RestoreDefaultExts();
-	void SetExts(std::list<CString>& exts);
+	void SetExts(CAtlList<CString>& exts);
 	void SetExts(CString exts);
 
 	bool FindExt(CString ext) {
-		return std::find(m_exts.cbegin(), m_exts.cend(), ext.TrimLeft('.').MakeLower()) != m_exts.cend();
+		return m_exts.Find(ext.TrimLeft('.').MakeLower()) != nullptr;
 	}
 
 	CString GetLabel() const {
