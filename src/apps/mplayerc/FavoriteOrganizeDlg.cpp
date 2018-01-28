@@ -25,8 +25,6 @@
 #include "FavoriteOrganizeDlg.h"
 #include "../../DSUtil/std_helper.h"
 
-#define GET_BY_INDEX(arg, index) (arg.GetAt(arg.FindIndex(index)))
-
 // CFavoriteOrganizeDlg dialog
 
 //IMPLEMENT_DYNAMIC(CFavoriteOrganizeDlg, CResizableDialog)
@@ -54,10 +52,11 @@ void CFavoriteOrganizeDlg::SetupList(bool fSave)
 				break;
 			}
 
-			CAtlList<CString> args;
+			std::list<CString> args;
 			ExplodeEsc(*it, args, L';');
-			args.RemoveHeadNoReturn();
-			args.AddHead(m_list.GetItemText(j, 0));
+			args.pop_front();
+			args.push_front(m_list.GetItemText(j, 0));
+
 			sl.push_back(ImplodeEsc(args, L';'));
 		}
 
@@ -227,12 +226,15 @@ void CFavoriteOrganizeDlg::OnEditBnClicked()
 			return;
 		}
 
-		CAtlList<CString> args;
+		std::list<CString> args;
 		ExplodeEsc(*it, args, L';');
+		if (args.size() < 4) {
+			ASSERT(0);
+			return;
+		}
 
-		ASSERT(args.GetCount() >= 4);
-		CString& name = GET_BY_INDEX(args, 0);
-		CString& path = GET_BY_INDEX(args, 3);
+		CString& name = args.front();
+		CString& path = *(std::next(args.begin(), 3));
 
 		CItemPropertiesDlg ipd(name, path);
 		if (ipd.DoModal() == IDOK) {
@@ -465,14 +467,17 @@ void CFavoriteOrganizeDlg::OnLvnGetInfoTipList(NMHDR* pNMHDR, LRESULT* pResult)
 		return;
 	}
 
-	CAtlList<CString> args;
+	std::list<CString> args;
 	ExplodeEsc(*it, args, L';');
+	if (args.size() < 4) {
+		ASSERT(0);
+		return;
+	}
 
-	ASSERT(args.GetCount() >= 4);
-	const CString& path = GET_BY_INDEX(args, 3);
+	const CString& path = *(std::next(args.begin(), 3));
 
 	// Relative to drive value is always third. If less args are available that means it is not included.
-	const int rootLength = (tab == 0 && GET_BY_INDEX(args, 2) != L"0") ? CPath(path).SkipRoot() : 0;
+	const int rootLength = (tab == 0 && *(std::next(args.begin(), 2)) != L"0") ? CPath(path).SkipRoot() : 0;
 
 	StringCchCopyW(pGetInfoTip->pszText, pGetInfoTip->cchTextMax, path.Mid(rootLength));
 	*pResult = 0;
