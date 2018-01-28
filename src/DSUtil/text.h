@@ -189,16 +189,16 @@ T Implode(const std::list<T>& sl, SEP sep)
 }
 
 template<class T, typename SEP>
-T ImplodeEsc(const CAtlList<T>& sl, SEP sep, SEP esc = '\\')
+T ImplodeEsc(const std::list<T>& sl, SEP sep, SEP esc = '\\')
 {
 	T ret;
 	T escsep = T(esc) + T(sep);
-	POSITION pos = sl.GetHeadPosition();
-	while (pos) {
-		T str = sl.GetNext(pos);
+	auto it = sl.begin();
+	while (it != sl.end()) {
+		T str = *it++;
 		str.Replace(T(sep), escsep);
 		ret += str;
-		if (pos) {
+		if (it != sl.end()) {
 			ret += sep;
 		}
 	}
@@ -211,8 +211,6 @@ extern CStringA UrlEncode(CStringA str_in, bool fArg = false);
 extern CStringA UrlDecode(CStringA str_in);
 extern CStringA HtmlSpecialChars(CStringA str, bool bQuotes = false);
 extern DWORD CharSetToCodePage(DWORD dwCharSet);
-extern CAtlList<CString>& MakeLower(CAtlList<CString>& sl);
-extern CAtlList<CString>& MakeUpper(CAtlList<CString>& sl);
 
 void FixFilename(CStringW& str);
 

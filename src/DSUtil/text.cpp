@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -175,24 +175,6 @@ CStringA HtmlSpecialChars(CStringA str, bool bQuotes /*= false*/)
 	return str;
 }
 
-CAtlList<CString>& MakeLower(CAtlList<CString>& sl)
-{
-	POSITION pos = sl.GetHeadPosition();
-	while (pos) {
-		sl.GetNext(pos).MakeLower();
-	}
-	return sl;
-}
-
-CAtlList<CString>& MakeUpper(CAtlList<CString>& sl)
-{
-	POSITION pos = sl.GetHeadPosition();
-	while (pos) {
-		sl.GetNext(pos).MakeUpper();
-	}
-	return sl;
-}
-
 void FixFilename(CStringW& str)
 {
 	str.Trim();
@@ -208,23 +190,29 @@ void FixFilename(CStringW& str)
 			case '*':
 			case '|':
 			case ':':
-				str.SetAt(i, '_');
+				str.GetBuffer()[i] = '_';
 		}
 	}
 
 	CString tmp;
-	// not support the following file names: "con", "con.txt" "con.name.txt". But supported "name.con" and "name.con.txt".
+	// not support the following file names: "con", "con.txt" "con.name.txt". But supported "content" "name.con" and "name.con.txt".
 	if (str.GetLength() == 3 || str.Find('.') == 3) {
 		tmp = str.Left(3).MakeUpper();
 		if (tmp == L"CON" || tmp == L"AUX" || tmp == L"PRN" || tmp == L"NUL") {
-			str = L"___" + str.Mid(3);
+			LPWSTR buffer = str.GetBuffer();
+			buffer[0] = '_';
+			buffer[1] = '_';
+			buffer[2] = '_';
 		}
 	}
-	if (str.GetLength() == 4 || str.Find('.') == 4) {
+	else if (str.GetLength() == 4 || str.Find('.') == 4) {
 		tmp = str.Left(4).MakeUpper();
-		if (tmp == L"COM1" || tmp == L"COM2" || tmp == L"COM3" || tmp == L"COM4" ||
-				tmp == L"LPT1" || tmp == L"LPT2" || tmp == L"LPT3") {
-			str = L"____" + str.Mid(4);
+		if (tmp == L"COM1" || tmp == L"COM2" || tmp == L"COM3" || tmp == L"COM4" || tmp == L"LPT1" || tmp == L"LPT2" || tmp == L"LPT3") {
+			LPWSTR buffer = str.GetBuffer();
+			buffer[0] = '_';
+			buffer[1] = '_';
+			buffer[2] = '_';
+			buffer[3] = '_';
 		}
 	}
 }
