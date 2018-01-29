@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,30 +33,30 @@ class CMediaFormatCategory
 {
 protected:
 	CString m_label, m_description, m_specreqnote;
-	CAtlList<CString> m_exts, m_backupexts;
+	std::list<CString> m_exts, m_backupexts;
 	filetype_t	m_filetype;
 
 public:
 	CMediaFormatCategory();
 	CMediaFormatCategory(
-		CString label, CString description, CAtlList<CString>& exts, filetype_t filetype = TVideo,
-		CString specreqnote = L"");
+		const CString& label, const CString& description, std::list<CString>& exts, const filetype_t& filetype = TVideo,
+		const CString& specreqnote = L"");
 	CMediaFormatCategory(
-		CString label, CString description, CString exts, filetype_t filetype = TVideo,
-		CString specreqnote = L"");
+		const CString& label, const CString& description, const CString& exts, const filetype_t& filetype = TVideo,
+		const CString& specreqnote = L"");
 	virtual ~CMediaFormatCategory();
 
-	void UpdateData(bool fSave);
+	void UpdateData(const bool& bSave);
 
 	CMediaFormatCategory(const CMediaFormatCategory& mfc);
 	CMediaFormatCategory& operator = (const CMediaFormatCategory& mfc);
 
 	void RestoreDefaultExts();
-	void SetExts(CAtlList<CString>& exts);
-	void SetExts(CString exts);
+	void SetExts(std::list<CString>& exts);
+	void SetExts(const CString& exts);
 
-	bool FindExt(CString ext) {
-		return m_exts.Find(ext.TrimLeft('.').MakeLower()) != nullptr;
+	bool FindExt(CString ext) const {
+		return std::find(m_exts.cbegin(), m_exts.cend(), ext.TrimLeft('.').MakeLower()) != m_exts.cend();
 	}
 
 	CString GetLabel() const {
@@ -78,16 +78,16 @@ public:
 	}
 };
 
-class CMediaFormats : public CAtlArray<CMediaFormatCategory>
+class CMediaFormats : public std::vector<CMediaFormatCategory>
 {
 public:
 	CMediaFormats();
 	virtual ~CMediaFormats();
 
-	void UpdateData(bool fSave);
+	void UpdateData(const bool& bSave);
 
-	bool FindExt(CString ext);
-	bool FindAudioExt(CString ext);
+	bool FindExt(const CString& ext);
+	bool FindAudioExt(const CString& ext);
 	CMediaFormatCategory* FindMediaByExt(CString ext);
 
 	void GetFilter(CString& filter, CAtlArray<CString>& mask);

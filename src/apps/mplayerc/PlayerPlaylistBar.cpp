@@ -926,10 +926,9 @@ static bool SearchFiles(CString path, std::list<CString>& sl, bool bSingleElemen
 
 				const CString ext = GetFileExt(fd.cFileName).MakeLower();
 				if (mf.FindExt(ext)) {
-					for (size_t i = 0; i < mf.GetCount(); i++) {
-						CMediaFormatCategory& mfc = mf.GetAt(i);
+					for (auto& mfc : mf) {
 						/* playlist files are skipped when playing the contents of an entire directory */
-						if (mfc.FindExt(ext) && mf[i].GetFileType() != TPlaylist) {
+						if (mfc.FindExt(ext) && mfc.GetFileType() != TPlaylist) {
 							sl.push_back(path + fd.cFileName);
 							break;
 						}

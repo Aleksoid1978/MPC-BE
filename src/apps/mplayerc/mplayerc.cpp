@@ -1508,16 +1508,17 @@ BOOL CMPlayerCApp::InitInstance()
 			CMediaFormats& mf = m_s.m_Formats;
 			mf.UpdateData(false);
 
-			for (unsigned int i = 0; i < mf.GetCount(); i++) {
-				filetype_t filetype = mf[i].GetFileType();
+			
+			for (auto& mfc : mf) {
+				filetype_t filetype = mfc.GetFileType();
 
 				if ((m_s.nCLSwitches & CLSW_REGEXTVID) && filetype == TVideo
 						|| (m_s.nCLSwitches & CLSW_REGEXTAUD) && filetype == TAudio
 						|| (m_s.nCLSwitches & CLSW_REGEXTPL) && filetype == TPlaylist) {
 					int j = 0;
-					CString str = mf[i].GetExtsWithPeriod();
+					CString str = mfc.GetExtsWithPeriod();
 					for (CString ext = str.Tokenize(L" ", j); !ext.IsEmpty(); ext = str.Tokenize(L" ", j)) {
-						CPPageFormats::RegisterExt(ext, mf[i].GetDescription(), filetype);
+						CPPageFormats::RegisterExt(ext, mfc.GetDescription(), filetype);
 					}
 				}
 			}
@@ -1548,9 +1549,9 @@ BOOL CMPlayerCApp::InitInstance()
 			CMediaFormats& mf = m_s.m_Formats;
 			mf.UpdateData(false);
 
-			for (unsigned int i = 0; i < mf.GetCount(); i++) {
+			for (auto& mfc : mf) {
 				int j = 0;
-				CString str = mf[i].GetExtsWithPeriod();
+				const CString str = mfc.GetExtsWithPeriod();
 				for (CString ext = str.Tokenize(L" ", j); !ext.IsEmpty(); ext = str.Tokenize(L" ", j)) {
 					CPPageFormats::UnRegisterExt(ext);
 				}

@@ -1641,8 +1641,7 @@ engine_t CAppSettings::GetFileEngine(CString path)
 	CString ext = CPath(path).GetExtension().MakeLower();
 
 	if (!ext.IsEmpty()) {
-		for (size_t i = 0; i < m_Formats.GetCount(); i++) {
-			CMediaFormatCategory& mfc = m_Formats.GetAt(i);
+		for (auto& mfc : m_Formats) {
 			if (mfc.GetLabel() == L"swf") {
 				if (mfc.FindExt(ext)) {
 					return ShockWave;
