@@ -365,9 +365,9 @@ HRESULT CPPageFormats::RegisterUI()
 {
 	int nRegisteredExtCount = 0;
 	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
-	for (size_t i = 0; i < mf.GetCount(); i++) {
+	for (auto& mfc : mf) {
 		int j = 0;
-		const CString str = mf[i].GetExtsWithPeriod();
+		const CString str = mfc.GetExtsWithPeriod();
 		for (CString ext = str.Tokenize(L" ", j); !ext.IsEmpty(); ext = str.Tokenize(L" ", j)) {
 			if (IsRegistered(ext)) {
 				nRegisteredExtCount++;
@@ -680,12 +680,15 @@ BOOL CPPageFormats::OnInitDialog()
 
 	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
 	mf.UpdateData(FALSE);
-	for (int i = 0; i < (int)mf.GetCount(); i++) {
+	int i = 0;
+	for (auto& mfc : mf) {
 		CString label;
-		label.Format (L"%s (%s)", mf[i].GetDescription(), mf[i].GetExts());
+		label.Format (L"%s (%s)", mfc.GetDescription(), mfc.GetExts());
 
 		int iItem = m_list.InsertItem(i, label);
 		m_list.SetItemData(iItem, i);
+
+		i++;
 	}
 
 	m_list.SetColumnWidth(COL_CATEGORY, LVSCW_AUTOSIZE);

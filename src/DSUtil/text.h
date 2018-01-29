@@ -161,20 +161,6 @@ T ExplodeEsc(T str,std::list<T>& sl, SEP sep, size_t limit = 0, SEP esc = '\\')
 }
 
 template<class T, typename SEP>
-T Implode(const CAtlList<T>& sl, SEP sep)
-{
-	T ret;
-	POSITION pos = sl.GetHeadPosition();
-	while (pos) {
-		ret += sl.GetNext(pos);
-		if (pos) {
-			ret += sep;
-		}
-	}
-	return ret;
-}
-
-template<class T, typename SEP>
 T Implode(const std::list<T>& sl, SEP sep)
 {
 	T ret;

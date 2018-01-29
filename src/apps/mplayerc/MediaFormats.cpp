@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,38 +33,38 @@ CMediaFormatCategory::CMediaFormatCategory()
 {
 }
 
-CMediaFormatCategory::CMediaFormatCategory(CString label, CString description, CAtlList<CString>& exts, filetype_t filetype, CString specreqnote)
+CMediaFormatCategory::CMediaFormatCategory(const CString& label, const CString& description, std::list<CString>& exts, const filetype_t& filetype, const CString& specreqnote)
 	: m_label(label)
 	, m_description(description)
 	, m_specreqnote(specreqnote)
 	, m_filetype(filetype)
 {
-	m_exts.AddTailList(&exts);
-	m_backupexts.AddTailList(&m_exts);
+	m_exts = exts;
+	m_backupexts = m_exts;
 }
 
-CMediaFormatCategory::CMediaFormatCategory(CString label, CString description, CString exts, filetype_t filetype, CString specreqnote)
+CMediaFormatCategory::CMediaFormatCategory(const CString& label, const CString& description, const CString& exts, const filetype_t& filetype, const CString& specreqnote)
 	: m_label(label)
 	, m_description(description)
 	, m_specreqnote(specreqnote)
 	, m_filetype(filetype)
 {
 	ExplodeMin(exts, m_exts, ' ');
-	POSITION pos = m_exts.GetHeadPosition();
-	while (pos) {
-		m_exts.GetNext(pos).TrimLeft('.');
+
+	for (auto& ext : m_exts) {
+		ext.TrimLeft('.');
 	}
 
-	m_backupexts.AddTailList(&m_exts);
+	m_backupexts = m_exts;
 }
 
 CMediaFormatCategory::~CMediaFormatCategory()
 {
 }
 
-void CMediaFormatCategory::UpdateData(bool fSave)
+void CMediaFormatCategory::UpdateData(const bool& bSave)
 {
-	if (fSave) {
+	if (bSave) {
 		AfxGetMyApp()->WriteProfileString(IDS_R_FILEFORMATS, m_label, GetExts());
 	} else {
 		SetExts(AfxGetMyApp()->GetProfileString(IDS_R_FILEFORMATS, m_label, GetExts()));
@@ -79,14 +79,12 @@ CMediaFormatCategory::CMediaFormatCategory(const CMediaFormatCategory& mfc)
 CMediaFormatCategory& CMediaFormatCategory::operator = (const CMediaFormatCategory& mfc)
 {
 	if (this != &mfc) {
-		m_label			= mfc.m_label;
-		m_description	= mfc.m_description;
-		m_specreqnote	= mfc.m_specreqnote;
-		m_filetype		= mfc.m_filetype;
-		m_exts.RemoveAll();
-		m_exts.AddTailList(&mfc.m_exts);
-		m_backupexts.RemoveAll();
-		m_backupexts.AddTailList(&mfc.m_backupexts);
+		m_label       = mfc.m_label;
+		m_description = mfc.m_description;
+		m_specreqnote = mfc.m_specreqnote;
+		m_filetype    = mfc.m_filetype;
+		m_exts        = mfc.m_exts;
+		m_backupexts  = mfc.m_backupexts;
 	}
 
 	return *this;
@@ -94,28 +92,25 @@ CMediaFormatCategory& CMediaFormatCategory::operator = (const CMediaFormatCatego
 
 void CMediaFormatCategory::RestoreDefaultExts()
 {
-	m_exts.RemoveAll();
-	m_exts.AddTailList(&m_backupexts);
+	m_exts = m_backupexts;
 }
 
-void CMediaFormatCategory::SetExts(CAtlList<CString>& exts)
+void CMediaFormatCategory::SetExts(std::list<CString>& exts)
 {
-	m_exts.RemoveAll();
-	m_exts.AddTailList(&exts);
+	m_exts = exts;
 }
 
-void CMediaFormatCategory::SetExts(CString exts)
+void CMediaFormatCategory::SetExts(const CString& exts)
 {
-	m_exts.RemoveAll();
+	m_exts.clear();
 	ExplodeMin(exts, m_exts, ' ');
-	POSITION pos = m_exts.GetHeadPosition();
 
-	while (pos) {
-		POSITION cur = pos;
-		CString& ext = m_exts.GetNext(pos);
+	for (auto it = m_exts.begin(); it != m_exts.end();) {
+		auto cur = it++;
+		CString& ext = *cur;
 
 		if (ext[0] == '\\') {
-			m_exts.RemoveAt(cur);
+			m_exts.erase(cur);
 		} else {
 			ext.TrimLeft('.');
 		}
@@ -125,10 +120,9 @@ void CMediaFormatCategory::SetExts(CString exts)
 CString CMediaFormatCategory::GetFilter()
 {
 	CString filter;
-	POSITION pos = m_exts.GetHeadPosition();
 
-	while (pos) {
-		filter += L"*." + m_exts.GetNext(pos) + L";";
+	for (const auto& ext : m_exts) {
+		filter += L"*." + ext + L";";
 	}
 
 	filter.TrimRight(';'); // cheap...
@@ -145,10 +139,9 @@ CString CMediaFormatCategory::GetExts()
 CString CMediaFormatCategory::GetExtsWithPeriod()
 {
 	CString exts;
-	POSITION pos = m_exts.GetHeadPosition();
 
-	while (pos) {
-		exts += L"." + m_exts.GetNext(pos) + L" ";
+	for (const auto& ext : m_exts) {
+		exts += L"." + ext + L" ";
 	}
 
 	exts.TrimRight(' ');
@@ -159,10 +152,9 @@ CString CMediaFormatCategory::GetExtsWithPeriod()
 CString CMediaFormatCategory::GetBackupExtsWithPeriod()
 {
 	CString exts;
-	POSITION pos = m_backupexts.GetHeadPosition();
 
-	while (pos) {
-		exts += L"." + m_backupexts.GetNext(pos) + L" ";
+	for (const auto& backupext : m_backupexts) {
+		exts += L"." + backupext + L" ";
 	}
 
 	exts.TrimRight(' ');
@@ -182,14 +174,15 @@ CMediaFormats::~CMediaFormats()
 {
 }
 
-void CMediaFormats::UpdateData(bool fSave)
+void CMediaFormats::UpdateData(const bool& bSave)
 {
-	if (fSave) {
+	if (bSave) {
 		AfxGetMyApp()->WriteProfileString(IDS_R_FILEFORMATS, nullptr, nullptr);
 	} else {
-		RemoveAll();
+		clear();
+		reserve(51);
 
-#define ADDFMT(f) Add(CMediaFormatCategory##f)
+#define ADDFMT(f) emplace_back(CMediaFormatCategory##f)
 		// video files
 		ADDFMT((L"avi",         ResStr(IDS_MFMT_AVI),         L"avi divx"));
 		ADDFMT((L"mpeg",        ResStr(IDS_MFMT_MPEG),        L"mpg mpeg mpe m1v m2v mpv2 mp2v pva evo m2p sfd"));
@@ -248,17 +241,17 @@ void CMediaFormats::UpdateData(bool fSave)
 #undef ADDFMT
 	}
 
-	for (size_t i = 0; i < GetCount(); i++) {
-		GetAt(i).UpdateData(fSave);
+	for (auto& mfc : (*this)) {
+		mfc.UpdateData(bSave);
 	}
 }
 
-bool CMediaFormats::FindExt(CString ext)
+bool CMediaFormats::FindExt(const CString& ext)
 {
 	return (FindMediaByExt(ext) != nullptr);
 }
 
-bool CMediaFormats::FindAudioExt(CString ext)
+bool CMediaFormats::FindAudioExt(const CString& ext)
 {
 	CMediaFormatCategory* pmfc = FindMediaByExt(ext);
 	return (pmfc && pmfc->GetFileType() == TAudio);
@@ -269,11 +262,11 @@ CMediaFormatCategory* CMediaFormats::FindMediaByExt(CString ext)
 	ext.TrimLeft('.');
 
 	if (!ext.IsEmpty()) {
-		for (size_t i = 0; i < GetCount(); i++) {
-			CMediaFormatCategory& mfc = GetAt(i);
-			if (mfc.FindExt(ext)) {
-				return &mfc;
-			}
+		const auto it = std::find_if(begin(), end(), [ext](const CMediaFormatCategory& mfc){
+			return mfc.FindExt(ext);
+		});
+		if (it != cend()) {
+			return &(*it);
 		}
 	}
 
@@ -288,8 +281,8 @@ void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 	filter += ResStr(IDS_AG_MEDIAFILES);
 	mask.Add(L"");
 
-	for (size_t i = 0; i < GetCount(); i++) {
-		strTemp = GetAt(i).GetFilter() + L";";
+	for (auto& mfc : (*this)) {
+		strTemp = mfc.GetFilter() + L";";
 		mask[0] += strTemp;
 		filter += strTemp;
 	}
@@ -301,9 +294,9 @@ void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 	filter += ResStr(IDS_AG_VIDEOFILES);
 	mask.Add(L"");
 
-	for (size_t i = 0; i < GetCount(); i++) {
-		if (GetAt(i).GetFileType() == TVideo) {
-			strTemp = GetAt(i).GetFilter() + L";";
+	for (auto& mfc : (*this)) {
+		if (mfc.GetFileType() == TVideo) {
+			strTemp = mfc.GetFilter() + L";";
 			mask[1] += strTemp;
 			filter += strTemp;
 		}
@@ -315,9 +308,9 @@ void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 	filter += ResStr(IDS_AG_AUDIOFILES);
 	mask.Add(L"");
 
-	for (size_t i = 0; i < GetCount(); i++) {
-		if (GetAt(i).GetFileType() == TAudio) {
-			strTemp = GetAt(i).GetFilter() + L";";
+	for (auto& mfc : (*this)) {
+		if (mfc.GetFileType() == TAudio) {
+			strTemp = mfc.GetFilter() + L";";
 			mask[1] += strTemp;
 			filter += strTemp;
 		}
@@ -325,9 +318,8 @@ void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 	filter.TrimRight(';');
 	filter += L"|";
 
-	for (size_t i = 0; i < GetCount(); i++) {
-		CMediaFormatCategory& mfc = GetAt(i);
-		filter += mfc.GetDescription() + L"|" + GetAt(i).GetFilter() + L"|";
+	for (auto& mfc : (*this)) {
+		filter += mfc.GetDescription() + L"|" + mfc.GetFilter() + L"|";
 		mask.Add(mfc.GetFilter());
 	}
 
@@ -343,10 +335,9 @@ void CMediaFormats::GetAudioFilter(CString& filter, CAtlArray<CString>& mask)
 	filter += ResStr(IDS_AG_AUDIOFILES);
 	mask.Add(L"");
 
-	for (size_t i = 0; i < GetCount(); i++) {
-		CMediaFormatCategory& mfc = GetAt(i);
+	for (auto& mfc : (*this)) {
 		if (mfc.GetFileType() == TAudio) {
-			strTemp = GetAt(i).GetFilter() + L";";
+			strTemp = mfc.GetFilter() + L";";
 			mask[0] += strTemp;
 			filter += strTemp;
 		}
@@ -356,10 +347,9 @@ void CMediaFormats::GetAudioFilter(CString& filter, CAtlArray<CString>& mask)
 	filter.TrimRight(';');
 	filter += L"|";
 
-	for (size_t i = 0; i < GetCount(); i++) {
-		CMediaFormatCategory& mfc = GetAt(i);
+	for (auto& mfc : (*this)) {
 		if (mfc.GetFileType() == TAudio) {
-			filter += mfc.GetDescription() + L"|" + GetAt(i).GetFilter() + L"|";
+			filter += mfc.GetDescription() + L"|" + mfc.GetFilter() + L"|";
 			mask.Add(mfc.GetFilter());
 		}
 	}
