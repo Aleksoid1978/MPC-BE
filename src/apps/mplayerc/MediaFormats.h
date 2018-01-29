@@ -66,10 +66,10 @@ public:
 	CString GetDescription() const {
 		return m_description;
 	}
-	CString GetFilter();
-	CString GetExts();
-	CString GetExtsWithPeriod();
-	CString GetBackupExtsWithPeriod();
+	CString GetFilter() const;
+	CString GetExts() const;
+	CString GetExtsWithPeriod() const;
+	CString GetBackupExtsWithPeriod() const;
 	CString GetSpecReqNote() const {
 		return m_specreqnote;
 	}
