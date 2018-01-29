@@ -31,8 +31,8 @@ CFavoriteAddDlg::CFavoriteAddDlg(std::list<CString>& shortnames, CString fullnam
 	, m_bRememberPos(TRUE)
 	, m_bRelativeDrive(FALSE)
 	, m_bShowRelativeDrive(bShowRelativeDrive)
+	, m_shortnames(shortnames)
 {
-	m_shortnames = shortnames;
 }
 
 CFavoriteAddDlg::~CFavoriteAddDlg()
