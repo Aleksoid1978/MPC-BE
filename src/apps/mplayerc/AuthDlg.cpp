@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -99,12 +99,12 @@ BOOL CAuthDlg::OnInitDialog()
 			CString str = p;
 			p += str.GetLength()+1;
 			len -= str.GetLength()+1;
-			CAtlList<CString> sl;
+			std::list<CString> sl;
 			Explode(str, sl, L'=', 2);
 
-			if (sl.GetCount() == 2) {
-				m_logins[sl.GetHead()] = DEncrypt(sl.GetTail());
-				m_usernamectrl.AddString(sl.GetHead());
+			if (sl.size() == 2) {
+				m_logins[sl.front()] = DEncrypt(sl.back());
+				m_usernamectrl.AddString(sl.front());
 			}
 		}
 	}
