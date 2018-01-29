@@ -65,16 +65,17 @@ void CFavoriteOrganizeDlg::SetupList(bool fSave)
 		m_list.DeleteAllItems();
 
 		for (auto it = m_sl[i].begin(); it != m_sl[i].end(); ++it) {
-			CAtlList<CString> sl;
+			std::list<CString> sl;
 			ExplodeEsc(*it, sl, L';', 3);
 
-			int n = m_list.InsertItem(m_list.GetItemCount(), sl.RemoveHead());
+			int n = m_list.InsertItem(m_list.GetItemCount(), sl.front());
+			sl.pop_front();
 			m_list.SetItemData(n, (DWORD_PTR)&(*it));
 
-			if (!sl.IsEmpty()) {
+			if (!sl.empty()) {
 				REFERENCE_TIME rt = 0;
 
-				if (1 == swscanf_s(sl.GetHead(), L"%I64d", &rt) && rt > 0) {
+				if (1 == swscanf_s(sl.front(), L"%I64d", &rt) && rt > 0) {
 					DVD_HMSF_TIMECODE hmsf = RT2HMSF(rt);
 
 					CString str;

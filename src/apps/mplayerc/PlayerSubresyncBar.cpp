@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -191,11 +191,11 @@ void CPlayerSubresyncBar::ReloadSubtitle()
 		m_list.InsertColumn(COL_EFFECT, ResStr(IDS_SUBRESYNC_CLN_EFFECT), LVCFMT_LEFT, 80);
 	}
 
-	m_subtimes.SetCount(m_sts.GetCount());
+	m_subtimes.resize(m_sts.GetCount());
 
 	for (size_t i = 0, j = m_sts.GetCount(); i < j; i++) {
 		m_subtimes[i].orgstart = m_sts[i].start;
-		m_subtimes[i].orgend = m_sts[i].end;
+		m_subtimes[i].orgend   = m_sts[i].end;
 	}
 
 	ResetSubtitle();
@@ -950,7 +950,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 						m_sts.InsertAt(iItem + 1, stse);
 
 						SubTime st = m_subtimes[iItem];
-						m_subtimes.InsertAt(iItem + 1, st);
+						m_subtimes.insert(m_subtimes.begin() + iItem + 1, st);
 
 						CHeaderCtrl* pHeader = (CHeaderCtrl*)m_list.GetDlgItem(0);
 						int nColumnCount = pHeader->GetItemCount();
@@ -984,7 +984,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 					for (INT_PTR i = 0, l = items.size(); i < l; i++) {
 						iItem = items[i];
 						m_sts.RemoveAt(iItem);
-						m_subtimes.RemoveAt(iItem);
+						m_subtimes.erase(m_subtimes.begin() + iItem);
 						m_list.DeleteItem(iItem);
 					}
 
@@ -1317,7 +1317,7 @@ bool CPlayerSubresyncBar::IsShortCut(const MSG* pMsg)
 
 int CPlayerSubresyncBar::FindNearestSub(REFERENCE_TIME& rtPos, bool bForward)
 {
-	if (m_subtimes.IsEmpty()) {
+	if (m_subtimes.empty()) {
 		return -2;
 	}
 

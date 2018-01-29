@@ -9727,8 +9727,8 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 		CString fn = GetCurFileName();
 		CString desc = GetFileOnly(fn);
 
-		CAtlList<CString> descList;
-		descList.AddTail(desc);
+		std::list<CString> descList;
+		descList.push_back(desc);
 
 		if (m_LastOpenBDPath.GetLength() > 0) {
 			CString fn2 = BLU_RAY;
@@ -9737,9 +9737,9 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 			} else {
 				MakeBDLabel(fn, fn2);
 			}
-			descList.AddHead(fn2);
+			descList.push_front(fn2);
 		} else if (!m_youtubeFields.title.IsEmpty()) {
-			descList.AddHead(m_youtubeFields.title);
+			descList.push_front(m_youtubeFields.title);
 		}
 
 		// Name
@@ -9751,7 +9751,7 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 			}
 			str = dlg.m_name;
 		} else {
-			str = descList.GetHead();
+			str = descList.front();
 		}
 
 		str.Remove(';');
@@ -9796,7 +9796,7 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 			CString fn = path;
 			fn.TrimRight(L"/\\");
 
-			CAtlList<CString> fnList;
+			std::list<CString> fnList;
 
 			// Name
 			CString str;

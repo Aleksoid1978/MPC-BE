@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,10 +31,10 @@ class CFavoriteAddDlg : public CCmdUIDialog
 
 private:
 	CString m_fullname;
-	CAtlList<CString> m_shortnames;
+	std::list<CString> m_shortnames;
 
 public:
-	CFavoriteAddDlg(CAtlList<CString>& shortnames, CString fullname, BOOL bShowRelativeDrive = TRUE, CWnd* pParent = nullptr);
+	CFavoriteAddDlg(std::list<CString>& shortnames, CString fullname, BOOL bShowRelativeDrive = TRUE, CWnd* pParent = nullptr);
 	virtual ~CFavoriteAddDlg();
 
 	enum { IDD = IDD_FAVADD };
