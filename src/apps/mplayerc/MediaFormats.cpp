@@ -38,9 +38,9 @@ CMediaFormatCategory::CMediaFormatCategory(const CString& label, const CString& 
 	, m_description(description)
 	, m_specreqnote(specreqnote)
 	, m_filetype(filetype)
+	, m_exts(exts)
+	, m_backupexts(exts)
 {
-	m_exts = exts;
-	m_backupexts = m_exts;
 }
 
 CMediaFormatCategory::CMediaFormatCategory(const CString& label, const CString& description, const CString& exts, const filetype_t& filetype, const CString& specreqnote)
