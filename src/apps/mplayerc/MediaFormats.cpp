@@ -117,7 +117,7 @@ void CMediaFormatCategory::SetExts(const CString& exts)
 	}
 }
 
-CString CMediaFormatCategory::GetFilter()
+CString CMediaFormatCategory::GetFilter() const
 {
 	CString filter;
 
@@ -126,17 +126,15 @@ CString CMediaFormatCategory::GetFilter()
 	}
 
 	filter.TrimRight(';'); // cheap...
-	return(filter);
+	return filter;
 }
 
-CString CMediaFormatCategory::GetExts()
+CString CMediaFormatCategory::GetExts() const
 {
-	CString exts = Implode(m_exts, ' ');
-
-	return(exts);
+	return Implode(m_exts, ' ');
 }
 
-CString CMediaFormatCategory::GetExtsWithPeriod()
+CString CMediaFormatCategory::GetExtsWithPeriod() const
 {
 	CString exts;
 
@@ -145,11 +143,10 @@ CString CMediaFormatCategory::GetExtsWithPeriod()
 	}
 
 	exts.TrimRight(' ');
-
-	return(exts);
+	return exts;
 }
 
-CString CMediaFormatCategory::GetBackupExtsWithPeriod()
+CString CMediaFormatCategory::GetBackupExtsWithPeriod() const
 {
 	CString exts;
 
@@ -159,7 +156,7 @@ CString CMediaFormatCategory::GetBackupExtsWithPeriod()
 
 	exts.TrimRight(' ');
 
-	return(exts);
+	return exts;
 }
 
 //
@@ -281,7 +278,7 @@ void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 	filter += ResStr(IDS_AG_MEDIAFILES);
 	mask.Add(L"");
 
-	for (auto& mfc : (*this)) {
+	for (const auto& mfc : (*this)) {
 		strTemp = mfc.GetFilter() + L";";
 		mask[0] += strTemp;
 		filter += strTemp;
@@ -294,7 +291,7 @@ void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 	filter += ResStr(IDS_AG_VIDEOFILES);
 	mask.Add(L"");
 
-	for (auto& mfc : (*this)) {
+	for (const auto& mfc : (*this)) {
 		if (mfc.GetFileType() == TVideo) {
 			strTemp = mfc.GetFilter() + L";";
 			mask[1] += strTemp;
@@ -308,7 +305,7 @@ void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 	filter += ResStr(IDS_AG_AUDIOFILES);
 	mask.Add(L"");
 
-	for (auto& mfc : (*this)) {
+	for (const auto& mfc : (*this)) {
 		if (mfc.GetFileType() == TAudio) {
 			strTemp = mfc.GetFilter() + L";";
 			mask[1] += strTemp;
@@ -318,7 +315,7 @@ void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 	filter.TrimRight(';');
 	filter += L"|";
 
-	for (auto& mfc : (*this)) {
+	for (const auto& mfc : (*this)) {
 		filter += mfc.GetDescription() + L"|" + mfc.GetFilter() + L"|";
 		mask.Add(mfc.GetFilter());
 	}
@@ -331,11 +328,11 @@ void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 
 void CMediaFormats::GetAudioFilter(CString& filter, CAtlArray<CString>& mask)
 {
-	CString		strTemp;
+	CString strTemp;
 	filter += ResStr(IDS_AG_AUDIOFILES);
 	mask.Add(L"");
 
-	for (auto& mfc : (*this)) {
+	for (const auto& mfc : (*this)) {
 		if (mfc.GetFileType() == TAudio) {
 			strTemp = mfc.GetFilter() + L";";
 			mask[0] += strTemp;
@@ -347,7 +344,7 @@ void CMediaFormats::GetAudioFilter(CString& filter, CAtlArray<CString>& mask)
 	filter.TrimRight(';');
 	filter += L"|";
 
-	for (auto& mfc : (*this)) {
+	for (const auto& mfc : (*this)) {
 		if (mfc.GetFileType() == TAudio) {
 			filter += mfc.GetDescription() + L"|" + mfc.GetFilter() + L"|";
 			mask.Add(mfc.GetFilter());

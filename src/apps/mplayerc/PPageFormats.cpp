@@ -364,8 +364,7 @@ bool CPPageFormats::UnRegisterExt(CString ext)
 HRESULT CPPageFormats::RegisterUI()
 {
 	int nRegisteredExtCount = 0;
-	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
-	for (auto& mfc : mf) {
+	for (const auto& mfc : AfxGetAppSettings().m_Formats) {
 		int j = 0;
 		const CString str = mfc.GetExtsWithPeriod();
 		for (CString ext = str.Tokenize(L" ", j); !ext.IsEmpty(); ext = str.Tokenize(L" ", j)) {
@@ -603,14 +602,14 @@ void CPPageFormats::SetListItemState(int nItem)
 		return;
 	}
 
-	CString str = AfxGetAppSettings().m_Formats[(int)m_list.GetItemData(nItem)].GetExtsWithPeriod();
+	const CString str = AfxGetAppSettings().m_Formats[(int)m_list.GetItemData(nItem)].GetExtsWithPeriod();
 
 	std::list<CString> exts;
 	ExplodeMin(str, exts, ' ');
 
 	int cnt = 0;
 
-	for (const auto ext : exts) {
+	for (const auto& ext : exts) {
 		if (IsRegistered(ext, true)) {
 			cnt++;
 		}
@@ -681,7 +680,7 @@ BOOL CPPageFormats::OnInitDialog()
 	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
 	mf.UpdateData(FALSE);
 	int i = 0;
-	for (auto& mfc : mf) {
+	for (const auto& mfc : mf) {
 		CString label;
 		label.Format (L"%s (%s)", mfc.GetDescription(), mfc.GetExts());
 
@@ -1116,7 +1115,7 @@ void CPPageFormats::OnBnClickedAll()
 
 void CPPageFormats::OnBnClickedVideo()
 {
-	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
+	const CMediaFormats& mf = AfxGetAppSettings().m_Formats;
 
 	for (int i = 0, j = m_list.GetItemCount(); i < j; i++) {
 		SetChecked(i, mf[(int)m_list.GetItemData(i)].GetFileType() == TVideo ? 1 : 0);
@@ -1128,7 +1127,7 @@ void CPPageFormats::OnBnClickedVideo()
 
 void CPPageFormats::OnBnClickedAudio()
 {
-	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
+	const CMediaFormats& mf = AfxGetAppSettings().m_Formats;
 
 	for (int i = 0, j = m_list.GetItemCount(); i < j; i++) {
 		SetChecked(i, mf[(int)m_list.GetItemData(i)].GetFileType() == TAudio ? 1 : 0);
@@ -1177,14 +1176,14 @@ void CPPageFormats::OnBnClickedDefault()
 	int iItem = m_list.GetSelectionMark();
 	if (iItem >= 0) {
 		DWORD_PTR i = m_list.GetItemData(iItem);
-		CMediaFormats& mf = AfxGetAppSettings().m_Formats;
+		auto& mfc = AfxGetAppSettings().m_Formats[i];
 
-		mf[i].RestoreDefaultExts();
-		GetUnRegisterExts(m_exts, mf[i].GetExtsWithPeriod(), m_lUnRegisterExts);
-		m_exts = mf[i].GetExtsWithPeriod();
+		mfc.RestoreDefaultExts();
+		GetUnRegisterExts(m_exts, mfc.GetExtsWithPeriod(), m_lUnRegisterExts);
+		m_exts = mfc.GetExtsWithPeriod();
 
 		CString label;
-		label.Format(L"%s (%s)", mf[i].GetDescription(), mf[i].GetExts());
+		label.Format(L"%s (%s)", mfc.GetDescription(), mfc.GetExts());
 		m_list.SetItemText(iItem, COL_CATEGORY, label);
 		m_list.SetColumnWidth(COL_CATEGORY, LVSCW_AUTOSIZE);
 
@@ -1204,14 +1203,14 @@ void CPPageFormats::OnBnClickedSet()
 	int iItem = m_list.GetSelectionMark();
 	if (iItem >= 0) {
 		DWORD_PTR i = m_list.GetItemData(iItem);
-		CMediaFormats& mf = AfxGetAppSettings().m_Formats;
+		auto& mfc = AfxGetAppSettings().m_Formats[i];
 
-		GetUnRegisterExts(mf[i].GetExtsWithPeriod(), m_exts, m_lUnRegisterExts);
-		mf[i].SetExts(m_exts);
-		m_exts = mf[i].GetExtsWithPeriod();
+		GetUnRegisterExts(mfc.GetExtsWithPeriod(), m_exts, m_lUnRegisterExts);
+		mfc.SetExts(m_exts);
+		m_exts = mfc.GetExtsWithPeriod();
 
 		CString label;
-		label.Format(L"%s (%s)", mf[i].GetDescription(), mf[i].GetExts());
+		label.Format(L"%s (%s)", mfc.GetDescription(), mfc.GetExts());
 		m_list.SetItemText(iItem, COL_CATEGORY, label);
 		m_list.SetColumnWidth(COL_CATEGORY, LVSCW_AUTOSIZE);
 
