@@ -319,8 +319,6 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 			screenSpacePassCount++;
 		}
 
-		screenSpacePassCount++; // currently all resizers are 1-pass
-
 		// Custom screen space pixel shaders
 		bCustomScreenSpacePixelShaders = !m_pCustomScreenSpacePixelShaders.empty();
 		if (bCustomScreenSpacePixelShaders) {
