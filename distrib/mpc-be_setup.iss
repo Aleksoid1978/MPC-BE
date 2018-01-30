@@ -137,14 +137,14 @@ Name: br; MessagesFile: compiler:Languages\BrazilianPortuguese.isl
 Name: by; MessagesFile: Languages\Belarusian.isl
 Name: ca; MessagesFile: compiler:Languages\Catalan.isl
 Name: cz; MessagesFile: compiler:Languages\Czech.isl
-Name: de; MessagesFile: compiler:Languages\German.isl
+Name: de; MessagesFile: Languages\German.isl
 Name: el; MessagesFile: compiler:Languages\Greek.isl
 Name: es; MessagesFile: compiler:Languages\Spanish.isl
 Name: eu; MessagesFile: Languages\Basque.isl
 Name: fr; MessagesFile: compiler:Languages\French.isl
 Name: he; MessagesFile: compiler:Languages\Hebrew.isl
 Name: hu; MessagesFile: compiler:Languages\Hungarian.isl
-Name: hy; MessagesFile: Languages\Armenian.islu
+Name: hy; MessagesFile: compiler:Languages\Armenian.islu
 Name: it; MessagesFile: compiler:Languages\Italian.isl
 Name: ja; MessagesFile: compiler:Languages\Japanese.isl
 Name: kr; MessagesFile: Languages\Korean.isl
@@ -156,7 +156,7 @@ Name: sc; MessagesFile: Languages\ChineseSimplified.isl
 Name: sv; MessagesFile: Languages\Swedish.isl
 Name: sk; MessagesFile: Languages\Slovak.isl
 Name: tc; MessagesFile: Languages\ChineseTraditional.isl
-Name: tr; MessagesFile: Languages\Turkish.isl
+Name: tr; MessagesFile: compiler:Languages\Turkish.isl
 Name: ua; MessagesFile: compiler:Languages\Ukrainian.isl
 #endif
 
