@@ -23,7 +23,6 @@
 
 ; If you want to compile the 64-bit version define "x64build" (uncomment the define below or use build.bat)
 #define localize
-#define sse2_required
 ; #define x64Build
 
 ; Don't forget to update the DirectX SDK number in "include\Version.h" (not updated so often)
@@ -275,10 +274,8 @@ Type: files; Name: {app}\{#msdk_dll}
 ;Root: "HKCU"; Subkey: "Software\{#app_name}\ShellExt"; ValueType: string; ValueName: "MpcPath"; ValueData: "{app}\{#mpcbe_exe}"; Flags: uninsdeletekey; Components: mpcbeshellext
 
 [Code]
-#if defined(sse2_required)
 function IsProcessorFeaturePresent(Feature: Integer): Boolean;
 external 'IsProcessorFeaturePresent@kernel32.dll stdcall';
-#endif
 
 const
   installer_mutex = 'mpcbe_setup_mutex';
@@ -391,13 +388,11 @@ begin
     Result := False;
 end;
 
-#if defined(sse2_required)
 function Is_SSE2_Supported(): Boolean;
 begin
   // PF_XMMI64_INSTRUCTIONS_AVAILABLE
   Result := IsProcessorFeaturePresent(10);
 end;
-#endif
 
 function IsUpgrade(): Boolean;
 var
@@ -524,12 +519,10 @@ begin
     Result := True;
     CreateMutex(installer_mutex);
 
-#if defined(sse2_required)
     if not Is_SSE2_Supported() then begin
       SuppressibleMsgBox(CustomMessage('msg_simd_sse2'), mbCriticalError, MB_OK, MB_OK);
       Result := False;
     end;
-#endif
 
   end;
 end;
