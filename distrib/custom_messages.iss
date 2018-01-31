@@ -1,5 +1,5 @@
 ﻿;
-; (C) 2009-2016 see Authors.txt
+; (C) 2009-2018 see Authors.txt
 ;
 ; This file is part of MPC-BE.
 ;
@@ -149,11 +149,7 @@ en.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
 en.msg_DeleteSettings=Do you also want to delete MPC-BE settings?%n%nIf you plan on installing MPC-BE again then you do not have to delete them.
 en.msg_NoD3DX9DLL_found=The latest DirectX runtime is not installed!%n%nPlease download and install the latest DirectX runtime June 2010 regardless of your operating system.
 en.msg_SetupIsRunningWarning=MPC-BE setup is already running!
-#if defined(sse_required)
-en.msg_simd_sse=This build of MPC-BE requires a CPU with SSE extension support.%n%nYour CPU does not have those capabilities.
-#elif defined(sse2_required)
 en.msg_simd_sse2=This build of MPC-BE requires a CPU with SSE2 extension support.%n%nYour CPU does not have those capabilities.
-#endif
 en.tsk_AllUsers=For all users
 en.tsk_CurrentUser=For the current user only
 en.tsk_Other=Other tasks:
@@ -190,11 +186,7 @@ br.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
 br.msg_DeleteSettings=Gostaria de excluir as configurações do MPC-BE?%n%nSe você quiser instalar o MPC-BE novamente então não precisa excluí-las.
 br.msg_NoD3DX9DLL_found=A versão mais recente do DirectX não está instalada!%n%nPor favor baixe e instale a versão mais recente June 2010 adequado ao seu sistema operacional.
 br.msg_SetupIsRunningWarning=A instalação do MPC-BE ja está sendo executada!
-#if defined(sse_required)
-br.msg_simd_sse=Esta versão do MPC-BE necessita uma CPU com suporte a extensões SSE.%n%nSua CPU não tem esse suporte.
-#elif defined(sse2_required)
 br.msg_simd_sse2=Esta versão do MPC-BE necessita uma CPU com suporte a extensões SSE2.%n%nSua CPU não tem esse suporte.
-#endif
 br.tsk_AllUsers=Para todos os usuários
 br.tsk_CurrentUser=Para o usuário atual somente
 br.tsk_Other=Outras tarefas:
@@ -229,11 +221,7 @@ by.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
 by.msg_DeleteSettings=Ці хочаце таксама выдаліць налады MPC-BE?%n%nКалі вы збіраецеся зноў усталяваць MPC-BE, тады іх можна пакінуць.
 by.msg_NoD3DX9DLL_found=Найноўшая бібліятэка DirectX не ўсталяваная!%n%nСцягніце і ўсталюйце яе (версія June 2010), незалежна ад таго, якая ў вас аперацыйная сістэма.
 by.msg_SetupIsRunningWarning=Праграма ўсталявання MPC-BE ужо працуе!
-#if defined(sse_required)
-by.msg_simd_sse=Гэтая будова MPC-BE вымагае працэсар, здольны выконваць інструкцыі SSE.%n%nВаш працэсар гэтага не ўмее.
-#elif defined(sse2_required)
 by.msg_simd_sse2=Гэтая будова MPC-BE вымагае працэсар, здольны выконваць інструкцыі SSE2.%n%nВаш працэсар гэтага не ўмее.
-#endif
 by.tsk_AllUsers=Для ўсіх карыстальнікаў
 by.tsk_CurrentUser=Толькі для дзейнага карыстальніка
 by.tsk_Other=Іншыя заданні:
@@ -266,11 +254,7 @@ eu.comp_mpcresources=Itzulpenak
 eu.msg_DeleteSettings=MPC-BE ezarpenak kentzea ere nahi dituzu?%n%nMPC-BE berriro ezartzeko asmoa baduzu ez dituzu ezabatu behar.
 eu.msg_NoD3DX9DLL_found=Azken DirectX bertsioa ez dago ezarrita!%n%nMesedez jeitsi eta ezarri azken DirectX bertsioa June 2010 sistema eragileari kasu egin gabe.
 eu.msg_SetupIsRunningWarning=MPC-BE ezarpena jadanik ekinean dago!
-#if defined(sse_required)
-eu.msg_simd_sse=MPC-BE eraiketa honek SSE hedapen sostengua duen CPU bat behar du.%n%nZure CPU-ak ez ditu gaitasun hauek.
-#elif defined(sse2_required)
 eu.msg_simd_sse2=MPC-BE erakiketa honek SSE2 hedapen sostengua duen CPU bat behar du.%n%nZure CPU-ak ez ditu gaitasun hauek.
-#endif
 eu.tsk_AllUsers=Erabiltzaile guztientzat
 eu.tsk_CurrentUser=Oraingo erabiltzailearentzat bakarrrik
 eu.tsk_Other=Beste eginkizunak:
@@ -305,11 +289,7 @@ ca.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
 ca.msg_DeleteSettings=Vols eliminar les preferències del MPC-BE?%n%nSi planeges instal.lar altre cop el MPC-BE no necessites eliminar-les.
 ca.msg_NoD3DX9DLL_found=No està instal.lada la darrera versió de DirectX!%n%nSisplau instal.lar la darrera versió DirectX runtime June 2010 independentment del sistema operatiu.
 ca.msg_SetupIsRunningWarning=La instal.lació del MPC-BE ja se està executant!
-#if defined(sse_required)
-ca.msg_simd_sse=Aquesta versió de MPC-BE requereix una CPU amb suport d'extensions SSE.%n%nLa teva CPU no cumpleix aquestes característiques.
-#elif defined(sse2_required)
 ca.msg_simd_sse2=Aquesta versió de MPC-BE requereix una CPU amb suport d'extensions SSE2.%n%nLa teva CPU no cumpleix aquestes característiques.
-#endif
 ca.tsk_AllUsers=Per tots els usuaris
 ca.tsk_CurrentUser=Només per l'usuari actual
 ca.tsk_Other=Altres tasques:
@@ -344,11 +324,7 @@ cz.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
 cz.msg_DeleteSettings=Chcete smazat také nastavení MPC-BE?%n%nPokud plánujete MPC-BE znovu nainstalovat, mazat je nemusíte.
 cz.msg_NoD3DX9DLL_found=Nainstalovaná verze DirectX není dostatečně aktuální!%n%nStáhněte a nainstalujte nejnovější aktualizaci DirectX June 2010.%n%nPozor, aktualizace je pro všechny verze DirectX, nejen pro DirectX 9!
 cz.msg_SetupIsRunningWarning=Instalátor MPC-BE je již spuštěn!
-#if defined(sse_required)
-cz.msg_simd_sse=Toto sestavení MPC-BE vyžaduje procesor s podporou rozšíření SSE.%n%nVáš procesor tato rozšíření nepodporuje.
-#elif defined(sse2_required)
 cz.msg_simd_sse2=Toto sestavení MPC-BE vyžaduje procesor s podporou rozšíření SSE2.%n%nVáš procesor tato rozšíření nepodporuje.
-#endif
 cz.tsk_AllUsers=Pro všechny uživatele
 cz.tsk_CurrentUser=Jen pro právě přihlášeného uživatele
 cz.tsk_Other=Ostatní úlohy:
@@ -383,11 +359,7 @@ de.comp_intel_msdk=H.264 MVC 3D Decoder (extra Download)
 de.msg_DeleteSettings=Wollen Sie auch die Einstellungen des MPC-BE löschen?%n%nWenn Sie den MPC-BE wieder installieren wollen, dann müssen Sie diese nicht unbedingt löschen.
 de.msg_NoD3DX9DLL_found=Die neueste DirectX-Runtime ist nicht installiert!%n%nBitte laden und installieren Sie die neueste DirectX-Runtime June 2010 unabhängig von Ihrem Betriebssystem.
 de.msg_SetupIsRunningWarning=MPC-BE Setup wird bereits ausgeführt!
-#if defined(sse_required)
-de.msg_simd_sse=Dieses MPC-BE-Build benötigt einen Prozessor mit SSE-Unterstützung.%n%nIhr Prozessor besitzt diese Eigenschaft nicht.
-#elif defined(sse2_required)
 de.msg_simd_sse2=Dieses MPC-BE-Build benötigt einen Prozessor mit SSE2-Unterstützung.%n%nIhr Prozessor besitzt diese Eigenschaft nicht.
-#endif
 de.tsk_AllUsers=Für alle Benutzer
 de.tsk_CurrentUser=Für aktuellen Benutzer
 de.tsk_Other=Andere Aufgaben:
@@ -422,11 +394,7 @@ el.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
 el.msg_DeleteSettings=Θέλετε να διαγράψετε τις ρυθμίσεις του MPC-BE;%n%nΑν σκοπεύετε να εγκαταστήσετε το MPC-BE πάλι τότε δεν χρειάζεται να τις διαγράψετε.
 el.msg_NoD3DX9DLL_found=The latest DirectX runtime is not installed!%n%nPlease download and install the latest DirectX runtime June 2010 regardless of your operating system.
 el.msg_SetupIsRunningWarning=Η εγκατάσταση του MPC-BE εκτελείται ήδη!
-#if defined(sse_required)
-el.msg_simd_sse=Αυτή η έκδοση του MPC-BE απαιτεί επεξεργαστή CPU με υποστήριξη SSE.%n%nΟ επεξεργαστής σας δεν το υποστηρίζει.
-#elif defined(sse2_required)
 el.msg_simd_sse2=Αυτή η έκδοση του MPC-BE απαιτεί επεξεργαστή CPU με υποστήριξη SSE2.%n%nΟ επεξεργαστής σας δεν το υποστηρίζει.
-#endif
 el.tsk_AllUsers=Για όλους τους χρήστες
 el.tsk_CurrentUser=Για τον τρέχων χρήστη μόνο
 el.tsk_Other=Επιπλέον ενέργειες:
@@ -461,11 +429,7 @@ es.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
 es.msg_DeleteSettings=¿Quiere eliminar también las preferencias de MPC-BE?%n%nSi planea instalar de nuevo MPC-BE no necesita eliminarlas.
 es.msg_NoD3DX9DLL_found=¡No está instalada la última versión de DirectX!%n%nPor favor descargue e instale DirectX runtime June 2010 independientemente de su sistema operativo.
 es.msg_SetupIsRunningWarning=La instalación de MPC-BE ya se esta ejecutando!
-#if defined(sse_required)
-es.msg_simd_sse=Esta versión de MPC-BE requiere una CPU con soporte de extensiones SSE.%n%nSu CPU carece de esta característica.
-#elif defined(sse2_required)
 es.msg_simd_sse2=Esta versión de MPC-BE requiere una CPU con soporte de extensiones SSE2.%n%nSu CPU carece de esta característica.
-#endif
 es.tsk_AllUsers=Para todos los usuarios
 es.tsk_CurrentUser=Para el usuario actual solamente
 es.tsk_Other=Otras tareas:
@@ -500,11 +464,7 @@ fr.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
 fr.msg_DeleteSettings=Souhaitez-vous supprimer également les paramètres de MPC-BE?%n%nSi vous réinstallez MPC-BE, il est conseillé de ne pas les supprimer.
 fr.msg_NoD3DX9DLL_found=La dernière version des composants d'exécution DirectX n'est pas installée !%n%nCelle-ci est nécessaire quelque soit votre système d'exploitation, veuillez la télécharger et l'installer June 2010.
 fr.msg_SetupIsRunningWarning=L'installation de MPC-BE est déjà en cours d'exécution!
-#if defined(sse_required)
-fr.msg_simd_sse=Cette version de MPC-BE nécessite un CPU avec support des instructions SSE.%n%nVotre CPU n'a pas cette capacité.
-#elif defined(sse2_required)
 fr.msg_simd_sse2=Cette version de MPC-BE nécessite un CPU avec support des instructions SSE2.%n%nVotre CPU n'a pas cette capacité.
-#endif
 fr.tsk_AllUsers=Pour tous les utilisateurs
 fr.tsk_CurrentUser=Pour l'utilisateur courant seulement
 fr.tsk_Other=Autres tâches:
@@ -539,11 +499,7 @@ he.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
 he.msg_DeleteSettings=האם ברצונך גם למחוק את ההגדרות של MPC-BE?%n%nאם אתה מתכנן להתקין את MPC-BE בשנית, אינך חייב להסירן.
 he.msg_NoD3DX9DLL_found=סביבת הריצה של ה-DirectX הכי חדש אינה מותקנת.%n%nאנא הורד והתקן את סביבת הריצה הכי חדשה June 2010 בלי קשר למערכת ההפעלה שברשותך.
 he.msg_SetupIsRunningWarning=ההתקנה של MPC-BE כבר רצה!
-#if defined(sse_required)
-he.msg_simd_sse=גרסה זו של MPC-BE דורשת מעבד עם תמיכה בהרחבת SSE.%n%nהמעבד שברשותך אינו תומך בכך.
-#elif defined(sse2_required)
 he.msg_simd_sse2=גרסה זו של MPC-BE דורשת מעבד עם תמיכה בהרחבת SSE2.%n%nהמעבד שברשותך אינו תומך בכך.
-#endif
 he.tsk_AllUsers=עבור כל המשתמשים
 he.tsk_CurrentUser=עבור המשתמש הנוכחי בלבד
 he.tsk_Other=פעולות אחרות:
@@ -578,11 +534,7 @@ hu.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
 hu.msg_DeleteSettings=Az MPC-BE beállításokat is törölni szeretné?%n%nHa azt tervezi, hogy újratelepíti az MPC-BE-t, akkor nem kell törölnie őket.
 hu.msg_NoD3DX9DLL_found=A legújabb DirectX nincs telepítve!%n%nKérjük töltse le és telepítse a legújabb DirectX runtime June 2010 verziót függetlenül az operációs rendszerétől.
 hu.msg_SetupIsRunningWarning=Az MPC-BE telepítő már fut!
-#if defined(sse_required)
-hu.msg_simd_sse=Az MPC-BE jelen változatához SSE támogatással bíró CPU-ra van szüksége.%n%nAz ön CPU-ja nem rendelkezik ilyen támogatással.
-#elif defined(sse2_required)
 hu.msg_simd_sse2=Az MPC-BE jelen változatához SSE2 támogatással bíró CPU-ra van szüksége.%n%nAz ön CPU-ja nem rendelkezik ilyen támogatással.
-#endif
 hu.tsk_AllUsers=Minden felhasználónak
 hu.tsk_CurrentUser=Csak a jelenlegi felhasználónak
 hu.tsk_Other=Egyéb feladatok:
@@ -617,11 +569,7 @@ hy.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
 hy.msg_DeleteSettings=Ջնջե՞լ MPC-BE-ի կարգավորումները։%n%nԵթե նախատեսում եք վերատեղակայել MPC-BE, ապա պետք է չէ դրանք ջնջել։.
 hy.msg_NoD3DX9DLL_found=Վերջին DirectX-ը տեղակայված չէ!%n%nԽնդրում ենք տեղակայել վերջին DirectX-ըJune 2010։
 hy.msg_SetupIsRunningWarning=MPC-BE-ի տեղակայիչը արդեն բացված է!
-#if defined(sse_required)
-hy.msg_simd_sse=MPC-BE-ի այս տարբերակը պահանջում է CPU՝ SSE-ի աջակցմամբ։%n%nՁեր CPU-ն այն չի աջակցում։
-#elif defined(sse2_required)
 hy.msg_simd_sse2=MPC-BE-ի այս տարբերակը պահանջում է CPU՝ SSE2-ի աջակցմամբ։%n%nՁեր CPU-ն այն չի աջակցում։
-#endif
 hy.tsk_AllUsers=Այս համակարգչի բոլոր օգտագործողների համար
 hy.tsk_CurrentUser=Միայն Ձեր համար
 hy.tsk_Other=Լրացուցիչ.
@@ -656,11 +604,7 @@ it.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
 it.msg_DeleteSettings=Vou eliminare anche le impostazioni di MPC-BE?%n%nSe pensi di reinstallare MPC-BE in seguito non dovresti eliminarle.
 it.msg_NoD3DX9DLL_found=La libreria di runtime DirectX più recente non è installata!%n%nScarica e installa la libreria di runtime DirectX più recente June 2010 indipendentemente dal tuo sistema operativo.
 it.msg_SetupIsRunningWarning=L'installazione di MPC-BE è già in corso!
-#if defined(sse_required)
-it.msg_simd_sse=Questa build di MPC-BE richiede una CPU con il supporto alle estensioni SSE.%n%nLa tua CPU non dispone di questa caratteristica.
-#elif defined(sse2_required)
 it.msg_simd_sse2=Questa build di MPC-BE richiede una CPU con il supporto alle estensioni SSE2.%n%nLa tua CPU non dispone di questa caratteristica.
-#endif
 it.tsk_AllUsers=Per tutti gli utenti
 it.tsk_CurrentUser=Solo per l'utente corrente
 it.tsk_Other=Altre operazioni:
@@ -690,11 +634,7 @@ ja.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
 ja.msg_DeleteSettings=MPC-BE の設定を削除してもよろしいですか？%n%nMPC-BE を再度インストールする場合は、設定を削除する必要はありません。
 ja.msg_NoD3DX9DLL_found=最新の DirectX ランタイムはインストールされません！%n%nオペレーティングシステムにかかわらず最新の DirectX ランタイム June 2010 をダウンロードして、インストールしてください。
 ja.msg_SetupIsRunningWarning=MPC-BE のインストーラーは既に実行されています！
-#if defined(sse_required)
-ja.msg_simd_sse=このバージョンの MPC-BE は CPU の SSE サポートが必要です。%n%nお使いの CPU はこの条件を満たしません。
-#elif defined(sse2_required)
 ja.msg_simd_sse2=このバージョンの MPC-BE は CPU の SSE2 サポートが必要です。%n%nお使いの CPU はこの条件を満たしません。
-#endif
 ja.tsk_AllUsers=全てのユーザーにインストールする。
 ja.tsk_CurrentUser=現在実行しているユーザーだけにインストールする。
 ja.tsk_Other=他のタスク :
@@ -729,11 +669,7 @@ kr.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
 kr.msg_DeleteSettings=MPC-BE 의 설정도 삭제하시겠습니까?%n%nMPC-BE 를 다시 설치할 계획이라면 설정들을 삭제할 필요가 없습니다.
 kr.msg_NoD3DX9DLL_found=최신 DirectX 런타임이 설치되어있지않습니다!%n%n사용하는 운영체제에 맞는 최신 DirectX 런타임 June 2010 을 다운로드해서 설치하세요.
 kr.msg_SetupIsRunningWarning=MPC-BE 설치프로그램이 이미 실행중입니다!
-#if defined(sse_required)
-kr.msg_simd_sse=이 버전의 MPC-BE 는 SSE 기술을 지원하는 CPU가 필요합니다.%n%n이 컴퓨터의 CPU는 이 기술을 지원하지않습니다.
-#elif defined(sse2_required)
 kr.msg_simd_sse2=이 버전의 MPC-BE 는 SSE2 기술을 지원하는 CPU가 필요합니다.%n%n이 컴퓨터의 CPU는 이 기술을 지원하지않습니다.
-#endif
 kr.tsk_AllUsers=모든 사용자
 kr.tsk_CurrentUser=현재 사용자만
 kr.tsk_Other=다른 작업:
@@ -768,11 +704,7 @@ nl.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloaden)
 nl.msg_DeleteSettings=Wilt u ook de instellingen van MPC-BE verwijderen?%n%nAls u MPC-BE opnieuw gaat installeren is dit niet nodig.
 nl.msg_NoD3DX9DLL_found=De nieuwste DirectX-runtime is niet geinstalleerd!%n%nGraag de nieuwste DirectX-runtime (Juni 2010) downloaden en installeren ongeacht uw Windowsversie.
 nl.msg_SetupIsRunningWarning=MPC-BE installatie is al gestart!
-#if defined(sse_required)
-nl.msg_simd_sse=Deze versie van MPC-BE heeft een processor nodig die SSE ondersteunt.%n%nUw processor ondersteunt dit niet.
-#elif defined(sse2_required)
 nl.msg_simd_sse2=Deze versie van MPC-BE heeft een processor nodig die SSE2 ondersteunt.%n%nUw processor ondersteunt dit niet.
-#endif
 nl.tsk_AllUsers=Voor alle gebruikers
 nl.tsk_CurrentUser=Alleen voor de huidige gebruiker
 nl.tsk_Other=Andere taken:
@@ -807,11 +739,7 @@ pl.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
 pl.msg_DeleteSettings=Czy chcesz usunąć ustawienia MPC-BE?%n%nJeśli planujesz ponownie zainstalować MPC-BE, wtedy nie trzeba ich usuwać.
 pl.msg_NoD3DX9DLL_found=Najnowszy DirectX runtime nie został zainstalowany!%n%nProszę pobrać i zainstalować najnowszy DirectX runtime June 2010 niezależnie od systemu operacyjnego.
 pl.msg_SetupIsRunningWarning=Instalator MPC-BE jest już uruchomiony!
-#if defined(sse_required)
-pl.msg_simd_sse=Ta kompilacja MPC-BE wymaga procesora z obsługą zestawu instrukcji SSE.%n%nTwój procesor ich nie obsługuje.
-#elif defined(sse2_required)
 pl.msg_simd_sse2=Ta kompilacja MPC-BE wymaga procesora z obsługą zestawu instrukcji SSE2.%n%nTwój procesor ich nie obsługuje.
-#endif
 pl.tsk_AllUsers=Dla wszystkich użytkowników
 pl.tsk_CurrentUser=Tylko dla bieżącego użytkownika
 pl.tsk_Other=Inne zadania:
@@ -844,11 +772,7 @@ ro.comp_mpcresources=Traduceri
 ro.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
 ro.msg_DeleteSettings=Doriţi de asemenea să ştergeţi setările MPC-BE?%n%nDacă doriţi a reinstala MPC-BE, atunci nu este necesar să le ştergeţi.
 ro.msg_SetupIsRunningWarning=Instalatorul MPC-BE rulează deja!
-#if defined(sse_required)
-ro.msg_simd_sse=Această versiune de MPC-BE necesită un procesor cu suport pentru extensii SSE.%n%nProcesorul dumneavoastră nu are aceste capacităţi.
-#elif defined(sse2_required)
 ro.msg_simd_sse2=Această versiune de MPC-BE necesită un procesor cu suport pentru extensii SSE2.%n%nProcesorul dumneavoastră nu are aceste capacităţi.
-#endif
 ro.tsk_AllUsers=Pentru toţi utilizatorii
 ro.tsk_CurrentUser=Doar pentru utilizatorul curent
 ro.tsk_Other=Alte activităţi:
@@ -883,11 +807,7 @@ ru.comp_intel_msdk=H.264 MVC 3D Декодер (будет скачан)
 ru.msg_DeleteSettings=Удалить также настроенные параметры MPC-BE?%n%nЕсли запланирована переустановка MPC-BE, эти параметры не нужно удалять.
 ru.msg_NoD3DX9DLL_found=Не установлена последняя версия системы DirectX!%n%nЗагрузите и установите последнюю версию DirectX June 2010 независимо от версии установленной операционной системы.
 ru.msg_SetupIsRunningWarning=Программа установки MPC-BE уже запущена!
-#if defined(sse_required)
-ru.msg_simd_sse=Для этой сборки MPC-BE требуется процессор с поддержкой SSE-инструкций.%n%nВ данном процессоре они не поддерживаются.
-#elif defined(sse2_required)
 ru.msg_simd_sse2=Для этой сборки MPC-BE требуется процессор с поддержкой SSE2-инструкций.%n%nВ данном процессоре они не поддерживаются.
-#endif
 ru.tsk_AllUsers=Для всех пользователей данного компьютера
 ru.tsk_CurrentUser=Только для текущего пользователя
 ru.tsk_Other=Другие задачи:
@@ -922,11 +842,7 @@ sc.comp_intel_msdk=H.264 MVC 3D 解码器（另外下载）
 sc.msg_DeleteSettings=是否同时删除 MPC-BE 设置?%n%n如果您打算再次安装 MPC-BE 则无需删除。
 sc.msg_NoD3DX9DLL_found=还没安装最新版本的 DirectX 运行库!%n%n不论您所使用的作业系统请下载及更新至最新版本的 DirectX 运行库（2010 年 6 月）。
 sc.msg_SetupIsRunningWarning=MPC-BE 安装程序已在运行中！
-#if defined(sse_required)
-sc.msg_simd_sse=这个编译版的 MPC-BE 需要一个支持 SSE 指令集的 CPU。%n%n但是您的 CPU 并不支持这个功能。
-#elif defined(sse2_required)
 sc.msg_simd_sse2=这个编译版的 MPC-BE 需要一个支持 SSE2 指令集的 CPU。%n%n但是您的 CPU 并不支持这个功能。
-#endif
 sc.tsk_AllUsers=为所有用户安装
 sc.tsk_CurrentUser=仅为当前用户安装
 sc.tsk_Other=其他任务:
@@ -961,11 +877,7 @@ sv.comp_mpcresources=Översättningar
 sv.msg_DeleteSettings=Vill du också ta bort inställningarna för MPC-BE?%n%nOm du planerar att installera MPC-BE igen så behöver du inte ta bort dem.
 sv.msg_NoD3DX9DLL_found=Senaste DirectX har inte installerats!%n%nHämta ner och installera senaste DirectX June 2010 oavsett ditt operativsystem.
 sv.msg_SetupIsRunningWarning=Konfigurering av MPC-BE pågår redan!
-#if defined(sse_required)
-sv.msg_simd_sse=Detta bygge av MPC-BE kräver en processor med stöd för SSE-tillägget.%n%nDin processor saknar detta stöd.
-#elif defined(sse2_required)
 sv.msg_simd_sse2=Detta bygge av MPC-BE kräver en processor med stöd för SSE2-tillägget.%n%nDin processor saknar detta stöd.
-#endif
 sv.tsk_AllUsers=För alla användare
 sv.tsk_CurrentUser=Endast för den aktuella användaren
 sv.tsk_Other=Andra uppgifter:
@@ -1000,11 +912,7 @@ sk.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
 sk.msg_DeleteSettings=Chcete vymazať aj nastavenia programu MPC-BE?%n%nAk plánujete opätovnú inštaláciu programu MPC-BE, tak nie je potrebné ich vymazávať.
 sk.msg_NoD3DX9DLL_found=Najnovšie rozhranie DirectX nie je nainštalované!%n%nProsím stiahnite a nainštalujte si ho June 2010 bez ohľadu na verziu operačného systému.
 sk.msg_SetupIsRunningWarning=Inštalácia programu MPC-BE je už spustená!
-#if defined(sse_required)
-sk.msg_simd_sse=Toto zostavenie MPC-BE vyžaduje procesor s podporou inštrukcií SSE.%n%nVáš procesor ich nepodporuje.
-#elif defined(sse2_required)
 sk.msg_simd_sse2=Toto zostavenie MPC-BE vyžaduje procesor s podporou inštrukcií SSE2.%n%nVáš procesor ich nepodporuje.
-#endif
 sk.tsk_AllUsers=Pre všetkých používateľov
 sk.tsk_CurrentUser=Len pre aktuálneho používateľa
 sk.tsk_Other=Iné úlohy:
@@ -1039,11 +947,7 @@ tc.comp_intel_msdk=H.264 MVC 3D 解碼器（額外下載）
 tc.msg_DeleteSettings=您是否也要刪除 MPC-BE 設定？%n%n如果您打算再次安裝 MPC-BE 則無需刪除。
 tc.msg_NoD3DX9DLL_found=未安裝最新版本的 DirectX Runtime！%n%n不論您使用的作業系統為何，請下載並更新至最新版本的 DirectX Runtime （2010 年 6 月）。
 tc.msg_SetupIsRunningWarning=已在執行 MPC-BE 安裝程式！
-#if defined(sse_required)
-tc.msg_simd_sse=此版的 MPC-BE 需要有支援 SSE 延伸指令集的 CPU。%n%n您的 CPU 並未相容這些功能。
-#elif defined(sse2_required)
 tc.msg_simd_sse2=此版的 MPC-BE 需要有支援 SSE2 延伸指令集的 CPU。%n%n您的 CPU 並未相容這些功能。
-#endif
 tc.tsk_AllUsers=安裝給所有使用者
 tc.tsk_CurrentUser=僅安裝給目前使用者
 tc.tsk_Other=其他工作：
@@ -1078,11 +982,7 @@ tr.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
 tr.msg_DeleteSettings=MPC-BE ayarlarını silmek istiyor musunuz?%n%nMPC-BE 'yi tekrar yüklemeyi planlıyorsanız, bu ayarları silmemeniz önerilir.
 tr.msg_NoD3DX9DLL_found=En son DirectX çalıştırılabilir paketi yüklü değil!%n%nLütfen en son DirectX paketini June 2010 innDirip kurunuz. İşletim sistemi sürümünüz, bu aşamada önemli değildir.
 tr.msg_SetupIsRunningWarning=MPC-BE kurulumu zaten çalışıyor.
-#if defined(sse_required)
-tr.msg_simd_sse=Bu MPC-BE sürümü, SSE eklentisi destekleyen bir işlemci gerektirmektedir.%n%nİşlemciniz bu özelliği desteklemiyor.
-#elif defined(sse2_required)
 tr.msg_simd_sse2=Bu MPC-BE sürümü, SSE2 eklentisi destekleyen bir işlemci gerektirmektedir.%n%nİşlemciniz bu özelliği desteklemiyor.
-#endif
 tr.tsk_AllUsers=Tüm kullanıcılar için
 tr.tsk_CurrentUser=Sadece mevcut kullanıcı için
 tr.tsk_Other=Diğer görevler:
@@ -1117,11 +1017,7 @@ ua.comp_intel_msdk=H.264 MVC 3D Decoder (extra downloading)
 ua.msg_DeleteSettings=Чи хочете ви видалити налаштування MPC-BE?%n%nЯкщо ви плануєте просто повторно встановити MPC-BE, то вам не потрібно їх видаляти.
 ua.msg_NoD3DX9DLL_found=Останню версію DirectX не встановлено!%n%nБудь ласка, завантажте і встановіть останню версію DirectX June 2010 відповідно до операційної системи, яку ви використовуєте.
 ua.msg_SetupIsRunningWarning=Встановлення MPC-BE вже запущено!
-#if defined(sse_required)
-ua.msg_simd_sse=Для використання даної версії MPC-BE необхідно, щоб ваш процесор підтримував SSE розширення.%n%nАле ваш процесор не підтримує їх.
-#elif defined(sse2_required)
 ua.msg_simd_sse2=Для використання даної версії MPC-BE необхідно, щоб ваш процесор підтримував SSE2 розширення.%n%nАле ваш процесор не підтримує їх.
-#endif
 ua.tsk_AllUsers=Для всіх користувачів
 ua.tsk_CurrentUser=Лише для поточного користувача
 ua.tsk_Other=Інші завдання:
