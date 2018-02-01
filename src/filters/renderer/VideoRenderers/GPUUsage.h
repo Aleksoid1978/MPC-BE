@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2017 see Authors.txt
+ * (C) 2013-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -82,12 +82,13 @@ public:
 	enum GPUType {
 		ATI_GPU,
 		NVIDIA_GPU,
+		OTHER_GPU,
 		UNKNOWN_GPU
 	};
 
 	CGPUUsage();
 	~CGPUUsage();
-	HRESULT Init(CString DeviceName, CString Device);
+	HRESULT Init(const CString& DeviceName, const CString& Device);
 
 	void	GetUsage(UINT& gpu_usage, UINT& gpu_clock, UINT64& gpu_mem_usage_total, UINT64& gpu_mem_usage_current);
 	GPUType	GetType() const { return m_GPUType; }
@@ -97,8 +98,11 @@ private:
 
 	UINT   m_iGPUUsage;
 	UINT   m_iGPUClock;
-	UINT64 m_llGPUdedicatedBytesUsedTotal;
-	UINT64 m_llGPUdedicatedBytesUsedCurrent;
+	UINT64 m_llGPUDedicatedBytesUsedTotal;
+	UINT64 m_llGPUDedicatedBytesUsedCurrent;
+	UINT64 m_llGPUSharedBytesUsedTotal;
+	UINT64 m_llGPUSharedBytesUsedCurrent;
+
 	DWORD  m_dwLastRun;
 
 	GPUType m_GPUType;
@@ -138,6 +142,18 @@ private:
 	DXGI_ADAPTER_DESC dxgiAdapterDesc = { 0 };
 
 	HANDLE processHandle = nullptr;
+
+	struct LONGLONG_DELTA {
+		LONGLONG Value;
+		LONGLONG Delta;
+	};
+	struct gpuStatictic {
+		LONGLONG_DELTA gputotalRunningTime;
+		LONGLONG runningTime;
+	};
+	std::vector <gpuStatictic> gpuStatictics;
+
+	LONGLONG_DELTA totalRunning = {};
 
 	void Clean();
 };
