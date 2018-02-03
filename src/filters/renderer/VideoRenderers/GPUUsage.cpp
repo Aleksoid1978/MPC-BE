@@ -30,15 +30,6 @@ static void* __stdcall ADL_Main_Memory_Alloc(int iSize)
 }
 
 CGPUUsage::CGPUUsage()
-	: m_iGPUUsage(0)
-	, m_iGPUClock(0)
-	, m_llGPUDedicatedBytesUsedTotal(0)
-	, m_llGPUDedicatedBytesUsedCurrent(0)
-	, m_llGPUSharedBytesUsedTotal(0)
-	, m_llGPUSharedBytesUsedCurrent(0)
-	, m_dwLastRun(0)
-	, m_lRunCount(0)
-	, m_GPUType(UNKNOWN_GPU)
 {
 	Clean();
 
@@ -114,16 +105,11 @@ void CGPUUsage::Clean()
 
 	ZeroMemory(&dxgiAdapterDesc, sizeof(dxgiAdapterDesc));
 
-	m_iGPUUsage = 0;
-	m_iGPUClock = 0;
-	m_llGPUDedicatedBytesUsedTotal = 0;
-	m_llGPUDedicatedBytesUsedCurrent = 0;
-	m_llGPUSharedBytesUsedTotal = 0;
-	m_llGPUSharedBytesUsedCurrent = 0;
+	m_statistic = {};
 	m_dwLastRun = 0;
 	m_lRunCount = 0;
 
-	gpuStatictics.clear();
+	gpuTimeStatistics.clear();
 	totalRunning = {0, 0};
 }
 
@@ -357,7 +343,7 @@ HRESULT CGPUUsage::Init(const CString& DeviceName, const CString& Device)
 	}
 
 	if (m_GPUType == UNKNOWN_GPU && dxgiAdapterDesc.AdapterLuid.LowPart) {
-		m_GPUType = OTHER_GPU;
+		m_GPUType = Device.Find(L"Intel") == 0 ? INTEL_GPU : OTHER_GPU;
 	}
 
 	return m_GPUType == UNKNOWN_GPU ? E_FAIL : S_OK;
@@ -365,12 +351,9 @@ HRESULT CGPUUsage::Init(const CString& DeviceName, const CString& Device)
 
 #define UpdateDelta(Var, NewValue) { if (Var.Value) { Var.Delta = NewValue - Var.Value; } Var.Value = NewValue; }
 
-void CGPUUsage::GetUsage(UINT& gpu_usage, UINT& gpu_clock, UINT64& gpu_mem_usage_total, UINT64& gpu_mem_usage_current)
+void CGPUUsage::GetUsage(statistic& gpu_statistic)
 {
-	gpu_usage             = m_iGPUUsage;
-	gpu_clock             = m_iGPUClock;
-	gpu_mem_usage_total   = m_llGPUDedicatedBytesUsedTotal ? m_llGPUDedicatedBytesUsedTotal : m_llGPUSharedBytesUsedTotal;
-	gpu_mem_usage_current = m_llGPUDedicatedBytesUsedCurrent ? m_llGPUDedicatedBytesUsedCurrent : m_llGPUSharedBytesUsedCurrent;
+	gpu_statistic = m_statistic;
 
 	if (m_GPUType != UNKNOWN_GPU && ::InterlockedIncrement(&m_lRunCount) == 1) {
 		if (!EnoughTimePassed()) {
@@ -384,8 +367,8 @@ void CGPUUsage::GetUsage(UINT& gpu_usage, UINT& gpu_clock, UINT64& gpu_mem_usage
 					{
 						ADLPMActivity activity = { sizeof(activity) };
 						if (ADL_OK == ATIData.ADL_Overdrive5_CurrentActivity_Get(ATIData.iAdapterId, &activity)) {
-							m_iGPUUsage = activity.iActivityPercent;
-							m_iGPUClock = activity.iEngineClock / 100;
+							m_statistic.gpu   = activity.iActivityPercent;
+							m_statistic.clock = activity.iEngineClock / 100;
 						}
 					}
 					break;
@@ -393,8 +376,8 @@ void CGPUUsage::GetUsage(UINT& gpu_usage, UINT& gpu_clock, UINT64& gpu_mem_usage
 					{
 						ADLOD6CurrentStatus currentStatus = { 0 };
 						if (ADL_OK == ATIData.ADL_Overdrive6_CurrentStatus_Get(ATIData.iAdapterId, &currentStatus)) {
-							m_iGPUUsage = currentStatus.iActivityPercent;
-							m_iGPUClock = currentStatus.iEngineClock / 100;
+							m_statistic.gpu   = currentStatus.iActivityPercent;
+							m_statistic.clock = currentStatus.iEngineClock / 100;
 						}
 					}
 					break;
@@ -402,8 +385,8 @@ void CGPUUsage::GetUsage(UINT& gpu_usage, UINT& gpu_clock, UINT64& gpu_mem_usage
 					{
 						ADLODNPerformanceStatus odNPerformanceStatus = { 0 };
 						if (ADL_OK == ATIData.ADL2_OverdriveN_PerformanceStatus_Get(nullptr, ATIData.iAdapterId, &odNPerformanceStatus)) {
-							m_iGPUUsage = odNPerformanceStatus.iGPUActivityPercent;
-							m_iGPUClock = odNPerformanceStatus.iCoreClock / 100;
+							m_statistic.gpu   = odNPerformanceStatus.iGPUActivityPercent;
+							m_statistic.clock = odNPerformanceStatus.iCoreClock / 100;
 						}
 					}
 					break;
@@ -412,31 +395,30 @@ void CGPUUsage::GetUsage(UINT& gpu_usage, UINT& gpu_clock, UINT64& gpu_mem_usage
 			const int idx = NVData.gpuSelected;
 			if (NVData.NvAPI_GPU_GetPStates) {
 				if (NVData.NvAPI_GPU_GetPStates(NVData.gpuHandles[idx], &NVData.gpuPStates) == OK) {
-					UINT state_gpu = NVData.gpuPStates.pstates[NVAPI_DOMAIN_GPU].present ? NVData.gpuPStates.pstates[NVAPI_DOMAIN_GPU].percent : 0;
-					UINT state_vid = NVData.gpuPStates.pstates[NVAPI_DOMAIN_VID].present ? NVData.gpuPStates.pstates[NVAPI_DOMAIN_VID].percent : 0;
-					m_iGPUUsage = state_vid << 16 | state_gpu;
+					m_statistic.gpu    = NVData.gpuPStates.pstates[NVAPI_DOMAIN_GPU].present ? NVData.gpuPStates.pstates[NVAPI_DOMAIN_GPU].percent : 0;
+					m_statistic.decode = NVData.gpuPStates.pstates[NVAPI_DOMAIN_VID].present ? NVData.gpuPStates.pstates[NVAPI_DOMAIN_VID].percent : 0;
 				}
 			} else {
 				if (NVData.NvAPI_GPU_GetUsages(NVData.gpuHandles[idx], &NVData.gpuUsages) == OK) {
-					m_iGPUUsage = NVData.gpuUsages.usage[10] << 16 | NVData.gpuUsages.usage[2];
+					m_statistic.gpu = NVData.gpuUsages.usage[10] << 16 | NVData.gpuUsages.usage[2];
 				}
 			}
 
 			if (NVData.NvAPI_GPU_GetAllClocks
 					&& NVData.NvAPI_GPU_GetAllClocks(NVData.gpuHandles[idx], &NVData.gpuClocks) == OK) {
 				if (NVData.gpuClocks.clock[30] != 0) {
-					m_iGPUClock = NVData.gpuClocks.clock[30] / 2000;
+					m_statistic.clock = NVData.gpuClocks.clock[30] / 2000;
 				} else {
-					m_iGPUClock = NVData.gpuClocks.clock[0] / 1000;
+					m_statistic.clock = NVData.gpuClocks.clock[0] / 1000;
 				}
 			}
 		}
 
 		if (dxgiAdapterDesc.AdapterLuid.LowPart) {
-			m_llGPUDedicatedBytesUsedTotal = 0;
-			m_llGPUDedicatedBytesUsedCurrent = 0;
-			m_llGPUSharedBytesUsedTotal = 0;
-			m_llGPUSharedBytesUsedCurrent = 0;
+			UINT64 llGPUDedicatedBytesUsedTotal = 0;
+			UINT64 llGPUDedicatedBytesUsedCurrent = 0;
+			UINT64 llGPUSharedBytesUsedTotal = 0;
+			UINT64 llGPUSharedBytesUsedCurrent = 0;
 
 			ULONG nodeCount = 0;
 
@@ -465,9 +447,9 @@ void CGPUUsage::GetUsage(UINT& gpu_usage, UINT& gpu_clock, UINT64& gpu_mem_usage
 						}
 
 						if (aperture) {
-							m_llGPUSharedBytesUsedTotal += commitLimit;
+							llGPUSharedBytesUsedTotal += commitLimit;
 						} else {
-							m_llGPUDedicatedBytesUsedTotal += commitLimit;
+							llGPUDedicatedBytesUsedTotal += commitLimit;
 						}
 
 						ZeroMemory(&queryStatistics, sizeof(D3DKMT_QUERYSTATISTICS));
@@ -478,24 +460,27 @@ void CGPUUsage::GetUsage(UINT& gpu_usage, UINT& gpu_clock, UINT64& gpu_mem_usage
 						if (NT_SUCCESS(pD3DKMTQueryStatistics(&queryStatistics))) {
 							if (SysVersion::IsWin81orLater()) {
 								if (aperture) {
-									m_llGPUSharedBytesUsedCurrent += queryStatistics.QueryResult.ProcessSegmentInformation.BytesCommitted;
+									llGPUSharedBytesUsedCurrent += queryStatistics.QueryResult.ProcessSegmentInformation.BytesCommitted;
 								} else {
-									m_llGPUDedicatedBytesUsedCurrent += queryStatistics.QueryResult.ProcessSegmentInformation.BytesCommitted;
+									llGPUDedicatedBytesUsedCurrent += queryStatistics.QueryResult.ProcessSegmentInformation.BytesCommitted;
 								}
 							} else {
 								if (aperture) {
-									m_llGPUSharedBytesUsedCurrent += (ULONG)queryStatistics.QueryResult.ProcessSegmentInformation.BytesCommitted;
+									llGPUSharedBytesUsedCurrent += (ULONG)queryStatistics.QueryResult.ProcessSegmentInformation.BytesCommitted;
 								} else {
-									m_llGPUDedicatedBytesUsedCurrent += (ULONG)queryStatistics.QueryResult.ProcessSegmentInformation.BytesCommitted;
+									llGPUDedicatedBytesUsedCurrent += (ULONG)queryStatistics.QueryResult.ProcessSegmentInformation.BytesCommitted;
 								}
 							}
 						}
 					}
 				}
+
+				m_statistic.memUsageTotal   = (llGPUDedicatedBytesUsedTotal ? llGPUDedicatedBytesUsedTotal : llGPUSharedBytesUsedTotal) / MEGABYTE;
+				m_statistic.memUsageCurrent = (llGPUDedicatedBytesUsedCurrent ? llGPUDedicatedBytesUsedCurrent : llGPUSharedBytesUsedCurrent) / MEGABYTE;
 			}
 
 			if (nodeCount && m_GPUType != NVIDIA_GPU) {
-				gpuStatictics.resize(nodeCount);
+				gpuTimeStatistics.resize(nodeCount);
 
 				ZeroMemory(&queryStatistics, sizeof(queryStatistics));
 				queryStatistics.Type = D3DKMT_QUERYSTATISTICS_NODE;
@@ -504,7 +489,7 @@ void CGPUUsage::GetUsage(UINT& gpu_usage, UINT& gpu_clock, UINT64& gpu_mem_usage
 					queryStatistics.QueryProcessNode.NodeId = i;
 					if (NT_SUCCESS(pD3DKMTQueryStatistics(&queryStatistics))
 							&& queryStatistics.QueryResult.NodeInformation.GlobalInformation.RunningTime.QuadPart) {
-						gpuStatictics[i].runningTime = queryStatistics.QueryResult.NodeInformation.GlobalInformation.RunningTime.QuadPart;
+						gpuTimeStatistics[i].runningTime = queryStatistics.QueryResult.NodeInformation.GlobalInformation.RunningTime.QuadPart;
 					}
 				}
 
@@ -516,14 +501,37 @@ void CGPUUsage::GetUsage(UINT& gpu_usage, UINT& gpu_clock, UINT64& gpu_mem_usage
 				if (performanceCounter.QuadPart && performanceFrequency.QuadPart) {
 					UpdateDelta(totalRunning, performanceCounter.QuadPart);
 					if (totalRunning.Delta) {
-						m_iGPUUsage = 0;
+						m_statistic.gpu = 0;
+						m_statistic.decode = 0;
+						m_statistic.processing = 0;
 						const auto elapsedTime = llMulDiv(totalRunning.Delta, 10000000, performanceFrequency.QuadPart, 0);
-						for (auto& item : gpuStatictics) {
-							if (item.runningTime) {
-								UpdateDelta(item.gputotalRunningTime, item.runningTime);
-								if (item.gputotalRunningTime.Delta) {
-									const UINT gpuUsage = llMulDiv(item.gputotalRunningTime.Delta, 100, elapsedTime, 0);
-									m_iGPUUsage = std::max(m_iGPUUsage, gpuUsage);
+
+						if (m_GPUType == INTEL_GPU && gpuTimeStatistics.size() >= 4) {
+							auto& item0 = gpuTimeStatistics[0];
+							UpdateDelta(item0.gputotalRunningTime, item0.runningTime);
+							if (item0.gputotalRunningTime.Delta) {
+								m_statistic.gpu = llMulDiv(item0.gputotalRunningTime.Delta, 100, elapsedTime, 0);
+							}
+
+							auto& item1 = gpuTimeStatistics[1];
+							UpdateDelta(item1.gputotalRunningTime, item1.runningTime);
+							if (item1.gputotalRunningTime.Delta) {
+								m_statistic.decode = llMulDiv(item1.gputotalRunningTime.Delta, 100, elapsedTime, 0);
+							}
+
+							auto& item3 = gpuTimeStatistics[3];
+							UpdateDelta(item3.gputotalRunningTime, item3.runningTime);
+							if (item3.gputotalRunningTime.Delta) {
+								m_statistic.processing = llMulDiv(item3.gputotalRunningTime.Delta, 100, elapsedTime, 0);
+							}
+						} else {
+							for (auto& item : gpuTimeStatistics) {
+								if (item.runningTime) {
+									UpdateDelta(item.gputotalRunningTime, item.runningTime);
+									if (item.gputotalRunningTime.Delta) {
+										const BYTE gpuUsage = llMulDiv(item.gputotalRunningTime.Delta, 100, elapsedTime, 0);
+										m_statistic.gpu = std::max(m_statistic.gpu, gpuUsage);
+									}
 								}
 							}
 						}
@@ -531,12 +539,8 @@ void CGPUUsage::GetUsage(UINT& gpu_usage, UINT& gpu_clock, UINT64& gpu_mem_usage
 				}
 			}
 		}
-
-		gpu_usage             = m_iGPUUsage;
-		gpu_clock             = m_iGPUClock;
-		gpu_mem_usage_total   = m_llGPUDedicatedBytesUsedTotal ? m_llGPUDedicatedBytesUsedTotal : m_llGPUSharedBytesUsedTotal;
-		gpu_mem_usage_current = m_llGPUDedicatedBytesUsedCurrent ? m_llGPUDedicatedBytesUsedCurrent : m_llGPUSharedBytesUsedCurrent;
-
+		
+		gpu_statistic = m_statistic;
 		m_dwLastRun = GetTickCount();
 	}
 
