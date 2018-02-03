@@ -72,7 +72,7 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 	DDX_CBIndex(pDX, IDC_D3D9DEVICE_COMBO, m_iD3D9RenderDevice);
 	DDX_Check(pDX, IDC_D3D9DEVICE_CHECK, m_bD3D9RenderDevice);
 	DDX_Check(pDX, IDC_RESETDEVICE, m_bResetDevice);
-	DDX_Control(pDX, IDC_FULLSCREEN_MONITOR_CHECK, m_chkD3DFullscreen);
+	DDX_Control(pDX, IDC_EXCLUSIVE_FULLSCREEN_CHECK, m_chkD3DFullscreen);
 	DDX_Control(pDX, IDC_CHECK1, m_chk10bitOutput);
 	DDX_Control(pDX, IDC_DSVMRLOADMIXER, m_chkVMRMixerMode);
 	DDX_Control(pDX, IDC_DSVMRYUVMIXER, m_chkVMRMixerYUV);
@@ -90,7 +90,7 @@ BEGIN_MESSAGE_MAP(CPPageVideo, CPPageBase)
 	ON_CBN_SELCHANGE(IDC_VIDRND_COMBO, OnDSRendererChange)
 	ON_BN_CLICKED(IDC_D3D9DEVICE_CHECK, OnD3D9DeviceCheck)
 	ON_BN_CLICKED(IDC_RESETDEVICE, OnResetDevice)
-	ON_BN_CLICKED(IDC_FULLSCREEN_MONITOR_CHECK, OnFullscreenCheck)
+	ON_BN_CLICKED(IDC_EXCLUSIVE_FULLSCREEN_CHECK, OnFullscreenCheck)
 	ON_UPDATE_COMMAND_UI(IDC_DSVMRYUVMIXER, OnUpdateMixerYUV)
 	ON_CBN_SELCHANGE(IDC_COMBO1, OnSurfaceFormatChange)
 	ON_CBN_SELCHANGE(IDC_COMBO8, OnFrameModeChange)
@@ -493,7 +493,7 @@ void CPPageVideo::OnResetDevice()
 
 void CPPageVideo::OnFullscreenCheck()
 {
-	if (m_chkD3DFullscreen.GetCheck() == BST_CHECKED && (MessageBoxW(ResStr(IDS_D3DFS_WARNING), nullptr, MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON2) == IDYES)) {
+	if (m_chkD3DFullscreen.GetCheck() == BST_CHECKED && (MessageBoxW(ResStr(IDS_EXCLUSIVE_FS_WARNING), nullptr, MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON2) == IDYES)) {
 		m_chk10bitOutput.EnableWindow(TRUE);
 	} else {
 		m_chkD3DFullscreen.SetCheck(BST_UNCHECKED);

@@ -882,7 +882,7 @@
 #define IDS_VIEW_FRAMEONLY              20008
 #define IDS_VIEW_CAPTIONMENU            20009
 #define IDS_VIEW_HIDEMENU               20010
-#define IDC_FULLSCREEN_MONITOR_CHECK    22002
+#define IDC_EXCLUSIVE_FULLSCREEN_CHECK  22002
 #define IDC_RESET                       22004
 #define IDC_DVD_POS                     22005
 #define IDC_FILE_POS                    22006
@@ -1207,7 +1207,7 @@
 #define IDS_AUDIOWINDOW_NONE            33180
 #define IDS_AUDIOWINDOW_COVER           33181
 #define IDS_AUDIOWINDOW_HIDE            33182
-#define IDS_D3DFS_WARNING               33190
+#define IDS_EXCLUSIVE_FS_WARNING        33190
 #define IDS_MAINFRM_139                 33191
 #define IDS_AG_TITLE2                   33192
 #define IDS_THUMB_ROWNUMBER             33195
