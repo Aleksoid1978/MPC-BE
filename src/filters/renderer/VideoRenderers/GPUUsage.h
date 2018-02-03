@@ -82,32 +82,35 @@ public:
 	enum GPUType {
 		ATI_GPU,
 		NVIDIA_GPU,
+		INTEL_GPU,
 		OTHER_GPU,
 		UNKNOWN_GPU
+	};
+
+	struct statistic {
+		BYTE gpu = 0;
+		BYTE decode = 0;
+		BYTE processing = 0;
+		UINT clock = 0;
+		UINT64 memUsageCurrent = 0;
+		UINT64 memUsageTotal = 0;
 	};
 
 	CGPUUsage();
 	~CGPUUsage();
 	HRESULT Init(const CString& DeviceName, const CString& Device);
 
-	void	GetUsage(UINT& gpu_usage, UINT& gpu_clock, UINT64& gpu_mem_usage_total, UINT64& gpu_mem_usage_current);
-	GPUType	GetType() const { return m_GPUType; }
+	void    GetUsage(statistic& gpu_statistic);
+	GPUType GetType() const { return m_GPUType; }
 
 private:
 	bool EnoughTimePassed();
 
-	UINT   m_iGPUUsage;
-	UINT   m_iGPUClock;
-	UINT64 m_llGPUDedicatedBytesUsedTotal;
-	UINT64 m_llGPUDedicatedBytesUsedCurrent;
-	UINT64 m_llGPUSharedBytesUsedTotal;
-	UINT64 m_llGPUSharedBytesUsedCurrent;
+	DWORD         m_dwLastRun = 0;
+	volatile LONG m_lRunCount = 0;
 
-	DWORD  m_dwLastRun;
-
-	GPUType m_GPUType;
-
-	volatile LONG m_lRunCount;
+	GPUType m_GPUType = UNKNOWN_GPU;
+	statistic m_statistic = {};
 
 	struct {
 		HMODULE                               hAtiADL;
@@ -139,7 +142,7 @@ private:
 	HMODULE dxgiHandle = nullptr;
 	typedef HRESULT (WINAPI *CreateDXGIFactory_t)(REFIID riid, _Out_ void **ppFactory);
 	CreateDXGIFactory_t pCreateDXGIFactory = nullptr;
-	DXGI_ADAPTER_DESC dxgiAdapterDesc = { 0 };
+	DXGI_ADAPTER_DESC dxgiAdapterDesc = {};
 
 	HANDLE processHandle = nullptr;
 
@@ -147,11 +150,11 @@ private:
 		LONGLONG Value;
 		LONGLONG Delta;
 	};
-	struct gpuStatictic {
+	struct gpuTimeStatistic {
 		LONGLONG_DELTA gputotalRunningTime;
 		LONGLONG runningTime;
 	};
-	std::vector <gpuStatictic> gpuStatictics;
+	std::vector <gpuTimeStatistic> gpuTimeStatistics;
 
 	LONGLONG_DELTA totalRunning = {};
 
