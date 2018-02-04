@@ -2013,7 +2013,8 @@ HRESULT CDX9RenderingEngine::InitCorrectionPass(const AM_MEDIA_TYPE& input_mt)
 		extformat.value = ((VIDEOINFOHEADER2*)input_mt.pbFormat)->dwControlFlags;
 	}
 
-	if (m_inputExtFormat.value != extformat.value) {
+	if (m_inputExtFormat.value != extformat.value
+			|| !m_pPSCorrection) {
 		// DXVA2_ExtendedFormat was chaged
 		m_inputExtFormat.value = extformat.value;
 		m_pPSCorrection.Release();
