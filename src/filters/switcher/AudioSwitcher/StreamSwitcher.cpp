@@ -580,7 +580,7 @@ HRESULT CStreamSwitcherInputPin::CompleteConnect(IPin* pReceivePin)
 		if (CComQIPtr<IAMStreamSelect> pSSF = pBF) {
 			hr = pSSF->Count(&cStreams);
 			if (SUCCEEDED(hr)) {
-				for (int i = 0; i < (int)cStreams; i++) {
+				for (long i = 0; i < (long)cStreams; i++) {
 					WCHAR* pszName = nullptr;
 					AM_MEDIA_TYPE* pmt = nullptr;
 					hr = pSSF->Info(i, &pmt, nullptr, nullptr, nullptr, &pszName, nullptr, nullptr);
@@ -1436,7 +1436,7 @@ STDMETHODIMP CStreamSwitcherFilter::Count(DWORD* pcStreams)
 				DWORD cStreams = 0;
 				HRESULT hr = pSSF->Count(&cStreams);
 				if (SUCCEEDED(hr)) {
-					for (int i = 0; i < (int)cStreams; i++) {
+					for (long i = 0; i < (long)cStreams; i++) {
 						AM_MEDIA_TYPE* pmt = nullptr;
 						hr = pSSF->Info(i, &pmt, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
 						if (SUCCEEDED(hr) && pmt && pmt->majortype == MEDIATYPE_Audio) {
@@ -1467,7 +1467,7 @@ STDMETHODIMP CStreamSwitcherFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWOR
 				DWORD cStreams = 0;
 				HRESULT hr = pSSF->Count(&cStreams);
 				if (SUCCEEDED(hr)) {
-					for (int i = 0; i < (int)cStreams; i++) {
+					for (long i = 0; i < (long)cStreams; i++) {
 						AM_MEDIA_TYPE* pmt = nullptr;
 						DWORD dwFlags;
 						LPWSTR pszName = nullptr;
@@ -1536,6 +1536,10 @@ STDMETHODIMP CStreamSwitcherFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWOR
 				lIndex--;
 			}
 		}
+
+		if (bFound) {
+			break;
+		}
 	}
 
 	if (!bFound) {
@@ -1587,6 +1591,10 @@ STDMETHODIMP CStreamSwitcherFilter::Enable(long lIndex, DWORD dwFlags)
 			} else {
 				lIndex--;
 			}
+		}
+
+		if (pNewInputPin) {
+			break;
 		}
 	}
 
