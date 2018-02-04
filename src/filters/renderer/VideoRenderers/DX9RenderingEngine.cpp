@@ -319,6 +319,10 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 			screenSpacePassCount++;
 		}
 
+		if (!pRenderTarget) {
+			screenSpacePassCount++;
+		}
+
 		// Custom screen space pixel shaders
 		bCustomScreenSpacePixelShaders = !m_pCustomScreenSpacePixelShaders.empty();
 		if (bCustomScreenSpacePixelShaders) {
