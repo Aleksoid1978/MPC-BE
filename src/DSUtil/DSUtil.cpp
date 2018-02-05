@@ -625,44 +625,43 @@ IPin* InsertFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB)
 	return pPin;
 }
 
-void ExtractMediaTypes(IPin* pPin, CAtlArray<GUID>& types)
+void ExtractMediaTypes(IPin* pPin, std::vector<GUID>& types)
 {
-	types.RemoveAll();
+	types.clear();
 
 	BeginEnumMediaTypes(pPin, pEM, pmt) {
 		bool fFound = false;
 
-		for (size_t i = 0; !fFound && i < types.GetCount(); i += 2) {
+		for (size_t i = 0; !fFound && i < types.size(); i += 2) {
 			if (types[i] == pmt->majortype && types[i+1] == pmt->subtype) {
 				fFound = true;
 			}
 		}
 
 		if (!fFound) {
-			types.Add(pmt->majortype);
-			types.Add(pmt->subtype);
+			types.push_back(pmt->majortype);
+			types.push_back(pmt->subtype);
 		}
 	}
 	EndEnumMediaTypes(pmt)
 }
 
-void ExtractMediaTypes(IPin* pPin, CAtlList<CMediaType>& mts)
+void ExtractMediaTypes(IPin* pPin, std::list<CMediaType>& mts)
 {
-	mts.RemoveAll();
+	mts.clear();
 
 	BeginEnumMediaTypes(pPin, pEM, pmt) {
 		bool fFound = false;
 
-		POSITION pos = mts.GetHeadPosition();
-		while (!fFound && pos) {
-			CMediaType& mt = mts.GetNext(pos);
+		for (const auto& mt : mts) {
 			if (mt.majortype == pmt->majortype && mt.subtype == pmt->subtype) {
 				fFound = true;
+				break;
 			}
 		}
 
 		if (!fFound) {
-			mts.AddTail(CMediaType(*pmt));
+			mts.emplace_back(*pmt);
 		}
 	}
 	EndEnumMediaTypes(pmt)
@@ -1371,7 +1370,7 @@ struct ExternalObject {
 	CLSID clsid;
 };
 
-static CAtlList<ExternalObject> s_extobjs;
+static std::list<ExternalObject> s_extobjs;
 
 HRESULT LoadExternalObject(LPCWSTR path, REFCLSID clsid, REFIID iid, void** ppv)
 {
@@ -1382,9 +1381,7 @@ HRESULT LoadExternalObject(LPCWSTR path, REFCLSID clsid, REFIID iid, void** ppv)
 	HINSTANCE hInst = nullptr;
 	bool fFound = false;
 
-	POSITION pos = s_extobjs.GetHeadPosition();
-	while (pos) {
-		ExternalObject& eo = s_extobjs.GetNext(pos);
+	for (const auto& eo : s_extobjs) {
 		if (!eo.path.CompareNoCase(fullpath)) {
 			hInst = eo.hInst;
 			fFound = true;
@@ -1419,7 +1416,7 @@ HRESULT LoadExternalObject(LPCWSTR path, REFCLSID clsid, REFIID iid, void** ppv)
 		eo.path = fullpath;
 		eo.hInst = hInst;
 		eo.clsid = clsid;
-		s_extobjs.AddTail(eo);
+		s_extobjs.push_back(eo);
 	}
 
 	return hr;
@@ -1437,9 +1434,7 @@ HRESULT LoadExternalPropertyPage(IPersist* pP, REFCLSID clsid, IPropertyPage** p
 		return E_FAIL;
 	}
 
-	POSITION pos = s_extobjs.GetHeadPosition();
-	while (pos) {
-		ExternalObject& eo = s_extobjs.GetNext(pos);
+	for (const auto& eo : s_extobjs) {
 		if (eo.clsid == clsid2) {
 			return LoadExternalObject(eo.path, clsid, __uuidof(IPropertyPage), (void**)ppPP);
 		}
@@ -1450,12 +1445,10 @@ HRESULT LoadExternalPropertyPage(IPersist* pP, REFCLSID clsid, IPropertyPage** p
 
 void UnloadExternalObjects()
 {
-	POSITION pos = s_extobjs.GetHeadPosition();
-	while (pos) {
-		ExternalObject& eo = s_extobjs.GetNext(pos);
+	for (auto& eo : s_extobjs) {
 		CoFreeLibrary(eo.hInst);
 	}
-	s_extobjs.RemoveAll();
+	s_extobjs.clear();
 }
 
 CString MakeFullPath(LPCWSTR path)
@@ -2287,13 +2280,12 @@ CString LanguageToISO6392(LPCWSTR lang)
 {
 	CString str = lang;
 	str.MakeLower();
-	for (size_t i = 0; i < _countof(s_isolangs); i++) {
-		CAtlList<CString> sl;
-		Explode(CString(s_isolangs[i].name), sl, L';');
-		POSITION pos = sl.GetHeadPosition();
-		while (pos) {
-			if (!str.CompareNoCase(sl.GetNext(pos))) {
-				return CString(s_isolangs[i].iso6392);
+	for (const auto& isolang : s_isolangs) {
+		std::list<CString> sl;
+		Explode(CString(isolang.name), sl, L';');
+		for (const auto& s : sl) {
+			if (!str.CompareNoCase(s)) {
+				return CString(isolang.iso6392);
 			}
 		}
 	}
@@ -2952,42 +2944,42 @@ HRESULT CreateAVCfromH264(CMediaType* mt)
 void CreateVorbisMediaType(CMediaType& mt, std::vector<CMediaType>& mts, DWORD Channels, DWORD SamplesPerSec, DWORD BitsPerSample, const BYTE* pData, size_t Count)
 {
 	const BYTE* p = pData;
-	CAtlArray<int> sizes;
+	std::vector<int> sizes;
 	int totalsize = 0;
 	for (BYTE n = *p++; n > 0; n--) {
 		int size = 0;
 		do {
 			size += *p;
 		} while (*p++ == 0xff);
-		sizes.Add(size);
+		sizes.push_back(size);
 		totalsize += size;
 	}
-	sizes.Add(Count - (p - pData) - totalsize);
-	totalsize += sizes[sizes.GetCount()-1];
+	sizes.push_back(Count - (p - pData) - totalsize);
+	totalsize += sizes[sizes.size()-1];
 
-	if (sizes.GetCount() == 3) {
-		mt.subtype			= MEDIASUBTYPE_Vorbis2;
-		mt.formattype		= FORMAT_VorbisFormat2;
-		VORBISFORMAT2* pvf2	= (VORBISFORMAT2*)mt.AllocFormatBuffer(sizeof(VORBISFORMAT2) + totalsize);
+	if (sizes.size() == 3) {
+		mt.subtype          = MEDIASUBTYPE_Vorbis2;
+		mt.formattype       = FORMAT_VorbisFormat2;
+		VORBISFORMAT2* pvf2 = (VORBISFORMAT2*)mt.AllocFormatBuffer(sizeof(VORBISFORMAT2) + totalsize);
 		memset(pvf2, 0, mt.FormatLength());
-		pvf2->Channels		= Channels;
-		pvf2->SamplesPerSec	= SamplesPerSec;
-		pvf2->BitsPerSample	= BitsPerSample;
+		pvf2->Channels      = Channels;
+		pvf2->SamplesPerSec = SamplesPerSec;
+		pvf2->BitsPerSample = BitsPerSample;
 		BYTE* p2 = mt.Format() + sizeof(VORBISFORMAT2);
-		for (size_t i = 0; i < sizes.GetCount(); p += sizes[i], p2 += sizes[i], i++) {
+		for (size_t i = 0; i < sizes.size(); p += sizes[i], p2 += sizes[i], i++) {
 			memcpy(p2, p, pvf2->HeaderSize[i] = sizes[i]);
 		}
 
 		mts.push_back(mt);
 	}
 
-	mt.subtype = MEDIASUBTYPE_Vorbis;
-	mt.formattype = FORMAT_VorbisFormat;
-	VORBISFORMAT* vf = (VORBISFORMAT*)mt.AllocFormatBuffer(sizeof(VORBISFORMAT));
+	mt.subtype         = MEDIASUBTYPE_Vorbis;
+	mt.formattype      = FORMAT_VorbisFormat;
+	VORBISFORMAT* vf   = (VORBISFORMAT*)mt.AllocFormatBuffer(sizeof(VORBISFORMAT));
 	memset(vf, 0, mt.FormatLength());
-	vf->nChannels		= Channels;
-	vf->nSamplesPerSec	= SamplesPerSec;
-	vf->nMinBitsPerSec	= vf->nMaxBitsPerSec = vf->nAvgBitsPerSec = DWORD_MAX;
+	vf->nChannels      = Channels;
+	vf->nSamplesPerSec = SamplesPerSec;
+	vf->nMinBitsPerSec = vf->nMaxBitsPerSec = vf->nAvgBitsPerSec = DWORD_MAX;
 	mts.push_back(mt);
 }
 

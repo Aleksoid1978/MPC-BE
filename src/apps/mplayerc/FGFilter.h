@@ -67,7 +67,7 @@ public:
 	void SetMerit(UINT64 merit);
 	void SetName(CString name);
 	void AddType(const GUID& majortype, const GUID& subtype);
-	bool CheckTypes(const CAtlArray<GUID>& types, bool fExactMatch);
+	bool CheckTypes(const std::vector<GUID>& types, bool fExactMatch);
 
 	CAtlList<CString> m_protocols, m_extensions, m_chkbytes; // TODO: subtype?
 

@@ -982,7 +982,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 	{
 		CFGFilterList fl;
 
-		CAtlArray<GUID> types;
+		std::vector<GUID> types;
 		ExtractMediaTypes(pPinOut, types);
 
 		for (const auto& pFGF : m_transform) {
@@ -998,10 +998,10 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 		}
 
 		CComPtr<IEnumMoniker> pEM;
-		if (!types.IsEmpty()
+		if (!types.empty()
 				&& SUCCEEDED(m_pFM->EnumMatchingFilters(
 								 &pEM, 0, FALSE, MERIT_DO_NOT_USE+1,
-								 TRUE, types.GetCount()/2, types.GetData(), nullptr, nullptr, FALSE,
+								 TRUE, types.size()/2, types.data(), nullptr, nullptr, FALSE,
 								 !!pPinIn, 0, nullptr, nullptr, nullptr))) {
 			for (CComPtr<IMoniker> pMoniker; S_OK == pEM->Next(1, &pMoniker, nullptr); pMoniker = nullptr) {
 				CFGFilterRegistry* pFGF = DNew CFGFilterRegistry(pMoniker);

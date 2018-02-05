@@ -89,8 +89,8 @@ extern IPin*			InsertFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB)
 extern bool				CreateFilter(CString DisplayName, IBaseFilter** ppBF, CString& FriendlyName);
 extern bool				HasMediaType(IPin *pPin, const GUID &mediaType);
 
-extern void				ExtractMediaTypes(IPin* pPin, CAtlArray<GUID>& types);
-extern void				ExtractMediaTypes(IPin* pPin, CAtlList<CMediaType>& mts);
+extern void				ExtractMediaTypes(IPin* pPin, std::vector<GUID>& types);
+extern void				ExtractMediaTypes(IPin* pPin, std::list<CMediaType>& mts);
 extern bool				ExtractBIH(const AM_MEDIA_TYPE* pmt, BITMAPINFOHEADER* bih);
 extern bool				ExtractBIH(IMediaSample* pMS, BITMAPINFOHEADER* bih);
 extern bool				ExtractAvgTimePerFrame(const AM_MEDIA_TYPE* pmt, REFERENCE_TIME& rtAvgTimePerFrame);
