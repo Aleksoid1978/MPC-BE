@@ -249,12 +249,13 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CComPtr<IVMRMixerControl9>      m_pVMRMC9;
 	CComPtr<IMFVideoDisplayControl> m_pMFVDC;
 	CComPtr<IMFVideoProcessor>      m_pMFVP;
+	CComPtr<IMFVideoMixerBitmap>    m_pMFVMB;
+
 	CComPtr<IAMLine21Decoder_2>     m_pLN21;
 	CComPtr<IVMRWindowlessControl9> m_pVMRWC;
 
 	CComPtr<ID3DFullscreenControl>	m_pD3DFS;
 
-	CComPtr<IVMRMixerBitmap9>		m_pVMB;
 	CComPtr<IMadVRTextOsd>			m_pMVTO;
 
 	CComPtr<ISubPicAllocatorPresenter3>	m_pCAP;

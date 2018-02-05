@@ -23,6 +23,7 @@
 
 #include "DX9RenderingEngine.h"
 #include <dx/d3dx9.h>
+#include <evr9.h>
 #include "CPUUsage.h"
 #include "GPUUsage.h"
 #include "MemUsage.h"
@@ -31,7 +32,8 @@
 #include <vector>
 #include <MediaOffset3D.h>
 
-#define VMRBITMAP_UPDATE 0x80000000
+#define MFVBITMAP_DISABLE 0x40000000 // TODO remake without it
+#define MFVBITMAP_UPDATE  0x80000000
 
 #define NB_JITTER        126
 
@@ -48,7 +50,7 @@ namespace DSObjects
 		, public ID3DFullscreenControl
 	{
 	public:
-		CCritSec	m_VMR9AlphaBitmapLock;
+		CCritSec	m_MFVAlphaBitmapLock;
 		void		UpdateAlphaBitmap();
 
 	protected:
@@ -115,10 +117,10 @@ namespace DSObjects
 		double GetFrameRate();
 
 		long					m_nTearingPos;
-		VMR9AlphaBitmap			m_VMR9AlphaBitmap;
-		CAutoVectorPtr<BYTE>	m_VMR9AlphaBitmapData;
-		CRect					m_VMR9AlphaBitmapRect;
-		int						m_VMR9AlphaBitmapWidthBytes;
+		MFVideoAlphaBitmap		m_MFVAlphaBitmap;
+		CAutoVectorPtr<BYTE>	m_MFVAlphaBitmapData;
+		CRect					m_MFVAlphaBitmapRect;
+		int						m_MFVAlphaBitmapWidthBytes;
 
 		HRESULT (__stdcall *m_pD3DXLoadSurfaceFromMemory)(
 			_In_       LPDIRECT3DSURFACE9 pDestSurface,

@@ -37,7 +37,7 @@ COSD::COSD(CMainFrame* pMainFrame)
 	, m_bSeekBarVisible(false)
 	, m_bFlyBarVisible(false)
 	, m_bCursorMoving(false)
-	, m_pVMB(nullptr)
+	, m_pMFVMB(nullptr)
 	, m_pMVTO(nullptr)
 	, m_pWnd(nullptr)
 	, m_FontSize(0)
@@ -170,7 +170,7 @@ void COSD::OnDrawWnd()
 
 void COSD::OnSize(UINT nType, int cx, int cy)
 {
-	if (m_pWnd && m_pVMB) {
+	if (m_pWnd && (m_pMFVMB)) {
 		if (m_bSeekBarVisible || m_bFlyBarVisible) {
 			m_bCursorMoving		= false;
 			m_bSeekBarVisible	= false;
@@ -178,9 +178,10 @@ void COSD::OnSize(UINT nType, int cx, int cy)
 		}
 
 		CalcRect();
-		InvalidateVMROSD();
+		InvalidateBitmapOSD();
 		UpdateBitmap();
-	} else if (m_pWnd) {
+	}
+	else if (m_pWnd) {
 		//PostMessageW(WM_OSD_DRAW);
 		DrawWnd();
 	}
@@ -214,19 +215,17 @@ void COSD::UpdateBitmap()
 		m_MemDC.SelectObject(hbmpRender);
 
 		if (::GetObjectW(hbmpRender, sizeof(BITMAP), &m_BitmapInfo) != 0) {
-			// Configure the VMR's bitmap structure
-			if (m_pVMB) {
-				ZeroMemory(&m_VMR9AlphaBitmap, sizeof(m_VMR9AlphaBitmap));
-				m_VMR9AlphaBitmap.dwFlags		= VMRBITMAP_HDC | VMRBITMAP_SRCCOLORKEY;
-				m_VMR9AlphaBitmap.hdc			= m_MemDC;
-				m_VMR9AlphaBitmap.rSrc			= m_rectWnd;
-				m_VMR9AlphaBitmap.rDest.left	= 0;
-				m_VMR9AlphaBitmap.rDest.top		= 0;
-				m_VMR9AlphaBitmap.rDest.right	= 1.0;
-				m_VMR9AlphaBitmap.rDest.bottom	= 1.0;
-				m_VMR9AlphaBitmap.fAlpha		= 1.0;
-				m_VMR9AlphaBitmap.clrSrcKey		= m_Color[OSD_TRANSPARENT];
+			if (m_pMFVMB) {
+				ZeroMemory(&m_MFVAlphaBitmap, sizeof(m_MFVAlphaBitmap));
+				m_MFVAlphaBitmap.GetBitmapFromDC  = TRUE;
+				m_MFVAlphaBitmap.bitmap.hdc       = m_MemDC;
+				m_MFVAlphaBitmap.params.dwFlags   = MFVideoAlphaBitmap_SrcColorKey;
+				m_MFVAlphaBitmap.params.clrSrcKey = m_Color[OSD_TRANSPARENT];
+				m_MFVAlphaBitmap.params.rcSrc     = m_rectWnd;
+				m_MFVAlphaBitmap.params.nrcDest   = { 0, 0, 1, 1 };
+				m_MFVAlphaBitmap.params.fAlpha    = 1.0;
 			}
+
 			m_MemDC.SetTextColor(m_Color[OSD_TEXT]);
 			m_MemDC.SetBkMode(TRANSPARENT);
 		}
@@ -249,9 +248,9 @@ void COSD::Reset()
 	CalcRect();
 }
 
-void COSD::Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB)
+void COSD::Start(CWnd* pWnd, IMFVideoMixerBitmap* pMFVMB)
 {
-	m_pVMB		= pVMB;
+	m_pMFVMB	= pMFVMB;
 	m_pMVTO		= nullptr;
 	m_pWnd		= pWnd;
 	m_OSDType	= OSD_TYPE_BITMAP;
@@ -265,7 +264,7 @@ void COSD::Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB)
 
 void COSD::Start(CWnd* pWnd, IMadVRTextOsd* pMVTO)
 {
-	m_pVMB		= nullptr;
+	m_pMFVMB	= nullptr;
 	m_pMVTO		= pMVTO;
 	m_pWnd		= pWnd;
 	m_OSDType	= OSD_TYPE_MADVR;
@@ -275,7 +274,7 @@ void COSD::Start(CWnd* pWnd, IMadVRTextOsd* pMVTO)
 
 void COSD::Start(CWnd* pWnd)
 {
-	m_pVMB		= nullptr;
+	m_pMFVMB	= nullptr;
 	m_pMVTO		= nullptr;
 	m_pWnd		= pWnd;
 	m_OSDType	= OSD_TYPE_GDI;
@@ -297,7 +296,7 @@ void COSD::Stop()
 
 	ClearMessage();
 
-	m_pVMB.Release();
+	m_pMFVMB.Release();
 	m_pMVTO.Release();
 	m_pWnd = nullptr;
 
@@ -508,11 +507,11 @@ void COSD::DrawDebug()
 	}
 }
 
-void COSD::InvalidateVMROSD()
+void COSD::InvalidateBitmapOSD()
 {
 	CAutoLock Lock(&m_Lock);
 
-	if (!m_BitmapInfo.bmWidth || !m_BitmapInfo.bmHeight || !m_BitmapInfo.bmBitsPixel || !m_pVMB) {
+	if (!m_pMFVMB || !m_BitmapInfo.bmWidth || !m_BitmapInfo.bmHeight || !m_BitmapInfo.bmBitsPixel) {
 		return;
 	}
 
@@ -528,8 +527,7 @@ void COSD::InvalidateVMROSD()
 	DrawMessage();
 	DrawDebug();
 
-	m_VMR9AlphaBitmap.dwFlags &= ~VMRBITMAP_DISABLE;
-	m_pVMB->SetAlphaBitmap(&m_VMR9AlphaBitmap);
+	m_pMFVMB->SetAlphaBitmap(&m_MFVAlphaBitmap);
 
 	m_pMainFrame->RepaintVideo();
 }
@@ -553,37 +551,37 @@ bool COSD::OnMouseMove(UINT nFlags, CPoint point)
 {
 	bool bRet = false;
 
-	if (m_pVMB) {
+	if (m_pMFVMB) {
 		if (m_bCursorMoving) {
 			bRet = true;
 			UpdateSeekBarPos(point);
-			InvalidateVMROSD();
+			InvalidateBitmapOSD();
 		} else if (m_rectSeekBar.PtInRect(point)) {
 			bRet = true;
 			if (!m_bSeekBarVisible) {
 				m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_HAND);
 				m_bSeekBarVisible = true;
-				InvalidateVMROSD();
+				InvalidateBitmapOSD();
 			}
 		} else if (m_rectFlyBar.PtInRect(point)) {
 			bRet = true;
 			if (!m_bFlyBarVisible) {
 				m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_ARROW);
 				m_bFlyBarVisible = true;
-				InvalidateVMROSD();
+				InvalidateBitmapOSD();
 			} else {
 				if (!m_bMouseOverExitButton && m_rectExitButton.PtInRect(point)) {
 					m_bMouseOverExitButton	= true;
 					m_bMouseOverCloseButton	= false;
-					InvalidateVMROSD();
+					InvalidateBitmapOSD();
 				} else if (!m_bMouseOverCloseButton && m_rectCloseButton.PtInRect(point)) {
 					m_bMouseOverExitButton	= false;
 					m_bMouseOverCloseButton	= true;
-					InvalidateVMROSD();
+					InvalidateBitmapOSD();
 				} else if ((m_bMouseOverCloseButton && !m_rectCloseButton.PtInRect(point)) || (m_bMouseOverExitButton && !m_rectExitButton.PtInRect(point))) {
 					m_bMouseOverExitButton	= false;
 					m_bMouseOverCloseButton	= false;
-					InvalidateVMROSD();
+					InvalidateBitmapOSD();
 				}
 
 				if (m_rectCloseButton.PtInRect(point) || m_rectExitButton.PtInRect(point)) {
@@ -604,7 +602,7 @@ void COSD::OnMouseLeave()
 {
 	m_pMainFrame->m_pFullscreenWnd->SetCursor(IDC_ARROW);
 
-	const bool bHideBars = (m_pVMB && (m_bSeekBarVisible || m_bFlyBarVisible));
+	const bool bHideBars = (m_pMFVMB && (m_bSeekBarVisible || m_bFlyBarVisible));
 
 	m_bCursorMoving			= false;
 	m_bSeekBarVisible		= false;
@@ -618,7 +616,7 @@ void COSD::OnMouseLeave()
 			m_pWnd->KillTimer((UINT_PTR)this);
 			m_pWnd->SetTimer((UINT_PTR)this, 1000, TimerFunc);
 		}
-		InvalidateVMROSD();
+		InvalidateBitmapOSD();
 	}
 }
 
@@ -626,7 +624,7 @@ bool COSD::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	bool bRet = false;
 
-	if (m_pVMB) {
+	if (m_pMFVMB) {
 		if (m_rectCursor.PtInRect (point)) {
 			m_bCursorMoving		= true;
 			bRet				= true;
@@ -636,7 +634,7 @@ bool COSD::OnLButtonDown(UINT nFlags, CPoint point)
 			m_bSeekBarVisible	= true;
 			bRet				= true;
 			UpdateSeekBarPos(point);
-			InvalidateVMROSD();
+			InvalidateBitmapOSD();
 		}
 	}
 
@@ -647,7 +645,7 @@ bool COSD::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	bool bRet = false;
 
-	if (m_pVMB) {
+	if (m_pMFVMB) {
 		m_bCursorMoving = false;
 
 		if (m_rectFlyBar.PtInRect(point)) {
@@ -675,20 +673,20 @@ void COSD::SetPos(__int64 pos)
 {
 	m_llSeekPos = pos;
 	if (m_bSeekBarVisible) {
-		InvalidateVMROSD();
+		InvalidateBitmapOSD();
 	}
 }
 
 void COSD::SetRange(__int64 start,  __int64 stop)
 {
-	m_llSeekMin	= start;
+	m_llSeekMin = start;
 	m_llSeekMax = stop;
 }
 
 void COSD::GetRange(__int64& start, __int64& stop)
 {
-	start	= m_llSeekMin;
-	stop	= m_llSeekMax;
+	start = m_llSeekMin;
+	stop  = m_llSeekMax;
 }
 
 void COSD::TimerFunc(HWND hWnd, UINT nMsg, UINT_PTR nIDEvent, DWORD dwTime)
@@ -714,12 +712,10 @@ void COSD::ClearMessage(bool hide)
 	}
 
 	BOOL bRepaint = FALSE;
-	if (m_pVMB) {
-		bRepaint = TRUE;
-		DWORD dwBackup				= (m_VMR9AlphaBitmap.dwFlags | VMRBITMAP_DISABLE);
-		m_VMR9AlphaBitmap.dwFlags	= VMRBITMAP_DISABLE;
-		m_pVMB->SetAlphaBitmap(&m_VMR9AlphaBitmap);
-		m_VMR9AlphaBitmap.dwFlags	= dwBackup;
+	if (m_pMFVMB) {
+		bRepaint = TRUE; //???
+		m_pMFVMB->ClearAlphaBitmap();
+		DLog(L"IMFVideoMixerBitmap::ClearAlphaBitmap");
 	} else if (m_pMVTO) {
 		m_pMVTO->OsdClearMessage();
 	} else if (::IsWindow(m_hWnd) && IsWindowVisible()) {
@@ -739,7 +735,7 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 
 	const CAppSettings& s = AfxGetAppSettings();
 
-	if (m_pVMB) {
+	if (m_pMFVMB) {
 		if (nPos != OSD_DEBUG) {
 			m_nMessagePos	= nPos;
 			m_strMessage	= strMsg;
@@ -779,7 +775,7 @@ void COSD::DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration, in
 			}
 		}
 
-		InvalidateVMROSD();
+		InvalidateBitmapOSD();
 	} else if (m_pMVTO) {
 		m_pMVTO->OsdDisplayMessage(strMsg, nDuration);
 	} else if (m_pWnd) {
@@ -822,11 +818,11 @@ void COSD::DebugMessage(LPCTSTR format, ...)
 
 void COSD::HideMessage(bool hide)
 {
-	if (m_pVMB) {
+	if (m_pMFVMB) {
 		if (hide) {
 			ClearMessage(true);
 		} else {
-			InvalidateVMROSD();
+			InvalidateBitmapOSD();
 		}
 	} else {
 		if (hide) {

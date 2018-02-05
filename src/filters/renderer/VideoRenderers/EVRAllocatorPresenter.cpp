@@ -270,7 +270,7 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 		CMacrovisionKicker*	pMK  = DNew CMacrovisionKicker(NAME("CMacrovisionKicker"), nullptr);
 		CComPtr<IUnknown>	pUnk = (IUnknown*)(INonDelegatingUnknown*)pMK;
 
-		COuterEVR *pOuterEVR = DNew COuterEVR(NAME("COuterEVR"), pUnk, hr, &m_VMR9AlphaBitmap, this);
+		COuterEVR *pOuterEVR = DNew COuterEVR(NAME("COuterEVR"), pUnk, hr, this);
 		m_pOuterEVR = pOuterEVR;
 
 		pMK->SetInner((IUnknown*)(INonDelegatingUnknown*)pOuterEVR);
@@ -334,6 +334,8 @@ STDMETHODIMP CEVRAllocatorPresenter::NonDelegatingQueryInterface(REFIID riid, vo
 		hr = GetInterface((IMFAsyncCallback*)this, ppv);
 	} else if (riid == __uuidof(IMFVideoDisplayControl)) {
 		hr = GetInterface((IMFVideoDisplayControl*)this, ppv);
+	} else if (riid == __uuidof(IMFVideoMixerBitmap)) {
+		hr = GetInterface((IMFVideoMixerBitmap*)this, ppv);
 	} else if (riid == __uuidof(IEVRTrustedVideoPlugin)) {
 		hr = GetInterface((IEVRTrustedVideoPlugin*)this, ppv);
 	} else if (riid == IID_IQualProp) {
@@ -1075,7 +1077,7 @@ STDMETHODIMP CEVRAllocatorPresenter::InitServicePointers(/* [in] */ __in  IMFTop
 	TRACE_EVR("EVR: CEVRAllocatorPresenter::InitServicePointers\n");
 
 	HRESULT hr;
-	DWORD	dwObjects = 1;
+	DWORD dwObjects = 1;
 
 	ASSERT(!m_pMixer);
 	hr = pLookup->LookupService(MF_SERVICE_LOOKUP_GLOBAL, 0, MR_VIDEO_MIXER_SERVICE, __uuidof(IMFTransform), (void**)&m_pMixer, &dwObjects);
@@ -1324,6 +1326,44 @@ STDMETHODIMP CEVRAllocatorPresenter::GetFullscreen(BOOL *pfFullscreen)
 {
 	ASSERT(FALSE);
 	return E_NOTIMPL;
+}
+
+// IMFVideoMixerBitmap
+STDMETHODIMP CEVRAllocatorPresenter::ClearAlphaBitmap()
+{
+	CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
+	m_MFVAlphaBitmap.params.dwFlags |= MFVBITMAP_DISABLE;
+	UpdateAlphaBitmap();
+	return S_OK;
+}
+
+STDMETHODIMP CEVRAllocatorPresenter::GetAlphaBitmapParameters(MFVideoAlphaBitmapParams *pBmpParms)
+{
+	CheckPointer(pBmpParms, E_POINTER);
+	CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
+	memcpy(pBmpParms, &m_MFVAlphaBitmap.params, sizeof(MFVideoAlphaBitmapParams));
+	return S_OK;
+}
+
+STDMETHODIMP CEVRAllocatorPresenter::SetAlphaBitmap(const MFVideoAlphaBitmap *pBmpParms)
+{
+	CheckPointer(pBmpParms, E_POINTER);
+	CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
+	memcpy(&m_MFVAlphaBitmap, pBmpParms, sizeof(MFVideoAlphaBitmap));
+	m_MFVAlphaBitmap.params.dwFlags &= ~MFVBITMAP_DISABLE;
+	m_MFVAlphaBitmap.params.dwFlags |= MFVBITMAP_UPDATE;
+	UpdateAlphaBitmap();
+	return S_OK;
+}
+
+STDMETHODIMP CEVRAllocatorPresenter::UpdateAlphaBitmapParameters(const MFVideoAlphaBitmapParams *pBmpParms)
+{
+	CheckPointer(pBmpParms, E_POINTER);
+	CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
+	memcpy(&m_MFVAlphaBitmap.params, pBmpParms, sizeof(MFVideoAlphaBitmapParams));
+	m_MFVAlphaBitmap.params.dwFlags |= MFVBITMAP_UPDATE;
+	UpdateAlphaBitmap();
+	return S_OK;
 }
 
 // IEVRTrustedVideoPlugin

@@ -26,7 +26,7 @@
 #include <InitGuid.h>
 #include <d3d9.h>
 #include <dx/d3dx9.h>
-#include <vmr9.h>
+#include <evr9.h>
 #include <evr.h>
 #include <mfapi.h>
 #include <Mferror.h>
@@ -134,7 +134,7 @@ CBaseAP::CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error):
 		return;
 	}
 
-	ZeroMemory(&m_VMR9AlphaBitmap, sizeof(m_VMR9AlphaBitmap));
+	ZeroMemory(&m_MFVAlphaBitmap, sizeof(m_MFVAlphaBitmap));
 
 	CRenderersSettings& rs = GetRenderersSettings();
 	if (rs.bDisableDesktopComposition) {
@@ -1142,12 +1142,12 @@ void CBaseAP::SyncOffsetStats(LONGLONG syncOffset)
 
 void CBaseAP::UpdateAlphaBitmap()
 {
-	m_VMR9AlphaBitmapData.Free();
+	m_MFVAlphaBitmapData.Free();
 	m_pOSDTexture.Release();
 	m_pOSDSurface.Release();
 
-	if ((m_VMR9AlphaBitmap.dwFlags & VMRBITMAP_DISABLE) == 0) {
-		HBITMAP hBitmap = (HBITMAP)GetCurrentObject (m_VMR9AlphaBitmap.hdc, OBJ_BITMAP);
+	if ((m_MFVAlphaBitmap.params.dwFlags & MFVBITMAP_DISABLE) == 0) {
+		HBITMAP hBitmap = (HBITMAP)GetCurrentObject(m_MFVAlphaBitmap.bitmap.hdc, OBJ_BITMAP);
 		if (!hBitmap) {
 			return;
 		}
@@ -1156,11 +1156,11 @@ void CBaseAP::UpdateAlphaBitmap()
 			return;
 		}
 
-		m_VMR9AlphaBitmapRect = CRect(0, 0, info.dsBm.bmWidth, info.dsBm.bmHeight);
-		m_VMR9AlphaBitmapWidthBytes = info.dsBm.bmWidthBytes;
+		m_MFVAlphaBitmapRect = CRect(0, 0, info.dsBm.bmWidth, info.dsBm.bmHeight);
+		m_MFVAlphaBitmapWidthBytes = info.dsBm.bmWidthBytes;
 
-		if (m_VMR9AlphaBitmapData.Allocate(info.dsBm.bmWidthBytes * info.dsBm.bmHeight)) {
-			memcpy((BYTE *)m_VMR9AlphaBitmapData, info.dsBm.bmBits, info.dsBm.bmWidthBytes * info.dsBm.bmHeight);
+		if (m_MFVAlphaBitmapData.Allocate(info.dsBm.bmWidthBytes * info.dsBm.bmHeight)) {
+			memcpy((BYTE *)m_MFVAlphaBitmapData, info.dsBm.bmBits, info.dsBm.bmWidthBytes * info.dsBm.bmHeight);
 		}
 	}
 }
@@ -1503,19 +1503,19 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 
 	AlphaBltSubPic(rDstPri, rDstVid);
 
-	if (m_VMR9AlphaBitmap.dwFlags & VMRBITMAP_UPDATE) {
-		CAutoLock BitMapLock(&m_VMR9AlphaBitmapLock);
-		CRect rcSrc(m_VMR9AlphaBitmap.rSrc);
+	if (m_MFVAlphaBitmap.params.dwFlags & MFVBITMAP_UPDATE) {
+		CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
+		CRect rcSrc(m_MFVAlphaBitmap.params.rcSrc);
 		m_pOSDTexture.Release();
 		m_pOSDSurface.Release();
-		if ((m_VMR9AlphaBitmap.dwFlags & VMRBITMAP_DISABLE) == 0 && (BYTE *)m_VMR9AlphaBitmapData) {
+		if ((m_MFVAlphaBitmap.params.dwFlags & MFVBITMAP_DISABLE) == 0 && (BYTE *)m_MFVAlphaBitmapData) {
 			if ( (m_pD3DXLoadSurfaceFromMemory != nullptr) &&
 					SUCCEEDED(hr = m_pD3DDevEx->CreateTexture(rcSrc.Width(), rcSrc.Height(), 1,
 								   D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
 								   D3DPOOL_DEFAULT, &m_pOSDTexture, nullptr)) ) {
 				if (SUCCEEDED (hr = m_pOSDTexture->GetSurfaceLevel(0, &m_pOSDSurface))) {
-					hr = m_pD3DXLoadSurfaceFromMemory (m_pOSDSurface, nullptr, nullptr, (BYTE *)m_VMR9AlphaBitmapData, D3DFMT_A8R8G8B8, m_VMR9AlphaBitmapWidthBytes,
-													   nullptr, &m_VMR9AlphaBitmapRect, D3DX_FILTER_NONE, m_VMR9AlphaBitmap.clrSrcKey);
+					hr = m_pD3DXLoadSurfaceFromMemory (m_pOSDSurface, nullptr, nullptr, (BYTE *)m_MFVAlphaBitmapData, D3DFMT_A8R8G8B8, m_MFVAlphaBitmapWidthBytes,
+													   nullptr, &m_MFVAlphaBitmapRect, D3DX_FILTER_NONE, m_MFVAlphaBitmap.params.clrSrcKey);
 				}
 				if (FAILED (hr)) {
 					m_pOSDTexture.Release();
@@ -1523,7 +1523,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 				}
 			}
 		}
-		m_VMR9AlphaBitmap.dwFlags ^= VMRBITMAP_UPDATE;
+		m_MFVAlphaBitmap.params.dwFlags ^= MFVBITMAP_UPDATE;
 	}
 	if (rd->m_iDisplayStats) {
 		DrawStats();
@@ -2340,7 +2340,7 @@ STDMETHODIMP CSyncAP::CreateRenderer(IUnknown** ppRenderer)
 		CMacrovisionKicker* pMK = DNew CMacrovisionKicker(NAME("CMacrovisionKicker"), nullptr);
 		CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)pMK;
 
-		CSyncRenderer *pOuterEVR = DNew CSyncRenderer(NAME("CSyncRenderer"), pUnk, hr, &m_VMR9AlphaBitmap, this);
+		CSyncRenderer *pOuterEVR = DNew CSyncRenderer(NAME("CSyncRenderer"), pUnk, hr, this);
 		m_pOuterEVR = pOuterEVR;
 
 		pMK->SetInner((IUnknown*)(INonDelegatingUnknown*)pOuterEVR);
@@ -2403,6 +2403,8 @@ STDMETHODIMP CSyncAP::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 		hr = GetInterface((IMFAsyncCallback*)this, ppv);
 	} else if (riid == __uuidof(IMFVideoDisplayControl)) {
 		hr = GetInterface((IMFVideoDisplayControl*)this, ppv);
+	} else if (riid == __uuidof(IMFVideoMixerBitmap)) {
+		hr = GetInterface((IMFVideoMixerBitmap*)this, ppv);
 	} else if (riid == __uuidof(IEVRTrustedVideoPlugin)) {
 		hr = GetInterface((IEVRTrustedVideoPlugin*)this, ppv);
 	} else if (riid == IID_IQualProp) {
@@ -3190,6 +3192,43 @@ STDMETHODIMP CSyncAP::GetFullscreen(BOOL *pfFullscreen)
 	return E_NOTIMPL;
 }
 
+// IMFVideoMixerBitmap
+STDMETHODIMP CSyncAP::ClearAlphaBitmap()
+{
+	CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
+	m_MFVAlphaBitmap.params.dwFlags |= MFVBITMAP_DISABLE;
+	UpdateAlphaBitmap();
+	return S_OK;
+}
+
+STDMETHODIMP CSyncAP::GetAlphaBitmapParameters(MFVideoAlphaBitmapParams *pBmpParms)
+{
+	CheckPointer(pBmpParms, E_POINTER);
+	CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
+	memcpy(pBmpParms, &m_MFVAlphaBitmap.params, sizeof(MFVideoAlphaBitmapParams));
+	return S_OK;
+}
+
+STDMETHODIMP CSyncAP::SetAlphaBitmap(const MFVideoAlphaBitmap *pBmpParms)
+{
+	CheckPointer(pBmpParms, E_POINTER);
+	CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
+	memcpy(&m_MFVAlphaBitmap, pBmpParms, sizeof(MFVideoAlphaBitmap));
+	m_MFVAlphaBitmap.params.dwFlags |= MFVBITMAP_UPDATE;
+	UpdateAlphaBitmap();
+	return S_OK;
+}
+
+STDMETHODIMP CSyncAP::UpdateAlphaBitmapParameters(const MFVideoAlphaBitmapParams *pBmpParms)
+{
+	CheckPointer(pBmpParms, E_POINTER);
+	CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
+	memcpy(&m_MFVAlphaBitmap.params, pBmpParms, sizeof(MFVideoAlphaBitmapParams));
+	m_MFVAlphaBitmap.params.dwFlags |= MFVBITMAP_UPDATE;
+	UpdateAlphaBitmap();
+	return S_OK;
+}
+
 // IEVRTrustedVideoPlugin
 STDMETHODIMP CSyncAP::IsInTrustedVideoMode(BOOL *pYes)
 {
@@ -3775,12 +3814,11 @@ HRESULT CreateSyncRenderer(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISub
 	return hr;
 }
 
-CSyncRenderer::CSyncRenderer(const TCHAR* pName, LPUNKNOWN pUnk, HRESULT& hr, VMR9AlphaBitmap* pVMR9AlphaBitmap, CSyncAP *pAllocatorPresenter): CUnknown(pName, pUnk)
+CSyncRenderer::CSyncRenderer(const TCHAR* pName, LPUNKNOWN pUnk, HRESULT& hr, CSyncAP *pAllocatorPresenter): CUnknown(pName, pUnk)
 {
 	hr = m_pEVR.CoCreateInstance(CLSID_EnhancedVideoRenderer, GetOwner());
 	CComQIPtr<IBaseFilter> pEVRBase = m_pEVR;
 	m_pEVRBase = pEVRBase; // Don't keep a second reference on the EVR filter
-	m_pVMR9AlphaBitmap = pVMR9AlphaBitmap;
 	m_pAllocatorPresenter = pAllocatorPresenter;
 }
 
@@ -3884,46 +3922,13 @@ STDMETHODIMP CSyncRenderer::GetClassID(__RPC__out CLSID *pClassID)
 	return E_NOTIMPL;
 }
 
-STDMETHODIMP CSyncRenderer::GetAlphaBitmapParameters(VMR9AlphaBitmap* pBmpParms)
-{
-	CheckPointer(pBmpParms, E_POINTER);
-	CAutoLock BitMapLock(&m_pAllocatorPresenter->m_VMR9AlphaBitmapLock);
-	memcpy (pBmpParms, m_pVMR9AlphaBitmap, sizeof(VMR9AlphaBitmap));
-	return S_OK;
-}
-
-STDMETHODIMP CSyncRenderer::SetAlphaBitmap(const VMR9AlphaBitmap* pBmpParms)
-{
-	CheckPointer(pBmpParms, E_POINTER);
-	CAutoLock BitMapLock(&m_pAllocatorPresenter->m_VMR9AlphaBitmapLock);
-	memcpy (m_pVMR9AlphaBitmap, pBmpParms, sizeof(VMR9AlphaBitmap));
-	m_pVMR9AlphaBitmap->dwFlags |= VMRBITMAP_UPDATE;
-	m_pAllocatorPresenter->UpdateAlphaBitmap();
-	return S_OK;
-}
-
-STDMETHODIMP CSyncRenderer::UpdateAlphaBitmapParameters(const VMR9AlphaBitmap* pBmpParms)
-{
-	CheckPointer(pBmpParms, E_POINTER);
-	CAutoLock BitMapLock(&m_pAllocatorPresenter->m_VMR9AlphaBitmapLock);
-	memcpy (m_pVMR9AlphaBitmap, pBmpParms, sizeof(VMR9AlphaBitmap));
-	m_pVMR9AlphaBitmap->dwFlags |= VMRBITMAP_UPDATE;
-	m_pAllocatorPresenter->UpdateAlphaBitmap();
-	return S_OK;
-}
-
 STDMETHODIMP CSyncRenderer::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	HRESULT hr;
 
-	if (riid == __uuidof(IVMRMixerBitmap9)) {
-		return GetInterface((IVMRMixerBitmap9*)this, ppv);
-	}
-
 	if (riid == __uuidof(IBaseFilter)) {
 		return GetInterface((IBaseFilter*)this, ppv);
 	}
-
 	if (riid == __uuidof(IMediaFilter)) {
 		return GetInterface((IMediaFilter*)this, ppv);
 	}

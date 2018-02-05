@@ -52,6 +52,7 @@ namespace DSObjects
 		public IQualProp,
 		public IMFRateSupport,
 		public IMFVideoDisplayControl,
+		public IMFVideoMixerBitmap,
 		public IEVRTrustedVideoPlugin,
 		public IMediaSideData
 		//public IMFVideoPositionMapper, // Non mandatory EVR Presenter Interfaces (see later...)
@@ -135,6 +136,12 @@ namespace DSObjects
 		STDMETHODIMP GetRenderingPrefs(DWORD *pdwRenderFlags);
 		STDMETHODIMP SetFullscreen(BOOL fFullscreen);
 		STDMETHODIMP GetFullscreen(BOOL *pfFullscreen);
+
+		// IMFVideoMixerBitmap
+		STDMETHODIMP ClearAlphaBitmap();
+		STDMETHODIMP GetAlphaBitmapParameters(MFVideoAlphaBitmapParams *pBmpParms);
+		STDMETHODIMP SetAlphaBitmap(const MFVideoAlphaBitmap *pBmpParms);
+		STDMETHODIMP UpdateAlphaBitmapParameters(const MFVideoAlphaBitmapParams *pBmpParms);
 
 		// IEVRTrustedVideoPlugin
 		STDMETHODIMP IsInTrustedVideoMode(BOOL *pYes);

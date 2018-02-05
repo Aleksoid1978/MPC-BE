@@ -28,7 +28,6 @@
 #include <HighDPI.h>
 #include "PngImage.h"
 #include "..\..\DSUtil\DSMPropertyBag.h"
-//#include <Gdiplus.h>
 
 #define WM_HIDE			(WM_USER + 1001)
 #define WM_OSD_DRAW		(WM_USER + 1002)
@@ -68,7 +67,7 @@ public:
 
 	HRESULT Create(CWnd* pWnd);
 
-	void Start(CWnd* pWnd, IVMRMixerBitmap9* pVMB);
+	void Start(CWnd* pWnd, IMFVideoMixerBitmap* pMFVMB);
 	void Start(CWnd* pWnd, IMadVRTextOsd* pMVTO);
 	void Start(CWnd* pWnd);
 	void Stop();
@@ -76,9 +75,9 @@ public:
 	void DisplayMessage(OSD_MESSAGEPOS nPos, LPCTSTR strMsg, int nDuration = 5000, int FontSize = 0, CString OSD_Font = L"");
 	void DebugMessage(LPCTSTR format, ...);
 	void ClearMessage(bool hide = false);
-	void HideMessage(bool hide);
 
-	void EnableShowMessage(bool bValue = true)	{ m_bShowMessage = bValue; };
+	void HideMessage(bool hide);
+	void EnableShowMessage(bool bValue = true) { m_bShowMessage = bValue; };
 
 	__int64 GetPos() const;
 	void SetPos(__int64 pos);
@@ -99,16 +98,16 @@ public:
 
 	DECLARE_DYNAMIC(COSD)
 
-private :
-	CComPtr<IVMRMixerBitmap9>	m_pVMB;
-	CComPtr<IMadVRTextOsd>		m_pMVTO;
+private:
+	CComPtr<IMFVideoMixerBitmap> m_pMFVMB;
+	CComPtr<IMadVRTextOsd>       m_pMVTO;
 
 	CMainFrame*			m_pMainFrame;
 	CWnd*				m_pWnd;
 
 	CCritSec			m_Lock;
 	CDC					m_MemDC;
-	VMR9AlphaBitmap		m_VMR9AlphaBitmap;
+	MFVideoAlphaBitmap	m_MFVAlphaBitmap;
 	BITMAP				m_BitmapInfo;
 
 	CFont	m_MainFont;
@@ -159,10 +158,10 @@ private :
 
 	CString			m_strMessage;
 	OSD_MESSAGEPOS	m_nMessagePos;
-	std::list<CString>	m_debugMessages;
+	std::list<CString> m_debugMessages;
 
 	CCritSec				m_CBLock;
-	CComPtr<IDSMChapterBag>	m_pChapterBag;
+	CComPtr<IDSMChapterBag> m_pChapterBag;
 
 	UINT m_nDEFFLAGS;
 
@@ -179,7 +178,7 @@ private :
 	void DrawSlider(CRect* rect, __int64 llMin, __int64 llMax, __int64 llPos);
 	void DrawFlyBar(CRect* rect);
 	void DrawRect(CRect* rect, CBrush* pBrush = nullptr, CPen* pPen = nullptr);
-	void InvalidateVMROSD();
+	void InvalidateBitmapOSD();
 	void DrawMessage();
 	void DrawDebug();
 	static void CALLBACK TimerFunc(HWND hWnd, UINT nMsg, UINT_PTR nIDEvent, DWORD dwTime);
@@ -190,13 +189,10 @@ private :
 
 	void GradientFill(CDC* pDc, CRect* rc);
 
-	// Gdiplus::GdiplusStartupInput m_gdiplusStartupInput;
-	// ULONG_PTR m_gdiplusToken;
-
 	int SeekBarHeight      = 0;
 	int SliderBarHeight    = 0;
 	int SliderCursorHeight = 0;
-	int SliderCursorWidth  = 0 ;
+	int SliderCursorWidth  = 0;
 	int SliderChapHeight   = 0;
 	int SliderChapWidth    = 0;
 

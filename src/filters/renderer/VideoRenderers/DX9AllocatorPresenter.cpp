@@ -474,7 +474,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	ZeroMemory(m_TimeChangeHistory, sizeof(m_TimeChangeHistory));
 	ZeroMemory(m_ClockChangeHistory, sizeof(m_ClockChangeHistory));
 
-	ZeroMemory(&m_VMR9AlphaBitmap, sizeof(m_VMR9AlphaBitmap));
+	ZeroMemory(&m_MFVAlphaBitmap, sizeof(m_MFVAlphaBitmap));
 
 	m_DetectedFrameRate				= 0.0;
 	m_DetectedFrameTime				= 0.0;
@@ -1266,12 +1266,12 @@ bool CDX9AllocatorPresenter::WaitForVBlank(bool &_Waited, bool &_bTakenLock)
 
 void CDX9AllocatorPresenter::UpdateAlphaBitmap()
 {
-	m_VMR9AlphaBitmapData.Free();
+	m_MFVAlphaBitmapData.Free();
 	m_pOSDTexture.Release();
 	m_pOSDSurface.Release();
 
-	if ((m_VMR9AlphaBitmap.dwFlags & VMRBITMAP_DISABLE) == 0) {
-		HBITMAP hBitmap = (HBITMAP)GetCurrentObject(m_VMR9AlphaBitmap.hdc, OBJ_BITMAP);
+	if ((m_MFVAlphaBitmap.params.dwFlags & MFVBITMAP_DISABLE) == 0) {
+		HBITMAP hBitmap = (HBITMAP)GetCurrentObject(m_MFVAlphaBitmap.bitmap.hdc, OBJ_BITMAP);
 		if (!hBitmap) {
 			return;
 		}
@@ -1280,11 +1280,11 @@ void CDX9AllocatorPresenter::UpdateAlphaBitmap()
 			return;
 		}
 
-		m_VMR9AlphaBitmapRect = CRect(0, 0, info.dsBm.bmWidth, info.dsBm.bmHeight);
-		m_VMR9AlphaBitmapWidthBytes = info.dsBm.bmWidthBytes;
+		m_MFVAlphaBitmapRect = CRect(0, 0, info.dsBm.bmWidth, info.dsBm.bmHeight);
+		m_MFVAlphaBitmapWidthBytes = info.dsBm.bmWidthBytes;
 
-		if (m_VMR9AlphaBitmapData.Allocate(info.dsBm.bmWidthBytes * info.dsBm.bmHeight)) {
-			memcpy((BYTE *)m_VMR9AlphaBitmapData, info.dsBm.bmBits, info.dsBm.bmWidthBytes * info.dsBm.bmHeight);
+		if (m_MFVAlphaBitmapData.Allocate(info.dsBm.bmWidthBytes * info.dsBm.bmHeight)) {
+			memcpy((BYTE *)m_MFVAlphaBitmapData, info.dsBm.bmBits, info.dsBm.bmWidthBytes * info.dsBm.bmHeight);
 		}
 	}
 }
@@ -1385,14 +1385,14 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	AlphaBltSubPic(rSrcPri, rDstVid, xOffsetInPixels);
 
 	// Casimir666 : show OSD
-	if (m_VMR9AlphaBitmap.dwFlags & VMRBITMAP_UPDATE) {
-		CAutoLock BitMapLock(&m_VMR9AlphaBitmapLock);
+	if (m_MFVAlphaBitmap.params.dwFlags & MFVBITMAP_UPDATE) {
+		CAutoLock BitMapLock(&m_MFVAlphaBitmapLock);
 
 		m_pOSDTexture.Release();
 		m_pOSDSurface.Release();
 
-		CRect rcSrc(m_VMR9AlphaBitmap.rSrc);
-		if ((m_VMR9AlphaBitmap.dwFlags & VMRBITMAP_DISABLE) == 0 && (BYTE *)m_VMR9AlphaBitmapData) {
+		CRect rcSrc(m_MFVAlphaBitmap.params.rcSrc);
+		if ((m_MFVAlphaBitmap.params.dwFlags & MFVBITMAP_DISABLE) == 0 && (BYTE *)m_MFVAlphaBitmapData) {
 			if ((m_pD3DXLoadSurfaceFromMemory != nullptr) &&
 					SUCCEEDED(hr = m_pD3DDevEx->CreateTexture(rcSrc.Width(), rcSrc.Height(), 1,
 								   D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8,
@@ -1401,13 +1401,13 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 					hr = m_pD3DXLoadSurfaceFromMemory(m_pOSDSurface,
 													  nullptr,
 													  nullptr,
-													  (BYTE *)m_VMR9AlphaBitmapData,
+													  (BYTE *)m_MFVAlphaBitmapData,
 													  D3DFMT_A8R8G8B8,
-													  m_VMR9AlphaBitmapWidthBytes,
+													  m_MFVAlphaBitmapWidthBytes,
 													  nullptr,
-													  &m_VMR9AlphaBitmapRect,
+													  &m_MFVAlphaBitmapRect,
 													  D3DX_FILTER_NONE,
-													  m_VMR9AlphaBitmap.clrSrcKey);
+													  m_MFVAlphaBitmap.params.clrSrcKey);
 				}
 				if (FAILED (hr)) {
 					m_pOSDTexture.Release();
@@ -1415,7 +1415,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 				}
 			}
 		}
-		m_VMR9AlphaBitmap.dwFlags ^= VMRBITMAP_UPDATE;
+		m_MFVAlphaBitmap.params.dwFlags ^= MFVBITMAP_UPDATE;
 	}
 
 	if (m_pOSDTexture) {
