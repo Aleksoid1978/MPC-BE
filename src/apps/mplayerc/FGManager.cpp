@@ -32,6 +32,7 @@
 #include <dmodshow.h>
 #include <evr.h>
 #include <evr9.h>
+#include <vmr9.h>
 #include <ksproxy.h>
 #include <moreuuids.h>
 #include "MediaFormats.h"

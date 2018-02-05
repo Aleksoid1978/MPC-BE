@@ -23,7 +23,6 @@
 #include <atlbase.h>
 #include <d3d9.h>
 #include <evr9.h>
-#include <vmr9.h>
 #include <mvrInterfaces.h>
 #include <HighDPI.h>
 #include "PngImage.h"

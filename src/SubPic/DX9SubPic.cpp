@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include "DX9SubPic.h"
-#include <vmr9.h>
 
 //
 // CDX9SubPic
