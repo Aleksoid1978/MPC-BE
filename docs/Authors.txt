@@ -25,7 +25,7 @@ Basque - azpidatziak - Xabier Aramendi (azpidatziak@users.sourceforge.net)
 Chinese (Simplified) - insolo, beter
 Chinese (Traditional) - beter
 Dutch - beter
-German - Markus Gaugg (gaugg@gmx.at), Sylt, Luan, Klaus
+German - Markus Gaugg (gaugg@gmx.at), Sylt, Luan, Klaus Luppert
 Greek - Lampros Zouloumis
 Italian - Lord Maius
 Korean - kuh3h3
