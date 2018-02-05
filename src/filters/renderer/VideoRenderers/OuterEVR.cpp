@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -123,32 +123,4 @@ STDMETHODIMP COuterEVR::GetClassID(__RPC__out CLSID* pClassID)
 		return m_pEVRBase->GetClassID(pClassID);
 	}
 	return E_NOTIMPL;
-}
-
-STDMETHODIMP COuterEVR::GetAlphaBitmapParameters(VMR9AlphaBitmap* pBmpParms)
-{
-	CheckPointer(pBmpParms, E_POINTER);
-	CAutoLock BitMapLock(&m_pAllocatorPresenter->m_VMR9AlphaBitmapLock);
-	memcpy(pBmpParms, m_pVMR9AlphaBitmap, sizeof(VMR9AlphaBitmap));
-	return S_OK;
-}
-
-STDMETHODIMP COuterEVR::SetAlphaBitmap(const VMR9AlphaBitmap* pBmpParms)
-{
-	CheckPointer(pBmpParms, E_POINTER);
-	CAutoLock BitMapLock(&m_pAllocatorPresenter->m_VMR9AlphaBitmapLock);
-	memcpy(m_pVMR9AlphaBitmap, pBmpParms, sizeof(VMR9AlphaBitmap));
-	m_pVMR9AlphaBitmap->dwFlags |= VMRBITMAP_UPDATE;
-	m_pAllocatorPresenter->UpdateAlphaBitmap();
-	return S_OK;
-}
-
-STDMETHODIMP COuterEVR::UpdateAlphaBitmapParameters(const VMR9AlphaBitmap* pBmpParms)
-{
-	CheckPointer(pBmpParms, E_POINTER);
-	CAutoLock BitMapLock(&m_pAllocatorPresenter->m_VMR9AlphaBitmapLock);
-	memcpy(m_pVMR9AlphaBitmap, pBmpParms, sizeof(VMR9AlphaBitmap));
-	m_pVMR9AlphaBitmap->dwFlags |= VMRBITMAP_UPDATE;
-	m_pAllocatorPresenter->UpdateAlphaBitmap();
-	return S_OK;
 }

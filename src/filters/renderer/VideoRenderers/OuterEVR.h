@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,20 +25,17 @@ namespace DSObjects
 {
 	class COuterEVR
 		: public CUnknown
-		, public IVMRMixerBitmap9
 		, public IBaseFilter
 	{
 		CComPtr<IUnknown> m_pEVR;
 		IBaseFilter* m_pEVRBase;
-		VMR9AlphaBitmap*  m_pVMR9AlphaBitmap;
 		CEVRAllocatorPresenter* m_pAllocatorPresenter;
 
 	public:
-		COuterEVR(const TCHAR* pName, LPUNKNOWN pUnk, HRESULT& hr, VMR9AlphaBitmap* pVMR9AlphaBitmap, CEVRAllocatorPresenter* pAllocatorPresenter) : CUnknown(pName, pUnk) {
+		COuterEVR(const TCHAR* pName, LPUNKNOWN pUnk, HRESULT& hr, CEVRAllocatorPresenter* pAllocatorPresenter) : CUnknown(pName, pUnk) {
 			hr = m_pEVR.CoCreateInstance(CLSID_EnhancedVideoRenderer, GetOwner());
 			CComQIPtr<IBaseFilter> pEVRBase = m_pEVR;
 			m_pEVRBase = pEVRBase; // Don't keep a second reference on the EVR filter
-			m_pVMR9AlphaBitmap = pVMR9AlphaBitmap;
 			m_pAllocatorPresenter = pAllocatorPresenter;
 		}
 
@@ -48,9 +45,6 @@ namespace DSObjects
 		STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv) {
 			HRESULT hr;
 
-			if (riid == __uuidof(IVMRMixerBitmap9)) {
-				return GetInterface((IVMRMixerBitmap9*)this, ppv);
-			}
 			if (riid == __uuidof(IMediaFilter)) {
 				return GetInterface((IMediaFilter*)this, ppv);
 			}
@@ -82,10 +76,5 @@ namespace DSObjects
 		STDMETHODIMP SetSyncSource(__in_opt  IReferenceClock* pClock);
 		STDMETHODIMP GetSyncSource(__deref_out_opt  IReferenceClock** pClock);
 		STDMETHODIMP GetClassID(__RPC__out CLSID* pClassID);
-
-		// IVMRMixerBitmap9
-		STDMETHODIMP GetAlphaBitmapParameters(VMR9AlphaBitmap* pBmpParms);
-		STDMETHODIMP SetAlphaBitmap(const VMR9AlphaBitmap* pBmpParms);
-		STDMETHODIMP UpdateAlphaBitmapParameters(const VMR9AlphaBitmap* pBmpParms);
 	};
 }

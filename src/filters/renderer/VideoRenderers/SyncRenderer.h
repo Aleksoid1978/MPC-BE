@@ -27,7 +27,8 @@
 #include "AllocatorCommon.h"
 #include <dxva2api.h>
 
-#define VMRBITMAP_UPDATE 0x80000000
+#define MFVBITMAP_DISABLE 0x40000000 // TODO remake without it
+#define MFVBITMAP_UPDATE  0x80000000
 #define NB_JITTER 126
 
 extern bool g_bNoDuration; // Defined in MainFrm.cpp
@@ -234,10 +235,10 @@ namespace GothSync
 		);
 
 		long m_nTearingPos;
-		VMR9AlphaBitmap m_VMR9AlphaBitmap;
-		CAutoVectorPtr<BYTE> m_VMR9AlphaBitmapData;
-		CRect m_VMR9AlphaBitmapRect;
-		int m_VMR9AlphaBitmapWidthBytes;
+		MFVideoAlphaBitmap   m_MFVAlphaBitmap;
+		CAutoVectorPtr<BYTE> m_MFVAlphaBitmapData;
+		CRect                m_MFVAlphaBitmapRect;
+		int                  m_MFVAlphaBitmapWidthBytes;
 
 		unsigned m_nSurfaces; // Total number of DX Surfaces
 		UINT32 m_iCurSurface; // Surface currently displayed
@@ -321,7 +322,7 @@ namespace GothSync
 		CBaseAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error);
 		~CBaseAP();
 
-		CCritSec m_VMR9AlphaBitmapLock;
+		CCritSec m_MFVAlphaBitmapLock;
 		void UpdateAlphaBitmap();
 		void ResetStats();
 
@@ -357,6 +358,7 @@ namespace GothSync
 		public IQualProp,
 		public IMFRateSupport,
 		public IMFVideoDisplayControl,
+		public IMFVideoMixerBitmap,
 		public IEVRTrustedVideoPlugin,
 		public ISyncClockAdviser,
 		public ID3DFullscreenControl
@@ -438,6 +440,12 @@ namespace GothSync
 		STDMETHODIMP GetRenderingPrefs(DWORD *pdwRenderFlags);
 		STDMETHODIMP SetFullscreen(BOOL fFullscreen);
 		STDMETHODIMP GetFullscreen(BOOL *pfFullscreen);
+
+		// IMFVideoMixerBitmap
+		STDMETHODIMP ClearAlphaBitmap();
+		STDMETHODIMP GetAlphaBitmapParameters(MFVideoAlphaBitmapParams *pBmpParms);
+		STDMETHODIMP SetAlphaBitmap(const MFVideoAlphaBitmap *pBmpParms);
+		STDMETHODIMP UpdateAlphaBitmapParameters(const MFVideoAlphaBitmapParams *pBmpParms);
 
 		// IEVRTrustedVideoPlugin
 		STDMETHODIMP IsInTrustedVideoMode(BOOL *pYes);
@@ -559,16 +567,14 @@ namespace GothSync
 
 	class CSyncRenderer:
 		public CUnknown,
-		public IVMRMixerBitmap9,
 		public IBaseFilter
 	{
 		CComPtr<IUnknown> m_pEVR;
 		IBaseFilter* m_pEVRBase;
-		VMR9AlphaBitmap *m_pVMR9AlphaBitmap;
 		CSyncAP *m_pAllocatorPresenter;
 
 	public:
-		CSyncRenderer(const TCHAR* pName, LPUNKNOWN pUnk, HRESULT& hr, VMR9AlphaBitmap* pVMR9AlphaBitmap, CSyncAP *pAllocatorPresenter);
+		CSyncRenderer(const TCHAR* pName, LPUNKNOWN pUnk, HRESULT& hr, CSyncAP *pAllocatorPresenter);
 		~CSyncRenderer();
 
 		// IBaseFilter
@@ -584,11 +590,6 @@ namespace GothSync
 		virtual HRESULT STDMETHODCALLTYPE SetSyncSource(__in_opt  IReferenceClock *pClock);
 		virtual HRESULT STDMETHODCALLTYPE GetSyncSource(__deref_out_opt  IReferenceClock **pClock);
 		virtual HRESULT STDMETHODCALLTYPE GetClassID(__RPC__out CLSID *pClassID);
-
-		// IVMRMixerBitmap9
-		STDMETHODIMP GetAlphaBitmapParameters(VMR9AlphaBitmap* pBmpParms);
-		STDMETHODIMP SetAlphaBitmap(const VMR9AlphaBitmap*  pBmpParms);
-		STDMETHODIMP UpdateAlphaBitmapParameters(const VMR9AlphaBitmap* pBmpParms);
 
 		DECLARE_IUNKNOWN;
 		virtual HRESULT STDMETHODCALLTYPE NonDelegatingQueryInterface(REFIID riid, void** ppvObject);
