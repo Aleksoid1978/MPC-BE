@@ -4978,7 +4978,9 @@ CBaseAllocator::Alloc(void)
     }
 
     /* should never get here while buffers outstanding */
-    ASSERT(m_lFree.GetCount() == m_lAllocated);
+    // ==> Start patch MPC
+    //ASSERT(m_lFree.GetCount() == m_lAllocated);
+    // ==> End patch MPC
 
     /* If the requirements haven't changed then don't reallocate */
     if (m_bChanged == FALSE) {
