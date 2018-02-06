@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+ * (C) 2012-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,7 +24,7 @@
 #include <atlutil.h>
 #include "Log.h"
 
-#define SOCKET_DUMPLOGFILE	0
+#define SOCKET_DUMPLOGFILE 0
 
 class CMPCSocket : public CSocket
 {
@@ -41,7 +41,7 @@ protected:
 	CStringA	m_RequestHdr;
 	CStringA	m_Hdr;
 
-	CAtlList<CStringA>	m_AddHeaderParams;
+	std::list<CStringA> m_AddHeaderParams;
 
 	UINT		m_uConnectTimeOut;
 	UINT		m_uReceiveTimeOut;
