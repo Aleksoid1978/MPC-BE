@@ -2030,28 +2030,26 @@ typedef bool (*STSOpenFunct)(CTextFile* file, CSimpleTextSubtitle& ret, int Char
 static bool OpenRealText(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet);
 
 struct OpenFunctStruct {
-	STSOpenFunct open;
-	tmode mode;
 	Subtitle::SubType type;
+	tmode mode;
+	STSOpenFunct open;
 };
 
-static OpenFunctStruct OpenFuncts[] = {
-	OpenSubStationAlpha, TIME, Subtitle::SSA,
-	OpenSubRipper, TIME, Subtitle::SRT,
-	OpenOldSubRipper, TIME, Subtitle::SRT,
-	OpenWebVTT, TIME, Subtitle::SRT,
-	OpenLRC, TIME, Subtitle::SRT,
-	OpenSubViewer, TIME, Subtitle::SUB,
-	OpenMicroDVD, FRAME, Subtitle::SSA,
-	OpenSami, TIME, Subtitle::SMI,
-	OpenVPlayer, TIME, Subtitle::SRT,
-	OpenXombieSub, TIME, Subtitle::XSS,
-	OpenUSF, TIME, Subtitle::USF,
-	OpenMPL2, TIME, Subtitle::SRT,
-	OpenRealText, TIME, Subtitle::RT,
+const static OpenFunctStruct s_OpenFuncts[] = {
+	Subtitle::SSA, TIME,  OpenSubStationAlpha,
+	Subtitle::SRT, TIME,  OpenSubRipper,
+	Subtitle::SRT, TIME,  OpenOldSubRipper,
+	Subtitle::SRT, TIME,  OpenWebVTT,
+	Subtitle::SRT, TIME,  OpenLRC,
+	Subtitle::SUB, TIME,  OpenSubViewer,
+	Subtitle::SSA, FRAME, OpenMicroDVD,
+	Subtitle::SMI, TIME,  OpenSami,
+	Subtitle::SRT, TIME,  OpenVPlayer,
+	Subtitle::XSS, TIME,  OpenXombieSub,
+	Subtitle::USF, TIME,  OpenUSF,
+	Subtitle::SRT, TIME,  OpenMPL2,
+	Subtitle::RT,  TIME,  OpenRealText,
 };
-
-static int nOpenFuncts = _countof(OpenFuncts);
 
 //
 
@@ -2932,8 +2930,8 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
 
 	ULONGLONG pos = f->GetPosition();
 
-	for (ptrdiff_t i = 0; i < nOpenFuncts; i++) {
-		if (!OpenFuncts[i].open(f, *this, CharSet)) {
+	for (const auto& OpenFunct : s_OpenFuncts) {
+		if (!OpenFunct.open(f, *this, CharSet)) {
 			if (!IsEmpty()) {
 				CString lastLine;
 				size_t n = CountLines(f, pos, f->GetPosition(), lastLine);
@@ -2949,11 +2947,11 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
 			continue;
 		}
 
-		m_name = name;
-		m_subtitleType = OpenFuncts[i].type;
-		m_mode = OpenFuncts[i].mode;
-		m_encoding = f->GetEncoding();
-		m_path = f->GetFilePath();
+		m_name         = name;
+		m_subtitleType = OpenFunct.type;
+		m_mode         = OpenFunct.mode;
+		m_encoding     = f->GetEncoding();
+		m_path         = f->GetFilePath();
 
 		// No need to call Sort() or CreateSegments(), everything is done on the fly
 
