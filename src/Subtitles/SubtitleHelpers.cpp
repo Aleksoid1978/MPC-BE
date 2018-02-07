@@ -30,7 +30,7 @@ static LPCWSTR extListVid = L"(avi)|(mkv)|(mp4)|((m2)?ts)";
 
 LPCWSTR Subtitle::GetSubtitleFileExt(SubType type)
 {
-	return (type >= 0 && size_t(type) < subTypesExt.size()) ? subTypesExt[type] : nullptr;
+	return (type >= 0 && size_t(type) < std::size(s_SubFileExts)) ? s_SubFileExts[type] : nullptr;
 }
 
 void Subtitle::GetSubFileNames(CString fn, const std::vector<CString>& paths, std::vector<CString>& ret)
@@ -63,12 +63,12 @@ void Subtitle::GetSubFileNames(CString fn, const std::vector<CString>& paths, st
 		WIN32_FIND_DATA wfd;
 
 		CString extListSub, regExpSub, regExpVid;
-		for (size_t i = 0; i < subTypesExt.size(); i++) {
-			extListSub.AppendFormat(L"(%s)", subTypesExt[i]);
-			if (i < subTypesExt.size() - 1) {
-				extListSub.AppendChar(L'|');
-			}
+
+		for (const auto& subext : s_SubFileExts) {
+			extListSub.AppendFormat(L"(%s)|", subext);
 		}
+		extListSub.TrimRight('|');
+
 		regExpSub.Format(L"([%s]+.+)?\\.(%s)$", separators, extListSub);
 		regExpVid.Format(L".+\\.(%s)$", extListVid);
 

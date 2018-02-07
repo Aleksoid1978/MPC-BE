@@ -5470,7 +5470,7 @@ void CMainFrame::DropFiles(std::list<CString>& slFiles)
 	for (const auto& fname : slFiles) {
 		const CString ext = GetFileExt(fname).Mid(1).MakeLower(); // extension without a dot
 
-		const bool validate_ext = std::any_of(Subtitle::subTypesExt.cbegin(), Subtitle::subTypesExt.cend(), [&](LPCWSTR subExt) {
+		const bool validate_ext = std::any_of(std::cbegin(Subtitle::s_SubFileExts), std::cend(Subtitle::s_SubFileExts), [&](LPCWSTR subExt) {
 			return ext == subExt;
 		});
 
@@ -6214,13 +6214,13 @@ void CMainFrame::OnFileLoadSubtitle()
 	}
 
 	static CString szFilter;
-	for (size_t idx = 0; idx < Subtitle::subTypesExt.size(); idx++) {
-		szFilter += (idx == 0 ? L"." : L" .") + CString(Subtitle::subTypesExt[idx]);
+	for (size_t idx = 0; idx < std::size(Subtitle::s_SubFileExts); idx++) {
+		szFilter += (idx == 0 ? L"." : L" .") + CString(Subtitle::s_SubFileExts[idx]);
 	}
 	szFilter += L"|";
 
-	for (size_t idx = 0; idx < Subtitle::subTypesExt.size(); idx++) {
-		szFilter += (idx == 0 ? L"*." : L";*.") + CString(Subtitle::subTypesExt[idx]);
+	for (size_t idx = 0; idx < std::size(Subtitle::s_SubFileExts); idx++) {
+		szFilter += (idx == 0 ? L"*." : L";*.") + CString(Subtitle::s_SubFileExts[idx]);
 	}
 	szFilter += L"||";
 
