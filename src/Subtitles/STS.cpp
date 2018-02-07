@@ -693,7 +693,11 @@ static bool OpenLRC(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet)
 	};
 	std::vector<lrc> lrc_lines;
 
-	while (file->ReadString(buff)) {
+	for(unsigned line = 0; file->ReadString(buff); ++line) {
+		if (line == 10 && lrc_lines.empty()) {
+			break; // this is not a lrc file, stop analysis
+		}
+
 		FastTrim(buff);
 		if (buff.IsEmpty()) {
 			continue;
