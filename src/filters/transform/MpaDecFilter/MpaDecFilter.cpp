@@ -639,7 +639,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 HRESULT CMpaDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin *pReceivePin)
 {
 	if (direction == PINDIR_OUTPUT) {
-		m_bHasVideo = HasMediaType(m_pInput, MEDIATYPE_Video) || HasMediaType(m_pInput, MEDIASUBTYPE_MPEG2_VIDEO);
+		m_bHasVideo = HasMediaType(m_pGraph, MEDIATYPE_Video) || HasMediaType(m_pGraph, MEDIASUBTYPE_MPEG2_VIDEO);
 	}
 	return __super::CompleteConnect(direction, pReceivePin);
 }
