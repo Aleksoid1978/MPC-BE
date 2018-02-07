@@ -479,7 +479,7 @@ HRESULT CMpcAudioRenderer::CompleteConnect(IPin *pReceivePin)
 {
 	DLog(L"CMpcAudioRenderer::CompleteConnect()");
 
-	m_bHasVideo = HasMediaType(m_pInputPin, MEDIATYPE_Video) || HasMediaType(m_pInputPin, MEDIASUBTYPE_MPEG2_VIDEO);
+	m_bHasVideo = HasMediaType(m_pGraph, MEDIATYPE_Video) || HasMediaType(m_pGraph, MEDIASUBTYPE_MPEG2_VIDEO);
 
 	return CBaseRenderer::CompleteConnect(pReceivePin);
 }
