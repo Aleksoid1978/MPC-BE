@@ -45,7 +45,6 @@ namespace Subtitle
 		VTT,
 		PSB,
 		XSS,
-		TXT,
 		RT,
 		MKS,
 		LRC
