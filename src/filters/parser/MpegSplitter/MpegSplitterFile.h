@@ -225,8 +225,8 @@ public:
 	CHdmvClipInfo &m_ClipInfo;
 	CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin);
 
-	BOOL CheckKeyFrame(std::vector<BYTE>& pData, stream_codec codec);
-	REFERENCE_TIME NextPTS(DWORD TrackNum, stream_codec codec, __int64& nextPos, BOOL bKeyFrameOnly = FALSE, REFERENCE_TIME rtLimit = _I64_MAX);
+	BOOL CheckKeyFrame(std::vector<BYTE>& pData, const stream_codec& codec);
+	REFERENCE_TIME NextPTS(const DWORD& TrackNum, const stream_codec& codec, __int64& nextPos, const BOOL& bKeyFrameOnly = FALSE, const REFERENCE_TIME& rtLimit = _I64_MAX);
 
 	MPEG_TYPES m_type;
 
@@ -432,26 +432,17 @@ public:
 
 	struct streamData {
 		struct {
-			char            lang[4] = {};
+			char              lang[4] = {};
 			std::vector<BYTE> extraData;
-			teletextPages   tlxPages;
+			teletextPages     tlxPages;
 		} pmt;
 
 		BOOL         usePTS = FALSE;
 		stream_codec codec  = stream_codec::NONE;
 
-		streamData& operator = (const streamData& src) {
-			strcpy_s(pmt.lang, src.pmt.lang);
-			pmt.extraData.insert(pmt.extraData.end(), src.pmt.extraData.begin(), src.pmt.extraData.end());
-			pmt.tlxPages = src.pmt.tlxPages;
-
-			usePTS = src.usePTS;
-			codec  = src.codec;
-
-			return *this;
-		}
+		REFERENCE_TIME rtStreamStart = 0;
 	};
-	std::map<WORD, streamData> m_streamData;
+	std::map<DWORD, streamData> m_streamData;
 
 	std::vector<program::stream> m_pmt_streams;
 };

@@ -693,7 +693,7 @@ HRESULT CMpegSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 }
 
 template<typename T>
-inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(DWORD TrackNumber, __int64 nBytes, T& h, REFERENCE_TIME rtStartOffset, BOOL bStreamUsePTS, DWORD Flag/* = 0*/)
+inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(const DWORD& TrackNumber, const __int64& nBytes, const T& h, const REFERENCE_TIME& rtStartOffset, const BOOL& bStreamUsePTS, const DWORD& Flag/* = 0*/)
 {
 	HRESULT hr = S_OK;
 
@@ -754,7 +754,7 @@ inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(DWORD TrackNumber, __int64 
 	return hr;
 }
 
-HRESULT CMpegSplitterFilter::DemuxNextPacket(REFERENCE_TIME rtStartOffset)
+HRESULT CMpegSplitterFilter::DemuxNextPacket(const REFERENCE_TIME& rtStartOffset)
 {
 	if (!m_pFile->IsStreaming() && !m_pFile->GetRemaining()) {
 		return E_FAIL;
@@ -983,7 +983,7 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 	s.mts.push_back(s.mt);
 }
 
-CString CMpegSplitterFilter::FormatStreamName(const CMpegSplitterFile::stream& s, CMpegSplitterFile::stream_type type)
+CString CMpegSplitterFilter::FormatStreamName(const CMpegSplitterFile::stream& s, const CMpegSplitterFile::stream_type& type)
 {
 	int nStream;
 	const CHdmvClipInfo::Stream *pClipInfo;

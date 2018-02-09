@@ -339,7 +339,11 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		const CStreamList& streams = m_streams[type];
 		for (const auto& s : streams) {
 			const SyncPoints& sps = m_SyncPoints[s];
-			m_streamData[s].usePTS = sps.size() > 1;
+			if (sps.size() > 1) {
+				auto& _streamData = m_streamData[s];
+				_streamData.usePTS = TRUE;
+				_streamData.rtStreamStart = sps[0].rt;
+			}
 		}
 	}
 
@@ -390,7 +394,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	return S_OK;
 }
 
-BOOL CMpegSplitterFile::CheckKeyFrame(std::vector<BYTE>& pData, stream_codec codec)
+BOOL CMpegSplitterFile::CheckKeyFrame(std::vector<BYTE>& pData, const stream_codec& codec)
 {
 	if (codec == stream_codec::H264) {
 		CH264Nalu Nalu;
@@ -429,12 +433,19 @@ BOOL CMpegSplitterFile::CheckKeyFrame(std::vector<BYTE>& pData, stream_codec cod
 	return TRUE;
 }
 
-REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, stream_codec codec, __int64& nextPos, BOOL bKeyFrameOnly/* = FALSE*/, REFERENCE_TIME rtLimit/* = _I64_MAX*/)
+REFERENCE_TIME CMpegSplitterFile::NextPTS(const DWORD& TrackNum, const stream_codec& codec, __int64& nextPos, const BOOL& bKeyFrameOnly/* = FALSE*/, const REFERENCE_TIME& rtLimit/* = _I64_MAX*/)
 {
 	REFERENCE_TIME rt	= INVALID_TIME;
 	__int64 rtpos		= -1;
 	__int64 pos			= GetPos();
 	nextPos				= pos + 1;
+
+	auto rtMin = m_rtMin;
+	if (m_type != MPEG_TYPES::mpeg_ts) {
+		if (const auto it = m_streamData.find(TrackNum); it != m_streamData.cend() && it->second.usePTS) {
+			rtMin = it->second.rtStreamStart;
+		}
+	}
 
 	BYTE b;
 
@@ -457,7 +468,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, stream_codec codec, __
 				nextPos = pos3 + h.len;
 
 				if (h.fpts && AddStream(0, b, h.id_ext, h.len, FALSE) == TrackNum) {
-					if (rtLimit != _I64_MAX && (h.pts - m_rtMin) > rtLimit) {
+					if (rtLimit != _I64_MAX && (h.pts - rtMin) > rtLimit) {
 						Seek(pos);
 						return INVALID_TIME;
 					}
@@ -496,7 +507,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, stream_codec codec, __
 			if (h.pid == TrackNum && h.payloadstart && NextMpegStartCode(b, 4)) {
 				peshdr h2;
 				if (ReadPES(h2, b) && h2.fpts) {
-					if (rtLimit != _I64_MAX && (h2.pts - m_rtMin) > rtLimit) {
+					if (rtLimit != _I64_MAX && (h2.pts - rtMin) > rtLimit) {
 						Seek(pos);
 						return INVALID_TIME;
 					}
@@ -570,6 +581,10 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, stream_codec codec, __
 			nextPos = GetPos() + h.length;
 
 			if (h.fpts) {
+				if (rtLimit != _I64_MAX && (h.pts - rtMin) > rtLimit) {
+					Seek(pos);
+					return INVALID_TIME;
+				}
 				rt = h.pts;
 				break;
 			}
@@ -577,7 +592,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(DWORD TrackNum, stream_codec codec, __
 	}
 
 	if (rt != INVALID_TIME) {
-		rt -= m_rtMin;
+		rt -= rtMin;
 		if (rtpos >= 0) {
 			pos = rtpos;
 		}
