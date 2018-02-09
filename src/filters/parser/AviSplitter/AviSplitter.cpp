@@ -561,24 +561,19 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		AddOutputPin(i, pPinOut);
 	}
 
-	POSITION pos = m_pFile->m_info.GetStartPosition();
-	while (pos) {
-		DWORD fcc;
-		CStringA value;
-		m_pFile->m_info.GetNextAssoc(pos, fcc, value);
-
-		switch (fcc) {
+	for (const auto info : m_pFile->m_info) {
+		switch (info.first) {
 			case FCC('INAM'):
-				SetProperty(L"TITL", CStringW(value));
+				SetProperty(L"TITL", CStringW(info.second));
 				break;
 			case FCC('IART'):
-				SetProperty(L"AUTH", CStringW(value));
+				SetProperty(L"AUTH", CStringW(info.second));
 				break;
 			case FCC('ICOP'):
-				SetProperty(L"CPYR", CStringW(value));
+				SetProperty(L"CPYR", CStringW(info.second));
 				break;
 			case FCC('ISBJ'):
-				SetProperty(L"DESC", CStringW(value));
+				SetProperty(L"DESC", CStringW(info.second));
 				break;
 		}
 	}

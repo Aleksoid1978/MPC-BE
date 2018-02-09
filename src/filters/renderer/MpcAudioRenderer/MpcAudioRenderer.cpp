@@ -19,6 +19,7 @@
  */
 
 #include "stdafx.h"
+#include <map>
 
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
@@ -1700,7 +1701,7 @@ HRESULT CMpcAudioRenderer::InitAudioClient()
 			}
 
 			#define ADDENTRY(mode) ChannelMaskStr[mode] = L#mode
-			CAtlMap<DWORD, CString> ChannelMaskStr;
+			std::map<DWORD, CString> ChannelMaskStr;
 			ADDENTRY(KSAUDIO_SPEAKER_STEREO);
 			ADDENTRY(KSAUDIO_SPEAKER_QUAD);
 			ADDENTRY(KSAUDIO_SPEAKER_SURROUND);
