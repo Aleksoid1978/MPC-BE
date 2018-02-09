@@ -299,7 +299,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	//bool b_HasVideo = false;
 
-	m_trackpos.RemoveAll();
+	m_trackpos.clear();
 
 	m_pFile.Free();
 	m_pFile.Attach(DNew CMP4SplitterFile(pAsyncReader, hr));
@@ -1808,10 +1808,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				m_sps.push_back(sp);
 			}
 		} else {
-			POSITION pos = m_trackpos.GetStartPosition();
-			while (pos) {
-				CAtlMap<DWORD, trackpos>::CPair* pPair = m_trackpos.GetNext(pos);
-				AP4_Track* track = movie->GetTrack(pPair->m_key);
+			for (const auto& tp : m_trackpos) {
+				AP4_Track* track = movie->GetTrack(tp.first);
 
 				if (!track->HasIndex()) {
 					continue;
@@ -1835,20 +1833,17 @@ bool CMP4SplitterFilter::DemuxInit()
 {
 	AP4_Movie* movie = m_pFile->GetMovie();
 
-	POSITION pos = m_trackpos.GetStartPosition();
-	while (pos) {
-		CAtlMap<DWORD, trackpos>::CPair* pPair = m_trackpos.GetNext(pos);
+	for (auto& tp : m_trackpos) {
+		tp.second.index = 0;
+		tp.second.ts = 0;
+		tp.second.offset = 0;
 
-		pPair->m_value.index = 0;
-		pPair->m_value.ts = 0;
-		pPair->m_value.offset = 0;
-
-		AP4_Track* track = movie->GetTrack(pPair->m_key);
+		AP4_Track* track = movie->GetTrack(tp.first);
 
 		AP4_Sample sample;
 		if (AP4_SUCCEEDED(track->GetSample(0, sample))) {
-			pPair->m_value.ts = sample.GetCts();
-			pPair->m_value.offset = sample.GetOffset();
+			tp.second.ts = sample.GetCts();
+			tp.second.offset = sample.GetOffset();
 		}
 	}
 
@@ -1875,24 +1870,22 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		return;
 	}
 
-	POSITION pos = m_trackpos.GetStartPosition();
-	while (pos) {
-		CAtlMap<DWORD, trackpos>::CPair* pPair = m_trackpos.GetNext(pos);
-		AP4_Track* track = movie->GetTrack(pPair->m_key);
+	for (auto& tp : m_trackpos) {
+		AP4_Track* track = movie->GetTrack(tp.first);
 
 		if (track->HasIndex() && track->GetIndexEntries().ItemCount()) {
-			if (AP4_FAILED(track->GetIndexForRefTime(rt, pPair->m_value.index, pPair->m_value.ts, pPair->m_value.offset))) {
+			if (AP4_FAILED(track->GetIndexForRefTime(rt, tp.second.index, tp.second.ts, tp.second.offset))) {
 				continue;
 			}
 		} else {
-			if (AP4_FAILED(track->GetSampleIndexForRefTime(rt, pPair->m_value.index))) {
+			if (AP4_FAILED(track->GetSampleIndexForRefTime(rt, tp.second.index))) {
 				continue;
 			}
 
 			AP4_Sample sample;
-			if (AP4_SUCCEEDED(track->GetSample(pPair->m_value.index, sample))) {
-				pPair->m_value.ts = sample.GetCts();
-				pPair->m_value.offset = sample.GetOffset();
+			if (AP4_SUCCEEDED(track->GetSample(tp.second.index, sample))) {
+				tp.second.ts = sample.GetCts();
+				tp.second.offset = sample.GetOffset();
 			}
 		}
 	}
@@ -1912,35 +1905,32 @@ bool CMP4SplitterFilter::DemuxLoop()
 	while (SUCCEEDED(hr) && !CheckRequest(nullptr)) {
 
 start:
-		CAtlMap<DWORD, trackpos>::CPair* pPairNext = nullptr;
+		std::pair<const DWORD, trackpos>* pNext = nullptr;
 		REFERENCE_TIME rtNext = _I64_MAX;
 		ULONGLONG nextOffset = 0;
 
-		POSITION pos = m_trackpos.GetStartPosition();
-		while (pos) {
-			CAtlMap<DWORD, trackpos>::CPair* pPair = m_trackpos.GetNext(pos);
-
-			AP4_Track* track = movie->GetTrack(pPair->m_key);
+		for (auto& tp : m_trackpos) {
+			AP4_Track* track = movie->GetTrack(tp.first);
 
 			CBaseSplitterOutputPin* pPin = GetOutputPin((DWORD)track->GetId());
 			if (!pPin->IsConnected()) {
 				continue;
 			}
 
-			const REFERENCE_TIME rt = (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * pPair->m_value.ts);
+			const REFERENCE_TIME rt = (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * tp.second.ts);
 
-			if (pPair->m_value.index < track->GetSampleCount()) {
-				if (!pPairNext
-						|| (llabs(rtNext - rt) <= UNITS && pPair->m_value.offset < nextOffset)
+			if (tp.second.index < track->GetSampleCount()) {
+				if (!pNext
+						|| (llabs(rtNext - rt) <= UNITS && tp.second.offset < nextOffset)
 						|| (llabs(rtNext - rt) > UNITS && rt < rtNext)) {
-					pPairNext = pPair;
-					nextOffset = pPair->m_value.offset;
+					pNext = &tp;
+					nextOffset = tp.second.offset;
 					rtNext = rt;
 				}
 			}
 		}
 
-		if (!pPairNext) {
+		if (!pNext) {
 			if (movie->HasFragmentsIndex()
 					&& (AP4_SUCCEEDED(movie->SwitchNextMoof()))) {
 				DemuxInit();
@@ -1950,14 +1940,14 @@ start:
 			}
 		}
 
-		AP4_Track* track = movie->GetTrack(pPairNext->m_key);
+		AP4_Track* track = movie->GetTrack(pNext->first);
 
 		CBaseSplitterOutputPin* pPin = GetOutputPin((DWORD)track->GetId());
 
 		AP4_Sample sample;
 		AP4_DataBuffer data;
 
-		if (pPin && pPin->IsConnected() && AP4_SUCCEEDED(track->ReadSample(pPairNext->m_value.index, sample, data))) {
+		if (pPin && pPin->IsConnected() && AP4_SUCCEEDED(track->ReadSample(pNext->second.index, sample, data))) {
 			const CMediaType& mt = pPin->CurrentMediaType();
 
 			CAutoPtr<CPacket> p(DNew CPacket());
@@ -1978,7 +1968,7 @@ start:
 
 				p->SetData(data.GetData(), data.GetDataSize());
 
-				while (duration < 500000 && AP4_SUCCEEDED(track->ReadSample(pPairNext->m_value.index + 1, sample, data))) {
+				while (duration < 500000 && AP4_SUCCEEDED(track->ReadSample(pNext->second.index + 1, sample, data))) {
 					size_t size = p->GetCount();
 					p->SetCount(size + data.GetDataSize());
 					memcpy(p->GetData() + size, data.GetData(), data.GetDataSize());
@@ -1987,7 +1977,7 @@ start:
 
 					duration = p->rtStop - p->rtStart;
 
-					pPairNext->m_value.index++;
+					pNext->second.index++;
 				}
 			}
 			else if (track->GetType() == AP4_Track::TYPE_TEXT) {
@@ -2039,9 +2029,9 @@ start:
 
 		{
 			AP4_Sample sample;
-			if (AP4_SUCCEEDED(track->GetSample(++pPairNext->m_value.index, sample))) {
-				pPairNext->m_value.ts = sample.GetCts();
-				pPairNext->m_value.offset = sample.GetOffset();
+			if (AP4_SUCCEEDED(track->GetSample(++pNext->second.index, sample))) {
+				pNext->second.ts = sample.GetCts();
+				pNext->second.offset = sample.GetOffset();
 			}
 		}
 
