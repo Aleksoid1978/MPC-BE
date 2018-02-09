@@ -84,7 +84,7 @@ public:
 		std::vector<chunk2> cs2;
 	};
 	CAutoPtrArray<strm_t> m_strms;
-	CAtlMap<DWORD, CStringA> m_info;
+	std::map<DWORD, CStringA> m_info;
 	CAutoPtr<AVIOLDINDEX> m_idx1;
 
 	std::list<UINT64> m_movis;

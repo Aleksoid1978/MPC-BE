@@ -190,7 +190,7 @@ start:
 
 	m_pFile->Seek(start_pos);
 
-	CAtlMap<WORD, BOOL> streamMoreInit;
+	std::map<WORD, BOOL> streamMoreInit;
 	int streamId = 0;
 
 	OggPage page;
@@ -337,7 +337,7 @@ start:
 						}
 						break;
 				}
-			} else if (!(type&1) && !streamMoreInit.GetCount()) {
+			} else if (!(type&1) && streamMoreInit.empty()) {
 				break;
 			}
 		}
@@ -346,7 +346,7 @@ start:
 			if (!pPin->IsInitialized()) {
 				pPin->UnpackInitPage(page);
 				if (pPin->IsInitialized()) {
-					streamMoreInit.RemoveKey(page.m_hdr.bitstream_serial_number);
+					streamMoreInit.erase(page.m_hdr.bitstream_serial_number);
 					m_bitstream_serial_number_Video = page.m_hdr.bitstream_serial_number;
 				}
 			}
@@ -356,7 +356,7 @@ start:
 			if (!pPin->IsInitialized()) {
 				pPin->UnpackInitPage(page);
 				if (pPin->IsInitialized()) {
-					streamMoreInit.RemoveKey(page.m_hdr.bitstream_serial_number);
+					streamMoreInit.erase(page.m_hdr.bitstream_serial_number);
 				}
 			}
 		}
@@ -365,7 +365,7 @@ start:
 			if (!pPin->IsInitialized()) {
 				pPin->UnpackInitPage(page);
 				if (pPin->IsInitialized()) {
-					streamMoreInit.RemoveKey(page.m_hdr.bitstream_serial_number);
+					streamMoreInit.erase(page.m_hdr.bitstream_serial_number);
 				}
 			}
 		}
