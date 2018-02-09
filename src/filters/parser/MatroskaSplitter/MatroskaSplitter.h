@@ -22,7 +22,6 @@
 #pragma once
 
 #include <atlbase.h>
-#include <atlcoll.h>
 #include "MatroskaFile.h"
 #include "MatroskaSplitterSettingsWnd.h"
 #include "../BaseSplitter/BaseSplitter.h"
@@ -113,7 +112,7 @@ protected:
 	bool ReadFirtsBlock(std::vector<byte>& pData, TrackEntry* pTE);
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 
-	CAtlMap<DWORD, MatroskaReader::TrackEntry*> m_pTrackEntryMap;
+	std::map<DWORD, MatroskaReader::TrackEntry*> m_pTrackEntryMap;
 	std::vector<MatroskaReader::TrackEntry* > m_pOrderedTrackArray;
 	MatroskaReader::TrackEntry* GetTrackEntryAt(UINT aTrackIdx);
 

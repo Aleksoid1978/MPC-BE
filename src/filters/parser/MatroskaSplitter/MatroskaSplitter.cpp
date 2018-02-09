@@ -288,11 +288,11 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	HRESULT hr = E_FAIL;
 
 	m_pFile.Free();
-	m_pTrackEntryMap.RemoveAll();
+	m_pTrackEntryMap.clear();
 	m_pOrderedTrackArray.clear();
 
-	CAtlArray<CMatroskaSplitterOutputPin*> pinOut;
-	CAtlArray<TrackEntry*> pinOutTE;
+	std::vector<CMatroskaSplitterOutputPin*> pinOut;
+	std::vector<TrackEntry*> pinOutTE;
 
 	m_pFile.Attach(DNew CMatroskaFile(pAsyncReader, hr));
 	if (!m_pFile) {
@@ -1350,16 +1350,16 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 
 			if (!isSub) {
-				pinOut.InsertAt((iVideo + iAudio - 3), pPinOut, 1);
-				pinOutTE.InsertAt((iVideo + iAudio - 3), pTE, 1);
+				pinOut.insert(pinOut.begin() + (iVideo + iAudio - 3), pPinOut);
+				pinOutTE.insert(pinOutTE.begin() + (iVideo + iAudio - 3), pTE);
 			} else {
-				pinOut.Add(pPinOut);
-				pinOutTE.Add(pTE);
+				pinOut.push_back(pPinOut);
+				pinOutTE.push_back(pTE);
 			}
 		}
 	}
 
-	for (size_t i = 0; i < pinOut.GetCount(); i++) {
+	for (size_t i = 0; i < pinOut.size(); i++) {
 		CAutoPtr<CBaseSplitterOutputPin> pPinOut;
 		pPinOut.Attach(pinOut[i]);
 		TrackEntry* pTE = pinOutTE[i];
@@ -1428,10 +1428,11 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									BlockGroup* bg = bgn.GetNext(pos4);
 
 									if (bg->Block.TrackNumber == pCueTrackPositions->CueTrack) {
-										TrackEntry* pTE = nullptr;
-										if (!m_pTrackEntryMap.Lookup(TrackNumber, pTE) || !pTE) {
+										auto it = m_pTrackEntryMap.find(TrackNumber);
+										if (it == m_pTrackEntryMap.end() || !(*it).second) {
 											continue;
 										}
+										TrackEntry* pTE = (*it).second;
 
 										REFERENCE_TIME duration = 1;
 										if (bg->BlockDuration.IsValid()) {
@@ -1669,12 +1670,9 @@ void CMatroskaSplitterFilter::InstallFonts()
 void CMatroskaSplitterFilter::SendVorbisHeaderSample()
 {
 	HRESULT hr;
-
-	POSITION pos = m_pTrackEntryMap.GetStartPosition();
-	while (pos) {
-		DWORD TrackNumber = 0;
-		TrackEntry* pTE = nullptr;
-		m_pTrackEntryMap.GetNextAssoc(pos, TrackNumber, pTE);
+	for (const auto& item : m_pTrackEntryMap) {
+		DWORD TrackNumber = item.first;
+		TrackEntry* pTE   = item.second;
 
 		CBaseSplitterOutputPin* pPin = GetOutputPin(TrackNumber);
 
@@ -1948,7 +1946,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 	SendVorbisHeaderSample(); // HACK: init vorbis decoder with the headers
 
 	if (m_Seek_rt > 0 && m_bSupportCueDuration) {
-		CAtlList<UINT64> TrackNumbers;
+		std::vector<UINT64> TrackNumbers;
 
 		Segment& s = m_pFile->m_segment;
 		POSITION pos1 = s.Tracks.GetHeadPosition();
@@ -1960,12 +1958,12 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 				const TrackEntry* pTE = pT->TrackEntries.GetNext(pos2);
 
 				if (pTE->TrackType == TrackEntry::TypeSubtitle) {
-					TrackNumbers.AddTail(pTE->TrackNumber);
+					TrackNumbers.push_back(pTE->TrackNumber);
 				}
 			}
 		}
 
-		if (TrackNumbers.GetCount()) {
+		if (TrackNumbers.size()) {
 			CMatroskaNode Root(m_pFile);
 			CAutoPtr<CMatroskaNode> pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 
@@ -1990,7 +1988,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 						while (pos3 && !bBreak) {
 							const CueTrackPosition* pCueTrackPositions = pCuePoint->CueTrackPositions.GetNext(pos3);
 
-							if (!TrackNumbers.Find(pCueTrackPositions->CueTrack)) {
+							if (std::find(TrackNumbers.cbegin(), TrackNumbers.cend(), pCueTrackPositions->CueTrack) == TrackNumbers.cend()) {
 								continue;
 							}
 
@@ -2039,17 +2037,18 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 									CAutoPtr<CMatroskaPacket> p(DNew CMatroskaPacket());
 									p->bg = bgn.RemoveHead();
 
-									if (!TrackNumbers.Find(p->bg->Block.TrackNumber)) {
+									if (std::find(TrackNumbers.cbegin(), TrackNumbers.cend(), p->bg->Block.TrackNumber) == TrackNumbers.cend()) {
 										continue;
 									}
 
 									p->bSyncPoint = !p->bg->ReferenceBlock.IsValid();
 									p->TrackNumber = (DWORD)p->bg->Block.TrackNumber;
 
-									TrackEntry* pTE = nullptr;
-									if (!m_pTrackEntryMap.Lookup(p->TrackNumber, pTE) || !pTE) {
+									auto it = m_pTrackEntryMap.find(p->TrackNumber);
+									if (it == m_pTrackEntryMap.end() || !(*it).second) {
 										continue;
 									}
+									TrackEntry* pTE = (*it).second;
 
 									SetBlockTime;
 
@@ -2105,10 +2104,11 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 				p->bSyncPoint = !p->bg->ReferenceBlock.IsValid();
 				p->TrackNumber = (DWORD)p->bg->Block.TrackNumber;
 
-				TrackEntry* pTE = nullptr;
-				if (!m_pTrackEntryMap.Lookup(p->TrackNumber, pTE) || !pTE) {
+				auto it = m_pTrackEntryMap.find(p->TrackNumber);
+				if (it == m_pTrackEntryMap.end() || !(*it).second) {
 					continue;
 				}
+				TrackEntry* pTE = (*it).second;
 
 				SetBlockTime;
 
@@ -2182,7 +2182,7 @@ TrackEntry* CMatroskaSplitterFilter::GetTrackEntryAt(UINT aTrackIdx)
 
 STDMETHODIMP_(UINT) CMatroskaSplitterFilter::GetTrackCount()
 {
-	return (UINT)m_pTrackEntryMap.GetCount();
+	return (UINT)m_pTrackEntryMap.size();
 }
 
 STDMETHODIMP_(BOOL) CMatroskaSplitterFilter::GetTrackInfo(UINT aTrackIdx, struct TrackElement* pStructureToFill)
