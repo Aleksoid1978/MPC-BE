@@ -22,7 +22,6 @@
 #pragma once
 
 #include <atlbase.h>
-#include <atlcoll.h>
 #include "MP4SplitterFile.h"
 #include "../BaseSplitter/BaseSplitter.h"
 #include "../../filters/FilterInterfacesImpl.h"
@@ -40,7 +39,7 @@ class __declspec(uuid("61F47056-E400-43d3-AF1E-AB7DFFD4C4AD"))
 		__int64 ts;
 		ULONGLONG offset;
 	};
-	CAtlMap<DWORD, trackpos> m_trackpos;
+	std::map<DWORD, trackpos> m_trackpos;
 
 	std::vector<SyncPoint> m_sps;
 
