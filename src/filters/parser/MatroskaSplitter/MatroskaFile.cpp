@@ -921,7 +921,7 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 			continue;
 		}
 		CAutoPtr<CBinary> p(DNew CBinary());
-		p->resize((INT_PTR)len);
+		p->resize((size_t)len);
 		pMN->Read(p->data(), len);
 		BlockData.AddTail(p);
 	}
@@ -1056,7 +1056,7 @@ HRESULT AttachedFile::Parse(CMatroskaNode* pMN0)
 		FileMimeType.Parse(pMN);
 		break;
 	case 0x465C: // binary
-		FileDataLen = (INT_PTR)pMN->m_len;
+		FileDataLen = pMN->m_len;
 		FileDataPos = pMN->m_start;
 		break;
 	case 0x46AE:
@@ -1190,7 +1190,7 @@ HRESULT Targets::Parse(CMatroskaNode* pMN0)
 HRESULT CBinary::Parse(CMatroskaNode* pMN)
 {
 	ASSERT(pMN->m_len <= INT_MAX);
-	resize((INT_PTR)pMN->m_len);
+	resize((size_t)pMN->m_len);
 	return pMN->Read(data(), pMN->m_len);
 }
 
