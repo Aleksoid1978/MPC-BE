@@ -1804,7 +1804,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		if (movie->HasFragmentsIndex()) {
 			const AP4_Array<AP4_IndexTableEntry>& entries = movie->GetFragmentsIndexEntries();
 			for (AP4_Cardinal i = 0; i < entries.ItemCount(); ++i) {
-				SyncPoint sp = { entries[i].m_rt, __int64(entries[i].m_offset) };
+				const SyncPoint sp = { entries[i].m_rt, __int64(entries[i].m_offset) };
 				m_sps.push_back(sp);
 			}
 		} else {
@@ -1817,7 +1817,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				const AP4_Array<AP4_IndexTableEntry>& entries = track->GetIndexEntries();
 				for (AP4_Cardinal i = 0; i < entries.ItemCount(); ++i) {
-					SyncPoint sp = { entries[i].m_rt, __int64(entries[i].m_offset) };
+					const SyncPoint sp = { entries[i].m_rt, __int64(entries[i].m_offset) };
 					m_sps.push_back(sp);
 				}
 
@@ -1833,17 +1833,17 @@ bool CMP4SplitterFilter::DemuxInit()
 {
 	AP4_Movie* movie = m_pFile->GetMovie();
 
-	for (auto& tp : m_trackpos) {
-		tp.second.index = 0;
-		tp.second.ts = 0;
-		tp.second.offset = 0;
+	for (auto& [id, tp] : m_trackpos) {
+		tp.index = 0;
+		tp.ts = 0;
+		tp.offset = 0;
 
-		AP4_Track* track = movie->GetTrack(tp.first);
+		AP4_Track* track = movie->GetTrack(id);
 
 		AP4_Sample sample;
 		if (AP4_SUCCEEDED(track->GetSample(0, sample))) {
-			tp.second.ts = sample.GetCts();
-			tp.second.offset = sample.GetOffset();
+			tp.ts = sample.GetCts();
+			tp.offset = sample.GetOffset();
 		}
 	}
 
@@ -1870,22 +1870,22 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		return;
 	}
 
-	for (auto& tp : m_trackpos) {
-		AP4_Track* track = movie->GetTrack(tp.first);
+	for (auto& [id, tp] : m_trackpos) {
+		AP4_Track* track = movie->GetTrack(id);
 
 		if (track->HasIndex() && track->GetIndexEntries().ItemCount()) {
-			if (AP4_FAILED(track->GetIndexForRefTime(rt, tp.second.index, tp.second.ts, tp.second.offset))) {
+			if (AP4_FAILED(track->GetIndexForRefTime(rt, tp.index, tp.ts, tp.offset))) {
 				continue;
 			}
 		} else {
-			if (AP4_FAILED(track->GetSampleIndexForRefTime(rt, tp.second.index))) {
+			if (AP4_FAILED(track->GetSampleIndexForRefTime(rt, tp.index))) {
 				continue;
 			}
 
 			AP4_Sample sample;
-			if (AP4_SUCCEEDED(track->GetSample(tp.second.index, sample))) {
-				tp.second.ts = sample.GetCts();
-				tp.second.offset = sample.GetOffset();
+			if (AP4_SUCCEEDED(track->GetSample(tp.index, sample))) {
+				tp.ts = sample.GetCts();
+				tp.offset = sample.GetOffset();
 			}
 		}
 	}
