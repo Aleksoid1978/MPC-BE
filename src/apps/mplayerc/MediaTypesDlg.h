@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,6 @@
 #pragma once
 
 #include <afxwin.h>
-#include <atlcoll.h>
 #include "BaseGraph.h"
 #include <ResizableLib/ResizableDialog.h>
 

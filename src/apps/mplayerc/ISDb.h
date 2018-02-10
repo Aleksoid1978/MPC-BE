@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <atlcoll.h>
 #include <afxinet.h>
 #include "PlayerPlaylistBar.h"
 
