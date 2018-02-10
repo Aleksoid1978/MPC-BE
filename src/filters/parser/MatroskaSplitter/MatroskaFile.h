@@ -130,14 +130,11 @@ namespace MatroskaReader
 	class CBinary : public std::vector<BYTE>
 	{
 	public:
-		CBinary& operator = (const CBinary& b) {
-			*this = b;
-			return *this;
-		}
 		CStringA ToString() {
 			return CStringA((LPCSTR)data(), (int)size());
 		}
-		bool Compress(ContentCompression& cc), Decompress(ContentCompression& cc);
+		bool Compress(ContentCompression& cc);
+		bool Decompress(ContentCompression& cc);
 		HRESULT Parse(CMatroskaNode* pMN);
 	};
 
