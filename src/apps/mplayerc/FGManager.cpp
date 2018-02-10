@@ -2012,6 +2012,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	if (src[SRC_APE] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
 		pFGF->m_chkbytes.AddTail(L"0,4,,4D414320");               // 'MAC '
+		pFGF->m_chkbytes.AddTail(L"0,3,,494433");                 // 'ID3'
 		m_source.push_back(pFGF);
 	}
 

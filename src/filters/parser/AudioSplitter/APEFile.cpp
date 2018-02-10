@@ -96,8 +96,15 @@ void CAPEFile::SetProperties(IBaseFilter* pBF)
 HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 {
 	m_pFile = pFile;
-
 	m_pFile->Seek(0);
+
+	BYTE data[10];
+	if (m_pFile->ByteRead(data, sizeof(data)) != S_OK) {
+		return E_FAIL;
+	}
+	int start_offset = id3v2_match_len(data);
+	m_pFile->Seek(start_offset);
+
 	DWORD id = 0;
 	if (m_pFile->ByteRead((BYTE*)&id, 4) != S_OK || id != FCC('MAC ')) {
 		return E_FAIL;
