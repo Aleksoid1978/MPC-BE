@@ -265,8 +265,8 @@ bool CMatroskaSplitterFilter::ReadFirtsBlock(std::vector<byte>& pData, TrackEntr
 				CBinary* pb = bg->Block.BlockData.GetNext(pos2);
 				pTE->Expand(*pb, ContentEncoding::AllFrameContents);
 
-				const auto input = (*pb).GetData();
-				pData.insert(pData.end(), input, input + (*pb).GetCount());
+				const auto input = (*pb).data();
+				pData.insert(pData.end(), input, input + (*pb).size());
 			}
 
 			break;
@@ -352,9 +352,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				if (CodecID == "V_MS/VFW/FOURCC") {
 					mt.formattype = FORMAT_VideoInfo;
-					VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.GetCount() - sizeof(BITMAPINFOHEADER));
+					VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.size() - sizeof(BITMAPINFOHEADER));
 					memset(mt.Format(), 0, mt.FormatLength());
-					memcpy(&pvih->bmiHeader, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					memcpy(&pvih->bmiHeader, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 					mt.subtype = FOURCCMap(pvih->bmiHeader.biCompression);
 					switch (pvih->bmiHeader.biCompression) {
 					case BI_RGB:
@@ -401,9 +401,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 					bHasVideo = true;
 				} else if (CodecID == "V_MPEG4/ISO/AVC") {
-					if (pTE->CodecPrivate.GetCount() > 9) {
+					if (pTE->CodecPrivate.size() > 9) {
 						vc_params_t params;
-						AVCParser::ParseSequenceParameterSet(pTE->CodecPrivate.GetData() + 9, pTE->CodecPrivate.GetCount() - 9, params);
+						AVCParser::ParseSequenceParameterSet(pTE->CodecPrivate.data() + 9, pTE->CodecPrivate.size() - 9, params);
 						codecAvgTimePerFrame = params.AvgTimePerFrame;
 						bInterlaced = params.interlaced;
 					}
@@ -420,14 +420,14 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					CSize aspect(pbmi.biWidth, pbmi.biHeight);
 					ReduceDim(aspect);
-					CreateMPEG2VIfromAVC(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					CreateMPEG2VIfromAVC(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 
 					if (!bHasVideo) {
 						mts.push_back(mt);
 
-						if (SUCCEEDED(CreateMPEG2VIfromMVC(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount()))) {
+						if (SUCCEEDED(CreateMPEG2VIfromMVC(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.data(), pTE->CodecPrivate.size()))) {
 							mts.insert(mts.cbegin(), mt);
-						} else if (pTE->CodecPrivate.IsEmpty()) {
+						} else if (pTE->CodecPrivate.empty()) {
 							std::vector<BYTE> pData;
 							if (ReadFirtsBlock(pData, pTE)) {
 								CBaseSplitterFileEx::avchdr h;
@@ -452,14 +452,14 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					CSize aspect(pbmi.biWidth, pbmi.biHeight);
 					ReduceDim(aspect);
-					CreateMPEG2VISimple(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					CreateMPEG2VISimple(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 					if (!bHasVideo)
 						mts.push_back(mt);
 					bHasVideo = true;
 				} else if (CodecID == "V_DIRAC") {
 					mt.subtype = MEDIASUBTYPE_DiracVideo;
 					mt.formattype = FORMAT_DiracVideoInfo;
-					DIRACINFOHEADER* dvih = (DIRACINFOHEADER*)mt.AllocFormatBuffer(FIELD_OFFSET(DIRACINFOHEADER, dwSequenceHeader) + pTE->CodecPrivate.GetCount());
+					DIRACINFOHEADER* dvih = (DIRACINFOHEADER*)mt.AllocFormatBuffer(FIELD_OFFSET(DIRACINFOHEADER, dwSequenceHeader) + pTE->CodecPrivate.size());
 					memset(mt.Format(), 0, mt.FormatLength());
 					dvih->hdr.bmiHeader.biSize = sizeof(dvih->hdr.bmiHeader);
 					dvih->hdr.bmiHeader.biWidth = (LONG)pTE->v.PixelWidth;
@@ -471,15 +471,15 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					dvih->hdr.dwPictAspectRatioY = dvih->hdr.bmiHeader.biHeight;
 
 					BYTE* pSequenceHeader = (BYTE*)dvih->dwSequenceHeader;
-					memcpy(pSequenceHeader, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
-					dvih->cbSequenceHeader = (DWORD)pTE->CodecPrivate.GetCount();
+					memcpy(pSequenceHeader, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
+					dvih->cbSequenceHeader = (DWORD)pTE->CodecPrivate.size();
 
 					if (!bHasVideo)
 						mts.push_back(mt);
 					bHasVideo = true;
 				} else if (CodecID == "V_MPEG2") {
-					BYTE* seqhdr = pTE->CodecPrivate.GetData();
-					DWORD len = (DWORD)pTE->CodecPrivate.GetCount();
+					BYTE* seqhdr = pTE->CodecPrivate.data();
+					DWORD len = (DWORD)pTE->CodecPrivate.size();
 					int w = (int)pTE->v.PixelWidth;
 					int h = (int)pTE->v.PixelHeight;
 
@@ -502,9 +502,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mt.subtype		= MEDIASUBTYPE_MPEG1Payload;
 					mt.formattype	= FORMAT_MPEGVideo;
 
-					MPEG1VIDEOINFO* pm1vi = (MPEG1VIDEOINFO*)mt.AllocFormatBuffer(sizeof(MPEG1VIDEOINFO) + pTE->CodecPrivate.GetCount());
+					MPEG1VIDEOINFO* pm1vi = (MPEG1VIDEOINFO*)mt.AllocFormatBuffer(sizeof(MPEG1VIDEOINFO) + pTE->CodecPrivate.size());
 					memset(mt.Format(), 0, mt.FormatLength());
-					memcpy(mt.Format() + sizeof(MPEG1VIDEOINFO), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					memcpy(mt.Format() + sizeof(MPEG1VIDEOINFO), pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 
 					pm1vi->hdr.bmiHeader.biSize			= sizeof(pm1vi->hdr.bmiHeader);
 					pm1vi->hdr.bmiHeader.biWidth		= (LONG)pTE->v.PixelWidth;
@@ -528,11 +528,11 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					CSize aspect(pbmi.biWidth, pbmi.biHeight);
 					ReduceDim(aspect);
-					CreateMPEG2VISimple(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					CreateMPEG2VISimple(&mt, &pbmi, 0, aspect, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 
 					MPEG2VIDEOINFO* pm2vi	= (MPEG2VIDEOINFO*)mt.pbFormat;
-					BYTE * extradata		= pTE->CodecPrivate.GetData();
-					size_t size				= pTE->CodecPrivate.GetCount();
+					BYTE * extradata		= pTE->CodecPrivate.data();
+					size_t size				= pTE->CodecPrivate.size();
 					vc_params_t params;
 					if (HEVCParser::ParseHEVCDecoderConfigurationRecord(extradata, size, params, false)) {
 						pm2vi->dwProfile	= params.profile;
@@ -547,7 +547,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					if (!bHasVideo) {
 						mts.push_back(mt);
-						if (pTE->CodecPrivate.IsEmpty()) {
+						if (pTE->CodecPrivate.empty()) {
 							std::vector<BYTE> pData;
 							if (ReadFirtsBlock(pData, pTE)) {
 								CBaseSplitterFileEx::hevchdr h;
@@ -578,11 +578,11 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						fourcc = FCC('VP80');
 					} else if (CodecID == "V_VP9") {
 						fourcc = FCC('VP90');
-					} else if (CodecID == "V_QUICKTIME" && pTE->CodecPrivate.GetCount() >= 8) {
+					} else if (CodecID == "V_QUICKTIME" && pTE->CodecPrivate.size() >= 8) {
 						if (m_pFile->m_ebml.DocTypeReadVersion == 1) {
-							fourcc = GETDWORD(pTE->CodecPrivate.GetData());
+							fourcc = GETDWORD(pTE->CodecPrivate.data());
 						} else {
-							fourcc = GETDWORD(pTE->CodecPrivate.GetData() + 4);
+							fourcc = GETDWORD(pTE->CodecPrivate.data() + 4);
 						}
 					} else if (CodecID.Left(9) == "V_REAL/RV" && CodecID.GetLength() >= 11) {
 						fourcc = CodecID[7] + (CodecID[8] << 8) + (CodecID[9] << 16) + (CodecID[10] << 24);
@@ -628,9 +628,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (fourcc) {
 						mt.formattype = FORMAT_VideoInfo;
 						mt.subtype = FOURCCMap(fourcc);
-						VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.GetCount());
+						VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + pTE->CodecPrivate.size());
 						memset(mt.Format(), 0, mt.FormatLength());
-						memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+						memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 						pvih->bmiHeader.biSize = sizeof(pvih->bmiHeader);
 						pvih->bmiHeader.biWidth = (LONG)pTE->v.PixelWidth;
 						pvih->bmiHeader.biHeight = (LONG)pTE->v.PixelHeight;
@@ -642,9 +642,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						if (!bHasVideo) {
 							mts.push_back(mt);
 
-							if (CodecID.Left(9) == "V_REAL/RV" && pTE->CodecPrivate.GetCount() > 26) {
-								const BYTE* extra = pTE->CodecPrivate.GetData() + 26;
-								const size_t extralen = pTE->CodecPrivate.GetCount() - 26;
+							if (CodecID.Left(9) == "V_REAL/RV" && pTE->CodecPrivate.size() > 26) {
+								const BYTE* extra = pTE->CodecPrivate.data() + 26;
+								const size_t extralen = pTE->CodecPrivate.size() - 26;
 
 								VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + extralen);
 								memcpy(pvih + 1, extra, extralen);
@@ -1056,8 +1056,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							if (pb) {
 								pTE->Expand(*pb, ContentEncoding::AllFrameContents);
 
-								BYTE* start	= pb->GetData();
-								BYTE* end	= start + pb->GetCount();
+								BYTE* start	= pb->data();
+								BYTE* end	= start + pb->size();
 								audioframe_t aframe;
 								int size = ParseDTSHeader(start, &aframe);
 								if (size) {
@@ -1112,9 +1112,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mts.push_back(mt);
 				} else if (CodecID == "A_AAC") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_RAW_AAC1);
-					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
-					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
-					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					wfe->cbSize = (WORD)pTE->CodecPrivate.size();
+					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.size());
+					memcpy(wfe + 1, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 					mts.push_back(mt);
 				} else if (CodecID.Left(6) == "A_AAC/") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_RAW_AAC1);
@@ -1148,15 +1148,15 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 				} else if (CodecID == "A_WAVPACK4") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_WAVPACK4);
-					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
-					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
-					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					wfe->cbSize = (WORD)pTE->CodecPrivate.size();
+					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.size());
+					memcpy(wfe + 1, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 					mts.push_back(mt);
 				} else if (CodecID == "A_FLAC") {
 					wfe->wFormatTag = WAVE_FORMAT_FLAC;
-					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
-					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
-					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					wfe->cbSize = (WORD)pTE->CodecPrivate.size();
+					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.size());
+					memcpy(wfe + 1, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 
 					mt.subtype = MEDIASUBTYPE_FLAC_FRAMED;
 					mts.push_back(mt);
@@ -1208,8 +1208,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 					mts.push_back(mt);
 				} else if (CodecID == "A_MS/ACM") {
-					wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(pTE->CodecPrivate.GetCount());
-					memcpy(wfe, (WAVEFORMATEX*)pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(pTE->CodecPrivate.size());
+					memcpy(wfe, (WAVEFORMATEX*)pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 					if (wfe->wFormatTag == WAVE_FORMAT_EXTENSIBLE && wfe->cbSize == 22) {
 						mt.subtype = ((WAVEFORMATEXTENSIBLE*)wfe)->SubFormat;
 					}
@@ -1220,40 +1220,40 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										  (DWORD)pTE->a.Channels,
 										  (DWORD)pTE->a.SamplingFrequency,
 										  DWORD(pTE->a.BitDepth),
-										  pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+										  pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 				} else if (CodecID.Left(7) == "A_REAL/" && CodecID.GetLength() >= 11) {
 					mt.subtype = FOURCCMap((DWORD)CodecID[7]|((DWORD)CodecID[8]<<8)|((DWORD)CodecID[9]<<16)|((DWORD)CodecID[10]<<24));
 					mt.bTemporalCompression = TRUE;
-					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
-					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
-					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					wfe->cbSize = (WORD)pTE->CodecPrivate.size();
+					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.size());
+					memcpy(wfe + 1, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 					wfe->cbSize = 0; // IMPORTANT: this is screwed, but cbSize has to be 0 and the extra data from codec priv must be after WAVEFORMATEX
 					mts.push_back(mt);
-				} else if (CodecID == "A_QUICKTIME" && pTE->CodecPrivate.GetCount() >= 8) {
-					DWORD type = GETDWORD(pTE->CodecPrivate.GetData() + 4);
+				} else if (CodecID == "A_QUICKTIME" && pTE->CodecPrivate.size() >= 8) {
+					DWORD type = GETDWORD(pTE->CodecPrivate.data() + 4);
 					// 'QDM2', 'QDMC', 'ima4'
 					mt.subtype = FOURCCMap(type);
-					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
-					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
-					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					wfe->cbSize = (WORD)pTE->CodecPrivate.size();
+					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.size());
+					memcpy(wfe + 1, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 					mts.push_back(mt);
 				} else if (CodecID == "A_QUICKTIME/QDM2") {
 					mt.subtype = MEDIASUBTYPE_QDM2;
-					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
-					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
-					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					wfe->cbSize = (WORD)pTE->CodecPrivate.size();
+					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.size());
+					memcpy(wfe + 1, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 					mts.push_back(mt);
 				} else if (CodecID.Left(6) == "A_OPUS") {
 					wfe->wFormatTag = WAVE_FORMAT_OPUS;
 					mt.subtype = MEDIASUBTYPE_OPUS;
-					wfe->cbSize = (WORD)pTE->CodecPrivate.GetCount();
-					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.GetCount());
-					memcpy(wfe + 1, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					wfe->cbSize = (WORD)pTE->CodecPrivate.size();
+					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.size());
+					memcpy(wfe + 1, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 					mts.push_back(mt);
 				} else if (CodecID == "A_ALAC") {
 					wfe->wFormatTag = WAVE_FORMAT_ALAC;
 					mt.subtype = MEDIASUBTYPE_ALAC;
-					WORD cbSize = (WORD)pTE->CodecPrivate.GetCount() + 12;
+					WORD cbSize = (WORD)pTE->CodecPrivate.size() + 12;
 					wfe->cbSize = cbSize;
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + cbSize);
 					BYTE *p = (BYTE *)(wfe + 1);
@@ -1261,7 +1261,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					memset(p, 0, cbSize);
 					memcpy(p + 3, &cbSize, 1);
 					memcpy(p + 4, (const unsigned char *)"alac", 4);
-					memcpy(p + 12, pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					memcpy(p + 12, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 					mts.push_back(mt);
 				}
 			} else if (pTE->TrackType == TrackEntry::TypeSubtitle) {
@@ -1277,12 +1277,12 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					isSub = true;
 				} else {
 					if (CodecID == "S_TEXT/WEBVTT") {
-						pTE->CodecPrivate.RemoveAll();
+						pTE->CodecPrivate.clear();
 					}
 
 					mt.majortype = MEDIATYPE_Subtitle;
 					mt.formattype = FORMAT_SubtitleInfo;
-					SUBTITLEINFO* psi = (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO) + pTE->CodecPrivate.GetCount());
+					SUBTITLEINFO* psi = (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO) + pTE->CodecPrivate.size());
 					memset(psi, 0, mt.FormatLength());
 					strncpy_s(psi->IsoLang, pTE->Language, _countof(psi->IsoLang) - 1);
 					CString subtitle_Name = pTE->Name;
@@ -1296,7 +1296,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					subtitle_Name = subtitle_Name.Trim();
 
 					wcsncpy_s(psi->TrackName, subtitle_Name, _countof(psi->TrackName) - 1);
-					memcpy(mt.pbFormat + (psi->dwOffset = sizeof(SUBTITLEINFO)), pTE->CodecPrivate.GetData(), pTE->CodecPrivate.GetCount());
+					memcpy(mt.pbFormat + (psi->dwOffset = sizeof(SUBTITLEINFO)), pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 
 					mt.subtype =
 						CodecID == "S_TEXT/UTF8" || CodecID == "D_WEBVTT/SUBTITLES" || CodecID == "S_TEXT/WEBVTT" ? MEDIASUBTYPE_UTF8 :
@@ -1681,8 +1681,8 @@ void CMatroskaSplitterFilter::SendVorbisHeaderSample()
 		}
 
 		if (pTE->CodecID.ToString() == "A_VORBIS" && pPin->CurrentMediaType().subtype == MEDIASUBTYPE_Vorbis
-				&& pTE->CodecPrivate.GetCount() > 0) {
-			BYTE* ptr = pTE->CodecPrivate.GetData();
+				&& pTE->CodecPrivate.size() > 0) {
+			BYTE* ptr = pTE->CodecPrivate.data();
 
 			std::list<int> sizes;
 			long last = 0;
@@ -1694,7 +1694,7 @@ void CMatroskaSplitterFilter::SendVorbisHeaderSample()
 				sizes.push_back(size);
 				last += size;
 			}
-			sizes.push_back(pTE->CodecPrivate.GetCount() - (ptr - pTE->CodecPrivate.GetData()) - last);
+			sizes.push_back(pTE->CodecPrivate.size() - (ptr - pTE->CodecPrivate.data()) - last);
 
 			hr = S_OK;
 
@@ -2492,7 +2492,7 @@ HRESULT CMatroskaSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		size_t size = 0;
 		POSITION pos = mp->bg->Block.BlockData.GetHeadPosition();
 		while (pos) {
-			size += mp->bg->Block.BlockData.GetNext(pos)->GetCount();
+			size += mp->bg->Block.BlockData.GetNext(pos)->size();
 		}
 
 		// simple check
@@ -2550,11 +2550,11 @@ static bool ParseWavpack(CMediaType* mt, CBinary* Data, CAutoPtr<CPacket>& p)
 	CheckPointer(mt->pbFormat, false);
 	CheckPointer(Data, false);
 
-	if (Data->GetCount() < 12) {
+	if (Data->size() < 12) {
 		return false;
 	}
 
-	CGolombBuffer gb(Data->GetData(), Data->GetCount());
+	CGolombBuffer gb(Data->data(), Data->size());
 
 	DWORD samples = gb.ReadDwordLE();
 	WORD ver      = 0;
@@ -2587,8 +2587,8 @@ static bool ParseWavpack(CMediaType* mt, CBinary* Data, CAutoPtr<CPacket>& p)
 			return false;
 		}
 
-		ptr->SetCount(dstlen + blocksize + 32);
-		BYTE *dst = ptr->GetData();
+		ptr->resize(dstlen + blocksize + 32);
+		BYTE *dst = ptr->data();
 
 		dstlen += blocksize + 32;
 
@@ -2607,7 +2607,7 @@ static bool ParseWavpack(CMediaType* mt, CBinary* Data, CAutoPtr<CPacket>& p)
 		offset += blocksize + 32;
 	}
 
-	p->Copy(*ptr);
+	p->SetData(ptr->data(), ptr->size());
 
 	return true;
 }
@@ -2644,31 +2644,33 @@ HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REF
 		if (m_mt.subtype == MEDIASUBTYPE_DVB_SUBTITLES) {
 			// Add DBV subtitle missing start code - 0x20 0x00 (in Matroska DVB packets start with 0x0F ...)
 			CAutoPtr<CBinary> ptr(DNew CBinary());
-			ptr->SetCount(2);
-			BYTE *pData = ptr->GetData();
+			ptr->resize(2);
+			BYTE *pData = ptr->data();
 			pData[0] = 0x20;
 			pData[1] = 0x00;
-			tmp->Copy(*ptr);
-			tmp->Append(*p->bg->Block.BlockData.GetNext(pos));
+			tmp->SetData(ptr->data(), ptr->size());
+			auto pBinary = p->bg->Block.BlockData.GetNext(pos);
+			tmp->AppendData(pBinary->data(), pBinary->size());
 		} else if (m_mt.subtype == MEDIASUBTYPE_WAVPACK4) {
 			if (!ParseWavpack(&m_mt, p->bg->Block.BlockData.GetNext(pos), tmp)) {
 				continue;
 			}
 		} else if (m_mt.subtype == MEDIASUBTYPE_icpf) {
 			CAutoPtr<CBinary> ptr(DNew CBinary());
-			ptr->SetCount(2 * sizeof(DWORD));
-			DWORD* pData = (DWORD*)ptr->GetData();
+			ptr->resize(2 * sizeof(DWORD));
+			DWORD* pData = (DWORD*)ptr->data();
 			pData[0] = p->bg->Block.BlockData.GetCount();
 			pData[1] = FCC('icpf');
-			tmp->Copy(*ptr);
-			tmp->Append(*p->bg->Block.BlockData.GetNext(pos));
+			tmp->SetData(ptr->data(), ptr->size());
+			auto pBinary = p->bg->Block.BlockData.GetNext(pos);
+			tmp->AppendData(pBinary->data(), pBinary->size());
 		} else if (m_mt.subtype == MEDIASUBTYPE_VP90) {
 			REFERENCE_TIME rtStartTmp = rtStart;
 			REFERENCE_TIME rtStopTmp = rtStop;
 
 			CAutoPtr<CBinary> ptr = p->bg->Block.BlockData.GetNext(pos);
-			const BYTE* pData = ptr->GetData();
-			size_t size = ptr->GetCount();
+			const BYTE* pData = ptr->data();
+			size_t size = ptr->size();
 
 			const BYTE marker = pData[size - 1];
 			if ((marker & 0xe0) == 0xc0) {
@@ -2723,9 +2725,10 @@ HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REF
 				continue;
 			}
 
-			tmp->Copy(*ptr);
+			tmp->SetData(ptr->data(), ptr->size());
 		} else {
-			tmp->Copy(*p->bg->Block.BlockData.GetNext(pos));
+			auto pBinari = p->bg->Block.BlockData.GetNext(pos);
+			tmp->SetData(pBinari->data(), pBinari->size());
 		}
 
 		if (S_OK != (hr = DeliverPacket(tmp))) {

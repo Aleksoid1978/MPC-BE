@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,6 @@
 #pragma once
 
 #include <atlbase.h>
-#include <atlcoll.h>
 #include "../BaseSplitter/BaseSplitter.h"
 
 /* top-level master-IDs */
@@ -128,15 +127,15 @@ namespace MatroskaReader
 
 	class ContentCompression;
 
-	class CBinary : public CAtlArray<BYTE>
+	class CBinary : public std::vector<BYTE>
 	{
 	public:
 		CBinary& operator = (const CBinary& b) {
-			Copy(b);
+			*this = b;
 			return *this;
 		}
 		CStringA ToString() {
-			return CStringA((LPCSTR)GetData(), (int)GetCount());
+			return CStringA((LPCSTR)data(), (int)size());
 		}
 		bool Compress(ContentCompression& cc), Decompress(ContentCompression& cc);
 		HRESULT Parse(CMatroskaNode* pMN);

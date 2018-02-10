@@ -46,6 +46,11 @@ public:
 		SetCount(len);
 		memcpy(GetData(), ptr, len);
 	}
+	void AppendData(const void* ptr, DWORD len) {
+		size_t oldsize = GetCount();
+		SetCount(oldsize + len);
+		memcpy(GetData() + oldsize, ptr, len);
+	}
 };
 
 class CPacketQueue : protected std::deque<CAutoPtr<CPacket>>
