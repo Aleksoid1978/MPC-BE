@@ -129,7 +129,7 @@ case EBML_ID_HEADER:
 	}
 	break;
 case MATROSKA_ID_SEGMENT:
-	if (m_segment.SegmentInfo.SegmentUID.IsEmpty()) {
+	if (m_segment.SegmentInfo.SegmentUID.empty()) {
 		m_segment.ParseMinimal(pMN);
 	}
 	break;
@@ -921,8 +921,8 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 			continue;
 		}
 		CAutoPtr<CBinary> p(DNew CBinary());
-		p->SetCount((INT_PTR)len);
-		pMN->Read(p->GetData(), len);
+		p->resize((INT_PTR)len);
+		pMN->Read(p->data(), len);
 		BlockData.AddTail(p);
 	}
 
@@ -1190,8 +1190,8 @@ HRESULT Targets::Parse(CMatroskaNode* pMN0)
 HRESULT CBinary::Parse(CMatroskaNode* pMN)
 {
 	ASSERT(pMN->m_len <= INT_MAX);
-	SetCount((INT_PTR)pMN->m_len);
-	return pMN->Read(GetData(), pMN->m_len);
+	resize((INT_PTR)pMN->m_len);
+	return pMN->Read(data(), pMN->m_len);
 }
 
 bool CBinary::Compress(ContentCompression& cc)
@@ -1208,8 +1208,8 @@ bool CBinary::Compress(ContentCompression& cc)
 			return false;
 		}
 
-		c_stream.next_in = GetData();
-		c_stream.avail_in = (uInt)GetCount();
+		c_stream.next_in = data();
+		c_stream.avail_in = (uInt)size();
 
 		BYTE* dst = nullptr;
 		int n = 0;
@@ -1225,8 +1225,8 @@ bool CBinary::Compress(ContentCompression& cc)
 
 		deflateEnd(&c_stream);
 
-		SetCount(c_stream.total_out);
-		memcpy(GetData(), dst, GetCount());
+		resize(c_stream.total_out);
+		memcpy(data(), dst, size());
 
 		free(dst);
 
@@ -1250,8 +1250,8 @@ bool CBinary::Decompress(ContentCompression& cc)
 			return false;
 		}
 
-		d_stream.next_in = GetData();
-		d_stream.avail_in = (uInt)GetCount();
+		d_stream.next_in = data();
+		d_stream.avail_in = (uInt)size();
 
 		BYTE* dst = nullptr;
 		int n = 0;
@@ -1267,14 +1267,14 @@ bool CBinary::Decompress(ContentCompression& cc)
 
 		inflateEnd(&d_stream);
 
-		SetCount(d_stream.total_out);
-		memcpy(GetData(), dst, GetCount());
+		resize(d_stream.total_out);
+		memcpy(data(), dst, size());
 
 		free(dst);
 
 		return true;
 	} else if (cc.ContentCompAlgo == ContentCompression::HDRSTRIP) {
-		InsertArrayAt(0, &cc.ContentCompSettings);
+		insert(begin(), cc.ContentCompSettings.begin(), cc.ContentCompSettings.end());
 	}
 
 	return false;
