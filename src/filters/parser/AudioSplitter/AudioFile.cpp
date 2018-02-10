@@ -109,6 +109,8 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 		}
 		if (*id == FCC('TTA1')) {
 			pAudioFile = DNew CTTAFile();
+		} else if (*id == FCC('MAC ')) {
+			pAudioFile = DNew CAPEFile();
 		} else {
 			return nullptr;
 		}
