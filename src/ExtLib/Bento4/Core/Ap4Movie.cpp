@@ -143,6 +143,12 @@ AP4_Movie::~AP4_Movie()
     m_Tracks.DeleteReferences();
     delete m_MoovAtom;
 
+    for (AP4_Cardinal i = 0; i < m_MoofAtomEntries.ItemCount(); i++) {
+        if (m_MoofAtomEntries[i]) {
+            delete m_MoofAtomEntries[i]; m_MoofAtomEntries[i] = nullptr;
+        }
+    }
+
     AP4_RELEASE(m_Stream);
 }
 
