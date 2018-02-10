@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <atlcoll.h>
 #include <vector>
 
 static const WCHAR* MPEG2_Profile[]=

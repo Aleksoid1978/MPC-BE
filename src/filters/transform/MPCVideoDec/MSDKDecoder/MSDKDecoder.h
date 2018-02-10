@@ -29,7 +29,6 @@
 
 #include "AnnexBConverter.h"
 
-#include <atlcoll.h>
 #include <deque>
 #include <vector>
 
