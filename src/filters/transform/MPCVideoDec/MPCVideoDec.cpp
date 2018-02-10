@@ -967,7 +967,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_DXVADecoderGUID(GUID_NULL)
 	, m_nActiveCodecs(CODECS_ALL & ~CODEC_H264_MVC)
 	, m_rtAvrTimePerFrame(0)
-	, m_rtLastStart(INVALID_TIME)
 	, m_rtLastStop(0)
 	, m_rtStartCache(INVALID_TIME)
 	, m_nWorkaroundBug(FF_BUG_AUTODETECT)
@@ -1158,7 +1157,7 @@ void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME
 {
 	const REFERENCE_TIME AvgTimePerFrame = GetFrameDuration();
 
-	if (rtStart == INVALID_TIME || (m_rtLastStart != INVALID_TIME && rtStart < m_rtLastStart)) {
+	if (rtStart == INVALID_TIME) {
 		rtStart = m_rtLastStop;
 		rtStop = INVALID_TIME;
 	}
@@ -1172,7 +1171,6 @@ void CMPCVideoDecFilter::UpdateFrameTime(REFERENCE_TIME& rtStart, REFERENCE_TIME
 		rtStop = rtStart + (rtFrameDuration / m_dRate);
 	}
 
-	m_rtLastStart = rtStart;
 	m_rtLastStop = rtStop;
 }
 
@@ -2549,7 +2547,6 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 
 	m_rtStartCache = INVALID_TIME;
 
-	m_rtLastStart = INVALID_TIME;
 	m_rtLastStop  = 0;
 
 	if (m_bReorderBFrame) {
