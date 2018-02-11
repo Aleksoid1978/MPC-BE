@@ -19,7 +19,7 @@
  */
 
 #include "stdafx.h"
-#include <unordered_map>
+#include <map>
 #include "EVRAllocatorPresenter.h"
 #include "OuterEVR.h"
 #include <Mferror.h>
@@ -2611,30 +2611,30 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 
 				m_DetectedFrameTimeHistoryHistory[m_DetectedFrameTimePos % 500u] = DetectedRate;
 
-				class CAutoInt
+				class CAutoUInt
 				{
 				public:
-					int m_Int;
+					unsigned m_UInt;
 
-					CAutoInt() { m_Int = 0; }
-					CAutoInt(int _Other) { m_Int = _Other; }
+					CAutoUInt() { m_UInt = 0; }
+					CAutoUInt(unsigned _Other) { m_UInt = _Other; }
 
-					operator int () const { return m_Int; }
+					operator unsigned() const { return m_UInt; }
 
-					CAutoInt &operator ++ () {
-						++m_Int;
+					CAutoUInt &operator ++ () {
+						++m_UInt;
 						return *this;
 					}
 				};
 
-				std::unordered_map<double, CAutoInt> Map;
+				std::map<double, CAutoUInt> Map;
 
-				for (int i = 0; i < 500; ++i) {
+				for (unsigned i = 0; i < 500u; ++i) {
 					++Map[m_DetectedFrameTimeHistoryHistory[i]];
 				}
 
 				double BestVal = 0.0;
-				int BestNum = 5;
+				unsigned BestNum = 5;
 				for (const auto& [Key, Value] : Map) {
 					if (Value > BestNum && Key != 0.0) {
 						BestNum = Value;
