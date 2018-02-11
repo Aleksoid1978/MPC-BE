@@ -2521,7 +2521,8 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 	if (_bSorted) {
 		CAutoLock lock(&m_SampleQueueLock);
 		// Insert sorted
-		/*POSITION Iterator = m_ScheduledSamples.GetHeadPosition();
+		/*
+		POSITION Iterator = m_ScheduledSamples.GetHeadPosition();
 
 		LONGLONG NewSampleTime;
 		pSample->GetSampleTime(&NewSampleTime);
@@ -2537,20 +2538,22 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 				m_ScheduledSamples.InsertBefore(CurrentPos, pSample);
 				return;
 			}
-		}*/
+		}
+		*/
 
 		m_ScheduledSamples.AddHead(pSample);
 	} else {
 
 		CAutoLock lock(&m_SampleQueueLock);
 
-		CRenderersSettings& rs = GetRenderersSettings();
-		/*double ForceFPS = 0.0;
+		/*
+		double ForceFPS = 0.0;
 		//double ForceFPS = 59.94;
 		//double ForceFPS = 23.976;
 		if (ForceFPS != 0.0) {
 			m_rtTimePerFrame = (REFERENCE_TIME)(10000000.0 / ForceFPS);
-		}*/
+		}
+		*/
 		LONGLONG Duration = m_rtTimePerFrame;
 		UNREFERENCED_PARAMETER(Duration);
 		LONGLONG PrevTime = m_LastScheduledUncorrectedSampleTime;
@@ -2611,25 +2614,9 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 
 				m_DetectedFrameTimeHistoryHistory[m_DetectedFrameTimePos % 500u] = DetectedRate;
 
-				class CAutoUInt
-				{
-				public:
-					unsigned m_UInt;
+				std::map<double, unsigned> Map;
 
-					CAutoUInt() { m_UInt = 0; }
-					CAutoUInt(unsigned _Other) { m_UInt = _Other; }
-
-					operator unsigned() const { return m_UInt; }
-
-					CAutoUInt &operator ++ () {
-						++m_UInt;
-						return *this;
-					}
-				};
-
-				std::map<double, CAutoUInt> Map;
-
-				for (unsigned i = 0; i < 500u; ++i) {
+				for (unsigned i = 0; i < _countof(m_DetectedFrameTimeHistoryHistory); ++i) {
 					++Map[m_DetectedFrameTimeHistoryHistory[i]];
 				}
 
@@ -2663,7 +2650,7 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 
 			if (m_DetectedFrameTime != 0.0
 					//&& PredictedDiff > MIN_FRAME_TIME
-					&& m_DetectedLock && rs.bEVRFrameTimeCorrection) {
+					&& m_DetectedLock && GetRenderersSettings().bEVRFrameTimeCorrection) {
 				double CurrentTime = Time / 10000000.0;
 				double LastTime = m_LastScheduledSampleTimeFP;
 				double PredictedTime = LastTime + m_DetectedFrameTime;
@@ -2745,13 +2732,11 @@ void CEVRAllocatorPresenter::FlushSamplesInternal()
 	CAutoLock Lock(&m_csExternalMixerLock);
 
 	while (!m_ScheduledSamples.IsEmpty()) {
-		CComPtr<IMFSample> pMFSample;
-
-		pMFSample = m_ScheduledSamples.RemoveHead();
-		MoveToFreeList (pMFSample, true);
+		CComPtr<IMFSample> pMFSample = m_ScheduledSamples.RemoveHead();
+		MoveToFreeList(pMFSample, true);
 	}
 
-	m_LastSampleOffset			= 0;
-	m_bLastSampleOffsetValid	= false;
-	m_bSignaledStarvation		= false;
+	m_LastSampleOffset       = 0;
+	m_bLastSampleOffsetValid = false;
+	m_bSignaledStarvation    = false;
 }
