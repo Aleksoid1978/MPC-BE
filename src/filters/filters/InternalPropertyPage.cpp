@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,9 +20,12 @@
  */
 
 #include "stdafx.h"
-#include "InternalPropertyPage.h"
 #include "../../DSUtil/DSUtil.h"
 #include "../../apps/mplayerc/mplayerc.h"
+#include "../../DSUtil/std_helper.h"
+
+#include "InternalPropertyPage.h"
+
 
 #define DEFAULT_FONTSIZE 13
 
@@ -344,7 +347,7 @@ STDMETHODIMP CInternalPropertyPage::TranslateAccelerator(LPMSG lpMsg)
 // CPinInfoWnd
 //
 
-CAtlMap<CLSID, CString> CPinInfoWnd::m_CachedRegistryFilters;
+std::map<CLSID, CString> CPinInfoWnd::m_CachedRegistryFilters;
 
 CPinInfoWnd::CPinInfoWnd()
 {
@@ -528,10 +531,10 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 
 			{
 				CString module;
+				auto it = m_CachedRegistryFilters.find(FilterClsid);
 
-				CachedFilters::CPair* pRegPair = m_CachedRegistryFilters.Lookup(FilterClsid);
-				if (pRegPair && ::PathFileExistsW(pRegPair->m_value)) {
-					module = pRegPair->m_value;
+				if (it != m_CachedRegistryFilters.end() && ::PathFileExistsW((*it).second)) {
+					module = (*it).second;
 				} else {
 					len = _countof(buff);
 					memset(buff, 0, len);
@@ -541,8 +544,11 @@ void CPinInfoWnd::OnCbnSelchangeCombo1()
 						module = CString(buff);
 						m_CachedRegistryFilters[FilterClsid] = module;
 						key.Close();
-					} else if (CachedFilters::CPair* pExtPair = m_CachedExternalFilters.Lookup(FilterClsid)) {
-						module = pExtPair->m_value;
+					} else {
+						auto it2 = m_CachedExternalFilters.find(FilterClsid);
+						if (it2 != m_CachedExternalFilters.end()) {
+							module = (*it2).second;;
+						}
 					}
 				}
 

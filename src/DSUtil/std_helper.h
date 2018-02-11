@@ -21,6 +21,13 @@
 #pragma once
 
 //#include <list>
+//#include <guiddef.h>
+
+// this operator is needed to use GUID or CLSID as key in std::map
+inline bool operator < (const GUID & a, const GUID & b)
+{
+	return memcmp(&a, &b, sizeof(GUID)) < 0;
+}
 
 // returns an iterator on the found element, or last if nothing is found
 template <class T>
