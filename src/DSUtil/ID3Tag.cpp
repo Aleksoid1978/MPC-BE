@@ -355,13 +355,13 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 			size -= 4;
 		}
 
-		CAtlArray<BYTE> Data;
+		std::vector<BYTE> Data;
 		BOOL bUnSync = m_flags & 0x80 || flags & ID3v2_FLAG_UNSYNCH;
 		if (bUnSync) {
 			DWORD dwSize = size;
 			while (dwSize) {
 				BYTE b = gb.ReadByte();
-				Data.Add(b);
+				Data.push_back(b);
 				dwSize--;
 				if (b == 0xFF && dwSize > 1) {
 					b = gb.ReadByte();
@@ -370,15 +370,15 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 						b = gb.ReadByte();
 						dwSize--;
 					}
-					Data.Add(b);
+					Data.push_back(b);
 				}
 			}
 		} else {
-			Data.SetCount(size);
-			gb.ReadBuffer(Data.GetData(), size);
+			Data.resize(size);
+			gb.ReadBuffer(Data.data(), size);
 		}
-		CGolombBuffer gbData(Data.GetData(), Data.GetCount());
-		size = Data.GetCount();
+		CGolombBuffer gbData(Data.data(), Data.size());
+		size = Data.size();
 
 		if (tag == 'TIT2'
 				|| tag == 'TPE1'

@@ -163,7 +163,7 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* pAPETag)
 		return;
 	}
 
-	CAtlArray<BYTE> CoverData;
+	std::vector<BYTE> CoverData;
 	CString CoverMime, CoverFileName;
 
 	CString Artist, Comment, Title, Year, Album;
@@ -182,10 +182,10 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* pAPETag)
 				}
 			}
 
-			if (!CoverData.GetCount() && CoverMime.GetLength() > 0) {
+			if (CoverData.empty() && CoverMime.GetLength() > 0) {
 				CoverFileName = TagKey;
-				CoverData.SetCount(item->GetDataLen());
-				memcpy(CoverData.GetData(), item->GetData(), item->GetDataLen());
+				CoverData.resize(item->GetDataLen());
+				memcpy(CoverData.data(), item->GetData(), item->GetDataLen());
 			}
 		} else {
 			CString sTitle, sPerformer;
@@ -235,8 +235,8 @@ void SetAPETagProperties(IBaseFilter* pBF, const CAPETag* pAPETag)
 	}
 
 	if (CComQIPtr<IDSMResourceBag> pRB = pBF) {
-		if (CoverData.GetCount()) {
-			pRB->ResAppend(CoverFileName, L"cover", CoverMime, CoverData.GetData(), (DWORD)CoverData.GetCount(), 0);
+		if (CoverData.size()) {
+			pRB->ResAppend(CoverFileName, L"cover", CoverMime, CoverData.data(), (DWORD)CoverData.size(), 0);
 		}
 	}
 }
