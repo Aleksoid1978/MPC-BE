@@ -443,7 +443,7 @@ bool CEVRAllocatorPresenter::GetState( DWORD dwMilliSecsTimeout, FILTER_STATE *S
 
 	if (m_bSignaledStarvation) {
 		size_t nSamples = std::max(m_nSurfaces / 2, 1u);
-		if ((m_ScheduledSamples.GetCount() < nSamples || m_LastSampleOffset < -m_rtTimePerFrame*2) && !g_bNoDuration) {
+		if ((m_ScheduledSamples.size() < nSamples || m_LastSampleOffset < -m_rtTimePerFrame*2) && !g_bNoDuration) {
 			*State = (FILTER_STATE)Paused;
 			_ReturnValue = VFW_S_STATE_INTERMEDIATE;
 			return true;
@@ -1013,7 +1013,7 @@ bool CEVRAllocatorPresenter::GetImageFromMixer()
 		}
 
 		if (hr == MF_E_TRANSFORM_NEED_MORE_INPUT) {
-			MoveToFreeList (pSample, false);
+			MoveToFreeList(pSample, false);
 			break;
 		}
 
@@ -1044,7 +1044,7 @@ bool CEVRAllocatorPresenter::GetImageFromMixer()
 
 		TRACE_EVR("EVR: Get from Mixer : %u  (%I64d) (%I64d)\n", iSurface, nsSampleTime, m_rtTimePerFrame ? nsSampleTime / m_rtTimePerFrame : 0);
 
-		MoveToScheduledList (pSample, false);
+		MoveToScheduledList(pSample, false);
 		bDoneSomething = true;
 		if (m_rtTimePerFrame == 0) {
 			break;
@@ -1526,7 +1526,7 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 
 				if (SUCCEEDED(hr)) {
 					pMFSample->SetUINT32(GUID_SURFACE_INDEX, i);
-					m_FreeSamples.AddTail(pMFSample);
+					m_FreeSamples.emplace_back(pMFSample);
 				}
 				ASSERT(SUCCEEDED(hr));
 			}
@@ -1900,7 +1900,7 @@ STDMETHODIMP_(bool) CEVRAllocatorPresenter::ResetDevice()
 
 		if (SUCCEEDED(hr)) {
 			pMFSample->SetUINT32(GUID_SURFACE_INDEX, i);
-			m_FreeSamples.AddTail(pMFSample);
+			m_FreeSamples.emplace_back(pMFSample);
 		}
 		ASSERT(SUCCEEDED(hr));
 	}
@@ -2463,8 +2463,8 @@ void CEVRAllocatorPresenter::RemoveAllSamples()
 	CAutoLock Lock(&m_csExternalMixerLock);
 
 	FlushSamples();
-	m_ScheduledSamples.RemoveAll();
-	m_FreeSamples.RemoveAll();
+	m_ScheduledSamples.clear();
+	m_FreeSamples.clear();
 	m_LastScheduledSampleTime = -1;
 	m_LastScheduledUncorrectedSampleTime = -1;
 	m_nUsedBuffer = 0;
@@ -2475,9 +2475,9 @@ HRESULT CEVRAllocatorPresenter::GetFreeSample(IMFSample** ppSample)
 	CAutoLock lock(&m_SampleQueueLock);
 	HRESULT hr = S_OK;
 
-	if (m_FreeSamples.GetCount() > 1) { // <= Cannot use first free buffer (can be currently displayed)
+	if (m_FreeSamples.size() > 1) { // <= Cannot use first free buffer (can be currently displayed)
 		InterlockedIncrement(&m_nUsedBuffer);
-		*ppSample = m_FreeSamples.RemoveHead().Detach();
+		*ppSample = m_FreeSamples.front().Detach(); m_FreeSamples.pop_front();
 	} else {
 		hr = MF_E_SAMPLEALLOCATOR_EMPTY;
 	}
@@ -2490,9 +2490,9 @@ HRESULT CEVRAllocatorPresenter::GetScheduledSample(IMFSample** ppSample, int &_C
 	CAutoLock lock(&m_SampleQueueLock);
 	HRESULT hr = S_OK;
 
-	_Count = (int)m_ScheduledSamples.GetCount();
+	_Count = (int)m_ScheduledSamples.size();
 	if (_Count > 0) {
-		*ppSample = m_ScheduledSamples.RemoveHead().Detach();
+		*ppSample = m_ScheduledSamples.front().Detach(); m_ScheduledSamples.pop_front();
 		--_Count;
 	} else {
 		hr = MF_E_SAMPLEALLOCATOR_EMPTY;
@@ -2501,7 +2501,7 @@ HRESULT CEVRAllocatorPresenter::GetScheduledSample(IMFSample** ppSample, int &_C
 	return hr;
 }
 
-void CEVRAllocatorPresenter::MoveToFreeList(IMFSample* pSample, bool bTail)
+void CEVRAllocatorPresenter::MoveToFreeList(IMFSample* pSample, const bool& bBack)
 {
 	CAutoLock lock(&m_SampleQueueLock);
 	InterlockedDecrement(&m_nUsedBuffer);
@@ -2509,16 +2509,16 @@ void CEVRAllocatorPresenter::MoveToFreeList(IMFSample* pSample, bool bTail)
 		m_bPendingMediaFinished = false;
 		m_pSink->Notify(EC_COMPLETE, 0, 0);
 	}
-	if (bTail) {
-		m_FreeSamples.AddTail(pSample);
+	if (bBack) {
+		m_FreeSamples.emplace_back(pSample);
 	} else {
-		m_FreeSamples.AddHead(pSample);
+		m_FreeSamples.emplace_front(pSample);
 	}
 }
 
-void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSorted)
+void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, const bool& bSorted)
 {
-	if (_bSorted) {
+	if (bSorted) {
 		CAutoLock lock(&m_SampleQueueLock);
 		// Insert sorted
 		/*
@@ -2541,7 +2541,7 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 		}
 		*/
 
-		m_ScheduledSamples.AddHead(pSample);
+		m_ScheduledSamples.emplace_front(pSample);
 	} else {
 
 		CAutoLock lock(&m_SampleQueueLock);
@@ -2714,7 +2714,7 @@ void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, bool _bSort
 #endif
 		m_LastScheduledSampleTime = Time;
 
-		m_ScheduledSamples.AddTail(pSample);
+		m_ScheduledSamples.emplace_back(pSample);
 	}
 }
 
@@ -2731,10 +2731,10 @@ void CEVRAllocatorPresenter::FlushSamplesInternal()
 {
 	CAutoLock Lock(&m_csExternalMixerLock);
 
-	while (!m_ScheduledSamples.IsEmpty()) {
-		CComPtr<IMFSample> pMFSample = m_ScheduledSamples.RemoveHead();
-		MoveToFreeList(pMFSample, true);
+	for (const auto& sample : m_ScheduledSamples) {
+		MoveToFreeList(sample, true);
 	}
+	m_ScheduledSamples.clear();
 
 	m_LastSampleOffset       = 0;
 	m_bLastSampleOffsetValid = false;
