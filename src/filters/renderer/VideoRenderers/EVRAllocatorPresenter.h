@@ -211,9 +211,9 @@ namespace DSObjects
 		CCritSec								m_SampleQueueLock;
 		CCritSec								m_ImageProcessingLock;
 
-		CInterfaceList<IMFSample, &IID_IMFSample> m_FreeSamples;
-		CInterfaceList<IMFSample, &IID_IMFSample> m_ScheduledSamples;
-		IMFSample *								m_pCurrentDisplaydSample;
+		std::deque<CComPtr<IMFSample>>			m_FreeSamples;
+		std::deque<CComPtr<IMFSample>>			m_ScheduledSamples;
+		IMFSample*								m_pCurrentDisplaydSample;
 		bool									m_bWaitingSample;
 		bool									m_bLastSampleOffsetValid;
 		LONGLONG								m_LastScheduledSampleTime;
@@ -260,8 +260,8 @@ namespace DSObjects
 		void									RemoveAllSamples();
 		HRESULT									GetFreeSample(IMFSample** ppSample);
 		HRESULT									GetScheduledSample(IMFSample** ppSample, int &_Count);
-		void									MoveToFreeList(IMFSample* pSample, bool bTail);
-		void									MoveToScheduledList(IMFSample* pSample, bool _bSorted);
+		void									MoveToFreeList(IMFSample* pSample, const bool& bBack);
+		void									MoveToScheduledList(IMFSample* pSample, const bool& bSorted);
 		void									FlushSamples();
 		void									FlushSamplesInternal();
 
