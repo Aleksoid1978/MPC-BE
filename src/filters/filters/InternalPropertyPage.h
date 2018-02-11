@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,7 +23,7 @@
 
 #include <atlcoll.h>
 #include <afxcmn.h>
-
+#include <map>
 #include <HighDPI.h>
 
 interface __declspec(uuid("03481710-D73E-4674-839F-03EDE2D60ED8"))
@@ -132,9 +132,8 @@ class __declspec(uuid("A1EB391C-6089-4A87-9988-BE50872317D4"))
 	CComboBox m_pin_combo;
 	CEdit m_info_edit;
 
-	typedef CAtlMap<CLSID, CString> CachedFilters;
-	CachedFilters m_CachedExternalFilters;
-	static CachedFilters m_CachedRegistryFilters;
+	std::map<CLSID, CString> m_CachedExternalFilters;
+	static std::map<CLSID, CString> m_CachedRegistryFilters;
 public:
 	CPinInfoWnd();
 
