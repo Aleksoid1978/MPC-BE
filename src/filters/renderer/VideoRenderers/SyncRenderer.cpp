@@ -768,9 +768,9 @@ HRESULT CBaseAP::InitShaderResizer()
 	case RESIZER_BILINEAR:
 	case RESIZER_DXVA2:
 		return S_FALSE;
-	case RESIZER_SHADER_BSPLINE4:  iShader = shader_bspline4_x;  break;
-	case RESIZER_SHADER_MITCHELL4: iShader = shader_mitchell4_x; break;
-	case RESIZER_SHADER_CATMULL4:  iShader = shader_catmull4_x;  break;
+	case RESIZER_SHADER_BSPLINE:   iShader = shader_bspline_x;   break;
+	case RESIZER_SHADER_MITCHELL:  iShader = shader_mitchell_x;  break;
+	case RESIZER_SHADER_CATMULL:   iShader = shader_catmull_x;   break;
 	case RESIZER_SHADER_BICUBIC06: iShader = shader_bicubic06_x; break;
 	case RESIZER_SHADER_BICUBIC08: iShader = shader_bicubic08_x; break;
 	case RESIZER_SHADER_BICUBIC10: iShader = shader_bicubic10_x; break;
@@ -792,9 +792,9 @@ HRESULT CBaseAP::InitShaderResizer()
 
 	if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
 		switch (iShader) {
-		case shader_bspline4_x:  resid = IDF_SHADER_PS20_BSPLINE4_X;  break;
-		case shader_mitchell4_x: resid = IDF_SHADER_PS20_MITCHELL4_X; break;
-		case shader_catmull4_x:  resid = IDF_SHADER_PS20_CATMULL4_X;  break;
+		case shader_bspline_x:   resid = IDF_SHADER_PS20_BSPLINE4_X;  break;
+		case shader_mitchell_x:  resid = IDF_SHADER_PS20_MITCHELL4_X; break;
+		case shader_catmull_x:   resid = IDF_SHADER_PS20_CATMULL4_X;  break;
 		case shader_bicubic06_x: resid = IDF_SHADER_PS20_BICUBIC06_X; break;
 		case shader_bicubic08_x: resid = IDF_SHADER_PS20_BICUBIC08_X; break;
 		case shader_bicubic10_x: resid = IDF_SHADER_PS20_BICUBIC10_X; break;
@@ -805,9 +805,9 @@ HRESULT CBaseAP::InitShaderResizer()
 	}
 	else {
 		switch (iShader) {
-		case shader_bspline4_x:  resid = IDF_SHADER_RESIZER_BSPLINE4_X;  break;
-		case shader_mitchell4_x: resid = IDF_SHADER_RESIZER_MITCHELL4_X; break;
-		case shader_catmull4_x:  resid = IDF_SHADER_RESIZER_CATMULL4_X;  break;
+		case shader_bspline_x:   resid = IDF_SHADER_RESIZER_BSPLINE4_X;  break;
+		case shader_mitchell_x:  resid = IDF_SHADER_RESIZER_MITCHELL4_X; break;
+		case shader_catmull_x:   resid = IDF_SHADER_RESIZER_CATMULL4_X;  break;
 		case shader_bicubic06_x: resid = IDF_SHADER_RESIZER_BICUBIC06_X; break;
 		case shader_bicubic08_x: resid = IDF_SHADER_RESIZER_BICUBIC08_X; break;
 		case shader_bicubic10_x: resid = IDF_SHADER_RESIZER_BICUBIC10_X; break;
@@ -1397,17 +1397,17 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 					m_wsResizer = L"Bilinear";
 					hr = TextureResize(pVideoTexture, rSrcVid, rDstVid, D3DTEXF_LINEAR);
 					break;
-				case RESIZER_SHADER_BSPLINE4:
-					m_wsResizer = L"B-spline4";
-					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_bspline4_x);
+				case RESIZER_SHADER_BSPLINE:
+					m_wsResizer = L"B-spline";
+					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_bspline_x);
 					break;
-				case RESIZER_SHADER_MITCHELL4:
-					m_wsResizer = L"Mitchell-Netravali spline4";
-					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_mitchell4_x);
+				case RESIZER_SHADER_MITCHELL:
+					m_wsResizer = L"Mitchell-Netravali";
+					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_mitchell_x);
 					break;
-				case RESIZER_SHADER_CATMULL4:
-					m_wsResizer = L"Catmull-Rom spline4";
-					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_catmull4_x);
+				case RESIZER_SHADER_CATMULL:
+					m_wsResizer = L"Catmull-Rom";
+					hr = TextureResizeShader2pass(pVideoTexture, rSrcVid, rDstVid, shader_catmull_x);
 					break;
 				case RESIZER_SHADER_BICUBIC06:
 					m_wsResizer = L"Bicubic A=-0.6";
