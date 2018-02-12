@@ -322,9 +322,9 @@ void CPPageVideo::UpdateResizerList(int select)
 		AddStringData(m_cbDX9Resizer, L"DXVA2 (Intel GPU only)", RESIZER_DXVA2);
 	}
 #endif
-	AddStringData(m_cbDX9Resizer, L"PS: B-spline4", RESIZER_SHADER_BSPLINE4);
-	AddStringData(m_cbDX9Resizer, L"PS: Mitchell-Netravali spline4", RESIZER_SHADER_MITCHELL4);
-	AddStringData(m_cbDX9Resizer, L"PS: Catmull-Rom spline4", RESIZER_SHADER_CATMULL4);
+	AddStringData(m_cbDX9Resizer, L"PS: B-spline", RESIZER_SHADER_BSPLINE);
+	AddStringData(m_cbDX9Resizer, L"PS: Mitchell-Netravali", RESIZER_SHADER_MITCHELL);
+	AddStringData(m_cbDX9Resizer, L"PS: Catmull-Rom", RESIZER_SHADER_CATMULL);
 	AddStringData(m_cbDX9Resizer, L"PS: Bicubic A=-0.6", RESIZER_SHADER_BICUBIC06);
 	AddStringData(m_cbDX9Resizer, L"PS: Bicubic A=-0.8", RESIZER_SHADER_BICUBIC08);
 	AddStringData(m_cbDX9Resizer, L"PS: Bicubic A=-1.0", RESIZER_SHADER_BICUBIC10);
@@ -549,7 +549,7 @@ void CPPageVideo::OnBnClickedDefault()
 	m_chk10bitOutput.SetCheck(BST_UNCHECKED);
 
 	SelectByItemData(m_cbDX9SurfaceFormat, D3DFMT_X8R8G8B8);
-	UpdateResizerList(RESIZER_SHADER_CATMULL4);
+	UpdateResizerList(RESIZER_SHADER_CATMULL);
 	UpdateDownscalerList(DOWNSCALER_SIMPLE);
 
 	OnFullscreenCheck();

@@ -69,12 +69,12 @@ extern bool g_bExternalSubtitleTime;
 #define MAX_FIFO_SIZE 1024
 
 enum {
-	shader_bspline4_x,
-	shader_bspline4_y,
-	shader_mitchell4_x,
-	shader_mitchell4_y,
-	shader_catmull4_x,
-	shader_catmull4_y,
+	shader_bspline_x,
+	shader_bspline_y,
+	shader_mitchell_x,
+	shader_mitchell_y,
+	shader_catmull_x,
+	shader_catmull_y,
 	shader_bicubic06_x,
 	shader_bicubic06_y,
 	shader_bicubic08_x,
