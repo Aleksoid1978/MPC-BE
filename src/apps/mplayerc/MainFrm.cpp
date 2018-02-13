@@ -91,6 +91,8 @@
 #include <SubRenderIntf.h>
 #include <LAVVideoSettings.h>
 
+#include "Variables.h"
+
 #define DEFCLIENTW		292
 #define DEFCLIENTH		200
 #define MENUBARBREAK	30
@@ -2202,9 +2204,6 @@ LRESULT CMainFrame::OnHotKey(WPARAM wParam, LPARAM lParam)
 
 	return fRet;
 }
-
-bool g_bNoDuration				= false;
-bool g_bExternalSubtitleTime	= false;
 
 void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 {

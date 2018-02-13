@@ -34,9 +34,6 @@
 #include <d3d9types.h>
 #include <dxva2api.h>
 
-// flag for display only forced subtitles (PGS/VOBSUB)
-bool g_bForcedSubtitle = false;
-
 int CountPins(IBaseFilter* pBF, int& nIn, int& nOut, int& nInC, int& nOutC)
 {
 	nIn = nOut = 0;

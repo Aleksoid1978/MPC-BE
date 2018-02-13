@@ -31,9 +31,6 @@
 #define MFVBITMAP_UPDATE  0x80000000
 #define NB_JITTER 126
 
-extern bool g_bNoDuration; // Defined in MainFrm.cpp
-extern bool g_bExternalSubtitleTime;
-
 // Possible messages to the PowerStrip API. PowerStrip is used to control
 // the display frequency in one of the video - display synchronization modes.
 // Powerstrip can also through a CGenlock object give very accurate timing data

@@ -33,8 +33,8 @@ enum SUBTITLE_TYPE {
 	ST_XYSUBPIC
 };
 
-// flag for display only forced subtitles (PGS/VOBSUB)
-extern bool g_bForcedSubtitle;
+// flag for display only forced subtitles (PGS/VOBSUB/RTS)
+inline bool g_bForcedSubtitle = false;
 
 #pragma pack(push, 1)
 struct SubPicDesc {

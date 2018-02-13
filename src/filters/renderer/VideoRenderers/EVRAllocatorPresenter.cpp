@@ -25,6 +25,7 @@
 #include <Mferror.h>
 #include "IPinHook.h"
 #include "MacrovisionKicker.h"
+#include "Variables.h"
 #include <IMediaSideData.h>
 
 #if (0)		// Set to 1 to activate EVR traces
@@ -2036,7 +2037,7 @@ void CEVRAllocatorPresenter::RenderThread()
 								pMFSample->GetUINT32(GUID_SURFACE_INDEX, &m_iCurSurface);
 								++m_OrderedPaint;
 								if (!g_bExternalSubtitleTime) {
-									__super::SetTime (g_tSegmentStart + nsSampleTime);
+									__super::SetTime(g_tSegmentStart + nsSampleTime);
 								}
 								Paint(true);
 								m_nDroppedUpdate = 0;
@@ -2059,7 +2060,7 @@ void CEVRAllocatorPresenter::RenderThread()
 								pMFSample->GetUINT32(GUID_SURFACE_INDEX, &m_iCurSurface);
 								++m_OrderedPaint;
 								if (!g_bExternalSubtitleTime) {
-									__super::SetTime (g_tSegmentStart + nsSampleTime);
+									__super::SetTime(g_tSegmentStart + nsSampleTime);
 								}
 								Paint(true);
 							} else {
@@ -2187,7 +2188,7 @@ void CEVRAllocatorPresenter::RenderThread()
 									++m_OrderedPaint;
 
 									if (!g_bExternalSubtitleTime) {
-										__super::SetTime (g_tSegmentStart + nsSampleTime);
+										__super::SetTime(g_tSegmentStart + nsSampleTime);
 									}
 									Paint(true);
 
