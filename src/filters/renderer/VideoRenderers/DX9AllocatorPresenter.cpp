@@ -35,6 +35,7 @@
 #include "../../transform/VSFilter/IDirectVobSub.h"
 #include "FocusThread.h"
 #include "D3DHook.h"
+#include "Variables.h"
 
 #define FRAMERATE_MAX_DELTA 3000
 

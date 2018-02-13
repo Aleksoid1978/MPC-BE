@@ -23,12 +23,12 @@
 #include "../../../SubPic/DX9SubPic.h"
 #include "../../../SubPic/SubPicQueueImpl.h"
 #include "RenderersSettings.h"
+#include "Variables.h"
 #include <moreuuids.h>
 #include <mvrInterfaces.h>
 
 using namespace DSObjects;
 
-extern bool g_bExternalSubtitleTime;
 //
 // CmadVRAllocatorPresenter
 //

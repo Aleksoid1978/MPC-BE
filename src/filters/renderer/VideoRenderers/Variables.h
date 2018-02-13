@@ -1,6 +1,5 @@
 /*
- * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -17,13 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ *
  */
 
 #pragma once
 
-// IPin hooks
-bool HookNewSegmentAndReceive(IPin* pPin);
-void UnhookNewSegmentAndReceive();
+#include "../../../DSUtil/DSUtil.h"
 
-// DXVA2 hook
-void HookDirectXVideoDecoderService(void* pIDirectXVideoDecoderService);
+inline REFERENCE_TIME g_tSegmentStart    = 0;
+inline FRAME_TYPE     g_nFrameType       = PICT_NONE;
+inline HANDLE         g_hNewSegmentEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+
+inline bool g_bNoDuration           = false;
+inline bool g_bExternalSubtitleTime = false;

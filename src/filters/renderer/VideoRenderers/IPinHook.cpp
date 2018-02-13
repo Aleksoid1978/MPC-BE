@@ -28,6 +28,7 @@
 
 #include "IPinHook.h"
 #include "AllocatorCommon.h"
+#include "Variables.h"
 #include "../../../DSUtil/SysVersion.h"
 #include "../../../DSUtil/DXVAState.h"
 
@@ -44,13 +45,58 @@
 #define LOG_FILE_BITSTREAM  L"bitstream.log"
 #endif
 
+interface IPinC;
+
+struct IPinCVtbl {
+	BEGIN_INTERFACE
+	HRESULT ( STDMETHODCALLTYPE *QueryInterface )( IPinC * This, /* [in] */ REFIID riid, /* [iid_is][out] */ void **ppvObject );
+	ULONG ( STDMETHODCALLTYPE *AddRef )( IPinC * This );
+	ULONG ( STDMETHODCALLTYPE *Release )( IPinC * This );
+	HRESULT ( STDMETHODCALLTYPE *Connect )( IPinC * This, /* [in] */ IPinC *pReceivePin, /* [in] */ const AM_MEDIA_TYPE *pmt );
+	HRESULT ( STDMETHODCALLTYPE *ReceiveConnection )( IPinC * This, /* [in] */ IPinC *pConnector, /* [in] */ const AM_MEDIA_TYPE *pmt );
+	HRESULT ( STDMETHODCALLTYPE *Disconnect )( IPinC * This );
+	HRESULT ( STDMETHODCALLTYPE *ConnectedTo )( IPinC * This, /* [out] */ IPinC **pPin );
+	HRESULT ( STDMETHODCALLTYPE *ConnectionMediaType )( IPinC * This, /* [out] */ AM_MEDIA_TYPE *pmt );
+	HRESULT ( STDMETHODCALLTYPE *QueryPinInfo )( IPinC * This, /* [out] */ PIN_INFO *pInfo );
+	HRESULT ( STDMETHODCALLTYPE *QueryDirection )( IPinC * This, /* [out] */ PIN_DIRECTION *pPinDir );
+	HRESULT ( STDMETHODCALLTYPE *QueryId )( IPinC * This, /* [out] */ LPWSTR *Id );
+	HRESULT ( STDMETHODCALLTYPE *QueryAccept )( IPinC * This, /* [in] */ const AM_MEDIA_TYPE *pmt );
+	HRESULT ( STDMETHODCALLTYPE *EnumMediaTypes )( IPinC * This, /* [out] */ IEnumMediaTypes **ppEnum );
+	HRESULT ( STDMETHODCALLTYPE *QueryInternalConnections )( IPinC * This, /* [out] */ IPinC **apPin, /* [out][in] */ ULONG *nPin );
+	HRESULT ( STDMETHODCALLTYPE *EndOfStream )( IPinC * This );
+	HRESULT ( STDMETHODCALLTYPE *BeginFlush )( IPinC * This );
+	HRESULT ( STDMETHODCALLTYPE *EndFlush )( IPinC * This );
+	HRESULT ( STDMETHODCALLTYPE *NewSegment )( IPinC * This, /* [in] */ REFERENCE_TIME tStart, /* [in] */ REFERENCE_TIME tStop, /* [in] */ double dRate );
+	END_INTERFACE
+};
+
+interface IPinC {
+	CONST_VTBL struct IPinCVtbl *lpVtbl;
+};
+
+interface IMemInputPinC;
+
+struct IMemInputPinCVtbl {
+	BEGIN_INTERFACE
+	HRESULT ( STDMETHODCALLTYPE *QueryInterface )( IPinC * This, /* [in] */ REFIID riid, /* [iid_is][out] */ void **ppvObject );
+	ULONG ( STDMETHODCALLTYPE *AddRef )( IPinC * This );
+	ULONG ( STDMETHODCALLTYPE *Release )( IPinC * This );
+	HRESULT ( STDMETHODCALLTYPE *GetAllocator )( IMemInputPinC * This, IMemAllocator **ppAllocator);
+	HRESULT ( STDMETHODCALLTYPE *NotifyAllocator )( IMemInputPinC * This, IMemAllocator *pAllocator, BOOL bReadOnly);
+	HRESULT ( STDMETHODCALLTYPE *GetAllocatorRequirements )( IMemInputPinC * This, ALLOCATOR_PROPERTIES *pProps);
+	HRESULT ( STDMETHODCALLTYPE *Receive )( IMemInputPinC * This, IMediaSample *pSample);
+	HRESULT ( STDMETHODCALLTYPE *ReceiveMultiple )( IMemInputPinC * This, IMediaSample **pSamples, long nSamples, long *nSamplesProcessed);
+	HRESULT ( STDMETHODCALLTYPE *ReceiveCanBlock )( IMemInputPinC * This);
+	END_INTERFACE
+};
+
+interface IMemInputPinC {
+	CONST_VTBL struct IMemInputPinCVtbl *lpVtbl;
+};
+
 IPinCVtbl*         g_pPinCVtbl         = nullptr;
 IMemInputPinCVtbl* g_pMemInputPinCVtbl = nullptr;
 IPinC*             g_pPinC             = nullptr;
-
-REFERENCE_TIME g_tSegmentStart    = 0;
-FRAME_TYPE     g_nFrameType       = PICT_NONE;
-HANDLE         g_hNewSegmentEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 
 // DirectShow hooks
 static HRESULT (STDMETHODCALLTYPE* NewSegmentOrg)(IPinC * This, /* [in] */ REFERENCE_TIME tStart, /* [in] */ REFERENCE_TIME tStop, /* [in] */ double dRate) PURE;

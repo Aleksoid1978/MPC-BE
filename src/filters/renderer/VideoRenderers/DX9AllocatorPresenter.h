@@ -37,9 +37,6 @@
 
 #define NB_JITTER        126
 
-extern bool g_bNoDuration;
-extern bool g_bExternalSubtitleTime;
-
 class CFocusThread;
 
 namespace DSObjects
