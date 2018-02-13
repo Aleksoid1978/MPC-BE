@@ -154,8 +154,10 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_bFinalPass(false)
 	, m_bDither(false)
 {
-#if DXVAVP
+#if DXVAVP || DXVAHDVP
 	m_hDxva2Lib = LoadLibraryW(L"dxva2.dll");
+#endif
+#if DXVAVP
 	ZeroMemory(m_ProcAmpValues, sizeof(m_ProcAmpValues));
 	ZeroMemory(m_NFilterValues, sizeof(m_NFilterValues));
 	ZeroMemory(m_DFilterValues, sizeof(m_DFilterValues));
@@ -164,7 +166,7 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 
 CDX9RenderingEngine::~CDX9RenderingEngine()
 {
-#if DXVAVP
+#if DXVAVP || DXVAHDVP
 	if (m_hDxva2Lib) {
 		FreeLibrary(m_hDxva2Lib);
 	}
@@ -614,34 +616,36 @@ BOOL CDX9RenderingEngine::InitializeDXVA2VP(int width, int height)
 	HRESULT (WINAPI *pDXVA2CreateVideoService)(IDirect3DDevice9* pDD, REFIID riid, void** ppService);
 	(FARPROC &)pDXVA2CreateVideoService = GetProcAddress(m_hDxva2Lib, "DXVA2CreateVideoService");
 	if (pDXVA2CreateVideoService) {
-		HRESULT hr = S_OK;
-		// Create DXVA2 Video Processor Service.
-		hr = pDXVA2CreateVideoService(m_pD3DDevEx, IID_IDirectXVideoProcessorService, (VOID**)&m_pDXVAVPS);
-		if (FAILED(hr)) {
-			DLog(L"DXVA2CreateVideoService failed with error 0x%x.", hr);
-			return FALSE;
-		}
-
-		// Initialize the video descriptor.
-		m_VideoDesc.SampleWidth                         = width;
-		m_VideoDesc.SampleHeight                        = height;
-		// no need to fill the fields of m_VideoDesc.SampleFormat when converting RGB to RGB
-		//m_VideoDesc.SampleFormat.VideoChromaSubsampling = DXVA2_VideoChromaSubsampling_Unknown;
-		//m_VideoDesc.SampleFormat.NominalRange           = DXVA2_NominalRange_Unknown;
-		//m_VideoDesc.SampleFormat.VideoTransferMatrix    = DXVA2_VideoTransferMatrix_Unknown;
-		//m_VideoDesc.SampleFormat.VideoLighting          = DXVA2_VideoLighting_Unknown;
-		//m_VideoDesc.SampleFormat.VideoPrimaries         = DXVA2_VideoPrimaries_Unknown;
-		//m_VideoDesc.SampleFormat.VideoTransferFunction  = DXVA2_VideoTransFunc_Unknown;
-		m_VideoDesc.SampleFormat.SampleFormat           = DXVA2_SampleProgressiveFrame;
-		m_VideoDesc.Format                              = D3DFMT_YUY2; // for Nvidia must be YUY2, for Intel may be any.
-		m_VideoDesc.InputSampleFreq.Numerator           = VIDEO_FPS;
-		m_VideoDesc.InputSampleFreq.Denominator         = 1;
-		m_VideoDesc.OutputFrameFreq.Numerator           = VIDEO_FPS;
-		m_VideoDesc.OutputFrameFreq.Denominator         = 1;
-
-		// Query DXVA2_VideoProcProgressiveDevice.
-		CreateDXVA2VPDevice(DXVA2_VideoProcProgressiveDevice);
+		return FALSE;
 	}
+
+	HRESULT hr = S_OK;
+	// Create DXVA2 Video Processor Service.
+	hr = pDXVA2CreateVideoService(m_pD3DDevEx, IID_IDirectXVideoProcessorService, (VOID**)&m_pDXVAVPS);
+	if (FAILED(hr)) {
+		DLog(L"DXVA2CreateVideoService failed with error 0x%x.", hr);
+		return FALSE;
+	}
+
+	// Initialize the video descriptor.
+	m_VideoDesc.SampleWidth                         = width;
+	m_VideoDesc.SampleHeight                        = height;
+	// no need to fill the fields of m_VideoDesc.SampleFormat when converting RGB to RGB
+	//m_VideoDesc.SampleFormat.VideoChromaSubsampling = DXVA2_VideoChromaSubsampling_Unknown;
+	//m_VideoDesc.SampleFormat.NominalRange           = DXVA2_NominalRange_Unknown;
+	//m_VideoDesc.SampleFormat.VideoTransferMatrix    = DXVA2_VideoTransferMatrix_Unknown;
+	//m_VideoDesc.SampleFormat.VideoLighting          = DXVA2_VideoLighting_Unknown;
+	//m_VideoDesc.SampleFormat.VideoPrimaries         = DXVA2_VideoPrimaries_Unknown;
+	//m_VideoDesc.SampleFormat.VideoTransferFunction  = DXVA2_VideoTransFunc_Unknown;
+	m_VideoDesc.SampleFormat.SampleFormat           = DXVA2_SampleProgressiveFrame;
+	m_VideoDesc.Format                              = D3DFMT_YUY2; // for Nvidia must be YUY2, for Intel may be any.
+	m_VideoDesc.InputSampleFreq.Numerator           = VIDEO_FPS;
+	m_VideoDesc.InputSampleFreq.Denominator         = 1;
+	m_VideoDesc.OutputFrameFreq.Numerator           = VIDEO_FPS;
+	m_VideoDesc.OutputFrameFreq.Denominator         = 1;
+
+	// Query DXVA2_VideoProcProgressiveDevice.
+	CreateDXVA2VPDevice(DXVA2_VideoProcProgressiveDevice);
 
 	if (!m_pDXVAVPD) {
 		DLog(L"Failed to create a DXVA2 device.");
@@ -880,6 +884,23 @@ HRESULT CDX9RenderingEngine::TextureResizeDXVA(IDirect3DTexture9* pTexture, cons
 	}
 
 	return S_OK;
+}
+#endif
+
+#if DXVAHDVP
+BOOL CDX9RenderingEngine::InitializeDXVAHDVP(int width, int height)
+{
+	if (!m_hDxva2Lib) {
+		return FALSE;
+	}
+
+	HRESULT(WINAPI *pDXVAHD_CreateDevice)(IDirect3DDevice9Ex  *pD3DDevice, const DXVAHD_CONTENT_DESC *pContentDesc, DXVAHD_DEVICE_USAGE Usage, PDXVAHDSW_Plugin pPlugin, IDXVAHD_Device **ppDevice);
+	(FARPROC &)pDXVAHD_CreateDevice = GetProcAddress(m_hDxva2Lib, "DXVAHD_CreateDevice");
+	if (!pDXVAHD_CreateDevice) {
+		return FALSE;
+	}
+
+	return FALSE; // TODO
 }
 #endif
 

@@ -24,6 +24,9 @@
 #include "RenderersSettings.h"
 #include <d3d9.h>
 #include <dxva2api.h>
+#if DXVAHDVP
+#include <dxvahd.h>
+#endif
 #include "../SubPic/SubPicAllocatorPresenterImpl.h"
 
 namespace DSObjects
@@ -117,8 +120,10 @@ namespace DSObjects
 		D3DCAPS9					m_Caps;
 		LPCSTR						m_ShaderProfile; // for shader compiler
 
-#if DXVAVP
+#if DXVAVP || DXVAHDVP
 		HMODULE m_hDxva2Lib = nullptr;
+#endif
+#if DXVAVP
 		CComPtr<IDirectXVideoProcessorService> m_pDXVAVPS;
 		CComPtr<IDirectXVideoProcessor> m_pDXVAVPD;
 
@@ -172,6 +177,9 @@ namespace DSObjects
 		BOOL InitializeDXVA2VP(int width, int height);
 		BOOL CreateDXVA2VPDevice(REFGUID guid);
 		HRESULT TextureResizeDXVA(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect);
+#endif
+#if DXVAHDVP
+		BOOL InitializeDXVAHDVP(int width, int height);
 #endif
 
 		// init processing textures
