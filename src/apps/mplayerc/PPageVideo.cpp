@@ -322,6 +322,11 @@ void CPPageVideo::UpdateResizerList(int select)
 		AddStringData(m_cbDX9Resizer, L"DXVA2 (Intel GPU only)", RESIZER_DXVA2);
 	}
 #endif
+#if DXVAHDVP
+	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8) {
+		AddStringData(m_cbDX9Resizer, L"DXVA-HD (test)", RESIZER_DXVAHD);
+	}
+#endif
 	AddStringData(m_cbDX9Resizer, L"PS: B-spline", RESIZER_SHADER_BSPLINE);
 	AddStringData(m_cbDX9Resizer, L"PS: Mitchell-Netravali", RESIZER_SHADER_MITCHELL);
 	AddStringData(m_cbDX9Resizer, L"PS: Catmull-Rom", RESIZER_SHADER_CATMULL);
@@ -346,6 +351,11 @@ void CPPageVideo::UpdateDownscalerList(int select)
 #if DXVAVP
 	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8) {
 		AddStringData(m_cbDownscaler, L"DXVA2 (Intel GPU only)", RESIZER_DXVA2);
+	}
+#endif
+#if DXVAHDVP
+	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8) {
+		AddStringData(m_cbDX9Resizer, L"DXVA-HD (test)", RESIZER_DXVAHD);
 	}
 #endif
 	AddStringData(m_cbDownscaler, L"PS: Simple averaging", DOWNSCALER_SIMPLE);
