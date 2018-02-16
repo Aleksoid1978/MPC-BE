@@ -768,6 +768,7 @@ HRESULT CBaseAP::InitShaderResizer()
 	case RESIZER_NEAREST:
 	case RESIZER_BILINEAR:
 	case RESIZER_DXVA2:
+	case RESIZER_DXVAHD:
 		return S_FALSE;
 	case RESIZER_SHADER_BSPLINE:   iShader = shader_bspline_x;   break;
 	case RESIZER_SHADER_MITCHELL:  iShader = shader_mitchell_x;  break;

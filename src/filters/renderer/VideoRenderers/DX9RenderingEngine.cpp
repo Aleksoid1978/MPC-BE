@@ -615,7 +615,7 @@ BOOL CDX9RenderingEngine::InitializeDXVA2VP(int width, int height)
 
 	HRESULT (WINAPI *pDXVA2CreateVideoService)(IDirect3DDevice9* pDD, REFIID riid, void** ppService);
 	(FARPROC &)pDXVA2CreateVideoService = GetProcAddress(m_hDxva2Lib, "DXVA2CreateVideoService");
-	if (pDXVA2CreateVideoService) {
+	if (!pDXVA2CreateVideoService) {
 		return FALSE;
 	}
 
@@ -900,7 +900,124 @@ BOOL CDX9RenderingEngine::InitializeDXVAHDVP(int width, int height)
 		return FALSE;
 	}
 
-	return FALSE; // TODO
+	HRESULT hr = S_OK;
+
+	DXVAHD_CONTENT_DESC desc;
+	desc.InputFrameFormat = DXVAHD_FRAME_FORMAT_PROGRESSIVE;
+	desc.InputFrameRate.Numerator = VIDEO_FPS;
+	desc.InputFrameRate.Denominator = 1;
+	desc.InputWidth = width;
+	desc.InputHeight = height;
+	desc.OutputFrameRate.Numerator = VIDEO_FPS;
+	desc.OutputFrameRate.Denominator = 1;
+	desc.OutputWidth = width;
+	desc.OutputHeight = height;
+
+	// Create the DXVA-HD device.
+	hr = pDXVAHD_CreateDevice(
+		m_pD3DDevEx,
+		&desc,
+		DXVAHD_DEVICE_USAGE_PLAYBACK_NORMAL,
+		nullptr,
+		&m_pDXVAHD
+	);
+	if (FAILED(hr)) {
+		return FALSE;
+	}
+
+	// Get the DXVA-HD device caps.
+	DXVAHD_VPDEVCAPS caps = {};
+	hr = m_pDXVAHD->GetVideoProcessorDeviceCaps(&caps);
+	if (FAILED(hr) || caps.MaxInputStreams < 1) {
+		return FALSE;
+	}
+
+	D3DFORMAT *pFormats = nullptr;
+	DXVAHD_VPCAPS *pVPCaps = nullptr;
+
+	// Check the output format.
+	pFormats = new (std::nothrow) D3DFORMAT[caps.OutputFormatCount];
+	if (pFormats == nullptr) {
+		hr = E_OUTOFMEMORY;
+		goto done;
+	}
+
+	hr = m_pDXVAHD->GetVideoProcessorOutputFormats(caps.OutputFormatCount, pFormats);
+	if (FAILED(hr)) {
+		goto done;
+	}
+
+#if _DEBUG
+	{
+		CString dbgstr = L"DXVA-HD output formats:";
+		for (UINT i = 0; i < caps.OutputFormatCount; i++) {
+			dbgstr.AppendFormat(L"\n%s", D3DFormatToString(pFormats[i]));
+		}
+		DLog(dbgstr);
+	}
+#endif
+
+	UINT index = 0;
+	for (index = 0; index < caps.OutputFormatCount; index++) {
+		if (pFormats[index] == D3DFMT_X8R8G8B8) {
+			break;
+		}
+	}
+	if (index == caps.OutputFormatCount) {
+		hr = E_FAIL;
+		goto done;
+	}
+
+	delete[] pFormats;
+	pFormats = nullptr;
+
+	// Check the input formats.
+
+	pFormats = new (std::nothrow) D3DFORMAT[caps.InputFormatCount];
+	if (pFormats == nullptr) {
+		hr = E_OUTOFMEMORY;
+		goto done;
+	}
+
+	hr = m_pDXVAHD->GetVideoProcessorInputFormats(caps.InputFormatCount, pFormats);
+	if (FAILED(hr)) {
+		goto done;
+	}
+
+#if _DEBUG
+	{
+		CString dbgstr = L"DXVA-HD input formats:";
+		for (UINT i = 0; i < caps.InputFormatCount; i++) {
+			dbgstr.AppendFormat(L"\n%s", D3DFormatToString(pFormats[i]));
+		}
+		DLog(dbgstr);
+	}
+#endif
+
+	// TODO
+
+done:
+	delete[] pFormats;
+	delete[] pVPCaps;
+	return (SUCCEEDED(hr));
+}
+
+HRESULT CDX9RenderingEngine::TextureResizeDXVAHD(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect)
+{
+	HRESULT hr = S_OK;
+
+	D3DSURFACE_DESC desc;
+	if (!pTexture || FAILED(pTexture->GetLevelDesc(0, &desc))) {
+		return E_FAIL;
+	}
+
+	if (!m_pDXVAHD && !InitializeDXVAHDVP(srcRect.Width(), srcRect.Height())) {
+		return E_FAIL;
+	}
+
+	// TODO
+
+	return S_OK;
 }
 #endif
 
@@ -996,6 +1113,7 @@ HRESULT CDX9RenderingEngine::InitShaderResizer(int resizer)
 	case RESIZER_NEAREST:
 	case RESIZER_BILINEAR:
 	case RESIZER_DXVA2:
+	case RESIZER_DXVAHD:
 		return S_FALSE;
 	case RESIZER_SHADER_BSPLINE:   iShader = shader_bspline_x;             break;
 	case RESIZER_SHADER_MITCHELL:  iShader = shader_mitchell_x;            break;
@@ -1166,6 +1284,12 @@ HRESULT CDX9RenderingEngine::ApplyResize(IDirect3DTexture9* pTexture, const CRec
 		hr = TextureResizeDXVA(pTexture, srcRect, destRect);
 		break;
 #endif
+#if DXVAHDVP
+	case RESIZER_DXVAHD:
+		wsResizer = L"DXVA-HD";
+		hr = TextureResizeDXVAHD(pTexture, srcRect, destRect);
+		break;
+#endif
 	case RESIZER_SHADER_BSPLINE:
 		wsResizer = L"B-spline";
 		hr = TextureResizeShader(pTexture, srcRect, destRect, shader_bspline_x + y);
@@ -1262,7 +1386,7 @@ HRESULT CDX9RenderingEngine::Resize(IDirect3DTexture9* pTexture, const CRect& sr
 		return TextureResize(pTexture, srcRect, destRect, D3DTEXF_POINT);
 	}
 
-	if (resizerX == resizerY && resizerX <= RESIZER_DXVA2) {
+	if (resizerX == resizerY && (resizerX <= RESIZER_DXVA2 || resizerX == RESIZER_DXVAHD)) {
 		// one pass texture or dxva resize
 		return ApplyResize(pTexture, srcRect, destRect, resizerX, 0);
 	}
