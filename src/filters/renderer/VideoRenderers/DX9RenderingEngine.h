@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -134,6 +134,10 @@ namespace DSObjects
 		DXVA2_Fixed32 m_NFilterValues[6];
 		DXVA2_Fixed32 m_DFilterValues[6];
 #endif
+#if DXVAHDVP
+		CComPtr<IDXVAHD_Device>         m_pDXVAHD;
+		CComPtr<IDXVAHD_VideoProcessor> m_pDXVAVP;
+#endif
 
 		CComPtr<IDirect3DTexture9>	m_pFrameTextures[2];
 		CComPtr<IDirect3DTexture9>	m_pRotateTexture;
@@ -180,6 +184,7 @@ namespace DSObjects
 #endif
 #if DXVAHDVP
 		BOOL InitializeDXVAHDVP(int width, int height);
+		HRESULT TextureResizeDXVAHD(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect);
 #endif
 
 		// init processing textures

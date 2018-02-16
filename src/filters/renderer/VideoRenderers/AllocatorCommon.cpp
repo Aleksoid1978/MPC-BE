@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -232,7 +232,11 @@ const wchar_t* D3DFormatToString(D3DFORMAT format)
 	//	UNPACK_VALUE(D3DFMT_A2B10G10R10_XR_BIAS);
 	//	UNPACK_VALUE(D3DFMT_BINARYBUFFER);
 	case FCC('NV12'): return L"D3DFMT_NV12";
+	case FCC('YV12'): return L"D3DFMT_YV12";
 	case FCC('P010'): return L"D3DFMT_P010";
+	case FCC('AYUV'): return L"D3DFMT_AYUV";
+	case FCC('AIP8'): return L"D3DFMT_AIP8";
+	case FCC('AI44'): return L"D3DFMT_AI44";
 	};
 #undef UNPACK_VALUE
 
