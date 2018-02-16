@@ -767,8 +767,6 @@ HRESULT CBaseAP::InitShaderResizer()
 	switch (GetRenderersSettings().iResizer) {
 	case RESIZER_NEAREST:
 	case RESIZER_BILINEAR:
-	case RESIZER_DXVA2:
-	case RESIZER_DXVAHD:
 		return S_FALSE;
 	case RESIZER_SHADER_BSPLINE:   iShader = shader_bspline_x;   break;
 	case RESIZER_SHADER_MITCHELL:  iShader = shader_mitchell_x;  break;
@@ -778,6 +776,8 @@ HRESULT CBaseAP::InitShaderResizer()
 	case RESIZER_SHADER_BICUBIC10: iShader = shader_bicubic10_x; break;
 	case RESIZER_SHADER_LANCZOS2:  iShader = shader_lanczos2_x;  break;
 	case RESIZER_SHADER_LANCZOS3:  iShader = shader_lanczos3_x;  break;
+	case RESIZER_DXVA2:
+	case RESIZER_DXVAHD:
 	default:
 		return E_INVALIDARG;
 	}

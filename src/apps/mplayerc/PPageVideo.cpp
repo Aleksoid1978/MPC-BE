@@ -318,12 +318,12 @@ void CPPageVideo::UpdateResizerList(int select)
 	AddStringData(m_cbDX9Resizer, L"Nearest neighbor", RESIZER_NEAREST);
 	AddStringData(m_cbDX9Resizer, L"Bilinear", RESIZER_BILINEAR);
 #if DXVAVP
-	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8) {
+	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8 && GetCurItemData(m_cbVideoRenderer) != VIDRNDT_SYNC) {
 		AddStringData(m_cbDX9Resizer, L"DXVA2 (Intel GPU only)", RESIZER_DXVA2);
 	}
 #endif
 #if DXVAHDVP
-	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8) {
+	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8 && GetCurItemData(m_cbVideoRenderer) != VIDRNDT_SYNC) {
 		AddStringData(m_cbDX9Resizer, L"DXVA-HD (test)", RESIZER_DXVAHD);
 	}
 #endif
@@ -349,13 +349,13 @@ void CPPageVideo::UpdateDownscalerList(int select)
 	AddStringData(m_cbDownscaler, L"Nearest neighbor", RESIZER_NEAREST);
 	AddStringData(m_cbDownscaler, L"Bilinear", RESIZER_BILINEAR);
 #if DXVAVP
-	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8) {
+	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8 && GetCurItemData(m_cbVideoRenderer) != VIDRNDT_SYNC) {
 		AddStringData(m_cbDownscaler, L"DXVA2 (Intel GPU only)", RESIZER_DXVA2);
 	}
 #endif
 #if DXVAHDVP
-	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8) {
-		AddStringData(m_cbDX9Resizer, L"DXVA-HD (test)", RESIZER_DXVAHD);
+	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8 && GetCurItemData(m_cbVideoRenderer) != VIDRNDT_SYNC) {
+		AddStringData(m_cbDownscaler, L"DXVA-HD (test)", RESIZER_DXVAHD);
 	}
 #endif
 	AddStringData(m_cbDownscaler, L"PS: Simple averaging", DOWNSCALER_SIMPLE);
