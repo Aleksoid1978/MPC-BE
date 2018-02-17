@@ -120,10 +120,10 @@ namespace DSObjects
 		D3DCAPS9					m_Caps;
 		LPCSTR						m_ShaderProfile; // for shader compiler
 
-#if DXVAVP || DXVAHDVP
+#if DXVA2VP || DXVAHDVP
 		HMODULE m_hDxva2Lib = nullptr;
 #endif
-#if DXVAVP
+#if DXVA2VP
 		CComPtr<IDirectXVideoProcessorService> m_pDXVA2_VPService;
 		CComPtr<IDirectXVideoProcessor> m_pDXVA2_VP;
 
@@ -177,10 +177,10 @@ namespace DSObjects
 		std::list<CExternalPixelShader>	m_pCustomScreenSpacePixelShaders;
 		CComPtr<IDirect3DPixelShader9>	m_pConvertToInterlacePixelShader;
 
-#if DXVAVP
+#if DXVA2VP
 		BOOL InitializeDXVA2VP(int width, int height);
 		BOOL CreateDXVA2VPDevice(REFGUID guid);
-		HRESULT TextureResizeDXVA(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect);
+		HRESULT TextureResizeDXVA2(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect);
 #endif
 #if DXVAHDVP
 		BOOL InitializeDXVAHDVP(int width, int height);
