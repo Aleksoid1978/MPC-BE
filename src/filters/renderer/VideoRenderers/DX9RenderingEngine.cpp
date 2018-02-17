@@ -138,7 +138,7 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_wsResizer2(nullptr)
 	, m_Caps({})
 	, m_ShaderProfile(nullptr)
-#if DXVAVP
+#if DXVA2VP
 	, m_VideoDesc({})
 	, m_VPCaps({})
 #endif
@@ -154,10 +154,11 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_bFinalPass(false)
 	, m_bDither(false)
 {
-#if DXVAVP || DXVAHDVP
+#if DXVA2VP || DXVAHDVP
 	m_hDxva2Lib = LoadLibraryW(L"dxva2.dll");
+	DLogIf(!m_hDxva2Lib, L"Failed to load dxva2.dll");
 #endif
-#if DXVAVP
+#if DXVA2VP
 	ZeroMemory(m_ProcAmpValues, sizeof(m_ProcAmpValues));
 	ZeroMemory(m_NFilterValues, sizeof(m_NFilterValues));
 	ZeroMemory(m_DFilterValues, sizeof(m_DFilterValues));
@@ -166,7 +167,7 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 
 CDX9RenderingEngine::~CDX9RenderingEngine()
 {
-#if DXVAVP || DXVAHDVP
+#if DXVA2VP || DXVAHDVP
 	if (m_hDxva2Lib) {
 		FreeLibrary(m_hDxva2Lib);
 	}
@@ -602,7 +603,7 @@ HRESULT CDX9RenderingEngine::Stereo3DTransform(IDirect3DSurface9* pRenderTarget,
 	return hr;
 }
 
-#if DXVAVP
+#if DXVA2VP
 const UINT VIDEO_FPS     = 60;
 const UINT VIDEO_MSPF    = (1000 + VIDEO_FPS / 2) / VIDEO_FPS;
 const UINT VIDEO_100NSPF = VIDEO_MSPF * 10000;
@@ -612,6 +613,7 @@ BOOL CDX9RenderingEngine::InitializeDXVA2VP(int width, int height)
 	if (!m_hDxva2Lib) {
 		return FALSE;
 	}
+	DLog(L"InitializeDXVA2VP: start");
 
 	HRESULT (WINAPI *pDXVA2CreateVideoService)(IDirect3DDevice9* pDD, REFIID riid, void** ppService);
 	(FARPROC &)pDXVA2CreateVideoService = GetProcAddress(m_hDxva2Lib, "DXVA2CreateVideoService");
@@ -770,7 +772,7 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 	return TRUE;
 }
 
-HRESULT CDX9RenderingEngine::TextureResizeDXVA(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect)
+HRESULT CDX9RenderingEngine::TextureResizeDXVA2(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect)
 {
 	HRESULT hr = S_OK;
 
@@ -880,10 +882,10 @@ HRESULT CDX9RenderingEngine::TextureResizeDXVA(IDirect3DTexture9* pTexture, cons
 
 	hr = m_pDXVA2_VP->VideoProcessBlt(pRenderTarget, &blt, samples, 1, nullptr);
 	if (FAILED(hr)) {
-		DLog(L"VideoProcessBlt failed with error 0x%x.", hr);
+		DLog(L"TextureResizeDXVA2: VideoProcessBlt() failed with error 0x%x.", hr);
 	}
 
-	return S_OK;
+	return hr;
 }
 #endif
 
@@ -962,6 +964,7 @@ BOOL CDX9RenderingEngine::InitializeDXVAHDVP(int width, int height)
 	if (!m_hDxva2Lib) {
 		return FALSE;
 	}
+	DLog(L"InitializeDXVAHDVP: start");
 
 	HRESULT(WINAPI *pDXVAHD_CreateDevice)(IDirect3DDevice9Ex  *pD3DDevice, const DXVAHD_CONTENT_DESC *pContentDesc, DXVAHD_DEVICE_USAGE Usage, PDXVAHDSW_Plugin pPlugin, IDXVAHD_Device **ppDevice);
 	(FARPROC &)pDXVAHD_CreateDevice = GetProcAddress(m_hDxva2Lib, "DXVAHD_CreateDevice");
@@ -983,14 +986,9 @@ BOOL CDX9RenderingEngine::InitializeDXVAHDVP(int width, int height)
 	desc.OutputHeight = m_ScreenSpaceTexHeight;
 
 	// Create the DXVA-HD device.
-	hr = pDXVAHD_CreateDevice(
-		m_pD3DDevEx,
-		&desc,
-		DXVAHD_DEVICE_USAGE_PLAYBACK_NORMAL,
-		nullptr,
-		&m_pDXVAHD_Device
-	);
+	hr = pDXVAHD_CreateDevice(m_pD3DDevEx, &desc, DXVAHD_DEVICE_USAGE_PLAYBACK_NORMAL, nullptr, &m_pDXVAHD_Device);
 	if (FAILED(hr)) {
+		DLog(L"InitializeDXVAHDVP: DXVAHD_CreateDevice() failed with error 0x%x.", hr);
 		return FALSE;
 	}
 
@@ -1052,6 +1050,7 @@ BOOL CDX9RenderingEngine::InitializeDXVAHDVP(int width, int height)
 
 	hr = m_pDXVAHD_Device->CreateVideoProcessor(&VPCaps[0].VPGuid, &m_pDXVAHD_VP);
 	if (FAILED(hr)) {
+		DLog(L"InitializeDXVAHDVP: CreateVideoProcessor() failed with error 0x%x.", hr);
 		return FALSE;
 	}
 
@@ -1106,11 +1105,11 @@ HRESULT CDX9RenderingEngine::TextureResizeDXVAHD(IDirect3DTexture9* pTexture, co
 	// Perform the blit.
 	hr = m_pDXVAHD_VP->VideoProcessBltHD(pRenderTarget, frame, 1, &stream_data);
 	if (FAILED(hr)) {
-		DLog(L"VideoProcessBltHD failed with error 0x%x.", hr);
+		DLog(L"TextureResizeDXVAHD: VideoProcessBltHD() failed with error 0x%x.", hr);
 	}
 	frame++;
 
-	return S_OK;
+	return hr;
 }
 #endif
 
@@ -1371,10 +1370,10 @@ HRESULT CDX9RenderingEngine::ApplyResize(IDirect3DTexture9* pTexture, const CRec
 		wsResizer = L"Bilinear";
 		hr = TextureResize(pTexture, srcRect, destRect, D3DTEXF_LINEAR);
 		break;
-#if DXVAVP
+#if DXVA2VP
 	case RESIZER_DXVA2:
 		wsResizer = L"DXVA2 VP";
-		hr = TextureResizeDXVA(pTexture, srcRect, destRect);
+		hr = TextureResizeDXVA2(pTexture, srcRect, destRect);
 		break;
 #endif
 #if DXVAHDVP

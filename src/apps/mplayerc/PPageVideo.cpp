@@ -317,7 +317,7 @@ void CPPageVideo::UpdateResizerList(int select)
 
 	AddStringData(m_cbDX9Resizer, L"Nearest neighbor", RESIZER_NEAREST);
 	AddStringData(m_cbDX9Resizer, L"Bilinear", RESIZER_BILINEAR);
-#if DXVAVP
+#if DXVA2VP
 	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8 && GetCurItemData(m_cbVideoRenderer) != VIDRNDT_SYNC) {
 		AddStringData(m_cbDX9Resizer, L"DXVA2 (Intel GPU only)", RESIZER_DXVA2);
 	}
@@ -348,7 +348,7 @@ void CPPageVideo::UpdateDownscalerList(int select)
 
 	AddStringData(m_cbDownscaler, L"Nearest neighbor", RESIZER_NEAREST);
 	AddStringData(m_cbDownscaler, L"Bilinear", RESIZER_BILINEAR);
-#if DXVAVP
+#if DXVA2VP
 	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8 && GetCurItemData(m_cbVideoRenderer) != VIDRNDT_SYNC) {
 		AddStringData(m_cbDownscaler, L"DXVA2 (Intel GPU only)", RESIZER_DXVA2);
 	}
