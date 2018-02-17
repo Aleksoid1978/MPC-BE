@@ -1009,6 +1009,16 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mts.push_back(mt);
 				} else if (CodecID.Left(5) == "A_AC3") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_DOLBY_AC3);
+
+					std::vector<BYTE> pData;
+					if (ReadFirtsBlock(pData, pTE)) {
+						audioframe_t aframe;
+						const int size = ParseAC3Header(pData.data(), &aframe);
+						if (size && aframe.param1) {
+							wfe->nAvgBytesPerSec = aframe.param1 / 8;
+						}
+					}
+
 					mts.push_back(mt);
 				} else if (CodecID == "A_EAC3") {
 					mt.subtype = MEDIASUBTYPE_DOLBY_DDPLUS;
@@ -1061,7 +1071,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								audioframe_t aframe;
 								int size = ParseDTSHeader(start, &aframe);
 								if (size) {
-									if (!wfe->nAvgBytesPerSec) {
+									if (aframe.samples) {
 										wfe->nAvgBytesPerSec = size * aframe.samplerate / aframe.samples;
 									}
 									if (start + size + 40 <= end) {
