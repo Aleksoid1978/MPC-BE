@@ -621,7 +621,7 @@ BOOL CDX9RenderingEngine::InitializeDXVA2VP(int width, int height)
 
 	HRESULT hr = S_OK;
 	// Create DXVA2 Video Processor Service.
-	hr = pDXVA2CreateVideoService(m_pD3DDevEx, IID_IDirectXVideoProcessorService, (VOID**)&m_pDXVAVPS);
+	hr = pDXVA2CreateVideoService(m_pD3DDevEx, IID_IDirectXVideoProcessorService, (VOID**)&m_pDXVA2_VPService);
 	if (FAILED(hr)) {
 		DLog(L"DXVA2CreateVideoService failed with error 0x%x.", hr);
 		return FALSE;
@@ -647,7 +647,7 @@ BOOL CDX9RenderingEngine::InitializeDXVA2VP(int width, int height)
 	// Query DXVA2_VideoProcProgressiveDevice.
 	CreateDXVA2VPDevice(DXVA2_VideoProcProgressiveDevice);
 
-	if (!m_pDXVAVPD) {
+	if (!m_pDXVA2_VP) {
 		DLog(L"Failed to create a DXVA2 device.");
 		return FALSE;
 	}
@@ -666,7 +666,7 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 	// Query the supported render target format.
 	UINT i, count;
 	D3DFORMAT* formats = nullptr;
-	hr = m_pDXVAVPS->GetVideoProcessorRenderTargets(guid, &m_VideoDesc, &count, &formats);
+	hr = m_pDXVA2_VPService->GetVideoProcessorRenderTargets(guid, &m_VideoDesc, &count, &formats);
 	if (FAILED(hr)) {
 		DLog(L"GetVideoProcessorRenderTargets failed with error 0x%x.", hr);
 		return FALSE;
@@ -683,7 +683,7 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 	}
 
 	// Query video processor capabilities.
-	hr = m_pDXVAVPS->GetVideoProcessorCaps(guid, &m_VideoDesc, m_BackbufferFmt, &m_VPCaps);
+	hr = m_pDXVA2_VPService->GetVideoProcessorCaps(guid, &m_VideoDesc, m_BackbufferFmt, &m_VPCaps);
 	if (FAILED(hr)) {
 		DLog(L"GetVideoProcessorCaps failed with error 0x%x.", hr);
 		return FALSE;
@@ -712,7 +712,7 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 	DXVA2_ValueRange range;
 	for (i = 0; i < ARRAYSIZE(m_ProcAmpValues); i++) {
 		if (m_VPCaps.ProcAmpControlCaps & (1 << i)) {
-			hr = m_pDXVAVPS->GetProcAmpRange(guid,
+			hr = m_pDXVA2_VPService->GetProcAmpRange(guid,
 											 &m_VideoDesc,
 											 m_BackbufferFmt,
 											 1 << i,
@@ -729,7 +729,7 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 	// Query Noise Filter ranges.
 	if (m_VPCaps.VideoProcessorOperations & DXVA2_VideoProcess_NoiseFilter) {
 		for (i = 0; i < ARRAYSIZE(m_NFilterValues); i++) {
-			hr = m_pDXVAVPS->GetFilterPropertyRange(guid,
+			hr = m_pDXVA2_VPService->GetFilterPropertyRange(guid,
 													&m_VideoDesc,
 													m_BackbufferFmt,
 													DXVA2_NoiseFilterLumaLevel + i,
@@ -746,7 +746,7 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 	// Query Detail Filter ranges.
 	if (m_VPCaps.VideoProcessorOperations & DXVA2_VideoProcess_DetailFilter) {
 		for (i = 0; i < ARRAYSIZE(m_DFilterValues); i++) {
-			hr = m_pDXVAVPS->GetFilterPropertyRange(guid,
+			hr = m_pDXVA2_VPService->GetFilterPropertyRange(guid,
 													&m_VideoDesc,
 													m_BackbufferFmt,
 													DXVA2_DetailFilterLumaLevel + i,
@@ -761,7 +761,7 @@ BOOL CDX9RenderingEngine::CreateDXVA2VPDevice(REFGUID guid)
 	}
 
 	// Finally create a video processor device.
-	hr = m_pDXVAVPS->CreateVideoProcessor(guid, &m_VideoDesc, m_BackbufferFmt, 0, &m_pDXVAVPD);
+	hr = m_pDXVA2_VPService->CreateVideoProcessor(guid, &m_VideoDesc, m_BackbufferFmt, 0, &m_pDXVA2_VP);
 	if (FAILED(hr)) {
 		DLog(L"CreateVideoProcessor failed with error 0x%x.", hr);
 		return FALSE;
@@ -779,7 +779,7 @@ HRESULT CDX9RenderingEngine::TextureResizeDXVA(IDirect3DTexture9* pTexture, cons
 		return E_FAIL;
 	}
 
-	if (!m_pDXVAVPD && !InitializeDXVA2VP(srcRect.Width(), srcRect.Height())) {
+	if (!m_pDXVA2_VP && !InitializeDXVA2VP(srcRect.Width(), srcRect.Height())) {
 		return E_FAIL;
 	}
 
@@ -878,7 +878,7 @@ HRESULT CDX9RenderingEngine::TextureResizeDXVA(IDirect3DTexture9* pTexture, cons
 		m_pD3DDevEx->ColorFill(pRenderTarget, nullptr, 0);
 	}
 
-	hr = m_pDXVAVPD->VideoProcessBlt(pRenderTarget, &blt, samples, 1, nullptr);
+	hr = m_pDXVA2_VP->VideoProcessBlt(pRenderTarget, &blt, samples, 1, nullptr);
 	if (FAILED(hr)) {
 		DLog(L"VideoProcessBlt failed with error 0x%x.", hr);
 	}
@@ -988,7 +988,7 @@ BOOL CDX9RenderingEngine::InitializeDXVAHDVP(int width, int height)
 		&desc,
 		DXVAHD_DEVICE_USAGE_PLAYBACK_NORMAL,
 		nullptr,
-		&m_pDXVAHD
+		&m_pDXVAHD_Device
 	);
 	if (FAILED(hr)) {
 		return FALSE;
@@ -996,7 +996,7 @@ BOOL CDX9RenderingEngine::InitializeDXVAHDVP(int width, int height)
 
 	// Get the DXVA-HD device caps.
 	DXVAHD_VPDEVCAPS caps = {};
-	hr = m_pDXVAHD->GetVideoProcessorDeviceCaps(&caps);
+	hr = m_pDXVAHD_Device->GetVideoProcessorDeviceCaps(&caps);
 	if (FAILED(hr) || caps.MaxInputStreams < 1) {
 		return FALSE;
 	}
@@ -1005,7 +1005,7 @@ BOOL CDX9RenderingEngine::InitializeDXVAHDVP(int width, int height)
 
 	// Check the output formats.
 	Formats.resize(caps.OutputFormatCount);
-	hr = m_pDXVAHD->GetVideoProcessorOutputFormats(caps.OutputFormatCount, Formats.data());
+	hr = m_pDXVAHD_Device->GetVideoProcessorOutputFormats(caps.OutputFormatCount, Formats.data());
 	if (FAILED(hr)) {
 		return FALSE;
 	}
@@ -1024,7 +1024,7 @@ BOOL CDX9RenderingEngine::InitializeDXVAHDVP(int width, int height)
 
 	// Check the input formats.
 	Formats.resize(caps.InputFormatCount);
-	hr = m_pDXVAHD->GetVideoProcessorInputFormats(caps.InputFormatCount, Formats.data());
+	hr = m_pDXVAHD_Device->GetVideoProcessorInputFormats(caps.InputFormatCount, Formats.data());
 	if (FAILED(hr)) {
 		return FALSE;
 	}
@@ -1045,23 +1045,23 @@ BOOL CDX9RenderingEngine::InitializeDXVAHDVP(int width, int height)
 	std::vector<DXVAHD_VPCAPS> VPCaps;
 	VPCaps.resize(caps.VideoProcessorCount);
 
-	hr = m_pDXVAHD->GetVideoProcessorCaps(caps.VideoProcessorCount, VPCaps.data());
+	hr = m_pDXVAHD_Device->GetVideoProcessorCaps(caps.VideoProcessorCount, VPCaps.data());
 	if (FAILED(hr)) {
 		return FALSE;
 	}
 
-	hr = m_pDXVAHD->CreateVideoProcessor(&VPCaps[0].VPGuid, &m_pDXVAVP);
+	hr = m_pDXVAHD_Device->CreateVideoProcessor(&VPCaps[0].VPGuid, &m_pDXVAHD_VP);
 	if (FAILED(hr)) {
 		return FALSE;
 	}
 
 	// Set the initial stream states for the primary stream.
-	hr = DXVAHD_SetStreamFormat(m_pDXVAVP, 0, D3DFMT_X8R8G8B8);
+	hr = DXVAHD_SetStreamFormat(m_pDXVAHD_VP, 0, D3DFMT_X8R8G8B8);
 	if (FAILED(hr)) {
 		return FALSE;
 	}
 
-	hr = DXVAHD_SetFrameFormat(m_pDXVAVP, 0, DXVAHD_FRAME_FORMAT_PROGRESSIVE);
+	hr = DXVAHD_SetFrameFormat(m_pDXVAHD_VP, 0, DXVAHD_FRAME_FORMAT_PROGRESSIVE);
 	if (FAILED(hr)) {
 		return FALSE;
 	}
@@ -1078,24 +1078,17 @@ HRESULT CDX9RenderingEngine::TextureResizeDXVAHD(IDirect3DTexture9* pTexture, co
 		return E_FAIL;
 	}
 
-	if (!m_pDXVAHD && !InitializeDXVAHDVP(srcRect.Width(), srcRect.Height())) {
+	if (!m_pDXVAHD_VP && !InitializeDXVAHDVP(srcRect.Width(), srcRect.Height())) {
 		return E_FAIL;
 	}
 
 	static DWORD frame = 0;
-	LONGLONG start_100ns = frame * LONGLONG(VIDEO_100NSPF);
-	LONGLONG end_100ns = start_100ns + LONGLONG(VIDEO_100NSPF);
-	frame++;
 
-	// TODO
 	CComPtr<IDirect3DSurface9> pRenderTarget;
-	m_pD3DDevEx->GetRenderTarget(0, &pRenderTarget);
-	CRect rSrcRect(srcRect);
-	CRect rDstRect(destRect);
-	ClipToSurface(pRenderTarget, rSrcRect, rDstRect);
+	hr = m_pD3DDevEx->GetRenderTarget(0, &pRenderTarget);
 
 	CComPtr<IDirect3DSurface9> pSurface;
-	pTexture->GetSurfaceLevel(0, &pSurface);
+	hr = pTexture->GetSurfaceLevel(0, &pSurface);
 
 	DXVAHD_STREAM_DATA stream_data = {};
 	stream_data.Enable = TRUE;
@@ -1103,14 +1096,19 @@ HRESULT CDX9RenderingEngine::TextureResizeDXVAHD(IDirect3DTexture9* pTexture, co
 	stream_data.InputFrameOrField = frame;
 	stream_data.pInputSurface = pSurface;
 
-	hr = DXVAHD_SetSourceRect(m_pDXVAVP, 0, TRUE, srcRect);
-	hr = DXVAHD_SetDestinationRect(m_pDXVAVP, 0, TRUE, destRect);
+	//CRect rSrcRect(srcRect);
+	//CRect rDstRect(destRect);
+	//ClipToSurface(pRenderTarget, rSrcRect, rDstRect);
+
+	hr = DXVAHD_SetSourceRect(m_pDXVAHD_VP, 0, TRUE, srcRect);
+	hr = DXVAHD_SetDestinationRect(m_pDXVAHD_VP, 0, TRUE, destRect);
 	
 	// Perform the blit.
-	hr = m_pDXVAVP->VideoProcessBltHD(pRenderTarget, frame, 1, &stream_data);
+	hr = m_pDXVAHD_VP->VideoProcessBltHD(pRenderTarget, frame, 1, &stream_data);
 	if (FAILED(hr)) {
 		DLog(L"VideoProcessBltHD failed with error 0x%x.", hr);
 	}
+	frame++;
 
 	return S_OK;
 }

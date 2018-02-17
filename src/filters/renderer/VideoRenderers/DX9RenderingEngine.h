@@ -124,8 +124,8 @@ namespace DSObjects
 		HMODULE m_hDxva2Lib = nullptr;
 #endif
 #if DXVAVP
-		CComPtr<IDirectXVideoProcessorService> m_pDXVAVPS;
-		CComPtr<IDirectXVideoProcessor> m_pDXVAVPD;
+		CComPtr<IDirectXVideoProcessorService> m_pDXVA2_VPService;
+		CComPtr<IDirectXVideoProcessor> m_pDXVA2_VP;
 
 		DXVA2_VideoDesc          m_VideoDesc;
 		DXVA2_VideoProcessorCaps m_VPCaps;
@@ -135,8 +135,8 @@ namespace DSObjects
 		DXVA2_Fixed32 m_DFilterValues[6];
 #endif
 #if DXVAHDVP
-		CComPtr<IDXVAHD_Device>         m_pDXVAHD;
-		CComPtr<IDXVAHD_VideoProcessor> m_pDXVAVP;
+		CComPtr<IDXVAHD_Device>         m_pDXVAHD_Device;
+		CComPtr<IDXVAHD_VideoProcessor> m_pDXVAHD_VP;
 #endif
 
 		CComPtr<IDirect3DTexture9>	m_pFrameTextures[2];
