@@ -888,6 +888,75 @@ HRESULT CDX9RenderingEngine::TextureResizeDXVA(IDirect3DTexture9* pTexture, cons
 #endif
 
 #if DXVAHDVP
+HRESULT DXVAHD_SetStreamFormat(IDXVAHD_VideoProcessor *pVP, UINT stream, D3DFORMAT format)
+{
+	DXVAHD_STREAM_STATE_D3DFORMAT_DATA d3dformat = { format };
+
+	HRESULT hr = pVP->SetVideoProcessStreamState(
+		stream,
+		DXVAHD_STREAM_STATE_D3DFORMAT,
+		sizeof(d3dformat),
+		&d3dformat
+	);
+
+	return hr;
+}
+
+HRESULT DXVAHD_SetFrameFormat(IDXVAHD_VideoProcessor *pVP, UINT stream, DXVAHD_FRAME_FORMAT format)
+{
+	DXVAHD_STREAM_STATE_FRAME_FORMAT_DATA frame_format = { format };
+
+	HRESULT hr = pVP->SetVideoProcessStreamState(
+		stream,
+		DXVAHD_STREAM_STATE_FRAME_FORMAT,
+		sizeof(frame_format),
+		&frame_format
+	);
+
+	return hr;
+}
+
+HRESULT DXVAHD_SetTargetRect(IDXVAHD_VideoProcessor *pVP, BOOL bEnable, const RECT &rect)
+{
+	DXVAHD_BLT_STATE_TARGET_RECT_DATA tr = { bEnable, rect };
+
+	HRESULT hr = pVP->SetVideoProcessBltState(
+		DXVAHD_BLT_STATE_TARGET_RECT,
+		sizeof(tr),
+		&tr
+	);
+
+	return hr;
+}
+
+HRESULT DXVAHD_SetSourceRect(IDXVAHD_VideoProcessor *pVP, UINT stream, BOOL bEnable, const RECT& rect)
+{
+	DXVAHD_STREAM_STATE_SOURCE_RECT_DATA src = { bEnable, rect };
+
+	HRESULT hr = pVP->SetVideoProcessStreamState(
+		stream,
+		DXVAHD_STREAM_STATE_SOURCE_RECT,
+		sizeof(src),
+		&src
+	);
+
+	return hr;
+}
+
+HRESULT DXVAHD_SetDestinationRect(IDXVAHD_VideoProcessor *pVP, UINT stream, BOOL bEnable, const RECT &rect)
+{
+	DXVAHD_STREAM_STATE_DESTINATION_RECT_DATA DstRect = { bEnable, rect };
+
+	HRESULT hr = pVP->SetVideoProcessStreamState(
+		stream,
+		DXVAHD_STREAM_STATE_DESTINATION_RECT,
+		sizeof(DstRect),
+		&DstRect
+	);
+
+	return hr;
+}
+
 BOOL CDX9RenderingEngine::InitializeDXVAHDVP(int width, int height)
 {
 	if (!m_hDxva2Lib) {
@@ -910,8 +979,8 @@ BOOL CDX9RenderingEngine::InitializeDXVAHDVP(int width, int height)
 	desc.InputHeight = height;
 	desc.OutputFrameRate.Numerator = VIDEO_FPS;
 	desc.OutputFrameRate.Denominator = 1;
-	desc.OutputWidth = width;
-	desc.OutputHeight = height;
+	desc.OutputWidth = m_ScreenSpaceTexWidth;
+	desc.OutputHeight = m_ScreenSpaceTexHeight;
 
 	// Create the DXVA-HD device.
 	hr = pDXVAHD_CreateDevice(
@@ -932,74 +1001,72 @@ BOOL CDX9RenderingEngine::InitializeDXVAHDVP(int width, int height)
 		return FALSE;
 	}
 
-	D3DFORMAT *pFormats = nullptr;
-	DXVAHD_VPCAPS *pVPCaps = nullptr;
+	std::vector<D3DFORMAT> Formats;
 
-	// Check the output format.
-	pFormats = new (std::nothrow) D3DFORMAT[caps.OutputFormatCount];
-	if (pFormats == nullptr) {
-		hr = E_OUTOFMEMORY;
-		goto done;
-	}
-
-	hr = m_pDXVAHD->GetVideoProcessorOutputFormats(caps.OutputFormatCount, pFormats);
+	// Check the output formats.
+	Formats.resize(caps.OutputFormatCount);
+	hr = m_pDXVAHD->GetVideoProcessorOutputFormats(caps.OutputFormatCount, Formats.data());
 	if (FAILED(hr)) {
-		goto done;
+		return FALSE;
 	}
-
 #if _DEBUG
 	{
 		CString dbgstr = L"DXVA-HD output formats:";
-		for (UINT i = 0; i < caps.OutputFormatCount; i++) {
-			dbgstr.AppendFormat(L"\n%s", D3DFormatToString(pFormats[i]));
+		for (const auto& format : Formats) {
+			dbgstr.AppendFormat(L"\n%s", D3DFormatToString(format));
 		}
 		DLog(dbgstr);
 	}
 #endif
-
-	UINT index = 0;
-	for (index = 0; index < caps.OutputFormatCount; index++) {
-		if (pFormats[index] == D3DFMT_X8R8G8B8) {
-			break;
-		}
+	if (std::none_of(Formats.cbegin(), Formats.cend(), [](D3DFORMAT f) { return f == D3DFMT_X8R8G8B8; })) {
+		return FALSE;
 	}
-	if (index == caps.OutputFormatCount) {
-		hr = E_FAIL;
-		goto done;
-	}
-
-	delete[] pFormats;
-	pFormats = nullptr;
 
 	// Check the input formats.
-
-	pFormats = new (std::nothrow) D3DFORMAT[caps.InputFormatCount];
-	if (pFormats == nullptr) {
-		hr = E_OUTOFMEMORY;
-		goto done;
-	}
-
-	hr = m_pDXVAHD->GetVideoProcessorInputFormats(caps.InputFormatCount, pFormats);
+	Formats.resize(caps.InputFormatCount);
+	hr = m_pDXVAHD->GetVideoProcessorInputFormats(caps.InputFormatCount, Formats.data());
 	if (FAILED(hr)) {
-		goto done;
+		return FALSE;
 	}
-
 #if _DEBUG
 	{
 		CString dbgstr = L"DXVA-HD input formats:";
-		for (UINT i = 0; i < caps.InputFormatCount; i++) {
-			dbgstr.AppendFormat(L"\n%s", D3DFormatToString(pFormats[i]));
+		for (const auto& format : Formats) {
+			dbgstr.AppendFormat(L"\n%s", D3DFormatToString(format));
 		}
 		DLog(dbgstr);
 	}
 #endif
+	if (std::none_of(Formats.cbegin(), Formats.cend(), [](D3DFORMAT f) { return f == D3DFMT_X8R8G8B8; })) {
+		return FALSE;
+	}
 
-	// TODO
+	// Create the VP device.
+	std::vector<DXVAHD_VPCAPS> VPCaps;
+	VPCaps.resize(caps.VideoProcessorCount);
 
-done:
-	delete[] pFormats;
-	delete[] pVPCaps;
-	return (SUCCEEDED(hr));
+	hr = m_pDXVAHD->GetVideoProcessorCaps(caps.VideoProcessorCount, VPCaps.data());
+	if (FAILED(hr)) {
+		return FALSE;
+	}
+
+	hr = m_pDXVAHD->CreateVideoProcessor(&VPCaps[0].VPGuid, &m_pDXVAVP);
+	if (FAILED(hr)) {
+		return FALSE;
+	}
+
+	// Set the initial stream states for the primary stream.
+	hr = DXVAHD_SetStreamFormat(m_pDXVAVP, 0, D3DFMT_X8R8G8B8);
+	if (FAILED(hr)) {
+		return FALSE;
+	}
+
+	hr = DXVAHD_SetFrameFormat(m_pDXVAVP, 0, DXVAHD_FRAME_FORMAT_PROGRESSIVE);
+	if (FAILED(hr)) {
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
 HRESULT CDX9RenderingEngine::TextureResizeDXVAHD(IDirect3DTexture9* pTexture, const CRect& srcRect, const CRect& destRect)
@@ -1015,7 +1082,35 @@ HRESULT CDX9RenderingEngine::TextureResizeDXVAHD(IDirect3DTexture9* pTexture, co
 		return E_FAIL;
 	}
 
+	static DWORD frame = 0;
+	LONGLONG start_100ns = frame * LONGLONG(VIDEO_100NSPF);
+	LONGLONG end_100ns = start_100ns + LONGLONG(VIDEO_100NSPF);
+	frame++;
+
 	// TODO
+	CComPtr<IDirect3DSurface9> pRenderTarget;
+	m_pD3DDevEx->GetRenderTarget(0, &pRenderTarget);
+	CRect rSrcRect(srcRect);
+	CRect rDstRect(destRect);
+	ClipToSurface(pRenderTarget, rSrcRect, rDstRect);
+
+	CComPtr<IDirect3DSurface9> pSurface;
+	pTexture->GetSurfaceLevel(0, &pSurface);
+
+	DXVAHD_STREAM_DATA stream_data = {};
+	stream_data.Enable = TRUE;
+	stream_data.OutputIndex = 0;
+	stream_data.InputFrameOrField = frame;
+	stream_data.pInputSurface = pSurface;
+
+	hr = DXVAHD_SetSourceRect(m_pDXVAVP, 0, TRUE, srcRect);
+	hr = DXVAHD_SetDestinationRect(m_pDXVAVP, 0, TRUE, destRect);
+	
+	// Perform the blit.
+	hr = m_pDXVAVP->VideoProcessBltHD(pRenderTarget, frame, 1, &stream_data);
+	if (FAILED(hr)) {
+		DLog(L"VideoProcessBltHD failed with error 0x%x.", hr);
+	}
 
 	return S_OK;
 }
@@ -1267,7 +1362,7 @@ HRESULT CDX9RenderingEngine::ApplyResize(IDirect3DTexture9* pTexture, const CRec
 {
 	HRESULT hr = S_OK;
 
-	const wchar_t* wsResizer;
+	const wchar_t* wsResizer = nullptr;
 
 	switch (resizer) {
 	case RESIZER_NEAREST:
