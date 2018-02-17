@@ -324,7 +324,7 @@ void CPPageVideo::UpdateResizerList(int select)
 #endif
 #if DXVAHDVP
 	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8 && GetCurItemData(m_cbVideoRenderer) != VIDRNDT_SYNC) {
-		AddStringData(m_cbDX9Resizer, L"DXVA-HD (test)", RESIZER_DXVAHD);
+		AddStringData(m_cbDX9Resizer, L"DXVA-HD (Intel GPU only)", RESIZER_DXVAHD);
 	}
 #endif
 	AddStringData(m_cbDX9Resizer, L"PS: B-spline", RESIZER_SHADER_BSPLINE);
@@ -355,7 +355,7 @@ void CPPageVideo::UpdateDownscalerList(int select)
 #endif
 #if DXVAHDVP
 	if ((D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat) == D3DFMT_X8R8G8B8 && GetCurItemData(m_cbVideoRenderer) != VIDRNDT_SYNC) {
-		AddStringData(m_cbDownscaler, L"DXVA-HD (test)", RESIZER_DXVAHD);
+		AddStringData(m_cbDownscaler, L"DXVA-HD (Intel GPU only)", RESIZER_DXVAHD);
 	}
 #endif
 	AddStringData(m_cbDownscaler, L"PS: Simple averaging", DOWNSCALER_SIMPLE);
