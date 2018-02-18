@@ -1,5 +1,5 @@
 ﻿/*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,7 @@
 #include "GolombBuffer.h"
 #include <mpc_defines.h>
 
-static void RemoveMpegEscapeCode(BYTE* dst, BYTE* src, int& length)
+static void RemoveMpegEscapeCode(BYTE* dst, const BYTE* src, int& length)
 {
 	memset(dst, 0, length);
 	int si = 0;
@@ -51,7 +51,7 @@ static void RemoveMpegEscapeCode(BYTE* dst, BYTE* src, int& length)
 	length = di;
 }
 
-CGolombBuffer::CGolombBuffer(BYTE* pBuffer, int nSize, bool bRemoveMpegEscapes/* = false*/)
+CGolombBuffer::CGolombBuffer(const BYTE* pBuffer, int nSize, const bool& bRemoveMpegEscapes/* = false*/)
 	: m_bRemoveMpegEscapes(bRemoveMpegEscapes)
 	, m_pTmpBuffer(nullptr)
 {
@@ -63,12 +63,12 @@ CGolombBuffer::~CGolombBuffer()
 	SAFE_DELETE_ARRAY(m_pTmpBuffer);
 }
 
-UINT64 CGolombBuffer::BitRead(int nBits, bool fPeek)
+UINT64 CGolombBuffer::BitRead(const int& nBits, const bool& bPeek/* = false*/)
 {
 	//ASSERT(nBits >= 0 && nBits <= 64);
-	const INT64 tmp_bitbuff	= m_bitbuff;
-	const int tmp_nBitPos	= m_nBitPos;
-	const int tmp_bitlen	= m_bitlen;
+	const INT64 tmp_bitbuff = m_bitbuff;
+	const int tmp_nBitPos   = m_nBitPos;
+	const int tmp_bitlen    = m_bitlen;
 
 	while (m_bitlen < nBits) {
 		m_bitbuff <<= 8;
@@ -81,7 +81,7 @@ UINT64 CGolombBuffer::BitRead(int nBits, bool fPeek)
 		m_bitlen += 8;
 	}
 
-	int bitlen = m_bitlen - nBits;
+	const int bitlen = m_bitlen - nBits;
 
 	UINT64 ret;
 	// The shift to 64 bits can give incorrect results.
@@ -92,13 +92,13 @@ UINT64 CGolombBuffer::BitRead(int nBits, bool fPeek)
 		ret = (m_bitbuff >> bitlen) & ((1ui64 << nBits) - 1);
 	}
 
-	if (!fPeek) {
-		m_bitbuff	&= ((1ui64 << bitlen) - 1);
-		m_bitlen	= bitlen;
+	if (!bPeek) {
+		m_bitbuff &= ((1ui64 << bitlen) - 1);
+		m_bitlen  = bitlen;
 	} else {
-		m_bitbuff	= tmp_bitbuff;
-		m_nBitPos	= tmp_nBitPos;
-		m_bitlen	= tmp_bitlen;
+		m_bitbuff = tmp_bitbuff;
+		m_nBitPos = tmp_nBitPos;
+		m_bitlen  = tmp_bitlen;
 	}
 
 	return ret;
@@ -136,9 +136,9 @@ void CGolombBuffer::BitByteAlign()
 	m_bitlen &= ~7;
 }
 
-int CGolombBuffer::GetPos()
+int CGolombBuffer::GetPos() const
 {
-	return m_nBitPos - (m_bitlen>>3);
+	return m_nBitPos - (m_bitlen >> 3);
 }
 
 void CGolombBuffer::ReadBuffer(BYTE* pDest, int nSize)
@@ -153,40 +153,40 @@ void CGolombBuffer::ReadBuffer(BYTE* pDest, int nSize)
 
 void CGolombBuffer::Reset()
 {
-	m_nBitPos	= 0;
-	m_bitlen	= 0;
-	m_bitbuff	= 0;
+	m_nBitPos = 0;
+	m_bitlen  = 0;
+	m_bitbuff = 0;
 }
 
-void CGolombBuffer::Reset(BYTE* pNewBuffer, int nNewSize)
+void CGolombBuffer::Reset(const BYTE* pNewBuffer, int nNewSize)
 {
 	if (m_bRemoveMpegEscapes) {
 		SAFE_DELETE_ARRAY(m_pTmpBuffer);
 		m_pTmpBuffer = DNew BYTE[nNewSize];
 
 		RemoveMpegEscapeCode(m_pTmpBuffer, pNewBuffer, nNewSize);
-		m_pBuffer	= m_pTmpBuffer;
-		m_nSize		= nNewSize;
+		m_pBuffer = m_pTmpBuffer;
+		m_nSize   = nNewSize;
 	} else {
-		m_pBuffer	= pNewBuffer;
-		m_nSize		= nNewSize;
+		m_pBuffer = pNewBuffer;
+		m_nSize   = nNewSize;
 	}
 
 	Reset();
 }
 
-void CGolombBuffer::SkipBytes(int nCount)
+void CGolombBuffer::SkipBytes(const int& nCount)
 {
-	m_nBitPos  += nCount;
-	m_bitlen	= 0;
-	m_bitbuff	= 0;
+	m_nBitPos += nCount;
+	m_bitlen   = 0;
+	m_bitbuff  = 0;
 }
 
-void CGolombBuffer::Seek(int nCount)
+void CGolombBuffer::Seek(const int& nCount)
 {
-	m_nBitPos	= nCount;
-	m_bitlen	= 0;
-	m_bitbuff	= 0;
+	m_nBitPos = nCount;
+	m_bitlen  = 0;
+	m_bitbuff = 0;
 }
 
 bool CGolombBuffer::NextMpegStartCode(BYTE& code)

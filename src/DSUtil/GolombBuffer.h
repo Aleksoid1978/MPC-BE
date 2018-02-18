@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,44 +23,44 @@
 class CGolombBuffer
 {
 public:
-	CGolombBuffer(BYTE* pBuffer, int nSize, bool bRemoveMpegEscapes = false);
+	CGolombBuffer(const BYTE* pBuffer, int nSize, const bool& bRemoveMpegEscapes = false);
 	~CGolombBuffer();
 
-	UINT64			BitRead(int nBits, bool fPeek = false);
-	UINT64			UExpGolombRead();
-	unsigned int	UintGolombRead();
-	INT64			SExpGolombRead();
-	void			BitByteAlign();
+	UINT64       BitRead(const int& nBits, const bool& bPeek = false);
+	UINT64       UExpGolombRead();
+	unsigned int UintGolombRead();
+	INT64        SExpGolombRead();
+	void         BitByteAlign();
 
-	inline BYTE		ReadByte()		{ return (BYTE)BitRead (8); };
-	inline SHORT	ReadShort()		{ return (SHORT)BitRead (16); };
-	inline DWORD	ReadDword()		{ return (DWORD)BitRead (32); };
-	inline SHORT	ReadShortLE()	{ return (SHORT)ReadByte() | (SHORT)ReadByte() << 8; };
-	inline DWORD	ReadDwordLE()	{ return (DWORD)(ReadByte() | ReadByte() << 8 | ReadByte() << 16 | ReadByte() << 24); };
-	void			ReadBuffer(BYTE* pDest, int nSize);
+	inline BYTE  ReadByte()    { return (BYTE)BitRead(8); };
+	inline SHORT ReadShort()   { return (SHORT)BitRead(16); };
+	inline DWORD ReadDword()   { return (DWORD)BitRead(32); };
+	inline SHORT ReadShortLE() { return (SHORT)ReadByte() | (SHORT)ReadByte() << 8; };
+	inline DWORD ReadDwordLE() { return (DWORD)(ReadByte() | ReadByte() << 8 | ReadByte() << 16 | ReadByte() << 24); };
+	void         ReadBuffer(BYTE* pDest, int nSize);
 
-	void			Reset();
-	void			Reset(BYTE* pNewBuffer, int nNewSize);
+	void         Reset();
+	void         Reset(const BYTE* pNewBuffer, int nNewSize);
 
-	void			SetSize(int nValue) { m_nSize = nValue; };
-	int				GetSize() const     { return m_nSize; };
-	int				RemainingSize() const { return m_nSize - m_nBitPos; };
-	bool			IsEOF() const { return m_nBitPos >= m_nSize; };
-	int				GetPos();
-	BYTE*			GetBufferPos() { return m_pBuffer + m_nBitPos; };
+	void         SetSize(const int& nValue) { m_nSize = nValue; };
+	int          GetSize() const { return m_nSize; };
+	int          RemainingSize() const { return m_nSize - m_nBitPos; };
+	bool         IsEOF() const { return m_nBitPos >= m_nSize; };
+	int          GetPos() const;
+	const BYTE*  GetBufferPos() const { return m_pBuffer + m_nBitPos; };
 
-	void			SkipBytes(int nCount);
-	void			Seek(int nPos);
+	void         SkipBytes(const int& nCount);
+	void         Seek(const int& nPos);
 
-	bool			NextMpegStartCode(BYTE& code);
+	bool         NextMpegStartCode(BYTE& code);
 
 private :
-	BYTE*			m_pBuffer;
-	int				m_nSize;
-	int				m_nBitPos;
-	int				m_bitlen;
-	INT64			m_bitbuff;
+	const BYTE*  m_pBuffer;
+	int          m_nSize;
+	int          m_nBitPos;
+	int          m_bitlen;
+	INT64        m_bitbuff;
 
-	BYTE*			m_pTmpBuffer;
-	bool			m_bRemoveMpegEscapes;
+	BYTE*        m_pTmpBuffer;
+	bool         m_bRemoveMpegEscapes;
 };
