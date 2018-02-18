@@ -213,7 +213,6 @@ CFFAudioDecoder::CFFAudioDecoder()
 {
 	memset(&m_raData, 0, sizeof(m_raData));
 
-	avcodec_register_all();
 	av_log_set_callback(ff_log);
 }
 

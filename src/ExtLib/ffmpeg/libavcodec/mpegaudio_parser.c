@@ -24,7 +24,10 @@
 #include "mpegaudiodecheader.h"
 #include "libavutil/common.h"
 // ==> Start patch MPC
-// #include "libavformat/id3v1.h" // for ID3v1_TAG_SIZE
+// #include "libavformat/apetag.h" // for APE tag.
+#define APE_TAG_PREAMBLE        "APETAGEX"
+#define APE_TAG_FOOTER_BYTES    32
+//#include "libavformat/id3v1.h" // for ID3v1_TAG_SIZE
 #define ID3v1_TAG_SIZE 128
 // ==> End patch MPC
 
@@ -118,6 +121,12 @@ static int mpegaudio_parse(AVCodecParserContext *s1,
     }
 
     if (flush && buf_size >= ID3v1_TAG_SIZE && memcmp(buf, "TAG", 3) == 0) {
+        *poutbuf = NULL;
+        *poutbuf_size = 0;
+        return next;
+    }
+
+    if (flush && buf_size >= APE_TAG_FOOTER_BYTES && memcmp(buf, APE_TAG_PREAMBLE, 8) == 0) {
         *poutbuf = NULL;
         *poutbuf_size = 0;
         return next;

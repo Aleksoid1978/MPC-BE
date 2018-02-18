@@ -1091,7 +1091,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		m_nSwRGBLevels = 0;
 	}
 
-	avcodec_register_all();
 	av_log_set_callback(ff_log);
 	m_FormatConverter.SetOptions(m_nSwRGBLevels);
 
