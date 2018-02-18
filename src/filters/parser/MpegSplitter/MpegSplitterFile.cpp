@@ -418,8 +418,8 @@ BOOL CMpegSplitterFile::CheckKeyFrame(std::vector<BYTE>& pData, const stream_cod
 			}
 
 			if (id == 0x00 && gb.RemainingSize()) {
-				BYTE* picture = gb.GetBufferPos();
-				BYTE pict_type = (picture[1] >> 3) & 7;
+				const BYTE* picture = gb.GetBufferPos();
+				const BYTE pict_type = (picture[1] >> 3) & 7;
 				if (pict_type == 1) {
 					// Intra
 					return TRUE;

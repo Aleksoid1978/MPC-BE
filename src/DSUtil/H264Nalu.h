@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -54,42 +54,42 @@ enum NALU_TYPE {
 class CH264Nalu
 {
 protected :
-	int			forbidden_bit;		//! should be always FALSE
-	int			nal_reference_idc;	//! NALU_PRIORITY_xxxx
-	NALU_TYPE	nal_unit_type;		//! NALU_TYPE_xxxx
+	int         forbidden_bit     = 0;                 //! should be always FALSE
+	int         nal_reference_idc = 0;                 //! NALU_PRIORITY_xxxx
+	NALU_TYPE   nal_unit_type     = NALU_TYPE_UNKNOWN; //! NALU_TYPE_xxxx
 
-	size_t		m_nNALStartPos;		//! NALU start (including startcode / size)
-	size_t		m_nNALDataPos;		//! Useful part
+	size_t      m_nNALStartPos    = 0;                 //! NALU start (including startcode / size)
+	size_t      m_nNALDataPos     = 0;                 //! Useful part
 
-	BYTE*		m_pBuffer;
-	size_t		m_nCurPos;
-	size_t		m_nNextRTP;
-	size_t		m_nSize;
-	int			m_nNALSize;
+	const BYTE* m_pBuffer         = nullptr;
+	size_t      m_nCurPos         = 0;
+	size_t      m_nNextRTP        = 0;
+	size_t      m_nSize           = 0;
+	int         m_nNALSize        = 0;
 
-	bool		MoveToNextAnnexBStartcode();
-	bool		MoveToNextRTPStartcode();
+	bool        MoveToNextAnnexBStartcode();
+	bool        MoveToNextRTPStartcode();
 
 public :
 	CH264Nalu() { SetBuffer(nullptr, 0, 0); }
 
-	NALU_TYPE GetType() const { return nal_unit_type; };
-	bool IsRefFrame() const { return (nal_reference_idc != 0); };
+	NALU_TYPE   GetType() const { return nal_unit_type; }
+	bool        IsRefFrame() const { return (nal_reference_idc != 0); }
 
-	size_t GetDataLength() const { return m_nCurPos - m_nNALDataPos; };
-	BYTE* GetDataBuffer() { return m_pBuffer + m_nNALDataPos; };
-	size_t GetRoundedDataLength() const {
-		size_t nSize = m_nCurPos - m_nNALDataPos;
+	size_t      GetDataLength() const { return m_nCurPos - m_nNALDataPos; }
+	const BYTE* GetDataBuffer() const { return m_pBuffer + m_nNALDataPos; }
+	size_t      GetRoundedDataLength() const {
+		const size_t nSize = m_nCurPos - m_nNALDataPos;
 		return nSize + 128 - (nSize % 128);
 	}
 
-	size_t GetLength() const { return m_nCurPos - m_nNALStartPos; };
-	BYTE* GetNALBuffer() { return m_pBuffer + m_nNALStartPos; };
-	size_t GetNALPos() { return m_nNALStartPos; }
-	bool IsEOF() const { return m_nCurPos >= m_nSize; };
+	size_t      GetLength() const { return m_nCurPos - m_nNALStartPos; }
+	const BYTE* GetNALBuffer() const { return m_pBuffer + m_nNALStartPos; }
+	size_t      GetNALPos() const { return m_nNALStartPos; }
+	bool        IsEOF() const { return m_nCurPos >= m_nSize; }
 
-	void SetBuffer(BYTE* pBuffer, size_t nSize, int nNALSize = 0);
-	bool ReadNext();
+	void        SetBuffer(const BYTE* pBuffer, const size_t& nSize, const int& nNALSize = 0);
+	bool        ReadNext();
 };
 
 class CH265Nalu : public CH264Nalu
