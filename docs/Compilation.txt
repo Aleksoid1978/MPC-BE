@@ -26,12 +26,12 @@ Part B: Preparing the GCC environment
 Part C: Downloading and compiling the MPC-BE source
 
 1. Use a subversion client to checkout MPC-BE's trunk to "C:\mpc-be" (or anywhere else you like)
-    Repository URL: svn://mpc-next.ru/mpc-be/trunk 
+    Repository URL: svn://svn.code.sf.net/p/mpcbe/code/trunk 
     The recommended SVN client is TortoiseSVN (http://tortoisesvn.net/downloads.html)
 2. When using TortoiseSVN
     a) Create an empty directory where you want to store the source files. e.g: C:\mpc-be
     b) Right-click on that directory and choose "SVN checkout".
-    c) Put svn://mpc-next.ru/mpc-be/trunk in "URL of Repository" and press OK.
+    c) Put svn://svn.code.sf.net/p/mpcbe/code/trunk in "URL of Repository" and press OK.
     d) Wait for the source tree to be downloaded.
 
 3. Open folder "C:\mpc-be\"
