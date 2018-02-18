@@ -130,7 +130,7 @@ static int extract_packet_props(AVCodecInternal *avci, const AVPacket *pkt)
     if (pkt) {
         ret = av_packet_copy_props(avci->last_pkt_props, pkt);
         if (!ret)
-            avci->last_pkt_props->size = pkt->size; // HACK: Needed for ff_init_buffer_info().
+            avci->last_pkt_props->size = pkt->size; // HACK: Needed for ff_decode_frame_props().
     }
     return ret;
 }
@@ -1192,10 +1192,6 @@ int ff_decode_get_hw_frames_ctx(AVCodecContext *avctx,
         // We guarantee 4 base work surfaces. The function above guarantees 1
         // (the absolute minimum), so add the missing count.
         frames_ctx->initial_pool_size += 3;
-
-        // Add an additional surface per thread is frame threading is enabled.
-        if (avctx->active_thread_type & FF_THREAD_FRAME)
-            frames_ctx->initial_pool_size += avctx->thread_count;
     }
 
     ret = av_hwframe_ctx_init(avctx->hw_frames_ctx);
@@ -1235,6 +1231,20 @@ int avcodec_get_hw_frames_parameters(AVCodecContext *avctx,
 
     ret = hwa->frame_params(avctx, frames_ref);
     if (ret >= 0) {
+        AVHWFramesContext *frames_ctx = (AVHWFramesContext*)frames_ref->data;
+
+        if (frames_ctx->initial_pool_size) {
+            // If the user has requested that extra output surfaces be
+            // available then add them here.
+            if (avctx->extra_hw_frames > 0)
+                frames_ctx->initial_pool_size += avctx->extra_hw_frames;
+
+            // If frame threading is enabled then an extra surface per thread
+            // is also required.
+            if (avctx->active_thread_type & FF_THREAD_FRAME)
+                frames_ctx->initial_pool_size += avctx->thread_count;
+        }
+
         *out_frames_ref = frames_ref;
     } else {
         av_buffer_unref(&frames_ref);
@@ -1657,7 +1667,7 @@ static int add_metadata_from_side_data(const AVPacket *avpkt, AVFrame *frame)
     return av_packet_unpack_dictionary(side_metadata, size, frame_md);
 }
 
-int ff_init_buffer_info(AVCodecContext *avctx, AVFrame *frame)
+int ff_decode_frame_props(AVCodecContext *avctx, AVFrame *frame)
 {
     const AVPacket *pkt = avctx->internal->last_pkt_props;
     int i;
@@ -1763,11 +1773,6 @@ FF_ENABLE_DEPRECATION_WARNINGS
         break;
     }
     return 0;
-}
-
-int ff_decode_frame_props(AVCodecContext *avctx, AVFrame *frame)
-{
-    return ff_init_buffer_info(avctx, frame);
 }
 
 static void validate_avframe_allocation(AVCodecContext *avctx, AVFrame *frame)
@@ -1911,8 +1916,6 @@ static int reget_buffer_internal(AVCodecContext *avctx, AVFrame *frame)
                frame->width, frame->height, av_get_pix_fmt_name(frame->format), avctx->width, avctx->height, av_get_pix_fmt_name(avctx->pix_fmt));
         av_frame_unref(frame);
     }
-
-    ff_init_buffer_info(avctx, frame);
 
     if (!frame->data[0])
         return ff_get_buffer(avctx, frame, AV_GET_BUFFER_FLAG_REF);

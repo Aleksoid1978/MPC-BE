@@ -465,7 +465,7 @@ int ff_mpeg4_decode_video_packet_header(Mpeg4DecContext *ctx)
     }
 
     mb_num = get_bits(&s->gb, mb_num_bits);
-    if (mb_num >= s->mb_num) {
+    if (mb_num >= s->mb_num || !mb_num) {
         av_log(s->avctx, AV_LOG_ERROR,
                "illegal mb_num in video packet (%d %d) \n", mb_num, s->mb_num);
         return -1;
@@ -1256,9 +1256,11 @@ not_coded:
  */
 static int mpeg4_decode_partitioned_mb(MpegEncContext *s, int16_t block[6][64])
 {
-    Mpeg4DecContext *ctx = (Mpeg4DecContext *)s;
+    Mpeg4DecContext *ctx = s->avctx->priv_data;
     int cbp, mb_type;
     const int xy = s->mb_x + s->mb_y * s->mb_stride;
+
+    av_assert2(s == (void*)ctx);
 
     mb_type = s->current_picture.mb_type[xy];
     cbp     = s->cbp_table[xy];
@@ -1341,12 +1343,13 @@ static int mpeg4_decode_partitioned_mb(MpegEncContext *s, int16_t block[6][64])
 
 static int mpeg4_decode_mb(MpegEncContext *s, int16_t block[6][64])
 {
-    Mpeg4DecContext *ctx = (Mpeg4DecContext *)s;
+    Mpeg4DecContext *ctx = s->avctx->priv_data;
     int cbpc, cbpy, i, cbp, pred_x, pred_y, mx, my, dquant;
     int16_t *mot_val;
     static const int8_t quant_tab[4] = { -1, -2, 1, 2 };
     const int xy = s->mb_x + s->mb_y * s->mb_stride;
 
+    av_assert2(s ==  (void*)ctx);
     av_assert2(s->h263_pred);
 
     if (s->pict_type == AV_PICTURE_TYPE_P ||
@@ -2704,8 +2707,8 @@ int ff_mpeg4_decode_picture_header(Mpeg4DecContext *ctx, GetBitContext *gb)
 
         if (startcode >= 0x120 && startcode <= 0x12F) {
             if (vol) {
-                av_log(s->avctx, AV_LOG_ERROR, "Multiple VOL headers");
-                return AVERROR_INVALIDDATA;
+                av_log(s->avctx, AV_LOG_WARNING, "Ignoring multiple VOL headers\n");
+                continue;
             }
             vol++;
             if ((ret = decode_vol_header(ctx, gb)) < 0)
