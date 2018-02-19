@@ -4118,8 +4118,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	}
 
 	CAppSettings& s = AfxGetAppSettings();
-	const CRenderersSettings& rs = s.m_VRSettings;
-	CRenderersData* rd = GetRenderersData();
+	CRenderersSettings& rs = s.m_VRSettings;
 
 	BOOL bMvcActive = FALSE;
 	if (CComQIPtr<IMPCVideoDecFilter> pVDF = FindFilter(__uuidof(CMPCVideoDecFilter), m_pGB)) {
@@ -4127,12 +4126,12 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	}
 
 	if (s.iStereo3DMode == STEREO3D_ROWINTERLEAVED || (s.iStereo3DMode == STEREO3D_AUTO && bMvcActive && !m_pBFmadVR)) {
-		rd->m_iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
+		rs.iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
 	} else {
-		rd->m_iStereo3DTransform = STEREO3D_AsIs;
+		rs.iStereo3DTransform = STEREO3D_AsIs;
 	}
 
-	rd->m_bStereo3DSwapLR = s.bStereo3DSwapLR;
+	rs.bStereo3DSwapLR = s.bStereo3DSwapLR;
 
 	if (OpenDeviceData *pDeviceData = dynamic_cast<OpenDeviceData*>(m_lastOMD.m_p)) {
 		m_wndCaptureBar.m_capdlg.SetVideoInput(pDeviceData->vinput);
@@ -6470,12 +6469,13 @@ void CMainFrame::OnUpdateViewTearingTest(CCmdUI* pCmdUI)
 	bool supported = (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM || rs.iVideoRenderer == VIDRNDT_SYNC);
 
 	pCmdUI->Enable(supported && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly);
-	pCmdUI->SetCheck(AfxGetMyApp()->m_Renderers.m_bTearingTest);
+	pCmdUI->SetCheck(rs.bTearingTest);
 }
 
 void CMainFrame::OnViewTearingTest()
 {
-	AfxGetMyApp()->m_Renderers.m_bTearingTest = !AfxGetMyApp()->m_Renderers.m_bTearingTest;
+	CRenderersSettings& rs = GetRenderersSettings();
+	rs.bTearingTest = !rs.bTearingTest;
 }
 
 void CMainFrame::OnUpdateViewDisplayStats(CCmdUI* pCmdUI)
@@ -6484,23 +6484,25 @@ void CMainFrame::OnUpdateViewDisplayStats(CCmdUI* pCmdUI)
 	bool supported = (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM || rs.iVideoRenderer == VIDRNDT_SYNC);
 
 	pCmdUI->Enable(supported && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly);
-	pCmdUI->SetCheck(supported && (AfxGetMyApp()->m_Renderers.m_iDisplayStats));
+	pCmdUI->SetCheck(supported && rs.iDisplayStats);
 }
 
 void CMainFrame::OnViewResetStats()
 {
-	AfxGetMyApp()->m_Renderers.m_bResetStats = true; // Reset by "consumer"
+	GetRenderersSettings().bResetStats = true; // Reset by "consumer"
 }
 
 void CMainFrame::OnViewDisplayStatsSC()
 {
-	if (!AfxGetMyApp()->m_Renderers.m_iDisplayStats) {
-		AfxGetMyApp()->m_Renderers.m_bResetStats = true; // to Reset statistics on first call ...
+	CRenderersSettings& rs = GetRenderersSettings();
+
+	if (!rs.iDisplayStats) {
+		rs.bResetStats = true; // to Reset statistics on first call ...
 	}
 
-	++AfxGetMyApp()->m_Renderers.m_iDisplayStats;
-	if (AfxGetMyApp()->m_Renderers.m_iDisplayStats > 3) {
-		AfxGetMyApp()->m_Renderers.m_iDisplayStats = 0;
+	++rs.iDisplayStats;
+	if (rs.iDisplayStats > 3) {
+		rs.iDisplayStats = 0;
 	}
 
 	RepaintVideo();
@@ -7381,7 +7383,7 @@ void CMainFrame::OnUpdateViewStereo3DMode(CCmdUI* pCmdUI)
 void CMainFrame::OnViewStereo3DMode(UINT nID)
 {
 	CAppSettings& s = AfxGetAppSettings();
-	CRenderersData* rd = GetRenderersData();
+	CRenderersSettings& rs = s.m_VRSettings;
 
 	s.iStereo3DMode = nID - ID_STEREO3D_AUTO;
 
@@ -7404,12 +7406,12 @@ void CMainFrame::OnViewStereo3DMode(UINT nID)
 	}
 
 	if (s.iStereo3DMode == STEREO3D_ROWINTERLEAVED || (s.iStereo3DMode == STEREO3D_AUTO && bMvcActive && !m_pBFmadVR)) {
-		rd->m_iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
+		rs.iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
 	} else {
-		rd->m_iStereo3DTransform = STEREO3D_AsIs;
+		rs.iStereo3DTransform = STEREO3D_AsIs;
 	}
 
-	rd->m_bStereo3DSwapLR = s.bStereo3DSwapLR;
+	rs.bStereo3DSwapLR = s.bStereo3DSwapLR;
 
 	RepaintVideo();
 }
@@ -7424,7 +7426,7 @@ void CMainFrame::OnViewSwapLeftRight()
 	CAppSettings& s = AfxGetAppSettings();
 
 	s.bStereo3DSwapLR = !s.bStereo3DSwapLR;
-	GetRenderersData()->m_bStereo3DSwapLR = s.bStereo3DSwapLR;
+	GetRenderersSettings().bStereo3DSwapLR = s.bStereo3DSwapLR;
 
 	IFilterGraph* pFG = m_pGB;
 	if (pFG) {

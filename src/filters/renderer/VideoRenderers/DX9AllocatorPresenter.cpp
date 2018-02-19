@@ -459,7 +459,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	g_nFrameType = PICT_NONE;
 
 	CRenderersSettings& rs = GetRenderersSettings();
-	CRenderersData* rd = GetRenderersData();
 
 	CAutoLock lock(&m_RenderLock);
 
@@ -1298,7 +1297,6 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	CRenderersSettings& rs = GetRenderersSettings();
-	CRenderersData* rd = GetRenderersData();
 
 	//TRACE("Thread: %d\n", (LONG)((CRITICAL_SECTION &)m_RenderLock).OwningThread);
 
@@ -1325,7 +1323,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	}
 
 	HRESULT hr = S_OK;
-	const bool bStereo3DTransform = rd->m_iStereo3DTransform != STEREO3D_AsIs;
+	const bool bStereo3DTransform = rs.iStereo3DTransform != STEREO3D_AsIs;
 
 	m_pD3DDevEx->BeginScene();
 
@@ -1370,7 +1368,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 	int xOffsetInPixels = 0;
 	if (rs.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE
 			|| rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM
-			|| rd->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
+			|| rs.iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
 		if (offset3D.timestamp != INVALID_TIME) {
 			int idx = m_nCurrentSubtitlesStream;
 			if (!m_stereo_subtitle_offset_ids.empty() && (size_t)m_nCurrentSubtitlesStream < m_stereo_subtitle_offset_ids.size()) {
@@ -1381,7 +1379,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 			}
 		}
 
-		xOffsetInPixels = (m_bMVC_Base_View_R_flag != rd->m_bStereo3DSwapLR) ? -m_nStereoOffsetInPixels : m_nStereoOffsetInPixels;
+		xOffsetInPixels = (m_bMVC_Base_View_R_flag != rs.bStereo3DSwapLR) ? -m_nStereoOffsetInPixels : m_nStereoOffsetInPixels;
 	}
 	AlphaBltSubPic(rSrcPri, rDstVid, xOffsetInPixels);
 
@@ -1432,7 +1430,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 
 			rcDst.left += rcDst.Width() / 2;
 			rcTemp.OffsetRect(xOffsetInPixels * 2, 0);
-		} else if (rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM || rd->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
+		} else if (rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM || rs.iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
 			CRect rcTemp(rcDst);
 			rcTemp.bottom -= rcTemp.Height() / 2;
 			rcTemp.OffsetRect(-xOffsetInPixels, 0);
@@ -1450,12 +1448,12 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		Stereo3DTransform(pBackBuffer, rDstVid);
 	}
 
-	if (rd->m_bResetStats) {
+	if (rs.bResetStats) {
 		ResetStats();
-		rd->m_bResetStats = false;
+		rs.bResetStats = false;
 	}
 
-	if (rd->m_iDisplayStats) {
+	if (rs.iDisplayStats) {
 		DrawStats();
 	}
 
@@ -1787,10 +1785,9 @@ void CDX9AllocatorPresenter::ResetStats()
 void CDX9AllocatorPresenter::DrawStats()
 {
 	const CRenderersSettings& rs = GetRenderersSettings();
-	const CRenderersData* rd = GetRenderersData();
 
 	int iDetailedStats = 2;
-	switch (rd->m_iDisplayStats) {
+	switch (rs.iDisplayStats) {
 		case 1:
 			iDetailedStats = 2;
 			break;

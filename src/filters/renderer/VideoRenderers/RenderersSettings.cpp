@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -121,6 +121,12 @@ void CRenderersSettings::SetDefault()
 	bSubpicAnimationWhenBuffering	= true;
 	bSubpicAllowDrop				= true;
 	iSubpicStereoMode				= 0;
+
+	bTearingTest					= false;
+	iDisplayStats					= 0;
+	bResetStats						= false;
+	iStereo3DTransform				= STEREO3D_AsIs;
+	bStereo3DSwapLR					= false;
 }
 
 void CRenderersSettings::Load()
@@ -245,17 +251,6 @@ void CRenderersSettings::Save()
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// CRenderersData construction
-
-CRenderersData::CRenderersData()
-	: m_bTearingTest(false)
-	, m_iDisplayStats(0)
-	, m_bResetStats(false)
-	, m_iStereo3DTransform(STEREO3D_AsIs)
-	, m_bStereo3DSwapLR(false)
-{
-}
-
 
 HINSTANCE GetD3X9Dll()
 {

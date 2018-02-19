@@ -2238,11 +2238,6 @@ void CMPlayerCApp::RunAsAdministrator(LPCTSTR strCommand, LPCTSTR strArgs, bool 
 	}
 }
 
-CRenderersData* GetRenderersData()
-{
-	return &AfxGetMyApp()->m_Renderers;
-}
-
 CRenderersSettings& GetRenderersSettings()
 {
 	return AfxGetAppSettings().m_VRSettings;

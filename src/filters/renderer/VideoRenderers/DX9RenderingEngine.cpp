@@ -298,7 +298,6 @@ HRESULT CDX9RenderingEngine::RenderVideo(IDirect3DSurface9* pRenderTarget, const
 	HRESULT hr = S_OK;
 
 	CRenderersSettings& rs = GetRenderersSettings();
-	CRenderersData* rd = GetRenderersData();
 
 	// Initialize the processing pipeline
 	bool bCustomPixelShaders = false;
@@ -577,7 +576,7 @@ HRESULT CDX9RenderingEngine::Stereo3DTransform(IDirect3DSurface9* pRenderTarget,
 
 	HRESULT hr = S_OK;
 
-	if (GetRenderersData()->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
+	if (GetRenderersSettings().iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
 		if (!m_pConvertToInterlacePixelShader) {
 			if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
 				hr = CreateShaderFromResource(m_pD3DDevEx, &m_pConvertToInterlacePixelShader, IDF_SHADER_PS20_CONVERT_TO_INTERLACE);

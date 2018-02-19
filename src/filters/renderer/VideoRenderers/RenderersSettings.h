@@ -167,6 +167,12 @@ public:
 	bool	bSubpicAllowDrop;
 	int		iSubpicStereoMode;
 
+	bool	bTearingTest;       // not saved
+	int		iDisplayStats;      // not saved
+	bool	bResetStats;        // not saved. Set to reset the presentation statistics
+	int		iStereo3DTransform; // not saved
+	bool	bStereo3DSwapLR;    // not saved
+
 	CRenderersSettings();
 
 	void	SetDefault();
@@ -194,21 +200,7 @@ public:
 	}
 };
 
-class CRenderersData
-{
-public:
-	CRenderersData();
-
-	bool	m_bTearingTest;
-	int		m_iDisplayStats;
-	bool	m_bResetStats; // Set to reset the presentation statistics
-	int		m_iStereo3DTransform;
-
-	bool	m_bStereo3DSwapLR;
-};
-
 extern CRenderersSettings&	GetRenderersSettings();
-extern CRenderersData*		GetRenderersData();
 
 extern bool LoadResource(UINT resid, CStringA& str, LPCTSTR restype);
 

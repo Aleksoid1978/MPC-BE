@@ -1005,9 +1005,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	iStereo3DMode	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, STEREO3D_AUTO);
 	iStereo3DMode	= discard(iStereo3DMode, (int)STEREO3D_AUTO, (int)STEREO3D_OVERUNDER, STEREO3D_AUTO);
 	if (iStereo3DMode == ID_STEREO3D_ROW_INTERLEAVED) {
-		GetRenderersData()->m_iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
+		GetRenderersSettings().iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
 	} else {
-		GetRenderersData()->m_iStereo3DTransform = STEREO3D_AsIs;
+		GetRenderersSettings().iStereo3DTransform = STEREO3D_AsIs;
 	}
 	bStereo3DSwapLR	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_SWAPLEFTRIGHT, FALSE);
 

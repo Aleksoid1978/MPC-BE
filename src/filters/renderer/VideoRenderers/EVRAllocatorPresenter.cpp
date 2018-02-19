@@ -1028,7 +1028,7 @@ bool CEVRAllocatorPresenter::GetImageFromMixer()
 		REFERENCE_TIME nsDuration;
 		pSample->GetSampleDuration(&nsDuration);
 
-		if (GetRenderersData()->m_bTearingTest) {
+		if (GetRenderersSettings().bTearingTest) {
 			RECT rcTearing;
 
 			rcTearing.left		= m_nTearingPos;
