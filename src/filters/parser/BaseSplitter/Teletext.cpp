@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2017 see Authors.txt
+ * (C) 2015-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Based on telxcc.c from ccextractor source code
- * http://ccextractor.sourceforge.net/
+ * https://github.com/CCExtractor/ccextractor
  */
 
 #include "stdafx.h"
@@ -308,11 +308,26 @@ void CTeletext::ProcessTeletextPage()
 		uint8_t col_start = 40;
 		uint8_t col_stop = 40;
 
-		for (int8_t col = 39; col >= 0; col--) {
-			if (m_page_buffer.text[row][col] == 0xb) {
-				col_start = col;
-				line_count++;
-				break;
+		uint8_t box_open = NO;
+		for (int8_t col = 0; col < 40; col++) {
+			// replace all 0/B and 0/A characters with 0/20, as specified in ETS 300 706:
+			// Unless operating in "Hold Mosaics" mode, each character space occupied by a
+			// spacing attribute is displayed as a SPACE
+			if (m_page_buffer.text[row][col] == 0xb) { // open the box
+				if (col_start == 40) {
+					col_start = col;
+					line_count++;
+				} else {
+					m_page_buffer.text[row][col] == 0x20;
+				}
+				box_open = YES;
+			} else if (m_page_buffer.text[row][col] == 0xa) { // close the box
+				m_page_buffer.text[row][col] == 0x20;
+				box_open = NO;
+			} else if (!box_open && col_start < 40 && m_page_buffer.text[row][col] > 0x20) {
+				// characters between 0xA and 0xB shouldn't be displayed
+				// m_page_buffer.text[row][col] > 0x20 added to preserve color information
+				m_page_buffer.text[row][col] == 0x20;
 			}
 		}
 		// line is empty
@@ -330,9 +345,6 @@ void CTeletext::ProcessTeletextPage()
 					col_start = col;
 				}
 				col_stop = col;
-			}
-			if (m_page_buffer.text[row][col] == 0xa) {
-				break;
 			}
 		}
 

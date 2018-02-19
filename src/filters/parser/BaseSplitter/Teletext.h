@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2017 see Authors.txt
+ * (C) 2015-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Based on telxcc.c from ccextractor source code
- * http://ccextractor.sourceforge.net/
+ * https://github.com/CCExtractor/ccextractor
  */
 
 #pragma once
