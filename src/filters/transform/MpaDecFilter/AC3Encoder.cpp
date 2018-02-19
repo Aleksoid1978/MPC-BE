@@ -42,7 +42,12 @@ CAC3Encoder::CAC3Encoder()
 	, m_buffersize(0)
 	, m_framesize(0)
 {
+#ifdef DEBUG_OR_LOG
 	av_log_set_callback(ff_log);
+#else
+	av_log_set_callback(nullptr);
+#endif
+
 	m_pAVCodec = avcodec_find_encoder(AV_CODEC_ID_AC3); // AC-3
 }
 
