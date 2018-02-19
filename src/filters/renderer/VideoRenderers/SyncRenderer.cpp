@@ -1684,6 +1684,16 @@ STDMETHODIMP CBaseAP::GetInt(LPCSTR field, int* value)
 		return S_OK;
 	}
 
+	if (strcmp(field, "supportedLevels") == 0) {
+		if (GetRenderersSettings().iEVROutputRange == 1) {
+			*value = 3; // TV preferred
+		} else {
+			*value = 2; // PC preferred
+		}
+
+		return S_OK;
+	}
+
 	return __super::GetInt(field, value);
 }
 

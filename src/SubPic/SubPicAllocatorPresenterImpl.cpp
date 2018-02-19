@@ -263,20 +263,6 @@ STDMETHODIMP CSubPicAllocatorPresenterImpl::GetBool(LPCSTR field, bool* value)
 STDMETHODIMP CSubPicAllocatorPresenterImpl::GetInt(LPCSTR field, int* value)
 {
 	CheckPointer(value, E_POINTER);
-	if (!strcmp(field, "supportedLevels")) {
-		if (CComQIPtr<IMFVideoPresenter> pEVR = (ISubPicAllocatorPresenter3*)this) {
-			const CRenderersSettings& rs = GetRenderersSettings();
-			if (rs.iEVROutputRange == 1) {
-				*value = 3; // TV preferred
-			} else {
-				*value = 2; // PC preferred
-			}
-		} else {
-			*value = 0; // PC only
-		}
-		return S_OK;
-	}
-
 	return E_INVALIDARG;
 }
 
