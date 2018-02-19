@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,8 +25,6 @@
 #include <Version.h>
 #include "XySubPicQueueImpl.h"
 #include "XySubPicProvider.h"
-#include <d3d9.h>
-#include <evr.h>
 #include <dxva2api.h>
 
 CSubPicAllocatorPresenterImpl::CSubPicAllocatorPresenterImpl(HWND hWnd, HRESULT& hr, CString *_pError)
@@ -116,7 +114,6 @@ void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, cons
 			CRect rcVideo(videoRect);
 
 			const CRenderersSettings& rs = GetRenderersSettings();
-			const CRenderersData* rd = GetRenderersData();
 
 			if (rs.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE) {
 				CRect rcTempWindow(windowRect);
@@ -129,7 +126,7 @@ void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, cons
 				rcWindow.left += rcWindow.Width() / 2;
 				rcVideo.left += rcVideo.Width() / 2;
 
-			} else if (rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM || rd->m_iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
+			} else if (rs.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM || rs.iStereo3DTransform == STEREO3D_HalfOverUnder_to_Interlace) {
 				CRect rcTempWindow(windowRect);
 				rcTempWindow.bottom -= rcTempWindow.Height() / 2;
 				CRect rcTempVideo(videoRect);
@@ -142,7 +139,7 @@ void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, cons
 
 			}
 
-			AlphaBlt(rcWindow, rcVideo, pSubPic, NULL, xOffsetInPixels, rs.iSubpicStereoMode == SUBPIC_STEREO_NONE && rd->m_iStereo3DTransform != STEREO3D_HalfOverUnder_to_Interlace);
+			AlphaBlt(rcWindow, rcVideo, pSubPic, NULL, xOffsetInPixels, rs.iSubpicStereoMode == SUBPIC_STEREO_NONE && rs.iStereo3DTransform != STEREO3D_HalfOverUnder_to_Interlace);
 		}
 	}
 }
