@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,6 +20,8 @@
 
 #pragma once
 
+#ifdef DEBUG_OR_LOG
+
 extern "C" {
 	#include <ffmpeg/libavutil/log.h>
 }
@@ -27,7 +29,6 @@ extern "C" {
 #define LOG_BUF_LEN 2048
 inline void ff_log(void* ptr, int level, const char *fmt, va_list valist)
 {
-#ifdef DEBUG_OR_LOG
 	if (level <= AV_LOG_VERBOSE) {
 		static int print_prefix = 1;
 		static char line[LOG_BUF_LEN] = {};
@@ -41,5 +42,6 @@ inline void ff_log(void* ptr, int level, const char *fmt, va_list valist)
 
 		DLog(L"FF_LOG : %S", line);
 	}
-#endif
 }
+
+#endif
