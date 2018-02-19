@@ -183,6 +183,7 @@ BOOL CFullscreenWnd::PreTranslateMessage(MSG* pMsg)
 		case WM_XBUTTONDOWN :
 
 		case WM_MOUSEWHEEL :
+		case WM_MOUSEHWHEEL :
 
 			m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
 			return TRUE;
