@@ -213,7 +213,11 @@ CFFAudioDecoder::CFFAudioDecoder()
 {
 	memset(&m_raData, 0, sizeof(m_raData));
 
+#ifdef DEBUG_OR_LOG
 	av_log_set_callback(ff_log);
+#else
+	av_log_set_callback(nullptr);
+#endif
 }
 
 static bool flac_parse_block_header(CGolombBuffer& gb, BYTE& last, BYTE& type, DWORD& size) {

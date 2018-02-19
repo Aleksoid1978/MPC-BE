@@ -1091,7 +1091,12 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		m_nSwRGBLevels = 0;
 	}
 
+#ifdef DEBUG_OR_LOG
 	av_log_set_callback(ff_log);
+#else
+	av_log_set_callback(nullptr);
+#endif
+
 	m_FormatConverter.SetOptions(m_nSwRGBLevels);
 
 	HWND hWnd = nullptr;

@@ -23,6 +23,7 @@
 #include <MMReg.h>
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
+#include "../../../DSUtil/ff_log.h"
 #include "AudioHelper.h"
 
 extern "C"
@@ -34,6 +35,12 @@ extern "C"
 
 CFilter::CFilter()
 {
+#ifdef DEBUG_OR_LOG
+	av_log_set_callback(ff_log);
+#else
+	av_log_set_callback(nullptr);
+#endif
+
 	avfilter_register_all();
 	m_pFrame = av_frame_alloc();
 }
