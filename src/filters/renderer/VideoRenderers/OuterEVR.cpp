@@ -25,10 +25,45 @@
 
 using namespace DSObjects;
 
+COuterEVR::COuterEVR(const TCHAR* pName, LPUNKNOWN pUnk, HRESULT& hr, CEVRAllocatorPresenter* pAllocatorPresenter)
+	: CUnknown(pName, pUnk)
+{
+	hr = m_pEVR.CoCreateInstance(CLSID_EnhancedVideoRenderer, GetOwner());
+	CComQIPtr<IBaseFilter> pEVRBase = m_pEVR;
+	m_pEVRBase = pEVRBase; // Don't keep a second reference on the EVR filter
+	m_pAllocatorPresenter = pAllocatorPresenter;
+}
+
+COuterEVR::~COuterEVR()
+{
+}
+
+STDMETHODIMP COuterEVR::NonDelegatingQueryInterface(REFIID riid, void** ppv)
+{
+	HRESULT hr;
+
+	if (riid == __uuidof(IBaseFilter)) {
+		return GetInterface((IBaseFilter*)this, ppv);
+	}
+	if (riid == __uuidof(IMediaFilter)) {
+		return GetInterface((IMediaFilter*)this, ppv);
+	}
+	if (riid == __uuidof(IPersist)) {
+		return GetInterface((IPersist*)this, ppv);
+	}
+
+	hr = m_pEVR ? m_pEVR->QueryInterface(riid, ppv) : E_NOINTERFACE;
+	if (m_pEVR && FAILED(hr)) {
+		hr = m_pAllocatorPresenter ? m_pAllocatorPresenter->QueryInterface(riid, ppv) : E_NOINTERFACE;
+	}
+
+	return SUCCEEDED(hr) ? hr : __super::NonDelegatingQueryInterface(riid, ppv);
+}
+
 STDMETHODIMP COuterEVR::EnumPins(__out  IEnumPins** ppEnum)
 {
 	if (m_pEVRBase) {
-	    return m_pEVRBase->EnumPins(ppEnum);
+		return m_pEVRBase->EnumPins(ppEnum);
 	}
 	return E_NOTIMPL;
 }
