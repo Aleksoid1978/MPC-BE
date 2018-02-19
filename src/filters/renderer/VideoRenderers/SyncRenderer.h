@@ -574,6 +574,9 @@ namespace GothSync
 		CSyncRenderer(const TCHAR* pName, LPUNKNOWN pUnk, HRESULT& hr, CSyncAP *pAllocatorPresenter);
 		~CSyncRenderer();
 
+		DECLARE_IUNKNOWN;
+		virtual HRESULT STDMETHODCALLTYPE NonDelegatingQueryInterface(REFIID riid, void** ppvObject);
+
 		// IBaseFilter
 		virtual HRESULT STDMETHODCALLTYPE EnumPins(__out IEnumPins **ppEnum);
 		virtual HRESULT STDMETHODCALLTYPE FindPin(LPCWSTR Id, __out IPin **ppPin);
@@ -587,9 +590,6 @@ namespace GothSync
 		virtual HRESULT STDMETHODCALLTYPE SetSyncSource(__in_opt  IReferenceClock *pClock);
 		virtual HRESULT STDMETHODCALLTYPE GetSyncSource(__deref_out_opt  IReferenceClock **pClock);
 		virtual HRESULT STDMETHODCALLTYPE GetClassID(__RPC__out CLSID *pClassID);
-
-		DECLARE_IUNKNOWN;
-		virtual HRESULT STDMETHODCALLTYPE NonDelegatingQueryInterface(REFIID riid, void** ppvObject);
 	};
 
 	// CGenlock

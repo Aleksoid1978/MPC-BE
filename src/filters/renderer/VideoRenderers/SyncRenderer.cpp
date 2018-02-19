@@ -3837,12 +3837,25 @@ CSyncRenderer::~CSyncRenderer()
 {
 }
 
-HRESULT STDMETHODCALLTYPE CSyncRenderer::GetState(DWORD dwMilliSecsTimeout, __out  FILTER_STATE *State)
+STDMETHODIMP CSyncRenderer::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
-	if (m_pEVRBase) {
-		return m_pEVRBase->GetState(dwMilliSecsTimeout, State);
+	HRESULT hr;
+
+	if (riid == __uuidof(IBaseFilter)) {
+		return GetInterface((IBaseFilter*)this, ppv);
 	}
-	return E_NOTIMPL;
+	if (riid == __uuidof(IMediaFilter)) {
+		return GetInterface((IMediaFilter*)this, ppv);
+	}
+	if (riid == __uuidof(IPersist)) {
+		return GetInterface((IPersist*)this, ppv);
+	}
+
+	hr = m_pEVR ? m_pEVR->QueryInterface(riid, ppv) : E_NOINTERFACE;
+	if (m_pEVR && FAILED(hr)) {
+		hr = m_pAllocatorPresenter ? m_pAllocatorPresenter->QueryInterface(riid, ppv) : E_NOINTERFACE;
+	}
+	return SUCCEEDED(hr) ? hr : __super::NonDelegatingQueryInterface(riid, ppv);
 }
 
 STDMETHODIMP CSyncRenderer::EnumPins(__out IEnumPins **ppEnum)
@@ -3909,6 +3922,14 @@ STDMETHODIMP CSyncRenderer::Run(REFERENCE_TIME tStart)
 	return E_NOTIMPL;
 }
 
+HRESULT STDMETHODCALLTYPE CSyncRenderer::GetState(DWORD dwMilliSecsTimeout, __out  FILTER_STATE *State)
+{
+	if (m_pEVRBase) {
+		return m_pEVRBase->GetState(dwMilliSecsTimeout, State);
+	}
+	return E_NOTIMPL;
+}
+
 STDMETHODIMP CSyncRenderer::SetSyncSource(__in_opt IReferenceClock *pClock)
 {
 	if (m_pEVRBase) {
@@ -3933,29 +3954,7 @@ STDMETHODIMP CSyncRenderer::GetClassID(__RPC__out CLSID *pClassID)
 	return E_NOTIMPL;
 }
 
-STDMETHODIMP CSyncRenderer::NonDelegatingQueryInterface(REFIID riid, void** ppv)
-{
-	HRESULT hr;
-
-	if (riid == __uuidof(IBaseFilter)) {
-		return GetInterface((IBaseFilter*)this, ppv);
-	}
-	if (riid == __uuidof(IMediaFilter)) {
-		return GetInterface((IMediaFilter*)this, ppv);
-	}
-	if (riid == __uuidof(IPersist)) {
-		return GetInterface((IPersist*)this, ppv);
-	}
-	if (riid == __uuidof(IBaseFilter)) {
-		return GetInterface((IBaseFilter*)this, ppv);
-	}
-
-	hr = m_pEVR ? m_pEVR->QueryInterface(riid, ppv) : E_NOINTERFACE;
-	if (m_pEVR && FAILED(hr)) {
-		hr = m_pAllocatorPresenter ? m_pAllocatorPresenter->QueryInterface(riid, ppv) : E_NOINTERFACE;
-	}
-	return SUCCEEDED(hr) ? hr : __super::NonDelegatingQueryInterface(riid, ppv);
-}
+// CSyncAP
 
 STDMETHODIMP CSyncAP::SetD3DFullscreen(bool fEnabled)
 {
