@@ -318,16 +318,16 @@ void CTeletext::ProcessTeletextPage()
 					col_start = col;
 					line_count++;
 				} else {
-					m_page_buffer.text[row][col] == 0x20;
+					m_page_buffer.text[row][col] = 0x20;
 				}
 				box_open = YES;
 			} else if (m_page_buffer.text[row][col] == 0xa) { // close the box
-				m_page_buffer.text[row][col] == 0x20;
+				m_page_buffer.text[row][col] = 0x20;
 				box_open = NO;
 			} else if (!box_open && col_start < 40 && m_page_buffer.text[row][col] > 0x20) {
 				// characters between 0xA and 0xB shouldn't be displayed
 				// m_page_buffer.text[row][col] > 0x20 added to preserve color information
-				m_page_buffer.text[row][col] == 0x20;
+				m_page_buffer.text[row][col] = 0x20;
 			}
 		}
 		// line is empty
