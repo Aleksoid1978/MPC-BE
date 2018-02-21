@@ -2119,16 +2119,22 @@ void CDX9AllocatorPresenter::DrawStats()
 					CGPUUsage::statistic gpu_statistic;
 					m_GPUUsage.GetUsage(gpu_statistic);
 
-					strText.AppendFormat(L", GPU:%3u%%", gpu_statistic.gpu);
+					if (m_GPUUsage.IsUseStatistics() || m_GPUUsage.GetType() != CGPUUsage::INTEL_GPU) {
+						strText.AppendFormat(L", GPU:%3u%%", gpu_statistic.gpu);
+					}
 
 					if (gpu_statistic.clock) {
 						strText.AppendFormat(L" (%4u MHz)", gpu_statistic.clock);
 					}
 
 					if (m_GPUUsage.GetType() == CGPUUsage::NVIDIA_GPU) {
-						strText.AppendFormat(L", Video Engine:%3u%%", gpu_statistic.decode);
-					} else if (m_GPUUsage.GetType() == CGPUUsage::INTEL_GPU) {
-						strText.AppendFormat(L", Video Decode/Processing:%3u%%/%3u%%", gpu_statistic.decode, gpu_statistic.processing);
+						strText.AppendFormat(L", Video Decode:%3u%%", gpu_statistic.decode);
+					} else if (m_GPUUsage.IsUseStatistics()) {
+						if (m_GPUUsage.GetType() == CGPUUsage::INTEL_GPU) {
+							strText.AppendFormat(L", Video Decode/Processing:%3u%%/%3u%%", gpu_statistic.decode, gpu_statistic.processing);
+						} else {
+							strText.AppendFormat(L", Video Decode:%3u%%", gpu_statistic.decode);
+						}
 					}
 
 					if (gpu_statistic.memUsageTotal) {
