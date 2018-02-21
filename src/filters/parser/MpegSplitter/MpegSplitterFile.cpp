@@ -1506,7 +1506,7 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 			}
 
 			const int packet_len = h.bytes - h2.hdr_size;
-			const int max_len    = std::min(packet_len, h2.section_length);
+			const int max_len    = std::min(packet_len, (int)h2.section_length);
 
 			if (max_len > 0) {
 				ProgramData = &m_ProgramData[h.pid];
@@ -2913,7 +2913,7 @@ bool CMpegSplitterFile::ReadPSI(psihdr& h)
 	h.private_bits               = (BYTE)BitRead(1);
 	h.reserved1                  = (BYTE)BitRead(2);
 	h.section_length_unused      = (BYTE)BitRead(2);
-	h.section_length             = (int)BitRead(10);
+	h.section_length             = (WORD)BitRead(10);
 	h.hdr_size += 3;
 	if (h.section_syntax_indicator) {
 		h.transport_stream_id    = (WORD)BitRead(16);
