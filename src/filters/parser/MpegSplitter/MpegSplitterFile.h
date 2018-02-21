@@ -169,7 +169,7 @@ public:
 		BYTE private_bits:1;
 		BYTE reserved1:2;
 		BYTE section_length_unused:2;
-		int section_length:10;
+		WORD section_length:10;
 		WORD transport_stream_id;
 		BYTE table_id;
 		BYTE reserved2:2;
