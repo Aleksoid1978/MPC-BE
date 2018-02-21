@@ -525,12 +525,15 @@ void CGPUUsage::GetUsage(statistic& gpu_statistic)
 								m_statistic.processing = llMulDiv(item3.gputotalRunningTime.Delta, 100, elapsedTime, 0);
 							}
 						} else {
-							for (auto& item : gpuTimeStatistics) {
+							for (size_t i = 0; i < gpuTimeStatistics.size(); i++) {
+								auto& item = gpuTimeStatistics[i];
 								if (item.runningTime) {
 									UpdateDelta(item.gputotalRunningTime, item.runningTime);
-									if (item.gputotalRunningTime.Delta) {
-										const BYTE gpuUsage = llMulDiv(item.gputotalRunningTime.Delta, 100, elapsedTime, 0);
-										m_statistic.gpu = std::max(m_statistic.gpu, gpuUsage);
+									if (i == 0) {
+										m_statistic.gpu = llMulDiv(item.gputotalRunningTime.Delta, 100, elapsedTime, 0);
+									} else {
+										const BYTE decodeUsage = llMulDiv(item.gputotalRunningTime.Delta, 100, elapsedTime, 0);
+										m_statistic.decode = std::max(m_statistic.decode, decodeUsage);
 									}
 								}
 							}

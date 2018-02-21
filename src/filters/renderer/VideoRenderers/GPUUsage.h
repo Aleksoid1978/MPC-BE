@@ -103,6 +103,8 @@ public:
 	void    GetUsage(statistic& gpu_statistic);
 	GPUType GetType() const { return m_GPUType; }
 
+	bool    IsUseStatistics() const { return !gpuTimeStatistics.empty(); }
+
 private:
 	bool EnoughTimePassed();
 
