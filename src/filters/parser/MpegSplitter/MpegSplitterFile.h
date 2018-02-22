@@ -308,9 +308,9 @@ public:
 	typedef CStreamList CStreamsList[unknown];
 	CStreamsList m_streams;
 
-	void SearchStreams(__int64 start, __int64 stop, DWORD msTimeOut = INFINITE);
-	DWORD AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len, BOOL bAddStream = TRUE);
-	void  AddHdmvPGStream(WORD pid, LPCSTR language_code);
+	void SearchStreams(const __int64& start, const __int64& stop, const DWORD& msTimeOut = INFINITE);
+	DWORD AddStream(const WORD& pid, BYTE pesid, const BYTE& ext_id, const DWORD& len, const BOOL& bAddStream = TRUE);
+	void  AddHdmvPGStream(const WORD& pid, LPCSTR language_code);
 	CMpegSplitterFile::CStreamList* GetMasterStream();
 	bool IsHdmv() {
 		return m_ClipInfo.IsHdmv();
@@ -402,14 +402,14 @@ public:
 	};
 	std::map<WORD, programData> m_ProgramData;
 
-	void SearchPrograms(__int64 start, __int64 stop);
+	void SearchPrograms(const __int64& start, const __int64& stop);
 	void ReadPrograms(const trhdr& h);
 	void ReadPAT(std::vector<BYTE>& pData);
-	void ReadPMT(std::vector<BYTE>& pData, WORD pid);
+	void ReadPMT(std::vector<BYTE>& pData, const WORD& pid);
 	void ReadSDT(std::vector<BYTE>& pData);
-	void ReadVCT(std::vector<BYTE>& pData, BYTE table_id);
+	void ReadVCT(std::vector<BYTE>& pData, const BYTE& table_id);
 
-	const program* FindProgram(WORD pid, int* pStream = nullptr, const CHdmvClipInfo::Stream** pClipInfo = nullptr);
+	const program* FindProgram(const WORD& pid, int* pStream = nullptr, const CHdmvClipInfo::Stream** pClipInfo = nullptr);
 
 	// program stream map - mpeg-ps
 	PES_STREAM_TYPE m_psm[256] = {};

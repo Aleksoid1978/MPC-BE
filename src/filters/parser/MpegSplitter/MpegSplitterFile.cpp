@@ -603,7 +603,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(const DWORD& TrackNum, const stream_co
 	return rt;
 }
 
-void CMpegSplitterFile::SearchPrograms(__int64 start, __int64 stop)
+void CMpegSplitterFile::SearchPrograms(const __int64& start, const __int64& stop)
 {
 	if (m_type != MPEG_TYPES::mpeg_ts || m_ClipInfo.IsHdmv()) {
 		return;
@@ -624,7 +624,7 @@ void CMpegSplitterFile::SearchPrograms(__int64 start, __int64 stop)
 	}
 }
 
-void CMpegSplitterFile::SearchStreams(__int64 start, __int64 stop, DWORD msTimeOut/* = INFINITE*/)
+void CMpegSplitterFile::SearchStreams(const __int64& start, const __int64& stop, const DWORD& msTimeOut/* = INFINITE*/)
 {
 	const ULONGLONG startTime = GetPerfCounter();
 
@@ -836,7 +836,7 @@ static const struct {
 	{ 'Opus', CMpegSplitterFile::stream_codec::OPUS,  OPUS_AUDIO  }
 };
 
-DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len, BOOL bAddStream/* = TRUE*/)
+DWORD CMpegSplitterFile::AddStream(const WORD& pid, BYTE pesid, const BYTE& ext_id, const DWORD& len, const BOOL& bAddStream/* = TRUE*/)
 {
 	if (pid) {
 		if (pesid) {
@@ -1440,7 +1440,7 @@ DWORD CMpegSplitterFile::AddStream(WORD pid, BYTE pesid, BYTE ext_id, DWORD len,
 	return s;
 }
 
-void CMpegSplitterFile::AddHdmvPGStream(WORD pid, LPCSTR language_code)
+void CMpegSplitterFile::AddHdmvPGStream(const WORD& pid, LPCSTR language_code)
 {
 	stream s;
 	s.pid   = pid;
@@ -1865,7 +1865,7 @@ static int mp4_read_dec_config_descr(std::vector<BYTE>& dec_config_descr, CMpegS
 	return -1;
 }
 
-void CMpegSplitterFile::ReadPMT(std::vector<BYTE>& pData, WORD pid)
+void CMpegSplitterFile::ReadPMT(std::vector<BYTE>& pData, const WORD& pid)
 {
 	mp4_descr.Clear();
 
@@ -1874,9 +1874,9 @@ void CMpegSplitterFile::ReadPMT(std::vector<BYTE>& pData, WORD pid)
 	CGolombBuffer gb(pData.data(), pData.size());
 	int len = gb.GetSize();
 
-	BYTE reserved1           = (BYTE)gb.BitRead(3);
-	WORD PCR_PID             = (WORD)gb.BitRead(13);
-	BYTE reserved2           = (BYTE)gb.BitRead(4);
+	const BYTE reserved1     = (BYTE)gb.BitRead(3);
+	const WORD PCR_PID       = (WORD)gb.BitRead(13);
+	const BYTE reserved2     = (BYTE)gb.BitRead(4);
 	WORD program_info_length = (WORD)gb.BitRead(12);
 	UNREFERENCED_PARAMETER(reserved1);
 	UNREFERENCED_PARAMETER(PCR_PID);
@@ -1911,11 +1911,11 @@ void CMpegSplitterFile::ReadPMT(std::vector<BYTE>& pData, WORD pid)
 	}
 
 	while (len >= 5) {
-		PES_STREAM_TYPE stream_type = (PES_STREAM_TYPE)gb.BitRead(8);
-		BYTE nreserved1             = (BYTE)gb.BitRead(3);
-		WORD pid                    = (WORD)gb.BitRead(13);
-		BYTE nreserved2             = (BYTE)gb.BitRead(4);
-		WORD ES_info_length         = (WORD)gb.BitRead(12);
+		const PES_STREAM_TYPE stream_type = (PES_STREAM_TYPE)gb.BitRead(8);
+		const BYTE nreserved1             = (BYTE)gb.BitRead(3);
+		const WORD pid                    = (WORD)gb.BitRead(13);
+		const BYTE nreserved2             = (BYTE)gb.BitRead(4);
+		WORD ES_info_length               = (WORD)gb.BitRead(12);
 		UNREFERENCED_PARAMETER(nreserved1);
 		UNREFERENCED_PARAMETER(nreserved2);
 
@@ -1937,8 +1937,8 @@ void CMpegSplitterFile::ReadPMT(std::vector<BYTE>& pData, WORD pid)
 		stream s_aac_mp4;
 
 		while (ES_info_length >= 2) {
-			BYTE descriptor_tag    = (BYTE)gb.BitRead(8);
-			BYTE descriptor_length = (BYTE)gb.BitRead(8);
+			const BYTE descriptor_tag = (BYTE)gb.BitRead(8);
+			BYTE descriptor_length    = (BYTE)gb.BitRead(8);
 			ES_info_length -= 2;
 
 			if (!descriptor_length) {
@@ -1958,9 +1958,9 @@ void CMpegSplitterFile::ReadPMT(std::vector<BYTE>& pData, WORD pid)
 						if (descriptor_length) {
 							gb.SkipBytes(descriptor_length);
 						}
-						for (size_t i = 0; i < _countof(StreamDesc); i++) {
-							if (codec_tag == StreamDesc[i].codec_tag) {
-								_streamData.codec = StreamDesc[i].codec;
+						for (const auto& streamDesc : StreamDesc) {
+							if (codec_tag == streamDesc.codec_tag) {
+								_streamData.codec = streamDesc.codec;
 								break;
 							}
 						}
@@ -1972,7 +1972,7 @@ void CMpegSplitterFile::ReadPMT(std::vector<BYTE>& pData, WORD pid)
 				case 0x1E: // SL descriptor
 				case 0x1F: // FMC descriptor
 					{
-						WORD es_id = gb.BitRead(16); descriptor_length -= 2;
+						const WORD es_id = gb.BitRead(16); descriptor_length -= 2;
 						if (descriptor_length) {
 							gb.SkipBytes(descriptor_length);
 						}
@@ -2304,15 +2304,15 @@ static void Descriptor_A1(CGolombBuffer& gb, int descriptor_length, std::map<WOR
 	}
 }
 
-void CMpegSplitterFile::ReadVCT(std::vector<BYTE>& pData, BYTE table_id)
+void CMpegSplitterFile::ReadVCT(std::vector<BYTE>& pData, const BYTE& table_id)
 {
 	CGolombBuffer gb(pData.data(), pData.size());
 
 	gb.BitRead(8); // protocol_version
-	BYTE num_channels_in_section = (BYTE)gb.BitRead(8);
+	const BYTE num_channels_in_section = (BYTE)gb.BitRead(8);
 	for (BYTE cnt = 0; cnt < num_channels_in_section; cnt++) {
 		// name stored in UTF16BE encoding
-		int nLength = table_id == 0xDA ? 8 : 7;
+		const int nLength = table_id == 0xDA ? 8 : 7;
 		CString short_name;
 		gb.ReadBuffer((BYTE*)short_name.GetBufferSetLength(nLength), nLength * 2);
 		for (int i = 0, j = short_name.GetLength(); i < j; i++) {
@@ -2336,7 +2336,7 @@ void CMpegSplitterFile::ReadVCT(std::vector<BYTE>& pData, BYTE table_id)
 
 		gb.BitRead(16); // channel_TSID
 
-		WORD program_number = (WORD)gb.BitRead(16);
+		const WORD program_number = (WORD)gb.BitRead(16);
 		if (program_number > 0 && program_number < 0x2000) {
 			if (auto p = m_programs.FindProgram(program_number)) {
 				p->name = short_name;
@@ -2363,9 +2363,9 @@ void CMpegSplitterFile::ReadVCT(std::vector<BYTE>& pData, BYTE table_id)
 		int descriptors_size = (int)gb.BitRead(10);
 		if (descriptors_size) {
 			while (descriptors_size > 0) {
-				BYTE descriptor_tag    = (BYTE)gb.BitRead(8);
-				BYTE descriptor_length = (BYTE)gb.BitRead(8);
-				descriptors_size      -= (2 + descriptor_length);
+				const BYTE descriptor_tag = (BYTE)gb.BitRead(8);
+				BYTE descriptor_length    = (BYTE)gb.BitRead(8);
+				descriptors_size         -= (2 + descriptor_length);
 				if (descriptors_size < 0) {
 					break;
 				}
@@ -2391,7 +2391,7 @@ void CMpegSplitterFile::ReadVCT(std::vector<BYTE>& pData, BYTE table_id)
 	}
 }
 
-const CMpegSplitterFile::program* CMpegSplitterFile::FindProgram(WORD pid, int* pStream/* = nullptr*/, const CHdmvClipInfo::Stream** ppClipInfo/* = nullptr*/)
+const CMpegSplitterFile::program* CMpegSplitterFile::FindProgram(const WORD& pid, int* pStream/* = nullptr*/, const CHdmvClipInfo::Stream** ppClipInfo/* = nullptr*/)
 {
 	if (pStream) {
 		*pStream = -1;
