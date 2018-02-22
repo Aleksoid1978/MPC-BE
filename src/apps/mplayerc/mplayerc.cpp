@@ -1119,24 +1119,24 @@ BOOL CMPlayerCApp::SendCommandLine(HWND hWnd)
 		return FALSE;
 	}
 
-	int bufflen = sizeof(DWORD);
+	size_t bufflen = sizeof(DWORD);
 
 	for (const auto& item : m_cmdln) {
-		bufflen += (item.GetLength()+1)*sizeof(WCHAR);
+		bufflen += (item.GetLength() + 1) * sizeof(WCHAR);
 	}
 
-	CAutoVectorPtr<BYTE> buff;
-	if (!buff.Allocate(bufflen)) {
+	std::vector<BYTE> buff(bufflen);
+	if (buff.empty()) {
 		return FALSE;
 	}
 
-	BYTE* p = buff;
+	BYTE* p = buff.data();
 
 	*(DWORD*)p = m_cmdln.size();
 	p += sizeof(DWORD);
 
 	for (const auto& item : m_cmdln) {
-		int len = (item.GetLength()+1)*sizeof(WCHAR);
+		const size_t len = (item.GetLength() + 1) * sizeof(WCHAR);
 		memcpy(p, item, len);
 		p += len;
 	}
@@ -1144,7 +1144,7 @@ BOOL CMPlayerCApp::SendCommandLine(HWND hWnd)
 	COPYDATASTRUCT cds;
 	cds.dwData = 0x6ABE51;
 	cds.cbData = bufflen;
-	cds.lpData = (void*)(BYTE*)buff;
+	cds.lpData = buff.data();
 	return SendMessageW(hWnd, WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
 }
 
