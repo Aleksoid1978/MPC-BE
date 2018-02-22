@@ -28,5 +28,5 @@ struct Chapters {
 };
 
 CString GetCUECommand(CString& ln);
-void MakeCUETitle(CString &Title, const CString& title, const CString& performer, const UINT& trackNum = UINT_MAX);
+void MakeCUETitle(CString &Title, const CString& title, const CString& performer, const UINT trackNum = UINT_MAX);
 bool ParseCUESheet(CString cueData, std::list<Chapters> &ChaptersList, CString& Title, CString& Performer);

@@ -102,7 +102,7 @@ void CAPETag::Clear()
 	m_TagSize = m_TagFields = 0;
 }
 
-bool CAPETag::ReadFooter(BYTE *buf, const size_t& len)
+bool CAPETag::ReadFooter(BYTE *buf, const size_t len)
 {
 	m_TagSize = m_TagFields = 0;
 
@@ -134,7 +134,7 @@ bool CAPETag::ReadFooter(BYTE *buf, const size_t& len)
 	return true;
 }
 
-bool CAPETag::ReadTags(BYTE *buf, const size_t& len)
+bool CAPETag::ReadTags(BYTE *buf, const size_t len)
 {
 	if (!m_TagSize || m_TagSize != len) {
 		return false;

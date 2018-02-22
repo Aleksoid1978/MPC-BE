@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2017 see Authors.txt
+ * (C) 2012-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -95,7 +95,7 @@ static const fraction_t dirac_frame_rate[] = {
 	{25, 2},
 };
 
-bool ParseDiracHeader(const BYTE* data, const int& size, vc_params_t& params)
+bool ParseDiracHeader(const BYTE* data, const int size, vc_params_t& params)
 {
 	memset(&params, 0, sizeof(params));
 
@@ -200,7 +200,7 @@ namespace AVCParser {
 
 #define H264_PROFILE_MULTIVIEW_HIGH	118
 #define H264_PROFILE_STEREO_HIGH	128
-	bool ParseSequenceParameterSet(const BYTE* data, const int& size, vc_params_t& params)
+	bool ParseSequenceParameterSet(const BYTE* data, const int size, vc_params_t& params)
 	{
 		static BYTE profiles[] = { 44, 66, 77, 88, 100, 110, 118, 122, 128, 144, 244 };
 		static BYTE levels[] = { 10, 11, 12, 13, 20, 21, 22, 30, 31, 32, 40, 41, 42, 50, 51, 52 };
@@ -416,7 +416,7 @@ namespace AVCParser {
 } // namespace AVCParser
 
 namespace HEVCParser {
-	void CreateSequenceHeaderAVC(const BYTE* data, const int& size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader)
+	void CreateSequenceHeaderAVC(const BYTE* data, const int size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader)
 	{
 		// copy VideoParameterSets(VPS), SequenceParameterSets(SPS) and PictureParameterSets(PPS) from AVCDecoderConfigurationRecord
 
@@ -460,7 +460,7 @@ namespace HEVCParser {
 		}
 	}
 
-	void CreateSequenceHeaderHEVC(const BYTE* data, const int& size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader)
+	void CreateSequenceHeaderHEVC(const BYTE* data, const int size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader)
 	{
 		// copy NAL units from HEVCDecoderConfigurationRecord
 
@@ -497,7 +497,7 @@ namespace HEVCParser {
 		}
 	}
 
-	static bool ParsePtl(CGolombBuffer& gb, const int& max_sub_layers_minus1, vc_params_t& params)
+	static bool ParsePtl(CGolombBuffer& gb, const int max_sub_layers_minus1, vc_params_t& params)
 	{
 		gb.BitRead(2);					// general_profile_space
 		gb.BitRead(1);					// general_tier_flag
@@ -671,7 +671,7 @@ namespace HEVCParser {
 		return true;
 	}
 
-	bool ParseSequenceParameterSet(const BYTE* data, const int& size, vc_params_t& params)
+	bool ParseSequenceParameterSet(const BYTE* data, const int size, vc_params_t& params)
 	{
 		// Recommendation H.265 (04/13) ( http://www.itu.int/rec/T-REC-H.265-201304-I )
 		// 7.3.2.2  Sequence parameter set RBSP syntax
@@ -917,7 +917,7 @@ namespace HEVCParser {
 		return true;
 	}
 
-	bool ParseVideoParameterSet(const BYTE* data, const int& size, vc_params_t& params)
+	bool ParseVideoParameterSet(const BYTE* data, const int size, vc_params_t& params)
 	{
 		if (size < 15) {
 			return false;
@@ -971,7 +971,7 @@ namespace HEVCParser {
 		return true;
 	}
 
-	bool ParseSequenceParameterSetHM91(const BYTE* data, const int& size, vc_params_t& params)
+	bool ParseSequenceParameterSetHM91(const BYTE* data, const int size, vc_params_t& params)
 	{
 		// decode SPS
 		CGolombBuffer gb(data, size, true);
@@ -1026,7 +1026,7 @@ namespace HEVCParser {
 		return true;
 	}
 
-	bool ParseAVCDecoderConfigurationRecord(const BYTE* data, const int& size, vc_params_t& params, const int& flv_hm/* = 0*/)
+	bool ParseAVCDecoderConfigurationRecord(const BYTE* data, const int size, vc_params_t& params, const int flv_hm/* = 0*/)
 	{
 		params.clear();
 		if (size < 7) {
@@ -1089,7 +1089,7 @@ namespace HEVCParser {
 		return true;
 	}
 
-	bool ParseHEVCDecoderConfigurationRecord(const BYTE* data, const int& size, vc_params_t& params, const bool& parseSPS)
+	bool ParseHEVCDecoderConfigurationRecord(const BYTE* data, const int size, vc_params_t& params, const bool parseSPS)
 	{
 		// ISO/IEC 14496-15 Third edition (2013-xx-xx)
 		// 8.3.3.1  HEVC decoder configuration record

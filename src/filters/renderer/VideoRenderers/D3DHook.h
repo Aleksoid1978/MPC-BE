@@ -1,5 +1,5 @@
 /*
- * (C) 2017 see Authors.txt
+ * (C) 2017-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,6 +22,6 @@
 #pragma once
 
 namespace D3DHook {
-	const bool Hook(const HMONITOR& hMonitor, const UINT& refreshRate);
+	const bool Hook(const HMONITOR hMonitor, const UINT refreshRate);
 	void UnHook();
 }

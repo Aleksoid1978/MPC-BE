@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2017 see Authors.txt
+ * (C) 2016-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,11 +27,11 @@
 
 namespace Content {
 	namespace Online {
-		const bool CheckConnect(const CString fn);
+		const bool CheckConnect(const CString& fn);
 		void Clear();
-		void Clear(const CString fn);
-		void Disconnect(const CString fn);
-		void GetRaw(const CString fn, std::vector<BYTE>& raw);
+		void Clear(const CString& fn);
+		void Disconnect(const CString& fn);
+		void GetRaw(const CString& fn, std::vector<BYTE>& raw);
 	}
 	const CString GetType(CString fn, std::list<CString>* redir = nullptr);
 }

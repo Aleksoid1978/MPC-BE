@@ -66,19 +66,19 @@ struct vc_params_t {
 	}
 };
 
-bool ParseDiracHeader(const BYTE* data, const int& size, vc_params_t& params);
+bool ParseDiracHeader(const BYTE* data, const int size, vc_params_t& params);
 
 namespace AVCParser {
-	bool ParseSequenceParameterSet(const BYTE* data, const int& size, vc_params_t& params);
+	bool ParseSequenceParameterSet(const BYTE* data, const int size, vc_params_t& params);
 } // namespace H264Parser
 
 namespace HEVCParser {
-	void CreateSequenceHeaderAVC(const BYTE* data, const int& size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader);
-	void CreateSequenceHeaderHEVC(const BYTE* data, const int& size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader);
+	void CreateSequenceHeaderAVC(const BYTE* data, const int size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader);
+	void CreateSequenceHeaderHEVC(const BYTE* data, const int size, DWORD* dwSequenceHeader, DWORD& cbSequenceHeader);
 
-	bool ParseSequenceParameterSet(const BYTE* data, const int& size, vc_params_t& params);
-	bool ParseVideoParameterSet(const BYTE* data, const int& size, vc_params_t& params);
+	bool ParseSequenceParameterSet(const BYTE* data, const int size, vc_params_t& params);
+	bool ParseVideoParameterSet(const BYTE* data, const int size, vc_params_t& params);
 
-	bool ParseAVCDecoderConfigurationRecord(const BYTE* data, const int& size, vc_params_t& params, const int& flv_hm = 0);
-	bool ParseHEVCDecoderConfigurationRecord(const BYTE* data, const int& size, vc_params_t& params, const bool& parseSPS);
+	bool ParseAVCDecoderConfigurationRecord(const BYTE* data, const int size, vc_params_t& params, const int flv_hm = 0);
+	bool ParseHEVCDecoderConfigurationRecord(const BYTE* data, const int size, vc_params_t& params, const bool parseSPS);
 } // namespace HEVCParser

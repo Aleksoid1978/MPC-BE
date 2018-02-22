@@ -58,7 +58,7 @@ enum ID3v2Encoding {
 	UTF8     = 3,
 };
 
-CString CID3Tag::ReadText(CGolombBuffer& gb, DWORD size, const BYTE& encoding)
+CString CID3Tag::ReadText(CGolombBuffer& gb, DWORD size, const BYTE encoding)
 {
 	CString  str;
 	CStringA strA;
@@ -103,7 +103,7 @@ CString CID3Tag::ReadText(CGolombBuffer& gb, DWORD size, const BYTE& encoding)
 	return str.Trim();
 }
 
-CString CID3Tag::ReadField(CGolombBuffer& gb, DWORD &size, const BYTE& encoding)
+CString CID3Tag::ReadField(CGolombBuffer& gb, DWORD &size, const BYTE encoding)
 {
 	int pos = gb.GetPos();
 
@@ -149,7 +149,7 @@ static void ReadLang(CGolombBuffer &gb, DWORD &size)
 	size -= 3;
 }
 
-void CID3Tag::ReadTag(const DWORD& tag, CGolombBuffer& gbData, DWORD &size, CID3TagItem** item)
+void CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size, CID3TagItem** item)
 {
 	BYTE encoding = (BYTE)gbData.BitRead(8);
 	size--;

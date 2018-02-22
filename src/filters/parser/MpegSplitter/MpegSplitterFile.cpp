@@ -394,7 +394,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	return S_OK;
 }
 
-BOOL CMpegSplitterFile::CheckKeyFrame(std::vector<BYTE>& pData, const stream_codec& codec)
+BOOL CMpegSplitterFile::CheckKeyFrame(std::vector<BYTE>& pData, const stream_codec codec)
 {
 	if (codec == stream_codec::H264) {
 		CH264Nalu Nalu;
@@ -433,7 +433,7 @@ BOOL CMpegSplitterFile::CheckKeyFrame(std::vector<BYTE>& pData, const stream_cod
 	return TRUE;
 }
 
-REFERENCE_TIME CMpegSplitterFile::NextPTS(const DWORD& TrackNum, const stream_codec& codec, __int64& nextPos, const BOOL& bKeyFrameOnly/* = FALSE*/, const REFERENCE_TIME& rtLimit/* = _I64_MAX*/)
+REFERENCE_TIME CMpegSplitterFile::NextPTS(const DWORD TrackNum, const stream_codec codec, __int64& nextPos, const BOOL bKeyFrameOnly/* = FALSE*/, const REFERENCE_TIME rtLimit/* = _I64_MAX*/)
 {
 	REFERENCE_TIME rt	= INVALID_TIME;
 	__int64 rtpos		= -1;
@@ -603,7 +603,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(const DWORD& TrackNum, const stream_co
 	return rt;
 }
 
-void CMpegSplitterFile::SearchPrograms(const __int64& start, const __int64& stop)
+void CMpegSplitterFile::SearchPrograms(const __int64 start, const __int64 stop)
 {
 	if (m_type != MPEG_TYPES::mpeg_ts || m_ClipInfo.IsHdmv()) {
 		return;
@@ -624,7 +624,7 @@ void CMpegSplitterFile::SearchPrograms(const __int64& start, const __int64& stop
 	}
 }
 
-void CMpegSplitterFile::SearchStreams(const __int64& start, const __int64& stop, const DWORD& msTimeOut/* = INFINITE*/)
+void CMpegSplitterFile::SearchStreams(const __int64 start, const __int64 stop, const DWORD msTimeOut/* = INFINITE*/)
 {
 	const ULONGLONG startTime = GetPerfCounter();
 
@@ -836,7 +836,7 @@ static const struct {
 	{ 'Opus', CMpegSplitterFile::stream_codec::OPUS,  OPUS_AUDIO  }
 };
 
-DWORD CMpegSplitterFile::AddStream(const WORD& pid, BYTE pesid, const BYTE& ext_id, const DWORD& len, const BOOL& bAddStream/* = TRUE*/)
+DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id, const DWORD len, const BOOL bAddStream/* = TRUE*/)
 {
 	if (pid) {
 		if (pesid) {
@@ -1440,7 +1440,7 @@ DWORD CMpegSplitterFile::AddStream(const WORD& pid, BYTE pesid, const BYTE& ext_
 	return s;
 }
 
-void CMpegSplitterFile::AddHdmvPGStream(const WORD& pid, LPCSTR language_code)
+void CMpegSplitterFile::AddHdmvPGStream(const WORD pid, LPCSTR language_code)
 {
 	stream s;
 	s.pid   = pid;
@@ -1865,7 +1865,7 @@ static int mp4_read_dec_config_descr(std::vector<BYTE>& dec_config_descr, CMpegS
 	return -1;
 }
 
-void CMpegSplitterFile::ReadPMT(std::vector<BYTE>& pData, const WORD& pid)
+void CMpegSplitterFile::ReadPMT(std::vector<BYTE>& pData, const WORD pid)
 {
 	mp4_descr.Clear();
 
@@ -2304,7 +2304,7 @@ static void Descriptor_A1(CGolombBuffer& gb, int descriptor_length, std::map<WOR
 	}
 }
 
-void CMpegSplitterFile::ReadVCT(std::vector<BYTE>& pData, const BYTE& table_id)
+void CMpegSplitterFile::ReadVCT(std::vector<BYTE>& pData, const BYTE table_id)
 {
 	CGolombBuffer gb(pData.data(), pData.size());
 
@@ -2391,7 +2391,7 @@ void CMpegSplitterFile::ReadVCT(std::vector<BYTE>& pData, const BYTE& table_id)
 	}
 }
 
-const CMpegSplitterFile::program* CMpegSplitterFile::FindProgram(const WORD& pid, int* pStream/* = nullptr*/, const CHdmvClipInfo::Stream** ppClipInfo/* = nullptr*/)
+const CMpegSplitterFile::program* CMpegSplitterFile::FindProgram(const WORD pid, int* pStream/* = nullptr*/, const CHdmvClipInfo::Stream** ppClipInfo/* = nullptr*/)
 {
 	if (pStream) {
 		*pStream = -1;

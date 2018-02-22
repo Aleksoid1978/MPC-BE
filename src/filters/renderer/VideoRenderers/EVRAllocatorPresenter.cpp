@@ -2502,7 +2502,7 @@ HRESULT CEVRAllocatorPresenter::GetScheduledSample(IMFSample** ppSample, int &_C
 	return hr;
 }
 
-void CEVRAllocatorPresenter::MoveToFreeList(IMFSample* pSample, const bool& bBack)
+void CEVRAllocatorPresenter::MoveToFreeList(IMFSample* pSample, const bool bBack)
 {
 	CAutoLock lock(&m_SampleQueueLock);
 	InterlockedDecrement(&m_nUsedBuffer);
@@ -2517,7 +2517,7 @@ void CEVRAllocatorPresenter::MoveToFreeList(IMFSample* pSample, const bool& bBac
 	}
 }
 
-void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, const bool& bSorted)
+void CEVRAllocatorPresenter::MoveToScheduledList(IMFSample* pSample, const bool bSorted)
 {
 	if (bSorted) {
 		CAutoLock lock(&m_SampleQueueLock);

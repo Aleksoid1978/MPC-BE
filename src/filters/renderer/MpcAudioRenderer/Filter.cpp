@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -53,7 +53,7 @@ CFilter::~CFilter()
 
 #define CheckRet(ret) if (ret < 0) { Flush(); return E_FAIL; }
 
-HRESULT CFilter::Init(const double& dRate, const WAVEFORMATEX* wfe, const REFERENCE_TIME& rtStart)
+HRESULT CFilter::Init(const double dRate, const WAVEFORMATEX* wfe, const REFERENCE_TIME rtStart)
 {
 	CAutoLock cAutoLock(&m_csFilter);
 
@@ -176,7 +176,7 @@ HRESULT CFilter::Init(const double& dRate, const WAVEFORMATEX* wfe, const REFERE
 	return S_OK;
 }
 
-HRESULT CFilter::Push(CAutoPtr<CPacket> p)
+HRESULT CFilter::Push(const CAutoPtr<CPacket>& p)
 {
 	CheckPointer(m_pFilterGraph, E_FAIL);
 	CheckPointer(m_pFrame, E_FAIL);
