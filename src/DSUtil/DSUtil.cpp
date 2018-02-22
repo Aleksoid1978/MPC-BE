@@ -2154,16 +2154,17 @@ CString ISO6392ToLanguage(LPCSTR code)
 {
 	CHAR tmp[3+1];
 	strncpy_s(tmp, code, 3);
-	tmp[3] = 0;
-	_strlwr_s(tmp);
-	for (size_t i = 0; i < _countof(s_isolangs); i++) {
-		if (!strcmp(s_isolangs[i].iso6392, tmp)) {
-			CStringA ret(s_isolangs[i].name);
-			int k = ret.Find(';');
-			if (k > 0) {
-				ret.Truncate(k);
+	if (tmp[0]) {
+		_strlwr_s(tmp);
+		for (const auto& isolang : s_isolangs) {
+			if (!strcmp(isolang.iso6392, tmp)) {
+				CStringA ret(isolang.name);
+				int k = ret.Find(';');
+				if (k > 0) {
+					ret.Truncate(k);
+				}
+				return CString(ret);
 			}
-			return CString(ret);
 		}
 	}
 	return CString(code);
