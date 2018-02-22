@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2017 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+ * (C) 2012-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,7 +19,6 @@
  */
 
 #include "stdafx.h"
-#include <Amvideo.h>
 #include <algorithm>
 #include "MPCBEContextMenu.h"
 
@@ -58,7 +57,7 @@ static HBITMAP TransparentBitmap(HBITMAP hBmp)
 				RGB32BitsBITMAPINFO.bmiHeader.biHeight    = bm.bmHeight;
 				RGB32BitsBITMAPINFO.bmiHeader.biPlanes    = 1;
 				RGB32BitsBITMAPINFO.bmiHeader.biBitCount  = 32;
-				RGB32BitsBITMAPINFO.bmiHeader.biSizeImage = DIBSIZE(RGB32BitsBITMAPINFO.bmiHeader);
+				RGB32BitsBITMAPINFO.bmiHeader.biSizeImage = bm.bmWidth * bm.bmHeight * 4;
 
 				// pointer used for direct Bitmap pixels access
 				UINT* ptPixels;	
@@ -212,7 +211,7 @@ STDMETHODIMP CMPCBEContextMenu::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJEC
 			typedef int (WINAPI *StrCmpLogicalW)(_In_ PCWSTR psz1, _In_ PCWSTR psz2);
 			static StrCmpLogicalW pStrCmpLogicalW = (StrCmpLogicalW)GetProcAddress(h, "StrCmpLogicalW");
 			if (pStrCmpLogicalW) {
-				std::sort(m_fileNames.begin(), m_fileNames.end(), [](const CString a, const CString b) {
+				std::sort(m_fileNames.begin(), m_fileNames.end(), [](const CString& a, const CString& b) {
 					return pStrCmpLogicalW(a, b) < 0;
 				});
 			}
@@ -257,23 +256,23 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 
 	size_t bufflen = sizeof(DWORD);
 
-	for(auto it = m_fileNames.begin(); it != m_fileNames.end(); ++it) {
-		bufflen += ((*it).GetLength() + 1) * sizeof(TCHAR);
+	for (const auto& item : m_fileNames) {
+		bufflen += (item.GetLength() + 1) * sizeof(WCHAR);
 	}
 
-	CAutoVectorPtr<BYTE> buff;
-	if(!buff.Allocate(bufflen)) {
+	std::vector<BYTE> buff(bufflen);
+	if (buff.empty()) {
 		return;
 	}
 
-	BYTE* p = buff;
+	BYTE* p = buff.data();
 
 	*(DWORD*)p = (DWORD)m_fileNames.size(); 
 	p += sizeof(DWORD);
 
-	for(auto it = m_fileNames.begin(); it != m_fileNames.end(); ++it) {
-		int len = ((*it).GetLength() + 1) * sizeof(TCHAR);
-		memcpy(p, (*it), len);
+	for (const auto& item : m_fileNames) {
+		const size_t len = (item.GetLength() + 1) * sizeof(WCHAR);
+		memcpy(p, item, len);
 		p += len;
 	}
 
@@ -281,8 +280,8 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 		COPYDATASTRUCT cds;
 		cds.dwData = 0x6ABE51;
 		cds.cbData = (DWORD)bufflen;
-		cds.lpData = (void*)(BYTE*)buff;
-		SendMessage(hWnd, WM_COPYDATA, NULL, (LPARAM)&cds);
+		cds.lpData = buff.data();
+		SendMessage(hWnd, WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
 	} else {
 		CRegKey key;
 		TCHAR path_buff[MAX_PATH] = { 0 };
@@ -334,8 +333,8 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 					COPYDATASTRUCT cds;
 					cds.dwData = 0x6ABE51;
 					cds.cbData = (DWORD)bufflen;
-					cds.lpData = (void*)(BYTE*)buff;
-					SendMessage(hWnd, WM_COPYDATA, NULL, (LPARAM)&cds);
+					cds.lpData = buff.data();
+					SendMessage(hWnd, WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
 				} 
 			}
 		}
