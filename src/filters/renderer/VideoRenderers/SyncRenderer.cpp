@@ -39,6 +39,7 @@
 #include "SyncRenderer.h"
 #include "FocusThread.h"
 #include "Variables.h"
+#include "Utils.h"
 #include "../DSUtil/D3D9Helper.h"
 #include "../DSUtil/DXVAState.h"
 #include "../../../apps/mplayerc/resource.h"
@@ -2104,10 +2105,7 @@ STDMETHODIMP CBaseAP::GetDIB(BYTE* lpDib, DWORD* size)
 		p = DNew uint32_t[bih->biWidth * bih->biHeight];
 	}
 
-	BitBltFromRGBToRGB(
-		bih->biWidth, bih->biHeight,
-		p ? (BYTE*)p : (BYTE*)(bih + 1), bih->biWidth*bih->biBitCount>>3, bih->biBitCount,
-		(BYTE*)r.pBits + r.Pitch*(desc.Height-1), -(int)r.Pitch, 32);
+	RetrieveBitmapData(desc.Width, desc.Height, 32, p ? (BYTE*)p : (BYTE*)(bih + 1), (BYTE*)r.pBits, r.Pitch);
 
 	pSurface->UnlockRect();
 
@@ -3153,9 +3151,7 @@ STDMETHODIMP CSyncAP::GetCurrentImage(BITMAPINFOHEADER *pBih, BYTE **pDib, DWORD
 		return hr;
 	}
 
-	BitBltFromRGBToRGB(pBih->biWidth, pBih->biHeight,
-		p, pBih->biWidth * 4, 32,
-		(BYTE*)r.pBits + r.Pitch * (pBih->biHeight - 1), -(int)r.Pitch, 32);
+	RetrieveBitmapData(width, height, 32, p ? (BYTE*)p : (BYTE*)(pBih + 1), (BYTE*)r.pBits, r.Pitch);
 
 	pDestSurface->UnlockRect();
 

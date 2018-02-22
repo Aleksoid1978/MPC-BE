@@ -26,6 +26,7 @@
 #include "IPinHook.h"
 #include "MacrovisionKicker.h"
 #include "Variables.h"
+#include "Utils.h"
 #include <IMediaSideData.h>
 
 #if (0)		// Set to 1 to activate EVR traces
@@ -1279,9 +1280,7 @@ STDMETHODIMP CEVRAllocatorPresenter::GetCurrentImage(BITMAPINFOHEADER *pBih, BYT
 		return hr;
 	}
 
-	BitBltFromRGBToRGB(pBih->biWidth, pBih->biHeight,
-		p, pBih->biWidth * 4, 32,
-		(BYTE*)r.pBits + r.Pitch * (pBih->biHeight - 1), -(int)r.Pitch, 32);
+	RetrieveBitmapData(width, height, 32, p, (BYTE*)r.pBits, r.Pitch);
 
 	pDestSurface->UnlockRect();
 
