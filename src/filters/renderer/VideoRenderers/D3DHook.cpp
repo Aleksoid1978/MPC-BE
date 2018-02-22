@@ -1,5 +1,5 @@
 /*
- * (C) 2017 see Authors.txt
+ * (C) 2017-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -42,7 +42,7 @@ namespace D3DHook {
 	}
 
 	template<typename T>
-	static void fixRefreshRate(T& pResource, const double& refreshRate)
+	static void fixRefreshRate(T& pResource, const double refreshRate)
 	{
 		if ((refreshRate > 59.970 && refreshRate < 60.5) && (m_refreshRate == 59)) {
 			DLog(L"    => applied refreshRate fix -> 59.940");
@@ -134,7 +134,7 @@ namespace D3DHook {
 		return hr;
 	}
 
-	const bool Hook(const HMONITOR& hMonitor, const UINT& refreshRate)
+	const bool Hook(const HMONITOR hMonitor, const UINT refreshRate)
 	{
 		DLog(L"D3DHook::Hook() : refreshRate : %u", refreshRate);
 

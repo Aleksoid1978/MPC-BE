@@ -260,8 +260,8 @@ namespace DSObjects
 		void									RemoveAllSamples();
 		HRESULT									GetFreeSample(IMFSample** ppSample);
 		HRESULT									GetScheduledSample(IMFSample** ppSample, int &_Count);
-		void									MoveToFreeList(IMFSample* pSample, const bool& bBack);
-		void									MoveToScheduledList(IMFSample* pSample, const bool& bSorted);
+		void									MoveToFreeList(IMFSample* pSample, const bool bBack);
+		void									MoveToScheduledList(IMFSample* pSample, const bool bSorted);
 		void									FlushSamples();
 		void									FlushSamplesInternal();
 

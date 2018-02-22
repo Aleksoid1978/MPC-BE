@@ -38,12 +38,12 @@ class CID3TagItem
 {
 public:
 
-	CID3TagItem(const DWORD& tag, const CString& value)
+	CID3TagItem(const DWORD tag, const CString& value)
 		: m_type(ID3_TYPE_STRING)
 		, m_tag(tag)
 		, m_value(value) {}
 
-	CID3TagItem(const DWORD& tag, const std::vector<BYTE>& data, const CString& mime)
+	CID3TagItem(const DWORD tag, const std::vector<BYTE>& data, const CString& mime)
 		: m_type(ID3_TYPE_BINARY)
 		, m_tag(tag)
 		, m_Mime(mime)
@@ -79,10 +79,10 @@ protected:
 	BYTE m_major;
 	BYTE m_flags;
 
-	CString ReadText(CGolombBuffer& gb, DWORD size, const BYTE& encoding);
-	CString ReadField(CGolombBuffer& gb, DWORD &size, const BYTE& encoding);
+	CString ReadText(CGolombBuffer& gb, DWORD size, const BYTE encoding);
+	CString ReadField(CGolombBuffer& gb, DWORD &size, const BYTE encoding);
 
-	void ReadTag(const DWORD& tag, CGolombBuffer& gbData, DWORD &size, CID3TagItem** item);
+	void ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size, CID3TagItem** item);
 	void ReadChapter(CGolombBuffer& gbData, DWORD &size);
 
 public:

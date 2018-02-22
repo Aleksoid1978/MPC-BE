@@ -84,8 +84,8 @@ public:
 	void Clear();
 
 	// tag reading
-	bool ReadFooter(BYTE *buf, const size_t& len);
-	bool ReadTags(BYTE *buf, const size_t& len);
+	bool ReadFooter(BYTE *buf, const size_t len);
+	bool ReadTags(BYTE *buf, const size_t len);
 
 	size_t GetTagSize() const { return m_TagSize; }
 };

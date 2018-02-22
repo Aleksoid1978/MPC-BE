@@ -1,5 +1,5 @@
 /*
- * (C) 2017 see Authors.txt
+ * (C) 2016-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -189,7 +189,7 @@ namespace Content {
 		}
 	}
 
-	static void GetContent(const CString fn, Content& content)
+	static void GetContent(const CString& fn, Content& content)
 	{
 		if (content.bInitialized) {
 			if (!content.bGOTCt) {
@@ -246,7 +246,7 @@ namespace Content {
 	const std::wregex ref_qtl(L"src[ \\t]*=[ \\t]*\"([^\"\\n]+)\"");                                    // src="..."
 	const std::wregex ref_wpl(L"<media src=\"([^\"\\n]+)\"");                                           // <media src="..."
 
-	static const bool FindRedir(CUrl& src, CString ct, CString& body, std::list<CString>& urls, int playlist_type)
+	static const bool FindRedir(const CUrl& src, const CString& body, std::list<CString>& urls, const int playlist_type)
 	{
 		std::wregex rgx;
 
@@ -263,7 +263,7 @@ namespace Content {
 		}
 
 		std::wcmatch match;
-		const wchar_t* start = body.GetBuffer();
+		const wchar_t* start = body.GetString();
 
 		while (std::regex_search(start, match, rgx) && match.size() > 1) {
 			start = match[0].second;
@@ -316,7 +316,7 @@ namespace Content {
 		return urls.size() > 0;
 	}
 
-	static const bool FindRedir(CString& fn, CString ct, std::list<CString>& fns, int playlist_type)
+	static const bool FindRedir(const CString& fn, std::list<CString>& fns, const int playlist_type)
 	{
 		CString body;
 
@@ -443,9 +443,9 @@ namespace Content {
 
 			if (!body.IsEmpty()) {
 				if (fn.Find(L"://") >= 0) {
-					FindRedir(url, ct, body, *redir, playlist_type);
+					FindRedir(url, body, *redir, playlist_type);
 				} else {
-					FindRedir(fn, ct, *redir, playlist_type);
+					FindRedir(fn, *redir, playlist_type);
 				}
 			}
 		}
@@ -454,7 +454,7 @@ namespace Content {
 	}
 
 	namespace Online {
-		const bool CheckConnect(const CString fn)
+		const bool CheckConnect(const CString& fn)
 		{
 			CString realPath(fn);
 			CorrectAceStream(realPath);
@@ -474,12 +474,12 @@ namespace Content {
 			Contents.clear();
 		}
 
-		void Clear(const CString fn)
+		void Clear(const CString& fn)
 		{
 			Contents.erase(fn);
 		}
 
-		void Disconnect(const CString fn)
+		void Disconnect(const CString& fn)
 		{
 			auto& it = Contents.find(fn);
 			if (it != Contents.end()) {
@@ -488,7 +488,7 @@ namespace Content {
 			}
 		}
 
-		void GetRaw(const CString fn, std::vector<BYTE>& raw)
+		void GetRaw(const CString& fn, std::vector<BYTE>& raw)
 		{
 			auto& it = Contents.find(fn);
 			if (it != Contents.end()) {

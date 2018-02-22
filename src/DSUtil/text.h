@@ -25,7 +25,7 @@
 #include <list>
 
 template<class T, typename SEP>
-T Explode(const T& str, CAtlList<T>& sl, SEP sep, size_t limit = 0)
+T Explode(const T& str, CAtlList<T>& sl, const SEP sep, const size_t limit = 0)
 {
 	sl.RemoveAll();
 
@@ -44,7 +44,7 @@ T Explode(const T& str, CAtlList<T>& sl, SEP sep, size_t limit = 0)
 }
 
 template<class T, typename SEP>
-T Explode(const T& str, std::list<T>& sl, SEP sep, size_t limit = 0)
+T Explode(const T& str, std::list<T>& sl, const SEP sep, const size_t limit = 0)
 {
 	sl.clear();
 
@@ -63,7 +63,7 @@ T Explode(const T& str, std::list<T>& sl, SEP sep, size_t limit = 0)
 }
 
 template<class T, typename SEP>
-T ExplodeMin(const T& str, CAtlList<T>& sl, SEP sep, size_t limit = 0)
+T ExplodeMin(const T& str, CAtlList<T>& sl, const SEP sep, const size_t limit = 0)
 {
 	Explode(str, sl, sep, limit);
 	POSITION pos = sl.GetHeadPosition();
@@ -81,7 +81,7 @@ T ExplodeMin(const T& str, CAtlList<T>& sl, SEP sep, size_t limit = 0)
 }
 
 template<class T, typename SEP>
-T ExplodeMin(const T& str, std::list<T>& sl, SEP sep, size_t limit = 0)
+T ExplodeMin(const T& str, std::list<T>& sl, const SEP sep, const size_t limit = 0)
 {
 	Explode(str, sl, sep, limit);
 	for (auto it = sl.cbegin(); it != sl.cend(); ) {
@@ -161,7 +161,7 @@ T ExplodeEsc(T str,std::list<T>& sl, SEP sep, size_t limit = 0, SEP esc = '\\')
 }
 
 template<class T, typename SEP>
-T Implode(const std::list<T>& sl, SEP sep)
+T Implode(const std::list<T>& sl, const SEP sep)
 {
 	T ret;
 	auto it = sl.begin();
@@ -175,7 +175,7 @@ T Implode(const std::list<T>& sl, SEP sep)
 }
 
 template<class T, typename SEP>
-T ImplodeEsc(const std::list<T>& sl, SEP sep, SEP esc = '\\')
+T ImplodeEsc(const std::list<T>& sl, const SEP sep, const SEP esc = '\\')
 {
 	T ret;
 	T escsep = T(esc) + T(sep);

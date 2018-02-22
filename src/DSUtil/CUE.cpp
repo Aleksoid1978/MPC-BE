@@ -38,7 +38,7 @@ CString GetCUECommand(CString& ln)
 	return c;
 }
 
-void MakeCUETitle(CString &Title, const CString& title, const CString& performer, const UINT& trackNum/* = UINT_MAX*/)
+void MakeCUETitle(CString &Title, const CString& title, const CString& performer, const UINT trackNum/* = UINT_MAX*/)
 {
 	if (performer.GetLength() > 0 && title.GetLength() > 0) {
 		Title.Format(L"%02u. %s - %s", trackNum, performer, title);

@@ -233,7 +233,7 @@ static bool flac_parse_block_header(CGolombBuffer& gb, BYTE& last, BYTE& type, D
 	return true;
 }
 
-static bool ParseVorbisTag(const CString field_name, const CString vorbisTag, CString& tagValue) {
+static bool ParseVorbisTag(const CString& field_name, const CString& vorbisTag, CString& tagValue) {
 	tagValue.Empty();
 
 	CString vorbis_data = vorbisTag;

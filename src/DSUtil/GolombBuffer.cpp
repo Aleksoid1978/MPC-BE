@@ -51,7 +51,7 @@ static void RemoveMpegEscapeCode(BYTE* dst, const BYTE* src, int& length)
 	length = di;
 }
 
-CGolombBuffer::CGolombBuffer(const BYTE* pBuffer, int nSize, const bool& bRemoveMpegEscapes/* = false*/)
+CGolombBuffer::CGolombBuffer(const BYTE* pBuffer, int nSize, const bool bRemoveMpegEscapes/* = false*/)
 	: m_bRemoveMpegEscapes(bRemoveMpegEscapes)
 	, m_pTmpBuffer(nullptr)
 {
@@ -63,7 +63,7 @@ CGolombBuffer::~CGolombBuffer()
 	SAFE_DELETE_ARRAY(m_pTmpBuffer);
 }
 
-UINT64 CGolombBuffer::BitRead(const int& nBits, const bool& bPeek/* = false*/)
+UINT64 CGolombBuffer::BitRead(const int nBits, const bool bPeek/* = false*/)
 {
 	//ASSERT(nBits >= 0 && nBits <= 64);
 	const INT64 tmp_bitbuff = m_bitbuff;
@@ -175,14 +175,14 @@ void CGolombBuffer::Reset(const BYTE* pNewBuffer, int nNewSize)
 	Reset();
 }
 
-void CGolombBuffer::SkipBytes(const int& nCount)
+void CGolombBuffer::SkipBytes(const int nCount)
 {
 	m_nBitPos += nCount;
 	m_bitlen   = 0;
 	m_bitbuff  = 0;
 }
 
-void CGolombBuffer::Seek(const int& nCount)
+void CGolombBuffer::Seek(const int nCount)
 {
 	m_nBitPos = nCount;
 	m_bitlen  = 0;

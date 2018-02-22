@@ -23,10 +23,10 @@
 class CGolombBuffer
 {
 public:
-	CGolombBuffer(const BYTE* pBuffer, int nSize, const bool& bRemoveMpegEscapes = false);
+	CGolombBuffer(const BYTE* pBuffer, int nSize, const bool bRemoveMpegEscapes = false);
 	~CGolombBuffer();
 
-	UINT64       BitRead(const int& nBits, const bool& bPeek = false);
+	UINT64       BitRead(const int nBits, const bool bPeek = false);
 	UINT64       UExpGolombRead();
 	unsigned int UintGolombRead();
 	INT64        SExpGolombRead();
@@ -42,15 +42,15 @@ public:
 	void         Reset();
 	void         Reset(const BYTE* pNewBuffer, int nNewSize);
 
-	void         SetSize(const int& nValue) { m_nSize = nValue; };
+	void         SetSize(const int nValue) { m_nSize = nValue; };
 	int          GetSize() const { return m_nSize; };
 	int          RemainingSize() const { return m_nSize - m_nBitPos; };
 	bool         IsEOF() const { return m_nBitPos >= m_nSize; };
 	int          GetPos() const;
 	const BYTE*  GetBufferPos() const { return m_pBuffer + m_nBitPos; };
 
-	void         SkipBytes(const int& nCount);
-	void         Seek(const int& nPos);
+	void         SkipBytes(const int nCount);
+	void         Seek(const int nPos);
 
 	bool         NextMpegStartCode(BYTE& code);
 

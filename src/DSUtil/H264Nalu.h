@@ -88,7 +88,7 @@ public :
 	size_t      GetNALPos() const { return m_nNALStartPos; }
 	bool        IsEOF() const { return m_nCurPos >= m_nSize; }
 
-	void        SetBuffer(const BYTE* pBuffer, const size_t& nSize, const int& nNALSize = 0);
+	void        SetBuffer(const BYTE* pBuffer, const size_t nSize, const int nNALSize = 0);
 	bool        ReadNext();
 };
 

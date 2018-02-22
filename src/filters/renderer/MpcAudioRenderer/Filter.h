@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -53,8 +53,8 @@ public:
 	CFilter();
 	~CFilter();
 
-	HRESULT Init(const double& dRate, const WAVEFORMATEX* wfe, const REFERENCE_TIME& rtStart);
-	HRESULT Push(CAutoPtr<CPacket> p);
+	HRESULT Init(const double dRate, const WAVEFORMATEX* wfe, const REFERENCE_TIME rtStart);
+	HRESULT Push(const CAutoPtr<CPacket>& p);
 	HRESULT Pull(CAutoPtr<CPacket>& p);
 
 	BOOL IsInitialized() const { return m_pFilterGraph != nullptr; }
