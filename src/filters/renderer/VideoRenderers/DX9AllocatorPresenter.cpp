@@ -36,6 +36,7 @@
 #include "FocusThread.h"
 #include "D3DHook.h"
 #include "Variables.h"
+#include "Utils.h"
 
 #define FRAMERATE_MAX_DELTA 3000
 
@@ -2276,9 +2277,7 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 		p = DNew uint32_t[bih->biWidth * bih->biHeight];
 	}
 
-	BitBltFromRGBToRGB(bih->biWidth, bih->biHeight,
-					   p ? (BYTE*)p : (BYTE*)(bih + 1), bih->biWidth * 4, 32,
-					   (BYTE*)r.pBits + r.Pitch * (desc.Height - 1), -(int)r.Pitch, 32);
+	RetrieveBitmapData(framesize.cx, framesize.cy, 32, p ? (BYTE*)p : (BYTE*)(bih + 1), (BYTE*)r.pBits, r.Pitch);
 
 	pSurface->UnlockRect();
 

@@ -1,5 +1,5 @@
 /*
- * (C) 2016 see Authors.txt
+ * (C) 2016-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,8 @@
 #pragma once
 
 #include <d3d9.h>
+
+bool RetrieveBitmapData(unsigned w, unsigned h, unsigned bpp, BYTE* dst, BYTE* src, int srcpitch);
 
 HRESULT DumpDX9Surface(IDirect3DDevice9* pD3DDev, IDirect3DSurface9* pSurface, wchar_t* filename);
 HRESULT DumpDX9Texture(IDirect3DDevice9* pD3DDev, IDirect3DTexture9* pTexture, wchar_t* filename);

@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2017 see Authors.txt
+ * (C) 2016-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,6 +22,24 @@
 #include <memory>
 
 #include "Utils.h"
+
+bool RetrieveBitmapData(unsigned w, unsigned h, unsigned bpp, BYTE* dst, BYTE* src, int srcpitch)
+{
+	unsigned linesize = w * bpp / 8;
+	if ((int)linesize > srcpitch) {
+		return false;
+	}
+
+	src += srcpitch * (h - 1);
+
+	for (unsigned y = 0; y < h; ++y) {
+		memcpy(dst, src, linesize);
+		src -= srcpitch;
+		dst += linesize;
+	}
+
+	return true;
+}
 
 HRESULT DumpDX9Surface(IDirect3DDevice9* pD3DDev, IDirect3DSurface9* pSurface, wchar_t* filename)
 {
@@ -59,9 +77,7 @@ HRESULT DumpDX9Surface(IDirect3DDevice9* pD3DDev, IDirect3DSurface9* pSurface, w
 	D3DLOCKED_RECT r;
 	hr = pTarget->LockRect(&r, nullptr, D3DLOCK_READONLY);
 
-	BitBltFromRGBToRGB(bih->biWidth, bih->biHeight,
-		(BYTE*)(bih + 1), bih->biWidth * 4, 32,
-		(BYTE*)r.pBits + r.Pitch * (desc.Height - 1), -(int)r.Pitch, 32);
+	RetrieveBitmapData(desc.Width, desc.Height, 32, (BYTE*)(bih + 1), (BYTE*)r.pBits, r.Pitch);
 
 	pTarget->UnlockRect();
 
@@ -172,9 +188,7 @@ HRESULT SaveRAWVideoAsBMP(BYTE* data, DWORD format, unsigned pitch, unsigned wid
 	}
 
 	//memcpy(p, r.pBits, len);
-	BitBltFromRGBToRGB(bih->biWidth, bih->biHeight,
-		p, pitch, pseudobitdepth,
-		(BYTE*)data + pitch * (height - 1), -(int)pitch, pseudobitdepth);
+	RetrieveBitmapData(width, height, pseudobitdepth, p, data, pitch);
 
 	BITMAPFILEHEADER bfh;
 	bfh.bfType = 0x4d42;
