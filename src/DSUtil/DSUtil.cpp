@@ -2171,15 +2171,20 @@ CString ISO6392ToLanguage(LPCSTR code)
 
 bool IsISO639Language(LPCSTR code)
 {
-	size_t nLen = strlen(code) + 1;
-	LPSTR tmp = DNew CHAR[nLen];
-	strncpy_s(tmp, nLen, code, nLen);
-	_strlwr_s(tmp, nLen);
+	size_t len = strlen(code);
+	if (!len) {
+		return false;
+	}
+	len++;
+
+	LPSTR tmp = DNew CHAR[len];
+	strncpy_s(tmp, len, code, len);
+	_strlwr_s(tmp, len);
 	tmp[0] = (CHAR)toupper(tmp[0]);
 
 	bool bFound = false;
-	for (size_t i = 0, cnt = _countof(s_isolangs); i < cnt; i++) {
-		if (!strcmp(s_isolangs[i].name, tmp)) {
+	for (const auto& isolang : s_isolangs) {
+		if (!strcmp(isolang.name, tmp)) {
 			bFound = true;
 			break;
 		}
@@ -2231,7 +2236,7 @@ LCID ISO6391ToLcid(LPCSTR code)
 
 LCID ISO6392ToLcid(LPCSTR code)
 {
-	CHAR tmp[3 + 1];
+	CHAR tmp[3+1];
 	if (strncpy_s(tmp, code, 3) == 0 && tmp[0]) {
 		_strlwr_s(tmp);
 		for (const auto& isolang : s_isolangs) {
