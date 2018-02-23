@@ -22,7 +22,6 @@
 #pragma once
 
 #include <afx.h>
-#include <atlcoll.h>
 #include <vector>
 
 namespace Subtitle
