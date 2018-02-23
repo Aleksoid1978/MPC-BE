@@ -840,8 +840,8 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 			p->rtStart = framenum * m_AvgTimePerFrame;
 			p->rtStop  = p->rtStart + m_AvgTimePerFrame;
 
-			p->SetCount(m_framesize);
-			if ((hr = m_pFile->ByteRead(p->GetData(), m_framesize)) != S_OK) {
+			p->resize(m_framesize);
+			if ((hr = m_pFile->ByteRead(p->data(), m_framesize)) != S_OK) {
 				break;
 			}
 
@@ -853,7 +853,7 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 			for (int i = 0; i < 65536; ++i) { // don't call CheckRequest so often
 				const bool eof = !m_pFile->GetRemaining();
 
-				if (mpeg4packet && !mpeg4packet->IsEmpty() && (m_pFile->BitRead(32, true) == 0x000001b6 || eof)) {
+				if (mpeg4packet && !mpeg4packet->empty() && (m_pFile->BitRead(32, true) == 0x000001b6 || eof)) {
 					hr = DeliverPacket(mpeg4packet);
 				}
 
@@ -863,7 +863,7 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 
 				if (!mpeg4packet) {
 					mpeg4packet.Attach(DNew CPacket());
-					mpeg4packet->SetCount(0, 1024);
+					mpeg4packet->resize(0);
 					mpeg4packet->rtStart = rt;
 					mpeg4packet->rtStop  = rt + m_AvgTimePerFrame;
 					rt += m_AvgTimePerFrame;
@@ -872,7 +872,7 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 
 				BYTE b;
 				m_pFile->ByteRead(&b, 1);
-				mpeg4packet->Add(b);
+				mpeg4packet->push_back(b);
 			}
 			continue;
 		}
@@ -880,8 +880,8 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 
 		if (const size_t size = std::min(64LL * KILOBYTE, m_pFile->GetRemaining())) {
 			CAutoPtr<CPacket> p(DNew CPacket());
-			p->SetCount(size);
-			if ((hr = m_pFile->ByteRead(p->GetData(), size)) != S_OK) {
+			p->resize(size);
+			if ((hr = m_pFile->ByteRead(p->data(), size)) != S_OK) {
 				break;
 			}
 

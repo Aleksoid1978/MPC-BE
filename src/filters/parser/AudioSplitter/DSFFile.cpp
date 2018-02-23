@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -221,7 +221,7 @@ int CDSFFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 	}
 
 	int size = (int)std::min((__int64)m_block_size, m_endpos - m_pFile->GetPos());
-	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->GetData(), size) != S_OK) {
+	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->data(), size) != S_OK) {
 		return 0;
 	}
 

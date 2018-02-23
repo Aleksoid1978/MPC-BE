@@ -340,7 +340,7 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 {
 	HRESULT hr;
 
-	long nBytes = (long)p->GetCount();
+	long nBytes = (long)p->size();
 
 	if (nBytes == 0) {
 		return S_OK;
@@ -465,7 +465,7 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 		if (S_OK != (hr = pSample->GetPointer(&pData)) || !pData) {
 			break;
 		}
-		memcpy(pData, p->GetData(), nBytes);
+		memcpy(pData, p->data(), nBytes);
 		if (S_OK != (hr = pSample->SetActualDataLength(nBytes))) {
 			break;
 		}

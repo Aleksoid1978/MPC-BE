@@ -1443,7 +1443,7 @@ HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 
 		if (!m_pRenderClient) {
 			if (p->rtStart != INVALID_TIME && m_pReferenceClock) {
-				const REFERENCE_TIME rtDuration = SamplesToTime(p->GetCount() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
+				const REFERENCE_TIME rtDuration = SamplesToTime(p->size() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
 				const REFERENCE_TIME rtStop = p->rtStart + rtDuration;
 				const REFERENCE_TIME rtRefClock = GetRefClockTime() - m_hnsPeriod;
 				if (rtStop > rtRefClock) {
@@ -2474,7 +2474,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 							}
 						}
 
-						const REFERENCE_TIME rtDuration = SamplesToTime(m_CurrentPacket->GetCount() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
+						const REFERENCE_TIME rtDuration = SamplesToTime(m_CurrentPacket->size() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
 						m_rtNextSampleTime = m_CurrentPacket->rtStart + rtDuration;
 					}
 
@@ -2511,12 +2511,12 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 					}
 					nWritenBytes += nSilenceBytes;
 				} else {
-					const UINT32 nFilledBytes = std::min((UINT32)m_CurrentPacket->GetCount(), nAvailableBytes - nWritenBytes);
-					memcpy(&pData[nWritenBytes], m_CurrentPacket->GetData(), nFilledBytes);
-					if (nFilledBytes == m_CurrentPacket->GetCount()) {
+					const UINT32 nFilledBytes = std::min((UINT32)m_CurrentPacket->size(), nAvailableBytes - nWritenBytes);
+					memcpy(&pData[nWritenBytes], m_CurrentPacket->data(), nFilledBytes);
+					if (nFilledBytes == m_CurrentPacket->size()) {
 						m_CurrentPacket.Free();
 					} else {
-						m_CurrentPacket->RemoveAt(0, nFilledBytes);
+						m_CurrentPacket->RemoveHead(nFilledBytes);
 					}
 					nWritenBytes += nFilledBytes;
 
@@ -2659,7 +2659,7 @@ void CMpcAudioRenderer::Flush()
 size_t CMpcAudioRenderer::WasapiQueueSize()
 {
 	CAutoLock cQueueLock(&m_csQueue);
-	return m_WasapiQueue.GetSize() + (m_CurrentPacket ? m_CurrentPacket->GetCount() : 0);
+	return m_WasapiQueue.GetSize() + (m_CurrentPacket ? m_CurrentPacket->size() : 0);
 }
 
 void CMpcAudioRenderer::WaitFinish()

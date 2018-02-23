@@ -866,9 +866,9 @@ HRESULT COggVorbisOutputPin::UnpackInitPage(OggPage& page)
 	while (m_packets.GetCount()) {
 		CPacket* p = m_packets.GetHead();
 
-		if (p->GetCount() >= 6 && p->GetAt(0) == 0x05) {
+		if (p->size() >= 6 && p->at(0) == 0x05) {
 			// yeah, right, we are going to be parsing this backwards! :P
-			bitstream bs(p->GetData(), p->GetCount(), true);
+			bitstream bs(p->data(), p->size(), true);
 			while (bs.hasbits(-1) && bs.getbits(-1) != 1) {
 				;
 			}
@@ -892,11 +892,11 @@ HRESULT COggVorbisOutputPin::UnpackInitPage(OggPage& page)
 		}
 
 		int cnt = m_initpackets.GetCount();
-		if (cnt < 3 && (p->GetCount() >= 6 && p->GetAt(0) == 1 + cnt * 2)) {
+		if (cnt < 3 && (p->size() >= 6 && p->at(0) == 1 + cnt * 2)) {
 			VORBISFORMAT2* vf2		= (VORBISFORMAT2*)m_mts[0].Format();
-			vf2->HeaderSize[cnt]	= p->GetCount();
+			vf2->HeaderSize[cnt]	= p->size();
 			int len					= m_mts[0].FormatLength();
-			memcpy(m_mts[0].ReallocFormatBuffer(len + p->GetCount()) + len, p->GetData(), p->GetCount());
+			memcpy(m_mts[0].ReallocFormatBuffer(len + p->size()) + len, p->data(), p->size());
 		}
 
 		m_initpackets.AddTail(m_packets.RemoveHead());
@@ -945,7 +945,7 @@ HRESULT COggVorbisOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int
 
 HRESULT COggVorbisOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 {
-	if (p->GetCount() > 0 && (p->GetAt(0) & 1)) {
+	if (p->size() > 0 && (p->at(0) & 1)) {
 		return S_OK;
 	}
 
@@ -966,7 +966,7 @@ HRESULT COggVorbisOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_
 			p->TrackNumber		= pi->TrackNumber;
 			p->bDiscontinuity	= p->bSyncPoint = FALSE;//TRUE;
 			p->rtStart			= p->rtStop = 0;
-			p->Copy(*pi);
+			p->SetData(*pi);
 			__super::DeliverPacket(p);
 		}
 	}
@@ -1058,7 +1058,7 @@ HRESULT COggFlacOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TI
 			p->TrackNumber		= pi->TrackNumber;
 			p->bDiscontinuity	= p->bSyncPoint = FALSE;//TRUE;
 			p->rtStart			= p->rtStop = 0;
-			p->Copy(*pi);
+			p->SetData(*pi);
 			__super::DeliverPacket(p);
 		}
 	}
@@ -1407,25 +1407,25 @@ HRESULT COggTheoraOutputPin::UnpackInitPage(OggPage& page)
 	while (m_packets.GetCount()) {
 		CPacket* p = m_packets.GetHead();
 
-		if (p->GetCount() == 0) {
+		if (p->size() == 0) {
 			m_packets.RemoveHeadNoReturn();
 			continue;
 		}
 
-		BYTE* data = p->GetData();
+		BYTE* data = p->data();
 		BYTE type = *data++;
 
 		if (type >= 0x80 && type <= 0x82 && !memcmp(data, "theora", 6)) {
 
 			CMediaType& mt = m_mts[0];
-			int size = p->GetCount();
+			int size = p->size();
 			//ASSERT(size <= 0xffff);
 			MPEG2VIDEOINFO* vih = (MPEG2VIDEOINFO*)mt.ReallocFormatBuffer(
 								   FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) +
 								   ((MPEG2VIDEOINFO*)mt.Format())->cbSequenceHeader +
 								   2 + size);
 			*(WORD*)((BYTE*)vih->dwSequenceHeader + vih->cbSequenceHeader) = (size >> 8) | (size << 8);
-			memcpy((BYTE*)vih->dwSequenceHeader + vih->cbSequenceHeader + 2, p->GetData(), size);
+			memcpy((BYTE*)vih->dwSequenceHeader + vih->cbSequenceHeader + 2, p->data(), size);
 			vih->cbSequenceHeader += 2 + size;
 
 			m_initpackets.AddTail(m_packets.RemoveHead());
@@ -1507,11 +1507,11 @@ HRESULT COggDiracOutputPin::UnpackInitPage(OggPage& page)
 		if (!m_IsInitialized) {
 			CPacket* p = m_packets.GetHead();
 
-			if (p->GetCount() > 13) {
-				BYTE* buf = p->GetData();
+			if (p->size() > 13) {
+				BYTE* buf = p->data();
 
 				if (!memcmp(buf, "BBCD\x00", 5)) {
-					m_IsInitialized = SUCCEEDED(InitDirac(buf, p->GetCount()));
+					m_IsInitialized = SUCCEEDED(InitDirac(buf, p->size()));
 				}
 			}
 		}

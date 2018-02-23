@@ -238,22 +238,22 @@ HRESULT CBaseSplitterParserOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 	return m_bEndOfStream ? S_OK : __super::DeliverPacket(p);
 }
 
-#define HandleInvalidPacket(size) if (m_p->GetCount() < size) { return S_OK; } // Should be invalid packet
+#define HandleInvalidPacket(SIZE) if (m_p->size() < SIZE) { return S_OK; } // Should be invalid packet
 
 #define BEGINDATA										\
-		BYTE* const base = m_p->GetData();				\
-		BYTE* start = m_p->GetData();					\
-		BYTE* end = start + m_p->GetCount();			\
-
+		BYTE* const base = m_p->data();					\
+		BYTE* start = m_p->data();						\
+		BYTE* end = start + m_p->size();				\
+ 
 #define ENDDATA											\
 		if (start == end) {								\
-			m_p->RemoveAll();							\
+			m_p->clear();								\
 		} else if (start > base) {						\
 			size_t remaining = (size_t)(end - start);	\
 			memmove(base, start, remaining);			\
-			m_p->SetCount(remaining);					\
+			m_p->resize(remaining);						\
 		}
-
+ 
 HRESULT CBaseSplitterParserOutputPin::ParseAAC(CAutoPtr<CPacket> p)
 {
 	if (!m_p) {
@@ -264,7 +264,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAAC(CAutoPtr<CPacket> p)
 		return S_OK;
 	}
 
-	if (p) m_p->Append(*p);
+	if (p) m_p->AppendData(*p);
 
 	HandleInvalidPacket(9);
 
@@ -314,7 +314,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAACLATM(CAutoPtr<CPacket> p)
 		return S_OK;
 	}
 
-	if (p) m_p->Append(*p);
+	if (p) m_p->AppendData(*p);
 
 	HandleInvalidPacket(4);
 
@@ -363,7 +363,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 		return S_OK;
 	}
 
-	if (p) m_p->Append(*p);
+	if (p) m_p->AppendData(*p);
 
 	HandleInvalidPacket(6);
 
@@ -399,18 +399,18 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 				dwNalLength			= _byteswap_ulong(dwNalLength);
 				const UINT dwSize	= sizeof(dwNalLength);
 
-				p3->SetCount(Nalu.GetDataLength() + dwSize);
-				memcpy(p3->GetData(), &dwNalLength, dwSize);
-				memcpy(p3->GetData() + dwSize, Nalu.GetDataBuffer(), Nalu.GetDataLength());
+				p3->resize(Nalu.GetDataLength() + dwSize);
+				memcpy(p3->data(), &dwNalLength, dwSize);
+				memcpy(p3->data() + dwSize, Nalu.GetDataBuffer(), Nalu.GetDataLength());
 			} else {
-				p3->SetCount(Nalu.GetLength());
-				memcpy(p3->GetData(), Nalu.GetNALBuffer(), Nalu.GetLength());
+				p3->resize(Nalu.GetLength());
+				memcpy(p3->data(), Nalu.GetNALBuffer(), Nalu.GetLength());
 			}
 
 			if (p2 == nullptr) {
 				p2 = p3;
 			} else {
-				p2->Append(*p3);
+				p2->AppendData(*p3);
 			}
 
 			if (Nalu.GetType() == NALU_TYPE_SLICE
@@ -481,7 +481,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 					bSliceExist = TRUE;
 				}
 
-				pl->Append(*p2);
+				pl->AppendData(*p2);
 			}
 
 			if (bSliceExist) {
@@ -500,7 +500,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 			}
 
 			CH264Packet* pPacket = m_pl.GetAt(pos);
-			const BYTE* pData = pPacket->GetData();
+			const BYTE* pData = pPacket->data();
 
 			BYTE nut = pData[3 + bConvertToAVCC] & 0x1f;
 			if (nut == NALU_TYPE_AUD) {
@@ -527,7 +527,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 						bSliceExist = TRUE;
 					}
 
-					pl->Append(*p2);
+					pl->AppendData(*p2);
 				}
 
 				if (!pl->pmt && m_bFlushed) {
@@ -597,9 +597,9 @@ HRESULT CBaseSplitterParserOutputPin::ParseHEVC(CAutoPtr<CPacket> p)
 		return S_OK;
 	}
 
-	int nBufferPos = m_p->GetCount();
+	int nBufferPos = m_p->size();
 
-	if (p) m_p->Append(*p);
+	if (p) m_p->AppendData(*p);
 
 	HandleInvalidPacket(6);
 
@@ -651,7 +651,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseVC1(CAutoPtr<CPacket> p)
 		return S_OK;
 	}
 
-	if (p) m_p->Append(*p);
+	if (p) m_p->AppendData(*p);
 
 	HandleInvalidPacket(5);
 
@@ -706,14 +706,14 @@ HRESULT CBaseSplitterParserOutputPin::ParseVC1(CAutoPtr<CPacket> p)
 
 HRESULT CBaseSplitterParserOutputPin::ParseHDMVLPCM(CAutoPtr<CPacket> p)
 {
-	if (!p || p->GetCount() <= 4) {
+	if (!p || p->size() <= 4) {
 		return S_OK;
 	}
 
 	HRESULT hr = S_OK;
 
-	if (ParseHdmvLPCMHeader(p->GetData())) {
-		p->RemoveAt(0, 4);
+	if (ParseHdmvLPCMHeader(p->data())) {
+		p->erase(p->begin(), p->begin()+4);
 		hr = __super::DeliverPacket(p);
 	}
 
@@ -730,7 +730,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAC3(CAutoPtr<CPacket> p)
 		return S_OK;
 	}
 
-	if (p) m_p->Append(*p);
+	if (p) m_p->AppendData(*p);
 
 	HandleInvalidPacket(8);
 
@@ -779,7 +779,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseTrueHD(CAutoPtr<CPacket> p, BOOL bChe
 		return S_OK;
 	}
 
-	if (p) m_p->Append(*p);
+	if (p) m_p->AppendData(*p);
 
 	HandleInvalidPacket(16);
 
@@ -838,7 +838,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseDirac(CAutoPtr<CPacket> p)
 		return S_OK;
 	}
 
-	if (p) m_p->Append(*p);
+	if (p) m_p->AppendData(*p);
 
 	HandleInvalidPacket(5);
 
@@ -883,11 +883,11 @@ HRESULT CBaseSplitterParserOutputPin::ParseVobSub(CAutoPtr<CPacket> p)
 		return S_OK;
 	}
 
-	if (p) m_p->Append(*p);
+	if (p) m_p->AppendData(*p);
 
 	HandleInvalidPacket(5);
 
-	BYTE* pData = m_p->GetData();
+	BYTE* pData = m_p->data();
 	int len = (pData[0] << 8) | pData[1];
 
 	if (!len) {
@@ -898,7 +898,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseVobSub(CAutoPtr<CPacket> p)
 
 	}
 
-	if ((len > (int)m_p->GetCount())) {
+	if ((len > (int)m_p->size())) {
 		return hr;
 	}
 
@@ -910,7 +910,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseVobSub(CAutoPtr<CPacket> p)
 		p2->rtStart			= m_p->rtStart;
 		p2->rtStop			= m_p->rtStop;
 		p2->pmt				= m_p->pmt;
-		p2->SetData(m_p->GetData(), m_p->GetCount());
+		p2->SetData(m_p->data(), m_p->size());
 		m_p.Free();
 
 		if (!p2->pmt && m_bFlushed) {
@@ -936,12 +936,12 @@ HRESULT CBaseSplitterParserOutputPin::ParseAdxADPCM(CAutoPtr<CPacket> p)
 		return S_OK;
 	}
 
-	if (p) m_p->Append(*p);
+	if (p) m_p->AppendData(*p);
 
 	if (!m_adx_block_size) {
 		UINT64 state	= 0;
-		BYTE* buf		= m_p->GetData();
-		for (size_t i = 0; i < m_p->GetCount(); i++) {
+		BYTE* buf		= m_p->data();
+		for (size_t i = 0; i < m_p->size(); i++) {
 			state = (state << 8) | buf[i];
 			if ((state & 0xFFFF0000FFFFFF00) == 0x8000000003120400ULL) {
 				int channels	= state & 0xFF;
@@ -953,7 +953,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAdxADPCM(CAutoPtr<CPacket> p)
 					int size	= headersize + m_adx_block_size;
 					HandlePacket(0);
 
-					m_p->RemoveAt(0, i - 7 + headersize + m_adx_block_size);
+					m_p->RemoveHead(i - 7 + headersize + m_adx_block_size);
 					break;
 				}
 			}
@@ -961,20 +961,20 @@ HRESULT CBaseSplitterParserOutputPin::ParseAdxADPCM(CAutoPtr<CPacket> p)
 	}
 
 	if (!m_adx_block_size) {
-		if (m_p->GetCount() > 16) {
-			size_t remove_size = m_p->GetCount() - 16;
-			m_p->RemoveAt(0, remove_size);
+		if (m_p->size() > 16) {
+			size_t remove_size = m_p->size() - 16;
+			m_p->RemoveHead(remove_size);
 		}
 		return hr;
 	}
 
-	while (m_p->GetCount() >= (size_t)m_adx_block_size) {
-		BYTE* start	= m_p->GetData();
+	while (m_p->size() >= (size_t)m_adx_block_size) {
+		BYTE* start	= m_p->data();
 		int size	= m_adx_block_size;
 
 		HandlePacket(0);
 
-		m_p->RemoveAt(0, size);
+		m_p->RemoveHead(size);
 	}
 
 	return hr;
@@ -990,7 +990,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseDTS(CAutoPtr<CPacket> p)
 		return S_OK;
 	}
 
-	if (p) m_p->Append(*p);
+	if (p) m_p->AppendData(*p);
 
 	HandleInvalidPacket(16);
 
@@ -1080,11 +1080,11 @@ HRESULT CBaseSplitterParserOutputPin::ParseTeletext(CAutoPtr<CPacket> p)
 			m_teletext.EraseOutput();
 		}
 	} else {
-		if (!p || p->GetCount() <= 6) {
+		if (!p || p->size() <= 6) {
 			return S_OK;
 		}
 
-		m_teletext.ProcessData(p->GetData(), (uint16_t)p->GetCount(), p->rtStart, p->Flag);
+		m_teletext.ProcessData(p->data(), (uint16_t)p->size(), p->rtStart, p->Flag);
 		if (m_teletext.IsOutputPresent()) {
 			m_teletext.GetOutput(output);
 			m_teletext.EraseOutput();
@@ -1119,7 +1119,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseMpegVideo(CAutoPtr<CPacket> p)
 		return S_OK;
 	}
 
-	if (p) m_p->Append(*p);
+	if (p) m_p->AppendData(*p);
 
 	HandleInvalidPacket(6);
 

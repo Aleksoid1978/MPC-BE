@@ -29,7 +29,7 @@ void CPacketQueue::Add(CAutoPtr<CPacket> p)
 {
 	std::unique_lock<std::mutex> lock(m_mutex);
 	if (p) {
-		m_size += p->GetCount();
+		m_size += p->size();
 	}
 	emplace_back(p);
 }
@@ -40,7 +40,7 @@ CAutoPtr<CPacket> CPacketQueue::Remove()
 	ASSERT(!empty());
 	CAutoPtr<CPacket> p = front(); pop_front();
 	if (p) {
-		m_size -= p->GetCount();
+		m_size -= p->size();
 	}
 	return p;
 }
@@ -53,7 +53,7 @@ void CPacketQueue::RemoveSafe(CAutoPtr<CPacket>& p, size_t& count)
 	if (count) {
 		p = front(); pop_front();
 		if (p) {
-			m_size -= p->GetCount();
+			m_size -= p->size();
 		}
 	}
 }

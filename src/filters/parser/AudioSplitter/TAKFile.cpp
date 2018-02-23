@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -462,7 +462,7 @@ int CTAKFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 		return 0;
 	}
 
-	memcpy(packet->GetData(), buffer, size);
+	memcpy(packet->data(), buffer, size);
 
 	packet->rtStart	= rtStart;
 	packet->rtStop	= rtStart + UNITS * m_framelen / m_samplerate;

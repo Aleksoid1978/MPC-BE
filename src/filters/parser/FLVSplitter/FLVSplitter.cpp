@@ -1358,8 +1358,8 @@ bool CFLVSplitterFilter::DemuxLoop()
 			p->rtStop		= p->rtStart + 1;
 			p->bSyncPoint	= t.TagType == FLV_VIDEODATA ? vt.FrameType == 1 : true;
 
-			p->SetCount((size_t)dataSize);
-			if (S_OK != (hr = m_pFile->ByteRead(p->GetData(), p->GetCount()))) {
+			p->resize((size_t)dataSize);
+			if (S_OK != (hr = m_pFile->ByteRead(p->data(), p->size()))) {
 				return true;
 			}
 

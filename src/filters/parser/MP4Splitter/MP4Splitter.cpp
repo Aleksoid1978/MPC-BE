@@ -1969,9 +1969,9 @@ start:
 				p->SetData(data.GetData(), data.GetDataSize());
 
 				while (duration < 500000 && AP4_SUCCEEDED(track->ReadSample(pNext->second.index + 1, sample, data))) {
-					size_t size = p->GetCount();
-					p->SetCount(size + data.GetDataSize());
-					memcpy(p->GetData() + size, data.GetData(), data.GetDataSize());
+					size_t size = p->size();
+					p->resize(size + data.GetDataSize());
+					memcpy(p->data() + size, data.GetData(), data.GetDataSize());
 
 					p->rtStop = FractionScale64(sample.GetCts() + sample.GetDuration(), UNITS, track->GetMediaTimeScale());
 
@@ -2015,12 +2015,12 @@ start:
 					track->m_hasPalette = false;
 					CAutoPtr<CPacket> p2(DNew CPacket());
 					p2->SetData(track->GetPalette(), 1024);
-					p->Append(*p2);
+					p->AppendData(*p2);
 
 					CAutoPtr<CPacket> p3(DNew CPacket());
 					static BYTE add[13] = {0x00, 0x00, 0x04, 0x00, 0x80, 0x8C, 0x4D, 0x9D, 0x10, 0x8E, 0x25, 0xE9, 0xFE};
 					p3->SetData(add, _countof(add));
-					p->Append(*p3);
+					p->AppendData(*p3);
 				}
 			}
 
@@ -2131,8 +2131,8 @@ HRESULT CMP4SplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 		REFERENCE_TIME rtStartTmp = p->rtStart;
 		REFERENCE_TIME rtStopTmp  = p->rtStop;
 
-		const BYTE* pData = p->GetData();
-		size_t size = p->GetCount();
+		const BYTE* pData = p->data();
+		size_t size = p->size();
 
 		const BYTE marker = pData[size - 1];
 		if ((marker & 0xe0) == 0xc0) {

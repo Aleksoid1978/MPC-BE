@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -209,7 +209,7 @@ int CTTAFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 	m_pFile->Seek(m_index[m_currentframe]);
 	m_currentframe++;
 
-	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->GetData(), size) != S_OK) {
+	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->data(), size) != S_OK) {
 		return 0;
 	}
 

@@ -199,8 +199,8 @@ bool CDSMSplitterFile::Read(__int64 len, CPacket* p, bool fData)
 	}
 
 	if (fData) {
-		p->SetCount((INT_PTR)len - (2 + iTimeStamp + iDuration));
-		ByteRead(p->GetData(), p->GetCount());
+		p->resize((INT_PTR)len - (2 + iTimeStamp + iDuration));
+		ByteRead(p->data(), p->size());
 	}
 
 	return true;

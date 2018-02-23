@@ -311,7 +311,7 @@ bool CBinkSplitterFilter::DemuxLoop()
 						pa->rtStart = rtstart;
 						pa->rtStop = rtstop;
 
-						m_pFile->ByteRead(pa->GetData(), packet_size);
+						m_pFile->ByteRead(pa->data(), packet_size);
 
 						hr = DeliverPacket(pa);
 					}
@@ -332,7 +332,7 @@ bool CBinkSplitterFilter::DemuxLoop()
 			pv->rtStart = rtstart;
 			pv->rtStop = rtstop;
 
-			m_pFile->ByteRead(pv->GetData(), packet_size);
+			m_pFile->ByteRead(pv->data(), packet_size);
 
 			hr = DeliverPacket(pv);
 		}
