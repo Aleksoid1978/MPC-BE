@@ -2134,17 +2134,17 @@ static struct {
 CString ISO6391ToLanguage(LPCSTR code)
 {
 	CHAR tmp[2+1];
-	strncpy_s(tmp, code, 2);
-	tmp[2] = 0;
-	_strlwr_s(tmp);
-	for (size_t i = 0; i < _countof(s_isolangs); i++) {
-		if (!strcmp(s_isolangs[i].iso6391, tmp)) {
-			CStringA ret(s_isolangs[i].name);
-			int k = ret.Find(';');
-			if (k > 0) {
-				ret.Truncate(k);
+	if (strncpy_s(tmp, code, 2) == 0 && tmp[0]) {
+		_strlwr_s(tmp);
+		for (const auto& isolang : s_isolangs) {
+			if (!strcmp(isolang.iso6391, tmp)) {
+				CStringA ret(isolang.name);
+				int k = ret.Find(';');
+				if (k > 0) {
+					ret.Truncate(k);
+				}
+				return CString(ret);
 			}
-			return CString(ret);
 		}
 	}
 	return L"";
@@ -2153,8 +2153,7 @@ CString ISO6391ToLanguage(LPCSTR code)
 CString ISO6392ToLanguage(LPCSTR code)
 {
 	CHAR tmp[3+1];
-	strncpy_s(tmp, code, 3);
-	if (tmp[0]) {
+	if (strncpy_s(tmp, code, 3) == 0 && tmp[0]) {
 		_strlwr_s(tmp);
 		for (const auto& isolang : s_isolangs) {
 			if (!strcmp(isolang.iso6392, tmp)) {
@@ -2219,12 +2218,12 @@ CString ISO639XToLanguage(LPCSTR code, bool bCheckForFullLangName /*= false*/)
 LCID ISO6391ToLcid(LPCSTR code)
 {
 	CHAR tmp[3+1];
-	strncpy_s(tmp, code, 3);
-	tmp[3] = 0;
-	_strlwr_s(tmp);
-	for (size_t i = 0; i < _countof(s_isolangs); i++) {
-		if (!strcmp(s_isolangs[i].iso6391, code)) {
-			return s_isolangs[i].lcid;
+	if (strncpy_s(tmp, code, 3) == 0 && tmp[0]) {
+		_strlwr_s(tmp);
+		for (const auto& isolang : s_isolangs) {
+			if (!strcmp(isolang.iso6391, code)) {
+				return isolang.lcid;
+			}
 		}
 	}
 	return 0;
@@ -2232,13 +2231,13 @@ LCID ISO6391ToLcid(LPCSTR code)
 
 LCID ISO6392ToLcid(LPCSTR code)
 {
-	CHAR tmp[3+1];
-	strncpy_s(tmp, code, 3);
-	tmp[3] = 0;
-	_strlwr_s(tmp);
-	for (size_t i = 0; i < _countof(s_isolangs); i++) {
-		if (!strcmp(s_isolangs[i].iso6392, tmp)) {
-			return s_isolangs[i].lcid;
+	CHAR tmp[3 + 1];
+	if (strncpy_s(tmp, code, 3) == 0 && tmp[0]) {
+		_strlwr_s(tmp);
+		for (const auto& isolang : s_isolangs) {
+			if (!strcmp(isolang.iso6392, tmp)) {
+				return isolang.lcid;
+			}
 		}
 	}
 	return 0;
@@ -2247,12 +2246,12 @@ LCID ISO6392ToLcid(LPCSTR code)
 CString ISO6391To6392(LPCSTR code)
 {
 	CHAR tmp[2+1];
-	strncpy_s(tmp, code, 2);
-	tmp[2] = 0;
-	_strlwr_s(tmp);
-	for (size_t i = 0; i < _countof(s_isolangs); i++) {
-		if (!strcmp(s_isolangs[i].iso6391, tmp)) {
-			return CString(s_isolangs[i].iso6392);
+	if (strncpy_s(tmp, code, 2) == 0 && tmp[0]) {
+		_strlwr_s(tmp);
+		for (const auto& isolang : s_isolangs) {
+			if (!strcmp(isolang.iso6391, tmp)) {
+				return CString(isolang.iso6392);
+			}
 		}
 	}
 	return L"";
@@ -2261,12 +2260,12 @@ CString ISO6391To6392(LPCSTR code)
 CString ISO6392To6391(LPCSTR code)
 {
 	CHAR tmp[3+1];
-	strncpy_s(tmp, code, 3);
-	tmp[3] = 0;
-	_strlwr_s(tmp);
-	for (size_t i = 0; i < _countof(s_isolangs); i++) {
-		if (!strcmp(s_isolangs[i].iso6392, tmp)) {
-			return CString(s_isolangs[i].iso6391);
+	if (strncpy_s(tmp, code, 3) == 0 && tmp[0]) {
+		_strlwr_s(tmp);
+		for (const auto& isolang : s_isolangs) {
+			if (!strcmp(isolang.iso6392, tmp)) {
+				return CString(isolang.iso6391);
+			}
 		}
 	}
 	return L"";
