@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,7 +37,7 @@ public:
 
 	uint8_t* Data()
 	{
-		return &__super::front().value;
+		return (uint8_t*)__super::data(); // don't use "&front().value" here, because it does not work for an empty array
 	}
 
 	size_t Size()
