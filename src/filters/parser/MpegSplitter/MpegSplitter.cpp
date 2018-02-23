@@ -666,7 +666,7 @@ HRESULT CMpegSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 			for (auto& pMVCBasePacket : m_MVCBaseQueue) {
 				for (const auto& pMVCExtensionPacket : m_MVCExtensionQueue) {
 					if (pMVCExtensionPacket->rtStart == pMVCBasePacket->rtStart) {
-						pMVCBasePacket->Append(*pMVCExtensionPacket);
+						pMVCBasePacket->AppendData(*pMVCExtensionPacket);
 						m_MVCExtensionQueue.erase(m_MVCExtensionQueue.begin());
 
 						__super::DeliverPacket(pMVCBasePacket);
@@ -727,10 +727,10 @@ inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(const DWORD TrackNumber, co
 				p->Flag        = Flag;
 			}
 
-			size_t oldSize = p->GetCount();
-			size_t newSize = p->GetCount() + nBytes;
-			p->SetCount(newSize, std::max(1024, (int)newSize));
-			hr = m_pFile->ByteRead(p->GetData() + oldSize, nBytes);
+			size_t oldSize = p->size();
+			size_t newSize = p->size() + nBytes;
+			p->resize(newSize);
+			hr = m_pFile->ByteRead(p->data() + oldSize, nBytes);
 		} else {
 			REFERENCE_TIME rtStart = INVALID_TIME;
 			if (h.fpts) {
@@ -745,8 +745,8 @@ inline HRESULT CMpegSplitterFilter::HandleMPEGPacket(const DWORD TrackNumber, co
 			p->rtStop      = (p->rtStart == INVALID_TIME) ? INVALID_TIME : p->rtStart + 1;
 			p->bSyncPoint  = p->rtStart != INVALID_TIME;
 			p->Flag        = Flag;
-			p->SetCount(nBytes);
-			m_pFile->ByteRead(p->GetData(), nBytes);
+			p->resize(nBytes);
+			m_pFile->ByteRead(p->data(), nBytes);
 			hr = DeliverPacket(p);
 		}
 	}
@@ -2018,8 +2018,8 @@ HRESULT CMpegSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 	bool force_packet = false;
 
 	if (m_SubtitleType == hdmvsub) {
-		if (p && p->GetCount() >= 3) {
-			int segtype = p->GetData()[0];
+		if (p && p->size() >= 3) {
+			int segtype = p->data()[0];
 			//int unitsize = p->GetData()[1] << 8 | p->GetData()[2];
 			//if (segtype == 22) Log2File(L"");
 			//Log2File(L"segtype %3d, unitsize %5d, time %4.3f", segtype, unitsize, p->rtStart/10000000.0);
@@ -2036,9 +2036,9 @@ HRESULT CMpegSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		}
 	}
 	else if (m_SubtitleType == dvbsub) {
-		if (p && p->GetCount() >= 6) {
-			BYTE* pos = p->GetData();
-			BYTE* end = pos + p->GetCount();
+		if (p && p->size() >= 6) {
+			BYTE* pos = p->data();
+			BYTE* end = pos + p->size();
 
 			while (pos + 6 < end) {
 				if (*pos++ == 0x0F) {

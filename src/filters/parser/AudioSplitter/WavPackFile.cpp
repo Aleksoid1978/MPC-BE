@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -441,7 +441,7 @@ int CWavPackFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 
 	wv_header_t wv_header;
 	BYTE buf[WV_HEADER_SIZE];
-	packet->SetCount(0);
+	packet->resize(0);
 
 	do {
 		wv_header.samples = 0;
@@ -450,12 +450,12 @@ int CWavPackFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 			m_pFile->Seek(m_pFile->GetPos() + wv_header.blocksize);
 		}
 
-		size_t offset = packet->GetCount();
+		size_t offset = packet->size();
 
 		if (wv_header.samples
 				&& packet->SetCount(offset + WV_HEADER_SIZE + wv_header.blocksize)
-				&& m_pFile->ByteRead(packet->GetData() + offset + WV_HEADER_SIZE, wv_header.blocksize) == S_OK) {
-			memcpy(packet->GetData() + offset, buf, WV_HEADER_SIZE);
+				&& m_pFile->ByteRead(packet->data() + offset + WV_HEADER_SIZE, wv_header.blocksize) == S_OK) {
+			memcpy(packet->data() + offset, buf, WV_HEADER_SIZE);
 		} else {
 			return 0;
 		}
@@ -464,5 +464,5 @@ int CWavPackFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 	packet->rtStart	= (wv_header.block_idx - m_block_idx_start) *  10000000i64 / m_samplerate;
 	packet->rtStop	= (wv_header.block_idx - m_block_idx_start + wv_header.samples) * 10000000i64 / m_samplerate;
 
-	return packet->GetCount();
+	return packet->size();
 }

@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -456,7 +456,7 @@ int CDFFFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 				dffchunk_t Chunk;
 				if (ReadDFFChunk(Chunk) && ((__int64)Chunk.size + m_pFile->GetPos()) <= m_endpos) {
 					const int size = Chunk.size;
-					if (!packet->SetCount(size) || m_pFile->ByteRead(packet->GetData(), size) != S_OK) {
+					if (!packet->SetCount(size) || m_pFile->ByteRead(packet->data(), size) != S_OK) {
 						return 0;
 					}
 
@@ -478,7 +478,7 @@ int CDFFFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 	}
 
 	int size = (int)std::min((__int64)m_max_blocksize, m_endpos - m_pFile->GetPos());
-	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->GetData(), size) != S_OK) {
+	if (!packet->SetCount(size) || m_pFile->ByteRead(packet->data(), size) != S_OK) {
 		return 0;
 	}
 

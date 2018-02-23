@@ -20,14 +20,13 @@
 
 #pragma once
 
-#include <atlcoll.h>
 #include <deque>
 #include <mutex>
 #include <mpc_defines.h>
 
 #define PACKET_AAC_RAW 0x0001
 
-class CPacket : public CAtlArray<BYTE>
+class CPacket : public std::vector<BYTE>
 {
 public:
 	DWORD TrackNumber      = 0;
@@ -42,14 +41,32 @@ public:
 	virtual ~CPacket() {
 		DeleteMediaType(pmt);
 	}
+	bool SetCount(const size_t newsize) {
+		try {
+			resize(newsize);
+		}
+		catch (...) {
+			return false;
+		}
+		return true;
+	}
+	void SetData(const CPacket& packet) {
+		*this = packet;
+	}
 	void SetData(const void* ptr, DWORD len) {
-		SetCount(len);
-		memcpy(GetData(), ptr, len);
+		resize(len);
+		memcpy(data(), ptr, len);
+	}
+	void AppendData(const CPacket& packet) {
+		insert(cend(), packet.cbegin(), packet.cend());
 	}
 	void AppendData(const void* ptr, DWORD len) {
-		size_t oldsize = GetCount();
-		SetCount(oldsize + len);
-		memcpy(GetData() + oldsize, ptr, len);
+		size_t oldsize = size();
+		resize(oldsize + len);
+		memcpy(data() + oldsize, ptr, len);
+	}
+	void RemoveHead(size_t size) {
+		erase(begin(), begin() + size);
 	}
 };
 

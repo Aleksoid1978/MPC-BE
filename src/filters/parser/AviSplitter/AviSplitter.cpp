@@ -785,8 +785,8 @@ bool CAviSplitterFilter::DemuxLoop()
 			p->bDiscontinuity	= fDiscontinuity[curTrack];
 			p->rtStart			= s->GetRefTime(f, s->cs[f].size);
 			p->rtStop			= s->GetRefTime(f + 1, f + 1 < (DWORD)s->cs.size() ? s->cs[f + 1].size : s->totalsize);
-			p->SetCount(size);
-			if (S_OK != (hr = m_pFile->ByteRead(p->GetData(), p->GetCount()))) {
+			p->resize(size);
+			if (S_OK != (hr = m_pFile->ByteRead(p->data(), p->size()))) {
 				return true;
 			}
 #if defined(DEBUG_OR_LOG) && 0

@@ -728,8 +728,8 @@ bool CRealMediaSplitterFilter::DemuxLoop()
 		p->rtStop = 1;
 
 		size_t count = (4+1) + (2+4+(s.name.GetLength()+1)*2) + (2+4+s.data.GetLength());
-		p->SetCount(count);
-		BYTE* ptr = p->GetData();
+		p->resize(count);
+		BYTE* ptr = p->data();
 
 		strcpy_s((char*)ptr, count, "GAB2");
 		ptr += 4+1;
@@ -771,7 +771,7 @@ bool CRealMediaSplitterFilter::DemuxLoop()
 			p->bSyncPoint	= !!(mph.flags & MediaPacketHeader::PN_KEYFRAME_FLAG);
 			p->rtStart		= 10000i64 * mph.tStart;
 			p->rtStop		= p->rtStart + 1;
-			p->Copy(mph.pData);
+			p->SetData(mph.pData.GetData(), mph.pData.GetCount());
 			hr				= DeliverPacket(p);
 		}
 
@@ -864,9 +864,9 @@ HRESULT CRealMediaSplitterOutputPin::DeliverSegments()
 
 	len += 1 + 2 * 4 * (!m_segments.fMerged ? m_segments.GetCount() : 1);
 
-	p->SetCount(len);
+	p->resize(len);
 
-	BYTE* pData = p->GetData();
+	BYTE* pData = p->data();
 
 	*pData++ = m_segments.fMerged ? 0 : (BYTE)(m_segments.GetCount() - 1);
 
@@ -903,8 +903,8 @@ HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 	ASSERT(p->rtStart < p->rtStop);
 
 	if (m_mt.subtype == MEDIASUBTYPE_WAVE_DOLBY_AC3) {
-		WORD* s = (WORD*)p->GetData();
-		WORD* e = s + p->GetCount()/2;
+		WORD* s = (WORD*)p->data();
+		WORD* e = s + p->size()/2;
 		while (s < e) {
 			bswap(*s++);
 		}
@@ -915,8 +915,8 @@ HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 			|| m_mt.subtype == MEDIASUBTYPE_RV41) {
 		CAutoLock cAutoLock(&m_csQueue);
 
-		int len = p->GetCount();
-		BYTE* pIn = p->GetData();
+		int len = p->size();
+		BYTE* pIn = p->data();
 		BYTE* pInOrg = pIn;
 
 		if (m_segments.rtStart != p->rtStart) {
@@ -999,11 +999,11 @@ HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 		}
 	} else if (m_mt.subtype == MEDIASUBTYPE_RAAC || m_mt.subtype == MEDIASUBTYPE_RACP
 			   || m_mt.subtype == MEDIASUBTYPE_RAW_AAC1) {
-		BYTE* ptr = p->GetData()+2;
+		BYTE* ptr = p->data()+2;
 
 		CAtlList<WORD> sizes;
 		int total = 0;
-		int remaining = p->GetCount()-2;
+		int remaining = p->size()-2;
 		int expected = *(ptr-1)>>4;
 
 		while (total < remaining) {
