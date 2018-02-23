@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -409,11 +409,11 @@ int CAPEFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 	int size = m_frames[m_curentframe].size + 8;
 	packet->SetCount(size);
 
-	memcpy(packet->GetData(), &m_frames[m_curentframe].nblocks, 4);
-	memcpy(packet->GetData() + 4, &m_frames[m_curentframe].skip, 4);
+	memcpy(packet->data(), &m_frames[m_curentframe].nblocks, 4);
+	memcpy(packet->data() + 4, &m_frames[m_curentframe].skip, 4);
 
 	m_pFile->Seek(m_frames[m_curentframe].pos);
-	m_pFile->ByteRead(packet->GetData() + 8, size - 8);
+	m_pFile->ByteRead(packet->data() + 8, size - 8);
 
 	packet->rtStart = m_frames[m_curentframe].pts * 10000000 / m_samplerate;
 	packet->rtStop  = (m_frames[m_curentframe].pts + m_frames[m_curentframe].nblocks) * 10000000 / m_samplerate;
