@@ -53,19 +53,19 @@ public:
 	void SetData(const CPacket& packet) {
 		*this = packet;
 	}
-	void SetData(const void* ptr, DWORD len) {
-		resize(len);
-		memcpy(data(), ptr, len);
+	void SetData(const void* ptr, const size_t size) {
+		resize(size);
+		memcpy(data(), ptr, size);
 	}
 	void AppendData(const CPacket& packet) {
 		insert(cend(), packet.cbegin(), packet.cend());
 	}
-	void AppendData(const void* ptr, DWORD len) {
-		size_t oldsize = size();
-		resize(oldsize + len);
-		memcpy(data() + oldsize, ptr, len);
+	void AppendData(const void* ptr, const size_t size) {
+		const size_t oldsize = this->size();
+		resize(oldsize + size);
+		memcpy(data() + oldsize, ptr, size);
 	}
-	void RemoveHead(size_t size) {
+	void RemoveHead(const size_t size) {
 		erase(begin(), begin() + size);
 	}
 };
