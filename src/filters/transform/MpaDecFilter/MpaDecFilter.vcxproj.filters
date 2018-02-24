@@ -53,7 +53,7 @@
     <ClInclude Include="FFAudioDecoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PaddedArray.h">
+    <ClInclude Include="PaddedBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AC3Encoder.h">

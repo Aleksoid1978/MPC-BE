@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,7 +28,7 @@
 #include "IMpaDecFilter.h"
 #include "MpaDecFilterSettingsWnd.h"
 #include "Mixer.h"
-#include "PaddedArray.h"
+#include "PaddedBuffer.h"
 #include "FFAudioDecoder.h"
 #include "AC3Encoder.h"
 
@@ -65,7 +65,7 @@ protected:
 	bool            m_fSPDIF[etcount];
 
 	CCritSec        m_csReceive;
-	CPaddedArray    m_buff;
+	CPaddedBuffer   m_buff;
 
 	REFERENCE_TIME  m_rtStart;
 	double          m_dStartOffset;

@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,8 +19,6 @@
  */
 
 #pragma once
-
-#include "PaddedArray.h"
 
 struct AVCodec;
 struct AVCodecContext;

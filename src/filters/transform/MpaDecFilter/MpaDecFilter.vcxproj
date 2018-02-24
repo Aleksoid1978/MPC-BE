@@ -224,7 +224,7 @@
     <ClInclude Include="IMpaDecFilter.h" />
     <ClInclude Include="MpaDecFilter.h" />
     <ClInclude Include="MpaDecFilterSettingsWnd.h" />
-    <ClInclude Include="PaddedArray.h" />
+    <ClInclude Include="PaddedBuffer.h" />
     <ClInclude Include="AudioDecoders.h" />
     <ClInclude Include="resource.h">
       <ExcludedFromBuild Condition="'$(Configuration)'=='Debug' or '$(Configuration)'=='Release'">true</ExcludedFromBuild>
