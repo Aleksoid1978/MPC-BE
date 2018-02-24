@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,7 +39,7 @@ private:
 	CString	m_type;
 	CString	m_size;
 	CString	m_time;
-	CString	m_res;
+	CString	m_resolution;
 	CString	m_created;
 	CString m_encodingText;
 	CEdit	m_encoding;

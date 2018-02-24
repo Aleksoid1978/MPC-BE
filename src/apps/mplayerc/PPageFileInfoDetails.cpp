@@ -63,7 +63,7 @@ CPPageFileInfoDetails::CPPageFileInfoDetails(CString fn, IFilterGraph* pFG, ISub
 	, m_type(ResStr(IDS_AG_NOT_KNOWN))
 	, m_size(ResStr(IDS_AG_NOT_KNOWN))
 	, m_time(ResStr(IDS_AG_NOT_KNOWN))
-	, m_res(ResStr(IDS_AG_NOT_KNOWN))
+	, m_resolution(ResStr(IDS_AG_NOT_KNOWN))
 	, m_created(ResStr(IDS_AG_NOT_KNOWN))
 {
 	CComVariant vt;
@@ -155,13 +155,13 @@ CPPageFileInfoDetails::CPPageFileInfoDetails(CString fn, IFilterGraph* pFG, ISub
 	}
 
 	if (wh.cx > 0 && wh.cy > 0) {
-		m_res.Format(L"%dx%d", wh.cx, wh.cy);
+		m_resolution.Format(L"%dx%d", wh.cx, wh.cy);
 		ReduceDim(arxy);
 
 		if (arxy.cx > 0 && arxy.cy > 0 && arxy.cx*wh.cy != arxy.cy*wh.cx) {
 			CString ar;
 			ar.Format(L" (AR %d:%d)", arxy.cx, arxy.cy);
-			m_res += ar;
+			m_resolution += ar;
 		}
 	}
 
@@ -184,7 +184,7 @@ void CPPageFileInfoDetails::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT4, m_type);
 	DDX_Text(pDX, IDC_EDIT3, m_size);
 	DDX_Text(pDX, IDC_EDIT2, m_time);
-	DDX_Text(pDX, IDC_EDIT5, m_res);
+	DDX_Text(pDX, IDC_EDIT5, m_resolution);
 	DDX_Text(pDX, IDC_EDIT6, m_created);
 	DDX_Control(pDX, IDC_EDIT7, m_encoding);
 }
