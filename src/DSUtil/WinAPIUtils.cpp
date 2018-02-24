@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2017 see Authors.txt
+ * (C) 2011-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,7 +22,6 @@
 #include <Shlobj.h>
 #include "WinAPIUtils.h"
 #include "Log.h"
-#include "../apps/mplayerc/resource.h"
 
 // retrieves the monitor EDID info
 // thanks to JanWillem32 for this code
