@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include "../../DSUtil/std_helper.h"
 #include "PPageFileInfoRes.h"
 #include "Misc.h"
 
@@ -53,7 +54,7 @@ CPPageFileInfoRes::CPPageFileInfoRes(CString fn, IFilterGraph* pFG)
 					r.data.resize(len);
 					memcpy(r.data.data(), pData, r.data.size());
 					CoTaskMemFree(pData);
-					m_res.AddTail(r);
+					m_resources.push_back(r);
 				}
 			}
 		}
@@ -101,15 +102,10 @@ BOOL CPPageFileInfoRes::OnInitDialog()
 	m_list.InsertColumn(0, L"Name", LVCFMT_LEFT, 187);
 	m_list.InsertColumn(1, L"Mime Type", LVCFMT_LEFT, 127);
 
-	POSITION pos = m_res.GetHeadPosition();
-	while (pos) {
-		CDSMResource res = m_res.GetAt(pos);
-
-		int iItem = m_list.InsertItem(m_list.GetItemCount(), res.name);
-		m_list.SetItemText(iItem, 1, res.mime);
-		m_list.SetItemData(iItem, (DWORD_PTR)pos);
-
-		m_res.GetNext(pos);
+	for (const auto& resource : m_resources) {
+		int iItem = m_list.InsertItem(m_list.GetItemCount(), resource.name);
+		m_list.SetItemText(iItem, 1, resource.mime);
+		m_list.SetItemData(iItem, (DWORD_PTR)&resource);
 	}
 
 	UpdateData(FALSE);
@@ -129,13 +125,17 @@ void CPPageFileInfoRes::OnSaveAs()
 		return;
 	}
 
-	CDSMResource& r = m_res.GetAt((POSITION)m_list.GetItemData(i));
+	auto it = FindInListByPointer(m_resources, (CDSMResource*)m_list.GetItemData(i));
+	if (it == m_resources.end()) {
+		ASSERT(0);
+		return;
+	}
 
-	CString fname(r.name);
+	CString fname((*it).name);
 	CString ext = ::PathFindExtension(fname);
 
 	CString ext_list = L"All files|*.*|";
-	CString mime(r.mime);
+	CString mime((*it).mime);
 	mime.MakeLower();
 	if (mime == L"application/x-truetype-font" || mime == L"application/x-font-ttf") {
 		ext_list = L"TrueType Font (*.ttf)|*.ttf|";
@@ -160,7 +160,7 @@ void CPPageFileInfoRes::OnSaveAs()
 	if (fd.DoModal() == IDOK) {
 		FILE* f = nullptr;
 		if (_wfopen_s(&f, fd.GetPathName(), L"wb") == 0) {
-			fwrite(r.data.data(), 1, r.data.size(), f);
+			fwrite((*it).data.data(), 1, (*it).data.size(), f);
 			fclose(f);
 		}
 	}

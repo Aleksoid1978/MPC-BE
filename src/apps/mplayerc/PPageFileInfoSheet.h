@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -68,10 +68,10 @@ class CPPageFileInfoSheet : public CMPCPropertySheet
 private:
 	CMainFrame* m_pMainFrame;
 
-	CPPageFileInfoClip m_clip;
 	CPPageFileInfoDetails m_details;
-	CPPageFileInfoRes m_res;
-	CPPageFileMediaInfo m_mi;
+	CPPageFileInfoClip    m_clip;
+	CPPageFileInfoRes     m_res;
+	CPPageFileMediaInfo   m_mi;
 
 	CButton m_Button_MI_SaveAs;
 	CButton m_Button_MI_Clipboard;
