@@ -65,6 +65,14 @@
 #define MAX_DTS_JITTER      1400000i64 // +-140ms jitter is allowed for DTS
 
 #define PADDING_SIZE        AV_INPUT_BUFFER_PADDING_SIZE
+/** ffmpeg\libavcodec\avcodec.h - AV_INPUT_BUFFER_PADDING_SIZE
+* @ingroup lavc_decoding
+* Required number of additionally allocated bytes at the end of the input bitstream for decoding.
+* This is mainly needed because some optimized bitstream readers read
+* 32 or 64 bit at once and could read over the end.
+* Note: If the first 23 bits of the additional bytes are not 0, then damaged
+* MPEG bitstreams could cause overread and segfault.
+*/
 
 #define BS_HEADER_SIZE          8
 #define BS_AC3_SIZE          6144
@@ -794,7 +802,7 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 	BYTE* p = base;
 
 	// RealAudio
-	CPaddedArray buffRA(AV_INPUT_BUFFER_PADDING_SIZE);
+	CPaddedBuffer buffRA(AV_INPUT_BUFFER_PADDING_SIZE);
 	bool isRA = false;
 	if (nCodecId == AV_CODEC_ID_ATRAC3 || nCodecId == AV_CODEC_ID_COOK || nCodecId == AV_CODEC_ID_SIPR) {
 		hr = m_FFAudioDec.RealPrepare(p, int(end - p), buffRA);

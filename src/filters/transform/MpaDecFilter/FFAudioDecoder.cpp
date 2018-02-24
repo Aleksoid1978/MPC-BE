@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -643,7 +643,7 @@ HRESULT CFFAudioDecoder::ParseRealAudioHeader(const BYTE* extra, const int extra
 	return S_OK;
 }
 
-HRESULT CFFAudioDecoder::RealPrepare(BYTE* p, int buffsize, CPaddedArray& BuffOut)
+HRESULT CFFAudioDecoder::RealPrepare(BYTE* p, int buffsize, CPaddedBuffer& BuffOut)
 {
 	if (m_raData.deint_id == MAKEFOURCC('r', 'n', 'e', 'g') || m_raData.deint_id == MAKEFOURCC('r', 'p', 'i', 's')) {
 

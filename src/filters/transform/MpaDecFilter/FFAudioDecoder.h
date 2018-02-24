@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "PaddedArray.h"
+#include "PaddedBuffer.h"
 #include "SampleFormat.h"
 
 struct AVCodec;
@@ -63,7 +63,7 @@ public:
 	void    SetDRC(bool fDRC);
 	void    SetStereoDownmix(bool stereodownmix);
 
-	HRESULT RealPrepare(BYTE* p, int buffsize, CPaddedArray& BuffOut);
+	HRESULT RealPrepare(BYTE* p, int buffsize, CPaddedBuffer& BuffOut);
 	HRESULT SendData(BYTE* p, int size, int* out_size = nullptr);
 	HRESULT ReceiveData(std::vector<BYTE>& BuffOut, SampleFormat& samplefmt);
 	void    FlushBuffers();
