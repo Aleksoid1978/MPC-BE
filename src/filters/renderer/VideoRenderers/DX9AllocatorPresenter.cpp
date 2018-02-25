@@ -42,6 +42,11 @@
 
 using namespace DSObjects;
 
+static const LPCSTR s_nominalrange[8] = { nullptr, "0-255", "16-235", "48-208", nullptr, nullptr, nullptr, nullptr };
+static const LPCSTR s_transfermatrix[8] = { nullptr, "BT.709", "BT.601", "SMPTE 240M", "BT.2020", nullptr, nullptr, "YCgCo" };
+static const LPCSTR s_transferfunction[32] = {nullptr, "Linear RGB", "1.8 gamma", "2.0 gamma", "2.2 gamma", "BT.709", "SMPTE 240M", "sRGB",
+	"2.8 gamma", "Log100", "Log316", "Symmetric BT.709", nullptr, nullptr, nullptr, nullptr, "SMPTE ST 2084", nullptr, "ARIB STD-B67 (HLG)" };
+
 // CDX9AllocatorPresenter
 
 CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, bool bIsEVR, CString &_Error)
@@ -1961,11 +1966,12 @@ void CDX9AllocatorPresenter::DrawStats()
 
 			drawText(strText);
 
-			drawText(L"Formats      | Input  | Mixer       | VideoBuffer   | Surface       | Backbuffer/Display |");
-			ASSERT(m_BackbufferFmt == m_DisplayFmt);
+			strText.Format(L"Input format : %s", m_strMixerFmtIn);
+			drawText(strText);
 
-			strText.Format(L"             | %-6s | %-11s | %-13s | %-13s | %-18s |"
-				, m_strMixerFmtIn
+			drawText(L"Surface fmts | Mixer       | VideoBuffer   | Surface       | Backbuffer/Display |");
+			ASSERT(m_BackbufferFmt == m_DisplayFmt);
+			strText.Format(L"             | %-11s | %-13s | %-13s | %-18s |"
 				, m_strMixerFmtOut
 				, GetD3DFormatStr(m_VideoBufferFmt)
 				, m_strSurfaceFmt
@@ -2353,6 +2359,23 @@ void CDX9AllocatorPresenter::OnChangeInput(CComPtr<IPin> pPin)
 					((char*)&bih.biCompression)[1],
 					((char*)&bih.biCompression)[2],
 					((char*)&bih.biCompression)[3]);
+			}
+		}
+
+		if (input_mt.formattype == FORMAT_VideoInfo2) {
+			VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)input_mt.pbFormat;
+			if (vih2->dwControlFlags & (AMCONTROL_USED | AMCONTROL_COLORINFO_PRESENT)) {
+				DXVA2_ExtendedFormat exfmt;
+				exfmt.value = vih2->dwControlFlags;
+				if (s_nominalrange[exfmt.NominalRange]) {
+					m_strMixerFmtIn.AppendFormat(L", %S", s_nominalrange[exfmt.NominalRange]);
+				}
+				if (s_transfermatrix[exfmt.VideoTransferMatrix]) {
+					m_strMixerFmtIn.AppendFormat(L", %S", s_transfermatrix[exfmt.VideoTransferMatrix]);
+				}
+				if (s_transferfunction[exfmt.VideoTransferFunction]) {
+					m_strMixerFmtIn.AppendFormat(L", %S", s_transferfunction[exfmt.VideoTransferFunction]);
+				}
 			}
 		}
 
