@@ -31,6 +31,126 @@
 #include <moreuuids.h>
 #include "../../DSUtil/std_helper.h"
 
+static const std::vector<GUID> s_MajorTypes = {
+	MEDIATYPE_NULL,
+	MEDIATYPE_Video,
+	MEDIATYPE_Audio,
+	MEDIATYPE_Text,
+	MEDIATYPE_Midi,
+	MEDIATYPE_Stream,
+	MEDIATYPE_Interleaved,
+	MEDIATYPE_File,
+	MEDIATYPE_ScriptCommand,
+	MEDIATYPE_AUXLine21Data,
+	MEDIATYPE_VBI,
+	MEDIATYPE_Timecode,
+	MEDIATYPE_LMRT,
+	MEDIATYPE_URL_STREAM,
+	MEDIATYPE_MPEG1SystemStream,
+	MEDIATYPE_AnalogVideo,
+	MEDIATYPE_AnalogAudio,
+	MEDIATYPE_MPEG2_PACK,
+	MEDIATYPE_MPEG2_PES,
+	MEDIATYPE_MPEG2_SECTIONS,
+	MEDIATYPE_DVD_ENCRYPTED_PACK,
+	MEDIATYPE_DVD_NAVIGATION,
+};
+
+static const std::vector<GUID> s_SubTypes = {
+	MEDIASUBTYPE_None,
+	MEDIASUBTYPE_YUY2,
+	MEDIASUBTYPE_MJPG,
+	MEDIASUBTYPE_MJPA,
+	MEDIASUBTYPE_MJPB,
+	MEDIASUBTYPE_TVMJ,
+	MEDIASUBTYPE_WAKE,
+	MEDIASUBTYPE_CFCC,
+	MEDIASUBTYPE_IJPG,
+	MEDIASUBTYPE_Plum,
+	MEDIASUBTYPE_DVCS,
+	MEDIASUBTYPE_DVSD,
+	MEDIASUBTYPE_MDVF,
+	MEDIASUBTYPE_RGB1,
+	MEDIASUBTYPE_RGB4,
+	MEDIASUBTYPE_RGB8,
+	MEDIASUBTYPE_RGB565,
+	MEDIASUBTYPE_RGB555,
+	MEDIASUBTYPE_RGB24,
+	MEDIASUBTYPE_RGB32,
+	MEDIASUBTYPE_ARGB1555,
+	MEDIASUBTYPE_ARGB4444,
+	MEDIASUBTYPE_ARGB32,
+	MEDIASUBTYPE_A2R10G10B10,
+	MEDIASUBTYPE_A2B10G10R10,
+	MEDIASUBTYPE_AYUV,
+	MEDIASUBTYPE_AI44,
+	MEDIASUBTYPE_IA44,
+	MEDIASUBTYPE_YV12,
+	MEDIASUBTYPE_NV12,
+	MEDIASUBTYPE_IMC1,
+	MEDIASUBTYPE_IMC2,
+	MEDIASUBTYPE_IMC3,
+	MEDIASUBTYPE_IMC4,
+	MEDIASUBTYPE_Overlay,
+	MEDIASUBTYPE_MPEG1Packet,
+	MEDIASUBTYPE_MPEG1Payload,
+	MEDIASUBTYPE_MPEG1AudioPayload,
+	MEDIASUBTYPE_MPEG1System,
+	MEDIASUBTYPE_MPEG1VideoCD,
+	MEDIASUBTYPE_MPEG1Video,
+	MEDIASUBTYPE_MPEG1Audio,
+	MEDIASUBTYPE_Avi,
+	MEDIASUBTYPE_Asf,
+	MEDIASUBTYPE_QTMovie,
+	MEDIASUBTYPE_QTRpza,
+	MEDIASUBTYPE_QTSmc,
+	MEDIASUBTYPE_QTRle,
+	MEDIASUBTYPE_QTJpeg,
+	MEDIASUBTYPE_PCMAudio_Obsolete,
+	MEDIASUBTYPE_PCM,
+	MEDIASUBTYPE_WAVE,
+	MEDIASUBTYPE_AU,
+	MEDIASUBTYPE_AIFF,
+	MEDIASUBTYPE_dvsd,
+	MEDIASUBTYPE_dvhd,
+	MEDIASUBTYPE_dvsl,
+	MEDIASUBTYPE_dv25,
+	MEDIASUBTYPE_dv50,
+	MEDIASUBTYPE_dvh1,
+	MEDIASUBTYPE_Line21_BytePair,
+	MEDIASUBTYPE_Line21_GOPPacket,
+	MEDIASUBTYPE_Line21_VBIRawData,
+	MEDIASUBTYPE_TELETEXT,
+	MEDIASUBTYPE_DRM_Audio,
+	MEDIASUBTYPE_IEEE_FLOAT,
+	MEDIASUBTYPE_DOLBY_AC3_SPDIF,
+	MEDIASUBTYPE_RAW_SPORT,
+	MEDIASUBTYPE_SPDIF_TAG_241h,
+	MEDIASUBTYPE_DssVideo,
+	MEDIASUBTYPE_DssAudio,
+	MEDIASUBTYPE_VPVideo,
+	MEDIASUBTYPE_VPVBI,
+	MEDIASUBTYPE_ATSC_SI,
+	MEDIASUBTYPE_DVB_SI,
+	MEDIASUBTYPE_MPEG2DATA,
+	MEDIASUBTYPE_MPEG2_VIDEO,
+	MEDIASUBTYPE_MPEG2_PROGRAM,
+	MEDIASUBTYPE_MPEG2_TRANSPORT,
+	MEDIASUBTYPE_MPEG2_TRANSPORT_STRIDE,
+	MEDIASUBTYPE_MPEG2_AUDIO,
+	MEDIASUBTYPE_DOLBY_AC3,
+	MEDIASUBTYPE_DVD_SUBPICTURE,
+	MEDIASUBTYPE_DVD_LPCM_AUDIO,
+	MEDIASUBTYPE_DTS,
+	MEDIASUBTYPE_SDDS,
+	MEDIASUBTYPE_DVD_NAVIGATION_PCI,
+	MEDIASUBTYPE_DVD_NAVIGATION_DSI,
+	MEDIASUBTYPE_DVD_NAVIGATION_PROVIDER,
+	MEDIASUBTYPE_I420,
+	MEDIASUBTYPE_WAVE_DOLBY_AC3,
+	MEDIASUBTYPE_DTS2,
+};
+
 // CPPageExternalFilters dialog
 
 IMPLEMENT_DYNAMIC(CPPageExternalFilters, CPPageBase)
@@ -100,130 +220,6 @@ FilterOverride* CPPageExternalFilters::GetCurFilter()
 {
 	int i = m_filters.GetCurSel();
 	return i >= 0 ? (FilterOverride*)m_pFilters.GetAt((POSITION)m_filters.GetItemDataPtr(i)) : (FilterOverride*)nullptr;
-}
-
-void CPPageExternalFilters::SetupMajorTypes(CAtlArray<GUID>& guids)
-{
-	guids.RemoveAll();
-	guids.Add(MEDIATYPE_NULL);
-	guids.Add(MEDIATYPE_Video);
-	guids.Add(MEDIATYPE_Audio);
-	guids.Add(MEDIATYPE_Text);
-	guids.Add(MEDIATYPE_Midi);
-	guids.Add(MEDIATYPE_Stream);
-	guids.Add(MEDIATYPE_Interleaved);
-	guids.Add(MEDIATYPE_File);
-	guids.Add(MEDIATYPE_ScriptCommand);
-	guids.Add(MEDIATYPE_AUXLine21Data);
-	guids.Add(MEDIATYPE_VBI);
-	guids.Add(MEDIATYPE_Timecode);
-	guids.Add(MEDIATYPE_LMRT);
-	guids.Add(MEDIATYPE_URL_STREAM);
-	guids.Add(MEDIATYPE_MPEG1SystemStream);
-	guids.Add(MEDIATYPE_AnalogVideo);
-	guids.Add(MEDIATYPE_AnalogAudio);
-	guids.Add(MEDIATYPE_MPEG2_PACK);
-	guids.Add(MEDIATYPE_MPEG2_PES);
-	guids.Add(MEDIATYPE_MPEG2_SECTIONS);
-	guids.Add(MEDIATYPE_DVD_ENCRYPTED_PACK);
-	guids.Add(MEDIATYPE_DVD_NAVIGATION);
-}
-
-void CPPageExternalFilters::SetupSubTypes(CAtlArray<GUID>& guids)
-{
-	guids.RemoveAll();
-	guids.Add(MEDIASUBTYPE_None);
-	guids.Add(MEDIASUBTYPE_YUY2);
-	guids.Add(MEDIASUBTYPE_MJPG);
-	guids.Add(MEDIASUBTYPE_MJPA);
-	guids.Add(MEDIASUBTYPE_MJPB);
-	guids.Add(MEDIASUBTYPE_TVMJ);
-	guids.Add(MEDIASUBTYPE_WAKE);
-	guids.Add(MEDIASUBTYPE_CFCC);
-	guids.Add(MEDIASUBTYPE_IJPG);
-	guids.Add(MEDIASUBTYPE_Plum);
-	guids.Add(MEDIASUBTYPE_DVCS);
-	guids.Add(MEDIASUBTYPE_DVSD);
-	guids.Add(MEDIASUBTYPE_MDVF);
-	guids.Add(MEDIASUBTYPE_RGB1);
-	guids.Add(MEDIASUBTYPE_RGB4);
-	guids.Add(MEDIASUBTYPE_RGB8);
-	guids.Add(MEDIASUBTYPE_RGB565);
-	guids.Add(MEDIASUBTYPE_RGB555);
-	guids.Add(MEDIASUBTYPE_RGB24);
-	guids.Add(MEDIASUBTYPE_RGB32);
-	guids.Add(MEDIASUBTYPE_ARGB1555);
-	guids.Add(MEDIASUBTYPE_ARGB4444);
-	guids.Add(MEDIASUBTYPE_ARGB32);
-	guids.Add(MEDIASUBTYPE_A2R10G10B10);
-	guids.Add(MEDIASUBTYPE_A2B10G10R10);
-	guids.Add(MEDIASUBTYPE_AYUV);
-	guids.Add(MEDIASUBTYPE_AI44);
-	guids.Add(MEDIASUBTYPE_IA44);
-	guids.Add(MEDIASUBTYPE_YV12);
-	guids.Add(MEDIASUBTYPE_NV12);
-	guids.Add(MEDIASUBTYPE_IMC1);
-	guids.Add(MEDIASUBTYPE_IMC2);
-	guids.Add(MEDIASUBTYPE_IMC3);
-	guids.Add(MEDIASUBTYPE_IMC4);
-	guids.Add(MEDIASUBTYPE_Overlay);
-	guids.Add(MEDIASUBTYPE_MPEG1Packet);
-	guids.Add(MEDIASUBTYPE_MPEG1Payload);
-	guids.Add(MEDIASUBTYPE_MPEG1AudioPayload);
-	guids.Add(MEDIASUBTYPE_MPEG1System);
-	guids.Add(MEDIASUBTYPE_MPEG1VideoCD);
-	guids.Add(MEDIASUBTYPE_MPEG1Video);
-	guids.Add(MEDIASUBTYPE_MPEG1Audio);
-	guids.Add(MEDIASUBTYPE_Avi);
-	guids.Add(MEDIASUBTYPE_Asf);
-	guids.Add(MEDIASUBTYPE_QTMovie);
-	guids.Add(MEDIASUBTYPE_QTRpza);
-	guids.Add(MEDIASUBTYPE_QTSmc);
-	guids.Add(MEDIASUBTYPE_QTRle);
-	guids.Add(MEDIASUBTYPE_QTJpeg);
-	guids.Add(MEDIASUBTYPE_PCMAudio_Obsolete);
-	guids.Add(MEDIASUBTYPE_PCM);
-	guids.Add(MEDIASUBTYPE_WAVE);
-	guids.Add(MEDIASUBTYPE_AU);
-	guids.Add(MEDIASUBTYPE_AIFF);
-	guids.Add(MEDIASUBTYPE_dvsd);
-	guids.Add(MEDIASUBTYPE_dvhd);
-	guids.Add(MEDIASUBTYPE_dvsl);
-	guids.Add(MEDIASUBTYPE_dv25);
-	guids.Add(MEDIASUBTYPE_dv50);
-	guids.Add(MEDIASUBTYPE_dvh1);
-	guids.Add(MEDIASUBTYPE_Line21_BytePair);
-	guids.Add(MEDIASUBTYPE_Line21_GOPPacket);
-	guids.Add(MEDIASUBTYPE_Line21_VBIRawData);
-	guids.Add(MEDIASUBTYPE_TELETEXT);
-	guids.Add(MEDIASUBTYPE_DRM_Audio);
-	guids.Add(MEDIASUBTYPE_IEEE_FLOAT);
-	guids.Add(MEDIASUBTYPE_DOLBY_AC3_SPDIF);
-	guids.Add(MEDIASUBTYPE_RAW_SPORT);
-	guids.Add(MEDIASUBTYPE_SPDIF_TAG_241h);
-	guids.Add(MEDIASUBTYPE_DssVideo);
-	guids.Add(MEDIASUBTYPE_DssAudio);
-	guids.Add(MEDIASUBTYPE_VPVideo);
-	guids.Add(MEDIASUBTYPE_VPVBI);
-	guids.Add(MEDIASUBTYPE_ATSC_SI);
-	guids.Add(MEDIASUBTYPE_DVB_SI);
-	guids.Add(MEDIASUBTYPE_MPEG2DATA);
-	guids.Add(MEDIASUBTYPE_MPEG2_VIDEO);
-	guids.Add(MEDIASUBTYPE_MPEG2_PROGRAM);
-	guids.Add(MEDIASUBTYPE_MPEG2_TRANSPORT);
-	guids.Add(MEDIASUBTYPE_MPEG2_TRANSPORT_STRIDE);
-	guids.Add(MEDIASUBTYPE_MPEG2_AUDIO);
-	guids.Add(MEDIASUBTYPE_DOLBY_AC3);
-	guids.Add(MEDIASUBTYPE_DVD_SUBPICTURE);
-	guids.Add(MEDIASUBTYPE_DVD_LPCM_AUDIO);
-	guids.Add(MEDIASUBTYPE_DTS);
-	guids.Add(MEDIASUBTYPE_SDDS);
-	guids.Add(MEDIASUBTYPE_DVD_NAVIGATION_PCI);
-	guids.Add(MEDIASUBTYPE_DVD_NAVIGATION_DSI);
-	guids.Add(MEDIASUBTYPE_DVD_NAVIGATION_PROVIDER);
-	guids.Add(MEDIASUBTYPE_I420);
-	guids.Add(MEDIASUBTYPE_WAVE_DOLBY_AC3);
-	guids.Add(MEDIASUBTYPE_DTS2);
 }
 
 BEGIN_MESSAGE_MAP(CPPageExternalFilters, CPPageBase)
@@ -474,10 +470,7 @@ void CPPageExternalFilters::OnAddMajorType()
 		return;
 	}
 
-	CAtlArray<GUID> guids;
-	SetupMajorTypes(guids);
-
-	CSelectMediaType dlg(guids, MEDIATYPE_NULL, this);
+	CSelectMediaType dlg(s_MajorTypes, MEDIATYPE_NULL, this);
 	if (dlg.DoModal() == IDOK) {
 		auto it = f->guids.begin();
 		while (it != f->guids.end() && std::next(it) != f->guids.end()) {
@@ -530,10 +523,7 @@ void CPPageExternalFilters::OnAddSubType()
 
 	GUID major = *it;
 
-	CAtlArray<GUID> guids;
-	SetupSubTypes(guids);
-
-	CSelectMediaType dlg(guids, MEDIASUBTYPE_NULL, this);
+	CSelectMediaType dlg(s_SubTypes, MEDIASUBTYPE_NULL, this);
 	if (dlg.DoModal() == IDOK) {
 		for (child = m_tree.GetChildItem(node); child; child = m_tree.GetNextSiblingItem(child)) {
 			it = FindInListByPointer(f->guids, (GUID*)m_tree.GetItemData(child));
@@ -731,10 +721,7 @@ void CPPageExternalFilters::OnNMDblclkTree2(NMHDR *pNMHDR, LRESULT *pResult)
 			return;
 		}
 
-		CAtlArray<GUID> guids;
-		SetupSubTypes(guids);
-
-		CSelectMediaType dlg(guids, *it, this);
+		CSelectMediaType dlg(s_SubTypes, *it, this);
 		if (dlg.DoModal() == IDOK) {
 			*it = dlg.m_guid;
 			m_tree.SetItemText(node, GetMediaTypeName(dlg.m_guid));
