@@ -774,7 +774,7 @@ bool CVobSubFileRipper::Create()
 						sb.cellid = (char)cell;
 						sb.celltimestamp = tTotal;
 						sb.fValid = true;
-						m_langs[iLang].subpos.Add(sb);
+						m_langs[iLang].subpos.push_back(sb);
 					}
 
 					m_sub.Write(buff, 2048);
@@ -810,20 +810,20 @@ bool CVobSubFileRipper::Create()
 	Progress(1);
 
 	for (ptrdiff_t i = 0; i < 32; i++) {
-		if (m_iLang == -1 && m_langs[i].subpos.GetCount() > 0) {
+		if (m_iLang == -1 && m_langs[i].subpos.size() > 0) {
 			m_iLang = (int)i;
 		}
 		m_langs[i].id = pgc.ids[i];
 		m_langs[i].name = m_langs[i].alt = FindLangFromId(m_langs[i].id);
 
-		CAtlArray<SubPos>& sp = m_langs[i].subpos;
-		qsort(sp.GetData(), sp.GetCount(), sizeof(SubPos), SubPosSortProc);
+		std::vector<SubPos>& sp = m_langs[i].subpos;
+		qsort(sp.data(), sp.size(), sizeof(SubPos), SubPosSortProc);
 
 		if (m_rd.fForcedOnly) {
 			Log(LOG_INFO, _T("Searching for forced subs..."));
 			Progress(0);
 
-			for (ptrdiff_t j = 0, len = sp.GetCount(); j < len; j++) {
+			for (ptrdiff_t j = 0, len = sp.size(); j < len; j++) {
 				Progress(1.0 * j / len);
 
 				sp[j].fValid = false;

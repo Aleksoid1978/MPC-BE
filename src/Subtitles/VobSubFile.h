@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -96,7 +96,7 @@ public:
 	struct SubLang {
 		int id = 0;
 		CString name, alt;
-		CAtlArray<SubPos> subpos;
+		std::vector<SubPos> subpos;
 	};
 protected:
 	CString m_title;

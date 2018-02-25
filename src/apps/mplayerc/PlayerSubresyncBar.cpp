@@ -143,9 +143,9 @@ void CPlayerSubresyncBar::ReloadSubtitle()
 		m_mode = VOBSUB;
 
 		ASSERT(pVSF->m_iLang >= 0);
-		CAtlArray<CVobSubFile::SubPos>& sp = pVSF->m_langs[pVSF->m_iLang].subpos;
+		std::vector<CVobSubFile::SubPos>& sp = pVSF->m_langs[pVSF->m_iLang].subpos;
 
-		for (size_t i = 0, j = sp.GetCount(); i < j; i++) {
+		for (size_t i = 0, j = sp.size(); i < j; i++) {
 			CString str;
 			str.Format(L"%d,%d,%d,%Iu", sp[i].vobid, sp[i].cellid, sp[i].fForced, i);
 			m_sts.Add(str, false, (int)sp[i].start, (int)sp[i].stop);
@@ -257,9 +257,9 @@ void CPlayerSubresyncBar::SaveSubtitle()
 		CAutoLock cAutoLock(m_pSubLock);
 
 		ASSERT(pVSF->m_iLang >= 0);
-		CAtlArray<CVobSubFile::SubPos>& sp = pVSF->m_langs[pVSF->m_iLang].subpos;
+		std::vector<CVobSubFile::SubPos>& sp = pVSF->m_langs[pVSF->m_iLang].subpos;
 
-		for (size_t i = 0, j = sp.GetCount(); i < j; i++) {
+		for (size_t i = 0, j = sp.size(); i < j; i++) {
 			sp[i].fValid = false;
 		}
 
@@ -298,10 +298,8 @@ void CPlayerSubresyncBar::UpdatePreview()
 				m_sts[i].end = (fEndMod || fEndAdj) ? m_subtimes[i].newend : m_subtimes[i].orgend;
 			}
 		} else {
-			CAtlArray<int> schk;
-
 			for (int i = 0, j = (int)m_sts.GetCount(); i < j;) {
-				schk.RemoveAll();
+				std::vector<int> schk;
 
 				int start = i, end;
 
@@ -311,16 +309,16 @@ void CPlayerSubresyncBar::UpdatePreview()
 						break;
 					}
 					if (data & (TSMOD | TSADJ)) {
-						schk.Add(end);
+						schk.push_back(end);
 					}
 				}
 
-				if (schk.IsEmpty()) {
+				if (schk.empty()) {
 					for (; start < end; start++) {
 						m_sts[start].start = m_subtimes[start].orgstart;
 						m_sts[start].end = m_subtimes[start].orgend;
 					}
-				} else if (schk.GetCount() == 1) {
+				} else if (schk.size() == 1) {
 					int k = schk[0];
 					int dt = m_subtimes[k].newstart - m_subtimes[k].orgstart;
 					for (; start < end; start++) {
@@ -329,7 +327,7 @@ void CPlayerSubresyncBar::UpdatePreview()
 										   ? m_subtimes[start].newend
 										   : (m_subtimes[start].orgend + dt);
 					}
-				} else if (schk.GetCount() >= 2) {
+				} else if (schk.size() >= 2) {
 					int i0 = 0;
 					int i1 = 0;
 					int ti0 = 0;
@@ -337,7 +335,7 @@ void CPlayerSubresyncBar::UpdatePreview()
 					double m = 0;
 
 					int k, l;
-					for (k = 0, l = (int)schk.GetCount() - 1; k < l; k++) {
+					for (k = 0, l = (int)schk.size() - 1; k < l; k++) {
 						i0 = schk[k];
 						i1 = schk[k + 1];
 
@@ -1031,7 +1029,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 						m_list.SetItemText(iItem, lpnmlv->iSubItem, s);
 					} else if (id == STYLEEDIT) {
 						CAutoPtrArray<CPPageSubStyle> pages;
-						CAtlArray<STSStyle*> styles;
+						std::vector<STSStyle*> styles;
 
 						STSStyle* stss = m_sts.GetStyle(iItem);
 						int iSelPage = 0;
@@ -1045,7 +1043,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 							CAutoPtr<CPPageSubStyle> page(DNew CPPageSubStyle());
 							page->InitSubStyle(key, val);
 							pages.Add(page);
-							styles.Add(val);
+							styles.push_back(val);
 
 							if (stss == val) {
 								iSelPage = i;

@@ -237,7 +237,7 @@ bool CVobSubFile::Copy(CVobSubFile& vsf)
 		dst.name = src.name;
 		dst.alt = src.alt;
 
-		for (size_t j = 0; j < src.subpos.GetCount(); j++) {
+		for (size_t j = 0; j < src.subpos.size(); j++) {
 			SubPos& sp = src.subpos[j];
 			if (!sp.fValid) {
 				continue;
@@ -272,7 +272,7 @@ bool CVobSubFile::Copy(CVobSubFile& vsf)
 				}
 			}
 
-			dst.subpos.Add(sp);
+			dst.subpos.push_back(sp);
 		}
 	}
 
@@ -318,9 +318,9 @@ bool CVobSubFile::Open(CString fn)
 		m_title = fn;
 
 		for (int i = 0; i < 32; i++) {
-			CAtlArray<SubPos>& sp = m_langs[i].subpos;
+			std::vector<SubPos>& sp = m_langs[i].subpos;
 
-			for (size_t j = 0; j < sp.GetCount(); j++) {
+			for (size_t j = 0; j < sp.size(); j++) {
 				sp[j].stop = sp[j].start;
 				sp[j].fForced = false;
 
@@ -331,9 +331,9 @@ bool CVobSubFile::Open(CString fn)
 					continue;
 				}
 
-				m_img.delay = j + 1 < sp.GetCount() ? sp[j + 1].start - sp[j].start : 3000;
+				m_img.delay = j + 1 < sp.size() ? sp[j + 1].start - sp[j].start : 3000;
 				m_img.GetPacketInfo(buff, packetsize, datasize);
-				if (j + 1 < sp.GetCount()) {
+				if (j + 1 < sp.size()) {
 					m_img.delay = std::min(m_img.delay, sp[j + 1].start - sp[j].start);
 				}
 
@@ -393,7 +393,7 @@ void CVobSubFile::Close()
 		m_langs[i].id = 0;
 		m_langs[i].name.Empty();
 		m_langs[i].alt.Empty();
-		m_langs[i].subpos.RemoveAll();
+		m_langs[i].subpos.clear();
 	}
 }
 
@@ -713,8 +713,8 @@ bool CVobSubFile::ReadIdx(CString fn, int& ver)
 				continue;
 			}
 
-			if (delay < 0 && !m_langs[id].subpos.IsEmpty()) {
-				__int64 ts = m_langs[id].subpos[m_langs[id].subpos.GetCount()-1].start;
+			if (delay < 0 && !m_langs[id].subpos.empty()) {
+				__int64 ts = m_langs[id].subpos[m_langs[id].subpos.size()-1].start;
 
 				if (sb.start < ts) {
 					delay += (int)(ts - sb.start);
@@ -722,7 +722,7 @@ bool CVobSubFile::ReadIdx(CString fn, int& ver)
 				}
 			}
 
-			m_langs[id].subpos.Add(sb);
+			m_langs[id].subpos.push_back(sb);
 		} else {
 			fError = true;
 		}
@@ -1007,8 +1007,8 @@ bool CVobSubFile::WriteIdx(CString fn)
 	for (size_t i = 0; i < 32; i++) {
 		SubLang& sl = m_langs[i];
 
-		CAtlArray<SubPos>& sp = sl.subpos;
-		if (sp.IsEmpty() && !sl.id) {
+		std::vector<SubPos>& sp = sl.subpos;
+		if (sp.empty() && !sl.id) {
 			continue;
 		}
 
@@ -1032,7 +1032,7 @@ bool CVobSubFile::WriteIdx(CString fn)
 
 		char vobid = -1, cellid = -1;
 
-		for (size_t j = 0; j < sp.GetCount(); j++) {
+		for (size_t j = 0; j < sp.size(); j++) {
 			if (!sp[j].fValid) {
 				continue;
 			}
@@ -1091,10 +1091,10 @@ BYTE* CVobSubFile::GetPacket(int idx, int& packetsize, int& datasize, int iLang)
 	if (iLang < 0 || iLang >= 32) {
 		iLang = m_iLang;
 	}
-	CAtlArray<SubPos>& sp = m_langs[iLang].subpos;
+	std::vector<SubPos>& sp = m_langs[iLang].subpos;
 
 	do {
-		if (idx < 0 || (size_t)idx >= sp.GetCount()) {
+		if (idx < 0 || (size_t)idx >= sp.size()) {
 			break;
 		}
 
@@ -1153,9 +1153,9 @@ const CVobSubFile::SubPos* CVobSubFile::GetFrameInfo(int idx, int iLang /*= -1*/
 	if (iLang < 0 || iLang >= 32) {
 		iLang = m_iLang;
 	}
-	const CAtlArray<SubPos>& sp = m_langs[iLang].subpos;
+	const std::vector<SubPos>& sp = m_langs[iLang].subpos;
 
-	if (idx < 0 || (size_t)idx >= sp.GetCount()
+	if (idx < 0 || (size_t)idx >= sp.size()
 			|| !sp[idx].fValid
 			|| ((m_fOnlyShowForcedSubs || g_bForcedSubtitle) && !sp[idx].fForced)) {
 		return NULL;
@@ -1169,9 +1169,9 @@ bool CVobSubFile::GetFrame(int idx, int iLang /*= -1*/, REFERENCE_TIME rt /*= -1
 	if (iLang < 0 || iLang >= 32) {
 		iLang = m_iLang;
 	}
-	CAtlArray<SubPos>& sp = m_langs[iLang].subpos;
+	std::vector<SubPos>& sp = m_langs[iLang].subpos;
 
-	if (idx < 0 || (size_t)idx >= sp.GetCount()) {
+	if (idx < 0 || (size_t)idx >= sp.size()) {
 		return false;
 	}
 
@@ -1213,9 +1213,9 @@ int CVobSubFile::GetFrameIdxByTimeStamp(__int64 time)
 		return -1;
 	}
 
-	CAtlArray<SubPos>& sp = m_langs[m_iLang].subpos;
+	std::vector<SubPos>& sp = m_langs[m_iLang].subpos;
 
-	int i = 0, j = (int)sp.GetCount() - 1, ret = -1;
+	int i = 0, j = (int)sp.size() - 1, ret = -1;
 
 	if (j >= 0 && time >= sp[j].start) {
 		return j;
@@ -1343,7 +1343,7 @@ STDMETHODIMP_(int) CVobSubFile::GetStreamCount()
 {
 	int iStreamCount = 0;
 	for (size_t i = 0; i < 32; i++) {
-		if (m_langs[i].subpos.GetCount()) {
+		if (m_langs[i].subpos.size()) {
 			iStreamCount++;
 		}
 	}
@@ -1355,7 +1355,7 @@ STDMETHODIMP CVobSubFile::GetStreamInfo(int iStream, WCHAR** ppName, LCID* pLCID
 	for (size_t i = 0; i < 32; i++) {
 		SubLang& sl = m_langs[i];
 
-		if (sl.subpos.IsEmpty() || iStream-- > 0) {
+		if (sl.subpos.empty() || iStream-- > 0) {
 			continue;
 		}
 
@@ -1383,7 +1383,7 @@ STDMETHODIMP_(int) CVobSubFile::GetStream()
 	int iStream = 0;
 
 	for (ptrdiff_t i = 0; i < m_iLang; i++) {
-		if (!m_langs[i].subpos.IsEmpty()) {
+		if (!m_langs[i].subpos.empty()) {
 			iStream++;
 		}
 	}
@@ -1394,9 +1394,9 @@ STDMETHODIMP_(int) CVobSubFile::GetStream()
 STDMETHODIMP CVobSubFile::SetStream(int iStream)
 {
 	for (int i = 0; i < 32; i++) {
-		CAtlArray<SubPos>& sp = m_langs[i].subpos;
+		std::vector<SubPos>& sp = m_langs[i].subpos;
 
-		if (sp.IsEmpty() || iStream-- > 0) {
+		if (sp.empty() || iStream-- > 0) {
 			continue;
 		}
 
@@ -1696,8 +1696,8 @@ bool CVobSubFile::SaveWinSubMux(CString fn)
 		return false;
 	}
 
-	CAtlArray<SubPos>& sp = m_langs[m_iLang].subpos;
-	for (size_t i = 0; i < sp.GetCount(); i++) {
+	std::vector<SubPos>& sp = m_langs[m_iLang].subpos;
+	for (size_t i = 0; i < sp.size(); i++) {
 		if (!GetFrame((int)i)) {
 			continue;
 		}
@@ -1932,8 +1932,8 @@ bool CVobSubFile::SaveScenarist(CString fn)
 
 	int pc[4] = {1, 1, 1, 1}, pa[4] = {15, 15, 15, 0};
 
-	CAtlArray<SubPos>& sp = m_langs[m_iLang].subpos;
-	for (size_t i = 0, k = 0; i < sp.GetCount(); i++) {
+	std::vector<SubPos>& sp = m_langs[m_iLang].subpos;
+	for (size_t i = 0, k = 0; i < sp.size(); i++) {
 		if (!GetFrame((int)i)) {
 			continue;
 		}
@@ -2017,7 +2017,7 @@ bool CVobSubFile::SaveScenarist(CString fn)
 			}
 		}
 
-		if (i+1 < sp.GetCount()) {
+		if (i+1 < sp.size()) {
 			int t3 = (int)sp[i+1].start;
 			int h3 = t3/1000/60/60, m3 = (t3/1000/60)%60, s3 = (t3/1000)%60;
 			int f3 = (int)((m_size.cy==480?29.97:25)*(t3%1000)/1000);
@@ -2162,8 +2162,8 @@ bool CVobSubFile::SaveMaestro(CString fn)
 
 	int pc[4] = {1,1,1,1}, pa[4] = {15,15,15,0};
 
-	CAtlArray<SubPos>& sp = m_langs[m_iLang].subpos;
-	for (size_t i = 0, k = 0; i < sp.GetCount(); i++) {
+	std::vector<SubPos>& sp = m_langs[m_iLang].subpos;
+	for (size_t i = 0, k = 0; i < sp.size(); i++) {
 		if (!GetFrame((int)i)) {
 			continue;
 		}
@@ -2245,7 +2245,7 @@ bool CVobSubFile::SaveMaestro(CString fn)
 			}
 		}
 
-		if (i < sp.GetCount()-1) {
+		if (i < sp.size()-1) {
 			int t3 = (int)sp[i+1].start;
 			int h3 = t3/1000/60/60, m3 = (t3/1000/60)%60, s3 = (t3/1000)%60;
 			int f3 = (int)((m_size.cy==480?29.97:25)*(t3%1000)/1000);
