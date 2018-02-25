@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -181,36 +181,6 @@ public:
 	DECLARE_IUNKNOWN;
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 };
-
-template<class T>
-int range_bsearch(const CAtlArray<T>& array, REFERENCE_TIME rt)
-{
-	int i = 0, j = array.GetCount() - 1, ret = -1;
-	if (j >= 0 && rt >= array[j].rt) {
-		return j;
-	}
-	while (i < j) {
-		int mid = (i + j) >> 1;
-		REFERENCE_TIME midrt = array[mid].rt;
-		if (rt == midrt) {
-			ret = mid;
-			break;
-		} else if (rt < midrt) {
-			ret = -1;
-			if (j == mid) {
-				mid--;
-			}
-			j = mid;
-		} else if (rt > midrt) {
-			ret = mid;
-			if (i == mid) {
-				mid++;
-			}
-			i = mid;
-		}
-	}
-	return ret;
-}
 
 template<class T>
 int range_bsearch(const std::vector<T>& array, REFERENCE_TIME rt)

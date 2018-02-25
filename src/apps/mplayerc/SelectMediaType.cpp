@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,7 +32,7 @@ CString GetMediaTypeName(const GUID& guid)
 // CSelectMediaType dialog
 
 IMPLEMENT_DYNAMIC(CSelectMediaType, CCmdUIDialog)
-CSelectMediaType::CSelectMediaType(CAtlArray<GUID>& guids, GUID guid, CWnd* pParent)
+CSelectMediaType::CSelectMediaType(const std::vector<GUID>& guids, GUID guid, CWnd* pParent)
 	: CCmdUIDialog(CSelectMediaType::IDD, pParent)
 	, m_guids(guids), m_guid(guid)
 {
@@ -62,8 +62,8 @@ BOOL CSelectMediaType::OnInitDialog()
 {
 	CCmdUIDialog::OnInitDialog();
 
-	for (size_t i = 0; i < m_guids.GetCount(); i++) {
-		m_guidsctrl.AddString(GetMediaTypeName(m_guids[i]));
+	for (const auto& guid : m_guids) {
+		m_guidsctrl.AddString(GetMediaTypeName(guid));
 	}
 
 	return TRUE;

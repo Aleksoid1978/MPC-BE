@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,9 +38,6 @@ private:
 	CAutoPtrList<FilterOverride> m_pFilters;
 	FilterOverride* m_pLastSelFilter;
 	FilterOverride* GetCurFilter();
-
-	void SetupMajorTypes(CAtlArray<GUID>& guids);
-	void SetupSubTypes(CAtlArray<GUID>& guids);
 
 public:
 	CPPageExternalFilters();

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,10 +33,10 @@ class CSelectMediaType : public CCmdUIDialog
 	DECLARE_DYNAMIC(CSelectMediaType)
 
 private:
-	CAtlArray<GUID>& m_guids;
+	const std::vector<GUID>& m_guids;
 
 public:
-	CSelectMediaType(CAtlArray<GUID>& guids, GUID guid, CWnd* pParent = nullptr);
+	CSelectMediaType(const std::vector<GUID>& guids, GUID guid, CWnd* pParent = nullptr);
 	virtual ~CSelectMediaType();
 
 	GUID m_guid;
