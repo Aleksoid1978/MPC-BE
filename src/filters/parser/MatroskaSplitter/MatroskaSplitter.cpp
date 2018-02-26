@@ -342,7 +342,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			CMediaType mt;
 			std::vector<CMediaType> mts;
 
-			if (pTE->TrackType == TrackEntry::TypeVideo) {
+			if (pTE->TrackType == TrackEntry::TypeVideo && !bHasVideo) {
 				Name.Format(L"Video %d", iVideo++);
 
 				mt.majortype = MEDIATYPE_Video;
@@ -1331,7 +1331,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			}
 
 			if (mts.empty()) {
-				DLog(L"CMatroskaSplitterFilter::CreateOutputs() : Unsupported TrackType '%S' (%I64u)", CodecID, (UINT64)pTE->TrackType);
+				DLog(L"CMatroskaSplitterFilter::CreateOutputs() : Unsupported or multiple TrackType '%S' (%I64u)", CodecID, (UINT64)pTE->TrackType);
 				continue;
 			}
 
