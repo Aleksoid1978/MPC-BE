@@ -113,15 +113,15 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 				ReadBuffer(m_hFile, (BYTE*)(&flen), sizeof(flen));
 				flen -= 8;
 
-				CAtlArray<BYTE> DecompData;
+				std::vector<BYTE> DecompData;
 
 				if (memcmp(Buff, "CWS", 3) == 0) {
 					if (size.QuadPart < 5 * MEGABYTE) {
 
-						DecompData.SetCount(size.QuadPart - 8);
-						DWORD size = ReadBuffer(m_hFile, DecompData.GetData(), DecompData.GetCount());
+						DecompData.resize(size.QuadPart - 8);
+						DWORD size = ReadBuffer(m_hFile, DecompData.data(), DecompData.size());
 
-						if (size == DecompData.GetCount()) {
+						if (size == DecompData.size()) {
 							// decompress
 							for (;;) {
 								int res;
@@ -132,12 +132,12 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 								d_stream.opaque	= (voidpf)nullptr;
 
 								if (Z_OK != (res = inflateInit(&d_stream))) {
-									DecompData.RemoveAll();
+									DecompData.clear();
 									break;
 								}
 
-								d_stream.next_in	= DecompData.GetData();
-								d_stream.avail_in	= (uInt)DecompData.GetCount();
+								d_stream.next_in	= DecompData.data();
+								d_stream.avail_in	= (uInt)DecompData.size();
 
 								BYTE* dst = nullptr;
 								int n = 0;
@@ -146,7 +146,7 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 									d_stream.next_out	= &dst[(n - 1) * 1000];
 									d_stream.avail_out	= 1000;
 									if (Z_OK != (res = inflate(&d_stream, Z_NO_FLUSH)) && Z_STREAM_END != res) {
-										DecompData.RemoveAll();
+										DecompData.clear();
 										free(dst);
 										break;
 									}
@@ -154,8 +154,8 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 
 								inflateEnd(&d_stream);
 
-								DecompData.SetCount(d_stream.total_out);
-								memcpy(DecompData.GetData(), dst, DecompData.GetCount());
+								DecompData.resize(d_stream.total_out);
+								memcpy(DecompData.data(), dst, DecompData.size());
 
 								free(dst);
 
@@ -163,8 +163,8 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 							}
 						}
 
-						if (flen == DecompData.GetCount()) {
-							gb.Reset(DecompData.GetData(), std::min(_countof(Buff), DecompData.GetCount()));
+						if (flen == DecompData.size()) {
+							gb.Reset(DecompData.data(), std::min(_countof(Buff), DecompData.size()));
 						}
 					}
 

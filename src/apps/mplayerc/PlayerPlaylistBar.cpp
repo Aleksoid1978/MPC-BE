@@ -421,7 +421,7 @@ void CPlaylistItem::AutoLoadFiles()
 	cuefn.Replace(ext, L"cue");
 	if (::PathFileExistsW(cuefn)) {
 		CString filter;
-		CAtlArray<CString> mask;
+		std::vector<CString> mask;
 		AfxGetAppSettings().m_Formats.GetAudioFilter(filter, mask);
 		std::list<CString> sl;
 		Explode(mask[0], sl, L';');
@@ -1334,7 +1334,7 @@ bool CPlayerPlaylistBar::ParseCUEPlayList(CString fn)
 			bExists = FALSE;
 
 			CString filter;
-			CAtlArray<CString> mask;
+			std::vector<CString> mask;
 			AfxGetAppSettings().m_Formats.GetAudioFilter(filter, mask);
 			std::list<CString> sl;
 			Explode(mask[0], sl, L';');
@@ -2438,7 +2438,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 					m_pl.SetPos(m_pl.GetTailPosition());
 				} else {
 					CString filter;
-					CAtlArray<CString> mask;
+					std::vector<CString> mask;
 					s.m_Formats.GetFilter(filter, mask);
 
 					DWORD dwFlags = OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_ALLOWMULTISELECT | OFN_ENABLEINCLUDENOTIFY | OFN_NOCHANGEDIR;

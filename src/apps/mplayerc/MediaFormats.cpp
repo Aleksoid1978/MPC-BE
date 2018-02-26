@@ -270,13 +270,13 @@ CMediaFormatCategory* CMediaFormats::FindMediaByExt(CString ext)
 	return nullptr;
 }
 
-void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
+void CMediaFormats::GetFilter(CString& filter, std::vector<CString>& mask)
 {
 	CString strTemp;
 
 	// Add All Media formats
 	filter += ResStr(IDS_AG_MEDIAFILES);
-	mask.Add(L"");
+	mask.emplace_back(L"");
 
 	for (const auto& mfc : (*this)) {
 		strTemp = mfc.GetFilter() + L";";
@@ -289,7 +289,7 @@ void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 
 	// Add Video formats
 	filter += ResStr(IDS_AG_VIDEOFILES);
-	mask.Add(L"");
+	mask.emplace_back(L"");
 
 	for (const auto& mfc : (*this)) {
 		if (mfc.GetFileType() == TVideo) {
@@ -303,7 +303,7 @@ void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 
 	// Add Audio formats
 	filter += ResStr(IDS_AG_AUDIOFILES);
-	mask.Add(L"");
+	mask.emplace_back(L"");
 
 	for (const auto& mfc : (*this)) {
 		if (mfc.GetFileType() == TAudio) {
@@ -317,20 +317,20 @@ void CMediaFormats::GetFilter(CString& filter, CAtlArray<CString>& mask)
 
 	for (const auto& mfc : (*this)) {
 		filter += mfc.GetDescription() + L"|" + mfc.GetFilter() + L"|";
-		mask.Add(mfc.GetFilter());
+		mask.emplace_back(mfc.GetFilter());
 	}
 
 	filter += ResStr(IDS_AG_ALLFILES);
-	mask.Add(L"*.*");
+	mask.emplace_back(L"*.*");
 
 	filter += L"|";
 }
 
-void CMediaFormats::GetAudioFilter(CString& filter, CAtlArray<CString>& mask)
+void CMediaFormats::GetAudioFilter(CString& filter, std::vector<CString>& mask)
 {
 	CString strTemp;
 	filter += ResStr(IDS_AG_AUDIOFILES);
-	mask.Add(L"");
+	mask.emplace_back(L"");
 
 	for (const auto& mfc : (*this)) {
 		if (mfc.GetFileType() == TAudio) {
@@ -347,12 +347,12 @@ void CMediaFormats::GetAudioFilter(CString& filter, CAtlArray<CString>& mask)
 	for (const auto& mfc : (*this)) {
 		if (mfc.GetFileType() == TAudio) {
 			filter += mfc.GetDescription() + L"|" + mfc.GetFilter() + L"|";
-			mask.Add(mfc.GetFilter());
+			mask.emplace_back(mfc.GetFilter());
 		}
 	}
 
 	filter += ResStr(IDS_AG_ALLFILES);
-	mask.Add(L"*.*");
+	mask.emplace_back(L"*.*");
 
 	filter += L"|";
 }

@@ -4962,7 +4962,7 @@ void CMainFrame::OnFileOpenQuick()
 	CAppSettings& s = AfxGetAppSettings();
 
 	CString filter;
-	CAtlArray<CString> mask;
+	std::vector<CString> mask;
 	s.m_Formats.GetFilter(filter, mask);
 
 	DWORD dwFlags = OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_ALLOWMULTISELECT | OFN_ENABLEINCLUDENOTIFY | OFN_NOCHANGEDIR;
@@ -6272,7 +6272,7 @@ void CMainFrame::OnFileLoadAudio()
 	CAppSettings& s = AfxGetAppSettings();
 
 	CString filter;
-	CAtlArray<CString> mask;
+	std::vector<CString> mask;
 	s.m_Formats.GetAudioFilter(filter, mask);
 
 	CString path = AddSlash(GetFolderOnly(GetCurFileName()));

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -164,7 +164,7 @@ void COpenDlg::OnBnClickedBrowsebutton()
 	CAppSettings& s = AfxGetAppSettings();
 
 	CString filter;
-	CAtlArray<CString> mask;
+	std::vector<CString> mask;
 	s.m_Formats.GetFilter(filter, mask);
 
 	DWORD dwFlags = OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ALLOWMULTISELECT|OFN_ENABLEINCLUDENOTIFY|OFN_NOCHANGEDIR;
@@ -213,7 +213,7 @@ void COpenDlg::OnBnClickedBrowsebutton2()
 	CAppSettings& s = AfxGetAppSettings();
 
 	CString filter;
-	CAtlArray<CString> mask;
+	std::vector<CString> mask;
 	s.m_Formats.GetAudioFilter(filter, mask);
 
 	DWORD dwFlags = OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_ENABLEINCLUDENOTIFY|OFN_NOCHANGEDIR;
@@ -283,7 +283,7 @@ bool COpenFileDlg::m_fAllowDirSelection = false;
 WNDPROC COpenFileDlg::m_wndProc = nullptr;
 
 IMPLEMENT_DYNAMIC(COpenFileDlg, CFileDialog)
-COpenFileDlg::COpenFileDlg(CAtlArray<CString>& mask, bool fAllowDirSelection, LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
+COpenFileDlg::COpenFileDlg(std::vector<CString>& mask, bool fAllowDirSelection, LPCWSTR lpszDefExt, LPCWSTR lpszFileName,
 						   DWORD dwFlags, LPCWSTR lpszFilter, CWnd* pParentWnd)
 	: CFileDialog(TRUE, lpszDefExt, lpszFileName, dwFlags|OFN_NOVALIDATE, lpszFilter, pParentWnd, 0)
 	, m_mask(mask)
