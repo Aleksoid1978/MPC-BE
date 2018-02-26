@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -77,7 +77,7 @@ struct OggStreamHeader {
 
 #pragma pack(pop)
 
-class OggPage : public CAtlArray<BYTE>
+class OggPage : public std::vector<BYTE>
 {
 public:
 	OggPageHeader m_hdr;

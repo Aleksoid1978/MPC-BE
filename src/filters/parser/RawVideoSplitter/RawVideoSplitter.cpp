@@ -863,7 +863,7 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 
 				if (!mpeg4packet) {
 					mpeg4packet.Attach(DNew CPacket());
-					mpeg4packet->resize(0);
+					mpeg4packet->clear();
 					mpeg4packet->rtStart = rt;
 					mpeg4packet->rtStop  = rt + m_AvgTimePerFrame;
 					rt += m_AvgTimePerFrame;

@@ -441,7 +441,7 @@ int CWavPackFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 
 	wv_header_t wv_header;
 	BYTE buf[WV_HEADER_SIZE];
-	packet->resize(0);
+	packet->clear();
 
 	do {
 		wv_header.samples = 0;

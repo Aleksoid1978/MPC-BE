@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -45,7 +45,7 @@ class COggSplitterOutputPin : public CBaseSplitterOutputPin
 protected:
 	CCritSec m_csPackets;
 	CAutoPtrList<CPacket> m_packets;
-	CAtlArray<BYTE> m_lastPacketData;
+	std::vector<BYTE> m_lastPacketData;
 	DWORD m_lastseqnum;
 	REFERENCE_TIME m_rtLast;
 	bool m_fSetKeyFrame;
@@ -74,7 +74,7 @@ class COggVorbisOutputPin : public COggSplitterOutputPin
 
 	DWORD m_audio_sample_rate;
 	DWORD m_blocksize[2], m_lastblocksize;
-	CAtlArray<bool> m_blockflags;
+	std::vector<bool> m_blockflags;
 
 	virtual HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
@@ -99,9 +99,6 @@ class COggFlacOutputPin : public COggSplitterOutputPin
 	int		m_nChannels;
 	WORD	m_wBitsPerSample;
 	int		m_nAvgBytesPerSec;
-
-	DWORD m_blocksize[2], m_lastblocksize;
-	CAtlArray<bool> m_blockflags;
 
 	virtual HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);

@@ -7930,38 +7930,6 @@ void CMainFrame::KillTimersStop()
 	KillTimer(TIMER_DM_AUTOCHANGING);
 }
 
-static int rangebsearch(REFERENCE_TIME val, CAtlArray<REFERENCE_TIME>& rta)
-{
-	int i = 0, j = rta.GetCount() - 1, ret = -1;
-
-	if (j >= 0 && val >= rta[j]) {
-		return(j);
-	}
-
-	while (i < j) {
-		int mid = (i + j) >> 1;
-		REFERENCE_TIME midt = rta[mid];
-		if (val == midt) {
-			ret = mid;
-			break;
-		} else if (val < midt) {
-			ret = -1;
-			if (j == mid) {
-				mid--;
-			}
-			j = mid;
-		} else if (val > midt) {
-			ret = mid;
-			if (i == mid) {
-				mid++;
-			}
-			i = mid;
-		}
-	}
-
-	return(ret);
-}
-
 void CMainFrame::OnPlaySeekKey(UINT nID)
 {
 	MatroskaLoadKeyFrames();

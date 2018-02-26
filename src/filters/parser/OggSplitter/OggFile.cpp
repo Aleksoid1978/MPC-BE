@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -74,7 +74,7 @@ bool COggFile::Read(OggPage& page, bool fFull, HANDLE hBreak)
 {
 	memset(&page.m_hdr, 0, sizeof(page.m_hdr));
 	page.m_lens.RemoveAll();
-	page.SetCount(0);
+	page.clear();
 
 	if (!Read(page.m_hdr, hBreak)) {
 		return false;
@@ -95,8 +95,8 @@ bool COggFile::Read(OggPage& page, bool fFull, HANDLE hBreak)
 	}
 
 	if (fFull) {
-		page.SetCount(pagelen);
-		if (S_OK != ByteRead(page.GetData(), page.GetCount())) {
+		page.resize(pagelen);
+		if (S_OK != ByteRead(page.data(), page.size())) {
 			return false;
 		}
 	} else {

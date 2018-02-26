@@ -195,7 +195,7 @@ start:
 
 	OggPage page;
 	for (int i = 0; m_pFile->Read(page), i < 30; i++) {
-		BYTE* p = page.GetData();
+		BYTE* p = page.data();
 		if (!p) {
 			continue;
 		}
@@ -220,7 +220,7 @@ start:
 					streamMoreInit[page.m_hdr.bitstream_serial_number] = TRUE;
 				} else if (type == 0x81) {
 					if (COggTheoraOutputPin* pOggPin = dynamic_cast<COggTheoraOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
-						pOggPin->AddComment(page.GetData() + 7, page.GetCount() - 7);
+						pOggPin->AddComment(page.data() + 7, page.size() - 7);
 					}
 				}
 			} else if (type == 1 && (page.m_hdr.header_type_flag & OggPageHeader::first)) {
@@ -258,14 +258,14 @@ start:
 				}
 			} else if (type == 3 && !memcmp(p, "vorbis", 6)) {
 				if (COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
-					pOggPin->AddComment(page.GetData() + 7, page.GetCount() - 7);
+					pOggPin->AddComment(page.data() + 7, page.size() - 7);
 				}
-			} else if (type == 0x7F && page.GetCount() > 12 && GETDWORD(p + 8) == FCC('fLaC')) {	// Flac
+			} else if (type == 0x7F && page.size() > 12 && GETDWORD(p + 8) == FCC('fLaC')) {	// Flac
 				if (PinNotExist) {
 					// Ogg Flac : method 1
 					CAutoPtr<CBaseSplitterOutputPin> pPinOut;
 					name.Format(L"FLAC %d", streamId++);
-					pPinOut.Attach(DNew COggFlacOutputPin(p + 12, page.GetCount() - 14, name, this, this, &hr));
+					pPinOut.Attach(DNew COggFlacOutputPin(p + 12, page.size() - 14, name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 				}
 			} else if (GETDWORD(p-1) == FCC('fLaC')) {
@@ -273,40 +273,40 @@ start:
 				if (PinNotExist && m_pFile->Read(page)) {
 					CAutoPtr<CBaseSplitterOutputPin> pPinOut;
 					name.Format(L"FLAC %d", streamId++);
-					p = page.GetData();
-					pPinOut.Attach(DNew COggFlacOutputPin(p, page.GetCount(), name, this, this, &hr));
+					p = page.data();
+					pPinOut.Attach(DNew COggFlacOutputPin(p, page.size(), name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 				}
-			} else if (!memcmp(page.GetData(), "BBCD\x00", 5) || !memcmp(page.GetData(), "KW-DIRAC\x00", 9)) {
+			} else if (!memcmp(page.data(), "BBCD\x00", 5) || !memcmp(page.data(), "KW-DIRAC\x00", 9)) {
 				if (PinNotExist) {
 					name.Format(L"Dirac %d", streamId++);
 					CAutoPtr<CBaseSplitterOutputPin> pPinOut;
-					pPinOut.Attach(DNew COggDiracOutputPin(page.GetData(), page.GetCount(), name, this, this, &hr));
+					pPinOut.Attach(DNew COggDiracOutputPin(page.data(), page.size(), name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 					streamMoreInit[page.m_hdr.bitstream_serial_number] = TRUE;
 				}
-			} else if (!memcmp(page.GetData(), "OpusHead", 8) && page.GetCount() > 8) {
+			} else if (!memcmp(page.data(), "OpusHead", 8) && page.size() > 8) {
 				if (PinNotExist) {
 					name.Format(L"Opus %d", streamId++);
 					CAutoPtr<CBaseSplitterOutputPin> pPinOut;
-					pPinOut.Attach(DNew COggOpusOutputPin(page.GetData(), page.GetCount(), name, this, this, &hr));
+					pPinOut.Attach(DNew COggOpusOutputPin(page.data(), page.size(), name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 				}
-			} else if (!memcmp(page.GetData(), "OpusTags", 8) && page.GetCount() > 8) {
+			} else if (!memcmp(page.data(), "OpusTags", 8) && page.size() > 8) {
 				if (COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
-					pOggPin->AddComment(page.GetData() + 8, page.GetCount() - 8);
+					pOggPin->AddComment(page.data() + 8, page.size() - 8);
 				}
-			} else if (!memcmp(page.GetData(), "Speex   ", 8) && page.GetCount() > 8) {
+			} else if (!memcmp(page.data(), "Speex   ", 8) && page.size() > 8) {
 				if (PinNotExist) {
 					name.Format(L"Speex %d", streamId++);
 					CAutoPtr<CBaseSplitterOutputPin> pPinOut;
-					pPinOut.Attach(DNew COggSpeexOutputPin(page.GetData(), page.GetCount(), name, this, this, &hr));
+					pPinOut.Attach(DNew COggSpeexOutputPin(page.data(), page.size(), name, this, this, &hr));
 					AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 				}
-			} else if (!memcmp(page.GetData(), "\x80kate\x00\x00\x00", 8) && page.GetCount() == 64) {
+			} else if (!memcmp(page.data(), "\x80kate\x00\x00\x00", 8) && page.size() == 64) {
 				if (PinNotExist) {
 					CStringA lang;
-					memcpy(lang.GetBuffer(16), page.GetData() + 32, 16);
+					memcpy(lang.GetBuffer(16), page.data() + 32, 16);
 					lang.ReleaseBuffer();
 
 					name.Format(L"Kate %d (%hS)", streamId++, lang);
@@ -319,11 +319,11 @@ start:
 				switch (p[4]) {
 					case 0x01:
 						if (PinNotExist
-								&& page.GetCount() >= 26
+								&& page.size() >= 26
 								&& p[5] == 0x01) {
 							name.Format(L"VP8 %d", streamId++);
 							CAutoPtr<CBaseSplitterOutputPin> pPinOut;
-							pPinOut.Attach(DNew COggVP8OutputPin(page.GetData(), page.GetCount(), name, this, this, &hr));
+							pPinOut.Attach(DNew COggVP8OutputPin(page.data(), page.size(), name, this, this, &hr));
 							AddOutputPin(page.m_hdr.bitstream_serial_number, pPinOut);
 
 							m_bitstream_serial_number_Video = page.m_hdr.bitstream_serial_number;
@@ -332,7 +332,7 @@ start:
 					case 0x02:
 						if (p[5] == 0x20) {
 							if (COggVP8OutputPin* pOggPin = dynamic_cast<COggVP8OutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
-								pOggPin->AddComment(page.GetData() + 7, page.GetCount() - 7);
+								pOggPin->AddComment(page.data() + 7, page.size() - 7);
 							}
 						}
 						break;
@@ -386,7 +386,7 @@ start:
 		for (int i = 0; m_pFile->Read(page), i < 10; i++) {
 			COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
 			if (!pOggPin) {
-				BYTE* p = page.GetData();
+				BYTE* p = page.data();
 				if (!p || !memcmp(p, "fishead", 7) || !memcmp(p, "fisbone", 7)) {
 					start_pos2 = m_pFile->GetPos();
 					continue;
@@ -704,7 +704,7 @@ void COggSplitterOutputPin::ResetState(DWORD seqnum/* = DWORD_MAX*/)
 {
 	CAutoLock csAutoLock(&m_csPackets);
 	m_packets.RemoveAll();
-	m_lastPacketData.RemoveAll();
+	m_lastPacketData.clear();
 	m_lastseqnum = seqnum;
 }
 
@@ -744,7 +744,7 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 		last = page.m_lens.GetTailPosition();
 	}
 
-	BYTE* pData = page.GetData();
+	BYTE* pData = page.data();
 
 	int i = 0, j = 0;
 
@@ -761,22 +761,22 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 			}
 
 			if (first == pos && (page.m_hdr.header_type_flag & OggPageHeader::continued)) {
-				if (!m_lastPacketData.IsEmpty()) {
-					const size_t size = m_lastPacketData.GetCount();
-					m_lastPacketData.SetCount(size + j - i);
-					memcpy(m_lastPacketData.GetData() + size, pData + i, j - i);
+				if (!m_lastPacketData.empty()) {
+					const size_t size = m_lastPacketData.size();
+					m_lastPacketData.resize(size + j - i);
+					memcpy(m_lastPacketData.data() + size, pData + i, j - i);
 
 					if (len < 255) {
-						HandlePacket(page.m_hdr.bitstream_serial_number, m_lastPacketData.GetData(), m_lastPacketData.GetCount());
-						m_lastPacketData.RemoveAll();
+						HandlePacket(page.m_hdr.bitstream_serial_number, m_lastPacketData.data(), m_lastPacketData.size());
+						m_lastPacketData.clear();
 					}
 				}
 			} else {
 				if (len < 255) {
 					HandlePacket(page.m_hdr.bitstream_serial_number, pData + i, j - i);
 				} else {
-					m_lastPacketData.SetCount(j - i);
-					memcpy(m_lastPacketData.GetData(), pData + i, j - i);
+					m_lastPacketData.resize(j - i);
+					memcpy(m_lastPacketData.data(), pData + i, j - i);
 				}
 			}
 
@@ -887,7 +887,7 @@ HRESULT COggVorbisOutputPin::UnpackInitPage(OggPage& page)
 					break;
 				}
 
-				m_blockflags.InsertAt(0, !!blockflag);
+				m_blockflags.insert(m_blockflags.begin(), !!blockflag);
 			}
 		}
 
@@ -919,10 +919,10 @@ HRESULT COggVorbisOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int
 		}
 	}
 
-	if (len > 0 && m_blockflags.GetCount()) {
+	if (len > 0 && m_blockflags.size()) {
 		bitstream bs(pData, len);
 		if (bs.getbits(1) == 0) {
-			int x = m_blockflags.GetCount() - 1, n = 0;
+			int x = m_blockflags.size() - 1, n = 0;
 			while (x) {
 				n++;
 				x >>= 1;
@@ -1047,8 +1047,6 @@ HRESULT COggFlacOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int l
 HRESULT COggFlacOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
 {
 	HRESULT hr = __super::DeliverNewSegment(tStart, tStop, dRate);
-
-	m_lastblocksize = 0;
 
 	if (m_mt.subtype == MEDIASUBTYPE_FLAC_FRAMED) {
 		POSITION pos = m_initpackets.GetHeadPosition();
@@ -1326,7 +1324,7 @@ COggTheoraOutputPin::COggTheoraOutputPin(OggPage& page, LPCWSTR pName, CBaseFilt
 	, m_nVersion(0)
 	, m_rtAvgTimePerFrame(0)
 {
-	CGolombBuffer gb(page.GetData(), page.GetCount());
+	CGolombBuffer gb(page.data(), page.size());
 	gb.SkipBytes(7);
 
 	m_nVersion	= (UINT)gb.BitRead(24);
