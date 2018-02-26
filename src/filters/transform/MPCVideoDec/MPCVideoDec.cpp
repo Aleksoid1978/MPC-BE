@@ -38,6 +38,7 @@
 #include "../../../DSUtil/SysVersion.h"
 #include "../../../DSUtil/DXVAState.h"
 #include "../../parser/AviSplitter/AviSplitter.h"
+#include "../../parser/MpegSplitter/MpegSplitter.h"
 #include "../../Lock.h"
 #include <moreuuids.h>
 #include <FilterInterfaces.h>
@@ -1830,8 +1831,9 @@ redo:
 
 		m_bRVDropBFrameTimings = (m_nCodecId == AV_CODEC_ID_RV10 || m_nCodecId == AV_CODEC_ID_RV20 || m_nCodecId == AV_CODEC_ID_RV30 || m_nCodecId == AV_CODEC_ID_RV40);
 
-		// Enable B-Frame reorder for AVI files
-		m_bReorderBFrame = (clsidInput == __uuidof(CAviSourceFilter) || clsidInput == __uuidof(CAviSplitterFilter) || IsAVI());
+		// Enable B-Frame reorder
+		m_bReorderBFrame = ((m_nCodecId == AV_CODEC_ID_VC1 && !(clsidInput == __uuidof(CMpegSourceFilter) || clsidInput == __uuidof(CMpegSplitterFilter)))
+							|| clsidInput == __uuidof(CAviSourceFilter) || clsidInput == __uuidof(CAviSplitterFilter) || IsAVI());
 	}
 
 	m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
