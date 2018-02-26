@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -72,10 +72,10 @@ class COpenFileDlg : public CFileDialog
 private:
 	WCHAR* m_buff;
 	WCHAR* m_InitialDir;
-	CAtlArray<CString>& m_mask;
+	std::vector<CString>& m_mask;
 
 public:
-	COpenFileDlg(CAtlArray<CString>& mask, bool fAllowDirSelection,
+	COpenFileDlg(std::vector<CString>& mask, bool fAllowDirSelection,
 				 LPCWSTR lpszDefExt = nullptr,
 				 LPCWSTR lpszFileName = nullptr,
 				 DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,

@@ -509,7 +509,7 @@ void CPPageFullscreen::ModesUpdate()
 	}
 
 	m_list.DeleteAllItems();
-	m_dms.RemoveAll();
+	m_dms.clear();
 	m_displayModesString.clear();
 
 	dispmode dm;
@@ -531,12 +531,12 @@ void CPPageFullscreen::ModesUpdate()
 		if (j < m) {
 			continue;
 		}
-		m_dms.Add(dm);
+		m_dms.push_back(dm);
 		m++;
 	}
 
 	// sort display modes
-	std::sort(&m_dms[0], &m_dms[0] + m_dms.GetCount());
+	std::sort(m_dms.begin(), m_dms.end());
 
 	CString strCur, strModes;
 	GetCurDispModeString(strCur);
@@ -544,8 +544,8 @@ void CPPageFullscreen::ModesUpdate()
 	dispmode dCurMod;
 	CMainFrame::GetCurDispMode(dCurMod, m_f_hmonitor);
 
-	int curModeIdx = m_dms.GetCount() - 1;
-	for (size_t i = 0; i < m_dms.GetCount(); i++) {
+	int curModeIdx = m_dms.size() - 1;
+	for (size_t i = 0; i < m_dms.size(); i++) {
 		m_displayModesString.push_back(FormatModeString(m_dms[i]));
 		if (dCurMod == m_dms[i]) {
 			curModeIdx = i;
@@ -565,7 +565,7 @@ void CPPageFullscreen::ModesUpdate()
 	}
 
 	auto findDisplayMode = [this](const dispmode& dm, const int& curModeIdx) {
-		for (size_t i = 0; i < m_dms.GetCount(); i++) {
+		for (size_t i = 0; i < m_dms.size(); i++) {
 			if (dm == m_dms[i]) {
 				return (int)i;
 			}

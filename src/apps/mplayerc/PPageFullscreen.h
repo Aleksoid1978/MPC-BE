@@ -32,7 +32,7 @@ class CPPageFullscreen : public CPPageBase
 	DECLARE_DYNAMIC(CPPageFullscreen)
 
 private:
-	CAtlArray<dispmode> m_dms;
+	std::vector<dispmode> m_dms;
 	std::list<CString> m_displayModesString;
 	CStringArray m_MonitorDisplayNames, m_MonitorDeviceName;
 

@@ -90,6 +90,6 @@ public:
 	bool FindAudioExt(const CString& ext);
 	CMediaFormatCategory* FindMediaByExt(CString ext);
 
-	void GetFilter(CString& filter, CAtlArray<CString>& mask);
-	void GetAudioFilter(CString& filter, CAtlArray<CString>& mask);
+	void GetFilter(CString& filter, std::vector<CString>& mask);
+	void GetAudioFilter(CString& filter, std::vector<CString>& mask);
 };
