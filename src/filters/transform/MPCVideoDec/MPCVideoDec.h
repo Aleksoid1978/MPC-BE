@@ -128,7 +128,7 @@ protected:
 
 	REFERENCE_TIME							m_rtStartCache;
 
-	DWORD									m_fSYNC;
+	DWORD									m_dwSYNC;
 
 	CMediaType								m_pCurrentMediaType;
 
@@ -181,7 +181,7 @@ protected:
 	void			SetThreadCount();
 	HRESULT			FindDecoderConfiguration();
 
-	bool			IsAVI();
+	void			ReadHeader();
 	HRESULT			InitDecoder(const CMediaType *pmt);
 
 	int				m_nAlign = 16;
