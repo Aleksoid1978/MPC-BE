@@ -1,7 +1,7 @@
 ﻿Part A: Preparing the Visual Studio 2017 environment
 
  Visual Studio 2017
-  1. Install Visual Studio 2017 (any edition will work fine). During installation, you must select the following components: 
+  1. Install Visual Studio 2017 v15.5.7 or later (any edition will work fine). During installation, you must select the following components: 
    * Desktop development with C++
      * VC++ 2017 v141 toolset
      * Visual C++ ATL support
