@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <atlcoll.h>
+#include <vector>
 
 #define FlicSourceName   L"MPC FLIC Source"
 
@@ -130,7 +130,7 @@ class CFLICStream
 {
 	CFile m_flic;
 	FLIC m_hdr;
-	CAtlArray<FLIC_FRAME_ENTRY> m_frames;
+	std::vector<FLIC_FRAME_ENTRY> m_frames;
 
 	CCritSec m_cSharedState;
 
