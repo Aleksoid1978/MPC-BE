@@ -19,9 +19,12 @@
  */
 
 #include "stdafx.h"
+#include <ks.h>
+#include <ksmedia.h>
 #include <MMReg.h>
 #include <moreuuids.h>
 #include "MediaDescription.h"
+#include "AudioParser.h"
 #include "DSUtil.h"
 
 CString GetMediaTypeDesc(std::vector<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter)
@@ -228,7 +231,34 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 				Infos.emplace_back(FormatString(L"%.1f kHz", double(pInfo->nSamplesPerSec)/1000.0));
 			}
 			if (pInfo->nChannels) {
-				Infos.emplace_back(FormatString(L"%d chn", pInfo->nChannels));
+				DWORD layout = 0;
+				if (IsWaveFormatExtensible(pInfo)) {
+					const WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)pInfo;
+					layout = wfex->dwChannelMask;
+				} else {
+					layout = GetDefChannelMask(pInfo->nChannels);
+				}
+				CString sChannel;
+				switch (layout) {
+					case KSAUDIO_SPEAKER_2POINT1:
+						sChannel = L"2.1 chn";
+						break;
+					case KSAUDIO_SPEAKER_3POINT1:
+						sChannel = L"3.1 chn";
+						break;
+					case KSAUDIO_SPEAKER_5POINT1:
+					case KSAUDIO_SPEAKER_5POINT1_SURROUND:
+						sChannel = L"5.1 chn";
+						break;
+					case KSAUDIO_SPEAKER_7POINT1:
+					case KSAUDIO_SPEAKER_7POINT1_SURROUND:
+						sChannel = L"7.1 chn";
+						break;
+					default:
+						sChannel.Format(L"%d chn", pInfo->nChannels);
+						break;
+				}
+				Infos.emplace_back(sChannel);
 			}
 			if (pInfo->wBitsPerSample) {
 				Infos.emplace_back(FormatString(L"%d bit", pInfo->wBitsPerSample));
