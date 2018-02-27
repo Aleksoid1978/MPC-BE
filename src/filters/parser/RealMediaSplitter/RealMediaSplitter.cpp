@@ -258,11 +258,11 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			mt.majortype = MEDIATYPE_Video;
 			mt.formattype = FORMAT_VideoInfo;
 
-			VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + pmp->typeSpecData.GetCount());
+			VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + pmp->typeSpecData.size());
 			memset(mt.Format(), 0, mt.FormatLength());
-			memcpy(pvih + 1, pmp->typeSpecData.GetData(), pmp->typeSpecData.GetCount());
+			memcpy(pvih + 1, pmp->typeSpecData.data(), pmp->typeSpecData.size());
 
-			rvinfo rvi = *(rvinfo*)pmp->typeSpecData.GetData();
+			rvinfo rvi = *(rvinfo*)pmp->typeSpecData.data();
 			rvi.bswap();
 
 			ASSERT(rvi.dwSize >= FIELD_OFFSET(rvinfo, morewh));
@@ -282,8 +282,8 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			pvih->bmiHeader.biSizeImage = rvi.w*rvi.h*3/2;
 			mts.push_back(mt);
 
-			BYTE* extra		= pmp->typeSpecData.GetData();
-			int extralen	= pmp->typeSpecData.GetCount();
+			BYTE* extra		= pmp->typeSpecData.data();
+			int extralen	= pmp->typeSpecData.size();
 
 			if (extralen > 26) {
 				extra		+= 26;
@@ -296,9 +296,9 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			if (pmp->width > 0 && pmp->height > 0) {
 				BITMAPINFOHEADER bmi = pvih->bmiHeader;
 				mt.formattype = FORMAT_VideoInfo2;
-				VIDEOINFOHEADER2* pvih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + pmp->typeSpecData.GetCount());
+				VIDEOINFOHEADER2* pvih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + pmp->typeSpecData.size());
 				memset(mt.Format() + FIELD_OFFSET(VIDEOINFOHEADER2, dwInterlaceFlags), 0, mt.FormatLength() - FIELD_OFFSET(VIDEOINFOHEADER2, dwInterlaceFlags));
-				memcpy(pvih2 + 1, pmp->typeSpecData.GetData(), pmp->typeSpecData.GetCount());
+				memcpy(pvih2 + 1, pmp->typeSpecData.data(), pmp->typeSpecData.size());
 				pvih2->bmiHeader = bmi;
 				pvih2->bmiHeader.biWidth = (DWORD)pmp->width;
 				pvih2->bmiHeader.biHeight = (DWORD)pmp->height;
@@ -312,10 +312,10 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			mt.formattype = FORMAT_WaveFormatEx;
 			mt.bTemporalCompression = 1;
 
-			WAVEFORMATEX* pwfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + pmp->typeSpecData.GetCount());
+			WAVEFORMATEX* pwfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + pmp->typeSpecData.size());
 			memset(mt.Format(), 0, mt.FormatLength());
-			memcpy(pwfe + 1, pmp->typeSpecData.GetData(), pmp->typeSpecData.GetCount());
-			pwfe->cbSize = (WORD)pmp->typeSpecData.GetCount();
+			memcpy(pwfe + 1, pmp->typeSpecData.data(), pmp->typeSpecData.size());
+			pwfe->cbSize = (WORD)pmp->typeSpecData.size();
 
 			union {
 				DWORD fcc;
@@ -325,8 +325,8 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			fcc = 0;
 			fccstr[4] = 0;
 
-			BYTE* fmt = pmp->typeSpecData.GetData();
-			for (size_t i = 0; i < pmp->typeSpecData.GetCount()-4; i++, fmt++) {
+			BYTE* fmt = pmp->typeSpecData.data();
+			for (size_t i = 0; i < pmp->typeSpecData.size()-4; i++, fmt++) {
 				if (*(DWORD*)fmt == MAKEFOURCC('.' ,'r' ,'a' ,0xfd)) {
 					break;
 				}
@@ -440,8 +440,8 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			CAtlMap<CStringA, CStringA, CStringElementTraits<CStringA> > lfi;
 			CStringA key, value;
 
-			BYTE* p = pmp->typeSpecData.GetData();
-			BYTE* end = p + pmp->typeSpecData.GetCount();
+			BYTE* p = pmp->typeSpecData.data();
+			BYTE* end = p + pmp->typeSpecData.size();
 			p += 8;
 
 			DWORD cnt = p <= end-4 ? *(DWORD*)p : 0;
@@ -771,7 +771,7 @@ bool CRealMediaSplitterFilter::DemuxLoop()
 			p->bSyncPoint	= !!(mph.flags & MediaPacketHeader::PN_KEYFRAME_FLAG);
 			p->rtStart		= 10000i64 * mph.tStart;
 			p->rtStop		= p->rtStart + 1;
-			p->SetData(mph.pData.GetData(), mph.pData.GetCount());
+			p->SetData(mph.pData.data(), mph.pData.size());
 			hr				= DeliverPacket(p);
 		}
 
@@ -857,8 +857,8 @@ HRESULT CRealMediaSplitterOutputPin::DeliverSegments()
 	POSITION pos = m_segments.GetHeadPosition();
 	while (pos) {
 		const segment* s = m_segments.GetNext(pos);
-		len = std::max(len, s->offset + (DWORD)s->data.GetCount());
-		total += s->data.GetCount();
+		len = std::max(len, s->offset + (DWORD)s->data.size());
+		total += s->data.size();
 	}
 	ASSERT(len == total);
 
@@ -889,7 +889,7 @@ HRESULT CRealMediaSplitterOutputPin::DeliverSegments()
 	pos = m_segments.GetHeadPosition();
 	while (pos) {
 		const segment* s = m_segments.GetNext(pos);
-		memcpy(pData + s->offset, s->data.GetData(), s->data.GetCount());
+		memcpy(pData + s->offset, s->data.data(), s->data.size());
 	}
 	m_segments.Clear();
 
@@ -985,8 +985,8 @@ HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 
 			CAutoPtr<segment> s(DNew segment);
 			s->offset = packetoffset;
-			s->data.SetCount((size_t)len2);
-			memcpy(s->data.GetData(), pIn, len2);
+			s->data.resize(len2);
+			memcpy(s->data.data(), pIn, len2);
 			m_segments.AddTail(s);
 
 			pIn += len2;
@@ -1124,8 +1124,8 @@ HRESULT CRMFile::Read(MediaPacketHeader& mph, bool fFull)
 	len = std::max(len, 0L);
 
 	if (fFull) {
-		mph.pData.SetCount(len);
-		if (mph.len > 0 && S_OK != (hr = ByteRead(mph.pData.GetData(), len))) {
+		mph.pData.resize(len);
+		if (mph.len > 0 && S_OK != (hr = ByteRead(mph.pData.data(), len))) {
 			return hr;
 		}
 	} else {
@@ -1284,8 +1284,8 @@ HRESULT CRMFile::Init()
 					if (S_OK != (hr = Read(tsdlen))) {
 						return hr;
 					}
-					mp->typeSpecData.SetCount(tsdlen);
-					if (tsdlen > 0 && S_OK != (hr = ByteRead(mp->typeSpecData.GetData(), tsdlen))) {
+					mp->typeSpecData.resize(tsdlen);
+					if (tsdlen > 0 && S_OK != (hr = ByteRead(mp->typeSpecData.data(), tsdlen))) {
 						return hr;
 					}
 					mp->width = mp->height = 0;
@@ -1526,7 +1526,7 @@ void CRMFile::GetDimensions()
 		if (pmp->mime == "video/x-pn-realvideo") {
 			pmp->width = pmp->height = 0;
 
-			rvinfo rvi = *(rvinfo*)pmp->typeSpecData.GetData();
+			rvinfo rvi = *(rvinfo*)pmp->typeSpecData.data();
 			rvi.bswap();
 
 			if (rvi.fcc2 != '04VR' && rvi.fcc2 != '14VR') {
@@ -1540,9 +1540,9 @@ void CRMFile::GetDimensions()
 					continue;
 				}
 
-				BYTE* p = mph.pData.GetData();
+				BYTE* p = mph.pData.data();
 				BYTE* p0 = p;
-				int len = mph.pData.GetCount();
+				int len = mph.pData.size();
 
 				BYTE hdr = *p++;
 				DWORD packetlen = 0, packetoffset = 0;

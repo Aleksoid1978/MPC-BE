@@ -64,7 +64,7 @@ namespace RMFF
 		UINT32 maxPacketSize, avgPacketSize;
 		UINT32 tStart, tPreroll, tDuration;
 		CStringA name, mime;
-		CAtlArray<BYTE> typeSpecData;
+		std::vector<BYTE> typeSpecData;
 		UINT32 width, height;
 		bool interlaced, top_field_first;
 	};
@@ -83,7 +83,7 @@ namespace RMFF
 			PN_RELIABLE_FLAG = 1,
 			PN_KEYFRAME_FLAG = 2
 		} flags; // UINT8
-		CAtlArray<BYTE> pData;
+		std::vector<BYTE> pData;
 	};
 	struct IndexChunkHeader {
 		UINT32 nIndices;
@@ -186,7 +186,7 @@ class CRealMediaSplitterOutputPin : public CBaseSplitterOutputPin
 {
 private:
 	struct segment {
-		CAtlArray<BYTE> data;
+		std::vector<BYTE> data;
 		DWORD offset;
 	};
 
