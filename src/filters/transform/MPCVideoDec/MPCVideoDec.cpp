@@ -38,6 +38,7 @@
 #include "../../../DSUtil/SysVersion.h"
 #include "../../../DSUtil/DXVAState.h"
 #include "../../parser/AviSplitter/AviSplitter.h"
+#include "../../parser/OggSplitter/OggSplitter.h"
 #include "../../parser/MpegSplitter/MpegSplitter.h"
 #include "../../Lock.h"
 #include <moreuuids.h>
@@ -984,7 +985,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_bWaitingForKeyFrame(TRUE)
 	, m_bRVDropBFrameTimings(FALSE)
 	, m_bInterlaced(FALSE)
-	, m_fSYNC(0)
+	, m_dwSYNC(0)
 	, m_bDecodingStart(FALSE)
 	, m_bHighBitdepth(FALSE)
 	, m_dRate(1.0)
@@ -1546,53 +1547,6 @@ HRESULT CMPCVideoDecFilter::CheckTransform(const CMediaType* mtIn, const CMediaT
 	return CheckInputType(mtIn); // TODO - add check output MediaType
 }
 
-bool CMPCVideoDecFilter::IsAVI()
-{
-	if (m_fSYNC == MAKEFOURCC('R','I','F','F')) {
-		return true;
-	} else if (m_fSYNC != 0) {
-		return false;
-	}
-
-	CString fname;
-
-	BeginEnumFilters(m_pGraph, pEF, pBF) {
-		CComQIPtr<IFileSourceFilter> pFSF = pBF;
-		if (pFSF) {
-			LPOLESTR pFN = nullptr;
-			AM_MEDIA_TYPE mt;
-			if (SUCCEEDED(pFSF->GetCurFile(&pFN, &mt)) && pFN && *pFN) {
-				fname = CString(pFN);
-				CoTaskMemFree(pFN);
-			}
-			break;
-		}
-	}
-	EndEnumFilters
-
-	if (!fname.IsEmpty() && ::PathFileExistsW(fname)) {
-		CFile f;
-		CFileException fileException;
-		if (!f.Open(fname, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone, &fileException)) {
-			DLog(L"CMPCVideoDecFilter::IsAVI() : Can't open file '%s', error = %u", fname, fileException.m_cause);
-			return false;
-		}
-
-		if (f.Read(&m_fSYNC, sizeof(m_fSYNC)) != sizeof(m_fSYNC)) {
-			DLog(L"CMPCVideoDecFilter::IsAVI() : Can't read SYNC from file '%s'", fname);
-			return false;
-		}
-
-		if (m_fSYNC == MAKEFOURCC('R','I','F','F')) {
-			DLog(L"CMPCVideoDecFilter::IsAVI() : '%s' is a valid AVI file", fname);
-			return true;
-		}
-	}
-
-	m_fSYNC = -1; // set non-zero value to avoid recheck of the file
-	return false;
-}
-
 HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaType *pmt)
 {
 	if (direction == PINDIR_INPUT) {
@@ -1831,9 +1785,55 @@ redo:
 
 		m_bRVDropBFrameTimings = (m_nCodecId == AV_CODEC_ID_RV10 || m_nCodecId == AV_CODEC_ID_RV20 || m_nCodecId == AV_CODEC_ID_RV30 || m_nCodecId == AV_CODEC_ID_RV40);
 
+		auto ReadSourceHeader = [&]() {
+			if (m_dwSYNC != 0) {
+				return;
+			}
+			m_dwSYNC = -1;
+
+			CString fn;
+
+			BeginEnumFilters(m_pGraph, pEF, pBF) {
+				CComQIPtr<IFileSourceFilter> pFSF = pBF;
+				if (pFSF) {
+					LPOLESTR pFN = nullptr;
+					AM_MEDIA_TYPE mt;
+					if (SUCCEEDED(pFSF->GetCurFile(&pFN, &mt)) && pFN && *pFN) {
+						fn = CString(pFN);
+						CoTaskMemFree(pFN);
+					}
+					break;
+				}
+			}
+			EndEnumFilters
+
+			if (!fn.IsEmpty() && ::PathFileExistsW(fn)) {
+				CFile f;
+				CFileException fileException;
+				if (!f.Open(fn, CFile::modeRead | CFile::typeBinary | CFile::shareDenyNone, &fileException)) {
+					DLog(L"CMPCVideoDecFilter::ReadSource() : Can't open file '%s', error = %u", fn, fileException.m_cause);
+					return;
+				}
+
+				f.Read(&m_dwSYNC, sizeof(m_dwSYNC));
+				f.Close();
+			}
+		};
+
+		auto IsAVI = [&]() {
+			ReadSourceHeader();
+			return (m_dwSYNC == MAKEFOURCC('R','I','F','F'));
+		};
+		auto IsOGG = [&]() {
+			ReadSourceHeader();
+			return (m_dwSYNC == MAKEFOURCC('O','g','g','S'));
+		};
+
 		// Enable B-Frame reorder
 		m_bReorderBFrame = ((m_nCodecId == AV_CODEC_ID_VC1 && !(clsidInput == __uuidof(CMpegSourceFilter) || clsidInput == __uuidof(CMpegSplitterFilter)))
-							|| clsidInput == __uuidof(CAviSourceFilter) || clsidInput == __uuidof(CAviSplitterFilter) || IsAVI());
+							|| clsidInput == __uuidof(CAviSourceFilter) || clsidInput == __uuidof(CAviSplitterFilter)
+							|| clsidInput == __uuidof(COggSourceFilter) || clsidInput == __uuidof(COggSplitterFilter)
+							|| IsAVI() || IsOGG());
 	}
 
 	m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
