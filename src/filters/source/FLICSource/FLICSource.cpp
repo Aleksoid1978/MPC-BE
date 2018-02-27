@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -193,7 +193,7 @@ CFLICStream::CFLICStream(const WCHAR* wfn, CFLICSource* pParent, HRESULT* phr)
 
 	FLIC_FRAME_ENTRY ffe;
 	unsigned int nFrames = 0;
-	m_frames.SetCount(m_hdr.frames);
+	m_frames.resize(m_hdr.frames);
 	while (nFrames < m_hdr.frames && m_flic.Read(&ffe.hdr, sizeof(ffe.hdr)) == sizeof(ffe.hdr) && ffe.hdr.type == 0xF1FA) {
 
 		ffe.pos = m_flic.GetPosition();
@@ -233,7 +233,7 @@ CFLICStream::CFLICStream(const WCHAR* wfn, CFLICSource* pParent, HRESULT* phr)
 		nFrames++;
 	}
 	if (nFrames>0) {
-		m_frames.SetCount(nFrames); // if the file is incomplete, then truncate the index
+		m_frames.resize(nFrames); // if the file is incomplete, then truncate the index
 		m_frames[0].fKeyframe = true;
 	} else {
 		if (phr) *phr = E_FAIL;
@@ -524,7 +524,7 @@ void CFLICStream::SeekToNearestKeyFrame(int nFrame)
 		m_nLastFrameNum = -1;
 	}
 
-	for (int i = m_nLastFrameNum+1, j = std::min((int)m_frames.GetCount(), nFrame); i < j; i++) {
+	for (int i = m_nLastFrameNum+1, j = std::min((int)m_frames.size(), nFrame); i < j; i++) {
 		FLIC_FRAME_ENTRY& ffe = m_frames[i];
 		if (ffe.fKeyframe) {
 			m_nLastFrameNum = i-1;
