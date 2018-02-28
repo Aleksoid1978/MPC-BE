@@ -240,12 +240,6 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 				}
 				CString sChannel;
 				switch (layout) {
-					case KSAUDIO_SPEAKER_2POINT1:
-						sChannel = L"2.1 chn";
-						break;
-					case KSAUDIO_SPEAKER_3POINT1:
-						sChannel = L"3.1 chn";
-						break;
 					case KSAUDIO_SPEAKER_5POINT1:
 					case KSAUDIO_SPEAKER_5POINT1_SURROUND:
 						sChannel = L"5.1 chn";
