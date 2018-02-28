@@ -189,7 +189,8 @@ bool IsVideoRenderer(const CLSID clsid)
 		|| clsid == CLSID_madVRAllocatorPresenter || clsid == CLSID_madVR
 		|| clsid == CLSID_VideoRenderer
 		|| clsid == CLSID_VideoRendererDefault
-		|| clsid == CLSID_SyncAllocatorPresenter) {
+		|| clsid == CLSID_SyncAllocatorPresenter
+		|| clsid == CLSID_MPCVR) {
 		return true;
 	}
 
