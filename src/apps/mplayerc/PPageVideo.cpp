@@ -40,6 +40,10 @@ static bool IsRenderTypeAvailable(UINT VideoRendererType, HWND hwnd)
 			return IsCLSIDRegistered(CLSID_DXR);
 		case VIDRNDT_MADVR:
 			return IsCLSIDRegistered(CLSID_madVR);
+#if MPCVR
+		case VIDRNDT_MPCVR:
+			return IsCLSIDRegistered(CLSID_MPCVR);
+#endif
 		default:
 		return true;
 	}
@@ -169,15 +173,18 @@ BOOL CPPageVideo::OnInitDialog()
 		CString sName;
 
 		switch (nID) {
-		case VIDRNDT_SYSDEFAULT:		sName = ResStr(IDS_PPAGE_OUTPUT_SYS_DEF);			break;
-		case VIDRNDT_VMR9WINDOWED:		sName = ResStr(IDS_PPAGE_OUTPUT_VMR9WINDOWED);		break;
-		case VIDRNDT_DXR:				sName = ResStr(IDS_PPAGE_OUTPUT_DXR);				break;
-		case VIDRNDT_NULL_COMP:			sName = ResStr(IDS_PPAGE_OUTPUT_NULL_COMP);			break;
-		case VIDRNDT_NULL_UNCOMP:		sName = ResStr(IDS_PPAGE_OUTPUT_NULL_UNCOMP);		break;
-		case VIDRNDT_EVR:				sName = ResStr(IDS_PPAGE_OUTPUT_EVR);				break;
-		case VIDRNDT_EVR_CUSTOM:		sName = ResStr(IDS_PPAGE_OUTPUT_EVR_CUSTOM);		break;
-		case VIDRNDT_MADVR:				sName = ResStr(IDS_PPAGE_OUTPUT_MADVR);				break;
-		case VIDRNDT_SYNC:				sName = ResStr(IDS_PPAGE_OUTPUT_SYNC);				break;
+		case VIDRNDT_SYSDEFAULT:	sName = ResStr(IDS_PPAGE_OUTPUT_SYS_DEF);		break;
+		case VIDRNDT_VMR9WINDOWED:	sName = ResStr(IDS_PPAGE_OUTPUT_VMR9WINDOWED);	break;
+		case VIDRNDT_EVR:			sName = ResStr(IDS_PPAGE_OUTPUT_EVR);			break;
+		case VIDRNDT_EVR_CUSTOM:	sName = ResStr(IDS_PPAGE_OUTPUT_EVR_CUSTOM);	break;
+		case VIDRNDT_SYNC:			sName = ResStr(IDS_PPAGE_OUTPUT_SYNC);			break;
+		case VIDRNDT_DXR:			sName = ResStr(IDS_PPAGE_OUTPUT_DXR);			break;
+		case VIDRNDT_MADVR:			sName = ResStr(IDS_PPAGE_OUTPUT_MADVR);			break;
+		case VIDRNDT_NULL_COMP:		sName = ResStr(IDS_PPAGE_OUTPUT_NULL_COMP);		break;
+		case VIDRNDT_NULL_UNCOMP:	sName = ResStr(IDS_PPAGE_OUTPUT_NULL_UNCOMP);	break;
+#if MPCVR
+		case VIDRNDT_MPCVR:			sName = L"Experimental MPC Video Renderer";		break;
+#endif
 		default:
 			ASSERT(FALSE);
 			return;
@@ -202,6 +209,9 @@ BOOL CPPageVideo::OnInitDialog()
 	addRenderer(VIDRNDT_MADVR);
 	addRenderer(VIDRNDT_NULL_COMP);
 	addRenderer(VIDRNDT_NULL_UNCOMP);
+#if MPCVR
+	addRenderer(VIDRNDT_MPCVR);
+#endif
 
 	for (int i = 0; i < m_iDSVRTC.GetCount(); ++i) {
 		if (m_iVideoRendererType == m_iDSVRTC.GetItemData(i)) {

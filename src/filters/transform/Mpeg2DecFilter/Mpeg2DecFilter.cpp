@@ -861,7 +861,8 @@ HRESULT CMpeg2DecFilter::CheckConnect(PIN_DIRECTION dir, IPin* pPin)
 					&& (clsid != CLSID_VSFilter || ver < 0x0234) // dvobsub
 					&& (clsid != CLSID_VSFilter_autoloading || ver < 0x0234) // dvobsub auto
 					&& clsid != CLSID_madVR
-					&& clsid != CLSID_DXR) { // Haali's video renderer
+					&& clsid != CLSID_DXR // Haali's video renderer
+					&& clsid != CLSID_MPCVR) {
 				return E_FAIL;
 			}
 		}
