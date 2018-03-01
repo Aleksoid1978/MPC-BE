@@ -180,25 +180,6 @@ public:
 			SendMessageW(WM_COMMAND, ID_PLAY_PLAY); \
 	} \
 
-static CString FormatStreamName(CString name, LCID lcid)
-{
-	CString str;
-	if (lcid) {
-		int len = GetLocaleInfoW(lcid, LOCALE_SENGLANGUAGE, str.GetBuffer(64), 64);
-		str.ReleaseBufferSetLength(max(len - 1, 0));
-	}
-
-	CString lcname = CString(name).MakeLower();
-	CString lcstr = CString(str).MakeLower();
-	if (str.IsEmpty() || lcname.Find(lcstr) >= 0) {
-		str = name;
-	} else if (!name.IsEmpty()) {
-		str = name + L" (" + str + L")";
-	}
-
-	return str;
-}
-
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame
 
@@ -11879,9 +11860,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 					m_pMainSourceFilter = FindFilter(__uuidof(CMpegSourceFilter), m_pGB);
 				}
 				if (!m_pMainSourceFilter) {
-					m_pMainSourceFilter = FindFilter(CLSID_OggSplitter, m_pGB);
-				}
-				if (!m_pMainSourceFilter) {
 					m_pMainSourceFilter = FindFilter(CLSID_LAVSplitter, m_pGB);
 				}
 				if (!m_pMainSourceFilter) {
@@ -12086,51 +12064,6 @@ void CMainFrame::SetupChapters()
 					}
 				}
 			}
-		}
-
-		pos = pBFs.GetHeadPosition();
-		while (pos && !m_pCB->ChapGetCount()) {
-			IBaseFilter* pBF = pBFs.GetNext(pos);
-
-			if (GetCLSID(pBF) != CLSID_OggSplitter) {
-				continue;
-			}
-
-			BeginEnumPins(pBF, pEP, pPin) {
-				if (m_pCB->ChapGetCount()) {
-					break;
-				}
-
-				if (CComQIPtr<IPropertyBag> pPB = pPin) {
-					for (int i = 1; ; i++) {
-						CStringW str;
-						CComVariant var;
-
-						var.Clear();
-						str.Format(L"CHAPTER%02d", i);
-						if (S_OK != pPB->Read(str, &var, nullptr)) {
-							break;
-						}
-
-						int h, m, s, ms;
-						WCHAR wc;
-						if (7 != swscanf_s(CStringW(var), L"%d%c%d%c%d%c%d", &h, &wc, sizeof(WCHAR), &m, &wc, sizeof(WCHAR), &s, &wc, sizeof(WCHAR), &ms)) {
-							break;
-						}
-
-						CStringW name;
-						name.Format(L"Chapter %d", i);
-						var.Clear();
-						str += L"NAME";
-						if (S_OK == pPB->Read(str, &var, nullptr)) {
-							name = var;
-						}
-
-						m_pCB->ChapAppend(10000i64*(((h*60 + m)*60 + s)*1000 + ms), name);
-					}
-				}
-			}
-			EndEnumPins;
 		}
 	} else if (GetPlaybackMode() == PM_DVD) {
 		m_pCB->ChapRemoveAll();
@@ -12461,53 +12394,6 @@ void CMainFrame::OpenCustomizeGraph()
 		}
 		EndEnumFilters;
 	}
-
-	BeginEnumFilters(m_pGB, pEF, pBF) {
-		if (GetCLSID(pBF) == CLSID_OggSplitter) {
-			if (CComQIPtr<IAMStreamSelect> pSS = pBF) {
-				LCID idAudio = s.idAudioLang;
-				if (!idAudio) {
-					idAudio = GetUserDefaultLCID();
-				}
-				LCID idSub = s.idSubtitlesLang;
-				if (!idSub) {
-					idSub = GetUserDefaultLCID();
-				}
-
-				DWORD cnt = 0;
-				pSS->Count(&cnt);
-				for (DWORD i = 0; i < cnt; i++) {
-					LCID lcid = DWORD_MAX;
-					WCHAR* pszName = nullptr;
-					if (SUCCEEDED(pSS->Info((long)i, nullptr, nullptr, &lcid, nullptr, &pszName, nullptr, nullptr))) {
-						CStringW name(pszName), sound(ResStr(IDS_AG_SOUND)), subtitle(L"Subtitle");
-
-						if (idAudio != (LCID)-1 && (idAudio&0x3ff) == (lcid&0x3ff) // sublang seems to be zeroed out in ogm...
-								&& name.GetLength() > sound.GetLength()
-								&& !name.Left(sound.GetLength()).CompareNoCase(sound)) {
-							if (SUCCEEDED(pSS->Enable(i, AMSTREAMSELECTENABLE_ENABLE))) {
-								idAudio = (LCID)-1;
-							}
-						}
-
-						if (idSub != (LCID)-1 && (idSub&0x3ff) == (lcid&0x3ff) // sublang seems to be zeroed out in ogm...
-								&& name.GetLength() > subtitle.GetLength()
-								&& !name.Left(subtitle.GetLength()).CompareNoCase(subtitle)
-								&& name.Mid(subtitle.GetLength()).Trim().CompareNoCase(L"off")) {
-							if (SUCCEEDED(pSS->Enable(i, AMSTREAMSELECTENABLE_ENABLE))) {
-								idSub = (LCID)-1;
-							}
-						}
-
-						if (pszName) {
-							CoTaskMemFree(pszName);
-						}
-					}
-				}
-			}
-		}
-	}
-	EndEnumFilters;
 
 	CleanGraph();
 }
@@ -13137,49 +13023,38 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 				DWORD cStreams;
 				pSS->Count(&cStreams);
 				for (int i = 0, j = cStreams; i < j; i++) {
-					DWORD dwFlags	= DWORD_MAX;
-					DWORD dwGroup	= DWORD_MAX;
-					LCID lcid		= DWORD_MAX;
+					DWORD dwFlags  = DWORD_MAX;
+					DWORD dwGroup  = DWORD_MAX;
 					WCHAR* pszName = nullptr;
 
-					if (FAILED(pSS->Info(i, nullptr, &dwFlags, &lcid, &dwGroup, &pszName, nullptr, nullptr))
-							|| !pszName) {
-						continue;
-					}
+					if (SUCCEEDED(pSS->Info(i, nullptr, &dwFlags, nullptr, &dwGroup, &pszName, nullptr, nullptr)) && pszName) {
+						if (dwGroup != 2) {
+							CoTaskMemFree(pszName);
+							continue;
+						}
 
-					CString name(pszName);
+						Stream substream;
+						substream.Filter = 2;
+						substream.Num++;
+						substream.Index++;
+						substream.Name = pszName;
+						if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
+							substream.Sel = subarray.GetCount();
+						}
+						subarray.Add(substream);
 
-					if (pszName) {
 						CoTaskMemFree(pszName);
 					}
-
-					if (dwGroup != 2) {
-						continue;
-					}
-
-					CString str = FormatStreamName(name, lcid);
-
-					Stream substream;
-					substream.Filter	= 2;
-					substream.Num++;
-					substream.Index++;
-					substream.Name		= str;
-					if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
-						substream.Sel = subarray.GetCount();
-					}
-					subarray.Add(substream);
-
-
 				}
 			} else {
 				for (int i = 0; i < nLangs; i++) {
 					WCHAR *pName;
 					if (SUCCEEDED(m_pDVS->get_LanguageName(i, &pName)) && pName) {
 						Stream substream;
-						substream.Filter	= 1;
-						substream.Num		= i;
-						substream.Index		= i;
-						substream.Name		= pName;
+						substream.Filter = 1;
+						substream.Num    = i;
+						substream.Index  = i;
+						substream.Name   = pName;
 
 						if (CComQIPtr<IDirectVobSub3> pDVS3 = m_pDVS) {
 							int nType = 0;
@@ -14594,35 +14469,27 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 					UINT baseid = id;
 
 					for (int i = 0, j = cStreams; i < j; i++) {
-						DWORD dwFlags	= DWORD_MAX;
-						DWORD dwGroup	= DWORD_MAX;
-						LCID lcid		= DWORD_MAX;
+						DWORD dwFlags  = DWORD_MAX;
+						DWORD dwGroup  = DWORD_MAX;
 						WCHAR* pszName = nullptr;
 
-						if (FAILED(pSS->Info(i, nullptr, &dwFlags, &lcid, &dwGroup, &pszName, nullptr, nullptr))
-								|| !pszName) {
-							continue;
-						}
+						if (SUCCEEDED(pSS->Info(i, nullptr, &dwFlags, nullptr, &dwGroup, &pszName, nullptr, nullptr)) && pszName) {
+							if (dwGroup != dwSelGroup) {
+								CoTaskMemFree(pszName);
+								continue;
+							}
 
-						CString name(pszName);
-
-						if (pszName) {
+							CString name(pszName);
 							CoTaskMemFree(pszName);
+
+							UINT flags = MF_BYCOMMAND | MF_STRING | (!fHideSubtitles ? MF_ENABLED : MF_DISABLED);
+							if (dwFlags && iSelectedLanguage == (nLangs - 1)) {
+								flags |= MF_CHECKED | MFT_RADIOCHECK;
+							}
+
+							name.Replace(L"&", L"&&");
+							pSub->AppendMenu(flags, id++, name);
 						}
-
-						if (dwGroup != dwSelGroup) {
-							continue;
-						}
-
-						CString str = FormatStreamName(name, lcid);
-
-						UINT flags = MF_BYCOMMAND | MF_STRING | (!fHideSubtitles ? MF_ENABLED : MF_DISABLED);
-						if (dwFlags && iSelectedLanguage == (nLangs - 1)) {
-							flags |= MF_CHECKED | MFT_RADIOCHECK;
-						}
-
-						str.Replace(L"&", L"&&");
-						pSub->AppendMenu(flags, id++, str);
 					}
 
 					return;
@@ -14673,40 +14540,32 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 				}
 
 				for (DWORD i = 0, j = cStreams; i < j; i++) {
-					DWORD dwFlags	= DWORD_MAX;
-					DWORD dwGroup	= DWORD_MAX;
-					LCID lcid		= DWORD_MAX;
-					WCHAR* pszName	= nullptr;
+					DWORD dwFlags  = DWORD_MAX;
+					DWORD dwGroup  = DWORD_MAX;
+					WCHAR* pszName = nullptr;
 
-					if (FAILED(pSS->Info(i, nullptr, &dwFlags, &lcid, &dwGroup, &pszName, nullptr, nullptr))
-							|| !pszName) {
-						continue;
-					}
-
-					CString name(pszName);
-
-					if (pszName) {
-						CoTaskMemFree(pszName);
-					}
-
-					if (dwGroup != dwSelGroup) {
-						continue;
-					}
-
-					CString str = FormatStreamName(name, lcid);
-
-					UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
-					if (dwFlags) {
-						if (m_iSubtitleSel == 0) {
-							flags |= MF_CHECKED | MFT_RADIOCHECK;
+					if (SUCCEEDED(pSS->Info(i, nullptr, &dwFlags, nullptr, &dwGroup, &pszName, nullptr, nullptr)) && pszName) {
+						if (dwGroup != dwSelGroup) {
+							CoTaskMemFree(pszName);
+							continue;
 						}
 
-					}
+						CString name(pszName);
+						CoTaskMemFree(pszName);
 
-					str.Replace(L"&", L"&&");
-					intsub++;
-					pSub->AppendMenu(flags, id++, str);
-					splcnt++;
+						UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
+						if (dwFlags) {
+							if (m_iSubtitleSel == 0) {
+								flags |= MF_CHECKED | MFT_RADIOCHECK;
+							}
+
+						}
+
+						name.Replace(L"&", L"&&");
+						intsub++;
+						pSub->AppendMenu(flags, id++, name);
+						splcnt++;
+					}
 				}
 			}
 		}
@@ -15020,40 +14879,32 @@ void CMainFrame::SetupNavStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGr
 	DWORD dwPrevGroup = (DWORD)-1;
 
 	for (int i = 0, j = cStreams; i < j; i++) {
-		DWORD dwFlags	= DWORD_MAX;
-		DWORD dwGroup	= DWORD_MAX;
-		LCID lcid		= DWORD_MAX;
-		WCHAR* pszName	= nullptr;
+		DWORD dwFlags  = DWORD_MAX;
+		DWORD dwGroup  = DWORD_MAX;
+		WCHAR* pszName = nullptr;
 
-		if (FAILED(pSS->Info(i, nullptr, &dwFlags, &lcid, &dwGroup, &pszName, nullptr, nullptr))
-				|| !pszName) {
-			continue;
-		}
+		if (SUCCEEDED(pSS->Info(i, nullptr, &dwFlags, nullptr, &dwGroup, &pszName, nullptr, nullptr)) && pszName) {
+			if (dwGroup != dwSelGroup) {
+				CoTaskMemFree(pszName);
+				continue;
+			}
 
-		CString name(pszName);
-
-		if (pszName) {
+			CString name(pszName);
 			CoTaskMemFree(pszName);
+
+			if (dwPrevGroup != -1 && dwPrevGroup != dwGroup) {
+				pSub->AppendMenu(MF_SEPARATOR);
+			}
+			dwPrevGroup = dwGroup;
+
+			UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
+			if (dwFlags) {
+				flags |= MF_CHECKED | MFT_RADIOCHECK;
+			}
+
+			name.Replace(L"&", L"&&");
+			pSub->AppendMenu(flags, id++, name);
 		}
-
-		if (dwGroup != dwSelGroup) {
-			continue;
-		}
-
-		if (dwPrevGroup != -1 && dwPrevGroup != dwGroup) {
-			pSub->AppendMenu(MF_SEPARATOR);
-		}
-		dwPrevGroup = dwGroup;
-
-		CString str = FormatStreamName(name, lcid);
-
-		UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
-		if (dwFlags) {
-			flags |= MF_CHECKED | MFT_RADIOCHECK;
-		}
-
-		str.Replace(L"&", L"&&");
-		pSub->AppendMenu(flags, id++, str);
 	}
 }
 
@@ -17602,7 +17453,7 @@ void CMainFrame::SendAudioTracksToApi()
 			for (int i = 0; i < (int)cStreams; i++) {
 				DWORD dwFlags  = DWORD_MAX;
 				WCHAR* pszName = nullptr;
-				if (FAILED(pSS->Info(i, nullptr, &dwFlags, nullptr, nullptr, &pszName, nullptr, nullptr))) {
+				if (FAILED(pSS->Info(i, nullptr, &dwFlags, nullptr, nullptr, &pszName, nullptr, nullptr)) || !pszName) {
 					return;
 				}
 				if (dwFlags == AMSTREAMSELECTINFO_EXCLUSIVE) {
@@ -17615,9 +17466,7 @@ void CMainFrame::SendAudioTracksToApi()
 				name.Replace(L"|", L"\\|");
 				strAudios.AppendFormat(L"%s", name);
 
-				if (pszName) {
-					CoTaskMemFree(pszName);
-				}
+				CoTaskMemFree(pszName);
 			}
 			strAudios.AppendFormat(L"|%i", currentStream);
 

@@ -1673,10 +1673,6 @@ MPC_GUID_ENTRY(MEDIASUBTYPE_CRAM,
 ////////////////////////////////////////////////////////////////////////////////////////
 // CLSID of some filters
 
-// Ogg
-// {F07E245F-5A1F-4d1e-8BFF-DC31D84A55AB}
-MPC_GUID_ENTRY(CLSID_OggSplitter,
-			0xf07e245f, 0x5a1f, 0x4d1e, 0x8b, 0xff, 0xdc, 0x31, 0xd8, 0x4a, 0x55, 0xab)
 // {8CAE96B7-85B1-4605-B23C-17FF5262B296}
 MPC_GUID_ENTRY(CLSID_OggMux,
 			0x8cae96b7, 0x85b1, 0x4605, 0xb2, 0x3c, 0x17, 0xff, 0x52, 0x62, 0xb2, 0x96)
