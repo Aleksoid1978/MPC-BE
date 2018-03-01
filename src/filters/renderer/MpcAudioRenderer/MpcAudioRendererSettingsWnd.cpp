@@ -326,26 +326,20 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 					}
 
 					CString sFormat;
-					sFormat.Format(L"%dbit %s%s", m_b24PaddedTo32bit ? 24 : pwfex->wBitsPerSample, m_b24PaddedTo32bit ? L"[padded] " : L"", bIsFloat ? L"Float" : L"Integer");
+					sFormat.Format(L"%ubit %s%s", m_b24PaddedTo32bit ? 24 : pwfex->wBitsPerSample, m_b24PaddedTo32bit ? L"[padded] " : L"", bIsFloat ? L"Float" : L"Integer");
+
+					BYTE lfe = 0;
+					WORD nChannels = pwfex->nChannels;
+					if (layout & SPEAKER_LOW_FREQUENCY) {
+						nChannels--;
+						lfe = 1;
+					}
 
 					CString sChannel;
-					switch (layout) {
-						case KSAUDIO_SPEAKER_5POINT1:
-						case KSAUDIO_SPEAKER_5POINT1_SURROUND:
-							sChannel = L"5.1";
-							break;
-						case KSAUDIO_SPEAKER_7POINT1:
-						case KSAUDIO_SPEAKER_7POINT1_SURROUND:
-							sChannel = L"7.1";
-							break;
-						default:
-							sChannel.Format(L"%d", pwfex->nChannels);
-							break;
-					}
-					sChannel.AppendFormat(L" / 0x%x", layout);
+					sChannel.Format(L"%u.%u / 0x%x", nChannels, lfe, layout);
 
 					CString sSampleRate;
-					sSampleRate.Format(L"%d", pwfex->nSamplesPerSec);
+					sSampleRate.Format(L"%u", pwfex->nSamplesPerSec);
 
 					formatText.SetWindowTextW(sFormat);
 					channelText.SetWindowTextW(sChannel);

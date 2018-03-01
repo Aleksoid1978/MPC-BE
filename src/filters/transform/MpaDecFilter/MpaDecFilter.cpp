@@ -2395,7 +2395,12 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 						str.Append(spks[i]);
 					}
 				}
-				infostr.AppendFormat(L"Channels: %u  [%hS]\r\n", channels, str);
+				BYTE lfe = 0;
+				if (layout & SPEAKER_LOW_FREQUENCY) {
+					channels--;
+					lfe = 1;
+				}
+				infostr.AppendFormat(L"Channels: %u.%u  [%hS]\r\n", channels, lfe, str);
 			}
 			else {
 				infostr.AppendFormat(L"Channels: %u\r\n", channels);

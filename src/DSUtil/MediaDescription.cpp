@@ -132,7 +132,7 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 							Infos.emplace_back(L"High 4:4:4 Profile");
 							break;
 						default:
-							Infos.emplace_back(FormatString(L"Profile %d", pInfo->dwProfile));
+							Infos.emplace_back(FormatString(L"Profile %u", pInfo->dwProfile));
 							break;
 					}
 				} else if (bIsHEVC) {
@@ -144,11 +144,11 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 							Infos.emplace_back(L"Main/10 Profile");
 							break;
 						default:
-							Infos.emplace_back(FormatString(L"Profile %d", pInfo->dwProfile));
+							Infos.emplace_back(FormatString(L"Profile %u", pInfo->dwProfile));
 							break;
 					}
 				} else {
-					Infos.emplace_back(FormatString(L"Profile %d", pInfo->dwProfile));
+					Infos.emplace_back(FormatString(L"Profile %u", pInfo->dwProfile));
 				}
 			}
 
@@ -158,9 +158,9 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 				if (bIsAVC) {
 					Infos.emplace_back(FormatString(L"Level %1.1f", double(pInfo->dwLevel) / 10.0));
 				} else if (bIsHEVC) {
-					Infos.emplace_back(FormatString(L"Level %d.%d", pInfo->dwLevel / 30, (pInfo->dwLevel % 30) / 3));
+					Infos.emplace_back(FormatString(L"Level %u.%u", pInfo->dwLevel / 30, (pInfo->dwLevel % 30) / 3));
 				} else {
-					Infos.emplace_back(FormatString(L"Level %d", pInfo->dwLevel));
+					Infos.emplace_back(FormatString(L"Level %u", pInfo->dwLevel));
 				}
 			}
 		} else if (pmt->formattype == FORMAT_VIDEOINFO2) {
@@ -184,7 +184,7 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 				Infos.emplace_back(FormatString(L"%dx%d", pVideoInfo2->bmiHeader.biWidth, pVideoInfo2->bmiHeader.biHeight));
 			}
 			if (pVideoInfo2->AvgTimePerFrame) {
-				Infos.emplace_back(FormatString(L"%.3f fps", 10000000.0/double(pVideoInfo2->AvgTimePerFrame)));
+				Infos.emplace_back(FormatString(L"%.3f fps", 10000000.0 / pVideoInfo2->AvgTimePerFrame));
 			}
 			if (pVideoInfo2->dwBitRate) {
 				Infos.emplace_back(FormatBitrate(pVideoInfo2->dwBitRate));
@@ -194,7 +194,7 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 				Infos.emplace_back(FormatString(L"%dx%d", pVideoInfo->bmiHeader.biWidth, pVideoInfo->bmiHeader.biHeight));
 			}
 			if (pVideoInfo->AvgTimePerFrame) {
-				Infos.emplace_back(FormatString(L"%.3f fps", 10000000.0/double(pVideoInfo->AvgTimePerFrame)));
+				Infos.emplace_back(FormatString(L"%.3f fps", 10000000.0 / pVideoInfo->AvgTimePerFrame));
 			}
 			if (pVideoInfo->dwBitRate) {
 				Infos.emplace_back(FormatBitrate(pVideoInfo->dwBitRate));
@@ -228,7 +228,7 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 			}
 
 			if (pInfo->nSamplesPerSec) {
-				Infos.emplace_back(FormatString(L"%.1f kHz", double(pInfo->nSamplesPerSec)/1000.0));
+				Infos.emplace_back(FormatString(L"%.1f kHz", double(pInfo->nSamplesPerSec) / 1000.0));
 			}
 			if (pInfo->nChannels) {
 				DWORD layout = 0;
@@ -238,24 +238,16 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 				} else {
 					layout = GetDefChannelMask(pInfo->nChannels);
 				}
-				CString sChannel;
-				switch (layout) {
-					case KSAUDIO_SPEAKER_5POINT1:
-					case KSAUDIO_SPEAKER_5POINT1_SURROUND:
-						sChannel = L"5.1 chn";
-						break;
-					case KSAUDIO_SPEAKER_7POINT1:
-					case KSAUDIO_SPEAKER_7POINT1_SURROUND:
-						sChannel = L"7.1 chn";
-						break;
-					default:
-						sChannel.Format(L"%d chn", pInfo->nChannels);
-						break;
+				BYTE lfe = 0;
+				WORD nChannels = pInfo->nChannels;
+				if (layout & SPEAKER_LOW_FREQUENCY) {
+					nChannels--;
+					lfe = 1;
 				}
-				Infos.emplace_back(sChannel);
+				Infos.emplace_back(FormatString(L"%u.%u chn", nChannels, lfe));
 			}
 			if (pInfo->wBitsPerSample) {
-				Infos.emplace_back(FormatString(L"%d bit", pInfo->wBitsPerSample));
+				Infos.emplace_back(FormatString(L"%u bit", pInfo->wBitsPerSample));
 			}
 			if (pInfo->nAvgBytesPerSec) {
 				Infos.emplace_back(FormatBitrate(pInfo->nAvgBytesPerSec * 8));
@@ -266,14 +258,14 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 			Infos.emplace_back(CMediaTypeEx::GetAudioCodecName(pmt->subtype, 0));
 
 			if (pInfo->nSamplesPerSec) {
-				Infos.emplace_back(FormatString(L"%.1f kHz", double(pInfo->nSamplesPerSec)/1000.0));
+				Infos.emplace_back(FormatString(L"%.1f kHz", double(pInfo->nSamplesPerSec) / 1000.0));
 			}
 			if (pInfo->nChannels) {
-				Infos.emplace_back(FormatString(L"%d chn", pInfo->nChannels));
+				Infos.emplace_back(FormatString(L"%u chn", pInfo->nChannels));
 			}
 
 			if (pInfo->nAvgBitsPerSec) {
-				Infos.emplace_back(FormatString(L"%d bit", pInfo->nAvgBitsPerSec));
+				Infos.emplace_back(FormatString(L"%u bit", pInfo->nAvgBitsPerSec));
 			}
 			if (pInfo->nAvgBitsPerSec) {
 				Infos.emplace_back(FormatBitrate(pInfo->nAvgBitsPerSec * 8));
@@ -284,10 +276,10 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 			Infos.emplace_back(CMediaTypeEx::GetAudioCodecName(pmt->subtype, 0));
 
 			if (pInfo->SamplesPerSec) {
-				Infos.emplace_back(FormatString(L"%.1f kHz", double(pInfo->SamplesPerSec)/1000.0));
+				Infos.emplace_back(FormatString(L"%.1f kHz", double(pInfo->SamplesPerSec) / 1000.0));
 			}
 			if (pInfo->Channels) {
-				Infos.emplace_back(FormatString(L"%d chn", pInfo->Channels));
+				Infos.emplace_back(FormatString(L"%u chn", pInfo->Channels));
 			}
 		}
 	}
