@@ -4106,7 +4106,8 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		bMvcActive = pVDF->GetMvcActive();
 	}
 
-	if (s.iStereo3DMode == STEREO3D_ROWINTERLEAVED || (s.iStereo3DMode == STEREO3D_AUTO && bMvcActive && !m_pBFmadVR)) {
+	if (s.iStereo3DMode == STEREO3D_ROWINTERLEAVED || s.iStereo3DMode == STEREO3D_ROWINTERLEAVED_2X
+			|| (s.iStereo3DMode == STEREO3D_AUTO && bMvcActive && !m_pBFmadVR)) {
 		rs.iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
 	} else {
 		rs.iStereo3DTransform = STEREO3D_AsIs;
@@ -7370,11 +7371,12 @@ void CMainFrame::OnViewStereo3DMode(UINT nID)
 
 	int iMvcOutputMode;
 	switch (s.iStereo3DMode) {
-	case STEREO3D_AUTO:           iMvcOutputMode = MVC_OUTPUT_Auto;          break;
-	case STEREO3D_MONO:           iMvcOutputMode = MVC_OUTPUT_Mono;          break;
-	case STEREO3D_ROWINTERLEAVED: iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
-	case STEREO3D_HALFOVERUNDER:  iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
-	case STEREO3D_OVERUNDER:      iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
+	case STEREO3D_AUTO:              iMvcOutputMode = MVC_OUTPUT_Auto;          break;
+	case STEREO3D_MONO:              iMvcOutputMode = MVC_OUTPUT_Mono;          break;
+	case STEREO3D_ROWINTERLEAVED:    iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
+	case STEREO3D_ROWINTERLEAVED_2X: iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
+	case STEREO3D_HALFOVERUNDER:     iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
+	case STEREO3D_OVERUNDER:         iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
 	default:
 		ASSERT(0);
 		return;
@@ -7386,7 +7388,8 @@ void CMainFrame::OnViewStereo3DMode(UINT nID)
 		bMvcActive = pVDF->GetMvcActive();
 	}
 
-	if (s.iStereo3DMode == STEREO3D_ROWINTERLEAVED || (s.iStereo3DMode == STEREO3D_AUTO && bMvcActive && !m_pBFmadVR)) {
+	if (s.iStereo3DMode == STEREO3D_ROWINTERLEAVED || s.iStereo3DMode == STEREO3D_ROWINTERLEAVED_2X
+			|| (s.iStereo3DMode == STEREO3D_AUTO && bMvcActive && !m_pBFmadVR)) {
 		rs.iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
 	} else {
 		rs.iStereo3DTransform = STEREO3D_AsIs;

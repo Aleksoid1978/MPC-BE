@@ -2781,11 +2781,12 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 	if (CComQIPtr<IMPCVideoDecFilter> pVDF = pBF) {
 		int iMvcOutputMode;
 		switch (s.iStereo3DMode) {
-		case STEREO3D_AUTO:           iMvcOutputMode = MVC_OUTPUT_Auto;          break;
-		case STEREO3D_MONO:           iMvcOutputMode = MVC_OUTPUT_Mono;          break;
-		case STEREO3D_ROWINTERLEAVED: iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
-		case STEREO3D_HALFOVERUNDER:  iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
-		case STEREO3D_OVERUNDER:      iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
+		case STEREO3D_AUTO:              iMvcOutputMode = MVC_OUTPUT_Auto;          break;
+		case STEREO3D_MONO:              iMvcOutputMode = MVC_OUTPUT_Mono;          break;
+		case STEREO3D_ROWINTERLEAVED:    iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
+		case STEREO3D_ROWINTERLEAVED_2X: iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
+		case STEREO3D_HALFOVERUNDER:     iMvcOutputMode = MVC_OUTPUT_HalfTopBottom; break;
+		case STEREO3D_OVERUNDER:         iMvcOutputMode = MVC_OUTPUT_TopBottom;     break;
 		default:
 			ASSERT(FALSE);
 			return hr;
