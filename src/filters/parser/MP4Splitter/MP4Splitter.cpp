@@ -33,6 +33,7 @@
 
 #include <Bento4/Core/Ap4.h>
 #include <Bento4/Core/Ap4File.h>
+#include <Bento4/Core/Ap4CttsAtom.h>
 #include <Bento4/Core/Ap4SttsAtom.h>
 #include <Bento4/Core/Ap4StssAtom.h>
 #include <Bento4/Core/Ap4StsdAtom.h>
@@ -383,17 +384,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 
-			if (track->GetType() == AP4_Track::TYPE_VIDEO && !nRotation) {
-				if (AP4_TkhdAtom* tkhd = dynamic_cast<AP4_TkhdAtom*>(track->GetTrakAtom()->GetChild(AP4_ATOM_TYPE_TKHD))) {
-					nRotation = tkhd->GetRotation();
-					if (nRotation) {
-						CString prop;
-						prop.Format(L"%d", nRotation);
-						SetProperty(L"ROTATION", prop);
-					}
-				}
-			}
-
 			CSize Aspect(0, 0);
 			AP4_UI32 width = 0;
 			AP4_UI32 height = 0;
@@ -415,7 +405,16 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					double den = 0;
 					tkhd->GetAspect(num, den);
 					if (num > 0 && den > 0) {
-						Aspect = ReduceDim(num/den);
+						Aspect = ReduceDim(num / den);
+					}
+
+					if (!nRotation) {
+						nRotation = tkhd->GetRotation();
+						if (nRotation) {
+							CString prop;
+							prop.Format(L"%d", nRotation);
+							SetProperty(L"ROTATION", prop);
+						}
 					}
 				}
 
@@ -427,6 +426,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						AvgTimePerFrame = 10000000.0 / track->GetMediaTimeScale() * totalDuration / totalFrames;
 					}
 				}
+
+				if (track->GetTrakAtom()->FindChild("mdia/minf/stbl/ctts") == nullptr) {
+					m_dtsonly = 1;
+				}
 			}
 
 			std::vector<CMediaType> mts;
@@ -434,8 +437,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			CMediaType mt;
 			mt.SetSampleSize(1);
 
-			VIDEOINFOHEADER2* vih2	= nullptr;
-			WAVEFORMATEX* wfe		= nullptr;
+			VIDEOINFOHEADER2* vih2 = nullptr;
+			WAVEFORMATEX* wfe      = nullptr;
 
 			AP4_DataBuffer empty;
 
@@ -2082,6 +2085,10 @@ STDMETHODIMP CMP4SplitterFilter::GetInt(LPCSTR field, int *value)
 			return S_OK;
 		}
 		return E_ABORT;
+	}
+	else if (!strcmp(field, "VIDEO_FLAG_ONLY_DTS")) {
+		*value = m_dtsonly;
+		return S_OK;
 	}
 
 	return E_INVALIDARG;

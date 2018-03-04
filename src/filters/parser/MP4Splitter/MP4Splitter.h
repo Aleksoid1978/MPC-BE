@@ -46,6 +46,7 @@ class __declspec(uuid("61F47056-E400-43d3-AF1E-AB7DFFD4C4AD"))
 	BOOL bSelectMoofSuccessfully = TRUE;
 
 	int m_interlaced = -1; // 0 - Progressive, 1 - Interlaced TFF, 2 - Interlaced BFF
+	int m_dtsonly = 0; // 0 - no, 1 - yes
 
 protected:
 	CAutoPtr<CMP4SplitterFile> m_pFile;
