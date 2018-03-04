@@ -242,6 +242,8 @@ public:
 
 	__int64 m_posMin;
 
+	typedef char ISO_639_codes[64];
+
 	struct stream {
 		CMediaType mt;
 		std::vector<CMediaType> mts;
@@ -252,8 +254,7 @@ public:
 
 		WORD tlxPage = 0;
 
-		bool lang_set = false;
-		char lang[4]  = {};
+		ISO_639_codes iso_639_codes = {};
 
 		struct {
 			bool bDTSCore = false;
@@ -418,23 +419,23 @@ public:
 	bool GetStreamType(WORD pid, PES_STREAM_TYPE &stream_type);
 
 	struct teletextPage {
-		bool bSubtitle = false;
-		WORD page      = 0;
-		char lang[4]   = {};
+		bool bSubtitle              = false;
+		WORD page                   = 0;
+		ISO_639_codes iso_639_codes = {};
 
 		bool operator == (const teletextPage& tlxPage) const {
 			return (page == tlxPage.page
 				&& bSubtitle == tlxPage.bSubtitle
-				&& !strcmp(lang, tlxPage.lang));
+				&& !strcmp(iso_639_codes, tlxPage.iso_639_codes));
 		}
 	};
 	typedef std::vector<teletextPage> teletextPages;
 
 	struct streamData {
 		struct {
-			char              lang[4] = {};
+			ISO_639_codes iso_639_codes = {};
 			std::vector<BYTE> extraData;
-			teletextPages     tlxPages;
+			teletextPages tlxPages;
 		} pmt;
 
 		BOOL         usePTS = FALSE;
