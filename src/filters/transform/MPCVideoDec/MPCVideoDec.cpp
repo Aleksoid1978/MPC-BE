@@ -1830,10 +1830,12 @@ redo:
 		};
 
 		// Enable B-Frame reorder
-		m_bReorderBFrame = ((m_nCodecId == AV_CODEC_ID_VC1 && !(clsidInput == __uuidof(CMpegSourceFilter) || clsidInput == __uuidof(CMpegSplitterFilter)))
-							|| clsidInput == __uuidof(CAviSourceFilter) || clsidInput == __uuidof(CAviSplitterFilter)
-							|| clsidInput == __uuidof(COggSourceFilter) || clsidInput == __uuidof(COggSplitterFilter)
-							|| IsAVI() || IsOGG());
+		m_bReorderBFrame = !(clsidInput == __uuidof(CMpegSourceFilter) || clsidInput == __uuidof(CMpegSplitterFilter))
+							&& (!(m_pAVCodec->capabilities & AV_CODEC_CAP_FRAME_THREADS)
+								|| m_nCodecId == AV_CODEC_ID_VC1
+								|| clsidInput == __uuidof(CAviSourceFilter) || clsidInput == __uuidof(CAviSplitterFilter)
+								|| clsidInput == __uuidof(COggSourceFilter) || clsidInput == __uuidof(COggSplitterFilter)
+								|| IsAVI() || IsOGG());
 	}
 
 	m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
@@ -1942,6 +1944,13 @@ redo:
 
 			if (SUCCEEDED(pIExFilterInfo->GetInt("VIDEO_INTERLACED", &value))) {
 				m_FilterInfo.interlaced = value;
+			}
+
+			if (!m_bReorderBFrame && (m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_HEVC)) {
+				if (SUCCEEDED(pIExFilterInfo->GetInt("VIDEO_FLAG_ONLY_DTS", &value))
+						&& value == 1) {
+					m_bReorderBFrame = true;
+				}
 			}
 
 			unsigned size = 0;
