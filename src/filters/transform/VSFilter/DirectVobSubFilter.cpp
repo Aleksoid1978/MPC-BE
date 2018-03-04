@@ -1655,6 +1655,7 @@ bool CDirectVobSubFilter2::ShouldWeAutoload(IFilterGraph* pGraph)
 	if (!fRet && m_bEmbeddedLoad) {
 		CComPtr<IBaseFilter> pBF;
 		if ((pBF = FindFilter(CLSID_AviSplitter, pGraph))
+				|| (pBF = FindFilter(L"{F07E245F-5A1F-4d1e-8BFF-DC31D84A55AB}", pGraph)) // old OggSplitter
 				|| (pBF = FindFilter(L"{34293064-02F2-41D5-9D75-CC5967ACA1AB}", pGraph)) // matroska demux
 				|| (pBF = FindFilter(L"{0A68C3B5-9164-4a54-AFAF-995B2FF0E0D4}", pGraph)) // matroska source
 				|| (pBF = FindFilter(L"{149D2E01-C32E-4939-80F6-C07B81015A7A}", pGraph)) // matroska splitter
