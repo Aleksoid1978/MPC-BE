@@ -307,9 +307,9 @@ public:
 	bool Read(vc1hdr& h, int len, CMediaType* pmt = nullptr);
 	bool Read(dirachdr& h, int len, CMediaType* pmt = nullptr);
 
-	bool Read(hdmvsubhdr& h, CMediaType* pmt, LPCSTR language_code);
-	bool Read(dvbsubhdr& h, int len, CMediaType* pmt, LPCSTR language_code, bool bCheckFormat = true);
-	bool Read(teletextsubhdr& h, int len, CMediaType* pmt, LPCSTR language_code, bool bCheckFormat = true);
+	bool Read(hdmvsubhdr& h, CMediaType* pmt, LPCSTR ISO_639_codes);
+	bool Read(dvbsubhdr& h, int len, CMediaType* pmt, LPCSTR ISO_639_codes, bool bCheckFormat = true);
+	bool Read(teletextsubhdr& h, int len, CMediaType* pmt, LPCSTR ISO_639_codes, bool bCheckFormat = true);
 
 	bool Read(avchdr& h, std::vector<BYTE>& pData, CMediaType* pmt = nullptr);
 	bool Read(avchdr& h, int len, CMediaType* pmt = nullptr);

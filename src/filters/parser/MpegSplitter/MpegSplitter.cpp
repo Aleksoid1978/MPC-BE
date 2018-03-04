@@ -105,7 +105,7 @@ CFilterApp theApp;
 
 #endif
 
-static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInfo::Stream *pClipInfo, PES_STREAM_TYPE pesStreamType, CStringA lang)
+static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInfo::Stream *pClipInfo, const PES_STREAM_TYPE pesStreamType, const CStringA& ISO_639_codes)
 {
 	const WCHAR *pPresentationDesc = nullptr;
 
@@ -118,6 +118,35 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 	CString MajorType;
 	std::list<CString> Infos;
 
+	const auto ISO_639_codes_to_language = [](LPCSTR ISO_639_codes) {
+		if (ISO_639_codes[0]) {
+			if (strstr(ISO_639_codes, ",")) {
+				std::list<CStringA> codes;
+				Explode(CStringA(ISO_639_codes), codes, ',');
+				
+				CString languages;
+				bool bFirst = true;
+
+				for (const auto& code : codes) {
+					if (code.GetLength() == 3) {
+						if (bFirst) {
+							languages = ISO6392ToLanguage(code);
+							bFirst = false;
+						} else {
+							languages += L", " + ISO6392ToLanguage(code);
+						}
+					}
+				}
+				return languages;
+			} else {
+				return ISO6392ToLanguage(ISO_639_codes);
+			}
+		}
+
+		return CString(L"");
+	};
+
+
 	if (pMediaType->majortype == MEDIATYPE_Video) {
 		MajorType = L"Video";
 		if (pMediaType->subtype == MEDIASUBTYPE_DVD_SUBPICTURE
@@ -126,18 +155,9 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 			MajorType = L"Subtitle";
 		}
 
-		if (pClipInfo) {
-			CString name = ISO6392ToLanguage(pClipInfo->m_LanguageCode);
-			if (!name.IsEmpty()) {
-				Infos.emplace_back(name);
-			}
-		} else {
-			if (!lang.IsEmpty()) {
-				CString name = ISO6392ToLanguage(lang);
-				if (!name.IsEmpty()) {
-					Infos.emplace_back(name);
-				}
-			}
+		const CString language = ISO_639_codes_to_language(pClipInfo ? pClipInfo->m_LanguageCode : ISO_639_codes);
+		if (!language.IsEmpty()) {
+			Infos.emplace_back(language);
 		}
 
 		const VIDEOINFOHEADER *pVideoInfo = nullptr;
@@ -306,19 +326,12 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 
 	} else if (pMediaType->majortype == MEDIATYPE_Audio) {
 		MajorType = L"Audio";
-		if (pClipInfo) {
-			CString name = ISO6392ToLanguage(pClipInfo->m_LanguageCode);
-			if (!name.IsEmpty()) {
-				Infos.emplace_back(name);
-			}
-		} else {
-			if (!lang.IsEmpty()) {
-				CString name = ISO6392ToLanguage(lang);
-				if (!name.IsEmpty()) {
-					Infos.emplace_back(name);
-				}
-			}
+
+		const CString language = ISO_639_codes_to_language(pClipInfo ? pClipInfo->m_LanguageCode : ISO_639_codes);
+		if (!language.IsEmpty()) {
+			Infos.emplace_back(language);
 		}
+
 		if (pMediaType->formattype == FORMAT_WaveFormatEx) {
 			const WAVEFORMATEX *pInfo = GetFormatHelper(pInfo, pMediaType);
 
@@ -443,35 +456,17 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 			Infos.emplace_back(pPresentationDesc);
 		}
 
-		if (pClipInfo) {
-			CString name = ISO6392ToLanguage(pClipInfo->m_LanguageCode);
-			if (!name.IsEmpty()) {
-				Infos.emplace_front(name);
-			} else if (!lang.IsEmpty()) {
-				CString name = ISO6392ToLanguage(lang);
-				if (!name.IsEmpty()) {
-					Infos.emplace_front(name);
-				}
-			}
+		const CString language = ISO_639_codes_to_language(pClipInfo ? pClipInfo->m_LanguageCode : ISO_639_codes);
+		if (!language.IsEmpty()) {
+			Infos.emplace_front(language);
 		} else if (pMediaType->cbFormat == sizeof(SUBTITLEINFO)) {
 			const SUBTITLEINFO *pInfo = GetFormatHelper(pInfo, pMediaType);
-			CString name = ISO6392ToLanguage(pInfo->IsoLang);
-
-			if (!lang.IsEmpty()) {
-				CString name = ISO6392ToLanguage(lang);
-				if (!name.IsEmpty()) {
-					Infos.emplace_front(name);
-				}
-			} else if (!name.IsEmpty()) {
-				Infos.emplace_front(name);
+			const CString language = ISO_639_codes_to_language(pInfo->IsoLang);
+			if (!language.IsEmpty()) {
+				Infos.emplace_front(language);
 			}
 			if (pInfo->TrackName[0]) {
 				Infos.emplace_back(pInfo->TrackName);
-			}
-		} else if (!lang.IsEmpty()) {
-			CString name = ISO6392ToLanguage(lang);
-			if (!name.IsEmpty()) {
-				Infos.emplace_front(name);
 			}
 		}
 	}
@@ -966,14 +961,14 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 			UNREFERENCED_PARAMETER(ary);
 		}
 
-		CStringA hdr		= VobSubDefHeader(vid_width ? vid_width : 720, vid_height ? vid_height : 576, palette);
+		CStringA hdr = VobSubDefHeader(vid_width ? vid_width : 720, vid_height ? vid_height : 576, palette);
 
-		mt.majortype		= MEDIATYPE_Subtitle;
-		mt.subtype			= MEDIASUBTYPE_VOBSUB;
-		mt.formattype		= FORMAT_SubtitleInfo;
-		SUBTITLEINFO* si	= (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO) + hdr.GetLength());
+		mt.majortype     = MEDIATYPE_Subtitle;
+		mt.subtype       = MEDIASUBTYPE_VOBSUB;
+		mt.formattype    = FORMAT_SubtitleInfo;
+		SUBTITLEINFO* si = (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO) + hdr.GetLength());
 		memset(si, 0, mt.FormatLength());
-		si->dwOffset		= sizeof(SUBTITLEINFO);
+		si->dwOffset     = sizeof(SUBTITLEINFO);
 		strncpy_s(si->IsoLang, m_pTI ? CStringA(m_pTI->GetTrackName(s.ps1id)) : "eng", _countof(si->IsoLang) - 1);
 		memcpy(si + 1, (LPCSTR)hdr, hdr.GetLength());
 
@@ -1007,9 +1002,9 @@ CString CMpegSplitterFilter::FormatStreamName(const CMpegSplitterFile::stream& s
 	const PES_STREAM_TYPE StreamType = pClipInfo ? pClipInfo->m_Type : pProgram ? pProgram->streams[nStream].type : INVALID;
 	const wchar_t *pStreamName = StreamTypeToName(StreamType);
 
-	CStringA lang_name(s.lang);
+	CStringA iso_639_codes(s.iso_639_codes);
 	if (m_pTI) {
-		lang_name = m_pTI->GetTrackName(s.ps1id);
+		iso_639_codes = m_pTI->GetTrackName(s.ps1id);
 	}
 
 	CString FormatId;
@@ -1024,7 +1019,7 @@ CString CMpegSplitterFilter::FormatStreamName(const CMpegSplitterFile::stream& s
 	}
 
 	const CString name = CMpegSplitterFile::CStreamList::ToString(type);
-	const CString FormatDesc = GetMediaTypeDesc(s.mts.empty() ? &s.mt : &s.mts[0], pClipInfo, StreamType, lang_name);
+	const CString FormatDesc = GetMediaTypeDesc(s.mts.empty() ? &s.mt : &s.mts[0], pClipInfo, StreamType, iso_639_codes);
 	CString streamName;
 	if (!FormatDesc.IsEmpty()) {
 		streamName.Format(L"%s (%s)", FormatDesc, FormatId);
@@ -1825,7 +1820,7 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 
 			}
 			if (plcid) {
-				*plcid = pStream ? pStream->m_LCID : ISO6392ToLcid(s.lang);
+				*plcid = pStream ? pStream->m_LCID : ISO6392ToLcid(s.iso_639_codes);
 			}
 			if (pdwGroup) {
 				*pdwGroup = type;

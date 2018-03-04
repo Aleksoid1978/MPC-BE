@@ -1174,7 +1174,7 @@ bool CBaseSplitterFileEx::Read(dirachdr& h, int len, CMediaType* pmt)
 	return false;
 }
 
-bool CBaseSplitterFileEx::Read(hdmvsubhdr& h, CMediaType* pmt, LPCSTR language_code)
+bool CBaseSplitterFileEx::Read(hdmvsubhdr& h, CMediaType* pmt, LPCSTR ISO_639_codes)
 {
 	if (pmt) {
 		pmt->majortype	= MEDIATYPE_Subtitle;
@@ -1184,8 +1184,8 @@ bool CBaseSplitterFileEx::Read(hdmvsubhdr& h, CMediaType* pmt, LPCSTR language_c
 		SUBTITLEINFO* psi = (SUBTITLEINFO*)pmt->AllocFormatBuffer(sizeof(SUBTITLEINFO));
 		if (psi) {
 			memset(psi, 0, pmt->FormatLength());
-			if (language_code[0]) {
-				strcpy_s(psi->IsoLang, language_code);
+			if (ISO_639_codes[0]) {
+				strncpy_s(psi->IsoLang, ISO_639_codes, 3);
 			}
 		}
 	}
@@ -1193,7 +1193,7 @@ bool CBaseSplitterFileEx::Read(hdmvsubhdr& h, CMediaType* pmt, LPCSTR language_c
 	return true;
 }
 
-bool CBaseSplitterFileEx::Read(dvbsubhdr& h, int len, CMediaType* pmt, LPCSTR language_code, bool bCheckFormat)
+bool CBaseSplitterFileEx::Read(dvbsubhdr& h, int len, CMediaType* pmt, LPCSTR ISO_639_codes, bool bCheckFormat)
 {
 	if (!bCheckFormat || (len > 4 && (BitRead(32, true) & 0xFFFFFF00) == 0x20000f00)) {
 		if (pmt) {
@@ -1204,8 +1204,8 @@ bool CBaseSplitterFileEx::Read(dvbsubhdr& h, int len, CMediaType* pmt, LPCSTR la
 			SUBTITLEINFO* psi = (SUBTITLEINFO*)pmt->AllocFormatBuffer(sizeof(SUBTITLEINFO));
 			if (psi) {
 				memset(psi, 0, pmt->FormatLength());
-				if (language_code[0]) {
-					strcpy_s(psi->IsoLang, language_code);
+				if (ISO_639_codes[0]) {
+					strncpy_s(psi->IsoLang, ISO_639_codes, 3);
 				}
 			}
 		}
@@ -1216,7 +1216,7 @@ bool CBaseSplitterFileEx::Read(dvbsubhdr& h, int len, CMediaType* pmt, LPCSTR la
 	return false;
 }
 
-bool CBaseSplitterFileEx::Read(teletextsubhdr& h, int len, CMediaType* pmt, LPCSTR language_code, bool bCheckFormat)
+bool CBaseSplitterFileEx::Read(teletextsubhdr& h, int len, CMediaType* pmt, LPCSTR ISO_639_codes, bool bCheckFormat)
 {
 	DWORD sync = 0;
 	if (bCheckFormat && len > 4) {
@@ -1232,8 +1232,8 @@ bool CBaseSplitterFileEx::Read(teletextsubhdr& h, int len, CMediaType* pmt, LPCS
 			SUBTITLEINFO* psi = (SUBTITLEINFO*)pmt->AllocFormatBuffer(sizeof(SUBTITLEINFO));
 			if (psi) {
 				memset(psi, 0, pmt->FormatLength());
-				if (language_code[0]) {
-					strcpy_s(psi->IsoLang, language_code);
+				if (ISO_639_codes[0]) {
+					strncpy_s(psi->IsoLang, ISO_639_codes, 3);
 				}
 			}
 		}
