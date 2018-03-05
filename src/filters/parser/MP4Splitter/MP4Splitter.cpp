@@ -420,14 +420,15 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 				AvgTimePerFrame = track->GetSampleCount() ? REFERENCE_TIME(track->GetDurationHighPrecision() * 10000.0 / (track->GetSampleCount())) : 0;
 				if (AP4_SttsAtom* stts = dynamic_cast<AP4_SttsAtom*>(track->GetTrakAtom()->FindChild("mdia/minf/stbl/stts"))) {
-					AP4_Duration totalDuration	= stts->GetTotalDuration();
-					AP4_UI32 totalFrames		= stts->GetTotalFrames();
+					AP4_Duration totalDuration = stts->GetTotalDuration();
+					AP4_UI32 totalFrames       = stts->GetTotalFrames();
 					if (totalDuration && totalFrames) {
 						AvgTimePerFrame = 10000000.0 / track->GetMediaTimeScale() * totalDuration / totalFrames;
 					}
 				}
 
-				if (track->GetTrakAtom()->FindChild("mdia/minf/stbl/ctts") == nullptr) {
+				if (!movie->HasFragmentsIndex()
+						&& track->GetTrakAtom()->FindChild("mdia/minf/stbl/ctts") == nullptr) {
 					m_dtsonly = 1;
 				}
 			}
