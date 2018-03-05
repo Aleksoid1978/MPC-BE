@@ -29,6 +29,8 @@
 #define OggSplitterName L"MPC Ogg Splitter"
 #define OggSourceName   L"MPC Ogg Source"
 
+class COggSplitterFilter;
+
 class COggSplitterOutputPin : public CBaseSplitterOutputPin
 {
 	class CComment
@@ -51,6 +53,8 @@ protected:
 	bool m_fSetKeyFrame;
 
 	void ResetState(DWORD seqnum = DWORD_MAX);
+
+	COggSplitterFilter* m_pFilter = nullptr;
 
 public:
 	COggSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
@@ -247,6 +251,8 @@ protected:
 	DWORD m_bitstream_serial_number_Video = DWORD_MAX;
 
 public:
+	REFERENCE_TIME m_rtOffset = 0;
+
 	COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
 	virtual ~COggSplitterFilter();
 

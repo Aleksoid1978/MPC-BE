@@ -434,6 +434,7 @@ start:
 		m_rtDuration -= rtMin;
 		m_rtDuration = std::max(0LL, m_rtDuration);
 
+		m_rtOffset = rtMin;
 	}
 
 	m_pFile->Seek(start_pos);
@@ -522,10 +523,11 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	if (rt <= 0) {
 		m_pFile->Seek(0);
 	} else if (m_rtDuration > 0) {
+		rt += m_rtOffset;
 
-		__int64 len			= m_pFile->GetLength();
-		__int64 seekpos		= CalcPos(rt);
-		__int64 minseekpos	= _I64_MIN;
+		const __int64 len  = m_pFile->GetLength();
+		__int64 seekpos    = CalcPos(rt);
+		__int64 minseekpos = _I64_MIN;
 
 		REFERENCE_TIME rtmax = rt - UNITS * (m_bitstream_serial_number_Video != DWORD_MAX ? 2 : 0);
 		REFERENCE_TIME rtmin = rtmax - UNITS / 2;
@@ -640,6 +642,7 @@ COggSourceFilter::COggSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
 
 COggSplitterOutputPin::COggSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseSplitterOutputPin(pName, pFilter, pLock, phr)
+	, m_pFilter(dynamic_cast<COggSplitterFilter*>(pFilter))
 	, m_rtLast(0)
 	, m_fSetKeyFrame(false)
 {
@@ -754,7 +757,7 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 
 		if (len < 255 || pos == page.m_lens.GetTailPosition()) {
 			if (last == pos && page.m_hdr.granule_position != -1) {
-				const REFERENCE_TIME rt = GetRefTime(page.m_hdr.granule_position);
+				const REFERENCE_TIME rt = GetRefTime(page.m_hdr.granule_position) - m_pFilter->m_rtOffset;
 				if (llabs(rt - m_rtLast) > GetRefTime(1)) {
 					m_rtLast = rt;
 				}
