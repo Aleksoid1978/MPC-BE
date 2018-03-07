@@ -41,6 +41,16 @@ CBinkSplitterFilter : public CBaseSplitterFilter
 	};
 	std::vector<frame_t> m_seektable;
 
+	struct audiotrack_t {
+		UINT16 sample_rate;
+		UINT16 audio_flags;
+		UINT32 track_ID;
+
+		BYTE channels;
+		REFERENCE_TIME pts;
+	};
+	std::vector<audiotrack_t> m_audiotracks;
+
 protected:
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 
