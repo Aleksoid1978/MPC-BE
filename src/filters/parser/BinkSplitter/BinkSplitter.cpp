@@ -181,29 +181,23 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 
 	if (num_audio_tracks) {
-		struct audiotrack_t {
-			UINT16 sample_rate = 0;
-			UINT16 audio_flags = 0;
-			UINT32 track_ID = 0;
-		};
-		std::vector<audiotrack_t> audiotracks(num_audio_tracks);
-
+		m_audiotracks.resize(num_audio_tracks);
 		m_pFile->Skip(4 * num_audio_tracks);
 
 		for (unsigned i = 0; i < num_audio_tracks; i++) {
-			m_pFile->ByteRead((BYTE*)&audiotracks[i].sample_rate, 2);
-			m_pFile->ByteRead((BYTE*)&audiotracks[i].audio_flags, 2);
+			m_pFile->ByteRead((BYTE*)&m_audiotracks[i].sample_rate, 2);
+			m_pFile->ByteRead((BYTE*)&m_audiotracks[i].audio_flags, 2);
 
 			mts.clear();
 			mt.InitMediaType();
 			mt.majortype = MEDIATYPE_Audio;
-			mt.subtype = (audiotracks[i].audio_flags & BINK_AUD_USEDCT) ? MEDIASUBTYPE_BINKA_DCT : MEDIASUBTYPE_BINKA_RDFT;
+			mt.subtype = (m_audiotracks[i].audio_flags & BINK_AUD_USEDCT) ? MEDIASUBTYPE_BINKA_DCT : MEDIASUBTYPE_BINKA_RDFT;
 			mt.formattype = FORMAT_WaveFormatEx;
 			WAVEFORMATEX wfe;
 			memset(&wfe, 0, sizeof(wfe));
 			wfe.wFormatTag = 0x4142;
-			wfe.nChannels = (audiotracks[i].audio_flags & BINK_AUD_STEREO) ? 2 : 1;
-			wfe.nSamplesPerSec = audiotracks[i].sample_rate;
+			wfe.nChannels = m_audiotracks[i].channels = (m_audiotracks[i].audio_flags & BINK_AUD_STEREO) ? 2 : 1;
+			wfe.nSamplesPerSec = m_audiotracks[i].sample_rate;
 			wfe.wBitsPerSample = 16;
 			mt.SetFormat((BYTE*)&wfe, sizeof(wfe));
 			mt.lSampleSize = 1;
@@ -213,7 +207,7 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		for (unsigned i = 0; i < num_audio_tracks; i++) {
-			m_pFile->ByteRead((BYTE*)&audiotracks[i].track_ID, 4);
+			m_pFile->ByteRead((BYTE*)&m_audiotracks[i].track_ID, 4);
 		}
 	}
 
@@ -256,8 +250,6 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 10000000i64 * num_frames * fps_den / fps_num;
 
-	CString time = ReftimeToString(m_rtDuration);
-
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
 }
 
@@ -284,18 +276,17 @@ void CBinkSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			m_indexpos--;
 		}
 	}
+
+	const REFERENCE_TIME pts = 10000000i64 * m_indexpos * m_fps.den / m_fps.num;
+	for (auto& audio_track : m_audiotracks) {
+		audio_track.pts = pts;
+	}
 }
 
 bool CBinkSplitterFilter::DemuxLoop()
 {
 	while (m_indexpos < m_seektable.size() && !CheckRequest(nullptr)) {
 		HRESULT hr = S_OK;
-
-		REFERENCE_TIME rtstart = 10000000i64 * m_indexpos * m_fps.den / m_fps.num;
-		REFERENCE_TIME rtstop = 10000000i64 * (m_indexpos + 1) * m_fps.den / m_fps.num;
-
-		CString timestart = ReftimeToString(rtstart);
-		CString timestop = ReftimeToString(rtstop);
 
 		m_pFile->Seek(m_seektable[m_indexpos].pos);
 
@@ -308,10 +299,16 @@ bool CBinkSplitterFilter::DemuxLoop()
 					if (pa->SetCount(packet_size)) {
 						pa->TrackNumber = i + 1;
 						pa->bSyncPoint = TRUE;
-						pa->rtStart = rtstart;
-						pa->rtStop = rtstop;
+						pa->rtStart = m_audiotracks[i].pts;
+						pa->rtStop = pa->rtStart + 1;
 
 						m_pFile->ByteRead(pa->data(), packet_size);
+
+						if (packet_size >= 4) {
+							const UINT32 samples_bytes = GETDWORD(pa->data());
+							m_audiotracks[i].pts += llMulDiv(samples_bytes / (m_audiotracks[i].channels * 2), UNITS, m_audiotracks[i].sample_rate, 0);
+							pa->rtStop = m_audiotracks[i].pts;
+						}
 
 						hr = DeliverPacket(pa);
 					}
@@ -329,8 +326,8 @@ bool CBinkSplitterFilter::DemuxLoop()
 		if (pv->SetCount(packet_size)) {
 			pv->TrackNumber = 0;
 			pv->bSyncPoint = m_seektable[m_indexpos].keyframe;
-			pv->rtStart = rtstart;
-			pv->rtStop = rtstop;
+			pv->rtStart = 10000000i64 * m_indexpos * m_fps.den / m_fps.num;
+			pv->rtStop = 10000000i64 * (m_indexpos + 1) * m_fps.den / m_fps.num;
 
 			m_pFile->ByteRead(pv->data(), packet_size);
 
