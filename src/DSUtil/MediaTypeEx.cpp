@@ -189,6 +189,8 @@ static const std::map<GUID, LPCSTR> audioguids = {
 	{MEDIASUBTYPE_DST,             "DST"},
 	{MEDIASUBTYPE_NELLYMOSER,      "Nelly Moser"},
 	{MEDIASUBTYPE_TAK,             "TAK"},
+	{MEDIASUBTYPE_BINKA_DCT,       "BINK"},
+	{MEDIASUBTYPE_BINKA_RDFT,      "BINK"},
 };
 
 static const std::map<GUID, LPCSTR> subtitleguids = {
