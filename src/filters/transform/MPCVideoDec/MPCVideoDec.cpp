@@ -1831,11 +1831,12 @@ redo:
 
 		// Enable B-Frame reorder
 		m_bReorderBFrame = !(clsidInput == __uuidof(CMpegSourceFilter) || clsidInput == __uuidof(CMpegSplitterFilter))
-							&& (!(m_pAVCodec->capabilities & AV_CODEC_CAP_FRAME_THREADS)
-								|| m_nCodecId == AV_CODEC_ID_VC1
-								|| clsidInput == __uuidof(CAviSourceFilter) || clsidInput == __uuidof(CAviSplitterFilter)
-								|| clsidInput == __uuidof(COggSourceFilter) || clsidInput == __uuidof(COggSplitterFilter)
-								|| IsAVI() || IsOGG());
+							&& !(m_pAVCodec->capabilities & AV_CODEC_CAP_FRAME_THREADS)
+							&& !(m_nCodecId == AV_CODEC_ID_MPEG1VIDEO || m_nCodecId == AV_CODEC_ID_MPEG2VIDEO)
+							|| m_nCodecId == AV_CODEC_ID_VC1
+							|| clsidInput == __uuidof(CAviSourceFilter) || clsidInput == __uuidof(CAviSplitterFilter)
+							|| clsidInput == __uuidof(COggSourceFilter) || clsidInput == __uuidof(COggSplitterFilter)
+							|| IsAVI() || IsOGG();
 	}
 
 	m_pAVCtx = avcodec_alloc_context3(m_pAVCodec);
