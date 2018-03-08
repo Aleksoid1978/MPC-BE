@@ -71,4 +71,9 @@ namespace DXVAState {
 	{
 		return m_sDXVADecoderShortDescription.GetString();
 	}
+
+	const GUID GetDecoderGUID()
+	{
+		return m_guidDXVADecoder;
+	}
 }

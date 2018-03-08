@@ -28,4 +28,5 @@ namespace DXVAState {
 	const BOOL GetState();
 	LPCWSTR GetDescription();
 	LPCWSTR GetShortDescription();
+	const GUID GetDecoderGUID();
 }
