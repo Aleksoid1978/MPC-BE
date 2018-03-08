@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include <atlutil.h>
 #include <atlpath.h>
+#include <IntShCut.h>
 #include "MainFrm.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/Filehandle.h"
@@ -963,25 +964,52 @@ void CPlayerPlaylistBar::ParsePlayList(CString fn, CSubtitleItemList* subs, bool
 	ParsePlayList(sl, subs, bCheck);
 }
 
+// Resolve .lnk and .url files.
 void CPlayerPlaylistBar::ResolveLinkFiles(std::list<CString> &fns)
 {
-	// resolve .lnk files
+	for (auto& fn : fns) {
+		const CString extension = GetFileExt(fn).MakeLower();
 
-	CComPtr<IShellLink> pSL;
-	pSL.CoCreateInstance(CLSID_ShellLink);
-	CComQIPtr<IPersistFile> pPF = pSL;
+		// Regular shortcut file.
+		if (extension == L".lnk") {
+			CComPtr<IShellLink> pShellLink;
+			pShellLink.CoCreateInstance(CLSID_ShellLink);
+			CComQIPtr<IPersistFile> pPersistFile = pShellLink;
 
-	if (pSL && pPF) {
-		for (auto& fn : fns) {
-			if (CPath(fn).GetExtension().MakeLower() == L".lnk") {
-				WCHAR buff[MAX_PATH] = { 0 };
-				if (SUCCEEDED(pPF->Load(fn, STGM_READ))
-						&& SUCCEEDED(pSL->Resolve(nullptr, SLR_ANY_MATCH | SLR_NO_UI))
-						&& SUCCEEDED(pSL->GetPath(buff, _countof(buff), nullptr, 0))) {
-					CString fnResolved(buff);
-					if (!fnResolved.IsEmpty()) {
-						fn = fnResolved;
-					}
+			WCHAR buffer[MAX_PATH] = {};
+			if (pShellLink && pPersistFile
+					// Load file.
+					&& SUCCEEDED(pPersistFile->Load(fn, STGM_READ))
+					// Possible recontruction of path.
+					&& SUCCEEDED(pShellLink->Resolve(nullptr, SLR_ANY_MATCH | SLR_NO_UI))
+					// Retrieve path.
+					&& SUCCEEDED(pShellLink->GetPath(buffer, _countof(buffer), nullptr, 0))
+					// non-empty buffer
+					&& wcslen(buffer)) {
+				fn = buffer;
+			}
+
+		// Internet shortcut file.
+		} else if (extension == L".url") {
+			CComPtr<IUniformResourceLocator> pUniformResourceLocator;
+			pUniformResourceLocator.CoCreateInstance(CLSID_InternetShortcut);
+			CComQIPtr<IPersistFile> pPersistFile = pUniformResourceLocator;
+
+			WCHAR* buffer;
+			if (pUniformResourceLocator && pPersistFile
+					// Load file.
+					&& SUCCEEDED(pPersistFile->Load(fn, STGM_READ))
+					// Retrieve URL (foreign-allocated).
+					&& SUCCEEDED(pUniformResourceLocator->GetURL(&buffer))) {
+				if (wcslen(buffer)) {
+					fn = buffer;
+				}
+
+				// Free foreign-allocated memory.
+				IMalloc* pMalloc;
+				if (SUCCEEDED(SHGetMalloc(&pMalloc))) {
+					pMalloc->Free(buffer);
+					pMalloc->Release();
 				}
 			}
 		}
