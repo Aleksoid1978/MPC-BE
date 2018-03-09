@@ -48,7 +48,7 @@ void alpha_mask_deleter::operator()(CAlphaMask* ptr) const noexcept
 
 CMyFont::CMyFont(STSStyle& style)
 {
-	LOGFONT lf;
+	LOGFONTW lf;
 	ZeroMemory(&lf, sizeof(lf));
 	lf <<= style;
 	lf.lfHeight = (LONG)(style.fontSize+0.5);
@@ -57,9 +57,9 @@ CMyFont::CMyFont(STSStyle& style)
 	lf.lfQuality = ANTIALIASED_QUALITY;
 	lf.lfPitchAndFamily = DEFAULT_PITCH|FF_DONTCARE;
 
-	if (!CreateFontIndirect(&lf)) {
-		_tcscpy_s(lf.lfFaceName, L"Arial");
-		CreateFontIndirect(&lf);
+	if (!CreateFontIndirectW(&lf)) {
+		wcscpy_s(lf.lfFaceName, L"Arial");
+		CreateFontIndirectW(&lf);
 	}
 
 	HFONT hOldFont = SelectFont(g_hDC, *this);
@@ -1717,7 +1717,7 @@ void CRenderedTextSubtitle::ParseEffect(CSubtitle* sub, CString str)
 		return;
 	}
 
-	const WCHAR* s = _tcschr(str, ';');
+	const WCHAR* s = wcschr(str, ';');
 	if (!s) {
 		s = (LPWSTR)(LPCWSTR)str;
 		s += str.GetLength() - 1;
@@ -1729,7 +1729,7 @@ void CRenderedTextSubtitle::ParseEffect(CSubtitle* sub, CString str)
 		sub->m_bIsAnimated = true;
 
 		int delay, lefttoright = 0, fadeawaywidth = 0;
-		if (_stscanf_s(s, L"%d;%d;%d", &delay, &lefttoright, &fadeawaywidth) < 1) {
+		if (swscanf_s(s, L"%d;%d;%d", &delay, &lefttoright, &fadeawaywidth) < 1) {
 			return;
 		}
 
@@ -1751,7 +1751,7 @@ void CRenderedTextSubtitle::ParseEffect(CSubtitle* sub, CString str)
 		sub->m_bIsAnimated = true;
 
 		int top, bottom, delay, fadeawayheight = 0;
-		if (_stscanf_s(s, L"%d;%d;%d;%d", &top, &bottom, &delay, &fadeawayheight) < 3) {
+		if (swscanf_s(s, L"%d;%d;%d;%d", &top, &bottom, &delay, &fadeawayheight) < 3) {
 			return;
 		}
 
@@ -2599,7 +2599,7 @@ bool CRenderedTextSubtitle::ParseHtmlTag(CStringW str, STSStyle& style, const ST
 					DWORD val;
 					if (g_colors.Lookup(key, val)) {
 						style.colors[nColor] = val;
-					} else if ((style.colors[nColor] = _tcstol(key, NULL, 16)) == 0) {
+					} else if ((style.colors[nColor] = wcstol(key, NULL, 16)) == 0) {
 						style.colors[nColor] = 0x00ffffff;	// default is white
 					}
 					style.colors[nColor] = ((style.colors[nColor] >> 16) & 0xff) | ((style.colors[nColor] & 0xff) << 16) | (style.colors[nColor] & 0x00ff00);

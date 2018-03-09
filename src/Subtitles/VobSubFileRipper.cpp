@@ -984,7 +984,7 @@ STDMETHODIMP CVobSubFileRipper::LoadParamFile(CString fn)
 			}
 			phase = P_PGC;
 		} else if (phase == P_PGC) {
-			m_rd.iSelPGC = _tcstol(line, NULL, 10)-1;
+			m_rd.iSelPGC = wcstol(line, NULL, 10)-1;
 			if (m_rd.iSelPGC < 0 || (size_t)m_rd.iSelPGC >= m_rd.pgcs.GetCount()) {
 				break;
 			}
@@ -992,7 +992,7 @@ STDMETHODIMP CVobSubFileRipper::LoadParamFile(CString fn)
 		} else if (phase == 3) {
 			PGC& pgc = m_rd.pgcs[m_rd.iSelPGC];
 
-			pgc.iSelAngle = _tcstol(line, NULL, 10);
+			pgc.iSelAngle = wcstol(line, NULL, 10);
 			if (pgc.iSelAngle < 0 || pgc.iSelAngle > std::max(1, pgc.nAngles) || pgc.iSelAngle > 9) {
 				break;
 			}
@@ -1017,11 +1017,11 @@ STDMETHODIMP CVobSubFileRipper::LoadParamFile(CString fn)
 							}
 						}
 
-						vob = _tcstol(s, &s, 10);
+						vob = wcstol(s, &s, 10);
 						cell = 0;
 					} else if (*s == L'c' && vob > 0) {
 						s++;
-						cell = _tcstol(s, &s, 10);
+						cell = wcstol(s, &s, 10);
 
 						for (size_t i = 0; i < angle.GetCount(); i++) {
 							if (angle[i].vob == vob && angle[i].cell == cell) {
@@ -1063,14 +1063,14 @@ STDMETHODIMP CVobSubFileRipper::LoadParamFile(CString fn)
 					int langnum;
 
 					if (_istdigit(lang[0])) {
-						n = _stscanf_s(lang, L"%d", &langnum);
+						n = swscanf_s(lang, L"%d", &langnum);
 						if (n != 1) {
 							break;
 						}
 
 						m_rd.selids[langnum] = true;
 					} else if (_istalpha(lang[0])) {
-						n = _stscanf_s(lang, L"%s", langid, _countof(langid));
+						n = swscanf_s(lang, L"%s", langid, _countof(langid));
 						if (n != 1) {
 							break;
 						}
