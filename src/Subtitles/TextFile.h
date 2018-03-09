@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -45,8 +45,8 @@ private:
 public:
 	CTextFile(enc encoding = ASCII, enc defaultencoding = ASCII);
 
-	virtual bool Open(LPCTSTR lpszFileName);
-	virtual bool Save(LPCTSTR lpszFileName, enc e /*= ASCII*/);
+	virtual bool Open(LPCWSTR lpszFileName);
+	virtual bool Save(LPCWSTR lpszFileName, enc e /*= ASCII*/);
 	virtual void Close() { return __super::Close(); };
 
 	void SetEncoding(enc e);
@@ -83,8 +83,8 @@ public:
 	CWebTextFile(enc encoding = ASCII, enc defaultencoding = ASCII, LONGLONG llMaxSize = 1024 * 1024);
 	~CWebTextFile();
 
-	bool Open(LPCTSTR lpszFileName);
-	bool Save(LPCTSTR lpszFileName, enc e /*= ASCII*/);
+	bool Open(LPCWSTR lpszFileName);
+	bool Save(LPCWSTR lpszFileName, enc e /*= ASCII*/);
 	void Close();
 };
 

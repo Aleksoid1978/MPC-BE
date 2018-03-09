@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -82,8 +82,8 @@ public:
 	CUSFSubtitles();
 	virtual ~CUSFSubtitles();
 
-	bool Read(LPCTSTR fn);
-	//bool Write(LPCTSTR fn); // TODO
+	bool Read(LPCWSTR fn);
+	//bool Write(LPCWSTR fn); // TODO
 
 	metadata_t metadata;
 	CAutoPtrList<style_t> styles;

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -544,7 +544,7 @@ wstring CRealTextParser::RenderTags(const list<Tag>& p_crlTags)
 				bEmpty = false;
 			}
 		} else {
-			//AfxMessageBox(CString(_T("Unknown RealText-tag: ")) + oTag.m_szName.c_str());
+			//AfxMessageBox(CString(L"Unknown RealText-tag: ") + oTag.m_szName.c_str());
 		}
 	}
 

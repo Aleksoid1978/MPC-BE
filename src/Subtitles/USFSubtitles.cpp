@@ -186,7 +186,7 @@ CUSFSubtitles::~CUSFSubtitles()
 {
 }
 
-bool CUSFSubtitles::Read(LPCTSTR fn)
+bool CUSFSubtitles::Read(LPCWSTR fn)
 {
 	VARIANT_BOOL vb;
 	CComPtr<IXMLDOMDocument> pDoc;
@@ -439,7 +439,7 @@ bool CUSFSubtitles::ConvertToSTS(CSimpleTextSubtitle& sts)
 
 		// TODO: apply effects as {\t(..)} after usf's standard clearly defines them
 
-		sts.Add(t->str, true, t->start, t->stop, t->style, _T(""), _T(""), marginRect);
+		sts.Add(t->str, true, t->start, t->stop, t->style, L"", L"", marginRect);
 	}
 
 	return true;

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -58,7 +58,7 @@ CMyFont::CMyFont(STSStyle& style)
 	lf.lfPitchAndFamily = DEFAULT_PITCH|FF_DONTCARE;
 
 	if (!CreateFontIndirect(&lf)) {
-		_tcscpy_s(lf.lfFaceName, _T("Arial"));
+		_tcscpy_s(lf.lfFaceName, L"Arial");
 		CreateFontIndirect(&lf);
 	}
 
@@ -1717,19 +1717,19 @@ void CRenderedTextSubtitle::ParseEffect(CSubtitle* sub, CString str)
 		return;
 	}
 
-	const TCHAR* s = _tcschr(str, ';');
+	const WCHAR* s = _tcschr(str, ';');
 	if (!s) {
-		s = (LPTSTR)(LPCTSTR)str;
+		s = (LPWSTR)(LPCWSTR)str;
 		s += str.GetLength() - 1;
 	}
 	s++;
 	CString effect = str.Left(int(s - str));
 
-	if (!effect.CompareNoCase(_T("Banner;"))) {
+	if (!effect.CompareNoCase(L"Banner;")) {
 		sub->m_bIsAnimated = true;
 
 		int delay, lefttoright = 0, fadeawaywidth = 0;
-		if (_stscanf_s(s, _T("%d;%d;%d"), &delay, &lefttoright, &fadeawaywidth) < 1) {
+		if (_stscanf_s(s, L"%d;%d;%d", &delay, &lefttoright, &fadeawaywidth) < 1) {
 			return;
 		}
 
@@ -1747,11 +1747,11 @@ void CRenderedTextSubtitle::ParseEffect(CSubtitle* sub, CString str)
 		e->param[2] = std::lround(sub->m_scalex * fadeawaywidth);
 
 		sub->m_wrapStyle = 2;
-	} else if (!effect.CompareNoCase(_T("Scroll up;")) || !effect.CompareNoCase(_T("Scroll down;"))) {
+	} else if (!effect.CompareNoCase(L"Scroll up;") || !effect.CompareNoCase(L"Scroll down;")) {
 		sub->m_bIsAnimated = true;
 
 		int top, bottom, delay, fadeawayheight = 0;
-		if (_stscanf_s(s, _T("%d;%d;%d;%d"), &top, &bottom, &delay, &fadeawayheight) < 3) {
+		if (_stscanf_s(s, L"%d;%d;%d;%d", &top, &bottom, &delay, &fadeawayheight) < 3) {
 			return;
 		}
 
