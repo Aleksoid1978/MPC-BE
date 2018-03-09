@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,11 +32,11 @@ CRenderedHdmvSubtitle::CRenderedHdmvSubtitle(CCritSec* pLock, SUBTITLE_TYPE nTyp
 	switch (m_nType) {
 		case ST_DVB :
 			m_pSub = DNew CDVBSub();
-			if (name.IsEmpty() || (name == _T("Unknown"))) m_name = _T("DVB");
+			if (name.IsEmpty() || (name == L"Unknown")) m_name = L"DVB";
 			break;
 		case ST_HDMV :
 			m_pSub = DNew CHdmvSub();
-			if (name.IsEmpty() || (name == _T("Unknown"))) m_name = _T("PGS");
+			if (name.IsEmpty() || (name == L"Unknown")) m_name = L"PGS";
 			break;
 		default :
 			ASSERT(FALSE);

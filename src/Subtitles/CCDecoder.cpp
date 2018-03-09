@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -42,9 +42,9 @@ CCDecoder::~CCDecoder()
 	if (!m_sts.IsEmpty() && !m_fn.IsEmpty()) {
 		m_sts.Sort();
 		m_sts.SaveAs(m_fn, Subtitle::SRT, -1, CTextFile::ASCII);
-		m_sts.SaveAs(m_fn.Left(m_fn.ReverseFind('.')+1) + _T("utf8.srt"), Subtitle::SRT, -1, CTextFile::UTF8);
-		m_sts.SaveAs(m_fn.Left(m_fn.ReverseFind('.')+1) + _T("utf16le.srt"), Subtitle::SRT, -1, CTextFile::LE16);
-		m_sts.SaveAs(m_fn.Left(m_fn.ReverseFind('.')+1) + _T("utf16be.srt"), Subtitle::SRT, -1, CTextFile::BE16);
+		m_sts.SaveAs(m_fn.Left(m_fn.ReverseFind('.')+1) + L"utf8.srt", Subtitle::SRT, -1, CTextFile::UTF8);
+		m_sts.SaveAs(m_fn.Left(m_fn.ReverseFind('.')+1) + L"utf16le.srt", Subtitle::SRT, -1, CTextFile::LE16);
+		m_sts.SaveAs(m_fn.Left(m_fn.ReverseFind('.')+1) + L"utf16be.srt", Subtitle::SRT, -1, CTextFile::BE16);
 	}
 }
 
@@ -111,24 +111,24 @@ void CCDecoder::DecodeCC(BYTE* buff, int len, __int64 time)
 {
 	if (!m_rawfn.IsEmpty()) {
 		FILE* f = NULL;
-		if (!_tfopen_s(&f, m_rawfn, _T("at"))) {
-			_ftprintf_s(f, _T("%02d:%02d:%02d.%03d\n"),
+		if (!_tfopen_s(&f, m_rawfn, L"at")) {
+			_ftprintf_s(f, L"%02d:%02d:%02d.%03d\n",
 						(int)(time/1000/60/60),
 						(int)((time/1000/60)%60),
 						(int)((time/1000)%60),
 						(int)(time%1000));
 
 			for (ptrdiff_t i = 0; i < len; i++) {
-				_ftprintf_s(f, _T("%02x"), buff[i]);
+				_ftprintf_s(f, L"%02x", buff[i]);
 				if (i < len-1) {
-					_ftprintf_s(f, _T(" "));
+					_ftprintf_s(f, L" ");
 				}
 				if (i > 0 && (i&15)==15) {
-					_ftprintf_s(f, _T("\n"));
+					_ftprintf_s(f, L"\n");
 				}
 			}
 			if (len > 0) {
-				_ftprintf_s(f, _T("\n\n"));
+				_ftprintf_s(f, L"\n\n");
 			}
 			fclose(f);
 		}

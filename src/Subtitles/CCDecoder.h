@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,7 +38,7 @@ class CCDecoder
 	void PutChar(WCHAR c);
 
 public:
-	CCDecoder(CString fn = _T(""), CString rawfn = _T(""));
+	CCDecoder(CString fn = L"", CString rawfn = L"");
 	virtual ~CCDecoder();
 	void DecodeCC(BYTE* buff, int len, __int64 time);
 	void ExtractCC(BYTE* buff, int len, __int64 time);

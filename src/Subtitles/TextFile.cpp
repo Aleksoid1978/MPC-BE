@@ -39,7 +39,7 @@ CTextFile::CTextFile(enc encoding/* = ASCII*/, enc defaultencoding/* = ASCII*/)
 	m_wbuffer.Allocate(TEXTFILE_BUFFER_SIZE);
 }
 
-bool CTextFile::Open(LPCTSTR lpszFileName)
+bool CTextFile::Open(LPCWSTR lpszFileName)
 {
 	if (!__super::Open(lpszFileName, modeRead | typeBinary | shareDenyNone)) {
 		return false;
@@ -95,7 +95,7 @@ bool CTextFile::ReopenAsText()
 	return !!__super::Open(strFileName, modeRead | typeText | shareDenyNone);
 }
 
-bool CTextFile::Save(LPCTSTR lpszFileName, enc e)
+bool CTextFile::Save(LPCWSTR lpszFileName, enc e)
 {
 	if (!__super::Open(lpszFileName, modeCreate | modeWrite | shareDenyWrite | (e == ASCII ? typeText : typeBinary))) {
 		return false;
@@ -717,11 +717,11 @@ CWebTextFile::~CWebTextFile()
 	Close();
 }
 
-bool CWebTextFile::Open(LPCTSTR lpszFileName)
+bool CWebTextFile::Open(LPCWSTR lpszFileName)
 {
 	CString fn(lpszFileName);
 
-	if (fn.Find(_T("http://")) != 0 && fn.Find(_T("https://")) != 0) {
+	if (fn.Find(L"http://") != 0 && fn.Find(L"https://") != 0) {
 		return __super::Open(lpszFileName);
 	}
 
@@ -729,11 +729,11 @@ bool CWebTextFile::Open(LPCTSTR lpszFileName)
 	if (s) {
 		f = InternetOpenUrl(s, fn, NULL, 0, INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 		if (f) {
-			TCHAR path[MAX_PATH];
+			WCHAR path[MAX_PATH];
 			GetTempPath(MAX_PATH, path);
 
 			fn = path + fn.Mid(fn.ReverseFind('/') + 1);
-			int i = fn.Find(_T("?"));
+			int i = fn.Find(L"?");
 			if (i > 0) {
 				fn = fn.Left(i);
 			}
@@ -771,7 +771,7 @@ bool CWebTextFile::Open(LPCTSTR lpszFileName)
 	return __super::Open(m_tempfn);
 }
 
-bool CWebTextFile::Save(LPCTSTR lpszFileName, enc e)
+bool CWebTextFile::Save(LPCWSTR lpszFileName, enc e)
 {
 	// CWebTextFile is read-only...
 	ASSERT(0);
@@ -796,7 +796,7 @@ CString AToT(CStringA str)
 {
 	CString ret;
 	for (int i = 0, j = str.GetLength(); i < j; i++) {
-		ret += (TCHAR)(BYTE)str[i];
+		ret += (WCHAR)(BYTE)str[i];
 	}
 	return ret;
 }

@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -128,25 +128,25 @@ HRESULT CHdmvSub::ParseSample(BYTE* pData, long nLen, REFERENCE_TIME rtStart, RE
 
 				switch (m_nCurSegment) {
 					case PALETTE :
-						TRACE_HDMVSUB(_T("CHdmvSub::ParseSample() : PALETTE\n"));
+						TRACE_HDMVSUB(L"CHdmvSub::ParseSample() : PALETTE\n");
 						ParsePalette(&SegmentBuffer, m_nSegSize);
 						break;
 					case OBJECT :
-						TRACE_HDMVSUB(_T("CHdmvSub::ParseSample() : OBJECT\n"));
+						TRACE_HDMVSUB(L"CHdmvSub::ParseSample() : OBJECT\n");
 						ParseObject(&SegmentBuffer, m_nSegSize);
 						break;
 					case PRESENTATION_SEG :
-						TRACE_HDMVSUB(_T("CHdmvSub::ParseSample() : PRESENTATION_SEG = [%10I64d], %s, size = %d\n"), rtStart, ReftimeToString(rtStart), m_nSegSize);
+						TRACE_HDMVSUB(L"CHdmvSub::ParseSample() : PRESENTATION_SEG = [%10I64d], %s, size = %d\n", rtStart, ReftimeToString(rtStart), m_nSegSize);
 						ParsePresentationSegment(&SegmentBuffer, rtStart);
 						break;
 					case WINDOW_DEF :
-						//TRACE_HDMVSUB(_T("CHdmvSub::ParseSample() : WINDOW_DEF = %10I64d, %S\n"), rtStart, ReftimeToString(rtStart));
+						//TRACE_HDMVSUB(L"CHdmvSub::ParseSample() : WINDOW_DEF = %10I64d, %S\n", rtStart, ReftimeToString(rtStart));
 						break;
 					case END_OF_DISPLAY :
-						//TRACE_HDMVSUB(_T("CHdmvSub::ParseSample() : END_OF_DISPLAY = %10I64d, %S\n"), rtStart, ReftimeToString(rtStart));
+						//TRACE_HDMVSUB(L"CHdmvSub::ParseSample() : END_OF_DISPLAY = %10I64d, %S\n", rtStart, ReftimeToString(rtStart));
 						break;
 					default :
-						TRACE_HDMVSUB(_T("CHdmvSub::ParseSample() : UNKNOWN Seg [%d] = [%10I64d], %s\n"), m_nCurSegment, rtStart, ReftimeToString(rtStart));
+						TRACE_HDMVSUB(L"CHdmvSub::ParseSample() : UNKNOWN Seg [%d] = [%10I64d], %s\n", m_nCurSegment, rtStart, ReftimeToString(rtStart));
 				}
 
 				m_nCurSegment = NO_SEGMENT;
@@ -185,7 +185,7 @@ HRESULT CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 				}
 
 				if (!pObject->HavePalette()) {
-					TRACE_HDMVSUB(_T("CHdmvSub::Render() : The palette is missing - cancel rendering\n"));
+					TRACE_HDMVSUB(L"CHdmvSub::Render() : The palette is missing - cancel rendering\n");
 					continue;
 				}
 
@@ -206,7 +206,7 @@ HRESULT CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 					bbox.bottom = MulDiv(bbox.bottom, spd.h, m_VideoDescriptor.nVideoHeight);
 				}
 
-				TRACE_HDMVSUB(_T("CHdmvSub::Render() : size = %ld, ObjRes = %dx%d, SPDRes = %dx%d, %I64d = %s\n"),
+				TRACE_HDMVSUB(L"CHdmvSub::Render() : size = %ld, ObjRes = %dx%d, SPDRes = %dx%d, %I64d = %s\n",
 								pObject->GetRLEDataSize(),
 								pObject->m_width, pObject->m_height, spd.w, spd.h,
 								rt, ReftimeToString(rt));
@@ -268,7 +268,7 @@ void CHdmvSub::CleanOld(REFERENCE_TIME rt)
 	while (!m_pObjects.IsEmpty()) {
 		pObject_old = m_pObjects.GetHead();
 		if (pObject_old->m_rtStop < rt) {
-			TRACE_HDMVSUB(_T("CHdmvSub:HDMV remove object, size = %d, %s => %s, (rt = %s)\n"), pObject_old->GetRLEDataSize(),
+			TRACE_HDMVSUB(L"CHdmvSub:HDMV remove object, size = %d, %s => %s, (rt = %s)\n", pObject_old->GetRLEDataSize(),
 						   ReftimeToString (pObject_old->m_rtStart), ReftimeToString(pObject_old->m_rtStop),
 						   ReftimeToString(rt));
 			m_pObjects.RemoveHeadNoReturn();
@@ -293,7 +293,7 @@ void CHdmvSub::ParsePresentationSegment(CGolombBuffer* pGBuffer, REFERENCE_TIME 
 	palette_id_ref		= pGBuffer->ReadByte();
 	nObjectNumber		= pGBuffer->ReadByte();
 
-	TRACE_HDMVSUB(_T("CHdmvSub::ParsePresentationSegment() : Size = %d, nObjectNumber = %d, palette_id_ref = %d, compositionNumber = %d\n"),
+	TRACE_HDMVSUB(L"CHdmvSub::ParsePresentationSegment() : Size = %d, nObjectNumber = %d, palette_id_ref = %d, compositionNumber = %d\n",
 					pGBuffer->GetSize(), nObjectNumber, palette_id_ref, CompositionDescriptor.nNumber);
 
 	if (m_pCurrentWindow && m_pCurrentWindow->m_nObjectNumber && m_pCurrentWindow->m_compositionNumber != -1) {
@@ -312,7 +312,7 @@ void CHdmvSub::ParsePresentationSegment(CGolombBuffer* pGBuffer, REFERENCE_TIME 
 						SetPalette(pObject, m_CLUT[palette_id_ref].pSize, m_CLUT[palette_id_ref].Palette, yuvMatrix, m_VideoDescriptor.nVideoWidth, convertType);
 					}
 
-					TRACE_HDMVSUB(_T("			store Segment : m_object_id_ref = %d, m_window_id_ref = %d, compositionNumber = %d, [%10I64d -> %10I64d], [%s -> %s]\n"),
+					TRACE_HDMVSUB(L"			store Segment : m_object_id_ref = %d, m_window_id_ref = %d, compositionNumber = %d, [%10I64d -> %10I64d], [%s -> %s]\n",
 									m_pCurrentWindow->Objects[i]->m_object_id_ref,
 									m_pCurrentWindow->Objects[i]->m_window_id_ref,
 									m_pCurrentWindow->Objects[i]->m_compositionNumber,
@@ -367,7 +367,7 @@ void CHdmvSub::ParseCompositionObject(CGolombBuffer* pGBuffer, CompositionObject
 		pCompositionObject->m_cropping_height				= pGBuffer->ReadShort();
 	}
 
-	TRACE_HDMVSUB(_T("CHdmvSub::ParseCompositionObject() : m_object_id_ref = %d, m_window_id_ref = %d, pos = %d:%d\n"),
+	TRACE_HDMVSUB(L"CHdmvSub::ParseCompositionObject() : m_object_id_ref = %d, m_window_id_ref = %d, pos = %d:%d\n",
 					pCompositionObject->m_object_id_ref, pCompositionObject->m_window_id_ref,
 					pCompositionObject->m_horizontal_position, pCompositionObject->m_vertical_position);
 }
@@ -406,7 +406,7 @@ void CHdmvSub::ParseObject(CGolombBuffer* pGBuffer, USHORT nUnitSize)
 {
 	SHORT object_id = pGBuffer->ReadShort();
 	if (object_id > _countof(m_ParsedObjects)) {
-		TRACE_HDMVSUB(_T("CHdmvSub::ParseObject() : FAILED, object_id = %d\n"), object_id);
+		TRACE_HDMVSUB(L"CHdmvSub::ParseObject() : FAILED, object_id = %d\n", object_id);
 		return;
 	}
 
@@ -423,7 +423,7 @@ void CHdmvSub::ParseObject(CGolombBuffer* pGBuffer, USHORT nUnitSize)
 
 		pObject.SetRLEData(pGBuffer->GetBufferPos(), nUnitSize-11, object_data_length-4);
 
-		TRACE_HDMVSUB(_T("CHdmvSub::ParseObject() : NewObject - size = %ld, version = %d, total obj = %d, size = %dx%d\n"),
+		TRACE_HDMVSUB(L"CHdmvSub::ParseObject() : NewObject - size = %ld, version = %d, total obj = %d, size = %dx%d\n",
 						object_data_length,
 						pObject.m_version_number,
 						m_pObjects.GetCount(),

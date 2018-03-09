@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -104,7 +104,7 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 			return E_FAIL;
 		}
 		CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)m_pSubStream;
-		pRTS->SetName(CString(GetPinName(pReceivePin)) + _T(" (embeded)"));
+		pRTS->SetName(CString(GetPinName(pReceivePin)) + L" (embeded)");
 		pRTS->m_dstScreenSize = DEFSCREENSIZE;
 		pRTS->CreateDefaultStyle(DEFAULT_CHARSET);
 	} else if (IsHdmvSub(&m_mt)
@@ -129,15 +129,15 @@ HRESULT CSubtitleInputPin::CompleteConnect(IPin* pReceivePin)
 				trackName.Trim();
 				if (!trackName.IsEmpty()) {
 					if (!name.IsEmpty()) {
-						if (trackName[0] != _T('(') && trackName[0] != _T('[')) {
-							name += _T(",");
+						if (trackName[0] != L'(' && trackName[0] != L'[') {
+							name += L",";
 						}
-						name += _T(" ");
+						name += L" ";
 					}
 					name += trackName;
 				}
 				if (name.IsEmpty()) {
-					name = _T("Unknown");
+					name = L"Unknown";
 				}
 			}
 		}

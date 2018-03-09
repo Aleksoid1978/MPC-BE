@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -90,7 +90,7 @@ typedef struct {
 interface __declspec(uuid("9E2EBB5C-AD7C-452f-A48B-38685716AC46"))
 IVSFRipperCallback :
 public IUnknown {
-	STDMETHOD (OnMessage) (LPCTSTR msg) PURE;
+	STDMETHOD (OnMessage) (LPCWSTR msg) PURE;
 	STDMETHOD (OnProgress) (double progress /*0->1*/) PURE;
 	STDMETHOD (OnFinished) (bool fSucceeded) PURE;
 };
@@ -112,7 +112,7 @@ protected:
 	}
 
 	// IVSFRipperCallback
-	STDMETHODIMP OnMessage(LPCTSTR msg) {
+	STDMETHODIMP OnMessage(LPCWSTR msg) {
 		return S_FALSE;
 	}
 	STDMETHODIMP OnProgress(double progress /*0->1*/) {
@@ -155,7 +155,7 @@ private:
 	//
 
 	typedef enum {LOG_INFO, LOG_WARNING, LOG_ERROR} log_t;
-	void Log(log_t type, LPCTSTR lpszFormat, ...);
+	void Log(log_t type, LPCWSTR lpszFormat, ...);
 	void Progress(double progress);
 	void Finished(bool fSucceeded);
 
