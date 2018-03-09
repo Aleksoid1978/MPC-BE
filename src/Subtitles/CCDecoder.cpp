@@ -33,7 +33,7 @@ CCDecoder::CCDecoder(CString fn, CString rawfn) : m_fn(fn), m_rawfn(rawfn)
 	m_cursor = CPoint(0, 0);
 
 	if (!m_rawfn.IsEmpty()) {
-		_tremove(m_rawfn);
+		_wremove(m_rawfn);
 	}
 }
 
@@ -111,24 +111,24 @@ void CCDecoder::DecodeCC(BYTE* buff, int len, __int64 time)
 {
 	if (!m_rawfn.IsEmpty()) {
 		FILE* f = NULL;
-		if (!_tfopen_s(&f, m_rawfn, L"at")) {
-			_ftprintf_s(f, L"%02d:%02d:%02d.%03d\n",
+		if (!_wfopen_s(&f, m_rawfn, L"at")) {
+			fwprintf_s(f, L"%02d:%02d:%02d.%03d\n",
 						(int)(time/1000/60/60),
 						(int)((time/1000/60)%60),
 						(int)((time/1000)%60),
 						(int)(time%1000));
 
 			for (ptrdiff_t i = 0; i < len; i++) {
-				_ftprintf_s(f, L"%02x", buff[i]);
+				fwprintf_s(f, L"%02x", buff[i]);
 				if (i < len-1) {
-					_ftprintf_s(f, L" ");
+					fwprintf_s(f, L" ");
 				}
 				if (i > 0 && (i&15)==15) {
-					_ftprintf_s(f, L"\n");
+					fwprintf_s(f, L"\n");
 				}
 			}
 			if (len > 0) {
-				_ftprintf_s(f, L"\n\n");
+				fwprintf_s(f, L"\n\n");
 			}
 			fclose(f);
 		}

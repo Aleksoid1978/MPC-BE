@@ -730,7 +730,7 @@ bool CWebTextFile::Open(LPCWSTR lpszFileName)
 		f = InternetOpenUrl(s, fn, NULL, 0, INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 		if (f) {
 			WCHAR path[MAX_PATH];
-			GetTempPath(MAX_PATH, path);
+			GetTempPathW(MAX_PATH, path);
 
 			fn = path + fn.Mid(fn.ReverseFind('/') + 1);
 			int i = fn.Find(L"?");
@@ -785,7 +785,7 @@ void CWebTextFile::Close()
 	}
 
 	if (!m_tempfn.IsEmpty()) {
-		_tremove(m_tempfn);
+		_wremove(m_tempfn);
 		m_tempfn.Empty();
 	}
 }

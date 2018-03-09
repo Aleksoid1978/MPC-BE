@@ -889,18 +889,18 @@ static STSStyle* GetMicroDVDStyle(CString str, int CharSet)
 			code.SetAt(1, (WCHAR)towlower(code[1]));
 		}
 
-		if (!_tcsnicmp(code, L"{c:$", 4)) {
-			_stscanf_s(code, L"{c:$%lx", &ret->colors[0]);
-		} else if (!_tcsnicmp(code, L"{f:", 3)) {
+		if (!_wcsnicmp(code, L"{c:$", 4)) {
+			swscanf_s(code, L"{c:$%lx", &ret->colors[0]);
+		} else if (!_wcsnicmp(code, L"{f:", 3)) {
 			ret->fontName = code.Mid(3);
-		} else if (!_tcsnicmp(code, L"{s:", 3)) {
+		} else if (!_wcsnicmp(code, L"{s:", 3)) {
 			double f;
-			if (1 == _stscanf_s(code, L"{s:%lf", &f)) {
+			if (1 == swscanf_s(code, L"{s:%lf", &f)) {
 				ret->fontSize = f;
 			}
-		} else if (!_tcsnicmp(code, L"{h:", 3)) {
-			_stscanf_s(code, L"{h:%d", &ret->charSet);
-		} else if (!_tcsnicmp(code, L"{y:", 3)) {
+		} else if (!_wcsnicmp(code, L"{h:", 3)) {
+			swscanf_s(code, L"{h:%d", &ret->charSet);
+		} else if (!_wcsnicmp(code, L"{y:", 3)) {
 			code.MakeLower();
 			if (code.Find(L'b') >= 0) {
 				ret->fontWeight = FW_BOLD;
@@ -914,9 +914,9 @@ static STSStyle* GetMicroDVDStyle(CString str, int CharSet)
 			if (code.Find(L's') >= 0) {
 				ret->fStrikeOut = true;
 			}
-		} else if (!_tcsnicmp(code, L"{p:", 3)) {
+		} else if (!_wcsnicmp(code, L"{p:", 3)) {
 			int p;
-			_stscanf_s(code, L"{p:%d", &p);
+			swscanf_s(code, L"{p:%d", &p);
 			ret->scrAlignment = (p == 0) ? 8 : 2;
 		}
 
@@ -1510,7 +1510,7 @@ static bool LoadFont(const CString& font)
 
 	if (hFont == INVALID_HANDLE_VALUE) {
 		WCHAR path[MAX_PATH] = { 0 };
-		GetTempPath(MAX_PATH, path);
+		GetTempPathW(MAX_PATH, path);
 
 		DWORD chksum = 0;
 		for (ptrdiff_t i = 0, j = datalen>>2; i < j; i++) {
@@ -2380,7 +2380,7 @@ void CSimpleTextSubtitle::AddStyle(CString name, STSStyle* style)
 
 		CString name2 = name;
 
-		if (i < len && _stscanf_s(name.Right(len-i), L"%d", &idx) == 1) {
+		if (i < len && swscanf_s(name.Right(len-i), L"%d", &idx) == 1) {
 			name2 = name.Left(i);
 		}
 
@@ -2980,17 +2980,17 @@ bool CSimpleTextSubtitle::Open(CTextFile* f, int CharSet, CString name)
 bool CSimpleTextSubtitle::Open(BYTE* data, int len, int CharSet, CString name)
 {
 	WCHAR path[MAX_PATH];
-	if (!GetTempPath(MAX_PATH, path)) {
+	if (!GetTempPathW(MAX_PATH, path)) {
 		return false;
 	}
 
 	WCHAR fn[MAX_PATH];
-	if (!GetTempFileName(path, L"vs", 0, fn)) {
+	if (!GetTempFileNameW(path, L"vs", 0, fn)) {
 		return false;
 	}
 
 	FILE* tmp = NULL;
-	if (_tfopen_s(&tmp, fn, L"wb")) {
+	if (_wfopen_s(&tmp, fn, L"wb")) {
 		return false;
 	}
 
@@ -3006,7 +3006,7 @@ bool CSimpleTextSubtitle::Open(BYTE* data, int len, int CharSet, CString name)
 
 	bool fRet = Open(fn, CharSet, name);
 
-	_tremove(fn);
+	_wremove(fn);
 
 	return fRet;
 }
