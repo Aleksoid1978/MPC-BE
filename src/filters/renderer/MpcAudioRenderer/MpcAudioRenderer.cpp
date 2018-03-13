@@ -629,6 +629,8 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME rtStart)
 	m_filterState = State_Running;
 	m_rtStartTime = rtStart;
 
+	m_bFirstSampleToRender = TRUE;
+
 	if (m_bEOS) {
 		NotifyEvent(EC_COMPLETE, S_OK, 0);
 	}
@@ -2483,7 +2485,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 					if (dueTime < rtRefClock - m_hnsPeriod) {
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL
 						DLog(L"CMpcAudioRenderer::RenderWasapiBuffer() - Drop packet, size = %Iu, dueTime = %I64d, refclock = %I64d",
-								m_CurrentPacket->GetCount(), dueTime, rtRefClock);
+								m_CurrentPacket->size(), dueTime, rtRefClock);
 #endif
 						m_bFirstSampleToRender = TRUE;
 						m_CurrentPacket.Free();
