@@ -48,32 +48,34 @@ public:
 #pragma pack(push, 1)
 
 	struct seqhdr {
-		WORD width;
-		WORD height;
-		BYTE ar:4;
-		DWORD ifps;
-		DWORD bitrate;
-		DWORD vbv;
-		BYTE constrained:1;
-		BYTE fiqm:1;
-		BYTE iqm[64];
-		BYTE fniqm:1;
-		BYTE niqm[64];
-		// ext
-		BYTE startcodeid:4;
-		BYTE profile_levelescape:1;
-		BYTE profile:3;
-		BYTE level:4;
-		BYTE progressive:1;
-		BYTE chroma:2;
-		BYTE lowdelay:1;
-		// misc
-		LONG arx, ary;
+		struct {;
+			WORD width;
+			WORD height;
+			BYTE ar:4;
+			DWORD ifps;
+			DWORD bitrate;
+			DWORD vbv;
+			BYTE constrained:1;
+			BYTE fiqm:1;
+			BYTE iqm[64];
+			BYTE fniqm:1;
+			BYTE niqm[64];
+			// ext
+			BYTE startcodeid:4;
+			BYTE profile_levelescape:1;
+			BYTE profile:3;
+			BYTE level:4;
+			BYTE progressive:1;
+			BYTE chroma:2;
+			BYTE lowdelay:1;
+			// misc
+			LONG arx, ary;
+		} hdr;
 		//
 		std::vector<BYTE> data;
 
 		seqhdr() {
-			memset(this, 0, sizeof(*this));
+			memset(&hdr, 0, sizeof(hdr));
 		}
 	};
 
