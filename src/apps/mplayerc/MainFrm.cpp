@@ -4010,7 +4010,7 @@ BOOL CMainFrame::OnMenu(CMenu* pMenu)
 
 void CMainFrame::OnMenuPlayerShort()
 {
-	OnMenu(IsD3DFullScreenMode() ? m_popupMainMenu.GetSubMenu(0) : m_popupMenu.GetSubMenu(0));
+	OnMenu((IsMenuHidden() || IsD3DFullScreenMode()) ? m_popupMainMenu.GetSubMenu(0) : m_popupMenu.GetSubMenu(0));
 }
 
 void CMainFrame::OnMenuPlayerLong()
