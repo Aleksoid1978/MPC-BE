@@ -426,7 +426,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				pName = L"MPEG2 Video Output";
 			}
 
-			m_AvgTimePerFrame = h.ifps;
+			m_AvgTimePerFrame = h.hdr.ifps;
 			if (m_pFile->IsRandomAccess()) {
 				REFERENCE_TIME rtStart = INVALID_TIME;
 				REFERENCE_TIME rtStop  = INVALID_TIME;

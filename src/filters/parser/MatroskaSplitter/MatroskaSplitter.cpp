@@ -493,7 +493,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						memcpy(buf.data(), seqhdr, len);
 						CBaseSplitterFileEx::seqhdr h;
 						if (m_pFile->CBaseSplitterFileEx::Read(h, buf)) {
-							codecAvgTimePerFrame = h.ifps;
+							codecAvgTimePerFrame = h.hdr.ifps;
 							bInterlaced = TRUE;
 						}
 					}

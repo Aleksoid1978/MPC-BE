@@ -92,26 +92,26 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, std::vector<BYTE>& buf, CMediaType* pm
 
 	__int64 shpos = gb.GetPos() - 4;
 
-	h.width = (WORD)gb.BitRead(12);
-	h.height = (WORD)gb.BitRead(12);
-	h.ar = gb.BitRead(4);
+	h.hdr.width = (WORD)gb.BitRead(12);
+	h.hdr.height = (WORD)gb.BitRead(12);
+	h.hdr.ar = gb.BitRead(4);
 	static int ifps[16] = {0, 1126125, 1125000, 1080000, 900900, 900000, 540000, 450450, 450000, 0, 0, 0, 0, 0, 0, 0};
-	h.ifps = ifps[gb.BitRead(4)];
-	h.bitrate = (DWORD)gb.BitRead(18);
+	h.hdr.ifps = ifps[gb.BitRead(4)];
+	h.hdr.bitrate = (DWORD)gb.BitRead(18);
 	MARKERGB;
-	h.vbv = (DWORD)gb.BitRead(10);
-	h.constrained = gb.BitRead(1);
+	h.hdr.vbv = (DWORD)gb.BitRead(10);
+	h.hdr.constrained = gb.BitRead(1);
 
-	h.fiqm = gb.BitRead(1);
-	if (h.fiqm)
-		for (int i = 0; i < _countof(h.iqm); i++) {
-			h.iqm[i] = (BYTE)gb.BitRead(8);
+	h.hdr.fiqm = gb.BitRead(1);
+	if (h.hdr.fiqm)
+		for (int i = 0; i < _countof(h.hdr.iqm); i++) {
+			h.hdr.iqm[i] = (BYTE)gb.BitRead(8);
 		}
 
-	h.fniqm = gb.BitRead(1);
-	if (h.fniqm)
-		for (int i = 0; i < _countof(h.niqm); i++) {
-			h.niqm[i] = (BYTE)gb.BitRead(8);
+	h.hdr.fniqm = gb.BitRead(1);
+	if (h.hdr.fniqm)
+		for (int i = 0; i < _countof(h.hdr.niqm); i++) {
+			h.hdr.niqm[i] = (BYTE)gb.BitRead(8);
 		}
 
 	__int64 shlen = gb.GetPos() - shpos;
@@ -121,8 +121,8 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, std::vector<BYTE>& buf, CMediaType* pm
 		0.9157f, 0.9815f, 1.0255f, 1.0695f, 1.0950f, 1.1575f, 1.2015f, 1.0000f
 	};
 
-	h.arx = (int)((float)h.width / ar[h.ar] + 0.5);
-	h.ary = h.height;
+	h.hdr.arx = (int)((float)h.hdr.width / ar[h.hdr.ar] + 0.5);
+	h.hdr.ary = h.hdr.height;
 
 	mpeg_t type = mpeg1;
 
@@ -131,28 +131,28 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, std::vector<BYTE>& buf, CMediaType* pm
 	if (gb.NextMpegStartCode(id) && id == 0xb5) { // sequence header ext
 		shextpos = gb.GetPos() - 4;
 
-		h.startcodeid = gb.BitRead(4);
-		h.profile_levelescape = gb.BitRead(1); // reserved, should be 0
-		h.profile = gb.BitRead(3);
-		h.level = gb.BitRead(4);
-		h.progressive = gb.BitRead(1);
-		h.chroma = gb.BitRead(2);
-		h.width |= (gb.BitRead(2) << 12);
-		h.height |= (gb.BitRead(2) << 12);
-		h.bitrate |= (gb.BitRead(12) << 18);
+		h.hdr.startcodeid = gb.BitRead(4);
+		h.hdr.profile_levelescape = gb.BitRead(1); // reserved, should be 0
+		h.hdr.profile = gb.BitRead(3);
+		h.hdr.level = gb.BitRead(4);
+		h.hdr.progressive = gb.BitRead(1);
+		h.hdr.chroma = gb.BitRead(2);
+		h.hdr.width |= (gb.BitRead(2) << 12);
+		h.hdr.height |= (gb.BitRead(2) << 12);
+		h.hdr.bitrate |= (gb.BitRead(12) << 18);
 		MARKERGB;
-		h.vbv |= (gb.BitRead(8) << 10);
-		h.lowdelay = gb.BitRead(1);
-		h.ifps = (DWORD)(h.ifps * (gb.BitRead(2) + 1) / (gb.BitRead(5) + 1));
+		h.hdr.vbv |= (gb.BitRead(8) << 10);
+		h.hdr.lowdelay = gb.BitRead(1);
+		h.hdr.ifps = (DWORD)(h.hdr.ifps * (gb.BitRead(2) + 1) / (gb.BitRead(5) + 1));
 
 		shextlen = gb.GetPos() - shextpos;
 
 		struct {
 			DWORD x, y;
-		} ar[] = {{h.width, h.height}, {4, 3}, {16, 9}, {221, 100}, {h.width, h.height}};
-		int i = std::clamp((int)h.ar, 1, 5) - 1;
-		h.arx = ar[i].x;
-		h.ary = ar[i].y;
+		} ar[] = {{h.hdr.width, h.hdr.height}, {4, 3}, {16, 9}, {221, 100}, {h.hdr.width, h.hdr.height}};
+		int i = std::clamp((int)h.hdr.ar, 1, 5) - 1;
+		h.hdr.arx = ar[i].x;
+		h.hdr.ary = ar[i].y;
 
 		type = mpeg2;
 
@@ -179,11 +179,11 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, std::vector<BYTE>& buf, CMediaType* pm
 						WORD panscan_height = (WORD)gb.BitRead(14);
 
 						if (panscan_width && panscan_height) {
-							CSize aspect(h.width  * panscan_height, h.height * panscan_width);
+							CSize aspect(h.hdr.width  * panscan_height, h.hdr.height * panscan_width);
 							ReduceDim(aspect);
 
-							h.arx *= aspect.cx;
-							h.ary *= aspect.cy;
+							h.hdr.arx *= aspect.cx;
+							h.hdr.ary *= aspect.cy;
 						}
 
 						break;
@@ -193,13 +193,13 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, std::vector<BYTE>& buf, CMediaType* pm
 		}
 	}
 
-	h.ifps = 10 * h.ifps / 27;
-	h.bitrate = h.bitrate == (1 << 30) - 1 ? 0 : h.bitrate * 400;
+	h.hdr.ifps = 10 * h.hdr.ifps / 27;
+	h.hdr.bitrate = h.hdr.bitrate == (1 << 30) - 1 ? 0 : h.hdr.bitrate * 400;
 
-	CSize aspect(h.arx, h.ary);
+	CSize aspect(h.hdr.arx, h.hdr.ary);
 	ReduceDim(aspect);
-	h.arx = aspect.cx;
-	h.ary = aspect.cy;
+	h.hdr.arx = aspect.cx;
+	h.hdr.ary = aspect.cy;
 
 	if (pmt) {
 		pmt->majortype = MEDIATYPE_Video;
@@ -210,16 +210,16 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, std::vector<BYTE>& buf, CMediaType* pm
 			int len								= FIELD_OFFSET(MPEG1VIDEOINFO, bSequenceHeader) + int(shlen + shextlen);
 			MPEG1VIDEOINFO* vi					= (MPEG1VIDEOINFO*)DNew BYTE[len];
 			memset(vi, 0, len);
-			vi->hdr.dwBitRate					= h.bitrate;
-			vi->hdr.AvgTimePerFrame				= h.ifps;
+			vi->hdr.dwBitRate					= h.hdr.bitrate;
+			vi->hdr.AvgTimePerFrame				= h.hdr.ifps;
 			vi->hdr.bmiHeader.biSize			= sizeof(vi->hdr.bmiHeader);
-			vi->hdr.bmiHeader.biWidth			= h.width;
-			vi->hdr.bmiHeader.biHeight			= h.height;
+			vi->hdr.bmiHeader.biWidth			= h.hdr.width;
+			vi->hdr.bmiHeader.biHeight			= h.hdr.height;
 			vi->hdr.bmiHeader.biPlanes			= 1;
 			vi->hdr.bmiHeader.biBitCount		= 12;
 			vi->hdr.bmiHeader.biSizeImage		= DIBSIZE(vi->hdr.bmiHeader);
-			vi->hdr.bmiHeader.biXPelsPerMeter	= h.width * h.ary;
-			vi->hdr.bmiHeader.biYPelsPerMeter	= h.height * h.arx;
+			vi->hdr.bmiHeader.biXPelsPerMeter	= h.hdr.width * h.hdr.ary;
+			vi->hdr.bmiHeader.biYPelsPerMeter	= h.hdr.height * h.hdr.arx;
 			vi->cbSequenceHeader				= DWORD(shlen + shextlen);
 			gb.Reset();
 			gb.SkipBytes(shextpos);
@@ -240,18 +240,18 @@ bool CBaseSplitterFileEx::Read(seqhdr& h, std::vector<BYTE>& buf, CMediaType* pm
 			int len							= FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + int(shlen + shextlen);
 			MPEG2VIDEOINFO* vi				= (MPEG2VIDEOINFO*)DNew BYTE[len];
 			memset(vi, 0, len);
-			vi->hdr.dwBitRate				= h.bitrate;
-			vi->hdr.AvgTimePerFrame			= h.ifps;
-			vi->hdr.dwPictAspectRatioX		= h.arx;
-			vi->hdr.dwPictAspectRatioY		= h.ary;
+			vi->hdr.dwBitRate				= h.hdr.bitrate;
+			vi->hdr.AvgTimePerFrame			= h.hdr.ifps;
+			vi->hdr.dwPictAspectRatioX		= h.hdr.arx;
+			vi->hdr.dwPictAspectRatioY		= h.hdr.ary;
 			vi->hdr.bmiHeader.biSize		= sizeof(vi->hdr.bmiHeader);
-			vi->hdr.bmiHeader.biWidth		= h.width;
-			vi->hdr.bmiHeader.biHeight		= h.height;
+			vi->hdr.bmiHeader.biWidth		= h.hdr.width;
+			vi->hdr.bmiHeader.biHeight		= h.hdr.height;
 			vi->hdr.bmiHeader.biPlanes		= 1;
 			vi->hdr.bmiHeader.biBitCount	= 12;
 			vi->hdr.bmiHeader.biSizeImage	= DIBSIZE(vi->hdr.bmiHeader);
-			vi->dwProfile					= h.profile;
-			vi->dwLevel						= h.level;
+			vi->dwProfile					= h.hdr.profile;
+			vi->dwLevel						= h.hdr.level;
 			vi->cbSequenceHeader			= DWORD(shlen + shextlen);
 			gb.Reset();
 			gb.SkipBytes(shpos);
