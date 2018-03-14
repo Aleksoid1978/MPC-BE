@@ -781,11 +781,11 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 {
 	if (IsWindow(pMsg->hwnd) && IsVisible() && pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST) {
 		if (pMsg->message == WM_KEYDOWN) {
-			if (pMsg->wParam == VK_ESCAPE) {
+			switch (pMsg->wParam) {
+			case VK_ESCAPE:
 				GetParentFrame()->ShowControlBar(this, FALSE, TRUE);
-
 				return TRUE;
-			} else if (pMsg->wParam == VK_RETURN) {
+			case VK_RETURN:
 				if (m_list.GetSelectedCount() == 1) {
 					const int item = m_list.GetNextItem(-1, LVNI_SELECTED);
 
@@ -795,28 +795,30 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 
 					return TRUE;
 				}
-			} else if (pMsg->wParam == '7' && GetKeyState(VK_CONTROL) < 0) {
-				GetParentFrame()->ShowControlBar(this, FALSE, TRUE);
-
+				break;
+			case 'A':
+				if (GetKeyState(VK_CONTROL) < 0) {
+					m_list.SetItemState(-1, LVIS_SELECTED, LVIS_SELECTED);
+				}
+				break;
+			case 'I':
+				if (GetKeyState(VK_CONTROL) < 0) {
+					for (int nItem = 0; nItem < m_list.GetItemCount(); nItem++) {
+						m_list.SetItemState(nItem, ~m_list.GetItemState(nItem, LVIS_SELECTED), LVIS_SELECTED);
+					}
+				}
+				break;
+			case VK_UP:
+			case VK_DOWN:
+			case VK_HOME:
+			case VK_END:
+			case VK_PRIOR:
+			case VK_NEXT:
+			case VK_DELETE:
+				break;
+			default:
+				m_pMainFrame->PreTranslateMessage(pMsg);
 				return TRUE;
-			}
-		}
-
-		if (pMsg->message == WM_CHAR) {
-			WCHAR chr = static_cast<WCHAR>(pMsg->wParam);
-			switch (chr) {
-				case 0x01: // Ctrl+A - select all
-					if (GetKeyState(VK_CONTROL) < 0) {
-						m_list.SetItemState(-1, LVIS_SELECTED, LVIS_SELECTED);
-					}
-					break;
-				case 0x09: // Ctrl+I - inverse selection
-					if (GetKeyState(VK_CONTROL) < 0) {
-						for (int nItem = 0; nItem < m_list.GetItemCount(); nItem++) {
-							m_list.SetItemState(nItem, ~m_list.GetItemState(nItem, LVIS_SELECTED), LVIS_SELECTED);
-						}
-					}
-					break;
 			}
 		}
 
