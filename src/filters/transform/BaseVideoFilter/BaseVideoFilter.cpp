@@ -163,6 +163,14 @@ HRESULT CBaseVideoFilter::GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, 
 		return hr;
 	}
 
+	if (m_bSendMediaType) {
+		CMediaType& mt = m_pOutput->CurrentMediaType();
+		AM_MEDIA_TYPE *sendmt = CreateMediaType(&mt);
+		(*ppOut)->SetMediaType(sendmt);
+		DeleteMediaType(sendmt);
+		m_bSendMediaType = false;
+	}
+
 	AM_MEDIA_TYPE* pmt;
 	if (SUCCEEDED((*ppOut)->GetMediaType(&pmt)) && pmt) {
 		CMediaType mt = *pmt;
@@ -194,8 +202,6 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 		}
 	}
 
-	bool extformatsupport = (m_RenderClsid == CLSID_EnhancedVideoRenderer || m_RenderClsid == CLSID_madVR);
-
 	bool bNeedReconnect = bForce;
 	{
 		int wout = 0, hout = 0, arxout = 0, aryout = 0;
@@ -221,7 +227,7 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 		bNeedReconnect = true;
 	}
 
-	if (extformatsupport && dxvaExtFormat) {
+	if (dxvaExtFormat) {
 		VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.Format();
 		if (vih2->dwControlFlags != dxvaExtFormat->value) {
 			bNeedReconnect = true;
@@ -254,8 +260,8 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 		vih2->dwPictAspectRatioX = m_arx;
 		vih2->dwPictAspectRatioY = m_ary;
 
-		DLog(L"    => FLAGS : 0x%0.8x -> 0x%0.8x", vih2->dwControlFlags, (extformatsupport && dxvaExtFormat) ? dxvaExtFormat->value : vih2->dwControlFlags);
-		if (extformatsupport && dxvaExtFormat) {
+		DLog(L"    => FLAGS : 0x%0.8x -> 0x%0.8x", vih2->dwControlFlags, dxvaExtFormat ? dxvaExtFormat->value : vih2->dwControlFlags);
+		if (dxvaExtFormat) {
 			vih2->dwControlFlags = dxvaExtFormat->value;
 		}
 
@@ -301,6 +307,9 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 					tryReceiveConnection = false;
 
 					continue;
+				} else if (hrQA == S_OK) {
+					m_pOutput->SetMediaType(&mt);
+					m_bSendMediaType = true;
 				} else {
 					DLog(L"    ReceiveConnection() failed (hr: %x); QueryAccept: %x", hr, hrQA);
 				}
