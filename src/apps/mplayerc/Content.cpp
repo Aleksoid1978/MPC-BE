@@ -463,7 +463,7 @@ namespace Content {
 			if (::PathIsURL(realPath)
 					&& url.CrackUrl(realPath)
 					&& (url.GetScheme() == ATL_URL_SCHEME_HTTP || url.GetScheme() == ATL_URL_SCHEME_HTTPS)) {
-				return Connect(fn);
+				return Connect(realPath);
 			}
 
 			return true;
