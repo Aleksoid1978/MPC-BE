@@ -118,6 +118,8 @@ bool File_DcpAm::FileHeader_Begin()
     #if defined(MEDIAINFO_REFERENCES_YES)
     Config->File_ID_OnlyRoot_Set(false);
 
+    ReferenceFiles_Accept(this, Config);
+
     //Parsing main elements
     for (XMLElement* AssetMap_Item=AssetMap->FirstChildElement(); AssetMap_Item; AssetMap_Item=AssetMap_Item->NextSiblingElement())
     {
@@ -229,8 +231,6 @@ bool File_DcpAm::FileHeader_Begin()
     //Creating the playlist
     if (!Config->File_IsReferenced_Get())
     {
-        ReferenceFiles_Accept(this, Config);
-
         for (File_DcpPkl::streams::iterator Stream=Streams.begin(); Stream!=Streams.end(); ++Stream)
             if (Stream->StreamKind==(stream_t)(Stream_Max+1) && Stream->ChunkList.size()==1) // Means CPL
             {

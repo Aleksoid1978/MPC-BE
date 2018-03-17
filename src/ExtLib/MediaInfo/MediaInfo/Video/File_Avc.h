@@ -407,6 +407,9 @@ private :
     void sei_message_user_data_unregistered(int32u payloadSize);
     void sei_message_user_data_unregistered_x264(int32u payloadSize);
     void sei_message_user_data_unregistered_bluray(int32u payloadSize);
+    void sei_message_user_data_unregistered_bluray_MDPM(int32u payloadSize);
+    void consumer_camera_1();
+    void consumer_camera_2();
     void sei_message_recovery_point();
     void sei_message_mainconcept(int32u payloadSize);
     void sei_alternative_transfer_characteristics();

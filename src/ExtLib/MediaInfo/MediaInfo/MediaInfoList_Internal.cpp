@@ -35,7 +35,6 @@ namespace MediaInfoLib
 
 //---------------------------------------------------------------------------
 extern MediaInfo_Config Config;
-extern const Char* MediaInfo_Version;
 //---------------------------------------------------------------------------
 
 //***************************************************************************
@@ -298,179 +297,7 @@ String MediaInfoList_Internal::Inform(size_t FilePos, size_t)
 {
     if (FilePos==Error)
     {
-        #if defined(MEDIAINFO_XML_YES)
-        if (MediaInfoLib::Config.Inform_Get()==__T("MAXML"))
-        {
-            Ztring Result;
-            Result+=__T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")+MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T('<');
-            Result+=__T("MediaArea");
-            Result+=MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("    xmlns=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediaarea\"");
-            Result+=MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
-            Result+=MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("    xsi:schemaLocation=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediaarea http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediaarea/mediaarea_0_1.xsd\"");
-            Result+=MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("    version=\"0.1\"");
-            Result+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("<!-- Work in progress, not for production -->")+MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("<creatingLibrary version=\"")+Ztring(MediaInfo_Version).SubString(__T(" - v"), Ztring())+__T("\" url=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>");
-            Result+=MediaInfoLib::Config.LineSeparator_Get();
-
-            for (size_t FilePos=0; FilePos<Info.size(); FilePos++)
-                Result+=Inform(FilePos);
-
-            if (!Result.empty() && Result[Result.size()-1]!=__T('\r') && Result[Result.size()-1]!=__T('\n'))
-                Result+=MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("</MediaArea");
-            Result+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
-
-            return Result;
-        }
-
-        if (MediaInfoLib::Config.Trace_Level_Get() && MediaInfoLib::Config.Trace_Format_Get()==MediaInfoLib::Config.Trace_Format_XML)
-        {
-            Ztring Result;
-            Result+=__T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")+MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T('<');
-            Result+=__T("MediaTrace");
-            Result+=MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("    xmlns=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediatrace\"");
-            Result+=MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
-            Result+=MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("    xsi:schemaLocation=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediatrace http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediatrace/mediatrace_0_1.xsd\"");
-            Result+=MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("    version=\"0.1\"");
-            Result+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("<creatingLibrary version=\"")+Ztring(MediaInfo_Version).SubString(__T(" - v"), Ztring())+__T("\" url=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>");
-            Result+=MediaInfoLib::Config.LineSeparator_Get();
-
-            for (size_t FilePos=0; FilePos<Info.size(); FilePos++)
-            {
-                size_t Modified;
-                Result+=__T("<media ref=\"")+MediaInfo_Internal::Xml_Content_Escape(Info[FilePos]->Get(Stream_General, 0, General_CompleteName), Modified)+__T("\"");
-                if (Info[FilePos] && !Info[FilePos]->ParserName.empty())
-                    Result+=__T(" parser=\"")+Info[FilePos]->ParserName+=__T("\"");
-                Result+= __T('>');
-                Result+=MediaInfoLib::Config.LineSeparator_Get();
-                Result+=Inform(FilePos);
-                if (!Result.empty() && Result[Result.size()-1]!=__T('\r') && Result[Result.size()-1]!=__T('\n'))
-                    Result+=MediaInfoLib::Config.LineSeparator_Get();
-                Result+=__T("</media>");
-                Result+=MediaInfoLib::Config.LineSeparator_Get();
-            }
-
-            if (!Result.empty() && Result[Result.size()-1]!=__T('\r') && Result[Result.size()-1]!=__T('\n'))
-                Result+=MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("</MediaTrace");
-            Result+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
-
-            return Result;
-        }
-
-        if (MediaInfoLib::Config.Trace_Level_Get() && MediaInfoLib::Config.Trace_Format_Get()==MediaInfoLib::Config.Trace_Format_MICRO_XML)
-        {
-            Ztring Result;
-            Result+=__T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")+MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T('<');
-            Result+=__T("MicroMediaTrace");
-            Result+=__T(" xmlns=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/micromediatrace\"");
-            Result+=__T(" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
-            Result+=__T(" mtsl=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/micromediatrace http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/micromediatrace/micromediatrace.xsd\"");
-            Result+=__T(" version=\"0.1\">");
-            Result+=__T("<creatingLibrary version=\"")+Ztring(MediaInfo_Version).SubString(__T(" - v"), Ztring())+__T("\" url=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>");
-
-            for (size_t FilePos=0; FilePos<Info.size(); FilePos++)
-            {
-                size_t Modified;
-                Result+=__T("<media ref=\"")+MediaInfo_Internal::Xml_Content_Escape(Info[FilePos]->Get(Stream_General, 0, General_CompleteName), Modified)+__T("\"");
-                if (Info[FilePos] && !Info[FilePos]->ParserName.empty())
-                    Result+=__T(" parser=\"")+Info[FilePos]->ParserName+=__T("\"");
-                Result+= __T('>');
-                Result+=Inform(FilePos);
-                Result+=__T("</media>");
-            }
-
-            Result+=__T("</MicroMediaTrace>");
-
-            return Result;
-        }
-
-        if (MediaInfoLib::Config.Inform_Get()==__T("XML") || MediaInfoLib::Config.Inform_Get()==__T("MIXML"))
-        {
-            Ztring Result;
-            Result+=__T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")+MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T('<');
-            Result+=__T("MediaInfo");
-            Result+=MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("    xmlns=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediainfo\"");
-            Result+=MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
-            Result+=MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("    xsi:schemaLocation=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediainfo http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediainfo/mediainfo_2_0.xsd\"");
-            Result+=MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("    version=\"2.0\"");
-            Result+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("<creatingLibrary version=\"")+Ztring(MediaInfo_Version).SubString(__T(" - v"), Ztring())+__T("\" url=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>");
-            Result+=MediaInfoLib::Config.LineSeparator_Get();
-
-            for (size_t FilePos=0; FilePos<Info.size(); FilePos++)
-                Result+=Inform(FilePos);
-
-            if (!Result.empty() && Result[Result.size()-1]!=__T('\r') && Result[Result.size()-1]!=__T('\n'))
-                Result+=MediaInfoLib::Config.LineSeparator_Get();
-            Result+=__T("</MediaInfo");
-            Result+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
-
-            return Result;
-        }
-        #endif //defined(MEDIAINFO_XML_YES)
-
-        Ztring Retour;
-        FilePos=0;
-        ZtringListList MediaInfo_Custom_View; MediaInfo_Custom_View.Write(Option(__T("Inform_Get")));
-        #if defined(MEDIAINFO_XML_YES)
-        bool XML=false;
-        if (MediaInfoLib::Config.Inform_Get()==__T("OLDXML"))
-            XML=true;
-        if (XML)
-        {
-            Retour+=__T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")+MediaInfoLib::Config.LineSeparator_Get();
-            Retour+=__T("<Mediainfo version=\"")+MediaInfoLib::Config.Info_Version_Get().SubString(__T(" v"), Ztring())+__T("\">");
-            Retour+=MediaInfoLib::Config.LineSeparator_Get();
-        }
-        else
-        #endif //defined(MEDIAINFO_XML_YES)
-        Retour+=MediaInfo_Custom_View("Page_Begin");
-        while (FilePos<Info.size())
-        {
-            Retour+=Inform(FilePos);
-            if (FilePos<Info.size()-1)
-            {
-                Retour+=MediaInfo_Custom_View("Page_Middle");
-            }
-            FilePos++;
-        }
-        #if defined(MEDIAINFO_XML_YES)
-        if (XML)
-        {
-            if (!Retour.empty() && Retour[Retour.size()-1]!=__T('\r') && Retour[Retour.size()-1]!=__T('\n'))
-                Retour+=MediaInfoLib::Config.LineSeparator_Get();
-            Retour+=__T("</");
-            if (MediaInfoLib::Config.Trace_Format_Get()==MediaInfoLib::Config.Trace_Format_XML)
-                Retour+=__T("MediaTrace");
-            else if (MediaInfoLib::Config.Trace_Format_Get()==MediaInfoLib::Config.Trace_Format_MICRO_XML)
-                Retour+=__T("MicroMediaTrace");
-            else
-                Retour+=__T("Mediainfo");
-            Retour+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
-        }
-        else
-        #endif //defined(MEDIAINFO_XML_YES)
-            Retour+=MediaInfo_Custom_View("Page_End");//
-        return Retour.c_str();
+        return MediaInfo_Internal::Inform(Info);
     }
 
     CriticalSectionLocker CSL(CS);
@@ -478,9 +305,7 @@ String MediaInfoList_Internal::Inform(size_t FilePos, size_t)
     if (FilePos>=Info.size() || Info[FilePos]==NULL || Info[FilePos]->Count_Get(Stream_General)==0)
         return MediaInfoLib::Config.EmptyString_Get();
 
-    Info[FilePos]->IsFirst=FilePos==0;
-    Info[FilePos]->IsLast=(FilePos+1)==Info.size();
-    return Info[FilePos]->Inform();
+    return MediaInfo_Internal::Inform(Info[FilePos]);
 }
 
 //---------------------------------------------------------------------------
@@ -583,6 +408,10 @@ String MediaInfoList_Internal::Option (const String &Option, const String &Value
         BlockMethod=1;
         return __T("");
     }
+    #if MEDIAINFO_ADVANCED
+        else if (OptionLower.find(__T("file_inform_stringpointer")) == 0 && Info.size() == 1)
+            return Info[0]->Option(Option, Value);
+    #endif //MEDIAINFO_ADVANCED
     else if (OptionLower.find(__T("file_"))==0)
     {
         Config_MediaInfo_Items[Option]=Value;

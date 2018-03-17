@@ -44,6 +44,10 @@
     #include "MediaInfo/Multiple/File_Ibi.h"
 #endif
 #include "MediaInfo/Multiple/File_Dxw.h"
+#ifdef MEDIAINFO_COMPRESS
+    #include "ThirdParty/base64/base64.h"
+    #include "zlib.h"
+#endif //MEDIAINFO_COMPRESS
 #include <cmath>
 #ifdef MEDIAINFO_DEBUG_WARNING_GET
     #include <iostream>
@@ -268,6 +272,8 @@ using namespace MediaInfo_Debug_MediaInfo_Internal;
 
 Ztring File__Analyze_Encoded_Library_String(const Ztring &CompanyName, const Ztring &Name, const Ztring &Version, const Ztring &Date, const Ztring &Encoded_Library);
 
+extern const Char* MediaInfo_Version;
+
 //***************************************************************************
 // Constructor/destructor
 //***************************************************************************
@@ -291,10 +297,6 @@ MediaInfo_Internal::MediaInfo_Internal()
 
     Stream.resize(Stream_Max);
     Stream_More.resize(Stream_Max);
-
-    //Position in a MediaInfoList class
-    IsFirst=true;
-    IsLast=true;
 
     //Threading
     BlockMethod=0;
@@ -835,6 +837,53 @@ std::bitset<32> MediaInfo_Internal::Open_Buffer_Continue (const int8u* ToAdd, si
     if (Info==NULL)
         return 0;
 
+    //Encoded content
+    #if MEDIAINFO_COMPRESS
+        bool zlib=MediaInfoLib::Config.FlagsX_Get(Flags_Input_zlib);
+        bool base64=MediaInfoLib::Config.FlagsX_Get(Flags_Input_base64);
+        if (zlib || base64)
+        {
+            if (ToAdd_Size!=Config.File_Size)
+            {
+                Info->ForceFinish(); // File must be complete when this option is used
+                return Info->Status;
+            }
+            string Input_Cache; // In case of encoded content, this string must live up to the end of the parsing
+            if (base64)
+            {
+                Input_Cache.assign((const char*)ToAdd, ToAdd_Size); ;
+                Input_Cache=Base64::decode(Input_Cache);
+                ToAdd=(const int8u*)Input_Cache.c_str();
+                ToAdd_Size= Input_Cache.size();
+            }
+            if (zlib)
+            {
+                uLongf Output_Size_Max = ToAdd_Size;
+                while (Output_Size_Max)
+                {
+                    Output_Size_Max *=16;
+                    int8u* Output = new int8u[Output_Size_Max];
+                    uLongf Output_Size = Output_Size_Max;
+                    if (uncompress((Bytef*)Output, &Output_Size, (const Bytef*)ToAdd, (uLong)ToAdd_Size)>=0)
+                    {
+                        ToAdd=Output;
+                        ToAdd_Size=Output_Size;
+                        break;
+                    }
+                    delete[] Output;
+                    if (Output_Size_Max>=4*1024*1024)
+                    {
+                        Info->ForceFinish();
+                        return Info->Status;
+                    }
+                }
+            }
+            Info->Open_Buffer_Continue(ToAdd, ToAdd_Size);
+            if (zlib)
+                delete[] ToAdd;
+        }
+        else
+    #endif //MEDIAINFO_COMPRESS
     Info->Open_Buffer_Continue(ToAdd, ToAdd_Size);
 
     if (Info_IsMultipleParsing && Info->Status[File__Analyze::IsAccepted])
@@ -1374,6 +1423,30 @@ String MediaInfo_Internal::Option (const String &Option, const String &Value)
             return Ztring::ToZtring((int64u)Details.data())+__T(':')+Ztring::ToZtring((int64u)Details.size());
         }
     #endif //MEDIAINFO_TRACE
+    #if MEDIAINFO_ADVANCED
+        if (OptionLower.find(__T("file_inform_stringpointer")) == 0)
+        {
+            Inform_Cache = Inform(this).To_UTF8();
+            #if MEDIAINFO_COMPRESS
+                if (Value.find(__T("zlib"))==0)
+                {
+                    uLongf Compressed_Size=(uLongf)(Inform_Cache.size() + 16);
+                    Bytef* Compressed=new Bytef[Inform_Cache.size()+16];
+                    if (compress(Compressed, &Compressed_Size, (const Bytef*)Inform_Cache.c_str(), (uLong)Inform_Cache.size()) < 0)
+                    {
+                        delete[] Compressed;
+                        return __T("Error during zlib compression");
+                    }
+                    Inform_Cache.assign((char*)Compressed, (size_t)Compressed_Size);
+                    if (Value.find(__T("+base64"))+7==Value.size())
+                    {
+                        Inform_Cache=Base64::encode(Inform_Cache);
+                    }
+                }
+            #endif //MEDIAINFO_COMPRESS
+            return Ztring::ToZtring((int64u)Inform_Cache.data()) + __T(':') + Ztring::ToZtring((int64u)Inform_Cache.size());
+        }
+    #endif //MEDIAINFO_ADVANCED
     else if (OptionLower.find(__T("file_"))==0)
     {
         Ztring ToReturn2=Config.Option(Option, Value);
@@ -1440,5 +1513,214 @@ void MediaInfo_Internal::Event_Prepare (struct MediaInfo_Event_Generic* Event)
         Info->Event_Prepare(Event);
 }
 #endif // MEDIAINFO_EVENTS
+
+//---------------------------------------------------------------------------
+Ztring MediaInfo_Internal::Inform(MediaInfo_Internal* Info)
+{
+    std::vector<MediaInfoLib::MediaInfo_Internal*> Info2;
+    Info2.push_back(Info);
+    return MediaInfoLib::MediaInfo_Internal::Inform(Info2);
+}
+
+//---------------------------------------------------------------------------
+Ztring MediaInfo_Internal::Inform(std::vector<MediaInfo_Internal*>& Info)
+{
+    Ztring Result;
+
+    #if defined(MEDIAINFO_XML_YES)
+    if (MediaInfoLib::Config.Inform_Get()==__T("MAXML"))
+    {
+        Result+=__T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")+MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T('<');
+        Result+=__T("MediaArea");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    xmlns=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediaarea\"");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    xsi:schemaLocation=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediaarea http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediaarea/mediaarea_0_1.xsd\"");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    version=\"0.1\"");
+        Result+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("<creatingLibrary version=\"")+Ztring(MediaInfo_Version).SubString(__T(" - v"), Ztring())+__T("\" url=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+
+        for (size_t FilePos=0; FilePos<Info.size(); FilePos++)
+            Result+=Info[FilePos]->Inform();
+
+        if (!Result.empty() && Result[Result.size()-1]!=__T('\r') && Result[Result.size()-1]!=__T('\n'))
+            Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("</MediaArea");
+        Result+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
+    }
+
+    else if (MediaInfoLib::Config.Trace_Level_Get() && MediaInfoLib::Config.Trace_Format_Get()==MediaInfoLib::Config.Trace_Format_XML)
+    {
+        Result+=__T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")+MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T('<');
+        Result+=__T("MediaTrace");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    xmlns=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediatrace\"");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    xsi:schemaLocation=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediatrace http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediatrace/mediatrace_0_1.xsd\"");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    version=\"0.1\"");
+        Result+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("<creatingLibrary version=\"")+Ztring(MediaInfo_Version).SubString(__T(" - v"), Ztring())+__T("\" url=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+
+        for (size_t FilePos=0; FilePos<Info.size(); FilePos++)
+        {
+            size_t Modified;
+            Result+=__T("<media");
+            Ztring Options=Info[FilePos]->Get(Stream_General, 0, General_CompleteName, Info_Options);
+            if (InfoOption_ShowInInform<Options.size() && Options[InfoOption_ShowInInform]==__T('Y'))
+                Result+=__T(" ref=\"")+MediaInfo_Internal::Xml_Content_Escape(Info[FilePos]->Get(Stream_General, 0, General_CompleteName), Modified)+__T("\"");
+            if (Info[FilePos] && !Info[FilePos]->ParserName.empty())
+                Result+=__T(" parser=\"")+Info[FilePos]->ParserName+=__T("\"");
+            Result+= __T('>');
+            Result+=MediaInfoLib::Config.LineSeparator_Get();
+            Result+=Info[FilePos]->Inform();
+            if (!Result.empty() && Result[Result.size()-1]!=__T('\r') && Result[Result.size()-1]!=__T('\n'))
+                Result+=MediaInfoLib::Config.LineSeparator_Get();
+            Result+=__T("</media>");
+            Result+=MediaInfoLib::Config.LineSeparator_Get();
+        }
+
+        if (!Result.empty() && Result[Result.size()-1]!=__T('\r') && Result[Result.size()-1]!=__T('\n'))
+            Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("</MediaTrace");
+        Result+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
+    }
+
+    else if (MediaInfoLib::Config.Trace_Level_Get() && MediaInfoLib::Config.Trace_Format_Get()==MediaInfoLib::Config.Trace_Format_MICRO_XML)
+    {
+        Result+=__T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")+MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T('<');
+        Result+=__T("MicroMediaTrace");
+        Result+=__T(" xmlns=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/micromediatrace\"");
+        Result+=__T(" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+        Result+=__T(" mtsl=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/micromediatrace http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/micromediatrace/micromediatrace.xsd\"");
+        Result+=__T(" version=\"0.1\">");
+        Result+=__T("<creatingLibrary version=\"")+Ztring(MediaInfo_Version).SubString(__T(" - v"), Ztring())+__T("\" url=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>");
+
+        for (size_t FilePos=0; FilePos<Info.size(); FilePos++)
+        {
+            size_t Modified;
+            Result+=__T("<media");
+            Ztring Options=Info[FilePos]->Get(Stream_General, 0, General_CompleteName, Info_Options);
+            if (InfoOption_ShowInInform<Options.size() && Options[InfoOption_ShowInInform]==__T('Y'))
+                Result+=__T(" ref=\"")+MediaInfo_Internal::Xml_Content_Escape(Info[FilePos]->Get(Stream_General, 0, General_CompleteName), Modified)+__T("\"");
+            if (Info[FilePos] && !Info[FilePos]->ParserName.empty())
+                Result+=__T(" parser=\"")+Info[FilePos]->ParserName+=__T("\"");
+            Result+= __T('>');
+            Result+=Info[FilePos]->Inform();
+            Result+=__T("</media>");
+        }
+
+        Result+=__T("</MicroMediaTrace>");
+    }
+
+    else if (MediaInfoLib::Config.Inform_Get()==__T("XML") || MediaInfoLib::Config.Inform_Get()==__T("MIXML"))
+    {
+        Result+=__T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")+MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T('<');
+        Result+=__T("MediaInfo");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    xmlns=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediainfo\"");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    xsi:schemaLocation=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediainfo http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediainfo/mediainfo_2_0.xsd\"");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    version=\"2.0\"");
+        Result+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("<creatingLibrary version=\"")+Ztring(MediaInfo_Version).SubString(__T(" - v"), Ztring())+__T("\" url=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+
+        for (size_t FilePos=0; FilePos<Info.size(); FilePos++)
+            Result+=Info[FilePos]->Inform();
+
+        if (!Result.empty() && Result[Result.size()-1]!=__T('\r') && Result[Result.size()-1]!=__T('\n'))
+            Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("</MediaInfo");
+        Result+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
+    }
+    else
+    #endif //defined(MEDIAINFO_XML_YES)
+
+    {
+        size_t FilePos=0;
+        ZtringListList MediaInfo_Custom_View; MediaInfo_Custom_View.Write(MediaInfoLib::Config.Option(__T("Inform_Get")));
+        #if defined(MEDIAINFO_XML_YES)
+        bool XML=false;
+        if (MediaInfoLib::Config.Inform_Get()==__T("OLDXML"))
+            XML=true;
+        if (XML)
+        {
+            Result+=__T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")+MediaInfoLib::Config.LineSeparator_Get();
+            Result+=__T("<Mediainfo version=\"")+MediaInfoLib::Config.Info_Version_Get().SubString(__T(" v"), Ztring())+__T("\">");
+            Result+=MediaInfoLib::Config.LineSeparator_Get();
+        }
+        else
+        #endif //defined(MEDIAINFO_XML_YES)
+        Result+=MediaInfo_Custom_View("Page_Begin");
+        while (FilePos<Info.size())
+        {
+            Result+=Info[FilePos]->Inform();
+            if (FilePos<Info.size()-1)
+            {
+                Result+=MediaInfo_Custom_View("Page_Middle");
+            }
+            FilePos++;
+        }
+        #if defined(MEDIAINFO_XML_YES)
+        if (XML)
+        {
+            if (!Result.empty() && Result[Result.size()-1]!=__T('\r') && Result[Result.size()-1]!=__T('\n'))
+                Result+=MediaInfoLib::Config.LineSeparator_Get();
+            Result+=__T("</");
+            if (MediaInfoLib::Config.Trace_Format_Get()==MediaInfoLib::Config.Trace_Format_XML)
+                Result+=__T("MediaTrace");
+            else if (MediaInfoLib::Config.Trace_Format_Get()==MediaInfoLib::Config.Trace_Format_MICRO_XML)
+                Result+=__T("MicroMediaTrace");
+            else
+                Result+=__T("Mediainfo");
+            Result+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
+        }
+        else
+        #endif //defined(MEDIAINFO_XML_YES)
+            Result+=MediaInfo_Custom_View("Page_End");//
+    }
+
+    #if MEDIAINFO_COMPRESS
+        bool zlib=MediaInfoLib::Config.FlagsX_Get(Flags_Inform_zlib);
+        bool base64=MediaInfoLib::Config.FlagsX_Get(Flags_Inform_base64);
+        if (zlib || base64)
+        {
+            string Inform_Cache = Result.To_UTF8();
+            if (zlib)
+            {
+                uLongf Compressed_Size=(uLongf)(Inform_Cache.size() + 16);
+                Bytef* Compressed=new Bytef[Inform_Cache.size()+16];
+                if (compress(Compressed, &Compressed_Size, (const Bytef*)Inform_Cache.c_str(), (uLong)Inform_Cache.size()) < 0)
+                {
+                    delete[] Compressed;
+                    return __T("Error during zlib compression");
+                }
+                Inform_Cache.assign((char*)Compressed, (size_t)Compressed_Size);
+            }
+            if (base64)
+            {
+                Inform_Cache=Base64::encode(Inform_Cache);
+            }
+            Result.From_UTF8(Inform_Cache);
+        }
+    #endif //MEDIAINFO_COMPRESS
+
+    return Result.c_str();
+}
 
 } //NameSpace

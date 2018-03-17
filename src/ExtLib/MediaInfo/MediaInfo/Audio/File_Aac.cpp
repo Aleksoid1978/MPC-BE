@@ -87,6 +87,7 @@ File_Aac::File_Aac()
     //Temp - General Audio
     sbr=NULL;
     ps=NULL;
+    raw_data_block_Pos=0;
 
     //Temp
     CanFill=true;
@@ -95,8 +96,10 @@ File_Aac::File_Aac()
 //---------------------------------------------------------------------------
 File_Aac::~File_Aac()
 {
-    delete sbr;
-    delete ps;
+    for (size_t i=0; i<sbrs.size(); i++)
+        delete sbrs[i];
+    for (size_t i=0; i<pss.size(); i++)
+        delete pss[i];
 }
 
 //***************************************************************************

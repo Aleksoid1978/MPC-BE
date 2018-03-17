@@ -315,6 +315,7 @@ private :
     void Streams_Fill_PerStream_PerKind(size_t StreamID, ps_stream &Temp, kindofstream KindOfStream, size_t Count);
     void Streams_Finish_PerStream(size_t StreamID, ps_stream &Temp, kindofstream KindOfStream);
     void xxx_stream_Parse(ps_stream &Temp, int8u &stream_Count);
+    void MergeGeneral(File__Analyze* Parser, general Parameter);
 
     //Output buffer
     size_t Output_Buffer_Get (const String &Value);

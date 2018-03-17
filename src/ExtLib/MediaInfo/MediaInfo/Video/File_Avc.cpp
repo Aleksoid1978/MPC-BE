@@ -393,6 +393,49 @@ namespace AVC_Intra_Headers
                                                             0x00, 0x00, 0x01, 0x68, 0xCE, 0x33, 0x48, 0xD0 };
 };
 
+
+//---------------------------------------------------------------------------
+// Some DV Metadata info: http://www.freepatentsonline.com/20050076039.pdf
+static const char* MDPM(int8u ID)
+{
+    switch (ID)
+    {
+        case 0x18: return "Date/Time";                          // Is "Text header" in doc?
+        case 0x19: return "Date/Time (continue 1)";             // Is "Text" in doc?
+        case 0x70: return "Consumer Camera 1";
+        case 0x71: return "Consumer Camera 2";
+        case 0x73: return "Lens";
+        case 0x7F: return "Camera shutter";
+        case 0xA1: return "Iris (F)";
+        case 0xE0: return "Make Model";
+        case 0xE1: return "Rec Info";
+        case 0xE4: return "Model Name";
+        case 0xE5: return "Model Name (continue 1)";
+        case 0xE6: return "Model Name (continue 1)";
+        default  : return "";
+    }
+}
+
+//---------------------------------------------------------------------------
+static const char* MDPM_MakeName(int16u Value)
+{
+    switch (Value)
+    {
+        case 0x0103: return "Panasonic";
+        case 0x0108: return "Sony";
+        case 0x1011: return "Canon";
+        case 0x1104: return "JVC";
+        default    : return "";
+    }
+}
+
+//---------------------------------------------------------------------------
+// From DV
+extern const char*  Dv_consumer_camera_1_ae_mode[];
+extern const char*  Dv_consumer_camera_1_wb_mode[];
+extern const char*  Dv_consumer_camera_1_white_balance(int8u white_balance);
+extern const char*  Dv_consumer_camera_1_fcm[];
+
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -3166,8 +3209,201 @@ void File_Avc::sei_message_user_data_unregistered_bluray(int32u payloadSize)
     switch (Identifier)
     {
         case 0x47413934 :   sei_message_user_data_registered_itu_t_t35_GA94_03(); return;
+        case 0x4D44504D :   sei_message_user_data_unregistered_bluray_MDPM(Element_Size-Element_Offset); return;
         default         :   Skip_XX(Element_Size-Element_Offset, "Unknown");
     }
+}
+
+//---------------------------------------------------------------------------
+// SEI - 5 - bluray - MDPM
+void File_Avc::sei_message_user_data_unregistered_bluray_MDPM(int32u payloadSize)
+{
+    if (payloadSize<1)
+    {
+        Skip_XX(payloadSize, "Unknown");
+        return;
+    }
+
+    Element_Info1("Modified Digital Video Pack Metadata");
+
+    Skip_B1(                                                    "Count");
+    payloadSize--;
+    string DateTime0, DateTime1, DateTime2, Model0, Model1, Model2;
+    int16u MakeName=(int16u)-1;
+    Ztring IrisFNumber;
+    while (payloadSize >= 5)
+    {
+        Element_Begin0();
+        int8u  ID;
+        Get_B1(ID,                                              "ID"); Element_Name(MDPM(ID));
+        switch (ID)
+        {
+            case 0x18:
+                        {
+                        int16u Year;
+                        int8u  ID, MM, Zone_Hours;
+                        bool   Zone_Sign, Zone_Minutes;
+                        BS_Begin();
+                        Mark_0();
+                        Skip_SB(                                "DST flag");
+                        Get_SB (Zone_Sign,                      "Time zone sign");
+                        Get_S1 (4, Zone_Hours,                  "Time zone hours");
+                        Get_SB (Zone_Minutes,                   "Time zone half-hour flag");
+                        BS_End();
+                        Get_B2 (Year,                           "Year");
+                        Get_B1 (MM,                             "Month");
+                        DateTime0+='0'+(Year>>12);
+                        DateTime0+='0'+((Year&0xF00)>>8);
+                        DateTime0+='0'+((Year&0xF0)>>4);
+                        DateTime0+='0'+(Year&0xF);
+                        DateTime0+='-';
+                        DateTime0+='0'+((MM&0xF0)>>4);
+                        DateTime0+='0'+(MM&0xF);
+                        DateTime0+='-';
+                        Element_Info1(DateTime0);
+                        DateTime2+=Zone_Sign?'-':'+';
+                        DateTime2+='0'+Zone_Hours/10;
+                        DateTime2+='0'+Zone_Hours%10;
+                        DateTime2+=':';
+                        DateTime2+=Zone_Minutes?'3':'0';
+                        DateTime2+='0';
+                        Element_Info1(DateTime2);
+                        }
+                        break;
+            case 0x19:
+                        {
+                        int8u  MM, DD, hh, mm, ss;
+                        Get_B1 (DD,                             "Day");
+                        Get_B1 (hh,                             "Hour");
+                        Get_B1 (mm,                             "Minute");
+                        Get_B1 (ss,                             "Second");
+                        DateTime1+='0'+(DD>>4);
+                        DateTime1+='0'+(DD&0xF);
+                        DateTime1+=' ';
+                        DateTime1+='0'+(hh>>4);
+                        DateTime1+='0'+(hh&0xF);
+                        DateTime1+=':';
+                        DateTime1+='0'+(mm>>4);
+                        DateTime1+='0'+(mm&0xF);
+                        DateTime1+=':';
+                        DateTime1+='0'+(ss>>4);
+                        DateTime1+='0'+(ss&0xF);
+                        Element_Info1(DateTime1);
+                        }
+                        break;
+            case 0x70:
+                        consumer_camera_1();
+                        break;
+            case 0x71:
+                        consumer_camera_2();
+                        break;
+            case 0xA1:
+                        {
+                        int16u D, N;
+                        Get_B2 (D,                              "D");
+                        Get_B2 (N,                              "N");
+                        IrisFNumber.From_Number(((float64)D)/N, 6);
+                        Element_Info1(IrisFNumber);
+                        }
+                        break;
+            case 0xE0:
+                        {
+                        Get_B2 (MakeName,                       "Name");
+                        Skip_B2(                                "Category");
+                        Element_Info1(MDPM_MakeName(MakeName));
+                        }
+                        break;
+            case 0xE4:
+                        Get_String(4, Model0,                   "Data"); Element_Info1(Model0);
+                        break;
+            case 0xE5:
+                        Get_String(4, Model1,                   "Data"); Element_Info1(Model1);
+                        break;
+            case 0xE6:
+                        Get_String(4, Model2,                   "Data");
+                        Model2.erase(Model2.find_last_not_of('\0')+1);
+                        Element_Info1(Model2);
+                        break;
+            default: Skip_B4("Data");
+        }
+        Element_End0();
+        payloadSize -= 5;
+    }
+    if (payloadSize)
+        Skip_XX(payloadSize, "Unknown");
+
+    FILLING_BEGIN();
+        if (!Frame_Count && !seq_parameter_sets.empty() && !pic_parameter_sets.empty())
+        {
+            if (!DateTime0.empty() && !DateTime1.empty())
+                Fill(Stream_General, 0, General_Recorded_Date, DateTime0+DateTime1+DateTime2);
+            if (MDPM_MakeName(MakeName)[0] || !Model0.empty())
+            {
+                string Model;
+                if (MDPM_MakeName(MakeName)[0])
+                {
+                    Model=MDPM_MakeName(MakeName);
+                    Fill(Stream_General, 0, General_Encoded_Application_CompanyName, Model);
+                    if (!Model0.empty())
+                        Model+=' ';
+                }
+                Fill(Stream_General, 0, General_Encoded_Application, Model+Model0+Model1+Model2);
+                Fill(Stream_General, 0, General_Encoded_Application_Name, Model0+Model1+Model2);
+            }
+            Fill(Stream_Video, 0, "IrisFNumber", IrisFNumber);
+        }
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Avc::consumer_camera_1()
+{
+    //Parsing
+    BS_Begin();
+    int8u ae_mode, wb_mode, white_balance, fcm;
+    Mark_1_NoTrustError();
+    Mark_1_NoTrustError();
+    Skip_S1(6,                                                  "iris");
+    Get_S1 (4, ae_mode,                                         "ae mode"); Param_Info1(Dv_consumer_camera_1_ae_mode[ae_mode]);
+    Skip_S1(4,                                                  "agc(Automatic Gain Control)");
+    Get_S1 (3, wb_mode,                                         "wb mode (white balance mode)"); Param_Info1(Dv_consumer_camera_1_wb_mode[wb_mode]);
+    Get_S1 (5, white_balance,                                   "white balance"); Param_Info1(Dv_consumer_camera_1_white_balance(white_balance));
+    Get_S1 (1, fcm,                                             "fcm (Focus mode)"); Param_Info1(Dv_consumer_camera_1_fcm[fcm]);
+    Skip_S1(7,                                                  "focus (focal point)");
+    BS_End();
+
+    /* TODO: need some tweaking
+    FILLING_BEGIN();
+        if (!Frame_Count)
+        {
+            Ztring Settings;
+            if (ae_mode<0x0F) Settings+=__T("ae mode=")+Ztring(Dv_consumer_camera_1_ae_mode[ae_mode])+__T(", ");
+            if (wb_mode<0x08) Settings+=__T("wb mode=")+Ztring(Dv_consumer_camera_1_wb_mode[wb_mode])+__T(", ");
+            if (wb_mode<0x1F) Settings+=__T("white balance=")+Ztring(Dv_consumer_camera_1_white_balance(white_balance))+__T(", ");
+            Settings+=__T("fcm=")+Ztring(Dv_consumer_camera_1_fcm[fcm]);
+            Fill(Stream_Video, 0, "Camera_Settings", Settings);
+        }
+    FILLING_END();
+    */
+}
+
+//---------------------------------------------------------------------------
+void File_Avc::consumer_camera_2()
+{
+    //Parsing
+    BS_Begin();
+    Mark_1_NoTrustError();
+    Mark_1_NoTrustError();
+    Skip_S1(1,                                                  "vpd");
+    Skip_S1(5,                                                  "vertical panning speed");
+    Skip_S1(1,                                                  "is");
+    Skip_S1(1,                                                  "hpd");
+    Skip_S1(6,                                                  "horizontal panning speed");
+    Skip_S1(8,                                                  "focal length");
+    Skip_S1(1,                                                  "zen");
+    Info_S1(3, zoom_U,                                          "units of e-zoom");
+    Info_S1(4, zoom_D,                                          "1/10 of e-zoom"); /*if (zoom_D!=0xF)*/ Param_Info1(__T("zoom=")+Ztring().From_Number(zoom_U+((float32)zoom_U)/10, 2));
+    BS_End();
 }
 
 //---------------------------------------------------------------------------

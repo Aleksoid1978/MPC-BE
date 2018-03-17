@@ -147,7 +147,7 @@ void MediaInfo::Close()
 //---------------------------------------------------------------------------
 String MediaInfo::Inform(size_t)
 {
-    return Internal->Inform();
+    return MediaInfo_Internal::Inform(Internal);
 }
 
 //---------------------------------------------------------------------------

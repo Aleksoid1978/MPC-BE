@@ -315,6 +315,8 @@ void File_Aac::program_config_element()
 //---------------------------------------------------------------------------
 void File_Aac::raw_data_block()
 {
+    raw_data_block_Pos=0;
+
     if (sampling_frequency_index>=13)
     {
         Trusted_IsNot("(Problem)");
@@ -355,6 +357,8 @@ void File_Aac::raw_data_block()
             case 0x07 :                                     break; //ID_END
             default   :                                          ; //Can not happen
         }
+        if (id_syn_ele<4) // All "content" element
+            raw_data_block_Pos++;
 
         #if MEDIAINFO_TRACE
             Trace_Activated=Trace_Activated_Save;

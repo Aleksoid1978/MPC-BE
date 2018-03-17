@@ -272,6 +272,16 @@
         #define MEDIAINFO_SHA2 1
     #endif
 #endif
+#if !defined(MEDIAINFO_COMPRESS)
+    #if defined(MEDIAINFO_COMPRESS_NO) && defined(MEDIAINFO_COMPRESS_YES)
+        #undef MEDIAINFO_COMPRESS_NO //MEDIAINFO_COMPRESS_YES has priority
+    #endif
+    #if defined(MEDIAINFO_COMPRESS_NO)
+        #define MEDIAINFO_COMPRESS 0
+    #else
+        #define MEDIAINFO_COMPRESS 1
+    #endif
+#endif
 #if !defined(MEDIAINFO_DEMUX)
     #if !defined(MEDIAINFO_DEMUX_NO) && !defined(MEDIAINFO_DEMUX_YES) && !MEDIAINFO_EVENTS
         #define MEDIAINFO_DEMUX_NO //MEDIAINFO_DEMUX is disabled by default if MEDIAINFO_EVENTS is set to 0
@@ -381,6 +391,9 @@
 #endif
 #if !defined(MEDIAINFO_EXPORT_NO) && !defined(MEDIAINFO_XML_NO) && !defined(MEDIAINFO_XML_YES)
     #define MEDIAINFO_XML_YES
+#endif
+#if !defined(MEDIAINFO_EXPORT_NO) && !defined(MEDIAINFO_JSON_NO) && !defined(MEDIAINFO_JSON_YES)
+    #define MEDIAINFO_JSON_YES
 #endif
 #if !defined(MEDIAINFO_EXPORT_NO) && !defined(MEDIAINFO_CSV_NO) && !defined(MEDIAINFO_CSV_YES)
     #define MEDIAINFO_CSV_YES
@@ -576,6 +589,9 @@
 #endif
 #if !defined(MEDIAINFO_VIDEO_NO) && !defined(MEDIAINFO_AFDBARDATA_NO) && !defined(MEDIAINFO_AFDBARDATA_YES)
     #define MEDIAINFO_AFDBARDATA_YES
+#endif
+#if !defined(MEDIAINFO_VIDEO_NO) && !defined(MEDIAINFO_AV1_NO) && !defined(MEDIAINFO_AV1_YES)
+    #define MEDIAINFO_AV1_YES
 #endif
 #if !defined(MEDIAINFO_VIDEO_NO) && !defined(MEDIAINFO_AVC_NO) && !defined(MEDIAINFO_AVC_YES)
     #define MEDIAINFO_AVC_YES

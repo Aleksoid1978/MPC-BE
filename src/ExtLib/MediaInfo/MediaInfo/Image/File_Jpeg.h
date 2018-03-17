@@ -131,7 +131,10 @@ private :
     void APP0_JFFF_3B();
     void APP1();
     void APP1_EXIF();
-    void APP2() {Skip_XX(Element_Size, "Data");}
+    void APP2();
+    void APP2_ICC_PROFILE();
+    void APP2_ICC_PROFILE_XYZNumber();
+    void APP2_ICC_PROFILE_s15Fixed16Number(const char* Name);
     void APP3() {Skip_XX(Element_Size, "Data");}
     void APP4() {Skip_XX(Element_Size, "Data");}
     void APP5() {Skip_XX(Element_Size, "Data");}

@@ -31,6 +31,9 @@
 #if defined(MEDIAINFO_MPEG4V_YES)
     #include "MediaInfo/Video/File_Mpeg4v.h"
 #endif
+#if defined(MEDIAINFO_AV1_YES)
+    #include "MediaInfo/Video/File_Av1.h"
+#endif
 #if defined(MEDIAINFO_AVC_YES)
     #include "MediaInfo/Video/File_Avc.h"
 #endif
@@ -2153,10 +2156,14 @@ void File_Mk::Segment_Attachments_AttachedFile_FileData()
 
         if (!CoverIsSetFromAttachment && CurrentAttachmentIsCover)
         {
-            std::string Data_Base64(Base64::encode(Data_Raw));
-
             //Filling
-            Fill(Stream_General, 0, General_Cover_Data, Data_Base64);
+            #if MEDIAINFO_ADVANCED
+                if (MediaInfoLib::Config.Flags1_Get(Flags_Cover_Data_base64))
+                {
+                    std::string Data_Base64(Base64::encode(Data_Raw));
+                    Fill(Stream_General, 0, General_Cover_Data, Data_Base64);
+                }
+            #endif //MEDIAINFO_ADVANCED
             Fill(Stream_General, 0, General_Cover, "Yes");
             CoverIsSetFromAttachment=true;
         }
@@ -4033,7 +4040,7 @@ void File_Mk::CodecID_Manage()
     stream& streamItem = Stream[TrackNumber];
 
     //Creating the parser
-    #if defined(MEDIAINFO_MPEG4V_YES) || defined(MEDIAINFO_AVC_YES) || defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_VC1_YES) || defined(MEDIAINFO_DIRAC_YES) || defined(MEDIAINFO_MPEGV_YES) || defined(MEDIAINFO_VP8_YES) || defined(MEDIAINFO_OGG_YES) || defined(MEDIAINFO_DTS_YES)
+    #if defined(MEDIAINFO_MPEG4V_YES) || defined(MEDIAINFO_AV1_YES) || defined(MEDIAINFO_AVC_YES) || defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_VC1_YES) || defined(MEDIAINFO_DIRAC_YES) || defined(MEDIAINFO_MPEGV_YES) || defined(MEDIAINFO_VP8_YES) || defined(MEDIAINFO_OGG_YES) || defined(MEDIAINFO_DTS_YES)
         const Ztring &Format=MediaInfoLib::Config.CodecID_Get(StreamKind_Last, InfoCodecID_Format_Type, CodecID, InfoCodecID_Format);
     #endif
         if (0);
@@ -4042,6 +4049,14 @@ void File_Mk::CodecID_Manage()
     {
         streamItem.Parser=new File_Mpeg4v;
         ((File_Mpeg4v*)streamItem.Parser)->FrameIsAlwaysComplete=true;
+    }
+    #endif
+    #if defined(MEDIAINFO_AV1_YES)
+    else if (Format==__T("AV1"))
+    {
+        File_Av1* Parser=new File_Av1;
+        Parser->FrameIsAlwaysComplete=true;
+        streamItem.Parser=Parser;
     }
     #endif
     #if defined(MEDIAINFO_AVC_YES)

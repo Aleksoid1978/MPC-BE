@@ -168,7 +168,7 @@ void PBCore_Transform(Node *Parent, MediaInfo_Internal &MI, stream_t StreamKind,
         Node_EssenceTrack->Add_Child_IfNotEmpty(MI, Stream_Audio, StreamPos, Audio_SamplingRate, "essenceTrackSamplingRate");
 
     //essenceTrackBitDepth
-    Node_EssenceTrack->Add_Child_IfNotEmpty(MI, StreamKind, StreamPos, "BitDepth", "essenceTrackBitDepth", "version", "PBCoreXSD_Ver_1.2_D1");
+    Node_EssenceTrack->Add_Child_IfNotEmpty(MI, StreamKind, StreamPos, "BitDepth", "essenceTrackBitDepth", "version", std::string("PBCoreXSD_Ver_1.2_D1"));
 
     //essenceTrackFrameSize
     if (StreamKind==Stream_Video && !MI.Get(Stream_Video, StreamPos, Video_Width).empty())
@@ -300,7 +300,7 @@ Ztring Export_PBCore::Transform(MediaInfo_Internal &MI)
         for (size_t StreamPos=0; StreamPos<MI.Count_Get((stream_t)StreamKind); StreamPos++)
             PBCore_Transform(Node_Instantiation, MI, (stream_t)StreamKind, StreamPos);
 
-    ToReturn+=Ztring().From_UTF8(To_XML(Node_Main, 0).c_str());
+    ToReturn+=Ztring().From_UTF8(To_XML(Node_Main, 0, true, true).c_str());
 
     size_t Pos=ToReturn.find(__T("<PBCoreDescriptionDocument"));
     if(Pos!=Ztring::npos)
