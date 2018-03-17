@@ -3,7 +3,7 @@
 1.5.2 (beta)
 ==============================
 Обновлены библиотеки:
-	ffmpeg git-n3.5-dev-2273-gdd8351b118;
+	ffmpeg git-n3.5-dev-2539-ga7a8320c4f;
 	libflac git-1.3.2-66-ga0027fad;
 	libpng git-v1.6.34-41-gd5e4915eb;
 	Little-CMS git-lcms2.9-14-gda9a329;

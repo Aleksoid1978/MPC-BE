@@ -139,6 +139,7 @@ Codecs:
   aacenc*, aaccoder.c                   Rostislav Pehlivanov
   alacenc.c                             Jaikrishnan Menon
   alsdec.c                              Thilo Borgmann, Umair Khan
+  aptx.c                                Aurelien Jacobs
   ass*                                  Aurelien Jacobs
   asv*                                  Michael Niedermayer
   atrac3plus*                           Maxim Poliakovski
@@ -187,6 +188,7 @@ Codecs:
   jvdec.c                               Peter Ross
   lcl*.c                                Roberto Togni, Reimar Doeffinger
   libcelt_dec.c                         Nicolas George
+  libcodec2.c                           Tomas Härdin
   libdirac*                             David Conrad
   libgsm.c                              Michel Bardiaux
   libkvazaar.c                          Arttu Ylä-Outinen
@@ -266,7 +268,7 @@ Hardware acceleration:
   crystalhd.c                           Philip Langdale
   dxva2*                                Hendrik Leppkes, Laurent Aimar, Steve Lhomme
   d3d11va*                              Steve Lhomme
-  mediacodec*                           Matthieu Bouron
+  mediacodec*                           Matthieu Bouron, Aman Gupta
   vaapi*                                Gwenole Beauchesne
   vaapi_encode*                         Mark Thompson
   vdpau*                                Philip Langdale, Carl Eugen Hoyos
@@ -280,6 +282,7 @@ libavdevice
 
 
   avfoundation.m                        Thilo Borgmann
+  android_camera.c                      Felix Matouschek
   decklink*                             Marton Balint
   dshow.c                               Roger Pack (CC rogerdpack@gmail.com)
   fbdev_enc.c                           Lukasz Marek
@@ -393,8 +396,10 @@ Muxers/Demuxers:
   brstm.c                               Paul B Mahol
   caf*                                  Peter Ross
   cdxl.c                                Paul B Mahol
+  codec2.c                              Tomas Härdin
   crc.c                                 Michael Niedermayer
   dashdec.c                             Steven Liu
+  dashenc.c                             Karthick Jeyapal
   daud.c                                Reimar Doeffinger
   dss.c                                 Oleksij Rempel
   dtsdec.c                              foo86
