@@ -523,10 +523,10 @@ cmsBool  PatchLUT(cmsStage* CLUT, cmsUInt16Number At[], cmsUInt16Number Value[],
                 return FALSE;
             }
 
-            for (i = 0; i < (int) nChannelsOut; i++)
-                Grid->Tab.T[index + i] = Value[i];
+    for (i = 0; i < (int) nChannelsOut; i++)
+        Grid->Tab.T[index + i] = Value[i];
 
-            return TRUE;
+    return TRUE;
 }
 
 // Auxiliary, to see if two values are equal or very different
@@ -908,7 +908,7 @@ void* Prelin8dup(cmsContext ContextID, const void* ptr)
 
 // A optimized interpolation for 8-bit input.
 #define DENS(i,j,k) (LutTable[(i)+(j)+(k)+OutChan])
-static
+static CMS_NO_SANITIZE
 void PrelinEval8(register const cmsUInt16Number Input[],
                   register cmsUInt16Number Output[],
                   register const void* D)
@@ -991,8 +991,8 @@ void PrelinEval8(register const cmsUInt16Number Input[],
                                 c1 = c2 = c3 = 0;
                             }
 
-                            Rest = c1 * rx + c2 * ry + c3 * rz + 0x8001;
-                            Output[OutChan] = (cmsUInt16Number) (c0 + ((Rest + (Rest >> 16)) >> 16));
+        Rest = c1 * rx + c2 * ry + c3 * rz + 0x8001;
+        Output[OutChan] = (cmsUInt16Number) (c0 + ((Rest + (Rest >> 16)) >> 16));
 
     }
 }
@@ -1764,8 +1764,8 @@ cmsBool OptimizeMatrixShaper(cmsPipeline** Lut, cmsUInt32Number Intent, cmsUInt3
         _cmsStageToneCurvesData* mpeC1 = (_cmsStageToneCurvesData*) cmsStageData(Curve1);
         _cmsStageToneCurvesData* mpeC2 = (_cmsStageToneCurvesData*) cmsStageData(Curve2);
 
-        // In this particular optimization, caché does not help as it takes more time to deal with
-        // the caché that with the pixel handling
+        // In this particular optimization, cache does not help as it takes more time to deal with
+        // the cache that with the pixel handling
         *dwFlags |= cmsFLAGS_NOCACHE;
 
         // Setup the optimizarion routines
