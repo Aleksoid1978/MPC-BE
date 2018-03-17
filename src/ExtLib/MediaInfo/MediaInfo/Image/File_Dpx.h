@@ -80,9 +80,11 @@ private :
     #if MEDIAINFO_TRACE
         #define Info_X2(_INFO, _NAME)   int16u  _INFO; Get_X2  (_INFO, _NAME)
         #define Info_X4(_INFO, _NAME)   int32u  _INFO; Get_X4  (_INFO, _NAME)
+        #define Skip_X4(       _NAME)   {int32u  tmp; Get_X4  (tmp, _NAME);}
     #else //MEDIAINFO_TRACE
         #define Info_X2(_INFO, _NAME)   Element_Offset+=2
         #define Info_X4(_INFO, _NAME)   Element_Offset+=4
+        #define Skip_X4(       _NAME)   Element_Offset+=4
     #endif //MEDIAINFO_TRACE
     void Get_ASCII (size_t Size, string &Info, const char* Name);
 };

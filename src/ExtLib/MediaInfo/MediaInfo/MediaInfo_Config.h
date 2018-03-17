@@ -46,6 +46,28 @@ enum basicformat
     BasicFormat_XML,
     BasicFormat_JSON,
 };
+#if MEDIAINFO_ADVANCED
+    #define MEDIAINFO_FLAG1 1
+    enum config_flags1
+    {
+        Flags_Cover_Data_base64,
+    };
+#else //MEDIAINFO_COMPRESS
+    #define MEDIAINFO_FLAG1 0
+#endif //MEDIAINFO_COMPRESS
+
+#if MEDIAINFO_COMPRESS
+    #define MEDIAINFO_FLAGX 1
+    enum config_flagsX
+    {
+        Flags_Inform_zlib,
+        Flags_Inform_base64,
+        Flags_Input_zlib,
+        Flags_Input_base64,
+    };
+#else //MEDIAINFO_COMPRESS
+    #define MEDIAINFO_FLAGX 0
+#endif //MEDIAINFO_COMPRESS
 
 //***************************************************************************
 // Class MediaInfo_Config
@@ -168,6 +190,23 @@ public :
           void      Inform_Replace_Set (const ZtringListList &NewInform_Replace);
           ZtringListList Inform_Replace_Get_All ();
 
+          #if MEDIAINFO_ADVANCED
+          Ztring    Cover_Data_Set (const Ztring &NewValue);
+          Ztring    Cover_Data_Get ();
+          #endif //MEDIAINFO_ADVANCED
+          #if MEDIAINFO_COMPRESS
+          Ztring    Inform_Compress_Set (const Ztring &NewInform);
+          Ztring    Inform_Compress_Get ();
+          Ztring    Input_Compressed_Set(const Ztring &NewInform);
+          Ztring    Input_Compressed_Get();
+          #endif //MEDIAINFO_COMPRESS
+          #if MEDIAINFO_FLAG1
+          bool      Flags1_Get(config_flags1 Flag) { return Flags1&(1 << Flag); }
+          #endif //MEDIAINFO_FLAGX
+          #if MEDIAINFO_FLAGX
+          bool      FlagsX_Get(config_flagsX Flag) { return FlagsX&(1 << Flag); }
+          #endif //MEDIAINFO_FLAGX
+
     const Ztring   &Format_Get (const Ztring &Value, infoformat_t KindOfFormatInfo=InfoFormat_Name);
           InfoMap  &Format_Get(); //Should not be, but too difficult to hide it
 
@@ -188,6 +227,7 @@ public :
     const ZtringListList &Info_Get(stream_t KindOfStream); //Should not be, but too difficult to hide it
 
           Ztring    Info_Parameters_Get (bool Complete=false);
+          Ztring    HideShowParameter   (const Ztring &Value, Char Show);
           Ztring    Info_OutputFormats_Get(basicformat Format);
           Ztring    Info_Tags_Get       () const;
           Ztring    Info_CodecsID_Get   ();
@@ -369,6 +409,12 @@ private :
     Translation     Language; //ex. : "KB;Ko"
     ZtringListList  Custom_View; //Definition of "General", "Video", "Audio", "Text", "Other", "Image"
     ZtringListList  Custom_View_Replace; //ToReplace;ReplaceBy
+    #if MEDIAINFO_FLAG1
+        int64u      Flags1;
+    #endif //MEDIAINFO_FLAG1
+    #if MEDIAINFO_FLAGX
+        int64u      FlagsX;
+    #endif //MEDIAINFO_FLAGX
     trace_Format    Trace_Format;
 
     InfoMap         Container;

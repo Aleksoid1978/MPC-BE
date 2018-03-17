@@ -146,7 +146,7 @@ static const char*  Dv_Emphasis[]=
 };
 
 //---------------------------------------------------------------------------
-static const char*  Dv_consumer_camera_1_ae_mode[]=
+const char*  Dv_consumer_camera_1_ae_mode[]=
 {
     "full automatic",
     "gain priority mode",
@@ -167,12 +167,25 @@ static const char*  Dv_consumer_camera_1_ae_mode[]=
 };
 
 //---------------------------------------------------------------------------
-static const char*  Dv_consumer_camera_1_wb_mode[]=
+const char*  Dv_consumer_camera_1_wb_mode[]=
 {
     "automatic",
     "hold",
     "one push",
     "pre-set",
+    "",
+    "",
+    "",
+    "", //no info
+};
+
+//---------------------------------------------------------------------------
+static const char*  Dv_APT[] =
+{
+    "IEC",
+    "SMPTE",
+    "",
+    "",
     "",
     "",
     "",
@@ -196,7 +209,7 @@ const char* Dv_consumer_camera_1_white_balance(int8u white_balance)
 }
 
 //---------------------------------------------------------------------------
-static const char*  Dv_consumer_camera_1_fcm[]=
+const char*  Dv_consumer_camera_1_fcm[]=
 {
     "auto focus",
     "manual focus",

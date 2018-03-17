@@ -316,6 +316,9 @@ int16u File_Aac::sbr_huff_dec(const sbr_huffman& Table, const char* Name)
 //---------------------------------------------------------------------------
 void File_Aac::sbr_extension_data(size_t End, int8u id_aac, bool crc_flag)
 {
+    if (raw_data_block_Pos>=sbrs.size())
+        sbrs.resize(raw_data_block_Pos+1);
+
     FILLING_BEGIN();
         if (Infos["Format_Settings_SBR"].empty())
         {
@@ -353,16 +356,19 @@ void File_Aac::sbr_extension_data(size_t End, int8u id_aac, bool crc_flag)
                 extension_sampling_frequency_index=Aac_AudioSpecificConfig_sampling_frequency_index(extension_sampling_frequency);
             }
 
-            delete sbr;
+            delete sbrs[raw_data_block_Pos];
             sbr=new sbr_handler;
+            sbrs[raw_data_block_Pos]=sbr;
 
             sbr_header();
 
             if (!Aac_Sbr_Compute(sbr, extension_sampling_frequency_index))
             {
-                delete sbr; sbr=NULL;
+                delete sbrs[raw_data_block_Pos]; sbr=sbrs[raw_data_block_Pos]=NULL;
             }
         }
+        else
+            sbr=sbrs[raw_data_block_Pos];
     //~ }
 
     //Parsing

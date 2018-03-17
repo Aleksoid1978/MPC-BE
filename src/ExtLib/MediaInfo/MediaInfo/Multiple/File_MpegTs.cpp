@@ -1014,41 +1014,13 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
     }
     #endif //MEDIAINFO_TELETEXT_YES
 
-    //Law rating
-    if (Temp->Parser)
-    {
-        Ztring LawRating=Temp->Parser->Retrieve(Stream_General, 0, General_LawRating);
-        if (!LawRating.empty())
-        {
-            if (Count_Get(Stream_Menu))
-            {
-                Ztring MenuID=Retrieve(Temp->StreamKind, Temp->StreamPos, General_MenuID);
-                for (size_t Pos=0; Pos<Count_Get(Stream_Menu); Pos++)
-                    if (Retrieve(Stream_Menu, Pos, General_MenuID)==MenuID)
-                        Fill(Stream_Menu, Pos, "LawRating", LawRating, true);
-            }
-            else
-                Fill(Stream_General, 0, General_LawRating, LawRating, true);
-        }
-    }
-
-    //Title
-    if (Temp->Parser)
-    {
-        Ztring Title=Temp->Parser->Retrieve(Stream_General, 0, General_Title);
-        if (!Title.empty() && Retrieve(Stream_General, 0, General_Title).empty())
-        {
-            if (Count_Get(Stream_Menu))
-            {
-                Ztring MenuID=Retrieve(Temp->StreamKind, Temp->StreamPos, General_MenuID);
-                for (size_t Pos=0; Pos<Count_Get(Stream_Menu); Pos++)
-                    if (Retrieve(Stream_Menu, Pos, General_MenuID)==MenuID)
-                        Fill(Stream_Menu, Pos, "Title", Title, true);
-            }
-            else
-                Fill(Stream_General, 0, General_Title, Title);
-        }
-    }
+    //From parser General part
+    MergeGeneral(Temp, General_LawRating);
+    MergeGeneral(Temp, General_Title);
+    MergeGeneral(Temp, General_Recorded_Date);
+    MergeGeneral(Temp, General_Encoded_Application);
+    MergeGeneral(Temp, General_Encoded_Application_CompanyName);
+    MergeGeneral(Temp, General_Encoded_Application_Name);
 }
 
 //---------------------------------------------------------------------------
@@ -3449,6 +3421,28 @@ void File_MpegTs::transport_private_data(int8u transport_private_data_length)
     else
         Skip_XX(transport_private_data_length,          "transport_private_data");
 }
+
+//---------------------------------------------------------------------------
+void File_MpegTs::MergeGeneral(complete_stream::stream* Stream, general Parameter)
+{
+    if (!Stream->Parser)
+        return;
+
+    const Ztring& Value = Stream->Parser->Retrieve_Const(Stream_General, 0, Parameter);
+    if (Value.empty())
+        return;
+
+    if (Count_Get(Stream_Menu))
+    {
+        Ztring MenuID = Retrieve(Stream->StreamKind, Stream->StreamPos, General_MenuID);
+        for (size_t Pos = 0; Pos<Count_Get(Stream_Menu); Pos++)
+            if (Retrieve(Stream_Menu, Pos, General_MenuID) == MenuID)
+                Fill(Stream_Menu, Pos, Stream->Parser->Retrieve(Stream_General, 0, Parameter, Info_Name).To_UTF8().c_str(), Value, true);
+    }
+    else
+        Fill(Stream_General, 0, Parameter, Value, true);
+}
+
 
 } //NameSpace
 

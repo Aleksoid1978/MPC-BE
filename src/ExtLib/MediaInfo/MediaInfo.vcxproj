@@ -168,6 +168,7 @@
     <ClInclude Include="MediaInfo\Multiple\File_Wtv.h" />
     <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Resource.h" />
     <ClInclude Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Sequence.h" />
+    <ClInclude Include="MediaInfo\OutputHelpers.h" />
     <ClInclude Include="MediaInfo\Tag\File_PropertyList.h" />
     <ClInclude Include="MediaInfo\Tag\File_Xmp.h" />
     <ClInclude Include="MediaInfo\Text\File_AribStdB24B37.h" />
@@ -177,6 +178,7 @@
     <ClInclude Include="MediaInfo\Text\File_TimedText.h" />
     <ClInclude Include="MediaInfo\Text\File_Ttml.h" />
     <ClInclude Include="MediaInfo\Video\File_Aic.h" />
+    <ClInclude Include="MediaInfo\Video\File_Av1.h" />
     <ClInclude Include="MediaInfo\Video\File_Canopus.h" />
     <ClInclude Include="MediaInfo\Video\File_Ffv1.h" />
     <ClInclude Include="MediaInfo\Video\File_Hevc.h" />
@@ -431,6 +433,7 @@
     <ClCompile Include="MediaInfo\Multiple\File__ReferenceFilesHelper.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Resource.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File__ReferenceFilesHelper_Sequence.cpp" />
+    <ClCompile Include="MediaInfo\OutputHelpers.cpp" />
     <ClCompile Include="MediaInfo\PreComp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -511,6 +514,7 @@
     <ClCompile Include="MediaInfo\Text\File_Teletext.cpp" />
     <ClCompile Include="MediaInfo\Video\File_AfdBarData.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Aic.cpp" />
+    <ClCompile Include="MediaInfo\Video\File_Av1.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Avc.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Avc_Duplicate.cpp" />
     <ClCompile Include="MediaInfo\Video\File_AvsV.cpp" />

@@ -124,10 +124,10 @@ Ztring ToReturn;
     Node_EssenceTrack->Add_Child("essenceTrackType", essenceTrackType);
 
     //essenceTrackIdentifier
-    Node_EssenceTrack->Add_Child_IfNotEmpty(MI, StreamKind, StreamPos, "ID", "essenceTrackIdentifier", "source", "ID (Mediainfo)");
-    Node_EssenceTrack->Add_Child_IfNotEmpty(MI, StreamKind, StreamPos, "UniqueID", "essenceTrackIdentifier", "source", "UniqueID (Mediainfo)");
-    Node_EssenceTrack->Add_Child_IfNotEmpty(MI, StreamKind, StreamPos, "StreamKindID", "essenceTrackIdentifier", "source", "StreamKindID (Mediainfo)");
-    Node_EssenceTrack->Add_Child_IfNotEmpty(MI, StreamKind, StreamPos, "StreamOrder", "essenceTrackIdentifier", "source", "StreamOrder (Mediainfo)");
+    Node_EssenceTrack->Add_Child_IfNotEmpty(MI, StreamKind, StreamPos, "ID", "essenceTrackIdentifier", "source", std::string("ID (Mediainfo)"));
+    Node_EssenceTrack->Add_Child_IfNotEmpty(MI, StreamKind, StreamPos, "UniqueID", "essenceTrackIdentifier", "source", std::string("UniqueID (Mediainfo)"));
+    Node_EssenceTrack->Add_Child_IfNotEmpty(MI, StreamKind, StreamPos, "StreamKindID", "essenceTrackIdentifier", "source", std::string("StreamKindID (Mediainfo)"));
+    Node_EssenceTrack->Add_Child_IfNotEmpty(MI, StreamKind, StreamPos, "StreamOrder", "essenceTrackIdentifier", "source", std::string("StreamOrder (Mediainfo)"));
 
     //essenceTrackStandard
     if (StreamKind==Stream_Video)
@@ -166,7 +166,7 @@ Ztring ToReturn;
 
     //essenceTrackSamplingRate
     if (StreamKind==Stream_Audio)
-        Node_EssenceTrack->Add_Child_IfNotEmpty(MI, Stream_Audio, StreamPos, Audio_SamplingRate, "essenceTrackSamplingRate", "unitsOfMeasure", "Hz");
+        Node_EssenceTrack->Add_Child_IfNotEmpty(MI, Stream_Audio, StreamPos, Audio_SamplingRate, "essenceTrackSamplingRate", "unitsOfMeasure", std::string("Hz"));
 
     //essenceTrackBitDepth
     Node_EssenceTrack->Add_Child_IfNotEmpty(MI, StreamKind, StreamPos, "BitDepth", "essenceTrackBitDepth");
@@ -339,7 +339,7 @@ Ztring Export_PBCore2::Transform(MediaInfo_Internal &MI, version Version)
         Node_Main.Add_Child("instantiationMediaType", PBCore2_MediaType(MI));
 
     //formatFileSize
-    Node_Main.Add_Child_IfNotEmpty(MI, Stream_General, 0, General_FileSize, "instantiationFileSize", "unitsOfMeasure", "bytes");
+    Node_Main.Add_Child_IfNotEmpty(MI, Stream_General, 0, General_FileSize, "instantiationFileSize", "unitsOfMeasure", std::string("bytes"));
 
     //formatTimeStart
     if (!MI.Get(Stream_Video, 0, Video_Delay_Original_String3).empty())
@@ -420,7 +420,7 @@ Ztring Export_PBCore2::Transform(MediaInfo_Internal &MI, version Version)
                 Node_Main.Add_Child("instantiationAnnotation", MI.Get(Stream_General, 0, Pos),
                     "annotationType", MI.Get(Stream_General, 0, Pos, Info_Name).To_UTF8());
 
-    ToReturn+=Ztring().From_UTF8(To_XML(Node_Main, 0).c_str());
+    ToReturn+=Ztring().From_UTF8(To_XML(Node_Main, 0, true, true).c_str());
 
     //Carriage return
     if (MediaInfoLib::Config.LineSeparator_Get()!=__T("\n"))

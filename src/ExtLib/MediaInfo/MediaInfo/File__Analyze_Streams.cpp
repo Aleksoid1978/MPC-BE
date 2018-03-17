@@ -44,6 +44,7 @@ const char* Mpegv_colour_primaries(int8u colour_primaries);
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+#if defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES)
 void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance)
 {
     //Parsing
@@ -62,22 +63,43 @@ void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_Col
 
     if (MasteringDisplay_ColorPrimaries.empty())
     {
-             if (x[0]==15000 && x[1]== 7500 && x[2]==32000 && x[3]==15635
-              && y[0]==30000 && y[1]== 3000 && y[2]==16500 && y[3]==16450)
+        //Reordering to RGB
+        size_t G=4, B=4, R=4;
+        for (size_t c=0; c<3; c++)
+        {
+            if (x[c]<17500 && y[c]<17500)
+                B=c;
+            else if (y[c]-x[c]>=0)
+                G=c;
+            else
+                R=c;
+        }
+        if ((R|B|G)>=4)
+        {
+            //Order not automaticly detected, betting on GBR order
+            G=0;
+            B=1;
+            R=2;
+        }
+        x[G] = 15000;  x[B] = 7500 ; x[R] = 32000 ; x[3] = 15635
+            ; y[G] = 30000; y[B] = 3000; y[R] = 16500; y[3] = 16450;
+
+             if (x[G]==15000 && x[B]== 7500 && x[R]==32000 && x[3]==15635
+              && y[G]==30000 && y[B]== 3000 && y[R]==16500 && y[3]==16450)
             MasteringDisplay_ColorPrimaries=Mpegv_colour_primaries(1); // BT.709
-        else if (x[0]== 8500 && x[1]== 6550 && x[2]==35400 && x[3]==15635
-              && y[0]==39850 && y[1]== 2300 && y[2]==14600 && y[3]==16450)
+        else if (x[G]== 8500 && x[B]== 6550 && x[R]==35400 && x[3]==15635
+              && y[G]==39850 && y[B]== 2300 && y[R]==14600 && y[3]==16450)
             MasteringDisplay_ColorPrimaries=Mpegv_colour_primaries(9); // BT.2020
-        else if (x[0]==13250 && x[1]== 7500 && x[2]==34000 && x[3]==15635
-              && y[0]==34500 && y[1]== 3000 && y[2]==16000 && y[3]==16450)
+        else if (x[G]==13250 && x[B]== 7500 && x[R]==34000 && x[3]==15635
+              && y[G]==34500 && y[B]== 3000 && y[R]==16000 && y[3]==16450)
             MasteringDisplay_ColorPrimaries=Mpegv_colour_primaries(12); // Display P3
         else
-        MasteringDisplay_ColorPrimaries=__T("R: x=")+Ztring::ToZtring(((float64)x[2])/50000, 6)
-                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[2])/50000, 6)
-                                     +__T(", G: x=")+Ztring::ToZtring(((float64)x[0])/50000, 6)
-                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[0])/50000, 6)
-                                     +__T(", B: x=")+Ztring::ToZtring(((float64)x[1])/50000, 6)
-                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[1])/50000, 6)
+        MasteringDisplay_ColorPrimaries=__T("R: x=")+Ztring::ToZtring(((float64)x[R])/50000, 6)
+                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[R])/50000, 6)
+                                     +__T(", G: x=")+Ztring::ToZtring(((float64)x[G])/50000, 6)
+                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[G])/50000, 6)
+                                     +__T(", B: x=")+Ztring::ToZtring(((float64)x[B])/50000, 6)
+                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[B])/50000, 6)
                            +__T(", White point: x=")+Ztring::ToZtring(((float64)x[3])/50000, 6)
                                        +__T(  " y=")+Ztring::ToZtring(((float64)y[3])/50000, 6);
         MasteringDisplay_Luminance=     __T("min: ")+Ztring::ToZtring(((float64)min)/10000, 4)
@@ -85,6 +107,7 @@ void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_Col
                                +__T(" cd/m2");
     }
 }
+#endif
 
 //***************************************************************************
 // Preparation des streams
@@ -205,6 +228,10 @@ size_t File__Analyze::Stream_Prepare (stream_t KindOfStream, size_t StreamPos)
                     Fill (Stream_General, 0, General_FileName, FileName_Modified.substr(FileName_Modified_PathSeparatorOffset+1));
             }
         }
+        if (Retrieve(Stream_General, 0, General_FileExtension).empty())
+            Fill(Stream_General, 0, General_FileNameExtension, Retrieve(Stream_General, 0, General_FileName));
+        else
+            Fill(Stream_General, 0, General_FileNameExtension, Retrieve(Stream_General, 0, General_FileName)+__T('.')+Retrieve(Stream_General, 0, General_FileExtension));
 
         //File dates
         #if defined(MEDIAINFO_FILE_YES)

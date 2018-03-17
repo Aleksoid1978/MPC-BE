@@ -276,6 +276,15 @@ namespace Elements
     //                         09 - Format Characteristics
     UUID(060E2B34, 0101010C, 04090500, 00000000, 0000, "SMPTE ST 429-5", UCSEncoding, "UCS Encoding")
 
+    //                         20 - Device Characteristics
+    //                           04 - Display Characteristics
+    //                             01 - Mastering Display Characteristics
+    //                                 01 - Mastering Display Color Volume
+    UUID(060E2B34, 0101010E, 04200401, 01010000, 0000, "SMPTE ST 2067-21", MasteringDisplayPrimaries, "Mastering Display Primaries")
+    UUID(060E2B34, 0101010E, 04200401, 01020000, 0000, "SMPTE ST 2067-21", MasteringDisplayWhitePointChromaticity, "Mastering Display White Point Chromaticity")
+    UUID(060E2B34, 0101010E, 04200401, 01030000, 0000, "SMPTE ST 2067-21", MasteringDisplayMaximumLuminance, "Mastering Display Maximum Luminance")
+    UUID(060E2B34, 0101010E, 04200401, 01040000, 0000, "SMPTE ST 2067-21", MasteringDisplayMinimumLuminance, "Mastering Display Minimum Luminance")
+
     //                       05 - Process
 
     //                       06 - Relational
@@ -1299,10 +1308,11 @@ static const char* Mxf_ColorPrimaries(const int128u ColorPrimaries)
     switch ((int8u)(Code_Compare4>>16))
     {
         case 0x01 : return "BT.601 NTSC";
-        case 0x02 : return "BT.470 System B";
+        case 0x02 : return "BT.601 PAL";
         case 0x03 : return "BT.709";
         case 0x04 : return "BT.2020";
-        case 0x06 : return "P3D65";
+        case 0x05 : return "XYZ";
+        case 0x06 : return "Display P3";
         default   : return "";
     }
 }
@@ -1313,16 +1323,16 @@ static const char* Mxf_TransferCharacteristic(const int128u TransferCharacterist
     int32u Code_Compare4=(int32u)TransferCharacteristic.lo;
     switch ((int8u)(Code_Compare4>>16))
     {
-        case 0x01 : return "BT.470";
+        case 0x01 : return "BT.601";
         case 0x02 : return "BT.709";
         case 0x03 : return "SMPTE 240M";
         case 0x04 : return "SMPTE 274M";
-        case 0x05 : return "BT.1361 extended colour gamut system";
+        case 0x05 : return "BT.1361";
         case 0x06 : return "Linear";
         case 0x07 : return "SMPTE 428M";
         case 0x08 : return "xvYCC";
-        case 0x09 : return "BT.2020";
-        case 0x0A : return "SMPTE ST 2084";
+        case 0x09 : return "BT.2020"; // ISO does a difference of value between 10 and 12 bit
+        case 0x0A : return "PQ";
         case 0x0B : return "HLG";
         default   : return "";
     }
@@ -1337,7 +1347,9 @@ static const char* Mxf_CodingEquations(const int128u CodingEquations)
         case 0x01 : return "BT.601";
         case 0x02 : return "BT.709";
         case 0x03 : return "SMPTE 240M";
-        case 0x06 : return "BT.2020";
+        case 0x04 : return "YCgCo";
+        case 0x05 : return "Identity";
+        case 0x06 : return "BT.2020"; // ISO does a difference between constant and non constant, not SMPTE?
         default   : return "";
     }
 }
@@ -3463,8 +3475,50 @@ void File_Mxf::Streams_Finish_Descriptor(const int128u DescriptorUID, const int1
                 Fill(Stream_Video, StreamPos_Last, Video_FrameRate_Original, SampleRate_RawStream);
             Fill(Stream_Video, StreamPos_Last, Video_FrameRate, SampleRate, 3, true);
         }
+
+        //MasteringDisplay specific info
+        std::map<std::string, Ztring>::iterator Info_MasteringDisplay_Primaries = Descriptor->second.Infos.find("MasteringDisplay_Primaries");
+        std::map<std::string, Ztring>::iterator Info_MasteringDisplay_WhitePointChromaticity = Descriptor->second.Infos.find("MasteringDisplay_WhitePointChromaticity");
+        std::map<std::string, Ztring>::iterator MasteringDisplay_Luminance_Max = Descriptor->second.Infos.find("MasteringDisplay_Luminance_Max");
+        std::map<std::string, Ztring>::iterator MasteringDisplay_Luminance_Min = Descriptor->second.Infos.find("MasteringDisplay_Luminance_Min");
+        if (Info_MasteringDisplay_Primaries!= Descriptor->second.Infos.end() || Info_MasteringDisplay_WhitePointChromaticity!= Descriptor->second.Infos.end())
+        {
+            Ztring MasteringDisplay_ColorPrimaries;
+            if (Info_MasteringDisplay_Primaries!= Descriptor->second.Infos.end())
+            {
+                MasteringDisplay_ColorPrimaries=Info_MasteringDisplay_Primaries->second;
+                if (Info_MasteringDisplay_WhitePointChromaticity!= Descriptor->second.Infos.end())
+                    MasteringDisplay_ColorPrimaries+=__T(", White point: ")+Info_MasteringDisplay_WhitePointChromaticity->second;
+            }
+            else
+                    MasteringDisplay_ColorPrimaries=__T("White point: ")+Info_MasteringDisplay_WhitePointChromaticity->second;
+
+            if (MasteringDisplay_ColorPrimaries==__T("R: x=0.640000 y=0.330000, G: x=0.300000 y=0.600000, B: x=0.150000 y=0.060000, White point: x=0.312700 y=0.329000")) MasteringDisplay_ColorPrimaries=__T("BT.709");
+            if (MasteringDisplay_ColorPrimaries==__T("R: x=0.708000 y=0.292000, G: x=0.170000 y=0.797000, B: x=0.131000 y=0.046000, White point: x=0.312700 y=0.329000")) MasteringDisplay_ColorPrimaries=__T("BT.2020");
+            if (MasteringDisplay_ColorPrimaries==__T("R: x=0.680000 y=0.320000, G: x=0.265000 y=0.690000, B: x=0.150000 y=0.060000, White point: x=0.312700 y=0.329000")) MasteringDisplay_ColorPrimaries=__T("Display P3");
+
+            Fill(StreamKind_Last, StreamPos_Last, "MasteringDisplay_ColorPrimaries", MasteringDisplay_ColorPrimaries, true);
+        }
+        if (MasteringDisplay_Luminance_Max!=Descriptor->second.Infos.end() || MasteringDisplay_Luminance_Min!=Descriptor->second.Infos.end())
+        {
+            Ztring MasteringDisplay_Luminance;
+            if (MasteringDisplay_Luminance_Min!=Descriptor->second.Infos.end())
+            {
+                MasteringDisplay_Luminance=__T("min: ")+MasteringDisplay_Luminance_Min->second+__T(" cd/m2");
+                if (MasteringDisplay_Luminance_Max!=Descriptor->second.Infos.end())
+                    MasteringDisplay_Luminance+=__T(", max: ")+ MasteringDisplay_Luminance_Max->second+__T(" cd/m2");;
+            }
+            else
+                    MasteringDisplay_Luminance=__T("max: ")+MasteringDisplay_Luminance_Max->second;
+            Fill(StreamKind_Last, StreamPos_Last, "MasteringDisplay_Luminance", MasteringDisplay_Luminance, true);
+        }
+
         for (std::map<std::string, Ztring>::iterator Info=Descriptor->second.Infos.begin(); Info!=Descriptor->second.Infos.end(); ++Info)
-            if (Retrieve(StreamKind_Last, StreamPos_Last, Info->first.c_str()).empty())
+            if (Info!=Info_MasteringDisplay_Primaries
+             && Info!=Info_MasteringDisplay_WhitePointChromaticity
+             && Info!=MasteringDisplay_Luminance_Max
+             && Info!=MasteringDisplay_Luminance_Min
+             && Retrieve(StreamKind_Last, StreamPos_Last, Info->first.c_str()).empty())
             {
                 //Special case
                 if (Info->first=="BitRate" && Retrieve(StreamKind_Last, StreamPos_Last, General_ID).find(__T(" / "))!=string::npos)
@@ -3886,6 +3940,36 @@ void File_Mxf::Streams_Finish_Component(const int128u ComponentUID, float64 Edit
             Fill(StreamKind_Last, StreamPos_Last, "FrameRate", EditRate);
 
         FillAllMergedStreams=false;
+
+        const Ztring& FrameRate_FromStream=Retrieve(StreamKind_Last, StreamPos_Last, "FrameRate");
+        if (FrameRate_FromStream.empty())
+            Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_FrameRate), EditRate);
+        else if (StreamKind_Last!=Stream_Audio || (Retrieve(Stream_Audio, StreamPos_Last, Audio_Format)==__T("Dolby E") && EditRate<1000)) //Arbitrary number for detecting frame rate vs sample rate (both are possible with Clip-wrapped MXF PCM e.g. 29.97 or 48000)
+        {
+            Ztring FrameRate_FromContainer; FrameRate_FromContainer.From_Number(EditRate);
+            if (FrameRate_FromStream!=FrameRate_FromContainer)
+            {
+                size_t ID_SubStreamInfo_Pos=Retrieve(StreamKind_Last, StreamPos_Last, General_ID).find(__T('-')); //Filling all tracks with same ID (e.g. Dolby E). TODO: merge code
+                size_t StreamPos_Last_Temp=StreamPos_Last;
+                Ztring ID;
+                if (ID_SubStreamInfo_Pos!=string::npos)
+                {
+                    ID=Retrieve(StreamKind_Last, StreamPos_Last, General_ID);
+                    ID.resize(ID_SubStreamInfo_Pos+1);
+                }
+                for (;;)
+                {
+                    //Merge was already done, we need to do here Container/Stream coherency test. TODO: merge of code
+                    Fill(StreamKind_Last, StreamPos_Last_Temp, "FrameRate_Original", FrameRate_FromStream);
+                    Fill(StreamKind_Last, StreamPos_Last_Temp, Fill_Parameter(StreamKind_Last, Generic_FrameRate), FrameRate_FromContainer, true);
+                    if (ID.empty() || !StreamPos_Last_Temp)
+                        break;
+                    StreamPos_Last_Temp--;
+                    if (Retrieve(StreamKind_Last, StreamPos_Last_Temp, General_ID).find(ID)!=0)
+                        break;
+                }
+            }
+        }
     }
 }
 
@@ -6490,13 +6574,6 @@ void File_Mxf::CDCIEssenceDescriptor()
             int32u Code_Compare4=(int32u)Primer_Value->second.lo;
             if(0);
             ELEMENT_UUID(SubDescriptors,                                "Sub Descriptors")
-            else
-            {
-                Element_Info1(Ztring().From_UUID(Primer_Value->second));
-                Skip_XX(Length2,                                        "Data");
-            }
-
-            return;
         }
     }
 
@@ -6892,6 +6969,24 @@ void File_Mxf::GenericPackage()
 //---------------------------------------------------------------------------
 void File_Mxf::GenericPictureEssenceDescriptor()
 {
+    if (Code2>=0x8000)
+    {
+        // Not a short code
+        std::map<int16u, int128u>::iterator Primer_Value=Primer_Values.find(Code2);
+        if (Primer_Value!=Primer_Values.end())
+        {
+            int32u Code_Compare1=Primer_Value->second.hi>>32;
+            int32u Code_Compare2=(int32u)Primer_Value->second.hi;
+            int32u Code_Compare3=Primer_Value->second.lo>>32;
+            int32u Code_Compare4=(int32u)Primer_Value->second.lo;
+            if(0);
+            ELEMENT_UUID(MasteringDisplayPrimaries, "Mastering Display Primaries")
+            ELEMENT_UUID(MasteringDisplayWhitePointChromaticity, "Mastering Display White Point Chromaticity")
+            ELEMENT_UUID(MasteringDisplayMaximumLuminance, "Mastering Display Maximum Luminance")
+            ELEMENT_UUID(MasteringDisplayMinimumLuminance, "Mastering Display Minimum Luminance")
+        }
+    }
+
     switch(Code2)
     {
         ELEMENT(3201, GenericPictureEssenceDescriptor_PictureEssenceCoding, "Identifier of the Picture Compression Scheme")
@@ -9592,6 +9687,96 @@ void File_Mxf::GenericPictureEssenceDescriptor_CodingEquations()
 
     FILLING_BEGIN();
         Descriptor_Fill("matrix_coefficients", Mxf_CodingEquations(Data));
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::MasteringDisplayPrimaries()
+{
+    //Parsing
+    int16u x[3];
+    int16u y[3];
+    for (size_t c = 0; c < 3; c++)
+    {
+        Get_B2(x[c],                                            "display_primaries_x");
+        Get_B2(y[c],                                            "display_primaries_y");
+    }
+
+    FILLING_BEGIN();
+        //Reordering to RGB
+        size_t G=4, B=4, R=4;
+        for (size_t c=0; c<3; c++)
+        {
+            if (x[c]<17500 && y[c]<17500)
+                B=c;
+            else if (y[c]-x[c]>=0)
+                G=c;
+            else
+                R=c;
+        }
+        if ((R|B|G)>=4)
+        {
+            //Order not automatically detected, betting on GBR order
+            G=0;
+            B=1;
+            R=2;
+        }
+
+        Ztring
+        MasteringDisplay_ColorPrimaries=__T("R: x=")+Ztring::ToZtring(((float64)x[R])/50000, 6)
+                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[R])/50000, 6)
+                                     +__T(", G: x=")+Ztring::ToZtring(((float64)x[G])/50000, 6)
+                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[G])/50000, 6)
+                                     +__T(", B: x=")+Ztring::ToZtring(((float64)x[B])/50000, 6)
+                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[B])/50000, 6)
+            ;
+        Descriptor_Fill("MasteringDisplay_Primaries", MasteringDisplay_ColorPrimaries);
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::MasteringDisplayWhitePointChromaticity()
+{
+    int16u x;
+    int16u y;
+    Get_B2(x,                                                   "white_point_x");
+    Get_B2(y,                                                   "white_point_y");
+
+    FILLING_BEGIN();
+        Ztring
+        MasteringDisplay_ColorPrimaries=
+                                           __T("x=")+Ztring::ToZtring(((float64)x)/50000, 6)
+                                       +__T(  " y=")+Ztring::ToZtring(((float64)y)/50000, 6);
+            ;
+        Descriptor_Fill("MasteringDisplay_WhitePointChromaticity", MasteringDisplay_ColorPrimaries);
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::MasteringDisplayMaximumLuminance()
+{
+    //Parsing
+    int32u max;
+    Get_B4 (max,                                                "Data");
+
+    FILLING_BEGIN();
+        Descriptor_Fill("MasteringDisplay_Luminance_Max", Ztring::ToZtring(((float64)max)/10000, (max-((int)max)==0)?0:4));
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+//
+void File_Mxf::MasteringDisplayMinimumLuminance()
+{
+    //Parsing
+    int32u min;
+    Get_B4 (min,                                               "Data");
+
+    FILLING_BEGIN();
+        Descriptor_Fill("MasteringDisplay_Luminance_Min", Ztring::ToZtring(((float64)min)/10000, 4));
     FILLING_END();
 }
 
@@ -14887,7 +15072,7 @@ void File_Mxf::Info_UL_040101_Values()
                                             switch (Code6)
                                             {
                                                 case 0x01 :
-                                                    Param_Info1("BT.470");
+                                                    Param_Info1("BT.470 System B/G");
                                                     Skip_B2(    "Reserved");
                                                     break;
                                                 case 0x02 :
@@ -14903,7 +15088,7 @@ void File_Mxf::Info_UL_040101_Values()
                                                     Skip_B2(    "Reserved");
                                                     break;
                                                 case 0x05 :
-                                                    Param_Info1("BT.1361 extended colour gamut system");
+                                                    Param_Info1("BT.1361");
                                                     Skip_B2(    "Reserved");
                                                     break;
                                                 case 0x06 :
@@ -14953,7 +15138,7 @@ void File_Mxf::Info_UL_040101_Values()
                                                     Skip_B2(    "Reserved");
                                                     break;
                                                 case 0x02 :
-                                                    Param_Info1("BT.470 System B");
+                                                    Param_Info1("BT.470 System B/G");
                                                     Skip_B2(    "Reserved");
                                                     break;
                                                 case 0x03 :

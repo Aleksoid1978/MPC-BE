@@ -768,7 +768,9 @@ public :
     // Others, specialized
     //***************************************************************************
 
+    #if defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES)
     void Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance);
+    #endif
 
     //***************************************************************************
     // Unknown

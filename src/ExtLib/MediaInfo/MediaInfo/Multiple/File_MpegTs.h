@@ -137,6 +137,7 @@ private :
     void Streams_Update_Duration_End();
     void SetAllToPES();
     void transport_private_data(int8u transport_private_data_length);
+    void MergeGeneral(complete_stream::stream* Parser, general Parameter);
 
     #if MEDIAINFO_DUPLICATE
         //File__Duplicate

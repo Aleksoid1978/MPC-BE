@@ -33,10 +33,8 @@ extern const char* Aac_audioObjectType(int8u audioObjectType);
 //---------------------------------------------------------------------------
 void File_Aac::ps_data(size_t End)
 {
-    FILLING_BEGIN();
-        if (Infos["Format_Settings_PS"].empty())
-            FillInfosHEAACv2(__T("Implicit"));
-    FILLING_END();
+    if (raw_data_block_Pos>=pss.size())
+        pss.resize(raw_data_block_Pos+1);
 
     //Parsing
     Element_Begin1("ps_data");
@@ -45,7 +43,9 @@ void File_Aac::ps_data(size_t End)
     if (enable_ps_header)
     {
         //Init
-        delete ps; ps=new ps_handler();
+        delete pss[raw_data_block_Pos];
+        ps=new ps_handler;
+        pss[raw_data_block_Pos]=ps;
 
         Get_SB(ps->enable_iid,                                  "enable_iid");
         if (ps->enable_iid)
@@ -59,6 +59,8 @@ void File_Aac::ps_data(size_t End)
         }
         Get_SB(ps->enable_ext,                                  "enable_ext");
     }
+    else
+        ps=pss[raw_data_block_Pos];
 
     if (ps==NULL)
     {
@@ -72,6 +74,11 @@ void File_Aac::ps_data(size_t End)
     if (Data_BS_Remain()>End)
         Skip_BS(Data_BS_Remain()-End,                           "Data");
     Element_End0();
+
+    FILLING_BEGIN();
+    if (Infos["Format_Settings_PS"].empty())
+        FillInfosHEAACv2(__T("Implicit"));
+    FILLING_END();
 }
 
 } //NameSpace

@@ -686,13 +686,13 @@ void File_MpegPs::Streams_Finish_PerStream(size_t StreamID, ps_stream &Temp, kin
             StreamPos_Last=Temp.StreamPos;
         }
 
-        //Law rating
-        Ztring LawRating=Temp.Parsers[0]->Retrieve(Stream_General, 0, General_LawRating);
-        if (!LawRating.empty())
-            Fill(Stream_General, 0, General_LawRating, LawRating, true);
-        Ztring Title=Temp.Parsers[0]->Retrieve(Stream_General, 0, General_Title);
-        if (!Title.empty() && Retrieve(Stream_General, 0, General_Title).empty())
-            Fill(Stream_General, 0, General_Title, Title);
+        //From parser General part
+        MergeGeneral(Temp.Parsers[0], General_LawRating);
+        MergeGeneral(Temp.Parsers[0], General_Title);
+        MergeGeneral(Temp.Parsers[0], General_Recorded_Date);
+        MergeGeneral(Temp.Parsers[0], General_Encoded_Application);
+        MergeGeneral(Temp.Parsers[0], General_Encoded_Application_CompanyName);
+        MergeGeneral(Temp.Parsers[0], General_Encoded_Application_Name);
     }
 
     //Duration if it is missing from the parser
@@ -4885,6 +4885,18 @@ size_t File_MpegPs::Output_Buffer_Get (size_t Pos_)
                     return Size;
 
     return 0;
+}
+
+//***************************************************************************
+// Helpers
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void File_MpegPs::MergeGeneral(File__Analyze* Parser, general Parameter)
+{
+    const Ztring& Value=Parser->Retrieve_Const(Stream_General, 0, Parameter);
+    if (!Value.empty())
+        Fill(Stream_General, 0, Parameter, Value, true);
 }
 
 } //Namespace

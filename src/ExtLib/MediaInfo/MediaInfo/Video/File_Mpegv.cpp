@@ -21,7 +21,7 @@
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-#if defined(MEDIAINFO_MPEGV_YES) || defined(MEDIAINFO_MPEG4V_YES) || defined(MEDIAINFO_AVC_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_PRORES_YES)
+#if defined(MEDIAINFO_MPEGV_YES) || defined(MEDIAINFO_MPEG4V_YES) || defined(MEDIAINFO_AVC_YES) || defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_PRORES_YES)
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -55,21 +55,21 @@ extern const char* Mpegv_transfer_characteristics(int8u transfer_characteristics
 {
     switch (transfer_characteristics)
     {
-        case  1 : return "BT.709"; //Same as BT.609
+        case  1 : return "BT.709"; //Same as BT.601
         case  4 : return "BT.470 System M";
-        case  5 : return "BT.470 System B, BT.470 System G";
+        case  5 : return "BT.470 System B/G";
         case  6 : return "BT.601";
         case  7 : return "SMPTE 240M";
         case  8 : return "Linear";
         case  9 : return "Logarithmic (100:1)";                         //Added in MPEG-4 Visual
         case 10 : return "Logarithmic (316.22777:1)";                   //Added in MPEG-4 Visual
-        case 11 : return "sRGB";                                        //Added in AVC
-        case 12 : return "BT.1361 extended colour gamut system";        //Added in AVC
-        case 13 : return "sYCC";                                        //Added in HEVC
-        case 14 : return "BT.2020 (10-bit)";                            //Added in HEVC, 10/12-bit difference is in ISO 23001-8
-        case 15 : return "BT.2020 (12-bit)";                            //Added in HEVC, 10/12-bit difference is in ISO 23001-8
+        case 11 : return "xvYCC";                                       //Added in AVC
+        case 12 : return "BT.1361";                                     //Added in AVC
+        case 13 : return "sRGB/sYCC";                                   //Added in HEVC
+        case 14 : return "BT.2020 (10-bit)"; //Same a BT.601            //Added in HEVC, 10/12-bit difference is in ISO 23001-8
+        case 15 : return "BT.2020 (12-bit)"; //Same a BT.601            //Added in HEVC, 10/12-bit difference is in ISO 23001-8
         case 16 : return "PQ";                                          //Added in HEVC 2015
-        case 17 : return "SMPTE ST 428-1";                              //Added in HEVC 2015
+        case 17 : return "SMPTE 428M";                                  //Added in HEVC 2015
         case 18 : return "HLG";                                         //Added in HEVC 2016
         default : return "";
     }
@@ -83,8 +83,8 @@ extern const char* Mpegv_matrix_coefficients(int8u matrix_coefficients)
         case  0 : return "Identity";                                    //Added in AVC
         case  1 : return "BT.709";
         case  4 : return "FCC 73.682";
-        case  5 : return "BT.470 System B, BT.470 System G"; //Same as BT.601
-        case  6 : return "BT.601";
+        case  5 : return "BT.470 System B/G";
+        case  6 : return "BT.601"; //Same as BT.470 System B/G
         case  7 : return "SMPTE 240M";
         case  8 : return "YCgCo";                                       //Added in AVC
         case  9 : return "BT.2020 non-constant";                        //Added in HEVC
@@ -1104,6 +1104,7 @@ File_Mpegv::File_Mpegv()
 
     //temporal_reference
     TemporalReference_Offset=0;
+    temporal_reference=0;
     #if defined(MEDIAINFO_DTVCCTRANSPORT_YES)
         GA94_03_Parser=NULL;
         GA94_03_TemporalReference_Offset=0;

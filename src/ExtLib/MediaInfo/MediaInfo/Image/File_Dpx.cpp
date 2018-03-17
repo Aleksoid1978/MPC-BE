@@ -141,40 +141,39 @@ static const char* DPX_Descriptors_ChromaSubsampling(int8u i)
 }
 
 //---------------------------------------------------------------------------
-const char* Mpegv_transfer_characteristics(int8u transfer_characteristics);
 static const char* DPX_TransferCharacteristic(int8u TransferCharacteristic)
 {
     switch (TransferCharacteristic)
     {
         case  1 : return "Printing density";
-        case  2 : return Mpegv_transfer_characteristics(8);             //Linear
+        case  2 : return "Linear";
         case  3 : return "Logarithmic";                                 //Value not specified in specs
-        case  5 :                                                       //SMPTE 274M, for HDTV, mapped to BT.709
-        case  6 : return Mpegv_transfer_characteristics(1);             //BT.709
-        case  7 : return Mpegv_transfer_characteristics(5);             //BT.470 System B, BT.470 System G (typo in specs?)
-        case  8 : return Mpegv_transfer_characteristics(4);             //BT.470 System M (typo in specs?)
-        case  9 :                                                       //BT.601 (NTSC)
-        case 10 : return Mpegv_transfer_characteristics(6);             //BT.601 (PAL)
+        case  5 : return "SMPTE 274M";                                  //Same as BT.709
+        case  6 : return "BT.709";
+        case  7 : return "BT.601 PAL";                                  //BT.470 System B, BT.470 System G, ISO does a difference between B and M
+        case  8 : return "BT.601 NTSC";                                 //BT.470 System M, ISO does a difference between B and M
+        case  9 : return "Composite NTSC";
+        case 10 : return "Composite PAL";
         case 11 : return "Z (depth) - linear";
         case 12 : return "Z (depth) - homogeneous";
+        case 13 : return "ADX";                                         //SMPTE ST 2065-3 Academy Density Exchange Encoding
         default : return "";
     }
 };
 
 //---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
-const char* Mpegv_colour_primaries(int8u colour_primaries);
 static const char* DPX_ColorimetricSpecification(int8u ColorimetricSpecification)
 {
     switch (ColorimetricSpecification)
     {
         case  1 : return "Printing density";
-        case  5 :                                                       //SMPTE 274M, for HDTV, mapped to BT.709
-        case  6 : return Mpegv_colour_primaries(1);                     //BT.709
-        case  7 : return Mpegv_colour_primaries(5);                     //BT.470 System B, BT.470 System G (typo in specs?), mapped to BT.601 PAL
-        case  8 : return Mpegv_colour_primaries(6);                     //BT.470 System M (typo in specs?), mapped to BT.601 NTSC
-        case  9 : return Mpegv_colour_primaries(6);                     //BT.601 NTSC
-        case 10 : return Mpegv_colour_primaries(5);                     //BT.601 PAL
+        case  5 : return "SMPTE 274M";                                  //SMPTE 274M, for HDTV, mapped to BT.709
+        case  6 : return "BT.709";
+        case  7 : return "BT.601 PAL";                                  //BT.470 System B, BT.470 System G
+        case  8 : return "BT.601 NTSC";                                 //BT.470 System M
+        case  9 : return "Composite NTSC";
+        case 10 : return "Composite PAL";
+        case 13 : return "ADX";                                         //SMPTE ST 2065-3 Academy Density Exchange Encoding
         default : return "";
     }
 }
@@ -202,27 +201,27 @@ static const char* DPX_ValidBitDephs(int8u i)
 //---------------------------------------------------------------------------
 static const char* DPX_ComponentDataPackingMethod[]=
 {
-    "Packed into 32-bit words",
-    "Filled to 32-bit words, method A",
-    "Filled to 32-bit words, method B",
-    "Reserved for future use",
-    "Reserved for future use",
-    "Reserved for future use",
-    "Reserved for future use",
-    "Reserved for future use"
+    "Packed",
+    "Filled A",
+    "Filled B",
+    "",
+    "",
+    "",
+    "",
+    "",
 };
 
 //---------------------------------------------------------------------------
 static const char* DPX_ComponentDataEncodingMethod[]=
 {
-    "No encoding applied",
-    "Run-length encoded",
-    "Reserved for future use",
-    "Reserved for future use",
-    "Reserved for future use",
-    "Reserved for future use",
-    "Reserved for future use",
-    "Reserved for future use"
+    "Raw",
+    "RLE",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
 };
 
 //---------------------------------------------------------------------------
@@ -402,6 +401,10 @@ void File_Dpx::Streams_Accept()
 
     //Configuration
     Buffer_MaximumSize=64*1024*1024; //Some big frames are possible (e.g YUV 4:2:2 10 bits 1080p)
+
+    //Filling
+    Fill(StreamKind_Last, StreamPos_Last, "Format_Settings_Endianness" /*Fill_Parameter(StreamKind_Last, Generic_Format)*/, LittleEndian?"Little":"Big");
+    Fill(StreamKind_Last, StreamPos_Last, "Format_Settings", LittleEndian? "Little":"Big");
 }
 
 //***************************************************************************
@@ -782,6 +785,7 @@ void File_Dpx::GenericSectionHeader_Dpx()
 void File_Dpx::GenericSectionHeader_Dpx_ImageElement()
 {
     Element_Begin1("image element");
+    int16u ComponentDataPackingMethod, ComponentDataEncodingMethod;
     int8u Descriptor, TransferCharacteristic, ColorimetricSpecification, BitDephs;
     Info_X4(DataSign,                                           "Data sign");Param_Info1((DataSign==0?"unsigned":"signed"));
     Skip_B4(                                                    "Reference low data code value");
@@ -792,11 +796,11 @@ void File_Dpx::GenericSectionHeader_Dpx_ImageElement()
     Get_B1 (TransferCharacteristic,                             "Transfer characteristic");Param_Info1(DPX_TransferCharacteristic(TransferCharacteristic));
     Get_B1 (ColorimetricSpecification,                          "Colorimetric specification");Param_Info1(DPX_ColorimetricSpecification(ColorimetricSpecification));
     Get_B1 (BitDephs,                                           "Bit depth");Param_Info1(DPX_ValidBitDephs(BitDephs));
-    Info_X2(ComponentDataPackingMethod,                         "Packing");Param_Info1((ComponentDataPackingMethod<8?DPX_ComponentDataPackingMethod[ComponentDataPackingMethod]:"invalid"));
-    Info_X2(ComponentDataEncodingMethod,                        "Encoding");Param_Info1((ComponentDataEncodingMethod<8?DPX_ComponentDataEncodingMethod[ComponentDataEncodingMethod]:"invalid"));
-    Skip_B4(                                                    "Offset to data");
-    Skip_B4(                                                    "End-of-line padding");
-    Skip_B4(                                                    "End-of-image padding");
+    Get_X2 (ComponentDataPackingMethod,                         "Packing");Param_Info1((ComponentDataPackingMethod<8?DPX_ComponentDataPackingMethod[ComponentDataPackingMethod]:"invalid"));
+    Get_X2 (ComponentDataEncodingMethod,                        "Encoding");Param_Info1((ComponentDataEncodingMethod<8?DPX_ComponentDataEncodingMethod[ComponentDataEncodingMethod]:"invalid"));
+    Skip_X4(                                                    "Offset to data");
+    Skip_X4(                                                    "End-of-line padding");
+    Skip_X4(                                                    "End-of-image padding");
     Skip_UTF8(32,                                               "Description of image element");
     Element_End0();
 
@@ -809,6 +813,15 @@ void File_Dpx::GenericSectionHeader_Dpx_ImageElement()
             Fill(StreamKind_Last, StreamPos_Last, "colour_description_present", "Yes");
             Fill(StreamKind_Last, StreamPos_Last, "colour_primaries", DPX_TransferCharacteristic(TransferCharacteristic));
             Fill(StreamKind_Last, StreamPos_Last, "transfer_characteristics", DPX_ColorimetricSpecification(ColorimetricSpecification));
+            if (ComponentDataPackingMethod<8)
+            {
+                Fill(StreamKind_Last, StreamPos_Last, "Format_Settings", DPX_ComponentDataPackingMethod[ComponentDataPackingMethod]);
+                Fill(StreamKind_Last, StreamPos_Last, "Format_Settings_Packing", DPX_ComponentDataPackingMethod[ComponentDataPackingMethod]);
+            }
+            if (ComponentDataEncodingMethod<8)
+            {
+                Fill(StreamKind_Last, StreamPos_Last, "Format_Compression", DPX_ComponentDataEncodingMethod[ComponentDataEncodingMethod]);
+            }
         }
     FILLING_END();
 }

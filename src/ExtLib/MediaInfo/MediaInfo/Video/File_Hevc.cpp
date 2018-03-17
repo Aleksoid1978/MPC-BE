@@ -797,6 +797,7 @@ void File_Hevc::Synched_Init()
     maximum_content_light_level=0;
     maximum_frame_average_light_level=0;
     preferred_transfer_characteristics=2;
+    chroma_format_idc=0;
 
     //Default values
     Streams.resize(0x100);

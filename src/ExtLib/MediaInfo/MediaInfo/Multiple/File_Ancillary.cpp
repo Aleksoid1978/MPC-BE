@@ -343,9 +343,9 @@ void File_Ancillary::Streams_Finish()
     #endif //defined(MEDIAINFO_MXF_YES)
 
     //Unsupported streams
-    for (DataID = 0; DataID<Unknown.size(); DataID++)
-        for (SecondaryDataID = 0; SecondaryDataID<Unknown[DataID].size(); SecondaryDataID++)
-            for (perid::iterator Stream = Unknown[DataID][SecondaryDataID].begin(); Stream!=Unknown[DataID][SecondaryDataID].end(); ++Stream)
+    for (size_t i = 0; i<Unknown.size(); i++)
+        for (size_t j = 0; j<Unknown[i].size(); j++)
+            for (perid::iterator Stream = Unknown[i][j].begin(); Stream!=Unknown[i][j].end(); ++Stream)
             {
                 Stream_Prepare(Stream->second.StreamKind);
                 for (std::map<string, Ztring>::iterator Info=Stream->second.Infos.begin(); Info!=Stream->second.Infos.end(); ++Info)

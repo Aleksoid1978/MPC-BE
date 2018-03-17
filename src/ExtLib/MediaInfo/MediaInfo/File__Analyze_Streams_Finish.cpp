@@ -310,6 +310,10 @@ void File__Analyze::TestContinuousFileNames(size_t CountOfFiles, Ztring FileExte
         Fill (Stream_General, 0, General_FolderName_Last, FileName::Path_Get(Config->File_Names[Config->File_Names.size()-1]), true);
         Fill (Stream_General, 0, General_FileName_Last, FileName::Name_Get(Config->File_Names[Config->File_Names.size()-1]), true);
         Fill (Stream_General, 0, General_FileExtension_Last, FileName::Extension_Get(Config->File_Names[Config->File_Names.size()-1]), true);
+        if (Retrieve(Stream_General, 0, General_FileExtension_Last).empty())
+            Fill(Stream_General, 0, General_FileNameExtension_Last, Retrieve(Stream_General, 0, General_FileName_Last));
+        else
+            Fill(Stream_General, 0, General_FileNameExtension_Last, Retrieve(Stream_General, 0, General_FileName_Last)+__T('.')+Retrieve(Stream_General, 0, General_FileExtension_Last));
     }
 
     #if MEDIAINFO_ADVANCED
@@ -557,6 +561,15 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
     }
 
     //Commercial name
+    if (Retrieve(Stream_Video, Pos, Video_Format_Commercial_IfAny).empty()
+     && Retrieve(Stream_Video, Pos, Video_BitDepth)==__T("10")
+     && Retrieve(Stream_Video, Pos, Video_ChromaSubsampling)==__T("4:2:0")
+     && Retrieve(Stream_Video, Pos, Video_colour_primaries)==__T("BT.2020")
+     && Retrieve(Stream_Video, Pos, Video_transfer_characteristics)==__T("PQ")
+     && Retrieve(Stream_Video, Pos, Video_matrix_coefficients).find(__T("BT.2020"))==0
+     && !Retrieve(Stream_Video, Pos, "MasteringDisplay_ColorPrimaries").empty()
+        )
+        Fill(Stream_Video, Pos, Video_Format_Commercial_IfAny, "HDR10");
     #if defined(MEDIAINFO_VC3_YES)
         if (Retrieve(Stream_Video, Pos, Video_Format_Commercial_IfAny).empty() && Retrieve(Stream_Video, Pos, Video_Format)==__T("VC-3") && Retrieve(Stream_Video, Pos, Video_Format_Profile).find(__T("HD"))==0)
         {
