@@ -2734,6 +2734,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .props     = AV_CODEC_PROP_LOSSY,
     },
     {
+        .id        = AV_CODEC_ID_CODEC2,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "codec2",
+        .long_name = NULL_IF_CONFIG_SMALL("codec2 (very low bitrate speech codec)"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
         .id        = AV_CODEC_ID_FFWAVESYNTH,
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "wavesynth",
@@ -2861,6 +2868,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "aptx_hd",
         .long_name = NULL_IF_CONFIG_SMALL("aptX HD (Audio Processing Technology for Bluetooth)"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_SBC,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "sbc",
+        .long_name = NULL_IF_CONFIG_SMALL("SBC (low-complexity subband codec)"),
         .props     = AV_CODEC_PROP_LOSSY,
     },
 
