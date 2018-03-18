@@ -4307,6 +4307,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 			{L"dxva2cb direct",  L"DXVA2 Copy-back (direct)"},
 			{L"d3d11 cb",        L"D3D11 Copy-back"},
 			{L"d3d11 cb direct", L"D3D11 Copy-back (direct)"},
+			{L"d3d11 native",    L"D3D11 Native"},
 			{L"cuvid",           L"Nvidia CUVID"},
 			{L"quicksync",       L"Intel QuickSync"},
 		};
