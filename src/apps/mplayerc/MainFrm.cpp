@@ -13753,6 +13753,8 @@ void CMainFrame::CloseMediaPrivate()
 		}
 	}
 
+	UnHookDirectXVideoDecoderService();
+
 	// madVR - unregister Callback function
 	if (m_pBFmadVR) {
 		CComQIPtr<IMadVRExclusiveModeCallback> pMVEMC = m_pBFmadVR;
