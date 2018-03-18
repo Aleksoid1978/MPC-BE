@@ -27,3 +27,4 @@ void UnhookNewSegmentAndReceive();
 
 // DXVA2 hook
 void HookDirectXVideoDecoderService(void* pIDirectXVideoDecoderService);
+void UnHookDirectXVideoDecoderService();

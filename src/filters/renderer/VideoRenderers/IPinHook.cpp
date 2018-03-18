@@ -1006,14 +1006,45 @@ static HRESULT STDMETHODCALLTYPE GetDecoderConfigurationsMine(IDirectXVideoDecod
 
 void HookDirectXVideoDecoderService(void* pIDirectXVideoDecoderService)
 {
-	IDirectXVideoDecoderServiceC* pIDirectXVideoDecoderServiceC = (IDirectXVideoDecoderServiceC*) pIDirectXVideoDecoderService;
+	UnHookDirectXVideoDecoderService();
 
-	BOOL res;
+	IDirectXVideoDecoderServiceC* pIDirectXVideoDecoderServiceC = (IDirectXVideoDecoderServiceC*)pIDirectXVideoDecoderService;
+
+	BOOL ret;
 	DWORD flOldProtect = 0;
 
-	// Casimir666 : unhook previous VTables
+#if defined(_DEBUG) && DXVA_LOGFILE_A
+	::DeleteFile (LOG_FILE_DXVA);
+	::DeleteFile (LOG_FILE_PICTURE);
+	::DeleteFile (LOG_FILE_SLICELONG);
+#endif
+
+	if (!g_pIDirectXVideoDecoderServiceCVtbl && pIDirectXVideoDecoderService) {
+		ret = VirtualProtect(pIDirectXVideoDecoderServiceC->lpVtbl, sizeof(IDirectXVideoDecoderServiceCVtbl), PAGE_WRITECOPY, &flOldProtect);
+
+		CreateVideoDecoderOrg = pIDirectXVideoDecoderServiceC->lpVtbl->CreateVideoDecoder;
+		pIDirectXVideoDecoderServiceC->lpVtbl->CreateVideoDecoder = CreateVideoDecoderMine;
+
+#ifdef _DEBUG
+		GetDecoderConfigurationsOrg = pIDirectXVideoDecoderServiceC->lpVtbl->GetDecoderConfigurations;
+		pIDirectXVideoDecoderServiceC->lpVtbl->GetDecoderConfigurations = GetDecoderConfigurationsMine;
+
+		//GetDecoderDeviceGuidsOrg = pIDirectXVideoDecoderServiceC->lpVtbl->GetDecoderDeviceGuids;
+		//pIDirectXVideoDecoderServiceC->lpVtbl->GetDecoderDeviceGuids = GetDecoderDeviceGuidsMine;
+#endif
+
+		ret = VirtualProtect(pIDirectXVideoDecoderServiceC->lpVtbl, sizeof(IDirectXVideoDecoderServiceCVtbl), flOldProtect, &flOldProtect);
+
+		g_pIDirectXVideoDecoderServiceCVtbl = pIDirectXVideoDecoderServiceC->lpVtbl;
+	}
+}
+
+void UnHookDirectXVideoDecoderService()
+{
 	if (g_pIDirectXVideoDecoderServiceCVtbl) {
-		res = VirtualProtect(g_pIDirectXVideoDecoderServiceCVtbl, sizeof(IDirectXVideoDecoderServiceCVtbl), PAGE_WRITECOPY, &flOldProtect);
+		BOOL ret;
+		DWORD flOldProtect = 0;
+		ret = VirtualProtect(g_pIDirectXVideoDecoderServiceCVtbl, sizeof(IDirectXVideoDecoderServiceCVtbl), PAGE_WRITECOPY, &flOldProtect);
 		if (g_pIDirectXVideoDecoderServiceCVtbl->CreateVideoDecoder == CreateVideoDecoderMine) {
 			g_pIDirectXVideoDecoderServiceCVtbl->CreateVideoDecoder = CreateVideoDecoderOrg;
 		}
@@ -1027,7 +1058,7 @@ void HookDirectXVideoDecoderService(void* pIDirectXVideoDecoderService)
 		//	g_pIDirectXVideoDecoderServiceCVtbl->GetDecoderDeviceGuids = GetDecoderDeviceGuidsOrg;
 #endif
 
-		res = VirtualProtect(g_pIDirectXVideoDecoderServiceCVtbl, sizeof(IDirectXVideoDecoderServiceCVtbl), flOldProtect, &flOldProtect);
+		ret = VirtualProtect(g_pIDirectXVideoDecoderServiceCVtbl, sizeof(IDirectXVideoDecoderServiceCVtbl), flOldProtect, &flOldProtect);
 
 		g_pIDirectXVideoDecoderServiceCVtbl = nullptr;
 		CreateVideoDecoderOrg               = nullptr;
@@ -1035,30 +1066,5 @@ void HookDirectXVideoDecoderService(void* pIDirectXVideoDecoderService)
 		GetDecoderConfigurationsOrg         = nullptr;
 #endif
 		DXVAState::ClearState();
-	}
-
-#if defined(_DEBUG) && DXVA_LOGFILE_A
-	::DeleteFile (LOG_FILE_DXVA);
-	::DeleteFile (LOG_FILE_PICTURE);
-	::DeleteFile (LOG_FILE_SLICELONG);
-#endif
-
-	if (!g_pIDirectXVideoDecoderServiceCVtbl && pIDirectXVideoDecoderService) {
-		res = VirtualProtect(pIDirectXVideoDecoderServiceC->lpVtbl, sizeof(IDirectXVideoDecoderServiceCVtbl), PAGE_WRITECOPY, &flOldProtect);
-
-		CreateVideoDecoderOrg = pIDirectXVideoDecoderServiceC->lpVtbl->CreateVideoDecoder;
-		pIDirectXVideoDecoderServiceC->lpVtbl->CreateVideoDecoder = CreateVideoDecoderMine;
-
-#ifdef _DEBUG
-		GetDecoderConfigurationsOrg = pIDirectXVideoDecoderServiceC->lpVtbl->GetDecoderConfigurations;
-		pIDirectXVideoDecoderServiceC->lpVtbl->GetDecoderConfigurations = GetDecoderConfigurationsMine;
-
-		//GetDecoderDeviceGuidsOrg = pIDirectXVideoDecoderServiceC->lpVtbl->GetDecoderDeviceGuids;
-		//pIDirectXVideoDecoderServiceC->lpVtbl->GetDecoderDeviceGuids = GetDecoderDeviceGuidsMine;
-#endif
-
-		res = VirtualProtect(pIDirectXVideoDecoderServiceC->lpVtbl, sizeof(IDirectXVideoDecoderServiceCVtbl), flOldProtect, &flOldProtect);
-
-		g_pIDirectXVideoDecoderServiceCVtbl = pIDirectXVideoDecoderServiceC->lpVtbl;
 	}
 }
