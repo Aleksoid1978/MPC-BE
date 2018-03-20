@@ -2259,7 +2259,7 @@ HRESULT CDX9RenderingEngine::InitCorrectionPass(const AM_MEDIA_TYPE& input_mt)
 		if (extformat.VideoTransferMatrix == 7) {
 			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_YCGCO : IDF_SHADER_PS20_CORRECTION_YCGCO);
 		}
-		else if (extformat.VideoTransferFunction == 16) {
+		else if (extformat.VideoTransferFunction == 15) {
 			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_ST2084 : IDF_SHADER_PS20_CORRECTION_ST2084);
 		}
 		else if (extformat.VideoTransferFunction == 18) {

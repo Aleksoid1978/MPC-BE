@@ -56,8 +56,6 @@ protected:
 
 	long m_cBuffers;
 
-	CLSID m_RenderClsid;
-
 	CCritSec m_csReceive;
 
 	DECODER_MODE m_nDecoderMode;
