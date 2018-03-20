@@ -219,7 +219,8 @@ namespace Content {
 						content.ct = L"application/http-live-streaming-m3u";
 					}
 					if ((content.ct.Find(L"text/plain") == 0
-							|| content.ct.Find(L"application/vnd.apple.mpegurl") == 0) && content.body.Find(L"#EXTM3U") == 0) {
+							|| content.ct.Find(L"application/vnd.apple.mpegurl") == 0
+							|| content.ct.Find(L"audio/mpegurl") == 0) && content.body.Find(L"#EXTM3U") == 0) {
 						content.ct = L"audio/x-mpegurl";
 					}
 				}
