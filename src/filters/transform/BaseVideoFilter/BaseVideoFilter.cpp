@@ -58,7 +58,6 @@ CBaseVideoFilter::CBaseVideoFilter(TCHAR* pName, LPUNKNOWN lpunk, HRESULT* phr, 
 	, m_cBuffers(cBuffers)
 	, m_bSendMediaType(false)
 	, m_nDecoderMode(MODE_SOFTWARE)
-	, m_RenderClsid(CLSID_NULL)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -194,13 +193,15 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 {
 	CMediaType& mt = m_pOutput->CurrentMediaType();
 
-	if (m_RenderClsid == CLSID_NULL) {
+	auto GetRenderCLSID = [&]() {
+		CLSID renderClsid = CLSID_NULL;
 		CComPtr<IPin> pPin = m_pOutput;
-		CComPtr<IPin> pPinRenderer;
 		for (CComPtr<IBaseFilter> pBF = this; pBF = GetDownStreamFilter(pBF, pPin); pPin = GetFirstPin(pBF, PINDIR_OUTPUT)) {
-			m_RenderClsid = GetCLSID(pBF);
+			renderClsid = GetCLSID(pBF);
 		}
-	}
+		return renderClsid;
+	};
+	static CLSID renderClsid = GetRenderCLSID();
 
 	bool bNeedReconnect = bForce;
 	{
@@ -228,6 +229,13 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 	}
 
 	if (dxvaExtFormat) {
+		if (renderClsid == CLSID_madVR) {
+			// madVR uses a different value for SMPTE ST 2084
+			if (dxvaExtFormat->VideoTransferFunction == 15) {
+				dxvaExtFormat->VideoTransferFunction = 16;
+			}
+		}
+
 		VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.Format();
 		if (vih2->dwControlFlags != dxvaExtFormat->value) {
 			bNeedReconnect = true;
