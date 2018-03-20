@@ -24,6 +24,8 @@
 #include <afxinet.h>
 #include "TextFile.h"
 #include <Utf8.h>
+#include "../DSUtil/FileHandle.h"
+#include "../DSUtil/HTTPAsync.h"
 
 #define TEXTFILE_BUFFER_SIZE (64 * 1024)
 
@@ -725,48 +727,34 @@ bool CWebTextFile::Open(LPCWSTR lpszFileName)
 		return __super::Open(lpszFileName);
 	}
 
-	HINTERNET f, s = InternetOpen(L"Googlebot", 0, NULL, NULL, 0);
-	if (s) {
-		f = InternetOpenUrl(s, fn, NULL, 0, INTERNET_FLAG_NO_COOKIES | INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
-		if (f) {
-			WCHAR path[MAX_PATH];
-			GetTempPathW(MAX_PATH, path);
-
-			fn = path + fn.Mid(fn.ReverseFind('/') + 1);
-			int i = fn.Find(L"?");
-			if (i > 0) {
-				fn = fn.Left(i);
-			}
+	CHTTPAsync m_HTTPAsync;
+	if (SUCCEEDED(m_HTTPAsync.Connect(lpszFileName, 5000))) {
+		if (GetTemporaryFilePath(L".tmp", fn)) {
 			CFile temp;
 			if (!temp.Open(fn, modeCreate | modeWrite | typeBinary | shareDenyWrite)) {
-				InternetCloseHandle(f);
-				InternetCloseHandle(s);
+				m_HTTPAsync.Close();
 				return false;
 			}
 
-			char buffer[1024]	= { 0 };
-			DWORD dwBytesRead	= 0;
-			DWORD totalSize		= 0;
+			BYTE buffer[1024] = {};
+			DWORD dwSizeRead  = 0;
+			DWORD totalSize   = 0;
 			do {
-				if (InternetReadFile(f, (LPVOID)buffer, _countof(buffer), &dwBytesRead) == FALSE) {
+				if (m_HTTPAsync.Read(buffer, 1024, &dwSizeRead) != S_OK) {
 					break;
 				}
-
-				temp.Write(buffer, dwBytesRead);
-				totalSize += dwBytesRead;
-			} while (dwBytesRead && totalSize < m_llMaxSize);
-			InternetCloseHandle(f);
+				temp.Write(buffer, dwSizeRead);
+				totalSize += dwSizeRead;
+			} while (dwSizeRead && totalSize < m_llMaxSize);
+			temp.Close();
 
 			if (totalSize) {
 				m_tempfn = fn;
 			}
-
-			InternetCloseHandle(f);
 		}
 
-		InternetCloseHandle(s);
+		m_HTTPAsync.Close();
 	}
-
 
 	return __super::Open(m_tempfn);
 }
