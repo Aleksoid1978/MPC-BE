@@ -1059,7 +1059,7 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 		const CString ct = Content::GetType(fn, &redir);
 		if (!redir.empty()) {
 			for (const auto& r : redir) {
-				ParsePlayList(r, subs);
+				ParsePlayList(r, subs, false);
 			}
 			return;
 		}
