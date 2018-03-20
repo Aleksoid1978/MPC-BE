@@ -230,7 +230,6 @@ namespace Content {
 
 	enum {
 		PLAYLIST_NONE = -1,
-		PLAYLIST_M3U,
 		PLAYLIST_PLS,
 		PLAYLIST_XSPF,
 		PLAYLIST_ASX,
@@ -239,7 +238,6 @@ namespace Content {
 		PLAYLIST_WPL,
 	};
 
-	const std::wregex ref_m3u(L"(^|\\n)(?!#)([^\\n]+)");                                                // any lines except those that start with '#'
 	const std::wregex ref_pls(L"(^|\\n)File\\d+[ \\t]*=[ \\t]*\"?([^\\n\"]+)");                         // File1=...
 	const std::wregex ref_xspf(L"<location>([^<>\\n]+)</location>");                                    // <location>...</location>
 	const std::wregex ref_asx(L"<REF HREF[ \\t]*=[ \\t]*\"([^\"\\n]+)\"", std::regex_constants::icase); // <REF HREF = "..." />
@@ -252,7 +250,6 @@ namespace Content {
 		std::wregex rgx;
 
 		switch (playlist_type) {
-			case PLAYLIST_M3U: rgx = ref_m3u;  break;
 			case PLAYLIST_PLS: rgx = ref_pls;  break;
 			case PLAYLIST_XSPF:rgx = ref_xspf; break;
 			case PLAYLIST_ASX: rgx = ref_asx;  break;
@@ -331,7 +328,6 @@ namespace Content {
 		std::wregex rgx;
 
 		switch (playlist_type) {
-			case PLAYLIST_M3U: rgx = ref_m3u;  break;
 			case PLAYLIST_PLS: rgx = ref_pls;  break;
 			case PLAYLIST_XSPF:rgx = ref_xspf; break;
 			case PLAYLIST_ASX: rgx = ref_asx;  break;
@@ -398,7 +394,7 @@ namespace Content {
 				GetContent(fn, Content);
 
 				if (redir
-						&& (Content.ct == L"audio/x-scpls" || Content.ct == L"audio/x-mpegurl" || Content.ct == L"application/xspf+xml")) {
+						&& (Content.ct == L"audio/x-scpls" || Content.ct == L"application/xspf+xml")) {
 					GetRedirectData(Content);
 				}
 
@@ -426,9 +422,7 @@ namespace Content {
 		if (redir && !ct.IsEmpty()) {
 			int playlist_type = PLAYLIST_NONE;
 
-			if (ct == L"audio/x-mpegurl" && fn.Find(L"://") > 0) {
-				playlist_type = PLAYLIST_M3U;
-			} else if (ct == L"audio/x-scpls") {
+			if (ct == L"audio/x-scpls") {
 				playlist_type = PLAYLIST_PLS;
 			} else if (ct == L"application/xspf+xml") {
 				playlist_type = PLAYLIST_XSPF;
