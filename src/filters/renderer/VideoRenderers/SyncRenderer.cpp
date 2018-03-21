@@ -2645,6 +2645,11 @@ STDMETHODIMP CSyncAP::ProcessMessage(MFVP_MESSAGE_TYPE eMessage, ULONG_PTR ulPar
 		case MFVP_MESSAGE_ENDSTREAMING:
 			m_pGenlock->ResetTiming();
 			m_pRefClock = nullptr;
+			for (unsigned i = 0; i < m_nSurfaces; i++) {
+				if (m_pVideoSurfaces) {
+					m_pD3DDevEx->ColorFill(m_pVideoSurfaces[i], nullptr, 0);
+				}
+			}
 			break;
 
 		case MFVP_MESSAGE_FLUSH:
