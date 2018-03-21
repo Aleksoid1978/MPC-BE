@@ -829,8 +829,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	WTSRegisterSessionNotification();
 
-	CStringW strFS = s.strFullScreenMonitor;
-	GetCurDispMode(s.dm_def, strFS);
+	s.strFSMonOnLaunch = s.strFullScreenMonitor;
+	GetCurDispMode(s.dmFSMonOnLaunch, s.strFSMonOnLaunch);
 
 	if (SysVersion::IsWin7orLater()) {
 		m_hDWMAPI = LoadLibraryW(L"dwmapi.dll");
@@ -952,7 +952,7 @@ void CMainFrame::OnClose()
 	SendAPICommand(CMD_DISCONNECT, L"\0"); // according to CMD_NOTIFYENDOFSTREAM (ctrl+f it here), you're not supposed to send NULL here
 
 	if (s.AutoChangeFullscrRes.bEnabled && s.fRestoreResAfterExit) {
-		SetDispMode(s.dm_def, s.strFullScreenMonitor, TRUE);
+		SetDispMode(s.dmFSMonOnLaunch, s.strFSMonOnLaunch, TRUE);
 	}
 
 	if (m_hDWMAPI) {
