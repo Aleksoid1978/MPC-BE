@@ -612,6 +612,11 @@ STDMETHODIMP CEVRAllocatorPresenter::ProcessMessage(MFVP_MESSAGE_TYPE eMessage, 
 
 		case MFVP_MESSAGE_ENDSTREAMING :			// The EVR switched from running or paused to stopped. The presenter should free resources
 			TRACE_EVR("EVR: MFVP_MESSAGE_ENDSTREAMING\n");
+			for (unsigned i = 0; i < m_nSurfaces; i++) {
+				if (m_pVideoSurfaces) {
+					m_pD3DDevEx->ColorFill(m_pVideoSurfaces[i], nullptr, 0);
+				}
+			}
 			break;
 
 		case MFVP_MESSAGE_FLUSH :					// The presenter should discard any pending samples
