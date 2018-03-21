@@ -566,7 +566,7 @@ void CPPageFullscreen::ModesUpdate()
 
 	auto findDisplayMode = [this](const dispmode& dm, const int& curModeIdx) {
 		for (size_t i = 0; i < m_dms.size(); i++) {
-			if (dm == m_dms[i]) {
+			if (dm == m_dms[i] && AfxGetAppSettings().strFullScreenMonitor == m_f_hmonitor) {
 				return (int)i;
 			}
 		}
