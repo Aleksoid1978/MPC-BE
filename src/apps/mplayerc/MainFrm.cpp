@@ -7636,7 +7636,7 @@ void CMainFrame::OnPlayPlayPause()
 	OAFilterState fs = GetMediaState();
 	if (fs == State_Running) {
 		SendMessageW(WM_COMMAND, ID_PLAY_PAUSE);
-	} else if (fs == State_Stopped || fs == State_Paused) {
+	} else {
 		SendMessageW(WM_COMMAND, ID_PLAY_PLAY);
 	}
 }
@@ -7749,7 +7749,7 @@ void CMainFrame::OnUpdatePlayPauseStop(CCmdUI* pCmdUI)
 				fEnable = false;
 			}
 		}
-	} else if (pCmdUI->m_nID == ID_PLAY_PLAY && m_wndPlaylistBar.GetCount() > 0) {
+	} else if ((pCmdUI->m_nID == ID_PLAY_PLAY || pCmdUI->m_nID == ID_PLAY_PLAYPAUSE) && m_wndPlaylistBar.GetCount() > 0) {
 		fEnable = true;
 	}
 
