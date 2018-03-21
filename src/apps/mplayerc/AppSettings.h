@@ -636,7 +636,7 @@ public:
 	AccelTbl		AccelTblColWidth;
 	bool			fRestoreResAfterExit;
 	dispmode		dmFSMonOnLaunch;
-	CString         strFSMonOnLaunch;
+	CString			strFSMonOnLaunch;
 	int				iDMChangeDelay;
 
 	// Sync Renderer Settings
