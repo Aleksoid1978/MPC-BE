@@ -398,6 +398,10 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 							}
 						}
+
+						if (mt.subtype == MEDIASUBTYPE_H264 || mt.subtype == MEDIASUBTYPE_h264) {
+							m_dtsonly = (pTE->CodecPrivate.empty() || pTE->CodecPrivate.data()[0] != 1);
+						}
 					}
 					bHasVideo = true;
 				} else if (CodecID == "V_MPEG4/ISO/AVC") {
@@ -2377,21 +2381,23 @@ STDMETHODIMP CMatroskaSplitterFilter::GetInt(LPCSTR field, int *value)
 		}
 		return E_ABORT;
 	}
-
-	if (!strcmp(field, "VIDEO_PIXEL_FORMAT")) {
+	else if (!strcmp(field, "VIDEO_PIXEL_FORMAT")) {
 		if (m_pix_fmt != -1) {
 			*value = m_pix_fmt;
 			return S_OK;
 		}
 		return E_ABORT;
 	}
-
-	if (!strcmp(field, "VIDEO_INTERLACED")) {
+	else if (!strcmp(field, "VIDEO_INTERLACED")) {
 		if (m_interlaced != -1) {
 			*value = m_interlaced;
 			return S_OK;
 		}
 		return E_ABORT;
+	}
+	else if (!strcmp(field, "VIDEO_FLAG_ONLY_DTS")) {
+		*value = m_dtsonly;
+		return S_OK;
 	}
 
 	return E_INVALIDARG;

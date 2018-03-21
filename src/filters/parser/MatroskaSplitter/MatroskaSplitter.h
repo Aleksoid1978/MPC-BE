@@ -99,6 +99,7 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 	int m_pix_fmt;
 	int m_bits;
 	int m_interlaced;
+	int m_dtsonly = 0; // 0 - no, 1 - yes
 
 	std::vector<SyncPoint> m_sps;
 
