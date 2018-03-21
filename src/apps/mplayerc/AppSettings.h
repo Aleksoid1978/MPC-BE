@@ -635,7 +635,8 @@ public:
 	AChFR			AutoChangeFullscrRes;
 	AccelTbl		AccelTblColWidth;
 	bool			fRestoreResAfterExit;
-	dispmode		dm_def;
+	dispmode		dmFSMonOnLaunch;
+	CString         strFSMonOnLaunch;
 	int				iDMChangeDelay;
 
 	// Sync Renderer Settings
