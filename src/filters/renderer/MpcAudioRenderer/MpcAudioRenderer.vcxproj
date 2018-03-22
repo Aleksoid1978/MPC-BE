@@ -255,6 +255,9 @@
     <ProjectReference Include="..\..\..\DSUtil\DSUtil.vcxproj">
       <Project>{fc70988b-1ae5-4381-866d-4f405e28ac42}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\ExtLib\libbs2b\libbs2b.vcxproj">
+      <Project>{c868fda0-2a56-4274-8c34-ac4751da7bed}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\ExtLib\openjpeg\openjpeg.vcxproj">
       <Project>{1557aa86-976c-4315-8fe8-a138e33f6580}</Project>
     </ProjectReference>

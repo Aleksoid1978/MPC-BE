@@ -43,6 +43,7 @@
 #define OPT_UseSystemLayoutChannels L"UseSystemLayoutChannels"
 #define OPT_ReleaseDeviceIdle       L"ReleaseDeviceIdle"
 #define OPT_SyncMethod              L"SyncMethod"
+#define OPT_UseCrossFeed            L"CrossFeed"
 // TODO: rename option values
 
 // set to 1(or more) to enable more detail debug log
@@ -159,6 +160,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_bUseDefaultDevice(FALSE)
 	, m_nSampleOffset(0)
 	, m_SyncMethod(SYNC_BY_DURATION)
+	, m_bUseCrossFeed(FALSE)
 	, m_bHasVideo(TRUE)
 	, m_bNeedReinitialize(FALSE)
 	, m_bNeedReinitializeFull(FALSE)
@@ -195,17 +197,21 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_SyncMethod, dw)) {
 			m_SyncMethod = (SYNC_METHOD)dw;
 		}
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_UseCrossFeed, dw)) {
+			m_bUseCrossFeed = !!dw;
+		}
 	}
 #else
-	m_WASAPIMode				= (WASAPI_MODE)AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, m_WASAPIMode);
-	m_DeviceId					= AfxGetApp()->GetProfileString(OPT_SECTION_AudRend, OPT_AudioDeviceId, m_DeviceId);
-	m_bUseBitExactOutput		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
-	m_bUseSystemLayoutChannels	= !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
-	m_bReleaseDeviceIdle		= !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
-	m_SyncMethod				= (SYNC_METHOD)AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_SyncMethod, m_SyncMethod);
+	m_WASAPIMode               = (WASAPI_MODE)AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, m_WASAPIMode);
+	m_DeviceId                 = AfxGetApp()->GetProfileString(OPT_SECTION_AudRend, OPT_AudioDeviceId, m_DeviceId);
+	m_bUseBitExactOutput       = !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
+	m_bUseSystemLayoutChannels = !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
+	m_bReleaseDeviceIdle       = !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
+	m_SyncMethod               = (SYNC_METHOD)AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_SyncMethod, m_SyncMethod);
+	m_bUseCrossFeed            = !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_UseCrossFeed, m_bUseCrossFeed);
 #endif
 
-	m_WASAPIMode				= std::clamp(m_WASAPIMode, MODE_WASAPI_EXCLUSIVE, MODE_WASAPI_SHARED);
+	m_WASAPIMode = std::clamp(m_WASAPIMode, MODE_WASAPI_EXCLUSIVE, MODE_WASAPI_SHARED);
 
 	if (phr) {
 		*phr = E_FAIL;
@@ -215,9 +221,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	if (m_hModule) {
 		pfAvSetMmThreadCharacteristicsW   = (PTR_AvSetMmThreadCharacteristicsW)GetProcAddress(m_hModule, "AvSetMmThreadCharacteristicsW");
 		pfAvRevertMmThreadCharacteristics = (PTR_AvRevertMmThreadCharacteristics)GetProcAddress(m_hModule, "AvRevertMmThreadCharacteristics");
-	}
-
-	if (!m_hModule) {
+	} else {
 		return;
 	}
 
@@ -976,6 +980,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 		key.SetDWORDValue(OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
 		key.SetDWORDValue(OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 		key.SetDWORDValue(OPT_SyncMethod, (DWORD)m_SyncMethod);
+		key.SetDWORDValue(OPT_UseCrossFeed, m_bUseCrossFeed);
 	}
 #else
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, (int)m_WASAPIMode);
@@ -984,6 +989,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_SyncMethod, (int)m_SyncMethod);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_UseCrossFeed, m_bUseCrossFeed);
 #endif
 
 	return S_OK;
@@ -1067,15 +1073,15 @@ STDMETHODIMP CMpcAudioRenderer::GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX**
 	return S_OK;
 }
 
-STDMETHODIMP CMpcAudioRenderer::SetBitExactOutput(BOOL nValue)
+STDMETHODIMP CMpcAudioRenderer::SetBitExactOutput(BOOL bValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (m_pAudioClient && m_bUseBitExactOutput != nValue) {
+	if (m_pAudioClient && m_bUseBitExactOutput != bValue) {
 		SetReinitializeAudioDevice();
 	}
 
-	m_bUseBitExactOutput = nValue;
+	m_bUseBitExactOutput = bValue;
 	return S_OK;
 }
 
@@ -1085,15 +1091,15 @@ STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetBitExactOutput()
 	return m_bUseBitExactOutput;
 }
 
-STDMETHODIMP CMpcAudioRenderer::SetSystemLayoutChannels(BOOL nValue)
+STDMETHODIMP CMpcAudioRenderer::SetSystemLayoutChannels(BOOL bValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (m_pAudioClient && m_bUseSystemLayoutChannels != nValue) {
+	if (m_pAudioClient && m_bUseSystemLayoutChannels != bValue) {
 		SetReinitializeAudioDevice();
 	}
 
-	m_bUseSystemLayoutChannels = nValue;
+	m_bUseSystemLayoutChannels = bValue;
 	return S_OK;
 }
 
@@ -1103,11 +1109,11 @@ STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetSystemLayoutChannels()
 	return m_bUseSystemLayoutChannels;
 }
 
-STDMETHODIMP CMpcAudioRenderer::SetReleaseDeviceIdle(BOOL nValue)
+STDMETHODIMP CMpcAudioRenderer::SetReleaseDeviceIdle(BOOL bValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	m_bReleaseDeviceIdle = nValue;
+	m_bReleaseDeviceIdle = bValue;
 	return S_OK;
 }
 
@@ -1146,6 +1152,34 @@ STDMETHODIMP_(INT) CMpcAudioRenderer::GetSyncMethod()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return (INT)m_SyncMethod;
+}
+
+STDMETHODIMP CMpcAudioRenderer::SetCrossFeed(BOOL bValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+	m_bUseCrossFeed = bValue;
+
+	if (m_bUseCrossFeed && m_pAudioClient && !m_bs2b_active) {
+		if (m_output_params.channels == 2
+				&& m_output_params.samplerate >= BS2B_MINSRATE
+				&& m_output_params.samplerate <= BS2B_MAXSRATE) {
+			m_bs2b.clear();
+			m_bs2b.set_srate(m_output_params.samplerate);
+			m_bs2b.set_level_fcut(700); // 700 Hz
+			m_bs2b.set_level_feed(60);  // 6 dB
+			m_bs2b_active = true;
+			return S_OK;
+		}
+	}
+
+	m_bs2b_active = false;
+	return S_OK;
+}
+
+STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetCrossFeed()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_bUseCrossFeed;
 }
 
 HRESULT CMpcAudioRenderer::GetReferenceClockInterface(REFIID riid, void **ppv)
@@ -1373,11 +1407,30 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 			if (FAILED(hr)) {
 				return E_INVALIDARG;
 			}
+
+			in_samples = out_samples;
 		}
 
 		pInputBufferPointer	= &out_buf[0];
 	} else {
 		pInputBufferPointer	= &pMediaBuffer[0];
+	}
+
+	if (m_bs2b_active) {
+		switch (m_output_params.sf) {
+		case SAMPLE_FMT_S16:
+			m_bs2b.cross_feed((int16_t*)out_buf, in_samples);
+			break;
+		case SAMPLE_FMT_S24:
+			m_bs2b.cross_feed((bs2b_int24_t*)out_buf, in_samples);
+			break;
+		case SAMPLE_FMT_S32:
+			m_bs2b.cross_feed((int32_t*)out_buf, in_samples);
+			break;
+		case SAMPLE_FMT_FLT:
+			m_bs2b.cross_feed((float*)out_buf, in_samples);
+			break;
+		}
 	}
 
 	CAutoPtr<CPacket> p(DNew CPacket());
@@ -2092,6 +2145,19 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 
 	hr = StartRendererThread();
 	EXIT_ON_ERROR(hr);
+
+	m_bs2b_active = false;
+	if (m_bUseCrossFeed) {
+		if (m_output_params.channels == 2
+				&& m_output_params.samplerate >= BS2B_MINSRATE
+				&& m_output_params.samplerate <= BS2B_MAXSRATE) {
+			m_bs2b.clear();
+			m_bs2b.set_srate(m_output_params.samplerate);
+			m_bs2b.set_level_fcut(700); // 700 Hz
+			m_bs2b.set_level_feed(60);  // 6 dB
+			m_bs2b_active = true;
+		}
+	}
 
 	return hr;
 }

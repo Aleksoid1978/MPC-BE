@@ -1,0 +1,118 @@
+2009-06-12 Sebastian Pipping <sebastian@pipping.org>
+	* Apply format string compile patch by Ilya Kotov
+
+2009-05-26 Boris Mikhaylov <http://www.tmn.ru/~bor>
+
+	3.1.0
+
+	* bs2bconvert/bs2bstream - add switch of crossfeed level
+	by feed level and cut frequency.
+	* Win32 library of libsndfile v1.0.19 migrated to v1.0.20.
+	* Fixed for higher compile warning level.
+	* Extended cut frequency set from [300..1000] to [300..2000] Hz
+	(BS2B_MAXFCUT)
+	* Apply compile fix patch for FreeBSD
+	by Diego Elio Petteno (flameeyes@gentoo)
+
+2009-03-31 Boris Mikhaylov <http://www.tmn.ru/~bor>
+
+	3.0.0
+
+	* Changed and extended presets.
+
+2009-03-24 Boris Mikhaylov <http://www.tmn.ru/~bor>
+	* Added unsigned 16/24/32 integer handling.
+
+2009-03-23 Boris Mikhaylov <http://www.tmn.ru/~bor>
+	* Normalization of integer samples are removed.
+	* Added more switches to bs2bstream.
+
+2009-03-17 Boris Mikhaylov <http://www.tmn.ru/~bor>
+	* Added handling of big/little endian buffers.
+
+2009-03-11 Boris Mikhaylov <http://www.tmn.ru/~bor>
+	* Changed processing from one stereo sample to more.
+
+2009-03-06 Boris Mikhaylov <http://www.tmn.ru/~bor>
+	* libsndfile v1.0.17 -> v1.0.19.
+	* Added more systems compatability (Integer types changed).
+	* Move to new API.
+	* Fixed 24bit data Native-bigendian handling.
+
+2009-02-18 Sebastian Pipping <sebastian@pipping.org>
+	* Shared lib (*nix) project started.
+
+2009-02-17 Boris Mikhaylov <http://www.tmn.ru/~bor>
+	* Sources are reorganized.
+
+2009-02-02 Boris Mikhaylov <http://www.tmn.ru/~bor>
+
+	2.2.0
+
+	* Dynamic variables for multiply instances are used.
+	* Compiled by MS VC++ 2008.
+	* Nothing changed for a sound.
+
+2006-11-14 Boris Mikhaylov <http://www.tmn.ru/~bor>
+
+	2.1.0
+
+	* Three new 'Easy' levels added.
+	'High easy' level is close to Chu Moy's version of crossfeeder
+	(http://headwize.com/projects/showfile.php?file=cmoy1_prj.htm)
+
+2006-09-22 Boris Mikhaylov <http://www.tmn.ru/~bor>
+
+	2.0.0
+
+	* Change of license.
+	* Package divided by library and plugins.
+	* foobar2000 0.8 plugin package created.
+
+2006-03-28 Boris Mikhaylov <http://www.tmn.ru/~bor>
+
+	2.0.0b2 - test prerelease.
+
+	* New plugin for foobar2000 0.9.
+	* Plugin for foobar2000 0.8 have removed.
+	* New look of configuration windows of plugins.
+	* Default coefficients of default middle crossfeed level and of
+	44100 Hz sampling rate was staticaly implemeted to bs2b library.
+
+2006-03-07 Boris Mikhaylov <http://www.tmn.ru/~bor>
+
+	2.0.0b - test prerelease.
+	
+	* The new high frequency boost filter have implemented.
+	The old version	of high-boost filter have been realized
+	by two-step recursive filter for computation power conserving
+	by subtraction of low-pass filter signal. The new method is
+	a one-step recursive filter. It has done to provide an adjusted
+	cut frequency value for more smooth frequency responce of
+	resulting signal.
+	* The new clipping feature by checking of [-1, +1] range of
+	double float operations have implemented against possible
+	overloads of signal level.
+	* Global gain have calculated from levels of low frequency range
+	like in first release. This is don't makes overload now due to
+	the new frequency responce and to the new clipping feature.
+	* New functions have added to library for various integer
+	audio data processing.
+	* New tuning method have implemented by three preset levels.
+	* Updatted Winamp 2 plugin have included to package.
+	
+2005-11-02 Boris Mikhaylov <http://www.tmn.ru/~bor>
+
+	1.1.0b - test prerelease.
+	
+	* Winamp2 plugin are unchanged and excluded from test package.
+	* Add high frequencies boost functions to bs2b library (see bs2b.h).
+	* Make less global gain against overloading.
+	* Add high frequencies boost option [-h] to bs2b-convert.
+	* Get out MSVCR71.DLL dependency from foobar2000 plugin.
+	* Create configuration window for foobar2000 plugin
+	with options like -h and -m in bs2b-convert.
+
+2005-10-26 Boris Mikhaylov <http://www.tmn.ru/~bor>
+
+	1.0.0 - first release of bs2b.

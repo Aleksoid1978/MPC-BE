@@ -28,6 +28,7 @@
 #include "Mixer.h"
 #include "Filter.h"
 #include "../../../DSUtil/Packet.h"
+#include <libbs2b/bs2bclass.h>
 
 #define MpcAudioRendererName L"MPC Audio Renderer"
 
@@ -67,6 +68,9 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	CString				m_strCurrentDeviceName;
 
 	BOOL				m_bHasVideo;
+
+	bs2b_base			m_bs2b;
+	bool				m_bs2b_active = false;
 
 public:
 	CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr);
@@ -159,17 +163,20 @@ public:
 	STDMETHODIMP_(CString)			GetDeviceId() override;
 	STDMETHODIMP_(UINT)				GetMode() override;
 	STDMETHODIMP					GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut) override;
-	STDMETHODIMP					SetBitExactOutput(BOOL nValue) override;
+	STDMETHODIMP					SetBitExactOutput(BOOL bValue) override;
 	STDMETHODIMP_(BOOL)				GetBitExactOutput() override;
-	STDMETHODIMP					SetSystemLayoutChannels(BOOL nValue) override;
+	STDMETHODIMP					SetSystemLayoutChannels(BOOL bValue) override;
 	STDMETHODIMP_(BOOL)				GetSystemLayoutChannels() override;
-	STDMETHODIMP					SetReleaseDeviceIdle(BOOL nValue) override;
+	STDMETHODIMP					SetReleaseDeviceIdle(BOOL bValue) override;
 	STDMETHODIMP_(BOOL)				GetReleaseDeviceIdle() override;
 	STDMETHODIMP_(BITSTREAM_MODE)	GetBitstreamMode() override;
 	STDMETHODIMP_(CString)			GetCurrentDeviceName() override;
 	STDMETHODIMP_(CString)			GetCurrentDeviceId() override;
 	STDMETHODIMP					SetSyncMethod(INT nValue) override;
 	STDMETHODIMP_(INT)				GetSyncMethod() override;
+	STDMETHODIMP					SetCrossFeed(BOOL bValue) override;
+	STDMETHODIMP_(BOOL)				GetCrossFeed() override;
+
 
 	// CMpcAudioRenderer
 private:
@@ -236,6 +243,7 @@ private:
 	BOOL					m_bUseSystemLayoutChannels;
 	BOOL					m_bReleaseDeviceIdle;
 	SYNC_METHOD				m_SyncMethod;
+	BOOL					m_bUseCrossFeed;
 	FILTER_STATE			m_filterState;
 
 	UINT32					m_nSampleOffset;
