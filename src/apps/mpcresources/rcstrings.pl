@@ -30,6 +30,8 @@ use vars qw(@InTags @TextTags);
 use File::Basename;
 use File::Spec;
 use File::Glob qw(:globally :nocase);
+
+use lib ".";
 require "common.pl";
 
 my $Extension=".txt";
