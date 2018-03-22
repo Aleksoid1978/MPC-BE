@@ -1419,16 +1419,16 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 	if (m_bs2b_active) {
 		switch (m_output_params.sf) {
 		case SAMPLE_FMT_S16:
-			m_bs2b.cross_feed((int16_t*)out_buf, in_samples);
+			m_bs2b.cross_feed((int16_t*)pInputBufferPointer, in_samples);
 			break;
 		case SAMPLE_FMT_S24:
-			m_bs2b.cross_feed((bs2b_int24_t*)out_buf, in_samples);
+			m_bs2b.cross_feed((bs2b_int24_t*)pInputBufferPointer, in_samples);
 			break;
 		case SAMPLE_FMT_S32:
-			m_bs2b.cross_feed((int32_t*)out_buf, in_samples);
+			m_bs2b.cross_feed((int32_t*)pInputBufferPointer, in_samples);
 			break;
 		case SAMPLE_FMT_FLT:
-			m_bs2b.cross_feed((float*)out_buf, in_samples);
+			m_bs2b.cross_feed((float*)pInputBufferPointer, in_samples);
 			break;
 		}
 	}
