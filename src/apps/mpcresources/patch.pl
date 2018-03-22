@@ -28,6 +28,7 @@ use Data::Dumper;
 use Getopt::Long;
 use vars qw(@InTags);
 
+use lib ".";
 require "common.pl";
 
 my $TxtFileName = "mplayerc.language.rc.txt";

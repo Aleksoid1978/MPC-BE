@@ -31,6 +31,7 @@ use File::Basename;
 use File::Spec;
 use File::Glob qw(:globally :nocase);
 
+use lib ".";
 require "common.pl";
 
 my $BaseFileName = "../mplayerc/mplayerc.rc";
