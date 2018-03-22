@@ -417,6 +417,9 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ExtLib\libbs2b\libbs2b.vcxproj">
+      <Project>{c868fda0-2a56-4274-8c34-ac4751da7bed}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\ExtLib\soxr\soxr.vcxproj">
       <Project>{88240767-4b7a-49e9-9e83-2f9e283d4f26}</Project>
     </ProjectReference>

@@ -40,6 +40,7 @@ private :
 	CButton		m_cbUseBitExactOutput;
 	CButton		m_cbUseSystemLayoutChannels;
 	CButton		m_cbReleaseDeviceIdle;
+	CButton		m_cbUseCrossFeed;
 
 	CStatic		m_txtSoundDevice;
 	CComboBox	m_cbSoundDevice;
@@ -54,6 +55,7 @@ private :
 		IDC_PP_USE_BITEXACT_OUTPUT,
 		IDC_PP_USE_SYSTEM_LAYOUT_CHANNELS,
 		IDC_PP_FREE_DEVICE_INACTIVE,
+		IDC_PP_USE_CROSSFEED,
 		IDC_PP_SYNC_METHOD
 	};
 

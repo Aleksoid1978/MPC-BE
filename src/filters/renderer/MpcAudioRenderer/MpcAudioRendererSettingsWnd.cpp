@@ -76,6 +76,8 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	m_cbUseSystemLayoutChannels.Create(ResStr(IDS_ARS_SYSTEM_LAYOUT_CHANNELS), WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_USE_SYSTEM_LAYOUT_CHANNELS);
 	p.y += h20;
 	m_cbReleaseDeviceIdle.Create(ResStr(IDS_ARS_RELEASE_DEVICE_IDLE), WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_FREE_DEVICE_INACTIVE);
+	p.y += h20;
+	m_cbUseCrossFeed.Create(ResStr(IDS_ARS_CROSSFEED), WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_USE_CROSSFEED);
 	p.y += h30;
 
 	m_txtSyncMethod.Create(ResStr(IDS_ARS_SYNC_METHOD), WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(320), m_fontheight)), this, (UINT)IDC_STATIC);
@@ -106,6 +108,7 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 		m_cbUseBitExactOutput.SetCheck(m_pMAR->GetBitExactOutput());
 		m_cbUseSystemLayoutChannels.SetCheck(m_pMAR->GetSystemLayoutChannels());
 		m_cbReleaseDeviceIdle.SetCheck(m_pMAR->GetReleaseDeviceIdle());
+		m_cbUseCrossFeed.SetCheck(m_pMAR->GetCrossFeed());
 		m_cbSyncMethod.SetCurSel(m_pMAR->GetSyncMethod());
 	}
 
@@ -137,6 +140,7 @@ bool CMpcAudioRendererSettingsWnd::OnApply()
 		m_pMAR->SetBitExactOutput(m_cbUseBitExactOutput.GetCheck());
 		m_pMAR->SetSystemLayoutChannels(m_cbUseSystemLayoutChannels.GetCheck());
 		m_pMAR->SetReleaseDeviceIdle(m_cbReleaseDeviceIdle.GetCheck());
+		m_pMAR->SetCrossFeed(m_cbUseCrossFeed.GetCheck());
 		m_pMAR->SetSyncMethod(m_cbSyncMethod.GetCurSel());
 		int idx = m_cbSoundDevice.GetCurSel();
 		if (idx >= 0) {
