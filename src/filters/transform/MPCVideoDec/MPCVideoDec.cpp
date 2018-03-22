@@ -2423,11 +2423,11 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 				}
 
 				const UINT numSurfaces = std::max(m_DXVA2Config.ConfigMinRenderTargetBuffCount, 1ui16);
-				LPDIRECT3DSURFACE9 pSurfaces[DXVA2_MAX_SURFACES] = { 0 };
+				LPDIRECT3DSURFACE9 pSurfaces[DXVA2_MAX_SURFACES] = {};
 				hr = pDXVA2Service->CreateSurface(
 						m_nSurfaceWidth,
 						m_nSurfaceHeight,
-						numSurfaces - 1,
+						numSurfaces,
 						m_VideoDesc.Format,
 						D3DPOOL_DEFAULT,
 						0,
