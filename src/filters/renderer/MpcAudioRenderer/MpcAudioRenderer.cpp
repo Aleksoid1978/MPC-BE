@@ -1338,12 +1338,12 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 	}
 
 	int in_samples = lSize / m_pWaveFormatExInput->nBlockAlign;
+	int out_samples = in_samples;
+	UNREFERENCED_PARAMETER(out_samples);
 
 	const bool bFormatChanged = !m_bIsBitstream && (m_input_params.layout != m_output_params.layout || m_input_params.samplerate != m_output_params.samplerate || m_input_params.sf != m_output_params.sf);
 	if (bFormatChanged) {
 		BYTE* in_buff = &pMediaBuffer[0];
-
-		int out_samples = in_samples;
 
 		if (m_input_params.layout != m_output_params.layout || m_input_params.samplerate != m_output_params.samplerate) {
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL > 2
@@ -1407,8 +1407,6 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 			if (FAILED(hr)) {
 				return E_INVALIDARG;
 			}
-
-			in_samples = out_samples;
 		}
 
 		pInputBufferPointer	= &out_buf[0];
@@ -1419,16 +1417,16 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 	if (m_bs2b_active) {
 		switch (m_output_params.sf) {
 		case SAMPLE_FMT_S16:
-			m_bs2b.cross_feed((int16_t*)pInputBufferPointer, in_samples);
+			m_bs2b.cross_feed((int16_t*)pInputBufferPointer, out_samples);
 			break;
 		case SAMPLE_FMT_S24:
-			m_bs2b.cross_feed((bs2b_int24_t*)pInputBufferPointer, in_samples);
+			m_bs2b.cross_feed((bs2b_int24_t*)pInputBufferPointer, out_samples);
 			break;
 		case SAMPLE_FMT_S32:
-			m_bs2b.cross_feed((int32_t*)pInputBufferPointer, in_samples);
+			m_bs2b.cross_feed((int32_t*)pInputBufferPointer, out_samples);
 			break;
 		case SAMPLE_FMT_FLT:
-			m_bs2b.cross_feed((float*)pInputBufferPointer, in_samples);
+			m_bs2b.cross_feed((float*)pInputBufferPointer, out_samples);
 			break;
 		}
 	}
@@ -1952,6 +1950,8 @@ again:
 		m_Filter.Flush();
 	}
 
+	m_bs2b_active = false;
+
 	if (SUCCEEDED(hr)) {
 		auto FillFormats = [](const WAVEFORMATEX* pwfe, AudioFormats& format, bool bInput) {
 			ZeroMemory(&format, sizeof(format));
@@ -1995,6 +1995,19 @@ again:
 
 		FillFormats(m_pWaveFormatExInput, m_input_params, true);
 		FillFormats(m_pWaveFormatExOutput, m_output_params, false);
+
+		if (m_bUseCrossFeed) {
+			if (!m_bIsBitstream
+					&& m_output_params.channels == 2
+					&& m_output_params.samplerate >= BS2B_MINSRATE
+					&& m_output_params.samplerate <= BS2B_MAXSRATE) {
+				m_bs2b.clear();
+				m_bs2b.set_srate(m_output_params.samplerate);
+				m_bs2b.set_level_fcut(700); // 700 Hz
+				m_bs2b.set_level_feed(60);  // 6 dB
+				m_bs2b_active = true;
+			}
+		}
 	}
 
 	return hr;
@@ -2145,19 +2158,6 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 
 	hr = StartRendererThread();
 	EXIT_ON_ERROR(hr);
-
-	m_bs2b_active = false;
-	if (m_bUseCrossFeed) {
-		if (m_output_params.channels == 2
-				&& m_output_params.samplerate >= BS2B_MINSRATE
-				&& m_output_params.samplerate <= BS2B_MAXSRATE) {
-			m_bs2b.clear();
-			m_bs2b.set_srate(m_output_params.samplerate);
-			m_bs2b.set_level_fcut(700); // 700 Hz
-			m_bs2b.set_level_feed(60);  // 6 dB
-			m_bs2b_active = true;
-		}
-	}
 
 	return hr;
 }
