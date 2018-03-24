@@ -1477,24 +1477,28 @@ void CMPCVideoDecFilter::Cleanup()
 {
 	CAutoLock cAutoLock(&m_csReceive);
 
-	ffmpegCleanup();
+	CleanupFFmpeg();
 
 	SAFE_DELETE(m_pMSDKDecoder);
 	SAFE_DELETE(m_pDXVADecoder);
 	SAFE_DELETE_ARRAY(m_pVideoOutputFormat);
 
-	if (m_hDevice != INVALID_HANDLE_VALUE) {
-		m_pDeviceManager->CloseDeviceHandle(m_hDevice);
-		m_hDevice = INVALID_HANDLE_VALUE;
-	}
-
-	m_pDeviceManager.Release();
-	m_pDecoderService.Release();
+	CleanupD3DResources();
 
 	m_FilterInfo.Clear();
 }
 
-void CMPCVideoDecFilter::ffmpegCleanup()
+void CMPCVideoDecFilter::CleanupD3DResources()
+{
+	if (m_hDevice != INVALID_HANDLE_VALUE) {
+		m_pDeviceManager->CloseDeviceHandle(m_hDevice);
+		m_hDevice = INVALID_HANDLE_VALUE;
+	}
+	m_pDeviceManager.Release();
+	m_pDecoderService.Release();
+}
+
+void CMPCVideoDecFilter::CleanupFFmpeg()
 {
 	m_pAVCodec = nullptr;
 
@@ -1727,7 +1731,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType *pmt)
 	}
 
 redo:
-	ffmpegCleanup();
+	CleanupFFmpeg();
 
 	const int nNewCodec = FindCodec(pmt, bReinit);
 	if (nNewCodec == -1) {
@@ -2427,7 +2431,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 				hr = pDXVA2Service->CreateSurface(
 						m_nSurfaceWidth,
 						m_nSurfaceHeight,
-						numSurfaces,
+						numSurfaces - 1,
 						m_VideoDesc.Format,
 						D3DPOOL_DEFAULT,
 						0,
@@ -3337,43 +3341,34 @@ HRESULT CMPCVideoDecFilter::ConfigureDXVA2(IPin *pPin)
 {
 	HRESULT hr = S_OK;
 
-	CComPtr<IMFGetService>               pGetService;
-	CComPtr<IDirect3DDeviceManager9>     pDeviceManager;
-	CComPtr<IDirectXVideoDecoderService> pDecoderService;
-	HANDLE                               hDevice = INVALID_HANDLE_VALUE;
+	CleanupD3DResources();
+
+	CComPtr<IMFGetService> pGetService;
 
 	// Query the pin for IMFGetService.
 	hr = pPin->QueryInterface(IID_PPV_ARGS(&pGetService));
 
 	// Get the Direct3D device manager.
 	if (SUCCEEDED(hr)) {
-		hr = pGetService->GetService(MR_VIDEO_ACCELERATION_SERVICE, IID_PPV_ARGS(&pDeviceManager));
+		hr = pGetService->GetService(MR_VIDEO_ACCELERATION_SERVICE, IID_PPV_ARGS(&m_pDeviceManager));
 	}
 
 	// Open a new device handle.
 	if (SUCCEEDED(hr)) {
-		hr = pDeviceManager->OpenDeviceHandle(&hDevice);
+		hr = m_pDeviceManager->OpenDeviceHandle(&m_hDevice);
 	}
 
 	// Get the video decoder service.
 	if (SUCCEEDED(hr)) {
-		hr = pDeviceManager->GetVideoService(hDevice, IID_PPV_ARGS(&pDecoderService));
+		hr = m_pDeviceManager->GetVideoService(m_hDevice, IID_PPV_ARGS(&m_pDecoderService));
 	}
 
 	if (SUCCEEDED(hr)) {
-		m_pDeviceManager  = pDeviceManager;
-		m_pDecoderService = pDecoderService;
-		m_hDevice         = hDevice;
-		hr                = FindDecoderConfiguration();
+		hr = FindDecoderConfiguration();
 	}
 
 	if (FAILED(hr)) {
-		if (hDevice != INVALID_HANDLE_VALUE) {
-			pDeviceManager->CloseDeviceHandle(hDevice);
-		}
-		m_pDeviceManager  = nullptr;
-		m_pDecoderService = nullptr;
-		m_hDevice         = INVALID_HANDLE_VALUE;
+		CleanupD3DResources();
 	}
 
 	return hr;
