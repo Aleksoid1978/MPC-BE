@@ -772,6 +772,7 @@ public:
 	int				iOnTop;
 	// After Playback
 	bool			fExitAfterPlayback;
+	bool			bCloseFileAfterPlayback;
 	bool			fNextInDirAfterPlayback;
 	bool			fNextInDirAfterPlaybackLooped;
 

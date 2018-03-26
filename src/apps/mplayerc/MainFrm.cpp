@@ -2770,6 +2770,9 @@ bool CMainFrame::DoAfterPlaybackEvent()
 
 	if (bExit) {
 		SendMessageW(WM_COMMAND, ID_FILE_EXIT);
+	} else if (s.bCloseFileAfterPlayback) {
+		SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+		return true;
 	}
 
 	return bExit;
@@ -8841,24 +8844,35 @@ void CMainFrame::OnAfterplayback(UINT nID)
 			break;
 		case ID_AFTERPLAYBACK_NEXT:
 			s.fExitAfterPlayback = false;
+			s.bCloseFileAfterPlayback = false;
 			s.fNextInDirAfterPlayback = true;
 			s.fNextInDirAfterPlaybackLooped = false;
 			osdMsg = ResStr(IDS_AFTERPLAYBACK_NEXT);
 			break;
 		case ID_AFTERPLAYBACK_NEXT_LOOPED:
 			s.fExitAfterPlayback = false;
+			s.bCloseFileAfterPlayback = false;
 			s.fNextInDirAfterPlayback = true;
 			s.fNextInDirAfterPlaybackLooped = true;
 			osdMsg = ResStr(IDS_AFTERPLAYBACK_NEXT);
 			break;
 		case ID_AFTERPLAYBACK_EXIT:
 			s.fExitAfterPlayback = true;
+			s.bCloseFileAfterPlayback = false;
 			s.fNextInDirAfterPlayback = false;
 			s.fNextInDirAfterPlaybackLooped = false;
 			osdMsg = ResStr(IDS_AFTERPLAYBACK_EXIT);
 			break;
+		case ID_AFTERPLAYBACK_CLOSE_FILE:
+			s.fExitAfterPlayback = false;
+			s.bCloseFileAfterPlayback = true;
+			s.fNextInDirAfterPlayback = false;
+			s.fNextInDirAfterPlaybackLooped = false;
+			osdMsg = ResStr(IDS_AFTERPLAYBACK_CLOSE_FILE);
+			break;
 		case ID_AFTERPLAYBACK_EVERYTIMEDONOTHING:
 			s.fExitAfterPlayback = false;
+			s.bCloseFileAfterPlayback = false;
 			s.fNextInDirAfterPlayback = false;
 			s.fNextInDirAfterPlaybackLooped = false;
 			osdMsg = ResStr(IDS_AFTERPLAYBACK_DONOTHING);
@@ -8900,6 +8914,9 @@ void CMainFrame::OnUpdateAfterplayback(CCmdUI* pCmdUI)
 		case ID_AFTERPLAYBACK_EXIT:
 			bChecked = !!s.fExitAfterPlayback;
 			break;
+		case ID_AFTERPLAYBACK_CLOSE_FILE:
+			bChecked = !!s.bCloseFileAfterPlayback;
+			break;
 		case ID_AFTERPLAYBACK_NEXT:
 			bChecked = !!s.fNextInDirAfterPlayback && !s.fNextInDirAfterPlaybackLooped;
 			break;
@@ -8907,7 +8924,7 @@ void CMainFrame::OnUpdateAfterplayback(CCmdUI* pCmdUI)
 			bChecked = !!s.fNextInDirAfterPlayback && !!s.fNextInDirAfterPlaybackLooped;
 			break;
 		case ID_AFTERPLAYBACK_EVERYTIMEDONOTHING:
-			bChecked = !s.fExitAfterPlayback && !s.fNextInDirAfterPlayback;
+			bChecked = !s.fExitAfterPlayback && !s.fNextInDirAfterPlayback && !s.bCloseFileAfterPlayback;
 			break;
 	}
 

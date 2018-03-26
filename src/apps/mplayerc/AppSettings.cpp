@@ -627,6 +627,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fUseWin7TaskBar = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_WIN7TASKBAR, 1);
 
 	fExitAfterPlayback				= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_EXIT_AFTER_PB, 0);
+	bCloseFileAfterPlayback			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_CLOSE_FILE_AFTER_PB, 0);
 	fNextInDirAfterPlayback			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_NEXT_AFTER_PB, 0);
 	fNextInDirAfterPlaybackLooped	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_NEXT_AFTER_PB_LOOPED, 0);
 	fDontUseSearchInFolder			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_NO_SEARCH_IN_FOLDER, 0);
@@ -1314,6 +1315,7 @@ void CAppSettings::SaveSettings()
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_WIN7TASKBAR, fUseWin7TaskBar);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_EXIT_AFTER_PB, fExitAfterPlayback);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_CLOSE_FILE_AFTER_PB, bCloseFileAfterPlayback);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_NEXT_AFTER_PB, fNextInDirAfterPlayback);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_NEXT_AFTER_PB_LOOPED, fNextInDirAfterPlaybackLooped);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_NO_SEARCH_IN_FOLDER, fDontUseSearchInFolder);
