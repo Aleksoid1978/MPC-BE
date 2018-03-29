@@ -240,7 +240,7 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 16		"With icons"
 17		"Explorer Context Menu"
 18		"Directory"
-19		"File(s)"
+19		"Files"
 20		"Autoplay"
 21		"Video"
 22		"Music"
