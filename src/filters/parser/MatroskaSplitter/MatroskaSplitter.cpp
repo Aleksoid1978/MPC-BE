@@ -582,6 +582,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						fourcc = FCC('VP80');
 					} else if (CodecID == "V_VP9") {
 						fourcc = FCC('VP90');
+					} else if (CodecID == "V_AV1") {
+						fourcc = FCC('AV01');
 					} else if (CodecID == "V_QUICKTIME" && pTE->CodecPrivate.size() >= 8) {
 						if (m_pFile->m_ebml.DocTypeReadVersion == 1) {
 							fourcc = GETDWORD(pTE->CodecPrivate.data());
