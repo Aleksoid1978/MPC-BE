@@ -69,7 +69,7 @@ public:
 	CString GetFilter() const;
 	CString GetExts() const;
 	CString GetExtsWithPeriod() const;
-	CString GetBackupExtsWithPeriod() const;
+	CString GetBackupExts() const;
 	CString GetSpecReqNote() const {
 		return m_specreqnote;
 	}

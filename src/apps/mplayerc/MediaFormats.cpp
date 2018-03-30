@@ -108,11 +108,10 @@ void CMediaFormatCategory::SetExts(const CString& exts)
 	for (auto it = m_exts.begin(); it != m_exts.end();) {
 		auto cur = it++;
 		CString& ext = *cur;
+		ext.TrimLeft('.');
 
-		if (ext[0] == '\\') {
+		if (ext.FindOneOf(L".\\/:*?\"<>|") >= 0) {
 			m_exts.erase(cur);
-		} else {
-			ext.TrimLeft('.');
 		}
 	}
 }
@@ -146,17 +145,9 @@ CString CMediaFormatCategory::GetExtsWithPeriod() const
 	return exts;
 }
 
-CString CMediaFormatCategory::GetBackupExtsWithPeriod() const
+CString CMediaFormatCategory::GetBackupExts() const
 {
-	CString exts;
-
-	for (const auto& backupext : m_backupexts) {
-		exts += L"." + backupext + L" ";
-	}
-
-	exts.TrimRight(' ');
-
-	return exts;
+	return Implode(m_backupexts, ' ');
 }
 
 //

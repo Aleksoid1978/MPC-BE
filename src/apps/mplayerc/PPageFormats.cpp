@@ -694,7 +694,7 @@ BOOL CPPageFormats::OnInitDialog()
 
 	m_list.SetSelectionMark(0);
 	m_list.SetItemState(0, LVIS_SELECTED, LVIS_SELECTED);
-	m_exts = mf[(int)m_list.GetItemData(0)].GetExtsWithPeriod();
+	m_exts = mf[(int)m_list.GetItemData(0)].GetExts();
 
 	CAppSettings& s = AfxGetAppSettings();
 
@@ -906,7 +906,7 @@ BOOL CPPageFormats::OnApply()
 				GetUnRegisterExts(mf[i].GetExtsWithPeriod(), m_exts, m_lUnRegisterExts);
 			}
 			mf[i].SetExts(m_exts);
-			m_exts = mf[i].GetExtsWithPeriod();
+			m_exts = mf[i].GetExts();
 			UpdateData(FALSE);
 		}
 	}
@@ -1050,7 +1050,7 @@ void CPPageFormats::OnLvnItemchangedList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 	if (pNMLV->iItem >= 0 && pNMLV->iSubItem == COL_CATEGORY
 			&& (pNMLV->uChanged&LVIF_STATE) && (pNMLV->uNewState&LVIS_SELECTED)) {
-		m_exts = AfxGetAppSettings().m_Formats[(int)m_list.GetItemData(pNMLV->iItem)].GetExtsWithPeriod();
+		m_exts = AfxGetAppSettings().m_Formats[(int)m_list.GetItemData(pNMLV->iItem)].GetExts();
 		UpdateData(FALSE);
 	}
 
@@ -1180,7 +1180,7 @@ void CPPageFormats::OnBnClickedDefault()
 
 		mfc.RestoreDefaultExts();
 		GetUnRegisterExts(m_exts, mfc.GetExtsWithPeriod(), m_lUnRegisterExts);
-		m_exts = mfc.GetExtsWithPeriod();
+		m_exts = mfc.GetExts();
 
 		CString label;
 		label.Format(L"%s (%s)", mfc.GetDescription(), mfc.GetExts());
@@ -1207,7 +1207,7 @@ void CPPageFormats::OnBnClickedSet()
 
 		GetUnRegisterExts(mfc.GetExtsWithPeriod(), m_exts, m_lUnRegisterExts);
 		mfc.SetExts(m_exts);
-		m_exts = mfc.GetExtsWithPeriod();
+		m_exts = mfc.GetExts();
 
 		CString label;
 		label.Format(L"%s (%s)", mfc.GetDescription(), mfc.GetExts());
@@ -1241,7 +1241,7 @@ void CPPageFormats::OnUpdateButtonDefault(CCmdUI* pCmdUI)
 	CString orgexts, newexts;
 	GetDlgItem(IDC_EDIT1)->GetWindowTextW(newexts);
 	newexts.Trim();
-	orgexts = AfxGetAppSettings().m_Formats[i].GetBackupExtsWithPeriod();
+	orgexts = AfxGetAppSettings().m_Formats[i].GetBackupExts();
 
 	pCmdUI->Enable(!!newexts.CompareNoCase(orgexts));
 }
@@ -1258,7 +1258,7 @@ void CPPageFormats::OnUpdateButtonSet(CCmdUI* pCmdUI)
 	CString orgexts, newexts;
 	GetDlgItem(IDC_EDIT1)->GetWindowTextW(newexts);
 	newexts.Trim();
-	orgexts = AfxGetAppSettings().m_Formats[i].GetExtsWithPeriod();
+	orgexts = AfxGetAppSettings().m_Formats[i].GetExts();
 
 	if (!!newexts.CompareNoCase(orgexts)) {
 		m_bFileExtChanged = true;
