@@ -2504,23 +2504,49 @@ HRESULT CMatroskaSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 
 	bool force_packet = false;
 
-	if (m_SubtitleType > not_hdmv_dvbsub && p) {
-		CMatroskaPacket* mp = static_cast<CMatroskaPacket*>(p.m_p);
-
-		size_t size = 0;
-		POSITION pos = mp->bg->Block.BlockData.GetHeadPosition();
-		while (pos) {
-			size += mp->bg->Block.BlockData.GetNext(pos)->size();
+	if (m_SubtitleType == hdmvsub && p) {
+		CMatroskaPacket* mp = dynamic_cast<CMatroskaPacket*>(p.m_p);
+		if (mp && !mp->bg->Block.BlockData.IsEmpty()) {
+			const CBinary* pBinary = mp->bg->Block.BlockData.GetHead();
+			if (pBinary->size() >= 3) {
+				const BYTE segtype = pBinary->data()[0];
+				if (segtype == 22) {
+					// this is first packet of HDMV sub, set standart mode
+					m_bNeedNextSubtitle = false;
+					force_packet = true; // but send this packet anyway
+				}
+				else if (segtype == 21) {
+					// this is picture packet, force next HDMV sub
+					m_bNeedNextSubtitle = true;
+				}
+			}
 		}
+	}
+	else if (m_SubtitleType == dvbsub && p) {
+		CMatroskaPacket* mp = dynamic_cast<CMatroskaPacket*>(p.m_p);
+		if (mp && !mp->bg->Block.BlockData.IsEmpty()) {
+			CBinary* pBinary = mp->bg->Block.BlockData.GetHead();
+			if (pBinary->size() >= 6) {
+				BYTE* pos = pBinary->data();
+				BYTE* end = pos + pBinary->size();
 
-		// simple check
-		if (m_SubtitleType == hdmvsub && size <= 30 || m_SubtitleType == dvbsub && size <= 14) {
-			// this is empty sub, set standart mode
-			m_bNeedNextSubtitle = false;
-			force_packet = true; // but send this packet anyway
-		} else {
-			// this is sub with picture, force next HDMV sub
-			m_bNeedNextSubtitle = true;
+				while (pos + 6 < end) {
+					if (*pos++ == 0x0F) {
+						const WORD segtype = *pos++;
+						pos += 2;
+						const WORD seglength = _byteswap_ushort(GETWORD(pos));
+						pos += 2 + seglength;
+
+						if (segtype == 0x14) { // first "display" segment
+							force_packet = m_bNeedNextSubtitle;
+							m_bNeedNextSubtitle = false;
+						}
+						else if (segtype == 0x13) { // "object" segment
+							m_bNeedNextSubtitle = true;
+						}
+					}
+				}
+			}
 		}
 	}
 
