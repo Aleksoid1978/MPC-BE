@@ -1635,6 +1635,16 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 				for (auto guid = supportedDecoderGuids.begin(); guid != supportedDecoderGuids.end(); guid++) {
 					DLog(L"    => Attempt : %s", GetGUIDString(*guid));
 
+					if (DXVA2_Intel_H264_ClearVideo == *guid) {
+						const int width_mbs  = m_nSurfaceWidth / 16;
+						const int height_mbs = m_nSurfaceWidth / 16;
+						const int max_ref_frames_dpb41 = std::min(11, 32768 / (width_mbs * height_mbs));
+						if (m_pAVCtx->refs > max_ref_frames_dpb41) {
+							DLog(L"    => Too many reference frames for Intel H.264 ClearVideo decoder, skip");
+							continue;
+						}
+					}
+
 					// Find a configuration that we support.
 					if (FAILED(hr = FindDXVA2DecoderConfiguration(m_pDecoderService, *guid, &config, &bFoundDXVA2Configuration))) {
 						break;
