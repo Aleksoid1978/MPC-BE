@@ -847,6 +847,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								type == AP4_ATOM_TYPE_HapM ||
 								type == AP4_ATOM_TYPE_HapY) {
 							FormatTrackName(L"Vidvox Hap", 0);
+						} else if (type == AP4_ATOM_TYPE_FMP4) {
+							FormatTrackName(L"MPEG-4", 0);
 						} else if (fourcc == FCC('WVC1')) {
 							FormatTrackName(L"VC-1", 0);
 							if (AP4_Dvc1Atom* Dvc1 = dynamic_cast<AP4_Dvc1Atom*>(vse->GetChild(AP4_ATOM_TYPE_DVC1))) {
