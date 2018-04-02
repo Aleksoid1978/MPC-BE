@@ -1622,20 +1622,32 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 			std::vector<GUID> supportedDecoderGuids;
 			DLog(L"    => Enumerating supported DXVA2 modes:");
 			for (UINT iGuid = 0; iGuid < cDecoderGuids; iGuid++) {
+				const auto& guid = pDecoderGuids[iGuid];
+
+#ifdef DEBUG_OR_LOG
 				CString msg;
-				msg.Format(L"        %s", GetGUIDString(pDecoderGuids[iGuid]));
-				if (IsSupportedDecoderMode(pDecoderGuids[iGuid])) {
+				msg.Format(L"        %s", GetGUIDString(guid));
+#endif
+				if (IsSupportedDecoderMode(guid)) {
+#ifdef DEBUG_OR_LOG
 					msg.Append(L" - supported");
-					supportedDecoderGuids.emplace_back(pDecoderGuids[iGuid]);
+#endif
+					if (guid == DXVA2_ModeH264_E || guid == DXVA2_ModeH264_F) {
+						supportedDecoderGuids.insert(supportedDecoderGuids.cbegin(), guid);
+					} else {
+						supportedDecoderGuids.emplace_back(guid);
+					}
 				}
+#ifdef DEBUG_OR_LOG
 				DLog(msg);
+#endif
 			}
 
 			if (!supportedDecoderGuids.empty()) {
-				for (auto guid = supportedDecoderGuids.begin(); guid != supportedDecoderGuids.end(); guid++) {
-					DLog(L"    => Attempt : %s", GetGUIDString(*guid));
+				for (const auto& guid : supportedDecoderGuids) {
+					DLog(L"    => Attempt : %s", GetGUIDString(guid));
 
-					if (DXVA2_Intel_H264_ClearVideo == *guid) {
+					if (DXVA2_Intel_H264_ClearVideo == guid) {
 						const int width_mbs  = m_nSurfaceWidth / 16;
 						const int height_mbs = m_nSurfaceWidth / 16;
 						const int max_ref_frames_dpb41 = std::min(11, 32768 / (width_mbs * height_mbs));
@@ -1646,13 +1658,13 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 					}
 
 					// Find a configuration that we support.
-					if (FAILED(hr = FindDXVA2DecoderConfiguration(m_pDecoderService, *guid, &config, &bFoundDXVA2Configuration))) {
+					if (FAILED(hr = FindDXVA2DecoderConfiguration(m_pDecoderService, guid, &config, &bFoundDXVA2Configuration))) {
 						break;
 					}
 
 					if (bFoundDXVA2Configuration) {
 						// Found a good configuration. Save the GUID.
-						decoderGuid = *guid;
+						decoderGuid = guid;
 						DLog(L"    => Use : %s", GetGUIDString(decoderGuid));
 						break;
 					}
