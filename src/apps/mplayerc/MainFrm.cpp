@@ -13981,7 +13981,7 @@ int CMainFrame::SearchInDir(const bool& bForward)
 	} else {
 		if (it == sl.cbegin()) {
 			if (s.fNextInDirAfterPlaybackLooped) {
-				it = sl.cend();
+				it = std::prev(sl.cend());
 			} else {
 				return 0;
 			}
