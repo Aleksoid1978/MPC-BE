@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include <mmreg.h>
 #include "OggSplitter.h"
+#include "../../../DSUtil/CUE.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/GolombBuffer.h"
 #include "../../../DSUtil/VideoParser.h"
@@ -337,7 +338,11 @@ start:
 						}
 						break;
 				}
-			} else if (!(type&1) && streamMoreInit.empty()) {
+			} else if (type == 0x84) {
+				if (COggFlacOutputPin* pOggPin = dynamic_cast<COggFlacOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number))) {
+					pOggPin->AddComment(page.data() + 4, page.size() - 4);
+				}
+			} else if (!(type & 1) && streamMoreInit.empty()) {
 				break;
 			}
 		}
@@ -501,6 +506,44 @@ start:
 				ChapAppend(rt, name);
 			}
 		}
+
+		if (!ChapGetCount()) {
+			pos = m_pOutputs.GetHeadPosition();
+			while (pos) {
+				COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>((CBaseOutputPin*)m_pOutputs.GetNext(pos));
+				if (!pOggPin) {
+					continue;
+				}
+
+				CStringW value = pOggPin->GetComment(L"CUESHEET");
+				if (!value.IsEmpty()) {
+					std::list<Chapters> ChaptersList;
+					CString Title, Performer;
+					if (ParseCUESheet(value, ChaptersList, Title, Performer)) {
+						if (!Title.IsEmpty()) {
+							CComBSTR value;
+							GetProperty(L"TITL", &value);
+							if (!value.Length()) {
+								SetProperty(L"TITL", Title);
+							}
+						}
+						if (!Performer.IsEmpty()) {
+							CComBSTR value;
+							GetProperty(L"AUTH", &value);
+							if (!value.Length()) {
+								SetProperty(L"AUTH", Performer);
+							}
+						}
+
+						ChapRemoveAll();
+						for (const auto& cp : ChaptersList) {
+							ChapAppend(cp.rt, cp.name);
+						}
+					}
+					break;
+				}
+			}
+		}
 	}
 
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
@@ -651,16 +694,16 @@ COggSplitterOutputPin::COggSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter
 
 void COggSplitterOutputPin::AddComment(BYTE* p, int len)
 {
-	bitstream bs(p, len);
+	CGolombBuffer gb(p, len);
+	gb.SkipBytes(gb.ReadDwordLE());
 
-	bs.getbits(bs.getbits(32) * 8);
-	for (int n = bs.getbits(32); n-- > 0; ) {
+	const DWORD cnt = gb.ReadDwordLE();
+	for (DWORD n = cnt; gb.RemainingSize() >= 4 && n-- > 0; ) {
+		const DWORD size = gb.ReadDwordLE();
 		CStringA str;
-		for (int cnt = bs.getbits(32); cnt-- > 0; ) {
-			str += (CHAR)bs.getbits(8);
-		}
+		gb.ReadBuffer((BYTE*)str.GetBufferSetLength(size), size);
 
-		int sepPos = str.Find('=');
+		const int sepPos = str.Find('=');
 		if (sepPos <= 0 || sepPos == str.GetLength() - 1) {
 			continue;
 		}
