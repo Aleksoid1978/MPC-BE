@@ -388,7 +388,6 @@ Ztring MediaInfo_Internal::Inform()
             {
                 Retour+=MediaInfoLib::Config.LineSeparator_Get();
                 Retour+=Inform((stream_t)StreamKind, StreamPos, false);
-                Retour.FindAndReplace(__T("\\"), __T("|SC1|"), 0, Ztring_Recursive);
             }
 
             if (HTML) Retour+=__T("</table>\n<br />");
@@ -398,6 +397,16 @@ Ztring MediaInfo_Internal::Inform()
 
     if (HTML) Retour+=__T("\n</body>\n</html>\n");
 
+    #if defined(MEDIAINFO_XML_YES)
+        if (XML || XML_0_7_78_MA || XML_0_7_78_MI)
+            Retour=Ztring().From_UTF8(To_XML(*Node_Main, 0, false, false));
+    #endif //MEDIAINFO_XML_YES
+    #if defined(MEDIAINFO_JSON_YES)
+        if (JSON)
+            Retour=__T("{\n")+Ztring().From_UTF8(To_JSON(*Node_Main, 0, false, false))+__T("\n}");
+    #endif //MEDIAINFO_JSON_YES
+
+    Retour.FindAndReplace(__T("\\"), __T("|SC1|"), 0, Ztring_Recursive);
     ConvertRetour(Retour);
 
     //Special characters
@@ -426,17 +435,6 @@ Ztring MediaInfo_Internal::Inform()
             }
         }
     #endif //MEDIAINFO_TRACE
-
-    #if defined(MEDIAINFO_XML_YES)
-        if (XML || XML_0_7_78_MA || XML_0_7_78_MI)
-            Retour=Ztring().From_UTF8(To_XML(*Node_Main, 0, false, false));
-    #endif //MEDIAINFO_XML_YES
-    #if defined(MEDIAINFO_JSON_YES)
-        if (JSON)
-            Retour=__T("{\n")+Ztring().From_UTF8(To_JSON(*Node_Main, 0, false, false))+__T("\n}");
-    #endif //MEDIAINFO_JSON_YES
-
-    ConvertRetour(Retour);
 
     return Retour;
 
