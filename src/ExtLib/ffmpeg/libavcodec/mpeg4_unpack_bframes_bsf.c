@@ -108,8 +108,8 @@ static int mpeg4_unpack_bframes_filter(AVBSFContext *ctx, AVPacket *out)
         s->b_frame_buf      = create_new_buffer(in->data + pos_vop2, s->b_frame_buf_size);
         if (!s->b_frame_buf) {
             s->b_frame_buf_size = 0;
-            av_packet_free(&in);
-            return AVERROR(ENOMEM);
+            ret = AVERROR(ENOMEM);
+            goto fail;
         }
     }
 
@@ -122,14 +122,12 @@ static int mpeg4_unpack_bframes_filter(AVBSFContext *ctx, AVPacket *out)
         /* use frame from BSFContext */
         ret = av_packet_copy_props(out, in);
         if (ret < 0) {
-            av_packet_free(&in);
-            return ret;
+            goto fail;
         }
 
         ret = av_packet_from_data(out, s->b_frame_buf, s->b_frame_buf_size);
         if (ret < 0) {
-            av_packet_free(&in);
-            return ret;
+            goto fail;
         }
         if (in->size <= MAX_NVOP_SIZE) {
             /* N-VOP */
@@ -142,9 +140,8 @@ static int mpeg4_unpack_bframes_filter(AVBSFContext *ctx, AVPacket *out)
             s->b_frame_buf      = create_new_buffer(in->data, in->size);
             if (!s->b_frame_buf) {
                 s->b_frame_buf_size = 0;
-                av_packet_unref(out);
-                av_packet_free(&in);
-                return AVERROR(ENOMEM);
+                ret = AVERROR(ENOMEM);
+                goto fail;
             }
         }
     } else if (nb_vop >= 2) {
@@ -152,6 +149,9 @@ static int mpeg4_unpack_bframes_filter(AVBSFContext *ctx, AVPacket *out)
         av_packet_move_ref(out, in);
         out->size = pos_vop2;
     } else if (pos_p >= 0) {
+        ret = av_packet_make_writable(in);
+        if (ret < 0)
+            goto fail;
         av_log(ctx, AV_LOG_DEBUG, "Updating DivX userdata (remove trailing 'p').\n");
         av_packet_move_ref(out, in);
         /* remove 'p' (packed) from the end of the (DivX) userdata string */
@@ -161,9 +161,12 @@ static int mpeg4_unpack_bframes_filter(AVBSFContext *ctx, AVPacket *out)
         av_packet_move_ref(out, in);
     }
 
+fail:
+    if (ret < 0)
+        av_packet_unref(out);
     av_packet_free(&in);
 
-    return 0;
+    return ret;
 }
 
 static int mpeg4_unpack_bframes_init(AVBSFContext *ctx)
