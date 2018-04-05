@@ -1063,7 +1063,8 @@ int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
                 sub->format = 1;
 
             for (i = 0; i < sub->num_rects; i++) {
-                if (sub->rects[i]->ass && !utf8_check(sub->rects[i]->ass)) {
+                if (avctx->sub_charenc_mode != FF_SUB_CHARENC_MODE_IGNORE &&
+                    sub->rects[i]->ass && !utf8_check(sub->rects[i]->ass)) {
                     av_log(avctx, AV_LOG_ERROR,
                            "Invalid UTF-8 in decoded subtitles text; "
                            "maybe missing -sub_charenc option\n");
@@ -1619,7 +1620,7 @@ static int video_get_buffer(AVCodecContext *s, AVFrame *pic)
         pic->linesize[i] = 0;
     }
     if (desc->flags & AV_PIX_FMT_FLAG_PAL ||
-        desc->flags & AV_PIX_FMT_FLAG_PSEUDOPAL)
+        ((desc->flags & FF_PSEUDOPAL) && pic->data[1]))
         avpriv_set_systematic_pal2((uint32_t *)pic->data[1], pic->format);
 
     if (s->debug & FF_DEBUG_BUFFERS)
@@ -1787,9 +1788,6 @@ static void validate_avframe_allocation(AVCodecContext *avctx, AVFrame *frame)
         for (i = 0; i < num_planes; i++) {
             av_assert0(frame->data[i]);
         }
-        // For now do not enforce anything for palette of pseudopal formats
-        if (num_planes == 1 && (flags & AV_PIX_FMT_FLAG_PSEUDOPAL))
-            num_planes = 2;
         // For formats without data like hwaccel allow unused pointers to be non-NULL.
         for (i = num_planes; num_planes > 0 && i < FF_ARRAY_ELEMS(frame->data); i++) {
             if (frame->data[i])

@@ -1345,6 +1345,19 @@ enum AVPacketSideDataType {
     AV_PKT_DATA_A53_CC,
 
     /**
+     * This side data is encryption initialization data.
+     * The format is not part of ABI, use av_encryption_init_info_* methods to
+     * access.
+     */
+    AV_PKT_DATA_ENCRYPTION_INIT_INFO,
+
+    /**
+     * This side data contains encryption info for how to decrypt the packet.
+     * The format is not part of ABI, use av_encryption_info_* methods to access.
+     */
+    AV_PKT_DATA_ENCRYPTION_INFO,
+
+    /**
      * The number of side data types.
      * This is not part of the public API/ABI in the sense that it may
      * change when new side data types are added.
@@ -2920,6 +2933,10 @@ typedef struct AVCodecContext {
 #define FF_PROFILE_HEVC_MAIN_STILL_PICTURE          3
 #define FF_PROFILE_HEVC_REXT                        4
 
+#define FF_PROFILE_AV1_MAIN                         0
+#define FF_PROFILE_AV1_HIGH                         1
+#define FF_PROFILE_AV1_PROFESSIONAL                 2
+
 #define FF_PROFILE_MJPEG_HUFFMAN_BASELINE_DCT            0xc0
 #define FF_PROFILE_MJPEG_HUFFMAN_EXTENDED_SEQUENTIAL_DCT 0xc1
 #define FF_PROFILE_MJPEG_HUFFMAN_PROGRESSIVE_DCT         0xc2
@@ -3079,6 +3096,7 @@ typedef struct AVCodecContext {
 #define FF_SUB_CHARENC_MODE_DO_NOTHING  -1  ///< do nothing (demuxer outputs a stream supposed to be already in UTF-8, or the codec is bitmap for instance)
 #define FF_SUB_CHARENC_MODE_AUTOMATIC    0  ///< libavcodec will select the mode itself
 #define FF_SUB_CHARENC_MODE_PRE_DECODER  1  ///< the AVPacket data needs to be recoded to UTF-8 before being fed to the decoder, requires iconv
+#define FF_SUB_CHARENC_MODE_IGNORE       2  ///< neither convert the subtitles, nor check them for valid UTF-8
 
     /**
      * Skip processing alpha if supported by codec.
@@ -4347,7 +4365,7 @@ int av_packet_from_data(AVPacket *pkt, uint8_t *data, int size);
  * @warning This is a hack - the packet memory allocation stuff is broken. The
  * packet is allocated if it was not really allocated.
  *
- * @deprecated Use av_packet_ref
+ * @deprecated Use av_packet_ref or av_packet_make_refcounted
  */
 attribute_deprecated
 int av_dup_packet(AVPacket *pkt);
@@ -4517,6 +4535,33 @@ void av_packet_move_ref(AVPacket *dst, AVPacket *src);
  * @return 0 on success AVERROR on failure.
  */
 int av_packet_copy_props(AVPacket *dst, const AVPacket *src);
+
+/**
+ * Ensure the data described by a given packet is reference counted.
+ *
+ * @note This function does not ensure that the reference will be writable.
+ *       Use av_packet_make_writable instead for that purpose.
+ *
+ * @see av_packet_ref
+ * @see av_packet_make_writable
+ *
+ * @param pkt packet whose data should be made reference counted.
+ *
+ * @return 0 on success, a negative AVERROR on error. On failure, the
+ *         packet is unchanged.
+ */
+int av_packet_make_refcounted(AVPacket *pkt);
+
+/**
+ * Create a writable reference for the data described by a given packet,
+ * avoiding data copy if possible.
+ *
+ * @param pkt Packet whose data should be made writable.
+ *
+ * @return 0 on success, a negative AVERROR on failure. On failure, the
+ *         packet is unchanged.
+ */
+int av_packet_make_writable(AVPacket *pkt);
 
 /**
  * Convert valid timing fields (timestamps / durations) in a packet from one
