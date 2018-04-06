@@ -919,7 +919,7 @@ HRESULT CMpaDecFilter::ProcessEAC3_SPDIF()
 		p += size;
 
 		if (m_hdmicount < repeat) {
-			break;
+			continue;
 		}
 
 		hr = DeliverBitstream(m_hdmibuff, m_hdmisize, IEC61937_EAC3, aframe.samplerate, aframe.samples * repeat);
