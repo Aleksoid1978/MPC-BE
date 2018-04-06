@@ -308,6 +308,7 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_hdmisize(0)
 	, m_truehd_samplerate(0)
 	, m_truehd_framelength(0)
+	, m_eac3_prev_frametype(EAC3_FRAME_TYPE_RESERVED)
 	, m_bNeedCheck(TRUE)
 	, m_bHasVideo(FALSE)
 	, m_bIgnoreJitter(FALSE)
@@ -903,13 +904,22 @@ HRESULT CMpaDecFilter::ProcessEAC3_SPDIF()
 		if (p + size > end) {
 			break;
 		}
+		if (aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT && m_eac3_prev_frametype != EAC3_FRAME_TYPE_INDEPENDENT) {
+			DLog(L"CMpaDecFilter::ProcessEAC3_SPDIF() : Ignoring dependent frame without independent frame.");
+			p++;
+			continue;
+		}
 
 		static const uint8_t eac3_repeat[4] = {6, 3, 2, 1};
 		int repeat = 1;
 		if ((p[4] & 0xc0) != 0xc0) { /* fscod */
 			repeat = eac3_repeat[(p[4] & 0x30) >> 4]; /* numblkscod */
 		}
-		m_hdmicount++;
+
+		if (aframe.param1 != EAC3_FRAME_TYPE_DEPENDENT) {
+			m_hdmicount++;
+		}
+
 		if (m_hdmisize + size <= BS_EAC3_SIZE - BS_HEADER_SIZE) {
 			memcpy(m_hdmibuff + m_hdmisize, p, size);
 			m_hdmisize += size;
@@ -918,13 +928,16 @@ HRESULT CMpaDecFilter::ProcessEAC3_SPDIF()
 		}
 		p += size;
 
-		if (m_hdmicount < repeat) {
+		if (m_hdmicount < repeat
+				|| m_eac3_prev_frametype == EAC3_FRAME_TYPE_DEPENDENT) {
+			m_eac3_prev_frametype = aframe.param1;
 			continue;
 		}
 
 		hr = DeliverBitstream(m_hdmibuff, m_hdmisize, IEC61937_EAC3, aframe.samplerate, aframe.samples * repeat);
 		m_hdmicount = 0;
 		m_hdmisize  = 0;
+		m_eac3_prev_frametype = EAC3_FRAME_TYPE_RESERVED;
 		if (FAILED(hr)) {
 			return hr;
 		}

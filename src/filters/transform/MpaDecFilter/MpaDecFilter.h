@@ -80,6 +80,7 @@ protected:
 	int             m_hdmisize;
 	int             m_truehd_samplerate;
 	int             m_truehd_framelength;
+	BYTE            m_eac3_prev_frametype;
 
 	CFFAudioDecoder m_FFAudioDec;
 
