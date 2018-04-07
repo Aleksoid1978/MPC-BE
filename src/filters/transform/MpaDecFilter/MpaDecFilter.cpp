@@ -471,6 +471,7 @@ HRESULT CMpaDecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, d
 	m_hdmisize  = 0;
 	m_truehd_samplerate  = 0;
 	m_truehd_framelength = 0;
+	m_eac3_prev_frametype = EAC3_FRAME_TYPE_RESERVED;
 	m_bResync = true;
 	m_rtStart = 0; // LOOKATTHIS // reset internal timer?
 
