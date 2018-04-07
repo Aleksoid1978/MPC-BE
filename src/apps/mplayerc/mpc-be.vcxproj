@@ -316,7 +316,6 @@
     <ClInclude Include="WinHotkeyCtrl.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\ani.avi" />
     <None Include="res\icon.ico">
       <FileType>ICO</FileType>
     </None>
@@ -337,11 +336,8 @@
     <CustomBuildStep Include="res\mplayerc.rc2">
       <FileType>RC2</FileType>
     </CustomBuildStep>
-    <None Include="res\multi.ico" />
     <None Include="res\noaudio.bmp" />
-    <None Include="res\onoff.bmp" />
     <None Include="res\empty.hlsl" />
-    <None Include="res\single.ico" />
     <None Include="res\stereo.bmp" />
     <None Include="res\streamtypes.bmp" />
     <None Include="res\tb_pause_16.ico" />

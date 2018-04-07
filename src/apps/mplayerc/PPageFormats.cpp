@@ -667,12 +667,15 @@ BOOL CPPageFormats::OnInitDialog()
 	}
 
 	CImage onoff;
-	if (dpiY < 144) {
-		onoff.LoadFromResource(AfxGetInstanceHandle(), IDB_ONOFF_96);
-		m_onoff.Create(12, 12, ILC_COLOR4 | ILC_MASK, 0, 3);
-	} else {
+	if (dpiY >= 192) {
+		onoff.LoadFromResource(AfxGetInstanceHandle(), IDB_ONOFF_192);
+		m_onoff.Create(24, 24, ILC_COLOR4 | ILC_MASK, 0, 3);
+	} else if (dpiY >= 144) {
 		onoff.LoadFromResource(AfxGetInstanceHandle(), IDB_ONOFF_144);
 		m_onoff.Create(18, 18, ILC_COLOR4 | ILC_MASK, 0, 3);
+	} else {
+		onoff.LoadFromResource(AfxGetInstanceHandle(), IDB_ONOFF_96);
+		m_onoff.Create(12, 12, ILC_COLOR4 | ILC_MASK, 0, 3);
 	}
 	m_onoff.Add(CBitmap::FromHandle(onoff), 0xffffff);
 	m_list.SetImageList(&m_onoff, LVSIL_SMALL);
