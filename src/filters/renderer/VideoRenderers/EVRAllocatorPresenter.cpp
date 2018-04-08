@@ -207,8 +207,8 @@ void CEVRAllocatorPresenter::StartWorkerThreads()
 	DWORD dwThreadId;
 
 	if (m_nRenderState == Shutdown) {
-		m_hEvtQuit			= CreateEvent (nullptr, TRUE, FALSE, nullptr);
-		m_hEvtFlush			= CreateEvent (nullptr, TRUE, FALSE, nullptr);
+		m_hEvtQuit			= CreateEventW(nullptr, TRUE, FALSE, nullptr);
+		m_hEvtFlush			= CreateEventW(nullptr, TRUE, FALSE, nullptr);
 
 		m_hRenderThread		= ::CreateThread(nullptr, 0, PresentThread, (LPVOID)this, 0, &dwThreadId);
 		SetThreadPriority(m_hRenderThread, THREAD_PRIORITY_TIME_CRITICAL);
@@ -639,7 +639,7 @@ STDMETHODIMP CEVRAllocatorPresenter::ProcessMessage(MFVP_MESSAGE_TYPE eMessage, 
 				CAutoLock cRenderLock(&m_RenderLock);
 				RenegotiateMediaType();
 			} else {// leave it to the other thread
-				m_hEvtRenegotiate = CreateEvent(nullptr, TRUE, FALSE, nullptr);
+				m_hEvtRenegotiate = CreateEventW(nullptr, TRUE, FALSE, nullptr);
 				EXECUTE_ASSERT(WAIT_OBJECT_0 == WaitForSingleObject(m_hEvtRenegotiate, INFINITE));
 				EXECUTE_ASSERT(CloseHandle(m_hEvtRenegotiate));
 				m_hEvtRenegotiate = nullptr;

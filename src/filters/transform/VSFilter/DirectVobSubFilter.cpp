@@ -99,7 +99,7 @@ CDirectVobSubFilter::CDirectVobSubFilter(LPUNKNOWN punk, HRESULT* phr, const GUI
 
 	memset(&m_CurrentVIH2, 0, sizeof(VIDEOINFOHEADER2));
 
-	m_hEvtTransform = CreateEvent(nullptr, FALSE, TRUE, nullptr);
+	m_hEvtTransform = CreateEventW(nullptr, FALSE, TRUE, nullptr);
 }
 
 CDirectVobSubFilter::~CDirectVobSubFilter()
@@ -2043,7 +2043,7 @@ void CDirectVobSubFilter::SetupFRD(CStringArray& paths, CAtlArray<HANDLE>& handl
 		if (!fFound) {
 			paths.Add(fn);
 
-			HANDLE h = FindFirstChangeNotification(fn, FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE);
+			HANDLE h = FindFirstChangeNotificationW(fn, FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE);
 			if (h != INVALID_HANDLE_VALUE) {
 				handles.Add(h);
 			}

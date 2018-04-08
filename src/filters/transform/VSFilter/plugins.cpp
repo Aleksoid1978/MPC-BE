@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -145,7 +145,7 @@ namespace Plugin
 					if (fn != fn2) {
 						CPath p(fn2);
 						p.RemoveFileSpec();
-						HANDLE h = FindFirstChangeNotification(p, FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE);
+						HANDLE h = FindFirstChangeNotificationW(p, FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE);
 						if (h != INVALID_HANDLE_VALUE) {
 							fn = fn2;
 							handles.SetCount(1);

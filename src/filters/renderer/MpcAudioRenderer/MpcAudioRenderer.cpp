@@ -225,15 +225,15 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		return;
 	}
 
-	m_hDataEvent             = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	m_hDataEvent             = CreateEventW(nullptr, FALSE, FALSE, nullptr);
 
-	m_hPauseEvent            = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-	m_hWaitPauseEvent        = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-	m_hResumeEvent           = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-	m_hWaitResumeEvent       = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-	m_hStopRenderThreadEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	m_hPauseEvent            = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+	m_hWaitPauseEvent        = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+	m_hResumeEvent           = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+	m_hWaitResumeEvent       = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+	m_hStopRenderThreadEvent = CreateEventW(nullptr, FALSE, FALSE, nullptr);
 
-	m_hRendererNeedMoreData  = CreateEvent(nullptr, TRUE, FALSE, nullptr);
+	m_hRendererNeedMoreData  = CreateEventW(nullptr, TRUE, FALSE, nullptr);
 
 	HRESULT hr = S_OK;
 	m_pInputPin = DNew CMpcAudioRendererInputPin(this, &hr);

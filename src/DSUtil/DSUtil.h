@@ -50,13 +50,6 @@
 //#define _countof(array) (sizeof(array)/sizeof(array[0]))
 //#endif
 
-enum FRAME_TYPE {
-	PICT_NONE,
-	PICT_TOP_FIELD,
-	PICT_BOTTOM_FIELD,
-	PICT_FRAME
-};
-
 extern int				CountPins(IBaseFilter* pBF, int& nIn, int& nOut, int& nInC, int& nOutC);
 extern bool				IsSplitter(IBaseFilter* pBF, bool fCountConnectedOnly = false);
 extern bool				IsMultiplexer(IBaseFilter* pBF, bool fCountConnectedOnly = false);

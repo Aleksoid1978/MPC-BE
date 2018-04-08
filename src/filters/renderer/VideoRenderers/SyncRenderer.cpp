@@ -2296,9 +2296,9 @@ void CSyncAP::StartWorkerThreads()
 {
 	DWORD dwThreadId;
 	if (m_nRenderState == Shutdown) {
-		m_hEvtQuit = CreateEvent(nullptr, TRUE, FALSE, nullptr);
-		m_hEvtFlush = CreateEvent(nullptr, TRUE, FALSE, nullptr);
-		m_hEvtSkip = CreateEvent(nullptr, TRUE, FALSE, nullptr);
+		m_hEvtQuit  = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+		m_hEvtFlush = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+		m_hEvtSkip  = CreateEventW(nullptr, TRUE, FALSE, nullptr);
 		m_hMixerThread = ::CreateThread(nullptr, 0, MixerThreadStatic, (LPVOID)this, 0, &dwThreadId);
 		SetThreadPriority(m_hMixerThread, THREAD_PRIORITY_HIGHEST);
 		m_hRenderThread = ::CreateThread(nullptr, 0, RenderThreadStatic, (LPVOID)this, 0, &dwThreadId);
