@@ -194,8 +194,11 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 		}
 
 		if (!pMainFrame->m_youtubeFields.content.IsEmpty()) {
-			m_descText += pMainFrame->m_youtubeFields.content;
-
+			CString content = pMainFrame->m_youtubeFields.content;
+			if (content.Find('\n') && content.Find(L"\r\n") == -1) {
+				content.Replace(L"\n", L"\r\n");
+			}
+			m_descText.Append(content);
 		}
 	}
 
