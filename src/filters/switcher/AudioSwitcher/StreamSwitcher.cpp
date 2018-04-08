@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -826,7 +826,7 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 
 		/*
 		if (CComQIPtr<IPinConnection> pPC = pOut->CurrentPinConnection()) {
-			HANDLE hEOS = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+			HANDLE hEOS = CreateEventW(nullptr, FALSE, FALSE, nullptr);
 			hr = pPC->NotifyEndOfStream(hEOS);
 			hr = pOut->DeliverEndOfStream();
 			WaitForSingleObject(hEOS, 3000);

@@ -15562,7 +15562,7 @@ bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 			}
 
 			if (!bExists) {
-				HANDLE h = FindFirstChangeNotification(fname, FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE);
+				HANDLE h = FindFirstChangeNotificationW(fname, FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE);
 				if (h != INVALID_HANDLE_VALUE) {
 					m_ExtSubPaths.Add(fname);
 					m_ExtSubPathsHandles.Add(h);

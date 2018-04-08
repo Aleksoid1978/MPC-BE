@@ -21,11 +21,16 @@
 
 #pragma once
 
-#include "../../../DSUtil/DSUtil.h"
+enum FRAME_TYPE {
+	PICT_NONE,
+	PICT_TOP_FIELD,
+	PICT_BOTTOM_FIELD,
+	PICT_FRAME
+};
 
 inline REFERENCE_TIME g_tSegmentStart    = 0;
 inline FRAME_TYPE     g_nFrameType       = PICT_NONE;
-inline HANDLE         g_hNewSegmentEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+inline HANDLE         g_hNewSegmentEvent = CreateEventW(nullptr, FALSE, FALSE, nullptr);
 
 inline bool g_bNoDuration           = false;
 inline bool g_bExternalSubtitleTime = false;
