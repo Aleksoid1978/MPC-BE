@@ -241,6 +241,9 @@ static const std::map<GUID, LPCSTR> dxvaguids = {
 	ADDENTRY(DXVA2_ModeMPEG4pt2_VLD_AdvSimple_GMC)
 	ADDENTRY(DXVA2_ModeHEVC_VLD_Main)
 	ADDENTRY(DXVA2_ModeHEVC_VLD_Main10)
+	ADDENTRY(DXVA2_ModeVP9_VLD_Profile0)
+	ADDENTRY(DXVA2_ModeVP9_VLD_10bit_Profile2)
+	ADDENTRY(DXVA2_ModeVP8_VLD)
 };
 #undef ADDENTRY
 
@@ -548,7 +551,12 @@ CString GetGUIDString(const GUID& guid)
 		}
 	}
 
-	return CString(guidStr);
+	CString ret(guidStr);
+	if (ret == L"Unknown GUID Name") {
+		ret.AppendFormat(L" %s", CStringFromGUID(guid));
+	}
+
+	return ret;
 }
 
 void CMediaTypeEx::Dump(std::list<CString>& sl)
