@@ -17314,13 +17314,13 @@ void CMainFrame::SendAPICommand(MPCAPI_COMMAND nCommand, LPCWSTR fmt, ...)
 	const CAppSettings& s = AfxGetAppSettings();
 
 	if (s.hMasterWnd) {
-		COPYDATASTRUCT CDS;
-		WCHAR buff[800] = { 0 };
+		WCHAR buff[800] = {};
 
 		va_list args;
 		va_start(args, fmt);
 		vswprintf_s(buff, _countof(buff), fmt, args);
 
+		COPYDATASTRUCT CDS;
 		CDS.cbData = (wcslen (buff) + 1) * sizeof(WCHAR);
 		CDS.dwData = nCommand;
 		CDS.lpData = (LPVOID)buff;
@@ -17338,11 +17338,11 @@ void CMainFrame::SendNowPlayingToApi()
 	}
 
 	if (m_eMediaLoadState == MLS_LOADED) {
-		CPlaylistItem	pli;
-		CString			title, author, description;
-		CString			label;
-		long			lDuration = 0;
-		REFERENCE_TIME	rtDur;
+		CPlaylistItem  pli;
+		CString        title, author, description;
+		CString        label;
+		long           lDuration = 0;
+		REFERENCE_TIME rtDur;
 
 		if (GetPlaybackMode() == PM_FILE) {
 			m_wndInfoBar.GetLine(ResStr(IDS_INFOBAR_TITLE), title);
@@ -17355,7 +17355,7 @@ void CMainFrame::SendNowPlayingToApi()
 
 				m_pMS->GetDuration(&rtDur);
 				DVD_HMSF_TIMECODE tcDur = RT2HMSF(rtDur);
-				lDuration = tcDur.bHours*60*60 + tcDur.bMinutes*60 + tcDur.bSeconds;
+				lDuration = tcDur.bHours * 60 * 60 + tcDur.bMinutes * 60 + tcDur.bSeconds;
 			}
 		}
 		else if (GetPlaybackMode() == PM_DVD) {
@@ -17396,7 +17396,7 @@ void CMainFrame::SendNowPlayingToApi()
 					ULONG ulFlags;
 					if (SUCCEEDED(m_pDVDI->GetTotalTitleTime(&tcDur, &ulFlags))) {
 						// calculate duration in seconds
-						lDuration = tcDur.bHours*60*60 + tcDur.bMinutes*60 + tcDur.bSeconds;
+						lDuration = tcDur.bHours * 60 * 60 + tcDur.bMinutes * 60 + tcDur.bSeconds;
 					}
 
 					// build string
@@ -17416,7 +17416,7 @@ void CMainFrame::SendNowPlayingToApi()
 		CStringW buff;
 		buff.Format(L"%s|%s|%s|%s|%d", title, author, description, label, lDuration);
 
-		SendAPICommand(CMD_NOWPLAYING, buff);
+		SendAPICommand(CMD_NOWPLAYING, L"%s", buff);
 		SendSubtitleTracksToApi();
 		SendAudioTracksToApi();
 	}
@@ -17460,7 +17460,7 @@ void CMainFrame::SendSubtitleTracksToApi()
 		strSubs.Append (L"-2");
 	}
 
-	SendAPICommand(CMD_LISTSUBTITLETRACKS, strSubs);
+	SendAPICommand(CMD_LISTSUBTITLETRACKS, L"%s", strSubs);
 }
 
 void CMainFrame::SendAudioTracksToApi()
@@ -17500,7 +17500,7 @@ void CMainFrame::SendAudioTracksToApi()
 		strAudios.Append(L"-2");
 	}
 
-	SendAPICommand(CMD_LISTAUDIOTRACKS, strAudios);
+	SendAPICommand(CMD_LISTAUDIOTRACKS, L"%s", strAudios);
 }
 
 void CMainFrame::SendPlaylistToApi()
@@ -17523,14 +17523,13 @@ void CMainFrame::SendPlaylistToApi()
 		}
 	}
 
-	int index = m_wndPlaylistBar.GetSelIdx();
 	if (strPlaylist.IsEmpty()) {
 		strPlaylist.Append(L"-1");
 	} else {
-		strPlaylist.AppendFormat(L"|%i", index);
+		strPlaylist.AppendFormat(L"|%i", m_wndPlaylistBar.GetSelIdx());
 	}
 
-	SendAPICommand(CMD_PLAYLIST, strPlaylist);
+	SendAPICommand(CMD_PLAYLIST, L"%s", strPlaylist);
 }
 
 void CMainFrame::SendCurrentPositionToApi(bool fNotifySeek)
