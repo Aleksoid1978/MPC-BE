@@ -180,7 +180,7 @@ HRESULT CMpaSplitterFile::Init()
 					start++;
 					continue;
 				}
-				if (start + frame_size >= end) {
+				if (start + frame_size + MPA_HEADER_SIZE > end) {
 					break;
 				}
 
@@ -222,7 +222,7 @@ HRESULT CMpaSplitterFile::Init()
 						start++;
 						continue;
 					}
-					if (start + frame_size >= end) {
+					if (start + frame_size + ADTS_HEADER_SIZE > end) {
 						break;
 					}
 
