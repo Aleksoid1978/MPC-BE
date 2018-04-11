@@ -2118,15 +2118,15 @@ HRESULT CDX9RenderingEngine::AlphaBlt(RECT* pSrc, RECT* pDst, IDirect3DTexture9*
 		float tu, tv;
 	}
 	pVertices[] = {
-		{(float)dst.left, (float)dst.top, 0.5f, 2.0f, (float)src.left / w, (float)src.top / h},
-		{(float)dst.right, (float)dst.top, 0.5f, 2.0f, (float)src.right / w, (float)src.top / h},
-		{(float)dst.left, (float)dst.bottom, 0.5f, 2.0f, (float)src.left / w, (float)src.bottom / h},
+		{(float)dst.left,  (float)dst.top,    0.5f, 2.0f, (float)src.left / w,  (float)src.top / h},
+		{(float)dst.right, (float)dst.top,    0.5f, 2.0f, (float)src.right / w, (float)src.top / h},
+		{(float)dst.left,  (float)dst.bottom, 0.5f, 2.0f, (float)src.left / w,  (float)src.bottom / h},
 		{(float)dst.right, (float)dst.bottom, 0.5f, 2.0f, (float)src.right / w, (float)src.bottom / h},
 	};
 
-	for (unsigned i = 0; i < _countof(pVertices); i++) {
-		pVertices[i].x -= 0.5f;
-		pVertices[i].y -= 0.5f;
+	for (auto& pVertice : pVertices) {
+		pVertice.x -= 0.5f;
+		pVertice.y -= 0.5f;
 	}
 
 	hr = m_pD3DDevEx->SetTexture(0, pTexture);
