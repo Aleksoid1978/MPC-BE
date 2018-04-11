@@ -3026,14 +3026,22 @@ void CorrectWaveFormatEx(CMediaType& mt)
 	}
 }
 
+namespace {
+	LONGLONG GetPerfFrequency()
+	{
+		LARGE_INTEGER freq;
+		QueryPerformanceFrequency(&freq);
+		return freq.QuadPart;
+	}
+}
+
 inline const LONGLONG GetPerfCounter()
 {
-	LARGE_INTEGER llPerfFrequency = { 0 };
-	QueryPerformanceFrequency(&llPerfFrequency);
-	if (llPerfFrequency.QuadPart != 0) {
+	static LONGLONG llPerfFrequency = GetPerfFrequency();
+	if (llPerfFrequency) {
 		LARGE_INTEGER llPerfCounter;
 		QueryPerformanceCounter(&llPerfCounter);
-		return llMulDiv(llPerfCounter.QuadPart, 10000000, llPerfFrequency.QuadPart, 0);
+		return llMulDiv(llPerfCounter.QuadPart, 10000000, llPerfFrequency, 0);
 	} else {
 		// ms to 100ns units
 		return timeGetTime() * 10000;
