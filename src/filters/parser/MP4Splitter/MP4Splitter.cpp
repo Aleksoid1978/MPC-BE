@@ -1350,6 +1350,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						} else if (type == AP4_ATOM_TYPE_FLAC) {
 							SetTrackName(&TrackName, L"FLAC");
 							fourcc = WAVE_FORMAT_FLAC;
+						} else if (type == AP4_ATOM_TYPE_Opus) {
+							SetTrackName(&TrackName, L"Opus");
+							fourcc = WAVE_FORMAT_OPUS;
 						} else if (type == AP4_ATOM_TYPE_DTSC || type == AP4_ATOM_TYPE_DTSE
 								|| type == AP4_ATOM_TYPE_DTSH || type == AP4_ATOM_TYPE_DTSL) {
 							fourcc = type = WAVE_FORMAT_DTS2;
@@ -1383,6 +1386,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						mt.subtype = FOURCCMap(fourcc);
 						if (type == AP4_ATOM_TYPE_EAC3) {
 							mt.subtype = MEDIASUBTYPE_DOLBY_DDPLUS;
+						} else if (type == AP4_ATOM_TYPE_Opus) {
+							mt.subtype = MEDIASUBTYPE_OPUS;
 						}
 
 						if (type == AP4_ATOM_TYPE('m', 's', 0x00, 0x02)) {
@@ -1517,6 +1522,28 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 
 							SetTrackName(&TrackName, Suffix);
+						} else if (type == AP4_ATOM_TYPE_Opus) {
+							if (AP4_DataInfoAtom* dOpsAtom = dynamic_cast<AP4_DataInfoAtom*>(ase->GetChild(AP4_ATOM_TYPE_DOPS))) {
+								const AP4_DataBuffer* di = dOpsAtom->GetData();
+								if (di && di->GetDataSize() >= 11 && di->GetData()[0] == 0) {
+									const BYTE* src = di->GetData() + 1;
+									const size_t size = di->GetDataSize() + 8;
+									std::vector<BYTE> extradata;
+									extradata.resize(size);
+									BYTE* dst = extradata.data();
+
+									memcpy(dst, "OpusHead", 8);
+									AV_WB8(dst + 8, 1); // OpusHead version
+									memcpy(dst + 9, src, size - 9);
+									AV_WL16(dst + 10, AV_RB16(dst + 10));
+									AV_WL32(dst + 12, AV_RB32(dst + 12));
+									AV_WL16(dst + 16, AV_RB16(dst + 16));
+
+									wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + size);
+									wfe->cbSize = (WORD)size;
+									memcpy(wfe + 1, dst, size);
+								}
+							}
 						} else if (db.GetDataSize() > 0) {
 							//always needed extra data for QDM2
 							wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + db.GetDataSize());

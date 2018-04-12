@@ -499,6 +499,9 @@ const AP4_Atom::Type AP4_ATOM_TYPE_HapM = AP4_ATOM_TYPE('H','a','p','M');
 const AP4_Atom::Type AP4_ATOM_TYPE_HapY = AP4_ATOM_TYPE('H','a','p','Y');
 // MPEG-4
 const AP4_Atom::Type AP4_ATOM_TYPE_FMP4 = AP4_ATOM_TYPE('F','M','P','4');
+// Opus
+const AP4_Atom::Type AP4_ATOM_TYPE_Opus = AP4_ATOM_TYPE('O','p','u','s');
+const AP4_Atom::Type AP4_ATOM_TYPE_DOPS = AP4_ATOM_TYPE('d','O','p','s');
 
 const AP4_Atom::Type AP4_ATOM_TYPE_VPCC = AP4_ATOM_TYPE('v','p','c','C');
 // fragmented atom ...
