@@ -632,10 +632,11 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_SAWB:
         case AP4_ATOM_TYPE_OWMA:
         case AP4_ATOM_TYPE_WMA:
-		case AP4_ATOM_TYPE_DTSC:
-		case AP4_ATOM_TYPE_DTSE:
-		case AP4_ATOM_TYPE_DTSH:
-		case AP4_ATOM_TYPE_DTSL:
+        case AP4_ATOM_TYPE_DTSC:
+        case AP4_ATOM_TYPE_DTSE:
+        case AP4_ATOM_TYPE_DTSH:
+        case AP4_ATOM_TYPE_DTSL:
+        case AP4_ATOM_TYPE_Opus:
             atom = new AP4_AudioSampleEntry(type, size, stream, *this);
             break;
 
@@ -689,6 +690,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 
         case AP4_ATOM_TYPE_WFEX:
         case AP4_ATOM_TYPE_GLBL:
+        case AP4_ATOM_TYPE_DOPS:
             atom = new AP4_DataInfoAtom(type, size, stream);
             break;
 
