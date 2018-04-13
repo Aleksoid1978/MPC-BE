@@ -66,7 +66,6 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_TextScale(1.0)
 	, m_MainThreadId(0)
 	, m_bNeedCheckSample(true)
-	, m_pDirectDraw(nullptr)
 	, m_bIsFullscreen(bFullscreen)
 	, m_nMonitorHorRes(0), m_nMonitorVerRes(0)
 	, m_rcMonitor(0, 0, 0, 0)
@@ -539,7 +538,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 	m_ClockTimeChangeHistoryPos		= 0;
 
-	m_pDirectDraw.Release();
 	m_pFont.Release();
 	m_pSprite.Release();
 	m_pLine.Release();
@@ -564,14 +562,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	}
 
 	HRESULT hr = S_OK;
-
-//#define ENABLE_DDRAWSYNC
-#ifdef ENABLE_DDRAWSYNC
-	hr = DirectDrawCreate(nullptr, &m_pDirectDraw, nullptr) ;
-	if (hr == S_OK) {
-		hr = m_pDirectDraw->SetCooperativeLevel(m_hWnd, DDSCL_NORMAL) ;
-	}
-#endif
 
 	ZeroMemory(&m_d3dpp, sizeof(m_d3dpp));
 
@@ -992,27 +982,13 @@ bool CDX9AllocatorPresenter::GetVBlank(int &_ScanLine, int &_bInVBlank, bool _bM
 	int ScanLine = 0;
 	_ScanLine = 0;
 	_bInVBlank = 0;
-
-	if (m_pDirectDraw) {
-		DWORD ScanLineGet = 0;
-		m_pDirectDraw->GetScanLine(&ScanLineGet);
-		BOOL InVBlank;
-		if (m_pDirectDraw->GetVerticalBlankStatus (&InVBlank) != S_OK) {
-			return false;
-		}
-		ScanLine = ScanLineGet;
-		_bInVBlank = InVBlank;
-		if (InVBlank) {
-			ScanLine = 0;
-		}
-	} else {
-		D3DRASTER_STATUS RasterStatus;
-		if (m_pD3DDevEx->GetRasterStatus(0, &RasterStatus) != S_OK) {
-			return false;
-		}
-		ScanLine = RasterStatus.ScanLine;
-		_bInVBlank = RasterStatus.InVBlank;
+	D3DRASTER_STATUS RasterStatus;
+	if (m_pD3DDevEx->GetRasterStatus(0, &RasterStatus) != S_OK) {
+		return false;
 	}
+	ScanLine = RasterStatus.ScanLine;
+	_bInVBlank = RasterStatus.InVBlank;
+
 	if (_bMeasureTime) {
 		m_VBlankMax = std::max(m_VBlankMax, ScanLine);
 		if (ScanLine != 0 && !_bInVBlank) {

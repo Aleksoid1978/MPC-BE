@@ -73,8 +73,6 @@ namespace DSObjects
 
 		CCritSec m_RenderLock;
 
-		CComPtr<IDirectDraw> m_pDirectDraw;
-
 		CComPtr<IDirect3DTexture9>	m_pOSDTexture;
 		CComPtr<IDirect3DSurface9>	m_pOSDSurface;
 		CComPtr<ID3DXLine>			m_pLine;
