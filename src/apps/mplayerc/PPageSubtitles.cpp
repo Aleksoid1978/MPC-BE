@@ -162,7 +162,7 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 	m_cbSubtitleRenderer.AddString(str); // SUBRNDT_XYSUBFILTER
 
 #if ENABLE_ASSFILTERMOD
-	str = L"AssFilterMod";
+	str = L"AssFilterMod (" + ResStr(IDS_AG_NOTRECOMMENDED) + ")";
 	if (!IsCLSIDRegistered(CLSID_AssFilterMod)) {
 		str += L" " + ResStr(IDS_REND_NOT_INSTALLED);
 	}
