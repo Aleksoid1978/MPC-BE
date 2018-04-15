@@ -108,7 +108,8 @@ COSD::COSD(CMainFrame* pMainFrame)
 
 COSD::~COSD()
 {
-	Stop();
+	//Stop();
+	// do not use Stop() here because m_pWnd->KillTimer((UINT_PTR)this) call causes an error
 
 	if (m_MemDC) {
 		m_MemDC.DeleteDC();
