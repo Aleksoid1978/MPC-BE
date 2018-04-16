@@ -142,6 +142,13 @@ void CRenderersSettings::Load()
 	GET_OPTION_BOOL(bResetDevice, IDS_RS_RESETDEVICE);
 
 	GET_OPTION_INT(iSurfaceFormat, IDS_RS_SURFACEFORMAT);
+	if (iSurfaceFormat == D3DFMT_A32B32G32R32F) { // is no longer supported, because it is very redundant.
+		iSurfaceFormat = D3DFMT_A16B16G16R16F;
+	}
+	else if (iSurfaceFormat != D3DFMT_X8R8G8B8 && iSurfaceFormat != D3DFMT_A2R10G10B10 && iSurfaceFormat != D3DFMT_A16B16G16R16F) {
+		iSurfaceFormat = D3DFMT_X8R8G8B8;
+	}
+
 	GET_OPTION_BOOL(b10BitOutput, IDS_RS_OUTPUT10BIT);
 	GET_OPTION_INT(iResizer, IDS_RS_RESIZER);
 	GET_OPTION_INT(iDownscaler, IDS_RS_DOWNSCALER);
