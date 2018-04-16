@@ -578,13 +578,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 	// set surface formats
 	switch (rs.iSurfaceFormat) {
-	case D3DFMT_A32B32G32R32F: {
-		bool bFP32Support = SUCCEEDED(m_pD3DEx->CheckDeviceFormat(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER, D3DRTYPE_VOLUMETEXTURE, D3DFMT_A32B32G32R32F));
-		if (bFP32Support) {
-			m_SurfaceFmt = D3DFMT_A32B32G32R32F;
-			break;
-		}
-	}
 	case D3DFMT_A16B16G16R16F:
 		if (m_bFP16Support) {
 			m_SurfaceFmt = D3DFMT_A16B16G16R16F;

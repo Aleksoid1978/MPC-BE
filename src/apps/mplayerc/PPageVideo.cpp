@@ -239,7 +239,6 @@ BOOL CPPageVideo::OnInitDialog()
 	AddStringData(m_cbDX9SurfaceFormat, L"8-bit Integer", D3DFMT_X8R8G8B8);
 	AddStringData(m_cbDX9SurfaceFormat, L"10-bit Integer", D3DFMT_A2R10G10B10);
 	AddStringData(m_cbDX9SurfaceFormat, L"16-bit Floating Point", D3DFMT_A16B16G16R16F);
-	AddStringData(m_cbDX9SurfaceFormat, L"32-bit Floating Point (" + ResStr(IDS_AG_NOTRECOMMENDED) + ")", D3DFMT_A32B32G32R32F);
 	m_cbDX9SurfaceFormat.SetCurSel(0); // default
 	SelectByItemData(m_cbDX9SurfaceFormat, rs.iSurfaceFormat);
 	CorrectComboListWidth(m_cbDX9SurfaceFormat);

@@ -972,7 +972,7 @@ HRESULT CBaseAP::TextureResizeShader2pass(IDirect3DTexture9* pTexture, const CRe
 		if (!m_pResizeTexture) {
 			hr = m_pD3DDevEx->CreateTexture(
 				texWidth, texHeight, 1, D3DUSAGE_RENDERTARGET,
-				m_SurfaceFmt == D3DFMT_A32B32G32R32F ? D3DFMT_A32B32G32R32F : D3DFMT_A16B16G16R16F, // use only float textures here
+				D3DFMT_A16B16G16R16F, // use only float textures here
 				D3DPOOL_DEFAULT, &m_pResizeTexture, nullptr);
 			if (FAILED(hr) || FAILED(m_pResizeTexture->GetLevelDesc(0, &desc))) {
 				m_pResizeTexture = nullptr;
