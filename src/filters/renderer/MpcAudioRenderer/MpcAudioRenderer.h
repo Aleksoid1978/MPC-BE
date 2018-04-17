@@ -60,6 +60,8 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 
 	REFERENCE_TIME		m_rtStartTime;
 	REFERENCE_TIME		m_rtNextSampleTime;
+	REFERENCE_TIME		m_rtLastSampleTimeEnd;
+	REFERENCE_TIME		m_rtEstimateSlavingJitter;
 
 	BOOL				m_bFirstSampleToRender;
 
