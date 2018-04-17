@@ -2173,7 +2173,6 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 	if (!m_bReleased) {
 		WasapiFlush();
 	}
-	m_bReleased = false;
 
 	auto GetAudioPosition = [&] {
 		UINT64 deviceClockFrequency, deviceClockPosition;
@@ -2187,9 +2186,15 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 
 	m_rtEstimateSlavingJitter = 0;
 	if (m_filterState == State_Running) {
-		m_rtEstimateSlavingJitter = m_rtLastSampleTimeEnd - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
-		m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtLastSampleTimeEnd - m_rtEstimateSlavingJitter);
+		if (!m_bReleased) {
+			m_rtEstimateSlavingJitter = m_rtLastSampleTimeEnd - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
+			m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtLastSampleTimeEnd - m_rtEstimateSlavingJitter);
+		} else {
+			m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtNextSampleTime);
+		}
 	}
+
+	m_bReleased = false;
 
 	m_nMaxWasapiQueueSize = TimeToSamples(2000000LL, m_pWaveFormatExOutput) * m_pWaveFormatExOutput->nBlockAlign; // 200 ms
 
