@@ -139,15 +139,18 @@ static bool BMPDIB(LPCWSTR fn, BYTE* pData, CStringW format, ULONG quality, bool
 
 static void PNGDIB(LPCWSTR fn, BYTE* pData, int level)
 {
+	BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
+	if (bih->biCompression != BI_RGB || bih->biWidth <= 0 || abs(bih->biHeight) == 0 || bih->biBitCount % 8) {
+		return;
+	}
+
 	FILE* fp;
 	if (_wfopen_s(&fp, fn, L"wb") == 0) {
-		BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
-		ASSERT(bih->biCompression == BI_RGB);
-
-		unsigned width = bih->biWidth;
-		int height = abs(bih->biHeight); // must be signed integer
-		unsigned bpp = bih->biBitCount / 8;
-		int bit_depth = (bih->biBitCount == 48 || bih->biBitCount == 64) ? 16 : 8; // bits per channel
+		const unsigned width = bih->biWidth;
+		const unsigned height = abs(bih->biHeight);
+		const int bit_depth = (bih->biBitCount == 48 || bih->biBitCount == 64) ? 16 : 8; // bits per channel
+		const unsigned src_bpp = bih->biBitCount / 8;
+		const unsigned dst_bpp = 3 * bit_depth / 8;
 
 		png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
 		png_infop info_ptr = png_create_info_struct(png_ptr);
@@ -157,18 +160,33 @@ static void PNGDIB(LPCWSTR fn, BYTE* pData, int level)
 		png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, 0, 0);
 		png_write_info(png_ptr, info_ptr);
 
-		png_bytep row_ptr = (png_bytep)malloc(width * 3);
-		BYTE *p, *src = pData + sizeof(BITMAPINFOHEADER);
+		BYTE* row_ptr = (png_bytep)malloc(width * dst_bpp);
+		const unsigned src_pitch = width * src_bpp;
+		BYTE* src = pData + sizeof(BITMAPINFOHEADER) + src_pitch * (height - 1);
 
-		for (int y = height - 1; y >= 0; y--) {
-			for (unsigned x = 0; x < width; x++) {
-				unsigned line = (3 * x);
-				p = src + (width * bpp * y) + (bpp * x);
-				row_ptr[line] = (png_byte)p[2];
-				row_ptr[line + 1] = (png_byte)p[1];
-				row_ptr[line + 2] = (png_byte)p[0];
+		for (unsigned y = 0; y < height; ++y) {
+			if (bit_depth == 16) {
+				uint16_t* src16 = (uint16_t*)src;
+				uint16_t* row16 = (uint16_t*)row_ptr;
+				for (unsigned x = 0; x < width; ++x) {
+					*row16++ = src16[2];
+					*row16++ = src16[1];
+					*row16++ = src16[0];
+					src16 += 4;
+				}
+			}
+			else {
+				uint8_t* src8 = (uint8_t*)src;
+				uint8_t* row8 = (uint8_t*)row_ptr;
+				for (unsigned x = 0; x < width; ++x) {
+					*row8++ = src8[2];
+					*row8++ = src8[1];
+					*row8++ = src8[0];
+					src8 += 4;
+				}
 			}
 			png_write_row(png_ptr, row_ptr);
+			src -= src_pitch;
 		}
 		png_write_end(png_ptr, info_ptr);
 
