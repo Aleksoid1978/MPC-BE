@@ -1912,18 +1912,19 @@ again:
 
 		if (bInitNeed) {
 			m_pSyncClock->UnSlave();
+
+			PauseRendererThread();
+			m_bIsAudioClientStarted = false;
+
+			SAFE_RELEASE(m_pRenderClient);
+			m_pSyncClock->UnSlave();
+			SAFE_RELEASE(m_pAudioClock);
+			SAFE_RELEASE(m_pAudioClient);
 		}
 
 		if (S_OK == hr) {
 			DLog(L"CMpcAudioRenderer::CheckAudioClient() - WASAPI client accepted the format");
 			if (bInitNeed) {
-				PauseRendererThread();
-				m_bIsAudioClientStarted = false;
-
-				SAFE_RELEASE(m_pRenderClient);
-				m_pSyncClock->UnSlave();
-				SAFE_RELEASE(m_pAudioClock);
-				SAFE_RELEASE(m_pAudioClient);
 				hr = InitAudioClient();
 			}
 		} else if (AUDCLNT_E_UNSUPPORTED_FORMAT == hr) {
