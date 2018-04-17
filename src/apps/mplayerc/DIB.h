@@ -167,21 +167,21 @@ static void PNGDIB(LPCWSTR fn, BYTE* pData, int level)
 		for (unsigned y = 0; y < height; ++y) {
 			if (bit_depth == 16) {
 				uint16_t* src16 = (uint16_t*)src;
-				uint16_t* row16 = (uint16_t*)row_ptr;
+				uint16_t* dst16 = (uint16_t*)row_ptr;
 				for (unsigned x = 0; x < width; ++x) {
-					*row16++ = src16[2];
-					*row16++ = src16[1];
-					*row16++ = src16[0];
+					*dst16++ = _byteswap_ushort(src16[2]);
+					*dst16++ = _byteswap_ushort(src16[1]);
+					*dst16++ = _byteswap_ushort(src16[0]);
 					src16 += 4;
 				}
 			}
 			else {
 				uint8_t* src8 = (uint8_t*)src;
-				uint8_t* row8 = (uint8_t*)row_ptr;
+				uint8_t* dst8 = (uint8_t*)row_ptr;
 				for (unsigned x = 0; x < width; ++x) {
-					*row8++ = src8[2];
-					*row8++ = src8[1];
-					*row8++ = src8[0];
+					*dst8++ = src8[2];
+					*dst8++ = src8[1];
+					*dst8++ = src8[0];
 					src8 += 4;
 				}
 			}
