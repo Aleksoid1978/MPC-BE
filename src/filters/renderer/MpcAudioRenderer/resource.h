@@ -16,9 +16,6 @@
 #define IDS_ARS_WASAPI_MODE_STATUS_2    7612
 #define IDS_ARS_WASAPI_MODE_STATUS_3    7613
 #define IDS_ARS_WASAPI_MODE_STATUS_5    7614
-#define IDS_ARS_SYNC_METHOD             7620
-#define IDS_ARS_SYNC_BY_TIMESTAMPS      7621
-#define IDS_ARS_SYNC_BY_DURATION        7622
 
 // Next default values for new objects
 //

@@ -101,9 +101,6 @@ BEGIN
     IDS_ARS_WASAPI_MODE_STATUS_2   "use WASAPI, Exclusive mode"
     IDS_ARS_WASAPI_MODE_STATUS_3   "use WASAPI, Shared mode"
     IDS_ARS_WASAPI_MODE_STATUS_5   "use WASAPI, Exclusive mode, Bitstream"
-    IDS_ARS_SYNC_METHOD            "Sync method:"
-    IDS_ARS_SYNC_BY_TIMESTAMPS     "Sync audio to video"
-    IDS_ARS_SYNC_BY_DURATION       "Sync video to audio"
 END
 
 #endif    // English (United States) resources
