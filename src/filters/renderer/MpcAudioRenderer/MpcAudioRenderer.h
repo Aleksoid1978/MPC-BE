@@ -27,6 +27,7 @@
 #include "MpcAudioRendererSettingsWnd.h"
 #include "Mixer.h"
 #include "Filter.h"
+#include "AudioSyncClock.h"
 #include "../../../DSUtil/Packet.h"
 #include <libbs2b/bs2bclass.h>
 
@@ -172,19 +173,15 @@ public:
 	STDMETHODIMP_(BITSTREAM_MODE)	GetBitstreamMode() override;
 	STDMETHODIMP_(CString)			GetCurrentDeviceName() override;
 	STDMETHODIMP_(CString)			GetCurrentDeviceId() override;
-	STDMETHODIMP					SetSyncMethod(INT nValue) override;
-	STDMETHODIMP_(INT)				GetSyncMethod() override;
 	STDMETHODIMP					SetCrossFeed(BOOL bValue) override;
 	STDMETHODIMP_(BOOL)				GetCrossFeed() override;
 
 
 	// CMpcAudioRenderer
 private:
-	HRESULT					GetReferenceClockInterface(REFIID riid, void **ppv);
-
-	WAVEFORMATEX			*m_pWaveFormatExInput;
-	WAVEFORMATEX			*m_pWaveFormatExOutput;
-	CBaseReferenceClock*	m_pReferenceClock;
+	WAVEFORMATEX*			m_pWaveFormatExInput;
+	WAVEFORMATEX*			m_pWaveFormatExOutput;
+	CAudioSyncClock*		m_pSyncClock;
 	double					m_dRate;
 	long					m_lVolume;
 	long					m_lBalance;
@@ -224,17 +221,16 @@ private:
 	void					CheckBufferStatus();
 	void					WasapiFlush();
 
-	inline REFERENCE_TIME	GetRefClockTime();
-
 	// WASAPI variables
 	HMODULE					m_hModule;
-	HANDLE					m_hTask;
 	WASAPI_MODE				m_WASAPIMode;
 	CString					m_DeviceId;
 	IMMDevice				*m_pMMDevice;
 	IAudioClient			*m_pAudioClient;
 	IAudioRenderClient		*m_pRenderClient;
+	IAudioClock				*m_pAudioClock;
 	UINT32					m_nFramesInBuffer;
+	size_t					m_nMaxWasapiQueueSize;
 	REFERENCE_TIME			m_hnsPeriod;
 	bool					m_bIsAudioClientStarted;
 	BOOL					m_bIsBitstream;
@@ -242,7 +238,6 @@ private:
 	BOOL					m_bUseBitExactOutput;
 	BOOL					m_bUseSystemLayoutChannels;
 	BOOL					m_bReleaseDeviceIdle;
-	SYNC_METHOD				m_SyncMethod;
 	BOOL					m_bUseCrossFeed;
 	FILTER_STATE			m_filterState;
 
@@ -253,9 +248,6 @@ private:
 
 	PTR_AvSetMmThreadCharacteristicsW	pfAvSetMmThreadCharacteristicsW;
 	PTR_AvRevertMmThreadCharacteristics	pfAvRevertMmThreadCharacteristics;
-
-	HRESULT					EnableMMCSS();
-	HRESULT					RevertMMCSS();
 
 	// Rendering thread
 	static DWORD WINAPI		RenderThreadEntryPoint(LPVOID lpParameter);

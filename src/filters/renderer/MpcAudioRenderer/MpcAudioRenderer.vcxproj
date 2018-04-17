@@ -222,6 +222,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AudioDevice.cpp" />
+    <ClCompile Include="AudioSyncClock.cpp" />
     <ClCompile Include="Filter.cpp" />
     <ClCompile Include="MpcAudioRenderer.cpp" />
     <ClCompile Include="MpcAudioRendererSettingsWnd.cpp" />
@@ -234,6 +235,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AudioDevice.h" />
+    <ClInclude Include="AudioSyncClock.h" />
     <ClInclude Include="Filter.h" />
     <ClInclude Include="IMpcAudioRenderer.h" />
     <ClInclude Include="MpcAudioRenderer.h" />
