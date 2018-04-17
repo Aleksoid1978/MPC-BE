@@ -142,23 +142,27 @@ static void PNGDIB(LPCWSTR fn, BYTE* pData, int level)
 	FILE* fp;
 	if (_wfopen_s(&fp, fn, L"wb") == 0) {
 		BITMAPINFOHEADER* bih = (BITMAPINFOHEADER*)pData;
+		ASSERT(bih->biCompression == BI_RGB);
 
-		int line, width = bih->biWidth, height = abs(bih->biHeight), bpp = bih->biBitCount / 8;
+		unsigned width = bih->biWidth;
+		int height = abs(bih->biHeight); // must be signed integer
+		unsigned bpp = bih->biBitCount / 8;
+		int bit_depth = (bih->biBitCount == 48 || bih->biBitCount == 64) ? 16 : 8; // bits per channel
 
 		png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
 		png_infop info_ptr = png_create_info_struct(png_ptr);
 		png_init_io(png_ptr, fp);
 
 		png_set_compression_level(png_ptr, level);
-		png_set_IHDR(png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, 0, 0);
+		png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, 0, 0);
 		png_write_info(png_ptr, info_ptr);
 
 		png_bytep row_ptr = (png_bytep)malloc(width * 3);
 		BYTE *p, *src = pData + sizeof(BITMAPINFOHEADER);
 
 		for (int y = height - 1; y >= 0; y--) {
-			for (int x = 0; x < width; x++) {
-				line = (3 * x);
+			for (unsigned x = 0; x < width; x++) {
+				unsigned line = (3 * x);
 				p = src + (width * bpp * y) + (bpp * x);
 				row_ptr[line] = (png_byte)p[2];
 				row_ptr[line + 1] = (png_byte)p[1];
