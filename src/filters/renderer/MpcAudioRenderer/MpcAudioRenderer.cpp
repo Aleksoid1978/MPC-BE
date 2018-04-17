@@ -160,7 +160,6 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_bUseDefaultDevice(FALSE)
 	, m_nSampleOffset(0)
 	, m_bUseCrossFeed(FALSE)
-	, m_bHasVideo(TRUE)
 	, m_bNeedReinitialize(FALSE)
 	, m_bNeedReinitializeFull(FALSE)
 	, m_FlushEvent(TRUE)
@@ -484,8 +483,6 @@ HRESULT CMpcAudioRenderer::SetMediaType(const CMediaType *pmt)
 HRESULT CMpcAudioRenderer::CompleteConnect(IPin *pReceivePin)
 {
 	DLog(L"CMpcAudioRenderer::CompleteConnect()");
-
-	m_bHasVideo = HasMediaType(m_pGraph, MEDIATYPE_Video) || HasMediaType(m_pGraph, MEDIASUBTYPE_MPEG2_VIDEO);
 
 	return CBaseRenderer::CompleteConnect(pReceivePin);
 }
@@ -1911,6 +1908,10 @@ again:
 		DLog(L"    Output format:");
 		DumpWaveFormatEx(m_pWaveFormatExOutput);
 #endif
+
+		if (bInitNeed) {
+			m_pSyncClock->UnSlave();
+		}
 
 		if (S_OK == hr) {
 			DLog(L"CMpcAudioRenderer::CheckAudioClient() - WASAPI client accepted the format");

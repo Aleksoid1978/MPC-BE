@@ -68,8 +68,6 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	CString				m_strCurrentDeviceId;
 	CString				m_strCurrentDeviceName;
 
-	BOOL				m_bHasVideo;
-
 	bs2b_base			m_bs2b;
 	bool				m_bs2b_active = false;
 
