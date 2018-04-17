@@ -339,20 +339,10 @@ HRESULT	CMpcAudioRenderer::CheckMediaType(const CMediaType *pmt)
 
 	HRESULT hr = S_OK;
 	if (pmt->subtype == MEDIASUBTYPE_PCM) {
-		// Check S/PDIF & Bistream ...
-		BOOL m_bIsBitstreamInput = FALSE;
-		WAVEFORMATEX *pWaveFormatEx = (WAVEFORMATEX*)pmt->pbFormat;
-
-		if (pWaveFormatEx->wFormatTag == WAVE_FORMAT_DOLBY_AC3_SPDIF) {
-			m_bIsBitstreamInput = TRUE;
-		} else if (IsWaveFormatExtensible(pWaveFormatEx)) {
-			WAVEFORMATEXTENSIBLE *wfex = (WAVEFORMATEXTENSIBLE*)pWaveFormatEx;
-			m_bIsBitstreamInput = (wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS
-								   || wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD
-								   || wfex->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP);
-		}
-
-		if (m_bIsBitstreamInput) {
+		// Check S/PDIF & HDMI Bitstream
+		const WAVEFORMATEX *pWaveFormatEx = (WAVEFORMATEX*)pmt->pbFormat;
+		const BOOL bIsBitstreamInput = IsBitstream(pWaveFormatEx);
+		if (bIsBitstreamInput) {
 			hr = CreateAudioClient();
 			if (FAILED(hr)) {
 				DLog(L"CMpcAudioRenderer::CheckMediaType() - audio client initialization error");
