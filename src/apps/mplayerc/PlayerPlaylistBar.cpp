@@ -2688,7 +2688,9 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 				*/
 
 				if (idx == 3 && !pli.m_label.IsEmpty()) { // M3U
-					str.Format(L"#EXTINF:%s\n", pli.m_label);
+					str.Format(L"#EXTINF:%I64d,%s\n",
+						pli.m_duration > 0 ? (pli.m_duration / UNITS) : -1LL,
+						pli.m_label);
 					f.WriteString(str);
 				}
 
