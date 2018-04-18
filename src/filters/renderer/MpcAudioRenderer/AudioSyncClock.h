@@ -22,6 +22,8 @@
 
 #include <AudioClient.h>
 
+#define OneMillisecond 10000
+
 class CAudioSyncClock: public CBaseReferenceClock
 {
 public:
