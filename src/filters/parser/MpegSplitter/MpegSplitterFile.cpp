@@ -214,6 +214,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			return E_FAIL;
 		}
 
+		/*
 		for (auto& syncPoint : m_SyncPoints) {
 			auto& sps = syncPoint.second;
 			std::list<REFERENCE_TIME> duplicates;
@@ -236,6 +237,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 				}
 			}
 		}
+		*/
 
 		WORD main_program_number = WORD_MAX;
 		if (m_type == MPEG_TYPES::mpeg_ts && m_programs.size() > 1) {
