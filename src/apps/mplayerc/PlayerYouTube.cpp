@@ -410,7 +410,7 @@ namespace Youtube
 			}
 
 			CStringA strUrls;
-
+			std::list<CStringA> strUrlsLive;
 			if (strstr(data, MATCH_AGE_RESTRICTION)) {
 				free(data); data = nullptr; dataSize = 0;
 
@@ -468,40 +468,70 @@ namespace Youtube
 				if (!hlspv_url.IsEmpty()) {
 					url = UrlDecode(UrlDecode(hlspv_url));
 					url.Replace(L"\\/", L"/");
-					urls.push_front(url);
+					DLog(L"Youtube::Parse_URL() : Downloading m3u8 information \"%s\"", url);
+					hUrl = InternetOpenUrl(hInet, url, nullptr, 0, INTERNET_OPEN_FALGS, 0);
+					if (hUrl) {
+						char* m3u8 = nullptr;
+						DWORD m3u8Size = 0;
+						InternetReadData(hUrl, &m3u8, m3u8Size, nullptr);
+						InternetCloseHandle(hUrl);
+						if (m3u8Size) {
+							CStringA m3u8Str(m3u8);
+							free(m3u8);
 
-					free(data);
-					InternetCloseHandle(hInet);
-					return true;
-				}
+							m3u8Str.Replace("\r\n", "\n");
+							std::list<CStringA> lines;
+							Explode(m3u8Str, lines, '\n');
+							for (auto& line : lines) {
+								line.Trim();
+								if (line.IsEmpty() || (line.GetAt(0) == '#')) {
+									continue;
+								}
 
-				// url_encoded_fmt_stream_map
-				const CStringA stream_map = GetEntry(data, MATCH_STREAM_MAP_START, MATCH_END);
-				if (stream_map.IsEmpty()) {
-					free(data);
-					InternetCloseHandle(hInet);
-					return false;
-				}
-				// adaptive_fmts
-				const CStringA adaptive_fmts = GetEntry(data, MATCH_ADAPTIVE_FMTS_START, MATCH_END);
+								line.Replace("/keepalive/yes/", "/");
+								strUrlsLive.emplace_back(line);
+							}
 
-				strUrls = stream_map;
-				if (!adaptive_fmts.IsEmpty()) {
-					strUrls += ',';
-					strUrls += adaptive_fmts;
+						}
+					}
+
+					if (strUrlsLive.empty()) {
+						urls.push_front(url);
+
+						free(data);
+						InternetCloseHandle(hInet);
+						return true;
+					
+					}
+				} else {
+					// url_encoded_fmt_stream_map
+					const CStringA stream_map = GetEntry(data, MATCH_STREAM_MAP_START, MATCH_END);
+					if (stream_map.IsEmpty()) {
+						free(data);
+						InternetCloseHandle(hInet);
+						return false;
+					}
+					// adaptive_fmts
+					const CStringA adaptive_fmts = GetEntry(data, MATCH_ADAPTIVE_FMTS_START, MATCH_END);
+
+					strUrls = stream_map;
+					if (!adaptive_fmts.IsEmpty()) {
+						strUrls += ',';
+						strUrls += adaptive_fmts;
+					}
+					strUrls.Replace("\\u0026", "&");
 				}
-				strUrls.Replace("\\u0026", "&");
 			}
 
 			YoutubeUrllist audioList;
 
-			auto AddUrl = [](YoutubeUrllist& videoUrls, YoutubeUrllist& audioUrls, CString url, int itag, int fps = 0) {
+			auto AddUrl = [](YoutubeUrllist& videoUrls, YoutubeUrllist& audioUrls, const CString& url, const int itag, const int fps = 0) {
 				if (const YoutubeProfile* profile = GetProfile(itag)) {
 					YoutubeUrllistItem item;
 					item.profile = profile;
 					item.url = url;
 					item.title.Format(L"%s %dp",
-						profile->format == y_webm ? L"WebM" : L"MP4",
+						profile->format == y_webm ? L"WebM" : (profile->live ? L"HLS Live" : L"MP4"),
 						profile->quality);
 					if (profile->type == y_video) {
 						item.title.Append(L" dash");
@@ -667,43 +697,45 @@ namespace Youtube
 				}
 			};
 
-			CString dashmpdUrl = UTF8To16(GetEntry(data, MATCH_MPD_START, MATCH_END));
-			if (!dashmpdUrl.IsEmpty()) {
-				dashmpdUrl.Replace(L"\\/", L"/");
-				if (dashmpdUrl.Find(L"/s/") > 0) {
-					CStringA url(dashmpdUrl);
-					CStringA signature = RegExpParseA(url, "/s/([0-9A-Z]+.[0-9A-Z]+)");
-					if (!signature.IsEmpty()) {
-						SignatureDecode(url, signature, "/signature/%s");
-						dashmpdUrl = url;
+			if (strUrlsLive.empty()) {
+				CString dashmpdUrl = UTF8To16(GetEntry(data, MATCH_MPD_START, MATCH_END));
+				if (!dashmpdUrl.IsEmpty()) {
+					dashmpdUrl.Replace(L"\\/", L"/");
+					if (dashmpdUrl.Find(L"/s/") > 0) {
+						CStringA url(dashmpdUrl);
+						CStringA signature = RegExpParseA(url, "/s/([0-9A-Z]+.[0-9A-Z]+)");
+						if (!signature.IsEmpty()) {
+							SignatureDecode(url, signature, "/signature/%s");
+							dashmpdUrl = url;
+						}
 					}
-				}
 
-				DLog(L"Youtube::Parse_URL() : Downloading MPD manifest \"%s\"", dashmpdUrl);
-				hUrl = InternetOpenUrl(hInet, dashmpdUrl, nullptr, 0, INTERNET_OPEN_FALGS, 0);
-				if (hUrl) {
-					char* dashmpd = nullptr;
-					DWORD dashmpdSize = 0;
-					InternetReadData(hUrl, &dashmpd, dashmpdSize, nullptr);
-					InternetCloseHandle(hUrl);
-					if (dashmpdSize) {
-						CString xml = UTF8To16(dashmpd);
-						free(dashmpd);
-						const std::wregex regex(L"<Representation(.*?)</Representation>");
-						std::wcmatch match;
-						LPCTSTR text = xml.GetBuffer();
-						while (std::regex_search(text, match, regex)) {
-							if (match.size() == 2) {
-								const CString xmlElement(match[1].first, match[1].length());
-								const CString url = RegExpParse(xmlElement, L"<BaseURL>(.*?)</BaseURL>");
-								const int itag    = _wtoi(RegExpParse(xmlElement, L"id=\"([0-9]+)\""));
-								const int fps     = _wtoi(RegExpParse(xmlElement, L"frameRate=\"([0-9]+)\""));
-								if (url.Find(L"dur/") > 0) {
-									AddUrl(youtubeUrllist, audioList, url, itag, fps);
+					DLog(L"Youtube::Parse_URL() : Downloading MPD manifest \"%s\"", dashmpdUrl);
+					hUrl = InternetOpenUrl(hInet, dashmpdUrl, nullptr, 0, INTERNET_OPEN_FALGS, 0);
+					if (hUrl) {
+						char* dashmpd = nullptr;
+						DWORD dashmpdSize = 0;
+						InternetReadData(hUrl, &dashmpd, dashmpdSize, nullptr);
+						InternetCloseHandle(hUrl);
+						if (dashmpdSize) {
+							CString xml = UTF8To16(dashmpd);
+							free(dashmpd);
+							const std::wregex regex(L"<Representation(.*?)</Representation>");
+							std::wcmatch match;
+							LPCTSTR text = xml.GetBuffer();
+							while (std::regex_search(text, match, regex)) {
+								if (match.size() == 2) {
+									const CString xmlElement(match[1].first, match[1].length());
+									const CString url = RegExpParse(xmlElement, L"<BaseURL>(.*?)</BaseURL>");
+									const int itag    = _wtoi(RegExpParse(xmlElement, L"id=\"([0-9]+)\""));
+									const int fps     = _wtoi(RegExpParse(xmlElement, L"frameRate=\"([0-9]+)\""));
+									if (url.Find(L"dur/") > 0) {
+										AddUrl(youtubeUrllist, audioList, url, itag, fps);
+									}
 								}
-							}
 
-							text = match[0].second;
+								text = match[0].second;
+							}
 						}
 					}
 				}
@@ -713,39 +745,48 @@ namespace Youtube
 
 			free(data);
 
-			std::list<CStringA> linesA;
-			Explode(strUrls, linesA, ',');
+			if (strUrlsLive.empty()) {
+				std::list<CStringA> linesA;
+				Explode(strUrls, linesA, ',');
 
-			for (const auto& lineA : linesA) {
-				int itag = 0;
-				CStringA url;
-				CStringA signature;
+				for (const auto& lineA : linesA) {
+					int itag = 0;
+					CStringA url;
+					CStringA signature;
 
-				std::list<CStringA> paramsA;
-				Explode(lineA, paramsA, '&');
+					std::list<CStringA> paramsA;
+					Explode(lineA, paramsA, '&');
 
-				for (const auto& paramA : paramsA) {
-					int k = paramA.Find('=');
-					if (k > 0) {
-						const CStringA paramHeader = paramA.Left(k);
-						const CStringA paramValue = paramA.Mid(k + 1);
+					for (const auto& paramA : paramsA) {
+						int k = paramA.Find('=');
+						if (k > 0) {
+							const CStringA paramHeader = paramA.Left(k);
+							const CStringA paramValue = paramA.Mid(k + 1);
 
-						if (paramHeader == "url") {
-							url = UrlDecode(UrlDecode(paramValue));
-						} else if (paramHeader == "s") {
-							signature = paramValue;
-						} else if (paramHeader == "itag") {
-							if (sscanf_s(paramValue, "%d", &itag) != 1) {
-								itag = 0;
+							if (paramHeader == "url") {
+								url = UrlDecode(UrlDecode(paramValue));
+							} else if (paramHeader == "s") {
+								signature = paramValue;
+							} else if (paramHeader == "itag") {
+								if (sscanf_s(paramValue, "%d", &itag) != 1) {
+									itag = 0;
+								}
 							}
 						}
 					}
+
+					if (itag) {
+						SignatureDecode(url, signature, "&signature=%s");
+
+						AddUrl(youtubeUrllist, audioList, CString(url), itag);
+					}
 				}
-
-				if (itag) {
-					SignatureDecode(url, signature, "&signature=%s");
-
-					AddUrl(youtubeUrllist, audioList, CString(url), itag);
+			} else {
+				for (const auto& urlLive : strUrlsLive) {
+					CStringA itag = RegExpParseA(urlLive, "/itag/(\\d+)");
+					if (!itag.IsEmpty()) {
+						AddUrl(youtubeUrllist, audioList, CString(urlLive), atoi(itag));
+					}
 				}
 			}
 
