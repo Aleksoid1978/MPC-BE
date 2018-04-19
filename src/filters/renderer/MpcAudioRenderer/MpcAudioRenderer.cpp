@@ -1488,7 +1488,8 @@ HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 
 	{
 		CAutoLock cQueueLock(&m_csQueue);
-		if (p && !m_rtNextSampleTime && !m_WasapiQueue.GetCount() && p->rtStart > 0) {
+		if (p && !m_rtNextSampleTime && !m_WasapiQueue.GetCount()
+				&& p->rtStart > 0 && p->rtStart <= 10 * UNITS) {
 			const UINT32 nSilenceFrames = TimeToSamples(p->rtStart, m_pWaveFormatExOutput);
 			const UINT32 nSilenceBytes  = nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign;
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL
@@ -2181,7 +2182,7 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 	if (m_filterState == State_Running) {
 		if (!m_bReleased) {
 			m_rtEstimateSlavingJitter = m_rtLastSampleTimeEnd - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
-			if (m_rtEstimateSlavingJitter < 0) {
+			if (m_rtEstimateSlavingJitter < 0 || m_rtEstimateSlavingJitter > 200 * OneMillisecond) {
 				m_rtEstimateSlavingJitter = 0;
 			}
 			m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtLastSampleTimeEnd - m_rtEstimateSlavingJitter);
