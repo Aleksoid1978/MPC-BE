@@ -11691,32 +11691,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 				m_strPlaybackRenderedPath = pOFD->fns.front().GetName();
 				m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
-
-				if (pOFD->fns.size() == 1) {
-					fn = (CString)pOFD->fns.front();
-					CString tmp(fn); tmp.MakeLower();
-					if (tmp.Find(L".m3u8") > 0) {
-						m_wndPlaylistBar.Open(fn);
-
-						POSITION pos = m_wndPlaylistBar.m_pl.GetHeadPosition();
-						while (pos) {
-							auto& listItem = m_wndPlaylistBar.m_pl.GetNext(pos);
-							if (!listItem.m_fns.empty()) {
-								auto& item = listItem.m_fns.front();
-								CString fn = item;
-								fn.Replace(L"/keepalive/yes/", L"/");
-
-								item = fn;
-							}
-						}
-						youtubeUrl.Empty();
-						m_youtubeFields.Empty();
-						m_youtubeUrllist.clear();
-
-						m_wndPlaylistBar.SetLast();
-						pOFD->fns.front() = m_wndPlaylistBar.GetCurFileName();
-					}
-				}
 			}
 		}
 	}

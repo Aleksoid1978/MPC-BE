@@ -39,13 +39,14 @@ namespace Youtube
 	};
 
 	struct YoutubeProfile {
-		int		iTag;
-		yformat	format;
-		ytype	type;
-		int		quality;
-		LPCTSTR	ext;
-		bool	fps60;
-		bool	hdr;
+		int     iTag;
+		yformat format;
+		ytype   type;
+		int     quality;
+		LPCTSTR ext;
+		bool    fps60;
+		bool    hdr;
+		bool    live;
 	};
 
 	// MP4, WebM and 360p resolution or above only
@@ -77,16 +78,24 @@ namespace Youtube
 		{244, y_webm, y_video,  480, L"webm", false, false},
 		{ 43, y_webm, y_media,  360, L"webm", false, false}, // VP8 + Vorbis
 		{242, y_webm, y_video,  240, L"webm", false, false},
+		// live (ts)
+		{301, y_mp4,  y_media, 1080, L"ts",   true , false, true},
+		{300, y_mp4,  y_media,  720, L"ts",   true , false, true},
+		{ 96, y_mp4,  y_media, 1080, L"ts",   false, false, true},
+		{ 95, y_mp4,  y_media,  720, L"ts",   false, false, true},
+		{ 94, y_mp4,  y_media,  480, L"ts",   false, false, true},
+		{ 93, y_mp4,  y_media,  360, L"ts",   false, false, true},
+		{ 92, y_mp4,  y_media,  240, L"ts",   false, false, true},
 	};
 
 	static const YoutubeProfile YAudioProfiles[] = {
 		// AAC
-		{140, y_mp4,  y_audio,  128, L"m4a",  false, false},
-		{139, y_mp4,  y_audio,   48, L"m4a",  false, false}, // may be outdated and no longer supported
+		{140, y_mp4,  y_audio,  128, L"m4a"},
+		{139, y_mp4,  y_audio,   48, L"m4a"}, // may be outdated and no longer supported
 		// Opus
-		{251, y_webm, y_audio,  160, L"webm", false, false},
-		{250, y_webm, y_audio,   70, L"webm", false, false},
-		{249, y_webm, y_audio,   50, L"webm", false, false},
+		{251, y_webm, y_audio,  160, L"webm"},
+		{250, y_webm, y_audio,   70, L"webm"},
+		{249, y_webm, y_audio,   50, L"webm"},
 		// Vorbis
 		//{249, y_webm, y_audio, 128, L"webm", false, false},
 	};
