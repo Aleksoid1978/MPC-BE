@@ -98,7 +98,7 @@
     <ClCompile Include="BaseSplitterInputPin.cpp" />
     <ClCompile Include="BaseSplitterOutputPin.cpp" />
     <ClCompile Include="BaseSplitterParserOutputPin.cpp" />
-    <ClCompile Include="FrameDuration.cpp" />
+    <ClCompile Include="TimecodeAnalyzer.cpp" />
     <ClCompile Include="MultiFiles.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -113,7 +113,7 @@
     <ClInclude Include="BaseSplitterInputPin.h" />
     <ClInclude Include="BaseSplitterOutputPin.h" />
     <ClInclude Include="BaseSplitterParserOutputPin.h" />
-    <ClInclude Include="FrameDuration.h" />
+    <ClInclude Include="TimecodeAnalyzer.h" />
     <ClInclude Include="MultiFiles.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Teletext.h" />

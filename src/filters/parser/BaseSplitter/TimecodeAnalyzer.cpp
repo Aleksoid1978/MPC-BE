@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include <vector>
-#include "FrameDuration.h"
+#include "TimecodeAnalyzer.h"
 
 static double Video_FrameRate_Rounding(double FrameRate)
 {
@@ -64,96 +64,92 @@ static REFERENCE_TIME Video_FrameDuration_Rounding(REFERENCE_TIME FrameDuration)
 	return FrameDuration;
 }
 
-REFERENCE_TIME FrameDuration::Calculate(std::vector<int64_t>& timecodes, const int64_t timecodescale)
+bool TimecodeAnalyzer::GetMonotoneInterval(std::vector<int64_t>& timecodes, int64_t& interval, unsigned& num)
 {
-	DLog(L"FrameDuration::Calculate()");
-	REFERENCE_TIME frameDuration = 417083;
-
-	if (timecodes.size() > 1) {
-#ifdef DEBUG
-		DLog(L"Frame timecodes as is:");
-		for (size_t i = 0; i < timecodes.size(); i++) {
-			DLog(L"    => Frame: %3Iu, TimeCode: %10I64d", i, timecodes[i]);
-		}
-#endif
-		std::sort(timecodes.begin(), timecodes.end());
-
-#ifdef DEBUG
-		DLog(L"Sorted frame timecodes with durations:");
-		for (size_t i = 0; i < timecodes.size() - 1; i++) {
-			DLog(L"    => Frame: %3Iu, TimeCode: %10I64d, Duration: %10I64d", i, timecodes[i], timecodes[i + 1] - timecodes[i]);
-		}
-		DLog(L"    => Frame: %3Iu, TimeCode: %10I64d", timecodes.size() - 1, timecodes.back());
-#endif
-
-		// calculate the average frame duration
-		frameDuration = timecodescale * (timecodes.back() - timecodes.front()) / (timecodes.size() - 1);
-		DLog(L"Average frame duration for %Iu frames = %I64d (fps = %.6f)",
-			timecodes.size(),
-			frameDuration,
-			10000000.0 * (timecodes.size() - 1) / ((timecodes.back() - timecodes.front()) * timecodescale));
-
-
-		std::vector<int> frametimes;
-		frametimes.reserve(timecodes.size() - 1);
-
-		unsigned k = 0;
-		for (size_t i = 1; i < timecodes.size(); i++) {
-			const int64_t diff = timecodes[i] - timecodes[i - 1];
-			if (diff > 0 && diff < INT_MAX) {
-				if (diff == 1) {
-					// calculate values equal to 1
-					k++;
-				} else if (k > 0 && k < frametimes.size()) {
-					// fill values equal to 1 due to the previous value
-					size_t j = frametimes.size() - k - 1;
-					int d = frametimes[j] + k;
-					k += 1;
-					while (k) {
-						frametimes[j] = d / k--;
-						d -= frametimes[j++];
-					}
-				}
-
-				frametimes.push_back((int)diff);
-			}
-		}
-
-		if (frametimes.size()) {
-			int longsum = 0;
-			int longcount = 0;
-
-			int sum = frametimes[0];
-			int count = 1;
-			for (size_t i = 1; i < frametimes.size(); i++) {
-				if (abs(frametimes[i - 1] - frametimes[i]) <= 1) {
-					sum += frametimes[i];
-					count++;
-
-					if (count > longcount) {
-						longsum = sum;
-						longcount = count;
-					}
-				} else {
-					sum = frametimes[i];
-					count = 1;
-				}
-			}
-
-			if (longsum && longcount >= 10) {
-				frameDuration = timecodescale * longsum / longcount;
-				DLog(L"Average frame duration for longest monotone interval (%Iu frames) = %I64d (fps = %.6f)",
-					longcount + 1,
-					frameDuration,
-					10000000.0 * longcount / (longsum * timecodescale));
-			}
-		}
-
-		frameDuration = Video_FrameDuration_Rounding(frameDuration);
-		DLog(L"Average frame duration after trying to rounding to the standard value = %I64d (fps = %.6f)",
-			frameDuration,
-			10000000.0 / frameDuration);
+	if (timecodes.size() < 2) {
+		return false;
 	}
 
-	return frameDuration;
+	std::sort(timecodes.begin(), timecodes.end());
+
+	std::vector<int> durations;
+	durations.reserve(timecodes.size() - 1);
+
+	// calculate durations, discard the zero durations, correct the ranges with duration equal to 1.
+	unsigned k = 0;
+	for (size_t i = 1; i < timecodes.size(); i++) {
+		const int64_t diff = timecodes[i] - timecodes[i - 1];
+		if (diff > 0 && diff < INT_MAX) {
+			if (diff == 1) {
+				// count values equal to 1
+				k++;
+			}
+			else if (k > 0 && k < durations.size()) {
+				// fill values equal to 1 due to the previous value
+				size_t j = durations.size() - k - 1;
+				int d = durations[j] + k;
+				k += 1;
+				while (k) {
+					durations[j] = d / k--;
+					d -= durations[j++];
+				}
+			}
+
+			durations.push_back((int)diff);
+		}
+	}
+
+	if (durations.empty()) {
+		return false;
+	}
+
+	int64_t longsum = 0;
+	int longcount = 0;
+
+	int64_t sum = durations[0];
+	int count = 1;
+	for (size_t i = 1; i < durations.size(); i++) {
+		if (abs(durations[i - 1] - durations[i]) <= 1) {
+			sum += durations[i];
+			count++;
+
+			if (count > longcount) {
+				longsum = sum;
+				longcount = count;
+			}
+		}
+		else {
+			sum = durations[i];
+			count = 1;
+		}
+	}
+
+	interval = longsum;
+	num = count;
+
+	return true;
+}
+
+REFERENCE_TIME TimecodeAnalyzer::CalculateFrameTime(std::vector<int64_t>& timecodes, const int64_t timecodescaleRF)
+{
+	int64_t interval;
+	unsigned num;
+
+	if (GetMonotoneInterval(timecodes, interval, num) && num >= 10) {
+		return Video_FrameDuration_Rounding((interval * timecodescaleRF) / num);
+	}
+
+	return 417083;
+}
+
+double TimecodeAnalyzer::CalculateFPS(std::vector<int64_t>& timecodes, const int64_t timecodescale)
+{
+	int64_t interval;
+	unsigned num;
+
+	if (GetMonotoneInterval(timecodes, interval, num) && num >= 10) {
+		return Video_FrameRate_Rounding((double)num / (interval * timecodescale));
+	}
+
+	return 24/1.001;
 }

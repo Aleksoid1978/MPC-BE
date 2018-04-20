@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include <MMReg.h>
 #include "MatroskaSplitter.h"
-#include "../BaseSplitter/FrameDuration.h"
+#include "../BaseSplitter/TimecodeAnalyzer.h"
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../DSUtil/VideoParser.h"
 #include "../../../DSUtil/GolombBuffer.h"
@@ -727,25 +727,27 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 				}
 
-				REFERENCE_TIME AvgFrameTime = 0;
+				double framerate = 0.0;
 				if (pTE->v.FrameRate > 0) {
-					AvgFrameTime = (REFERENCE_TIME)(UNITS / pTE->v.FrameRate);
+					framerate = pTE->v.FrameRate;
+					DLog(L"CMatroskaSplitterFilter::CreateOutputs(): FrameRate = %.6f (by pTE->v.FrameRate)", framerate);
 				} else if (pTE->DefaultDuration > 0) {
-					AvgFrameTime = (REFERENCE_TIME)pTE->DefaultDuration / 100;
+					framerate = 100.0 * UNITS / pTE->DefaultDuration;
+					DLog(L"CMatroskaSplitterFilter::CreateOutputs(): FrameRate = %.6f (by pTE->DefaultDuration = %I64d)", framerate, pTE->DefaultDuration);
 				}
 
 				if (CodecID == "V_DSHOW/MPEG1VIDEO" || CodecID == "V_MPEG1") {
-					DLog(L"CMatroskaSplitterFilter: HACK: MPEG1 fps = %.6f overwritten to %.6f", 10000000.0 / AvgFrameTime, 10000000.0 / (AvgFrameTime * 2));
-					AvgFrameTime *= 2;
+					DLog(L"CMatroskaSplitterFilter::CreateOutputs(): HACK: MPEG1 fps = %.6f overwritten to %.6f", framerate, framerate / 2);
+					framerate /= 2;
 				}
 
-				if (AvgFrameTime < 50000 && CodecID != "V_MPEG2") { // incorrect fps - calculate avarage value
+				if (1 || framerate > 200.0 && CodecID != "V_MPEG2") { // incorrect fps - calculate avarage value
 					CMatroskaNode Root(m_pFile);
 					m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
 					m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
 
 					std::vector<REFERENCE_TIME> timecodes;
-					timecodes.reserve(FrameDuration::DefaultFrameNum);
+					timecodes.reserve(TimecodeAnalyzer::DefaultFrameNum);
 
 					bool readmore = true;
 
@@ -774,7 +776,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									}
 									timecodes.push_back(c.TimeCode + bg->Block.TimeCode);
 
-									if (timecodes.size() >= FrameDuration::DefaultFrameNum) {
+									if (timecodes.size() >= TimecodeAnalyzer::DefaultFrameNum) {
 										readmore = false;
 										break;
 									}
@@ -785,26 +787,26 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					m_pCluster.Free();
 
-					AvgFrameTime = FrameDuration::Calculate(timecodes, m_pFile->m_segment.SegmentInfo.TimeCodeScale / 100);
+					framerate = TimecodeAnalyzer::CalculateFPS(timecodes, m_pFile->m_segment.SegmentInfo.TimeCodeScale);
 				}
 
-				if (bInterlaced && codecAvgTimePerFrame && AvgFrameTime) {
+				if (bInterlaced && codecAvgTimePerFrame) {
 					// hack for interlaced video
-					float factor = (float)AvgFrameTime / (float)codecAvgTimePerFrame;
+					double factor = 10000000.0 / (framerate * codecAvgTimePerFrame);
 					if (factor > 0.4 && factor < 0.6) {
-						AvgFrameTime = codecAvgTimePerFrame;
+						framerate = 10000000.0 / codecAvgTimePerFrame;
 					}
 				}
 
-				if (AvgFrameTime <= 0) {
+				if (std::isnan(framerate) || framerate <= 0) {
 					DLog(L"CMatroskaSplitterFilter::CreateOutputs() : Very damaged file? Set fps as 23.976.");
-					AvgFrameTime = 417083; // set 23.976 as default
+					framerate = 24/1.001; // set 23.976 as default
 				}
 
 				if (!pTE->DefaultDuration) {
 					// manual fill DefaultDuration only if it is empty
 					DLog(L"CMatroskaSplitterFilter::CreateOutputs() : Empty DefaultDuration! Set calculated value.");
-					pTE->DefaultDuration.Set(AvgFrameTime * 100);
+					pTE->DefaultDuration.Set((UINT64)((100.0 * UNITS) / framerate + 0.001));
 				}
 
 				for (auto& item : mts) {
@@ -822,9 +824,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							vih->rcSource = vih->rcTarget = rect;
 						}
 
-						if (AvgFrameTime) {
-							((VIDEOINFOHEADER*)item.Format())->AvgTimePerFrame = AvgFrameTime;
-						}
+						((VIDEOINFOHEADER*)item.Format())->AvgTimePerFrame = (UINT64)(UNITS / framerate + 0.001);
 					}
 				}
 
