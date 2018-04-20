@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include <MMReg.h>
 #include "FLVSplitter.h"
-#include "../BaseSplitter/FrameDuration.h"
+#include "../BaseSplitter/TimecodeAnalyzer.h"
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/VideoParser.h"
 
@@ -1082,7 +1082,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						__int64 sync_pos = m_DataOffset;
 						if (Sync(sync_pos)) {
 							std::vector<REFERENCE_TIME> timecodes;
-							timecodes.reserve(FrameDuration::DefaultFrameNum);
+							timecodes.reserve(TimecodeAnalyzer::DefaultFrameNum);
 
 							Tag tag;
 							VideoTag vtag;
@@ -1098,7 +1098,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									}
 
 									timecodes.push_back(tag.TimeStamp);
-									if (timecodes.size() >= FrameDuration::DefaultFrameNum) {
+									if (timecodes.size() >= TimecodeAnalyzer::DefaultFrameNum) {
 										break;
 									}
 								}
@@ -1109,7 +1109,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 							}
 
-							rtAvgTimePerFrame = FrameDuration::Calculate(timecodes, 10000);
+							rtAvgTimePerFrame = TimecodeAnalyzer::CalculateFrameTime(timecodes, 10000);
 
 							if (mt.formattype == FORMAT_MPEG2_VIDEO) {
 								((MPEG2VIDEOINFO*)mt.pbFormat)->hdr.AvgTimePerFrame = rtAvgTimePerFrame;

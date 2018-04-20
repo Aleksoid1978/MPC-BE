@@ -27,7 +27,7 @@
 #endif
 #include <moreuuids.h>
 #include "MpegSplitterFile.h"
-#include "../BaseSplitter/FrameDuration.h"
+#include "../BaseSplitter/TimecodeAnalyzer.h"
 #include "../../../DSUtil/AudioParser.h"
 
 CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin)
@@ -1375,7 +1375,7 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 				REFERENCE_TIME rt = NextPTS(s, s.codec, nextPos);
 				if (rt != INVALID_TIME) {
 					std::vector<REFERENCE_TIME> timecodes;
-					timecodes.reserve(FrameDuration::DefaultFrameNum);
+					timecodes.reserve(TimecodeAnalyzer::DefaultFrameNum);
 
 					Seek(nextPos);
 					int count = 0;
@@ -1386,14 +1386,14 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 						}
 
 						timecodes.push_back((rt + 100) / 200); // get a real precision for time codes (need for some files)
-						if (timecodes.size() >= FrameDuration::DefaultFrameNum) {
+						if (timecodes.size() >= TimecodeAnalyzer::DefaultFrameNum) {
 							break;
 						}
 
 						Seek(nextPos);
 					}
 
-					rtAvgTimePerFrame = FrameDuration::Calculate(timecodes, 200);
+					rtAvgTimePerFrame = TimecodeAnalyzer::CalculateFrameTime(timecodes, 200);
 
 					if (s.mt.formattype == FORMAT_MPEG2_VIDEO) {
 						((MPEG2VIDEOINFO*)s.mt.pbFormat)->hdr.AvgTimePerFrame = rtAvgTimePerFrame;

@@ -41,7 +41,7 @@
     <ClCompile Include="Teletext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FrameDuration.cpp">
+    <ClCompile Include="TimecodeAnalyzer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -76,7 +76,7 @@
     <ClInclude Include="Teletext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FrameDuration.h">
+    <ClInclude Include="TimecodeAnalyzer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
