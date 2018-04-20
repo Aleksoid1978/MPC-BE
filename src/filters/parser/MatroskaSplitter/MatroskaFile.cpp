@@ -682,7 +682,7 @@ HRESULT Video::Parse(CMatroskaNode* pMN0)
 		GammaValue.Parse(pMN);
 		break;
 	case 0x2383E3:
-		FramePerSec.Parse(pMN);
+		FrameRate.Parse(pMN);
 		break;
 	case 0x55B0:
 		VideoColorInformation.Parse(pMN);

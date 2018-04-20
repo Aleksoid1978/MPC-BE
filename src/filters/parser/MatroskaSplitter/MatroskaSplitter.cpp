@@ -727,19 +727,19 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 				}
 
-				REFERENCE_TIME AvgTimePerFrame = 0;
-				if (pTE->v.FramePerSec > 0) {
-					AvgTimePerFrame = (REFERENCE_TIME)(10000000i64 / pTE->v.FramePerSec);
+				REFERENCE_TIME AvgFrameTime = 0;
+				if (pTE->v.FrameRate > 0) {
+					AvgFrameTime = (REFERENCE_TIME)(UNITS / pTE->v.FrameRate);
 				} else if (pTE->DefaultDuration > 0) {
-					AvgTimePerFrame = (REFERENCE_TIME)pTE->DefaultDuration / 100;
+					AvgFrameTime = (REFERENCE_TIME)pTE->DefaultDuration / 100;
 				}
 
 				if (CodecID == "V_DSHOW/MPEG1VIDEO" || CodecID == "V_MPEG1") {
-					DLog(L"CMatroskaSplitterFilter: HACK: MPEG1 fps = %.6f overwritten to %.6f", 10000000.0 / AvgTimePerFrame, 10000000.0 / (AvgTimePerFrame * 2));
-					AvgTimePerFrame *= 2;
+					DLog(L"CMatroskaSplitterFilter: HACK: MPEG1 fps = %.6f overwritten to %.6f", 10000000.0 / AvgFrameTime, 10000000.0 / (AvgFrameTime * 2));
+					AvgFrameTime *= 2;
 				}
 
-				if (AvgTimePerFrame < 50000 && CodecID != "V_MPEG2") { // incorrect fps - calculate avarage value
+				if (AvgFrameTime < 50000 && CodecID != "V_MPEG2") { // incorrect fps - calculate avarage value
 					CMatroskaNode Root(m_pFile);
 					m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
 					m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
@@ -785,33 +785,26 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					m_pCluster.Free();
 
-					AvgTimePerFrame = FrameDuration::Calculate(timecodes, m_pFile->m_segment.SegmentInfo.TimeCodeScale / 100);
+					AvgFrameTime = FrameDuration::Calculate(timecodes, m_pFile->m_segment.SegmentInfo.TimeCodeScale / 100);
 				}
 
-				if (bInterlaced && codecAvgTimePerFrame && AvgTimePerFrame) {
+				if (bInterlaced && codecAvgTimePerFrame && AvgFrameTime) {
 					// hack for interlaced video
-					float factor = (float)AvgTimePerFrame / (float)codecAvgTimePerFrame;
+					float factor = (float)AvgFrameTime / (float)codecAvgTimePerFrame;
 					if (factor > 0.4 && factor < 0.6) {
-						AvgTimePerFrame = codecAvgTimePerFrame;
+						AvgFrameTime = codecAvgTimePerFrame;
 					}
 				}
 
-				if (AvgTimePerFrame < 50000) {
-					ASSERT(FALSE); // hmm. really high fps?
-					if (codecAvgTimePerFrame > 0) {
-						DLog(L"CMatroskaSplitterFilter::CreateOutputs() : Something went wrong, take fps from the video stream.");
-						AvgTimePerFrame = codecAvgTimePerFrame;
-					}
-					else if (AvgTimePerFrame <= 0) {
-						DLog(L"CMatroskaSplitterFilter::CreateOutputs() : Everything is bad, set fps at random.");
-						AvgTimePerFrame = 417083; // set 23.976 as default
-					}
+				if (AvgFrameTime <= 0) {
+					DLog(L"CMatroskaSplitterFilter::CreateOutputs() : Very damaged file? Set fps as 23.976.");
+					AvgFrameTime = 417083; // set 23.976 as default
 				}
 
 				if (!pTE->DefaultDuration) {
 					// manual fill DefaultDuration only if it is empty
 					DLog(L"CMatroskaSplitterFilter::CreateOutputs() : Empty DefaultDuration! Set calculated value.");
-					pTE->DefaultDuration.Set(AvgTimePerFrame * 100);
+					pTE->DefaultDuration.Set(AvgFrameTime * 100);
 				}
 
 				for (auto& item : mts) {
@@ -829,8 +822,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							vih->rcSource = vih->rcTarget = rect;
 						}
 
-						if (AvgTimePerFrame) {
-							((VIDEOINFOHEADER*)item.Format())->AvgTimePerFrame = AvgTimePerFrame;
+						if (AvgFrameTime) {
+							((VIDEOINFOHEADER*)item.Format())->AvgTimePerFrame = AvgFrameTime;
 						}
 					}
 				}

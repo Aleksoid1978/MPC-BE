@@ -334,7 +334,7 @@ namespace MatroskaReader
 		CUInt AspectRatioType;
 		CUInt ColourSpace;
 		CFloat GammaValue;
-		CFloat FramePerSec;
+		CFloat FrameRate; // Number of frames per second. Informational only.
 
 		Colour VideoColorInformation;
 
