@@ -13670,8 +13670,10 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 		m_bUseReclock = (FindFilter(CLSID_ReClock, m_pGB) != nullptr);
 
-		if (pFileData) {
-			if (pFileData->rtStart > 0 && m_pMS) {
+		if (pFileData && pFileData->rtStart > 0 && m_pMS) {
+			REFERENCE_TIME rtDur = 0;
+			m_pMS->GetDuration(&rtDur);
+			if (rtDur > 0 && pFileData->rtStart <= rtDur) {
 				REFERENCE_TIME rtPos = pFileData->rtStart;
 				VERIFY(SUCCEEDED(m_pMS->SetPositions(&rtPos, AM_SEEKING_AbsolutePositioning, nullptr, AM_SEEKING_NoPositioning)));
 			}
