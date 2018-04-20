@@ -28,9 +28,12 @@ enum FRAME_TYPE {
 	PICT_FRAME
 };
 
+inline double         g_dRate            = 1.0;
 inline REFERENCE_TIME g_tSegmentStart    = 0;
 inline FRAME_TYPE     g_nFrameType       = PICT_NONE;
 inline HANDLE         g_hNewSegmentEvent = CreateEventW(nullptr, FALSE, FALSE, nullptr);
 
 inline bool g_bNoDuration           = false;
 inline bool g_bExternalSubtitleTime = false;
+
+inline bool g_bExternalSubtitle     = false;

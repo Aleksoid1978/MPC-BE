@@ -103,6 +103,7 @@ static HRESULT (STDMETHODCALLTYPE* NewSegmentOrg)(IPinC * This, /* [in] */ REFER
 static HRESULT STDMETHODCALLTYPE NewSegmentMine(IPinC * This, /* [in] */ REFERENCE_TIME tStart, /* [in] */ REFERENCE_TIME tStop, /* [in] */ double dRate)
 {
 	if (g_pPinC == This) {
+		g_dRate         = dRate;
 		g_tSegmentStart = tStart;
 		g_nFrameType    = PICT_NONE;
 		SetEvent(g_hNewSegmentEvent);
@@ -215,6 +216,7 @@ bool HookNewSegmentAndReceive(IPin* pPin)
 		return false;
 	}
 
+	g_dRate = 1.0;
 	g_tSegmentStart = 0;
 
 	BOOL res;
