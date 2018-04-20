@@ -3470,6 +3470,12 @@ void CSyncAP::RenderThread()
 	dwUser = timeBeginPeriod(dwResolution);
 	pNewSample = nullptr;
 
+	auto SubPicSetTime = [&] {
+		if (!g_bExternalSubtitleTime) {
+			CSubPicAllocatorPresenterImpl::SetTime(g_tSegmentStart + m_llSampleTime * (g_bExternalSubtitle ? g_dRate : 1));
+		}
+	};
+
 	while (!bQuit) {
 		m_lNextSampleWait = 1; // Default value for running this loop
 		nSamplesLeft = 0;
@@ -3617,18 +3623,14 @@ void CSyncAP::RenderThread()
 					stepForward = true;
 				} else if (pNewSample && (m_nStepCount > 0)) {
 					pNewSample->GetUINT32(GUID_SURFACE_INDEX, &m_iCurSurface);
-					if (!g_bExternalSubtitleTime) {
-						__super::SetTime (g_tSegmentStart + m_llSampleTime);
-					}
+					SubPicSetTime();
 					Paint(true);
 					CompleteFrameStep(false);
 					m_pcFramesDrawn++;
 					stepForward = true;
 				} else if (pNewSample && !m_bStepping) { // When a stepped frame is shown, a new one is fetched that we don't want to show here while stepping
 					pNewSample->GetUINT32(GUID_SURFACE_INDEX, &m_iCurSurface);
-					if (!g_bExternalSubtitleTime) {
-						__super::SetTime (g_tSegmentStart + m_llSampleTime);
-					}
+					SubPicSetTime();
 					Paint(true);
 					m_pcFramesDrawn++;
 					stepForward = true;

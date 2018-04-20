@@ -285,6 +285,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	CCritSec m_csSubLock;
 	CInterfaceList<ISubStream> m_pSubStreams;
+	std::list<ISubStream*> m_ExternalSubstreams;
 	int m_iSubtitleSel; // if (m_iSubtitleSel & 0x80000000) - disabled
 	CComPtr<ISubStream> m_pCurrentSubStream;
 

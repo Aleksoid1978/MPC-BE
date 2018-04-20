@@ -13722,6 +13722,8 @@ void CMainFrame::CloseMediaPrivate()
 		}
 	}
 
+	m_ExternalSubstreams.clear();
+
 	m_strPlaybackLabel.Empty();
 	m_strPlaybackRenderedPath.Empty();
 
@@ -15499,6 +15501,7 @@ bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 
 	if (pSubStream) {
 		ISubStream *r = InsertSubStream(&m_pSubStreams, pSubStream);
+		m_ExternalSubstreams.push_back(r);
 		if (actualStream != nullptr) {
 			*actualStream = r;
 
@@ -15719,6 +15722,7 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 	}
 
 	if (m_pCAP) {
+		g_bExternalSubtitle = (std::find(m_ExternalSubstreams.cbegin(), m_ExternalSubstreams.cend(), pSubStream) != m_ExternalSubstreams.cend());
 		m_pCAP->SetSubPicProvider(CComQIPtr<ISubPicProvider>(pSubStream));
 		if (s.fUseSybresync) {
 			CAutoLock cAutoLock(&m_csSubLock);
