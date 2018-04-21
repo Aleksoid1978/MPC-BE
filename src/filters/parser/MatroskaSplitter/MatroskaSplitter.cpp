@@ -741,7 +741,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					framerate /= 2;
 				}
 
-				if (1 || framerate > 200.0 && CodecID != "V_MPEG2") { // incorrect fps - calculate avarage value
+				if (framerate > 200.0 && CodecID != "V_MPEG2") { // incorrect fps - calculate avarage value
 					CMatroskaNode Root(m_pFile);
 					m_pSegment = Root.Child(MATROSKA_ID_SEGMENT);
 					m_pCluster = m_pSegment->Child(MATROSKA_ID_CLUSTER);
@@ -787,7 +787,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					m_pCluster.Free();
 
-					framerate = TimecodeAnalyzer::CalculateFPS(timecodes, m_pFile->m_segment.SegmentInfo.TimeCodeScale);
+					framerate = TimecodeAnalyzer::CalculateFPS(timecodes, 1000);
 				}
 
 				if (bInterlaced && codecAvgTimePerFrame) {
