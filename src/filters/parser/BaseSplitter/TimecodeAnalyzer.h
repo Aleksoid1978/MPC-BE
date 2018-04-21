@@ -28,8 +28,8 @@ namespace TimecodeAnalyzer
 	const unsigned DefaultFrameNum = 120;
 
 
-	bool GetMonotoneInterval(std::vector<int64_t>& timecodes, int64_t& interval, unsigned& num);
+	bool GetMonotoneInterval(std::vector<int64_t>& timecodes, uint64_t& interval, unsigned& num);
 
-	REFERENCE_TIME CalculateFrameTime(std::vector<int64_t>& timecodes, const int64_t timecodescaleRF);
-	double CalculateFPS(std::vector<int64_t>& timecodes, const int64_t timecodescale);
+	REFERENCE_TIME CalculateFrameTime(std::vector<int64_t>& timecodes, const unsigned timecodescaleRF);
+	double CalculateFPS(std::vector<int64_t>& timecodes, const unsigned timecodespersecond);
 }
