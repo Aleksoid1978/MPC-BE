@@ -64,7 +64,7 @@ static REFERENCE_TIME Video_FrameDuration_Rounding(REFERENCE_TIME FrameDuration)
 	return FrameDuration;
 }
 
-bool TimecodeAnalyzer::GetMonotoneInterval(std::vector<int64_t>& timecodes, int64_t& interval, unsigned& num)
+bool TimecodeAnalyzer::GetMonotoneInterval(std::vector<int64_t>& timecodes, uint64_t& interval, unsigned& num)
 {
 	if (timecodes.size() < 2) {
 		return false;
@@ -103,11 +103,11 @@ bool TimecodeAnalyzer::GetMonotoneInterval(std::vector<int64_t>& timecodes, int6
 		return false;
 	}
 
-	int64_t longsum = 0;
-	int longcount = 0;
-
-	int64_t sum = durations[0];
-	int count = 1;
+	// find the longest monotone interval
+	uint64_t longsum = 0;
+	unsigned longcount = 0;
+	uint64_t sum = durations[0];
+	unsigned count = 1;
 	for (size_t i = 1; i < durations.size(); i++) {
 		if (abs(durations[i - 1] - durations[i]) <= 1) {
 			sum += durations[i];
@@ -130,9 +130,9 @@ bool TimecodeAnalyzer::GetMonotoneInterval(std::vector<int64_t>& timecodes, int6
 	return true;
 }
 
-REFERENCE_TIME TimecodeAnalyzer::CalculateFrameTime(std::vector<int64_t>& timecodes, const int64_t timecodescaleRF)
+REFERENCE_TIME TimecodeAnalyzer::CalculateFrameTime(std::vector<int64_t>& timecodes, const unsigned timecodescaleRF)
 {
-	int64_t interval;
+	uint64_t interval;
 	unsigned num;
 
 	if (GetMonotoneInterval(timecodes, interval, num) && num >= 10) {
@@ -142,13 +142,13 @@ REFERENCE_TIME TimecodeAnalyzer::CalculateFrameTime(std::vector<int64_t>& timeco
 	return 417083;
 }
 
-double TimecodeAnalyzer::CalculateFPS(std::vector<int64_t>& timecodes, const int64_t timecodescale)
+double TimecodeAnalyzer::CalculateFPS(std::vector<int64_t>& timecodes, const unsigned timecodespersecond)
 {
-	int64_t interval;
+	uint64_t interval;
 	unsigned num;
 
 	if (GetMonotoneInterval(timecodes, interval, num) && num >= 10) {
-		return Video_FrameRate_Rounding((double)num * timecodescale / interval);
+		return Video_FrameRate_Rounding((double)num * timecodespersecond / interval);
 	}
 
 	return 24/1.001;
