@@ -125,7 +125,7 @@ bool TimecodeAnalyzer::GetMonotoneInterval(std::vector<int64_t>& timecodes, int6
 	}
 
 	interval = longsum;
-	num = count;
+	num = longcount;
 
 	return true;
 }
