@@ -148,7 +148,7 @@ double TimecodeAnalyzer::CalculateFPS(std::vector<int64_t>& timecodes, const int
 	unsigned num;
 
 	if (GetMonotoneInterval(timecodes, interval, num) && num >= 10) {
-		return Video_FrameRate_Rounding((double)num / (interval * timecodescale));
+		return Video_FrameRate_Rounding((double)num * timecodescale / interval);
 	}
 
 	return 24/1.001;
