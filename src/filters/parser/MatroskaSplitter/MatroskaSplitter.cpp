@@ -733,7 +733,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					DLog(L"CMatroskaSplitterFilter::CreateOutputs(): FrameRate = %.6f (by pTE->v.FrameRate)", framerate);
 				} else if (pTE->DefaultDuration > 0) {
 					framerate = 100.0 * UNITS / pTE->DefaultDuration;
-					DLog(L"CMatroskaSplitterFilter::CreateOutputs(): FrameRate = %.6f (by pTE->DefaultDuration = %I64d)", framerate, pTE->DefaultDuration);
+					DLog(L"CMatroskaSplitterFilter::CreateOutputs(): FrameRate = %.6f (by pTE->DefaultDuration = %I64d)", framerate, (INT64)pTE->DefaultDuration);
 				}
 
 				if (CodecID == "V_DSHOW/MPEG1VIDEO" || CodecID == "V_MPEG1") {
