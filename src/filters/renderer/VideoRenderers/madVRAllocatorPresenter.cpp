@@ -26,6 +26,7 @@
 #include "Variables.h"
 #include <moreuuids.h>
 #include <mvrInterfaces.h>
+#include "IPinHook.h"
 
 using namespace DSObjects;
 
@@ -126,7 +127,12 @@ HRESULT CmadVRAllocatorPresenter::RenderEx3(REFERENCE_TIME rtStart,
 
 	__super::SetPosition(viewportRect, croppedVideoRect);
 	if (!g_bExternalSubtitleTime) {
-		SetTime(rtStart);
+		if (g_bExternalSubtitle && g_dRate != 0.0) {
+			const REFERENCE_TIME sampleTime = rtStart - g_tSegmentStart;
+			SetTime(g_tSegmentStart + sampleTime * g_dRate);
+		} else {
+			SetTime(rtStart);
+		}
 	}
 	if (atpf > 0) {
 		m_fps = 10000000.0 / atpf;
@@ -153,6 +159,9 @@ STDMETHODIMP CmadVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 	}
 
 	(*ppRenderer = (IUnknown*)(INonDelegatingUnknown*)(this))->AddRef();
+
+	CComQIPtr<IBaseFilter> pBF = m_pMVR;
+	HookNewSegmentAndReceive(GetFirstPin(pBF), true);
 
 	return S_OK;
 }

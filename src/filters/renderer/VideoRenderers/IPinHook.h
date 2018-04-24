@@ -22,7 +22,7 @@
 #pragma once
 
 // IPin hooks
-bool HookNewSegmentAndReceive(IPin* pPin);
+bool HookNewSegmentAndReceive(IPin* pPin, const bool bMadVR = false);
 void UnhookNewSegmentAndReceive();
 
 // DXVA2 hook

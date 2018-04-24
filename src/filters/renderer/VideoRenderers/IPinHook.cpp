@@ -168,11 +168,6 @@ static HRESULT STDMETHODCALLTYPE ReceiveMineI(IMemInputPinC * This, IMediaSample
 	return ReceiveOrg(This, pSample);
 }
 
-static HRESULT STDMETHODCALLTYPE ReceiveMine(IMemInputPinC * This, IMediaSample *pSample)
-{
-	return ReceiveMineI(This, pSample);
-}
-
 void UnhookNewSegmentAndReceive()
 {
 	BOOL res;
@@ -192,7 +187,7 @@ void UnhookNewSegmentAndReceive()
 		res = VirtualProtect(g_pPinCVtbl, sizeof(IPinCVtbl), flOldProtect, &flOldProtect);
 
 		res = VirtualProtect(g_pMemInputPinCVtbl, sizeof(IMemInputPinCVtbl), PAGE_WRITECOPY, &flOldProtect);
-		if (g_pMemInputPinCVtbl->Receive == ReceiveMine) {
+		if (g_pMemInputPinCVtbl->Receive == ReceiveMineI) {
 			g_pMemInputPinCVtbl->Receive = ReceiveOrg;
 		}
 		res = VirtualProtect(g_pMemInputPinCVtbl, sizeof(IMemInputPinCVtbl), flOldProtect, &flOldProtect);
@@ -206,7 +201,7 @@ void UnhookNewSegmentAndReceive()
 	}
 }
 
-bool HookNewSegmentAndReceive(IPin* pPin)
+bool HookNewSegmentAndReceive(IPin* pPin, const bool bMadVR)
 {
 	IPinC* pPinC = (IPinC*)pPin;
 	CComQIPtr<IMemInputPin> pMemInputPin = pPin;
@@ -231,19 +226,23 @@ bool HookNewSegmentAndReceive(IPin* pPin)
 	}
 	pPinC->lpVtbl->NewSegment = NewSegmentMine;
 
-	if (ReceiveConnectionOrg == nullptr) {
-		ReceiveConnectionOrg = pPinC->lpVtbl->ReceiveConnection;
+	if (!bMadVR) {
+		if (ReceiveConnectionOrg == nullptr) {
+			ReceiveConnectionOrg = pPinC->lpVtbl->ReceiveConnection;
+		}
+		pPinC->lpVtbl->ReceiveConnection = ReceiveConnectionMine;
 	}
-	pPinC->lpVtbl->ReceiveConnection = ReceiveConnectionMine;
 
 	res = VirtualProtect(pPinC->lpVtbl, sizeof(IPinCVtbl), flOldProtect, &flOldProtect);
 
 	// Casimir666 : change sizeof(IMemInputPinC) to sizeof(IMemInputPinCVtbl) to fix crash with EVR hack on Vista!
 	res = VirtualProtect(pMemInputPinC->lpVtbl, sizeof(IMemInputPinCVtbl), PAGE_WRITECOPY, &flOldProtect);
-	if (ReceiveOrg == nullptr) {
-		ReceiveOrg = pMemInputPinC->lpVtbl->Receive;
+	if (!bMadVR) {
+		if (ReceiveOrg == nullptr) {
+			ReceiveOrg = pMemInputPinC->lpVtbl->Receive;
+		}
+		pMemInputPinC->lpVtbl->Receive = ReceiveMineI;
 	}
-	pMemInputPinC->lpVtbl->Receive = ReceiveMine;
 	res = VirtualProtect(pMemInputPinC->lpVtbl, sizeof(IMemInputPinCVtbl), flOldProtect, &flOldProtect);
 
 	g_pPinCVtbl         = pPinC->lpVtbl;
