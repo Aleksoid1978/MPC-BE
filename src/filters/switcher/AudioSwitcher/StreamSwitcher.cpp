@@ -767,7 +767,11 @@ STDMETHODIMP CStreamSwitcherInputPin::EndOfStream()
 // IMemInputPin
 STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 {
-	if (!IsActive() || m_bFlushing) {
+	if (!IsActive()) {
+		return E_FAIL;
+	}
+
+	if (m_bFlushing) {
 		return S_FALSE;
 	}
 
