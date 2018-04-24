@@ -22,7 +22,6 @@
 #pragma once
 
 #include <atlbase.h>
-#include <mutex>
 
 class CStreamSwitcherFilter;
 
@@ -112,7 +111,11 @@ class CStreamSwitcherInputPin : public CBaseInputPin, public IPinConnection, pub
 	BOOL m_bSampleSkipped;
 	BOOL m_bQualityChanged;
 	BOOL m_bUsingOwnAllocator;
-	BOOL m_bFlushing;
+
+	CAMEvent m_evBlock;
+	bool m_bCanBlock;
+	HRESULT Active();
+	HRESULT Inactive();
 
 	HRESULT QueryAcceptDownstream(const AM_MEDIA_TYPE* pmt);
 
@@ -133,6 +136,8 @@ public:
 	IMemAllocator* CurrentAllocator() { return m_pAllocator; }
 
 	bool IsUsingOwnAllocator() { return m_bUsingOwnAllocator == TRUE; }
+
+	void Block(const bool bBlock);
 
 	CCritSec m_csReceive;
 
@@ -218,8 +223,6 @@ class CStreamSwitcherFilter : public CBaseFilter, public IAMStreamSelect
 	CStreamSwitcherOutputPin* m_pOutput;
 
 	CCritSec m_csState, m_csPins;
-
-	std::mutex m_inputpin_receive_mutex;
 
 	HRESULT CompleteConnect(PIN_DIRECTION dir, CBasePin* pPin, IPin* pReceivePin);
 	bool m_bInputPinChanged;
