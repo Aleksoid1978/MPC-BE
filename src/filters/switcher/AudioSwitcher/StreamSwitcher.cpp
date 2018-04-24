@@ -29,6 +29,8 @@
 #endif
 #include <moreuuids.h>
 
+#define BLOCKSTREAM
+
 #define PauseGraph \
 	CComQIPtr<IMediaControl> _pMC(m_pGraph); \
 	OAFilterState _fs = -1; \
@@ -388,8 +390,9 @@ CStreamSwitcherInputPin::CStreamSwitcherInputPin(CStreamSwitcherFilter* pFilter,
 	, m_bSampleSkipped(FALSE)
 	, m_bQualityChanged(FALSE)
 	, m_bUsingOwnAllocator(FALSE)
+	, m_evBlock(TRUE)
+	, m_bCanBlock(false)
 	, m_hNotifyEvent(nullptr)
-	, m_bFlushing(FALSE)
 	, m_pSSF(static_cast<CStreamSwitcherFilter*>(m_pFilter))
 {
 	m_bCanReconnectWhenActive = true;
@@ -462,6 +465,16 @@ HRESULT CStreamSwitcherInputPin::QueryAcceptDownstream(const AM_MEDIA_TYPE* pmt)
 	}
 
 	return hr;
+}
+
+void CStreamSwitcherInputPin::Block(const bool bBlock)
+{
+	if (bBlock) {
+		m_evBlock.Reset();
+	}
+	else {
+		m_evBlock.Set();
+	}
 }
 
 HRESULT CStreamSwitcherInputPin::InitializeOutputSample(IMediaSample* pInSample, IMediaSample** ppOutSample)
@@ -560,6 +573,9 @@ HRESULT CStreamSwitcherInputPin::CompleteConnect(IPin* pReceivePin)
 
 	m_pSSF->CompleteConnect(PINDIR_INPUT, this, pReceivePin);
 
+	m_bCanBlock = false;
+	bool bForkedSomewhere = false;
+
 	CString fileName;
 	CString pinName;
 	CString trackName;
@@ -600,6 +616,15 @@ HRESULT CStreamSwitcherInputPin::CompleteConnect(IPin* pReceivePin)
 				}
 			}
 		}
+
+		CLSID clsid = GetCLSID(pBF);
+		if (clsid == CLSID_AviSplitter) {
+			m_bCanBlock = true;
+		}
+
+		int nIn, nOut, nInC, nOutC;
+		CountPins(pBF, nIn, nOut, nInC, nOutC);
+		bForkedSomewhere = bForkedSomewhere || nIn > 1 || nOut > 1;
 
 		if (CComQIPtr<IFileSourceFilter> pFSF = pBF) {
 			WCHAR* pszName = nullptr;
@@ -645,9 +670,27 @@ HRESULT CStreamSwitcherInputPin::CompleteConnect(IPin* pReceivePin)
 		}
 	}
 
+	if (!bForkedSomewhere) {
+		m_bCanBlock = true;
+	}
+
 	m_hNotifyEvent = nullptr;
 
 	return S_OK;
+}
+
+HRESULT CStreamSwitcherInputPin::Active()
+{
+	Block(!IsActive());
+
+	return __super::Active();
+}
+
+HRESULT CStreamSwitcherInputPin::Inactive()
+{
+	Block(false);
+
+	return __super::Inactive();
 }
 
 // IPin
@@ -717,14 +760,12 @@ STDMETHODIMP CStreamSwitcherInputPin::BeginFlush()
 		return VFW_E_NOT_CONNECTED;
 	}
 
-	m_bFlushing = TRUE;
-
 	HRESULT hr;
 	if (FAILED(hr = __super::BeginFlush())) {
 		return hr;
 	}
 
-	return IsActive() ? m_pSSF->DeliverBeginFlush() : S_OK;
+	return IsActive() ? m_pSSF->DeliverBeginFlush() : Block(false), S_OK;
 }
 
 STDMETHODIMP CStreamSwitcherInputPin::EndFlush()
@@ -741,10 +782,7 @@ STDMETHODIMP CStreamSwitcherInputPin::EndFlush()
 		return hr;
 	}
 
-	hr = IsActive() ? m_pSSF->DeliverEndFlush() : S_OK;
-	m_bFlushing = FALSE;
-
-	return hr;
+	return IsActive() ? m_pSSF->DeliverEndFlush() : Block(true), S_OK;
 }
 
 STDMETHODIMP CStreamSwitcherInputPin::EndOfStream()
@@ -767,14 +805,6 @@ STDMETHODIMP CStreamSwitcherInputPin::EndOfStream()
 // IMemInputPin
 STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 {
-	if (!IsActive()) {
-		return E_FAIL;
-	}
-
-	if (m_bFlushing) {
-		return S_FALSE;
-	}
-
 	bool bFormatChanged = m_pSSF->m_bInputPinChanged || m_pSSF->m_bOutputFormatChanged;
 
 	AM_MEDIA_TYPE* pmt = nullptr;
@@ -785,8 +815,28 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 		SetMediaType(&mt);
 	}
 
+	// DAMN!!!!!! this doesn't work if the stream we are blocking
+	// shares the same thread with another stream, mpeg splitters
+	// are usually like that. Our nicely built up multithreaded
+	// strategy is useless because of this, ARRRRRRGHHHHHH.
+
+#ifdef BLOCKSTREAM
+	if (m_bCanBlock) {
+		m_evBlock.Wait();
+	}
+#endif
+
+	if (!IsActive()) {
+#ifdef BLOCKSTREAM
+		if (m_bCanBlock) {
+			return S_FALSE;
+		}
+#endif
+
+		return E_FAIL; // a stupid fix for this stupid problem
+	}
+
 	CAutoLock cAutoLock(&m_csReceive);
-	std::unique_lock<std::mutex> lock(m_pSSF->m_inputpin_receive_mutex);
 
 	CStreamSwitcherOutputPin* pOut = m_pSSF->GetOutputPin();
 	ASSERT(pOut->GetConnected());
@@ -1361,6 +1411,14 @@ void CStreamSwitcherFilter::SelectInput(CStreamSwitcherInputPin* pInput)
 	// make sure no input thinks it is active
 	m_pInput = nullptr;
 
+	// release blocked GetBuffer in our own allocator & block all Receive
+	for (auto pInput: m_pInputs) {
+		CStreamSwitcherInputPin* pPin = pInput;
+		pPin->Block(false);
+		// a few Receive calls can arrive here, but since m_pInput == NULL neighter of them gets delivered
+		pPin->Block(true);
+	}
+
 	// this will let waiting GetBuffer() calls go on inside our Receive()
 	if (m_pOutput) {
 		m_pOutput->DeliverBeginFlush();
@@ -1374,6 +1432,9 @@ void CStreamSwitcherFilter::SelectInput(CStreamSwitcherInputPin* pInput)
 	// set new input
 	m_pInput = pInput;
 	m_bInputPinChanged = true;
+
+	// let it go
+	m_pInput->Block(false);
 }
 
 //
