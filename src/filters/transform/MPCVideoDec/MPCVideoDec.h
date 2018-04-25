@@ -163,6 +163,9 @@ protected:
 
 	} m_FilterInfo;
 
+	bool m_bHasPalette = false;
+	unsigned int m_Palette[256] = {};
+
 	// === Private functions
 	void			Cleanup();
 	void			CleanupD3DResources();

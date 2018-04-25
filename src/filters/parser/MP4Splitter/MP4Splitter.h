@@ -48,6 +48,9 @@ class __declspec(uuid("61F47056-E400-43d3-AF1E-AB7DFFD4C4AD"))
 	int m_interlaced = -1; // 0 - Progressive, 1 - Interlaced TFF, 2 - Interlaced BFF
 	int m_dtsonly = 0; // 0 - no, 1 - yes
 
+	bool m_bHasPalette = false;
+	unsigned int m_Palette[256] = {};
+
 protected:
 	CAutoPtr<CMP4SplitterFile> m_pFile;
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
@@ -72,6 +75,7 @@ public:
 
 	// IExFilterInfo
 	STDMETHODIMP GetInt(LPCSTR field, int *value) override;
+	STDMETHODIMP GetBin(LPCSTR field, LPVOID *value, unsigned *size) override;
 };
 
 class __declspec(uuid("3CCC052E-BDEE-408a-BEA7-90914EF2964B"))
