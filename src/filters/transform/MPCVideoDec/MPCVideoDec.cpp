@@ -2004,6 +2004,13 @@ redo:
 				}
 				LocalFree(pData);
 			}
+			if (SUCCEEDED(pIExFilterInfo->GetBin("PALETTE", &pData, &size))) {
+				if (size == sizeof(m_Palette)) {
+					m_bHasPalette = true;
+					memcpy(m_Palette, pData, size);
+				}
+				LocalFree(pData);
+			}
 		}
 	}
 
@@ -2897,6 +2904,12 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 					return S_OK;
 				}
 			}
+		}
+
+		if (m_bHasPalette) {
+			m_bHasPalette = false;
+			uint32_t *pal = (uint32_t *)av_packet_new_side_data(avpkt, AV_PKT_DATA_PALETTE, AVPALETTE_SIZE);
+			memcpy(pal, m_Palette, AVPALETTE_SIZE);
 		}
 	}
 

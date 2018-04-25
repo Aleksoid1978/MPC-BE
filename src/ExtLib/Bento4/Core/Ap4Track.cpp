@@ -64,8 +64,7 @@ AP4_Track::AP4_Track(Type             type,
     m_MovieTimeScale(movie_time_scale ? 
                      movie_time_scale : 
                      AP4_TRACK_DEFAULT_MOVIE_TIMESCALE),
-    m_MediaTimeScale(media_time_scale),
-    m_hasPalette(false)
+    m_MediaTimeScale(media_time_scale)
 {
     // compute the default volume value
     unsigned int volume = 0;
@@ -129,8 +128,7 @@ AP4_Track::AP4_Track(AP4_TrakAtom&   atom,
     m_SampleTable(NULL),
     m_SampleTableIsOwned(true),
     m_MovieTimeScale(movie_time_scale),
-    m_MediaTimeScale(0),
-    m_hasPalette(false)
+    m_MediaTimeScale(0)
 {
     // find the handler type
     AP4_Atom* sub = atom.FindChild("mdia/hdlr");
@@ -443,18 +441,6 @@ AP4_Track::GetTrackLanguage()
     if(AP4_MdhdAtom* mdhd = dynamic_cast<AP4_MdhdAtom*>(m_TrakAtom->FindChild("mdia/mdhd")))
         TrackLanguage = mdhd->GetLanguage().c_str();
     return TrackLanguage;
-}
-
-/*----------------------------------------------------------------------
-|       AP4_Track::SetPalette
-+---------------------------------------------------------------------*/
-AP4_Result
-AP4_Track::SetPalette(AP4_UI32 Palette[256])
-{
-    memcpy(m_Palette, Palette, 1024);
-    m_hasPalette = true;
-
-    return AP4_SUCCESS;
 }
 
 /*----------------------------------------------------------------------

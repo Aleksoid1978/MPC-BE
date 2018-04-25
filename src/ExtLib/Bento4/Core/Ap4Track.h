@@ -132,10 +132,6 @@ class AP4_Track {
     AP4_String    GetTrackName();
     AP4_String    GetTrackLanguage();
 
-    AP4_UI32*     GetPalette() { return m_Palette; }
-    AP4_Result    SetPalette(AP4_UI32* Palette);
-    bool          m_hasPalette;
-
     AP4_FragmentSampleTable* GetFragmentSampleTable() { return &m_FragmentSampleTable; }
     AP4_Result               CreateFragmentFromStdSamples();
     AP4_Result               CreateIndexFromFragment();
@@ -152,8 +148,6 @@ class AP4_Track {
     bool             m_SampleTableIsOwned;
     AP4_UI32         m_MovieTimeScale;
     AP4_UI32         m_MediaTimeScale;
-
-    AP4_UI32         m_Palette[256];
 
     AP4_FragmentSampleTable m_FragmentSampleTable;
 

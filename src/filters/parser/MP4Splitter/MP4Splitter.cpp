@@ -945,7 +945,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 
 						if (vse->m_hasPalette) {
-							track->SetPalette(vse->GetPalette());
+							m_bHasPalette = vse->m_hasPalette;
+							memcpy(m_Palette, vse->GetPalette(), 1024);
 						}
 
 						if (AP4_DataInfoAtom* fiel = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_FIEL))) {
@@ -1994,10 +1995,10 @@ start:
 
 			REFERENCE_TIME duration = p->rtStop - p->rtStart;
 
-			if (track->GetType() == AP4_Track::TYPE_AUDIO
+			if (/*track->GetType() == AP4_Track::TYPE_AUDIO
 					&& mt.subtype != MEDIASUBTYPE_RAW_AAC1
 					&& mt.subtype != MEDIASUBTYPE_Vorbis2
-					&& duration < 100000) { // duration < 10 ms (hack for PCM, ADPCM, Law and other)
+					&& duration < 100000*/FALSE) { // duration < 10 ms (hack for PCM, ADPCM, Law and other)
 
 				p->SetData(data.GetData(), data.GetDataSize());
 
@@ -2043,18 +2044,6 @@ start:
 			}
 			else {
 				p->SetData(data.GetData(), data.GetDataSize());
-
-				if (track->m_hasPalette) {
-					track->m_hasPalette = false;
-					CAutoPtr<CPacket> p2(DNew CPacket());
-					p2->SetData(track->GetPalette(), 1024);
-					p->AppendData(*p2);
-
-					CAutoPtr<CPacket> p3(DNew CPacket());
-					static BYTE add[13] = {0x00, 0x00, 0x04, 0x00, 0x80, 0x8C, 0x4D, 0x9D, 0x10, 0x8E, 0x25, 0xE9, 0xFE};
-					p3->SetData(add, _countof(add));
-					p->AppendData(*p3);
-				}
 			}
 
 			hr = DeliverPacket(p);
@@ -2119,6 +2108,25 @@ STDMETHODIMP CMP4SplitterFilter::GetInt(LPCSTR field, int *value)
 	else if (!strcmp(field, "VIDEO_FLAG_ONLY_DTS")) {
 		*value = m_dtsonly;
 		return S_OK;
+	}
+
+	return E_INVALIDARG;
+}
+
+STDMETHODIMP CMP4SplitterFilter::GetBin(LPCSTR field, LPVOID *value, unsigned *size)
+{
+	CheckPointer(value, E_POINTER);
+	CheckPointer(size, E_POINTER);
+
+	if (!strcmp(field, "PALETTE")) {
+		if (m_bHasPalette) {
+			*size = sizeof(m_Palette);
+			*value = (LPVOID)LocalAlloc(LPTR, *size);
+			memcpy(*value, m_Palette, *size);
+
+			return S_OK;
+		}
+		return E_ABORT;
 	}
 
 	return E_INVALIDARG;
