@@ -6197,46 +6197,48 @@ void CMainFrame::OnFileLoadSubtitle()
 		return;
 	}
 
-	static CString szFilter;
+	CString filter;
 	for (size_t idx = 0; idx < std::size(Subtitle::s_SubFileExts); idx++) {
-		szFilter += (idx == 0 ? L"." : L" .") + CString(Subtitle::s_SubFileExts[idx]);
+		filter += (idx == 0 ? L"." : L" .") + CString(Subtitle::s_SubFileExts[idx]);
 	}
-	szFilter += L"|";
+	filter += L"|";
 
 	for (size_t idx = 0; idx < std::size(Subtitle::s_SubFileExts); idx++) {
-		szFilter += (idx == 0 ? L"*." : L";*.") + CString(Subtitle::s_SubFileExts[idx]);
+		filter += (idx == 0 ? L"*." : L";*.") + CString(Subtitle::s_SubFileExts[idx]);
 	}
-	szFilter += L"||";
+	filter += L"||";
 
-	CFileDialog fd(TRUE, nullptr, nullptr,
-				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_ALLOWMULTISELECT,
-				   szFilter, GetModalParent(), 0);
-	fd.m_ofn.lpstrInitialDir = GetFolderOnly(GetCurFileName()).AllocSysString();
+	std::vector<CString> mask;
+	for (const auto& subExt : Subtitle::s_SubFileExts) {
+		mask.emplace_back(L"*." + CString(subExt));
+	
+	}
 
+	COpenFileDlg fd(mask, false, nullptr, GetCurFileName(),
+					OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_ALLOWMULTISELECT | OFN_DONTADDTORECENT,
+					filter, GetModalParent());
 	if (fd.DoModal() != IDOK) {
 		return;
 	}
 
-	CAtlList<CString> fns;
+	std::list<CString> fns;
 	POSITION pos = fd.GetStartPosition();
 	while (pos) {
-		fns.AddTail(fd.GetNextPathName(pos));
+		fns.emplace_back(fd.GetNextPathName(pos));
 	}
 
 	if (m_pDVS) {
-		if (SUCCEEDED(m_pDVS->put_FileName((LPWSTR)(LPCWSTR)fns.GetHead()))) {
+		if (SUCCEEDED(m_pDVS->put_FileName((LPWSTR)(LPCWSTR)(*fns.cbegin())))) {
 			m_pDVS->put_SelectedLanguage(0);
 			m_pDVS->put_HideSubtitles(true);
 			m_pDVS->put_HideSubtitles(false);
 		}
 	} else {
-		pos = fns.GetHeadPosition();
-		while (pos) {
-			CString fname = fns.GetNext(pos);
+		for (const auto& fn : fns) {
 			ISubStream *pSubStream = nullptr;
-			if (LoadSubtitle(fname, &pSubStream)) {
+			if (LoadSubtitle(fn, &pSubStream)) {
 				SetSubtitle(pSubStream); // the subtitle at the insert position according to LoadSubtitle()
-				AddSubtitlePathsAddons(fname);
+				AddSubtitlePathsAddons(fn);
 			}
 		}
 	}
@@ -6261,14 +6263,9 @@ void CMainFrame::OnFileLoadAudio()
 	std::vector<CString> mask;
 	s.m_Formats.GetAudioFilter(filter, mask);
 
-	CString path = AddSlash(GetFolderOnly(GetCurFileName()));
-
-	CFileDialog fd(TRUE, nullptr, nullptr,
-				   OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_ALLOWMULTISELECT,
-				   filter, GetModalParent(), 0);
-
-	fd.m_ofn.lpstrInitialDir = path;
-
+	COpenFileDlg fd(mask, false, nullptr, GetCurFileName(),
+					OFN_EXPLORER | OFN_ENABLESIZING | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_ALLOWMULTISELECT | OFN_DONTADDTORECENT,
+					filter, GetModalParent());
 	if (fd.DoModal() != IDOK) {
 		return;
 	}
