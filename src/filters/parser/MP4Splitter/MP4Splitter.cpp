@@ -1995,10 +1995,10 @@ start:
 
 			REFERENCE_TIME duration = p->rtStop - p->rtStart;
 
-			if (/*track->GetType() == AP4_Track::TYPE_AUDIO
+			if (track->GetType() == AP4_Track::TYPE_AUDIO
 					&& mt.subtype != MEDIASUBTYPE_RAW_AAC1
 					&& mt.subtype != MEDIASUBTYPE_Vorbis2
-					&& duration < 100000*/FALSE) { // duration < 10 ms (hack for PCM, ADPCM, Law and other)
+					&& duration < 100000) { // duration < 10 ms (hack for PCM, ADPCM, Law and other)
 
 				p->SetData(data.GetData(), data.GetDataSize());
 
