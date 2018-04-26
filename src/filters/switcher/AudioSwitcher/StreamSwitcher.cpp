@@ -894,7 +894,8 @@ STDMETHODIMP CStreamSwitcherInputPin::Receive(IMediaSample* pSample)
 			props.cBuffers = 8;
 		}
 
-		props.cbBuffer = cbBuffer * 3 / 2;
+		//props.cbBuffer = cbBuffer * 3 / 2;
+		props.cbBuffer = cbBuffer * 2;
 
 		if (actual.cbAlign != props.cbAlign
 				|| actual.cbPrefix != props.cbPrefix
