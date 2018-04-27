@@ -1,4 +1,4 @@
-/* SoX Resampler Library      Copyright (c) 2007-16 robs@users.sourceforge.net
+/* SoX Resampler Library      Copyright (c) 2007-18 robs@users.sourceforge.net
  * Licence for this file: LGPL v2.1                  See LICENCE for details.
  *
  * Constant-rate resampling engine-specific code. */
@@ -68,16 +68,35 @@ static void cubic_stage_fn(stage_t * p, fifo_t * output_fifo)
 
 
 
+#if defined __AVX__
+  #define DEFINED_AVX 1
+#else
+  #define DEFINED_AVX 0
+#endif
+
+#if defined __x86_64__ || defined _M_X64 || defined i386 || defined _M_IX86
+  #define DEFINED_X86 1
+#else
+  #define DEFINED_X86 0
+#endif
+
+#if defined __arm__
+  #define DEFINED_ARM 1
+#else
+  #define DEFINED_ARM 0
+#endif
+
+
+
 #if CORE_TYPE & CORE_DBL
-  #define SIMD_AVX ((CORE_TYPE & CORE_SIMD_HALF) && defined __AVX__)
+  #define SIMD_AVX ((CORE_TYPE & CORE_SIMD_HALF) && DEFINED_AVX)
   #define SIMD_SSE 0
 #else
-  #define SIMD_SSE ((CORE_TYPE & CORE_SIMD_HALF) && (defined __x86_64__ || defined _M_X64 || defined i386 || defined _M_IX86))
+  #define SIMD_SSE ((CORE_TYPE & CORE_SIMD_HALF) && DEFINED_X86)
   #define SIMD_AVX 0
 #endif
 
-#define SIMD_NEON ((CORE_TYPE & CORE_SIMD_HALF) && defined __arm__)
-
+#define SIMD_NEON ((CORE_TYPE & CORE_SIMD_HALF) && DEFINED_ARM)
 
 
 
@@ -136,15 +155,14 @@ static half_fir_info_t const half_firs[] = {
 
 
 #if CORE_TYPE & CORE_DBL
-  #define SIMD_AVX ((CORE_TYPE & CORE_SIMD_POLY) && defined __AVX__)
+  #define SIMD_AVX ((CORE_TYPE & CORE_SIMD_POLY) && DEFINED_AVX)
   #define SIMD_SSE 0
 #else
-  #define SIMD_SSE ((CORE_TYPE & CORE_SIMD_POLY) && \
-      (defined __x86_64__ || defined _M_X64 || defined i386 || defined _M_IX86))
+  #define SIMD_SSE ((CORE_TYPE & CORE_SIMD_POLY) && DEFINED_X86)
   #define SIMD_AVX 0
 #endif
 
-#define SIMD_NEON ((CORE_TYPE & CORE_SIMD_POLY) && defined __arm__)
+#define SIMD_NEON ((CORE_TYPE & CORE_SIMD_POLY) && DEFINED_ARM)
 
 
 

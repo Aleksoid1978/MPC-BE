@@ -292,7 +292,7 @@ Appendix :
   #define sin(x)   sinf(x)
   #define cos(x)   cosf(x)
   // ==> Start patch MPC
-  //#define atan(x)  atanf(x)
+  // #define atan(x)  atanf(x)
   // ==> End patch MPC
 
   #define cdft  lsx_cdft_f

@@ -1,4 +1,4 @@
-/* SoX Resampler Library      Copyright (c) 2007-16 robs@users.sourceforge.net
+/* SoX Resampler Library      Copyright (c) 2007-18 robs@users.sourceforge.net
  * Licence for this file: LGPL v2.1                  See LICENCE for details. */
 
 #include <math.h>
@@ -131,8 +131,10 @@ soxr_quality_spec_t soxr_quality_spec(unsigned long recipe, unsigned long flags)
   else { /* TODO: move to soxr-lsr.c */
     static float const bw[] = {.931f, .832f, .663f};
     p->passband_end = bw[quality - SOXR_LSR0Q];
-    if (quality == SOXR_LSR2Q)
-      p->flags &= ~SOXR_ROLLOFF_NONE, p->flags |= SOXR_ROLLOFF_LSR2Q | SOXR_PROMOTE_TO_LQ;
+    if (quality == SOXR_LSR2Q) {
+      p->flags &= ~SOXR_ROLLOFF_NONE;
+      p->flags |= SOXR_ROLLOFF_LSR2Q | SOXR_PROMOTE_TO_LQ;
+    }
   }
   if (recipe & SOXR_STEEP_FILTER)
     p->passband_end = 1 - .01 / lsx_to_3dB(rej);
@@ -374,7 +376,7 @@ soxr_t soxr_create(
   char const * e = getenv("SOXR_TRACE");
   _soxr_trace_level = e? atoi(e) : 0;
   {
-    char const arch[] = {_(char), _(short), _(int), _(long), _(long long)
+    static char const arch[] = {_(char), _(short), _(int), _(long), _(long long)
       , ' ', _(float), _(double), _(long double)
       , ' ', _(int *), _(int (*)(int))
       , ' ', HAVE_BIGENDIAN ? 'B' : 'L'
@@ -508,7 +510,8 @@ static void soxr_delete0(soxr_t p)
 
 double soxr_delay(soxr_t p)
 {
-  return (p && !p->error && p->resamplers)? resampler_delay(p->resamplers[0]) : 0;
+  return
+    (p && !p->error && p->resamplers)? resampler_delay(p->resamplers[0]) : 0;
 }
 
 
@@ -582,7 +585,7 @@ soxr_error_t soxr_set_io_ratio(soxr_t p, double io_ratio, size_t slew_len)
     return error;
   }
   return fabs(p->io_ratio - io_ratio) < 1e-15? 0 :
-    "Varying O/I ratio is not supported with this quality level";
+    "varying O/I ratio is not supported with this quality level";
 }
 
 

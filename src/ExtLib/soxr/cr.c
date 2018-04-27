@@ -111,7 +111,14 @@ static void dft_stage_fn(stage_t * p, fifo_t * output_fifo)
 
       for (portion <<= 1; i < f->dft_length; i += portion, portion <<= 1) {
         memcpy((char *)dft_out + (size_t)i * sizeof_real, dft_out, (size_t)portion * sizeof_real);
-        ((char *)dft_out)[((size_t)i + 1) * sizeof_real] = 0;
+        if (IS_FLOAT32)
+        #define dft_out ((float *)dft_out)
+          dft_out[i + 1] = 0;
+        #undef dft_out
+        else if (WITH_FLOAT64)
+        #define dft_out ((double *)dft_out)
+          dft_out[i + 1] = 0;
+        #undef dft_out
       }
       if (p->step.integer > 0)
         rdft_reorder_back(f->dft_length, f->dft_backward_setup, dft_out, p->dft_scratch);
