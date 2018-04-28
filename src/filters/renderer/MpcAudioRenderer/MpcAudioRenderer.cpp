@@ -2655,11 +2655,14 @@ HRESULT CMpcAudioRenderer::EndFlush()
 	HRESULT hr = CBaseRenderer::EndFlush();
 	m_FlushEvent.Reset();
 
+	return hr;
+}
+
+void CMpcAudioRenderer::NewSegment()
+{
 	m_rtNextSampleTime = 0;
 	m_rtLastSampleTimeEnd = 0;
 	m_rtEstimateSlavingJitter = 0;
-
-	return hr;
 }
 
 void CMpcAudioRenderer::Flush()
@@ -2892,6 +2895,7 @@ CMpcAudioRendererInputPin::CMpcAudioRendererInputPin(CBaseRenderer* pRenderer, H
 STDMETHODIMP CMpcAudioRendererInputPin::NewSegment(REFERENCE_TIME startTime, REFERENCE_TIME stopTime, double rate)
 {
 	CAutoLock cReceiveLock(&m_csReceive);
+	m_pRenderer->NewSegment();
 	return CRendererInputPin::NewSegment(startTime, stopTime, rate);
 }
 

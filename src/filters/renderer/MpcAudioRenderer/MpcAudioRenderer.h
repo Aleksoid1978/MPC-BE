@@ -87,6 +87,7 @@ public:
 
 	HRESULT EndFlush() override;
 
+	void NewSegment();
 	void Flush();
 
 	size_t WasapiQueueSize();
