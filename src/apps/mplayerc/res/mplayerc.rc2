@@ -208,7 +208,7 @@ IDB_DXVA_INDICATOR_350           PNG                     "res\\gpu_350.png"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION MPC_VERSION_NUM_SVN
+ FILEVERSION MPC_VERSION_SVN_NUM
  PRODUCTVERSION MPC_VERSION_NUM
  FILEFLAGSMASK 0x1fL
 #ifdef _DEBUG
@@ -226,7 +226,7 @@ BEGIN
         BEGIN
             VALUE "Comments", "Based on the original MPC v6.4.9.0 © Gabest & MPC-HC"
             VALUE "CompanyName", MPC_COMP_NAME_STR
-            VALUE "FileVersion", MPC_VERSION_STR_SVN
+            VALUE "FileVersion", MPC_VERSION_SVN_STR
             VALUE "LegalCopyright", MPC_COPYRIGHT_STR
 #ifdef _WIN64
             VALUE "FileDescription", "MPC-BE x64"
