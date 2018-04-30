@@ -650,7 +650,7 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME rtStart)
 	}
 
 	if (m_pAudioClock) {
-		m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtNextSampleTime);
+		m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime);
 	}
 
 	return CBaseRenderer::Run(rtStart);
@@ -2894,7 +2894,10 @@ CMpcAudioRendererInputPin::CMpcAudioRendererInputPin(CBaseRenderer* pRenderer, H
 
 STDMETHODIMP CMpcAudioRendererInputPin::NewSegment(REFERENCE_TIME startTime, REFERENCE_TIME stopTime, double rate)
 {
+	DLog(L"CMpcAudioRendererInputPin::NewSegment()");
+
 	CAutoLock cReceiveLock(&m_csReceive);
+
 	m_pRenderer->NewSegment();
 	return CRendererInputPin::NewSegment(startTime, stopTime, rate);
 }
