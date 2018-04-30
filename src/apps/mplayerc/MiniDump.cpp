@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -103,7 +103,7 @@ LONG WINAPI CMiniDump::UnhandledExceptionFilter( _EXCEPTION_POINTERS *lpTopLevel
 				VERIFY(CreateDirectoryW(strDumpPath, nullptr));
 			}
 
-			strDumpPath.AppendFormat(L"%s.exe.%d.%d.%d.%d.dmp", AfxGetApp()->m_pszExeName, MPC_VERSION_NUM_SVN);
+			strDumpPath.AppendFormat(L"%s.exe.%d.%d.%d.%d.dmp", AfxGetApp()->m_pszExeName, MPC_VERSION_SVN_NUM);
 
 			HANDLE hFile = ::CreateFileW(strDumpPath, GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS,
 										FILE_ATTRIBUTE_NORMAL, nullptr);

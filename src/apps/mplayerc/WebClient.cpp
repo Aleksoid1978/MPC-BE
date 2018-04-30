@@ -388,7 +388,7 @@ bool CWebClientSocket::OnInfo(CStringA& hdr, CStringA& body, CStringA& mime)
 	int dur = (int)(m_pMainFrame->GetDur()/10000);
 
 	CString positionstring, durationstring, versionstring, sizestring;
-	versionstring.Format(L"%s", _T(MPC_VERSION_STR));
+	versionstring.Format(L"%s", MPC_VERSION_WSTR);
 	CPath file(m_pMainFrame->m_wndPlaylistBar.GetCurFileName());
 	file.StripPath();
 	file.RemoveExtension();

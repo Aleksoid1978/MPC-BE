@@ -814,9 +814,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_bToggleShaderScreenSpace = s.bToggleShaderScreenSpace;
 
 #ifdef _WIN64
-	m_strTitle.Format(L"%s x64 - v%s", ResStr(IDR_MAINFRAME), _T(MPC_VERSION_STR));
+	m_strTitle.Format(L"%s x64 - v%s", ResStr(IDR_MAINFRAME), MPC_VERSION_WSTR);
 #else
-	m_strTitle.Format(L"%s - v%s", ResStr(IDR_MAINFRAME), _T(MPC_VERSION_STR));
+	m_strTitle.Format(L"%s - v%s", ResStr(IDR_MAINFRAME), MPC_VERSION_WSTR);
 #endif
 #if (MPC_VERSION_STATUS == 0)
 	m_strTitle.AppendFormat(L" (build %d) beta",  MPC_VERSION_REV);
@@ -17253,7 +17253,7 @@ void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)
 			JumpOfNSeconds(_wtoi((LPCWSTR)pCDS->lpData));
 			break;
 		case CMD_GETVERSION:
-			SendAPICommand(CMD_VERSION, CStringW(MPC_VERSION_STR_SVN));
+			SendAPICommand(CMD_VERSION, MPC_VERSION_SVN_WSTR);
 			break;
 		case CMD_TOGGLEFULLSCREEN :
 			OnViewFullscreen();

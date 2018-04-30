@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2017 see Authors.txt
+ * (C) 2013-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -131,7 +131,7 @@ UpdateCheckerDlg::UpdateCheckerDlg(Update_Status updateStatus, Version UpdateVer
 		m_text.LoadString(IDS_UPDATE_ERROR);
 		break;
 	case UPDATER_NO_NEW_VERSION:
-		VersionStr.Format(L"%s (build %d)", _T(MPC_VERSION_STR), MPC_VERSION_REV);
+		VersionStr.Format(L"%s (build %d)", MPC_VERSION_WSTR, MPC_VERSION_REV);
 		m_text.Format(IDS_USING_NEWER_VERSION, VersionStr);
 		break;
 	case UPDATER_NEW_VERSION_IS_AVAILABLE:

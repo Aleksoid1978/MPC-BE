@@ -25,7 +25,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION MPC_VERSION_NUM_SVN
+ FILEVERSION MPC_VERSION_SVN_NUM
  PRODUCTVERSION MPC_VERSION_NUM
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
@@ -44,7 +44,7 @@ BEGIN
             VALUE "Comments", MPC_VERSION_COMMENTS
             VALUE "CompanyName", MPC_COMP_NAME_STR
             VALUE "FileDescription", "RAW Video Splitter"
-            VALUE "FileVersion", MPC_VERSION_STR_SVN
+            VALUE "FileVersion", MPC_VERSION_SVN_STR
             VALUE "InternalName", "RAW Video Splitter"
             VALUE "LegalCopyright", MPC_COPYRIGHT_STR
             VALUE "OriginalFilename", "RawVideoSplitter.ax"
