@@ -61,8 +61,6 @@
 #define OPTION_SPDIF_dtshd  L"HDMI_dtshd"
 #define OPTION_SPDIF_ac3enc L"SPDIF_ac3enc"
 
-#define MAX_JITTER          100000i64 // +-10ms jitter is allowed
-
 #define PADDING_SIZE        AV_INPUT_BUFFER_PADDING_SIZE
 /** ffmpeg\libavcodec\avcodec.h - AV_INPUT_BUFFER_PADDING_SIZE
 * @ingroup lavc_decoding
@@ -311,7 +309,6 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_eac3_prev_frametype(EAC3_FRAME_TYPE_RESERVED)
 	, m_bNeedCheck(TRUE)
 	, m_bHasVideo(FALSE)
-	, m_bIgnoreJitter(FALSE)
 	, m_dRate(1.0)
 	, m_bFlushing(FALSE)
 	, m_bNeedSyncPoint(FALSE)
@@ -781,11 +778,6 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 	if (m_FFAudioDec.GetCodecId() == AV_CODEC_ID_NONE) {
 		if (m_FFAudioDec.Init(nCodecId, &m_pInput->CurrentMediaType())) {
 			m_FFAudioDec.SetDRC(GetDynamicRangeControl());
-
-			m_bIgnoreJitter = (nCodecId == AV_CODEC_ID_COOK
-							  || nCodecId == AV_CODEC_ID_ATRAC3
-							  || nCodecId == AV_CODEC_ID_SIPR
-							  || nCodecId == AV_CODEC_ID_BINKAUDIO_DCT);
 		} else {
 			return S_OK;
 		}
@@ -1066,7 +1058,6 @@ HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 			return hr;
 		}
 	}
-
 
 	m_buff.RemoveHead(p - base);
 
@@ -1535,12 +1526,14 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, const size_t size, const REFERENCE_T
 		m_bResyncTimestamp = FALSE;
 	}
 
-	if (m_bAVSync && m_bHasVideo
-			&& rtStartInput != INVALID_TIME) {
+	if (rtStartInput != INVALID_TIME) {
 		const REFERENCE_TIME rtJitter = m_rtStart - rtStartInput;
-		if (abs(rtJitter) > MAX_JITTER) {
-			m_rtStart = rtStartInput;
-			DLog(L"CMpaDecFilter::Deliver() : corrected A/V sync by %I64d", rtJitter);
+		m_faJitter.Sample(rtJitter);
+		const REFERENCE_TIME rtJitterMin = m_faJitter.AbsMinimum();
+		if (m_bAVSync && m_bHasVideo && abs(rtJitterMin)> m_JitterLimit) {
+			DLog(L"CMpaDecFilter::Deliver() : corrected A/V sync by %I64d", rtJitterMin);
+			m_rtStart -= rtJitterMin;
+			m_faJitter.OffsetValues(-rtJitterMin);
 			m_bDiscontinuity = TRUE;
 		}
 	}
@@ -1706,12 +1699,14 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, const int size, const REFER
 		m_bResyncTimestamp = FALSE;
 	}
 
-	if (m_bAVSync && m_bHasVideo
-			&& rtStartInput != INVALID_TIME) {
+	if (rtStartInput != INVALID_TIME) {
 		const REFERENCE_TIME rtJitter = m_rtStart - rtStartInput;
-		if (abs(rtJitter) > MAX_JITTER) {
-			m_rtStart = rtStartInput;
-			DLog(L"CMpaDecFilter::DeliverBitstream() : corrected A/V sync by %I64d", rtJitter);
+		m_faJitter.Sample(rtJitter);
+		const REFERENCE_TIME rtJitterMin = m_faJitter.AbsMinimum();
+		if (m_bAVSync && m_bHasVideo && abs(rtJitterMin)> m_JitterLimit) {
+			DLog(L"CMpaDecFilter::DeliverBitstream() : corrected A/V sync by %I64d", rtJitterMin);
+			m_rtStart -= rtJitterMin;
+			m_faJitter.OffsetValues(-rtJitterMin);
 			m_bDiscontinuity = TRUE;
 		}
 	}
@@ -2182,8 +2177,6 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 HRESULT CMpaDecFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt)
 {
 	if (dir == PINDIR_INPUT) {
-		m_bIgnoreJitter = FALSE;
-
 		if (m_FFAudioDec.GetCodecId() != AV_CODEC_ID_NONE) {
 			m_FFAudioDec.StreamFinish();
 		}
@@ -2192,13 +2185,16 @@ HRESULT CMpaDecFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt)
 		if (nCodecId != AV_CODEC_ID_NONE) {
 			if (m_FFAudioDec.Init(nCodecId, &m_pInput->CurrentMediaType())) {
 				m_FFAudioDec.SetDRC(GetDynamicRangeControl());
-
-				m_bIgnoreJitter = (nCodecId == AV_CODEC_ID_COOK
-								  || nCodecId == AV_CODEC_ID_ATRAC3
-								  || nCodecId == AV_CODEC_ID_SIPR
-								  || nCodecId == AV_CODEC_ID_BINKAUDIO_DCT);
 			} else {
 				return VFW_E_TYPE_NOT_ACCEPTED;
+			}
+
+			if (nCodecId == AV_CODEC_ID_DTS || nCodecId == AV_CODEC_ID_TRUEHD) {
+				m_faJitter.SetNumSamples(200);
+				m_JitterLimit = MAX_JITTER * 10;
+			} else {
+				m_faJitter.SetNumSamples(50);
+				m_JitterLimit = MAX_JITTER;
 			}
 		}
 	}
@@ -2213,7 +2209,6 @@ HRESULT CMpaDecFilter::BreakConnect(PIN_DIRECTION dir)
 	if (dir == PINDIR_INPUT) {
 		m_FFAudioDec.StreamFinish();
 		m_bNeedCheck = TRUE;
-		m_bIgnoreJitter = FALSE;
 	}
 
 	return __super::BreakConnect(dir);

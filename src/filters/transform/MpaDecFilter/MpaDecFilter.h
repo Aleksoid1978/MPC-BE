@@ -31,8 +31,11 @@
 #include "PaddedBuffer.h"
 #include "FFAudioDecoder.h"
 #include "AC3Encoder.h"
+#include "FloatingAverage.h"
 
 #define MPCAudioDecName L"MPC Audio Decoder"
+
+#define MAX_JITTER 100000i64 // +-10ms jitter is allowed
 
 struct ps2_state_t {
 	bool sync;
@@ -87,7 +90,6 @@ protected:
 
 	BOOL            m_bNeedCheck;
 	BOOL            m_bHasVideo;
-	BOOL            m_bIgnoreJitter;
 
 	double          m_dRate;
 
@@ -101,6 +103,10 @@ protected:
 	REFERENCE_TIME  m_rtStartInputCache;
 	REFERENCE_TIME  m_rtStopInputCache;
 	BOOL            m_bUpdateTimeCache;
+
+	FloatingAverage<REFERENCE_TIME> m_faJitter{50};
+	REFERENCE_TIME m_JitterLimit = MAX_JITTER;
+
 
 	enum BitstreamType {
 		SPDIF,
