@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "FFAudioDecoder.h"
+#include "MpaDecFilter.h"
 
 #pragma warning(push)
 #pragma warning(disable: 4005)
@@ -202,8 +203,9 @@ static DWORD get_lav_channel_layout(uint64_t layout)
 
 // CFFAudioDecoder
 
-CFFAudioDecoder::CFFAudioDecoder()
-	: m_pAVCodec(nullptr)
+CFFAudioDecoder::CFFAudioDecoder(CMpaDecFilter* pFilter)
+	: m_pFilter(pFilter)
+	, m_pAVCodec(nullptr)
 	, m_pAVCtx(nullptr)
 	, m_pParser(nullptr)
 	, m_pFrame(nullptr)
@@ -483,6 +485,10 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 			DLog(L"CFFAudioDecoder::Decode() : could not process buffer while parsing");
 		}
 
+		if (used_bytes >= pOut_size && m_pFilter->m_bUpdateTimeCache) {
+			m_pFilter->UpdateCacheTimeStamp();
+		}
+
 		if (out_size) {
 			*out_size = used_bytes;
 		}
@@ -490,12 +496,14 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 		if (pOut_size > 0) {
 			avpkt.data = pOut;
 			avpkt.size = pOut_size;
+			avpkt.dts  = m_pFilter->m_rtStartInputCache;
 
 			ret = avcodec_send_packet(m_pAVCtx, &avpkt);
 		}
 	} else {
 		avpkt.data = p;
 		avpkt.size = size;
+		avpkt.dts  = m_pFilter->m_rtStartInput;
 
 		ret = avcodec_send_packet(m_pAVCtx, &avpkt);
 	}
@@ -517,7 +525,7 @@ HRESULT CFFAudioDecoder::SendData(BYTE* p, int size, int* out_size)
 	return hr;
 }
 
-HRESULT CFFAudioDecoder::ReceiveData(std::vector<BYTE>& BuffOut, SampleFormat& samplefmt)
+HRESULT CFFAudioDecoder::ReceiveData(std::vector<BYTE>& BuffOut, SampleFormat& samplefmt, REFERENCE_TIME& rtStart)
 {
 	HRESULT hr = E_FAIL;
 	const int ret = avcodec_receive_frame(m_pAVCtx, m_pFrame);
@@ -526,6 +534,9 @@ HRESULT CFFAudioDecoder::ReceiveData(std::vector<BYTE>& BuffOut, SampleFormat& s
 		// this code does not solve the problem, it only reduces the likelihood of crash.
 		// do it better!
 	} else if (ret >= 0) {
+		rtStart = m_pFrame->pkt_dts;
+		m_pFilter->ClearCacheTimeStamp();
+
 		const size_t nSamples = m_pFrame->nb_samples;
 		if (nSamples) {
 			const WORD nChannels = m_pAVCtx->channels;
@@ -556,6 +567,7 @@ void CFFAudioDecoder::FlushBuffers()
 	if (m_pParser) {
 		av_parser_close(m_pParser);
 		m_pParser = av_parser_init(GetCodecId());
+		m_pFilter->m_bUpdateTimeCache = TRUE;
 	}
 
 	if (m_pAVCtx && avcodec_is_open(m_pAVCtx)) {
