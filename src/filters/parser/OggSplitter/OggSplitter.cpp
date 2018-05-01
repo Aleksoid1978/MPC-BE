@@ -136,7 +136,7 @@ public:
 //
 
 COggSplitterFilter::COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
-	: CBaseSplitterFilter(NAME("COggSplitterFilter"), pUnk, phr, __uuidof(this))
+	: CBaseSplitterFilter(L"COggSplitterFilter", pUnk, phr, __uuidof(this))
 {
 	m_nFlag |= SOURCE_SUPPORT_URL;
 }

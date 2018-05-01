@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,7 +27,7 @@
 //
 
 CSubPicImpl::CSubPicImpl()
-	: CUnknown(NAME("CSubPicImpl"), NULL)
+	: CUnknown(L"CSubPicImpl", NULL)
 	, m_rtStart(0)
 	, m_rtStop(0)
 	, m_rtSegmentStart(0)
@@ -249,7 +249,7 @@ STDMETHODIMP_(void) CSubPicImpl::SetInverseAlpha(bool bInverted)
 //
 
 CSubPicAllocatorImpl::CSubPicAllocatorImpl(SIZE cursize, bool fDynamicWriteOnly)
-	: CUnknown(NAME("ISubPicAllocatorImpl"), NULL)
+	: CUnknown(L"ISubPicAllocatorImpl", NULL)
 	, m_cursize(cursize)
 	, m_fDynamicWriteOnly(fDynamicWriteOnly)
 {

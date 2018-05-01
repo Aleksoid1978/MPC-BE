@@ -92,7 +92,7 @@ static const BYTE LONG_START_CODE[4]  = {0x00, 0x00, 0x00, 0x01};
 //
 
 CRawVideoSplitterFilter::CRawVideoSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
-	: CBaseSplitterFilter(NAME("CRawVideoSplitterFilter"), pUnk, phr, __uuidof(this))
+	: CBaseSplitterFilter(L"CRawVideoSplitterFilter", pUnk, phr, __uuidof(this))
 {
 }
 

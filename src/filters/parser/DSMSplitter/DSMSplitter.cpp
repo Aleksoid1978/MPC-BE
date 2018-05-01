@@ -84,7 +84,7 @@ CFilterApp theApp;
 //
 
 CDSMSplitterFilter::CDSMSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
-	: CBaseSplitterFilter(NAME("CDSMSplitterFilter"), pUnk, phr, __uuidof(this))
+	: CBaseSplitterFilter(L"CDSMSplitterFilter", pUnk, phr, __uuidof(this))
 {
 }
 

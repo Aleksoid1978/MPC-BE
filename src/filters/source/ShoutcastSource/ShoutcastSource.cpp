@@ -104,7 +104,7 @@ CShoutcastSourceApp theApp;
 //
 
 CShoutcastSource::CShoutcastSource(LPUNKNOWN lpunk, HRESULT* phr)
-	: CSource(NAME("CShoutcastSource"), lpunk, __uuidof(this))
+	: CSource(L"CShoutcastSource", lpunk, __uuidof(this))
 {
 #ifndef REGISTER_FILTER
 	AfxSocketInit();
@@ -229,7 +229,7 @@ STDMETHODIMP CShoutcastSource::QueryFilterInfo(FILTER_INFO* pInfo)
 // CShoutcastStream
 
 CShoutcastStream::CShoutcastStream(const WCHAR* wfn, CShoutcastSource* pParent, HRESULT* phr)
-	: CSourceStream(NAME("ShoutcastStream"), phr, pParent, L"Output")
+	: CSourceStream(L"ShoutcastStream", phr, pParent, L"Output")
 	, m_fBuffering(false)
 	, m_hSocket(INVALID_SOCKET)
 {

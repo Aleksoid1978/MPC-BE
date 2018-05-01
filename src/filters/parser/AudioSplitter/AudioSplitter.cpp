@@ -100,7 +100,7 @@ CFilterApp theApp;
 //
 
 CAudioSplitterFilter::CAudioSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
-	: CBaseSplitterFilter(NAME("CAudioSplitterFilter"), pUnk, phr, __uuidof(this))
+	: CBaseSplitterFilter(L"CAudioSplitterFilter", pUnk, phr, __uuidof(this))
 	, m_pAudioFile(nullptr)
 	, m_rtime(0)
 {

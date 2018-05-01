@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -69,15 +69,15 @@ CFilterApp theApp;
 //
 
 CStreamDriveThruFilter::CStreamDriveThruFilter(LPUNKNOWN pUnk, HRESULT* phr)
-	: CBaseFilter(NAME("CStreamDriveThruFilter"), pUnk, &m_csLock, __uuidof(this))
+	: CBaseFilter(L"CStreamDriveThruFilter", pUnk, &m_csLock, __uuidof(this))
 	, m_position(0)
 {
 	if (phr) {
 		*phr = S_OK;
 	}
 
-	m_pInput = DNew CStreamDriveThruInputPin(NAME("CStreamDriveThruInputPin"), this, &m_csLock, phr);
-	m_pOutput = DNew CStreamDriveThruOutputPin(NAME("CStreamDriveThruOutputPin"), this, &m_csLock, phr);
+	m_pInput = DNew CStreamDriveThruInputPin(L"CStreamDriveThruInputPin", this, &m_csLock, phr);
+	m_pOutput = DNew CStreamDriveThruOutputPin(L"CStreamDriveThruOutputPin", this, &m_csLock, phr);
 
 	CAMThread::Create();
 }

@@ -118,7 +118,7 @@ struct roq_info { WORD w, h, unk1, unk2; };
 //
 
 CRoQSplitterFilter::CRoQSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
-	: CBaseSplitterFilter(NAME("CRoQSplitterFilter"), pUnk, phr, __uuidof(this))
+	: CBaseSplitterFilter(L"CRoQSplitterFilter", pUnk, phr, __uuidof(this))
 {
 }
 
@@ -369,7 +369,7 @@ STDMETHODIMP CRoQSourceFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 //
 
 CRoQVideoDecoder::CRoQVideoDecoder(LPUNKNOWN lpunk, HRESULT* phr)
-	: CTransformFilter(NAME("CRoQVideoDecoder"), lpunk, __uuidof(this))
+	: CTransformFilter(L"CRoQVideoDecoder", lpunk, __uuidof(this))
 {
 	if(phr) *phr = S_OK;
 }
@@ -885,7 +885,7 @@ HRESULT CRoQVideoDecoder::StopStreaming()
 //
 
 CRoQAudioDecoder::CRoQAudioDecoder(LPUNKNOWN lpunk, HRESULT* phr)
-	: CTransformFilter(NAME("CRoQAudioDecoder"), lpunk, __uuidof(this))
+	: CTransformFilter(L"CRoQAudioDecoder", lpunk, __uuidof(this))
 {
 	if(phr) *phr = S_OK;
 }

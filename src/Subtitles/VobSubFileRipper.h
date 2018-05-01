@@ -123,7 +123,7 @@ protected:
 	}
 
 public:
-	IVSFRipperCallbackImpl() : CUnknown(NAME("IVSFRipperCallbackImpl"), NULL) {}
+	IVSFRipperCallbackImpl() : CUnknown(L"IVSFRipperCallbackImpl", NULL) {}
 };
 
 //

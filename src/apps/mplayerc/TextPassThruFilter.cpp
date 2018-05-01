@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -144,7 +144,7 @@ HRESULT CTextPassThruInputPin::CompleteConnect(IPin* pReceivePin)
 }
 
 CTextPassThruOutputPin::CTextPassThruOutputPin(CTextPassThruFilter* pTPTFilter, CCritSec* pLock, HRESULT* phr)
-	: CBaseOutputPin(NAME(""), pTPTFilter, pLock, phr, L"Out")
+	: CBaseOutputPin(L"", pTPTFilter, pLock, phr, L"Out")
 	, m_pTPTFilter(pTPTFilter)
 {
 }
@@ -205,7 +205,7 @@ HRESULT CTextPassThruOutputPin::GetMediaType(int iPosition, CMediaType* pmt)
 //
 
 CTextPassThruFilter::CTextPassThruFilter(CMainFrame* pMainFrame)
-	: CBaseFilter(NAME("CTextPassThruFilter"), nullptr, this, __uuidof(this))
+	: CBaseFilter(L"CTextPassThruFilter", nullptr, this, __uuidof(this))
 	, m_pMainFrame(pMainFrame)
 {
 	HRESULT hr;

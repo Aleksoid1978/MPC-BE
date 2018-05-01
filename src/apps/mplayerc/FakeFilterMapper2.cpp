@@ -258,7 +258,7 @@ HRESULT WINAPI Mine_CoCreateInstance(IN REFCLSID rclsid, IN LPUNKNOWN pUnkOuter,
 		if (rclsid == CLSID_VideoMixingRenderer || rclsid == CLSID_VideoMixingRenderer9
 				|| rclsid == CLSID_VideoRenderer || rclsid == CLSID_VideoRendererDefault
 				|| rclsid == CLSID_OverlayMixer) { // || rclsid == CLSID_OverlayMixer2 - where is this declared?)
-			CMacrovisionKicker* pMK = DNew CMacrovisionKicker(NAME("CMacrovisionKicker"), nullptr);
+			CMacrovisionKicker* pMK = DNew CMacrovisionKicker(L"CMacrovisionKicker", nullptr);
 			CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)pMK;
 			CComPtr<IUnknown> pInner;
 			HRESULT hr;
@@ -555,7 +555,7 @@ void CFilterMapper2::Init()
 }
 
 CFilterMapper2::CFilterMapper2(bool fRefCounted, bool fAllowUnreg, LPUNKNOWN pUnkOuter)
-	: CUnknown(NAME("CFilterMapper2"), pUnkOuter)
+	: CUnknown(L"CFilterMapper2", pUnkOuter)
 	, m_fRefCounted(fRefCounted), m_fAllowUnreg(fAllowUnreg)
 {
 	m_cRef = fRefCounted ? 0 : 1;

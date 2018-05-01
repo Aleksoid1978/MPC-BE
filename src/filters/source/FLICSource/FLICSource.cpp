@@ -78,7 +78,7 @@ CFilterApp theApp;
 //
 
 CFLICSource::CFLICSource(LPUNKNOWN lpunk, HRESULT* phr)
-	: CSource(NAME("CFLICSource"), lpunk, __uuidof(this))
+	: CSource(L"CFLICSource", lpunk, __uuidof(this))
 {
 }
 
@@ -153,8 +153,8 @@ STDMETHODIMP CFLICSource::QueryFilterInfo(FILTER_INFO* pInfo)
 // CFLICStream
 
 CFLICStream::CFLICStream(const WCHAR* wfn, CFLICSource* pParent, HRESULT* phr)
-	: CSourceStream(NAME("FLICStream"), phr, pParent, L"Output")
-	, CSourceSeeking(NAME("FLICStream"), (IPin*)this, phr, &m_cSharedState)
+	: CSourceStream(L"FLICStream", phr, pParent, L"Output")
+	, CSourceSeeking(L"FLICStream", (IPin*)this, phr, &m_cSharedState)
 	, m_bDiscontinuity(FALSE), m_bFlushing(FALSE)
 {
 	CAutoLock cAutoLock(&m_cSharedState);

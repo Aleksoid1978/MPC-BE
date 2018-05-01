@@ -89,7 +89,7 @@ CMusePackSplitter::CMusePackSplitter(LPUNKNOWN pUnk, HRESULT *phr)
 	, ev_abort(TRUE)
 	, output(nullptr)
 {
-	input = DNew CMusePackInputPin(NAME("MPC Input Pin"), this, phr, L"In");
+	input = DNew CMusePackInputPin(L"MPC Input Pin", this, phr, L"In");
 	retired.clear();
 
 	ev_abort.Reset();

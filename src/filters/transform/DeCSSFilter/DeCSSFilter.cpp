@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -107,13 +107,13 @@ public:
 };
 
 CDeCSSFilter::CDeCSSFilter(LPUNKNOWN lpunk, HRESULT* phr)
-	: CTransformFilter(NAME("CDeCSSFilter"), lpunk, __uuidof(this))
+	: CTransformFilter(L"CDeCSSFilter", lpunk, __uuidof(this))
 {
 	if (phr) {
 		*phr = S_OK;
 	}
 
-	m_pInput = DNew CKsPSInputPin(NAME("CKsPSInputPin"), this, phr, L"In");
+	m_pInput = DNew CKsPSInputPin(L"CKsPSInputPin", this, phr, L"In");
 	if (!m_pInput) {
 		*phr = E_OUTOFMEMORY;
 	}
@@ -121,7 +121,7 @@ CDeCSSFilter::CDeCSSFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		return;
 	}
 
-	m_pOutput = DNew CTransformOutputPin(NAME("CTransformOutputPin"), this, phr, L"Out");
+	m_pOutput = DNew CTransformOutputPin(L"CTransformOutputPin", this, phr, L"Out");
 	if (!m_pOutput) {
 		*phr = E_OUTOFMEMORY;
 	}

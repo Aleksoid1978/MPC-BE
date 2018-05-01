@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,7 +23,7 @@
 #include "../MPCVideoDec.h"
 
 CDXVA2Sample::CDXVA2Sample(CVideoDecDXVAAllocator *pAlloc, HRESULT *phr)
-	: CMediaSampleSideData(NAME("CDXVA2Sample"), (CBaseAllocator*)pAlloc, phr, nullptr, 0)
+	: CMediaSampleSideData(L"CDXVA2Sample", (CBaseAllocator*)pAlloc, phr, nullptr, 0)
 	, m_dwSurfaceId(0)
 {
 }
@@ -89,7 +89,7 @@ STDMETHODIMP_(int) CDXVA2Sample::GetDXSurfaceId()
 }
 
 CVideoDecDXVAAllocator::CVideoDecDXVAAllocator(CMPCVideoDecFilter* pVideoDecFilter,  HRESULT* phr)
-	: CBaseAllocator(NAME("CVideoDecDXVAAllocator"), nullptr, phr)
+	: CBaseAllocator(L"CVideoDecDXVAAllocator", nullptr, phr)
 	, m_pVideoDecFilter(pVideoDecFilter)
 	, m_ppRTSurfaceArray(nullptr)
 	, m_nSurfaceArrayCount(0)

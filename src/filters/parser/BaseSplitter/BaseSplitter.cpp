@@ -44,7 +44,7 @@ CBaseSplitterFilter::CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT*
 		*phr = S_OK;
 	}
 
-	m_pInput.Attach(DNew CBaseSplitterInputPin(NAME("CBaseSplitterInputPin"), this, this, phr));
+	m_pInput.Attach(DNew CBaseSplitterInputPin(L"CBaseSplitterInputPin", this, this, phr));
 }
 
 CBaseSplitterFilter::~CBaseSplitterFilter()

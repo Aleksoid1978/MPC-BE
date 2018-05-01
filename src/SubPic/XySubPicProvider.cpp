@@ -22,7 +22,7 @@
 #include "XySubPicProvider.h"
 
 CXySubPicProvider::CXySubPicProvider(ISubRenderProvider* provider)
-	: CUnknown(NAME("CXySubPicProvider"), NULL)
+	: CUnknown(L"CXySubPicProvider", NULL)
 	, m_pSubRenderProvider(provider)
 	, m_pSubFrame(NULL)
 	, m_rtStart(0)

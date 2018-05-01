@@ -91,7 +91,7 @@ CFilterApp theApp;
 //
 
 CAviSplitterFilter::CAviSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
-	: CBaseSplitterFilter(NAME("CAviSplitterFilter"), pUnk, phr, __uuidof(this))
+	: CBaseSplitterFilter(L"CAviSplitterFilter", pUnk, phr, __uuidof(this))
 	, m_maxTimeStamp(INVALID_TIME)
 	, m_bBadInterleavedSuport(true)
 	, m_bSetReindex(true)

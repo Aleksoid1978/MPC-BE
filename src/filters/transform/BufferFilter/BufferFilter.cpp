@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -69,13 +69,13 @@ CFilterApp theApp;
 //
 
 CBufferFilter::CBufferFilter(LPUNKNOWN lpunk, HRESULT* phr)
-	: CTransformFilter(NAME("CBufferFilter"), lpunk, __uuidof(this))
+	: CTransformFilter(L"CBufferFilter", lpunk, __uuidof(this))
 	, m_nSamplesToBuffer(2)
 {
 	HRESULT hr = S_OK;
 
 	do {
-		m_pInput = DNew CTransformInputPin(NAME("Transform input pin"), this, &hr, L"In");
+		m_pInput = DNew CTransformInputPin(L"Transform input pin", this, &hr, L"In");
 		if (!m_pInput) {
 			hr = E_OUTOFMEMORY;
 		}
@@ -308,7 +308,7 @@ HRESULT CBufferFilter::StopStreaming()
 //
 
 CBufferFilterOutputPin::CBufferFilterOutputPin(CTransformFilter* pFilter, HRESULT* phr)
-	: CTransformOutputPin(NAME("CBufferFilterOutputPin"), pFilter, phr, L"Out")
+	: CTransformOutputPin(L"CBufferFilterOutputPin", pFilter, phr, L"Out")
 {
 }
 

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -110,7 +110,7 @@ class CComPropertyPageSite : public CUnknown, public IPropertyPageSite
 	IComPropertyPageDirty* m_pPPD;
 
 public:
-	CComPropertyPageSite(IComPropertyPageDirty* pPPD) : CUnknown(NAME("CComPropertyPageSite"), nullptr), m_pPPD(pPPD) {}
+	CComPropertyPageSite(IComPropertyPageDirty* pPPD) : CUnknown(L"CComPropertyPageSite", nullptr), m_pPPD(pPPD) {}
 
 	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv) {

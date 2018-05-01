@@ -96,7 +96,7 @@ CFilterApp theApp;
 //
 
 CMatroskaSplitterFilter::CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
-	: CBaseSplitterFilter(NAME("CMatroskaSplitterFilter"), pUnk, phr, __uuidof(this))
+	: CBaseSplitterFilter(L"CMatroskaSplitterFilter", pUnk, phr, __uuidof(this))
 	, m_bLoadEmbeddedFonts(true)
 	, m_bCalcDuration(false)
 	, m_hasHdmvDvbSubPin(false)

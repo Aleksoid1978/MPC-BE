@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,7 +23,7 @@
 #include "SubPicProviderImpl.h"
 
 CSubPicProviderImpl::CSubPicProviderImpl(CCritSec* pLock)
-	: CUnknown(NAME("CSubPicProviderImpl"), NULL)
+	: CUnknown(L"CSubPicProviderImpl", NULL)
 	, m_pLock(pLock)
 {
 }

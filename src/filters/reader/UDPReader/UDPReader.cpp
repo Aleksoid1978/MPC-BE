@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -70,7 +70,7 @@ CFilterApp theApp;
 //
 
 CUDPReader::CUDPReader(IUnknown* pUnk, HRESULT* phr)
-	: CAsyncReader(NAME("CUDPReader"), pUnk, &m_stream, phr, __uuidof(this))
+	: CAsyncReader(L"CUDPReader", pUnk, &m_stream, phr, __uuidof(this))
 {
 	if (phr) {
 		*phr = S_OK;

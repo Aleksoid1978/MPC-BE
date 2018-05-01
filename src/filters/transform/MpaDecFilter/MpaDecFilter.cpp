@@ -296,7 +296,7 @@ static const SampleFormat MPCtoSamplefmt[sfcount] = {
 };
 
 CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
-	: CTransformFilter(NAME("CMpaDecFilter"), lpunk, __uuidof(this))
+	: CTransformFilter(L"CMpaDecFilter", lpunk, __uuidof(this))
 	, m_InternalSampleFormat(SAMPLE_FMT_NONE)
 	, m_rtStart(0)
 	, m_dStartOffset(0.0)
@@ -327,7 +327,7 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		*phr = S_OK;
 	}
 
-	m_pInput = DNew CDeCSSInputPin(NAME("CDeCSSInputPin"), this, phr, L"In");
+	m_pInput = DNew CDeCSSInputPin(L"CDeCSSInputPin", this, phr, L"In");
 	if (!m_pInput) {
 		*phr = E_OUTOFMEMORY;
 	}
@@ -335,7 +335,7 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		return;
 	}
 
-	m_pOutput = DNew CTransformOutputPin(NAME("CTransformOutputPin"), this, phr, L"Out");
+	m_pOutput = DNew CTransformOutputPin(L"CTransformOutputPin", this, phr, L"Out");
 	if (!m_pOutput) {
 		*phr = E_OUTOFMEMORY;
 	}

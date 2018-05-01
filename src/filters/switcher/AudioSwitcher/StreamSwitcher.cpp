@@ -56,7 +56,7 @@
 //
 
 CStreamSwitcherPassThru::CStreamSwitcherPassThru(LPUNKNOWN pUnk, HRESULT* phr, CStreamSwitcherFilter* pFilter)
-	: CMediaPosition(NAME("CStreamSwitcherPassThru"), pUnk)
+	: CMediaPosition(L"CStreamSwitcherPassThru", pUnk)
 	, m_pFilter(pFilter)
 {
 }
@@ -292,7 +292,7 @@ STDMETHODIMP CStreamSwitcherPassThru::CanSeekBackward(LONG* pCanSeekBackward)
 //
 
 CStreamSwitcherAllocator::CStreamSwitcherAllocator(CStreamSwitcherInputPin* pPin, HRESULT* phr)
-	: CMemAllocator(NAME("CStreamSwitcherAllocator"), nullptr, phr)
+	: CMemAllocator(L"CStreamSwitcherAllocator", nullptr, phr)
 	, m_pPin(pPin)
 	, m_fMediaTypeChanged(false)
 {
@@ -385,7 +385,7 @@ void CStreamSwitcherAllocator::NotifyMediaType(const CMediaType& mt)
 //
 
 CStreamSwitcherInputPin::CStreamSwitcherInputPin(CStreamSwitcherFilter* pFilter, HRESULT* phr, LPCWSTR pName)
-	: CBaseInputPin(NAME("CStreamSwitcherInputPin"), pFilter, &pFilter->m_csState, phr, pName)
+	: CBaseInputPin(L"CStreamSwitcherInputPin", pFilter, &pFilter->m_csState, phr, pName)
 	, m_Allocator(this, phr)
 	, m_bSampleSkipped(FALSE)
 	, m_bQualityChanged(FALSE)
@@ -989,9 +989,9 @@ STDMETHODIMP CStreamSwitcherInputPin::NewSegment(REFERENCE_TIME tStart, REFERENC
 //
 
 CStreamSwitcherOutputPin::CStreamSwitcherOutputPin(CStreamSwitcherFilter* pFilter, HRESULT* phr)
-	: CBaseOutputPin(NAME("CStreamSwitcherOutputPin"), pFilter, &pFilter->m_csState, phr, L"Out")
+	: CBaseOutputPin(L"CStreamSwitcherOutputPin", pFilter, &pFilter->m_csState, phr, L"Out")
 {
-	//	m_bCanReconnectWhenActive = true;
+	//m_bCanReconnectWhenActive = true;
 }
 
 STDMETHODIMP CStreamSwitcherOutputPin::NonDelegatingQueryInterface(REFIID riid, void **ppv)
@@ -1245,7 +1245,7 @@ STDMETHODIMP CStreamSwitcherOutputPin::Backout(IPin* ppinOut, IGraphBuilder* pGr
 //
 
 CStreamSwitcherFilter::CStreamSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr, const CLSID& clsid)
-	: CBaseFilter(NAME("CStreamSwitcherFilter"), lpunk, &m_csState, clsid)
+	: CBaseFilter(L"CStreamSwitcherFilter", lpunk, &m_csState, clsid)
 	, m_bInputPinChanged(false)
 	, m_bOutputFormatChanged(false)
 {

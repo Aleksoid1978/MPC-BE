@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -281,7 +281,7 @@ CNullRenderer::CNullRenderer(REFCLSID clsid, WCHAR* pName, LPUNKNOWN pUnk, HRESU
 //
 
 CNullVideoRenderer::CNullVideoRenderer(LPUNKNOWN pUnk, HRESULT* phr)
-	: CNullRenderer(__uuidof(this), NAME("Null Video Renderer"), pUnk, phr)
+	: CNullRenderer(__uuidof(this), L"Null Video Renderer", pUnk, phr)
 {
 }
 
@@ -323,7 +323,7 @@ HRESULT CNullVideoRenderer::DoRenderSample(IMediaSample* pSample)
 //
 
 CNullUVideoRenderer::CNullUVideoRenderer(LPUNKNOWN pUnk, HRESULT* phr)
-	: CNullRenderer(__uuidof(this), NAME("Null Video Renderer (Uncompressed)"), pUnk, phr)
+	: CNullRenderer(__uuidof(this), L"Null Video Renderer (Uncompressed)", pUnk, phr)
 {
 #ifdef USE_DXVA
 	m_pInputPin = DNew CNullVideoRendererInputPin(this,phr,L"In");
@@ -444,7 +444,7 @@ HRESULT CNullUVideoRenderer::DoRenderSample(IMediaSample* pSample)
 //
 
 CNullAudioRenderer::CNullAudioRenderer(LPUNKNOWN pUnk, HRESULT* phr)
-	: CNullRenderer(__uuidof(this), NAME("Null Audio Renderer"), pUnk, phr)
+	: CNullRenderer(__uuidof(this), L"Null Audio Renderer", pUnk, phr)
 {
 }
 
@@ -468,7 +468,7 @@ HRESULT CNullAudioRenderer::CheckMediaType(const CMediaType* pmt)
 //
 
 CNullUAudioRenderer::CNullUAudioRenderer(LPUNKNOWN pUnk, HRESULT* phr)
-	: CNullRenderer(__uuidof(this), NAME("Null Audio Renderer (Uncompressed)"), pUnk, phr)
+	: CNullRenderer(__uuidof(this), L"Null Audio Renderer (Uncompressed)", pUnk, phr)
 {
 }
 
@@ -520,7 +520,7 @@ HRESULT CNullTextRenderer::CTextInputPin::CheckMediaType(const CMediaType* pmt)
 }
 
 CNullTextRenderer::CNullTextRenderer(LPUNKNOWN pUnk, HRESULT* phr)
-	: CBaseFilter(NAME("CNullTextRenderer"), pUnk, this, __uuidof(this), phr)
+	: CBaseFilter(L"CNullTextRenderer", pUnk, this, __uuidof(this), phr)
 {
 	m_pInput.Attach(DNew CTextInputPin(this, this, phr));
 }
