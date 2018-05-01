@@ -573,9 +573,11 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	if (pIn->IsDiscontinuity() == S_OK
 			|| (m_bNeedSyncPoint && S_OK == pIn->IsSyncPoint())) {
 		DLog(L"CMpaDecFilter::Receive() : Discontinuity, flushing decoder");
-		m_bDiscontinuity = TRUE;
 		m_buff.Clear();
+		m_FFAudioDec.FlushBuffers();
+		m_Mixer.FlushBuffers();
 		m_encbuff.clear();
+		m_bDiscontinuity = TRUE;
 		m_bResync = TRUE;
 		if (FAILED(hr)) {
 			DLog(L"    -> Discontinuity without timestamp");
@@ -824,7 +826,13 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 			p = buffRA.Data();
 			end = p + buffRA.Size();
 			isRA = true;
+
+			m_rtStartInput = m_rtStartInputCache;
+			m_rtStartInputCache = AV_NOPTS_VALUE;
 		} else if (hr == E_FAIL) {
+			if (m_rtStartInputCache == INVALID_TIME) {
+				m_rtStartInputCache = m_rtStartInput;
+			}
 			return S_OK;
 		} else {
 			// trying continue decoding without any pre-processing ...
