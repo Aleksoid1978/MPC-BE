@@ -288,7 +288,7 @@ void CDVSBasePPage::BindControl(UINT id, CWnd& control)
 /* CDVSMainPPage */
 
 CDVSMainPPage::CDVSMainPPage(LPUNKNOWN pUnk, HRESULT* phr) :
-	CDVSBasePPage(NAME("DirectVobSub Property Page (main)"), pUnk, IDD_DVSMAINPAGE, IDD_DVSMAINPAGE),
+	CDVSBasePPage(L"DirectVobSub Property Page (main)", pUnk, IDD_DVSMAINPAGE, IDD_DVSMAINPAGE),
 	m_nLangs(0),
 	m_ppLangs(nullptr)
 {
@@ -467,7 +467,7 @@ void CDVSMainPPage::UpdateControlData(bool fSave)
 /* CDVSGeneralPPage */
 
 CDVSGeneralPPage::CDVSGeneralPPage(LPUNKNOWN pUnk, HRESULT* phr) :
-	CDVSBasePPage(NAME("DirectVobSub Property Page (global settings)"), pUnk, IDD_DVSGENERALPAGE, IDD_DVSGENERALPAGE)
+	CDVSBasePPage(L"DirectVobSub Property Page (global settings)", pUnk, IDD_DVSGENERALPAGE, IDD_DVSGENERALPAGE)
 {
 	BindControl(IDC_VEREXTCOMBO, m_verext);
 	BindControl(IDC_MOD32FIX, m_mod32fix);
@@ -581,7 +581,7 @@ void CDVSGeneralPPage::UpdateControlData(bool fSave)
 /* CDVSMiscPPage */
 
 CDVSMiscPPage::CDVSMiscPPage(LPUNKNOWN pUnk, HRESULT* phr) :
-	CDVSBasePPage(NAME("DirectVobSub Property Page (misc settings)"), pUnk, IDD_DVSMISCPAGE, IDD_DVSMISCPAGE)
+	CDVSBasePPage(L"DirectVobSub Property Page (misc settings)", pUnk, IDD_DVSMISCPAGE, IDD_DVSMISCPAGE)
 {
 	BindControl(IDC_FLIP, m_flippic);
 	BindControl(IDC_FLIPSUB, m_flipsub);
@@ -684,7 +684,7 @@ void CDVSMiscPPage::UpdateControlData(bool fSave)
 /* CDVSTimingPPage */
 
 CDVSTimingPPage::CDVSTimingPPage(LPUNKNOWN pUnk, HRESULT* phr) :
-	CDVSBasePPage(NAME("DirectVobSub Timing Property Page"), pUnk, IDD_DVSTIMINGPAGE, IDD_DVSTIMINGPAGE)
+	CDVSBasePPage(L"DirectVobSub Timing Property Page", pUnk, IDD_DVSTIMINGPAGE, IDD_DVSTIMINGPAGE)
 {
 	BindControl(IDC_MODFPS, m_modfps);
 	BindControl(IDC_FPS, m_fps);
@@ -756,7 +756,7 @@ void CDVSTimingPPage::UpdateControlData(bool fSave)
 /* CDVSAboutPPage */
 
 CDVSAboutPPage::CDVSAboutPPage(LPUNKNOWN lpunk, HRESULT* phr) :
-	CDVSBasePPage(NAME("About Property Page"), lpunk, IDD_DVSABOUTPAGE, IDD_DVSABOUTPAGE)
+	CDVSBasePPage(L"About Property Page", lpunk, IDD_DVSABOUTPAGE, IDD_DVSABOUTPAGE)
 {
 
 }
@@ -793,7 +793,7 @@ bool CDVSAboutPPage::OnMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 /* CDVSZoomPPage */
 
 CDVSZoomPPage::CDVSZoomPPage(LPUNKNOWN pUnk, HRESULT* phr) :
-	CDVSBasePPage(NAME("DirectVobSub Zoom Property Page"), pUnk, IDD_DVSZOOMPAGE, IDD_DVSZOOMPAGE)
+	CDVSBasePPage(L"DirectVobSub Zoom Property Page", pUnk, IDD_DVSZOOMPAGE, IDD_DVSZOOMPAGE)
 {
 	BindControl(IDC_SPIN1, m_posx);
 	BindControl(IDC_SPIN2, m_posy);
@@ -858,7 +858,7 @@ void CDVSZoomPPage::UpdateObjectData(bool fSave)
 /* CDVSColorPPage */
 
 CDVSColorPPage::CDVSColorPPage(LPUNKNOWN pUnk, HRESULT* phr) :
-	CDVSBasePPage(NAME("DirectVobSub Color Property Page"), pUnk, IDD_DVSCOLORPAGE, IDD_DVSCOLORPAGE)
+	CDVSBasePPage(L"DirectVobSub Color Property Page", pUnk, IDD_DVSCOLORPAGE, IDD_DVSCOLORPAGE)
 {
 	BindControl(IDC_PREFLIST, m_preflist);
 	BindControl(IDC_DYNCHGLIST, m_dynchglist);
@@ -1008,7 +1008,7 @@ void CDVSColorPPage::UpdateControlData(bool fSave)
 /* CDVSPathsPPage */
 
 CDVSPathsPPage::CDVSPathsPPage(LPUNKNOWN pUnk, HRESULT* phr) :
-	CDVSBasePPage(NAME("DirectVobSub Paths Property Page"), pUnk, IDD_DVSPATHSPAGE, IDD_DVSPATHSPAGE)
+	CDVSBasePPage(L"DirectVobSub Paths Property Page", pUnk, IDD_DVSPATHSPAGE, IDD_DVSPATHSPAGE)
 {
 	BindControl(IDC_PATHLIST, m_pathlist);
 	BindControl(IDC_PATHEDIT, m_path);

@@ -242,7 +242,7 @@ CMpeg2DecFilterApp theApp;
 //
 
 CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
-	: CBaseVideoFilter(NAME("CMpeg2DecFilter"), lpunk, phr, __uuidof(this), 1)
+	: CBaseVideoFilter(L"CMpeg2DecFilter", lpunk, phr, __uuidof(this), 1)
 	, m_fWaitForKeyFrame(true)
 	, m_ControlThread(nullptr)
 	, m_ditype(DIAuto)
@@ -1256,7 +1256,7 @@ STDMETHODIMP_(bool) CMpeg2DecFilter::IsReadARFromStreamEnabled()
 //
 
 CMpeg2DecInputPin::CMpeg2DecInputPin(CTransformFilter* pFilter, HRESULT* phr, LPWSTR pName)
-	: CDeCSSInputPin(NAME("CMpeg2DecInputPin"), pFilter, phr, pName)
+	: CDeCSSInputPin(L"CMpeg2DecInputPin", pFilter, phr, pName)
 {
 	m_CorrectTS = 0;
 	m_ratechange.Rate = 10000;
@@ -2216,7 +2216,7 @@ void CSubpicInputPin::svcdspu::Render(REFERENCE_TIME rt, BYTE** yuv, int w, int 
 //
 
 CClosedCaptionOutputPin::CClosedCaptionOutputPin(CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
-	: CBaseOutputPin(NAME("CClosedCaptionOutputPin"), pFilter, pLock, phr, L"~CC")
+	: CBaseOutputPin(L"CClosedCaptionOutputPin", pFilter, pLock, phr, L"~CC")
 {
 }
 

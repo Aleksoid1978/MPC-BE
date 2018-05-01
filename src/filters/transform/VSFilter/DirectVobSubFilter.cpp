@@ -46,7 +46,7 @@ bool g_RegOK = true;//false; // doesn't work with the dvd graph builder
 //
 
 CDirectVobSubFilter::CDirectVobSubFilter(LPUNKNOWN punk, HRESULT* phr, const GUID& clsid)
-	: CBaseVideoFilter(NAME("CDirectVobSubFilter"), punk, phr, clsid)
+	: CBaseVideoFilter(L"CDirectVobSubFilter", punk, phr, clsid)
 	, m_nSubtitleId((DWORD_PTR)-1)
 	, m_bMSMpeg4Fix(false)
 	, m_fps(25)

@@ -948,7 +948,7 @@ BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 // CMPCVideoDecFilter
 
 CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
-	: CBaseVideoFilter(NAME("MPC - Video decoder"), lpunk, phr, __uuidof(this))
+	: CBaseVideoFilter(L"MPC - Video decoder", lpunk, phr, __uuidof(this))
 	, m_nThreadNumber(0)
 	, m_nDiscardMode(AVDISCARD_DEFAULT)
 	, m_nDeinterlacing(AUTO)
@@ -1002,7 +1002,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	if (m_pOutput)	{
 		delete m_pOutput;
 	}
-	m_pOutput = DNew CVideoDecOutputPin(NAME("CVideoDecOutputPin"), this, phr, L"Output");
+	m_pOutput = DNew CVideoDecOutputPin(L"CVideoDecOutputPin", this, phr, L"Output");
 	if (!m_pOutput) {
 		*phr = E_OUTOFMEMORY;
 		return;

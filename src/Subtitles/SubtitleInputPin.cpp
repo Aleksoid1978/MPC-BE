@@ -60,7 +60,7 @@ static const bool IsHdmvSub(const CMediaType* pmt)
 }
 
 CSubtitleInputPin::CSubtitleInputPin(CBaseFilter* pFilter, CCritSec* pLock, CCritSec* pSubLock, HRESULT* phr)
-	: CBaseInputPin(NAME("CSubtitleInputPin"), pFilter, pLock, phr, L"Input")
+	: CBaseInputPin(L"CSubtitleInputPin", pFilter, pLock, phr, L"Input")
 	, m_pSubLock(pSubLock)
 	, m_bExitDecodingThread(false)
 	, m_bStopDecoding(false)

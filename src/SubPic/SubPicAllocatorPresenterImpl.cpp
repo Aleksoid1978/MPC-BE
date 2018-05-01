@@ -28,7 +28,7 @@
 #include <dxva2api.h>
 
 CSubPicAllocatorPresenterImpl::CSubPicAllocatorPresenterImpl(HWND hWnd, HRESULT& hr, CString *_pError)
-	: CUnknown(NAME("CSubPicAllocatorPresenterImpl"), NULL)
+	: CUnknown(L"CSubPicAllocatorPresenterImpl", NULL)
 	, m_hWnd(hWnd)
 	, m_maxSubtitleTextureSize(0, 0)
 	, m_nativeVideoSize(0, 0)

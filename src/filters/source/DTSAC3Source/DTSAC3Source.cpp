@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -138,7 +138,7 @@ CFilterApp theApp;
 //
 
 CDTSAC3Source::CDTSAC3Source(LPUNKNOWN lpunk, HRESULT* phr)
-	: CBaseSource<CDTSAC3Stream>(NAME("CDTSAC3Source"), lpunk, phr, __uuidof(this))
+	: CBaseSource<CDTSAC3Stream>(L"CDTSAC3Source", lpunk, phr, __uuidof(this))
 {
 }
 
@@ -162,7 +162,7 @@ STDMETHODIMP CDTSAC3Source::QueryFilterInfo(FILTER_INFO* pInfo)
 // CDTSAC3Stream
 
 CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
-	: CBaseStream(NAME("CDTSAC3Stream"), pParent, phr)
+	: CBaseStream(L"CDTSAC3Stream", pParent, phr)
 	, m_dataStart(0)
 	, m_dataEnd(0)
 	, m_subtype(GUID_NULL)

@@ -30,7 +30,7 @@
 //
 
 CBaseSplitterOutputPin::CBaseSplitterOutputPin(std::vector<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
-	: CBaseOutputPin(NAME("CBaseSplitterOutputPin"), pFilter, pLock, phr, GetMediaTypeDesc(mts, pName, pFilter))
+	: CBaseOutputPin(L"CBaseSplitterOutputPin", pFilter, pLock, phr, GetMediaTypeDesc(mts, pName, pFilter))
 	, pSplitter(static_cast<CBaseSplitterFilter*>(m_pFilter))
 {
 	m_mts = mts;
@@ -39,7 +39,7 @@ CBaseSplitterOutputPin::CBaseSplitterOutputPin(std::vector<CMediaType>& mts, LPC
 }
 
 CBaseSplitterOutputPin::CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
-	: CBaseOutputPin(NAME("CBaseSplitterOutputPin"), pFilter, pLock, phr, pName)
+	: CBaseOutputPin(L"CBaseSplitterOutputPin", pFilter, pLock, phr, pName)
 	, pSplitter(static_cast<CBaseSplitterFilter*>(m_pFilter))
 {
 	memset(&m_brs, 0, sizeof(m_brs));

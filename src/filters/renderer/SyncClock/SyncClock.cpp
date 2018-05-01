@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2017 see Authors.txt
+ * (C) 2009-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,7 +23,7 @@
 
 
 CSyncClockFilter::CSyncClockFilter(LPUNKNOWN pUnk, HRESULT *phr)
-	: CBaseFilter(NAME("SyncClock"), nullptr, &m_Lock, CLSID_NULL)
+	: CBaseFilter(L"SyncClock", nullptr, &m_Lock, CLSID_NULL)
 	, m_Clock(static_cast<IBaseFilter*>(this), phr)
 {
 }
@@ -82,7 +82,7 @@ CBasePin *CSyncClockFilter::GetPin(int i)
 
 // CSyncClock methods
 CSyncClock::CSyncClock(LPUNKNOWN pUnk, HRESULT *phr)
-	: CBaseReferenceClock(NAME("SyncClock"), pUnk, phr)
+	: CBaseReferenceClock(L"SyncClock", pUnk, phr)
 	, m_pCurrentRefClock(0), m_pPrevRefClock(0)
 {
 	QueryPerformanceFrequency((LARGE_INTEGER*)&m_llPerfFrequency);

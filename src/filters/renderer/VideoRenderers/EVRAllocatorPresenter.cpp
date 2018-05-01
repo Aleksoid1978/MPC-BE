@@ -269,10 +269,10 @@ STDMETHODIMP CEVRAllocatorPresenter::CreateRenderer(IUnknown** ppRenderer)
 	HRESULT hr = E_FAIL;
 
 	do {
-		CMacrovisionKicker*	pMK  = DNew CMacrovisionKicker(NAME("CMacrovisionKicker"), nullptr);
+		CMacrovisionKicker*	pMK  = DNew CMacrovisionKicker(L"CMacrovisionKicker", nullptr);
 		CComPtr<IUnknown>	pUnk = (IUnknown*)(INonDelegatingUnknown*)pMK;
 
-		COuterEVR *pOuterEVR = DNew COuterEVR(NAME("COuterEVR"), pUnk, hr, this);
+		COuterEVR *pOuterEVR = DNew COuterEVR(L"COuterEVR", pUnk, hr, this);
 		m_pOuterEVR = pOuterEVR;
 
 		pMK->SetInner((IUnknown*)(INonDelegatingUnknown*)pOuterEVR);

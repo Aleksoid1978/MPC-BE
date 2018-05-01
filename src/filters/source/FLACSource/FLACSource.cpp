@@ -104,7 +104,7 @@ static void								StreamDecoderMetadata(const FLAC__StreamDecoder *decoder, con
 //
 
 CFLACSource::CFLACSource(LPUNKNOWN lpunk, HRESULT* phr)
-	: CBaseSource<CFLACStream>(NAME("CFLACSource"), lpunk, phr, __uuidof(this))
+	: CBaseSource<CFLACStream>(L"CFLACSource", lpunk, phr, __uuidof(this))
 {
 }
 
@@ -158,7 +158,7 @@ STDMETHODIMP CFLACSource::QueryFilterInfo(FILTER_INFO* pInfo)
 // CFLACStream
 
 CFLACStream::CFLACStream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
-	: CBaseStream(NAME("CFLACStream"), pParent, phr)
+	: CBaseStream(L"CFLACStream", pParent, phr)
 	, m_bIsEOF(false)
 	, m_pDecoder(nullptr)
 {

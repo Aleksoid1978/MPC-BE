@@ -2346,10 +2346,10 @@ STDMETHODIMP CSyncAP::CreateRenderer(IUnknown** ppRenderer)
 	HRESULT hr = E_FAIL;
 
 	do {
-		CMacrovisionKicker* pMK = DNew CMacrovisionKicker(NAME("CMacrovisionKicker"), nullptr);
+		CMacrovisionKicker* pMK = DNew CMacrovisionKicker(L"CMacrovisionKicker", nullptr);
 		CComPtr<IUnknown> pUnk = (IUnknown*)(INonDelegatingUnknown*)pMK;
 
-		CSyncRenderer *pOuterEVR = DNew CSyncRenderer(NAME("CSyncRenderer"), pUnk, hr, this);
+		CSyncRenderer *pOuterEVR = DNew CSyncRenderer(L"CSyncRenderer", pUnk, hr, this);
 		m_pOuterEVR = pOuterEVR;
 
 		pMK->SetInner((IUnknown*)(INonDelegatingUnknown*)pOuterEVR);

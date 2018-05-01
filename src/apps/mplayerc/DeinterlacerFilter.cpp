@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,7 +25,7 @@
 #include <moreuuids.h>
 
 CDeinterlacerFilter::CDeinterlacerFilter(LPUNKNOWN punk, HRESULT* phr)
-	: CTransformFilter(NAME("CDeinterlacerFilter"), punk, __uuidof(CDeinterlacerFilter))
+	: CTransformFilter(L"CDeinterlacerFilter", punk, __uuidof(CDeinterlacerFilter))
 {
 	if (phr) {
 		*phr = S_OK;

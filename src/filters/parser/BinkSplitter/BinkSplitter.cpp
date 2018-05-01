@@ -81,7 +81,7 @@ enum BinkAudFlags {
 //
 
 CBinkSplitterFilter::CBinkSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
-	: CBaseSplitterFilter(NAME("CBinkSplitterFilter"), pUnk, phr, __uuidof(this))
+	: CBaseSplitterFilter(L"CBinkSplitterFilter", pUnk, phr, __uuidof(this))
 {
 }
 

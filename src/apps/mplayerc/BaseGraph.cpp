@@ -68,7 +68,7 @@ BOOL CPlayerWindow::OnEraseBkgnd(CDC* pDC)
 //
 
 CBaseGraph::CBaseGraph()
-	: CUnknown(NAME("CBaseGraph"), nullptr)
+	: CUnknown(L"CBaseGraph", nullptr)
 	, m_hNotifyWnd(NULL)
 	, m_lNotifyMsg(0)
 {

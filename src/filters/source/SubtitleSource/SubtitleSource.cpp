@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -147,7 +147,7 @@ CSubtitleSourceApp theApp;
 //
 
 CSubtitleSource::CSubtitleSource(LPUNKNOWN lpunk, HRESULT* phr, const CLSID& clsid)
-	: CSource(NAME("CSubtitleSource"), lpunk, clsid)
+	: CSource(L"CSubtitleSource", lpunk, clsid)
 {
 }
 
@@ -224,8 +224,8 @@ STDMETHODIMP CSubtitleSource::QueryFilterInfo(FILTER_INFO* pInfo)
 //
 
 CSubtitleStream::CSubtitleStream(const WCHAR* wfn, CSubtitleSource* pParent, HRESULT* phr)
-	: CSourceStream(NAME("SubtitleStream"), phr, pParent, L"Output")
-	, CSourceSeeking(NAME("SubtitleStream"), (IPin*)this, phr, &m_cSharedState)
+	: CSourceStream(L"SubtitleStream", phr, pParent, L"Output")
+	, CSourceSeeking(L"SubtitleStream", (IPin*)this, phr, &m_cSharedState)
 	, m_bDiscontinuity(FALSE), m_bFlushing(FALSE)
 	, m_nPosition(0)
 	, m_rts(nullptr)

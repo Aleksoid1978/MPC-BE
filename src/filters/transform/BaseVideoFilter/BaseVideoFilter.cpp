@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -63,7 +63,7 @@ CBaseVideoFilter::CBaseVideoFilter(TCHAR* pName, LPUNKNOWN lpunk, HRESULT* phr, 
 		*phr = S_OK;
 	}
 
-	m_pInput = DNew CBaseVideoInputPin(NAME("CBaseVideoInputPin"), this, phr, L"Video");
+	m_pInput = DNew CBaseVideoInputPin(L"CBaseVideoInputPin", this, phr, L"Video");
 	if (!m_pInput) {
 		*phr = E_OUTOFMEMORY;
 	}
@@ -71,7 +71,7 @@ CBaseVideoFilter::CBaseVideoFilter(TCHAR* pName, LPUNKNOWN lpunk, HRESULT* phr, 
 		return;
 	}
 
-	m_pOutput = DNew CBaseVideoOutputPin(NAME("CBaseVideoOutputPin"), this, phr, L"Output");
+	m_pOutput = DNew CBaseVideoOutputPin(L"CBaseVideoOutputPin", this, phr, L"Output");
 	if (!m_pOutput) {
 		*phr = E_OUTOFMEMORY;
 	}
@@ -623,7 +623,7 @@ HRESULT CBaseVideoFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType* pmt)
 //
 
 CBaseVideoInputAllocator::CBaseVideoInputAllocator(HRESULT* phr)
-	: CMemAllocator(NAME("CBaseVideoInputAllocator"), nullptr, phr)
+	: CMemAllocator(L"CBaseVideoInputAllocator", nullptr, phr)
 {
 	if (phr) {
 		*phr = S_OK;

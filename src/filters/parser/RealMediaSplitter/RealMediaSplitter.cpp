@@ -183,7 +183,7 @@ CFilterApp theApp;
 //
 
 CRealMediaSplitterFilter::CRealMediaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
-	: CBaseSplitterFilter(NAME("CRealMediaSplitterFilter"), pUnk, phr, __uuidof(this))
+	: CBaseSplitterFilter(L"CRealMediaSplitterFilter", pUnk, phr, __uuidof(this))
 {
 	m_nFlag |= SOURCE_SUPPORT_URL;
 }
@@ -1636,7 +1636,7 @@ int CRMFile::GetMasterStream()
 //
 
 CRealVideoDecoder::CRealVideoDecoder(LPUNKNOWN lpunk, HRESULT* phr)
-	: CBaseVideoFilter(NAME("CRealVideoDecoder"), lpunk, phr, __uuidof(this))
+	: CBaseVideoFilter(L"CRealVideoDecoder", lpunk, phr, __uuidof(this))
 	, m_hDrvDll(nullptr)
 	, m_dwCookie(0)
 	, m_lastBuffSizeDim(0)
@@ -2152,7 +2152,7 @@ HRESULT CRealVideoDecoder::AlterQuality(Quality q)
 //
 
 CRealAudioDecoder::CRealAudioDecoder(LPUNKNOWN lpunk, HRESULT* phr)
-	: CTransformFilter(NAME("CRealAudioDecoder"), lpunk, __uuidof(this))
+	: CTransformFilter(L"CRealAudioDecoder", lpunk, __uuidof(this))
 	, m_hDrvDll(nullptr)
 	, m_dwCookie(0)
 {

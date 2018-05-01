@@ -498,7 +498,7 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 //
 
 CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLSID& clsid)
-	: CBaseSplitterFilter(NAME("CMpegSplitterFilter"), pUnk, phr, clsid)
+	: CBaseSplitterFilter(L"CMpegSplitterFilter", pUnk, phr, clsid)
 	, m_pPipoBimbo(false)
 	, m_rtPlaylistDuration(0)
 	, m_rtStartOffset(0)

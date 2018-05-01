@@ -85,7 +85,7 @@ class __declspec(uuid("655D7613-C26C-4A25-BBBD-3C9C516122CC"))
 	{
 	public:
 		CTextInputPin(CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
-			: CBaseInputPin(NAME("CTextInputPin"), pFilter, pLock, phr, L"In") {}
+			: CBaseInputPin(L"CTextInputPin", pFilter, pLock, phr, L"In") {}
 		HRESULT CheckMediaType(const CMediaType* pmt);
 	};
 

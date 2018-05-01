@@ -115,7 +115,7 @@ public:
 	DECLARE_IUNKNOWN;
 };
 
-ChaptersSouce::ChaptersSouce() : CSource(NAME("Chapters Source"), nullptr, __uuidof(this))
+ChaptersSouce::ChaptersSouce() : CSource(L"Chapters Source", nullptr, __uuidof(this))
 {
 }
 
@@ -139,7 +139,7 @@ class CSubClock : public CUnknown, public ISubClock
 	REFERENCE_TIME m_rt;
 
 public:
-	CSubClock() : CUnknown(NAME("CSubClock"), nullptr) {
+	CSubClock() : CUnknown(L"CSubClock", nullptr) {
 		m_rt = 0;
 	}
 
@@ -9608,7 +9608,7 @@ class CDVDStateStream : public CUnknown, public IStream
 	__int64 m_pos;
 
 public:
-	CDVDStateStream() : CUnknown(NAME("CDVDStateStream"), nullptr) {
+	CDVDStateStream() : CUnknown(L"CDVDStateStream", nullptr) {
 		m_pos = 0;
 	}
 
