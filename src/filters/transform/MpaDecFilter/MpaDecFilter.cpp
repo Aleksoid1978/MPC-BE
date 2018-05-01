@@ -61,8 +61,7 @@
 #define OPTION_SPDIF_dtshd  L"HDMI_dtshd"
 #define OPTION_SPDIF_ac3enc L"SPDIF_ac3enc"
 
-#define MAX_JITTER          1000000i64 // +-100ms jitter is allowed
-#define MAX_DTS_JITTER      1400000i64 // +-140ms jitter is allowed for DTS
+#define MAX_JITTER          100000i64 // +-10ms jitter is allowed
 
 #define PADDING_SIZE        AV_INPUT_BUFFER_PADDING_SIZE
 /** ffmpeg\libavcodec\avcodec.h - AV_INPUT_BUFFER_PADDING_SIZE
@@ -302,7 +301,8 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_rtStart(0)
 	, m_dStartOffset(0.0)
 	, m_bDiscontinuity(FALSE)
-	, m_bResync(false)
+	, m_bResync(FALSE)
+	, m_bResyncTimestamp(FALSE)
 	, m_buff(PADDING_SIZE)
 	, m_hdmicount(0)
 	, m_hdmisize(0)
@@ -316,6 +316,12 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_bFlushing(FALSE)
 	, m_bNeedSyncPoint(FALSE)
 	, m_DTSHDProfile(0)
+	, m_rtStartInput(INVALID_TIME)
+	, m_rtStopInput(INVALID_TIME)
+	, m_rtStartInputCache(INVALID_TIME)
+	, m_rtStopInputCache(INVALID_TIME)
+	, m_bUpdateTimeCache(TRUE)
+	, m_FFAudioDec(this)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -472,7 +478,7 @@ HRESULT CMpaDecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, d
 	m_truehd_samplerate  = 0;
 	m_truehd_framelength = 0;
 	m_eac3_prev_frametype = EAC3_FRAME_TYPE_RESERVED;
-	m_bResync = true;
+	m_bResync = TRUE;
 	m_rtStart = 0; // LOOKATTHIS // reset internal timer?
 
 	m_bNeedSyncPoint = m_FFAudioDec.NeedSyncPoint();
@@ -480,6 +486,8 @@ HRESULT CMpaDecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, d
 	m_dRate = dRate > 0.0 ? dRate : 1.0;
 
 	m_DTSHDProfile = 0;
+
+	m_bUpdateTimeCache = TRUE;
 
 	return __super::NewSegment(tStart, tStop, dRate);
 }
@@ -568,7 +576,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 		m_bDiscontinuity = TRUE;
 		m_buff.Clear();
 		m_encbuff.clear();
-		m_bResync = true;
+		m_bResync = TRUE;
 		if (FAILED(hr)) {
 			DLog(L"    -> Discontinuity without timestamp");
 		}
@@ -582,33 +590,22 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	const GUID& subtype = m_pInput->CurrentMediaType().subtype;
 	const enum AVCodecID nCodecId = FindCodec(subtype);
 
-	REFERENCE_TIME jitterLimit = MAX_JITTER;
-	if (!m_bHasVideo || m_bIgnoreJitter) {
-		jitterLimit = INT64_MAX;
-	} else if (nCodecId == AV_CODEC_ID_DTS) {
-		jitterLimit = MAX_DTS_JITTER;
-	}
-
-	if (m_bAVSync
-			&& rtStart != INVALID_TIME && abs(m_rtStart - rtStart) > jitterLimit) {
-		DLog(L"CMpaDecFilter::Receive() : jitter limit is exceeded - %I64d", abs(m_rtStart - rtStart));
-		m_bResync = true;
-	}
-
 	if (m_bResync && SUCCEEDED(hr)) {
 		DLog(L"CMpaDecFilter::Receive() : Resync Request - [%I64d -> %I64d], buffer : %Iu", m_rtStart, rtStart, m_buff.Size());
-
-		m_buff.Clear();
-		m_encbuff.clear();
 
 		if (m_rtStart != INVALID_TIME && rtStart != m_rtStart) {
 			m_bDiscontinuity = TRUE;
 		}
 
 		m_rtStart = rtStart;
+		m_rtStartInputCache = INVALID_TIME;
 		m_dStartOffset = 0.0;
-		m_bResync = false;
+		m_bResync = FALSE;
+		m_bResyncTimestamp = TRUE;
 	}
+
+	m_rtStartInput = SUCCEEDED(hr) ? rtStart : INVALID_TIME;
+	m_rtStopInput = SUCCEEDED(hr) ? rtStop : INVALID_TIME;
 
 	m_buff.Append(pDataIn, len);
 
@@ -652,6 +649,20 @@ HRESULT CMpaDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin *pReceivePi
 		m_bHasVideo = HasMediaType(m_pGraph, MEDIATYPE_Video) || HasMediaType(m_pGraph, MEDIASUBTYPE_MPEG2_VIDEO);
 	}
 	return __super::CompleteConnect(direction, pReceivePin);
+}
+
+void CMpaDecFilter::UpdateCacheTimeStamp()
+{
+	m_rtStartInputCache = m_rtStartInput;
+	m_rtStopInputCache = m_rtStopInput;
+	m_rtStartInput = m_rtStopInput = INVALID_TIME;
+	m_bUpdateTimeCache = FALSE;
+}
+
+void CMpaDecFilter::ClearCacheTimeStamp()
+{
+	m_rtStartInputCache = INVALID_TIME;
+	m_bUpdateTimeCache = TRUE;
 }
 
 BOOL CMpaDecFilter::ProcessBitstream(enum AVCodecID nCodecId, HRESULT& hr, BOOL bEOF/* = FALSE*/)
@@ -719,7 +730,7 @@ HRESULT CMpaDecFilter::ProcessDvdLPCM()
 		m_buff.RemoveHead(m_buff.Size() - src_size);
 		DLogIf(src_size > 0, L"ProcessDvdLPCM(): %u bytes not processed", src_size);
 
-		return Deliver(dst.get(), dst_size, out_sf, wfein->nSamplesPerSec, channels, layout);
+		return Deliver(dst.get(), dst_size, m_rtStartInput, out_sf, wfein->nSamplesPerSec, channels, layout);
 	}
 	else {
 		auto dst = DecodeDvdLPCM(dst_size, out_sf, m_buff.Data(), src_size, channels, wfein->wBitsPerSample);
@@ -733,7 +744,7 @@ HRESULT CMpaDecFilter::ProcessDvdLPCM()
 		m_buff.RemoveHead(m_buff.Size() - src_size);
 		DLogIf(src_size > 0, L"ProcessDvdLPCM(): %u bytes not processed", src_size);
 
-		return Deliver(dst.get(), dst_size, out_sf, wfein->nSamplesPerSec, channels);
+		return Deliver(dst.get(), dst_size, m_rtStartInput, out_sf, wfein->nSamplesPerSec, channels);
 	}
 }
 
@@ -758,7 +769,7 @@ HRESULT CMpaDecFilter::ProcessHdmvLPCM() // Blu ray LPCM
 	m_buff.RemoveHead(m_buff.Size() - src_size);
 	DLogIf(src_size > 0, L"ProcessHdmvLPCM(): %u bytes not processed", src_size);
 
-	return Deliver(dst.get(), dst_size, out_sf, wfein->nSamplesPerSec, wfein->nChannels, s_scmap_hdmv[wfein->channel_conf].layout);
+	return Deliver(dst.get(), dst_size, m_rtStartInput, out_sf, wfein->nSamplesPerSec, wfein->nChannels, s_scmap_hdmv[wfein->channel_conf].layout);
 }
 
 HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALSE*/)
@@ -788,9 +799,10 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 			std::vector<BYTE> output;
 			SampleFormat samplefmt = SAMPLE_FMT_NONE;
 
-			while (S_OK == (hr = m_FFAudioDec.ReceiveData(output, samplefmt))) {
+			REFERENCE_TIME rtStart = INVALID_TIME;
+			while (S_OK == (hr = m_FFAudioDec.ReceiveData(output, samplefmt, rtStart))) {
 				if (output.size()) {
-					hr = Deliver(output.data(), output.size(), samplefmt, m_FFAudioDec.GetSampleRate(), m_FFAudioDec.GetChannels(), m_FFAudioDec.GetChannelMask());
+					hr = Deliver(output.data(), output.size(), rtStart, samplefmt, m_FFAudioDec.GetSampleRate(), m_FFAudioDec.GetChannels(), m_FFAudioDec.GetChannelMask());
 					output.clear();
 				}
 			}
@@ -827,14 +839,15 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 			std::vector<BYTE> output;
 			SampleFormat samplefmt = SAMPLE_FMT_NONE;
 
-			while (S_OK == (hr = m_FFAudioDec.ReceiveData(output, samplefmt))) {
+			REFERENCE_TIME rtStart = INVALID_TIME;
+			while (S_OK == (hr = m_FFAudioDec.ReceiveData(output, samplefmt, rtStart))) {
 				if (output.size()) {
-					hr = Deliver(output.data(), output.size(), samplefmt, m_FFAudioDec.GetSampleRate(), m_FFAudioDec.GetChannels(), m_FFAudioDec.GetChannelMask());
+					hr = Deliver(output.data(), output.size(), rtStart, samplefmt, m_FFAudioDec.GetSampleRate(), m_FFAudioDec.GetChannels(), m_FFAudioDec.GetChannelMask());
 					output.clear();
 				}
 			}
 		} else {
-			m_bResync = true;
+			m_bResync = TRUE;
 			if (!out_size) {
 				m_buff.Clear();
 				return S_OK;
@@ -870,11 +883,16 @@ HRESULT CMpaDecFilter::ProcessAC3_SPDIF()
 			p++;
 			continue;
 		}
+
+		if (m_bUpdateTimeCache) {
+			UpdateCacheTimeStamp();
+		}
+
 		if (p + size > end) {
 			break;
 		}
 
-		if (FAILED(hr = DeliverBitstream(p, size, IEC61937_AC3, aframe.samplerate, 1536))) {
+		if (FAILED(hr = DeliverBitstream(p, size, m_rtStartInputCache, IEC61937_AC3, aframe.samplerate, 1536))) {
 			return hr;
 		}
 
@@ -902,12 +920,18 @@ HRESULT CMpaDecFilter::ProcessEAC3_SPDIF()
 			p++;
 			continue;
 		}
+
+		if (m_bUpdateTimeCache) {
+			UpdateCacheTimeStamp();
+		}
+
 		if (p + size > end) {
 			break;
 		}
 		if (aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT && m_eac3_prev_frametype != EAC3_FRAME_TYPE_INDEPENDENT) {
 			DLog(L"CMpaDecFilter::ProcessEAC3_SPDIF() : Ignoring dependent frame without independent frame.");
 			p++;
+			ClearCacheTimeStamp();
 			continue;
 		}
 
@@ -935,7 +959,7 @@ HRESULT CMpaDecFilter::ProcessEAC3_SPDIF()
 			continue;
 		}
 
-		hr = DeliverBitstream(m_hdmibuff, m_hdmisize, IEC61937_EAC3, aframe.samplerate, aframe.samples * repeat);
+		hr = DeliverBitstream(m_hdmibuff, m_hdmisize, m_rtStartInputCache, IEC61937_EAC3, aframe.samplerate, aframe.samples * repeat);
 		m_hdmicount = 0;
 		m_hdmisize  = 0;
 		m_eac3_prev_frametype = EAC3_FRAME_TYPE_RESERVED;
@@ -991,6 +1015,11 @@ HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 			p++;
 			continue;
 		}
+
+		if (m_bUpdateTimeCache) {
+			UpdateCacheTimeStamp();
+		}
+
 		if (p + size > end) {
 			break;
 		}
@@ -1022,7 +1051,7 @@ HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 		memcpy(m_hdmibuff + (BS_HEADER_SIZE + BS_MAT_SIZE) - sizeof(mat_end_code), mat_end_code, sizeof(mat_end_code));
 		m_hdmisize = (BS_HEADER_SIZE + BS_MAT_SIZE);
 
-		hr = DeliverBitstream(m_hdmibuff + BS_HEADER_SIZE, m_hdmisize - BS_HEADER_SIZE, IEC61937_TRUEHD, m_truehd_samplerate, m_truehd_framelength * 24);
+		hr = DeliverBitstream(m_hdmibuff + BS_HEADER_SIZE, m_hdmisize - BS_HEADER_SIZE, m_rtStartInputCache, IEC61937_TRUEHD, m_truehd_samplerate, m_truehd_framelength * 24);
 		m_hdmicount = 0;
 		m_hdmisize  = 0;
 		if (FAILED(hr)) {
@@ -1054,6 +1083,10 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF(BOOL bEOF/* = FALSE*/)
 			continue;
 		}
 
+		if (m_bUpdateTimeCache) {
+			UpdateCacheTimeStamp();
+		}
+
 		int sizehd = 0;
 		if (p + size + 16 <= end) {
 			sizehd = ParseDTSHDHeader(p + size);
@@ -1078,7 +1111,7 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF(BOOL bEOF/* = FALSE*/)
 
 		bool usehdmi = sizehd && bUseDTSHDBitstream;
 		if (usehdmi) {
-			if (FAILED(hr = DeliverBitstream(p, size + sizehd, IEC61937_DTSHD, aframe.samplerate, aframe.samples))) {
+			if (FAILED(hr = DeliverBitstream(p, size + sizehd, m_rtStartInputCache, IEC61937_DTSHD, aframe.samplerate, aframe.samples))) {
 				return hr;
 			}
 		} else {
@@ -1097,7 +1130,7 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF(BOOL bEOF/* = FALSE*/)
 					DLog(L"CMpaDecFilter:ProcessDTS_SPDIF() - framelength is not supported");
 					return E_FAIL;
 			}
-			if (FAILED(hr = DeliverBitstream(p, size, type, aframe.samplerate >> aframe.param2, aframe.samples))) {
+			if (FAILED(hr = DeliverBitstream(p, size, m_rtStartInputCache, type, aframe.samplerate >> aframe.param2, aframe.samples))) {
 				return hr;
 			}
 		}
@@ -1138,7 +1171,7 @@ HRESULT CMpaDecFilter::ProcessPCMraw() //'raw '
 	}
 
 	HRESULT hr;
-	if (S_OK != (hr = Deliver(&outBuff.front().value, size, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
+	if (S_OK != (hr = Deliver(&outBuff.front().value, size, m_rtStartInput, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
 		return hr;
 	}
 
@@ -1202,7 +1235,7 @@ HRESULT CMpaDecFilter::ProcessPCMintBE() // 'twos', big-endian 'in24' and 'in32'
 	}
 
 	HRESULT hr;
-	if (S_OK != (hr = Deliver(&outBuff.front().value, outSize, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
+	if (S_OK != (hr = Deliver(&outBuff.front().value, outSize, m_rtStartInput, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
 		return hr;
 	}
 
@@ -1246,7 +1279,7 @@ HRESULT CMpaDecFilter::ProcessPCMintLE() // 'sowt', little-endian 'in24' and 'in
 	}
 
 	HRESULT hr;
-	if (S_OK != (hr = Deliver(&outBuff.front().value, outSize, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
+	if (S_OK != (hr = Deliver(&outBuff.front().value, outSize, m_rtStartInput, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
 		return hr;
 	}
 
@@ -1286,7 +1319,7 @@ HRESULT CMpaDecFilter::ProcessPCMfloatBE() // big-endian 'fl32' and 'fl64'
 	}
 
 	HRESULT hr;
-	if (S_OK != (hr = Deliver(&outBuff.front().value, size, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
+	if (S_OK != (hr = Deliver(&outBuff.front().value, size, m_rtStartInput, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
 		return hr;
 	}
 
@@ -1314,7 +1347,7 @@ HRESULT CMpaDecFilter::ProcessPCMfloatLE() // little-endian 'fl32' and 'fl64'
 	memcpy(outBuff.data(), m_buff.Data(), size);
 
 	HRESULT hr;
-	if (S_OK != (hr = Deliver(&outBuff.front().value, size, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
+	if (S_OK != (hr = Deliver(&outBuff.front().value, size, m_rtStartInput, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
 		return hr;
 	}
 
@@ -1351,9 +1384,10 @@ HRESULT CMpaDecFilter::ProcessPS2PCM()
 			}
 
 			HRESULT hr;
-			if (S_OK != (hr = Deliver(&outBuff.front().value, size, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
+			if (S_OK != (hr = Deliver(&outBuff.front().value, size, m_rtStartInput, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
 				return hr;
 			}
+			m_rtStartInput = INVALID_TIME;
 
 			p += size;
 		}
@@ -1434,9 +1468,10 @@ HRESULT CMpaDecFilter::ProcessPS2ADPCM()
 			}
 
 			HRESULT hr;
-			if (S_OK != (hr = Deliver(&outBuff.front().value, outSize, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
+			if (S_OK != (hr = Deliver(&outBuff.front().value, outSize, m_rtStartInput, out_sf, wfe->nSamplesPerSec, wfe->nChannels))) {
 				return hr;
 			}
+			m_rtStartInput = INVALID_TIME;
 
 			p += size;
 		}
@@ -1468,7 +1503,7 @@ HRESULT CMpaDecFilter::GetDeliveryBuffer(IMediaSample** pSample, BYTE** pData)
 	return S_OK;
 }
 
-HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, size_t size, SampleFormat sfmt, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask)
+HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, const size_t size, const REFERENCE_TIME rtStartInput, const SampleFormat sfmt, const DWORD nSamplesPerSec, const WORD nChannels, DWORD dwChannelMask/* = 0*/)
 {
 	if (m_bFlushing) {
 		return S_FALSE;
@@ -1482,10 +1517,25 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, size_t size, SampleFormat sfmt, DWOR
 	m_InternalSampleFormat = sfmt;
 
 	if (m_bBitstreamSupported[SPDIF] && GetSPDIF(ac3enc) && nChannels > 2) { // do not encode mono and stereo
-		return AC3Encode(pBuff, size, sfmt, nSamplesPerSec, nChannels, dwChannelMask);
+		return AC3Encode(pBuff, size, rtStartInput, sfmt, nSamplesPerSec, nChannels, dwChannelMask);
 	}
 
 	int nSamples = size / (nChannels * get_bytes_per_sample(sfmt));
+
+	if (m_bResyncTimestamp && rtStartInput != INVALID_TIME) {
+		m_rtStart = rtStartInput;
+		m_bResyncTimestamp = FALSE;
+	}
+
+	if (m_bAVSync && m_bHasVideo
+			&& rtStartInput != INVALID_TIME) {
+		const REFERENCE_TIME rtJitter = m_rtStart - rtStartInput;
+		if (abs(rtJitter) > MAX_JITTER) {
+			m_rtStart = rtStartInput;
+			DLog(L"CMpaDecFilter::Deliver() : corrected A/V sync by %I64d", rtJitter);
+			m_bDiscontinuity = TRUE;
+		}
+	}
 
 	REFERENCE_TIME rtStart, rtStop;
 	CalculateDuration(nSamples, nSamplesPerSec, rtStart, rtStop);
@@ -1551,8 +1601,10 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, size_t size, SampleFormat sfmt, DWOR
 	return m_pOutput->Deliver(pOut);
 }
 
-HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, WORD type, int sample_rate, int samples)
+HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, const int size, const REFERENCE_TIME rtStartInput, const WORD type, const int sample_rate, const int samples)
 {
+	ClearCacheTimeStamp();
+
 	HRESULT hr;
 	WORD subtype  = 0;
 	bool isDTSWAV = false;
@@ -1641,6 +1693,21 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, WORD type, int sa
 		}
 	}
 
+	if (m_bResyncTimestamp && rtStartInput != INVALID_TIME) {
+		m_rtStart = rtStartInput;
+		m_bResyncTimestamp = FALSE;
+	}
+
+	if (m_bAVSync && m_bHasVideo
+			&& rtStartInput != INVALID_TIME) {
+		const REFERENCE_TIME rtJitter = m_rtStart - rtStartInput;
+		if (abs(rtJitter) > MAX_JITTER) {
+			m_rtStart = rtStartInput;
+			DLog(L"CMpaDecFilter::DeliverBitstream() : corrected A/V sync by %I64d", rtJitter);
+			m_bDiscontinuity = TRUE;
+		}
+	}
+
 	REFERENCE_TIME rtStart, rtStop;
 	CalculateDuration(samples, sample_rate, rtStart, rtStop, type == IEC61937_TRUEHD);
 
@@ -1666,7 +1733,7 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, int size, WORD type, int sa
 	return m_pOutput->Deliver(pOut);
 }
 
-HRESULT CMpaDecFilter::AC3Encode(BYTE* pBuff, int size, SampleFormat sfmt, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask)
+HRESULT CMpaDecFilter::AC3Encode(BYTE* pBuff, const size_t size, REFERENCE_TIME rtStartInput, const SampleFormat sfmt, const DWORD nSamplesPerSec, const WORD nChannels, const DWORD dwChannelMask)
 {
 	DWORD new_layout     = m_AC3Enc.SelectLayout(dwChannelMask);
 	WORD  new_channels   = av_popcount(new_layout);
@@ -1706,7 +1773,8 @@ HRESULT CMpaDecFilter::AC3Encode(BYTE* pBuff, int size, SampleFormat sfmt, DWORD
 	std::vector<BYTE> output;
 
 	while (m_AC3Enc.Encode(m_encbuff, output) == S_OK) {
-		DeliverBitstream(output.data(), output.size(), IEC61937_AC3, new_samplerate, 1536);
+		DeliverBitstream(output.data(), output.size(), rtStartInput, IEC61937_AC3, new_samplerate, 1536);
+		rtStartInput = INVALID_TIME;
 	}
 
 	return S_OK;

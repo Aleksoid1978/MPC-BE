@@ -71,7 +71,8 @@ protected:
 	double          m_dStartOffset;
 
 	BOOL            m_bDiscontinuity;
-	bool            m_bResync;
+	BOOL            m_bResync;
+	BOOL            m_bResyncTimestamp;
 
 	ps2_state_t     m_ps2_state;
 
@@ -95,6 +96,12 @@ protected:
 
 	int             m_DTSHDProfile;
 
+	REFERENCE_TIME  m_rtStartInput;
+	REFERENCE_TIME  m_rtStopInput;
+	REFERENCE_TIME  m_rtStartInputCache;
+	REFERENCE_TIME  m_rtStopInputCache;
+	BOOL            m_bUpdateTimeCache;
+
 	enum BitstreamType {
 		SPDIF,
 		EAC3,
@@ -104,10 +111,13 @@ protected:
 	};
 	BOOL            m_bBitstreamSupported[BTCOUNT];
 
+	void UpdateCacheTimeStamp();
+	void ClearCacheTimeStamp();
+
 	CMixer m_Mixer;
 	std::vector<float> m_encbuff;
 	CAC3Encoder m_AC3Enc;
-	HRESULT AC3Encode(BYTE* pBuff, int size, SampleFormat sfmt, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
+	HRESULT AC3Encode(BYTE* pBuff, const size_t size, REFERENCE_TIME rtStartInput, const SampleFormat sfmt, const DWORD nSamplesPerSec, const WORD nChannels, const DWORD dwChannelMask);
 
 	BOOL ProcessBitstream(enum AVCodecID nCodecId, HRESULT& hr, BOOL bEOF = FALSE);
 
@@ -128,8 +138,8 @@ protected:
 	HRESULT ProcessPCMfloatLE();
 
 	HRESULT GetDeliveryBuffer(IMediaSample** pSample, BYTE** pData);
-	HRESULT Deliver(BYTE* pBuff, size_t size, SampleFormat sfmt, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
-	HRESULT DeliverBitstream(BYTE* pBuff, int size, WORD type, int sample_rate, int samples);
+	HRESULT Deliver(BYTE* pBuff, const size_t size, const REFERENCE_TIME rtStartInput, const SampleFormat sfmt, const DWORD nSamplesPerSec, const WORD nChannels, DWORD dwChannelMask = 0);
+	HRESULT DeliverBitstream(BYTE* pBuff, const int size, const REFERENCE_TIME rtStartInput, const WORD type, const int sample_rate, const int samples);
 	HRESULT ReconnectOutput(int nSamples, CMediaType& mt);
 	CMediaType CreateMediaType(MPCSampleFormat sf, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);
 	CMediaType CreateMediaTypeSPDIF(DWORD nSamplesPerSec = 48000);
@@ -137,6 +147,8 @@ protected:
 
 	void CalculateDuration(int samples, int sample_rate, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, BOOL bIsTrueHDBitstream = FALSE);
 	MPCSampleFormat SelectOutputFormat(MPCSampleFormat sf);
+
+	friend class CFFAudioDecoder;
 
 public:
 	CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr);

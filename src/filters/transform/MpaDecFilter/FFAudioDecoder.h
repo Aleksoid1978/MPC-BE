@@ -31,6 +31,8 @@ struct AVFrame;
 enum AVCodecID FindCodec(const GUID subtype);
 const char* GetCodecDescriptorName(enum AVCodecID codec_id);
 
+class CMpaDecFilter;
+
 // CFFAudioDecoder
 
 class CFFAudioDecoder
@@ -56,8 +58,10 @@ protected:
 	bool m_bStereoDownmix;
 	bool m_bNeedReinit;
 
+	CMpaDecFilter* m_pFilter;
+
 public:
-	CFFAudioDecoder();
+	CFFAudioDecoder(CMpaDecFilter* pFilter);
 
 	bool    Init(enum AVCodecID codecID, CMediaType* mediaType);
 	void    SetDRC(bool fDRC);
@@ -65,7 +69,7 @@ public:
 
 	HRESULT RealPrepare(BYTE* p, int buffsize, CPaddedBuffer& BuffOut);
 	HRESULT SendData(BYTE* p, int size, int* out_size = nullptr);
-	HRESULT ReceiveData(std::vector<BYTE>& BuffOut, SampleFormat& samplefmt);
+	HRESULT ReceiveData(std::vector<BYTE>& BuffOut, SampleFormat& samplefmt, REFERENCE_TIME& rtStart);
 	void    FlushBuffers();
 	void    StreamFinish();
 
