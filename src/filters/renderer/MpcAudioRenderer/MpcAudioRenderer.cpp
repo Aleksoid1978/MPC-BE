@@ -158,7 +158,6 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_rtNextSampleTime(0)
 	, m_rtLastSampleTimeEnd(0)
 	, m_rtEstimateSlavingJitter(0)
-	, m_bFirstSampleToRender(TRUE)
 	, m_bUseDefaultDevice(FALSE)
 	, m_nSampleOffset(0)
 	, m_bUseCrossFeed(FALSE)
@@ -639,8 +638,6 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME rtStart)
 
 	m_filterState = State_Running;
 	m_rtStartTime = rtStart;
-
-	m_bFirstSampleToRender = TRUE;
 
 	if (m_bEOS) {
 		NotifyEvent(EC_COMPLETE, S_OK, 0);
@@ -2645,7 +2642,6 @@ void CMpcAudioRenderer::WasapiFlush()
 		m_CurrentPacket.Free();
 
 		m_nSampleOffset = 0;
-		m_bFirstSampleToRender = TRUE;
 	}
 
 	{
