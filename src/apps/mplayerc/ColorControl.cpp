@@ -91,6 +91,11 @@ void CColorControl::EnableVMR9ColorControl()
 
 void CColorControl::EnableEVRColorControl()
 {
+	// fix nvidia min contrast bug
+	if (m_EVRColorCon.MinValue.ll == 6553) {
+		m_EVRColorCon.MinValue = DXVA2FloatToFixed(0.11f);
+	}
+
 	m_VMR9Used = false;
 }
 
