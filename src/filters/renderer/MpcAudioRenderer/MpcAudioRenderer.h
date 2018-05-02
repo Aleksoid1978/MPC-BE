@@ -284,6 +284,8 @@ private:
 
 	BOOL					m_bReal32bitSupport;
 
+	BOOL					m_bDVDPlayback;
+
 	struct AudioParams {
 		WORD  wBitsPerSample;
 		DWORD nSamplesPerSec;
