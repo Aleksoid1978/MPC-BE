@@ -2551,6 +2551,10 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 		}
 #endif
 		dwFlags = AUDCLNT_BUFFERFLAGS_SILENT;
+
+		if (!nWasapiQueueSize && m_filterState == State_Running && m_bDVDPlayback) {
+			m_rtNextSampleTime = m_rtLastSampleTimeEnd = std::max(m_rtNextSampleTime, m_pSyncClock->GetPrivateTime() - m_rtStartTime + m_hnsPeriod);
+		}
 	} else {
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL > 1
 		DLog(L"CMpcAudioRenderer::RenderWasapiBuffer() - requested: %u[%u], available: %Iu", nAvailableBytes, numFramesAvailable, nWasapiQueueSize);
