@@ -167,6 +167,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_FlushEvent(TRUE)
 	, m_ReceiveEvent(TRUE)
 	, m_bReal32bitSupport(FALSE)
+	, m_bDVDPlayback(FALSE)
 {
 	DLog(L"CMpcAudioRenderer::CMpcAudioRenderer()");
 
@@ -476,6 +477,8 @@ HRESULT CMpcAudioRenderer::CompleteConnect(IPin *pReceivePin)
 {
 	DLog(L"CMpcAudioRenderer::CompleteConnect()");
 
+	m_bDVDPlayback = FindFilter(CLSID_DVDNavigator, m_pGraph) != nullptr;
+
 	return CBaseRenderer::CompleteConnect(pReceivePin);
 }
 
@@ -650,7 +653,7 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME rtStart)
 	}
 
 	if (m_pAudioClock) {
-		m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime);
+		m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtNextSampleTime);
 	}
 
 	return CBaseRenderer::Run(rtStart);
@@ -2655,14 +2658,22 @@ HRESULT CMpcAudioRenderer::EndFlush()
 	HRESULT hr = CBaseRenderer::EndFlush();
 	m_FlushEvent.Reset();
 
+	if (!m_bDVDPlayback) {
+		m_rtNextSampleTime = 0;
+		m_rtLastSampleTimeEnd = 0;
+		m_rtEstimateSlavingJitter = 0;
+	}
+
 	return hr;
 }
 
 void CMpcAudioRenderer::NewSegment()
 {
-	m_rtNextSampleTime = 0;
-	m_rtLastSampleTimeEnd = 0;
-	m_rtEstimateSlavingJitter = 0;
+	if (m_bDVDPlayback) {
+		m_rtNextSampleTime = 0;
+		m_rtLastSampleTimeEnd = 0;
+		m_rtEstimateSlavingJitter = 0;
+	}
 }
 
 void CMpcAudioRenderer::Flush()
