@@ -2196,6 +2196,9 @@ HRESULT CMpaDecFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt)
 				m_faJitter.SetNumSamples(50);
 				m_JitterLimit = MAX_JITTER;
 			}
+		} else {
+			m_faJitter.SetNumSamples(50);
+			m_JitterLimit = MAX_JITTER;
 		}
 	}
 
