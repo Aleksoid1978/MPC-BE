@@ -25,7 +25,7 @@ template <class T>
 class FloatingAverage
 {
 public:
-  FloatingAverage(unsigned int iNumSamples = 10) {
+  FloatingAverage(const unsigned int iNumSamples = 10) {
     SetNumSamples(iNumSamples);
   }
 
@@ -33,17 +33,17 @@ public:
     free(m_Samples);
   }
 
-  void SetNumSamples(unsigned int iNumSamples) {
+  void SetNumSamples(const unsigned int iNumSamples) {
     if (iNumSamples > m_NumSamplesAlloc) {
       m_Samples = (T *)realloc(m_Samples, iNumSamples * sizeof(T));
       m_NumSamplesAlloc = iNumSamples;
     }
-    if (iNumSamples > m_NumSamples)
-      memset(m_Samples + m_NumSamples, 0, sizeof(T) * (iNumSamples - m_NumSamples));
+    memset(m_Samples, 0, sizeof(T) * m_NumSamplesAlloc);
     m_NumSamples = iNumSamples;
+    m_CurrentSample = 0;
   }
 
-  void Sample(T fSample) {
+  void Sample(const T fSample) {
     m_Samples[m_CurrentSample] = fSample;
     if (++m_CurrentSample >= m_NumSamples) {
       m_CurrentSample = 0;
@@ -94,7 +94,7 @@ public:
     return max;
   }
 
-  void OffsetValues(T value) const {
+  void OffsetValues(const T value) const {
     for(unsigned int i = 0; i < m_NumSamples; ++i) {
       m_Samples[i] += value;
     }
