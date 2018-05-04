@@ -10,6 +10,7 @@
 	MediaInfo git-v18.03.1;
 	openjpeg git-v2.3.0-9-gd9f8f7ba;
 	rapidjson git-v1.1.0-301-gfc7cda78;
+	Speex-1.2.0-6-g0c02121;
 	soxr git-0.1.3-0-g945b592;
 	ZenLib git-v0.4.37-6-g6694a74;
 
