@@ -7686,6 +7686,10 @@ void CMainFrame::OnPlayStop()
 			m_fFrameSteppingActive = false;
 			m_pBA->put_Volume(m_nVolumeBeforeFrameStepping);
 		}
+
+		if (m_pPlaybackNotify) {
+			m_pPlaybackNotify->Stop();
+		}
 	}
 
 	m_nLoops = 0;
@@ -13572,8 +13576,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			m_pMFVDC->SetVideoPosition(nullptr, &Rect);
 
 			m_pD3DFS = m_pMFVDC;
-		} else {
-			m_pD3DFS = m_pVMRWC;
+			m_pPlaybackNotify = m_pMFVDC;
 		}
 
 		if (m_bUseSmartSeek) {
@@ -13783,6 +13786,8 @@ void CMainFrame::CloseMediaPrivate()
 	m_pVMRWC.Release();
 	m_pVMRMC9.Release();
 	m_pMVTO.Release();
+	
+	m_pPlaybackNotify.Release();
 	m_pD3DFS.Release();
 
 	m_pMFVMB.Release();

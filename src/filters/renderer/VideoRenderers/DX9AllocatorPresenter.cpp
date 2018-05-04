@@ -2380,6 +2380,7 @@ void CDX9AllocatorPresenter::OnChangeInput(CComPtr<IPin> pPin)
 	}
 }
 
+// ID3DFullscreenControl
 STDMETHODIMP CDX9AllocatorPresenter::SetD3DFullscreen(bool fEnabled)
 {
 	m_bIsFullscreen = fEnabled;

@@ -2426,6 +2426,8 @@ STDMETHODIMP CSyncAP::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 		hr = GetInterface((ISyncClockAdviser*)this, ppv);
 	} else if (riid == __uuidof(ID3DFullscreenControl)) {
 		hr = GetInterface((ID3DFullscreenControl*)this, ppv);
+	} else if (riid == __uuidof(IPlaybackNotify)) {
+		hr = GetInterface((IPlaybackNotify*)this, ppv);
 	} else {
 		hr = __super::NonDelegatingQueryInterface(riid, ppv);
 	}
@@ -2645,13 +2647,6 @@ STDMETHODIMP CSyncAP::ProcessMessage(MFVP_MESSAGE_TYPE eMessage, ULONG_PTR ulPar
 		case MFVP_MESSAGE_ENDSTREAMING:
 			m_pGenlock->ResetTiming();
 			m_pRefClock = nullptr;
-			/*
-			for (unsigned i = 0; i < m_nSurfaces; i++) {
-				if (m_pVideoSurfaces) {
-					m_pD3DDevEx->ColorFill(m_pVideoSurfaces[i], nullptr, 0);
-				}
-			}
-			*/
 			break;
 
 		case MFVP_MESSAGE_FLUSH:
@@ -3959,8 +3954,7 @@ STDMETHODIMP CSyncRenderer::GetClassID(__RPC__out CLSID *pClassID)
 	return E_NOTIMPL;
 }
 
-// CSyncAP
-
+// ID3DFullscreenControl
 STDMETHODIMP CSyncAP::SetD3DFullscreen(bool fEnabled)
 {
 	m_bIsFullscreen = fEnabled;
@@ -3971,6 +3965,18 @@ STDMETHODIMP CSyncAP::GetD3DFullscreen(bool* pfEnabled)
 {
 	CheckPointer(pfEnabled, E_POINTER);
 	*pfEnabled = m_bIsFullscreen;
+	return S_OK;
+}
+
+// IPlaybackNotify
+STDMETHODIMP CSyncAP::Stop()
+{
+	for (unsigned i = 0; i < m_nSurfaces + 2; i++) {
+		if (m_pVideoSurfaces[i]) {
+			m_pD3DDevEx->ColorFill(m_pVideoSurfaces[i], nullptr, 0);
+		}
+	}
+
 	return S_OK;
 }
 

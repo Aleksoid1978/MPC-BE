@@ -54,7 +54,8 @@ namespace DSObjects
 		public IMFVideoDisplayControl,
 		public IMFVideoMixerBitmap,
 		public IEVRTrustedVideoPlugin,
-		public IMediaSideData
+		public IMediaSideData,
+		public IPlaybackNotify
 		//public IMFVideoPositionMapper, // Non mandatory EVR Presenter Interfaces (see later...)
 	{
 	public:
@@ -161,6 +162,9 @@ namespace DSObjects
 		// IMediaSideData
 		STDMETHODIMP SetSideData(GUID guidType, const BYTE *pData, size_t size);
 		STDMETHODIMP GetSideData(GUID guidType, const BYTE **pData, size_t *pSize);
+
+		// IPlaybackNotify
+		STDMETHODIMP Stop();
 
 	protected :
 		void			OnResetDevice();

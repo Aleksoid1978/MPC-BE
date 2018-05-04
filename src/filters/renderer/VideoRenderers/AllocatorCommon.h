@@ -23,10 +23,13 @@
 
 #include <d3d9.h>
 #include "../../../SubPic/ISubPic.h"
-#include "PixelShaderCompiler.h"
 
-extern HRESULT CreateAP9(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP);
-extern HRESULT CreateEVR(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP);
+HRESULT CreateAP9(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP);
+HRESULT CreateEVR(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP);
+
+CString GetWindowsErrorMessage(HRESULT _Error, HMODULE _Module);
+const wchar_t* D3DFormatToString(D3DFORMAT format);
+const wchar_t* GetD3DFormatStr(D3DFORMAT Format);
 
 // Set and query D3DFullscreen mode.
 interface __declspec(uuid("8EA1E899-B77D-4777-9F0E-66421BEA50F8"))
@@ -36,8 +39,10 @@ public IUnknown {
 	STDMETHOD(GetD3DFullscreen)(bool * pfEnabled) PURE;
 };
 
-//
+// Notify playback events
+interface __declspec(uuid("7DB66F45-A3CB-4B06-8219-916C33E53E2D"))
+IPlaybackNotify :
+public IUnknown {
+	STDMETHOD(Stop)() PURE;
+};
 
-CString GetWindowsErrorMessage(HRESULT _Error, HMODULE _Module);
-const wchar_t* D3DFormatToString(D3DFORMAT format);
-const wchar_t* GetD3DFormatStr(D3DFORMAT Format);
