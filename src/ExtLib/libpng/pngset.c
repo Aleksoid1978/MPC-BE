@@ -623,7 +623,7 @@ png_set_PLTE(png_structrp png_ptr, png_inforp info_ptr,
        PNG_MAX_PALETTE_LENGTH * (sizeof (png_color))));
 
    if (num_palette > 0)
-      memcpy(png_ptr->palette, palette, (unsigned int)PNG_MAX_PALETTE_LENGTH *
+      memcpy(png_ptr->palette, palette, (unsigned int)num_palette *
           (sizeof (png_color)));
    info_ptr->palette = png_ptr->palette;
    info_ptr->num_palette = png_ptr->num_palette = (png_uint_16)num_palette;
