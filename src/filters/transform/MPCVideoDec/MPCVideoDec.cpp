@@ -1859,7 +1859,6 @@ redo:
 		m_bReorderBFrame = !(clsidInput == __uuidof(CMpegSourceFilter) || clsidInput == __uuidof(CMpegSplitterFilter))
 							&& !(m_pAVCodec->capabilities & AV_CODEC_CAP_FRAME_THREADS)
 							&& !(m_nCodecId == AV_CODEC_ID_MPEG1VIDEO || m_nCodecId == AV_CODEC_ID_MPEG2VIDEO)
-							|| m_nCodecId == AV_CODEC_ID_VC1
 							|| (m_nCodecId == AV_CODEC_ID_MPEG4 && pmt->formattype != FORMAT_MPEG2Video)
 							|| clsidInput == __uuidof(CAviSourceFilter) || clsidInput == __uuidof(CAviSplitterFilter)
 							|| clsidInput == __uuidof(COggSourceFilter) || clsidInput == __uuidof(COggSplitterFilter)
