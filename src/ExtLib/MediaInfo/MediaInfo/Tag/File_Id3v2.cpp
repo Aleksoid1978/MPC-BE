@@ -968,6 +968,8 @@ void File_Id3v2::APIC()
             Fill(Stream_General, 0, General_Cover_Data, Data_Base64);
         }
     #endif //MEDIAINFO_ADVANCED
+
+    Skip_XX(Element_Size-Element_Offset, "Data");
 }
 
 //---------------------------------------------------------------------------

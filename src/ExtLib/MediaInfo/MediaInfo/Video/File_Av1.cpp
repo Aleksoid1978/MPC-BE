@@ -166,7 +166,6 @@ void File_Av1::Header_Parse()
     FILLING_END();
 
     int8u obu_type;
-    bool obu_extension_flag;
     BS_Begin();
     Mark_0 ();
     Get_S1 ( 4, obu_type,                                   "obu_type");

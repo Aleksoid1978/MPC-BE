@@ -40,6 +40,10 @@
     #include "MediaInfo/Export/Export_PBCore.h"
     #include "MediaInfo/Export/Export_PBCore2.h"
 #endif //defined(MEDIAINFO_PBCORE_YES)
+#if defined(MEDIAINFO_NISO_YES)
+#include "MediaInfo/Export/Export_Niso.h"
+#endif //defined(MEDIAINFO_NISO_YES)
+
 #include "MediaInfo/MediaInfo_Internal.h"
 #include "MediaInfo/File__Analyze.h"
 #include "ThirdParty/base64/base64.h"
@@ -155,6 +159,9 @@ Ztring MediaInfo_Internal::Inform()
         if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore"))
             return Export_EbuCore().Transform(*this, Export_EbuCore::version(Export_EbuCore::Version_Max-1), (Export_EbuCore::acquisitiondataoutputmode)MediaInfoLib::Config.AcquisitionDataOutputMode_Get(),
             Export_EbuCore::Format_XML, MediaInfoLib::Config.ExternalMetadata_Get(), MediaInfoLib::Config.ExternalMetaDataConfig_Get());
+        if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_JSON"))
+            return Export_EbuCore().Transform(*this, Export_EbuCore::version(Export_EbuCore::Version_Max-1), (Export_EbuCore::acquisitiondataoutputmode)MediaInfoLib::Config.AcquisitionDataOutputMode_Get(),
+            Export_EbuCore::Format_JSON, MediaInfoLib::Config.ExternalMetadata_Get(), MediaInfoLib::Config.ExternalMetaDataConfig_Get());
     #endif //defined(MEDIAINFO_EBUCORE_YES)
     #if defined(MEDIAINFO_EBUCORE_YES)
         if (MediaInfoLib::Config.Inform_Get()==__T("FIMS_1.1"))
@@ -184,6 +191,10 @@ Ztring MediaInfo_Internal::Inform()
         if (MediaInfoLib::Config.Inform_Get()==__T("PBCore")) //x.x
             return Export_PBCore2().Transform(*this);
     #endif //defined(MEDIAINFO_PBCORE_YES)
+    #if defined(MEDIAINFO_NISO_YES)
+        if (MediaInfoLib::Config.Inform_Get()==__T("NISO_Z39.87"))
+            return Export_Niso().Transform(*this, MediaInfoLib::Config.ExternalMetadata_Get(), MediaInfoLib::Config.ExternalMetaDataConfig_Get());
+    #endif //defined(MEDIAINFO_NISO_YES)
     #if defined(MEDIAINFO_REVTMD_YES)
         if (MediaInfoLib::Config.Inform_Get()==__T("reVTMD"))
             return __T("reVTMD is disabled due to its non-free licensing."); //return Export_reVTMD().Transform(*this);

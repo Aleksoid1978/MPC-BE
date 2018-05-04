@@ -282,11 +282,13 @@ public :
     #if defined(MEDIAINFO_EBUCORE_YES)
           void        AcquisitionDataOutputMode_Set (size_t Value);
           size_t      AcquisitionDataOutputMode_Get ();
+    #endif //MEDIAINFO_EBUCORE_YES
+    #if defined(MEDIAINFO_EBUCORE_YES) || defined(MEDIAINFO_NISO_YES)
           void        ExternalMetadata_Set (Ztring Value);
           Ztring      ExternalMetadata_Get ();
           void        ExternalMetaDataConfig_Set (Ztring Value);
           Ztring      ExternalMetaDataConfig_Get ();
-    #endif //MEDIAINFO_EBUCORE_YES
+    #endif //MEDIAINFO_EBUCORE_YES || defined(MEDIAINFO_NISO_YES)
 
     ZtringListList  SubFile_Config_Get ();
 
@@ -370,11 +372,11 @@ private :
     #if MEDIAINFO_ADVANCED
         bool        Format_Profile_Split;
     #endif //MEDIAINFO_ADVANCED
-    #if defined(MEDIAINFO_EBUCORE_YES)
+    #if defined(MEDIAINFO_EBUCORE_YES) || defined(MEDIAINFO_NISO_YES)
         size_t      AcquisitionDataOutputMode;
         Ztring      ExternalMetadata;
         Ztring      ExternalMetaDataConfig;
-    #endif //defined(MEDIAINFO_EBUCORE_YES)
+    #endif //defined(MEDIAINFO_EBUCORE_YES) || defined(MEDIAINFO_NISO_YES)
     size_t          Complete;
     size_t          BlockMethod;
     size_t          Internet;

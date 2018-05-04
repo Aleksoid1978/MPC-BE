@@ -3241,7 +3241,7 @@ void File_Avc::sei_message_user_data_unregistered_bluray_MDPM(int32u payloadSize
             case 0x18:
                         {
                         int16u Year;
-                        int8u  ID, MM, Zone_Hours;
+                        int8u  MM, Zone_Hours;
                         bool   Zone_Sign, Zone_Minutes;
                         BS_Begin();
                         Mark_0();
@@ -3272,7 +3272,7 @@ void File_Avc::sei_message_user_data_unregistered_bluray_MDPM(int32u payloadSize
                         break;
             case 0x19:
                         {
-                        int8u  MM, DD, hh, mm, ss;
+                        int8u  DD, hh, mm, ss;
                         Get_B1 (DD,                             "Day");
                         Get_B1 (hh,                             "Hour");
                         Get_B1 (mm,                             "Minute");
