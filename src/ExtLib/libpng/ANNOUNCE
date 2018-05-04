@@ -1,4 +1,4 @@
-Libpng 1.6.35beta01 - January 8, 2018
+Libpng 1.6.35beta02 - March 28, 2018
 
 This is not intended to be a public release. It will be replaced
 within a few weeks by a public version or by another test version.
@@ -8,23 +8,23 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.35beta01.tar.xz (LZMA-compressed, recommended)
-   1.6.35beta01.tar.gz
+   1.6.35beta02.tar.xz (LZMA-compressed, recommended)
+   1.6.35beta02.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1635b01.7z  (LZMA-compressed, recommended)
-   lp1635b01.zip
+   lp1635b02.7z  (LZMA-compressed, recommended)
+   lp1635b02.zip
 
 Other information:
 
-   1.6.35beta01-README.txt
-   1.6.35beta01-LICENSE.txt
+   1.6.35beta02-README.txt
+   1.6.35beta02-LICENSE.txt
 
 Changes since the last public release (1.6.34):
 
-Version 1.6.35beta01 [January 8, 2018]
+Version 1.6.35beta01 [March 6, 2018]
   Restored 21 of the contrib/pngsuite/i*.png, which do not cause test
     failures. Placed the remainder in contrib/pngsuite/interlaced/i*.png.
   Added calls to png_set_*() transforms commonly used by browsers to
@@ -33,6 +33,13 @@ Version 1.6.35beta01 [January 8, 2018]
   Fixed miscellaneous typos (Patch by github user "luzpaz")
   Change "ASM C" to "C ASM" in CMakeLists.txt
   Fixed incorrect handling of bKGD chunk in sub-8-bit files (Cosmin)
+  Added hardware optimization directories to zip and 7z distributions.
+  Fixed incorrect bitmask for options.
+  Fixed many spelling typos.
+
+Version 1.6.35bet02 [%DATE]
+  Make png_get_iCCP consistent with man page (allow compression-type argument
+  to be NULL, bug report by Lenard Szolnoki).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

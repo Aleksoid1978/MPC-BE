@@ -2,7 +2,7 @@
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
  * Last changed in libpng 1.6.35 [(PENDING RELEASE)]
- * Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -2979,7 +2979,7 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
  *  values this results in an implicit assumption that the original PNG RGB
  *  values were linear.
  *
- *  Other integer coefficents can be used via png_set_rgb_to_gray().  Because
+ *  Other integer coefficients can be used via png_set_rgb_to_gray().  Because
  *  the API takes just red and green coefficients the blue coefficient is
  *  calculated to make the sum 32768.  This will result in different rounding
  *  to that used above.
@@ -4755,8 +4755,7 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
                 &(png_ptr->trans_color));
 
          else
-            png_do_expand(row_info, png_ptr->row_buf + 1,
-                (png_const_color_16p)NULL);
+            png_do_expand(row_info, png_ptr->row_buf + 1, NULL);
       }
    }
 #endif

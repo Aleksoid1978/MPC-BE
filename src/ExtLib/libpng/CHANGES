@@ -3259,7 +3259,7 @@ Version 1.5.2beta01 [February 13, 2011]
   Revised PNG_EXPORTA macro to not use an empty parameter, to accommodate the
     old VisualC++ preprocessor.
   Turned on interlace handling in png_read_png().
-  Fixed gcc pendantic warnings.
+  Fixed gcc pedantic warnings.
   Handle longjmp in Cygwin.
   Fixed png_get_current_row_number() in the interlaced case.
   Cleaned up ALPHA flags and transformations.
@@ -3643,7 +3643,7 @@ Version 1.5.6beta05 [October 12, 2011]
   Fixed bug in png_write_chunk_header() debug print, introduced in 1.5.6beta01.
 
 Version 1.5.6beta06 [October 17, 2011]
-  Removed two redundant tests for unitialized row.
+  Removed two redundant tests for uninitialized row.
   Fixed a relatively harmless memory overwrite in compressed text writing
     with a 1 byte zlib buffer.
   Add ability to call png_read_update_info multiple times to pngvalid.c.
@@ -3689,7 +3689,7 @@ Version 1.5.7beta01 [November 4, 2011]
     crash.  The pngmem.c implementation of png_malloc() included a cast
     to png_size_t which would fail on large allocations on 16-bit systems.
   Fix for the preprocessor of the Intel C compiler. The preprocessor
-    splits adjacent @ signs with a space; this changes the concatentation
+    splits adjacent @ signs with a space; this changes the concatenation
     token from @-@-@ to PNG_JOIN; that should work with all compiler
     preprocessors.
   Paeth filter speed improvements from work by Siarhei Siamashka. This
@@ -4176,7 +4176,7 @@ Version 1.6.0beta27 [August 11, 2012]
     declared even though the functions are never actually defined.  This
     change provides a dummy definition so that the declarations work, yet any
     implementation will fail to compile because of an incomplete type.
-  Re-eliminated the use of strcpy() in pngtest.c.  An unncessary use of
+  Re-eliminated the use of strcpy() in pngtest.c.  An unnecessary use of
     strcpy() was accidentally re-introduced in libpng16; this change replaces
     it with strncpy().
   Eliminated use of png_sizeof(); use sizeof() instead.
@@ -6040,7 +6040,7 @@ Version 1.6.33 [September 28, 2017]
 Version 1.6.34 [September 29, 2017]
   Removed contrib/pngsuite/i*.png; some of them caused test failures.
 
-Version 1.6.35beta01 [January 8, 2018]
+Version 1.6.35beta01 [March 6, 2018]
   Restored 21 of the contrib/pngsuite/i*.png, which do not cause test
     failures. Placed the remainder in contrib/pngsuite/interlaced/i*.png.
   Added calls to png_set_*() transforms commonly used by browsers to
@@ -6049,6 +6049,13 @@ Version 1.6.35beta01 [January 8, 2018]
   Fixed miscellaneous typos (Patch by github user "luzpaz").
   Change "ASM C" to "C ASM" in CMakeLists.txt
   Fixed incorrect handling of bKGD chunk in sub-8-bit files (Cosmin)
+  Added hardware optimization directories to zip and 7z distributions.
+  Fixed incorrect bitmask for options.
+  Fixed many spelling typos.
+
+Version 1.6.35beta02 [March 28, 2018]
+  Make png_get_iCCP consistent with man page (allow compression-type argument
+  to be NULL, bug report by Lenard Szolnoki).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
