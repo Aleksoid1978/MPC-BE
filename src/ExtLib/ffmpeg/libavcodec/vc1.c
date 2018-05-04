@@ -991,6 +991,7 @@ int ff_vc1_parse_frame_header_adv(VC1Context *v, GetBitContext* gb)
         v->pquantizer = 1;
         break;
     }
+    v->dquantfrm = 0;
     if (v->postprocflag)
         v->postproc = get_bits(gb, 2);
 
@@ -1055,6 +1056,8 @@ int ff_vc1_parse_frame_header_adv(VC1Context *v, GetBitContext* gb)
                     v->last_use_ic = 1;
                 }
                 status = bitplane_decoding(v->s.mbskip_table, &v->skip_is_raw, v);
+                if (status < 0)
+                    return -1;
                 av_log(v->s.avctx, AV_LOG_DEBUG, "SKIPMB plane encoding: "
                        "Imode: %i, Invert: %i\n", status>>1, status&1);
                 v->mbmodetab = get_bits(gb, 2);
@@ -1224,7 +1227,7 @@ int ff_vc1_parse_frame_header_adv(VC1Context *v, GetBitContext* gb)
             v->mv_mode          = ff_vc1_mv_pmode_table2[lowquant][mvmode];
             v->qs_last          = v->s.quarter_sample;
             v->s.quarter_sample = (v->mv_mode == MV_PMODE_1MV || v->mv_mode == MV_PMODE_MIXED_MV);
-            v->s.mspel          = !(v->mv_mode == MV_PMODE_1MV_HPEL_BILIN || v->mv_mode == MV_PMODE_1MV_HPEL);
+            v->s.mspel          = (v->mv_mode != MV_PMODE_1MV_HPEL_BILIN);
             status = bitplane_decoding(v->forward_mb_plane, &v->fmb_is_raw, v);
             if (status < 0)
                 return -1;
