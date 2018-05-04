@@ -1,5 +1,3 @@
-// file much modified for MPC-BE
-
 /*
  * filter registration
  * Copyright (c) 2008 Vitor Sessak
@@ -25,35 +23,73 @@
 #include "avfilter.h"
 #include "config.h"
 
+extern AVFilter ff_af_aresample;
+extern AVFilter ff_af_atempo;
+// extern AVFilter ff_af_lowpass;
 
-#define REGISTER_FILTER(X, x, y)                                        \
-    {                                                                   \
-        extern AVFilter ff_##y##_##x;                                   \
-        if (CONFIG_##X##_FILTER)                                        \
-            avfilter_register(&ff_##y##_##x);                           \
-    }
+#include "libavfilter/filter_list.c"
 
-#define REGISTER_FILTER_UNCONDITIONAL(x)                                \
-    {                                                                   \
-        extern AVFilter ff_##x;                                         \
-        avfilter_register(&ff_##x);                                     \
-    }
 
-static void register_all(void)
+const AVFilter *av_filter_iterate(void **opaque)
 {
-    REGISTER_FILTER(ARESAMPLE,      aresample,      af);
-    REGISTER_FILTER(ATEMPO,         atempo,         af);
-    //REGISTER_FILTER(LOWPASS,        lowpass,        af);
+    uintptr_t i = (uintptr_t)*opaque;
+    const AVFilter *f = filter_list[i];
 
-    /* those filters are part of public or internal API => registered
-     * unconditionally */
-    REGISTER_FILTER_UNCONDITIONAL(asrc_abuffer);
-    REGISTER_FILTER_UNCONDITIONAL(asink_abuffer);
+    if (f)
+        *opaque = (void*)(i + 1);
+
+    return f;
+}
+
+const AVFilter *avfilter_get_by_name(const char *name)
+{
+    const AVFilter *f = NULL;
+    void *opaque = 0;
+
+    if (!name)
+        return NULL;
+
+    while ((f = av_filter_iterate(&opaque)))
+        if (!strcmp(f->name, name))
+            return (AVFilter *)f;
+
+    return NULL;
+}
+
+
+#if FF_API_NEXT
+FF_DISABLE_DEPRECATION_WARNINGS
+static AVOnce av_filter_next_init = AV_ONCE_INIT;
+
+static void av_filter_init_next(void)
+{
+    AVFilter *prev = NULL, *p;
+    void *i = 0;
+    while ((p = (AVFilter*)av_filter_iterate(&i))) {
+        if (prev)
+            prev->next = p;
+        prev = p;
+    }
 }
 
 void avfilter_register_all(void)
 {
-    static AVOnce control = AV_ONCE_INIT;
-
-    ff_thread_once(&control, register_all);
+    ff_thread_once(&av_filter_next_init, av_filter_init_next);
 }
+
+int avfilter_register(AVFilter *filter)
+{
+    ff_thread_once(&av_filter_next_init, av_filter_init_next);
+
+    return 0;
+}
+
+const AVFilter *avfilter_next(const AVFilter *prev)
+{
+    ff_thread_once(&av_filter_next_init, av_filter_init_next);
+
+    return prev ? prev->next : filter_list[0];
+}
+
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
