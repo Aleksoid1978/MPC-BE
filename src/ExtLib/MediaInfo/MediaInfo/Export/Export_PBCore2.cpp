@@ -179,8 +179,24 @@ Ztring ToReturn;
     if (StreamKind==Stream_Video)
         Node_EssenceTrack->Add_Child_IfNotEmpty(MI, Stream_Video, StreamPos, Video_DisplayAspectRatio, "essenceTrackAspectRatio");
 
+    //essenceTrackTimeStart
+    if (StreamKind==Stream_Video)
+    {
+        if (!MI.Get(Stream_Video, StreamPos, Video_Delay_Original_String4).empty())
+            Node_EssenceTrack->Add_Child_IfNotEmpty(MI, Stream_Video, StreamPos, Video_Delay_Original_String4, "essenceTrackTimeStart", "annotation", std::string("from encoding"));
+        else if (!MI.Get(Stream_Video, StreamPos, Video_Delay_Original_String3).empty())
+            Node_EssenceTrack->Add_Child_IfNotEmpty(MI, Stream_Video, StreamPos, Video_Delay_Original_String3, "essenceTrackTimeStart", "annotation", std::string("from encoding"));
+        else if (!MI.Get(Stream_Video, StreamPos, Video_Delay_String4).empty())
+            Node_EssenceTrack->Add_Child_IfNotEmpty(MI, Stream_Video, StreamPos, Video_Delay_Original_String4, "essenceTrackTimeStart", "annotation", std::string("from container"));
+        else if (!MI.Get(Stream_Video, StreamPos, Video_Delay_String3).empty())
+            Node_EssenceTrack->Add_Child_IfNotEmpty(MI, Stream_Video, StreamPos, Video_Delay_Original_String3, "essenceTrackTimeStart", "annotation", std::string("from container"));
+    }
+
     //essenceTrackDuration
-    Node_EssenceTrack->Add_Child_IfNotEmpty(MI, StreamKind, StreamPos, "Duration_String3", "essenceTrackDuration");
+    if (!MI.Get(StreamKind, StreamPos, __T("Duration_String4")).empty())
+        Node_EssenceTrack->Add_Child_IfNotEmpty(MI, StreamKind, StreamPos, "Duration_String4", "essenceTrackDuration");
+    else
+        Node_EssenceTrack->Add_Child_IfNotEmpty(MI, StreamKind, StreamPos, "Duration_String3", "essenceTrackDuration");
 
     //essenceTrackLanguage
     if (!MI.Get(StreamKind, StreamPos, __T("Language")).empty())
@@ -189,18 +205,13 @@ Ztring ToReturn;
     //essenceTrackAnnotation - all fields (except *_String* and a blacklist)
     for (size_t Pos=0; Pos<MI.Count_Get(StreamKind, StreamPos); Pos++)
         if (
-            MI.Get(StreamKind, StreamPos, Pos, Info_Name).find(__T("String"))==std::string::npos &&
             !MI.Get(StreamKind, StreamPos, Pos).empty() &&
-            MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Bits-(Pixel*Frame)") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("BitDepth") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("BitRate") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("BitRate_Mode") &&
+            MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Bits-(Pixel*Frame)") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("ChannelPositions") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Codec") &&
-            MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Codec_Profile") &&
-            MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Codec_Settings") &&
-            MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Codec_Settings_CABAC") &&
-            MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Codec_Settings_RefFrames") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Codec/CC") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Codec/Family") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Codec/Info") &&
@@ -208,7 +219,13 @@ Ztring ToReturn;
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("CodecID") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("CodecID/Info") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("CodecID/Url") &&
+            MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Codec_Profile") &&
+            MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Codec_Settings") &&
+            MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Codec_Settings_CABAC") &&
+            MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Codec_Settings_Endianness") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Codec_Settings_Floor") &&
+            MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Codec_Settings_RefFrames") &&
+            MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Codec_Settings_Sign") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Colorimetry") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Count") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("DisplayAspectRatio") &&
@@ -216,6 +233,7 @@ Ztring ToReturn;
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Encoded_Date") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Encoded_Library") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Format") &&
+            MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Format_Settings") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Format/Info") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Format/Url") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Format_Commercial") &&
@@ -244,7 +262,8 @@ Ztring ToReturn;
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Video_Height") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Video_Standard") &&
             MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Video_Width") &&
-            MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Width")
+            MI.Get(StreamKind, StreamPos, Pos, Info_Name)!=__T("Width") &&
+            MI.Get(StreamKind, StreamPos, Pos, Info_Name).find(__T("String"))==std::string::npos
             )
                 Node_EssenceTrack->Add_Child("essenceTrackAnnotation", MI.Get(StreamKind, StreamPos, Pos),
                     "annotationType", MI.Get(StreamKind, StreamPos, Pos, Info_Name).To_UTF8());
@@ -270,11 +289,18 @@ Ztring Export_PBCore2::Transform(MediaInfo_Internal &MI, version Version)
 
     Node_Main.Add_Child("instantiationIdentifier", instantiationIdentifier, "source", "File Name");
 
-    // need to figure out how to get to non-internally-declared-values
-    //if (!MI.Get(Stream_General, 0, General_Media/UUID).empty())
-    //{
-    //    ToReturn+=__T("\t<instantiationIdentifier source=\"Media UUID\">")+MI.Get(Stream_General, 0, General_Media/UUID)+__T("</instantiationIdentifier>\n");
-    //}
+    // call UniqueID as SegmentUID for Matroska, else UniqueID
+    if (MI.Get(Stream_General, 0, General_Format)==__T("Matroska"))
+      Node_Main.Add_Child_IfNotEmpty(MI, Stream_General, 0, General_UniqueID, "instantiationIdentifier", "source", std::string("SegmentUID"));
+    else if (MI.Get(Stream_General, 0, General_Format)==__T("P2 Clip"))
+      Node_Main.Add_Child_IfNotEmpty(MI, Stream_General, 0, General_UniqueID, "instantiationIdentifier", "source", std::string("GlobalClipID"));
+    else if (MI.Get(Stream_General, 0, General_Format)==__T("Windows Media"))
+      Node_Main.Add_Child_IfNotEmpty(MI, Stream_General, 0, General_UniqueID, "instantiationIdentifier", "source", std::string("WM/UniqueFileIdentifier"));
+    else
+      Node_Main.Add_Child_IfNotEmpty(MI, Stream_General, 0, General_UniqueID, "instantiationIdentifier", "source", std::string("UniqueID"));
+
+    // get final cut uuids as instantiation identifiers
+    Node_Main.Add_Child_IfNotEmpty(MI, Stream_General, 0, "Media/UUID", "instantiationIdentifier", "source", std::string("com.apple.finalcutstudio.media.uuid"));
 
     //instantiationDates
     //dateIssued
@@ -284,7 +310,7 @@ Ztring Export_PBCore2::Transform(MediaInfo_Internal &MI, version Version)
         dateIssued.FindAndReplace(__T("UTC"), __T(""));
         dateIssued.FindAndReplace(__T(" "), __T("T"));
         dateIssued+=__T('Z');
-        Node_Main.Add_Child("instantiationDate", dateIssued, "dateType", "issued");
+        Node_Main.Add_Child("instantiationDate", dateIssued, "dateType", "recorded");
     }
 
     //dateFileModified
@@ -331,6 +357,14 @@ Ztring Export_PBCore2::Transform(MediaInfo_Internal &MI, version Version)
         Format=__T("application/x-")+Ztring(MI.Get(Stream_General, 0, __T("Format"))).MakeLowerCase();
     Node_Main.Add_Child("instantiationDigital", Format);
 
+    //formatStandard
+    Ztring formatStandard=MI.Get(Stream_General, 0, General_Format);
+    if (!MI.Get(Stream_General, 0, General_Format_Commercial_IfAny).empty())
+        formatStandard+=__T(" (")+MI.Get(Stream_General, 0, General_Format_Commercial_IfAny)+__T(")");
+    Node* Child=Node_Main.Add_Child("instantiationStandard", formatStandard);
+    Child->Add_Attribute_IfNotEmpty(MI, Stream_General, 0, General_Format_Profile, "profile");
+    Child->Add_Attribute_IfNotEmpty(MI, Stream_General, 0, General_Format_Version, "annotation");
+
     //formatLocation
     Node_Main.Add_Child("instantiationLocation", MI.Get(Stream_General, 0, General_CompleteName));
 
@@ -342,13 +376,17 @@ Ztring Export_PBCore2::Transform(MediaInfo_Internal &MI, version Version)
     Node_Main.Add_Child_IfNotEmpty(MI, Stream_General, 0, General_FileSize, "instantiationFileSize", "unitsOfMeasure", std::string("bytes"));
 
     //formatTimeStart
-    if (!MI.Get(Stream_Video, 0, Video_Delay_Original_String3).empty())
-        Node_Main.Add_Child("instantiationTimeStart", MI.Get(Stream_Video, 0, Video_Delay_Original_String3));
-    else if (!MI.Get(Stream_Video, 0, Video_Delay_String3).empty())
-        Node_Main.Add_Child("instantiationTimeStart", MI.Get(Stream_Video, 0, Video_Delay_String3));
+    if (!MI.Get(Stream_General, 0, General_Delay_String4).empty())
+        Node_Main.Add_Child("instantiationTimeStart", MI.Get(Stream_General, 0, General_Delay_String4));
+    else if (!MI.Get(Stream_General, 0, General_Delay_String3).empty())
+        Node_Main.Add_Child("instantiationTimeStart", MI.Get(Stream_General, 0, General_Delay_String3));
 
     //formatDuration
-    Node_Main.Add_Child_IfNotEmpty(MI, Stream_General, 0, General_Duration_String3, "instantiationDuration");
+    //TODO add annotation if duration/source_duration mismatch
+    if (!MI.Get(Stream_General, 0, General_Duration_String4).empty())
+        Node_Main.Add_Child_IfNotEmpty(MI, Stream_General, 0, General_Duration_String4, "instantiationDuration");
+    else
+        Node_Main.Add_Child_IfNotEmpty(MI, Stream_General, 0, General_Duration_String3, "instantiationDuration");
 
     //formatDataRate
     if (!MI.Get(Stream_General, 0, General_OverallBitRate).empty())
@@ -369,53 +407,70 @@ Ztring Export_PBCore2::Transform(MediaInfo_Internal &MI, version Version)
     //instantiationAnnotations
     for (size_t Pos=0; Pos<MI.Count_Get(Stream_General, 0); Pos++)
         if (
-            MI.Get(Stream_General, 0, Pos, Info_Name).find(__T("String"))==std::string::npos &&
             !MI.Get(Stream_General, 0, Pos).empty() &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Count") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("StreamCount") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("StreamKind") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("StreamKindID") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("UniqueID") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Format/Url") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Format_Commercial") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("AudioCount") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Audio_Codec_List") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Audio_Format_List") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Audio_Format_WithHint_List") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Audio_Language_List") &&
             MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Codec") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Codec/Extensions") &&
             MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Codec/Url") &&
             MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("CodecID") &&
             MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("CodecID/Url") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Encoded_Date") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Tagged_Date") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Codec/Url") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("CodecID_Compatible") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("CodecID_Version") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("CompleteName") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("com.apple.quicktime.player.movie.audio.mute") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Count") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("DataSize") &&
             MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Duration") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("StreamSize_Proportion") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("VideoCount") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("AudioCount") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("TextCount") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Encoded_Date") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Encoded_Library_Name") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Encoded_Library_Version") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("FileExtension") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("FileName") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("FileNameExtension") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("FileSize") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("File_Modified_Date") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("File_Modified_Date_Local") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("FolderName") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("FooterSize") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Format") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Format/Extensions") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Format/Url") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Format_Commercial") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Format_Profile") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Format_Version") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("FrameRate") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("HeaderSize") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("InternetMediaType") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("IsStreamable") &&
             MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("MenuCount") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Video_Format_List") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Video_Format_WithHint_List") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Video_Codec_List") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Video_Language_List") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Audio_Format_List") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Audio_Format_WithHint_List") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Audio_Codec_List") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Audio_Language_List") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("OtherCount") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Other_Format_List") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Other_Format_WithHint_List") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Other_Language_List") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("OverallBitRate") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("OverallBitRate_Mode") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("StreamCount") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("StreamKind") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("StreamKindID") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("StreamSize") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("StreamSize_Proportion") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Tagged_Date") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("TextCount") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Text_Codec_List") &&
             MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Text_Format_List") &&
             MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Text_Format_WithHint_List") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Text_Codec_List") &&
             MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Text_Language_List") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("CompleteName") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("FolderName") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("FileName") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("FileExtension") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("InternetMediaType") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Format/Extensions") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Codec/Extensions") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("FileSize") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("OverallBitRate_Mode") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("OverallBitRate") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("StreamSize") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("File_Modified_Date") &&
-            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("File_Modified_Date_Local")
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("UniqueID") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("VideoCount") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Video_Codec_List") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Video_Format_List") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Video_Format_WithHint_List") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name)!=__T("Video_Language_List") &&
+            MI.Get(Stream_General, 0, Pos, Info_Name).find(__T("String"))==std::string::npos
             )
                 Node_Main.Add_Child("instantiationAnnotation", MI.Get(Stream_General, 0, Pos),
                     "annotationType", MI.Get(Stream_General, 0, Pos, Info_Name).To_UTF8());

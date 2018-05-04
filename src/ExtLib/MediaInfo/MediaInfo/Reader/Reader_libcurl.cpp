@@ -536,25 +536,33 @@ size_t libcurl_WriteData_CallBack(void *ptr, size_t size, size_t nmemb, void *da
 
 bool Reader_libcurl_HomeIsSet()
 {
-    return getenv("HOME")?true:false;
+    #ifdef WINDOWS_UWP
+        return false; //Environment is not aviable
+    #else
+        return getenv("HOME")?true:false;
+    #endif
 }
 
 Ztring Reader_libcurl_ExpandFileName(const Ztring &FileName)
 {
-    Ztring FileName_Modified(FileName);
-    if (FileName_Modified.find(__T("$HOME"))==0)
-    {
-        char* env=getenv("HOME");
-        if (env)
-            FileName_Modified.FindAndReplace(__T("$HOME"), Ztring().From_Local(env));
-    }
-    if (FileName_Modified.find(__T('~'))==0)
-    {
-        char* env=getenv("HOME");
-        if (env)
-            FileName_Modified.FindAndReplace(__T("~"), Ztring().From_Local(env));
-    }
-    return FileName_Modified;
+    #ifdef WINDOWS_UWP
+        return FileName; //Environment is not aviable
+    #else
+        Ztring FileName_Modified(FileName);
+        if (FileName_Modified.find(__T("$HOME"))==0)
+        {
+            char* env=getenv("HOME");
+            if (env)
+                FileName_Modified.FindAndReplace(__T("$HOME"), Ztring().From_Local(env));
+        }
+        if (FileName_Modified.find(__T('~'))==0)
+        {
+            char* env=getenv("HOME");
+            if (env)
+                FileName_Modified.FindAndReplace(__T("~"), Ztring().From_Local(env));
+        }
+        return FileName_Modified;
+    #endif
 }
 
 //***************************************************************************
@@ -1322,7 +1330,11 @@ bool Reader_libcurl::Load(const Ztring File_Name)
             #ifdef MEDIAINFO_GLIBC
                 libcurl_Module=g_module_open(MEDIAINFODLL_NAME, G_MODULE_BIND_LAZY);
             #elif defined (_WIN32) || defined (WIN32)
-                libcurl_Module=LoadLibrary(MEDIAINFODLL_NAME);
+                #ifdef WINDOWS_UWP
+                    libcurl_Module=LoadPackagedLibrary(MEDIAINFODLL_NAME, 0);
+                #else
+                    libcurl_Module=LoadLibrary(MEDIAINFODLL_NAME);
+                #endif
             #else
                 libcurl_Module=dlopen(MEDIAINFODLL_NAME, RTLD_LAZY);
                 if (!libcurl_Module)

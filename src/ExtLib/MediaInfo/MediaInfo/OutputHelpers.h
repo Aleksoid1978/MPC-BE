@@ -211,6 +211,9 @@ struct Node
 
 std::string To_XML (Node& Cur_Node, const int& Level, bool Print_Header=false, bool Indent=true);
 std::string To_JSON (Node& Cur_Node, const int& Level, bool Print_Header=false, bool Indent=true);
+
+bool ExternalMetadata(const ZenLib::Ztring& FileName, const ZenLib::Ztring& ExternalMetadata, const ZenLib::Ztring& ExternalMetaDataConfig, const ZenLib::ZtringList& Parents, const  ZenLib::Ztring& PlaceHolder, Node* Main, Node* MI_Info);
+
 Ztring VideoCompressionCodeCS_Name(int32u termID, MediaInfo_Internal &MI, size_t StreamPos);
 
 } //NameSpace

@@ -263,7 +263,6 @@ void File_Flac::PICTURE()
     Get_B4 (Data_Size,                                          "Data size");
     if (Element_Offset+Data_Size>Element_Size)
         return; //There is a problem
-    Skip_XX(Element_Size-Element_Offset, "Data");
 
     //Filling
     Fill(Stream_General, 0, General_Cover, "Yes");
@@ -278,6 +277,10 @@ void File_Flac::PICTURE()
             Fill(Stream_General, 0, General_Cover_Data, Data_Base64);
         }
     #endif //MEDIAINFO_ADVANCED
+
+    Skip_XX(Data_Size,                                          "Data");
+    if (Element_Offset<Element_Size)
+        Skip_XX(Element_Size-Element_Offset,                    "?");
 }
 
 } //NameSpace

@@ -186,7 +186,7 @@ static const char* OutputFormats_JSONFields[output_formats_item_size] =
     "mime",
 };
 typedef const char* output_formats_item[output_formats_item_size];
-static const size_t output_formats_size = 14;
+static const size_t output_formats_size = 15;
 static output_formats_item OutputFormats[output_formats_size] =
 {
     { "Text",                   "Text",                                                         "text/plain",       },
@@ -203,6 +203,7 @@ static output_formats_item OutputFormats[output_formats_size] =
     { "PBCore_2.1",             "PBCore 2.1",                                                   "text/xml",         },
     { "PBCore_2.0",             "PBCore 2.0",                                                   "text/xml",         },
     { "PBCore_1.2",             "PBCore 1.2",                                                   "text/xml",         },
+    { "NISO_Z39.87",            "NISO Z39.87",                                                  "text/xml",         },
 };
 
 //---------------------------------------------------------------------------
@@ -248,9 +249,12 @@ void MediaInfo_Config::Init()
     #endif //MEDIAINFO_ADVANCED
     #if defined(MEDIAINFO_EBUCORE_YES)
         AcquisitionDataOutputMode=Export_EbuCore::AcquisitionDataOutputMode_Default;
+    #endif //defined(MEDIAINFO_EBUCORE_YES)
+    #if defined(MEDIAINFO_EBUCORE_YES) || defined(MEDIAINFO_NISO_YES)
         ExternalMetadata=Ztring();
         ExternalMetaDataConfig=Ztring();
-    #endif //defined(MEDIAINFO_EBUCORE_YES)
+    #endif //defined(MEDIAINFO_EBUCORE_YES) || defined(MEDIAINFO_NISO_YES)
+
     Complete=0;
     BlockMethod=0;
     Internet=0;
@@ -1177,21 +1181,21 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
     }
     if (Option_Lower==__T("externalmetadata"))
     {
-        #if defined(MEDIAINFO_EBUCORE_YES)
+        #if defined(MEDIAINFO_EBUCORE_YES) || defined(MEDIAINFO_NISO_YES)
             ExternalMetadata_Set(Value);
             return Ztring();
-        #else // MEDIAINFO_EBUCORE_YES
-            return __T("EBUCore features are disabled due to compilation options");
-        #endif // MEDIAINFO_EBUCORE_YES
+        #else // MEDIAINFO_EBUCORE_YES || defined(MEDIAINFO_NISO_YES)
+            return __T("Feature disabled due to compilation options");
+        #endif // MEDIAINFO_EBUCORE_YES || defined(MEDIAINFO_NISO_YES)
     }
     if (Option_Lower==__T("externalmetadataconfig"))
     {
-        #if defined(MEDIAINFO_EBUCORE_YES)
+        #if defined(MEDIAINFO_EBUCORE_YES) || defined(MEDIAINFO_NISO_YES)
             ExternalMetaDataConfig_Set(Value);
             return Ztring();
-        #else // MEDIAINFO_EBUCORE_YES
-            return __T("EBUCore features are disabled due to compilation options");
-        #endif // MEDIAINFO_EBUCORE_YES
+        #else // MEDIAINFO_EBUCORE_YES || defined(MEDIAINFO_NISO_YES)
+            return __T("Features disabled due to compilation options");
+        #endif // MEDIAINFO_EBUCORE_YES || defined(MEDIAINFO_NISO_YES)
     }
     if (Option_Lower==__T("event_callbackfunction"))
     {
@@ -3005,7 +3009,8 @@ size_t MediaInfo_Config::AcquisitionDataOutputMode_Get ()
     CriticalSectionLocker CSL(CS);
     return AcquisitionDataOutputMode;
 }
-
+#endif // MEDIAINFO_EBUCORE_YES
+#if defined(MEDIAINFO_EBUCORE_YES) || defined(MEDIAINFO_NISO_YES)
 void MediaInfo_Config::ExternalMetadata_Set(Ztring Value)
 {
     CriticalSectionLocker CSL(CS);
@@ -3029,7 +3034,7 @@ Ztring MediaInfo_Config::ExternalMetaDataConfig_Get ()
     CriticalSectionLocker CSL(CS);
     return ExternalMetaDataConfig;
 }
-#endif // MEDIAINFO_EBUCORE_YES
+#endif //defined(MEDIAINFO_EBUCORE_YES) || defined(MEDIAINFO_NISO_YES)
 
 //***************************************************************************
 // Event

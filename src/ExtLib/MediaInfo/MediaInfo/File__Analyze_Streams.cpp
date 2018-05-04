@@ -81,9 +81,6 @@ void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_Col
             B=1;
             R=2;
         }
-        x[G] = 15000;  x[B] = 7500 ; x[R] = 32000 ; x[3] = 15635
-            ; y[G] = 30000; y[B] = 3000; y[R] = 16500; y[3] = 16450;
-
              if (x[G]==15000 && x[B]== 7500 && x[R]==32000 && x[3]==15635
               && y[G]==30000 && y[B]== 3000 && y[R]==16500 && y[3]==16450)
             MasteringDisplay_ColorPrimaries=Mpegv_colour_primaries(1); // BT.709

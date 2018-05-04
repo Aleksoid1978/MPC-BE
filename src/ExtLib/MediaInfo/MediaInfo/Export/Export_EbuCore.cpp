@@ -27,7 +27,7 @@
 #include <ctime>
 #include <cmath>
 #include "tinyxml2.h"
-using namespace tinyxml2;
+
 using namespace std;
 //---------------------------------------------------------------------------
 
@@ -36,106 +36,6 @@ namespace MediaInfoLib
 //---------------------------------------------------------------------------
 extern MediaInfo_Config Config;
 //---------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------
-bool Parse_XML(const XMLNode* _XmlNode, Node* _Node, Node** _MI_Info, const Ztring& FileName, ZtringListList& Values)
-{
-    bool ToReturn = true;
-
-    if (!_Node)
-        return ToReturn;
-
-    Node* Current=NULL;
-
-    const XMLElement* Element = _XmlNode->ToElement();
-
-    if (!Element)
-        return ToReturn;
-
-    if (!strcmp(Element->Value(), "ebucore:ebuCoreMain") == 0 && !strcmp(Element->Value(), "ebucore:coreMetadata") == 0)
-    {
-        if (strcmp(Element->Value(), "ebucore:format") == 0 && Element->FirstChild() == NULL && _MI_Info && *_MI_Info)
-        {
-            //Replace placeholder by MediaInfo report
-            _Node->Childs.push_back(*_MI_Info);
-            *_MI_Info=NULL;
-        }
-        else
-        {
-            Ztring Value=Ztring(Element->GetText()?Element->GetText():"");
-            if (Value.length()>3 && Value.at(0)=='%' && Value.at(1)!='%' && Value.at(Value.length()-1)=='%')
-            {
-                Value=Values.FindValue(FileName, Values(0).Find(Value.substr(1, Value.length()-2)), 0, 1);
-                if (Value.empty())
-                    return false;
-            }
-
-            Current=new Node(Element->Value(), Value.To_UTF8(), true);
-
-            for (const XMLAttribute* Attribute = Element->FirstAttribute(); Attribute; Attribute = Attribute->Next())
-            {
-                Ztring Value=Ztring(Attribute->Value());
-                if (Value.length()>3 && Value.at(0)=='%' && Value.at(1)!='%' && Value.at(Value.length()-1)=='%')
-                {
-                    Value=Values.FindValue(FileName, Values(0).Find(Value.substr(1, Value.length()-2)), 0, 1);
-                    if (Value.empty())
-                        return false;
-                }
-
-                Current->Add_Attribute(Attribute->Name(), Value);
-            }
-        }
-    }
-
-    for (const XMLNode* El = Element->FirstChild(); El; El = El->NextSibling())
-        ToReturn=Parse_XML(El, Current?Current:_Node, _MI_Info, FileName, Values);
-
-    if (Current)
-    {
-        if (ToReturn)
-            _Node->Childs.push_back(Current);
-        else
-            delete Current;
-  }
-
-    return ToReturn;
-}
-
-//---------------------------------------------------------------------------
-bool ExternalMetadata(Ztring FileName, Ztring ExternalMetadata, Ztring ExternalMetaDataConfig, Node* Main, Node* MI_Info)
-{
-
-    ZtringListList CSV;
-    CSV.Separator_Set(0, EOL);
-    CSV.Separator_Set(1, __T(";"));
-    CSV.Write(ExternalMetadata);
-
-    //Check if the CSV contains at least the header + one entry
-    if (CSV.size()<2)
-    {
-        MediaInfoLib::Config.Log_Send(0xC0, 0xFF, 0, "Invalid CSV for external metadata");
-        return false;
-    }
-
-    //Check if the file is present in the CSV
-    if (CSV.FindValue(FileName, 0, 0, 1).empty())
-    {
-        MediaInfoLib::Config.Log_Send(0xC0, 0xFF, 0, "File name not found in external metadata file");
-        return false;
-    }
-
-    //Parse XML template
-    XMLDocument Template;
-    if (Template.Parse(ExternalMetaDataConfig.To_UTF8().c_str()) != XML_SUCCESS)
-    {
-        MediaInfoLib::Config.Log_Send(0xC0, 0xFF, 0, "Invalid XML template for external metadata");
-        return false;
-    }
-
-    Parse_XML(Template.RootElement(), Main, &MI_Info, FileName, CSV);
-
-    return true;
-}
 
 //***************************************************************************
 // Infos
@@ -1559,7 +1459,7 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version, acquis
             return Ztring();
         }
 
-        if (!ExternalMetadata(FileName, ExternalMetadataValues, ExternalMetaDataConfig, Node_CoreMetadata, Node_Format))
+        if (!ExternalMetadata(FileName, ExternalMetadataValues, ExternalMetaDataConfig, ZtringList(__T("ebucore:ebuCoreMain;ebucore:coreMetadata")), __T("ebucore:format"), Node_CoreMetadata, Node_Format))
         {
             delete Node_CoreMain;
             delete Node_Format;
