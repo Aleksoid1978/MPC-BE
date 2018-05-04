@@ -73,6 +73,7 @@
 #include "ColorControl.h"
 #include "RateControl.h"
 #include "DiskImage.h"
+#include <AllocatorCommon.h>
 
 #define USE_MEDIAINFO_STATIC
 #include <MediaInfo/MediaInfo.h>
@@ -255,6 +256,8 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CComPtr<IVMRWindowlessControl9> m_pVMRWC;
 
 	CComPtr<ID3DFullscreenControl>	m_pD3DFS;
+
+	CComPtr<IPlaybackNotify>		m_pPlaybackNotify;
 
 	CComPtr<IMadVRTextOsd>			m_pMVTO;
 

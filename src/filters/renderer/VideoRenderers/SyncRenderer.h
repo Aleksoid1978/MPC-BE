@@ -358,7 +358,8 @@ namespace GothSync
 		public IMFVideoMixerBitmap,
 		public IEVRTrustedVideoPlugin,
 		public ISyncClockAdviser,
-		public ID3DFullscreenControl
+		public ID3DFullscreenControl,
+		public IPlaybackNotify
 	{
 	public:
 		CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error);
@@ -462,6 +463,9 @@ namespace GothSync
 		// ID3DFullscreenControl
 		STDMETHODIMP SetD3DFullscreen(bool fEnabled);
 		STDMETHODIMP GetD3DFullscreen(bool* pfEnabled);
+
+		// IPlaybackNotify
+		STDMETHODIMP Stop();
 
 	protected:
 		void OnResetDevice();

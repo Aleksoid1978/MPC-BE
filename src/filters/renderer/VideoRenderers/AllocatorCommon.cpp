@@ -27,10 +27,8 @@
 #include "madVRAllocatorPresenter.h"
 #include "EVRAllocatorPresenter.h"
 
-static bool bIsErrorShowing		= false;
-static bool bIsWarningShowing	= false;
-
-//
+static bool bIsErrorShowing   = false;
+static bool bIsWarningShowing = false;
 
 HRESULT CreateAP9(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAllocatorPresenter3** ppAP)
 {
@@ -111,8 +109,6 @@ HRESULT CreateEVR(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAlloca
 
 	return hr;
 }
-
-//
 
 CString GetWindowsErrorMessage(HRESULT _Error, HMODULE _Module)
 {

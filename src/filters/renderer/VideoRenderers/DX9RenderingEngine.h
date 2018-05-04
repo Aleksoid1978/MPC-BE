@@ -21,6 +21,7 @@
 #pragma once
 
 #include "AllocatorCommon.h"
+#include "PixelShaderCompiler.h"
 #include "RenderersSettings.h"
 #include <d3d9.h>
 #include <dxva2api.h>
