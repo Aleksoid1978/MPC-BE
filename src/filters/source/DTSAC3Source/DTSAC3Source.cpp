@@ -236,7 +236,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 				} else if (ParseAC3Header(buffer + i)) {
 					m_streamtype = AC3;
 					break;
-				} else if (ParseEAC3Header(buffer + i)) {
+				} else if (ParseEAC3Header(buffer + i, &aframe) && aframe.param1 == EAC3_FRAME_TYPE_INDEPENDENT) {
 					m_streamtype = EAC3;
 					break;
 				} else if (ParseMLPHeader(buffer + i)) {
@@ -348,29 +348,42 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			m_framelength = aframe.samples;
 			m_bitrate     = aframe.param1;
 
+			bool bAC3 = true;
+			m_file.Seek(m_dataStart + fsize, CFile::begin);
+			if (m_file.Read(&buf, 8) == 8) {
+				int fsize2 = ParseEAC3Header(buf, &aframe);
+				if (fsize2 > 0 && aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT) {
+					fsize += fsize2;
+					m_channels += aframe.channels / 2; // TODO
+					m_bitrate = (int)(fsize * 8i64 * m_samplerate / m_framelength);
+					bAC3 = false;
+				}
+			}
+
 			// calculate framesize to support a sonic audio decoder 4.3 (TODO: make otherwise)
 			// sonicAC3minsize = framesize + 64
 			m_framesize = fsize * 2;
 			m_framelength *= 2;
 
 			m_wFormatTag = WAVE_FORMAT_UNKNOWN;
-			m_subtype = MEDIASUBTYPE_DOLBY_AC3;
-		} // E-AC3 header
+			m_subtype = bAC3 ? MEDIASUBTYPE_DOLBY_AC3 : MEDIASUBTYPE_DOLBY_DDPLUS;
+		}
+		// E-AC3
 		else if (m_streamtype == EAC3 && ParseEAC3Header(buf, &aframe)) {
 			int fsize     = aframe.size;
 			m_samplerate  = aframe.samplerate;
 			m_channels    = aframe.channels;
 			m_framelength = aframe.samples;
-			int frametype = aframe.param1;
 
 			m_file.Seek(m_dataStart + fsize, CFile::begin);
 			if (m_file.Read(&buf, 8) == 8) {
 				int fsize2 = ParseEAC3Header(buf, &aframe);
 				if (fsize2 > 0 && aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT) {
 					fsize += fsize2;
+					m_channels += aframe.channels / 2; // TODO
 				}
 			}
-			m_bitrate = int (fsize * 8i64 * m_samplerate / m_framelength);
+			m_bitrate = (int)(fsize * 8i64 * m_samplerate / m_framelength);
 
 			// calculate framesize to support a sonic audio decoder 4.3 (TODO: make otherwise)
 			// sonicAC3minsize = framesize + 64
