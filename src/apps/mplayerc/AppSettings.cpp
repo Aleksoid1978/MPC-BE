@@ -746,8 +746,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	bAudioTimeShift					= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEAUDIOTIMESHIFT, 0);
 	iAudioTimeShift					= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, 0);
 
-	iBufferDuration					= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, 3000);
-	iBufferDuration = discard(iBufferDuration, 100, 10000, 3000);
+	iBufferDuration					= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, APP_BUFDURATION_DEF);
+	iBufferDuration = discard(iBufferDuration, APP_BUFDURATION_MIN, APP_BUFDURATION_MAX, APP_BUFDURATION_DEF);
 
 	bAudioMixer				= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOMIXER, FALSE);
 	nAudioMixerLayout		= SPK_STEREO;

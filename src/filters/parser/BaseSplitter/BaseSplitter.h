@@ -103,7 +103,7 @@ protected:
 
 	DWORD m_nFlag;
 
-	int m_iBufferDuration; // 100..10000 ms
+	int m_iBufferDuration; // 100..15000 ms
 
 protected:
 	enum {CMD_EXIT, CMD_SEEK};

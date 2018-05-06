@@ -38,7 +38,7 @@ CBaseSplitterFilter::CBaseSplitterFilter(LPCTSTR pName, LPUNKNOWN pUnk, HRESULT*
 	, m_rtLastStop(INVALID_TIME)
 	, m_priority(THREAD_PRIORITY_NORMAL)
 	, m_nFlag(0)
-	, m_iBufferDuration(DEFAULT_BUFFER_DURATION)
+	, m_iBufferDuration(BUFFER_DURATION_DEF)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -867,7 +867,7 @@ STDMETHODIMP_(DWORD) CBaseSplitterFilter::GetPriority()
 
 STDMETHODIMP CBaseSplitterFilter::SetBufferDuration(int duration)
 {
-	if (duration < 100 || duration > 10000) {
+	if (duration < BUFFER_DURATION_MIN || duration > BUFFER_DURATION_MAX) {
 		return E_INVALIDARG;
 	}
 
