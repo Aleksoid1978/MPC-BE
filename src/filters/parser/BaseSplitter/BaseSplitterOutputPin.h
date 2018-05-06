@@ -28,7 +28,9 @@
 #include "../../../DSUtil/Packet.h"
 #include "../../../DSUtil/DSMPropertyBag.h"
 
-#define DEFAULT_BUFFER_DURATION 3000
+#define BUFFER_DURATION_MIN   100
+#define BUFFER_DURATION_DEF  3000
+#define BUFFER_DURATION_MAX 15000
 
 class CBaseSplitterFilter;
 
@@ -44,8 +46,8 @@ private:
 	bool			m_fFlushed			= false;
 	CAMEvent		m_eEndFlush			= TRUE;
 
-	REFERENCE_TIME	m_maxQueueDuration	= DEFAULT_BUFFER_DURATION * 10000;
-	size_t			m_maxQueueCount		= DEFAULT_BUFFER_DURATION * 12 / 10;
+	REFERENCE_TIME	m_maxQueueDuration	= BUFFER_DURATION_DEF * 10000;
+	size_t			m_maxQueueCount		= BUFFER_DURATION_DEF * 12 / 10;
 
 	REFERENCE_TIME	m_rtPrev			= 0;
 	REFERENCE_TIME	m_rtOffset			= 0;

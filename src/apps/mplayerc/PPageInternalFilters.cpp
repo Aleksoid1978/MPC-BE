@@ -441,9 +441,9 @@ BOOL CPPageInternalFilters::OnInitDialog()
 	m_listVideo.UpdateCheckState();
 	m_listAudio.UpdateCheckState();
 
-	m_edtBufferDuration = std::clamp(s.iBufferDuration / 1000, 1, 10);
-	m_edtBufferDuration.SetRange(1, 10);
-	m_spnBufferDuration.SetRange(1, 10);
+	m_edtBufferDuration = std::clamp(s.iBufferDuration, APP_BUFDURATION_MIN, APP_BUFDURATION_MAX) / 1000;
+	m_edtBufferDuration.SetRange(APP_BUFDURATION_MIN / 1000, APP_BUFDURATION_MAX / 1000);
+	m_spnBufferDuration.SetRange(APP_BUFDURATION_MIN / 1000, APP_BUFDURATION_MAX / 1000);
 
 	TC_ITEM tci;
 	memset(&tci, 0, sizeof(tci));
