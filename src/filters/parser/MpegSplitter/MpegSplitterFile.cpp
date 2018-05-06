@@ -1072,6 +1072,7 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 							}
 						}
 					} else if (Read(h, len, &s.mt)) {
+						s.codec = h.bsid <= 10 ? stream_codec::AC3 : stream_codec::EAC3;
 						type = stream_type::audio;
 					}
 				}
@@ -1166,29 +1167,47 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 						type = stream_type::subpic;
 					}
 				}
-			} else if (!m_bOpeningCompleted && type == stream_type::unknown && (pes_stream_type == AUDIO_STREAM_DTS_HD || pes_stream_type == AUDIO_STREAM_DTS_HD_MASTER_AUDIO)) {
-				stream* source = (stream*)m_streams[stream_type::audio].GetStream(s);
-				if (source && source->dts.bDTSCore && !source->dts.bDTSHD && source->mt.pbFormat) {
-					Seek(start);
-					if (BitRead(32, true) == FCC(DTS_SYNCWORD_SUBSTREAM)) {
-						BYTE* buf = DNew BYTE[len];
-						audioframe_t aframe;
-						if (ByteRead(buf, len) == S_OK && ParseDTSHDHeader(buf, len, &aframe)) {
-							WAVEFORMATEX* wfe = (WAVEFORMATEX*)source->mt.pbFormat;
-							wfe->nSamplesPerSec = aframe.samplerate;
-							wfe->nChannels = aframe.channels;
-							if (aframe.param1) {
-								wfe->wBitsPerSample = aframe.param1;
-							}
-							if (aframe.param2 == DCA_PROFILE_HD_HRA) {
-								wfe->nAvgBytesPerSec += CalcBitrate(aframe) / 8;
-							} else {
-								wfe->nAvgBytesPerSec = 0;
-							}
+			} else if (!m_bOpeningCompleted && type == stream_type::unknown) {
+				if (pes_stream_type == AUDIO_STREAM_DTS_HD || pes_stream_type == AUDIO_STREAM_DTS_HD_MASTER_AUDIO) {
+					stream* source = (stream*)m_streams[stream_type::audio].GetStream(s);
+					if (source && source->dts.bDTSCore && !source->dts.bDTSHD && source->mt.pbFormat) {
+						Seek(start);
+						if (BitRead(32, true) == FCC(DTS_SYNCWORD_SUBSTREAM)) {
+							BYTE* buf = DNew BYTE[len];
+							audioframe_t aframe;
+							if (ByteRead(buf, len) == S_OK && ParseDTSHDHeader(buf, len, &aframe)) {
+								WAVEFORMATEX* wfe = (WAVEFORMATEX*)source->mt.pbFormat;
+								wfe->nSamplesPerSec = aframe.samplerate;
+								wfe->nChannels = aframe.channels;
+								if (aframe.param1) {
+									wfe->wBitsPerSample = aframe.param1;
+								}
+								if (aframe.param2 == DCA_PROFILE_HD_HRA) {
+									wfe->nAvgBytesPerSec += CalcBitrate(aframe) / 8;
+								} else {
+									wfe->nAvgBytesPerSec = 0;
+								}
 
-							source->dts.bDTSHD	= true;
+								source->dts.bDTSHD = true;
+							}
+							delete [] buf;
 						}
-						delete [] buf;
+					}
+				} else if (pes_stream_type == AUDIO_STREAM_AC3_PLUS) {
+					stream* source = (stream*)m_streams[stream_type::audio].GetStream(s);
+					if (source && source->codec == stream_codec::AC3 && source->mt.pbFormat) {
+						Seek(start);
+						ac3hdr h;
+						if (Read(h, len, &s.mt) && h.bsid > 10) {
+							source->codec = stream_codec::EAC3;
+
+							const WAVEFORMATEX* wfeEAC3 = (WAVEFORMATEX*)s.mt.pbFormat;
+							WAVEFORMATEX* wfe = (WAVEFORMATEX*)source->mt.pbFormat;
+							wfe->nChannels += wfeEAC3->nChannels / 2;
+							// TODO - calculate wfe->nAvgBytesPerSec
+
+							source->mt.subtype = MEDIASUBTYPE_DOLBY_DDPLUS;
+						}
 					}
 				}
 			}
