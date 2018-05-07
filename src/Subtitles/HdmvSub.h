@@ -102,6 +102,8 @@ public:
 
 private :
 
+	static const REFERENCE_TIME		UNKNOWN_TIME		= _I64_MAX;
+
 	HDMV_SEGMENT_TYPE				m_nCurSegment		= NO_SEGMENT;
 	BYTE*							m_pSegBuffer		= NULL;
 	int								m_nTotalSegBuffer	= 0;
@@ -119,7 +121,9 @@ private :
 	HDMV_CLUT						m_CLUT[256];
 	HDMV_CLUT						m_DefaultCLUT;
 
+	void				UpdateTimeStamp(REFERENCE_TIME rtStop);
 	void				ParsePresentationSegment(CGolombBuffer* pGBuffer, REFERENCE_TIME rtTime);
+	void				EnqueuePresentationSegment();
 	void				ParsePalette(CGolombBuffer* pGBuffer, USHORT nSize);
 	void				ParseObject(CGolombBuffer* pGBuffer, USHORT nUnitSize);
 

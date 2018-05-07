@@ -137,13 +137,22 @@ HRESULT CHdmvSub::ParseSample(BYTE* pData, long nLen, REFERENCE_TIME rtStart, RE
 						break;
 					case PRESENTATION_SEG :
 						TRACE_HDMVSUB(L"CHdmvSub::ParseSample() : PRESENTATION_SEG = [%10I64d], %s, size = %d\n", rtStart, ReftimeToString(rtStart), m_nSegSize);
+						if (rtStart == INVALID_TIME) {
+							break;
+						}
+						// Update the timestamp for the previous segment
+						UpdateTimeStamp(rtStart);
+
+						// Parse the new presentation segment
 						ParsePresentationSegment(&SegmentBuffer, rtStart);
 						break;
 					case WINDOW_DEF :
 						//TRACE_HDMVSUB(L"CHdmvSub::ParseSample() : WINDOW_DEF = %10I64d, %S\n", rtStart, ReftimeToString(rtStart));
 						break;
 					case END_OF_DISPLAY :
-						//TRACE_HDMVSUB(L"CHdmvSub::ParseSample() : END_OF_DISPLAY = %10I64d, %S\n", rtStart, ReftimeToString(rtStart));
+						TRACE_HDMVSUB(L"CHdmvSub::ParseSample() : END_OF_DISPLAY = %10I64d, %s\n", rtStart, ReftimeToString(rtStart));
+						// Enqueue the current presentation segment
+						EnqueuePresentationSegment();
 						break;
 					default :
 						TRACE_HDMVSUB(L"CHdmvSub::ParseSample() : UNKNOWN Seg [%d] = [%10I64d], %s\n", m_nCurSegment, rtStart, ReftimeToString(rtStart));
@@ -268,13 +277,28 @@ void CHdmvSub::CleanOld(REFERENCE_TIME rt)
 	while (!m_pObjects.IsEmpty()) {
 		pObject_old = m_pObjects.GetHead();
 		if (pObject_old->m_rtStop < rt) {
-			TRACE_HDMVSUB(L"CHdmvSub:HDMV remove object, size = %d, %s => %s, (rt = %s)\n", pObject_old->GetRLEDataSize(),
+			TRACE_HDMVSUB(L"CCHdmvSub::CleanOld() : remove object, size = %d, %s => %s, (rt = %s)\n", pObject_old->GetRLEDataSize(),
 						   ReftimeToString (pObject_old->m_rtStart), ReftimeToString(pObject_old->m_rtStop),
 						   ReftimeToString(rt));
 			m_pObjects.RemoveHeadNoReturn();
 			delete pObject_old;
 		} else {
 			break;
+		}
+	}
+}
+
+void CHdmvSub::UpdateTimeStamp(REFERENCE_TIME rtStop)
+{
+	if (!m_pObjects.IsEmpty()) {
+		const auto& pObject = m_pObjects.GetTail();
+
+		if (pObject->m_rtStop == UNKNOWN_TIME) {
+			pObject->m_rtStop = rtStop;
+
+			TRACE_HDMVSUB(L"CHdmvSub::EnqueuePresentationSegment() : Update Presentation Segment TimeStamp : compositionNumber = %d, %10I64d -> %10I64d [%s -> %s]\n", pObject->m_compositionNumber,
+							pObject->m_rtStart, pObject->m_rtStop,
+							ReftimeToString(pObject->m_rtStart), ReftimeToString(pObject->m_rtStop));
 		}
 	}
 }
@@ -296,35 +320,10 @@ void CHdmvSub::ParsePresentationSegment(CGolombBuffer* pGBuffer, REFERENCE_TIME 
 	TRACE_HDMVSUB(L"CHdmvSub::ParsePresentationSegment() : Size = %d, nObjectNumber = %d, palette_id_ref = %d, compositionNumber = %d\n",
 					pGBuffer->GetSize(), nObjectNumber, palette_id_ref, CompositionDescriptor.nNumber);
 
-	if (m_pCurrentWindow && m_pCurrentWindow->m_nObjectNumber && m_pCurrentWindow->m_compositionNumber != -1) {
-		for (int i = 0; i < m_pCurrentWindow->m_nObjectNumber; i++) {
-			if (m_pCurrentWindow->Objects[i]) {
-				CompositionObject* pObject		= m_pCurrentWindow->Objects[i];
-				CompositionObject& pObjectData	= m_ParsedObjects[pObject->m_object_id_ref];
-				if (pObjectData.m_width) {
-					pObject->m_rtStop	= rtTime;
-					pObject->m_width	= pObjectData.m_width;
-					pObject->m_height	= pObjectData.m_height;
-
-					pObject->SetRLEData(pObjectData.GetRLEData(), pObjectData.GetRLEDataSize(), pObjectData.GetRLEDataSize());
-
-					if (!pObject->HavePalette() && m_CLUT[palette_id_ref].Palette) {
-						SetPalette(pObject, m_CLUT[palette_id_ref].pSize, m_CLUT[palette_id_ref].Palette, yuvMatrix, m_VideoDescriptor.nVideoWidth, convertType);
-					}
-
-					TRACE_HDMVSUB(L"			store Segment : m_object_id_ref = %d, m_window_id_ref = %d, compositionNumber = %d, [%10I64d -> %10I64d], [%s -> %s]\n",
-									m_pCurrentWindow->Objects[i]->m_object_id_ref,
-									m_pCurrentWindow->Objects[i]->m_window_id_ref,
-									m_pCurrentWindow->Objects[i]->m_compositionNumber,
-									m_pCurrentWindow->Objects[i]->m_rtStart, m_pCurrentWindow->Objects[i]->m_rtStop,
-									ReftimeToString(m_pCurrentWindow->Objects[i]->m_rtStart), ReftimeToString(m_pCurrentWindow->Objects[i]->m_rtStop));
-
-					m_pObjects.AddTail (m_pCurrentWindow->Objects[i]);
-				} else {
-					delete m_pCurrentWindow->Objects[i];
-				}
-			}
-			m_pCurrentWindow->Objects[i] = NULL;
+	if (!m_pObjects.IsEmpty()) {
+		auto& pObject = m_pObjects.GetTail();
+		if (!pObject->HavePalette() && m_CLUT[palette_id_ref].Palette) {
+			SetPalette(pObject, m_CLUT[palette_id_ref].pSize, m_CLUT[palette_id_ref].Palette, yuvMatrix, m_VideoDescriptor.nVideoWidth, convertType);
 		}
 	}
 
@@ -335,17 +334,48 @@ void CHdmvSub::ParsePresentationSegment(CGolombBuffer* pGBuffer, REFERENCE_TIME 
 	}
 
 	if (nObjectNumber > 0) {
-		m_pCurrentWindow->m_nObjectNumber		= nObjectNumber;
-		m_pCurrentWindow->m_palette_id_ref		= (SHORT)palette_id_ref;
-		m_pCurrentWindow->m_compositionNumber	= CompositionDescriptor.nNumber;
+		m_pCurrentWindow->m_nObjectNumber     = nObjectNumber;
+		m_pCurrentWindow->m_palette_id_ref    = (SHORT)palette_id_ref;
+		m_pCurrentWindow->m_compositionNumber = CompositionDescriptor.nNumber;
 
 		for (int i = 0; i < nObjectNumber; i++) {
-			m_pCurrentWindow->Objects[i]						= DNew CompositionObject();
-			m_pCurrentWindow->Objects[i]->m_rtStart				= rtTime;
-			m_pCurrentWindow->Objects[i]->m_rtStop				= _I64_MAX;
-			m_pCurrentWindow->Objects[i]->m_compositionNumber	= CompositionDescriptor.nNumber;
+			m_pCurrentWindow->Objects[i]                      = DNew CompositionObject();
+			m_pCurrentWindow->Objects[i]->m_rtStart           = rtTime;
+			m_pCurrentWindow->Objects[i]->m_rtStop            = UNKNOWN_TIME;
+			m_pCurrentWindow->Objects[i]->m_compositionNumber = CompositionDescriptor.nNumber;
 
 			ParseCompositionObject(pGBuffer, m_pCurrentWindow->Objects[i]);
+		}
+	}
+}
+
+void CHdmvSub::EnqueuePresentationSegment()
+{
+	if (m_pCurrentWindow && m_pCurrentWindow->m_nObjectNumber && m_pCurrentWindow->m_compositionNumber != -1) {
+		for (int i = 0; i < m_pCurrentWindow->m_nObjectNumber; i++) {
+			if (m_pCurrentWindow->Objects[i]) {
+				CompositionObject* pObject     = m_pCurrentWindow->Objects[i];
+				CompositionObject& pObjectData = m_ParsedObjects[pObject->m_object_id_ref];
+				if (pObjectData.m_width) {
+					pObject->m_width  = pObjectData.m_width;
+					pObject->m_height = pObjectData.m_height;
+
+					if (pObjectData.GetRLEData()) {
+						pObject->SetRLEData(pObjectData.GetRLEData(), pObjectData.GetRLEDataSize(), pObjectData.GetRLEDataSize());
+					}
+
+					TRACE_HDMVSUB(L"CHdmvSub::EnqueuePresentationSegment() : Enqueue Presentation Segment : m_object_id_ref = %d, m_window_id_ref = %d, compositionNumber = %d, %10I64d [%s]\n",
+									pObject->m_object_id_ref,
+									pObject->m_window_id_ref,
+									pObject->m_compositionNumber,
+									pObject->m_rtStart, ReftimeToString(pObject->m_rtStart));
+
+					m_pObjects.AddTail(m_pCurrentWindow->Objects[i]);
+				} else {
+					delete m_pCurrentWindow->Objects[i];
+				}
+			}
+			m_pCurrentWindow->Objects[i] = NULL;
 		}
 	}
 }
