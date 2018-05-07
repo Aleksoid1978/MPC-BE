@@ -1021,6 +1021,26 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					mts.push_back(mt);
 				} else if (CodecID == "A_EAC3") {
 					mt.subtype = MEDIASUBTYPE_DOLBY_DDPLUS;
+
+					std::vector<BYTE> pData;
+					if (ReadFirtsBlock(pData, pTE)) {
+						audioframe_t aframe;
+						int size = ParseEAC3Header(pData.data(), &aframe);
+						if (!size) {
+							size = ParseAC3Header(pData.data(), &aframe);
+						}
+						if (size) {
+							wfe->nAvgBytesPerSec = size * aframe.samplerate / aframe.samples;
+							if (size + 8 <= (int)pData.size()) {
+								int size2 = ParseEAC3Header(pData.data() + size, &aframe);
+								if (size2 && aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT) {
+									wfe->nChannels += aframe.channels - 2;
+									wfe->nAvgBytesPerSec = (size + size2) * aframe.samplerate / aframe.samples;
+								}
+							}
+						}
+					}
+
 					mts.push_back(mt);
 				} else if (CodecID == "A_TRUEHD" ||
 						   CodecID == "A_MLP") {
