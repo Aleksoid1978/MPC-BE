@@ -354,7 +354,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 				int fsize2 = ParseEAC3Header(buf, &aframe);
 				if (fsize2 > 0 && aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT) {
 					fsize += fsize2;
-					m_channels += aframe.channels / 2; // TODO
+					m_channels += aframe.channels - 2;
 					m_bitrate = (int)(fsize * 8i64 * m_samplerate / m_framelength);
 					bAC3 = false;
 				}
@@ -380,7 +380,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 				int fsize2 = ParseEAC3Header(buf, &aframe);
 				if (fsize2 > 0 && aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT) {
 					fsize += fsize2;
-					m_channels += aframe.channels / 2; // TODO
+					m_channels += aframe.channels - 2;
 				}
 			}
 			m_bitrate = (int)(fsize * 8i64 * m_samplerate / m_framelength);

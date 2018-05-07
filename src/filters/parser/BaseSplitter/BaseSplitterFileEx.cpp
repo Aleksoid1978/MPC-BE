@@ -646,9 +646,11 @@ bool CBaseSplitterFileEx::Read(ac3hdr& h, int len, CMediaType* pmt, bool find_sy
 		Seek(pos);
 		h.frame_type = (BYTE)BitRead(2);
 		h.substreamid = (BYTE)BitRead(3);
+		/*
 		if (h.frame_type || h.substreamid) {
 			return false;
 		}
+		*/
 		h.frame_size = ((WORD)BitRead(11) + 1) << 1;
 		if (h.frame_size < 7) {
 			return false;
