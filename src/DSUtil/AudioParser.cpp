@@ -424,7 +424,7 @@ int ParseEAC3Header(const BYTE* buf, audioframe_t* audioframe)
 		return 0;
 	}
 
-	int frame_size = (((buf[2] & 0x03) << 8) + buf[3] + 1) * 2;
+	int frame_size = (((buf[2] & 0x07) << 8) + buf[3] + 1) * 2;
 
 	int fscod     =  buf[4] >> 6;
 	int fscod2    = (buf[4] >> 4) & 0x03;
