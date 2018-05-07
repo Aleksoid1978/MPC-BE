@@ -28,7 +28,7 @@
 	#define TRACE_HDMVSUB __noop
 #endif
 
-CHdmvSub::CHdmvSub(void)
+CHdmvSub::CHdmvSub()
 	: CBaseSub(ST_HDMV)
 {
 }
@@ -220,7 +220,7 @@ HRESULT CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 							  rt, ReftimeToString(rt));
 
 				InitSpd(spd, m_VideoDescriptor.nVideoWidth, m_VideoDescriptor.nVideoHeight);
-				pObject->RenderHdmv(spd, m_bResizedRender ? &m_spd : NULL);
+				pObject->RenderHdmv(spd, m_bResizedRender ? &m_spd : nullptr);
 
 				hr = S_OK;
 			}
@@ -291,14 +291,18 @@ void CHdmvSub::CleanOld(REFERENCE_TIME rt)
 void CHdmvSub::UpdateTimeStamp(REFERENCE_TIME rtStop)
 {
 	if (!m_pObjects.IsEmpty()) {
-		const auto& pObject = m_pObjects.GetTail();
+		POSITION pos = m_pObjects.GetTailPosition();
+		while (pos) {
+			auto& pObject = m_pObjects.GetPrev(pos);
+			if (pObject->m_rtStop == UNKNOWN_TIME) {
+				pObject->m_rtStop = rtStop;
 
-		if (pObject->m_rtStop == UNKNOWN_TIME) {
-			pObject->m_rtStop = rtStop;
-
-			TRACE_HDMVSUB(L"CHdmvSub::UpdateTimeStamp() : Update Presentation Segment TimeStamp : compositionNumber - %d, %I64d -> %I64d [%s -> %s]", pObject->m_compositionNumber,
-						  pObject->m_rtStart, pObject->m_rtStop,
-						  ReftimeToString(pObject->m_rtStart), ReftimeToString(pObject->m_rtStop));
+				TRACE_HDMVSUB(L"CHdmvSub::UpdateTimeStamp() : Update Presentation Segment TimeStamp : compositionNumber - %d, %I64d -> %I64d [%s -> %s]", pObject->m_compositionNumber,
+							  pObject->m_rtStart, pObject->m_rtStop,
+							  ReftimeToString(pObject->m_rtStart), ReftimeToString(pObject->m_rtStop));
+			} else {
+				break;
+			}
 		}
 	}
 }
@@ -371,7 +375,7 @@ void CHdmvSub::EnqueuePresentationSegment()
 					delete m_pCurrentWindow->Objects[i];
 				}
 			}
-			m_pCurrentWindow->Objects[i] = NULL;
+			m_pCurrentWindow->Objects[i] = nullptr;
 		}
 	}
 }
@@ -413,7 +417,7 @@ void CHdmvSub::ParsePalette(CGolombBuffer* pGBuffer, USHORT nSize)
 	m_CLUT[palette_id].Palette = DNew HDMV_PALETTE[nNbEntry];
 	memcpy(m_CLUT[palette_id].Palette, pPalette, nNbEntry * sizeof(HDMV_PALETTE));
 
-	if (m_DefaultCLUT.Palette == NULL || m_DefaultCLUT.pSize != nNbEntry) {
+	if (m_DefaultCLUT.Palette == nullptr || m_DefaultCLUT.pSize != nNbEntry) {
 		SAFE_DELETE_ARRAY(m_DefaultCLUT.Palette);
 		m_DefaultCLUT.Palette = DNew HDMV_PALETTE[nNbEntry];
 		m_DefaultCLUT.pSize   = nNbEntry;
