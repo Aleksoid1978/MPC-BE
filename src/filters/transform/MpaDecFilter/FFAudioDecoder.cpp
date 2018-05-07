@@ -435,20 +435,20 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 	return bRet;
 }
 
-void CFFAudioDecoder::SetDRC(bool fDRC)
+void CFFAudioDecoder::SetDRC(bool bDRC)
 {
 	if (m_pAVCtx) {
 		AVCodecID codec_id = m_pAVCtx->codec_id;
 		if (codec_id == AV_CODEC_ID_AC3 || codec_id == AV_CODEC_ID_EAC3) {
-			av_opt_set_double(m_pAVCtx, "drc_scale", fDRC ? 1.0f : 0.0f, AV_OPT_SEARCH_CHILDREN);
+			av_opt_set_double(m_pAVCtx, "drc_scale", bDRC ? 1.0f : 0.0f, AV_OPT_SEARCH_CHILDREN);
 		}
 	}
 }
 
-void CFFAudioDecoder::SetStereoDownmix(bool stereodownmix)
+void CFFAudioDecoder::SetStereoDownmix(bool bStereoDownmix)
 {
-	if (stereodownmix != m_bStereoDownmix) {
-		m_bStereoDownmix = stereodownmix;
+	if (bStereoDownmix != m_bStereoDownmix) {
+		m_bStereoDownmix = bStereoDownmix;
 		AVCodecID codec = GetCodecId();
 		if (codec == AV_CODEC_ID_AC3 || codec == AV_CODEC_ID_EAC3 || codec == AV_CODEC_ID_DTS || codec == AV_CODEC_ID_TRUEHD) {
 			// reinit for supported codec only
