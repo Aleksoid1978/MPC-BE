@@ -302,11 +302,6 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_bResync(FALSE)
 	, m_bResyncTimestamp(FALSE)
 	, m_buff(PADDING_SIZE)
-	, m_hdmicount(0)
-	, m_hdmisize(0)
-	, m_truehd_samplerate(0)
-	, m_truehd_framelength(0)
-	, m_eac3_prev_frametype(EAC3_FRAME_TYPE_RESERVED)
 	, m_bNeedCheck(TRUE)
 	, m_bHasVideo(FALSE)
 	, m_dRate(1.0)
@@ -319,6 +314,8 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_rtStopInputCache(INVALID_TIME)
 	, m_bUpdateTimeCache(TRUE)
 	, m_FFAudioDec(this)
+	, m_bAVSync(true)
+	, m_bDRC(false)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -341,79 +338,66 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		return;
 	}
 
-	memset(&m_bBitstreamSupported, FALSE, sizeof(m_bBitstreamSupported));
-
-	// default settings
-	m_bAVSync              = true;
-	m_fDRC                 = false;
-	m_fSPDIF[ac3]          = false;
-	m_fSPDIF[eac3]         = false;
-	m_fSPDIF[truehd]       = false;
-	m_fSPDIF[dts]          = false;
-	m_fSPDIF[dtshd]        = false;
-	m_fSPDIF[ac3enc]       = false;
-
 	// read settings
-	CString layout_str;
 #ifdef REGISTER_FILTER
-	m_fSampleFmt[SF_PCM16] = true;
-	m_fSampleFmt[SF_PCM24] = false;
-	m_fSampleFmt[SF_PCM32] = false;
-	m_fSampleFmt[SF_FLOAT] = false;
+	m_bSampleFmt[SF_PCM16] = true;
+	m_bSampleFmt[SF_PCM24] = false;
+	m_bSampleFmt[SF_PCM32] = false;
+	m_bSampleFmt[SF_FLOAT] = false;
 
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_MpaDec, KEY_READ)) {
 		DWORD dw;
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SFormat_i16, dw)) {
-			m_fSampleFmt[SF_PCM16] = !!dw;
+			m_bSampleFmt[SF_PCM16] = !!dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SFormat_i24, dw)) {
-			m_fSampleFmt[SF_PCM24] = !!dw;
+			m_bSampleFmt[SF_PCM24] = !!dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SFormat_i32, dw)) {
-			m_fSampleFmt[SF_PCM32] = !!dw;
+			m_bSampleFmt[SF_PCM32] = !!dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SFormat_flt, dw)) {
-			m_fSampleFmt[SF_FLOAT] = !!dw;
+			m_bSampleFmt[SF_FLOAT] = !!dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_AVSYNC, dw)) {
 			m_bAVSync = !!dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_DRC, dw)) {
-			m_fDRC = !!dw;
+			m_bDRC = !!dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SPDIF_ac3, dw)) {
-			m_fSPDIF[ac3] = !!dw;
+			m_bSPDIF[ac3] = !!dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SPDIF_eac3, dw)) {
-			m_fSPDIF[eac3] = !!dw;
+			m_bSPDIF[eac3] = !!dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SPDIF_truehd, dw)) {
-			m_fSPDIF[truehd] = !!dw;
+			m_bSPDIF[truehd] = !!dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SPDIF_dts, dw)) {
-			m_fSPDIF[dts] = !!dw;
+			m_bSPDIF[dts] = !!dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SPDIF_dtshd, dw)) {
-			m_fSPDIF[dtshd] = !!dw;
+			m_bSPDIF[dtshd] = !!dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPTION_SPDIF_ac3enc, dw)) {
-			m_fSPDIF[ac3enc] = !!dw;
+			m_bSPDIF[ac3enc] = !!dw;
 		}
 	}
 
-	if (!(m_fSampleFmt[SF_PCM16] || m_fSampleFmt[SF_PCM24] || m_fSampleFmt[SF_PCM32] || m_fSampleFmt[SF_FLOAT])) {
-		m_fSampleFmt[SF_PCM16] = true;
+	if (!(m_bSampleFmt[SF_PCM16] || m_bSampleFmt[SF_PCM24] || m_bSampleFmt[SF_PCM32] || m_bSampleFmt[SF_FLOAT])) {
+		m_bSampleFmt[SF_PCM16] = true;
 	}
 #else
 	m_bAVSync              = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_AVSYNC, m_bAVSync);
-	m_fDRC                 = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_DRC, m_fDRC);
-	m_fSPDIF[ac3]          = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3, m_fSPDIF[ac3]);
-	m_fSPDIF[eac3]         = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_eac3, m_fSPDIF[eac3]);
-	m_fSPDIF[truehd]       = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_truehd, m_fSPDIF[truehd]);
-	m_fSPDIF[dts]          = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dts, m_fSPDIF[dts]);
-	m_fSPDIF[dtshd]        = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dtshd, m_fSPDIF[dtshd]);
-	m_fSPDIF[ac3enc]       = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3enc, m_fSPDIF[ac3enc]);
+	m_bDRC                 = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_DRC, m_bDRC);
+	m_bSPDIF[ac3]          = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3, m_bSPDIF[ac3]);
+	m_bSPDIF[eac3]         = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_eac3, m_bSPDIF[eac3]);
+	m_bSPDIF[truehd]       = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_truehd, m_bSPDIF[truehd]);
+	m_bSPDIF[dts]          = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dts, m_bSPDIF[dts]);
+	m_bSPDIF[dtshd]        = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dtshd, m_bSPDIF[dtshd]);
+	m_bSPDIF[ac3enc]       = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3enc, m_bSPDIF[ac3enc]);
 #endif
 }
 
@@ -470,11 +454,8 @@ HRESULT CMpaDecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, d
 {
 	CAutoLock cAutoLock(&m_csReceive);
 	m_ps2_state.sync = false;
-	m_hdmicount = 0;
-	m_hdmisize  = 0;
-	m_truehd_samplerate  = 0;
-	m_truehd_framelength = 0;
-	m_eac3_prev_frametype = EAC3_FRAME_TYPE_RESERVED;
+	ZeroMemory(&m_hdmi_bitstream, sizeof(m_hdmi_bitstream));
+
 	m_bResync = TRUE;
 	m_rtStart = 0; // LOOKATTHIS // reset internal timer?
 
@@ -496,7 +477,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	if (m_bNeedCheck) {
 		m_bNeedCheck = FALSE;
 
-		memset(&m_bBitstreamSupported, TRUE, sizeof(m_bBitstreamSupported));
+		memset(&m_bBitstreamSupported, true, sizeof(m_bBitstreamSupported));
 
 		CComPtr<IPin> pPinRenderer;
 		CComPtr<IPin> pPin = m_pOutput;
@@ -509,19 +490,19 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 		if (pPinRenderer) {
 			CMediaType mtRenderer;
 			if (SUCCEEDED(pPinRenderer->ConnectionMediaType(&mtRenderer)) && mtRenderer.pbFormat) {
-				memset(&m_bBitstreamSupported, FALSE, sizeof(m_bBitstreamSupported));
+				memset(&m_bBitstreamSupported, false, sizeof(m_bBitstreamSupported));
 
 				CMediaType mt = CreateMediaTypeSPDIF();
-				m_bBitstreamSupported[SPDIF]	= pPinRenderer->QueryAccept(&mt) == S_OK;
+				m_bBitstreamSupported[SPDIF]  = pPinRenderer->QueryAccept(&mt) == S_OK;
 
 				mt = CreateMediaTypeHDMI(IEC61937_EAC3);
-				m_bBitstreamSupported[EAC3]		= pPinRenderer->QueryAccept(&mt) == S_OK;
+				m_bBitstreamSupported[EAC3]   = pPinRenderer->QueryAccept(&mt) == S_OK;
 
 				mt = CreateMediaTypeHDMI(IEC61937_TRUEHD);
-				m_bBitstreamSupported[TRUEHD]	= pPinRenderer->QueryAccept(&mt) == S_OK;
+				m_bBitstreamSupported[TRUEHD] = pPinRenderer->QueryAccept(&mt) == S_OK;
 
 				mt = CreateMediaTypeHDMI(IEC61937_DTSHD);
-				m_bBitstreamSupported[DTSHD]	= pPinRenderer->QueryAccept(&mt) == S_OK;
+				m_bBitstreamSupported[DTSHD]  = pPinRenderer->QueryAccept(&mt) == S_OK;
 
 				pPinRenderer->QueryAccept(&mtRenderer);
 			}
@@ -678,7 +659,7 @@ BOOL CMpaDecFilter::ProcessBitstream(enum AVCodecID nCodecId, HRESULT& hr, BOOL 
 	}
 
 	if (m_bBitstreamSupported[EAC3] && GetSPDIF(eac3) && nCodecId == AV_CODEC_ID_EAC3) {
-		hr = bEOF ? S_OK : ProcessEAC3_SPDIF();
+		hr = ProcessEAC3_SPDIF(bEOF);
 		return TRUE;
 	}
 
@@ -904,9 +885,22 @@ HRESULT CMpaDecFilter::ProcessAC3_SPDIF()
 	return S_OK;
 }
 
-HRESULT CMpaDecFilter::ProcessEAC3_SPDIF()
+HRESULT CMpaDecFilter::ProcessEAC3_SPDIF(BOOL bEOF/* = FALSE*/)
 {
-	HRESULT hr;
+	HRESULT hr = S_OK;
+
+	if (bEOF) {
+		if (m_hdmi_bitstream.Ready()) {
+			hr = DeliverBitstream(m_hdmi_bitstream.buf, m_hdmi_bitstream.size, m_rtStartInputCache, IEC61937_EAC3, m_hdmi_bitstream.samplerate, m_hdmi_bitstream.samples * m_hdmi_bitstream.repeat);
+			m_hdmi_bitstream.count = 0;
+			m_hdmi_bitstream.size  = 0;
+			
+			m_hdmi_bitstream.repeat     = 0;
+			m_hdmi_bitstream.samples    = 0;
+			m_hdmi_bitstream.samplerate = 0;
+		}
+		return hr;
+	}
 
 	BYTE* const base = m_buff.Data();
 	BYTE* end = base + m_buff.Size();
@@ -916,8 +910,34 @@ HRESULT CMpaDecFilter::ProcessEAC3_SPDIF()
 		audioframe_t aframe;
 		int size = ParseEAC3Header(p, &aframe);
 
+		bool bAC3Frame = false;
 		if (size == 0) {
-			p++;
+			size = ParseAC3Header(p, &aframe);
+			if (size == 0) {
+				p++;
+				continue;
+			}
+
+			bAC3Frame = true;
+			aframe.param1 = EAC3_FRAME_TYPE_INDEPENDENT;
+		}
+
+		if (aframe.param1 == EAC3_FRAME_TYPE_INDEPENDENT && m_hdmi_bitstream.Ready()) {
+			hr = DeliverBitstream(m_hdmi_bitstream.buf, m_hdmi_bitstream.size, m_rtStartInputCache, IEC61937_EAC3, m_hdmi_bitstream.samplerate, m_hdmi_bitstream.samples * m_hdmi_bitstream.repeat);
+			m_hdmi_bitstream.count = 0;
+			m_hdmi_bitstream.size  = 0;
+			
+			m_hdmi_bitstream.repeat     = 0;
+			m_hdmi_bitstream.samples    = 0;
+			m_hdmi_bitstream.samplerate = 0;
+			if (FAILED(hr)) {
+				return hr;
+			}
+		}
+
+		if (m_hdmi_bitstream.count == 0 && aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT) {
+			DLog(L"CMpaDecFilter::ProcessEAC3_SPDIF() : Ignoring dependent frame without independent frame.");
+			p += size;
 			continue;
 		}
 
@@ -928,44 +948,29 @@ HRESULT CMpaDecFilter::ProcessEAC3_SPDIF()
 		if (p + size > end) {
 			break;
 		}
-		if (aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT && m_eac3_prev_frametype != EAC3_FRAME_TYPE_INDEPENDENT) {
-			DLog(L"CMpaDecFilter::ProcessEAC3_SPDIF() : Ignoring dependent frame without independent frame.");
-			p++;
-			ClearCacheTimeStamp();
-			continue;
-		}
 
 		static const uint8_t eac3_repeat[4] = {6, 3, 2, 1};
 		int repeat = 1;
-		if ((p[4] & 0xc0) != 0xc0) { /* fscod */
+		if (!bAC3Frame && (p[4] & 0xc0) != 0xc0) { /* fscod */
 			repeat = eac3_repeat[(p[4] & 0x30) >> 4]; /* numblkscod */
 		}
 
-		if (aframe.param1 != EAC3_FRAME_TYPE_DEPENDENT) {
-			m_hdmicount++;
+		if (aframe.param1 == EAC3_FRAME_TYPE_INDEPENDENT) {
+			m_hdmi_bitstream.count++;
+			if (!m_hdmi_bitstream.repeat) {
+				m_hdmi_bitstream.repeat = repeat;
+				m_hdmi_bitstream.samples = aframe.samples;
+				m_hdmi_bitstream.samplerate = aframe.samplerate;
+			}
 		}
 
-		if (m_hdmisize + size <= BS_EAC3_SIZE - BS_HEADER_SIZE) {
-			memcpy(m_hdmibuff + m_hdmisize, p, size);
-			m_hdmisize += size;
+		if (m_hdmi_bitstream.size + size <= BS_EAC3_SIZE - BS_HEADER_SIZE) {
+			memcpy(m_hdmi_bitstream.buf + m_hdmi_bitstream.size, p, size);
+			m_hdmi_bitstream.size += size;
 		} else {
 			ASSERT(0);
 		}
 		p += size;
-
-		if (m_hdmicount < repeat
-				|| m_eac3_prev_frametype == EAC3_FRAME_TYPE_DEPENDENT) {
-			m_eac3_prev_frametype = aframe.param1;
-			continue;
-		}
-
-		hr = DeliverBitstream(m_hdmibuff, m_hdmisize, m_rtStartInputCache, IEC61937_EAC3, aframe.samplerate, aframe.samples * repeat);
-		m_hdmicount = 0;
-		m_hdmisize  = 0;
-		m_eac3_prev_frametype = EAC3_FRAME_TYPE_RESERVED;
-		if (FAILED(hr)) {
-			return hr;
-		}
 	}
 
 	m_buff.RemoveHead(p - base);
@@ -990,8 +995,8 @@ HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 		int size = ParseMLPHeader(p, &aframe);
 		if (size > 0) {
 			// sync frame
-			m_truehd_samplerate  = aframe.samplerate;
-			m_truehd_framelength = aframe.samples;
+			m_hdmi_bitstream.truehd_samplerate  = aframe.samplerate;
+			m_hdmi_bitstream.truehd_framelength = aframe.samples;
 		} else {
 			int ac3size = ParseAC3Header(p);
 			if (ac3size == 0) {
@@ -1006,7 +1011,7 @@ HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 			}
 		}
 
-		if (size == 0 && m_truehd_framelength > 0) {
+		if (size == 0 && m_hdmi_bitstream.truehd_framelength > 0) {
 			// get not sync frame size
 			size = ((p[0] << 8 | p[1]) & 0xfff) * 2;
 		}
@@ -1024,36 +1029,36 @@ HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 			break;
 		}
 
-		m_hdmicount++;
-		if (m_hdmicount == 1) {
+		m_hdmi_bitstream.count++;
+		if (m_hdmi_bitstream.count == 1) {
 			// skip 8 header bytes and write MAT start code
-			memcpy(m_hdmibuff + BS_HEADER_SIZE, mat_start_code, sizeof(mat_start_code));
-			m_hdmisize = BS_HEADER_SIZE + sizeof(mat_start_code);
-		} else if (m_hdmicount == 13) {
-			memcpy(m_hdmibuff + (BS_HEADER_SIZE + BS_MAT_SIZE) / 2, mat_middle_code, sizeof(mat_middle_code));
-			m_hdmisize = (BS_HEADER_SIZE + BS_MAT_SIZE) / 2 + sizeof(mat_middle_code);
+			memcpy(m_hdmi_bitstream.buf + BS_HEADER_SIZE, mat_start_code, sizeof(mat_start_code));
+			m_hdmi_bitstream.size = BS_HEADER_SIZE + sizeof(mat_start_code);
+		} else if (m_hdmi_bitstream.count == 13) {
+			memcpy(m_hdmi_bitstream.buf + (BS_HEADER_SIZE + BS_MAT_SIZE) / 2, mat_middle_code, sizeof(mat_middle_code));
+			m_hdmi_bitstream.size = (BS_HEADER_SIZE + BS_MAT_SIZE) / 2 + sizeof(mat_middle_code);
 		}
 
-		if (m_hdmisize + size <= m_hdmicount * BS_MAT_OFFSET) {
-			memcpy(m_hdmibuff + m_hdmisize, p, size);
-			m_hdmisize += size;
-			memset(m_hdmibuff + m_hdmisize, 0, m_hdmicount * BS_MAT_OFFSET - m_hdmisize);
-			m_hdmisize = m_hdmicount * BS_MAT_OFFSET;
+		if (m_hdmi_bitstream.size + size <= m_hdmi_bitstream.count * BS_MAT_OFFSET) {
+			memcpy(m_hdmi_bitstream.buf + m_hdmi_bitstream.size, p, size);
+			m_hdmi_bitstream.size += size;
+			memset(m_hdmi_bitstream.buf + m_hdmi_bitstream.size, 0, m_hdmi_bitstream.count * BS_MAT_OFFSET - m_hdmi_bitstream.size);
+			m_hdmi_bitstream.size = m_hdmi_bitstream.count * BS_MAT_OFFSET;
 		} else {
 			ASSERT(0);
 		}
 		p += size;
 
-		if (m_hdmicount < 24) {
+		if (m_hdmi_bitstream.count < 24) {
 			break;
 		}
 
-		memcpy(m_hdmibuff + (BS_HEADER_SIZE + BS_MAT_SIZE) - sizeof(mat_end_code), mat_end_code, sizeof(mat_end_code));
-		m_hdmisize = (BS_HEADER_SIZE + BS_MAT_SIZE);
+		memcpy(m_hdmi_bitstream.buf + (BS_HEADER_SIZE + BS_MAT_SIZE) - sizeof(mat_end_code), mat_end_code, sizeof(mat_end_code));
+		m_hdmi_bitstream.size = (BS_HEADER_SIZE + BS_MAT_SIZE);
 
-		hr = DeliverBitstream(m_hdmibuff + BS_HEADER_SIZE, m_hdmisize - BS_HEADER_SIZE, m_rtStartInputCache, IEC61937_TRUEHD, m_truehd_samplerate, m_truehd_framelength * 24);
-		m_hdmicount = 0;
-		m_hdmisize  = 0;
+		hr = DeliverBitstream(m_hdmi_bitstream.buf + BS_HEADER_SIZE, m_hdmi_bitstream.size - BS_HEADER_SIZE, m_rtStartInputCache, IEC61937_TRUEHD, m_hdmi_bitstream.truehd_samplerate, m_hdmi_bitstream.truehd_framelength * 24);
+		m_hdmi_bitstream.count = 0;
+		m_hdmi_bitstream.size  = 0;
 		if (FAILED(hr)) {
 			return hr;
 		}
@@ -1989,7 +1994,7 @@ MPCSampleFormat CMpaDecFilter::SelectOutputFormat(MPCSampleFormat mpcsf)
 
 	if (mpcsf >= 0 && mpcsf < sfcount) {
 		for (int i = 0; i < sfcount; i++) {
-			if (m_fSampleFmt[SFmtPrority[mpcsf][i]]) {
+			if (m_bSampleFmt[SFmtPrority[mpcsf][i]]) {
 				return SFmtPrority[mpcsf][i];
 			}
 		}
@@ -2221,11 +2226,11 @@ HRESULT CMpaDecFilter::BreakConnect(PIN_DIRECTION dir)
 
 #ifdef REGISTER_FILTER
 
-STDMETHODIMP CMpaDecFilter::SetOutputFormat(MPCSampleFormat mpcsf, bool enable)
+STDMETHODIMP CMpaDecFilter::SetOutputFormat(MPCSampleFormat mpcsf, bool bEnable)
 {
 	CAutoLock cAutoLock(&m_csProps);
 	if (mpcsf >= 0 && mpcsf < sfcount) {
-		m_fSampleFmt[mpcsf] = enable;
+		m_bSampleFmt[mpcsf] = bEnable;
 	} else {
 		return E_INVALIDARG;
 	}
@@ -2237,14 +2242,14 @@ STDMETHODIMP_(bool) CMpaDecFilter::GetOutputFormat(MPCSampleFormat mpcsf)
 {
 	CAutoLock cAutoLock(&m_csProps);
 	if (mpcsf >= 0 && mpcsf < sfcount) {
-		return m_fSampleFmt[mpcsf];
+		return m_bSampleFmt[mpcsf];
 	}
 	return false;
 }
 
 #else
 
-STDMETHODIMP CMpaDecFilter::SetOutputFormat(MPCSampleFormat mpcsf, bool enable)
+STDMETHODIMP CMpaDecFilter::SetOutputFormat(MPCSampleFormat mpcsf, bool bEnable)
 {
 	return E_NOTIMPL;
 }
@@ -2271,12 +2276,12 @@ STDMETHODIMP_(bool) CMpaDecFilter::GetAVSyncCorrection()
 	return m_bAVSync;
 }
 
-STDMETHODIMP CMpaDecFilter::SetDynamicRangeControl(bool fDRC)
+STDMETHODIMP CMpaDecFilter::SetDynamicRangeControl(bool bDRC)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	m_fDRC = fDRC;
+	m_bDRC = bDRC;
 
-	m_FFAudioDec.SetDRC(fDRC);
+	m_FFAudioDec.SetDRC(bDRC);
 
 	return S_OK;
 }
@@ -2285,17 +2290,17 @@ STDMETHODIMP_(bool) CMpaDecFilter::GetDynamicRangeControl()
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	return m_fDRC;
+	return m_bDRC;
 }
 
-STDMETHODIMP CMpaDecFilter::SetSPDIF(enctype et, bool fSPDIF)
+STDMETHODIMP CMpaDecFilter::SetSPDIF(enctype et, bool bSPDIF)
 {
 	CAutoLock cAutoLock(&m_csProps);
 	if (et < 0 || et >= etcount) {
 		return E_INVALIDARG;
 	}
 
-	m_fSPDIF[et] = fSPDIF;
+	m_bSPDIF[et] = bSPDIF;
 	return S_OK;
 }
 
@@ -2305,11 +2310,11 @@ STDMETHODIMP_(bool) CMpaDecFilter::GetSPDIF(enctype et)
 	if (et < 0 || et >= etcount) {
 		return false;
 	}
-	if (et == dtshd && !m_fSPDIF[dts]) {
+	if (et == dtshd && !m_bSPDIF[dts]) {
 		return false;
 	}
 
-	return m_fSPDIF[et];
+	return m_bSPDIF[et];
 }
 
 STDMETHODIMP CMpaDecFilter::SaveSettings()
@@ -2319,28 +2324,28 @@ STDMETHODIMP CMpaDecFilter::SaveSettings()
 #ifdef REGISTER_FILTER
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_MpaDec)) {
-		key.SetDWORDValue(OPTION_SFormat_i16, m_fSampleFmt[SF_PCM16]);
-		key.SetDWORDValue(OPTION_SFormat_i24, m_fSampleFmt[SF_PCM24]);
-		key.SetDWORDValue(OPTION_SFormat_i32, m_fSampleFmt[SF_PCM32]);
-		key.SetDWORDValue(OPTION_SFormat_flt, m_fSampleFmt[SF_FLOAT]);
+		key.SetDWORDValue(OPTION_SFormat_i16, m_bSampleFmt[SF_PCM16]);
+		key.SetDWORDValue(OPTION_SFormat_i24, m_bSampleFmt[SF_PCM24]);
+		key.SetDWORDValue(OPTION_SFormat_i32, m_bSampleFmt[SF_PCM32]);
+		key.SetDWORDValue(OPTION_SFormat_flt, m_bSampleFmt[SF_FLOAT]);
 		key.SetDWORDValue(OPTION_AVSYNC, m_bAVSync);
-		key.SetDWORDValue(OPTION_DRC, m_fDRC);
-		key.SetDWORDValue(OPTION_SPDIF_ac3, m_fSPDIF[ac3]);
-		key.SetDWORDValue(OPTION_SPDIF_eac3, m_fSPDIF[eac3]);
-		key.SetDWORDValue(OPTION_SPDIF_truehd, m_fSPDIF[truehd]);
-		key.SetDWORDValue(OPTION_SPDIF_dts, m_fSPDIF[dts]);
-		key.SetDWORDValue(OPTION_SPDIF_dtshd, m_fSPDIF[dtshd]);
-		key.SetDWORDValue(OPTION_SPDIF_ac3enc, m_fSPDIF[ac3enc]);
+		key.SetDWORDValue(OPTION_DRC, m_bDRC);
+		key.SetDWORDValue(OPTION_SPDIF_ac3, m_bSPDIF[ac3]);
+		key.SetDWORDValue(OPTION_SPDIF_eac3, m_bSPDIF[eac3]);
+		key.SetDWORDValue(OPTION_SPDIF_truehd, m_bSPDIF[truehd]);
+		key.SetDWORDValue(OPTION_SPDIF_dts, m_bSPDIF[dts]);
+		key.SetDWORDValue(OPTION_SPDIF_dtshd, m_bSPDIF[dtshd]);
+		key.SetDWORDValue(OPTION_SPDIF_ac3enc, m_bSPDIF[ac3enc]);
 	}
 #else
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_AVSYNC, m_bAVSync);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_DRC, m_fDRC);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3, m_fSPDIF[ac3]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_eac3, m_fSPDIF[eac3]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_truehd, m_fSPDIF[truehd]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dts, m_fSPDIF[dts]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dtshd, m_fSPDIF[dtshd]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3enc, m_fSPDIF[ac3enc]);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_DRC, m_bDRC);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3, m_bSPDIF[ac3]);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_eac3, m_bSPDIF[eac3]);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_truehd, m_bSPDIF[truehd]);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dts, m_bSPDIF[dts]);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dtshd, m_bSPDIF[dtshd]);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3enc, m_bSPDIF[ac3enc]);
 #endif
 
 	return S_OK;

@@ -61,11 +61,12 @@ protected:
 	// settings
 	CCritSec        m_csProps;
 #ifdef REGISTER_FILTER
-	bool            m_fSampleFmt[sfcount];
+	bool            m_bSampleFmt[sfcount] = {};
 #endif
 	bool            m_bAVSync;
-	bool            m_fDRC;
-	bool            m_fSPDIF[etcount];
+	bool            m_bDRC;
+
+	bool            m_bSPDIF[etcount] = {};
 
 	CCritSec        m_csReceive;
 	CPaddedBuffer   m_buff;
@@ -79,12 +80,23 @@ protected:
 
 	ps2_state_t     m_ps2_state;
 
-	BYTE            m_hdmibuff[61440];
-	int             m_hdmicount;
-	int             m_hdmisize;
-	int             m_truehd_samplerate;
-	int             m_truehd_framelength;
-	BYTE            m_eac3_prev_frametype;
+	struct {
+		BYTE buf[61440];
+		int  count;
+		int  size;
+		int  truehd_samplerate;
+		int  truehd_framelength;
+
+		// E-AC3 block
+		int  repeat;
+		int  samples;
+		int  samplerate;
+
+		bool Ready() const {
+			return repeat > 0 && repeat == count;
+		}
+
+	} m_hdmi_bitstream = {};
 
 	CFFAudioDecoder m_FFAudioDec;
 
@@ -115,7 +127,7 @@ protected:
 		DTSHD,
 		BTCOUNT
 	};
-	BOOL            m_bBitstreamSupported[BTCOUNT];
+	bool m_bBitstreamSupported[BTCOUNT] = {};
 
 	void UpdateCacheTimeStamp();
 	void ClearCacheTimeStamp();
@@ -132,7 +144,7 @@ protected:
 	HRESULT ProcessDvdLPCM();
 	HRESULT ProcessHdmvLPCM();
 	HRESULT ProcessAC3_SPDIF();
-	HRESULT ProcessEAC3_SPDIF();
+	HRESULT ProcessEAC3_SPDIF(BOOL bEOF = FALSE);
 	HRESULT ProcessTrueHD_SPDIF();
 	HRESULT ProcessDTS_SPDIF(BOOL bEOF = FALSE);
 	HRESULT ProcessPS2PCM();
@@ -184,13 +196,13 @@ public:
 	STDMETHODIMP CreatePage(const GUID& guid, IPropertyPage** ppPage);
 
 	// IMpaDecFilter
-	STDMETHODIMP SetOutputFormat(MPCSampleFormat sf, bool enable);
+	STDMETHODIMP SetOutputFormat(MPCSampleFormat sf, bool bEnable);
 	STDMETHODIMP_(bool) GetOutputFormat(MPCSampleFormat sf);
 	STDMETHODIMP SetAVSyncCorrection(bool bAVSync);
 	STDMETHODIMP_(bool) GetAVSyncCorrection();
-	STDMETHODIMP SetDynamicRangeControl(bool fDRC);
+	STDMETHODIMP SetDynamicRangeControl(bool bDRC);
 	STDMETHODIMP_(bool) GetDynamicRangeControl();
-	STDMETHODIMP SetSPDIF(enctype et, bool fSPDIF);
+	STDMETHODIMP SetSPDIF(enctype et, bool bSPDIF);
 	STDMETHODIMP_(bool) GetSPDIF(enctype et);
 	STDMETHODIMP SaveSettings();
 	STDMETHODIMP_(CString) GetInformation(MPCAInfo index);

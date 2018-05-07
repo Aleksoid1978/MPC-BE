@@ -64,8 +64,8 @@ public:
 	CFFAudioDecoder(CMpaDecFilter* pFilter);
 
 	bool    Init(enum AVCodecID codecID, CMediaType* mediaType);
-	void    SetDRC(bool fDRC);
-	void    SetStereoDownmix(bool stereodownmix);
+	void    SetDRC(bool bDRC);
+	void    SetStereoDownmix(bool bStereoDownmix);
 
 	HRESULT RealPrepare(BYTE* p, int buffsize, CPaddedBuffer& BuffOut);
 	HRESULT SendData(BYTE* p, int size, int* out_size = nullptr);

@@ -46,13 +46,13 @@ public IUnknown {
 		ac3enc,
 		etcount};
 
-	STDMETHOD(SetOutputFormat(MPCSampleFormat sf, bool enable)) PURE;
+	STDMETHOD(SetOutputFormat(MPCSampleFormat sf, bool bEnable)) PURE;
 	STDMETHOD_(bool, GetOutputFormat(MPCSampleFormat sf)) PURE;
 	STDMETHOD(SetAVSyncCorrection(bool bAVSync)) PURE;
 	STDMETHOD_(bool, GetAVSyncCorrection()) PURE;
-	STDMETHOD(SetDynamicRangeControl(bool fDRC)) PURE;
+	STDMETHOD(SetDynamicRangeControl(bool bDRC)) PURE;
 	STDMETHOD_(bool, GetDynamicRangeControl()) PURE;
-	STDMETHOD(SetSPDIF(enctype et, bool fSPDIF)) PURE;
+	STDMETHOD(SetSPDIF(enctype et, bool bSPDIF)) PURE;
 	STDMETHOD_(bool, GetSPDIF(enctype et)) PURE;
 
 	STDMETHOD(SaveSettings()) PURE;
