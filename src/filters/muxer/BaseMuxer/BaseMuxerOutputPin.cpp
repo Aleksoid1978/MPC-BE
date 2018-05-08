@@ -33,7 +33,7 @@
 //
 
 CBaseMuxerOutputPin::CBaseMuxerOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
-	: CBaseOutputPin(_T("CBaseMuxerOutputPin"), pFilter, pLock, phr, pName)
+	: CBaseOutputPin(L"CBaseMuxerOutputPin", pFilter, pLock, phr, pName)
 {
 }
 
@@ -450,29 +450,29 @@ void CBaseMuxerRawOutputPin::MuxFooter(const CMediaType& mt)
 				CoTaskMemFree(fn);
 
 				FILE* f;
-				if (!_tfopen_s(&f, CString((LPCWSTR)p), _T("w"))) {
+				if (!_wfopen_s(&f, CString((LPCWSTR)p), L"w")) {
 					SUBTITLEINFO* si = (SUBTITLEINFO*)mt.Format();
 
-					_ftprintf_s(f, _T("%s\n"), _T("# VobSub index file, v7 (do not modify this line!)"));
+					fwprintf_s(f, L"%s\n", L"# VobSub index file, v7 (do not modify this line!)");
 
 					fwrite(mt.Format() + si->dwOffset, mt.FormatLength() - si->dwOffset, 1, f);
 
 					CString iso6391 = ISO6392To6391(si->IsoLang);
 					if (iso6391.IsEmpty()) {
-						iso6391 = _T("--");
+						iso6391 = L"--";
 					}
-					_ftprintf_s(f, _T("\nlangidx: 0\n\nid: %s, index: 0\n"), iso6391.GetString());
+					fwprintf_s(f, L"\nlangidx: 0\n\nid: %s, index: 0\n", iso6391.GetString());
 
 					CString alt = CString(CStringW(si->TrackName));
 					if (!alt.IsEmpty()) {
-						_ftprintf_s(f, _T("alt: %s\n"), alt.GetString());
+						fwprintf_s(f, L"alt: %s\n", alt.GetString());
 					}
 
 					POSITION pos = m_idx.GetHeadPosition();
 					while (pos) {
 						const idx_t& i = m_idx.GetNext(pos);
 						DVD_HMSF_TIMECODE start = RT2HMSF(i.rt, 25);
-						_ftprintf_s(f, _T("timestamp: %02u:%02u:%02u:%03d, filepos: %09I64x\n"),
+						fwprintf_s(f, L"timestamp: %02u:%02u:%02u:%03d, filepos: %09I64x\n",
 									start.bHours, start.bMinutes, start.bSeconds, (int)((i.rt / 10000) % 1000),
 									i.fp);
 					}

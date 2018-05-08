@@ -27,7 +27,7 @@
 //
 
 CBitStream::CBitStream(IStream* pStream, bool fThrowError)
-	: CUnknown(_T("CBitStream"), nullptr)
+	: CUnknown(L"CBitStream", nullptr)
 	, m_pStream(pStream)
 	, m_fThrowError(fThrowError)
 	, m_bitlen(0)

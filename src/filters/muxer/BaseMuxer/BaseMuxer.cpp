@@ -27,7 +27,7 @@
 //
 
 CBaseMuxerFilter::CBaseMuxerFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLSID& clsid)
-	: CBaseFilter(NAME("CBaseMuxerFilter"), pUnk, this, clsid)
+	: CBaseFilter(L"CBaseMuxerFilter", pUnk, this, clsid)
 	, m_rtCurrent(0)
 {
 	if (phr) {
@@ -202,7 +202,7 @@ DWORD CBaseMuxerFilter::ThreadProc()
 
 void CBaseMuxerFilter::MuxHeaderInternal()
 {
-	TRACE(_T("MuxHeader\n"));
+	TRACE(L"MuxHeader\n");
 
 	if (CComQIPtr<IBitStream> pBitStream = m_pOutput->GetBitStream()) {
 		MuxHeader(pBitStream);
@@ -223,7 +223,7 @@ void CBaseMuxerFilter::MuxHeaderInternal()
 
 void CBaseMuxerFilter::MuxPacketInternal(const MuxerPacket* pPacket)
 {
-	TRACE(_T("MuxPacket pPin=%x, size=%d, s%d e%d b%d, rt=(%I64d-%I64d)\n"),
+	TRACE(L"MuxPacket pPin=%x, size=%d, s%d e%d b%d, rt=(%I64d-%I64d)\n",
 		  pPacket->pPin->GetID(),
 		  pPacket->pData.GetCount(),
 		  !!(pPacket->flags & MuxerPacket::syncpoint),
@@ -245,7 +245,7 @@ void CBaseMuxerFilter::MuxPacketInternal(const MuxerPacket* pPacket)
 
 void CBaseMuxerFilter::MuxFooterInternal()
 {
-	TRACE(_T("MuxFooter\n"));
+	TRACE(L"MuxFooter\n");
 
 	if (CComQIPtr<IBitStream> pBitStream = m_pOutput->GetBitStream()) {
 		MuxFooter(pBitStream);

@@ -73,7 +73,7 @@ CFilterApp theApp;
 //
 
 CMatroskaMuxerFilter::CMatroskaMuxerFilter(LPUNKNOWN pUnk, HRESULT* phr)
-	: CBaseFilter(NAME("CMatroskaMuxerFilter"), pUnk, this, __uuidof(this))
+	: CBaseFilter(L"CMatroskaMuxerFilter", pUnk, this, __uuidof(this))
 	, m_rtCurrent(0)
 	, m_fNegative(true)
 	, m_fPositive(false)
@@ -82,7 +82,7 @@ CMatroskaMuxerFilter::CMatroskaMuxerFilter(LPUNKNOWN pUnk, HRESULT* phr)
 		*phr = S_OK;
 	}
 
-	m_pOutput.Attach(DNew CMatroskaMuxerOutputPin(NAME("CMatroskaMuxerOutputPin"), this, this, phr));
+	m_pOutput.Attach(DNew CMatroskaMuxerOutputPin(L"CMatroskaMuxerOutputPin", this, this, phr));
 
 	AddInput();
 
@@ -589,7 +589,7 @@ DWORD CMatroskaMuxerFilter::ThreadProc()
 						b->Block.TimeCodeStop -= firstTimeCode;
 
 						/*
-						TRACE(_T("Muxing (%d): %I64d-%I64d dur=%I64d (c=%d, co=%dms), cnt=%d, ref=%d\n"),
+						TRACE(L"Muxing (%d): %I64d-%I64d dur=%I64d (c=%d, co=%dms), cnt=%d, ref=%d\n",
 							GetTrackNumber(pPin),
 							(INT64)b->Block.TimeCode, (INT64)b->Block.TimeCodeStop, (UINT64)b->BlockDuration,
 							(int)((b->Block.TimeCode)/MAXCLUSTERTIME), (int)(b->Block.TimeCode%MAXCLUSTERTIME),
@@ -715,7 +715,7 @@ DWORD CMatroskaMuxerFilter::ThreadProc()
 //
 
 CMatroskaMuxerInputPin::CMatroskaMuxerInputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
-	: CBaseInputPin(NAME("CMatroskaMuxerInputPin"), pFilter, pLock, phr, pName)
+	: CBaseInputPin(L"CMatroskaMuxerInputPin", pFilter, pLock, phr, pName)
 	, m_fActive(false)
 	, m_rtLastStart(0)
 	, m_rtLastStop(0)
@@ -1233,7 +1233,7 @@ STDMETHODIMP CMatroskaMuxerInputPin::Receive(IMediaSample* pSample)
 	hr = pSample->GetTime(&rtStart, &rtStop);
 
 	if (FAILED(hr) || rtStart == -1 || rtStop == -1) {
-		TRACE(_T("No timestamp was set on the sample!!!"));
+		TRACE(L"No timestamp was set on the sample!!!");
 		m_pFilter->NotifyEvent(EC_ERRORABORT, VFW_E_SAMPLE_TIME_NOT_SET, 0);
 		return VFW_E_SAMPLE_TIME_NOT_SET;
 	}
@@ -1241,7 +1241,7 @@ STDMETHODIMP CMatroskaMuxerInputPin::Receive(IMediaSample* pSample)
 	//rtStart += m_tStart;
 	//rtStop += m_tStart;
 
-	TRACE(_T("Received (%u): %I64d-%I64d (c=%d, co=%dms), len=%ld, d%d p%d s%d\n"),
+	TRACE(L"Received (%u): %I64d-%I64d (c=%d, co=%dms), len=%ld, d%d p%d s%d\n",
 		  (static_cast<CMatroskaMuxerFilter*>(m_pFilter))->GetTrackNumber(this),
 		  rtStart, rtStop, (int)((rtStart / 10000) / MAXCLUSTERTIME), (int)((rtStart / 10000) % MAXCLUSTERTIME),
 		  inputLen,
@@ -1294,7 +1294,7 @@ STDMETHODIMP CMatroskaMuxerInputPin::Receive(IMediaSample* pSample)
 			// TODO: test this with a longer capture (pcm, mp3)
 			if (S_OK == pSample->IsSyncPoint() && rtStart < m_rtLastStart)
 			{
-				TRACE(_T("!!! timestamp went backwards, dropping this frame !!! rtStart (%I64) < m_rtLastStart (%I64)"), rtStart, m_rtLastStart);
+				TRACE(L"!!! timestamp went backwards, dropping this frame !!! rtStart (%I64) < m_rtLastStart (%I64)", rtStart, m_rtLastStart);
 				return S_OK;
 			}
 	*/

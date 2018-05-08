@@ -71,7 +71,7 @@ CFilterApp theApp;
 //
 
 CWavDestFilter::CWavDestFilter(LPUNKNOWN pUnk, HRESULT* phr)
-	: CTransformFilter(NAME("WavDest filter"), pUnk, __uuidof(this))
+	: CTransformFilter(L"WavDest filter", pUnk, __uuidof(this))
 	, m_cbWavData(0)
 	, m_cbHeader(0)
 {
@@ -86,7 +86,7 @@ CWavDestFilter::CWavDestFilter(LPUNKNOWN pUnk, HRESULT* phr)
 		return;
 	}
 
-	if (CTransformInputPin* pIn = DNew CTransformInputPin(NAME("Transform input pin"), this, phr, L"In")) {
+	if (CTransformInputPin* pIn = DNew CTransformInputPin(L"Transform input pin", this, phr, L"In")) {
 		if (SUCCEEDED(*phr)) {
 			m_pInput = pIn;
 		} else {
@@ -162,7 +162,7 @@ HRESULT CWavDestFilter::Copy(IMediaSample* pSource, IMediaSample* pDest) const
 		return E_FAIL;
 	}
 
-	CopyMemory((PVOID)pDestBuffer, (PVOID)pSourceBuffer, lSourceSize);
+	memcpy((PVOID)pDestBuffer, (PVOID)pSourceBuffer, lSourceSize);
 
 	// Copy the sample times
 
@@ -295,7 +295,7 @@ HRESULT CWavDestFilter::StopStreaming()
 
 		pRiffFmt->fcc = FCC('fmt ');
 		pRiffFmt->cb = m_pInput->CurrentMediaType().FormatLength();
-		CopyMemory(pRiffFmt + 1, m_pInput->CurrentMediaType().Format(), pRiffFmt->cb);
+		memcpy(pRiffFmt + 1, m_pInput->CurrentMediaType().Format(), pRiffFmt->cb);
 
 		pRiffWave->fcc = FCC('RIFF');
 		pRiffWave->cb = m_cbWavData + m_cbHeader - sizeof(RIFFCHUNK);
@@ -315,7 +315,7 @@ HRESULT CWavDestFilter::StopStreaming()
 }
 
 CWavDestOutputPin::CWavDestOutputPin(CTransformFilter* pFilter, HRESULT* phr)
-	: CTransformOutputPin(NAME("WavDest output pin"), pFilter, phr, L"Out")
+	: CTransformOutputPin(L"WavDest output pin", pFilter, phr, L"Out")
 {
 }
 
