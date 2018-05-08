@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,7 +23,7 @@
 #include <afxwin.h>
 #include <afxcmn.h>
 #include "../../filters/transform/BufferFilter/BufferFilter.h"
-#include "FloatEdit.h"
+#include "controls/FloatEdit.h"
 #include "DVBChannel.h"
 #include <ResizableLib/ResizableDialog.h>
 #include "PlayerBar.h"

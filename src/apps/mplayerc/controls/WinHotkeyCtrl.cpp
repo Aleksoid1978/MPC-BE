@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2017 see Authors.txt
+ * (C) 2011-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,8 +19,8 @@
  */
 
 #include "stdafx.h"
+#include "../vkCodes.h"
 #include "WinHotkeyCtrl.h"
-#include "vkCodes.h"
 
 #define WM_KEY	(WM_USER + 444)
 

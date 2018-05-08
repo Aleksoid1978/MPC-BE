@@ -1,6 +1,5 @@
 /*
- * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,29 +18,19 @@
  *
  */
 
-#pragma once
+#include "stdafx.h"
+#include "../../../DSUtil/DSMPropertyBag.h"
+#include "ChaptersSouce.h"
 
-
-class CTextPassThruInputPin;
-
-class __declspec(uuid("E2BA9B7B-B65D-4804-ACB2-89C3E55511DB"))
-	CTextPassThruFilter : public CBaseFilter, public CCritSec
+ChaptersSouce::ChaptersSouce() : CSource(L"Chapters Source", nullptr, __uuidof(this))
 {
-	friend class CTextPassThruInputPin;
-	friend class CTextPassThruOutputPin;
+}
 
-	CTextPassThruInputPin* m_pInput;
-	CTextPassThruOutputPin* m_pOutput;
+STDMETHODIMP ChaptersSouce::NonDelegatingQueryInterface(REFIID riid, void** ppv)
+{
+	CheckPointer(ppv, E_POINTER);
 
-	CMainFrame* m_pMainFrame;
-
-public:
-	CTextPassThruFilter(CMainFrame* pMainFrame);
-	virtual ~CTextPassThruFilter();
-
-	DECLARE_IUNKNOWN;
-	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
-
-	int GetPinCount();
-	CBasePin* GetPin(int n);
-};
+	return
+		QI(IDSMChapterBag)
+		__super::NonDelegatingQueryInterface(riid, ppv);
+}

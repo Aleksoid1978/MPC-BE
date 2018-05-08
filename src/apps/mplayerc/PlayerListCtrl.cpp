@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include "PlayerListCtrl.h"
-#include "WinHotkeyCtrl.h"
 #include "../../DSUtil/SysVersion.h"
 
 // CInPlaceHotKey

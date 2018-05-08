@@ -24,7 +24,7 @@
 #include "FGManager.h"
 #include "../../filters/Filters.h"
 #include <madVRAllocatorPresenter.h>
-#include "DeinterlacerFilter.h"
+#include "filters/DeinterlacerFilter.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/FileVersion.h"
 #include "../../filters/transform/DeCSSFilter/VobFile.h"

@@ -19,6 +19,12 @@
     <Filter Include="Resource Files\shaders">
       <UniqueIdentifier>{edc56d11-5b93-44ca-9d82-5e0e3c2cb680}</UniqueIdentifier>
     </Filter>
+    <Filter Include="filters">
+      <UniqueIdentifier>{eb2d565b-0d83-4439-8f9f-971a796fcbfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="controls">
+      <UniqueIdentifier>{cb62768f-3084-4ae3-b385-c7953845709f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AppSettings.cpp">
@@ -34,9 +40,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CShockwaveFlash.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DeinterlacerFilter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DVBChannel.cpp">
@@ -63,9 +66,6 @@
     <ClCompile Include="FileDropTarget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FloatEdit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FullscreenWnd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -82,9 +82,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LcdSupport.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LineNumberEdit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MainFrm.cpp">
@@ -258,19 +255,10 @@
     <ClCompile Include="ShockwaveGraph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="StaticLink.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="StatusLabel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SubtitleDlDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TextPassThruFilter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TunerScanDlg.cpp">
@@ -283,12 +271,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="vkCodes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="WinHotkeyCtrl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EditWithButton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="UpdateChecker.cpp">
@@ -351,6 +333,33 @@
     <ClCompile Include="CmdLineHelpDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="filters\ChaptersSouce.cpp">
+      <Filter>filters</Filter>
+    </ClCompile>
+    <ClCompile Include="filters\DeinterlacerFilter.cpp">
+      <Filter>filters</Filter>
+    </ClCompile>
+    <ClCompile Include="filters\TextPassThruFilter.cpp">
+      <Filter>filters</Filter>
+    </ClCompile>
+    <ClCompile Include="controls\EditWithButton.cpp">
+      <Filter>controls</Filter>
+    </ClCompile>
+    <ClCompile Include="controls\FloatEdit.cpp">
+      <Filter>controls</Filter>
+    </ClCompile>
+    <ClCompile Include="controls\LineNumberEdit.cpp">
+      <Filter>controls</Filter>
+    </ClCompile>
+    <ClCompile Include="controls\StaticLink.cpp">
+      <Filter>controls</Filter>
+    </ClCompile>
+    <ClCompile Include="controls\StatusLabel.cpp">
+      <Filter>controls</Filter>
+    </ClCompile>
+    <ClCompile Include="controls\WinHotkeyCtrl.cpp">
+      <Filter>controls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSettings.h">
@@ -366,9 +375,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CShockwaveFlash.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DeinterlacerFilter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DVBChannel.h">
@@ -398,9 +404,6 @@
     <ClInclude Include="FilterEnum.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FloatEdit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FullscreenWnd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -417,9 +420,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LcdSupport.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LineNumberEdit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MainFrm.h">
@@ -602,19 +602,10 @@
     <ClInclude Include="ShockwaveGraph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="StaticLink.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="StatusLabel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SubtitleDlDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TextPassThruFilter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TunerScanDlg.h">
@@ -630,12 +621,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vkCodes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="WinHotkeyCtrl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EditWithButton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UpdateChecker.h">
@@ -700,6 +685,33 @@
     </ClInclude>
     <ClInclude Include="CmdLineHelpDlg.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filters\ChaptersSouce.h">
+      <Filter>filters</Filter>
+    </ClInclude>
+    <ClInclude Include="filters\DeinterlacerFilter.h">
+      <Filter>filters</Filter>
+    </ClInclude>
+    <ClInclude Include="filters\TextPassThruFilter.h">
+      <Filter>filters</Filter>
+    </ClInclude>
+    <ClInclude Include="controls\EditWithButton.h">
+      <Filter>controls</Filter>
+    </ClInclude>
+    <ClInclude Include="controls\FloatEdit.h">
+      <Filter>controls</Filter>
+    </ClInclude>
+    <ClInclude Include="controls\LineNumberEdit.h">
+      <Filter>controls</Filter>
+    </ClInclude>
+    <ClInclude Include="controls\StaticLink.h">
+      <Filter>controls</Filter>
+    </ClInclude>
+    <ClInclude Include="controls\StatusLabel.h">
+      <Filter>controls</Filter>
+    </ClInclude>
+    <ClInclude Include="controls\WinHotkeyCtrl.h">
+      <Filter>controls</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,7 +24,7 @@
 #include <afxwin.h>
 #include "PPageBase.h"
 #include "afxcmn.h"
-#include "FloatEdit.h"
+#include "controls/FloatEdit.h"
 
 enum {
 	SOURCE,

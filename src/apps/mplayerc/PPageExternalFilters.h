@@ -22,7 +22,7 @@
 #pragma once
 
 #include "PPageBase.h"
-#include "FloatEdit.h"
+#include "controls/FloatEdit.h"
 
 
 // CPPageExternalFilters dialog

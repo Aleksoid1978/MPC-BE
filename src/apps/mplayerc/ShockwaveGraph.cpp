@@ -20,8 +20,8 @@
  */
 
 #include "stdafx.h"
-#include "..\DSUtil\SysVersion.h"
-#include "..\DSUtil\GolombBuffer.h"
+#include "../DSUtil/SysVersion.h"
+#include "../DSUtil/GolombBuffer.h"
 #include <math.h>
 #include <zlib/zlib.h>
 #include <Audiopolicy.h>

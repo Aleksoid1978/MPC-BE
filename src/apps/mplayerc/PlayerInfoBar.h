@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "StatusLabel.h"
+#include "controls/StatusLabel.h"
 
 class CMainFrame;
 
