@@ -181,10 +181,10 @@ void CDSMMuxerFilter::MuxInit()
 void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
 {
 	CString muxer;
-	muxer.Format(_T("DSM Muxer (%S)"), __TIMESTAMP__);
+	muxer.Format(L"DSM Muxer (%S)", __TIMESTAMP__);
 
 	SetProperty(L"MUXR", CStringW(muxer));
-	SetProperty(L"DATE", CStringW(CTime::GetCurrentTime().FormatGmt(_T("%Y-%m-%d %H:%M:%S"))));
+	SetProperty(L"DATE", CStringW(CTime::GetCurrentTime().FormatGmt(L"%Y-%m-%d %H:%M:%S")));
 
 	MuxFileInfo(pBS);
 
@@ -367,7 +367,7 @@ void CDSMMuxerFilter::MuxFooter(IBitStream* pBS)
 	POSITION pos = m_isps.GetHeadPosition();
 	while (pos) {
 		IndexedSyncPoint& isp = m_isps.GetNext(pos);
-		TRACE(_T("sp[%d]: %I64d %I64x\n"), isp.id, isp.rt, isp.fp);
+		TRACE(L"sp[%d]: %I64d %I64x\n", isp.id, isp.rt, isp.fp);
 
 		rt = isp.rt - rtPrev;
 		rtPrev = isp.rt;

@@ -32,7 +32,7 @@
 //
 
 CBaseMuxerInputPin::CBaseMuxerInputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
-	: CBaseInputPin(NAME("CBaseMuxerInputPin"), pFilter, pLock, phr, pName)
+	: CBaseInputPin(L"CBaseMuxerInputPin", pFilter, pLock, phr, pName)
 	, m_rtMaxStart(INVALID_TIME)
 	, m_rtDuration(0)
 	, m_fEOS(false)
