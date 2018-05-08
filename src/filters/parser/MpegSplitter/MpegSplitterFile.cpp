@@ -1200,15 +1200,18 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 							&& (source->codec == stream_codec::AC3 || (source->codec == stream_codec::EAC3 && source->bEAC3Core))) {
 						Seek(start);
 						ac3hdr h;
-						if (Read(h, len, &s.mt) && h.frame_type == EAC3_FRAME_TYPE_DEPENDENT) {
-							source->codec = stream_codec::EAC3;
-							source->bEAC3Core = false;
-							source->mt.subtype = MEDIASUBTYPE_DOLBY_DDPLUS;
-
-							const WAVEFORMATEX* wfeEAC3 = (WAVEFORMATEX*)s.mt.pbFormat;
+						CMediaType mt;
+						if (Read(h, len, &mt) && h.frame_type == EAC3_FRAME_TYPE_DEPENDENT) {
+							const WAVEFORMATEX* wfeEAC3 = (WAVEFORMATEX*)mt.pbFormat;
 							WAVEFORMATEX* wfe = (WAVEFORMATEX*)source->mt.pbFormat;
-							wfe->nChannels += wfeEAC3->nChannels - 2;
-							wfe->nAvgBytesPerSec += wfeEAC3->nAvgBytesPerSec;
+							if (wfeEAC3->nSamplesPerSec == wfe->nSamplesPerSec && wfeEAC3->nChannels == 4) {
+								source->codec = stream_codec::EAC3;
+								source->bEAC3Core = false;
+								source->mt.subtype = MEDIASUBTYPE_DOLBY_DDPLUS;
+
+								wfe->nChannels += wfeEAC3->nChannels - 2;
+								wfe->nAvgBytesPerSec += wfeEAC3->nAvgBytesPerSec;
+							}
 						}
 					}
 				}
