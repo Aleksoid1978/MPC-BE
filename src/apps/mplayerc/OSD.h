@@ -26,7 +26,7 @@
 #include <mvrInterfaces.h>
 #include <HighDPI.h>
 #include "PngImage.h"
-#include "..\..\DSUtil\DSMPropertyBag.h"
+#include "../../DSUtil/DSMPropertyBag.h"
 
 #define WM_HIDE			(WM_USER + 1001)
 #define WM_OSD_DRAW		(WM_USER + 1002)

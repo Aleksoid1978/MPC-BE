@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "WinHotkeyCtrl.h"
+#include "controls/WinHotkeyCtrl.h"
 
 #define LVN_DOLABELEDIT (LVN_FIRST+1)
 

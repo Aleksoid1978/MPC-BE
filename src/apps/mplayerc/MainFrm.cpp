@@ -61,7 +61,8 @@
 
 #include "FGManager.h"
 #include "FGManagerBDA.h"
-#include "TextPassThruFilter.h"
+#include "filters/TextPassThruFilter.h"
+#include "filters/ChaptersSouce.h"
 #include "../../filters/filters.h"
 #include "../../filters/filters/InternalPropertyPage.h"
 #include <AllocatorCommon.h>
@@ -103,30 +104,6 @@ static UINT s_uTaskbarRestart		= RegisterWindowMessage(L"TaskbarCreated");
 static UINT s_uTBBC					= RegisterWindowMessage(L"TaskbarButtonCreated");
 static UINT WM_NOTIFYICON			= RegisterWindowMessage(L"MYWM_NOTIFYICON");
 static UINT s_uQueryCancelAutoPlay	= RegisterWindowMessage(L"QueryCancelAutoPlay");
-
-class __declspec(uuid("5933BB4F-EC4D-454E-8E11-B74DDA92E6F9")) ChaptersSouce : public CSource, public IDSMChapterBagImpl
-{
-	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
-
-public:
-	ChaptersSouce();
-	virtual ~ChaptersSouce() {}
-
-	DECLARE_IUNKNOWN;
-};
-
-ChaptersSouce::ChaptersSouce() : CSource(L"Chapters Source", nullptr, __uuidof(this))
-{
-}
-
-STDMETHODIMP ChaptersSouce::NonDelegatingQueryInterface(REFIID riid, void** ppv)
-{
-	CheckPointer(ppv, E_POINTER);
-
-	return
-		QI(IDSMChapterBag)
-		__super::NonDelegatingQueryInterface(riid, ppv);
-}
 
 class CSubClock : public CUnknown, public ISubClock
 {
@@ -1204,7 +1181,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 
 	cs.dwExStyle &= ~WS_EX_CLIENTEDGE;
 
-	cs.lpszClass = _T(MPC_WND_CLASS_NAME);
+	cs.lpszClass = MPC_WND_CLASS_NAMEW;
 
 	return TRUE;
 }
@@ -10051,7 +10028,7 @@ void CMainFrame::OnUpdateFavoritesDevice(CCmdUI* pCmdUI)
 
 void CMainFrame::OnHelpHomepage()
 {
-	ShellExecuteW(m_hWnd, L"open", _T(MPC_VERSION_COMMENTS), nullptr, nullptr, SW_SHOWDEFAULT);
+	ShellExecuteW(m_hWnd, L"open", _CRT_WIDE(MPC_VERSION_COMMENTS), nullptr, nullptr, SW_SHOWDEFAULT);
 }
 
 void CMainFrame::OnHelpCheckForUpdate()

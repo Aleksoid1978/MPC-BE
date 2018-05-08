@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,9 +21,7 @@
 #include "stdafx.h"
 #include "LcdSupport.h"
 
-#define LCD_APP_NAME _T(MPC_WND_CLASS_NAME)
 #define LCD_UPD_TIMER 40
-
 
 void LCD_UpdateThread(void* Control)
 {
@@ -555,7 +553,7 @@ CMPC_Lcd::CMPC_Lcd(void)
 	// lcd init
 	ZeroMemory(&m_ConnCtx, sizeof(m_ConnCtx));
 
-	m_ConnCtx.appFriendlyName = LCD_APP_NAME;
+	m_ConnCtx.appFriendlyName = MPC_WND_CLASS_NAMEW;
 	m_ConnCtx.dwAppletCapabilitiesSupported = LGLCD_APPLET_CAP_BW | LGLCD_APPLET_CAP_QVGA;
 	m_ConnCtx.isAutostartable = FALSE;
 	m_ConnCtx.isPersistent = FALSE;

@@ -46,6 +46,8 @@
 
 #ifndef ISPP_INVOKED
 
+#define MPC_WND_CLASS_NAMEW     _CRT_WIDE(MPC_WND_CLASS_NAME)
+
 #define MPC_COMP_NAME_STR       L"MPC-BE Team"
 #define MPC_COPYRIGHT_STR       L"Copyright © 2002-2018 all contributors, see Authors.txt"
 

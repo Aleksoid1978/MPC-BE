@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,31 +21,27 @@
 
 #pragma once
 
-// CStatusLabel
 
-class CStatusLabel : public CStatic
+class CTextPassThruInputPin;
+
+class __declspec(uuid("E2BA9B7B-B65D-4804-ACB2-89C3E55511DB"))
+	CTextPassThruFilter : public CBaseFilter, public CCritSec
 {
-	DECLARE_DYNAMIC(CStatusLabel)
+	friend class CTextPassThruInputPin;
+	friend class CTextPassThruOutputPin;
 
-private:
-	bool m_fRightAlign, m_fAddEllipses;
-	CFont m_font;
+	CTextPassThruInputPin* m_pInput;
+	CTextPassThruOutputPin* m_pOutput;
+
+	CMainFrame* m_pMainFrame;
 
 public:
-	CStatusLabel(bool fRightAlign, bool fAddEllipses);
-	virtual ~CStatusLabel();
+	CTextPassThruFilter(CMainFrame* pMainFrame);
+	virtual ~CTextPassThruFilter();
 
-	BOOL Create(LPCTSTR lpszText, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID = 0xffff);
+	DECLARE_IUNKNOWN;
+	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-	CFont& GetFont() {return m_font;}
-	void ScaleFont();
-
-	void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
-
-protected:
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
-
-	DECLARE_MESSAGE_MAP()
-
-	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	int GetPinCount();
+	CBasePin* GetPin(int n);
 };

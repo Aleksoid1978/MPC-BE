@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 #include <commdlg.h>
-#include "MainFrm.h"
+#include "../MainFrm.h"
 #include "TextPassThruFilter.h"
 #include <moreuuids.h>
 #include "../../Subtitles/SubtitleInputPin.h"

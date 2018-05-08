@@ -1,5 +1,5 @@
 /*
- * (C) 2017 see Authors.txt
+ * (C) 2017-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,7 @@
 #pragma once
 
 #include "PPageBase.h"
-#include "FloatEdit.h"
+#include "controls/FloatEdit.h"
 
 // CPPageSoundProcessing dialog
 

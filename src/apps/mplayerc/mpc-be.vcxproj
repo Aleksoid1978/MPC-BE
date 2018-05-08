@@ -92,8 +92,17 @@
     <ClCompile Include="ColorControl.cpp" />
     <ClCompile Include="ComPropertyPage.cpp" />
     <ClCompile Include="Content.cpp" />
+    <ClCompile Include="controls\EditWithButton.cpp" />
+    <ClCompile Include="controls\FloatEdit.cpp" />
+    <ClCompile Include="controls\LineNumberEdit.cpp" />
+    <ClCompile Include="controls\StaticLink.cpp" />
+    <ClCompile Include="controls\StatusLabel.cpp" />
+    <ClCompile Include="controls\WinHotkeyCtrl.cpp" />
     <ClCompile Include="CShockwaveFlash.cpp" />
     <ClCompile Include="DiskImage.cpp" />
+    <ClCompile Include="filters\ChaptersSouce.cpp" />
+    <ClCompile Include="filters\DeinterlacerFilter.cpp" />
+    <ClCompile Include="filters\TextPassThruFilter.cpp" />
     <ClCompile Include="ItemPropertiesDlg.cpp" />
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="OSD.cpp" />
@@ -104,9 +113,7 @@
     <ClCompile Include="PPageInterface.cpp" />
     <ClCompile Include="PPageSoundProcessing.cpp" />
     <ClCompile Include="PPageYouTube.cpp" />
-    <ClCompile Include="DeinterlacerFilter.cpp" />
     <ClCompile Include="DVBChannel.cpp" />
-    <ClCompile Include="EditWithButton.cpp" />
     <ClCompile Include="FakeFilterMapper2.cpp" />
     <ClCompile Include="FavoriteAddDlg.cpp" />
     <ClCompile Include="FavoriteOrganizeDlg.cpp" />
@@ -114,14 +121,12 @@
     <ClCompile Include="FGManager.cpp" />
     <ClCompile Include="FGManagerBDA.cpp" />
     <ClCompile Include="FileDropTarget.cpp" />
-    <ClCompile Include="FloatEdit.cpp" />
     <ClCompile Include="FullscreenWnd.cpp" />
     <ClCompile Include="GoToDlg.cpp" />
     <ClCompile Include="Ifo.cpp" />
     <ClCompile Include="ISDb.cpp" />
     <ClCompile Include="KeyProvider.cpp" />
     <ClCompile Include="LcdSupport.cpp" />
-    <ClCompile Include="LineNumberEdit.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="MediaFormats.cpp" />
     <ClCompile Include="MediaTypesDlg.cpp" />
@@ -182,20 +187,16 @@
     <ClCompile Include="ShaderEditorDlg.cpp" />
     <ClCompile Include="ShaderNewDlg.cpp" />
     <ClCompile Include="ShockwaveGraph.cpp" />
-    <ClCompile Include="StaticLink.cpp" />
-    <ClCompile Include="StatusLabel.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SubtitleDlDlg.cpp" />
-    <ClCompile Include="TextPassThruFilter.cpp" />
     <ClCompile Include="ThumbsTaskDlg.cpp" />
     <ClCompile Include="TunerScanDlg.cpp" />
     <ClCompile Include="UpdateChecker.cpp" />
     <ClCompile Include="vkCodes.cpp" />
     <ClCompile Include="WebClient.cpp" />
     <ClCompile Include="WebServer.cpp" />
-    <ClCompile Include="WinHotkeyCtrl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutDlg.h" />
@@ -206,9 +207,18 @@
     <ClInclude Include="ColorControl.h" />
     <ClInclude Include="ComPropertyPage.h" />
     <ClInclude Include="Content.h" />
+    <ClInclude Include="controls\EditWithButton.h" />
+    <ClInclude Include="controls\FloatEdit.h" />
+    <ClInclude Include="controls\LineNumberEdit.h" />
+    <ClInclude Include="controls\StaticLink.h" />
+    <ClInclude Include="controls\StatusLabel.h" />
+    <ClInclude Include="controls\WinHotkeyCtrl.h" />
     <ClInclude Include="CShockwaveFlash.h" />
     <ClInclude Include="DIB.h" />
     <ClInclude Include="DiskImage.h" />
+    <ClInclude Include="filters\ChaptersSouce.h" />
+    <ClInclude Include="filters\DeinterlacerFilter.h" />
+    <ClInclude Include="filters\TextPassThruFilter.h" />
     <ClInclude Include="ItemPropertiesDlg.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="OpenImage.h" />
@@ -220,9 +230,7 @@
     <ClInclude Include="PPageInterface.h" />
     <ClInclude Include="PPageSoundProcessing.h" />
     <ClInclude Include="PPageYouTube.h" />
-    <ClInclude Include="DeinterlacerFilter.h" />
     <ClInclude Include="DVBChannel.h" />
-    <ClInclude Include="EditWithButton.h" />
     <ClInclude Include="FakeFilterMapper2.h" />
     <ClInclude Include="FavoriteAddDlg.h" />
     <ClInclude Include="FavoriteOrganizeDlg.h" />
@@ -231,14 +239,12 @@
     <ClInclude Include="FGManagerBDA.h" />
     <ClInclude Include="FileDropTarget.h" />
     <ClInclude Include="FilterEnum.h" />
-    <ClInclude Include="FloatEdit.h" />
     <ClInclude Include="FullscreenWnd.h" />
     <ClInclude Include="GoToDlg.h" />
     <ClInclude Include="Ifo.h" />
     <ClInclude Include="ISDb.h" />
     <ClInclude Include="KeyProvider.h" />
     <ClInclude Include="LcdSupport.h" />
-    <ClInclude Include="LineNumberEdit.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MediaFormats.h" />
     <ClInclude Include="MediaTypesDlg.h" />
@@ -301,11 +307,8 @@
     <ClInclude Include="ShaderEditorDlg.h" />
     <ClInclude Include="ShaderNewDlg.h" />
     <ClInclude Include="ShockwaveGraph.h" />
-    <ClInclude Include="StaticLink.h" />
-    <ClInclude Include="StatusLabel.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SubtitleDlDlg.h" />
-    <ClInclude Include="TextPassThruFilter.h" />
     <ClInclude Include="ThumbsTaskDlg.h" />
     <ClInclude Include="TunerScanDlg.h" />
     <ClInclude Include="..\..\..\include\Version.h" />
@@ -313,7 +316,6 @@
     <ClInclude Include="vkCodes.h" />
     <ClInclude Include="WebClient.h" />
     <ClInclude Include="WebServer.h" />
-    <ClInclude Include="WinHotkeyCtrl.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\icon.ico">
