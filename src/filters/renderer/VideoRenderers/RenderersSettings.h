@@ -24,7 +24,7 @@
 #define WM_MYMOUSELAST WM_XBUTTONDBLCLK
 #define DXVA2VP 1
 #define DXVAHDVP 1
-#define MPCVR 1
+#define MPCVR 0
 
 #define RS_EVRBUFFERS_MIN	4
 #define RS_EVRBUFFERS_DEF	5
