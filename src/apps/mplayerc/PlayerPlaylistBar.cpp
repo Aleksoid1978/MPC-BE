@@ -992,7 +992,7 @@ void CPlayerPlaylistBar::ResolveLinkFiles(std::list<CString> &fns)
 			}
 
 		// Internet shortcut file.
-		} else if (extension == L".url") {
+		} else if (extension == L".url" || extension == L".website") {
 			CComPtr<IUniformResourceLocator> pUniformResourceLocator;
 			pUniformResourceLocator.CoCreateInstance(CLSID_InternetShortcut);
 			CComQIPtr<IPersistFile> pPersistFile = pUniformResourceLocator;
