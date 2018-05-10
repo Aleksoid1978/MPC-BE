@@ -41,7 +41,6 @@ CFilter::CFilter()
 	av_log_set_callback(nullptr);
 #endif
 
-	avfilter_register_all();
 	m_pFrame = av_frame_alloc();
 }
 

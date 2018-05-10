@@ -27,6 +27,9 @@ extern AVFilter ff_af_aresample;
 extern AVFilter ff_af_atempo;
 // extern AVFilter ff_af_lowpass;
 
+extern AVFilter ff_asrc_abuffer;
+extern AVFilter ff_asink_abuffer;
+
 #include "libavfilter/filter_list.c"
 
 
