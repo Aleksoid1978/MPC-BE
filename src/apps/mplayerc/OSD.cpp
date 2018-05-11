@@ -1005,7 +1005,7 @@ void COSD::DrawWnd()
 		r.bottom	+= rectText.Height();
 
 		mdc.SetTextColor(RGB(16, 24, 32));
-		mdc.DrawTextW(m_strMessage, &r, uFormat);
+		mdc.DrawText(m_strMessage, &r, uFormat);
 	}
 
 	r			= rcBar;
@@ -1014,7 +1014,7 @@ void COSD::DrawWnd()
 	r.bottom	+= rectText.Height();
 
 	mdc.SetTextColor(s.clrFontABGR);
-	mdc.DrawTextW(m_strMessage, &r, uFormat);
+	mdc.DrawText(m_strMessage, &r, uFormat);
 
 	/*
 	// GDI+ handling

@@ -65,6 +65,8 @@
 
 #define MAX_FIFO_SIZE 1024
 
+#undef DrawText // disable conflicting define
+
 enum {
 	shader_bspline_x,
 	shader_bspline_y,

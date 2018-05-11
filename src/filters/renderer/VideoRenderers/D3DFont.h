@@ -32,6 +32,7 @@
 #define D3DFONT_TWOSIDED    0x0004
 #define D3DFONT_FILTERED    0x0008
 
+#undef DrawText // disable conflicting define
 
 class CD3DFont
 {

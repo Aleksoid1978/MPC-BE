@@ -244,15 +244,15 @@ void CDirectVobSubFilter::PrintMessages(BYTE* pOut)
 	SetMapMode(m_hdc, MM_TEXT);
 
 	BITMAP bm;
-	GetObject(m_hbm, sizeof(BITMAP), &bm);
+	GetObjectW(m_hbm, sizeof(BITMAP), &bm);
 
 	CRect r(0, 0, bm.bmWidth, bm.bmHeight);
-	DrawText(m_hdc, msg, wcslen(msg), &r, DT_CALCRECT|DT_EXTERNALLEADING|DT_NOPREFIX|DT_WORDBREAK);
+	DrawTextW(m_hdc, msg, wcslen(msg), &r, DT_CALCRECT|DT_EXTERNALLEADING|DT_NOPREFIX|DT_WORDBREAK);
 
 	r += CPoint(10, 10);
 	r &= CRect(0, 0, bm.bmWidth, bm.bmHeight);
 
-	DrawText(m_hdc, msg, wcslen(msg), &r, DT_LEFT|DT_TOP|DT_NOPREFIX|DT_WORDBREAK);
+	DrawTextW(m_hdc, msg, wcslen(msg), &r, DT_LEFT|DT_TOP|DT_NOPREFIX|DT_WORDBREAK);
 
 	BYTE* pIn = (BYTE*)bm.bmBits;
 	int pitchIn = bm.bmWidthBytes;
