@@ -2151,7 +2151,7 @@ void CEVRAllocatorPresenter::RenderThread()
 								} else {
 									MinMargin = MIN_FRAME_TIME + std::min(LONGLONG(m_DetectedFrameTimeStdDev), 20000LL);
 								}
-								LONGLONG TimePerFrameMargin = std::clamp(TimePerFrame * 2 / 100, MinMargin, std::max(MinMargin, TimePerFrame * 11 / 100)); // (0.02..0.11)TimePerFrame
+								LONGLONG TimePerFrameMargin = std::max(TimePerFrame * 2 / 100, MinMargin);
 								LONGLONG TimePerFrameMargin0 = TimePerFrameMargin / 2;
 								LONGLONG TimePerFrameMargin1 = 0;
 
