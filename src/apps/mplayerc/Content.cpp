@@ -57,11 +57,7 @@ static const CString ConvertToUTF16(const BYTE* pData, size_t size)
 		return str;
 	}
 
-	CString str = AltUTF8To16(lpMultiByteStr);
-	if (str.IsEmpty()) {
-		str = ConvertToUTF16(lpMultiByteStr, CP_ACP);
-	}
-
+	CString str = MultiByteToUTF16(lpMultiByteStr);
 	return str;
 }
 
@@ -458,7 +454,7 @@ namespace Content {
 			if (::PathIsURLW(realPath)
 					&& url.CrackUrl(realPath)
 					&& (url.GetScheme() == ATL_URL_SCHEME_HTTP || url.GetScheme() == ATL_URL_SCHEME_HTTPS)) {
-				return Connect(realPath);
+				return Connect(fn);
 			}
 
 			return true;
