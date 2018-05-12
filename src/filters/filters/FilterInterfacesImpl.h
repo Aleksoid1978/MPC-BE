@@ -1,5 +1,5 @@
 /*
- * (C) 2017 see Authors.txt
+ * (C) 2017-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <Windows.h>
 #include <FilterInterfaces.h>
 
 class CExFilterInfoImpl : public IExFilterInfo

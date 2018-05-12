@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <Windows.h>
-
 namespace DXVAState {
 	void ClearState();
 	void SetActiveState(const GUID& guidDXVADecoder, LPCWSTR customDescription = nullptr);
