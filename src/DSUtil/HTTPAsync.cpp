@@ -84,10 +84,10 @@ CString CHTTPAsync::QueryInfoStr(DWORD dwInfoLevel) const
 
 	CString queryInfo;
 	DWORD   dwLen = 0;
-	if (!HttpQueryInfo(m_hRequest, dwInfoLevel, nullptr, &dwLen, 0) && dwLen) {
+	if (!HttpQueryInfoW(m_hRequest, dwInfoLevel, nullptr, &dwLen, 0) && dwLen) {
 		const DWORD dwError = GetLastError();
 		if (dwError == ERROR_INSUFFICIENT_BUFFER
-				&& HttpQueryInfo(m_hRequest, dwInfoLevel, (LPVOID)queryInfo.GetBuffer(dwLen), &dwLen, 0)) {
+				&& HttpQueryInfoW(m_hRequest, dwInfoLevel, (LPVOID)queryInfo.GetBuffer(dwLen), &dwLen, 0)) {
 			queryInfo.ReleaseBuffer(dwLen);
 		}
 	}
@@ -101,7 +101,7 @@ DWORD CHTTPAsync::QueryInfoDword(DWORD dwInfoLevel) const
 
 	DWORD dwStatusCode = 0;
 	DWORD dwStatusLen  = sizeof(dwStatusCode);
-	HttpQueryInfo(m_hRequest, HTTP_QUERY_FLAG_NUMBER | dwInfoLevel, &dwStatusCode, &dwStatusLen, 0);
+	HttpQueryInfoW(m_hRequest, HTTP_QUERY_FLAG_NUMBER | dwInfoLevel, &dwStatusCode, &dwStatusLen, 0);
 
 	return dwStatusCode;
 }
@@ -133,9 +133,9 @@ static CString FormatErrorMessage(DWORD dwError)
 	CString errMsg;
 
 	LPVOID lpMsgBuf = nullptr;
-	if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS |
+	if (FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS |
 					  FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_FROM_HMODULE,
-					  GetModuleHandle(L"wininet"), dwError,
+					  GetModuleHandleW(L"wininet"), dwError,
 					  MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
 					  (LPTSTR)&lpMsgBuf, 0, nullptr) > 0) {
 		errMsg = (LPTSTR)lpMsgBuf;
@@ -146,10 +146,10 @@ static CString FormatErrorMessage(DWORD dwError)
 	if (dwError == ERROR_INTERNET_EXTENDED_ERROR) {
 		CString internetInfo;
 		DWORD   dwLen = 0;
-		if (!InternetGetLastResponseInfo(&dwError, nullptr, &dwLen) && dwLen) {
+		if (!InternetGetLastResponseInfoW(&dwError, nullptr, &dwLen) && dwLen) {
 			const DWORD dwLastError = GetLastError();
 			if (dwLastError == ERROR_INSUFFICIENT_BUFFER
-					&& InternetGetLastResponseInfo(&dwError, internetInfo.GetBuffer(dwLen), &dwLen)) {
+					&& InternetGetLastResponseInfoW(&dwError, internetInfo.GetBuffer(dwLen), &dwLen)) {
 				internetInfo.ReleaseBuffer(dwLen);
 				if (!internetInfo.IsEmpty()) {
 					errMsg += L", " + internetInfo;
@@ -179,7 +179,7 @@ void CHTTPAsync::Close()
 	ResetEvent(m_hRequestCompleteEvent);
 
 	if (m_hInstance) {
-		InternetSetStatusCallback(m_hInstance, nullptr);
+		InternetSetStatusCallbackW(m_hInstance, nullptr);
 	}
 
 	SAFE_INTERNET_CLOSE_HANDLE(m_hRequest);
@@ -226,20 +226,20 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 	m_nPort   = m_url.GetPortNumber();
 	m_nScheme = m_url.GetScheme();
 
-	m_hInstance = InternetOpen(lpszAgent,
+	m_hInstance = InternetOpenW(lpszAgent,
 							   INTERNET_OPEN_TYPE_PRECONFIG,
 							   nullptr,
 							   nullptr,
 							   INTERNET_FLAG_ASYNC);
 	CheckPointer(m_hInstance, E_FAIL);
 
-	if (InternetSetStatusCallback(m_hInstance, (INTERNET_STATUS_CALLBACK)&Callback) == INTERNET_INVALID_STATUS_CALLBACK) {
+	if (InternetSetStatusCallbackW(m_hInstance, (INTERNET_STATUS_CALLBACK)&Callback) == INTERNET_INVALID_STATUS_CALLBACK) {
 		return E_FAIL;
 	}
 
 	m_context = Context::CONTEXT_CONNECT;
 
-	m_hConnect = InternetConnect(m_hInstance,
+	m_hConnect = InternetConnectW(m_hInstance,
 								 m_host,
 								 m_nPort,
 								 m_url.GetUserNameW(),
@@ -248,7 +248,7 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 								 INTERNET_FLAG_KEEP_CONNECTION | INTERNET_FLAG_NO_CACHE_WRITE,
 								 (DWORD_PTR)this);
 	if (m_hConnect == nullptr) {
-		CheckLastError(L"InternetConnect()", E_FAIL);
+		CheckLastError(L"InternetConnectW()", E_FAIL);
 
 		if (WaitForSingleObject(m_hConnectedEvent, dwTimeOut) == WAIT_TIMEOUT) {
 			return E_FAIL;
@@ -300,7 +300,7 @@ HRESULT CHTTPAsync::SendRequest(LPCWSTR lpszCustomHeader/* = L""*/, DWORD dwTime
 		dwFlags |= (INTERNET_FLAG_SECURE | INTERNET_FLAG_IGNORE_CERT_CN_INVALID | INTERNET_FLAG_IGNORE_CERT_DATE_INVALID);
 	}
 
-	m_hRequest = HttpOpenRequest(m_hConnect,
+	m_hRequest = HttpOpenRequestW(m_hConnect,
 								 L"GET",
 								 m_path,
 								 nullptr,
@@ -309,10 +309,10 @@ HRESULT CHTTPAsync::SendRequest(LPCWSTR lpszCustomHeader/* = L""*/, DWORD dwTime
 								 dwFlags,
 								 (DWORD_PTR)this);
 	if (m_hRequest == nullptr) {
-		CheckLastError(L"HttpOpenRequest()", E_FAIL);
+		CheckLastError(L"HttpOpenRequestW()", E_FAIL);
 
 		if (WaitForSingleObject(m_hRequestOpenedEvent, dwTimeOut) == WAIT_TIMEOUT) {
-			DLog(L"CHTTPAsync::SendRequest() : HttpOpenRequest() - %u ms time out reached, exit", dwTimeOut);
+			DLog(L"CHTTPAsync::SendRequest() : HttpOpenRequestW() - %u ms time out reached, exit", dwTimeOut);
 			m_bRequestComplete = FALSE;
 			return E_FAIL;
 		}
@@ -323,15 +323,15 @@ HRESULT CHTTPAsync::SendRequest(LPCWSTR lpszCustomHeader/* = L""*/, DWORD dwTime
 	CString lpszHeaders = L"Accept: */*\r\n";
 	lpszHeaders += lpszCustomHeader;
 	for (;;) {
-		if (!HttpSendRequest(m_hRequest,
+		if (!HttpSendRequestW(m_hRequest,
 							 lpszHeaders,
 							 lpszHeaders.GetLength(),
 							 nullptr,
 							 0)) {
-			CheckLastError(L"HttpSendRequest()", E_FAIL);
+			CheckLastError(L"HttpSendRequestW()", E_FAIL);
 
 			if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
-				DLog(L"CHTTPAsync::SendRequest() : HttpSendRequest() - %u ms time out reached, exit", dwTimeOut);
+				DLog(L"CHTTPAsync::SendRequest() : HttpSendRequestW() - %u ms time out reached, exit", dwTimeOut);
 				m_bRequestComplete = FALSE;
 				return S_FALSE;
 			}
@@ -377,14 +377,14 @@ HRESULT CHTTPAsync::Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, 
 
 	m_context = Context::CONTEXT_REQUEST;
 
-	if (!InternetReadFileEx(m_hRequest,
+	if (!InternetReadFileExW(m_hRequest,
 							&InetBuff,
 							IRF_ASYNC,
 							(DWORD_PTR)this)) {
-		CheckLastError(L"InternetReadFileEx()", E_FAIL);
+		CheckLastError(L"InternetReadFileExW()", E_FAIL);
 
 		if (WaitForSingleObject(m_hRequestCompleteEvent, dwTimeOut) == WAIT_TIMEOUT) {
-			DLog(L"CHTTPAsync::Read() : InternetReadFileEx() - %u ms time out reached, exit", dwTimeOut);
+			DLog(L"CHTTPAsync::Read() : InternetReadFileExW() - %u ms time out reached, exit", dwTimeOut);
 			m_bRequestComplete = FALSE;
 			return S_FALSE;
 		}

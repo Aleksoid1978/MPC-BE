@@ -103,7 +103,7 @@ CString GetLastErrorMsg(LPTSTR lpszFunction, DWORD dw/* = GetLastError()*/)
 	LPVOID lpMsgBuf;
 	LPVOID lpDisplayBuf;
 
-	FormatMessage(
+	FormatMessageW(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_FROM_SYSTEM |
 		FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -117,8 +117,8 @@ CString GetLastErrorMsg(LPTSTR lpszFunction, DWORD dw/* = GetLastError()*/)
 	// Format the error message
 
 	lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
-		(lstrlen((LPCWSTR)lpMsgBuf) + lstrlen((LPCWSTR)lpszFunction) + 40) * sizeof(WCHAR));
-	StringCchPrintf((LPWSTR)lpDisplayBuf,
+		(lstrlenW((LPCWSTR)lpMsgBuf) + lstrlen((LPCWSTR)lpszFunction) + 40) * sizeof(WCHAR));
+	StringCchPrintfW((LPWSTR)lpDisplayBuf,
 		LocalSize(lpDisplayBuf) / sizeof(WCHAR),
 		L"Function '%s' failed with error %d: %s",
 		lpszFunction, dw, lpMsgBuf);
@@ -165,7 +165,7 @@ HICON LoadIcon(CString fn, bool fSmall)
 	}
 
 	WCHAR buff[MAX_PATH];
-	lstrcpy(buff, fn.GetBuffer());
+	lstrcpyW(buff, fn.GetBuffer());
 
 	SHFILEINFO sfi;
 	ZeroMemory(&sfi, sizeof(sfi));
@@ -232,8 +232,8 @@ HICON LoadIcon(CString fn, bool fSmall)
 
 		hIcon = nullptr;
 		UINT cnt = fSmall
-				   ? ExtractIconEx(icon, id, nullptr, &hIcon, 1)
-				   : ExtractIconEx(icon, id, &hIcon, nullptr, 1);
+				   ? ExtractIconExW(icon, id, nullptr, &hIcon, 1)
+				   : ExtractIconExW(icon, id, &hIcon, nullptr, 1);
 		UNREFERENCED_PARAMETER(cnt);
 		if (hIcon) {
 			return hIcon;

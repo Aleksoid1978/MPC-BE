@@ -84,7 +84,7 @@ BOOL CWinHotkeyCtrl::InstallKbHook()
 
 	sm_pwhcFocus = this;
 
-	sm_hhookKb = ::SetWindowsHookExW(WH_KEYBOARD_LL, (HOOKPROC)LowLevelKeyboardProc, GetModuleHandle(nullptr), 0);
+	sm_hhookKb = ::SetWindowsHookExW(WH_KEYBOARD_LL, (HOOKPROC)LowLevelKeyboardProc, GetModuleHandleW(nullptr), 0);
 
 	return(sm_hhookKb != nullptr);
 }

@@ -243,7 +243,7 @@ namespace Youtube
 		if (hInet && !videoId.IsEmpty()) {
 			CString link;
 			link.Format(L"https://www.googleapis.com/youtube/v3/videos?id=%s&key=%s&part=snippet,contentDetails&fields=items/snippet/title,items/snippet/publishedAt,items/snippet/channelTitle,items/snippet/description,items/contentDetails/duration", videoId, GOOGLE_API_KEY);
-			HINTERNET hUrl = InternetOpenUrl(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
+			HINTERNET hUrl = InternetOpenUrlW(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 			if (hUrl) {
 				char* data = nullptr;
 				DWORD dataSize = 0;
@@ -335,7 +335,7 @@ namespace Youtube
 			CString videoId;
 
 			HINTERNET hUrl;
-			HINTERNET hInet = InternetOpen(L"Googlebot", 0, nullptr, nullptr, 0);
+			HINTERNET hInet = InternetOpenW(L"Googlebot", 0, nullptr, nullptr, 0);
 			if (hInet) {
 				HandleURL(url);
 
@@ -376,7 +376,7 @@ namespace Youtube
 					}
 				}
 
-				hUrl = InternetOpenUrl(hInet, url, nullptr, 0, INTERNET_OPEN_FALGS, 0);
+				hUrl = InternetOpenUrlW(hInet, url, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 				if (hUrl) {
 					InternetReadData(hUrl, &data, dataSize, nullptr);
 					InternetCloseHandle(hUrl);
@@ -415,7 +415,7 @@ namespace Youtube
 				free(data); data = nullptr; dataSize = 0;
 
 				CString link; link.Format(L"https://www.youtube.com/embed/%s", videoId);
-				hUrl = InternetOpenUrl(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
+				hUrl = InternetOpenUrlW(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 				if (hUrl) {
 					InternetReadData(hUrl, &data, dataSize, nullptr);
 					InternetCloseHandle(hUrl);
@@ -436,7 +436,7 @@ namespace Youtube
 				}
 
 				link.Format(L"https://www.youtube.com/get_video_info?video_id=%s&eurl=https://youtube.googleapis.com/v/%s&sts=%S", videoId, videoId, sts);
-				hUrl = InternetOpenUrl(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
+				hUrl = InternetOpenUrlW(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 				if (hUrl) {
 					InternetReadData(hUrl, &data, dataSize, nullptr);
 					InternetCloseHandle(hUrl);
@@ -469,7 +469,7 @@ namespace Youtube
 					url = UrlDecode(UrlDecode(hlspv_url));
 					url.Replace(L"\\/", L"/");
 					DLog(L"Youtube::Parse_URL() : Downloading m3u8 information \"%s\"", url);
-					hUrl = InternetOpenUrl(hInet, url, nullptr, 0, INTERNET_OPEN_FALGS, 0);
+					hUrl = InternetOpenUrlW(hInet, url, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 					if (hUrl) {
 						char* m3u8 = nullptr;
 						DWORD m3u8Size = 0;
@@ -562,7 +562,7 @@ namespace Youtube
 				if (!signature.IsEmpty() && !JSUrl.IsEmpty()) {
 					if (!bJSParsed) {
 						bJSParsed = TRUE;
-						hUrl = InternetOpenUrl(hInet, JSUrl, nullptr, 0, INTERNET_OPEN_FALGS, 0);
+						hUrl = InternetOpenUrlW(hInet, JSUrl, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 						if (hUrl) {
 							char* data = nullptr;
 							DWORD dataSize = 0;
@@ -711,7 +711,7 @@ namespace Youtube
 					}
 
 					DLog(L"Youtube::Parse_URL() : Downloading MPD manifest \"%s\"", dashmpdUrl);
-					hUrl = InternetOpenUrl(hInet, dashmpdUrl, nullptr, 0, INTERNET_OPEN_FALGS, 0);
+					hUrl = InternetOpenUrlW(hInet, dashmpdUrl, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 					if (hUrl) {
 						char* dashmpd = nullptr;
 						DWORD dashmpdSize = 0;
@@ -961,7 +961,7 @@ namespace Youtube
 					// This code is deprecated
 					CString link;
 					link.Format(L"https://video.google.com/timedtext?hl=en&type=list&v=%s", videoId);
-					hUrl = InternetOpenUrl(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
+					hUrl = InternetOpenUrlW(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 					if (hUrl) {
 						char* data = nullptr;
 						DWORD dataSize = 0;
@@ -1035,10 +1035,10 @@ namespace Youtube
 			DWORD dataSize = 0;
 
 			HINTERNET hUrl;
-			HINTERNET hInet = InternetOpen(L"Googlebot", 0, nullptr, nullptr, 0);
+			HINTERNET hInet = InternetOpenW(L"Googlebot", 0, nullptr, nullptr, 0);
 			if (hInet) {
 				HandleURL(url);
-				hUrl = InternetOpenUrl(hInet, url, nullptr, 0, INTERNET_OPEN_FALGS, 0);
+				hUrl = InternetOpenUrlW(hInet, url, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 				if (hUrl) {
 					InternetReadData(hUrl, &data, dataSize, "id=\"footer\"");
 					InternetCloseHandle(hUrl);
@@ -1122,7 +1122,7 @@ namespace Youtube
 	{
 		bool bRet = false;
 		if (CheckURL(url)) {
-			HINTERNET hInet = InternetOpen(L"Googlebot", 0, nullptr, nullptr, 0);
+			HINTERNET hInet = InternetOpenW(L"Googlebot", 0, nullptr, nullptr, 0);
 			if (hInet) {
 				HandleURL(url);
 

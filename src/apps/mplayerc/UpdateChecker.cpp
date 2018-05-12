@@ -62,9 +62,9 @@ Update_Status UpdateChecker::CheckNewVersion()
 	CStringA updateinfo;
 
 	HINTERNET hUrl;
-	HINTERNET hInet = InternetOpen(L"MPC-BE", 0, nullptr, nullptr, 0);
+	HINTERNET hInet = InternetOpenW(L"MPC-BE", 0, nullptr, nullptr, 0);
 	if (hInet) {
-		hUrl = InternetOpenUrl(hInet, L"http://mpc-be.org/version.txt", nullptr, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
+		hUrl = InternetOpenUrlW(hInet, L"http://mpc-be.org/version.txt", nullptr, 0, INTERNET_FLAG_TRANSFER_BINARY | INTERNET_FLAG_EXISTING_CONNECT | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_RELOAD, 0);
 		if (hUrl) {
 			char buffer[1024] = { 0 }; // limit update file to 1024 bytes
 			DWORD dwBytesRead = 0;
