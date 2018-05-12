@@ -4059,7 +4059,7 @@ HRESULT CGenlock::GetTiming()
 	// The display update frequency is controlled by adding and subtracting pixels form the
 	// image. This is done by either subtracting columns or rows or both. Some displays like
 	// row adjustments and some column adjustments. One should probably not do both.
-	StringCchPrintf(faster, MAX_LOADSTRING, L"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\0",
+	StringCchPrintfW(faster, MAX_LOADSTRING, L"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\0",
 					displayTiming[0],
 					displayTiming[HFRONTPORCH] - columnDelta,
 					displayTiming[2],
@@ -4073,7 +4073,7 @@ HRESULT CGenlock::GetTiming()
 				   );
 
 	// Nominal update frequency
-	StringCchPrintf(cruise, MAX_LOADSTRING, L"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\0",
+	StringCchPrintfW(cruise, MAX_LOADSTRING, L"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\0",
 					displayTiming[0],
 					displayTiming[HFRONTPORCH],
 					displayTiming[2],
@@ -4087,7 +4087,7 @@ HRESULT CGenlock::GetTiming()
 				   );
 
 	// Lower than nominal update frequency
-	StringCchPrintf(slower, MAX_LOADSTRING, L"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\0",
+	StringCchPrintfW(slower, MAX_LOADSTRING, L"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\0",
 					displayTiming[0],
 					displayTiming[HFRONTPORCH] + columnDelta,
 					displayTiming[2],
