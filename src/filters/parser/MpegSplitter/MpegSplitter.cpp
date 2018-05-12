@@ -1546,7 +1546,7 @@ bool CMpegSplitterFilter::DemuxLoop()
 
 	for (auto& pPacket : pPackets) {
 		auto& p = pPacket.second;
-		if (p->bSyncPoint && GetOutputPin(p->TrackNumber)) {
+		if (p && p->bSyncPoint && GetOutputPin(p->TrackNumber)) {
 			DeliverPacket(p);
 		}
 	}
