@@ -1783,3 +1783,5 @@ MPC_GUID_ENTRY(CLSID_MorganSwitcher,
 // {482d10b6-376e-4411-8a17-833800A065DB}" XEB Navigation Filter (RatDVD)
 MPC_GUID_ENTRY(CLSID_RatDVDNavigator,
 			0x482d10b6, 0x376e, 0x4411, 0x8a, 0x17, 0x83, 0x38, 0x00, 0xA0, 0x65, 0xDB)
+
+#undef MPC_GUID_ENTRY

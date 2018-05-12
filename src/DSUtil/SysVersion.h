@@ -1,5 +1,5 @@
 /*
- * (C) 2013-2017 see Authors.txt
+ * (C) 2013-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,7 +21,6 @@
 #pragma once
 
 #include <VersionHelpers.h>
-#include <Windows.h>
 
 #ifndef _WIN32_WINNT_WINTHRESHOLD
 #define _WIN32_WINNT_WINTHRESHOLD 0x0A00

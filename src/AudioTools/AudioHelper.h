@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -137,3 +137,5 @@ inline void convert_float_to_int24(BYTE* pOut, float* pIn, size_t allsamples)
     }
 }
 */
+
+#undef SAMPLECONVERTFUNCT
