@@ -377,7 +377,7 @@ namespace Content {
 		CString realPath(fn);
 		CorrectAceStream(realPath);
 
-		if (::PathIsURL(realPath) && url.CrackUrl(realPath)) {
+		if (::PathIsURLW(realPath) && url.CrackUrl(realPath)) {
 			CString schemeName = url.GetSchemeName();
 			schemeName.MakeLower();
 			if (schemeName == L"pnm") {
@@ -455,7 +455,7 @@ namespace Content {
 			CorrectAceStream(realPath);
 
 			CUrl url;
-			if (::PathIsURL(realPath)
+			if (::PathIsURLW(realPath)
 					&& url.CrackUrl(realPath)
 					&& (url.GetScheme() == ATL_URL_SCHEME_HTTP || url.GetScheme() == ATL_URL_SCHEME_HTTPS)) {
 				return Connect(realPath);
