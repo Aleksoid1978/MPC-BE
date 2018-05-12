@@ -787,6 +787,7 @@ static const struct StreamType {
 	{ AUDIO_STREAM_AC3,						AC3_AUDIO	},
 	{ AUDIO_STREAM_AC3_PLUS,				AC3_AUDIO	},
 	{ AUDIO_STREAM_AC3_TRUE_HD,				AC3_AUDIO	},
+	{ AUDIO_STREAM_EAC3,					AC3_AUDIO	},
 	{ SECONDARY_AUDIO_AC3_PLUS,				AC3_AUDIO	},
 	{ PES_PRIVATE,							AC3_AUDIO	},
 	// DTS Audio
@@ -1194,7 +1195,7 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 							delete [] buf;
 						}
 					}
-				} else if (pes_stream_type ==  AUDIO_STREAM_AC3 || pes_stream_type == AUDIO_STREAM_AC3_PLUS || pes_stream_type == SECONDARY_AUDIO_AC3_PLUS) {
+				} else if (pes_stream_type ==  AUDIO_STREAM_AC3 || pes_stream_type == AUDIO_STREAM_AC3_PLUS || pes_stream_type == AUDIO_STREAM_EAC3 || pes_stream_type == SECONDARY_AUDIO_AC3_PLUS) {
 					stream* source = (stream*)m_streams[stream_type::audio].GetStream(s);
 					if (source && source->mt.pbFormat
 							&& (source->codec == stream_codec::AC3 || (source->codec == stream_codec::EAC3 && source->bEAC3Core))) {
