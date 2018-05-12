@@ -56,7 +56,7 @@ STDMETHODIMP CAsyncFileReader::NonDelegatingQueryInterface(REFIID riid, void** p
 
 BOOL CAsyncFileReader::Open(LPCTSTR lpszFileName)
 {
-	if (::PathIsURL(lpszFileName)) {
+	if (::PathIsURLW(lpszFileName)) {
 		CUrl url;
 		if (m_bSupportURL
 				&& url.CrackUrl(lpszFileName)

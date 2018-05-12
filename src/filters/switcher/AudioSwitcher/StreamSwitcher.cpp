@@ -633,7 +633,7 @@ HRESULT CStreamSwitcherInputPin::CompleteConnect(IPin* pReceivePin)
 				fileName = pszName;
 				CoTaskMemFree(pszName);
 
-				if (::PathIsURL(fileName)) {
+				if (::PathIsURLW(fileName)) {
 					pinName = GetPinName(pPin);
 					fileName = !trackName.IsEmpty() ? trackName : !pinName.IsEmpty() ? pinName : L"Audio";
 				} else {

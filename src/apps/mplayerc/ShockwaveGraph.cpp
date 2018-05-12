@@ -93,7 +93,7 @@ STDMETHODIMP CShockwaveGraph::RenderFile(LPCWSTR lpcwstrFile, LPCWSTR lpcwstrPla
 		return E_FAIL;
 	}
 
-	if (!::PathIsURL(lpcwstrFile)) {
+	if (!::PathIsURLW(lpcwstrFile)) {
 		// handle only local files
 		HANDLE m_hFile = CreateFileW(lpcwstrFile, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
 												 OPEN_EXISTING, FILE_ATTRIBUTE_READONLY | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);

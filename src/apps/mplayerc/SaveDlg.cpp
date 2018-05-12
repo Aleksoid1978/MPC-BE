@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -142,7 +142,7 @@ HRESULT CSaveDlg::InitFileCopy()
 	const CString fn = m_in;
 	CComPtr<IFileSourceFilter> pReader;
 
-	if (::PathIsURL(fn)) {
+	if (::PathIsURLW(fn)) {
 		CUrl url;
 		url.CrackUrl(fn);
 		CString protocol = url.GetSchemeName();

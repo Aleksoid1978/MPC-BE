@@ -2361,7 +2361,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 						CString strOSD;
 						if (!m_youtubeFields.title.IsEmpty()) {
 							strOSD = m_youtubeFields.title;
-						} else if (::PathIsURL(GetCurFileName())) {
+						} else if (::PathIsURLW(GetCurFileName())) {
 							CPlaylistItem pli;
 							if (m_wndPlaylistBar.GetCur(pli) && !pli.m_label.IsEmpty()) {
 								strOSD = pli.m_label;
@@ -4379,7 +4379,7 @@ void CMainFrame::OnFilePostCloseMedia()
 	}
 	m_bNeedUnmountImage = TRUE;
 
-	SetCurrentDirectory(GetProgramDir()); // It is necessary to unlock the folder after opening files from explorer.
+	SetCurrentDirectoryW(GetProgramDir()); // It is necessary to unlock the folder after opening files from explorer.
 
 	SetThreadExecutionState(ES_CONTINUOUS);
 
@@ -5501,7 +5501,7 @@ void CMainFrame::OnFileSaveAs()
 		out = GetAltFileName();
 		ext = GetFileExt(out).MakeLower();
 	} else {
-		if (!::PathIsURL(out)) {
+		if (!::PathIsURLW(out)) {
 			ext = GetFileExt(out).MakeLower();
 			out = GetFileOnly(out);
 			if (ext == L".cda") {
@@ -7503,7 +7503,7 @@ void CMainFrame::OnPlayPlay()
 
 		if (!m_youtubeFields.title.IsEmpty()) {
 			strOSD = m_youtubeFields.title;
-		} else if (::PathIsURL(GetCurFileName())) {
+		} else if (::PathIsURLW(GetCurFileName())) {
 			CPlaylistItem pli;
 			if (m_wndPlaylistBar.GetCur(pli) && !pli.m_label.IsEmpty()) {
 				strOSD = pli.m_label;
@@ -11692,8 +11692,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		if (SUCCEEDED(hr)) {
 			WCHAR path[MAX_PATH] = { 0 };
 			BOOL bIsDirSet       = FALSE;
-			if (!::PathIsURL(fn) && ::GetCurrentDirectory(MAX_PATH, path)) {
-				bIsDirSet = ::SetCurrentDirectory(GetFolderOnly(fn));
+			if (!::PathIsURLW(fn) && ::GetCurrentDirectoryW(MAX_PATH, path)) {
+				bIsDirSet = ::SetCurrentDirectoryW(GetFolderOnly(fn));
 			}
 
 			if (bFirst) {
@@ -11703,7 +11703,7 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			}
 
 			if (bIsDirSet) {
-				::SetCurrentDirectory(path);
+				::SetCurrentDirectoryW(path);
 			}
 		}
 
@@ -13310,7 +13310,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	if (pFileData) {
 		UINT index = 0;
 		for (auto& fi : pFileData->fns) {
-			if (::PathIsURL(fi) && fi.GetName().Find(L"://") <= 0) {
+			if (::PathIsURLW(fi) && fi.GetName().Find(L"://") <= 0) {
 				fi = L"http://" + fi.GetName();
 			}
 
@@ -15488,7 +15488,7 @@ bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 			s.fEnableSubtitles = true;
 		}
 
-		if (subChangeNotifyThread.joinable() && !::PathIsURL(fname)) {
+		if (subChangeNotifyThread.joinable() && !::PathIsURLW(fname)) {
 			BOOL bExists = FALSE;
 			for (INT_PTR idx = 0; idx < m_ExtSubFiles.GetCount(); idx++) {
 				if (fname == m_ExtSubFiles[idx]) {
