@@ -1026,10 +1026,11 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					if (ReadFirtsBlock(pData, pTE)) {
 						audioframe_t aframe;
 						int size = ParseEAC3Header(pData.data(), &aframe);
-						if (!size) {
+						if (!size || aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT) {
 							size = ParseAC3Header(pData.data(), &aframe);
 						}
 						if (size) {
+							wfe->nChannels = aframe.channels;
 							wfe->nAvgBytesPerSec = size * aframe.samplerate / aframe.samples;
 							if (size + 8 <= (int)pData.size()) {
 								int size2 = ParseEAC3Header(pData.data() + size, &aframe);
