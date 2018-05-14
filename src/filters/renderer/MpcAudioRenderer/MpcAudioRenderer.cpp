@@ -1489,7 +1489,7 @@ HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 	{
 		CAutoLock cQueueLock(&m_csQueue);
 		if (p && !m_rtNextSampleTime && !m_WasapiQueue.GetCount()
-				&& p->rtStart > 0 && p->rtStart <= 10 * UNITS) {
+				&& p->rtStart > 0 && p->rtStart <= 60 * UNITS) {
 			const UINT32 nSilenceFrames = TimeToSamples(p->rtStart, m_pWaveFormatExOutput);
 			const UINT32 nSilenceBytes  = nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign;
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL
