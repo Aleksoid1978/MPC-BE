@@ -37,7 +37,7 @@
 // option names
 #define OPT_REGKEY_AudRend          L"Software\\MPC-BE Filters\\MPC Audio Renderer"
 #define OPT_SECTION_AudRend         L"Filters\\MPC Audio Renderer"
-#define OPT_DeviceMode              L"UseWasapi"
+#define OPT_DeviceMode              L"DeviceMode"
 #define OPT_AudioDeviceId           L"SoundDeviceId"
 #define OPT_UseBitExactOutput       L"UseBitExactOutput"
 #define OPT_UseSystemLayoutChannels L"UseSystemLayoutChannels"
@@ -110,8 +110,8 @@ static void DumpWaveFormatEx(const WAVEFORMATEX* pwfx)
 #define SamplesToTime(samples, wfex) (FractionScale64(samples, UNITS, wfex->nSamplesPerSec))
 #define TimeToSamples(time, wfex)    (FractionScale64(time, wfex->nSamplesPerSec, UNITS))
 
-#define IsExclusive(wfex)            (m_WASAPIMode == MODE_WASAPI_EXCLUSIVE || IsBitstream(wfex))
-#define IsExclusiveMode()            (m_WASAPIMode == MODE_WASAPI_EXCLUSIVE || m_bIsBitstream)
+#define IsExclusive(wfex)            (m_DeviceMode == MODE_WASAPI_EXCLUSIVE || IsBitstream(wfex))
+#define IsExclusiveMode()            (m_DeviceMode == MODE_WASAPI_EXCLUSIVE || m_bIsBitstream)
 
 CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	: CBaseRenderer(__uuidof(this), L"CMpcAudioRenderer", punk, phr)
@@ -123,7 +123,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_pAudioClient(nullptr)
 	, m_pRenderClient(nullptr)
 	, m_pAudioClock(nullptr)
-	, m_WASAPIMode(MODE_WASAPI_EXCLUSIVE)
+	, m_DeviceMode(MODE_WASAPI_SHARED)
 	, m_nFramesInBuffer(0)
 	, m_nMaxWasapiQueueSize(0)
 	, m_hnsPeriod(0)
@@ -178,7 +178,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_AudRend, KEY_READ)) {
 		DWORD dw;
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DeviceMode, dw)) {
-			m_WASAPIMode = (WASAPI_MODE)dw;
+			m_DeviceMode = (DEVICE_MODE)dw;
 		}
 		len = _countof(buff);
 		memset(buff, 0, sizeof(buff));
@@ -199,7 +199,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		}
 	}
 #else
-	m_WASAPIMode               = (WASAPI_MODE)AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, m_WASAPIMode);
+	m_DeviceMode               = (DEVICE_MODE)AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, m_DeviceMode);
 	m_DeviceId                 = AfxGetApp()->GetProfileString(OPT_SECTION_AudRend, OPT_AudioDeviceId, m_DeviceId);
 	m_bUseBitExactOutput       = !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
 	m_bUseSystemLayoutChannels = !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
@@ -207,7 +207,9 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	m_bUseCrossFeed            = !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_UseCrossFeed, m_bUseCrossFeed);
 #endif
 
-	m_WASAPIMode = std::clamp(m_WASAPIMode, MODE_WASAPI_EXCLUSIVE, MODE_WASAPI_SHARED);
+	if (m_DeviceMode != MODE_WASAPI_EXCLUSIVE) {
+		m_DeviceMode = MODE_WASAPI_SHARED;
+	}
 
 	if (phr) {
 		*phr = E_FAIL;
@@ -986,7 +988,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 #ifdef REGISTER_FILTER
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_AudRend)) {
-		key.SetDWORDValue(OPT_DeviceMode, (DWORD)m_WASAPIMode);
+		key.SetDWORDValue(OPT_DeviceMode, (DWORD)m_DeviceMode);
 		key.SetStringValue(OPT_AudioDeviceId, m_DeviceId);
 		key.SetDWORDValue(OPT_UseBitExactOutput, m_bUseBitExactOutput);
 		key.SetDWORDValue(OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
@@ -994,7 +996,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 		key.SetDWORDValue(OPT_UseCrossFeed, m_bUseCrossFeed);
 	}
 #else
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, (int)m_WASAPIMode);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, (int)m_DeviceMode);
 	AfxGetApp()->WriteProfileString(OPT_SECTION_AudRend, OPT_AudioDeviceId, m_DeviceId);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
@@ -1009,17 +1011,17 @@ STDMETHODIMP CMpcAudioRenderer::SetWasapiMode(INT nValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (m_pAudioClient && m_WASAPIMode != nValue) {
+	if (m_pAudioClient && m_DeviceMode != nValue) {
 		SetReinitializeAudioDevice();
 	}
 
-	m_WASAPIMode = (WASAPI_MODE)nValue;
+	m_DeviceMode = (DEVICE_MODE)nValue;
 	return S_OK;
 }
 STDMETHODIMP_(INT) CMpcAudioRenderer::GetWasapiMode()
 {
 	CAutoLock cAutoLock(&m_csProps);
-	return (INT)m_WASAPIMode;
+	return (INT)m_DeviceMode;
 }
 
 STDMETHODIMP CMpcAudioRenderer::SetDeviceId(CString pDeviceId)
@@ -1070,7 +1072,7 @@ STDMETHODIMP_(UINT) CMpcAudioRenderer::GetMode()
 		return MODE_WASAPI_EXCLUSIVE_BITSTREAM;
 	}
 
-	return (UINT)m_WASAPIMode;
+	return (UINT)m_DeviceMode;
 }
 
 STDMETHODIMP CMpcAudioRenderer::GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut)
@@ -1886,7 +1888,7 @@ again:
 				PropVariantClear(&varConfig);
 				SAFE_RELEASE(pProps);
 			}
-		} else if (m_WASAPIMode == MODE_WASAPI_SHARED) { // SHARED
+		} else if (m_DeviceMode == MODE_WASAPI_SHARED) { // SHARED
 			WAVEFORMATEX* pDeviceFormat = nullptr;
 			hr = m_pAudioClient->GetMixFormat(&pDeviceFormat);
 			if (SUCCEEDED(hr) && pDeviceFormat) {
@@ -2511,7 +2513,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 	HRESULT hr = S_OK;
 
 	UINT32 numFramesPadding = 0;
-	if (m_WASAPIMode == MODE_WASAPI_SHARED && !m_bIsBitstream) { // SHARED
+	if (m_DeviceMode == MODE_WASAPI_SHARED && !m_bIsBitstream) { // SHARED
 		m_pAudioClient->GetCurrentPadding(&numFramesPadding);
 		if (FAILED(hr)) {
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL > 1

@@ -20,9 +20,11 @@
 
 #pragma once
 
-enum WASAPI_MODE {
+enum DEVICE_MODE {
+	// for settings and internal
+	MODE_WASAPI_SHARED = 0,
 	MODE_WASAPI_EXCLUSIVE,
-	MODE_WASAPI_SHARED,
+	// internal
 	MODE_WASAPI_EXCLUSIVE_BITSTREAM,
 	MODE_NONE
 };
