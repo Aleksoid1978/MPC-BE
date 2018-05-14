@@ -222,7 +222,7 @@ private:
 
 	// WASAPI variables
 	HMODULE					m_hModule;
-	WASAPI_MODE				m_WASAPIMode;
+	DEVICE_MODE				m_DeviceMode;
 	CString					m_DeviceId;
 	IMMDevice				*m_pMMDevice;
 	IAudioClient			*m_pAudioClient;
