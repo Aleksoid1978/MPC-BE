@@ -32,22 +32,32 @@ public:
 	INT64        SExpGolombRead();
 	void         BitByteAlign();
 
-	inline BYTE  ReadByte()    { return (BYTE)BitRead(8); };
-	inline SHORT ReadShort()   { return (SHORT)BitRead(16); };
-	inline DWORD ReadDword()   { return (DWORD)BitRead(32); };
-	inline SHORT ReadShortLE() { return (SHORT)ReadByte() | (SHORT)ReadByte() << 8; };
-	inline DWORD ReadDwordLE() { return (DWORD)(ReadByte() | ReadByte() << 8 | ReadByte() << 16 | ReadByte() << 24); };
+	inline BYTE  ReadByte()    { return (BYTE)BitRead(8); }
+	inline SHORT ReadShort()   { return (SHORT)BitRead(16); }
+	inline DWORD ReadDword()   { return (DWORD)BitRead(32); }
+	inline SHORT ReadShortLE() {
+		SHORT ret = ReadByte();
+		ret |= ReadByte() << 8;
+		return ret;
+	}
+	inline DWORD ReadDwordLE() {
+		DWORD ret = ReadByte();
+		ret |= ReadByte() <<  8;
+		ret |= ReadByte() << 16;
+		ret |= ReadByte() << 24;
+		return ret;
+	}
 	void         ReadBuffer(BYTE* pDest, int nSize);
 
 	void         Reset();
 	void         Reset(const BYTE* pNewBuffer, int nNewSize);
 
-	void         SetSize(const int nValue) { m_nSize = nValue; };
-	int          GetSize() const { return m_nSize; };
-	int          RemainingSize() const { return m_nSize - m_nBitPos; };
-	bool         IsEOF() const { return m_nBitPos >= m_nSize; };
+	void         SetSize(const int nValue) { m_nSize = nValue; }
+	int          GetSize() const { return m_nSize; }
+	int          RemainingSize() const { return m_nSize - m_nBitPos; }
+	bool         IsEOF() const { return m_nBitPos >= m_nSize; }
 	int          GetPos() const;
-	const BYTE*  GetBufferPos() const { return m_pBuffer + m_nBitPos; };
+	const BYTE*  GetBufferPos() const { return m_pBuffer + m_nBitPos; }
 
 	void         SkipBytes(const int nCount);
 	void         Seek(const int nPos);
