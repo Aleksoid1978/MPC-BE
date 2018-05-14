@@ -2182,14 +2182,14 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 	if (m_filterState == State_Running) {
 		if (!m_bReleased) {
 			m_rtEstimateSlavingJitter = m_rtLastSampleTimeEnd - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
-			if (m_rtEstimateSlavingJitter < 0 || m_rtEstimateSlavingJitter > 200 * OneMillisecond) {
+			if (m_rtEstimateSlavingJitter < 0 || m_rtEstimateSlavingJitter > 500 * OneMillisecond) {
 				m_rtEstimateSlavingJitter = 0;
 			}
 			m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtLastSampleTimeEnd - m_rtEstimateSlavingJitter);
 		} else {
 			const REFERENCE_TIME rtEstimateSlavingJitter = m_rtNextSampleTime - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
 			if (rtEstimateSlavingJitter >= OneMillisecond
-					&& rtEstimateSlavingJitter <= 200 * OneMillisecond) {
+					&& rtEstimateSlavingJitter <= 500 * OneMillisecond) {
 				const DWORD dwMilliseconds = rtEstimateSlavingJitter / OneMillisecond;
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL
 				DLog(L"CMpcAudioRenderer::CreateRenderClient() - Sleep %u ms to minimize slaving jitter", dwMilliseconds);
