@@ -35,18 +35,9 @@ public:
 	inline BYTE  ReadByte()    { return (BYTE)BitRead(8); }
 	inline SHORT ReadShort()   { return (SHORT)BitRead(16); }
 	inline DWORD ReadDword()   { return (DWORD)BitRead(32); }
-	inline SHORT ReadShortLE() {
-		SHORT ret = ReadByte();
-		ret |= ReadByte() << 8;
-		return ret;
-	}
-	inline DWORD ReadDwordLE() {
-		DWORD ret = ReadByte();
-		ret |= ReadByte() <<  8;
-		ret |= ReadByte() << 16;
-		ret |= ReadByte() << 24;
-		return ret;
-	}
+	inline SHORT ReadShortLE() { return _byteswap_ushort((SHORT)BitRead(16)); }
+	inline DWORD ReadDwordLE() { return _byteswap_ulong((DWORD)BitRead(32)); }
+
 	void         ReadBuffer(BYTE* pDest, int nSize);
 
 	void         Reset();
