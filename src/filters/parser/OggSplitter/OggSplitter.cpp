@@ -718,13 +718,13 @@ void COggSplitterOutputPin::AddComment(BYTE* p, int len)
 			CString lang = ISO6392ToLanguage(TagValue), iso6392 = LanguageToISO6392(pComment->m_value);
 
 			if (pComment->m_value.GetLength() == 3 && !lang.IsEmpty()) {
-				SetName(lang);
+				SetName(GetMediaTypeDesc(m_mts, lang, m_pFilter));
 				SetProperty(L"LANG", pComment->m_value);
 			} else if (!iso6392.IsEmpty()) {
-				SetName(pComment->m_value);
+				SetName(GetMediaTypeDesc(m_mts, pComment->m_value, m_pFilter));
 				SetProperty(L"LANG", iso6392);
 			} else {
-				SetName(pComment->m_value);
+				SetName(GetMediaTypeDesc(m_mts, pComment->m_value, m_pFilter));
 				SetProperty(L"NAME", pComment->m_value);
 			}
 		}
