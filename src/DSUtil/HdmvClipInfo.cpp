@@ -920,22 +920,26 @@ HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CPlaylist& Playlist
 			rtSum += Item.Duration();
 		}
 
-		ReadDword();						// PlayList_start_address
-		LONGLONG playlistPos = ReadDword();	// PlayListMark_start_address
+		ReadDword();                        // PlayList_start_address
+		LONGLONG playlistPos = ReadDword(); // PlayListMark_start_address
 
 		// PlayListMark()
 		SetPos(playlistPos);
-		ReadDword();							// length
-		const USHORT nMarkCount = ReadShort();	// number_of_PlayList_marks
+		ReadDword();                           // length
+		const USHORT nMarkCount = ReadShort(); // number_of_PlayList_marks
 		for (USHORT i = 0; i < nMarkCount; i++) {
 			PlaylistChapter	Chapter;
 
-			ReadByte();																// reserved_for_future_use
-			Chapter.m_nMarkType   = (PlaylistMarkType)ReadByte();					// mark_type
-			Chapter.m_nPlayItemId = ReadShort();									// ref_to_PlayItem_id
-			Chapter.m_rtTimestamp = REFERENCE_TIME(20000.0f * ReadDword() / 90) + rtOffsets[Chapter.m_nPlayItemId];		// mark_time_stamp
-			Chapter.m_nEntryPID   = ReadShort();									// entry_ES_PID
-			Chapter.m_rtDuration  = REFERENCE_TIME(20000.0f * ReadDword() / 90);	// duration
+			ReadByte();                                                          // reserved_for_future_use
+			Chapter.m_nMarkType   = (PlaylistMarkType)ReadByte();                // mark_type
+			Chapter.m_nPlayItemId = ReadShort();                                 // ref_to_PlayItem_id
+			if (Chapter.m_nPlayItemId >= (SHORT)rtOffsets.size()) {
+				break;
+			}
+			Chapter.m_rtTimestamp = REFERENCE_TIME(20000.0f * ReadDword() / 90)  // mark_time_stamp
+								  + rtOffsets[Chapter.m_nPlayItemId];
+			Chapter.m_nEntryPID   = ReadShort();                                 // entry_ES_PID
+			Chapter.m_rtDuration  = REFERENCE_TIME(20000.0f * ReadDword() / 90); // duration
 
 			if (Chapter.m_rtTimestamp < 0 || Chapter.m_rtTimestamp > rtSum) {
 				continue;
