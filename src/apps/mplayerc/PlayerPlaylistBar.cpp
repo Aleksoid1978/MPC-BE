@@ -1970,6 +1970,8 @@ void CPlayerPlaylistBar::OnLvnKeyDown(NMHDR* pNMHDR, LRESULT* pResult)
 			LVIS_SELECTED, LVIS_SELECTED);
 
 		ResizeListColumn();
+		SavePlaylist();
+		UpdateList();
 
 		*pResult = TRUE;
 	} else if (pLVKeyDown->wVKey == VK_SPACE && items.size() == 1) {
@@ -2514,8 +2516,8 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 					LVIS_SELECTED, LVIS_SELECTED);
 
 				ResizeListColumn();
-
 				SavePlaylist();
+				UpdateList();
 			}
 			break;
 		case M_CLEAR:
