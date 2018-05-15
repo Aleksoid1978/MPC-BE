@@ -351,8 +351,8 @@ void SetAudioRenderer(int AudioDevNo)
 	pApp->m_AudioRendererDisplayName_CL.Empty();
 
 	CStringArray m_AudioRendererDisplayNames;
-	m_AudioRendererDisplayNames.Add(L"");
-	int i = 2;
+	m_AudioRendererDisplayNames.Add(AUDRNDT_MPC);
+	m_AudioRendererDisplayNames.Add(L""); // Default DirectSound Device
 
 	BeginEnumSysDev(CLSID_AudioRendererCategory, pMoniker) {
 		LPOLESTR olestr = nullptr;
@@ -364,22 +364,11 @@ void SetAudioRenderer(int AudioDevNo)
 		if (SUCCEEDED(pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB))) {
 			CComVariant var;
 			if (pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr) == S_OK) {
-				bool dev_enable = true;
-
-				var.Clear();
-				if (pPB->Read(CComBSTR(L"WaveOutId"), &var, nullptr) == S_OK) {
-					//if (var.lVal >= 0) { fname.Insert(0, L"WaveOut: "); }
-					dev_enable = false; // skip WaveOut devices
-				}
-				else if (pPB->Read(CComBSTR(L"DSGuid"), &var, nullptr) == S_OK) {
-					if (CString(var.bstrVal) == "{00000000-0000-0000-0000-000000000000}") {
-						dev_enable = false; // skip Default DirectSound Device
+				// only DirectSound device, skip WaveOut
+				if (pPB->Read(CComBSTR(L"DSGuid"), &var, nullptr) == S_OK) {
+					if (CString(var.bstrVal) != "{00000000-0000-0000-0000-000000000000}") { // skip Default DirectSound Device
+						m_AudioRendererDisplayNames.Add(olestr);
 					}
-				}
-
-				if (dev_enable) {
-					m_AudioRendererDisplayNames.Add(olestr);
-					i++;
 				}
 			}
 		}
@@ -389,10 +378,9 @@ void SetAudioRenderer(int AudioDevNo)
 
 	m_AudioRendererDisplayNames.Add(AUDRNDT_NULL_COMP);
 	m_AudioRendererDisplayNames.Add(AUDRNDT_NULL_UNCOMP);
-	m_AudioRendererDisplayNames.Add(AUDRNDT_MPC);
-	i += 3;
-	if (AudioDevNo >= 1 && AudioDevNo <= i) {
-		pApp->m_AudioRendererDisplayName_CL = m_AudioRendererDisplayNames[AudioDevNo-1];
+
+	if (AudioDevNo >= 0 && AudioDevNo < m_AudioRendererDisplayNames.GetCount()) {
+		pApp->m_AudioRendererDisplayName_CL = m_AudioRendererDisplayNames[AudioDevNo];
 	}
 }
 
