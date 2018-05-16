@@ -138,7 +138,6 @@ public:
 COggSplitterFilter::COggSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(L"COggSplitterFilter", pUnk, phr, __uuidof(this))
 {
-	m_nFlag |= PACKET_PTS_DISCONTINUITY;
 	m_nFlag |= SOURCE_SUPPORT_URL;
 }
 
@@ -573,7 +572,7 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		__int64 seekpos    = CalcPos(rt);
 		__int64 minseekpos = _I64_MIN;
 
-		REFERENCE_TIME rtmax = rt - UNITS * (m_bitstream_serial_number_Video != DWORD_MAX ? 2 : 0);
+		REFERENCE_TIME rtmax = rt - UNITS * (m_bitstream_serial_number_Video != DWORD_MAX ? 4 : 0);
 		REFERENCE_TIME rtmin = rtmax - UNITS / 2;
 
 		__int64 curpos = seekpos;
@@ -687,7 +686,7 @@ COggSourceFilter::COggSourceFilter(LPUNKNOWN pUnk, HRESULT* phr)
 COggSplitterOutputPin::COggSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseSplitterOutputPin(pName, pFilter, pLock, phr)
 	, m_pFilter(dynamic_cast<COggSplitterFilter*>(pFilter))
-	, m_rtLast(0)
+	, m_rtLast(INVALID_TIME)
 	, m_fSetKeyFrame(false)
 {
 	ResetState();
@@ -757,13 +756,15 @@ void COggSplitterOutputPin::ResetState(DWORD seqnum/* = DWORD_MAX*/)
 
 void COggSplitterOutputPin::HandlePacket(DWORD TrackNumber, BYTE* pData, int len)
 {
-	CAutoPtr<CPacket> p(DNew CPacket());
-	p->TrackNumber = TrackNumber;
-	if (S_OK == UnpackPacket(p, pData, len)) {
-		m_rtLast = p->rtStop;
+	if (m_rtLast != INVALID_TIME) {
+		CAutoPtr<CPacket> p(DNew CPacket());
+		p->TrackNumber = TrackNumber;
+		if (S_OK == UnpackPacket(p, pData, len)) {
+			m_rtLast = p->rtStop;
 
-		CAutoLock csAutoLock(&m_csPackets);
-		m_packets.AddTail(p);
+			CAutoLock csAutoLock(&m_csPackets);
+			m_packets.AddTail(p);
+		}
 	}
 }
 
@@ -802,7 +803,7 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 		if (len < 255 || pos == page.m_lens.GetTailPosition()) {
 			if (last == pos && page.m_hdr.granule_position != -1) {
 				const REFERENCE_TIME rt = GetRefTime(page.m_hdr.granule_position) - m_pFilter->m_rtOffset;
-				if (llabs(rt - m_rtLast) > GetRefTime(1)) {
+				if (rt >= 0) {
 					m_rtLast = rt;
 				}
 			}
@@ -854,7 +855,7 @@ HRESULT COggSplitterOutputPin::DeliverEndFlush()
 HRESULT COggSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
 {
 	ResetState();
-	m_rtLast = tStart;
+	m_rtLast = INVALID_TIME;
 	m_fSetKeyFrame = false;
 	return __super::DeliverNewSegment(tStart, tStop, dRate);
 }
@@ -874,32 +875,32 @@ COggVorbisOutputPin::COggVorbisOutputPin(OggVorbisIdHeader* h, LPCWSTR pName, CB
 	CMediaType mt;
 
 	mt.InitMediaType();
-	mt.majortype	= MEDIATYPE_Audio;
-	mt.subtype		= MEDIASUBTYPE_Vorbis;
-	mt.formattype	= FORMAT_VorbisFormat;
+	mt.majortype  = MEDIATYPE_Audio;
+	mt.subtype    = MEDIASUBTYPE_Vorbis;
+	mt.formattype = FORMAT_VorbisFormat;
 
 	VORBISFORMAT* vf = (VORBISFORMAT*)mt.AllocFormatBuffer(sizeof(VORBISFORMAT));
 	memset(mt.Format(), 0, mt.FormatLength());
 
-	vf->nChannels		= h->audio_channels;
-	vf->nSamplesPerSec	= h->audio_sample_rate;
-	vf->nAvgBitsPerSec	= h->bitrate_nominal;
-	vf->nMinBitsPerSec	= h->bitrate_minimum;
-	vf->nMaxBitsPerSec	= h->bitrate_maximum;
-	vf->fQuality		= -1;
+	vf->nChannels      = h->audio_channels;
+	vf->nSamplesPerSec = h->audio_sample_rate;
+	vf->nAvgBitsPerSec = h->bitrate_nominal;
+	vf->nMinBitsPerSec = h->bitrate_minimum;
+	vf->nMaxBitsPerSec = h->bitrate_maximum;
+	vf->fQuality       = -1;
 	mt.SetSampleSize(8192);
 	m_mts.push_back(mt);
 
 	mt.InitMediaType();
-	mt.majortype	= MEDIATYPE_Audio;
-	mt.subtype		= MEDIASUBTYPE_Vorbis2;
-	mt.formattype	= FORMAT_VorbisFormat2;
+	mt.majortype  = MEDIATYPE_Audio;
+	mt.subtype    = MEDIASUBTYPE_Vorbis2;
+	mt.formattype = FORMAT_VorbisFormat2;
 
 	VORBISFORMAT2* vf2 = (VORBISFORMAT2*)mt.AllocFormatBuffer(sizeof(VORBISFORMAT2));
 	memset(mt.Format(), 0, mt.FormatLength());
 
-	vf2->Channels		= h->audio_channels;
-	vf2->SamplesPerSec	= h->audio_sample_rate;
+	vf2->Channels      = h->audio_channels;
+	vf2->SamplesPerSec = h->audio_sample_rate;
 	mt.SetSampleSize(8192);
 	m_mts.insert(m_mts.cbegin(), mt);
 
@@ -922,10 +923,10 @@ HRESULT COggVorbisOutputPin::UnpackInitPage(OggPage& page)
 			for (int cnt = 0; bs.hasbits(-8-16-16-1-6); cnt++) {
 				unsigned int modes = bs.showbits(-6) + 1;
 
-				unsigned int mapping		= bs.getbits(-8);
-				unsigned int transformtype	= bs.getbits(-16);
-				unsigned int windowtype		= bs.getbits(-16);
-				unsigned int blockflag		= bs.getbits(-1);
+				unsigned int mapping       = bs.getbits(-8);
+				unsigned int transformtype = bs.getbits(-16);
+				unsigned int windowtype    = bs.getbits(-16);
+				unsigned int blockflag     = bs.getbits(-1);
 				UNREFERENCED_PARAMETER(mapping);
 
 				if (transformtype != 0 || windowtype != 0) {
@@ -940,9 +941,9 @@ HRESULT COggVorbisOutputPin::UnpackInitPage(OggPage& page)
 
 		int cnt = m_initpackets.GetCount();
 		if (cnt < 3 && (p->size() >= 6 && p->at(0) == 1 + cnt * 2)) {
-			VORBISFORMAT2* vf2		= (VORBISFORMAT2*)m_mts[0].Format();
-			vf2->HeaderSize[cnt]	= p->size();
-			int len					= m_mts[0].FormatLength();
+			VORBISFORMAT2* vf2   = (VORBISFORMAT2*)m_mts[0].Format();
+			vf2->HeaderSize[cnt] = p->size();
+			int len              = m_mts[0].FormatLength();
 			memcpy(m_mts[0].ReallocFormatBuffer(len + p->size()) + len, p->data(), p->size());
 		}
 
@@ -966,6 +967,7 @@ HRESULT COggVorbisOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int
 		}
 	}
 
+	REFERENCE_TIME duration = 1;
 	if (len > 0 && m_blockflags.size()) {
 		bitstream bs(pData, len);
 		if (bs.getbits(1) == 0) {
@@ -976,15 +978,15 @@ HRESULT COggVorbisOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int
 			}
 			DWORD blocksize = m_blocksize[m_blockflags[bs.getbits(n)] ? 1 : 0];
 			if (m_lastblocksize) {
-				m_rtLast += GetRefTime((m_lastblocksize + blocksize) >> 2);
+				duration = GetRefTime((m_lastblocksize + blocksize) >> 2);
 			}
 			m_lastblocksize = blocksize;
 		}
 	}
 
-	p->bSyncPoint	= TRUE;
-	p->rtStart		= m_rtLast;
-	p->rtStop		= m_rtLast + 1;
+	p->bSyncPoint = TRUE;
+	p->rtStart    = m_rtLast;
+	p->rtStop     = m_rtLast + duration;
 	p->SetData(pData, len);
 
 	return S_OK;
@@ -1009,10 +1011,9 @@ HRESULT COggVorbisOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_
 		POSITION pos = m_initpackets.GetHeadPosition();
 		while (pos) {
 			CPacket* pi = m_initpackets.GetNext(pos);
+
 			CAutoPtr<CPacket> p(DNew CPacket());
-			p->TrackNumber		= pi->TrackNumber;
-			p->bDiscontinuity	= p->bSyncPoint = FALSE;//TRUE;
-			p->rtStart			= p->rtStop = 0;
+			p->TrackNumber = pi->TrackNumber;
 			p->SetData(*pi);
 			__super::DeliverPacket(p);
 		}
@@ -1039,31 +1040,32 @@ COggFlacOutputPin::COggFlacOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFi
 		return;
 	}
 
-	Buffer.BitRead(24);		// Length (in bytes) of metadata to follow
-	Buffer.ReadShort();		// m_nMinBlocksize
-	Buffer.ReadShort();		// m_nMaxBlocksize
-	Buffer.BitRead(24);		// m_nMinFrameSize
-	Buffer.BitRead(24);		// m_nMaxFrameSize
-	m_nSamplesPerSec		= (int)Buffer.BitRead(20);
-	m_nChannels				= (int)Buffer.BitRead(3)  + 1;
-	m_wBitsPerSample		= (WORD)Buffer.BitRead(5) + 1;
-	Buffer.BitRead(36);		// m_i64TotalNumSamples
-	m_nAvgBytesPerSec		= (m_nChannels * (m_wBitsPerSample >> 3)) * m_nSamplesPerSec;
+	Buffer.BitRead(24); // Length (in bytes) of metadata to follow
+	Buffer.ReadShort(); // m_nMinBlocksize
+	Buffer.ReadShort(); // m_nMaxBlocksize
+	Buffer.BitRead(24); // m_nMinFrameSize
+	Buffer.BitRead(24); // m_nMaxFrameSize
+	m_nSamplesPerSec    = (int)Buffer.BitRead(20);
+	m_nChannels         = (int)Buffer.BitRead(3)  + 1;
+	m_wBitsPerSample    = (WORD)Buffer.BitRead(5) + 1;
+	Buffer.BitRead(36); // m_i64TotalNumSamples
+	m_nAvgBytesPerSec   = (m_nChannels * (m_wBitsPerSample >> 3)) * m_nSamplesPerSec;
 
 	CMediaType mt;
 
-	mt.majortype			= MEDIATYPE_Audio;
-	mt.subtype				= MEDIASUBTYPE_FLAC_FRAMED;
-	mt.formattype			= FORMAT_WaveFormatEx;
-	WAVEFORMATEX* wfe		= (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX));
+	mt.majortype  = MEDIATYPE_Audio;
+	mt.subtype    = MEDIASUBTYPE_FLAC_FRAMED;
+	mt.formattype = FORMAT_WaveFormatEx;
+
+	WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX));
 	memset(wfe, 0, sizeof(WAVEFORMATEX));
 	wfe->cbSize = sizeof(WAVEFORMATEX);
-	wfe->wFormatTag			= WAVE_FORMAT_FLAC;
-	wfe->nSamplesPerSec		= m_nSamplesPerSec;
-	wfe->nAvgBytesPerSec	= m_nAvgBytesPerSec;
-	wfe->nChannels			= m_nChannels;
-	wfe->nBlockAlign		= 1;
-	wfe->wBitsPerSample		= m_wBitsPerSample;
+	wfe->wFormatTag      = WAVE_FORMAT_FLAC;
+	wfe->nSamplesPerSec  = m_nSamplesPerSec;
+	wfe->nAvgBytesPerSec = m_nAvgBytesPerSec;
+	wfe->nChannels       = m_nChannels;
+	wfe->nBlockAlign     = 1;
+	wfe->wBitsPerSample  = m_wBitsPerSample;
 
 	m_mts.insert(m_mts.cbegin(), mt);
 
@@ -1083,9 +1085,9 @@ HRESULT COggFlacOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int l
 		return S_FALSE;
 	}
 
-	p->bSyncPoint	= TRUE;
-	p->rtStart		= m_rtLast;
-	p->rtStop		= m_rtLast + 1; // TODO : find packet duration !
+	p->bSyncPoint = TRUE;
+	p->rtStart    = m_rtLast;
+	p->rtStop     = m_rtLast + 1; // TODO : find packet duration !
 	p->SetData(pData, len);
 
 	return S_OK;
@@ -1098,11 +1100,10 @@ HRESULT COggFlacOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TI
 	if (m_mt.subtype == MEDIASUBTYPE_FLAC_FRAMED) {
 		POSITION pos = m_initpackets.GetHeadPosition();
 		while (pos) {
-			CPacket* pi			= m_initpackets.GetNext(pos);
-			CAutoPtr<CPacket>	p(DNew CPacket());
-			p->TrackNumber		= pi->TrackNumber;
-			p->bDiscontinuity	= p->bSyncPoint = FALSE;//TRUE;
-			p->rtStart			= p->rtStop = 0;
+			CPacket* pi = m_initpackets.GetNext(pos);
+
+			CAutoPtr<CPacket> p(DNew CPacket());
+			p->TrackNumber = pi->TrackNumber;
 			p->SetData(*pi);
 			__super::DeliverPacket(p);
 		}
@@ -1172,9 +1173,9 @@ HRESULT COggDirectShowOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData,
 			}
 		}
 
-		p->bSyncPoint	= bKeyFrame;
-		p->rtStart		= m_rtLast;
-		p->rtStop		= m_rtLast + (nLenBytes ? GetRefTime(Length) : GetRefTime(1));
+		p->bSyncPoint = bKeyFrame;
+		p->rtStart    = m_rtLast;
+		p->rtStop     = m_rtLast + (nLenBytes ? GetRefTime(Length) : GetRefTime(1));
 		p->SetData(&pData[i], len - i);
 
 		return S_OK;
@@ -1223,16 +1224,16 @@ HRESULT COggStreamOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int
 			m_fSetKeyFrame = bKeyFrame;
 		}
 
-		if (COggVideoOutputPin* pOggPinVideo = dynamic_cast<COggVideoOutputPin*>(this)) {
+		if (m_mt.majortype == MEDIATYPE_Video) {
 			if (!m_fSetKeyFrame) {
 				DLog(L"COggStreamOutputPin::UnpackPacket() : KeyFrame not found !!!");
 				return E_FAIL; // waiting for a key frame after seeking
 			}
 		}
 
-		p->bSyncPoint	= bKeyFrame;
-		p->rtStart		= m_rtLast;
-		p->rtStop		= m_rtLast + (nLenBytes ? GetRefTime(Length) : GetRefTime(m_default_len));
+		p->bSyncPoint = bKeyFrame;
+		p->rtStart    = m_rtLast;
+		p->rtStop     = m_rtLast + (nLenBytes ? GetRefTime(Length) : GetRefTime(m_default_len));
 		p->SetData(&pData[i], len - i);
 
 		return S_OK;
@@ -1252,20 +1253,20 @@ COggVideoOutputPin::COggVideoOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseF
 	extra = std::max(extra, 0);
 
 	CMediaType mt;
-	mt.majortype	= MEDIATYPE_Video;
-	mt.subtype		= FOURCCMap(MAKEFOURCC(h->subtype[0], h->subtype[1], h->subtype[2], h->subtype[3]));
-	mt.formattype	= FORMAT_VideoInfo;
+	mt.majortype  = MEDIATYPE_Video;
+	mt.formattype = FORMAT_VideoInfo;
+	mt.subtype    = FOURCCMap(MAKEFOURCC(h->subtype[0], h->subtype[1], h->subtype[2], h->subtype[3]));
 
 	VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER) + extra);
 	memset(mt.Format(), 0, mt.FormatLength());
 	memcpy(mt.Format() + sizeof(VIDEOINFOHEADER), h + 1, extra);
 
-	pvih->AvgTimePerFrame			= h->time_unit / h->samples_per_unit;
-	pvih->bmiHeader.biWidth			= h->v.w;
-	pvih->bmiHeader.biHeight		= h->v.h;
-	pvih->bmiHeader.biBitCount		= (WORD)h->bps;
-	pvih->bmiHeader.biSizeImage		= DIBSIZE(pvih->bmiHeader);
-	pvih->bmiHeader.biCompression	= mt.subtype.Data1;
+	pvih->AvgTimePerFrame         = h->time_unit / h->samples_per_unit;
+	pvih->bmiHeader.biWidth       = h->v.w;
+	pvih->bmiHeader.biHeight      = h->v.h;
+	pvih->bmiHeader.biBitCount    = (WORD)h->bps;
+	pvih->bmiHeader.biSizeImage   = DIBSIZE(pvih->bmiHeader);
+	pvih->bmiHeader.biCompression = mt.subtype.Data1;
 	switch (pvih->bmiHeader.biCompression) {
 		case BI_RGB:
 		case BI_BITFIELDS:
@@ -1306,21 +1307,21 @@ COggAudioOutputPin::COggAudioOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseF
 	extra = std::max(extra, 0);
 
 	CMediaType mt;
-	mt.majortype	= MEDIATYPE_Audio;
-	mt.subtype		= FOURCCMap(strtol(CStringA(h->subtype, 4), nullptr, 16));
-	mt.formattype	= FORMAT_WaveFormatEx;
+	mt.majortype   = MEDIATYPE_Audio;
+	mt.subtype    = FOURCCMap(strtol(CStringA(h->subtype, 4), nullptr, 16));
+	mt.formattype = FORMAT_WaveFormatEx;
 
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + extra);
 	memset(mt.Format(), 0, mt.FormatLength());
 	memcpy(mt.Format() + sizeof(WAVEFORMATEX), h + 1, extra);
 
-	wfe->cbSize				= extra;
-	wfe->wFormatTag			= (WORD)mt.subtype.Data1;
-	wfe->nChannels			= h->a.nChannels;
-	wfe->nSamplesPerSec		= (DWORD)(10000000i64 * h->samples_per_unit / h->time_unit);
-	wfe->wBitsPerSample		= (WORD)h->bps;
-	wfe->nAvgBytesPerSec	= h->a.nAvgBytesPerSec; // TODO: verify for PCM
-	wfe->nBlockAlign		= h->a.nBlockAlign; // TODO: verify for PCM
+	wfe->cbSize          = extra;
+	wfe->wFormatTag      = (WORD)mt.subtype.Data1;
+	wfe->nChannels       = h->a.nChannels;
+	wfe->nSamplesPerSec  = (DWORD)(10000000i64 * h->samples_per_unit / h->time_unit);
+	wfe->wBitsPerSample  = (WORD)h->bps;
+	wfe->nAvgBytesPerSec = h->a.nAvgBytesPerSec; // TODO: verify for PCM
+	wfe->nBlockAlign     = h->a.nBlockAlign; // TODO: verify for PCM
 	mt.SetSampleSize(std::max(h->buffersize, 1uL));
 	m_mts.push_back(mt);
 
@@ -1335,9 +1336,9 @@ COggTextOutputPin::COggTextOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseFil
 	: COggStreamOutputPin(h, pName, pFilter, pLock, phr)
 {
 	CMediaType mt;
-	mt.majortype	= MEDIATYPE_Text;
-	mt.subtype		= MEDIASUBTYPE_NULL;
-	mt.formattype	= FORMAT_None;
+	mt.majortype  = MEDIATYPE_Text;
+	mt.subtype    = MEDIASUBTYPE_NULL;
+	mt.formattype = FORMAT_None;
 	mt.SetSampleSize(1);
 	m_mts.push_back(mt);
 }
@@ -1350,9 +1351,9 @@ COggKateOutputPin::COggKateOutputPin(OggStreamHeader* h, LPCWSTR pName, CBaseFil
 	: COggStreamOutputPin(h, pName, pFilter, pLock, phr)
 {
 	CMediaType mt;
-	mt.majortype	= MEDIATYPE_Subtitle;
-	mt.subtype		= FOURCCMap(FCC('KATE')); // TODO: use the correct subtype for KATE subtitles
-	mt.formattype	= FORMAT_SubtitleInfo;
+	mt.majortype  = MEDIATYPE_Subtitle;
+	mt.subtype    = FOURCCMap(FCC('KATE')); // TODO: use the correct subtype for KATE subtitles
+	mt.formattype = FORMAT_SubtitleInfo;
 
 	SUBTITLEINFO* psi = (SUBTITLEINFO*)mt.AllocFormatBuffer(sizeof(SUBTITLEINFO));
 	memset(psi, 0, mt.FormatLength());
@@ -1374,32 +1375,35 @@ COggTheoraOutputPin::COggTheoraOutputPin(OggPage& page, LPCWSTR pName, CBaseFilt
 	CGolombBuffer gb(page.data(), page.size());
 	gb.SkipBytes(7);
 
-	m_nVersion	= (UINT)gb.BitRead(24);
-	LONG width	= gb.ReadShort() << 4;
-	LONG height	= gb.ReadShort() << 4;
+	m_nVersion  = (UINT)gb.BitRead(24);
+	LONG width  = gb.ReadShort() << 4;
+	LONG height = gb.ReadShort() << 4;
 	if (m_nVersion > 0x030400) {
 		gb.BitRead(50); gb.BitRead(50);
 	}
 
 	if (m_nVersion >= 0x030200) {
-		LONG visible_width	= gb.BitRead(24);
-		LONG visible_height	= gb.BitRead(24);
+		LONG visible_width  = gb.BitRead(24);
+		LONG visible_height = gb.BitRead(24);
 		if (visible_width <= width && visible_width > width - 16
 				&& visible_height <= height && visible_height > height - 16) {
-			width	= visible_width;
-			height	= visible_height;
+			width  = visible_width;
+			height = visible_height;
 		}
 		gb.BitRead(16);
 	}
 
-	int nFpsNum	= gb.ReadDword();
-	int nFpsDen	= gb.ReadDword();
-	if (nFpsNum) {
-		m_rtAvgTimePerFrame = (REFERENCE_TIME)(10000000.0 * nFpsDen / nFpsNum);
+	int nFpsNum = gb.ReadDword();
+	int nFpsDen = gb.ReadDword();
+	if (!nFpsNum || !nFpsDen) {
+		DLog(L"COggTheoraOutputPin::COggTheoraOutputPin() : Invalid time base, use 25 fps");
+		nFpsNum = 1;
+		nFpsDen = 25;
 	}
+	m_rtAvgTimePerFrame = (REFERENCE_TIME)(10000000.0 * nFpsDen / nFpsNum);
 
-	int nARnum	= gb.BitRead(24);
-	int nARden	= gb.BitRead(24);
+	int nARnum = gb.BitRead(24);
+	int nARden = gb.BitRead(24);
 	CSize Aspect(width, height);
 	if (nARnum && nARden) {
 		Aspect.cx *= nARnum;
@@ -1421,23 +1425,23 @@ COggTheoraOutputPin::COggTheoraOutputPin(OggPage& page, LPCWSTR pName, CBaseFilt
 	m_KfgMask = (1 << m_KfgShift) - 1;
 
 	CMediaType mt;
-	mt.majortype		= MEDIATYPE_Video;
-	mt.subtype			= FOURCCMap('OEHT');
-	mt.formattype		= FORMAT_MPEG2_VIDEO;
+	mt.majortype  = MEDIATYPE_Video;
+	mt.formattype = FORMAT_MPEG2_VIDEO;
+	mt.subtype    = FOURCCMap(FCC('THEO'));
 
 	MPEG2VIDEOINFO* vih	= (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(sizeof(MPEG2VIDEOINFO));
 	memset(mt.Format(), 0, mt.FormatLength());
 
-	vih->hdr.bmiHeader.biSize			= sizeof(vih->hdr.bmiHeader);
-	vih->hdr.bmiHeader.biWidth			= width;
-	vih->hdr.bmiHeader.biHeight			= height;
-	vih->hdr.bmiHeader.biCompression	= FCC('THEO');
-	vih->hdr.bmiHeader.biPlanes			= 1;
-	vih->hdr.bmiHeader.biBitCount		= 24;
-	vih->hdr.bmiHeader.biSizeImage		= DIBSIZE(vih->hdr.bmiHeader);
-	vih->hdr.AvgTimePerFrame			= m_rtAvgTimePerFrame;
-	vih->hdr.dwPictAspectRatioX			= Aspect.cx;
-	vih->hdr.dwPictAspectRatioY			= Aspect.cy;
+	vih->hdr.bmiHeader.biSize        = sizeof(vih->hdr.bmiHeader);
+	vih->hdr.bmiHeader.biWidth       = width;
+	vih->hdr.bmiHeader.biHeight      = height;
+	vih->hdr.bmiHeader.biCompression = mt.subtype.Data1;
+	vih->hdr.bmiHeader.biPlanes      = 1;
+	vih->hdr.bmiHeader.biBitCount    = 24;
+	vih->hdr.bmiHeader.biSizeImage   = DIBSIZE(vih->hdr.bmiHeader);
+	vih->hdr.AvgTimePerFrame         = m_rtAvgTimePerFrame;
+	vih->hdr.dwPictAspectRatioX      = Aspect.cx;
+	vih->hdr.dwPictAspectRatioY      = Aspect.cy;
 
 	mt.bFixedSizeSamples = 0;
 	m_mts.push_back(mt);
@@ -1520,9 +1524,9 @@ HRESULT COggTheoraOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int
 		return E_FAIL; // waiting for a key frame after seeking
 	}
 
-	p->bSyncPoint	= bKeyFrame;
-	p->rtStart		= m_rtLast;
-	p->rtStop		= m_rtLast + 1;
+	p->bSyncPoint = bKeyFrame;
+	p->rtStart    = m_rtLast;
+	p->rtStop     = m_rtLast + m_rtAvgTimePerFrame;
 	p->SetData(pData, len);
 
 	if (!(*pData & 0x80) && m_mt.majortype == MEDIATYPE_Video) {
@@ -1582,20 +1586,20 @@ HRESULT COggDiracOutputPin::InitDirac(BYTE* p, int nCount)
 
 	CMediaType mt;
 
-	mt.majortype			= MEDIATYPE_Video;
-	mt.formattype			= FORMAT_VideoInfo;
-	mt.subtype				= FOURCCMap('card');
+	mt.majortype  = MEDIATYPE_Video;
+	mt.formattype = FORMAT_VideoInfo;
+	mt.subtype    = FOURCCMap('card');
 
-	VIDEOINFOHEADER* pvih	= (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER));
+	VIDEOINFOHEADER* pvih = (VIDEOINFOHEADER*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER));
 	memset(mt.Format(), 0, mt.FormatLength());
-	pvih->AvgTimePerFrame			= m_rtAvgTimePerFrame;
-	pvih->bmiHeader.biSize			= sizeof(pvih->bmiHeader);
-	pvih->bmiHeader.biWidth			= params.width;
-	pvih->bmiHeader.biHeight		= params.height;
-	pvih->bmiHeader.biPlanes		= 1;
-	pvih->bmiHeader.biBitCount		= 12;
-	pvih->bmiHeader.biCompression	= 'card';
-	pvih->bmiHeader.biSizeImage		= DIBSIZE(pvih->bmiHeader);
+	pvih->AvgTimePerFrame         = m_rtAvgTimePerFrame;
+	pvih->bmiHeader.biSize        = sizeof(pvih->bmiHeader);
+	pvih->bmiHeader.biWidth       = params.width;
+	pvih->bmiHeader.biHeight      = params.height;
+	pvih->bmiHeader.biPlanes      = 1;
+	pvih->bmiHeader.biBitCount    = 12;
+	pvih->bmiHeader.biCompression = mt.subtype.Data1;
+	pvih->bmiHeader.biSizeImage   = DIBSIZE(pvih->bmiHeader);
 
 	mt.bFixedSizeSamples = 0;
 	m_mts.push_back(mt);
@@ -1634,9 +1638,9 @@ HRESULT COggDiracOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int 
 		return E_FAIL;
 	}
 
+	p->bSyncPoint = TRUE;
 	p->rtStart    = m_rtLast;
-	p->rtStop     = m_rtLast != INVALID_TIME ? m_rtLast + m_rtAvgTimePerFrame : INVALID_TIME;
-	p->bSyncPoint = (p->rtStart != INVALID_TIME);
+	p->rtStop     = m_rtLast + m_rtAvgTimePerFrame;
 	p->SetData(pData, len);
 
 	return S_OK;
@@ -1652,31 +1656,31 @@ COggOpusOutputPin::COggOpusOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFi
 	// http://wiki.xiph.org/OggOpus
 	CGolombBuffer Buffer(h + 8, nCount - 8); // skip "OpusHead"
 
-	BYTE version	= Buffer.ReadByte();
-	BYTE channels	= Buffer.ReadByte();
-	m_Preskip		= Buffer.ReadShortLE();
+	BYTE version  = Buffer.ReadByte();
+	BYTE channels = Buffer.ReadByte();
+	m_Preskip     = Buffer.ReadShortLE();
 	Buffer.SkipBytes(4); // Input sample rate
 	Buffer.SkipBytes(2); // Output gain
 
 	m_SampleRate	= 48000;
 
-	WAVEFORMATEX* wfe		= (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + nCount];
+	WAVEFORMATEX* wfe = (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + nCount];
 	memset(wfe, 0, sizeof(WAVEFORMATEX));
-	wfe->wFormatTag			= WAVE_FORMAT_OPUS;
-	wfe->nChannels			= channels;
-	wfe->nSamplesPerSec		= m_SampleRate;
-	wfe->wBitsPerSample		= 16;
-	wfe->nBlockAlign		= 1;
-	wfe->nAvgBytesPerSec	= 0;
-	wfe->cbSize				= nCount;
+	wfe->wFormatTag      = WAVE_FORMAT_OPUS;
+	wfe->nChannels       = channels;
+	wfe->nSamplesPerSec  = m_SampleRate;
+	wfe->wBitsPerSample  = 16;
+	wfe->nBlockAlign     = 1;
+	wfe->nAvgBytesPerSec = 0;
+	wfe->cbSize          = nCount;
 	memcpy((BYTE*)(wfe+1), h, nCount);
 
 	CMediaType mt;
 	ZeroMemory(&mt, sizeof(CMediaType));
 
-	mt.majortype	= MEDIATYPE_Audio;
-	mt.subtype		= MEDIASUBTYPE_OPUS;
-	mt.formattype	= FORMAT_WaveFormatEx;
+	mt.majortype  = MEDIATYPE_Audio;
+	mt.subtype    = MEDIASUBTYPE_OPUS;
+	mt.formattype = FORMAT_WaveFormatEx;
 	mt.SetFormat((BYTE*)wfe, sizeof(WAVEFORMATEX)+wfe->cbSize);
 
 	delete [] wfe;
@@ -1720,9 +1724,9 @@ HRESULT COggOpusOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int l
 	}
 	__int64 pduration = (frame_size * nb_frames * UNITS) / m_SampleRate;
 
-	p->bSyncPoint	= TRUE;
-	p->rtStart		= m_rtLast;
-	p->rtStop		= m_rtLast + pduration;
+	p->bSyncPoint = TRUE;
+	p->rtStart    = m_rtLast;
+	p->rtStop     = m_rtLast + pduration;
 	p->SetData(pData, len);
 
 	return S_OK;
@@ -1739,39 +1743,39 @@ COggSpeexOutputPin::COggSpeexOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBase
 
 	CGolombBuffer Buffer(h + (8 + 20), nCount - (8 + 20)); // 8 + 20 = speex_string + speex_version
 
-	int speex_version_id		= Buffer.ReadDwordLE();
-	int header_size				= Buffer.ReadDwordLE();
-	int rate					= Buffer.ReadDwordLE();
-	int mode					= Buffer.ReadDwordLE();
-	int mode_bitstream_version	= Buffer.ReadDwordLE();
-	int nb_channels				= Buffer.ReadDwordLE();
-	int bitrate					= Buffer.ReadDwordLE();
-	int frame_size				= Buffer.ReadDwordLE();
-	int vbr						= Buffer.ReadDwordLE();
-	int frames_per_packet		= Buffer.ReadDwordLE();
-	int extra_headers			= Buffer.ReadDwordLE();
-	int reserved1				= Buffer.ReadDwordLE();
-	int reserved2				= Buffer.ReadDwordLE();
+	int speex_version_id       = Buffer.ReadDwordLE();
+	int header_size            = Buffer.ReadDwordLE();
+	int rate                   = Buffer.ReadDwordLE();
+	int mode                   = Buffer.ReadDwordLE();
+	int mode_bitstream_version = Buffer.ReadDwordLE();
+	int nb_channels            = Buffer.ReadDwordLE();
+	int bitrate                = Buffer.ReadDwordLE();
+	int frame_size             = Buffer.ReadDwordLE();
+	int vbr                    = Buffer.ReadDwordLE();
+	int frames_per_packet      = Buffer.ReadDwordLE();
+	int extra_headers          = Buffer.ReadDwordLE();
+	int reserved1              = Buffer.ReadDwordLE();
+	int reserved2              = Buffer.ReadDwordLE();
 
 	m_SampleRate = rate;
 
-	WAVEFORMATEX* wfe		= (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + nCount];
+	WAVEFORMATEX* wfe = (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + nCount];
 	memset(wfe, 0, sizeof(WAVEFORMATEX));
-	wfe->wFormatTag			= WAVE_FORMAT_SPEEX;
-	wfe->nChannels			= nb_channels;
-	wfe->nSamplesPerSec		= rate;
-	wfe->wBitsPerSample		= 16;
-	wfe->nBlockAlign		= frame_size;
-	wfe->nAvgBytesPerSec	= 0;
-	wfe->cbSize				= nCount;
+	wfe->wFormatTag      = WAVE_FORMAT_SPEEX;
+	wfe->nChannels       = nb_channels;
+	wfe->nSamplesPerSec  = rate;
+	wfe->wBitsPerSample  = 16;
+	wfe->nBlockAlign     = frame_size;
+	wfe->nAvgBytesPerSec = 0;
+	wfe->cbSize          = nCount;
 	memcpy((BYTE*)(wfe+1), h, nCount);
 
 	CMediaType mt;
 	ZeroMemory(&mt, sizeof(CMediaType));
 
-	mt.majortype	= MEDIATYPE_Audio;
-	mt.subtype		= MEDIASUBTYPE_SPEEX;
-	mt.formattype	= FORMAT_WaveFormatEx;
+	mt.majortype  = MEDIATYPE_Audio;
+	mt.subtype    = MEDIASUBTYPE_SPEEX;
+	mt.formattype = FORMAT_WaveFormatEx;
 	mt.SetFormat((BYTE*)wfe, sizeof(WAVEFORMATEX) + wfe->cbSize);
 
 	delete [] wfe;
@@ -1791,9 +1795,9 @@ REFERENCE_TIME COggSpeexOutputPin::GetRefTime(__int64 granule_position)
 
 HRESULT COggSpeexOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len)
 {
-	p->bSyncPoint	= TRUE;
-	p->rtStart		= m_rtLast;
-	p->rtStop		= m_rtLast + 1; // TODO : find packet duration !
+	p->bSyncPoint = TRUE;
+	p->rtStart    = m_rtLast;
+	p->rtStop     = m_rtLast + 1; // TODO : find packet duration !
 	p->SetData(pData, len);
 
 	return S_OK;
@@ -1821,28 +1825,31 @@ COggVP8OutputPin::COggVP8OutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFilt
 	ReduceDim(Aspect);
 	int nFpsNum = gb.BitRead(32);
 	int nFpsDen = gb.BitRead(32);
-	if (nFpsNum) {
-		m_rtAvgTimePerFrame = (REFERENCE_TIME)(10000000.0 * nFpsDen / nFpsNum);
+	if (!nFpsNum || !nFpsDen) {
+		DLog(L"COggVP8OutputPin::COggVP8OutputPin() : Invalid time base, use 25 fps");
+		nFpsNum = 1;
+		nFpsDen = 25;
 	}
+	m_rtAvgTimePerFrame = (REFERENCE_TIME)(10000000.0 * nFpsDen / nFpsNum);
 
 	CMediaType mt;
-	mt.majortype					= MEDIATYPE_Video;
-	mt.subtype						= FOURCCMap(FCC('VP80'));
-	mt.formattype					= FORMAT_VIDEOINFO2;
+	mt.majortype  = MEDIATYPE_Video;
+	mt.formattype = FORMAT_VIDEOINFO2;
+	mt.subtype    = FOURCCMap(FCC('VP80'));
 
-	VIDEOINFOHEADER2* vih2			= (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2));
+	VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2));
 	memset(mt.Format(), 0, mt.FormatLength());
 
-	vih2->AvgTimePerFrame			= m_rtAvgTimePerFrame;
-	vih2->dwPictAspectRatioX		= Aspect.cx;
-	vih2->dwPictAspectRatioY		= Aspect.cy;
-	vih2->bmiHeader.biSize			= sizeof(vih2->bmiHeader);
-	vih2->bmiHeader.biWidth			= width;
-	vih2->bmiHeader.biHeight		= height;
-	vih2->bmiHeader.biCompression	= mt.subtype.Data1;
-	vih2->bmiHeader.biPlanes		= 1;
-	vih2->bmiHeader.biBitCount		= 24;
-	vih2->bmiHeader.biSizeImage		= DIBSIZE(vih2->bmiHeader);
+	vih2->AvgTimePerFrame         = m_rtAvgTimePerFrame;
+	vih2->dwPictAspectRatioX      = Aspect.cx;
+	vih2->dwPictAspectRatioY      = Aspect.cy;
+	vih2->bmiHeader.biSize        = sizeof(vih2->bmiHeader);
+	vih2->bmiHeader.biWidth       = width;
+	vih2->bmiHeader.biHeight      = height;
+	vih2->bmiHeader.biCompression = mt.subtype.Data1;
+	vih2->bmiHeader.biPlanes      = 1;
+	vih2->bmiHeader.biBitCount    = 24;
+	vih2->bmiHeader.biSizeImage   = DIBSIZE(vih2->bmiHeader);
 
 	mt.bFixedSizeSamples = 0;
 	m_mts.push_back(mt);
@@ -1874,9 +1881,9 @@ HRESULT COggVP8OutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int le
 		return E_FAIL; // waiting for a key frame after seeking
 	}
 
-	p->rtStart		= m_rtLast;
-	p->rtStop		= m_rtLast == INVALID_TIME ? m_rtLast : (m_rtLast + (m_rtAvgTimePerFrame > 0 ? m_rtAvgTimePerFrame : 1));
-	p->bSyncPoint	= bKeyFrame && (p->rtStart != INVALID_TIME);
+	p->bSyncPoint = bKeyFrame;
+	p->rtStart    = m_rtLast;
+	p->rtStop     = m_rtLast + m_rtAvgTimePerFrame;
 	p->SetData(pData, len);
 
 	return S_OK;
