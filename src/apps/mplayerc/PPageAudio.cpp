@@ -104,19 +104,27 @@ BOOL CPPageAudio::OnInitDialog()
 			CComVariant var;
 			if (pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr) == S_OK) {
 				CStringW fname = var.bstrVal;
-				var.Clear();
 
-				// only DirectSound device, skip WaveOut
-				if (pPB->Read(CComBSTR(L"DSGuid"), &var, nullptr) == S_OK) {
-					if (CString(var.bstrVal) != "{00000000-0000-0000-0000-000000000000}") { // skip Default DirectSound Device
-						m_AudioRendererDisplayNames.Add(CString(olestr));
-						str.Format(L"%d. %s", i++, fname);
-						m_iAudioRendererTypeCtrl.AddString(str);
-						m_iSecAudioRendererTypeCtrl.AddString(str);
-					}
+				// skip WaveOut
+				var.Clear();
+				if (pPB->Read(CComBSTR(L"WaveOutId"), &var, nullptr) == S_OK) {
+					CoTaskMemFree(olestr);
+					continue;
 				}
+
+				// skip Default DirectSound Device
+				var.Clear();
+				if (pPB->Read(CComBSTR(L"DSGuid"), &var, nullptr) == S_OK
+						&& CString(var.bstrVal) == "{00000000-0000-0000-0000-000000000000}") {
+					CoTaskMemFree(olestr);
+					continue;
+				}
+
+				m_AudioRendererDisplayNames.Add(CString(olestr));
+				str.Format(L"%d. %s", i++, fname);
+				m_iAudioRendererTypeCtrl.AddString(str);
+				m_iSecAudioRendererTypeCtrl.AddString(str);
 			}
-			var.Clear();
 		}
 		CoTaskMemFree(olestr);
 	}
