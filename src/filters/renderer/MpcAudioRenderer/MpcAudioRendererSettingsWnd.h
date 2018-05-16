@@ -72,6 +72,7 @@ public:
 	afx_msg void OnClickedBitExact();
 };
 
+
 class __declspec(uuid("E3D0704B-1579-4E9E-8674-2674CB90D07A"))
 	CMpcAudioRendererStatusWnd : public CInternalPropertyPageWnd
 {
@@ -98,6 +99,11 @@ private :
 
 	CStatic		m_ModeText;
 	CEdit		m_CurrentDeviceText;
+
+	void UpdateStatus();
+
+protected:
+	BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult) override;
 
 public:
 	CMpcAudioRendererStatusWnd();
