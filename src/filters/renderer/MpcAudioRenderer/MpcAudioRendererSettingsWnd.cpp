@@ -27,6 +27,11 @@
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
 
+
+//
+// CMpcAudioRendererSettingsWnd
+//
+
 CMpcAudioRendererSettingsWnd::CMpcAudioRendererSettingsWnd()
 {
 }
@@ -162,6 +167,117 @@ void CMpcAudioRendererSettingsWnd::OnClickedBitExact()
 	m_cbUseSystemLayoutChannels.EnableWindow(m_cbUseBitExactOutput.GetCheck() && m_cbUseBitExactOutput.IsWindowEnabled());
 }
 
+
+//
+// CMpcAudioRendererStatusWnd
+//
+
+void CMpcAudioRendererStatusWnd::UpdateStatus()
+{
+	DLog(L"CMpcAudioRendererStatusWnd: UpdateStatus");
+
+	if (m_pMAR) {
+		UINT status = m_pMAR->GetMode();
+		switch (status) {
+		case MODE_NONE:
+		default:
+			m_ModeText.SetWindowTextW(L"");
+			break;
+		case MODE_WASAPI_SHARED:
+			m_ModeText.SetWindowTextW(ResStr(IDS_ARS_WASAPI_MODE_STATUS_3));
+			break;
+		case MODE_WASAPI_EXCLUSIVE:
+			m_ModeText.SetWindowTextW(ResStr(IDS_ARS_WASAPI_MODE_STATUS_2));
+			break;
+		case MODE_WASAPI_EXCLUSIVE_BITSTREAM:
+			CString btMode_str;
+			BITSTREAM_MODE btMode = m_pMAR->GetBitstreamMode();
+			switch (btMode) {
+			case BITSTREAM_AC3:    btMode_str = L"AC3";    break;
+			case BITSTREAM_DTS:    btMode_str = L"DTS";    break;
+			case BITSTREAM_EAC3:   btMode_str = L"E-AC3";  break;
+			case BITSTREAM_TRUEHD: btMode_str = L"TrueHD"; break;
+			case BITSTREAM_DTSHD:  btMode_str = L"DTS-HD"; break;
+			}
+
+			CString msg = ResStr(IDS_ARS_WASAPI_MODE_STATUS_5);
+			if (!btMode_str.IsEmpty()) {
+				msg.AppendFormat(L" [%s]", btMode_str);
+			}
+			m_ModeText.SetWindowTextW(msg);
+			break;
+		}
+
+		if (status == MODE_WASAPI_EXCLUSIVE_BITSTREAM) {
+			m_InputFormatText.SetWindowTextW(L"Bitstream");
+			m_OutputFormatText.SetWindowTextW(L"Bitstream");
+		}
+		else {
+			WAVEFORMATEX *pWfxIn, *pWfxOut;
+			m_pMAR->GetStatus(&pWfxIn, &pWfxOut);
+			if (pWfxIn && pWfxOut) {
+				auto SetText = [](WAVEFORMATEX* pwfex, CStatic& formatText, CStatic& channelText, CStatic& rateText) {
+					bool bIsFloat = false;
+					bool m_b24PaddedTo32bit = false;
+					DWORD layout = 0;
+					if (IsWaveFormatExtensible(pwfex)) {
+						WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)pwfex;
+						layout = wfex->dwChannelMask;
+						if (wfex->SubFormat == MEDIASUBTYPE_IEEE_FLOAT) {
+							bIsFloat = true;
+						}
+						else {
+							m_b24PaddedTo32bit = wfex->Samples.wValidBitsPerSample == 24 && pwfex->wBitsPerSample == 32;
+						}
+					}
+					else {
+						layout = GetDefChannelMask(pwfex->nChannels);
+						if (pwfex->wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
+							bIsFloat = true;
+						}
+					}
+
+					CString sFormat;
+					sFormat.Format(L"%ubit %s%s", m_b24PaddedTo32bit ? 24 : pwfex->wBitsPerSample, m_b24PaddedTo32bit ? L"[padded] " : L"", bIsFloat ? L"Float" : L"Integer");
+
+					BYTE lfe = 0;
+					WORD nChannels = pwfex->nChannels;
+					if (layout & SPEAKER_LOW_FREQUENCY) {
+						nChannels--;
+						lfe = 1;
+					}
+
+					CString sChannel;
+					sChannel.Format(L"%u.%u / 0x%x", nChannels, lfe, layout);
+
+					CString sSampleRate;
+					sSampleRate.Format(L"%u", pwfex->nSamplesPerSec);
+
+					formatText.SetWindowTextW(sFormat);
+					channelText.SetWindowTextW(sChannel);
+					rateText.SetWindowTextW(sSampleRate);
+				};
+
+				SetText(pWfxIn, m_InputFormatText, m_InputChannelText, m_InputRateText);
+				SetText(pWfxOut, m_OutputFormatText, m_OutputChannelText, m_OutputRateText);
+			}
+		}
+
+		m_CurrentDeviceText.SetWindowTextW(m_pMAR->GetCurrentDeviceName());
+	}
+}
+
+BOOL CMpcAudioRendererStatusWnd::OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult)
+{
+	// each page activation receives 3 unique messages:
+	// WM_WINDOWPOSCHANGING, WM_PAINT, WM_NCPAINT, which does not occur in other cases
+	if (message == WM_WINDOWPOSCHANGING) {
+		UpdateStatus();
+	}
+
+	return CWnd::OnWndMsg(message, wParam, lParam, pResult);
+}
+
 CMpcAudioRendererStatusWnd::CMpcAudioRendererStatusWnd()
 {
 }
@@ -251,106 +367,11 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 	p.y += ScaleY(15);
 	m_CurrentDeviceText.Create(WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_READONLY, CRect(p, CSize(ScaleX(377), m_fontheight)), this, (UINT)IDC_STATIC);
 
-	if (m_pMAR) {
-		UINT status = m_pMAR->GetMode();
-		switch (status) {
-			case MODE_NONE:
-			default:
-				break;
-			case MODE_WASAPI_EXCLUSIVE:
-				m_ModeText.SetWindowTextW(ResStr(IDS_ARS_WASAPI_MODE_STATUS_2));
-				break;
-			case MODE_WASAPI_SHARED:
-				m_ModeText.SetWindowTextW(ResStr(IDS_ARS_WASAPI_MODE_STATUS_3));
-				break;
-			case MODE_WASAPI_EXCLUSIVE_BITSTREAM:
-				CString btMode_str;
-
-				BITSTREAM_MODE btMode = m_pMAR->GetBitstreamMode();
-				switch (btMode) {
-					case BITSTREAM_AC3:
-						btMode_str = L"AC3";
-						break;
-					case BITSTREAM_DTS:
-						btMode_str = L"DTS";
-						break;
-					case BITSTREAM_EAC3:
-						btMode_str = L"E-AC3";
-						break;
-					case BITSTREAM_TRUEHD:
-						btMode_str = L"TrueHD";
-						break;
-					case BITSTREAM_DTSHD:
-						btMode_str = L"DTS-HD";
-						break;
-				}
-
-				CString msg = ResStr(IDS_ARS_WASAPI_MODE_STATUS_5);
-				if (!btMode_str.IsEmpty()) {
-					msg.AppendFormat(L" [%s]", btMode_str);
-				}
-				m_ModeText.SetWindowTextW(msg);
-				break;
-		}
-
-		if (status == MODE_WASAPI_EXCLUSIVE_BITSTREAM) {
-			m_InputFormatText.SetWindowTextW(L"Bitstream");
-			m_OutputFormatText.SetWindowTextW(L"Bitstream");
-		} else {
-			WAVEFORMATEX *pWfxIn, *pWfxOut;
-			m_pMAR->GetStatus(&pWfxIn, &pWfxOut);
-			if (pWfxIn && pWfxOut) {
-				auto SetText = [](WAVEFORMATEX* pwfex, CStatic& formatText, CStatic& channelText, CStatic& rateText) {
-					bool bIsFloat = false;
-					bool m_b24PaddedTo32bit = false;
-					DWORD layout = 0;
-					if (IsWaveFormatExtensible(pwfex)) {
-						WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)pwfex;
-						layout = wfex->dwChannelMask;
-						if (wfex->SubFormat == MEDIASUBTYPE_IEEE_FLOAT) {
-							bIsFloat = true;
-						} else {
-							m_b24PaddedTo32bit = wfex->Samples.wValidBitsPerSample == 24 && pwfex->wBitsPerSample == 32;
-						}
-					} else {
-						layout = GetDefChannelMask(pwfex->nChannels);
-						if (pwfex->wFormatTag == WAVE_FORMAT_IEEE_FLOAT) {
-							bIsFloat = true;
-						}
-					}
-
-					CString sFormat;
-					sFormat.Format(L"%ubit %s%s", m_b24PaddedTo32bit ? 24 : pwfex->wBitsPerSample, m_b24PaddedTo32bit ? L"[padded] " : L"", bIsFloat ? L"Float" : L"Integer");
-
-					BYTE lfe = 0;
-					WORD nChannels = pwfex->nChannels;
-					if (layout & SPEAKER_LOW_FREQUENCY) {
-						nChannels--;
-						lfe = 1;
-					}
-
-					CString sChannel;
-					sChannel.Format(L"%u.%u / 0x%x", nChannels, lfe, layout);
-
-					CString sSampleRate;
-					sSampleRate.Format(L"%u", pwfex->nSamplesPerSec);
-
-					formatText.SetWindowTextW(sFormat);
-					channelText.SetWindowTextW(sChannel);
-					rateText.SetWindowTextW(sSampleRate);
-				};
-
-				SetText(pWfxIn, m_InputFormatText, m_InputChannelText, m_InputRateText);
-				SetText(pWfxOut, m_OutputFormatText, m_OutputChannelText, m_OutputRateText);
-			}
-		}
-
-		m_CurrentDeviceText.SetWindowTextW(m_pMAR->GetCurrentDeviceName());
-	}
-
 	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow()) {
 		pWnd->SetFont(&m_font, FALSE);
 	}
+
+	UpdateStatus();
 
 	SetDirty(false);
 
