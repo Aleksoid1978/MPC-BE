@@ -2446,7 +2446,9 @@ void CMpcAudioRenderer::SetReinitializeAudioDevice(BOOL bFullInitialization/* = 
 		m_bNeedReinitialize = TRUE;
 	}
 
-	SetEvent(m_hRendererNeedMoreData);
+	if (m_filterState == State_Running) {
+		SetEvent(m_hRendererNeedMoreData);
+	}
 }
 
 HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = FALSE*/)
