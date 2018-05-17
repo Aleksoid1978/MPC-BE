@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,20 +21,13 @@
 #include "stdafx.h"
 #include "MultiFiles.h"
 
-IMPLEMENT_DYNAMIC(CMultiFiles, CObject)
-
 CMultiFiles::CMultiFiles()
 {
 }
 
-void CMultiFiles::Reset()
+CMultiFiles::~CMultiFiles()
 {
-	m_strFiles.clear();
-	m_FilesSize.clear();
-	m_rtPtsOffsets.clear();
-	m_nCurPart = SIZE_T_MAX;
-	m_llTotalLength = 0;
-	m_pCurrentPTSOffset = nullptr;
+	Close();
 }
 
 BOOL CMultiFiles::Open(LPCTSTR lpszFileName)
@@ -83,7 +76,11 @@ ULONGLONG CMultiFiles::Seek(LONGLONG lOff, UINT nFrom)
 
 	if (m_strFiles.size() == 1) {
 		llOff.QuadPart = lOff;
-		SetFilePointerEx(m_hFile, llOff, &llNewPos, nFrom);
+		if (!SetFilePointerEx(m_hFile, llOff, &llNewPos, nFrom)) {
+			if (Reopen()) {
+				SetFilePointerEx(m_hFile, llOff, &llNewPos, nFrom);
+			}
+		}
 
 		return llNewPos.QuadPart;
 	} else {
@@ -98,35 +95,25 @@ ULONGLONG CMultiFiles::Seek(LONGLONG lOff, UINT nFrom)
 
 		OpenPart(nNewPart);
 		llOff.QuadPart = lAbsolutePos - llSum;
-		SetFilePointerEx(m_hFile, llOff, &llNewPos, FILE_BEGIN);
+		if (!SetFilePointerEx(m_hFile, llOff, &llNewPos, FILE_BEGIN)) {
+			if (Reopen()) {
+				SetFilePointerEx(m_hFile, llOff, &llNewPos, FILE_BEGIN);
+			}
+		}
 
 		return llSum + llNewPos.QuadPart;
 	}
 }
 
-LONGLONG CMultiFiles::GetAbsolutePosition(LONGLONG lOff, UINT nFrom)
-{
-	LARGE_INTEGER llNoMove = {};
-	LARGE_INTEGER llCurPos = {};
-
-	switch (nFrom) {
-		case FILE_BEGIN :
-			return lOff;
-		case FILE_CURRENT :
-			SetFilePointerEx(m_hFile, llNoMove, &llCurPos, FILE_CURRENT);
-			return llCurPos.QuadPart + lOff;
-		case FILE_END :
-			return m_llTotalLength - lOff;
-		default:
-			return 0; // just used to quash "not all control paths return a value" warning
-	}
-}
-
-ULONGLONG CMultiFiles::GetLength() const
+ULONGLONG CMultiFiles::GetLength()
 {
 	if (m_strFiles.size() == 1) {
 		LARGE_INTEGER llSize = {};
-		GetFileSizeEx(m_hFile, &llSize);
+		if (!GetFileSizeEx(m_hFile, &llSize)) {
+			if (Reopen()) {
+				GetFileSizeEx(m_hFile, &llSize);
+			}
+		}
 		return llSize.QuadPart;
 	} else {
 		return m_llTotalLength;
@@ -152,20 +139,13 @@ UINT CMultiFiles::Read(BYTE* lpBuf, UINT nCount, DWORD& dwError)
 again:
 		DWORD nNumberOfBytesRead = 0;
 		if (!ReadFile(m_hFile, lpBuf, nCount - dwRead, &nNumberOfBytesRead, nullptr)) {
-			const DWORD dwLastError = GetLastError();
-			if (dwLastError != ERROR_SUCCESS) {
-				// TODO - select only the necessary error codes : ERROR_INVALID_HANDLE, ERROR_BAD_NETPATH, ERROR_DEV_NOT_EXIST, ERROR_FILE_INVALID ...
-				nCurPart = m_nCurPart;
-				ClosePart();
-				if (OpenPart(nCurPart)) {
-					LARGE_INTEGER llNewPos = {};
-					if (SetFilePointerEx(m_hFile, llCurPos, &llNewPos, FILE_BEGIN) && llCurPos.QuadPart == llNewPos.QuadPart) {
-						goto again;
-					}
+			if (Reopen(&dwError)) {
+				LARGE_INTEGER llNewPos = {};
+				if (SetFilePointerEx(m_hFile, llCurPos, &llNewPos, FILE_BEGIN) && llCurPos.QuadPart == llNewPos.QuadPart) {
+					goto again;
 				}
 			}
 
-			dwError = dwLastError;
 			break;
 		}
 
@@ -185,11 +165,6 @@ void CMultiFiles::Close()
 {
 	ClosePart();
 	Reset();
-}
-
-CMultiFiles::~CMultiFiles()
-{
-	Close();
 }
 
 BOOL CMultiFiles::OpenPart(size_t nPart)
@@ -218,5 +193,54 @@ void CMultiFiles::ClosePart()
 		CloseHandle(m_hFile);
 		m_hFile    = INVALID_HANDLE_VALUE;
 		m_nCurPart = SIZE_T_MAX;
+	}
+}
+
+void CMultiFiles::Reset()
+{
+	m_strFiles.clear();
+	m_FilesSize.clear();
+	m_rtPtsOffsets.clear();
+	m_nCurPart = SIZE_T_MAX;
+	m_llTotalLength = 0;
+	m_pCurrentPTSOffset = nullptr;
+}
+
+BOOL CMultiFiles::Reopen(DWORD* dwError/* = nullptr*/)
+{
+	const DWORD dwLastError = GetLastError();
+	if (dwError) {
+		*dwError = dwLastError;
+	}
+	if (dwLastError != ERROR_SUCCESS) {
+		const size_t nCurPart = m_nCurPart;
+		ClosePart();
+		if (OpenPart(nCurPart)) {
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
+
+LONGLONG CMultiFiles::GetAbsolutePosition(LONGLONG lOff, UINT nFrom)
+{
+	LARGE_INTEGER llNoMove = {};
+	LARGE_INTEGER llCurPos = {};
+
+	switch (nFrom) {
+		case FILE_BEGIN :
+			return lOff;
+		case FILE_CURRENT :
+			if (!SetFilePointerEx(m_hFile, llNoMove, &llCurPos, FILE_CURRENT)) {
+				if (Reopen()) {
+					SetFilePointerEx(m_hFile, llNoMove, &llCurPos, FILE_CURRENT);
+				}
+			}
+			return llCurPos.QuadPart + lOff;
+		case FILE_END :
+			return m_llTotalLength - lOff;
+		default:
+			return 0; // just used to quash "not all control paths return a value" warning
 	}
 }

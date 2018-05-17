@@ -22,10 +22,8 @@
 
 #include "../../../DSUtil/HdmvClipInfo.h"
 
-class CMultiFiles : public CObject
+class CMultiFiles
 {
-	DECLARE_DYNAMIC(CMultiFiles)
-
 protected:
 	std::vector<CString>        m_strFiles;
 	std::vector<LONGLONG>       m_FilesSize;
@@ -36,12 +34,6 @@ protected:
 	size_t                      m_nCurPart          = SIZE_T_MAX;
 	REFERENCE_TIME*             m_pCurrentPTSOffset = nullptr;
 
-private:
-	BOOL     OpenPart(size_t nPart);
-	void     ClosePart();
-	void     Reset();
-	LONGLONG GetAbsolutePosition(LONGLONG lOff, UINT nFrom);
-
 public:
 	CMultiFiles();
 	virtual ~CMultiFiles();
@@ -50,7 +42,14 @@ public:
 	virtual BOOL OpenFiles(CHdmvClipInfo::CPlaylist& files);
 
 	virtual ULONGLONG Seek(LONGLONG lOff, UINT nFrom);
-	virtual ULONGLONG GetLength() const;
+	virtual ULONGLONG GetLength();
 	virtual UINT Read(BYTE* lpBuf, UINT nCount, DWORD& dwError);
 	virtual void Close();
+
+private:
+	BOOL     OpenPart(size_t nPart);
+	void     ClosePart();
+	void     Reset();
+	BOOL     Reopen(DWORD* dwError = nullptr);
+	LONGLONG GetAbsolutePosition(LONGLONG lOff, UINT nFrom);
 };

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -64,7 +64,7 @@ protected:
 	CString m_url;
 
 	virtual BOOL Open(LPCTSTR lpszFileName) final;
-	virtual ULONGLONG GetLength() const final;
+	virtual ULONGLONG GetLength() final;
 
 public:
 
