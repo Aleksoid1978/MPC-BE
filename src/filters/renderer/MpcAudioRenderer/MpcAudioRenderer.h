@@ -271,7 +271,7 @@ private:
 	HANDLE					m_hRendererNeedMoreData;
 
 	CAMEvent				m_FlushEvent;
-	CAMEvent				m_ReceiveEvent;
+	std::mutex				m_receive_mutex;
 
 	BOOL					m_bNeedReinitialize;
 	BOOL					m_bNeedReinitializeFull;

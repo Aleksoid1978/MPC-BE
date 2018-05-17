@@ -164,7 +164,6 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_bNeedReinitialize(FALSE)
 	, m_bNeedReinitializeFull(FALSE)
 	, m_FlushEvent(TRUE)
-	, m_ReceiveEvent(TRUE)
 	, m_bReal32bitSupport(FALSE)
 	, m_bDVDPlayback(FALSE)
 {
@@ -363,12 +362,6 @@ HRESULT CMpcAudioRenderer::Receive(IMediaSample* pSample)
 	auto ReceiveInternal = [&](IMediaSample* pSample) {
 		ASSERT(pSample);
 
-		if (m_FlushEvent.Check()) {
-			return S_OK;
-		}
-
-		m_ReceiveEvent.Set();
-
 		// It may return VFW_E_SAMPLE_REJECTED code to say don't bother
 		HRESULT hr = PrepareReceive(pSample);
 		ASSERT(m_bInReceive == SUCCEEDED(hr));
@@ -409,8 +402,9 @@ HRESULT CMpcAudioRenderer::Receive(IMediaSample* pSample)
 
 	};
 
+	m_receive_mutex.lock();
 	HRESULT hr = ReceiveInternal(pSample);
-	m_ReceiveEvent.Reset();
+	m_receive_mutex.unlock();
 
 	return hr;
 }
@@ -1484,10 +1478,6 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 
 HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 {
-	if (m_FlushEvent.Check()) {
-		return S_FALSE;
-	}
-
 	{
 		CAutoLock cQueueLock(&m_csQueue);
 		if (p && !m_rtNextSampleTime && !m_WasapiQueue.GetCount()
@@ -2660,6 +2650,8 @@ HRESULT CMpcAudioRenderer::EndFlush()
 	m_Filter.Flush();
 
 	HRESULT hr = CBaseRenderer::EndFlush();
+
+	m_receive_mutex.unlock();
 	m_FlushEvent.Reset();
 
 	if (!m_bDVDPlayback) {
@@ -2685,17 +2677,13 @@ void CMpcAudioRenderer::Flush()
 	m_FlushEvent.Set();
 
 #if DEBUG
-	ULONGLONG start = 0;
-	if (m_ReceiveEvent.Check()) {
-		start = GetPerfCounter();
-	}
+	const ULONGLONG start = GetPerfCounter();
 #endif
-	while (m_ReceiveEvent.Check()) {
-		Sleep(1);
-	};
+	m_receive_mutex.lock();
+
 #if DEBUG
-	if (start) {
-		const ULONGLONG end = GetPerfCounter();
+	const ULONGLONG end = GetPerfCounter();
+	if ((end - start) >= OneMillisecond / 2) {
 		DLog(L"CMpcAudioRenderer::Flush() : Waiting for the end of data receive - %0.3f ms", (end - start) / 10000.0);
 	}
 #endif
