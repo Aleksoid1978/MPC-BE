@@ -82,7 +82,7 @@ BOOL CAsyncFileReader::Open(LPCTSTR lpszFileName)
 	return __super::Open(lpszFileName);
 }
 
-ULONGLONG CAsyncFileReader::GetLength() const
+ULONGLONG CAsyncFileReader::GetLength()
 {
 	return m_total ? m_total : __super::GetLength();
 }
