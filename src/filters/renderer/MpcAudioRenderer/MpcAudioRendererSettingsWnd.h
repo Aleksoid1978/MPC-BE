@@ -63,7 +63,7 @@ public:
 	void OnDeactivate();
 	bool OnApply();
 
-	static LPCWSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_FILTER_SETTINGS_CAPTION); }
+	static LPCWSTR GetWindowTitle() { return MAKEINTRESOURCEW(IDS_FILTER_SETTINGS_CAPTION); }
 	static CSize GetWindowSize() { return CSize(340, 211); }
 
 	DECLARE_MESSAGE_MAP()
@@ -113,7 +113,7 @@ public:
 	bool OnActivate();
 	void OnDeactivate();
 
-	static LPCWSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_ARS_STATUS); }
+	static LPCWSTR GetWindowTitle() { return MAKEINTRESOURCEW(IDS_ARS_STATUS); }
 	static CSize GetWindowSize() { return CSize(392, 143); }
 
 	DECLARE_MESSAGE_MAP()

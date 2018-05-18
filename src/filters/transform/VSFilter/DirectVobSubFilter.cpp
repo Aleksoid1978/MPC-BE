@@ -72,7 +72,7 @@ CDirectVobSubFilter::CDirectVobSubFilter(LPUNKNOWN punk, HRESULT* phr, const GUI
 		ReleaseDC(nullptr, hdc);
 		lf.lfWeight = FW_BOLD;
 		wcscpy_s(lf.lfFaceName, L"Arial");
-		m_hfont = CreateFontIndirect(&lf);
+		m_hfont = CreateFontIndirectW(&lf);
 	}
 
 	theApp.WriteProfileString(ResStr(IDS_R_DEFTEXTPATHES), L"Hint", L"The first three are fixed, but you can add more up to ten entries.");

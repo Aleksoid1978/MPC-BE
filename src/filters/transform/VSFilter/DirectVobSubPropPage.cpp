@@ -30,8 +30,8 @@
 
 BOOL WINAPI MyGetDialogSize(int iResourceID, DLGPROC pDlgProc, LPARAM lParam, SIZE* pResult)
 {
-	HWND hwnd = CreateDialogParam(AfxGetResourceHandle(),
-								  MAKEINTRESOURCE(iResourceID),
+	HWND hwnd = CreateDialogParamW(AfxGetResourceHandle(),
+								  MAKEINTRESOURCEW(iResourceID),
 								  GetDesktopWindow(),
 								  pDlgProc,
 								  lParam);
@@ -102,7 +102,7 @@ STDMETHODIMP CDVSBasePPage::Activate(HWND hwndParent, LPCRECT pRect, BOOL fModal
 		return E_UNEXPECTED;
 	}
 
-	m_hwnd = CreateDialogParam(AfxGetResourceHandle(), MAKEINTRESOURCE(m_DialogId), hwndParent, DialogProc, (LPARAM)this);
+	m_hwnd = CreateDialogParamW(AfxGetResourceHandle(), MAKEINTRESOURCEW(m_DialogId), hwndParent, DialogProc, (LPARAM)this);
 	if (m_hwnd == nullptr) {
 		return E_OUTOFMEMORY;
 	}

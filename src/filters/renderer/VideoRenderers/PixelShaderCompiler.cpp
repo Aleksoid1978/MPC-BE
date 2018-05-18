@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -147,7 +147,7 @@ HRESULT CreateShaderFromResource(IDirect3DDevice9* pD3DDev, IDirect3DPixelShader
 		return E_POINTER;
 	}
 
-	HRSRC hrsrc = FindResource(AfxGetApp()->m_hInstance, MAKEINTRESOURCE(resid), L"SHADER");
+	HRSRC hrsrc = FindResource(AfxGetApp()->m_hInstance, MAKEINTRESOURCEW(resid), L"SHADER");
 	if (!hrsrc) {
 		return E_INVALIDARG;
 	}
