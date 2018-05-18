@@ -96,11 +96,14 @@ BEGIN
     IDS_ARS_RELEASE_DEVICE_IDLE    "Release device when idle"
     IDS_ARS_CROSSFEED              "Enable stereo crossfeed (for headphones)"
     IDS_ARS_SOUND_DEVICE           "Sound Device:"
-    IDS_ARS_WASAPI_MODE_STATUS     "Status"
-    IDS_ARS_WASAPI_MODE_STATUS_1   "Not running"
-    IDS_ARS_WASAPI_MODE_STATUS_2   "use WASAPI, Exclusive mode"
-    IDS_ARS_WASAPI_MODE_STATUS_3   "use WASAPI, Shared mode"
-    IDS_ARS_WASAPI_MODE_STATUS_5   "use WASAPI, Exclusive mode, Bitstream"
+    IDS_ARS_STATUS                 "Status"
+    IDS_ARS_DEVICE                 "Device:"
+    IDS_ARS_MODE                   "Mode:"
+    IDS_ARS_INPUT                  "Input"
+    IDS_ARS_OUTPUT                 "Output"
+    IDS_ARS_FORMAT                 "Format:"
+    IDS_ARS_SAMPLERATE             "Sample rate:"
+    IDS_ARS_CHANNELS               "Channels"
 END
 
 #endif    // English (United States) resources

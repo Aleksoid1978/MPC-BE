@@ -11,11 +11,14 @@
 #define IDS_ARS_SOUND_DEVICE            7605
 #define IDS_ARS_RELEASE_DEVICE_IDLE     7606
 #define IDS_ARS_CROSSFEED               7607
-#define IDS_ARS_WASAPI_MODE_STATUS      7610
-#define IDS_ARS_WASAPI_MODE_STATUS_1    7611
-#define IDS_ARS_WASAPI_MODE_STATUS_2    7612
-#define IDS_ARS_WASAPI_MODE_STATUS_3    7613
-#define IDS_ARS_WASAPI_MODE_STATUS_5    7614
+#define IDS_ARS_STATUS                  7610
+#define IDS_ARS_DEVICE                  7611
+#define IDS_ARS_MODE                    7612
+#define IDS_ARS_INPUT                   7613
+#define IDS_ARS_OUTPUT                  7614
+#define IDS_ARS_FORMAT                  7615
+#define IDS_ARS_SAMPLERATE              7616
+#define IDS_ARS_CHANNELS                7617
 
 // Next default values for new objects
 //

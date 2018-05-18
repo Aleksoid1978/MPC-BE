@@ -33,6 +33,24 @@
 // CInternalPropertyPageWnd
 //
 
+void CInternalPropertyPageWnd::CalcTextRect(CRect& rect, long x, long y, long w)
+{
+	rect.left = x;
+	rect.top = rect.bottom = y;
+	rect.right = x + w;
+	ScaleRect(rect);
+	rect.bottom += m_fontheight;
+}
+
+void CInternalPropertyPageWnd::CalcRect(CRect& rect, long x, long y, long w, long h)
+{
+	rect.left   = x;
+	rect.top    = y;
+	rect.right  = x + w;
+	rect.bottom = y + h;
+	ScaleRect(rect);
+}
+
 CInternalPropertyPageWnd::CInternalPropertyPageWnd()
 	: m_fDirty(false)
 	, m_fontheight(DEFAULT_FONTSIZE)
@@ -68,15 +86,15 @@ BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRec
 		lf.lfHeight = -PointsToPixels(height);
 		lf.lfWeight = FW_NORMAL;
 		lf.lfCharSet = DEFAULT_CHARSET;
-		if (!m_font.CreateFontIndirect(&lf)) {
+		if (!m_font.CreateFontIndirectW(&lf)) {
 			return FALSE;
 		}
 
 		lf.lfHeight -= -1;
 		wcscpy_s(lf.lfFaceName, L"Lucida Console");
-		if (!m_monospacefont.CreateFontIndirect(&lf)) {
+		if (!m_monospacefont.CreateFontIndirectW(&lf)) {
 			wcscpy_s(lf.lfFaceName, L"Courier New");
-			if (!m_monospacefont.CreateFontIndirect(&lf)) {
+			if (!m_monospacefont.CreateFontIndirectW(&lf)) {
 				return FALSE;
 			}
 		}
@@ -84,7 +102,7 @@ BOOL CInternalPropertyPageWnd::Create(IPropertyPageSite* pPageSite, LPCRECT pRec
 		HDC hDC = ::GetDC(nullptr);
 		HFONT hFontOld = (HFONT)SelectObject(hDC, m_font.m_hObject);
 		CSize size;
-		GetTextExtentPoint32(hDC, L"x", 1, &size);
+		GetTextExtentPoint32W(hDC, L"x", 1, &size);
 		SelectObject(hDC, hFontOld);
 		::ReleaseDC(nullptr, hDC);
 

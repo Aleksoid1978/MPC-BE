@@ -41,6 +41,8 @@ protected:
 	CFont m_font, m_monospacefont;
 	int m_fontheight;
 
+	void CalcTextRect(CRect& rect, long x, long y, long w);
+	void CalcRect(CRect& rect, long x, long y, long w, long h);
 	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 
 public:

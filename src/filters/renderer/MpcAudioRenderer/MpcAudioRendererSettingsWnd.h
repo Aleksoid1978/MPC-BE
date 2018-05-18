@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2017 see Authors.txt
+ * (C) 2010-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -79,26 +79,26 @@ class __declspec(uuid("E3D0704B-1579-4E9E-8674-2674CB90D07A"))
 private :
 	CComQIPtr<IMpcAudioRendererFilter> m_pMAR;
 
-	CButton		m_gInput;
-	CButton		m_gOutput;
+	CStatic		m_txtDevice;
+	CEdit		m_edtDevice;
+	CStatic		m_txtMode;
+	CEdit		m_edtMode;
 
+	CButton		m_grpInput;
 	CStatic		m_InputFormatLabel;
 	CStatic		m_InputFormatText;
-	CStatic		m_OutputFormatLabel;
-	CStatic		m_OutputFormatText;
-
 	CStatic		m_InputChannelLabel;
 	CStatic		m_InputChannelText;
-	CStatic		m_OutputChannelLabel;
-	CStatic		m_OutputChannelText;
-
 	CStatic		m_InputRateLabel;
 	CStatic		m_InputRateText;
+
+	CButton		m_grpOutput;
+	CStatic		m_OutputFormatLabel;
+	CStatic		m_OutputFormatText;
+	CStatic		m_OutputChannelLabel;
+	CStatic		m_OutputChannelText;
 	CStatic		m_OutputRateLabel;
 	CStatic		m_OutputRateText;
-
-	CStatic		m_ModeText;
-	CEdit		m_CurrentDeviceText;
 
 	void UpdateStatus();
 
@@ -113,7 +113,7 @@ public:
 	bool OnActivate();
 	void OnDeactivate();
 
-	static LPCWSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_ARS_WASAPI_MODE_STATUS); }
+	static LPCWSTR GetWindowTitle() { return MAKEINTRESOURCE(IDS_ARS_STATUS); }
 	static CSize GetWindowSize() { return CSize(392, 143); }
 
 	DECLARE_MESSAGE_MAP()
