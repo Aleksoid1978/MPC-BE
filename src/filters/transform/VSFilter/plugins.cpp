@@ -317,7 +317,7 @@ namespace Plugin
 				UINT_PTR CALLBACK OpenHookProc(HWND hDlg, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 
 				fd.m_pOFN->hInstance = AfxGetResourceHandle();
-				fd.m_pOFN->lpTemplateName = MAKEINTRESOURCE(IDD_TEXTSUBOPENTEMPLATE);
+				fd.m_pOFN->lpTemplateName = MAKEINTRESOURCEW(IDD_TEXTSUBOPENTEMPLATE);
 				fd.m_pOFN->lpfnHook = (LPOFNHOOKPROC)OpenHookProc;
 				fd.m_pOFN->lCustData = (LPARAM)DEFAULT_CHARSET;
 
@@ -591,7 +591,7 @@ namespace Plugin
 				UINT_PTR CALLBACK OpenHookProc(HWND hDlg, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 
 				fd.m_pOFN->hInstance = AfxGetResourceHandle();
-				fd.m_pOFN->lpTemplateName = MAKEINTRESOURCE(IDD_TEXTSUBOPENTEMPLATE);
+				fd.m_pOFN->lpTemplateName = MAKEINTRESOURCEW(IDD_TEXTSUBOPENTEMPLATE);
 				fd.m_pOFN->lpfnHook = (LPOFNHOOKPROC)OpenHookProc;
 				fd.m_pOFN->lCustData = (LPARAM)DEFAULT_CHARSET;
 #else

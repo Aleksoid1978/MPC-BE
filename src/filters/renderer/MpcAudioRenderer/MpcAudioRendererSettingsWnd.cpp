@@ -240,7 +240,7 @@ void CMpcAudioRendererStatusWnd::UpdateStatus()
 					}
 
 					CString sFormat;
-					sFormat.Format(L"%ubit %s%s", m_b24PaddedTo32bit ? 24 : pwfex->wBitsPerSample, m_b24PaddedTo32bit ? L"[padded] " : L"", bIsFloat ? L"Float" : L"Integer");
+					sFormat.Format(L"%u-bit %s%s", m_b24PaddedTo32bit ? 24 : pwfex->wBitsPerSample, m_b24PaddedTo32bit ? L"[padded] " : L"", bIsFloat ? L"Float" : L"Integer");
 
 					BYTE lfe = 0;
 					WORD nChannels = pwfex->nChannels;

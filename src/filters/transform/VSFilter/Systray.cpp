@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -109,7 +109,7 @@ void CSystrayWindow::OnDestroy()
 	tnid.cbSize = sizeof(NOTIFYICONDATA);
 	tnid.hWnd = m_hWnd;
 	tnid.uID = IDI_ICON1;
-	Shell_NotifyIcon(NIM_DELETE, &tnid);
+	Shell_NotifyIconW(NIM_DELETE, &tnid);
 
 	if (g_hHook != INVALID_HANDLE_VALUE) {
 		UnhookWindowsHookEx(g_hHook);
@@ -159,13 +159,13 @@ LRESULT CSystrayWindow::OnTaskBarRestart(WPARAM, LPARAM)
 		tnid.cbSize = sizeof(NOTIFYICONDATA);
 		tnid.hWnd = m_hWnd;
 		tnid.uID = IDI_ICON1;
-		tnid.hIcon = (HICON)LoadIcon(AfxGetResourceHandle(), MAKEINTRESOURCE(IDI_ICON1));
-		//tnid.hIcon = (HICON)LoadImage(AfxGetResourceHandle(), MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
+		tnid.hIcon = (HICON)LoadIcon(AfxGetResourceHandle(), MAKEINTRESOURCEW(IDI_ICON1));
+		//tnid.hIcon = (HICON)LoadImage(AfxGetResourceHandle(), MAKEINTRESOURCEW(IDI_ICON1), IMAGE_ICON, 0, 0, LR_LOADTRANSPARENT);
 		tnid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
 		tnid.uCallbackMessage = WM_NOTIFYICON;
 		wcscpy_s(tnid.szTip, L"DirectVobSub");
 
-		BOOL res = Shell_NotifyIcon(NIM_ADD, &tnid);
+		BOOL res = Shell_NotifyIconW(NIM_ADD, &tnid);
 
 		if (tnid.hIcon) {
 			DestroyIcon(tnid.hIcon);
