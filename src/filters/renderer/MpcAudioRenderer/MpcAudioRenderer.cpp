@@ -359,54 +359,51 @@ HRESULT	CMpcAudioRenderer::CheckMediaType(const CMediaType *pmt)
 
 HRESULT CMpcAudioRenderer::Receive(IMediaSample* pSample)
 {
-	auto ReceiveInternal = [&](IMediaSample* pSample) {
-		ASSERT(pSample);
-
-		// It may return VFW_E_SAMPLE_REJECTED code to say don't bother
-		HRESULT hr = PrepareReceive(pSample);
-		ASSERT(m_bInReceive == SUCCEEDED(hr));
-		if (FAILED(hr)) {
-			if (hr == VFW_E_SAMPLE_REJECTED) {
-				hr = S_OK;
-			}
-			return hr;
-		}
-
-		if (m_State == State_Paused) {
-			{
-				CAutoLock cRendererLock(&m_InterfaceLock);
-				if (m_State == State_Stopped) {
-					m_bInReceive = FALSE;
-					return S_OK;
-				}
-			}
-			Ready();
-		}
-
-		Transform(pSample);
-
-		m_bInReceive = FALSE;
-
-		CAutoLock cRendererLock(&m_InterfaceLock);
-		if (m_State == State_Stopped) {
-			return S_OK;
-		}
-
-		CAutoLock cSampleLock(&m_RendererLock);
-
-		ClearPendingSample();
-		SendEndOfStream();
-		CancelNotification();
-
+	if (m_FlushEvent.Check()) {
 		return S_OK;
+	}
 
-	};
+	std::unique_lock<std::mutex> lock(m_receive_mutex);
 
-	m_receive_mutex.lock();
-	HRESULT hr = ReceiveInternal(pSample);
-	m_receive_mutex.unlock();
+	ASSERT(pSample);
 
-	return hr;
+	// It may return VFW_E_SAMPLE_REJECTED code to say don't bother
+	HRESULT hr = PrepareReceive(pSample);
+	ASSERT(m_bInReceive == SUCCEEDED(hr));
+	if (FAILED(hr)) {
+		if (hr == VFW_E_SAMPLE_REJECTED) {
+			hr = S_OK;
+		}
+		return hr;
+	}
+
+	if (m_State == State_Paused) {
+		{
+			CAutoLock cRendererLock(&m_InterfaceLock);
+			if (m_State == State_Stopped) {
+				m_bInReceive = FALSE;
+				return S_OK;
+			}
+		}
+		Ready();
+	}
+
+	Transform(pSample);
+
+	m_bInReceive = FALSE;
+
+	CAutoLock cRendererLock(&m_InterfaceLock);
+	if (m_State == State_Stopped) {
+		return S_OK;
+	}
+
+	CAutoLock cSampleLock(&m_RendererLock);
+
+	ClearPendingSample();
+	SendEndOfStream();
+	CancelNotification();
+
+	return S_OK;
 }
 
 STDMETHODIMP CMpcAudioRenderer::NonDelegatingQueryInterface(REFIID riid, void **ppv)
