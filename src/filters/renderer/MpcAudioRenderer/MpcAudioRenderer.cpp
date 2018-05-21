@@ -166,6 +166,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_FlushEvent(TRUE)
 	, m_bReal32bitSupport(FALSE)
 	, m_bDVDPlayback(FALSE)
+	, m_bs2b_active(false)
 {
 	DLog(L"CMpcAudioRenderer::CMpcAudioRenderer()");
 
@@ -1310,7 +1311,6 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 		m_rtNextSampleTime = pSilent->rtStart;
 		m_rtEstimateSlavingJitter = 0;
 
-		CAutoLock cQueueLock(&m_csQueue);
 		m_WasapiQueue.Add(pSilent);
 
 		StartAudioClient();
@@ -1475,26 +1475,22 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 
 HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 {
-	{
-		CAutoLock cQueueLock(&m_csQueue);
-		if (p && !m_rtNextSampleTime && !m_WasapiQueue.GetCount()
-				&& p->rtStart > 0 && p->rtStart <= 60 * UNITS) {
-			const UINT32 nSilenceFrames = TimeToSamples(p->rtStart, m_pWaveFormatExOutput);
-			const UINT32 nSilenceBytes  = nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign;
+	if (p && !m_rtNextSampleTime && !m_WasapiQueue.GetCount()
+			&& p->rtStart > 0 && p->rtStart <= 60 * UNITS) {
+		const UINT32 nSilenceFrames = TimeToSamples(p->rtStart, m_pWaveFormatExOutput);
+		const UINT32 nSilenceBytes  = nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign;
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL
-			DLog(L"CMpcAudioRenderer::PushToQueue() - Pad silence %.2f ms", p->rtStart / 10000.0);
+		DLog(L"CMpcAudioRenderer::PushToQueue() - Pad silence %.2f ms", p->rtStart / 10000.0);
 #endif
-			CAutoPtr<CPacket> pSilent(DNew CPacket());
-			pSilent->rtStart = 0;
-			pSilent->rtStop  = p->rtStart;
-			pSilent->SetCount(nSilenceBytes);
-			ZeroMemory(pSilent->data(), nSilenceBytes);
+		CAutoPtr<CPacket> pSilent(DNew CPacket());
+		pSilent->rtStart = 0;
+		pSilent->rtStop  = p->rtStart;
+		pSilent->SetCount(nSilenceBytes);
+		ZeroMemory(pSilent->data(), nSilenceBytes);
 
-			m_WasapiQueue.Add(pSilent);
-		}
+		m_WasapiQueue.Add(pSilent);
 	}
 
-	CAutoLock cQueueLock(&m_csQueue);
 	m_WasapiQueue.Add(p);
 
 	return S_OK;
@@ -2550,15 +2546,14 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 		UINT32 nWritenBytes = 0;
 
 		do {
-			{
-				CAutoLock cQueueLock(&m_csQueue);
-				if (!m_CurrentPacket && m_WasapiQueue.GetCount()) {
-					m_CurrentPacket = m_WasapiQueue.Remove();
-					m_nSampleOffset = 0;
-				}
-			}
 			if (!m_CurrentPacket) {
-				break;
+				m_nSampleOffset = 0;
+
+				size_t count;
+				m_WasapiQueue.RemoveSafe(m_CurrentPacket, count);
+				if (!m_CurrentPacket) {
+					break;
+				}
 			}
 
 			if (!m_nSampleOffset) {
@@ -2627,18 +2622,13 @@ void CMpcAudioRenderer::WasapiFlush()
 {
 	DLog(L"CMpcAudioRenderer::WasapiFlush()");
 
-	{
-		CAutoLock cQueueLock(&m_csQueue);
-		m_WasapiQueue.RemoveAll();
-		m_CurrentPacket.Free();
+	m_WasapiQueue.RemoveAll();
+	m_CurrentPacket.Free();
 
-		m_nSampleOffset = 0;
-	}
+	m_nSampleOffset = 0;
 
-	{
-		CAutoLock cResamplerLock(&m_csResampler);
-		m_Resampler.FlushBuffers();
-	}
+	CAutoLock cResamplerLock(&m_csResampler);
+	m_Resampler.FlushBuffers();
 }
 
 HRESULT CMpcAudioRenderer::EndFlush()
@@ -2688,7 +2678,6 @@ void CMpcAudioRenderer::Flush()
 
 size_t CMpcAudioRenderer::WasapiQueueSize()
 {
-	CAutoLock cQueueLock(&m_csQueue);
 	return m_WasapiQueue.GetSize() + (m_CurrentPacket ? m_CurrentPacket->size() : 0);
 }
 
