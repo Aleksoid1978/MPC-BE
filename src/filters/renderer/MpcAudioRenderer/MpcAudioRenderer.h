@@ -47,29 +47,28 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	, public ISpecifyPropertyPages2
 	, public IMpcAudioRendererFilter
 {
-	CCritSec			m_csQueue;
-	CCritSec			m_csResampler;
-	CCritSec			m_csRender;
-	CCritSec			m_csProps;
-	CCritSec			m_csCheck;
+	CCritSec          m_csResampler;
+	CCritSec          m_csRender;
+	CCritSec          m_csProps;
+	CCritSec          m_csCheck;
 
-	CMixer				m_Resampler;
+	CMixer            m_Resampler;
 
-	CPacketQueue		m_WasapiQueue;
-	CAutoPtr<CPacket>	m_CurrentPacket;
+	CPacketQueue      m_WasapiQueue;
+	CAutoPtr<CPacket> m_CurrentPacket;
 
-	REFERENCE_TIME		m_rtStartTime;
-	REFERENCE_TIME		m_rtNextSampleTime;
-	REFERENCE_TIME		m_rtLastSampleTimeEnd;
-	REFERENCE_TIME		m_rtEstimateSlavingJitter;
+	REFERENCE_TIME    m_rtStartTime;
+	REFERENCE_TIME    m_rtNextSampleTime;
+	REFERENCE_TIME    m_rtLastSampleTimeEnd;
+	REFERENCE_TIME    m_rtEstimateSlavingJitter;
 
-	BOOL				m_bUseDefaultDevice;
+	BOOL              m_bUseDefaultDevice;
 
-	CString				m_strCurrentDeviceId;
-	CString				m_strCurrentDeviceName;
+	CString           m_strCurrentDeviceId;
+	CString           m_strCurrentDeviceName;
 
-	bs2b_base			m_bs2b;
-	bool				m_bs2b_active = false;
+	bs2b_base         m_bs2b;
+	bool              m_bs2b_active;
 
 public:
 	CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr);
