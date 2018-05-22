@@ -690,7 +690,7 @@ HRESULT CEVRAllocatorPresenter::IsMediaTypeSupported(IMFMediaType* pMixerType)
 	int Merit = 0;
 
 	if (SUCCEEDED(hr)) {
-		hr = GetMixerMediaTypeMerit(pMixerType, &Merit);
+		hr = GetMixerMediaTypeMerit(pMixerType, Merit);
 	}
 
 	return hr;
@@ -762,7 +762,7 @@ HRESULT CEVRAllocatorPresenter::SetMediaType(IMFMediaType* pType)
 
 	if (SUCCEEDED(hr == InitializeDevice(pType))) {
 		D3DFORMAT format = D3DFMT_UNKNOWN;
-		GetMediaTypeFourCC(pType, (DWORD*)&format);
+		GetMediaTypeD3DFormat(pType, format);
 		m_strMixerFmtOut = GetD3DFormatStr(format);
 	}
 
@@ -771,26 +771,22 @@ HRESULT CEVRAllocatorPresenter::SetMediaType(IMFMediaType* pType)
 	return hr;
 }
 
-HRESULT CEVRAllocatorPresenter::GetMediaTypeFourCC(IMFMediaType* pType, DWORD* pFourCC)
+HRESULT CEVRAllocatorPresenter::GetMediaTypeD3DFormat(IMFMediaType* pType, D3DFORMAT& d3dformat)
 {
-	if (pFourCC == nullptr) {
-		return E_POINTER;
-	}
+	GUID subtype = GUID_NULL;
+	HRESULT hr = pType->GetGUID(MF_MT_SUBTYPE, &subtype);
 
-	GUID guidSubType = GUID_NULL;
-	HRESULT hr = pType->GetGUID(MF_MT_SUBTYPE, &guidSubType);
-
-	if (SUCCEEDED(hr)) {
-		*pFourCC = guidSubType.Data1;
+	if (SUCCEEDED(hr) && subtype == FOURCCMap(subtype.Data1)) { // {xxxxxxxx-0000-0010-8000-00AA00389B71}
+		d3dformat = (D3DFORMAT)subtype.Data1;
 	}
 
 	return hr;
 }
 
-HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int* pMerit)
+HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int& merit)
 {
-	DWORD mix_fmt;
-	HRESULT hr = GetMediaTypeFourCC(pType, &mix_fmt);
+	D3DFORMAT mix_fmt;
+	HRESULT hr = GetMediaTypeD3DFormat(pType, mix_fmt);
 
 	if (SUCCEEDED(hr)) {
 		// Information about actual YUV formats - http://msdn.microsoft.com/en-us/library/windows/desktop/dd206750%28v=vs.85%29.aspx
@@ -817,48 +813,48 @@ HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int*
 			case D3DFMT_X4R4G4B4:
 			case D3DFMT_A8P8:
 			case D3DFMT_P8:
-				*pMerit = 0;
+				merit = 0;
 				return MF_E_INVALIDMEDIATYPE;
 		}
 
-		*pMerit = 2;
+		merit = 2;
 
 		if (m_inputMediaType.subtype == MEDIASUBTYPE_NV12 || m_inputMediaType.subtype == MEDIASUBTYPE_YV12) {
 			switch (mix_fmt) {
-				case FCC('NV12'): *pMerit = 90; break;
-				case FCC('YUY2'): *pMerit = 80; break;
-				case FCC('P010'): *pMerit = 70; break;
-				case D3DFMT_X8R8G8B8: *pMerit = 60; break;
-				case D3DFMT_A2R10G10B10: *pMerit = 50; break;
+				case FCC('NV12'): merit = 90; break;
+				case FCC('YUY2'): merit = 80; break;
+				case FCC('P010'): merit = 70; break;
+				case D3DFMT_X8R8G8B8: merit = 60; break;
+				case D3DFMT_A2R10G10B10: merit = 50; break;
 			}
 		}
 		else if (m_inputMediaType.subtype == MEDIASUBTYPE_YUY2 || m_inputMediaType.subtype == MEDIASUBTYPE_UYVY) {
 			switch (mix_fmt) {
-				case FCC('YUY2'): *pMerit = 90; break;
-				case D3DFMT_X8R8G8B8: *pMerit = 80; break;
-				case D3DFMT_A2R10G10B10: *pMerit = 70; break;
-				case FCC('NV12'): *pMerit = 60; break; // colour degradation
-				case FCC('P010'): *pMerit = 50; break; // colour degradation
+				case FCC('YUY2'): merit = 90; break;
+				case D3DFMT_X8R8G8B8: merit = 80; break;
+				case D3DFMT_A2R10G10B10: merit = 70; break;
+				case FCC('NV12'): merit = 60; break; // colour degradation
+				case FCC('P010'): merit = 50; break; // colour degradation
 			}
 		}
 		else if (m_inputMediaType.subtype == MEDIASUBTYPE_P010) {
 			switch (mix_fmt) {
-				case FCC('P010'): *pMerit = 90; break;
-				case D3DFMT_A2R10G10B10: *pMerit = 80; break;
-				case D3DFMT_X8R8G8B8: *pMerit = 70; break; // bit depth degradation
-				case FCC('YUY2'): *pMerit = 60; break; // bit depth degradation
-				case FCC('NV12'): *pMerit = 50; break; // bit depth degradation
+				case FCC('P010'): merit = 90; break;
+				case D3DFMT_A2R10G10B10: merit = 80; break;
+				case D3DFMT_X8R8G8B8: merit = 70; break; // bit depth degradation
+				case FCC('YUY2'): merit = 60; break; // bit depth degradation
+				case FCC('NV12'): merit = 50; break; // bit depth degradation
 			}
 		}
 		else if (m_inputMediaType.subtype == MEDIASUBTYPE_AYUV
 				|| m_inputMediaType.subtype == MEDIASUBTYPE_RGB32
 				|| m_inputMediaType.subtype == MEDIASUBTYPE_ARGB32) {
 			switch (mix_fmt) {
-				case D3DFMT_X8R8G8B8: *pMerit = 90; break;
-				case D3DFMT_A2R10G10B10: *pMerit = 80; break;
-				case FCC('YUY2'): *pMerit = 70; break; // colour degradation
-				case FCC('NV12'): *pMerit = 60; break; // colour degradation
-				case FCC('P010'): *pMerit = 50; break; // colour degradation
+				case D3DFMT_X8R8G8B8: merit = 90; break;
+				case D3DFMT_A2R10G10B10: merit = 80; break;
+				case FCC('YUY2'): merit = 70; break; // colour degradation
+				case FCC('NV12'): merit = 60; break; // colour degradation
+				case FCC('P010'): merit = 50; break; // colour degradation
 			}
 		}
 	}
@@ -866,10 +862,10 @@ HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int*
 	return hr;
 }
 
-LPCTSTR CEVRAllocatorPresenter::GetMediaTypeFormatDesc(IMFMediaType* pMediaType)
+LPCWSTR CEVRAllocatorPresenter::GetMediaTypeFormatDesc(IMFMediaType* pMediaType)
 {
 	D3DFORMAT Format = D3DFMT_UNKNOWN;
-	GetMediaTypeFourCC(pMediaType, (DWORD*)&Format);
+	GetMediaTypeD3DFormat(pMediaType, Format);
 	return D3DFormatToString(Format);
 }
 
@@ -925,7 +921,7 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 
 		int Merit;
 		if (SUCCEEDED(hr)) {
-			hr = GetMixerMediaTypeMerit(pType, &Merit);
+			hr = GetMixerMediaTypeMerit(pType, Merit);
 		}
 
 		if (SUCCEEDED(hr)) {
@@ -933,7 +929,7 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 			size_t iInsertPos = 0;
 			for (size_t i = 0; i < nTypes; ++i) {
 				int ThisMerit;
-				GetMixerMediaTypeMerit(ValidMixerTypes[i], &ThisMerit);
+				GetMixerMediaTypeMerit(ValidMixerTypes[i], ThisMerit);
 
 				if (Merit > ThisMerit) {
 					iInsertPos = i;
@@ -1517,7 +1513,7 @@ STDMETHODIMP CEVRAllocatorPresenter::InitializeDevice(IMFMediaType* pMediaType)
 		m_bStreamChanged |= m_nativeVideoSize != frameSize;
 		m_nativeVideoSize = frameSize;
 		D3DFORMAT Format;
-		hr = GetMediaTypeFourCC(pMediaType, (DWORD*)&Format);
+		hr = GetMediaTypeD3DFormat(pMediaType, Format);
 	}
 
 	if (!m_bStreamChanged && m_pVideoTextures[0]) {
