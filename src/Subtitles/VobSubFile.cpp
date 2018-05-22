@@ -1826,7 +1826,7 @@ bool CVobSubFile::SaveScenarist(CString fn)
 	CString title = fn.Mid(fn.ReverseFind('/')+1);
 
 	WCHAR buff[MAX_PATH], * pFilePart = buff;
-	if (GetFullPathName(fn, MAX_PATH, buff, &pFilePart) == 0) {
+	if (GetFullPathNameW(fn, MAX_PATH, buff, &pFilePart) == 0) {
 		return false;
 	}
 
@@ -2085,7 +2085,7 @@ bool CVobSubFile::SaveMaestro(CString fn)
 	CString title = fn.Mid(fn.ReverseFind('/')+1);
 
 	WCHAR buff[MAX_PATH], * pFilePart = buff;
-	if (GetFullPathName(fn, MAX_PATH, buff, &pFilePart) == 0) {
+	if (GetFullPathNameW(fn, MAX_PATH, buff, &pFilePart) == 0) {
 		return false;
 	}
 

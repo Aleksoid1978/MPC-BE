@@ -89,10 +89,10 @@ LONG WINAPI CMiniDump::UnhandledExceptionFilter( _EXCEPTION_POINTERS *lpTopLevel
 		return retval;
 	}
 
-	hDll = ::LoadLibraryW(GetProgramDir() + L"DBGHELP.DLL");
+	hDll = ::LoadLibraryW(GetProgramDir() + L"dbghelp.dll");
 
 	if (hDll == nullptr) {
-		hDll = ::LoadLibraryW(L"DBGHELP.DLL");
+		hDll = ::LoadLibraryW(L"dbghelp.dll");
 	}
 
 	if (hDll != nullptr) {
