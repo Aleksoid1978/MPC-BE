@@ -2074,14 +2074,15 @@ HRESULT CMpaDecFilter::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_PRO
 		return E_UNEXPECTED;
 	}
 
-	CMediaType& mt		= m_pInput->CurrentMediaType();
-	WAVEFORMATEX* wfe	= (WAVEFORMATEX*)mt.Format();
+	/*
+	CMediaType& mt    = m_pInput->CurrentMediaType();
+	WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.Format();
 	UNREFERENCED_PARAMETER(wfe);
+	*/
 
 	pProperties->cBuffers = 4;
-	// pProperties->cbBuffer = 1;
-	pProperties->cbBuffer = 48000*6*(32/8)/10; // 48KHz 6ch 32bps 100ms
-	pProperties->cbAlign = 1;
+	pProperties->cbBuffer = 192000 * 8 * (32/8) / 10; // 192KHz 8ch 32bps 100ms
+	pProperties->cbAlign  = 1;
 	pProperties->cbPrefix = 0;
 
 	HRESULT hr;
