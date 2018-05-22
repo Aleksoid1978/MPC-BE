@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,11 +25,6 @@
 
 class CFontInstaller
 {
-	HANDLE (WINAPI *pAddFontMemResourceEx)(PVOID,DWORD,PVOID,DWORD*);
-	BOOL (WINAPI *pRemoveFontMemResourceEx)(HANDLE);
-	int (WINAPI *pAddFontResourceEx)(LPCWSTR,DWORD,PVOID);
-	BOOL (WINAPI *pRemoveFontResourceEx)(LPCWSTR,DWORD,PVOID);
-
 	std::list<HANDLE> m_fonts;
 	std::list<CString> m_files;
 	std::list<CString> m_tempfiles;

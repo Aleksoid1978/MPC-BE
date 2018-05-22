@@ -215,7 +215,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		*phr = E_FAIL;
 	}
 
-	m_hModule = LoadLibraryW(L"AVRT.dll");
+	m_hModule = LoadLibraryW(L"avrt.dll");
 	if (m_hModule) {
 		pfAvSetMmThreadCharacteristicsW   = (PTR_AvSetMmThreadCharacteristicsW)GetProcAddress(m_hModule, "AvSetMmThreadCharacteristicsW");
 		pfAvRevertMmThreadCharacteristics = (PTR_AvRevertMmThreadCharacteristics)GetProcAddress(m_hModule, "AvRevertMmThreadCharacteristics");
