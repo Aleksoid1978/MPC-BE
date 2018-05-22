@@ -138,7 +138,6 @@ private:
 		NvAPI_GPU_GetAllClocks_t NvAPI_GPU_GetAllClocks;
 	} NVData;
 
-	HMODULE gdi32Handle = nullptr;
 	PFND3DKMT_QUERYSTATISTICS pD3DKMTQueryStatistics = nullptr;
 
 	HMODULE dxgiHandle = nullptr;

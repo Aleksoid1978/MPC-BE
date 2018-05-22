@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -69,7 +69,7 @@ int CVSFilterApp::ExitInstance()
 HINSTANCE CVSFilterApp::LoadAppLangResourceDLL()
 {
 	CString fn;
-	fn.ReleaseBufferSetLength(::GetModuleFileName(m_hInstance, fn.GetBuffer(MAX_PATH), MAX_PATH));
+	fn.ReleaseBufferSetLength(::GetModuleFileNameW(m_hInstance, fn.GetBuffer(MAX_PATH), MAX_PATH));
 	fn = fn.Mid(fn.ReverseFind('\\')+1);
 	fn = fn.Left(fn.ReverseFind('.')+1);
 	fn = fn + L"lang";
