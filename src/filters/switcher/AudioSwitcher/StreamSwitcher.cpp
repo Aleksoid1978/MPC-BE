@@ -1106,6 +1106,7 @@ HRESULT CStreamSwitcherOutputPin::CheckConnect(IPin* pPin)
 			|| clsid == GUIDFromCString(L"{A753A1EC-973E-4718-AF8E-A3F554D45C44}") // AC3Filter
 			|| clsid == GUIDFromCString(L"{B38C58A0-1809-11D6-A458-EDAE78F1DF12}") // DC-DSP Filter
 			|| clsid == GUIDFromCString(L"{36F74DF0-12FF-4881-8A55-E7CE4D12688E}") // CyberLink TimeStretch Filter (PDVD10)
+			|| clsid == GUIDFromCString(L"{32F1FE49-F8EB-4102-9B2E-E2C016BC049C}") // Acon Digital Media EffectChainer
 			//|| clsid == GUIDFromCString(L"{AEFA5024-215A-4FC7-97A4-1043C86FD0B8}") // MatrixMixer unstable when changing format
 		? __super::CheckConnect(pPin)
 		: E_FAIL;
