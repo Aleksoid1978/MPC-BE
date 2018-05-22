@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,7 +36,7 @@
 
 class CD3DFont
 {
-	TCHAR	m_strFontName[80];				// Font properties
+	WCHAR	m_strFontName[80];				// Font properties
 	DWORD	m_dwFontHeight;
 	DWORD	m_dwFontFlags;
 
@@ -59,22 +59,22 @@ class CD3DFont
 public:
 	// 2D and 3D text drawing functions
 	HRESULT DrawText( FLOAT x, FLOAT y, DWORD dwColor,
-					  const TCHAR* strText, DWORD dwFlags=0L );
+					  const WCHAR* strText, DWORD dwFlags=0L );
 	HRESULT DrawTextScaled( FLOAT x, FLOAT y, FLOAT z,
 							FLOAT fXScale, FLOAT fYScale, DWORD dwColor,
-							const TCHAR* strText, DWORD dwFlags=0L );
-	HRESULT Render3DText( const TCHAR* strText, DWORD dwFlags=0L );
+							const WCHAR* strText, DWORD dwFlags=0L );
+	HRESULT Render3DText( const WCHAR* strText, DWORD dwFlags=0L );
 
 	// Function to get extent of text
-	HRESULT GetTextExtent( const TCHAR* strText, SIZE* pSize );
+	HRESULT GetTextExtent( const WCHAR* strText, SIZE* pSize );
 
 	// Initializing and destroying device-dependent objects
-	HRESULT InitDeviceObjects( IDirect3DDevice9* pd3dDevice );
+	HRESULT InitDeviceObjects(LPDIRECT3DDEVICE9 pd3dDevice);
 	HRESULT RestoreDeviceObjects();
 	HRESULT InvalidateDeviceObjects();
 	HRESULT DeleteDeviceObjects();
 
 	// Constructor / destructor
-	CD3DFont( const TCHAR* strFontName, DWORD dwHeight, DWORD dwFlags=0L );
+	CD3DFont( const WCHAR* strFontName, DWORD dwHeight, DWORD dwFlags=0L );
 	~CD3DFont();
 };

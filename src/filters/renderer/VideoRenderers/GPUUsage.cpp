@@ -34,7 +34,7 @@ CGPUUsage::CGPUUsage()
 	Clean();
 
 	if (SysVersion::IsWin7orLater()) {
-		gdi32Handle = GetModuleHandleW(L"gdi32.dll");
+		HMODULE gdi32Handle = GetModuleHandleW(L"gdi32.dll");
 		if (gdi32Handle) {
 			pD3DKMTQueryStatistics = (PFND3DKMT_QUERYSTATISTICS)GetProcAddress(gdi32Handle, "D3DKMTQueryStatistics");
 
