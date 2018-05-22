@@ -274,9 +274,9 @@ namespace DSObjects
 		HRESULT									IsMediaTypeSupported(IMFMediaType* pMixerType);
 		HRESULT									CreateProposedOutputType(IMFMediaType* pMixerType, IMFMediaType* pMixerInputType, IMFMediaType** pType);
 		HRESULT									SetMediaType(IMFMediaType* pType);
-		HRESULT									GetMediaTypeFourCC(IMFMediaType* pType, DWORD* pFourCC);
-		HRESULT									GetMixerMediaTypeMerit(IMFMediaType* pType, int *pMerit);
-		LPCTSTR									GetMediaTypeFormatDesc(IMFMediaType* pMediaType);
+		HRESULT									GetMediaTypeD3DFormat(IMFMediaType* pType, D3DFORMAT& d3dformat);
+		HRESULT									GetMixerMediaTypeMerit(IMFMediaType* pType, int& merit);
+		LPCWSTR									GetMediaTypeFormatDesc(IMFMediaType* pMediaType);
 
 		// === Functions pointers on Vista / .Net3 specifics library
 		PTR_DXVA2CreateDirect3DDeviceManager9	pfDXVA2CreateDirect3DDeviceManager9;
