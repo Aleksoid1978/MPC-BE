@@ -66,6 +66,23 @@ private :
     void Ebml_DocType();
     void Ebml_DocTypeVersion();
     void Ebml_DocTypeReadVersion();
+    void RawcookedBlock();
+    void RawcookedBlock_BeforeData();
+    void RawcookedBlock_AfterData();
+    void RawcookedBlock_FileName();
+    void RawcookedBlock_MaskAdditionBeforeData();
+    void RawcookedBlock_MaskAdditionAfterData();
+    void RawcookedBlock_MaskAdditionFileName();
+    void RawcookedSegment();
+    void RawcookedSegment_LibraryName();
+    void RawcookedSegment_LibraryVersion();
+    void RawcookedTrackEntry();
+    void RawcookedTrackEntry_BeforeData();
+    void RawcookedTrackEntry_AfterData();
+    void RawcookedTrackEntry_FileName();
+    void RawcookedTrackEntry_MaskBaseBeforeData();
+    void RawcookedTrackEntry_MaskBaseAfterData();
+    void RawcookedTrackEntry_MaskBaseFileName();
     void Segment();
     void Segment_SeekHead();
     void Segment_SeekHead_Seek();
@@ -259,6 +276,8 @@ private :
     void Segment_Attachments_AttachedFile_FileName();
     void Segment_Attachments_AttachedFile_FileMimeType();
     void Segment_Attachments_AttachedFile_FileData();
+    void Segment_Attachments_AttachedFile_FileData_RawcookedBlock() {RawcookedBlock();};
+    void Segment_Attachments_AttachedFile_FileData_RawcookedTrackEntry() {RawcookedTrackEntry();};
     void Segment_Attachments_AttachedFile_FileUID(){UInteger_Info();};
     void Segment_Attachments_AttachedFile_FileReferral(){Skip_XX(Element_Size, "Data");};
     void Segment_Attachments_AttachedFile_FileUsedStartTime(){UInteger_Info();};
@@ -488,6 +507,18 @@ private :
     #if MEDIAINFO_DEMUX
         int64u              Demux_EventWasSent;
     #endif //MEDIAINFO_DEMUX
+
+    //RAWcooked data
+    struct rawcookedtrack
+    {
+        string MaskAdditionFileName;
+        int64u FramePos;
+
+        rawcookedtrack() :
+            FramePos(0)
+        {}
+    };
+    rawcookedtrack RawcookedTrack;
 
     //Hints
     size_t*                 File_Buffer_Size_Hint_Pointer;

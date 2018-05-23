@@ -28,6 +28,17 @@
     #ifdef WINDOWS
         #undef __TEXT
         #include <windows.h>
+        #ifdef WINDOWS_UWP
+            #include <wrl.h>
+            #include <windows.foundation.h>
+            #include <windows.storage.h>
+            #include <windows.storage.accesscache.h>
+            using namespace Microsoft::WRL;
+            using namespace Microsoft::WRL::Wrappers;
+            using namespace ABI::Windows::Foundation;
+            using namespace ABI::Windows::Foundation::Collections;
+            using namespace ABI::Windows::Storage;
+        #endif
     #else
         #include <sys/stat.h>
         #include <sys/types.h>
@@ -187,67 +198,127 @@ ZtringList Dir::GetAllFileNames(const Ztring &Dir_Name_, dirlist_t Options)
             ToReturn.push_back(Liste[Pos].c_str());
     #else //ZENLIB_USEWX
         #ifdef WINDOWS
-            //Is a dir?
-            if (Exists(Dir_Name))
-                Dir_Name+=__T("\\*");
+            #ifdef WINDOWS_UWP
+                //Ensure all slashs are converted to backslashs (WinRT file API don't like slashs)
+                Dir_Name.FindAndReplace(__T("/"), __T("\\"));
 
-            //Path
-            Ztring Path=FileName::Path_Get(Dir_Name);
-            if (Path.empty())
-            {
-                DWORD Path_Size=GetFullPathName(Dir_Name.c_str(), 0, NULL, NULL);
-                Char* PathTemp=new Char[Path_Size+1];
-                if (GetFullPathName(Dir_Name.c_str(), Path_Size+1, PathTemp, NULL))
-                    Path=FileName::Path_Get(PathTemp);
-                delete [] PathTemp;
-            }
+                ComPtr<IStorageFolder> Folder;
+                if (FAILED(Get_Folder(HStringReference(Dir_Name.c_str(), (unsigned int)Dir_Name.size()), Folder)))
+                    return ToReturn;
 
-            #ifdef UNICODE
-                WIN32_FIND_DATAW FindFileDataW;
-                HANDLE hFind=FindFirstFileW(Dir_Name.c_str(), &FindFileDataW);
-            #else
-                WIN32_FIND_DATA FindFileData;
-                HANDLE hFind=FindFirstFile(Dir_Name.c_str(), &FindFileData);
-            #endif //UNICODE
+                ComPtr<IAsyncOperation<IVectorView<IStorageItem*>* > > Async_GetItems;
+                ComPtr<IVectorView<IStorageItem*> > Items;
+                if (FAILED(Folder->GetItemsAsyncOverloadDefaultStartAndCount(&Async_GetItems)) ||
+                    FAILED(Await(Async_GetItems)) ||
+                    FAILED(Async_GetItems->GetResults(&Items)) ||
+                    !Items)
+                    return ToReturn;
 
-            if (hFind==INVALID_HANDLE_VALUE)
-            {
-                ZENLIB_DEBUG2(   "Dir GetAllFileNames",
-                                    Debug+=", returns with files count="; Debug +=Ztring::ToZtring(ToReturn.size()).To_UTF8())
+                unsigned int Size;
+                if (FAILED(Items->get_Size(&Size)))
+                    return ToReturn;
 
-                return ZtringList();
-            }
-
-            BOOL ReturnValue;
-            do
-            {
-                #ifdef UNICODE
-                    Ztring File_Name(FindFileDataW.cFileName);
-                #else
-                    Ztring File_Name(FindFileData.cFileName);
-                #endif //UNICODE
-                if (File_Name!=__T(".") && File_Name!=__T("..")) //Avoid . an ..
+                for (unsigned int Pos=0; Pos<Size; ++Pos)
                 {
-                    Ztring File_Name_Complete=Path+__T("\\")+File_Name;
-                    if (Exists(File_Name_Complete))
-                    {
-                        if (Options&Include_Dirs)
-                            ToReturn.push_back(File_Name_Complete); //A dir
-                        if (Options&Parse_SubDirs)
-                            ToReturn+=GetAllFileNames(File_Name_Complete, Options); //A SubDir
-                    }
-                    else if ((Options&Include_Files) && ((Options&Include_Hidden) || (!File_Name.empty() && File_Name[0]!=__T('.'))))
-                        ToReturn.push_back(File_Name_Complete); //A file
-                }
-                #ifdef UNICODE
-                    ReturnValue=FindNextFileW(hFind, &FindFileDataW);
-                #else
-                    ReturnValue=FindNextFile(hFind, &FindFileData);
-                #endif //UNICODE
-            }
-            while (ReturnValue);
+                    ComPtr<IStorageItem> Item;
+                    if (FAILED(Items->GetAt(Pos, &Item)) || !Item)
+                        continue;
 
-            FindClose(hFind);
+                    HString File_Name_HString;
+                    if (FAILED(Item->get_Name(File_Name_HString.GetAddressOf())))
+                        continue;
+
+                    Ztring File_Name(WindowsGetStringRawBuffer(File_Name_HString.Get(), NULL));
+
+                    if (File_Name.empty() || (!(Options&Include_Hidden) && File_Name[0]==__T('.')))
+                        continue;
+
+                    tstring File_Name_Complete = Dir_Name + __T("\\") + File_Name;
+
+                    boolean IsFile = FALSE;
+                    boolean IsFolder = FALSE;
+                    Item->IsOfType(StorageItemTypes_File, &IsFile);
+                    Item->IsOfType(StorageItemTypes_Folder, &IsFolder);
+
+                    if ((Options&Include_Files) && IsFile && ((Options&Include_Hidden) || File_Name[0] != __T('.')))
+                    {
+                        Add_Item_To_FUA(HStringReference(File_Name_Complete.c_str(), (unsigned int)File_Name_Complete.length()), Item);
+                        ToReturn.push_back(File_Name_Complete);
+                    }
+                    else if ((Options&Include_Dirs) && IsFolder)
+                    {
+                        Add_Item_To_FUA(HStringReference(File_Name_Complete.c_str(), (unsigned int)File_Name_Complete.length()), Item);
+                        ToReturn.push_back(File_Name_Complete);
+                    }
+
+                    if (IsFolder && Options&Parse_SubDirs)
+                        ToReturn+=GetAllFileNames(File_Name_Complete, Options);
+                }
+
+                return ToReturn;
+            #else
+                //Is a dir?
+                if (Exists(Dir_Name))
+                    Dir_Name+=__T("\\*");
+
+                //Path
+                Ztring Path=FileName::Path_Get(Dir_Name);
+                if (Path.empty())
+                {
+                    DWORD Path_Size=GetFullPathName(Dir_Name.c_str(), 0, NULL, NULL);
+                    Char* PathTemp=new Char[Path_Size+1];
+                    if (GetFullPathName(Dir_Name.c_str(), Path_Size+1, PathTemp, NULL))
+                        Path=FileName::Path_Get(PathTemp);
+                    delete [] PathTemp;
+                }
+
+                #ifdef UNICODE
+                    WIN32_FIND_DATAW FindFileDataW;
+                    HANDLE hFind=FindFirstFileW(Dir_Name.c_str(), &FindFileDataW);
+                #else
+                    WIN32_FIND_DATA FindFileData;
+                    HANDLE hFind=FindFirstFile(Dir_Name.c_str(), &FindFileData);
+                #endif //UNICODE
+
+                if (hFind==INVALID_HANDLE_VALUE)
+                {
+                    ZENLIB_DEBUG2(   "Dir GetAllFileNames",
+                                        Debug+=", returns with files count="; Debug +=Ztring::ToZtring(ToReturn.size()).To_UTF8())
+
+                    return ZtringList();
+                }
+
+                BOOL ReturnValue;
+                do
+                {
+                    #ifdef UNICODE
+                        Ztring File_Name(FindFileDataW.cFileName);
+                    #else
+                        Ztring File_Name(FindFileData.cFileName);
+                    #endif //UNICODE
+                    if (File_Name!=__T(".") && File_Name!=__T("..")) //Avoid . an ..
+                    {
+                        Ztring File_Name_Complete=Path+__T("\\")+File_Name;
+                        if (Exists(File_Name_Complete))
+                        {
+                            if (Options&Include_Dirs)
+                                ToReturn.push_back(File_Name_Complete); //A dir
+                            if (Options&Parse_SubDirs)
+                                ToReturn+=GetAllFileNames(File_Name_Complete, Options); //A SubDir
+                        }
+                        else if ((Options&Include_Files) && ((Options&Include_Hidden) || (!File_Name.empty() && File_Name[0]!=__T('.'))))
+                            ToReturn.push_back(File_Name_Complete); //A file
+                    }
+                    #ifdef UNICODE
+                        ReturnValue=FindNextFileW(hFind, &FindFileDataW);
+                    #else
+                        ReturnValue=FindNextFile(hFind, &FindFileData);
+                    #endif //UNICODE
+                }
+                while (ReturnValue);
+
+                FindClose(hFind);
+            #endif
         #else //WINDOWS
             //A file?
             if (File::Exists(Dir_Name))
@@ -330,16 +401,52 @@ bool Dir::Exists(const Ztring &File_Name)
         return FN.DirExists();
     #else //ZENLIB_USEWX
        #ifdef WINDOWS
-            #ifdef UNICODE
-                DWORD FileAttributes=GetFileAttributesW(File_Name.c_str());
+           #ifdef WINDOWS_UWP
+                //Ensure all slashs are converted to backslashs (WinRT file API don't like slashs)
+                Ztring File_Name_=File_Name;
+                File_Name_.FindAndReplace(__T("/"), __T("\\"));
+
+                //Try to access folder directly
+                ComPtr<IStorageFolder> Folder;
+                if (SUCCEEDED(Get_Folder(HStringReference(File_Name_.c_str(), (unsigned int)File_Name_.size()), Folder)))
+                    return true;
+
+                //Try directory access methods
+                tstring Parent=FileName::Path_Get(File_Name_);
+                tstring Dir=FileName::Name_Get(File_Name_);
+
+                ComPtr<IStorageFolder> Parent_Folder;
+                if (FAILED(Get_Folder(HStringReference(Parent.c_str(), (unsigned int)Parent.size()), Parent_Folder)))
+                    return false;
+
+                //IStorageFolder don't provide TryGetItemAsync
+                ComPtr<IStorageFolder2> Parent_Folder2;
+                if (FAILED(Parent_Folder->QueryInterface(IID_PPV_ARGS(&Parent_Folder2))) || !Parent_Folder2)
+                    return false;
+
+                ComPtr<IAsyncOperation<IStorageItem*> > Async_GetItem;
+                ComPtr<IStorageItem> Item;
+                ComPtr<IStorageFolder> Child;
+                if (SUCCEEDED(Parent_Folder2->TryGetItemAsync(HStringReference(Dir.c_str(), (unsigned int)Dir.size()).Get(), &Async_GetItem)) &&
+                    SUCCEEDED(Await(Async_GetItem)) &&
+                    SUCCEEDED(Async_GetItem->GetResults(&Item)) &&
+                    Item &&
+                    SUCCEEDED(Item.As(&Child)))
+                    return true;
+
+                return false;
             #else
-                DWORD FileAttributes=GetFileAttributes(File_Name.c_str());
-            #endif //UNICODE
+                #ifdef UNICODE
+                    DWORD FileAttributes=GetFileAttributesW(File_Name.c_str());
+                #else
+                    DWORD FileAttributes=GetFileAttributes(File_Name.c_str());
+                #endif //UNICODE
 
-            ZENLIB_DEBUG2(   "Dir Exists",
-                                Debug+=", returns "; Debug +=Ztring::ToZtring(((FileAttributes!=INVALID_FILE_ATTRIBUTES) && (FileAttributes&FILE_ATTRIBUTE_DIRECTORY))?1:0).To_UTF8())
+                ZENLIB_DEBUG2(   "Dir Exists",
+                                    Debug+=", returns "; Debug +=Ztring::ToZtring(((FileAttributes!=INVALID_FILE_ATTRIBUTES) && (FileAttributes&FILE_ATTRIBUTE_DIRECTORY))?1:0).To_UTF8())
 
-            return ((FileAttributes!=INVALID_FILE_ATTRIBUTES) && (FileAttributes&FILE_ATTRIBUTE_DIRECTORY));
+                return ((FileAttributes!=INVALID_FILE_ATTRIBUTES) && (FileAttributes&FILE_ATTRIBUTE_DIRECTORY));
+            #endif
         #else //WINDOWS
             struct stat buffer;
             int         status;
@@ -364,15 +471,44 @@ bool Dir::Create(const Ztring &File_Name)
             return false;
     }
 
-    #ifdef ZENLIB_USEWX
+  #ifdef ZENLIB_USEWX
         return wxFileName::Mkdir(File_Name.c_str());
     #else //ZENLIB_USEWX
         #ifdef WINDOWS
-            #ifdef UNICODE
-                return CreateDirectoryW(File_Name.c_str(), NULL)!=0;
+            #ifdef WINDOWS_UWP
+                CreationCollisionOption Collision_Option=CreationCollisionOption_FailIfExists;
+
+                //Ensure all slashs are converted to backslashs (WinRT file API don't like slashs)
+                Parent.FindAndReplace(__T("/"), __T("\\"));
+
+                //Split folder and parent
+                Ztring Dir=FileName::Name_Get(File_Name);
+
+                //Split folder and parent
+                size_t Last_Separator=File_Name.rfind(__T("\\"));
+
+                //Open parent folder
+                ComPtr<IStorageFolder> Folder;
+                if (FAILED(Get_Folder(HStringReference(Parent.c_str(), (unsigned int)Parent.size()), Folder)))
+                    return false;
+
+                //Create folder
+                ComPtr<IAsyncOperation<StorageFolder*> > Async_Create;
+                ComPtr<IStorageFolder> New;
+                if (FAILED(Folder->CreateFolderAsync(HStringReference(Dir.c_str(), (unsigned int)Dir.size()).Get(), Collision_Option, &Async_Create)) ||
+                    FAILED(Await(Async_Create)) ||
+                    FAILED(Async_Create->GetResults(&New)) ||
+                    !New)
+                    return false;
+
+                return true;
             #else
-                return CreateDirectory(File_Name.c_str(), NULL)!=0;
-            #endif //UNICODE
+                #ifdef UNICODE
+                    return CreateDirectoryW(File_Name.c_str(), NULL)!=0;
+                #else
+                    return CreateDirectory(File_Name.c_str(), NULL)!=0;
+                #endif //UNICODE
+            #endif
         #else //WINDOWS
             return mkdir(File_Name.To_Local().c_str(), 0700)==0;
         #endif //WINDOWS
@@ -383,7 +519,7 @@ bool Dir::Create(const Ztring &File_Name)
 // GetAllFileNames
 //***************************************************************************
 
-#ifdef WINDOWS
+#if defined WINDOWS && !defined WINDOWS_UWP
 class GetAllFileNames_Private
 {
 public:
@@ -532,7 +668,7 @@ void GetAllFileNames::Close ()
     ZENLIB_DEBUG2(   "GetAllFileNames Close",
                         )
 }
-#endif //WINDOWS
+#endif //WINDOWS && !WINDOWS_UWP
 
 //***************************************************************************
 //

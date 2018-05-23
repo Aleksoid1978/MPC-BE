@@ -24,7 +24,11 @@
 #include <ctype.h>
 #include <time.h>
 #if defined(_WIN32) || defined(WIN32)
-    #include <winsock.h>
+    #ifdef WINDOWS_UWP
+        #include <winsock2.h>
+    #else
+        #include <winsock.h>
+    #endif
 #endif
 
 // Generic types
