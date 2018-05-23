@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2017 see Authors.txt
+ * (C) 2009-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -56,6 +56,7 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 
 	CPacketQueue      m_WasapiQueue;
 	CAutoPtr<CPacket> m_CurrentPacket;
+	UINT32            m_nSampleOffset;
 
 	REFERENCE_TIME    m_rtStartTime;
 	REFERENCE_TIME    m_rtNextSampleTime;
@@ -79,7 +80,6 @@ public:
 	HRESULT Receive(IMediaSample* pSample) override;
 	HRESULT CheckMediaType(const CMediaType *pmt) override;
 	HRESULT SetMediaType(const CMediaType *pmt) override;
-	HRESULT CompleteConnect(IPin *pReceivePin) override;
 	HRESULT DoRenderSample(IMediaSample *pMediaSample) override { return E_NOTIMPL; }
 
 	HRESULT EndFlush() override;
@@ -155,133 +155,125 @@ public:
 	STDMETHODIMP CreatePage(const GUID& guid, IPropertyPage** ppPage) override;
 
 	// === IMpcAudioRendererFilter
-	STDMETHODIMP					Apply() override;
-	STDMETHODIMP					SetWasapiMode(INT nValue) override;
-	STDMETHODIMP_(INT)				GetWasapiMode() override;
-	STDMETHODIMP					SetDeviceId(CString pDeviceId) override;
-	STDMETHODIMP_(CString)			GetDeviceId() override;
-	STDMETHODIMP_(UINT)				GetMode() override;
-	STDMETHODIMP					GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut) override;
-	STDMETHODIMP					SetBitExactOutput(BOOL bValue) override;
-	STDMETHODIMP_(BOOL)				GetBitExactOutput() override;
-	STDMETHODIMP					SetSystemLayoutChannels(BOOL bValue) override;
-	STDMETHODIMP_(BOOL)				GetSystemLayoutChannels() override;
-	STDMETHODIMP					SetReleaseDeviceIdle(BOOL bValue) override;
-	STDMETHODIMP_(BOOL)				GetReleaseDeviceIdle() override;
-	STDMETHODIMP_(BITSTREAM_MODE)	GetBitstreamMode() override;
-	STDMETHODIMP_(CString)			GetCurrentDeviceName() override;
-	STDMETHODIMP_(CString)			GetCurrentDeviceId() override;
-	STDMETHODIMP					SetCrossFeed(BOOL bValue) override;
-	STDMETHODIMP_(BOOL)				GetCrossFeed() override;
-
+	STDMETHODIMP                  Apply() override;
+	STDMETHODIMP                  SetWasapiMode(INT nValue) override;
+	STDMETHODIMP_(INT)            GetWasapiMode() override;
+	STDMETHODIMP                  SetDeviceId(CString pDeviceId) override;
+	STDMETHODIMP_(CString)        GetDeviceId() override;
+	STDMETHODIMP_(UINT)           GetMode() override;
+	STDMETHODIMP                  GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut) override;
+	STDMETHODIMP                  SetBitExactOutput(BOOL bValue) override;
+	STDMETHODIMP_(BOOL)           GetBitExactOutput() override;
+	STDMETHODIMP                  SetSystemLayoutChannels(BOOL bValue) override;
+	STDMETHODIMP_(BOOL)           GetSystemLayoutChannels() override;
+	STDMETHODIMP                  SetReleaseDeviceIdle(BOOL bValue) override;
+	STDMETHODIMP_(BOOL)           GetReleaseDeviceIdle() override;
+	STDMETHODIMP_(BITSTREAM_MODE) GetBitstreamMode() override;
+	STDMETHODIMP_(CString)        GetCurrentDeviceName() override;
+	STDMETHODIMP_(CString)        GetCurrentDeviceId() override;
+	STDMETHODIMP                  SetCrossFeed(BOOL bValue) override;
+	STDMETHODIMP_(BOOL)           GetCrossFeed() override;
 
 	// CMpcAudioRenderer
 private:
-	WAVEFORMATEX*			m_pWaveFormatExInput;
-	WAVEFORMATEX*			m_pWaveFormatExOutput;
-	CAudioSyncClock*		m_pSyncClock;
-	double					m_dRate;
-	long					m_lVolume;
-	long					m_lBalance;
-	double					m_dVolumeFactor;
-	double					m_dBalanceFactor;
-	DWORD					m_dwBalanceMask;
-	bool					m_bUpdateBalanceMask; // TODO: remove it
+	WAVEFORMATEX*    m_pWaveFormatExInput;
+	WAVEFORMATEX*    m_pWaveFormatExOutput;
+	CAudioSyncClock* m_pSyncClock;
 
-	void					SetBalanceMask(const DWORD output_layout);
-	void					ApplyVolumeBalance(BYTE* pData, UINT32 size);
+	double m_dRate;
+	long   m_lVolume;
+	long   m_lBalance;
+	double m_dVolumeFactor;
+	double m_dBalanceFactor;
+	DWORD  m_dwBalanceMask;
+	bool   m_bUpdateBalanceMask; // TODO: remove it
 
-	CFilter					m_Filter;
+	void SetBalanceMask(const DWORD output_layout);
+	void ApplyVolumeBalance(BYTE* pData, UINT32 size);
+
+	CFilter m_Filter;
 
 	// CMpcAudioRenderer WASAPI methods
-	HRESULT					GetAudioDevice(const BOOL bForceUseDefaultDevice);
-	HRESULT					InitAudioClient();
-	HRESULT					CreateAudioClient(const BOOL bForceUseDefaultDevice = FALSE);
-	HRESULT					CheckAudioClient(const WAVEFORMATEX *pWaveFormatEx);
-	HRESULT					CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const BOOL bCheckFormat = TRUE);
+	HRESULT GetAudioDevice(const BOOL bForceUseDefaultDevice);
+	HRESULT InitAudioClient();
+	HRESULT CreateAudioClient(const BOOL bForceUseDefaultDevice = FALSE);
+	HRESULT CheckAudioClient(const WAVEFORMATEX *pWaveFormatEx);
+	HRESULT CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const BOOL bCheckFormat = TRUE);
 
-	HRESULT					Transform(IMediaSample *pMediaSample);
-	HRESULT					PushToQueue(CAutoPtr<CPacket> p);
+	HRESULT Transform(IMediaSample *pMediaSample);
+	HRESULT PushToQueue(CAutoPtr<CPacket> p);
 
-	bool					IsFormatChanged(const WAVEFORMATEX *pWaveFormatEx, const WAVEFORMATEX *pNewWaveFormatEx);
-	bool					CopyWaveFormat(const WAVEFORMATEX *pSrcWaveFormatEx, WAVEFORMATEX **ppDestWaveFormatEx);
+	bool IsFormatChanged(const WAVEFORMATEX *pWaveFormatEx, const WAVEFORMATEX *pNewWaveFormatEx);
+	bool CopyWaveFormat(const WAVEFORMATEX *pSrcWaveFormatEx, WAVEFORMATEX **ppDestWaveFormatEx);
 
-	BOOL					IsBitstream(const WAVEFORMATEX *pWaveFormatEx);
-	HRESULT					SelectFormat(const WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex);
-	void					CreateFormat(WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSample, WORD nChannels, DWORD dwChannelMask, DWORD nSamplesPerSec, WORD wValidBitsPerSample = 0);
+	BOOL    IsBitstream(const WAVEFORMATEX *pWaveFormatEx);
+	HRESULT SelectFormat(const WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex);
+	void    CreateFormat(WAVEFORMATEXTENSIBLE& wfex, WORD wBitsPerSample, WORD nChannels, DWORD dwChannelMask, DWORD nSamplesPerSec, WORD wValidBitsPerSample = 0);
 
-	HRESULT					StartAudioClient();
+	HRESULT StartAudioClient();
 
-	void					SetReinitializeAudioDevice(BOOL bFullInitialization = FALSE);
-	HRESULT					ReinitializeAudioDevice(BOOL bFullInitialization = FALSE);
+	void    SetReinitializeAudioDevice(BOOL bFullInitialization = FALSE);
+	HRESULT ReinitializeAudioDevice(BOOL bFullInitialization = FALSE);
 
-	HRESULT					RenderWasapiBuffer();
-	void					CheckBufferStatus();
-	void					WasapiFlush();
+	HRESULT RenderWasapiBuffer();
+	void    CheckBufferStatus();
+	void    WasapiFlush();
 
 	// WASAPI variables
-	HMODULE					m_hModule;
-	DEVICE_MODE				m_DeviceMode;
-	CString					m_DeviceId;
-	IMMDevice				*m_pMMDevice;
-	IAudioClient			*m_pAudioClient;
-	IAudioRenderClient		*m_pRenderClient;
-	IAudioClock				*m_pAudioClock;
-	UINT32					m_nFramesInBuffer;
-	size_t					m_nMaxWasapiQueueSize;
-	REFERENCE_TIME			m_hnsPeriod;
-	bool					m_bIsAudioClientStarted;
-	BOOL					m_bIsBitstream;
-	BITSTREAM_MODE			m_BitstreamMode;
-	BOOL					m_bUseBitExactOutput;
-	BOOL					m_bUseSystemLayoutChannels;
-	BOOL					m_bReleaseDeviceIdle;
-	BOOL					m_bUseCrossFeed;
-	FILTER_STATE			m_filterState;
+	HMODULE            m_hModule;
+	DEVICE_MODE        m_DeviceMode;
+	CString            m_DeviceId;
+	IMMDevice          *m_pMMDevice;
+	IAudioClient       *m_pAudioClient;
+	IAudioRenderClient *m_pRenderClient;
+	IAudioClock        *m_pAudioClock;
+	UINT32             m_nFramesInBuffer;
+	size_t             m_nMaxWasapiQueueSize;
+	REFERENCE_TIME     m_hnsPeriod;
+	bool               m_bIsAudioClientStarted;
+	BOOL               m_bIsBitstream;
+	BITSTREAM_MODE     m_BitstreamMode;
+	BOOL               m_bUseBitExactOutput;
+	BOOL               m_bUseSystemLayoutChannels;
+	BOOL               m_bReleaseDeviceIdle;
+	BOOL               m_bUseCrossFeed;
+	FILTER_STATE       m_filterState;
 
-	UINT32					m_nSampleOffset;
-
-	typedef HANDLE			(__stdcall *PTR_AvSetMmThreadCharacteristicsW)(LPCWSTR TaskName, LPDWORD TaskIndex);
-	typedef BOOL			(__stdcall *PTR_AvRevertMmThreadCharacteristics)(HANDLE AvrtHandle);
-
+	typedef HANDLE (__stdcall *PTR_AvSetMmThreadCharacteristicsW)(LPCWSTR TaskName, LPDWORD TaskIndex);
+	typedef BOOL   (__stdcall *PTR_AvRevertMmThreadCharacteristics)(HANDLE AvrtHandle);
 	PTR_AvSetMmThreadCharacteristicsW	pfAvSetMmThreadCharacteristicsW;
 	PTR_AvRevertMmThreadCharacteristics	pfAvRevertMmThreadCharacteristics;
 
 	// Rendering thread
-	static DWORD WINAPI		RenderThreadEntryPoint(LPVOID lpParameter);
-	DWORD					RenderThread();
-	DWORD					m_nThreadId;
+	static DWORD WINAPI RenderThreadEntryPoint(LPVOID lpParameter);
+	DWORD               RenderThread();
+	DWORD               m_nThreadId;
+	BOOL                m_bThreadPaused;
+	HRESULT             StopRendererThread();
+	HRESULT             StartRendererThread();
+	HRESULT             PauseRendererThread();
 
-	BOOL					m_bThreadPaused;
+	HANDLE              m_hRenderThread;
+	HANDLE              m_hDataEvent;
+	HANDLE              m_hPauseEvent;
+	HANDLE              m_hResumeEvent;
+	HANDLE              m_hWaitPauseEvent;
+	HANDLE              m_hWaitResumeEvent;
+	HANDLE              m_hStopRenderThreadEvent;
 
-	HRESULT					StopRendererThread();
-	HRESULT					StartRendererThread();
-	HRESULT					PauseRendererThread();
+	HANDLE              m_hRendererNeedMoreData;
 
-	HANDLE					m_hRenderThread;
+	CAMEvent            m_FlushEvent;
+	BOOL                m_bFlushing;
 
-	HANDLE					m_hDataEvent;
-	HANDLE					m_hPauseEvent;
-	HANDLE					m_hResumeEvent;
-	HANDLE					m_hWaitPauseEvent;
-	HANDLE					m_hWaitResumeEvent;
-	HANDLE					m_hStopRenderThreadEvent;
+	BOOL                m_bNeedReinitialize;
+	BOOL                m_bNeedReinitializeFull;
 
-	HANDLE					m_hRendererNeedMoreData;
+	CSimpleArray<WORD>  m_wBitsPerSampleList;
+	CSimpleArray<WORD>  m_nChannelsList;
+	CSimpleArray<DWORD> m_dwChannelMaskList;
 
-	CAMEvent				m_FlushEvent;
-	std::mutex				m_receive_mutex;
-
-	BOOL					m_bNeedReinitialize;
-	BOOL					m_bNeedReinitializeFull;
-
-	CSimpleArray<WORD>		m_wBitsPerSampleList;
-	CSimpleArray<WORD>		m_nChannelsList;
-	CSimpleArray<DWORD>		m_dwChannelMaskList;
-
-	BOOL					m_bReal32bitSupport;
-
-	BOOL					m_bDVDPlayback;
+	BOOL                m_bReal32bitSupport;
 
 	struct AudioParams {
 		WORD  wBitsPerSample;
@@ -311,8 +303,7 @@ private:
 class CMpcAudioRendererInputPin final
 	: public CRendererInputPin
 {
-	CMpcAudioRenderer* m_pRenderer;
-
+	CMpcAudioRenderer* m_pRenderer = nullptr;
 	CCritSec m_csReceive;
 
 public:
