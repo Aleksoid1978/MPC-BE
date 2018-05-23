@@ -53,10 +53,18 @@ namespace Tiff_Tag
     const int16u Compression                = 259;
     const int16u PhotometricInterpretation  = 262;
     const int16u ImageDescription           = 270;
+    const int16u Make                       = 271;
+    const int16u Model                      = 272;
     const int16u StripOffsets               = 273;
     const int16u SamplesPerPixel            = 277;
     const int16u RowsPerStrip               = 278;
     const int16u StripByteCounts            = 279;
+    const int16u XResolution                = 282;
+    const int16u YResolution                = 283;
+    const int16u PlanarConfiguration        = 284;
+    const int16u ResolutionUnit             = 296;
+    const int16u Software                   = 305;
+    const int16u DateTime                   = 306;
     const int16u ExtraSamples               = 338;
 }
 
@@ -71,10 +79,18 @@ static const char* Tiff_Tag_Name(int32u Tag)
         case Tiff_Tag::Compression                  : return "Compression";
         case Tiff_Tag::PhotometricInterpretation    : return "PhotometricInterpretation";
         case Tiff_Tag::ImageDescription             : return "ImageDescription";
+        case Tiff_Tag::Make                         : return "Make";
+        case Tiff_Tag::Model                        : return "Model";
         case Tiff_Tag::StripOffsets                 : return "StripOffsets";
         case Tiff_Tag::SamplesPerPixel              : return "SamplesPerPixel";
         case Tiff_Tag::RowsPerStrip                 : return "RowsPerStrip";
         case Tiff_Tag::StripByteCounts              : return "StripByteCounts";
+        case Tiff_Tag::XResolution                  : return "XResolution";
+        case Tiff_Tag::YResolution                  : return "YResolution";
+        case Tiff_Tag::PlanarConfiguration          : return "PlanarConfiguration";
+        case Tiff_Tag::ResolutionUnit               : return "ResolutionUnit";
+        case Tiff_Tag::Software                     : return "Software";
+        case Tiff_Tag::DateTime                     : return "DateTime";
         case Tiff_Tag::ExtraSamples                 : return "ExtraSamples";
         default                                     : return "";
     }
@@ -87,6 +103,7 @@ namespace Tiff_Type
     const int16u ASCII      = 2;
     const int16u Short      = 3;
     const int16u Long       = 4;
+    const int16u Rational   = 5;
 }
 
 //---------------------------------------------------------------------------
@@ -98,6 +115,7 @@ static const char* Tiff_Type_Name(int32u Type)
         case Tiff_Type::ASCII                       : return "ASCII";
         case Tiff_Type::Short                       : return "Short";
         case Tiff_Type::Long                        : return "Long";
+        case Tiff_Type::Rational                    : return "Rational";
         default                                     : return ""; //Unknown
     }
 }
@@ -111,6 +129,7 @@ static const int8u Tiff_Type_Size(int32u Type)
         case Tiff_Type::ASCII                       : return 1;
         case Tiff_Type::Short                       : return 2;
         case Tiff_Type::Long                        : return 4;
+        case Tiff_Type::Rational                    : return 8;
         default                                     : return 0; //Unknown
     }
 }
@@ -331,6 +350,8 @@ void File_Tiff::Data_Parse()
 void File_Tiff::Data_Parse_Fill()
 {
     Stream_Prepare(Stream_Image);
+    Fill(Stream_Image, 0, Image_Format_Settings, LittleEndian?"Little":"Big");
+    Fill(Stream_Image, 0, Image_Format_Settings_Endianness, LittleEndian?"Little":"Big");
 
     infos::iterator Info;
 
@@ -384,6 +405,83 @@ void File_Tiff::Data_Parse_Fill()
     Info=Infos.find(Tiff_Tag::ImageDescription);
     if (Info!=Infos.end())
         Fill(Stream_Image, StreamPos_Last, Image_Title, Info->second.Read());
+
+    //Make
+    Info=Infos.find(Tiff_Tag::Make);
+    if (Info!=Infos.end())
+        Fill(Stream_General, StreamPos_Last, General_Encoded_Application_CompanyName, Info->second.Read());
+
+    //Model
+    Info=Infos.find(Tiff_Tag::Model);
+    if (Info!=Infos.end())
+        Fill(Stream_General, StreamPos_Last, General_Encoded_Library_Name, Info->second.Read());
+
+    //XResolution
+    Info=Infos.find(Tiff_Tag::XResolution);
+    if (Info!=Infos.end())
+    {
+        Fill(Stream_Image, StreamPos_Last, "Density_X", Info->second.Read());
+        Fill_SetOptions(Stream_Image, StreamPos_Last, "Density_X", "N NT");
+    }
+
+    //YResolution
+    Info=Infos.find(Tiff_Tag::XResolution);
+    if (Info!=Infos.end())
+    {
+        Fill(Stream_Image, StreamPos_Last, "Density_Y", Info->second.Read());
+        Fill_SetOptions(Stream_Image, StreamPos_Last, "Density_Y", "N NT");
+    }
+
+    //ResolutionUnit
+    Info=Infos.find(Tiff_Tag::ResolutionUnit);
+    if (Info!=Infos.end())
+    {
+        switch (Info->second.Read().To_int32u())
+        {
+            case 0 : break;
+            case 1 : Fill(Stream_Image, StreamPos_Last, "Density_Unit", "dpcm"); Fill_SetOptions(Stream_Image, StreamPos_Last, "Density_Unit", "N NT"); break;
+            case 2 : Fill(Stream_Image, StreamPos_Last, "Density_Unit", "dpi"); Fill_SetOptions(Stream_Image, StreamPos_Last, "Density_Unit", "N NT"); break;
+            default: Fill(Stream_Image, StreamPos_Last, "Density_Unit", Info->second.Read()); Fill_SetOptions(Stream_Image, StreamPos_Last, "Density_Unit", "N NT");
+        }
+    }
+    else if (Infos.find(Tiff_Tag::XResolution)!=Infos.end() || Infos.find(Tiff_Tag::XResolution)!=Infos.end())
+    {
+        Fill(Stream_Image, StreamPos_Last, "Density_Unit", "dpi");
+        Fill_SetOptions(Stream_Image, StreamPos_Last, "Density_Unit", "N NT");
+    }
+    
+    //XResolution or YResolution 
+    if (Infos.find(Tiff_Tag::XResolution)!=Infos.end() || Infos.find(Tiff_Tag::XResolution)!=Infos.end())
+    {
+        Ztring X=Retrieve(Stream_Image, StreamPos_Last, "Density_X");
+        if (X.empty())
+            X.assign(1, __T('?'));
+        Ztring Y=Retrieve(Stream_Image, StreamPos_Last, "Density_Y");
+        if (Y.empty())
+            Y.assign(1, __T('?'));
+        if (X!=Y)
+        {
+            X+=__T('x');
+            X+=Y;
+        }
+        Y=Retrieve(Stream_Image, StreamPos_Last, "Density_Unit");
+        if (!Y.empty())
+        {
+            X+=__T(' ');
+            X+=Y;
+            Fill(Stream_Image, StreamPos_Last, "Density/String", X);
+        }
+    }
+
+    //Software
+    Info=Infos.find(Tiff_Tag::Software);
+    if (Info!=Infos.end())
+        Fill(Stream_General, StreamPos_Last, General_Encoded_Application_Name, Info->second.Read());
+
+    //DateTime
+    Info=Infos.find(Tiff_Tag::DateTime);
+    if (Info!=Infos.end())
+        Fill(Stream_Image, StreamPos_Last, Image_Encoded_Date, Info->second.Read());
 
     //ExtraSamples
     Info=Infos.find(Tiff_Tag::ExtraSamples);
@@ -551,6 +649,44 @@ void File_Tiff::GetValueOffsetu(ifditem &IfdItem)
                         Element_Offset+=4;
                     #endif //MEDIAINFO_TRACE
                     Info.push_back(Ztring::ToZtring(Ret32));
+                }
+                break;
+
+        case 5:                /* 2x32-bit (2x4-byte) unsigned integers */
+                for (int16u Pos=0; Pos<IfdItem.Count; Pos++)
+                {
+                    int32u N, D;
+                    #if MEDIAINFO_TRACE
+                        if (LittleEndian)
+                        {
+                            Get_L4 (N,                          "Numerator");
+                            Get_L4 (D,                          "Denominator");
+                        }
+                        else
+                        {
+                            Get_B4 (N,                          "Numerator");
+                            Get_B4 (D,                          "Denominator");
+                        }
+                        Element_Info1(Ztring::ToZtring(((float64)N)/D));
+                    #else //MEDIAINFO_TRACE
+                        if (Element_Offset+8>Element_Size)
+                        {
+                            Trusted_IsNot();
+                            break;
+                        }
+                        if (LittleEndian)
+                        {
+                            N=LittleEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset);
+                            D=LittleEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset);
+                        }
+                        else
+                        {
+                            N=BigEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset);
+                            D=BigEndian2int32u(Buffer+Buffer_Offset+(size_t)Element_Offset);
+                        }
+                        Element_Offset+=8;
+                    #endif //MEDIAINFO_TRACE
+                    Info.push_back(Ztring::ToZtring(((float64)N)/D, D==1?0:3));
                 }
                 break;
 

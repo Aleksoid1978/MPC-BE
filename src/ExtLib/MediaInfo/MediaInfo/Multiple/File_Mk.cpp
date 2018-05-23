@@ -95,6 +95,7 @@
 #include <cstring>
 #include <cmath>
 #include <algorithm>
+#include <zlib.h>
 #include "ThirdParty/base64/base64.h"
 #if MEDIAINFO_EVENTS
     #include "MediaInfo/MediaInfo_Events_Internal.h"
@@ -130,6 +131,25 @@ namespace Elements
     const int64u Ebml_DocType=0x282;
     const int64u Ebml_DocTypeVersion=0x287;
     const int64u Ebml_DocTypeReadVersion=0x285;
+
+    //RAWcooked
+    const int64u RawcookedBlock=0x7262;
+    const int64u RawcookedBlock_AfterData=0x02;
+    const int64u RawcookedBlock_BeforeData=0x01;
+    const int64u RawcookedBlock_FileName=0x10;
+    const int64u RawcookedBlock_MaskAdditionAfterData=0x04;
+    const int64u RawcookedBlock_MaskAdditionBeforeData=0x03;
+    const int64u RawcookedBlock_MaskAdditionFileName=0x11;
+    const int64u RawcookedSegment=0x7273;
+    const int64u RawcookedSegment_LibraryName=0x70;
+    const int64u RawcookedSegment_LibraryVersion=0x71;
+    const int64u RawcookedTrackEntry=0x7274;
+    const int64u RawcookedTrackEntry_AfterData=0x02;
+    const int64u RawcookedTrackEntry_BeforeData=0x01;
+    const int64u RawcookedTrackEntry_FileName=0x10;
+    const int64u RawcookedTrackEntry_MaskBaseAfterData=0x04;
+    const int64u RawcookedTrackEntry_MaskBaseBeforeData=0x03;
+    const int64u RawcookedTrackEntry_MaskBaseFileName=0x11;
 
     //Segment
     const int64u Segment=0x8538067;
@@ -325,6 +345,8 @@ namespace Elements
     const int64u Segment_Attachments_AttachedFile_FileName=0x66E;
     const int64u Segment_Attachments_AttachedFile_FileMimeType=0x660;
     const int64u Segment_Attachments_AttachedFile_FileData=0x65C;
+    const int64u Segment_Attachments_AttachedFile_FileData_RawcookedBlock=0x7262;
+    const int64u Segment_Attachments_AttachedFile_FileData_RawcookedTrackEntry=0x7274;
     const int64u Segment_Attachments_AttachedFile_FileUID=0x6AE;
     const int64u Segment_Attachments_AttachedFile_FileReferral=0x675;
     const int64u Segment_Attachments_AttachedFile_FileUsedStartTime=0x661;
@@ -1559,6 +1581,29 @@ void File_Mk::Data_Parse()
         ATO2(Ebml_DocTypeVersion, "DocTypeVersion")
         ATO2(Ebml_DocTypeReadVersion, "DocTypeReadVersion")
         ATOM_END_MK
+    LIS2(RawcookedBlock, "RawcookedBlock")
+        ATOM_BEGIN
+        ATO2(RawcookedBlock_AfterData, "AfterData")
+        ATO2(RawcookedBlock_BeforeData, "BeforeData")
+        ATO2(RawcookedBlock_FileName, "FileName")
+        ATO2(RawcookedBlock_MaskAdditionBeforeData, "MaskAdditionBeforeData")
+        ATO2(RawcookedBlock_MaskAdditionAfterData, "MaskAdditionAfterData")
+        ATO2(RawcookedBlock_MaskAdditionFileName, "MaskAdditionFileName")
+        ATOM_END_MK
+    LIS2(RawcookedSegment, "RawcookedSegment")
+        ATOM_BEGIN
+        ATO2(RawcookedSegment_LibraryName, "LibraryName")
+        ATO2(RawcookedSegment_LibraryVersion, "LibraryVersion")
+        ATOM_END_MK
+    LIS2(RawcookedTrackEntry, "RawcookedTrackEntry")
+        ATOM_BEGIN
+        ATO2(RawcookedTrackEntry_BeforeData, "BeforeData")
+        ATO2(RawcookedTrackEntry_AfterData, "AfterData")
+        ATO2(RawcookedTrackEntry_FileName, "FileName")
+        ATO2(RawcookedTrackEntry_MaskBaseAfterData, "MaskBaseAfterData")
+        ATO2(RawcookedTrackEntry_MaskBaseBeforeData, "MaskBaseBeforeData")
+        ATO2(RawcookedTrackEntry_MaskBaseFileName, "MaskBaseFileName")
+        ATOM_END_MK
     LIS2(Segment, "Segment")
         ATOM_BEGIN
         LIS2(Segment_SeekHead, "SeekHead")
@@ -1823,7 +1868,11 @@ void File_Mk::Data_Parse()
                 ATO2(Segment_Attachments_AttachedFile_FileDescription, "FileDescription")
                 ATO2(Segment_Attachments_AttachedFile_FileName, "FileName")
                 ATO2(Segment_Attachments_AttachedFile_FileMimeType, "FileMimeType")
-                LIST_SKIP(Segment_Attachments_AttachedFile_FileData) //This is ATOM, but some ATOMs are too big
+                LIS2(Segment_Attachments_AttachedFile_FileData, "FileData") //This is ATOM, but some ATOMs are too big
+                    ATOM_BEGIN
+                    ATO2(Segment_Attachments_AttachedFile_FileData_RawcookedBlock, "RawcookedBlock")
+                    ATO2(Segment_Attachments_AttachedFile_FileData_RawcookedTrackEntry, "RawcookedTrackEntry")
+                    ATOM_END_MK
                 ATO2(Segment_Attachments_AttachedFile_FileUID, "FileUID")
                 ATO2(Segment_Attachments_AttachedFile_FileReferral, "FileReferral")
                 ATO2(Segment_Attachments_AttachedFile_FileUsedStartTime, "FileUsedStartTime")
@@ -2044,6 +2093,11 @@ void File_Mk::Ebml_DocType()
             Accept("Matroska");
             Fill(Stream_General, 0, General_Format, "WebM");
         }
+        else if (Data==__T("rawcooked"))
+        {
+            Accept("RAWcooked");
+            Fill(Stream_General, 0, General_Format, "RAWcooked");
+        }
         else
         {
             Reject("Matroska");
@@ -2075,6 +2129,209 @@ void File_Mk::Ebml_DocTypeReadVersion()
         if (UInteger!=Format_Version)
             Fill(Stream_General, 0, General_Format_Version, __T("Version ")+Ztring::ToZtring(UInteger)); //Adding compatible version for info about legacy decoders
     FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::RawcookedBlock()
+{
+    Element_Info1(Ztring().From_Number(RawcookedTrack.FramePos));
+    RawcookedTrack.FramePos++;
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::RawcookedBlock_BeforeData()
+{
+    int64u Size;
+    Get_EB (Size,                                               "Size");
+    Skip_XX(Element_Size-Element_Offset,                        "Data");
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::RawcookedBlock_AfterData()
+{
+    int64u Size;
+    Get_EB (Size,                                               "Size");
+    Skip_XX(Element_Size-Element_Offset,                        "Data");
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::RawcookedBlock_FileName()
+{
+    int64u Size;
+    Get_EB (Size,                                               "Size");
+    if (Size)
+    {
+        FILLING_BEGIN();
+            //Sizes
+            unsigned long Source_Size=(unsigned long)(Element_Size-Element_Offset);
+            unsigned long Dest_Size=Size;
+
+            //Uncompressing
+            int8u* Dest=new int8u[Dest_Size];
+            if (uncompress((Bytef*)Dest, &Dest_Size, (const Bytef*)Buffer+Buffer_Offset+Element_Offset, Source_Size)<0)
+            {
+                Skip_XX(Element_Size-Element_Offset,            "Problem during the decompression");
+                delete[] Dest; //Dest=NULL;
+                return;
+            }
+
+            //Parsing
+            Skip_XX(Element_Size-Element_Offset,                "Compressed data"); Param_Info1(string((const char*)Dest, Size).c_str());
+
+            delete[] Dest; //Dest=NULL;
+        FILLING_END();
+    }
+    else
+        Skip_Local(Element_Size-Element_Offset,                 "Data");
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::RawcookedBlock_MaskAdditionBeforeData()
+{
+    int64u Size;
+    Get_EB (Size,                                               "Size");
+    Skip_XX(Element_Size-Element_Offset,                        "Data");
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::RawcookedBlock_MaskAdditionAfterData()
+{
+    int64u Size;
+    Get_EB (Size,                                               "Size");
+    Skip_XX(Element_Size-Element_Offset,                        "Data");
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::RawcookedBlock_MaskAdditionFileName()
+{
+    int64u Size;
+    Get_EB (Size,                                               "Size");
+    if (Size)
+    {
+        FILLING_BEGIN();
+            //Sizes
+            unsigned long Source_Size=(unsigned long)(Element_Size-Element_Offset);
+            unsigned long Dest_Size=Size;
+
+            //Uncompressing
+            int8u* Dest=new int8u[Dest_Size];
+            if (uncompress((Bytef*)Dest, &Dest_Size, (const Bytef*)Buffer+Buffer_Offset+Element_Offset, Source_Size)<0)
+            {
+                Skip_XX(Element_Size-Element_Offset,            "Problem during the decompression");
+                delete[] Dest; //Dest=NULL;
+                return;
+            }
+
+            //Applying mask
+            for (size_t i=0; i<Size && i<RawcookedTrack.MaskAdditionFileName.size(); i++)
+                Dest[i]+=RawcookedTrack.MaskAdditionFileName[i];
+
+            //Parsing
+            Skip_XX(Element_Size-Element_Offset,                "Compressed data"); Param_Info1(string((const char*)Dest, Size).c_str());
+
+            delete[] Dest; //Dest=NULL;
+        FILLING_END();
+    }
+    else
+        Skip_Local(Element_Size-Element_Offset,                 "Data");
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::RawcookedSegment()
+{
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::RawcookedSegment_LibraryName()
+{
+    Skip_Local(Element_Size,                                    "LibraryName");
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::RawcookedSegment_LibraryVersion()
+{
+    Skip_Local(Element_Size,                                    "LibraryVersion");
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::RawcookedTrackEntry()
+{
+    RawcookedTrack=rawcookedtrack();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::RawcookedTrackEntry_BeforeData()
+{
+    int64u Size;
+    Get_EB (Size,                                               "Size");
+    Skip_XX(Element_Size-Element_Offset,                        "Data");
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::RawcookedTrackEntry_AfterData()
+{
+    int64u Size;
+    Get_EB (Size,                                               "Size");
+    Skip_XX(Element_Size-Element_Offset,                        "Data");
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::RawcookedTrackEntry_FileName()
+{
+    int64u Size;
+    Get_EB (Size,                                               "Size");
+    if (Size)
+        Skip_XX(Element_Size-Element_Offset,                    "Data");
+    else
+        Skip_Local(Element_Size-Element_Offset,                 "Data");
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::RawcookedTrackEntry_MaskBaseBeforeData()
+{
+    int64u Size;
+    Get_EB (Size,                                               "Size");
+    Skip_XX(Element_Size-Element_Offset,                        "Data");
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::RawcookedTrackEntry_MaskBaseAfterData()
+{
+    int64u Size;
+    Get_EB (Size,                                               "Size");
+    Skip_XX(Element_Size-Element_Offset,                        "Data");
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::RawcookedTrackEntry_MaskBaseFileName()
+{
+    int64u Size;
+    Get_EB (Size,                                               "Size");
+    if (Size)
+    {
+        FILLING_BEGIN();
+            //Sizes
+            unsigned long Source_Size=(unsigned long)(Element_Size-Element_Offset);
+            unsigned long Dest_Size=Size;
+
+            //Uncompressing
+            int8u* Dest=new int8u[Dest_Size];
+            if (uncompress((Bytef*)Dest, &Dest_Size, (const Bytef*)Buffer+Buffer_Offset+Element_Offset, Source_Size)<0)
+            {
+                Skip_XX(Element_Size-Element_Offset,            "Problem during the decompression");
+                delete[] Dest; //Dest=NULL;
+                return;
+            }
+
+            //Parsing
+            RawcookedTrack.MaskAdditionFileName=string((const char*)Dest, Size);
+            Skip_XX(Element_Size-Element_Offset,                "Compressed data"); Param_Info1(RawcookedTrack.MaskAdditionFileName.c_str());
+
+            delete[] Dest; //Dest=NULL;
+        FILLING_END();
+    }
+    else
+        Get_String(Element_Size-Element_Offset, RawcookedTrack.MaskAdditionFileName, "Data");
 }
 
 //---------------------------------------------------------------------------
@@ -2183,7 +2440,9 @@ void File_Mk::Segment_Attachments_AttachedFile_FileData()
         #endif //MEDIAINFO_EVENTS
     }
     
-    Skip_XX(Element_TotalSize_Get(),                            "Data");
+    //Skip_XX(Element_TotalSize_Get(),                            "Data");
+
+    Element_ThisIsAList();
 }
 
 //---------------------------------------------------------------------------

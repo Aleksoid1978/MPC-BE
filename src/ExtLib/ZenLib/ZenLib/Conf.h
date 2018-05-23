@@ -56,6 +56,16 @@
 #endif
 
 //---------------------------------------------------------------------------
+//Windows UWP
+#if defined(WIN32) || defined(WIN64)
+    #if defined(WINAPI_FAMILY) && (WINAPI_FAMILY==WINAPI_FAMILY_APP)
+        #ifndef WINDOWS_UWP
+            #define WINDOWS_UWP
+        #endif
+    #endif
+#endif
+
+//---------------------------------------------------------------------------
 //Unix (Linux, HP, Sun, BeOS...)
 #if defined(UNIX) || defined(_UNIX) || defined(__UNIX__) \
     || defined(__unix) || defined(__unix__) \

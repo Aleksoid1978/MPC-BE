@@ -723,7 +723,15 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
         #endif //defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_JSON_YES)
         ConvertRetour(Retour);
 
-        Retour.FindAndReplace(__T("|SC1|"), __T("\\"), 0, Ztring_Recursive);
+        #if defined(MEDIAINFO_JSON_YES)
+            if (JSON)
+                Retour.FindAndReplace(__T("|SC1|"), __T("\\\\"), 0, Ztring_Recursive);
+            else
+                Retour.FindAndReplace(__T("|SC1|"), __T("\\"), 0, Ztring_Recursive);
+        #else
+            Retour.FindAndReplace(__T("|SC1|"), __T("\\"), 0, Ztring_Recursive);
+        #endif
+
         return Retour;
     }
 
