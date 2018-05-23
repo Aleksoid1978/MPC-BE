@@ -889,31 +889,31 @@ void FLAC__lpc_restore_signal_wide_intrin_sse41(const FLAC__int32 residual[], ui
 			switch((order+1) / 2) {
 				case 16: /* order == 31, 32 */
 					dat = _mm_cvtepu32_epi64(_mm_loadl_epi64((const __m128i*)(datai-32)));
-					summ = _mm_add_epi64(summ, _mm_mul_epi32(dat, qlp[15]));
+					summ = _mm_add_epi64(summ, _mm_mul_epi32(dat, qlp[15]));                /* Falls through. */
 				case 15:
 					dat = _mm_cvtepu32_epi64(_mm_loadl_epi64((const __m128i*)(datai-30)));
-					summ = _mm_add_epi64(summ, _mm_mul_epi32(dat, qlp[14]));
+					summ = _mm_add_epi64(summ, _mm_mul_epi32(dat, qlp[14]));                /* Falls through. */
 				case 14:
 					dat = _mm_cvtepu32_epi64(_mm_loadl_epi64((const __m128i*)(datai-28)));
-					summ = _mm_add_epi64(summ, _mm_mul_epi32(dat, qlp[13]));
+					summ = _mm_add_epi64(summ, _mm_mul_epi32(dat, qlp[13]));                /* Falls through. */
 				case 13:
 					dat = _mm_cvtepu32_epi64(_mm_loadl_epi64((const __m128i*)(datai-26)));
-					summ = _mm_add_epi64(summ, _mm_mul_epi32(dat, qlp[12]));
+					summ = _mm_add_epi64(summ, _mm_mul_epi32(dat, qlp[12]));                /* Falls through. */
 				case 12:
 					dat = _mm_cvtepu32_epi64(_mm_loadl_epi64((const __m128i*)(datai-24)));
-					summ = _mm_add_epi64(summ, _mm_mul_epi32(dat, qlp[11]));
+					summ = _mm_add_epi64(summ, _mm_mul_epi32(dat, qlp[11]));                /* Falls through. */
 				case 11:
 					dat = _mm_cvtepu32_epi64(_mm_loadl_epi64((const __m128i*)(datai-22)));
-					summ = _mm_add_epi64(summ, _mm_mul_epi32(dat, qlp[10]));
+					summ = _mm_add_epi64(summ, _mm_mul_epi32(dat, qlp[10]));                /* Falls through. */
 				case 10:
 					dat = _mm_cvtepu32_epi64(_mm_loadl_epi64((const __m128i*)(datai-20)));
-					summ = _mm_add_epi64(summ, _mm_mul_epi32(dat, qlp[9]));
+					summ = _mm_add_epi64(summ, _mm_mul_epi32(dat, qlp[9]));                 /* Falls through. */
 				case  9:
 					dat = _mm_cvtepu32_epi64(_mm_loadl_epi64((const __m128i*)(datai-18)));
-					summ = _mm_add_epi64(summ, _mm_mul_epi32(dat, qlp[8]));
+					summ = _mm_add_epi64(summ, _mm_mul_epi32(dat, qlp[8]));                 /* Falls through. */
 				case  8:
 					dat = _mm_cvtepu32_epi64(_mm_loadl_epi64((const __m128i*)(datai-16)));
-					summ = _mm_add_epi64(summ, _mm_mul_epi32(dat, qlp[7]));
+					summ = _mm_add_epi64(summ, _mm_mul_epi32(dat, qlp[7]));                 /* Falls through. */
 				case  7: /* order == 13, 14 */
 					dat = _mm_cvtepu32_epi64(_mm_loadl_epi64((const __m128i*)(datai-14)));
 					summ = _mm_add_epi64(summ, _mm_mul_epi32(dat, qlp[6]));

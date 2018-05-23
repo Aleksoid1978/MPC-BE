@@ -86,8 +86,8 @@ void FLAC__precompute_partition_info_sums_intrin_avx2(const FLAC__int32 residual
 				sum128 = _mm_hadd_epi32(sum128, sum128);
 				sum128 = _mm_hadd_epi32(sum128, sum128);
 				abs_residual_partition_sums[partition] = (FLAC__uint32)_mm_cvtsi128_si32(sum128);
-/* workaround for a bug in MSVC2015U2 - see https://connect.microsoft.com/VisualStudio/feedback/details/2659191/incorrect-code-generation-for-x86-64 */
-#if (defined _MSC_VER) && (_MSC_FULL_VER == 190023918) && (defined FLAC__CPU_X86_64)
+/* workaround for MSVC bugs (at least versions 2015 and 2017 are affected) */
+#if (defined _MSC_VER) && (defined FLAC__CPU_X86_64)
 				abs_residual_partition_sums[partition] &= 0xFFFFFFFF; /**/
 #endif
 			}
