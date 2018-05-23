@@ -164,8 +164,8 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_bNeedReinitialize(FALSE)
 	, m_bNeedReinitializeFull(FALSE)
 	, m_FlushEvent(TRUE)
+	, m_bFlushing(FALSE)
 	, m_bReal32bitSupport(FALSE)
-	, m_bDVDPlayback(FALSE)
 	, m_bs2b_active(false)
 {
 	DLog(L"CMpcAudioRenderer::CMpcAudioRenderer()");
@@ -364,7 +364,7 @@ HRESULT CMpcAudioRenderer::Receive(IMediaSample* pSample)
 		return S_OK;
 	}
 
-	std::unique_lock<std::mutex> lock(m_receive_mutex);
+	m_bFlushing = FALSE;
 
 	ASSERT(pSample);
 
@@ -464,15 +464,6 @@ HRESULT CMpcAudioRenderer::SetMediaType(const CMediaType *pmt)
 	CopyWaveFormat(pwf, &m_pWaveFormatExInput);
 
 	return CBaseRenderer::SetMediaType(pmt);
-}
-
-HRESULT CMpcAudioRenderer::CompleteConnect(IPin *pReceivePin)
-{
-	DLog(L"CMpcAudioRenderer::CompleteConnect()");
-
-	m_bDVDPlayback = FindFilter(CLSID_DVDNavigator, m_pGraph) != nullptr;
-
-	return CBaseRenderer::CompleteConnect(pReceivePin);
 }
 
 DWORD WINAPI CMpcAudioRenderer::RenderThreadEntryPoint(LPVOID lpParameter)
@@ -641,6 +632,10 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME rtStart)
 
 	if (m_hRendererNeedMoreData) {
 		SetEvent(m_hRendererNeedMoreData);
+	}
+
+	if (m_bFlushing) {
+		NewSegment();
 	}
 
 	if (m_pAudioClock) {
@@ -2536,7 +2531,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 #endif
 		dwFlags = AUDCLNT_BUFFERFLAGS_SILENT;
 
-		if (!nWasapiQueueSize && m_filterState == State_Running && m_bDVDPlayback) {
+		if (!nWasapiQueueSize && m_filterState == State_Running && !bFlushing) {
 			m_rtNextSampleTime = m_rtLastSampleTimeEnd = std::max(m_rtNextSampleTime, m_pSyncClock->GetPrivateTime() - m_rtStartTime + m_hnsPeriod);
 		}
 	} else {
@@ -2638,42 +2633,24 @@ HRESULT CMpcAudioRenderer::EndFlush()
 
 	HRESULT hr = CBaseRenderer::EndFlush();
 
-	m_receive_mutex.unlock();
 	m_FlushEvent.Reset();
-
-	if (!m_bDVDPlayback) {
-		m_rtNextSampleTime = 0;
-		m_rtLastSampleTimeEnd = 0;
-		m_rtEstimateSlavingJitter = 0;
-	}
 
 	return hr;
 }
 
 void CMpcAudioRenderer::NewSegment()
 {
-	if (m_bDVDPlayback) {
-		m_rtNextSampleTime = 0;
-		m_rtLastSampleTimeEnd = 0;
-		m_rtEstimateSlavingJitter = 0;
-	}
+	m_rtNextSampleTime = 0;
+	m_rtLastSampleTimeEnd = 0;
+	m_rtEstimateSlavingJitter = 0;
+
+	m_bFlushing = FALSE;
 }
 
 void CMpcAudioRenderer::Flush()
 {
 	m_FlushEvent.Set();
-
-#if DEBUG
-	const ULONGLONG start = GetPerfCounter();
-#endif
-	m_receive_mutex.lock();
-
-#if DEBUG
-	const ULONGLONG end = GetPerfCounter();
-	if ((end - start) >= OneMillisecond / 2) {
-		DLog(L"CMpcAudioRenderer::Flush() : Waiting for the end of data receive - %0.3f ms", (end - start) / 10000.0);
-	}
-#endif
+	m_bFlushing = TRUE;
 }
 
 size_t CMpcAudioRenderer::WasapiQueueSize()
@@ -2915,6 +2892,7 @@ STDMETHODIMP CMpcAudioRendererInputPin::BeginFlush()
 
 	m_pRenderer->Flush();
 
+	CAutoLock cReceiveLock(&m_csReceive);
 	return CRendererInputPin::BeginFlush();
 }
 
