@@ -175,6 +175,10 @@
 #define flac_fstat fstat
 #endif
 
+#ifndef WINAPI_FAMILY_PARTITION
+#define WINAPI_FAMILY_PARTITION(x) 0
+#endif
+
 #ifdef ANDROID
 #include <limits.h>
 #endif
