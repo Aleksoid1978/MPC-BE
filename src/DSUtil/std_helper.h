@@ -43,9 +43,15 @@ auto FindInListByPointer(std::list<T>& list, const T* p)
 	return it;
 }
 
-// TODO?
-//template <class T>
-//bool ItemInList(std::list<T>& list, const T& item)
-//{
-//	return std::find(list.cbegin(), list.cend(), item) != list.cend();
-//}
+
+template <class T>
+bool Contains(std::list<T>& list, const T& item)
+{
+	return std::find(list.cbegin(), list.cend(), item) != list.cend();
+}
+
+template <class T>
+bool Contains(std::vector<T>& vector, const T& item)
+{
+	return std::find(vector.cbegin(), vector.cend(), item) != vector.cend();
+}
