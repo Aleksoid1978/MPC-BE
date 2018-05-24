@@ -90,6 +90,11 @@ CFilterApp theApp;
 
 #endif
 
+struct channel_layout_t {
+	WORD channels;
+	DWORD layout;
+};
+
 static void DumpWaveFormatEx(const WAVEFORMATEX* pwfx)
 {
 	DLog(L"        => wFormatTag      = 0x%04x", pwfx->wFormatTag);
@@ -1645,12 +1650,14 @@ HRESULT CMpcAudioRenderer::InitAudioClient()
 			// get list of supported output formats - wBitsPerSample, nChannels(dwChannelMask), nSamplesPerSec
 			const WORD  wBitsPerSampleValues[] = {16, 24, 32};
 			const DWORD nSamplesPerSecValues[] = {44100, 48000, 88200, 96000, 176400, 192000};
-			const WORD  nChannelsValues[]      = {2, 4, 4, 6, 6, 8, 8};
-			const DWORD dwChannelMaskValues[]  = {
-				KSAUDIO_SPEAKER_STEREO,
-				KSAUDIO_SPEAKER_QUAD, KSAUDIO_SPEAKER_SURROUND,
-				KSAUDIO_SPEAKER_5POINT1_SURROUND, KSAUDIO_SPEAKER_5POINT1,
-				KSAUDIO_SPEAKER_7POINT1_SURROUND, KSAUDIO_SPEAKER_7POINT1
+			const channel_layout_t ChannelLayoutValues[] = {
+				{2, KSAUDIO_SPEAKER_STEREO},
+				{4, KSAUDIO_SPEAKER_QUAD},
+				{4, KSAUDIO_SPEAKER_SURROUND},
+				{6, KSAUDIO_SPEAKER_5POINT1_SURROUND},
+				{6, KSAUDIO_SPEAKER_5POINT1},
+				{8, KSAUDIO_SPEAKER_7POINT1_SURROUND},
+				{8, KSAUDIO_SPEAKER_7POINT1},
 			};
 
 			auto RemoveAll = [&]() {
@@ -1664,16 +1671,16 @@ HRESULT CMpcAudioRenderer::InitAudioClient()
 			WAVEFORMATEXTENSIBLE wfex;
 
 			// 1 - wBitsPerSample
-			for (int i = 0; i < _countof(wBitsPerSampleValues); i++) {
-				for (int k = 0; k < _countof(nSamplesPerSecValues); k++) {
-					CreateFormat(wfex, wBitsPerSampleValues[i], 2, KSAUDIO_SPEAKER_STEREO, nSamplesPerSecValues[k]);
+			for (const auto& _bitdepth : wBitsPerSampleValues) {
+				for (const auto& _samplerate : nSamplesPerSecValues) {
+					CreateFormat(wfex, _bitdepth, 2, KSAUDIO_SPEAKER_STEREO, _samplerate);
 					if (S_OK == m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfex, nullptr)) {
-						if (Contains(m_wBitsPerSampleList, wBitsPerSampleValues[i]) == false) {
-							m_wBitsPerSampleList.push_back(wBitsPerSampleValues[i]);
+						if (Contains(m_wBitsPerSampleList, _bitdepth) == false) {
+							m_wBitsPerSampleList.push_back(_bitdepth);
 						}
 
-						if (wBitsPerSampleValues[i] == 32) {
-							CreateFormat(wfex, wBitsPerSampleValues[i], 2, KSAUDIO_SPEAKER_STEREO, nSamplesPerSecValues[k], 32);
+						if (_bitdepth == 32) {
+							CreateFormat(wfex, _bitdepth, 2, KSAUDIO_SPEAKER_STEREO, _samplerate, 32);
 							m_bReal32bitSupport = (S_OK == m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfex, nullptr));
 						}
 					}
@@ -1685,11 +1692,11 @@ HRESULT CMpcAudioRenderer::InitAudioClient()
 			}
 
 			// 2 - m_nSamplesPerSec
-			for (int k = 0; k < m_wBitsPerSampleList.size(); k++) {
-				for (int i = 0; i < _countof(nSamplesPerSecValues); i++) {
-					CreateFormat(wfex, m_wBitsPerSampleList[k], nChannelsValues[0], dwChannelMaskValues[0], nSamplesPerSecValues[i]);
+			for (const auto& _bitdepth : m_wBitsPerSampleList) {
+				for (const auto& _samplerate : nSamplesPerSecValues) {
+					CreateFormat(wfex, _bitdepth, ChannelLayoutValues[0].channels, ChannelLayoutValues[0].layout, _samplerate);
 					if (S_OK == m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfex, nullptr)) {
-						AudioParams ap(m_wBitsPerSampleList[k], nSamplesPerSecValues[i]);
+						AudioParams ap(_bitdepth, _samplerate);
 						m_AudioParamsList.push_back(ap);
 					}
 				}
@@ -1701,11 +1708,11 @@ HRESULT CMpcAudioRenderer::InitAudioClient()
 
 			// 3 - nChannels(dwChannelMask)
 			AudioParams ap = m_AudioParamsList[0];
-			for (int i = 0; i < _countof(nChannelsValues); i++) {
-				CreateFormat(wfex, ap.wBitsPerSample, nChannelsValues[i], dwChannelMaskValues[i], ap.nSamplesPerSec);
+			for (const auto item : ChannelLayoutValues) {
+				CreateFormat(wfex, ap.wBitsPerSample, item.channels, item.layout, ap.nSamplesPerSec);
 				if (S_OK == m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfex, nullptr)) {
-					m_nChannelsList.push_back(nChannelsValues[i]);
-					m_dwChannelMaskList.push_back(dwChannelMaskValues[i]);
+					m_nChannelsList.push_back(item.channels);
+					m_dwChannelMaskList.push_back(item.layout);
 				}
 			}
 			if (m_nChannelsList.empty()) {
@@ -1716,16 +1723,16 @@ HRESULT CMpcAudioRenderer::InitAudioClient()
 #ifdef DEBUG_OR_LOG
 			DLog(L"    List of supported output formats:");
 			DLog(L"        BitsPerSample:");
-			for (int i = 0; i < m_wBitsPerSampleList.size(); i++) {
-				if (m_wBitsPerSampleList[i] == 32 && !m_bReal32bitSupport) {
+			for (const auto& _bitdepth : m_wBitsPerSampleList) {
+				if (_bitdepth == 32 && !m_bReal32bitSupport) {
 					DLog(L"            24 padded to 32");
 				} else {
-					DLog(L"            %d", m_wBitsPerSampleList[i]);
+					DLog(L"            %d", _bitdepth);
 				}
 				DLog(L"            SamplesPerSec:");
-				for (int k = 0; k < m_AudioParamsList.size(); k++) {
-					if (m_AudioParamsList[k].wBitsPerSample == m_wBitsPerSampleList[i]) {
-						DLog(L"                %d", m_AudioParamsList[k].nSamplesPerSec);
+				for (const auto& audioparams : m_AudioParamsList) {
+					if (audioparams.wBitsPerSample == _bitdepth) {
+						DLog(L"                %d", audioparams.nSamplesPerSec);
 					}
 				}
 			}
@@ -2266,12 +2273,11 @@ static DWORD FindClosestInArray(std::vector<DWORD>& array, DWORD val)
 {
 	LONG diff = abs(LONG(val - array[0]));
 	DWORD Num = array[0];
-	for (int idx = 0; idx < array.size(); idx++) {
-		DWORD val1 = array[idx];
-		LONG diff1 = abs(LONG(val - array[idx]));
-		if (diff > abs(LONG(val - array[idx]))) {
-			diff = abs(LONG(val - array[idx]));
-			Num = array[idx];
+	for (const auto& item : array) {
+		LONG diff1 = abs(LONG(val - item));
+		if (diff > diff1) {
+			diff = diff1;
+			Num = item;
 		}
 	}
 
@@ -2291,8 +2297,8 @@ HRESULT CMpcAudioRenderer::SelectFormat(const WAVEFORMATEX* pwfx, WAVEFORMATEXTE
 
 	DWORD nSamplesPerSec = pwfx->nSamplesPerSec;
 	BOOL bExists = FALSE;
-	for (int i = 0; i < m_AudioParamsList.size(); i++) {
-		if (m_AudioParamsList[i].nSamplesPerSec == nSamplesPerSec) {
+	for (const auto& audioparams : m_AudioParamsList) {
+		if (audioparams.nSamplesPerSec == nSamplesPerSec) {
 			bExists = TRUE;
 			break;
 		}
@@ -2300,9 +2306,9 @@ HRESULT CMpcAudioRenderer::SelectFormat(const WAVEFORMATEX* pwfx, WAVEFORMATEXTE
 
 	if (!bExists) {
 		std::vector<DWORD> array;
-		for (int i = 0; i < m_AudioParamsList.size(); i++) {
-			if (Contains(array, m_AudioParamsList[i].nSamplesPerSec) == false) {
-				array.push_back(m_AudioParamsList[i].nSamplesPerSec);
+		for (const auto& audioparams : m_AudioParamsList) {
+			if (Contains(array, audioparams.nSamplesPerSec) == false) {
+				array.push_back(audioparams.nSamplesPerSec);
 			}
 		}
 		nSamplesPerSec = FindClosestInArray(array, nSamplesPerSec);
