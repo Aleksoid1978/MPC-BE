@@ -269,9 +269,9 @@ private:
 	BOOL                m_bNeedReinitialize;
 	BOOL                m_bNeedReinitializeFull;
 
-	CSimpleArray<WORD>  m_wBitsPerSampleList;
-	CSimpleArray<WORD>  m_nChannelsList;
-	CSimpleArray<DWORD> m_dwChannelMaskList;
+	std::vector<WORD>   m_wBitsPerSampleList;
+	std::vector<WORD>   m_nChannelsList;
+	std::vector<DWORD>  m_dwChannelMaskList;
 
 	BOOL                m_bReal32bitSupport;
 
@@ -289,7 +289,7 @@ private:
 					&& this->nSamplesPerSec == ap.nSamplesPerSec);
 		}
 	};
-	CSimpleArray<AudioParams> m_AudioParamsList;
+	std::vector<AudioParams> m_AudioParamsList;
 
 	struct AudioFormats {
 		SampleFormat sf = SAMPLE_FMT_NONE;
