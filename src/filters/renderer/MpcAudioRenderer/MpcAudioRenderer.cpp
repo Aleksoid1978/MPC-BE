@@ -30,6 +30,7 @@
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../DSUtil/AudioTools.h"
 #include "../../../DSUtil/SysVersion.h"
+#include "../../../DSUtil/std_helper.h"
 #include "AudioHelper.h"
 #include "AudioDevice.h"
 #include "MpcAudioRenderer.h"
@@ -1640,7 +1641,7 @@ HRESULT CMpcAudioRenderer::InitAudioClient()
 		DLog(L"CMpcAudioRenderer::InitAudioClient() - IMMDevice::Activate() failed: (0x%08x)", hr);
 	} else {
 		DLog(L"CMpcAudioRenderer::InitAudioClient() - success");
-		if (!m_wBitsPerSampleList.GetSize()) {
+		if (m_wBitsPerSampleList.empty()) {
 			// get list of supported output formats - wBitsPerSample, nChannels(dwChannelMask), nSamplesPerSec
 			const WORD  wBitsPerSampleValues[] = {16, 24, 32};
 			const DWORD nSamplesPerSecValues[] = {44100, 48000, 88200, 96000, 176400, 192000};
@@ -1653,10 +1654,10 @@ HRESULT CMpcAudioRenderer::InitAudioClient()
 			};
 
 			auto RemoveAll = [&]() {
-				m_wBitsPerSampleList.RemoveAll();
-				m_nChannelsList.RemoveAll();
-				m_dwChannelMaskList.RemoveAll();
-				m_AudioParamsList.RemoveAll();
+				m_wBitsPerSampleList.clear();
+				m_nChannelsList.clear();
+				m_dwChannelMaskList.clear();
+				m_AudioParamsList.clear();
 				m_bReal32bitSupport = FALSE;
 			};
 
@@ -1667,8 +1668,8 @@ HRESULT CMpcAudioRenderer::InitAudioClient()
 				for (int k = 0; k < _countof(nSamplesPerSecValues); k++) {
 					CreateFormat(wfex, wBitsPerSampleValues[i], 2, KSAUDIO_SPEAKER_STEREO, nSamplesPerSecValues[k]);
 					if (S_OK == m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfex, nullptr)) {
-						if (m_wBitsPerSampleList.Find(wBitsPerSampleValues[i]) == -1) {
-							m_wBitsPerSampleList.Add(wBitsPerSampleValues[i]);
+						if (Contains(m_wBitsPerSampleList, wBitsPerSampleValues[i]) == false) {
+							m_wBitsPerSampleList.push_back(wBitsPerSampleValues[i]);
 						}
 
 						if (wBitsPerSampleValues[i] == 32) {
@@ -1678,22 +1679,22 @@ HRESULT CMpcAudioRenderer::InitAudioClient()
 					}
 				}
 			}
-			if (m_wBitsPerSampleList.GetSize() == 0) {
+			if (m_wBitsPerSampleList.empty()) {
 				RemoveAll();
 				return hr;
 			}
 
 			// 2 - m_nSamplesPerSec
-			for (int k = 0; k < m_wBitsPerSampleList.GetSize(); k++) {
+			for (int k = 0; k < m_wBitsPerSampleList.size(); k++) {
 				for (int i = 0; i < _countof(nSamplesPerSecValues); i++) {
 					CreateFormat(wfex, m_wBitsPerSampleList[k], nChannelsValues[0], dwChannelMaskValues[0], nSamplesPerSecValues[i]);
 					if (S_OK == m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfex, nullptr)) {
 						AudioParams ap(m_wBitsPerSampleList[k], nSamplesPerSecValues[i]);
-						m_AudioParamsList.Add(ap);
+						m_AudioParamsList.push_back(ap);
 					}
 				}
 			}
-			if (m_AudioParamsList.GetSize() == 0) {
+			if (m_AudioParamsList.empty()) {
 				RemoveAll();
 				return hr;
 			}
@@ -1703,11 +1704,11 @@ HRESULT CMpcAudioRenderer::InitAudioClient()
 			for (int i = 0; i < _countof(nChannelsValues); i++) {
 				CreateFormat(wfex, ap.wBitsPerSample, nChannelsValues[i], dwChannelMaskValues[i], ap.nSamplesPerSec);
 				if (S_OK == m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfex, nullptr)) {
-					m_nChannelsList.Add(nChannelsValues[i]);
-					m_dwChannelMaskList.Add(dwChannelMaskValues[i]);
+					m_nChannelsList.push_back(nChannelsValues[i]);
+					m_dwChannelMaskList.push_back(dwChannelMaskValues[i]);
 				}
 			}
-			if (m_nChannelsList.GetSize() == 0) {
+			if (m_nChannelsList.empty()) {
 				RemoveAll();
 				return hr;
 			}
@@ -1715,14 +1716,14 @@ HRESULT CMpcAudioRenderer::InitAudioClient()
 #ifdef DEBUG_OR_LOG
 			DLog(L"    List of supported output formats:");
 			DLog(L"        BitsPerSample:");
-			for (int i = 0; i < m_wBitsPerSampleList.GetSize(); i++) {
+			for (int i = 0; i < m_wBitsPerSampleList.size(); i++) {
 				if (m_wBitsPerSampleList[i] == 32 && !m_bReal32bitSupport) {
 					DLog(L"            24 padded to 32");
 				} else {
 					DLog(L"            %d", m_wBitsPerSampleList[i]);
 				}
 				DLog(L"            SamplesPerSec:");
-				for (int k = 0; k < m_AudioParamsList.GetSize(); k++) {
+				for (int k = 0; k < m_AudioParamsList.size(); k++) {
 					if (m_AudioParamsList[k].wBitsPerSample == m_wBitsPerSampleList[i]) {
 						DLog(L"                %d", m_AudioParamsList[k].nSamplesPerSec);
 					}
@@ -1741,7 +1742,7 @@ HRESULT CMpcAudioRenderer::InitAudioClient()
 			#undef ADDENTRY
 
 			DLog(L"        Channels:");
-			for (int i = 0; i < m_nChannelsList.GetSize(); i++) {
+			for (int i = 0; i < m_nChannelsList.size(); i++) {
 				DLog(L"            %d/0x%x  [%s]", m_nChannelsList[i], m_dwChannelMaskList[i], ChannelMaskStr[m_dwChannelMaskList[i]]);
 			}
 #endif
@@ -2261,11 +2262,11 @@ BOOL CMpcAudioRenderer::IsBitstream(const WAVEFORMATEX *pWaveFormatEx)
 	return FALSE;
 }
 
-static DWORD FindClosestInArray(CSimpleArray<DWORD> array, DWORD val)
+static DWORD FindClosestInArray(std::vector<DWORD>& array, DWORD val)
 {
 	LONG diff = abs(LONG(val - array[0]));
 	DWORD Num = array[0];
-	for (int idx = 0; idx < array.GetSize(); idx++) {
+	for (int idx = 0; idx < array.size(); idx++) {
 		DWORD val1 = array[idx];
 		LONG diff1 = abs(LONG(val - array[idx]));
 		if (diff > abs(LONG(val - array[idx]))) {
@@ -2280,9 +2281,9 @@ static DWORD FindClosestInArray(CSimpleArray<DWORD> array, DWORD val)
 HRESULT CMpcAudioRenderer::SelectFormat(const WAVEFORMATEX* pwfx, WAVEFORMATEXTENSIBLE& wfex)
 {
 	// first - check variables ...
-	if (m_wBitsPerSampleList.GetSize() == 0
-			|| m_AudioParamsList.GetSize() == 0
-			|| m_nChannelsList.GetSize() == 0) {
+	if (m_wBitsPerSampleList.empty()
+			|| m_AudioParamsList.empty()
+			|| m_nChannelsList.empty()) {
 		return E_FAIL;
 	}
 
@@ -2290,7 +2291,7 @@ HRESULT CMpcAudioRenderer::SelectFormat(const WAVEFORMATEX* pwfx, WAVEFORMATEXTE
 
 	DWORD nSamplesPerSec = pwfx->nSamplesPerSec;
 	BOOL bExists = FALSE;
-	for (int i = 0; i < m_AudioParamsList.GetSize(); i++) {
+	for (int i = 0; i < m_AudioParamsList.size(); i++) {
 		if (m_AudioParamsList[i].nSamplesPerSec == nSamplesPerSec) {
 			bExists = TRUE;
 			break;
@@ -2298,10 +2299,10 @@ HRESULT CMpcAudioRenderer::SelectFormat(const WAVEFORMATEX* pwfx, WAVEFORMATEXTE
 	}
 
 	if (!bExists) {
-		CSimpleArray<DWORD> array;
-		for (int i = 0; i < m_AudioParamsList.GetSize(); i++) {
-			if (array.Find(m_AudioParamsList[i].nSamplesPerSec) == -1) {
-				array.Add(m_AudioParamsList[i].nSamplesPerSec);
+		std::vector<DWORD> array;
+		for (int i = 0; i < m_AudioParamsList.size(); i++) {
+			if (Contains(array, m_AudioParamsList[i].nSamplesPerSec) == false) {
+				array.push_back(m_AudioParamsList[i].nSamplesPerSec);
 			}
 		}
 		nSamplesPerSec = FindClosestInArray(array, nSamplesPerSec);
@@ -2309,9 +2310,9 @@ HRESULT CMpcAudioRenderer::SelectFormat(const WAVEFORMATEX* pwfx, WAVEFORMATEXTE
 
 	WORD wBitsPerSample = pwfx->wBitsPerSample;
 	AudioParams ap(wBitsPerSample, nSamplesPerSec);
-	if (m_AudioParamsList.Find(ap) == -1) {
+	if (Contains(m_AudioParamsList, ap) == false) {
 		wBitsPerSample = 0;
-		for (int i = m_AudioParamsList.GetSize() - 1; i >= 0; i--) {
+		for (int i = m_AudioParamsList.size() - 1; i >= 0; i--) {
 			if (m_AudioParamsList[i].nSamplesPerSec == nSamplesPerSec) {
 				wBitsPerSample = m_AudioParamsList[i].wBitsPerSample;
 				break;
@@ -2353,13 +2354,15 @@ HRESULT CMpcAudioRenderer::SelectFormat(const WAVEFORMATEX* pwfx, WAVEFORMATEXTE
 			dwChannelMask = ((WAVEFORMATEXTENSIBLE*)pwfx)->dwChannelMask;
 		}
 
-		if (m_nChannelsList.Find(nChannels) == -1) {
-			nChannels     = m_nChannelsList[m_nChannelsList.GetSize() - 1];
-			dwChannelMask = m_dwChannelMaskList[m_nChannelsList.Find(nChannels)];
+		if (Contains(m_nChannelsList, nChannels) == false) {
+			nChannels     = m_nChannelsList[m_nChannelsList.size() - 1];
+			auto idx = std::distance(m_nChannelsList.begin(), std::find(m_nChannelsList.begin(), m_nChannelsList.end(), nChannels));
+			dwChannelMask = m_dwChannelMaskList[idx];
 		}
 
-		if (m_dwChannelMaskList.Find(dwChannelMask) == -1) {
-			dwChannelMask = m_dwChannelMaskList[m_nChannelsList.Find(nChannels)];
+		if (Contains(m_dwChannelMaskList, dwChannelMask) == false) {
+			auto idx = std::distance(m_nChannelsList.begin(), std::find(m_nChannelsList.begin(), m_nChannelsList.end(), nChannels));
+			dwChannelMask = m_dwChannelMaskList[idx];
 		}
 	}
 
@@ -2452,10 +2455,10 @@ HRESULT CMpcAudioRenderer::ReinitializeAudioDevice(BOOL bFullInitialization/* = 
 
 		SAFE_DELETE_ARRAY(m_pWaveFormatExInput);
 
-		m_wBitsPerSampleList.RemoveAll();
-		m_nChannelsList.RemoveAll();
-		m_dwChannelMaskList.RemoveAll();
-		m_AudioParamsList.RemoveAll();
+		m_wBitsPerSampleList.clear();
+		m_nChannelsList.clear();
+		m_dwChannelMaskList.clear();
+		m_AudioParamsList.clear();
 
 		m_bReal32bitSupport = FALSE;
 	}
