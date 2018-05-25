@@ -679,7 +679,7 @@ public:
 	int				nAudioMixerLayout;
 	bool			bAudioStereoFromDecoder;
 	bool			bAudioBassRedirect;
-	double			dAudioCenter_dB = 0.0;
+	float			fAudioCenter_dB; // need float for swscanf
 	double			dAudioGain_dB;
 	bool			bAudioAutoVolumeControl;
 	bool			bAudioNormBoost;
