@@ -398,21 +398,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Procesprioriteit ""hoger dan normaal"""
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 28
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 30
 5		"Kanaalmixer"
 6		"Mix kanalen in:"
 8		"Stereo-audio uit decoder proberen te verkrijgen"
 9		"Herleid bas naar LFE-kanaal*"
-10		"Volumecontrole"
-13		"Automatische volumeregeling"
-14		"Audio boosten"
-19		"Audio-tijdsverschuiving (ms):"
-22		"Standaard"
-23		"Audio-uitvoerformaat:"
-24		"Int16"
-25		"Int24"
-26		"Int32"
-27		"Float"
+12		"Volumecontrole"
+15		"Automatische volumeregeling"
+16		"Audio boosten"
+21		"Audio-tijdsverschuiving (ms):"
+24		"Standaard"
+25		"Audio-uitvoerformaat:"
+26		"Int16"
+27		"Int24"
+28		"Int32"
+29		"Float"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -1309,9 +1309,9 @@ STRING IDS_ARS_RELEASE_DEVICE_IDLE		"Apparaat vrijgeven als de speler niet actie
 STRING IDS_ARS_SAMPLERATE		"Sample rate:"
 STRING IDS_ARS_SHARED		"Gedeeld"
 STRING IDS_ARS_SOUND_DEVICE		"Geluidsapparaat:"
+STRING IDS_ARS_STATUS		"Status"
 STRING IDS_ARS_SYSTEM_LAYOUT_CHANNELS		"Gebruik systeem kanaal lay-out"
 STRING IDS_ARS_WASAPI_MODE		"WASAPI-modus:"
-STRING IDS_ARS_STATUS		"Status"
 STRING IDS_AT_TOGGLE_SHADER		"Pre-resize Pixel Shaders aan/uit"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Post-resize Pixel Shaders aan/uit"
 STRING IDS_AUDIOWINDOW_COVER		"albumhoezen/coverafbeeldingen tonen"

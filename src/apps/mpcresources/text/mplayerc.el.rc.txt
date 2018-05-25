@@ -398,21 +398,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Προτεραιότητα διεργασίας πάνω από κανονική"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 28
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 30
 5		"Channel Mixer"
 6		"Μίξη καναλιών σε:"
 8		"Request stereo from the decoder"
 9		"Redirect bass to LFE*"
-10		"Volume control"
-13		"Αυτόματος έλεγχος έντασης"
-14		"Ώθηση ήχου"
-19		"Χρονική μετατόπιση ήχου (ms):"
-22		"Προεπιλογή"
-23		"Μορφή δείγμ. εξόδου:"
-24		"Int16"
-25		"Int24"
-26		"Int32"
-27		"Float"
+12		"Volume control"
+15		"Αυτόματος έλεγχος έντασης"
+16		"Ώθηση ήχου"
+21		"Χρονική μετατόπιση ήχου (ms):"
+24		"Προεπιλογή"
+25		"Μορφή δείγμ. εξόδου:"
+26		"Int16"
+27		"Int24"
+28		"Int32"
+29		"Float"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -1312,9 +1312,9 @@ STRING IDS_ARS_RELEASE_DEVICE_IDLE		"Release device when idle"
 STRING IDS_ARS_SAMPLERATE		"Sample rate:"
 STRING IDS_ARS_SHARED		"Shared"
 STRING IDS_ARS_SOUND_DEVICE		"Συσκευή ήχου:"
+STRING IDS_ARS_STATUS		"Status"
 STRING IDS_ARS_SYSTEM_LAYOUT_CHANNELS		"Use system layout channels"
 STRING IDS_ARS_WASAPI_MODE		"WASAPI mode:"
-STRING IDS_ARS_STATUS		"Status"
 STRING IDS_AT_TOGGLE_SHADER		"Εναλλαγή Pixel Shaders"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Εναλλαγή Pixel Shaders επιφάνειας οθόνης"
 STRING IDS_AUDIOWINDOW_COVER		"display album art/cover pictures"

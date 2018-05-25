@@ -398,21 +398,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Priorytet programu powyżej normalnego"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 28
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 30
 5		"Channel Mixer"
 6		"Miksuj kanały do:"
 8		"Request stereo from the decoder"
 9		"Przekieruj niskie tony do LFE*"
-10		"Volume control"
-13		"Automatyczna regulacja głośności"
-14		"Wzmocnienie dźwięku"
-19		"Opóźnienie dźwięku (ms):"
-22		"Domyślne"
-23		"Format próbki wyjściowej:"
-24		"Int16"
-25		"Int24"
-26		"Int32"
-27		"Float"
+12		"Volume control"
+15		"Automatyczna regulacja głośności"
+16		"Wzmocnienie dźwięku"
+21		"Opóźnienie dźwięku (ms):"
+24		"Domyślne"
+25		"Format próbki wyjściowej:"
+26		"Int16"
+27		"Int24"
+28		"Int32"
+29		"Float"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -1300,9 +1300,9 @@ STRING IDS_ARS_RELEASE_DEVICE_IDLE		"Release device when idle"
 STRING IDS_ARS_SAMPLERATE		"Sample rate:"
 STRING IDS_ARS_SHARED		"Współdzielenie (Shared)"
 STRING IDS_ARS_SOUND_DEVICE		"Urządzenie dźwiękowe:"
+STRING IDS_ARS_STATUS		"Status"
 STRING IDS_ARS_SYSTEM_LAYOUT_CHANNELS		"Korzystaj z systemowego układu kanałów"
 STRING IDS_ARS_WASAPI_MODE		"Tryb WASAPI:"
-STRING IDS_ARS_STATUS		"Status"
 STRING IDS_AT_TOGGLE_SHADER		"Przełącz widoczność cieniowania pikseli"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Przełącz cieniowanie pikseli przestrzeni ekranu"
 STRING IDS_AUDIOWINDOW_COVER		"wyświetl zdjęcie lub okładkę"
