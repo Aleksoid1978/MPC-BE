@@ -29,16 +29,14 @@ class CPPageSoundProcessing : public CPPageBase
 {
 	DECLARE_DYNAMIC(CPPageSoundProcessing)
 
-public:
-	CPPageSoundProcessing();
-	virtual ~CPPageSoundProcessing();
-
 	enum { IDD = IDD_PPAGESOUNDPROCESSING };
 
 	CButton		m_chkMixer;
 	CComboBox	m_cmbMixerLayout;
 	CButton		m_chkStereoFromDecoder;
 	CButton		m_chkBassRedirect;
+	CStatic		m_stcCenter;
+	CSliderCtrl	m_sldCenter;
 
 	CStatic		m_stcGain;
 	CSliderCtrl	m_sldGain;
@@ -59,9 +57,15 @@ public:
 	CIntEdit	m_edtTimeShift;
 	CSpinButtonCtrl m_spnTimeShift;
 
-	void UpdateGainInfo() { CString str; str.Format(ResStr(IDS_AUDIO_GAIN), m_sldGain.GetPos() / 10.0f); m_stcGain.SetWindowTextW(str); };
-	void UpdateNormLevelInfo() { CString str; str.Format(ResStr(IDS_AUDIO_LEVEL), m_sldNormLevel.GetPos()); m_stcNormLevel.SetWindowTextW(str); };
-	void UpdateNormRealeaseTimeInfo() { CString str; str.Format(ResStr(IDS_AUDIO_RELEASETIME), m_sldNormRealeaseTime.GetPos()); m_stcNormRealeaseTime.SetWindowTextW(str); };
+public:
+	CPPageSoundProcessing();
+	virtual ~CPPageSoundProcessing();
+
+private:
+	void UpdateCenterInfo();
+	void UpdateGainInfo();
+	void UpdateNormLevelInfo();
+	void UpdateNormRealeaseTimeInfo();
 
 	int GetSampleFormats();
 
