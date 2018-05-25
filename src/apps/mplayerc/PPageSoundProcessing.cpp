@@ -139,9 +139,11 @@ BOOL CPPageSoundProcessing::OnInitDialog()
 	m_chkStereoFromDecoder.SetCheck(s.bAudioStereoFromDecoder);
 	m_chkBassRedirect.SetCheck(s.bAudioBassRedirect);
 	m_sldCenter.SetRange(-60, 60, TRUE);
-	m_sldCenter.SetPos((int)std::round(s.dAudioCenter_dB * 10));
+	m_sldCenter.SetPos((int)std::round(s.fAudioCenter_dB * 10));
+#ifndef _DEBUG
 	m_stcCenter.ShowWindow(SW_HIDE);
 	m_sldCenter.ShowWindow(SW_HIDE);
+#endif
 
 	m_sldGain.SetRange(-30, 100, TRUE);
 	m_sldGain.SetPos((int)std::round(s.dAudioGain_dB * 10));
@@ -188,7 +190,7 @@ BOOL CPPageSoundProcessing::OnApply()
 	s.nAudioMixerLayout			= GetCurItemData(m_cmbMixerLayout);
 	s.bAudioStereoFromDecoder	= !!m_chkStereoFromDecoder.GetCheck();
 	s.bAudioBassRedirect		= !!m_chkBassRedirect.GetCheck();
-	s.dAudioCenter_dB			= m_sldCenter.GetPos() / 10.0;
+	s.fAudioCenter_dB			= m_sldCenter.GetPos() / 10.0f;
 
 	s.dAudioGain_dB				= m_sldGain.GetPos() / 10.0;
 
