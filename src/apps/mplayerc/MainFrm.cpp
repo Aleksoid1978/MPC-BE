@@ -8680,28 +8680,28 @@ void CMainFrame::OnPlayVolumeGain(UINT nID)
 	if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), m_pGB)) {
 		switch (nID) {
 		case ID_VOLUME_GAIN_INC:
-			s.fAudioGain_dB = floor(s.fAudioGain_dB * 2) / 2 + 0.5f;
-			if (s.fAudioGain_dB > 10.0f) {
-				s.fAudioGain_dB = 10.0f;
+			s.dAudioGain_dB = floor(s.dAudioGain_dB * 2) / 2 + 0.5;
+			if (s.dAudioGain_dB > 10.0) {
+				s.dAudioGain_dB = 10.0;
 			}
 			break;
 		case ID_VOLUME_GAIN_DEC:
-			s.fAudioGain_dB = ceil(s.fAudioGain_dB * 2) / 2 - 0.5f;
-			if (s.fAudioGain_dB < -3.0f) {
-				s.fAudioGain_dB = -3.0f;
+			s.dAudioGain_dB = ceil(s.dAudioGain_dB * 2) / 2 - 0.5;
+			if (s.dAudioGain_dB < -3.0) {
+				s.dAudioGain_dB = -3.0;
 			}
 			break;
 		case ID_VOLUME_GAIN_OFF:
-			s.fAudioGain_dB = 0.0f;
+			s.dAudioGain_dB = 0.0;
 			break;
 		case ID_VOLUME_GAIN_MAX:
-			s.fAudioGain_dB = 10.0f;
+			s.dAudioGain_dB = 10.0;
 			break;
 		}
-		pASF->SetAudioGain(s.fAudioGain_dB);
+		pASF->SetAudioGain(s.dAudioGain_dB);
 
 		CString osdMessage;
-		osdMessage.Format(IDS_GAIN_OSD, s.fAudioGain_dB);
+		osdMessage.Format(IDS_GAIN_OSD, s.dAudioGain_dB);
 		m_OSD.DisplayMessage(OSD_TOPLEFT, osdMessage);
 	}
 }

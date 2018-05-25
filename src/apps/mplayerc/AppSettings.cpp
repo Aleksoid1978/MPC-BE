@@ -761,8 +761,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 	bAudioStereoFromDecoder	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOSTEREOFROMDECODER, FALSE);
 	bAudioBassRedirect		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOBASSREDIRECT, FALSE);
-	fAudioGain_dB			= (float)_wtof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, L"0"));
-	fAudioGain_dB			= discard(fAudioGain_dB, -3.0f, 10.0f, 0.0f);
+	dAudioGain_dB			= _wtof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, L"0"));
+	dAudioGain_dB			= discard(dAudioGain_dB, -3.0, 10.0, 0.0);
 	bAudioAutoVolumeControl	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, FALSE);
 	bAudioNormBoost			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, TRUE);
 	iAudioNormLevel			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, 75);
@@ -1291,7 +1291,7 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOSTEREOFROMDECODER, bAudioStereoFromDecoder);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOBASSREDIRECT, bAudioBassRedirect);
 	CString strGain;
-	strGain.Format(L"%.1f", fAudioGain_dB);
+	strGain.Format(L"%.1f", dAudioGain_dB);
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, strGain);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, bAudioAutoVolumeControl);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, bAudioNormBoost);

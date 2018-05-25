@@ -121,8 +121,7 @@ CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_bMixer(false)
 	, m_nMixerLayout(SPK_STEREO)
 	, m_bBassRedirect(false)
-	, m_fGain_dB(0.0f)
-	, m_fGainFactor(1.0f)
+	, m_dGainFactor(1.0)
 	, m_bAutoVolumeControl(false)
 	, m_bNormBoost(true)
 	, m_iNormLevel(75)
@@ -297,22 +296,22 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		audio_allsamples = audio_samples * audio_channels;
 	}
 	// Gain (works in place)
-	else if (m_fGainFactor != 1.0f) {
+	else if (m_dGainFactor != 1.0) {
 		switch (audio_sampleformat) {
 		case SAMPLE_FMT_U8:
-			gain_uint8(m_fGainFactor, audio_allsamples, (uint8_t*)audio_data);
+			gain_uint8(m_dGainFactor, audio_allsamples, (uint8_t*)audio_data);
 			break;
 		case SAMPLE_FMT_S16:
-			gain_int16(m_fGainFactor, audio_allsamples, (int16_t*)audio_data);
+			gain_int16(m_dGainFactor, audio_allsamples, (int16_t*)audio_data);
 			break;
 		case SAMPLE_FMT_S24:
-			gain_int24(m_fGainFactor, audio_allsamples, audio_data);
+			gain_int24(m_dGainFactor, audio_allsamples, audio_data);
 			break;
 		case SAMPLE_FMT_S32:
-			gain_int32(m_fGainFactor, audio_allsamples, (int32_t*)audio_data);
+			gain_int32(m_dGainFactor, audio_allsamples, (int32_t*)audio_data);
 			break;
 		case SAMPLE_FMT_FLT:
-			gain_float(m_fGainFactor, audio_allsamples, (float*)audio_data);
+			gain_float(m_dGainFactor, audio_allsamples, (float*)audio_data);
 			break;
 		}
 	}
@@ -508,10 +507,15 @@ STDMETHODIMP CAudioSwitcherFilter::SetBassRedirect(bool bBassRedirect)
 	return S_OK;
 }
 
-STDMETHODIMP CAudioSwitcherFilter::SetAudioGain(float fGain_dB)
+STDMETHODIMP CAudioSwitcherFilter::SetLevels(double dCenterLevel_dB)
 {
-	m_fGain_dB = std::clamp(fGain_dB, -3.0f, 10.0f);
-	m_fGainFactor = pow(10.0f, m_fGain_dB/20.0f);
+	return E_NOTIMPL;
+}
+
+STDMETHODIMP CAudioSwitcherFilter::SetAudioGain(double dGain_dB)
+{
+	dGain_dB = std::clamp(dGain_dB, -3.0, 10.0);
+	m_dGainFactor = pow(10.0f, dGain_dB/20.0);
 
 	return S_OK;
 }
