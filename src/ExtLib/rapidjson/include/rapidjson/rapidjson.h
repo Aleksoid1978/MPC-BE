@@ -26,7 +26,7 @@
 
     Some RapidJSON features are configurable to adapt the library to a wide
     variety of platforms, environments and usage scenarios.  Most of the
-    features can be configured in terms of overriden or predefined
+    features can be configured in terms of overridden or predefined
     preprocessor macros at compile-time.
 
     Some additional customization is available in the \ref RAPIDJSON_ERRORS APIs.
@@ -219,7 +219,7 @@
 #    elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #      define RAPIDJSON_ENDIAN RAPIDJSON_BIGENDIAN
 #    else
-#      error Unknown machine endianess detected. User needs to define RAPIDJSON_ENDIAN.
+#      error Unknown machine endianness detected. User needs to define RAPIDJSON_ENDIAN.
 #    endif // __BYTE_ORDER__
 // Detect with GLIBC's endian.h
 #  elif defined(__GLIBC__)
@@ -229,7 +229,7 @@
 #    elif (__BYTE_ORDER == __BIG_ENDIAN)
 #      define RAPIDJSON_ENDIAN RAPIDJSON_BIGENDIAN
 #    else
-#      error Unknown machine endianess detected. User needs to define RAPIDJSON_ENDIAN.
+#      error Unknown machine endianness detected. User needs to define RAPIDJSON_ENDIAN.
 #   endif // __GLIBC__
 // Detect with _LITTLE_ENDIAN and _BIG_ENDIAN macro
 #  elif defined(_LITTLE_ENDIAN) && !defined(_BIG_ENDIAN)
@@ -246,7 +246,7 @@
 #  elif defined(RAPIDJSON_DOXYGEN_RUNNING)
 #    define RAPIDJSON_ENDIAN
 #  else
-#    error Unknown machine endianess detected. User needs to define RAPIDJSON_ENDIAN.   
+#    error Unknown machine endianness detected. User needs to define RAPIDJSON_ENDIAN.   
 #  endif
 #endif // RAPIDJSON_ENDIAN
 
@@ -433,7 +433,7 @@ template <> struct STATIC_ASSERTION_FAILURE<true> { enum { value = 1 }; };
 template <size_t x> struct StaticAssertTest {};
 RAPIDJSON_NAMESPACE_END
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) || defined(__clang__)
 #define RAPIDJSON_STATIC_ASSERT_UNUSED_ATTRIBUTE __attribute__((unused))
 #else
 #define RAPIDJSON_STATIC_ASSERT_UNUSED_ATTRIBUTE 
@@ -543,7 +543,7 @@ RAPIDJSON_NAMESPACE_END
 #ifndef RAPIDJSON_HAS_CXX11_RVALUE_REFS
 #if defined(__clang__)
 #if __has_feature(cxx_rvalue_references) && \
-    (defined(_LIBCPP_VERSION) || defined(__GLIBCXX__) && __GLIBCXX__ >= 20080306)
+    (defined(_MSC_VER) || defined(_LIBCPP_VERSION) || defined(__GLIBCXX__) && __GLIBCXX__ >= 20080306)
 #define RAPIDJSON_HAS_CXX11_RVALUE_REFS 1
 #else
 #define RAPIDJSON_HAS_CXX11_RVALUE_REFS 0
