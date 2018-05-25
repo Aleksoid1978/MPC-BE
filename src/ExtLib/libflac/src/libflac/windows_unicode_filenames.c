@@ -186,7 +186,7 @@ int flac_internal_rename_utf8(const char *oldname, const char *newname)
 
 HANDLE WINAPI flac_internal_CreateFile_utf8(const char *lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)
 {
-#if _MSC_VER > 1900 && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
+#if 0 && _MSC_VER > 1900 && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP) // MPC-BE patch. Disable the use of CreateFile2 in Windows 7.
 	wchar_t *wname;
 	HANDLE handle = INVALID_HANDLE_VALUE;
 
