@@ -1,0 +1,3 @@
+﻿The following files have MPC-BE specific custom code (compared to VirtualDub):
+
+* windows_unicode_filenames.c
