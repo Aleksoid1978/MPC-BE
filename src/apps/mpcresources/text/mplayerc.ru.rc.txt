@@ -398,21 +398,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Повышенный приоритет процесса"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 28
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 30
 5		"Микшер каналов"
 6		"Микшировать каналы в:"
 8		"Запросить стерео у декодера"
 9		"Перенаправить бас в LFE*"
-10		"Управление громкостью"
-13		"Автоматическая регулировка громкости"
-14		"Повышать громкость"
-19		"Смещение звука (в мс):"
-22		"По умолчанию"
-23		"Формат вывода:"
-24		"Int16"
-25		"Int24"
-26		"Int32"
-27		"Float"
+12		"Управление громкостью"
+15		"Автоматическая регулировка громкости"
+16		"Повышать громкость"
+21		"Смещение звука (в мс):"
+24		"По умолчанию"
+25		"Формат вывода:"
+26		"Int16"
+27		"Int24"
+28		"Int32"
+29		"Float"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -1309,9 +1309,9 @@ STRING IDS_ARS_RELEASE_DEVICE_IDLE		"Разблокировать устройс
 STRING IDS_ARS_SAMPLERATE		"Частота:"
 STRING IDS_ARS_SHARED		"Shared"
 STRING IDS_ARS_SOUND_DEVICE		"Звуковое устройство:"
+STRING IDS_ARS_STATUS		"Статус"
 STRING IDS_ARS_SYSTEM_LAYOUT_CHANNELS		"Использовать системную раскладку каналов"
 STRING IDS_ARS_WASAPI_MODE		"Режим WASAPI:"
-STRING IDS_ARS_STATUS		"Статус"
 STRING IDS_AT_TOGGLE_SHADER		"Вкл/Откл пиксельные шейдеры"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Вкл/Откл экранные шейдеры"
 STRING IDS_AUDIOWINDOW_COVER		"показывать обложки дисков"

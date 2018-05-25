@@ -398,21 +398,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"プロセスの優先度を 通常以上 にする"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 28
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 30
 5		"チャンネル ミキサー"
 6		"チャンネルをミックス:"
 8		"デコーダーからステレオを要求する"
 9		"LFE* にバスをリダイレクト"
-10		"音量コントロール"
-13		"自動音量コントロール"
-14		"音声のブースト"
-19		"音声のタイム シフト(ミリ秒):"
-22		"デフォルト"
-23		"出力サンプル形式:"
-24		"Int16"
-25		"Int24"
-26		"Int32"
-27		"Float"
+12		"音量コントロール"
+15		"自動音量コントロール"
+16		"音声のブースト"
+21		"音声のタイム シフト(ミリ秒):"
+24		"デフォルト"
+25		"出力サンプル形式:"
+26		"Int16"
+27		"Int24"
+28		"Int32"
+29		"Float"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -1309,9 +1309,9 @@ STRING IDS_ARS_RELEASE_DEVICE_IDLE		"Release device when idle"
 STRING IDS_ARS_SAMPLERATE		"Sample rate:"
 STRING IDS_ARS_SHARED		"共有"
 STRING IDS_ARS_SOUND_DEVICE		"サウンドデバイス:"
+STRING IDS_ARS_STATUS		"ステータス"
 STRING IDS_ARS_SYSTEM_LAYOUT_CHANNELS		"システム レイアウト チャネルを使用"
 STRING IDS_ARS_WASAPI_MODE		"WASAPI モード:"
-STRING IDS_ARS_STATUS		"ステータス"
 STRING IDS_AT_TOGGLE_SHADER		"ピクセル シェーダー 切り替え"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"スクリーン空間 ピクセル シェーダーの切り替え"
 STRING IDS_AUDIOWINDOW_COVER		"アルバムの アート/カバー 画像を表示する"

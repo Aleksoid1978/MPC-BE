@@ -398,21 +398,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"프로세스 우선순위 높이기"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 28
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 30
 5		"Channel Mixer"
 6		"Mix channels to:"
 8		"Request stereo from the decoder"
 9		"Redirect bass to LFE*"
-10		"Volume control"
-13		"Auto volume control"
-14		"Boost audio"
-19		"오디오 시간 조절 (ms):"
-22		"Default"
-23		"출력 샘플 형식:"
-24		"Int16"
-25		"Int24"
-26		"Int32"
-27		"Float"
+12		"Volume control"
+15		"Auto volume control"
+16		"Boost audio"
+21		"오디오 시간 조절 (ms):"
+24		"Default"
+25		"출력 샘플 형식:"
+26		"Int16"
+27		"Int24"
+28		"Int32"
+29		"Float"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -1309,9 +1309,9 @@ STRING IDS_ARS_RELEASE_DEVICE_IDLE		"Release device when idle"
 STRING IDS_ARS_SAMPLERATE		"Sample rate:"
 STRING IDS_ARS_SHARED		"Shared"
 STRING IDS_ARS_SOUND_DEVICE		"사운드 장치:"
+STRING IDS_ARS_STATUS		"상태"
 STRING IDS_ARS_SYSTEM_LAYOUT_CHANNELS		"시스템 layout 채널 사용"
 STRING IDS_ARS_WASAPI_MODE		"WASAPI mode:"
-STRING IDS_ARS_STATUS		"상태"
 STRING IDS_AT_TOGGLE_SHADER		"픽셸 셰이더 토글"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"화면 픽셀셰이더 토글"
 STRING IDS_AUDIOWINDOW_COVER		"display album art/cover pictures"

@@ -398,21 +398,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Підвищений пріоритет процесу"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 28
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 30
 5		"Мікшер каналів"
 6		"Мікшування каналів:"
 8		"Запит стерео у декодера"
 9		"Перенаправлення басів до LFE*"
-10		"Volume control"
-13		"Автоматичне регулювання гучності"
-14		"Підсилення аудіо"
-19		"Затримка звуку (мс):"
-22		"Типово"
-23		"Формат виводу:"
-24		"Int16"
-25		"Int24"
-26		"Int32"
-27		"Float"
+12		"Volume control"
+15		"Автоматичне регулювання гучності"
+16		"Підсилення аудіо"
+21		"Затримка звуку (мс):"
+24		"Типово"
+25		"Формат виводу:"
+26		"Int16"
+27		"Int24"
+28		"Int32"
+29		"Float"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -1309,9 +1309,9 @@ STRING IDS_ARS_RELEASE_DEVICE_IDLE		"Розблокувати пристрій �
 STRING IDS_ARS_SAMPLERATE		"Sample rate:"
 STRING IDS_ARS_SHARED		"режим Shared"
 STRING IDS_ARS_SOUND_DEVICE		"Пристрій виведення звуку:"
+STRING IDS_ARS_STATUS		"Статус"
 STRING IDS_ARS_SYSTEM_LAYOUT_CHANNELS		"Використовувати системне розташування каналів"
 STRING IDS_ARS_WASAPI_MODE		"Режим WASAPI:"
-STRING IDS_ARS_STATUS		"Статус"
 STRING IDS_AT_TOGGLE_SHADER		"Перемикання перед-масштабовних шейдерів"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Перемикання після-масштабовних шейдерів"
 STRING IDS_AUDIOWINDOW_COVER		"Відображати обкладинку альбома"

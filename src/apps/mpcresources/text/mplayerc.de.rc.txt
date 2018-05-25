@@ -398,21 +398,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"&Prozesspriorität ""Höher als normal"""
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 28
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 30
 5		"Kanalmixer"
 6		"Kanäle mischen zu:"
 8		"Stereo vom Decoder anfordern"
 9		"Tieftonanteil zum LFE umleiten"
-10		"Lautstärkeregelung"
-13		"Automatische Verstärkungsregelung"
-14		"Audio verstärken"
-19		"Audioverzögerung (ms):"
-22		"Zurücksetzen"
-23		"Ausgabesampleformat"
-24		"Int16"
-25		"Int24"
-26		"Int32"
-27		"Float"
+12		"Lautstärkeregelung"
+15		"Automatische Verstärkungsregelung"
+16		"Audio verstärken"
+21		"Audioverzögerung (ms):"
+24		"Zurücksetzen"
+25		"Ausgabesampleformat"
+26		"Int16"
+27		"Int24"
+28		"Int32"
+29		"Float"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -1309,9 +1309,9 @@ STRING IDS_ARS_RELEASE_DEVICE_IDLE		"Gerät freigeben, falls im Leerlauf"
 STRING IDS_ARS_SAMPLERATE		"Abtastrate:"
 STRING IDS_ARS_SHARED		"Shared"
 STRING IDS_ARS_SOUND_DEVICE		"Audiogerät:"
+STRING IDS_ARS_STATUS		"Status"
 STRING IDS_ARS_SYSTEM_LAYOUT_CHANNELS		"Systemlayout-Kanäle verwenden"
 STRING IDS_ARS_WASAPI_MODE		"WASAPI-Modus:"
-STRING IDS_ARS_STATUS		"Status"
 STRING IDS_AT_TOGGLE_SHADER		"Pre-Resize Shader (Ein/Aus)"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Post-Resize Shader (Ein/Aus)"
 STRING IDS_AUDIOWINDOW_COVER		"Album-Cover/Titelbilder anzeigen"

@@ -398,21 +398,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Ekinbide lehentasuna arruntetik gora"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 28
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 30
 5		"Bide Nahastzailea"
 6		"Nahastu bideak:"
 8		"Eskatu estereoa dekodeatzailetik"
 9		"Berzuzendu hotslodiak BME*-RA"
-10		"Bolumen agintea"
-13		"Berez irabazi agintea"
-14		"Audioa bultzada"
-19		"Audio denbora aldaketa (sm):"
-22		"Berezkoa"
-23		"Irteera lagin heuskarria:"
-24		"Int16"
-25		"Int24"
-26		"Int32"
-27		"Gain"
+12		"Bolumen agintea"
+15		"Berez irabazi agintea"
+16		"Audioa bultzada"
+21		"Audio denbora aldaketa (sm):"
+24		"Berezkoa"
+25		"Irteera lagin heuskarria:"
+26		"Int16"
+27		"Int24"
+28		"Int32"
+29		"Gain"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
@@ -1309,9 +1309,9 @@ STRING IDS_ARS_RELEASE_DEVICE_IDLE		"Release device when idle"
 STRING IDS_ARS_SAMPLERATE		"Sample rate:"
 STRING IDS_ARS_SHARED		"Elkarbanatua"
 STRING IDS_ARS_SOUND_DEVICE		"Soinu Gailua:"
+STRING IDS_ARS_STATUS		"Egoera"
 STRING IDS_ARS_SYSTEM_LAYOUT_CHANNELS		"Erabili sistemako antolakuntza bideak"
 STRING IDS_ARS_WASAPI_MODE		"WASAPI modua:"
-STRING IDS_ARS_STATUS		"Egoera"
 STRING IDS_AT_TOGGLE_SHADER		"Aldatu Pixel Itzalak"
 STRING IDS_AT_TOGGLE_SHADERSCREENSPACE		"Aldatu Ikusleiho Tarte Pixel Itzalak"
 STRING IDS_AUDIOWINDOW_COVER		"erakutsi bilduma argazki/azal irudiak"
