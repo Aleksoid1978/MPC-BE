@@ -1,5 +1,5 @@
 /*
- * (C) 2017 see Authors.txt
+ * (C) 2017-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -43,7 +43,8 @@ IAudioSwitcherFilter :
 public IUnknown {
 	STDMETHOD(SetChannelMixer) (bool bMixer, int nLayout) PURE;
 	STDMETHOD(SetBassRedirect) (bool bBassRedirect) PURE;
-	STDMETHOD(SetAudioGain) (float fGain_dB) PURE;
+	STDMETHOD(SetLevels) (double dCenterLevel_dB) PURE;
+	STDMETHOD(SetAudioGain) (double dGain_dB) PURE;
 	STDMETHOD(SetAutoVolumeControl) (bool bAutoVolumeControl, bool bNormBoost, int iNormLevel, int iNormRealeaseTime) PURE;
 	STDMETHOD(SetOutputFormats) (int iSampleFormat) PURE;
 	STDMETHOD_(REFERENCE_TIME, GetAudioTimeShift) () PURE;

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -44,8 +44,7 @@ class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	CBassRedirect m_BassRedirect;
 	bool	m_bBassRedirect;
 
-	float	m_fGain_dB;
-	float	m_fGainFactor;
+	double	m_dGainFactor;
 
 	CAudioNormalizer m_AudioNormalizer;
 	bool	m_bAutoVolumeControl;
@@ -76,7 +75,8 @@ public:
 	// IAudioSwitcherFilter
 	STDMETHODIMP SetChannelMixer(bool bMixer, int nLayout);
 	STDMETHODIMP SetBassRedirect(bool bBassRedirect);
-	STDMETHODIMP SetAudioGain(float fGain_dB);
+	STDMETHODIMP SetLevels(double dCenterLevel_dB);
+	STDMETHODIMP SetAudioGain(double dGain_dB);
 	STDMETHODIMP SetAutoVolumeControl(bool bAutoVolumeControl, bool bNormBoost, int iNormLevel, int iNormRealeaseTime);
 	STDMETHODIMP SetOutputFormats(int iSampleFormats);
 	STDMETHODIMP_(REFERENCE_TIME) GetAudioTimeShift();

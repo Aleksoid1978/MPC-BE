@@ -680,7 +680,7 @@ public:
 	bool			bAudioStereoFromDecoder;
 	bool			bAudioBassRedirect;
 	double			dAudioCenter_dB = 0.0;
-	float			fAudioGain_dB;
+	double			dAudioGain_dB;
 	bool			bAudioAutoVolumeControl;
 	bool			bAudioNormBoost;
 	int				iAudioNormLevel;
