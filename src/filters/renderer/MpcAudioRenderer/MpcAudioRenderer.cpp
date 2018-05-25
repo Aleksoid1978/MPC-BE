@@ -1749,7 +1749,7 @@ HRESULT CMpcAudioRenderer::InitAudioClient()
 			#undef ADDENTRY
 
 			DLog(L"        Channels:");
-			for (int i = 0; i < m_nChannelsList.size(); i++) {
+			for (size_t i = 0; i < m_nChannelsList.size(); i++) {
 				DLog(L"            %d/0x%x  [%s]", m_nChannelsList[i], m_dwChannelMaskList[i], ChannelMaskStr[m_dwChannelMaskList[i]]);
 			}
 #endif
