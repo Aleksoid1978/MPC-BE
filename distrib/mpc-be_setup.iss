@@ -297,10 +297,12 @@ var
   objShell, colVerbs, oFile: Variant;
 begin
   if (GetWindowsVersion shr 24 < 6) or ((GetWindowsVersion shr 24 = 6) and ((GetWindowsVersion shr 16) and $FF < 1)) then Exit; // Windows 7 check
+  Log('Start PinToTaskbar');
 
   if not FileExists(Filename) then Exit;
 
   if IsPin then Res := 5386 else Res := 5387;
+
   begin
     hInst := LoadLibraryEx(ExpandConstant('{sys}\shell32.dll'), 0, LOAD_LIBRARY_AS_DATAFILE);
     if hInst <> 0 then
@@ -315,7 +317,8 @@ begin
       oFile    := objShell.Namespace(ExtractFileDir(Filename)).ParseName(ExtractFileName(Filename));
       colVerbs := oFile.Verbs;
 
-      if IsWin64 and (Pos (ExpandConstant ('{pf64}\'), Filename) = 1) then begin
+      if IsWin64 and (Pos (ExpandConstant ('{pf64}\'), Filename) = 1) then
+      begin
         sVBSFile := GenerateUniqueName (GetTempDir, 'mpc_be.vbs');
         SaveStringToFile (sVBSFile, \
           'Set oShell=CreateObject("Shell.Application")'  + #13 + \
@@ -329,8 +332,10 @@ begin
 
         exec( ExpandConstant ('{win}\Sysnative\cscript.exe'), '"' + sVBSFile + '" /B', '', SW_HIDE, ewWaitUntilTerminated, i);
         DeleteFile (sVBSFile);
-      end else begin
-        for i := colVerbs.Count downto 1 do if colVerbs.Item[i].Name = strVerb then begin
+      end else
+      begin
+        for i := colVerbs.Count downto 1 do if colVerbs.Item[i].Name = strVerb then
+        begin
           if (IsPin and oFile.IsLink) then
             DeleteFile (ExpandConstant ('{userappdata}\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\') + ExtractFileName (Filename));
 
@@ -359,11 +364,13 @@ var
   sInstallPath: String;
 begin
   Result := '';
-  if RegQueryStringValue(HKLM, 'SOFTWARE\{#app_name}', 'ExePath', sInstallPath) then begin
+  if RegQueryStringValue(HKLM, 'SOFTWARE\{#app_name}', 'ExePath', sInstallPath) then
+  begin
     Result := ExtractFileDir(sInstallPath);
   end;
 
-  if (Result = '') or not DirExists(Result) then begin
+  if (Result = '') or not DirExists(Result) then
+  begin
     #ifdef x64Build
     Result := ExpandConstant('{pf}\{#app_name} x64');
     #else
@@ -428,6 +435,7 @@ procedure CleanUpSettingsAndFiles();
 Var
   resCode: integer;
 begin
+  Log('Start CleanUpSettingsAndFiles');
   // Unregister all extensions, include custom
   Exec(ExpandConstant('{app}\{#mpcbe_exe}'), ' /unregall', ExpandConstant('{app}'), SW_HIDE, ewWaitUntilTerminated, resCode);
 
@@ -446,9 +454,9 @@ var
   sRegParams: String;
   resCode: integer;
 begin
-  if CurStep = ssPostInstall then begin
-
-    if IsTaskSelected('pintotaskbar') then
+  if CurStep = ssPostInstall then
+  begin
+     if IsTaskSelected('pintotaskbar') then
       PinToTaskbar(ExpandConstant('{app}\{#mpcbe_exe}'), True);
 
     if IsTaskSelected('reset_settings') then
@@ -462,7 +470,8 @@ begin
     else
       RegWriteStringValue(HKCU, 'Software\{#app_name}\Settings', 'Language', sLanguage);
 
-    if IsComponentSelected('mpcberegvid') or IsComponentSelected('mpcberegaud') or IsComponentSelected('mpcberegpl') then begin
+    if IsComponentSelected('mpcberegvid') or IsComponentSelected('mpcberegaud') or IsComponentSelected('mpcberegpl') then
+    begin
       if IsComponentSelected('mpcberegvid') then
         sRegParams := sRegParams + ' /regvid';
       if IsComponentSelected('mpcberegaud') then 
@@ -473,18 +482,21 @@ begin
     end;
 
     if IsComponentSelected('intel_msdk') then
+    begin
+      Log('Unzip ' + ExpandConstant('{#msdk_dll_zip}'));
       Unzip(ExpandConstant('{tmp}\{#msdk_dll_zip}'), ExpandConstant('{app}'));
+    end
   end;
 end;
 
 procedure CurPageChanged(CurPageID: Integer);
 begin
-  if CurPageID = wpReady then begin
+  if CurPageID = wpReady then
+  begin
     idpClearFiles;
 
-    if IsComponentSelected('intel_msdk') then begin
+    if IsComponentSelected('intel_msdk') then
       idpAddFile('http://mpc-be.org/Intel_MSDK/{#msdk_dll_zip}', ExpandConstant('{tmp}\{#msdk_dll_zip}'));
-    end;
   end;
 end;
 
@@ -494,7 +506,8 @@ begin
     PinToTaskbar(ExpandConstant('{app}\{#mpcbe_exe}'), False);
 
   // When uninstalling, ask the user to delete settings
-  if ((CurUninstallStep = usUninstall) and SettingsExist()) then begin
+  if ((CurUninstallStep = usUninstall) and SettingsExist()) then
+   begin
     if SuppressibleMsgBox(CustomMessage('msg_DeleteSettings'), mbConfirmation, MB_YESNO or MB_DEFBUTTON2, IDNO) = IDYES then
     begin
       DelTree(ExpandConstant('{userappdata}\{#app_name}\Shaders\*.psh'), False, True, False);
@@ -511,29 +524,31 @@ end;
 function InitializeSetup(): Boolean;
 begin
   // Create a mutex for the installer and if it's already running display a message and stop installation
-  if CheckForMutexes(installer_mutex) and not WizardSilent() then begin
+  if CheckForMutexes(installer_mutex) and not WizardSilent() then
+  begin
     SuppressibleMsgBox(CustomMessage('msg_SetupIsRunningWarning'), mbError, MB_OK, MB_OK);
     Result := False;
-  end
-  else begin
+  end else
+  begin
     Result := True;
     CreateMutex(installer_mutex);
 
-    if not Is_SSE2_Supported() then begin
+    if not Is_SSE2_Supported() then
+    begin
       SuppressibleMsgBox(CustomMessage('msg_simd_sse2'), mbCriticalError, MB_OK, MB_OK);
       Result := False;
     end;
-
   end;
 end;
 
 function InitializeUninstall(): Boolean;
 begin
-  if CheckForMutexes(installer_mutex) then begin
+  if CheckForMutexes(installer_mutex) then
+  begin
     SuppressibleMsgBox(CustomMessage('msg_SetupIsRunningWarning'), mbError, MB_OK, MB_OK);
     Result := False;
-  end
-  else begin
+  end else
+  begin
     Result := True;
     CreateMutex(installer_mutex);
   end;
@@ -541,10 +556,11 @@ end;
 
 function IsInactiveLang(Lang: String): Boolean;
 begin
-  if ActiveLanguage() = lang then begin
+  if ActiveLanguage() = lang then
+  begin
     Result := False;
-  end
-  else begin
+  end else
+  begin
     Result :=  True;
   end;
 end;
