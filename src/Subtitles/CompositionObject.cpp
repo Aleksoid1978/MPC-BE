@@ -135,7 +135,7 @@ void CompositionObject::DvbRenderField(SubPicDesc& spd, CGolombBuffer& gb, SHORT
 	SHORT	nY		= nYStart;
 	int		nEnd	= gb.GetPos()+nLength;
 	while (gb.GetPos() < nEnd) {
-		BYTE	bType	= gb.ReadByte();
+		BYTE bType = gb.ReadByte();
 		switch (bType) {
 			case 0x10 :
 				Dvb2PixelsCodeString(spd, gb, nX, nY);
@@ -160,7 +160,8 @@ void CompositionObject::DvbRenderField(SubPicDesc& spd, CGolombBuffer& gb, SHORT
 				nY += 2;
 				break;
 			default :
-				ASSERT(FALSE);
+				DLog(L"DvbRenderField(): Unknown DVBSUB segment 0x%02x, offset %d", bType, gb.GetPos()-1);
+				gb.SkipBytes(1); // Hmm
 				break;
 		}
 	}
