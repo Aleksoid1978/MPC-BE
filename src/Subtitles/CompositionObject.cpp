@@ -133,7 +133,7 @@ void CompositionObject::DvbRenderField(SubPicDesc& spd, CGolombBuffer& gb, SHORT
 	//return;
 	SHORT	nX		= nXStart;
 	SHORT	nY		= nYStart;
-	int		nEnd	= gb.GetPos()+nLength;
+	int		nEnd	= std::min(gb.GetPos()+nLength, gb.GetSize());
 	while (gb.GetPos() < nEnd) {
 		BYTE bType = gb.ReadByte();
 		switch (bType) {
@@ -161,7 +161,6 @@ void CompositionObject::DvbRenderField(SubPicDesc& spd, CGolombBuffer& gb, SHORT
 				break;
 			default :
 				DLog(L"DvbRenderField(): Unknown DVBSUB segment 0x%02x, offset %d", bType, gb.GetPos()-1);
-				gb.SkipBytes(1); // Hmm
 				break;
 		}
 	}
