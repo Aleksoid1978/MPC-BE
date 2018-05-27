@@ -39,7 +39,7 @@ CPPageSoundProcessing::~CPPageSoundProcessing()
 void CPPageSoundProcessing::UpdateCenterInfo()
 {
 	CString str;
-	str.Format(L"Center level (%+.1f dB):", m_sldCenter.GetPos() / 10.0f);
+	str.Format(L"Center level* (%+.1f dB):", m_sldCenter.GetPos() / 10.0f);
 	m_stcCenter.SetWindowTextW(str);
 };
 
@@ -140,10 +140,6 @@ BOOL CPPageSoundProcessing::OnInitDialog()
 	m_chkBassRedirect.SetCheck(s.bAudioBassRedirect);
 	m_sldCenter.SetRange(-60, 60, TRUE);
 	m_sldCenter.SetPos((int)std::round(s.fAudioCenter_dB * 10));
-#ifndef _DEBUG
-	m_stcCenter.ShowWindow(SW_HIDE);
-	m_sldCenter.ShowWindow(SW_HIDE);
-#endif
 
 	m_sldGain.SetRange(-30, 100, TRUE);
 	m_sldGain.SetPos((int)std::round(s.dAudioGain_dB * 10));
@@ -218,6 +214,7 @@ BOOL CPPageSoundProcessing::OnApply()
 		if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG)) {
 			pASF->SetChannelMixer(s.bAudioMixer, s.nAudioMixerLayout);
 			pASF->SetBassRedirect(s.bAudioBassRedirect);
+			pASF->SetLevels(s.fAudioCenter_dB);
 			pASF->SetAudioGain(s.dAudioGain_dB);
 			pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
 			pASF->SetOutputFormats(s.iAudioSampleFormats);

@@ -44,6 +44,7 @@ class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	CBassRedirect m_BassRedirect;
 	bool	m_bBassRedirect;
 
+	double	m_dCenterLevel;
 	double	m_dGainFactor;
 
 	CAudioNormalizer m_AudioNormalizer;
