@@ -112,6 +112,10 @@ static DWORD GetChannelLayout(const WAVEFORMATEX* wfe)
 	return channel_layout;
 }
 
+inline double decibel2factor(double dB) {
+	return pow(10.0, dB / 20.0);
+}
+
 //
 // CAudioSwitcherFilter
 //
@@ -121,6 +125,7 @@ CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_bMixer(false)
 	, m_nMixerLayout(SPK_STEREO)
 	, m_bBassRedirect(false)
+	, m_dCenterLevel(1.0)
 	, m_dGainFactor(1.0)
 	, m_bAutoVolumeControl(false)
 	, m_bNormBoost(true)
@@ -178,6 +183,19 @@ HRESULT CAudioSwitcherFilter::CheckMediaType(const CMediaType* pmt)
 	return VFW_E_TYPE_NOT_ACCEPTED;
 }
 
+int get_channel_pos(DWORD layout, DWORD channel)
+{
+	ASSERT(layout & channel);
+	ASSERT(CountBits(channel) == 1);
+
+	int num = 0;
+	layout &= channel - 1;
+	for (; layout; layout >>= 1) {
+		num += layout & 1;
+	}
+	return num;
+}
+
 HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 {
 	CAutoLock cAutoLock(&m_csTransform);
@@ -202,7 +220,7 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	}
 
 	const WAVEFORMATEX* in_wfe = (WAVEFORMATEX*)pInPin->CurrentMediaType().pbFormat;
-	SampleFormat audio_sampleformat   = GetSampleFormat(in_wfe);
+	SampleFormat audio_sampleformat = GetSampleFormat(in_wfe);
 
 	// bitsreaming
 	if (audio_sampleformat == SAMPLE_FMT_NONE) {
@@ -241,6 +259,15 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	const int    output_samplesize    = pOut->GetSize() / (output_channels * get_bytes_per_sample(output_sampleformat));
 
 	REFERENCE_TIME delay = 0;
+
+	if (audio_channels > 1 && (audio_layout&SPEAKER_FRONT_CENTER) && audio_sampleformat == SAMPLE_FMT_FLT && m_dCenterLevel != 1.0) {
+		int centerpos = get_channel_pos(audio_layout, SPEAKER_FRONT_CENTER);
+		float* p = (float*)audio_data;
+		for (int i = 0; i < audio_samples; i++) {
+			p[centerpos] *= m_dCenterLevel;
+			p += audio_channels;
+		}
+	}
 
 	// Mixer
 	if (audio_layout != output_layout || audio_samplerate != output_samplerate) {
@@ -509,13 +536,16 @@ STDMETHODIMP CAudioSwitcherFilter::SetBassRedirect(bool bBassRedirect)
 
 STDMETHODIMP CAudioSwitcherFilter::SetLevels(double dCenterLevel_dB)
 {
-	return E_NOTIMPL;
+	dCenterLevel_dB = std::clamp(dCenterLevel_dB, -6.0, 6.0);
+	m_dCenterLevel = decibel2factor(dCenterLevel_dB);
+
+	return S_OK;
 }
 
 STDMETHODIMP CAudioSwitcherFilter::SetAudioGain(double dGain_dB)
 {
 	dGain_dB = std::clamp(dGain_dB, -3.0, 10.0);
-	m_dGainFactor = pow(10.0f, dGain_dB/20.0);
+	m_dGainFactor = decibel2factor(dGain_dB);
 
 	return S_OK;
 }
