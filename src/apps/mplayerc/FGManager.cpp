@@ -2772,6 +2772,7 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 	if (CComQIPtr<IAudioSwitcherFilter> pASF = pBF) {
 		pASF->SetChannelMixer(s.bAudioMixer, s.nAudioMixerLayout);
 		pASF->SetBassRedirect(s.bAudioBassRedirect);
+		pASF->SetLevels(s.fAudioCenter_dB);
 		pASF->SetAudioGain(s.dAudioGain_dB);
 		pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
 		pASF->SetOutputFormats(s.iAudioSampleFormats);
@@ -2799,7 +2800,7 @@ STDMETHODIMP CFGManagerCustom::AddFilter(IBaseFilter* pBF, LPCWSTR pName)
 }
 
 //
-// 	CFGManagerPlayer
+// CFGManagerPlayer
 //
 
 CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, bool IsPreview)
