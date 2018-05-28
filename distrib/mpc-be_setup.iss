@@ -297,10 +297,9 @@ var
   objShell, colVerbs, oFile: Variant;
 begin
   if (GetWindowsVersion shr 24 < 6) or ((GetWindowsVersion shr 24 = 6) and ((GetWindowsVersion shr 16) and $FF < 1)) then Exit; // Windows 7 check
-  Log('Start PinToTaskbar');
-
   if not FileExists(Filename) then Exit;
 
+  Log('Start PinToTaskbar');
   if IsPin then Res := 5386 else Res := 5387;
 
   begin
@@ -347,16 +346,23 @@ begin
       FreeDLL(hInst);
     end;
   end;
+  Log('PinToTaskbar done.');
 end;
 
 procedure Unzip(ZipFile, TargetFolder: String); 
 var
   ShellObj, SrcFile, DestFolder: Variant;
 begin
-  ShellObj := CreateOleObject('Shell.Application');
-  SrcFile := ShellObj.NameSpace(ZipFile);
-  DestFolder := ShellObj.NameSpace(TargetFolder);
-  DestFolder.CopyHere(SrcFile.Items, SHCONTCH_NOPROGRESSBOX or SHCONTCH_RESPONDYESTOALL)
+  if FileExists(ZipFile) then
+  begin
+    Log('Start unziping ' + ZipFile);
+    ShellObj := CreateOleObject('Shell.Application');
+    SrcFile := ShellObj.NameSpace(ZipFile);
+    DestFolder := ShellObj.NameSpace(TargetFolder);
+    DestFolder.CopyHere(SrcFile.Items, SHCONTCH_NOPROGRESSBOX or SHCONTCH_RESPONDYESTOALL);
+    Log('Unzip done.');
+  end else
+    Log('ERROR: File ' + ZipFile + ' not found');
 end;
 
 function GetInstallFolder(Default: String): String;
@@ -446,6 +452,7 @@ begin
   RegDeleteKeyIncludingSubkeys(HKCU, 'Software\{#app_name} Filters');
   RegDeleteKeyIncludingSubkeys(HKCU, 'Software\{#app_name}');
   RegDeleteKeyIncludingSubkeys(HKLM, 'SOFTWARE\{#app_name}');
+  Log('CleanUpSettingsAndFiles done.');
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -482,10 +489,7 @@ begin
     end;
 
     if IsComponentSelected('intel_msdk') then
-    begin
-      Log('Unzip ' + ExpandConstant('{#msdk_dll_zip}'));
       Unzip(ExpandConstant('{tmp}\{#msdk_dll_zip}'), ExpandConstant('{app}'));
-    end
   end;
 end;
 
