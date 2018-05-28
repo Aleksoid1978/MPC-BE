@@ -39,8 +39,15 @@ CPPageSoundProcessing::~CPPageSoundProcessing()
 void CPPageSoundProcessing::UpdateCenterInfo()
 {
 	CString str;
-	str.Format(L"Center level* (%+.1f dB):", m_sldCenter.GetPos() / 10.0f);
+	str.Format(L"Center level* (%+.1f dB)", m_sldCenter.GetPos() / 10.0f);
 	m_stcCenter.SetWindowTextW(str);
+};
+
+void CPPageSoundProcessing::UpdateSurroundInfo()
+{
+	CString str;
+	str.Format(L"Surround level* (%+.1f dB)", m_sldSurround.GetPos() / 10.0f);
+	m_stcSurround.SetWindowTextW(str);
 };
 
 void CPPageSoundProcessing::UpdateGainInfo()
@@ -86,6 +93,8 @@ void CPPageSoundProcessing::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BASSREDIRECT_CHECK, m_chkBassRedirect);
 	DDX_Control(pDX, IDC_SLIDER2, m_sldCenter);
 	DDX_Control(pDX, IDC_STATIC5, m_stcCenter);
+	DDX_Control(pDX, IDC_SLIDER5, m_sldSurround);
+	DDX_Control(pDX, IDC_STATIC8, m_stcSurround);
 
 	DDX_Control(pDX, IDC_SLIDER1, m_sldGain);
 	DDX_Control(pDX, IDC_STATIC4, m_stcGain);
@@ -138,8 +147,10 @@ BOOL CPPageSoundProcessing::OnInitDialog()
 	SelectByItemData(m_cmbMixerLayout, s.nAudioMixerLayout);
 	m_chkStereoFromDecoder.SetCheck(s.bAudioStereoFromDecoder);
 	m_chkBassRedirect.SetCheck(s.bAudioBassRedirect);
-	m_sldCenter.SetRange(-60, 60, TRUE);
+	m_sldCenter.SetRange(-100, 100, TRUE);
 	m_sldCenter.SetPos((int)std::round(s.fAudioCenter_dB * 10));
+	m_sldSurround.SetRange(-100, 100, TRUE);
+	m_sldSurround.SetPos((int)std::round(s.fAudioSurround_dB * 10));
 
 	m_sldGain.SetRange(-30, 100, TRUE);
 	m_sldGain.SetPos((int)std::round(s.dAudioGain_dB * 10));
@@ -162,6 +173,7 @@ BOOL CPPageSoundProcessing::OnInitDialog()
 	m_spnTimeShift.SetRange32(APP_AUDIOTIMESHIFT_MIN, APP_AUDIOTIMESHIFT_MAX);
 
 	UpdateCenterInfo();
+	UpdateSurroundInfo();
 	UpdateGainInfo();
 	UpdateNormLevelInfo();
 	UpdateNormRealeaseTimeInfo();
@@ -187,6 +199,7 @@ BOOL CPPageSoundProcessing::OnApply()
 	s.bAudioStereoFromDecoder	= !!m_chkStereoFromDecoder.GetCheck();
 	s.bAudioBassRedirect		= !!m_chkBassRedirect.GetCheck();
 	s.fAudioCenter_dB			= m_sldCenter.GetPos() / 10.0f;
+	s.fAudioSurround_dB			= m_sldSurround.GetPos() / 10.0f;
 
 	s.dAudioGain_dB				= m_sldGain.GetPos() / 10.0;
 
@@ -214,7 +227,7 @@ BOOL CPPageSoundProcessing::OnApply()
 		if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG)) {
 			pASF->SetChannelMixer(s.bAudioMixer, s.nAudioMixerLayout);
 			pASF->SetBassRedirect(s.bAudioBassRedirect);
-			pASF->SetLevels(s.fAudioCenter_dB);
+			pASF->SetLevels(s.fAudioCenter_dB, s.fAudioSurround_dB);
 			pASF->SetAudioGain(s.dAudioGain_dB);
 			pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
 			pASF->SetOutputFormats(s.iAudioSampleFormats);
@@ -318,6 +331,7 @@ void CPPageSoundProcessing::OnBnClickedSoundProcessingDefault()
 	SelectByItemData(m_cmbMixerLayout, SPK_STEREO);
 	m_chkBassRedirect.SetCheck(BST_UNCHECKED);
 	m_sldCenter.SetPos(0);
+	m_sldSurround.SetPos(0);
 
 	m_sldGain.SetPos(0);
 	m_chkAutoVolumeControl.SetCheck(BST_UNCHECKED);
@@ -333,6 +347,7 @@ void CPPageSoundProcessing::OnBnClickedSoundProcessingDefault()
 	m_chkTimeShift.SetCheck(BST_UNCHECKED);
 
 	UpdateCenterInfo();
+	UpdateSurroundInfo();
 	UpdateGainInfo();
 	UpdateNormLevelInfo();
 	UpdateNormRealeaseTimeInfo();
@@ -345,6 +360,9 @@ void CPPageSoundProcessing::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScro
 {
 	if (*pScrollBar == m_sldCenter) {
 		UpdateCenterInfo();
+	}
+	if (*pScrollBar == m_sldSurround) {
+		UpdateSurroundInfo();
 	}
 	else if (*pScrollBar == m_sldGain) {
 		UpdateGainInfo();

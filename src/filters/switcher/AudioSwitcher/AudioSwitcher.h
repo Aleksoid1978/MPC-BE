@@ -45,6 +45,7 @@ class __declspec(uuid("18C16B08-6497-420e-AD14-22D21C2CEAB7"))
 	bool	m_bBassRedirect;
 
 	double	m_dCenterLevel;
+	double	m_dSurroundLevel;
 	double	m_dGainFactor;
 
 	CAudioNormalizer m_AudioNormalizer;
@@ -76,7 +77,7 @@ public:
 	// IAudioSwitcherFilter
 	STDMETHODIMP SetChannelMixer(bool bMixer, int nLayout);
 	STDMETHODIMP SetBassRedirect(bool bBassRedirect);
-	STDMETHODIMP SetLevels(double dCenterLevel_dB);
+	STDMETHODIMP SetLevels(double dCenterLevel_dB, double dSurroundLevel_dB);
 	STDMETHODIMP SetAudioGain(double dGain_dB);
 	STDMETHODIMP SetAutoVolumeControl(bool bAutoVolumeControl, bool bNormBoost, int iNormLevel, int iNormRealeaseTime);
 	STDMETHODIMP SetOutputFormats(int iSampleFormats);

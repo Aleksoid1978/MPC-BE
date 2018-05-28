@@ -126,6 +126,7 @@ CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_nMixerLayout(SPK_STEREO)
 	, m_bBassRedirect(false)
 	, m_dCenterLevel(1.0)
+	, m_dSurroundLevel(1.0)
 	, m_dGainFactor(1.0)
 	, m_bAutoVolumeControl(false)
 	, m_bNormBoost(true)
@@ -260,12 +261,19 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 	REFERENCE_TIME delay = 0;
 
-	if (audio_channels > 1 && (audio_layout&SPEAKER_FRONT_CENTER) && audio_sampleformat == SAMPLE_FMT_FLT && m_dCenterLevel != 1.0) {
-		int centerpos = get_channel_pos(audio_layout, SPEAKER_FRONT_CENTER);
-		float* p = (float*)audio_data;
-		for (int i = 0; i < audio_samples; i++) {
-			p[centerpos] *= m_dCenterLevel;
-			p += audio_channels;
+	if (audio_channels > 1 && audio_sampleformat == SAMPLE_FMT_FLT) {
+		if (audio_layout&SPEAKER_FRONT_CENTER && m_dCenterLevel != 1.0) {
+			int centerpos = get_channel_pos(audio_layout, SPEAKER_FRONT_CENTER);
+			float* p = (float*)audio_data;
+			for (int i = 0; i < audio_samples; i++) {
+				p[centerpos] *= m_dCenterLevel;
+				p += audio_channels;
+			}
+		}
+
+		const DWORD suraund_mask = SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT|SPEAKER_BACK_CENTER|SPEAKER_SIDE_LEFT|SPEAKER_SIDE_RIGHT;
+		if (audio_layout&suraund_mask && m_dSurroundLevel != 1.0) {
+			//TODO
 		}
 	}
 
@@ -534,10 +542,13 @@ STDMETHODIMP CAudioSwitcherFilter::SetBassRedirect(bool bBassRedirect)
 	return S_OK;
 }
 
-STDMETHODIMP CAudioSwitcherFilter::SetLevels(double dCenterLevel_dB)
+STDMETHODIMP CAudioSwitcherFilter::SetLevels(double dCenterLevel_dB, double dSurroundLevel_dB)
 {
 	dCenterLevel_dB = std::clamp(dCenterLevel_dB, -6.0, 6.0);
 	m_dCenterLevel = decibel2factor(dCenterLevel_dB);
+
+	dSurroundLevel_dB = std::clamp(dSurroundLevel_dB, -6.0, 6.0);
+	m_dSurroundLevel = decibel2factor(dSurroundLevel_dB);
 
 	return S_OK;
 }

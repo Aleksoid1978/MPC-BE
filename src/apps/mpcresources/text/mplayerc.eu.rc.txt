@@ -398,21 +398,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"Ekinbide lehentasuna arruntetik gora"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 30
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 5		"Bide Nahastzailea"
 6		"Nahastu bideak:"
 8		"Eskatu estereoa dekodeatzailetik"
 9		"Berzuzendu hotslodiak BME*-RA"
-12		"Bolumen agintea"
-15		"Berez irabazi agintea"
-16		"Audioa bultzada"
-21		"Audio denbora aldaketa (sm):"
-24		"Berezkoa"
-25		"Irteera lagin heuskarria:"
-26		"Int16"
-27		"Int24"
-28		"Int32"
-29		"Gain"
+14		"Bolumen agintea"
+17		"Berez irabazi agintea"
+18		"Audioa bultzada"
+23		"Audio denbora aldaketa (sm):"
+26		"Berezkoa"
+27		"Irteera lagin heuskarria:"
+28		"Int16"
+29		"Int24"
+30		"Int32"
+31		"Gain"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

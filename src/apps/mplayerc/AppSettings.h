@@ -680,6 +680,7 @@ public:
 	bool			bAudioStereoFromDecoder;
 	bool			bAudioBassRedirect;
 	float			fAudioCenter_dB; // need float for swscanf
+	float			fAudioSurround_dB; // need float for swscanf
 	double			dAudioGain_dB;
 	bool			bAudioAutoVolumeControl;
 	bool			bAudioNormBoost;

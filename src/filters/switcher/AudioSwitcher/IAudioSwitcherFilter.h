@@ -43,7 +43,7 @@ IAudioSwitcherFilter :
 public IUnknown {
 	STDMETHOD(SetChannelMixer) (bool bMixer, int nLayout) PURE;
 	STDMETHOD(SetBassRedirect) (bool bBassRedirect) PURE;
-	STDMETHOD(SetLevels) (double dCenterLevel_dB) PURE;
+	STDMETHOD(SetLevels) (double dCenterLevel_dB, double dSurroundLevel_dB) PURE;
 	STDMETHOD(SetAudioGain) (double dGain_dB) PURE;
 	STDMETHOD(SetAutoVolumeControl) (bool bAutoVolumeControl, bool bNormBoost, int iNormLevel, int iNormRealeaseTime) PURE;
 	STDMETHOD(SetOutputFormats) (int iSampleFormat) PURE;

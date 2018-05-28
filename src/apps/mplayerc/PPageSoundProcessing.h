@@ -37,6 +37,8 @@ class CPPageSoundProcessing : public CPPageBase
 	CButton		m_chkBassRedirect;
 	CStatic		m_stcCenter;
 	CSliderCtrl	m_sldCenter;
+	CStatic		m_stcSurround;
+	CSliderCtrl	m_sldSurround;
 
 	CStatic		m_stcGain;
 	CSliderCtrl	m_sldGain;
@@ -63,6 +65,7 @@ public:
 
 private:
 	void UpdateCenterInfo();
+	void UpdateSurroundInfo();
 	void UpdateGainInfo();
 	void UpdateNormLevelInfo();
 	void UpdateNormRealeaseTimeInfo();
