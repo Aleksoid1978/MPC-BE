@@ -45,6 +45,7 @@
 #include <Bento4/Core/Ap4ChapAtom.h>
 #include <Bento4/Core/Ap4Dvc1Atom.h>
 #include <Bento4/Core/Ap4DataInfoAtom.h>
+#include <Bento4/Codecs/Ap4Mp4AudioInfo.h>
 
 #include <libavutil/intreadwrite.h>
 
@@ -602,35 +603,40 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 					switch (audio_desc->GetObjectTypeId()) {
 						case AP4_MPEG4_AUDIO_OTI:
-							if (di->GetDataSize() >= 1) {
-								Mpeg4AudioObjectType = di->GetData()[0] >> 3;
-								if (Mpeg4AudioObjectType == 31) {
-									if (di->GetDataSize() < 2) {
-										Mpeg4AudioObjectType = 0;
-									} else {
-										Mpeg4AudioObjectType = 32 + (((di->GetData()[0] & 0x07) << 3) |
-																	 ((di->GetData()[1] & 0xE0) >> 5));
+							{
+								const AP4_MpegAudioSampleDescription::Mpeg4AudioObjectType objectType = audio_desc->GetMpeg4AudioObjectType();
+								if (objectType == AP4_MPEG4_AUDIO_OBJECT_TYPE_AAC_LC
+										|| objectType == AP4_MPEG4_AUDIO_OBJECT_TYPE_AAC_MAIN
+										|| objectType == AP4_MPEG4_AUDIO_OBJECT_TYPE_SBR
+										|| objectType == AP4_MPEG4_AUDIO_OBJECT_TYPE_PS) {
+
+									AP4_Mp4AudioDecoderConfig dec_config;
+									AP4_Result result = dec_config.Parse(di->GetData(), di->GetDataSize());
+									if (AP4_SUCCEEDED(result)) {
+										if (dec_config.m_ChannelCount > wfe->nChannels) {
+											wfe->nChannels = dec_config.m_ChannelCount;
+											wfe->nBlockAlign = (WORD)((wfe->nChannels * wfe->wBitsPerSample) / 8);
+										}
+										if (dec_config.m_SamplingFrequency > wfe->nSamplesPerSec) {
+											wfe->nSamplesPerSec = dec_config.m_SamplingFrequency;
+										}
+										if (dec_config.m_Extension.m_ObjectType && dec_config.m_Extension.m_SamplingFrequency > wfe->nSamplesPerSec) {
+											wfe->nSamplesPerSec = dec_config.m_Extension.m_SamplingFrequency;
+										}
 									}
+								}
+
+								if (objectType == AP4_MPEG4_AUDIO_OBJECT_TYPE_ALS) {
+									wfe->wFormatTag = WAVE_FORMAT_UNKNOWN;
+									mt.subtype = MEDIASUBTYPE_ALS;
+									mts.push_back(mt);
+									break;
 								}
 							}
 						case AP4_MPEG2_AAC_AUDIO_MAIN_OTI:
 						case AP4_MPEG2_AAC_AUDIO_LC_OTI:
 						case AP4_MPEG2_AAC_AUDIO_SSRP_OTI:
-							if (Mpeg4AudioObjectType == 36) { // ALS Lossless Coding
-								wfe->wFormatTag = WAVE_FORMAT_UNKNOWN;
-								mt.subtype = MEDIASUBTYPE_ALS;
-								mts.push_back(mt);
-								break;
-							}
-
 							mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_RAW_AAC1);
-							if (wfe->cbSize >= 2) {
-								WORD Channels = (((BYTE*)(wfe+1))[1]>>3) & 0xf;
-								if (Channels) {
-									wfe->nChannels   = Channels;
-									wfe->nBlockAlign = (WORD)((wfe->nChannels * wfe->wBitsPerSample) / 8);
-								}
-							}
 							mts.push_back(mt);
 							break;
 						case AP4_MPEG2_PART3_AUDIO_OTI:

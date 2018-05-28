@@ -178,6 +178,27 @@ AP4_MpegAudioSampleDescription::ToAtom() const
 }
 
 /*----------------------------------------------------------------------
+|       AP4_MpegAudioSampleDescription::GetMpeg4AudioObjectType
++---------------------------------------------------------------------*/
+AP4_MpegAudioSampleDescription::Mpeg4AudioObjectType
+AP4_MpegAudioSampleDescription::GetMpeg4AudioObjectType() const
+{
+    if (m_ObjectTypeId == AP4_MPEG4_AUDIO_OTI &&
+        m_DecoderInfo &&
+        m_DecoderInfo->GetDataSize() >= 1) {
+        AP4_UI08 type = m_DecoderInfo->GetData()[0]>>3;
+        if (type == 31) {
+            if (m_DecoderInfo->GetDataSize() < 2) return 0;
+            type = 32+(((m_DecoderInfo->GetData()[0]&0x07)<<3) |
+                       ((m_DecoderInfo->GetData()[1]&0xE0)>>5));
+        }
+        return type;
+    } else {
+        return 0;
+    }
+}
+
+/*----------------------------------------------------------------------
 |       AP4_MpegVideoSampleDescription::AP4_MpegVideoSampleDescription
 +---------------------------------------------------------------------*/
 AP4_MpegVideoSampleDescription::AP4_MpegVideoSampleDescription(
