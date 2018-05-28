@@ -398,21 +398,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"程式優先順序調成標準以上"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 30
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 5		"聲道混音"
 6		"混合聲道為："
 8		"要求解碼器輸出 2.0 立體聲"
 9		"低音重新分配到 LFE 聲道*"
-12		"音量控制"
-15		"自動音量控制"
-16		"音訊增強"
-21		"平移音訊時間 (ms)："
-24		"預設值"
-25		"輸出取樣格式："
-26		"Int16"
-27		"Int24"
-28		"Int32"
-29		"浮點"
+14		"音量控制"
+17		"自動音量控制"
+18		"音訊增強"
+23		"平移音訊時間 (ms)："
+26		"預設值"
+27		"輸出取樣格式："
+28		"Int16"
+29		"Int24"
+30		"Int32"
+31		"浮點"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

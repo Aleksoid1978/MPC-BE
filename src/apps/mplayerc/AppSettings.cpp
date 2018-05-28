@@ -762,10 +762,12 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	bAudioStereoFromDecoder	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOSTEREOFROMDECODER, FALSE);
 	bAudioBassRedirect		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOBASSREDIRECT, FALSE);
 	str						= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOLEVELS, L"");
-	if (swscanf_s(str, L"C:%f", &fAudioCenter_dB) == 1) {
-		fAudioCenter_dB = discard(fAudioCenter_dB, -6.0f, 6.0f, 0.0f);
+	if (swscanf_s(str, L"C:%f;S:%f", &fAudioCenter_dB, &fAudioSurround_dB) == 2) {
+		fAudioCenter_dB = discard(fAudioCenter_dB, -10.0f, 10.0f, 0.0f);
+		fAudioSurround_dB = discard(fAudioSurround_dB, -10.0f, 10.0f, 0.0f);
 	} else {
 		fAudioCenter_dB = 0.0;
+		fAudioSurround_dB = 0.0;
 	}
 	dAudioGain_dB			= _wtof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, L"0"));
 	dAudioGain_dB			= discard(dAudioGain_dB, -3.0, 10.0, 0.0);
@@ -1296,7 +1298,7 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOMIXERLAYOUT, channel_mode_sets[nAudioMixerLayout]);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOSTEREOFROMDECODER, bAudioStereoFromDecoder);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOBASSREDIRECT, bAudioBassRedirect);
-	str.Format(L"C:%.1f", fAudioCenter_dB);
+	str.Format(L"C:%.1f;S:%.1f", fAudioCenter_dB, fAudioSurround_dB);
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOLEVELS, str);
 	str.Format(L"%.1f", dAudioGain_dB);
 	pApp->WriteProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, str);

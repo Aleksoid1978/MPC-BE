@@ -711,6 +711,8 @@
 #define IDC_SLIDER2                     10342
 #define IDC_SLIDER3                     10343
 #define IDC_SLIDER4                     10344
+#define IDC_SLIDER5                     10345
+#define IDC_SLIDER6                     10346
 //
 #define IDC_LIST1                       10351
 #define IDC_LIST2                       10352

@@ -398,21 +398,21 @@ BEGIN DIALOGEX IDD_PPAGEPLAYER LINES 36
 35		"プロセスの優先度を 通常以上 にする"
 END
 
-BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 30
+BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 5		"チャンネル ミキサー"
 6		"チャンネルをミックス:"
 8		"デコーダーからステレオを要求する"
 9		"LFE* にバスをリダイレクト"
-12		"音量コントロール"
-15		"自動音量コントロール"
-16		"音声のブースト"
-21		"音声のタイム シフト(ミリ秒):"
-24		"デフォルト"
-25		"出力サンプル形式:"
-26		"Int16"
-27		"Int24"
-28		"Int32"
-29		"Float"
+14		"音量コントロール"
+17		"自動音量コントロール"
+18		"音声のブースト"
+23		"音声のタイム シフト(ミリ秒):"
+26		"デフォルト"
+27		"出力サンプル形式:"
+28		"Int16"
+29		"Int24"
+30		"Int32"
+31		"Float"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
