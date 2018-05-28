@@ -19,6 +19,15 @@
     <Filter Include="Crypto\Header Files">
       <UniqueIdentifier>{7a8496cc-0c15-4b6a-9f62-96990fafb9d4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Codecs">
+      <UniqueIdentifier>{f5079ff8-8852-415b-97dc-55ccd36bb98e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Codecs\Source Files">
+      <UniqueIdentifier>{0a33c548-0843-43fe-a1a2-7e1a4bfdf045}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Codecs\Header Files">
+      <UniqueIdentifier>{6361eee8-5860-4ee0-b6af-f66d24a059ab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Ap4.h">
@@ -282,6 +291,9 @@
     <ClInclude Include="Crypto\Ap4StreamCipher.h">
       <Filter>Crypto\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Codecs\Ap4Mp4AudioInfo.h">
+      <Filter>Codecs\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="precomp.cpp" />
@@ -518,6 +530,9 @@
     </ClCompile>
     <ClCompile Include="Crypto\Ap4StreamCipher.cpp">
       <Filter>Crypto\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Codecs\Ap4Mp4AudioInfo.cpp">
+      <Filter>Codecs\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

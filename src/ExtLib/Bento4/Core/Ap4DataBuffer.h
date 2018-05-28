@@ -43,6 +43,7 @@ class AP4_DataBuffer
     // constructors & destructor
     AP4_DataBuffer();              
     AP4_DataBuffer(AP4_Size size);
+    AP4_DataBuffer(const void* data, AP4_Size data_size);
     AP4_DataBuffer(const AP4_DataBuffer& other);
     virtual ~AP4_DataBuffer();
 
