@@ -82,18 +82,18 @@ public:
 	struct mpahdr
 	{
 		WORD sync:11;
-		WORD version:2;
-		WORD layer:2;
-		WORD crc:1;
-		WORD bitrate:4;
-		WORD freq:2;
-		WORD padding:1;
-		WORD privatebit:1;
-		WORD channels:2;
-		WORD modeext:2;
-		WORD copyright:1;
-		WORD original:1;
-		WORD emphasis:2;
+		BYTE version:2;
+		BYTE layer:2;
+		BYTE crc:1;
+		BYTE bitrate:4;
+		BYTE freq:2;
+		BYTE padding:1;
+		BYTE privatebit:1;
+		BYTE channels:2;
+		BYTE modeext:2;
+		BYTE copyright:1;
+		BYTE original:1;
+		BYTE emphasis:2;
 
 		int Samplerate, FrameSize, FrameSamples;
 		REFERENCE_TIME rtDuration;
@@ -110,22 +110,23 @@ public:
 	struct aachdr
 	{
 		WORD sync:12;
-		WORD version:1;
-		WORD layer:2;
-		WORD fcrc:1;
-		WORD profile:2;
-		WORD freq:4;
-		WORD privatebit:1;
-		WORD channels:3;
-		WORD original:1;
-		WORD home:1; // ?
+		BYTE version:1;
+		BYTE layer:2;
+		BYTE fcrc:1;
+		BYTE profile:2;
+		BYTE freq:4;
+		BYTE privatebit:1;
+		BYTE channel_index:3;
+		BYTE original:1;
+		BYTE home:1; // ?
 
-		WORD copyright_id_bit:1;
-		WORD copyright_id_start:1;
+		BYTE copyright_id_bit:1;
+		BYTE copyright_id_start:1;
 		WORD aac_frame_length:13;
 		WORD adts_buffer_fullness:11;
-		WORD no_raw_data_blocks_in_frame:2;
+		BYTE no_raw_data_blocks_in_frame:2;
 
+		BYTE channels;
 		WORD crc;
 
 		int Samplerate, FrameSize, FrameSamples;
@@ -136,7 +137,7 @@ public:
 					&& version == h.version
 					&& profile == h.profile
 					&& freq == h.freq
-					&& channels == h.channels);
+					&& channel_index == h.channel_index);
 		}
 	};
 
