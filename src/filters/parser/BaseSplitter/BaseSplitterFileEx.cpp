@@ -483,9 +483,9 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 
 bool CBaseSplitterFileEx::Read(aachdr& h, int len, CMediaType* pmt, bool find_sync)
 {
-	memset(&h, 0, sizeof(h));
-
 	for (;;) {
+		memset(&h, 0, sizeof(h));
+
 		if (!find_sync && (BitRead(12, true) != 0xfff)) {
 			return false;
 		}
@@ -507,7 +507,7 @@ bool CBaseSplitterFileEx::Read(aachdr& h, int len, CMediaType* pmt, bool find_sy
 		h.profile = BitRead(2);
 		h.freq = BitRead(4);
 		h.privatebit = BitRead(1);
-		h.channels = BitRead(3);
+		h.channel_index = BitRead(3);
 		h.original = BitRead(1);
 		h.home = BitRead(1);
 
@@ -521,32 +521,37 @@ bool CBaseSplitterFileEx::Read(aachdr& h, int len, CMediaType* pmt, bool find_sy
 			h.crc = (WORD)BitRead(16);
 		}
 
-		if (h.layer != 0 || h.freq > 12 || h.aac_frame_length <= (h.fcrc == 0 ? 9 : 7) || h.channels < 1) {
+		if (h.channel_index < 8) {
+			static const BYTE channels[8] = { 0, 1, 2, 3, 4, 5, 6, 8 };
+			h.channels = channels[h.channel_index];
+		}
+
+		if (h.layer != 0 || h.freq > 12 || h.aac_frame_length <= (h.fcrc == 0 ? 9 : 7) || h.channel_index >= 8) {
 			AGAIN_OR_EXIT
 		}
 
 		break;
 	}
 
-	static int freq[] = {96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350};
+	static int freq[] = { 96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350 };
 	h.Samplerate = freq[h.freq];
 	h.FrameSize = h.aac_frame_length - (h.fcrc == 0 ? 9 : 7);
 	h.FrameSamples = 1024; // ok?
 	h.rtDuration = 10000000i64 * h.FrameSamples / h.Samplerate;
 
 	if (pmt) {
-		WAVEFORMATEX* wfe		= (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + 5];
-		memset(wfe, 0, sizeof(WAVEFORMATEX) + 5);
-		wfe->wFormatTag			= WAVE_FORMAT_RAW_AAC1;
-		wfe->nChannels			= h.channels <= 6 ? h.channels : 2;
-		wfe->nSamplesPerSec		= freq[h.freq];
-		wfe->nBlockAlign		= h.aac_frame_length;
-		wfe->nAvgBytesPerSec	= h.aac_frame_length * h.Samplerate / h.FrameSamples;
-		wfe->cbSize				= MakeAACInitData((BYTE*)(wfe + 1), h.profile, wfe->nSamplesPerSec, wfe->nChannels);
+		WAVEFORMATEX* wfe    = (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + (h.channel_index ? 5 : 0)];
+		memset(wfe, 0, sizeof(WAVEFORMATEX) + (h.channel_index ? 5 : 0));
+		wfe->wFormatTag      = WAVE_FORMAT_RAW_AAC1;
+		wfe->nChannels       = h.channels ? h.channels : 2;
+		wfe->nSamplesPerSec  = h.Samplerate;
+		wfe->nBlockAlign     = h.aac_frame_length;
+		wfe->nAvgBytesPerSec = h.aac_frame_length * h.Samplerate / h.FrameSamples;
+		wfe->cbSize          = h.channel_index ? MakeAACInitData((BYTE*)(wfe + 1), h.profile, wfe->nSamplesPerSec, h.channel_index) : 0;
 
-		pmt->majortype			= MEDIATYPE_Audio;
-		pmt->subtype			= MEDIASUBTYPE_RAW_AAC1;
-		pmt->formattype			= FORMAT_WaveFormatEx;
+		pmt->majortype       = MEDIATYPE_Audio;
+		pmt->subtype         = MEDIASUBTYPE_RAW_AAC1;
+		pmt->formattype      = FORMAT_WaveFormatEx;
 		pmt->SetFormat((BYTE*)wfe, sizeof(WAVEFORMATEX) + wfe->cbSize);
 
 		delete [] wfe;
