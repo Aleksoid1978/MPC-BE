@@ -425,6 +425,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND_RANGE(ID_VOLUME_GAIN_INC, ID_VOLUME_GAIN_MAX, OnPlayVolumeGain)
 	ON_COMMAND(ID_NORMALIZE, OnAutoVolumeControl)
 	ON_UPDATE_COMMAND_UI(ID_NORMALIZE, OnUpdateNormalizeVolume)
+	ON_COMMAND_RANGE(ID_AUDIO_CENTER_INC, ID_AUDIO_CENTER_DEC, OnPlayCenterLevel)
+
 	ON_COMMAND_RANGE(ID_COLOR_BRIGHTNESS_INC, ID_COLOR_RESET, OnPlayColor)
 
 	ON_COMMAND_RANGE(ID_AFTERPLAYBACK_CLOSE, ID_AFTERPLAYBACK_LOCK, OnAfterplayback)
@@ -8722,6 +8724,33 @@ void CMainFrame::OnAutoVolumeControl()
 void CMainFrame::OnUpdateNormalizeVolume(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable();
+}
+
+void CMainFrame::OnPlayCenterLevel(UINT nID)
+{
+	CAppSettings& s = AfxGetAppSettings();
+
+	if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), m_pGB)) {
+		switch (nID) {
+		case ID_AUDIO_CENTER_INC:
+			s.fAudioCenter_dB = floor(s.fAudioCenter_dB * 2) / 2 + 0.5f;
+			if (s.fAudioCenter_dB > 10.0f) {
+				s.fAudioCenter_dB = 10.0f;
+			}
+			break;
+		case ID_AUDIO_CENTER_DEC:
+			s.fAudioCenter_dB = ceil(s.fAudioCenter_dB * 2) / 2 - 0.5f;
+			if (s.fAudioCenter_dB < -10.0f) {
+				s.fAudioCenter_dB = -10.0f;
+			}
+			break;
+		}
+		pASF->SetLevels(s.fAudioCenter_dB, s.fAudioSurround_dB);
+
+		CString osdMessage;
+		osdMessage.Format(IDS_CENTER_LEVEL_OSD, s.fAudioCenter_dB);
+		m_OSD.DisplayMessage(OSD_TOPLEFT, osdMessage);
+	}
 }
 
 void CMainFrame::OnPlayColor(UINT nID)

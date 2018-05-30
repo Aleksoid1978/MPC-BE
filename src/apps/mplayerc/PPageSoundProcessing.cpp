@@ -39,14 +39,14 @@ CPPageSoundProcessing::~CPPageSoundProcessing()
 void CPPageSoundProcessing::UpdateCenterInfo()
 {
 	CString str;
-	str.Format(L"Center level* (%+.1f dB)", m_sldCenter.GetPos() / 10.0f);
+	str.Format(ResStr(IDS_CENTER_LEVEL)+L"*", m_sldCenter.GetPos() / 10.0f);
 	m_stcCenter.SetWindowTextW(str);
 };
 
 void CPPageSoundProcessing::UpdateSurroundInfo()
 {
 	CString str;
-	str.Format(L"Surround level* (%+.1f dB)", m_sldSurround.GetPos() / 10.0f);
+	str.Format(L"Surround level (%+.1f dB)*", m_sldSurround.GetPos() / 10.0f);
 	m_stcSurround.SetWindowTextW(str);
 };
 

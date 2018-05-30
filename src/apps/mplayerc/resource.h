@@ -377,16 +377,15 @@
 #define ID_VIEW_VSYNCOFFSET_DECREASE    1070
 #define ID_VIEW_VSYNCOFFSET_INCREASE    1071
 #define ID_VIEW_RESET_DEFAULT           1075
-
+//
 #define ID_AFTERPLAYBACK_EXIT               1077
 #define ID_AFTERPLAYBACK_CLOSE_FILE         1078
 #define ID_AFTERPLAYBACK_NEXT_LOOPED        1079
 #define ID_AFTERPLAYBACK_EVERYTIMEDONOTHING 1080
-
+//
 #define ID_PLAY_SEEKBEGIN               1085
-
 #define ID_FILE_OPENISO                 1090
-
+//
 #define ID_SUB_POS_UP                   1100
 #define ID_SUB_POS_DOWN                 1101
 #define ID_SUB_POS_LEFT                 1102
@@ -401,6 +400,9 @@
 #define ID_STEREO3D_OVERUNDER           1115
 #define ID_STEREO3D_SWAP_LEFTRIGHT      1120
 //
+#define ID_AUDIO_CENTER_INC             1150
+#define ID_AUDIO_CENTER_DEC             1151
+// ranges for menus
 #define ID_FILTERS_SUBITEM_START        2000
 #define ID_FILTERS_SUBITEM_END          2099
 #define ID_FILTERSTREAMS_SUBITEM_START  2100
@@ -431,7 +433,7 @@
 #define ID_RECENT_FILE_END              4399
 #define ID_NAVIGATE_CHAP_SUBITEM_START  4400
 #define ID_NAVIGATE_CHAP_SUBITEM_END    4699
-//
+// languages
 #define ID_VIEW_LANGUAGE                5000
 #define ID_LANGUAGE_ENGLISH             5001
 #define ID_LANGUAGE_FRENCH              5002
@@ -1314,6 +1316,10 @@
 #define IDS_FRAME_ZOOM1                 33505
 #define IDS_FRAME_ZOOM2                 33506
 #define IDS_FRAME_FROMOUTSIDE           33507
+#define IDS_CENTER_LEVEL_INC            33510
+#define IDS_CENTER_LEVEL_DEC            33511
+#define IDS_CENTER_LEVEL                33512
+#define IDS_CENTER_LEVEL_OSD            33513
 // stereoscopic subtitles
 #define IDS_SUBTITLES_STEREO              34000
 #define IDS_SUBTITLES_STEREO_DONTUSE      34001
