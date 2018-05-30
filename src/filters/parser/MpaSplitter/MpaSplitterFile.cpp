@@ -266,7 +266,7 @@ HRESULT CMpaSplitterFile::Init()
 	if (m_mode == mode::mpa) {
 		Read(m_mpahdr, MPA_HEADER_SIZE, &m_mt, true);
 	} else {
-		Read(m_aachdr, ADTS_HEADER_SIZE, &m_mt, false);
+		Read(m_aachdr, ADTS_HEADER_SIZE + 10, &m_mt, false);
 	}
 
 	if (m_mode == mode::mpa) {

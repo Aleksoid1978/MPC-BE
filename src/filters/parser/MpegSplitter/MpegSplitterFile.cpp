@@ -964,9 +964,13 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 			Seek(start);
 			aachdr h;
 			if (!m_streams[stream_type::audio].Find(s) && Read(h, len, &s.mt, false)) {
-				m_aacValid[s].Handle(h);
-				if (m_aacValid[s].IsValid()) {
+				if (h.channel_index == 0 && h.channels) {
 					type = stream_type::audio;
+				} else {
+					m_aacValid[s].Handle(h);
+					if (m_aacValid[s].IsValid()) {
+						type = stream_type::audio;
+					}
 				}
 			}
 		}
@@ -992,9 +996,13 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 			Seek(start);
 			aachdr h;
 			if (Read(h, len, &s.mt)) {
-				m_aacValid[s].Handle(h);
-				if (m_aacValid[s].IsValid()) {
+				if (h.channel_index == 0 && h.channels) {
 					type = stream_type::audio;
+				} else {
+					m_aacValid[s].Handle(h);
+					if (m_aacValid[s].IsValid()) {
+						type = stream_type::audio;
+					}
 				}
 			}
 		}
