@@ -188,11 +188,6 @@ AP4_Mp4AudioDecoderConfig::ParseProgramConfigElement(AP4_Mp4AudioDsiParser& pars
         parser.ReadBits(1);        // pseudo_surround_enable
     }
 
-    if (!num_side_channel_elements && num_back_channel_elements && num_back_channel_elements < 3) { // Hack: e.g. in case of 5.1, 7.1
-        num_side_channel_elements = 1;
-        num_back_channel_elements--;
-    }
-
     if (parser.BitsLeft() < num_front_channel_elements * 5) return AP4_ERROR_INVALID_FORMAT;
     for (AP4_UI08 i = 0; i < num_front_channel_elements; i++) {
         bool front_element_is_cpe = (parser.ReadBits(1) == 1);
