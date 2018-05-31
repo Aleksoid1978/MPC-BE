@@ -34,26 +34,6 @@ static const unsigned int AacSamplingFreqTable[13] =
     7350
 };
 
-CMP4AudioDecoderConfig::CMP4AudioDecoderConfig()
-{
-    Reset();
-}
-
-void CMP4AudioDecoderConfig::Reset()
-{
-    m_ObjectType             = 0;
-    m_SamplingFrequencyIndex = 0;
-    m_SamplingFrequency      = 0;
-    m_ChannelCount           = 0;
-    m_ChannelConfiguration   = 0;
-    m_FrameLengthFlag        = false;
-    m_DependsOnCoreCoder     = false;
-    m_CoreCoderDelay         = 0;
-    m_Extension.m_SbrPresent = false;
-    m_Extension.m_PsPresent  = false;
-    m_Extension.m_ObjectType = 0;
-}
-
 bool CMP4AudioDecoderConfig::ParseAudioObjectType(CGolombBuffer& parser, BYTE& object_type)
 {
     if (parser.BitsLeft() < 5) return false;
@@ -264,9 +244,6 @@ bool CMP4AudioDecoderConfig::Parse(const BYTE* data, int data_size)
 
 bool CMP4AudioDecoderConfig::Parse(CGolombBuffer& parser)
 {
-    // default config
-    Reset();
-    
     // parse the audio object type
     bool result = ParseAudioObjectType(parser, m_ObjectType);
     if (!result) return result;
