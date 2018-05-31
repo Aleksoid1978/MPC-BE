@@ -68,6 +68,7 @@
     <ClCompile Include="MediaDescription.cpp" />
     <ClCompile Include="MediaTypeEx.cpp" />
     <ClCompile Include="MFCHelper.cpp" />
+    <ClCompile Include="MP4AudioDecoderConfig.cpp" />
     <ClCompile Include="MPCSocket.cpp" />
     <ClCompile Include="NullRenderers.cpp" />
     <ClCompile Include="Packet.cpp" />
@@ -109,6 +110,7 @@
     <ClInclude Include="MediaDescription.h" />
     <ClInclude Include="MediaTypeEx.h" />
     <ClInclude Include="MFCHelper.h" />
+    <ClInclude Include="MP4AudioDecoderConfig.h" />
     <ClInclude Include="MPCSocket.h" />
     <ClInclude Include="Mpeg2Def.h" />
     <ClInclude Include="NullRenderers.h" />

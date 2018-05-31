@@ -24,6 +24,7 @@
 #include <MMReg.h>
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../DSUtil/GolombBuffer.h"
+#include "../../../DSUtil/MP4AudioDecoderConfig.h"
 #include <InitGuid.h>
 #include <moreuuids.h>
 #include <basestruct.h>
@@ -526,64 +527,24 @@ bool CBaseSplitterFileEx::Read(aachdr& h, int len, CMediaType* pmt, bool find_sy
 			h.channels = channels[h.channel_index];
 		}
 
-		if (pmt && h.channel_index == 0 && h.profile == 1 && !h.no_raw_data_blocks_in_frame && len >= 19) { // AAC LC only
+		if (pmt && h.channel_index == 0 && h.profile == 1 && !h.no_raw_data_blocks_in_frame && len > (h.fcrc == 0 ? 9 : 7)) { // AAC LC only
 			const __int64 adts_header_end = GetPos();
 			const BYTE element_type = BitRead(3);
 			if (element_type == 0x05) { // program config element
-				BitRead(4); // element_instance_tag
-				BitRead(2); // object_type
-				BitRead(4); // sampling_frequency_index
-				BYTE num_front_channel_elements = BitRead(4);
-				BYTE num_side_channel_elements  = BitRead(4);
-				BYTE num_back_channel_elements  = BitRead(4);
-				BYTE num_lfe_channel_elements   = BitRead(2);
-				BYTE num_assoc_data_elements    = BitRead(3);
-				BYTE num_valid_cc_elements      = BitRead(4);
-				if (BitRead(1) == 1) { // mono_mixdown_present
-					BitRead(4);        // mono_mixdown_element_number
-				}
-				if (BitRead(1) == 1) { // stereo_mixdown_present
-					BitRead(4);        // stereo_mixdown_element_number
-				}
-				if (BitRead(1) == 1) { // matrix_mixdown_idx_present
-					BitRead(2);        // matrix_mixdown_idx
-					BitRead(1);        // pseudo_surround_enable
+				Seek(adts_header_end);
+
+				const int size = len - (h.fcrc == 0 ? 9 : 7);
+				BYTE* buf = DNew BYTE[size];
+				ByteRead(buf, size);
+				CGolombBuffer gb(buf, size);
+				gb.BitRead(3); // element_type
+
+				CMP4AudioDecoderConfig MP4AudioDecoderConfig;
+				if (MP4AudioDecoderConfig.ParseProgramConfigElement(gb)) {
+					h.channels = MP4AudioDecoderConfig.m_ChannelCount;
 				}
 
-				for (BYTE i = 0; i < num_front_channel_elements; i++) {
-					bool front_element_is_cpe = (BitRead(1) == 1);
-					BitRead(4); // front_element_tag_select
-					if (front_element_is_cpe) {
-						h.channels += 2;
-					} else {
-						h.channels += 1;
-					}
-				}
-
-				for (BYTE i = 0; i < num_side_channel_elements; i++) {
-					bool side_element_is_cpe = (BitRead(1) == 1);
-					BitRead(4); // side_element_tag_select
-					if (side_element_is_cpe) {
-						h.channels += 2;
-					} else {
-						h.channels += 1;
-					}
-				}
-
-				for (BYTE i = 0; i < num_back_channel_elements; i++) {
-					bool back_element_is_cpe = (BitRead(1) == 1);
-					BitRead(4); // back_element_tag_select
-					if (back_element_is_cpe) {
-						h.channels += 2;
-					} else {
-						h.channels += 1;
-					}
-				}
-
-				for (BYTE i = 0; i < num_lfe_channel_elements; i++) {
-					BitRead(4); // lfe_element_tag_select
-					h.channels += 1;
-				}
+				delete [] buf;
 			}
 
 			Seek(adts_header_end);

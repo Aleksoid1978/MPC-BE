@@ -46,6 +46,7 @@ public:
 	void         SetSize(const int nValue) { m_nSize = nValue; }
 	int          GetSize() const { return m_nSize; }
 	int          RemainingSize() const { return m_nSize - m_nBitPos; }
+	int          BitsLeft() const { return 8 * RemainingSize() + m_bitlen; }
 	bool         IsEOF() const { return m_nBitPos >= m_nSize; }
 	int          GetPos() const;
 	const BYTE*  GetBufferPos() const { return m_pBuffer + m_nBitPos; }

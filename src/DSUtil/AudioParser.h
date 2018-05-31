@@ -124,5 +124,4 @@ int ParseHdmvLPCMHeader    (const BYTE* buf, audioframe_t* audioframe = nullptr)
 // need >= 7 bytes, param1 = header size, param2 = MPEG-4 Audio Object Type
 int ParseADTSAACHeader     (const BYTE* buf, audioframe_t* audioframe = nullptr);
 
-bool ReadAudioConfig(CGolombBuffer& gb, int& samplingFrequency, int& channels);
-bool ParseAACLatmHeader(const BYTE* buf, int len, int& samplerate, int& channels, BYTE* extra, unsigned int& extralen);
+bool ParseAACLatmHeader    (const BYTE* buf, int len, int& samplerate, int& channels, BYTE* extra, unsigned int& extralen);

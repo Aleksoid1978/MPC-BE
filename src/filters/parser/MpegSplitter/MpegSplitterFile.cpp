@@ -29,6 +29,7 @@
 #include "MpegSplitterFile.h"
 #include "../BaseSplitter/TimecodeAnalyzer.h"
 #include "../../../DSUtil/AudioParser.h"
+#include "../../../DSUtil/MP4AudioDecoderConfig.h"
 
 CMpegSplitterFile::CMpegSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr, CHdmvClipInfo &ClipInfo, bool bIsBD, bool ForcedSub, int AC3CoreOnly, bool SubEmptyPin)
 	: CBaseSplitterFileEx(pAsyncReader, hr, FM_FILE | FM_FILE_DL | FM_FILE_VAR | FM_STREAM)
@@ -1871,8 +1872,8 @@ static int mp4_read_dec_config_descr(std::vector<BYTE>& dec_config_descr, CMpegS
 		int tag_len = mp4_read_descr(gb, tag, len);
 		if (len && tag_len && tag_len <= len && tag == MP4DecSpecificDescrTag) {
 			const BYTE* extra = gb.GetBufferPos();
-			int samplingFrequency, channels;
-			if (ReadAudioConfig(gb, samplingFrequency, channels)) {
+			CMP4AudioDecoderConfig MP4AudioDecoderConfig;
+			if (MP4AudioDecoderConfig.Parse(gb)) {
 				s.codec = CMpegSplitterFile::stream_codec::AAC_RAW;
 
 				CMediaType* pmt = &s.mt;
@@ -1884,8 +1885,8 @@ static int mp4_read_dec_config_descr(std::vector<BYTE>& dec_config_descr, CMpegS
 				WAVEFORMATEX* wfe    = (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + tag_len];
 				memset(wfe, 0, sizeof(WAVEFORMATEX));
 				wfe->wFormatTag      = WAVE_FORMAT_RAW_AAC1;
-				wfe->nChannels       = channels;
-				wfe->nSamplesPerSec  = samplingFrequency;
+				wfe->nChannels       = MP4AudioDecoderConfig.m_ChannelCount;
+				wfe->nSamplesPerSec  = MP4AudioDecoderConfig.m_SamplingFrequency;
 				wfe->nBlockAlign     = 1;
 				wfe->nAvgBytesPerSec = 0;
 				wfe->cbSize          = tag_len;
