@@ -62,28 +62,27 @@ const BYTE AOT_SMR_MAIN              = 41; /**< SMR Main                        
 
 class CMP4AudioDecoderConfig {
 public:
-    CMP4AudioDecoderConfig();
+    CMP4AudioDecoderConfig() = default;
+    ~CMP4AudioDecoderConfig() = default;
 
     bool ParseProgramConfigElement(CGolombBuffer& parser);
 
     bool Parse(const BYTE* data, int data_size);
     bool Parse(CGolombBuffer& parser);
 
-    void Reset();
-    
-    BYTE         m_ObjectType;             /**< Type identifier for the audio data */
-    BYTE         m_SamplingFrequencyIndex; /**< Index of the sampling frequency in the sampling frequency table */
-    unsigned int m_SamplingFrequency;      /**< Sampling frequency */
-    BYTE         m_ChannelCount;           /**< Number of audio channels */
-    BYTE         m_ChannelConfiguration;   /**< Channel configuration */
-    bool         m_FrameLengthFlag;        /**< Frame Length Flag     */
-    bool         m_DependsOnCoreCoder;     /**< Depends on Core Coder */
-    unsigned int m_CoreCoderDelay;         /**< Core Code delay       */
+    BYTE         m_ObjectType             = 0;     /**< Type identifier for the audio data */
+    BYTE         m_SamplingFrequencyIndex = 0;     /**< Index of the sampling frequency in the sampling frequency table */
+    unsigned int m_SamplingFrequency      = 0;     /**< Sampling frequency */
+    BYTE         m_ChannelCount           = 0;     /**< Number of audio channels */
+    BYTE         m_ChannelConfiguration   = 0;     /**< Channel configuration */
+    bool         m_FrameLengthFlag        = false; /**< Frame Length Flag     */
+    bool         m_DependsOnCoreCoder     = false; /**< Depends on Core Coder */
+    unsigned int m_CoreCoderDelay         = 0;     /**< Core Code delay       */
 
     struct {
-        bool     m_SbrPresent;             /**< SBR is present        */
-        bool     m_PsPresent;              /**< PS is present         */
-        BYTE     m_ObjectType;             /**< Extension object type */
+        bool     m_SbrPresent             = false; /**< SBR is present        */
+        bool     m_PsPresent              = false; /**< PS is present         */
+        BYTE     m_ObjectType             = 0;     /**< Extension object type */
     } m_Extension;
     
 private:
