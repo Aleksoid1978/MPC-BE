@@ -110,6 +110,9 @@
     <ClCompile Include="DXVAState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MP4AudioDecoderConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DSMPropertyBag.h">
@@ -230,6 +233,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="std_helper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MP4AudioDecoderConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

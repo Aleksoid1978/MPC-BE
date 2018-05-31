@@ -24,6 +24,7 @@
 #include "MP4Splitter.h"
 #include "../../../DSUtil/GolombBuffer.h"
 #include "../../../DSUtil/AudioParser.h"
+#include "../../../DSUtil/MP4AudioDecoderConfig.h"
 
 #ifdef REGISTER_FILTER
 #include <InitGuid.h>
@@ -45,7 +46,6 @@
 #include <Bento4/Core/Ap4ChapAtom.h>
 #include <Bento4/Core/Ap4Dvc1Atom.h>
 #include <Bento4/Core/Ap4DataInfoAtom.h>
-#include <Bento4/Codecs/Ap4Mp4AudioInfo.h>
 
 #include <libavutil/intreadwrite.h>
 
@@ -605,28 +605,23 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						case AP4_MPEG4_AUDIO_OTI:
 							{
 								const AP4_MpegAudioSampleDescription::Mpeg4AudioObjectType objectType = audio_desc->GetMpeg4AudioObjectType();
-								if (objectType == AP4_MPEG4_AUDIO_OBJECT_TYPE_AAC_LC
-										|| objectType == AP4_MPEG4_AUDIO_OBJECT_TYPE_AAC_MAIN
-										|| objectType == AP4_MPEG4_AUDIO_OBJECT_TYPE_SBR
-										|| objectType == AP4_MPEG4_AUDIO_OBJECT_TYPE_PS) {
-
-									AP4_Mp4AudioDecoderConfig dec_config;
-									AP4_Result result = dec_config.Parse(di->GetData(), di->GetDataSize());
-									if (AP4_SUCCEEDED(result)) {
-										if (dec_config.m_ChannelCount > wfe->nChannels) {
-											wfe->nChannels = dec_config.m_ChannelCount;
+								if (objectType == AOT_AAC_LC
+										|| objectType == AOT_AAC_MAIN
+										|| objectType == AOT_SBR
+										|| objectType == AOT_PS) {
+									CMP4AudioDecoderConfig MP4AudioDecoderConfig;
+									if (MP4AudioDecoderConfig.Parse(di->GetData(), di->GetDataSize())) {
+										if (MP4AudioDecoderConfig.m_ChannelCount > wfe->nChannels) {
+											wfe->nChannels = MP4AudioDecoderConfig.m_ChannelCount;
 											wfe->nBlockAlign = (WORD)((wfe->nChannels * wfe->wBitsPerSample) / 8);
 										}
-										if (dec_config.m_SamplingFrequency > wfe->nSamplesPerSec) {
-											wfe->nSamplesPerSec = dec_config.m_SamplingFrequency;
-										}
-										if (dec_config.m_Extension.m_ObjectType && dec_config.m_Extension.m_SamplingFrequency > wfe->nSamplesPerSec) {
-											wfe->nSamplesPerSec = dec_config.m_Extension.m_SamplingFrequency;
+										if (MP4AudioDecoderConfig.m_SamplingFrequency > wfe->nSamplesPerSec) {
+											wfe->nSamplesPerSec = MP4AudioDecoderConfig.m_SamplingFrequency;
 										}
 									}
 								}
 
-								if (objectType == AP4_MPEG4_AUDIO_OBJECT_TYPE_ALS) {
+								if (objectType == AOT_ALS) {
 									wfe->wFormatTag = WAVE_FORMAT_UNKNOWN;
 									mt.subtype = MEDIASUBTYPE_ALS;
 									mts.push_back(mt);
