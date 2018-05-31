@@ -544,10 +544,10 @@ STDMETHODIMP CAudioSwitcherFilter::SetBassRedirect(bool bBassRedirect)
 
 STDMETHODIMP CAudioSwitcherFilter::SetLevels(double dCenterLevel_dB, double dSurroundLevel_dB)
 {
-	dCenterLevel_dB = std::clamp(dCenterLevel_dB, -6.0, 6.0);
+	dCenterLevel_dB = std::clamp(dCenterLevel_dB, -10.0, 10.0);
 	m_dCenterLevel = decibel2factor(dCenterLevel_dB);
 
-	dSurroundLevel_dB = std::clamp(dSurroundLevel_dB, -6.0, 6.0);
+	dSurroundLevel_dB = std::clamp(dSurroundLevel_dB, -10.0, 10.0);
 	m_dSurroundLevel = decibel2factor(dSurroundLevel_dB);
 
 	return S_OK;

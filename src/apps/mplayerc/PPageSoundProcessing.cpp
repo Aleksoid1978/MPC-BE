@@ -361,7 +361,7 @@ void CPPageSoundProcessing::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScro
 	if (*pScrollBar == m_sldCenter) {
 		UpdateCenterInfo();
 	}
-	if (*pScrollBar == m_sldSurround) {
+	else if (*pScrollBar == m_sldSurround) {
 		UpdateSurroundInfo();
 	}
 	else if (*pScrollBar == m_sldGain) {
