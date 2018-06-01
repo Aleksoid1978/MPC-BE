@@ -75,14 +75,13 @@ void CVolumeCtrl::SetPosInternal(int pos)
 void CVolumeCtrl::IncreaseVolume()
 {
 	// align volume up to step. recommend using steps 1, 2, 5 and 10
-	SetPosInternal(GetPos() + GetPageSize() - GetPos() % GetPageSize());
+	SetPosInternal(IncreaseByGrid(GetPos(), GetPageSize()));
 }
 
 void CVolumeCtrl::DecreaseVolume()
 {
 	// align volume down to step. recommend using steps 1, 2, 5 and 10
-	int m = GetPos() % GetPageSize();
-	SetPosInternal(GetPos() - (m ? m : GetPageSize()));
+	SetPosInternal(DecreaseByGrid(GetPos(), GetPageSize()));
 }
 
 BEGIN_MESSAGE_MAP(CVolumeCtrl, CSliderCtrl)

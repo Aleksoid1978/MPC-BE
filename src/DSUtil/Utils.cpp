@@ -126,3 +126,17 @@ SIZE ReduceDim(double value)
 	fraction_t a = av_d2q(value, INT_MAX);
 	return{ a.num, a.den };
 }
+
+int IncreaseByGrid(int value, const int step)
+{
+	auto r = value % step;
+	value -= r;
+	return r<0 ? value : value + step;
+}
+
+int DecreaseByGrid(int value, const int step)
+{
+	auto r = value % step;
+	value -= r;
+	return r>0 ? value : value - step;
+}
