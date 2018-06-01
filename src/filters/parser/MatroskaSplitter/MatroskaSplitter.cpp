@@ -24,6 +24,7 @@
 #include "MatroskaSplitter.h"
 #include "../BaseSplitter/TimecodeAnalyzer.h"
 #include "../../../DSUtil/AudioParser.h"
+#include "../../../DSUtil/MP4AudioDecoderConfig.h"
 #include "../../../DSUtil/VideoParser.h"
 #include "../../../DSUtil/GolombBuffer.h"
 #include <IMediaSideData.h>
@@ -1145,6 +1146,21 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					wfe->cbSize = (WORD)pTE->CodecPrivate.size();
 					wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + pTE->CodecPrivate.size());
 					memcpy(wfe + 1, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
+
+					if (!pTE->CodecPrivate.empty()) {
+						CMP4AudioDecoderConfig MP4AudioDecoderConfig;
+						if (MP4AudioDecoderConfig.Parse(pTE->CodecPrivate.data(), pTE->CodecPrivate.size())) {
+							if (MP4AudioDecoderConfig.m_ChannelCount > wfe->nChannels) {
+								wfe->nChannels = MP4AudioDecoderConfig.m_ChannelCount;
+								wfe->nBlockAlign = (WORD)((wfe->nChannels * wfe->wBitsPerSample) / 8);
+							}
+							if (MP4AudioDecoderConfig.m_SamplingFrequency > wfe->nSamplesPerSec) {
+								wfe->nSamplesPerSec = MP4AudioDecoderConfig.m_SamplingFrequency;
+							}
+						}
+					}
+
+					wfe->nAvgBytesPerSec = 0;
 					mts.push_back(mt);
 				} else if (CodecID.Left(6) == "A_AAC/") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_RAW_AAC1);
