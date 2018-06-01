@@ -8060,17 +8060,17 @@ void CMainFrame::OnPlayChangeRate(UINT nID)
 	double PlaybackRate = 0;
 	if (GetPlaybackMode() == PM_FILE) {
 		if (nID == ID_PLAY_INCRATE) {
-			PlaybackRate = GatNextRate(m_PlaybackRate, s.nSpeedStep / 100.0);
+			PlaybackRate = GetNextRate(m_PlaybackRate, s.nSpeedStep);
 		} else if (nID == ID_PLAY_DECRATE) {
-			PlaybackRate = GatPreviousRate(m_PlaybackRate, s.nSpeedStep / 100.0);
+			PlaybackRate = GetPreviousRate(m_PlaybackRate, s.nSpeedStep);
 		}
 		hr = m_pMS->SetRate(PlaybackRate);
 	}
 	else if (GetPlaybackMode() == PM_DVD) {
 		if (nID == ID_PLAY_INCRATE) {
-			PlaybackRate = GatNextDVDRate(m_PlaybackRate);
+			PlaybackRate = GetNextDVDRate(m_PlaybackRate);
 		} else if (nID == ID_PLAY_DECRATE) {
-			PlaybackRate = GatPreviousDVDRate(m_PlaybackRate);
+			PlaybackRate = GetPreviousDVDRate(m_PlaybackRate);
 		}
 		if (PlaybackRate >= 0.0) {
 			hr = m_pDVDC->PlayForwards(PlaybackRate, DVD_CMD_FLAG_Block, nullptr);
@@ -8682,13 +8682,13 @@ void CMainFrame::OnPlayVolumeGain(UINT nID)
 	if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), m_pGB)) {
 		switch (nID) {
 		case ID_VOLUME_GAIN_INC:
-			s.dAudioGain_dB = floor(s.dAudioGain_dB * 2) / 2 + 0.5;
+			s.dAudioGain_dB = IncreaseFloatByGrid(s.dAudioGain_dB, -2);
 			if (s.dAudioGain_dB > 10.0) {
 				s.dAudioGain_dB = 10.0;
 			}
 			break;
 		case ID_VOLUME_GAIN_DEC:
-			s.dAudioGain_dB = ceil(s.dAudioGain_dB * 2) / 2 - 0.5;
+			s.dAudioGain_dB = DecreaseFloatByGrid(s.dAudioGain_dB, -2);
 			if (s.dAudioGain_dB < -3.0) {
 				s.dAudioGain_dB = -3.0;
 			}
@@ -8733,13 +8733,13 @@ void CMainFrame::OnPlayCenterLevel(UINT nID)
 	if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), m_pGB)) {
 		switch (nID) {
 		case ID_AUDIO_CENTER_INC:
-			s.fAudioCenter_dB = floor(s.fAudioCenter_dB * 2) / 2 + 0.5f;
+			s.fAudioCenter_dB = IncreaseFloatByGrid(s.fAudioCenter_dB, -2);
 			if (s.fAudioCenter_dB > 10.0f) {
 				s.fAudioCenter_dB = 10.0f;
 			}
 			break;
 		case ID_AUDIO_CENTER_DEC:
-			s.fAudioCenter_dB = ceil(s.fAudioCenter_dB * 2) / 2 - 0.5f;
+			s.fAudioCenter_dB = DecreaseFloatByGrid(s.fAudioCenter_dB, -2);
 			if (s.fAudioCenter_dB < -10.0f) {
 				s.fAudioCenter_dB = -10.0f;
 			}

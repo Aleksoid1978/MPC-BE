@@ -1,5 +1,5 @@
 /*
- * (C) 2016 see Authors.txt
+ * (C) 2016-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -57,3 +57,8 @@ SIZE ReduceDim(double value);
 
 int IncreaseByGrid(int value, const int step);
 int DecreaseByGrid(int value, const int step);
+
+// steps < 0  mean 1.0/(-step)
+double IncreaseFloatByGrid(double value, const int step);
+// steps < 0  mean 1.0/(-step)
+double DecreaseFloatByGrid(double value, const int step);

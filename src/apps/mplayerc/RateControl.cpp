@@ -1,5 +1,5 @@
 /*
- * (C) 2014 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,9 +24,9 @@
 const static double s_autorates[] = { 0.125, 0.25, 0.5, 1.0, 1.2, 1.5, 2.0, 4.0, 8.0 };
 const static double s_dvdautorates[] = { -16.0, -8.0, -4.0, -2.0, -1.0, 1.0, 2.0, 4.0, 8.0, 16.0 };
 
-double GatNextRate(double rate, double step) // 0 < step <= 1.0
+double GetNextRate(double rate, int step_pct) // 0..100%
 {
-	if (step == 0.0) {
+	if (step_pct == 0) {
 		size_t i = 0;
 		for (; i < _countof(s_autorates) - 1; i++) {
 			if (s_autorates[i] > rate) {
@@ -35,7 +35,7 @@ double GatNextRate(double rate, double step) // 0 < step <= 1.0
 		}
 		rate = s_autorates[i];
 	} else {
-		rate = 1.0 + (floor((rate - 0.9999) / step) + 1) * step;
+		rate = IncreaseFloatByGrid(rate, -100 / step_pct);
 		if (rate > MAXRATE) {
 			rate = MAXRATE;
 		}
@@ -44,9 +44,9 @@ double GatNextRate(double rate, double step) // 0 < step <= 1.0
 	return rate;
 }
 
-double GatPreviousRate(double rate, double step) // 0 < step <= 1.0
+double GetPreviousRate(double rate, int step_pct) // 0..100%
 {
-	if (step == 0.0) {
+	if (step_pct == 0) {
 		size_t i = 1;
 		for (; i < _countof(s_autorates); i++) {
 			if (s_autorates[i] >= rate) {
@@ -55,7 +55,7 @@ double GatPreviousRate(double rate, double step) // 0 < step <= 1.0
 		}
 		rate = s_autorates[i - 1];
 	} else {
-		rate = 1.0 + (ceil((rate - 1.0001) / step) - 1) * step;
+		rate = DecreaseFloatByGrid(rate, -100 / step_pct);
 		if (rate < MINRATE) {
 			rate = MINRATE;
 		}
@@ -64,7 +64,7 @@ double GatPreviousRate(double rate, double step) // 0 < step <= 1.0
 	return rate;
 }
 
-double GatNextDVDRate(double rate)
+double GetNextDVDRate(double rate)
 {
 	size_t i = 0;
 	for (; i < _countof(s_dvdautorates) - 1; i++) {
@@ -76,7 +76,7 @@ double GatNextDVDRate(double rate)
 	return s_dvdautorates[i];
 }
 
-double GatPreviousDVDRate(double rate)
+double GetPreviousDVDRate(double rate)
 {
 	size_t i = 1;
 	for (; i < _countof(s_dvdautorates); i++) {

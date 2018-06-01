@@ -1,5 +1,5 @@
 /*
- * (C) 2016 see Authors.txt
+ * (C) 2016-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -139,4 +139,42 @@ int DecreaseByGrid(int value, const int step)
 	auto r = value % step;
 	value -= r;
 	return r>0 ? value : value - step;
+}
+
+double IncreaseFloatByGrid(double value, const int step)
+{
+	if (step > 0) {
+		value /= step;
+	} else {
+		value *= -step;
+	}
+
+	value = std::floor(value + 0.0625) + 1;
+
+	if (step < 0) {
+		value /= -step;
+	} else {
+		value *= step;
+	}
+
+	return value;
+}
+
+double DecreaseFloatByGrid(double value, const int step)
+{
+	if (step > 0) {
+		value /= step;
+	} else {
+		value *= -step;
+	}
+
+	value = std::ceil(value - 0.0625) - 1;
+
+	if (step < 0) {
+		value /= -step;
+	} else {
+		value *= step;
+	}
+
+	return value;
 }

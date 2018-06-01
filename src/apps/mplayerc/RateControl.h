@@ -1,5 +1,5 @@
 /*
- * (C) 2014 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,10 +26,10 @@
 #define MINDVDRATE -16.0
 #define MAXDVDRATE 16.0
 
-double GatNextRate(double rate, double step = 0.0);
-double GatPreviousRate(double rate, double step = 0.0);
+double GetNextRate(double rate, int step_pct = 0);
+double GetPreviousRate(double rate, int step_pct = 0);
 
-double GatNextDVDRate(double rate);
-double GatPreviousDVDRate(double rate);
+double GetNextDVDRate(double rate);
+double GetPreviousDVDRate(double rate);
 
 CString Rate2String(double rate);
