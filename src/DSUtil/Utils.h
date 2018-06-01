@@ -54,3 +54,6 @@ void ReduceDim(long &num, long &den);
 void ReduceDim(SIZE &dim);
 
 SIZE ReduceDim(double value);
+
+int IncreaseByGrid(int value, const int step);
+int DecreaseByGrid(int value, const int step);
