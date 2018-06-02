@@ -8683,14 +8683,14 @@ void CMainFrame::OnPlayVolumeGain(UINT nID)
 		switch (nID) {
 		case ID_VOLUME_GAIN_INC:
 			s.dAudioGain_dB = IncreaseFloatByGrid(s.dAudioGain_dB, -2);
-			if (s.dAudioGain_dB > 10.0) {
-				s.dAudioGain_dB = 10.0;
+			if (s.dAudioGain_dB > APP_AUDIOGAIN_MAX) {
+				s.dAudioGain_dB = APP_AUDIOGAIN_MAX;
 			}
 			break;
 		case ID_VOLUME_GAIN_DEC:
 			s.dAudioGain_dB = DecreaseFloatByGrid(s.dAudioGain_dB, -2);
-			if (s.dAudioGain_dB < -3.0) {
-				s.dAudioGain_dB = -3.0;
+			if (s.dAudioGain_dB < APP_AUDIOGAIN_MIN) {
+				s.dAudioGain_dB = APP_AUDIOGAIN_MIN;
 			}
 			break;
 		case ID_VOLUME_GAIN_OFF:
@@ -8734,14 +8734,14 @@ void CMainFrame::OnPlayCenterLevel(UINT nID)
 		switch (nID) {
 		case ID_AUDIO_CENTER_INC:
 			s.fAudioCenter_dB = IncreaseFloatByGrid(s.fAudioCenter_dB, -2);
-			if (s.fAudioCenter_dB > 10.0f) {
-				s.fAudioCenter_dB = 10.0f;
+			if (s.fAudioCenter_dB > APP_AUDIOLEVEL_MAX) {
+				s.fAudioCenter_dB = APP_AUDIOLEVEL_MAX;
 			}
 			break;
 		case ID_AUDIO_CENTER_DEC:
 			s.fAudioCenter_dB = DecreaseFloatByGrid(s.fAudioCenter_dB, -2);
-			if (s.fAudioCenter_dB < -10.0f) {
-				s.fAudioCenter_dB = -10.0f;
+			if (s.fAudioCenter_dB < APP_AUDIOLEVEL_MIN) {
+				s.fAudioCenter_dB = APP_AUDIOLEVEL_MIN;
 			}
 			break;
 		}

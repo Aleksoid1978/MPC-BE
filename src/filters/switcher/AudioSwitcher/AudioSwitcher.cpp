@@ -82,6 +82,11 @@ CFilterApp theApp;
 
 #endif
 
+#define AUDIO_LEVEL_MAX   10.0
+#define AUDIO_LEVEL_MIN  -10.0
+#define AUDIO_GAIN_MAX    10.0
+#define AUDIO_GAIN_MIN    -3.0
+
 static struct channel_mode_t {
 	const WORD channels;
 	const DWORD ch_layout;
@@ -261,25 +266,11 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 	REFERENCE_TIME delay = 0;
 
-	if (audio_channels > 1 && audio_sampleformat == SAMPLE_FMT_FLT) {
-		if (audio_layout&SPEAKER_FRONT_CENTER && m_dCenterLevel != 1.0) {
-			int centerpos = get_channel_pos(audio_layout, SPEAKER_FRONT_CENTER);
-			float* p = (float*)audio_data;
-			for (int i = 0; i < audio_samples; i++) {
-				p[centerpos] *= m_dCenterLevel;
-				p += audio_channels;
-			}
-		}
-
-		const DWORD suraund_mask = SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT|SPEAKER_BACK_CENTER|SPEAKER_SIDE_LEFT|SPEAKER_SIDE_RIGHT;
-		if (audio_layout&suraund_mask && m_dSurroundLevel != 1.0) {
-			//TODO
-		}
-	}
+	bool center_level = (audio_layout&SPEAKER_FRONT_CENTER) && m_dCenterLevel != 1.0;
 
 	// Mixer
-	if (audio_layout != output_layout || audio_samplerate != output_samplerate) {
-		//m_Mixer.SetOptions(true);
+	if (audio_layout != output_layout || audio_samplerate != output_samplerate || center_level) {
+		m_Mixer.SetOptions(m_dCenterLevel, false);
 		m_Mixer.UpdateInput(audio_sampleformat, audio_layout, audio_samplerate);
 		m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, output_layout, output_samplerate);
 
@@ -544,10 +535,10 @@ STDMETHODIMP CAudioSwitcherFilter::SetBassRedirect(bool bBassRedirect)
 
 STDMETHODIMP CAudioSwitcherFilter::SetLevels(double dCenterLevel_dB, double dSurroundLevel_dB)
 {
-	dCenterLevel_dB = std::clamp(dCenterLevel_dB, -10.0, 10.0);
+	dCenterLevel_dB = std::clamp(dCenterLevel_dB, AUDIO_LEVEL_MIN, AUDIO_LEVEL_MAX);
 	m_dCenterLevel = decibel2factor(dCenterLevel_dB);
 
-	dSurroundLevel_dB = std::clamp(dSurroundLevel_dB, -10.0, 10.0);
+	dSurroundLevel_dB = std::clamp(dSurroundLevel_dB, AUDIO_LEVEL_MIN, AUDIO_LEVEL_MAX);
 	m_dSurroundLevel = decibel2factor(dSurroundLevel_dB);
 
 	return S_OK;
@@ -555,7 +546,7 @@ STDMETHODIMP CAudioSwitcherFilter::SetLevels(double dCenterLevel_dB, double dSur
 
 STDMETHODIMP CAudioSwitcherFilter::SetAudioGain(double dGain_dB)
 {
-	dGain_dB = std::clamp(dGain_dB, -3.0, 10.0);
+	dGain_dB = std::clamp(dGain_dB, AUDIO_GAIN_MIN, AUDIO_GAIN_MAX);
 	m_dGainFactor = decibel2factor(dGain_dB);
 
 	return S_OK;

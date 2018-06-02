@@ -147,12 +147,12 @@ BOOL CPPageSoundProcessing::OnInitDialog()
 	SelectByItemData(m_cmbMixerLayout, s.nAudioMixerLayout);
 	m_chkStereoFromDecoder.SetCheck(s.bAudioStereoFromDecoder);
 	m_chkBassRedirect.SetCheck(s.bAudioBassRedirect);
-	m_sldCenter.SetRange(-100, 100, TRUE);
+	m_sldCenter.SetRange(APP_AUDIOLEVEL_MIN * 10, APP_AUDIOLEVEL_MAX * 10, TRUE);
 	m_sldCenter.SetPos((int)std::round(s.fAudioCenter_dB * 10));
-	m_sldSurround.SetRange(-100, 100, TRUE);
+	m_sldSurround.SetRange(APP_AUDIOLEVEL_MIN * 10, APP_AUDIOLEVEL_MAX * 10, TRUE);
 	m_sldSurround.SetPos((int)std::round(s.fAudioSurround_dB * 10));
 
-	m_sldGain.SetRange(-30, 100, TRUE);
+	m_sldGain.SetRange(APP_AUDIOGAIN_MIN * 10, APP_AUDIOGAIN_MAX * 10, TRUE);
 	m_sldGain.SetPos((int)std::round(s.dAudioGain_dB * 10));
 
 	m_chkAutoVolumeControl.SetCheck(s.bAudioAutoVolumeControl);
