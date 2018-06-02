@@ -1675,7 +1675,7 @@ void CMainFrame::OnEnterSizeMove()
 	GetCursorPos(&cur_pos);
 
 	MONITORINFO mi = { sizeof(mi) };
-	GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
+	GetMonitorInfoW(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 	RECT rcWork = mi.rcWork;
 
 	if (IsZoomed() // window is maximized
@@ -1742,7 +1742,7 @@ void CMainFrame::ClipRectToMonitor(LPRECT prc)
 	int h = rcNormalPosition.bottom - rcNormalPosition.top;
 
 	MONITORINFO mi = { sizeof(mi) };
-	GetMonitorInfo(MonitorFromRect(prc, MONITOR_DEFAULTTONEAREST), &mi);
+	GetMonitorInfoW(MonitorFromRect(prc, MONITOR_DEFAULTTONEAREST), &mi);
 	RECT rcWork = mi.rcWork;
 
 	POINT cur_pos;
@@ -1784,7 +1784,7 @@ void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 	if (AfxGetAppSettings().bSnapToDesktopEdges && !bCtrl) {
 
 		MONITORINFO mi = { sizeof(mi) };
-		GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
+		GetMonitorInfoW(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 		CRect rcWork(mi.rcWork);
 		if (SysVersion::IsWin10orLater()) {
 			rcWork.InflateRect(GetInvisibleBorderSize());
@@ -1847,7 +1847,7 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 		// maximized window in MODE_FRAMEONLY | MODE_BORDERLESS is not correct
 		if (nType == SIZE_MAXIMIZED && (s.iCaptionMenuMode == MODE_FRAMEONLY || s.iCaptionMenuMode == MODE_BORDERLESS)) {
 			MONITORINFO mi = { sizeof(mi) };
-			GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
+			GetMonitorInfoW(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 			CRect wr(mi.rcWork);
 			if (s.iCaptionMenuMode == MODE_FRAMEONLY && SysVersion::IsWin10orLater()) {
 				CRect invisibleBorders = GetInvisibleBorderSize();
@@ -1955,7 +1955,7 @@ void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
 
 		MONITORINFO MonitorInfo = { sizeof(MonitorInfo) };
 		HMONITOR hMonitor = MonitorFromWindow(cwnd->m_hWnd, 0);
-		if (GetMonitorInfo(hMonitor, &MonitorInfo)) {
+		if (GetMonitorInfoW(hMonitor, &MonitorInfo)) {
 			CRect MonitorRect = CRect(MonitorInfo.rcMonitor);
 			cwnd->SetWindowPos(nullptr,
 							   MonitorRect.left,
@@ -4621,7 +4621,7 @@ void CMainFrame::OnStreamSub(UINT nID)
 
 		int splcnt	= 0;
 		Stream ss;
-		CAtlArray<Stream> MixSS;
+		std::vector<Stream> MixSS;
 		int iSel	= -1;
 
 		CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
@@ -4645,19 +4645,19 @@ void CMainFrame::OnStreamSub(UINT nID)
 
 					if (dwGroup == 2) {
 						if (dwFlags & (AMSTREAMSELECTINFO_ENABLED|AMSTREAMSELECTINFO_EXCLUSIVE)) {
-							iSel = MixSS.GetCount();
+							iSel = MixSS.size();
 						}
 						ss.Filter	= 1;
 						ss.Index	= i;
 						ss.Sel		= iSel;
 						ss.Num++;
-						MixSS.Add(ss);
+						MixSS.push_back(ss);
 					}
 				}
 			}
 		}
 
-		splcnt = MixSS.GetCount();
+		splcnt = MixSS.size();
 
 		int subcnt = -1;
 		POSITION pos = m_pSubStreams.GetHeadPosition();
@@ -4672,19 +4672,19 @@ void CMainFrame::OnStreamSub(UINT nID)
 				ss.Filter	= 2;
 				ss.Index	= subcnt;
 				ss.Num++;
-				if (m_iSubtitleSel == subcnt) iSel = MixSS.GetCount();
+				if (m_iSubtitleSel == subcnt) iSel = MixSS.size();
 				ss.Sel		= iSel;
-				MixSS.Add(ss);
+				MixSS.push_back(ss);
 			}
 		}
 
-		int cnt = MixSS.GetCount();
+		int cnt = MixSS.size();
 		if (cnt > 1) {
 			int nNewStream2 = MixSS[(iSel + (nID == 0 ? 1 : cnt - 1)) % cnt].Num;
 			int iF;
 			int nNewStream;
 
-			for (size_t i = 0; i < MixSS.GetCount(); i++) {
+			for (size_t i = 0; i < MixSS.size(); i++) {
 				if (MixSS[i].Num == nNewStream2) {
 					iF			= MixSS[i].Filter;
 					nNewStream	= MixSS[i].Index;
@@ -4695,7 +4695,7 @@ void CMainFrame::OnStreamSub(UINT nID)
 			bool ExtStream = false;
 			if (iF == 1) { // Splitter Subtitle Tracks
 
-				for (size_t i = 0; i < MixSS.GetCount(); i++) {
+				for (size_t i = 0; i < MixSS.size(); i++) {
 					if (MixSS[i].Sel == iSel && MixSS[i].Filter == 2) {
 						ExtStream = true;
 						break;
@@ -4843,7 +4843,7 @@ void CMainFrame::OnStreamVideo(UINT nID)
 		if (pSS) {
 			DWORD count = 0;
 			if (SUCCEEDED(pSS->Count(&count)) && count >= 2) {
-				CAtlArray<int> stms;
+				std::vector<int> stms;
 				int current = -1;
 
 				for (DWORD i = 0; i < count; i++) {
@@ -4857,21 +4857,21 @@ void CMainFrame::OnStreamVideo(UINT nID)
 					if (pmt && pmt->majortype == MEDIATYPE_Video) {
 						if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
 							ASSERT(current  < 0);
-							current = stms.GetCount();
+							current = stms.size();
 						}
-						stms.Add(i);
+						stms.push_back(i);
 					}
 
 					DeleteMediaType(pmt);
 				}
 
-				if (current >= 0 && stms.GetCount() >= 2) {
+				if (current >= 0 && stms.size() >= 2) {
 					current += (nID == ID_STREAM_VIDEO_NEXT) ? 1 : -1;
-					if (current >= (int)stms.GetCount()) {
+					if (current >= (int)stms.size()) {
 						current = 0;
 					}
 					else if (current < 0) {
-						current = stms.GetCount() - 1;
+						current = stms.size() - 1;
 					}
 
 					if (SUCCEEDED(pSS->Enable(stms[current], AMSTREAMSELECTENABLE_ENABLE))) {
@@ -10436,7 +10436,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 		}
 
 		dwRemove = WS_CAPTION | WS_THICKFRAME;
-		GetMonitorInfo(hm, &mi);
+		GetMonitorInfoW(hm, &mi);
 		if (fToNearest) {
 			r = mi.rcMonitor;
 		} else {
@@ -10533,7 +10533,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 			r = s.rcLastWindowPos;
 			if (!s.bRememberWindowPos) {
 				hm = MonitorFromPoint( CPoint( 0,0 ), MONITOR_DEFAULTTOPRIMARY );
-				GetMonitorInfo(hm, &mi);
+				GetMonitorInfoW(hm, &mi);
 				CRect m_r = mi.rcMonitor;
 				int left = m_r.left + (m_r.Width() - r.Width())/2;
 				int top = m_r.top + (m_r.Height() - r.Height())/2;
@@ -10551,7 +10551,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 			}
 		} else {
 			if (m_LastWindow_HM != hm_cur) {
-				GetMonitorInfo(m_LastWindow_HM, &mi);
+				GetMonitorInfoW(m_LastWindow_HM, &mi);
 				r = mi.rcMonitor;
 				ShowWindow(SW_HIDE);
 				SetWindowPos(nullptr, r.left, r.top, r.Width(), r.Height(), SWP_NOZORDER | SWP_NOSENDCHANGING);
@@ -12779,7 +12779,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 	m_Lcd.SetMediaTitle(fn);
 }
 
-BOOL CMainFrame::SelectMatchTrack(CAtlArray<Stream>& Tracks, CString pattern, BOOL bExtPrior, size_t& nIdx)
+BOOL CMainFrame::SelectMatchTrack(std::vector<Stream>& Tracks, CString pattern, BOOL bExtPrior, size_t& nIdx)
 {
 	CharLower(pattern.GetBuffer());
 	pattern.Replace(L"[fc]", L"forced");
@@ -12796,7 +12796,7 @@ BOOL CMainFrame::SelectMatchTrack(CAtlArray<Stream>& Tracks, CString pattern, BO
 	int tPos = 0;
 	CString lang = pattern.Tokenize(L",; ", tPos);
 	while (tPos != -1) {
-		for (size_t iIndex = 0; iIndex < Tracks.GetCount(); iIndex++) {
+		for (size_t iIndex = 0; iIndex < Tracks.size(); iIndex++) {
 			if (bExtPrior && !Tracks[iIndex].Ext) {
 				continue;
 			}
@@ -12865,7 +12865,7 @@ void CMainFrame::OpenSetupAudioStream()
 	DWORD cStreams = 0;
 	if (pSS && SUCCEEDED(pSS->Count(&cStreams))) {
 		Stream stream;
-		CAtlArray<Stream> streams;
+		std::vector<Stream> streams;
 		for (DWORD i = 0; i < cStreams; i++) {
 			DWORD dwFlags = 0;
 			CComHeapPtr<WCHAR> pszName;
@@ -12879,13 +12879,13 @@ void CMainFrame::OpenSetupAudioStream()
 			stream.Name  = name;
 			stream.Index = i;
 			stream.Ext   = bExternal;
-			streams.Add(stream);
+			streams.push_back(stream);
 		}
 
 #ifdef DEBUG
-		if (!streams.IsEmpty()) {
+		if (!streams.empty()) {
 			DLog(L"Audio Track list :");
-			for (size_t i = 0; i < streams.GetCount(); i++) {
+			for (size_t i = 0; i < streams.size(); i++) {
 				DLog(L"    %s", streams[i].Name);
 			}
 		}
@@ -12894,7 +12894,7 @@ void CMainFrame::OpenSetupAudioStream()
 		const CAppSettings& s = AfxGetAppSettings();
 		if (!s.fUseInternalSelectTrackLogic) {
 			if (s.fPrioritizeExternalAudio && extAudioList.GetCount() > 0) {
-				for (size_t i = 0; i < streams.GetCount(); i++) {
+				for (size_t i = 0; i < streams.size(); i++) {
 					if (streams[i].Ext) {
 						Stream& stream = streams[i];
 						pSS->Enable(stream.Index, AMSTREAMSELECTENABLE_ENABLE);
@@ -12905,14 +12905,14 @@ void CMainFrame::OpenSetupAudioStream()
 		} else {
 			CString pattern = s.strAudiosLanguageOrder;
 			if (s.fPrioritizeExternalAudio && extAudioList.GetCount() > 0) {
-				size_t nIdx	= 0;
+				size_t nIdx = 0;
 				const BOOL bMatch = SelectMatchTrack(streams, pattern, TRUE, nIdx);
 
 				Stream stream;
 				if (bMatch) {
 					stream = streams[nIdx];
 				} else {
-					for (size_t i = 0; i < streams.GetCount(); i++) {
+					for (size_t i = 0; i < streams.size(); i++) {
 						if (streams[i].Ext) {
 							stream = streams[i];
 							break;
@@ -12927,7 +12927,7 @@ void CMainFrame::OpenSetupAudioStream()
 				return;
 			}
 
-			size_t nIdx	= 0;
+			size_t nIdx = 0;
 			const BOOL bMatch = SelectMatchTrack(streams, pattern, FALSE, nIdx);
 
 			if (bMatch) {
@@ -12961,7 +12961,7 @@ size_t CMainFrame::GetSubSelIdx()
 	CAppSettings& s	= AfxGetAppSettings();
 	CString pattern	= s.strSubtitlesLanguageOrder;
 
-	if (subarray.GetCount()) {
+	if (subarray.size()) {
 		if (s.fPrioritizeExternalSubtitles) { // try external sub ...
 			size_t nIdx	= 0;
 			BOOL bMatch = SelectMatchTrack(subarray, pattern, TRUE, nIdx);
@@ -12969,7 +12969,7 @@ size_t CMainFrame::GetSubSelIdx()
 			if (bMatch) {
 				return nIdx;
  			} else {
-				for (size_t iIndex = 0; iIndex < subarray.GetCount(); iIndex++) {
+				for (size_t iIndex = 0; iIndex < subarray.size(); iIndex++) {
 					if (subarray[iIndex].Ext) {
 						return iIndex;
 					}
@@ -12977,7 +12977,7 @@ size_t CMainFrame::GetSubSelIdx()
 			}
 		}
 
-		size_t nIdx	= 0;
+		size_t nIdx = 0;
 		BOOL bMatch = SelectMatchTrack(subarray, pattern, FALSE, nIdx);
 
 		if (bMatch) {
@@ -13002,7 +13002,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 	if (m_pDVS) {
 		int nLangs;
 		if (SUCCEEDED(m_pDVS->get_LanguageCount(&nLangs)) && nLangs) {
-			subarray.RemoveAll();
+			subarray.clear();
 
 			int subcount = GetStreamCount(2);
 			CComQIPtr<IAMStreamSelect> pSS	= m_pMainSourceFilter;
@@ -13016,7 +13016,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 						substream.Index		= i;
 						substream.Ext		= true;
 						substream.Name		= pName;
-						subarray.Add(substream);
+						subarray.push_back(substream);
 
 						CoTaskMemFree(pName);
 					}
@@ -13041,9 +13041,9 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 						substream.Index++;
 						substream.Name = pszName;
 						if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
-							substream.Sel = subarray.GetCount();
+							substream.Sel = subarray.size();
 						}
-						subarray.Add(substream);
+						subarray.push_back(substream);
 
 						CoTaskMemFree(pszName);
 					}
@@ -13064,7 +13064,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 							substream.Ext = !!nType;
 						}
 
-						subarray.Add(substream);
+						subarray.push_back(substream);
 
 						CoTaskMemFree(pName);
 					}
@@ -13083,7 +13083,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 
 	if (m_pCAP && !m_bAudioOnly) {
 		Stream substream;
-		subarray.RemoveAll();
+		subarray.clear();
 		int checkedsplsub	= 0;
 		int subIndex		= -1;
 		int iNum			= 0;
@@ -13143,7 +13143,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 						substream.forced	= Forced;
 						substream.def		= Def;
 
-						subarray.Add(substream);
+						subarray.push_back(substream);
 					}
 
 					if (pName) {
@@ -13157,7 +13157,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			m_pSubStreams.RemoveAll();
 		}
 
-		int splsubcnt	= subarray.GetCount();
+		int splsubcnt = subarray.size();
 
 		if (splsubcnt < 1) {
 			POSITION pos = m_pSubStreams.GetHeadPosition();
@@ -13191,7 +13191,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 					substream.forced	= Forced;
 					substream.def		= Def;
 
-					subarray.Add(substream);
+					subarray.push_back(substream);
 
 					if (pName) {
 						CoTaskMemFree(pName);
@@ -13215,7 +13215,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 		CComPtr<ISubStream> pSubStream;
 		int tPos = -1;
 		int extcnt = -1;
-		for (size_t i = 0; i < subarray.GetCount(); i++) {
+		for (size_t i = 0; i < subarray.size(); i++) {
 			if (subarray[i].Filter == 2) extcnt++;
 		}
 
@@ -13242,7 +13242,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 					substream.forced	= Forced;
 					substream.def		= Def;
 
-					subarray.Add(substream);
+					subarray.push_back(substream);
 
 					if (pName) {
 						CoTaskMemFree(pName);
@@ -13263,7 +13263,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 
 		if (!s.fUseInternalSelectTrackLogic) {
 			if (s.fPrioritizeExternalSubtitles) {
-				size_t cnt = subarray.GetCount();
+				size_t cnt = subarray.size();
 				for (size_t i = 0; i < cnt; i++) {
 					if (subarray[i].Ext)	{
 						checkedsplsub = i;
@@ -13273,7 +13273,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			}
 			OnNavMixStreamSubtitleSelectSubMenu(checkedsplsub, 2);
 		} else {
-			int cnt = subarray.GetCount();
+			int cnt = subarray.size();
 			size_t defsub = GetSubSelIdx();
 
 			if (m_pMainSourceFilter && s.fDisableInternalSubtitles) {

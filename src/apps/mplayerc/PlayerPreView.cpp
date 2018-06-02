@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2017 see Authors.txt
+ * (C) 2012-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -294,7 +294,7 @@ void CPreView::OnShowWindow(BOOL bShow, UINT nStatus)
 void CPreView::SetWindowSize()
 {
 	MONITORINFO mi = { sizeof(mi) };
-	GetMonitorInfo(MonitorFromWindow(GetParent()->GetSafeHwnd(), MONITOR_DEFAULTTONEAREST), &mi);
+	GetMonitorInfoW(MonitorFromWindow(GetParent()->GetSafeHwnd(), MONITOR_DEFAULTTONEAREST), &mi);
 
 	CRect wr;
 	GetParent()->GetClientRect(&wr);
