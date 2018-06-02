@@ -808,7 +808,7 @@ void CPlayerSeekBar::UpdateToolTipPosition(CPoint point)
 		const int r_height = rc.Height();
 
 		MONITORINFO mi = { sizeof(mi) };
-		GetMonitorInfo(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
+		GetMonitorInfoW(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 
 		point.x -= r_width / 2 - 2;
 		point.y = GetChannelRect().TopLeft().y - (r_height + 13);

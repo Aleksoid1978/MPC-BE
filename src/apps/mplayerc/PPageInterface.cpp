@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -150,9 +150,9 @@ BOOL CPPageInterface::OnInitDialog()
 	m_fFontAA			= m_fFontAA_Old		= s.fFontAA;
 	m_FontType.Clear();
 	m_FontSize.Clear();
-	HDC dc = CreateDC(L"DISPLAY", nullptr, nullptr, nullptr);
+	HDC dc = CreateDCW(L"DISPLAY", nullptr, nullptr, nullptr);
 	CAtlArray<CString> fntl;
-	EnumFontFamilies(dc, nullptr, (FONTENUMPROC)EnumFontProc, (LPARAM)&fntl);
+	EnumFontFamiliesW(dc, nullptr, (FONTENUMPROC)EnumFontProc, (LPARAM)&fntl);
 	DeleteDC(dc);
 
 	for (size_t i = 0; i < fntl.GetCount(); ++i) {

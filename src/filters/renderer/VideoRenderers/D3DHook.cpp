@@ -140,7 +140,7 @@ namespace D3DHook {
 
 		MONITORINFOEX mi = {};
 		mi.cbSize = sizeof(mi);
-		GetMonitorInfo(hMonitor, &mi);
+		GetMonitorInfoW(hMonitor, &mi);
 
 		if (m_DeviceName == mi.szDevice) {
 			DLog(L"D3DHook::Hook() : already installed a hook for a device '%s'", m_DeviceName);

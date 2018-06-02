@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2017 see Authors.txt
+ * (C) 2012-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -281,7 +281,7 @@ void CFlyBar::UpdateWnd(CPoint point)
 	CRect r_tooltip;
 	m_tooltip.GetWindowRect(&r_tooltip);
 	MONITORINFO mi = { sizeof(mi) };
-	GetMonitorInfo(MonitorFromWindow(this->m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
+	GetMonitorInfoW(MonitorFromWindow(this->m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
 	CPoint p;
 	p.x = std::max(0L, std::min(point.x, mi.rcMonitor.right - r_tooltip.Width()));
 	int iCursorHeight = 24;
