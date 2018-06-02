@@ -35,6 +35,7 @@ extern "C" {
 CMixer::CMixer()
 	: m_pSWRCxt(nullptr)
 	, m_matrix_dbl(nullptr)
+	, m_center_level(1.0)
 	, m_normalize_matrix(false)
 	, m_ActualContext(false)
 	, m_in_sf(SAMPLE_FMT_NONE)
@@ -109,8 +110,8 @@ bool CMixer::Init()
 			m_matrix_dbl[i++] = 1.0;
 		}
 		if (m_out_layout & AV_CH_FRONT_CENTER) {
-			m_matrix_dbl[i++] = 0.5;
-			m_matrix_dbl[i++] = 0.5;
+			m_matrix_dbl[i++] = 0.5; // m_center_level is not needed here
+			m_matrix_dbl[i++] = 0.5; // m_center_level is not needed here
 		}
 		if (m_out_layout & AV_CH_LOW_FREQUENCY) {
 			m_matrix_dbl[i++] = 0.0;
@@ -128,8 +129,24 @@ bool CMixer::Init()
 			m_matrix_dbl[i++] = (-0.2222);
 			m_matrix_dbl[i++] = 0.6666;
 		}
-	} else {
-		const double center_mix_level   = M_SQRT1_2;
+	}
+	// no mixing
+	else if (m_in_layout == m_out_layout) {
+		for (int j = 0; j < out_ch; j++) {
+			for (int i = 0; i < in_ch; i++) {
+				m_matrix_dbl[j * in_ch + i] = (i == j) ? 1.0 : 0.0;
+			}
+		}
+
+		if (m_out_layout&AV_CH_FRONT_CENTER && m_center_level != 1.0) {
+			int center_pos = 0;
+			if (m_out_layout & AV_CH_FRONT_LEFT) center_pos++;
+			if (m_out_layout & AV_CH_FRONT_RIGHT) center_pos++;
+			m_matrix_dbl[center_pos * in_ch + center_pos] *= m_center_level;
+		}
+	}
+	else {
+		const double center_mix_level   = M_SQRT1_2 * m_center_level;
 		const double surround_mix_level = 1.0;
 		const double lfe_mix_level      = 1.0;
 		const double rematrix_maxval    = INT_MAX; // matrix coefficients will not be normalized
@@ -222,9 +239,10 @@ bool CMixer::Init()
 	return true;
 }
 
-void CMixer::SetOptions(bool normalize_matrix)
+void CMixer::SetOptions(double center_level, bool normalize_matrix)
 {
-	if (normalize_matrix != m_normalize_matrix) {
+	if (center_level != m_center_level || normalize_matrix != m_normalize_matrix) {
+		m_center_level = center_level;
 		m_normalize_matrix = normalize_matrix;
 		m_ActualContext = false;
 	}

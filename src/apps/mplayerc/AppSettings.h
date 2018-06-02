@@ -94,6 +94,11 @@
 #define APP_BUFDURATION_DEF		3000
 #define APP_BUFDURATION_MAX		10000
 
+#define APP_AUDIOLEVEL_MAX		 10.0f
+#define APP_AUDIOLEVEL_MIN		-10.0f
+#define APP_AUDIOGAIN_MAX		 10.0
+#define APP_AUDIOGAIN_MIN		 -3.0
+
 #define OSD_ENABLE		(1 << 0)
 #define OSD_FILENAME	(1 << 1)
 #define OSD_SEEKTIME	(1 << 2)

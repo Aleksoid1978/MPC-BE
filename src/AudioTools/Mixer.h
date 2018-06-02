@@ -26,9 +26,10 @@ struct SwrContext;
 
 class CMixer
 {
-protected:
+private:
 	SwrContext* m_pSWRCxt;
 	double* m_matrix_dbl;
+	double  m_center_level;
 	bool    m_normalize_matrix;
 	bool    m_ActualContext;
 
@@ -42,14 +43,15 @@ protected:
 	enum AVSampleFormat m_in_avsf;
 	enum AVSampleFormat m_out_avsf;
 
-	bool Init();
-
 public:
 	CMixer();
 	~CMixer();
 
-	void SetOptions(bool normalize_matrix);
+private:
+	bool Init();
 
+public:
+	void SetOptions(double center_level, bool normalize_matrix);
 	void UpdateInput (SampleFormat  in_sf, DWORD  in_layout, int  in_samplerate = 48000);
 	void UpdateOutput(SampleFormat out_sf, DWORD out_layout, int out_samplerate = 48000);
 

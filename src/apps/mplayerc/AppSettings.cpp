@@ -765,14 +765,14 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	bAudioBassRedirect		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOBASSREDIRECT, FALSE);
 	str						= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOLEVELS, L"");
 	if (swscanf_s(str, L"C:%f;S:%f", &fAudioCenter_dB, &fAudioSurround_dB) == 2) {
-		fAudioCenter_dB = discard(fAudioCenter_dB, -10.0f, 10.0f, 0.0f);
-		fAudioSurround_dB = discard(fAudioSurround_dB, -10.0f, 10.0f, 0.0f);
+		fAudioCenter_dB = discard(fAudioCenter_dB, APP_AUDIOLEVEL_MIN, APP_AUDIOLEVEL_MAX, 0.0f);
+		fAudioSurround_dB = discard(fAudioSurround_dB, APP_AUDIOLEVEL_MIN, APP_AUDIOLEVEL_MAX, 0.0f);
 	} else {
 		fAudioCenter_dB = 0.0;
 		fAudioSurround_dB = 0.0;
 	}
 	dAudioGain_dB			= _wtof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, L"0"));
-	dAudioGain_dB			= discard(dAudioGain_dB, -3.0, 10.0, 0.0);
+	dAudioGain_dB			= discard(dAudioGain_dB, APP_AUDIOGAIN_MIN, APP_AUDIOGAIN_MAX, 0.0);
 	bAudioAutoVolumeControl	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, FALSE);
 	bAudioNormBoost			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, TRUE);
 	iAudioNormLevel			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, 75);
