@@ -346,8 +346,6 @@ struct Codec {
 	CComBSTR DisplayName;
 };
 
-typedef CAtlArray<Codec> CCodecArray;
-
 class CMainFrame;
 
 // CPlayerCaptureDialog dialog
@@ -374,11 +372,11 @@ private:
 	CAudFormatArray m_afa;
 
 	// video codec
-	CCodecArray m_pVidEncArray;
+	std::vector<Codec> m_pVidEncArray;
 	CVidFormatArray m_vcfa;
 
 	// audio codec
-	CCodecArray m_pAudEncArray;
+	std::vector<Codec> m_pAudEncArray;
 	CAudFormatArray m_acfa;
 
 	void EmptyVideo();
