@@ -382,7 +382,7 @@ void CPPageCapture::FindAnalogDevices()
 		LPOLESTR strName = nullptr;
 
 		if (SUCCEEDED(pMoniker->GetDisplayName(nullptr, nullptr, &strName))) {
-			m_vidnames.Add(CString(strName));
+			m_vidnames.emplace_back(strName);
 
 			if (s.strAnalogVideo == CString(strName)) {
 				iSel = i;
@@ -399,7 +399,7 @@ void CPPageCapture::FindAnalogDevices()
 
 	{
 		int i = m_cbAnalogAudio.AddString(L"<Video Capture Device>");
-		m_audnames.Add(L"");
+		m_audnames.emplace_back(L"");
 
 		if (s.strAnalogAudio.IsEmpty()) {
 			iSel = i;
@@ -419,7 +419,7 @@ void CPPageCapture::FindAnalogDevices()
 		LPOLESTR strName = nullptr;
 
 		if (SUCCEEDED(pMoniker->GetDisplayName(nullptr, nullptr, &strName))) {
-			m_audnames.Add(CString(strName));
+			m_audnames.emplace_back(strName);
 
 			if (s.strAnalogAudio == CString(strName)) {
 				iSel = i;
@@ -493,7 +493,7 @@ void CPPageCapture::FindDigitalDevices()
 		LPOLESTR strName = nullptr;
 
 		if (SUCCEEDED(pMoniker->GetDisplayName(nullptr, nullptr, &strName))) {
-			m_providernames.Add(CString(strName));
+			m_providernames.emplace_back(strName);
 
 			if (s.strBDANetworkProvider == CString(strName)) {
 				iSel = i;
@@ -520,7 +520,7 @@ void CPPageCapture::FindDigitalDevices()
 		LPOLESTR strName = nullptr;
 
 		if (SUCCEEDED(pMoniker->GetDisplayName(nullptr, nullptr, &strName))) {
-			m_tunernames.Add(CString(strName));
+			m_tunernames.emplace_back(strName);
 
 			if (s.strBDATuner == CString(strName)) {
 				iSel = i;
@@ -547,7 +547,7 @@ void CPPageCapture::FindDigitalDevices()
 		LPOLESTR strName = nullptr;
 
 		if (SUCCEEDED(pMoniker->GetDisplayName(nullptr, nullptr, &strName))) {
-			m_receivernames.Add(CString(strName));
+			m_receivernames.emplace_back(strName);
 
 			if (s.strBDAReceiver == CString(strName)) {
 				iSel = i;
