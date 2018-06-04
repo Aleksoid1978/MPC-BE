@@ -43,10 +43,8 @@ void CPPageSoundProcessing::UpdateCenterInfo()
 	str.Format(ResStr(IDS_CENTER_LEVEL)+L"*", center);
 	m_stcCenter.SetWindowTextW(str);
 
-	if (AfxGetMainFrame()->m_pSwitcherFilter) {
-		if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
-			pASF->SetLevels(center, m_sldSurround.GetPos() / 10.0f);
-		}
+	if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
+		pASF->SetLevels(center, m_sldSurround.GetPos() / 10.0f);
 	}
 };
 
@@ -57,10 +55,8 @@ void CPPageSoundProcessing::UpdateSurroundInfo()
 	str.Format(L"Surround level (%+.1f dB)*", surround);
 	m_stcSurround.SetWindowTextW(str);
 
-	if (AfxGetMainFrame()->m_pSwitcherFilter) {
-		if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
-			pASF->SetLevels(m_sldCenter.GetPos() / 10.0f, surround);
-		}
+	if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
+		pASF->SetLevels(m_sldCenter.GetPos() / 10.0f, surround);
 	}
 };
 
@@ -71,10 +67,8 @@ void CPPageSoundProcessing::UpdateGainInfo()
 	str.Format(ResStr(IDS_AUDIO_GAIN), gain);
 	m_stcGain.SetWindowTextW(str);
 
-	if (AfxGetMainFrame()->m_pSwitcherFilter) {
-		if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
-			pASF->SetAudioGain(gain);
-		}
+	if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
+		pASF->SetAudioGain(gain);
 	}
 };
 
@@ -250,16 +244,14 @@ BOOL CPPageSoundProcessing::OnApply()
 		EndEnumFilters
 	}
 
-	if (AfxGetMainFrame()->m_pSwitcherFilter) {
-		if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
-			pASF->SetChannelMixer(s.bAudioMixer, s.nAudioMixerLayout);
-			pASF->SetBassRedirect(s.bAudioBassRedirect);
-			pASF->SetLevels(s.fAudioCenter_dB, s.fAudioSurround_dB);
-			pASF->SetAudioGain(s.dAudioGain_dB);
-			pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
-			pASF->SetOutputFormats(s.iAudioSampleFormats);
-			pASF->SetAudioTimeShift(s.bAudioTimeShift ? 10000i64*s.iAudioTimeShift : 0);
-		}
+	if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
+		pASF->SetChannelMixer(s.bAudioMixer, s.nAudioMixerLayout);
+		pASF->SetBassRedirect(s.bAudioBassRedirect);
+		pASF->SetLevels(s.fAudioCenter_dB, s.fAudioSurround_dB);
+		pASF->SetAudioGain(s.dAudioGain_dB);
+		pASF->SetAutoVolumeControl(s.bAudioAutoVolumeControl, s.bAudioNormBoost, s.iAudioNormLevel, s.iAudioNormRealeaseTime);
+		pASF->SetOutputFormats(s.iAudioSampleFormats);
+		pASF->SetAudioTimeShift(s.bAudioTimeShift ? 10000i64*s.iAudioTimeShift : 0);
 	}
 
 	return __super::OnApply();
@@ -410,11 +402,9 @@ void CPPageSoundProcessing::OnCancel()
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	if (AfxGetMainFrame()->m_pSwitcherFilter) {
-		if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
-			pASF->SetLevels(s.fAudioCenter_dB, s.fAudioSurround_dB);
-			pASF->SetAudioGain(s.dAudioGain_dB);
-		}
+	if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
+		pASF->SetLevels(s.fAudioCenter_dB, s.fAudioSurround_dB);
+		pASF->SetAudioGain(s.dAudioGain_dB);
 	}
 
 	__super::OnCancel();
