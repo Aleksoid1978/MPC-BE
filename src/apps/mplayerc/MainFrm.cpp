@@ -8146,7 +8146,7 @@ void CMainFrame::OnUpdatePlayResetRate(CCmdUI* pCmdUI)
 
 void CMainFrame::SetAudioDelay(REFERENCE_TIME rtShift)
 {
-	if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), m_pGB)) {
+	if (CComQIPtr<IAudioSwitcherFilter> pASF = m_pSwitcherFilter) {
 		pASF->SetAudioTimeShift(rtShift);
 
 		CString str;
@@ -8174,7 +8174,7 @@ void CMainFrame::SetSubtitleDelay(int delay_ms)
 
 void CMainFrame::OnPlayChangeAudDelay(UINT nID)
 {
-	if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), m_pGB)) {
+	if (CComQIPtr<IAudioSwitcherFilter> pASF = m_pSwitcherFilter) {
 		REFERENCE_TIME rtShift = pASF->GetAudioTimeShift();
 		rtShift +=
 			nID == ID_PLAY_AUDIODELAY_PLUS ? 100000 :
@@ -8679,7 +8679,7 @@ void CMainFrame::OnPlayVolumeGain(UINT nID)
 		return;
 	}
 
-	if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), m_pGB)) {
+	if (CComQIPtr<IAudioSwitcherFilter> pASF = m_pSwitcherFilter) {
 		switch (nID) {
 		case ID_VOLUME_GAIN_INC:
 			s.dAudioGain_dB = IncreaseFloatByGrid(s.dAudioGain_dB, -2);
@@ -8710,7 +8710,7 @@ void CMainFrame::OnPlayVolumeGain(UINT nID)
 
 void CMainFrame::OnAutoVolumeControl()
 {
-	if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), m_pGB)) {
+	if (CComQIPtr<IAudioSwitcherFilter> pASF = m_pSwitcherFilter) {
 		CAppSettings& s = AfxGetAppSettings();
 
 		s.bAudioAutoVolumeControl = !s.bAudioAutoVolumeControl;
@@ -8730,7 +8730,7 @@ void CMainFrame::OnPlayCenterLevel(UINT nID)
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), m_pGB)) {
+	if (CComQIPtr<IAudioSwitcherFilter> pASF = m_pSwitcherFilter) {
 		switch (nID) {
 		case ID_AUDIO_CENTER_INC:
 			s.fAudioCenter_dB = IncreaseFloatByGrid(s.fAudioCenter_dB, -2);

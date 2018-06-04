@@ -43,8 +43,8 @@ void CPPageSoundProcessing::UpdateCenterInfo()
 	str.Format(ResStr(IDS_CENTER_LEVEL)+L"*", center);
 	m_stcCenter.SetWindowTextW(str);
 
-	if (IFilterGraph* pFG = AfxGetMainFrame()->m_pGB) {
-		if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG)) {
+	if (AfxGetMainFrame()->m_pSwitcherFilter) {
+		if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
 			pASF->SetLevels(center, m_sldSurround.GetPos() / 10.0f);
 		}
 	}
@@ -57,8 +57,8 @@ void CPPageSoundProcessing::UpdateSurroundInfo()
 	str.Format(L"Surround level (%+.1f dB)*", surround);
 	m_stcSurround.SetWindowTextW(str);
 
-	if (IFilterGraph* pFG = AfxGetMainFrame()->m_pGB) {
-		if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG)) {
+	if (AfxGetMainFrame()->m_pSwitcherFilter) {
+		if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
 			pASF->SetLevels(m_sldCenter.GetPos() / 10.0f, surround);
 		}
 	}
@@ -71,8 +71,8 @@ void CPPageSoundProcessing::UpdateGainInfo()
 	str.Format(ResStr(IDS_AUDIO_GAIN), gain);
 	m_stcGain.SetWindowTextW(str);
 
-	if (IFilterGraph* pFG = AfxGetMainFrame()->m_pGB) {
-		if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG)) {
+	if (AfxGetMainFrame()->m_pSwitcherFilter) {
+		if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
 			pASF->SetAudioGain(gain);
 		}
 	}
@@ -248,8 +248,10 @@ BOOL CPPageSoundProcessing::OnApply()
 			}
 		}
 		EndEnumFilters
+	}
 
-		if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG)) {
+	if (AfxGetMainFrame()->m_pSwitcherFilter) {
+		if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
 			pASF->SetChannelMixer(s.bAudioMixer, s.nAudioMixerLayout);
 			pASF->SetBassRedirect(s.bAudioBassRedirect);
 			pASF->SetLevels(s.fAudioCenter_dB, s.fAudioSurround_dB);
@@ -408,8 +410,8 @@ void CPPageSoundProcessing::OnCancel()
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	if (IFilterGraph* pFG = AfxGetMainFrame()->m_pGB) {
-		if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG)) {
+	if (AfxGetMainFrame()->m_pSwitcherFilter) {
+		if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
 			pASF->SetLevels(s.fAudioCenter_dB, s.fAudioSurround_dB);
 			pASF->SetAudioGain(s.dAudioGain_dB);
 		}
