@@ -38,23 +38,44 @@ CPPageSoundProcessing::~CPPageSoundProcessing()
 
 void CPPageSoundProcessing::UpdateCenterInfo()
 {
+	double center = m_sldCenter.GetPos() / 10.0f;
 	CString str;
-	str.Format(ResStr(IDS_CENTER_LEVEL)+L"*", m_sldCenter.GetPos() / 10.0f);
+	str.Format(ResStr(IDS_CENTER_LEVEL)+L"*", center);
 	m_stcCenter.SetWindowTextW(str);
+
+	if (IFilterGraph* pFG = AfxGetMainFrame()->m_pGB) {
+		if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG)) {
+			pASF->SetLevels(center, m_sldSurround.GetPos() / 10.0f);
+		}
+	}
 };
 
 void CPPageSoundProcessing::UpdateSurroundInfo()
 {
+	double surround = m_sldSurround.GetPos() / 10.0f;
 	CString str;
-	str.Format(L"Surround level (%+.1f dB)*", m_sldSurround.GetPos() / 10.0f);
+	str.Format(L"Surround level (%+.1f dB)*", surround);
 	m_stcSurround.SetWindowTextW(str);
+
+	if (IFilterGraph* pFG = AfxGetMainFrame()->m_pGB) {
+		if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG)) {
+			pASF->SetLevels(m_sldCenter.GetPos() / 10.0f, surround);
+		}
+	}
 };
 
 void CPPageSoundProcessing::UpdateGainInfo()
 {
+	double gain = m_sldGain.GetPos() / 10.0f;
 	CString str;
-	str.Format(ResStr(IDS_AUDIO_GAIN), m_sldGain.GetPos() / 10.0f);
+	str.Format(ResStr(IDS_AUDIO_GAIN), gain);
 	m_stcGain.SetWindowTextW(str);
+
+	if (IFilterGraph* pFG = AfxGetMainFrame()->m_pGB) {
+		if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG)) {
+			pASF->SetAudioGain(gain);
+		}
+	}
 };
 
 void CPPageSoundProcessing::UpdateNormLevelInfo()
@@ -381,4 +402,18 @@ void CPPageSoundProcessing::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScro
 	SetModified();
 
 	__super::OnHScroll(nSBCode, nPos, pScrollBar);
+}
+
+void CPPageSoundProcessing::OnCancel()
+{
+	CAppSettings& s = AfxGetAppSettings();
+
+	if (IFilterGraph* pFG = AfxGetMainFrame()->m_pGB) {
+		if (CComQIPtr<IAudioSwitcherFilter> pASF = FindFilter(__uuidof(CAudioSwitcherFilter), pFG)) {
+			pASF->SetLevels(s.fAudioCenter_dB, s.fAudioSurround_dB);
+			pASF->SetAudioGain(s.dAudioGain_dB);
+		}
+	}
+
+	__super::OnCancel();
 }

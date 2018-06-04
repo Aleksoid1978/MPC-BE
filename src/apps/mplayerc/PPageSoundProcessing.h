@@ -91,4 +91,5 @@ public:
 	afx_msg void OnBnClickedSoundProcessingDefault();
 
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	afx_msg void OnCancel();
 };
