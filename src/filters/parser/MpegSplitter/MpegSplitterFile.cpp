@@ -771,8 +771,9 @@ void CMpegSplitterFile::SearchStreams(const __int64 start, const __int64 stop, c
 #define TELETEXT_SUB      (1ULL << 12)
 #define OPUS_AUDIO        (1ULL << 13)
 #define DTS_EXPRESS_AUDIO (1ULL << 14)
+#define MPEG4_VIDEO       (1ULL << 15)
 
-#define PES_STREAM_TYPE_ANY (MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB | TELETEXT_SUB | OPUS_AUDIO | DTS_EXPRESS_AUDIO)
+#define PES_STREAM_TYPE_ANY (MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB | TELETEXT_SUB | OPUS_AUDIO | DTS_EXPRESS_AUDIO | MPEG4_VIDEO)
 
 static const struct StreamType {
 	PES_STREAM_TYPE pes_stream_type;
@@ -821,7 +822,9 @@ static const struct StreamType {
 	// DVB Subtitle
 	{ PES_PRIVATE,							DVB_SUB		},
 	// Teletext Subtitle
-	{ PES_PRIVATE,							TELETEXT_SUB}
+	{ PES_PRIVATE,							TELETEXT_SUB},
+	// MPEG4 Video
+	{ VIDEO_STREAM_MPEG4,					MPEG4_VIDEO}
 };
 
 static const struct {
@@ -956,6 +959,16 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 			hevchdr h;
 			if (!m_streams[stream_type::video].Find(s) && Read(h, len, hevch[s], &s.mt)) {
 				s.codec = stream_codec::HEVC;
+				type = stream_type::video;
+			}
+		}
+
+		// MPEG4 Video
+		if (type == stream_type::unknown && (stream_type & MPEG4_VIDEO)) {
+			Seek(start);
+			mpeg4videohdr h;
+			if (!m_streams[stream_type::video].Find(s) && Read(h, len, &s.mt)) {
+				s.codec = stream_codec::MPEG4Video;
 				type = stream_type::video;
 			}
 		}

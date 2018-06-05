@@ -447,6 +447,9 @@ CString CMediaTypeEx::GetVideoCodecName(const GUID& subtype, DWORD biCompression
 		} else {
 			if (subtype == MEDIASUBTYPE_DiracVideo) {
 				str = L"Dirac Video";
+			} else if (subtype == MEDIASUBTYPE_MP4V ||
+					   subtype == MEDIASUBTYPE_mp4v) {
+				str = L"MPEG4 Video";
 			} else if (subtype == MEDIASUBTYPE_apch ||
 					   subtype == MEDIASUBTYPE_apcn ||
 					   subtype == MEDIASUBTYPE_apcs ||

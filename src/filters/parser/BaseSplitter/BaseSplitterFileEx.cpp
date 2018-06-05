@@ -1578,6 +1578,191 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, std::vector<BYTE>& pData, CM
 	return Read(h, pData, pmt);
 }
 
+bool CBaseSplitterFileEx::Read(mpeg4videohdr& h, int len, CMediaType* pmt/* = nullptr*/)
+{
+	memset(&h, 0, sizeof(h));
+
+	const __int64 endpos = GetPos() + len;
+	__int64 extrapos = 0, extralen = len;
+
+	__int64 limit = len;
+
+	DWORD width  = 0;
+	DWORD height = 0;
+	fraction_t sar{1, 1};
+	REFERENCE_TIME AvgTimePerFrame = 0;
+
+	BYTE id;
+	while (NextMpegStartCode(id, limit)) {
+		if (extrapos == 0) {
+			extrapos = GetPos();
+		}
+
+		if (id >= 0x20 && id <= 0x2F) { // vol header
+			BYTE random_accessible_vol = (BYTE)BitRead(1);
+			BYTE video_object_type_indication = (BYTE)BitRead(8);
+
+			if (video_object_type_indication == 0x12) { // Fine Granularity Scalable
+				break;
+			}
+
+			BYTE is_object_layer_identifier = (BYTE)BitRead(1);
+			BYTE video_object_layer_verid = 0;
+			if (is_object_layer_identifier) {
+				video_object_layer_verid = (BYTE)BitRead(4);
+				BYTE video_object_layer_priority = (BYTE)BitRead(3);
+			}
+
+			BYTE aspect_ratio_info = (BYTE)BitRead(4);
+			switch (aspect_ratio_info) {
+				default:
+					ASSERT(0);
+					break;
+				case 1:
+					sar.num = 1;
+					sar.den = 1;
+					break;
+				case 2:
+					sar.num = 12;
+					sar.den = 11;
+					break;
+				case 3:
+					sar.num = 10;
+					sar.den = 11;
+					break;
+				case 4:
+					sar.num = 16;
+					sar.den = 11;
+					break;
+				case 5:
+					sar.num = 40;
+					sar.den = 33;
+					break;
+				case 15:
+					sar.num = (BYTE)BitRead(8);
+					sar.den = (BYTE)BitRead(8);
+					break;
+			}
+
+			BYTE vol_control_parameters = (BYTE)BitRead(1);
+
+			if (vol_control_parameters) {
+				BYTE chroma_format = (BYTE)BitRead(2);
+				BYTE low_delay = (BYTE)BitRead(1);
+				BYTE vbv_parameters = (BYTE)BitRead(1);
+
+				if (vbv_parameters) {
+					WORD first_half_bit_rate = (WORD)BitRead(15);
+					if (!BitRead(1)) {
+						break;
+					}
+					WORD latter_half_bit_rate = (WORD)BitRead(15);
+					if (!BitRead(1)) {
+						break;
+					}
+					WORD first_half_vbv_buffer_size = (WORD)BitRead(15);
+					if (!BitRead(1)) {
+						break;
+					}
+
+					BYTE latter_half_vbv_buffer_size = (BYTE)BitRead(3);
+					WORD first_half_vbv_occupancy = (WORD)BitRead(11);
+					if (!BitRead(1)) {
+						break;
+					}
+					WORD latter_half_vbv_occupancy = (WORD)BitRead(15);
+					if (!BitRead(1)) {
+						break;
+					}
+				}
+			}
+
+			BYTE video_object_layer_shape = (BYTE)BitRead(2);
+
+			if (video_object_layer_shape == 3 && video_object_layer_verid != 1) {
+				BYTE video_object_layer_shape_extension = (BYTE)BitRead(4);
+			}
+
+			if (!BitRead(1)) {
+				break;
+			}
+
+			WORD vop_time_increment_resolution = (WORD)BitRead(16);
+			if (!BitRead(1)) {
+				break;
+			}
+
+			BYTE fixed_vop_rate = (BYTE)BitRead(1);
+			if (fixed_vop_rate) {
+				int bits = 0;
+				for (WORD i = vop_time_increment_resolution; i; i /= 2) {
+					++bits;
+				}
+
+				WORD fixed_vop_time_increment = BitRead(bits);
+				if (fixed_vop_time_increment) {
+					AvgTimePerFrame = UNITS * fixed_vop_time_increment / vop_time_increment_resolution;
+				}
+			}
+
+			if (video_object_layer_shape != 2) {
+				if (video_object_layer_shape == 0) {
+					if (!BitRead(1)) {
+						break;
+					}
+					width = (WORD)BitRead(13);
+					if (!BitRead(1)) {
+						break;
+					}
+					height = (WORD)BitRead(13);
+					if (!BitRead(1)) {
+						break;
+					}
+				}
+			}
+
+			BitByteAlign();
+		} else if (id == 0xb6) { // vop
+			extralen = GetPos() - 4 - extrapos;
+			break;
+		}
+
+		limit = endpos - GetPos();
+	}
+
+	if (!width || !height) {
+		return false;
+	}
+
+	if (pmt) {
+		CSize aspect(width * sar.num, height * sar.den);
+		ReduceDim(aspect);
+
+		pmt->majortype = MEDIATYPE_Video;
+		pmt->subtype = FOURCCMap('V4PM');
+		pmt->formattype = FORMAT_MPEG2Video;
+
+		MPEG2VIDEOINFO* mvih = (MPEG2VIDEOINFO*)pmt->AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + extralen);
+		memset(mvih, 0, pmt->FormatLength());
+		mvih->hdr.bmiHeader.biSize = sizeof(mvih->hdr.bmiHeader);
+		mvih->hdr.bmiHeader.biWidth = width;
+		mvih->hdr.bmiHeader.biHeight = height;
+		mvih->hdr.bmiHeader.biCompression = 'V4PM';
+		mvih->hdr.bmiHeader.biPlanes = 1;
+		mvih->hdr.bmiHeader.biBitCount = 24;
+		mvih->hdr.bmiHeader.biSizeImage = DIBSIZE(mvih->hdr.bmiHeader);
+		mvih->hdr.AvgTimePerFrame = AvgTimePerFrame;
+		mvih->hdr.dwPictAspectRatioX = aspect.cx;
+		mvih->hdr.dwPictAspectRatioY = aspect.cy;
+
+		mvih->cbSequenceHeader = extralen;
+		Seek(extrapos);
+		ByteRead((BYTE*)mvih->dwSequenceHeader, extralen);
+	}
+
+	return true;
+}
+
 bool CBaseSplitterFileEx::Read(adx_adpcm_hdr& h, int len, CMediaType* pmt)
 {
 	memset(&h, 0, sizeof(h));
