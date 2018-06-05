@@ -210,7 +210,8 @@ public:
 		TELETEXT,
 		DVDAudio,
 		MLP,
-		DVDLPCM
+		DVDLPCM,
+		MPEG4Video
 	};
 
 	enum stream_type {

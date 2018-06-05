@@ -280,6 +280,9 @@ public:
 	struct hevchdr {
 	};
 
+	struct mpeg4videohdr {
+	};
+
 	struct adx_adpcm_hdr {
 		DWORD channels;
 		DWORD samplerate;
@@ -321,6 +324,8 @@ public:
 	bool Read(hevchdr& h, std::vector<BYTE>& pData, CMediaType* pmt = nullptr);
 	bool Read(hevchdr& h, int len, CMediaType* pmt = nullptr);
 	bool Read(hevchdr& h, int len, std::vector<BYTE>& pData, CMediaType* pmt = nullptr);
+
+	bool Read(mpeg4videohdr& h, int len, CMediaType* pmt = nullptr);
 
 	bool Read(adx_adpcm_hdr& h, int len, CMediaType* pmt = nullptr);
 	bool Read(pcm_law_hdr& h, int len, bool bAlaw, CMediaType* pmt = nullptr);
