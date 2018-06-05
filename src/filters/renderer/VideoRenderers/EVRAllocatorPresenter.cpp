@@ -790,7 +790,6 @@ HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int&
 
 	if (SUCCEEDED(hr)) {
 		// Information about actual YUV formats - http://msdn.microsoft.com/en-us/library/windows/desktop/dd206750%28v=vs.85%29.aspx
-		// DirectShow EVR not support 10 and 16-bit format
 
 		// Test result
 		// EVR input formats: NV12, YV12, YUY2, UYVY, AYUV, RGB32, ARGB32, AI44 and P010.
@@ -798,64 +797,33 @@ HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int&
 		// Intel: YUY2, X8R8G8B8, A8R8G8B8 (HD 4000).
 		// Nvidia: NV12, YUY2, X8R8G8B8 (GTX 660Ti, GTX 960).
 		// ATI/AMD: NV12, X8R8G8B8 (HD 5770)
+		// for Win8+ A2R10G10B10 additional A2R10G10B10
 
 		switch (mix_fmt) {
-			case D3DFMT_A8R8G8B8:// an accepted format, but fails on most surface types
-			case D3DFMT_A8B8G8R8:
-			case D3DFMT_X8B8G8R8:
-			case D3DFMT_R8G8B8:
-			case D3DFMT_R5G6B5:
-			case D3DFMT_X1R5G5B5:
-			case D3DFMT_A1R5G5B5:
-			case D3DFMT_A4R4G4B4:
-			case D3DFMT_R3G3B2:
-			case D3DFMT_A8R3G3B2:
-			case D3DFMT_X4R4G4B4:
-			case D3DFMT_A8P8:
-			case D3DFMT_P8:
+			case D3DFMT_A2R10G10B10:
+				if (m_SurfaceFmt != D3DFMT_X8R8G8B8) {
+					merit = 100;
+				} else {
+					merit = 80;
+				}
+				break;
+			case D3DFMT_X8R8G8B8:
+				merit = 90;
+				break;
+			case FCC('NV12'):
+				merit = 70;
+				break;
+			case FCC('YUY2'):
+				merit = 60;
+				break;
+			case FCC('P010'):
+				merit = 50;
+				break;
+			// an accepted format, but fails on most surface types
+			case D3DFMT_A8R8G8B8:
+			default:
 				merit = 0;
 				return MF_E_INVALIDMEDIATYPE;
-		}
-
-		merit = 2;
-
-		if (m_inputMediaType.subtype == MEDIASUBTYPE_NV12 || m_inputMediaType.subtype == MEDIASUBTYPE_YV12) {
-			switch (mix_fmt) {
-				case FCC('NV12'): merit = 90; break;
-				case FCC('YUY2'): merit = 80; break;
-				case FCC('P010'): merit = 70; break;
-				case D3DFMT_X8R8G8B8: merit = 60; break;
-				case D3DFMT_A2R10G10B10: merit = 50; break;
-			}
-		}
-		else if (m_inputMediaType.subtype == MEDIASUBTYPE_YUY2 || m_inputMediaType.subtype == MEDIASUBTYPE_UYVY) {
-			switch (mix_fmt) {
-				case FCC('YUY2'): merit = 90; break;
-				case D3DFMT_X8R8G8B8: merit = 80; break;
-				case D3DFMT_A2R10G10B10: merit = 70; break;
-				case FCC('NV12'): merit = 60; break; // colour degradation
-				case FCC('P010'): merit = 50; break; // colour degradation
-			}
-		}
-		else if (m_inputMediaType.subtype == MEDIASUBTYPE_P010) {
-			switch (mix_fmt) {
-				case FCC('P010'): merit = 90; break;
-				case D3DFMT_A2R10G10B10: merit = 80; break;
-				case D3DFMT_X8R8G8B8: merit = 70; break; // bit depth degradation
-				case FCC('YUY2'): merit = 60; break; // bit depth degradation
-				case FCC('NV12'): merit = 50; break; // bit depth degradation
-			}
-		}
-		else if (m_inputMediaType.subtype == MEDIASUBTYPE_AYUV
-				|| m_inputMediaType.subtype == MEDIASUBTYPE_RGB32
-				|| m_inputMediaType.subtype == MEDIASUBTYPE_ARGB32) {
-			switch (mix_fmt) {
-				case D3DFMT_X8R8G8B8: merit = 90; break;
-				case D3DFMT_A2R10G10B10: merit = 80; break;
-				case FCC('YUY2'): merit = 70; break; // colour degradation
-				case FCC('NV12'): merit = 60; break; // colour degradation
-				case FCC('P010'): merit = 50; break; // colour degradation
-			}
 		}
 	}
 
