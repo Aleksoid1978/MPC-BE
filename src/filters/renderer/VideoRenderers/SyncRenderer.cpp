@@ -626,6 +626,7 @@ HRESULT CBaseAP::AllocSurfaces(D3DFORMAT Format)
 	m_pScreenSizeTextures[0] = nullptr;
 	m_pScreenSizeTextures[1] = nullptr;
 	m_SurfaceFmt = Format;
+	m_strMixerOutputFmt.Format(L"Mixer output : %s", GetD3DFormatStr(m_SurfaceFmt));
 
 	HRESULT hr;
 	unsigned nTexturesNeeded = m_nSurfaces+2;
@@ -1899,7 +1900,7 @@ void CBaseAP::DrawStats()
 			DrawText(rc, strText, 1);
 			OffsetRect(&rc, 0, TextHeight);
 
-			DrawText(rc, m_strMixerFmtOut, 1);
+			DrawText(rc, m_strMixerOutputFmt, 1);
 			OffsetRect(&rc, 0, TextHeight);
 			if (m_strMsgError.GetLength()) {
 				DrawText(rc, m_strMsgError, 1);
@@ -2757,53 +2758,48 @@ HRESULT CSyncAP::SetMediaType(IMFMediaType* pType)
 	CHECK_HR(pType->GetRepresentation(FORMAT_VideoInfo2, (void**)&pAMMedia));
 
 	hr = InitializeDevice(pAMMedia);
-	if (SUCCEEDED(hr)) {
-		strTemp = GetGUIDString(pAMMedia->subtype);
-		strTemp.Replace(L"MEDIASUBTYPE_", L"");
-		m_strMixerFmtOut.Format (L"Mixer output : %s", strTemp);
-	}
 
 	pType->FreeRepresentation(FORMAT_VideoInfo2, (void*)pAMMedia);
 
 	return hr;
 }
 
-LONGLONG CSyncAP::GetMediaTypeMerit(IMFMediaType *pMediaType)
+int CSyncAP::GetOutputMediaTypeMerit(IMFMediaType *pMediaType)
 {
 	AM_MEDIA_TYPE *pAMMedia = nullptr;
 	MFVIDEOFORMAT *VideoFormat;
 
 	HRESULT hr;
-	CHECK_HR(pMediaType->GetRepresentation  (FORMAT_MFVideoFormat, (void**)&pAMMedia));
+	if (FAILED(hr = pMediaType->GetRepresentation(FORMAT_MFVideoFormat, (void**)&pAMMedia))) {
+		return 0;
+	};
 	VideoFormat = (MFVIDEOFORMAT*)pAMMedia->pbFormat;
 
-	LONGLONG Merit = 0;
+	int merit = 0;
 	switch (VideoFormat->surfaceInfo.Format) {
-		case FCC('NV12'):
-			Merit = 90000000;
+		case D3DFMT_X8R8G8B8:
+			merit = 80;
 			break;
-		case FCC('YV12'):
-			Merit = 80000000;
+		case D3DFMT_A2R10G10B10:
+			merit = 70;
+			break;
+		case FCC('NV12'):
+			merit = 60;
 			break;
 		case FCC('YUY2'):
-			Merit = 70000000;
+			merit = 50;
 			break;
-		case FCC('UYVY'):
-			Merit = 60000000;
+		case FCC('P010'):
+			merit = 40;
 			break;
-
-		case D3DFMT_X8R8G8B8: // Never opt for RGB
 		case D3DFMT_A8R8G8B8:
-		case D3DFMT_R8G8B8:
-		case D3DFMT_R5G6B5:
-			Merit = 0;
-			break;
 		default:
-			Merit = 1000;
+			merit = 0;
 			break;
 	}
 	pMediaType->FreeRepresentation(FORMAT_MFVideoFormat, (void*)pAMMedia);
-	return Merit;
+
+	return merit;
 }
 
 HRESULT CSyncAP::RenegotiateMediaType()
@@ -2858,12 +2854,12 @@ HRESULT CSyncAP::RenegotiateMediaType()
 			hr = m_pMixer->SetOutputType(0, pType, MFT_SET_TYPE_TEST_ONLY);
 		}
 		if (SUCCEEDED(hr)) {
-			LONGLONG Merit = GetMediaTypeMerit(pType);
+			int Merit = GetOutputMediaTypeMerit(pType);
 
 			size_t nTypes = ValidMixerTypes.GetCount();
 			size_t iInsertPos = 0;
 			for (size_t i = 0; i < nTypes; ++i) {
-				LONGLONG ThisMerit = GetMediaTypeMerit(ValidMixerTypes[i]);
+				int ThisMerit = GetOutputMediaTypeMerit(ValidMixerTypes[i]);
 				if (Merit > ThisMerit) {
 					iInsertPos = i;
 					break;
