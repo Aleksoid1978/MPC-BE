@@ -417,6 +417,43 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	}
 
 	if (m_RAWType == RAW_NONE && COMPARE(SHORT_START_CODE)) {
+		// MPEG-PS probe
+		m_pFile->Seek(0);
+		int cnt = 0, limit = 5;
+		int ps = 0;
+
+		m_pFile->Seek(0);
+		BYTE id = 0x00;
+		while (cnt < limit && m_pFile->GetPos() < std::min(64I64 * KILOBYTE, m_pFile->GetLength())) {
+			if (!m_pFile->NextMpegStartCode(id)) {
+				continue;
+			}
+			if (id == 0xba) { // program stream header
+				const BYTE b = (BYTE)m_pFile->BitRead(8, true);
+				if (((b & 0xf1) == 0x21) || ((b & 0xc4) == 0x44)) {
+					ps++;
+				}
+			} else if (id == 0xbb) { // program stream system header
+				const WORD len = (WORD)m_pFile->BitRead(16);
+				m_pFile->Seek(m_pFile->GetPos() + len);
+				if (m_pFile->BitRead(24, true) == 0x000001) {
+					cnt++;
+				}
+			} else if ((id >= 0xbd && id < 0xf0) || (id == 0xfd)) { // pes packet
+				const WORD len = (WORD)m_pFile->BitRead(16);
+				m_pFile->Seek(m_pFile->GetPos() + len);
+				if (m_pFile->BitRead(24, true) == 0x000001) {
+					cnt++;
+				}
+			}
+		}
+
+		if (ps > 0 && cnt == limit) {
+			return E_FAIL;
+		}
+	}
+
+	if (m_RAWType == RAW_NONE && COMPARE(SHORT_START_CODE)) {
 		m_pFile->Seek(0);
 		CBaseSplitterFileEx::seqhdr h;
 		if (m_pFile->Read(h, (int)std::min((__int64)KILOBYTE, m_pFile->GetLength()), &mt, false)) {

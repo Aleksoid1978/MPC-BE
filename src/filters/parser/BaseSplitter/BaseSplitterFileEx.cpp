@@ -1289,7 +1289,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, std::vector<BYTE>& pData, CMediaType* 
 		Nalu.ReadNext();
 		while (!(sps_present && pps_present)) {
 			NALU_TYPE nalu_type = Nalu.GetType();
-			if (!Nalu.ReadNext() || nalu_type > NALU_TYPE_UNSPECIFIED24) {
+			if (!Nalu.ReadNext()) {
 				break;
 			}
 			switch (nalu_type) {
