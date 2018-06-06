@@ -251,6 +251,7 @@ HRESULT CDX9RenderingEngine::CreateVideoSurfaces()
 	else {
 		m_VideoBufferFmt = m_SurfaceFmt;
 	}
+	m_strMixerOutputFmt = GetD3DFormatStr(m_VideoBufferFmt);
 
 	for (unsigned i = 0; i < m_nSurfaces; i++) {
 		if (FAILED(hr = m_pD3DDevEx->CreateTexture(

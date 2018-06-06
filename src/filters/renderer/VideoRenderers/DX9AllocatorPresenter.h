@@ -249,9 +249,8 @@ namespace DSObjects
 		LONGLONG				m_LastFrameDuration;
 		LONGLONG				m_LastSampleTime;
 
-		CString					m_strMixerFmtIn;
-		CString					m_strMixerFmtOut;
-		CString					m_strSurfaceFmt;
+		CString					m_strInputFmt;
+		CString					m_strProcessingFmt;
 		CString					m_strBackbufferFmt;
 
 		CString					m_D3D9Device;

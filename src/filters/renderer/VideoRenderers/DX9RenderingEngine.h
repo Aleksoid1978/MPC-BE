@@ -94,6 +94,7 @@ namespace DSObjects
 		DXVA2_ExtendedFormat		m_inputExtFormat;
 		const wchar_t*				m_wsResizer;
 		const wchar_t*				m_wsResizer2;
+		CString						m_strMixerOutputFmt;
 
 
 		CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pError);

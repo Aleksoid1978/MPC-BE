@@ -738,7 +738,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		m_rcMonitor = mi.rcMonitor;
 	}
 
-	m_strSurfaceFmt = GetD3DFormatStr(m_SurfaceFmt);
+	m_strProcessingFmt = GetD3DFormatStr(m_SurfaceFmt);
 	m_strBackbufferFmt = GetD3DFormatStr(m_BackbufferFmt);
 
 	return S_OK;
@@ -1935,15 +1935,14 @@ void CDX9AllocatorPresenter::DrawStats()
 
 			drawText(strText);
 
-			strText.Format(L"Input format : %s", m_strMixerFmtIn);
+			strText.Format(L"Input format : %s", m_strInputFmt);
 			drawText(strText);
 
-			drawText(L"Surface fmts | Mixer       | VideoBuffer   | Surface       | Backbuffer/Display |");
+			drawText(L"Surface fmts | Mixer output  | Processing    | Backbuffer/Display |");
 			ASSERT(m_BackbufferFmt == m_DisplayFmt);
-			strText.Format(L"             | %-11s | %-13s | %-13s | %-18s |"
-				, m_strMixerFmtOut
-				, GetD3DFormatStr(m_VideoBufferFmt)
-				, m_strSurfaceFmt
+			strText.Format(L"             | %-13s | %-13s | %-18s |"
+				, m_strMixerOutputFmt
+				, m_strProcessingFmt
 				, m_strBackbufferFmt);
 			drawText(strText);
 
@@ -2319,11 +2318,11 @@ void CDX9AllocatorPresenter::OnChangeInput(CComPtr<IPin> pPin)
 		// set mixer format string
 		CString subtypestr = GetGUIDString(input_mt.subtype);
 		if (subtypestr.Left(13) == L"MEDIASUBTYPE_") {
-			m_strMixerFmtIn = subtypestr.Mid(13);
+			m_strInputFmt = subtypestr.Mid(13);
 		} else {
 			BITMAPINFOHEADER bih;
 			if (ExtractBIH(&input_mt, &bih)) {
-				m_strMixerFmtIn.Format(L"%C%C%C%C",
+				m_strInputFmt.Format(L"%C%C%C%C",
 					((char*)&bih.biCompression)[0],
 					((char*)&bih.biCompression)[1],
 					((char*)&bih.biCompression)[2],
@@ -2337,13 +2336,13 @@ void CDX9AllocatorPresenter::OnChangeInput(CComPtr<IPin> pPin)
 				DXVA2_ExtendedFormat exfmt;
 				exfmt.value = vih2->dwControlFlags;
 				if (s_nominalrange[exfmt.NominalRange]) {
-					m_strMixerFmtIn.AppendFormat(L", %S", s_nominalrange[exfmt.NominalRange]);
+					m_strInputFmt.AppendFormat(L", %S", s_nominalrange[exfmt.NominalRange]);
 				}
 				if (s_transfermatrix[exfmt.VideoTransferMatrix]) {
-					m_strMixerFmtIn.AppendFormat(L", %S", s_transfermatrix[exfmt.VideoTransferMatrix]);
+					m_strInputFmt.AppendFormat(L", %S", s_transfermatrix[exfmt.VideoTransferMatrix]);
 				}
 				if (s_transferfunction[exfmt.VideoTransferFunction]) {
-					m_strMixerFmtIn.AppendFormat(L", %S", s_transferfunction[exfmt.VideoTransferFunction]);
+					m_strInputFmt.AppendFormat(L", %S", s_transferfunction[exfmt.VideoTransferFunction]);
 				}
 			}
 		}

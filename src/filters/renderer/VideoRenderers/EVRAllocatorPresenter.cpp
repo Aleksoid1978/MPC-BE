@@ -760,11 +760,7 @@ HRESULT CEVRAllocatorPresenter::SetMediaType(IMFMediaType* pType)
 
 	CHECK_HR(pType->GetRepresentation(FORMAT_VideoInfo2, (LPVOID*)&pAMMedia));
 
-	if (SUCCEEDED(hr == InitializeDevice(pType))) {
-		D3DFORMAT format = D3DFMT_UNKNOWN;
-		GetMediaTypeD3DFormat(pType, format);
-		m_strMixerFmtOut = GetD3DFormatStr(format);
-	}
+	hr = InitializeDevice(pType);
 
 	pType->FreeRepresentation(FORMAT_VideoInfo2, (LPVOID)pAMMedia);
 
