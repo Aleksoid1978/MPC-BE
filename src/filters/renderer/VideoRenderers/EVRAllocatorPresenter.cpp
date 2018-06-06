@@ -797,23 +797,19 @@ HRESULT CEVRAllocatorPresenter::GetMixerMediaTypeMerit(IMFMediaType* pType, int&
 
 		switch (mix_fmt) {
 			case D3DFMT_A2R10G10B10:
-				if (m_SurfaceFmt != D3DFMT_X8R8G8B8) {
-					merit = 100;
-				} else {
-					merit = 80;
-				}
+				merit = (m_SurfaceFmt != D3DFMT_X8R8G8B8) ? 90 : 70;
 				break;
 			case D3DFMT_X8R8G8B8:
-				merit = 90;
+				merit = 80;
 				break;
 			case FCC('NV12'):
-				merit = 70;
-				break;
-			case FCC('YUY2'):
 				merit = 60;
 				break;
-			case FCC('P010'):
+			case FCC('YUY2'):
 				merit = 50;
+				break;
+			case FCC('P010'):
+				merit = 40;
 				break;
 			// an accepted format, but fails on most surface types
 			case D3DFMT_A8R8G8B8:

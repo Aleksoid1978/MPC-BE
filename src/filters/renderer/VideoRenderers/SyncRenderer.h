@@ -301,7 +301,7 @@ namespace GothSync
 		bool m_bVideoSlowerThanDisplay;
 
 		double m_TextScale;
-		CString m_strMixerFmtOut;
+		CString m_strMixerOutputFmt;
 		CString m_strMsgError;
 
 		CGenlock *m_pGenlock; // The video - display synchronizer class
@@ -550,7 +550,7 @@ namespace GothSync
 		void FlushSamples();
 		void FlushSamplesInternal();
 
-		LONGLONG GetMediaTypeMerit(IMFMediaType *pMediaType);
+		int GetOutputMediaTypeMerit(IMFMediaType *pMediaType);
 		HRESULT RenegotiateMediaType();
 		HRESULT IsMediaTypeSupported(IMFMediaType* pMixerType);
 		HRESULT CreateProposedOutputType(IMFMediaType* pMixerType, IMFMediaType** pType);
