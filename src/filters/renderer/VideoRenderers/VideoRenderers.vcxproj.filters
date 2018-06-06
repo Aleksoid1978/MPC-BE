@@ -9,6 +9,9 @@
       <UniqueIdentifier>{48be6b66-cd30-4af5-b7d8-22839d28baaa}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl</Extensions>
     </Filter>
+    <Filter Include="Header Files\Include">
+      <UniqueIdentifier>{1a873151-c074-4ff8-a37e-9b1e957193a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AllocatorCommon.cpp">
@@ -139,14 +142,20 @@
     <ClInclude Include="Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="d3dkmt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="D3DHook.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Variables.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\d3dkmt.h">
+      <Filter>Header Files\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\d3dukmdt.h">
+      <Filter>Header Files\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\d3dumddi.h">
+      <Filter>Header Files\Include</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
