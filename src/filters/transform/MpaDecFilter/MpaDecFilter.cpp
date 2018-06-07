@@ -74,9 +74,9 @@
 #define BS_HEADER_SIZE          8
 #define BS_AC3_SIZE          6144
 #define BS_EAC3_SIZE        24576 // 6144 for DD Plus * 4 for IEC 60958 frames
-#define BS_MAT_SIZE         61424 // max length of MAT data
-#define BS_MAT_OFFSET        2560
-#define BS_TRUEHD_SIZE      61440 // 8 header bytes + 61424 of MAT data + 8 zero byte
+#define BS_MAT_TRUEHD_SIZE  61440                     // 8 header bytes + 61424 of MAT data + 8 zero byte
+#define BS_MAT_TRUEHD_LIMIT (BS_MAT_TRUEHD_SIZE - 24) // IEC total frame size - MAT end code size
+#define BS_MAT_POS_MIDDLE   (BS_HEADER_SIZE + 30708)  // middle point + 8 header bytes
 #define BS_DTSHD_SIZE       32768
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
@@ -889,15 +889,19 @@ HRESULT CMpaDecFilter::ProcessEAC3_SPDIF(BOOL bEOF/* = FALSE*/)
 {
 	HRESULT hr = S_OK;
 
+	auto DeliverPacket = [&] {
+		hr = DeliverBitstream(m_hdmi_bitstream.buf, m_hdmi_bitstream.size, m_rtStartInputCache, IEC61937_EAC3, m_hdmi_bitstream.EAC3State.samplerate, m_hdmi_bitstream.EAC3State.samples * m_hdmi_bitstream.EAC3State.repeat);
+		m_hdmi_bitstream.size = 0;
+
+		m_hdmi_bitstream.EAC3State.count      = 0;
+		m_hdmi_bitstream.EAC3State.repeat     = 0;
+		m_hdmi_bitstream.EAC3State.samples    = 0;
+		m_hdmi_bitstream.EAC3State.samplerate = 0;
+	};
+
 	if (bEOF) {
-		if (m_hdmi_bitstream.Ready()) {
-			hr = DeliverBitstream(m_hdmi_bitstream.buf, m_hdmi_bitstream.size, m_rtStartInputCache, IEC61937_EAC3, m_hdmi_bitstream.samplerate, m_hdmi_bitstream.samples * m_hdmi_bitstream.repeat);
-			m_hdmi_bitstream.count = 0;
-			m_hdmi_bitstream.size  = 0;
-			
-			m_hdmi_bitstream.repeat     = 0;
-			m_hdmi_bitstream.samples    = 0;
-			m_hdmi_bitstream.samplerate = 0;
+		if (m_hdmi_bitstream.EAC3State.Ready()) {
+			DeliverPacket();
 		}
 		return hr;
 	}
@@ -922,20 +926,14 @@ HRESULT CMpaDecFilter::ProcessEAC3_SPDIF(BOOL bEOF/* = FALSE*/)
 			aframe.param1 = EAC3_FRAME_TYPE_INDEPENDENT;
 		}
 
-		if (aframe.param1 == EAC3_FRAME_TYPE_INDEPENDENT && m_hdmi_bitstream.Ready()) {
-			hr = DeliverBitstream(m_hdmi_bitstream.buf, m_hdmi_bitstream.size, m_rtStartInputCache, IEC61937_EAC3, m_hdmi_bitstream.samplerate, m_hdmi_bitstream.samples * m_hdmi_bitstream.repeat);
-			m_hdmi_bitstream.count = 0;
-			m_hdmi_bitstream.size  = 0;
-			
-			m_hdmi_bitstream.repeat     = 0;
-			m_hdmi_bitstream.samples    = 0;
-			m_hdmi_bitstream.samplerate = 0;
+		if (aframe.param1 == EAC3_FRAME_TYPE_INDEPENDENT && m_hdmi_bitstream.EAC3State.Ready()) {
+			DeliverPacket();
 			if (FAILED(hr)) {
 				return hr;
 			}
 		}
 
-		if (m_hdmi_bitstream.count == 0 && aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT) {
+		if (m_hdmi_bitstream.EAC3State.count == 0 && aframe.param1 == EAC3_FRAME_TYPE_DEPENDENT) {
 			DLog(L"CMpaDecFilter::ProcessEAC3_SPDIF() : Ignoring dependent frame without independent frame.");
 			p += size;
 			continue;
@@ -956,11 +954,11 @@ HRESULT CMpaDecFilter::ProcessEAC3_SPDIF(BOOL bEOF/* = FALSE*/)
 		}
 
 		if (aframe.param1 == EAC3_FRAME_TYPE_INDEPENDENT) {
-			m_hdmi_bitstream.count++;
-			if (!m_hdmi_bitstream.repeat) {
-				m_hdmi_bitstream.repeat = repeat;
-				m_hdmi_bitstream.samples = aframe.samples;
-				m_hdmi_bitstream.samplerate = aframe.samplerate;
+			m_hdmi_bitstream.EAC3State.count++;
+			if (!m_hdmi_bitstream.EAC3State.repeat) {
+				m_hdmi_bitstream.EAC3State.repeat = repeat;
+				m_hdmi_bitstream.EAC3State.samples = aframe.samples;
+				m_hdmi_bitstream.EAC3State.samplerate = aframe.samplerate;
 			}
 		}
 
@@ -978,12 +976,134 @@ HRESULT CMpaDecFilter::ProcessEAC3_SPDIF(BOOL bEOF/* = FALSE*/)
 	return S_OK;
 }
 
+static const BYTE mat_start_code[20]  = { 0x07, 0x9E, 0x00, 0x03, 0x84, 0x01, 0x01, 0x01, 0x80, 0x00, 0x56, 0xA5, 0x3B, 0xF4, 0x81, 0x83, 0x49, 0x80, 0x77, 0xE0 };
+static const BYTE mat_middle_code[12] = { 0xC3, 0xC1, 0x42, 0x49, 0x3B, 0xFA, 0x82, 0x83, 0x49, 0x80, 0x77, 0xE0 };
+static const BYTE mat_end_code[24]    = { 0xC3, 0xC2, 0xC0, 0xC4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x97, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+void CMpaDecFilter::MATWriteHeader()
+{
+	ASSERT(m_hdmi_bitstream.size == 0);
+
+	// skip 8 header bytes and write MAT start code
+	memcpy(m_hdmi_bitstream.buf + BS_HEADER_SIZE, mat_start_code, sizeof(mat_start_code));
+	m_hdmi_bitstream.size = BS_HEADER_SIZE + sizeof(mat_start_code);
+
+	// unless the start code falls into the padding,  its considered part of the current MAT frame
+	// Note that audio frames are not always aligned with MAT frames, so we might already have a partial frame at this point
+	DWORD dwSize = BS_HEADER_SIZE + sizeof(mat_start_code);
+	m_hdmi_bitstream.TrueHDMATState.mat_framesize += dwSize;
+
+	// The MAT metadata counts as padding, if we're scheduled to write any, which mean the start bytes should reduce any further padding.
+	if (m_hdmi_bitstream.TrueHDMATState.padding > 0) {
+		// if the header fits into the padding of the last frame, just reduce the amount of needed padding
+		if (m_hdmi_bitstream.TrueHDMATState.padding > dwSize) {
+			m_hdmi_bitstream.TrueHDMATState.padding -= dwSize;
+			m_hdmi_bitstream.TrueHDMATState.mat_framesize = 0;
+		} else { // otherwise, consume all padding and set the size of the next MAT frame to the remaining data
+			m_hdmi_bitstream.TrueHDMATState.mat_framesize = (dwSize - m_hdmi_bitstream.TrueHDMATState.padding);
+			m_hdmi_bitstream.TrueHDMATState.padding = 0;
+		}
+	}
+}
+
+void CMpaDecFilter::MATWritePadding()
+{
+	if (m_hdmi_bitstream.TrueHDMATState.padding > 0) {
+		static BYTE padding[5120] = {};
+
+		memset(padding, 0, m_hdmi_bitstream.TrueHDMATState.padding);
+		int remaining = MATFillDataBuffer(padding, m_hdmi_bitstream.TrueHDMATState.padding, true);
+
+		// not all padding could be written to the buffer, write it later
+		if (remaining >= 0) {
+			m_hdmi_bitstream.TrueHDMATState.padding = remaining;
+			m_hdmi_bitstream.TrueHDMATState.mat_framesize = 0;
+		} else {// more padding then requested was written, eg. there was a MAT middle/end marker that needed to be written
+			m_hdmi_bitstream.TrueHDMATState.padding = 0;
+			m_hdmi_bitstream.TrueHDMATState.mat_framesize = -remaining;
+		}
+	}
+}
+
+void CMpaDecFilter::MATAppendData(const BYTE *p, int size)
+{
+	memcpy(m_hdmi_bitstream.buf + m_hdmi_bitstream.size, p, size);
+	m_hdmi_bitstream.size += size;
+	m_hdmi_bitstream.TrueHDMATState.mat_framesize += size;
+}
+
+int CMpaDecFilter::MATFillDataBuffer(const BYTE *p, int size, bool padding)
+{
+	if (m_hdmi_bitstream.size >= BS_MAT_TRUEHD_LIMIT) {
+		return size;
+	}
+
+	int remaining = size;
+
+	// Write MAT middle marker, if needed
+	// The MAT middle marker always needs to be in the exact same spot, any audio data will be split.
+	// If we're currently writing padding, then the marker will be considered as padding data and reduce the amount of padding still required.
+	if (m_hdmi_bitstream.size <= BS_MAT_POS_MIDDLE && m_hdmi_bitstream.size + size > BS_MAT_POS_MIDDLE) {
+		// write as much data before the middle code as we can
+		int nBytesBefore = BS_MAT_POS_MIDDLE - m_hdmi_bitstream.size;
+		MATAppendData(p, nBytesBefore);
+		remaining -= nBytesBefore;
+
+		// write the MAT middle code
+		MATAppendData(mat_middle_code, sizeof(mat_middle_code));
+
+		// if we're writing padding, deduct the size of the code from it
+		if (padding) {
+			remaining -= sizeof(mat_middle_code);
+		}
+
+		// write remaining data after the MAT marker
+		if (remaining > 0) {
+			MATAppendData(p + nBytesBefore, remaining);
+			remaining = 0;
+		}
+
+		return remaining;
+	}
+
+	// not enough room in the buffer to write all the data, write as much as we can and add the MAT footer
+	if (m_hdmi_bitstream.size + size > BS_MAT_TRUEHD_LIMIT) {
+		// write as much data before the middle code as we can
+		int nBytesBefore = BS_MAT_TRUEHD_LIMIT - m_hdmi_bitstream.size;
+		MATAppendData(p, nBytesBefore);
+		remaining -= nBytesBefore;
+
+		// write the MAT end code
+		MATAppendData(mat_end_code, sizeof(mat_end_code));
+
+		// MAT markers don't displace padding, so reduce the amount of padding
+		if (padding) {
+			remaining -= sizeof(mat_end_code);
+		}
+
+		// any remaining data will be written in future calls
+		return remaining;
+	}
+
+	MATAppendData(p, size);
+
+	return 0;
+}
+
+HRESULT CMpaDecFilter::MATDeliverPacket()
+{
+	HRESULT hr = S_OK;
+	if (m_hdmi_bitstream.size > 0) {
+		// Deliver MAT packet
+		hr = DeliverBitstream(m_hdmi_bitstream.buf + BS_HEADER_SIZE, m_hdmi_bitstream.size - BS_HEADER_SIZE, m_rtStartInputCache, IEC61937_TRUEHD, 0, 0);
+		m_hdmi_bitstream.size = 0;
+	}
+
+	return hr;
+}
+
 HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 {
-	const BYTE mat_start_code[20]  = { 0x07, 0x9E, 0x00, 0x03, 0x84, 0x01, 0x01, 0x01, 0x80, 0x00, 0x56, 0xA5, 0x3B, 0xF4, 0x81, 0x83, 0x49, 0x80, 0x77, 0xE0 };
-	const BYTE mat_middle_code[12] = { 0xC3, 0xC1, 0x42, 0x49, 0x3B, 0xFA, 0x82, 0x83, 0x49, 0x80, 0x77, 0xE0 };
-	const BYTE mat_end_code[16]    = { 0xC3, 0xC2, 0xC0, 0xC4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x97, 0x11 };
-
 	HRESULT hr;
 
 	BYTE* const base = m_buff.Data();
@@ -995,8 +1115,10 @@ HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 		int size = ParseMLPHeader(p, &aframe);
 		if (size > 0) {
 			// sync frame
-			m_hdmi_bitstream.truehd_samplerate  = aframe.samplerate;
-			m_hdmi_bitstream.truehd_framelength = aframe.samples;
+			m_hdmi_bitstream.TrueHDMATState.sync = true;
+
+			// get the ratebits from the sync frame
+			m_hdmi_bitstream.TrueHDMATState.ratebits = p[8] >> 4;
 		} else {
 			int ac3size = ParseAC3Header(p);
 			if (ac3size == 0) {
@@ -1011,7 +1133,7 @@ HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 			}
 		}
 
-		if (size == 0 && m_hdmi_bitstream.truehd_framelength > 0) {
+		if (size == 0 && m_hdmi_bitstream.TrueHDMATState.sync) {
 			// get not sync frame size
 			size = ((p[0] << 8 | p[1]) & 0xfff) * 2;
 		}
@@ -1029,39 +1151,77 @@ HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 			break;
 		}
 
-		m_hdmi_bitstream.count++;
-		if (m_hdmi_bitstream.count == 1) {
-			// skip 8 header bytes and write MAT start code
-			memcpy(m_hdmi_bitstream.buf + BS_HEADER_SIZE, mat_start_code, sizeof(mat_start_code));
-			m_hdmi_bitstream.size = BS_HEADER_SIZE + sizeof(mat_start_code);
-		} else if (m_hdmi_bitstream.count == 13) {
-			memcpy(m_hdmi_bitstream.buf + (BS_HEADER_SIZE + BS_MAT_SIZE) / 2, mat_middle_code, sizeof(mat_middle_code));
-			m_hdmi_bitstream.size = (BS_HEADER_SIZE + BS_MAT_SIZE) / 2 + sizeof(mat_middle_code);
+		uint16_t frame_time = (p[2] << 8 | p[3]);
+		uint32_t space_size = 0;
+
+		// compute final padded size for the previous frame, if any
+		if (m_hdmi_bitstream.TrueHDMATState.prev_frametime_valid) {
+			space_size = ((frame_time - m_hdmi_bitstream.TrueHDMATState.prev_frametime) & 0xff) * (64 >> (m_hdmi_bitstream.TrueHDMATState.ratebits & 7));
 		}
 
-		if (m_hdmi_bitstream.size + size <= m_hdmi_bitstream.count * BS_MAT_OFFSET) {
-			memcpy(m_hdmi_bitstream.buf + m_hdmi_bitstream.size, p, size);
-			m_hdmi_bitstream.size += size;
-			memset(m_hdmi_bitstream.buf + m_hdmi_bitstream.size, 0, m_hdmi_bitstream.count * BS_MAT_OFFSET - m_hdmi_bitstream.size);
-			m_hdmi_bitstream.size = m_hdmi_bitstream.count * BS_MAT_OFFSET;
-		} else {
-			ASSERT(0);
+		// compute padding (ie. difference to the size of the previous frame)
+		m_hdmi_bitstream.TrueHDMATState.padding += (space_size - m_hdmi_bitstream.TrueHDMATState.prev_mat_framesize) & 0xfff;
+
+		// store frame time of the previous frame
+		m_hdmi_bitstream.TrueHDMATState.prev_frametime = frame_time;
+		m_hdmi_bitstream.TrueHDMATState.prev_frametime_valid = true;
+
+		// if the buffer is as full as its going to be, add the MAT footer and flush it
+		if (m_hdmi_bitstream.size >= BS_MAT_TRUEHD_LIMIT) {
+			// write footer and remove it from the padding
+			MATAppendData(mat_end_code, sizeof(mat_end_code));
+			m_hdmi_bitstream.TrueHDMATState.padding -= sizeof(mat_end_code);
+
+			// flush packet out
+			hr = MATDeliverPacket();
+			if (FAILED(hr)) {
+				return hr;
+			}
 		}
+
+		// Write the MAT header into the fresh buffer
+		if (m_hdmi_bitstream.size == 0) {
+			MATWriteHeader();
+		}
+
+		// write padding of the previous frame (if any)
+		MATWritePadding();
+
+		// Buffer is full, submit it
+		if (m_hdmi_bitstream.size >= (BS_MAT_TRUEHD_SIZE - BS_HEADER_SIZE)) {
+			hr = MATDeliverPacket();
+			if (FAILED(hr)) {
+				return hr;
+			}
+
+			// and setup a new buffer
+			MATWriteHeader();
+			MATWritePadding();
+		}
+
+		// write actual audio data to the buffer
+		int remaining = MATFillDataBuffer(p, size);
+
+		// not all data could be written
+		if (remaining) {
+			// flush out old data
+			hr = MATDeliverPacket();
+			if (FAILED(hr)) {
+				return hr;
+			}
+
+			// .. setup a new buffer
+			MATWriteHeader();
+
+			// and write the remaining data
+			MATFillDataBuffer(p + (size - remaining), remaining);
+		}
+
+		// store the size of the current MAT frame, so we can add padding later
+		m_hdmi_bitstream.TrueHDMATState.prev_mat_framesize = m_hdmi_bitstream.TrueHDMATState.mat_framesize;
+		m_hdmi_bitstream.TrueHDMATState.mat_framesize = 0;
+
 		p += size;
-
-		if (m_hdmi_bitstream.count < 24) {
-			break;
-		}
-
-		memcpy(m_hdmi_bitstream.buf + (BS_HEADER_SIZE + BS_MAT_SIZE) - sizeof(mat_end_code), mat_end_code, sizeof(mat_end_code));
-		m_hdmi_bitstream.size = (BS_HEADER_SIZE + BS_MAT_SIZE);
-
-		hr = DeliverBitstream(m_hdmi_bitstream.buf + BS_HEADER_SIZE, m_hdmi_bitstream.size - BS_HEADER_SIZE, m_rtStartInputCache, IEC61937_TRUEHD, m_hdmi_bitstream.truehd_samplerate, m_hdmi_bitstream.truehd_framelength * 24);
-		m_hdmi_bitstream.count = 0;
-		m_hdmi_bitstream.size  = 0;
-		if (FAILED(hr)) {
-			return hr;
-		}
 	}
 
 	m_buff.RemoveHead(p - base);
@@ -1641,7 +1801,7 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, const int size, const REFER
 			isHDMI = true;
 			break;
 		case IEC61937_TRUEHD:
-			length = BS_TRUEHD_SIZE;
+			length = BS_MAT_TRUEHD_SIZE;
 			isHDMI = true;
 			break;
 		default:
