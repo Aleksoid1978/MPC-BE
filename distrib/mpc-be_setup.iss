@@ -359,7 +359,12 @@ begin
     ShellObj := CreateOleObject('Shell.Application');
     SrcFile := ShellObj.NameSpace(ZipFile);
     DestFolder := ShellObj.NameSpace(TargetFolder);
-    DestFolder.CopyHere(SrcFile.Items, SHCONTCH_NOPROGRESSBOX or SHCONTCH_RESPONDYESTOALL);
+    try
+      DestFolder.CopyHere(SrcFile.Items, SHCONTCH_NOPROGRESSBOX or SHCONTCH_RESPONDYESTOALL);
+    except
+      Log('ERROR: unziping failed');
+      MsgBox('Unable to extract ' + ZipFile, mbError, MB_OK);
+    end;
     Log('Unzip done.');
   end else
     Log('ERROR: File ' + ZipFile + ' not found');
