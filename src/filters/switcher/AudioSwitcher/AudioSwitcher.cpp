@@ -266,11 +266,11 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 	REFERENCE_TIME delay = 0;
 
-	bool center_level = (audio_layout&SPEAKER_FRONT_CENTER) && m_dCenterLevel != 1.0;
+	bool levels = (audio_layout&SPEAKER_FRONT_CENTER) && m_dCenterLevel != 1.0
+				|| (audio_layout&(SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT|SPEAKER_BACK_CENTER|SPEAKER_SIDE_LEFT|SPEAKER_SIDE_RIGHT)) && m_dSurroundLevel != 1.0;
 
 	// Mixer
-	if (audio_layout != output_layout || audio_samplerate != output_samplerate || center_level) {
-		m_Mixer.SetOptions(m_dCenterLevel, false);
+	if (audio_layout != output_layout || audio_samplerate != output_samplerate || levels) {
 		m_Mixer.UpdateInput(audio_sampleformat, audio_layout, audio_samplerate);
 		m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, output_layout, output_samplerate);
 
@@ -540,6 +540,8 @@ STDMETHODIMP CAudioSwitcherFilter::SetLevels(double dCenterLevel_dB, double dSur
 
 	dSurroundLevel_dB = std::clamp(dSurroundLevel_dB, AUDIO_LEVEL_MIN, AUDIO_LEVEL_MAX);
 	m_dSurroundLevel = decibel2factor(dSurroundLevel_dB);
+
+	m_Mixer.SetOptions(m_dCenterLevel, m_dSurroundLevel, false);
 
 	return S_OK;
 }

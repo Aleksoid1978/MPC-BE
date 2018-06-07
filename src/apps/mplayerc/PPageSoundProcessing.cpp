@@ -166,10 +166,6 @@ BOOL CPPageSoundProcessing::OnInitDialog()
 	m_sldCenter.SetPos((int)std::round(s.dAudioCenter_dB * 10));
 	m_sldSurround.SetRange(APP_AUDIOLEVEL_MIN * 10, APP_AUDIOLEVEL_MAX * 10, TRUE);
 	m_sldSurround.SetPos((int)std::round(s.dAudioSurround_dB * 10));
-#ifndef _DEBUG
-	m_stcSurround.ShowWindow(SW_HIDE);
-	m_sldSurround.ShowWindow(SW_HIDE);
-#endif
 
 	m_sldGain.SetRange(APP_AUDIOGAIN_MIN * 10, APP_AUDIOGAIN_MAX * 10, TRUE);
 	m_sldGain.SetPos((int)std::round(s.dAudioGain_dB * 10));

@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "AudioHelper.h"
+#include "../DSUtil/Utils.h"
 #include "Mixer.h"
 
 #pragma warning(push)
@@ -36,6 +37,7 @@ CMixer::CMixer()
 	: m_pSWRCxt(nullptr)
 	, m_matrix_dbl(nullptr)
 	, m_center_level(1.0)
+	, m_surround_level(1.0)
 	, m_normalize_matrix(false)
 	, m_ActualContext(false)
 	, m_in_sf(SAMPLE_FMT_NONE)
@@ -138,16 +140,31 @@ bool CMixer::Init()
 			}
 		}
 
-		if (m_out_layout&AV_CH_FRONT_CENTER && m_center_level != 1.0) {
-			int center_pos = 0;
-			if (m_out_layout & AV_CH_FRONT_LEFT) center_pos++;
-			if (m_out_layout & AV_CH_FRONT_RIGHT) center_pos++;
-			m_matrix_dbl[center_pos * in_ch + center_pos] *= m_center_level;
+		if (m_in_layout&AV_CH_FRONT_CENTER && m_center_level != 1.0) {
+			m_matrix_dbl[BitNum(m_in_layout, AV_CH_FRONT_CENTER) * (in_ch + 1)] *= m_center_level;
+		}
+
+		if (m_surround_level != 1.0) {
+			if (m_in_layout&AV_CH_BACK_LEFT) {
+				m_matrix_dbl[BitNum(m_in_layout, AV_CH_BACK_LEFT) * (in_ch + 1)] *= m_surround_level;
+			}
+			if (m_in_layout&AV_CH_BACK_RIGHT) {
+				m_matrix_dbl[BitNum(m_in_layout, AV_CH_BACK_RIGHT) * (in_ch + 1)] *= m_surround_level;
+			}
+			if (m_in_layout&AV_CH_BACK_CENTER) {
+				m_matrix_dbl[BitNum(m_in_layout, AV_CH_BACK_CENTER) * (in_ch + 1)] *= m_surround_level;
+			}
+			if (m_in_layout&AV_CH_SIDE_LEFT) {
+				m_matrix_dbl[BitNum(m_out_layout, AV_CH_SIDE_LEFT) * (in_ch + 1)] *= m_surround_level;
+			}
+			if (m_in_layout&AV_CH_SIDE_RIGHT) {
+				m_matrix_dbl[BitNum(m_in_layout, AV_CH_SIDE_RIGHT) * (in_ch + 1)] *= m_surround_level;
+			}
 		}
 	}
 	else {
 		const double center_mix_level   = M_SQRT1_2 * m_center_level;
-		const double surround_mix_level = 1.0;
+		const double surround_mix_level = 1.0 * m_surround_level;
 		const double lfe_mix_level      = 1.0;
 		const double rematrix_maxval    = INT_MAX; // matrix coefficients will not be normalized
 		const double rematrix_volume    = 0.0; // not to do a rematrix.
@@ -239,10 +256,11 @@ bool CMixer::Init()
 	return true;
 }
 
-void CMixer::SetOptions(double center_level, bool normalize_matrix)
+void CMixer::SetOptions(double center_level, double suround_level, bool normalize_matrix)
 {
-	if (center_level != m_center_level || normalize_matrix != m_normalize_matrix) {
+	if (center_level != m_center_level || suround_level != m_surround_level || normalize_matrix != m_normalize_matrix) {
 		m_center_level = center_level;
+		m_surround_level = suround_level;
 		m_normalize_matrix = normalize_matrix;
 		m_ActualContext = false;
 	}
