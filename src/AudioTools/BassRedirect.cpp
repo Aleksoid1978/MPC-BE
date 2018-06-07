@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2017 see Authors.txt
+ * (C) 2016-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,27 +21,8 @@
 #include "stdafx.h"
 #include "AudioHelper.h"
 #include <MMReg.h>
-#include "../DSUtil/Utils.h" // for CountBits()
+#include "../DSUtil/Utils.h"
 #include "BassRedirect.h"
-
-int get_channel_num(DWORD layout, DWORD channel)
-{
-	ASSERT(layout & channel);
-	ASSERT(CountBits(channel) == 1);
-
-	int num = 0;
-	for (unsigned i = 0; i < 32; i++) {
-		DWORD mask = (1 << i);
-		if (channel == mask) {
-			break;
-		}
-		if (layout & mask) {
-			num++;
-		}
-	}
-
-	return num;
-}
 
 // CBassRedirect
 
@@ -109,7 +90,7 @@ void CBassRedirect::UpdateInput(SampleFormat sf, DWORD layout, int samplerate)
 	if (layout != m_layout) {
 		m_layout = layout;
 		m_chanels = CountBits(layout);
-		m_lfepos = get_channel_num(layout, SPEAKER_LOW_FREQUENCY);
+		m_lfepos = BitNum(layout, SPEAKER_LOW_FREQUENCY);
 		m_sample = 0.0f;
 	}
 
