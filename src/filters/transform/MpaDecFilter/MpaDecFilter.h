@@ -82,20 +82,34 @@ protected:
 
 	struct {
 		BYTE buf[61440];
-		int  count;
 		int  size;
-		int  truehd_samplerate;
-		int  truehd_framelength;
 
-		// E-AC3 block
-		int  repeat;
-		int  samples;
-		int  samplerate;
+		// E-AC3 Bitstreaming
+		struct {
+			int count;
+			int repeat;
+			int samples;
+			int samplerate;
 
-		bool Ready() const {
-			return repeat > 0 && repeat == count;
-		}
+			bool Ready() const {
+				return repeat > 0 && repeat == count;
+			}
+		} EAC3State;
 
+		// TrueHD Bitstreaming
+		struct {
+			bool sync;
+
+			int ratebits;
+
+			int prev_frametime;
+			bool prev_frametime_valid ;
+
+			int mat_framesize;
+			int prev_mat_framesize;
+
+			DWORD padding;
+		} TrueHDMATState;
 	} m_hdmi_bitstream = {};
 
 	CFFAudioDecoder m_FFAudioDec;
@@ -145,7 +159,14 @@ protected:
 	HRESULT ProcessHdmvLPCM();
 	HRESULT ProcessAC3_SPDIF();
 	HRESULT ProcessEAC3_SPDIF(BOOL bEOF = FALSE);
+
+	void MATWriteHeader();
+	void MATWritePadding();
+	void MATAppendData(const BYTE *p, int size);
+	int MATFillDataBuffer(const BYTE *p, int size, bool padding = false);
+	HRESULT MATDeliverPacket();
 	HRESULT ProcessTrueHD_SPDIF();
+
 	HRESULT ProcessDTS_SPDIF(BOOL bEOF = FALSE);
 	HRESULT ProcessPS2PCM();
 	HRESULT ProcessPS2ADPCM();
