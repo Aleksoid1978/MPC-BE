@@ -8733,22 +8733,22 @@ void CMainFrame::OnPlayCenterLevel(UINT nID)
 	if (CComQIPtr<IAudioSwitcherFilter> pASF = m_pSwitcherFilter) {
 		switch (nID) {
 		case ID_AUDIO_CENTER_INC:
-			s.fAudioCenter_dB = IncreaseFloatByGrid(s.fAudioCenter_dB, -2);
-			if (s.fAudioCenter_dB > APP_AUDIOLEVEL_MAX) {
-				s.fAudioCenter_dB = APP_AUDIOLEVEL_MAX;
+			s.dAudioCenter_dB = IncreaseFloatByGrid(s.dAudioCenter_dB, -2);
+			if (s.dAudioCenter_dB > APP_AUDIOLEVEL_MAX) {
+				s.dAudioCenter_dB = APP_AUDIOLEVEL_MAX;
 			}
 			break;
 		case ID_AUDIO_CENTER_DEC:
-			s.fAudioCenter_dB = DecreaseFloatByGrid(s.fAudioCenter_dB, -2);
-			if (s.fAudioCenter_dB < APP_AUDIOLEVEL_MIN) {
-				s.fAudioCenter_dB = APP_AUDIOLEVEL_MIN;
+			s.dAudioCenter_dB = DecreaseFloatByGrid(s.dAudioCenter_dB, -2);
+			if (s.dAudioCenter_dB < APP_AUDIOLEVEL_MIN) {
+				s.dAudioCenter_dB = APP_AUDIOLEVEL_MIN;
 			}
 			break;
 		}
-		pASF->SetLevels(s.fAudioCenter_dB, s.fAudioSurround_dB);
+		pASF->SetLevels(s.dAudioCenter_dB, s.dAudioSurround_dB);
 
 		CString osdMessage;
-		osdMessage.Format(IDS_CENTER_LEVEL_OSD, s.fAudioCenter_dB);
+		osdMessage.Format(IDS_CENTER_LEVEL_OSD, s.dAudioCenter_dB);
 		m_OSD.DisplayMessage(OSD_TOPLEFT, osdMessage);
 	}
 }
