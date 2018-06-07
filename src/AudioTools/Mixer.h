@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,6 +30,7 @@ private:
 	SwrContext* m_pSWRCxt;
 	double* m_matrix_dbl;
 	double  m_center_level;
+	double  m_surround_level;
 	bool    m_normalize_matrix;
 	bool    m_ActualContext;
 
@@ -51,7 +52,7 @@ private:
 	bool Init();
 
 public:
-	void SetOptions(double center_level, bool normalize_matrix);
+	void SetOptions(double center_level, double suround_level, bool normalize_matrix);
 	void UpdateInput (SampleFormat  in_sf, DWORD  in_layout, int  in_samplerate = 48000);
 	void UpdateOutput(SampleFormat out_sf, DWORD out_layout, int out_samplerate = 48000);
 

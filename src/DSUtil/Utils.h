@@ -49,6 +49,7 @@ inline void expand_range(T const& val, T& lo, T& hi)
 }
 
 uint32_t CountBits(uint32_t v);
+uint32_t BitNum(uint32_t v, uint32_t b);
 
 void ReduceDim(long &num, long &den);
 void ReduceDim(SIZE &dim);

@@ -31,6 +31,14 @@ uint32_t CountBits(uint32_t v)
 	return (v * 0x01010101) >> 24;
 }
 
+uint32_t BitNum(uint32_t v, uint32_t b)
+{
+	ASSERT(b != 0 && (b & (b - 1)) == 0);
+	ASSERT(v & b);
+
+	return CountBits(v & (b - 1));
+}
+
 int GCD(int a, int b) {
 	if (b) return GCD(b, a%b);
 	else  return a;
