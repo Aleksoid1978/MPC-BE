@@ -94,8 +94,8 @@
 #define APP_BUFDURATION_DEF		3000
 #define APP_BUFDURATION_MAX		10000
 
-#define APP_AUDIOLEVEL_MAX		 10.0f
-#define APP_AUDIOLEVEL_MIN		-10.0f
+#define APP_AUDIOLEVEL_MAX		 10.0
+#define APP_AUDIOLEVEL_MIN		-10.0
 #define APP_AUDIOGAIN_MAX		 10.0
 #define APP_AUDIOGAIN_MIN		 -3.0
 
@@ -684,8 +684,8 @@ public:
 	int				nAudioMixerLayout;
 	bool			bAudioStereoFromDecoder;
 	bool			bAudioBassRedirect;
-	float			fAudioCenter_dB; // need float for swscanf
-	float			fAudioSurround_dB; // need float for swscanf
+	double			dAudioCenter_dB;
+	double			dAudioSurround_dB;
 	double			dAudioGain_dB;
 	bool			bAudioAutoVolumeControl;
 	bool			bAudioNormBoost;
