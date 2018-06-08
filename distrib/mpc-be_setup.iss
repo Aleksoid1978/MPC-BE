@@ -356,10 +356,10 @@ begin
   if FileExists(ZipFile) then
   begin
     Log('Start unziping ' + ZipFile);
-    ShellObj := CreateOleObject('Shell.Application');
-    SrcFile := ShellObj.NameSpace(ZipFile);
-    DestFolder := ShellObj.NameSpace(TargetFolder);
     try
+      ShellObj := CreateOleObject('Shell.Application');
+      SrcFile := ShellObj.NameSpace(ZipFile);
+      DestFolder := ShellObj.NameSpace(TargetFolder);
       DestFolder.CopyHere(SrcFile.Items, SHCONTCH_NOPROGRESSBOX or SHCONTCH_RESPONDYESTOALL);
     except
       Log('ERROR: unziping failed');
