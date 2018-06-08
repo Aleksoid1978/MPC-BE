@@ -164,7 +164,7 @@ bool CMixer::Init()
 	}
 	else {
 		const double center_mix_level   = M_SQRT1_2 * m_center_level;
-		const double surround_mix_level = 1.0 * m_surround_level;
+		const double surround_mix_level = M_SQRT1_2 * m_surround_level;
 		const double lfe_mix_level      = 1.0;
 		const double rematrix_maxval    = INT_MAX; // matrix coefficients will not be normalized
 		const double rematrix_volume    = 0.0; // not to do a rematrix.
