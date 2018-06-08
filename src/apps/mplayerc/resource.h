@@ -1320,6 +1320,7 @@
 #define IDS_CENTER_LEVEL_DEC            33511
 #define IDS_CENTER_LEVEL                33512
 #define IDS_CENTER_LEVEL_OSD            33513
+#define IDS_SURROUND_LEVEL              33514
 // stereoscopic subtitles
 #define IDS_SUBTITLES_STEREO              34000
 #define IDS_SUBTITLES_STEREO_DONTUSE      34001
