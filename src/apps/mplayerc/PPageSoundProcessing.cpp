@@ -52,7 +52,7 @@ void CPPageSoundProcessing::UpdateSurroundInfo()
 {
 	double surround = m_sldSurround.GetPos() / 10.0f;
 	CString str;
-	str.Format(L"Surround level (%+.1f dB)*", surround);
+	str.Format(ResStr(IDS_SURROUND_LEVEL) + L"*", surround);
 	m_stcSurround.SetWindowTextW(str);
 
 	if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {

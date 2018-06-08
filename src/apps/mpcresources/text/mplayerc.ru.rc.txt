@@ -1897,6 +1897,7 @@ STRING IDS_SUB_POS_RIGHT		"Сдвиг позиции субтитров впра
 STRING IDS_SUB_POS_UP		"Сдвиг позиции субтитров вверх"
 STRING IDS_SUB_SAVE_EXTERNAL_STYLE_FILE		"Сохранить пользовательский стиль"
 STRING IDS_SUB_USE_INTERNAL		"встроенный рендерер субтитров"
+STRING IDS_SURROUND_LEVEL		"Окруж. звук (%+.1f dB)"
 STRING IDS_TEXTFILE_ENC		"Кодировка:"
 STRING IDS_THUMB_COLNUMBER		"Столбцов:"
 STRING IDS_THUMB_IMAGE_QUALITY		"Качество изображения"
