@@ -9137,21 +9137,58 @@ void CMainFrame::OnNavigateSkip(UINT nID)
 
 void CMainFrame::OnUpdateNavigateSkip(CCmdUI* pCmdUI)
 {
-	// moved to the timer callback function, that runs less frequent
-	//if (GetPlaybackMode() == PM_FILE) SetupChapters();
+	BOOL bOn = FALSE;
+	if (m_eMediaLoadState == MLS_LOADED) {
+		if (GetPlaybackMode() == PM_DVD && m_iDVDDomain != DVD_DOMAIN_VideoManagerMenu && m_iDVDDomain != DVD_DOMAIN_VideoTitleSetMenu) {
+			bOn = TRUE;
+		} else if (GetPlaybackMode() == PM_CAPTURE && !m_fCapturing) {
+			bOn = TRUE;
+		} else if (GetPlaybackMode() == PM_FILE) {
+			if (m_pCB->ChapGetCount() > 1) {
+				bOn = TRUE;
+			} else if (m_wndPlaylistBar.GetCount() == 1) {
+				if (m_bIsBDPlay) {
+					bOn = !m_BDPlaylists.empty();
+				} else if (!AfxGetAppSettings().fDontUseSearchInFolder) {
+					bOn = TRUE;
+				}
+			} else {
+				bOn = TRUE;
+			}
+		}	
+	}
 
-	pCmdUI->Enable(m_eMediaLoadState == MLS_LOADED
-				   && ((GetPlaybackMode() == PM_DVD
-						&& m_iDVDDomain != DVD_DOMAIN_VideoManagerMenu
-						&& m_iDVDDomain != DVD_DOMAIN_VideoTitleSetMenu)
-					   || (GetPlaybackMode() == PM_FILE  && !AfxGetAppSettings().fDontUseSearchInFolder)
-					   || (GetPlaybackMode() == PM_FILE  && AfxGetAppSettings().fDontUseSearchInFolder && (m_wndPlaylistBar.GetCount() > 1 || m_pCB->ChapGetCount() > 1))
-					   || (GetPlaybackMode() == PM_CAPTURE && !m_fCapturing)));
+	pCmdUI->Enable(bOn);
 }
 
 void CMainFrame::OnNavigateSkipFile(UINT nID)
 {
-	if (GetPlaybackMode() == PM_FILE || GetPlaybackMode() == PM_CAPTURE) {
+	if (m_bIsBDPlay && m_wndPlaylistBar.GetCount() == 1) {
+		if (!m_BDPlaylists.empty()) {
+			auto it = std::find_if(m_BDPlaylists.cbegin(), m_BDPlaylists.cend(), [&](const CHdmvClipInfo::PlaylistItem& item) {
+				return item.m_strFileName == m_strPlaybackRenderedPath;
+			});
+
+			if (nID == ID_NAVIGATE_SKIPBACKFILE) {
+				if (it == m_BDPlaylists.cbegin()) {
+					return;
+				}
+				it--;
+			} else if (nID == ID_NAVIGATE_SKIPFORWARDFILE) {
+				if (it == std::prev(m_BDPlaylists.cend())) {
+					return;
+				}
+				it++;
+			}
+
+			const CString fileName(it->m_strFileName);
+			m_bNeedUnmountImage = FALSE;
+			SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+			m_bIsBDPlay = TRUE;
+
+			OpenFile(fileName, INVALID_TIME, FALSE);
+		}
+	} else if (GetPlaybackMode() == PM_FILE || GetPlaybackMode() == PM_CAPTURE) {
 		if (m_wndPlaylistBar.GetCount() == 1) {
 			if (GetPlaybackMode() == PM_CAPTURE || AfxGetAppSettings().fDontUseSearchInFolder) {
 				SendMessageW(WM_COMMAND, ID_PLAY_STOP); // do not remove this, unless you want a circular call with OnPlayPlay()
@@ -9416,7 +9453,7 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 	if (GetPlaybackMode() == PM_FILE) {
 		UINT id = nID - ID_NAVIGATE_CHAP_SUBITEM_START;
 
-		if (m_BDPlaylists.size() > 1 && id < m_BDPlaylists.size()) {
+		if (!m_BDPlaylists.empty() && id < m_BDPlaylists.size()) {
 			UINT idx = 0;
 			for (const auto& Item : m_BDPlaylists) {
 				if (idx == id) {
@@ -9432,7 +9469,7 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 			}
 		}
 
-		if (m_BDPlaylists.size() > 1) {
+		if (!m_BDPlaylists.empty()) {
 			id -= m_BDPlaylists.size();
 		}
 
@@ -14680,14 +14717,6 @@ void CMainFrame::SetupVideoStreamsSubMenu()
 	}
 }
 
-static CString StripPath(CString path)
-{
-	CString p = path;
-	p.Replace('\\', '/');
-	p = p.Mid(p.ReverseFind('/')+1);
-	return(p.IsEmpty() ? path : p);
-}
-
 void CMainFrame::SetupNavChaptersSubMenu()
 {
 	CMenu* pSub = &m_chaptersMenu;
@@ -14703,7 +14732,7 @@ void CMainFrame::SetupNavChaptersSubMenu()
 	UINT id = ID_NAVIGATE_CHAP_SUBITEM_START;
 
 	if (GetPlaybackMode() == PM_FILE) {
-		if (m_BDPlaylists.size() > 1) {
+		if (!m_BDPlaylists.empty()) {
 			DWORD idx = 1;
 			for (const auto& Item : m_BDPlaylists) {
 				UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
@@ -14713,15 +14742,12 @@ void CMainFrame::SetupNavChaptersSubMenu()
 				}
 				idx++;
 
-				CString time = L"[" + ReftimeToString2(Item.Duration()) + L"]";
-				CString name = StripPath(Item.m_strFileName);
-
-				if (name == GetFileOnly(m_strPlaybackRenderedPath)) {
+				if (Item.m_strFileName == m_strPlaybackRenderedPath) {
 					flags |= MF_CHECKED | MFT_RADIOCHECK;
 				}
 
-				name.Replace(L"&", L"&&");
-				pSub->AppendMenu(flags, id++, name + '\t' + time);
+				const CString time = L"[" + ReftimeToString2(Item.Duration()) + L"]";
+				pSub->AppendMenu(flags, id++, GetFileOnly(Item.m_strFileName) + '\t' + time);
 			}
 		} else if (m_youtubeUrllist.size() > 1) {
 			DWORD idx = 1;
@@ -14737,9 +14763,7 @@ void CMainFrame::SetupNavChaptersSubMenu()
 					flags |= MF_CHECKED | MFT_RADIOCHECK;
 				}
 
-				CString name = item->title;
-				name.Replace(L"&", L"&&");
-				pSub->AppendMenu(flags, id++, name);
+				pSub->AppendMenu(flags, id++, item->title);
 			}
 		}
 
@@ -14770,7 +14794,7 @@ void CMainFrame::SetupNavChaptersSubMenu()
 
 				if (id != ID_NAVIGATE_CHAP_SUBITEM_START && i == 0) {
 					//pSub->AppendMenu(MF_SEPARATOR | MF_ENABLED);
-					if (m_BDPlaylists.size() > 1 || m_youtubeUrllist.size() > 1) {
+					if (!m_BDPlaylists.empty() || m_youtubeUrllist.size() > 1) {
 						flags |= MF_MENUBARBREAK;
 					}
 				}
