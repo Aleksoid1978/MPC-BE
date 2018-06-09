@@ -58,12 +58,14 @@ BOOL CAboutDlg::OnInitDialog()
 		m_MPCCompiler = L"ICL " MAKE_STR(__INTEL_COMPILER) L" Build ") MAKE_STR(__INTEL_COMPILER_BUILD_DATE);
 	#else
 		#error Compiler is not supported!
-#endif
+	#endif
 #elif defined(_MSC_VER)
-	#if (_MSC_VER >= 1910)
-		m_MPCCompiler = L"MSVC 2017";
-	#else
-		#error Compiler is not supported!
+	m_MPCCompiler.Format(L"MSVC v%.2d.%.2d.%.5d", _MSC_VER / 100, _MSC_VER % 100, _MSC_FULL_VER % 100000);
+	#if _MSC_BUILD
+		m_MPCCompiler.AppendFormat(L".%.2d", _MSC_BUILD);
+	#endif
+	#if (_MSC_VER >= 1910 && _MSC_VER <= 1919)
+		m_MPCCompiler.Append(L"|VS 2017");
 	#endif
 #else
 	#error Please add support for your compiler
