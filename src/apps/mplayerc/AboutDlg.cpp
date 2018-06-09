@@ -52,6 +52,9 @@ BOOL CAboutDlg::OnInitDialog()
 #if (MPC_VERSION_STATUS == 0)
 	m_strVersionNumber.Append(L" beta");
 #endif
+#ifdef _DEBUG
+	m_strVersionNumber.Append(L", Debug");
+#endif
 
 #if defined(__INTEL_COMPILER)
 	#if (__INTEL_COMPILER >= 1210)
@@ -65,14 +68,10 @@ BOOL CAboutDlg::OnInitDialog()
 		m_MPCCompiler.AppendFormat(L".%.2d", _MSC_BUILD);
 	#endif
 	#if (_MSC_VER >= 1910 && _MSC_VER <= 1919)
-		m_MPCCompiler.Append(L"|VS 2017");
+		m_MPCCompiler.Append(L" (VS 2017)");
 	#endif
 #else
 	#error Please add support for your compiler
-#endif
-
-#ifdef _DEBUG
-	m_MPCCompiler += L" Debug";
 #endif
 
 #if (__AVX__)
