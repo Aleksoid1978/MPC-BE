@@ -1112,7 +1112,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 	m_nSelected_idx = INT_MAX;
 
 	CString str;
-	CAtlMap<int, CPlaylistItem> pli;
+	std::map<int, CPlaylistItem> pli;
 	std::vector<int> idx;
 	int selected_idx = -1;
 
@@ -1189,7 +1189,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn)
 		m_nSelected_idx = selected_idx - 1;
 	}
 
-	return pli.GetCount() > 0;
+	return pli.size() > 0;
 }
 
 bool CPlayerPlaylistBar::SaveMPCPlayList(CString fn, CTextFile::enc e, bool fRemovePath)

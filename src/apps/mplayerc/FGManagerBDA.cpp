@@ -270,7 +270,7 @@ CFGManagerBDA::CFGManagerBDA(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd)
 
 CFGManagerBDA::~CFGManagerBDA()
 {
-	m_DVBStreams.RemoveAll();
+	m_DVBStreams.clear();
 	LOG (L"\nCFGManagerBDA object destroyed.");
 }
 
@@ -520,11 +520,9 @@ STDMETHODIMP CFGManagerBDA::Scan(ULONG ulFrequency, HWND hWnd)
 	Parser.ParsePAT();
 	Parser.ParseNIT();
 
-	POSITION pos = Parser.Channels.GetStartPosition();
-	while (pos) {
-		CDVBChannel& Channel = Parser.Channels.GetNextValue(pos);
+	for (auto&[num, Channel] : Parser.Channels) {
 		if (Channel.HasName()) {
-			::SendMessageW(hWnd, WM_TUNER_NEW_CHANNEL, 0, (LPARAM)(LPCTSTR)Channel.ToString());
+			::SendMessageW(hWnd, WM_TUNER_NEW_CHANNEL, 0, (LPARAM)(LPCWSTR)Channel.ToString());
 		}
 	}
 
@@ -691,13 +689,10 @@ HRESULT CFGManagerBDA::CreateMicrosoftDemux(IBaseFilter* pReceiver, CComPtr<IBas
 
 	LOG (L"Receiver -> Demux connected.");
 
-	POSITION	pos = m_DVBStreams.GetStartPosition();
-	while (pos) {
-		CComPtr<IPin>		pPin;
-		DVB_STREAM_TYPE		nType  = m_DVBStreams.GetNextKey(pos);
-		CDVBStream&			Stream = m_DVBStreams[nType];
+	for (auto& [nType, Stream] : m_DVBStreams) {
+		CComPtr<IPin> pPin;
 
-		if (nType != DVB_EPG) {	// Hack: DVB_EPG not required
+		if (nType != DVB_EPG) { // Hack: DVB_EPG not required
 			if (!Stream.GetFindExisting() ||
 					(pPin = FindPin (pMpeg2Demux, PINDIR_OUTPUT, Stream.GetMediaType())) == nullptr) {
 				CheckNoLog (pDemux->CreateOutputPin ((AM_MEDIA_TYPE*)Stream.GetMediaType(), Stream.GetName(), &pPin));

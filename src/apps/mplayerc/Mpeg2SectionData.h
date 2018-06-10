@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -77,7 +77,7 @@ public :
 
 	static CString ConvertString(BYTE* pBuffer, int nLength);
 
-	CAtlMap<int,CDVBChannel>	Channels;
+	std::map<int,CDVBChannel>	Channels;
 
 private :
 	CComQIPtr<IMpeg2Data>		m_pData;

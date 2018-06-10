@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <unordered_map>
+#include <map>
 #include <basestruct.h>
 #include "VobFile.h"
 
@@ -36,7 +36,7 @@ class CIfoFile
 		UINT32 title:16, track:8;
 	};
 
-	std::unordered_map<DWORD, CString> m_pStream_Lang;
+	std::map<DWORD, CString> m_pStream_Lang;
 	std::vector<chapter_t> m_pChapters;
 
 	REFERENCE_TIME	m_rtDuration;
