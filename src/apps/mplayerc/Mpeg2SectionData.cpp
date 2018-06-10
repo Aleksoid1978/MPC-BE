@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -237,10 +237,9 @@ HRESULT CMpeg2DataParser::ParseSDT(ULONG ulFreq)
 					break;
 			}
 		}
-		EndEnumDescriptors
+		EndEnumDescriptors;
 
-
-		if (!Channels.Lookup(Channel.GetSID())) {
+		if (Channels.find(Channel.GetSID()) == Channels.end()) {
 			Channels [Channel.GetSID()] = Channel;
 		}
 	}
@@ -271,7 +270,7 @@ HRESULT CMpeg2DataParser::ParsePAT()
 			gb.BitRead(13);									// network_PID
 		} else {
 			WORD program_map_PID = (WORD)gb.BitRead(13);	// program_map_PID
-			if (Channels.Lookup(program_number)) {
+			if (Channels.find(program_number) != Channels.end()) {
 				Channels [program_number].SetPMT (program_map_PID);
 				ParsePMT (Channels [program_number]);
 			}
@@ -553,10 +552,10 @@ HRESULT CMpeg2DataParser::ParseNIT()
 			switch (nType) {
 				case DT_LOGICAL_CHANNEL :
 					for (int i=0; i<nLength/4; i++) {
-						WORD	service_id	= (WORD)gb.BitRead(16);
+						WORD service_id = (WORD)gb.BitRead(16);
 						gb.BitRead(6);
-						WORD	logical_channel_number	= (WORD)gb.BitRead(10);
-						if (Channels.Lookup(service_id)) {
+						WORD logical_channel_number = (WORD)gb.BitRead(10);
+						if (Channels.find(service_id) != Channels.end()) {
 							Channels[service_id].SetOriginNumber (logical_channel_number);
 							DLog(L"NIT association : %d -> %s", logical_channel_number, Channels[service_id].ToString());
 						}

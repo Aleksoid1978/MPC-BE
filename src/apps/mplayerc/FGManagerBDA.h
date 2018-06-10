@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -137,26 +137,26 @@ public:
 
 	DECLARE_IUNKNOWN;
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
-	STDMETHODIMP UpdatePSI(	PresentFollowing &NowNext);
+	STDMETHODIMP UpdatePSI(PresentFollowing &NowNext);
 
 private :
 
 	CComQIPtr<IBDA_DeviceControl>			m_pBDAControl;
 	CComPtr<IBDA_FrequencyFilter>			m_pBDAFreq;
 	CComPtr<IBDA_SignalStatistics>			m_pBDAStats;
-	CAtlMap<DVB_STREAM_TYPE, CDVBStream>	m_DVBStreams;
+	std::map<DVB_STREAM_TYPE, CDVBStream>	m_DVBStreams;
 
 	DVB_STREAM_TYPE							m_nCurVideoType;
 	DVB_STREAM_TYPE							m_nCurAudioType;
 	CString									m_BDANetworkProvider;
 	bool									m_fHideWindow;
-	CComPtr<IPin>		                    m_pPin_h264;
+	CComPtr<IPin>							m_pPin_h264;
 
 	HRESULT			CreateKSFilter(IBaseFilter** ppBF, CLSID KSCategory, CStringW& DisplayName);
 	HRESULT			ConnectFilters(IBaseFilter* pOutFiter, IBaseFilter* pInFilter);
 	HRESULT			CreateMicrosoftDemux(IBaseFilter* pReceiver, CComPtr<IBaseFilter>& pMpeg2Demux);
-	HRESULT			SetChannelInternal (CDVBChannel* pChannel);
-	HRESULT			SwitchStream (DVB_STREAM_TYPE& nOldType, DVB_STREAM_TYPE nNewType);
+	HRESULT			SetChannelInternal(CDVBChannel* pChannel);
+	HRESULT			SwitchStream(DVB_STREAM_TYPE& nOldType, DVB_STREAM_TYPE nNewType);
 	HRESULT			ChangeState(FILTER_STATE nRequested);
 	FILTER_STATE	GetState();
 

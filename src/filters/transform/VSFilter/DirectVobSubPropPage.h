@@ -22,7 +22,7 @@
 #pragma once
 
 #include "IDirectVobSub.h"
-#include <unordered_map>
+#include <map>
 
 class CDVSBasePPage : public CBasePropertyPage
 {
@@ -56,7 +56,7 @@ private:
 	bool m_bAttached;
 	void AttachControls(), DetachControls();
 
-	std::unordered_map<UINT, CWnd*> m_controls;
+	std::map<UINT, CWnd*> m_controls;
 
 protected:
 	void BindControl(UINT id, CWnd& control);

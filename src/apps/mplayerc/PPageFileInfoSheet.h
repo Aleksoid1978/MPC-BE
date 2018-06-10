@@ -43,11 +43,11 @@ public:
 	}
 
 	void RemovePage(CPropertyPage* pPage) {
-		m_IdMap.RemoveKey(GetPageIndex(pPage));
+		m_IdMap.erase(GetPageIndex(pPage));
 		CPropertySheet::RemovePage(pPage);
 	}
 	void RemovePage(int nPage) {
-		m_IdMap.RemoveKey(nPage);
+		m_IdMap.erase(nPage);
 		CPropertySheet::RemovePage(nPage);
 	}
 
@@ -56,7 +56,7 @@ public:
 	}
 
 protected:
-	CAtlMap<int, DWORD> m_IdMap;
+	std::map<int, DWORD> m_IdMap;
 };
 
 // CPPageFileInfoSheet
