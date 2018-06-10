@@ -7536,7 +7536,7 @@ void CMainFrame::OnPlayPlay()
 					strOSD = ResStr(ID_PLAY_PLAY);
 					int i = strOSD.Find('\n');
 					if (i > 0) {
-						strOSD.Delete(i, strOSD.GetLength()-i);
+						strOSD.Delete(i, strOSD.GetLength() - i);
 					}
 					strOSD.AppendFormat(L" %s", BLU_RAY);
 					if (m_BDLabel.GetLength() > 0) {
@@ -7544,6 +7544,8 @@ void CMainFrame::OnPlayPlay()
 					} else {
 						MakeBDLabel(GetCurFileName(), strOSD);
 					}
+
+					strOSD.AppendFormat(L" (%s)", GetFileOnly(m_strPlaybackRenderedPath));
 				} else if (strOSD.GetLength() > 0) {
 					strOSD.TrimRight('/');
 					strOSD.Replace('\\', '/');
@@ -7553,7 +7555,7 @@ void CMainFrame::OnPlayPlay()
 				strOSD = ResStr(ID_PLAY_PLAY);
 				int i = strOSD.Find('\n');
 				if (i > 0) {
-					strOSD.Delete(i, strOSD.GetLength()-i);
+					strOSD.Delete(i, strOSD.GetLength() - i);
 				}
 				strOSD += L" DVD";
 				MakeDVDLabel(L"", strOSD);
