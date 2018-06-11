@@ -488,7 +488,7 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 				break;
 			}
 
-			int gzippedBuffLen = body.GetLength();
+			int gzippedBuffLen = body.GetLength()+1;
 			BYTE* gzippedBuff = DNew BYTE[gzippedBuffLen];
 
 			// Compress
