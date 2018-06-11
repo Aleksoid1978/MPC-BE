@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,6 +25,9 @@ class CWebServer;
 
 class CWebClientSocket : public CAsyncSocket
 {
+	template <class T = CString, class S = CString>
+	class CAtlStringMap : public CAtlMap<S, T, CStringElementTraits<S> > {};
+
 	CWebServer* m_pWebServer;
 	CMainFrame* m_pMainFrame;
 
