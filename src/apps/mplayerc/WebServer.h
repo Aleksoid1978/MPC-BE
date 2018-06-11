@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -62,12 +62,12 @@ class CWebServer
 	CAutoPtrList<CWebClientSocket> m_clients;
 
 	typedef bool (CWebClientSocket::*RequestHandler)(CStringA& hdr, CStringA& body, CStringA& mime);
-	static CAtlStringMap<RequestHandler> m_internalpages;
-	static CAtlStringMap<UINT> m_downloads;
-	static CAtlStringMap<CStringA, CStringA> m_mimes;
+	static const std::map<CString, CWebServer::RequestHandler> m_internalpages;
+	static const std::map<CString, UINT> m_downloads;
+	static std::map<CStringA, CStringA> m_mimes;
 	CPath m_webroot;
 
-	CAtlStringMap<> m_cgi;
+	std::map<CString, CString> m_cgi;
 	bool CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& body, CStringA& mime);
 
 public:

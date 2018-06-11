@@ -46,65 +46,63 @@ void CWebServerSocket::OnAccept(int nErrorCode)
 	__super::OnAccept(nErrorCode);
 }
 
-CAtlStringMap<CWebServer::RequestHandler> CWebServer::m_internalpages;
-CAtlStringMap<UINT> CWebServer::m_downloads;
-CAtlStringMap<CStringA, CStringA> CWebServer::m_mimes;
+const std::map<CString, CWebServer::RequestHandler> CWebServer::m_internalpages = {
+	{ L"/",               &CWebClientSocket::OnIndex        },
+	{ L"/index.html",     &CWebClientSocket::OnIndex        },
+	{ L"/info.html",      &CWebClientSocket::OnInfo         },
+	{ L"/browser.html",   &CWebClientSocket::OnBrowser      },
+	{ L"/controls.html",  &CWebClientSocket::OnControls     },
+	{ L"/command.html",   &CWebClientSocket::OnCommand      },
+	{ L"/status.html",    &CWebClientSocket::OnStatus       },
+	{ L"/player.html",    &CWebClientSocket::OnPlayer       },
+	{ L"/variables.html", &CWebClientSocket::OnVariables    },
+	{ L"/snapshot.jpg",   &CWebClientSocket::OnSnapShotJpeg },
+	{ L"/404.html",       &CWebClientSocket::OnError404     },
+};
+
+const std::map<CString, UINT> CWebServer::m_downloads = {
+	{L"/default.css",                  IDF_DEFAULT_CSS},
+	{L"/favicon.png",                  IDF_FAVICON},
+	{L"/vbg.png",                      IDF_VBR_PNG},
+	{L"/vbs.png",                      IDF_VBS_PNG},
+	{L"/sliderbar.gif",                IDF_SLIDERBAR_GIF},
+	{L"/slidergrip.gif",               IDF_SLIDERGRIP_GIF},
+	{L"/sliderback.png",               IDF_SLIDERBACK_PNG},
+	{L"/1pix.gif",                     IDF_1PIX_GIF},
+	{L"/headericon.png",               IDF_HEADERICON_PNG},
+	{L"/headerback.png",               IDF_HEADERBACK_PNG},
+	{L"/headerclose.png",              IDF_HEADERCLOSE_PNG},
+	{L"/leftside.png",                 IDF_LEFTSIDE_PNG},
+	{L"/rightside.png",                IDF_RIGHTSIDE_PNG},
+	{L"/bottomside.png",               IDF_BOTTOMSIDE_PNG},
+	{L"/leftbottomside.png",           IDF_LEFTBOTTOMSIDE_PNG},
+	{L"/rightbottomside.png",          IDF_RIGHTBOTTOMSIDE_PNG},
+	{L"/seekbarleft.png",              IDF_SEEKBARLEFT_PNG},
+	{L"/seekbarmid.png",               IDF_SEEKBARMID_PNG},
+	{L"/seekbarright.png",             IDF_SEEKBARRIGHT_PNG},
+	{L"/seekbargrip.png",              IDF_SEEKBARGRIP_PNG},
+	{L"/logo.png",                     IDF_LOGO1},
+	{L"/controlback.png",              IDF_CONTROLBACK_PNG},
+	{L"/controlbuttonplay.png",        IDF_CONTROLBUTTONPLAY_PNG},
+	{L"/controlbuttonpause.png",       IDF_CONTROLBUTTONPAUSE_PNG},
+	{L"/controlbuttonstop.png",        IDF_CONTROLBUTTONSTOP_PNG},
+	{L"/controlbuttonskipback.png",    IDF_CONTROLBUTTONSKIPBACK_PNG},
+	{L"/controlbuttondecrate.png",     IDF_CONTROLBUTTONDECRATE_PNG},
+	{L"/controlbuttonincrate.png",     IDF_CONTROLBUTTONINCRATE_PNG},
+	{L"/controlbuttonskipforward.png", IDF_CONTROLBUTTONSKIPFORWARD_PNG},
+	{L"/controlbuttonstep.png",        IDF_CONTROLBUTTONSTEP_PNG},
+	{L"/controlvolumeon.png",          IDF_CONTROLVOLUMEON_PNG},
+	{L"/controlvolumeoff.png",         IDF_CONTROLVOLUMEOFF_PNG},
+	{L"/controlvolumebar.png",         IDF_CONTROLVOLUMEBAR_PNG},
+	{L"/controlvolumegrip.png",        IDF_CONTROLVOLUMEGRIP_PNG},
+};
+
+std::map<CStringA, CStringA> CWebServer::m_mimes;
 
 CWebServer::CWebServer(CMainFrame* pMainFrame, int nPort)
 	: m_pMainFrame(pMainFrame)
 	, m_nPort(nPort)
 {
-	if (m_internalpages.IsEmpty()) {
-		m_internalpages[L"/"] = &CWebClientSocket::OnIndex;
-		m_internalpages[L"/index.html"] = &CWebClientSocket::OnIndex;
-		m_internalpages[L"/info.html"] = &CWebClientSocket::OnInfo;
-		m_internalpages[L"/browser.html"] = &CWebClientSocket::OnBrowser;
-		m_internalpages[L"/controls.html"] = &CWebClientSocket::OnControls;
-		m_internalpages[L"/command.html"] = &CWebClientSocket::OnCommand;
-		m_internalpages[L"/status.html"] = &CWebClientSocket::OnStatus;
-		m_internalpages[L"/player.html"] = &CWebClientSocket::OnPlayer;
-		m_internalpages[L"/variables.html"] = &CWebClientSocket::OnVariables;
-		m_internalpages[L"/snapshot.jpg"] = &CWebClientSocket::OnSnapShotJpeg;
-		m_internalpages[L"/404.html"] = &CWebClientSocket::OnError404;
-	}
-
-	if (m_downloads.IsEmpty()) {
-		m_downloads[L"/default.css"] = IDF_DEFAULT_CSS;
-		m_downloads[L"/favicon.png"] = IDF_FAVICON;
-		m_downloads[L"/vbg.png"] = IDF_VBR_PNG;
-		m_downloads[L"/vbs.png"] = IDF_VBS_PNG;
-		m_downloads[L"/sliderbar.gif"] = IDF_SLIDERBAR_GIF;
-		m_downloads[L"/slidergrip.gif"] = IDF_SLIDERGRIP_GIF;
-		m_downloads[L"/sliderback.png"] = IDF_SLIDERBACK_PNG;
-		m_downloads[L"/1pix.gif"] = IDF_1PIX_GIF;
-		m_downloads[L"/headericon.png"] = IDF_HEADERICON_PNG;
-		m_downloads[L"/headerback.png"] = IDF_HEADERBACK_PNG;
-		m_downloads[L"/headerclose.png"] = IDF_HEADERCLOSE_PNG;
-		m_downloads[L"/leftside.png"] = IDF_LEFTSIDE_PNG;
-		m_downloads[L"/rightside.png"] = IDF_RIGHTSIDE_PNG;
-		m_downloads[L"/bottomside.png"] = IDF_BOTTOMSIDE_PNG;
-		m_downloads[L"/leftbottomside.png"] = IDF_LEFTBOTTOMSIDE_PNG;
-		m_downloads[L"/rightbottomside.png"] = IDF_RIGHTBOTTOMSIDE_PNG;
-		m_downloads[L"/seekbarleft.png"] = IDF_SEEKBARLEFT_PNG;
-		m_downloads[L"/seekbarmid.png"] = IDF_SEEKBARMID_PNG;
-		m_downloads[L"/seekbarright.png"] = IDF_SEEKBARRIGHT_PNG;
-		m_downloads[L"/seekbargrip.png"] = IDF_SEEKBARGRIP_PNG;
-		m_downloads[L"/logo.png"] = IDF_LOGO1;
-		m_downloads[L"/controlback.png"] = IDF_CONTROLBACK_PNG;
-		m_downloads[L"/controlbuttonplay.png"] = IDF_CONTROLBUTTONPLAY_PNG;
-		m_downloads[L"/controlbuttonpause.png"] = IDF_CONTROLBUTTONPAUSE_PNG;
-		m_downloads[L"/controlbuttonstop.png"] = IDF_CONTROLBUTTONSTOP_PNG;
-		m_downloads[L"/controlbuttonskipback.png"] = IDF_CONTROLBUTTONSKIPBACK_PNG;
-		m_downloads[L"/controlbuttondecrate.png"] = IDF_CONTROLBUTTONDECRATE_PNG;
-		m_downloads[L"/controlbuttonincrate.png"] = IDF_CONTROLBUTTONINCRATE_PNG;
-		m_downloads[L"/controlbuttonskipforward.png"] = IDF_CONTROLBUTTONSKIPFORWARD_PNG;
-		m_downloads[L"/controlbuttonstep.png"] = IDF_CONTROLBUTTONSTEP_PNG;
-		m_downloads[L"/controlvolumeon.png"] = IDF_CONTROLVOLUMEON_PNG;
-		m_downloads[L"/controlvolumeoff.png"] = IDF_CONTROLVOLUMEOFF_PNG;
-		m_downloads[L"/controlvolumebar.png"] = IDF_CONTROLVOLUMEBAR_PNG;
-		m_downloads[L"/controlvolumegrip.png"] = IDF_CONTROLVOLUMEGRIP_PNG;
-	}
-
 	CRegKey key;
 	CString str(L"MIME\\Database\\Content Type");
 	if (ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, str, KEY_READ)) {
@@ -230,11 +228,7 @@ void CWebServer::Deploy(CString dir)
 		PutFileContents(dir + L"player.html", data);
 	}
 
-	POSITION pos = m_downloads.GetStartPosition();
-	while (pos) {
-		CString fn;
-		UINT id;
-		m_downloads.GetNextAssoc(pos, fn, id);
+	for (auto& [fn, id] : m_downloads) {
 		if (LoadResource(id, data, L"FILE")) {
 			PutFileContents(dir + fn, data);
 		}
@@ -334,7 +328,10 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 	if (ext.IsEmpty()) {
 		mime = "text/html";
 	} else {
-		m_mimes.Lookup(ext, mime);
+		auto it = m_mimes.find(ext);
+		if (it != m_mimes.end()) {
+			mime = (*it).second;
+		}
 	}
 
 	hdr = "HTTP/1.1 200 OK\r\n";
@@ -371,37 +368,42 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 	}
 
 	RequestHandler rh = nullptr;
-	if (!fHandled && m_internalpages.Lookup(pClient->m_path, rh) && (pClient->*rh)(hdr, body, mime)) {
-		if (mime.IsEmpty()) {
-			mime = "text/html";
-		}
-
-		CString redir;
-		if (pClient->m_get.Lookup(L"redir", redir)
-				|| pClient->m_post.Lookup(L"redir", redir)) {
-			if (redir.IsEmpty()) {
-				redir = '/';
+	if (!fHandled) {
+		auto it = m_internalpages.find(pClient->m_path);
+		if (it != m_internalpages.end() && (pClient->*(*it).second)(hdr, body, mime)) {
+			if (mime.IsEmpty()) {
+				mime = "text/html";
 			}
 
-			hdr =
-				"HTTP/1.1 302 Found\r\n"
-				"Location: " + CStringA(redir) + "\r\n";
-			return;
-		}
+			CString redir;
+			if (pClient->m_get.Lookup(L"redir", redir)
+				|| pClient->m_post.Lookup(L"redir", redir)) {
+				if (redir.IsEmpty()) {
+					redir = '/';
+				}
 
-		fHandled = true;
+				hdr =
+					"HTTP/1.1 302 Found\r\n"
+					"Location: " + CStringA(redir) + "\r\n";
+				return;
+			}
+
+			fHandled = true;
+		}
 	}
 
 	if (!fHandled && m_webroot.IsDirectory()) {
 		fHandled = LoadPage(0, body, pClient->m_path);
 	}
 
-	UINT resid;
-	if (!fHandled && m_downloads.Lookup(pClient->m_path, resid) && LoadResource(resid, body, L"FILE")) {
-		if (mime.IsEmpty()) {
-			mime = "application/octet-stream";
+	if (!fHandled) {
+		auto& it = m_downloads.find(pClient->m_path);
+		if (it != m_downloads.end() && LoadResource((*it).second, body, L"FILE")) {
+			if (mime.IsEmpty()) {
+				mime = "application/octet-stream";
+			}
+			fHandled = true;
 		}
-		fHandled = true;
 	}
 
 	if (!fHandled) {
@@ -543,9 +545,11 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 	dir.RemoveFileSpec();
 
 	CString cgi;
-	if (!m_cgi.Lookup(ext, cgi) || !CPath(cgi).FileExists()) {
+	auto it = m_cgi.find(ext);
+	if (it == m_cgi.end() || !CPath((*it).second).FileExists()) {
 		return false;
 	}
+	cgi = (*it).second;
 
 	HANDLE hProcess = GetCurrentProcess();
 	HANDLE hChildStdinRd, hChildStdinWr, hChildStdinWrDup = nullptr;

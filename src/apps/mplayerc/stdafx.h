@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -52,9 +52,6 @@ namespace Gdiplus
 
 #include "../../DSUtil/DSUtil.h"
 #include "mplayerc.h"
-
-template <class T = CString, class S = CString>
-class CAtlStringMap : public CAtlMap<S, T, CStringElementTraits<S> > {};
 
 #define CheckAndLog(x, msg)	hr = ##x; if (FAILED (hr)) { DLog(msg" : 0x%08x", hr); return hr; }
 #define CheckNoLog(x)		hr = ##x; if (FAILED (hr)) { return hr; }
