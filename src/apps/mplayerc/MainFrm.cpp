@@ -406,7 +406,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_FILTERS_SUBITEM_START, ID_FILTERS_SUBITEM_END, OnUpdatePlayFilters)
 	ON_COMMAND_RANGE(ID_SHADERS_START, ID_SHADERS_END, OnPlayShaders)
 	ON_COMMAND_RANGE(ID_AUDIO_SUBITEM_START, ID_AUDIO_SUBITEM_END, OnPlayAudioOption)
-	ON_COMMAND_RANGE(ID_AUDIO_SUBITEM_START, ID_AUDIO_SUBITEM_END, OnPlayAudio)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_AUDIO_SUBITEM_START, ID_AUDIO_SUBITEM_END, OnUpdatePlayAudioOption)
 	ON_COMMAND(ID_MENU_NAVIGATE_AUDIO, OnMenuNavAudio)
 	ON_COMMAND(ID_MENU_NAVIGATE_SUBTITLES, OnMenuNavSubtitle)
@@ -414,7 +413,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_MENU_RECENT_FILES, OnMenuRecentFiles)
 	ON_COMMAND(ID_FAVORITES, OnMenuFavorites)
 
-	ON_UPDATE_COMMAND_UI_RANGE(ID_AUDIO_SUBITEM_START, ID_AUDIO_SUBITEM_END, OnUpdatePlayAudio)
 	ON_COMMAND_RANGE(ID_SUBTITLES_SUBITEM_START, ID_SUBTITLES_SUBITEM_END, OnPlaySubtitles)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_SUBTITLES_SUBITEM_START, ID_SUBTITLES_SUBITEM_END, OnUpdatePlaySubtitles)
 
@@ -8237,19 +8235,6 @@ void CMainFrame::OnPlayShaders(UINT nID)
 	SetShaders();
 }
 
-void CMainFrame::OnPlayAudio(UINT nID)
-{
-	int i = (int)nID - (ID_AUDIO_SUBITEM_START);
-
-	CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter;
-
-	if (i == -1) {
-		ShowOptions(CPPageAudio::IDD);
-	} else if (i >= 0 && pSS) {
-		pSS->Enable(i, AMSTREAMSELECTENABLE_ENABLE);
-	}
-}
-
 void CMainFrame::OnPlayAudioOption(UINT nID)
 {
 	int i = (int)nID - (1 + ID_AUDIO_SUBITEM_START);
@@ -8269,35 +8254,6 @@ void CMainFrame::OnUpdatePlayAudioOption(CCmdUI* pCmdUI)
 		pCmdUI->Enable(TRUE);
 	} else if (i == 0) {
 		pCmdUI->Enable(GetPlaybackMode() == PM_FILE/* && !m_bAudioOnly*/);
-	}
-}
-
-void CMainFrame::OnUpdatePlayAudio(CCmdUI* pCmdUI)
-{
-	UINT nID = pCmdUI->m_nID;
-	int i = (int)nID - (ID_AUDIO_SUBITEM_START);
-
-	CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter;
-
-	/*if (i == -1)
-	{
-		// TODO****
-	}
-	else*/
-	if (i >= 0 && pSS) {
-		DWORD flags = DWORD_MAX;
-
-		if (SUCCEEDED(pSS->Info(i, nullptr, &flags, nullptr, nullptr, nullptr, nullptr, nullptr))) {
-			if (flags & AMSTREAMSELECTINFO_EXCLUSIVE) {
-				//pCmdUI->SetRadio(TRUE);
-			} else if (flags & AMSTREAMSELECTINFO_ENABLED) {
-				pCmdUI->SetCheck(TRUE);
-			} else {
-				pCmdUI->SetCheck(FALSE);
-			}
-		} else {
-			pCmdUI->Enable(FALSE);
-		}
 	}
 }
 
