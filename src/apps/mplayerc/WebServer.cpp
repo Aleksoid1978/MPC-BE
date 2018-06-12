@@ -145,16 +145,15 @@ CWebServer::CWebServer(CMainFrame* pMainFrame, int nPort)
 		m_webroot = CPath();
 	}
 
-	CAtlList<CString> sl;
+	std::list<CString> sl;
 	Explode(AfxGetAppSettings().strWebServerCGI, sl, L';');
-	POSITION pos = sl.GetHeadPosition();
-	while (pos) {
-		CAtlList<CString> sl2;
-		CString ext = Explode(sl.GetNext(pos), sl2, L'=', 2);
-		if (sl2.GetCount() < 2) {
+	for (const auto& item : sl) {
+		std::list<CString> sl2;
+		CString ext = Explode(item, sl2, L'=', 2);
+		if (sl2.size() < 2) {
 			continue;
 		}
-		m_cgi[ext] = sl2.GetTail();
+		m_cgi[ext] = sl2.back();
 	}
 
 	m_ThreadId = 0;
@@ -247,11 +246,9 @@ bool CWebServer::ToLocalPath(CString& path, CString& redir)
 		p.Canonicalize();
 
 		if (p.IsDirectory()) {
-			CAtlList<CString> sl;
+			std::list<CString> sl;
 			Explode(AfxGetAppSettings().strWebDefIndex, sl, L';');
-			POSITION pos = sl.GetHeadPosition();
-			while (pos) {
-				str = sl.GetNext(pos);
+			for (const auto& str : sl) {
 				CPath p2 = p;
 				p2.Append(str);
 				if (p2.FileExists()) {
@@ -472,9 +469,9 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 			CString accept_encoding;
 			pClient->m_hdrlines.Lookup(L"accept-encoding", accept_encoding);
 			accept_encoding.MakeLower();
-			CAtlList<CString> sl;
+			std::list<CString> sl;
 			ExplodeMin(accept_encoding, sl, ',');
-			if (!sl.Find(L"gzip")) {
+			if (std::find(sl.cbegin(), sl.cend(), L"gzip") == sl.cend()) {
 				break;
 			}
 
