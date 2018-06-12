@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -417,7 +417,7 @@ bool CVobFile::OpenVOBs(const std::list<CString>& vobs)
 				CString fn = m_files[0].fn;
 				fn.MakeLower();
 
-				if (fn.Find(L":\\video_ts") == 1 && GetDriveType(fn.Left(3)) == DRIVE_CDROM) {
+				if (fn.Find(L":\\video_ts") == 1 && GetDriveTypeW(fn.Left(3)) == DRIVE_CDROM) {
 					m_fDVD = true;
 				}
 

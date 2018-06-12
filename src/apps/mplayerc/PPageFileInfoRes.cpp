@@ -132,7 +132,7 @@ void CPPageFileInfoRes::OnSaveAs()
 	}
 
 	CString fname((*it).name);
-	CString ext = ::PathFindExtension(fname);
+	CString ext = ::PathFindExtensionW(fname);
 
 	CString ext_list = L"All files|*.*|";
 	CString mime((*it).mime);
@@ -217,7 +217,7 @@ LRESULT CPPageFileInfoRes::OnSetPageFocus(WPARAM wParam, LPARAM lParam)
 	CPropertySheet* psheet = (CPropertySheet*) GetParent();
 	psheet->GetTabControl()->SetFocus();
 
-	SendDlgItemMessage(IDC_EDIT1, EM_SETSEL, 0, 0);
+	SendDlgItemMessageW(IDC_EDIT1, EM_SETSEL, 0, 0);
 
 	return 0;
 }

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -223,7 +223,7 @@ LRESULT CPPageFileInfoClip::OnSetPageFocus(WPARAM wParam, LPARAM lParam)
 	CPropertySheet* psheet = (CPropertySheet*) GetParent();
 	psheet->GetTabControl()->SetFocus();
 
-	SendDlgItemMessage(IDC_EDIT1, EM_SETSEL, 0, 0);
+	SendDlgItemMessageW(IDC_EDIT1, EM_SETSEL, 0, 0);
 
 	return 0;
 }
