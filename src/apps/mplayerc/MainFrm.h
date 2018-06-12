@@ -1061,11 +1061,8 @@ public:
 	afx_msg void OnPlayFilters(UINT nID);
 	afx_msg void OnUpdatePlayFilters(CCmdUI* pCmdUI);
 	afx_msg void OnPlayShaders(UINT nID);
-	afx_msg void OnPlayAudio(UINT nID);
 
 	afx_msg void OnPlayAudioOption(UINT nID);
-
-	afx_msg void OnUpdatePlayAudio(CCmdUI* pCmdUI);
 	afx_msg void OnUpdatePlayAudioOption(CCmdUI* pCmdUI);
 	afx_msg void OnPlaySubtitles(UINT nID);
 	afx_msg void OnUpdatePlaySubtitles(CCmdUI* pCmdUI);
