@@ -10814,11 +10814,11 @@ void CMainFrame::SetDispMode(dispmode& dm, CString& DisplayName, BOOL bForceRegi
 	dmScreenSettings.dmFields           = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL | DM_DISPLAYFREQUENCY | DM_DISPLAYFLAGS;
 
 	if (s.fRestoreResAfterExit && !bForceRegistryMode) {
-		ChangeDisplaySettingsEx(ChangeDisplayName, &dmScreenSettings, nullptr, CDS_FULLSCREEN, nullptr);
+		ChangeDisplaySettingsExW(ChangeDisplayName, &dmScreenSettings, nullptr, CDS_FULLSCREEN, nullptr);
 	} else {
-		LONG ret = ChangeDisplaySettingsEx(ChangeDisplayName, &dmScreenSettings, nullptr, CDS_UPDATEREGISTRY | CDS_NORESET, nullptr);
+		LONG ret = ChangeDisplaySettingsExW(ChangeDisplayName, &dmScreenSettings, nullptr, CDS_UPDATEREGISTRY | CDS_NORESET, nullptr);
 		if (ret == DISP_CHANGE_SUCCESSFUL) {
-			ChangeDisplaySettingsEx(nullptr, nullptr, nullptr, 0, nullptr);
+			ChangeDisplaySettingsExW(nullptr, nullptr, nullptr, 0, nullptr);
 		}
 	}
 
@@ -13403,7 +13403,7 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			int i = fn.Find(L":\\");
 			if (i > 0) {
 				CString drive = fn.Left(i+2);
-				UINT type = GetDriveType(drive);
+				UINT type = GetDriveTypeW(drive);
 				std::list<CString> sl;
 				if (type == DRIVE_REMOVABLE || (type == DRIVE_CDROM && GetCDROMType(drive[0], sl) != CDROM_Audio)) {
 					int ret = IDRETRY;
