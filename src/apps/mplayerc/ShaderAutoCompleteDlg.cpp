@@ -148,7 +148,7 @@ BOOL CShaderAutoCompleteDlg::OnInitDialog()
 
 	AddAnchor(IDC_LIST1, TOP_LEFT, BOTTOM_RIGHT);
 
-	m_hToolTipWnd = CreateWindowEx(
+	m_hToolTipWnd = CreateWindowExW(
 						WS_EX_TOPMOST, TOOLTIPS_CLASS, nullptr, TTS_NOPREFIX | TTS_ALWAYSTIP,
 						CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
 						nullptr, nullptr, nullptr, nullptr);
@@ -159,7 +159,7 @@ BOOL CShaderAutoCompleteDlg::OnInitDialog()
 	m_ti.hwnd = m_hWnd;
 	m_ti.lpszText = m_text;
 
-	::SendMessageW(m_hToolTipWnd, TTM_ADDTOOL, 0, (LPARAM)&m_ti);
+	::SendMessageW(m_hToolTipWnd, TTM_ADDTOOLW, 0, (LPARAM)&m_ti);
 	::SendMessageW(m_hToolTipWnd, TTM_SETMAXTIPWIDTH, 0, (LPARAM)400);
 
 	return TRUE;

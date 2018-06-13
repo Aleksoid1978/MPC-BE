@@ -28,9 +28,9 @@
 const BYTE AAC_MAX_SAMPLING_FREQUENCY_INDEX = 12;
 static const unsigned int AacSamplingFreqTable[13] =
 {
-    96000, 88200, 64000, 48000, 
-    44100, 32000, 24000, 22050, 
-    16000, 12000, 11025, 8000, 
+    96000, 88200, 64000, 48000,
+    44100, 32000, 24000, 22050,
+    16000, 12000, 11025, 8000,
     7350
 };
 
@@ -58,7 +58,7 @@ bool CMP4AudioDecoderConfig::ParseExtension(CGolombBuffer& parser)
         if (m_Extension.m_ObjectType == AOT_SBR) {
             m_Extension.m_SbrPresent = (parser.BitRead(1) == 1);
             if (m_Extension.m_SbrPresent) {
-                result = ParseSamplingFrequency(parser, 
+                result = ParseSamplingFrequency(parser,
                                                 m_SamplingFrequencyIndex,
                                                 m_SamplingFrequency);
                 if (!result) return result;
@@ -72,12 +72,12 @@ bool CMP4AudioDecoderConfig::ParseExtension(CGolombBuffer& parser)
         } else if (m_Extension.m_ObjectType == AOT_ER_BSAC) {
             m_Extension.m_SbrPresent = (parser.BitRead(1) == 1);
             if (m_Extension.m_SbrPresent) {
-                result = ParseSamplingFrequency(parser, 
+                result = ParseSamplingFrequency(parser,
                                                 m_SamplingFrequencyIndex,
                                                 m_SamplingFrequency);
                 if (!result) return result;
-            } 
-            parser.BitRead(4); // extensionChannelConfiguration           
+            }
+            parser.BitRead(4); // extensionChannelConfiguration
         }
     }
     return true;
@@ -125,11 +125,11 @@ bool CMP4AudioDecoderConfig::ParseGASpecificInfo(CGolombBuffer& parser)
             // return false;
         }
     }
-    
+
     return true;
 }
 
-bool CMP4AudioDecoderConfig::ParseSamplingFrequency(CGolombBuffer& parser, 
+bool CMP4AudioDecoderConfig::ParseSamplingFrequency(CGolombBuffer& parser,
                                                     BYTE&          sampling_frequency_index,
                                                     unsigned int&  sampling_frequency)
 {
@@ -249,8 +249,8 @@ bool CMP4AudioDecoderConfig::Parse(CGolombBuffer& parser)
     if (!result) return result;
 
     // parse the sampling frequency
-    result = ParseSamplingFrequency(parser, 
-                                    m_SamplingFrequencyIndex, 
+    result = ParseSamplingFrequency(parser,
+                                    m_SamplingFrequencyIndex,
                                     m_SamplingFrequency);
     if (!result) return result;
 
@@ -266,8 +266,8 @@ bool CMP4AudioDecoderConfig::Parse(CGolombBuffer& parser)
         m_Extension.m_ObjectType = AOT_SBR;
         m_Extension.m_SbrPresent = true;
         m_Extension.m_PsPresent  = m_ObjectType == AOT_PS;
-        result = ParseSamplingFrequency(parser, 
-                                        m_SamplingFrequencyIndex, 
+        result = ParseSamplingFrequency(parser,
+                                        m_SamplingFrequencyIndex,
                                         m_SamplingFrequency);
         if (!result) return result;
         result = ParseAudioObjectType(parser, m_ObjectType);
@@ -281,7 +281,7 @@ bool CMP4AudioDecoderConfig::Parse(CGolombBuffer& parser)
         m_Extension.m_SbrPresent = false;
         m_Extension.m_PsPresent  = false;
     }
-    
+
     switch (m_ObjectType) {
         case AOT_AAC_MAIN:
         case AOT_AAC_LC:

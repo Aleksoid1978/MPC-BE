@@ -1269,7 +1269,7 @@ bool HasMediaType(IFilterGraph *pFilterGraph, const GUID &mediaType)
 							bFound = true;
 							break;
 						}
-					EndEnumMediaTypes(pmt)				
+					EndEnumMediaTypes(pmt)
 				}
 			}
 			if (bFound) {

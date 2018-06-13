@@ -2329,7 +2329,7 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 			WAVEFORMATEX_HDMV_LPCM* wfelpcm = (WAVEFORMATEX_HDMV_LPCM*)mt.Format();
 			out_layout = s_scmap_hdmv[wfelpcm->channel_conf].layout;
 		}
-		
+
 		if (!out_layout) {
 			out_layout = GetDefChannelMask(out_channels);
 		}

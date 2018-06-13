@@ -186,7 +186,6 @@ std::unique_ptr<BYTE[]> DecodeDvdaLPCM(unsigned& dst_size, SampleFormat& dst_sf,
 				dst_1 += 2 * channels;
 				dst_2 = dst_1 + a.channels1;
 			}
-			
 		}
 		dst_sf = SAMPLE_FMT_S32;
 

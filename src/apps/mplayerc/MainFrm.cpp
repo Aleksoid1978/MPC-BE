@@ -6187,7 +6187,6 @@ void CMainFrame::OnFileLoadSubtitle()
 	std::vector<CString> mask;
 	for (const auto& subExt : Subtitle::s_SubFileExts) {
 		mask.emplace_back(L"*." + CString(subExt));
-	
 	}
 
 	COpenFileDlg fd(mask, false, nullptr, GetCurFileName(),
@@ -9113,7 +9112,7 @@ void CMainFrame::OnUpdateNavigateSkip(CCmdUI* pCmdUI)
 			} else {
 				bOn = TRUE;
 			}
-		}	
+		}
 	}
 
 	pCmdUI->Enable(bOn);
@@ -13788,7 +13787,7 @@ void CMainFrame::CloseMediaPrivate()
 	m_pVMRWC.Release();
 	m_pVMRMC9.Release();
 	m_pMVTO.Release();
-	
+
 	m_pPlaybackNotify.Release();
 	m_pD3DFS.Release();
 

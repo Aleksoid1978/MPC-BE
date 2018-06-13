@@ -995,7 +995,7 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile
 							if (item.size() != Playlist.size()) {
 								continue;
 							}
-							
+
 							duplicate = true;
 							for (size_t i = 0; i < item.size() && duplicate; i++) {
 								if (item[i] == Playlist[i]) {
