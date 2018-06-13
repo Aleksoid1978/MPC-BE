@@ -1272,7 +1272,7 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 		if (!m_pRenderClient && m_pAudioClient) {
 			CheckAudioClient(m_pWaveFormatExInput);
 		}
-		
+
 		if (!m_pRenderClient) {
 			m_rtNextSampleTime = rtStart + SamplesToTime(lSize / m_pWaveFormatExInput->nBlockAlign, m_pWaveFormatExInput) / m_dRate;
 

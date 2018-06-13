@@ -178,7 +178,7 @@ bool CRawVideoSplitterFilter::ReadGOP(REFERENCE_TIME& rt)
 	return true;
 }
 
-#define COMPARE(V) (memcmp(buf, V, sizeof(V)) == 0) 
+#define COMPARE(V) (memcmp(buf, V, sizeof(V)) == 0)
 HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);

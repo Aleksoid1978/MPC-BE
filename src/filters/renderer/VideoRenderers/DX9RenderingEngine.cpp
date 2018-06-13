@@ -1100,7 +1100,7 @@ HRESULT CDX9RenderingEngine::TextureResizeDXVAHD(IDirect3DTexture9* pTexture, co
 
 	hr = DXVAHD_SetSourceRect(m_pDXVAHD_VP, 0, TRUE, srcRect);
 	hr = DXVAHD_SetDestinationRect(m_pDXVAHD_VP, 0, TRUE, destRect);
-	
+
 	// Perform the blit.
 	hr = m_pDXVAHD_VP->VideoProcessBltHD(pRenderTarget, frame, 1, &stream_data);
 	if (FAILED(hr)) {

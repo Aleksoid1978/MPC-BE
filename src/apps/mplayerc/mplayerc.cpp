@@ -1508,7 +1508,6 @@ BOOL CMPlayerCApp::InitInstance()
 			CMediaFormats& mf = m_s.m_Formats;
 			mf.UpdateData(false);
 
-			
 			for (auto& mfc : mf) {
 				filetype_t filetype = mfc.GetFileType();
 

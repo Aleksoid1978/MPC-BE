@@ -595,7 +595,7 @@ UINT CShoutcastStream::SocketThreadProc()
 				while (pos + 2 <= end && ((GETWORD(pos) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD)) {
 					pos++;
 				}
-				
+
 				if (pos + ADTS_HEADER_SIZE > end) {
 					break;
 				}

@@ -538,7 +538,7 @@ void CGPUUsage::GetUsage(statistic& gpu_statistic)
 				}
 			}
 		}
-		
+
 		gpu_statistic = m_statistic;
 		m_dwLastRun = GetTickCount();
 	}

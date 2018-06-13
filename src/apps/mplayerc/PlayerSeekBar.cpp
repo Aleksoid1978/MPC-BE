@@ -61,7 +61,7 @@ BOOL CPlayerSeekBar::Create(CWnd* pParentWnd)
 	m_ti.lpszText = nullptr;
 	m_ti.uId      = (UINT)m_hWnd;
 
-	m_tooltip.SendMessageW(TTM_ADDTOOL, 0, (LPARAM)&m_ti);
+	m_tooltip.SendMessageW(TTM_ADDTOOLW, 0, (LPARAM)&m_ti);
 
 	if (m_BackGroundbm.FileExists(CString(L"background"))) {
 		m_BackGroundbm.LoadExternalGradient(L"background");

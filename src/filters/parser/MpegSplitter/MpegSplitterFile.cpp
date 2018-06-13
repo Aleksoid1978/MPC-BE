@@ -1320,7 +1320,7 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 									s.codec = stream_codec::MLP;
 									type = stream_type::audio;
 								}
-								
+
 								Seek(start + 10);
 								break;
 							}

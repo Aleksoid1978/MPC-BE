@@ -501,7 +501,6 @@ namespace Youtube
 						free(data);
 						InternetCloseHandle(hInet);
 						return true;
-					
 					}
 				} else {
 					// url_encoded_fmt_stream_map

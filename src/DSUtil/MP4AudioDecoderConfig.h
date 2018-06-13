@@ -84,11 +84,11 @@ public:
         bool     m_PsPresent              = false; /**< PS is present         */
         BYTE     m_ObjectType             = 0;     /**< Extension object type */
     } m_Extension;
-    
+
 private:
     bool ParseAudioObjectType(CGolombBuffer& parser, BYTE& object_type);
     bool ParseGASpecificInfo(CGolombBuffer& parser);
-    bool ParseSamplingFrequency(CGolombBuffer& parser, 
+    bool ParseSamplingFrequency(CGolombBuffer& parser,
                                 BYTE&          sampling_frequency_index,
                                 unsigned int&  sampling_frequency);
     bool ParseExtension(CGolombBuffer& parser);
