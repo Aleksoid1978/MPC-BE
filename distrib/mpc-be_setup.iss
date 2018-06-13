@@ -364,6 +364,7 @@ begin
     except
       Log('ERROR: unziping failed');
       MsgBox('Unable to extract ' + ZipFile, mbError, MB_OK);
+      Exit;
     end;
     Log('Unzip done.');
   end else

@@ -67,9 +67,6 @@ BOOL CAboutDlg::OnInitDialog()
 	#if _MSC_BUILD
 		m_MPCCompiler.AppendFormat(L".%.2d", _MSC_BUILD);
 	#endif
-	#if (_MSC_VER >= 1910 && _MSC_VER <= 1919)
-		m_MPCCompiler.Append(L" (VS 2017)");
-	#endif
 #else
 	#error Please add support for your compiler
 #endif
