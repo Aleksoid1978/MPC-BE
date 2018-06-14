@@ -415,8 +415,11 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_LOAD_EXT_AUDIO, OnFileLoadAudio)
 	ON_UPDATE_COMMAND_UI(ID_LOAD_EXT_AUDIO, OnUpdateFileLoadAudio)
 
-	ON_COMMAND_RANGE(ID_SUBTITLES_SUBITEM_START, ID_SUBTITLES_SUBITEM_END, OnPlaySubtitles)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_SUBTITLES_SUBITEM_START, ID_SUBTITLES_SUBITEM_END, OnUpdatePlaySubtitles)
+	ON_COMMAND(ID_SUBTITLES_OPTIONS, OnMenuSubtitlesOption)
+	ON_COMMAND(ID_LOAD_EXT_SUBTITLES, OnFileLoadSubtitle)
+	ON_UPDATE_COMMAND_UI(ID_LOAD_EXT_SUBTITLES, OnUpdateFileLoadSubtitle)
+	ON_COMMAND_RANGE(ID_SUBTITLES_STYLES, ID_SUBTITLES_STEREO_TOPBOTTOM, OnPlaySubtitles)
+	ON_UPDATE_COMMAND_UI_RANGE(ID_SUBTITLES_STYLES, ID_SUBTITLES_STEREO_TOPBOTTOM, OnUpdatePlaySubtitles)
 
 	ON_COMMAND_RANGE(ID_FILTERSTREAMS_SUBITEM_START, ID_FILTERSTREAMS_SUBITEM_END, OnSelectStream)
 	ON_COMMAND_RANGE(ID_VOLUME_UP, ID_VOLUME_MUTE, OnPlayVolume)
@@ -6225,7 +6228,8 @@ void CMainFrame::OnFileLoadSubtitle()
 
 void CMainFrame::OnUpdateFileLoadSubtitle(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(m_eMediaLoadState == MLS_LOADED && /*m_pCAP &&*/ !m_bAudioOnly);
+	//pCmdUI->Enable(m_eMediaLoadState == MLS_LOADED && /*m_pCAP &&*/ !m_bAudioOnly);
+	pCmdUI->Enable((m_pCAP || m_pDVS) && !m_bAudioOnly && GetPlaybackMode() != PM_DVD);
 }
 
 void CMainFrame::OnFileLoadAudio()
@@ -8246,19 +8250,18 @@ void CMainFrame::OnMenuAudioOption()
 	ShowOptions(CPPageAudio::IDD);
 }
 
+void CMainFrame::OnMenuSubtitlesOption()
+{
+	ShowOptions(CPPageSubtitles::IDD);
+}
+
 void CMainFrame::OnPlaySubtitles(UINT nID)
 {
-	int i = (int)nID - (10 + ID_SUBTITLES_SUBITEM_START); // currently the subtitles submenu contains 5 items, apart from the actual subtitles list
-
 	CAppSettings& s = AfxGetAppSettings();
+	CString osd;
 
-	if (i == -10) {
-		// options
-		ShowOptions(CPPageSubtitles::IDD);
-	} else if (i == -9) {
-		OnFileLoadSubtitle();
-	} else if (i == -8) {
-		// styles
+	switch (nID) {
+	case ID_SUBTITLES_STYLES:
 		if (auto pRTS = dynamic_cast<CRenderedTextSubtitle*>((ISubStream*)m_pCurrentSubStream)) {
 			CAutoPtrArray<CPPageSubStyle> pages;
 			CAtlArray<STSStyle*> styles;
@@ -8294,19 +8297,20 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 				*/
 			}
 		}
-	} else if (i == -7) {
-		// reload
+		break;
+	case ID_SUBTITLES_RELOAD:
 		ReloadSubtitle();
-	} else if (i == -6) {
-
+		break;
+	case ID_SUBTITLES_ENABLE:
 		SelectSubtilesAMStream(-1);
-
-	} else if (i == -5) {
+		break;
+	case ID_SUBTITLES_DEFSTYLE:
 		// override default style
 		// TODO: default subtitles style toggle here
 		s.fUseDefaultSubtitlesStyle = !s.fUseDefaultSubtitlesStyle;
 		UpdateSubtitle();
-	} else if (i == -4) {
+		break;
+	case ID_SUBTITLES_FORCEDONLY:
 		if (m_pDVS) {
 			bool fBuffer, fOnlyShowForcedSubs, fPolygonize;
 			m_pDVS->get_VobSubSettings(&fBuffer, &fOnlyShowForcedSubs, &fPolygonize);
@@ -8321,39 +8325,37 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 		if (m_pCAP) {
 			m_pCAP->Invalidate();
 		}
-	} else if (i == -3) {
+		break;
+	case ID_SUBTITLES_STEREO_DONTUSE:
 		s.m_VRSettings.iSubpicStereoMode = SUBPIC_STEREO_NONE;
-
 		if (m_pCAP) {
 			m_pCAP->Invalidate();
 			RepaintVideo();
 		}
-
-		CString osd = ResStr(IDS_SUBTITLES_STEREO);
+		osd = ResStr(IDS_SUBTITLES_STEREO);
 		osd.AppendFormat(L": %s", ResStr(IDS_SUBTITLES_STEREO_DONTUSE));
 		m_OSD.DisplayMessage(OSD_TOPLEFT, osd, 3000);
-	} else if (i == -2) {
+		break;
+	case ID_SUBTITLES_STEREO_SIDEBYSIDE:
 		s.m_VRSettings.iSubpicStereoMode = SUBPIC_STEREO_SIDEBYSIDE;
-
 		if (m_pCAP) {
 			m_pCAP->Invalidate();
 			RepaintVideo();
 		}
-
-		CString osd = ResStr(IDS_SUBTITLES_STEREO);
+		osd = ResStr(IDS_SUBTITLES_STEREO);
 		osd.AppendFormat(L": %s", ResStr(IDS_SUBTITLES_STEREO_SIDEBYSIDE));
 		m_OSD.DisplayMessage(OSD_TOPLEFT, osd, 3000);
-	} else if (i == -1) {
+		break;
+	case ID_SUBTITLES_STEREO_TOPBOTTOM:
 		s.m_VRSettings.iSubpicStereoMode = SUBPIC_STEREO_TOPANDBOTTOM;
-
 		if (m_pCAP) {
 			m_pCAP->Invalidate();
 			RepaintVideo();
 		}
-
-		CString osd = ResStr(IDS_SUBTITLES_STEREO);
+		osd = ResStr(IDS_SUBTITLES_STEREO);
 		osd.AppendFormat(L": %s", ResStr(IDS_SUBTITLES_STEREO_TOPANDBOTTOM));
 		m_OSD.DisplayMessage(OSD_TOPLEFT, osd, 3000);
+		break;
 	}
 }
 
@@ -8401,7 +8403,6 @@ void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
 void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 {
 	const UINT nID = pCmdUI->m_nID;
-	const int i = (int)nID - (10 + ID_SUBTITLES_SUBITEM_START);
 
 	const CAppSettings& s = AfxGetAppSettings();
 
@@ -8418,45 +8419,42 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 		pCmdUI->Enable(TRUE);
 	};
 
-	if (i == -10) {
-		pCmdUI->Enable(GetPlaybackMode() == PM_NONE || (m_pCAP && !m_pDVS && !m_bAudioOnly)) ;
-	} else if (i == -9) {
-		pCmdUI->Enable((m_pCAP || m_pDVS) && !m_bAudioOnly && GetPlaybackMode() != PM_DVD);
-	} else if (i == -8) {
-		// styles
-		pCmdUI->Enable(FALSE);
+	switch (nID) {
+	case ID_SUBTITLES_STYLES:
 		if (dynamic_cast<CRenderedTextSubtitle*>((ISubStream*)m_pCurrentSubStream)) {
 			pCmdUI->Enable(TRUE);
+		} else {
+			pCmdUI->Enable(FALSE);
 		}
-	} else if (i == -7) {
+		break;
+	case ID_SUBTITLES_RELOAD:
 		if (m_pDVS) {
 			pCmdUI->SetCheck(FALSE);
 			pCmdUI->Enable(FALSE);
-			return;
 		}
-	} else if (i == -6) {
-		// enabled
+		break;
+	case ID_SUBTITLES_ENABLE:
 		pCmdUI->Enable(TRUE);
 		if (m_pDVS) {
 			bool fHideSubtitles = false;
 			m_pDVS->get_HideSubtitles(&fHideSubtitles);
-
 			pCmdUI->SetCheck(!fHideSubtitles);
-			return;
+		} else {
+			pCmdUI->SetCheck(s.fEnableSubtitles);
 		}
-		pCmdUI->SetCheck(s.fEnableSubtitles);
-	} else if (i == -5) {
+		break;
+	case ID_SUBTITLES_DEFSTYLE:
 		// override
 		if (m_pDVS) {
 			pCmdUI->SetCheck(FALSE);
 			pCmdUI->Enable(FALSE);
-			return;
+		} else {
+			// TODO: foxX - default subtitles style toggle here; still wip
+			pCmdUI->SetCheck(s.fUseDefaultSubtitlesStyle);
+			pCmdUI->Enable(s.fEnableSubtitles && m_pCAP && !m_bAudioOnly && GetPlaybackMode() != PM_DVD);
 		}
-
-		// TODO: foxX - default subtitles style toggle here; still wip
-		pCmdUI->SetCheck(s.fUseDefaultSubtitlesStyle);
-		pCmdUI->Enable(s.fEnableSubtitles && m_pCAP && !m_bAudioOnly && GetPlaybackMode() != PM_DVD);
-	} else if (i == -4) {
+		break;
+	case ID_SUBTITLES_FORCEDONLY:
 		if (m_pDVS) {
 			bool fOnlyShowForcedSubs = false;
 			bool fBuffer, fPolygonize;
@@ -8465,16 +8463,20 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 			pCmdUI->Enable();
 			pCmdUI->SetCheck(fOnlyShowForcedSubs);
 			return;
+		} else {
+			pCmdUI->SetCheck(s.fForcedSubtitles);
+			pCmdUI->Enable(s.fEnableSubtitles && m_pCAP && !m_bAudioOnly && GetPlaybackMode() != PM_DVD);
 		}
-
-		pCmdUI->SetCheck(s.fForcedSubtitles);
-		pCmdUI->Enable(s.fEnableSubtitles && m_pCAP && !m_bAudioOnly && GetPlaybackMode() != PM_DVD);
-	} else if (i == -3) {
+		break;
+	case ID_SUBTITLES_STEREO_DONTUSE:
 		SetRadioCheck(pCmdUI, s.m_VRSettings.iSubpicStereoMode == SUBPIC_STEREO_NONE);
-	} else if (i == -2) {
+		break;
+	case ID_SUBTITLES_STEREO_SIDEBYSIDE:
 		SetRadioCheck(pCmdUI, s.m_VRSettings.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE);
-	} else if (i == -1) {
+		break;
+	case ID_SUBTITLES_STEREO_TOPBOTTOM:
 		SetRadioCheck(pCmdUI, s.m_VRSettings.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM);
+		break;
 	}
 }
 
@@ -14293,24 +14295,22 @@ void CMainFrame::SetupSubtitlesSubMenu()
 		pSub->CreatePopupMenu();
 	} else while (pSub->RemoveMenu(0, MF_BYPOSITION));
 
-	UINT id = ID_SUBTITLES_SUBITEM_START;
-
-	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_SUBTITLES_OPTIONS));
-	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_AG_LOAD_SUBTITLE));
-	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_SUBTITLES_STYLES));
-	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_SUBTITLES_RELOAD));
+	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SUBTITLES_OPTIONS, ResStr(IDS_SUBTITLES_OPTIONS));
+	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_LOAD_EXT_SUBTITLES, ResStr(IDS_AG_LOAD_SUBTITLE));
+	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SUBTITLES_STYLES, ResStr(IDS_SUBTITLES_STYLES));
+	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SUBTITLES_RELOAD, ResStr(IDS_SUBTITLES_RELOAD));
 	pSub->AppendMenu(MF_SEPARATOR);
 
-	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_SUBTITLES_ENABLE));
-	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_SUBTITLES_DEFAULT_STYLE));
-	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_SUBTITLES_FORCED));
+	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SUBTITLES_ENABLE, ResStr(IDS_SUBTITLES_ENABLE));
+	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SUBTITLES_DEFSTYLE, ResStr(IDS_SUBTITLES_DEFAULT_STYLE));
+	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SUBTITLES_FORCEDONLY, ResStr(IDS_SUBTITLES_FORCED));
 	pSub->AppendMenu(MF_SEPARATOR);
 
 	CMenu subMenu;
 	subMenu.CreatePopupMenu();
-	subMenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_SUBTITLES_STEREO_DONTUSE));
-	subMenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_SUBTITLES_STEREO_SIDEBYSIDE));
-	subMenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_SUBTITLES_STEREO_TOPANDBOTTOM));
+	subMenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SUBTITLES_STEREO_DONTUSE, ResStr(IDS_SUBTITLES_STEREO_DONTUSE));
+	subMenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SUBTITLES_STEREO_SIDEBYSIDE, ResStr(IDS_SUBTITLES_STEREO_SIDEBYSIDE));
+	subMenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SUBTITLES_STEREO_TOPBOTTOM, ResStr(IDS_SUBTITLES_STEREO_TOPANDBOTTOM));
 	pSub->AppendMenu(MF_STRING | MF_POPUP | MF_ENABLED, (UINT_PTR)subMenu.Detach(), ResStr(IDS_SUBTITLES_STEREO));
 }
 
