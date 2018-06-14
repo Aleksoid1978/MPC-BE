@@ -8309,7 +8309,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 		ReloadSubtitle();
 	} else if (i == -6) {
 
-		OnNavMixStreamSubtitleSelectSubMenu(-1, 2);
+		SelectSubtilesAMStream(-1, 2);
 
 	} else if (i == -5) {
 		// override default style
@@ -9227,7 +9227,7 @@ void CMainFrame::OnNavigateAudio(UINT nID)
 void CMainFrame::OnNavigateSubpic(UINT nID)
 {
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
-		OnNavMixStreamSubtitleSelectSubMenu(nID - (ID_NAVIGATE_SUBP_SUBITEM_START + 1), 2);
+		SelectSubtilesAMStream(nID - (ID_NAVIGATE_SUBP_SUBITEM_START + 1), 2);
 	} else if (GetPlaybackMode() == PM_DVD) {
 		int i = (int)nID - (ID_NAVIGATE_SUBP_SUBITEM_START + 1);
 
@@ -9244,7 +9244,7 @@ void CMainFrame::OnNavigateSubpic(UINT nID)
 	}
 }
 
-void CMainFrame::OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup)
+void CMainFrame::SelectSubtilesAMStream(UINT id, DWORD dwSelGroup)
 {
 	int streamCount = GetStreamCount(2);
 	if (streamCount) {
@@ -9389,7 +9389,7 @@ void CMainFrame::OnNavigateAngle(UINT nID)
 	nID -= ID_NAVIGATE_ANGLE_SUBITEM_START;
 
 	if (GetPlaybackMode() == PM_FILE) {
-		OnNavStreamSelectSubMenu(nID, 0);
+		SelectAMStream(nID, 0);
 	} else if (GetPlaybackMode() == PM_DVD) {
 		m_pDVDC->SelectAngle(nID+1, DVD_CMD_FLAG_Block, nullptr);
 
@@ -13064,7 +13064,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			}
 
 			if (s.fUseInternalSelectTrackLogic) {
-				OnNavMixStreamSubtitleSelectSubMenu(GetSubSelIdx(), 2);
+				SelectSubtilesAMStream(GetSubSelIdx(), 2);
 			} else if (subcount && !s.fPrioritizeExternalSubtitles) {
 				m_pDVS->put_SelectedLanguage(nLangs - 1);
 			}
@@ -13263,7 +13263,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 					}
 				}
 			}
-			OnNavMixStreamSubtitleSelectSubMenu(checkedsplsub, 2);
+			SelectSubtilesAMStream(checkedsplsub, 2);
 		} else {
 			int cnt = subarray.size();
 			size_t defsub = GetSubSelIdx();
@@ -13273,7 +13273,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			}
 
 			if (cnt > 0) {
-				OnNavMixStreamSubtitleSelectSubMenu(defsub, 2);
+				SelectSubtilesAMStream(defsub, 2);
 			}
 		}
 	}
@@ -14341,7 +14341,7 @@ void CMainFrame::SetupSubtitleTracksSubMenu()
 	UINT id = ID_NAVIGATE_SUBP_SUBITEM_START;
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
-		SetupNavMixStreamSubtitleSelectSubMenu(pSub, id, 2);
+		SetupSubtilesAMStreamSubMenu(pSub, id, 2);
 	} else if (GetPlaybackMode() == PM_DVD) {
 		ULONG ulStreamsAvailable, ulCurrentStream;
 		BOOL bIsDisabled;
@@ -14426,7 +14426,7 @@ void CMainFrame::SetupSubtitleTracksSubMenu()
 	}
 }
 
-void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup)
+void CMainFrame::SetupSubtilesAMStreamSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup)
 {
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
@@ -14647,7 +14647,7 @@ void CMainFrame::SetupVideoStreamsSubMenu()
 	UINT id = ID_NAVIGATE_ANGLE_SUBITEM_START;
 
 	if (GetPlaybackMode() == PM_FILE) {
-		SetupNavStreamSelectSubMenu(pSub, id, 0);
+		SetupAMStreamSubMenu(pSub, id, 0);
 	} else if (GetPlaybackMode() == PM_DVD) {
 		ULONG ulStreamsAvailable, ulCurrentStream;
 		if (FAILED(m_pDVDI->GetCurrentAngle(&ulStreamsAvailable, &ulCurrentStream))) {
@@ -14847,7 +14847,7 @@ IBaseFilter* CMainFrame::FindSwitcherFilter()
 	return FindFilter(__uuidof(CAudioSwitcherFilter), m_pGB);
 }
 
-void CMainFrame::SetupNavStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup)
+void CMainFrame::SetupAMStreamSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup)
 {
 	UINT baseid = id;
 
@@ -14896,7 +14896,7 @@ void CMainFrame::SetupNavStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGr
 	}
 }
 
-void CMainFrame::OnNavStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
+void CMainFrame::SelectAMStream(UINT id, DWORD dwSelGroup)
 {
 	CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
 	if (!pSS) {
@@ -15801,7 +15801,7 @@ void CMainFrame::SetSubtitleTrackIdx(int index)
 		if (index != -1) {
 			AfxGetAppSettings().fEnableSubtitles = true;
 		}
-		OnNavMixStreamSubtitleSelectSubMenu(index, 2);
+		SelectSubtilesAMStream(index, 2);
 	}
 }
 

@@ -313,6 +313,19 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	void SetAlwaysOnTop(int i);
 
 	// dynamic menus
+	CMenu m_popupMainMenu, m_popupMenu;
+	CMenu m_openCDsMenu;
+	CMenu m_recentfilesMenu;
+	CMenu m_languageMenu;
+	CMenu m_filtersMenu;
+	CMenu m_shadersMenu;
+	CMenu m_AudiosMenu;
+	CMenu m_SubtitlesMenu;
+	CMenu m_chaptersMenu;
+	CMenu m_VideoStreamsMenu;
+	CMenu m_AudioTracksMenu;
+	CMenu m_SubtitleTracksMenu;
+	CMenu m_favoritesMenu;
 
 	void SetupOpenCDSubMenu();
 	void SetupFiltersSubMenu();
@@ -328,25 +341,11 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	void SetupLanguageMenu();
 
 	IBaseFilter* FindSwitcherFilter();
-	void SetupNavStreamSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup);
-	void OnNavStreamSelectSubMenu(UINT id, DWORD dwSelGroup);
+	void SetupAMStreamSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup);
+	void SelectAMStream(UINT id, DWORD dwSelGroup);
 
-	void SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup);
-	void OnNavMixStreamSubtitleSelectSubMenu(UINT id, DWORD dwSelGroup);
-
-	CMenu m_popupMainMenu, m_popupMenu;
-	CMenu m_openCDsMenu;
-	CMenu m_recentfilesMenu;
-	CMenu m_languageMenu;
-	CMenu m_filtersMenu;
-	CMenu m_shadersMenu;
-	CMenu m_AudiosMenu;
-	CMenu m_SubtitlesMenu;
-	CMenu m_chaptersMenu;
-	CMenu m_VideoStreamsMenu;
-	CMenu m_AudioTracksMenu;
-	CMenu m_SubtitleTracksMenu;
-	CMenu m_favoritesMenu;
+	void SetupSubtilesAMStreamSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup);
+	void SelectSubtilesAMStream(UINT id, DWORD dwSelGroup);
 
 	CInterfaceArray<IUnknown, &IID_IUnknown> m_pparray;
 	CInterfaceArray<IAMStreamSelect> m_ssarray;
