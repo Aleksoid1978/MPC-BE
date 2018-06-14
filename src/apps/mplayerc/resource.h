@@ -402,6 +402,9 @@
 //
 #define ID_AUDIO_CENTER_INC             1150
 #define ID_AUDIO_CENTER_DEC             1151
+//
+#define ID_AUDIO_OPTIONS                1160
+#define ID_LOAD_EXT_AUDIO               1161
 // ranges for menus
 #define ID_FILTERS_SUBITEM_START        2000
 #define ID_FILTERS_SUBITEM_END          2099

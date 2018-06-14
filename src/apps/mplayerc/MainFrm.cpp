@@ -411,8 +411,10 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_MENU_RECENT_FILES, OnMenuRecentFiles)
 	ON_COMMAND(ID_FAVORITES, OnMenuFavorites)
 
-	ON_COMMAND_RANGE(ID_AUDIO_SUBITEM_START, ID_AUDIO_SUBITEM_END, OnPlayAudioOption)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_AUDIO_SUBITEM_START, ID_AUDIO_SUBITEM_END, OnUpdatePlayAudioOption)
+	ON_COMMAND(ID_AUDIO_OPTIONS, OnMenuAudioOption)
+	ON_COMMAND(ID_LOAD_EXT_AUDIO, OnFileLoadAudio)
+	ON_UPDATE_COMMAND_UI(ID_LOAD_EXT_AUDIO, OnUpdateFileLoadAudio)
+
 	ON_COMMAND_RANGE(ID_SUBTITLES_SUBITEM_START, ID_SUBTITLES_SUBITEM_END, OnPlaySubtitles)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_SUBTITLES_SUBITEM_START, ID_SUBTITLES_SUBITEM_END, OnUpdatePlaySubtitles)
 
@@ -6275,6 +6277,11 @@ void CMainFrame::OnFileLoadAudio()
 	SetToolBarAudioButton();
 }
 
+void CMainFrame::OnUpdateFileLoadAudio(CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable(GetPlaybackMode() == PM_FILE/* && !m_bAudioOnly*/);
+}
+
 void CMainFrame::OnFileSaveSubtitle()
 {
 	if (m_pCurrentSubStream) {
@@ -8234,26 +8241,9 @@ void CMainFrame::OnPlayShaders(UINT nID)
 	SetShaders();
 }
 
-void CMainFrame::OnPlayAudioOption(UINT nID)
+void CMainFrame::OnMenuAudioOption()
 {
-	int i = (int)nID - (1 + ID_AUDIO_SUBITEM_START);
-	if (i == -1) {
- 		ShowOptions(CPPageAudio::IDD);
-	} else if (i == 0) {
-		OnFileLoadAudio();
- 	}
-}
-
-void CMainFrame::OnUpdatePlayAudioOption(CCmdUI* pCmdUI)
-{
-	UINT nID = pCmdUI->m_nID;
-	int i = (int)nID - (1 + ID_AUDIO_SUBITEM_START);
-
-	if (i == -1) {
-		pCmdUI->Enable(TRUE);
-	} else if (i == 0) {
-		pCmdUI->Enable(GetPlaybackMode() == PM_FILE/* && !m_bAudioOnly*/);
-	}
+	ShowOptions(CPPageAudio::IDD);
 }
 
 void CMainFrame::OnPlaySubtitles(UINT nID)
@@ -14291,10 +14281,8 @@ void CMainFrame::SetupAudioSubMenu()
 		pSub->CreatePopupMenu();
 	} else while (pSub->RemoveMenu(0, MF_BYPOSITION));
 
-	UINT id = ID_AUDIO_SUBITEM_START;
-
-	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_SUBTITLES_OPTIONS));
-	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, id++, ResStr(IDS_AG_LOAD_AUDIO));
+	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_AUDIO_OPTIONS, ResStr(IDS_SUBTITLES_OPTIONS));
+	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_LOAD_EXT_AUDIO, ResStr(IDS_AG_LOAD_AUDIO));
 }
 
 void CMainFrame::SetupSubtitlesSubMenu()
