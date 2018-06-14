@@ -340,7 +340,7 @@ namespace MatroskaReader
 
 		Video() {
 			FlagInterlaced.Set(0);
-			FieldOrder.Set(0);
+			FieldOrder.Set(-1);
 			StereoMode.Set(0);
 			DisplayUnit.Set(0);
 			AspectRatioType.Set(0);
