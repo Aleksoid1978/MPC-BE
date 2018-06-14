@@ -1065,6 +1065,7 @@ public:
 	afx_msg void OnPlayShaders(UINT nID);
 
 	afx_msg void OnMenuAudioOption();
+	afx_msg void OnMenuSubtitlesOption();
 	afx_msg void OnPlaySubtitles(UINT nID);
 	afx_msg void OnUpdatePlaySubtitles(CCmdUI* pCmdUI);
 
