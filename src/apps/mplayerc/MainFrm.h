@@ -316,10 +316,10 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	void SetupOpenCDSubMenu();
 	void SetupFiltersSubMenu();
-	void SetupAudioOptionSubMenu();
-	void SetupSubtitlesSubMenu();
 	void SetupAudioSubMenu();
-	void SetupNavMixSubtitleSubMenu();
+	void SetupSubtitlesSubMenu();
+	void SetupAudioTracksSubMenu();
+	void SetupSubtitleTracksSubMenu();
 	void SetupVideoStreamsSubMenu();
 	void SetupNavChaptersSubMenu();
 	void SetupFavoritesSubMenu();
@@ -336,13 +336,17 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	CMenu m_popupMainMenu, m_popupMenu;
 	CMenu m_openCDsMenu;
-	CMenu m_filtersMenu, m_subtitlesMenu, m_audiosMenu;
-	CMenu m_languageMenu;
-	CMenu m_videoStreamsMenu;
-	CMenu m_chaptersMenu;
-	CMenu m_favoritesMenu;
-	CMenu m_shadersMenu;
 	CMenu m_recentfilesMenu;
+	CMenu m_languageMenu;
+	CMenu m_filtersMenu;
+	CMenu m_shadersMenu;
+	CMenu m_AudiosMenu;
+	CMenu m_SubtitlesMenu;
+	CMenu m_chaptersMenu;
+	CMenu m_VideoStreamsMenu;
+	CMenu m_AudioTracksMenu;
+	CMenu m_SubtitleTracksMenu;
+	CMenu m_favoritesMenu;
 
 	CInterfaceArray<IUnknown, &IID_IUnknown> m_pparray;
 	CInterfaceArray<IAMStreamSelect> m_ssarray;
@@ -353,7 +357,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 		int  Num    = -1;
 		int  Sel    = -1;
 		bool Ext    = false;
-		bool forced	= false;
+		bool forced = false;
 		bool def    = false;
 		CString Name;
 	};
@@ -465,9 +469,6 @@ public:
 	bool m_bFirstFSAfterLaunchOnFullScreen;
 	bool m_bStartInD3DFullscreen;
 	bool m_bHideCursor;
-
-	CMenu m_navAudioMenu;
-	CMenu m_navMixSubtitleMenu;
 
 	CComPtr<IBaseFilter> m_pRefClock; // Adjustable reference clock. GothSync
 	CComPtr<ISyncClock> m_pSyncClock;

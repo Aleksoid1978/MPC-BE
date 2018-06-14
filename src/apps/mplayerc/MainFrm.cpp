@@ -3816,17 +3816,17 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			SetupLanguageMenu();
 			pSubMenu = &m_languageMenu;
 		} else if (itemID == ID_AUDIOS) {
-			SetupAudioOptionSubMenu();
-			pSubMenu = &m_audiosMenu;
+			SetupAudioSubMenu();
+			pSubMenu = &m_AudiosMenu;
 		} else if (itemID == ID_SUBTITLES) {
 			SetupSubtitlesSubMenu();
-			pSubMenu = &m_subtitlesMenu;
+			pSubMenu = &m_SubtitlesMenu;
 		} else if (itemID == ID_AUDIOLANGUAGE) {
-			SetupAudioSubMenu();
-			pSubMenu = &m_navAudioMenu;
+			SetupAudioTracksSubMenu();
+			pSubMenu = &m_AudioTracksMenu;
 		} else if (itemID == ID_SUBTITLELANGUAGE) {
-			SetupNavMixSubtitleSubMenu();
-			pSubMenu = &m_navMixSubtitleMenu;
+			SetupSubtitleTracksSubMenu();
+			pSubMenu = &m_SubtitleTracksMenu;
 		} else if (itemID == ID_VIDEOANGLE) {
 
 			CString menu_str = GetPlaybackMode() == PM_DVD ? ResStr(IDS_MENU_VIDEO_ANGLE) : ResStr(IDS_MENU_VIDEO_STREAM);
@@ -3836,7 +3836,7 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			pPopupMenu->SetMenuItemInfo(i, &mii, TRUE);
 
 			SetupVideoStreamsSubMenu();
-			pSubMenu = &m_videoStreamsMenu;
+			pSubMenu = &m_VideoStreamsMenu;
 		} else if (itemID == ID_JUMPTO) {
 			SetupNavChaptersSubMenu();
 			pSubMenu = &m_chaptersMenu;
@@ -4239,8 +4239,8 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	// Ensure the dynamically added menu items are updated
 	SetupFiltersSubMenu();
 	SetupSubtitlesSubMenu();
-	SetupAudioSubMenu();
-	SetupNavMixSubtitleSubMenu();
+	SetupAudioTracksSubMenu();
+	SetupSubtitleTracksSubMenu();
 	SetupVideoStreamsSubMenu();
 	SetupNavChaptersSubMenu();
 	SetupRecentFilesSubMenu();
@@ -4364,8 +4364,8 @@ void CMainFrame::OnFilePostCloseMedia()
 	// Ensure the dynamically added menu items are cleared
 	SetupFiltersSubMenu();
 	SetupSubtitlesSubMenu();
-	SetupAudioSubMenu();
-	SetupNavMixSubtitleSubMenu();
+	SetupAudioTracksSubMenu();
+	SetupSubtitleTracksSubMenu();
 	SetupVideoStreamsSubMenu();
 	SetupNavChaptersSubMenu();
 
@@ -8543,28 +8543,26 @@ void CMainFrame::OnSelectStream(UINT nID)
 
 void CMainFrame::OnMenuNavAudio()
 {
-	m_navAudioMenu.DestroyMenu();
-	SetupAudioSubMenu();
-	OnMenu(&m_navAudioMenu);
+	SetupAudioTracksSubMenu();
+	OnMenu(&m_AudioTracksMenu);
 }
 
 void CMainFrame::OnMenuNavSubtitle()
 {
-	m_navMixSubtitleMenu.DestroyMenu();
-	SetupNavMixSubtitleSubMenu();
-	OnMenu(&m_navMixSubtitleMenu);
+	SetupSubtitleTracksSubMenu();
+	OnMenu(&m_SubtitleTracksMenu);
 }
 
 void CMainFrame::OnMenuNavAudioOptions()
 {
-	SetupAudioOptionSubMenu();
-	OnMenu(&m_audiosMenu);
+	SetupAudioSubMenu();
+	OnMenu(&m_AudiosMenu);
 }
 
 void CMainFrame::OnMenuNavSubtitleOptions()
 {
 	SetupSubtitlesSubMenu();
-	OnMenu(&m_subtitlesMenu);
+	OnMenu(&m_SubtitlesMenu);
 }
 
 void CMainFrame::OnMenuNavJumpTo()
@@ -14285,9 +14283,9 @@ void CMainFrame::SetupLanguageMenu()
 	}
 }
 
-void CMainFrame::SetupAudioOptionSubMenu()
+void CMainFrame::SetupAudioSubMenu()
 {
-	CMenu* pSub = &m_audiosMenu;
+	CMenu* pSub = &m_AudiosMenu;
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
@@ -14301,7 +14299,7 @@ void CMainFrame::SetupAudioOptionSubMenu()
 
 void CMainFrame::SetupSubtitlesSubMenu()
 {
-	CMenu* pSub = &m_subtitlesMenu;
+	CMenu* pSub = &m_SubtitlesMenu;
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
@@ -14328,9 +14326,9 @@ void CMainFrame::SetupSubtitlesSubMenu()
 	pSub->AppendMenu(MF_STRING | MF_POPUP | MF_ENABLED, (UINT_PTR)subMenu.Detach(), ResStr(IDS_SUBTITLES_STEREO));
 }
 
-void CMainFrame::SetupNavMixSubtitleSubMenu()
+void CMainFrame::SetupSubtitleTracksSubMenu()
 {
-	CMenu* pSub = &m_navMixSubtitleMenu;
+	CMenu* pSub = &m_SubtitleTracksMenu;
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
@@ -14636,7 +14634,7 @@ void CMainFrame::SetupNavMixStreamSubtitleSelectSubMenu(CMenu* pSub, UINT id, DW
 
 void CMainFrame::SetupVideoStreamsSubMenu()
 {
-	CMenu* pSub = &m_videoStreamsMenu;
+	CMenu* pSub = &m_VideoStreamsMenu;
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
@@ -14939,9 +14937,9 @@ void CMainFrame::OnNavStreamSelectSubMenu(UINT id, DWORD dwSelGroup)
 	}
 }
 
-void CMainFrame::SetupAudioSubMenu()
+void CMainFrame::SetupAudioTracksSubMenu()
 {
-	CMenu* pSub = &m_navAudioMenu;
+	CMenu* pSub = &m_AudioTracksMenu;
 
 	if (!IsMenu(pSub->m_hMenu)) {
 		pSub->CreatePopupMenu();
@@ -17111,11 +17109,11 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 
 	m_openCDsMenu.DestroyMenu();
 	m_filtersMenu.DestroyMenu();
-	m_subtitlesMenu.DestroyMenu();
-	m_audiosMenu.DestroyMenu();
-	m_navAudioMenu.DestroyMenu();
-	m_navMixSubtitleMenu.DestroyMenu();
-	m_videoStreamsMenu.DestroyMenu();
+	m_SubtitlesMenu.DestroyMenu();
+	m_AudiosMenu.DestroyMenu();
+	m_AudioTracksMenu.DestroyMenu();
+	m_SubtitleTracksMenu.DestroyMenu();
+	m_VideoStreamsMenu.DestroyMenu();
 	m_chaptersMenu.DestroyMenu();
 	m_favoritesMenu.DestroyMenu();
 	m_shadersMenu.DestroyMenu();
@@ -17123,12 +17121,12 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	m_languageMenu.DestroyMenu();
 
 	m_popupMenu.DestroyMenu();
-	m_popupMenu.LoadMenuW(IDR_POPUP);
+	m_popupMenu.LoadMenu(IDR_POPUP);
 	m_popupMainMenu.DestroyMenu();
-	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
+	m_popupMainMenu.LoadMenu(IDR_POPUPMAIN);
 
 	oldMenu = GetMenu();
-	defaultMenu.LoadMenuW(IDR_MAINFRAME);
+	defaultMenu.LoadMenu(IDR_MAINFRAME);
 	if (oldMenu) {
 		// Attach the new menu to the window only if there was a menu before
 		SetMenu(&defaultMenu);
