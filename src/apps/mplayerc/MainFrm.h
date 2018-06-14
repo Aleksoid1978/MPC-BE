@@ -344,8 +344,9 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	void SetupAMStreamSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup);
 	void SelectAMStream(UINT id, DWORD dwSelGroup);
 
-	void SetupSubtilesAMStreamSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup);
-	void SelectSubtilesAMStream(UINT id, DWORD dwSelGroup);
+	#define SUBTITLE_GROUP 2
+	void SetupSubtilesAMStreamSubMenu(CMenu* pSub, UINT id);
+	void SelectSubtilesAMStream(UINT id);
 
 	CInterfaceArray<IUnknown, &IID_IUnknown> m_pparray;
 	CInterfaceArray<IAMStreamSelect> m_ssarray;

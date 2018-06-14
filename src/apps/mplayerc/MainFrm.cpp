@@ -8309,7 +8309,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 		ReloadSubtitle();
 	} else if (i == -6) {
 
-		SelectSubtilesAMStream(-1, 2);
+		SelectSubtilesAMStream(-1);
 
 	} else if (i == -5) {
 		// override default style
@@ -9227,7 +9227,7 @@ void CMainFrame::OnNavigateAudio(UINT nID)
 void CMainFrame::OnNavigateSubpic(UINT nID)
 {
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
-		SelectSubtilesAMStream(nID - (ID_NAVIGATE_SUBP_SUBITEM_START + 1), 2);
+		SelectSubtilesAMStream(nID - (ID_NAVIGATE_SUBP_SUBITEM_START + 1));
 	} else if (GetPlaybackMode() == PM_DVD) {
 		int i = (int)nID - (ID_NAVIGATE_SUBP_SUBITEM_START + 1);
 
@@ -9244,9 +9244,9 @@ void CMainFrame::OnNavigateSubpic(UINT nID)
 	}
 }
 
-void CMainFrame::SelectSubtilesAMStream(UINT id, DWORD dwSelGroup)
+void CMainFrame::SelectSubtilesAMStream(UINT id)
 {
-	int streamCount = GetStreamCount(2);
+	int streamCount = GetStreamCount(SUBTITLE_GROUP);
 	if (streamCount) {
 		streamCount--;
 	}
@@ -9277,7 +9277,7 @@ void CMainFrame::SelectSubtilesAMStream(UINT id, DWORD dwSelGroup)
 			int nLangs;
 			if (SUCCEEDED(m_pDVS->get_LanguageCount(&nLangs)) && nLangs) {
 
-				int subcount = GetStreamCount(2);
+				int subcount = GetStreamCount(SUBTITLE_GROUP);
 				if (subcount) {
 					CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
 					DWORD cStreams = 0;
@@ -9300,7 +9300,7 @@ void CMainFrame::SelectSubtilesAMStream(UINT id, DWORD dwSelGroup)
 							continue;
 						}
 
-						if (dwGroup != 2) {
+						if (dwGroup != SUBTITLE_GROUP) {
 							continue;
 						}
 
@@ -9341,7 +9341,7 @@ void CMainFrame::SelectSubtilesAMStream(UINT id, DWORD dwSelGroup)
 						continue;
 					}
 
-					if (dwGroup != 2) {
+					if (dwGroup != SUBTITLE_GROUP) {
 						continue;
 					}
 					splsubcnt++;
@@ -13064,7 +13064,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			}
 
 			if (s.fUseInternalSelectTrackLogic) {
-				SelectSubtilesAMStream(GetSubSelIdx(), 2);
+				SelectSubtilesAMStream(GetSubSelIdx());
 			} else if (subcount && !s.fPrioritizeExternalSubtitles) {
 				m_pDVS->put_SelectedLanguage(nLangs - 1);
 			}
@@ -13263,7 +13263,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 					}
 				}
 			}
-			SelectSubtilesAMStream(checkedsplsub, 2);
+			SelectSubtilesAMStream(checkedsplsub);
 		} else {
 			int cnt = subarray.size();
 			size_t defsub = GetSubSelIdx();
@@ -13273,7 +13273,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			}
 
 			if (cnt > 0) {
-				SelectSubtilesAMStream(defsub, 2);
+				SelectSubtilesAMStream(defsub);
 			}
 		}
 	}
@@ -14341,7 +14341,7 @@ void CMainFrame::SetupSubtitleTracksSubMenu()
 	UINT id = ID_NAVIGATE_SUBP_SUBITEM_START;
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
-		SetupSubtilesAMStreamSubMenu(pSub, id, 2);
+		SetupSubtilesAMStreamSubMenu(pSub, id);
 	} else if (GetPlaybackMode() == PM_DVD) {
 		ULONG ulStreamsAvailable, ulCurrentStream;
 		BOOL bIsDisabled;
@@ -14426,7 +14426,7 @@ void CMainFrame::SetupSubtitleTracksSubMenu()
 	}
 }
 
-void CMainFrame::SetupSubtilesAMStreamSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup)
+void CMainFrame::SetupSubtilesAMStreamSubMenu(CMenu* pSub, UINT id)
 {
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
@@ -14441,7 +14441,7 @@ void CMainFrame::SetupSubtilesAMStreamSubMenu(CMenu* pSub, UINT id, DWORD dwSelG
 				pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | (!fHideSubtitles ? MF_ENABLED : MF_DISABLED), id++, ResStr(IDS_SUBTITLES_ENABLE));
 				pSub->AppendMenu(MF_SEPARATOR);
 
-				int subcount = GetStreamCount(dwSelGroup);
+				int subcount = GetStreamCount(SUBTITLE_GROUP);
 				if (subcount) {
 					int iSelectedLanguage = 0;
 					m_pDVS->get_SelectedLanguage(&iSelectedLanguage);
@@ -14475,7 +14475,7 @@ void CMainFrame::SetupSubtilesAMStreamSubMenu(CMenu* pSub, UINT id, DWORD dwSelG
 						WCHAR* pszName = nullptr;
 
 						if (SUCCEEDED(pSS->Info(i, nullptr, &dwFlags, nullptr, &dwGroup, &pszName, nullptr, nullptr)) && pszName) {
-							if (dwGroup != dwSelGroup) {
+							if (dwGroup != SUBTITLE_GROUP) {
 								CoTaskMemFree(pszName);
 								continue;
 							}
@@ -14546,7 +14546,7 @@ void CMainFrame::SetupSubtilesAMStreamSubMenu(CMenu* pSub, UINT id, DWORD dwSelG
 					WCHAR* pszName = nullptr;
 
 					if (SUCCEEDED(pSS->Info(i, nullptr, &dwFlags, nullptr, &dwGroup, &pszName, nullptr, nullptr)) && pszName) {
-						if (dwGroup != dwSelGroup) {
+						if (dwGroup != SUBTITLE_GROUP) {
 							CoTaskMemFree(pszName);
 							continue;
 						}
@@ -15801,7 +15801,7 @@ void CMainFrame::SetSubtitleTrackIdx(int index)
 		if (index != -1) {
 			AfxGetAppSettings().fEnableSubtitles = true;
 		}
-		SelectSubtilesAMStream(index, 2);
+		SelectSubtilesAMStream(index);
 	}
 }
 
