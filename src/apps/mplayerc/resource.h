@@ -404,9 +404,7 @@
 #define ID_AUDIO_CENTER_DEC             1151
 //
 #define ID_AUDIO_OPTIONS                1160
-#define ID_LOAD_EXT_AUDIO               1161
 #define ID_SUBTITLES_OPTIONS            1170
-#define ID_LOAD_EXT_SUBTITLES           1171
 #define ID_SUBTITLES_STYLES             1172
 #define ID_SUBTITLES_RELOAD             1173
 #define ID_SUBTITLES_ENABLE             1174
