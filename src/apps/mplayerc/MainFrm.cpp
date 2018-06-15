@@ -440,10 +440,10 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND_RANGE(ID_NAVIGATE_TITLEMENU, ID_NAVIGATE_CHAPTERMENU, OnNavigateMenu)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_NAVIGATE_TITLEMENU, ID_NAVIGATE_CHAPTERMENU, OnUpdateNavigateMenu)
 
-	ON_COMMAND_RANGE(ID_NAVIGATE_AUDIO_SUBITEM_START, ID_NAVIGATE_AUDIO_SUBITEM_END, OnNavigateAudio)
-	ON_COMMAND_RANGE(ID_NAVIGATE_SUBP_SUBITEM_START, ID_NAVIGATE_SUBP_SUBITEM_END, OnNavigateSubpic)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_NAVIGATE_SUBP_SUBITEM_START, ID_NAVIGATE_SUBP_SUBITEM_END, OnUpdateNavMixSubtitles)
-	ON_COMMAND_RANGE(ID_NAVIGATE_ANGLE_SUBITEM_START, ID_NAVIGATE_ANGLE_SUBITEM_END, OnNavigateAngle)
+	ON_COMMAND_RANGE(ID_AUDIO_SUBITEM_START, ID_AUDIO_SUBITEM_END, OnNavigateAudio)
+	ON_COMMAND_RANGE(ID_SUBTITLES_SUBITEM_START, ID_SUBTITLES_SUBITEM_END, OnNavigateSubpic)
+	ON_UPDATE_COMMAND_UI_RANGE(ID_SUBTITLES_SUBITEM_START, ID_SUBTITLES_SUBITEM_END, OnUpdateNavMixSubtitles)
+	ON_COMMAND_RANGE(ID_VIDEO_STREAMS_SUBITEM_START, ID_VIDEO_STREAMS_SUBITEM_END, OnNavigateAngle)
 
 	ON_COMMAND_RANGE(ID_NAVIGATE_CHAP_SUBITEM_START, ID_NAVIGATE_CHAP_SUBITEM_END, OnNavigateChapters)
 	ON_COMMAND_RANGE(ID_NAVIGATE_MENU_LEFT, ID_NAVIGATE_MENU_LEAVE, OnNavigateMenuItem)
@@ -8358,7 +8358,7 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
 {
 	UINT nID = pCmdUI->m_nID;
-	int i = (int)nID - (1 + ID_NAVIGATE_SUBP_SUBITEM_START);
+	int i = (int)nID - (1 + ID_SUBTITLES_SUBITEM_START);
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 
@@ -9199,7 +9199,7 @@ void CMainFrame::OnUpdateNavigateMenu(CCmdUI* pCmdUI)
 
 void CMainFrame::OnNavigateAudio(UINT nID)
 {
-	nID -= ID_NAVIGATE_AUDIO_SUBITEM_START;
+	nID -= ID_AUDIO_SUBITEM_START;
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 		CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter;
@@ -9215,9 +9215,9 @@ void CMainFrame::OnNavigateAudio(UINT nID)
 void CMainFrame::OnNavigateSubpic(UINT nID)
 {
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
-		SelectSubtilesAMStream(nID - (ID_NAVIGATE_SUBP_SUBITEM_START + 1));
+		SelectSubtilesAMStream(nID - (ID_SUBTITLES_SUBITEM_START + 1));
 	} else if (GetPlaybackMode() == PM_DVD) {
-		int i = (int)nID - (ID_NAVIGATE_SUBP_SUBITEM_START + 1);
+		int i = (int)nID - (ID_SUBTITLES_SUBITEM_START + 1);
 
 		if (i == -1) {
 			ULONG ulStreamsAvailable, ulCurrentStream;
@@ -9374,7 +9374,7 @@ void CMainFrame::SelectSubtilesAMStream(UINT id)
 
 void CMainFrame::OnNavigateAngle(UINT nID)
 {
-	nID -= ID_NAVIGATE_ANGLE_SUBITEM_START;
+	nID -= ID_VIDEO_STREAMS_SUBITEM_START;
 
 	if (GetPlaybackMode() == PM_FILE) {
 		SelectAMStream(nID, 0);
@@ -14322,7 +14322,7 @@ void CMainFrame::SetupSubtitleTracksSubMenu()
 		return;
 	}
 
-	UINT id = ID_NAVIGATE_SUBP_SUBITEM_START;
+	UINT id = ID_SUBTITLES_SUBITEM_START;
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 		SetupSubtilesAMStreamSubMenu(pSub, id);
@@ -14628,7 +14628,7 @@ void CMainFrame::SetupVideoStreamsSubMenu()
 		return;
 	}
 
-	UINT id = ID_NAVIGATE_ANGLE_SUBITEM_START;
+	UINT id = ID_VIDEO_STREAMS_SUBITEM_START;
 
 	if (GetPlaybackMode() == PM_FILE) {
 		SetupAMStreamSubMenu(pSub, id, 0);
@@ -14933,7 +14933,7 @@ void CMainFrame::SetupAudioTracksSubMenu()
 		return;
 	}
 
-	UINT id = ID_NAVIGATE_AUDIO_SUBITEM_START;
+	UINT id = ID_AUDIO_SUBITEM_START;
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 		CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter;
