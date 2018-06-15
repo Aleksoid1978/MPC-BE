@@ -405,9 +405,9 @@
 //
 #define ID_AUDIO_OPTIONS                1160
 #define ID_SUBTITLES_OPTIONS            1170
+#define ID_SUBTITLES_ENABLE             1171
 #define ID_SUBTITLES_STYLES             1172
 #define ID_SUBTITLES_RELOAD             1173
-#define ID_SUBTITLES_ENABLE             1174
 #define ID_SUBTITLES_DEFSTYLE           1175
 #define ID_SUBTITLES_FORCEDONLY         1176
 #define ID_SUBTITLES_STEREO_DONTUSE     1177
