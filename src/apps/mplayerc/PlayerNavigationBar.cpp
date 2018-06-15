@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -308,7 +308,7 @@ void CPlayerNavigationDialog::OnSelChangeComboAudio()
 	CAppSettings& s = AfxGetAppSettings();
 	CDVBChannel*	 pChannel = s.FindChannelByPref(s.nDVBLastChannel);
 
-	nID = m_ComboAudio.GetCurSel() + ID_NAVIGATE_AUDIO_SUBITEM_START;
+	nID = m_ComboAudio.GetCurSel() + ID_AUDIO_SUBITEM_START;
 
 	TempWnd = static_cast<CPlayerNavigationBar*> (m_pParent) -> m_pParent;
 	static_cast<CMainFrame*>(TempWnd)->OnNavigateAudio(nID);
