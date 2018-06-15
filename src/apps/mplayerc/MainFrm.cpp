@@ -8405,41 +8405,26 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 
 void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
 {
-	UINT nID = pCmdUI->m_nID;
-	int i = (int)nID - (1 + ID_SUBTITLES_SUBITEM_START);
+	UINT nID = pCmdUI->m_nID - ID_SUBTITLES_SUBITEM_START;
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
-
 		if (m_pDVS) {
 			int nLangs;
 			if (SUCCEEDED(m_pDVS->get_LanguageCount(&nLangs)) && nLangs) {
 				bool fHideSubtitles = false;
 				m_pDVS->get_HideSubtitles(&fHideSubtitles);
-				pCmdUI->Enable();
-				if (i == -1) {
-					pCmdUI->SetCheck(!fHideSubtitles);
-				} else {
-					pCmdUI->Enable(!fHideSubtitles);
-				}
+				pCmdUI->Enable(!fHideSubtitles);
 			}
-
-			return;
 		}
-
-		pCmdUI->Enable(m_pCAP && !m_bAudioOnly);
-
-		if (i == -1) {	// enabled
-			pCmdUI->SetCheck(AfxGetAppSettings().fEnableSubtitles);
-		} else if (i >= 0) {
+		else {
 			pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles);
 		}
-	} else if (GetPlaybackMode() == PM_DVD) {
-		if (i >= 0 && m_pDVDI) {
-			ULONG ulStreamsAvailable, ulCurrentStream;
-			BOOL bIsDisabled;
-			if (SUCCEEDED(m_pDVDI->GetCurrentSubpicture(&ulStreamsAvailable, &ulCurrentStream, &bIsDisabled))) {
-				pCmdUI->Enable(!bIsDisabled);
-			}
+	}
+	else if (GetPlaybackMode() == PM_DVD && m_pDVDI) {
+		ULONG ulStreamsAvailable, ulCurrentStream;
+		BOOL bIsDisabled;
+		if (SUCCEEDED(m_pDVDI->GetCurrentSubpicture(&ulStreamsAvailable, &ulCurrentStream, &bIsDisabled))) {
+			pCmdUI->Enable(!bIsDisabled);
 		}
 	}
 }
@@ -9252,21 +9237,13 @@ void CMainFrame::OnNavigateAudio(UINT nID)
 
 void CMainFrame::OnNavigateSubpic(UINT nID)
 {
-	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
-		SelectSubtilesAMStream(nID - (ID_SUBTITLES_SUBITEM_START + 1));
-	} else if (GetPlaybackMode() == PM_DVD) {
-		int i = (int)nID - (ID_SUBTITLES_SUBITEM_START + 1);
+	nID -= ID_SUBTITLES_SUBITEM_START;
 
-		if (i == -1) {
-			ULONG ulStreamsAvailable, ulCurrentStream;
-			BOOL bIsDisabled;
-			if (SUCCEEDED(m_pDVDI->GetCurrentSubpicture(&ulStreamsAvailable, &ulCurrentStream, &bIsDisabled))) {
-				m_pDVDC->SetSubpictureState(bIsDisabled, DVD_CMD_FLAG_Block, nullptr);
-			}
-		} else {
-			m_pDVDC->SelectSubpictureStream(i, DVD_CMD_FLAG_Block, nullptr);
-			m_pDVDC->SetSubpictureState(TRUE, DVD_CMD_FLAG_Block, nullptr);
-		}
+	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
+		SelectSubtilesAMStream(nID);
+	} else if (GetPlaybackMode() == PM_DVD) {
+		m_pDVDC->SelectSubpictureStream(nID, DVD_CMD_FLAG_Block, nullptr);
+		m_pDVDC->SetSubpictureState(TRUE, DVD_CMD_FLAG_Block, nullptr);
 	}
 }
 
@@ -14378,7 +14355,7 @@ void CMainFrame::SetupSubtitleTracksSubMenu()
 			return;
 		}
 
-		pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | (bIsDisabled ? MF_ENABLED : MF_CHECKED), id++, ResStr(IDS_AG_ENABLED));
+		pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | (bIsDisabled ? MF_ENABLED : MF_CHECKED), ID_SUBTITLES_ENABLE, ResStr(IDS_AG_ENABLED));
 		pSub->AppendMenu(MF_BYCOMMAND | MF_SEPARATOR | MF_ENABLED);
 
 		for (ULONG i = 0; i < ulStreamsAvailable; i++) {
@@ -14454,13 +14431,13 @@ void CMainFrame::SetupSubtilesAMStreamSubMenu(CMenu* pSub, UINT id)
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 
 		if (m_pDVS) {
-			CComQIPtr<IAMStreamSelect> pSS	= m_pMainSourceFilter;
+			CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
 			int nLangs;
 			if (SUCCEEDED(m_pDVS->get_LanguageCount(&nLangs)) && nLangs) {
 
 				bool fHideSubtitles = false;
 				m_pDVS->get_HideSubtitles(&fHideSubtitles);
-				pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | (!fHideSubtitles ? MF_ENABLED : MF_DISABLED), id++, ResStr(IDS_SUBTITLES_ENABLE));
+				pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | (!fHideSubtitles ? MF_ENABLED : MF_DISABLED), ID_SUBTITLES_ENABLE, ResStr(IDS_SUBTITLES_ENABLE));
 				pSub->AppendMenu(MF_SEPARATOR);
 
 				int subcount = GetStreamCount(SUBTITLE_GROUP);
@@ -14542,7 +14519,7 @@ void CMainFrame::SetupSubtilesAMStreamSubMenu(CMenu* pSub, UINT id)
 
 		POSITION pos = m_pSubStreams.GetHeadPosition();
 
-		pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | (pos ? MF_ENABLED : MF_DISABLED), id++, ResStr(IDS_SUBTITLES_ENABLE));
+		pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | (pos ? MF_ENABLED : MF_DISABLED), ID_SUBTITLES_ENABLE, ResStr(IDS_SUBTITLES_ENABLE));
 		pSub->AppendMenu(MF_SEPARATOR);
 
 		bool sep = false;
