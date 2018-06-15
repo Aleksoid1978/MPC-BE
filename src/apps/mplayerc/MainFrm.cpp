@@ -9262,63 +9262,56 @@ void CMainFrame::SelectSubtilesAMStream(UINT id)
 			subStreamCount += pSubStream->GetStreamCount();
 		}
 
-		if (id != -1 && id >= (subStreamCount + streamCount)) {
+		if (id >= (subStreamCount + streamCount)) {
 			id = 0;
 		}
 	}
 
 	int splsubcnt = 0;
-	int i = (int)id;
+	const int i = (int)id;
 
 	if (GetPlaybackMode() == PM_FILE && m_pDVS) {
-		if (i == -1) {
-			bool fHideSubtitles = false;
-			m_pDVS->get_HideSubtitles(&fHideSubtitles);
-			fHideSubtitles = !fHideSubtitles;
-			m_pDVS->put_HideSubtitles(fHideSubtitles);
-		} else {
-			int nLangs;
-			if (SUCCEEDED(m_pDVS->get_LanguageCount(&nLangs)) && nLangs) {
+		int nLangs;
+		if (SUCCEEDED(m_pDVS->get_LanguageCount(&nLangs)) && nLangs) {
 
-				int subcount = GetStreamCount(SUBTITLE_GROUP);
-				if (subcount) {
-					CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
-					DWORD cStreams = 0;
-					pSS->Count(&cStreams);
+			int subcount = GetStreamCount(SUBTITLE_GROUP);
+			if (subcount) {
+				CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
+				DWORD cStreams = 0;
+				pSS->Count(&cStreams);
 
-					if (nLangs > 1) {
-						if (i < (nLangs-1)) {
-							m_pDVS->put_SelectedLanguage(i);
-							return;
-						} else {
-							m_pDVS->put_SelectedLanguage(nLangs - 1);
-							id -= (nLangs - 1);
-						}
-					}
-
-					for (int m = 0, j = cStreams; m < j; m++) {
-						DWORD dwGroup = DWORD_MAX;
-
-						if (FAILED(pSS->Info(m, nullptr, nullptr, nullptr, &dwGroup, nullptr, nullptr, nullptr))) {
-							continue;
-						}
-
-						if (dwGroup != SUBTITLE_GROUP) {
-							continue;
-						}
-
-						if (id == 0) {
-							pSS->Enable(m, AMSTREAMSELECTENABLE_ENABLE);
-							return;
-						}
-
-						id--;
+				if (nLangs > 1) {
+					if (i < (nLangs-1)) {
+						m_pDVS->put_SelectedLanguage(i);
+						return;
+					} else {
+						m_pDVS->put_SelectedLanguage(nLangs - 1);
+						id -= (nLangs - 1);
 					}
 				}
 
-				if (i <= (nLangs - 1)) {
-					m_pDVS->put_SelectedLanguage(i);
+				for (int m = 0, j = cStreams; m < j; m++) {
+					DWORD dwGroup = DWORD_MAX;
+
+					if (FAILED(pSS->Info(m, nullptr, nullptr, nullptr, &dwGroup, nullptr, nullptr, nullptr))) {
+						continue;
+					}
+
+					if (dwGroup != SUBTITLE_GROUP) {
+						continue;
+					}
+
+					if (id == 0) {
+						pSS->Enable(m, AMSTREAMSELECTENABLE_ENABLE);
+						return;
+					}
+
+					id--;
 				}
+			}
+
+			if (i <= (nLangs - 1)) {
+				m_pDVS->put_SelectedLanguage(i);
 			}
 		}
 
@@ -9363,28 +9356,16 @@ void CMainFrame::SelectSubtilesAMStream(UINT id)
 		return;
 	}
 
-	if (i == -1) {
-		AfxGetAppSettings().fEnableSubtitles = !AfxGetAppSettings().fEnableSubtitles;
-		// enable
+	int m = splsubcnt - (splsubcnt > 0 ? 1 : 0);
+	m = i - m;
 
-		if (!AfxGetAppSettings().fEnableSubtitles) {
-			m_nSelSub2		= m_iSubtitleSel;
-			m_iSubtitleSel	= -1;
-		} else {
-			m_iSubtitleSel = m_nSelSub2;
-		}
-		UpdateSubtitle();
-	} else if (i >= 0) {
-		int m = splsubcnt - (splsubcnt > 0 ? 1 : 0);
-		m = i - m;
-
-		m_iSubtitleSel = m;
-		m_nSelSub2 = m_iSubtitleSel;
-		if (!AfxGetAppSettings().fEnableSubtitles) {
-			m_iSubtitleSel = -1;
-		}
-		UpdateSubtitle();
+	m_iSubtitleSel = m;
+	m_nSelSub2 = m_iSubtitleSel;
+	if (!AfxGetAppSettings().fEnableSubtitles) {
+		m_iSubtitleSel = -1;
 	}
+
+	UpdateSubtitle();
 }
 
 void CMainFrame::OnNavigateAngle(UINT nID)
