@@ -414,6 +414,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_COMMAND(ID_AUDIO_OPTIONS, OnMenuAudioOption)
 	ON_COMMAND(ID_SUBTITLES_OPTIONS, OnMenuSubtitlesOption)
+	ON_COMMAND(ID_SUBTITLES_ENABLE, OnMenuSubtitlesEnable)
+	ON_UPDATE_COMMAND_UI(ID_SUBTITLES_ENABLE, OnUpdateSubtitlesEnable)
 	ON_COMMAND_RANGE(ID_SUBTITLES_STYLES, ID_SUBTITLES_STEREO_TOPBOTTOM, OnPlaySubtitles)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_SUBTITLES_STYLES, ID_SUBTITLES_STEREO_TOPBOTTOM, OnUpdatePlaySubtitles)
 
@@ -8251,6 +8253,23 @@ void CMainFrame::OnMenuSubtitlesOption()
 	ShowOptions(CPPageSubtitles::IDD);
 }
 
+void CMainFrame::OnMenuSubtitlesEnable()
+{
+	SelectSubtilesAMStream(-1);
+}
+
+void CMainFrame::OnUpdateSubtitlesEnable(CCmdUI* pCmdUI)
+{
+	if (m_pDVS) {
+		bool fHideSubtitles = false;
+		m_pDVS->get_HideSubtitles(&fHideSubtitles);
+		pCmdUI->SetCheck(!fHideSubtitles);
+	}
+	else {
+		pCmdUI->SetCheck(AfxGetAppSettings().fEnableSubtitles);
+	}
+}
+
 void CMainFrame::OnPlaySubtitles(UINT nID)
 {
 	CAppSettings& s = AfxGetAppSettings();
@@ -8296,9 +8315,6 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 		break;
 	case ID_SUBTITLES_RELOAD:
 		ReloadSubtitle();
-		break;
-	case ID_SUBTITLES_ENABLE:
-		SelectSubtilesAMStream(-1);
 		break;
 	case ID_SUBTITLES_DEFSTYLE:
 		// override default style
@@ -8427,16 +8443,6 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 		if (m_pDVS) {
 			pCmdUI->SetCheck(FALSE);
 			pCmdUI->Enable(FALSE);
-		}
-		break;
-	case ID_SUBTITLES_ENABLE:
-		pCmdUI->Enable(TRUE);
-		if (m_pDVS) {
-			bool fHideSubtitles = false;
-			m_pDVS->get_HideSubtitles(&fHideSubtitles);
-			pCmdUI->SetCheck(!fHideSubtitles);
-		} else {
-			pCmdUI->SetCheck(s.fEnableSubtitles);
 		}
 		break;
 	case ID_SUBTITLES_DEFSTYLE:
