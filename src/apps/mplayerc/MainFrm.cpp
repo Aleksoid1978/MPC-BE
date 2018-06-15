@@ -18688,18 +18688,14 @@ int CMainFrame::GetStreamCount(DWORD dwSelGroup)
 	int streamcount = 0;
 	if (CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter) {
 		DWORD cStreams;
-		if (!FAILED(pSS->Count(&cStreams))) {
-			for (int i = 0, j = cStreams; i < j; i++) {
+		if (S_OK == pSS->Count(&cStreams)) {
+			for (long i = 0, n = cStreams; i < n; i++) {
 				DWORD dwGroup = DWORD_MAX;
-				if (FAILED(pSS->Info(i, nullptr, nullptr, nullptr, &dwGroup, nullptr, nullptr, nullptr))) {
-					continue;
+				if (S_OK == pSS->Info(i, nullptr, nullptr, nullptr, &dwGroup, nullptr, nullptr, nullptr)) {
+					if (dwGroup == dwSelGroup) {
+						streamcount++;
+					}
 				}
-
-				if (dwGroup != dwSelGroup) {
-					continue;
-				}
-
-				streamcount++;
 			}
 		}
 	}
