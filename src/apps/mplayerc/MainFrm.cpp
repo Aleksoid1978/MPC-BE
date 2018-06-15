@@ -8255,12 +8255,44 @@ void CMainFrame::OnMenuSubtitlesOption()
 
 void CMainFrame::OnMenuSubtitlesEnable()
 {
-	SelectSubtilesAMStream(-1);
+	if (GetPlaybackMode() == PM_DVD && m_pDVDI) {
+		ULONG ulStreamsAvailable, ulCurrentStream;
+		BOOL bIsDisabled;
+		if (SUCCEEDED(m_pDVDI->GetCurrentSubpicture(&ulStreamsAvailable, &ulCurrentStream, &bIsDisabled))) {
+			m_pDVDC->SetSubpictureState(bIsDisabled, DVD_CMD_FLAG_Block, nullptr);
+		}
+	}
+	else if (m_pDVS) {
+		bool fHideSubtitles = false;
+		m_pDVS->get_HideSubtitles(&fHideSubtitles);
+		fHideSubtitles = !fHideSubtitles;
+		m_pDVS->put_HideSubtitles(fHideSubtitles);
+		return;
+	}
+	else {
+		AfxGetAppSettings().fEnableSubtitles = !AfxGetAppSettings().fEnableSubtitles;
+
+		if (AfxGetAppSettings().fEnableSubtitles) {
+			m_iSubtitleSel = m_nSelSub2;
+		} else {
+			m_nSelSub2 = m_iSubtitleSel;
+			m_iSubtitleSel = -1;
+		}
+
+		UpdateSubtitle();
+	}
 }
 
 void CMainFrame::OnUpdateSubtitlesEnable(CCmdUI* pCmdUI)
 {
-	if (m_pDVS) {
+	if (GetPlaybackMode() == PM_DVD && m_pDVDI) {
+		ULONG ulStreamsAvailable, ulCurrentStream;
+		BOOL bIsDisabled;
+		if (SUCCEEDED(m_pDVDI->GetCurrentSubpicture(&ulStreamsAvailable, &ulCurrentStream, &bIsDisabled))) {
+			pCmdUI->SetCheck(!bIsDisabled);
+		}
+	}
+	else if (m_pDVS) {
 		bool fHideSubtitles = false;
 		m_pDVS->get_HideSubtitles(&fHideSubtitles);
 		pCmdUI->SetCheck(!fHideSubtitles);
@@ -15549,7 +15581,7 @@ void CMainFrame::UpdateSubtitle(bool fDisplayMessage, bool fApplyDefStyle)
 			if (fDisplayMessage) {
 				WCHAR* pName = nullptr;
 				if (SUCCEEDED(pSubStream->GetStreamInfo(i, &pName, nullptr))) {
-					CString	strMessage;
+					CString strMessage;
 					strMessage.Format(ResStr(IDS_SUBTITLE_STREAM), pName);
 					m_OSD.DisplayMessage(OSD_TOPLEFT, strMessage);
 				}
