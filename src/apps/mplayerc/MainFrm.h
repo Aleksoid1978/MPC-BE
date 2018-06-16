@@ -312,7 +312,6 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	void SetAlwaysOnTop(int i);
 
-	// dynamic menus
 	CMenu m_popupMainMenu, m_popupMenu;
 	CMenu m_openCDsMenu;
 	CMenu m_recentfilesMenu;
@@ -327,6 +326,8 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CMenu m_SubtitleTracksMenu;
 	CMenu m_favoritesMenu;
 
+	// dynamic menus
+	void MakeEmptySubMenu(CMenu& menu);
 	void SetupOpenCDSubMenu();
 	void SetupFiltersSubMenu();
 	void SetupAudioSubMenu();
@@ -341,11 +342,11 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	void SetupLanguageMenu();
 
 	IBaseFilter* FindSwitcherFilter();
-	void SetupAMStreamSubMenu(CMenu* pSub, UINT id, DWORD dwSelGroup);
+	void SetupAMStreamSubMenu(CMenu& submenu, UINT id, DWORD dwSelGroup);
 	void SelectAMStream(UINT id, DWORD dwSelGroup);
 
 	#define SUBTITLE_GROUP 2
-	void SetupSubtilesAMStreamSubMenu(CMenu* pSub, UINT id);
+	void SetupSubtilesAMStreamSubMenu(CMenu& submenu, UINT id);
 	void SelectSubtilesAMStream(UINT id);
 
 	CInterfaceArray<IUnknown, &IID_IUnknown> m_pparray;
