@@ -1070,6 +1070,7 @@ public:
 	afx_msg void OnUpdateSubtitlesEnable(CCmdUI* pCmdUI);
 	afx_msg void OnPlaySubtitles(UINT nID);
 	afx_msg void OnUpdatePlaySubtitles(CCmdUI* pCmdUI);
+	afx_msg void OnStereoSubtitles(UINT nID);
 
 	afx_msg void OnUpdateNavMixSubtitles(CCmdUI* pCmdUI);
 

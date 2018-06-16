@@ -416,8 +416,9 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_SUBTITLES_OPTIONS, OnMenuSubtitlesOption)
 	ON_COMMAND(ID_SUBTITLES_ENABLE, OnMenuSubtitlesEnable)
 	ON_UPDATE_COMMAND_UI(ID_SUBTITLES_ENABLE, OnUpdateSubtitlesEnable)
-	ON_COMMAND_RANGE(ID_SUBTITLES_STYLES, ID_SUBTITLES_STEREO_TOPBOTTOM, OnPlaySubtitles)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_SUBTITLES_STYLES, ID_SUBTITLES_STEREO_TOPBOTTOM, OnUpdatePlaySubtitles)
+	ON_COMMAND_RANGE(ID_SUBTITLES_STYLES, ID_SUBTITLES_FORCEDONLY, OnPlaySubtitles)
+	ON_UPDATE_COMMAND_UI_RANGE(ID_SUBTITLES_STYLES, ID_SUBTITLES_FORCEDONLY, OnUpdatePlaySubtitles)
+	ON_COMMAND_RANGE(ID_SUBTITLES_STEREO_DONTUSE, ID_SUBTITLES_STEREO_TOPBOTTOM, OnStereoSubtitles)
 
 	ON_COMMAND_RANGE(ID_FILTERSTREAMS_SUBITEM_START, ID_FILTERSTREAMS_SUBITEM_END, OnSelectStream)
 	ON_COMMAND_RANGE(ID_VOLUME_UP, ID_VOLUME_MUTE, OnPlayVolume)
@@ -8370,62 +8371,6 @@ void CMainFrame::OnPlaySubtitles(UINT nID)
 			m_pCAP->Invalidate();
 		}
 		break;
-	case ID_SUBTITLES_STEREO_DONTUSE:
-		s.m_VRSettings.iSubpicStereoMode = SUBPIC_STEREO_NONE;
-		if (m_pCAP) {
-			m_pCAP->Invalidate();
-			RepaintVideo();
-		}
-		osd = ResStr(IDS_SUBTITLES_STEREO);
-		osd.AppendFormat(L": %s", ResStr(IDS_SUBTITLES_STEREO_DONTUSE));
-		m_OSD.DisplayMessage(OSD_TOPLEFT, osd, 3000);
-		break;
-	case ID_SUBTITLES_STEREO_SIDEBYSIDE:
-		s.m_VRSettings.iSubpicStereoMode = SUBPIC_STEREO_SIDEBYSIDE;
-		if (m_pCAP) {
-			m_pCAP->Invalidate();
-			RepaintVideo();
-		}
-		osd = ResStr(IDS_SUBTITLES_STEREO);
-		osd.AppendFormat(L": %s", ResStr(IDS_SUBTITLES_STEREO_SIDEBYSIDE));
-		m_OSD.DisplayMessage(OSD_TOPLEFT, osd, 3000);
-		break;
-	case ID_SUBTITLES_STEREO_TOPBOTTOM:
-		s.m_VRSettings.iSubpicStereoMode = SUBPIC_STEREO_TOPANDBOTTOM;
-		if (m_pCAP) {
-			m_pCAP->Invalidate();
-			RepaintVideo();
-		}
-		osd = ResStr(IDS_SUBTITLES_STEREO);
-		osd.AppendFormat(L": %s", ResStr(IDS_SUBTITLES_STEREO_TOPANDBOTTOM));
-		m_OSD.DisplayMessage(OSD_TOPLEFT, osd, 3000);
-		break;
-	}
-}
-
-void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
-{
-	UINT nID = pCmdUI->m_nID - ID_SUBTITLES_SUBITEM_START;
-
-	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
-		if (m_pDVS) {
-			int nLangs;
-			if (SUCCEEDED(m_pDVS->get_LanguageCount(&nLangs)) && nLangs) {
-				bool fHideSubtitles = false;
-				m_pDVS->get_HideSubtitles(&fHideSubtitles);
-				pCmdUI->Enable(!fHideSubtitles);
-			}
-		}
-		else {
-			pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles);
-		}
-	}
-	else if (GetPlaybackMode() == PM_DVD && m_pDVDI) {
-		ULONG ulStreamsAvailable, ulCurrentStream;
-		BOOL bIsDisabled;
-		if (SUCCEEDED(m_pDVDI->GetCurrentSubpicture(&ulStreamsAvailable, &ulCurrentStream, &bIsDisabled))) {
-			pCmdUI->Enable(!bIsDisabled);
-		}
 	}
 }
 
@@ -8436,17 +8381,6 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 	const CAppSettings& s = AfxGetAppSettings();
 
 	pCmdUI->Enable(m_pCAP && !m_bAudioOnly && GetPlaybackMode() != PM_DVD);
-
-	auto SetRadioCheck = [](CCmdUI* pCmdUI, BOOL bCheck) {
-		if (IsMenu(*pCmdUI->m_pMenu)) {
-			MENUITEMINFO mii = { sizeof(mii) };
-			mii.fMask = MIIM_FTYPE | MIIM_STATE;
-			mii.fType = bCheck ? MFT_RADIOCHECK : MF_ENABLED;
-			mii.fState = bCheck ? MFS_CHECKED : MF_ENABLED;
-			VERIFY(pCmdUI->m_pMenu->SetMenuItemInfo(pCmdUI->m_nID, &mii));
-		}
-		pCmdUI->Enable(TRUE);
-	};
 
 	switch (nID) {
 	case ID_SUBTITLES_STYLES:
@@ -8487,15 +8421,61 @@ void CMainFrame::OnUpdatePlaySubtitles(CCmdUI* pCmdUI)
 			pCmdUI->Enable(s.fEnableSubtitles && m_pCAP && !m_bAudioOnly && GetPlaybackMode() != PM_DVD);
 		}
 		break;
+	}
+}
+
+void CMainFrame::OnStereoSubtitles(UINT nID)
+{
+	CAppSettings& s = AfxGetAppSettings();
+
+	CString osd = ResStr(IDS_SUBTITLES_STEREO);
+
+	switch (nID) {
 	case ID_SUBTITLES_STEREO_DONTUSE:
-		SetRadioCheck(pCmdUI, s.m_VRSettings.iSubpicStereoMode == SUBPIC_STEREO_NONE);
+		s.m_VRSettings.iSubpicStereoMode = SUBPIC_STEREO_NONE;
+		osd.AppendFormat(L": %s", ResStr(IDS_SUBTITLES_STEREO_DONTUSE));
 		break;
 	case ID_SUBTITLES_STEREO_SIDEBYSIDE:
-		SetRadioCheck(pCmdUI, s.m_VRSettings.iSubpicStereoMode == SUBPIC_STEREO_SIDEBYSIDE);
+		s.m_VRSettings.iSubpicStereoMode = SUBPIC_STEREO_SIDEBYSIDE;
+		osd.AppendFormat(L": %s", ResStr(IDS_SUBTITLES_STEREO_SIDEBYSIDE));
 		break;
 	case ID_SUBTITLES_STEREO_TOPBOTTOM:
-		SetRadioCheck(pCmdUI, s.m_VRSettings.iSubpicStereoMode == SUBPIC_STEREO_TOPANDBOTTOM);
+		s.m_VRSettings.iSubpicStereoMode = SUBPIC_STEREO_TOPANDBOTTOM;
+		osd.AppendFormat(L": %s", ResStr(IDS_SUBTITLES_STEREO_TOPANDBOTTOM));
 		break;
+	}
+
+	if (m_pCAP) {
+		m_pCAP->Invalidate();
+		RepaintVideo();
+	}
+
+	m_OSD.DisplayMessage(OSD_TOPLEFT, osd, 3000);
+}
+
+void CMainFrame::OnUpdateNavMixSubtitles(CCmdUI* pCmdUI)
+{
+	UINT nID = pCmdUI->m_nID - ID_SUBTITLES_SUBITEM_START;
+
+	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
+		if (m_pDVS) {
+			int nLangs;
+			if (SUCCEEDED(m_pDVS->get_LanguageCount(&nLangs)) && nLangs) {
+				bool fHideSubtitles = false;
+				m_pDVS->get_HideSubtitles(&fHideSubtitles);
+				pCmdUI->Enable(!fHideSubtitles);
+			}
+		}
+		else {
+			pCmdUI->Enable(AfxGetAppSettings().fEnableSubtitles);
+		}
+	}
+	else if (GetPlaybackMode() == PM_DVD && m_pDVDI) {
+		ULONG ulStreamsAvailable, ulCurrentStream;
+		BOOL bIsDisabled;
+		if (SUCCEEDED(m_pDVDI->GetCurrentSubpicture(&ulStreamsAvailable, &ulCurrentStream, &bIsDisabled))) {
+			pCmdUI->Enable(!bIsDisabled);
+		}
 	}
 }
 
@@ -14298,11 +14278,19 @@ void CMainFrame::SetupSubtitlesSubMenu()
 	pSub->AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SUBTITLES_FORCEDONLY, ResStr(IDS_SUBTITLES_FORCED));
 	pSub->AppendMenu(MF_SEPARATOR);
 
+	auto SetFlags = [](int smode) {
+		if (AfxGetAppSettings().m_VRSettings.iSubpicStereoMode == smode) {
+			return MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_CHECKED | MFT_RADIOCHECK;
+		} else {
+			return MF_BYCOMMAND | MF_STRING | MF_ENABLED;
+		}
+	};
+
 	CMenu subMenu;
 	subMenu.CreatePopupMenu();
-	subMenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SUBTITLES_STEREO_DONTUSE, ResStr(IDS_SUBTITLES_STEREO_DONTUSE));
-	subMenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SUBTITLES_STEREO_SIDEBYSIDE, ResStr(IDS_SUBTITLES_STEREO_SIDEBYSIDE));
-	subMenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SUBTITLES_STEREO_TOPBOTTOM, ResStr(IDS_SUBTITLES_STEREO_TOPANDBOTTOM));
+	subMenu.AppendMenu(SetFlags(SUBPIC_STEREO_NONE), ID_SUBTITLES_STEREO_DONTUSE, ResStr(IDS_SUBTITLES_STEREO_DONTUSE));
+	subMenu.AppendMenu(SetFlags(SUBPIC_STEREO_SIDEBYSIDE), ID_SUBTITLES_STEREO_SIDEBYSIDE, ResStr(IDS_SUBTITLES_STEREO_SIDEBYSIDE));
+	subMenu.AppendMenu(SetFlags(SUBPIC_STEREO_TOPANDBOTTOM), ID_SUBTITLES_STEREO_TOPBOTTOM, ResStr(IDS_SUBTITLES_STEREO_TOPANDBOTTOM));
 	pSub->AppendMenu(MF_STRING | MF_POPUP | MF_ENABLED, (UINT_PTR)subMenu.Detach(), ResStr(IDS_SUBTITLES_STEREO));
 }
 
