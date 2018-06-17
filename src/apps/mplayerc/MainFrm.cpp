@@ -10780,7 +10780,7 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 						h = (double)wy / arxy.cx;
 					}
 
-					if (m_bFullScreen) {
+					if (m_bFullScreen || IsD3DFullScreenMode()) {
 						const CAppSettings& s = AfxGetAppSettings();
 						const double factor = (wy > hx) ? w / arxy.cx : h / arxy.cy;
 
