@@ -63,6 +63,7 @@ namespace Youtube
 		{ 18, y_mp4,  y_media,  360, L"mp4",  false, false}, // H.264 + AAC
 		{133, y_mp4,  y_video,  240, L"mp4",  false, false},
 		// WebM (VP9)
+		{272, y_webm, y_video, 2880, L"webm", false, false},
 		{337, y_webm, y_video, 2160, L"webm", true , true },
 		{315, y_webm, y_video, 2160, L"webm", true , false},
 		{313, y_webm, y_video, 2160, L"webm", false, false},

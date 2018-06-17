@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2017 see Authors.txt
+ * (C) 2012-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "PPageYoutube.h"
+#include "PlayerYouTube.h"
 
 // CPPageYoutube dialog
 
@@ -66,11 +67,20 @@ BOOL CPPageYoutube::OnInitDialog()
 	m_cbFormat.AddString(L"WebM");
 	m_cbFormat.SetCurSel(s.YoutubeFormat.fmt);
 
-	static const int resolutions[] = { 2160, 1440, 1080, 720, 480, 360, 240 };
-	for (int i = 0; i < _countof(resolutions); i++) {
+	static std::vector<int> resolutions;
+	if (resolutions.empty()) {
+		for (const auto& profile : Youtube::YProfiles) {
+			resolutions.emplace_back(profile.quality);
+		}
+		// sort
+		std::sort(resolutions.begin(), resolutions.end(), std::greater{});
+		// deduplicate
+		resolutions.erase(std::unique(resolutions.begin(), resolutions.end()), resolutions.end());
+	}
+	for (const auto& res : resolutions) {
 		CString str;
-		str.Format(L"%dp", resolutions[i]);
-		AddStringData(m_cbResolution, str, resolutions[i]);
+		str.Format(L"%dp", res);
+		AddStringData(m_cbResolution, str, res);
 	}
 	SelectByItemData(m_cbResolution, s.YoutubeFormat.res);
 
