@@ -103,7 +103,7 @@ protected:
 			int ratebits;
 
 			int prev_frametime;
-			bool prev_frametime_valid ;
+			bool prev_frametime_valid;
 
 			int mat_framesize;
 			int prev_mat_framesize;
