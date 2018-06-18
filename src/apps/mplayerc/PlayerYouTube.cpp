@@ -68,9 +68,9 @@ namespace Youtube
 
 	const YoutubeProfile* GetProfile(int iTag)
 	{
-		for (int i = 0; i < _countof(YProfiles); i++) {
-			if (iTag == YProfiles[i].iTag) {
-				return &YProfiles[i];
+		for (const auto& profile : YProfiles) {
+			if (iTag == profile.iTag) {
+				return &profile;
 			}
 		}
 
@@ -79,9 +79,9 @@ namespace Youtube
 
 	const YoutubeProfile* GetAudioProfile(int iTag)
 	{
-		for (int i = 0; i < _countof(YAudioProfiles); i++) {
-			if (iTag == YAudioProfiles[i].iTag) {
-				return &YAudioProfiles[i];
+		for (const auto& profile : YAudioProfiles) {
+			if (iTag == profile.iTag) {
+				return &profile;
 			}
 		}
 
@@ -524,24 +524,37 @@ namespace Youtube
 
 			YoutubeUrllist audioList;
 
-			auto AddUrl = [](YoutubeUrllist& videoUrls, YoutubeUrllist& audioUrls, const CString& url, const int itag, const int fps = 0) {
+			auto AddUrl = [](YoutubeUrllist& videoUrls, YoutubeUrllist& audioUrls, const CString& url, const int itag, const int fps = 0, LPCSTR quality_label = nullptr) {
 				if (const YoutubeProfile* profile = GetProfile(itag)) {
 					YoutubeUrllistItem item;
 					item.profile = profile;
 					item.url = url;
-					item.title.Format(L"%s %dp",
-						profile->format == y_webm ? L"WebM" : (profile->live ? L"HLS Live" : L"MP4"),
-						profile->quality);
-					if (profile->type == y_video) {
-						item.title.Append(L" dash");
-					}
-					if (fps) {
-						item.title.AppendFormat(L" %dfps", fps);
-					} else if (profile->fps60) {
-						item.title.Append(L" 60fps");
-					}
-					if (profile->hdr) {
-						item.title.Append(L" HDR (10 bit)");
+
+					if (quality_label) {
+						item.title.Format(L"%s %S",
+							profile->format == y_webm ? L"WebM" : (profile->live ? L"HLS Live" : L"MP4"),
+							quality_label);
+						if (profile->type == y_video) {
+							item.title.Append(L" dash");
+						}
+						if (profile->hdr) {
+							item.title.Append(L" (10 bit)");
+						}
+					} else {
+						item.title.Format(L"%s %dp",
+							profile->format == y_webm ? L"WebM" : (profile->live ? L"HLS Live" : L"MP4"),
+							profile->quality);
+						if (profile->type == y_video) {
+							item.title.Append(L" dash");
+						}
+						if (fps) {
+							item.title.AppendFormat(L" %dfps", fps);
+						} else if (profile->fps60) {
+							item.title.Append(L" 60fps");
+						}
+						if (profile->hdr) {
+							item.title.Append(L" HDR (10 bit)");
+						}
 					}
 
 					videoUrls.emplace_back(item);
@@ -753,6 +766,8 @@ namespace Youtube
 					CStringA url;
 					CStringA signature;
 
+					CStringA quality_label;
+
 					std::list<CStringA> paramsA;
 					Explode(lineA, paramsA, '&');
 
@@ -766,6 +781,8 @@ namespace Youtube
 								url = UrlDecode(UrlDecode(paramValue));
 							} else if (paramHeader == "s") {
 								signature = paramValue;
+							} else if (paramHeader == "quality_label") {
+								quality_label = paramValue;
 							} else if (paramHeader == "itag") {
 								if (sscanf_s(paramValue, "%d", &itag) != 1) {
 									itag = 0;
@@ -777,7 +794,7 @@ namespace Youtube
 					if (itag) {
 						SignatureDecode(url, signature, "&signature=%s");
 
-						AddUrl(youtubeUrllist, audioList, CString(url), itag);
+						AddUrl(youtubeUrllist, audioList, CString(url), itag, 0, !quality_label.IsEmpty() ? quality_label.GetString() : nullptr);
 					}
 				}
 			} else {
@@ -816,7 +833,7 @@ namespace Youtube
 			const YoutubeUrllistItem* final_item = nullptr;
 
 			if (s.iYoutubeTagSelected) {
-				for (auto item : youtubeUrllist) {
+				for (const auto& item : youtubeUrllist) {
 					if (s.iYoutubeTagSelected == item.profile->iTag) {
 						final_item = &item;
 						break;
@@ -839,7 +856,7 @@ namespace Youtube
 				}
 
 				for (size_t i = k + 1; i < youtubeUrllist.size(); i++) {
-					auto profile = youtubeUrllist[i].profile;
+					const auto profile = youtubeUrllist[i].profile;
 
 					if (final_item->profile->format == profile->format) {
 						if (profile->quality == final_item->profile->quality) {
@@ -873,7 +890,7 @@ namespace Youtube
 				final_item = nullptr;
 
 				// select audio stream
-				for (auto item : audioList) {
+				for (const auto& item : audioList) {
 					if (fmt == item.profile->format) {
 						final_item = &item;
 						break;
