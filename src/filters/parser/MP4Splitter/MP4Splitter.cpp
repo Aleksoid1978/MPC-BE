@@ -1358,6 +1358,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						} else if (type == AP4_ATOM_TYPE_DTSC || type == AP4_ATOM_TYPE_DTSE
 								|| type == AP4_ATOM_TYPE_DTSH || type == AP4_ATOM_TYPE_DTSL) {
 							fourcc = type = WAVE_FORMAT_DTS2;
+						} else if (type == AP4_ATOM_TYPE_MP2) {
+							SetTrackName(&TrackName, L"MP2");
+							fourcc = WAVE_FORMAT_MPEG;
 						}
 
 						if (type == AP4_ATOM_TYPE_NONE ||
@@ -1379,17 +1382,15 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						if (!(fourcc & 0xffff0000)) {
 							wfe->wFormatTag = (WORD)fourcc;
 						}
-						wfe->nSamplesPerSec		= samplerate;
-						wfe->nChannels			= channels;
-						wfe->wBitsPerSample		= bitspersample;
-						wfe->nBlockAlign		= ase->GetBytesPerFrame();
-						wfe->nAvgBytesPerSec	= ase->GetSamplesPerPacket() ? wfe->nSamplesPerSec * wfe->nBlockAlign / ase->GetSamplesPerPacket() : 0;
+						wfe->nSamplesPerSec  = samplerate;
+						wfe->nChannels       = channels;
+						wfe->wBitsPerSample  = bitspersample;
+						wfe->nBlockAlign     = ase->GetBytesPerFrame();
+						wfe->nAvgBytesPerSec = ase->GetSamplesPerPacket() ? wfe->nSamplesPerSec * wfe->nBlockAlign / ase->GetSamplesPerPacket() : 0;
 
 						mt.subtype = FOURCCMap(fourcc);
 						if (type == AP4_ATOM_TYPE_EAC3) {
 							mt.subtype = MEDIASUBTYPE_DOLBY_DDPLUS;
-						} else if (type == AP4_ATOM_TYPE_Opus) {
-							mt.subtype = MEDIASUBTYPE_OPUS;
 						}
 
 						if (type == AP4_ATOM_TYPE('m', 's', 0x00, 0x02)) {
@@ -1525,6 +1526,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 							SetTrackName(&TrackName, Suffix);
 						} else if (type == AP4_ATOM_TYPE_Opus) {
+							mt.subtype = MEDIASUBTYPE_OPUS;
+
 							if (AP4_DataInfoAtom* dOpsAtom = dynamic_cast<AP4_DataInfoAtom*>(ase->GetChild(AP4_ATOM_TYPE_DOPS))) {
 								const AP4_DataBuffer* di = dOpsAtom->GetData();
 								if (di && di->GetDataSize() >= 11 && di->GetData()[0] == 0) {
@@ -1544,6 +1547,18 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + size);
 									wfe->cbSize = (WORD)size;
 									memcpy(wfe + 1, dst, size);
+								}
+							}
+						} else if (type == AP4_ATOM_TYPE_MP2) {
+							mt.subtype = MEDIASUBTYPE_MPEG2_AUDIO;
+
+							m_pFile->Seek(sample.GetOffset());
+							AP4_DataBuffer data;
+							if (AP4_SUCCEEDED(sample.ReadData(data)) && data.GetDataSize() >= 4) {
+								MPEG1WAVEFORMAT mpeg1wf = {};
+								if (ParseMPEG1Header(data.GetData(), &mpeg1wf)) {
+									MPEG1WAVEFORMAT* f = (MPEG1WAVEFORMAT*)mt.ReallocFormatBuffer(sizeof(MPEG1WAVEFORMAT));
+									memcpy(f, &mpeg1wf, sizeof(MPEG1WAVEFORMAT));
 								}
 							}
 						} else if (db.GetDataSize() > 0) {
