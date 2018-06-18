@@ -315,9 +315,7 @@
 #define ID_AUDIOS                       978
 #define ID_SUBTITLES                    979
 #define ID_JUMPTO                       980
-#define ID_AUDIOLANGUAGE                981
-#define ID_SUBTITLELANGUAGE             982
-#define ID_VIDEOANGLE                   983
+#define ID_VIDEOSTREAMS                 983
 #define ID_COLOR_BRIGHTNESS_INC         984
 #define ID_COLOR_BRIGHTNESS_DEC         985
 #define ID_COLOR_CONTRAST_INC           986
@@ -1093,6 +1091,7 @@
 #define IDS_AG_AUTO                     33002
 #define IDS_AG_RECOMMENDED              33003
 #define IDS_AG_NOTRECOMMENDED           33004
+#define IDS_AG_ADVANCED                 33005
 #define IDS_MAINFRM_2                   33014
 #define IDS_AG_SUBTITLES_SAVED          33015
 #define IDS_MAINFRM_4                   33016

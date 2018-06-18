@@ -3827,24 +3827,15 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			pSubMenu = &m_languageMenu;
 		} else if (itemID == ID_AUDIOS) {
 			SetupAudioSubMenu();
-			pSubMenu = &m_AudiosMenu;
+			pSubMenu = &m_AudioMenu;
 		} else if (itemID == ID_SUBTITLES) {
 			SetupSubtitlesSubMenu();
 			pSubMenu = &m_SubtitlesMenu;
-		} else if (itemID == ID_AUDIOLANGUAGE) {
-			SetupAudioTracksSubMenu();
-			pSubMenu = &m_AudioTracksMenu;
-		} else if (itemID == ID_SUBTITLELANGUAGE) {
-			SetupSubtitleTracksSubMenu();
-			pSubMenu = &m_SubtitleTracksMenu;
-		} else if (itemID == ID_VIDEOANGLE) {
-
+		} else if (itemID == ID_VIDEOSTREAMS) {
 			CString menu_str = GetPlaybackMode() == PM_DVD ? ResStr(IDS_MENU_VIDEO_ANGLE) : ResStr(IDS_MENU_VIDEO_STREAM);
-
 			mii.fMask = MIIM_STRING;
 			mii.dwTypeData = (LPTSTR)(LPCTSTR)menu_str;
 			pPopupMenu->SetMenuItemInfo(i, &mii, TRUE);
-
 			SetupVideoStreamsSubMenu();
 			pSubMenu = &m_VideoStreamsMenu;
 		} else if (itemID == ID_JUMPTO) {
@@ -4374,8 +4365,8 @@ void CMainFrame::OnFilePostCloseMedia()
 	// Ensure the dynamically added menu items are cleared
 	MakeEmptySubMenu(m_filtersMenu);
 	MakeEmptySubMenu(m_SubtitlesMenu);
-	MakeEmptySubMenu(m_AudioTracksMenu);
-	MakeEmptySubMenu(m_SubtitleTracksMenu);
+	MakeEmptySubMenu(m_AudioMenu);
+	MakeEmptySubMenu(m_SubtitlesMenu);
 	MakeEmptySubMenu(m_VideoStreamsMenu);
 	MakeEmptySubMenu(m_chaptersMenu);
 
@@ -8526,25 +8517,25 @@ void CMainFrame::OnSelectStream(UINT nID)
 void CMainFrame::OnMenuNavAudio()
 {
 	SetupAudioTracksSubMenu();
-	OnMenu(&m_AudioTracksMenu);
+	OnMenu(&m_AudioMenu);
 }
 
 void CMainFrame::OnMenuNavSubtitle()
 {
 	SetupSubtitleTracksSubMenu();
-	OnMenu(&m_SubtitleTracksMenu);
+	OnMenu(&m_SubtitlesMenu);
 }
 
 void CMainFrame::OnMenuNavAudioOptions()
 {
-	SetupAudioSubMenu();
-	OnMenu(&m_AudiosMenu);
+	SetupAudioRButtonMenu();
+	OnMenu(&m_RButtonMenu);
 }
 
 void CMainFrame::OnMenuNavSubtitleOptions()
 {
-	SetupSubtitlesSubMenu();
-	OnMenu(&m_SubtitlesMenu);
+	SetupSubtitlesRButtonMenu();
+	OnMenu(&m_RButtonMenu);
 }
 
 void CMainFrame::OnMenuNavJumpTo()
@@ -14237,7 +14228,19 @@ void CMainFrame::SetupLanguageMenu()
 
 void CMainFrame::SetupAudioSubMenu()
 {
-	CMenu& submenu = m_AudiosMenu;
+	SetupAudioTracksSubMenu();
+
+	CMenu& submenu = m_AudioMenu;
+	if (submenu.GetMenuItemCount() >= 1) {
+		submenu.AppendMenu(MF_SEPARATOR);
+	}
+
+	submenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_FILE_LOAD_AUDIO, ResStr(IDS_AG_LOAD_AUDIO));
+}
+
+void CMainFrame::SetupAudioRButtonMenu()
+{
+	CMenu& submenu = m_RButtonMenu;
 	MakeEmptySubMenu(submenu);
 
 	submenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_AUDIO_OPTIONS, ResStr(IDS_SUBTITLES_OPTIONS));
@@ -14246,7 +14249,44 @@ void CMainFrame::SetupAudioSubMenu()
 
 void CMainFrame::SetupSubtitlesSubMenu()
 {
+	SetupSubtitleTracksSubMenu();
+
 	CMenu& submenu = m_SubtitlesMenu;
+	if (submenu.GetMenuItemCount() == 0) {
+		submenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SUBTITLES_ENABLE, ResStr(IDS_SUBTITLES_ENABLE));
+	}
+
+	submenu.AppendMenu(MF_SEPARATOR);
+	submenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_FILE_LOAD_SUBTITLE, ResStr(IDS_AG_LOAD_SUBTITLE));
+
+
+	CMenu submenu2;
+	submenu2.CreatePopupMenu();
+	submenu2.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SUBTITLES_STYLES, ResStr(IDS_SUBTITLES_STYLES));
+	submenu2.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SUBTITLES_RELOAD, ResStr(IDS_SUBTITLES_RELOAD));
+	submenu2.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SUBTITLES_DEFSTYLE, ResStr(IDS_SUBTITLES_DEFAULT_STYLE));
+	submenu2.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SUBTITLES_FORCEDONLY, ResStr(IDS_SUBTITLES_FORCED));
+	submenu.AppendMenu(MF_STRING | MF_POPUP | MF_ENABLED, (UINT_PTR)submenu2.Detach(), ResStr(IDS_AG_ADVANCED));
+
+	auto SetFlags = [](int smode) {
+		if (AfxGetAppSettings().m_VRSettings.iSubpicStereoMode == smode) {
+			return MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_CHECKED | MFT_RADIOCHECK;
+		} else {
+			return MF_BYCOMMAND | MF_STRING | MF_ENABLED;
+		}
+	};
+
+	CMenu submenu3;
+	submenu3.CreatePopupMenu();
+	submenu3.AppendMenu(SetFlags(SUBPIC_STEREO_NONE), ID_SUBTITLES_STEREO_DONTUSE, ResStr(IDS_SUBTITLES_STEREO_DONTUSE));
+	submenu3.AppendMenu(SetFlags(SUBPIC_STEREO_SIDEBYSIDE), ID_SUBTITLES_STEREO_SIDEBYSIDE, ResStr(IDS_SUBTITLES_STEREO_SIDEBYSIDE));
+	submenu3.AppendMenu(SetFlags(SUBPIC_STEREO_TOPANDBOTTOM), ID_SUBTITLES_STEREO_TOPBOTTOM, ResStr(IDS_SUBTITLES_STEREO_TOPANDBOTTOM));
+	submenu.AppendMenu(MF_STRING | MF_POPUP | MF_ENABLED, (UINT_PTR)submenu3.Detach(), ResStr(IDS_SUBTITLES_STEREO));
+}
+
+void CMainFrame::SetupSubtitlesRButtonMenu()
+{
+	CMenu& submenu = m_RButtonMenu;
 	MakeEmptySubMenu(submenu);
 
 	submenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ID_SUBTITLES_OPTIONS, ResStr(IDS_SUBTITLES_OPTIONS));
@@ -14263,22 +14303,23 @@ void CMainFrame::SetupSubtitlesSubMenu()
 	auto SetFlags = [](int smode) {
 		if (AfxGetAppSettings().m_VRSettings.iSubpicStereoMode == smode) {
 			return MF_BYCOMMAND | MF_STRING | MF_ENABLED | MF_CHECKED | MFT_RADIOCHECK;
-		} else {
+		}
+		else {
 			return MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 		}
 	};
 
-	CMenu subMenu;
-	subMenu.CreatePopupMenu();
-	subMenu.AppendMenu(SetFlags(SUBPIC_STEREO_NONE), ID_SUBTITLES_STEREO_DONTUSE, ResStr(IDS_SUBTITLES_STEREO_DONTUSE));
-	subMenu.AppendMenu(SetFlags(SUBPIC_STEREO_SIDEBYSIDE), ID_SUBTITLES_STEREO_SIDEBYSIDE, ResStr(IDS_SUBTITLES_STEREO_SIDEBYSIDE));
-	subMenu.AppendMenu(SetFlags(SUBPIC_STEREO_TOPANDBOTTOM), ID_SUBTITLES_STEREO_TOPBOTTOM, ResStr(IDS_SUBTITLES_STEREO_TOPANDBOTTOM));
-	submenu.AppendMenu(MF_STRING | MF_POPUP | MF_ENABLED, (UINT_PTR)subMenu.Detach(), ResStr(IDS_SUBTITLES_STEREO));
+	CMenu submenu3;
+	submenu3.CreatePopupMenu();
+	submenu3.AppendMenu(SetFlags(SUBPIC_STEREO_NONE), ID_SUBTITLES_STEREO_DONTUSE, ResStr(IDS_SUBTITLES_STEREO_DONTUSE));
+	submenu3.AppendMenu(SetFlags(SUBPIC_STEREO_SIDEBYSIDE), ID_SUBTITLES_STEREO_SIDEBYSIDE, ResStr(IDS_SUBTITLES_STEREO_SIDEBYSIDE));
+	submenu3.AppendMenu(SetFlags(SUBPIC_STEREO_TOPANDBOTTOM), ID_SUBTITLES_STEREO_TOPBOTTOM, ResStr(IDS_SUBTITLES_STEREO_TOPANDBOTTOM));
+	submenu.AppendMenu(MF_STRING | MF_POPUP | MF_ENABLED, (UINT_PTR)submenu3.Detach(), ResStr(IDS_SUBTITLES_STEREO));
 }
 
 void CMainFrame::SetupSubtitleTracksSubMenu()
 {
-	CMenu& submenu = m_SubtitleTracksMenu;
+	CMenu& submenu = m_SubtitlesMenu;
 	MakeEmptySubMenu(submenu);
 
 	if (m_eMediaLoadState != MLS_LOADED) {
@@ -14879,7 +14920,7 @@ void CMainFrame::SelectAMStream(UINT id, DWORD dwSelGroup)
 
 void CMainFrame::SetupAudioTracksSubMenu()
 {
-	CMenu& submenu = m_AudioTracksMenu;
+	CMenu& submenu = m_AudioMenu;
 	MakeEmptySubMenu(submenu);
 
 	if (m_eMediaLoadState != MLS_LOADED) {
@@ -17038,15 +17079,16 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	m_openCDsMenu.DestroyMenu();
 	m_filtersMenu.DestroyMenu();
 	m_SubtitlesMenu.DestroyMenu();
-	m_AudiosMenu.DestroyMenu();
-	m_AudioTracksMenu.DestroyMenu();
-	m_SubtitleTracksMenu.DestroyMenu();
+	m_AudioMenu.DestroyMenu();
+	m_AudioMenu.DestroyMenu();
+	m_SubtitlesMenu.DestroyMenu();
 	m_VideoStreamsMenu.DestroyMenu();
 	m_chaptersMenu.DestroyMenu();
 	m_favoritesMenu.DestroyMenu();
 	m_shadersMenu.DestroyMenu();
 	m_recentfilesMenu.DestroyMenu();
 	m_languageMenu.DestroyMenu();
+	m_RButtonMenu.DestroyMenu();
 
 	m_popupMenu.DestroyMenu();
 	m_popupMenu.LoadMenu(IDR_POPUP);
