@@ -318,20 +318,21 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CMenu m_languageMenu;
 	CMenu m_filtersMenu;
 	CMenu m_shadersMenu;
-	CMenu m_AudiosMenu;
+	CMenu m_AudioMenu;
 	CMenu m_SubtitlesMenu;
-	CMenu m_chaptersMenu;
 	CMenu m_VideoStreamsMenu;
-	CMenu m_AudioTracksMenu;
-	CMenu m_SubtitleTracksMenu;
+	CMenu m_chaptersMenu;
 	CMenu m_favoritesMenu;
+	CMenu m_RButtonMenu;
 
 	// dynamic menus
 	void MakeEmptySubMenu(CMenu& menu);
 	void SetupOpenCDSubMenu();
 	void SetupFiltersSubMenu();
 	void SetupAudioSubMenu();
+	void SetupAudioRButtonMenu();
 	void SetupSubtitlesSubMenu();
+	void SetupSubtitlesRButtonMenu();
 	void SetupAudioTracksSubMenu();
 	void SetupSubtitleTracksSubMenu();
 	void SetupVideoStreamsSubMenu();
