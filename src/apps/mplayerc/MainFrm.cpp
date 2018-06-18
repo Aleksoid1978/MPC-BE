@@ -8358,7 +8358,7 @@ void CMainFrame::OnUpdateSubtitlesReload(CCmdUI* pCmdUI)
 	if (m_pDVS) {
 		pCmdUI->Enable(FALSE);
 	} else {
-		pCmdUI->Enable(m_pCAP && !m_bAudioOnly && GetPlaybackMode() != PM_DVD);
+		pCmdUI->Enable(GetPlaybackMode() == PM_FILE && m_pCAP && m_pCurrentSubStream);
 	}
 }
 
