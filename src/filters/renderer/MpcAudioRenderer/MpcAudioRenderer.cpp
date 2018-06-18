@@ -1538,17 +1538,11 @@ HRESULT CMpcAudioRenderer::GetAudioDevice(const BOOL bForceUseDefaultDevice)
 				if (hr == S_OK) {
 					hr = endpoint->OpenPropertyStore(STGM_READ, &pProps);
 					if (hr == S_OK) {
-						PROPVARIANT eventDriven;
-						PropVariantInit(&eventDriven);
-						BOOL bEventDrivenModeSupport = (pProps->GetValue(PKEY_AudioEndpoint_Supports_EventDriven_Mode, &eventDriven) == S_OK);
-						PropVariantClear(&eventDriven);
-
 						PROPVARIANT varName;
 						PropVariantInit(&varName);
 
 						// Found the configured audio endpoint
-						if (bEventDrivenModeSupport
-								&& (pProps->GetValue(PKEY_Device_FriendlyName, &varName) == S_OK) && (m_DeviceId == CString(pwszID))) {
+						if ((pProps->GetValue(PKEY_Device_FriendlyName, &varName) == S_OK) && (m_DeviceId == CString(pwszID))) {
 							DLog(L"CMpcAudioRenderer::GetAudioDevice() - devices->GetId() OK, num: (%u), pwszVal: '%s', pwszID: '%s'", i, varName.pwszVal, pwszID);
 
 							m_strCurrentDeviceId = pwszID;
@@ -1594,15 +1588,9 @@ HRESULT CMpcAudioRenderer::GetAudioDevice(const BOOL bForceUseDefaultDevice)
 			if (hr == S_OK) {
 				hr = E_FAIL;
 
-				PROPVARIANT eventDriven;
-				PropVariantInit(&eventDriven);
-				BOOL bEventDrivenModeSupport = (pProps->GetValue(PKEY_AudioEndpoint_Supports_EventDriven_Mode, &eventDriven) == S_OK);
-				PropVariantClear(&eventDriven);
-
 				PROPVARIANT varName;
 				PropVariantInit(&varName);
-				if (bEventDrivenModeSupport
-						&& (pProps->GetValue(PKEY_Device_FriendlyName, &varName) == S_OK)) {
+				if (pProps->GetValue(PKEY_Device_FriendlyName, &varName) == S_OK) {
 					DLog(L"CMpcAudioRenderer::GetAudioDevice() - Unable to find selected audio device, using the default end point : pwszVal: '%s', pwszID: '%s'", varName.pwszVal, pwszID);
 
 					m_strCurrentDeviceId = pwszID;
