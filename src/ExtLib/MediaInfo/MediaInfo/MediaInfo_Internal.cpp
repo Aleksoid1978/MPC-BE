@@ -1650,7 +1650,25 @@ Ztring MediaInfo_Internal::Inform(std::vector<MediaInfo_Internal*>& Info)
     }
     else
     #endif //defined(MEDIAINFO_XML_YES)
+    #if defined(MEDIAINFO_JSON_YES)
+    if (MediaInfoLib::Config.Inform_Get()==__T("JSON"))
+    {
+        if (Info.size() > 1)
+            Result+=__T("[")+MediaInfoLib::Config.LineSeparator_Get();
+        for (size_t FilePos=0; FilePos<Info.size(); FilePos++)
+        {
+            Result+=Info[FilePos]->Inform();
 
+            if (FilePos < Info.size() -1)
+                Result+=__T(",");
+
+            Result+=MediaInfoLib::Config.LineSeparator_Get();
+        }
+        if (Info.size() > 1)
+            Result+=__T("]")+MediaInfoLib::Config.LineSeparator_Get();
+    }
+    else
+    #endif //defined(MEDIAINFO_JSON_YES)
     {
         size_t FilePos=0;
         ZtringListList MediaInfo_Custom_View; MediaInfo_Custom_View.Write(MediaInfoLib::Config.Option(__T("Inform_Get")));

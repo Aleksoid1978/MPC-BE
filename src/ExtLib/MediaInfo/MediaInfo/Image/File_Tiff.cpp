@@ -425,7 +425,7 @@ void File_Tiff::Data_Parse_Fill()
     }
 
     //YResolution
-    Info=Infos.find(Tiff_Tag::XResolution);
+    Info=Infos.find(Tiff_Tag::YResolution);
     if (Info!=Infos.end())
     {
         Fill(Stream_Image, StreamPos_Last, "Density_Y", Info->second.Read());
@@ -444,14 +444,14 @@ void File_Tiff::Data_Parse_Fill()
             default: Fill(Stream_Image, StreamPos_Last, "Density_Unit", Info->second.Read()); Fill_SetOptions(Stream_Image, StreamPos_Last, "Density_Unit", "N NT");
         }
     }
-    else if (Infos.find(Tiff_Tag::XResolution)!=Infos.end() || Infos.find(Tiff_Tag::XResolution)!=Infos.end())
+    else if (Infos.find(Tiff_Tag::XResolution)!=Infos.end() || Infos.find(Tiff_Tag::YResolution)!=Infos.end())
     {
         Fill(Stream_Image, StreamPos_Last, "Density_Unit", "dpi");
         Fill_SetOptions(Stream_Image, StreamPos_Last, "Density_Unit", "N NT");
     }
     
     //XResolution or YResolution 
-    if (Infos.find(Tiff_Tag::XResolution)!=Infos.end() || Infos.find(Tiff_Tag::XResolution)!=Infos.end())
+    if (Infos.find(Tiff_Tag::XResolution)!=Infos.end() || Infos.find(Tiff_Tag::YResolution)!=Infos.end())
     {
         Ztring X=Retrieve(Stream_Image, StreamPos_Last, "Density_X");
         if (X.empty())

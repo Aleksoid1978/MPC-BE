@@ -255,6 +255,7 @@ void MediaInfo_Config::Init()
         ExternalMetaDataConfig=Ztring();
     #endif //defined(MEDIAINFO_EBUCORE_YES) || defined(MEDIAINFO_NISO_YES)
 
+    Verbosity=0;
     Complete=0;
     BlockMethod=0;
     Internet=0;

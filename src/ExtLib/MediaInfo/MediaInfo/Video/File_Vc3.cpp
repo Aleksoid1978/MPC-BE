@@ -487,7 +487,7 @@ void File_Vc3::Streams_Fill()
             Fill(Stream_Video, 0, Video_ChromaSubsampling, Vc3_SSC_FromCID(CID));
         Fill(Stream_Video, 0, Video_PixelAspectRatio, Video_Width==1440?1.333:1.0);
     }
-    else
+    else if (HVN <= 3)
     {
         Fill(Stream_Video, 0, Video_Width, SPL);
         Fill(Stream_Video, 0, Video_Height, ALPF*(SST?2:1));
