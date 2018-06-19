@@ -1564,7 +1564,7 @@ void* CMSEXPORT cmsReadTag(cmsHPROFILE hProfile, cmsTagSignature sig)
 
     if (!IsTypeSupported(TagDescriptor, BaseType)) goto Error;
    
-    TagSize  -= 8;       // Alredy read by the type base logic
+    TagSize  -= 8;       // Already read by the type base logic
 
     // Get type handler
     TypeHandler = _cmsGetTagTypeHandler(Icc ->ContextID, BaseType);
@@ -1815,7 +1815,7 @@ cmsUInt32Number CMSEXPORT cmsReadRawTag(cmsHPROFILE hProfile, cmsTagSignature si
         return Icc ->TagSizes[i];
     }
 
-    // Already readed, or previously set by cmsWriteTag(). We need to serialize that
+    // Already read, or previously set by cmsWriteTag(). We need to serialize that
     // data to raw in order to maintain consistency.
 
     _cmsUnlockMutex(Icc->ContextID, Icc ->UsrMutex);

@@ -435,7 +435,7 @@ void* _cmsSubAllocDup(_cmsSubAllocator* s, const void *ptr, cmsUInt32Number size
 // There is no error handling at all. When a function fails, it returns proper value.
 // For example, all create functions does return NULL on failure. Other return FALSE
 // It may be interesting, for the developer, to know why the function is failing.
-// for that reason, lcms2 does offer a logging function. This function does recive
+// for that reason, lcms2 does offer a logging function. This function does receive
 // a ENGLISH string with some clues on what is going wrong. You can show this
 // info to the end user, or just create some sort of log.
 // The logging function should NOT terminate the program, as this obviously can leave

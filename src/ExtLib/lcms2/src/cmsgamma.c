@@ -817,7 +817,7 @@ cmsToneCurve* CMSEXPORT cmsBuildTabulatedToneCurveFloat(cmsContext ContextID, cm
 //
 // Parameters goes as: Curve, a, b, c, d, e, f
 // Type is the ICC type +1
-// if type is negative, then the curve is analyticaly inverted
+// if type is negative, then the curve is analytically inverted
 cmsToneCurve* CMSEXPORT cmsBuildParametricToneCurve(cmsContext ContextID, cmsInt32Number Type, const cmsFloat64Number Params[])
 {
     cmsCurveSegment Seg0;
@@ -1258,7 +1258,7 @@ cmsBool  CMSEXPORT cmsSmoothToneCurve(cmsToneCurve* Tab, cmsFloat64Number lambda
 }
 
 // Is a table linear? Do not use parametric since we cannot guarantee some weird parameters resulting
-// in a linear table. This way assures it is linear in 12 bits, which should be enought in most cases.
+// in a linear table. This way assures it is linear in 12 bits, which should be enough in most cases.
 cmsBool CMSEXPORT cmsIsToneCurveLinear(const cmsToneCurve* Curve)
 {
     int i;

@@ -33,7 +33,7 @@
 
 //      Little-Endian to Big-Endian
 
-// Adjust a word value after being readed/ before being written from/to an ICC profile
+// Adjust a word value after being read/ before being written from/to an ICC profile
 cmsUInt16Number CMSEXPORT  _cmsAdjustEndianess16(cmsUInt16Number Word)
 {
 #ifndef CMS_USE_BIG_ENDIAN

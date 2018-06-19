@@ -166,7 +166,7 @@ typedef cmsBool (* PositionTableEntryFn)(struct _cms_typehandler_struct* self,
                                              cmsUInt32Number SizeOfTag);
 
 // Helper function to deal with position tables as described in ICC spec 4.3
-// A table of n elements is readed, where first comes n records containing offsets and sizes and
+// A table of n elements is read, where first comes n records containing offsets and sizes and
 // then a block containing the data itself. This allows to reuse same data in more than one entry
 static
 cmsBool ReadPositionTable(struct _cms_typehandler_struct* self,
@@ -1480,7 +1480,7 @@ void *Type_MLU_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, cmsU
         // True begin of the string
         BeginOfThisString = Offset - SizeOfHeader - 8;
 
-        // Ajust to wchar_t elements
+        // Adjust to wchar_t elements
         mlu ->Entries[i].Len = (Len * sizeof(wchar_t)) / sizeof(cmsUInt16Number);
         mlu ->Entries[i].StrW = (BeginOfThisString * sizeof(wchar_t)) / sizeof(cmsUInt16Number);
 
