@@ -135,6 +135,8 @@ const size_t Buffer_NormalSize=/*188*7;//*/64*1024;
 
 MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
 {
+    MediaInfoLib::Config.Init(); //Initialize Configuration
+
     RequestTerminate=false;
     FileIsSeekable=true;
     FileIsSub=false;

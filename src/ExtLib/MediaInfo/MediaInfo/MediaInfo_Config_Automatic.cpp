@@ -1258,7 +1258,7 @@ void MediaInfo_Config_Format (InfoMap &Info)
     "MIDI;;;A;Riff;RIFF Musical Instrument Digital Interface;midi mid kar;audio/midi;\n"
     "Module;;;A;Module;;mod;;\n"
     "Monkey's Audio;;;A;Ape;;ape mac;;http://www.monkeysaudio.com/;Lossless\n"
-    "MPEG Audio;;;A;Mpega;;m1a mpa1 mp1 m2a mpa2 mp2 mp3;audio/mpeg;;Lossy\n"
+    "MPEG Audio;;;A;Mpega;;m1a mpa mpa1 mp1 m2a mpa2 mp2 mp3;audio/mpeg;;Lossy\n"
     "OpenMG;;;A;OpenMG;;oma omg aa3 at3;;;Lossy\n"
     "Musepack SV7;;;A;Mpc;;mpc;;http://www.musepack.net;Lossy\n"
     "Musepack SV8;;;A;MpcSv8;;mp+;;http://www.musepack.net;Lossy\n"
