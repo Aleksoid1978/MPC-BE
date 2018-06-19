@@ -776,7 +776,7 @@ void CMpegSplitterFile::SearchStreams(const __int64 start, const __int64 stop, c
 #define DTS_EXPRESS_AUDIO (1ULL << 14)
 #define MPEG4_VIDEO       (1ULL << 15)
 
-#define PES_STREAM_TYPE_ANY (MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB | TELETEXT_SUB | OPUS_AUDIO | DTS_EXPRESS_AUDIO | MPEG4_VIDEO)
+#define PES_STREAM_TYPE_ANY (MPEG_AUDIO | AAC_AUDIO | AC3_AUDIO | DTS_AUDIO/* | LPCM_AUDIO */| MPEG2_VIDEO | H264_VIDEO | DIRAC_VIDEO | HEVC_VIDEO/* | PGS_SUB*/ | DVB_SUB | TELETEXT_SUB | DTS_EXPRESS_AUDIO)
 
 static const struct StreamType {
 	PES_STREAM_TYPE pes_stream_type;
@@ -1125,7 +1125,7 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 				}
 
 				// OPUS
-				if (type == stream_type::unknown && stream_type == OPUS_AUDIO) {
+				if (type == stream_type::unknown && stream_type & OPUS_AUDIO) {
 					Seek(start);
 					opus_ts_hdr h;
 					if (Read(h, len, _streamData.pmt.extraData, &s.mt)) {
