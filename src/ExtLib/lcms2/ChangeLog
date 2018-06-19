@@ -146,7 +146,7 @@ Fixed a 0 byte allocation issue in _cmsCreateSubAllocChunk
 Pascal unit now is supported by Free Pascal Compiler
 Fixed a bug on ReadRAWtag 
 Added dictionary metatag support
-Fixed a bug in black preservation and sligtly non-monotonic curves
+Fixed a bug in black preservation and slightly non-monotonic curves
 Added named color functionality
 Fixed a bug that made crash black preservation on CMYK2CMYK devicelinks
 Added functions to retrieve formatters from transforms

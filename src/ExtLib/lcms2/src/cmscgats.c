@@ -129,7 +129,7 @@ typedef struct _Table {
 
 // File stream being parsed
 typedef struct _FileContext {
-        char           FileName[cmsMAX_PATH];    // File name if being readed from file
+        char           FileName[cmsMAX_PATH];    // File name if being read from file
         FILE*          Stream;                   // File stream or NULL if holded in memory
     } FILECTX;
 

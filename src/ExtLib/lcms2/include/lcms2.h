@@ -1644,7 +1644,7 @@ CMSAPI cmsUInt32Number  CMSEXPORT cmsGetSupportedIntentsTHR(cmsContext ContextID
 // Misc
 #define cmsFLAGS_BLACKPOINTCOMPENSATION   0x2000
 #define cmsFLAGS_NOWHITEONWHITEFIXUP      0x0004    // Don't fix scum dot
-#define cmsFLAGS_HIGHRESPRECALC           0x0400    // Use more memory to give better accurancy
+#define cmsFLAGS_HIGHRESPRECALC           0x0400    // Use more memory to give better accuracy
 #define cmsFLAGS_LOWRESPRECALC            0x0800    // Use less memory to minimize resources
 
 // For devicelink creation
