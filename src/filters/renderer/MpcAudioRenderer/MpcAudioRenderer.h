@@ -158,6 +158,8 @@ public:
 	STDMETHODIMP                  Apply() override;
 	STDMETHODIMP                  SetWasapiMode(INT nValue) override;
 	STDMETHODIMP_(INT)            GetWasapiMode() override;
+	STDMETHODIMP                  SetDevicePeriod(INT nValue) override;
+	STDMETHODIMP_(INT)            GetDevicePeriod() override;
 	STDMETHODIMP                  SetDeviceId(CString pDeviceId) override;
 	STDMETHODIMP_(CString)        GetDeviceId() override;
 	STDMETHODIMP_(UINT)           GetMode() override;
@@ -222,6 +224,7 @@ private:
 	// WASAPI variables
 	HMODULE            m_hModule;
 	DEVICE_MODE        m_DeviceMode;
+	DEVICE_PERIOD      m_DevicePeriod;
 	CString            m_DeviceId;
 	IMMDevice          *m_pMMDevice;
 	IAudioClient       *m_pAudioClient;

@@ -36,6 +36,8 @@ private :
 	CButton		m_output_group;
 	CStatic		m_txtWasapiMode;
 	CComboBox	m_cbWasapiMode;
+	CStatic		m_txtDevicePeriod;
+	CComboBox	m_cbDevicePeriod;
 
 	CButton		m_cbUseBitExactOutput;
 	CButton		m_cbUseSystemLayoutChannels;
@@ -48,6 +50,7 @@ private :
 	enum {
 		IDC_PP_SOUND_DEVICE = 10000,
 		IDC_PP_WASAPI_MODE,
+		IDC_PP_WASAPI_DEVICE_PERIOD,
 		IDC_PP_USE_BITEXACT_OUTPUT,
 		IDC_PP_USE_SYSTEM_LAYOUT_CHANNELS,
 		IDC_PP_FREE_DEVICE_INACTIVE,

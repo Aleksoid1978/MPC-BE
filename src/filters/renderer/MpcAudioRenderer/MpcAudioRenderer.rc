@@ -104,6 +104,8 @@ BEGIN
     IDS_ARS_FORMAT                 "Format:"
     IDS_ARS_SAMPLERATE             "Sample rate:"
     IDS_ARS_CHANNELS               "Channels"
+    IDS_ARS_DEVICE_PERIOD          "Device buffer:"
+    IDS_AG_DEFAULT                 "Default"
 END
 
 #endif    // English (United States) resources

@@ -22,11 +22,17 @@
 
 enum DEVICE_MODE {
 	// for settings and internal
-	MODE_WASAPI_SHARED = 0,
+	MODE_WASAPI_SHARED,
 	MODE_WASAPI_EXCLUSIVE,
 	// internal
 	MODE_WASAPI_EXCLUSIVE_BITSTREAM,
 	MODE_NONE
+};
+
+enum DEVICE_PERIOD {
+	PERIOD_DEFAULT,
+	PERIOD_50MS,
+	PERIOD_100MS
 };
 
 enum BITSTREAM_MODE {
@@ -45,6 +51,8 @@ public IUnknown {
 
 	STDMETHOD(SetWasapiMode(INT nValue)) PURE;
 	STDMETHOD_(INT, GetWasapiMode()) PURE;
+	STDMETHOD(SetDevicePeriod(INT nValue)) PURE;
+	STDMETHOD_(INT, GetDevicePeriod()) PURE;
 	STDMETHOD(SetDeviceId(CString pDeviceId)) PURE;
 	STDMETHOD_(CString, GetDeviceId()) PURE;
 	STDMETHOD_(UINT, GetMode()) PURE;

@@ -1292,6 +1292,7 @@ STRING IDS_ARS_BITEXACT_OUTPUT		"Использовать побитовый в�
 STRING IDS_ARS_CHANNELS		"Каналы:"
 STRING IDS_ARS_CROSSFEED		"Включить стерео crossfeed (для наушников)"
 STRING IDS_ARS_DEVICE		"Устройство:"
+STRING IDS_ARS_DEVICE_PERIOD		"Буфер устройства:"
 STRING IDS_ARS_EXCLUSIVE		"Exclusive"
 STRING IDS_ARS_FORMAT		"Формат:"
 STRING IDS_ARS_INPUT		"Вход"
