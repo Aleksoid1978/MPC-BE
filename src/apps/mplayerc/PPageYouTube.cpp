@@ -73,7 +73,7 @@ BOOL CPPageYoutube::OnInitDialog()
 			resolutions.emplace_back(profile.quality);
 		}
 		// sort
-		std::sort(resolutions.begin(), resolutions.end(), std::greater{});
+		std::sort(resolutions.begin(), resolutions.end(), std::greater<int>());
 		// deduplicate
 		resolutions.erase(std::unique(resolutions.begin(), resolutions.end()), resolutions.end());
 	}
