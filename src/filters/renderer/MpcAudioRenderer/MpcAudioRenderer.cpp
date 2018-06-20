@@ -188,7 +188,6 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DeviceMode, dw)) {
 			m_DeviceMode = (DEVICE_MODE)dw;
 		}
-		DWORD dw;
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DevicePeriod, dw)) {
 			m_DevicePeriod = (DEVICE_PERIOD)dw;
 		}
