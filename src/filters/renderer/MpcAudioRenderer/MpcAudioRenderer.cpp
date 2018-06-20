@@ -131,7 +131,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_pRenderClient(nullptr)
 	, m_pAudioClock(nullptr)
 	, m_DeviceMode(MODE_WASAPI_SHARED)
-	, m_DevicePeriod(PERIOD_50MS)
+	, m_DevicePeriod(50)
 	, m_nFramesInBuffer(0)
 	, m_nMaxWasapiQueueSize(0)
 	, m_hnsPeriod(0)
@@ -189,7 +189,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 			m_DeviceMode = (DEVICE_MODE)dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DevicePeriod, dw)) {
-			m_DevicePeriod = (DEVICE_PERIOD)dw;
+			m_DevicePeriod = dw;
 		}
 		len = _countof(buff);
 		memset(buff, 0, sizeof(buff));
@@ -211,7 +211,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	}
 #else
 	m_DeviceMode               = (DEVICE_MODE)AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, m_DeviceMode);
-	m_DevicePeriod             = (DEVICE_PERIOD)AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_DevicePeriod, m_DevicePeriod);
+	m_DevicePeriod             = AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_DevicePeriod, m_DevicePeriod);
 	m_DeviceId                 = AfxGetApp()->GetProfileString(OPT_SECTION_AudRend, OPT_AudioDeviceId, m_DeviceId);
 	m_bUseBitExactOutput       = !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
 	m_bUseSystemLayoutChannels = !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
@@ -223,7 +223,9 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		m_DeviceMode = MODE_WASAPI_SHARED;
 	}
 
-	m_DevicePeriod = std::clamp(m_DevicePeriod, PERIOD_DEFAULT, PERIOD_100MS);
+	if (m_DevicePeriod != 0 || m_DevicePeriod != 50 || m_DevicePeriod != 100) {
+		m_DevicePeriod = 50;
+	}
 
 	if (phr) {
 		*phr = E_FAIL;
@@ -1030,13 +1032,16 @@ STDMETHODIMP_(INT) CMpcAudioRenderer::GetWasapiMode()
 
 STDMETHODIMP CMpcAudioRenderer::SetDevicePeriod(INT nValue)
 {
+	if (nValue != 0 || nValue != 50 || nValue != 100) {
+		return E_INVALIDARG;
+	}
+
 	CAutoLock cAutoLock(&m_csProps);
 
 	if (m_pAudioClient && m_DevicePeriod != nValue) {
 		SetReinitializeAudioDevice();
 	}
 
-	m_DevicePeriod = std::clamp((DEVICE_PERIOD)nValue, PERIOD_DEFAULT, PERIOD_100MS);
 	return S_OK;
 }
 
@@ -2071,18 +2076,10 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 		DLog(L"CMpcAudioRenderer::CreateRenderClient() - DefaultDevicePeriod = %.2f ms, MinimumDevicePeriod = %.2f ms", hnsDefaultDevicePeriod / 10000.0, hnsMinimumDevicePeriod / 10000.0);
 	}
 
-	switch (m_DevicePeriod) {
-		case PERIOD_DEFAULT:
-			if (hnsDefaultDevicePeriod != 0) {
-				m_hnsPeriod = hnsDefaultDevicePeriod;
-				break;
-			}
-		case PERIOD_50MS:
-			m_hnsPeriod = 500000LL;
-			break;
-		case PERIOD_100MS:
-			m_hnsPeriod = 1000000LL;
-			break;
+	if (m_DevicePeriod == 0 && hnsDefaultDevicePeriod != 0) {
+		m_hnsPeriod = hnsDefaultDevicePeriod;
+	} else {
+		m_hnsPeriod = m_DevicePeriod * 10000LL;
 	}
 	DLog(L"CMpcAudioRenderer::CreateRenderClient() - using period = %.2f ms", m_hnsPeriod / 10000.0);
 

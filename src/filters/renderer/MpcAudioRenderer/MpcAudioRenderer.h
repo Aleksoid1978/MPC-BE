@@ -224,7 +224,7 @@ private:
 	// WASAPI variables
 	HMODULE            m_hModule;
 	DEVICE_MODE        m_DeviceMode;
-	DEVICE_PERIOD      m_DevicePeriod;
+	int                m_DevicePeriod; // 0 - default, 1 - reserved, 50 ms, 100 ms
 	CString            m_DeviceId;
 	IMMDevice          *m_pMMDevice;
 	IAudioClient       *m_pAudioClient;
