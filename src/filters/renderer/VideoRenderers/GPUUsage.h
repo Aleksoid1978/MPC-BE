@@ -138,12 +138,12 @@ private:
 		NvAPI_GPU_GetAllClocks_t NvAPI_GPU_GetAllClocks;
 	} NVData;
 
+	PFND3DKMT_OPENADAPTERFROMHDC pD3DKMTOpenAdapterFromHdc = nullptr;
+	PFND3DKMT_CLOSEADAPTER pD3DKMTCloseAdapter = nullptr;
 	PFND3DKMT_QUERYSTATISTICS pD3DKMTQueryStatistics = nullptr;
 
-	HMODULE dxgiHandle = nullptr;
-	typedef HRESULT (WINAPI *CreateDXGIFactory_t)(REFIID riid, _Out_ void **ppFactory);
-	CreateDXGIFactory_t pCreateDXGIFactory = nullptr;
-	DXGI_ADAPTER_DESC dxgiAdapterDesc = {};
+	D3DKMT_HANDLE AdapterHandle = 0;
+	LUID AdapterLuid = {};
 
 	HANDLE processHandle = nullptr;
 
