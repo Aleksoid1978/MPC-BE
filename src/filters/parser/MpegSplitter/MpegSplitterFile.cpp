@@ -1525,48 +1525,74 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 
 	programData* ProgramData = (it != m_ProgramData.end()) ? &it->second : nullptr;
 	if (h.payload && h.payloadstart) {
-		psihdr h2;
-		if (ReadPSI(h2)) {
-			switch (h2.table_id) {
-				case DVB_SI::SI_PAT:
-					if (h.pid != MPEG2_PID::PID_PAT) {
-						return;
-					}
+		if (BitRead(24, true) == 0x000001) {
+			return;
+		}
+
+		static BYTE psiData[184] = {};
+		ByteRead(psiData, h.bytes);
+		CGolombBuffer gb(psiData, h.bytes);
+		const BYTE pointer_field = (BYTE)gb.BitRead(8);
+		gb.SkipBytes(pointer_field);
+
+		while (gb.RemainingSize() >= 3 && gb.GetBufferPos()[0] != 0xFF) {
+			const BYTE table_id = (BYTE)gb.BitRead(8);
+			const BYTE section_syntax_indicator = (BYTE)gb.BitRead(1);
+			gb.BitRead(1); // private_bits
+			gb.BitRead(2); // reserved1
+			gb.BitRead(2); // section_length_unused
+			WORD section_length = (WORD)gb.BitRead(10);
+			if (section_syntax_indicator) {
+				if (gb.RemainingSize() < 5) {
 					break;
-				case DVB_SI::SI_SDT:
-				case 0x46:
-					if (m_programs.empty() || h.pid != MPEG2_PID::PID_SDT) {
-						return;
-					}
-					break;
-				case 0xC8:
-				case 0xC9:
-				case 0xDA:
-					if (m_programs.empty() || h.pid != MPEG2_PID::PID_VCT) {
-						return;
-					}
-					break;
-				case DVB_SI::SI_PMT:
-					break;
-				default:
-					return;
+				}
+				gb.SkipBytes(5);
+				section_length -= 5;
 			}
 
-			if (h2.section_syntax_indicator == 1) {
-				h2.section_length -= 4; // Reserving size of CRC32
-			}
+			const BYTE crc_size = section_syntax_indicator * 4;
+			if (section_length > 0 + crc_size) {
+				bool bSkipTable = false;
+				switch (table_id) {
+					case DVB_SI::SI_PAT:
+						if (h.pid != MPEG2_PID::PID_PAT) {
+							bSkipTable = true;
+						}
+						break;
+					case DVB_SI::SI_SDT:
+					case 0x46:
+						if (m_programs.empty() || h.pid != MPEG2_PID::PID_SDT) {
+							bSkipTable = true;
+						}
+						break;
+					case 0xC8:
+					case 0xC9:
+					case 0xDA:
+						if (m_programs.empty() || h.pid != MPEG2_PID::PID_VCT) {
+							bSkipTable = true;
+						}
+						break;
+					case DVB_SI::SI_PMT:
+						break;
+					default:
+						bSkipTable = true;
+				}
 
-			const int packet_len = h.bytes - h2.hdr_size;
-			const int max_len    = std::min(packet_len, (int)h2.section_length);
+				int max_len = std::min(gb.RemainingSize(), (int)section_length);
+				if (max_len > 0) {
+					if (bSkipTable) {
+						gb.SkipBytes(max_len);
+					} else {
+						ProgramData = &m_ProgramData[h.pid];
 
-			if (max_len > 0) {
-				ProgramData = &m_ProgramData[h.pid];
+						ProgramData->table_id       = table_id;
+						ProgramData->section_length = section_length;
+						ProgramData->crc_size       = crc_size;
 
-				ProgramData->table_id       = h2.table_id;
-				ProgramData->section_length = h2.section_length;
-
-				ProgramData->pData.resize(max_len);
-				ByteRead(ProgramData->pData.data(), max_len);
+						ProgramData->pData.resize(max_len);
+						gb.ReadBuffer(ProgramData->pData.data(), max_len);
+					}
+				}
 			}
 		}
 	} else if (ProgramData && !ProgramData->pData.empty()) {
@@ -1578,6 +1604,9 @@ void CMpegSplitterFile::ReadPrograms(const trhdr& h)
 	}
 
 	if (ProgramData && ProgramData->IsFull()) {
+		if (ProgramData->crc_size) {
+			ProgramData->pData.resize(ProgramData->pData.size() - ProgramData->crc_size); // exclude CRC32
+		}
 		switch (ProgramData->table_id) {
 			case DVB_SI::SI_PAT:
 				ReadPAT(ProgramData->pData);
@@ -2948,39 +2977,4 @@ bool CMpegSplitterFile::ReadTR(trhdr& h, bool fSync)
 	}
 
 	return true;
-}
-
-bool CMpegSplitterFile::ReadPSI(psihdr& h)
-{
-	memset(&h, 0, sizeof(h));
-
-	if (BitRead(24, true) == 0x000001) {
-		return false;
-	}
-
-	BYTE pointer_field           = (BYTE)BitRead(8);
-	h.hdr_size++;
-	Skip(pointer_field);
-	h.hdr_size += pointer_field;
-
-	h.table_id                   = (BYTE)BitRead(8);
-	h.section_syntax_indicator   = (BYTE)BitRead(1);
-	h.private_bits               = (BYTE)BitRead(1);
-	h.reserved1                  = (BYTE)BitRead(2);
-	h.section_length_unused      = (BYTE)BitRead(2);
-	h.section_length             = (WORD)BitRead(10);
-	h.hdr_size += 3;
-	if (h.section_syntax_indicator) {
-		h.transport_stream_id    = (WORD)BitRead(16);
-		h.reserved2              = (BYTE)BitRead(2);
-		h.version_number         = (BYTE)BitRead(5);
-		h.current_next_indicator = (BYTE)BitRead(1);
-		h.section_number         = (BYTE)BitRead(8);
-		h.last_section_number    = (BYTE)BitRead(8);
-
-		h.section_length -= 5;
-		h.hdr_size += 5;
-	}
-
-	return h.reserved1 == 0x03 && h.section_length_unused == 0x00 && h.reserved2 == 0x03 && ((h.table_id <= 0x06) ? (h.section_syntax_indicator == 1 && h.section_length > 4) : h.section_length > 0);
 }
