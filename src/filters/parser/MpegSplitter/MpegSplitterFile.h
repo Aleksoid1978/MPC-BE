@@ -163,24 +163,6 @@ public:
 		// TODO: add more fields here when the flags above are set (they aren't very interesting...)
 	};
 
-	struct psihdr
-	{
-		BYTE section_syntax_indicator:1;
-		BYTE private_bits:1;
-		BYTE reserved1:2;
-		BYTE section_length_unused:2;
-		WORD section_length:10;
-		WORD transport_stream_id;
-		BYTE table_id;
-		BYTE reserved2:2;
-		BYTE version_number:5;
-		BYTE current_next_indicator:1;
-		BYTE section_number;
-		BYTE last_section_number;
-
-		BYTE hdr_size;
-	};
-
 	bool ReadPS(pshdr& h);              // program stream header
 	bool ReadPSS(pssyshdr& h);          // program stream system header
 
@@ -189,7 +171,6 @@ public:
 	bool ReadPVA(pvahdr& h, bool fSync = true);
 
 	bool ReadTR(trhdr& h, bool fSync = true);
-	bool ReadPSI(psihdr& h);
 
 	enum stream_codec {
 		NONE,
@@ -391,12 +372,14 @@ public:
 	struct programData {
 		BYTE table_id      = 0;
 		int section_length = 0;
+		BYTE crc_size       = 0;
 		bool bFinished     = false;
 		std::vector<BYTE> pData;
 
 		void Finish() {
 			table_id       = 0;
 			section_length = 0;
+			crc_size       = 0;
 			bFinished      = true;
 			pData.clear();
 		}
