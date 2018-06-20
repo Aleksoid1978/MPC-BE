@@ -37,11 +37,8 @@ CGPUUsage::CGPUUsage()
 		HMODULE gdi32Handle = GetModuleHandleW(L"gdi32.dll");
 		if (gdi32Handle) {
 			pD3DKMTQueryStatistics = (PFND3DKMT_QUERYSTATISTICS)GetProcAddress(gdi32Handle, "D3DKMTQueryStatistics");
-
-			dxgiHandle = LoadLibraryW(L"dxgi.dll");
-			if (dxgiHandle) {
-				pCreateDXGIFactory = (CreateDXGIFactory_t)GetProcAddress(dxgiHandle, "CreateDXGIFactory");
-			}
+			pD3DKMTOpenAdapterFromHdc = (PFND3DKMT_OPENADAPTERFROMHDC)GetProcAddress(gdi32Handle, "D3DKMTOpenAdapterFromHdc");
+			pD3DKMTCloseAdapter = (PFND3DKMT_CLOSEADAPTER)GetProcAddress(gdi32Handle, "D3DKMTCloseAdapter");
 		}
 
 		processHandle = GetCurrentProcess();
@@ -51,10 +48,6 @@ CGPUUsage::CGPUUsage()
 CGPUUsage::~CGPUUsage()
 {
 	Clean();
-
-	if (dxgiHandle) {
-		FreeLibrary(dxgiHandle);
-	}
 }
 
 void CGPUUsage::Clean()
@@ -84,22 +77,27 @@ void CGPUUsage::Clean()
 	ZeroMemory(&NVData.gpuHandles, sizeof(NVData.gpuHandles));
 
 	ZeroMemory(&NVData.gpuUsages, sizeof(NVData.gpuUsages));
-	NVData.gpuUsages.version					= sizeof(gpuUsages) | 0x10000;
-	NVData.NvAPI_GPU_GetUsages					= nullptr;
+	NVData.gpuUsages.version   = sizeof(gpuUsages) | 0x10000;
+	NVData.NvAPI_GPU_GetUsages = nullptr;
 
 	ZeroMemory(&NVData.gpuPStates, sizeof(NVData.gpuPStates));
-	NVData.gpuPStates.version					= sizeof(gpuPStates) | 0x10000;
-	NVData.NvAPI_GPU_GetPStates					= nullptr;
+	NVData.gpuPStates.version   = sizeof(gpuPStates) | 0x10000;
+	NVData.NvAPI_GPU_GetPStates = nullptr;
 
 	ZeroMemory(&NVData.gpuClocks, sizeof(NVData.gpuClocks));
-	NVData.gpuClocks.version					= sizeof(gpuClocks) | 0x20000;
-	NVData.NvAPI_GPU_GetAllClocks				= nullptr;
+	NVData.gpuClocks.version      = sizeof(gpuClocks) | 0x20000;
+	NVData.NvAPI_GPU_GetAllClocks = nullptr;
 
-	NVData.gpuSelected							= -1;
+	NVData.gpuSelected = -1;
+	NVData.hNVApi      = nullptr;
 
-	NVData.hNVApi								= nullptr;
+	if (AdapterHandle) {
+		D3DKMT_CLOSEADAPTER closeAdapter = { AdapterHandle };
+		pD3DKMTCloseAdapter(&closeAdapter);
 
-	ZeroMemory(&dxgiAdapterDesc, sizeof(dxgiAdapterDesc));
+		AdapterHandle = 0;
+		ZeroMemory(&AdapterLuid, sizeof(AdapterLuid));
+	}
 
 	m_statistic = {};
 	m_dwLastRun = 0;
@@ -317,28 +315,30 @@ HRESULT CGPUUsage::Init(const CString& DeviceName, const CString& Device)
 			m_GPUType = NVIDIA_GPU;
 		}
 	}
+	
+	if (pD3DKMTOpenAdapterFromHdc) {
+		DISPLAY_DEVICEW dd = { sizeof(DISPLAY_DEVICEW) };
+		DWORD iDevNum = 0;
+		while (EnumDisplayDevicesW(nullptr, iDevNum, &dd, 0)) {
+			const CString ddDeviceName(dd.DeviceName);
+			if (ddDeviceName == DeviceName) {
+				HDC hDC = CreateDCW(nullptr, dd.DeviceName, nullptr, nullptr);
+				if (hDC) {
+					D3DKMT_OPENADAPTERFROMHDC oafh = { hDC };
+					if (NT_SUCCESS(pD3DKMTOpenAdapterFromHdc(&oafh))) {
+						AdapterHandle = oafh.hAdapter;
+						AdapterLuid = oafh.AdapterLuid;
+					}
 
-	if (!Device.IsEmpty() && pCreateDXGIFactory) {
-		IDXGIFactory* pDXGIFactory = nullptr;
-		if (SUCCEEDED(pCreateDXGIFactory(IID_PPV_ARGS(&pDXGIFactory)))) {
-			IDXGIAdapter *pDXGIAdapter = nullptr;
-			for (UINT i = 0; pDXGIFactory->EnumAdapters(i, &pDXGIAdapter) != DXGI_ERROR_NOT_FOUND; ++i) {
-				DXGI_ADAPTER_DESC adapterDesc = { 0 };
-				pDXGIAdapter->GetDesc(&adapterDesc);
-				pDXGIAdapter->Release();
-
-				const CString Description = CString(adapterDesc.Description).Trim();
-				if (Description == Device) {
-					memcpy(&dxgiAdapterDesc, &adapterDesc, sizeof(adapterDesc));
-					break;
+					DeleteDC(hDC);
 				}
+				break;
 			}
-
-			pDXGIFactory->Release();
+			iDevNum++;
 		}
 	}
 
-	if (m_GPUType == UNKNOWN_GPU && dxgiAdapterDesc.AdapterLuid.LowPart) {
+	if (m_GPUType == UNKNOWN_GPU && AdapterLuid.LowPart) {
 		m_GPUType = Device.Find(L"Intel") == 0 ? INTEL_GPU : OTHER_GPU;
 	}
 
@@ -410,7 +410,7 @@ void CGPUUsage::GetUsage(statistic& gpu_statistic)
 			}
 		}
 
-		if (dxgiAdapterDesc.AdapterLuid.LowPart) {
+		if (AdapterLuid.LowPart) {
 			UINT64 llGPUDedicatedBytesUsedTotal = 0;
 			UINT64 llGPUDedicatedBytesUsedCurrent = 0;
 			UINT64 llGPUSharedBytesUsedTotal = 0;
@@ -420,14 +420,14 @@ void CGPUUsage::GetUsage(statistic& gpu_statistic)
 
 			D3DKMT_QUERYSTATISTICS queryStatistics = {};
 			queryStatistics.Type = D3DKMT_QUERYSTATISTICS_ADAPTER;
-			queryStatistics.AdapterLuid = dxgiAdapterDesc.AdapterLuid;
+			queryStatistics.AdapterLuid = AdapterLuid;
 			if (NT_SUCCESS(pD3DKMTQueryStatistics(&queryStatistics))) {
 				nodeCount = queryStatistics.QueryResult.AdapterInformation.NodeCount;
 				const ULONG segmentCount = queryStatistics.QueryResult.AdapterInformation.NbSegments;
 				for (ULONG i = 0; i < segmentCount; i++) {
 					ZeroMemory(&queryStatistics, sizeof(D3DKMT_QUERYSTATISTICS));
 					queryStatistics.Type = D3DKMT_QUERYSTATISTICS_SEGMENT;
-					queryStatistics.AdapterLuid = dxgiAdapterDesc.AdapterLuid;
+					queryStatistics.AdapterLuid = AdapterLuid;
 					queryStatistics.QuerySegment.SegmentId = i;
 
 					if (NT_SUCCESS(pD3DKMTQueryStatistics(&queryStatistics))) {
@@ -451,7 +451,7 @@ void CGPUUsage::GetUsage(statistic& gpu_statistic)
 						ZeroMemory(&queryStatistics, sizeof(D3DKMT_QUERYSTATISTICS));
 						queryStatistics.Type = D3DKMT_QUERYSTATISTICS_PROCESS_SEGMENT;
 						queryStatistics.hProcess = processHandle;
-						queryStatistics.AdapterLuid = dxgiAdapterDesc.AdapterLuid;
+						queryStatistics.AdapterLuid = AdapterLuid;
 						queryStatistics.QuerySegment.SegmentId = i;
 						if (NT_SUCCESS(pD3DKMTQueryStatistics(&queryStatistics))) {
 							if (SysVersion::IsWin81orLater()) {
@@ -480,7 +480,7 @@ void CGPUUsage::GetUsage(statistic& gpu_statistic)
 
 				ZeroMemory(&queryStatistics, sizeof(queryStatistics));
 				queryStatistics.Type = D3DKMT_QUERYSTATISTICS_NODE;
-				queryStatistics.AdapterLuid = dxgiAdapterDesc.AdapterLuid;
+				queryStatistics.AdapterLuid = AdapterLuid;
 				for (ULONG i = 0; i < nodeCount; i++) {
 					queryStatistics.QueryProcessNode.NodeId = i;
 					if (NT_SUCCESS(pD3DKMTQueryStatistics(&queryStatistics))
