@@ -63,25 +63,25 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 {
 	const int h20 = ScaleY(20);
 	const int h25 = ScaleY(25);
-	const int h30 = ScaleY(30);
+	const int h35 = ScaleY(35);
 	CPoint p(10, 10);
 
 	m_txtSoundDevice.Create(ResStr(IDS_ARS_SOUND_DEVICE), WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(320), m_fontheight)), this, (UINT)IDC_STATIC);
 	p.y += h20;
 	m_cbSoundDevice.Create(WS_VISIBLE | WS_CHILD | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p, CSize(ScaleX(320), 200)), this, IDC_PP_SOUND_DEVICE);
-	p.y += h20 + h20;
+	p.y += h35;
 
 	m_txtWasapiMode.Create(ResStr(IDS_ARS_WASAPI_MODE), WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(200), m_fontheight)), this, (UINT)IDC_STATIC);
 	m_cbWasapiMode.Create(WS_VISIBLE | WS_CHILD | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(ScaleX(200), -4), CSize(ScaleX(120), 200)), this, IDC_PP_WASAPI_MODE);
 	m_cbWasapiMode.AddString(ResStr(IDS_ARS_SHARED));
 	m_cbWasapiMode.AddString(ResStr(IDS_ARS_EXCLUSIVE));
-	p.y += h20;
+	p.y += h25;
 	m_txtDevicePeriod.Create(ResStr(IDS_ARS_DEVICE_PERIOD), WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(200), m_fontheight)), this, (UINT)IDC_STATIC);
 	m_cbDevicePeriod.Create(WS_VISIBLE | WS_CHILD | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(ScaleX(200), -4), CSize(ScaleX(120), 200)), this, IDC_PP_WASAPI_DEVICE_PERIOD);
-	m_cbDevicePeriod.AddString(ResStr(IDS_AG_DEFAULT));
-	m_cbDevicePeriod.AddString(L"50 ms");
-	m_cbDevicePeriod.AddString(L"100 ms");
-	p.y += h20;
+	AddStringData(m_cbDevicePeriod, ResStr(IDS_AG_DEFAULT), 0);
+	AddStringData(m_cbDevicePeriod, L"50 ms", 50);
+	AddStringData(m_cbDevicePeriod, L"100 ms", 100);
+	p.y += h25;
 	m_cbUseBitExactOutput.Create(ResStr(IDS_ARS_BITEXACT_OUTPUT), WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_USE_BITEXACT_OUTPUT);
 	p.y += h20;
 	m_cbUseSystemLayoutChannels.Create(ResStr(IDS_ARS_SYSTEM_LAYOUT_CHANNELS), WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_USE_SYSTEM_LAYOUT_CHANNELS);
@@ -109,7 +109,7 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 			m_cbSoundDevice.SetCurSel(idx);
 		}
 		m_cbWasapiMode.SetCurSel(m_pMAR->GetWasapiMode());
-		m_cbDevicePeriod.SetCurSel(m_pMAR->GetDevicePeriod());
+		SelectByItemData(m_cbDevicePeriod, m_pMAR->GetDevicePeriod());
 		m_cbUseBitExactOutput.SetCheck(m_pMAR->GetBitExactOutput());
 		m_cbUseSystemLayoutChannels.SetCheck(m_pMAR->GetSystemLayoutChannels());
 		m_cbReleaseDeviceIdle.SetCheck(m_pMAR->GetReleaseDeviceIdle());
@@ -140,7 +140,7 @@ bool CMpcAudioRendererSettingsWnd::OnApply()
 
 	if (m_pMAR) {
 		m_pMAR->SetWasapiMode(m_cbWasapiMode.GetCurSel());
-		m_pMAR->SetDevicePeriod(m_cbDevicePeriod.GetCurSel());
+		m_pMAR->SetDevicePeriod(GetCurItemData(m_cbDevicePeriod));
 		m_pMAR->SetBitExactOutput(m_cbUseBitExactOutput.GetCheck());
 		m_pMAR->SetSystemLayoutChannels(m_cbUseSystemLayoutChannels.GetCheck());
 		m_pMAR->SetReleaseDeviceIdle(m_cbReleaseDeviceIdle.GetCheck());

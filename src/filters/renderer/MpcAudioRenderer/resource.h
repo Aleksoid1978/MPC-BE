@@ -11,6 +11,7 @@
 #define IDS_ARS_SOUND_DEVICE            7605
 #define IDS_ARS_RELEASE_DEVICE_IDLE     7606
 #define IDS_ARS_CROSSFEED               7607
+#define IDS_ARS_DEVICE_PERIOD           7608
 #define IDS_ARS_STATUS                  7610
 #define IDS_ARS_DEVICE                  7611
 #define IDS_ARS_MODE                    7612
@@ -19,7 +20,6 @@
 #define IDS_ARS_FORMAT                  7615
 #define IDS_ARS_SAMPLERATE              7616
 #define IDS_ARS_CHANNELS                7617
-#define IDS_ARS_DEVICE_PERIOD           7618
 #define IDS_AG_DEFAULT                  33000
 
 // Next default values for new objects
