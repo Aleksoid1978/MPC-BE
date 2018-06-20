@@ -223,7 +223,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		m_DeviceMode = MODE_WASAPI_SHARED;
 	}
 
-	if (m_DevicePeriod != 0 || m_DevicePeriod != 50 || m_DevicePeriod != 100) {
+	if (m_DevicePeriod != 0 && m_DevicePeriod != 50 && m_DevicePeriod != 100) {
 		m_DevicePeriod = 50;
 	}
 
@@ -1001,7 +1001,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 	}
 #else
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, (int)m_DeviceMode);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_DevicePeriod, (int)m_DevicePeriod);
+	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_DevicePeriod, m_DevicePeriod);
 	AfxGetApp()->WriteProfileString(OPT_SECTION_AudRend, OPT_AudioDeviceId, m_DeviceId);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
@@ -1032,13 +1032,14 @@ STDMETHODIMP_(INT) CMpcAudioRenderer::GetWasapiMode()
 
 STDMETHODIMP CMpcAudioRenderer::SetDevicePeriod(INT nValue)
 {
-	if (nValue != 0 || nValue != 50 || nValue != 100) {
+	if (nValue != 0 && nValue != 50 && nValue != 100) {
 		return E_INVALIDARG;
 	}
 
 	CAutoLock cAutoLock(&m_csProps);
 
 	if (m_pAudioClient && m_DevicePeriod != nValue) {
+		m_DevicePeriod = nValue;
 		SetReinitializeAudioDevice();
 	}
 
