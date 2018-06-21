@@ -141,12 +141,19 @@ private:
 		NvAPI_GPU_GetAllClocks_t NvAPI_GPU_GetAllClocks;
 	} NVData;
 
+	PFND3DKMT_QUERYSTATISTICS pD3DKMTQueryStatistics = nullptr;
 	PFND3DKMT_OPENADAPTERFROMHDC pD3DKMTOpenAdapterFromHdc = nullptr;
 	PFND3DKMT_CLOSEADAPTER pD3DKMTCloseAdapter = nullptr;
-	PFND3DKMT_QUERYSTATISTICS pD3DKMTQueryStatistics = nullptr;
+	PFND3DKMT_QUERYADAPTERINFO pD3DKMTQueryAdapterInfo = nullptr;
 
 	D3DKMT_HANDLE AdapterHandle = 0;
 	LUID AdapterLuid = {};
+
+	ULONG nodeCount = 0;
+	bool bUseNode = false;
+	ULONG gpuNode = -1;
+	ULONG decodeNode = -1;
+	ULONG processingNode = -1;
 
 	HANDLE processHandle = nullptr;
 

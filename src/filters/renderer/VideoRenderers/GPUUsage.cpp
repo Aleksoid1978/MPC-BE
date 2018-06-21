@@ -39,6 +39,7 @@ CGPUUsage::CGPUUsage()
 			pD3DKMTQueryStatistics = (PFND3DKMT_QUERYSTATISTICS)GetProcAddress(gdi32Handle, "D3DKMTQueryStatistics");
 			pD3DKMTOpenAdapterFromHdc = (PFND3DKMT_OPENADAPTERFROMHDC)GetProcAddress(gdi32Handle, "D3DKMTOpenAdapterFromHdc");
 			pD3DKMTCloseAdapter = (PFND3DKMT_CLOSEADAPTER)GetProcAddress(gdi32Handle, "D3DKMTCloseAdapter");
+			pD3DKMTQueryAdapterInfo = (PFND3DKMT_QUERYADAPTERINFO)GetProcAddress(gdi32Handle, "D3DKMTQueryAdapterInfo");
 		}
 
 		processHandle = GetCurrentProcess();
@@ -96,16 +97,22 @@ void CGPUUsage::Clean()
 		pD3DKMTCloseAdapter(&closeAdapter);
 
 		AdapterHandle = 0;
-		ZeroMemory(&AdapterLuid, sizeof(AdapterLuid));
+		AdapterLuid = {};
 	}
+
+	nodeCount = 0;
+	bUseNode = false;
+	gpuNode = decodeNode = processingNode = -1;
 
 	m_statistic = {};
 	m_dwLastRun = 0;
 	m_lRunCount = 0;
 
 	gpuTimeStatistics.clear();
-	totalRunning = {0, 0};
+	totalRunning = {};
 }
+
+#define UpdateDelta(Var, NewValue) { if (Var.Value) { Var.Delta = NewValue - Var.Value; } Var.Value = NewValue; }
 
 HRESULT CGPUUsage::Init(const CString& DeviceName, const CString& Device)
 {
@@ -342,10 +349,81 @@ HRESULT CGPUUsage::Init(const CString& DeviceName, const CString& Device)
 		m_GPUType = Device.Find(L"Intel") == 0 ? INTEL_GPU : OTHER_GPU;
 	}
 
+	if (m_GPUType == NVIDIA_GPU) {
+		if (NVData.NvAPI_GPU_GetPStates
+				&& NVData.NvAPI_GPU_GetPStates(NVData.gpuHandles[NVData.gpuSelected], &NVData.gpuPStates) == OK) {
+			m_statistic.bUseDecode = true;
+		}
+	} else if (AdapterLuid.LowPart) {
+		D3DKMT_QUERYSTATISTICS queryStatistics = {};
+		queryStatistics.Type = D3DKMT_QUERYSTATISTICS_ADAPTER;
+		queryStatistics.AdapterLuid = AdapterLuid;
+		if (NT_SUCCESS(pD3DKMTQueryStatistics(&queryStatistics))) {
+			nodeCount = queryStatistics.QueryResult.AdapterInformation.NodeCount;
+		}
+
+		if (nodeCount) {
+			gpuTimeStatistics.resize(nodeCount);
+
+			ZeroMemory(&queryStatistics, sizeof(queryStatistics));
+			queryStatistics.Type = D3DKMT_QUERYSTATISTICS_NODE;
+			queryStatistics.AdapterLuid = AdapterLuid;
+			for (ULONG i = 0; i < nodeCount; i++) {
+				queryStatistics.QueryProcessNode.NodeId = i;
+				if (NT_SUCCESS(pD3DKMTQueryStatistics(&queryStatistics))
+						&& queryStatistics.QueryResult.NodeInformation.GlobalInformation.RunningTime.QuadPart) {
+					auto& item = gpuTimeStatistics[i];
+					item.runningTime = queryStatistics.QueryResult.NodeInformation.GlobalInformation.RunningTime.QuadPart;
+					UpdateDelta(item.gputotalRunningTime, item.runningTime);
+
+					if (SysVersion::IsWin10orLater() && pD3DKMTQueryAdapterInfo) {
+						D3DKMT_NODEMETADATA metaDataInfo = {};
+						metaDataInfo.NodeOrdinal = i;
+
+						D3DKMT_QUERYADAPTERINFO queryAdapterInfo = {};
+						queryAdapterInfo.AdapterHandle = AdapterHandle;
+						queryAdapterInfo.Type = KMTQAITYPE_NODEMETADATA;
+						queryAdapterInfo.PrivateDriverData = &metaDataInfo;
+						queryAdapterInfo.PrivateDriverDataSize = sizeof(D3DKMT_NODEMETADATA);
+
+						if (NT_SUCCESS(pD3DKMTQueryAdapterInfo(&queryAdapterInfo))) {
+							switch (metaDataInfo.EngineType) {
+								case DXGK_ENGINE_TYPE_3D:
+									gpuNode = i;
+									bUseNode = true;
+									break;
+								case DXGK_ENGINE_TYPE_VIDEO_DECODE:
+									decodeNode = i;
+									m_statistic.bUseDecode = true;
+									break;
+								case DXGK_ENGINE_TYPE_VIDEO_PROCESSING:
+									processingNode = i;
+									m_statistic.bUseProcessing = true;
+									break;
+							}
+						}
+					}
+				}
+			}
+
+			if (!bUseNode) {
+				if (m_GPUType == INTEL_GPU && nodeCount >= 4) {
+					m_statistic.bUseDecode = m_statistic.bUseProcessing = true;
+				} else if (nodeCount > 1) {
+					m_statistic.bUseDecode = true;
+				}
+			}
+
+			LARGE_INTEGER performanceCounter = {};
+			QueryPerformanceCounter(&performanceCounter);
+			if (performanceCounter.QuadPart) {
+				UpdateDelta(totalRunning, performanceCounter.QuadPart);
+			}
+		}
+	}
+
 	return m_GPUType == UNKNOWN_GPU ? E_FAIL : S_OK;
 }
-
-#define UpdateDelta(Var, NewValue) { if (Var.Value) { Var.Delta = NewValue - Var.Value; } Var.Value = NewValue; }
 
 void CGPUUsage::GetUsage(statistic& gpu_statistic)
 {
@@ -391,8 +469,6 @@ void CGPUUsage::GetUsage(statistic& gpu_statistic)
 			const int idx = NVData.gpuSelected;
 			if (NVData.NvAPI_GPU_GetPStates) {
 				if (NVData.NvAPI_GPU_GetPStates(NVData.gpuHandles[idx], &NVData.gpuPStates) == OK) {
-					m_statistic.bUseDecode = true;
-
 					m_statistic.gpu    = NVData.gpuPStates.pstates[NVAPI_DOMAIN_GPU].present ? NVData.gpuPStates.pstates[NVAPI_DOMAIN_GPU].percent : 0;
 					m_statistic.decode = NVData.gpuPStates.pstates[NVAPI_DOMAIN_VID].present ? NVData.gpuPStates.pstates[NVAPI_DOMAIN_VID].percent : 0;
 				}
@@ -418,13 +494,10 @@ void CGPUUsage::GetUsage(statistic& gpu_statistic)
 			UINT64 llGPUSharedBytesUsedTotal = 0;
 			UINT64 llGPUSharedBytesUsedCurrent = 0;
 
-			ULONG nodeCount = 0;
-
 			D3DKMT_QUERYSTATISTICS queryStatistics = {};
 			queryStatistics.Type = D3DKMT_QUERYSTATISTICS_ADAPTER;
 			queryStatistics.AdapterLuid = AdapterLuid;
 			if (NT_SUCCESS(pD3DKMTQueryStatistics(&queryStatistics))) {
-				nodeCount = queryStatistics.QueryResult.AdapterInformation.NodeCount;
 				const ULONG segmentCount = queryStatistics.QueryResult.AdapterInformation.NbSegments;
 				for (ULONG i = 0; i < segmentCount; i++) {
 					ZeroMemory(&queryStatistics, sizeof(D3DKMT_QUERYSTATISTICS));
@@ -477,9 +550,7 @@ void CGPUUsage::GetUsage(statistic& gpu_statistic)
 				m_statistic.memUsageCurrent = (llGPUDedicatedBytesUsedCurrent ? llGPUDedicatedBytesUsedCurrent : llGPUSharedBytesUsedCurrent) / MEGABYTE;
 			}
 
-			if (nodeCount && m_GPUType != NVIDIA_GPU) {
-				gpuTimeStatistics.resize(nodeCount);
-
+			if (nodeCount) {
 				ZeroMemory(&queryStatistics, sizeof(queryStatistics));
 				queryStatistics.Type = D3DKMT_QUERYSTATISTICS_NODE;
 				queryStatistics.AdapterLuid = AdapterLuid;
@@ -489,12 +560,6 @@ void CGPUUsage::GetUsage(statistic& gpu_statistic)
 							&& queryStatistics.QueryResult.NodeInformation.GlobalInformation.RunningTime.QuadPart) {
 						gpuTimeStatistics[i].runningTime = queryStatistics.QueryResult.NodeInformation.GlobalInformation.RunningTime.QuadPart;
 					}
-				}
-
-				if (m_GPUType == INTEL_GPU && gpuTimeStatistics.size() >= 4) {
-					m_statistic.bUseDecode = m_statistic.bUseProcessing = true;
-				} else if (!m_statistic.bUseDecode && gpuTimeStatistics.size() > 1) {
-					m_statistic.bUseDecode = true;
 				}
 
 				LARGE_INTEGER performanceCounter = {};
@@ -510,34 +575,58 @@ void CGPUUsage::GetUsage(statistic& gpu_statistic)
 						m_statistic.processing = 0;
 						const auto elapsedTime = llMulDiv(totalRunning.Delta, 10000000, performanceFrequency.QuadPart, 0);
 
-						if (m_GPUType == INTEL_GPU && gpuTimeStatistics.size() >= 4) {
-							auto& item0 = gpuTimeStatistics[0];
-							UpdateDelta(item0.gputotalRunningTime, item0.runningTime);
-							if (item0.gputotalRunningTime.Delta) {
-								m_statistic.gpu = llMulDiv(item0.gputotalRunningTime.Delta, 100, elapsedTime, 0);
+						if (bUseNode) {
+							if (gpuNode != -1) {
+								auto& item = gpuTimeStatistics[gpuNode];
+								UpdateDelta(item.gputotalRunningTime, item.runningTime);
+								if (item.gputotalRunningTime.Delta) {
+									m_statistic.gpu = llMulDiv(item.gputotalRunningTime.Delta, 100, elapsedTime, 0);
+								}
 							}
-
-							auto& item1 = gpuTimeStatistics[1];
-							UpdateDelta(item1.gputotalRunningTime, item1.runningTime);
-							if (item1.gputotalRunningTime.Delta) {
-								m_statistic.decode = llMulDiv(item1.gputotalRunningTime.Delta, 100, elapsedTime, 0);
+							if (decodeNode != -1) {
+								auto& item = gpuTimeStatistics[decodeNode];
+								UpdateDelta(item.gputotalRunningTime, item.runningTime);
+								if (item.gputotalRunningTime.Delta) {
+									m_statistic.decode = llMulDiv(item.gputotalRunningTime.Delta, 100, elapsedTime, 0);
+								}
 							}
-
-							auto& item3 = gpuTimeStatistics[3];
-							UpdateDelta(item3.gputotalRunningTime, item3.runningTime);
-							if (item3.gputotalRunningTime.Delta) {
-								m_statistic.processing = llMulDiv(item3.gputotalRunningTime.Delta, 100, elapsedTime, 0);
+							if (processingNode != -1) {
+								auto& item = gpuTimeStatistics[processingNode];
+								UpdateDelta(item.gputotalRunningTime, item.runningTime);
+								if (item.gputotalRunningTime.Delta) {
+									m_statistic.processing = llMulDiv(item.gputotalRunningTime.Delta, 100, elapsedTime, 0);
+								}
 							}
 						} else {
-							for (size_t i = 0; i < gpuTimeStatistics.size(); i++) {
-								auto& item = gpuTimeStatistics[i];
-								if (item.runningTime) {
-									UpdateDelta(item.gputotalRunningTime, item.runningTime);
-									if (i == 0) {
-										m_statistic.gpu = llMulDiv(item.gputotalRunningTime.Delta, 100, elapsedTime, 0);
-									} else {
-										const BYTE decodeUsage = llMulDiv(item.gputotalRunningTime.Delta, 100, elapsedTime, 0);
-										m_statistic.decode = std::max(m_statistic.decode, decodeUsage);
+							if (m_GPUType == INTEL_GPU && nodeCount >= 4) {
+								auto& item0 = gpuTimeStatistics[0];
+								UpdateDelta(item0.gputotalRunningTime, item0.runningTime);
+								if (item0.gputotalRunningTime.Delta) {
+									m_statistic.gpu = llMulDiv(item0.gputotalRunningTime.Delta, 100, elapsedTime, 0);
+								}
+
+								auto& item1 = gpuTimeStatistics[1];
+								UpdateDelta(item1.gputotalRunningTime, item1.runningTime);
+								if (item1.gputotalRunningTime.Delta) {
+									m_statistic.decode = llMulDiv(item1.gputotalRunningTime.Delta, 100, elapsedTime, 0);
+								}
+
+								auto& item3 = gpuTimeStatistics[3];
+								UpdateDelta(item3.gputotalRunningTime, item3.runningTime);
+								if (item3.gputotalRunningTime.Delta) {
+									m_statistic.processing = llMulDiv(item3.gputotalRunningTime.Delta, 100, elapsedTime, 0);
+								}
+							} else {
+								for (size_t i = 0; i < gpuTimeStatistics.size(); i++) {
+									auto& item = gpuTimeStatistics[i];
+									if (item.runningTime) {
+										UpdateDelta(item.gputotalRunningTime, item.runningTime);
+										if (i == 0) {
+											m_statistic.gpu = llMulDiv(item.gputotalRunningTime.Delta, 100, elapsedTime, 0);
+										} else {
+											const BYTE decodeUsage = llMulDiv(item.gputotalRunningTime.Delta, 100, elapsedTime, 0);
+											m_statistic.decode = std::max(m_statistic.decode, decodeUsage);
+										}
 									}
 								}
 							}
