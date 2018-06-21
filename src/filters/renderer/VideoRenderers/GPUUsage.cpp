@@ -391,6 +391,8 @@ void CGPUUsage::GetUsage(statistic& gpu_statistic)
 			const int idx = NVData.gpuSelected;
 			if (NVData.NvAPI_GPU_GetPStates) {
 				if (NVData.NvAPI_GPU_GetPStates(NVData.gpuHandles[idx], &NVData.gpuPStates) == OK) {
+					m_statistic.bUseDecode = true;
+
 					m_statistic.gpu    = NVData.gpuPStates.pstates[NVAPI_DOMAIN_GPU].present ? NVData.gpuPStates.pstates[NVAPI_DOMAIN_GPU].percent : 0;
 					m_statistic.decode = NVData.gpuPStates.pstates[NVAPI_DOMAIN_VID].present ? NVData.gpuPStates.pstates[NVAPI_DOMAIN_VID].percent : 0;
 				}
@@ -489,6 +491,12 @@ void CGPUUsage::GetUsage(statistic& gpu_statistic)
 					}
 				}
 
+				if (m_GPUType == INTEL_GPU && gpuTimeStatistics.size() >= 4) {
+					m_statistic.bUseDecode = m_statistic.bUseProcessing = true;
+				} else if (!m_statistic.bUseDecode && gpuTimeStatistics.size() > 1) {
+					m_statistic.bUseDecode = true;
+				}
+
 				LARGE_INTEGER performanceCounter = {};
 				QueryPerformanceCounter(&performanceCounter);
 				LARGE_INTEGER performanceFrequency = {};
@@ -548,6 +556,6 @@ void CGPUUsage::GetUsage(statistic& gpu_statistic)
 
 bool CGPUUsage::EnoughTimePassed()
 {
-	const int minElapsedMS = 1000;
+	const DWORD minElapsedMS = 1000UL;
 	return (GetTickCount() - m_dwLastRun) >= minElapsedMS;
 }

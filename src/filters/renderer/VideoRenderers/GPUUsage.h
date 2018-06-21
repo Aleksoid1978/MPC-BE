@@ -94,6 +94,9 @@ public:
 		UINT clock = 0;
 		UINT64 memUsageCurrent = 0;
 		UINT64 memUsageTotal = 0;
+
+		bool bUseDecode = false;
+		bool bUseProcessing = false;
 	};
 
 	CGPUUsage();

@@ -49,6 +49,6 @@ const size_t CMemUsage::GetUsage()
 
 const bool CMemUsage::EnoughTimePassed()
 {
-	const int minElapsedMS = 1000;
+	const DWORD minElapsedMS = 1000UL;
 	return (GetTickCount() - m_dwLastRun) >= minElapsedMS;
 }

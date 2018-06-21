@@ -121,6 +121,6 @@ ULONGLONG CCPUUsage::SubtractTimes(const FILETIME& ftA, const FILETIME& ftB)
 
 bool CCPUUsage::EnoughTimePassed()
 {
-	const int minElapsedMS = 1000;
+	const DWORD minElapsedMS = 1000UL;
 	return (GetTickCount() - m_dwLastRun) >= minElapsedMS;
 }
