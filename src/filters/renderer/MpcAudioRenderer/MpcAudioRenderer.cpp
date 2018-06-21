@@ -126,15 +126,15 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_pSyncClock(nullptr)
 	, m_pWaveFormatExInput(nullptr)
 	, m_pWaveFormatExOutput(nullptr)
+	, m_DeviceMode(MODE_WASAPI_SHARED)
 	, m_pMMDevice(nullptr)
 	, m_pAudioClient(nullptr)
 	, m_pRenderClient(nullptr)
 	, m_pAudioClock(nullptr)
-	, m_DeviceMode(MODE_WASAPI_SHARED)
 	, m_BufferDuration(50)
+	, m_hnsBufferDuration(0)
 	, m_nFramesInBuffer(0)
 	, m_nMaxWasapiQueueSize(0)
-	, m_hnsBufferDuration(0)
 	, m_bIsAudioClientStarted(false)
 	, m_lVolume(DSBVOLUME_MAX)
 	, m_lBalance(DSBPAN_CENTER)
@@ -1038,9 +1038,11 @@ STDMETHODIMP CMpcAudioRenderer::SetDevicePeriod(INT nValue)
 
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (m_pAudioClient && m_BufferDuration != nValue) {
+	if (m_BufferDuration != nValue) {
 		m_BufferDuration = nValue;
-		SetReinitializeAudioDevice();
+		if (m_pAudioClient) {
+			SetReinitializeAudioDevice();
+		}
 	}
 
 	return S_OK;
