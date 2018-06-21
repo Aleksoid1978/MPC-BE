@@ -2102,10 +2102,8 @@ void CDX9AllocatorPresenter::DrawStats()
 						strText.AppendFormat(L" (%4u MHz)", gpu_statistic.clock);
 					}
 
-					if (m_GPUUsage.GetType() == CGPUUsage::NVIDIA_GPU) {
-						strText.AppendFormat(L", Video Decode:%3u%%", gpu_statistic.decode);
-					} else if (m_GPUUsage.IsUseStatistics()) {
-						if (m_GPUUsage.GetType() == CGPUUsage::INTEL_GPU) {
+					if (gpu_statistic.bUseDecode) {
+						if (gpu_statistic.bUseProcessing) {
 							strText.AppendFormat(L", Video Decode/Processing:%3u%%/%3u%%", gpu_statistic.decode, gpu_statistic.processing);
 						} else {
 							strText.AppendFormat(L", Video Decode:%3u%%", gpu_statistic.decode);
