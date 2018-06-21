@@ -224,15 +224,15 @@ private:
 	// WASAPI variables
 	HMODULE            m_hModule;
 	DEVICE_MODE        m_DeviceMode;
-	int                m_DevicePeriod; // 0 - default, 1 - reserved, 50 ms, 100 ms
 	CString            m_DeviceId;
 	IMMDevice          *m_pMMDevice;
 	IAudioClient       *m_pAudioClient;
 	IAudioRenderClient *m_pRenderClient;
 	IAudioClock        *m_pAudioClock;
+	int                m_BufferDuration; // 0 - default, 1 - reserved, 50 ms, 100 ms
+	REFERENCE_TIME     m_hnsBufferDuration;
 	UINT32             m_nFramesInBuffer;
 	size_t             m_nMaxWasapiQueueSize;
-	REFERENCE_TIME     m_hnsPeriod;
 	bool               m_bIsAudioClientStarted;
 	BOOL               m_bIsBitstream;
 	BITSTREAM_MODE     m_BitstreamMode;
