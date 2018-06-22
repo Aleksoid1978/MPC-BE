@@ -1694,7 +1694,7 @@ COggOpusOutputPin::COggOpusOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFi
 
 REFERENCE_TIME COggOpusOutputPin::GetRefTime(__int64 granule_position)
 {
-	REFERENCE_TIME rt = ((granule_position - m_Preskip) * UNITS) / m_SampleRate;
+	REFERENCE_TIME rt = granule_position * UNITS / m_SampleRate;
 	return rt;
 }
 
@@ -1724,9 +1724,12 @@ HRESULT COggOpusOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int l
 	}
 	__int64 pduration = (frame_size * nb_frames * UNITS) / m_SampleRate;
 
+	const REFERENCE_TIME preSkip = m_Preskip * UNITS / m_SampleRate;
+	const REFERENCE_TIME pts = m_rtLast - preSkip;
+
 	p->bSyncPoint = TRUE;
-	p->rtStart    = m_rtLast;
-	p->rtStop     = m_rtLast + pduration;
+	p->rtStart    = pts;
+	p->rtStop     = pts + pduration;
 	p->SetData(pData, len);
 
 	return S_OK;
