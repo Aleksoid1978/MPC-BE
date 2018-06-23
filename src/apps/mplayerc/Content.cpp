@@ -232,6 +232,7 @@ namespace Content {
 		PLAYLIST_RAM,
 		PLAYLIST_QTL,
 		PLAYLIST_WPL,
+		PLAYLIST_HTML_META_REFRESH,
 	};
 
 	const std::wregex ref_pls(L"(^|\\n)File\\d+[ \\t]*=[ \\t]*\"?([^\\n\"]+)");                         // File1=...
@@ -240,18 +241,21 @@ namespace Content {
 	const std::wregex ref_ram(L"(^|\\n)((?:rtsp|http|file)://[^\\n]+)");                                // (rtsp|http|file)://...
 	const std::wregex ref_qtl(L"src[ \\t]*=[ \\t]*\"([^\"\\n]+)\"");                                    // src="..."
 	const std::wregex ref_wpl(L"<media src=\"([^\"\\n]+)\"");                                           // <media src="..."
+	const std::wregex ref_html_meta_refresh(L"<meta\\s+http-equiv\\s*=\\s*([\"'])refresh\\1\\s+content\\s*=\\s*([\"'])\\d+;\\s*url=((?!\2)[\"']?)([^\"'\\n]+?)\\3\\2\\s*/?>", std::regex_constants::icase);
+	                                                                                                    // <meta http-equiv="refresh" content="0; url='...'">
 
 	static const bool FindRedir(const CUrl& src, const CString& body, std::list<CString>& urls, const int playlist_type)
 	{
 		std::wregex rgx;
 
 		switch (playlist_type) {
-			case PLAYLIST_PLS: rgx = ref_pls;  break;
-			case PLAYLIST_XSPF:rgx = ref_xspf; break;
-			case PLAYLIST_ASX: rgx = ref_asx;  break;
-			case PLAYLIST_RAM: rgx = ref_ram;  break;
-			case PLAYLIST_QTL: rgx = ref_qtl;  break;
-			case PLAYLIST_WPL: rgx = ref_wpl;  break;
+			case PLAYLIST_PLS:               rgx = ref_pls;               break;
+			case PLAYLIST_XSPF:              rgx = ref_xspf;              break;
+			case PLAYLIST_ASX:               rgx = ref_asx;               break;
+			case PLAYLIST_RAM:               rgx = ref_ram;               break;
+			case PLAYLIST_QTL:               rgx = ref_qtl;               break;
+			case PLAYLIST_WPL:               rgx = ref_wpl;               break;
+			case PLAYLIST_HTML_META_REFRESH: rgx = ref_html_meta_refresh; break;
 			default:
 				return false;
 		}
@@ -324,12 +328,12 @@ namespace Content {
 		std::wregex rgx;
 
 		switch (playlist_type) {
-			case PLAYLIST_PLS: rgx = ref_pls;  break;
-			case PLAYLIST_XSPF:rgx = ref_xspf; break;
-			case PLAYLIST_ASX: rgx = ref_asx;  break;
-			case PLAYLIST_RAM: rgx = ref_ram;  break;
-			case PLAYLIST_QTL: rgx = ref_qtl;  break;
-			case PLAYLIST_WPL: rgx = ref_wpl;  break;
+			case PLAYLIST_PLS:  rgx = ref_pls;  break;
+			case PLAYLIST_XSPF: rgx = ref_xspf; break;
+			case PLAYLIST_ASX:  rgx = ref_asx;  break;
+			case PLAYLIST_RAM:  rgx = ref_ram;  break;
+			case PLAYLIST_QTL:  rgx = ref_qtl;  break;
+			case PLAYLIST_WPL:  rgx = ref_wpl;  break;
 			default:
 				return false;
 		}
@@ -364,6 +368,8 @@ namespace Content {
 
 		return fns.size() > 0;
 	}
+
+	const std::wregex html_mime_regex(L"text/html(?:;\\s*charset=([\"']?)[\\w-]+\\1)?", std::regex_constants::icase);
 
 	const CString GetType(CString fn, std::list<CString>* redir)
 	{
@@ -430,6 +436,8 @@ namespace Content {
 				playlist_type = PLAYLIST_QTL;
 			} else if (ct == L"application/vnd.ms-wpl") {
 				playlist_type = PLAYLIST_WPL;
+			} else if (std::regex_match(ct.GetString(), html_mime_regex) && body.GetLength() < 4 * KILOBYTE) {
+				playlist_type = PLAYLIST_HTML_META_REFRESH;
 			}
 
 			if (!body.IsEmpty()) {
