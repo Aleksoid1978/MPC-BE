@@ -370,11 +370,12 @@ HRESULT CGPUUsage::Init(const CString& DeviceName, const CString& Device)
 			queryStatistics.AdapterLuid = AdapterLuid;
 			for (ULONG i = 0; i < nodeCount; i++) {
 				queryStatistics.QueryProcessNode.NodeId = i;
-				if (NT_SUCCESS(pD3DKMTQueryStatistics(&queryStatistics))
-						&& queryStatistics.QueryResult.NodeInformation.GlobalInformation.RunningTime.QuadPart) {
-					auto& item = gpuTimeStatistics[i];
-					item.runningTime = queryStatistics.QueryResult.NodeInformation.GlobalInformation.RunningTime.QuadPart;
-					UpdateDelta(item.gputotalRunningTime, item.runningTime);
+				if (NT_SUCCESS(pD3DKMTQueryStatistics(&queryStatistics))) {
+					if (queryStatistics.QueryResult.NodeInformation.GlobalInformation.RunningTime.QuadPart) {
+						auto& item = gpuTimeStatistics[i];
+						item.runningTime = queryStatistics.QueryResult.NodeInformation.GlobalInformation.RunningTime.QuadPart;
+						UpdateDelta(item.gputotalRunningTime, item.runningTime);
+					}
 
 					if (SysVersion::IsWin10orLater() && pD3DKMTQueryAdapterInfo) {
 						D3DKMT_NODEMETADATA metaDataInfo = {};
