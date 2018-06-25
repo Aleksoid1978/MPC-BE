@@ -1,5 +1,5 @@
 /*
- * (C) 2017 see Authors.txt
+ * (C) 2017-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,11 +37,15 @@ interface __declspec(uuid("3F56FEBC-633C-4C76-8455-0787FC62C8F8")) IExFilterInfo
 // S_OK         - operation successful
 //
 // available info fields:
-// name                type   filter                             valid values
-// VIDEO_PROFILE       int    MatroskaSplitter
-// VIDEO_PIXEL_FORMAT  int    MatroskaSplitter
-// VIDEO_INTERLACED    int    MatroskaSplitter, MP4Splitter      0-progressive, 1-tff, 2-bff
-// VIDEO_FLAG_ONLY_DTS int    MatroskaSplitter, MP4Splitter      0-no, 1-yes
+// name                    type  filter                                         valid values
+// VIDEO_PROFILE           int   MatroskaSplitter
+// VIDEO_PIXEL_FORMAT      int   MatroskaSplitter
+// VIDEO_INTERLACED        int   MatroskaSplitter,MP4Splitter,RawVideoSplitter  0-progressive, 1-tff, 2-bff
+// VIDEO_FLAG_ONLY_DTS     int   MatroskaSplitter,MP4Splitter                   0-no, 1-yes
+// PALETTE                 bin   MP4Splitter
+// VIDEO_COLOR_SPACE       bin   MatroskaSplitter
+// HDR_MASTERING_METADATA  bin   MatroskaSplitter
+// HDR_CONTENT_LIGHT_LEVEL bin   MatroskaSplitter
 
 interface __declspec(uuid("37CBDF10-D65E-4E5A-8F37-40E0C8EA1695")) IExFilterConfig : public IUnknown
 {
