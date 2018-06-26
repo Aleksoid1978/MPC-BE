@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "OggFile.h"
+#include <numeric>
 
 COggFile::COggFile(IAsyncReader* pAsyncReader, HRESULT& hr)
 	: CBaseSplitterFile(pAsyncReader, hr, FM_FILE | FM_FILE_DL | FM_STREAM)
@@ -70,38 +71,29 @@ bool COggFile::Read(OggPageHeader& hdr, HANDLE hBreak)
 	return Sync(hBreak) && S_OK == ByteRead((BYTE*)&hdr, sizeof(hdr)) && hdr.capture_pattern == 'SggO';
 }
 
-bool COggFile::Read(OggPage& page, bool fFull, HANDLE hBreak)
+bool COggFile::Read(OggPage& page, const bool bFull, HANDLE hBreak)
 {
 	memset(&page.m_hdr, 0, sizeof(page.m_hdr));
-	page.m_lens.RemoveAll();
+	page.m_lens.clear();
 	page.clear();
 
-	if (!Read(page.m_hdr, hBreak)) {
+	if (!Read(page.m_hdr, hBreak)|| !page.m_hdr.number_page_segments) {
 		return false;
 	}
 
-	int pagelen = 0, packetlen = 0;
-	for (BYTE i = 0; i < page.m_hdr.number_page_segments; i++) {
-		BYTE b;
-		if (S_OK != ByteRead(&b, 1)) {
-			return false;
-		}
-		packetlen += b;
-		if (1/*b < 0xff*/) {
-			page.m_lens.AddTail(packetlen);
-			pagelen += packetlen;
-			packetlen = 0;
-		}
+	page.m_lens.resize(page.m_hdr.number_page_segments);
+	if (S_OK != ByteRead(page.m_lens.data(), page.m_hdr.number_page_segments)) {
+		return false;
 	}
 
-	if (fFull) {
+	const size_t pagelen = std::accumulate(page.m_lens.cbegin(), page.m_lens.cend(), 0);
+	if (bFull) {
 		page.resize(pagelen);
 		if (S_OK != ByteRead(page.data(), page.size())) {
 			return false;
 		}
 	} else {
 		Seek(GetPos() + pagelen);
-		page.m_lens.RemoveAll();
 	}
 
 	return true;

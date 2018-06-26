@@ -80,11 +80,10 @@ struct OggStreamHeader {
 class OggPage : public std::vector<BYTE>
 {
 public:
-	OggPageHeader m_hdr;
-	CAtlList<int> m_lens;
-	OggPage() {
-		memset(&m_hdr, 0, sizeof(m_hdr));
-	}
+	OggPageHeader m_hdr = {};
+	std::vector<BYTE> m_lens;
+
+	OggPage() = default;
 };
 
 class COggFile : public CBaseSplitterFile
@@ -96,5 +95,5 @@ public:
 
 	bool Sync(HANDLE hBreak = nullptr);
 	bool Read(OggPageHeader& hdr, HANDLE hBreak = nullptr);
-	bool Read(OggPage& page, bool fFull = true, HANDLE hBreak = nullptr);
+	bool Read(OggPage& page, const bool bFull = true, HANDLE hBreak = nullptr);
 };
