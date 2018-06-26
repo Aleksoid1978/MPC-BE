@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <atlbase.h>
-#include <atlcoll.h>
 #include "OggFile.h"
 #include "../BaseSplitter/BaseSplitter.h"
 
@@ -45,12 +43,11 @@ class COggSplitterOutputPin : public CBaseSplitterOutputPin
 	CAutoPtrList<CComment> m_pComments;
 
 protected:
-	CCritSec m_csPackets;
-	CAutoPtrList<CPacket> m_packets;
+	CPacketQueue m_queue;
 	std::vector<BYTE> m_lastPacketData;
 	DWORD m_lastseqnum;
 	REFERENCE_TIME m_rtLast;
-	bool m_fSetKeyFrame;
+	bool m_bSetKeyFrame;
 
 	void ResetState(DWORD seqnum = DWORD_MAX);
 
@@ -74,7 +71,7 @@ public:
 
 class COggVorbisOutputPin : public COggSplitterOutputPin
 {
-	CAutoPtrList<CPacket> m_initpackets;
+	std::list<CAutoPtr<CPacket>> m_initpackets;
 
 	DWORD m_audio_sample_rate;
 	DWORD m_blocksize[2], m_lastblocksize;
@@ -91,30 +88,22 @@ public:
 
 	HRESULT UnpackInitPage(OggPage& page);
 	bool IsInitialized() {
-		return m_initpackets.GetCount() >= 3;
+		return m_initpackets.size() >= 3;
 	}
 };
 
 class COggFlacOutputPin : public COggSplitterOutputPin
 {
-	CAutoPtrList<CPacket> m_initpackets;
-
-	int		m_nSamplesPerSec;
-	int		m_nChannels;
-	WORD	m_wBitsPerSample;
-	int		m_nAvgBytesPerSec;
+	int  m_nSamplesPerSec;
+	int  m_nChannels;
+	WORD m_wBitsPerSample;
+	int  m_nAvgBytesPerSec;
 
 	virtual HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
 
-	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
-
 public:
 	COggFlacOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
-
-	bool IsInitialized() {
-		return m_initpackets.GetCount() >= 3;
-	}
 };
 
 class COggDirectShowOutputPin : public COggSplitterOutputPin
@@ -164,11 +153,11 @@ public:
 
 class COggTheoraOutputPin : public COggSplitterOutputPin
 {
-	CAutoPtrList<CPacket>	m_initpackets;
-	LONG					m_KfgShift;
-	LONG					m_KfgMask;
-	UINT					m_nVersion;
-	REFERENCE_TIME			m_rtAvgTimePerFrame;
+	std::list<CAutoPtr<CPacket>> m_initpackets;
+	LONG                         m_KfgShift;
+	LONG                         m_KfgMask;
+	UINT                         m_nVersion;
+	REFERENCE_TIME               m_rtAvgTimePerFrame;
 
 	virtual HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);
@@ -178,15 +167,15 @@ public:
 
 	HRESULT UnpackInitPage(OggPage& page);
 	bool IsInitialized() {
-		return m_initpackets.GetCount() >= 3;
+		return m_initpackets.size() >= 3;
 	}
 };
 
 class COggDiracOutputPin : public COggSplitterOutputPin
 {
-	REFERENCE_TIME	m_rtAvgTimePerFrame;
-	bool			m_bOldDirac;
-	bool			m_IsInitialized;
+	REFERENCE_TIME m_rtAvgTimePerFrame;
+	bool           m_bOldDirac;
+	bool           m_IsInitialized;
 
 	virtual HRESULT UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int len);
 	virtual REFERENCE_TIME GetRefTime(__int64 granule_position);

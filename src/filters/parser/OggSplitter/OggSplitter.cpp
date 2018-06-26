@@ -598,6 +598,13 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 						continue;
 					}
 
+					const bool start_segment = std::any_of(page.m_lens.cbegin(), page.m_lens.cend(), [](const BYTE& len) {
+						return len < 255;
+					});
+					if (!start_segment){
+						continue;
+					}
+
 					rt2 = pOggPin->GetRefTime(page.m_hdr.granule_position) + pOggPin->GetOffset();
 					break;
 				}
@@ -687,7 +694,7 @@ COggSplitterOutputPin::COggSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter
 	: CBaseSplitterOutputPin(pName, pFilter, pLock, phr)
 	, m_pFilter(dynamic_cast<COggSplitterFilter*>(pFilter))
 	, m_rtLast(INVALID_TIME)
-	, m_fSetKeyFrame(false)
+	, m_bSetKeyFrame(false)
 {
 	ResetState();
 }
@@ -748,8 +755,7 @@ CStringW COggSplitterOutputPin::GetComment(CStringW key)
 
 void COggSplitterOutputPin::ResetState(DWORD seqnum/* = DWORD_MAX*/)
 {
-	CAutoLock csAutoLock(&m_csPackets);
-	m_packets.RemoveAll();
+	m_queue.RemoveAll();
 	m_lastPacketData.clear();
 	m_lastseqnum = seqnum;
 }
@@ -762,8 +768,7 @@ void COggSplitterOutputPin::HandlePacket(DWORD TrackNumber, BYTE* pData, int len
 		if (S_OK == UnpackPacket(p, pData, len)) {
 			m_rtLast = p->rtStop;
 
-			CAutoLock csAutoLock(&m_csPackets);
-			m_packets.AddTail(p);
+			m_queue.Add(p);
 		}
 	}
 }
@@ -776,60 +781,49 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 		m_lastseqnum = page.m_hdr.page_sequence_number;
 	}
 
-	POSITION first = page.m_lens.GetHeadPosition();
-	while (first && page.m_lens.GetAt(first) == 255) {
-		page.m_lens.GetNext(first);
-	}
-	if (!first) {
-		first = page.m_lens.GetTailPosition();
-	}
-
-	POSITION last = page.m_lens.GetTailPosition();
-	while (last && page.m_lens.GetAt(last) == 255) {
-		page.m_lens.GetPrev(last);
-	}
-	if (!last) {
-		last = page.m_lens.GetTailPosition();
+	size_t last_segment = -1;
+	for (size_t segment = page.m_lens.size() - 1; (int)segment >= 0; segment--) {
+		if (page.m_lens[segment] < 255) {
+			last_segment = segment;
+			break;
+		}
 	}
 
-	BYTE* pData = page.data();
+	BYTE* start = page.data();
 
-	int i = 0, j = 0;
+	unsigned size = 0;
+	for (size_t segment = 0; segment < page.m_lens.size(); segment++) {
+		const auto& len = page.m_lens[segment];
+		size += len;
 
-	for (POSITION pos = page.m_lens.GetHeadPosition(); pos; page.m_lens.GetNext(pos)) {
-		int len = page.m_lens.GetAt(pos);
-		j += len;
-
-		if (len < 255 || pos == page.m_lens.GetTailPosition()) {
-			if (last == pos && page.m_hdr.granule_position != -1) {
+		if (len < 255) {
+			if (last_segment == segment && page.m_hdr.granule_position != -1) {
 				const REFERENCE_TIME rt = GetRefTime(page.m_hdr.granule_position) - m_pFilter->m_rtOffset;
 				if (rt >= 0) {
 					m_rtLast = rt;
 				}
 			}
 
-			if (first == pos && (page.m_hdr.header_type_flag & OggPageHeader::continued)) {
-				if (!m_lastPacketData.empty()) {
-					const size_t size = m_lastPacketData.size();
-					m_lastPacketData.resize(size + j - i);
-					memcpy(m_lastPacketData.data() + size, pData + i, j - i);
+			if (!m_lastPacketData.empty()) {
+				const size_t old_size = m_lastPacketData.size();
+				m_lastPacketData.resize(old_size + size);
+				memcpy(m_lastPacketData.data() + old_size, start, size);
 
-					if (len < 255) {
-						HandlePacket(page.m_hdr.bitstream_serial_number, m_lastPacketData.data(), m_lastPacketData.size());
-						m_lastPacketData.clear();
-					}
-				}
+				HandlePacket(page.m_hdr.bitstream_serial_number, m_lastPacketData.data(), m_lastPacketData.size());
+				m_lastPacketData.clear();
 			} else {
-				if (len < 255) {
-					HandlePacket(page.m_hdr.bitstream_serial_number, pData + i, j - i);
-				} else {
-					m_lastPacketData.resize(j - i);
-					memcpy(m_lastPacketData.data(), pData + i, j - i);
-				}
+				HandlePacket(page.m_hdr.bitstream_serial_number, start, size);
 			}
 
-			i = j;
+			start += size;
+			size = 0;
 		}
+	}
+
+	if (size) {
+		const size_t old_size = m_lastPacketData.size();
+		m_lastPacketData.resize(old_size + size);
+		memcpy(m_lastPacketData.data() + old_size, start, size);
 	}
 
 	return S_OK;
@@ -837,12 +831,9 @@ HRESULT COggSplitterOutputPin::UnpackPage(OggPage& page)
 
 CAutoPtr<CPacket> COggSplitterOutputPin::GetPacket()
 {
-	CAutoLock csAutoLock(&m_csPackets);
-
 	CAutoPtr<CPacket> p;
-	if (m_packets.GetCount()) {
-		p = m_packets.RemoveHead();
-	}
+	size_t count;
+	m_queue.RemoveSafe(p, count);
 	return p;
 }
 
@@ -856,7 +847,7 @@ HRESULT COggSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENC
 {
 	ResetState();
 	m_rtLast = INVALID_TIME;
-	m_fSetKeyFrame = false;
+	m_bSetKeyFrame = false;
 	return __super::DeliverNewSegment(tStart, tStop, dRate);
 }
 
@@ -911,8 +902,8 @@ HRESULT COggVorbisOutputPin::UnpackInitPage(OggPage& page)
 {
 	HRESULT hr = __super::UnpackPage(page);
 
-	while (m_packets.GetCount()) {
-		CPacket* p = m_packets.GetHead();
+	while (m_queue.GetCount()) {
+		CAutoPtr<CPacket> p = m_queue.Remove();
 
 		if (p->size() >= 6 && p->at(0) == 0x05) {
 			// yeah, right, we are going to be parsing this backwards! :P
@@ -939,7 +930,7 @@ HRESULT COggVorbisOutputPin::UnpackInitPage(OggPage& page)
 			}
 		}
 
-		int cnt = m_initpackets.GetCount();
+		int cnt = m_initpackets.size();
 		if (cnt < 3 && (p->size() >= 6 && p->at(0) == 1 + cnt * 2)) {
 			VORBISFORMAT2* vf2   = (VORBISFORMAT2*)m_mts[0].Format();
 			vf2->HeaderSize[cnt] = p->size();
@@ -947,7 +938,7 @@ HRESULT COggVorbisOutputPin::UnpackInitPage(OggPage& page)
 			memcpy(m_mts[0].ReallocFormatBuffer(len + p->size()) + len, p->data(), p->size());
 		}
 
-		m_initpackets.AddTail(m_packets.RemoveHead());
+		m_initpackets.emplace_back(p);
 	}
 
 	return hr;
@@ -1008,13 +999,10 @@ HRESULT COggVorbisOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_
 	m_lastblocksize = 0;
 
 	if (m_mt.subtype == MEDIASUBTYPE_Vorbis) {
-		POSITION pos = m_initpackets.GetHeadPosition();
-		while (pos) {
-			CPacket* pi = m_initpackets.GetNext(pos);
-
+		for (const auto& packet : m_initpackets) {
 			CAutoPtr<CPacket> p(DNew CPacket());
-			p->TrackNumber = pi->TrackNumber;
-			p->SetData(*pi);
+			p->TrackNumber = packet->TrackNumber;
+			p->SetData(*packet);
 			__super::DeliverPacket(p);
 		}
 	}
@@ -1059,7 +1047,6 @@ COggFlacOutputPin::COggFlacOutputPin(BYTE* h, int nCount, LPCWSTR pName, CBaseFi
 
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX));
 	memset(wfe, 0, sizeof(WAVEFORMATEX));
-	wfe->cbSize = sizeof(WAVEFORMATEX);
 	wfe->wFormatTag      = WAVE_FORMAT_FLAC;
 	wfe->nSamplesPerSec  = m_nSamplesPerSec;
 	wfe->nAvgBytesPerSec = m_nAvgBytesPerSec;
@@ -1093,24 +1080,6 @@ HRESULT COggFlacOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int l
 	return S_OK;
 }
 
-HRESULT COggFlacOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
-{
-	HRESULT hr = __super::DeliverNewSegment(tStart, tStop, dRate);
-
-	if (m_mt.subtype == MEDIASUBTYPE_FLAC_FRAMED) {
-		POSITION pos = m_initpackets.GetHeadPosition();
-		while (pos) {
-			CPacket* pi = m_initpackets.GetNext(pos);
-
-			CAutoPtr<CPacket> p(DNew CPacket());
-			p->TrackNumber = pi->TrackNumber;
-			p->SetData(*pi);
-			__super::DeliverPacket(p);
-		}
-	}
-
-	return hr;
-}
 //
 // COggDirectShowOutputPin
 //
@@ -1162,12 +1131,12 @@ HRESULT COggDirectShowOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData,
 		}
 
 		bool bKeyFrame = !!(hdr & 8);
-		if (!m_fSetKeyFrame) {
-			m_fSetKeyFrame = bKeyFrame;
+		if (!m_bSetKeyFrame) {
+			m_bSetKeyFrame = bKeyFrame;
 		}
 
 		if (m_mt.majortype == MEDIATYPE_Video) {
-			if (!m_fSetKeyFrame) {
+			if (!m_bSetKeyFrame) {
 				DLog(L"COggDirectShowOutputPin::UnpackPacket() : KeyFrame not found !!!");
 				return E_FAIL; // waiting for a key frame after seeking
 			}
@@ -1220,12 +1189,12 @@ HRESULT COggStreamOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int
 		}
 
 		bool bKeyFrame = !!(hdr & 8);
-		if (!m_fSetKeyFrame) {
-			m_fSetKeyFrame = bKeyFrame;
+		if (!m_bSetKeyFrame) {
+			m_bSetKeyFrame = bKeyFrame;
 		}
 
 		if (m_mt.majortype == MEDIATYPE_Video) {
-			if (!m_fSetKeyFrame) {
+			if (!m_bSetKeyFrame) {
 				DLog(L"COggStreamOutputPin::UnpackPacket() : KeyFrame not found !!!");
 				return E_FAIL; // waiting for a key frame after seeking
 			}
@@ -1453,11 +1422,10 @@ HRESULT COggTheoraOutputPin::UnpackInitPage(OggPage& page)
 {
 	HRESULT hr = __super::UnpackPage(page);
 
-	while (m_packets.GetCount()) {
-		CPacket* p = m_packets.GetHead();
+	while (m_queue.GetCount()) {
+		CAutoPtr<CPacket> p = m_queue.Remove();
 
 		if (p->size() == 0) {
-			m_packets.RemoveHeadNoReturn();
 			continue;
 		}
 
@@ -1477,9 +1445,7 @@ HRESULT COggTheoraOutputPin::UnpackInitPage(OggPage& page)
 			memcpy((BYTE*)vih->dwSequenceHeader + vih->cbSequenceHeader + 2, p->data(), size);
 			vih->cbSequenceHeader += 2 + size;
 
-			m_initpackets.AddTail(m_packets.RemoveHead());
-		} else {
-			m_packets.RemoveHeadNoReturn();
+			m_initpackets.emplace_back(p);
 		}
 	}
 
@@ -1516,10 +1482,10 @@ HRESULT COggTheoraOutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int
 	}
 
 	bool bKeyFrame = (!(*pData & 0x40) && !(*pData & 0x80));
-	if (!m_fSetKeyFrame) {
-		m_fSetKeyFrame = bKeyFrame;
+	if (!m_bSetKeyFrame) {
+		m_bSetKeyFrame = bKeyFrame;
 	}
-	if (!m_fSetKeyFrame && IsInitialized()) {
+	if (!m_bSetKeyFrame && IsInitialized()) {
 		DLog(L"COggTheoraOutputPin::UnpackPacket() : KeyFrame not found !!!");
 		return E_FAIL; // waiting for a key frame after seeking
 	}
@@ -1552,21 +1518,17 @@ HRESULT COggDiracOutputPin::UnpackInitPage(OggPage& page)
 {
 	HRESULT hr = __super::UnpackPage(page);
 
-	while (m_packets.GetCount()) {
-		if (!m_IsInitialized) {
-			CPacket* p = m_packets.GetHead();
+	while (m_queue.GetCount() && !m_IsInitialized) {
+		CAutoPtr<CPacket> p = m_queue.Remove();
+		if (p->size() > 13) {
+			BYTE* buf = p->data();
 
-			if (p->size() > 13) {
-				BYTE* buf = p->data();
-
-				if (!memcmp(buf, "BBCD\x00", 5)) {
-					m_IsInitialized = SUCCEEDED(InitDirac(buf, p->size()));
-				}
+			if (!memcmp(buf, "BBCD\x00", 5)) {
+				m_IsInitialized = SUCCEEDED(InitDirac(buf, p->size()));
 			}
 		}
-
-		m_packets.RemoveHeadNoReturn();
 	}
+	m_queue.RemoveAll();
 
 	return hr;
 }
@@ -1876,10 +1838,10 @@ HRESULT COggVP8OutputPin::UnpackPacket(CAutoPtr<CPacket>& p, BYTE* pData, int le
 	}
 
 	bool bKeyFrame = !(*pData & 1);
-	if (!m_fSetKeyFrame) {
-		m_fSetKeyFrame = bKeyFrame;
+	if (!m_bSetKeyFrame) {
+		m_bSetKeyFrame = bKeyFrame;
 	}
-	if (!m_fSetKeyFrame) {
+	if (!m_bSetKeyFrame) {
 		DLog(L"COggVP8OutputPin::UnpackPacket() : KeyFrame not found !!!");
 		return E_FAIL; // waiting for a key frame after seeking
 	}
