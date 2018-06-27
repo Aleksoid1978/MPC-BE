@@ -4294,10 +4294,16 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 		for (const auto &item : LAVDecoderNames) {
 			if (wcscmp(item.name, decoderName) == 0) {
+				UnHookDirectXVideoDecoderService();
 				DXVAState::SetActiveState(GUID_NULL, item.friendlyname);
 				break;
 			}
 		}
+	}
+
+	if (bMvcActive == 2) {
+		UnHookDirectXVideoDecoderService();
+		DXVAState::SetActiveState(GUID_NULL, L"Intel H.264(MVC 3D)");
 	}
 }
 
