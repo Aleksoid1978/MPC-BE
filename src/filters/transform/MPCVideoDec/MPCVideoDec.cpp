@@ -3877,7 +3877,7 @@ STDMETHODIMP CMPCVideoDecFilter::SetMvcOutputMode(int nMode, bool bSwapLR)
 
 STDMETHODIMP_(int) CMPCVideoDecFilter::GetMvcActive()
 {
-	return m_pMSDKDecoder != nullptr;
+	return (m_pMSDKDecoder != nullptr) ? 1 + m_pMSDKDecoder->GetHwAcceleration() : 0;
 }
 
 STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)

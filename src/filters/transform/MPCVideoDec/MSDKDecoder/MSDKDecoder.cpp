@@ -214,6 +214,7 @@ HRESULT CMSDKDecoder::Init()
       }
     }
 
+    m_bHwAcceleration = bHwAcceleration;
     break;
   }
 

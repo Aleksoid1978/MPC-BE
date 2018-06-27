@@ -74,6 +74,7 @@ public:
   HRESULT EndOfStream();
 
   void SetOutputMode(int mode, bool swaplr);
+  bool GetHwAcceleration() const { return m_bHwAcceleration; }
 
 private:
   void DestroyDecoder(bool bFull);
@@ -125,6 +126,8 @@ private:
   int                   m_iOutputMode = MVC_OUTPUT_Auto;
   int                   m_iNewOutputMode = MVC_OUTPUT_Auto;
   bool                  m_bSwapLR = false;
+
+  bool                  m_bHwAcceleration = false;
 
   CComQIPtr<IMediaSideData> m_pMediaSideData;
 };

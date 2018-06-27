@@ -142,5 +142,5 @@ public IUnknown {
 	STDMETHOD_(int, GetColorSpaceConversion()) PURE;
 
 	STDMETHOD(SetMvcOutputMode(int nMode, bool bSwapLR)) PURE;
-	STDMETHOD_(int, GetMvcActive()) PURE;
+	STDMETHOD_(int, GetMvcActive()) PURE; // 0 - no, 1 - software decode, 2 - h/w decode
 };
