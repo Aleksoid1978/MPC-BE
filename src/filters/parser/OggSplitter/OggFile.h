@@ -82,6 +82,7 @@ class OggPage : public std::vector<BYTE>
 public:
 	OggPageHeader m_hdr = {};
 	std::vector<BYTE> m_lens;
+	__int64 pos = 0;
 
 	OggPage() = default;
 };

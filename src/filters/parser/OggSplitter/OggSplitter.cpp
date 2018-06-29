@@ -568,59 +568,56 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	} else if (m_rtDuration > 0) {
 		rt += m_rtOffset;
 
-		const __int64 len  = m_pFile->GetLength();
-		__int64 seekpos    = CalcPos(rt);
-		__int64 minseekpos = _I64_MIN;
+		const __int64 len = m_pFile->GetLength();
+		__int64 seekpos   = CalcPos(rt);
 
-		REFERENCE_TIME rtmax = rt - UNITS * (m_bitstream_serial_number_Video != DWORD_MAX ? 4 : 0);
-		REFERENCE_TIME rtmin = rtmax - UNITS / 2;
+		const REFERENCE_TIME rtmax = rt - UNITS * (m_bitstream_serial_number_Video != DWORD_MAX ? 4 : 0);
+		const REFERENCE_TIME rtmin = rtmax - UNITS / 2;
 
 		__int64 curpos = seekpos;
 		double div = 1.0;
 		for (;;) {
-			REFERENCE_TIME rt2 = INVALID_TIME;
+			REFERENCE_TIME rtSeek = INVALID_TIME;
 
-			{
-				OggPage page;
-				m_pFile->Seek(curpos);
-				while (m_pFile->Read(page, false)) {
-					if (page.m_hdr.granule_position == -1) {
-						continue;
-					}
-
-					COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
-					if (!pOggPin) {
-						continue;
-					}
-
-					if (m_bitstream_serial_number_Video != DWORD_MAX
-							&& m_bitstream_serial_number_Video != page.m_hdr.bitstream_serial_number) {
-						continue;
-					}
-
-					const bool start_segment = std::any_of(page.m_lens.cbegin(), page.m_lens.cend(), [](const BYTE& len) {
-						return len < 255;
-					});
-					if (!start_segment){
-						continue;
-					}
-
-					rt2 = pOggPin->GetRefTime(page.m_hdr.granule_position) + pOggPin->GetOffset();
-					break;
+			m_pFile->Seek(curpos);
+			OggPage page;
+			while (m_pFile->Read(page, false)) {
+				if (page.m_hdr.granule_position == -1) {
+					continue;
 				}
-			}
 
-			if (rt2 == INVALID_TIME) {
+				COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
+				if (!pOggPin) {
+					continue;
+				}
+
+				if (m_bitstream_serial_number_Video != DWORD_MAX
+						&& m_bitstream_serial_number_Video != page.m_hdr.bitstream_serial_number) {
+					continue;
+				}
+
+				const bool start_segment = std::any_of(page.m_lens.cbegin(), page.m_lens.cend(), [](const BYTE len) {
+					return len < 255;
+				});
+				if (!start_segment) {
+					continue;
+				}
+
+				rtSeek = pOggPin->GetRefTime(page.m_hdr.granule_position) + pOggPin->GetOffset();
 				break;
 			}
 
-			if (rtmin <= rt2 && rt2 <= rtmax) {
-				m_pFile->Seek(curpos);
+			if (rtSeek == INVALID_TIME) {
+				break;
+			}
+
+			if (rtmin <= rtSeek && rtSeek <= rtmax) {
+				m_pFile->Seek(page.pos);
 				return;
 			}
 
-			REFERENCE_TIME dt = rt2 - rtmax;
-			if (rt2 < 0) {
+			REFERENCE_TIME dt = rtSeek - rtmax;
+			if (rtSeek < 0) {
 				dt = UNITS / div;
 			}
 			dt /= div;
