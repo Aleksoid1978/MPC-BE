@@ -74,6 +74,7 @@ bool COggFile::Read(OggPageHeader& hdr, HANDLE hBreak)
 bool COggFile::Read(OggPage& page, const bool bFull, HANDLE hBreak)
 {
 	memset(&page.m_hdr, 0, sizeof(page.m_hdr));
+	page.pos = 0;
 	page.m_lens.clear();
 	page.clear();
 
@@ -85,6 +86,8 @@ bool COggFile::Read(OggPage& page, const bool bFull, HANDLE hBreak)
 	if (S_OK != ByteRead(page.m_lens.data(), page.m_hdr.number_page_segments)) {
 		return false;
 	}
+
+	page.pos = GetPos() - page.m_hdr.number_page_segments - sizeof(OggPageHeader);
 
 	const size_t pagelen = std::accumulate(page.m_lens.cbegin(), page.m_lens.cend(), 0);
 	if (bFull) {
