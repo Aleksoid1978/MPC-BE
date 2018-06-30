@@ -868,7 +868,7 @@ int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t*
 			for (UINT i = 0; i < nmixoutconfigs; i++) {
 				for (UINT j = 0; j < nchannels_dmix; j++) {
 					if (!nmixoutchs[i]) {
-						int c = 9;
+						return 0;
 					}
 					const UINT mix_map_mask = gb.BitRead(nmixoutchs[i]);
 					int nmixcoefs = CountBits(mix_map_mask);
