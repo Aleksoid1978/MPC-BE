@@ -449,31 +449,30 @@ bool CBaseSplitterFileEx::Read(latm_aachdr& h, int len, CMediaType* pmt)
 		return false;
 	}
 
-	BYTE buffer[64] = { 0 };
-	ByteRead(buffer, std::min(len, 64));
+	std::vector<BYTE> buf(std::min(len, 32));
+	ByteRead(buf.data(), buf.size());
 
-	BYTE extra[64] = { 0 };
-	unsigned int extralen = 0;
-	if (!ParseAACLatmHeader(buffer, std::min(len, 64), h.samplerate, h.channels, extra, extralen)) {
+	std::vector<BYTE> extra;
+	if (!ParseAACLatmHeader(buf.data(), buf.size(), h.samplerate, h.channels, extra)) {
 		return false;
 	}
 
 	if (pmt) {
-		WAVEFORMATEX* wfe		= (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + extralen];
+		WAVEFORMATEX* wfe    = (WAVEFORMATEX*)DNew BYTE[sizeof(WAVEFORMATEX) + extra.size()];
 		memset(wfe, 0, sizeof(WAVEFORMATEX));
-		wfe->wFormatTag			= WAVE_FORMAT_LATM_AAC;
-		wfe->nChannels			= h.channels;
-		wfe->nSamplesPerSec		= h.samplerate;
-		wfe->nBlockAlign		= 1;
-		wfe->nAvgBytesPerSec	= 0;
-		wfe->cbSize				= extralen;
-		if (extralen) {
-			memcpy((BYTE*)(wfe + 1), extra, extralen);
+		wfe->wFormatTag      = WAVE_FORMAT_LATM_AAC;
+		wfe->nChannels       = h.channels;
+		wfe->nSamplesPerSec  = h.samplerate;
+		wfe->nBlockAlign     = 1;
+		wfe->nAvgBytesPerSec = 0;
+		wfe->cbSize          = (WORD)extra.size();
+		if (extra.size()) {
+			memcpy((BYTE*)(wfe + 1), extra.data(), extra.size());
 		}
 
-		pmt->majortype			= MEDIATYPE_Audio;
-		pmt->subtype			= MEDIASUBTYPE_LATM_AAC;
-		pmt->formattype			= FORMAT_WaveFormatEx;
+		pmt->majortype       = MEDIATYPE_Audio;
+		pmt->subtype         = MEDIASUBTYPE_LATM_AAC;
+		pmt->formattype      = FORMAT_WaveFormatEx;
 		pmt->SetFormat((BYTE*)wfe, sizeof(WAVEFORMATEX) + wfe->cbSize);
 
 		delete [] wfe;
