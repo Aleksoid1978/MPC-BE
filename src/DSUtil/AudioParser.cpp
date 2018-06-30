@@ -1067,15 +1067,14 @@ static bool StreamMuxConfig(CGolombBuffer& gb, int& samplingFrequency, int& chan
 	return false;
 }
 
-bool ParseAACLatmHeader(const BYTE* buf, int len, int& samplerate, int& channels, BYTE* extra, unsigned int& extralen)
+bool ParseAACLatmHeader(const BYTE* buf, int len, int& samplerate, int& channels, std::vector<BYTE>& extra)
 {
 	if ((GETWORD(buf) & 0xe0FF) != 0xe056) {
 		return false;
 	}
 
-	samplerate = 0;
-	channels   = 0;
-	extralen   = 0;
+	samplerate = channels = 0;
+	extra.clear();
 
 	int nExtraPos = 0;
 
@@ -1097,11 +1096,12 @@ bool ParseAACLatmHeader(const BYTE* buf, int len, int& samplerate, int& channels
 	}
 
 	if (nExtraPos) {
-		int nExtraPosEnd = gb.GetPos();
-		extralen = nExtraPosEnd - nExtraPos;
+		const int extralen = gb.GetPos() - nExtraPos;
 		gb.Reset();
 		gb.SkipBytes(nExtraPos);
-		gb.ReadBuffer(extra, 4);
+
+		extra.resize(extralen);
+		gb.ReadBuffer(extra.data(), extra.size());
 	}
 
 	return true;

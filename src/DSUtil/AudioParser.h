@@ -21,6 +21,7 @@
 #pragma once
 
 #include <MMReg.h>
+#include <vector>
 #include "GolombBuffer.h"
 
 #define AC3_SYNCWORD                 0x770B
@@ -124,4 +125,4 @@ int ParseHdmvLPCMHeader    (const BYTE* buf, audioframe_t* audioframe = nullptr)
 // need >= 7 bytes, param1 = header size, param2 = MPEG-4 Audio Object Type
 int ParseADTSAACHeader     (const BYTE* buf, audioframe_t* audioframe = nullptr);
 
-bool ParseAACLatmHeader    (const BYTE* buf, int len, int& samplerate, int& channels, BYTE* extra, unsigned int& extralen);
+bool ParseAACLatmHeader    (const BYTE* buf, int len, int& samplerate, int& channels, std::vector<BYTE>& extra);
