@@ -970,17 +970,27 @@ DROPEFFECT CMainFrame::OnDragEnter(COleDataObject* pDataObject, DWORD dwKeyState
 
 DROPEFFECT CMainFrame::OnDragOver(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point)
 {
-	return (pDataObject->IsDataAvailable(CF_URLA) || pDataObject->IsDataAvailable(CF_URLW) || pDataObject->IsDataAvailable(CF_HDROP)) ? DROPEFFECT_COPY : DROPEFFECT_NONE;
+	return (pDataObject->IsDataAvailable(CF_HDROP) ||
+			pDataObject->IsDataAvailable(CF_URLW) ||
+			pDataObject->IsDataAvailable(CF_URLA) ||
+			pDataObject->IsDataAvailable(CF_UNICODETEXT) ||
+			pDataObject->IsDataAvailable(CF_TEXT)) ?
+			DROPEFFECT_COPY :
+			DROPEFFECT_NONE;
 }
 
 BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point)
 {
 	BOOL bResult = FALSE;
-	std::list<CString> slFiles;
+
+	CLIPFORMAT cfFormat = 0;
+	bool bUnicode = false;
+	bool bUrl = false;
 
 	if (pDataObject->IsDataAvailable(CF_HDROP)) {
 		if (HGLOBAL hGlobal = pDataObject->GetGlobalData(CF_HDROP)) {
 			if (HDROP hDrop = (HDROP)GlobalLock(hGlobal)) {
+				std::list<CString> slFiles;
 				UINT nFiles = ::DragQueryFile(hDrop, UINT_MAX, nullptr, 0);
 				for (UINT iFile = 0; iFile < nFiles; iFile++) {
 					CString fn;
@@ -993,29 +1003,49 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 			}
 			GlobalUnlock(hGlobal);
 		}
-	} else if (pDataObject->IsDataAvailable(CF_URLA)) {
-		FORMATETC fmt = {CF_URLA, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
-		if (HGLOBAL hGlobal = pDataObject->GetGlobalData(CF_URLA, &fmt)) {
-			LPCSTR pText = (LPCSTR)GlobalLock(hGlobal);
-			if (AfxIsValidString(pText)) {
-				std::list<CString> sl;
-				sl.push_back(pText);
-				DropFiles(sl);
-				GlobalUnlock(hGlobal);
-				bResult = TRUE;
-			}
-		}
 	} else if (pDataObject->IsDataAvailable(CF_URLW)) {
-		FORMATETC fmt = { CF_URLW, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
-		if (HGLOBAL hGlobal = pDataObject->GetGlobalData(CF_URLW, &fmt)) {
-			LPCTSTR pText = (LPCTSTR)GlobalLock(hGlobal);
-			if (AfxIsValidString(pText)) {
-				std::list<CString> sl;
-				sl.push_back(pText);
-				DropFiles(sl);
-				GlobalUnlock(hGlobal);
-				bResult = TRUE;
+		cfFormat = CF_URLW;
+		bUnicode = true;
+		bUrl = true;
+	} else if (pDataObject->IsDataAvailable(CF_URLA)) {
+		cfFormat = CF_URLA;
+		bUrl = true;
+	} else if (pDataObject->IsDataAvailable(CF_UNICODETEXT)) {
+		cfFormat = CF_UNICODETEXT;
+		bUnicode = true;
+	} else if (pDataObject->IsDataAvailable(CF_TEXT)) {
+		cfFormat = CF_TEXT;
+	}
+
+	if (cfFormat) {
+		FORMATETC fmt = { cfFormat, nullptr, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
+		if (HGLOBAL hGlobal = pDataObject->GetGlobalData(cfFormat, &fmt)) {
+			LPVOID LockData = GlobalLock(hGlobal);
+			auto pUnicodeText = (LPCTSTR)LockData;
+			auto pAnsiText = (LPCSTR)LockData;
+			if (bUnicode ? AfxIsValidString(pUnicodeText) : AfxIsValidString(pAnsiText)) {
+				CString text(bUnicode ? pUnicodeText : (LPCTSTR)pAnsiText);
+				if (!text.IsEmpty()) {
+					std::list<CString> slFiles;
+					if (bUrl) {
+						slFiles.push_back(text);
+					} else {
+						std::list<CString> lines;
+						Explode(text, lines, L'\n');
+						for (const auto& line : lines) {
+							if (::PathIsURLW(line) || ::PathFileExistsW(line)) {
+								slFiles.push_back(line);
+							}
+						}
+					}
+
+					if (!slFiles.empty()) {
+						DropFiles(slFiles);
+						bResult = TRUE;
+					}
+				}
 			}
+			GlobalUnlock(hGlobal);
 		}
 	}
 
