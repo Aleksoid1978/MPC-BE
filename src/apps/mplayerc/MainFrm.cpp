@@ -7047,9 +7047,8 @@ void CMainFrame::OnViewDefaultVideoFrame(UINT nID)
 
 void CMainFrame::OnUpdateViewDefaultVideoFrame(CCmdUI* pCmdUI)
 {
-	if (m_iVideoSize == (pCmdUI->m_nID - ID_VIEW_VF_HALF)) {
-		CheckMenuRadioItem(ID_VIEW_VF_HALF, ID_VIEW_VF_ZOOM2, pCmdUI->m_nID);
-	}
+	bool bCheck = m_iVideoSize == (pCmdUI->m_nID - ID_VIEW_VF_HALF);
+	SetMenuRadioCheck(pCmdUI, bCheck);
 }
 
 void CMainFrame::OnViewSwitchVideoFrame()
@@ -7351,11 +7350,10 @@ void CMainFrame::OnViewAspectRatio(UINT nID)
 
 void CMainFrame::OnUpdateViewAspectRatio(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly);
+	bool bCheck = AfxGetAppSettings().sizeAspectRatio == s_ar[pCmdUI->m_nID - ID_ASPECTRATIO_START];
+	SetMenuRadioCheck(pCmdUI, bCheck);
 
-	if (AfxGetAppSettings().sizeAspectRatio == s_ar[pCmdUI->m_nID - ID_ASPECTRATIO_START]) {
-		CheckMenuRadioItem(ID_ASPECTRATIO_START, ID_ASPECTRATIO_END, pCmdUI->m_nID);
-	}
+	pCmdUI->Enable(m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly);
 }
 
 void CMainFrame::OnViewAspectRatioNext()
@@ -7450,9 +7448,8 @@ void CMainFrame::OnViewOntop(UINT nID)
 
 void CMainFrame::OnUpdateViewOntop(CCmdUI* pCmdUI)
 {
-	if (AfxGetAppSettings().iOnTop == (pCmdUI->m_nID - ID_ONTOP_NEVER)) {
-		CheckMenuRadioItem(ID_ONTOP_NEVER, ID_ONTOP_WHILEPLAYINGVIDEO, pCmdUI->m_nID);
-	}
+	bool bCheck = AfxGetAppSettings().iOnTop == (pCmdUI->m_nID - ID_ONTOP_NEVER);
+	SetMenuRadioCheck(pCmdUI, bCheck);
 }
 
 void CMainFrame::OnViewOptions()
