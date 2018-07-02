@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2017 see Authors.txt
+ * (C) 2016-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -27,6 +27,8 @@ extern void SetCursor(HWND m_hWnd, UINT nID, LPCWSTR lpCursorName);
 
 extern void CorrectComboListWidth(CComboBox& ComboBox);
 extern void CorrectCWndWidth(CWnd* pWnd);
+
+extern void SetMenuRadioCheck(CCmdUI* pCmdUI, bool bCheck);
 
 extern inline void AddStringData(CComboBox& ComboBox, LPCWSTR str, DWORD_PTR data);
 extern inline void AddStringData(CListBox& ListBox, LPCWSTR str, DWORD_PTR data);
