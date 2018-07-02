@@ -7376,7 +7376,8 @@ void CMainFrame::OnViewAspectRatioNext()
 
 void CMainFrame::OnUpdateViewStereo3DMode(CCmdUI* pCmdUI)
 {
-	pCmdUI->SetCheck(AfxGetAppSettings().iStereo3DMode == (pCmdUI->m_nID - ID_STEREO3D_AUTO));
+	bool bCheck = AfxGetAppSettings().iStereo3DMode == (pCmdUI->m_nID - ID_STEREO3D_AUTO);
+	SetMenuRadioCheck(pCmdUI, bCheck);
 }
 
 void CMainFrame::OnViewStereo3DMode(UINT nID)

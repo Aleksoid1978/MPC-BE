@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2017 see Authors.txt
+ * (C) 2016-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -111,6 +111,17 @@ void CorrectCWndWidth(CWnd* pWnd)
 
 	r.right = r.left + ::GetSystemMetrics(SM_CXMENUCHECK) + szText.cx + tm.tmAveCharWidth;
 	pWnd->MoveWindow(r);
+}
+
+extern void SetMenuRadioCheck(CCmdUI* pCmdUI, bool bCheck)
+{
+	if (IsMenu(*pCmdUI->m_pMenu)) {
+		MENUITEMINFO mii = { sizeof(mii) };
+		mii.fMask = MIIM_FTYPE | MIIM_STATE;
+		mii.fType = bCheck ? MFT_RADIOCHECK : MFT_STRING;
+		mii.fState = bCheck ? MFS_CHECKED : MFS_UNCHECKED;
+		VERIFY(pCmdUI->m_pMenu->SetMenuItemInfo(pCmdUI->m_nID, &mii));
+	}
 }
 
 inline void AddStringData(CComboBox& ComboBox, LPCWSTR str, DWORD_PTR data)
