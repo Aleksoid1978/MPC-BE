@@ -1289,8 +1289,6 @@ public:
 
 	BOOL CheckDVD(CString path);
 
-	void CheckMenuRadioItem(UINT first, UINT last, UINT check);
-
 	bool m_bUseReclock;
 
 private:

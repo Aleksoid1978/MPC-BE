@@ -8850,8 +8850,6 @@ void CMainFrame::OnUpdateAfterplayback(CCmdUI* pCmdUI)
 	CAppSettings& s = AfxGetAppSettings();
 	bool bChecked = false;
 
-	pCmdUI->SetCheck(FALSE);
-
 	switch (pCmdUI->m_nID) {
 		case ID_AFTERPLAYBACK_CLOSE:
 			bChecked = !!(s.nCLSwitches & CLSW_CLOSE);
@@ -8891,15 +8889,7 @@ void CMainFrame::OnUpdateAfterplayback(CCmdUI* pCmdUI)
 			break;
 	}
 
-	if (bChecked) {
-		if (pCmdUI->m_nID >= ID_AFTERPLAYBACK_EXIT && pCmdUI->m_nID <= ID_AFTERPLAYBACK_EVERYTIMEDONOTHING) {
-			CheckMenuRadioItem(ID_AFTERPLAYBACK_EXIT, ID_AFTERPLAYBACK_EVERYTIMEDONOTHING, pCmdUI->m_nID);
-		} else if (pCmdUI->m_nID >= ID_AFTERPLAYBACK_CLOSE && pCmdUI->m_nID <= ID_AFTERPLAYBACK_LOCK) {
-			CheckMenuRadioItem(ID_AFTERPLAYBACK_CLOSE, ID_AFTERPLAYBACK_LOCK, pCmdUI->m_nID);
-		} else if (pCmdUI->m_nID == ID_AFTERPLAYBACK_NEXT || pCmdUI->m_nID == ID_AFTERPLAYBACK_DONOTHING) {
-			CheckMenuRadioItem(pCmdUI->m_nID, pCmdUI->m_nID, pCmdUI->m_nID);
-		}
-	}
+	SetMenuRadioCheck(pCmdUI, bChecked);
 }
 
 // navigate
@@ -18944,13 +18934,6 @@ void CMainFrame::AddRecent(CString pathName)
 			SHAddToRecentDocs(SHARD_PATHW, pathName); // remember the last open files (system) through the drag-n-drop
 		}
 	}
-}
-
-void CMainFrame::CheckMenuRadioItem(UINT first, UINT last, UINT check)
-{
-	m_popupMenu.CheckMenuRadioItem(first, last, check, MF_BYCOMMAND);
-	m_popupMainMenu.CheckMenuRadioItem(first, last, check, MF_BYCOMMAND);
-	::CheckMenuRadioItem(m_hMenuDefault, first, last, check, MF_BYCOMMAND);
 }
 
 template<typename T>
