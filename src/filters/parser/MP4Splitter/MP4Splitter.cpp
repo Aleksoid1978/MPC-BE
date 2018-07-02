@@ -1429,6 +1429,13 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 
 							if (size >= 36) {
+								channels   = AV_RB8(data + 21);
+								samplerate = AV_RB32(data + 32);
+
+								wfe->nSamplesPerSec  = samplerate;
+								wfe->nChannels       = channels;
+								wfe->nAvgBytesPerSec = ase->GetSamplesPerPacket() ? wfe->nSamplesPerSec * wfe->nBlockAlign / ase->GetSamplesPerPacket() : 0;
+
 								wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 36);
 								wfe->cbSize = 36;
 								memcpy(wfe+1, data, 36);
