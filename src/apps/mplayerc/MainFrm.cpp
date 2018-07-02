@@ -1024,7 +1024,7 @@ BOOL CMainFrame::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoi
 			auto pUnicodeText = (LPCTSTR)LockData;
 			auto pAnsiText = (LPCSTR)LockData;
 			if (bUnicode ? AfxIsValidString(pUnicodeText) : AfxIsValidString(pAnsiText)) {
-				CString text(bUnicode ? pUnicodeText : (LPCTSTR)pAnsiText);
+				CString text = bUnicode ? pUnicodeText : CString(pAnsiText);
 				if (!text.IsEmpty()) {
 					std::list<CString> slFiles;
 					if (bUrl) {
@@ -7376,9 +7376,7 @@ void CMainFrame::OnViewAspectRatioNext()
 
 void CMainFrame::OnUpdateViewStereo3DMode(CCmdUI* pCmdUI)
 {
-	if (AfxGetAppSettings().iStereo3DMode == (pCmdUI->m_nID - ID_STEREO3D_AUTO)) {
-		CheckMenuRadioItem(ID_STEREO3D_AUTO, ID_STEREO3D_OVERUNDER, pCmdUI->m_nID);
-	}
+	pCmdUI->SetCheck(AfxGetAppSettings().iStereo3DMode == (pCmdUI->m_nID - ID_STEREO3D_AUTO));
 }
 
 void CMainFrame::OnViewStereo3DMode(UINT nID)
