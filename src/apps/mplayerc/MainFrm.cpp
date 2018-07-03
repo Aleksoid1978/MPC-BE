@@ -19049,9 +19049,10 @@ BOOL CMainFrame::AddSimilarFiles(std::list<CString>& fns)
 		L"VTS_\\d{2}_\\d{1}.*|" // DVD Video
 		L"\\d{5}\\.clpi|"       // Blu-ray clip info
 		L"\\d{5}\\.m2ts|"       // Blu-ray streams
-		L"\\d{5}\\.mpls";       // Blu-ray playlist
+		L"\\d{5}\\.mpls|"       // Blu-ray playlist
+		L".+\\.evo";            // HD-DVD streams
 	const std::wregex excludeMaskRe(excludeMask, std::wregex::icase);
-	if (std::regex_match((LPCTSTR)fname, excludeMaskRe)) {
+	if (std::regex_match(fname.GetString(), excludeMaskRe)) {
 		return FALSE;
 	};
 
@@ -19115,8 +19116,7 @@ BOOL CMainFrame::AddSimilarFiles(std::list<CString>& fns)
 
 	if (!files.empty()) {
 		bool bFoundCurFile = false;
-		for (size_t i = 0; i < files.size(); i++) {
-			const CString& fn = files[i];
+		for (const auto& fn : files) {
 			if (bFoundCurFile) {
 				fns.push_back(path + fn);
 			} else {
