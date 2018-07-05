@@ -1635,9 +1635,18 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 					lastCueClusterPosition = pCueTrackPositions->CueClusterPosition;
 
-					m_sps.push_back(SyncPoint{s.GetRefTime(pCuePoint->CueTime) - m_pFile->m_rtOffset, __int64(m_pSegment->m_start + pCueTrackPositions->CueClusterPosition)});
+					const auto cueTime = s.GetRefTime(pCuePoint->CueTime);
+					const auto rtOffset = (cueTime >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
+
+					m_sps.push_back(SyncPoint{cueTime - rtOffset, __int64(m_pSegment->m_start + pCueTrackPositions->CueClusterPosition)});
 				}
 			}
+		}
+
+		if (!m_sps.empty()) {
+			std::sort(m_sps.begin(), m_sps.end(), [](const SyncPoint& a, const SyncPoint& b) {
+				return (a.rt < b.rt);
+			});
 		}
 	}
 
@@ -1674,7 +1683,9 @@ void CMatroskaSplitterFilter::SetupChapters(LPCSTR lng, ChapterAtom* parent, int
 
 			name = tabs + (!name.IsEmpty() ? name : first);
 
-			ChapAppend(ca->ChapterTimeStart / 100 - m_pFile->m_rtOffset, name);
+			const auto chapterTime = (REFERENCE_TIME)ca->ChapterTimeStart / 100;
+			const auto rtOffset = (chapterTime >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
+			ChapAppend(chapterTime - rtOffset, name);
 
 			if (!ca->ChapterAtoms.IsEmpty() && level < 5) {
 				// level < 5 - hard limit for the number of levels
@@ -1791,7 +1802,10 @@ bool CMatroskaSplitterFilter::DemuxInit()
 			Cluster c;
 			c.ParseTimeCode(m_pCluster);
 
-			s.SegmentInfo.Duration.Set((float)c.TimeCode - m_pFile->m_rtOffset / 10000);
+			const auto clusterTime = s.GetRefTime(c.TimeCode);
+			const auto rtOffset = (clusterTime >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
+
+			s.SegmentInfo.Duration.Set((float)c.TimeCode - rtOffset / 10000);
 
 			CAutoPtr<CuePoint> pCuePoint(DNew CuePoint());
 			CAutoPtr<CueTrackPosition> pCueTrackPosition(DNew CueTrackPosition());
@@ -1850,9 +1864,18 @@ bool CMatroskaSplitterFilter::DemuxInit()
 						}
 						lastCueClusterPosition = pCueTrackPositions->CueClusterPosition;
 
-						m_sps.push_back(SyncPoint{s.GetRefTime(pCuePoint->CueTime) - m_pFile->m_rtOffset, __int64(m_pSegment->m_start + pCueTrackPositions->CueClusterPosition)});
+						const auto cueTime = s.GetRefTime(pCuePoint->CueTime);
+						const auto rtOffset = (cueTime >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
+
+						m_sps.push_back(SyncPoint{cueTime - rtOffset, __int64(m_pSegment->m_start + pCueTrackPositions->CueClusterPosition)});
 					}
 				}
+			}
+
+			if (!m_sps.empty()) {
+				std::sort(m_sps.begin(), m_sps.end(), [](const SyncPoint& a, const SyncPoint& b) {
+					return (a.rt < b.rt);
+				});
 			}
 		}
 	}
@@ -1907,12 +1930,14 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 			Cluster c;
 			c.ParseTimeCode(m_pCluster);
-			const REFERENCE_TIME seek_rt = s.GetRefTime(c.TimeCode) - m_pFile->m_rtOffset;
+
+			const auto clusterTime = s.GetRefTime(c.TimeCode);
+			const auto rtOffset = (clusterTime >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
+			const REFERENCE_TIME seek_rt = clusterTime - rtOffset;
 			if (seek_rt <= rt) {
 				DLog(L"CMatroskaSplitterFilter::DemuxSeek() : plan A - %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
 				goto end;
 			}
-
 		}
 		{
 			// Plan B
@@ -1925,7 +1950,9 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					continue;
 				}
 
-				const REFERENCE_TIME seek_rt2 = s.GetRefTime(c.TimeCode) - m_pFile->m_rtOffset;
+				const auto clusterTime = s.GetRefTime(c.TimeCode);
+				const auto rtOffset = (clusterTime >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
+				const REFERENCE_TIME seek_rt2 = clusterTime - rtOffset;
 				if (seek_rt2 > rt) {
 					break;
 				}
@@ -1942,7 +1969,9 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 						continue;
 					}
 
-					if ((s.GetRefTime(c.TimeCode) - m_pFile->m_rtOffset) == seek_rt) {
+					const auto clusterTime = s.GetRefTime(c.TimeCode);
+					const auto rtOffset = (clusterTime >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
+					if ((clusterTime - rtOffset) == seek_rt) {
 						DLog(L"CMatroskaSplitterFilter::DemuxSeek(), plan B : %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(seek_rt), rt, seek_rt);
 						goto end;
 					}
@@ -1957,29 +1986,32 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	end:
 		Cluster c;
 		c.ParseTimeCode(m_pCluster);
-		m_Seek_rt = m_pFile->m_segment.GetRefTime(c.TimeCode);
-		DLog(L"CMatroskaSplitterFilter::DemuxSeek() : Final(Cluster timecode) - %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(m_Seek_rt - m_pFile->m_rtOffset), rt, m_Seek_rt - m_pFile->m_rtOffset);
+		m_Seek_rt = s.GetRefTime(c.TimeCode);
+		const auto rtOffset = (m_Seek_rt >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
+		DLog(L"CMatroskaSplitterFilter::DemuxSeek() : Final(Cluster timecode) - %s => %s, [%10I64d - %10I64d]", ReftimeToString(rt), ReftimeToString(m_Seek_rt - rtOffset), rt, m_Seek_rt - rtOffset);
 	}
 }
 
-#define SetBlockTime																				\
-	REFERENCE_TIME duration = 0;																	\
-	if (p->bg->BlockDuration.IsValid()) {															\
-		duration = m_pFile->m_segment.GetRefTime(p->bg->BlockDuration);								\
-	} else if (pTE->DefaultDuration) {																\
-		duration = (pTE->DefaultDuration / 100) * p->bg->Block.BlockData.GetCount();				\
-	}																								\
-	if (pTE->TrackType == TrackEntry::TypeSubtitle && !duration) {									\
-		duration = 1;																				\
-	}																								\
+#define SetBlockTime																		\
+	REFERENCE_TIME duration = 0;															\
+	if (p->bg->BlockDuration.IsValid()) {													\
+		duration = m_pFile->m_segment.GetRefTime(p->bg->BlockDuration);						\
+	} else if (pTE->DefaultDuration) {														\
+		duration = (pTE->DefaultDuration / 100) * p->bg->Block.BlockData.GetCount();		\
+	}																						\
+	if (pTE->TrackType == TrackEntry::TypeSubtitle && !duration) {							\
+		duration = 1;																		\
+	}																						\
 	\
-	p->rtStart = m_pFile->m_segment.GetRefTime((INT64)c.TimeCode + p->bg->Block.TimeCode);			\
-	p->rtStop = p->rtStart + duration;																\
+	p->rtStart = m_pFile->m_segment.GetRefTime((INT64)c.TimeCode + p->bg->Block.TimeCode);	\
+	p->rtStop = p->rtStart + duration;														\
 	\
-	p->rtStart -= m_pFile->m_rtOffset;																\
-	p->rtStop -= m_pFile->m_rtOffset;																\
+	const auto clusterTime = m_pFile->m_segment.GetRefTime(c.TimeCode);						\
+	const auto rtOffset = (clusterTime >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;	\
+	p->rtStart -= rtOffset;																	\
+	p->rtStop -= rtOffset;																	\
 	\
-	p->TrackType = pTE->TrackType;																	\
+	p->TrackType = pTE->TrackType;															\
 
 bool CMatroskaSplitterFilter::DemuxLoop()
 {
