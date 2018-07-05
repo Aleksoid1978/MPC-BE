@@ -1992,26 +1992,24 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	}
 }
 
-#define SetBlockTime																		\
-	REFERENCE_TIME duration = 0;															\
-	if (p->bg->BlockDuration.IsValid()) {													\
-		duration = m_pFile->m_segment.GetRefTime(p->bg->BlockDuration);						\
-	} else if (pTE->DefaultDuration) {														\
-		duration = (pTE->DefaultDuration / 100) * p->bg->Block.BlockData.GetCount();		\
-	}																						\
-	if (pTE->TrackType == TrackEntry::TypeSubtitle && !duration) {							\
-		duration = 1;																		\
-	}																						\
+#define SetBlockTime																	\
+	REFERENCE_TIME duration = 0;														\
+	if (p->bg->BlockDuration.IsValid()) {												\
+		duration = m_pFile->m_segment.GetRefTime(p->bg->BlockDuration);					\
+	} else if (pTE->DefaultDuration) {													\
+		duration = (pTE->DefaultDuration / 100) * p->bg->Block.BlockData.GetCount();	\
+	}																					\
+	if (pTE->TrackType == TrackEntry::TypeSubtitle && !duration) {						\
+		duration = 1;																	\
+	}																					\
 	\
-	p->rtStart = m_pFile->m_segment.GetRefTime((INT64)c.TimeCode + p->bg->Block.TimeCode);	\
-	p->rtStop = p->rtStart + duration;														\
+	p->rtStart = clusterTime + s.GetRefTime(p->bg->Block.TimeCode);						\
+	p->rtStop = p->rtStart + duration;													\
 	\
-	const auto clusterTime = m_pFile->m_segment.GetRefTime(c.TimeCode);						\
-	const auto rtOffset = (clusterTime >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;	\
-	p->rtStart -= rtOffset;																	\
-	p->rtStop -= rtOffset;																	\
+	p->rtStart -= rtOffset;																\
+	p->rtStop -= rtOffset;																\
 	\
-	p->TrackType = pTE->TrackType;															\
+	p->TrackType = pTE->TrackType;														\
 
 bool CMatroskaSplitterFilter::DemuxLoop()
 {
@@ -2023,10 +2021,11 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 
 	SendVorbisHeaderSample(); // HACK: init vorbis decoder with the headers
 
+	auto& s = m_pFile->m_segment;
+
 	if (m_Seek_rt > 0 && m_bSupportCueDuration) {
 		std::vector<UINT64> TrackNumbers;
 
-		Segment& s = m_pFile->m_segment;
 		POSITION pos1 = s.Tracks.GetHeadPosition();
 		while (pos1) {
 			const Track* pT = s.Tracks.GetNext(pos1);
@@ -2089,15 +2088,16 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 								}
 								lastCueRelativePosition = pos + pCueTrackPositions->CueRelativePosition;
 
-								Cluster c;
-								c.ParseTimeCode(pCluster);
-
 								pCluster->SeekTo(pos + pCueTrackPositions->CueRelativePosition);
 								CAutoPtr<CMatroskaNode> pBlock(DNew CMatroskaNode(pCluster));
-
 								if (!pBlock) {
 									continue;
 								}
+
+								Cluster c;
+								c.ParseTimeCode(pCluster);
+								const auto clusterTime = s.GetRefTime(c.TimeCode);
+								const auto rtOffset = (clusterTime >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
 
 								CBlockGroupNode bgn;
 								if (pBlock->m_id == MATROSKA_ID_BLOCKGROUP) {
@@ -2151,15 +2151,17 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 	}
 
 	do {
-		Cluster c;
-		c.ParseTimeCode(m_pCluster);
-
 		if (!m_pBlock) {
 			m_pBlock = m_pCluster->GetFirstBlock();
 		}
 		if (!m_pBlock) {
 			continue;
 		}
+
+		Cluster c;
+		c.ParseTimeCode(m_pCluster);
+		const auto clusterTime = s.GetRefTime(c.TimeCode);
+		const auto rtOffset = (clusterTime >= m_pFile->m_rtOffset) ? m_pFile->m_rtOffset : 0LL;
 
 		do {
 			CBlockGroupNode bgn;
