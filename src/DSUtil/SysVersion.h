@@ -32,6 +32,24 @@ IsWindows10OrGreater()
 }
 #endif
 
+static VERSIONHELPERAPI
+IsWindowsVersionOrGreaterBuild(WORD wMajorVersion, WORD wMinorVersion, DWORD dwBuildNumber)
+{
+    OSVERSIONINFOEXW osvi = { sizeof(osvi), 0, 0, 0, 0, {0}, 0, 0 };
+    DWORDLONG        const dwlConditionMask = VerSetConditionMask(
+        VerSetConditionMask(
+        VerSetConditionMask(
+            0, VER_MAJORVERSION, VER_GREATER_EQUAL),
+               VER_MINORVERSION, VER_GREATER_EQUAL),
+               VER_BUILDNUMBER, VER_GREATER_EQUAL);
+
+    osvi.dwMajorVersion = wMajorVersion;
+    osvi.dwMinorVersion = wMinorVersion;
+    osvi.dwBuildNumber = dwBuildNumber;
+
+    return VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_BUILDNUMBER, dwlConditionMask) != FALSE;
+}
+
 static bool IsWindows64()
 {
 #ifdef _WIN64
@@ -65,6 +83,10 @@ namespace SysVersion
 	inline const bool IsWin10orLater() {
 		const static bool bIsWin10orLater = IsWindows10OrGreater();
 		return bIsWin10orLater;
+	}
+	inline const bool IsWin10RS4orLater() {
+		const static bool bIsWin10RS4orLater = IsWindowsVersionOrGreaterBuild(HIBYTE(_WIN32_WINNT_WINTHRESHOLD), LOBYTE(_WIN32_WINNT_WINTHRESHOLD), 17134);
+		return bIsWin10RS4orLater;
 	}
 	inline const bool IsW64() {
 		const static bool bIsW64 = IsWindows64();

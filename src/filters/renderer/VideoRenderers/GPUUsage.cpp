@@ -377,7 +377,7 @@ HRESULT CGPUUsage::Init(const CString& DeviceName, const CString& Device)
 						UpdateDelta(item.gputotalRunningTime, item.runningTime);
 					}
 
-					if (SysVersion::IsWin10orLater() && pD3DKMTQueryAdapterInfo) {
+					if (SysVersion::IsWin10RS4orLater() && pD3DKMTQueryAdapterInfo) {
 						D3DKMT_NODEMETADATA metaDataInfo = {};
 						metaDataInfo.NodeOrdinal = i;
 
