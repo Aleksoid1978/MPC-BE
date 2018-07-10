@@ -1,21 +1,31 @@
-// ResizableGrip.cpp: implementation of the CResizableGrip class.
-//
 /////////////////////////////////////////////////////////////////////////////
 //
-// Copyright (C) 2000-2002 by Paolo Messina
-// (http://www.geocities.com/ppescher - ppescher@yahoo.com)
+// This file is part of ResizableLib
+// https://github.com/ppescher/resizablelib
 //
-// The contents of this file are subject to the Artistic License (the "License").
-// You may not use this file except in compliance with the License. 
-// You may obtain a copy of the License at:
-// http://www.opensource.org/licenses/artistic-license.html
+// Copyright (C) 2000-2015 by Paolo Messina
+// mailto:ppescher@hotmail.com
+//
+// The contents of this file are subject to the Artistic License 2.0
+// http://opensource.org/licenses/Artistic-2.0
 //
 // If you find this code useful, credits would be nice!
 //
 /////////////////////////////////////////////////////////////////////////////
 
+/*!
+ *  @file
+ *  @brief Implementation of the CResizableGrip class.
+ */
+
 #include "stdafx.h"
 #include "ResizableGrip.h"
+
+#ifdef _DEBUG
+#undef THIS_FILE
+static char THIS_FILE[]=__FILE__;
+#define new DEBUG_NEW
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -33,7 +43,8 @@ CResizableGrip::~CResizableGrip()
 
 void CResizableGrip::UpdateSizeGrip()
 {
-	ASSERT(::IsWindow(m_wndGrip.m_hWnd));
+	if (!::IsWindow(m_wndGrip.m_hWnd))
+		return;
 
 	// size-grip goes bottom right in the client area
 	// (any right-to-left adjustment should go here)
@@ -79,7 +90,7 @@ void CResizableGrip::HideSizeGrip(DWORD* pStatus, DWORD dwMask /*= 1*/)
 	}
 }
 
-BOOL CResizableGrip::IsSizeGripVisible()
+BOOL CResizableGrip::IsSizeGripVisible() const
 {
 	// NB: visibility is effective only after an update
 	return (m_nShowCount > 0);
@@ -110,7 +121,8 @@ BOOL CResizableGrip::SetSizeGripBkMode(int nBkMode)
 
 void CResizableGrip::SetSizeGripShape(BOOL bTriangular)
 {
-	m_wndGrip.SetTriangularShape(bTriangular);
+	if (::IsWindow(m_wndGrip.m_hWnd))
+		m_wndGrip.SetTriangularShape(bTriangular);
 }
 
 BOOL CResizableGrip::CreateSizeGrip(BOOL bVisible /*= TRUE*/,
@@ -127,7 +139,7 @@ BOOL CResizableGrip::CreateSizeGrip(BOOL bVisible /*= TRUE*/,
 		m_wndGrip.SetTriangularShape(bTriangular);
 		m_wndGrip.SetTransparency(bTransparent);
 		SetSizeGripVisibility(bVisible);
-	
+
 		// update position
 		UpdateSizeGrip();
 	}
@@ -140,10 +152,10 @@ BOOL CResizableGrip::CreateSizeGrip(BOOL bVisible /*= TRUE*/,
 
 BOOL CResizableGrip::CSizeGrip::IsRTL()
 {
-	return GetExStyle() & 0x00400000L/*WS_EX_LAYOUTRTL*/;
+	return GetExStyle() & WS_EX_LAYOUTRTL;
 }
 
-BOOL CResizableGrip::CSizeGrip::PreCreateWindow(CREATESTRUCT& cs) 
+BOOL CResizableGrip::CSizeGrip::PreCreateWindow(CREATESTRUCT& cs)
 {
 	// set window size
 	m_size.cx = GetSystemMetrics(SM_CXVSCROLL);
@@ -151,7 +163,7 @@ BOOL CResizableGrip::CSizeGrip::PreCreateWindow(CREATESTRUCT& cs)
 
 	cs.cx = m_size.cx;
 	cs.cy = m_size.cy;
-	
+
 	return CScrollBar::PreCreateWindow(cs);
 }
 
@@ -165,13 +177,14 @@ LRESULT CResizableGrip::CSizeGrip::WindowProc(UINT message,
 		// (standard grip returns DLGC_WANTARROWS, like any standard scrollbar)
 		return DLGC_STATIC;
 
+	case WM_SETFOCUS:
+		// fix to prevent the control to gain focus, if set directly
+		// (for example when it's the only one control in a dialog)
+		return 0;
+
 	case WM_NCHITTEST:
 		// choose proper cursor shape
-		if (IsRTL())
-			return HTBOTTOMLEFT;
-		else
-			return HTBOTTOMRIGHT;
-		break;
+		return IsRTL() ? HTBOTTOMLEFT : HTBOTTOMRIGHT;
 
 	case WM_SETTINGCHANGE:
 		{
@@ -214,9 +227,12 @@ LRESULT CResizableGrip::CSizeGrip::WindowProc(UINT message,
 		break;
 
 	case WM_PAINT:
+	case WM_PRINTCLIENT:
 		if (m_bTransparent)
 		{
-			CPaintDC dc(this);
+			PAINTSTRUCT ps;
+			CDC* pDC = (message == WM_PAINT && wParam == 0) ?
+				BeginPaint(&ps) : CDC::FromHandle((HDC)wParam);
 
 			// select bitmaps
 			CBitmap *pOldGrip, *pOldMask;
@@ -225,22 +241,23 @@ LRESULT CResizableGrip::CSizeGrip::WindowProc(UINT message,
 			pOldMask = m_dcMask.SelectObject(&m_bmMask);
 
 			// obtain original grip bitmap, make the mask and prepare masked bitmap
-			CScrollBar::WindowProc(WM_PAINT, (WPARAM)m_dcGrip.GetSafeHdc(), lParam);
+			CScrollBar::WindowProc(message, (WPARAM)m_dcGrip.GetSafeHdc(), lParam);
 			m_dcGrip.SetBkColor(m_dcGrip.GetPixel(0, 0));
 			m_dcMask.BitBlt(0, 0, m_size.cx, m_size.cy, &m_dcGrip, 0, 0, SRCCOPY);
 			m_dcGrip.BitBlt(0, 0, m_size.cx, m_size.cy, &m_dcMask, 0, 0, 0x00220326);
-			
+
 			// draw transparently
-			dc.BitBlt(0, 0, m_size.cx, m_size.cy, &m_dcMask, 0, 0, SRCAND);
-			dc.BitBlt(0, 0, m_size.cx, m_size.cy, &m_dcGrip, 0, 0, SRCPAINT);
+			pDC->BitBlt(0, 0, m_size.cx, m_size.cy, &m_dcMask, 0, 0, SRCAND);
+			pDC->BitBlt(0, 0, m_size.cx, m_size.cy, &m_dcGrip, 0, 0, SRCPAINT);
 
 			// unselect bitmaps
 			m_dcGrip.SelectObject(pOldGrip);
 			m_dcMask.SelectObject(pOldMask);
 
+			if (message == WM_PAINT && wParam == 0)
+				EndPaint(&ps);
 			return 0;
 		}
-		break;
 	}
 
 	return CScrollBar::WindowProc(message, wParam, lParam);

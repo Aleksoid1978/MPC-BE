@@ -541,13 +541,6 @@ void CSubtitleDlDlg::OnDestroy()
 	__super::OnDestroy();
 }
 
-BOOL CSubtitleDlDlg::OnEraseBkgnd(CDC* pDC)
-{
-	EraseBackground(pDC);
-
-	return TRUE;
-}
-
 void CSubtitleDlDlg::DownloadSelectedSubtitles()
 {
 	POSITION pos = m_list.GetFirstSelectedItemPosition();
@@ -561,7 +554,6 @@ void CSubtitleDlDlg::DownloadSelectedSubtitles()
 }
 
 BEGIN_MESSAGE_MAP(CSubtitleDlDlg, CResizableDialog)
-	ON_WM_ERASEBKGND()
 	ON_WM_SIZE()
 	ON_MESSAGE_VOID(UWM_PARSE, OnParse)
 	ON_MESSAGE_VOID(UWM_FAILED, OnFailedConnection)

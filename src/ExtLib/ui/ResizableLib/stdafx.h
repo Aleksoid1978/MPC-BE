@@ -32,3 +32,5 @@
 #include <afxwin.h>			// MFC core and standard components
 #include <afxcmn.h>
 #include <afxdlgs.h>
+
+#define RSZLIB_NO_XP_DOUBLE_BUFFER

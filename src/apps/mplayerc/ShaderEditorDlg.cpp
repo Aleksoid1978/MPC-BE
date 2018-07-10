@@ -531,8 +531,8 @@ void CShaderEditorDlg::OnMouseMove(UINT nFlags, CPoint point)
 
 		RemoveAnchor(IDC_EDIT1);
 		RemoveAnchor(IDC_EDIT2);
-		AddAnchor(IDC_EDIT1, TOP_LEFT, CSize(100, div)/*BOTTOM_RIGHT*/);
-		AddAnchor(IDC_EDIT2, CSize(0, div)/*BOTTOM_LEFT*/, BOTTOM_RIGHT);
+		AddAnchor(IDC_EDIT1, TOP_LEFT, BOTTOM_RIGHT);
+		AddAnchor(IDC_EDIT2, BOTTOM_LEFT, BOTTOM_RIGHT);
 	}
 
 	__super::OnMouseMove(nFlags, point);
