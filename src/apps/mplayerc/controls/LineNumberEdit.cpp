@@ -22,7 +22,7 @@
 #include "stdafx.h"
 #include "LineNumberEdit.h"
 
-UINT urm_SELECTLINE = ::RegisterWindowMessage( L"_LINE_NUMBER_EDIT_SELECTLINE_" );
+UINT urm_SELECTLINE = ::RegisterWindowMessageW( L"_LINE_NUMBER_EDIT_SELECTLINE_" );
 
 // CLineNumberEdit
 
