@@ -2021,7 +2021,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 
 	SendVorbisHeaderSample(); // HACK: init vorbis decoder with the headers
 
-	auto& s = m_pFile->m_segment;
+	const auto& s = m_pFile->m_segment;
 
 	if (m_Seek_rt > 0 && m_bSupportCueDuration) {
 		std::vector<UINT64> TrackNumbers;
