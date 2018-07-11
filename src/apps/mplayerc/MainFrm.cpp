@@ -98,12 +98,10 @@
 #define DEFCLIENTH		200
 #define MENUBARBREAK	30
 
-#define BLU_RAY			L"Blu-ray"
-
-static UINT s_uTaskbarRestart		= RegisterWindowMessage(L"TaskbarCreated");
-static UINT s_uTBBC					= RegisterWindowMessage(L"TaskbarButtonCreated");
-static UINT WM_NOTIFYICON			= RegisterWindowMessage(L"MYWM_NOTIFYICON");
-static UINT s_uQueryCancelAutoPlay	= RegisterWindowMessage(L"QueryCancelAutoPlay");
+static UINT s_uTaskbarRestart		= RegisterWindowMessageW(L"TaskbarCreated");
+static UINT s_uTBBC					= RegisterWindowMessageW(L"TaskbarButtonCreated");
+static UINT WM_NOTIFYICON			= RegisterWindowMessageW(L"MYWM_NOTIFYICON");
+static UINT s_uQueryCancelAutoPlay	= RegisterWindowMessageW(L"QueryCancelAutoPlay");
 
 class CSubClock : public CUnknown, public ISubClock
 {
@@ -7601,7 +7599,7 @@ void CMainFrame::OnPlayPlay()
 					if (i > 0) {
 						strOSD.Delete(i, strOSD.GetLength() - i);
 					}
-					strOSD.AppendFormat(L" %s", BLU_RAY);
+					strOSD.Append(L" Blu-ray");
 					if (m_BDLabel.GetLength() > 0) {
 						strOSD.AppendFormat(L" \"%s\"", m_BDLabel);
 					} else {
@@ -9692,7 +9690,7 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 		descList.push_back(desc);
 
 		if (m_LastOpenBDPath.GetLength() > 0) {
-			CString fn2 = BLU_RAY;
+			CString fn2 = L"Blu-ray";
 			if (m_BDLabel.GetLength() > 0) {
 				fn2.AppendFormat(L" \"%s\"", m_BDLabel);
 			} else {
@@ -12695,7 +12693,7 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 	if (!fn.IsEmpty()) {
 		if (GetPlaybackMode() == PM_FILE) {
 			if (m_LastOpenBDPath.GetLength() > 0) {
-				CString fn2 = BLU_RAY;
+				CString fn2 = L"Blu-ray";
 				if (m_BDLabel.GetLength() > 0) {
 					fn2.AppendFormat(L" \"%s\"", m_BDLabel);
 				} else {
@@ -14045,7 +14043,7 @@ void CMainFrame::SetupOpenCDSubMenu()
 					DiskType = L"DVD Video";
 					break;
 				case CDROM_BDVideo:
-					DiskType = CString(BLU_RAY) + L" Disc";
+					DiskType = L"Blu-ray Disc";
 					break;
 				default:
 					ASSERT(FALSE);
@@ -15126,9 +15124,9 @@ void CMainFrame::SetupRecentFilesSubMenu()
 			CString path(MRU[i]);
 			if (path.Find(L"\\") != 0) {
 				if (CheckBD(path)) {
-					path.Format(L"%s - %s", BLU_RAY, path);
+					path.Insert(0, L"Blu-ray - ");
 				} else if (CheckDVD(path)) {
-					path = L"DVD - " + path;
+					path.Insert(0, L"DVD - ");
 				}
 			}
 			submenu.AppendMenu(flags, id, path);
