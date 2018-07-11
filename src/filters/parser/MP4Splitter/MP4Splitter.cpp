@@ -1016,7 +1016,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									mts.clear();
 									mts.push_back(mt);
 
-									if (!di->GetDataSize()) {
+									if (SUCCEEDED(CreateMPEG2VIfromMVC(&mt, &pbmi, AvgTimePerFrame, Aspect, data, size))) {
+										mts.insert(mts.cbegin(), mt);
+									} else if (!di->GetDataSize()) {
 										switch (type) {
 											case AP4_ATOM_TYPE_AI1P:
 											case AP4_ATOM_TYPE_AI1Q:
