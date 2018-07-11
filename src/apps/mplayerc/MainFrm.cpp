@@ -2479,98 +2479,127 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 			}
 		}
 		break;
-		case TIMER_STATS: {
-			if (m_pQP) {
-				CString rate;
-				rate.Format(L" (%sx)", Rate2String(m_PlaybackRate));
+		case TIMER_STATS:
+			if (m_wndStatsBar.IsWindowVisible()) {
+				if (m_pQP) {
+					CString rate;
+					rate.Format(L" (%sx)", Rate2String(m_PlaybackRate));
 
-				CString info;
-				int val = 0;
+					CString info;
+					int val = 0;
 
-				m_pQP->get_AvgFrameRate(&val); // We hang here due to a lock that never gets released.
-				info.Format(L"%d.%02d %s", val / 100, val % 100, rate);
-				m_wndStatsBar.SetLine(ResStr(IDS_AG_FRAMERATE), info);
+					m_pQP->get_AvgFrameRate(&val); // We hang here due to a lock that never gets released.
+					info.Format(L"%d.%02d %s", val / 100, val % 100, rate);
+					m_wndStatsBar.SetLine(ResStr(IDS_AG_FRAMERATE), info);
 
-				int avg, dev;
-				m_pQP->get_AvgSyncOffset(&avg);
-				m_pQP->get_DevSyncOffset(&dev);
-				info.Format(ResStr(IDS_STATSBAR_SYNC_OFFSET_FORMAT), avg, dev);
-				m_wndStatsBar.SetLine(ResStr(IDS_STATSBAR_SYNC_OFFSET), info);
+					int avg, dev;
+					m_pQP->get_AvgSyncOffset(&avg);
+					m_pQP->get_DevSyncOffset(&dev);
+					info.Format(ResStr(IDS_STATSBAR_SYNC_OFFSET_FORMAT), avg, dev);
+					m_wndStatsBar.SetLine(ResStr(IDS_STATSBAR_SYNC_OFFSET), info);
 
-				int drawn, dropped;
-				m_pQP->get_FramesDrawn(&drawn);
-				m_pQP->get_FramesDroppedInRenderer(&dropped);
-				info.Format(ResStr(IDS_MAINFRM_6), drawn, dropped);
-				m_wndStatsBar.SetLine(ResStr(IDS_AG_FRAMES), info);
+					int drawn, dropped;
+					m_pQP->get_FramesDrawn(&drawn);
+					m_pQP->get_FramesDroppedInRenderer(&dropped);
+					info.Format(ResStr(IDS_MAINFRM_6), drawn, dropped);
+					m_wndStatsBar.SetLine(ResStr(IDS_AG_FRAMES), info);
 
-				m_pQP->get_Jitter(&val);
-				info.Format(L"%d ms", val);
-				m_wndStatsBar.SetLine(ResStr(IDS_STATSBAR_JITTER), info);
-			}
+					m_pQP->get_Jitter(&val);
+					info.Format(L"%d ms", val);
+					m_wndStatsBar.SetLine(ResStr(IDS_STATSBAR_JITTER), info);
+				}
 
-			if (m_pBI) {
-				std::list<CString> sl;
+				if (GetPlaybackMode() != PM_DVD) {
+					std::list<CComQIPtr<IBaseFilter>> pBFs;
+					std::list<CComQIPtr<IBaseFilter>> pBFsVideo;
+					BeginEnumFilters(m_pGB, pEF, pBF) {
+						if (CComQIPtr<IBufferInfo> pBI = pBF) {
+							bool bHasVideo = false;
+							BeginEnumPins(pBF, pEP, pPin) {
+								CMediaType mt;
+								PIN_DIRECTION dir;
+								if (FAILED(pPin->QueryDirection(&dir)) || dir != PINDIR_OUTPUT
+										|| FAILED(pPin->ConnectionMediaType(&mt))) {
+									continue;
+								}
+								if (mt.majortype == MEDIATYPE_Video || mt.subtype == MEDIASUBTYPE_MPEG2_VIDEO) {
+									bHasVideo = true;
+									break;
+								}
+							}
+							EndEnumPins;
 
-				for (int i = 0, j = m_pBI->GetCount(); i < j; i++) {
-					int samples, size;
-					if (S_OK == m_pBI->GetStatus(i, samples, size)) {
-						CString str;
-						str.Format(L"[%d]: %03d/%d KB", i, samples, size / 1024);
-						sl.push_back(str);
+							if (bHasVideo) {
+								pBFsVideo.emplace_back(pBF);
+							} else {
+								pBFs.emplace_front(pBF);
+							}
+						}
 					}
-				}
+					EndEnumFilters;
 
-				if (!sl.empty()) {
-					CString str;
-					str.Format(L"%s (p%d)", Implode(sl, ' '), m_pBI->GetPriority());
-
-					m_wndStatsBar.SetLine(ResStr(IDS_AG_BUFFERS), str);
-				}
-			}
-
-			CInterfaceList<IBitRateInfo> pBRIs;
-
-			BeginEnumFilters(m_pGB, pEF, pBF) {
-				BeginEnumPins(pBF, pEP, pPin) {
-					if (CComQIPtr<IBitRateInfo> pBRI = pPin) {
-						pBRIs.AddTail(pBRI);
+					for (const auto& pBF : pBFsVideo) {
+						pBFs.emplace_front(pBF);
 					}
-				}
-				EndEnumPins;
 
-				if (!pBRIs.IsEmpty()) {
-					std::list<CString> sl;
+					if (!pBFs.empty()) {
+						std::list<CString> sl;
+						int cnt = 0;
+						for (const auto& pBF : pBFs) {
+							CComQIPtr<IBufferInfo> pBI = pBF;
+							for (int i = 0, j = pBI->GetCount(); i < j; i++) {
+								int samples, size;
+								if (S_OK == pBI->GetStatus(i, samples, size)) {
+									CString str;
+									str.Format(L"[%d]: %03d/%d KB", cnt, samples, size / 1024);
+									sl.push_back(str);
+								}
 
-					POSITION pos = pBRIs.GetHeadPosition();
-					for (int i = 0; pos; i++) {
-						IBitRateInfo* pBRI = pBRIs.GetNext(pos);
-
-						DWORD cur = pBRI->GetCurrentBitRate() / 1000;
-						DWORD avg = pBRI->GetAverageBitRate() / 1000;
-
-						if (avg == 0) {
-							continue;
+								cnt++;
+							}
 						}
 
-						CString str;
-						if (cur != avg) {
-							str.Format(L"[%d]: %u/%u Kb/s", i, avg, cur);
-						} else {
-							str.Format(L"[%d]: %u Kb/s", i, avg);
+						if (!sl.empty()) {
+							m_wndStatsBar.SetLine(ResStr(IDS_AG_BUFFERS), Implode(sl, L' '));
 						}
-						sl.push_back(str);
-					}
 
-					if (!sl.empty()) {
-						m_wndStatsBar.SetLine(ResStr(IDS_STATSBAR_BITRATE), Implode(sl, ' ') + ResStr(IDS_STATSBAR_BITRATE_AVG_CUR));
-					}
+						std::list<CComQIPtr<IBitRateInfo>> pBRIs;
+						for (const auto& pBF : pBFs) {
+							BeginEnumPins(pBF, pEP, pPin) {
+								if (CComQIPtr<IBitRateInfo> pBRI = pPin) {
+									pBRIs.emplace_back(pBRI);
+								}
+							}
+							EndEnumPins;
+						}
 
-					break;
+						if (!pBRIs.empty()) {
+							sl.clear();
+							cnt = 0;
+							for (const auto& pBRI : pBRIs) {
+								const DWORD cur = pBRI->GetCurrentBitRate() / 1000;
+								const DWORD avg = pBRI->GetAverageBitRate() / 1000;
+
+								CString str;
+								if (cur != avg) {
+									str.Format(L"[%d]: %u/%u Kb/s", cnt, avg, cur);
+								} else {
+									str.Format(L"[%d]: %u Kb/s", cnt, avg);
+								}
+								sl.push_back(str);
+
+								cnt++;
+							}
+
+							if (!sl.empty()) {
+								m_wndStatsBar.SetLine(ResStr(IDS_STATSBAR_BITRATE), Implode(sl, L' ') + ResStr(IDS_STATSBAR_BITRATE_AVG_CUR));
+							}
+						}
+					}
 				}
 			}
-			EndEnumFilters;
 
-			if (GetPlaybackMode() == PM_DVD) { // we also use this timer to update the info panel for DVD playback
+			if (m_wndInfoBar.IsWindowVisible() && GetPlaybackMode() == PM_DVD) { // we also use this timer to update the info panel for DVD playback
 				ULONG ulAvailable, ulCurrent;
 
 				// Location
@@ -2730,13 +2759,11 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 						lang = L"-";
 					}
 
-					Subtitles.Format(L"%s",
-									 lang);
+					Subtitles.Format(L"%s", lang);
 				}
 
 				m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_SUBTITLES), Subtitles);
 			}
-		}
 		break;
 		case TIMER_STATUSERASER: {
 			KillTimer(TIMER_STATUSERASER);
@@ -12591,7 +12618,7 @@ void CMainFrame::OpenSetupStatsBar()
 			RecalcLayout();
 		}
 
-		if (!m_pBI && (m_pBI = pBF)) {
+		if (CComQIPtr<IBufferInfo> pBI = pBF) {
 			m_wndStatsBar.SetLine(ResStr(IDS_AG_BUFFERS), info);
 			m_wndStatsBar.SetLine(ResStr(IDS_STATSBAR_BITRATE), info); // FIXME: shouldn't be here
 			RecalcLayout();
@@ -13775,7 +13802,6 @@ void CMainFrame::CloseMediaPrivate()
 	m_pDVDC.Release();
 	m_pDVDI.Release();
 	m_pAMOP.Release();
-	m_pBI.Release();
 	m_pQP.Release();
 	m_pFS.Release();
 	m_pMS.Release();
