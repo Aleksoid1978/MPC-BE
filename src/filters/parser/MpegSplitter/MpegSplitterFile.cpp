@@ -895,7 +895,11 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 	if (_streamData.codec != stream_codec::NONE) {
 		for (const auto& streamDesc : StreamDesc) {
 			if (streamDesc.codec == _streamData.codec) {
-				stream_type = streamDesc.stream_type;
+				if (stream_type == PES_STREAM_TYPE_ANY) {
+					stream_type = streamDesc.stream_type;
+				} else {
+					stream_type |= streamDesc.stream_type;
+				}
 				break;
 			}
 		}
