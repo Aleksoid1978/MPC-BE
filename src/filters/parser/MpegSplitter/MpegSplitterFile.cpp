@@ -2780,9 +2780,11 @@ bool CMpegSplitterFile::ReadPES(peshdr& h, BYTE code)
 
 		Skip(left);
 
+		/*
 		if (h.scrambling) {
 			goto error;
 		}
+		*/
 	}
 
 	return true;
