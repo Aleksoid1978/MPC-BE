@@ -1037,22 +1037,46 @@ CString CMpegSplitterFilter::FormatStreamName(const CMpegSplitterFile::stream& s
 	return streamName;
 }
 
-__int64 CMpegSplitterFilter::SeekBD(REFERENCE_TIME rt)
+__int64 CMpegSplitterFilter::SeekBD(const REFERENCE_TIME rt)
 {
 	if (!m_Items.empty()) {
 		for (const auto& Item : m_Items) {
-			if (Item.m_sps.size()
+			if (!Item.m_ClpiEpMapList.empty()
 					&& rt >= Item.m_rtStartTime && rt <= (Item.m_rtStartTime + Item.Duration())) {
-				REFERENCE_TIME _rt = rt - Item.m_rtStartTime + Item.m_rtIn;
-				for (size_t idx = 0; idx < Item.m_sps.size() - 1; idx++) {
-					if (_rt < Item.m_sps[idx].rt) {
-						if (idx > 0) {
-							idx--;
-						}
+				const auto rtSeek = rt - Item.m_rtStartTime + Item.m_rtIn;
+				const uint32_t timestamp = llMulDiv(rtSeek, 9, 2000, 0); // 45khz timestamps
 
-						return Item.m_sps[idx].fp + Item.m_SizeIn;
+				const auto& entry = Item.m_ClpiEpMapList[0];
+
+				WORD coarse_index = 0;
+				for (coarse_index = 0; coarse_index < entry.num_ep_coarse; coarse_index++) {
+					const auto& ref = entry.coarse[coarse_index].ref_ep_fine_id;
+					const auto pts  = ((uint32_t)(entry.coarse[coarse_index].pts_ep & ~0x01) << 18) +
+									  ((uint32_t)entry.fine[ref].pts_ep << 8);
+					if (pts > timestamp) {
+						break;
 					}
 				}
+				if (coarse_index == 0) {
+					return 0;
+				}
+				coarse_index--;
+
+				const auto coarse_pts = (uint32_t)(entry.coarse[coarse_index].pts_ep & ~0x01) << 18;
+				const auto& start = entry.coarse[coarse_index].ref_ep_fine_id;
+				const auto& end = (coarse_index < entry.num_ep_coarse - 1) ? entry.coarse[coarse_index + 1].ref_ep_fine_id : entry.num_ep_fine;
+
+				UINT fine_index = 0;
+				for (fine_index = start; fine_index < end; fine_index++) {
+					const auto pts = coarse_pts + ((uint32_t)entry.fine[fine_index].pts_ep << 8);
+					if (pts > timestamp) {
+						break;
+					}
+				}
+				fine_index--;
+
+				const auto spn = (entry.coarse[coarse_index].spn_ep & ~0x1FFFF) + entry.fine[fine_index].spn_ep;
+				return (__int64)spn * 192 + Item.m_SizeIn;
 			}
 		}
 	}
@@ -1370,7 +1394,7 @@ bool CMpegSplitterFilter::DemuxInit()
 			if (m_bUseMVCExtension) {
 
 				for (auto& Item : m_Items) {
-					Item.m_sps.clear();
+					Item.m_ClpiEpMapList.clear();
 				}
 			} else {
 				if (m_pSyncReader) {
@@ -1426,7 +1450,6 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		const __int64 pos = SeekBD(rt);
 		if (pos >= 0 && pos < (m_pFile->GetLength() - 4)) {
 			m_pFile->Seek(pos + 4);
-
 			DLog(L"CMpegSplitterFilter::DemuxSeek() : BD seek - %I64d, position - %I64d", rt, m_pFile->GetPos());
 			return;
 		}

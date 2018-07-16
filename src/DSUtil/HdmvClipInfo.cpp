@@ -192,12 +192,8 @@ HRESULT CHdmvClipInfo::ReadProgramInfo()
 	return S_OK;
 }
 
-HRESULT CHdmvClipInfo::ReadCpiInfo(SyncPoints& sps)
+HRESULT CHdmvClipInfo::ReadCpiInfo(std::vector<PlaylistItem::ClpiEpMapEntry>& ClpiEpMapList)
 {
-	sps.clear();
-
-	std::vector<ClpiEpMapEntry> ClpiEpMapList;
-
 	SetPos(Cpi_start_addrress);
 
 	DWORD len = ReadDword();
@@ -216,17 +212,17 @@ HRESULT CHdmvClipInfo::ReadCpiInfo(SyncPoints& sps)
 	ReadBuffer(buf, size);
 	CGolombBuffer gb(buf, size);
 	for (BYTE i = 0; i < num_stream_pid; i++) {
-		ClpiEpMapEntry em;
+		PlaylistItem::ClpiEpMapEntry em;
 
-		em.pid                      = gb.ReadShort();
+		em.pid                      = gb.BitRead(16);
 		gb.BitRead(10);
 		em.ep_stream_type           = gb.BitRead(4);
-		em.num_ep_coarse            = gb.ReadShort();
+		em.num_ep_coarse            = gb.BitRead(16);
 		em.num_ep_fine              = gb.BitRead(18);
 		em.ep_map_stream_start_addr = gb.ReadDword() + ep_map_pos;
 
-		em.coarse                   = DNew ClpiEpCoarse[em.num_ep_coarse];
-		em.fine                     = DNew ClpiEpFine[em.num_ep_fine];
+		em.coarse.resize(em.num_ep_coarse);
+		em.fine.resize(em.num_ep_fine);
 
 		ClpiEpMapList.emplace_back(em);
 	}
@@ -241,7 +237,7 @@ HRESULT CHdmvClipInfo::ReadCpiInfo(SyncPoints& sps)
 		ReadBuffer(buf, size);
 		gb.Reset(buf, size);
 
-		for (int j = 0; j < em.num_ep_coarse; j++) {
+		for (WORD j = 0; j < em.num_ep_coarse; j++) {
 			em.coarse[j].ref_ep_fine_id = gb.BitRead(18);
 			em.coarse[j].pts_ep         = gb.BitRead(14);
 			em.coarse[j].spn_ep         = gb.ReadDword();
@@ -255,43 +251,13 @@ HRESULT CHdmvClipInfo::ReadCpiInfo(SyncPoints& sps)
 		ReadBuffer(buf, size);
 		gb.Reset(buf, size);
 
-		for (int j = 0; j < em.num_ep_fine; j++) {
+		for (UINT j = 0; j < em.num_ep_fine; j++) {
 			em.fine[j].is_angle_change_point = gb.BitRead(1);
 			em.fine[j].i_end_position_offset = gb.BitRead(3);
 			em.fine[j].pts_ep                = gb.BitRead(11);
 			em.fine[j].spn_ep                = gb.BitRead(17);
 		}
 		SAFE_DELETE_ARRAY(buf);
-	}
-
-	if (!ClpiEpMapList.empty()) {
-		const auto& entry = ClpiEpMapList.begin();
-		for (int i = 0; i < entry->num_ep_coarse; i++) {
-			int start, end;
-
-			const ClpiEpCoarse* coarse = &entry->coarse[i];
-			start = coarse->ref_ep_fine_id;
-			if (i < entry->num_ep_coarse - 1) {
-				end = entry->coarse[i+1].ref_ep_fine_id;
-			} else {
-				end = entry->num_ep_fine;
-			}
-
-			for (int j = start; j < end; j++) {
-				const ClpiEpFine* fine = &entry->fine[j];
-				const UINT64 pts = ((UINT64)(coarse->pts_ep & ~0x01) << 18) +
-				                   ((UINT64)fine->pts_ep << 8);
-				const UINT32 spn = (coarse->spn_ep & ~0x1FFFF) + fine->spn_ep;
-
-				SyncPoint sp = {REFERENCE_TIME(20000.0f * pts / 90), (__int64)spn * 192};
-				sps.emplace_back(sp);
-			}
-		}
-	}
-
-	for (auto& em : ClpiEpMapList) {
-		SAFE_DELETE_ARRAY(em.coarse);
-		SAFE_DELETE_ARRAY(em.fine);
 	}
 
 	return S_OK;
@@ -302,7 +268,7 @@ HRESULT CHdmvClipInfo::ReadCpiInfo(SyncPoints& sps)
 
 #define CheckVer() (!(memcmp(Buff, "0300", 4)) || (!memcmp(Buff, "0200", 4)) || (!memcmp(Buff, "0100", 4)))
 
-HRESULT CHdmvClipInfo::ReadInfo(LPCWSTR strFile, SyncPoints* sps/* = nullprt*/)
+HRESULT CHdmvClipInfo::ReadInfo(LPCWSTR strFile, std::vector<PlaylistItem::ClpiEpMapEntry>* ClpiEpMapList/* = nullptr*/)
 {
 	m_hFile = CreateFileW(strFile, GENERIC_READ, dwShareMode, nullptr,
 						 OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
@@ -349,8 +315,8 @@ HRESULT CHdmvClipInfo::ReadInfo(LPCWSTR strFile, SyncPoints* sps/* = nullprt*/)
 			}
 		}
 
-		if (sps) {
-			ReadCpiInfo(*sps);
+		if (ClpiEpMapList) {
+			ReadCpiInfo(*ClpiEpMapList);
 		}
 
 		return CloseFile(S_OK);
@@ -864,7 +830,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 					fname.Replace(L".M2TS", L".CLPI");
 				}
 
-				ReadInfo(fname, &Item.m_sps);
+				ReadInfo(fname, &Item.m_ClpiEpMapList);
 			}
 
 			if (!ext_sub_paths.empty()) {
