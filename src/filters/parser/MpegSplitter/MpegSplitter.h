@@ -94,7 +94,7 @@ class __declspec(uuid("DC257063-045F-4BE2-BD5B-E12279C464F0"))
 
 	CString FormatStreamName(const CMpegSplitterFile::stream& s, const CMpegSplitterFile::stream_type type);
 
-	__int64 SeekBD(REFERENCE_TIME rt);
+	__int64 SeekBD(const REFERENCE_TIME rt);
 
 public:
 	CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLSID& clsid = __uuidof(CMpegSplitterFilter));
