@@ -212,28 +212,4 @@ private :
 
 	HRESULT ReadStreamInfo();
 	HRESULT ReadSTNInfo(BOOL bFullInfoRead);
-
-	struct ClpiEpCoarse {
-		UINT  ref_ep_fine_id = 0;
-		WORD  pts_ep         = 0;
-		DWORD spn_ep         = 0;
-	};
-
-	struct ClpiEpFine {
-		BYTE is_angle_change_point = 0;
-		BYTE i_end_position_offset = 0;
-		WORD pts_ep                = 0;
-		UINT spn_ep                = 0;
-	};
-
-	struct ClpiEpMapEntry {
-		WORD  pid                      = 0;
-		BYTE  ep_stream_type           = 0;
-		WORD  num_ep_coarse            = 0;
-		UINT  num_ep_fine              = 0;
-		DWORD ep_map_stream_start_addr = 0;
-
-		std::vector<ClpiEpCoarse> coarse;
-		std::vector<ClpiEpFine>   fine;
-	};
 };

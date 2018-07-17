@@ -195,6 +195,30 @@ HRESULT CHdmvClipInfo::ReadProgramInfo()
 HRESULT CHdmvClipInfo::ReadCpiInfo(SyncPoints& sps)
 {
 	sps.clear();
+
+	struct ClpiEpCoarse {
+		UINT  ref_ep_fine_id;
+		WORD  pts_ep;
+		DWORD spn_ep;
+	};
+
+	struct ClpiEpFine {
+		BYTE is_angle_change_point;
+		BYTE i_end_position_offset;
+		WORD pts_ep;
+		UINT spn_ep;
+	};
+
+	struct ClpiEpMapEntry {
+		WORD  pid;
+		BYTE  ep_stream_type;
+		WORD  num_ep_coarse;
+		UINT  num_ep_fine;
+		DWORD ep_map_stream_start_addr;
+
+		std::vector<ClpiEpCoarse> coarse;
+		std::vector<ClpiEpFine>   fine;
+	};
 	std::vector<ClpiEpMapEntry> ClpiEpMapList;
 
 	SetPos(Cpi_start_addrress);
