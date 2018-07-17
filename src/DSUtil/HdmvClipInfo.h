@@ -113,6 +113,8 @@ public:
 		std::vector<BYTE> m_pg_offset_sequence_id;
 		std::vector<BYTE> m_ig_offset_sequence_id;
 
+		SyncPoints m_sps;
+
 		REFERENCE_TIME Duration() const {
 			return m_rtOut - m_rtIn;
 		}
@@ -136,36 +138,11 @@ public:
 
 			m_pg_offset_sequence_id = pi.m_pg_offset_sequence_id;
 			m_ig_offset_sequence_id = pi.m_ig_offset_sequence_id;
-			m_ClpiEpMapList         = pi.m_ClpiEpMapList;
+
+			m_sps = pi.m_sps;
 
 			return *this;
 		}
-
-		struct ClpiEpCoarse {
-			UINT  ref_ep_fine_id = 0;
-			WORD  pts_ep         = 0;
-			DWORD spn_ep         = 0;
-		};
-
-		struct ClpiEpFine {
-			BYTE is_angle_change_point = 0;
-			BYTE i_end_position_offset = 0;
-			WORD pts_ep                = 0;
-			UINT spn_ep                = 0;
-		};
-
-		struct ClpiEpMapEntry {
-			WORD  pid                      = 0;
-			BYTE  ep_stream_type           = 0;
-			WORD  num_ep_coarse            = 0;
-			UINT  num_ep_fine              = 0;
-			DWORD ep_map_stream_start_addr = 0;
-
-			std::vector<ClpiEpCoarse> coarse;
-			std::vector<ClpiEpFine>   fine;
-		};
-
-		std::vector<ClpiEpMapEntry> m_ClpiEpMapList;
 	};
 
 	enum PlaylistMarkType {
@@ -188,7 +165,7 @@ public:
 	CHdmvClipInfo();
 	~CHdmvClipInfo();
 
-	HRESULT ReadInfo(LPCWSTR strFile, std::vector<PlaylistItem::ClpiEpMapEntry>* ClpiEpMapList = nullptr);
+	HRESULT ReadInfo(LPCWSTR strFile, SyncPoints* sps = nullptr);
 	bool    IsHdmv() const { return !m_Streams.empty(); }
 
 	Stream*  FindStream(SHORT wPID);
@@ -230,9 +207,33 @@ private :
 
 	HRESULT ReadLang(Stream& s);
 	HRESULT ReadProgramInfo();
-	HRESULT ReadCpiInfo(std::vector<PlaylistItem::ClpiEpMapEntry>& ClpiEpMapList);
+	HRESULT ReadCpiInfo(SyncPoints& sps);
 	HRESULT CloseFile(HRESULT hr);
 
 	HRESULT ReadStreamInfo();
 	HRESULT ReadSTNInfo(BOOL bFullInfoRead);
+
+	struct ClpiEpCoarse {
+		UINT  ref_ep_fine_id = 0;
+		WORD  pts_ep         = 0;
+		DWORD spn_ep         = 0;
+	};
+
+	struct ClpiEpFine {
+		BYTE is_angle_change_point = 0;
+		BYTE i_end_position_offset = 0;
+		WORD pts_ep                = 0;
+		UINT spn_ep                = 0;
+	};
+
+	struct ClpiEpMapEntry {
+		WORD  pid                      = 0;
+		BYTE  ep_stream_type           = 0;
+		WORD  num_ep_coarse            = 0;
+		UINT  num_ep_fine              = 0;
+		DWORD ep_map_stream_start_addr = 0;
+
+		std::vector<ClpiEpCoarse> coarse;
+		std::vector<ClpiEpFine>   fine;
+	};
 };
