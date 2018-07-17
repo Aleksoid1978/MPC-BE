@@ -9400,14 +9400,13 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 
 		if (!m_BDPlaylists.empty() && id < m_BDPlaylists.size()) {
 			UINT idx = 0;
-			for (const auto& Item : m_BDPlaylists) {
-				if (idx == id) {
+			for (const auto& item : m_BDPlaylists) {
+				if (idx == id && item.m_strFileName != m_strPlaybackRenderedPath) {
 					m_bNeedUnmountImage = FALSE;
 					SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 					m_bIsBDPlay = TRUE;
 
-					OpenFile(Item.m_strFileName, INVALID_TIME, FALSE);
-
+					OpenFile(item.m_strFileName, INVALID_TIME, FALSE);
 					return;
 				}
 				idx++;
@@ -9420,9 +9419,9 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 
 		if (m_youtubeUrllist.size() > 1 && id < m_youtubeUrllist.size()) {
 			UINT idx = 0;
-			for(auto item = m_youtubeUrllist.begin(); item != m_youtubeUrllist.end(); ++item) {
-				if (idx == id && item->url != m_strPlaybackRenderedPath) {
-					const int tagSelected = item->profile->iTag;
+			for (const auto& item : m_youtubeUrllist) {
+				if (idx == id && item.url != m_strPlaybackRenderedPath) {
+					const int tagSelected = item.profile->iTag;
 					REFERENCE_TIME rtNow = INVALID_TIME;
 					m_pMS->GetCurrentPosition(&rtNow);
 
