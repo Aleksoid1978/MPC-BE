@@ -244,7 +244,7 @@ public:
 		} dts;
 
 		stream_codec codec = stream_codec::NONE;
-		bool bEAC3Core = false;
+		bool bParseEAC3SubStream = false;
 
 		operator DWORD() const {
 			return pid ? pid : ((pesid << 8) | ps1id);

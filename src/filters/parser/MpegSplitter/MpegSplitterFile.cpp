@@ -1103,7 +1103,8 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 						}
 					} else if (Read(h, len, &s.mt) && h.frame_type == EAC3_FRAME_TYPE_INDEPENDENT) {
 						s.codec = h.bsid <= 10 ? stream_codec::AC3 : stream_codec::EAC3;
-						s.bEAC3Core = s.codec == stream_codec::EAC3;
+						const auto wfe = (WAVEFORMATEX*)s.mt.pbFormat;
+						s.bParseEAC3SubStream = (wfe->nChannels == 6);
 						type = stream_type::audio;
 					}
 				}
@@ -1226,8 +1227,7 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 					}
 				} else if (pes_stream_type ==  AUDIO_STREAM_AC3 || pes_stream_type == AUDIO_STREAM_AC3_PLUS || pes_stream_type == AUDIO_STREAM_EAC3 || pes_stream_type == SECONDARY_AUDIO_AC3_PLUS) {
 					stream* source = (stream*)m_streams[stream_type::audio].GetStream(s);
-					if (source && source->mt.pbFormat
-							&& (source->codec == stream_codec::AC3 || (source->codec == stream_codec::EAC3 && source->bEAC3Core))) {
+					if (source && source->mt.pbFormat && source->bParseEAC3SubStream) {
 						Seek(start);
 						ac3hdr h;
 						CMediaType mt;
@@ -1236,7 +1236,7 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 							WAVEFORMATEX* wfe = (WAVEFORMATEX*)source->mt.pbFormat;
 							if (wfeEAC3->nSamplesPerSec == wfe->nSamplesPerSec && wfeEAC3->nChannels == 4) {
 								source->codec = stream_codec::EAC3;
-								source->bEAC3Core = false;
+								source->bParseEAC3SubStream = false;
 								source->mt.subtype = MEDIASUBTYPE_DOLBY_DDPLUS;
 
 								wfe->nChannels += wfeEAC3->nChannels - 2;
