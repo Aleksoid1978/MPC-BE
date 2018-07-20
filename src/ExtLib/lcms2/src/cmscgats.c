@@ -2314,6 +2314,11 @@ cmsHANDLE  CMSEXPORT cmsIT8LoadFromMem(cmsContext ContextID, const void *Ptr, cm
 
     it8 = (cmsIT8*) hIT8;
     it8 ->MemoryBlock = (char*) _cmsMalloc(ContextID, len + 1);
+    if (it8->MemoryBlock == NULL)
+    {
+        cmsIT8Free(hIT8);
+        return FALSE;
+    }
 
     strncpy(it8 ->MemoryBlock, (const char*) Ptr, len);
     it8 ->MemoryBlock[len] = 0;
