@@ -716,6 +716,12 @@
     <ClInclude Include="MediaInfo\OutputHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Audio\File_Dsdiff.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Audio\File_Dsf.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ThirdParty\tinyxml2\tinyxml2.cpp">
@@ -1374,6 +1380,12 @@
     </ClCompile>
     <ClCompile Include="MediaInfo\OutputHelpers.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Audio\File_Dsdiff.cpp">
+      <Filter>Source Files\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Audio\File_Dsf.cpp">
+      <Filter>Source Files\Audio</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

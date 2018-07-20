@@ -711,6 +711,7 @@ namespace Elements
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_ddts=0x64647473;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_dvc1=0x64766331;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_dvcC=0x64766343;
+    const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_dvvC=0x64767643;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_esds=0x65736473;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_fiel=0x6669656C;
     const int64u moov_trak_mdia_minf_stbl_stsd_xxxx_glbl=0x676C626C;
@@ -1051,6 +1052,7 @@ void File_Mpeg4::Data_Parse()
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_ddts)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_dvc1)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_dvcC)
+                                ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_dvvC)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_esds)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_fiel)
                                 ATOM(moov_trak_mdia_minf_stbl_stsd_xxxx_glbl)
@@ -5197,6 +5199,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_AORD()
 void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_avcC()
 {
     Element_Name("AVC decode");
+    AddCodecConfigurationBoxInfo();
 
     //Parsing
     int8u Version;
@@ -5268,6 +5271,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_avcC()
 void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_avcE()
 {
     Element_Name("Dolby Vision EL AVC");
+    AddCodecConfigurationBoxInfo();
 
     //Parsing
     Skip_XX(Element_Size,                                       "AVCDecoderConfigurationRecord"); //enhancement-layer configuration information required to initialize the Dolby Vision decoder for the enhancement - layer substream
@@ -5848,36 +5852,23 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_dvc1()
 extern const size_t DolbyVision_Profiles_Size = 10;
 extern const char* DolbyVision_Profiles [DolbyVision_Profiles_Size] = // dv[BL_codec_type].[number_of_layers][bit_depth][cross-compatibility]
 {
-    "dvav.per",
-    "dvav.pen",
-    "dvhe.der",
-    "dvhe.den",
-    "dvhe.dtr",
-    "dvhe.stn",
-    "dvhe.dth",
-    "dvhe.dtb",
-    "dvhe.st",
-    "dvav.se",
-};
-extern const size_t DolbyVision_Levels_Size = 10;
-extern const char* DolbyVision_Levels[DolbyVision_Profiles_Size] = // dv[BL_codec_type].[number_of_layers][bit_depth][cross-compatibility]
-{
-    "",
-    "hd24",
-    "hd30",
-    "fhd24",
-    "fhd30",
-    "fhd60",
-    "uhd24",
-    "uhd30",
-    "uhd48",
-    "uhd60",
+    "dvav",
+    "dvav",
+    "dvhe",
+    "dvhe",
+    "dvhe",
+    "dvhe",
+    "dvhe",
+    "dvhe",
+    "dvhe",
+    "dvav",
 };
 
 //---------------------------------------------------------------------------
 void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_dvcC()
 {
     Element_Name("Dolby Vision Configuration");
+    AddCodecConfigurationBoxInfo();
 
     //Parsing
     int8u  dv_version_major, dv_version_minor, dv_profile, dv_level;
@@ -5902,23 +5893,21 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_dvcC()
         Fill(Stream_Video, StreamPos_Last, "DolbyVision_Version", Summary);
         if (dv_version_major==1)
         {
-            string Profile;
+            string Profile, Level;
             if (dv_profile<DolbyVision_Profiles_Size)
                 Profile+=DolbyVision_Profiles[dv_profile];
             else
-                Profile+=Ztring().From_Number(dv_profile).To_UTF8();
-            if (dv_level)
-            {
-                Profile+='@';
-                if (dv_level<DolbyVision_Levels_Size)
-                    Profile+=DolbyVision_Levels[dv_level];
-                else
-                    Profile+=Ztring().From_Number(dv_level).To_UTF8();
-            }
+                Profile+=Ztring().From_CC1(dv_profile).To_UTF8();
+            Profile+=__T('.');
+            Profile+=Ztring().From_CC1(dv_profile).To_UTF8();
+            Level+=Ztring().From_CC1(dv_level).To_UTF8();
             Fill(Stream_Video, StreamPos_Last, "DolbyVision_Profile", Profile);
+            Fill(Stream_Video, StreamPos_Last, "DolbyVision_Level", Level);
             Summary+=__T(',');
             Summary+=__T(' ');
             Summary+=Ztring().From_UTF8(Profile);
+            Summary+=__T('.');
+            Summary+=Ztring().From_UTF8(Level);
 
             string Layers;
             if (rpu_present_flag|el_present_flag|bl_present_flag)
@@ -6033,6 +6022,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_fiel()
 void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_glbl()
 {
     Element_Name("Global");
+    AddCodecConfigurationBoxInfo();
 
     if (Retrieve(Stream_Video, StreamPos_Last, Video_MuxingMode)==__T("MXF"))
     {
@@ -6070,6 +6060,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_glbl()
 void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_hvcC()
 {
     Element_Name("HEVCDecoderConfigurationRecord");
+    AddCodecConfigurationBoxInfo();
 
     //Parsing
     #ifdef MEDIAINFO_HEVC_YES
@@ -6128,6 +6119,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_hvcC()
 void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxx_hvcE()
 {
     Element_Name("Dolby Vision EL HEVC");
+    AddCodecConfigurationBoxInfo();
 
     //Parsing
     Skip_XX(Element_Size,                                       "HEVCDecoderConfigurationRecord"); //enhancement-layer configuration information required to initialize the Dolby Vision decoder for the enhancement - layer substream
@@ -6745,7 +6737,7 @@ void File_Mpeg4::moov_trak_tkhd()
     Get_DATE1904_DEPENDOFVERSION(Date_Modified,                 "Modification time");
     Get_B4 (moov_trak_tkhd_TrackID,                             "Track ID"); Element_Info1(moov_trak_tkhd_TrackID);
     Skip_B4(                                                    "Reserved");
-    Get_B_DEPENDOFVERSION(Duration,                             "Duration"); if (moov_mvhd_TimeScale) {Param_Info2(Duration*1000/moov_mvhd_TimeScale, " ms"); Element_Info2(Duration*1000/moov_mvhd_TimeScale, " ms");}
+    Get_B_DEPENDOFVERSION(Duration,                             "Duration"); if (moov_mvhd_TimeScale && Duration!=((Version==0)?(int32u)-1:(int64u)-1)) {Param_Info2(Duration*1000/moov_mvhd_TimeScale, " ms"); Element_Info2(Duration*1000/moov_mvhd_TimeScale, " ms");}
     Skip_B4(                                                    "Reserved");
     Skip_B4(                                                    "Reserved");
     Skip_B2(                                                    "Layer");
@@ -6777,7 +6769,7 @@ void File_Mpeg4::moov_trak_tkhd()
         }
         Streams[moov_trak_tkhd_TrackID].IsEnabled = Enabled;
         if (Alternate_Group) Fill(StreamKind_Last, StreamPos_Last, "AlternateGroup", Alternate_Group);
-        if (moov_mvhd_TimeScale)
+        if (moov_mvhd_TimeScale && Duration!=((Version==0)?(int32u)-1:(int64u)-1))
             Fill(StreamKind_Last, StreamPos_Last, "Duration", float64_int64s(((float64)Duration)*1000/moov_mvhd_TimeScale));
         Fill(StreamKind_Last, StreamPos_Last, "Encoded_Date", Date_Created);
         Fill(StreamKind_Last, StreamPos_Last, "Tagged_Date", Date_Modified);

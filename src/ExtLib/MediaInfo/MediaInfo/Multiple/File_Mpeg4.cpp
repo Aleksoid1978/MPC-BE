@@ -1171,6 +1171,16 @@ void File_Mpeg4::Streams_Finish()
         for (std::map<string, Ztring>::iterator Info=Temp->second.Infos.begin(); Info!=Temp->second.Infos.end(); ++Info)
             Fill(StreamKind_Last, StreamPos_Last, Info->first.c_str(), Info->second);
 
+        //Codec configuration box
+        Ztring CodecConfigurationBoxInfo;
+        for (size_t i=0; i<Temp->second.CodecConfigurationBoxInfo.size(); i++)
+        {
+            if (i)
+                CodecConfigurationBoxInfo+=__T('+');
+            CodecConfigurationBoxInfo+=Ztring().From_CC4(Temp->second.CodecConfigurationBoxInfo[i]);
+        }
+        Fill(StreamKind_Last, StreamPos_Last, "Codec configuration box", CodecConfigurationBoxInfo);
+
         ++Temp;
     }
     if (Vendor!=0x00000000 && Vendor!=0xFFFFFFFF)
@@ -2815,6 +2825,14 @@ void File_Mpeg4::TimeCode_Associate(int32u TrackID)
             //Fill(Strea->second.StreamKind, Strea->second.StreamPos, "TimeCode_Source", Streams[TrackID].Parsers[0]->Get(Stream_General, 0, "TimeCode_Source"));
         }
  }
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::AddCodecConfigurationBoxInfo()
+{
+    if (moov_trak_mdia_minf_stbl_stsd_Pos>1)
+        return;
+    Streams[moov_trak_tkhd_TrackID].CodecConfigurationBoxInfo.push_back((int32u)Element_Code);
+}
 
 //---------------------------------------------------------------------------
 void File_Mpeg4::IsParsing_mdat_Set()
