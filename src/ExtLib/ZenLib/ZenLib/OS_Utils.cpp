@@ -21,7 +21,6 @@
     #ifdef WINDOWS
         #undef __TEXT
         #include <windows.h>
-        #include <shlobj.h>
         #ifdef WINDOWS_UWP
             #include <wrl.h>
             #include <windows.foundation.h>
@@ -39,6 +38,8 @@
             using namespace ABI::Windows::Storage::Streams;
             using namespace ABI::Windows::Security::Cryptography;
             using namespace ABI::Windows::Security::Cryptography::Core;
+        #else
+            #include <shlobj.h>
         #endif
     #endif
 #endif //ZENLIB_USEWX

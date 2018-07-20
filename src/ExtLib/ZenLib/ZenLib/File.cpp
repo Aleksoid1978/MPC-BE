@@ -804,6 +804,7 @@ bool File::Truncate (int64u Offset)
                 return false; //Not supported
             #else //defined(WINDOWS)
                 //Need to close the file, use truncate, reopen it
+                #if !defined(__ANDROID_API__) || __ANDROID_API__ >= 21
                 if (Offset==(int64u)-1)
                     Offset=Position_Get();
                 Ztring File_Name_Sav=File_Name;
@@ -813,6 +814,9 @@ bool File::Truncate (int64u Offset)
                     return false;
                 GoTo(0, FromEnd);
                 return true;
+                #else
+                return false; //Not supported
+                #endif
             #endif //!defined(WINDOWS)
         #elif defined WINDOWS
             #ifdef WINDOWS_UWP

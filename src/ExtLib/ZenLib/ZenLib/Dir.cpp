@@ -368,6 +368,7 @@ ZtringList Dir::GetAllFileNames(const Ztring &Dir_Name_, dirlist_t Options)
                 //Close it
                 closedir(Dir);
             }
+            #if !defined(__ANDROID_API__) || __ANDROID_API__ >= 28
             else
             {
                 glob_t globbuf;
@@ -377,6 +378,7 @@ ZtringList Dir::GetAllFileNames(const Ztring &Dir_Name_, dirlist_t Options)
                         ToReturn.push_back(Ztring().From_Local(globbuf.gl_pathv[Pos]));
                 }
             }
+            #endif
         #endif
     #endif //ZENLIB_USEWX
 

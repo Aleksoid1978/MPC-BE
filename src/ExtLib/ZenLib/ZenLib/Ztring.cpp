@@ -589,11 +589,11 @@ Ztring& Ztring::From_Local (const char* S)
                 else
                     clear();
             #else //WINDOWS
-                size_t Size=mbstowcs(NULL, S, 0);
+                size_t Size=mbsrtowcs(NULL, &S, 0, NULL);
                 if (Size!=0 && Size!=(size_t)-1)
                 {
                     wchar_t* WideString=new wchar_t[Size+1];
-                    Size=mbstowcs(WideString, S, Size);
+                    Size=mbsrtowcs(WideString, &S, Size, NULL);
                     WideString[Size]=L'\0';
                     assign (WideString);
                     delete[] WideString; //WideString=NULL;
@@ -1698,8 +1698,8 @@ std::string Ztring::To_Local () const
                 std::string AnsiString;
                 for (size_t Pos=0; Pos<size(); Pos++)
                 {
-                    int Result_Size=wctomb(Result, operator[](Pos));
-                    if (Result_Size>=0)
+                    size_t Result_Size=wcrtomb(Result, operator[](Pos), 0);
+                    if (Result_Size && Result_Size!=(size_t)-1)
                         AnsiString.append(Result, Result_Size);
                     else
                         AnsiString+='?';
