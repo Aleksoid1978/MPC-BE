@@ -650,7 +650,7 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 		encoder->protected_->loose_mid_side_stereo = false;
 
 	if(encoder->protected_->bits_per_sample >= 32)
-		encoder->protected_->do_mid_side_stereo = false; /* since we currenty do 32-bit math, the side channel would have 33 bps and overflow */
+		encoder->protected_->do_mid_side_stereo = false; /* since we currently do 32-bit math, the side channel would have 33 bps and overflow */
 
 	if(encoder->protected_->bits_per_sample < FLAC__MIN_BITS_PER_SAMPLE || encoder->protected_->bits_per_sample > FLAC__REFERENCE_CODEC_MAX_BITS_PER_SAMPLE)
 		return FLAC__STREAM_ENCODER_INIT_STATUS_INVALID_BITS_PER_SAMPLE;
@@ -1913,7 +1913,7 @@ FLAC_API FLAC__bool FLAC__stream_encoder_set_metadata(FLAC__StreamEncoder *encod
 }
 
 /*
- * These three functions are not static, but not publically exposed in
+ * These three functions are not static, but not publicly exposed in
  * include/FLAC/ either.  They are used by the test suite.
  */
 FLAC_API FLAC__bool FLAC__stream_encoder_disable_constant_subframes(FLAC__StreamEncoder *encoder, FLAC__bool value)
