@@ -31,6 +31,9 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
+extern const float64 Mpegv_frame_rate[16];
+
+//---------------------------------------------------------------------------
 extern const int32u AC3_SamplingRate[]=
 { 48000,  44100,  32000,      0,};
 
@@ -198,7 +201,7 @@ int16u AC3_acmod2chanmap[]=
     0xE000,
     0xA100,
     0xE100,
-    0xB900,
+    0xB800,
     0xF800,
 };
 
@@ -284,6 +287,7 @@ int8u AC3_chanmap_Channels (int16u chanmap)
                 case  9 :
                 case 10 :
                 case 11 :
+                case 13 :
                             Channels+=2; break;
                 default:
                             Channels++; break;
@@ -295,26 +299,115 @@ int8u AC3_chanmap_Channels (int16u chanmap)
 }
 
 //---------------------------------------------------------------------------
+static const char* AC3_chanmap_ChannelLayout_List[16] =
+{
+    "L",
+    "C",
+    "R",
+    "Ls",
+    "Rs",
+    "Lc Rc",
+    "Lrs Rrs",
+    "Cs",
+    "Ts",
+    "Lsd Rsd",
+    "Lw Rw",
+    "Lvh Rvh",
+    "Vhc", // Cvh is a typo in specs 
+    "Lts Rts",
+    "LFE2",
+    "LFE",
+};
 Ztring AC3_chanmap_ChannelLayout (int16u chanmap, const Ztring &ChannelLayout0)
 {
     Ztring ToReturn=ChannelLayout0;
 
-    for (int8u Pos=0; Pos<16; Pos++)
+    for (int8u Pos=5; Pos<15; Pos++) // Custom ones only
     {
         if (chanmap&(1<<(15-Pos)))
         {
-            switch (Pos)
-            {
-                case  5 :   ToReturn+=__T(" Lc Rc"); break;
-                case  6 :   ToReturn+=__T(" Lrs Rrs"); break;
-                case  7 :   ToReturn+=__T(" Cs");
-                default: ;
-            }
+            if (!ChannelLayout0.empty())
+                ToReturn+=__T(' ');
+            ToReturn+=Ztring().From_UTF8(AC3_chanmap_ChannelLayout_List[Pos]);
         }
     }
 
     return ToReturn;
 }
+
+//---------------------------------------------------------------------------
+static const char* AC3_nonstd_bed_channel_assignment_mask_ChannelLayout_List[17] =
+{
+    "L",
+    "R",
+    "C",
+    "LFE",
+    "Ls",
+    "Rs",
+    "Lrs",
+    "Rrs",
+    "Lvh", // Lfh in spec but same as Lvh from E-AC-3
+    "Rvh", // Rfh in spec but same as Rvh from E-AC-3
+    "Lts", // Ltm in spec but same as Lts from E-AC-3
+    "Rts", // Rtm in spec but same as Rts from E-AC-3
+    "Lrh",
+    "Rrh",
+    "Lw",
+    "Rw",
+    "LFE2",
+};
+Ztring AC3_nonstd_bed_channel_assignment_mask_ChannelLayout(int32u nonstd_bed_channel_assignment_mask)
+{
+    Ztring ToReturn;
+
+    for (int8u i=0; i<17; i++)
+    {
+        if (nonstd_bed_channel_assignment_mask&(1<<i))
+        {
+            ToReturn+=Ztring().From_UTF8(AC3_nonstd_bed_channel_assignment_mask_ChannelLayout_List[i]);
+            ToReturn+=__T(' ');
+        }
+    }
+
+    if (!ToReturn.empty())
+        ToReturn.resize(ToReturn.size()-1);
+
+    return ToReturn;
+}
+//---------------------------------------------------------------------------
+static const int8u AC3_bed_channel_assignment_mask_ChannelLayout_Mapping[10] =
+{
+    2,
+    1,
+    1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    1,
+};
+int32u AC3_bed_channel_assignment_mask_2_nonstd(int16u bed_channel_assignment_mask)
+{
+    int32u ToReturn=0;
+
+    int8u j=0;
+    for (int8u i=0; i<10; i++)
+    {
+        if (bed_channel_assignment_mask&(1<<i))
+        {
+            ToReturn|=(1<<(j++));
+            if (AC3_bed_channel_assignment_mask_ChannelLayout_Mapping[i]>1)
+                ToReturn|=(1<<(j++));
+        }
+        else
+            j+=AC3_bed_channel_assignment_mask_ChannelLayout_Mapping[i];
+    }
+
+    return ToReturn;
+}
+
 
 //---------------------------------------------------------------------------
 const int16u AC3_FrameSize[27][4]=
@@ -823,10 +916,14 @@ File_Ac3::File_Ac3()
 
     //Temp
     Frame_Count_HD=0;
+    addbsi_Buffer=NULL;
+    addbsi_Buffer_Size=0;
     fscod=0;
     fscod2=0;
     frmsizecod=0;
     bsid_Max=(int8u)-1;
+    Formats[0]=0;
+    Formats[1]=0;
     for (int8u Pos=0; Pos<8; Pos++)
         for (int8u Pos2=0; Pos2<9; Pos2++)
         {
@@ -841,6 +938,10 @@ File_Ac3::File_Ac3()
     numblkscod=0;
     substreamid_Independant_Current=0;
     substreams_Count=0;
+    joc_complexity_index_Container=(int8u)-1;
+    joc_complexity_index_Stream=(int8u)-1;
+    num_dynamic_objects=(int8u)-1;
+    nonstd_bed_channel_assignment_mask=(int32u)-1;
     dxc3_Parsed=false;
     HD_MajorSync_Parsed=false;
     Core_IsPresent=false;
@@ -855,6 +956,12 @@ File_Ac3::File_Ac3()
     IgnoreCrc_Done=false;
 }
 
+//---------------------------------------------------------------------------
+File_Ac3::~File_Ac3()
+{
+    delete[] addbsi_Buffer;
+}
+
 //***************************************************************************
 // Streams management
 //***************************************************************************
@@ -862,30 +969,31 @@ File_Ac3::File_Ac3()
 //---------------------------------------------------------------------------
 void File_Ac3::Streams_Fill()
 {
+    if (dxc3_Parsed)
+    {
+        if (Count_Get(Stream_Audio)==0)
+            Stream_Prepare(Stream_Audio);
+    }
+
     if (HD_MajorSync_Parsed)
     {
-        Stream_Prepare(Stream_Audio);
+        if (Count_Get(Stream_Audio)==0)
+            Stream_Prepare(Stream_Audio);
         if (HD_BitRate_Max)
             Fill(Stream_Audio, 0, Audio_BitRate_Maximum, (HD_BitRate_Max*AC3_HD_SamplingRate(HD_SamplingRate2)+8)>>4);
 
         if (HD_StreamType==0xBA) //TrueHD
         {
-            Fill(Stream_General, 0, General_Format, "TrueHD");
             Fill(Stream_Audio, 0, Audio_Format, "TrueHD");
             Fill(Stream_Audio, 0, Audio_Codec, "TrueHD");
             if (HD_HasAtmos)
             {
-
                 Fill(Stream_Audio, 0, Audio_Format_Profile, "TrueHD+Atmos / TrueHD");
                 Fill(Stream_Audio, 0, Audio_Codec_Profile, "TrueHD+Atmos / TrueHD");
-                Fill(Stream_Audio, 0, Audio_Channel_s_, "Object Based");
-                Fill(Stream_Audio, 0, Audio_ChannelPositions, "Object Based");
-                Fill(Stream_Audio, 0, Audio_ChannelPositions_String2, "Object Based");
             }
             Fill(Stream_Audio, 0, Audio_BitRate_Mode, "VBR");
             Ztring Sampling;
             Sampling.From_Number(AC3_HD_SamplingRate(HD_SamplingRate1));
-            if (HD_HasAtmos) Sampling.insert(0, __T(" / "));
             Fill(Stream_Audio, 0, Audio_SamplingRate, Sampling);
             Fill(Stream_Audio, 0, Audio_Channel_s_, AC3_TrueHD_Channels(HD_Channels2));
             Fill(Stream_Audio, 0, Audio_ChannelPositions, AC3_TrueHD_Channels_Positions(HD_Channels2));
@@ -894,7 +1002,6 @@ void File_Ac3::Streams_Fill()
 
         if (HD_StreamType==0xBB) //TrueHD
         {
-            Fill(Stream_General, 0, General_Format, "MLP");
             if (!Core_IsPresent)
             {
                 Fill(Stream_Audio, 0, Audio_Format, "MLP");
@@ -905,22 +1012,50 @@ void File_Ac3::Streams_Fill()
             if (HD_SamplingRate1!=HD_SamplingRate2)
                 Fill(Stream_Audio, 0, Audio_SamplingRate, AC3_HD_SamplingRate(HD_SamplingRate2));
             Fill(Stream_Audio, 0, Audio_Channel_s_, AC3_MLP_Channels[HD_Channels1]);
-            if (HD_Channels1!=HD_Channels2)
+            if (MediaInfoLib::Config.LegacyStreamDisplay_Get() && HD_Channels1!=HD_Channels2)
                 Fill(Stream_Audio, 0, Audio_Channel_s_, AC3_MLP_Channels[HD_Channels1]);
             Fill(Stream_Audio, 0, Audio_BitDepth, AC3_MLP_Resolution[HD_Resolution2]);
-            if (HD_Resolution1!=HD_Resolution2)
+            if (MediaInfoLib::Config.LegacyStreamDisplay_Get() && HD_Resolution1!=HD_Resolution2)
                 Fill(Stream_Audio, 0, Audio_BitDepth, AC3_MLP_Resolution[HD_Resolution1]);
         }
     }
 
-    if (joc_num_objects_map.size()==1 && (joc_num_objects_map.begin()->second >= Frame_Count_Valid / 2 || joc_num_objects_map.begin()->second >= Frame_Count / 2)) //Accepting that some frames do not contain JOC
+    bool HasJOC = joc_num_objects_map.size()==1 && (joc_num_objects_map.begin()->second >= Frame_Count_Valid / 8 || joc_num_objects_map.begin()->second >= Frame_Count / 8); //Accepting that some frames do not contain JOC
+    if (HasJOC || HD_HasAtmos)
     {
-        joc_num_objects = joc_num_objects_map.begin()->first;
-        Fill(Stream_Audio, 0, Audio_Format_Profile, bsid_Max<=0x09?"AC-3+Atmos":"E-AC-3+Atmos");
-        Fill(Stream_Audio, 0, Audio_Codec_Profile, bsid_Max<=0x09?"AC-3+Atmos":"E-AC-3+Atmos");
-        Fill(Stream_Audio, 0, Audio_Channel_s_, Ztring::ToZtring(joc_num_objects)+__T(" objects"));
-        Fill(Stream_Audio, 0, Audio_ChannelPositions, Ztring::ToZtring(joc_num_objects) + __T(" objects"));
-        Fill(Stream_Audio, 0, Audio_ChannelPositions_String2, Ztring::ToZtring(joc_num_objects) + __T(" objects"));
+        if (Count_Get(Stream_Audio)==0)
+            Stream_Prepare(Stream_Audio);
+        if (HasJOC)
+        {
+            Fill(Stream_Audio, 0, Audio_Format_Profile, bsid_Max<=0x09?"AC-3 JOC":"E-AC-3 JOC");
+            Fill(Stream_Audio, 0, Audio_Codec_Profile, bsid_Max<=0x09?"AC-3 JOC":"E-AC-3 JOC");
+        }
+        if (dxc3_Parsed && joc_complexity_index_Container!=(int8u)-1)
+            Fill(Stream_Audio, 0, "ComplexityIndex", joc_complexity_index_Container);
+        if (dxc3_Parsed && joc_complexity_index_Container==(int8u)-1 && joc_complexity_index_Stream!=(int8u)-1)
+            Fill(Stream_Audio, 0, "ComplexityIndex", "Not present");
+        if (joc_complexity_index_Stream!=(int8u)-1 && joc_complexity_index_Stream!=joc_complexity_index_Container)
+            Fill(Stream_Audio, 0, "ComplexityIndex", joc_complexity_index_Stream);
+        if (dxc3_Parsed && joc_complexity_index_Container!=(int8u)-1 && joc_complexity_index_Stream==(int8u)-1)
+            Fill(Stream_Audio, 0, "ComplexityIndex", "Not present");
+        if (num_dynamic_objects!=(int8u)-1)
+            Fill(Stream_Audio, 0, "NumberOfDynamicObjects", num_dynamic_objects);
+        if (nonstd_bed_channel_assignment_mask !=(int32u)-1)
+        {
+            Ztring BedChannelConfiguration=AC3_nonstd_bed_channel_assignment_mask_ChannelLayout(nonstd_bed_channel_assignment_mask);
+            size_t BedChannelCount=0;
+            if (!BedChannelConfiguration.empty())
+                for (size_t i=0; i<BedChannelConfiguration.size();)
+                {
+                    BedChannelCount++;
+                    i=BedChannelConfiguration.find(__T(' '), i+1);
+                }
+            Fill(Stream_Audio, 0, "BedChannelCount", BedChannelCount);
+            Fill_SetOptions(Stream_Audio, 0, "BedChannelCount", "N NIY");
+            Fill(Stream_Audio, 0, "BedChannelCount/String", MediaInfoLib::Config.Language_Get(Ztring::ToZtring(BedChannelCount), __T(" channel")));
+            Fill_SetOptions(Stream_Audio, 0, "BedChannelCount/String", "Y NIN");
+            Fill(Stream_Audio, 0, "BedChannelConfiguration", BedChannelConfiguration);
+        }
     }
 
     //AC-3
@@ -928,9 +1063,11 @@ void File_Ac3::Streams_Fill()
     {
         if (Count_Get(Stream_Audio)==0)
             Stream_Prepare(Stream_Audio);
-        Fill(Stream_General, 0, General_Format, "AC-3");
-        Fill(Stream_Audio, 0, Audio_Format, "AC-3");
-        Fill(Stream_Audio, 0, Audio_Codec, "AC3");
+        if (Retrieve(Stream_Audio, 0, Audio_Format).empty() || !HasJOC)
+        {
+            Fill(Stream_Audio, 0, Audio_Format, "AC-3");
+            Fill(Stream_Audio, 0, Audio_Codec, "AC3");
+        }
         Fill(Stream_Audio, 0, Audio_BitDepth, 16);
 
         int32u Divider=bsid_Max==9?2:1; // Unofficial hack for low sample rate (e.g. 22.05 kHz)
@@ -952,7 +1089,7 @@ void File_Ac3::Streams_Fill()
 
         Fill(Stream_Audio, 0, Audio_ServiceKind, AC3_Mode[bsmod_Max[0][0]]);
         Fill(Stream_Audio, 0, Audio_ServiceKind_String, AC3_Mode_String[bsmod_Max[0][0]]);
-        if (acmod_Max[0][0]!=(int8u)-1)
+        if (MediaInfoLib::Config.LegacyStreamDisplay_Get() && acmod_Max[0][0]!=(int8u)-1)
         {
             int8u Channels=AC3_Channels[acmod_Max[0][0]];
             Ztring ChannelPositions; ChannelPositions.From_Local(AC3_ChannelPositions[acmod_Max[0][0]]);
@@ -970,7 +1107,7 @@ void File_Ac3::Streams_Fill()
                 Fill(Stream_Audio, 0, Audio_ChannelPositions, ChannelPositions);
             if (ChannelPositions2!=Retrieve(Stream_Audio, 0, Audio_ChannelPositions_String2))
                 Fill(Stream_Audio, 0, Audio_ChannelPositions_String2, ChannelPositions2);
-            if (ChannelLayout!=Retrieve(Stream_Audio, 0, Audio_ChannelLayout))
+            if (Retrieve(Stream_Audio, 0, Audio_ChannelLayout).empty())
                 Fill(Stream_Audio, 0, Audio_ChannelLayout, ChannelLayout);
         }
         if (dsurmod_Max[0][0]==2)
@@ -989,9 +1126,13 @@ void File_Ac3::Streams_Fill()
         for (size_t Pos=0; Pos<8; Pos++)
             if (acmod_Max[Pos][0]!=(int8u)-1)
             {
-                Stream_Prepare(Stream_Audio);
-                Fill(Stream_Audio, 0, Audio_Format, "E-AC-3");
-                Fill(Stream_Audio, 0, Audio_Codec, "AC3+");
+                if (Count_Get(Stream_Audio)==0)
+                    Stream_Prepare(Stream_Audio);
+                if (Retrieve(Stream_Audio, 0, Audio_Format).empty() || !HasJOC)
+                {
+                    Fill(Stream_Audio, 0, Audio_Format, Formats[0]?"AC-3":"E-AC-3");
+                    Fill(Stream_Audio, 0, Audio_Codec, Formats[0] ?"AC-3":"AC3+");
+                }
 
                 if (acmod_Max[1][0]!=(int8u)-1)
                     Fill(Stream_Audio, 0, Audio_ID, 1+Pos);
@@ -1001,18 +1142,13 @@ void File_Ac3::Streams_Fill()
                 int32u frmsiz_Total=0;
                 for (size_t Pos2=0; Pos2<8; Pos2++)
                     frmsiz_Total+=frmsizplus1_Max[Pos][Pos2];
-                if (numblks)
-                {
-                    Fill(Stream_Audio, 0, Audio_BitRate, ((frmsiz_Total*2)*8*(750/((int32u)numblks)))/4);
-                    if (frmsizplus1_Max[Pos][1]) //If dependand substreams
-                        Fill(Stream_Audio, 0, Audio_BitRate, ((frmsizplus1_Max[Pos][0]*2)*8*(750/((int16u)numblks)))/4);
-
-                }
-
+                int32u SamplingRate;
                 if (fscod!=3)
-                    Fill(Stream_Audio, 0, Audio_SamplingRate, AC3_SamplingRate[fscod]);
+                    SamplingRate=AC3_SamplingRate[fscod];
                 else
-                    Fill(Stream_Audio, 0, Audio_SamplingRate, AC3_SamplingRate2[fscod2]);
+                    SamplingRate=AC3_SamplingRate2[fscod2];
+                Fill(Stream_Audio, 0, Audio_SamplingRate, SamplingRate);
+                Fill(Stream_Audio, 0, Audio_BitRate, ((int64u)frmsiz_Total)*SamplingRate/32/numblks);
 
                 if (acmod_Max[Pos][1]!=(int8u)-1)
                 {
@@ -1034,16 +1170,19 @@ void File_Ac3::Streams_Fill()
                     Fill(Stream_Audio, 0, Audio_Codec_Profile, "E-AC-3+Dep");
                     Fill(Stream_Audio, 0, Audio_Channel_s_, AC3_chanmap_Channels(chanmap_Final));
                     Fill(Stream_Audio, 0, Audio_ChannelPositions, AC3_chanmap_ChannelPositions(chanmap_Final));
-                    Ztring ChannelLayout; ChannelLayout.From_Local(lfeon_Max[0][0]?AC3_ChannelLayout_lfeon[acmod_Max[0][0]]:AC3_ChannelLayout_lfeoff[acmod_Max[0][0]]);
-                    Fill(Stream_Audio, 0, Audio_ChannelLayout, AC3_chanmap_ChannelLayout(chanmap_Final, ChannelLayout));
+                    if (MediaInfoLib::Config.LegacyStreamDisplay_Get() || Retrieve(Stream_Audio, 0, Audio_ChannelLayout).empty())
+                    {
+                        Ztring ChannelLayout; ChannelLayout.From_Local(lfeon_Max[0][0]?AC3_ChannelLayout_lfeon[acmod_Max[0][0]]:AC3_ChannelLayout_lfeoff[acmod_Max[0][0]]);
+                        Fill(Stream_Audio, 0, Audio_ChannelLayout, AC3_chanmap_ChannelLayout(chanmap_Final, ChannelLayout));
+                    }
                 }
                 if (!Retrieve(Stream_Audio, 0, Audio_Format_Profile).empty())
-                    Fill(Stream_Audio, 0, Audio_Format_Profile, "E-AC-3");
+                    Fill(Stream_Audio, 0, Audio_Format_Profile, Retrieve(Stream_Audio, 0, Audio_Format));
                 if (!Retrieve(Stream_Audio, 0, Audio_Codec_Profile).empty())
-                    Fill(Stream_Audio, 0, Audio_Codec_Profile, "E-AC-3");
+                    Fill(Stream_Audio, 0, Audio_Codec_Profile, Retrieve(Stream_Audio, 0, Audio_Format));
                 Fill(Stream_Audio, 0, Audio_ServiceKind, AC3_Mode[bsmod_Max[0][0]]);
                 Fill(Stream_Audio, 0, Audio_ServiceKind_String, AC3_Mode_String[bsmod_Max[0][0]]);
-                if (acmod_Max[Pos][0]!=(int8u)-1)
+                if ((MediaInfoLib::Config.LegacyStreamDisplay_Get() || Retrieve(Stream_Audio, 0, Audio_Channel_s_).empty()) && acmod_Max[Pos][0]!=(int8u)-1)
                 {
                     int8u Channels=AC3_Channels[acmod_Max[Pos][0]];
                     Ztring ChannelPositions; ChannelPositions.From_Local(AC3_ChannelPositions[acmod_Max[Pos][0]]);
@@ -1143,13 +1282,27 @@ void File_Ac3::Streams_Fill()
     else if (bsid_Max<=0x09)
         SamplesPerFrame=768; // Unofficial hack for low sample rate (e.g. 22.05 kHz)
     else if (bsid_Max>0x0A && bsid_Max<=0x10)
-        SamplesPerFrame=256;
+        SamplesPerFrame=256*(numblkscod==3?6:(numblkscod+1));
     else if (HD_MajorSync_Parsed && (HD_StreamType==0xBA || HD_StreamType==0xBB)) // TrueHD or MLP
         SamplesPerFrame=40;
     else
         SamplesPerFrame=0;
     if (SamplesPerFrame)
         Fill(Stream_Audio, 0, Audio_SamplesPerFrame, SamplesPerFrame);
+
+    // Commercial name
+    if (Retrieve(Stream_Audio, 0, Audio_Format)==__T("E-AC-3") || Retrieve(Stream_Audio, 0, Audio_Format_Profile).find(__T("E-AC-3"))==0)
+    {
+        if (HasJOC)
+            Fill(Stream_Audio, 0, Audio_Format_Commercial_IfAny, "Dolby Digital Plus with Dolby Atmos");
+        else
+            Fill(Stream_Audio, 0, Audio_Format_Commercial_IfAny, "Dolby Digital Plus");
+    }
+    else if (Retrieve(Stream_Audio, 0, Audio_Format)==__T("AC-3"))
+        Fill(Stream_Audio, 0, Audio_Format_Commercial_IfAny, "Dolby Digital");
+    Fill(Stream_General, 0, General_Format, Retrieve(Stream_Audio, 0, Audio_Format), true);
+    Fill(Stream_General, 0, General_Format_Profile, Retrieve(Stream_Audio, 0, Audio_Format_Profile));
+    Fill(Stream_General, 0, General_Format_Commercial_IfAny, Retrieve(Stream_Audio, 0, Audio_Format_Commercial_IfAny));
 }
 
 //---------------------------------------------------------------------------
@@ -1353,7 +1506,10 @@ void File_Ac3::Streams_Finish()
         else if (bsid_Max<=0x09)
             FrameDuration=16; // Unofficial hack for low sample rate (e.g. 22.05 kHz)
         else if (bsid_Max>0x0A && bsid_Max<=0x10)
-            FrameDuration=((float64)32)/6;
+        {
+            int8u numblks=numblkscod==3?6:numblkscod+1;
+            FrameDuration=((float64)32)/6*numblks;
+        }
         else
             FrameDuration=0;
         if (FrameDuration)
@@ -1483,9 +1639,6 @@ bool File_Ac3::Synchronize()
         {
             TimeStamp_IsPresent=true;
             Buffer_Offset-=16;
-
-            if (Frame_Count_Valid<10000)
-                Frame_Count_Valid=10000; //Setting it to 10000 in order to be able to have the drop frame for extreme stream (60 fps...)
         }
     }
 
@@ -1547,7 +1700,11 @@ bool File_Ac3::Synched_Test()
 
     //Quick test of synchro
     if (!FrameSynchPoint_Test())
+    {
+        if (TimeStamp_IsPresent && !TimeStamp_Parsed && Buffer_Offset>=16)
+            Buffer_Offset-=16;
         return false; //Need more data
+    }
     if (!Synched)
         return true;
 
@@ -1729,8 +1886,6 @@ void File_Ac3::Header_Parse()
         Header_Fill_Code(2, "TimeStamp");
         return;
     }
-    else
-        TimeStamp_Parsed=false; //Currently, only one kind of intermediate element is detected (no TimeStamp and HD part together), and we don't know the precise specification of MLP nor TimeStamp, so we consider next eleemnt is TimeStamp
 
     if (Save_Buffer)
     {
@@ -1790,6 +1945,9 @@ void File_Ac3::Header_Parse()
 //---------------------------------------------------------------------------
 void File_Ac3::Data_Parse()
 {
+    if (Element_Code != 2) // Not time stamp
+        TimeStamp_Parsed=false; //Currently, only one kind of intermediate element is detected (no TimeStamp and HD part together), and we don't know the precise specification of MLP nor TimeStamp, so we consider next eleemnt is TimeStamp
+
     if (Save_Buffer)
     {
         File_Offset+=Buffer_Offset;
@@ -1891,13 +2049,28 @@ void File_Ac3::Core_Frame()
 {
     //Save true Element_Size (if Core+substreams, Element_Size is for all elements, and we want to limit to core)
     int64u Element_Size_Save=Element_Size;
-    if (bsid>0x0A && bsid<=0x10) //E-AC-3 only
+    bsid=CC1(Buffer+Buffer_Offset+Element_Offset+5)>>3;
+    if (bsid<=0x09)
+    {
+        fscod     =(Buffer[(size_t)(Buffer_Offset+4)]&0xC0)>>6;
+        frmsizecod= Buffer[(size_t)(Buffer_Offset+4)]&0x3F;
+
+        //Filling
+        fscods[fscod]++;
+        frmsizecods[frmsizecod]++;
+        Element_Size=Element_Offset+AC3_FrameSize_Get(frmsizecod, fscod);
+        if (Element_Size>Element_Size_Save)
+            Element_Size=Element_Size_Save; // Not expected, but trying to parse the begining
+    }
+    else if (bsid>0x0A && bsid<=0x10) //E-AC-3 only
     {
         int16u frmsiz=CC2(Buffer+Buffer_Offset+(size_t)Element_Offset+2)&0x07FF;
         Element_Size=Element_Offset+2+frmsiz*2;
         if (Element_Size>Element_Size_Save)
             Element_Size=Element_Size_Save; // Not expected, but trying to parse the begining
     }
+    if (Element_Offset==Element_Size)
+        Element_Size=Element_Size_Save; // Something went wrong, using the whole packet
 
     //Pre-parsing, finding some elements presence
     int16u auxdatal;
@@ -1906,7 +2079,7 @@ void File_Ac3::Core_Frame()
                 |(         Buffer[Buffer_Offset+(Element_Size)-3] >>2);
     else
         auxdatal=(int16u)-1; //auxdata is empty
-    BitStream_Fast Search(Buffer+Buffer_Offset, Element_Size);
+    BitStream_Fast Search(Buffer+Buffer_Offset+Element_Offset, Element_Size-Element_Offset);
     while(Search.Remain()>18)
     {
         if (Search.Peek2(16)==0x5838 && Ac3_EMDF_Test(Search))
@@ -1924,6 +2097,7 @@ void File_Ac3::Core_Frame()
     int8u  strmtyp=0, substreamid=0, acmod=0, bsmod=0, dsurmod=0;
     bool   compre=false, compr2e=false, dynrnge=false, dynrng2e=false;
     bool   lfeon=false, chanmape=false;
+    bool   addbsie;
 
     if (bsid<=0x09)
     {
@@ -2084,7 +2258,6 @@ void File_Ac3::Core_Frame()
                     Get_S2(16, chanmap,                             "chanmap"); Param_Info1(AC3_chanmap_ChannelPositions(chanmap));
                 TEST_SB_END();
             }
-            /* Not finished, for reference only
             TEST_SB_SKIP(                                           "mixmdate");
                 int8u dmixmod, ltrtcmixlev, lorocmixlev, ltrtsurmixlev, lorosurmixlev, mixdef;
                 if(acmod > 0x2)
@@ -2198,7 +2371,7 @@ void File_Ac3::Core_Frame()
                         {
                             int8u blkmixcfginfo;
                             Get_S1 (5, blkmixcfginfo,               "blkmixcfginfo[0]");
-                            aud_blks[0].blkmixcfginfo = blkmixcfginfo;
+                            //aud_blks[0].blkmixcfginfo = blkmixcfginfo;
                         }
                         else
                         {
@@ -2208,7 +2381,7 @@ void File_Ac3::Core_Frame()
                                 TEST_SB_SKIP(                       "blkmixcfginfoe");
                                     int8u blkmixcfginfo;
                                     Get_S1 (5, blkmixcfginfo,       "blkmixcfginfo[x]");
-                                    aud_blks[blk].blkmixcfginfo = blkmixcfginfo;
+                                    //aud_blks[blk].blkmixcfginfo = blkmixcfginfo;
                                 TEST_SB_END();
                             }
                         }
@@ -2258,14 +2431,21 @@ void File_Ac3::Core_Frame()
                     Get_S1(6, frmsizecod,                           "frmsizecod");
             }
 
-            TEST_SB_SKIP(                                           "addbsie");
+            TEST_SB_GET (addbsie,                                   "addbsie");
                 int8u addbsil;
                 Get_S1 (6, addbsil,                                 "addbsil");
-                size_t addbsilen = (addbsil + 1) * 8;
-                Skip_BS(addbsilen,                                  "addbsi");
+                if (addbsil+1!=addbsi_Buffer_Size)
+                {
+                    delete[] addbsi_Buffer;
+                    addbsi_Buffer_Size=addbsil+1;
+                    addbsi_Buffer=new int8u[addbsi_Buffer_Size];
+                }
+                for (int8u Pos=0; Pos<=addbsil; Pos++) //addbsil+1 bytes
+                    Get_S1 (8, addbsi_Buffer[Pos],                  "addbsi");
             TEST_SB_END();
         Element_End0();
 
+        /* Not finished, for reference only
         int8u numblks = numblkscod == 3 ? 6 : (numblkscod + 1);
 
         Element_Begin1("audfrm");
@@ -3353,8 +3533,6 @@ void File_Ac3::Core_Frame()
                 Element_End0();
             }
             //*/
-
-        Element_End0();
     }
     else
         Skip_XX(Element_Size-Element_Offset,                        "Unknown");
@@ -3375,6 +3553,11 @@ void File_Ac3::Core_Frame()
             else if (Data_BS_Remain()>BitsAtEnd)
                 Skip_BS(Data_BS_Remain()-BitsAtEnd,                 bsid<=0x0A?"(Unparsed audblk(continue)+5*audblk+padding)":"(Unparsed bsi+6*audblk+padding)");
             Element_Begin1("auxdata");
+                if (auxdatal!=(int16u)-1)
+                {
+                    Skip_BS(auxdatal,                               "auxbits");
+                    Skip_S2(14,                                     "auxdatal");
+                }
                 Skip_SB(                                            "auxdatae");
             Element_End0();
             Element_Begin1("errorcheck");
@@ -3384,21 +3567,24 @@ void File_Ac3::Core_Frame()
             Element_End0();
         }
         else
-        {
             BS_End();
-            Skip_XX(Element_Size-Element_Offset,                    "Unknown");
-        }
 
-        if (bsid>0x0A) //E-AC-3 only
-        {
-            //true Element_Size is back
-            Element_Size=Element_Size_Save;
-        }
+        if (Element_Offset<Element_Size)
+            Skip_XX(Element_Size-Element_Offset,                    "Unknown");
+        Element_Size=Element_Size_Save;
     }
 
     FILLING_BEGIN();
         if (bsid>0x10)
             return; //Not supported
+
+        Formats[bsid<=0x09?0:1]++;
+
+        // addbsi
+        if (!joc_num_objects_map.empty() && addbsie && addbsi_Buffer_Size >= 2 && (addbsi_Buffer[0]&0x01))
+        {
+            joc_complexity_index_Stream = addbsi_Buffer[1];
+        }
 
         //Information
         if (strmtyp>1)
@@ -3411,7 +3597,7 @@ void File_Ac3::Core_Frame()
         //Specific to first frame
         if (Frame_Count==0)
         {
-            frmsizplus1_Max[substreamid_Independant_Current][strmtyp+substreamid]=frmsiz+1;
+            frmsizplus1_Max[substreamid_Independant_Current][strmtyp+substreamid]=((bsid<=0x09)?(frmsizecod/2<19?AC3_BitRate[frmsizecod/2]*4:0):((frmsiz+1)*2));
             acmod_Max[substreamid_Independant_Current][strmtyp+substreamid]=acmod;
             lfeon_Max[substreamid_Independant_Current][strmtyp+substreamid]=lfeon;
             bsmod_Max[substreamid_Independant_Current][strmtyp+substreamid]=bsmod;
@@ -3457,6 +3643,11 @@ void File_Ac3::Core_Frame()
 //---------------------------------------------------------------------------
 void File_Ac3::emdf()
 {
+    //JOC reinit
+    joc_complexity_index_Stream=(int8u)-1;
+    num_dynamic_objects=(int8u)-1;
+    nonstd_bed_channel_assignment_mask=(int32u)-1;
+
     Element_Begin1("emdf");
     emdf_sync();
     emdf_container();
@@ -3660,11 +3851,12 @@ void File_Ac3::object_audio_metadata_payload()
 
     int8u object_count_bits;
     Get_S1 (5, object_count_bits,                               "object_count_bits");
+    num_dynamic_objects = object_count_bits + 1;
     if (object_count_bits == 0x1F)
     {
         int8u object_count_bits_ext;
         Get_S1 (7, object_count_bits_ext,                       "object_count_bits_ext");
-        object_count_bits += object_count_bits_ext;
+        num_dynamic_objects += object_count_bits_ext;
     }
 
     program_assignment();
@@ -3682,7 +3874,14 @@ void File_Ac3::program_assignment()
     Get_SB (b_dyn_object_only_program,                          "b_dyn_object_only_program");
     if (b_dyn_object_only_program)
     {
-        Skip_SB(                                                "b_lfe_present");
+        bool b_lfe_present;
+        Get_SB (b_lfe_present,                                  "b_lfe_present");
+        if (b_lfe_present)
+        {
+            nonstd_bed_channel_assignment_mask=(1<<3);
+            if (num_dynamic_objects!=(int8u)-1)
+                num_dynamic_objects--;
+        }
     }
     else
     {
@@ -3712,9 +3911,13 @@ void File_Ac3::program_assignment()
                     bool b_standard_chan_assign;
                     Get_SB (b_standard_chan_assign,             "b_standard_chan_assign");
                     if (b_standard_chan_assign)
-                        Skip_S2(10,                             "bed_channel_assignment_mask");
+                    {
+                        int16u bed_channel_assignment_mask;
+                        Get_S2 (10, bed_channel_assignment_mask, "bed_channel_assignment_mask");
+                        nonstd_bed_channel_assignment_mask=AC3_bed_channel_assignment_mask_2_nonstd(bed_channel_assignment_mask);
+                    }
                     else
-                        Skip_S3(17,                             "nonstd_bed_channel_assignment_mask");
+                        Get_S3 (17, nonstd_bed_channel_assignment_mask, "nonstd_bed_channel_assignment_mask");
                 }
                 Element_End0();
             }
@@ -3726,14 +3929,17 @@ void File_Ac3::program_assignment()
         if (content_description_mask & 0x4)
         {
             int8u num_dynamic_objects_bits;
-            Get_S1 (5, num_dynamic_objects_bits,                "num_dynamic_objects_bits");
+            Get_S1(5, num_dynamic_objects_bits,                 "num_dynamic_objects_bits");
             if (num_dynamic_objects_bits == 0x1F)
             {
                 int8u num_dynamic_objects_bits_ext = 0;
                 Get_S1 (7, num_dynamic_objects_bits_ext,        "num_dynamic_objects_bits_ext");
                 num_dynamic_objects_bits += num_dynamic_objects_bits_ext;
             }
+            num_dynamic_objects = num_dynamic_objects_bits + 1;
         }
+        else
+            num_dynamic_objects = 0;
 
         if (content_description_mask & 0x8)
         {
@@ -3844,21 +4050,28 @@ void File_Ac3::HD()
         CRC_16^=LittleEndian2int16u(Buffer+Buffer_Offset+24);
         */
 
-        Element_Begin1("MajorSync");
-        Skip_B3(                                                "Synch");
-        Get_B1 (HD_StreamType,                                  "Stream type"); Param_Info1(AC3_HD_StreamType(HD_StreamType));
+        Element_Begin1("format_sync");
+        int32u format_sync;
+        Get_B4(format_sync,                                     "format_sync");
+        HD_StreamType=(int8u)format_sync; Param_Info1(AC3_HD_StreamType(HD_StreamType));
 
         if (HD_StreamType==0xBA)
         {
+            Element_Begin1("format_info");
             BS_Begin();
-            Get_S1 ( 4, HD_SamplingRate1,                       "Sampling rate"); Param_Info2(AC3_HD_SamplingRate(HD_SamplingRate1), " Hz");
-            Skip_S1( 8,                                         "Unknown");
-            Get_S1 ( 5, HD_Channels1,                           "Channels (1st substream)"); Param_Info1(AC3_TrueHD_Channels(HD_Channels1)); Param_Info1(Ztring().From_Local(AC3_TrueHD_Channels_Positions(HD_Channels1)));
-            Skip_S1( 2,                                         "Unknown");
-            Get_S2 (13, HD_Channels2,                           "Channels (2nd substream)"); Param_Info1(AC3_TrueHD_Channels(HD_Channels2)); Param_Info1(Ztring().From_Local(AC3_TrueHD_Channels_Positions(HD_Channels2)));
+            Get_S1 ( 4, HD_SamplingRate1,                       "audio_sampling_frequency"); Param_Info2(AC3_HD_SamplingRate(HD_SamplingRate1), " Hz");
+            Skip_SB(                                            "6ch_multichannel_type");
+            Skip_SB(                                            "8ch_multichannel_typ");
+            Skip_S1( 2,                                         "reserved");
+            Skip_S1( 2,                                         "2ch_presentation_channel_modifier");
+            Skip_S1( 2,                                         "6ch_presentation_channel_modifier");
+            Get_S1 ( 5, HD_Channels1,                           "6ch_presentation_channel_assignment"); Param_Info1(AC3_TrueHD_Channels(HD_Channels1)); Param_Info1(Ztring().From_Local(AC3_TrueHD_Channels_Positions(HD_Channels1)));
+            Skip_S1( 2,                                         "8ch_presentation_channel_modifier");
+            Get_S2 (13, HD_Channels2,                           "8ch_presentation_channel_assignment"); Param_Info1(AC3_TrueHD_Channels(HD_Channels2)); Param_Info1(Ztring().From_Local(AC3_TrueHD_Channels_Positions(HD_Channels2)));
             BS_End();
             HD_Resolution2=HD_Resolution1=24; //Not sure
             HD_SamplingRate2=HD_SamplingRate1;
+            Element_End0();
         }
         else if (HD_StreamType==0xBB)
         {
@@ -3878,47 +4091,64 @@ void File_Ac3::HD()
             return;
         }
 
-        Skip_B6(                                                "Unknown");
+        Skip_B2(                                                "signature");
+        Skip_B2(                                                "flags");
+        Skip_B2(                                                "reserved");
         BS_Begin();
-        Get_SB (    HD_IsVBR,                                   "Is VBR");
-        Get_S2 (15, HD_BitRate_Max,                             "Maximum bitrate"); Param_Info2((HD_BitRate_Max*(AC3_HD_SamplingRate(HD_SamplingRate2)?AC3_HD_SamplingRate(HD_SamplingRate2):AC3_HD_SamplingRate(HD_SamplingRate1))+8)>>4, " bps");
-        Get_S1 ( 4, HD_SubStreams_Count,                        "SubStreams_Count");
-        Skip_S1( 4,                                             "Unknown");
-        BS_End();
-        Skip_B1(                                                "Unknown");
-        Skip_B1(                                                "Unknown");
-        Skip_B1(                                                "Unknown");
-        Skip_B1(                                                "Unknown");
-        Skip_B1(                                                "Unknown");
-        Skip_B1(                                                "Unknown");
-        Skip_B1(                                                "Unknown");
-        Skip_B1(                                                "Unknown");
-        BS_Begin();
-        Skip_S1( 7,                                             "Unknown");
-        bool HasExtend;
-        Get_SB (    HasExtend,                                  "Has Extend");
-        BS_End();
-        if (HasExtend)
+        Get_SB (    HD_IsVBR,                                   "variable_rate");
+        Get_S2 (15, HD_BitRate_Max,                             "peak_data_rate"); Param_Info2((HD_BitRate_Max*(AC3_HD_SamplingRate(HD_SamplingRate2)?AC3_HD_SamplingRate(HD_SamplingRate2):AC3_HD_SamplingRate(HD_SamplingRate1))+8)>>4, " bps");
+        Get_S1 ( 4, HD_SubStreams_Count,                        "substreams");
+        Skip_S1( 2,                                             "reserved");
+        Skip_S1( 2,                                             "extended_substream_info");
+        if (HD_StreamType==0xBA)
         {
-            unsigned char Extend = 0;
-            unsigned char Unknown = 0;
-            bool HasContent = false;
-            BS_Begin();
-            Get_S1( 4, Extend,                                  "Extend Header");
-            Get_S1( 4, Unknown,                                 "Unknown");
-            if (Unknown)
-                HasContent = true;
+            Element_Begin1("substream_info");
+                Get_SB (    HD_HasAtmos,                        "16-channel presentation is present");
+                Skip_S1(3,                                      "8-ch presentation");
+                Skip_S1(2,                                      "6-ch presentation");
+                Skip_S1(2,                                      "reserved");
+            Element_End0();
             BS_End();
-            for (Extend = (Extend * 2) + 1; Extend > 0; Extend--)
-            {
-                Get_B1(Unknown,                                 "Unknown");
-                if (Unknown)
-                    HasContent = true;
-            }
-            if (HasContent)
-                HD_HasAtmos=true; //Currently only Atmos is known as having data here
+            Element_Begin1("channel_meaning");
+                Skip_B1(                                        "Unknown");
+                Skip_B1(                                        "Unknown");
+                Skip_B1(                                        "Unknown");
+                Skip_B1(                                        "Unknown");
+                Skip_B1(                                        "Unknown");
+                Skip_B1(                                        "Unknown");
+                Skip_B1(                                        "Unknown");
+                BS_Begin();
+                Skip_S1( 7,                                     "Unknown");
+                bool HasExtend;
+                Get_SB (    HasExtend,                          "extra_channel_meaning_present");
+                BS_End();
+                if (HasExtend)
+                {
+                    unsigned char Extend = 0;
+                    unsigned char Unknown = 0;
+                    bool HasContent = false;
+                    BS_Begin();
+                    Get_S1( 4, Extend,                          "extra_channel_meaning_length");
+                    size_t After=(((size_t)Extend)+1)*16-4;
+                    if (After>=Data_BS_Remain())
+                        After=0;
+                    else
+                        After=Data_BS_Remain()-After;
+                    if (HD_HasAtmos)
+                    {
+                        Element_Begin1("16ch_channel_meaning");
+                        Skip_S1(5,                              "16ch_dialogue_norm");
+                        Skip_S1(6,                              "16ch_mix_level");
+                        Get_S1 (5, num_dynamic_objects,         "16ch_channel_count");
+                        num_dynamic_objects++;
+                        program_assignment();
+                        Element_End0();
+                    }
+                    if (Data_BS_Remain()>After)
+                        Skip_BS(Data_BS_Remain()-After,         "Unknown");
+                }
+            Element_End0();
         }
-
         Element_End0();
 
         FILLING_BEGIN();
@@ -4038,27 +4268,34 @@ void File_Ac3::HD()
 //---------------------------------------------------------------------------
 void File_Ac3::TimeStamp()
 {
+    // Format looks like a Sync word 0x0110 then SMPTE ST 339 Time stamp
+    
     //Parsing
-    int8u H1, H2, M1, M2, S1, S2, F1, F2;
-    Skip_B1(                                                    "Magic value");
-    Skip_B1(                                                    "Size?");
+    int8u H1, H2, M1, M2, S1, S2, F1, F2, FrameRate;
+    bool DropFrame;
+    Skip_B2(                                                    "Sync word");
     BS_Begin();
-    Skip_S1(8,                                                  "H");
-    Get_S1 (4, H1,                                              "H");
-    Get_S1( 4, H2,                                              "H");
-    Skip_S1(8,                                                  "M");
-    Get_S1 (4, M1,                                              "M");
-    Get_S1( 4, M2,                                              "M");
-    Skip_S1(8,                                                  "S");
-    Get_S1 (4, S1,                                              "S");
-    Get_S1( 4, S2,                                              "S");
-    Skip_S1(8,                                                  "F");
-    Get_S1 (4, F1,                                              "F");
-    Get_S1( 4, F2,                                              "F");
+    Skip_S2(10,                                                 "H");
+    Get_S1 ( 2, H1,                                             "H");
+    Get_S1 ( 4, H2,                                             "H");
+    Skip_S2( 9,                                                 "M");
+    Get_S1 ( 3, M1,                                             "M");
+    Get_S1 ( 4, M2,                                             "M");
+    Skip_S2( 9,                                                 "S");
+    Get_S1 ( 3, S1,                                             "S");
+    Get_S1 ( 4, S2,                                             "S");
+    Skip_S2( 9,                                                 "F");
+    Get_SB (    DropFrame,                                      "Drop frame");
+    Get_S1 ( 2, F1,                                             "F");
+    Get_S1 ( 4, F2,                                             "F");
+    Skip_S2(16,                                                 "Sample number");
+    Skip_S2( 9,                                                 "Unknown");
+    Skip_SB(                                                    "Status");
+    Get_S1 ( 4, FrameRate,                                      "Frame rate"); Param_Info1(Mpegv_frame_rate[FrameRate]);
+    Skip_SB(                                                    "Status");
+    Skip_SB(                                                    "Drop frame");
     BS_End();
-    Skip_B2(                                                    "Unknown");
-    Skip_B2(                                                    "Unknown");
-    Skip_B2(                                                    "Unknown (fixed)");
+    Skip_B2(                                                    "User private");
 
     FILLING_BEGIN();
         float64 Temp=H1*10*60*60
@@ -4066,41 +4303,23 @@ void File_Ac3::TimeStamp()
                    + M1   *10*60
                    + M2      *60
                    + S1      *10
-                   + S2
-                   + (F1*10+F2)/29.97; //No idea about where is the frame rate
+                   + S2;
+        if (Mpegv_frame_rate[FrameRate])
+            Temp+=(F1*10+F2)/Mpegv_frame_rate[FrameRate];
         #ifdef MEDIAINFO_TRACE
-            Element_Info1(Ztring::ToZtring(H1)+Ztring::ToZtring(H2)+__T(':')
+           Element_Info1(Ztring::ToZtring(H1)+Ztring::ToZtring(H2)+__T(':')
                        + Ztring::ToZtring(M1)+Ztring::ToZtring(M2)+__T(':')
-                       + Ztring::ToZtring(S1)+Ztring::ToZtring(S2)+__T(':')
+                       + Ztring::ToZtring(S1)+Ztring::ToZtring(S2)+(DropFrame?__T(';'):__T(':'))
                        + Ztring::ToZtring(F1)+Ztring::ToZtring(F2));
         #endif //MEDIAINFO_TRACE
         if (Frame_Count==0)
+        {
             TimeStamp_Content=Temp;
+            TimeStamp_DropFrame_IsValid=true;
+            TimeStamp_DropFrame_Content=DropFrame;
+        }
         TimeStamp_IsParsing=false;
         TimeStamp_Parsed=true;
-
-        if (!TimeStamp_DropFrame_IsValid && M2 && !S2 && !S1 && !F1)
-        {
-            //If drop frame configuration, frames 0 and 1 are dropped for every minutes except 00 10 20 30 40 50
-            switch (F2)
-            {
-                case 0 :
-                case 1 :
-                            TimeStamp_DropFrame_IsValid=true;
-                            TimeStamp_DropFrame_Content=false;
-                            break;
-                case 2 :
-                            if (Frame_Count>=2)
-                            {
-                                TimeStamp_DropFrame_IsValid=true;
-                                TimeStamp_DropFrame_Content=true;
-                            }
-                default:    ;
-            }
-
-            if (TimeStamp_DropFrame_IsValid)
-                Frame_Count_Valid=32; //Reset
-        }
     FILLING_END();
 }
 
@@ -4135,6 +4354,8 @@ void File_Ac3::dec3()
         int8u num_dep_sub;
         Get_S1 (2, fscod,                                       "fscod");
         Get_S1 (5, bsid,                                        "bsid");
+        Skip_SB(                                                "reserved");
+        Skip_SB(                                                "asvc");
         Get_S1 (3, bsmod_Max[Pos][0],                           "bsmod");
         Get_S1 (3, acmod_Max[Pos][0],                           "acmod");
         Get_SB (   lfeon_Max[Pos][0],                           "lfeon");
@@ -4146,7 +4367,16 @@ void File_Ac3::dec3()
             Skip_SB(                                            "reserved");
         Element_End0();
     }
+    if (Data_BS_Remain())
+    {
+        Skip_S1( 7,                                             "reserved");
+        TEST_SB_SKIP(                                           "flag_ec3_extension_type_joc");
+            Get_S1 ( 8, joc_complexity_index_Container,         "joc_complexity_index");
+        TEST_SB_END();
+    }
     BS_End();
+    if (Element_Offset<Element_Size)
+        Skip_XX(Element_Size-Element_Offset,                    "reserved");
 
     MustParse_dec3=false;
     dxc3_Parsed=true;
@@ -4206,7 +4436,8 @@ bool File_Ac3::FrameSynchPoint_Test()
         }
         if (Size>=6)
         {
-            if (Buffer_Offset+Size>Buffer_Size)
+            size_t Size_Total=Core_Size_Get();
+            if (Element_IsWaitingForMoreData())
                 return false; //Need more data
 
             Save_Buffer=Buffer;
@@ -4214,15 +4445,15 @@ bool File_Ac3::FrameSynchPoint_Test()
             Save_Buffer_Size=Buffer_Size;
 
             {
-                int8u* Buffer_Little=new int8u[Size];
-                for (size_t Pos=0; Pos+1<Size; Pos+=2)
+                int8u* Buffer_Little=new int8u[Size_Total];
+                for (size_t Pos=0; Pos+1<Size_Total; Pos+=2)
                 {
                     Buffer_Little[Pos+1]=Save_Buffer[Buffer_Offset+Pos  ];
                     Buffer_Little[Pos  ]=Save_Buffer[Buffer_Offset+Pos+1];
                 }
                 Buffer=Buffer_Little;
                 Buffer_Offset=0;
-                Buffer_Size=Size;
+                Buffer_Size=Size_Total;
 
                 Synched=CRC_Compute(Size);
 
@@ -4322,12 +4553,14 @@ bool File_Ac3::CRC_Compute(size_t Size)
 //---------------------------------------------------------------------------
 size_t File_Ac3::Core_Size_Get()
 {
+    bool IsLE=(Buffer[Buffer_Offset+0]==0x77);
+
     int16u Size=1;
-    bsid=(Buffer[(size_t)(Buffer_Offset+5)]&0xF8)>>3;
+    bsid=(Buffer[(size_t)(Buffer_Offset+5-IsLE)]&0xF8)>>3;
     if (bsid<=0x09)
     {
-        fscod     =(Buffer[(size_t)(Buffer_Offset+4)]&0xC0)>>6;
-        frmsizecod= Buffer[(size_t)(Buffer_Offset+4)]&0x3F;
+        fscod     =(Buffer[(size_t)(Buffer_Offset+4+IsLE)]&0xC0)>>6;
+        frmsizecod= Buffer[(size_t)(Buffer_Offset+4+IsLE)]&0x3F;
 
         //Filling
         fscods[fscod]++;
@@ -4336,40 +4569,42 @@ size_t File_Ac3::Core_Size_Get()
     }
     else if (bsid>0x0A && bsid<=0x10)
     {
-        int16u frmsiz    =((int16u)(Buffer[(size_t)(Buffer_Offset+2)]&0x07)<<8)
-                        | (         Buffer[(size_t)(Buffer_Offset+3)]         );
+        int16u frmsiz    =((int16u)(Buffer[(size_t)(Buffer_Offset+2+IsLE)]&0x07)<<8)
+                        | (         Buffer[(size_t)(Buffer_Offset+3-IsLE)]         );
 
         //Filling
         Size=2+frmsiz*2;
+    }
 
         substreams_Count=0;
         int8u substreams_Count_Independant=0;
         int8u substreams_Count_Dependant=0;
+
         for (;;)
         {
             if (Buffer_Offset+Size+6>Buffer_Size)
             {
-                if (!IsSub && !Save_Buffer)
+                if (!IsSub && !Save_Buffer && File_Offset+Buffer_Offset+Size<File_Size)
                     Element_WaitForMoreData();
                 break;
             }
 
-            int8u bsid=Buffer[Buffer_Offset+Size+5]>>3;
+            int8u bsid=Buffer[Buffer_Offset+Size+5-IsLE]>>3;
             if (bsid<=0x09 || bsid>0x10)
                 break; //Not E-AC-3
 
-            int8u substreamid=(Buffer[Buffer_Offset+Size+2]>>3)&0x07;
+            int8u substreamid=(Buffer[Buffer_Offset+Size+2+IsLE]>>3)&0x07;
             if (substreamid!=substreams_Count_Independant)
                 break; //Problem
             if (substreamid!=substreams_Count_Dependant)
                 break; //Problem
 
-            int8u strmtyp = Buffer[Buffer_Offset + Size + 2] >> 6;
+            int8u strmtyp = Buffer[Buffer_Offset+Size+2+IsLE]>>6;
             if (substreamid==0 && strmtyp==0)
                 break; //Next block
 
-            frmsiz    =((int16u)(Buffer[(size_t)(Buffer_Offset+Size+2)]&0x07)<<8)
-                     | (         Buffer[(size_t)(Buffer_Offset+Size+3)]         );
+            int16u frmsiz =((int16u)(Buffer[(size_t)(Buffer_Offset+Size+2+IsLE)]&0x07)<<8)
+                          | (         Buffer[(size_t)(Buffer_Offset+Size+3-IsLE)]         );
 
             //Filling
             Size+=2+frmsiz*2;
@@ -4383,7 +4618,6 @@ size_t File_Ac3::Core_Size_Get()
                 substreams_Count_Dependant++;
             substreams_Count++;
         }
-    }
 
     return Size;
 }
@@ -4408,7 +4642,7 @@ void File_Ac3::Get_V4(int8u  Bits, int32u  &Info, const char* Name)
             int8u Count = 0;
             do
             {
-                Info += BS->Get1(Bits);
+                Info += BS->Get4(Bits);
                 Count += Bits;
             }
             while (BS->GetB());
@@ -4419,7 +4653,7 @@ void File_Ac3::Get_V4(int8u  Bits, int32u  &Info, const char* Name)
     #endif //MEDIAINFO_TRACE
         {
             do
-                Info += BS->Get1(Bits);
+                Info += BS->Get4(Bits);
             while (BS->GetB());
         }
 }
@@ -4434,7 +4668,7 @@ void File_Ac3::Skip_V4(int8u  Bits, const char* Name)
             int8u Count = 0;
             do
             {
-                Info += BS->Get1(Bits);
+                Info += BS->Get4(Bits);
                 Count += Bits;
             }
             while (BS->GetB());

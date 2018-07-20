@@ -3594,6 +3594,8 @@ void File_Riff::WAVE_bext()
         Get_Local(Element_Size-Element_Offset, History,         "History");
 
     FILLING_BEGIN();
+        Fill(Stream_General, 0, "bext_Present", "Yes");
+        Fill_SetOptions(Stream_General, 0, "bext_Present", "N NT");
         Fill(Stream_General, 0, General_Description, Description);
         Fill(Stream_General, 0, General_Producer, Originator);
         Fill(Stream_General, 0, "Producer_Reference", OriginatorReference);

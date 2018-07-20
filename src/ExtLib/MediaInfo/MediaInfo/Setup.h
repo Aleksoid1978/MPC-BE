@@ -695,6 +695,12 @@
 #if !defined(MEDIAINFO_AUDIO_NO) && !defined(MEDIAINFO_DOLBYE_NO) && !defined(MEDIAINFO_DOLBYE_YES)
     #define MEDIAINFO_DOLBYE_YES
 #endif
+#if !defined(MEDIAINFO_AUDIO_NO) && !defined(MEDIAINFO_DSF_NO) && !defined(MEDIAINFO_DSF_YES)
+    #define MEDIAINFO_DSF_YES
+#endif
+#if !defined(MEDIAINFO_AUDIO_NO) && !defined(MEDIAINFO_DSDIFF_NO) && !defined(MEDIAINFO_DSDIFF_YES)
+    #define MEDIAINFO_DSDIFF_YES
+#endif
 #if !defined(MEDIAINFO_AUDIO_NO) && !defined(MEDIAINFO_DTS_NO) && !defined(MEDIAINFO_DTS_YES)
     #define MEDIAINFO_DTS_YES
 #endif

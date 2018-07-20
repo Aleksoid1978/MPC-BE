@@ -231,7 +231,7 @@ void File_VorbisCom::Data_Parse()
         else if (Key==__T("DISC"))                   Fill(StreamKind_Common,   0, "Part", Value, true);
         else if (Key==__T("DISCID"))                 {}
         else if (Key==__T("DISCNUMBER"))             Fill(StreamKind_Common,   0, "Part", Value, true);
-        else if (Key==__T("DISCTOTAL"))              Fill(StreamKind_Common,   0, "Part/Position_Total", Value);
+        else if (Key==__T("DISCTOTAL"))              {if (Value!=Retrieve(StreamKind_Common, 0, "Part/Position_Total")) Fill(StreamKind_Common,   0, "Part/Position_Total", Value);}
         else if (Key==__T("ENCODEDBY"))              Fill(StreamKind_Common,   0, "EncodedBy", Value);
         else if (Key==__T("ENCODED-BY"))             Fill(StreamKind_Common,   0, "EncodedBy", Value);
         else if (Key==__T("ENCODER"))                Fill(StreamKind_Common,   0, "Encoded_Application", Value);
@@ -265,11 +265,11 @@ void File_VorbisCom::Data_Parse()
         else if (Key==__T("REPLAYGAIN_TRACK_GAIN"))  Fill(StreamKind_Specific, 0, "ReplayGain_Gain",       Value.To_float64(), 2);
         else if (Key==__T("REPLAYGAIN_TRACK_PEAK"))  Fill(StreamKind_Specific, 0, "ReplayGain_Peak",       Value.To_float64(), 6);
         else if (Key==__T("TITLE"))                  Fill(StreamKind_Common,   0, "Title", Value);
-        else if (Key==__T("TOTALTRACKS"))            Fill(StreamKind_Common,   0, "Track/Position_Total", Value);
-        else if (Key==__T("TOTALDISCS"))             Fill(StreamKind_Common,   0, "Part/Position_Total", Value);
+        else if (Key==__T("TOTALTRACKS"))            {if (Value!=Retrieve(StreamKind_Common, 0, "Track/Position_Total")) Fill(StreamKind_Common,   0, "Track/Position_Total", Value);}
+        else if (Key==__T("TOTALDISCS"))             {if (Value!=Retrieve(StreamKind_Common, 0, "Part/Position_Total")) Fill(StreamKind_Common,   0, "Part/Position_Total", Value);}
         else if (Key==__T("TRACK_COMMENT"))          Fill(StreamKind_Multiple, 0, "Comment", Value);
         else if (Key==__T("TRACKNUMBER"))            Fill(StreamKind_Multiple, 0, "Track/Position", Value);
-        else if (Key==__T("TRACKTOTAL"))             Fill(StreamKind_Multiple, 0, "Track/Position_Total", Value);
+        else if (Key==__T("TRACKTOTAL"))             {if (Value!=Retrieve(StreamKind_Common, 0, "Track/Position_Total")) Fill(StreamKind_Multiple, 0, "Track/Position_Total", Value);}
         else if (Key==__T("VERSION"))                Fill(StreamKind_Common,   0, "Track_More", Value);
         else if (Key==__T("BPM"))                    Fill(StreamKind_Common,   0, "BPM", Value);
         else if (Key==__T("WAVEFORMATEXTENSIBLE_CHANNEL_MASK"))

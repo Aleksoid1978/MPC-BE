@@ -522,6 +522,7 @@ enum video
     Video_DolbyVision_String,
     Video_DolbyVision_Version,
     Video_DolbyVision_Profile,
+    Video_DolbyVision_Level,
     Video_DolbyVision_Layers,
     Video_Format_Settings,
     Video_Format_Settings_BVOP,

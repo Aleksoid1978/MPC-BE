@@ -337,6 +337,14 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
     if (StreamKind>Stream_Max || Parameter==(size_t)-1)
         return;
 
+    //Remove deprecated fields
+    if (!MediaInfoLib::Config.Legacy_Get())
+    {
+        const Ztring& Info=MediaInfoLib::Config.Info_Get(StreamKind, Parameter, Info_Info);
+        if (Info.size()>10 && Info[0]==__T('D') && Info[1]==__T('e') && Info[2]==__T('p') && Info[3]==__T('r') && Info[4]==__T('e') && Info[5]==__T('c') && Info[6]==__T('a') && Info[7]==__T('t') && Info[8]==__T('e') && Info[9]==__T('d'))
+            return;
+    }
+
     //Format_Profile split (see similar code in MediaInfo_Inform.cpp, dedicated to MIXML)
     #if MEDIAINFO_ADVANCED
         if (Parameter==Fill_Parameter(StreamKind, Generic_Format_Profile) && MediaInfoLib::Config.Format_Profile_Split_Get())
@@ -1676,7 +1684,7 @@ void File__Analyze::Video_FrameRate_Rounding(size_t Pos, video Parameter)
     else if (FrameRate>29.940*2 && FrameRate<=29.985*2) FrameRate=29.970*2;
     else if (FrameRate>29.970*2 && FrameRate<=30.030*2) FrameRate=30.000*2;
 
-    if (FrameRate!=FrameRate_Sav)
+    if (std::fabs(FrameRate-FrameRate_Sav) > 0.01)
         Fill(Stream_Video, Pos, Parameter, FrameRate, 3, true);
 }
 

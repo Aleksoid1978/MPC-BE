@@ -49,6 +49,9 @@ const char* Av1_obu_type(int8u obu_type)
         case  0x3 : return "frame_header";
         case  0x4 : return "tile_group";
         case  0x5 : return "metadata";
+        case  0x6 : return "frame";
+        case  0x7 : return "redundant_frame_header";
+        case  0x8 : return "tile_list";
         case  0xF : return "padding";
         default   : return "";
     }
@@ -151,33 +154,37 @@ void File_Av1::Streams_Finish()
 void File_Av1::Header_Parse()
 {
     //Parsing
-    int64u ObuSize = 0;
+    int8u obu_type;
+    bool obu_extension_flag;
+    BS_Begin();
+    Mark_0 ();
+    Get_S1 ( 4, obu_type,                                       "obu_type");
+    Get_SB (    obu_extension_flag,                             "obu_extension_flag");
+    Skip_SB(                                                    "obu_has_size_field");
+    Skip_SB(                                                    "obu_reserved_1bit");
+    if (obu_extension_flag)
+    {
+        Skip_S1(3,                                              "temporal_id");
+        Skip_S1(2,                                              "spatial_id");
+        Skip_S1(3,                                              "extension_header_reserved_3bits");
+    }
+    BS_End();
+
+    int64u obu_size = 0;
     for (int8u i=0; i<8; i++)
     {
         int8u uleb128_byte;
         Get_B1(uleb128_byte,                                    "uleb128_byte");
-        ObuSize|=((uleb128_byte & 0x7f) << (i * 7));
+        obu_size|=((uleb128_byte & 0x7f) << (i * 7));
         if (!(uleb128_byte&0x80))
             break;
     }
 
     FILLING_BEGIN();
-    Header_Fill_Size(Element_Offset+ObuSize);
+    Header_Fill_Size(Element_Offset+obu_size);
     FILLING_END();
 
-    int8u obu_type;
-    BS_Begin();
-    Mark_0 ();
-    Get_S1 ( 4, obu_type,                                   "obu_type");
-    Skip_S1( 2,                                             "obu_reserved_2bits");
-    TEST_SB_SKIP(                                           "obu_extension_flag");
-        Skip_S1(4,                                          "temporal_id");
-        Skip_S1(2,                                          "enhancement_id");
-        Skip_S1(3,                                          "extension_header_reserved_3bits");
-    TEST_SB_END();
-    BS_End();
-
-    if (FrameIsAlwaysComplete && (Element_IsWaitingForMoreData() || Element_Offset+1+ObuSize>=Element_Size))
+    if (FrameIsAlwaysComplete && (Element_IsWaitingForMoreData() || Element_Offset+obu_size>Element_Size))
     {
         // Trashing the remaining bytes, as the the frame is always complete so remaining bytes should not be prepending the next frame
         Buffer_Offset=Buffer_Size;
@@ -222,37 +229,98 @@ void File_Av1::sequence_header()
 {
     //Parsing
     int32u max_frame_width_minus_1, max_frame_height_minus_1;
-    int8u seq_profile, level[4], max_enhancement_layers_cnt, frame_width_bits_minus_1, frame_height_bits_minus_1, seq_force_screen_content_tools, BitDepth, color_primaries, transfer_characteristics, matrix_coefficients;
-    bool seq_choose_screen_content_tools, mono_chrome, color_range, color_description_present_flag, subsampling_x, subsampling_y;
+    int8u seq_profile, seq_level_idx[33], operating_points_cnt_minus_1, buffer_delay_length_minus_1, frame_width_bits_minus_1, frame_height_bits_minus_1, seq_force_screen_content_tools, BitDepth, color_primaries, transfer_characteristics, matrix_coefficients;
+    bool reduced_still_picture_header, seq_tier[33], decoder_model_info_present_flag, seq_choose_screen_content_tools, mono_chrome, color_range, color_description_present_flag, subsampling_x, subsampling_y;
     BS_Begin();
-    Get_S1 ( 2, seq_profile,                                    "seq_profile"); Param_Info1(Av1_seq_profile(seq_profile));
-    Get_S1 ( 4, level[0],                                       "level[0]");
-    Get_S1 ( 2, max_enhancement_layers_cnt,                     "max_enhancement_layers_cnt");
-    for (int8u i=1; i<=max_enhancement_layers_cnt; i++)
-        Get_S1(4, level[i],                                     "level[i]");
+    Get_S1 ( 3, seq_profile,                                    "seq_profile"); Param_Info1(Av1_seq_profile(seq_profile));
+    Skip_SB(                                                    "still_picture");
+    Get_SB (    reduced_still_picture_header,                   "reduced_still_picture_header");
+    if (reduced_still_picture_header)
+    {
+        Get_S1 ( 5, seq_level_idx[0],                           "seq_level_idx[0]");
+        decoder_model_info_present_flag=false;
+        seq_tier[0]=false;
+    }
+    else
+    {
+        TEST_SB_SKIP(                                           "timing_info_present_flag");
+            bool equal_picture_interval;
+            Skip_S4(32,                                         "num_units_in_tick");
+            Skip_S4(32,                                         "time_scale");
+            Get_SB (equal_picture_interval,                     "equal_picture_interval");
+            if (equal_picture_interval)
+                Skip_UE(                                        "num_ticks_per_picture_minus1");
+            TEST_SB_GET (decoder_model_info_present_flag,       "decoder_model_info_present_flag");
+                Get_S1 ( 5, buffer_delay_length_minus_1,        "buffer_delay_length_minus_1");
+                Skip_S4(32,                                     "num_units_in_decoding_tick");
+                Skip_S1( 5,                                     "buffer_removal_time_length_minus_1");
+                Skip_S1( 5,                                     "frame_presentation_time_length_minus_1");
+            TEST_SB_END();
+        TEST_SB_END();
+        Skip_SB(                                                "initial_display_delay_present_flag");
+        Get_S1 ( 5, operating_points_cnt_minus_1,               "operating_points_cnt_minus_1");
+        for (int8u i=0; i<=operating_points_cnt_minus_1; i++)
+        {
+            Element_Begin1("operating_point");
+            Skip_S2(12,                                         "operating_point_idc[i]");
+            Get_S1(5, seq_level_idx[i],                         "seq_level_idx[i]");
+            if (seq_level_idx[i]>7)
+                Get_SB(seq_tier[i],                             "seq_tier[i]");
+            if (decoder_model_info_present_flag)
+            {
+                TEST_SB_SKIP(                                   "decoder_model_present_for_this_op[i]");
+                    Skip_S5(buffer_delay_length_minus_1+1,      "decoder_buffer_delay[op]");
+                    Skip_S5(buffer_delay_length_minus_1+1,      "encoder_buffer_delay[op]");
+                    Skip_SB(                                    "low_delay_mode_flag[op]");
+                TEST_SB_END();
+
+            }
+            Element_End0();
+        }
+    }
     Get_S1 ( 4, frame_width_bits_minus_1,                       "frame_width_bits_minus_1");
     Get_S1 ( 4, frame_height_bits_minus_1,                      "frame_height_bits_minus_1");
     Get_S4 (frame_width_bits_minus_1+1, max_frame_width_minus_1, "max_frame_width_minus_1");
     Get_S4 (frame_height_bits_minus_1+1, max_frame_height_minus_1, "max_frame_height_minus_1");
-    TEST_SB_SKIP(                                               "frame_id_numbers_present_flag");
-        Skip_S1(4,                                              "delta_frame_id_length_minus2");
-        Skip_S1(3,                                              "frame_id_length_minus1");
-    TEST_SB_END();
+    if (!reduced_still_picture_header)
+    {
+        TEST_SB_SKIP(                                           "frame_id_numbers_present_flag");
+            Skip_S1(4,                                          "delta_frame_id_length_minus2");
+            Skip_S1(3,                                          "frame_id_length_minus1");
+        TEST_SB_END();
+    }
     Skip_SB(                                                    "use_128x128_superblock");
     Skip_SB(                                                    "enable_dual_filter");
-    Skip_SB(                                                    "enable_jnt_comp");
-    Get_SB (seq_choose_screen_content_tools,                    "seq_choose_screen_content_tools");
-    if (seq_choose_screen_content_tools)
-        seq_force_screen_content_tools=2;
-    else
-        Get_S1 (1, seq_force_screen_content_tools,              "seq_force_screen_content_tools");
-    if (seq_force_screen_content_tools)
+    Skip_SB(                                                    "enable_intra_edge_filter");
+    if (!reduced_still_picture_header)
     {
-        bool seq_choose_integer_mv;
-        Get_SB(seq_choose_integer_mv,                           "seq_choose_integer_mv");
-        if (!seq_choose_integer_mv)
-            Skip_S1(1,                                          "seq_force_integer_mv");
+        bool enable_order_hint;
+        Skip_SB(                                                "enable_interintra_compound");
+        Skip_SB(                                                "enable_masked_compound");
+        Skip_SB(                                                "enable_warped_motion");
+        Skip_SB(                                                "enable_dual_filter");
+        TEST_SB_GET (enable_order_hint,                         "enable_order_hint");
+            Skip_SB(                                            "enable_jnt_comp");
+            Skip_SB(                                            "enable_ref_frame_mvs");
+        TEST_SB_END();
+        Get_SB (seq_choose_screen_content_tools,                "seq_choose_screen_content_tools");
+        if (seq_choose_screen_content_tools)
+            seq_force_screen_content_tools=2;
+        else
+            Get_S1 (1, seq_force_screen_content_tools,          "seq_force_screen_content_tools");
+        if (seq_force_screen_content_tools)
+        {
+            bool seq_choose_integer_mv;
+            Get_SB(seq_choose_integer_mv,                       "seq_choose_integer_mv");
+            if (!seq_choose_integer_mv)
+                Skip_S1(1,                                      "seq_force_integer_mv");
+        }
+        if (enable_order_hint)
+            Skip_S1(3,                                          "order_hint_bits_minus_1");
     }
+    Skip_SB(                                                    "enable_superres");
+    Skip_SB(                                                    "enable_cdef");
+    Skip_SB(                                                    "enable_restoration");
     Element_Begin1("color_config");
         bool high_bitdepth;
         Get_SB (high_bitdepth,                                  "high_bitdepth");
@@ -322,15 +390,11 @@ void File_Av1::sequence_header()
         }
         Skip_SB(                                                "separate_uv_delta_q");
     Element_End0();
-    TEST_SB_SKIP(                                               "timing_info_present_flag");
-        bool equal_picture_interval;
-        Skip_S4(32,                                             "num_units_in_tick");
-        Skip_S4(32,                                             "time_scale");
-        Get_SB (equal_picture_interval,                         "equal_picture_interval");
-        //if (equal_picture_interval)
-        //    Skip_UE(                                            "num_ticks_per_picture_minus1");
-    TEST_SB_END();
     Skip_SB(                                                    "film_grain_params_present");
+    Mark_1();
+    if (Data_BS_Remain()<8)
+        while (Data_BS_Remain())
+            Mark_0();
     BS_End();
 
     FILLING_BEGIN_PRECISE();
@@ -338,7 +402,7 @@ void File_Av1::sequence_header()
         {
             if (IsSub)
                 Accept();
-            Fill(Stream_Video, 0, Video_Format_Profile, Ztring().From_UTF8(Av1_seq_profile(seq_profile))+__T("@L")+Ztring().From_Number(level[0]));
+            Fill(Stream_Video, 0, Video_Format_Profile, Ztring().From_UTF8(Av1_seq_profile(seq_profile))+(seq_level_idx[0]==31?Ztring():(__T("@L")+Ztring().From_Number(2+(seq_level_idx[0]>>2))+__T(".")+Ztring().From_Number(seq_level_idx[0]&3))));
             Fill(Stream_Video, 0, Video_Width, max_frame_width_minus_1+1);
             Fill(Stream_Video, 0, Video_Height, max_frame_height_minus_1+1);
             Fill(Stream_Video, 0, Video_BitDepth, BitDepth);

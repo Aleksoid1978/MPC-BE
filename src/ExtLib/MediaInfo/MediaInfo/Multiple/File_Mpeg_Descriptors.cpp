@@ -3184,8 +3184,6 @@ void File_Mpeg_Descriptors::Descriptor_AA()
 //---------------------------------------------------------------------------
 extern const size_t DolbyVision_Profiles_Size;
 extern const char* DolbyVision_Profiles[];
-extern const size_t DolbyVision_Levels_Size;
-extern const char* DolbyVision_Levels[];
 void File_Mpeg_Descriptors::Descriptor_B0()
 {
     //Parsing
@@ -3211,23 +3209,21 @@ void File_Mpeg_Descriptors::Descriptor_B0()
         Complete_Stream->Streams[elementary_PID]->Infos["DolbyVision_Version"]=Summary;
         if (dv_version_major==1)
         {
-            string Profile;
+            string Profile, Level;
             if (dv_profile<DolbyVision_Profiles_Size)
                 Profile+=DolbyVision_Profiles[dv_profile];
             else
-                Profile+=Ztring().From_Number(dv_profile).To_UTF8();
-            if (dv_level)
-            {
-                Profile+='@';
-                if (dv_level<DolbyVision_Levels_Size)
-                    Profile+=DolbyVision_Levels[dv_level];
-                else
-                    Profile+=Ztring().From_Number(dv_level).To_UTF8();
-            }
+                Profile+=Ztring().From_CC1(dv_profile).To_UTF8();
+            Profile+=__T('.');
+            Profile+=Ztring().From_CC1(dv_profile).To_UTF8();
+            Level+=Ztring().From_CC1(dv_level).To_UTF8();
             Complete_Stream->Streams[elementary_PID]->Infos["DolbyVision_Profile"].From_UTF8(Profile);
+            Complete_Stream->Streams[elementary_PID]->Infos["DolbyVision_Level"].From_UTF8(Level);
             Summary+=__T(',');
             Summary+=__T(' ');
             Summary+=Ztring().From_UTF8(Profile);
+            Summary+=__T('.');
+            Summary+=Ztring().From_UTF8(Level);
 
             string Layers;
             if (rpu_present_flag|el_present_flag|bl_present_flag)

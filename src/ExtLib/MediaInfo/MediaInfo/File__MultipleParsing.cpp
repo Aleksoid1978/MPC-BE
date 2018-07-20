@@ -200,6 +200,12 @@
 #if defined(MEDIAINFO_CAF_YES)
     #include "MediaInfo/Audio/File_Caf.h"
 #endif
+#if defined(MEDIAINFO_DSF_YES)
+    #include "MediaInfo/Audio/File_Dsf.h"
+#endif
+#if defined(MEDIAINFO_DSDIFF_YES)
+    #include "MediaInfo/Audio/File_Dsdiff.h"
+#endif
 #if defined(MEDIAINFO_DTS_YES)
     #include "MediaInfo/Audio/File_Dts.h"
 #endif
@@ -588,6 +594,12 @@ File__MultipleParsing::File__MultipleParsing()
     #endif
     #if defined(MEDIAINFO_CAF_YES)
         Parser.push_back(new File_Caf());
+    #endif
+    #if defined(MEDIAINFO_DSF_YES)
+        Parser.push_back(new File_Dsf());
+    #endif
+    #if defined(MEDIAINFO_DSDIFF_YES)
+        Parser.push_back(new File_Dsdiff());
     #endif
     #if defined(MEDIAINFO_DTS_YES)
         Parser.push_back(new File_Dts());

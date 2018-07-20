@@ -2909,7 +2909,7 @@ void File__Analyze::Accept ()
         return;
 
     //In case of buffer interface without filename
-    if (!IsSub && File_Name.empty())
+    if (!IsSub && !Config->File_FileName_Get().empty())
         File_Name=Config->File_FileName_Get();
 
     #if MEDIAINFO_TRACE

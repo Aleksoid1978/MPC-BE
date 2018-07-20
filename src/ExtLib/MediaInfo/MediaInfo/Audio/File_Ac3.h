@@ -31,6 +31,7 @@ public :
 
     //Constructor/Destructor
     File_Ac3();
+    ~File_Ac3();
 
 private :
     //Streams management
@@ -125,16 +126,21 @@ private :
         }
     };
     dolby  FirstFrame_Dolby;
+    int8u* addbsi_Buffer;
+    size_t addbsi_Buffer_Size;
+    int64u Formats[2]; // AC-3 or E-AC-3
     std::vector<int64u> dialnorms;
     std::vector<int64u> comprs;
     std::vector<int64u> dynrngs;
     std::map<int8u, int64u> fscods;
     std::map<int8u, int64u> frmsizecods;
     int64u Frame_Count_HD;
+    int32u nonstd_bed_channel_assignment_mask;
     int16u chanmap_Max[8][9];
     int16u frmsizplus1_Max[8][9];
     int16u HD_BitRate_Max;
     int16u HD_Channels2;
+    int8u  num_dynamic_objects;
     int8u  fscod;
     int8u  fscod2;
     int8u  frmsizecod;
@@ -153,6 +159,9 @@ private :
     int8u  HD_Resolution2;
     int8u  substreamid_Independant_Current;
     int8u  substreams_Count;
+    int8u  joc_complexity_index_Container;
+    int8u  joc_complexity_index_Stream;
+    bool   b_lfe_present;
     bool   lfeon_Max[8][9];
     bool   dxc3_Parsed;
     bool   HD_MajorSync_Parsed;

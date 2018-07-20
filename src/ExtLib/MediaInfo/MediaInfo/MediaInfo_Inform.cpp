@@ -736,9 +736,6 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
     }
 
     Ztring Retour=MediaInfoLib::Config.Inform_Get(Get(StreamKind, 0, __T("StreamKind"), Info_Text));
-    ZtringList Info;
-
-    Info=Stream[StreamKind][StreamPos];
 
     //Special characters
     Retour.FindAndReplace(__T("\\\\"), __T("|SC1|"), 0, Ztring_Recursive);
@@ -780,7 +777,7 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
         size_t Pos=MediaInfoLib::Config.Info_Get(StreamKind).Find(Elements(0));
         if (Pos!=std::string::npos)
         {
-            if (Info(Pos).size()>0)
+            if (Get(StreamKind, StreamPos, Pos).size()>0)
                 Elements_Index=1;
             else
                 Elements_Index=2;
@@ -792,7 +789,7 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
         while (Elements(Elements_Index).SubString(__T("%"), __T("%")).size()>0)
         {
             Ztring ToReplace=Elements(Elements_Index).SubString(__T("%"), __T("%"));
-            Ztring ReplacedBy=Info(MediaInfoLib::Config.Info_Get(StreamKind).Find(ToReplace));
+            Ztring ReplacedBy=Get(StreamKind, StreamPos, ToReplace);
             ToReplace=Ztring(__T("%"))+ToReplace+Ztring(__T("%"));
             Elements(Elements_Index).FindAndReplace(ToReplace, ReplacedBy);
         }
@@ -811,7 +808,7 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
         Ztring ARemplacer=Ztring(__T("[")+Crochets+__T("]"));
         if (ValueToFind_Pos!=Error)
         {
-            Ztring RemplacerPar=Info(ValueToFind_Pos);
+            Ztring RemplacerPar= Get(StreamKind, StreamPos, ValueToFind_Pos);
             if (RemplacerPar.empty())
                 Retour.FindAndReplace(ARemplacer, Ztring());
             else
@@ -819,7 +816,7 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                 //Formate l'interieur
                 Ztring ATraiter=Crochets;
                 Ztring Crochets_ARemplacer=Ztring(__T("%")+ATraiter.SubString(__T("%"), __T("%")))+__T("%");
-                Ztring Crochets_RemplacerPar=Info(MediaInfoLib::Config.Info_Get(StreamKind).Find(ATraiter.SubString(__T("%"), __T("%"))));
+                Ztring Crochets_RemplacerPar=Get(StreamKind, StreamPos, MediaInfoLib::Config.Info_Get(StreamKind).Find(ATraiter.SubString(__T("%"), __T("%"))));
                 ATraiter.FindAndReplace(Crochets_ARemplacer, Crochets_RemplacerPar);
                 Retour.FindAndReplace(ARemplacer, ATraiter);
             }
