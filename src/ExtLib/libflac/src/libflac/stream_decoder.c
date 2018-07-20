@@ -3020,7 +3020,7 @@ FLAC__bool seek_to_absolute_sample_(FLAC__StreamDecoder *decoder, FLAC__uint64 s
 	 * min_blocksize might be zero.
 	 */
 	else if(min_blocksize == max_blocksize && min_blocksize > 0) {
-		/* note there are no () around 'bps/8' to keep precision up since it's an integer calulation */
+		/* note there are no () around 'bps/8' to keep precision up since it's an integer calculation */
 		approx_bytes_per_frame = min_blocksize * channels * bps/8 + 64;
 	}
 	else

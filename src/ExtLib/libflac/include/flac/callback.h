@@ -165,7 +165,7 @@ typedef int (*FLAC__IOCallback_Close) (FLAC__IOHandle handle);
  *  required may be set to NULL.
  *
  *  If the seek requirement for an interface is optional, you can signify that
- *  a data sorce is not seekable by setting the \a seek field to \c NULL.
+ *  a data source is not seekable by setting the \a seek field to \c NULL.
  */
 typedef struct {
 	FLAC__IOCallback_Read read;
