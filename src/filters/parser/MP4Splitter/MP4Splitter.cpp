@@ -279,11 +279,14 @@ static const DWORD GetFourcc(AP4_VisualSampleEntry* vse)
 	case AP4_ATOM_TYPE_M2RA:
 		fourcc = FCC('MAGY');
 		break;
-	case AP4_ATOM_TYPE_VP80:
+	case AP4_ATOM_TYPE_vp08:
 		fourcc = FCC('VP80');
 		break;
-	case AP4_ATOM_TYPE_VP90:
+	case AP4_ATOM_TYPE_vp09:
 		fourcc = FCC('VP90');
+		break;
+	case AP4_ATOM_TYPE_av01:
+		fourcc = FCC('AV01');
 		break;
 	default:
 		fourcc = _byteswap_ulong(type);
@@ -836,10 +839,12 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							FormatTrackName(L"Sorenson", 0);
 						} else if (type == AP4_ATOM_TYPE_CVID) {
 							FormatTrackName(L"Cinepack", 0);
-						} else if (type == AP4_ATOM_TYPE_VP80) {
+						} else if (type == AP4_ATOM_TYPE_vp08) {
 							FormatTrackName(L"VP8", 0);
-						} else if (type == AP4_ATOM_TYPE_VP90) {
+						} else if (type == AP4_ATOM_TYPE_vp09) {
 							FormatTrackName(L"VP9", 0);
+						} else if (type == AP4_ATOM_TYPE_av01) {
+							FormatTrackName(L"AV1", 0);
 						} else if (type == AP4_ATOM_TYPE_Hap1 ||
 								type == AP4_ATOM_TYPE_Hap5 ||
 								type == AP4_ATOM_TYPE_HapA ||
@@ -1262,8 +1267,9 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									}
 								}
 								break;
-							case AP4_ATOM_TYPE_VP80:
-							case AP4_ATOM_TYPE_VP90:
+							case AP4_ATOM_TYPE_vp08:
+							case AP4_ATOM_TYPE_vp09:
+							case AP4_ATOM_TYPE_av01:
 								if (AP4_DataInfoAtom* vpcC = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_VPCC))) {
 									const AP4_DataBuffer* di = vpcC->GetData();
 									if (di->GetDataSize() >= 12) {
