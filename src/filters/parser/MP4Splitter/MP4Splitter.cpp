@@ -1269,7 +1269,6 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								break;
 							case AP4_ATOM_TYPE_vp08:
 							case AP4_ATOM_TYPE_vp09:
-							case AP4_ATOM_TYPE_av01:
 								if (AP4_DataInfoAtom* vpcC = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_VPCC))) {
 									const AP4_DataBuffer* di = vpcC->GetData();
 									if (di->GetDataSize() >= 12) {
