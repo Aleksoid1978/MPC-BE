@@ -1278,9 +1278,28 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										memcpy(extra + 4, di->GetData(), di->GetDataSize());
 
 										mts.clear();
-
 										mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = fourcc);
 										mts.push_back(mt);
+									}
+								}
+								break;
+							case AP4_ATOM_TYPE_av01:
+								if (AP4_DataInfoAtom* av1C = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_AV1C))) {
+									const AP4_DataBuffer* di = av1C->GetData();
+									if (di->GetDataSize() > 5) {
+										const auto& version = di->GetData()[0];
+										if (version != 0) {
+											DLog(L"CMP4SplitterFilter::CreateOutputs() : Unknown AV1 Codec Configuration Box version %d", version);
+										} else {
+											const auto size = di->GetDataSize() - 5;
+											vih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + size);
+											BYTE *extra = (BYTE*)(vih2 + 1);
+											memcpy(extra, di->GetData() + 5, size);
+
+											mts.clear();
+											mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = fourcc);
+											mts.push_back(mt);
+										}
 									}
 								}
 								break;
