@@ -21,6 +21,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <vector>
 
 template <typename T>
 // Clamps the specified value to the specified minimum and maximum range.
@@ -34,6 +35,20 @@ template <typename T, typename D>
 inline T discard(T const& val, T const& lo, T const& hi, D const& def)
 {
 	return (val > hi || val < lo) ? def : val;
+}
+
+template <typename T>
+// If the specified value is out of set, set to default values.
+inline T discard2(T const& val, T const& def, const std::vector<T>& vars)
+{
+	if (val != def) {
+		for (const auto& v : vars) {
+			if (val == v) {
+				return val;
+			}
+		}
+	}
+	return def;
 }
 
 template <typename T>

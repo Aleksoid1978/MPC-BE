@@ -304,7 +304,7 @@ BOOL CPPageVideo::OnApply()
 	s.fD3DFullscreen	= !!m_chkD3DFullscreen.GetCheck();
 	rs.bResetDevice		= !!m_bResetDevice;
 
-	rs.iSurfaceFormat		= GetCurItemData(m_cbDX9SurfaceFormat);
+	rs.iSurfaceFormat	= (D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat);
 	rs.b10BitOutput		= !!m_chk10bitOutput.GetCheck();
 	rs.iEVROutputRange	= m_cbEVROutputRange.GetCurSel();
 
