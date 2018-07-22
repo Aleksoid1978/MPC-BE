@@ -122,7 +122,7 @@ public:
 	bool	bResetDevice;
 
 	// surfaces and resizer
-	int		iSurfaceFormat;
+	D3DFORMAT iSurfaceFormat;
 	bool	b10BitOutput;
 	int		iResizer;
 	int		iDownscaler;
@@ -185,7 +185,7 @@ public:
 class CAffectingRenderersSettings // used in SettingsNeedResetDevice()
 {
 public:
-	int iSurfaceFormat		= D3DFMT_X8R8G8B8;
+	D3DFORMAT iSurfaceFormat = D3DFMT_X8R8G8B8;
 	bool b10BitOutput		= false;
 
 	bool bVSyncAccurate		= false;

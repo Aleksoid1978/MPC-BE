@@ -141,12 +141,11 @@ void CRenderersSettings::Load()
 	sD3DRenderDevice = pApp->GetProfileString(IDS_R_VIDEO, IDS_RS_RENDERDEVICE);
 	GET_OPTION_BOOL(bResetDevice, IDS_RS_RESETDEVICE);
 
-	GET_OPTION_INT(iSurfaceFormat, IDS_RS_SURFACEFORMAT);
+	iSurfaceFormat = (D3DFORMAT)pApp->GetProfileInt(IDS_R_VIDEO, IDS_RS_SURFACEFORMAT, iSurfaceFormat);
 	if (iSurfaceFormat == D3DFMT_A32B32G32R32F) { // is no longer supported, because it is very redundant.
 		iSurfaceFormat = D3DFMT_A16B16G16R16F;
-	}
-	else if (iSurfaceFormat != D3DFMT_X8R8G8B8 && iSurfaceFormat != D3DFMT_A2R10G10B10 && iSurfaceFormat != D3DFMT_A16B16G16R16F) {
-		iSurfaceFormat = D3DFMT_X8R8G8B8;
+	} else {
+		iSurfaceFormat = discard2(iSurfaceFormat, D3DFMT_X8R8G8B8, { D3DFMT_A2R10G10B10 , D3DFMT_A16B16G16R16F });
 	}
 
 	GET_OPTION_BOOL(b10BitOutput, IDS_RS_OUTPUT10BIT);

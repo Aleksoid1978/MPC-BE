@@ -578,9 +578,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	nVolumeStep = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, 5);
 	nVolumeStep = std::clamp(nVolumeStep, 1, 10);
 	nSpeedStep = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPEED_STEP, 0);
-	if (nSpeedStep != 10 && nSpeedStep != 20 && nSpeedStep != 25 && nSpeedStep != 50 && nSpeedStep != 100) {
-		nSpeedStep = 0;
-	}
+	nSpeedStep = discard2(nSpeedStep, 0, { 10, 20, 25, 50, 100 });
 
 	m_VRSettings.Load();
 
@@ -603,9 +601,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fReportFailedPins = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REPORTFAILEDPINS, TRUE);
 
 	iMultipleInst = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, 1);
-	if (iMultipleInst < 0 || iMultipleInst > 2) {
-		iMultipleInst = 1;
-	}
+	iMultipleInst = discard(iMultipleInst, 0, 2, 1);
+
 	iTitleBarTextStyle = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXTSTYLE, 1);
 	bTitleBarTextTitle = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXTTITLE, FALSE);
 	iOnTop = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ONTOP, 0);
