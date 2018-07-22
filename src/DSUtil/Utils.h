@@ -24,15 +24,8 @@
 #include <vector>
 
 template <typename T>
-// Clamps the specified value to the specified minimum and maximum range.
-inline T clamp(T const& val, T const& lo, T const& hi)
-{
-	return (val > hi) ? hi : (val < lo) ? lo : val;
-}
-
-template <typename T, typename D>
 // If the specified value is out of range, set to default values.
-inline T discard(T const& val, T const& lo, T const& hi, D const& def)
+inline T discard(T const& val, T const& def, T const& lo, T const& hi)
 {
 	return (val > hi || val < lo) ? def : val;
 }

@@ -601,7 +601,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fReportFailedPins = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REPORTFAILEDPINS, TRUE);
 
 	iMultipleInst = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, 1);
-	iMultipleInst = discard(iMultipleInst, 0, 2, 1);
+	iMultipleInst = discard(iMultipleInst, 1, 0, 2);
 
 	iTitleBarTextStyle = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXTSTYLE, 1);
 	bTitleBarTextTitle = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXTTITLE, FALSE);
@@ -746,7 +746,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	iAudioTimeShift					= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, 0);
 
 	iBufferDuration					= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, APP_BUFDURATION_DEF);
-	iBufferDuration = discard(iBufferDuration, APP_BUFDURATION_MIN, APP_BUFDURATION_MAX, APP_BUFDURATION_DEF);
+	iBufferDuration = discard(iBufferDuration, APP_BUFDURATION_DEF, APP_BUFDURATION_MIN, APP_BUFDURATION_MAX);
 
 	bAudioMixer				= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOMIXER, FALSE);
 	nAudioMixerLayout		= SPK_STEREO;
@@ -761,11 +761,11 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	bAudioStereoFromDecoder	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOSTEREOFROMDECODER, FALSE);
 	bAudioBassRedirect		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOBASSREDIRECT, FALSE);
 	dAudioCenter_dB			= _wtof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOLEVELCENTER, L"0"));
-	dAudioCenter_dB			= discard(dAudioCenter_dB, APP_AUDIOLEVEL_MIN, APP_AUDIOLEVEL_MAX, 0.0);
+	dAudioCenter_dB			= discard(dAudioCenter_dB, 0.0, APP_AUDIOLEVEL_MIN, APP_AUDIOLEVEL_MAX);
 	dAudioSurround_dB		= _wtof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOLEVELSURROUND, L"0"));
-	dAudioSurround_dB		= discard(dAudioSurround_dB, APP_AUDIOLEVEL_MIN, APP_AUDIOLEVEL_MAX, 0.0);
+	dAudioSurround_dB		= discard(dAudioSurround_dB, 0.0, APP_AUDIOLEVEL_MIN, APP_AUDIOLEVEL_MAX);
 	dAudioGain_dB			= _wtof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, L"0"));
-	dAudioGain_dB			= discard(dAudioGain_dB, APP_AUDIOGAIN_MIN, APP_AUDIOGAIN_MAX, 0.0);
+	dAudioGain_dB			= discard(dAudioGain_dB, 0.0, APP_AUDIOGAIN_MIN, APP_AUDIOGAIN_MAX);
 	bAudioAutoVolumeControl	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, FALSE);
 	bAudioNormBoost			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, TRUE);
 	iAudioNormLevel			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, 75);
@@ -1007,7 +1007,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	fD3DFullscreen	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_D3DFULLSCREEN, FALSE);
 	//fMonitorAutoRefreshRate	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, FALSE);
 	iStereo3DMode	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, STEREO3D_AUTO);
-	iStereo3DMode	= discard(iStereo3DMode, (int)STEREO3D_AUTO, (int)STEREO3D_OVERUNDER, STEREO3D_AUTO);
+	iStereo3DMode	= discard(iStereo3DMode, (int)STEREO3D_AUTO, (int)STEREO3D_AUTO, (int)STEREO3D_OVERUNDER);
 	if (iStereo3DMode == ID_STEREO3D_ROW_INTERLEAVED) {
 		GetRenderersSettings().iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
 	} else {
