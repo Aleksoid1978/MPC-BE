@@ -145,7 +145,7 @@ void CRenderersSettings::Load()
 	if (iSurfaceFormat == D3DFMT_A32B32G32R32F) { // is no longer supported, because it is very redundant.
 		iSurfaceFormat = D3DFMT_A16B16G16R16F;
 	} else {
-		iSurfaceFormat = discard2(iSurfaceFormat, D3DFMT_X8R8G8B8, { D3DFMT_A2R10G10B10 , D3DFMT_A16B16G16R16F });
+		iSurfaceFormat = discard(iSurfaceFormat, D3DFMT_X8R8G8B8, { D3DFMT_A2R10G10B10 , D3DFMT_A16B16G16R16F });
 	}
 
 	GET_OPTION_BOOL(b10BitOutput, IDS_RS_OUTPUT10BIT);
