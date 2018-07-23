@@ -32,7 +32,7 @@ inline T discard(T const& val, T const& def, T const& lo, T const& hi)
 
 template <typename T>
 // If the specified value is out of set, set to default values.
-inline T discard2(T const& val, T const& def, const std::vector<T>& vars)
+inline T discard(T const& val, T const& def, const std::vector<T>& vars)
 {
 	if (val != def) {
 		for (const auto& v : vars) {

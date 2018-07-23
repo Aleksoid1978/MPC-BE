@@ -578,7 +578,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	nVolumeStep = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, 5);
 	nVolumeStep = std::clamp(nVolumeStep, 1, 10);
 	nSpeedStep = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPEED_STEP, 0);
-	nSpeedStep = discard2(nSpeedStep, 0, { 10, 20, 25, 50, 100 });
+	nSpeedStep = discard(nSpeedStep, 0, { 10, 20, 25, 50, 100 });
 
 	m_VRSettings.Load();
 
