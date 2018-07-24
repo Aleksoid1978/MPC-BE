@@ -11695,7 +11695,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			DLog(L"CMainFrame::OpenFile: Connection failed to %s", fn);
 			hr = VFW_E_NOT_FOUND;
 		}
-		Content::Online::Disconnect(fn);
 
 		CorrectAceStream(fn);
 
