@@ -211,7 +211,7 @@ bool CUDPStream::Load(const WCHAR* fnw)
 	} else if (str_protocol == L"http" || str_protocol == L"https") {
 		m_protocol = protocol::PR_HTTP;
 		BOOL bConnected = FALSE;
-		if (m_HTTPAsync.Connect(m_url_str, 10000, L"MPC UDP/HTTP Reader") == S_OK
+		if (m_HTTPAsync.Connect(m_url_str, 10000) == S_OK
 				&& !m_HTTPAsync.GetLenght()) { // only streams without content length
 #ifdef DEBUG
 			const CString hdr = m_HTTPAsync.GetHeader();
@@ -222,7 +222,8 @@ bool CUDPStream::Load(const WCHAR* fnw)
 			CString contentType = m_HTTPAsync.GetContentType();
 			contentType.MakeLower();
 			if (contentType == L"application/octet-stream"
-					|| contentType == L"video/unknown" || contentType == L"none") {
+					|| contentType == L"video/unknown" || contentType == L"none"
+					|| contentType.IsEmpty()) {
 				BYTE buf[1024] = {};
 				DWORD dwSizeRead = 0;
 				if (m_HTTPAsync.Read(buf, sizeof(buf), &dwSizeRead) == S_OK && dwSizeRead) {
