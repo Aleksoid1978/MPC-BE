@@ -107,7 +107,7 @@ void CFavoriteOrganizeDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CFavoriteOrganizeDlg, CResizableDialog)
-	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB1, OnTcnSelchangeTab1)
+	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB1, OnTcnSelChangeTab1)
 	ON_WM_DRAWITEM()
 	ON_BN_CLICKED(IDC_BUTTON1, OnEditBnClicked)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON1, OnUpdateEditBn)
@@ -117,10 +117,10 @@ BEGIN_MESSAGE_MAP(CFavoriteOrganizeDlg, CResizableDialog)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON3, OnUpdateUpBn)
 	ON_BN_CLICKED(IDC_BUTTON4, OnDownBnClicked)
 	ON_UPDATE_COMMAND_UI(IDC_BUTTON4, OnUpdateDownBn)
-	ON_NOTIFY(TCN_SELCHANGING, IDC_TAB1, OnTcnSelchangingTab1)
+	ON_NOTIFY(TCN_SELCHANGING, IDC_TAB1, OnTcnSelChangingTab1)
 	ON_BN_CLICKED(IDOK, OnBnClickedOk)
 	ON_WM_ACTIVATE()
-	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_LIST2, OnLvnEndlabeleditList2)
+	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_LIST2, OnLvnEndLabelEditList2)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST2, OnPlayFavorite)
 	ON_NOTIFY(LVN_KEYDOWN, IDC_LIST2, OnKeyPressed)
 	ON_NOTIFY(LVN_GETINFOTIP, IDC_LIST2, OnLvnGetInfoTipList)
@@ -172,11 +172,12 @@ BOOL CFavoriteOrganizeDlg::PreTranslateMessage(MSG* pMsg)
 	return __super::PreTranslateMessage(pMsg);
 }
 
-void CFavoriteOrganizeDlg::OnTcnSelchangeTab1(NMHDR* pNMHDR, LRESULT* pResult)
+void CFavoriteOrganizeDlg::OnTcnSelChangeTab1(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	SetupList(false);
-
+	m_list.SetRedraw(FALSE);
 	m_list.SetWindowPos(&wndTop, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	SetupList(false);
+	m_list.SetRedraw();
 
 	*pResult = 0;
 }
@@ -253,7 +254,7 @@ void CFavoriteOrganizeDlg::OnUpdateEditBn(CCmdUI* pCmdUI)
 	pCmdUI->Enable(m_list.GetSelectedCount() == 1);
 }
 
-void CFavoriteOrganizeDlg::OnLvnEndlabeleditList2(NMHDR* pNMHDR, LRESULT* pResult)
+void CFavoriteOrganizeDlg::OnLvnEndLabelEditList2(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NMLVDISPINFO* pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pNMHDR);
 
@@ -419,7 +420,7 @@ void CFavoriteOrganizeDlg::OnUpdateDownBn(CCmdUI* pCmdUI)
 	pCmdUI->Enable(m_list.GetSelectedCount() > 0 && !m_list.GetItemState(m_list.GetItemCount() - 1, LVIS_SELECTED));
 }
 
-void CFavoriteOrganizeDlg::OnTcnSelchangingTab1(NMHDR *pNMHDR, LRESULT *pResult)
+void CFavoriteOrganizeDlg::OnTcnSelChangingTab1(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	SetupList(true);
 
@@ -439,21 +440,15 @@ void CFavoriteOrganizeDlg::OnBnClickedOk()
 	OnOK();
 }
 
-void CFavoriteOrganizeDlg::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
-{
-	__super::OnActivate(nState, pWndOther, bMinimized);
-
-	if (nState == WA_ACTIVE) {
-		m_list.SetWindowPos(&wndTop, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-	}
-}
-
 void CFavoriteOrganizeDlg::OnSize(UINT nType, int cx, int cy)
 {
 	__super::OnSize(nType, cx, cy);
 
 	if (IsWindow(m_list)) {
-		m_list.SetColumnWidth(0, LVSCW_AUTOSIZE_USEHEADER);
+		m_list.SetRedraw(FALSE);
+		m_list.SetWindowPos(&wndTop, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+		UpdateColumnsSizes();
+		m_list.SetRedraw();
 	}
 }
 

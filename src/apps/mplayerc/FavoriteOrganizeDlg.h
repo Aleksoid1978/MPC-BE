@@ -56,7 +56,7 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTcnSelChangeTab1(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 	afx_msg void OnEditBnClicked();
 	afx_msg void OnUpdateEditBn(CCmdUI* pCmdUI);
@@ -66,10 +66,9 @@ public:
 	afx_msg void OnUpdateUpBn(CCmdUI* pCmdUI);
 	afx_msg void OnDownBnClicked();
 	afx_msg void OnUpdateDownBn(CCmdUI* pCmdUI);
-	afx_msg void OnTcnSelchangingTab1(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTcnSelChangingTab1(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickedOk();
-	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
-	afx_msg void OnLvnEndlabeleditList2(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnLvnEndLabelEditList2(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnPlayFavorite(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnKeyPressed(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
