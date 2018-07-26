@@ -202,7 +202,7 @@ void CHTTPAsync::Close()
 	m_bRequestComplete = TRUE;
 }
 
-HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/)
+HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPCWSTR lpszCustomHeader/* = L""*/)
 {
 	Close();
 
@@ -260,7 +260,7 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/)
 
 	CheckPointer(m_hConnect, E_FAIL);
 
-	if (SendRequest(L"", dwTimeOut) != S_OK) {
+	if (SendRequest(lpszCustomHeader, dwTimeOut) != S_OK) {
 		return E_FAIL;
 	}
 
