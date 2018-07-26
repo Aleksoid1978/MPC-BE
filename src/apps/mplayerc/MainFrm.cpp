@@ -1469,7 +1469,7 @@ LPCWSTR CMainFrame::GetTextForBar(int style)
 		return m_PlaybackInfo.GetTitleOrFileNameOrPath();
 	}
 	if (style == TEXTBAR_FULLPATH) {
-		return (PCWSTR)m_PlaybackInfo.Path;
+		return m_PlaybackInfo.Path.GetString();
 	}
 
 	return L"";
@@ -1495,6 +1495,10 @@ void CMainFrame::UpdateTitle()
 			}
 		}
 		EndEnumFilters;
+
+		if (m_wndInfoBar.IsWindowVisible()) {
+			OpenSetupInfoBar();
+		}
 	}
 }
 
@@ -4343,6 +4347,8 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 
 	SetToolBarAudioButton();
 	SetToolBarSubtitleButton();
+
+	UpdateTitle();
 
 	// correct window size if "Limit window proportions on resize" enable.
 	if (!s.bRememberZoomLevel && s.bLimitWindowProportions) {
