@@ -32,6 +32,7 @@ namespace Content {
 		void Clear(const CString& fn);
 		void Disconnect(const CString& fn);
 		void GetRaw(const CString& fn, std::vector<BYTE>& raw);
+		void GetHeader(const CString& fn, CString& hdr);
 	}
 	const CString GetType(CString fn, std::list<CString>* redir = nullptr);
 }

@@ -99,6 +99,7 @@ namespace Content {
 		std::shared_ptr<CHTTPAsync> HTTPAsync = nullptr;
 		CString ct;
 		CString body;
+		CString hdr;
 	};
 	static std::map<CString, Content> Contents;
 
@@ -147,7 +148,8 @@ namespace Content {
 			CString realPath(fn);
 			CorrectAceStream(realPath);
 
-			content.bHTTPConnected = (content.HTTPAsync->Connect(realPath, 10000) == S_OK);
+			content.bHTTPConnected = (content.HTTPAsync->Connect(realPath, 10000, L"Icy-MetaData: 1\r\n") == S_OK);
+			content.hdr = content.HTTPAsync->GetHeader();
 
 			GetData(content);
 		}
@@ -493,6 +495,15 @@ namespace Content {
 			if (it != Contents.end()) {
 				auto& content = it->second;
 				raw = content.raw;
+			}
+		}
+
+		void GetHeader(const CString& fn, CString& hdr)
+		{
+			auto& it = Contents.find(fn);
+			if (it != Contents.end()) {
+				auto& content = it->second;
+				hdr = content.hdr;
 			}
 		}
 	}

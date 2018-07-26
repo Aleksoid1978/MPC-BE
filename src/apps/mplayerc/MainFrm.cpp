@@ -11695,7 +11695,11 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			DLog(L"CMainFrame::OpenFile: Connection failed to %s", fn);
 			hr = VFW_E_NOT_FOUND;
 		}
-		Content::Online::Disconnect(fn);
+		CString online_hdr;
+		Content::Online::GetHeader(fn, online_hdr);
+		if (online_hdr.Find(L"StreamBuffRe") == -1) {
+			Content::Online::Disconnect(fn);
+		}
 
 		CorrectAceStream(fn);
 

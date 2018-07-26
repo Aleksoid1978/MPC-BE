@@ -73,7 +73,7 @@ public:
 
 	void Close();
 
-	HRESULT Connect(LPCWSTR lpszURL, DWORD dwTimeOut = INFINITE);
+	HRESULT Connect(LPCWSTR lpszURL, DWORD dwTimeOut = INFINITE, LPCWSTR lpszCustomHeader = L"");
 	HRESULT SendRequest(LPCWSTR lpszCustomHeader = L"", DWORD dwTimeOut = INFINITE);
 	HRESULT Read(PBYTE pBuffer, DWORD dwSizeToRead, LPDWORD dwSizeRead, DWORD dwTimeOut = INFINITE);
 
