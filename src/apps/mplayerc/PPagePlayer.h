@@ -35,8 +35,6 @@ public:
 	virtual ~CPPagePlayer();
 
 	int  m_iMultipleInst;
-	int  m_iTitleBarTextStyle;
-	BOOL m_bTitleBarTextTitle;
 	BOOL m_bKeepHistory;
 	int  m_nRecentFiles;
 	BOOL m_bRememberDVDPos;
@@ -54,6 +52,9 @@ public:
 	BOOL m_bUseIni;
 	BOOL m_bHideCDROMsSubMenu;
 	BOOL m_bPriority;
+
+	CComboBox m_cbTitleBarPrefix;
+	CComboBox m_cbSeekBarText;
 
 	CSpinButtonCtrl m_RecentFilesCtrl;
 

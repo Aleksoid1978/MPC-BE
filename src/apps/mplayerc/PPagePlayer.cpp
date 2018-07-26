@@ -30,8 +30,6 @@ IMPLEMENT_DYNAMIC(CPPagePlayer, CPPageBase)
 CPPagePlayer::CPPagePlayer()
 	: CPPageBase(CPPagePlayer::IDD, CPPagePlayer::IDD)
 	, m_iMultipleInst(1)
-	, m_iTitleBarTextStyle(0)
-	, m_bTitleBarTextTitle(FALSE)
 	, m_bKeepHistory(FALSE)
 	, m_nRecentFiles(APP_RECENTFILES_DEF)
 	, m_bRememberDVDPos(FALSE)
@@ -61,8 +59,8 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 	__super::DoDataExchange(pDX);
 
 	DDX_Radio(pDX, IDC_RADIO1, m_iMultipleInst);
-	DDX_Radio(pDX, IDC_RADIO4, m_iTitleBarTextStyle);
-	DDX_Check(pDX, IDC_CHECK13, m_bTitleBarTextTitle);
+	DDX_Control(pDX, IDC_COMBO1, m_cbTitleBarPrefix);
+	DDX_Control(pDX, IDC_COMBO2, m_cbSeekBarText);
 	DDX_Check(pDX, IDC_CHECK3, m_bTrayIcon);
 	DDX_Check(pDX, IDC_CHECK6, m_bRememberWindowPos);
 	DDX_Check(pDX, IDC_CHECK7, m_bRememberWindowSize);
@@ -86,7 +84,6 @@ void CPPagePlayer::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CPPagePlayer, CPPageBase)
-	ON_UPDATE_COMMAND_UI(IDC_CHECK13, OnUpdateCheck13)
 	ON_UPDATE_COMMAND_UI(IDC_DVD_POS, OnUpdatePos)
 	ON_UPDATE_COMMAND_UI(IDC_FILE_POS, OnUpdatePos)
 	ON_UPDATE_COMMAND_UI(IDC_EDIT1, OnUpdatePos)
@@ -107,9 +104,25 @@ BOOL CPPagePlayer::OnInitDialog()
 
 	CAppSettings& s = AfxGetAppSettings();
 
+	m_cbTitleBarPrefix.AddString(ResStr(IDS_TEXTBAR_NOTHING));
+	m_cbTitleBarPrefix.AddString(ResStr(IDS_TEXTBAR_FILENANE));
+	m_cbTitleBarPrefix.AddString(ResStr(IDS_TEXTBAR_TITLE));
+	m_cbTitleBarPrefix.AddString(ResStr(IDS_TEXTBAR_FULLPATH));
+	CorrectComboListWidth(m_cbTitleBarPrefix);
+	if (CB_ERR == m_cbTitleBarPrefix.SetCurSel(s.iTitleBarTextStyle)) {
+		m_cbTitleBarPrefix.SetCurSel(TEXTBAR_FILENAME);
+	}
+
+	m_cbSeekBarText.AddString(ResStr(IDS_TEXTBAR_NOTHING));
+	m_cbSeekBarText.AddString(ResStr(IDS_TEXTBAR_FILENANE));
+	m_cbSeekBarText.AddString(ResStr(IDS_TEXTBAR_TITLE));
+	m_cbSeekBarText.AddString(ResStr(IDS_TEXTBAR_FULLPATH));
+	CorrectComboListWidth(m_cbSeekBarText);
+	if (CB_ERR == m_cbSeekBarText.SetCurSel(s.iSeekBarTextStyle)) {
+		m_cbSeekBarText.SetCurSel(TEXTBAR_TITLE);
+	}
+
 	m_iMultipleInst				= s.iMultipleInst;
-	m_iTitleBarTextStyle		= s.iTitleBarTextStyle;
-	m_bTitleBarTextTitle		= s.bTitleBarTextTitle;
 	m_bTrayIcon					= s.bTrayIcon;
 	m_bRememberWindowPos		= s.bRememberWindowPos;
 	m_bRememberWindowSize		= s.bRememberWindowSize;
@@ -157,11 +170,17 @@ BOOL CPPagePlayer::OnApply()
 	auto pFrame = AfxGetMainFrame();
 
 	s.iMultipleInst = m_iMultipleInst;
-	if (s.iTitleBarTextStyle != m_iTitleBarTextStyle || s.bTitleBarTextTitle != !!m_bTitleBarTextTitle) {
-		s.iTitleBarTextStyle = m_iTitleBarTextStyle;
-		s.bTitleBarTextTitle = !!m_bTitleBarTextTitle;
-		pFrame->OpenSetupWindowTitle(pFrame->m_strPlaybackRenderedPath);
+
+	int i = m_cbTitleBarPrefix.GetCurSel();
+	if (s.iTitleBarTextStyle != i) {
+		s.iTitleBarTextStyle = i;
+		pFrame->UpdateWindowTitle();
 	}
+	i = m_cbSeekBarText.GetCurSel();
+	if (s.iSeekBarTextStyle != i) {
+		s.iSeekBarTextStyle = i;
+	}
+
 	s.bTrayIcon = !!m_bTrayIcon;
 	s.bRememberWindowPos = !!m_bRememberWindowPos;
 	s.bRememberWindowSize = !!m_bRememberWindowSize;
@@ -233,13 +252,6 @@ BOOL CPPagePlayer::OnApply()
 	m_RecentFilesCtrl.EnableWindow(s.bKeepHistory);
 
 	return __super::OnApply();
-}
-
-void CPPagePlayer::OnUpdateCheck13(CCmdUI* pCmdUI)
-{
-	UpdateData();
-
-	pCmdUI->Enable(m_iTitleBarTextStyle == 1);
 }
 
 void CPPagePlayer::OnUpdatePos(CCmdUI* pCmdUI)

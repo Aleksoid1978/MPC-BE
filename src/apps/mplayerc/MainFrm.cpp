@@ -1460,6 +1460,44 @@ BOOL CMainFrame::OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTO
 	return TRUE;
 }
 
+LPCWSTR CMainFrame::GetTextForBar(int style)
+{
+	if (style == TEXTBAR_FILENAME) {
+		return m_PlaybackInfo.GetFileNameOrTitleOrPath();
+	}
+	if (style == TEXTBAR_TITLE) {
+		return m_PlaybackInfo.GetTitleOrFileNameOrPath();
+	}
+	if (style == TEXTBAR_FULLPATH) {
+		return (PCWSTR)m_PlaybackInfo.Path;
+	}
+
+	return L"";
+}
+
+void CMainFrame::UpdateTitle()
+{
+	CAppSettings& s = AfxGetAppSettings();
+
+	if (m_eMediaLoadState == MLS_LOADED && m_PlaybackInfo.bUpdateTitle) {
+		BeginEnumFilters(m_pGB, pEF, pBF) {
+			if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
+				if (CheckMainFilter(pBF)) {
+					CComBSTR bstr;
+					if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
+						if (m_PlaybackInfo.Title != bstr.m_str) {
+							m_PlaybackInfo.Title = bstr.m_str;
+							UpdateWindowTitle();
+						}
+						break;
+					}
+				}
+			}
+		}
+		EndEnumFilters;
+	}
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame diagnostics
 
@@ -2423,7 +2461,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 						}
 
 						if (strOSD.IsEmpty()) {
-							strOSD = m_strPlaybackLabel;
+							strOSD = GetTextForBar(TEXTBAR_TITLE);
 						}
 
 						str_temp.GetLength() > 0 ? str_temp += L"\n" + strOSD : str_temp = strOSD;
@@ -2477,6 +2515,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 		}
 		break;
 		case TIMER_STATS:
+			UpdateTitle();
 			if (m_wndStatsBar.IsWindowVisible()) {
 				if (m_pQP) {
 					CString rate;
@@ -11947,10 +11986,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		EndEnumFilters;
 	}
 
-	if (FindFilter(__uuidof(CShoutcastSource), m_pGB)) {
-		m_fUpdateInfoBar = true;
-	}
-
 	SetPlaybackMode(PM_FILE);
 
 	SetupChapters();
@@ -12678,65 +12713,45 @@ void CMainFrame::OpenSetupStatusBar()
 	}
 }
 
-void CMainFrame::OpenSetupWindowTitle(CString fn)
+void CMainFrame::OpenUpdatePlaybackInfo(const CString path)
 {
-	if (fn.IsEmpty()) {
+	m_PlaybackInfo.Clear();
+
+	if (path.IsEmpty()) {
 		return;
 	}
 
-	CString title;
-	title.LoadString(IDR_MAINFRAME);
-	CString fname = fn;
+	m_PlaybackInfo.Path = path;
 
-	CAppSettings& s = AfxGetAppSettings();
-
-	int i = s.iTitleBarTextStyle;
-
-	if (!fn.IsEmpty()) {
-		if (GetPlaybackMode() == PM_FILE) {
-			if (m_LastOpenBDPath.GetLength() > 0) {
-				CString fn2 = L"Blu-ray";
-				if (m_BDLabel.GetLength() > 0) {
-					fn2.AppendFormat(L" \"%s\"", m_BDLabel);
-				} else {
-					MakeBDLabel(fn, fn2);
-				}
-				fn = fn2;
+	if (GetPlaybackMode() == PM_FILE) {
+		// BD title
+		if (m_LastOpenBDPath.GetLength() > 0) {
+			CString fn2 = L"Blu-ray";
+			if (m_BDLabel.GetLength() > 0) {
+				fn2.AppendFormat(L" \"%s\"", m_BDLabel);
 			} else {
-				fn.Replace('\\', '/');
-				CString fn2 = fn.Mid(fn.ReverseFind('/') + 1);
-				if (!fn2.IsEmpty()) {
-					fn = fn2;
-				}
+				MakeBDLabel(path, fn2);
 			}
-		} else if (GetPlaybackMode() == PM_DVD) {
-			fn = L"DVD";
-			MakeDVDLabel(L"", fn);
-		} else if (GetPlaybackMode() == PM_CAPTURE) {
-			fn = ResStr(IDS_CAPTURE_LIVE);
+			m_PlaybackInfo.Title = fn2;
 		}
-	}
-
-	m_strPlaybackLabel = fn;
-
-	if (i == 1) {
-		if (s.bTitleBarTextTitle) {
-			if (!m_youtubeFields.title.IsEmpty()) {
-				fn = m_youtubeFields.title;
-			}
-
+		// YouTube title and path
+		else if (m_youtubeFields.title.GetLength()) {
+			m_PlaybackInfo.Title = m_youtubeFields.title;
+			m_PlaybackInfo.Path = m_wndPlaylistBar.GetCurFileName();
+		}
+		// file and URL title
+		else {
 			bool bGetTitle = false;
+
 			BeginEnumFilters(m_pGB, pEF, pBF) {
 				if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
-					if (!CheckMainFilter(pBF)) {
-						continue;
-					}
-
-					CComBSTR bstr;
-					if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
-						fn = CString(bstr.m_str);
-						bGetTitle = true;
-						break;
+					if (CheckMainFilter(pBF)) {
+						CComBSTR bstr;
+						if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
+							m_PlaybackInfo.Title = bstr.m_str;
+							bGetTitle = true;
+							break;
+						}
 					}
 				}
 			}
@@ -12745,13 +12760,38 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 			if (!bGetTitle) {
 				CPlaylistItem pli;
 				if (m_wndPlaylistBar.GetCur(pli) && !pli.m_fns.empty() && !pli.m_label.IsEmpty()) {
-					fn = pli.m_label;
+					m_PlaybackInfo.Title = pli.m_label;
 				}
 			}
+
+			if (::PathIsURLW(path)) {
+				// use update for title for URLs
+				m_PlaybackInfo.bUpdateTitle = true;
+			} else {
+				// file name
+				m_PlaybackInfo.FileName = path.Mid(std::max(path.ReverseFind('\\'), path.ReverseFind('/')) + 1);
+			}
 		}
-		title = fn + L" - " + m_strTitle;
-	} else if (i == 0) {
-		title = fname + L" - " + m_strTitle;
+	}
+	else if (GetPlaybackMode() == PM_DVD) {
+		MakeDVDLabel(L"", m_PlaybackInfo.Title);
+	}
+	else if (GetPlaybackMode() == PM_CAPTURE) {
+		m_PlaybackInfo.Title = ResStr(IDS_CAPTURE_LIVE);
+	}
+}
+
+void CMainFrame::UpdateWindowTitle()
+{
+	const int style = AfxGetAppSettings().iTitleBarTextStyle;
+	CString title = GetTextForBar(style);
+
+	m_Lcd.SetMediaTitle(title);
+
+	if (style == TEXTBAR_EMPTY) {
+		title = m_strTitle;
+	} else {
+		title += L" - " + m_strTitle;
 	}
 
 	CString curTitle;
@@ -12759,8 +12799,6 @@ void CMainFrame::OpenSetupWindowTitle(CString fn)
 	if (curTitle != title) {
 		SetWindowTextW(title);
 	}
-
-	m_Lcd.SetMediaTitle(fn);
 }
 
 BOOL CMainFrame::SelectMatchTrack(std::vector<Stream>& Tracks, CString pattern, BOOL bExtPrior, size_t& nIdx)
@@ -13493,7 +13531,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 
 	CString err, aborted(ResStr(IDS_AG_ABORTED));
 
-	m_fUpdateInfoBar = false;
 	BeginWaitCursor();
 
 	for (;;) {
@@ -13637,7 +13674,8 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 			s.rtShift = 0;
 		}
 
-		OpenSetupWindowTitle(pOMD->title);
+		OpenUpdatePlaybackInfo(pOMD->title);
+		UpdateWindowTitle();
 
 		OpenSetupSubStream(pOMD);
 
@@ -13716,7 +13754,8 @@ void CMainFrame::CloseMediaPrivate()
 
 	m_ExternalSubstreams.clear();
 
-	m_strPlaybackLabel.Empty();
+	m_PlaybackInfo.Clear();
+
 	m_strPlaybackRenderedPath.Empty();
 
 	m_youtubeFields.Empty();
@@ -18234,10 +18273,6 @@ CString CMainFrame::FillMessage()
 			OnTimer(TIMER_STREAMPOSPOLLER);
 		}
 
-		if (m_fUpdateInfoBar) {
-			OpenSetupInfoBar();
-			OpenSetupWindowTitle(m_strPlaybackRenderedPath);
-		}
 	}
 
 	return msg;
@@ -18618,40 +18653,6 @@ void CMainFrame::CreateCaptureWindow()
 	}
 
 	m_CaptureWndBitmap = CreateCaptureDIB(rectClient.Width(), rectClient.Height());
-}
-
-const CString CMainFrame::GetStrForTitle()
-{
-	if (m_eMediaLoadState == MLS_LOADED) {
-		if (!m_youtubeFields.title.IsEmpty()) {
-			return m_youtubeFields.title;
-		} else if (m_bIsBDPlay || GetPlaybackMode() == PM_DVD) {
-			return m_strPlaybackLabel;
-		} else {
-			BeginEnumFilters(m_pGB, pEF, pBF) {
-				if (CComQIPtr<IAMMediaContent, &IID_IAMMediaContent> pAMMC = pBF) {
-					if (!CheckMainFilter(pBF)) {
-						continue;
-					}
-
-					CComBSTR bstr;
-					if (SUCCEEDED(pAMMC->get_Title(&bstr)) && bstr.Length()) {
-						return CString(bstr.m_str);
-					}
-				}
-			}
-			EndEnumFilters;
-		}
-
-		CPlaylistItem pli;
-		if (m_wndPlaylistBar.GetCur(pli) && !pli.m_label.IsEmpty()) {
-			return pli.m_label;
-		}
-
-		return m_strPlaybackLabel;
-	}
-
-	return L"";
 }
 
 const CString CMainFrame::GetAltFileName()

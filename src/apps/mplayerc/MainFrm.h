@@ -398,8 +398,6 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	bool m_fLiveWM;
 
-	bool m_fUpdateInfoBar;
-
 	void SendStatusMessage(CString msg, int nTimeOut);
 	CString m_playingmsg, m_closingmsg;
 
@@ -550,7 +548,10 @@ protected:
 	void OpenSetupStatusBar();
 	// void OpenSetupToolBar();
 	void OpenSetupCaptureBar();
-	void OpenSetupWindowTitle(CString fn);
+	void OpenUpdatePlaybackInfo(const CString path);
+
+	void UpdateWindowTitle();
+
 	void AutoChangeMonitorMode();
 	double m_dMediaInfoFPS;
 
@@ -673,6 +674,29 @@ protected:
 	};
 	touchScreen m_touchScreen;
 
+	struct {
+		CString FileName;
+		CString Title;
+		CString Path;
+		bool bUpdateTitle = false;
+
+		void Clear() {
+			FileName.Empty();
+			Title.Empty();
+			Path.Empty();
+			bUpdateTitle = false;
+		}
+		LPCWSTR GetFileNameOrTitleOrPath() {
+			return FileName.GetLength() ? (PCWSTR)FileName : Title.GetLength() ? (PCWSTR)Title : (PCWSTR)Path;
+		}
+		LPCWSTR GetTitleOrFileNameOrPath() {
+			return Title.GetLength() ? (PCWSTR)Title : FileName.GetLength() ? (PCWSTR)FileName : (PCWSTR)Path;
+		}
+	} m_PlaybackInfo;
+
+	CString m_strTitle;
+	CString m_strPlaybackRenderedPath;
+
 public:
 	BOOL OpenCurPlaylistItem(REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
 	BOOL OpenFile(const CString fname, REFERENCE_TIME rtStart = INVALID_TIME, BOOL bAddRecent = TRUE);
@@ -758,6 +782,9 @@ public:
 	virtual void RecalcLayout(BOOL bNotify = TRUE);
 
 	BOOL OnTouchInput(CPoint pt, int nInputNumber, int nInputsCount, PTOUCHINPUT pInput);
+
+	LPCWSTR GetTextForBar(int style);
+	void UpdateTitle();
 
 	// Dvb capture
 	void DisplayCurrentChannelOSD();
@@ -1177,14 +1204,8 @@ public:
 	long		m_lSubtitleShift;
 	__int64		m_rtCurSubPos;
 
-	CString		m_strTitle;
-
-	CString		m_strPlaybackLabel;
-	CString		m_strPlaybackRenderedPath;
-
 	Youtube::YoutubeFields m_youtubeFields;
 	Youtube::YoutubeUrllist m_youtubeUrllist;
-	const CString GetStrForTitle();
 	const CString GetAltFileName();
 
 	bool		m_bInOptions;
