@@ -687,10 +687,10 @@ protected:
 			bUpdateTitle = false;
 		}
 		LPCWSTR GetFileNameOrTitleOrPath() {
-			return FileName.GetLength() ? (PCWSTR)FileName : Title.GetLength() ? (PCWSTR)Title : (PCWSTR)Path;
+			return FileName.GetLength() ? FileName.GetString() : Title.GetLength() ? Title.GetString() : Path.GetString();
 		}
 		LPCWSTR GetTitleOrFileNameOrPath() {
-			return Title.GetLength() ? (PCWSTR)Title : FileName.GetLength() ? (PCWSTR)FileName : (PCWSTR)Path;
+			return Title.GetLength() ? Title.GetString() : FileName.GetLength() ? FileName.GetString() : Path.GetString();
 		}
 	} m_PlaybackInfo;
 
