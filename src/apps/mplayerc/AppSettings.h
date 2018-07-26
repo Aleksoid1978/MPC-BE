@@ -205,6 +205,13 @@ enum engine_t {
 	ShockWave
 };
 
+enum : int {
+	TEXTBAR_EMPTY = 0,
+	TEXTBAR_FILENAME,
+	TEXTBAR_TITLE,
+	TEXTBAR_FULLPATH,
+};
+
 struct ShaderC {
 	CString		label;
 	CString		profile;
@@ -539,7 +546,7 @@ public:
 	bool			bHideCDROMsSubMenu;
 	DWORD			dwPriority;
 	int				iTitleBarTextStyle;
-	bool			bTitleBarTextTitle;
+	int				iSeekBarTextStyle;
 	bool			bKeepHistory;
 	int				iRecentFilesNumber;
 	CRecentFileAndURLList MRU;

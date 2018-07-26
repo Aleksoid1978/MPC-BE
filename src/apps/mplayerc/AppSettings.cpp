@@ -603,8 +603,11 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	iMultipleInst = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, 1);
 	iMultipleInst = discard(iMultipleInst, 1, 0, 2);
 
-	iTitleBarTextStyle = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXTSTYLE, 1);
-	bTitleBarTextTitle = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXTTITLE, FALSE);
+	iTitleBarTextStyle = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXT, TEXTBAR_FILENAME);
+	iTitleBarTextStyle = discard(iTitleBarTextStyle, (int)TEXTBAR_FILENAME, (int)TEXTBAR_EMPTY, (int)TEXTBAR_FULLPATH);
+	iSeekBarTextStyle = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SEEKBARTEXT, TEXTBAR_TITLE);
+	iTitleBarTextStyle = discard(iTitleBarTextStyle, (int)TEXTBAR_TITLE, (int)TEXTBAR_EMPTY, (int)TEXTBAR_FULLPATH);
+
 	iOnTop = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ONTOP, 0);
 	bTrayIcon = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TRAYICON, 0);
 	bRememberZoomLevel = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOZOOM, 0);
@@ -1213,8 +1216,8 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, nVolumeStep);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SPEED_STEP, nSpeedStep);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, iMultipleInst);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXTSTYLE, iTitleBarTextStyle);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXTTITLE, bTitleBarTextTitle);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXT, iTitleBarTextStyle);
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_SEEKBARTEXT, iSeekBarTextStyle);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_ONTOP, iOnTop);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_TRAYICON, bTrayIcon);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOZOOM, bRememberZoomLevel);

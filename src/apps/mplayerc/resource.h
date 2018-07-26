@@ -891,6 +891,10 @@
 #define IDS_STATSBAR_BITRATE            14197
 #define IDS_STATSBAR_BITRATE_AVG_CUR    14198
 #define IDS_AUTOPLAY_PLAYBDMOVIE        14199
+#define IDS_TEXTBAR_NOTHING             14200
+#define IDS_TEXTBAR_FILENANE            14201
+#define IDS_TEXTBAR_TITLE               14202
+#define IDS_TEXTBAR_FULLPATH            14203
 #define IDS_AG_RESET_STATS              20005
 #define IDS_VIEW_BORDERLESS             20007
 #define IDS_VIEW_FRAMEONLY              20008

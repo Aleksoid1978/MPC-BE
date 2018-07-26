@@ -278,7 +278,7 @@ void CPlayerSeekBar::OnPaint()
 	const bool bEnabled = m_bEnabled && m_stop > 0;
 
 	if (s.bUseDarkTheme) {
-		CString str = m_pMainFrame->GetStrForTitle();
+		CString str = m_pMainFrame->GetTextForBar(s.iSeekBarTextStyle);
 		CDC memdc;
 		CBitmap m_bmPaint;
 		CRect r;
