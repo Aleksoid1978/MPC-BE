@@ -213,11 +213,6 @@ bool CUDPStream::Load(const WCHAR* fnw)
 		BOOL bConnected = FALSE;
 		if (m_HTTPAsync.Connect(m_url_str, 10000) == S_OK
 				&& !m_HTTPAsync.GetLenght()) { // only streams without content length
-#ifdef DEBUG
-			const CString hdr = m_HTTPAsync.GetHeader();
-			DLog(L"CUDPStream::Load() - HTTP hdr:\n%s", hdr);
-#endif
-
 			bConnected = TRUE;
 			CString contentType = m_HTTPAsync.GetContentType();
 			contentType.MakeLower();
