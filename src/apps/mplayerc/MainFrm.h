@@ -692,6 +692,9 @@ protected:
 		LPCWSTR GetTitleOrFileNameOrPath() {
 			return Title.GetLength() ? Title.GetString() : FileName.GetLength() ? FileName.GetString() : Path.GetString();
 		}
+		LPCWSTR GetFileNameOrOrPath() {
+			return FileName.GetLength() ? FileName.GetString() : Path.GetString();
+		}
 	} m_PlaybackInfo;
 
 	CString m_strTitle;
