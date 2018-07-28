@@ -2465,7 +2465,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 						}
 
 						if (strOSD.IsEmpty()) {
-							strOSD = GetTextForBar(TEXTBAR_TITLE);
+							strOSD = m_PlaybackInfo.GetFileNameOrTitleOrPath();
 						}
 
 						str_temp.GetLength() > 0 ? str_temp += L"\n" + strOSD : str_temp = strOSD;
