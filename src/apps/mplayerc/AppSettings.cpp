@@ -933,7 +933,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	nThemeBlue = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THEMEBLUE, 256);
 	nOSDTransparent = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_TRANSPARENT, 100);
 	nOSDBorder = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_BORDER, 1);
-	fFileNameOnSeekBar = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_FILENAMEONSEEKBAR, TRUE);
 
 	clrFaceABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, 0x00ffffff);
 	clrOutlineABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, 0x00868686);
@@ -1474,7 +1473,6 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_THEMEBLUE, nThemeBlue);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_TRANSPARENT, nOSDTransparent);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_BORDER, nOSDBorder);
-	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_FILENAMEONSEEKBAR, fFileNameOnSeekBar);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, clrFaceABGR);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, clrOutlineABGR);

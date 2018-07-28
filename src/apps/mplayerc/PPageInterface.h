@@ -42,7 +42,6 @@ public:
 	int  m_nThemeGreen;
 	int  m_nThemeBlue;
 	BOOL m_fUseTimeTooltip;
-	BOOL m_fFileNameOnSeekBar;
 	BOOL m_fSmartSeek;
 	BOOL m_fChapterMarker;
 	BOOL m_fFlybar;

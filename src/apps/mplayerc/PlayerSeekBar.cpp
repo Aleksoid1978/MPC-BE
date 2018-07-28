@@ -278,7 +278,7 @@ void CPlayerSeekBar::OnPaint()
 	const bool bEnabled = m_bEnabled && m_stop > 0;
 
 	if (s.bUseDarkTheme) {
-		CString str = m_pMainFrame->GetTextForBar(s.iSeekBarTextStyle);
+		CString seekbartext = m_pMainFrame->GetTextForBar(s.iSeekBarTextStyle);
 		CDC memdc;
 		CBitmap m_bmPaint;
 		CRect r;
@@ -416,7 +416,7 @@ void CPlayerSeekBar::OnPaint()
 			}
 		}
 
-		if (s.fFileNameOnSeekBar || !s.bStatusBarIsVisible || !m_strChap.IsEmpty()) {
+		if (seekbartext.GetLength() || !s.bStatusBarIsVisible || !m_strChap.IsEmpty()) {
 			ThemeRGB(135, 140, 145, R, G, B);
 			memdc.SetTextColor(RGB(R,G,B));
 
@@ -429,9 +429,9 @@ void CPlayerSeekBar::OnPaint()
 
 			LONG xt = s.bStatusBarIsVisible ? 0 : s.strTimeOnSeekBar.GetLength() <= 21 ? 150 : 160;
 
-			if (s.fFileNameOnSeekBar || !m_strChap.IsEmpty()) {
+			if (seekbartext.GetLength() || !m_strChap.IsEmpty()) {
 				if (!m_strChap.IsEmpty() && bEnabled) {
-					str = m_strChap;
+					seekbartext = m_strChap;
 				}
 
 				// draw filename || chapter name.
@@ -439,21 +439,21 @@ void CPlayerSeekBar::OnPaint()
 				rt.left  += 6;
 				rt.top   -= 2;
 				rt.right -= xt;
-				memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
+				memdc.DrawText(seekbartext, seekbartext.GetLength(), &rt, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
 
 				// highlights string
 				ThemeRGB(205, 210, 215, R, G, B);
 				memdc.SetTextColor(RGB(R,G,B));
 				if (nposx > rt.right - 15) {
-					memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
+					memdc.DrawText(seekbartext, seekbartext.GetLength(), &rt, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
 				} else {
 					rt.right = nposx;
-					memdc.DrawText(str, str.GetLength(), &rt, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
+					memdc.DrawText(seekbartext, seekbartext.GetLength(), &rt, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
 				}
 			}
 
 			if (!s.bStatusBarIsVisible) {
-				str = s.strTimeOnSeekBar;
+				CString str = s.strTimeOnSeekBar;
 				CRect rt = rc;
 				rt.left  -= xt - 10;
 				rt.top   -= 2;

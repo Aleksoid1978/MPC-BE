@@ -268,7 +268,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Przywrócenie domyślnego trybu po zakończeniu programu"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
 6		"Użyj ""ciemnego"" motywu (domyślne)"
 7		"Jasność:"
 9		"Ustawianie koloru wskaźnika dźwięku:"
@@ -281,22 +281,21 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 16		"G:"
 17		"B:"
 22		"Pokazuj dymek z czasem:"
-24		"Nazwa pliku na pasku postępu"
-25		"Użyj podglądu podczas szukania"
-26		"Rozmiar w stosunku do szerokości ekranu:"
-29		"Pokaż znacznik rozdziałów"
-30		"Użyj flybar"
-31		"OSD"
-32		"Czcionka:"
-35		"F"
-36		"Tło:"
-37		"G1"
-38		"G2"
-39		"Przezroczystość:"
-41		"Rozmiar obramowania:"
-44		"Cień"
-45		"Wygładzanie krawędzi"
-46		"Użyj funkcji paska zadań (Windows 7 i nowsze)"
+24		"Użyj podglądu podczas szukania"
+25		"Rozmiar w stosunku do szerokości ekranu:"
+28		"Pokaż znacznik rozdziałów"
+29		"Użyj flybar"
+30		"OSD"
+31		"Czcionka:"
+34		"F"
+35		"Tło:"
+36		"G1"
+37		"G2"
+38		"Przezroczystość:"
+40		"Rozmiar obramowania:"
+43		"Cień"
+44		"Wygładzanie krawędzi"
+45		"Użyj funkcji paska zadań (Windows 7 i nowsze)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
