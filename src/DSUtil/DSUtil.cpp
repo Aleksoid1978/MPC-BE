@@ -1574,7 +1574,10 @@ CString AltUTF8To16(LPCSTR lpMultiByteStr) // Use if MultiByteToWideChar() funct
 		} else if ((*Z & 0xF8) == 0xF0) {
 		//4 bytes
 			if ((*(Z + 1) & 0xC0) == 0x80 && (*(Z + 2) & 0xC0) == 0x80 && (*(Z + 3) & 0xC0) == 0x80) {
-				str += (wchar_t)((((wchar_t)(*Z & 0x0F)) << 18) | ((*(Z + 1) & 0x3F) << 12) || ((*(Z + 2) & 0x3F) << 6) | (*(Z + 3) & 0x3F));
+				uint32_t u32 = ((uint32_t)(*Z & 0x0F) << 18) | ((uint32_t)(*(Z + 1) & 0x3F) << 12) | ((uint32_t)(*(Z + 2) & 0x3F) << 6) | ((uint32_t)*(Z + 3) & 0x3F);
+				if (u32 <= UINT16_MAX) {
+					str += (wchar_t)u32;
+				}
 				Z+=4;
 			} else {
 				return L""; //Bad character
