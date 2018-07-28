@@ -739,7 +739,6 @@ public:
 
 	bool			fUseTimeTooltip;
 	int				nTimeTooltipPosition;
-	bool			fFileNameOnSeekBar;
 	bool			fSmartSeek;
 	int				iSmartSeekSize;
 	bool			fChapterMarker;

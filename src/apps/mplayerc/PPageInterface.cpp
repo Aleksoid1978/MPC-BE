@@ -36,7 +36,6 @@ CPPageInterface::CPPageInterface()
 	, m_nThemeGreen(255)
 	, m_nThemeBlue(255)
 	, m_fUseTimeTooltip(TRUE)
-	, m_fFileNameOnSeekBar(TRUE)
 	, m_fSmartSeek(FALSE)
 	, m_fChapterMarker(FALSE)
 	, m_fFlybar(TRUE)
@@ -74,7 +73,6 @@ void CPPageInterface::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SLIDER3, m_ThemeGreenCtrl);
 	DDX_Control(pDX, IDC_SLIDER4, m_ThemeBlueCtrl);
 	DDX_Control(pDX, IDC_SLIDER_OSDTRANS, m_OSDTransparentCtrl);
-	DDX_Check(pDX, IDC_CHECK5, m_fFileNameOnSeekBar);
 	DDX_Check(pDX, IDC_CHECK_WIN7, m_fUseWin7TaskBar);
 	DDX_Check(pDX, IDC_CHECK8, m_fUseTimeTooltip);
 	DDX_Control(pDX, IDC_COMBO3, m_TimeTooltipPosition);
@@ -124,7 +122,6 @@ BOOL CPPageInterface::OnInitDialog()
 	m_OSDTransparentCtrl.SetRange	(0, 255, TRUE);
 	m_OSDBorderCtrl.SetRange32(0, 5);
 
-	m_fFileNameOnSeekBar	= s.fFileNameOnSeekBar;
 	m_clrFaceABGR			= m_clrFaceABGR_Old			= s.clrFaceABGR;
 	m_clrOutlineABGR		= m_clrOutlineABGR_Old		= s.clrOutlineABGR;
 	m_clrFontABGR			= m_clrFontABGR_Old			= s.clrFontABGR;
@@ -212,7 +209,6 @@ BOOL CPPageInterface::OnApply()
 	s.nThemeGreen			= m_nThemeGreen;
 	s.nThemeBlue			= m_nThemeBlue;
 	s.nOSDTransparent		= m_nOSDTransparent;
-	s.fFileNameOnSeekBar	= !!m_fFileNameOnSeekBar;
 	s.nOSDBorder			= m_OSDBorder;
 
 	ApplyOSDTransparent();
