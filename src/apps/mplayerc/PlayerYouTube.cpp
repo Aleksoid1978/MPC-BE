@@ -263,7 +263,7 @@ namespace Youtube
 
 						const rapidjson::Value& snippet = items->value[0]["snippet"];
 						if (snippet["title"].IsString()) {
-							y_fields.title = FixHtmlSymbols(UTF8To16(snippet["title"].GetString()));
+							y_fields.title = FixHtmlSymbols(MultiByteToUTF16(snippet["title"].GetString()));
 						}
 						if (snippet["channelTitle"].IsString()) {
 							y_fields.author = UTF8To16(snippet["channelTitle"].GetString());
@@ -391,7 +391,7 @@ namespace Youtube
 				return false;
 			}
 
-			const CString Title = UTF8To16(GetEntry(data, "<title>", "</title>"));
+			const CString Title = MultiByteToUTF16(GetEntry(data, "<title>", "</title>"));
 			y_fields.title = FixHtmlSymbols(Title);
 
 			std::vector<youtubeFuncType> JSFuncs;
