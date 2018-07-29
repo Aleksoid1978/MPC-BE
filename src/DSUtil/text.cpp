@@ -20,6 +20,7 @@
  */
 
 #include "stdafx.h"
+#include "SysVersion.h"
 #include "text.h"
 
 DWORD CharSetToCodePage(DWORD dwCharSet)
@@ -202,6 +203,18 @@ CStringA UTF16To8(LPCWSTR lpWideCharStr)
 	return str;
 }
 
+void ReplaceCharacter(uint32_t& ch)
+{
+	if (!SysVersion::IsWin10orLater()) {
+		if (ch == 0x1F534 || ch == 0x1F535) { // Large Red Circle, Large Blue Circle
+			ch = 0x25CF; // Black Circle
+		}
+		else if (ch >= 0x1F600 && ch <= 0x1F64F) { // Emoticons
+			ch = 0x263A; // White Smiling Face
+		}
+	}
+}
+
 CString AltUTF8To16(LPCSTR lpMultiByteStr) // Use if MultiByteToWideChar() function does not work.
 {
 	if (!lpMultiByteStr) {
@@ -241,6 +254,7 @@ CString AltUTF8To16(LPCSTR lpMultiByteStr) // Use if MultiByteToWideChar() funct
 			//4 bytes
 			if ((*(Z + 1) & 0xC0) == 0x80 && (*(Z + 2) & 0xC0) == 0x80 && (*(Z + 3) & 0xC0) == 0x80) {
 				uint32_t u32 = ((uint32_t)(*Z & 0x0F) << 18) | ((uint32_t)(*(Z + 1) & 0x3F) << 12) | ((uint32_t)(*(Z + 2) & 0x3F) << 6) | ((uint32_t)*(Z + 3) & 0x3F);
+				ReplaceCharacter(u32);
 				if (u32 <= UINT16_MAX) {
 					str += (wchar_t)u32;
 				}
