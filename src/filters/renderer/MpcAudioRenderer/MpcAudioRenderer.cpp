@@ -1225,11 +1225,11 @@ void CMpcAudioRenderer::SetBalanceMask(const DWORD output_layout)
 
 	unsigned channel_num = 0;
 	for (unsigned i = 0; i < 32; i++) {
-		DWORD ch = 1 << i;
+		DWORD ch = 1u << i;
 
 		if (ch & output_layout) {
 			if (ch & quiet_layout) {
-				m_dwBalanceMask |= 1 << channel_num;
+				m_dwBalanceMask |= 1u << channel_num;
 			}
 			channel_num++;
 		}
