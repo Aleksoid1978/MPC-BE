@@ -404,7 +404,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 							BYTE* comment = DNew BYTE[comment_lenght + 1];
 							ZeroMemory(comment, comment_lenght + 1);
 							gb.ReadBuffer(comment, comment_lenght);
-							CString vorbisTag = AltUTF8To16((LPCSTR)comment);
+							CString vorbisTag = AltUTF8ToWStr((LPCSTR)comment);
 							delete [] comment;
 							CString tagValue;
 							if (!vorbisTag.IsEmpty() && ParseVorbisTag(L"WAVEFORMATEXTENSIBLE_CHANNEL_MASK", vorbisTag, tagValue)) {

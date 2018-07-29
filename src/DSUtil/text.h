@@ -198,11 +198,12 @@ extern CStringA UrlDecode(CStringA str_in);
 extern CString  ExtractTag(CString tag, CMapStringToString& attribs, bool& fClosing);
 extern CStringA HtmlSpecialChars(CStringA str, bool bQuotes = false);
 
-extern CString  ConvertToUTF16(LPCSTR lpMultiByteStr, UINT CodePage);
-extern CString  UTF8To16(LPCSTR lpMultiByteStr);
-extern CStringA UTF16To8(LPCWSTR lpWideCharStr);
-extern CString  AltUTF8To16(LPCSTR lpMultiByteStr);
-extern CString  MultiByteToUTF16(LPCSTR lpMultiByteStr);
+extern CStringA WStrToUTF8(LPCWSTR lpWideCharStr);
+
+extern CStringW ConvertToWStr(LPCSTR lpMultiByteStr, UINT CodePage);
+extern CStringW UTF8ToWStr(LPCSTR lpUTF8Str);
+extern CStringW AltUTF8ToWStr(LPCSTR lpUTF8Str);
+extern CStringW UTF8orLocalToWStr(LPCSTR lpMultiByteStr);
 
 void FixFilename(CStringW& str);
 

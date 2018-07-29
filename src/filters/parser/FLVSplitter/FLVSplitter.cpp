@@ -181,7 +181,7 @@ CString CFLVSplitterFilter::AMF0GetString(UINT64 end)
 
 	m_pFile->ByteRead((BYTE*)name, length);
 
-	return MultiByteToUTF16(name);
+	return UTF8orLocalToWStr(name);
 }
 
 bool CFLVSplitterFilter::ParseAMF0(UINT64 end, const CString key, std::vector<AMF0> &AMF0Array)

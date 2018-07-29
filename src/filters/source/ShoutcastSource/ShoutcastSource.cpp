@@ -718,7 +718,7 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 		static BYTE buff[255*16], b = 0;
 		memset(buff, 0, sizeof(buff));
 		if (1 == __super::Receive(&b, 1) && b && b*16 == __super::Receive(buff, b*16)) {
-			CString str = MultiByteToUTF16((LPCSTR)buff);
+			CString str = UTF8orLocalToWStr((LPCSTR)buff);
 
 			DLog(L"CShoutcastStream(): Metainfo: %s", str);
 
@@ -880,13 +880,13 @@ bool CShoutcastStream::CShoutcastSocket::Connect(CUrl& url, CString& redirectUrl
 				metaint = atoi(value);
 			}
 			else if (param == "icy-name") {
-				m_title = MultiByteToUTF16(value);
+				m_title = UTF8orLocalToWStr(value);
 			}
 			else if (param == "icy-url") {
 				m_url = value;
 			}
 			else if (param == "icy-description") {
-				m_description = MultiByteToUTF16(value);
+				m_description = UTF8orLocalToWStr(value);
 			}
 		}
 

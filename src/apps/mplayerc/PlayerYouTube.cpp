@@ -263,13 +263,13 @@ namespace Youtube
 
 						const rapidjson::Value& snippet = items->value[0]["snippet"];
 						if (snippet["title"].IsString()) {
-							y_fields.title = FixHtmlSymbols(MultiByteToUTF16(snippet["title"].GetString()));
+							y_fields.title = FixHtmlSymbols(AltUTF8ToWStr(snippet["title"].GetString()));
 						}
 						if (snippet["channelTitle"].IsString()) {
-							y_fields.author = UTF8To16(snippet["channelTitle"].GetString());
+							y_fields.author = UTF8ToWStr(snippet["channelTitle"].GetString());
 						}
 						if (snippet["description"].IsString()) {
-							y_fields.content = UTF8To16(snippet["description"].GetString());
+							y_fields.content = UTF8ToWStr(snippet["description"].GetString());
 						}
 						if (snippet["publishedAt"].IsString()) {
 							WORD y, m, d;
@@ -391,15 +391,15 @@ namespace Youtube
 				return false;
 			}
 
-			const CString Title = MultiByteToUTF16(GetEntry(data, "<title>", "</title>"));
+			const CString Title = AltUTF8ToWStr(GetEntry(data, "<title>", "</title>"));
 			y_fields.title = FixHtmlSymbols(Title);
 
 			std::vector<youtubeFuncType> JSFuncs;
 			std::vector<int> JSFuncArgs;
 			BOOL bJSParsed = FALSE;
-			CString JSUrl = UTF8To16(GetEntry(data, MATCH_JS_START, MATCH_END));
+			CString JSUrl = UTF8ToWStr(GetEntry(data, MATCH_JS_START, MATCH_END));
 			if (JSUrl.IsEmpty()) {
-				JSUrl = UTF8To16(GetEntry(data, MATCH_JS_START_2, MATCH_END));
+				JSUrl = UTF8ToWStr(GetEntry(data, MATCH_JS_START_2, MATCH_END));
 			}
 			if (!JSUrl.IsEmpty()) {
 				JSUrl.Replace(L"\\/", L"/");
@@ -710,7 +710,7 @@ namespace Youtube
 			};
 
 			if (strUrlsLive.empty()) {
-				CString dashmpdUrl = UTF8To16(GetEntry(data, MATCH_MPD_START, MATCH_END));
+				CString dashmpdUrl = UTF8ToWStr(GetEntry(data, MATCH_MPD_START, MATCH_END));
 				if (!dashmpdUrl.IsEmpty()) {
 					dashmpdUrl.Replace(L"\\/", L"/");
 					if (dashmpdUrl.Find(L"/s/") > 0) {
@@ -730,7 +730,7 @@ namespace Youtube
 						InternetReadData(hUrl, &dashmpd, dashmpdSize, nullptr);
 						InternetCloseHandle(hUrl);
 						if (dashmpdSize) {
-							CString xml = UTF8To16(dashmpd);
+							CString xml = UTF8ToWStr(dashmpd);
 							free(dashmpd);
 							const std::wregex regex(L"<Representation(.*?)</Representation>");
 							std::wcmatch match;
@@ -949,7 +949,7 @@ namespace Youtube
 											if (baseUrl != elem->MemberEnd() && baseUrl->value.IsString()) {
 												const CStringA urlA = baseUrl->value.GetString();
 												if (!urlA.IsEmpty()) {
-													url = UTF8To16(urlA) + L"&fmt=vtt";
+													url = UTF8ToWStr(urlA) + L"&fmt=vtt";
 												}
 											}
 
@@ -959,7 +959,7 @@ namespace Youtube
 												if (simpleText != nameObject->value.MemberEnd() && simpleText->value.IsString()) {
 													const CStringA nameA = simpleText->value.GetString();
 													if (!nameA.IsEmpty()) {
-														name = UTF8To16(nameA);
+														name = UTF8ToWStr(nameA);
 													}
 												}
 											}
@@ -985,7 +985,7 @@ namespace Youtube
 						InternetCloseHandle(hUrl);
 
 						if (dataSize) {
-							CString xml = UTF8To16(data);
+							CString xml = UTF8ToWStr(data);
 							free(data);
 							const std::wregex regex(L"<track id(.*?)/>");
 							std::wcmatch match;
@@ -1084,7 +1084,7 @@ namespace Youtube
 				}
 				block += blockEntry.GetLength();
 
-				CString item = UTF8To16(blockEntry);
+				CString item = UTF8ToWStr(blockEntry);
 				CString data_video_id;
 				int data_index = 0;
 				CString data_video_title;

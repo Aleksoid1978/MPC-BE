@@ -494,7 +494,7 @@ void CFLACStream::UpdateFromMetadata (void* pBuffer)
 		file_info.got_vorbis_comments = (vc->num_comments > 0);
 		for(unsigned i = 0; i < vc->num_comments; i++) {
 			CString TagValue;
-			CString VorbisTag = AltUTF8To16((LPCSTR)vc->comments[i].entry);
+			CString VorbisTag = AltUTF8ToWStr((LPCSTR)vc->comments[i].entry);
 			if (VorbisTag.GetLength() > 0) {
 				if (ParseVorbisTag(L"artist", VorbisTag, &TagValue)) {
 					file_info.artist = TagValue;

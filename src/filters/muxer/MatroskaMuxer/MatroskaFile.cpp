@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -120,7 +120,7 @@ QWORD CUTF8::Size(bool fWithHeader)
 	}
 
 	QWORD len = 0;
-	len += UTF16To8(*this).GetLength();
+	len += WStrToUTF8(*this).GetLength();
 	if (fWithHeader) {
 		len += HeaderSize(len);
 	}
@@ -134,7 +134,7 @@ HRESULT CUTF8::Write(IStream* pStream)
 	}
 
 	HeaderWrite(pStream);
-	CStringA str = UTF16To8(*this);
+	CStringA str = WStrToUTF8(*this);
 	return pStream->Write((BYTE*)(LPCSTR)str, str.GetLength(), nullptr);
 }
 

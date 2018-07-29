@@ -69,7 +69,7 @@ bool CApeTagItem::Load(CGolombBuffer &gb){
 		BYTE* value = DNew BYTE[tag_size + 1];
 		memset(value, 0, tag_size + 1);
 		gb.ReadBuffer(value, tag_size);
-		m_value = UTF8To16((LPCSTR)value);
+		m_value = UTF8ToWStr((LPCSTR)value);
 		m_key   = key;
 		delete [] value;
 	}

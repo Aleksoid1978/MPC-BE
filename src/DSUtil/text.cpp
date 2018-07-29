@@ -176,7 +176,18 @@ CStringA HtmlSpecialChars(CStringA str, bool bQuotes /*= false*/)
 	return str;
 }
 
-CString ConvertToUTF16(LPCSTR lpMultiByteStr, UINT CodePage)
+CStringA WStrToUTF8(LPCWSTR lpWideCharStr)
+{
+	CStringA str;
+	int len = WideCharToMultiByte(CP_UTF8, 0, lpWideCharStr, -1, nullptr, 0, nullptr, nullptr) - 1;
+	if (len < 0) {
+		return str;
+	}
+	str.ReleaseBuffer(WideCharToMultiByte(CP_UTF8, 0, lpWideCharStr, -1, str.GetBuffer(len), len + 1, nullptr, nullptr) - 1);
+	return str;
+}
+
+CString ConvertToWStr(LPCSTR lpMultiByteStr, UINT CodePage)
 {
 	CString str;
 	int len = MultiByteToWideChar(CodePage, 0, lpMultiByteStr, -1, nullptr, 0) - 1;
@@ -187,20 +198,9 @@ CString ConvertToUTF16(LPCSTR lpMultiByteStr, UINT CodePage)
 	return str;
 }
 
-CString UTF8To16(LPCSTR lpMultiByteStr)
+CString UTF8ToWStr(LPCSTR lpUTF8Str)
 {
-	return ConvertToUTF16(lpMultiByteStr, CP_UTF8);
-}
-
-CStringA UTF16To8(LPCWSTR lpWideCharStr)
-{
-	CStringA str;
-	int len = WideCharToMultiByte(CP_UTF8, 0, lpWideCharStr, -1, nullptr, 0, nullptr, nullptr) - 1;
-	if (len < 0) {
-		return str;
-	}
-	str.ReleaseBuffer(WideCharToMultiByte(CP_UTF8, 0, lpWideCharStr, -1, str.GetBuffer(len), len + 1, nullptr, nullptr) - 1);
-	return str;
+	return ConvertToWStr(lpUTF8Str, CP_UTF8);
 }
 
 void ReplaceCharacter(uint32_t& ch)
@@ -215,15 +215,15 @@ void ReplaceCharacter(uint32_t& ch)
 	}
 }
 
-CString AltUTF8To16(LPCSTR lpMultiByteStr) // Use if MultiByteToWideChar() function does not work.
+CString AltUTF8ToWStr(LPCSTR lpUTF8Str) // Use if MultiByteToWideChar() function does not work.
 {
-	if (!lpMultiByteStr) {
+	if (!lpUTF8Str) {
 		return L"";
 	}
 
 	CString str;
 	// Don't use MultiByteToWideChar(), some characters are not well decoded
-	const unsigned char* Z = (const unsigned char*)lpMultiByteStr;
+	const unsigned char* Z = (const unsigned char*)lpUTF8Str;
 	while (*Z) { //0 is end
 				 //1 byte
 		if (*Z < 0x80) {
@@ -276,11 +276,11 @@ CString AltUTF8To16(LPCSTR lpMultiByteStr) // Use if MultiByteToWideChar() funct
 	return str;
 }
 
-CString MultiByteToUTF16(LPCSTR lpMultiByteStr)
+CString UTF8orLocalToWStr(LPCSTR lpMultiByteStr)
 {
-	CString str = AltUTF8To16(lpMultiByteStr);
+	CString str = AltUTF8ToWStr(lpMultiByteStr);
 	if (str.IsEmpty()) {
-		str = ConvertToUTF16(lpMultiByteStr, CP_ACP); // Trying Local...
+		str = ConvertToWStr(lpMultiByteStr, CP_ACP); // Trying Local...
 	}
 
 	return str;
