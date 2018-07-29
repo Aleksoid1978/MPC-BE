@@ -180,10 +180,9 @@ CStringA WStrToUTF8(LPCWSTR lpWideCharStr)
 {
 	CStringA str;
 	int len = WideCharToMultiByte(CP_UTF8, 0, lpWideCharStr, -1, nullptr, 0, nullptr, nullptr) - 1;
-	if (len < 0) {
-		return str;
+	if (len > 0) {
+		str.ReleaseBuffer(WideCharToMultiByte(CP_UTF8, 0, lpWideCharStr, -1, str.GetBuffer(len), len + 1, nullptr, nullptr) - 1);
 	}
-	str.ReleaseBuffer(WideCharToMultiByte(CP_UTF8, 0, lpWideCharStr, -1, str.GetBuffer(len), len + 1, nullptr, nullptr) - 1);
 	return str;
 }
 
@@ -191,10 +190,9 @@ CString ConvertToWStr(LPCSTR lpMultiByteStr, UINT CodePage)
 {
 	CString str;
 	int len = MultiByteToWideChar(CodePage, 0, lpMultiByteStr, -1, nullptr, 0) - 1;
-	if (len < 0) {
-		return str;
+	if (len > 0) {
+		str.ReleaseBuffer(MultiByteToWideChar(CodePage, 0, lpMultiByteStr, -1, str.GetBuffer(len), len + 1) - 1);
 	}
-	str.ReleaseBuffer(MultiByteToWideChar(CodePage, 0, lpMultiByteStr, -1, str.GetBuffer(len), len + 1) - 1);
 	return str;
 }
 
@@ -225,46 +223,42 @@ CString AltUTF8ToWStr(LPCSTR lpUTF8Str) // Use if MultiByteToWideChar() function
 	// Don't use MultiByteToWideChar(), some characters are not well decoded
 	const unsigned char* Z = (const unsigned char*)lpUTF8Str;
 	while (*Z) { //0 is end
-				 //1 byte
+		//1 byte
 		if (*Z < 0x80) {
 			str += (wchar_t)(*Z);
 			Z++;
 		}
+		//2 bytes
 		else if ((*Z & 0xE0) == 0xC0) {
-			//2 bytes
 			if ((*(Z + 1) & 0xC0) == 0x80) {
 				str += (wchar_t)((((wchar_t)(*Z & 0x1F)) << 6) | (*(Z + 1) & 0x3F));
 				Z += 2;
-			}
-			else {
+			} else {
 				return L""; //Bad character
 			}
 		}
+		//3 bytes
 		else if ((*Z & 0xF0) == 0xE0) {
-			//3 bytes
 			if ((*(Z + 1) & 0xC0) == 0x80 && (*(Z + 2) & 0xC0) == 0x80) {
 				str += (wchar_t)((((wchar_t)(*Z & 0x0F)) << 12) | ((*(Z + 1) & 0x3F) << 6) | (*(Z + 2) & 0x3F));
 				Z += 3;
-			}
-			else {
+			} else {
 				return L""; //Bad character
 			}
 		}
+		//4 bytes
 		else if ((*Z & 0xF8) == 0xF0) {
-			//4 bytes
 			if ((*(Z + 1) & 0xC0) == 0x80 && (*(Z + 2) & 0xC0) == 0x80 && (*(Z + 3) & 0xC0) == 0x80) {
 				uint32_t u32 = ((uint32_t)(*Z & 0x0F) << 18) | ((uint32_t)(*(Z + 1) & 0x3F) << 12) | ((uint32_t)(*(Z + 2) & 0x3F) << 6) | ((uint32_t)*(Z + 3) & 0x3F);
 				ReplaceCharacter(u32);
 				if (u32 <= UINT16_MAX) {
 					str += (wchar_t)u32;
-				}
-				else {
+				} else {
 					str += (wchar_t)((((u32 - 0x010000) & 0x000FFC00) >> 10) | 0xD800);
 					str += (wchar_t)((u32 & 0x000003FF) | 0xDC00);
 				}
 				Z += 4;
-			}
-			else {
+			} else {
 				return L""; //Bad character
 			}
 		}
