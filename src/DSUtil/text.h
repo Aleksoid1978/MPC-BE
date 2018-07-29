@@ -191,12 +191,18 @@ T ImplodeEsc(const std::list<T>& sl, const SEP sep, const SEP esc = '\\')
 	return ret;
 }
 
-extern CString ExtractTag(CString tag, CMapStringToString& attribs, bool& fClosing);
+extern DWORD    CharSetToCodePage(DWORD dwCharSet);
 extern CStringA ConvertMBCS(CStringA str, DWORD SrcCharSet, DWORD DstCharSet);
 extern CStringA UrlEncode(CStringA str_in, bool fArg = false);
 extern CStringA UrlDecode(CStringA str_in);
+extern CString  ExtractTag(CString tag, CMapStringToString& attribs, bool& fClosing);
 extern CStringA HtmlSpecialChars(CStringA str, bool bQuotes = false);
-extern DWORD CharSetToCodePage(DWORD dwCharSet);
+
+extern CString  ConvertToUTF16(LPCSTR lpMultiByteStr, UINT CodePage);
+extern CString  UTF8To16(LPCSTR lpMultiByteStr);
+extern CStringA UTF16To8(LPCWSTR lpWideCharStr);
+extern CString  AltUTF8To16(LPCSTR lpMultiByteStr);
+extern CString  MultiByteToUTF16(LPCSTR lpMultiByteStr);
 
 void FixFilename(CStringW& str);
 

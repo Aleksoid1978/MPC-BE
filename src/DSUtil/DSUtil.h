@@ -138,11 +138,6 @@ extern GUID				GUIDFromCString(CString str);
 extern HRESULT			GUIDFromCString(CString str, GUID& guid);
 extern CString			CStringFromGUID(const GUID& guid);
 
-extern CString			ConvertToUTF16(LPCSTR lpMultiByteStr, UINT CodePage);
-extern CString			UTF8To16(LPCSTR lpMultiByteStr);
-extern CStringA			UTF16To8(LPCWSTR lpWideCharStr);
-extern CString			AltUTF8To16(LPCSTR lpMultiByteStr);
-extern CString			MultiByteToUTF16(LPCSTR lpMultiByteStr);
 extern CString			ISO6391ToLanguage(LPCSTR code);
 extern CString			ISO6392ToLanguage(LPCSTR code);
 
