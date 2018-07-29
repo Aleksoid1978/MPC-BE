@@ -200,7 +200,7 @@ static const DWORD GetFourcc(AP4_VisualSampleEntry* vse)
 	DWORD fourcc = -1;
 
 	AP4_Atom::Type type = vse->GetType();
-	CString tname = UTF8To16(vse->GetCompressorName());
+	CString tname = UTF8ToWStr(vse->GetCompressorName());
 
 	switch (type) {
 	// RAW video
@@ -392,7 +392,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			AP4_UI32 width = 0;
 			AP4_UI32 height = 0;
 
-			CString TrackName = MultiByteToUTF16(track->GetTrackName().c_str());
+			CString TrackName = UTF8orLocalToWStr(track->GetTrackName().c_str());
 			if (TrackName.GetLength() && TrackName[0] < 0x20) {
 				TrackName.Delete(0);
 			}
@@ -808,7 +808,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 						char buff[5] = { 0 };
 						memcpy(buff, &fourcc, 4);
-						CString tname = UTF8To16(vse->GetCompressorName());
+						CString tname = UTF8ToWStr(vse->GetCompressorName());
 
 						if ((buff[0] == 'x' || buff[0] == 'h') && buff[1] == 'd') {
 							// Apple HDV/XDCAM
@@ -1687,7 +1687,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			for (AP4_Cardinal i = 0; i < chapters.ItemCount(); ++i) {
 				AP4_ChplAtom::AP4_Chapter& chapter = chapters[i];
 
-				CString ChapterName = MultiByteToUTF16(chapter.Name.c_str());
+				CString ChapterName = UTF8orLocalToWStr(chapter.Name.c_str());
 				ChapAppend(chapter.Time, ChapterName);
 			}
 		} else if (ChapterTrackEntries.ItemCount()) {
@@ -1748,7 +1748,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								memcpy(buff, &ptr[2], size);
 								buff[size] = 0;
 
-								ChapterName = MultiByteToUTF16(buff);
+								ChapterName = UTF8orLocalToWStr(buff);
 
 								SAFE_DELETE_ARRAY(buff);
 							}
@@ -1797,7 +1797,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 							}
 						} else {
-							CStringW str = UTF8To16(CStringA((LPCSTR)db->GetData(), db->GetDataSize()));
+							CStringW str = UTF8ToWStr(CStringA((LPCSTR)db->GetData(), db->GetDataSize()));
 
 							switch (atom->GetType()) {
 								case AP4_ATOM_TYPE_NAM:
@@ -2076,7 +2076,7 @@ start:
 							for (int i = 0; i < wstr.GetLength(); ++i) {
 								wstr.SetAt(i, ((WORD)wstr[i] >> 8) | ((WORD)wstr[i] << 8));
 							}
-							str = UTF16To8(wstr);
+							str = WStrToUTF8(wstr);
 						} else {
 							str = CStringA((LPCSTR)&ptr[2], size);
 						}

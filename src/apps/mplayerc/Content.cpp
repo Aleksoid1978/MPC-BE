@@ -53,11 +53,11 @@ static const CString ConvertToUTF16(const BYTE* pData, size_t size)
 
 	CStringA lpMultiByteStr((LPCSTR)pData, size);
 	if (bUTF8) {
-		CString str = UTF8To16(lpMultiByteStr);
+		CString str = UTF8ToWStr(lpMultiByteStr);
 		return str;
 	}
 
-	CString str = MultiByteToUTF16(lpMultiByteStr);
+	CString str = UTF8orLocalToWStr(lpMultiByteStr);
 	return str;
 }
 

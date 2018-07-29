@@ -300,7 +300,7 @@ __int64 CDSMSplitterFile::Read(__int64 len, CStringW& str)
 	while (i++ < len && (c = (char)BitRead(8)) != 0) {
 		s += c;
 	}
-	str = UTF8To16(s);
+	str = UTF8ToWStr(s);
 	return i;
 }
 

@@ -715,7 +715,7 @@ void COggSplitterOutputPin::AddComment(BYTE* p, int len)
 		CStringA TagKey   = str.Left(sepPos);
 		CStringA TagValue = str.Mid(sepPos + 1);
 
-		CAutoPtr<CComment> pComment(DNew CComment(UTF8To16(TagKey), UTF8To16(TagValue)));
+		CAutoPtr<CComment> pComment(DNew CComment(UTF8ToWStr(TagKey), UTF8ToWStr(TagValue)));
 
 		if (pComment->m_key == L"LANGUAGE") {
 			CString lang = ISO6392ToLanguage(TagValue), iso6392 = LanguageToISO6392(pComment->m_value);

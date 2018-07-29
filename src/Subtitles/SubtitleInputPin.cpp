@@ -468,7 +468,7 @@ REFERENCE_TIME CSubtitleInputPin::DecodeSample(const std::unique_ptr<SubtitleSam
 		if (m_mt.subtype == MEDIASUBTYPE_UTF8) {
 			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)m_pSubStream;
 
-			CStringW str = UTF8To16(CStringA((LPCSTR)pData, nLen)).Trim();
+			CStringW str = UTF8ToWStr(CStringA((LPCSTR)pData, nLen)).Trim();
 			if (!str.IsEmpty()) {
 				pRTS->Add(str, true, (int)(tStart / 10000), (int)(tStop / 10000));
 				bInvalidate = true;
@@ -476,7 +476,7 @@ REFERENCE_TIME CSubtitleInputPin::DecodeSample(const std::unique_ptr<SubtitleSam
 		} else if (m_mt.subtype == MEDIASUBTYPE_SSA || m_mt.subtype == MEDIASUBTYPE_ASS || m_mt.subtype == MEDIASUBTYPE_ASS2) {
 			CRenderedTextSubtitle* pRTS = (CRenderedTextSubtitle*)(ISubStream*)m_pSubStream;
 
-			CStringW str = UTF8To16(CStringA((LPCSTR)pData, nLen)).Trim();
+			CStringW str = UTF8ToWStr(CStringA((LPCSTR)pData, nLen)).Trim();
 			if (!str.IsEmpty()) {
 				STSEntry stse;
 

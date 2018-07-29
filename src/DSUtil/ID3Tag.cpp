@@ -69,7 +69,7 @@ CString CID3Tag::ReadText(CGolombBuffer& gb, DWORD size, const BYTE encoding)
 		case ID3v2Encoding::ISO8859:
 		case ID3v2Encoding::UTF8:
 			gb.ReadBuffer((BYTE*)strA.GetBufferSetLength(size), size);
-			str = encoding == ID3v2Encoding::ISO8859 ? CString(strA) : UTF8To16(strA);
+			str = encoding == ID3v2Encoding::ISO8859 ? CString(strA) : UTF8ToWStr(strA);
 			break;
 		case ID3v2Encoding::UTF16BOM:
 			if (size > 2) {

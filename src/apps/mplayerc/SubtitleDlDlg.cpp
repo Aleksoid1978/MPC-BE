@@ -248,11 +248,11 @@ bool CSubtitleDlDlg::Parse()
 
 		CStringA titlesA = Implode(raw_movie.titles, '|');
 		titlesA.Replace("|", ", ");
-		p.titles = UTF8To16(titlesA);
+		p.titles = UTF8ToWStr(titlesA);
 		p.checked = false;
 
 		for (const auto& s : raw_movie.subs) {
-			p.name = UTF8To16(s.name);
+			p.name = UTF8ToWStr(s.name);
 			p.language = s.language;
 			p.format = s.format;
 			p.disc.Format(L"%d/%d", s.disc_no, s.discs);

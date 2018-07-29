@@ -1093,7 +1093,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseTeletext(CAutoPtr<CPacket> p)
 
 	if (!output.empty()) {
 		for (auto& tData : output) {
-			const CStringA strA = UTF16To8(tData.str);
+			const CStringA strA = WStrToUTF8(tData.str);
 
 			CAutoPtr<CPacket> p2(DNew CPacket());
 			p2->TrackNumber = m_p->TrackNumber;

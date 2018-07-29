@@ -197,7 +197,7 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			CStringA cuetextA;
 			cuefile.Read(cuetextA.GetBufferSetLength(size), size);
 
-			CStringW cuetextW = UTF8To16(cuetextA);
+			CStringW cuetextW = UTF8ToWStr(cuetextA);
 			std::list<Chapters> ChaptersList;
 			CString sTitle, sPerformer;
 
