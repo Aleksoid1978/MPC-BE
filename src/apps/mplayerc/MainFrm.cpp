@@ -10612,6 +10612,8 @@ void CMainFrame::ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo)
 			// Destroy the D3D Fullscreen window
 			DestroyD3DWindow();
 
+			SetAlwaysOnTop(s.iOnTop);
+
 			MoveVideoWindow();
 			RecalcLayout();
 		} else {
@@ -10622,6 +10624,8 @@ void CMainFrame::ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo)
 
 			// Create a new D3D Fullscreen window
 			CreateFullScreenWindow();
+
+			SetAlwaysOnTop(s.iOnTop);
 
 			// Turn on D3D Fullscreen
 			m_pD3DFS->SetD3DFullscreen(true);
@@ -15374,7 +15378,15 @@ void CMainFrame::SetAlwaysOnTop(int i)
 {
 	AfxGetAppSettings().iOnTop = i;
 
-	if (!m_bFullScreen && !IsD3DFullScreenMode()) {
+	BOOL bD3DOnMain = FALSE;
+	if (IsD3DFullScreenMode()) {
+		const auto mainMonitor = CMonitors::GetNearestMonitor(this);
+		const auto fullScreenMonitor = CMonitors::GetNearestMonitor(m_pFullscreenWnd);
+
+		bD3DOnMain = mainMonitor == fullScreenMonitor;
+	}
+
+	if (!m_bFullScreen && !bD3DOnMain) {
 		const CWnd* pInsertAfter = nullptr;
 
 		if (i == 0) {
@@ -15392,6 +15404,8 @@ void CMainFrame::SetAlwaysOnTop(int i)
 		}
 	} else if (m_bFullScreen && !(GetWindowLongPtrW(m_hWnd, GWL_EXSTYLE) & WS_EX_TOPMOST)) {
 		SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+	} else if (bD3DOnMain) {
+		SetWindowPos(&wndNoTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 	}
 }
 
