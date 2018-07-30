@@ -107,7 +107,6 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_pMediaType(nullptr)
 	, m_bStreamChanged(TRUE)
 {
-	HMODULE hLib = nullptr;
 	CRenderersSettings& rs = GetRenderersSettings();
 
 	ZeroMemory(m_VSyncOffsetHistory, sizeof(m_VSyncOffsetHistory));
@@ -119,13 +118,17 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	}
 
 	// Load EVR specifics DLLs
-	hLib = LoadLibraryW(L"dxva2.dll");
-	pfDXVA2CreateDirect3DDeviceManager9	= hLib ? (PTR_DXVA2CreateDirect3DDeviceManager9) GetProcAddress(hLib, "DXVA2CreateDirect3DDeviceManager9") : nullptr;
+	pfDXVA2CreateDirect3DDeviceManager9 = m_hDxva2Lib ? (PTR_DXVA2CreateDirect3DDeviceManager9) GetProcAddress(m_hDxva2Lib, "DXVA2CreateDirect3DDeviceManager9") : nullptr;
 
 	// Load EVR functions
-	hLib = LoadLibraryW(L"evr.dll");
-	pfMFCreateVideoSampleFromSurface	= hLib ? (PTR_MFCreateVideoSampleFromSurface)	GetProcAddress(hLib, "MFCreateVideoSampleFromSurface") : nullptr;
-	pfMFCreateVideoMediaType			= hLib ? (PTR_MFCreateVideoMediaType)			GetProcAddress(hLib, "MFCreateVideoMediaType") : nullptr;
+	m_hEvrLib = LoadLibraryW(L"evr.dll");
+	if (m_hEvrLib) {
+		pfMFCreateVideoSampleFromSurface = (PTR_MFCreateVideoSampleFromSurface)GetProcAddress(m_hEvrLib, "MFCreateVideoSampleFromSurface");
+		pfMFCreateVideoMediaType         = (PTR_MFCreateVideoMediaType)GetProcAddress(m_hEvrLib, "MFCreateVideoMediaType");
+	} else {
+		pfMFCreateVideoSampleFromSurface = nullptr;
+		pfMFCreateVideoMediaType         = nullptr;
+	}
 
 	if (!pfDXVA2CreateDirect3DDeviceManager9 || !pfMFCreateVideoSampleFromSurface || !pfMFCreateVideoMediaType) {
 		if (!pfDXVA2CreateDirect3DDeviceManager9) {
@@ -143,7 +146,7 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 
 	// Load mfplat fuctions
 #if 0
-	hLib = LoadLibraryW(L"mfplat.dll");
+	HMODULE hLib = LoadLibraryW(L"mfplat.dll");
 	(FARPROC &)pMFCreateMediaType = GetProcAddress(hLib, "MFCreateMediaType");
 	(FARPROC &)pMFInitMediaTypeFromAMMediaType = GetProcAddress(hLib, "MFInitMediaTypeFromAMMediaType");
 	(FARPROC &)pMFInitAMMediaTypeFromMFMediaType = GetProcAddress(hLib, "MFInitAMMediaTypeFromMFMediaType");
@@ -155,10 +158,16 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 #endif
 
 	// Load Vista specifics DLLs
-	hLib = LoadLibraryW(L"avrt.dll");
-	pfAvSetMmThreadCharacteristicsW		= hLib ? (PTR_AvSetMmThreadCharacteristicsW)	GetProcAddress(hLib, "AvSetMmThreadCharacteristicsW") : nullptr;
-	pfAvSetMmThreadPriority				= hLib ? (PTR_AvSetMmThreadPriority)			GetProcAddress(hLib, "AvSetMmThreadPriority") : nullptr;
-	pfAvRevertMmThreadCharacteristics	= hLib ? (PTR_AvRevertMmThreadCharacteristics)	GetProcAddress(hLib, "AvRevertMmThreadCharacteristics") : nullptr;
+	m_hAvrtLib = LoadLibraryW(L"avrt.dll");
+	if (m_hAvrtLib) {
+		pfAvSetMmThreadCharacteristicsW   = (PTR_AvSetMmThreadCharacteristicsW)GetProcAddress(m_hAvrtLib, "AvSetMmThreadCharacteristicsW");
+		pfAvSetMmThreadPriority           = (PTR_AvSetMmThreadPriority)GetProcAddress(m_hAvrtLib, "AvSetMmThreadPriority");
+		pfAvRevertMmThreadCharacteristics = (PTR_AvRevertMmThreadCharacteristics)GetProcAddress(m_hAvrtLib, "AvRevertMmThreadCharacteristics");
+	} else {
+		pfAvSetMmThreadCharacteristicsW   = nullptr;
+		pfAvSetMmThreadPriority           = nullptr;
+		pfAvRevertMmThreadCharacteristics = nullptr;
+	}
 
 	// Init DXVA manager
 	hr = pfDXVA2CreateDirect3DDeviceManager9(&m_nResetToken, &m_pD3DManager);
@@ -177,11 +186,17 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 
 CEVRAllocatorPresenter::~CEVRAllocatorPresenter(void)
 {
-	StopWorkerThreads();	// If not already done...
-	m_pMediaType	= nullptr;
-	m_pClock		= nullptr;
+	StopWorkerThreads(); // If not already done...
+	m_pMediaType  = nullptr;
+	m_pClock      = nullptr;
+	m_pD3DManager = nullptr;
 
-	m_pD3DManager	= nullptr;
+	if (m_hAvrtLib) {
+		FreeLibrary(m_hAvrtLib);
+	}
+	if (m_hEvrLib) {
+		FreeLibrary(m_hEvrLib);
+	}
 }
 
 void CEVRAllocatorPresenter::ResetStats()

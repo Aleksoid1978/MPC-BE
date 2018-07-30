@@ -58,6 +58,10 @@ namespace DSObjects
 		public IPlaybackNotify
 		//public IMFVideoPositionMapper, // Non mandatory EVR Presenter Interfaces (see later...)
 	{
+	private:
+		HMODULE m_hEvrLib = nullptr;
+		HMODULE m_hAvrtLib = nullptr;
+
 	public:
 		CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error);
 		~CEVRAllocatorPresenter(void);

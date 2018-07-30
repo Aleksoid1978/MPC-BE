@@ -363,6 +363,11 @@ namespace GothSync
 		public ID3DFullscreenControl,
 		public IPlaybackNotify
 	{
+	private:
+		HMODULE m_hDxva2Lib = nullptr;
+		HMODULE m_hEvrLib = nullptr;
+		HMODULE m_hAvrtLib = nullptr;
+
 	public:
 		CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error);
 		~CSyncAP();

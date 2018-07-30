@@ -96,6 +96,7 @@ namespace DSObjects
 		const wchar_t*				m_wsResizer2;
 		CString						m_strMixerOutputFmt;
 
+		HMODULE m_hDxva2Lib = nullptr;
 
 		CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pError);
 		~CDX9RenderingEngine();
@@ -122,9 +123,6 @@ namespace DSObjects
 		D3DCAPS9					m_Caps;
 		LPCSTR						m_ShaderProfile; // for shader compiler
 
-#if DXVA2VP || DXVAHDVP
-		HMODULE m_hDxva2Lib = nullptr;
-#endif
 #if DXVA2VP
 		CComPtr<IDirectXVideoProcessorService> m_pDXVA2_VPService;
 		CComPtr<IDirectXVideoProcessor> m_pDXVA2_VP;
