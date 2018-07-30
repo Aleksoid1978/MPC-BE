@@ -2199,7 +2199,6 @@ STDMETHODIMP CBaseAP::AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profi
 CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	: CBaseAP(hWnd, bFullscreen, hr, _Error)
 {
-	HMODULE		hLib;
 	CRenderersSettings& rs = GetRenderersSettings();
 
 	m_nResetToken   = 0;
@@ -2218,13 +2217,18 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	}
 
 	// Load EVR specifics DLLs
-	hLib = LoadLibraryW(L"dxva2.dll");
-	pfDXVA2CreateDirect3DDeviceManager9	= hLib ? (PTR_DXVA2CreateDirect3DDeviceManager9) GetProcAddress (hLib, "DXVA2CreateDirect3DDeviceManager9") : nullptr;
+	m_hDxva2Lib = LoadLibraryW(L"dxva2.dll");
+	pfDXVA2CreateDirect3DDeviceManager9 = m_hDxva2Lib ? (PTR_DXVA2CreateDirect3DDeviceManager9) GetProcAddress (m_hDxva2Lib, "DXVA2CreateDirect3DDeviceManager9") : nullptr;
 
 	// Load EVR functions
-	hLib = LoadLibraryW(L"evr.dll");
-	pfMFCreateVideoSampleFromSurface = hLib ? (PTR_MFCreateVideoSampleFromSurface)GetProcAddress (hLib, "MFCreateVideoSampleFromSurface") : nullptr;
-	pfMFCreateVideoMediaType = hLib ? (PTR_MFCreateVideoMediaType)GetProcAddress (hLib, "MFCreateVideoMediaType") : nullptr;
+	m_hEvrLib = LoadLibraryW(L"evr.dll");
+	if (m_hEvrLib) {
+		pfMFCreateVideoSampleFromSurface = (PTR_MFCreateVideoSampleFromSurface)GetProcAddress(m_hEvrLib, "MFCreateVideoSampleFromSurface");
+		pfMFCreateVideoMediaType         = (PTR_MFCreateVideoMediaType)GetProcAddress(m_hEvrLib, "MFCreateVideoMediaType");
+	} else {
+		pfMFCreateVideoSampleFromSurface = nullptr;
+		pfMFCreateVideoMediaType         = nullptr;
+	}
 
 	if (!pfDXVA2CreateDirect3DDeviceManager9 || !pfMFCreateVideoSampleFromSurface || !pfMFCreateVideoMediaType) {
 		if (!pfDXVA2CreateDirect3DDeviceManager9) {
@@ -2241,10 +2245,16 @@ CSyncAP::CSyncAP(HWND hWnd, bool bFullscreen, HRESULT& hr, CString &_Error)
 	}
 
 	// Load Vista specific DLLs
-	hLib = LoadLibraryW(L"avrt.dll");
-	pfAvSetMmThreadCharacteristicsW = hLib ? (PTR_AvSetMmThreadCharacteristicsW) GetProcAddress (hLib, "AvSetMmThreadCharacteristicsW") : nullptr;
-	pfAvSetMmThreadPriority = hLib ? (PTR_AvSetMmThreadPriority) GetProcAddress (hLib, "AvSetMmThreadPriority") : nullptr;
-	pfAvRevertMmThreadCharacteristics = hLib ? (PTR_AvRevertMmThreadCharacteristics) GetProcAddress (hLib, "AvRevertMmThreadCharacteristics") : nullptr;
+	m_hAvrtLib = LoadLibraryW(L"avrt.dll");
+	if (m_hAvrtLib) {
+		pfAvSetMmThreadCharacteristicsW   = (PTR_AvSetMmThreadCharacteristicsW)GetProcAddress(m_hAvrtLib, "AvSetMmThreadCharacteristicsW");
+		pfAvSetMmThreadPriority           = (PTR_AvSetMmThreadPriority)GetProcAddress(m_hAvrtLib, "AvSetMmThreadPriority");
+		pfAvRevertMmThreadCharacteristics = (PTR_AvRevertMmThreadCharacteristics)GetProcAddress(m_hAvrtLib, "AvRevertMmThreadCharacteristics");
+	} else {
+		pfAvSetMmThreadCharacteristicsW   = nullptr;
+		pfAvSetMmThreadPriority           = nullptr;
+		pfAvRevertMmThreadCharacteristics = nullptr;
+	}
 
 	// Init DXVA manager
 	hr = pfDXVA2CreateDirect3DDeviceManager9(&m_nResetToken, &m_pD3DManager);
@@ -2282,6 +2292,16 @@ CSyncAP::~CSyncAP(void)
 	m_pMediaType = nullptr;
 	m_pClock = nullptr;
 	m_pD3DManager = nullptr;
+
+	if (m_hAvrtLib) {
+		FreeLibrary(m_hAvrtLib);
+	}
+	if (m_hEvrLib) {
+		FreeLibrary(m_hEvrLib);
+	}
+	if (m_hDxva2Lib) {
+		FreeLibrary(m_hDxva2Lib);
+	}
 }
 
 HRESULT CSyncAP::CheckShutdown() const

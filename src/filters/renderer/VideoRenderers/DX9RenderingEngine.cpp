@@ -154,10 +154,8 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_bFinalPass(false)
 	, m_bDither(false)
 {
-#if DXVA2VP || DXVAHDVP
 	m_hDxva2Lib = LoadLibraryW(L"dxva2.dll");
 	DLogIf(!m_hDxva2Lib, L"Failed to load dxva2.dll");
-#endif
 #if DXVA2VP
 	ZeroMemory(m_ProcAmpValues, sizeof(m_ProcAmpValues));
 	ZeroMemory(m_NFilterValues, sizeof(m_NFilterValues));
@@ -167,11 +165,9 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 
 CDX9RenderingEngine::~CDX9RenderingEngine()
 {
-#if DXVA2VP || DXVAHDVP
 	if (m_hDxva2Lib) {
 		FreeLibrary(m_hDxva2Lib);
 	}
-#endif
 }
 
 void CDX9RenderingEngine::InitRenderingEngine()
