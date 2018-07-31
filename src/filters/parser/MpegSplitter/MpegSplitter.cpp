@@ -1385,9 +1385,10 @@ bool CMpegSplitterFilter::DemuxInit()
 
 #define SimpleSeek																		\
 	__int64 nextPos;																	\
+	const auto& masterStream = pMasterStream->front();									\
 	REFERENCE_TIME rtPTS = m_pFile->NextPTS(masterStream, masterStream.codec, nextPos);	\
 	if (rtPTS != INVALID_TIME) {														\
-		m_rtStartOffset = m_pFile->m_rtMin + rtPTS - rt;								\
+		m_rtStartOffset = m_pFile->m_rtMin + rtPTS - rt + UNITS;						\
 	}																					\
 	if (m_rtStartOffset > m_pFile->m_rtMax) {											\
 		m_rtStartOffset = 0;															\
@@ -1413,9 +1414,6 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	m_MVCExtensionQueue.clear();
 	m_MVCBaseQueue.clear();
 
-	const auto& masterStream = pMasterStream->front();
-	DWORD TrackNum = masterStream;
-
 	if (rt == 0) {
 		m_pFile->Seek(m_pFile->m_posMin);
 	} else {
@@ -1437,7 +1435,7 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		if (m_pFile->m_bPESPTSPresent) {
 			for (const auto& stream : *pMasterStream) {
 				CMpegSplitterFile::stream_codec codec = stream.codec;
-				TrackNum = stream;
+				DWORD TrackNum = stream;
 
 				CBaseSplitterOutputPin* pPin = GetOutputPin(TrackNum);
 				if (pPin && pPin->IsConnected()) {
@@ -1453,26 +1451,29 @@ void CMpegSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					__int64 nextPos;
 					for (;;) {
 						REFERENCE_TIME rtPTS = m_pFile->NextPTS(TrackNum, codec, nextPos);
-						if (rtPTS != INVALID_TIME
-								&& rtmin <= rtPTS && rtPTS < rtmax) {
-							minseekrt = rtPTS;
-							minseekpos = m_pFile->GetPos();
+						if (rtPTS != INVALID_TIME) {
+							if (rtPTS < 0) {
+								break;
+							} else if (rtmin <= rtPTS && rtPTS < rtmax) {
+								minseekrt = rtPTS;
+								minseekpos = m_pFile->GetPos();
 
-							if (codec == CMpegSplitterFile::stream_codec::MPEG
-									|| codec == CMpegSplitterFile::stream_codec::H264) {
-								const REFERENCE_TIME rtLimit = codec == CMpegSplitterFile::stream_codec::MPEG ? rt : rt - UNITS/2;
-								while (m_pFile->GetRemaining()) {
-									m_pFile->Seek(nextPos);
-									rtPTS = m_pFile->NextPTS(TrackNum, codec, nextPos, TRUE, rtLimit);
-									if (rtPTS > rtLimit || rtPTS == INVALID_TIME) {
-										break;
+								if (codec == CMpegSplitterFile::stream_codec::MPEG
+										|| codec == CMpegSplitterFile::stream_codec::H264) {
+									const REFERENCE_TIME rtLimit = codec == CMpegSplitterFile::stream_codec::MPEG ? rt : rt - UNITS/2;
+									while (m_pFile->GetRemaining()) {
+										m_pFile->Seek(nextPos);
+										rtPTS = m_pFile->NextPTS(TrackNum, codec, nextPos, TRUE, rtLimit);
+										if (rtPTS > rtLimit || rtPTS == INVALID_TIME) {
+											break;
+										}
+										minseekrt = rtPTS;
+										minseekpos = m_pFile->GetPos();
 									}
-									minseekrt = rtPTS;
-									minseekpos = m_pFile->GetPos();
 								}
-							}
 
-							break;
+								break;
+							}
 						}
 
 						REFERENCE_TIME dt = rtPTS == INVALID_TIME ? rtPTS : rtPTS - rtmax;
