@@ -17442,29 +17442,82 @@ void CMainFrame::SendSubtitleTracksToApi()
 	CString strSubs;
 	if (m_eMediaLoadState == MLS_LOADED) {
 		if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
-			POSITION pos = m_pSubStreams.GetHeadPosition();
-			if (pos) {
-				while (pos) {
-					CComPtr<ISubStream> pSubStream = m_pSubStreams.GetNext(pos);
+			int currentStream = -1;
+			int intSubCount = 0;
+			CComQIPtr<IAMStreamSelect> pSS = m_pMainSourceFilter;
+			if (pSS) {
+				DWORD cStreams;
+				if (!FAILED(pSS->Count(&cStreams))) {
 
-					for (int i = 0, j = pSubStream->GetStreamCount(); i < j; i++) {
-						WCHAR* pName = nullptr;
-						if (SUCCEEDED(pSubStream->GetStreamInfo(i, &pName, nullptr))) {
-							if (!strSubs.IsEmpty()) {
-								strSubs.Append(L"|");
+					BOOL bIsHaali = FALSE;
+					CComQIPtr<IBaseFilter> pBF = pSS;
+					if (GetCLSID(pBF) == CLSID_HaaliSplitterAR || GetCLSID(pBF) == CLSID_HaaliSplitter) {
+						bIsHaali = TRUE;
+						cStreams--;
+					}
+
+					for (DWORD i = 0, j = cStreams; i < j; i++) {
+						DWORD dwFlags  = DWORD_MAX;
+						DWORD dwGroup  = DWORD_MAX;
+						WCHAR* pszName = nullptr;
+
+						if (SUCCEEDED(pSS->Info(i, nullptr, &dwFlags, nullptr, &dwGroup, &pszName, nullptr, nullptr)) && pszName) {
+							if (dwGroup != SUBTITLE_GROUP) {
+								CoTaskMemFree(pszName);
+								continue;
 							}
-							CString name(pName);
+
+							CString name(pszName);
 							name.Replace(L"|", L"\\|");
 							strSubs.AppendFormat(L"%s", name);
-							CoTaskMemFree(pName);
+							CoTaskMemFree(pszName);
+
+							if ((dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) && m_iSubtitleSel == 0) {
+								currentStream = intSubCount;
+							}
+							intSubCount++;
 						}
 					}
 				}
+			}
+
+			int iSubtitleSel = m_iSubtitleSel;
+
+			POSITION pos = m_pSubStreams.GetHeadPosition();
+			CComPtr<ISubStream> pSubStream;
+			if (intSubCount > 0 && pos) {
+				pSubStream = m_pSubStreams.GetNext(pos);
+				if (iSubtitleSel != -1) {
+					iSubtitleSel += (intSubCount - 1);
+				}
+			}
+
+			while (pos) {
+				pSubStream = m_pSubStreams.GetNext(pos);
+				if (!pSubStream) {
+					continue;
+				}
+
+				for (int i = 0; i < pSubStream->GetStreamCount(); i++) {
+					WCHAR* pName = nullptr;
+					if (SUCCEEDED(pSubStream->GetStreamInfo(i, &pName, nullptr))) {
+						if (!strSubs.IsEmpty()) {
+							strSubs.Append(L"|");
+						}
+						CString name(pName);
+						name.Replace(L"|", L"\\|");
+						strSubs.AppendFormat(L"%s", name);
+						CoTaskMemFree(pName);
+					}
+				}
+			}
+
+			if (!strSubs.IsEmpty()) {
 				if (AfxGetAppSettings().fEnableSubtitles) {
-					if (m_iSubtitleSel >= 0) {
-						strSubs.AppendFormat(L"|%i", m_iSubtitleSel);
-					} else {
-						strSubs.Append(L"|-1");
+					if (currentStream != -1) {
+						strSubs.AppendFormat(L"|%i", currentStream);
+					} else if (iSubtitleSel != -1) {
+						strSubs.AppendFormat(L"|%i", iSubtitleSel);
 					}
 				} else {
 					strSubs.Append(L"|-1");
