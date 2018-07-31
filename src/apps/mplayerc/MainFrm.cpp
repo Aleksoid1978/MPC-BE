@@ -15844,7 +15844,7 @@ void CMainFrame::SetAudioTrackIdx(int index)
 
 void CMainFrame::SetSubtitleTrackIdx(int index)
 {
-	if (/*m_eMediaLoadState == MLS_LOADED && */GetPlaybackMode() == PM_FILE) {
+	if (m_eMediaLoadState == MLS_LOADING || m_eMediaLoadState == MLS_LOADED) {
 		if (index != -1) {
 			AfxGetAppSettings().fEnableSubtitles = true;
 		}
