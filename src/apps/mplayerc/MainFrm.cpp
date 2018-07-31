@@ -17441,38 +17441,122 @@ void CMainFrame::SendSubtitleTracksToApi()
 {
 	CString strSubs;
 	if (m_eMediaLoadState == MLS_LOADED) {
-		POSITION pos = m_pSubStreams.GetHeadPosition();
-		if (pos) {
-			while (pos) {
-				CComPtr<ISubStream> pSubStream = m_pSubStreams.GetNext(pos);
+		if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
+			POSITION pos = m_pSubStreams.GetHeadPosition();
+			if (pos) {
+				while (pos) {
+					CComPtr<ISubStream> pSubStream = m_pSubStreams.GetNext(pos);
 
-				for (int i = 0, j = pSubStream->GetStreamCount(); i < j; i++) {
-					WCHAR* pName = nullptr;
-					if (SUCCEEDED(pSubStream->GetStreamInfo(i, &pName, nullptr))) {
-						CString name(pName);
-						if (!strSubs.IsEmpty()) {
-							strSubs.Append (L"|");
+					for (int i = 0, j = pSubStream->GetStreamCount(); i < j; i++) {
+						WCHAR* pName = nullptr;
+						if (SUCCEEDED(pSubStream->GetStreamInfo(i, &pName, nullptr))) {
+							if (!strSubs.IsEmpty()) {
+								strSubs.Append(L"|");
+							}
+							CString name(pName);
+							name.Replace(L"|", L"\\|");
+							strSubs.AppendFormat(L"%s", name);
+							CoTaskMemFree(pName);
 						}
-						name.Replace(L"|", L"\\|");
-						strSubs.AppendFormat(L"%s", name);
-						CoTaskMemFree(pName);
 					}
 				}
-			}
-			if (AfxGetAppSettings().fEnableSubtitles) {
-				if (m_iSubtitleSel >= 0) {
-					strSubs.AppendFormat(L"|%i", m_iSubtitleSel);
+				if (AfxGetAppSettings().fEnableSubtitles) {
+					if (m_iSubtitleSel >= 0) {
+						strSubs.AppendFormat(L"|%i", m_iSubtitleSel);
+					} else {
+						strSubs.Append(L"|-1");
+					}
 				} else {
 					strSubs.Append(L"|-1");
 				}
 			} else {
-				strSubs.Append (L"|-1");
+				strSubs.Append(L"-1");
 			}
-		} else {
-			strSubs.Append (L"-1");
+		} else if (GetPlaybackMode() == PM_DVD && m_pDVDC) {
+			ULONG ulStreamsAvailable, ulCurrentStream;
+			BOOL bIsDisabled;
+			if (FAILED(m_pDVDI->GetCurrentSubpicture(&ulStreamsAvailable, &ulCurrentStream, &bIsDisabled))
+					|| ulStreamsAvailable == 0) {
+				return;
+			}
+
+			LCID DefLanguage;
+			DVD_SUBPICTURE_LANG_EXT ext;
+			if (FAILED(m_pDVDI->GetDefaultSubpictureLanguage(&DefLanguage, &ext))) {
+				return;
+			}
+
+			int currentStream = -1;
+			for (ULONG i = 0; i < ulStreamsAvailable; i++) {
+				LCID Language;
+				if (FAILED(m_pDVDI->GetSubpictureLanguage(i, &Language))) {
+					continue;
+				}
+
+				CString name;
+				if (Language) {
+					int len = GetLocaleInfoW(Language, LOCALE_SENGLANGUAGE, name.GetBuffer(256), 256);
+					name.ReleaseBufferSetLength(max(len - 1, 0));
+				} else {
+					name.Format(ResStr(IDS_AG_UNKNOWN), i + 1);
+				}
+
+				DVD_SubpictureAttributes ATR;
+				if (SUCCEEDED(m_pDVDI->GetSubpictureAttributes(i, &ATR))) {
+					switch (ATR.LanguageExtension) {
+						case DVD_SP_EXT_NotSpecified:
+						default:
+							break;
+						case DVD_SP_EXT_Caption_Normal:
+							name += L"";
+							break;
+						case DVD_SP_EXT_Caption_Big:
+							name += L" (Big)";
+							break;
+						case DVD_SP_EXT_Caption_Children:
+							name += L" (Children)";
+							break;
+						case DVD_SP_EXT_CC_Normal:
+							name += L" (CC)";
+							break;
+						case DVD_SP_EXT_CC_Big:
+							name += L" (CC Big)";
+							break;
+						case DVD_SP_EXT_CC_Children:
+							name += L" (CC Children)";
+							break;
+						case DVD_SP_EXT_Forced:
+							name += L" (Forced)";
+							break;
+						case DVD_SP_EXT_DirectorComments_Normal:
+							name += L" (Director Comments)";
+							break;
+						case DVD_SP_EXT_DirectorComments_Big:
+							name += L" (Director Comments, Big)";
+							break;
+						case DVD_SP_EXT_DirectorComments_Children:
+							name += L" (Director Comments, Children)";
+							break;
+					}
+				}
+
+				if (i == ulCurrentStream) {
+					currentStream = i;
+				}
+				if (!strSubs.IsEmpty()) {
+					strSubs.Append(L"|");
+				}
+				name.Replace(L"|", L"\\|");
+				strSubs.AppendFormat(L"%s", name);
+			}
+			if (AfxGetAppSettings().fEnableSubtitles) {
+				strSubs.AppendFormat(L"|%i", currentStream);
+			} else {
+				strSubs.Append(L"|-1");
+			}
 		}
 	} else {
-		strSubs.Append (L"-2");
+		strSubs.Append(L"-2");
 	}
 
 	SendAPICommand(CMD_LISTSUBTITLETRACKS, L"%s", strSubs);
@@ -17483,33 +17567,104 @@ void CMainFrame::SendAudioTracksToApi()
 	CString strAudios;
 
 	if (m_eMediaLoadState == MLS_LOADED) {
-		CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter;
+		if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
+			CComQIPtr<IAMStreamSelect> pSS = m_pSwitcherFilter;
 
-		DWORD cStreams = 0;
-		if (pSS && SUCCEEDED(pSS->Count(&cStreams))) {
-			int currentStream = -1;
-			for (int i = 0; i < (int)cStreams; i++) {
-				DWORD dwFlags  = DWORD_MAX;
-				WCHAR* pszName = nullptr;
-				if (FAILED(pSS->Info(i, nullptr, &dwFlags, nullptr, nullptr, &pszName, nullptr, nullptr)) || !pszName) {
-					return;
+			DWORD cStreams = 0;
+			if (pSS && SUCCEEDED(pSS->Count(&cStreams))) {
+				int currentStream = -1;
+				for (DWORD i = 0; i < cStreams; i++) {
+					DWORD dwFlags  = 0;
+					WCHAR* pszName = nullptr;
+					if (FAILED(pSS->Info(i, nullptr, &dwFlags, nullptr, nullptr, &pszName, nullptr, nullptr)) || !pszName) {
+						return;
+					}
+					if (dwFlags & (AMSTREAMSELECTINFO_ENABLED | AMSTREAMSELECTINFO_EXCLUSIVE)) {
+						currentStream = i;
+					}
+					if (!strAudios.IsEmpty()) {
+						strAudios.Append(L"|");
+					}
+					CString name(pszName);
+					name.Replace(L"|", L"\\|");
+					strAudios.AppendFormat(L"%s", name);
+
+					CoTaskMemFree(pszName);
 				}
-				if (dwFlags == AMSTREAMSELECTINFO_EXCLUSIVE) {
+				strAudios.AppendFormat(L"|%i", currentStream);
+			} else {
+				strAudios.Append(L"-1");
+			}
+		} else if (GetPlaybackMode() == PM_DVD && m_pDVDC) {
+			ULONG ulStreamsAvailable, ulCurrentStream;
+			if (FAILED(m_pDVDI->GetCurrentAudio(&ulStreamsAvailable, &ulCurrentStream))
+					|| ulStreamsAvailable == 0) {
+				return;
+			}
+
+			LCID DefLanguage;
+			DVD_AUDIO_LANG_EXT ext;
+			if (FAILED(m_pDVDI->GetDefaultAudioLanguage(&DefLanguage, &ext))) {
+				return;
+			}
+
+			int currentStream = -1;
+			for (ULONG i = 0; i < ulStreamsAvailable; i++) {
+				LCID Language;
+				if (FAILED(m_pDVDI->GetAudioLanguage(i, &Language))) {
+					continue;
+				}
+
+				CString name;
+				if (Language) {
+					int len = GetLocaleInfoW(Language, LOCALE_SENGLANGUAGE, name.GetBuffer(256), 256);
+					name.ReleaseBufferSetLength(max(len-1, 0));
+				} else {
+					name.Format(ResStr(IDS_AG_UNKNOWN), i+1);
+				}
+
+				DVD_AudioAttributes ATR;
+				if (SUCCEEDED(m_pDVDI->GetAudioAttributes(i, &ATR))) {
+					switch (ATR.LanguageExtension) {
+						case DVD_AUD_EXT_NotSpecified:
+						default:
+							break;
+						case DVD_AUD_EXT_Captions:
+							name += L" (Captions)";
+							break;
+						case DVD_AUD_EXT_VisuallyImpaired:
+							name += L" (Visually Impaired)";
+							break;
+						case DVD_AUD_EXT_DirectorComments1:
+							name += ResStr(IDS_MAINFRM_121);
+							break;
+						case DVD_AUD_EXT_DirectorComments2:
+							name += ResStr(IDS_MAINFRM_122);
+							break;
+					}
+
+					const CString format = GetDVDAudioFormatName(ATR);
+					if (!format.IsEmpty()) {
+						name.Format(ResStr(IDS_MAINFRM_11),
+									name.GetString(),
+									format,
+									ATR.dwFrequency,
+									ATR.bQuantization,
+									ATR.bNumberOfChannels,
+									(ATR.bNumberOfChannels > 1 ? ResStr(IDS_MAINFRM_13) : ResStr(IDS_MAINFRM_12)));
+					}
+				}
+
+				if (i == ulCurrentStream) {
 					currentStream = i;
 				}
-				CString name(pszName);
 				if (!strAudios.IsEmpty()) {
-					strAudios.Append (L"|");
+					strAudios.Append(L"|");
 				}
 				name.Replace(L"|", L"\\|");
 				strAudios.AppendFormat(L"%s", name);
-
-				CoTaskMemFree(pszName);
 			}
 			strAudios.AppendFormat(L"|%i", currentStream);
-
-		} else {
-			strAudios.Append(L"-1");
 		}
 	} else {
 		strAudios.Append(L"-2");
