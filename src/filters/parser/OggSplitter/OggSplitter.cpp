@@ -195,7 +195,7 @@ start:
 	int streamId = 0;
 
 	OggPage page;
-	for (int i = 0; m_pFile->Read(page), i < 30; i++) {
+	for (int i = 0; m_pFile->ReadPages(page), i < 30; i++) {
 		BYTE* p = page.data();
 		if (!p) {
 			continue;
@@ -448,19 +448,17 @@ start:
 
 	// comments
 	{
-		CAtlMap<CStringW, CStringW, CStringElementTraits<CStringW> > tagmap;
-		tagmap[L"TITLE"]		= L"TITL";
-		tagmap[L"ARTIST"]		= L"AUTH";
-		tagmap[L"COPYRIGHT"]	= L"CPYR";
-		tagmap[L"DESCRIPTION"]	= L"DESC";
-		tagmap[L"ENCODER"]		= L"DESC";
-		tagmap[L"ALBUM"]		= L"ALBUM";
+		std::map<CStringW, CStringW> tagmap = {
+			{ L"TITLE",                  L"TITL"  },
+			{ L"ARTIST",                 L"AUTH"  },
+			{ L"COPYRIGHT",              L"CPYR"  },
+			{ L"DESCRIPTION",            L"DESC"  },
+			{ L"ENCODER",                L"DESC"  },
+			{ L"ALBUM",                  L"ALBUM" },
+			{ L"METADATA_BLOCK_PICTURE", L""      }
+		};
 
-		POSITION pos2 = tagmap.GetStartPosition();
-		while (pos2) {
-			CStringW oggtag, dsmtag;
-			tagmap.GetNextAssoc(pos2, oggtag, dsmtag);
-
+		for (const auto& [oggtag, dsmtag] : tagmap) {
 			POSITION pos = m_pOutputs.GetHeadPosition();
 			while (pos) {
 				COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>((CBaseOutputPin*)m_pOutputs.GetNext(pos));
@@ -470,7 +468,11 @@ start:
 
 				CStringW value = pOggPin->GetComment(oggtag);
 				if (!value.IsEmpty()) {
-					SetProperty(dsmtag, value);
+					if (oggtag == L"METADATA_BLOCK_PICTURE") {
+						// TODO
+					} else {
+						SetProperty(dsmtag, value);
+					}
 					break;
 				}
 			}
@@ -585,6 +587,9 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 				if (page.m_hdr.granule_position == -1) {
 					continue;
 				}
+				if (!page.bComplete) {
+					continue;
+				}
 
 				COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
 				if (!pOggPin) {
@@ -593,13 +598,6 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 				if (m_bitstream_serial_number_Video != DWORD_MAX
 						&& m_bitstream_serial_number_Video != page.m_hdr.bitstream_serial_number) {
-					continue;
-				}
-
-				const bool start_segment = std::any_of(page.m_lens.cbegin(), page.m_lens.cend(), [](const BYTE len) {
-					return len < 255;
-				});
-				if (!start_segment) {
 					continue;
 				}
 
@@ -715,24 +713,24 @@ void COggSplitterOutputPin::AddComment(BYTE* p, int len)
 		CStringA TagKey   = str.Left(sepPos);
 		CStringA TagValue = str.Mid(sepPos + 1);
 
-		CAutoPtr<CComment> pComment(DNew CComment(UTF8ToWStr(TagKey), UTF8ToWStr(TagValue)));
+		const CStringW commentKey   = UTF8ToWStr(TagKey).MakeUpper();
+		const CStringW commentValue = UTF8ToWStr(TagValue);
 
-		if (pComment->m_key == L"LANGUAGE") {
-			CString lang = ISO6392ToLanguage(TagValue), iso6392 = LanguageToISO6392(pComment->m_value);
-
-			if (pComment->m_value.GetLength() == 3 && !lang.IsEmpty()) {
+		if (commentKey == L"LANGUAGE") {
+			CString lang = ISO6392ToLanguage(TagValue), iso6392 = LanguageToISO6392(commentValue);
+			if (commentValue.GetLength() == 3 && !lang.IsEmpty()) {
 				SetName(GetMediaTypeDesc(m_mts, lang, m_pFilter));
-				SetProperty(L"LANG", pComment->m_value);
+				SetProperty(L"LANG", commentValue);
 			} else if (!iso6392.IsEmpty()) {
-				SetName(GetMediaTypeDesc(m_mts, pComment->m_value, m_pFilter));
+				SetName(GetMediaTypeDesc(m_mts, commentValue, m_pFilter));
 				SetProperty(L"LANG", iso6392);
 			} else {
-				SetName(GetMediaTypeDesc(m_mts, pComment->m_value, m_pFilter));
-				SetProperty(L"NAME", pComment->m_value);
+				SetName(GetMediaTypeDesc(m_mts, commentValue, m_pFilter));
+				SetProperty(L"NAME", commentValue);
 			}
 		}
 
-		m_pComments.AddTail(pComment);
+		m_pComments[commentKey] = commentValue;
 	}
 }
 
@@ -740,11 +738,9 @@ CStringW COggSplitterOutputPin::GetComment(CStringW key)
 {
 	key.MakeUpper();
 	std::list<CStringW> sl;
-	POSITION pos = m_pComments.GetHeadPosition();
-	while (pos) {
-		CComment* p = m_pComments.GetNext(pos);
-		if (key == p->m_key) {
-			sl.push_back(p->m_value);
+	for (const auto& [_key, _value] : m_pComments) {
+		if (_key == key) {
+			sl.push_back(_value);
 		}
 	}
 	return Implode(sl, ';');
