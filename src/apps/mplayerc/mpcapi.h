@@ -168,6 +168,10 @@ enum MPCAPI_COMMAND : unsigned int {
 	// Pause playback
 	CMD_PAUSE               = 0xA0000005,
 
+	// Open new file with dub
+	// Parameter 1 : file path|dub path|dub path
+	CMD_OPENFILE_DUB        = 0xA0000006,
+
 	// Add a new file to playlist (did not start playing)
 	// Parameter 1 : file path
 	CMD_ADDTOPLAYLIST       = 0xA0001000,
