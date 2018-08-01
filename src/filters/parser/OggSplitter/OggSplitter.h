@@ -31,18 +31,9 @@ class COggSplitterFilter;
 
 class COggSplitterOutputPin : public CBaseSplitterOutputPin
 {
-	class CComment
-	{
-	public:
-		CStringW m_key, m_value;
-		CComment(CStringW key, CStringW value) : m_key(key), m_value(value) {
-			m_key.MakeUpper();
-		}
-	};
-
-	CAutoPtrList<CComment> m_pComments;
-
 protected:
+	std::map<CStringW, CStringW> m_pComments;
+
 	CPacketQueue m_queue;
 	std::vector<BYTE> m_lastPacketData;
 	DWORD m_lastseqnum;

@@ -83,6 +83,7 @@ public:
 	OggPageHeader m_hdr = {};
 	std::vector<BYTE> m_lens;
 	__int64 pos = 0;
+	bool bComplete = false;
 
 	OggPage() = default;
 };
@@ -97,4 +98,5 @@ public:
 	bool Sync(HANDLE hBreak = nullptr);
 	bool Read(OggPageHeader& hdr, HANDLE hBreak = nullptr);
 	bool Read(OggPage& page, const bool bFull = true, HANDLE hBreak = nullptr);
+	bool ReadPages(OggPage& page);
 };
