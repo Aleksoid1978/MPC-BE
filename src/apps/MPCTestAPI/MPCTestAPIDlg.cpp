@@ -50,6 +50,7 @@ static const MPCCommandInfo s_ReceivedCmds[] = {
 
 static const MPCCommandInfo s_SentCmds[] = {
 	ADD_CMD(CMD_OPENFILE,           L"Open file")
+	ADD_CMD(CMD_OPENFILE_DUB,       L"Open file with dub")
 	ADD_CMD(CMD_STOP,               L"Stop")
 	ADD_CMD(CMD_CLOSEFILE,          L"Close")
 	ADD_CMD(CMD_PLAYPAUSE,          L"Play-Pause")
@@ -387,6 +388,7 @@ void CRegisterCopyDataDlg::OnBnClickedButtonSendcommand()
 
 	switch (cmdInfo.id) {
 		case CMD_OPENFILE:
+		case CMD_OPENFILE_DUB:
 		case CMD_ADDTOPLAYLIST:
 		case CMD_REMOVEFROMPLAYLIST: // TODO
 		case CMD_SETPOSITION:

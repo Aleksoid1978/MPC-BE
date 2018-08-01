@@ -17212,6 +17212,16 @@ void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)
 				OpenCurPlaylistItem();
 			}
 			break;
+		case CMD_OPENFILE_DUB:
+			fn = (LPCWSTR)pCDS->lpData;
+			fn.Trim();
+			if (fn.GetLength()) {
+				std::list<CString> fns;
+				Explode(fn, fns, L'|');
+				m_wndPlaylistBar.Open(fns, false);
+				OpenCurPlaylistItem();
+			}
+			break;
 		case CMD_STOP :
 			OnPlayStop();
 			break;
