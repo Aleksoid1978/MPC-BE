@@ -469,7 +469,56 @@ start:
 				CStringW value = pOggPin->GetComment(oggtag);
 				if (!value.IsEmpty()) {
 					if (oggtag == L"METADATA_BLOCK_PICTURE") {
-						// TODO
+						// Flac format, METADATA_BLOCK_PICTURE
+						if (!value.IsEmpty()) {
+							const CStringA base64(value);
+							int byteLength = Base64DecodeGetRequiredLength(base64.GetLength());
+							std::vector<BYTE> pData(byteLength);
+							if (Base64Decode(base64.GetString(), base64.GetLength(), pData.data(), &byteLength)) {
+								CGolombBuffer gb(pData.data(), byteLength);
+								for (;;) {
+									gb.SkipBytes(4); // picture type
+
+									const auto mime_len = gb.ReadDword(); // MIME type size in bytes.
+									if (mime_len >= 64) {
+										break;
+									}
+									CStringA mimeA;
+									gb.ReadBuffer((BYTE*)mimeA.GetBufferSetLength(mime_len), mime_len); // MIME type
+
+									const auto desc_len = gb.ReadDword(); // description size in bytes.
+									if (desc_len) {
+										gb.SkipBytes(desc_len); // description of the picture
+									}
+
+									gb.SkipBytes(4); // width of the picture
+									gb.SkipBytes(4); // height of the picture
+									gb.SkipBytes(4); // color depth of the picture
+									gb.SkipBytes(4); // number of colors used
+
+									const auto picture_len = gb.ReadDword(); // picture data size in bytes.
+									if (picture_len) {
+										std::vector<BYTE> picture_data(picture_len);
+										gb.ReadBuffer(picture_data.data(), picture_len); // binary picture data.
+
+										CStringW fname;
+										CStringW mime(mimeA);
+										if (mime == L"image/jpeg" || mime == L"image/jpg") {
+											fname = L"cover.jpg";
+										} else if (mime == L"image/png") {
+											fname = L"cover.png";
+										} else {
+											fname = mime;
+											fname.Replace(L"image/", L"cover.");
+										}
+
+										ResAppend(fname, L"cover", mime.GetString(), picture_data.data(), picture_len, 0);
+									}
+
+									break;
+								}
+							}
+						}
 					} else {
 						SetProperty(dsmtag, value);
 					}
