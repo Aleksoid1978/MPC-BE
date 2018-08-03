@@ -1441,6 +1441,65 @@ bool CPlayerPlaylistBar::Empty()
 	return bWasPlaying;
 }
 
+void CPlayerPlaylistBar::Remove(const std::vector<int>& items, const bool bDelete)
+{
+	if (!items.empty()) {
+		std::list<CString> fns;
+
+		for (int i = (int)items.size() - 1; i >= 0; --i) {
+			POSITION pos = FindPos(items[i]);
+
+			if (bDelete) {
+				const auto item = m_pl.GetAt(pos);
+				for (const auto& fn : item.m_fns) {
+					if (::PathFileExistsW(fn)) {
+						fns.emplace_back(fn);
+					}
+				}
+				for (const auto& sub : item.m_subs) {
+					if (::PathFileExistsW(sub)) {
+						fns.emplace_back(sub);
+					}
+				}
+			}
+
+			if (m_pl.RemoveAt(pos)) {
+				m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+			}
+			m_list.DeleteItem(items[i]);
+		}
+
+		m_list.SetItemState(-1, 0, LVIS_SELECTED);
+		m_list.SetItemState(
+			std::max(std::min(items.front(), m_list.GetItemCount() - 1), 0),
+			LVIS_SELECTED, LVIS_SELECTED);
+
+		ResizeListColumn();
+		SavePlaylist();
+		UpdateList();
+
+		if (bDelete && !fns.empty()
+				&& MessageBoxW(ResStr(IDS_PLAYLIST_DELETE_QUESTION), nullptr, MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON1) == IDYES) {
+			fns.sort();
+			fns.unique();
+
+			CString filesToDelete;
+			for (const auto& fn : fns) {
+				filesToDelete.Append(fn);
+				filesToDelete.AppendChar(0);
+			}
+			filesToDelete.AppendChar(0);
+
+			SHFILEOPSTRUCTW shfoDelete = {};
+			shfoDelete.hwnd = m_hWnd;
+			shfoDelete.wFunc = FO_DELETE;
+			shfoDelete.pFrom = filesToDelete;
+			shfoDelete.fFlags = FOF_NOCONFIRMATION | FOF_SILENT | FOF_ALLOWUNDO;
+			SHFileOperationW(&shfoDelete);
+		}
+	}
+}
+
 void CPlayerPlaylistBar::Open(CString fn)
 {
 	std::list<CString> fns;
@@ -1957,21 +2016,7 @@ void CPlayerPlaylistBar::OnLvnKeyDown(NMHDR* pNMHDR, LRESULT* pResult)
 	}
 
 	if (pLVKeyDown->wVKey == VK_DELETE && items.size() > 0) {
-		for (int i = (int)items.size() - 1; i >= 0; --i) {
-			if (m_pl.RemoveAt(FindPos(items[i]))) {
-				m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
-			}
-			m_list.DeleteItem(items[i]);
-		}
-
-		m_list.SetItemState(-1, 0, LVIS_SELECTED);
-		m_list.SetItemState(
-			std::max(std::min(items.front(), m_list.GetItemCount() - 1), 0),
-			LVIS_SELECTED, LVIS_SELECTED);
-
-		ResizeListColumn();
-		SavePlaylist();
-		UpdateList();
+		Remove(items, GetKeyState(VK_SHIFT) < 0);
 
 		*pResult = TRUE;
 	} else if (pLVKeyDown->wVKey == VK_SPACE && items.size() == 1) {
@@ -2430,10 +2475,20 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	CMenu m;
 	m.CreatePopupMenu();
 
-	enum {
-		M_OPEN=1, M_ADD, M_REMOVE, M_CLEAR, M_CLIPBOARD, M_SAVEAS,
-		M_SORTBYNAME, M_SORTBYPATH, M_RANDOMIZE, M_SORTBYID,
-		M_SHUFFLE, M_HIDEFULLSCREEN
+	enum operation {
+		M_OPEN = 1,
+		M_ADD,
+		M_REMOVE,
+		M_DELETE,
+		M_CLEAR,
+		M_CLIPBOARD,
+		M_SAVEAS,
+		M_SORTBYNAME,
+		M_SORTBYPATH,
+		M_RANDOMIZE,
+		M_SORTBYID,
+		M_SHUFFLE,
+		M_HIDEFULLSCREEN
 	};
 
 	CAppSettings& s = AfxGetAppSettings();
@@ -2441,6 +2496,8 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	m.AppendMenu(MF_STRING | (!fOnItem ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_OPEN, ResStr(IDS_PLAYLIST_OPEN));
 	m.AppendMenu(MF_STRING | MF_ENABLED, M_ADD, ResStr(IDS_PLAYLIST_ADD));
 	m.AppendMenu(MF_STRING | (/*fSelected||*/!fOnItem ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_REMOVE, ResStr(IDS_PLAYLIST_REMOVE));
+	m.AppendMenu(MF_SEPARATOR);
+	m.AppendMenu(MF_STRING | (!fOnItem  ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_DELETE, ResStr(IDS_PLAYLIST_DELETE));
 	m.AppendMenu(MF_SEPARATOR);
 	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_CLEAR, ResStr(IDS_PLAYLIST_CLEAR));
 	m.AppendMenu(MF_SEPARATOR);
@@ -2495,6 +2552,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			}
 			break;
 		case M_REMOVE:
+		case M_DELETE:
 			{
 				std::vector<int> items;
 				items.reserve(m_list.GetSelectedCount());
@@ -2503,21 +2561,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 					items.push_back(m_list.GetNextSelectedItem(pos));
 				}
 
-				for (int i = (int)items.size() - 1; i >= 0; --i) {
-					if (m_pl.RemoveAt(FindPos(items[i]))) {
-						m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
-					}
-					m_list.DeleteItem(items[i]);
-				}
-
-				m_list.SetItemState(-1, 0, LVIS_SELECTED);
-				m_list.SetItemState(
-					std::max(std::min(items.front(), m_list.GetItemCount() - 1), 0),
-					LVIS_SELECTED, LVIS_SELECTED);
-
-				ResizeListColumn();
-				SavePlaylist();
-				UpdateList();
+				Remove(items, nID == M_DELETE);
 			}
 			break;
 		case M_CLEAR:

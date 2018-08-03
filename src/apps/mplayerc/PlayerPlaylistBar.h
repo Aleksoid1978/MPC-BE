@@ -250,6 +250,7 @@ public:
 
 	void Refresh();
 	bool Empty();
+	void Remove(const std::vector<int>& items, const bool bDelete);
 
 	void Open(CString fn);
 	void Open(std::list<CString>& fns, bool fMulti, CSubtitleItemList* subs = nullptr, bool bCheck = true);
