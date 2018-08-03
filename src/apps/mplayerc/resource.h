@@ -844,6 +844,8 @@
 #define IDS_SUBRESYNC_INCREASE          14134
 #define IDS_OPTIONS_CAPTION             14135
 #define IDS_SHADERS_SELECT              14136
+#define IDS_PLAYLIST_DELETE             14137
+#define IDS_PLAYLIST_DELETE_QUESTION    14138
 #define IDS_AG_AUDIO                    14145
 #define IDS_AG_ZOOM                     14152
 #define IDS_FAVORITES_ADD               14153
