@@ -1444,6 +1444,10 @@ bool CPlayerPlaylistBar::Empty()
 void CPlayerPlaylistBar::Remove(const std::vector<int>& items, const bool bDelete)
 {
 	if (!items.empty()) {
+		if (bDelete && (MessageBoxW(ResStr(IDS_PLAYLIST_DELETE_QUESTION), nullptr, MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON1) == IDNO)) {
+			return;
+		}
+
 		std::list<CString> fns;
 
 		for (int i = (int)items.size() - 1; i >= 0; --i) {
@@ -1470,16 +1474,13 @@ void CPlayerPlaylistBar::Remove(const std::vector<int>& items, const bool bDelet
 		}
 
 		m_list.SetItemState(-1, 0, LVIS_SELECTED);
-		m_list.SetItemState(
-			std::max(std::min(items.front(), m_list.GetItemCount() - 1), 0),
-			LVIS_SELECTED, LVIS_SELECTED);
+		m_list.SetItemState(std::max(std::min(items.front(), m_list.GetItemCount() - 1), 0), LVIS_SELECTED, LVIS_SELECTED);
 
 		ResizeListColumn();
 		SavePlaylist();
 		UpdateList();
 
-		if (bDelete && !fns.empty()
-				&& MessageBoxW(ResStr(IDS_PLAYLIST_DELETE_QUESTION), nullptr, MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON1) == IDYES) {
+		if (bDelete && !fns.empty()) {
 			fns.sort();
 			fns.unique();
 
