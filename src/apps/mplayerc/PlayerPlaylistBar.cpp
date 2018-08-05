@@ -2494,11 +2494,11 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	m.AppendMenu(MF_STRING | (!fOnItem ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_OPEN, ResStr(IDS_PLAYLIST_OPEN));
+	m.AppendMenu(MF_STRING | (!fOnItem ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_OPEN, ResStr(IDS_PLAYLIST_OPEN) + L"\tSpace");
 	m.AppendMenu(MF_STRING | MF_ENABLED, M_ADD, ResStr(IDS_PLAYLIST_ADD));
-	m.AppendMenu(MF_STRING | (/*fSelected||*/!fOnItem ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_REMOVE, ResStr(IDS_PLAYLIST_REMOVE));
+	m.AppendMenu(MF_STRING | (/*fSelected||*/!fOnItem ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_REMOVE, ResStr(IDS_PLAYLIST_REMOVE) + L"\tDelete");
 	m.AppendMenu(MF_SEPARATOR);
-	m.AppendMenu(MF_STRING | (!fOnItem  ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_DELETE, ResStr(IDS_PLAYLIST_DELETE));
+	m.AppendMenu(MF_STRING | (!fOnItem  ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_DELETE, ResStr(IDS_PLAYLIST_DELETE) + L"\tShift+Delete");
 	m.AppendMenu(MF_SEPARATOR);
 	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_CLEAR, ResStr(IDS_PLAYLIST_CLEAR));
 	m.AppendMenu(MF_SEPARATOR);
