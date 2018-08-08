@@ -222,7 +222,7 @@ private:
 	void    WasapiFlush();
 
 	// WASAPI variables
-	HMODULE            m_hModule;
+	HMODULE            m_hAvrtLib;
 	DEVICE_MODE        m_DeviceMode;
 	CString            m_DeviceId;
 	IMMDevice          *m_pMMDevice;
