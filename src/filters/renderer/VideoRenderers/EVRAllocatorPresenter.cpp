@@ -118,16 +118,15 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	}
 
 	// Load EVR specifics DLLs
-	pfDXVA2CreateDirect3DDeviceManager9 = m_hDxva2Lib ? (PTR_DXVA2CreateDirect3DDeviceManager9) GetProcAddress(m_hDxva2Lib, "DXVA2CreateDirect3DDeviceManager9") : nullptr;
+	if (m_hDxva2Lib) {
+		pfDXVA2CreateDirect3DDeviceManager9 = (PTR_DXVA2CreateDirect3DDeviceManager9)GetProcAddress(m_hDxva2Lib, "DXVA2CreateDirect3DDeviceManager9");
+	}
 
 	// Load EVR functions
 	m_hEvrLib = LoadLibraryW(L"evr.dll");
 	if (m_hEvrLib) {
 		pfMFCreateVideoSampleFromSurface = (PTR_MFCreateVideoSampleFromSurface)GetProcAddress(m_hEvrLib, "MFCreateVideoSampleFromSurface");
 		pfMFCreateVideoMediaType         = (PTR_MFCreateVideoMediaType)GetProcAddress(m_hEvrLib, "MFCreateVideoMediaType");
-	} else {
-		pfMFCreateVideoSampleFromSurface = nullptr;
-		pfMFCreateVideoMediaType         = nullptr;
 	}
 
 	if (!pfDXVA2CreateDirect3DDeviceManager9 || !pfMFCreateVideoSampleFromSurface || !pfMFCreateVideoMediaType) {
@@ -163,10 +162,6 @@ CEVRAllocatorPresenter::CEVRAllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 		pfAvSetMmThreadCharacteristicsW   = (PTR_AvSetMmThreadCharacteristicsW)GetProcAddress(m_hAvrtLib, "AvSetMmThreadCharacteristicsW");
 		pfAvSetMmThreadPriority           = (PTR_AvSetMmThreadPriority)GetProcAddress(m_hAvrtLib, "AvSetMmThreadPriority");
 		pfAvRevertMmThreadCharacteristics = (PTR_AvRevertMmThreadCharacteristics)GetProcAddress(m_hAvrtLib, "AvRevertMmThreadCharacteristics");
-	} else {
-		pfAvSetMmThreadCharacteristicsW   = nullptr;
-		pfAvSetMmThreadPriority           = nullptr;
-		pfAvRevertMmThreadCharacteristics = nullptr;
 	}
 
 	// Init DXVA manager
