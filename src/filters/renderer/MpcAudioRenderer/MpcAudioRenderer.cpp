@@ -153,7 +153,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_hStopRenderThreadEvent(nullptr)
 	, m_bIsBitstream(FALSE)
 	, m_BitstreamMode(BITSTREAM_NONE)
-	, m_hModule(nullptr)
+	, m_hAvrtLib(nullptr)
 	, pfAvSetMmThreadCharacteristicsW(nullptr)
 	, pfAvRevertMmThreadCharacteristics(nullptr)
 	, m_bUseBitExactOutput(TRUE)
@@ -231,10 +231,10 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		*phr = E_FAIL;
 	}
 
-	m_hModule = LoadLibraryW(L"avrt.dll");
-	if (m_hModule) {
-		pfAvSetMmThreadCharacteristicsW   = (PTR_AvSetMmThreadCharacteristicsW)GetProcAddress(m_hModule, "AvSetMmThreadCharacteristicsW");
-		pfAvRevertMmThreadCharacteristics = (PTR_AvRevertMmThreadCharacteristics)GetProcAddress(m_hModule, "AvRevertMmThreadCharacteristics");
+	m_hAvrtLib = LoadLibraryW(L"avrt.dll");
+	if (m_hAvrtLib) {
+		pfAvSetMmThreadCharacteristicsW   = (PTR_AvSetMmThreadCharacteristicsW)GetProcAddress(m_hAvrtLib, "AvSetMmThreadCharacteristicsW");
+		pfAvRevertMmThreadCharacteristics = (PTR_AvRevertMmThreadCharacteristics)GetProcAddress(m_hAvrtLib, "AvRevertMmThreadCharacteristics");
 	} else {
 		return;
 	}
@@ -328,8 +328,8 @@ CMpcAudioRenderer::~CMpcAudioRenderer()
 	SAFE_DELETE_ARRAY(m_pWaveFormatExInput);
 	SAFE_DELETE_ARRAY(m_pWaveFormatExOutput);
 
-	if (m_hModule) {
-		FreeLibrary(m_hModule);
+	if (m_hAvrtLib) {
+		FreeLibrary(m_hAvrtLib);
 	}
 }
 
