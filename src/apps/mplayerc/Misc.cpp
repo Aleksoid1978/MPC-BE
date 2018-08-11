@@ -430,7 +430,7 @@ bool IsFontInstalled(LPCWSTR lpszFont)
 	wcscpy_s(lf.lfFaceName, lpszFont);
 	LPARAM lParam = 0;
 	// Enumerate fonts
-	EnumFontFamiliesExW(dc.GetSafeHdc(), &lf, (FONTENUMPROC)EnumFontFamExProc, (LPARAM)&lParam, 0);
+	EnumFontFamiliesExW(dc.GetSafeHdc(), &lf, (FONTENUMPROCW)EnumFontFamExProc, (LPARAM)&lParam, 0);
 
 	return lParam ? true : false;
 }

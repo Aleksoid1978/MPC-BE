@@ -8376,7 +8376,7 @@ void CMainFrame::OnMenuSubtitlesStyle()
 {
 	if (auto pRTS = dynamic_cast<CRenderedTextSubtitle*>((ISubStream*)m_pCurrentSubStream)) {
 		CAutoPtrArray<CPPageSubStyle> pages;
-		CAtlArray<STSStyle*> styles;
+		//std::vector<STSStyle*> styles;
 
 		POSITION pos = pRTS->m_styles.GetStartPosition();
 		for (int i = 0; pos; i++) {
@@ -8387,7 +8387,7 @@ void CMainFrame::OnMenuSubtitlesStyle()
 			CAutoPtr<CPPageSubStyle> page(DNew CPPageSubStyle());
 			page->InitSubStyle(key, val);
 			pages.Add(page);
-			styles.Add(val);
+			//styles.push_back(val);
 		}
 
 		CString m_style = ResStr(IDS_SUBTITLES_STYLES);
@@ -8400,14 +8400,12 @@ void CMainFrame::OnMenuSubtitlesStyle()
 			dlg.AddPage(pages[i]);
 		}
 
-		if (dlg.DoModal() == IDOK) {
-			/*
-			for (int j = 0; j < (int)pages.GetCount(); j++) {
-				pages[j]->GetSubStyle(styles[j]);
-			}
-			UpdateSubtitle(false, false);
-			*/
-		}
+		//if (dlg.DoModal() == IDOK) {
+		//	for (int j = 0; j < (int)pages.GetCount(); j++) {
+		//		pages[j]->GetSubStyle(styles[j]);
+		//	}
+		//	UpdateSubtitle(false, false);
+		//}
 	}
 }
 
