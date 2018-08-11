@@ -90,10 +90,12 @@ void CPPageInterface::DoDataExchange(CDataExchange* pDX)
 
 int CALLBACK EnumFontProc(ENUMLOGFONT FAR* lf, NEWTEXTMETRIC FAR* tm, int FontType, LPARAM dwData)
 {
-	CAtlArray<CString>* fntl = (CAtlArray<CString>*)dwData;
+	std::vector<CString>* fontnames = (std::vector<CString>*)dwData;
 
 	if (FontType == TRUETYPE_FONTTYPE) {
-		fntl->Add(lf->elfFullName);
+		if (fontnames->empty() || fontnames->back().Compare(lf->elfFullName) != 0) {
+			fontnames->emplace_back(lf->elfFullName);
+		}
 	}
 
 	return true;
@@ -148,16 +150,12 @@ BOOL CPPageInterface::OnInitDialog()
 	m_FontType.Clear();
 	m_FontSize.Clear();
 	HDC dc = CreateDCW(L"DISPLAY", nullptr, nullptr, nullptr);
-	CAtlArray<CString> fntl;
-	EnumFontFamiliesW(dc, nullptr, (FONTENUMPROC)EnumFontProc, (LPARAM)&fntl);
+	std::vector<CString> fontnames;
+	EnumFontFamiliesW(dc, nullptr, (FONTENUMPROCW)EnumFontProc, (LPARAM)&fontnames);
 	DeleteDC(dc);
 
-	for (size_t i = 0; i < fntl.GetCount(); ++i) {
-		if (i > 0 && fntl[i - 1] == fntl[i]) {
-			continue;
-		}
-
-		m_FontType.AddString(fntl[i]);
+	for (const auto& fontname : fontnames) {
+		m_FontType.AddString(fontname);
 	}
 
 	CorrectComboListWidth(m_FontType);
