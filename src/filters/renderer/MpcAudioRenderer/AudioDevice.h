@@ -1,5 +1,5 @@
 /*
- * (C) 2015 see Authors.txt
+ * (C) 2015-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,9 +24,9 @@
 
 namespace AudioDevices
 {
-	typedef std::pair<CString, CString> device;
-	typedef std::vector<device> devicesList;
+	typedef std::pair<CString, CString> device_t;
+	typedef std::vector<device_t> deviceList_t;
 
-	HRESULT GetActiveAudioDevices(devicesList* devicesList = NULL, UINT* devicesCount = NULL, BOOL bIncludeDefault = TRUE);
-	HRESULT GetDefaultAudioDevice(device& device);
+	HRESULT GetActiveAudioDevices(deviceList_t* deviceList = NULL, UINT* devicesCount = NULL, BOOL bIncludeDefault = TRUE);
+	HRESULT GetDefaultAudioDevice(device_t& device);
 }

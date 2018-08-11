@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2017 see Authors.txt
+ * (C) 2015-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,7 +29,7 @@ static BOOL CALLBACK DSEnumCallback(LPGUID lpGUID,
 	LPCTSTR lpszDrvName,
 	LPVOID lpContext)
 {
-	auto device = (AudioDevices::device*)lpContext;
+	auto device = (AudioDevices::device_t*)lpContext;
 	ASSERT(device);
 
 	if (lpGUID == nullptr) { // add only "Primary Sound Driver"
@@ -54,23 +54,23 @@ static void InitDSound()
 
 namespace AudioDevices
 {
-	HRESULT GetActiveAudioDevices(devicesList* devicesList/* = NULL*/, UINT* devicesCount/* = NULL*/, BOOL bIncludeDefault/* = TRUE*/)
+	HRESULT GetActiveAudioDevices(deviceList_t* deviceList/* = NULL*/, UINT* devicesCount/* = NULL*/, BOOL bIncludeDefault/* = TRUE*/)
 	{
 		HRESULT hr = E_FAIL;
 
-		if (devicesList) {
-			devicesList->clear();
+		if (deviceList) {
+			deviceList->clear();
 		}
 
 		if (bIncludeDefault) {
 			InitDSound();
 			if (pDirectSoundEnumerate) {
-				device device;
+				device_t device;
 				pDirectSoundEnumerate((LPDSENUMCALLBACK)DSEnumCallback, (LPVOID)&device);
 
 				if (!device.first.IsEmpty()) {
-					if (devicesList) {
-						devicesList->emplace_back(device);
+					if (deviceList) {
+						deviceList->emplace_back(device);
 					}
 
 					if (devicesCount) {
@@ -100,7 +100,7 @@ namespace AudioDevices
 				*devicesCount += count;
 			}
 
-			if (devicesList) {
+			if (deviceList) {
 				IMMDevice* endpoint = nullptr;
 				IPropertyStore* pProps = nullptr;
 				LPWSTR pwszID = nullptr;
@@ -112,7 +112,7 @@ namespace AudioDevices
 						PROPVARIANT varName;
 						PropVariantInit(&varName);
 						if (SUCCEEDED(hr = pProps->GetValue(PKEY_Device_FriendlyName, &varName))) {
-							devicesList->emplace_back(varName.pwszVal, pwszID);
+							deviceList->emplace_back(varName.pwszVal, pwszID);
 
 							PropVariantClear(&varName);
 						}
@@ -134,7 +134,7 @@ namespace AudioDevices
 		return hr;
 	}
 
-	HRESULT GetDefaultAudioDevice(device& device)
+	HRESULT GetDefaultAudioDevice(device_t& device)
 	{
 		HRESULT hr = E_FAIL;
 
