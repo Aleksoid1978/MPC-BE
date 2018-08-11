@@ -31,7 +31,7 @@ class __declspec(uuid("1E53BA32-3BCC-4dff-9342-34E46BE3F5A5"))
 private :
 	CComQIPtr<IMpcAudioRendererFilter> m_pMAR;
 
-	AudioDevices::devicesList m_devicesList;
+	AudioDevices::deviceList_t m_deviceList;
 
 	CButton		m_output_group;
 	CStatic		m_txtWasapiMode;

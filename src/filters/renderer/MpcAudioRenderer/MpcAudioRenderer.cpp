@@ -881,17 +881,17 @@ STDMETHODIMP CMpcAudioRenderer::Count(DWORD* pcStreams)
 
 STDMETHODIMP CMpcAudioRenderer::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD* pdwFlags, LCID* plcid, DWORD* pdwGroup, WCHAR** ppszName, IUnknown** ppObject, IUnknown** ppUnk)
 {
-	AudioDevices::devicesList devicesList;
-	if (S_OK != AudioDevices::GetActiveAudioDevices(&devicesList, NULL, FALSE)
-			|| !devicesList.size()) {
+	AudioDevices::deviceList_t deviceList;
+	if (S_OK != AudioDevices::GetActiveAudioDevices(&deviceList, NULL, FALSE)
+			|| !deviceList.size()) {
 		return E_FAIL;
 	}
 
-	if (lIndex >= (long)devicesList.size()) {
+	if (lIndex >= (long)deviceList.size()) {
 		return S_FALSE;
 	}
 
-	const auto& [deviceName, deviceId] = devicesList[lIndex];
+	const auto& [deviceName, deviceId] = deviceList[lIndex];
 
 	if (ppmt) {
 		*ppmt = nullptr;
@@ -933,17 +933,17 @@ STDMETHODIMP CMpcAudioRenderer::Enable(long lIndex, DWORD dwFlags)
 		return E_NOTIMPL;
 	}
 
-	AudioDevices::devicesList devicesList;
-	if (S_OK != AudioDevices::GetActiveAudioDevices(&devicesList, NULL, FALSE)
-			|| !devicesList.size()) {
+	AudioDevices::deviceList_t deviceList;
+	if (S_OK != AudioDevices::GetActiveAudioDevices(&deviceList, NULL, FALSE)
+			|| !deviceList.size()) {
 		return E_FAIL;
 	}
 
-	if (lIndex >= (long)devicesList.size()) {
+	if (lIndex >= (long)deviceList.size()) {
 		return S_FALSE;
 	}
 
-	return SetDeviceId(devicesList[lIndex].second);
+	return SetDeviceId(deviceList[lIndex].second);
 }
 
 
@@ -1064,7 +1064,7 @@ STDMETHODIMP CMpcAudioRenderer::SetDeviceId(CString pDeviceId)
 
 		if (deviceIdSrc != deviceIdDst
 				&& (deviceIdSrc.IsEmpty() || deviceIdDst.IsEmpty())) {
-			AudioDevices::device device;
+			AudioDevices::device_t device;
 			AudioDevices::GetDefaultAudioDevice(device);
 
 			if (deviceIdSrc.IsEmpty()) {
