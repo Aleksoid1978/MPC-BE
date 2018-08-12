@@ -890,9 +890,9 @@ void CMainFrame::OnDestroy()
 		subChangeNotifyThread.join();
 	}
 
-	m_ExtSubFiles.RemoveAll();
-	m_ExtSubFilesTime.RemoveAll();
-	m_ExtSubPaths.RemoveAll();
+	m_ExtSubFiles.clear();
+	m_ExtSubFilesTime.clear();
+	m_ExtSubPaths.clear();
 
 	__super::OnDestroy();
 }
@@ -4403,10 +4403,10 @@ void CMainFrame::OnFilePostCloseMedia()
 		m_OSD.Start(m_pOSDWnd);
 	}
 
-	m_ExtSubFiles.RemoveAll();
-	m_ExtSubFilesTime.RemoveAll();
-	m_ExtSubPaths.RemoveAll();
-	m_ExtSubPathsHandles.RemoveAll();
+	m_ExtSubFiles.clear();
+	m_ExtSubFilesTime.clear();
+	m_ExtSubPaths.clear();
+	m_ExtSubPathsHandles.clear();
 	m_EventSubChangeRefreshNotify.Set();
 
 	m_wndSeekBar.Enable(false);
@@ -13314,10 +13314,10 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	OpenDeviceData* pDeviceData	= dynamic_cast<OpenDeviceData*>(pOMD.m_p);
 	ASSERT(pFileData || pDVDData || pDeviceData);
 
-	m_ExtSubFiles.RemoveAll();
-	m_ExtSubFilesTime.RemoveAll();
-	m_ExtSubPaths.RemoveAll();
-	m_ExtSubPathsHandles.RemoveAll();
+	m_ExtSubFiles.clear();
+	m_ExtSubFilesTime.clear();
+	m_ExtSubPaths.clear();
+	m_ExtSubPathsHandles.clear();
 	m_EventSubChangeRefreshNotify.Set();
 
 	m_PlaybackRate = 1.0;
@@ -15534,40 +15534,26 @@ bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 		}
 
 		if (subChangeNotifyThread.joinable() && !::PathIsURLW(fname)) {
-			BOOL bExists = FALSE;
-			for (INT_PTR idx = 0; idx < m_ExtSubFiles.GetCount(); idx++) {
-				if (fname == m_ExtSubFiles[idx]) {
-					bExists = TRUE;
-					break;
-				}
-			}
 
-			if (!bExists) {
-				m_ExtSubFiles.Add(fname);
+			if (!Contains(m_ExtSubFiles, fname)) {
+				m_ExtSubFiles.push_back(fname);
+
 				CFileStatus status;
 				if (CFileGetStatus(fname, status)) {
-					m_ExtSubFilesTime.Add(status.m_mtime);
+					m_ExtSubFilesTime.push_back(status.m_mtime);
 				} else {
-					m_ExtSubFilesTime.Add(CTime(0));
+					m_ExtSubFilesTime.emplace_back(0);
 				}
 			}
 
 			fname.Replace('\\', '/');
 			fname = fname.Left(fname.ReverseFind('/')+1);
 
-			bExists = FALSE;
-			for (INT_PTR idx = 0; idx < m_ExtSubPaths.GetCount(); idx++) {
-				if (fname == m_ExtSubPaths[idx]) {
-					bExists = TRUE;
-					break;
-				}
-			}
-
-			if (!bExists) {
+			if (!Contains(m_ExtSubPaths, fname)) {
 				HANDLE h = FindFirstChangeNotificationW(fname, FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE);
 				if (h != INVALID_HANDLE_VALUE) {
-					m_ExtSubPaths.Add(fname);
-					m_ExtSubPathsHandles.Add(h);
+					m_ExtSubPaths.push_back(fname);
+					m_ExtSubPathsHandles.push_back(h);
 					m_EventSubChangeRefreshNotify.Set();
 				}
 			}
@@ -18864,35 +18850,35 @@ const CString CMainFrame::GetAltFileName()
 	return ret;
 }
 
-void CMainFrame::subChangeNotifySetupThread(CAtlArray<HANDLE>& handles)
+void CMainFrame::subChangeNotifySetupThread(std::vector<HANDLE>& handles)
 {
-	for (size_t i = 2; i < handles.GetCount(); i++) {
+	for (size_t i = 2; i < handles.size(); i++) {
 		FindCloseChangeNotification(handles[i]);
 	}
-	handles.RemoveAll();
-	handles.Add(m_EventSubChangeStopNotify);
-	handles.Add(m_EventSubChangeRefreshNotify);
-	handles.Append(m_ExtSubPathsHandles);
+	handles.clear();
+	handles.push_back(m_EventSubChangeStopNotify);
+	handles.push_back(m_EventSubChangeRefreshNotify);
+	handles.insert(handles.end(), m_ExtSubPathsHandles.begin(), m_ExtSubPathsHandles.end());
 }
 
 void CMainFrame::subChangeNotifyThreadFunction()
 {
-	CAtlArray<HANDLE> handles;
+	std::vector<HANDLE> handles;
 	subChangeNotifySetupThread(handles);
 
 	while (true) {
-		DWORD idx = WaitForMultipleObjects(handles.GetCount(), handles.GetData(), FALSE, INFINITE);
+		DWORD idx = WaitForMultipleObjects(handles.size(), handles.data(), FALSE, INFINITE);
 		if (idx == WAIT_OBJECT_0) { // m_hStopNotifyRenderThreadEvent
 			break;
 		} else if (idx == (WAIT_OBJECT_0 + 1)) { // m_hRefreshNotifyRenderThreadEvent
 			subChangeNotifySetupThread(handles);
-		} else if (idx > (WAIT_OBJECT_0 + 1) && idx < (WAIT_OBJECT_0 + handles.GetCount())) {
+		} else if (idx > (WAIT_OBJECT_0 + 1) && idx < (WAIT_OBJECT_0 + handles.size())) {
 			if (FindNextChangeNotification(handles[idx - WAIT_OBJECT_0]) == FALSE) {
 				break;
 			}
 
 			BOOL bChanged = FALSE;
-			for (INT_PTR idx = 0; idx < m_ExtSubFiles.GetCount(); idx++) {
+			for (size_t idx = 0; idx < m_ExtSubFiles.size(); idx++) {
 				CFileStatus status;
 				CString fn = m_ExtSubFiles[idx];
 				if (CFileGetStatus(fn, status) && m_ExtSubFilesTime[idx] != status.m_mtime) {
@@ -18911,7 +18897,7 @@ void CMainFrame::subChangeNotifyThreadFunction()
 		}
 	}
 
-	for (size_t i = 2; i < handles.GetCount(); i++) {
+	for (size_t i = 2; i < handles.size(); i++) {
 		FindCloseChangeNotification(handles[i]);
 	}
 }
