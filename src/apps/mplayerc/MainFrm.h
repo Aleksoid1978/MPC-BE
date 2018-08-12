@@ -1284,11 +1284,12 @@ protected:
 
 	HMODULE m_hWtsLib;
 
-	CStringArray      m_ExtSubFiles;
-	CAtlArray<CTime>  m_ExtSubFilesTime;
-	CStringArray      m_ExtSubPaths;
-	CAtlArray<HANDLE> m_ExtSubPathsHandles;
-	void              subChangeNotifySetupThread(CAtlArray<HANDLE>& handles);
+	std::vector<CStringW> m_ExtSubFiles;
+	std::vector<CTime>    m_ExtSubFilesTime;
+	std::vector<CStringW> m_ExtSubPaths;
+	std::vector<HANDLE>   m_ExtSubPathsHandles;
+
+	void              subChangeNotifySetupThread(std::vector<HANDLE>& handles);
 
 	CAMEvent          m_EventSubChangeStopNotify;
 	CAMEvent          m_EventSubChangeRefreshNotify;
