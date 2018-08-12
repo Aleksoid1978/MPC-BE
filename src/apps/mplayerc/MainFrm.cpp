@@ -15168,27 +15168,28 @@ void CMainFrame::SetupFavoritesSubMenu()
 		f_str.Replace(L"&", L"&&");
 		f_str.Replace(L"\t", L" ");
 
-		CAtlList<CString> sl;
+		std::list<CString> sl;
 		ExplodeEsc(f_str, sl, L';', 3);
 
-		f_str = sl.RemoveHead();
+		f_str = sl.front();
+		sl.pop_front();
 
-		CString str;
+		if (!sl.empty()) {
+			CString str;
 
-		if (!sl.IsEmpty()) {
 			// pos
 			REFERENCE_TIME rt = 0;
-			if (1 == swscanf_s(sl.GetHead(), L"%I64d", &rt) && rt > 0) {
+			if (1 == swscanf_s(sl.front(), L"%I64d", &rt) && rt > 0) {
 				DVD_HMSF_TIMECODE hmsf = RT2HMSF(rt);
 				str.Format(L"[%02u:%02u:%02u]", hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
 			}
 
 			// relative drive
-			if (sl.GetCount() > 1) { // Here to prevent crash if old favorites settings are present
-				sl.RemoveHeadNoReturn();
+			if (sl.size() > 1) { // Here to prevent crash if old favorites settings are present
+				sl.pop_front();
 
 				BOOL bRelativeDrive = FALSE;
-				if (swscanf_s(sl.GetHead(), L"%d", &bRelativeDrive) == 1) {
+				if (swscanf_s(sl.front(), L"%d", &bRelativeDrive) == 1) {
 					if (bRelativeDrive) {
 						str.Format(L"[RD]%s", str);
 					}
@@ -15222,18 +15223,19 @@ void CMainFrame::SetupFavoritesSubMenu()
 		CString str = item;
 		str.Replace(L"&", L"&&");
 
-		CAtlList<CString> sl;
+		std::list<CString> sl;
 		ExplodeEsc(str, sl, L';', 4);
-		size_t cnt = sl.GetCount();
+		size_t cnt = sl.size();
 
-		str = sl.RemoveHead();
+		str = sl.front();
+		sl.pop_front();
 
 		if (!str.IsEmpty()) {
 			if (cnt == 4) {
 				// pos
 				CString posStr;
 				REFERENCE_TIME rt = 0;
-				if (1 == swscanf_s(sl.GetHead(), L"%I64d", &rt) && rt > 0) {
+				if (1 == swscanf_s(sl.front(), L"%I64d", &rt) && rt > 0) {
 					DVD_HMSF_TIMECODE hmsf = RT2HMSF(rt);
 					posStr.Format(L"[%02u:%02u:%02u]", hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
 				}
@@ -15265,10 +15267,10 @@ void CMainFrame::SetupFavoritesSubMenu()
 		CString str = item;
 		str.Replace(L"&", L"&&");
 
-		CAtlList<CString> sl;
+		std::list<CString> sl;
 		ExplodeEsc(str, sl, L';', 2);
 
-		str = sl.RemoveHead();
+		str = sl.front();
 
 		if (!str.IsEmpty()) {
 			submenu.AppendMenu(flags, id, str);
@@ -18295,10 +18297,10 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/,
 					if (cf.Open(infFile)) {
 						CString line;
 						while (cf.ReadString(line)) {
-							CAtlList<CString> sl;
+							std::list<CString> sl;
 							Explode(line, sl, L'=');
-							if (sl.GetCount() == 2 && CString(sl.GetHead().Trim()).MakeLower() == L"label") {
-								m_BDLabel = sl.GetTail();
+							if (sl.size() == 2 && CString(sl.front().Trim()).MakeLower() == L"label") {
+								m_BDLabel = sl.back();
 								break;
 							}
 						}
