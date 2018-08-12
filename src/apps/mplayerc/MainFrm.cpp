@@ -9697,21 +9697,13 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 
 	if (GetPlaybackMode() == PM_FILE) {
 		CString fn = GetCurFileName();
-		CString desc = GetFileOnly(fn);
 
 		std::list<CString> descList;
-		descList.push_back(desc);
-
-		if (m_LastOpenBDPath.GetLength() > 0) {
-			CString fn2 = L"Blu-ray";
-			if (m_BDLabel.GetLength() > 0) {
-				fn2.AppendFormat(L" \"%s\"", m_BDLabel);
-			} else {
-				MakeBDLabel(fn, fn2);
-			}
-			descList.push_front(fn2);
-		} else if (!m_youtubeFields.title.IsEmpty()) {
-			descList.push_front(m_youtubeFields.title);
+		if (m_PlaybackInfo.FileName.GetLength()) {
+			descList.push_back(m_PlaybackInfo.FileName);
+		}
+		if (m_PlaybackInfo.Title.GetLength()) {
+			descList.push_back(m_PlaybackInfo.Title);
 		}
 
 		// Name
