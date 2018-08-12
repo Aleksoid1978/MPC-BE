@@ -30,6 +30,7 @@
 #include "../../DSUtil/Filehandle.h"
 #include "../../DSUtil/FileVersion.h"
 #include "../../DSUtil/DXVAState.h"
+#include "../../DSUtil/std_helper.h"
 #include "OpenDlg.h"
 #include "SaveDlg.h"
 #include "GoToDlg.h"
@@ -10141,15 +10142,6 @@ void CMainFrame::OnSubCopyClipboard()
 	}
 }
 
-//////////////////////////////////
-
-static BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData)
-{
-	CAtlArray<HMONITOR>* ml = (CAtlArray<HMONITOR>*)dwData;
-	ml->Add(hMonitor);
-	return TRUE;
-}
-
 void CMainFrame::SetDefaultWindowRect(int iMonitor)
 {
 	const CAppSettings& s = AfxGetAppSettings();
@@ -12805,14 +12797,11 @@ BOOL CMainFrame::SelectMatchTrack(std::vector<Stream>& Tracks, CString pattern, 
 			CString name(Tracks[iIndex].Name);
 			CharLower(name.GetBuffer());
 
-			CAtlList<CString> sl;
+			std::list<CString> sl;
 			Explode(lang, sl, L'|');
-			POSITION pos = sl.GetHeadPosition();
 
 			int nLangMatch = 0;
-			while (pos) {
-				CString subPattern = sl.GetNext(pos);
-
+			for (CString subPattern : sl) {
 				if ((Tracks[iIndex].forced && subPattern == L"forced") || (Tracks[iIndex].def && subPattern == L"default")) {
 					nLangMatch++;
 					continue;
@@ -12828,7 +12817,7 @@ BOOL CMainFrame::SelectMatchTrack(std::vector<Stream>& Tracks, CString pattern, 
 				}
 			}
 
-			if (nLangMatch == sl.GetCount()) {
+			if (nLangMatch == sl.size()) {
 				nIdx = iIndex;
 				return TRUE;
 			}
@@ -12851,14 +12840,14 @@ void CMainFrame::OpenSetupAudioStream()
 		return;
 	}
 
-	CAtlList<CString> extAudioList;
+	std::list<CString> extAudioList;
 	CPlaylistItem pli;
 	if (m_wndPlaylistBar.GetCur(pli)) {
 		auto it = pli.m_fns.begin();
 		++it; // skip main file
 		for (; it != pli.m_fns.end(); ++it) {
 			CString str = *it;
-			extAudioList.AddTail(GetFileOnly(str));
+			extAudioList.emplace_back(GetFileOnly(str));
 		}
 	}
 
@@ -12875,7 +12864,7 @@ void CMainFrame::OpenSetupAudioStream()
 			}
 
 			CString name(pszName);
-			const bool bExternal = (extAudioList.Find(name) != nullptr);
+			const bool bExternal = Contains(extAudioList, name);
 
 			stream.Name  = name;
 			stream.Index = i;
@@ -12894,7 +12883,7 @@ void CMainFrame::OpenSetupAudioStream()
 
 		const CAppSettings& s = AfxGetAppSettings();
 		if (!s.fUseInternalSelectTrackLogic) {
-			if (s.fPrioritizeExternalAudio && extAudioList.GetCount() > 0) {
+			if (s.fPrioritizeExternalAudio && extAudioList.size() > 0) {
 				for (size_t i = 0; i < streams.size(); i++) {
 					if (streams[i].Ext) {
 						Stream& stream = streams[i];
@@ -12905,7 +12894,7 @@ void CMainFrame::OpenSetupAudioStream()
 			}
 		} else {
 			CString pattern = s.strAudiosLanguageOrder;
-			if (s.fPrioritizeExternalAudio && extAudioList.GetCount() > 0) {
+			if (s.fPrioritizeExternalAudio && extAudioList.size() > 0) {
 				size_t nIdx = 0;
 				const BOOL bMatch = SelectMatchTrack(streams, pattern, TRUE, nIdx);
 
