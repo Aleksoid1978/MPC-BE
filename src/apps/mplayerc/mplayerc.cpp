@@ -771,6 +771,68 @@ bool CMPlayerCApp::HasProfileEntry(LPCTSTR lpszSection, LPCTSTR lpszEntry)
 	return ret;
 }
 
+void CMPlayerCApp::EnumProfileEntries(LPCTSTR lpszSection, std::vector<CString>& entries)
+{
+	std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
+
+	entries.clear();
+
+	if (m_pszRegistryKey) {
+		CRegKey regkey;
+		if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_READ)) {
+			// https://docs.microsoft.com/ru-ru/windows/desktop/SysInfo/enumerating-registry-subkeys
+			WCHAR    achClass[MAX_PATH] = L"";
+			DWORD    cchClassName = MAX_PATH; 
+			DWORD    cSubKeys = 0;
+			DWORD    cbMaxSubKey;
+			DWORD    cchMaxClass;
+			DWORD    cValues;
+			DWORD    cchMaxValue;
+			DWORD    cbMaxValueData;
+			DWORD    cbSecurityDescriptor;
+			FILETIME ftLastWriteTime;
+
+			// Get the class name and the value count. 
+			DWORD retCode = RegQueryInfoKeyW(
+				regkey.m_hKey,
+				achClass,
+				&cchClassName,
+				nullptr,
+				&cSubKeys,
+				&cbMaxSubKey,
+				&cchMaxClass,
+				&cValues,
+				&cchMaxValue,
+				&cbMaxValueData,
+				&cbSecurityDescriptor,
+				&ftLastWriteTime);
+
+			if (ERROR_SUCCESS == retCode  && cValues) {
+				WCHAR achValue[16383];
+
+				for (DWORD i = 0, retCode = ERROR_SUCCESS; i < cValues; i++) {
+					DWORD cchValue = _countof(achValue);
+					achValue[0] = '\0';
+					retCode = RegEnumValueW(regkey.m_hKey, i, achValue, &cchValue, NULL, NULL, NULL, NULL);
+					if (retCode == ERROR_SUCCESS) {
+						entries.emplace_back(achValue, cchValue);
+					}
+				}
+			}
+			regkey.Close();
+		}
+	} else {
+		InitProfile();
+		auto it1 = m_ProfileMap.find(lpszSection);
+		if (it1 != m_ProfileMap.end()) {
+			auto& sectionMap = it1->second;
+			for (const auto& entry : sectionMap) {
+				entries.emplace_back(entry.first);
+			}
+		}
+	}
+}
+
 void CMPlayerCApp::ShowCmdlnSwitches() const
 {
 	CString s;
