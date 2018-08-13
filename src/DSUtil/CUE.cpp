@@ -87,7 +87,7 @@ bool ParseCUESheet(CString cueData, std::list<Chapters> &ChaptersList, CString& 
 			index_cnt = 0;
 
 			WCHAR type[256];
-			swscanf_s(cueLine, L"%d %s", &track_no, type, _countof(type)-1);
+			swscanf_s(cueLine, L"%d %s", &track_no, type, _countof(type));
 			fAudioTrack = (wcscmp(type, L"AUDIO") == 0);
 			TrackTitle.Format(L"Track %02d", track_no);
 		} else if (cmd == L"TITLE") {
