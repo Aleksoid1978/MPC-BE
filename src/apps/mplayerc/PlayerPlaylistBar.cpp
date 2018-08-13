@@ -124,7 +124,7 @@ static bool ParseCUESheetFile(CString fn, std::list<CUETrack> &CUETrackList, CSt
 			WCHAR type[256] = { 0 };
 			trackNum = 0;
 			fAudioTrack = FALSE;
-			if (2 == swscanf_s(cueLine, L"%u %s", &trackNum, type, _countof(type)) {
+			if (2 == swscanf_s(cueLine, L"%u %s", &trackNum, type, _countof(type))) {
 				fAudioTrack = (wcscmp(type, L"AUDIO") == 0);
 			}
 		} else if (cmd == L"TITLE") {
