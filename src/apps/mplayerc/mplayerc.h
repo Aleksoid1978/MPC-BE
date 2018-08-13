@@ -130,6 +130,7 @@ public:
 	virtual INT64	GetProfileInt64(LPCTSTR lpszSection, LPCTSTR lpszEntry, INT64 nDefault);
 	virtual BOOL	WriteProfileInt64(LPCTSTR lpszSection, LPCTSTR lpszEntry, INT64 nValue);
 	bool			HasProfileEntry(LPCTSTR lpszSection, LPCTSTR lpszEntry);
+	void			EnumProfileEntries(LPCTSTR lpszSection, std::vector<CString>& entries);
 
 public:
 	virtual BOOL InitInstance();
