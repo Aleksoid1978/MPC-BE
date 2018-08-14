@@ -187,7 +187,7 @@ double DecreaseFloatByGrid(double value, const int step)
 	return value;
 }
 
-bool StrToInt32(int32_t& value, const wchar_t* str)
+bool StrToInt32(const wchar_t* str, int32_t& value)
 {
 	wchar_t* end;
 	int32_t v = wcstol(str, &end, 10);
@@ -198,7 +198,7 @@ bool StrToInt32(int32_t& value, const wchar_t* str)
 	return false;
 }
 
-bool StrToInt64(int64_t& value, const wchar_t* str)
+bool StrToInt64(const wchar_t* str, int64_t& value)
 {
 	wchar_t* end;
 	int64_t v = wcstoll(str, &end, 10);
@@ -209,7 +209,7 @@ bool StrToInt64(int64_t& value, const wchar_t* str)
 	return false;
 }
 
-bool StrToDouble(double& value, const wchar_t* str)
+bool StrToDouble(const wchar_t* str, double& value)
 {
 	wchar_t* end;
 	double v = wcstod(str, &end);
