@@ -783,29 +783,26 @@ void CStringToBin(CString str, std::vector<BYTE>& data)
 	data.reserve(str.GetLength()/2);
 
 	BYTE b = 0;
-
-	str.MakeUpper();
-	for (int i = 0, j = str.GetLength(); i < j; i++) {
-		WCHAR c = str[i];
-		if (c >= '0' && c <= '9') {
-			if (!(i&1)) {
-				b = ((char(c-'0')<<4)&0xf0)|(b&0x0f);
-			} else {
-				b = (char(c-'0')&0x0f)|(b&0xf0);
-			}
-		} else if (c >= 'A' && c <= 'F') {
-			if (!(i&1)) {
-				b = ((char(c-'A'+10)<<4)&0xf0)|(b&0x0f);
-			} else {
-				b = (char(c-'A'+10)&0x0f)|(b&0xf0);
-			}
-		} else {
+	for (int i = 0, len = str.GetLength(); i < len; i++) {
+		WCHAR ch = str[i];
+		if (ch >= '0' && ch <= '9') {
+			ch -= '0';
+		}
+		else if (ch >= 'A' && ch <= 'F') {
+			ch -= ('A'-10);
+		}
+		else if (ch >= 'a' && ch <= 'f') {
+			ch -= ('a'-10);
+		}
+		else {
 			break;
 		}
 
-		if (i&1) {
+		if (i & 1) {
+			b |= (BYTE)ch;
 			data.push_back(b);
-			b = 0;
+		} else {
+			b = (BYTE)ch << 4;
 		}
 	}
 }
@@ -816,10 +813,13 @@ CString BinToCString(const BYTE* ptr, size_t len)
 	WCHAR high, low;
 
 	while (len-- > 0) {
-		high = (*ptr>>4) >= 10 ? (*ptr>>4)-10 + 'A' : (*ptr>>4) + '0';
-		low = (*ptr&0xf) >= 10 ? (*ptr&0xf)-10 + 'A' : (*ptr&0xf) + '0';
+		high = *ptr >> 4;
+		high += (high >= 10) ? ('A'-10) : '0';
+		low = *ptr & 0xf;
+		low += (low >= 10) ? ('A'-10) : '0';
 
-		ret.AppendFormat(L"%c%c", high, low);
+		ret.AppendChar(high);
+		ret.AppendChar(low);
 
 		ptr++;
 	}
