@@ -186,3 +186,36 @@ double DecreaseFloatByGrid(double value, const int step)
 
 	return value;
 }
+
+bool StrToInt32(int32_t& value, const wchar_t* str)
+{
+	wchar_t* end;
+	int32_t v = wcstol(str, &end, 10);
+	if (end > str) {
+		value = v;
+		return true;
+	}
+	return false;
+}
+
+bool StrToInt64(int64_t& value, const wchar_t* str)
+{
+	wchar_t* end;
+	int64_t v = wcstoll(str, &end, 10);
+	if (end > str) {
+		value = v;
+		return true;
+	}
+	return false;
+}
+
+bool StrToDouble(double& value, const wchar_t* str)
+{
+	wchar_t* end;
+	double v = wcstod(str, &end);
+	if (end > str) {
+		value = v;
+		return true;
+	}
+	return false;
+}

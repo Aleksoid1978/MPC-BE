@@ -71,3 +71,7 @@ int DecreaseByGrid(int value, const int step);
 double IncreaseFloatByGrid(double value, const int step);
 // steps < 0  mean 1.0/(-step)
 double DecreaseFloatByGrid(double value, const int step);
+
+bool StrToInt32(int32_t& value, const wchar_t* str);
+bool StrToInt64(int64_t& value, const wchar_t* str);
+bool StrToDouble(double& value, const wchar_t* str);
