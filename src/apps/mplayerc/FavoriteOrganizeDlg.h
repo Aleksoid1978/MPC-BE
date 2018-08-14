@@ -49,7 +49,8 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
 
-	void SetupList(bool fSave);
+	void SetupList();
+	void SaveList();
 	void UpdateColumnsSizes();
 	void MoveItem(int nItem, int offset);
 	void PlayFavorite(int nItem);
