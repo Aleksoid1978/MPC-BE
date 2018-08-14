@@ -1287,7 +1287,6 @@ protected:
 	std::vector<CStringW> m_ExtSubFiles;
 	std::vector<CTime>    m_ExtSubFilesTime;
 	std::vector<CStringW> m_ExtSubPaths;
-	std::vector<HANDLE>   m_ExtSubPathsHandles;
 
 	void              subChangeNotifySetupThread(std::vector<HANDLE>& handles);
 
