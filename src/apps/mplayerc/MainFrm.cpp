@@ -4406,7 +4406,6 @@ void CMainFrame::OnFilePostCloseMedia()
 	m_ExtSubFiles.clear();
 	m_ExtSubFilesTime.clear();
 	m_ExtSubPaths.clear();
-	m_ExtSubPathsHandles.clear();
 	m_EventSubChangeRefreshNotify.Set();
 
 	m_wndSeekBar.Enable(false);
@@ -13309,7 +13308,6 @@ bool CMainFrame::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 	m_ExtSubFiles.clear();
 	m_ExtSubFilesTime.clear();
 	m_ExtSubPaths.clear();
-	m_ExtSubPathsHandles.clear();
 	m_EventSubChangeRefreshNotify.Set();
 
 	m_PlaybackRate = 1.0;
@@ -15528,26 +15526,20 @@ bool CMainFrame::LoadSubtitle(CSubtitleItem subItem, ISubStream **actualStream)
 		if (subChangeNotifyThread.joinable() && !::PathIsURLW(fname)) {
 
 			if (!Contains(m_ExtSubFiles, fname)) {
-				m_ExtSubFiles.push_back(fname);
+				m_ExtSubFiles.emplace_back(fname);
 
 				CFileStatus status;
 				if (CFileGetStatus(fname, status)) {
 					m_ExtSubFilesTime.push_back(status.m_mtime);
 				} else {
-					m_ExtSubFilesTime.emplace_back(0);
+					m_ExtSubFilesTime.push_back(0);
 				}
 			}
 
-			fname.Replace('\\', '/');
-			fname = fname.Left(fname.ReverseFind('/')+1);
-
-			if (!Contains(m_ExtSubPaths, fname)) {
-				HANDLE h = FindFirstChangeNotificationW(fname, FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE);
-				if (h != INVALID_HANDLE_VALUE) {
-					m_ExtSubPaths.push_back(fname);
-					m_ExtSubPathsHandles.push_back(h);
-					m_EventSubChangeRefreshNotify.Set();
-				}
+			const CString path = GetFolderOnly(fname);
+			if (!Contains(m_ExtSubPaths, path)) {
+				m_ExtSubPaths.emplace_back(path);
+				m_EventSubChangeRefreshNotify.Set();
 			}
 		}
 	}
@@ -18850,7 +18842,13 @@ void CMainFrame::subChangeNotifySetupThread(std::vector<HANDLE>& handles)
 	handles.clear();
 	handles.push_back(m_EventSubChangeStopNotify);
 	handles.push_back(m_EventSubChangeRefreshNotify);
-	handles.insert(handles.end(), m_ExtSubPathsHandles.begin(), m_ExtSubPathsHandles.end());
+	
+	for (const auto& path : m_ExtSubPaths) {
+		const HANDLE h = FindFirstChangeNotificationW(path, FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE);
+		if (h != INVALID_HANDLE_VALUE) {
+			handles.push_back(h);
+		}
+	}
 }
 
 void CMainFrame::subChangeNotifyThreadFunction()
@@ -18860,9 +18858,9 @@ void CMainFrame::subChangeNotifyThreadFunction()
 
 	while (true) {
 		DWORD idx = WaitForMultipleObjects(handles.size(), handles.data(), FALSE, INFINITE);
-		if (idx == WAIT_OBJECT_0) { // m_hStopNotifyRenderThreadEvent
+		if (idx == WAIT_OBJECT_0) { // m_EventSubChangeStopNotify
 			break;
-		} else if (idx == (WAIT_OBJECT_0 + 1)) { // m_hRefreshNotifyRenderThreadEvent
+		} else if (idx == (WAIT_OBJECT_0 + 1)) { // m_EventSubChangeRefreshNotify
 			subChangeNotifySetupThread(handles);
 		} else if (idx > (WAIT_OBJECT_0 + 1) && idx < (WAIT_OBJECT_0 + handles.size())) {
 			if (FindNextChangeNotification(handles[idx - WAIT_OBJECT_0]) == FALSE) {
