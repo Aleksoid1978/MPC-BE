@@ -38,54 +38,52 @@ CFavoriteOrganizeDlg::~CFavoriteOrganizeDlg()
 {
 }
 
-void CFavoriteOrganizeDlg::SetupList(bool fSave)
+void CFavoriteOrganizeDlg::SetupList()
 {
 	auto& favlist = m_FavLists[m_tab.GetCurSel()];
 
-	if (fSave) {
+	m_list.DeleteAllItems();
+
+	for (const auto& fav : favlist) {
 		std::list<CString> sl;
+		ExplodeEsc(fav, sl, L';', 3);
 
-		for (int j = 0; j < m_list.GetItemCount(); j++) {
-			auto it = FindInListByPointer(favlist, (CString*)m_list.GetItemData(j));
-			if (it == favlist.end()) {
-				ASSERT(0);
-				break;
-			}
+		int n = m_list.InsertItem(m_list.GetItemCount(), sl.front());
+		sl.pop_front();
+		m_list.SetItemData(n, (DWORD_PTR)&(fav));
 
-			std::list<CString> args;
-			ExplodeEsc(*it, args, L';');
-			args.pop_front();
-			args.push_front(m_list.GetItemText(j, 0));
+		if (!sl.empty()) {
+			REFERENCE_TIME rt = 0;
 
-			sl.push_back(ImplodeEsc(args, L';'));
-		}
+			if (1 == swscanf_s(sl.front(), L"%I64d", &rt) && rt > 0) {
+				DVD_HMSF_TIMECODE hmsf = RT2HMSF(rt);
 
-		favlist = sl;
-	} else {
-		m_list.DeleteAllItems();
-
-		for (auto it = favlist.begin(); it != favlist.end(); ++it) {
-			std::list<CString> sl;
-			ExplodeEsc(*it, sl, L';', 3);
-
-			int n = m_list.InsertItem(m_list.GetItemCount(), sl.front());
-			sl.pop_front();
-			m_list.SetItemData(n, (DWORD_PTR)&(*it));
-
-			if (!sl.empty()) {
-				REFERENCE_TIME rt = 0;
-
-				if (1 == swscanf_s(sl.front(), L"%I64d", &rt) && rt > 0) {
-					DVD_HMSF_TIMECODE hmsf = RT2HMSF(rt);
-
-					CString str;
-					str.Format(L"[%02u:%02u:%02u]", hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
-					m_list.SetItemText(n, 1, str);
-				}
+				CString str;
+				str.Format(L"[%02u:%02u:%02u]", hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
+				m_list.SetItemText(n, 1, str);
 			}
 		}
+	}
 
-		UpdateColumnsSizes();
+	UpdateColumnsSizes();
+}
+
+void CFavoriteOrganizeDlg::SaveList()
+{
+	auto& favlist = m_FavLists[m_tab.GetCurSel()];
+
+	for (int i = 0; i < m_list.GetItemCount(); i++) {
+		auto it = FindInListByPointer(favlist, (CString*)m_list.GetItemData(i));
+		if (it == favlist.end()) {
+			ASSERT(0);
+			break;
+		}
+
+		std::list<CString> args;
+		ExplodeEsc(*it, args, L';');
+		args.front() = m_list.GetItemText(i, 0);
+
+		*it = ImplodeEsc(args, L';');
 	}
 }
 
@@ -148,7 +146,7 @@ BOOL CFavoriteOrganizeDlg::OnInitDialog()
 	s.GetFav(FAV_DVD, m_FavLists[1]);
 	s.GetFav(FAV_DEVICE, m_FavLists[2]);
 
-	SetupList(false);
+	SetupList();
 
 	AddAnchor(IDC_TAB1, TOP_LEFT, BOTTOM_RIGHT);
 	AddAnchor(IDC_LIST2, TOP_LEFT, BOTTOM_RIGHT);
@@ -176,7 +174,7 @@ void CFavoriteOrganizeDlg::OnTcnSelChangeTab1(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	m_list.SetRedraw(FALSE);
 	m_list.SetWindowPos(&wndTop, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-	SetupList(false);
+	SetupList();
 	m_list.SetRedraw();
 
 	*pResult = 0;
@@ -423,14 +421,14 @@ void CFavoriteOrganizeDlg::OnUpdateDownBn(CCmdUI* pCmdUI)
 
 void CFavoriteOrganizeDlg::OnTcnSelChangingTab1(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	SetupList(true);
+	SaveList();
 
 	*pResult = 0;
 }
 
 void CFavoriteOrganizeDlg::OnBnClickedOk()
 {
-	SetupList(true);
+	SaveList();
 
 	CAppSettings& s = AfxGetAppSettings();
 
