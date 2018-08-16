@@ -51,8 +51,8 @@ void CConfigDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CConfigDlg, CDialog)
-	ON_BN_CLICKED(IDOK,		OnBnClickedOk)
-	ON_BN_CLICKED(IDCANCEL,	OnBnClickedCancel)
+	ON_BN_CLICKED(IDOK,     OnBnClickedOk)
+	ON_BN_CLICKED(IDCANCEL, OnBnClickedCancel)
 END_MESSAGE_MAP()
 
 // CConfigDlg message handlers
@@ -83,8 +83,8 @@ BOOL CConfigDlg::OnInitDialog()
 
 	SetWindowTextW((GetUserDefaultUILanguage() == 1049) ? CAPTION_RU : CAPTION_EN);
 
-	::SetWindowTextW(GetDlgItem(IDC_STATIC)->m_hWnd, (GetUserDefaultUILanguage() == 1049) ? MPCBE_PATH_RU : MPCBE_PATH_EN);
-	::SetWindowTextW(GetDlgItem(IDCANCEL)->m_hWnd,   (GetUserDefaultUILanguage() == 1049) ? CANCEL_RU : CANCEL_EN);
+	::SetWindowTextW(GetDlgItem(IDC_STATIC1)->m_hWnd, (GetUserDefaultUILanguage() == 1049) ? MPCBE_PATH_RU : MPCBE_PATH_EN);
+	::SetWindowTextW(GetDlgItem(IDCANCEL)->m_hWnd,    (GetUserDefaultUILanguage() == 1049) ? CANCEL_RU : CANCEL_EN);
 
 	SetClassLongPtrW(GetDlgItem(IDOK)->m_hWnd,         GCLP_HCURSOR, (LONG_PTR)AfxGetApp()->LoadStandardCursor(IDC_HAND));
 	SetClassLongPtrW(GetDlgItem(IDCANCEL)->m_hWnd,     GCLP_HCURSOR, (LONG_PTR)AfxGetApp()->LoadStandardCursor(IDC_HAND));
