@@ -182,14 +182,15 @@ void CDX9RenderingEngine::InitRenderingEngine()
 	} else if (m_Caps.PixelShaderVersion >= D3DPS_VERSION(2,0)) {
 		// http://en.wikipedia.org/wiki/High-level_shader_language
 
-		if (m_Caps.PS20Caps.NumTemps >= 22
-			&& (m_Caps.PS20Caps.Caps & (D3DPS20CAPS_ARBITRARYSWIZZLE | D3DPS20CAPS_GRADIENTINSTRUCTIONS |
-			D3DPS20CAPS_PREDICATION | D3DPS20CAPS_NODEPENDENTREADLIMIT | D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT))) {
-			m_ShaderProfile = "ps_2_a";
-		} else if (m_Caps.PS20Caps.NumTemps >= 32
-			&& (m_Caps.PS20Caps.Caps & D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT)) {
+		if (m_Caps.PS20Caps.NumTemps >= 32 && (m_Caps.PS20Caps.Caps & D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT)) {
 			m_ShaderProfile = "ps_2_b";
-		} else {
+		}
+		else if (m_Caps.PS20Caps.NumTemps >= 22
+			&& (m_Caps.PS20Caps.Caps & (D3DPS20CAPS_ARBITRARYSWIZZLE | D3DPS20CAPS_GRADIENTINSTRUCTIONS |
+				D3DPS20CAPS_PREDICATION | D3DPS20CAPS_NODEPENDENTREADLIMIT | D3DPS20CAPS_NOTEXINSTRUCTIONLIMIT))) {
+			m_ShaderProfile = "ps_2_a";
+		}
+		else {
 			m_ShaderProfile = "ps_2_0";
 		}
 	} else {
