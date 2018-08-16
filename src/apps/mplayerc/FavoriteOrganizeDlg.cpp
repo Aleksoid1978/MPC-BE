@@ -71,6 +71,7 @@ void CFavoriteOrganizeDlg::SetupList()
 void CFavoriteOrganizeDlg::SaveList()
 {
 	auto& favlist = m_FavLists[m_tab.GetCurSel()];
+	std::list<CString> sl;
 
 	for (int i = 0; i < m_list.GetItemCount(); i++) {
 		auto it = FindInListByPointer(favlist, (CString*)m_list.GetItemData(i));
@@ -83,8 +84,10 @@ void CFavoriteOrganizeDlg::SaveList()
 		ExplodeEsc(*it, args, L';');
 		args.front() = m_list.GetItemText(i, 0);
 
-		*it = ImplodeEsc(args, L';');
+		sl.push_back(ImplodeEsc(args, L';'));
 	}
+
+	favlist = sl;
 }
 
 void CFavoriteOrganizeDlg::UpdateColumnsSizes()
