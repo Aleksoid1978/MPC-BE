@@ -46,18 +46,15 @@ void CFavoriteOrganizeDlg::SetupList()
 
 	for (const auto& fav : favlist) {
 		std::list<CString> sl;
-		ExplodeEsc(fav, sl, L';', 3);
+		ExplodeEsc(fav, sl, L'|', 2);
 
-		int n = m_list.InsertItem(m_list.GetItemCount(), sl.front());
-		sl.pop_front();
-		m_list.SetItemData(n, (DWORD_PTR)&(fav));
+		if (sl.size() == 2) {
+			int n = m_list.InsertItem(m_list.GetItemCount(), sl.front());
+			m_list.SetItemData(n, (DWORD_PTR)&(fav));
 
-		if (!sl.empty()) {
 			REFERENCE_TIME rt = 0;
-
-			if (1 == swscanf_s(sl.front(), L"%I64d", &rt) && rt > 0) {
+			if (StrToInt64(sl.back(), rt) && rt > 0) {
 				DVD_HMSF_TIMECODE hmsf = RT2HMSF(rt);
-
 				CString str;
 				str.Format(L"[%02u:%02u:%02u]", hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
 				m_list.SetItemText(n, 1, str);
@@ -80,10 +77,10 @@ void CFavoriteOrganizeDlg::SaveList()
 		}
 
 		std::list<CString> args;
-		ExplodeEsc(*it, args, L';');
+		ExplodeEsc(*it, args, L'|');
 		args.front() = m_list.GetItemText(i, 0);
 
-		*it = ImplodeEsc(args, L';');
+		*it = ImplodeEsc(args, L'|');
 	}
 }
 
@@ -228,7 +225,7 @@ void CFavoriteOrganizeDlg::OnEditBnClicked()
 		}
 
 		std::list<CString> args;
-		ExplodeEsc(*it, args, L';');
+		ExplodeEsc(*it, args, L'|');
 		if (args.size() < 4) {
 			ASSERT(0);
 			return;
@@ -242,7 +239,7 @@ void CFavoriteOrganizeDlg::OnEditBnClicked()
 			m_list.SetItemText(nItem, 0, ipd.GetPropertyName());
 			name = ipd.GetPropertyName();
 			path = ipd.GetPropertyPath();
-			const CString str = ImplodeEsc(args, L';');
+			const CString str = ImplodeEsc(args, L'|');
 			*it = str;
 		}
 	}
@@ -339,7 +336,7 @@ void CFavoriteOrganizeDlg::OnDeleteBnClicked()
 	int nItem = -1;
 	auto& favlist = m_FavLists[m_tab.GetCurSel()];
 
-	while ((pos = m_list.GetFirstSelectedItemPosition()) != nullptr) {
+	while (pos = m_list.GetFirstSelectedItemPosition()) {
 		nItem = m_list.GetNextSelectedItem(pos);
 		if (nItem < 0 || nItem >= m_list.GetItemCount()) {
 			return;
@@ -469,7 +466,7 @@ void CFavoriteOrganizeDlg::OnLvnGetInfoTipList(NMHDR* pNMHDR, LRESULT* pResult)
 	}
 
 	std::list<CString> args;
-	ExplodeEsc(*it, args, L';');
+	ExplodeEsc(*it, args, L'|');
 	if (args.size() < 4) {
 		ASSERT(0);
 		return;
@@ -477,9 +474,6 @@ void CFavoriteOrganizeDlg::OnLvnGetInfoTipList(NMHDR* pNMHDR, LRESULT* pResult)
 
 	const CString& path = *(std::next(args.begin(), 3));
 
-	// Relative to drive value is always third. If less args are available that means it is not included.
-	const int rootLength = (tab == 0 && *(std::next(args.begin(), 2)) != L"0") ? CPath(path).SkipRoot() : 0;
-
-	StringCchCopyW(pGetInfoTip->pszText, pGetInfoTip->cchTextMax, path.Mid(rootLength));
+	StringCchCopyW(pGetInfoTip->pszText, pGetInfoTip->cchTextMax, path);
 	*pResult = 0;
 }
