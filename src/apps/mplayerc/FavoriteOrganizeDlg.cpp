@@ -456,8 +456,7 @@ void CFavoriteOrganizeDlg::OnSize(UINT nType, int cx, int cy)
 void CFavoriteOrganizeDlg::OnLvnGetInfoTipList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMLVGETINFOTIPW pGetInfoTip = reinterpret_cast<LPNMLVGETINFOTIPW>(pNMHDR);
-	const int tab = m_tab.GetCurSel();
-	auto& favlist = m_FavLists[tab];
+	auto& favlist = m_FavLists[m_tab.GetCurSel()];
 
 	auto it = FindInListByPointer(favlist, (CString*)m_list.GetItemData(pGetInfoTip->iItem));
 	if (it == favlist.end()) {

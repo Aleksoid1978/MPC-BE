@@ -15095,16 +15095,15 @@ void CMainFrame::SetupFavoritesSubMenu()
 
 	UINT nLastGroupStart = submenu.GetMenuItemCount();
 
+	const UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
+	std::list<CString> favlist;
+
 	UINT id = ID_FAVORITES_FILE_START;
+	AfxGetAppSettings().GetFav(FAV_FILE, favlist);
 
-	std::list<CString> sl;
-	AfxGetAppSettings().GetFav(FAV_FILE, sl);
-
-	for (const auto& item : sl) {
-		UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
-
+	for (const auto& fav : favlist) {
 		std::list<CString> sl;
-		ExplodeEsc(item, sl, L'|', 4);
+		ExplodeEsc(fav, sl, L'|', 4);
 
 		if (sl.size() == 4 && sl.front().GetLength()) {
 			auto it = sl.cbegin();
@@ -15144,14 +15143,11 @@ void CMainFrame::SetupFavoritesSubMenu()
 	nLastGroupStart = submenu.GetMenuItemCount();
 
 	id = ID_FAVORITES_DVD_START;
+	s.GetFav(FAV_DVD, favlist);
 
-	s.GetFav(FAV_DVD, sl);
-
-	for (const auto& item : sl) {
-		UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
-
+	for (const auto& fav : favlist) {
 		std::list<CString> sl;
-		ExplodeEsc(item, sl, L'|', 4);
+		ExplodeEsc(fav, sl, L'|', 4);
 
 		if (sl.size() == 4 && sl.front().GetLength()) {
 			auto it = sl.cbegin();
@@ -15190,14 +15186,11 @@ void CMainFrame::SetupFavoritesSubMenu()
 	nLastGroupStart = submenu.GetMenuItemCount();
 
 	id = ID_FAVORITES_DEVICE_START;
+	s.GetFav(FAV_DEVICE, favlist);
 
-	s.GetFav(FAV_DEVICE, sl);
-
-	for (const auto& item : sl) {
-		UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
-
+	for (const auto& fav : favlist) {
 		std::list<CString> sl;
-		ExplodeEsc(item, sl, L'|', 2);
+		ExplodeEsc(fav, sl, L'|', 2);
 
 		if (sl.size() == 2 && sl.front().GetLength()) {
 			CString favname = sl.front();
