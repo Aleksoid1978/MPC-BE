@@ -29,6 +29,7 @@
 #include "../../DSUtil/FileHandle.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/WinAPIUtils.h"
+#include "../../DSUtil/std_helper.h"
 #include "../../filters/switcher/AudioSwitcher/IAudioSwitcherFilter.h"
 
 const LPCWSTR channel_mode_sets[] = {
@@ -1996,7 +1997,7 @@ void CAppSettings::GetFav(favtype ft, std::list<CString>& sl)
 			return;
 	}
 
-	for (int i = 0; ; i++) {
+	for (int i = 0; i < 100; i++) {
 		CString s;
 		s.Format(L"Name%d", i);
 		s = AfxGetMyApp()->GetProfileString(root, s);
@@ -2046,11 +2047,10 @@ void CAppSettings::AddFav(favtype ft, CString s)
 {
 	std::list<CString> sl;
 	GetFav(ft, sl);
-	if (std::find(sl.cbegin(), sl.cend(), s) != sl.cend()) {
-		return;
+	if (sl.size() < 100 && !Contains(sl, s)) {
+		sl.push_back(s);
+		SetFav(ft, sl);
 	}
-	sl.push_back(s);
-	SetFav(ft, sl);
 }
 
 CDVBChannel* CAppSettings::FindChannelByPref(int nPrefNumber)
