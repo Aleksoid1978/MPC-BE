@@ -71,7 +71,6 @@ void CFavoriteOrganizeDlg::SetupList()
 void CFavoriteOrganizeDlg::SaveList()
 {
 	auto& favlist = m_FavLists[m_tab.GetCurSel()];
-	std::list<CString> sl;
 
 	for (int i = 0; i < m_list.GetItemCount(); i++) {
 		auto it = FindInListByPointer(favlist, (CString*)m_list.GetItemData(i));
@@ -84,10 +83,8 @@ void CFavoriteOrganizeDlg::SaveList()
 		ExplodeEsc(*it, args, L';');
 		args.front() = m_list.GetItemText(i, 0);
 
-		sl.push_back(ImplodeEsc(args, L';'));
+		*it = ImplodeEsc(args, L';');
 	}
-
-	favlist = sl;
 }
 
 void CFavoriteOrganizeDlg::UpdateColumnsSizes()
@@ -340,12 +337,17 @@ void CFavoriteOrganizeDlg::OnDeleteBnClicked()
 {
 	POSITION pos;
 	int nItem = -1;
+	auto& favlist = m_FavLists[m_tab.GetCurSel()];
 
 	while ((pos = m_list.GetFirstSelectedItemPosition()) != nullptr) {
 		nItem = m_list.GetNextSelectedItem(pos);
-
 		if (nItem < 0 || nItem >= m_list.GetItemCount()) {
 			return;
+		}
+
+		auto it = FindInListByPointer(favlist, (CString*)m_list.GetItemData(nItem));
+		if (it != favlist.end()) {
+			favlist.erase(it);
 		}
 
 		m_list.DeleteItem(nItem);
