@@ -8,7 +8,8 @@
 #define IDD_CONFIGDLG                   104
 #define IDB_MPCBEBMP_PLAY               200
 #define IDB_MPCBEBMP_ADD                201
-#define IDC_MPCCOMBO                    201
+#define IDC_STATIC1                     202
+#define IDC_MPCCOMBO                    203
 
 // Next default values for new objects
 // 
