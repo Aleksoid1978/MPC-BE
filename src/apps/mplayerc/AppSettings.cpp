@@ -1999,14 +1999,14 @@ void CAppSettings::GetFav(favtype ft, std::list<CString>& sl)
 
 	for (int i = 0; i < 100; i++) {
 		CString s;
-		s.Format(L"Name%d", i);
+		s.Format(L"Fav%02d", i);
 		s = AfxGetMyApp()->GetProfileString(root, s);
 		if (s.IsEmpty()) {
 			break;
 		}
 
 		std::list<CString> args;
-		ExplodeEsc(s, args, L';');
+		ExplodeEsc(s, args, L'|');
 		if (args.size() < 4) {
 			ASSERT(FALSE);
 			continue;
@@ -2038,7 +2038,7 @@ void CAppSettings::SetFav(favtype ft, std::list<CString>& sl)
 	int i = 0;
 	for (const auto& item : sl) {
 		CString s;
-		s.Format(L"Name%d", i++);
+		s.Format(L"Fav%02d", i++);
 		AfxGetMyApp()->WriteProfileString(root, s, item);
 	}
 }

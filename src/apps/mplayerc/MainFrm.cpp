@@ -9694,122 +9694,79 @@ void CMainFrame::AddFavorite(bool bDisplayMessage/* = false*/, bool bShowDialog/
 
 	CString osdMsg;
 
+	CString path;
 	if (GetPlaybackMode() == PM_FILE) {
-		CString fn = GetCurFileName();
+		path = GetCurFileName();
+	}
+	else if (GetPlaybackMode() == PM_DVD) {
+		//ULONG len = 0;
+		//if (SUCCEEDED(m_pDVDI->GetDVDDirectory(path.GetBuffer(MAX_PATH), MAX_PATH, &len))) {
+		//	path.ReleaseBuffer(len);
+		//}
+		path = m_wndPlaylistBar.GetCurFileName(); // get path to the VIDEO_TS.IFO or image file (.iso)
+	}
 
-		std::list<CString> descList;
-		if (m_PlaybackInfo.FileName.GetLength()) {
-			descList.push_back(m_PlaybackInfo.FileName);
+	if (path.IsEmpty()) {
+		return;
+	}
+
+	std::list<CString> descList;
+	if (m_PlaybackInfo.FileName.GetLength()) {
+		descList.push_back(m_PlaybackInfo.FileName);
+	}
+	if (m_PlaybackInfo.Title.GetLength()) {
+		descList.push_back(m_PlaybackInfo.Title);
+	}
+
+	CString favname;
+	if (bShowDialog) {
+		CFavoriteAddDlg dlg(descList, path);
+		if (dlg.DoModal() != IDOK) {
+			return;
 		}
-		if (m_PlaybackInfo.Title.GetLength()) {
-			descList.push_back(m_PlaybackInfo.Title);
-		}
+		favname = dlg.m_name;
+	} else {
+		favname = descList.front();
+	}
+	favname.Remove('|');
 
-		// Name
-		CString str;
-		if (bShowDialog) {
-			CFavoriteAddDlg dlg(descList, fn);
-			if (dlg.DoModal() != IDOK) {
-				return;
-			}
-			str = dlg.m_name;
-		} else {
-			str = descList.front();
-		}
+	// RelativeDrive
+	if (s.bFavRelativeDrive && path.GetLength() >= 3 && path.Mid(1, 2) == L":\\") {
+		path.SetAt(0, '?');
+	}
 
-		str.Remove(';');
-
+	if (GetPlaybackMode() == PM_FILE) {
 		// RememberPos
-		CString pos(L"0");
-		if (s.bFavRememberPos) {
-			pos.Format(L"%I64d", GetPos());
-		}
+		REFERENCE_TIME rtime = s.bFavRememberPos ? GetPos() : 0;
 
-		str += ';';
-		str += pos;
-
-		// RelativeDrive
-		CString relativeDrive;
-		relativeDrive.Format(L"%d", s.bFavRelativeDrive);
-
-		str += ';';
-		str += relativeDrive;
-
-		// Paths
-		if (m_LastOpenBDPath.GetLength() > 0 && !m_DiskImage.DriveAvailable()) {
-			str += L";" + m_LastOpenBDPath;
-		} else {
-			CPlaylistItem pli;
-			if (m_wndPlaylistBar.GetCur(pli)) {
-				for (const auto& fi : pli.m_fns) {
-					str += L";" + fi.GetName();
-				}
-			}
-		}
-
-		str.AppendFormat(L";%d;%d", GetAudioTrackIdx(), GetSubtitleTrackIdx());
-
-		s.AddFav(FAV_FILE, str);
+		CString favstr;
+		favstr.Format(L"%s|%I64d|%d;%d|%s", favname, rtime, GetAudioTrackIdx(), GetSubtitleTrackIdx(), path);
+		s.AddFav(FAV_FILE, favstr);
 
 		osdMsg = ResStr(IDS_FILE_FAV_ADDED);
-	} else if (GetPlaybackMode() == PM_DVD) {
-		WCHAR path[MAX_PATH] = { 0 };
-		ULONG len = 0;
-		if (SUCCEEDED(m_pDVDI->GetDVDDirectory(path, _countof(path), &len))) {
-			CString fn = path;
-			fn.TrimRight(L"/\\");
-
-			std::list<CString> fnList;
-
-			// Name
-			CString str;
-			if (bShowDialog) {
-				CFavoriteAddDlg dlg(fnList, fn, FALSE);
-				if (dlg.DoModal() != IDOK) {
-					return;
-				}
-				str = dlg.m_name;
-			} else {
-				str = fn;
+	}
+	else if (GetPlaybackMode() == PM_DVD) {
+		// RememberPos
+		REFERENCE_TIME rtime = 0;
+		CString dvd_state(L"0");
+		if (s.bFavRememberPos) {
+			rtime = GetPos();
+			CDVDStateStream stream;
+			stream.AddRef();
+			CComPtr<IDvdState> pStateData;
+			CComQIPtr<IPersistStream> pPersistStream;
+			if (SUCCEEDED(m_pDVDI->GetState(&pStateData))
+				&& (pPersistStream = pStateData)
+				&& SUCCEEDED(OleSaveToStream(pPersistStream, (IStream*)&stream))) {
+				dvd_state = BinToCString(stream.m_data.data(), stream.m_data.size());
 			}
-
-			str.Remove(';');
-
-			// RememberPos - seek bar position
-			CString pos(L"0");
-			if (s.bFavRememberPos) {
-				pos.Format(L"%I64d", GetPos());
-			}
-
-			str += ';';
-			str += pos;
-
-			// RememberPos - DVD state
-			pos = L"0";
-			if (s.bFavRememberPos) {
-				CDVDStateStream stream;
-				stream.AddRef();
-
-				CComPtr<IDvdState> pStateData;
-				CComQIPtr<IPersistStream> pPersistStream;
-				if (SUCCEEDED(m_pDVDI->GetState(&pStateData))
-						&& (pPersistStream = pStateData)
-						&& SUCCEEDED(OleSaveToStream(pPersistStream, (IStream*)&stream))) {
-					pos = BinToCString(stream.m_data.data(), stream.m_data.size());
-				}
-			}
-
-			str += ';';
-			str += pos;
-
-			// Paths
-			str += ';';
-			str += fn;
-
-			s.AddFav(FAV_DVD, str);
-
-			osdMsg = ResStr(IDS_DVD_FAV_ADDED);
 		}
+
+		CString favstr;
+		favstr.Format(L"%s|%I64d|%s|%s", favname, rtime, dvd_state, path);
+		s.AddFav(FAV_DVD, favstr);
+
+		osdMsg = ResStr(IDS_DVD_FAV_ADDED);
 	}
 
 	if (bDisplayMessage && !osdMsg.IsEmpty()) {
@@ -9873,61 +9830,45 @@ void CMainFrame::OnFavoritesFile(UINT nID)
 void CMainFrame::PlayFavoriteFile(CString fav)
 {
 	std::list<CString> args;
-	REFERENCE_TIME rtStart = 0;
-	BOOL bRelativeDrive = FALSE;
-
-	ExplodeEsc(fav, args, L';');
-	args.pop_front();									// desc / name
-	swscanf_s(args.front(), L"%I64d", &rtStart);		// pos
-	args.pop_front();
-	swscanf_s(args.front(), L"%d", &bRelativeDrive);	// relative drive
-	args.pop_front();
-	rtStart = max(rtStart, 0LL);
-
-	m_nAudioTrackStored    = -1;
-	m_nSubtitleTrackStored = -1;
-	if (args.size() > 2) {
-		if (swscanf_s(args.back(), L"%d", &m_nSubtitleTrackStored) == 1) {
-			args.pop_back();
-		}
-		if (swscanf_s(args.back(), L"%d", &m_nAudioTrackStored) == 1) {
-			args.pop_back();
-		}
+	ExplodeEsc(fav, args, L'|');
+	if (args.size() < 4) {
+		return;
 	}
+
+	auto it = args.cbegin();
+	it++; // skip title
+
+	REFERENCE_TIME rtime = 0;
+	StrToInt64(*it++, rtime);
+
+	m_nAudioTrackStored = -1;
+	m_nSubtitleTrackStored = -1;
+	if (swscanf_s(*it++, L"%d;%d", &m_nAudioTrackStored, &m_nSubtitleTrackStored) != 2) {
+		return;
+	}
+
+	CString path = *it++;
 
 	// NOTE: This is just for the favorites but we could add a global settings that does this always when on. Could be useful when using removable devices.
 	//       All you have to do then is plug in your 500 gb drive, full with movies and/or music, start MPC-BE (from the 500 gb drive) with a preloaded playlist and press play.
-	if (bRelativeDrive) {
-		// Get the drive MPC-BE is on and apply it to the path list
-		CPath exeDrive(GetProgramPath());
+	if (path.Left(3) == L"?:\\") {
+		CString exepath(GetProgramPath());
 
-		if (exeDrive.StripToRoot()) {
-			for (auto& stringPath : args) {
-				CPath path(stringPath);
-				const int rootLength = path.SkipRoot();
-
-				if (path.StripToRoot()) {
-					if (_wcsicmp(exeDrive, path) != 0) { // Do we need to replace the drive letter ?
-						// Replace drive letter
-						CString newPath(exeDrive);
-
-						newPath += stringPath.Mid(rootLength);//newPath += stringPath.Mid( 3 );
-						stringPath = newPath;
-					}
-				}
-			}
+		if (exepath.Mid(1, 2) == L":\\") {
+			path.SetAt(0, exepath[0]);
 		}
 	}
 
-	if (!m_wndPlaylistBar.SelectFileInPlaylist(args.front())) {
-		m_wndPlaylistBar.Open(args, false);
+	if (!m_wndPlaylistBar.SelectFileInPlaylist(path)) {
+		m_wndPlaylistBar.Open(path);
 	}
-	if (GetPlaybackMode() == PM_FILE && args.front() == m_lastOMD->title && !m_bEndOfStream) {
+
+	if (GetPlaybackMode() == PM_FILE && path == m_lastOMD->title && !m_bEndOfStream) {
 		m_wndPlaylistBar.SetFirstSelected();
-		m_pMS->SetPositions(&rtStart, AM_SEEKING_AbsolutePositioning, nullptr, AM_SEEKING_NoPositioning);
+		m_pMS->SetPositions(&rtime, AM_SEEKING_AbsolutePositioning, nullptr, AM_SEEKING_NoPositioning);
 		OnPlayPlay();
 	} else {
-		OpenCurPlaylistItem(rtStart);
+		OpenCurPlaylistItem(rtime);
 	}
 }
 
@@ -9986,23 +9927,31 @@ void CMainFrame::OnFavoritesDVD(UINT nID)
 
 void CMainFrame::PlayFavoriteDVD(CString fav)
 {
-	CString fn;
-	CDVDStateStream stream;
-	stream.AddRef();
-
 	std::list<CString> args;
-	ExplodeEsc(fav, args, L';', 4);
+	ExplodeEsc(fav, args, L'|');
+	if (args.size() < 3) {
+		return;
+	}
 
 	auto it = args.cbegin();
-	++it; // desc / name
-	if (args.size() == 4) {
-		++it; // pos
+	it++; // skip title
+	it++; // skip time
+
+	CString dvdstate = *it++;
+	CDVDStateStream stream;
+	stream.AddRef();
+	if (dvdstate != L"0") {
+		CStringToBin(dvdstate, stream.m_data);
 	}
-	CString state = *it++; // state
-	if (state != L"0") {
-		CStringToBin(state, stream.m_data);
+
+	CString path = *it++;
+
+	if (path.Left(3) == L"?:\\") {
+		CString exepath(GetProgramPath());
+		if (exepath.Mid(1, 2) == L":\\") {
+			path.SetAt(0, exepath[0]);
+		}
 	}
-	fn = *it++; // path
 
 	SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 
@@ -10016,7 +9965,7 @@ void CMainFrame::PlayFavoriteDVD(CString fav)
 
 	CAutoPtr<OpenDVDData> p(DNew OpenDVDData());
 	if (p) {
-		p->path = fn;
+		p->path = path;
 		p->pDvdState = pDvdState;
 	}
 	OpenMedia(p);
@@ -15154,44 +15103,35 @@ void CMainFrame::SetupFavoritesSubMenu()
 	for (const auto& item : sl) {
 		UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 
-		CString f_str = item;
-		f_str.Replace(L"&", L"&&");
-		f_str.Replace(L"\t", L" ");
-
 		std::list<CString> sl;
-		ExplodeEsc(f_str, sl, L';', 3);
+		ExplodeEsc(item, sl, L'|', 4);
 
-		f_str = sl.front();
-		sl.pop_front();
+		if (sl.size() == 4 && sl.front().GetLength()) {
+			auto it = sl.cbegin();
 
-		if (!sl.empty()) {
-			CString str;
+			CString favname = *it++;
+			favname.Replace(L"&", L"&&");
+			favname.Replace(L"\t", L" ");
 
 			// pos
+			CString posStr;
 			REFERENCE_TIME rt = 0;
-			if (1 == swscanf_s(sl.front(), L"%I64d", &rt) && rt > 0) {
+			if (StrToInt64(*it++, rt) && rt > 0) {
 				DVD_HMSF_TIMECODE hmsf = RT2HMSF(rt);
-				str.Format(L"[%02u:%02u:%02u]", hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
+				posStr.Format(L"[%02u:%02u:%02u]", hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
 			}
 
-			// relative drive
-			if (sl.size() > 1) { // Here to prevent crash if old favorites settings are present
-				sl.pop_front();
+			it++; // skip audio and sub nums
 
-				BOOL bRelativeDrive = FALSE;
-				if (swscanf_s(sl.front(), L"%d", &bRelativeDrive) == 1) {
-					if (bRelativeDrive) {
-						str.Format(L"[RD]%s", str);
-					}
-				}
+			// relative drive from path
+			if (*it++ == L"?:\\") {
+				posStr.Insert(0, L"[RD]");
 			}
-			if (!str.IsEmpty()) {
-				f_str.Format(L"%s\t%.14s", f_str, str);
-			}
-		}
 
-		if (!f_str.IsEmpty()) {
-			submenu.AppendMenu(flags, id, f_str);
+			if (!posStr.IsEmpty()) {
+				favname.AppendFormat(L"\t%.14s", posStr);
+			}
+			submenu.AppendMenu(flags, id, favname);
 		}
 
 		id++;
@@ -15210,32 +15150,34 @@ void CMainFrame::SetupFavoritesSubMenu()
 	for (const auto& item : sl) {
 		UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 
-		CString str = item;
-		str.Replace(L"&", L"&&");
-
 		std::list<CString> sl;
-		ExplodeEsc(str, sl, L';', 4);
-		size_t cnt = sl.size();
+		ExplodeEsc(item, sl, L'|', 4);
 
-		str = sl.front();
-		sl.pop_front();
+		if (sl.size() == 4 && sl.front().GetLength()) {
+			auto it = sl.cbegin();
 
-		if (!str.IsEmpty()) {
-			if (cnt == 4) {
-				// pos
-				CString posStr;
-				REFERENCE_TIME rt = 0;
-				if (1 == swscanf_s(sl.front(), L"%I64d", &rt) && rt > 0) {
-					DVD_HMSF_TIMECODE hmsf = RT2HMSF(rt);
-					posStr.Format(L"[%02u:%02u:%02u]", hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
-				}
+			CString favname = *it++;
+			favname.Replace(L"&", L"&&");
+			favname.Replace(L"\t", L" ");
 
-				if (!posStr.IsEmpty()) {
-					str.AppendFormat(L"\t%.14s", posStr);
-				}
+			CString posStr;
+			REFERENCE_TIME rt = 0;
+			if (StrToInt64(*it++, rt) && rt > 0) {
+				DVD_HMSF_TIMECODE hmsf = RT2HMSF(rt);
+				posStr.Format(L"[%02u:%02u:%02u]", hmsf.bHours, hmsf.bMinutes, hmsf.bSeconds);
 			}
 
-			submenu.AppendMenu(flags, id, str);
+			it++; // skip dvd state
+
+			// relative drive from path
+			if (*it++ == L"?:\\") {
+				posStr.Insert(0, L"[RD]");
+			}
+
+			if (!posStr.IsEmpty()) {
+				favname.AppendFormat(L"\t%.14s", posStr);
+			}
+			submenu.AppendMenu(flags, id, favname);
 		}
 
 		id++;
@@ -15254,16 +15196,15 @@ void CMainFrame::SetupFavoritesSubMenu()
 	for (const auto& item : sl) {
 		UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 
-		CString str = item;
-		str.Replace(L"&", L"&&");
-
 		std::list<CString> sl;
-		ExplodeEsc(str, sl, L';', 2);
+		ExplodeEsc(item, sl, L'|', 2);
 
-		str = sl.front();
+		if (sl.size() == 2 && sl.front().GetLength()) {
+			CString favname = sl.front();
+			favname.Replace(L"&", L"&&");
+			favname.Replace(L"\t", L" ");
 
-		if (!str.IsEmpty()) {
-			submenu.AppendMenu(flags, id, str);
+			submenu.AppendMenu(flags, id, favname);
 		}
 
 		id++;
