@@ -20,18 +20,18 @@
 
 #include "stdafx.h"
 #include "ConfigDlg.h"
-#include <winuser.h>
+//#include <winuser.h>
 
 // CConfigDlg dialog
 
-#define MPCBE_PATH_RU	_T("Текущий путь MPC-BE:")
-#define MPCBE_PATH_EN	_T("Current MPC-BE path:")
+#define MPCBE_PATH_RU	L"Текущий путь MPC-BE:"
+#define MPCBE_PATH_EN	L"Current MPC-BE path:"
 
-#define CANCEL_RU		_T("Отмена")
-#define CANCEL_EN		_T("Cancel")
+#define CANCEL_RU		L"Отмена"
+#define CANCEL_EN		L"Cancel"
 
-#define CAPTION_RU		_T("Настройки MPC-BE ShellExt")
-#define CAPTION_EN		_T("MPC-BE ShellExt settings")
+#define CAPTION_RU		L"Настройки MPC-BE ShellExt"
+#define CAPTION_EN		L"MPC-BE ShellExt settings"
 
 IMPLEMENT_DYNAMIC(CConfigDlg, CDialog)
 
@@ -60,11 +60,11 @@ END_MESSAGE_MAP()
 void CConfigDlg::OnBnClickedOk()
 {
 	CRegKey key;
-	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
+	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
 		CString path;
 		m_MPCPath.GetLBText(m_MPCPath.GetCurSel(), path);
-		if (::PathFileExists(path)) {
-			key.SetStringValue(_T("MpcPath"), path);
+		if (::PathFileExistsW(path)) {
+			key.SetStringValue(L"MpcPath", path);
 		}
 		key.Close();
 	}
@@ -81,43 +81,43 @@ BOOL CConfigDlg::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	SetWindowText((GetUserDefaultUILanguage() == 1049) ? CAPTION_RU : CAPTION_EN);
+	SetWindowTextW((GetUserDefaultUILanguage() == 1049) ? CAPTION_RU : CAPTION_EN);
 
-	::SetWindowText(GetDlgItem(IDC_STATIC)->m_hWnd, (GetUserDefaultUILanguage() == 1049) ? MPCBE_PATH_RU : MPCBE_PATH_EN);
-	::SetWindowText(GetDlgItem(IDCANCEL)->m_hWnd,   (GetUserDefaultUILanguage() == 1049) ? CANCEL_RU : CANCEL_EN);
+	::SetWindowTextW(GetDlgItem(IDC_STATIC)->m_hWnd, (GetUserDefaultUILanguage() == 1049) ? MPCBE_PATH_RU : MPCBE_PATH_EN);
+	::SetWindowTextW(GetDlgItem(IDCANCEL)->m_hWnd,   (GetUserDefaultUILanguage() == 1049) ? CANCEL_RU : CANCEL_EN);
 
-	SetClassLongPtr(GetDlgItem(IDOK)->m_hWnd,         GCLP_HCURSOR, (LONG_PTR)AfxGetApp()->LoadStandardCursor(IDC_HAND));
-	SetClassLongPtr(GetDlgItem(IDCANCEL)->m_hWnd,     GCLP_HCURSOR, (LONG_PTR)AfxGetApp()->LoadStandardCursor(IDC_HAND));
-	SetClassLongPtr(GetDlgItem(IDC_MPCCOMBO)->m_hWnd, GCLP_HCURSOR, (LONG_PTR)AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetClassLongPtrW(GetDlgItem(IDOK)->m_hWnd,         GCLP_HCURSOR, (LONG_PTR)AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetClassLongPtrW(GetDlgItem(IDCANCEL)->m_hWnd,     GCLP_HCURSOR, (LONG_PTR)AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	SetClassLongPtrW(GetDlgItem(IDC_MPCCOMBO)->m_hWnd, GCLP_HCURSOR, (LONG_PTR)AfxGetApp()->LoadStandardCursor(IDC_HAND));
 
 	CRegKey key;
-	TCHAR path_buff[MAX_PATH];
+	WCHAR path_buff[MAX_PATH];
 	memset(path_buff, 0, sizeof(path_buff));
 	ULONG len = sizeof(path_buff);
 
-	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\MPC-BE"))) {
-		if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && ::PathFileExists(path_buff)) {
+	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
+		if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
 			m_MPCPath.AddString(path_buff);
 		}
 		key.Close();
 	}
 #ifdef _WIN64
 	// x86 application on x64 system
-	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, _T("Software\\Wow6432Node\\MPC-BE"))) {
+	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\MPC-BE")) {
 		len = sizeof(path_buff);
 		memset(path_buff, 0, sizeof(path_buff));
-		if (ERROR_SUCCESS == key.QueryStringValue(_T("ExePath"), path_buff, &len) && ::PathFileExists(path_buff)) {
+		if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
 			m_MPCPath.AddString(path_buff);
 		}
 		key.Close();
 	}
 #endif
 
-	CString mpc_path = _T("");
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, _T("Software\\MPC-BE\\ShellExt"))) {
+	CString mpc_path;
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
 		len = sizeof(path_buff);
 		memset(path_buff, 0, sizeof(path_buff));
-		if (ERROR_SUCCESS == key.QueryStringValue(_T("MpcPath"), path_buff, &len) && ::PathFileExists(path_buff)) {
+		if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
 			mpc_path = CString(path_buff).Trim();
 		}
 		key.Close();
