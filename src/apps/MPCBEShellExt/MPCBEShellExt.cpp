@@ -27,7 +27,7 @@
 extern "C" __declspec(dllexport) HRESULT DllConfig(LPCTSTR lpszPath)
 {
 	if (wcslen(lpszPath)) {
-		if (::PathFileExists(lpszPath)) {
+		if (::PathFileExistsW(lpszPath)) {
 			CRegKey key;
 			if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
 				key.SetStringValue(L"MpcPath", lpszPath);
@@ -40,13 +40,13 @@ extern "C" __declspec(dllexport) HRESULT DllConfig(LPCTSTR lpszPath)
 
 	// ѕровер€ем - надо ли показывать диалог выбора
 	CRegKey key;
-	TCHAR path_buff[MAX_PATH];
+	WCHAR path_buff[MAX_PATH];
 	memset(path_buff, 0, sizeof(path_buff));
 	ULONG len = sizeof(path_buff);
 	unsigned count = 0;
 
 	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
-		if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExists(path_buff)) {
+		if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
 			count++;
 		}
 		key.Close();
@@ -56,7 +56,7 @@ extern "C" __declspec(dllexport) HRESULT DllConfig(LPCTSTR lpszPath)
 	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\MPC-BE")) {
 		len = sizeof(path_buff);
 		memset(path_buff, 0, sizeof(path_buff));
-		if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExists(path_buff)) {
+		if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
 			count++;
 		}
 		key.Close();
@@ -73,7 +73,7 @@ extern "C" __declspec(dllexport) HRESULT DllConfig(LPCTSTR lpszPath)
 		len = sizeof(path_buff);
 
 		if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
-			if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExists(path_buff)) {
+			if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
 				CString path(path_buff);
 				key.Close();
 
@@ -105,7 +105,7 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
 static CString GetFileOnly(LPCTSTR Path)
 {
 	CString cs(Path);
-	::PathStripPath(cs.GetBuffer(0));
+	::PathStripPathW(cs.GetBuffer(0));
 	cs.ReleaseBuffer(-1);
 	return cs;
 }
@@ -113,13 +113,13 @@ static CString GetFileOnly(LPCTSTR Path)
 static CString GetKeyName()
 {
 	CString KeyName;
-	TCHAR path_buff[MAX_PATH];
+	WCHAR path_buff[MAX_PATH];
 	memset(path_buff, 0, sizeof(path_buff));
 	ULONG len = sizeof(path_buff);
 
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
-		if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", path_buff, &len) && ::PathFileExists(path_buff)) {
+		if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
 			KeyName = GetFileOnly(path_buff);
 			KeyName.Truncate(KeyName.GetLength() - 4);
 		}
@@ -169,7 +169,7 @@ STDAPI DllRegisterServer(void)
 				if (reg.Open(HKEY_CLASSES_ROOT, NULL, KEY_READ) == ERROR_SUCCESS) {
 					DWORD dwIndex = 0;
 					DWORD cbName = IS_KEY_LEN;
-					TCHAR szSubKeyName[IS_KEY_LEN] = { 0 };
+					WCHAR szSubKeyName[IS_KEY_LEN] = { 0 };
 					LONG lRet;
 
 					while ((lRet = reg.EnumKey(dwIndex, szSubKeyName, &cbName)) != ERROR_NO_MORE_ITEMS) {
@@ -213,7 +213,7 @@ STDAPI DllUnregisterServer(void)
 		if (reg.Open(HKEY_CLASSES_ROOT, NULL, KEY_READ) == ERROR_SUCCESS) {
 			DWORD dwIndex = 0;
 			DWORD cbName = IS_KEY_LEN;
-			TCHAR szSubKeyName[IS_KEY_LEN] = { 0 };
+			WCHAR szSubKeyName[IS_KEY_LEN] = { 0 };
 			LONG lRet;
 
 			while ((lRet = reg.EnumKey(dwIndex, szSubKeyName, &cbName)) != ERROR_NO_MORE_ITEMS) {

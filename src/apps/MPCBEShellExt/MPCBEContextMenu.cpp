@@ -127,7 +127,7 @@ STDMETHODIMP CMPCBEContextMenu::QueryContextMenu(HMENU hmenu, UINT indexMenu, UI
 
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
-		TCHAR path_buff[MAX_PATH] = { 0 };
+		WCHAR path_buff[MAX_PATH] = { 0 };
 		ULONG len = sizeof(path_buff);
 
 		if (ERROR_SUCCESS == key.QueryStringValue(L"Play", path_buff, &len)) {
@@ -169,7 +169,7 @@ STDMETHODIMP CMPCBEContextMenu::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJEC
 	FORMATETC fmte      = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
 	STGMEDIUM stg       = { TYMED_HGLOBAL };
 	UINT      uNumFiles = 0;
-	TCHAR     strFilePath[MAX_PATH] = { 0 };
+	WCHAR     strFilePath[MAX_PATH] = { 0 };
 
 	// No data object
 	if (!lpdobj) {
@@ -191,11 +191,11 @@ STDMETHODIMP CMPCBEContextMenu::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJEC
 	}
 
 	// Make sure HDROP contains at least one file.
-	if ((uNumFiles = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0)) >= 1) {
+	if ((uNumFiles = DragQueryFileW(hDrop, 0xFFFFFFFF, NULL, 0)) >= 1) {
 		for (UINT i = 0; i < uNumFiles; i++) {
-			DragQueryFile(hDrop, i, strFilePath, MAX_PATH);
-			if (GetFileAttributes(strFilePath) & FILE_ATTRIBUTE_DIRECTORY) {
-				size_t nLen = _tcslen(strFilePath);
+			DragQueryFileW(hDrop, i, strFilePath, MAX_PATH);
+			if (GetFileAttributesW(strFilePath) & FILE_ATTRIBUTE_DIRECTORY) {
+				size_t nLen = wcslen(strFilePath);
 				if (strFilePath[nLen - 1] != L'\\') {
 					wcscat_s(strFilePath, L"\\");
 				}
@@ -206,7 +206,7 @@ STDMETHODIMP CMPCBEContextMenu::Initialize(LPCITEMIDLIST pidlFolder, LPDATAOBJEC
 		hr = S_OK;
 		
 		// sort list by path
-		static HMODULE h = LoadLibrary(L"Shlwapi.dll");
+		static HMODULE h = LoadLibraryW(L"Shlwapi.dll");
 		if (h) {
 			typedef int (WINAPI *StrCmpLogicalW)(_In_ PCWSTR psz1, _In_ PCWSTR psz2);
 			static StrCmpLogicalW pStrCmpLogicalW = (StrCmpLogicalW)GetProcAddress(h, "StrCmpLogicalW");
@@ -276,20 +276,20 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 		p += len;
 	}
 
-	if (HWND hWnd = ::FindWindow(MPC_WND_CLASS_NAME, NULL)) {
+	if (HWND hWnd = ::FindWindowW(MPC_WND_CLASS_NAME, NULL)) {
 		COPYDATASTRUCT cds;
 		cds.dwData = 0x6ABE51;
 		cds.cbData = (DWORD)bufflen;
 		cds.lpData = buff.data();
-		SendMessage(hWnd, WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
+		SendMessageW(hWnd, WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
 	} else {
 		CRegKey key;
-		TCHAR path_buff[MAX_PATH] = { 0 };
+		WCHAR path_buff[MAX_PATH] = { 0 };
 		ULONG len = sizeof(path_buff);
 		CString mpc_path;
 		
 		if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
-			if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", path_buff, &len) && ::PathFileExists(path_buff)) {
+			if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
 				mpc_path = path_buff;
 			}
 			key.Close();
@@ -299,7 +299,7 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 			if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
 				memset(path_buff, 0, sizeof(path_buff));
 				len = sizeof(path_buff);
-				if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExists(path_buff)) {
+				if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
 					mpc_path = path_buff;
 				}
 				key.Close();
@@ -311,7 +311,7 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 			if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\Wow6432Node\\MPC-BE")) {
 				memset(path_buff, 0, sizeof(path_buff));
 				len = sizeof(path_buff);
-				if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExists(path_buff)) {
+				if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
 					mpc_path = path_buff;
 				}
 				key.Close();
@@ -323,10 +323,10 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 			if (HINSTANCE(HINSTANCE_ERROR) < ShellExecute(NULL, L"", path_buff, NULL, 0, SW_SHOWDEFAULT)) {
 				Sleep(100);
 				int wait_count = 0;
-				HWND hWnd = ::FindWindow(MPC_WND_CLASS_NAME, NULL);
+				HWND hWnd = ::FindWindowW(MPC_WND_CLASS_NAME, NULL);
 				while (!hWnd && (wait_count++ < 200)) {
 					Sleep(100);
-					hWnd = ::FindWindow(MPC_WND_CLASS_NAME, NULL);
+					hWnd = ::FindWindowW(MPC_WND_CLASS_NAME, NULL);
 				}
 
 				if (hWnd && (wait_count < 200)) {
@@ -334,7 +334,7 @@ void CMPCBEContextMenu::SendData(bool add_pl)
 					cds.dwData = 0x6ABE51;
 					cds.cbData = (DWORD)bufflen;
 					cds.lpData = buff.data();
-					SendMessage(hWnd, WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
+					SendMessageW(hWnd, WM_COPYDATA, (WPARAM)nullptr, (LPARAM)&cds);
 				} 
 			}
 		}
