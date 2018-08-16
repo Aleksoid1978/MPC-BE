@@ -40,8 +40,7 @@ extern "C" __declspec(dllexport) HRESULT DllConfig(LPCTSTR lpszPath)
 
 	// ѕровер€ем - надо ли показывать диалог выбора
 	CRegKey key;
-	WCHAR path_buff[MAX_PATH];
-	memset(path_buff, 0, sizeof(path_buff));
+	WCHAR path_buff[MAX_PATH] = { 0 };
 	ULONG len = sizeof(path_buff);
 	unsigned count = 0;
 
@@ -113,8 +112,7 @@ static CString GetFileOnly(LPCTSTR Path)
 static CString GetKeyName()
 {
 	CString KeyName;
-	WCHAR path_buff[MAX_PATH];
-	memset(path_buff, 0, sizeof(path_buff));
+	WCHAR path_buff[MAX_PATH] = { 0 };
 	ULONG len = sizeof(path_buff);
 
 	CRegKey key;
@@ -147,7 +145,7 @@ static BOOL GetKeyValue(CString value)
 #define	IS_KEY_LEN 256
 STDAPI DllRegisterServer(void)
 {
-	OLECHAR	strWideCLSID[50] = { 0 };
+	OLECHAR strWideCLSID[50] = { 0 };
 	HRESULT hr = _AtlModule.DllRegisterServer();
 
 	if (SUCCEEDED(hr)) {

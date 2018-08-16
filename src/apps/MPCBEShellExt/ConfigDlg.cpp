@@ -91,8 +91,7 @@ BOOL CConfigDlg::OnInitDialog()
 	SetClassLongPtrW(GetDlgItem(IDC_MPCCOMBO)->m_hWnd, GCLP_HCURSOR, (LONG_PTR)AfxGetApp()->LoadStandardCursor(IDC_HAND));
 
 	CRegKey key;
-	WCHAR path_buff[MAX_PATH];
-	memset(path_buff, 0, sizeof(path_buff));
+	WCHAR path_buff[MAX_PATH] = { 0 };
 	ULONG len = sizeof(path_buff);
 
 	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
