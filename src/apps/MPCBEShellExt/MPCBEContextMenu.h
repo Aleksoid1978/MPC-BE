@@ -22,6 +22,7 @@
 
 #include "resource.h"
 #include <vector>
+#include <Shobjidl.h>
 #include "MPCBEShellExt_i.h"
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)

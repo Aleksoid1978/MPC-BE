@@ -24,28 +24,8 @@
 
 CMPCBEShellExtModule _AtlModule;
 
-class CMPCBEShellExtApp : public CWinApp
+// DLL Entry Point
+extern "C" BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 {
-public:
-
-// Overrides
-	virtual BOOL InitInstance();
-	virtual int ExitInstance();
-
-	DECLARE_MESSAGE_MAP()
-};
-
-BEGIN_MESSAGE_MAP(CMPCBEShellExtApp, CWinApp)
-END_MESSAGE_MAP()
-
-CMPCBEShellExtApp theApp;
-
-BOOL CMPCBEShellExtApp::InitInstance()
-{
-	return CWinApp::InitInstance();
-}
-
-int CMPCBEShellExtApp::ExitInstance()
-{
-	return CWinApp::ExitInstance();
+	return _AtlModule.DllMain(dwReason, lpReserved);
 }

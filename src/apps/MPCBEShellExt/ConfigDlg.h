@@ -20,28 +20,28 @@
 
 #pragma once
 
-#include <afxwin.h>
+#include <atlwin.h>
 
 // CConfigDlg dialog
 
-class CConfigDlg : public CDialog
+class CConfigDlg : public CDialogImpl<CConfigDlg>
 {
-	DECLARE_DYNAMIC(CConfigDlg)
-
 public:
-	CConfigDlg(CWnd* pParent = NULL);
-	virtual ~CConfigDlg();
+	CConfigDlg();
 
-// Dialog Data
 	enum { IDD = IDD_CONFIGDLG };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);
-	virtual BOOL OnInitDialog();
+	LRESULT OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnOK(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnCancel(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
-	DECLARE_MESSAGE_MAP()
-public:
-	afx_msg void OnBnClickedOk();
-	afx_msg void OnBnClickedCancel();
-	CComboBox m_MPCPath;
+	BEGIN_MSG_MAP(CConfigDlg)
+		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+		COMMAND_HANDLER(IDOK, 0, OnOK)
+		COMMAND_HANDLER(IDCANCEL, 0, OnCancel)
+	END_MSG_MAP()
+
+private:
+	HWND m_hMPCPathCombo;
 };

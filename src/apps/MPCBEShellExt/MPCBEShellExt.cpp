@@ -26,7 +26,7 @@
 // config & dialog
 extern "C" __declspec(dllexport) HRESULT DllConfig(LPCTSTR lpszPath)
 {
-	if (wcslen(lpszPath)) {
+	if (lpszPath) {
 		if (::PathFileExistsW(lpszPath)) {
 			CRegKey key;
 			if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
@@ -91,8 +91,7 @@ extern "C" __declspec(dllexport) HRESULT DllConfig(LPCTSTR lpszPath)
 // Used to determine whether the DLL can be unloaded by OLE
 STDAPI DllCanUnloadNow(void)
 {
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	return (AfxDllCanUnloadNow() == S_OK && _AtlModule.GetLockCount() == 0) ? S_OK : S_FALSE;
+	return (_AtlModule.DllCanUnloadNow() == S_OK && _AtlModule.GetLockCount() == 0) ? S_OK : S_FALSE;
 }
 
 // Returns a class factory to create an object of the requested type
@@ -149,7 +148,7 @@ STDAPI DllRegisterServer(void)
 	HRESULT hr = _AtlModule.DllRegisterServer();
 
 	if (SUCCEEDED(hr)) {
-		//DllConfig(NULL);
+		//DllConfig(nullptr);
 
 		CString KeyName = GetKeyName();
 		if (KeyName.IsEmpty()) {
