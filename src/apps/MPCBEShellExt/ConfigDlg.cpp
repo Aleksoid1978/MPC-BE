@@ -19,84 +19,55 @@
  */
 
 #include "stdafx.h"
+#include "resource.h"
 #include "ConfigDlg.h"
-//#include <winuser.h>
+#include <winuser.h>
 
 // CConfigDlg dialog
 
-#define MPCBE_PATH_RU	L"Текущий путь MPC-BE:"
-#define MPCBE_PATH_EN	L"Current MPC-BE path:"
+#define MPCBE_PATH_RU L"Текущий путь MPC-BE:"
+#define MPCBE_PATH_EN L"Current MPC-BE path:"
 
-#define CANCEL_RU		L"Отмена"
-#define CANCEL_EN		L"Cancel"
+#define CANCEL_RU     L"Отмена"
+#define CANCEL_EN     L"Cancel"
 
-#define CAPTION_RU		L"Настройки MPC-BE ShellExt"
-#define CAPTION_EN		L"MPC-BE ShellExt settings"
+#define CAPTION_RU    L"Настройки MPC-BE ShellExt"
+#define CAPTION_EN    L"MPC-BE ShellExt settings"
 
-IMPLEMENT_DYNAMIC(CConfigDlg, CDialog)
+//IMPLEMENT_DYNAMIC(CConfigDlg, CDialog)
 
-CConfigDlg::CConfigDlg(CWnd* pParent)
-	: CDialog(CConfigDlg::IDD, pParent)
+CConfigDlg::CConfigDlg()
 {
 }
-
-CConfigDlg::~CConfigDlg()
-{
-}
-
-void CConfigDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_MPCCOMBO, m_MPCPath);
-}
-
-BEGIN_MESSAGE_MAP(CConfigDlg, CDialog)
-	ON_BN_CLICKED(IDOK,     OnBnClickedOk)
-	ON_BN_CLICKED(IDCANCEL, OnBnClickedCancel)
-END_MESSAGE_MAP()
 
 // CConfigDlg message handlers
 
-void CConfigDlg::OnBnClickedOk()
+LRESULT CConfigDlg::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	CRegKey key;
-	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
-		CString path;
-		m_MPCPath.GetLBText(m_MPCPath.GetCurSel(), path);
-		if (::PathFileExistsW(path)) {
-			key.SetStringValue(L"MpcPath", path);
-		}
-		key.Close();
-	}
-
-	OnOK();
-}
-
-void CConfigDlg::OnBnClickedCancel()
-{
-	OnCancel();
-}
-
-BOOL CConfigDlg::OnInitDialog()
-{
-	__super::OnInitDialog();
-
 	SetWindowTextW((GetUserDefaultUILanguage() == 1049) ? CAPTION_RU : CAPTION_EN);
 
-	::SetWindowTextW(GetDlgItem(IDC_STATIC1)->m_hWnd, (GetUserDefaultUILanguage() == 1049) ? MPCBE_PATH_RU : MPCBE_PATH_EN);
-	::SetWindowTextW(GetDlgItem(IDCANCEL)->m_hWnd,    (GetUserDefaultUILanguage() == 1049) ? CANCEL_RU : CANCEL_EN);
+	GetDlgItem(IDC_STATIC1).SetWindowTextW((GetUserDefaultUILanguage() == 1049) ? MPCBE_PATH_RU : MPCBE_PATH_EN);
+	GetDlgItem(IDCANCEL).SetWindowTextW((GetUserDefaultUILanguage() == 1049) ? CANCEL_RU : CANCEL_EN);
 
-	SetClassLongPtrW(GetDlgItem(IDOK)->m_hWnd,         GCLP_HCURSOR, (LONG_PTR)AfxGetApp()->LoadStandardCursor(IDC_HAND));
-	SetClassLongPtrW(GetDlgItem(IDCANCEL)->m_hWnd,     GCLP_HCURSOR, (LONG_PTR)AfxGetApp()->LoadStandardCursor(IDC_HAND));
-	SetClassLongPtrW(GetDlgItem(IDC_MPCCOMBO)->m_hWnd, GCLP_HCURSOR, (LONG_PTR)AfxGetApp()->LoadStandardCursor(IDC_HAND));
+	m_hMPCPathCombo = GetDlgItem(IDC_MPCCOMBO);
 
 	CRegKey key;
 	WCHAR path_buff[MAX_PATH] = { 0 };
 	ULONG len = sizeof(path_buff);
 
+	CString mpc_path;
+	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+		if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
+			mpc_path = CString(path_buff).Trim();
+		}
+		key.Close();
+	}
+
 	if (ERROR_SUCCESS == key.Open(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
+		len = sizeof(path_buff);
+		memset(path_buff, 0, sizeof(path_buff));
 		if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
-			m_MPCPath.AddString(path_buff);
+			::SendMessage(m_hMPCPathCombo, CB_ADDSTRING, 0, (LPARAM)path_buff);
 		}
 		key.Close();
 	}
@@ -106,24 +77,41 @@ BOOL CConfigDlg::OnInitDialog()
 		len = sizeof(path_buff);
 		memset(path_buff, 0, sizeof(path_buff));
 		if (ERROR_SUCCESS == key.QueryStringValue(L"ExePath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
-			m_MPCPath.AddString(path_buff);
+			::SendMessage(m_hMPCPathCombo, CB_ADDSTRING, 0, (LPARAM)path_buff);
 		}
 		key.Close();
 	}
 #endif
 
-	CString mpc_path;
-	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
-		len = sizeof(path_buff);
-		memset(path_buff, 0, sizeof(path_buff));
-		if (ERROR_SUCCESS == key.QueryStringValue(L"MpcPath", path_buff, &len) && ::PathFileExistsW(path_buff)) {
-			mpc_path = CString(path_buff).Trim();
+	::SendMessage(m_hMPCPathCombo, CB_SELECTSTRING, 0, (LPARAM)mpc_path.GetString());
+
+	return 0;
+}
+
+LRESULT CConfigDlg::OnOK(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	const int comboLength = ::GetWindowTextLengthW(m_hMPCPathCombo);
+	CString strCombo = new WCHAR[comboLength + 1];
+
+	::GetWindowTextW(m_hMPCPathCombo, strCombo.GetBuffer(comboLength), comboLength + 1);
+	strCombo.ReleaseBuffer();
+
+	CRegKey key;
+	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, L"Software\\MPC-BE\\ShellExt")) {
+		if (::PathFileExistsW(strCombo)) {
+			key.SetStringValue(L"MpcPath", strCombo);
 		}
 		key.Close();
 	}
 
-	int sel = m_MPCPath.FindStringExact(0, mpc_path);
-	m_MPCPath.SetCurSel(mpc_path.IsEmpty() ? 0 : (sel != LB_ERR) ? sel : 0);
+	EndDialog(IDOK);
 
-	return TRUE;
+	return 0;
+}
+
+LRESULT CConfigDlg::OnCancel(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+{
+	EndDialog(IDCANCEL);
+
+	return 0;
 }

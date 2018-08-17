@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include <algorithm>
+#include <shellapi.h>
 #include "MPCBEContextMenu.h"
 
 #define MPC_WND_CLASS_NAME L"MPC-BE"
@@ -27,11 +28,11 @@
 // CMPCBEContextMenu
 #define ID_MPCBE_PLAY 0
 
-#define PLAY_MPC_RU   L"&Воспроизвести в MPC-BE"
-#define ADDTO_MPC_RU  L"&Добавить в плейлист MPC-BE"
+#define PLAY_MPC_RU  L"&Воспроизвести в MPC-BE"
+#define ADDTO_MPC_RU L"&Добавить в плейлист MPC-BE"
 
-#define PLAY_MPC_EN   L"&Play with MPC-BE"
-#define ADDTO_MPC_EN  L"&Add to MPC-BE Playlist"
+#define PLAY_MPC_EN  L"&Play with MPC-BE"
+#define ADDTO_MPC_EN L"&Add to MPC-BE Playlist"
 
 static HBITMAP TransparentBitmap(HBITMAP hBmp)
 {
