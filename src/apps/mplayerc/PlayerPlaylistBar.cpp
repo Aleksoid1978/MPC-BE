@@ -822,7 +822,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 			}
 		}
 
-		if (IsDialogMessage(pMsg)) {
+		if (IsDialogMessageW(pMsg)) {
 			return TRUE;
 		}
 	}

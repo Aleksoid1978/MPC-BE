@@ -60,7 +60,7 @@ BOOL CPlayerNavigationBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 BOOL CPlayerNavigationBar::PreTranslateMessage(MSG* pMsg)
 {
 	if (IsWindow(pMsg->hwnd) && IsVisible() && pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST) {
-		if (IsDialogMessage(pMsg)) {
+		if (IsDialogMessageW(pMsg)) {
 			return TRUE;
 		}
 	}

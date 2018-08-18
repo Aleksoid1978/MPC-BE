@@ -360,6 +360,9 @@
     <ClCompile Include="controls\WinHotkeyCtrl.cpp">
       <Filter>controls</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerCaptureDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSettings.h">
@@ -712,6 +715,9 @@
     </ClInclude>
     <ClInclude Include="controls\WinHotkeyCtrl.h">
       <Filter>controls</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerCaptureDialog.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

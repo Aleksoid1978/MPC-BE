@@ -106,6 +106,7 @@
     <ClCompile Include="ItemPropertiesDlg.cpp" />
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="OSD.cpp" />
+    <ClCompile Include="PlayerCaptureDialog.cpp" />
     <ClCompile Include="PlayerFlyBar.cpp" />
     <ClCompile Include="PlayerYouTube.cpp" />
     <ClCompile Include="PPageColor.cpp" />
@@ -223,6 +224,7 @@
     <ClInclude Include="Misc.h" />
     <ClInclude Include="OpenImage.h" />
     <ClInclude Include="OSD.h" />
+    <ClInclude Include="PlayerCaptureDialog.h" />
     <ClInclude Include="PlayerFlyBar.h" />
     <ClInclude Include="PlayerYouTube.h" />
     <ClInclude Include="PPageColor.h" />

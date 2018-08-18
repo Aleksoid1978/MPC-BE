@@ -62,7 +62,7 @@ BOOL CPlayerShaderEditorBar::PreTranslateMessage(MSG* pMsg)
 			return TRUE;
 		}
 
-		if (IsDialogMessage(pMsg)) {
+		if (IsDialogMessageW(pMsg)) {
 			return TRUE;
 		}
 	}
