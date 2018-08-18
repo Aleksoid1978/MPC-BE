@@ -79,7 +79,7 @@ BOOL CPlayerSubresyncBar::PreTranslateMessage(MSG* pMsg)
 			return TRUE;
 		}
 
-		if (IsShortCut(pMsg) || IsDialogMessage(pMsg)) {
+		if (IsShortCut(pMsg) || IsDialogMessageW(pMsg)) {
 			return TRUE;
 		}
 	}
