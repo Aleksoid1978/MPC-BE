@@ -21,19 +21,17 @@
 
 #pragma once
 
-#include <afxwin.h>
-#include <afxcmn.h>
 #include "../../filters/transform/BufferFilter/BufferFilter.h"
 #include "controls/FloatEdit.h"
 #include <ResizableLib/ResizableDialog.h>
 #include "PlayerBar.h"
 
-//
+
+class CMainFrame;
 
 template<class T>
-class CFormatElem
+struct CFormatElem
 {
-public:
 	CMediaType mt;
 	T caps;
 };
@@ -43,9 +41,7 @@ class CFormat : public CAutoPtrArray<CFormatElem<T> >
 {
 public:
 	CString name;
-	CFormat(CString name = L"") {
-		this->name = name;
-	}
+	CFormat(CString name = L"") : name(name) {}
 	virtual ~CFormat() {}
 };
 
@@ -177,7 +173,7 @@ public:
 			// it may have a fourcc in the mediasubtype, let's check that
 
 			WCHAR guid[100];
-			memset(guid, 0, 100*sizeof(WCHAR));
+			ZeroMemory(guid, 100 * sizeof(WCHAR));
 			StringFromGUID2(pmt->subtype, guid, 100);
 
 			if (CStringW(guid).MakeUpper().Find(L"0000-0010-8000-00AA00389B71") >= 0) {
@@ -244,7 +240,7 @@ public:
 		if (pfe->mt.formattype == FORMAT_VideoInfo2) {
 			VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)pfe->mt.pbFormat;
 			CString str2;
-			str2.Format(L" i%02x %d:%d", vih2->dwInterlaceFlags, vih2->dwPictAspectRatioX, vih2->dwPictAspectRatioY);
+			str2.Format(L" i%02x %u:%u", vih2->dwInterlaceFlags, vih2->dwPictAspectRatioX, vih2->dwPictAspectRatioY);
 			str += str2;
 		}
 
@@ -271,7 +267,7 @@ public:
 
 		if (!wfe) {
 			WCHAR guid[100];
-			memset(guid, 0, 100*sizeof(WCHAR));
+			ZeroMemory(guid, 100 * sizeof(WCHAR));
 			StringFromGUID2(pmt->subtype, guid, 100);
 
 			if (CStringW(guid).MakeUpper().Find(L"0000-0010-8000-00AA00389B71") >= 0) {
@@ -311,10 +307,10 @@ public:
 		str.Empty();
 		CString str2;
 
-		str2.Format(L"%6dKHz ", wfe->nSamplesPerSec);
+		str2.Format(L"%6uKHz ", wfe->nSamplesPerSec);
 		str += str2;
 
-		str2.Format(L"%dbps ", wfe->wBitsPerSample);
+		str2.Format(L"%ubps ", wfe->wBitsPerSample);
 		str += str2;
 
 		switch (wfe->nChannels) {
@@ -325,12 +321,12 @@ public:
 				str += L"stereo ";
 				break;
 			default:
-				str2.Format(L"%d channels ", wfe->nChannels);
+				str2.Format(L"%u channels ", wfe->nChannels);
 				str += str2;
 				break;
 		}
 
-		str2.Format(L"%3dkbps ", wfe->nAvgBytesPerSec*8/1000);
+		str2.Format(L"%3ukbps ", wfe->nAvgBytesPerSec*8/1000);
 		str += str2;
 
 		return(str);
@@ -346,8 +342,6 @@ struct Codec {
 	CComBSTR DisplayName;
 };
 
-class CMainFrame;
-
 // CPlayerCaptureDialog dialog
 
 class CPlayerCaptureDialog : public CResizableDialog
@@ -356,6 +350,37 @@ class CPlayerCaptureDialog : public CResizableDialog
 
 private:
 	CMainFrame* m_pMainFrame;
+
+	CComboBox m_vidinput;
+	CComboBox m_vidtype;
+	CComboBox m_viddimension;
+	CSpinButtonCtrl m_vidhor;
+	CSpinButtonCtrl m_vidver;
+	CEdit m_vidhoredit;
+	CEdit m_vidveredit;
+	CFloatEdit m_vidfpsedit;
+	float m_vidfps;
+	CButton m_vidsetres;
+	CComboBox m_audinput;
+	CComboBox m_audtype;
+	CComboBox m_auddimension;
+	CComboBox m_vidcodec;
+	CComboBox m_vidcodectype;
+	CComboBox m_vidcodecdimension;
+	CButton m_vidoutput;
+	CButton m_vidpreview;
+	CComboBox m_audcodec;
+	CComboBox m_audcodectype;
+	CComboBox m_audcodecdimension;
+	CButton m_audoutput;
+	CButton m_audpreview;
+	int m_nVidBuffers;
+	int m_nAudBuffers;
+	CButton m_recordbtn;
+	BOOL m_fSepAudio;
+	int m_muxtype;
+	CComboBox m_muxctrl;
+	bool m_fEnableOgm;
 
 	// video input
 	CStringW m_VidDisplayName;
@@ -379,6 +404,8 @@ private:
 	std::vector<Codec> m_pAudEncArray;
 	CAudFormatArray m_acfa;
 
+	CComPtr<IMoniker> m_pVidEncMoniker, m_pAudEncMoniker;
+
 	void EmptyVideo();
 	void EmptyAudio();
 
@@ -394,9 +421,17 @@ private:
 	CMap<HWND, HWND&, BOOL, BOOL&> m_wndenabledmap;
 	void EnableControls(CWnd* pWnd, bool fEnable);
 
-	bool m_fEnableOgm;
-
 public:
+	CString m_file;
+	BOOL m_fVidOutput;
+	int m_fVidPreview;
+	BOOL m_fAudOutput;
+	int m_fAudPreview;
+
+	CMediaType m_mtv, m_mta, m_mtcv, m_mtca;
+	CComPtr<IBaseFilter> m_pVidEnc, m_pAudEnc, m_pMux, m_pDst, m_pAudMux, m_pAudDst;
+	CComPtr<IBaseFilter> m_pVidBuffer, m_pAudBuffer;
+
 	CPlayerCaptureDialog(CMainFrame* pMainFrame);
 	virtual ~CPlayerCaptureDialog();
 
@@ -405,47 +440,6 @@ public:
 	// Dialog Data
 	enum { IDD = IDD_CAPTURE_DLG };
 
-	CComboBox m_vidinput;
-	CComboBox m_vidtype;
-	CComboBox m_viddimension;
-	CSpinButtonCtrl m_vidhor;
-	CSpinButtonCtrl m_vidver;
-	CEdit m_vidhoredit;
-	CEdit m_vidveredit;
-	CFloatEdit m_vidfpsedit;
-	float m_vidfps;
-	CButton m_vidsetres;
-	CComboBox m_audinput;
-	CComboBox m_audtype;
-	CComboBox m_auddimension;
-	CComboBox m_vidcodec;
-	CComboBox m_vidcodectype;
-	CComboBox m_vidcodecdimension;
-	BOOL m_fVidOutput;
-	CButton m_vidoutput;
-	int m_fVidPreview;
-	CButton m_vidpreview;
-	CComboBox m_audcodec;
-	CComboBox m_audcodectype;
-	CComboBox m_audcodecdimension;
-	BOOL m_fAudOutput;
-	CButton m_audoutput;
-	int m_fAudPreview;
-	CButton m_audpreview;
-	int m_nVidBuffers;
-	int m_nAudBuffers;
-	CString m_file;
-	CButton m_recordbtn;
-	BOOL m_fSepAudio;
-	int m_muxtype;
-	CComboBox m_muxctrl;
-
-	CMediaType m_mtv, m_mta, m_mtcv, m_mtca;
-	CComPtr<IBaseFilter> m_pVidEnc, m_pAudEnc, m_pMux, m_pDst, m_pAudMux, m_pAudDst;
-	CComPtr<IMoniker> m_pVidEncMoniker, m_pAudEncMoniker;
-	CComPtr<IBaseFilter> m_pVidBuffer, m_pAudBuffer;
-
-public:
 	void SetupVideoControls(CStringW DisplayName, IAMStreamConfig* pAMSC, IAMCrossbar* pAMXB, IAMTVTuner* pAMTuner);
 	void SetupVideoControls(CStringW DisplayName, IAMStreamConfig* pAMSC, IAMVfwCaptureDialogs* pAMVfwCD);
 	void SetupAudioControls(CStringW DisplayName, IAMStreamConfig* pAMSC, const CInterfaceArray<IAMAudioInputMixer>& pAMAIM);
@@ -488,10 +482,10 @@ public:
 	afx_msg void OnAudioCodecDimension();
 	afx_msg void OnOpenFile();
 	afx_msg void OnRecord();
-	afx_msg void OnEnChangeEdit9();
-	afx_msg void OnEnChangeEdit12();
+	afx_msg void OnChangeVideoBuffers();
+	afx_msg void OnChangeAudioBuffers();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedVidAudPreview();
-	afx_msg void OnBnClickedCheck7();
-	afx_msg void OnCbnSelchangeCombo14();
+	afx_msg void OnBnClickedAudioToWav();
+	afx_msg void OnChangeFileType();
 };

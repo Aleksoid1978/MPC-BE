@@ -1284,13 +1284,13 @@ BEGIN_MESSAGE_MAP(CPlayerCaptureDialog, CResizableDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO11, OnAudioCodecDimension)
 	ON_BN_CLICKED(IDC_BUTTON3, OnOpenFile)
 	ON_BN_CLICKED(IDC_BUTTON2, OnRecord)
-	ON_EN_CHANGE(IDC_EDIT5, OnEnChangeEdit9)
-	ON_EN_CHANGE(IDC_EDIT6, OnEnChangeEdit12)
+	ON_EN_CHANGE(IDC_EDIT5, OnChangeVideoBuffers)
+	ON_EN_CHANGE(IDC_EDIT6, OnChangeAudioBuffers)
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_CHECK2, OnBnClickedVidAudPreview)
 	ON_BN_CLICKED(IDC_CHECK4, OnBnClickedVidAudPreview)
-	ON_BN_CLICKED(IDC_CHECK5, OnBnClickedCheck7)
-	ON_CBN_SELCHANGE(IDC_COMBO14, OnCbnSelchangeCombo14)
+	ON_BN_CLICKED(IDC_CHECK5, OnBnClickedAudioToWav)
+	ON_CBN_SELCHANGE(IDC_COMBO14, OnChangeFileType)
 END_MESSAGE_MAP()
 
 // CPlayerCaptureDialog message handlers
@@ -1327,7 +1327,7 @@ BOOL CPlayerCaptureDialog::OnInitDialog()
 
 	UpdateData(FALSE);
 
-	OnCbnSelchangeCombo14();
+	OnChangeFileType();
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -1654,13 +1654,13 @@ void CPlayerCaptureDialog::OnRecord()
 	}
 }
 
-void CPlayerCaptureDialog::OnEnChangeEdit9()
+void CPlayerCaptureDialog::OnChangeVideoBuffers()
 {
 	UpdateData();
 	AfxGetMyApp()->WriteProfileInt(IDS_R_CAPTURE, L"VidBuffers", std::max(m_nVidBuffers, 0));
 }
 
-void CPlayerCaptureDialog::OnEnChangeEdit12()
+void CPlayerCaptureDialog::OnChangeAudioBuffers()
 {
 	UpdateData();
 	AfxGetMyApp()->WriteProfileInt(IDS_R_CAPTURE, L"AudBuffers", std::max(m_nAudBuffers, 0));
@@ -1687,12 +1687,12 @@ void CPlayerCaptureDialog::OnBnClickedVidAudPreview()
 	UpdateGraph();
 }
 
-void CPlayerCaptureDialog::OnBnClickedCheck7()
+void CPlayerCaptureDialog::OnBnClickedAudioToWav()
 {
 	//UpdateMuxer();
 }
 
-void CPlayerCaptureDialog::OnCbnSelchangeCombo14()
+void CPlayerCaptureDialog::OnChangeFileType()
 {
 	UpdateData();
 
