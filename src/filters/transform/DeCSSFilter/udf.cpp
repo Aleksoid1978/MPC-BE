@@ -303,6 +303,9 @@ void udf_free(tp_udf_file f)
 
 #define udf_PATH_DELIMITERS "/\\"
 
+#pragma warning(push)
+#pragma warning(disable: 4996) // 'strtok' function may be unsafe, ñonsider using strtok_s instead.
+
 static tp_udf_file udf_ff_traverse(const HANDLE hDrive, tp_udf_file f, char *token)
 {
 	while (udf_get_next(hDrive, f)) {
@@ -345,6 +348,8 @@ tp_udf_file udf_find_file(const HANDLE hDrive, const WORD partition, const char 
 	}
 	return f2;
 }
+
+#pragma warning(pop)
 
 bool udf_get_lba(const HANDLE hDrive, const tp_udf_file f, DWORD *start_lba, DWORD *end_lba)
 {
