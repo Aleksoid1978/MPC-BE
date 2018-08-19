@@ -54,6 +54,7 @@ STDAPI DllRegisterServer()
 {
 	const std::list<CString> chkbytes = {
 		L"0,9,,595556344D50454732",      // YUV4MPEG2
+		L"0,6,,444B49460000",            // 'DKIF\0\0'
 		L"0,3,,000001",                  // MPEG1/2, VC-1
 		L"0,4,,00000001",                // H.264/AVC, H.265/HEVC
 		L"0,4,,434D5331,20,4,,50445652", // 'CMS1................PDVR'
@@ -370,6 +371,49 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		m_RAWType   = RAW_Y4M;
 		pName = L"YUV4MPEG2 Video Output";
+	}
+
+	if (m_RAWType == RAW_NONE) {
+		// https://wiki.multimedia.cx/index.php/IVF
+		if (GETDWORD(buf) == FCC('DKIF')) {
+			if (GETWORD(buf + 4) != 0 || GETWORD(buf + 6) < 32) {
+				return E_FAIL; // incorrect or unsuppurted IVF file
+			}
+
+			m_startpos = GETWORD(buf + 6);
+			DWORD fourcc = GETDWORD(buf + 8);
+			int width  = GETWORD(buf + 12);
+			int height = GETWORD(buf + 14);
+			unsigned fpsnum = GETDWORD(buf + 16);
+			unsigned fpsden = GETDWORD(buf + 20);
+			unsigned num_frames = GETDWORD(buf + 24);
+
+			if (width <= 0 || height <= 0 || !fpsnum || !fpsden || !num_frames) {
+				return E_FAIL; // incorrect IVF file
+			}
+
+			m_AvgTimePerFrame = UNITS * fpsden / fpsnum;
+			m_rtDuration = FractionScale64(UNITS * num_frames,fpsden, fpsnum);
+
+			mt.majortype = MEDIATYPE_Video;
+			mt.formattype = FORMAT_VIDEOINFO2;
+			mt.subtype = FOURCCMap(fourcc);
+
+			VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2));
+			memset(vih2, 0, sizeof(VIDEOINFOHEADER2));
+
+			vih2->bmiHeader.biSize = sizeof(vih2->bmiHeader);
+			vih2->bmiHeader.biWidth = width;
+			vih2->bmiHeader.biHeight = height;
+			vih2->bmiHeader.biPlanes = 1;
+			vih2->bmiHeader.biBitCount = 12;
+			vih2->bmiHeader.biCompression = fourcc;
+			vih2->bmiHeader.biSizeImage = width * height * 12 / 8;
+			vih2->AvgTimePerFrame = m_AvgTimePerFrame;
+			mts.push_back(mt);
+
+			m_RAWType = RAW_IVF;
+		}
 	}
 
 	if (m_RAWType == RAW_NONE) {
@@ -813,10 +857,10 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	if (m_RAWType != RAW_NONE) {
 		for (size_t i = 0; i < mts.size(); i++) {
-			VIDEOINFOHEADER *vih = (VIDEOINFOHEADER*)mts[i].Format();
-			if (!vih->AvgTimePerFrame) {
+			VIDEOINFOHEADER2 *vih2 = (VIDEOINFOHEADER2*)mts[i].Format();
+			if (!vih2->AvgTimePerFrame) {
 				// set 25 fps as default value.
-				vih->AvgTimePerFrame = 400000;
+				vih2->AvgTimePerFrame = 400000;
 			}
 		}
 		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterParserOutputPin(mts, pName, this, this, &hr));
@@ -844,21 +888,23 @@ bool CRawVideoSplitterFilter::DemuxInit()
 
 void CRawVideoSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
-	if (m_RAWType == RAW_Y4M) {
-		if (rt <= 0 || m_rtDuration <= 0) {
-			m_pFile->Seek(m_startpos);
-		} else {
-			const __int64 framenum = rt / m_AvgTimePerFrame;
-			m_pFile->Seek(m_startpos + framenum * (sizeof(FRAME_) + m_framesize));
-		}
+	if (rt <= 0 || m_rtDuration <= 0) {
+		m_pFile->Seek(m_startpos);
 		return;
 	}
 
-	if (rt <= 0 || m_rtDuration <= 0) {
-		m_pFile->Seek(0);
-	} else {
-		m_pFile->Seek((__int64)((double)rt / m_rtDuration * m_pFile->GetLength()));
+	if (m_RAWType == RAW_Y4M) {
+		const __int64 framenum = rt / m_AvgTimePerFrame;;
+		m_pFile->Seek(m_startpos + framenum * (sizeof(FRAME_) + m_framesize));
+		return;
 	}
+
+	if (m_RAWType == RAW_IVF) {
+		m_pFile->Seek(m_startpos);
+		return;
+	}
+
+	m_pFile->Seek((__int64)((double)rt / m_rtDuration * m_pFile->GetLength()));
 }
 
 bool CRawVideoSplitterFilter::DemuxLoop()
@@ -883,6 +929,28 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 
 			p->resize(m_framesize);
 			if ((hr = m_pFile->ByteRead(p->data(), m_framesize)) != S_OK) {
+				break;
+			}
+
+			hr = DeliverPacket(p);
+			continue;
+		}
+
+		if (m_RAWType == RAW_IVF) {
+			BYTE header[12];
+			if ((hr = m_pFile->ByteRead(header, sizeof(header))) != S_OK) {
+				break;
+			}
+
+			const int framesize = GETDWORD(header);
+			const __int64 framenum = GETQWORD(header + 4);
+
+			CAutoPtr<CPacket> p(DNew CPacket());
+			p->rtStart = framenum * m_AvgTimePerFrame;
+			p->rtStop = p->rtStart + m_AvgTimePerFrame;
+
+			p->resize(framesize);
+			if ((hr = m_pFile->ByteRead(p->data(), framesize)) != S_OK) {
 				break;
 			}
 
