@@ -40,6 +40,7 @@ class __declspec(uuid("486AA463-EE67-4F75-B941-F1FAB217B342"))
 		RAW_HEVC,
 		RAW_Y4M,
 		RAW_MPEG4,
+		RAW_IVF,
 	} m_RAWType = RAW_NONE;
 
 	int y4m_interl = -1;

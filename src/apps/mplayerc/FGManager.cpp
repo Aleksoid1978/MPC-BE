@@ -2063,12 +2063,13 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	if (src[SRC_RAWVIDEO] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CRawVideoSourceFilter>(RawVideoSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,9,,595556344D50454732");		// YUV4MPEG2
-		pFGF->m_chkbytes.AddTail(L"0,3,,000001");					// MPEG1/2, VC-1
-		pFGF->m_chkbytes.AddTail(L"0,4,,00000001");					// H.264/AVC, H.265/HEVC
-		pFGF->m_chkbytes.AddTail(L"0,4,,434D5331,20,4,,50445652");	// 'CMS1................PDVR'
-		pFGF->m_chkbytes.AddTail(L"0,5,,3236344456");				// '264DV'
-		pFGF->m_chkbytes.AddTail(L"0,4,,44484156");					// 'DHAV'
+		pFGF->m_chkbytes.AddTail(L"0,9,,595556344D50454732");      // YUV4MPEG2
+		pFGF->m_chkbytes.AddTail(L"0,6,,444B49460000");            // 'DKIF\0\0'
+		pFGF->m_chkbytes.AddTail(L"0,3,,000001");                  // MPEG1/2, VC-1
+		pFGF->m_chkbytes.AddTail(L"0,4,,00000001");                // H.264/AVC, H.265/HEVC
+		pFGF->m_chkbytes.AddTail(L"0,4,,434D5331,20,4,,50445652"); // 'CMS1................PDVR'
+		pFGF->m_chkbytes.AddTail(L"0,5,,3236344456");              // '264DV'
+		pFGF->m_chkbytes.AddTail(L"0,4,,44484156");                // 'DHAV'
 		pFGF->m_chkbytes.AddTail(L"0,4,,FFFFFF88");
 		m_source.push_back(pFGF);
 	}
