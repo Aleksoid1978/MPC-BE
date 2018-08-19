@@ -325,7 +325,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		m_startpos  = firstframepos;
-		m_AvgTimePerFrame = 10000000i64 * fpsden / fpsnum;
+		m_AvgTimePerFrame = UNITS * fpsden / fpsnum;
 		m_framesize = width * height * bpp >> 3;
 
 		mt.majortype  = MEDIATYPE_Video;
@@ -353,7 +353,9 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		vih2->dwPictAspectRatioY = sar_y;
 
 		if (!m_pFile->IsStreaming()) {
-			m_rtNewStop = m_rtStop = m_rtDuration = (m_pFile->GetLength() - m_startpos) / (sizeof(FRAME_) + m_framesize) * 10000000i64 * fpsden / fpsnum;
+			__int64 num_frames = (m_pFile->GetLength() - m_startpos) / (sizeof(FRAME_) + m_framesize);
+			m_rtDuration = FractionScale64(UNITS * num_frames, fpsden, fpsnum);
+			m_rtNewStop = m_rtStop = m_rtDuration;
 		}
 		mt.SetSampleSize(m_framesize);
 
@@ -388,12 +390,13 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			unsigned fpsden = GETDWORD(buf + 20);
 			unsigned num_frames = GETDWORD(buf + 24);
 
-			if (width <= 0 || height <= 0 || !fpsnum || !fpsden || !num_frames) {
+			if (width <= 0 || height <= 0 || !fpsnum || !fpsden) {
 				return E_FAIL; // incorrect IVF file
 			}
+			DLogIf(!num_frames, L"IVF: unknown number of frames");
 
 			m_AvgTimePerFrame = UNITS * fpsden / fpsnum;
-			m_rtDuration = FractionScale64(UNITS * num_frames,fpsden, fpsnum);
+			m_rtDuration = FractionScale64(UNITS * num_frames, fpsden, fpsnum);
 
 			mt.majortype = MEDIATYPE_Video;
 			mt.formattype = FORMAT_VIDEOINFO2;
