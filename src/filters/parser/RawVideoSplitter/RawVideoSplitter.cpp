@@ -760,7 +760,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			mt.SetSampleSize(0);
 			mt.SetTemporalCompression(TRUE);
 			mt.majortype = MEDIATYPE_Video;
-			mt.subtype = MEDIASUBTYPE_MP4V;
+			mt.subtype = MEDIASUBTYPE_FMP4;
 			mt.formattype = FORMAT_VIDEOINFO2;
 
 			VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2) + extrasize);
@@ -770,7 +770,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			vih2->bmiHeader.biHeight = height;
 			vih2->bmiHeader.biPlanes = 1;
 			vih2->bmiHeader.biBitCount = 12;
-			vih2->bmiHeader.biCompression = FCC('MP4V');
+			vih2->bmiHeader.biCompression = FCC('FMP4');
 			vih2->bmiHeader.biSizeImage = width * height * 12 / 8;
 			vih2->AvgTimePerFrame = m_AvgTimePerFrame;
 			vih2->dwInterlaceFlags = 0;
