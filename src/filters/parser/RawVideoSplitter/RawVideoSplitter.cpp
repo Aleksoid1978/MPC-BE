@@ -604,194 +604,151 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		DWORD height = 0;
 		BYTE parx = 1;
 		BYTE pary = 1;
-		__int64 seqhdrsize = 0;
+		__int64 extrasize = 0;
 
 		BYTE id;
 		while (m_pFile->NextMpegStartCode(id, 1024 - m_pFile->GetPos())) {
-			if (id == 0xb5) {
-				BYTE is_visual_object_identifier = (BYTE)m_pFile->BitRead(1);
-
-				if (is_visual_object_identifier) {
-					BYTE visual_object_verid = (BYTE)m_pFile->BitRead(4);
-					BYTE visual_object_priority = (BYTE)m_pFile->BitRead(3);
+			if (id == 0x00) {
+				if (m_pFile->BitRead(24) != 0x000001) {
+					break;
 				}
 
-				BYTE visual_object_type = (BYTE)m_pFile->BitRead(4);
+				BYTE video_object_layer_start_code = (DWORD)m_pFile->BitRead(8);
+				if (video_object_layer_start_code < 0x20 || video_object_layer_start_code > 0x2f) {
+					break;
+				}
 
-				if (visual_object_type == 1 || visual_object_type == 2) {
-					BYTE video_signal_type = (BYTE)m_pFile->BitRead(1);
+				BYTE random_accessible_vol = (BYTE)m_pFile->BitRead(1);
+				BYTE video_object_type_indication = (BYTE)m_pFile->BitRead(8);
 
-					if (video_signal_type) {
-						BYTE video_format = (BYTE)m_pFile->BitRead(3);
-						BYTE video_range = (BYTE)m_pFile->BitRead(1);
-						BYTE colour_description = (BYTE)m_pFile->BitRead(1);
+				if (video_object_type_indication == 0x12) { // Fine Granularity Scalable
+					break;    // huh
+				}
 
-						if (colour_description) {
-							BYTE colour_primaries = (BYTE)m_pFile->BitRead(8);
-							BYTE transfer_characteristics = (BYTE)m_pFile->BitRead(8);
-							BYTE matrix_coefficients = (BYTE)m_pFile->BitRead(8);
+				BYTE is_object_layer_identifier = (BYTE)m_pFile->BitRead(1);
+
+				BYTE video_object_layer_verid = 0;
+
+				if (is_object_layer_identifier) {
+					video_object_layer_verid = (BYTE)m_pFile->BitRead(4);
+					BYTE video_object_layer_priority = (BYTE)m_pFile->BitRead(3);
+				}
+
+				BYTE aspect_ratio_info = (BYTE)m_pFile->BitRead(4);
+
+				switch (aspect_ratio_info) {
+					default:
+						ASSERT(0);
+						break;
+					case 1:
+						parx = 1;
+						pary = 1;
+						break;
+					case 2:
+						parx = 12;
+						pary = 11;
+						break;
+					case 3:
+						parx = 10;
+						pary = 11;
+						break;
+					case 4:
+						parx = 16;
+						pary = 11;
+						break;
+					case 5:
+						parx = 40;
+						pary = 33;
+						break;
+					case 15:
+						parx = (BYTE)m_pFile->BitRead(8);
+						pary = (BYTE)m_pFile->BitRead(8);
+						break;
+				}
+
+				BYTE vol_control_parameters = (BYTE)m_pFile->BitRead(1);
+
+				if (vol_control_parameters) {
+					BYTE chroma_format = (BYTE)m_pFile->BitRead(2);
+					BYTE low_delay = (BYTE)m_pFile->BitRead(1);
+					BYTE vbv_parameters = (BYTE)m_pFile->BitRead(1);
+
+					if (vbv_parameters) {
+						WORD first_half_bit_rate = (WORD)m_pFile->BitRead(15);
+						if (!m_pFile->BitRead(1)) {
+							break;
+						}
+						WORD latter_half_bit_rate = (WORD)m_pFile->BitRead(15);
+						if (!m_pFile->BitRead(1)) {
+							break;
+						}
+						WORD first_half_vbv_buffer_size = (WORD)m_pFile->BitRead(15);
+						if (!m_pFile->BitRead(1)) {
+							break;
+						}
+
+						BYTE latter_half_vbv_buffer_size = (BYTE)m_pFile->BitRead(3);
+						WORD first_half_vbv_occupancy = (WORD)m_pFile->BitRead(11);
+						if (!m_pFile->BitRead(1)) {
+							break;
+						}
+						WORD latter_half_vbv_occupancy = (WORD)m_pFile->BitRead(15);
+						if (!m_pFile->BitRead(1)) {
+							break;
 						}
 					}
 				}
 
-				m_pFile->BitByteAlign();
-				while (m_pFile->BitRead(32, true) == 0x000001b2) {
-					while (m_pFile->BitRead(24, true) != 0x000001) {
-						m_pFile->BitRead(8);
+				BYTE video_object_layer_shape = (BYTE)m_pFile->BitRead(2);
+
+				if (video_object_layer_shape == 3 && video_object_layer_verid != 1) {
+					BYTE video_object_layer_shape_extension = (BYTE)m_pFile->BitRead(4);
+				}
+
+				if (!m_pFile->BitRead(1)) {
+					break;
+				}
+				WORD vop_time_increment_resolution = (WORD)m_pFile->BitRead(16);
+				if (!m_pFile->BitRead(1)) {
+					break;
+				}
+				BYTE fixed_vop_rate = (BYTE)m_pFile->BitRead(1);
+
+				if (fixed_vop_rate) {
+					int bits = 0;
+					for (WORD i = vop_time_increment_resolution; i; i /= 2) {
+						++bits;
+					}
+
+					WORD fixed_vop_time_increment = m_pFile->BitRead(bits);
+
+					if (fixed_vop_time_increment) {
+						m_AvgTimePerFrame = UNITS * fixed_vop_time_increment / vop_time_increment_resolution;
 					}
 				}
 
-				if (visual_object_type == 1) {
-					if (m_pFile->BitRead(24) != 0x000001) {
-						break;
-					}
-
-					BYTE video_object_start_code = (BYTE)m_pFile->BitRead(8);
-					if (video_object_start_code < 0x00 || video_object_start_code > 0x1f) {
-						break;
-					}
-
-					if (m_pFile->BitRead(24) != 0x000001) {
-						break;
-					}
-
-					BYTE video_object_layer_start_code = (DWORD)m_pFile->BitRead(8);
-					if (video_object_layer_start_code < 0x20 || video_object_layer_start_code > 0x2f) {
-						break;
-					}
-
-					BYTE random_accessible_vol = (BYTE)m_pFile->BitRead(1);
-					BYTE video_object_type_indication = (BYTE)m_pFile->BitRead(8);
-
-					if (video_object_type_indication == 0x12) { // Fine Granularity Scalable
-						break;    // huh
-					}
-
-					BYTE is_object_layer_identifier = (BYTE)m_pFile->BitRead(1);
-
-					BYTE video_object_layer_verid = 0;
-
-					if (is_object_layer_identifier) {
-						video_object_layer_verid = (BYTE)m_pFile->BitRead(4);
-						BYTE video_object_layer_priority = (BYTE)m_pFile->BitRead(3);
-					}
-
-					BYTE aspect_ratio_info = (BYTE)m_pFile->BitRead(4);
-
-					switch (aspect_ratio_info) {
-						default:
-							ASSERT(0);
+				if (video_object_layer_shape != 2) {
+					if (video_object_layer_shape == 0) {
+						if (!m_pFile->BitRead(1)) {
 							break;
-						case 1:
-							parx = 1;
-							pary = 1;
+						}
+						width = (WORD)m_pFile->BitRead(13);
+						if (!m_pFile->BitRead(1)) {
 							break;
-						case 2:
-							parx = 12;
-							pary = 11;
+						}
+						height = (WORD)m_pFile->BitRead(13);
+						if (!m_pFile->BitRead(1)) {
 							break;
-						case 3:
-							parx = 10;
-							pary = 11;
-							break;
-						case 4:
-							parx = 16;
-							pary = 11;
-							break;
-						case 5:
-							parx = 40;
-							pary = 33;
-							break;
-						case 15:
-							parx = (BYTE)m_pFile->BitRead(8);
-							pary = (BYTE)m_pFile->BitRead(8);
-							break;
-					}
-
-					BYTE vol_control_parameters = (BYTE)m_pFile->BitRead(1);
-
-					if (vol_control_parameters) {
-						BYTE chroma_format = (BYTE)m_pFile->BitRead(2);
-						BYTE low_delay = (BYTE)m_pFile->BitRead(1);
-						BYTE vbv_parameters = (BYTE)m_pFile->BitRead(1);
-
-						if (vbv_parameters) {
-							WORD first_half_bit_rate = (WORD)m_pFile->BitRead(15);
-							if (!m_pFile->BitRead(1)) {
-								break;
-							}
-							WORD latter_half_bit_rate = (WORD)m_pFile->BitRead(15);
-							if (!m_pFile->BitRead(1)) {
-								break;
-							}
-							WORD first_half_vbv_buffer_size = (WORD)m_pFile->BitRead(15);
-							if (!m_pFile->BitRead(1)) {
-								break;
-							}
-
-							BYTE latter_half_vbv_buffer_size = (BYTE)m_pFile->BitRead(3);
-							WORD first_half_vbv_occupancy = (WORD)m_pFile->BitRead(11);
-							if (!m_pFile->BitRead(1)) {
-								break;
-							}
-							WORD latter_half_vbv_occupancy = (WORD)m_pFile->BitRead(15);
-							if (!m_pFile->BitRead(1)) {
-								break;
-							}
 						}
 					}
 
-					BYTE video_object_layer_shape = (BYTE)m_pFile->BitRead(2);
+					BYTE interlaced = (BYTE)m_pFile->BitRead(1);
+					BYTE obmc_disable = (BYTE)m_pFile->BitRead(1);
 
-					if (video_object_layer_shape == 3 && video_object_layer_verid != 1) {
-						BYTE video_object_layer_shape_extension = (BYTE)m_pFile->BitRead(4);
-					}
-
-					if (!m_pFile->BitRead(1)) {
-						break;
-					}
-					WORD vop_time_increment_resolution = (WORD)m_pFile->BitRead(16);
-					if (!m_pFile->BitRead(1)) {
-						break;
-					}
-					BYTE fixed_vop_rate = (BYTE)m_pFile->BitRead(1);
-
-					if (fixed_vop_rate) {
-						int bits = 0;
-						for (WORD i = vop_time_increment_resolution; i; i /= 2) {
-							++bits;
-						}
-
-						WORD fixed_vop_time_increment = m_pFile->BitRead(bits);
-
-						if (fixed_vop_time_increment) {
-							m_AvgTimePerFrame = UNITS * fixed_vop_time_increment / vop_time_increment_resolution;
-						}
-					}
-
-					if (video_object_layer_shape != 2) {
-						if (video_object_layer_shape == 0) {
-							if (!m_pFile->BitRead(1)) {
-								break;
-							}
-							width = (WORD)m_pFile->BitRead(13);
-							if (!m_pFile->BitRead(1)) {
-								break;
-							}
-							height = (WORD)m_pFile->BitRead(13);
-							if (!m_pFile->BitRead(1)) {
-								break;
-							}
-						}
-
-						BYTE interlaced = (BYTE)m_pFile->BitRead(1);
-						BYTE obmc_disable = (BYTE)m_pFile->BitRead(1);
-
-						// ...
-					}
+					// ...
 				}
 			} else if (id == 0xb6) {
-				seqhdrsize = m_pFile->GetPos() - 4;
+				extrasize = m_pFile->GetPos() - 4;
 			}
 		}
 
@@ -800,30 +757,34 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				m_AvgTimePerFrame = 400000;
 			};
 
+			mt.SetSampleSize(0);
+			mt.SetTemporalCompression(TRUE);
 			mt.majortype = MEDIATYPE_Video;
-			mt.subtype = FOURCCMap('v4pm');
-			mt.formattype = FORMAT_MPEG2Video;
+			mt.subtype = MEDIASUBTYPE_MP4V;
+			mt.formattype = FORMAT_VIDEOINFO2;
 
-			MPEG2VIDEOINFO* mvih = (MPEG2VIDEOINFO*)mt.AllocFormatBuffer(FIELD_OFFSET(MPEG2VIDEOINFO, dwSequenceHeader) + seqhdrsize);
-			memset(mvih, 0, mt.FormatLength());
-			mvih->hdr.bmiHeader.biSize = sizeof(mvih->hdr.bmiHeader);
-			mvih->hdr.bmiHeader.biWidth = width;
-			mvih->hdr.bmiHeader.biHeight = height;
-			mvih->hdr.bmiHeader.biCompression = 'v4pm';
-			mvih->hdr.bmiHeader.biPlanes = 1;
-			mvih->hdr.bmiHeader.biBitCount = 24;
-			mvih->hdr.bmiHeader.biSizeImage = DIBSIZE(mvih->hdr.bmiHeader);
-			mvih->hdr.AvgTimePerFrame = m_AvgTimePerFrame;
-			mvih->hdr.dwPictAspectRatioX = width*parx;
-			mvih->hdr.dwPictAspectRatioY = height*pary;
-			mvih->cbSequenceHeader = seqhdrsize;
+			VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2) + extrasize);
+			memset(vih2, 0, mt.FormatLength());
+			vih2->bmiHeader.biSize = sizeof(vih2->bmiHeader) + extrasize;
+			vih2->bmiHeader.biWidth = width;
+			vih2->bmiHeader.biHeight = height;
+			vih2->bmiHeader.biPlanes = 1;
+			vih2->bmiHeader.biBitCount = 12;
+			vih2->bmiHeader.biCompression = FCC('MP4V');
+			vih2->bmiHeader.biSizeImage = width * height * 12 / 8;
+			vih2->AvgTimePerFrame = m_AvgTimePerFrame;
+			vih2->dwInterlaceFlags = 0;
+			long par_x = width * parx;
+			long par_y = height * pary;
+			ReduceDim(par_x, par_y);
+			vih2->dwPictAspectRatioX = par_x;
+			vih2->dwPictAspectRatioY = par_y;
 			m_pFile->Seek(0);
-			m_pFile->ByteRead((BYTE*)mvih->dwSequenceHeader, seqhdrsize);
-			mts.push_back(mt);
-			mt.subtype = FOURCCMap(mvih->hdr.bmiHeader.biCompression = 'V4PM');
+			m_pFile->ByteRead((BYTE*)vih2 + 1, extrasize);
+
 			mts.push_back(mt);
 
-			m_startpos = seqhdrsize;
+			m_startpos = 0;
 
 			m_RAWType = RAW_MPEG4;
 			pName = L"MPEG-4 Visual Video Output";
