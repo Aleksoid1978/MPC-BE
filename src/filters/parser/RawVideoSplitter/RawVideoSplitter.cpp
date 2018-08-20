@@ -774,13 +774,14 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			vih2->bmiHeader.biSizeImage = width * height * 12 / 8;
 			vih2->AvgTimePerFrame = m_AvgTimePerFrame;
 			vih2->dwInterlaceFlags = 0;
+			vih2->rcSource = vih2->rcTarget = CRect(0, 0, width, height);
 			long par_x = width * parx;
 			long par_y = height * pary;
 			ReduceDim(par_x, par_y);
 			vih2->dwPictAspectRatioX = par_x;
 			vih2->dwPictAspectRatioY = par_y;
 			m_pFile->Seek(0);
-			m_pFile->ByteRead((BYTE*)vih2 + 1, extrasize);
+			m_pFile->ByteRead((BYTE*)(vih2 + 1), extrasize);
 
 			mts.push_back(mt);
 
