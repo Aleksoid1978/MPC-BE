@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -86,7 +86,7 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 	else if (memcmp(data, AMR_header, 6) == 0 || memcmp(data, AMRWB_header, 9) == 0) {
 		pAudioFile = DNew CAMRFile();
 	}
-	else if (*id == FCC('RIFF') && GETDWORD(data+8) == FCC('WAVE')) {
+	else if (*id == FCC('RIFF') && GETUINT32(data+8) == FCC('WAVE')) {
 		pAudioFile = DNew CWAVFile();
 	}
 	else if (memcmp(data, w64_guid_riff, 16) == 0 &&  memcmp(data+24, w64_guid_wave, 16) == 0) {
@@ -95,7 +95,7 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* m_pFile)
 	else if (memcmp(data, chk_DTSHDHDR, 8) == 0) {
 		pAudioFile = DNew CDTSHDFile();
 	}
-	else if (*id == FCC('FRM8') && GETDWORD(data+12) == FCC('DSD ')) {
+	else if (*id == FCC('FRM8') && GETUINT32(data+12) == FCC('DSD ')) {
 		pAudioFile = DNew CDFFFile();
 	}
 	else if (*id == FCC('DSD ') && data[4] == 0x1C) {

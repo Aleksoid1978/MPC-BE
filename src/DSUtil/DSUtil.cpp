@@ -1100,7 +1100,7 @@ bool ExtractDim(const AM_MEDIA_TYPE* pmt, int& w, int& h, int& arx, int& ary)
 			ptr = ((MPEG1VIDEOINFO*)pmt->pbFormat)->bSequenceHeader;
 			len = ((MPEG1VIDEOINFO*)pmt->pbFormat)->cbSequenceHeader;
 
-			if (ptr && len >= 8 && GETDWORD(ptr) == 0xb3010000) {
+			if (ptr && len >= 8 && GETUINT32(ptr) == 0xb3010000) {
 				w = (ptr[4]<<4)|(ptr[5]>>4);
 				h = ((ptr[5]&0xf)<<8)|ptr[6];
 				float ar[] = {
@@ -1116,7 +1116,7 @@ bool ExtractDim(const AM_MEDIA_TYPE* pmt, int& w, int& h, int& arx, int& ary)
 			ptr = (BYTE*)((MPEG2VIDEOINFO*)pmt->pbFormat)->dwSequenceHeader;
 			len = ((MPEG2VIDEOINFO*)pmt->pbFormat)->cbSequenceHeader;
 
-			if (ptr && len >= 8 && GETDWORD(ptr) == 0xb3010000) {
+			if (ptr && len >= 8 && GETUINT32(ptr) == 0xb3010000) {
 				w = (ptr[4]<<4)|(ptr[5]>>4);
 				h = ((ptr[5]&0xf)<<8)|ptr[6];
 				struct {
@@ -1151,7 +1151,7 @@ bool MakeMPEG2MediaType(CMediaType& mt, BYTE* seqhdr, DWORD len, int w, int h)
 {
 	mt = CMediaType();
 
-	if (len < 4 || GETDWORD(seqhdr) != 0xb3010000) {
+	if (len < 4 || GETUINT32(seqhdr) != 0xb3010000) {
 		mt.majortype					= MEDIATYPE_Video;
 		mt.subtype						= MEDIASUBTYPE_MPEG2_VIDEO;
 		mt.formattype					= FORMAT_MPEG2Video;
@@ -1174,7 +1174,7 @@ bool MakeMPEG2MediaType(CMediaType& mt, BYTE* seqhdr, DWORD len, int w, int h)
 	BYTE* seqhdr_end = seqhdr + 7;
 
 	while (seqhdr_end < (seqhdr + len - 6)) {
-		if (GETDWORD(seqhdr_end) == 0xb5010000) {
+		if (GETUINT32(seqhdr_end) == 0xb5010000) {
 			seqhdr_ext = seqhdr_end;
 			seqhdr_end += 10;
 			len = (DWORD)(seqhdr_end - seqhdr);
@@ -2769,7 +2769,7 @@ HRESULT CreateMPEG2VIfromMVC(CMediaType* mt, BITMAPINFOHEADER* pbmi, REFERENCE_T
 		// Update pointers to the start of the mvcC atom
 		extra = extra + i - 7;
 		extralen = extralen - i + 7;
-		DWORD atomSize = GETDWORD(extra); atomSize = FCC(atomSize);
+		DWORD atomSize = GETUINT32(extra); atomSize = FCC(atomSize);
 
 		// verify size atom and actual size
 		if ((atomSize + 4) > extralen || extralen < 14) {

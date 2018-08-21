@@ -330,7 +330,7 @@ void CCDecoder::DecodeCC(BYTE* buff, int len, __int64 time)
 void CCDecoder::ExtractCC(BYTE* buff, int len, __int64 time)
 {
 	for (ptrdiff_t i = 0; i < len-9; i++) {
-		if (GETDWORD(&buff[i]) == 0xb2010000 && GETDWORD(&buff[i+4]) == 0xf8014343) {
+		if (GETUINT32(&buff[i]) == 0xb2010000 && GETUINT32(&buff[i+4]) == 0xf8014343) {
 			i += 8;
 			int nBytes = buff[i++]&0x3f;
 			if (nBytes > 0) {

@@ -77,7 +77,7 @@ inline long crc_octets(BYTE *octets, size_t len)
 
 static int GetTAKFrameNumber(BYTE* buf, int size)
 {
-	if (size < 32 || GETWORD(buf) != 0xA0FF) { // sync
+	if (size < 32 || GETUINT16(buf) != 0xA0FF) { // sync
 		return -1;
 	}
 
@@ -449,7 +449,7 @@ int CTAKFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 		size += len;
 
 		for (; pos < (size - 2); pos++) {
-			if (GETWORD(buffer + pos) == 0xA0FF) {
+			if (GETUINT16(buffer + pos) == 0xA0FF) {
 				syncfound = true;
 				m_pFile->Seek(m_pFile->GetPos() + pos - size);
 				size = pos;

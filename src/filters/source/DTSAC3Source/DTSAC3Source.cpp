@@ -192,8 +192,8 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 		if (m_file.Read(&data, sizeof(data)) != sizeof(data)) {
 			break;
 		}
-		if (GETDWORD(data) == FCC('RIFF') ||		// ignore RIFF files
-			GETQWORD(data) == 0x5244484448535444) {	// ignore DTS-HD files ('DTSHDHDR')
+		if (GETUINT32(data) == FCC('RIFF') ||        // ignore RIFF files
+			GETUINT64(data) == 0x5244484448535444) { // ignore DTS-HD files ('DTSHDHDR')
 			break;
 		}
 
@@ -284,7 +284,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 			m_file.Seek(m_dataStart + fsize, CFile::begin);
 			if (m_file.Read(&buf, _countof(buf)) == _countof(buf)) {
-				sync = GETDWORD(buf);
+				sync = GETUINT32(buf);
 				HD_size = ParseDTSHDHeader(buf, _countof(buf), &aframe);
 				if (HD_size) {
 					m_samplerate = aframe.samplerate;

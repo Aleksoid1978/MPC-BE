@@ -162,7 +162,7 @@ HRESULT CDeCSSFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	}
 
 	if (m_pOutput->CurrentMediaType().majortype == MEDIATYPE_MPEG2_PES) {
-		if (GETDWORD(pDataIn) == 0xBA010000) {
+		if (GETUINT32(pDataIn) == 0xBA010000) {
 			len -= 14;
 			pDataIn += 14;
 			if (int stuffing = (pDataIn[-1]&7)) {
@@ -173,7 +173,7 @@ HRESULT CDeCSSFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		if (len <= 0) {
 			return S_FALSE;
 		}
-		if (GETDWORD(pDataIn) == 0xBB010000) {
+		if (GETUINT32(pDataIn) == 0xBB010000) {
 			len -= 4;
 			pDataIn += 4;
 			int hdrlen = ((pDataIn[0]<<8)|pDataIn[1]) + 2;
@@ -314,7 +314,7 @@ void CDeCSSInputPin::StripPacket(BYTE*& p, long& len)
 	GUID majortype = m_mt.majortype;
 
 	if(majortype == MEDIATYPE_MPEG2_PACK || majortype == MEDIATYPE_DVD_ENCRYPTED_PACK)
-		if(len > 0 && GETDWORD(p) == 0xba010000) { // MEDIATYPE_*_PACK
+		if(len > 0 && GETUINT32(p) == 0xba010000) { // MEDIATYPE_*_PACK
 			len -= 14;
 			p += 14;
 			if(int stuffing = (p[-1]&7)) {
@@ -325,7 +325,7 @@ void CDeCSSInputPin::StripPacket(BYTE*& p, long& len)
 		}
 
 	if(majortype == MEDIATYPE_MPEG2_PES)
-		if(len > 0 && GETDWORD(p) == 0xbb010000) {
+		if(len > 0 && GETUINT32(p) == 0xbb010000) {
 			len -= 4;
 			p += 4;
 			int hdrlen = ((p[0]<<8)|p[1]) + 2;
@@ -335,10 +335,10 @@ void CDeCSSInputPin::StripPacket(BYTE*& p, long& len)
 
 	if(majortype == MEDIATYPE_MPEG2_PES)
 		if(len > 0
-				&& ((GETDWORD(p)&0xf0ffffff) == 0xe0010000
-					|| (GETDWORD(p)&0xe0ffffff) == 0xc0010000
-					|| (GETDWORD(p)&0xbdffffff) == 0xbd010000)) { // PES
-			bool ps1 = (GETDWORD(p)&0xbdffffff) == 0xbd010000;
+				&& ((GETUINT32(p)&0xf0ffffff) == 0xe0010000
+					|| (GETUINT32(p)&0xe0ffffff) == 0xc0010000
+					|| (GETUINT32(p)&0xbdffffff) == 0xbd010000)) { // PES
+			bool ps1 = (GETUINT32(p)&0xbdffffff) == 0xbd010000;
 
 			len -= 4;
 			p += 4;

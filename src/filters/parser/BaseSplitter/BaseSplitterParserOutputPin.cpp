@@ -30,13 +30,13 @@
 #define SEQ_START_CODE     0xB3010000
 #define PICTURE_START_CODE 0x00010000
 
-#define MOVE_TO_H264_START_CODE(b, e)    while(b <= e - 4  && !((GETDWORD(b) == 0x01000000) || ((GETDWORD(b) & 0x00FFFFFF) == 0x00010000))) b++; if((b <= e - 4) && GETDWORD(b) == 0x01000000) b++;
-#define MOVE_TO_AC3_START_CODE(b, e)     while(b <= e - 8  && (GETWORD(b) != AC3_SYNCWORD)) b++;
-#define MOVE_TO_AAC_START_CODE(b, e)     while(b <= e - 9  && ((GETWORD(b) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD)) b++;
-#define MOVE_TO_AACLATM_START_CODE(b, e) while(b <= e - 4  && ((GETWORD(b) & 0xe0FF) != 0xe056)) b++;
-#define MOVE_TO_DIRAC_START_CODE(b, e)   while(b <= e - 4  && (GETDWORD(b) != 0x44434242)) b++;
-#define MOVE_TO_DTS_START_CODE(b, e)     while(b <= e - 16 && (GETDWORD(b) != DTS_SYNCWORD_CORE_BE) && GETDWORD(b) != DTS_SYNCWORD_SUBSTREAM) b++;
-#define MOVE_TO_MPEG_START_CODE(b, e)    while(b <= e - 4  && !(GETDWORD(b) == SEQ_START_CODE || GETDWORD(b) == PICTURE_START_CODE)) b++;
+#define MOVE_TO_H264_START_CODE(b, e)    while(b <= e - 4  && !((GETUINT32(b) == 0x01000000) || ((GETUINT32(b) & 0x00FFFFFF) == 0x00010000))) b++; if((b <= e - 4) && GETUINT32(b) == 0x01000000) b++;
+#define MOVE_TO_AC3_START_CODE(b, e)     while(b <= e - 8  && (GETUINT16(b) != AC3_SYNCWORD)) b++;
+#define MOVE_TO_AAC_START_CODE(b, e)     while(b <= e - 9  && ((GETUINT16(b) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD)) b++;
+#define MOVE_TO_AACLATM_START_CODE(b, e) while(b <= e - 4  && ((GETUINT16(b) & 0xe0FF) != 0xe056)) b++;
+#define MOVE_TO_DIRAC_START_CODE(b, e)   while(b <= e - 4  && (GETUINT32(b) != 0x44434242)) b++;
+#define MOVE_TO_DTS_START_CODE(b, e)     while(b <= e - 16 && (GETUINT32(b) != DTS_SYNCWORD_CORE_BE) && GETUINT32(b) != DTS_SYNCWORD_SUBSTREAM) b++;
+#define MOVE_TO_MPEG_START_CODE(b, e)    while(b <= e - 4  && !(GETUINT32(b) == SEQ_START_CODE || GETUINT32(b) == PICTURE_START_CODE)) b++;
 
 //
 // CBaseSplitterParserOutputPin
@@ -323,13 +323,13 @@ HRESULT CBaseSplitterParserOutputPin::ParseAACLATM(CAutoPtr<CPacket> p)
 	for(;;) {
 		MOVE_TO_AACLATM_START_CODE(start, end);
 		if (start <= end - 4) {
-			int size = (_byteswap_ushort(GETWORD(start + 1)) & 0x1FFF) + 3;
+			int size = (_byteswap_ushort(GETUINT16(start + 1)) & 0x1FFF) + 3;
 			if (start + size > end) {
 				break;
 			}
 
 			if (start + size + 4 <= end) {
-				if ((GETWORD(start + size) & 0xE0FF) != 0xe056) {
+				if ((GETUINT16(start + size) & 0xE0FF) != 0xe056) {
 					start++;
 					continue;
 				}
@@ -659,10 +659,10 @@ HRESULT CBaseSplitterParserOutputPin::ParseVC1(CAutoPtr<CPacket> p)
 
 	bool bSeqFound = false;
 	while (start <= end - 4) {
-		if (GETDWORD(start) == 0x0D010000) {
+		if (GETUINT32(start) == 0x0D010000) {
 			bSeqFound = true;
 			break;
-		} else if (GETDWORD(start) == 0x0F010000) {
+		} else if (GETUINT32(start) == 0x0F010000) {
 			break;
 		}
 		start++;
@@ -675,12 +675,12 @@ HRESULT CBaseSplitterParserOutputPin::ParseVC1(CAutoPtr<CPacket> p)
 			next = end;
 		} else {
 			while (next <= end - 4) {
-				if (GETDWORD(next) == 0x0D010000) {
+				if (GETUINT32(next) == 0x0D010000) {
 					if (bSeqFound) {
 						break;
 					}
 					bSeqFound = true;
-				} else if (GETDWORD(next) == 0x0F010000) {
+				} else if (GETUINT32(next) == 0x0F010000) {
 					break;
 				}
 				next++;
@@ -696,7 +696,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseVC1(CAutoPtr<CPacket> p)
 		HandlePacket(0);
 
 		start		= next;
-		bSeqFound	= (GETDWORD(start) == 0x0D010000);
+		bSeqFound	= (GETUINT32(start) == 0x0D010000);
 	}
 
 	ENDDATA;
@@ -999,7 +999,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseDTS(CAutoPtr<CPacket> p)
 	for(;;) {
 		MOVE_TO_DTS_START_CODE(start, end);
 		if (start <= end - 16) {
-			if (GETDWORD(start) == DTS_SYNCWORD_CORE_BE) {
+			if (GETUINT32(start) == DTS_SYNCWORD_CORE_BE) {
 				int size = ParseDTSHeader(start);
 				if (size == 0) {
 					start++;
