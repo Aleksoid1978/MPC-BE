@@ -320,7 +320,7 @@ HRESULT CCDXAStream::Read(PBYTE pbBuffer, DWORD dwBytesToRead, BOOL bAlign, LPDW
 					break;
 				}
 
-				if (GETUINT32(&m_sector[RAW_SECTOR_SIZE-4]) == 0) { // no CRC? it happens...
+				if (GETU32(&m_sector[RAW_SECTOR_SIZE-4]) == 0) { // no CRC? it happens...
 					break;
 				}
 

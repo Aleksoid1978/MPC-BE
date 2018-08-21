@@ -587,9 +587,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						fourcc = FCC('AV01');
 					} else if (CodecID == "V_QUICKTIME" && pTE->CodecPrivate.size() >= 8) {
 						if (m_pFile->m_ebml.DocTypeReadVersion == 1) {
-							fourcc = GETUINT32(pTE->CodecPrivate.data());
+							fourcc = GETU32(pTE->CodecPrivate.data());
 						} else {
-							fourcc = GETUINT32(pTE->CodecPrivate.data() + 4);
+							fourcc = GETU32(pTE->CodecPrivate.data() + 4);
 						}
 					} else if (CodecID.Left(9) == "V_REAL/RV" && CodecID.GetLength() >= 11) {
 						fourcc = CodecID[7] + (CodecID[8] << 8) + (CodecID[9] << 16) + (CodecID[10] << 24);
@@ -1276,7 +1276,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					wfe->cbSize = 0; // IMPORTANT: this is screwed, but cbSize has to be 0 and the extra data from codec priv must be after WAVEFORMATEX
 					mts.push_back(mt);
 				} else if (CodecID == "A_QUICKTIME" && pTE->CodecPrivate.size() >= 8) {
-					DWORD type = GETUINT32(pTE->CodecPrivate.data() + 4);
+					DWORD type = GETU32(pTE->CodecPrivate.data() + 4);
 					// 'QDM2', 'QDMC', 'ima4'
 					mt.subtype = FOURCCMap(type);
 					wfe->cbSize = (WORD)pTE->CodecPrivate.size();
@@ -2598,7 +2598,7 @@ HRESULT CMatroskaSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 					if (*pos++ == 0x0F) {
 						const WORD segtype = *pos++;
 						pos += 2;
-						const WORD seglength = _byteswap_ushort(GETUINT16(pos));
+						const WORD seglength = _byteswap_ushort(GETU16(pos));
 						pos += 2 + seglength;
 
 						if (segtype == 0x14) { // first "display" segment

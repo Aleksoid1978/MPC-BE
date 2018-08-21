@@ -173,7 +173,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 			break;
 		case AV_CODEC_ID_LAGARITH:
 			if (pAVCtx->extradata_size >= 4) {
-				switch (GETUINT32(pAVCtx->extradata)) { // "lossy_option"
+				switch (GETU32(pAVCtx->extradata)) { // "lossy_option"
 				case 0:
 					switch (pAVCtx->bits_per_coded_sample) {
 					case 32: pAVCtx->pix_fmt = AV_PIX_FMT_RGBA; break;
@@ -226,7 +226,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 			break;
 		case AV_CODEC_ID_MAGICYUV:
 			if (pAVCtx->extradata_size >= 32 && *(DWORD*)pAVCtx->extradata == FCC('MAGY')) {
-				int hsize = GETUINT32(pAVCtx->extradata + 4);
+				int hsize = GETU32(pAVCtx->extradata + 4);
 				if (hsize >= 32 && pAVCtx->extradata[8] == 7) {
 					switch (pAVCtx->extradata[9]) {
 					case 0x65: pAVCtx->pix_fmt = AV_PIX_FMT_GBRP;      break;
@@ -246,7 +246,7 @@ void FillAVCodecProps(struct AVCodecContext* pAVCtx)
 				}
 			}
 			else if (pAVCtx->extradata_size >= 8) {
-				switch (GETUINT32(pAVCtx->extradata + 4)) {
+				switch (GETU32(pAVCtx->extradata + 4)) {
 				case FCC('M8RG'): pAVCtx->pix_fmt = AV_PIX_FMT_GBRP;      break;
 				case FCC('M8RA'): pAVCtx->pix_fmt = AV_PIX_FMT_GBRAP;     break;
 				case FCC('M8Y4'): pAVCtx->pix_fmt = AV_PIX_FMT_YUV444P;   break;

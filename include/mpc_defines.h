@@ -26,9 +26,9 @@
 
 #define INVALID_TIME INT64_MIN
 
-#define GETUINT16(b) *(UINT16*)(b)
-#define GETUINT32(b) *(UINT32*)(b)
-#define GETUINT64(b) *(UINT64*)(b)
+#define GETU16(b) *(UINT16*)(b)
+#define GETU32(b) *(UINT32*)(b)
+#define GETU64(b) *(UINT64*)(b)
 
 #ifndef FCC
 #define FCC(ch4) ((((DWORD)(ch4) & 0xFF) << 24) |     \

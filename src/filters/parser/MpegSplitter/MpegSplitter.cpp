@@ -2051,7 +2051,7 @@ HRESULT CMpegSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 				if (*pos++ == 0x0F) {
 					int segtype = *pos++;
 					pos += 2;
-					int seglength = _byteswap_ushort(GETUINT16(pos));
+					int seglength = _byteswap_ushort(GETU16(pos));
 					pos += 2 + seglength;
 
 					if (segtype == 0x14) { // first "display" segment

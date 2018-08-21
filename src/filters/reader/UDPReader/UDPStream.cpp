@@ -96,19 +96,19 @@ static void GetType(BYTE* buf, int size, GUID& subtype)
 		if (bIsMPEGTS) {
 			subtype = MEDIASUBTYPE_MPEG2_TRANSPORT;
 		}
-	} else if (size > 6 && GETUINT32(buf) == 0xBA010000) {
+	} else if (size > 6 && GETU32(buf) == 0xBA010000) {
 		if ((buf[4] & 0xc4) == 0x44) {
 			subtype = MEDIASUBTYPE_MPEG2_PROGRAM;
 		} else if ((buf[4] & 0xf1) == 0x21) {
 			subtype = MEDIASUBTYPE_MPEG1System;
 		}
-	} else if (size > 4 && GETUINT32(buf) == 'SggO') {
+	} else if (size > 4 && GETU32(buf) == 'SggO') {
 		subtype = MEDIASUBTYPE_Ogg;
-	} else if (size > 4 && GETUINT32(buf) == 0xA3DF451A) {
+	} else if (size > 4 && GETU32(buf) == 0xA3DF451A) {
 		subtype = MEDIASUBTYPE_Matroska;
-	} else if (size > 4 && GETUINT32(buf) == FCC('FLV\x1')) {
+	} else if (size > 4 && GETU32(buf) == FCC('FLV\x1')) {
 		subtype = MEDIASUBTYPE_FLV;
-	} else if (size > 8 && GETUINT32(buf + 4) == FCC('ftyp')) {
+	} else if (size > 8 && GETU32(buf + 4) == FCC('ftyp')) {
 		subtype = MEDIASUBTYPE_MP4;
 	}
 }

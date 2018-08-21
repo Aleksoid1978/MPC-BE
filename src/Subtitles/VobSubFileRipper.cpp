@@ -681,7 +681,7 @@ bool CVobSubFileRipper::Create()
 
 			bool hasPTS = false;
 
-			if ((GETUINT32(&buff[0x0e]) == 0xe0010000 || GETUINT32(&buff[0x0e]) == 0xbd010000)
+			if ((GETU32(&buff[0x0e]) == 0xe0010000 || GETU32(&buff[0x0e]) == 0xbd010000)
 					&& buff[0x15] & 0x80) {
 				PTS = (__int64)(buff[0x17] & 0x0e) << 29			// 32-30 (+marker)
 					  | ((__int64)(buff[0x18]) << 22)				// 29-22
@@ -750,7 +750,7 @@ bool CVobSubFileRipper::Create()
 				fDiscontinuityFixApplied = true;
 			}
 
-			if (GETUINT32(&buff[0x0e]) == 0xe0010000) {
+			if (GETU32(&buff[0x0e]) == 0xe0010000) {
 				if (fDiscontinuity) {
 					if (PTS < minPTSframeoffset) {
 						selvcmap[vcid] = PTSframeoffset = (int)PTS;
@@ -762,7 +762,7 @@ bool CVobSubFileRipper::Create()
 				if (m_rd.fClosedCaption) {
 					ccdec.ExtractCC(buff, 2048, tOffset + ((PTS - PTSframeoffset) / 90) - tStart);
 				}
-			} else if (GETUINT32(&buff[0x0e]) == 0xbd010000) {
+			} else if (GETU32(&buff[0x0e]) == 0xbd010000) {
 				BYTE id = buff[0x17 + buff[0x16]], iLang = id&0x1f;
 
 				if ((id & 0xe0) == 0x20 && m_rd.selids.Lookup(iLang)) {
