@@ -933,7 +933,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 
 						_strlwr_s(buff);
-						DWORD typelwr = GETDWORD(buff);
+						DWORD typelwr = GETUINT32(buff);
 						if (typelwr != fourcc) {
 							mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = typelwr);
 							mts.push_back(mt);
@@ -941,7 +941,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 
 						_strupr_s(buff);
-						DWORD typeupr = GETDWORD(buff);
+						DWORD typeupr = GETUINT32(buff);
 						if (typeupr != fourcc) {
 							mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = typeupr);
 							mts.push_back(mt);
@@ -1149,7 +1149,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 													if (AP4_DataInfoAtom* ares = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_ARES))) {
 														const AP4_DataBuffer* ares_data = ares->GetData();
 														if (ares_data->GetDataSize() > 11) {
-															const WORD cid = _byteswap_ushort(GETWORD(ares_data->GetData() + 10));
+															const WORD cid = _byteswap_ushort(GETUINT16(ares_data->GetData() + 10));
 															if (cid == 0xd4d || cid == 0xd4e) {
 																width = 1440;
 															}
@@ -1445,7 +1445,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							AP4_Size size = db.GetDataSize();
 
 							while (size >= 36) {
-								if ((GETDWORD(data) == 0x24000000) && (GETDWORD(data+4) == 0x63616c61)) {
+								if ((GETUINT32(data) == 0x24000000) && (GETUINT32(data+4) == 0x63616c61)) {
 									break;
 								}
 								size--;
@@ -1788,7 +1788,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							}
 						} else if (atom->GetType() == AP4_ATOM_TYPE_COVR) {
 							if (db->GetDataSize() > 10) {
-								DWORD sync = GETDWORD(db->GetData());
+								DWORD sync = GETUINT32(db->GetData());
 								if ((sync & 0x00ffffff) == 0x00FFD8FF) { // SOI segment + first byte of next segment
 									ResAppend(L"cover.jpg", L"cover", L"image/jpeg", (BYTE*)db->GetData(), (DWORD)db->GetDataSize());
 								}

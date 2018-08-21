@@ -743,7 +743,7 @@ bool CVobSubFile::ReadSub(CString fn)
 
 	int len;
 	BYTE buff[2048];
-	while ((len = f.Read(buff, sizeof(buff))) > 0 && GETDWORD(buff) == 0xba010000) {
+	while ((len = f.Read(buff, sizeof(buff))) > 0 && GETUINT32(buff) == 0xba010000) {
 		m_sub.Write(buff, len);
 	}
 
@@ -1075,7 +1075,7 @@ bool CVobSubFile::WriteSub(CString fn)
 
 	int len;
 	BYTE buff[2048];
-	while ((len = m_sub.Read(buff, sizeof(buff))) > 0 && GETDWORD(buff) == 0xba010000) {
+	while ((len = m_sub.Read(buff, sizeof(buff))) > 0 && GETUINT32(buff) == 0xba010000) {
 		f.Write(buff, len);
 	}
 
@@ -1108,8 +1108,8 @@ BYTE* CVobSubFile::GetPacket(int idx, int& packetsize, int& datasize, int iLang)
 		}
 
 		// let's check a few things to make sure...
-		if (GETDWORD(&buff[0x00]) != 0xba010000
-				|| GETDWORD(&buff[0x0e]) != 0xbd010000
+		if (GETUINT32(&buff[0x00]) != 0xba010000
+				|| GETUINT32(&buff[0x0e]) != 0xbd010000
 				|| !(buff[0x15] & 0x80)
 				|| (buff[0x17] & 0xf0) != 0x20
 				|| (buff[buff[0x16] + 0x17] & 0xe0) != 0x20
@@ -2363,7 +2363,7 @@ void CVobSubStream::Open(CString name, BYTE* pData, int len)
 		} else if (key == L"palette") {
 			Explode(value, sl, L',', 16);
 			for (size_t i = 0; i < 16 && sl.GetCount(); i++) {
-				GETDWORD(&m_orgpal[i]) = wcstol(sl.RemoveHead(), NULL, 16);
+				GETUINT32(&m_orgpal[i]) = wcstol(sl.RemoveHead(), NULL, 16);
 			}
 		} else if (key == L"custom colors") {
 			m_fCustomPal = Explode(value, sl, L',', 3) == L"ON";
@@ -2387,7 +2387,7 @@ void CVobSubStream::Open(CString name, BYTE* pData, int len)
 
 					RGBQUAD pal[4];
 					for (size_t i = 0; i < 4 && colors.GetCount(); i++) {
-						GETDWORD(&pal[i]) = wcstol(colors.RemoveHead(), NULL, 16);
+						GETUINT32(&pal[i]) = wcstol(colors.RemoveHead(), NULL, 16);
 					}
 
 					SetCustomPal(pal, _tridx);

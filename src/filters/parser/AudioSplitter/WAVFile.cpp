@@ -211,12 +211,12 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 	m_pFile->Seek(0);
 	BYTE data[12];
 	if (m_pFile->ByteRead(data, sizeof(data)) != S_OK
-			|| GETDWORD(data+0) != FCC('RIFF')
-			|| GETDWORD(data+4) < (4 + 8 + sizeof(PCMWAVEFORMAT) + 8) // 'WAVE' + ('fmt ' + fmt.size) + sizeof(PCMWAVEFORMAT) + (data + data.size)
-			|| GETDWORD(data+8) != FCC('WAVE')) {
+			|| GETUINT32(data+0) != FCC('RIFF')
+			|| GETUINT32(data+4) < (4 + 8 + sizeof(PCMWAVEFORMAT) + 8) // 'WAVE' + ('fmt ' + fmt.size) + sizeof(PCMWAVEFORMAT) + (data + data.size)
+			|| GETUINT32(data+8) != FCC('WAVE')) {
 		return E_FAIL;
 	}
-	__int64 end = std::min((__int64)GETDWORD(data + 4) + 8, m_pFile->GetLength());
+	__int64 end = std::min((__int64)GETUINT32(data + 4) + 8, m_pFile->GetLength());
 
 	chunk_t Chunk;
 

@@ -5282,7 +5282,7 @@ void CMainFrame::cmdLineThreadFunction()
 						DLog(L"CMainFrame::cmdLineThreadFunction() : command line queue size - %u", m_cmdLineQueue.size());
 						const std::vector<BYTE>& pData = m_cmdLineQueue.front();
 						const BYTE* p = pData.data();
-						DWORD cnt = GETDWORD(p);
+						DWORD cnt = GETUINT32(p);
 						p += sizeof(DWORD);
 						const WCHAR* pBuff    = (WCHAR*)(p);
 						const WCHAR* pBuffEnd = (WCHAR*)(p + pData.size() - sizeof(DWORD));

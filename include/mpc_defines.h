@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2017 see Authors.txt
+ * (C) 2016-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,9 +26,9 @@
 
 #define INVALID_TIME INT64_MIN
 
-#define GETWORD(b)    *(WORD*)(b)
-#define GETDWORD(b)  *(DWORD*)(b)
-#define GETQWORD(b) *(UINT64*)(b)
+#define GETUINT16(b) *(UINT16*)(b)
+#define GETUINT32(b) *(UINT32*)(b)
+#define GETUINT64(b) *(UINT64*)(b)
 
 #ifndef FCC
 #define FCC(ch4) ((((DWORD)(ch4) & 0xFF) << 24) |     \

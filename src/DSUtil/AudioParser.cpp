@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2017 see Authors.txt
+ * (C) 2011-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -129,7 +129,7 @@ int CalcBitrate(const audioframe_t& audioframe)
 int ParseAC3IEC61937Header(const BYTE* buf)
 {
 	WORD* wbuf = (WORD*)buf;
-	if (GETDWORD(buf) != IEC61937_SYNCWORD
+	if (GETUINT32(buf) != IEC61937_SYNCWORD
 			|| wbuf[2] !=  0x0001
 			|| wbuf[3] == 0
 			|| wbuf[3] >= (6144-8)*8
@@ -168,7 +168,7 @@ static const int mpeg1_samplerates[] = { 44100, 48000, 32000, 0 };
 
 int ParseMPAHeader(const BYTE* buf, audioframe_t* audioframe)
 {
-	if ((GETWORD(buf) & MPA_SYNCWORD) != MPA_SYNCWORD) { // sync
+	if ((GETUINT16(buf) & MPA_SYNCWORD) != MPA_SYNCWORD) { // sync
 		return 0;
 	}
 
@@ -242,7 +242,7 @@ int ParseMPEG1Header(const BYTE* buf, MPEG1WAVEFORMAT* mpeg1wf)
 {
 	// http://msdn.microsoft.com/en-us/library/windows/desktop/dd390701%28v=vs.85%29.aspx
 
-	if ((GETWORD(buf) & 0xf8ff) != 0xf8ff) { // sync + (mpaver_id = MPEG Version 1)
+	if ((GETUINT16(buf) & 0xf8ff) != 0xf8ff) { // sync + (mpaver_id = MPEG Version 1)
 		return 0;
 	}
 
@@ -293,7 +293,7 @@ int ParseMP3Header(const BYTE* buf, MPEGLAYER3WAVEFORMAT* mp3wf) // experimental
 {
 	// http://msdn.microsoft.com/en-us/library/windows/desktop/dd390710%28v=vs.85%29.aspx
 
-	if ((GETWORD(buf) & 0xfeff) != 0xfaff) { // sync + (mpaver_id = MPEG Version 1 = 11b) + (layer_desc = Layer 3 = 01b)
+	if ((GETUINT16(buf) & 0xfeff) != 0xfaff) { // sync + (mpaver_id = MPEG Version 1 = 11b) + (layer_desc = Layer 3 = 01b)
 		return 0;
 	}
 
@@ -332,7 +332,7 @@ int ParseAC3Header(const BYTE* buf, audioframe_t* audioframe)
 	static const BYTE  ac3_halfrate[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3 };
 	static const BYTE  ac3_lfeon[8]     = { 0x10, 0x10, 0x04, 0x04, 0x04, 0x01, 0x04, 0x01 };
 
-	if (GETWORD(buf) != AC3_SYNCWORD) { // syncword
+	if (GETUINT16(buf) != AC3_SYNCWORD) { // syncword
 		return 0;
 	}
 
@@ -416,7 +416,7 @@ int ParseEAC3Header(const BYTE* buf, audioframe_t* audioframe)
 	static const BYTE  eac3_channels[8]    = { 2, 1, 2, 3, 3, 4, 4, 5 };
 	static const short eac3_samples_tbl[4] = { 256, 512, 768, 1536 };
 
-	if (GETWORD(buf) != AC3_SYNCWORD) { // syncword
+	if (GETUINT16(buf) != AC3_SYNCWORD) { // syncword
 		return 0;
 	}
 
@@ -465,7 +465,7 @@ int ParseMLPHeader(const BYTE* buf, audioframe_t* audioframe)
 		   2,   1,   1,   2,   2,   2,   2,   1,   1,   2,   2,   1,   1
 	};
 
-	DWORD sync = GETDWORD(buf+4);
+	DWORD sync = GETUINT32(buf+4);
 	bool isTrueHD;
 	if (sync == TRUEHD_SYNCWORD) {
 		isTrueHD = true;
@@ -590,7 +590,7 @@ int ParseDTSHeader(const BYTE* buf, audioframe_t* audioframe)
 	};
 
 	int frame_size = 0;
-	DWORD sync = GETDWORD(buf);
+	DWORD sync = GETUINT32(buf);
 	switch (sync) {
 		case DTS_SYNCWORD_CORE_BE:    // '7FFE8001' 16 bits and big endian bitstream
 			frame_size = ((buf[5] & 3) << 12 | buf[6] << 4 | (buf[7] & 0xf0) >> 4) + 1;
@@ -634,7 +634,7 @@ int ParseDTSHeader(const BYTE* buf, audioframe_t* audioframe)
 				dts14le_to_dts16be(buf, (BYTE*)hdr, 16);
 				break;
 		}
-		ASSERT(GETDWORD(hdr) == 0x0180fe7f);
+		ASSERT(GETUINT32(hdr) == 0x0180fe7f);
 
 		audioframe->size = frame_size;
 
@@ -683,7 +683,7 @@ enum ExtensionMask {
 
 int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t* audioframe /* = nullptr*/)
 {
-	if (GETDWORD(buf) != DTS_SYNCWORD_SUBSTREAM) { // syncword
+	if (GETUINT32(buf) != DTS_SYNCWORD_SUBSTREAM) { // syncword
 		return 0;
 	}
 
@@ -983,7 +983,7 @@ int ParseADTSAACHeader(const BYTE* buf, audioframe_t* audioframe)
 	static const int  mp4a_samplerates[16] = { 96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350, 0, 0, 0 };
 	static const BYTE mp4a_channels[8]     = { 0, 1, 2, 3, 4, 5, 6, 8 };
 
-	if ((GETWORD(buf) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD) { // syncword
+	if ((GETUINT16(buf) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD) { // syncword
 		return 0;
 	}
 
@@ -1069,7 +1069,7 @@ static bool StreamMuxConfig(CGolombBuffer& gb, int& samplingFrequency, int& chan
 
 bool ParseAACLatmHeader(const BYTE* buf, int len, int& samplerate, int& channels, std::vector<BYTE>& extra)
 {
-	if ((GETWORD(buf) & 0xe0FF) != 0xe056) {
+	if ((GETUINT16(buf) & 0xe0FF) != 0xe056) {
 		return false;
 	}
 

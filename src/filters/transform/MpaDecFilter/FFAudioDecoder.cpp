@@ -351,7 +351,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 
 		if (extradata && extralen) {
 			if (codec_id == AV_CODEC_ID_COOK || codec_id == AV_CODEC_ID_ATRAC3 || codec_id == AV_CODEC_ID_SIPR) {
-				if (extralen >= 4 && GETDWORD(extradata) == MAKEFOURCC('.', 'r', 'a', 0xfd)) {
+				if (extralen >= 4 && GETUINT32(extradata) == MAKEFOURCC('.', 'r', 'a', 0xfd)) {
 					HRESULT hr = ParseRealAudioHeader(extradata, extralen);
 					av_freep(&extradata);
 					extralen = 0;
@@ -385,7 +385,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		}
 		avcodec_unlock;
 
-		if (bRet && m_pAVCtx->codec_id == AV_CODEC_ID_FLAC && m_pAVCtx->extradata_size > (4+4+34) && GETDWORD(m_pAVCtx->extradata) == FCC('fLaC')) {
+		if (bRet && m_pAVCtx->codec_id == AV_CODEC_ID_FLAC && m_pAVCtx->extradata_size > (4+4+34) && GETUINT32(m_pAVCtx->extradata) == FCC('fLaC')) {
 			BYTE metadata_last, metadata_type;
 			DWORD metadata_size;
 			CGolombBuffer gb(m_pAVCtx->extradata + 4, m_pAVCtx->extradata_size - 4);

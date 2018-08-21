@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -54,8 +54,8 @@ CMpaSplitterFile::~CMpaSplitterFile()
 #define MPA_HEADER_SIZE  4
 #define ADTS_HEADER_SIZE 9
 
-#define MOVE_TO_MPA_START_CODE(b, e) while(b <= e - MPA_HEADER_SIZE  && ((GETWORD(b) & MPA_SYNCWORD) != MPA_SYNCWORD)) b++;
-#define MOVE_TO_AAC_START_CODE(b, e) while(b <= e - ADTS_HEADER_SIZE && ((GETWORD(b) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD)) b++;
+#define MOVE_TO_MPA_START_CODE(b, e) while(b <= e - MPA_HEADER_SIZE  && ((GETUINT16(b) & MPA_SYNCWORD) != MPA_SYNCWORD)) b++;
+#define MOVE_TO_AAC_START_CODE(b, e) while(b <= e - ADTS_HEADER_SIZE && ((GETUINT16(b) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD)) b++;
 
 #define FRAMES_FLAG 0x0001
 
