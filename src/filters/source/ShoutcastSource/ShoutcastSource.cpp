@@ -550,7 +550,7 @@ UINT CShoutcastStream::SocketThreadProc()
 
 		if (m_socket.m_Format == AUDIO_MPEG) {
 			for(;;) {
-				while (pos + 2 <= end && ((GETUINT16(pos) & MPA_SYNCWORD) != MPA_SYNCWORD)) {
+				while (pos + 2 <= end && ((GETU16(pos) & MPA_SYNCWORD) != MPA_SYNCWORD)) {
 					pos++;
 				}
 
@@ -592,7 +592,7 @@ UINT CShoutcastStream::SocketThreadProc()
 		}
 		else if (m_socket.m_Format == AUDIO_AAC) {
 			for(;;) {
-				while (pos + 2 <= end && ((GETUINT16(pos) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD)) {
+				while (pos + 2 <= end && ((GETU16(pos) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD)) {
 					pos++;
 				}
 

@@ -204,7 +204,7 @@ namespace Content {
 							|| (content.body.GetLength() >= 4 && wcsncmp(content.body, L".RMF", 4) == 0)) {
 						content.ct = L"audio/x-pn-realaudio";
 					}
-					if (content.body.GetLength() >= 4 && GETUINT32((LPCTSTR)content.body) == 0x75b22630) {
+					if (content.body.GetLength() >= 4 && GETU32((LPCTSTR)content.body) == 0x75b22630) {
 						content.ct = L"video/x-ms-wmv";
 					}
 					if (content.body.GetLength() >= 8 && wcsncmp((LPCTSTR)content.body + 4, L"moov", 4) == 0) {

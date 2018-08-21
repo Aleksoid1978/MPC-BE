@@ -54,8 +54,8 @@ CMpaSplitterFile::~CMpaSplitterFile()
 #define MPA_HEADER_SIZE  4
 #define ADTS_HEADER_SIZE 9
 
-#define MOVE_TO_MPA_START_CODE(b, e) while(b <= e - MPA_HEADER_SIZE  && ((GETUINT16(b) & MPA_SYNCWORD) != MPA_SYNCWORD)) b++;
-#define MOVE_TO_AAC_START_CODE(b, e) while(b <= e - ADTS_HEADER_SIZE && ((GETUINT16(b) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD)) b++;
+#define MOVE_TO_MPA_START_CODE(b, e) while(b <= e - MPA_HEADER_SIZE  && ((GETU16(b) & MPA_SYNCWORD) != MPA_SYNCWORD)) b++;
+#define MOVE_TO_AAC_START_CODE(b, e) while(b <= e - ADTS_HEADER_SIZE && ((GETU16(b) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD)) b++;
 
 #define FRAMES_FLAG 0x0001
 

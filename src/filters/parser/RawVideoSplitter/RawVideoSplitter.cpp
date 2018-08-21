@@ -377,18 +377,18 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	if (m_RAWType == RAW_NONE) {
 		// https://wiki.multimedia.cx/index.php/IVF
-		if (GETUINT32(buf) == FCC('DKIF')) {
-			if (GETUINT16(buf + 4) != 0 || GETUINT16(buf + 6) < 32) {
+		if (GETU32(buf) == FCC('DKIF')) {
+			if (GETU16(buf + 4) != 0 || GETU16(buf + 6) < 32) {
 				return E_FAIL; // incorrect or unsuppurted IVF file
 			}
 
-			m_startpos = GETUINT16(buf + 6);
-			DWORD fourcc = GETUINT32(buf + 8);
-			int width  = GETUINT16(buf + 12);
-			int height = GETUINT16(buf + 14);
-			unsigned fpsnum = GETUINT32(buf + 16);
-			unsigned fpsden = GETUINT32(buf + 20);
-			unsigned num_frames = GETUINT32(buf + 24);
+			m_startpos = GETU16(buf + 6);
+			DWORD fourcc = GETU32(buf + 8);
+			int width  = GETU16(buf + 12);
+			int height = GETU16(buf + 14);
+			unsigned fpsnum = GETU32(buf + 16);
+			unsigned fpsden = GETU32(buf + 20);
+			unsigned num_frames = GETU32(buf + 24);
 
 			if (width <= 0 || height <= 0 || !fpsnum || !fpsden) {
 				return E_FAIL; // incorrect IVF file
@@ -425,7 +425,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		DWORD value;
 
 		// Polyvision PVDR ?
-		if (GETUINT32(buf) == FCC('CMS1') && GETUINT32(buf + 20) == FCC('PDVR')) {
+		if (GETU32(buf) == FCC('CMS1') && GETU32(buf + 20) == FCC('PDVR')) {
 			m_pFile->Seek(24);
 			if (S_OK != m_pFile->ByteRead((BYTE*)&value, 4)) {
 				return E_FAIL;
@@ -434,13 +434,13 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			maxpos = 1536;
 		}
 		// LTV-DVR ?
-		else if ((GETUINT32(buf) == 0x88FFFFFF && GETUINT32(buf + 12) == GETUINT32(buf + 20))
-				|| GETUINT32(buf) == FCC('DHAV')) {
+		else if ((GETU32(buf) == 0x88FFFFFF && GETU32(buf + 12) == GETU32(buf + 20))
+				|| GETU32(buf) == FCC('DHAV')) {
 			m_pFile->Seek(28);
 			maxpos = 512;
 		}
 		// ?
-		else if (GETUINT32(buf) == FCC('264D') && buf[4] == 'V') {
+		else if (GETU32(buf) == FCC('264D') && buf[4] == 'V') {
 			m_pFile->Seek(0x400);
 			maxpos = 2 * KILOBYTE;
 		}
@@ -907,8 +907,8 @@ bool CRawVideoSplitterFilter::DemuxLoop()
 				break;
 			}
 
-			const int framesize = GETUINT32(header);
-			const __int64 framenum = GETUINT64(header + 4);
+			const int framesize = GETU32(header);
+			const __int64 framenum = GETU64(header + 4);
 
 			CAutoPtr<CPacket> p(DNew CPacket());
 			p->rtStart = framenum * m_AvgTimePerFrame;
