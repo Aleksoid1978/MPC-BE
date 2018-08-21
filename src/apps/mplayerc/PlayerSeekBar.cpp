@@ -381,31 +381,31 @@ void CPlayerSeekBar::OnPaint()
 			// draw chapter markers
 			if (s.fChapterMarker) {
 				CAutoLock lock(&m_CBLock);
+				const REFERENCE_TIME stop = m_stop;
 
-				if (m_pChapterBag && m_pChapterBag->ChapGetCount()) {
+				if (stop > 0 && m_pChapterBag && m_pChapterBag->ChapGetCount()) {
 					const CRect rc2 = rc;
-					for (DWORD idx = 0; idx < m_pChapterBag->ChapGetCount(); idx++) {
-						const CRect r = GetChannelRect();
-						REFERENCE_TIME rt;
+					const CRect r = GetChannelRect();
+					ThemeRGB(255, 255, 255, R, G, B);
+					CPen penPlayed2(PS_SOLID, 0, RGB(R, G, B));
+					memdc.SelectObject(&penPlayed2);
 
+					for (DWORD idx = 0; idx < m_pChapterBag->ChapGetCount(); idx++) {
+						REFERENCE_TIME rt;
 						if (FAILED(m_pChapterBag->ChapGet(idx, &rt, nullptr))) {
 							continue;
 						}
 
-						if (rt <= 0 || (rt >= m_stop)) {
+						if (rt <= 0 || rt >= stop) {
 							continue;
 						}
 
-						const int x = r.left + (int)((m_stop > 0) ? (REFERENCE_TIME)r.Width() * rt / m_stop : 0);
+						const int x = r.left + (long)(rt * r.Width() / stop);
 
 						// instead of drawing hands can be a marker icon
 						// HICON appIcon = (HICON)::LoadImageW(AfxGetResourceHandle(), MAKEINTRESOURCEW(IDR_MARKERS), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 						// ::DrawIconEx(memdc, x, rc2.top + 10, appIcon, 0,0, 0, nullptr, DI_NORMAL);
 						// ::DestroyIcon(appIcon);
-
-						ThemeRGB(255, 255, 255, R, G, B);
-						CPen penPlayed2(PS_SOLID, 0, RGB(R,G,B));
-						memdc.SelectObject(&penPlayed2);
 
 						memdc.MoveTo(x, rc2.top + 14);
 						memdc.LineTo(x, rc2.bottom - 2);
