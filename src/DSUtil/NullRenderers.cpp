@@ -301,11 +301,12 @@ HRESULT CNullVideoRenderer::DoRenderSample(IMediaSample* pSample)
 		const long lSize = pSample->GetActualDataLength();
 		BYTE* pMediaBuffer = nullptr;
 		HRESULT hr = pSample->GetPointer(&pMediaBuffer);
-		char strFile[MAX_PATH];
 
-		sprintf_s(strFile, "VideoData%02d.bin", nNb++);
-		FILE* hFile = fopen(strFile, "wb");
-		if (hFile) {
+		WCHAR strFile[MAX_PATH];
+		swprintf_s(strFile, L"C:\\TEMP\\VideoData%03d.bin", nNb++);
+
+		FILE* hFile;
+		if (_wfopen_s(&hFile, strFile, L"wb") == 0) {
 			fwrite(pMediaBuffer,
 				   1,
 				   lSize,
@@ -493,11 +494,12 @@ HRESULT CNullUAudioRenderer::DoRenderSample(IMediaSample* pSample)
 		const long lSize = pSample->GetActualDataLength();
 		BYTE* pMediaBuffer = nullptr;
 		HRESULT hr = pSample->GetPointer(&pMediaBuffer);
-		char strFile[MAX_PATH];
 
-		sprintf_s(strFile, "AudioData%02d.bin", nNb++);
-		FILE* hFile = fopen(strFile, "wb");
-		if (hFile) {
+		WCHAR strFile[MAX_PATH];
+		swprintf_s(strFile, L"C:\\TEMP\\AudioData%03d.bin", nNb++);
+
+		FILE* hFile;
+		if (_wfopen_s(&hFile, strFile, L"wb") == 0) {
 			fwrite(pMediaBuffer,
 				   1,
 				   lSize,
