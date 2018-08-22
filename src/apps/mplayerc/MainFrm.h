@@ -1326,8 +1326,8 @@ private:
 public:
 	BOOL		CheckMainFilter(IBaseFilter* pBF);
 
-	void		AddSubtitlePathsAddons(CString FileName);
-	void		AddAudioPathsAddons(CString FileName);
+	void		AddSubtitlePathsAddons(LPCWSTR FileName);
+	void		AddAudioPathsAddons(LPCWSTR FileName);
 
 	void		MakeBDLabel(CString path, CString& label, CString* pBDlabel = nullptr);
 	void		MakeDVDLabel(CString path, CString& label, CString* pDVDlabel = nullptr);

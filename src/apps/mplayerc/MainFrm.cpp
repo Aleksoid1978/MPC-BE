@@ -5537,7 +5537,7 @@ void CMainFrame::DropFiles(std::list<CString>& slFiles)
 					SetSubtitle(pSubStream); // the subtitle at the insert position according to LoadSubtitle()
 					b_SubLoaded = TRUE;
 
-					AddSubtitlePathsAddons(fname);
+					AddSubtitlePathsAddons(fname.GetString());
 				}
 			}
 
@@ -6290,7 +6290,7 @@ void CMainFrame::OnFileLoadSubtitle()
 			ISubStream *pSubStream = nullptr;
 			if (LoadSubtitle(fn, &pSubStream)) {
 				SetSubtitle(pSubStream); // the subtitle at the insert position according to LoadSubtitle()
-				AddSubtitlePathsAddons(fn);
+				AddSubtitlePathsAddons(fn.GetString());
 			}
 		}
 	}
@@ -6333,7 +6333,7 @@ void CMainFrame::OnFileLoadAudio()
 				HRESULT hr = pGBA->RenderAudioFile(fname);
 				if (SUCCEEDED(hr)) {
 					pli->m_fns.push_back(fname);
-					AddAudioPathsAddons(fname);
+					AddAudioPathsAddons(fname.GetString());
 
 					CComQIPtr<IAMStreamSelect> pSS = FindSwitcherFilter();
 					if (pSS) {
@@ -18846,22 +18846,22 @@ int CMainFrame::GetStreamCount(DWORD dwSelGroup)
 	return streamcount;
 }
 
-void CMainFrame::AddSubtitlePathsAddons(CString FileName)
+void CMainFrame::AddSubtitlePathsAddons(LPCWSTR FileName)
 {
-	CString tmp(AddSlash(GetFolderOnly(FileName)).MakeUpper());
-	CAppSettings& s = AfxGetAppSettings();
+	const CString tmp(AddSlash(GetFolderOnly(FileName)).MakeUpper());
+	auto& s = AfxGetAppSettings();
 
-	if (std::find(s.slSubtitlePathsAddons.cbegin(), s.slSubtitlePathsAddons.cend(), tmp) == s.slSubtitlePathsAddons.cend()) {
+	if (!Contains(s.slSubtitlePathsAddons, tmp)) {
 		s.slSubtitlePathsAddons.push_back(tmp);
 	}
 }
 
-void CMainFrame::AddAudioPathsAddons(CString FileName)
+void CMainFrame::AddAudioPathsAddons(LPCWSTR FileName)
 {
-	CString tmp(AddSlash(GetFolderOnly(FileName)).MakeUpper());
-	CAppSettings& s = AfxGetAppSettings();
+	const CString tmp(AddSlash(GetFolderOnly(FileName)).MakeUpper());
+	auto& s = AfxGetAppSettings();
 
-	if (std::find(s.slAudioPathsAddons.cbegin(), s.slAudioPathsAddons.cend(), tmp) == s.slAudioPathsAddons.cend()) {
+	if (!Contains(s.slAudioPathsAddons, tmp)) {
 		s.slAudioPathsAddons.push_back(tmp);
 	}
 }

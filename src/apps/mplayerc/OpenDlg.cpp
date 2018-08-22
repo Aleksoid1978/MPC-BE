@@ -242,7 +242,7 @@ void COpenDlg::OnBnClickedOk()
 		m_fns.push_back(m_path2);
 
 		if (::PathFileExistsW(m_path2)) {
-			AfxGetMainFrame()->AddAudioPathsAddons(m_path2);
+			AfxGetMainFrame()->AddAudioPathsAddons(m_path2.GetString());
 		}
 	}
 
