@@ -790,11 +790,11 @@ public :
 
 #if LOG_MATRIX
 			if (pExecuteParams->pCompressedBuffers[i].CompressedBufferType == DXVA2_InverseQuantizationMatrixBufferType) {
-				char strFile[MAX_PATH];
+				WCHAR strFile[MAX_PATH];
 				static int nNb = 1;
-				sprintf_s(strFile, "Matrix%d.bin", nNb++);
-				FILE* hFile = fopen(strFile, "wb");
-				if (hFile) {
+				swprintf_s(strFile, L"C:\\TEMP\\Matrix%03d.bin", nNb++);
+				FILE* hFile;
+				if (_wfopen_s(&hFile, strFile, L"wb") == 0) {
 					fwrite(m_ppBuffer[pExecuteParams->pCompressedBuffers[i].CompressedBufferType],
 						   1,
 						   pExecuteParams->pCompressedBuffers[i].DataSize,
@@ -808,11 +808,11 @@ public :
 				LogDXVA_Bitstream(m_ppBuffer[pExecuteParams->pCompressedBuffers[i].CompressedBufferType], pExecuteParams->pCompressedBuffers[i].DataSize);
 
 #if LOG_BITSTREAM
-				char strFile[MAX_PATH];
+				WCHAR strFile[MAX_PATH];
 				static int nNb = 1;
-				sprintf_s(strFile, "BitStream%d.bin", nNb++);
-				FILE* hFile = fopen(strFile, "wb");
-				if (hFile) {
+				swprintf_s(strFile, L"C:\\TEMP\\BitStream%03d.bin", nNb++);
+				FILE* hFile;
+				if (_wfopen_s(&hFile, strFile, L"wb") == 0) {
 					fwrite(m_ppBuffer[pExecuteParams->pCompressedBuffers[i].CompressedBufferType],
 						   1,
 						   pExecuteParams->pCompressedBuffers[i].DataSize,
