@@ -129,6 +129,7 @@ SRCS_LC = \
 	libavcodec/atrac3plusdec.c \
 	libavcodec/atrac3plusdsp.c \
 	libavcodec/audiodsp.c \
+	libavcodec/av1_parse.c \
 	libavcodec/avdct.c \
 	libavcodec/avfft.c \
 	libavcodec/avpacket.c \
@@ -383,6 +384,7 @@ SRCS_LC_B = \
 	libavcodec/opusdec.c \
 	libavcodec/opustab.c \
 	libavcodec/parser.c \
+	libavcodec/parsers.c \
 	libavcodec/pcm.c \
 	libavcodec/pixblockdsp.c \
 	libavcodec/png.c \

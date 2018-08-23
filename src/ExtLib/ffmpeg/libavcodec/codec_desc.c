@@ -1395,6 +1395,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .props     = AV_CODEC_PROP_LOSSLESS,
     },
     {
+        .id        = AV_CODEC_ID_AVS2,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "avs2",
+        .long_name = NULL_IF_CONFIG_SMALL("AVS2-P2/IEEE1857.4"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
         .id        = AV_CODEC_ID_Y41P,
         .type      = AVMEDIA_TYPE_VIDEO,
         .name      = "y41p",
@@ -1516,7 +1523,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_VIDEO,
         .name      = "truemotion2rt",
         .long_name = NULL_IF_CONFIG_SMALL("Duck TrueMotion 2.0 Real Time"),
-        .props     = AV_CODEC_PROP_LOSSY,
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
     {
         .id        = AV_CODEC_ID_M101,
@@ -1646,6 +1653,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .name      = "fits",
         .long_name = NULL_IF_CONFIG_SMALL("FITS (Flexible Image Transport System)"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
+    },
+    {
+        .id        = AV_CODEC_ID_IMM4,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "imm4",
+        .long_name = NULL_IF_CONFIG_SMALL("Infinity IMM4"),
+        .props     = AV_CODEC_PROP_LOSSY,
     },
 
     /* various PCM "codecs" */
