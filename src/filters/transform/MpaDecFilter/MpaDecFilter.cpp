@@ -2187,12 +2187,7 @@ HRESULT CMpaDecFilter::CheckInputType(const CMediaType* mtIn)
 			}
 			if (mtIn->FormatLength() == sizeof(DVDALPCMFORMAT)) {
 				auto fmt = (DVDALPCMFORMAT*)mtIn->Format();
-				if (fmt->GroupAssignment > 20
-#if (1)
-					|| fmt->wfe.nSamplesPerSec != fmt->nSamplesPerSec2
-					|| fmt->wfe.wBitsPerSample != fmt->wBitsPerSample2
-#endif
-					) {
+				if (fmt->GroupAssignment > 20) {
 					return VFW_E_TYPE_NOT_ACCEPTED;
 				}
 			}
