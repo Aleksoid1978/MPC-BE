@@ -101,6 +101,22 @@ static const char* OpenMG_ChannelPositions (int8u Channels_Code)
     }
 }
 
+//---------------------------------------------------------------------------
+static const char* OpenMG_ChannelLayout (int8u Channels_Code)
+{
+    switch (Channels_Code)
+    {
+        case  1 :   return "C";
+        case  2 :   return "L R";
+        case  3 :   return "L R S";
+        case  4 :   return "L R BL BR";
+        case  5 :   return "L R C SL SR LFE";
+        case  6 :   return "L R C SL SR BC LFE";
+        case  7 :   return "L R C SL SR BL BR LFE";
+        default :   return "";
+    }
+}
+
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -199,6 +215,7 @@ void File_OpenMG::FileHeader_Parse()
             {
                 Fill(Stream_Audio, 0, Audio_Channel_s_, OpenMG_Channels(Channels_Code));
                 Fill(Stream_Audio, 0, Audio_ChannelPositions, OpenMG_ChannelPositions(Channels_Code));
+                Fill(Stream_Audio, 0, Audio_ChannelLayout, OpenMG_ChannelLayout(Channels_Code));
                 if (Channels_Code==1 && JointStereo)
                     Fill(Stream_Audio, 0, Audio_Format_Settings_Mode, "Joint Stereo");
                 Fill(Stream_Audio, 0, Audio_SamplingRate, OpenMG_SamplingRate(SamplingRate_Code));

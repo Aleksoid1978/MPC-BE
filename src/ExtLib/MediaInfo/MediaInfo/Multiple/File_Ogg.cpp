@@ -99,6 +99,8 @@ void File_Ogg::Streams_Fill()
     Fill(Stream_General, 0, General_Format, "Ogg", Unlimited, true, true);
     if (Count_Get(Stream_Video)==0 && Count_Get(Stream_Image)==0)
         Fill(Stream_General, 0, General_InternetMediaType, "audio/ogg", Unlimited, true, true);
+    else
+        Fill(Stream_General, 0, General_InternetMediaType, "video/ogg", Unlimited, true, true);
 }
 
 //---------------------------------------------------------------------------

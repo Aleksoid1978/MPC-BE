@@ -277,7 +277,7 @@ size_t libcurl_WriteData_CallBack_Amazon_AWS_Region(void *ptr, size_t size, size
 }
 
 //---------------------------------------------------------------------------
-void Amazon_AWS_Sign(MediaInfoLib::String &File_Name, struct curl_slist* &HttpHeader, const Http::Url &File_URL, const string &regionName, const string &serviceName)
+void Amazon_AWS_Sign(MediaInfoLib::String &File_Name, struct curl_slist* &HttpHeader, const Http::Url &File_URL, const string &regionName, const string &serviceName, const ZtringList& ExternalHttpHeaders)
 {
     // Amazon AWS Authorization Header v4
     // See http://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html
@@ -311,8 +311,24 @@ void Amazon_AWS_Sign(MediaInfoLib::String &File_Name, struct curl_slist* &HttpHe
     CanonicalRequest+="host:"+File_URL.Host+'\n';
     CanonicalRequest+="x-amz-content-sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\n";
     CanonicalRequest+="x-amz-date:"+timeStamp+'\n';
+    string HeadersToSign;
+    for (size_t i=0; i<ExternalHttpHeaders.size(); i++)
+    {
+        string ExternalHttpHeader=ExternalHttpHeaders[i].To_UTF8();
+        if (!ExternalHttpHeader.find("x-amz-")) //contains "x-amz-" so must be signed
+        {
+            size_t Colon=ExternalHttpHeader.find(':');
+            if (Colon!=string::npos)
+            {
+                HeadersToSign+=';';
+                HeadersToSign+=ExternalHttpHeader.substr(0, Colon);
+                CanonicalRequest+=ExternalHttpHeader;
+                CanonicalRequest+='\n';
+            }
+        }
+    }
     CanonicalRequest+='\n';
-    CanonicalRequest+="host;x-amz-content-sha256;x-amz-date\n";
+    CanonicalRequest+="host;x-amz-content-sha256;x-amz-date"+HeadersToSign+'\n';
     CanonicalRequest+="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
     string CanonicalRequest_Signature=HashWrapper::Generate(HashWrapper::SHA256, (const int8u*)CanonicalRequest.c_str(), CanonicalRequest.size());
 
@@ -326,16 +342,26 @@ void Amazon_AWS_Sign(MediaInfoLib::String &File_Name, struct curl_slist* &HttpHe
     hmac_sha((int8u*)SigningKey.c_str(), (unsigned long)HASH_OUTPUT_SIZE, (int8u*)StringToSign.c_str(), (unsigned long)StringToSign.size(), (int8u*)Signature.c_str(), HASH_OUTPUT_SIZE);
 
     //Authorization
-    string Amazon_S3_Authorization="AWS4-HMAC-SHA256 Credential="+File_URL.User+"/"+dateStamp+"/"+regionName+"/"+serviceName+"/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature="+HashWrapper::Hex2String((const int8u*)Signature.c_str(), Signature.size());
+    string Amazon_S3_Authorization="AWS4-HMAC-SHA256 Credential="+File_URL.User+"/"+dateStamp+"/"+regionName+"/"+serviceName+"/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date"+HeadersToSign+", Signature="+HashWrapper::Hex2String((const int8u*)Signature.c_str(), Signature.size());
 
     //Set cUrl headers
     HttpHeader=curl_slist_append(HttpHeader, ("Authorization: "+Amazon_S3_Authorization).c_str());
     HttpHeader=curl_slist_append(HttpHeader, "x-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
     HttpHeader=curl_slist_append(HttpHeader, ("x-amz-date: "+timeStamp).c_str());
+    for (size_t i=0; i<ExternalHttpHeaders.size(); i++)
+    {
+        string ExternalHttpHeader=ExternalHttpHeaders[i].To_UTF8();
+        if (!ExternalHttpHeader.find("x-amz-")) //contains "x-amz-" so must be signed by Amazon algorithm, postponing the injectiong of Amazon related headers
+        {
+            size_t Colon=ExternalHttpHeader.find(':');
+            if (Colon!=string::npos)
+                HttpHeader=curl_slist_append(HttpHeader, ExternalHttpHeader.c_str());
+        }
+    }
 };
 
 //---------------------------------------------------------------------------
-string Amazon_AWS_GetRegion(const string &serviceName, const string &bucketName, const Http::Url &File_URL, CURL* Curl)
+string Amazon_AWS_GetRegion(const string &serviceName, const string &bucketName, const Http::Url &File_URL, CURL* Curl, const ZtringList& ExternalHttpHeaders)
 {
     //Transform the URL to a location request URL
     Http::Url File_URL2=File_URL;
@@ -348,7 +374,7 @@ string Amazon_AWS_GetRegion(const string &serviceName, const string &bucketName,
     Curl_Data2.Curl=Curl;
     Curl_Data2.File_Name.From_UTF8(File_URL2.ToString());
     struct curl_slist* HttpHeader=NULL;
-    Amazon_AWS_Sign(Curl_Data2.File_Name, HttpHeader, File_URL2, "us-east-1", serviceName);
+    Amazon_AWS_Sign(Curl_Data2.File_Name, HttpHeader, File_URL2, "us-east-1", serviceName, ExternalHttpHeaders);
     string FileName_String=Curl_Data2.File_Name.To_UTF8();
     curl_easy_setopt(Curl, CURLOPT_WRITEFUNCTION, &libcurl_WriteData_CallBack_Amazon_AWS_Region);
     curl_easy_setopt(Curl, CURLOPT_WRITEDATA, &Curl_Data2);
@@ -365,7 +391,7 @@ string Amazon_AWS_GetRegion(const string &serviceName, const string &bucketName,
     return Curl_Data2.Amazon_AWS_Region;
 }
 
-void Amazon_AWS_Manage(Http::Url &File_URL, Reader_libcurl::curl_data* Curl_Data)
+void Amazon_AWS_Manage(Http::Url &File_URL, Reader_libcurl::curl_data* Curl_Data, const ZtringList& ExternalHttpHeaders)
 {
     // Looking for style of URL (Virtual-hosted–style URL Path-style URL), service name, region name
     // Format:
@@ -390,7 +416,7 @@ void Amazon_AWS_Manage(Http::Url &File_URL, Reader_libcurl::curl_data* Curl_Data
         if (AfterLastDot)
         {
             string bucketName=regionName.substr(0, AfterLastDot-1); 
-            regionName=Amazon_AWS_GetRegion(serviceName, bucketName, File_URL, Curl_Data->Curl);
+            regionName=Amazon_AWS_GetRegion(serviceName, bucketName, File_URL, Curl_Data->Curl, ExternalHttpHeaders);
         }
         else
             regionName="us-east-1";
@@ -421,7 +447,7 @@ void Amazon_AWS_Manage(Http::Url &File_URL, Reader_libcurl::curl_data* Curl_Data
     // Handling S3 signature
     if (serviceName=="s3" && !regionName.empty())
     {
-        Amazon_AWS_Sign(Curl_Data->File_Name, Curl_Data->HttpHeader, File_URL, regionName, serviceName);
+        Amazon_AWS_Sign(Curl_Data->File_Name, Curl_Data->HttpHeader, File_URL, regionName, serviceName, ExternalHttpHeaders);
 
         //Removing the login/pass FTP-style, not usable by libcurl
         File_URL.User.clear();
@@ -704,12 +730,13 @@ size_t Reader_libcurl::Format_Test_PerParser(MediaInfo_Internal* MI, const Strin
         curl_easy_setopt(Curl_Data->Curl, CURLOPT_USERAGENT, MI->Config.File_Curl_Get(__T("UserAgent")).To_Local().c_str());
     if (!MI->Config.File_Curl_Get(__T("Proxy")).empty())
         curl_easy_setopt(Curl_Data->Curl, CURLOPT_PROXY, MI->Config.File_Curl_Get(__T("Proxy")).To_Local().c_str());
-    if (!MI->Config.File_Curl_Get(__T("HttpHeader")).empty())
+    ZtringList HttpHeaderStrings; HttpHeaderStrings.Separator_Set(0, EOL); //End of line is set depending of the platform: \n on Linux, \r on Mac, or \r\n on Windows
+    HttpHeaderStrings.Write(MI->Config.File_Curl_Get(__T("HttpHeader")));
+    if (!HttpHeaderStrings.empty())
     {
-        ZtringList HttpHeaderStrings; HttpHeaderStrings.Separator_Set(0, EOL); //End of line is set depending of the platform: \n on Linux, \r on Mac, or \r\n on Windows
-        HttpHeaderStrings.Write(MI->Config.File_Curl_Get(__T("HttpHeader")));
         for (size_t Pos=0; Pos<HttpHeaderStrings.size(); Pos++)
-            Curl_Data->HttpHeader=curl_slist_append(Curl_Data->HttpHeader, HttpHeaderStrings[Pos].To_Local().c_str());
+            if (HttpHeaderStrings[Pos].find(__T("x-amz-"))) //Ignore headers begining with "x-amz-", as they must be signed by Amazon algo
+                Curl_Data->HttpHeader=curl_slist_append(Curl_Data->HttpHeader, HttpHeaderStrings[Pos].To_Local().c_str());
     }
 
     //Special cases
@@ -730,7 +757,7 @@ size_t Reader_libcurl::Format_Test_PerParser(MediaInfo_Internal* MI, const Strin
         if ((File_URL.Protocol=="http" || File_URL.Protocol=="https") && !File_URL.User.empty())
         {
             if (File_URL.Host.find(".amazonaws.com")+14==File_URL.Host.size())
-                Amazon_AWS_Manage(File_URL, Curl_Data);
+                Amazon_AWS_Manage(File_URL, Curl_Data, HttpHeaderStrings);
         }
 
         if (File_URL.Protocol=="sftp" || File_URL.Protocol=="scp")

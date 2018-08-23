@@ -146,7 +146,14 @@ bool File_MiXml::FileHeader_Begin()
                                             Fill(StreamKind_Last, StreamPos_Last, Element->Name(), N.To_float64()*1000, Precision, true);
                                         }
                                         else if (Name != "extra")
-                                            Fill(StreamKind_Last, StreamPos_Last, Element->Name(), Element->GetText(), Unlimited, true, true);
+                                        {
+                                            //Special cases
+                                            if (Name == "Channels")
+                                                Fill(StreamKind_Last, StreamPos_Last, "Channel(s)", Element->GetText());
+                                            //Generic filling
+                                            else
+                                                Fill(StreamKind_Last, StreamPos_Last, Element->Name(), Element->GetText(), Unlimited, true, true);
+                                        }
                                         else
                                         {
                                             XMLElement* Extra = Element->FirstChildElement();

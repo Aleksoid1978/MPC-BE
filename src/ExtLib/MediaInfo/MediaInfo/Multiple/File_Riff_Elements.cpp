@@ -110,6 +110,44 @@ std::string ExtensibleWave_ChannelMask2 (int32u ChannelMask)
     return Text;
 }
 
+//---------------------------------------------------------------------------
+static const size_t ExtensibleWave_ChannelLayoutNames_Size=18;
+const char* ExtensibleWave_ChannelLayoutNames[ExtensibleWave_ChannelLayoutNames_Size]=
+{
+    "FL",
+    "FR",
+    "FC",
+    "LFE",
+    "BL",
+    "BR",
+    "FLC",
+    "FRC",
+    "BC",
+    "SL",
+    "SR",
+    "TC",
+    "TFL",
+    "TFC",
+    "TFR",
+    "TBL",
+    "TBC",
+    "TBR",
+};
+std::string ExtensibleWave_ChannelMask_ChannelLayout(int32u ChannelMask)
+{
+    std::string Text;
+
+    for (size_t i=0; i<ExtensibleWave_ChannelLayoutNames_Size; i++)
+        if (ChannelMask&(1<<i))
+        {
+            if (!Text.empty())
+                Text+=' ';
+            Text+=ExtensibleWave_ChannelLayoutNames[i];
+        }
+
+    return Text;
+}
+
 }
 
 //---------------------------------------------------------------------------
@@ -1583,6 +1621,7 @@ void File_Riff::AVI__hdlr_strl_strf_auds_ExtensibleWave(int16u BitsPerSample)
         }
         Fill(Stream_Audio, StreamPos_Last, Audio_ChannelPositions, ExtensibleWave_ChannelMask(ChannelMask));
         Fill(Stream_Audio, StreamPos_Last, Audio_ChannelPositions_String2, ExtensibleWave_ChannelMask2(ChannelMask));
+        Fill(Stream_Audio, StreamPos_Last, Audio_ChannelLayout, ExtensibleWave_ChannelMask_ChannelLayout(ChannelMask));
     FILLING_END();
 }
 

@@ -390,6 +390,8 @@ bool Parse_XML(const ZtringList& Parents, const Ztring& PlaceHolder, const XMLNo
 //---------------------------------------------------------------------------
 bool ExternalMetadata(const Ztring& FileName, const Ztring& ExternalMetadata, const Ztring& ExternalMetaDataConfig, const ZtringList& Parents, const Ztring& PlaceHolder, Node* Main, Node* MI_Info)
 {
+    if (ExternalMetaDataConfig.empty()) // ExternalMetadata is used in export only if there is ExternalMetadata config (= else it is another format)
+        return true;
 
     ZtringListList CSV;
     CSV.Separator_Set(0, EOL);

@@ -37,6 +37,7 @@ namespace MediaInfoLib
 extern const char* Id3v2_PictureType(int8u Type); //In Tag/File_Id3v2.cpp
 extern std::string ExtensibleWave_ChannelMask (int32u ChannelMask); //In Multiple/File_Riff_Elements.cpp
 extern std::string ExtensibleWave_ChannelMask2 (int32u ChannelMask); //In Multiple/File_Riff_Elements.cpp
+extern std::string ExtensibleWave_ChannelMask_ChannelLayout(int32u ChannelMask); //In Multiple/File_Riff_Elements.cpp
 
 //***************************************************************************
 // Constructor/Destructor
@@ -155,6 +156,7 @@ void File_Flac::Data_Parse()
         if (t) {
             Fill(Stream_Audio, 0, Audio_ChannelPositions, ExtensibleWave_ChannelMask(t));
             Fill(Stream_Audio, 0, Audio_ChannelPositions_String2, ExtensibleWave_ChannelMask2(t));
+            Fill(Stream_Audio, 0, Audio_ChannelLayout, ExtensibleWave_ChannelMask_ChannelLayout(t));
         }
     }
 

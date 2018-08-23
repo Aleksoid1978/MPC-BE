@@ -87,6 +87,9 @@ void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_Col
         else if (x[G]== 8500 && x[B]== 6550 && x[R]==35400 && x[3]==15635
               && y[G]==39850 && y[B]== 2300 && y[R]==14600 && y[3]==16450)
             MasteringDisplay_ColorPrimaries=Mpegv_colour_primaries(9); // BT.2020
+        else if (x[G]==13250 && x[B]== 7500 && x[R]==34000 && x[3]==15700
+              && y[G]==34500 && y[B]== 3000 && y[R]==16000 && y[3]==17550)
+            MasteringDisplay_ColorPrimaries=Mpegv_colour_primaries(11); // DCI P3
         else if (x[G]==13250 && x[B]== 7500 && x[R]==34000 && x[3]==15635
               && y[G]==34500 && y[B]== 3000 && y[R]==16000 && y[3]==16450)
             MasteringDisplay_ColorPrimaries=Mpegv_colour_primaries(12); // Display P3
@@ -341,7 +344,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
     if (!MediaInfoLib::Config.Legacy_Get())
     {
         const Ztring& Info=MediaInfoLib::Config.Info_Get(StreamKind, Parameter, Info_Info);
-        if (Info.size()>10 && Info[0]==__T('D') && Info[1]==__T('e') && Info[2]==__T('p') && Info[3]==__T('r') && Info[4]==__T('e') && Info[5]==__T('c') && Info[6]==__T('a') && Info[7]==__T('t') && Info[8]==__T('e') && Info[9]==__T('d'))
+        if (Info.size()>9 && Info[0]==__T('D') && Info[1]==__T('e') && Info[2]==__T('p') && Info[3]==__T('r') && Info[4]==__T('e') && Info[5]==__T('c') && Info[6]==__T('a') && Info[7]==__T('t') && Info[8]==__T('e') && Info[9]==__T('d'))
             return;
     }
 
@@ -374,16 +377,20 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
     #endif //MEDIAINFO_ADVANCED
 
     //Handling values with \r\n inside
-    if (Value.find(__T('\r'))!=string::npos || Value.find(__T('\n'))!=string::npos)
+    if (Value.find_first_of(__T("\r\n"))!=string::npos)
     {
-        Ztring NewValue=Value;
-        NewValue.FindAndReplace(__T("\r\n"), __T(" / "), 0, Ztring_Recursive);
-        NewValue.FindAndReplace(__T("\r"), __T(" / "), 0, Ztring_Recursive);
-        NewValue.FindAndReplace(__T("\n"), __T(" / "), 0, Ztring_Recursive);
-        if (NewValue.size()>=3 && NewValue.rfind(__T(" / "))==NewValue.size()-3)
-            NewValue.resize(NewValue.size()-3);
-        Fill(StreamKind, StreamPos, Parameter, NewValue, Replace);
-        return;
+        Ztring CarriageReturnReplace=MediaInfoLib::Config.CarriageReturnReplace_Get();
+        if (!CarriageReturnReplace.empty())
+        {
+            Ztring NewValue=Value;
+            NewValue.FindAndReplace(__T("\r\n"), CarriageReturnReplace, 0, Ztring_Recursive);
+            NewValue.FindAndReplace(__T("\r"), CarriageReturnReplace, 0, Ztring_Recursive);
+            NewValue.FindAndReplace(__T("\n"), CarriageReturnReplace, 0, Ztring_Recursive);
+            if (NewValue.size()>=CarriageReturnReplace.size() && NewValue.rfind(CarriageReturnReplace)==NewValue.size()-CarriageReturnReplace.size())
+                NewValue.resize(NewValue.size()-CarriageReturnReplace.size());
+            Fill(StreamKind, StreamPos, Parameter, NewValue, Replace);
+            return;
+        }
     }
 
     //Handle Value before StreamKind
@@ -449,8 +456,8 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
     //Deprecated
     if (Parameter==Fill_Parameter(StreamKind, Generic_BitDepth))
         Fill(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_Resolution), Retrieve(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_BitDepth)), true);
-    if (StreamKind==Stream_Video && Parameter==Video_Colorimetry)
-        Fill(Stream_Video, StreamPos, Video_ChromaSubsampling, Value, Replace);
+    if (StreamKind==Stream_Video && Parameter==Video_ChromaSubsampling)
+        Fill(Stream_Video, StreamPos, Video_Colorimetry, Value, Replace);
 
     switch (StreamKind)
     {
@@ -1015,16 +1022,20 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, const char* Par
         return;
 
     //Handling values with \r\n inside
-    if (Value.find(__T('\r'))!=string::npos || Value.find(__T('\n'))!=string::npos)
+    if (Value.find_first_of(__T("\r\n"))!=string::npos)
     {
-        Ztring NewValue=Value;
-        NewValue.FindAndReplace(__T("\r\n"), __T(" / "), 0, Ztring_Recursive);
-        NewValue.FindAndReplace(__T("\r"), __T(" / "), 0, Ztring_Recursive);
-        NewValue.FindAndReplace(__T("\n"), __T(" / "), 0, Ztring_Recursive);
-        if (NewValue.size()>=3 && NewValue.rfind(__T(" / "))==NewValue.size()-3)
-            NewValue.resize(NewValue.size()-3);
-        Fill(StreamKind, StreamPos, Parameter, NewValue, Replace);
-        return;
+        Ztring CarriageReturnReplace=MediaInfoLib::Config.CarriageReturnReplace_Get();
+        if (!CarriageReturnReplace.empty())
+        {
+            Ztring NewValue=Value;
+            NewValue.FindAndReplace(__T("\r\n"), CarriageReturnReplace, 0, Ztring_Recursive);
+            NewValue.FindAndReplace(__T("\r"), CarriageReturnReplace, 0, Ztring_Recursive);
+            NewValue.FindAndReplace(__T("\n"), CarriageReturnReplace, 0, Ztring_Recursive);
+            if (NewValue.size()>=CarriageReturnReplace.size() && NewValue.rfind(CarriageReturnReplace)==NewValue.size()-CarriageReturnReplace.size())
+                NewValue.resize(NewValue.size()-CarriageReturnReplace.size());
+            Fill(StreamKind, StreamPos, Parameter, NewValue, Replace);
+            return;
+        }
     }
 
     //Handle Value before StreamKind
@@ -1684,7 +1695,7 @@ void File__Analyze::Video_FrameRate_Rounding(size_t Pos, video Parameter)
     else if (FrameRate>29.940*2 && FrameRate<=29.985*2) FrameRate=29.970*2;
     else if (FrameRate>29.970*2 && FrameRate<=30.030*2) FrameRate=30.000*2;
 
-    if (std::fabs(FrameRate-FrameRate_Sav) > 0.01)
+    if (std::fabs(FrameRate-FrameRate_Sav)>=0.000999999)
         Fill(Stream_Video, Pos, Parameter, FrameRate, 3, true);
 }
 
@@ -1708,11 +1719,9 @@ void File__Analyze::Video_BitRate_Rounding(size_t Pos, video Parameter)
 void File__Analyze::Audio_BitRate_Rounding(size_t Pos, audio Parameter)
 {
     const Ztring& Format=Retrieve(Stream_Audio, Pos, Audio_Format);
-    const Ztring& Codec=Retrieve(Stream_Audio, Pos, Audio_Codec);
     int32u BitRate=Retrieve(Stream_Audio, Pos, Parameter).To_int32u();
     int32u BitRate_Sav=BitRate;
-    if (MediaInfoLib::Config.Codec_Get(Codec, InfoCodec_KindofCodec, Stream_Audio).find(__T("MPEG-"))==0
-     || Retrieve(Stream_Audio, Pos, Audio_Codec_String).find(__T("MPEG-"))==0)
+    if (Format.find(__T("MPEG"))==0)
     {
         if (BitRate>=   7500 && BitRate<=   8500) BitRate=   8000;
         if (BitRate>=  15000 && BitRate<=  17000) BitRate=  16000;
@@ -1742,7 +1751,7 @@ void File__Analyze::Audio_BitRate_Rounding(size_t Pos, audio Parameter)
             BitRate=BitRate_Sav; //If VBR, we want the exact value
     }
 
-    else if (MediaInfoLib::Config.Codec_Get(Codec, InfoCodec_Name, Stream_Audio).find(__T("AC3"))==0)
+    else if (Format.find(__T("AC3"))==0)
     {
         if (BitRate>=  31000 && BitRate<=  33000) BitRate=  32000;
         if (BitRate>=  39000 && BitRate<=  41000) BitRate=  40000;
@@ -1763,42 +1772,9 @@ void File__Analyze::Audio_BitRate_Rounding(size_t Pos, audio Parameter)
         if (BitRate>= 501760 && BitRate<= 522240) BitRate= 512000;
         if (BitRate>= 564480 && BitRate<= 587520) BitRate= 576000;
         if (BitRate>= 627200 && BitRate<= 652800) BitRate= 640000;
-  }
-
-    else if (MediaInfoLib::Config.Codec_Get(Codec, InfoCodec_Name, Stream_Audio).find(__T("DTS"))==0)
-    {
-        if (BitRate>=  31000 && BitRate<=  33000) BitRate=  32000;
-        if (BitRate>=  54000 && BitRate<=  58000) BitRate=  56000;
-        if (BitRate>=  62720 && BitRate<=  65280) BitRate=  64000;
-        if (BitRate>=  94080 && BitRate<=  97920) BitRate=  96000;
-        if (BitRate>= 109760 && BitRate<= 114240) BitRate= 112000;
-        if (BitRate>= 125440 && BitRate<= 130560) BitRate= 128000;
-        if (BitRate>= 188160 && BitRate<= 195840) BitRate= 192000;
-        if (BitRate>= 219520 && BitRate<= 228480) BitRate= 224000;
-        if (BitRate>= 250880 && BitRate<= 261120) BitRate= 256000;
-        if (BitRate>= 313600 && BitRate<= 326400) BitRate= 320000;
-        if (BitRate>= 376320 && BitRate<= 391680) BitRate= 384000;
-        if (BitRate>= 439040 && BitRate<= 456960) BitRate= 448000;
-        if (BitRate>= 501760 && BitRate<= 522240) BitRate= 512000;
-        if (BitRate>= 564480 && BitRate<= 587520) BitRate= 576000;
-        if (BitRate>= 627200 && BitRate<= 652800) BitRate= 640000;
-        if (BitRate>= 752640 && BitRate<= 783360) BitRate= 768000;
-        if (BitRate>= 940800 && BitRate<= 979200) BitRate= 960000;
-        if (BitRate>=1003520 && BitRate<=1044480) BitRate=1024000;
-        if (BitRate>=1128960 && BitRate<=1175040) BitRate=1152000;
-        if (BitRate>=1254400 && BitRate<=1305600) BitRate=1280000;
-        if (BitRate>=1317120 && BitRate<=1370880) BitRate=1344000;
-        if (BitRate>=1379840 && BitRate<=1436160) BitRate=1408000;
-        if (BitRate>=1382976 && BitRate<=1439424) BitRate=1411200;
-        if (BitRate>=1442560 && BitRate<=1501440) BitRate=1472000;
-        if (BitRate>=1505280 && BitRate<=1566720) BitRate=1536000;
-        if (BitRate>=1881600 && BitRate<=1958400) BitRate=1920000;
-        if (BitRate>=2007040 && BitRate<=2088960) BitRate=2048000;
-        if (BitRate>=3010560 && BitRate<=3133440) BitRate=3072000;
-        if (BitRate>=3763200 && BitRate<=3916800) BitRate=3840000;
     }
 
-    else if (Codec.find(__T("AAC"))==0 || MediaInfoLib::Config.Codec_Get(Codec, InfoCodec_Name, Stream_Audio).find(__T("AAC"))==0)
+    else if (Format.find(__T("AAC"))==0)
     {
         if (BitRate>=  46000 && BitRate<=  50000) BitRate=  48000;
         if (BitRate>=  64827 && BitRate<=  67473) BitRate=  66150;
@@ -1817,7 +1793,7 @@ void File__Analyze::Audio_BitRate_Rounding(size_t Pos, audio Parameter)
         if (BitRate>= 648270 && BitRate<= 674730) BitRate= 661500;
     }
 
-    else if (Codec==__T("PCM") || Codec==__T("QDM2") || MediaInfoLib::Config.Codec_Get(Codec, InfoCodec_Name, Stream_Audio).find(__T("PCM"))==0)
+    else if (Format==__T("PCM") || Format==__T("Qdesign 2"))
     {
         if (BitRate>=  62720 && BitRate<=  65280) BitRate=  64000;
         if (BitRate>=  86436 && BitRate<=  89964) BitRate=  88200;
@@ -1838,11 +1814,8 @@ void File__Analyze::Audio_BitRate_Rounding(size_t Pos, audio Parameter)
         if (BitRate>=6021120 && BitRate<=6266880) BitRate=6144000;
     }
 
-    else if (MediaInfoLib::Config.Codec_Get(Codec, InfoCodec_Name, Stream_Audio).find(__T("ADPCM"))==0
-          || MediaInfoLib::Config.Codec_Get(Codec, InfoCodec_Name, Stream_Audio).find(__T("U-Law"))==0
-          || MediaInfoLib::Config.Codec_Get(Codec, InfoCodec_KindofCodec, Stream_Audio)==__T("ADPCM")
-          || MediaInfoLib::Config.Codec_Get(Codec, InfoCodec_KindofCodec, Stream_Audio)==__T("U-Law")
-          || Format==__T("ADPCM"))
+    else if (Format.find(__T("ADPCM"))==0
+          || Format.find(__T("U-Law"))==0)
     {
         if (BitRate>=  42000 && BitRate<=  46000) BitRate=  44100;
         if (BitRate>=  62720 && BitRate<=  65280) BitRate=  64000;
@@ -2407,7 +2380,8 @@ void File__Analyze::CodecID_Fill(const Ztring &Value, stream_t StreamKind, size_
 
     Fill(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_CodecID), Value);
     const Ztring &C1=MediaInfoLib::Config.CodecID_Get(StreamKind_CodecID, Format, Value, InfoCodecID_Format);
-    Fill(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_Format), C1.empty()?Value:C1, true);
+    if (!C1.empty())
+        Fill(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_Format), C1, true);
     Fill(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_CodecID_Info), MediaInfoLib::Config.CodecID_Get(StreamKind_CodecID, Format, Value, InfoCodecID_Description), true);
     Fill(StreamKind, StreamPos, "CodecID/Hint", MediaInfoLib::Config.CodecID_Get(StreamKind_CodecID, Format, Value, InfoCodecID_Hint), true);
     Fill(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_CodecID_Url), MediaInfoLib::Config.CodecID_Get(StreamKind_CodecID, Format, Value, InfoCodecID_Url), true);
@@ -2531,12 +2505,14 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_Format : return General_Format;
                                     case Generic_Format_Info : return General_Format_Info;
                                     case Generic_Format_Url : return General_Format_Url;
+                                    case Generic_Format_String : return General_Format_String;
                                     case Generic_Format_Version : return General_Format_Version;
                                     case Generic_Format_Commercial : return General_Format_Commercial;
                                     case Generic_Format_Commercial_IfAny : return General_Format_Commercial_IfAny;
                                     case Generic_Format_Profile : return General_Format_Profile;
                                     case Generic_Format_Level: return General_Format_Level;
                                     case Generic_Format_Settings : return General_Format_Settings;
+                                    case Generic_Format_AdditionalFeatures : return General_Format_AdditionalFeatures;
                                     case Generic_InternetMediaType : return General_InternetMediaType;
                                     case Generic_CodecID : return General_CodecID;
                                     case Generic_CodecID_Info : return General_CodecID_Info;
@@ -2585,6 +2561,7 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_Format : return Video_Format;
                                     case Generic_Format_Info : return Video_Format_Info;
                                     case Generic_Format_Url : return Video_Format_Url;
+                                    case Generic_Format_String: return Video_Format_String;
                                     case Generic_Format_Commercial : return Video_Format_Commercial;
                                     case Generic_Format_Commercial_IfAny : return Video_Format_Commercial_IfAny;
                                     case Generic_Format_Version : return Video_Format_Version;
@@ -2592,6 +2569,7 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_Format_Level: return Video_Format_Level;
                                     case Generic_Format_Tier: return Video_Format_Tier;
                                     case Generic_Format_Settings : return Video_Format_Settings;
+                                    case Generic_Format_AdditionalFeatures : return Video_Format_AdditionalFeatures;
                                     case Generic_InternetMediaType : return Video_InternetMediaType;
                                     case Generic_CodecID : return Video_CodecID;
                                     case Generic_CodecID_Info : return Video_CodecID_Info;
@@ -2702,12 +2680,14 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_Format : return Audio_Format;
                                     case Generic_Format_Info : return Audio_Format_Info;
                                     case Generic_Format_Url : return Audio_Format_Url;
+                                    case Generic_Format_String : return Audio_Format_String;
                                     case Generic_Format_Commercial : return Audio_Format_Commercial;
                                     case Generic_Format_Commercial_IfAny : return Audio_Format_Commercial_IfAny;
                                     case Generic_Format_Version : return Audio_Format_Version;
                                     case Generic_Format_Profile : return Audio_Format_Profile;
                                     case Generic_Format_Level: return Audio_Format_Level;
                                     case Generic_Format_Settings : return Audio_Format_Settings;
+                                    case Generic_Format_AdditionalFeatures : return Audio_Format_AdditionalFeatures;
                                     case Generic_InternetMediaType : return Audio_InternetMediaType;
                                     case Generic_CodecID : return Audio_CodecID;
                                     case Generic_CodecID_Info : return Audio_CodecID_Info;
@@ -2822,11 +2802,13 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_Format : return Text_Format;
                                     case Generic_Format_Info : return Text_Format_Info;
                                     case Generic_Format_Url : return Text_Format_Url;
+                                    case Generic_Format_String : return Text_Format_String;
                                     case Generic_Format_Commercial : return Text_Format_Commercial;
                                     case Generic_Format_Commercial_IfAny : return Text_Format_Commercial_IfAny;
                                     case Generic_Format_Version : return Text_Format_Version;
                                     case Generic_Format_Profile : return Text_Format_Profile;
                                     case Generic_Format_Settings : return Text_Format_Settings;
+                                    case Generic_Format_AdditionalFeatures : return Text_Format_AdditionalFeatures;
                                     case Generic_InternetMediaType : return Text_InternetMediaType;
                                     case Generic_CodecID : return Text_CodecID;
                                     case Generic_CodecID_Info : return Text_CodecID_Info;
@@ -2943,11 +2925,13 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_Format : return Other_Format;
                                     case Generic_Format_Info : return Other_Format_Info;
                                     case Generic_Format_Url : return Other_Format_Url;
+                                    case Generic_Format_String : return Other_Format_String;
                                     case Generic_Format_Commercial : return Other_Format_Commercial;
                                     case Generic_Format_Commercial_IfAny : return Other_Format_Commercial_IfAny;
                                     case Generic_Format_Version : return Other_Format_Version;
                                     case Generic_Format_Profile : return Other_Format_Profile;
                                     case Generic_Format_Settings : return Other_Format_Settings;
+                                    case Generic_Format_AdditionalFeatures : return Other_Format_AdditionalFeatures;
                                     case Generic_CodecID : return Other_CodecID;
                                     case Generic_CodecID_Info : return Other_CodecID_Info;
                                     case Generic_CodecID_Hint : return Other_CodecID_Hint;
@@ -2997,10 +2981,12 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_Format : return Image_Format;
                                     case Generic_Format_Info : return Image_Format_Info;
                                     case Generic_Format_Url : return Image_Format_Url;
+                                    case Generic_Format_String : return Image_Format_String;
                                     case Generic_Format_Commercial : return Image_Format_Commercial;
                                     case Generic_Format_Commercial_IfAny : return Image_Format_Commercial_IfAny;
                                     case Generic_Format_Version : return Image_Format_Version;
                                     case Generic_Format_Profile : return Image_Format_Profile;
+                                    case Generic_Format_AdditionalFeatures : return Image_Format_AdditionalFeatures;
                                     case Generic_InternetMediaType : return Image_InternetMediaType;
                                     case Generic_CodecID : return Image_CodecID;
                                     case Generic_CodecID_Info : return Image_CodecID_Info;
@@ -3037,6 +3023,7 @@ size_t File__Analyze::Fill_Parameter(stream_t StreamKind, generic StreamPos)
                                     case Generic_Format : return Menu_Format;
                                     case Generic_Format_Info : return Menu_Format_Info;
                                     case Generic_Format_Url : return Menu_Format_Url;
+                                    case Generic_Format_String : return Menu_Format_String;
                                     case Generic_Format_Commercial : return Menu_Format_Commercial;
                                     case Generic_Format_Commercial_IfAny : return Menu_Format_Commercial_IfAny;
                                     case Generic_Format_Version : return Menu_Format_Version;

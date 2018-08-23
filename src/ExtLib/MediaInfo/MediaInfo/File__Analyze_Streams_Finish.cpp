@@ -85,6 +85,64 @@ void File__Analyze::Streams_Finish_Global()
         return;
 
     #if MEDIAINFO_ADVANCED
+        if (MediaInfoLib::Config.ExternalMetaDataConfig_Get().empty()) // ExternalMetadata is used directly only if there is no ExternalMetadata config (=another format)
+        {
+            Ztring ExternalMetadata=MediaInfoLib::Config.ExternalMetadata_Get();
+            if (!ExternalMetadata.empty())
+            {
+                ZtringListList List;
+                List.Separator_Set(0, MediaInfoLib::Config.LineSeparator_Get());
+                List.Separator_Set(1, __T(";"));
+                List.Write(ExternalMetadata);
+
+                for (size_t i=0; i<List.size(); i++)
+                {
+                    // col 1&2 can be removed, conidered as "General;0"
+                    // 1: stream kind (General, Video, Audio, Text...)
+                    // 2: 0-based stream number
+                    // 3: field name
+                    // 4: field value
+                    // 5 (optional): replace instead of ignoring if field is already present (metadata from the file)
+                    if (List[i].size()<2 || List[i].size()>5)
+                    {
+                        MediaInfoLib::Config.Log_Send(0xC0, 0xFF, 0, "Invalid column size for external metadata");
+                        continue;
+                    }
+
+                    Ztring StreamKindZ=Ztring(List[i][0]).MakeLowerCase();
+                    stream_t StreamKind;
+                    size_t   Offset;
+                    if (List[i].size()<4)
+                    {
+                        StreamKind=Stream_General;
+                        Offset=2;
+                    }
+                    else
+                    {
+                        Offset=0;
+                             if (StreamKindZ==__T("general"))   StreamKind=Stream_General;
+                        else if (StreamKindZ==__T("video"))     StreamKind=Stream_Video;
+                        else if (StreamKindZ==__T("audio"))     StreamKind=Stream_Audio;
+                        else if (StreamKindZ==__T("text"))      StreamKind=Stream_Text;
+                        else if (StreamKindZ==__T("other"))     StreamKind=Stream_Other;
+                        else if (StreamKindZ==__T("image"))     StreamKind=Stream_Image;
+                        else if (StreamKindZ==__T("menu"))      StreamKind=Stream_Menu;
+                        else
+                        {
+                            MediaInfoLib::Config.Log_Send(0xC0, 0xFF, 0, "Invalid column 0 for external metadata");
+                            continue;
+                        }
+                    }
+                    size_t StreamPos=(size_t)List[i][1].To_int64u();
+                    bool ShouldReplace=List[i].size()>4-Offset && List[i][4-Offset].To_int64u();
+                    if (ShouldReplace || Retrieve_Const(StreamKind, StreamPos, List[i][2-Offset].To_UTF8().c_str()).empty())
+                        Fill(StreamKind, StreamPos, List[i][2-Offset].To_UTF8().c_str(), List[i][3-Offset], ShouldReplace);
+                }
+            }
+        }
+    #endif //MEDIAINFO_ADVANCED
+
+    #if MEDIAINFO_ADVANCED
         //Default frame rate
         if (Count_Get(Stream_Video)==1 && Retrieve(Stream_Video, 0, Video_FrameRate).empty() && Config->File_DefaultFrameRate_Get())
             Fill(Stream_Video, 0, Video_FrameRate, Config->File_DefaultFrameRate_Get());
@@ -392,6 +450,10 @@ void File__Analyze::Streams_Finish_StreamOnly()
 //---------------------------------------------------------------------------
 void File__Analyze::Streams_Finish_StreamOnly(stream_t StreamKind, size_t Pos)
 {
+    //Format
+    if (Retrieve_Const(StreamKind, Pos, Fill_Parameter(StreamKind, Generic_Format)).empty())
+        Fill(StreamKind, Pos, Fill_Parameter(StreamKind, Generic_Format), Retrieve_Const(StreamKind, Pos, Fill_Parameter(StreamKind, Generic_CodecID)));
+
     //BitRate from Duration and StreamSize
     if (StreamKind!=Stream_General && StreamKind!=Stream_Other && StreamKind!=Stream_Menu && Retrieve(StreamKind, Pos, "BitRate").empty() && !Retrieve(StreamKind, Pos, Fill_Parameter(StreamKind, Generic_StreamSize)).empty() && !Retrieve(StreamKind, Pos, Fill_Parameter(StreamKind, Generic_Duration)).empty())
     {
@@ -459,9 +521,9 @@ void File__Analyze::Streams_Finish_StreamOnly(stream_t StreamKind, size_t Pos)
 void File__Analyze::Streams_Finish_StreamOnly_General(size_t StreamPos)
 {
     //Exception
-    if (Retrieve(Stream_General, 0, General_Format)==__T("AC-3") && Retrieve(Stream_General, 0, General_Format_Profile).find(__T("E-AC-3"))==0)
+    if (Retrieve(Stream_General, 0, General_Format)==__T("AC-3") && (Retrieve(Stream_General, 0, General_Format_Profile).find(__T("E-AC-3"))==0 || Retrieve(Stream_General, 0, General_Format_AdditionalFeatures).find(__T("Dep"))!=string::npos))
     {
-        Fill(Stream_General, 0, General_Format_Extensions, "ac3 eb3 ec3", Unlimited, true, true); //ec3 added because sauf reference files use it
+        Fill(Stream_General, 0, General_Format_Extensions, "ac3 eb3 ec3", Unlimited, true, true); //ec3 added because some reference files use it
         Fill(Stream_General, 0, General_Codec_Extensions, "ac3 eb3 ec3", Unlimited, true, true);
     }
 

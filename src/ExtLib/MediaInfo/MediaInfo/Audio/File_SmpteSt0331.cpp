@@ -40,36 +40,6 @@ namespace MediaInfoLib
 {
 
 //***************************************************************************
-// Infos
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-static const char* Smpte_St0331_ChannelsPositions(int8u number_channels)
-{
-    switch (number_channels)
-    {
-        case  2 : return "Front: L R";                                  //2 channels
-        case  4 : return "Front: L C R, LFE";                           //4 channels
-        case  6 : return "Front: L C R, Side: L R, LFE";                //6 channels
-        case  8 : return "Front: L C R, Side: L R, Back: L R, LFE";     //8 channels
-        default : return "";
-    }
-}
-
-//---------------------------------------------------------------------------
-static const char* Smpte_St0331_ChannelsPositions2(int8u number_channels)
-{
-    switch (number_channels)
-    {
-        case  2 : return "2/0/0.0";                                     //2 channels
-        case  4 : return "3/0/0.1";                                     //4 channels
-        case  6 : return "3/2/0.1";                                     //6 channels
-        case  8 : return "3/2/2.1";                                     //8 channels
-        default : return "";
-    }
-}
-
-//***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
 
@@ -114,8 +84,6 @@ void File_SmpteSt0331::Streams_Fill()
 
     Fill(Stream_Audio, 0, Audio_Format_Settings_Endianness, "Little");
     Fill(Stream_Audio, 0, Audio_Channel_s_, Channels_Count);
-    Fill(Stream_Audio, 0, Audio_ChannelPositions, Smpte_St0331_ChannelsPositions(Channels_Count));
-    Fill(Stream_Audio, 0, Audio_ChannelPositions_String2, Smpte_St0331_ChannelsPositions2(Channels_Count));
     if (QuantizationBits)
         Fill(Stream_Audio, 0, Audio_BitDepth, QuantizationBits);
 }

@@ -144,7 +144,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* Mpeg4v_Colorimetry[]=
+const char* Mpeg4v_ChromaSubsampling[]=
 {
     "",
     "4:2:0",
@@ -444,7 +444,7 @@ void File_Mpeg4v::Streams_Fill()
     Fill(Stream_Video, 0, Video_ColorSpace, rgb_components?"RGB":"YUV");
     Fill(Stream_Video, 0, Video_BitDepth, bits_per_pixel);
     if (chroma_format<4)
-        Fill(Stream_Video, 0, Video_Colorimetry, Mpeg4v_Colorimetry[chroma_format]);
+        Fill(Stream_Video, 0, Video_ChromaSubsampling, Mpeg4v_ChromaSubsampling[chroma_format]);
     if (colour_description)
     {
         Fill(Stream_Video, 0, Video_colour_description_present, "Yes");
@@ -891,7 +891,7 @@ void File_Mpeg4v::video_object_layer_start()
         if (shape!=2) //Shape!=BinaryOnly
         {
             Get_SB (   rgb_components,                          "rgb_components");
-            Get_S1 (2, chroma_format,                           "chroma_format"); Param_Info1(Mpeg4v_Colorimetry[chroma_format]);
+            Get_S1 (2, chroma_format,                           "chroma_format"); Param_Info1(Mpeg4v_ChromaSubsampling[chroma_format]);
             Get_S1 (4, bits_per_pixel,                          "bits_per_pixel");
         }
         if (shape==0) //Shape=Rectangular
@@ -941,7 +941,7 @@ void File_Mpeg4v::video_object_layer_start()
         Get_S1 (8, par_height,                                  "par_height");
     }
     TEST_SB_SKIP(                                               "vol_control_parameters");
-        Get_S1 (2, chroma_format,                               "chroma_format"); Param_Info1(Mpeg4v_Colorimetry[chroma_format]);
+        Get_S1 (2, chroma_format,                               "chroma_format"); Param_Info1(Mpeg4v_ChromaSubsampling[chroma_format]);
         Get_SB (   low_delay,                                   "low_delay");
         TEST_SB_SKIP(                                           "vbv_parameters");
             int16u first_half_bit_rate, latter_half_bit_rate, first_half_vbv_buffer_size, latter_half_vbv_buffer_size;

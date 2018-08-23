@@ -90,6 +90,25 @@ const char* Pcm_VOB_ChannelsPositions2(int8u channel_assignment)
     }
 }
 
+//---------------------------------------------------------------------------
+const char* Pcm_VOB_ChannelLayout(int8u channel_assignment)
+{
+    switch (channel_assignment)
+    {
+        case  1 : return "C";                                           //1 channel
+        case  3 : return "L R";                                         //2 channels
+        case  4 : return "L R C";                                       //3 channels
+        case  5 : return "L R LFE";                                     //3 channels
+        case  6 : return "L C R LFE";                                   //4 channels
+        case  7 : return "L R Ls Rs";                                   //4 channels
+        case  8 : return "L R C Ls Rs";                                 //5 channels
+        case  9 : return "L R C Ls Rs LFE";                             //6 channels
+        case 10 : return "L R C Ls Rs Lrs Rrs";                         //7 channels
+        case 11 : return "L R C Ls Rs Lrs Rrs LFE";                     //8 channels
+        default : return "";
+    }
+}
+
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -121,6 +140,7 @@ void File_Pcm_Vob::Streams_Fill()
     Fill(Stream_Audio, 0, Audio_Channel_s_, NumberOfChannelsMinusOne+1);
     Fill(Stream_Audio, 0, Audio_ChannelPositions, Pcm_VOB_ChannelsPositions(NumberOfChannelsMinusOne+1));
     Fill(Stream_Audio, 0, Audio_ChannelPositions_String2, Pcm_VOB_ChannelsPositions2(NumberOfChannelsMinusOne+1));
+    Fill(Stream_Audio, 0, Audio_ChannelLayout, Pcm_VOB_ChannelLayout(NumberOfChannelsMinusOne+1));
     Fill(Stream_Audio, 0, Audio_BitRate, Pcm_VOB_Frequency[Frequency]*(NumberOfChannelsMinusOne+1)*16);
 
     //PCM Signed 16 bits Big Endian, Interleavement is for 2 samples*2 channels L0-1/L0-0/R0-1/R0-0/L1-1/L1-0/R1-1/R1-0/L0-2/R0-2/L1-2/R1-2, http://wiki.multimedia.cx/index.php?title=PCM

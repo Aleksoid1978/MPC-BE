@@ -26,6 +26,7 @@
 #endif //defined(MEDIAINFO_DIRECTORY_YES)
 #include "MediaInfo/Reader/Reader_Directory.h"
 #include "MediaInfo/File__Analyse_Automatic.h"
+#include <algorithm>
 using namespace ZenLib;
 using namespace std;
 //---------------------------------------------------------------------------
@@ -94,7 +95,10 @@ size_t MediaInfoList_Internal::Open(const String &File_Name, const fileoptions_t
     #endif //defined(MEDIAINFO_FILE_YES)
     #if defined(MEDIAINFO_DIRECTORY_YES)
     else
+    {
         List=Dir::GetAllFileNames(File_Name, (Options&FileOption_NoRecursive)?Dir::Include_Files:((Dir::dirlist_t)(Dir::Include_Files|Dir::Parse_SubDirs)));
+        sort(List.begin(), List.end());
+    }
     #endif //defined(MEDIAINFO_DIRECTORY_YES)
 
     #if defined(MEDIAINFO_DIRECTORY_YES)
