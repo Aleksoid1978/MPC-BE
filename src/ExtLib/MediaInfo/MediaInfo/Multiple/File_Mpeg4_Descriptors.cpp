@@ -199,61 +199,154 @@ static const char* Mpeg4_Descriptors_SceneProfileLevelIndication(int8u ID)
 }
 
 //---------------------------------------------------------------------------
-static const char* Mpeg4_Descriptors_AudioProfileLevelIndication(int8u ID)
+static const char* Mpeg4_Descriptors_AudioProfileLevelIndication_Profile[]=
 {
-    switch (ID)
-    {
-        case    1 : return "Main@L1";
-        case    2 : return "Main@L2";
-        case    3 : return "Main@L3";
-        case    4 : return "Main@L4";
-        case    5 : return "Scalable@L1";
-        case    6 : return "Scalable@L2";
-        case    7 : return "Scalable@L3";
-        case    8 : return "Scalable@L4";
-        case    9 : return "Speech@L1";
-        case   10 : return "Speech@L2";
-        case   11 : return "Synthesis@L1";
-        case   12 : return "Synthesis@L2";
-        case   13 : return "Synthesis@L3";
-        case   14 : return "HighQualityAudio@L1";
-        case   15 : return "HighQualityAudio@L2";
-        case   16 : return "HighQualityAudio@L3";
-        case   17 : return "HighQualityAudio@L4";
-        case   18 : return "HighQualityAudio@L5";
-        case   19 : return "HighQualityAudio@L6";
-        case   20 : return "HighQualityAudio@L7";
-        case   21 : return "HighQualityAudio@L8";
-        case   22 : return "LowDelayAudio@L1";
-        case   23 : return "LowDelayAudio@L2";
-        case   24 : return "LowDelayAudio@L3";
-        case   25 : return "LowDelayAudio@L4";
-        case   26 : return "LowDelayAudio@L5";
-        case   27 : return "LowDelayAudio@L6";
-        case   28 : return "LowDelayAudio@L7";
-        case   29 : return "LowDelayAudio@L8";
-        case   30 : return "NaturalAudio@L1";
-        case   31 : return "NaturalAudio@L2";
-        case   32 : return "NaturalAudio@L3";
-        case   33 : return "NaturalAudio@L4";
-        case   34 : return "MobileAudioInternetworking@L1";
-        case   35 : return "MobileAudioInternetworking@L2";
-        case   36 : return "MobileAudioInternetworking@L3";
-        case   37 : return "MobileAudioInternetworking@L4";
-        case   38 : return "MobileAudioInternetworking@L5";
-        case   39 : return "MobileAudioInternetworking@L6";
-        case   40 : return "AAC@L1";
-        case   41 : return "AAC@L2";
-        case   42 : return "AAC@L4";
-        case   43 : return "AAC@L5";
-        case   44 : return "HighEfficiencyAAC@L2";
-        case   45 : return "HighEfficiencyAAC@L3";
-        case   46 : return "HighEfficiencyAAC@L4";
-        case   47 : return "HighEfficiencyAAC@L5";
-        case   59 : return "HighDefinitionAAC@L1";
-        case   60 : return "ALSSimple@L1";
-        default   : return "";
-    }
+    "",
+    "Main Audio",
+    "Scalable Audio",
+    "Speech Audio",
+    "Synthesis Audio",
+    "High Quality Audio",
+    "Low Delay Audio",
+    "Natural Audio",
+    "Mobile Audio Internetworking",
+    "AAC",
+    "High Efficiency AAC",
+    "High Efficiency AAC v2",
+    "Low Delay AAC",
+    "Baseline MPEG Surround",
+    "High Definition AAC",
+    "ALS Simple",
+    "Baseline USAC",
+    "Extended HE AAC",
+};
+enum profile
+{
+    NoProfile,
+    Main_Audio,
+    Scalable_Audio,
+    Speech_Audio,
+    Synthesis_Audio,
+    High_Quality_Audio,
+    Low_Delay_Audio,
+    Natural_Audio,
+    Mobile_Audio_Internetworking,
+    AAC,
+    High_Efficiency_AAC,
+    High_Efficiency_AAC_v2,
+    Low_Delay_AAC,
+    Baseline_MPEG_Surround,
+    High_Definition_AAC,
+    ALS_Simple,
+    Baseline_USAC,
+    Extended_HE_AAC,
+};
+struct profilelevel_struct
+{
+    int8u profile;
+    int8u level;
+};
+static const size_t Mpeg4_Descriptors_AudioProfileLevelIndication_Size=0x58;
+static const profilelevel_struct Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[Mpeg4_Descriptors_AudioProfileLevelIndication_Size]=
+{
+    { NoProfile, 0 },
+    { Main_Audio, 1 },
+    { Main_Audio, 2 },
+    { Main_Audio, 3 },
+    { Main_Audio, 4 },
+    { Scalable_Audio, 1 },
+    { Scalable_Audio, 2 },
+    { Scalable_Audio, 3 },
+    { Scalable_Audio, 4 },
+    { Speech_Audio, 1 },
+    { Speech_Audio, 2 },
+    { Synthesis_Audio, 1 },
+    { Synthesis_Audio, 2 },
+    { Synthesis_Audio, 3 },
+    { High_Quality_Audio, 1 },
+    { High_Quality_Audio, 2 },
+    { High_Quality_Audio, 3 },
+    { High_Quality_Audio, 4 },
+    { High_Quality_Audio, 5 },
+    { High_Quality_Audio, 6 },
+    { High_Quality_Audio, 7 },
+    { High_Quality_Audio, 8 },
+    { Low_Delay_Audio, 1 },
+    { Low_Delay_Audio, 2 },
+    { Low_Delay_Audio, 3 },
+    { Low_Delay_Audio, 4 },
+    { Low_Delay_Audio, 5 },
+    { Low_Delay_Audio, 6 },
+    { Low_Delay_Audio, 7 },
+    { Low_Delay_Audio, 8 },
+    { Natural_Audio, 1 },
+    { Natural_Audio, 2 },
+    { Natural_Audio, 3 },
+    { Natural_Audio, 4 },
+    { Mobile_Audio_Internetworking, 1 },
+    { Mobile_Audio_Internetworking, 2 },
+    { Mobile_Audio_Internetworking, 3 },
+    { Mobile_Audio_Internetworking, 4 },
+    { Mobile_Audio_Internetworking, 5 },
+    { Mobile_Audio_Internetworking, 6 },
+    { AAC, 1 },
+    { AAC, 2 },
+    { AAC, 4 },
+    { AAC, 5 },
+    { High_Efficiency_AAC, 2 },
+    { High_Efficiency_AAC, 3 },
+    { High_Efficiency_AAC, 4 },
+    { High_Efficiency_AAC, 5 },
+    { High_Efficiency_AAC_v2, 2 },
+    { High_Efficiency_AAC_v2, 3 },
+    { High_Efficiency_AAC_v2, 4 },
+    { High_Efficiency_AAC_v2, 5 },
+    { Low_Delay_AAC, 1 },
+    { Baseline_MPEG_Surround, 1 },
+    { Baseline_MPEG_Surround, 2 },
+    { Baseline_MPEG_Surround, 3 },
+    { Baseline_MPEG_Surround, 4 },
+    { Baseline_MPEG_Surround, 5 },
+    { Baseline_MPEG_Surround, 6 },
+    { High_Definition_AAC, 1 },
+    { ALS_Simple, 1 },
+    { NoProfile, 0 },
+    { NoProfile, 0 },
+    { NoProfile, 0 },
+    { NoProfile, 0 },
+    { NoProfile, 0 },
+    { NoProfile, 0 },
+    { NoProfile, 0 },
+    { Baseline_USAC, 1 },
+    { Baseline_USAC, 2 },
+    { Baseline_USAC, 3 },
+    { Baseline_USAC, 4 },
+    { Extended_HE_AAC, 1 },
+    { Extended_HE_AAC, 2 },
+    { Extended_HE_AAC, 3 },
+    { Extended_HE_AAC, 4 },
+    { NoProfile, 0 },
+    { NoProfile, 0 },
+    { NoProfile, 0 },
+    { NoProfile, 0 },
+    { AAC, 6 },
+    { AAC, 7 },
+    { High_Efficiency_AAC, 6 },
+    { High_Efficiency_AAC, 7 },
+    { High_Efficiency_AAC_v2, 6 },
+    { High_Efficiency_AAC_v2, 7 },
+    { Extended_HE_AAC, 6 },
+    { Extended_HE_AAC, 7 },
+};
+static const Ztring Mpeg4_Descriptors_AudioProfileLevelIndication(int8u AudioProfileLevelIndication)
+{
+    if (AudioProfileLevelIndication>=Mpeg4_Descriptors_AudioProfileLevelIndication_Size || Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[AudioProfileLevelIndication].profile==NoProfile)
+        return Ztring();
+    Ztring ToReturn;
+    ToReturn.From_UTF8(Mpeg4_Descriptors_AudioProfileLevelIndication_Profile[Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[AudioProfileLevelIndication].profile]);
+    ToReturn+=__T("@L");
+    ToReturn+=Ztring().From_Number(Mpeg4_Descriptors_AudioProfileLevelIndication_Mapping[AudioProfileLevelIndication].level);
+    return ToReturn;
 }
 
 //---------------------------------------------------------------------------
@@ -420,6 +513,7 @@ void File_Mpeg4_Descriptors::Data_Parse()
 void File_Mpeg4_Descriptors::Descriptor_01()
 {
     //Parsing
+    int8u ProfileLevel[5];
     bool URL_Flag;
     BS_Begin();
     Skip_S2(10,                                                 "ObjectDescriptorID");
@@ -433,16 +527,50 @@ void File_Mpeg4_Descriptors::Descriptor_01()
         Get_B1 (URLlength,                                      "URLlength");
         Skip_UTF8(URLlength,                                    "URLstring");
     }
-    if (Element_Code==0x02 || Element_Code==0x10)
+    else if (Element_Code==0x02 || Element_Code==0x10)
     {
-        Info_B1(ODProfileLevel,                                 "ODProfileLevelIndication"); Param_Info1(Mpeg4_Descriptors_ODProfileLevelIndication(ODProfileLevel));
-        Info_B1(SceneProfileLevel,                              "sceneProfileLevelIndication"); Param_Info1(Mpeg4_Descriptors_SceneProfileLevelIndication(SceneProfileLevel));
-        Info_B1(AudioProfileLevel,                              "audioProfileLevelIndication"); Param_Info1(Mpeg4_Descriptors_AudioProfileLevelIndication(AudioProfileLevel));
-        Info_B1(VisualProfileLevel,                             "visualProfileLevelIndication"); Param_Info1(Mpeg4v_Profile_Level(VisualProfileLevel));
-        Info_B1(GraphicsProfileLevel,                           "graphicsProfileLevelIndication"); Param_Info1(Mpeg4_Descriptors_GraphicsProfileLevelIndication(GraphicsProfileLevel));
+        Get_B1 (ProfileLevel[0],                                "ODProfileLevelIndication"); Param_Info1(Mpeg4_Descriptors_ODProfileLevelIndication(ProfileLevel[0]));
+        Get_B1 (ProfileLevel[1],                                "sceneProfileLevelIndication"); Param_Info1(Mpeg4_Descriptors_SceneProfileLevelIndication(ProfileLevel[1]));
+        Get_B1 (ProfileLevel[2],                                "audioProfileLevelIndication"); Param_Info1(Mpeg4_Descriptors_AudioProfileLevelIndication(ProfileLevel[2]));
+        Get_B1 (ProfileLevel[3],                                "visualProfileLevelIndication"); Param_Info1(Mpeg4v_Profile_Level(ProfileLevel[3]));
+        Get_B1 (ProfileLevel[4],                                "graphicsProfileLevelIndication"); Param_Info1(Mpeg4_Descriptors_GraphicsProfileLevelIndication(ProfileLevel[4]));
     }
 
     FILLING_BEGIN();
+        if (Element_Code==0x10)
+        {
+            //Clear
+            ES_ID_Infos.clear();
+
+            //Fill
+            int8u ProfileLevel_Count=0;
+            for (int8u i=0; i<5; i++)
+                if (ProfileLevel[i]!=0xFF)
+                    ProfileLevel_Count++;
+            if (ProfileLevel_Count==1)
+            {
+                for (int8u i=0; i<5; i++)
+                {
+                    if (ProfileLevel[i]!=0xFF)
+                    {
+                        es_id_info& ES_ID_Info=ES_ID_Infos[(int32u)-1];
+                        switch (i)
+                        {
+                            case  2 :   ES_ID_Info.StreamKind=Stream_Audio; 
+                                        ES_ID_Info.ProfileLevel=Mpeg4_Descriptors_AudioProfileLevelIndication(ProfileLevel[i]);
+                                        break;
+                            case  3 :
+                                        ES_ID_Info.StreamKind=Stream_Video;
+                                        ES_ID_Info.ProfileLevel=Mpeg4v_Profile_Level(ProfileLevel[i]);
+                                        break;
+                            default :   ;
+                        }
+                        if (ES_ID_Info.ProfileLevel.empty() && ProfileLevel[i]!=0xFE)
+                            ES_ID_Info.ProfileLevel.From_Number(ProfileLevel[i]);
+                    }
+                }
+            }
+        }
         Element_ThisIsAList();
     FILLING_END();
 }
@@ -548,7 +676,7 @@ void File_Mpeg4_Descriptors::Descriptor_04()
             case 0x20 : Fill(Stream_Video   , StreamPos_Last, Video_Format, "MPEG-4 Visual", Error, false, true); break;
             case 0x21 : Fill(Stream_Video   , StreamPos_Last, Video_Format, "AVC", Error, false, true); break;
             //case 0x22 Parameter Sets for AVC
-            case 0x40 : Fill(Stream_Audio   , StreamPos_Last, Audio_Format, "AAC", Error, false, true); break; //MPEG-4 AAC
+            case 0x40 : break; //MPEG-4 Audio (several formats are possible)
             case 0x60 : Fill(Stream_Video   , StreamPos_Last, Video_Format, "MPEG Video", Error, false, true); Fill(Stream_Video, StreamPos_Last, Video_Format_Profile, "Simple" , Error, false, true); Fill(Stream_Video, StreamPos_Last, Video_Format_Version, "Version 2", Error, false, true); break; //MPEG-2V Simple
             case 0x61 : Fill(Stream_Video   , StreamPos_Last, Video_Format, "MPEG Video", Error, false, true); Fill(Stream_Video, StreamPos_Last, Video_Format_Profile, "Main"   , Error, false, true); Fill(Stream_Video, StreamPos_Last, Video_Format_Version, "Version 2", Error, false, true); break; //MPEG-2V Main
             case 0x62 : Fill(Stream_Video   , StreamPos_Last, Video_Format, "MPEG Video", Error, false, true); Fill(Stream_Video, StreamPos_Last, Video_Format_Profile, "SNR"    , Error, false, true); Fill(Stream_Video, StreamPos_Last, Video_Format_Version, "Version 2", Error, false, true); break; //MPEG-2V SNR
@@ -634,8 +762,10 @@ void File_Mpeg4_Descriptors::Descriptor_04()
          && !(bufferSizeDB==AvgBitrate && bufferSizeDB==MaxBitrate && bufferSizeDB==0x1000)) //Some buggy data were found
         {
             Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_BitRate_Nominal), AvgBitrate);
-            if (MaxBitrate<=AvgBitrate*1.005)
+            if (!MaxBitrate || (MaxBitrate>=AvgBitrate && MaxBitrate<=AvgBitrate*1.005))
+            {
                 Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_BitRate_Mode), "CBR");
+            }
             else
             {
                 Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_BitRate_Mode), "VBR");
@@ -974,7 +1104,14 @@ void File_Mpeg4_Descriptors::Descriptor_09()
 void File_Mpeg4_Descriptors::Descriptor_0E()
 {
     //Parsing
-    Skip_B4(                                                    "Track_ID"); //ID of the track to use
+    int32u Track_ID;
+    Get_B4 (Track_ID,                                           "Track_ID"); //ID of the track to use
+
+    FILLING_BEGIN();
+        es_id_infos::iterator ES_ID_Info=ES_ID_Infos.find((int32u)-1);
+        if (ES_ID_Info!=ES_ID_Infos.end())
+            ES_ID_Infos[Track_ID]=ES_ID_Info->second;
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------

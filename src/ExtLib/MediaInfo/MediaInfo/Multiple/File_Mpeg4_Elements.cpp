@@ -1405,7 +1405,6 @@ void File_Mpeg4::ftyp()
     FILLING_BEGIN();
         Accept("MPEG-4");
 
-        Fill(Stream_General, 0, General_Format, "MPEG-4");
         for (size_t Pos=0; Pos<ftyps.size(); Pos++)
             switch (ftyps[Pos])
             {
@@ -1414,6 +1413,8 @@ void File_Mpeg4::ftyp()
                 default : ;
             }
         CodecID_Fill(Ztring().From_CC4(MajorBrand), Stream_General, 0, InfoCodecID_Format_Mpeg4);
+        if (Retrieve_Const(Stream_General, 0, General_Format).empty())
+            Fill(Stream_General, 0, General_Format, Ztring().From_CC4(MajorBrand));
         Ztring CodecID_String=Ztring().From_CC4(MajorBrand);
         if (MajorBrand==Elements::ftyp_qt)
         {
@@ -4130,6 +4131,22 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_tmcd()
         Parser->NumberOfFrames=NumberOfFrames; //tc->FrameDuration?(((float64)tc->TimeScale)/tc->FrameDuration):0;
         Parser->DropFrame=tc->DropFrame;
         Parser->NegativeTimes=tc->NegativeTimes;
+
+        //Get delay from timecode track's edit list
+        int64s FrameDurationInMediaUnits = tc->FrameDuration * Streams[moov_trak_tkhd_TrackID].mdhd_TimeScale;
+        if (FrameDurationInMediaUnits > 0)
+        {
+            for (size_t i = 0; i < Streams[moov_trak_tkhd_TrackID].edts.size(); ++i)
+            {
+                const stream::edts_struct& Edit = Streams[moov_trak_tkhd_TrackID].edts[i];
+                if (Edit.Delay != (int32u)-1)
+                {
+                    //Inform parser of offset (in TC frames) due to edit list
+                    Parser->FirstEditOffset = Edit.Delay * tc->TimeScale / FrameDurationInMediaUnits;
+                    break;
+                }
+            }
+        }
         Streams[moov_trak_tkhd_TrackID].Parsers.push_back(Parser);
         mdat_MustParse=true; //Data is in MDAT
     FILLING_ELSE();
@@ -4338,9 +4355,23 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxSound()
 {
     Element_Name("Audio");
 
-    int64s SampleRate;
-    int32u Channels, SampleSize, Flags=0;
+    int64s SampleRate=0;
+    int32u Channels=0, SampleSize=0, Flags=0;
     int16u Version, ID;
+    if (!IsQt() && Element_Code==0x6D703461) // like ISO MP4 and CodecID is mp4a
+    {
+        int16u SampleRate16;
+        Skip_B4(                                                "reserved (0)");
+        Skip_B4(                                                "reserved (0)");
+        Skip_B2(                                                "reserved (2)");
+        Skip_B2(                                                "reserved (16)");
+        Skip_B4(                                                "reserved (0)");
+        Get_B2 (SampleRate16,                                   "time-scale");
+        Skip_B2(                                                "reserved (0)");
+        SampleRate=SampleRate16;
+    }
+    else
+    {
     Get_B2 (Version,                                            "Version");
     Skip_B2(                                                    "Revision level");
     Skip_C4(                                                    "Vendor");
@@ -4387,6 +4418,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxSound()
     {
         Skip_XX(Element_Size,                                   "Unknown");
         return;
+    }
     }
 
     //Bug found in one file: sample size is 16 with a 24-bit CodecID ("in24")
@@ -4670,7 +4702,8 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxSound()
             mdat_MustParse=true; //Data is in MDAT
         }
 
-        Fill(Stream_Audio, StreamPos_Last, Audio_Channel_s_, Channels, 10, true);
+        if (Channels)
+            Fill(Stream_Audio, StreamPos_Last, Audio_Channel_s_, Channels, 10, true);
         if (SampleSize!=0 && Element_Code!=0x6D703461 && (Element_Code&0xFFFF0000)!=0x6D730000 && Retrieve(Stream_Audio, StreamPos_Last, Audio_BitDepth).empty()) //if not mp4a, and not ms*
             Fill(Stream_Audio, StreamPos_Last, Audio_BitDepth, SampleSize, 10, true);
         Fill(Stream_Audio, StreamPos_Last, Audio_SamplingRate, SampleRate, 10, true);

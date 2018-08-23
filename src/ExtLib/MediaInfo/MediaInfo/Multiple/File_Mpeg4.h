@@ -13,6 +13,7 @@
 #include "MediaInfo/File__Analyze.h"
 #include "MediaInfo/File__HasReferences.h"
 #include "MediaInfo/MediaInfo_Internal.h"
+#include "MediaInfo/Multiple/File_Mpeg4_Descriptors.h"
 class File_MpegPs;
 //---------------------------------------------------------------------------
 
@@ -302,6 +303,7 @@ private :
     bool Element_Name_Get();
     bool Element_Size_Get();
     Ztring Language_Get(int16u Language);
+    bool IsQt();
     enum method
     {
         Method_None,
@@ -537,6 +539,7 @@ private :
     typedef std::map<int32u, stream> streams;
     streams             Streams;
     streams::iterator   Stream;
+    File_Mpeg4_Descriptors::es_id_infos ES_ID_Infos;
     #if MEDIAINFO_NEXTPACKET
         bool                    ReferenceFiles_IsParsing;
     #endif //MEDIAINFO_NEXTPACKET

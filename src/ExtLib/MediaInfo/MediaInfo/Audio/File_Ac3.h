@@ -140,6 +140,7 @@ private :
     int16u frmsizplus1_Max[8][9];
     int16u HD_BitRate_Max;
     int16u HD_Channels2;
+    int16u HD_flags;
     int8u  num_dynamic_objects;
     int8u  fscod;
     int8u  fscod2;

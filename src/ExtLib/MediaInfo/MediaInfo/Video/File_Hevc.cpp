@@ -295,7 +295,7 @@ void File_Hevc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator se
         Fill(Stream_Video, StreamPos_Last, Video_Stored_Height, (*seq_parameter_set_Item)->pic_height_in_luma_samples);
 
     Fill(Stream_Video, 0, Video_ColorSpace, Hevc_chroma_format_idc_ColorSpace((*seq_parameter_set_Item)->chroma_format_idc));
-    Fill(Stream_Video, 0, Video_Colorimetry, Hevc_chroma_format_idc((*seq_parameter_set_Item)->chroma_format_idc));
+    Fill(Stream_Video, 0, Video_ChromaSubsampling, Hevc_chroma_format_idc((*seq_parameter_set_Item)->chroma_format_idc));
     if ((*seq_parameter_set_Item)->bit_depth_luma_minus8==(*seq_parameter_set_Item)->bit_depth_chroma_minus8)
         Fill(Stream_Video, 0, Video_BitDepth, (*seq_parameter_set_Item)->bit_depth_luma_minus8+8);
 

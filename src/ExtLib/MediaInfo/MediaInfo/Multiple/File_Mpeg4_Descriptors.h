@@ -38,6 +38,17 @@ public :
     //Out
     File__Analyze* Parser;
     int16u ES_ID;
+    struct es_id_info
+    {
+        stream_t    StreamKind;
+        Ztring      ProfileLevel;
+
+        es_id_info() :
+            StreamKind(Stream_Max)
+        {}
+    };
+    typedef map<int32u, es_id_info> es_id_infos;
+    es_id_infos ES_ID_Infos;
 
     struct slconfig
     {

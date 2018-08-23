@@ -210,7 +210,7 @@ void File_AvsV::Streams_Fill()
     }
     else if (AvsV_aspect_ratio[aspect_ratio])
         Fill(Stream_Video, StreamPos_Last, Video_DisplayAspectRatio, AvsV_aspect_ratio[aspect_ratio], 3, true);
-    Fill(Stream_Video, 0, Video_Colorimetry, AvsV_chroma_format[chroma_format]);
+    Fill(Stream_Video, 0, Video_ChromaSubsampling, AvsV_chroma_format[chroma_format]);
     if (progressive_frame_Count && progressive_frame_Count!=Frame_Count)
     {
         //This is mixed

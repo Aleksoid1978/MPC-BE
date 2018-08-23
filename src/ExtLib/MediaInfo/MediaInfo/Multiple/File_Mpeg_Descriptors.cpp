@@ -861,7 +861,7 @@ const char* Mpeg_Descriptors_MPEG_4_audio_profile_and_level(int8u MPEG_4_audio_p
 
 //---------------------------------------------------------------------------
 extern const float64 Mpegv_frame_rate[16]; //In Video/File_Mpegv.cpp
-extern const char*  Mpegv_Colorimetry_format[]; //In Video/File_Mpegv.cpp
+extern const char*  Mpegv_chroma_format[]; //In Video/File_Mpegv.cpp
 extern const char*  Mpegv_profile_and_level_indication_profile[]; //In Video/File_Mpegv.cpp
 extern const char*  Mpegv_profile_and_level_indication_level[]; //In Video/File_Mpegv.cpp
 
@@ -1565,7 +1565,7 @@ void File_Mpeg_Descriptors::Descriptor_02()
         Skip_SB(                                                "profile_and_level_indication_escape");
         Get_S1 (3, profile_and_level_indication_profile,        "profile_and_level_indication_profile"); Param_Info1(Mpegv_profile_and_level_indication_profile[profile_and_level_indication_profile]);
         Get_S1 (4, profile_and_level_indication_level,          "profile_and_level_indication_level"); Param_Info1(Mpegv_profile_and_level_indication_level[profile_and_level_indication_level]);
-        Get_S1 (2, chroma_format,                               "chroma_format"); Param_Info1(Mpegv_Colorimetry_format[chroma_format]);
+        Get_S1 (2, chroma_format,                               "chroma_format"); Param_Info1(Mpegv_chroma_format[chroma_format]);
         Get_SB (   frame_rate_extension_flag,                   "frame_rate_extension_flag");
         Skip_S1(5,                                              "reserved");
     }
@@ -1581,7 +1581,7 @@ void File_Mpeg_Descriptors::Descriptor_02()
                             if (!multiple_frame_rate_flag && !frame_rate_extension_flag && frame_rate_code)
                                 Complete_Stream->Streams[elementary_PID]->Infos["FrameRate"]=Ztring::ToZtring(Mpegv_frame_rate[frame_rate_code]);
                             Complete_Stream->Streams[elementary_PID]->Infos["Format_Version"]=MPEG_1_only_flag?__T("Version 1"):__T("Version 2");
-                            Complete_Stream->Streams[elementary_PID]->Infos["Colorimetry"]=Mpegv_Colorimetry_format[chroma_format];
+                            Complete_Stream->Streams[elementary_PID]->Infos["ChromaSubsampling"]=Mpegv_chroma_format[chroma_format];
                             if (profile_and_level_indication_profile)
                             {
                                 Complete_Stream->Streams[elementary_PID]->Infos["Format_Profile"]=Ztring().From_Local(Mpegv_profile_and_level_indication_profile[profile_and_level_indication_profile])+__T("@")+Ztring().From_Local(Mpegv_profile_and_level_indication_level[profile_and_level_indication_level]);

@@ -63,7 +63,7 @@ static const char* Vc1_Profile[]=
 };
 
 //---------------------------------------------------------------------------
-static const char* Vc1_ColorimetryFormat[]=
+static const char* Vc1_ChromaSubsamplingFormat[]=
 {
     "",
     "4:2:0",
@@ -288,7 +288,7 @@ void File_Vc1::Streams_Fill()
     Fill(Stream_Video, 0, Video_Format_Profile, Profile);
     Fill(Stream_Video, 0, Video_Codec_Profile, Profile);
     Fill(Stream_Video, 0, Video_ColorSpace, "YUV");
-    Fill(Stream_Video, 0, Video_Colorimetry, Vc1_ColorimetryFormat[colordiff_format]);
+    Fill(Stream_Video, 0, Video_ChromaSubsampling, Vc1_ChromaSubsamplingFormat[colordiff_format]);
     if (coded_width && coded_height)
     {
         Fill(Stream_Video, StreamPos_Last, Video_Width, (coded_width+1)*2);
@@ -1085,7 +1085,7 @@ void File_Vc1::SequenceHeader()
     else if (profile==3) //Advanced
     {
         Get_S1 ( 3, level,                                      "level");
-        Get_S1 ( 2, colordiff_format,                           "colordiff_format"); Param_Info1(Vc1_ColorimetryFormat[colordiff_format]);
+        Get_S1 ( 2, colordiff_format,                           "colordiff_format"); Param_Info1(Vc1_ChromaSubsamplingFormat[colordiff_format]);
         Skip_S1( 3,                                             "frmrtq_postproc");
         Skip_S1( 5,                                             "bitrtq_postproc");
         Skip_SB(                                                "postprocflag");

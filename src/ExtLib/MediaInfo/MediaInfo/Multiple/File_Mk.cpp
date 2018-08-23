@@ -678,9 +678,8 @@ static Ztring Mk_ID_String_From_Source_ID (const Ztring &Value)
 
 //---------------------------------------------------------------------------
 extern std::string ExtensibleWave_ChannelMask (int32u ChannelMask);
-
-//---------------------------------------------------------------------------
 extern std::string ExtensibleWave_ChannelMask2 (int32u ChannelMask);
+extern std::string ExtensibleWave_ChannelMask_ChannelLayout(int32u ChannelMask);
 
 //---------------------------------------------------------------------------
 const char* Mpegv_colour_primaries(int8u colour_primaries);
@@ -3507,6 +3506,7 @@ void File_Mk::Segment_Tracks_TrackEntry_CodecPrivate_auds_ExtensibleWave(int16u 
         }
         Fill(Stream_Audio, StreamPos_Last, Audio_ChannelPositions, ExtensibleWave_ChannelMask(ChannelMask));
         Fill(Stream_Audio, StreamPos_Last, Audio_ChannelPositions_String2, ExtensibleWave_ChannelMask2(ChannelMask));
+        Fill(Stream_Audio, StreamPos_Last, Audio_ChannelLayout, ExtensibleWave_ChannelMask_ChannelLayout(ChannelMask));
     FILLING_END();
 }
 

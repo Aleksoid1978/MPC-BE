@@ -167,7 +167,7 @@ void File_H263::Streams_Fill()
     Fill(Stream_Video, 0, Video_Width, H263_Source_Format_Width[Source_Format]);
     Fill(Stream_Video, 0, Video_Height, H263_Source_Format_Height[Source_Format]);
     Fill(Stream_Video, 0, Video_ColorSpace, "YUV");
-    Fill(Stream_Video, 0, Video_Colorimetry, "4:2:0");
+    Fill(Stream_Video, 0, Video_ChromaSubsampling, "4:2:0");
     Fill(Stream_Video, 0, Video_BitDepth, 8);
     Fill(Stream_Video, 0, Video_PixelAspectRatio, ((float32)PAR_W)/PAR_H, 3);
 }

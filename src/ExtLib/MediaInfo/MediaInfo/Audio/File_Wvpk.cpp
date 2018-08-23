@@ -94,6 +94,9 @@ static const char* Wvpk_id(int8u ID)
     }
 }
 
+//---------------------------------------------------------------------------
+extern std::string ExtensibleWave_ChannelMask_ChannelLayout(int32u ChannelMask); //In Multiple/File_Riff_Elements.cpp
+                                                                                 
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -548,6 +551,7 @@ void File_Wvpk::Data_Parse_Fill()
         }
         Fill(Stream_Audio, 0, Audio_ChannelPositions, Channels_Positions);
         Fill(Stream_Audio, 0, Audio_ChannelPositions_String2, Channels_Positions2);
+        Fill(Stream_Audio, 0, Audio_ChannelLayout, ExtensibleWave_ChannelMask_ChannelLayout(channel_mask));
     }
 
     if (!FromMKV && SamplingRate<15)

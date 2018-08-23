@@ -64,6 +64,18 @@ static const char*  Opus_ChannelPositions2[]=
     "3/2/3",
 };
 
+//---------------------------------------------------------------------------
+static const char*  Opus_ChannelLayout[]=
+{
+    "",
+    "C",
+    "L R",
+    "L R C",
+    "L R BL BR",
+    "L R C SL SR LFE",
+    "L R C SL SR BC LFE",
+    "L R C SL SR BL BR LFE",
+};
 
 //***************************************************************************
 // Constructor/Destructor
@@ -154,10 +166,13 @@ void File_Opus::Identification()
                     {
                     Ztring ChannelPositions; ChannelPositions.From_Local(Opus_ChannelPositions[ch_count]);
                     Ztring ChannelPositions2; ChannelPositions2.From_Local(Opus_ChannelPositions2[ch_count]);
+                    Ztring ChannelLayout2; ChannelLayout2.From_Local(Opus_ChannelLayout[ch_count]);
                     if (ChannelPositions!=Retrieve(Stream_Audio, 0, Audio_ChannelPositions))
                         Fill(Stream_Audio, 0, Audio_ChannelPositions, ChannelPositions);
                     if (ChannelPositions2!=Retrieve(Stream_Audio, 0, Audio_ChannelPositions_String2))
                         Fill(Stream_Audio, 0, Audio_ChannelPositions_String2, ChannelPositions2);
+                    if (ChannelLayout2!=Retrieve(Stream_Audio, 0, Audio_ChannelLayout))
+                        Fill(Stream_Audio, 0, Audio_ChannelLayout, ChannelLayout2);
                     }
             default: ; //Unknown
         }

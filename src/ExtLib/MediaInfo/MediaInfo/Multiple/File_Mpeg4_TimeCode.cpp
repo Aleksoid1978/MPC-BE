@@ -40,6 +40,7 @@ File_Mpeg4_TimeCode::File_Mpeg4_TimeCode()
     //Out
     Pos=(int32u)-1;
 
+    FirstEditOffset=0;
     NumberOfFrames=0;
     DropFrame=false;
     NegativeTimes=false;
@@ -99,7 +100,7 @@ void File_Mpeg4_TimeCode::Read_Buffer_Continue()
         Get_B4 (Position,                                       "Position");
         if (Pos==(int32u)-1) //First time code
         {
-            Pos=Position;
+            Pos=Position + FirstEditOffset;
             if (NegativeTimes)
                 Pos=(int32s)Position;
             if (Config->ParseSpeed<=1.0 && Element_Offset!=Element_Size)

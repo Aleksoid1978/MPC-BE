@@ -88,6 +88,7 @@ static int8u Pcm_M2TS_bits_per_sample[4]=
 //---------------------------------------------------------------------------
 extern const char* Pcm_VOB_ChannelsPositions(int8u channel_assignment);
 extern const char* Pcm_VOB_ChannelsPositions2(int8u channel_assignment);
+extern const char* Pcm_VOB_ChannelLayout(int8u channel_assignment);
 
 //***************************************************************************
 // Constructor/Destructor
@@ -126,6 +127,7 @@ void File_Pcm_M2ts::Streams_Fill()
         Fill(Stream_Audio, 0, Audio_Channel_s_, Channels);
         Fill(Stream_Audio, 0, Audio_ChannelPositions, Pcm_VOB_ChannelsPositions(channel_assignment));
         Fill(Stream_Audio, 0, Audio_ChannelPositions_String2, Pcm_VOB_ChannelsPositions2(channel_assignment));
+        Fill(Stream_Audio, 0, Audio_ChannelLayout, Pcm_VOB_ChannelLayout(channel_assignment));
         if (Pcm_M2TS_sampling_frequency[sampling_frequency] && Pcm_M2TS_bits_per_sample[bits_per_sample])
         {
             if (Channels%2)

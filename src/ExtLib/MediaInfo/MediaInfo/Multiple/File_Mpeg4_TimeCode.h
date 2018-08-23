@@ -27,6 +27,7 @@ public :
     int8u   NumberOfFrames;
     bool    DropFrame;
     bool    NegativeTimes;
+    int64s  FirstEditOffset;
 
     //Out
     int64s  Pos;

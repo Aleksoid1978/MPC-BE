@@ -437,7 +437,7 @@ void File_Dirac::Streams_Fill()
     }
     if (frame_rate)
         Fill(Stream_Video, StreamPos_Last, Video_FrameRate, frame_rate);
-    Fill(Stream_Video, 0, Video_Colorimetry, Dirac_chroma_format(chroma_format));
+    Fill(Stream_Video, 0, Video_ChromaSubsampling, Dirac_chroma_format(chroma_format));
     Fill(Stream_Video, 0, Video_ScanType, Dirac_source_sampling(source_sampling));
     Fill(Stream_Video, 0, Video_Interlacement, Dirac_source_sampling_Codec(source_sampling));
 }

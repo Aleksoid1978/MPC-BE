@@ -255,7 +255,6 @@ void MediaInfo_Config::Init()
         ExternalMetaDataConfig=Ztring();
     #endif //defined(MEDIAINFO_EBUCORE_YES) || defined(MEDIAINFO_NISO_YES)
 
-    Verbosity=0;
     Complete=0;
     BlockMethod=0;
     Internet=0;
@@ -275,8 +274,8 @@ void MediaInfo_Config::Init()
     Trace_Format=Trace_Format_Tree;
     Language_Raw=false;
     ReadByHuman=true;
-    Legacy=true;
-    LegacyStreamDisplay=true;
+    Legacy=false;
+    LegacyStreamDisplay=false;
     SkipBinaryData=false;
     Demux=0;
     LineSeparator=EOL;
@@ -285,6 +284,7 @@ void MediaInfo_Config::Init()
     Quote=__T("\"");
     DecimalPoint=__T(".");
     ThousandsPoint=Ztring();
+    CarriageReturnReplace=__T(" / ");
     #if MEDIAINFO_EVENTS
         Event_CallBackFunction=NULL;
         Event_UserHandler=NULL;
@@ -725,6 +725,17 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
     if (Option_Lower==__T("thousandspoint_get"))
     {
         return ThousandsPoint_Get();
+    }
+    if (Option_Lower==__T("carriagereturnreplace"))
+    {
+        if (Value.find_first_of(__T("\r\n"))!=string::npos)
+            return __T("\\r or \\n in CarriageReturnReplace is not supported");
+        CarriageReturnReplace_Set(Value);
+        return Ztring();
+    }
+    if (Option_Lower==__T("carriagereturnreplace_get"))
+    {
+        return CarriageReturnReplace_Get();
     }
     if (Option_Lower==__T("streammax"))
     {
@@ -1764,6 +1775,19 @@ Ztring MediaInfo_Config::ThousandsPoint_Get ()
 {
     CriticalSectionLocker CSL(CS);
     return ThousandsPoint;
+}
+
+//---------------------------------------------------------------------------
+void MediaInfo_Config::CarriageReturnReplace_Set (const Ztring &NewValue)
+{
+    CriticalSectionLocker CSL(CS);
+    CarriageReturnReplace=NewValue;
+}
+
+Ztring MediaInfo_Config::CarriageReturnReplace_Get ()
+{
+    CriticalSectionLocker CSL(CS);
+    return CarriageReturnReplace;
 }
 
 //---------------------------------------------------------------------------
@@ -3011,10 +3035,16 @@ size_t MediaInfo_Config::AcquisitionDataOutputMode_Get ()
     return AcquisitionDataOutputMode;
 }
 #endif // MEDIAINFO_EBUCORE_YES
-#if defined(MEDIAINFO_EBUCORE_YES) || defined(MEDIAINFO_NISO_YES)
+#if defined(MEDIAINFO_EBUCORE_YES) || defined(MEDIAINFO_NISO_YES) || MEDIAINFO_ADVANCED
 void MediaInfo_Config::ExternalMetadata_Set(Ztring Value)
 {
     CriticalSectionLocker CSL(CS);
+    if (!ExternalMetadata.empty() && !Value.empty() && Value.find_first_of(__T("\r\n"))==string::npos) //Exception: if new value is on a single line, we add content to the previous content
+    {
+        ExternalMetadata+=LineSeparator;
+        ExternalMetadata+=Value;
+        return;
+    }
     ExternalMetadata=Value;
 }
 
@@ -3035,7 +3065,7 @@ Ztring MediaInfo_Config::ExternalMetaDataConfig_Get ()
     CriticalSectionLocker CSL(CS);
     return ExternalMetaDataConfig;
 }
-#endif //defined(MEDIAINFO_EBUCORE_YES) || defined(MEDIAINFO_NISO_YES)
+#endif //defined(MEDIAINFO_EBUCORE_YES) || defined(MEDIAINFO_NISO_YES) || MEDIAINFO_ADVANCED
 
 //***************************************************************************
 // Event

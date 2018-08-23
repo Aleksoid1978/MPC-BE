@@ -254,7 +254,7 @@ const char* Mpegv_matrix_coefficients(int8u matrix_coefficients);
 const char* Mpegv_matrix_coefficients_ColorSpace(int8u matrix_coefficients);
 
 //---------------------------------------------------------------------------
-static const char* Avc_Colorimetry_format_idc(int8u chroma_format_idc)
+static const char* Avc_ChromaSubsampling_format_idc(int8u chroma_format_idc)
 {
     switch (chroma_format_idc)
     {
@@ -266,7 +266,7 @@ static const char* Avc_Colorimetry_format_idc(int8u chroma_format_idc)
 }
 
 //---------------------------------------------------------------------------
-static const char* Avc_Colorimetry_format_idc_ColorSpace(int8u chroma_format_idc)
+static const char* Avc_ChromaSubsampling_format_idc_ColorSpace(int8u chroma_format_idc)
 {
     switch (chroma_format_idc)
     {
@@ -923,8 +923,8 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
         Fill(Stream_Video, 0, Video_Codec_Settings_RefFrames, (*seq_parameter_set_Item)->max_num_ref_frames);
     }
     if (Retrieve(Stream_Video, 0, Video_ColorSpace).empty())
-        Fill(Stream_Video, 0, Video_ColorSpace, Avc_Colorimetry_format_idc_ColorSpace((*seq_parameter_set_Item)->chroma_format_idc));
-    Fill(Stream_Video, 0, Video_Colorimetry, Avc_Colorimetry_format_idc((*seq_parameter_set_Item)->chroma_format_idc));
+        Fill(Stream_Video, 0, Video_ColorSpace, Avc_ChromaSubsampling_format_idc_ColorSpace((*seq_parameter_set_Item)->chroma_format_idc));
+    Fill(Stream_Video, 0, Video_ChromaSubsampling, Avc_ChromaSubsampling_format_idc((*seq_parameter_set_Item)->chroma_format_idc));
     if ((*seq_parameter_set_Item)->bit_depth_luma_minus8==(*seq_parameter_set_Item)->bit_depth_chroma_minus8)
         Fill(Stream_Video, 0, Video_BitDepth, (*seq_parameter_set_Item)->bit_depth_luma_minus8+8);
 }
@@ -3902,7 +3902,7 @@ File_Avc::seq_parameter_set_struct* File_Avc::seq_parameter_set_data(int32u &Dat
         case 128 :  //High profiles
         case 138 :
                     Element_Begin1("high profile specific");
-                    Get_UE (chroma_format_idc,                  "chroma_format_idc"); Param_Info1C((chroma_format_idc<3), Avc_Colorimetry_format_idc(chroma_format_idc));
+                    Get_UE (chroma_format_idc,                  "chroma_format_idc"); Param_Info1C((chroma_format_idc<3), Avc_ChromaSubsampling_format_idc(chroma_format_idc));
                     if (chroma_format_idc==3)
                         Get_SB (separate_colour_plane_flag,     "separate_colour_plane_flag");
                     Get_UE (bit_depth_luma_minus8,              "bit_depth_luma_minus8");

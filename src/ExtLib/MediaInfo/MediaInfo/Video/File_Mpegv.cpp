@@ -162,7 +162,7 @@ extern const float64 Mpegv_frame_rate[16]=
 };
 
 //---------------------------------------------------------------------------
-const char* Mpegv_Colorimetry_format[4]=
+const char* Mpegv_chroma_format[4]=
 {
     "",
     "4:2:0",
@@ -171,7 +171,7 @@ const char* Mpegv_Colorimetry_format[4]=
 };
 
 //---------------------------------------------------------------------------
-const char* Mpegv_Colorimetry_format_Colorspace[4] =
+const char* Mpegv_chroma_format_Colorspace[4] =
 {
     "",
     "YUV",
@@ -1274,8 +1274,8 @@ void File_Mpegv::Streams_Fill()
 
     Fill(Stream_Video, 0, Video_Width, 0x1000*horizontal_size_extension+horizontal_size_value);
     Fill(Stream_Video, 0, Video_Height, 0x1000*vertical_size_extension+vertical_size_value);
-    Fill(Stream_Video, 0, Video_Colorimetry, Mpegv_Colorimetry_format[chroma_format]);
-    Fill(Stream_Video, 0, Video_ColorSpace, Mpegv_Colorimetry_format_Colorspace[chroma_format]);
+    Fill(Stream_Video, 0, Video_ChromaSubsampling, Mpegv_chroma_format[chroma_format]);
+    Fill(Stream_Video, 0, Video_ColorSpace, Mpegv_chroma_format_Colorspace[chroma_format]);
     Fill(Stream_Video, 0, Video_BitDepth, 8);
 
     //AspectRatio
@@ -3762,7 +3762,7 @@ void File_Mpegv::extension_start()
                         Get_S1 ( 4, profile_and_level_indication_level, "profile_and_level_indication_level"); Param_Info1(Mpegv_profile_and_level_indication_level[profile_and_level_indication_level]);
                     }
                     Get_SB (    progressive_sequence,           "progressive_sequence");
-                    Get_S1 ( 2, chroma_format,                  "chroma_format"); Param_Info1(Mpegv_Colorimetry_format[chroma_format]);
+                    Get_S1 ( 2, chroma_format,                  "chroma_format"); Param_Info1(Mpegv_chroma_format[chroma_format]);
                     Get_S1 ( 2, horizontal_size_extension,      "horizontal_size_extension");
                     Get_S1 ( 2, vertical_size_extension,        "vertical_size_extension");
                     Get_S2 (12, bit_rate_extension,             "bit_rate_extension");

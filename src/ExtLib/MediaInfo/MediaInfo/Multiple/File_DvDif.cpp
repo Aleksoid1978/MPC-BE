@@ -394,7 +394,7 @@ void File_DvDif::Streams_Fill()
         {
             switch (video_source_stype)
             {
-                case  0 : Fill(Stream_Video, 0, Video_Colorimetry, "4:1:1"); break; //NTSC 25 Mbps
+                case  0 : Fill(Stream_Video, 0, Video_ChromaSubsampling, "4:1:1"); break; //NTSC 25 Mbps
                 default : ;
             }
         }
@@ -403,16 +403,16 @@ void File_DvDif::Streams_Fill()
             switch (video_source_stype)
             {
                 case  0 : if (APT==0)
-                            Fill(Stream_Video, 0, Video_Colorimetry, "4:2:0");      //PAL 25 Mbps (IEC 61834)
+                            Fill(Stream_Video, 0, Video_ChromaSubsampling, "4:2:0");      //PAL 25 Mbps (IEC 61834)
                           else
-                            Fill(Stream_Video, 0, Video_Colorimetry, "4:1:1");      //PAL 25 Mbps (SMPTE 314M)
+                            Fill(Stream_Video, 0, Video_ChromaSubsampling, "4:1:1");      //PAL 25 Mbps (SMPTE 314M)
                           break;
                 default : ;
             }
         }
     }
     else //DV 50 Mbps and 100 Mbps
-        Fill(Stream_Video, 0, Video_Colorimetry, "4:2:2");
+        Fill(Stream_Video, 0, Video_ChromaSubsampling, "4:2:2");
 
     if (FrameSize_Theory && !IsHd)
     {
@@ -481,7 +481,7 @@ void File_DvDif::Streams_Fill()
             Fill(Stream_Video, 0, Video_BitRate_Mode, "CBR");
         }
     }
-    else if (audio_locked || (Retrieve(Stream_Video, 0, Video_Standard)==__T("PAL") && Retrieve(Stream_Video, 0, Video_Colorimetry)==__T("4:1:1")))
+    else if (audio_locked || (Retrieve(Stream_Video, 0, Video_Standard)==__T("PAL") && Retrieve(Stream_Video, 0, Video_ChromaSubsampling)==__T("4:1:1")))
     {
         Fill(Stream_General, 0, General_Format_Commercial_IfAny, "DVCPRO");
         Fill(Stream_Video, 0, Video_Format_Commercial_IfAny, "DVCPRO");
