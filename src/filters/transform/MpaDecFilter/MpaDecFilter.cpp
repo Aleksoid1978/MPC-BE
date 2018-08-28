@@ -73,10 +73,11 @@
 
 #define BS_HEADER_SIZE          8
 #define BS_AC3_SIZE          6144
-#define BS_EAC3_SIZE        24576 // 6144 for DD Plus * 4 for IEC 60958 frames
-#define BS_MAT_TRUEHD_SIZE  61440                     // 8 header bytes + 61424 of MAT data + 8 zero byte
-#define BS_MAT_TRUEHD_LIMIT (BS_MAT_TRUEHD_SIZE - 24) // IEC total frame size - MAT end code size
-#define BS_MAT_POS_MIDDLE   (BS_HEADER_SIZE + 30708)  // middle point + 8 header bytes
+#define BS_EAC3_SIZE        24576                       // 6144 for DD Plus * 4 for IEC 60958 frames
+#define BS_MAT_FRAME_SIZE   61424                       // MAT frame size
+#define BS_MAT_TRUEHD_SIZE  (BS_MAT_FRAME_SIZE + 8 + 8) // 8 header bytes + 61424 of MAT data + 8 zero byte
+#define BS_MAT_TRUEHD_LIMIT (BS_MAT_TRUEHD_SIZE - 24)   // IEC total frame size - MAT end code size
+#define BS_MAT_POS_MIDDLE   (BS_HEADER_SIZE + 30708)    // middle point + 8 header bytes
 #define BS_DTSHD_SIZE       32768
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
@@ -1013,6 +1014,7 @@ void CMpaDecFilter::MATWritePadding()
 
 		memset(padding, 0, m_hdmi_bitstream.TrueHDMATState.padding);
 		int remaining = MATFillDataBuffer(padding, m_hdmi_bitstream.TrueHDMATState.padding, true);
+		ASSERT(remaining <= 5120);
 
 		// not all padding could be written to the buffer, write it later
 		if (remaining >= 0) {
@@ -1095,7 +1097,7 @@ HRESULT CMpaDecFilter::MATDeliverPacket()
 	HRESULT hr = S_OK;
 	if (m_hdmi_bitstream.size > 0) {
 		// Deliver MAT packet
-		hr = DeliverBitstream(m_hdmi_bitstream.buf + BS_HEADER_SIZE, m_hdmi_bitstream.size - BS_HEADER_SIZE, m_rtStartInputCache, IEC61937_TRUEHD, 0, 0);
+		hr = DeliverBitstream(m_hdmi_bitstream.buf + BS_HEADER_SIZE, BS_MAT_FRAME_SIZE, m_rtStartInputCache, IEC61937_TRUEHD, 0, 0);
 		m_hdmi_bitstream.size = 0;
 	}
 
@@ -1160,7 +1162,8 @@ HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 		}
 
 		// compute padding (ie. difference to the size of the previous frame)
-		m_hdmi_bitstream.TrueHDMATState.padding += (space_size - m_hdmi_bitstream.TrueHDMATState.prev_mat_framesize) & 0xfff;
+		m_hdmi_bitstream.TrueHDMATState.padding += (space_size - m_hdmi_bitstream.TrueHDMATState.prev_mat_framesize) & 0xffff;
+		ASSERT((space_size - m_hdmi_bitstream.TrueHDMATState.prev_mat_framesize) <= 0xffff);
 
 		// store frame time of the previous frame
 		m_hdmi_bitstream.TrueHDMATState.prev_frametime = frame_time;

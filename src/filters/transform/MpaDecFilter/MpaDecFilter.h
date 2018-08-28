@@ -102,11 +102,11 @@ protected:
 
 			int ratebits;
 
-			int prev_frametime;
+			uint16_t prev_frametime;
 			bool prev_frametime_valid;
 
-			int mat_framesize;
-			int prev_mat_framesize;
+			uint32_t mat_framesize;
+			uint32_t prev_mat_framesize;
 
 			DWORD padding;
 		} TrueHDMATState;
