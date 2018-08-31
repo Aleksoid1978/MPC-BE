@@ -1393,6 +1393,10 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt/* = nullptr*/
 
 bool CBaseSplitterFileEx::Read(avchdr& h, int len, std::vector<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
 {
+	if (h.skip_bytes > MEGABYTE) {
+		return false;
+	}
+
 	if (pData.empty()) {
 		std::vector<BYTE> pTmpData;
 		pTmpData.resize(len);
@@ -1407,8 +1411,11 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, std::vector<BYTE>& pData, CMe
 		}
 
 		if (!IS_SPS(nalu_type)) {
+			h.skip_bytes += len;
 			return false;
 		}
+
+		h.skip_bytes = 0;
 
 		pData.resize(len);
 		memcpy(pData.data(), pTmpData.data(), len);
@@ -1418,7 +1425,12 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, std::vector<BYTE>& pData, CMe
 		ByteRead(pData.data() + dataLen, len);
 	}
 
-	return Read(h, pData, pmt);
+	const bool ret = Read(h, pData, pmt);
+	if (!ret) {
+		h.skip_bytes += len;
+	}
+
+	return ret;
 }
 
 bool CBaseSplitterFileEx::Read(hevchdr& h, std::vector<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
@@ -1550,6 +1562,10 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt/* = nullptr*
 
 bool CBaseSplitterFileEx::Read(hevchdr& h, int len, std::vector<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
 {
+	if (h.skip_bytes > MEGABYTE) {
+		return false;
+	}
+
 	if (pData.empty()) {
 		std::vector<BYTE> pTmpData;
 		pTmpData.resize(len);
@@ -1563,8 +1579,11 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, std::vector<BYTE>& pData, CM
 		}
 
 		if (nalu_type != NALU_TYPE_HEVC_VPS) {
+			h.skip_bytes += len;
 			return false;
 		}
+
+		h.skip_bytes = 0;
 
 		pData.resize(len);
 		memcpy(pData.data(), pTmpData.data(), len);
@@ -1574,7 +1593,12 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, std::vector<BYTE>& pData, CM
 		ByteRead(pData.data() + dataLen, len);
 	}
 
-	return Read(h, pData, pmt);
+	const bool ret = Read(h, pData, pmt);
+	if (!ret) {
+		h.skip_bytes += len;
+	}
+
+	return ret;
 }
 
 bool CBaseSplitterFileEx::Read(mpeg4videohdr& h, int len, CMediaType* pmt/* = nullptr*/)

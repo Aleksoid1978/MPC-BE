@@ -387,9 +387,9 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 
 	m_pmt_streams.clear();
 	m_ProgramData.clear();
-	avch.clear();
-	hevch.clear();
-	seqh.clear();
+	mpeg_streams.clear();
+	avc_streams.clear();
+	hevc_streams.clear();
 	m_SyncPoints.clear();
 
 	Seek(m_posMin);
@@ -631,9 +631,9 @@ void CMpegSplitterFile::SearchStreams(const __int64 start, const __int64 stop, c
 {
 	const ULONGLONG startTime = GetPerfCounter();
 
-	avch.clear();
-	hevch.clear();
-	seqh.clear();
+	mpeg_streams.clear();
+	avc_streams.clear();
+	hevc_streams.clear();
 
 	Seek(start);
 
@@ -914,7 +914,7 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 		if (stream_type & MPEG2_VIDEO) {
 			// Sequence/extension header can be split into multiple packets
 			if (!m_streams[stream_type::video].Find(s)) {
-				seqhdr& h = seqh[s];
+				auto& h = mpeg_streams[s];
 				if (h.data.size()) {
 					if (h.data.size() < 512) {
 						const size_t size = h.data.size();
@@ -947,9 +947,9 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 		// AVC/H.264
 		if (type == stream_type::unknown && (stream_type & H264_VIDEO)) {
 			Seek(start);
-			avchdr h;
+			auto& avc = avc_streams[s];
 			if (!m_streams[stream_type::video].Find(s) && !m_streams[stream_type::stereo].Find(s)
-					&& Read(h, len, avch[s], &s.mt)) {
+					&& Read(avc.h, len, avc.pData, &s.mt)) {
 				if (s.mt.subtype == MEDIASUBTYPE_AMVC) {
 					s.codec = stream_codec::MVC;
 					type = stream_type::stereo;
@@ -963,8 +963,8 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 		// HEVC/H.265
 		if (type == stream_type::unknown && (stream_type & HEVC_VIDEO)) {
 			Seek(start);
-			hevchdr h;
-			if (!m_streams[stream_type::video].Find(s) && Read(h, len, hevch[s], &s.mt)) {
+			auto& hevc = hevc_streams[s];
+			if (!m_streams[stream_type::video].Find(s) && Read(hevc.h, len, hevc.pData, &s.mt)) {
 				s.codec = stream_codec::HEVC;
 				type = stream_type::video;
 			}

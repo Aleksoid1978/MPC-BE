@@ -41,9 +41,19 @@ class CMpegSplitterFile : public CBaseSplitterFileEx
 {
 	std::map<WORD, BYTE> m_pid2pes;
 
-	std::map<DWORD, seqhdr> seqh;
-	std::map<DWORD, std::vector<BYTE>> avch;
-	std::map<DWORD, std::vector<BYTE>> hevch;
+	std::map<DWORD, seqhdr> mpeg_streams;
+
+	struct avc_data {
+		avchdr h;
+		std::vector<BYTE> pData;
+	};
+	std::map<DWORD, avc_data> avc_streams;
+
+	struct hevc_data {
+		hevchdr h;
+		std::vector<BYTE> pData;
+	};
+	std::map<DWORD, hevc_data> hevc_streams;
 
 	template<class T, int validCount = 5>
 	class CValidStream {
