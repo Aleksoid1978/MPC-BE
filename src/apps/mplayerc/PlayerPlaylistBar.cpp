@@ -523,10 +523,11 @@ void CPlaylist::SortByName()
 	a.reserve(GetCount());
 
 	POSITION pos = GetHeadPosition();
-	for (int i = 0; pos; i++, GetNext(pos)) {
-		CString fn = GetAt(pos).m_fns.front();
-		plsort_str_t item = { fn.Mid(std::max(fn.ReverseFind('/'), fn.ReverseFind('\\')) + 1), pos };
+	while (pos) {
+		const plsort_str_t item = { GetAt(pos).GetLabel(), pos };
 		a.emplace_back(item);
+
+		GetNext(pos);
 	}
 
 	std::sort(a.begin(), a.end(), [](const plsort_str_t& a, const plsort_str_t& b) {
@@ -548,9 +549,11 @@ void CPlaylist::SortByPath()
 	a.reserve(GetCount());
 
 	POSITION pos = GetHeadPosition();
-	for (int i = 0; pos; i++, GetNext(pos)) {
-		plsort_str_t item = { GetAt(pos).m_fns.front(), pos };
+	while (pos) {
+		const plsort_str_t item = { GetAt(pos).m_fns.front(), pos };
 		a.emplace_back(item);
+
+		GetNext(pos);
 	}
 
 	std::sort(a.begin(), a.end(), [](const plsort_str_t& a, const plsort_str_t& b) {
