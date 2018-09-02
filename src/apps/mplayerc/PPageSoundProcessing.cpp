@@ -263,7 +263,12 @@ void CPPageSoundProcessing::OnMixerCheck()
 
 void CPPageSoundProcessing::OnMixerLayoutChange()
 {
-	m_chkStereoFromDecoder.EnableWindow(m_chkMixer.GetCheck() && GetCurItemData(m_cmbMixerLayout) == SPK_STEREO);
+	const int CurentMixerLayout = GetCurItemData(m_cmbMixerLayout);
+	m_chkStereoFromDecoder.EnableWindow(m_chkMixer.GetCheck() && CurentMixerLayout == SPK_STEREO);
+
+	if (CurentMixerLayout != AfxGetAppSettings().nAudioMixerLayout) {
+		SetModified();
+	}
 }
 
 void CPPageSoundProcessing::OnAutoVolumeControlCheck()
