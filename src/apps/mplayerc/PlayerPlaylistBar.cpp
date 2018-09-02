@@ -2468,6 +2468,18 @@ BOOL CPlayerPlaylistBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResul
 
 void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 {
+	if (p.x == -1 && p.y == -1 && m_list.GetSelectedCount()) {
+		// hack for the menu invoked with the VK_APPS key
+		POSITION pos = m_list.GetFirstSelectedItemPosition();
+		int nItem = m_list.GetNextSelectedItem(pos);
+		RECT r;
+		if (m_list.GetItemRect(nItem, &r, LVIR_LABEL)) {
+			p.x = r.left;
+			p.y = r.bottom;
+			m_list.ClientToScreen(&p);
+		}
+	}
+
 	LVHITTESTINFO lvhti;
 	lvhti.pt = p;
 	m_list.ScreenToClient(&lvhti.pt);
