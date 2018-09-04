@@ -739,7 +739,7 @@ BOOL CPPageFormats::OnInitDialog()
 		GetDlgItem(IDC_BUTTON5)->ShowWindow(SW_HIDE);
 	}
 
-	m_lUnRegisterExts.RemoveAll();
+	m_lUnRegisterExts.clear();
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
@@ -860,7 +860,7 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 	return SUCCEEDED(hr);
 }
 
-void GetUnRegisterExts(CString saved_ext, CString new_ext, CAtlList<CString>& UnRegisterExts)
+void GetUnRegisterExts(CString saved_ext, CString new_ext, std::list<CString>& UnRegisterExts)
 {
 	if (saved_ext.CompareNoCase(new_ext) != 0) {
 		CAtlList<CString> saved_exts;
@@ -883,7 +883,7 @@ void GetUnRegisterExts(CString saved_ext, CString new_ext, CAtlList<CString>& Un
 			}
 
 			if (!bMatch) {
-				UnRegisterExts.AddTail(saved_ext);
+				UnRegisterExts.push_back(saved_ext);
 			}
 		}
 	}
@@ -914,11 +914,8 @@ BOOL CPPageFormats::OnApply()
 		}
 	}
 
-	if (m_lUnRegisterExts.GetCount()) {
-		POSITION pos = m_lUnRegisterExts.GetHeadPosition();
-		while (pos) {
-			UnRegisterExt(m_lUnRegisterExts.GetNext(pos));
-		}
+	for (const auto& ext : m_lUnRegisterExts) {
+		UnRegisterExt(ext);
 	}
 
 	RegisterApp();
@@ -1021,7 +1018,7 @@ BOOL CPPageFormats::OnApply()
 
 	m_bFileExtChanged = false;
 
-	m_lUnRegisterExts.RemoveAll();
+	m_lUnRegisterExts.clear();
 
 	return __super::OnApply();
 }

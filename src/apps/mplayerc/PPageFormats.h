@@ -60,7 +60,7 @@ private:
 
 	static CComPtr<IApplicationAssociationRegistration> m_pAAR;
 
-	CAtlList<CString> m_lUnRegisterExts;
+	std::list<CString> m_lUnRegisterExts;
 
 public:
 	CPPageFormats();
