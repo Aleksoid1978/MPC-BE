@@ -863,19 +863,17 @@ BOOL CPPageFormats::SetFileAssociation(CString strExt, CString strProgID, bool b
 void GetUnRegisterExts(CString saved_ext, CString new_ext, std::list<CString>& UnRegisterExts)
 {
 	if (saved_ext.CompareNoCase(new_ext) != 0) {
-		CAtlList<CString> saved_exts;
+		std::list<CString> saved_exts;
 		Explode(saved_ext, saved_exts, L' ');
-		CAtlList<CString> new_exts;
+		std::list<CString> new_exts;
 		Explode(new_ext, new_exts, L' ');
 
-		POSITION pos = saved_exts.GetHeadPosition();
-		while (pos) {
-			saved_ext = saved_exts.GetNext(pos);
+		for (const auto& ext1 : saved_exts) {
+			saved_ext = ext1;
 			bool bMatch = false;
 
-			POSITION pos2 = new_exts.GetHeadPosition();
-			while (pos2) {
-				new_ext = new_exts.GetNext(pos2);
+			for (const auto& ext2 : new_exts) {
+				new_ext = ext2;
 				if (new_ext.CompareNoCase(saved_ext) == 0) {
 					bMatch = true;
 					continue;
@@ -933,15 +931,14 @@ BOOL CPPageFormats::OnApply()
 				continue;
 			}
 
-			CAtlList<CString> exts;
+			std::list<CString> exts;
 			Explode(mf[(int)m_list.GetItemData(i)].GetExtsWithPeriod(), exts, L' ');
 
-			POSITION pos = exts.GetHeadPosition();
-			while (pos) {
+			for (const auto& ext : exts) {
 				if (iChecked) {
-					RegisterExt(exts.GetNext(pos), mf[(int)m_list.GetItemData(i)].GetDescription(), mf[i].GetFileType(), bSetContextFile, bSetAssociatedWithIcon);
+					RegisterExt(ext, mf[(int)m_list.GetItemData(i)].GetDescription(), mf[i].GetFileType(), bSetContextFile, bSetAssociatedWithIcon);
 				} else {
-					UnRegisterExt(exts.GetNext(pos));
+					UnRegisterExt(ext);
 				}
 			}
 		}
