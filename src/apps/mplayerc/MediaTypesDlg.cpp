@@ -86,15 +86,13 @@ BOOL CMediaTypesDlg::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	CAtlList<CStringW> path;
-	CAtlList<CMediaType> mts;
+	std::list<CStringW> path;
+	std::list<CMediaType> mts;
 
 	for (int i = 0; S_OK == m_pGBDE->GetDeadEnd(i, path, mts); i++) {
-		if (!path.GetCount()) {
-			continue;
+		if (path.size()) {
+			AddStringData(m_pins, path.back(), i);
 		}
-
-		AddStringData(m_pins, path.GetTail(), i);
 	}
 
 	m_pins.SetCurSel(0);
@@ -121,30 +119,28 @@ void CMediaTypesDlg::OnCbnSelchangeCombo1()
 		return;
 	}
 
-	CAtlList<CStringW> path;
-	CAtlList<CMediaType> mts;
+	std::list<CStringW> paths;
+	std::list<CMediaType> mts;
 
-	if (FAILED(m_pGBDE->GetDeadEnd(i, path, mts)) || !path.GetCount()) {
+	if (FAILED(m_pGBDE->GetDeadEnd(i, paths, mts)) || paths.empty()) {
 		return;
 	}
 
-	POSITION pos = path.GetHeadPosition();
-
-	while (pos) {
-		AddLine(CString(path.GetNext(pos)));
-		if (!pos) {
-			AddLine();
+	if (paths.size()) {
+		for (const auto& path : paths) {
+			AddLine(path);
 		}
+		AddLine();
 	}
 
-	pos = mts.GetHeadPosition();
+	auto it = mts.begin();
 
-	for (int j = 0; pos; j++) {
+	for (int j = 0; it != mts.end(); j++) {
 		CString str;
 		str.Format(L"Media Type %d:", j);
 		AddLine(str);
 		AddLine(L"--------------------------");
-		AddMediaType(&mts.GetNext(pos));
+		AddMediaType(&(*it++));
 		AddLine();
 	}
 
