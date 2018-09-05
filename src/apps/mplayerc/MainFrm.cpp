@@ -9435,6 +9435,8 @@ void CMainFrame::OnNavigateChapters(UINT nID)
 			for (const auto& item : m_youtubeUrllist) {
 				if (idx == id && item.url != m_strPlaybackRenderedPath) {
 					const int tagSelected = item.profile->iTag;
+					m_bYoutubeOpened = true;
+
 					REFERENCE_TIME rtNow = INVALID_TIME;
 					m_pMS->GetCurrentPosition(&rtNow);
 
@@ -11605,22 +11607,38 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 	CAppSettings& s = AfxGetAppSettings();
 
 	bool bFirst = true;
-	m_youtubeFields.Empty();
-	m_youtubeUrllist.clear();
 
 	m_strPlaybackRenderedPath.Empty();
 
 	CString youtubeUrl;
-	if (s.bYoutubePageParser && pOFD->fns.size() == 1) {
+
+	if (!m_youtubeUrllist.empty()) {
+		youtubeUrl = (CString)pOFD->fns.front();
+		Content::Online::Disconnect(youtubeUrl);
+
+		pOFD->fns.clear();
+
+		const auto it = std::find_if(m_youtubeUrllist.cbegin(), m_youtubeUrllist.cend(), [&](const Youtube::YoutubeUrllistItem& item) {
+			return item.profile->iTag == s.iYoutubeTagSelected;
+		});
+		if (it != m_youtubeUrllist.cend()) {
+			pOFD->fns.push_back(it->url);
+			if (it->profile->type == Youtube::y_video && !m_youtubeAudioUrllist.empty()) {
+				pOFD->fns.push_back(m_youtubeAudioUrllist.cbegin()->url);
+			}
+		}
+
+		m_strPlaybackRenderedPath = pOFD->fns.front().GetName();
+		m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
+	} else if (s.bYoutubePageParser && pOFD->fns.size() == 1) {
 		CString fn = (CString)pOFD->fns.front();
 		if (Youtube::CheckURL(fn)) {
 			youtubeUrl = fn;
 			std::list<CString> urls;
-			if (Youtube::Parse_URL(fn, urls, m_youtubeFields, m_youtubeUrllist, pOFD->subs, pOFD->rtStart)) {
+			if (Youtube::Parse_URL(fn, urls, m_youtubeFields, m_youtubeUrllist, m_youtubeAudioUrllist, pOFD->subs, pOFD->rtStart)) {
 				Content::Online::Disconnect(fn);
 
 				pOFD->fns.clear();
-
 				for (const auto& url : urls) {
 					pOFD->fns.push_back(url);
 				}
@@ -13665,9 +13683,13 @@ void CMainFrame::CloseMediaPrivate()
 
 	m_strPlaybackRenderedPath.Empty();
 
-	m_youtubeFields.Empty();
-	m_youtubeUrllist.clear();
-	AfxGetAppSettings().iYoutubeTagSelected = 0;
+	if (!m_bYoutubeOpened) {
+		m_youtubeFields.Empty();
+		m_youtubeUrllist.clear();
+		m_youtubeAudioUrllist.clear();
+		AfxGetAppSettings().iYoutubeTagSelected = 0;
+	}
+	m_bYoutubeOpened = false;
 
 	m_OSD.Stop();
 	OnPlayStop();

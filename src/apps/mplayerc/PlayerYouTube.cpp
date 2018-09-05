@@ -321,7 +321,7 @@ namespace Youtube
 		funcSWAP
 	};
 
-	bool Parse_URL(CString url, std::list<CString>& urls, YoutubeFields& y_fields, YoutubeUrllist& youtubeUrllist, CSubtitleItemList& subs, REFERENCE_TIME& rtStart)
+	bool Parse_URL(CString url, std::list<CString>& urls, YoutubeFields& y_fields, YoutubeUrllist& youtubeUrllist, YoutubeUrllist& youtubeAudioUrllist, CSubtitleItemList& subs, REFERENCE_TIME& rtStart)
 	{
 		if (CheckURL(url)) {
 			DLog(L"Youtube::Parse_URL() : \"%s\"", url);
@@ -518,8 +518,6 @@ namespace Youtube
 					strUrls.Replace("\\u0026", "&");
 				}
 			}
-
-			YoutubeUrllist audioList;
 
 			auto AddUrl = [](YoutubeUrllist& videoUrls, YoutubeUrllist& audioUrls, const CString& url, const int itag, const int fps = 0, LPCSTR quality_label = nullptr) {
 				if (const YoutubeProfile* profile = GetProfile(itag)) {
@@ -739,7 +737,7 @@ namespace Youtube
 									const int itag    = _wtoi(RegExpParse(xmlElement, L"id=\"([0-9]+)\""));
 									const int fps     = _wtoi(RegExpParse(xmlElement, L"frameRate=\"([0-9]+)\""));
 									if (url.Find(L"dur/") > 0) {
-										AddUrl(youtubeUrllist, audioList, url, itag, fps);
+										AddUrl(youtubeUrllist, youtubeAudioUrllist, url, itag, fps);
 									}
 								}
 
@@ -791,14 +789,14 @@ namespace Youtube
 					if (itag) {
 						SignatureDecode(url, signature, "&signature=%s");
 
-						AddUrl(youtubeUrllist, audioList, CString(url), itag, 0, !quality_label.IsEmpty() ? quality_label.GetString() : nullptr);
+						AddUrl(youtubeUrllist, youtubeAudioUrllist, CString(url), itag, 0, !quality_label.IsEmpty() ? quality_label.GetString() : nullptr);
 					}
 				}
 			} else {
 				for (const auto& urlLive : strUrlsLive) {
 					CStringA itag = RegExpParseA(urlLive, "/itag/(\\d+)");
 					if (!itag.IsEmpty()) {
-						AddUrl(youtubeUrllist, audioList, CString(urlLive), atoi(itag));
+						AddUrl(youtubeUrllist, youtubeAudioUrllist, CString(urlLive), atoi(itag));
 					}
 				}
 			}
@@ -808,7 +806,7 @@ namespace Youtube
 			}
 
 			std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), CompareUrllistItem);
-			std::sort(audioList.begin(), audioList.end(), CompareUrllistItem);
+			std::sort(youtubeAudioUrllist.begin(), youtubeAudioUrllist.end(), CompareUrllistItem);
 
 #ifdef DEBUG_OR_LOG
 			DLog(L"Youtube::Parse_URL() : parsed video formats list:");
@@ -816,9 +814,9 @@ namespace Youtube
 				DLog(L"    %-35s, \"%s\"", item.title, item.url);
 			}
 
-			if (!audioList.empty()) {
+			if (!youtubeAudioUrllist.empty()) {
 				DLog(L"Youtube::Parse_URL() : parsed audio formats list:");
-				for (const auto& item : audioList) {
+				for (const auto& item : youtubeAudioUrllist) {
 					DLog(L"    %-35s, \"%s\"", item.title, item.url);
 				}
 			}
@@ -828,51 +826,39 @@ namespace Youtube
 
 			// select video stream
 			const YoutubeUrllistItem* final_item = nullptr;
-
-			if (s.iYoutubeTagSelected) {
-				for (const auto& item : youtubeUrllist) {
-					if (s.iYoutubeTagSelected == item.profile->iTag) {
-						final_item = &item;
-						break;
-					}
+			size_t k;
+			for (k = 0; k < youtubeUrllist.size(); k++) {
+				if (s.YoutubeFormat.fmt == youtubeUrllist[k].profile->format) {
+					final_item = &youtubeUrllist[k];
+					break;
 				}
 			}
-
 			if (!final_item) {
-				size_t k;
-				for (k = 0; k < youtubeUrllist.size(); k++) {
-					if (s.YoutubeFormat.fmt == youtubeUrllist[k].profile->format) {
-						final_item = &youtubeUrllist[k];
+				final_item = &youtubeUrllist[0];
+				k = 0;
+				DLog(L"YouTube::Parse_URL() : %s format not found, used %s", s.YoutubeFormat.fmt == 1 ? L"WebM" : L"MP4", final_item->profile->format == y_webm ? L"WebM" : L"MP4");
+			}
+
+			for (size_t i = k + 1; i < youtubeUrllist.size(); i++) {
+				const auto profile = youtubeUrllist[i].profile;
+
+				if (final_item->profile->format == profile->format) {
+					if (profile->quality == final_item->profile->quality) {
+						if (profile->fps60 != s.YoutubeFormat.fps60) {
+							// same resolution as that of the previous, but not suitable fps
+							continue;
+						}
+						if (profile->hdr != s.YoutubeFormat.hdr) {
+							// same resolution as that of the previous, but not suitable HDR
+							continue;
+						}
+					}
+
+					if (profile->quality < final_item->profile->quality && final_item->profile->quality <= s.YoutubeFormat.res) {
 						break;
 					}
-				}
-				if (!final_item) {
-					final_item = &youtubeUrllist[0];
-					k = 0;
-					DLog(L"YouTube::Parse_URL() : %s format not found, used %s", s.YoutubeFormat.fmt == 1 ? L"WebM" : L"MP4", final_item->profile->format == y_webm ? L"WebM" : L"MP4");
-				}
 
-				for (size_t i = k + 1; i < youtubeUrllist.size(); i++) {
-					const auto profile = youtubeUrllist[i].profile;
-
-					if (final_item->profile->format == profile->format) {
-						if (profile->quality == final_item->profile->quality) {
-							if (profile->fps60 != s.YoutubeFormat.fps60) {
-								// same resolution as that of the previous, but not suitable fps
-								continue;
-							}
-							if (profile->hdr != s.YoutubeFormat.hdr) {
-								// same resolution as that of the previous, but not suitable HDR
-								continue;
-							}
-						}
-
-						if (profile->quality < final_item->profile->quality && final_item->profile->quality <= s.YoutubeFormat.res) {
-							break;
-						}
-
-						final_item = &youtubeUrllist[i];
-					}
+					final_item = &youtubeUrllist[i];
 				}
 			}
 
@@ -882,19 +868,19 @@ namespace Youtube
 			const YoutubeProfile* final_video_profile = final_item->profile;
 
 			CString final_audio_url;
-			if (final_item->profile->type == y_video && !audioList.empty()) {
+			if (final_item->profile->type == y_video && !youtubeAudioUrllist.empty()) {
 				int fmt = final_item->profile->format;
 				final_item = nullptr;
 
 				// select audio stream
-				for (const auto& item : audioList) {
+				for (const auto& item : youtubeAudioUrllist) {
 					if (fmt == item.profile->format) {
 						final_item = &item;
 						break;
 					}
 				}
 				if (!final_item) {
-					final_item = &audioList[0];
+					final_item = &youtubeAudioUrllist[0];
 				}
 
 				final_audio_url = final_item->url;

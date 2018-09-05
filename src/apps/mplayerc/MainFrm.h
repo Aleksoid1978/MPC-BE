@@ -1209,6 +1209,9 @@ public:
 
 	Youtube::YoutubeFields m_youtubeFields;
 	Youtube::YoutubeUrllist m_youtubeUrllist;
+	Youtube::YoutubeUrllist m_youtubeAudioUrllist;
+	bool m_bYoutubeOpened = false;
+
 	const CString GetAltFileName();
 
 	bool		m_bInOptions;
