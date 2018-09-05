@@ -1452,6 +1452,8 @@ void CPlayerPlaylistBar::Remove(const std::vector<int>& items, const bool bDelet
 			return;
 		}
 
+		m_list.SetRedraw(FALSE);
+
 		std::list<CString> fns;
 
 		for (int i = (int)items.size() - 1; i >= 0; --i) {
@@ -1483,6 +1485,8 @@ void CPlayerPlaylistBar::Remove(const std::vector<int>& items, const bool bDelet
 		ResizeListColumn();
 		SavePlaylist();
 		UpdateList();
+
+		m_list.SetRedraw();
 
 		if (bDelete && !fns.empty()) {
 			fns.sort();
@@ -1984,7 +1988,7 @@ void CPlayerPlaylistBar::ResizeListColumn()
 		m_list.MoveWindow(r);
 		m_list.GetClientRect(r);
 		m_list.SetColumnWidth(COL_NAME, r.Width() - m_nTimeColWidth);
-		m_list.SetRedraw(TRUE);
+		m_list.SetRedraw();
 	}
 }
 
