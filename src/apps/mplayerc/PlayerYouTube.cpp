@@ -214,7 +214,7 @@ namespace Youtube
 		return "";
 	}
 
-	static void InternetReadData(HINTERNET& f, char** pData, DWORD& dataSize, LPCSTR endCondition)
+	static void InternetReadData(HINTERNET& f, char** pData, DWORD& dataSize)
 	{
 		char buffer[16 * KILOBYTE] = { 0 };
 		const DWORD dwNumberOfBytesToRead = _countof(buffer);
@@ -228,10 +228,6 @@ namespace Youtube
 			memcpy(*pData + dataSize, buffer, dwBytesRead);
 			dataSize += dwBytesRead;
 			(*pData)[dataSize] = 0;
-
-			if (endCondition && strstr(*pData, endCondition)) {
-				break;
-			}
 		}
 	}
 
@@ -244,7 +240,7 @@ namespace Youtube
 			if (hUrl) {
 				char* data = nullptr;
 				DWORD dataSize = 0;
-				InternetReadData(hUrl, &data, dataSize, nullptr);
+				InternetReadData(hUrl, &data, dataSize);
 				InternetCloseHandle(hUrl);
 
 				if (dataSize) {
@@ -375,7 +371,7 @@ namespace Youtube
 
 				hUrl = InternetOpenUrlW(hInet, url, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 				if (hUrl) {
-					InternetReadData(hUrl, &data, dataSize, nullptr);
+					InternetReadData(hUrl, &data, dataSize);
 					InternetCloseHandle(hUrl);
 				}
 			}
@@ -414,7 +410,7 @@ namespace Youtube
 				CString link; link.Format(L"https://www.youtube.com/embed/%s", videoId);
 				hUrl = InternetOpenUrlW(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 				if (hUrl) {
-					InternetReadData(hUrl, &data, dataSize, nullptr);
+					InternetReadData(hUrl, &data, dataSize);
 					InternetCloseHandle(hUrl);
 				}
 
@@ -435,7 +431,7 @@ namespace Youtube
 				link.Format(L"https://www.youtube.com/get_video_info?video_id=%s&eurl=https://youtube.googleapis.com/v/%s&sts=%S", videoId, videoId, sts);
 				hUrl = InternetOpenUrlW(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 				if (hUrl) {
-					InternetReadData(hUrl, &data, dataSize, nullptr);
+					InternetReadData(hUrl, &data, dataSize);
 					InternetCloseHandle(hUrl);
 				}
 
@@ -470,7 +466,7 @@ namespace Youtube
 					if (hUrl) {
 						char* m3u8 = nullptr;
 						DWORD m3u8Size = 0;
-						InternetReadData(hUrl, &m3u8, m3u8Size, nullptr);
+						InternetReadData(hUrl, &m3u8, m3u8Size);
 						InternetCloseHandle(hUrl);
 						if (m3u8Size) {
 							CStringA m3u8Str(m3u8);
@@ -573,7 +569,7 @@ namespace Youtube
 						if (hUrl) {
 							char* data = nullptr;
 							DWORD dataSize = 0;
-							InternetReadData(hUrl, &data, dataSize, nullptr);
+							InternetReadData(hUrl, &data, dataSize);
 							InternetCloseHandle(hUrl);
 							if (dataSize) {
 								const CStringA funcName = RegExpParseA(data, "\"signature\",([a-zA-Z0-9$]+)\\(");
@@ -722,7 +718,7 @@ namespace Youtube
 					if (hUrl) {
 						char* dashmpd = nullptr;
 						DWORD dashmpdSize = 0;
-						InternetReadData(hUrl, &dashmpd, dashmpdSize, nullptr);
+						InternetReadData(hUrl, &dashmpd, dashmpdSize);
 						InternetCloseHandle(hUrl);
 						if (dashmpdSize) {
 							CString xml = UTF8ToWStr(dashmpd);
@@ -956,56 +952,6 @@ namespace Youtube
 							}
 						}
 					}
-#if (0)
-					// This code is deprecated
-					CString link;
-					link.Format(L"https://video.google.com/timedtext?hl=en&type=list&v=%s", videoId);
-					hUrl = InternetOpenUrlW(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
-					if (hUrl) {
-						char* data = nullptr;
-						DWORD dataSize = 0;
-						InternetReadData(hUrl, &data, dataSize, nullptr);
-						InternetCloseHandle(hUrl);
-
-						if (dataSize) {
-							CString xml = UTF8ToWStr(data);
-							free(data);
-							const std::wregex regex(L"<track id(.*?)/>");
-							std::wcmatch match;
-							LPCTSTR text = xml.GetBuffer();
-							while (std::regex_search(text, match, regex)) {
-								if (match.size() == 2) {
-									CString url, name;
-									CString xmlElement(match[1].first, match[1].length());
-
-									const std::wregex regexValues(L"([a-z_]+)=\"([^\"]+)\"");
-									std::wcmatch matchValues;
-									LPCTSTR textValues = xmlElement.GetBuffer();
-									while (std::regex_search(textValues, matchValues, regexValues)) {
-										if (matchValues.size() == 3) {
-											const CString xmlHeader(matchValues[1].first, matchValues[1].length());
-											const CString xmlValue(matchValues[2].first, matchValues[2].length());
-
-											if (xmlHeader == L"lang_code") {
-												url.Format(L"https://www.youtube.com/api/timedtext?lang=%s&v=%s&fmt=vtt", xmlValue, videoId);
-											} else if (xmlHeader == L"lang_original") {
-												name = xmlValue;
-											}
-										}
-
-										textValues = matchValues[0].second;
-									}
-
-									if (!url.IsEmpty() && !name.IsEmpty()) {
-										subs.AddTail(CSubtitleItem(url, name));
-									}
-								}
-
-								text = match[0].second;
-							}
-						}
-					}
-#endif
 				}
 
 				InternetCloseHandle(hInet);
@@ -1031,7 +977,7 @@ namespace Youtube
 		if (CheckPlaylist(url)) {
 			const CString videoId = RegExpParse(url, videoIdRegExps[0]);
 			const CString playlistId = RegExpParse(url, L"list=([-a-zA-Z0-9_]+)");
-			if (videoId.IsEmpty() || playlistId.IsEmpty()) {
+			if (playlistId.IsEmpty()) {
 				return false;
 			}
 
@@ -1052,7 +998,7 @@ namespace Youtube
 
 					HINTERNET hUrl = InternetOpenUrlW(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
 					if (hUrl) {
-						InternetReadData(hUrl, &data, dataSize, nullptr);
+						InternetReadData(hUrl, &data, dataSize);
 						InternetCloseHandle(hUrl);
 					}
 				}
