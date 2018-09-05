@@ -1174,10 +1174,10 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 			if (pmt->majortype == MEDIATYPE_Stream && pmt->subtype == MEDIASUBTYPE_NULL) {
 				skip++;
 			}
-			psde->mts.AddTail(CMediaType(*pmt));
+			psde->mts.emplace_back(*pmt);
 		}
 		EndEnumMediaTypes(pmt)
-		if (skip < (int)psde->mts.GetCount()) {
+		if (skip < (int)psde->mts.size()) {
 			m_deadends.Add(psde);
 		}
 	}
@@ -1799,10 +1799,7 @@ STDMETHODIMP CFGManager::GetDeadEnd(int iIndex, std::list<CStringW>& path, std::
 		path.emplace_back(str);
 	}
 
-	pos = deadend->mts.GetHeadPosition();
-	while (pos) {
-		mts.push_back(deadend->mts.GetNext(pos));
-	}
+	mts.insert(mts.end(), deadend->mts.begin(), deadend->mts.end());
 
 	return S_OK;
 }
