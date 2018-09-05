@@ -50,7 +50,7 @@ public:
 	class CStreamDeadEnd : public CStreamPath
 	{
 	public:
-		CAtlList<CMediaType> mts;
+		std::list<CMediaType> mts;
 	};
 
 private:
