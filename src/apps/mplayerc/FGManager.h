@@ -114,7 +114,7 @@ protected:
 	// IGraphBuilderDeadEnd
 
 	STDMETHODIMP_(size_t) GetCount();
-	STDMETHODIMP GetDeadEnd(int iIndex, CAtlList<CStringW>& path, CAtlList<CMediaType>& mts);
+	STDMETHODIMP GetDeadEnd(int iIndex, std::list<CStringW>& path, std::list<CMediaType>& mts);
 
 	// IGraphBuilderSub
 	STDMETHODIMP RenderSubFile(LPCWSTR lpcwstrFile);

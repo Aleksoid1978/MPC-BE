@@ -1777,7 +1777,7 @@ STDMETHODIMP_(size_t) CFGManager::GetCount()
 	return m_deadends.GetCount();
 }
 
-STDMETHODIMP CFGManager::GetDeadEnd(int iIndex, CAtlList<CStringW>& path, CAtlList<CMediaType>& mts)
+STDMETHODIMP CFGManager::GetDeadEnd(int iIndex, std::list<CStringW>& path, std::list<CMediaType>& mts)
 {
 	CAutoLock cAutoLock(this);
 
@@ -1785,19 +1785,24 @@ STDMETHODIMP CFGManager::GetDeadEnd(int iIndex, CAtlList<CStringW>& path, CAtlLi
 		return E_FAIL;
 	}
 
-	path.RemoveAll();
-	mts.RemoveAll();
+	path.clear();
+	mts.clear();
 
-	POSITION pos = m_deadends[iIndex]->GetHeadPosition();
+	auto& deadend = m_deadends[iIndex];
+
+	POSITION pos = deadend->GetHeadPosition();
 	while (pos) {
-		const path_t& p = m_deadends[iIndex]->GetNext(pos);
+		const path_t& p = deadend->GetNext(pos);
 
 		CStringW str;
 		str.Format(L"%s::%s", p.filter, p.pin);
-		path.AddTail(str);
+		path.emplace_back(str);
 	}
 
-	mts.AddTailList(&m_deadends[iIndex]->mts);
+	pos = deadend->mts.GetHeadPosition();
+	while (pos) {
+		mts.push_back(deadend->mts.GetNext(pos));
+	}
 
 	return S_OK;
 }
