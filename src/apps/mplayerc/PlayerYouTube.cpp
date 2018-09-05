@@ -214,96 +214,100 @@ namespace Youtube
 		return "";
 	}
 
-	static void InternetReadData(HINTERNET& f, char** pData, DWORD& dataSize)
+	static void InternetReadData(HINTERNET& hInternet, const CString& url, char** pData, DWORD& dataSize)
 	{
-		char buffer[16 * KILOBYTE] = { 0 };
-		const DWORD dwNumberOfBytesToRead = _countof(buffer);
-		DWORD dwBytesRead = 0;
-		for (;;) {
-			if (InternetReadFile(f, (LPVOID)buffer, dwNumberOfBytesToRead, &dwBytesRead) == FALSE || dwBytesRead == 0) {
-				break;
+		dataSize = 0;
+		*pData = nullptr;
+
+		const HINTERNET hFile = InternetOpenUrlW(hInternet, url.GetString(), nullptr, 0, INTERNET_OPEN_FALGS, 0);
+		if (hFile) {
+			char buffer[16 * KILOBYTE] = { 0 };
+			const DWORD dwNumberOfBytesToRead = _countof(buffer);
+			DWORD dwBytesRead = 0;
+			for (;;) {
+				if (InternetReadFile(hFile, (LPVOID)buffer, dwNumberOfBytesToRead, &dwBytesRead) == FALSE || dwBytesRead == 0) {
+					break;
+				}
+
+				*pData = (char*)realloc(*pData, dataSize + dwBytesRead + 1);
+				memcpy(*pData + dataSize, buffer, dwBytesRead);
+				dataSize += dwBytesRead;
+				(*pData)[dataSize] = 0;
 			}
 
-			*pData = (char*)realloc(*pData, dataSize + dwBytesRead + 1);
-			memcpy(*pData + dataSize, buffer, dwBytesRead);
-			dataSize += dwBytesRead;
-			(*pData)[dataSize] = 0;
+			InternetCloseHandle(hFile);
 		}
 	}
 
 	static bool ParseMetadata(HINTERNET& hInet, const CString videoId, YoutubeFields& y_fields)
 	{
 		if (hInet && !videoId.IsEmpty()) {
-			CString link;
-			link.Format(L"https://www.googleapis.com/youtube/v3/videos?id=%s&key=%s&part=snippet,contentDetails&fields=items/snippet/title,items/snippet/publishedAt,items/snippet/channelTitle,items/snippet/description,items/contentDetails/duration", videoId, GOOGLE_API_KEY);
-			HINTERNET hUrl = InternetOpenUrlW(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
-			if (hUrl) {
-				char* data = nullptr;
-				DWORD dataSize = 0;
-				InternetReadData(hUrl, &data, dataSize);
-				InternetCloseHandle(hUrl);
+			CString url;
+			url.Format(L"https://www.googleapis.com/youtube/v3/videos?id=%s&key=%s&part=snippet,contentDetails&fields=items/snippet/title,items/snippet/publishedAt,items/snippet/channelTitle,items/snippet/description,items/contentDetails/duration", videoId, GOOGLE_API_KEY);
+			char* data = nullptr;
+			DWORD dataSize = 0;
+			InternetReadData(hInet, url, &data, dataSize);
 
-				if (dataSize) {
-					rapidjson::Document d;
-					if (!d.Parse(data).HasParseError()) {
-						const auto& items = d.FindMember("items");
-						if (items == d.MemberEnd()
-								|| !items->value.IsArray()
-								|| items->value.Empty()) {
-							free(data);
-							return false;
-						}
+			if (dataSize) {
+				rapidjson::Document d;
+				if (!d.Parse(data).HasParseError()) {
+					const auto& items = d.FindMember("items");
+					if (items == d.MemberEnd()
+							|| !items->value.IsArray()
+							|| items->value.Empty()) {
+						free(data);
+						return false;
+					}
 
-						const rapidjson::Value& snippet = items->value[0]["snippet"];
-						if (snippet["title"].IsString()) {
-							y_fields.title = FixHtmlSymbols(AltUTF8ToWStr(snippet["title"].GetString()));
-						}
-						if (snippet["channelTitle"].IsString()) {
-							y_fields.author = UTF8ToWStr(snippet["channelTitle"].GetString());
-						}
-						if (snippet["description"].IsString()) {
-							y_fields.content = UTF8ToWStr(snippet["description"].GetString());
-						}
-						if (snippet["publishedAt"].IsString()) {
-							WORD y, m, d;
-							WORD hh, mm, ss;
-							if (sscanf_s(snippet["publishedAt"].GetString(), "%04hu-%02hu-%02huT%02hu:%02hu:%02hu", &y, &m, &d, &hh, &mm, &ss) == 6) {
-								y_fields.dtime.wYear   = y;
-								y_fields.dtime.wMonth  = m;
-								y_fields.dtime.wDay    = d;
-								y_fields.dtime.wHour   = hh;
-								y_fields.dtime.wMinute = mm;
-								y_fields.dtime.wSecond = ss;
-							}
-						}
-
-						const rapidjson::Value& duration = items->value[0]["contentDetails"]["duration"];
-						if (duration.IsString()) {
-							const std::regex regex("PT(\\d+H)?(\\d{1,2}M)?(\\d{1,2}S)?", std::regex_constants::icase);
-							std::cmatch match;
-							if (std::regex_search(duration.GetString(), match, regex) && match.size() == 4) {
-								int h = 0;
-								int m = 0;
-								int s = 0;
-								if (match[1].matched) {
-									h = atoi(match[1].first);
-								}
-								if (match[2].matched) {
-									m = atoi(match[2].first);
-								}
-								if (match[3].matched) {
-									s = atoi(match[3].first);
-								}
-
-								y_fields.duration = (h * 3600 + m * 60 + s) * UNITS;
-							}
+					const rapidjson::Value& snippet = items->value[0]["snippet"];
+					if (snippet["title"].IsString()) {
+						y_fields.title = FixHtmlSymbols(AltUTF8ToWStr(snippet["title"].GetString()));
+					}
+					if (snippet["channelTitle"].IsString()) {
+						y_fields.author = UTF8ToWStr(snippet["channelTitle"].GetString());
+					}
+					if (snippet["description"].IsString()) {
+						y_fields.content = UTF8ToWStr(snippet["description"].GetString());
+					}
+					if (snippet["publishedAt"].IsString()) {
+						WORD y, m, d;
+						WORD hh, mm, ss;
+						if (sscanf_s(snippet["publishedAt"].GetString(), "%04hu-%02hu-%02huT%02hu:%02hu:%02hu", &y, &m, &d, &hh, &mm, &ss) == 6) {
+							y_fields.dtime.wYear   = y;
+							y_fields.dtime.wMonth  = m;
+							y_fields.dtime.wDay    = d;
+							y_fields.dtime.wHour   = hh;
+							y_fields.dtime.wMinute = mm;
+							y_fields.dtime.wSecond = ss;
 						}
 					}
 
-					free(data);
+					const rapidjson::Value& duration = items->value[0]["contentDetails"]["duration"];
+					if (duration.IsString()) {
+						const std::regex regex("PT(\\d+H)?(\\d{1,2}M)?(\\d{1,2}S)?", std::regex_constants::icase);
+						std::cmatch match;
+						if (std::regex_search(duration.GetString(), match, regex) && match.size() == 4) {
+							int h = 0;
+							int m = 0;
+							int s = 0;
+							if (match[1].matched) {
+								h = atoi(match[1].first);
+							}
+							if (match[2].matched) {
+								m = atoi(match[2].first);
+							}
+							if (match[3].matched) {
+								s = atoi(match[3].first);
+							}
 
-					return true;
+							y_fields.duration = (h * 3600 + m * 60 + s) * UNITS;
+						}
+					}
 				}
+
+				free(data);
+
+				return true;
 			}
 		}
 
@@ -327,7 +331,6 @@ namespace Youtube
 
 			CString videoId;
 
-			HINTERNET hUrl;
 			HINTERNET hInet = InternetOpenW(L"Googlebot", 0, nullptr, nullptr, 0);
 			if (hInet) {
 				HandleURL(url);
@@ -369,11 +372,7 @@ namespace Youtube
 					}
 				}
 
-				hUrl = InternetOpenUrlW(hInet, url, nullptr, 0, INTERNET_OPEN_FALGS, 0);
-				if (hUrl) {
-					InternetReadData(hUrl, &data, dataSize);
-					InternetCloseHandle(hUrl);
-				}
+				InternetReadData(hInet, url, &data, dataSize);
 			}
 
 			if (!data) {
@@ -405,14 +404,10 @@ namespace Youtube
 			CStringA strUrls;
 			std::list<CStringA> strUrlsLive;
 			if (strstr(data, MATCH_AGE_RESTRICTION)) {
-				free(data); data = nullptr; dataSize = 0;
+				free(data);
 
 				CString link; link.Format(L"https://www.youtube.com/embed/%s", videoId);
-				hUrl = InternetOpenUrlW(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
-				if (hUrl) {
-					InternetReadData(hUrl, &data, dataSize);
-					InternetCloseHandle(hUrl);
-				}
+				InternetReadData(hInet, link, &data, dataSize);
 
 				if (!data) {
 					InternetCloseHandle(hInet);
@@ -421,7 +416,7 @@ namespace Youtube
 
 				const CStringA sts = RegExpParseA(data, "\"sts\"\\s*:\\s*(\\d+)");
 
-				free(data); data = nullptr; dataSize = 0;
+				free(data);
 
 				if (sts.IsEmpty()) {
 					InternetCloseHandle(hInet);
@@ -429,11 +424,7 @@ namespace Youtube
 				}
 
 				link.Format(L"https://www.youtube.com/get_video_info?video_id=%s&eurl=https://youtube.googleapis.com/v/%s&sts=%S", videoId, videoId, sts);
-				hUrl = InternetOpenUrlW(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
-				if (hUrl) {
-					InternetReadData(hUrl, &data, dataSize);
-					InternetCloseHandle(hUrl);
-				}
+				InternetReadData(hInet, link, &data, dataSize);
 
 				if (!data) {
 					InternetCloseHandle(hInet);
@@ -462,29 +453,24 @@ namespace Youtube
 					url = UrlDecode(UrlDecode(hlspv_url));
 					url.Replace(L"\\/", L"/");
 					DLog(L"Youtube::Parse_URL() : Downloading m3u8 information \"%s\"", url);
-					hUrl = InternetOpenUrlW(hInet, url, nullptr, 0, INTERNET_OPEN_FALGS, 0);
-					if (hUrl) {
-						char* m3u8 = nullptr;
-						DWORD m3u8Size = 0;
-						InternetReadData(hUrl, &m3u8, m3u8Size);
-						InternetCloseHandle(hUrl);
-						if (m3u8Size) {
-							CStringA m3u8Str(m3u8);
-							free(m3u8);
+					char* m3u8 = nullptr;
+					DWORD m3u8Size = 0;
+					InternetReadData(hInet, url, &m3u8, m3u8Size);
+					if (m3u8Size) {
+						CStringA m3u8Str(m3u8);
+						free(m3u8);
 
-							m3u8Str.Replace("\r\n", "\n");
-							std::list<CStringA> lines;
-							Explode(m3u8Str, lines, '\n');
-							for (auto& line : lines) {
-								line.Trim();
-								if (line.IsEmpty() || (line.GetAt(0) == '#')) {
-									continue;
-								}
-
-								line.Replace("/keepalive/yes/", "/");
-								strUrlsLive.emplace_back(line);
+						m3u8Str.Replace("\r\n", "\n");
+						std::list<CStringA> lines;
+						Explode(m3u8Str, lines, '\n');
+						for (auto& line : lines) {
+							line.Trim();
+							if (line.IsEmpty() || (line.GetAt(0) == '#')) {
+								continue;
 							}
 
+							line.Replace("/keepalive/yes/", "/");
+							strUrlsLive.emplace_back(line);
 						}
 					}
 
@@ -565,96 +551,92 @@ namespace Youtube
 				if (!signature.IsEmpty() && !JSUrl.IsEmpty()) {
 					if (!bJSParsed) {
 						bJSParsed = TRUE;
-						hUrl = InternetOpenUrlW(hInet, JSUrl, nullptr, 0, INTERNET_OPEN_FALGS, 0);
-						if (hUrl) {
-							char* data = nullptr;
-							DWORD dataSize = 0;
-							InternetReadData(hUrl, &data, dataSize);
-							InternetCloseHandle(hUrl);
-							if (dataSize) {
-								const CStringA funcName = RegExpParseA(data, "\"signature\",([a-zA-Z0-9$]+)\\(");
-								if (!funcName.IsEmpty()) {
-									CStringA funcRegExp = funcName + "=function\\(a\\)\\{([^\\n]+)\\};"; funcRegExp.Replace("$", "\\$");
-									const CStringA funcBody = RegExpParseA(data, funcRegExp);
-									if (!funcBody.IsEmpty()) {
-										CStringA funcGroup;
-										std::list<CStringA> funcList;
-										std::list<CStringA> funcCodeList;
+						char* data = nullptr;
+						DWORD dataSize = 0;
+						InternetReadData(hInet, JSUrl, &data, dataSize);
+						if (dataSize) {
+							const CStringA funcName = RegExpParseA(data, "\"signature\",([a-zA-Z0-9$]+)\\(");
+							if (!funcName.IsEmpty()) {
+								CStringA funcRegExp = funcName + "=function\\(a\\)\\{([^\\n]+)\\};"; funcRegExp.Replace("$", "\\$");
+								const CStringA funcBody = RegExpParseA(data, funcRegExp);
+								if (!funcBody.IsEmpty()) {
+									CStringA funcGroup;
+									std::list<CStringA> funcList;
+									std::list<CStringA> funcCodeList;
 
-										std::list<CStringA> code;
-										Explode(funcBody, code, ';');
+									std::list<CStringA> code;
+									Explode(funcBody, code, ';');
 
-										for (const auto& line : code) {
+									for (const auto& line : code) {
 
-											if (line.Find("split") >= 0 || line.Find("return") >= 0) {
-												continue;
-											}
-
-											funcList.push_back(line);
-
-											if (funcGroup.IsEmpty()) {
-												const int k = line.Find('.');
-												if (k > 0) {
-													funcGroup = line.Left(k);
-												}
-											}
+										if (line.Find("split") >= 0 || line.Find("return") >= 0) {
+											continue;
 										}
 
-										if (!funcGroup.IsEmpty()) {
-											CStringA tmp; tmp.Format("var %s={", funcGroup);
-											tmp = GetEntry(data, tmp, "};");
-											if (!tmp.IsEmpty()) {
-												tmp.Remove('\n');
-												Explode(tmp, funcCodeList, "},");
+										funcList.push_back(line);
+
+										if (funcGroup.IsEmpty()) {
+											const int k = line.Find('.');
+											if (k > 0) {
+												funcGroup = line.Left(k);
 											}
 										}
+									}
 
-										if (!funcList.empty() && !funcCodeList.empty()) {
-											funcGroup += '.';
+									if (!funcGroup.IsEmpty()) {
+										CStringA tmp; tmp.Format("var %s={", funcGroup);
+										tmp = GetEntry(data, tmp, "};");
+										if (!tmp.IsEmpty()) {
+											tmp.Remove('\n');
+											Explode(tmp, funcCodeList, "},");
+										}
+									}
 
-											for (const auto& func : funcList) {
-												int funcArg = 0;
-												const CStringA funcArgs = GetEntry(func, "(", ")");
+									if (!funcList.empty() && !funcCodeList.empty()) {
+										funcGroup += '.';
 
-												std::list<CStringA> args;
-												Explode(funcArgs, args, ',');
-												if (args.size() >= 1) {
-													CStringA& arg = args.back();
-													int value = 0;
-													if (sscanf_s(arg, "%d", &value) == 1) {
-														funcArg = value;
+										for (const auto& func : funcList) {
+											int funcArg = 0;
+											const CStringA funcArgs = GetEntry(func, "(", ")");
+
+											std::list<CStringA> args;
+											Explode(funcArgs, args, ',');
+											if (args.size() >= 1) {
+												CStringA& arg = args.back();
+												int value = 0;
+												if (sscanf_s(arg, "%d", &value) == 1) {
+													funcArg = value;
+												}
+											}
+
+											CStringA funcName = GetEntry(func, funcGroup, "(");
+											funcName += ":function";
+
+											youtubeFuncType funcType = youtubeFuncType::funcNONE;
+
+											for (const auto& funcCode : funcCodeList) {
+												if (funcCode.Find(funcName) >= 0) {
+													if (funcCode.Find("splice") > 0) {
+														funcType = youtubeFuncType::funcDELETE;
+													} else if (funcCode.Find("reverse") > 0) {
+														funcType = youtubeFuncType::funcREVERSE;
+													} else if (funcCode.Find(".length]") > 0) {
+														funcType = youtubeFuncType::funcSWAP;
 													}
+													break;
 												}
+											}
 
-												CStringA funcName = GetEntry(func, funcGroup, "(");
-												funcName += ":function";
-
-												youtubeFuncType funcType = youtubeFuncType::funcNONE;
-
-												for (const auto& funcCode : funcCodeList) {
-													if (funcCode.Find(funcName) >= 0) {
-														if (funcCode.Find("splice") > 0) {
-															funcType = youtubeFuncType::funcDELETE;
-														} else if (funcCode.Find("reverse") > 0) {
-															funcType = youtubeFuncType::funcREVERSE;
-														} else if (funcCode.Find(".length]") > 0) {
-															funcType = youtubeFuncType::funcSWAP;
-														}
-														break;
-													}
-												}
-
-												if (funcType != youtubeFuncType::funcNONE) {
-													JSFuncs.push_back(funcType);
-													JSFuncArgs.push_back(funcArg);
-												}
+											if (funcType != youtubeFuncType::funcNONE) {
+												JSFuncs.push_back(funcType);
+												JSFuncArgs.push_back(funcArg);
 											}
 										}
 									}
 								}
-
-								free(data);
 							}
+
+							free(data);
 						}
 					}
 				}
@@ -714,31 +696,27 @@ namespace Youtube
 					}
 
 					DLog(L"Youtube::Parse_URL() : Downloading MPD manifest \"%s\"", dashmpdUrl);
-					hUrl = InternetOpenUrlW(hInet, dashmpdUrl, nullptr, 0, INTERNET_OPEN_FALGS, 0);
-					if (hUrl) {
-						char* dashmpd = nullptr;
-						DWORD dashmpdSize = 0;
-						InternetReadData(hUrl, &dashmpd, dashmpdSize);
-						InternetCloseHandle(hUrl);
-						if (dashmpdSize) {
-							CString xml = UTF8ToWStr(dashmpd);
-							free(dashmpd);
-							const std::wregex regex(L"<Representation(.*?)</Representation>");
-							std::wcmatch match;
-							LPCTSTR text = xml.GetBuffer();
-							while (std::regex_search(text, match, regex)) {
-								if (match.size() == 2) {
-									const CString xmlElement(match[1].first, match[1].length());
-									const CString url = RegExpParse(xmlElement, L"<BaseURL>(.*?)</BaseURL>");
-									const int itag    = _wtoi(RegExpParse(xmlElement, L"id=\"([0-9]+)\""));
-									const int fps     = _wtoi(RegExpParse(xmlElement, L"frameRate=\"([0-9]+)\""));
-									if (url.Find(L"dur/") > 0) {
-										AddUrl(youtubeUrllist, youtubeAudioUrllist, url, itag, fps);
-									}
+					char* dashmpd = nullptr;
+					DWORD dashmpdSize = 0;
+					InternetReadData(hInet, dashmpdUrl, &dashmpd, dashmpdSize);
+					if (dashmpdSize) {
+						CString xml = UTF8ToWStr(dashmpd);
+						free(dashmpd);
+						const std::wregex regex(L"<Representation(.*?)</Representation>");
+						std::wcmatch match;
+						LPCTSTR text = xml.GetBuffer();
+						while (std::regex_search(text, match, regex)) {
+							if (match.size() == 2) {
+								const CString xmlElement(match[1].first, match[1].length());
+								const CString url = RegExpParse(xmlElement, L"<BaseURL>(.*?)</BaseURL>");
+								const int itag    = _wtoi(RegExpParse(xmlElement, L"id=\"([0-9]+)\""));
+								const int fps     = _wtoi(RegExpParse(xmlElement, L"frameRate=\"([0-9]+)\""));
+								if (url.Find(L"dur/") > 0) {
+									AddUrl(youtubeUrllist, youtubeAudioUrllist, url, itag, fps);
 								}
-
-								text = match[0].second;
 							}
+
+							text = match[0].second;
 						}
 					}
 				}
@@ -996,11 +974,7 @@ namespace Youtube
 						nextToken.Empty();
 					}
 
-					HINTERNET hUrl = InternetOpenUrlW(hInet, link, nullptr, 0, INTERNET_OPEN_FALGS, 0);
-					if (hUrl) {
-						InternetReadData(hUrl, &data, dataSize);
-						InternetCloseHandle(hUrl);
-					}
+					InternetReadData(hInet, link, &data, dataSize);
 				}
 
 				if (!data) {
@@ -1051,8 +1025,6 @@ namespace Youtube
 				}
 
 				free(data);
-				data = nullptr;
-				dataSize = 0;
 
 				if (nextToken.IsEmpty()) {
 					InternetCloseHandle(hInet);
