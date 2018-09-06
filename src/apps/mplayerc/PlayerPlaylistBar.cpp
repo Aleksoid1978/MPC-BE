@@ -1125,6 +1125,19 @@ static CString CombinePath(CPath p, CString fn)
 		return fn;
 	}
 
+	if (fn.Find(L"/") != -1) {
+		CString url;
+		if (fn.Find(L"//") == 0) {
+			url = L"http:" + fn;
+		} else {
+			url = L"http://" + fn;
+		}
+		CUrl cUrl;
+		if (cUrl.CrackUrl(url) && cUrl.GetHostNameLength()) {
+			return url;
+		}
+	}
+
 	p.Append(CPath(fn));
 	CString out(p);
 	if (out.Find(L"://")) {
