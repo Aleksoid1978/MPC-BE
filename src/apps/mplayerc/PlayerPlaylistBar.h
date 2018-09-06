@@ -150,6 +150,7 @@ public:
 	void SortByPath();
 	void SortById();
 	void Randomize();
+	void ReverseSort();
 
 	POSITION GetPos() const;
 	void SetPos(POSITION pos);
