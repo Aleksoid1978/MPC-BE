@@ -623,9 +623,31 @@ void CPlaylist::Randomize()
 	}
 }
 
+void CPlaylist::ReverseSort()
+{
+	std::vector<plsort_str_t> a;
+	a.reserve(GetCount());
+
+	POSITION pos = GetHeadPosition();
+	while (pos) {
+		const plsort_str_t item = { GetAt(pos).m_fns.front(), pos };
+		a.emplace_back(item);
+
+		GetNext(pos);
+	}
+
+	for (const auto& item : a) {
+		AddHead(GetAt(item.pos));
+		__super::RemoveAt(item.pos);
+		if (m_pos == item.pos) {
+			m_pos = GetTailPosition();
+		}
+	}
+}
+
 POSITION CPlaylist::GetPos() const
 {
-	return(m_pos);
+	return m_pos;
 }
 
 void CPlaylist::SetPos(POSITION pos)
@@ -2506,6 +2528,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		M_SAVEAS,
 		M_SORTBYNAME,
 		M_SORTBYPATH,
+		M_REVERSESORT,
 		M_RANDOMIZE,
 		M_SORTBYID,
 		M_SHUFFLE,
@@ -2527,6 +2550,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	m.AppendMenu(MF_SEPARATOR);
 	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_SORTBYNAME, ResStr(IDS_PLAYLIST_SORTBYLABEL));
 	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_SORTBYPATH, ResStr(IDS_PLAYLIST_SORTBYPATH));
+	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_REVERSESORT, ResStr(IDS_PLAYLIST_REVERSESORT));
 	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_RANDOMIZE, ResStr(IDS_PLAYLIST_RANDOMIZE));
 	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_SORTBYID, ResStr(IDS_PLAYLIST_RESTORE));
 	m.AppendMenu(MF_SEPARATOR);
@@ -2602,6 +2626,11 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			break;
 		case M_SORTBYPATH:
 			m_pl.SortByPath();
+			SetupList();
+			SavePlaylist();
+			break;
+		case M_REVERSESORT:
+			m_pl.ReverseSort();
 			SetupList();
 			SavePlaylist();
 			break;
