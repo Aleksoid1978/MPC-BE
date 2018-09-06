@@ -1628,7 +1628,6 @@
 #define IDS_CAPTURE_ERROR_AUD_FILTER    41380
 #define IDS_CAPTURE_ERROR_DEVICE        41381
 #define IDS_INVALID_PARAMS_ERROR        41382
-#define IDS_EDIT_LIST_EDITOR            41383
 #define IDS_FILTERS_SOURCE              41384
 #define IDS_FILTERS_VIDEO               41385
 #define IDS_FILTERS_AUDIO               41386

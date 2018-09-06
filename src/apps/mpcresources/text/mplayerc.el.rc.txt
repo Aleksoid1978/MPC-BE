@@ -1399,7 +1399,6 @@ STRING IDS_DVD_FAV_ADDED		"Το DVD προστέθηκε στα αγαπημέν
 STRING IDS_DVD_INTERFACES_ERROR		"Απέτυχε το ερώτημα των απαραίτητων διασυνδέσεων για αναπαραγωγή DVD"
 STRING IDS_DVD_NAV_ALL_PINS_ERROR		"Απέτυχε η απόδοση όλων των pins του φίλτρου περιήγησης DVD"
 STRING IDS_DVD_NAV_SOME_PINS_ERROR		"Απέτυχε η απόδοση ορισμένων pins του φίλτρου περιήγησης DVD"
-STRING IDS_EDIT_LIST_EDITOR		"Επεξεργασία λίστας επεξεργαστών"
 STRING IDS_ENABLE_ALL_FILTERS		"&Ενεργοποίηση όλων των φίλτρων"
 STRING IDS_ENABLE_DXVA_FILTERS		"Ενεργοποίηση φίλτρων DXVA"
 STRING IDS_ENABLE_FFMPEG_FILTERS		"Ενεργοποίηση φίλτρων FFmpeg"
