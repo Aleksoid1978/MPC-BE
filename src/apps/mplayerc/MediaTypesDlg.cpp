@@ -20,7 +20,6 @@
  */
 
 #include "stdafx.h"
-#include <atlcoll.h>
 #include "MediaTypesDlg.h"
 #include <moreuuids.h>
 
@@ -31,8 +30,6 @@
 CMediaTypesDlg::CMediaTypesDlg(IGraphBuilderDeadEnd* pGBDE, CWnd* pParent /*=nullptr*/)
 	: CResizableDialog(CMediaTypesDlg::IDD, pParent)
 	, m_pGBDE(pGBDE)
-	, m_type(UNKNOWN)
-	, m_subtype(GUID_NULL)
 {
 }
 
@@ -46,34 +43,6 @@ void CMediaTypesDlg::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Control(pDX, IDC_COMBO1, m_pins);
 	DDX_Control(pDX, IDC_EDIT1, m_report);
-}
-
-void CMediaTypesDlg::AddLine(CString str)
-{
-	str += L"\r\n";
-	int len = m_report.GetWindowTextLength();
-	m_report.SetSel(len, len, TRUE);
-	m_report.ReplaceSel(str);
-}
-
-void CMediaTypesDlg::AddMediaType(AM_MEDIA_TYPE* pmt)
-{
-	m_subtype = pmt->subtype;
-
-	if (pmt->majortype == MEDIATYPE_Video) {
-		m_type = VIDEO;
-	} else if (pmt->majortype == MEDIATYPE_Audio) {
-		m_type = AUDIO;
-	} else {
-		m_type = UNKNOWN;
-	}
-
-	std::list<CString> sl;
-	CMediaTypeEx(*pmt).Dump(sl);
-
-	for (const auto& line : sl) {
-		AddLine(line);
-	}
 }
 
 BEGIN_MESSAGE_MAP(CMediaTypesDlg, CResizableDialog)
@@ -112,9 +81,9 @@ BOOL CMediaTypesDlg::OnInitDialog()
 void CMediaTypesDlg::OnCbnSelchangeCombo1()
 {
 	m_report.SetWindowTextW(L"");
+	CString reportStr;
 
 	int i = m_pins.GetCurSel();
-
 	if (i < 0) {
 		return;
 	}
@@ -128,21 +97,26 @@ void CMediaTypesDlg::OnCbnSelchangeCombo1()
 
 	if (paths.size()) {
 		for (const auto& path : paths) {
-			AddLine(path);
+			reportStr.Append(path + L"\r\n");
 		}
-		AddLine();
+		reportStr.Append(L"\r\n");
 	}
 
 	auto it = mts.begin();
 
 	for (int j = 0; it != mts.end(); j++) {
-		CString str;
-		str.Format(L"Media Type %d:", j);
-		AddLine(str);
-		AddLine(L"--------------------------");
-		AddMediaType(&(*it++));
-		AddLine();
+		reportStr.AppendFormat(L"Media Type %d:\r\n", j);
+		reportStr.Append(L"--------------------------\r\n");
+
+		auto& mt = *it++;
+		std::list<CString> sl;
+		CMediaTypeEx(mt).Dump(sl);
+		for (const auto& line : sl) {
+			reportStr.Append(line + L"\r\n");
+		}
+
+		reportStr.Append(L"\r\n");
 	}
 
-	m_report.SetSel(0, 0);
+	m_report.SetWindowTextW(reportStr);
 }
