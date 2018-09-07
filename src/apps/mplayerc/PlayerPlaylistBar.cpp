@@ -2541,31 +2541,34 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		M_SAVEAS,
 		M_SORTBYNAME,
 		M_SORTBYPATH,
-		M_REVERSESORT,
+		M_SORTREVERSE,
 		M_RANDOMIZE,
-		M_SORTBYID,
+		M_SORTBYID, // restore
 		M_SHUFFLE,
 		M_HIDEFULLSCREEN
 	};
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	m.AppendMenu(MF_STRING | (!fOnItem ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_OPEN, ResStr(IDS_PLAYLIST_OPEN) + L"\tSpace");
+	m.AppendMenu(MF_STRING | (fOnItem ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_OPEN, ResStr(IDS_PLAYLIST_OPEN) + L"\tSpace");
 	m.AppendMenu(MF_STRING | MF_ENABLED, M_ADD, ResStr(IDS_PLAYLIST_ADD));
-	m.AppendMenu(MF_STRING | (/*fSelected||*/!fOnItem ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_REMOVE, ResStr(IDS_PLAYLIST_REMOVE) + L"\tDelete");
+	m.AppendMenu(MF_STRING | (/*fSelected||*/fOnItem ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_REMOVE, ResStr(IDS_PLAYLIST_REMOVE) + L"\tDelete");
 	m.AppendMenu(MF_SEPARATOR);
-	m.AppendMenu(MF_STRING | (!fOnItem  ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_DELETE, ResStr(IDS_PLAYLIST_DELETE) + L"\tShift+Delete");
+	m.AppendMenu(MF_STRING | (fOnItem  ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_DELETE, ResStr(IDS_PLAYLIST_DELETE) + L"\tShift+Delete");
 	m.AppendMenu(MF_SEPARATOR);
-	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_CLEAR, ResStr(IDS_PLAYLIST_CLEAR));
+	m.AppendMenu(MF_STRING | (m_pl.GetCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_CLEAR, ResStr(IDS_PLAYLIST_CLEAR));
 	m.AppendMenu(MF_SEPARATOR);
-	m.AppendMenu(MF_STRING | (!fOnItem ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_CLIPBOARD, ResStr(IDS_PLAYLIST_COPYTOCLIPBOARD));
-	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_SAVEAS, ResStr(IDS_PLAYLIST_SAVEAS));
+	m.AppendMenu(MF_STRING | (fOnItem ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_CLIPBOARD, ResStr(IDS_PLAYLIST_COPYTOCLIPBOARD));
+	m.AppendMenu(MF_STRING | (m_pl.GetCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_SAVEAS, ResStr(IDS_PLAYLIST_SAVEAS));
 	m.AppendMenu(MF_SEPARATOR);
-	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_SORTBYNAME, ResStr(IDS_PLAYLIST_SORTBYLABEL));
-	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_SORTBYPATH, ResStr(IDS_PLAYLIST_SORTBYPATH));
-	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_REVERSESORT, ResStr(IDS_PLAYLIST_REVERSESORT));
-	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_RANDOMIZE, ResStr(IDS_PLAYLIST_RANDOMIZE));
-	m.AppendMenu(MF_STRING | (!m_pl.GetCount() ? (MF_DISABLED | MF_GRAYED) : MF_ENABLED), M_SORTBYID, ResStr(IDS_PLAYLIST_RESTORE));
+	CMenu submenu2;
+	submenu2.CreatePopupMenu();
+	submenu2.AppendMenu(MF_STRING | MF_ENABLED, M_SORTBYNAME, ResStr(IDS_PLAYLIST_SORTBYLABEL));
+	submenu2.AppendMenu(MF_STRING | MF_ENABLED, M_SORTBYPATH, ResStr(IDS_PLAYLIST_SORTBYPATH));
+	submenu2.AppendMenu(MF_STRING | MF_ENABLED, M_SORTREVERSE, ResStr(IDS_PLAYLIST_SORTREVERSE));
+	m.AppendMenu(MF_STRING | MF_POPUP | (m_pl.GetCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), (UINT_PTR)submenu2.Detach(), ResStr(IDS_PLAYLIST_SORT));
+	m.AppendMenu(MF_STRING | (m_pl.GetCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_RANDOMIZE, ResStr(IDS_PLAYLIST_RANDOMIZE));
+	m.AppendMenu(MF_STRING | (m_pl.GetCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_SORTBYID, ResStr(IDS_PLAYLIST_RESTORE));
 	m.AppendMenu(MF_SEPARATOR);
 	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bShufflePlaylistItems ? MF_CHECKED : MF_UNCHECKED), M_SHUFFLE, ResStr(IDS_PLAYLIST_SHUFFLE));
 	m.AppendMenu(MF_SEPARATOR);
@@ -2642,7 +2645,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			SetupList();
 			SavePlaylist();
 			break;
-		case M_REVERSESORT:
+		case M_SORTREVERSE:
 			m_pl.ReverseSort();
 			SetupList();
 			SavePlaylist();
