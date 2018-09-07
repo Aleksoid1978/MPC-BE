@@ -34,10 +34,6 @@ class CMediaTypesDlg : public CResizableDialog
 
 private:
 	CComPtr<IGraphBuilderDeadEnd> m_pGBDE;
-	enum {UNKNOWN, VIDEO, AUDIO} m_type;
-	GUID m_subtype;
-	void AddLine(CString str = L"");
-	void AddMediaType(AM_MEDIA_TYPE* pmt);
 
 public:
 	CMediaTypesDlg(IGraphBuilderDeadEnd* pGBDE, CWnd* pParent = nullptr);
