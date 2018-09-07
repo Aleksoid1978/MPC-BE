@@ -846,7 +846,8 @@
 #define IDS_SHADERS_SELECT              14136
 #define IDS_PLAYLIST_DELETE             14137
 #define IDS_PLAYLIST_DELETE_QUESTION    14138
-#define IDS_PLAYLIST_REVERSESORT        14139
+#define IDS_PLAYLIST_SORT               14140
+#define IDS_PLAYLIST_SORTREVERSE        14141
 #define IDS_AG_AUDIO                    14145
 #define IDS_AG_ZOOM                     14152
 #define IDS_FAVORITES_ADD               14153
