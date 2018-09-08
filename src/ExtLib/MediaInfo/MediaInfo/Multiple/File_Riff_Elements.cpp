@@ -3633,6 +3633,52 @@ void File_Riff::WAVE_bext()
         Get_Local(Element_Size-Element_Offset, History,         "History");
 
     FILLING_BEGIN();
+        // Handle some buggy OriginationDate/OriginalTime, prefixed 0 are sometimes missing e.g. 2015-3-2
+        if (OriginationDate.size()!=10
+         && OriginationDate.size()>=8
+         && OriginationDate[0]>=__T('0') && OriginationDate[0]<=__T('9')
+         && OriginationDate[1]>=__T('0') && OriginationDate[1]<=__T('9')
+         && OriginationDate[2]>=__T('0') && OriginationDate[2]<=__T('9')
+         && OriginationDate[3]>=__T('0') && OriginationDate[3]<=__T('9')
+         && OriginationDate[4]==__T('-')
+         && OriginationDate[5]>=__T('0') && OriginationDate[5]<=__T('9'))
+        {
+            Ztring Modified(OriginationDate);
+            if (Modified[6]==__T('-'))
+                Modified.insert(5, 1, __T('0'));
+            if (Modified.size()==10
+             && Modified[8]>=__T('0') && Modified[8]<=__T('9')
+             && Modified[9]>=__T('0') && Modified[9]<=__T('9'))
+                OriginationDate=Modified;
+            if (Modified.size()==9
+             && Modified[8]>=__T('0') && Modified[8]<=__T('9'))
+            {
+                Modified.insert(8, 1, __T('0'));
+                OriginationDate=Modified;
+            }
+        }
+        if (OriginationTime.size()!=8
+         && OriginationTime.size()>=6
+         && OriginationTime[0]>=__T('0') && OriginationTime[0]<=__T('9')
+         && OriginationTime[1]>=__T('0') && OriginationTime[1]<=__T('9')
+         && OriginationTime[2]==__T(':')
+         && OriginationTime[3]>=__T('0') && OriginationTime[3]<=__T('9'))
+        {
+            Ztring Modified(OriginationTime);
+            if (Modified[4]==__T(':'))
+                Modified.insert(3, 1, __T('0'));
+            if (Modified.size()==8
+             && Modified[6]>=__T('0') && Modified[6]<=__T('9')
+             && Modified[7]>=__T('0') && Modified[7]<=__T('9'))
+                OriginationTime=Modified;
+            if (Modified.size()==7
+             && Modified[6]>=__T('0') && Modified[6]<=__T('9'))
+            {
+                Modified.insert(6, 1, __T('0'));
+                OriginationTime=Modified;
+            }
+        }
+
         Fill(Stream_General, 0, "bext_Present", "Yes");
         Fill_SetOptions(Stream_General, 0, "bext_Present", "N NT");
         Fill(Stream_General, 0, General_Description, Description);
@@ -3642,7 +3688,7 @@ void File_Riff::WAVE_bext()
         Fill(Stream_General, 0, General_Encoded_Library_Settings, History);
         if (SamplesPerSec && TimeReference!=(int64u)-1)
         {
-            Fill(Stream_Audio, 0, Audio_Delay, float64_int64s(((float64)TimeReference)*1000/SamplesPerSec));
+            Fill(Stream_Audio, 0, Audio_Delay, ((float64)TimeReference*1000/SamplesPerSec), 6);
             Fill(Stream_Audio, 0, Audio_Delay_Source, "Container (bext)");
         }
         if (Version>=1 && UMID1 != 0 && UMID2 != 0)

@@ -1603,6 +1603,8 @@ MediaInfo_Internal* File__ReferenceFilesHelper::MI_Create()
         MI_Temp->Config.File_Names_RootDirectory=FileName(MI->File_Name).Path_Get();
         if (!Config->File_TestContinuousFileNames_Get() || Sequences[Sequences_Current]->FileNames.size()>1)
             MI_Temp->Option(__T("File_TestContinuousFileNames"), __T("0"));
+        if (!Config->File_TestDirectory_Get())
+            MI_Temp->Option(__T("File_TestDirectory"), __T("0"));
         ZtringListList SubFile_IDs;
         if (Sequences[Sequences_Current]->IsMain)
             HasMainFile=true;

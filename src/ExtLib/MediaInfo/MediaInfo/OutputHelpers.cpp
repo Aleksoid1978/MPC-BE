@@ -70,7 +70,7 @@ string XML_Encode (const string& Data)
                 if (Pos+1<Data.size() && Data[Pos+1]=='\n') // translate the #xD #xA sequence to a single #xA character
                     Pos++;
             break;
-            default: if (Data[Pos]>=0x20) Result+=Data[Pos]; // Ignore others control characters
+            default: if ((unsigned char)Data[Pos]>=0x20) Result+=Data[Pos]; // Ignore others control characters
         }
     }
     return Result;
@@ -135,6 +135,8 @@ string To_XML (Node& Cur_Node, const int& Level, bool Print_Header, bool Indent)
     if (Cur_Node.Value.empty() && Cur_Node.Childs.empty())
     {
         Result+=" />";
+        if (!Cur_Node.XmlComment.empty() && Cur_Node.XmlCommentOut.empty())
+            Result+=" <!-- "+Cur_Node.XmlComment+" -->";
         if (Cur_Node.XmlCommentOut.size())
             Result+="\n"+(Indent?string(Level, '\t'):string(""))+"-->";
         return Result;
@@ -149,8 +151,13 @@ string To_XML (Node& Cur_Node, const int& Level, bool Print_Header, bool Indent)
         Result+=XML_Encode(Cur_Node.Value);
     }
 
+    bool CanDisplayXmlComment;
     if (Cur_Node.Childs.size())
     {
+        CanDisplayXmlComment=false;
+        if (!Cur_Node.XmlComment.empty() && Cur_Node.XmlCommentOut.empty())
+            Result+=" <!-- "+Cur_Node.XmlComment+" -->";
+
         for (size_t Pos=0; Pos<Cur_Node.Childs.size(); Pos++)
         {
             if (!Cur_Node.Childs[Pos])
@@ -163,10 +170,14 @@ string To_XML (Node& Cur_Node, const int& Level, bool Print_Header, bool Indent)
         Cur_Node.Childs.clear(); //Free memory
         Result+="\n"+(Indent?string(Level, '\t'):string(""));
     }
+    else
+        CanDisplayXmlComment=true;
 
     Result+="</"+Cur_Node.Name+">";
     if (Cur_Node.XmlCommentOut.size())
         Result+="\n"+(Indent?string(Level, '\t'):string(""))+"-->";
+    else if (!Cur_Node.XmlComment.empty() && CanDisplayXmlComment)
+        Result+=" <!-- "+Cur_Node.XmlComment+" -->";
     if (!Level)
         Result+="\n";
 

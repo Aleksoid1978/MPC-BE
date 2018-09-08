@@ -98,6 +98,22 @@ size_t MediaInfoList_Internal::Open(const String &File_Name, const fileoptions_t
     {
         List=Dir::GetAllFileNames(File_Name, (Options&FileOption_NoRecursive)?Dir::Include_Files:((Dir::dirlist_t)(Dir::Include_Files|Dir::Parse_SubDirs)));
         sort(List.begin(), List.end());
+
+        #if MEDIAINFO_ADVANCED
+            if (MediaInfoLib::Config.ParseOnlyKnownExtensions_IsSet())
+            {
+                set<Ztring> ExtensionsList=MediaInfoLib::Config.ParseOnlyKnownExtensions_GetList_Set();
+                bool AcceptNoExtension=ExtensionsList.find(Ztring())!=ExtensionsList.end();
+                for (size_t i=List.size()-1; i!=(size_t)-1; i--)
+                {
+                    const Ztring& Name=List[i];
+                    size_t Extension_Pos=Name.rfind(__T('.'));
+                    if (Extension_Pos!=string::npos && ExtensionsList.find(Name.substr(Extension_Pos+1))==ExtensionsList.end()
+                     || Extension_Pos==string::npos && !AcceptNoExtension)
+                            List.erase(List.begin()+i);
+                }
+            }
+        #endif //MEDIAINFO_ADVANCED
     }
     #endif //defined(MEDIAINFO_DIRECTORY_YES)
 
@@ -137,6 +153,31 @@ size_t MediaInfoList_Internal::Open(const String &File_Name, const fileoptions_t
     }
 }
 
+#if defined(MEDIAINFO_FILE_YES)
+static size_t RemoveFilesFromList(std::queue<String>& ToParse, Ztring CompleteName_Begin, const Ztring &CompleteName_Last)
+{
+    size_t Removed=0;
+    size_t Pos=0;
+    for (; Pos<CompleteName_Begin.size(); Pos++)
+    {
+        if (Pos>=CompleteName_Last.size())
+            break;
+        if (CompleteName_Begin[Pos]!=CompleteName_Last[Pos])
+            break;
+    }
+    if (Pos<CompleteName_Begin.size())
+    {
+        CompleteName_Begin.resize(Pos);
+        while (!ToParse.empty() && ToParse.front().find(CompleteName_Begin)==0)
+        {
+            ToParse.pop();
+            Removed++;
+        }
+    }
+    return Removed;
+}
+#endif //defined(MEDIAINFO_FILE_YES)
+
 void MediaInfoList_Internal::Entry()
 {
     if (ToParse_Total==0)
@@ -149,6 +190,21 @@ void MediaInfoList_Internal::Entry()
         {
             Ztring FileName=ToParse.front();
             ToParse.pop();
+            #if defined(MEDIAINFO_FILE_YES)
+                bool Skip=false;
+                for (size_t i=0; i<ToParse_ToIgnore.size(); i++)
+                {
+                    if (ToParse_ToIgnore[i]==FileName)
+                    {
+                        ToParse_ToIgnore.erase(ToParse_ToIgnore.begin()+i);
+                        ToParse_AlreadyDone++;
+                        Skip=true;
+                        continue;
+                    }
+                }
+                if (Skip)
+                    continue;
+            #endif //defined(MEDIAINFO_FILE_YES)
             MediaInfo_Internal* MI=new MediaInfo_Internal();
             for (std::map<String, String>::iterator Config_MediaInfo_Item=Config_MediaInfo_Items.begin(); Config_MediaInfo_Item!=Config_MediaInfo_Items.end(); ++Config_MediaInfo_Item)
                 MI->Option(Config_MediaInfo_Item->first, Config_MediaInfo_Item->second);
@@ -176,34 +232,60 @@ void MediaInfoList_Internal::Entry()
             CS.Enter();
             ToParse_AlreadyDone++;
 
-            //Removing sequences of files from the list
-            if (!MI->Get(Stream_General, 0, General_CompleteName_Last).empty())
-            {
-                Ztring CompleteName_Begin=MI->Get(Stream_General, 0, General_CompleteName);
-                Ztring CompleteName_Last=MI->Get(Stream_General, 0, General_CompleteName_Last);
-                size_t Pos=0;
-                for (; Pos<CompleteName_Begin.size(); Pos++)
+            #if defined(MEDIAINFO_FILE_YES)
+                //Removing sequences of files from the list
+                if (!MI->Get(Stream_General, 0, General_CompleteName_Last).empty())
+                    ToParse_AlreadyDone+=RemoveFilesFromList(ToParse, MI->Get(Stream_General, 0, General_CompleteName),
+                                                                      MI->Get(Stream_General, 0, General_CompleteName_Last));
+                if (MI->Config.File_TestDirectory_Get() && MI->Get(Stream_General, 0, General_Format)==__T("Directory"))
                 {
-                    if (Pos>=CompleteName_Last.size())
-                        break;
-                    if (CompleteName_Begin[Pos]!=CompleteName_Last[Pos])
-                        break;
+                    for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Max; StreamKind++)
+                        for (size_t StreamPos=0; StreamPos<MI->Count_Get((stream_t)StreamKind); StreamPos++)
+                        {
+                            if (!MI->Get((stream_t)StreamKind, StreamPos, __T("Source_Last")).empty())
+                                ToParse_AlreadyDone+=RemoveFilesFromList(ToParse, MI->Get(Stream_General, 0, General_CompleteName)+MI->Get((stream_t)StreamKind, StreamPos, __T("Source")),
+                                                                                  MI->Get(Stream_General, 0, General_CompleteName)+MI->Get((stream_t)StreamKind, StreamPos, __T("Source_Last")));
+                            else
+                            {
+                                Ztring Source=MI->Get((stream_t)StreamKind, StreamPos, __T("Source"));
+                                if (!Source.empty())
+                                {
+                                    Ztring Dir=MI->Get(Stream_General, 0, General_CompleteName);
+                                    if (!Dir.empty() && Dir[Dir.size()-1]!=__T('/') && Dir[Dir.size()-1]!=__T('\\'))
+                                    {
+                                        size_t Separator_Pos=Dir.find_last_of(__T("\\/"));
+                                        if (Separator_Pos!=string::npos)
+                                            Dir.resize(Separator_Pos+1);
+                                        else
+                                            Dir.clear();
+                                    }
+                                    size_t i;
+                                    if (PathSeparator!=__T('/'))
+                                        while ((i=Source.find(__T('/')))!=string::npos)
+                                            Source[i]=PathSeparator;
+                                    if (PathSeparator!=__T('\\'))
+                                        while ((i=Source.find(__T('\\')))!=string::npos)
+                                            Source[i]=PathSeparator;
+                                    Source=Dir+Source;
+                                    i=0;
+                                    for (; i<Info.size(); i++)
+                                        if (Info[i]->Get(Stream_General, 0, General_CompleteName)==Source)
+                                        {
+                                            delete Info[i];
+                                            Info.erase(Info.begin()+i);
+                                        }
+                                    if (i>=Info.size())
+                                        ToParse_ToIgnore.push_back(Source);
+                                }
+                            }
+                        }
                 }
-                if (Pos<CompleteName_Begin.size())
-                {
-                    CompleteName_Begin.resize(Pos);
-                    while (!ToParse.empty() && ToParse.front().find(CompleteName_Begin)==0)
-                    {
-                        ToParse.pop();
-                        ToParse_Total--;
-                    }
-                }
-            }
-
-            State=ToParse_AlreadyDone*10000/ToParse_Total;
-            //if ((ToParse_AlreadyDone%10)==0)
-            //    printf("%f done (%i/%i %s)\n", ((float)State)/100, (int)ToParse_AlreadyDone, (int)ToParse_Total, Ztring(ToParse.front()).To_UTF8().c_str());
+            #endif //defined(MEDIAINFO_FILE_YES)
         }
+
+        State=ToParse_AlreadyDone*10000/ToParse_Total;
+        //if ((ToParse_AlreadyDone%10)==0)
+        //    printf("%f done (%i/%i %s)\n", ((float)State)/100, (int)ToParse_AlreadyDone, (int)ToParse_Total, Ztring(ToParse.front()).To_UTF8().c_str());
         if (IsTerminating() || State==10000)
         {
             CS.Leave();

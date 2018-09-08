@@ -1326,8 +1326,10 @@ protected :
 public:
     #if defined(MEDIAINFO_FILE_YES)
     void TestContinuousFileNames(size_t CountOfFiles=24, Ztring FileExtension=Ztring(), bool SkipComputeDelay=false);
+    void TestDirectory();
     #else //defined(MEDIAINFO_FILE_YES)
     void TestContinuousFileNames(size_t =24, Ztring =Ztring(), bool =false) {}
+    void TestDirectory() {}
     #endif //defined(MEDIAINFO_FILE_YES)
     #if MEDIAINFO_FIXITY
     bool FixFile(int64u FileOffsetForWriting, const int8u* ToWrite, const size_t ToWrite_Size);

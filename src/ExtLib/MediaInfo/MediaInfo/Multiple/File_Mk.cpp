@@ -801,7 +801,6 @@ void File_Mk::Streams_Finish()
                     Item->second.erase(Item2);
                     bool Tags_Verified=false;
                     {
-                        Ztring Happ = Retrieve(Stream_General, 0, "Encoded_Application");
                         Ztring Hutc = Retrieve(Stream_General, 0, "Encoded_Date");
                         Hutc.FindAndReplace(__T("UTC "), Ztring());
                         Ztring App, Utc;
@@ -817,8 +816,10 @@ void File_Mk::Streams_Finish()
                             Utc=Item2->second;
                             Item->second.erase(Item2);
                         }
-                        if (App==Happ && Utc==Hutc) Tags_Verified=true;
-                        else Fill(StreamKind_Last, StreamPos_Last, "Statistics Tags Issue", App + __T(' ') + Utc + __T(" / ") + Happ + __T(' ') + Hutc);
+                        if (Utc<=Hutc)
+                            Tags_Verified=true;
+                        else
+                            Fill(StreamKind_Last, StreamPos_Last, "Statistics Tags Issue", App + __T(' ') + Utc + __T(" / ") + Retrieve(Stream_General, 0, "Encoded_Application") + __T(' ') + Hutc);
                     }
                     Ztring TempTag;
 
@@ -2125,7 +2126,7 @@ void File_Mk::Ebml_DocTypeReadVersion()
 
     //Filling
     FILLING_BEGIN();
-        if (UInteger!=Format_Version)
+        if (UInteger!=Format_Version && MediaInfoLib::Config.LegacyStreamDisplay_Get())
             Fill(Stream_General, 0, General_Format_Version, __T("Version ")+Ztring::ToZtring(UInteger)); //Adding compatible version for info about legacy decoders
     FILLING_END();
 }

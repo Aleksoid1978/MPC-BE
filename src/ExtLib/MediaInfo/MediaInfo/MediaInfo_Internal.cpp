@@ -444,6 +444,7 @@ Ztring HighestFormat(stream_t StreamKind, size_t Parameter, ZtringList& Info, Zt
     static const Char* AACLCSBRPS=__T("AAC LC SBR PS");
     static const Char* Core=__T("Core");
     static const Char* Discrete=__T("ES Discrete without ES Matrix");
+    static const Char* Dep=__T("Dep");
     static const Char* DTS=__T("DTS");
     static const Char* ERAAC=__T("ER AAC");
     static const Char* ERAACLC=__T("ER AAC LC");
@@ -487,9 +488,7 @@ Ztring HighestFormat(stream_t StreamKind, size_t Parameter, ZtringList& Info, Zt
             }
             break;
         case Generic_Format_String:
-            if (!Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format_AdditionalFeatures)].empty())
-                return Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format)]+__T(' ')+Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format_AdditionalFeatures)];
-            else if (Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format)]==AC3 || Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format)]==EAC3)
+            if (Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format)]==AC3 || Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format)]==EAC3)
             {
                 Ztring ToReturn=Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format)];
                 Ztring AdditionalFeatures=HighestFormat(StreamKind, File__Analyze::Fill_Parameter(StreamKind, Generic_Format_AdditionalFeatures), Info, Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format_AdditionalFeatures)], ShouldReturn);
@@ -497,7 +496,7 @@ Ztring HighestFormat(stream_t StreamKind, size_t Parameter, ZtringList& Info, Zt
                     ToReturn.clear();
 
                 //Remove "Dep" from Format string
-                size_t HasDep=AdditionalFeatures.find(__T("Dep"));
+                size_t HasDep=AdditionalFeatures.find(Dep);
                 if (HasDep!=string::npos)
                 {
                     if (ToReturn==AC3)
@@ -599,7 +598,7 @@ Ztring HighestFormat(stream_t StreamKind, size_t Parameter, ZtringList& Info, Zt
                         AdditionalFeatures+=__T(' ');
 
                             if (Profiles[i]==EAC3Dep)
-                        AdditionalFeatures+=__T("Dep");
+                        AdditionalFeatures+=Dep;
                     else if (Profiles[i].find(JOC)!=string::npos)
                         AdditionalFeatures+=JOC;
                     else if (Profiles[i].find(_16ch)!=string::npos)
@@ -642,7 +641,7 @@ Ztring HighestFormat(stream_t StreamKind, size_t Parameter, ZtringList& Info, Zt
                 if (Profile.find(LC)!=string::npos)
                     return "Advanced Audio Codec Low Complexity";
             }
-            if (Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format)]==MLP || Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format_Profile)].find(MLP)!=string::npos)
+            if (Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format)].find(MLP)!=string::npos || Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format_Profile)].find(MLP)!=string::npos)
             {
                 Ztring ToReturn;
                 if (Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format)]==AC3)
@@ -664,9 +663,11 @@ Ztring HighestFormat(stream_t StreamKind, size_t Parameter, ZtringList& Info, Zt
             }
             if (Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format)]==AC3 || Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format)]==EAC3)
             {
-                if (Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format_Profile)].find(JOC)!=string::npos)
+                if (Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format_Profile)].find(JOC)!=string::npos
+                 || Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format_AdditionalFeatures)].find(JOC)!=string::npos)
                     return __T("Enhanced AC-3 with Joint Object Coding");
-                if (Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format_Profile)].find(EAC3)!=string::npos)
+                if (Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format_Profile)].find(EAC3)!=string::npos
+                 || Info[File__Analyze::Fill_Parameter(StreamKind, Generic_Format_AdditionalFeatures)].find(Dep)!=string::npos)
                     return __T("Enhanced AC-3");
             }
             break;
@@ -700,6 +701,27 @@ Ztring HighestFormat(stream_t StreamKind, size_t Parameter, ZtringList& Info, Zt
         default:;
     }
     return Value;
+}
+
+static stream_t Text2StreamT(const Ztring& ParameterName, size_t ToRemove)
+{
+    Ztring StreamKind_Text=ParameterName.substr(0, ParameterName.size()-ToRemove);
+    stream_t StreamKind2=Stream_Max;
+    if (StreamKind_Text==__T("General"))
+        StreamKind2=Stream_General;
+    if (StreamKind_Text==__T("Video"))
+        StreamKind2=Stream_Video;
+    if (StreamKind_Text==__T("Audio"))
+        StreamKind2=Stream_Audio;
+    if (StreamKind_Text==__T("Text"))
+        StreamKind2=Stream_Text;
+    if (StreamKind_Text==__T("Other"))
+        StreamKind2=Stream_Other;
+    if (StreamKind_Text==__T("Image"))
+        StreamKind2=Stream_Image;
+    if (StreamKind_Text==__T("Menu"))
+        StreamKind2=Stream_Menu;
+    return StreamKind2;
 }
 
 //***************************************************************************
@@ -1511,6 +1533,127 @@ Ztring MediaInfo_Internal::Inform(size_t)
 //---------------------------------------------------------------------------
 Ztring MediaInfo_Internal::Get(stream_t StreamKind, size_t StreamPos, size_t Parameter, info_t KindOfInfo)
 {
+    #if MEDIAINFO_ADVANCED
+    if (StreamKind==Stream_General && KindOfInfo==Info_Text)
+    {
+        switch (Parameter)
+        {
+            case General_Video_Codec_List: 
+            case General_Audio_Codec_List: 
+            case General_Text_Codec_List: 
+            case General_Image_Codec_List: 
+            case General_Other_Codec_List: 
+            case General_Menu_Codec_List:
+                if (!MediaInfoLib::Config.Legacy_Get())
+                {
+                    // MediaInfo GUI is using them by default in one of its old templates, using the "Format" ones.
+                    return Get(StreamKind, StreamPos, Parameter-2, Info_Text);
+                }
+                {
+                Ztring ParameterName=Get(Stream_General, 0, Parameter, Info_Name);
+                stream_t StreamKind2=Text2StreamT(ParameterName, 12);
+                size_t Parameter2=File__Analyze::Fill_Parameter(StreamKind2, Generic_Codec_String);
+                Ztring Temp;
+                size_t Count=Count_Get(StreamKind2);
+                for (size_t i=0; i<Count; i++)
+                {
+                    if (i)
+                        Temp+=__T(" / ");
+                    size_t Temp_Size=Temp.size();
+                    Temp+=Get(StreamKind2, i, Parameter2, Info_Text);
+                }
+                return (Temp.size()>(Count-1)*3)?Temp:Ztring();
+                }
+                break;
+            case General_Video_Format_List: 
+            case General_Audio_Format_List:
+            case General_Text_Format_List:
+            case General_Image_Format_List:
+            case General_Other_Format_List:
+            case General_Menu_Format_List:
+                {
+                Ztring ParameterName=Get(Stream_General, 0, Parameter, Info_Name);
+                stream_t StreamKind2=Text2StreamT(ParameterName, 12);
+                size_t Parameter2=File__Analyze::Fill_Parameter(StreamKind2, Generic_Format_String);
+                Ztring Temp;
+                size_t Count=Count_Get(StreamKind2);
+                for (size_t i=0; i<Count; i++)
+                {
+                    if (i)
+                        Temp+=__T(" / ");
+                    size_t Temp_Size=Temp.size();
+                    Temp+=Get(StreamKind2, i, Parameter2, Info_Text);
+                }
+                return (Temp.size()>(Count-1)*3)?Temp:Ztring();
+                }
+            case General_Video_Format_WithHint_List:
+            case General_Audio_Format_WithHint_List:
+            case General_Text_Format_WithHint_List:
+            case General_Image_Format_WithHint_List:
+            case General_Other_Format_WithHint_List:
+            case General_Menu_Format_WithHint_List:
+                {
+                Ztring ParameterName=Get(Stream_General, 0, Parameter, Info_Name);
+                stream_t StreamKind2=Text2StreamT(ParameterName, 21);
+                size_t Parameter2=File__Analyze::Fill_Parameter(StreamKind2, Generic_Format_String);
+                Ztring Temp;
+                size_t Count=Count_Get(StreamKind2);
+                for (size_t i=0; i<Count; i++)
+                {
+                    if (i)
+                        Temp+=__T(" / ");
+                    size_t Temp_Size=Temp.size();
+                    Temp+=Get(StreamKind2, i, Parameter2, Info_Text);
+                    Ztring Hint=Get(StreamKind2, i, File__Analyze::Fill_Parameter(StreamKind2, Generic_CodecID_Hint), Info_Text);
+                    if (!Hint.empty())
+                    {
+                        Temp+=__T(" (");
+                        Temp+=Hint;
+                        Temp+=__T(')');
+                    }
+                }
+                return (Temp.size()>(Count-1)*3)?Temp:Ztring();
+                }
+            case General_Video_Language_List:
+            case General_Audio_Language_List:
+            case General_Text_Language_List:
+            case General_Image_Language_List:
+            case General_Other_Language_List:
+            case General_Menu_Language_List:
+                {
+                Ztring ParameterName=Get(Stream_General, 0, Parameter, Info_Name);
+                stream_t StreamKind2=Text2StreamT(ParameterName, 14);
+                size_t Parameter2=File__Analyze::Fill_Parameter(StreamKind2, Generic_Language)+1;
+                Ztring Temp;
+                size_t Count=Count_Get(StreamKind2);
+                for (size_t i=0; i<Count; i++)
+                {
+                    if (i)
+                        Temp+=__T(" / ");
+                    size_t Temp_Size=Temp.size();
+                    Temp+=Get(StreamKind2, i, Parameter2, Info_Text);
+                }
+                return (Temp.size()>(Count-1)*3)?Temp:Ztring();
+                }
+            case General_VideoCount: 
+            case General_AudioCount: 
+            case General_TextCount: 
+            case General_ImageCount:
+            case General_OtherCount:
+            case General_MenuCount:
+                {
+                stream_t StreamKind2=Text2StreamT(Get(Stream_General, 0, Parameter, Info_Name), 5);
+                size_t Count=Count_Get(StreamKind2);
+                if (Count)
+                    return Ztring::ToZtring(Count);
+                else
+                    return Ztring();
+                }
+            default:;
+        }
+    }
+    #endif //MEDIAINFO_ADVANCED
+
     CriticalSectionLocker CSL(CS);
     MEDIAINFO_DEBUG_CONFIG_TEXT(Debug+=__T("Get, StreamKind=");Debug+=Ztring::ToZtring((size_t)StreamKind);Debug+=__T(", StreamPos=");Debug+=Ztring::ToZtring(StreamPos);Debug+=__T(", Parameter=");Debug+=Ztring::ToZtring(Parameter);)
 

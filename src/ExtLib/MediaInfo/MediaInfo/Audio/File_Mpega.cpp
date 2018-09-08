@@ -400,6 +400,23 @@ void File_Mpega::Streams_Fill()
     Fill(Stream_Audio, 0, Audio_BitRate_Minimum, BitRate_Minimum);
     Fill(Stream_Audio, 0, Audio_BitRate_Nominal, BitRate_Nominal);
 
+    #if MEDIAINFO_ADVANCED
+        if (!IsSub && !VBR_Frames && !VBR_FileSize && BitRate_Mode==__T("VBR") && ID<4 && sampling_frequency<4 && Retrieve_Const(Stream_Audio, 0, Audio_BitRate).empty() && Config->File_RiskyBitRateEstimation_Get())
+        {
+            size_t Divider;
+            if (ID==3 && layer==3) //MPEG 1 layer 1
+                 Divider=384/8;
+            else if ((ID==2 || ID==0) && layer==3) ///MPEG 2 or 2.5 layer 1
+                 Divider=192/8;
+            else if ((ID==2 || ID==0) && layer==1) //MPEG 2 or 2.5 layer 3
+                Divider=576/8;
+            else
+                Divider=1152/8;
+            BitRate=(int32u)((File_Offset+Buffer_Offset+Element_Size)*Mpega_SamplingRate[ID][sampling_frequency]/Frame_Count/Divider);
+            Fill(Stream_Audio, 0, Audio_BitRate, BitRate);
+        }
+    #endif //MEDIAINFO_ADVANCED
+
     //Tags
     File__Tags_Helper::Streams_Fill();
 }

@@ -133,7 +133,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=__T("MediaInfoLib - v18.05");
+const Char*  MediaInfo_Version=__T("MediaInfoLib - v18.08");
 const Char*  MediaInfo_Url=__T("http://MediaArea.net/MediaInfo");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
@@ -259,7 +259,6 @@ void MediaInfo_Config::Init()
     BlockMethod=0;
     Internet=0;
     MultipleValues=0;
-    ParseUnknownExtensions=1;
     ShowFiles_Nothing=1;
     ShowFiles_VideoAudio=1;
     ShowFiles_VideoOnly=1;
@@ -589,20 +588,53 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
         else
             return Ztring();
     }
+    if (Option_Lower==__T("parseonlyknownextensions"))
+    {
+        #if MEDIAINFO_ADVANCED
+            ParseOnlyKnownExtensions_Set(Value);
+            return Ztring();
+        #else // MEDIAINFO_ADVANCED
+            return __T("advanced features are disabled due to compilation options");
+        #endif // MEDIAINFO_ADVANCED
+    }
+    if (Option_Lower==__T("parseonlyknownextensions_get"))
+    {
+        #if MEDIAINFO_ADVANCED
+            return ParseOnlyKnownExtensions_Get();
+        #else // MEDIAINFO_ADVANCED
+            return __T("advanced features are disabled due to compilation options");
+        #endif // MEDIAINFO_ADVANCED
+    }
+    if (Option_Lower==__T("parseonlyknownextensions_getlist"))
+    {
+        #if MEDIAINFO_ADVANCED
+            return ParseOnlyKnownExtensions_GetList_String();
+        #else // MEDIAINFO_ADVANCED
+            return __T("advanced features are disabled due to compilation options");
+        #endif // MEDIAINFO_ADVANCED
+    }
     if (Option_Lower==__T("parseunknownextensions"))
     {
-        if (Value.empty())
-            ParseUnknownExtensions_Set(0);
-        else
-            ParseUnknownExtensions_Set(1);
-        return Ztring();
+        #if MEDIAINFO_ADVANCED
+            if (Value==__T("0"))
+                ParseOnlyKnownExtensions_Set(__T("1"));
+            else
+                ParseOnlyKnownExtensions_Set(Ztring());
+            return Ztring();
+        #else // MEDIAINFO_ADVANCED
+            return __T("advanced features are disabled due to compilation options");
+        #endif // MEDIAINFO_ADVANCED
     }
     if (Option_Lower==__T("parseunknownextensions_get"))
     {
-        if (ParseUnknownExtensions_Get())
-            return __T("1");
-        else
-            return Ztring();
+        #if MEDIAINFO_ADVANCED
+            if (ParseOnlyKnownExtensions_Get().empty())
+                return __T("1");
+            else
+                return Ztring();
+        #else // MEDIAINFO_ADVANCED
+            return __T("advanced features are disabled due to compilation options");
+        #endif // MEDIAINFO_ADVANCED
     }
     if (Option_Lower==__T("showfiles_set"))
     {
@@ -1417,17 +1449,120 @@ size_t MediaInfo_Config::MultipleValues_Get ()
 }
 
 //---------------------------------------------------------------------------
-void MediaInfo_Config::ParseUnknownExtensions_Set (size_t NewValue)
+#if MEDIAINFO_ADVANCED
+void MediaInfo_Config::ParseOnlyKnownExtensions_Set(const Ztring &NewValue)
 {
     CriticalSectionLocker CSL(CS);
-    ParseUnknownExtensions=NewValue;
+    ParseOnlyKnownExtensions=NewValue;
 }
 
-size_t MediaInfo_Config::ParseUnknownExtensions_Get ()
+Ztring MediaInfo_Config::ParseOnlyKnownExtensions_Get()
 {
     CriticalSectionLocker CSL(CS);
-    return ParseUnknownExtensions;
+    return ParseOnlyKnownExtensions;
 }
+
+bool MediaInfo_Config::ParseOnlyKnownExtensions_IsSet()
+{
+    CriticalSectionLocker CSL(CS);
+    return !ParseOnlyKnownExtensions.empty();
+}
+
+set<Ztring> MediaInfo_Config::ParseOnlyKnownExtensions_GetList_Set()
+{
+    // Example: "+M,-dat" add all extensions for Containers (M) except "dat"
+
+    if (!ParseOnlyKnownExtensions_IsSet())
+        return set<Ztring>();
+
+    Ztring Value=ParseOnlyKnownExtensions_Get();
+    Ztring StreamKinds;
+    bool DefaultList;
+    set<Ztring> List;
+    set<Ztring> Excluded;
+
+    // Know extensions
+    if (Value.empty() || (Value[0]==__T('1') && (Value.size()==1 || Value[1]==__T(',') || Value[1]==__T(';'))))
+    {
+        DefaultList=true;
+        if (Value.size()>=2)
+            Value.erase(0, 2);
+        else
+            Value.clear();
+    }
+    else
+        DefaultList=false;
+
+    //With custom list
+    if (!Value.empty())
+    {
+        ZtringList ValidExtensions;
+        size_t SeparatorPos=Value.find_first_of(__T(",;"));
+        if (SeparatorPos==string::npos)
+            List.insert(Value);
+        else
+        {
+            ValidExtensions.Separator_Set(0, Ztring(1, Value[SeparatorPos]));
+            ValidExtensions.Write(Value);
+        }
+        for (size_t i = 0; i<ValidExtensions.size(); i++)
+        {
+            if (!ValidExtensions[i].empty())
+            {
+                switch (ValidExtensions[i][0])
+                {
+                    case __T('+'):
+                                    StreamKinds+=ValidExtensions[i].substr(1);
+                                    DefaultList=true;
+                                    continue;
+                    case __T('-'):
+                                    Excluded.insert(ValidExtensions[i].substr(1));
+                                    DefaultList=true;
+                                    continue;
+                    default:;
+                }
+            }
+            List.insert(ValidExtensions[i]);
+        }
+    }
+
+    //Default list
+    if (DefaultList)
+    {
+        InfoMap &FormatList=MediaInfoLib::Config.Format_Get();
+        for (InfoMap::iterator Format=FormatList.begin(); Format!=FormatList.end(); Format++)
+            if (InfoFormat_Extensions<Format->second.size())
+            {
+                if (!StreamKinds.empty() && Format->second[InfoFormat_KindofFormat].find_first_of(StreamKinds)==string::npos)
+                    continue;
+
+                ZtringList ValidExtensions;
+                ValidExtensions.Separator_Set(0, __T(" "));
+                ValidExtensions.Write(Format->second[InfoFormat_Extensions]);
+                for (size_t i=0; i<ValidExtensions.size(); i++)
+                    if (Excluded.find(ValidExtensions[i])==Excluded.end())
+                        List.insert(ValidExtensions[i]);
+            }
+    }
+
+    return List;
+}
+
+Ztring MediaInfo_Config::ParseOnlyKnownExtensions_GetList_String()
+{
+    set<Ztring> Extensions=ParseOnlyKnownExtensions_GetList_Set();
+    Ztring List;
+    for (set<Ztring>::iterator Extension=Extensions.begin(); Extension!=Extensions.end(); Extension++)
+    {
+        List+=*Extension;
+        List+=__T(',');
+    }
+    if (!List.empty())
+        List.resize(List.size()-1);
+
+    return List;
+}
+#endif //MEDIAINFO_ADVANCED
 
 //---------------------------------------------------------------------------
 void MediaInfo_Config::ShowFiles_Set (const ZtringListList &NewShowFiles)

@@ -33,6 +33,175 @@ namespace MediaInfoLib
 {
 
 //***************************************************************************
+// Info
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+extern const char* AC3_Surround[];
+extern const char* AC3_Mode[];
+extern const char* AC3_Mode_String[];
+
+//---------------------------------------------------------------------------
+// What should be hidden by default
+
+struct extra_string
+{
+    const char** Names;
+    const char* ToAdd;
+};
+struct extra_array
+{
+    const char** Names;
+    const char* Options;
+};
+
+static const char* Xml_Extra_HideString[] =
+{
+    "GuardBand_Before",
+    "GuardBand_After",
+    "compr",
+    "compr_Average",
+    "compr_Minimum",
+    "compr_Maximum",
+    "dialnorm",
+    "dialnorm_Average",
+    "dialnorm_Minimum",
+    "dialnorm_Maximum",
+    "dynrng",
+    "dynrng_Average",
+    "dynrng_Minimum",
+    "dynrng_Maximum",
+    NULL,
+};
+
+static const char* Xml_Extra_String_channel[] =
+{
+    "BedChannelCount",
+    NULL,
+};
+
+static const char* Xml_Extra_String_dB[] =
+{
+    "compr",
+    "compr_Average",
+    "compr_Minimum",
+    "compr_Maximum",
+    "dialnorm",
+    "dialnorm_Average",
+    "dialnorm_Minimum",
+    "dialnorm_Maximum",
+    "dynrng",
+    "dynrng_Average",
+    "dynrng_Minimum",
+    "dynrng_Maximum",
+    NULL,
+};
+
+static const char* Xml_Extra_String_micro[] =
+{
+    "GuardBand_Before",
+    "GuardBand_After",
+    NULL,
+};
+
+static const extra_string Xml_Extra_String[] =
+{
+    { Xml_Extra_String_channel,         " channel"},
+    { Xml_Extra_String_dB,              " dB" },
+    { Xml_Extra_String_micro,           " \xC2xB5s"}, //0xC2 0xB5 = micro sign
+    { NULL, NULL},
+};
+
+static const char* Xml_Extra_N_NIY[] =
+{
+    "BedChannelCount",
+    "BitRate_Instantaneous",
+    "page_id",
+    "region_depth",
+    "region_height",
+    "region_horizontal_address",
+    "region_id",
+    "region_vertical_address",
+    "region_width",
+    "subtitle_stream_id",
+};
+
+static const char* Xml_Extra_N_NT[] =
+{
+    "acmod",
+    "bext_Present",
+    "BlockAlignment",
+    "bsid",
+    "CaptionServiceContent_IsPresent",
+    "CaptionServiceDescriptor_IsPresent",
+    "CaptionServiceName",
+    "cdp_length_Max",
+    "cdp_length_Min",
+    "compr",
+    "compr_Average",
+    "compr_Count",
+    "compr_Maximum",
+    "compr_Minimum",
+    "data_partitioned",
+    "Delay_SDTI",
+    "Delay_SDTI",
+    "Delay_SystemScheme1",
+    "Demux_InitBytes",
+    "Density_Unit",
+    "Density_X",
+    "Density_Y",
+    "dialnorm",
+    "dialnorm_Average",
+    "dialnorm_Count",
+    "dialnorm_Maximum",
+    "dialnorm_Minimum",
+    "dsurmod",
+    "dynrng",
+    "dynrng_Average",
+    "dynrng_Count",
+    "dynrng_Maximum",
+    "dynrng_Minimum",
+    "Errors_Stats",
+    "Errors_Stats_03",
+    "Errors_Stats_05",
+    "Errors_Stats_09",
+    "Errors_Stats_10",
+    "Errors_Stats_Begin",
+    "Errors_Stats_End",
+    "Errors_Stats_End_03",
+    "Errors_Stats_End_05",
+    "FrameCount_Speed",
+    "GuardBand_After",
+    "GuardBand_Before",
+    "IBI",
+    "intra_dc_precision",
+    "lfeon",
+    "OverallBitRate_Precision_Max",
+    "OverallBitRate_Precision_Min",
+    "PCR_Distance_Average",
+    "PCR_Distance_Max",
+    "PCR_Distance_Min",
+    "PCR_Invalid_Count",
+    "PrimaryPackage",
+    "reversible_vlc",
+    "SideCar_FilePos",
+    "Source_Delay",
+    "Source_Delay_Source",
+    "Source_List",
+    "UniversalAdID_Registry",
+    "UniversalAdID_Value",
+    "UnsupportedSources",
+    NULL,
+};
+
+static const extra_array Xml_Extra_Array[] =
+{
+    { Xml_Extra_N_NIY,                  "N NIY" },
+    { Xml_Extra_N_NT,                   "N NT" },
+    { NULL, NULL },
+};
+
+//***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
 
@@ -159,7 +328,68 @@ bool File_MiXml::FileHeader_Begin()
                                             XMLElement* Extra = Element->FirstChildElement();
                                             while (Extra)
                                             {
+                                                if (strstr(Extra->Name(), "_String"))
+                                                {
+                                                    Extra = Extra->NextSiblingElement();
+                                                    continue;
+                                                }
+
                                                 Fill(StreamKind_Last, StreamPos_Last, Extra->Name(), Extra->GetText(), Unlimited, true, true);
+
+                                                bool HasString=false;
+                                                for (size_t i=0; Xml_Extra_String[i].Names; i++)
+                                                    for (size_t j=0; Xml_Extra_String[i].Names[j]; j++)
+                                                        if (!strcmp(Extra->Name(), Xml_Extra_String[i].Names[j]))
+                                                        {
+                                                            Fill(StreamKind_Last, StreamPos_Last, (string(Extra->Name())+"/String").c_str(), MediaInfoLib::Config.Language_Get(Extra->GetText(), Ztring().From_UTF8(Xml_Extra_String[i].ToAdd)), true);
+                                                            HasString=true;
+                                                            break;
+                                                        }
+
+                                                for (size_t i=0; Xml_Extra_Array[i].Names; i++)
+                                                    for (size_t j=0; Xml_Extra_Array[i].Names[j]; j++)
+                                                        if (!strcmp(Extra->Name(), Xml_Extra_Array[i].Names[j]))
+                                                        {
+                                                            Fill_SetOptions(StreamKind_Last, StreamPos_Last, Extra->Name(), Xml_Extra_Array[i].Options);
+                                                            if (HasString)
+                                                            {
+                                                                string Options(Xml_Extra_Array[i].Options);
+                                                                if (InfoOption_ShowInXml<=Options.size())
+                                                                    Options.resize(InfoOption_ShowInXml+1, ' ');
+                                                                char Show='Y';
+                                                                for (size_t k=0; Xml_Extra_HideString[k]; k++)
+                                                                    if (!strcmp(Extra->Name(), Xml_Extra_HideString[k]))
+                                                                    {
+                                                                        Show='N';
+                                                                        break;
+                                                                    }
+                                                                Options[InfoOption_ShowInInform]=Show;
+                                                                Options[InfoOption_ShowInXml]='N';
+                                                                Fill_SetOptions(StreamKind_Last, StreamPos_Last, (string(Extra->Name())+"/String").c_str(), Options.c_str());
+                                                            }
+                                                            break;
+                                                        }
+
+                                                if (!strcmp(Extra->Name(), "dsurmod"))
+                                                {
+                                                    size_t dsurmod=Ztring().From_UTF8(Extra->GetText()).To_int32u();
+                                                    if (dsurmod<4)
+                                                    {
+                                                        Fill(StreamKind_Last, StreamPos_Last, "dsurmod/String", AC3_Surround[dsurmod]);
+                                                        Fill_SetOptions(StreamKind_Last, StreamPos_Last, "dsurmod/String", "N NTN");
+                                                    }
+                                                }
+
+                                                if (!strcmp(Extra->Name(), "ServiceKind"))
+                                                {
+                                                    const char* ServiceKind=Extra->GetText();
+                                                    for (int8u i=0; i<8; i++)
+                                                        if (!strcmp(ServiceKind, AC3_Mode[i]))
+                                                        {
+                                                            Fill(Stream_Audio, 0, Audio_ServiceKind_String, AC3_Mode_String[i]);
+                                                            break;
+                                                        }
+                                                }
 
                                                 Extra = Extra->NextSiblingElement();
                                             }
@@ -189,6 +419,32 @@ bool File_MiXml::FileHeader_Begin()
             Reject("MiXml");
             return false;
         }
+    }
+
+    //Special cases
+    Ztring UniversalAdID_Value=Retrieve(Stream_General, 0, General_UniversalAdID_Value);
+    Ztring UniversalAdID_Registry=Retrieve(Stream_General, 0, General_UniversalAdID_Registry);
+    if (!UniversalAdID_Value.empty() && !UniversalAdID_Registry.empty())
+    {
+        Fill(Stream_General, 0, General_UniversalAdID_String, UniversalAdID_Value + __T(" (") + UniversalAdID_Registry + __T(")"), true);
+    }
+    Ztring MajorBrand=Retrieve(Stream_General, 0, General_CodecID);
+    if (!UniversalAdID_Value.empty() && !UniversalAdID_Registry.empty())
+    {
+        Ztring CodecID_String=MajorBrand;
+        Ztring Compatible=Retrieve(Stream_General, 0, General_CodecID);
+        if (MajorBrand == __T("qt  "))
+        {
+            CodecID_String += __T(' ');
+            CodecID_String += Retrieve(Stream_General, 0, General_CodecID_Version);
+        }
+        if (!Compatible.empty())
+        {
+            CodecID_String += __T(" (");
+            CodecID_String += Compatible;
+            CodecID_String += __T(')');
+        }
+        Fill(Stream_General, 0, General_CodecID_String, CodecID_String, true);
     }
 
     Element_Offset=File_Size;

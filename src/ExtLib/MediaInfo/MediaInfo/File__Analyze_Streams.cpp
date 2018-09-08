@@ -163,35 +163,6 @@ size_t File__Analyze::Stream_Prepare (stream_t KindOfStream, size_t StreamPos)
     if (!IsSub && KindOfStream!=Stream_General)
     {
         const Ztring& StreamKind_Text=Get(KindOfStream, 0, General_StreamKind, Info_Text);
-        if (Count_Get(KindOfStream)>1)
-        {
-            ZtringList Temp; Temp.Separator_Set(0, __T(" / "));
-            Temp.Write(Retrieve(Stream_General, 0, Ztring(StreamKind_Text+__T("_Codec_List")).To_Local().c_str()));
-            if (StreamPos<Temp.size())
-                Temp.insert(Temp.begin()+StreamPos, Ztring());
-            else
-                Temp.push_back(Ztring());
-            Fill(Stream_General, 0, Ztring(StreamKind_Text+__T("_Codec_List")).To_Local().c_str(), Temp.Read(), true);
-            Temp.Write(Retrieve(Stream_General, 0, Ztring(StreamKind_Text+__T("_Language_List")).To_Local().c_str()));
-            if (StreamPos<Temp.size())
-                Temp.insert(Temp.begin()+StreamPos, Ztring());
-            else
-                Temp.push_back(Ztring());
-            Fill(Stream_General, 0, Ztring(StreamKind_Text+__T("_Language_List")).To_Local().c_str(), Temp.Read(), true);
-            Temp.Write(Retrieve(Stream_General, 0, Ztring(StreamKind_Text+__T("_Format_List")).To_Local().c_str()));
-            if (StreamPos<Temp.size())
-                Temp.insert(Temp.begin()+StreamPos, Ztring());
-            else
-                Temp.push_back(Ztring());
-            Fill(Stream_General, 0, Ztring(StreamKind_Text+__T("_Format_List")).To_Local().c_str(), Temp.Read(), true);
-            Temp.Write(Retrieve(Stream_General, 0, Ztring(StreamKind_Text+__T("_Format_WithHint_List")).To_Local().c_str()));
-            if (StreamPos<Temp.size())
-                Temp.insert(Temp.begin()+StreamPos, Ztring());
-            else
-                Temp.push_back(Ztring());
-            Fill(Stream_General, 0, Ztring(StreamKind_Text+__T("_Format_WithHint_List")).To_Local().c_str(), Temp.Read(), true);
-        }
-
         Fill(Stream_General, 0, Ztring(StreamKind_Text+__T("Count")).To_Local().c_str(), Count_Get(KindOfStream), 10, true);
     }
 
@@ -529,51 +500,8 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
     {
         Ztring ParameterName=Retrieve(StreamKind, StreamPos, Parameter, Info_Name);
 
-        //Lists
-        if (StreamKind!=Stream_General &&  (ParameterName==__T("Codec/String")
-                                         || ParameterName==__T("Language/String")
-                                         || ParameterName==__T("Format")
-                                         || ParameterName==__T("CodecID/Hint")))
-        {
-            Ztring Temp1, Temp2;
-            for (size_t StreamPos_Local=0; StreamPos_Local<(*Stream)[StreamKind].size(); StreamPos_Local++)
-            {
-                if (ParameterName==__T("CodecID/Hint"))
-                    Temp1+=Retrieve(StreamKind, StreamPos_Local, Fill_Parameter(StreamKind, Generic_Format))+__T(" / ");
-                else
-                    Temp1+=Retrieve(StreamKind, StreamPos_Local, Parameter)+__T(" / ");
-                if (ParameterName==__T("Format")
-                 || ParameterName==__T("CodecID/Hint"))
-                {
-                    Temp2+=Retrieve(StreamKind, StreamPos_Local, Fill_Parameter(StreamKind, Generic_Format));
-                    if (!Retrieve(StreamKind, StreamPos_Local, Fill_Parameter(StreamKind, Generic_CodecID_Hint)).empty())
-                    {
-                        Temp2+=__T(" (");
-                        Temp2+=Retrieve(StreamKind, StreamPos_Local, Fill_Parameter(StreamKind, Generic_CodecID_Hint));
-                        Temp2+=__T(")");
-                    }
-                    Temp2+=__T(" / ");
-                }
-            }
-            if (!Temp1.empty())
-                Temp1.resize(Temp1.size()-3); //Delete extra " / "
-            if (!Temp2.empty())
-                Temp2.resize(Temp2.size()-3); //Delete extra " / "
-            Ztring StreamKind_Text=Get(StreamKind, 0, General_StreamKind, Info_Text);
-            if (ParameterName==__T("Codec/String"))
-                Fill(Stream_General, 0, Ztring(StreamKind_Text+__T("_Codec_List")).To_Local().c_str(), Temp1, true);
-            if (ParameterName==__T("Language/String"))
-                Fill(Stream_General, 0, Ztring(StreamKind_Text+__T("_Language_List")).To_Local().c_str(), Temp1, true);
-            if (ParameterName==__T("Format")
-             || ParameterName==__T("CodecID/Hint"))
-            {
-                Fill(Stream_General, 0, Ztring(StreamKind_Text+__T("_Format_List")).To_Local().c_str(), Temp1, true);
-                Fill(Stream_General, 0, Ztring(StreamKind_Text+__T("_Format_WithHint_List")).To_Local().c_str(), Temp2, true);
-            }
-        }
-
         //General Format
-        if (Parameter==Fill_Parameter(StreamKind, Generic_Format) && Retrieve(Stream_General, 0, General_Format).empty() && !Value.empty())
+        if (Parameter==Fill_Parameter(StreamKind, Generic_Format) && Retrieve(Stream_General, 0, General_Format).empty() && !Value.empty() && Count_Get(Stream_Video)+Count_Get(Stream_Audio)+Count_Get(Stream_Text)+Count_Get(Stream_Other)+Count_Get(Stream_Image)==1)
             Fill(Stream_General, 0, General_Format, Value); //If not already filled, we are filling with the stream format
 
         //ID
@@ -602,6 +530,8 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
                 Fill(Stream_General, 0, General_Codec_String, Value, true);
             }
         }
+        if (MediaInfoLib::Config.Legacy_Get())
+        {
         if (StreamKind==Stream_General && Parameter==General_Format_Info)
             (*Stream)[Stream_General][0](General_Codec_Info)=Value;
         if (StreamKind==Stream_General && Parameter==General_Format_Url)
@@ -612,7 +542,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
             (*Stream)[Stream_General][0](General_Codec_Settings)=Value;
 
         //Codec
-        if (Parameter==Fill_Parameter(StreamKind, Generic_Codec) && MediaInfoLib::Config.Legacy_Get())
+        if (Parameter==Fill_Parameter(StreamKind, Generic_Codec))
         {
             const Ztring &C1=MediaInfoLib::Config.Codec_Get(Retrieve(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_Codec)), InfoCodec_Name, (stream_t)StreamKind);
             if (C1.empty())
@@ -627,6 +557,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
                 Fill(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_Codec_Info)  , MediaInfoLib::Config.Codec_Get(Retrieve(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_Codec)), InfoCodec_Description, StreamKind), true);
                 Fill(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_Codec_Url)   , MediaInfoLib::Config.Codec_Get(Retrieve(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_Codec)), InfoCodec_Url,         StreamKind), true);
             }
+        }
         }
 
         //CodecID_Description
@@ -1369,6 +1300,7 @@ size_t File__Analyze::Merge(MediaInfo_Internal &ToAdd, bool)
             {
                 if (StreamKind!=Stream_General
                  || !(Pos==General_CompleteName
+                   || Pos==General_CompleteName_Last
                    || Pos==General_FolderName
                    || Pos==General_FileName
                    || Pos==General_FileExtension

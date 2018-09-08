@@ -21,7 +21,7 @@
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-#if defined(MEDIAINFO_AC3_YES) || defined(MEDIAINFO_DVDV_YES) || defined(MEDIAINFO_MPEGPS_YES) || defined(MEDIAINFO_MPEGTS_YES)
+#if defined(MEDIAINFO_AC3_YES) || defined(MEDIAINFO_DVDV_YES) || defined(MEDIAINFO_MPEGPS_YES) || defined(MEDIAINFO_MPEGTS_YES) || defined(MEDIAINFO_MIXML_YES)
 //---------------------------------------------------------------------------
 
 #include "ZenLib/Conf.h"
@@ -1279,14 +1279,14 @@ void File_Ac3::Streams_Fill()
         Fill(Stream_Audio, 0, "dialnorm", FirstFrame_Dolby.dialnorm==0?-31:-FirstFrame_Dolby.dialnorm);
         Fill_SetOptions(Stream_Audio, 0, "dialnorm", "N NT");
         Fill(Stream_Audio, 0, "dialnorm/String", Ztring::ToZtring(FirstFrame_Dolby.dialnorm==0?-31:-FirstFrame_Dolby.dialnorm)+__T(" dB"));
-        Fill_SetOptions(Stream_Audio, 0, "dialnorm/String", "N NT");
+        Fill_SetOptions(Stream_Audio, 0, "dialnorm/String", "N NTN");
         if (FirstFrame_Dolby.compre)
         {
             float64 Value=AC3_compr[FirstFrame_Dolby.compr>>4]+20*std::log10(((float)(0x10+(FirstFrame_Dolby.compr&0x0F)))/32);
             Fill(Stream_Audio, 0, "compr", Value, 2);
             Fill_SetOptions(Stream_Audio, 0, "compr", "N NT");
             Fill(Stream_Audio, 0, "compr/String", Ztring::ToZtring(Value, 2)+__T(" dB"));
-            Fill_SetOptions(Stream_Audio, 0, "compr/String", "N NT");
+            Fill_SetOptions(Stream_Audio, 0, "compr/String", "N NTN");
         }
         if (FirstFrame_Dolby.dynrnge)
         {
@@ -1298,7 +1298,7 @@ void File_Ac3::Streams_Fill()
             Fill(Stream_Audio, 0, "dynrng", Value, 2);
             Fill_SetOptions(Stream_Audio, 0, "dynrng", "N NT");
             Fill(Stream_Audio, 0, "dynrng/String", Ztring::ToZtring(Value, 2)+__T(" dB"));
-            Fill_SetOptions(Stream_Audio, 0, "dynrng/String", "N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dynrng/String", "N NTN");
         }
 
         for (int8u Pos=0; Pos<8; Pos++)
@@ -1313,7 +1313,7 @@ void File_Ac3::Streams_Fill()
                         Fill(Stream_Audio, 0, "dsurmod", dsurmod_Max[Pos][Pos2]);
                         Fill_SetOptions(Stream_Audio, 0, "dsurmod", "N NT");
                         Fill(Stream_Audio, 0, "dsurmod/String", AC3_Surround[dsurmod_Max[Pos][Pos2]]);
-                        Fill_SetOptions(Stream_Audio, 0, "dsurmod/String", "N NT");
+                        Fill_SetOptions(Stream_Audio, 0, "dsurmod/String", "N NTN");
                     }
                     Fill_SetOptions(Stream_Audio, 0, "bsid", "N NT");
                     Fill(Stream_Audio, 0, "acmod", acmod_Max[Pos][Pos2]);
@@ -1342,7 +1342,19 @@ void File_Ac3::Streams_Fill()
     else if (bsid_Max>0x0A && bsid_Max<=0x10)
         SamplesPerFrame=256*(numblkscod==3?6:(numblkscod+1));
     else if (HD_MajorSync_Parsed && (HD_StreamType==0xBA || HD_StreamType==0xBB)) // TrueHD or MLP
-        SamplesPerFrame=40;
+    {
+        int64u HD_SamplingRate=Retrieve_Const(Stream_Audio, 0, Audio_SamplingRate).To_int64u();
+        if (HD_SamplingRate<44100)
+            SamplesPerFrame=0; //Unknown
+        else if (HD_SamplingRate<=48000)
+            SamplesPerFrame=40;
+        else if (HD_SamplingRate<=96000)
+            SamplesPerFrame=80;
+        else if (HD_SamplingRate<=192000)
+            SamplesPerFrame=160;
+        else
+            SamplesPerFrame=0; //Unknown
+    }
     else
         SamplesPerFrame=0;
     if (SamplesPerFrame)
@@ -1359,9 +1371,13 @@ void File_Ac3::Streams_Fill()
     else if (Retrieve(Stream_Audio, 0, Audio_Format)==__T("MLP FBA") || Retrieve(Stream_Audio, 0, Audio_Format_Profile).find(__T("MLP FBA"))==0)
     {
         if (HasJOC || HD_HasAtmos)
-            Fill(Stream_Audio, 0, Audio_Format_Commercial_IfAny, "TrueHD with Dolby Atmos");
+            Fill(Stream_Audio, 0, Audio_Format_Commercial_IfAny, "Dolby TrueHD with Dolby Atmos");
         else
-            Fill(Stream_Audio, 0, Audio_Format_Commercial_IfAny, "TrueHD");
+            Fill(Stream_Audio, 0, Audio_Format_Commercial_IfAny, "Dolby TrueHD");
+    }
+    else if (Retrieve(Stream_Audio, 0, Audio_Format)==__T("MLP") || Retrieve(Stream_Audio, 0, Audio_Format_Profile).find(__T("MLP"))==0)
+    {
+        Fill(Stream_Audio, 0, Audio_Format_Commercial_IfAny, "MLP Lossless");
     }
     else if (Retrieve(Stream_Audio, 0, Audio_Format)==__T("AC-3"))
         Fill(Stream_Audio, 0, Audio_Format_Commercial_IfAny, "Dolby Digital");
@@ -1396,17 +1412,17 @@ void File_Ac3::Streams_Finish()
             Fill(Stream_Audio, 0, "dialnorm_Average", Average_dB, 0);
             Fill_SetOptions(Stream_Audio, 0, "dialnorm_Average", "N NT");
             Fill(Stream_Audio, 0, "dialnorm_Average/String", Ztring::ToZtring(Average_dB, 0) + __T(" dB"));
-            Fill_SetOptions(Stream_Audio, 0, "dialnorm_Average/String", "N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dialnorm_Average/String", "N NTN");
             Fill(Stream_Audio, 0, "dialnorm_Minimum", -Minimum_Raw);
             Fill_SetOptions(Stream_Audio, 0, "dialnorm_Minimum", "N NT");
             Fill(Stream_Audio, 0, "dialnorm_Minimum/String", Ztring::ToZtring(-Minimum_Raw) + __T(" dB"));
-            Fill_SetOptions(Stream_Audio, 0, "dialnorm_Minimum/String", "N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dialnorm_Minimum/String", "N NTN");
             Fill(Stream_Audio, 0, "dialnorm_Maximum", -Maximum_Raw);
-            Fill_SetOptions(Stream_Audio, 0, "dialnorm_Maximum", "N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dialnorm_Maximum", "N NTN");
             Fill(Stream_Audio, 0, "dialnorm_Maximum/String", Ztring::ToZtring(-Maximum_Raw) + __T(" dB"));
-            Fill_SetOptions(Stream_Audio, 0, "dialnorm_Maximum/String", "N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dialnorm_Maximum/String", "N NTN");
             Fill(Stream_Audio, 0, "dialnorm_Count", Count);
-            Fill_SetOptions(Stream_Audio, 0, "dialnorm_Count", "N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dialnorm_Count", "N NTN");
         }
     }
     if (!comprs.empty())
@@ -1432,15 +1448,15 @@ void File_Ac3::Streams_Finish()
             Fill(Stream_Audio, 0, "compr_Average", Average_dB, 2);
             Fill_SetOptions(Stream_Audio, 0, "compr_Average", "N NT");
             Fill(Stream_Audio, 0, "compr_Average/String", Ztring::ToZtring(Average_dB, 2) + __T(" dB"));
-            Fill_SetOptions(Stream_Audio, 0, "compr_Average/String", "N NT");
+            Fill_SetOptions(Stream_Audio, 0, "compr_Average/String", "N NTN");
             Fill(Stream_Audio, 0, "compr_Minimum", Minimum_dB, 2);
             Fill_SetOptions(Stream_Audio, 0, "compr_Minimum", "N NT");
             Fill(Stream_Audio, 0, "compr_Minimum/String", Ztring::ToZtring(Minimum_dB, 2) + __T(" dB"));
-            Fill_SetOptions(Stream_Audio, 0, "compr_Minimum/String", "N NT");
+            Fill_SetOptions(Stream_Audio, 0, "compr_Minimum/String", "N NTN");
             Fill(Stream_Audio, 0, "compr_Maximum", Maximum_dB, 2);
             Fill_SetOptions(Stream_Audio, 0, "compr_Maximum", "N NT");
             Fill(Stream_Audio, 0, "compr_Maximum/String", Ztring::ToZtring(Maximum_dB, 2) + __T(" dB"));
-            Fill_SetOptions(Stream_Audio, 0, "compr_Maximum/String", "N NT");
+            Fill_SetOptions(Stream_Audio, 0, "compr_Maximum/String", "N NTN");
             Fill(Stream_Audio, 0, "compr_Count", Count);
             Fill_SetOptions(Stream_Audio, 0, "compr_Count", "N NT");
         }
@@ -1472,15 +1488,15 @@ void File_Ac3::Streams_Finish()
             Fill(Stream_Audio, 0, "dynrng_Average", Average_dB, 2);
             Fill_SetOptions(Stream_Audio, 0, "dynrng_Average", "N NT");
             Fill(Stream_Audio, 0, "dynrng_Average/String", Ztring::ToZtring(Average_dB, 2) + __T(" dB"));
-            Fill_SetOptions(Stream_Audio, 0, "dynrng_Average/String", "N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dynrng_Average/String", "N NTN");
             Fill(Stream_Audio, 0, "dynrng_Minimum", Minimum_dB, 2);
             Fill_SetOptions(Stream_Audio, 0, "dynrng_Minimum", "N NT");
             Fill(Stream_Audio, 0, "dynrng_Minimum/String", Ztring::ToZtring(Minimum_dB, 2) + __T(" dB"));
-            Fill_SetOptions(Stream_Audio, 0, "dynrng_Minimum/String", "N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dynrng_Minimum/String", "N NTN");
             Fill(Stream_Audio, 0, "dynrng_Maximum", Maximum_dB, 2);
             Fill_SetOptions(Stream_Audio, 0, "dynrng_Maximum", "N NT");
             Fill(Stream_Audio, 0, "dynrng_Maximum/String", Ztring::ToZtring(Maximum_dB, 2) + __T(" dB"));
-            Fill_SetOptions(Stream_Audio, 0, "dynrng_Maximum/String", "N NT");
+            Fill_SetOptions(Stream_Audio, 0, "dynrng_Maximum/String", "N NTN");
             Fill(Stream_Audio, 0, "dynrng_Count", Count);
             Fill_SetOptions(Stream_Audio, 0, "dynrng_Count", "N NT");
         }

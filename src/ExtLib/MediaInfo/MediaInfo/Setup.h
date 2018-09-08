@@ -125,6 +125,9 @@
     #if !defined (MEDIAINFO_EXPORT_NO) && !defined (MEDIAINFO_EXPORT_YES)
         #define MEDIAINFO_EXPORT_NO
     #endif
+    #if !defined (MEDIAINFO_JNI_NO) && !defined (MEDIAINFO_JNI_YES)
+        #define MEDIAINFO_JNI_NO
+    #endif
 #endif
 
 //---------------------------------------------------------------------------
@@ -961,6 +964,9 @@
 #endif
 #if !defined(MEDIAINFO_UNKNOWN_NO)
     #define MEDIAINFO_UNKNOWN_YES
+#endif
+#if !defined(MEDIAINFO_JNI_NO)
+    #define MEDIAINFO_JNI_YES
 #endif
 
 #endif

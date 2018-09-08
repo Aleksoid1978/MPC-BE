@@ -200,6 +200,7 @@ bool File_Hls::FileHeader_Begin()
 
     //All should be OK...
     Config->File_TestContinuousFileNames_Set(false);
+    Config->File_TestDirectory_Set(false);
     return true;
 }
 

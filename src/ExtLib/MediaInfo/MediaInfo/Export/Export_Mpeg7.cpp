@@ -55,6 +55,81 @@ static Ztring Mpeg7_TimeToISO(Ztring Value)
 }
 
 //---------------------------------------------------------------------------
+static bool Mpeg7_TimeToISO_Isvalid(Ztring& TimePoint)
+{
+    if (TimePoint.size()<=3)
+       return false;
+    else if (!(TimePoint[0]>=__T('0') && TimePoint[0]<=__T('9')
+            && TimePoint[1]>=__T('0') && TimePoint[1]<=__T('9')
+            && TimePoint[2]>=__T('0') && TimePoint[2]<=__T('9')
+            && TimePoint[3]>=__T('0') && TimePoint[3]<=__T('9')))
+       return false;
+    else if (TimePoint.size()>4)
+    {
+        if (TimePoint.size()<=6)
+           return false;
+        else if (!(TimePoint[4]==__T('-')
+                && TimePoint[5]>=__T('0') && TimePoint[5]<=__T('9')
+                && TimePoint[6]>=__T('0') && TimePoint[6]<=__T('9')))
+           return false;
+        else if (TimePoint.size()>7)
+        {
+            if (TimePoint.size()<=9)
+               return false;
+            else if (!(TimePoint[7]==__T('-')
+                    && TimePoint[8]>=__T('0') && TimePoint[8]<=__T('9')
+                    && TimePoint[9]>=__T('0') && TimePoint[9]<=__T('9')))
+               return false;
+            else if (TimePoint.size()>10)
+            {
+                if (TimePoint.size()<=12)
+                   return false;
+                else if (!(TimePoint[10]==__T('T')
+                        && TimePoint[11]>=__T('0') && TimePoint[11]<=__T('9')
+                        && TimePoint[12]>=__T('0') && TimePoint[12]<=__T('9')))
+                   return false;
+                else if (TimePoint.size()>13)
+                {
+                    if (TimePoint.size()<=15)
+                       return false;
+                    else if (!(TimePoint[13]==__T(':')
+                            && TimePoint[14]>=__T('0') && TimePoint[14]<=__T('9')
+                            && TimePoint[15]>=__T('0') && TimePoint[15]<=__T('9')))
+                       return false;
+                    else if (TimePoint.size()>16)
+                    {
+                        if (TimePoint.size()<=18)
+                           return false;
+                        else if (!(TimePoint[16]==__T(':')
+                                && TimePoint[17]>=__T('0') && TimePoint[17]<=__T('9')
+                                && TimePoint[18]>=__T('0') && TimePoint[18]<=__T('9')))
+                           return false;
+                        else if (TimePoint.size()>19)
+                        {
+                            if (TimePoint.size()==20 && TimePoint[19]==__T('Z'))
+                            {
+                                TimePoint[19]=__T('+');
+                                TimePoint+=__T("00:00");
+                            }
+                            else if (TimePoint.size()<=24)
+                               return false;
+                            else if (!((TimePoint[19]==__T('+') || TimePoint[19]==__T('-'))
+                                    && TimePoint[20]>=__T('0') && TimePoint[20]<=__T('9')
+                                    && TimePoint[21]>=__T('0') && TimePoint[21]<=__T('9')
+                                    && TimePoint[22]>=__T(':')
+                                    && TimePoint[23]>=__T('0') && TimePoint[23]<=__T('9')
+                                    && TimePoint[24]>=__T('0') && TimePoint[24]<=__T('9')))
+                               return false;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}
+
+//---------------------------------------------------------------------------
 const Char* Mpeg7_Type(MediaInfo_Internal &MI) //TO ADAPT
 {
     if (MI.Count_Get(Stream_Image))
@@ -785,6 +860,32 @@ Ztring Mpeg7_MediaTimePoint(MediaInfo_Internal &MI)
         return ToReturn;
     }
 
+    if (MI.Count_Get(Stream_Audio)==1 && MI.Get(Stream_General, 0, General_Format)==__T("Wave"))
+    {
+        int64u Rate=MI.Get(Stream_Audio, 0, Audio_SamplingRate).To_int64u();
+        if (!Rate)
+            return Ztring();
+        int64u Delay=(int64u)float64_int64s(MI.Get(Stream_Audio, 0, Audio_Delay).To_float64()*Rate/1000);
+        int64u DD=Delay/(24*60*60*Rate);
+        Delay=Delay%(24*60*60*Rate);
+        int64u HH=Delay/(60*60*Rate);
+        Delay=Delay%(60*60*Rate);
+        int64u MM=Delay/(60*Rate);
+        Delay=Delay%(60*Rate);
+        int64u Sec=Delay/Rate;
+        Delay=Delay%Rate;
+        Ztring ToReturn;
+        if (DD)
+            ToReturn+=Ztring::ToZtring(DD);
+        ToReturn+=__T('T');
+        ToReturn+=(HH<10?__T("0"):__T(""))+Ztring::ToZtring(HH)+__T(':');
+        ToReturn+=(MM<10?__T("0"):__T(""))+Ztring::ToZtring(MM)+__T(':');
+        ToReturn+=(Sec<10?__T("0"):__T(""))+Ztring::ToZtring(Sec)+__T(':');
+        ToReturn+=Ztring::ToZtring(Delay)+__T('F');
+        ToReturn+=Ztring::ToZtring(Rate);
+        return ToReturn;
+    }
+
     //Default: In milliseconds
     int64u Milliseconds=MI.Get(Stream_Video, 0, Video_Delay).To_int64u();
     int64u DD=Milliseconds/(24*60*60*1000);
@@ -1232,7 +1333,9 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
     Mpeg7_CS(Node_MediaFormat, "mpeg7:FileFormat", "FileFormatCS", Mpeg7_FileFormatCS_termID, Mpeg7_FileFormatCS_Name, MI, 0);
 
     //FileSize
-    Node_MediaFormat->Add_Child_IfNotEmpty(MI, Stream_General, 0, General_FileSize, "mpeg7:FileSize");
+    Node* FileSize=Node_MediaFormat->Add_Child_IfNotEmpty(MI, Stream_General, 0, General_FileSize, "mpeg7:FileSize");
+    if (FileSize && !MI.Get(Stream_General, 0, __T("IsTruncated")).empty())
+        FileSize->XmlComment="Malformed file: truncated";
 
     //System
     Mpeg7_CS(Node_MediaFormat, "mpeg7:System", "SystemCS", Mpeg7_SystemCS_termID, Mpeg7_SystemCS_Name, MI, 0);
@@ -1283,6 +1386,8 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
     }
 
     if (!MI.Get(Stream_General, 0, General_Movie).empty()
+     || !MI.Get(Stream_General, 0, General_Part).empty()
+     || !MI.Get(Stream_General, 0, General_Part_Position).empty()
      || !MI.Get(Stream_General, 0, General_Track).empty()
      || !MI.Get(Stream_General, 0, General_Track_Position).empty()
      || !MI.Get(Stream_General, 0, General_Album).empty()
@@ -1298,10 +1403,19 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
         if (!MI.Get(Stream_General, 0, General_Movie).empty()
          || !MI.Get(Stream_General, 0, General_Track).empty()
          || !MI.Get(Stream_General, 0, General_Track_Position).empty()
+         || !MI.Get(Stream_General, 0, General_Part).empty()
+         || !MI.Get(Stream_General, 0, General_Part_Position).empty()
          || !MI.Get(Stream_General, 0, General_Album).empty())
         {
             Node_Creation->Add_Child_IfNotEmpty(MI, Stream_General, 0, General_Movie, "mpeg7:Title", "type", std::string("songTitle"));
             Node_Creation->Add_Child_IfNotEmpty(MI, Stream_General, 0, General_Track, "mpeg7:Title", "type", std::string("songTitle"));
+            if (!MI.Get(Stream_General, 0, General_Part_Position).empty())
+            {
+                Ztring Total=MI.Get(Stream_General, 0, General_Part_Position_Total);
+                Value=MI.Get(Stream_General, 0, General_Part_Position)+(Total.empty()?Ztring():(__T("/")+Total));
+
+                Node_Creation->Add_Child("mpeg7:Title", Value, "type", std::string("urn:x-mpeg7-mediainfo:cs:TitleTypeCS:2009:PART"));
+            }
             if (!MI.Get(Stream_General, 0, General_Track_Position).empty())
             {
                  Ztring Total=MI.Get(Stream_General, 0, General_Track_Position_Total);
@@ -1403,8 +1517,13 @@ Ztring Export_Mpeg7::Transform(MediaInfo_Internal &MI)
         if (!MI.Get(Stream_General, 0, General_Encoded_Date).empty())
         {
             Node* Node_Date=Node_Creation->Add_Child("mpeg7:CreationCoordinates")->Add_Child("mpeg7:Date");
-            Node_Date->Add_Child("")->XmlCommentOut="Encoded date";
-            Node_Date->Add_Child("mpeg7:TimePoint", Mpeg7_TimeToISO(MI.Get(Stream_General, 0, General_Encoded_Date)));
+            Ztring TimePoint=Mpeg7_TimeToISO(MI.Get(Stream_General, 0, General_Encoded_Date));
+            bool TimePoint_Isvalid=Mpeg7_TimeToISO_Isvalid(TimePoint);
+            if (TimePoint_Isvalid)
+                Node_Date->Add_Child("")->XmlCommentOut="Encoded date";
+            Node_Date->Add_Child("mpeg7:TimePoint", TimePoint);
+            if (!TimePoint_Isvalid)
+                Node_Date->XmlCommentOut="Encoded date, invalid input";
         }
         if (!MI.Get(Stream_General, 0, General_Producer).empty())
         {

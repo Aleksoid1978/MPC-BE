@@ -61,6 +61,9 @@ public :
 
 private :
     std::vector<MediaInfo_Internal*> Info;
+    #if defined(MEDIAINFO_FILE_YES)
+    std::vector<String> ToParse_ToIgnore;
+    #endif //defined(MEDIAINFO_FILE_YES)
     std::queue<String> ToParse;
     std::map<String, String> Config_MediaInfo_Items; //Config per file
     size_t  ToParse_AlreadyDone;
