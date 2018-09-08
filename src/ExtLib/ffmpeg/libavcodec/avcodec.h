@@ -448,6 +448,10 @@ enum AVCodecID {
     AV_CODEC_ID_GDV,
     AV_CODEC_ID_FITS,
     AV_CODEC_ID_IMM4,
+    AV_CODEC_ID_PROSUMER,
+    AV_CODEC_ID_MWSC,
+    AV_CODEC_ID_WCMV,
+    AV_CODEC_ID_RASC,
 
     /* various PCM "codecs" */
     AV_CODEC_ID_FIRST_AUDIO = 0x10000,     ///< A dummy id pointing at the start of audio codecs
@@ -1616,6 +1620,7 @@ typedef struct AVCodecContext {
      * The allocated memory should be AV_INPUT_BUFFER_PADDING_SIZE bytes larger
      * than extradata_size to avoid problems if it is read with the bitstream reader.
      * The bytewise contents of extradata must not depend on the architecture or CPU endianness.
+     * Must be allocated with the av_malloc() family of functions.
      * - encoding: Set/allocated/freed by libavcodec.
      * - decoding: Set/allocated/freed by user.
      */
