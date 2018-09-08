@@ -99,6 +99,9 @@ public :
     void          File_TestContinuousFileNames_Set (bool NewValue);
     bool          File_TestContinuousFileNames_Get ();
 
+    void          File_TestDirectory_Set (bool NewValue);
+    bool          File_TestDirectory_Get ();
+
     void          File_KeepInfo_Set (bool NewValue);
     bool          File_KeepInfo_Get ();
 
@@ -427,6 +430,7 @@ private :
     bool                    FileIsDetectingDuration;
     bool                    FileIsReferenced;
     bool                    FileTestContinuousFileNames;
+    bool                    FileTestDirectory;
     bool                    FileKeepInfo;
     bool                    FileStopAfterFilled;
     bool                    FileStopSubStreamAfterFilled;

@@ -98,7 +98,7 @@ void File__Analyze::BS_Begin()
     else
         BS_Size=0;
 
-    BS->Attach(Buffer+Buffer_Offset+(size_t)Element_Offset, BS_Size);
+    BS->Attach(Buffer+Buffer_Offset+(size_t)(BS_Size?Element_Offset:0), BS_Size);
     #if MEDIAINFO_TRACE
         BS_Size<<=3; //In bits
     #endif

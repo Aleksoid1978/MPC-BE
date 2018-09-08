@@ -28,12 +28,14 @@
 #include "ZenLib/ZtringListList.h"
 #include "ZenLib/Translation.h"
 #include "ZenLib/InfoMap.h"
+#include <set>
 #include <bitset>
 using namespace ZenLib;
 using std::vector;
 using std::string;
 using std::map;
 using std::make_pair;
+using namespace std;
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -96,8 +98,13 @@ public :
           void      MultipleValues_Set (size_t NewValue);
           size_t    MultipleValues_Get ();
 
-          void      ParseUnknownExtensions_Set (size_t NewValue);
-          size_t    ParseUnknownExtensions_Get ();
+          #if MEDIAINFO_ADVANCED
+          void      ParseOnlyKnownExtensions_Set (const Ztring &NewValue);
+          Ztring    ParseOnlyKnownExtensions_Get();
+          bool      ParseOnlyKnownExtensions_IsSet();
+          set<Ztring> ParseOnlyKnownExtensions_GetList_Set();
+          Ztring    ParseOnlyKnownExtensions_GetList_String();
+          #endif //MEDIAINFO_ADVANCED
 
           void      ShowFiles_Set (const ZtringListList &NewShowFiles);
           size_t    ShowFiles_Nothing_Get ();
@@ -384,7 +391,9 @@ private :
     size_t          BlockMethod;
     size_t          Internet;
     size_t          MultipleValues;
-    size_t          ParseUnknownExtensions;
+    #ifdef MEDIAINFO_ADVANCED
+    Ztring          ParseOnlyKnownExtensions;
+    #endif
     size_t          ShowFiles_Nothing;
     size_t          ShowFiles_VideoAudio;
     size_t          ShowFiles_VideoOnly;

@@ -143,6 +143,7 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
     FileIsDetectingDuration=false;
     FileIsReferenced=false;
     FileTestContinuousFileNames=true;
+    FileTestDirectory=true;
     FileKeepInfo=false;
     FileStopAfterFilled=false;
     FileStopSubStreamAfterFilled=false;
@@ -380,6 +381,15 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
     else if (Option_Lower==__T("file_testcontinuousfilenames_get"))
     {
         return File_TestContinuousFileNames_Get()?"1":"0";
+    }
+    if (Option_Lower==__T("file_testdirectory"))
+    {
+        File_TestDirectory_Set(!(Value==__T("0") || Value.empty()));
+        return __T("");
+    }
+    else if (Option_Lower==__T("file_testdirectory_get"))
+    {
+        return File_TestDirectory_Get()?"1":"0";
     }
     if (Option_Lower==__T("file_keepinfo"))
     {
@@ -1360,6 +1370,19 @@ bool MediaInfo_Config_MediaInfo::File_TestContinuousFileNames_Get ()
 {
     CriticalSectionLocker CSL(CS);
     return FileTestContinuousFileNames;
+}
+
+//---------------------------------------------------------------------------
+void MediaInfo_Config_MediaInfo::File_TestDirectory_Set (bool NewValue)
+{
+    CriticalSectionLocker CSL(CS);
+    FileTestDirectory=NewValue;
+}
+
+bool MediaInfo_Config_MediaInfo::File_TestDirectory_Get ()
+{
+    CriticalSectionLocker CSL(CS);
+    return FileTestDirectory;
 }
 
 //***************************************************************************
