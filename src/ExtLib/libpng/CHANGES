@@ -1,4 +1,3 @@
-#if 0
 CHANGES - changes for libpng
 
 version 0.1 [March 29, 1995]
@@ -6057,11 +6056,17 @@ Version 1.6.35beta02 [March 28, 2018]
   Make png_get_iCCP consistent with man page (allow compression-type argument
   to be NULL, bug report by Lenard Szolnoki).
 
+Version 1.6.35 [July 15, 2018]
+  Replaced the remaining uses of png_size_t with size_t (Cosmin)
+  Fixed the calculation of row_factor in png_check_chunk_length
+    (reported by Thuan Pham in SourceForge issue #278)
+  Added missing parentheses to a macro definition
+    (suggested by "irwir" in GitHub issue #216)
+
+Version 1.6.36
+  [TODO]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
-to subscribe)
-or to glennrp at users.sourceforge.net
-
-Glenn R-P
-#endif
+to subscribe).

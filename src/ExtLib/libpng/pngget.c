@@ -1,10 +1,10 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.6.35 [(PENDING RELEASE)]
+ * Copyright (c) 2018 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
- * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
- * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ * Copyright (c) 1996-1997 Andreas Dilger
+ * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -26,7 +26,7 @@ png_get_valid(png_const_structrp png_ptr, png_const_inforp info_ptr,
    return(0);
 }
 
-png_size_t PNGAPI
+size_t PNGAPI
 png_get_rowbytes(png_const_structrp png_ptr, png_const_inforp info_ptr)
 {
    if (png_ptr != NULL && info_ptr != NULL)
@@ -1165,7 +1165,7 @@ png_get_user_chunk_ptr(png_const_structrp png_ptr)
 }
 #endif
 
-png_size_t PNGAPI
+size_t PNGAPI
 png_get_compression_buffer_size(png_const_structrp png_ptr)
 {
    if (png_ptr == NULL)

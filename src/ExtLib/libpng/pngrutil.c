@@ -1,10 +1,10 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.6.35 [(PENDING RELEASE)]
+ * Copyright (c) 2018 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
- * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
- * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ * Copyright (c) 1996-1997 Andreas Dilger
+ * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -120,7 +120,7 @@ png_get_uint_16)(png_const_bytep buf)
 void /* PRIVATE */
 png_read_sig(png_structrp png_ptr, png_inforp info_ptr)
 {
-   png_size_t num_checked, num_to_check;
+   size_t num_checked, num_to_check;
 
    /* Exit if the user application does not expect a signature. */
    if (png_ptr->sig_bytes >= 8)
@@ -1461,8 +1461,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                {
                   /* We have the ICC profile header; do the basic header checks.
                    */
-                  const png_uint_32 profile_length =
-                     png_get_uint_32(profile_header);
+                  png_uint_32 profile_length = png_get_uint_32(profile_header);
 
                   if (png_icc_check_length(png_ptr, &png_ptr->colorspace,
                       keyword, profile_length) != 0)
@@ -1479,8 +1478,8 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                          * profile.  The header check has already validated
                          * that none of this stuff will overflow.
                          */
-                        const png_uint_32 tag_count = png_get_uint_32(
-                            profile_header+128);
+                        png_uint_32 tag_count =
+                           png_get_uint_32(profile_header + 128);
                         png_bytep profile = png_read_buffer(png_ptr,
                             profile_length, 2/*silent*/);
 
@@ -1648,7 +1647,7 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    int entry_size, i;
    png_uint_32 skip = 0;
    png_uint_32 dl;
-   png_size_t max_dl;
+   size_t max_dl;
 
    png_debug(1, "in png_handle_sPLT");
 
@@ -2377,7 +2376,7 @@ void /* PRIVATE */
 png_handle_sCAL(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 {
    png_bytep buffer;
-   png_size_t i;
+   size_t i;
    int state;
 
    png_debug(1, "in png_handle_sCAL");
@@ -2447,7 +2446,7 @@ png_handle_sCAL(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    else
    {
-      png_size_t heighti = i;
+      size_t heighti = i;
 
       state = 0;
       if (png_check_fp_number((png_const_charp)buffer, length,
@@ -2885,7 +2884,7 @@ png_cache_unknown_chunk(png_structrp png_ptr, png_uint_32 length)
    {
       PNG_CSTRING_FROM_CHUNK(png_ptr->unknown_chunk.name, png_ptr->chunk_name);
       /* The following is safe because of the PNG_SIZE_MAX init above */
-      png_ptr->unknown_chunk.size = (png_size_t)length/*SAFE*/;
+      png_ptr->unknown_chunk.size = (size_t)length/*SAFE*/;
       /* 'mode' is a flag array, only the bottom four bits matter here */
       png_ptr->unknown_chunk.location = (png_byte)png_ptr->mode/*SAFE*/;
 
@@ -3132,7 +3131,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
  */
 
 void /* PRIVATE */
-png_check_chunk_name(png_const_structrp png_ptr, const png_uint_32 chunk_name)
+png_check_chunk_name(png_const_structrp png_ptr, png_uint_32 chunk_name)
 {
    int i;
    png_uint_32 cn=chunk_name;
@@ -3151,7 +3150,7 @@ png_check_chunk_name(png_const_structrp png_ptr, const png_uint_32 chunk_name)
 }
 
 void /* PRIVATE */
-png_check_chunk_length(png_const_structrp png_ptr, const png_uint_32 length)
+png_check_chunk_length(png_const_structrp png_ptr, png_uint_32 length)
 {
    png_alloc_size_t limit = PNG_UINT_31_MAX;
 
@@ -3167,10 +3166,13 @@ png_check_chunk_length(png_const_structrp png_ptr, const png_uint_32 length)
    {
       png_alloc_size_t idat_limit = PNG_UINT_31_MAX;
       size_t row_factor =
-         (png_ptr->width * png_ptr->channels * (png_ptr->bit_depth > 8? 2: 1)
-          + 1 + (png_ptr->interlaced? 6: 0));
+         (size_t)png_ptr->width
+         * (size_t)png_ptr->channels
+         * (png_ptr->bit_depth > 8? 2: 1)
+         + 1
+         + (png_ptr->interlaced? 6: 0);
       if (png_ptr->height > PNG_UINT_32_MAX/row_factor)
-         idat_limit=PNG_UINT_31_MAX;
+         idat_limit = PNG_UINT_31_MAX;
       else
          idat_limit = png_ptr->height * row_factor;
       row_factor = row_factor > 32566? 32566 : row_factor;
@@ -3360,7 +3362,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
          /* Hence the pre-compiled masks indexed by PACKSWAP (or not), depth and
           * then pass:
           */
-         static PNG_CONST png_uint_32 row_mask[2/*PACKSWAP*/][3/*depth*/][6] =
+         static const png_uint_32 row_mask[2/*PACKSWAP*/][3/*depth*/][6] =
          {
             /* Little-endian byte masks for PACKSWAP */
             { S_MASKS(1,0), S_MASKS(2,0), S_MASKS(4,0) },
@@ -3371,7 +3373,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
          /* display_mask has only three entries for the odd passes, so index by
           * pass>>1.
           */
-         static PNG_CONST png_uint_32 display_mask[2][3][3] =
+         static const png_uint_32 display_mask[2][3][3] =
          {
             /* Little-endian byte masks for PACKSWAP */
             { B_MASKS(1,0), B_MASKS(2,0), B_MASKS(4,0) },
@@ -3684,7 +3686,7 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 {
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
    /* Offset to next interlace block */
-   static PNG_CONST unsigned int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+   static const unsigned int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
 
    png_debug(1, "in png_do_read_interlace");
    if (row != NULL && row_info != NULL)
@@ -3697,8 +3699,8 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
       {
          case 1:
          {
-            png_bytep sp = row + (png_size_t)((row_info->width - 1) >> 3);
-            png_bytep dp = row + (png_size_t)((final_width - 1) >> 3);
+            png_bytep sp = row + (size_t)((row_info->width - 1) >> 3);
+            png_bytep dp = row + (size_t)((final_width - 1) >> 3);
             unsigned int sshift, dshift;
             unsigned int s_start, s_end;
             int s_inc;
@@ -3824,8 +3826,8 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 
          case 4:
          {
-            png_bytep sp = row + (png_size_t)((row_info->width - 1) >> 1);
-            png_bytep dp = row + (png_size_t)((final_width - 1) >> 1);
+            png_bytep sp = row + (size_t)((row_info->width - 1) >> 1);
+            png_bytep dp = row + (size_t)((final_width - 1) >> 1);
             unsigned int sshift, dshift;
             unsigned int s_start, s_end;
             int s_inc;
@@ -3887,12 +3889,12 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 
          default:
          {
-            png_size_t pixel_bytes = (row_info->pixel_depth >> 3);
+            size_t pixel_bytes = (row_info->pixel_depth >> 3);
 
-            png_bytep sp = row + (png_size_t)(row_info->width - 1)
+            png_bytep sp = row + (size_t)(row_info->width - 1)
                 * pixel_bytes;
 
-            png_bytep dp = row + (png_size_t)(final_width - 1) * pixel_bytes;
+            png_bytep dp = row + (size_t)(final_width - 1) * pixel_bytes;
 
             int jstop = (int)png_pass_inc[pass];
             png_uint_32 i;
@@ -3929,8 +3931,8 @@ static void
 png_read_filter_row_sub(png_row_infop row_info, png_bytep row,
     png_const_bytep prev_row)
 {
-   png_size_t i;
-   png_size_t istop = row_info->rowbytes;
+   size_t i;
+   size_t istop = row_info->rowbytes;
    unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
    png_bytep rp = row + bpp;
 
@@ -3947,8 +3949,8 @@ static void
 png_read_filter_row_up(png_row_infop row_info, png_bytep row,
     png_const_bytep prev_row)
 {
-   png_size_t i;
-   png_size_t istop = row_info->rowbytes;
+   size_t i;
+   size_t istop = row_info->rowbytes;
    png_bytep rp = row;
    png_const_bytep pp = prev_row;
 
@@ -3963,11 +3965,11 @@ static void
 png_read_filter_row_avg(png_row_infop row_info, png_bytep row,
     png_const_bytep prev_row)
 {
-   png_size_t i;
+   size_t i;
    png_bytep rp = row;
    png_const_bytep pp = prev_row;
    unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
-   png_size_t istop = row_info->rowbytes - bpp;
+   size_t istop = row_info->rowbytes - bpp;
 
    for (i = 0; i < bpp; i++)
    {
@@ -4326,16 +4328,16 @@ png_read_finish_row(png_structrp png_ptr)
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* Start of interlace block */
-   static PNG_CONST png_byte png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
+   static const png_byte png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
 
    /* Offset to next interlace block */
-   static PNG_CONST png_byte png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+   static const png_byte png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
 
    /* Start of interlace block in the y direction */
-   static PNG_CONST png_byte png_pass_ystart[7] = {0, 0, 4, 0, 2, 0, 1};
+   static const png_byte png_pass_ystart[7] = {0, 0, 4, 0, 2, 0, 1};
 
    /* Offset to next interlace block in the y direction */
-   static PNG_CONST png_byte png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
+   static const png_byte png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
 
    png_debug(1, "in png_read_finish_row");
    png_ptr->row_number++;
@@ -4391,19 +4393,19 @@ png_read_start_row(png_structrp png_ptr)
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* Start of interlace block */
-   static PNG_CONST png_byte png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
+   static const png_byte png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
 
    /* Offset to next interlace block */
-   static PNG_CONST png_byte png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+   static const png_byte png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
 
    /* Start of interlace block in the y direction */
-   static PNG_CONST png_byte png_pass_ystart[7] = {0, 0, 4, 0, 2, 0, 1};
+   static const png_byte png_pass_ystart[7] = {0, 0, 4, 0, 2, 0, 1};
 
    /* Offset to next interlace block in the y direction */
-   static PNG_CONST png_byte png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
+   static const png_byte png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
 
    unsigned int max_pixel_depth;
-   png_size_t row_bytes;
+   size_t row_bytes;
 
    png_debug(1, "in png_read_start_row");
 
