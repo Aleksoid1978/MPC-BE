@@ -1661,6 +1661,34 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("Infinity IMM4"),
         .props     = AV_CODEC_PROP_LOSSY,
     },
+    {
+        .id        = AV_CODEC_ID_PROSUMER,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "prosumer",
+        .long_name = NULL_IF_CONFIG_SMALL("Brooktree ProSumer Video"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_MWSC,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "mwsc",
+        .long_name = NULL_IF_CONFIG_SMALL("MatchWare Screen Capture Codec"),
+        .props     = AV_CODEC_PROP_LOSSLESS,
+    },
+    {
+        .id        = AV_CODEC_ID_WCMV,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "wcmv",
+        .long_name = NULL_IF_CONFIG_SMALL("WinCAM Motion Video"),
+        .props     = AV_CODEC_PROP_LOSSLESS,
+    },
+    {
+        .id        = AV_CODEC_ID_RASC,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "rasc",
+        .long_name = NULL_IF_CONFIG_SMALL("RemotelyAnywhere Screen Capture"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
 
     /* various PCM "codecs" */
     {
