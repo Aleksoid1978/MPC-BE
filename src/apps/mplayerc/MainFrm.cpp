@@ -95,6 +95,8 @@
 
 #include "Variables.h"
 
+#include "PlayerYouTubeDL.h"
+
 #define DEFCLIENTW		292
 #define DEFCLIENTH		200
 #define MENUBARBREAK	30
@@ -11645,6 +11647,48 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 				m_strPlaybackRenderedPath = pOFD->fns.front().GetName();
 				m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
+			}
+		}
+	}
+
+	if (pOFD->fns.size() == 1 && ::PathIsURL(pOFD->fns.front())
+			&& youtubeUrl.IsEmpty()
+			&& Content::Online::CheckConnect(pOFD->fns.front())) {
+		const CString fn = pOFD->fns.front().GetName();
+		CString online_hdr;
+		Content::Online::GetHeader(fn, online_hdr);
+		if (!online_hdr.IsEmpty()) {
+			online_hdr.Trim(L"\r\n "); online_hdr.Replace(L"\r", L"");
+			std::list<CString> params;
+			Explode(online_hdr, params, L'\n');
+			bool bIsHtml = false;
+			for (const auto& param : params) {
+				int k = param.Find(L':');
+				if (k > 0) {
+					const CString key = param.Left(k).Trim().MakeLower();
+					const CString value = param.Mid(k).MakeLower();
+					if (key == L"content-type") {
+						bIsHtml = (value.Find(L"text/html") != -1);
+						break;
+					}
+				}
+			}
+
+			if (bIsHtml) {
+				std::list<CString> urls;
+				if (YoutubeDL::Parse_URL(fn, s.iYDLMaxHeight, urls, m_youtubeFields)) {
+					youtubeUrl = fn;
+					Content::Online::Disconnect(youtubeUrl);
+
+					pOFD->fns.clear();
+
+					for (const auto& url : urls) {
+						pOFD->fns.push_back(url);
+					}
+
+					m_strPlaybackRenderedPath = pOFD->fns.front().GetName();
+					m_wndPlaylistBar.SetCurLabel(m_youtubeFields.title);
+				}
 			}
 		}
 	}

@@ -363,6 +363,9 @@
     <ClCompile Include="PlayerCaptureDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerYouTubeDL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSettings.h">
@@ -717,6 +720,9 @@
       <Filter>controls</Filter>
     </ClInclude>
     <ClInclude Include="PlayerCaptureDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerYouTubeDL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
