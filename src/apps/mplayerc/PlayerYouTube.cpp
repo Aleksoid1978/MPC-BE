@@ -555,7 +555,15 @@ namespace Youtube
 						DWORD dataSize = 0;
 						InternetReadData(hInet, JSUrl, &data, dataSize);
 						if (dataSize) {
-							const CStringA funcName = RegExpParseA(data, "\"signature\",([a-zA-Z0-9$]+)\\(");
+							static LPCSTR signatureRegExps[] = {
+								"\"signature\",([a-zA-Z0-9$]+)\\(",
+								"\\.sig\\|\\|([a-zA-Z0-9$]+)\\(",
+								"\\bc\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*([a-zA-Z0-9$]+)\\("
+							};
+							CStringA funcName;
+							for (int i = 0; i < _countof(signatureRegExps) && funcName.IsEmpty(); i++) {
+								funcName = RegExpParseA(data, signatureRegExps[i]);
+							}
 							if (!funcName.IsEmpty()) {
 								CStringA funcRegExp = funcName + "=function\\(a\\)\\{([^\\n]+)\\};"; funcRegExp.Replace("$", "\\$");
 								const CStringA funcBody = RegExpParseA(data, funcRegExp);
