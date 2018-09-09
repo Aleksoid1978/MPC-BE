@@ -1001,14 +1001,16 @@ HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 			   || m_mt.subtype == MEDIASUBTYPE_RAW_AAC1) {
 		BYTE* ptr = p->data()+2;
 
-		CAtlList<WORD> sizes;
 		int total = 0;
 		int remaining = p->size()-2;
 		int expected = *(ptr-1)>>4;
 
+		std::vector<WORD> sizes;
+		sizes.reserve(expected);
+
 		while (total < remaining) {
 			int size = (ptr[0]<<8)|(ptr[1]);
-			sizes.AddTail(size);
+			sizes.push_back(size);
 			total += size;
 			ptr += 2;
 			remaining -= 2;
@@ -1023,10 +1025,7 @@ HRESULT CRealMediaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 		REFERENCE_TIME rtStart = p->rtStart;
 		BOOL bDiscontinuity = p->bDiscontinuity;
 
-		POSITION pos = sizes.GetHeadPosition();
-		while (pos) {
-			WORD size = sizes.GetNext(pos);
-
+		for (const auto& size : sizes) {
 			CAutoPtr<CPacket> p(DNew CPacket);
 			p->bDiscontinuity = bDiscontinuity;
 			p->bSyncPoint = true;
@@ -1975,7 +1974,7 @@ HRESULT CRealVideoDecoder::CheckInputType(const CMediaType* mtIn)
 			m_hDrvDll = nullptr;
 		}
 
-		CAtlList<CString> paths;
+		std::list<CString> paths;
 		CString olddll, newdll, oldpath, newpath;
 
 		olddll.Format(L"drv%c3260.dll", (WCHAR)((mtIn->subtype.Data1>>16)&0xff));
@@ -2008,26 +2007,26 @@ HRESULT CRealVideoDecoder::CheckInputType(const CMediaType* mtIn)
 		}
 
 		if (!newpath.IsEmpty()) {
-			paths.AddTail(newpath + newdll);
+			paths.emplace_back(newpath + newdll);
 		}
 		if (!oldpath.IsEmpty()) {
-			paths.AddTail(oldpath + newdll);
+			paths.emplace_back(oldpath + newdll);
 		}
-		paths.AddTail(newdll);	// default dll paths
+		paths.emplace_back(newdll); // default dll paths
 		if (!newpath.IsEmpty()) {
-			paths.AddTail(newpath + olddll);
+			paths.emplace_back(newpath + olddll);
 		}
 		if (!oldpath.IsEmpty()) {
-			paths.AddTail(oldpath + olddll);
+			paths.emplace_back(oldpath + olddll);
 		}
-		paths.AddTail(olddll);	// default dll paths
+		paths.emplace_back(olddll); // default dll paths
 
-		POSITION pos = paths.GetHeadPosition();
-		do {
-			if (pos) {
-				m_hDrvDll = LoadLibraryW(paths.GetNext(pos));
+		for (const auto& path : paths) {
+			m_hDrvDll = LoadLibraryW(path);
+			if (m_hDrvDll) {
+				break;
 			}
-		} while (pos && !m_hDrvDll);
+		}
 
 		if (m_hDrvDll) {
 			RVCustomMessage = (PRVCustomMessage)GetProcAddress(m_hDrvDll, "RV20toYUV420CustomMessage");
@@ -2471,7 +2470,7 @@ HRESULT CRealAudioDecoder::CheckInputType(const CMediaType* mtIn)
 			m_hDrvDll = nullptr;
 		}
 
-		CAtlList<CString> paths;
+		std::list<CString> paths;
 		CString olddll, newdll, oldpath, newpath;
 
 		WCHAR fourcc[5] = {
@@ -2513,26 +2512,26 @@ HRESULT CRealAudioDecoder::CheckInputType(const CMediaType* mtIn)
 		}
 
 		if (!newpath.IsEmpty()) {
-			paths.AddTail(newpath + newdll);
+			paths.emplace_back(newpath + newdll);
 		}
 		if (!oldpath.IsEmpty()) {
-			paths.AddTail(oldpath + newdll);
+			paths.emplace_back(oldpath + newdll);
 		}
-		paths.AddTail(newdll);	// default dll paths
+		paths.emplace_back(newdll); // default dll paths
 		if (!newpath.IsEmpty()) {
-			paths.AddTail(newpath + olddll);
+			paths.emplace_back(newpath + olddll);
 		}
 		if (!oldpath.IsEmpty()) {
-			paths.AddTail(oldpath + olddll);
+			paths.emplace_back(oldpath + olddll);
 		}
-		paths.AddTail(olddll);	// default dll paths
+		paths.emplace_back(olddll); // default dll paths
 
-		POSITION pos = paths.GetHeadPosition();
-		do {
-			if (pos) {
-				m_hDrvDll = LoadLibraryW(paths.GetNext(pos));
+		for (const auto& path : paths) {
+			m_hDrvDll = LoadLibraryW(path);
+			if (m_hDrvDll) {
+				break;
 			}
-		} while (pos && !m_hDrvDll);
+		}
 
 		if (m_hDrvDll) {
 			RACloseCodec = (PCloseCodec)GetProcAddress(m_hDrvDll, "RACloseCodec");
