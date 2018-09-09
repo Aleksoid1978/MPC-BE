@@ -99,37 +99,6 @@ T ExplodeMin(const T& str, std::list<T>& sl, const SEP sep, const size_t limit =
 }
 
 template<class T, typename SEP>
-T ExplodeEsc(T str, CAtlList<T>& sl, SEP sep, size_t limit = 0, SEP esc = '\\')
-{
-	sl.RemoveAll();
-
-	int split = 0;
-	for (int i = 0, j = 0; ; i = j + 1) {
-		j = str.Find(sep, i);
-		if (j < 0) {
-			break;
-		}
-
-		// Skip this separator if it is escaped
-		if (j > 0 && str.GetAt(j - 1) == esc) {
-			// Delete the escape character
-			str.Delete(j - 1);
-			continue;
-		}
-
-		if (sl.GetCount() < limit - 1) {
-			sl.AddTail(str.Mid(split, j - split).Trim());
-
-			// Save new splitting position
-			split = j + 1;
-		}
-	}
-	sl.AddTail(str.Mid(split).Trim());
-
-	return sl.GetHead();
-}
-
-template<class T, typename SEP>
 T ExplodeEsc(T str,std::list<T>& sl, SEP sep, size_t limit = 0, SEP esc = '\\')
 {
 	sl.clear();
