@@ -530,12 +530,15 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Operatori CGI: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 13
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 16
+5		"YouTube"
 6		"Use the built-in web page parser"
 7		"Preferred format:"
 10		"60 fps"
 11		"HDR"
 12		"Load playlist"
+13		"youtube-dl (experimental)"
+14		"Max video height:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -1099,7 +1102,7 @@ STRING IDD_PPAGESUBTITLES		"Subtitrări"
 STRING IDD_PPAGESYNC		"Video::Frame synchronization"
 STRING IDD_PPAGEVIDEO		"Video"
 STRING IDD_PPAGEWEBSERVER		"Player::Interfață web"
-STRING IDD_PPAGEYOUTUBE		"Redare::YouTube"
+STRING IDD_PPAGEYOUTUBE		"Redare::Online media services"
 STRING IDF_LOGO1		"Default"
 STRING IDR_MAINFRAME		"MPC-BE"
 STRING IDS_ADD_TO_PLAYLIST		"Adaugă la lista de redare a MPC-BE"

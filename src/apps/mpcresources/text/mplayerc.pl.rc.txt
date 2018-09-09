@@ -530,12 +530,15 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Obsługa interfejsu CGI: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 13
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 16
+5		"YouTube"
 6		"Użyj wbudowanego analizatora strony internetowej"
 7		"Preferowany format:"
 10		"60 fps"
 11		"HDR"
 12		"Wgraj listę odtwarzania"
+13		"youtube-dl (experimental)"
+14		"Max video height:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -1087,7 +1090,7 @@ STRING IDD_PPAGESUBTITLES		"Napisy"
 STRING IDD_PPAGESYNC		"Wideo::Ustawienia synchronizacji"
 STRING IDD_PPAGEVIDEO		"Wideo"
 STRING IDD_PPAGEWEBSERVER		"Program::Interfejs internetowy"
-STRING IDD_PPAGEYOUTUBE		"Odtwarzanie::YouTube"
+STRING IDD_PPAGEYOUTUBE		"Odtwarzanie::Online media services"
 STRING IDF_LOGO1		"Domyślne"
 STRING IDR_MAINFRAME		"MPC-BE"
 STRING IDS_ADD_TO_PLAYLIST		"Dodaj do listy odtwarzania MPC-BE"

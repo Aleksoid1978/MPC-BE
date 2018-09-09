@@ -530,12 +530,15 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Інтерпретація CGI: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 13
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 16
+5		"YouTube"
 6		"Використовувати вбудований парсер веб-сторінок"
 7		"Вибір формату перегляду:"
 10		"60 кадрів\с"
 11		"HDR"
 12		"Завантажити список відтворення"
+13		"youtube-dl (experimental)"
+14		"Max video height:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -1096,7 +1099,7 @@ STRING IDD_PPAGESUBTITLES		"Субтитри"
 STRING IDD_PPAGESYNC		"Відео::Синхронізація кадрів"
 STRING IDD_PPAGEVIDEO		"Відео"
 STRING IDD_PPAGEWEBSERVER		"Програвач::Web-інтерфейс"
-STRING IDD_PPAGEYOUTUBE		"Відтворення::YouTube"
+STRING IDD_PPAGEYOUTUBE		"Відтворення::Online media services"
 STRING IDF_LOGO1		"Типовий"
 STRING IDR_MAINFRAME		"MPC-BE"
 STRING IDS_ADD_TO_PLAYLIST		"Додати до списка відтворення MPC-BE"
