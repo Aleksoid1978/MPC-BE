@@ -180,7 +180,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BinkSplitter", "src\filters
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shaders", "src\Shaders\Shaders.vcxproj", "{154D3FA8-9BB8-4EC1-8D56-DA14715ACD56}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "soxr", "src\ExtLib\soxr\soxr.vcxproj", "{88240767-4B7A-49E9-9E83-2F9E283D4F26}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libsoxr", "src\ExtLib\soxr\soxr.vcxproj", "{88240767-4B7A-49E9-9E83-2F9E283D4F26}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VirtualDub", "VirtualDub", "{CD6C4E10-5031-4C5A-86A6-D125A77D886A}"
 EndProject
