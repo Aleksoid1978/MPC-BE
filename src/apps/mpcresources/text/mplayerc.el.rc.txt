@@ -530,12 +530,15 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"Δείκτες χειρισμού CGI: (.ext1=κατάλογος1, .ext2=κατάλογος2, ...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 13
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 16
+5		"YouTube"
 6		"Χρήση ενσωματωμένης μορφής στην ιστοσελίδα"
 7		"Προτίμηση μορφής:"
 10		"60 fps"
 11		"HDR"
 12		"Φόρτωση λίστας αναπαραγωγής"
+13		"youtube-dl (experimental)"
+14		"Max video height:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -1099,7 +1102,7 @@ STRING IDD_PPAGESUBTITLES		"Υπότιτλοι"
 STRING IDD_PPAGESYNC		"Βίντεο::Συγχρονισμός καρέ"
 STRING IDD_PPAGEVIDEO		"Βίντεο"
 STRING IDD_PPAGEWEBSERVER		"Αναπαραγωγός::Διεπαφή διαδικτύου"
-STRING IDD_PPAGEYOUTUBE		"Αναπαραγωγή::YouTube"
+STRING IDD_PPAGEYOUTUBE		"Αναπαραγωγή::Online media services"
 STRING IDF_LOGO1		"Προεπιλογή"
 STRING IDR_MAINFRAME		"MPC-BE"
 STRING IDS_ADD_TO_PLAYLIST		"Προσθήκη στη λίστα αναπαραγωγής του MPC-BE"

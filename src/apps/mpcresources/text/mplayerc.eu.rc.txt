@@ -530,12 +530,15 @@ BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
 22		"CGI kudeatzaileak: (.ext1=path1;.ext2=path2;...)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 13
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 16
+5		"YouTube"
 6		"Erabili barnebildutako web orrialde aztertzailea"
 7		"Heuskarri Hobetsia:"
 10		"60 fs-ko"
 11		"HDR"
 12		"Gertatu irakur-zerrenda"
+13		"youtube-dl (experimental)"
+14		"Max video height:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
@@ -1096,7 +1099,7 @@ STRING IDD_PPAGESUBTITLES		"Azpidatziak"
 STRING IDD_PPAGESYNC		"Bideoa::Frame aldiberetzea"
 STRING IDD_PPAGEVIDEO		"Bideoa"
 STRING IDD_PPAGEWEBSERVER		"Irakurgailua::Web Interfazea"
-STRING IDD_PPAGEYOUTUBE		"Irakurketa::YouTube"
+STRING IDD_PPAGEYOUTUBE		"Irakurketa::Online media services"
 STRING IDF_LOGO1		"Berezkoa"
 STRING IDR_MAINFRAME		"Media Player Classic - BE"
 STRING IDS_ADD_TO_PLAYLIST		"Gehitu MPC-BE Irakur-zerrendara"
