@@ -36,6 +36,8 @@ private:
 	CButton m_chkHdr;
 	CButton m_chkLoadPlaylist;
 
+	CComboBox m_cbYDLMaxHeight;
+
 public:
 	CPPageYoutube();
 	virtual ~CPPageYoutube();

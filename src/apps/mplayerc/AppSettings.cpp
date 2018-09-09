@@ -1158,6 +1158,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 	bYoutubeLoadPlaylist	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_LOAD_PLAYLIST, FALSE);
 
+	iYDLMaxHeight			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YDL_MAXHEIGHT, 720);
+	iYDLMaxHeight = discard(iYDLMaxHeight, 720, s_CommonVideoHeights);
+
 	nLastFileInfoPage		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, 0);
 
 	bUpdaterAutoCheck		= !!pApp->GetProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_AUTO_CHECK, 0);
@@ -1548,6 +1551,8 @@ void CAppSettings::SaveSettings()
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_60FPS, YoutubeFormat.fps60);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_HDR, YoutubeFormat.hdr);
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
+
+	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_YDL_MAXHEIGHT, iYDLMaxHeight);
 
 	pApp->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, fRemainingTime);
 

@@ -44,6 +44,7 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK3, m_chk60fps);
 	DDX_Control(pDX, IDC_CHECK4, m_chkHdr);
 	DDX_Control(pDX, IDC_CHECK1, m_chkLoadPlaylist);
+	DDX_Control(pDX, IDC_COMBO3, m_cbYDLMaxHeight);
 }
 
 BEGIN_MESSAGE_MAP(CPPageYoutube, CPPageBase)
@@ -94,6 +95,13 @@ BOOL CPPageYoutube::OnInitDialog()
 	OnCheck60fps();
 	OnCheckPageParser();
 
+	for (const auto& h : s_CommonVideoHeights) {
+		CString str;
+		str.Format(L"%d", h);
+		AddStringData(m_cbYDLMaxHeight, str, h);
+	}
+	SelectByItemData(m_cbYDLMaxHeight, s.iYDLMaxHeight);
+
 	UpdateData(FALSE);
 
 	return TRUE;
@@ -111,6 +119,8 @@ BOOL CPPageYoutube::OnApply()
 	s.YoutubeFormat.fps60	= !!m_chk60fps.GetCheck();
 	s.YoutubeFormat.hdr		= !!m_chkHdr.GetCheck();
 	s.bYoutubeLoadPlaylist	= !!m_chkLoadPlaylist.GetCheck();
+
+	s.iYDLMaxHeight = GetCurItemData(m_cbYDLMaxHeight);
 
 	return __super::OnApply();
 }
