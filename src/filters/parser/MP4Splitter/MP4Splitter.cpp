@@ -1284,17 +1284,19 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 								break;
 							case AP4_ATOM_TYPE_av01:
+								// https://aomediacodec.github.io/av1-isobmff/#av1codecconfigurationbox-section
 								if (AP4_DataInfoAtom* av1C = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_AV1C))) {
 									const AP4_DataBuffer* di = av1C->GetData();
-									if (di->GetDataSize() > 5) {
+									if (di->GetDataSize() > 4) {
 										const auto& version = di->GetData()[0];
-										if (version != 0) {
-											DLog(L"CMP4SplitterFilter::CreateOutputs() : Unknown AV1 Codec Configuration Box version %d", version);
+										if (version != 0x81) { // marker = 1(1), version = 1(7)
+											DLog(L"CMP4SplitterFilter::CreateOutputs() : Unknown AV1 Codec Configuration Box version - 0x%02x", version);
 										} else {
-											const auto size = di->GetDataSize() - 5;
+											// handle only the OBUs
+											const auto size = di->GetDataSize() - 4;
 											vih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + size);
 											BYTE *extra = (BYTE*)(vih2 + 1);
-											memcpy(extra, di->GetData() + 5, size);
+											memcpy(extra, di->GetData() + 4, size);
 
 											mts.clear();
 											mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = fourcc);
