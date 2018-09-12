@@ -24,7 +24,6 @@
 #include "../../DSUtil/text.h"
 #include "PlayerYouTube.h"
 
-#define RAPIDJSON_ASSERT(x) ASSERT(x)
 #define RAPIDJSON_SSE2
 #include <rapidjson/include/rapidjson/document.h>
 
