@@ -508,7 +508,7 @@ namespace Youtube
 
 					if (quality_label) {
 						item.title.Format(L"%s %S",
-							profile->format == y_webm ? L"WebM" : (profile->live ? L"HLS Live" : L"MP4"),
+							profile->format == y_webm ? L"WebM" : (profile->live ? L"HLS Live" : (profile->format == y_mp4_av1 ? L"MP4(AV1)" : L"MP4")),
 							quality_label);
 						if (profile->type == y_video) {
 							item.title.Append(L" dash");
@@ -518,7 +518,7 @@ namespace Youtube
 						}
 					} else {
 						item.title.Format(L"%s %dp",
-							profile->format == y_webm ? L"WebM" : (profile->live ? L"HLS Live" : L"MP4"),
+							profile->format == y_webm ? L"WebM" : (profile->live ? L"HLS Live" : (profile->format == y_mp4_av1 ? L"MP4(AV1)" : L"MP4")),
 							profile->quality);
 						if (profile->type == y_video) {
 							item.title.Append(L" dash");

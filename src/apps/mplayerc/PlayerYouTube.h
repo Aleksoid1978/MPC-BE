@@ -27,6 +27,7 @@ namespace Youtube
 	enum yformat {
 		y_mp4,
 		y_webm,
+		y_mp4_av1,
 		// not used
 		y_flv,
 		y_3gp,
@@ -81,6 +82,12 @@ namespace Youtube
 		{244, y_webm, y_video,  480, L"webm", false, false},
 		{ 43, y_webm, y_media,  360, L"webm", false, false}, // VP8 + Vorbis
 		{242, y_webm, y_video,  240, L"webm", false, false},
+		// MP4 (AV1)
+		{399, y_mp4_av1,  y_video, 1080, L"mp4",  false, false},
+		{398, y_mp4_av1,  y_video,  720, L"mp4",  false, false},
+		{397, y_mp4_av1,  y_video,  480, L"mp4",  false, false},
+		{396, y_mp4_av1,  y_video,  360, L"mp4",  false, false},
+		{395, y_mp4_av1,  y_video,  240, L"mp4",  false, false},
 		// live (ts)
 		{267, y_mp4,  y_media, 2160, L"ts",   false, false, true},
 		{265, y_mp4,  y_media, 1440, L"ts",   false, false, true},
