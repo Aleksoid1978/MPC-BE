@@ -3218,6 +3218,12 @@ void CMPCVideoDecFilter::SetThreadCount()
 			int nThreadNumber = (m_nThreadNumber > 0) ? m_nThreadNumber : CPUInfo::GetProcessorNumber() * 3 / 2;
 			m_pAVCtx->thread_count = std::clamp(nThreadNumber, 1, MAX_AUTO_THREADS);
 		}
+
+#ifdef _WIN64
+		if (m_nCodecId == AV_CODEC_ID_AV1) {
+			m_pAVCtx->thread_count = 1;
+		}
+#endif
 	}
 }
 
