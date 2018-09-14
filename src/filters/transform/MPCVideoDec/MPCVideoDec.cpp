@@ -125,6 +125,7 @@ vcodecs[] = {
 	{L"quicktime",		CODEC_QT		},
 	{L"cineform",		CODEC_CINEFORM	},
 	{L"hap",			CODEC_HAP		},
+	{L"av1",			CODEC_AV1		},
 	// dxva codecs
 	{L"h264_dxva",		CODEC_H264_DXVA	},
 	{L"hevc_dxva",		CODEC_HEVC_DXVA	},
@@ -485,6 +486,9 @@ FFMPEG_CODECS ffCodecs[] = {
 	{ &MEDIASUBTYPE_HapM, AV_CODEC_ID_HAP, VDEC_HAP, -1 },
 	{ &MEDIASUBTYPE_HapY, AV_CODEC_ID_HAP, VDEC_HAP, -1 },
 
+	// AV1
+	{ &MEDIASUBTYPE_AV01, AV_CODEC_ID_AV1, VDEC_AV1, -1 },
+
 	// uncompressed video
 	{ &MEDIASUBTYPE_v210, AV_CODEC_ID_V210, VDEC_UNCOMPRESSED, -1 },
 	{ &MEDIASUBTYPE_V410, AV_CODEC_ID_V410, VDEC_UNCOMPRESSED, -1 },
@@ -832,6 +836,9 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HapA },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HapM },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_HapY },
+
+	// AV1
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_AV01 },
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesInUncompressed[] = {
@@ -1464,6 +1471,9 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 					break;
 				case AV_CODEC_ID_HAP :
 					bCodecActivated = (m_nActiveCodecs & CODEC_HAP) != 0;
+					break;
+				case AV_CODEC_ID_AV1 :
+					bCodecActivated = (m_nActiveCodecs & CODEC_AV1) != 0;
 					break;
 			}
 

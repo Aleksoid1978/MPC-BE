@@ -130,7 +130,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;libspeex.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;libspeex.a;libaom.a;libpthread.a;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>MpcAudioRenderer.def</ModuleDefinitionFile>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -145,7 +145,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;libspeex.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;libspeex.a;libaom.a;libpthread.a;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>MpcAudioRenderer.def</ModuleDefinitionFile>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalLibraryDirectories>$(SolutionDir)lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -160,7 +160,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;libspeex.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;libspeex.a;libaom.a;libpthread.a;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>MpcAudioRenderer.def</ModuleDefinitionFile>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalLibraryDirectories>$(SolutionDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -175,7 +175,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>/ignore:4049 /ignore:4217 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;libspeex.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgcc.a;libmingwex.a;Winmm.lib;vfw32.lib;Version.lib;libspeex.a;libaom.a;libpthread.a;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>MpcAudioRenderer.def</ModuleDefinitionFile>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalLibraryDirectories>$(SolutionDir)lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>

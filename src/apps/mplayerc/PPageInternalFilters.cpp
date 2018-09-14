@@ -69,6 +69,7 @@ static filter_t s_filters[] = {
 		// Video Decoder
 	{L"AMV Video",					VIDEO_DECODER, VDEC_AMV,			0},
 	{L"Apple ProRes",				VIDEO_DECODER, VDEC_PRORES,			0},
+	{L"AOMedia Video 1 (AV1)",		VIDEO_DECODER, VDEC_AV1,			0},
 	{L"Avid DNxHD",					VIDEO_DECODER, VDEC_DNXHD,			0},
 	{L"Bink Video",					VIDEO_DECODER, VDEC_BINK,			0},
 	{L"Canopus Lossless/HQ/HQX",	VIDEO_DECODER, VDEC_CANOPUS,		0},

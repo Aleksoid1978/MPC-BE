@@ -73,6 +73,9 @@ const LanguageResource CMPlayerCApp::languageResources[] = {
 const size_t CMPlayerCApp::languageResourcesCount = _countof(CMPlayerCApp::languageResources);
 
 extern "C" {
+	#include <sys/timeb.h>
+	void *__imp___ftime64 = _ftime64;
+
 	int mingw_app_type = 1;
 }
 
