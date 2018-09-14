@@ -1669,6 +1669,9 @@ MPC_GUID_ENTRY(MEDIASUBTYPE_TAK_Stream,
 MPC_GUID_ENTRY(MEDIASUBTYPE_CRAM,
 			0x4D415243, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71)
 
+// {31305641-0000-0010-8000-00AA00389B71}
+MPC_GUID_ENTRY(MEDIASUBTYPE_AV01,
+			0x31305641, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71)
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // CLSID of some filters

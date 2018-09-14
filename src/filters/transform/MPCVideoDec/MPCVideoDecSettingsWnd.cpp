@@ -445,6 +445,7 @@ static const struct {
 	{CODEC_WMV3_DXVA,	L"WMV3 (DXVA)"},
 	{CODEC_VP9_DXVA,	L"VP9 (DXVA)"},
 	{CODEC_AMVV,		L"AMV video"},
+	{CODEC_AV1,			L"AOMedia Video 1 (AV1)"},
 	{CODEC_PRORES,		L"Apple ProRes"},
 	{CODEC_DNXHD,		L"Avid DNxHD"},
 	{CODEC_BINKV,		L"Bink video"},

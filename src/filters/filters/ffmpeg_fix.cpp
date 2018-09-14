@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2015 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include <io.h>
+#include <sys/timeb.h>
 
 extern "C" {
 	// hack to avoid error "unresolved external symbol" when linking
@@ -34,7 +35,6 @@ extern "C" {
 	FILE* __cdecl __iob_func(void) { return __iob; }
 #endif
 #endif
-}
 
 #ifdef REGISTER_FILTER
 	void *__imp_time64           = _time64;
@@ -44,4 +44,7 @@ extern "C" {
 
 	void *__imp__sopen           = _sopen;
 	void *__imp__wsopen          = _wsopen;
+
+	void *__imp___ftime64        = _ftime64;
 #endif
+}

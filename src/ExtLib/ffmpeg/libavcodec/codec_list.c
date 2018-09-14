@@ -150,4 +150,5 @@ static const AVCodec * const codec_list[] = {
     &ff_adpcm_yamaha_decoder,
 
     &ff_libspeex_decoder,
+    &ff_libaom_av1_decoder,
     NULL };
