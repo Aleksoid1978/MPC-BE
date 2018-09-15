@@ -1306,6 +1306,36 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 								break;
 						}
+
+						if (AP4_DataInfoAtom* clap = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_CLAP))) {
+							const AP4_DataBuffer* clap_data = clap->GetData();
+							if (clap_data->GetDataSize() == 32) { // 40 bytes(size) - 8 bytes(header)
+								const auto& buf = clap_data->GetData();
+								auto apertureWidth_N = _byteswap_ulong(GETU32(buf));
+								const auto apertureWidth_D = _byteswap_ulong(GETU32(buf + 4));
+								auto apertureHeight_N = _byteswap_ulong(GETU32(buf + 8));
+								const auto apertureHeight_D = _byteswap_ulong(GETU32(buf + 12));
+
+								if (apertureWidth_N && apertureWidth_D) {
+									apertureWidth_N /= apertureWidth_D;
+								}
+								if (apertureHeight_N && apertureHeight_D) {
+									apertureHeight_N /= apertureHeight_D;
+								}
+
+								if (apertureWidth_N && apertureHeight_N) {
+									for (auto& item : mts) {
+										if (item.formattype == FORMAT_VideoInfo
+												|| item.formattype == FORMAT_VideoInfo2
+												|| item.formattype == FORMAT_MPEG2Video
+												|| item.formattype == FORMAT_MPEGVideo) {
+											auto vih = (VIDEOINFOHEADER*)item.Format();
+											vih->rcSource = vih->rcTarget = CRect(0, 0, apertureWidth_N, apertureHeight_N);
+										}
+									}
+								}
+							}
+						}
 					} else if (AP4_AudioSampleEntry* ase = dynamic_cast<AP4_AudioSampleEntry*>(atom)) {
 						DWORD fourcc        = _byteswap_ulong(ase->GetType());
 						DWORD samplerate    = ase->GetSampleRate();
