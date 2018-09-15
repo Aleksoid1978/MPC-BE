@@ -99,20 +99,19 @@ CBaseSplitterOutputPin* CBaseSplitterFilter::GetOutputPin(DWORD TrackNum)
 {
 	CAutoLock cAutoLock(&m_csPinMap);
 
-	CBaseSplitterOutputPin* pPin = nullptr;
-	m_pPinMap.Lookup(TrackNum, pPin);
-	return pPin;
+	auto& it = m_pPinMap.find(TrackNum);
+	if (it != m_pPinMap.end()) {
+		return (*it).second;
+	}
+
+	return nullptr;
 }
 
 DWORD CBaseSplitterFilter::GetOutputTrackNum(CBaseSplitterOutputPin* pPin)
 {
 	CAutoLock cAutoLock(&m_csPinMap);
 
-	POSITION pos = m_pPinMap.GetStartPosition();
-	while (pos) {
-		DWORD TrackNum;
-		CBaseSplitterOutputPin* pPinTmp;
-		m_pPinMap.GetNextAssoc(pos, TrackNum, pPinTmp);
+	for (const auto& [TrackNum, pPinTmp] : m_pPinMap) {
 		if (pPinTmp == pPin) {
 			return TrackNum;
 		}
@@ -125,8 +124,9 @@ HRESULT CBaseSplitterFilter::RenameOutputPin(DWORD TrackNumSrc, DWORD TrackNumDs
 {
 	CAutoLock cAutoLock(&m_csPinMap);
 
-	CBaseSplitterOutputPin* pPin;
-	if (m_pPinMap.Lookup(TrackNumSrc, pPin)) {
+	auto& it = m_pPinMap.find(TrackNumSrc);
+	if (it != m_pPinMap.end()) {
+		CBaseSplitterOutputPin* pPin = (*it).second;
 		AM_MEDIA_TYPE* pmt = nullptr;
 		HRESULT hr = S_OK;
 
@@ -147,7 +147,7 @@ HRESULT CBaseSplitterFilter::RenameOutputPin(DWORD TrackNumSrc, DWORD TrackNumDs
 			}
 		}
 
-		m_pPinMap.RemoveKey(TrackNumSrc);
+		m_pPinMap.erase(it);
 		m_pPinMap[TrackNumDst] = pPin;
 
 		if (pmt) {
@@ -195,10 +195,10 @@ HRESULT CBaseSplitterFilter::DeleteOutputs()
 	}
 
 	CAutoLock cAutoLockPM(&m_csPinMap);
-	m_pPinMap.RemoveAll();
+	m_pPinMap.clear();
 
 	CAutoLock cAutoLockMT(&m_csmtnew);
-	m_mtnew.RemoveAll();
+	m_mtnew.clear();
 
 	RemoveAll();
 	ResRemoveAll();
@@ -320,10 +320,10 @@ HRESULT CBaseSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 	{
 		CAutoLock cAutoLock(&m_csmtnew);
 
-		CMediaType mt;
-		if (m_mtnew.Lookup(p->TrackNumber, mt)) {
-			p->pmt = CreateMediaType(&mt);
-			m_mtnew.RemoveKey(p->TrackNumber);
+		auto& it = m_mtnew.find(p->TrackNumber);
+		if (it != m_mtnew.end()) {
+			p->pmt = CreateMediaType(&(*it).second);
+			m_mtnew.erase(it);
 		}
 	}
 
