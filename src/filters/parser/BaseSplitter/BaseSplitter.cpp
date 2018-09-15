@@ -99,7 +99,7 @@ CBaseSplitterOutputPin* CBaseSplitterFilter::GetOutputPin(DWORD TrackNum)
 {
 	CAutoLock cAutoLock(&m_csPinMap);
 
-	auto& it = m_pPinMap.find(TrackNum);
+	auto it = m_pPinMap.find(TrackNum);
 	if (it != m_pPinMap.end()) {
 		return (*it).second;
 	}
@@ -124,7 +124,7 @@ HRESULT CBaseSplitterFilter::RenameOutputPin(DWORD TrackNumSrc, DWORD TrackNumDs
 {
 	CAutoLock cAutoLock(&m_csPinMap);
 
-	auto& it = m_pPinMap.find(TrackNumSrc);
+	auto it = m_pPinMap.find(TrackNumSrc);
 	if (it != m_pPinMap.end()) {
 		CBaseSplitterOutputPin* pPin = (*it).second;
 		AM_MEDIA_TYPE* pmt = nullptr;
@@ -320,7 +320,7 @@ HRESULT CBaseSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 	{
 		CAutoLock cAutoLock(&m_csmtnew);
 
-		auto& it = m_mtnew.find(p->TrackNumber);
+		auto it = m_mtnew.find(p->TrackNumber);
 		if (it != m_mtnew.end()) {
 			p->pmt = CreateMediaType(&(*it).second);
 			m_mtnew.erase(it);

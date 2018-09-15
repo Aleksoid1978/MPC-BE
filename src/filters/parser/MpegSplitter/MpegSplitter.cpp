@@ -1639,7 +1639,7 @@ STDMETHODIMP CMpegSplitterFilter::Enable(long lIndex, DWORD dwFlags)
 		if (lIndex >= j && lIndex < j + cnt) {
 			lIndex -= j;
 
-			const auto& it = std::next(streams.cbegin(), lIndex);
+			const auto it = std::next(streams.cbegin(), lIndex);
 			if (it == streams.cend()) {
 				return E_UNEXPECTED;
 			}
@@ -1796,7 +1796,7 @@ STDMETHODIMP CMpegSplitterFilter::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD*
 		if (lIndex >= j && lIndex < j + cnt) {
 			lIndex -= j;
 
-			const auto& it = std::next(streams.cbegin(), lIndex);
+			const auto it = std::next(streams.cbegin(), lIndex);
 			if (it == streams.cend()) {
 				return E_UNEXPECTED;
 			}
@@ -1999,7 +1999,7 @@ HRESULT CMpegSplitterOutputPin::CheckMediaType(const CMediaType* pmt)
 {
 	std::vector<CMediaType> mts;
 	(static_cast<CMpegSplitterFilter*>(m_pFilter))->GetMediaTypes(m_type, mts);
-	const auto& it = std::find(mts.cbegin(), mts.cend(), *pmt);
+	const auto it = std::find(mts.cbegin(), mts.cend(), *pmt);
 	if (it != mts.cend()) {
 		return S_OK;
 	}

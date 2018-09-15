@@ -553,7 +553,7 @@ void SetID3TagProperties(IBaseFilter* pBF, const CID3Tag* pID3tag)
 	}
 
 	const auto Lookup = [&](const DWORD& tag, CString& str) {
-		if (const auto& it = pID3tag->Tags.find(tag); it != pID3tag->Tags.cend()) {
+		if (const auto it = pID3tag->Tags.find(tag); it != pID3tag->Tags.cend()) {
 			str = it->second;
 			return true;
 		}

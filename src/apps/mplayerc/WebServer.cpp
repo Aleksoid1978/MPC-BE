@@ -394,7 +394,7 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 	}
 
 	if (!fHandled) {
-		auto& it = m_downloads.find(pClient->m_path);
+		auto it = m_downloads.find(pClient->m_path);
 		if (it != m_downloads.end() && LoadResource((*it).second, body, L"FILE")) {
 			if (mime.IsEmpty()) {
 				mime = "application/octet-stream";

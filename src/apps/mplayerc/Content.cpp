@@ -482,7 +482,7 @@ namespace Content {
 
 		void Disconnect(const CString& fn)
 		{
-			auto& it = Contents.find(fn);
+			auto it = Contents.find(fn);
 			if (it != Contents.end()) {
 				auto& content = it->second;
 				content.HTTPAsync->Close();
@@ -491,7 +491,7 @@ namespace Content {
 
 		void GetRaw(const CString& fn, std::vector<BYTE>& raw)
 		{
-			auto& it = Contents.find(fn);
+			auto it = Contents.find(fn);
 			if (it != Contents.end()) {
 				auto& content = it->second;
 				raw = content.raw;
@@ -500,7 +500,7 @@ namespace Content {
 
 		void GetHeader(const CString& fn, CString& hdr)
 		{
-			auto& it = Contents.find(fn);
+			auto it = Contents.find(fn);
 			if (it != Contents.end()) {
 				auto& content = it->second;
 				hdr = content.hdr;
