@@ -378,19 +378,17 @@ __int64 CDSMSplitterFile::FindSyncPoint(REFERENCE_TIME rt)
 
 	// 3. iterate backwards from maxpos and find at least one syncpoint for every stream, except for subtitle streams
 
-	CAtlMap<BYTE,BYTE> ids;
+	std::map<BYTE,BYTE> ids;
 
-	{
-		for (const auto&[id, mt] : m_mts) {
-			if (mt.majortype != MEDIATYPE_Text && mt.majortype != MEDIATYPE_Subtitle) {
-				ids[id] = 0;
-			}
+	for (const auto&[id, mt] : m_mts) {
+		if (mt.majortype != MEDIATYPE_Text && mt.majortype != MEDIATYPE_Subtitle) {
+			ids[id] = 0;
 		}
 	}
 
 	__int64 ret = maxpos;
 
-	while (maxpos > 0 && !ids.IsEmpty()) {
+	while (maxpos > 0 && ids.size()) {
 		minpos = std::max(0LL, maxpos - 65536);
 
 		Seek(minpos);
@@ -401,9 +399,10 @@ __int64 CDSMSplitterFile::FindSyncPoint(REFERENCE_TIME rt)
 			if (type == DSMP_SAMPLE) {
 				CPacket p;
 				if (Read(len, &p, false) && p.rtStart != INVALID_TIME && p.bSyncPoint) {
-					BYTE id = (BYTE)p.TrackNumber, tmp;
-					if (ids.Lookup(id, tmp)) {
-						ids.RemoveKey((BYTE)p.TrackNumber);
+					auto it = ids.find((BYTE)p.TrackNumber);
+
+					if (it != ids.end()) {
+						ids.erase(it);
 						ret = std::min(ret, (__int64)syncpos);
 					}
 				}
