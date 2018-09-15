@@ -87,8 +87,8 @@ protected:
 	REFERENCE_TIME m_rtStart, m_rtStop, m_rtCurrent, m_rtNewStart, m_rtNewStop;
 	double m_dRate;
 
-	CAtlList<UINT64> m_bDiscontinuitySent;
-	CAtlList<CBaseSplitterOutputPin*> m_pActivePins;
+	std::list<DWORD> m_bDiscontinuitySent;
+	std::list<CBaseSplitterOutputPin*> m_pActivePins;
 
 	CAMEvent m_eEndFlush;
 	bool m_fFlushing;
@@ -166,7 +166,7 @@ protected:
 
 private:
 	REFERENCE_TIME m_rtLastStart, m_rtLastStop;
-	CAtlList<void*> m_LastSeekers;
+	std::list<void*> m_LastSeekers;
 
 public:
 	// IAMOpenProgress

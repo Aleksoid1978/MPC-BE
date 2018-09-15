@@ -142,9 +142,7 @@ CMatroskaSplitterFilter::~CMatroskaSplitterFilter()
 bool CMatroskaSplitterFilter::IsHdmvDvbSubPinDrying()
 {
 	if (m_hasHdmvDvbSubPin) {
-		POSITION pos = m_pActivePins.GetHeadPosition();
-		while (pos) {
-			CBaseSplitterOutputPin* pPin = m_pActivePins.GetNext(pos);
+		for (const auto pPin : m_pActivePins) {
 			if (pPin->QueueCount() == 0 && ((CMatroskaSplitterOutputPin*)pPin)->NeedNextSubtitle()) {
 				return true;
 			}
