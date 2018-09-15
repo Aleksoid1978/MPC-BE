@@ -437,7 +437,7 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				}
 			}
 		} else if (pmp->mime == "logical-fileinfo") {
-			CAtlMap<CStringA, CStringA, CStringElementTraits<CStringA> > lfi;
+			std::map<CStringA, CStringA> lfi;
 			CStringA key, value;
 
 			BYTE* p = pmp->typeSpecData.data();
@@ -484,9 +484,9 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				lfi[key] = value;
 			}
 
-			POSITION pos = lfi.GetStartPosition();
-			while (pos) {
-				lfi.GetNextAssoc(pos, key, value);
+			for (const auto& item : lfi) {
+				key = item.first;
+				value = item.second;
 
 				int n = 0;
 				if (key.Find("CHAPTER") == 0 && key.Find("TIME") == key.GetLength()-4
@@ -499,7 +499,9 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 
 					key.Format("CHAPTER%02dNAME", n);
-					if (!lfi.Lookup(key, value) || value.IsEmpty()) {
+					const auto it = lfi.find(key);
+
+					if (it == lfi.end() || (*it).second.IsEmpty()) {
 						value.Format("Chapter %d", n);
 					}
 
@@ -525,9 +527,9 @@ HRESULT CRealMediaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
 
-	pos = m_pFile->m_subs.GetHeadPosition();
-	for (DWORD stream = 0; pos; stream++) {
-		CRMFile::subtitle& s = m_pFile->m_subs.GetNext(pos);
+	auto it = m_pFile->m_subs.begin();
+	for (DWORD stream = 0; it != m_pFile->m_subs.end(); stream++) {
+		CRMFile::subtitle& s = *it++;
 
 		CStringW name;
 		name.Format(L"Subtitle %02d", stream);
@@ -716,9 +718,9 @@ bool CRealMediaSplitterFilter::DemuxLoop()
 	HRESULT hr = S_OK;
 	POSITION pos;
 
-	pos = m_pFile->m_subs.GetHeadPosition();
-	for (DWORD stream = 0; pos && SUCCEEDED(hr) && !CheckRequest(nullptr); stream++) {
-		CRMFile::subtitle& s = m_pFile->m_subs.GetNext(pos);
+	auto it = m_pFile->m_subs.begin();
+	for (DWORD stream = 0; it != m_pFile->m_subs.end() && SUCCEEDED(hr) && !CheckRequest(nullptr); stream++) {
+		CRMFile::subtitle& s = *it++;
 
 		CAutoPtr<CPacket> p(DNew CPacket);
 
@@ -1359,7 +1361,7 @@ HRESULT CRMFile::Init()
 							p += len.GetLength()+1;
 							s.data = CStringA(p, strtol(len, nullptr, 10));
 							p += s.data.GetLength();
-							m_subs.AddTail(s);
+							m_subs.emplace_back(s);
 						}
 					}
 					break;

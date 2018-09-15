@@ -22,7 +22,6 @@
 #pragma once
 
 #include <atlbase.h>
-#include <atlcoll.h>
 #include "../BaseSplitter/BaseSplitter.h"
 #include "../../transform/BaseVideoFilter/BaseVideoFilter.h"
 
@@ -177,7 +176,7 @@ public:
 	struct subtitle {
 		CStringA name, data;
 	};
-	CAtlList<subtitle> m_subs;
+	std::list<subtitle> m_subs;
 
 	int GetMasterStream();
 };
