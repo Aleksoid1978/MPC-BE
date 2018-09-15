@@ -46,10 +46,10 @@ HRESULT CDSMSplitterFile::Init(IDSMResourceBagImpl& res, IDSMChapterBagImpl& cha
 
 	Seek(0);
 
-	m_mts.RemoveAll();
+	m_mts.clear();
 	m_rtFirst = m_rtDuration = 0;
-	m_fim.RemoveAll();
-	m_sim.RemoveAll();
+	m_fim.clear();
+	m_sim.clear();
 	res.ResRemoveAll();
 	chap.ChapRemoveAll();
 
@@ -129,7 +129,7 @@ HRESULT CDSMSplitterFile::Init(IDSMResourceBagImpl& res, IDSMChapterBagImpl& cha
 		m_rtFirst = 0;
 	}
 
-	return m_mts.GetCount() > 0 ? S_OK : E_FAIL;
+	return m_mts.size() > 0 ? S_OK : E_FAIL;
 }
 
 bool CDSMSplitterFile::Sync(dsmp_t& type, UINT64& len, __int64 limit)
@@ -381,11 +381,7 @@ __int64 CDSMSplitterFile::FindSyncPoint(REFERENCE_TIME rt)
 	CAtlMap<BYTE,BYTE> ids;
 
 	{
-		POSITION pos = m_mts.GetStartPosition();
-		while (pos) {
-			BYTE id;
-			CMediaType mt;
-			m_mts.GetNextAssoc(pos, id, mt);
+		for (const auto&[id, mt] : m_mts) {
 			if (mt.majortype != MEDIATYPE_Text && mt.majortype != MEDIATYPE_Subtitle) {
 				ids[id] = 0;
 			}

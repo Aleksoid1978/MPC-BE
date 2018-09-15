@@ -131,13 +131,9 @@ HRESULT CDSMSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStop = m_rtStop = m_rtDuration = m_pFile->m_rtDuration;
 
 	std::vector<BYTE> ids;
-	ids.reserve(m_pFile->m_mts.GetCount());
+	ids.reserve(m_pFile->m_mts.size());
 
-	POSITION pos = m_pFile->m_mts.GetStartPosition();
-	while (pos) {
-		BYTE id;
-		CMediaType mt;
-		m_pFile->m_mts.GetNextAssoc(pos, id, mt);
+	for (const auto& [id, mt] : m_pFile->m_mts) {
 		ids.push_back(id);
 	}
 
@@ -157,11 +153,7 @@ HRESULT CDSMSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		name.Empty();
 
-		pos = m_pFile->m_sim[id].GetStartPosition();
-		while (pos) {
-			CStringA key;
-			CStringW value;
-			m_pFile->m_sim[id].GetNextAssoc(pos, key, value);
+		for (const auto& [key, value] : m_pFile->m_sim[id]) {
 			pPinOut->SetProperty(CStringW(key), value);
 
 			if (key == "NAME") {
@@ -186,11 +178,7 @@ HRESULT CDSMSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(id, pPinOut)));
 	}
 
-	pos = m_pFile->m_fim.GetStartPosition();
-	while (pos) {
-		CStringA key;
-		CStringW value;
-		m_pFile->m_fim.GetNextAssoc(pos, key, value);
+	for (const auto& [key, value] : m_pFile->m_fim) {
 		SetProperty(CStringW(key), value);
 	}
 

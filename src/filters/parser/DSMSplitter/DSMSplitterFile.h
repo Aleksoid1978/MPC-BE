@@ -32,14 +32,14 @@ class CDSMSplitterFile : public CBaseSplitterFile
 public:
 	CDSMSplitterFile(IAsyncReader* pReader, HRESULT& hr, IDSMResourceBagImpl& res, IDSMChapterBagImpl& chap);
 
-	CAtlMap<BYTE, CMediaType> m_mts;
+	std::map<BYTE, CMediaType> m_mts;
 	REFERENCE_TIME m_rtFirst, m_rtDuration;
 
 	std::vector<SyncPoint> m_sps;
 
-	typedef CAtlMap<CStringA, CStringW, CStringElementTraits<CStringA>, CStringElementTraits<CStringW> > CStreamInfoMap;
+	typedef std::map<CStringA, CStringW> CStreamInfoMap;
 	CStreamInfoMap m_fim;
-	CAtlMap<BYTE, CStreamInfoMap> m_sim;
+	std::map<BYTE, CStreamInfoMap> m_sim;
 
 	bool Sync(dsmp_t& type, UINT64& len, __int64 limit = 65536);
 	bool Sync(UINT64& syncpos, dsmp_t& type, UINT64& len, __int64 limit = 65536);
