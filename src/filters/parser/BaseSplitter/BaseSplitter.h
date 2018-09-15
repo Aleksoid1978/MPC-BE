@@ -58,10 +58,10 @@ class CBaseSplitterFilter
 	, public IBufferControl
 {
 	CCritSec m_csPinMap;
-	CAtlMap<DWORD, CBaseSplitterOutputPin*> m_pPinMap;
+	std::map<DWORD, CBaseSplitterOutputPin*> m_pPinMap;
 
 	CCritSec m_csmtnew;
-	CAtlMap<DWORD, CMediaType> m_mtnew;
+	std::map<DWORD, CMediaType> m_mtnew;
 
 	CAutoPtrList<CBaseSplitterOutputPin> m_pRetiredOutputs;
 
