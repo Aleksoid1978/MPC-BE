@@ -643,7 +643,7 @@ void CMpegSplitterFile::SearchStreams(const __int64 start, const __int64 stop, c
 			for (const auto& stream : m_pmt_streams) {
 				for (int type = stream_type::video; type < stream_type::subpic; type++) {
 					if (m_streams[type].Find(stream.pid)) {
-						const auto& it = m_SyncPoints.find(stream.pid);
+						const auto it = m_SyncPoints.find(stream.pid);
 						if (it != m_SyncPoints.cend() && it->second.size() > 1) {
 							streams_cnt++;
 							break;
@@ -852,7 +852,7 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 		if (pesid) {
 			m_pid2pes[pid] = pesid;
 		} else {
-			const auto& it = m_pid2pes.find(pid);
+			const auto it = m_pid2pes.find(pid);
 			if (it != m_pid2pes.end()) {
 				pesid = it->second;
 			}
