@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include <InitGuid.h>
 #include <moreuuids.h>
+#include "../../../DSUtil/std_helper.h"
 #include "BaseSplitter.h"
 
 //
@@ -57,9 +58,7 @@ CBaseSplitterFilter::~CBaseSplitterFilter()
 
 bool CBaseSplitterFilter::IsSomePinDrying()
 {
-	POSITION pos = m_pActivePins.GetHeadPosition();
-	while (pos) {
-		CBaseSplitterOutputPin* pPin = m_pActivePins.GetNext(pos);
+	for (const auto pPin: m_pActivePins) {
 		if (!pPin->IsDiscontinuous() && pPin->QueueCount() == 0) {
 			return true;
 		}
@@ -272,24 +271,26 @@ DWORD CBaseSplitterFilter::ThreadProc()
 
 		m_eEndFlush.Wait();
 
-		m_pActivePins.RemoveAll();
+		m_pActivePins.clear();
 
 		POSITION pos = m_pOutputs.GetHeadPosition();
 		while (pos && !m_fFlushing) {
 			CBaseSplitterOutputPin* pPin = m_pOutputs.GetNext(pos);
 			if (pPin->IsConnected() && pPin->IsActive()) {
-				m_pActivePins.AddTail(pPin);
+				m_pActivePins.push_back(pPin);
 				pPin->DeliverNewSegment(m_rtStart, m_rtStop, m_dRate);
 			}
 		}
 
 		do {
-			m_bDiscontinuitySent.RemoveAll();
+			m_bDiscontinuitySent.clear();
 		} while (!DemuxLoop());
 
-		pos = m_pActivePins.GetHeadPosition();
-		while (pos && !CheckRequest(&cmd)) {
-			m_pActivePins.GetNext(pos)->QueueEndOfStream();
+		for (const auto pPin : m_pActivePins) {
+			if (CheckRequest(&cmd)) {
+				break;
+			}
+			pPin->QueueEndOfStream();
 		}
 	}
 
@@ -304,7 +305,7 @@ HRESULT CBaseSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 	HRESULT hr = S_FALSE;
 
 	CBaseSplitterOutputPin* pPin = GetOutputPin(p->TrackNumber);
-	if (!pPin || !pPin->IsConnected() || !m_pActivePins.Find(pPin)) {
+	if (!pPin || !pPin->IsConnected() || !Contains(m_pActivePins, pPin)) {
 		return S_FALSE;
 	}
 
@@ -327,7 +328,7 @@ HRESULT CBaseSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 		}
 	}
 
-	if (!m_bDiscontinuitySent.Find(p->TrackNumber)) {
+	if (!Contains(m_bDiscontinuitySent, p->TrackNumber)) {
 		p->bDiscontinuity = TRUE;
 	}
 
@@ -344,11 +345,12 @@ HRESULT CBaseSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 	hr = pPin->QueuePacket(p);
 
 	if (S_OK != hr) {
-		if (POSITION pos = m_pActivePins.Find(pPin)) {
-			m_pActivePins.RemoveAt(pos);
+		auto it = std::find(m_pActivePins.begin(), m_pActivePins.end(), pPin);
+		if (it != m_pActivePins.end()) {
+			m_pActivePins.erase(it);
 		}
 
-		if (!m_pActivePins.IsEmpty()) { // only die when all pins are down
+		if (m_pActivePins.size()) { // only die when all pins are down
 			hr = S_OK;
 		}
 
@@ -356,7 +358,7 @@ HRESULT CBaseSplitterFilter::DeliverPacket(CAutoPtr<CPacket> p)
 	}
 
 	if (bDiscontinuity) {
-		m_bDiscontinuitySent.AddTail(TrackNumber);
+		m_bDiscontinuitySent.push_back(TrackNumber);
 	}
 
 	return hr;
@@ -704,15 +706,15 @@ HRESULT CBaseSplitterFilter::SetPositionsInternal(void* id, LONGLONG* pCurrent, 
 		return S_OK;
 	}
 
-	if (m_rtLastStart == rtCurrent && m_rtLastStop == rtStop && !m_LastSeekers.Find(id)) {
-		m_LastSeekers.AddTail(id);
+	if (m_rtLastStart == rtCurrent && m_rtLastStop == rtStop && !Contains(m_LastSeekers, id)) {
+		m_LastSeekers.push_back(id);
 		return S_OK;
 	}
 
 	m_rtLastStart = rtCurrent;
 	m_rtLastStop = rtStop;
-	m_LastSeekers.RemoveAll();
-	m_LastSeekers.AddTail(id);
+	m_LastSeekers.clear();
+	m_LastSeekers.push_back(id);
 
 	DLog(L"CBaseSplitterFilter() : Seek Started %I64d", rtCurrent);
 

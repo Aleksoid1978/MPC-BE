@@ -563,9 +563,7 @@ void CMpegSplitterFilter::GetMediaTypes(CMpegSplitterFile::stream_type sType, st
 bool CMpegSplitterFilter::IsHdmvDvbSubPinDrying()
 {
 	if (m_hasHdmvDvbSubPin) {
-		POSITION pos = m_pActivePins.GetHeadPosition();
-		while (pos) {
-			CBaseSplitterOutputPin* pPin = m_pActivePins.GetNext(pos);
+		for (const auto pPin : m_pActivePins) {
 			if (((CMpegSplitterOutputPin*)pPin)->NeedNextSubtitle()) {
 				return true;
 			}
