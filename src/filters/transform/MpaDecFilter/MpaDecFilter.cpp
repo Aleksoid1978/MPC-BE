@@ -2693,7 +2693,7 @@ STDMETHODIMP_(CString) CMpaDecFilter::GetInformation(MPCAInfo index)
 						// wfeout samplerate, channels and bit depth is not actual
 					}
 					else if (wfexout->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS) {
-						infostr += L" -> HDMI E-AC3";
+						infostr += L" -> HDMI E-AC-3";
 						// wfeout samplerate, channels and bit depth is not actual
 					}
 					else if (wfexout->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP) {

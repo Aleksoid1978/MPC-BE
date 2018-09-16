@@ -96,7 +96,7 @@ BEGIN
     IDS_FILTER_SETTINGS_CAPTION "Settings"
     IDS_MPADEC_SAMPLE_FMT       "Output sample format:"
     IDS_MPADEC_AV_SYNC          "A/V Sync correction"
-    IDS_MPADEC_DRC              "Apply DRC for AC-3 and E-AC3"
+    IDS_MPADEC_DRC              "Apply DRC for AC-3 and E-AC-3"
     IDS_MPADEC_MIXER            "Mixer"
     IDS_MPADEC_MIX_SPEAKERS     "Output speakers:"
     IDS_MPADEC_MONO             "Mono"

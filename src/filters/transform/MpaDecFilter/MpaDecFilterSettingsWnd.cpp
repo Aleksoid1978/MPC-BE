@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -130,7 +130,7 @@ bool CMpaDecSettingsWnd::OnActivate()
 	m_spdif_ac3_check.Create(L"AC-3", dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(ScaleX(50), m_fontheight)), this, IDC_PP_CHECK_SPDIF_AC3);
 	m_spdif_dts_check.Create(L"DTS", dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(ScaleX(110), 0), CSize(ScaleX(50), m_fontheight)), this, IDC_PP_CHECK_SPDIF_DTS);
 	p.y += h20;
-	m_spdif_eac3_check.Create(L"E-AC3", dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(ScaleX(55), m_fontheight)), this, IDC_PP_CHECK_SPDIF_EAC3);
+	m_spdif_eac3_check.Create(L"E-AC-3", dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(ScaleX(55), m_fontheight)), this, IDC_PP_CHECK_SPDIF_EAC3);
 	m_spdif_dtshd_check.Create(L"DTS-HD", dwStyle | BS_AUTOCHECKBOX, CRect(p + CPoint(ScaleX(110), 0), CSize(ScaleX(65), m_fontheight)), this, IDC_PP_CHECK_SPDIF_DTSHD);
 	p.y += h20;
 	m_spdif_truehd_check.Create(L"TrueHD", dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(ScaleX(60), m_fontheight)), this, IDC_PP_CHECK_SPDIF_TRUEHD);
