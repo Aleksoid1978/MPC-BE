@@ -21,7 +21,6 @@
 
 #include "stdafx.h"
 #include <io.h>
-#include <sys/timeb.h>
 
 extern "C" {
 	// hack to avoid error "unresolved external symbol" when linking
@@ -44,7 +43,5 @@ extern "C" {
 
 	void *__imp__sopen           = _sopen;
 	void *__imp__wsopen          = _wsopen;
-
-	void *__imp___ftime64        = _ftime64;
 #endif
 }
