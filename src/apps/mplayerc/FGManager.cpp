@@ -179,17 +179,17 @@ void CFGManager::CStreamPath::Append(IBaseFilter* pBF, IPin* pPin)
 	p.clsid = GetCLSID(pBF);
 	p.filter = GetFilterName(pBF);
 	p.pin = GetPinName(pPin);
-	AddTail(p);
+	emplace_back(p);
 }
 
 bool CFGManager::CStreamPath::Compare(const CStreamPath& path)
 {
-	POSITION pos1 = GetHeadPosition();
-	POSITION pos2 = path.GetHeadPosition();
+	auto it1 = begin();
+	auto it2 = path.begin();
 
-	while (pos1 && pos2) {
-		const path_t& p1 = GetNext(pos1);
-		const path_t& p2 = path.GetNext(pos2);
+	while (it1 != end() && it2 != path.end()) {
+		const path_t& p1 = *it1++;
+		const path_t& p2 = *it2++;
 
 		if (p1.filter != p2.filter) {
 			return true;
@@ -1168,7 +1168,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 
 	if (fDeadEnd) {
 		CAutoPtr<CStreamDeadEnd> psde(DNew CStreamDeadEnd());
-		psde->AddTailList(&m_streampath);
+		psde->insert(psde->end(), m_streampath.begin(), m_streampath.end());
 		int skip = 0;
 		BeginEnumMediaTypes(pPinOut, pEM, pmt) {
 			if (pmt->majortype == MEDIATYPE_Stream && pmt->subtype == MEDIASUBTYPE_NULL) {
@@ -1197,7 +1197,7 @@ STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlay
 	DLog(L"CFGManager::RenderFile() on thread: %u", GetCurrentThreadId());
 	CAutoLock cAutoLock(this);
 
-	m_streampath.RemoveAll();
+	m_streampath.clear();
 	m_deadends.RemoveAll();
 
 	HRESULT hr;
@@ -1225,7 +1225,7 @@ STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlay
 		CFGFilter* pFG = fl.GetNext(pos);
 
 		if (SUCCEEDED(hr = AddSourceFilter(pFG, lpcwstrFileName, pFG->GetName(), &pBF))) {
-			m_streampath.RemoveAll();
+			m_streampath.clear();
 			m_deadends.RemoveAll();
 
 			hr = ConnectFilter(pBF, nullptr);
@@ -1329,7 +1329,7 @@ STDMETHODIMP CFGManager::RenderEx(IPin* pPinOut, DWORD dwFlags, DWORD* pvContext
 {
 	CAutoLock cAutoLock(this);
 
-	m_streampath.RemoveAll();
+	m_streampath.clear();
 	m_deadends.RemoveAll();
 
 	if (!pPinOut || dwFlags > AM_RENDEREX_RENDERTOEXISTINGRENDERERS || pvContext) {
@@ -1601,7 +1601,7 @@ STDMETHODIMP CFGManager::ConnectFilter(IBaseFilter* pBF, IPin* pPinIn)
 
 			nTotal++;
 
-			m_streampath.RemoveTailNoReturn();
+			m_streampath.pop_back();
 
 			if (SUCCEEDED(hr) && pPinIn) {
 				return S_OK;
@@ -1788,18 +1788,15 @@ STDMETHODIMP CFGManager::GetDeadEnd(int iIndex, std::list<CStringW>& path, std::
 	path.clear();
 	mts.clear();
 
-	auto& deadend = m_deadends[iIndex];
+	auto& deadend = *m_deadends[iIndex];
 
-	POSITION pos = deadend->GetHeadPosition();
-	while (pos) {
-		const path_t& p = deadend->GetNext(pos);
-
+	for (const auto& item : deadend) {
 		CStringW str;
-		str.Format(L"%s::%s", p.filter, p.pin);
+		str.Format(L"%s::%s", item.filter, item.pin);
 		path.emplace_back(str);
 	}
 
-	mts.insert(mts.end(), deadend->mts.begin(), deadend->mts.end());
+	mts.insert(mts.end(), deadend.mts.begin(), deadend.mts.end());
 
 	return S_OK;
 }
@@ -1820,7 +1817,7 @@ STDMETHODIMP CFGManager::RenderSubFile(LPCWSTR lpcwstrFileName)
 
 	CComPtr<IBaseFilter> pBF;
 	if (SUCCEEDED(hr = AddSourceFilter(pFG, lpcwstrFileName, pFG->GetName(), &pBF))) {
-		m_streampath.RemoveAll();
+		m_streampath.clear();
 		m_deadends.RemoveAll();
 
 		hr = ConnectFilter(pBF, nullptr);

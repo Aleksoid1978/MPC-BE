@@ -40,7 +40,7 @@ public:
 		CString filter, pin;
 	};
 
-	class CStreamPath : public CAtlList<path_t>
+	class CStreamPath : public std::list<path_t>
 	{
 	public:
 		void Append(IBaseFilter* pBF, IPin* pPin);
