@@ -65,7 +65,7 @@ BEGIN
     IDS_MPEGSPLITTER_LANG_ORDER     "Audio language order:"
     IDS_MPEGSPLITTER_SUB_ORDER      "Subtitles language order:"
     IDS_MPEGSPLITTER_SUB_FORCING    "Forced load all subtitles"
-    IDS_MPEGSPLITTER_TRUEHD_OUTPUT  "TrueHD+AC3 streams output"
+    IDS_MPEGSPLITTER_TRUEHD_OUTPUT  "TrueHD + AC-3 streams output"
     IDS_MPEGSPLITTER_SUB_EMPTY_PIN  "Output empty Subtitle pin"
 END
 

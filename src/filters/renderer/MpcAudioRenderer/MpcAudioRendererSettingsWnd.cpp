@@ -203,9 +203,9 @@ void CMpcAudioRendererStatusWnd::UpdateStatus()
 			CString btMode_str;
 			BITSTREAM_MODE btMode = m_pMAR->GetBitstreamMode();
 			switch (btMode) {
-			case BITSTREAM_AC3:    btMode_str = L"AC3";    break;
+			case BITSTREAM_AC3:    btMode_str = L"AC-3";    break;
 			case BITSTREAM_DTS:    btMode_str = L"DTS";    break;
-			case BITSTREAM_EAC3:   btMode_str = L"E-AC3";  break;
+			case BITSTREAM_EAC3:   btMode_str = L"E-AC-3";  break;
 			case BITSTREAM_TRUEHD: btMode_str = L"TrueHD"; break;
 			case BITSTREAM_DTSHD:  btMode_str = L"DTS-HD"; break;
 			}
