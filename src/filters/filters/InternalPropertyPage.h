@@ -41,7 +41,8 @@ protected:
 	CFont m_font, m_monospacefont;
 	int m_fontheight;
 
-	void CalcTextRect(CRect& rect, long x, long y, long w);
+	// border: 0 - static or edit text without edges, 2 - radio bottom, 6 - edit text with edges
+	void CalcTextRect(CRect& rect, long x, long y, long w, long border = 0);
 	void CalcRect(CRect& rect, long x, long y, long w, long h);
 	virtual BOOL OnWndMsg(UINT message, WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 

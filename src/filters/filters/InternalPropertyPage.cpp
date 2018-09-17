@@ -33,11 +33,12 @@
 // CInternalPropertyPageWnd
 //
 
-void CInternalPropertyPageWnd::CalcTextRect(CRect& rect, long x, long y, long w)
+void CInternalPropertyPageWnd::CalcTextRect(CRect& rect, long x, long y, long w, long border)
 {
-	rect.left = x;
-	rect.top = rect.bottom = y;
-	rect.right = x + w;
+	rect.left   = x;
+	rect.top    = y;
+	rect.right  = x + w;
+	rect.bottom = y + border;
 	ScaleRect(rect);
 	rect.bottom += m_fontheight;
 }
