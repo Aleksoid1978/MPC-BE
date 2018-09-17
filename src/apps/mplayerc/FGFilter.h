@@ -69,7 +69,10 @@ public:
 	void AddType(const GUID& majortype, const GUID& subtype);
 	bool CheckTypes(const std::vector<GUID>& types, bool fExactMatch);
 
-	CAtlList<CString> m_protocols, m_extensions, m_chkbytes; // TODO: subtype?
+	std::list<CString> m_protocols;
+	std::list<CString> m_extensions;
+	std::list<CString> m_chkbytes;
+	// TODO: subtype?
 
 	virtual HRESULT Create(IBaseFilter** ppBF, CInterfaceList<IUnknown, &IID_IUnknown>& pUnks) PURE;
 
