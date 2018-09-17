@@ -50,35 +50,48 @@ void CMpegSplitterSettingsWnd::OnDisconnect()
 
 bool CMpegSplitterSettingsWnd::OnActivate()
 {
-	const int h20 = ScaleY(20);
-	const int h25 = ScaleY(25);
-	const int h30 = ScaleY(30);
 	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
-	CPoint p(10, 10);
+	CRect rect;
+	const long w1 = 305;
+	const long w2 = 200;
+	const long w3 = 60;
 
-	m_cbForcedSub.Create(ResStr(IDS_MPEGSPLITTER_SUB_FORCING), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(305), m_fontheight)), this, IDC_PP_SUBTITLE_FORCED);
-	p.y += h20;
+	const long x1 = 10;
+	const long x2 = 20;
+	const long x3 = 180;
+	long y = 10;
 
-	m_cbSubEmptyPin.Create(ResStr(IDS_MPEGSPLITTER_SUB_EMPTY_PIN), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(305), m_fontheight)), this, IDC_PP_ENABLE_SUB_EMPTY_PIN);
-	p.y += h25;
+	CalcTextRect(rect, x1, y, w1);
+	m_cbForcedSub.Create(ResStr(IDS_MPEGSPLITTER_SUB_FORCING), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, rect, this, IDC_PP_SUBTITLE_FORCED);
+	y += 20;
+
+	CalcTextRect(rect, x1, y, w1);
+	m_cbSubEmptyPin.Create(ResStr(IDS_MPEGSPLITTER_SUB_EMPTY_PIN), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, rect, this, IDC_PP_ENABLE_SUB_EMPTY_PIN);
+	y += 25;
 
 #ifdef REGISTER_FILTER
-	m_txtAudioLanguageOrder.Create(ResStr(IDS_MPEGSPLITTER_LANG_ORDER), WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(200), m_fontheight)), this, (UINT)IDC_STATIC);
-	p.y += h20;
-	m_edtAudioLanguageOrder.CreateEx(WS_EX_CLIENTEDGE, L"EDIT", L"", WS_CHILD | WS_VISIBLE | WS_TABSTOP, CRect(p, CSize(ScaleX(305), m_fontheight + 6)), this, IDC_PP_AUDIO_LANGUAGE_ORDER);
-	p.y += h25;
+	CalcTextRect(rect, x1, y, w2);
+	m_txtAudioLanguageOrder.Create(ResStr(IDS_MPEGSPLITTER_LANG_ORDER), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	y += 20;
+	CalcTextRect(rect, x1, y, w1, 6);
+	m_edtAudioLanguageOrder.CreateEx(WS_EX_CLIENTEDGE, L"EDIT", L"", WS_CHILD | WS_VISIBLE | WS_TABSTOP, rect, this, IDC_PP_AUDIO_LANGUAGE_ORDER);
+	y += 25;
 
-	m_txtSubtitlesLanguageOrder.Create(ResStr(IDS_MPEGSPLITTER_SUB_ORDER), WS_VISIBLE | WS_CHILD, CRect(p, CSize(ScaleX(200), m_fontheight)), this, (UINT)IDC_STATIC);
-	p.y += h20;
-	m_edtSubtitlesLanguageOrder.CreateEx(WS_EX_CLIENTEDGE, L"EDIT", L"", WS_CHILD | WS_VISIBLE | WS_TABSTOP, CRect(p, CSize(ScaleX(305), m_fontheight + 6)), this, IDC_PP_SUBTITLES_LANGUAGE_ORDER);
-	p.y += h25;
+	CalcTextRect(rect, x1, y, w2);
+	m_txtSubtitlesLanguageOrder.Create(ResStr(IDS_MPEGSPLITTER_SUB_ORDER), WS_VISIBLE | WS_CHILD, rect, this, (UINT)IDC_STATIC);
+	y += 20;
+	CalcTextRect(rect, x1, y, w1, 6);
+	m_edtSubtitlesLanguageOrder.CreateEx(WS_EX_CLIENTEDGE, L"EDIT", L"", WS_CHILD | WS_VISIBLE | WS_TABSTOP, rect, this, IDC_PP_SUBTITLES_LANGUAGE_ORDER);
+	y += 25;
 #endif
 
-	m_grpTrueHD.Create(ResStr(IDS_MPEGSPLITTER_TRUEHD_OUTPUT), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, CRect(p, CSize(ScaleX(305), h20 + h20)), this, (UINT)IDC_STATIC);
-	p.y += ScaleY(15);
-	p.x += ScaleY(10);
-	m_cbTrueHD.Create(L"TrueHD", dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE | WS_GROUP, CRect(p, CSize(ScaleX(60), m_fontheight + 2)), this, IDC_PP_TRUEHD);
-	m_cbAC3Core.Create(L"AC-3", dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE, CRect(p + CPoint(ScaleX(160), 0), CSize(ScaleX(60), m_fontheight + 2)), this, IDC_PP_AC3CORE);
+	CalcRect(rect, x1, y, w1, 40);
+	m_grpTrueHD.Create(ResStr(IDS_MPEGSPLITTER_TRUEHD_OUTPUT), WS_VISIBLE | WS_CHILD | BS_GROUPBOX, rect, this, (UINT)IDC_STATIC);
+	y += 20;
+	CalcTextRect(rect, x2, y, w3, 2);
+	m_cbTrueHD.Create(L"TrueHD", dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE | WS_GROUP, rect, this, IDC_PP_TRUEHD);
+	CalcTextRect(rect, x3, y, w3, 2);
+	m_cbAC3Core.Create(L"AC-3", dwStyle | BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE, rect, this, IDC_PP_AC3CORE);
 
 	if (m_pMSF) {
 		m_cbForcedSub.SetCheck(m_pMSF->GetForcedSub());
