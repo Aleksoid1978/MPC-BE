@@ -27,6 +27,7 @@
 #include "filters/DeinterlacerFilter.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/FileVersion.h"
+#include "../../DSUtil/std_helper.h"
 #include "../../filters/transform/DeCSSFilter/VobFile.h"
 #include <InitGuid.h>
 #include <dmodshow.h>
@@ -374,9 +375,8 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 			// check bytes for http
 			if (httpbuf.size()) {
 				for (const auto& pFGF : m_source) {
-					POSITION pos2 = pFGF->m_chkbytes.GetHeadPosition();
-					while (pos2) {
-						if (CheckBytes(httpbuf.data(), httpbuf.size(), pFGF->m_chkbytes.GetNext(pos2))) {
+					for (const auto& bytestring : pFGF->m_chkbytes) {
+						if (CheckBytes(httpbuf.data(), httpbuf.size(), bytestring)) {
 							fl.Insert(pFGF, 0, false, false);
 							break;
 						}
@@ -386,16 +386,15 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 			// protocol
 			for (const auto& pFGF : m_source) {
-				if (pFGF->m_protocols.Find(CString(protocol))) {
+				if (Contains(pFGF->m_protocols, protocol)) {
 					fl.Insert(pFGF, 0, false, false);
 				}
 			}
 		} else {
 			// check bytes
 			for (const auto& pFGF : m_source) {
-				POSITION pos2 = pFGF->m_chkbytes.GetHeadPosition();
-				while (pos2) {
-					if (CheckBytes(hFile, pFGF->m_chkbytes.GetNext(pos2))) {
+				for (const auto& bytestring : pFGF->m_chkbytes) {
+					if (CheckBytes(hFile, bytestring)) {
 						fl.Insert(pFGF, 1, false, false);
 						break;
 					}
@@ -407,7 +406,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 			// file extension
 
 			for (const auto& pFGF : m_source) {
-				if (pFGF->m_extensions.Find(CString(ext))) {
+				if (Contains(pFGF->m_extensions, ext)) {
 					fl.Insert(pFGF, 2, false, false);
 				}
 			}
@@ -416,7 +415,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 		{
 			// the rest
 			for (const auto& pFGF : m_source) {
-				if (pFGF->m_protocols.IsEmpty() && pFGF->m_chkbytes.IsEmpty() && pFGF->m_extensions.IsEmpty()) {
+				if (pFGF->m_protocols.empty() && pFGF->m_chkbytes.empty() && pFGF->m_extensions.empty()) {
 					fl.Insert(pFGF, 3, false, false);
 				}
 			}
@@ -1861,196 +1860,196 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	if (src[SRC_SHOUTCAST] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CShoutcastSource>(ShoutcastSourceName);
-		pFGF->m_protocols.AddTail(L"http");
+		pFGF->m_protocols.emplace_back(L"http");
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_UDP] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CUDPReader>(UDPReaderName);
-		pFGF->m_protocols.AddTail(L"udp");
-		pFGF->m_protocols.AddTail(L"http");
-		pFGF->m_protocols.AddTail(L"https");
+		pFGF->m_protocols.emplace_back(L"udp");
+		pFGF->m_protocols.emplace_back(L"http");
+		pFGF->m_protocols.emplace_back(L"https");
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_STDINPUT] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CUDPReader>(STDInReaderName);
-		pFGF->m_protocols.AddTail(L"pipe");
+		pFGF->m_protocols.emplace_back(L"pipe");
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_AVI] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAviSourceFilter>(AviSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,4,,52494646,8,4,,41564920"); // 'RIFF....AVI '
-		pFGF->m_chkbytes.AddTail(L"0,4,,52494646,8,4,,41564958"); // 'RIFF....AVIX'
-		pFGF->m_chkbytes.AddTail(L"0,4,,52494646,8,4,,414D5620"); // 'RIFF....AMV '
+		pFGF->m_chkbytes.emplace_back(L"0,4,,52494646,8,4,,41564920"); // 'RIFF....AVI '
+		pFGF->m_chkbytes.emplace_back(L"0,4,,52494646,8,4,,41564958"); // 'RIFF....AVIX'
+		pFGF->m_chkbytes.emplace_back(L"0,4,,52494646,8,4,,414D5620"); // 'RIFF....AMV '
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_MP4] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CMP4SourceFilter>(MP4SourceName);
 		// mov, mp4
-		pFGF->m_chkbytes.AddTail(L"4,4,,66747970"); // '....ftyp'
-		pFGF->m_chkbytes.AddTail(L"4,4,,6d6f6f76"); // '....moov'
-		pFGF->m_chkbytes.AddTail(L"4,4,,6d646174"); // '....mdat'
-		pFGF->m_chkbytes.AddTail(L"4,4,,77696465"); // '....wide'
-		pFGF->m_chkbytes.AddTail(L"4,4,,736b6970"); // '....skip'
-		pFGF->m_chkbytes.AddTail(L"4,4,,66726565"); // '....free'
-		pFGF->m_chkbytes.AddTail(L"4,4,,706e6f74"); // '....pnot'
-		pFGF->m_extensions.AddTail(L".mov");
+		pFGF->m_chkbytes.emplace_back(L"4,4,,66747970"); // '....ftyp'
+		pFGF->m_chkbytes.emplace_back(L"4,4,,6d6f6f76"); // '....moov'
+		pFGF->m_chkbytes.emplace_back(L"4,4,,6d646174"); // '....mdat'
+		pFGF->m_chkbytes.emplace_back(L"4,4,,77696465"); // '....wide'
+		pFGF->m_chkbytes.emplace_back(L"4,4,,736b6970"); // '....skip'
+		pFGF->m_chkbytes.emplace_back(L"4,4,,66726565"); // '....free'
+		pFGF->m_chkbytes.emplace_back(L"4,4,,706e6f74"); // '....pnot'
+		pFGF->m_extensions.emplace_back(L".mov");
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_FLV] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CFLVSourceFilter>(FlvSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,4,,464C5601"); // FLV (v1)
+		pFGF->m_chkbytes.emplace_back(L"0,4,,464C5601"); // FLV (v1)
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_MATROSKA] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CMatroskaSourceFilter>(MatroskaSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,4,,1A45DFA3");
+		pFGF->m_chkbytes.emplace_back(L"0,4,,1A45DFA3");
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_REAL] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CRealMediaSourceFilter>(RMSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,4,,2E524D46");
+		pFGF->m_chkbytes.emplace_back(L"0,4,,2E524D46");
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_ROQ] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CRoQSourceFilter>(RoQSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,8,,8410FFFFFFFF1E00");
+		pFGF->m_chkbytes.emplace_back(L"0,8,,8410FFFFFFFF1E00");
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_DSM] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CDSMSourceFilter>(DSMSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,4,,44534D53");
+		pFGF->m_chkbytes.emplace_back(L"0,4,,44534D53");
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_BINK] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CBinkSourceFilter>(BinkSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,3,,42494B");
+		pFGF->m_chkbytes.emplace_back(L"0,3,,42494B");
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_FLIC] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CFLICSource>(FlicSourceName);
-		pFGF->m_chkbytes.AddTail(L"4,2,,11AF");
-		pFGF->m_chkbytes.AddTail(L"4,2,,12AF");
+		pFGF->m_chkbytes.emplace_back(L"4,2,,11AF");
+		pFGF->m_chkbytes.emplace_back(L"4,2,,12AF");
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_FLAC] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CFLACSource>(FlacSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,4,,664C6143");
-		pFGF->m_extensions.AddTail(L".flac");
+		pFGF->m_chkbytes.emplace_back(L"0,4,,664C6143");
+		pFGF->m_extensions.emplace_back(L".flac");
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_CDDA] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CCDDAReader>(CCDDAReaderName);
-		pFGF->m_extensions.AddTail(L".cda");
+		pFGF->m_extensions.emplace_back(L".cda");
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_CDXA] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CCDXAReader>(CCDXAReaderName);
-		pFGF->m_chkbytes.AddTail(L"0,4,,52494646,8,4,,43445841");
+		pFGF->m_chkbytes.emplace_back(L"0,4,,52494646,8,4,,43445841");
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_VTS] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CVTSReader>(VTSReaderName);
-		pFGF->m_chkbytes.AddTail(L"0,12,,445644564944454F2D565453");
-		pFGF->m_chkbytes.AddTail(L"0,12,,445644415544494F2D415453");
+		pFGF->m_chkbytes.emplace_back(L"0,12,,445644564944454F2D565453");
+		pFGF->m_chkbytes.emplace_back(L"0,12,,445644415544494F2D415453");
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_OGG] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<COggSourceFilter>(OggSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,4,,4F676753");
+		pFGF->m_chkbytes.emplace_back(L"0,4,,4F676753");
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_MPA] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CMpaSourceFilter>(MpaSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,2,FFE0,FFE0");
-		pFGF->m_chkbytes.AddTail(L"0,10,FFFFFF00000080808080,49443300000000000000");
-		pFGF->m_extensions.AddTail(L".mp3");
-		pFGF->m_extensions.AddTail(L".aac");
+		pFGF->m_chkbytes.emplace_back(L"0,2,FFE0,FFE0");
+		pFGF->m_chkbytes.emplace_back(L"0,10,FFFFFF00000080808080,49443300000000000000");
+		pFGF->m_extensions.emplace_back(L".mp3");
+		pFGF->m_extensions.emplace_back(L".aac");
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_DTSAC3] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CDTSAC3Source>(DTSAC3SourceName);
-		pFGF->m_chkbytes.AddTail(L"0,4,,7FFE8001");               // DTS
-		pFGF->m_chkbytes.AddTail(L"0,4,,fE7f0180");               // DTS LE
-		pFGF->m_chkbytes.AddTail(L"0,4,,64582025");               // DTS Substream
-		pFGF->m_chkbytes.AddTail(L"0,2,,0B77");                   // AC3, E-AC3
-		pFGF->m_chkbytes.AddTail(L"4,4,,F8726FBB");               // MLP
-		pFGF->m_chkbytes.AddTail(L"4,4,,F8726FBA");               // TrueHD
-		pFGF->m_extensions.AddTail(L".ac3");
-		pFGF->m_extensions.AddTail(L".dts");
-		pFGF->m_extensions.AddTail(L".dtshd");
-		pFGF->m_extensions.AddTail(L".eac3");
-		pFGF->m_extensions.AddTail(L".thd");
+		pFGF->m_chkbytes.emplace_back(L"0,4,,7FFE8001");               // DTS
+		pFGF->m_chkbytes.emplace_back(L"0,4,,fE7f0180");               // DTS LE
+		pFGF->m_chkbytes.emplace_back(L"0,4,,64582025");               // DTS Substream
+		pFGF->m_chkbytes.emplace_back(L"0,2,,0B77");                   // AC3, E-AC3
+		pFGF->m_chkbytes.emplace_back(L"4,4,,F8726FBB");               // MLP
+		pFGF->m_chkbytes.emplace_back(L"4,4,,F8726FBA");               // TrueHD
+		pFGF->m_extensions.emplace_back(L".ac3");
+		pFGF->m_extensions.emplace_back(L".dts");
+		pFGF->m_extensions.emplace_back(L".dtshd");
+		pFGF->m_extensions.emplace_back(L".eac3");
+		pFGF->m_extensions.emplace_back(L".thd");
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_AMR] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,6,,2321414D520A");           // '#!AMR\n'
-		pFGF->m_chkbytes.AddTail(L"0,9,,2321414D522D57420A");     // '#!AMR-WB\n'
+		pFGF->m_chkbytes.emplace_back(L"0,6,,2321414D520A");           // '#!AMR\n'
+		pFGF->m_chkbytes.emplace_back(L"0,9,,2321414D522D57420A");     // '#!AMR-WB\n'
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_APE] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,4,,4D414320");               // 'MAC '
-		pFGF->m_chkbytes.AddTail(L"0,3,,494433");                 // 'ID3'
+		pFGF->m_chkbytes.emplace_back(L"0,4,,4D414320");               // 'MAC '
+		pFGF->m_chkbytes.emplace_back(L"0,3,,494433");                 // 'ID3'
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_TAK] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,4,,7442614B");               // 'tBaK'
+		pFGF->m_chkbytes.emplace_back(L"0,4,,7442614B");               // 'tBaK'
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_TTA] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,4,,54544131");               // 'TTA1'
-		pFGF->m_chkbytes.AddTail(L"0,3,,494433");                 // 'ID3'
+		pFGF->m_chkbytes.emplace_back(L"0,4,,54544131");               // 'TTA1'
+		pFGF->m_chkbytes.emplace_back(L"0,3,,494433");                 // 'ID3'
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_WAVPACK] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,4,,7776706B");               // 'wvpk'
+		pFGF->m_chkbytes.emplace_back(L"0,4,,7776706B");               // 'wvpk'
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_WAV] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,4,,52494646,8,4,,57415645"); // 'RIFF....WAVE'
-		pFGF->m_chkbytes.AddTail(L"0,16,,726966662E91CF11A5D628DB04C10000,24,16,,77617665F3ACD3118CD100C04F8EDB8A"); // Wave64
+		pFGF->m_chkbytes.emplace_back(L"0,4,,52494646,8,4,,57415645"); // 'RIFF....WAVE'
+		pFGF->m_chkbytes.emplace_back(L"0,16,,726966662E91CF11A5D628DB04C10000,24,16,,77617665F3ACD3118CD100C04F8EDB8A"); // Wave64
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_DSD] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,12,,445344201C00000000000000"); // 'DSD..."
-		pFGF->m_chkbytes.AddTail(L"0,4,,46524D38,12,4,,44534420"); // 'FRM8........DSD '
+		pFGF->m_chkbytes.emplace_back(L"0,12,,445344201C00000000000000"); // 'DSD..."
+		pFGF->m_chkbytes.emplace_back(L"0,4,,46524D38,12,4,,44534420"); // 'FRM8........DSD '
 		m_source.push_back(pFGF);
 	}
 
 	if (src[SRC_DTSAC3] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,8,,4454534844484452");       // DTSHDHDR
+		pFGF->m_chkbytes.emplace_back(L"0,8,,4454534844484452");       // DTSHDHDR
 		m_source.push_back(pFGF);
 	}
 
@@ -2062,14 +2061,14 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	if (src[SRC_RAWVIDEO] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CRawVideoSourceFilter>(RawVideoSourceName);
-		pFGF->m_chkbytes.AddTail(L"0,9,,595556344D50454732");      // YUV4MPEG2
-		pFGF->m_chkbytes.AddTail(L"0,6,,444B49460000");            // 'DKIF\0\0'
-		pFGF->m_chkbytes.AddTail(L"0,3,,000001");                  // MPEG1/2, VC-1
-		pFGF->m_chkbytes.AddTail(L"0,4,,00000001");                // H.264/AVC, H.265/HEVC
-		pFGF->m_chkbytes.AddTail(L"0,4,,434D5331,20,4,,50445652"); // 'CMS1................PDVR'
-		pFGF->m_chkbytes.AddTail(L"0,5,,3236344456");              // '264DV'
-		pFGF->m_chkbytes.AddTail(L"0,4,,44484156");                // 'DHAV'
-		pFGF->m_chkbytes.AddTail(L"0,4,,FFFFFF88");
+		pFGF->m_chkbytes.emplace_back(L"0,9,,595556344D50454732");      // YUV4MPEG2
+		pFGF->m_chkbytes.emplace_back(L"0,6,,444B49460000");            // 'DKIF\0\0'
+		pFGF->m_chkbytes.emplace_back(L"0,3,,000001");                  // MPEG1/2, VC-1
+		pFGF->m_chkbytes.emplace_back(L"0,4,,00000001");                // H.264/AVC, H.265/HEVC
+		pFGF->m_chkbytes.emplace_back(L"0,4,,434D5331,20,4,,50445652"); // 'CMS1................PDVR'
+		pFGF->m_chkbytes.emplace_back(L"0,5,,3236344456");              // '264DV'
+		pFGF->m_chkbytes.emplace_back(L"0,4,,44484156");                // 'DHAV'
+		pFGF->m_chkbytes.emplace_back(L"0,4,,FFFFFF88");
 		m_source.push_back(pFGF);
 	}
 
