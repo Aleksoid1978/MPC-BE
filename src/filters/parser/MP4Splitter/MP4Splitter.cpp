@@ -1978,7 +1978,7 @@ void CMP4SplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	}
 	bSelectMoofSuccessfully = TRUE;
 
-	if (rt <= 0) {
+	if (rt <= 0 || movie->HasFragmentsIndex()) {
 		DemuxInit();
 		return;
 	}
