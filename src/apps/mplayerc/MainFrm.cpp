@@ -11628,6 +11628,9 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 			if (it->profile->type == Youtube::y_video && !m_youtubeAudioUrllist.empty()) {
 				pOFD->fns.push_back(m_youtubeAudioUrllist.cbegin()->url);
 			}
+
+			m_youtubeFields.fname.Format(L"%s.%dp.%s", m_youtubeFields.title, it->profile->quality, it->profile->ext);
+			FixFilename(m_youtubeFields.fname);
 		}
 
 		m_strPlaybackRenderedPath = pOFD->fns.front().GetName();
