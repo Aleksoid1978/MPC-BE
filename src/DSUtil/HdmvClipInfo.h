@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -109,6 +109,7 @@ public:
 		__int64           m_SizeOut     = 0;
 
 		BYTE              m_num_video   = 0;
+		SHORT             m_num_streams = 0;
 
 		std::vector<BYTE> m_pg_offset_sequence_id;
 		std::vector<BYTE> m_ig_offset_sequence_id;
@@ -124,24 +125,7 @@ public:
 		}
 
 		bool operator == (const PlaylistItem& pi) const {
-			return pi.m_strFileName == m_strFileName;
-		}
-
-		PlaylistItem& operator = (const PlaylistItem& pi) {
-			m_strFileName           = pi.m_strFileName;
-			m_rtIn                  = pi.m_rtIn;
-			m_rtOut                 = pi.m_rtOut;
-			m_rtStartTime           = pi.m_rtStartTime;
-			m_SizeIn                = pi.m_SizeIn;
-			m_SizeOut               = pi.m_SizeOut;
-			m_num_video             = pi.m_num_video;
-
-			m_pg_offset_sequence_id = pi.m_pg_offset_sequence_id;
-			m_ig_offset_sequence_id = pi.m_ig_offset_sequence_id;
-
-			m_sps = pi.m_sps;
-
-			return *this;
+			return pi.m_strFileName == m_strFileName && pi.m_num_streams == m_num_streams;
 		}
 	};
 
