@@ -49,7 +49,6 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ffmpeg_fix.cpp" />
     <ClCompile Include="Filters.cpp" />
     <ClCompile Include="InternalPropertyPage.cpp" />
     <ClCompile Include="stdafx.cpp">

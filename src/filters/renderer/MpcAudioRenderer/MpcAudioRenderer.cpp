@@ -22,8 +22,10 @@
 #include <map>
 
 #ifdef REGISTER_FILTER
-#include <InitGuid.h>
+	#include <InitGuid.h>
+	#include "../../../DSUtil/ffmpeg_link_fix.cpp"
 #endif
+
 #include <moreuuids.h>
 #include <math.h>
 #include "../../../DSUtil/DSUtil.h"
@@ -51,8 +53,6 @@
 #define DBGLOG_LEVEL 1
 
 #ifdef REGISTER_FILTER
-
-#include "../../filters/ffmpeg_fix.cpp"
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_Audio, &MEDIASUBTYPE_PCM},

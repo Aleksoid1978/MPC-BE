@@ -24,6 +24,7 @@
 
 #ifdef REGISTER_FILTER
 	#include <InitGuid.h>
+	#include "../../../DSUtil/ffmpeg_link_fix.cpp"
 #endif
 
 #include "MPCVideoDec.h"
@@ -33,7 +34,7 @@
 #include "../../../DSUtil/CPUInfo.h"
 #include "../../../DSUtil/D3D9Helper.h"
 #include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/ff_log.h"
+#include "../../../DSUtil/ffmpeg_log.h"
 #include "../../../DSUtil/GolombBuffer.h"
 #include "../../../DSUtil/SysVersion.h"
 #include "../../../DSUtil/DXVAState.h"
@@ -893,8 +894,6 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 };
 
 #ifdef REGISTER_FILTER
-
-#include "../../filters/ffmpeg_fix.cpp"
 
 const AMOVIESETUP_PIN sudpPins[] = {
 	{L"Input", FALSE, FALSE, FALSE, FALSE, &CLSID_NULL, nullptr, _countof(sudPinTypesIn),  sudPinTypesIn},

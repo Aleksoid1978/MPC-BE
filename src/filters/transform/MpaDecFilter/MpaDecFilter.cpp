@@ -35,7 +35,7 @@
 
 #ifdef REGISTER_FILTER
 	#include <InitGuid.h>
-	#include "../../filters/ffmpeg_fix.cpp"
+	#include "../../../DSUtil/ffmpeg_link_fix.cpp"
 #endif
 
 #include <moreuuids.h>

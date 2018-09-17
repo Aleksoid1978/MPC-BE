@@ -113,6 +113,9 @@
     <ClCompile Include="MP4AudioDecoderConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ffmpeg_link_fix.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DSMPropertyBag.h">
@@ -167,9 +170,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WinAPIUtils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ff_log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ApeTag.h">
@@ -236,6 +236,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MP4AudioDecoderConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ffmpeg_log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
