@@ -23,7 +23,7 @@
 #include <MMReg.h>
 #include "../../../DSUtil/DSUtil.h"
 #include "../../../DSUtil/AudioParser.h"
-#include "../../../DSUtil/ff_log.h"
+#include "../../../DSUtil/ffmpeg_log.h"
 #include "AudioHelper.h"
 
 extern "C"

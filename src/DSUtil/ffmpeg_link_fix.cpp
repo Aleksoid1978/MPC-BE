@@ -1,5 +1,4 @@
 /*
- * (C) 2003-2006 Gabest
  * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
@@ -24,15 +23,15 @@
 
 extern "C" {
 	// hack to avoid error "unresolved external symbol" when linking
+
 	void __mingw_raise_matherr(int typ, const char *name, double a1, double a2, double rslt) {}
-#if defined(_MSC_VER) & (_MSC_VER >= 1900) // 2015
 	unsigned int __cdecl _get_output_format(void) { return 1; }
+
 #ifdef _WIN64
 	FILE __iob[_IOB_ENTRIES] = {
 		*stdin, *stdout, *stderr
 	};
 	FILE* __cdecl __iob_func(void) { return __iob; }
-#endif
 #endif
 
 #ifdef REGISTER_FILTER
@@ -43,5 +42,7 @@ extern "C" {
 
 	void *__imp__sopen           = _sopen;
 	void *__imp__wsopen          = _wsopen;
+#else
+	int mingw_app_type = 1;
 #endif
 }

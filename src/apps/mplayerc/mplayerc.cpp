@@ -72,16 +72,6 @@ const LanguageResource CMPlayerCApp::languageResources[] = {
 
 const size_t CMPlayerCApp::languageResourcesCount = _countof(CMPlayerCApp::languageResources);
 
-extern "C" {
-	int mingw_app_type = 1;
-#ifdef _WIN64
-	FILE __iob[_IOB_ENTRIES] = {
-		*stdin, *stdout, *stderr
-	};
-	FILE* __cdecl __iob_func(void) { return __iob; }
-#endif
-}
-
 typedef struct _PEB_FREE_BLOCK // Size = 8
 {
 	struct _PEB_FREE_BLOCK *Next;

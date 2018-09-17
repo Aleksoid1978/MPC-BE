@@ -34,7 +34,7 @@ extern "C" {
 #include <moreuuids.h>
 #include "../../../DSUtil/AudioParser.h"
 #include "../../../DSUtil/DSUtil.h"
-#include "../../../DSUtil/ff_log.h"
+#include "../../../DSUtil/ffmpeg_log.h"
 #include "../../../DSUtil/GolombBuffer.h"
 #include "../../Lock.h"
 

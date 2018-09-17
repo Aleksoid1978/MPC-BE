@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2017 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,7 +28,7 @@ extern "C" {
 }
 #pragma warning(pop)
 
-#include "../../../DSUtil/ff_log.h"
+#include "../../../DSUtil/ffmpeg_log.h"
 
 #include "../../Lock.h"
 
