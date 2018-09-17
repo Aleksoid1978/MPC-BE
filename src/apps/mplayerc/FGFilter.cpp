@@ -537,11 +537,12 @@ CFGFilterList::~CFGFilterList()
 
 void CFGFilterList::RemoveAll()
 {
-	while (!m_filters.IsEmpty()) {
-		const filter_t& f = m_filters.RemoveHead();
+	while (!m_filters.empty()) {
+		const filter_t& f = m_filters.front();
 		if (f.autodelete) {
 			delete f.pFGF;
 		}
+		m_filters.pop_front();
 	}
 
 	m_sortedfilters.RemoveAll();
@@ -550,10 +551,7 @@ void CFGFilterList::RemoveAll()
 void CFGFilterList::Insert(CFGFilter* pFGF, int group, bool exactmatch, bool autodelete)
 {
 	if (CFGFilterRegistry* f1r = dynamic_cast<CFGFilterRegistry*>(pFGF)) {
-		POSITION pos = m_filters.GetHeadPosition();
-		while (pos) {
-			filter_t& f2 = m_filters.GetNext(pos);
-
+		for (const auto& f2 : m_filters) {
 			if (group != f2.group) {
 				continue;
 			}
@@ -574,9 +572,7 @@ void CFGFilterList::Insert(CFGFilter* pFGF, int group, bool exactmatch, bool aut
 		}
 	}
 
-	POSITION pos = m_filters.GetHeadPosition();
-	while (pos) {
-		filter_t f = m_filters.GetNext(pos);
+	for (const auto& f : m_filters) {
 		CFGFilter* pFGF2 = f.pFGF;
 		if (pFGF2->GetCLSID() == pFGF->GetCLSID() && ((pFGF2->GetMerit() >= pFGF->GetMerit()) || (f.group < group))) {
 			if (pFGF->GetType() != pFGF2->GetType()) {
@@ -616,8 +612,8 @@ void CFGFilterList::Insert(CFGFilter* pFGF, int group, bool exactmatch, bool aut
 		}
 	}
 
-	filter_t f = {m_filters.GetCount(), pFGF, group, exactmatch, autodelete};
-	m_filters.AddTail(f);
+	filter_t f = {m_filters.size(), pFGF, group, exactmatch, autodelete};
+	m_filters.emplace_back(f);
 
 	m_sortedfilters.RemoveAll();
 }
@@ -626,11 +622,9 @@ POSITION CFGFilterList::GetHeadPosition()
 {
 	if (m_sortedfilters.IsEmpty()) {
 		std::vector<filter_t> flts;
-		flts.reserve(m_filters.GetCount());
+		flts.reserve(m_filters.size());
 
-		POSITION pos = m_filters.GetHeadPosition();
-		while (pos) {
-			const filter_t& flt = m_filters.GetNext(pos);
+		for (const auto& flt : m_filters) {
 			if (flt.pFGF->GetMerit() >= MERIT64_DO_USE) {
 				flts.emplace_back(flt);
 			}
@@ -646,7 +640,7 @@ POSITION CFGFilterList::GetHeadPosition()
 
 #ifdef DEBUG_OR_LOG
 		DLog(L"FGM: Sorting filters");
-		pos = m_sortedfilters.GetHeadPosition();
+		POSITION pos = m_sortedfilters.GetHeadPosition();
 		while (pos) {
 			CFGFilter* pFGF = m_sortedfilters.GetNext(pos);
 			DLog(L"FGM:    %016I64x '%s', type = '%s'",
