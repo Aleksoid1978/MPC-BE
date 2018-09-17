@@ -316,7 +316,7 @@ HRESULT CHdmvClipInfo::ReadCpiInfo(SyncPoints& sps)
 HRESULT CHdmvClipInfo::ReadInfo(LPCWSTR strFile, SyncPoints* sps/* = nullprt*/)
 {
 	m_hFile = CreateFileW(strFile, GENERIC_READ, dwShareMode, nullptr,
-						 OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
+						  OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
 	if (m_hFile != INVALID_HANDLE_VALUE) {
 		BYTE Buff[4] = { 0 };
 
@@ -558,7 +558,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 	Path.RemoveFileSpec();
 
 	m_hFile = CreateFileW(strPlaylistFile, GENERIC_READ, dwShareMode, nullptr,
-						 OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
+						  OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
 	if (m_hFile != INVALID_HANDLE_VALUE) {
 		bool bDuplicate = false;
 		BYTE Buff[9] = { 0 };
@@ -737,6 +737,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			ReadSTNInfo(bFullInfoRead);
 
 			Item.m_num_video = stn.num_video;
+			Item.m_num_streams = stn.num_video + stn.num_audio + stn.num_pg + stn.num_pip_pg;
 
 			Item.m_pg_offset_sequence_id.resize(stn.num_pg, 0xFF);
 			Item.m_ig_offset_sequence_id.resize(stn.num_ig, 0xFF);
@@ -744,14 +745,14 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			if (bFullInfoRead) {
 				LARGE_INTEGER size = {0, 0};
 				HANDLE hFile = CreateFileW(Item.m_strFileName, GENERIC_READ, dwShareMode, nullptr,
-										  OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
+										   OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
 				if (hFile != INVALID_HANDLE_VALUE) {
 					GetFileSizeEx(hFile, &size);
 					CloseHandle(hFile);
 				}
 
 				Item.m_SizeIn  = TotalSize;
-				TotalSize       += size.QuadPart;
+				TotalSize     += size.QuadPart;
 				Item.m_SizeOut = TotalSize;
 			}
 
@@ -908,7 +909,7 @@ HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CPlaylist& Playlist
 	Path.RemoveFileSpec();
 
 	m_hFile = CreateFileW(strPlaylistFile, GENERIC_READ, dwShareMode, nullptr,
-						 OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
+						  OPEN_EXISTING, dwFlagsAndAttributes, nullptr);
 	if (m_hFile != INVALID_HANDLE_VALUE) {
 		BYTE Buff[4] = { 0 };
 
