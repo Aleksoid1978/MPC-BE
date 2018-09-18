@@ -65,8 +65,8 @@ bool YoutubeDL::Parse_URL(const CString& url, const int maxHeightOptions, std::l
 		return false;
 	}
 
-	std::vector<char> buf_out;
-	std::vector<char> buf_err;
+	CStringA buf_out;
+	CStringA buf_err;
 
 	std::thread stdout_thread;
 	std::thread stderr_thread;
@@ -79,10 +79,7 @@ bool YoutubeDL::Parse_URL(const CString& url, const int maxHeightOptions, std::l
 				if (!dwBytesRead) {
 					break;
 				}
-
-				const size_t size = buf_out.size();
-				buf_out.resize(size + dwBytesRead);
-				memcpy(buf_out.data() + size, buffer, dwBytesRead);
+				buf_out.Append(buffer, dwBytesRead);
 			}
 		});
 	}
@@ -95,10 +92,7 @@ bool YoutubeDL::Parse_URL(const CString& url, const int maxHeightOptions, std::l
 				if (!dwBytesRead) {
 					break;
 				}
-
-				const size_t size = buf_err.size();
-				buf_err.resize(size + dwBytesRead);
-				memcpy(buf_err.data() + size, buffer, dwBytesRead);
+				buf_err.Append(buffer, dwBytesRead);
 			}
 		});
 	}
@@ -114,11 +108,9 @@ bool YoutubeDL::Parse_URL(const CString& url, const int maxHeightOptions, std::l
 
 	DWORD exitcode;
 	GetExitCodeProcess(proc_info.hProcess, &exitcode);
-	if (exitcode && !buf_err.empty()) {
-		buf_err.push_back('\0');
-		const CString err = buf_err.data();
-		if (err.Find(L"Unsupported URL:") == -1) {
-			AfxMessageBox(err.GetString(), MB_ICONERROR, 0);
+	if (exitcode && buf_err.GetLength()) {
+		if (buf_err.Find("Unsupported URL:") == -1) {
+			AfxMessageBox(CStringW(buf_err), MB_ICONERROR, 0);
 		}
 	}
 
@@ -127,11 +119,10 @@ bool YoutubeDL::Parse_URL(const CString& url, const int maxHeightOptions, std::l
 	CloseHandle(hStdout_r);
 	CloseHandle(hStderr_r);
 
-	if (!exitcode && !buf_out.empty()) {
-		buf_out.push_back('\0');
+	if (!exitcode && buf_out.GetLength()) {
 
 		rapidjson::Document d;
-		if (!d.Parse(buf_out.data()).HasParseError()) {
+		if (!d.Parse(buf_out.GetString()).HasParseError()) {
 			const auto& formats = d["formats"];
 			if (!formats.IsArray()) {
 				return false;
