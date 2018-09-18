@@ -41,6 +41,11 @@
 #include <atlutil.h>
 #include "UpdateChecker.h"
 
+extern "C" {
+	// hack to avoid error "unresolved external symbol" when linking
+	int mingw_app_type = 1;
+}
+
 const LanguageResource CMPlayerCApp::languageResources[] = {
 	{ID_LANGUAGE_ARMENIAN,				1067,	L"Armenian",				L"hy"},
 	{ID_LANGUAGE_BASQUE,				1069,	L"Basque",					L"eu"},

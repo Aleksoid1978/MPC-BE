@@ -22,6 +22,11 @@
 #include "stdafx.h"
 #include "Filters.h"
 
+extern "C" {
+	// hack to avoid error "unresolved external symbol" when linking
+	void __mingw_raise_matherr(int typ, const char *name, double a1, double a2, double rslt) {}
+}
+
 extern "C" BOOL WINAPI DllEntryPoint(HINSTANCE, ULONG, LPVOID);
 
 CFilterApp::CFilterApp()

@@ -56,7 +56,6 @@
     <ClCompile Include="DSMPropertyBag.cpp" />
     <ClCompile Include="DSUtil.cpp" />
     <ClCompile Include="DXVAState.cpp" />
-    <ClCompile Include="ffmpeg_link_fix.cpp" />
     <ClCompile Include="FileHandle.cpp" />
     <ClCompile Include="FileVersionInfo.cpp" />
     <ClCompile Include="FontInstaller.cpp" />
