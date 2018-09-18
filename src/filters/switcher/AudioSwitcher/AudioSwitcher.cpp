@@ -23,7 +23,6 @@
 
 #ifdef REGISTER_FILTER
 	#include <InitGuid.h>
-	#include "../../../DSUtil/ffmpeg_link_fix.cpp"
 #endif
 
 #include <math.h>
@@ -37,9 +36,7 @@
 #include "../../../DSUtil/SysVersion.h"
 #include "../../../AudioTools/AudioHelper.h"
 #include "../../../ExtLib/ffmpeg/libavutil/channel_layout.h"
-
 #include "AudioSwitcher.h"
-
 
 #ifdef REGISTER_FILTER
 
@@ -153,6 +150,14 @@ CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 			*phr = S_OK;
 		}
 	}
+
+#ifdef REGISTER_FILTER
+	// hack to avoid error "unresolved external symbol" when linking
+	BYTE* tmp = nullptr;
+	if (tmp) {
+		_aligned_free(tmp);
+	}
+#endif
 }
 
 CAudioSwitcherFilter::~CAudioSwitcherFilter()
