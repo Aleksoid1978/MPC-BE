@@ -545,7 +545,7 @@ void CFGFilterList::RemoveAll()
 		m_filters.pop_front();
 	}
 
-	m_sortedfilters.RemoveAll();
+	m_sortedfilters.clear();
 }
 
 void CFGFilterList::Insert(CFGFilter* pFGF, int group, bool exactmatch, bool autodelete)
@@ -615,12 +615,12 @@ void CFGFilterList::Insert(CFGFilter* pFGF, int group, bool exactmatch, bool aut
 	filter_t f = {m_filters.size(), pFGF, group, exactmatch, autodelete};
 	m_filters.emplace_back(f);
 
-	m_sortedfilters.RemoveAll();
+	m_sortedfilters.clear();
 }
 
-POSITION CFGFilterList::GetHeadPosition()
+unsigned CFGFilterList::GetSortedSize()
 {
-	if (m_sortedfilters.IsEmpty()) {
+	if (m_sortedfilters.empty()) {
 		std::vector<filter_t> flts;
 		flts.reserve(m_filters.size());
 
@@ -634,15 +634,14 @@ POSITION CFGFilterList::GetHeadPosition()
 			return (filter_cmp(a, b) < 0);
 		});
 
+		m_sortedfilters.reserve(flts.size());
 		for (const auto& flt : flts) {
-			m_sortedfilters.AddTail(flt.pFGF);
+			m_sortedfilters.push_back(flt.pFGF);
 		}
 
 #ifdef DEBUG_OR_LOG
 		DLog(L"FGM: Sorting filters");
-		POSITION pos = m_sortedfilters.GetHeadPosition();
-		while (pos) {
-			CFGFilter* pFGF = m_sortedfilters.GetNext(pos);
+		for (const auto& pFGF : m_sortedfilters) {
 			DLog(L"FGM:    %016I64x '%s', type = '%s'",
 				pFGF->GetMerit(),
 				pFGF->GetName().IsEmpty() ? CStringFromGUID(pFGF->GetCLSID()) : CString(pFGF->GetName()),
@@ -651,12 +650,12 @@ POSITION CFGFilterList::GetHeadPosition()
 #endif
 	}
 
-	return m_sortedfilters.GetHeadPosition();
+	return (unsigned)m_sortedfilters.size();
 }
 
-CFGFilter* CFGFilterList::GetNext(POSITION& pos)
+CFGFilter* CFGFilterList::GetFilter(unsigned pos)
 {
-	return m_sortedfilters.GetNext(pos);
+	return pos < m_sortedfilters.size() ? m_sortedfilters[pos] : nullptr;
 }
 
 int CFGFilterList::filter_cmp(const filter_t& a, const filter_t& b)
