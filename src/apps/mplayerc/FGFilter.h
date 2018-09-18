@@ -176,7 +176,7 @@ class CFGFilterList
 	};
 	static int filter_cmp(const filter_t& a, const filter_t& b);
 	std::list<filter_t> m_filters;
-	CAtlList<CFGFilter*> m_sortedfilters;
+	std::vector<CFGFilter*> m_sortedfilters;
 
 public:
 	CFGFilterList();
@@ -188,6 +188,6 @@ public:
 	void RemoveAll();
 	void Insert(CFGFilter* pFGF, int group, bool exactmatch = false, bool autodelete = true);
 
-	POSITION GetHeadPosition();
-	CFGFilter* GetNext(POSITION& pos);
+	unsigned GetSortedSize();
+	CFGFilter* GetFilter(unsigned pos);
 };

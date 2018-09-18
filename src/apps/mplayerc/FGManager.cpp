@@ -1011,9 +1011,9 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 		// let's check whether the madVR allocator presenter is in our list
 		// it should be if madVR is selected as the video renderer
 		CFGFilter* pMadVRAllocatorPresenter = nullptr;
-		POSITION pos = fl.GetHeadPosition();
-		while (pos) {
-			CFGFilter* pFGF = fl.GetNext(pos);
+
+		for (unsigned pos = 0, fltnum = fl.GetSortedSize(); pos < fltnum; pos++) {
+			CFGFilter* pFGF = fl.GetFilter(pos);
 			if (pFGF->GetCLSID() == CLSID_madVRAllocatorPresenter) {
 				// found it!
 				pMadVRAllocatorPresenter = pFGF;
@@ -1021,9 +1021,8 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 			}
 		}
 
-		pos = fl.GetHeadPosition();
-		while (pos) {
-			CFGFilter* pFGF = fl.GetNext(pos);
+		for (unsigned pos = 0, fltnum = fl.GetSortedSize(); pos < fltnum; pos++) {
+			CFGFilter* pFGF = fl.GetFilter(pos);
 
 			// Checks if any Video Renderer is already in the graph to avoid trying to connect a second instance
 			if (IsVideoRenderer(pFGF->GetCLSID())) {
@@ -1218,12 +1217,11 @@ STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlay
 
 	hr = VFW_E_CANNOT_RENDER;
 
-	POSITION pos = fl.GetHeadPosition();
-	while (pos) {
+	for (unsigned pos = 0, fltnum = fl.GetSortedSize(); pos < fltnum; pos++) {
+		CFGFilter* pFGF = fl.GetFilter(pos);
 		CComPtr<IBaseFilter> pBF;
-		CFGFilter* pFG = fl.GetNext(pos);
 
-		if (SUCCEEDED(hr = AddSourceFilter(pFG, lpcwstrFileName, pFG->GetName(), &pBF))) {
+		if (SUCCEEDED(hr = AddSourceFilter(pFGF, lpcwstrFileName, pFGF->GetName(), &pBF))) {
 			m_streampath.clear();
 			m_deadends.RemoveAll();
 
@@ -1257,9 +1255,9 @@ STDMETHODIMP CFGManager::AddSourceFilter(LPCWSTR lpcwstrFileName, LPCWSTR lpcwst
 		return hr;
 	}
 
-	POSITION pos = fl.GetHeadPosition();
-	while (pos) {
-		if (SUCCEEDED(hr = AddSourceFilter(fl.GetNext(pos), lpcwstrFileName, lpcwstrFilterName, ppFilter))) {
+	for (unsigned pos = 0, fltnum = fl.GetSortedSize(); pos < fltnum; pos++) {
+		CFGFilter* pFGF = fl.GetFilter(pos);
+		if (SUCCEEDED(hr = AddSourceFilter(pFGF, lpcwstrFileName, lpcwstrFilterName, ppFilter))) {
 			return hr;
 		}
 	}
