@@ -163,7 +163,7 @@ CWebServer::CWebServer(CMainFrame* pMainFrame, int nPort)
 CWebServer::~CWebServer()
 {
 	if (m_hThread != nullptr) {
-		PostThreadMessage(m_ThreadId, WM_QUIT, 0, 0);
+		PostThreadMessageW(m_ThreadId, WM_QUIT, 0, 0);
 		if (WaitForSingleObject(m_hThread, 10000) == WAIT_TIMEOUT) {
 			TerminateThread (m_hThread, 0xDEAD);
 		}
