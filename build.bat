@@ -334,6 +334,7 @@ EXIT /B
 
 :SubCreateInstaller
 IF "%~1" == "x64" SET ISDefs=/Dx64Build
+IF /I "%SIGN%" == "True" SET ISDefsSign=/DSign
 
 CALL :SubDetectInnoSetup
 
@@ -344,7 +345,7 @@ IF NOT DEFINED InnoSetupPath (
 
 TITLE Compiling %1 installer...
 
-"%InnoSetupPath%\iscc.exe" /Q /O"%BIN%" "distrib\mpc-be_setup.iss" %ISDefs%
+"%InnoSetupPath%\iscc.exe" /Q /O"%BIN%" "distrib\mpc-be_setup.iss" %ISDefs% %ISDefsSign%
 IF %ERRORLEVEL% NEQ 0 CALL :SubMsg "ERROR" "Compilation failed!"
 CALL :SubMsg "INFO" "%1 installer successfully built"
 
@@ -354,10 +355,6 @@ IF /I "%~1" == "Win32" (
   SET ARCH=x86
 ) ELSE (
   SET ARCH=x64
-)
-
-IF /I "%SIGN%" == "True" (
-  CALL :SubSign %BIN% MPC-BE.%MPCBE_VER%.%ARCH%.exe
 )
 
 EXIT /B
