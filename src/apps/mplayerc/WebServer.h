@@ -72,7 +72,7 @@ class CWebServer
 
 public:
 	CWebServer(CMainFrame* pMainFrame, int nPort = 13579);
-	virtual ~CWebServer();
+	~CWebServer();
 
 	static void Deploy(CString dir);
 

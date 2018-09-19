@@ -422,7 +422,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	//
 
-	CAutoPtr<CWebServer> m_pWebServer;
+	std::unique_ptr<CWebServer> m_pWebServer;
 	PMODE m_ePlaybackMode;
 	ULONG m_lCurrentChapter;
 	ULONG m_lChapterStartTime;

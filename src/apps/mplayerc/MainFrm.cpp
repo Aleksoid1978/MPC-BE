@@ -16555,14 +16555,14 @@ void CMainFrame::ShowOptions(int idPage)
 void CMainFrame::StartWebServer(int nPort)
 {
 	if (!m_pWebServer) {
-		m_pWebServer.Attach(DNew CWebServer(this, nPort));
+		m_pWebServer = std::make_unique<CWebServer>(this, nPort);
 	}
 }
 
 void CMainFrame::StopWebServer()
 {
 	if (m_pWebServer) {
-		m_pWebServer.Free();
+		delete m_pWebServer.release();
 	}
 }
 
