@@ -127,6 +127,9 @@ DisableProgramGroupPage=auto
 MinVersion=6.0.6000
 AppMutex={#MPC_WND_CLASS_NAME}
 ChangesAssociations=true
+#ifdef Sign
+SignTool=OpenSourceSign
+#endif
 
 [Languages]
 Name: en; MessagesFile: compiler:Default.isl
