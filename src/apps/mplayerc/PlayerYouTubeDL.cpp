@@ -135,6 +135,11 @@ bool YoutubeDL::Parse_URL(const CString& url, const int maxHeightOptions, std::l
 			float maxtbr = 0.0f;
 			CString bestAudioUrl;
 
+			const auto& url = d["url"];
+			if (url.IsString()) {
+				bestUrl = url.GetString();
+			}
+
 			for (rapidjson::SizeType i = 0; i < formats.Size(); i++) {
 				const auto& format = formats[i];
 				const auto& protocol = format["protocol"];
