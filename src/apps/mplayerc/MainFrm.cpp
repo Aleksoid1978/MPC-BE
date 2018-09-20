@@ -4442,11 +4442,11 @@ void CMainFrame::OnFilePostCloseMedia()
 
 	// Ensure the dynamically added menu items are cleared
 	MakeEmptySubMenu(m_filtersMenu);
-	MakeEmptySubMenu(m_SubtitlesMenu);
-	MakeEmptySubMenu(m_AudioMenu);
-	MakeEmptySubMenu(m_SubtitlesMenu);
 	MakeEmptySubMenu(m_VideoStreamsMenu);
-	MakeEmptySubMenu(m_chaptersMenu);
+	// dynamic menus (which can be called independently) must be destroyed to reset the minimum width value
+	m_SubtitlesMenu.DestroyMenu();
+	m_AudioMenu.DestroyMenu();
+	m_chaptersMenu.DestroyMenu();
 
 	UnloadExternalObjects();
 
