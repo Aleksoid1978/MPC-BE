@@ -238,14 +238,14 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 14		"모두(&L)"
 15		"&None"
 16		"아이콘 사용"
-17		"탐색기 메뉴"
-18		"디렉토리"
-19		"파일"
-20		"자동 실행 (XP 전용)"
-21		"비디오"
-22		"음악"
-23		"DVD"
-24		"오디오 CD"
+17		"자동 실행 (XP 전용)"
+18		"비디오"
+19		"음악"
+20		"DVD"
+21		"오디오 CD"
+22		"탐색기 메뉴"
+23		"디렉토리"
+24		"파일"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
@@ -402,13 +402,13 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"Volume control"
 17		"Auto volume control"
 18		"Boost audio"
-23		"오디오 시간 조절 (ms):"
-26		"Default"
-27		"출력 샘플 형식:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
+23		"출력 샘플 형식:"
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"Float"
+28		"오디오 시간 조절 (ms):"
+31		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

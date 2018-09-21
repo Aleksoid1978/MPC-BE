@@ -238,14 +238,14 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 14		"全部(&L)"
 15		"清空(&N)"
 16		"包含圖示"
-17		"檔案總管右鍵選單"
-18		"目錄"
-19		"檔案"
-20		"自動播放"
-21		"影片"
-22		"音樂"
-23		"DVD"
-24		"音樂 CD"
+17		"自動播放"
+18		"影片"
+19		"音樂"
+20		"DVD"
+21		"音樂 CD"
+22		"檔案總管右鍵選單"
+23		"目錄"
+24		"檔案"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
@@ -402,13 +402,13 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"音量控制"
 17		"自動音量控制"
 18		"音訊增強"
-23		"平移音訊時間 (ms)："
-26		"預設值"
-27		"輸出取樣格式："
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"浮點"
+23		"輸出取樣格式："
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"浮點"
+28		"平移音訊時間 (ms)："
+31		"預設值"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

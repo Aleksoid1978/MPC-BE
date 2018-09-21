@@ -238,14 +238,14 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 14		"&Tots"
 15		"&None"
 16		"Amb Icones"
-17		"Menú contextual del gestor d'arxius"
-18		"Directori"
-19		"Arxiu(s)"
-20		"Reproducció Automàtica"
-21		"Vídeo"
-22		"Música"
-23		"DVD"
-24		"CDs Àudio"
+17		"Reproducció Automàtica"
+18		"Vídeo"
+19		"Música"
+20		"DVD"
+21		"CDs Àudio"
+22		"Menú contextual del gestor d'arxius"
+23		"Directori"
+24		"Arxiu(s)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
@@ -402,13 +402,13 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"Volume control"
 17		"Auto volume control"
 18		"Boost audio"
-23		"Desplaçament de l'àudio (ms):"
-26		"Default"
-27		"Format de mostres de sortida:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
+23		"Format de mostres de sortida:"
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"Float"
+28		"Desplaçament de l'àudio (ms):"
+31		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

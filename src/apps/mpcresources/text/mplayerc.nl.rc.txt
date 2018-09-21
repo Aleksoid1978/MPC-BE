@@ -238,14 +238,14 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 14		"A&lle"
 15		"&Niets"
 16		"Met pictogrammen"
-17		"Snelmenu verkenner"
-18		"Map"
-19		"Bestand(en)"
-20		"Automatisch afspelen"
-21		"Video"
-22		"Muziek"
-23		"Dvd"
-24		"Audio-cd"
+17		"Automatisch afspelen"
+18		"Video"
+19		"Muziek"
+20		"Dvd"
+21		"Audio-cd"
+22		"Snelmenu verkenner"
+23		"Map"
+24		"Bestand(en)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
@@ -402,13 +402,13 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"Volumecontrole"
 17		"Automatische volumeregeling"
 18		"Audio boosten"
-23		"Audio-tijdsverschuiving (ms):"
-26		"Standaard"
-27		"Audio-uitvoerformaat:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
+23		"Audio-uitvoerformaat:"
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"Float"
+28		"Audio-tijdsverschuiving (ms):"
+31		"Standaard"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

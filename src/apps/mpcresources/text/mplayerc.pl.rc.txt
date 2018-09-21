@@ -238,14 +238,14 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 14		"W&szystkie"
 15		"&None"
 16		"Ikony"
-17		"Menu kontekstowe"
-18		"Foldery"
-19		"Pliki"
-20		"Automatyczne odtwarzanie"
-21		"Wideo"
-22		"Audio"
-23		"DVD"
-24		"Audio CD"
+17		"Automatyczne odtwarzanie"
+18		"Wideo"
+19		"Audio"
+20		"DVD"
+21		"Audio CD"
+22		"Menu kontekstowe"
+23		"Foldery"
+24		"Pliki"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
@@ -402,13 +402,13 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"Volume control"
 17		"Automatyczna regulacja głośności"
 18		"Wzmocnienie dźwięku"
-23		"Opóźnienie dźwięku (ms):"
-26		"Domyślne"
-27		"Format próbki wyjściowej:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
+23		"Format próbki wyjściowej:"
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"Float"
+28		"Opóźnienie dźwięku (ms):"
+31		"Domyślne"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

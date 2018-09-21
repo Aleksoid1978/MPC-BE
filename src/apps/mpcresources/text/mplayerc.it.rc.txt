@@ -238,14 +238,14 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 14		"&Tutto"
 15		"&Nessuno"
 16		"Icone di MPC-BE"
-17		"Menù contestuale di Windows"
-18		"Cartella"
-19		"File"
-20		"Autoplay"
-21		"Video"
-22		"Musica"
-23		"DVD"
-24		"CD Audio"
+17		"Autoplay"
+18		"Video"
+19		"Musica"
+20		"DVD"
+21		"CD Audio"
+22		"Menù contestuale di Windows"
+23		"Cartella"
+24		"File"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
@@ -402,13 +402,13 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"Volume control"
 17		"Controllo volume automatico"
 18		"Boost audio"
-23		"Spostamento audio (ms):"
-26		"Default"
-27		"Formato di output dei campioni:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
+23		"Formato di output dei campioni:"
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"Float"
+28		"Spostamento audio (ms):"
+31		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

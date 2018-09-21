@@ -238,14 +238,14 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 14		"すべて(&L)"
 15		"解除(&N)"
 16		"アイコンの関連付け"
-17		"エクスプローラーのコンテキスト メニュー"
-18		"ディレクトリ"
-19		"ファイル"
-20		"自動再生"
-21		"映像"
-22		"音楽"
-23		"DVD"
-24		"音楽 CD"
+17		"自動再生"
+18		"映像"
+19		"音楽"
+20		"DVD"
+21		"音楽 CD"
+22		"エクスプローラーのコンテキスト メニュー"
+23		"ディレクトリ"
+24		"ファイル"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
@@ -402,13 +402,13 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"音量コントロール"
 17		"自動音量コントロール"
 18		"音声のブースト"
-23		"音声のタイム シフト(ミリ秒):"
-26		"デフォルト"
-27		"出力サンプル形式:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
+23		"出力サンプル形式:"
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"Float"
+28		"音声のタイム シフト(ミリ秒):"
+31		"デフォルト"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

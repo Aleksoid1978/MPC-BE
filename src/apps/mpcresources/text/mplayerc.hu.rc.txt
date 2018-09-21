@@ -238,14 +238,14 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 14		"&Mind"
 15		"&None"
 16		"Ikonokkal"
-17		"Windows Intéző kontextus menü"
-18		"Mappákhoz"
-19		"Fájlokhoz"
-20		"Automatikus lejátszás (csak XP-n)"
-21		"Videó"
-22		"Zene"
-23		"DVD"
-24		"Audió CD"
+17		"Automatikus lejátszás (csak XP-n)"
+18		"Videó"
+19		"Zene"
+20		"DVD"
+21		"Audió CD"
+22		"Windows Intéző kontextus menü"
+23		"Mappákhoz"
+24		"Fájlokhoz"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
@@ -402,13 +402,13 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"Volume control"
 17		"Auto volume control"
 18		"Boost audio"
-23		"Audió időzítés-eltolása:\n(ezredmásodpercben)"
-26		"Default"
-27		"Kimenet minta formátuma:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
+23		"Kimenet minta formátuma:"
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"Float"
+28		"Audió időzítés-eltolása:\n(ezredmásodpercben)"
+31		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

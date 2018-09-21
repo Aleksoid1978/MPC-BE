@@ -238,14 +238,14 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 14		"&Denak"
 15		"&Ezer ez"
 16		"Ikurrekin"
-17		"Explorer Hitzinguru Menua"
-18		"Zuzenbidea"
-19		"Agiria(k)"
-20		"Berez-irakurri"
-21		"Bideoa"
-22		"Musika"
-23		"DVD"
-24		"Audio CD"
+17		"Berez-irakurri"
+18		"Bideoa"
+19		"Musika"
+20		"DVD"
+21		"Audio CD"
+22		"Explorer Hitzinguru Menua"
+23		"Zuzenbidea"
+24		"Agiria(k)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
@@ -402,13 +402,13 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"Bolumen agintea"
 17		"Berez irabazi agintea"
 18		"Audioa bultzada"
-23		"Audio denbora aldaketa (sm):"
-26		"Berezkoa"
-27		"Irteera lagin heuskarria:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Gain"
+23		"Irteera lagin heuskarria:"
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"Gain"
+28		"Audio denbora aldaketa (sm):"
+31		"Berezkoa"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
