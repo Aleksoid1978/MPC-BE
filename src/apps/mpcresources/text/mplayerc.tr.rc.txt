@@ -238,14 +238,14 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 14		"T&ümü"
 15		"&Hiçbiri"
 16		"Özel simgeler kullan"
-17		"Sağ tuş menüsü"
-18		"Klasör"
-19		"Dosya"
-20		"Otomatik oynatma"
-21		"Video"
-22		"Müzik"
-23		"DVD"
-24		"Ses CD'si"
+17		"Otomatik oynatma"
+18		"Video"
+19		"Müzik"
+20		"DVD"
+21		"Ses CD'si"
+22		"Sağ tuş menüsü"
+23		"Klasör"
+24		"Dosya"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
@@ -402,13 +402,13 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"Volume control"
 17		"Oto ses kontrolü"
 18		"Sesi güçlendir"
-23		"Ses zaman kaydırma (ms):"
-26		"Varsayılan"
-27		"Çıktı örnekleme biçimi:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
+23		"Çıktı örnekleme biçimi:"
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"Float"
+28		"Ses zaman kaydırma (ms):"
+31		"Varsayılan"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

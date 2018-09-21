@@ -238,14 +238,14 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 14		"A&lla"
 15		"&None"
 16		"Med ikoner"
-17		"Explorer Kontext Menyn"
-18		"Mapp"
-19		"Fil(er)"
-20		"Spela upp automatiskt"
-21		"Video"
-22		"Musik"
-23		"DVD"
-24		"Ljud CD"
+17		"Spela upp automatiskt"
+18		"Video"
+19		"Musik"
+20		"DVD"
+21		"Ljud CD"
+22		"Explorer Kontext Menyn"
+23		"Mapp"
+24		"Fil(er)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
@@ -402,13 +402,13 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"Volume control"
 17		"Auto volume control"
 18		"Boost audio"
-23		"Ljud tidsförskjutning (ms):"
-26		"Default"
-27		"Output sample format"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
+23		"Output sample format"
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"Float"
+28		"Ljud tidsförskjutning (ms):"
+31		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

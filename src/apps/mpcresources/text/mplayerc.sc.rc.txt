@@ -238,14 +238,14 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 14		"全部(&L)"
 15		"全不(&N)"
 16		"关联图标"
-17		"资源管理器右键菜单"
-18		"目录"
-19		"文件"
-20		"自动播放"
-21		"视频"
-22		"音乐"
-23		"DVD"
-24		"音频 CD"
+17		"自动播放"
+18		"视频"
+19		"音乐"
+20		"DVD"
+21		"音频 CD"
+22		"资源管理器右键菜单"
+23		"目录"
+24		"文件"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
@@ -402,13 +402,13 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"音量控制"
 17		"自动音量控制"
 18		"音频增强"
-23		"音频延迟时间(毫秒): "
-26		"默认值"
-27		"输出采样格式:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"浮点"
+23		"输出采样格式:"
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"浮点"
+28		"音频延迟时间(毫秒): "
+31		"默认值"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

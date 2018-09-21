@@ -238,14 +238,14 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 14		"&Tout"
 15		"&None"
 16		"Utiliser les icônes de MPC-BE"
-17		"Menu contextuel de l'explorateur"
-18		"Répertoires"
-19		"Fichiers"
-20		"Lecture automatique (XP uniquement)"
-21		"Vidéo"
-22		"Musique"
-23		"DVD"
-24		"CD Audio"
+17		"Lecture automatique (XP uniquement)"
+18		"Vidéo"
+19		"Musique"
+20		"DVD"
+21		"CD Audio"
+22		"Menu contextuel de l'explorateur"
+23		"Répertoires"
+24		"Fichiers"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
@@ -402,13 +402,13 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"Volume control"
 17		"Auto volume control"
 18		"Boost audio"
-23		"Décalage audio (en ms) :"
-26		"Default"
-27		"Format de sortie audio :"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
+23		"Format de sortie audio :"
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"Float"
+28		"Décalage audio (en ms) :"
+31		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

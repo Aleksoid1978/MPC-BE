@@ -238,14 +238,14 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 14		"Toat&e"
 15		"&None"
 16		"Cu pictograme"
-17		"Meniu contextual pentru Explorator"
-18		"Directoare"
-19		"Fișier(e)"
-20		"Redare automată"
-21		"Video"
-22		"Muzică"
-23		"DVD"
-24		"CD Audio"
+17		"Redare automată"
+18		"Video"
+19		"Muzică"
+20		"DVD"
+21		"CD Audio"
+22		"Meniu contextual pentru Explorator"
+23		"Directoare"
+24		"Fișier(e)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
@@ -402,13 +402,13 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"Volume control"
 17		"Auto volume control"
 18		"Boost audio"
-23		"Decalare timp audio (ms):"
-26		"Default"
-27		"Format eşantion de ieşire:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
+23		"Format eşantion de ieşire:"
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"Float"
+28		"Decalare timp audio (ms):"
+31		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

@@ -238,14 +238,14 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 14		"&Všetko"
 15		"&None"
 16		"S ikonami"
-17		"Kontextové menu Prieskumníka"
-18		"Priečinok"
-19		"Súbor(y)"
-20		"Autom. prehrávanie (len systém Win XP)"
-21		"Video"
-22		"Hudba"
-23		"DVD"
-24		"Audio CD"
+17		"Autom. prehrávanie (len systém Win XP)"
+18		"Video"
+19		"Hudba"
+20		"DVD"
+21		"Audio CD"
+22		"Kontextové menu Prieskumníka"
+23		"Priečinok"
+24		"Súbor(y)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
@@ -402,13 +402,13 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"Volume control"
 17		"Auto volume control"
 18		"Boost audio"
-23		"Čas. posun zvuku (ms):"
-26		"Default"
-27		"Výstupný vzorkovací formát:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
+23		"Výstupný vzorkovací formát:"
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"Float"
+28		"Čas. posun zvuku (ms):"
+31		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

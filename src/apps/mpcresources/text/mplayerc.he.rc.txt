@@ -238,14 +238,14 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 14		"&הכל"
 15		"&None"
 16		"עם אייקונים"
-17		"תפריט ימני בסייר חלונות"
-18		"תיקייה"
-19		"קובץ/קבצים"
-20		"ניגון אוטומטי"
-21		"וידאו"
-22		"מוזיקה"
-23		"די.וי.די"
-24		"דיסק שמע"
+17		"ניגון אוטומטי"
+18		"וידאו"
+19		"מוזיקה"
+20		"די.וי.די"
+21		"דיסק שמע"
+22		"תפריט ימני בסייר חלונות"
+23		"תיקייה"
+24		"קובץ/קבצים"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
@@ -402,13 +402,13 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"Volume control"
 17		"Auto volume control"
 18		"Boost audio"
-23		"הזזת רצועת השמע (מילישניות):"
-26		"Default"
-27		"פורמט דוגמית פלט:"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
+23		"פורמט דוגמית פלט:"
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"Float"
+28		"הזזת רצועת השמע (מילישניות):"
+31		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30

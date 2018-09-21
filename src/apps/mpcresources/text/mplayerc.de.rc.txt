@@ -238,14 +238,14 @@ BEGIN DIALOGEX IDD_PPAGEFORMATS LINES 25
 14		"A&lle"
 15		"&Nichts"
 16		"Inkl. Icons"
-17		"Explorer-Kontextmenü"
-18		"Verzeichnis"
-19		"Dateien"
-20		"Automatische Wiedergabe"
-21		"Videos"
-22		"Musik"
-23		"DVD/BD"
-24		"Audio-CD"
+17		"Automatische Wiedergabe"
+18		"Videos"
+19		"Musik"
+20		"DVD/BD"
+21		"Audio-CD"
+22		"Explorer-Kontextmenü"
+23		"Verzeichnis"
+24		"Dateien"
 END
 
 BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
@@ -402,13 +402,13 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 14		"Lautstärkeregelung"
 17		"Automatische Verstärkungsregelung"
 18		"Audio verstärken"
-23		"Audioverzögerung (ms):"
-26		"Zurücksetzen"
-27		"Ausgabesampleformat"
-28		"Int16"
-29		"Int24"
-30		"Int32"
-31		"Float"
+23		"Ausgabesampleformat"
+24		"Int16"
+25		"Int24"
+26		"Int32"
+27		"Float"
+28		"Audioverzögerung (ms):"
+31		"Zurücksetzen"
 END
 
 BEGIN DIALOGEX IDD_PPAGESUBRENDERING LINES 30
