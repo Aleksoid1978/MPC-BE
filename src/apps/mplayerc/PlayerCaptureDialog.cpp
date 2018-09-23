@@ -670,7 +670,7 @@ void CPlayerCaptureDialog::UpdateMediaTypes()
 	// fps
 
 	CString fps;
-	m_vidfpsedit.GetWindowTextW(fps);
+	m_vidfpsedit.GetWindowText(fps);
 	if (!fps.IsEmpty()) {
 		float ffps;
 		swscanf_s(fps, L"%f", &ffps);
