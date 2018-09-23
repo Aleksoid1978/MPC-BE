@@ -68,7 +68,7 @@ bool CWebClientSocket::SetCookie(CString name, CString value, __time64_t expire,
 void CWebClientSocket::Clear()
 {
 	m_hdr.Empty();
-	m_hdrlines.RemoveAll();
+	m_hdrlines.clear();
 	m_data.Empty();
 
 	m_cmd.Empty();
@@ -109,8 +109,8 @@ void CWebClientSocket::Header()
 
 	// remember new cookies
 
-	CString value;
-	if (m_hdrlines.Lookup(L"cookie", value)) {
+	if (const auto it = m_hdrlines.find(L"cookie"); it != m_hdrlines.end()) {
+		CString value = (*it).second;
 		CAtlList<CString> sl;
 		Explode(value, sl, L';');
 		POSITION pos = sl.GetHeadPosition();
@@ -134,9 +134,8 @@ void CWebClientSocket::Header()
 	CStringA reshdr, resbody;
 
 	if (m_cmd == L"POST") {
-		CString str;
-		if (m_hdrlines.Lookup(L"content-length", str)) {
-
+		if (const auto it = m_hdrlines.find(L"content-length"); it != m_hdrlines.end()) {
+			CString str = (*it).second;
 			int len = wcstol(str, nullptr, 10);
 			str.Empty();
 
@@ -270,12 +269,7 @@ void CWebClientSocket::Header()
 			Send(resbody, resbody.GetLength());
 		}
 
-		CString connection = L"close";
-		m_hdrlines.Lookup(L"connection", connection);
-
 		Clear();
-
-		// if (connection == L"close")
 		OnClose(0);
 	}
 }
@@ -313,7 +307,7 @@ bool CWebClientSocket::OnCommand(CStringA& hdr, CStringA& body, CStringA& mime)
 {
 	CString arg;
 	if (m_request.Lookup(L"wm_command", arg)) {
-		int id = _wtol(arg);
+		const int id = _wtol(arg);
 
 		if (id > 0) {
 			if (id == ID_FILE_EXIT) {
@@ -348,14 +342,9 @@ bool CWebClientSocket::OnCommand(CStringA& hdr, CStringA& body, CStringA& mime)
 		}
 	}
 
-	CString ref;
-	if (!m_hdrlines.Lookup(L"referer", ref)) {
-		return true;
+	if (const auto it = m_hdrlines.find(L"referer"); it != m_hdrlines.end()) {
+		hdr = "HTTP/1.1 302 Found\r\nLocation: " + CStringA((*it).second) + "\r\n";
 	}
-
-	hdr =
-		"HTTP/1.1 302 Found\r\n"
-		"Location: " + CStringA(ref) + "\r\n";
 
 	return true;
 }

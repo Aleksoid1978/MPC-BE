@@ -419,16 +419,15 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 		CStringA debug;
 		if (AfxGetAppSettings().fWebServerPrintDebugInfo) {
 			debug += "<hr>\r\n";
-			CString key, value;
-			POSITION pos;
-			pos = pClient->m_hdrlines.GetStartPosition();
-			while (pos) {
-				pClient->m_hdrlines.GetNextAssoc(pos, key, value);
+
+			for (const auto& [key, value] : pClient->m_hdrlines) {
 				debug += "HEADER[" + key + "] = " + value + "<br>\r\n";
 			}
 			debug += "cmd: " + pClient->m_cmd + "<br>\r\n";
 			debug += "path: " + pClient->m_path + "<br>\r\n";
 			debug += "ver: " + pClient->m_ver + "<br>\r\n";
+			CString key, value;
+			POSITION pos;
 			pos = pClient->m_get.GetStartPosition();
 			while (pos) {
 				pClient->m_get.GetNextAssoc(pos, key, value);
@@ -466,11 +465,13 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 	if (AfxGetAppSettings().fWebServerUseCompression && !body.IsEmpty()
 		&& hdr.Find("Content-Encoding:") < 0 && ext != ".png" && ext != ".jpg" && ext != ".gif")
 		do {
-			CString accept_encoding;
-			pClient->m_hdrlines.Lookup(L"accept-encoding", accept_encoding);
-			accept_encoding.MakeLower();
 			std::list<CString> sl;
-			ExplodeMin(accept_encoding, sl, ',');
+			CString accept_encoding;
+			if (const auto it = pClient->m_hdrlines.find(L"accept-encoding"); it != pClient->m_hdrlines.end()) {
+				accept_encoding = (*it).second;
+				accept_encoding.MakeLower();
+				ExplodeMin(accept_encoding, sl, ',');
+			}
 			if (std::find(sl.cbegin(), sl.cend(), L"gzip") == sl.cend()) {
 				break;
 			}
@@ -583,7 +584,7 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 
 	CStringA envstr;
 
-	LPVOID lpvEnv = GetEnvironmentStrings();
+	LPVOID lpvEnv = GetEnvironmentStringsW();
 	if (lpvEnv) {
 		CString str;
 
@@ -602,20 +603,18 @@ bool CWebServer::CallCGI(CWebClientSocket* pClient, CStringA& hdr, CStringA& bod
 		env.emplace_back(L"SCRIPT_NAME=" + redir);
 		env.emplace_back(L"QUERY_STRING=" + pClient->m_query);
 
-		if (pClient->m_hdrlines.Lookup(L"content-type", str)) {
-			env.emplace_back(L"CONTENT_TYPE=" + str);
+		if (const auto it = pClient->m_hdrlines.find(L"content-type"); it != pClient->m_hdrlines.end()) {
+			env.emplace_back(L"CONTENT_TYPE=" + (*it).second);
 		}
-		if (pClient->m_hdrlines.Lookup(L"content-length", str)) {
-			env.emplace_back(L"CONTENT_LENGTH=" + str);
+		if (const auto it = pClient->m_hdrlines.find(L"content-length"); it != pClient->m_hdrlines.end()) {
+			env.emplace_back(L"CONTENT_LENGTH=" + (*it).second);
 		}
 
-		POSITION pos = pClient->m_hdrlines.GetStartPosition();
-		while (pos) {
-			CString key = pClient->m_hdrlines.GetKeyAt(pos);
-			CString value = pClient->m_hdrlines.GetNextValue(pos);
-			key.Replace(L"-", L"_");
-			key.MakeUpper();
-			env.emplace_back(L"HTTP_" + key + L"=" + value);
+		for (const auto& [key, value] : pClient->m_hdrlines) {
+			CString Key = key;
+			Key.Replace(L"-", L"_");
+			Key.MakeUpper();
+			env.emplace_back(L"HTTP_" + Key + L"=" + value);
 		}
 
 		CString name;
