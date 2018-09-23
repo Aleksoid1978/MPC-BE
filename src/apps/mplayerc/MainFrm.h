@@ -237,14 +237,14 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CComPtr<IMFVideoProcessor>      m_pMFVP_preview;
 	//
 
-	CComPtr<ICaptureGraphBuilder2>  pCGB;
+	CComPtr<ICaptureGraphBuilder2>  m_pCGB;
 	CStringW                        m_VidDispName, m_AudDispName;
-	CComPtr<IBaseFilter>            pVidCap, pAudCap;
+	CComPtr<IBaseFilter>            m_pVidCap, m_pAudCap;
 	CComPtr<IAMVideoCompression>    pAMVCCap, pAMVCPrev;
 	CComPtr<IAMStreamConfig>        pAMVSCCap, pAMVSCPrev, pAMASC;
 	CComPtr<IAMCrossbar>            pAMXBar;
 	CComPtr<IAMTVTuner>             pAMTuner;
-	CComPtr<IAMDroppedFrames>       pAMDF;
+	CComPtr<IAMDroppedFrames>       m_pAMDF;
 
 	CComPtr<IVMRMixerControl9>      m_pVMRMC9;
 	CComPtr<IMFVideoDisplayControl> m_pMFVDC;

@@ -133,30 +133,6 @@ public:
 	}
 };
 
-//
-
-#define SaveMediaState \
-	OAFilterState __fs = GetMediaState(); \
- \
-	REFERENCE_TIME __rt = 0; \
-	if (m_eMediaLoadState == MLS_LOADED) __rt = GetPos(); \
- \
-	if (__fs != State_Stopped) \
-		SendMessageW(WM_COMMAND, ID_PLAY_STOP); \
-
-
-#define RestoreMediaState \
-	if (m_eMediaLoadState == MLS_LOADED) \
-	{ \
-		SeekTo(__rt); \
- \
-		if (__fs == State_Stopped) \
-			SendMessageW(WM_COMMAND, ID_PLAY_STOP); \
-		else if (__fs == State_Paused) \
-			SendMessageW(WM_COMMAND, ID_PLAY_PAUSE); \
-		else if (__fs == State_Running) \
-			SendMessageW(WM_COMMAND, ID_PLAY_PLAY); \
-	} \
 
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame
@@ -2975,7 +2951,7 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 			case EC_DEVICE_LOST:
 				if (GetPlaybackMode() == PM_CAPTURE && evParam2 == 0) {
 					CComQIPtr<IBaseFilter> pBF = (IUnknown*)evParam1;
-					if (!pVidCap && pVidCap == pBF || !pAudCap && pAudCap == pBF) {
+					if (!m_pVidCap && m_pVidCap == pBF || !m_pAudCap && m_pAudCap == pBF) {
 						SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 					}
 				}
@@ -12219,57 +12195,57 @@ CString CMainFrame::OpenCapture(OpenDeviceData* pODD)
 		return ResStr(IDS_MAINFRM_98);
 	}
 
-	pCGB = nullptr;
-	pVidCap = nullptr;
-	pAudCap = nullptr;
+	m_pCGB = nullptr;
+	m_pVidCap = nullptr;
+	m_pAudCap = nullptr;
 
-	if (FAILED(pCGB.CoCreateInstance(CLSID_CaptureGraphBuilder2))) {
+	if (FAILED(m_pCGB.CoCreateInstance(CLSID_CaptureGraphBuilder2))) {
 		return ResStr(IDS_MAINFRM_99);
 	}
 
 	HRESULT hr;
 
-	pCGB->SetFiltergraph(m_pGB);
+	m_pCGB->SetFiltergraph(m_pGB);
 
 	if (pVidCapTmp) {
 		if (FAILED(hr = m_pGB->AddFilter(pVidCapTmp, vidfrname))) {
 			return ResStr(IDS_CAPTURE_ERROR_VID_FILTER);
 		}
 
-		pVidCap = pVidCapTmp;
+		m_pVidCap = pVidCapTmp;
 
 		if (!pAudCapTmp) {
-			if (FAILED(pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Interleaved, pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCCap))
-					&& FAILED(pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCCap))) {
+			if (FAILED(m_pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Interleaved, m_pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCCap))
+					&& FAILED(m_pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, m_pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCCap))) {
 				DLog(L"Warning: No IAMStreamConfig interface for vidcap capture");
 			}
 
-			if (FAILED(pCGB->FindInterface(&PIN_CATEGORY_PREVIEW, &MEDIATYPE_Interleaved, pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCPrev))
-					&& FAILED(pCGB->FindInterface(&PIN_CATEGORY_PREVIEW, &MEDIATYPE_Video, pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCPrev))) {
+			if (FAILED(m_pCGB->FindInterface(&PIN_CATEGORY_PREVIEW, &MEDIATYPE_Interleaved, m_pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCPrev))
+					&& FAILED(m_pCGB->FindInterface(&PIN_CATEGORY_PREVIEW, &MEDIATYPE_Video, m_pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCPrev))) {
 				DLog(L"Warning: No IAMStreamConfig interface for vidcap capture");
 			}
 
-			if (FAILED(pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Audio, pVidCap, IID_IAMStreamConfig, (void **)&pAMASC))
-					&& FAILED(pCGB->FindInterface(&PIN_CATEGORY_PREVIEW, &MEDIATYPE_Audio, pVidCap, IID_IAMStreamConfig, (void **)&pAMASC))) {
+			if (FAILED(m_pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Audio, m_pVidCap, IID_IAMStreamConfig, (void **)&pAMASC))
+					&& FAILED(m_pCGB->FindInterface(&PIN_CATEGORY_PREVIEW, &MEDIATYPE_Audio, m_pVidCap, IID_IAMStreamConfig, (void **)&pAMASC))) {
 				DLog(L"Warning: No IAMStreamConfig interface for vidcap");
 			} else {
-				pAudCap = pVidCap;
+				m_pAudCap = m_pVidCap;
 			}
 		} else {
-			if (FAILED(pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCCap))) {
+			if (FAILED(m_pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, m_pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCCap))) {
 				DLog(L"Warning: No IAMStreamConfig interface for vidcap capture");
 			}
 
-			if (FAILED(pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCPrev))) {
+			if (FAILED(m_pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, m_pVidCap, IID_IAMStreamConfig, (void **)&pAMVSCPrev))) {
 				DLog(L"Warning: No IAMStreamConfig interface for vidcap capture");
 			}
 		}
 
-		if (FAILED(pCGB->FindInterface(&LOOK_UPSTREAM_ONLY, nullptr, pVidCap, IID_IAMCrossbar, (void**)&pAMXBar))) {
+		if (FAILED(m_pCGB->FindInterface(&LOOK_UPSTREAM_ONLY, nullptr, m_pVidCap, IID_IAMCrossbar, (void**)&pAMXBar))) {
 			DLog(L"Warning: No IAMCrossbar interface was found");
 		}
 
-		if (FAILED(pCGB->FindInterface(&LOOK_UPSTREAM_ONLY, nullptr, pVidCap, IID_IAMTVTuner, (void**)&pAMTuner))) {
+		if (FAILED(m_pCGB->FindInterface(&LOOK_UPSTREAM_ONLY, nullptr, m_pVidCap, IID_IAMTVTuner, (void**)&pAMTuner))) {
 			DLog(L"Warning: No IAMTVTuner interface was found");
 		}
 
@@ -12299,10 +12275,10 @@ CString CMainFrame::OpenCapture(OpenDeviceData* pODD)
 			return ResStr(IDS_CAPTURE_ERROR_AUD_FILTER);
 		}
 
-		pAudCap = pAudCapTmp;
+		m_pAudCap = pAudCapTmp;
 
-		if (FAILED(pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Audio, pAudCap, IID_IAMStreamConfig, (void **)&pAMASC))
-				&& FAILED(pCGB->FindInterface(&PIN_CATEGORY_PREVIEW, &MEDIATYPE_Audio, pAudCap, IID_IAMStreamConfig, (void **)&pAMASC))) {
+		if (FAILED(m_pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Audio, m_pAudCap, IID_IAMStreamConfig, (void **)&pAMASC))
+				&& FAILED(m_pCGB->FindInterface(&PIN_CATEGORY_PREVIEW, &MEDIATYPE_Audio, m_pAudCap, IID_IAMStreamConfig, (void **)&pAMASC))) {
 			DLog(L"Warning: No IAMStreamConfig interface for vidcap");
 		}
 		/*
@@ -12326,7 +12302,7 @@ CString CMainFrame::OpenCapture(OpenDeviceData* pODD)
 		*/
 	}
 
-	if (!(pVidCap || pAudCap)) {
+	if (!(m_pVidCap || m_pAudCap)) {
 		return ResStr(IDS_MAINFRM_108);
 	}
 
@@ -12509,8 +12485,8 @@ void CMainFrame::OpenSetupToolBar()
 void CMainFrame::OpenSetupCaptureBar()
 {
 	if (GetPlaybackMode() == PM_CAPTURE) {
-		if (pVidCap && pAMVSCCap) {
-			CComQIPtr<IAMVfwCaptureDialogs> pVfwCD = pVidCap;
+		if (m_pVidCap && pAMVSCCap) {
+			CComQIPtr<IAMVfwCaptureDialogs> pVfwCD = m_pVidCap;
 
 			if (!pAMXBar && pVfwCD) {
 				m_wndCaptureBar.m_capdlg.SetupVideoControls(m_VidDispName, pAMVSCCap, pVfwCD);
@@ -12519,10 +12495,10 @@ void CMainFrame::OpenSetupCaptureBar()
 			}
 		}
 
-		if (pAudCap && pAMASC) {
+		if (m_pAudCap && pAMASC) {
 			CInterfaceArray<IAMAudioInputMixer> pAMAIM;
 
-			BeginEnumPins(pAudCap, pEP, pPin) {
+			BeginEnumPins(m_pAudCap, pEP, pPin) {
 				if (CComQIPtr<IAMAudioInputMixer> pAIM = pPin) {
 					pAMAIM.Add(pAIM);
 				}
@@ -13803,16 +13779,16 @@ void CMainFrame::CloseMediaPrivate()
 	m_pSyncClock.Release();
 
 	pAMXBar.Release();
-	pAMDF.Release();
+	m_pAMDF.Release();
 	pAMVCCap.Release();
 	pAMVCPrev.Release();
 	pAMVSCCap.Release();
 	pAMVSCPrev.Release();
 	pAMASC.Release();
-	pVidCap.Release();
-	pAudCap.Release();
+	m_pVidCap.Release();
+	m_pAudCap.Release();
 	pAMTuner.Release();
-	pCGB.Release();
+	m_pCGB.Release();
 
 	m_pDVDC.Release();
 	m_pDVDI.Release();
@@ -16114,7 +16090,7 @@ void CMainFrame::CleanGraph()
 
 		// some capture filters forget to set AM_FILTER_MISC_FLAGS_IS_SOURCE
 		// or to implement the IAMFilterMiscFlags interface
-		if (pBF == pVidCap || pBF == pAudCap) {
+		if (pBF == m_pVidCap || pBF == m_pAudCap) {
 			continue;
 		}
 
@@ -16260,16 +16236,16 @@ bool CMainFrame::BuildToCapturePreviewPin(
 	if (pVidCap) {
 		CComPtr<IPin> pPin;
 		if (!pAudCap // only look for interleaved stream when we don't use any other audio capture source
-				&& SUCCEEDED(pCGB->FindPin(pVidCap, PINDIR_OUTPUT, &PIN_CATEGORY_CAPTURE, &MEDIATYPE_Interleaved, TRUE, 0, &pPin))) {
+				&& SUCCEEDED(m_pCGB->FindPin(pVidCap, PINDIR_OUTPUT, &PIN_CATEGORY_CAPTURE, &MEDIATYPE_Interleaved, TRUE, 0, &pPin))) {
 			CComPtr<IBaseFilter> pDVSplitter;
 			hr = pDVSplitter.CoCreateInstance(CLSID_DVSplitter);
 			hr = m_pGB->AddFilter(pDVSplitter, L"DV Splitter");
 
-			hr = pCGB->RenderStream(nullptr, &MEDIATYPE_Interleaved, pPin, nullptr, pDVSplitter);
+			hr = m_pCGB->RenderStream(nullptr, &MEDIATYPE_Interleaved, pPin, nullptr, pDVSplitter);
 
 			pPin = nullptr;
-			hr = pCGB->FindPin(pDVSplitter, PINDIR_OUTPUT, nullptr, &MEDIATYPE_Video, TRUE, 0, &pPin);
-			hr = pCGB->FindPin(pDVSplitter, PINDIR_OUTPUT, nullptr, &MEDIATYPE_Audio, TRUE, 0, &pDVAudPin);
+			hr = m_pCGB->FindPin(pDVSplitter, PINDIR_OUTPUT, nullptr, &MEDIATYPE_Video, TRUE, 0, &pPin);
+			hr = m_pCGB->FindPin(pDVSplitter, PINDIR_OUTPUT, nullptr, &MEDIATYPE_Audio, TRUE, 0, &pDVAudPin);
 
 			CComPtr<IBaseFilter> pDVDec;
 			hr = pDVDec.CoCreateInstance(CLSID_DVVideoCodec);
@@ -16278,8 +16254,8 @@ bool CMainFrame::BuildToCapturePreviewPin(
 			hr = m_pGB->ConnectFilter(pPin, pDVDec);
 
 			pPin = nullptr;
-			hr = pCGB->FindPin(pDVDec, PINDIR_OUTPUT, nullptr, &MEDIATYPE_Video, TRUE, 0, &pPin);
-		} else if (FAILED(pCGB->FindPin(pVidCap, PINDIR_OUTPUT, &PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, TRUE, 0, &pPin))) {
+			hr = m_pCGB->FindPin(pDVDec, PINDIR_OUTPUT, nullptr, &MEDIATYPE_Video, TRUE, 0, &pPin);
+		} else if (FAILED(m_pCGB->FindPin(pVidCap, PINDIR_OUTPUT, &PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, TRUE, 0, &pPin))) {
 			MessageBoxW(ResStr(IDS_CAPTURE_ERROR_VID_CAPT_PIN), ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
 			return false;
 		}
@@ -16298,7 +16274,7 @@ bool CMainFrame::BuildToCapturePreviewPin(
 		CComPtr<IPin> pPin;
 		if (pDVAudPin) {
 			pPin = pDVAudPin;
-		} else if (FAILED(pCGB->FindPin(pAudCap, PINDIR_OUTPUT, &PIN_CATEGORY_CAPTURE, &MEDIATYPE_Audio, TRUE, 0, &pPin))) {
+		} else if (FAILED(m_pCGB->FindPin(pAudCap, PINDIR_OUTPUT, &PIN_CATEGORY_CAPTURE, &MEDIATYPE_Audio, TRUE, 0, &pPin))) {
 			MessageBoxW(ResStr(IDS_CAPTURE_ERROR_AUD_CAPT_PIN), ResStr(IDS_CAPTURE_ERROR), MB_ICONERROR | MB_OK);
 			return false;
 		}
@@ -16318,16 +16294,20 @@ bool CMainFrame::BuildToCapturePreviewPin(
 
 bool CMainFrame::BuildGraphVideoAudio(int fVPreview, bool fVCapture, int fAPreview, bool fACapture)
 {
-	if (!pCGB) {
+	if (!m_pCGB) {
 		return false;
 	}
 
-	SaveMediaState;
+	OAFilterState fs = GetMediaState();
+
+	if (fs != State_Stopped) {
+		SendMessageW(WM_COMMAND, ID_PLAY_STOP);
+	}
 
 	HRESULT hr;
 
-	m_pGB->NukeDownstream(pVidCap);
-	m_pGB->NukeDownstream(pAudCap);
+	m_pGB->NukeDownstream(m_pVidCap);
+	m_pGB->NukeDownstream(m_pAudCap);
 
 	CleanGraph();
 
@@ -16353,18 +16333,18 @@ bool CMainFrame::BuildGraphVideoAudio(int fVPreview, bool fVCapture, int fAPrevi
 	bool fFileOutput = (pMux && pDst) || (pAudMux && pAudDst);
 	bool fCapture = (fVCapture || fACapture);
 
-	if (pAudCap) {
+	if (m_pAudCap) {
 		AM_MEDIA_TYPE* pmt = &m_wndCaptureBar.m_capdlg.m_mta;
 		int ms = (fACapture && fFileOutput && m_wndCaptureBar.m_capdlg.m_fAudOutput) ? AUDIOBUFFERLEN : 60;
 		if (pMux != pAudMux && fACapture) {
-			SetLatency(pAudCap, -1);
+			SetLatency(m_pAudCap, -1);
 		} else if (pmt->pbFormat) {
-			SetLatency(pAudCap, ((WAVEFORMATEX*)pmt->pbFormat)->nAvgBytesPerSec * ms / 1000);
+			SetLatency(m_pAudCap, ((WAVEFORMATEX*)pmt->pbFormat)->nAvgBytesPerSec * ms / 1000);
 		}
 	}
 
 	CComPtr<IPin> pVidCapPin, pVidPrevPin, pAudCapPin, pAudPrevPin;
-	BuildToCapturePreviewPin(pVidCap, &pVidCapPin, &pVidPrevPin, pAudCap, &pAudCapPin, &pAudPrevPin);
+	BuildToCapturePreviewPin(m_pVidCap, &pVidCapPin, &pVidPrevPin, m_pAudCap, &pAudCapPin, &pAudPrevPin);
 
 	//if (pVidCap)
 	{
@@ -16377,9 +16357,52 @@ bool CMainFrame::BuildGraphVideoAudio(int fVPreview, bool fVCapture, int fAPrevi
 		}
 
 		if (fVidPrev) {
-			m_pCAP = nullptr;
+			CComPtr<IVMRMixerBitmap9>    pVMB;
+			CComPtr<IMFVideoMixerBitmap> pMFVMB;
+			CComPtr<IMadVRTextOsd>       pMVTO;
+
+			m_pMVRS.Release();
+			m_pMVRSR.Release();
+
+			m_OSD.Stop();
+			m_pCAP.Release();
+			m_pVMRWC.Release();
+			m_pVMRMC9.Release();
+			m_pMFVP.Release();
+			m_pMFVDC.Release();
+			m_pQP.Release();
+
 			m_pGB->Render(pVidPrevPin);
+
 			m_pGB->FindInterface(IID_PPV_ARGS(&m_pCAP), TRUE);
+			m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRWC), FALSE);
+			m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRMC9), TRUE);
+			m_pGB->FindInterface(IID_PPV_ARGS(&pVMB), TRUE);
+			m_pGB->FindInterface(IID_PPV_ARGS(&pMFVMB), TRUE);
+			m_pGB->FindInterface(IID_PPV_ARGS(&m_pMFVDC), TRUE);
+			m_pGB->FindInterface(IID_PPV_ARGS(&m_pMFVP), TRUE);
+			pMVTO = m_pCAP;
+			m_pMVRSR = m_pCAP;
+			m_pMVRS = m_pCAP;
+
+			const CAppSettings& s = AfxGetAppSettings();
+			m_pVideoWnd = &m_wndView;
+
+			if (m_pMFVDC) {
+				m_pMFVDC->SetVideoWindow(m_pVideoWnd->m_hWnd);
+			}
+			else if (m_pVMRWC) {
+				m_pVMRWC->SetVideoClippingWindow(m_pVideoWnd->m_hWnd);
+			}
+
+			if (s.iShowOSD & OSD_ENABLE || s.bShowDebugInfo) {
+				if (pMFVMB) {
+					m_OSD.Start(m_pVideoWnd, pMFVMB);
+				}
+				else if (pMVTO) {
+					m_OSD.Start(m_pVideoWnd, pMVTO);
+				}
+			}
 		}
 
 		if (fVidCap) {
@@ -16388,8 +16411,10 @@ bool CMainFrame::BuildGraphVideoAudio(int fVPreview, bool fVCapture, int fAPrevi
 			UNREFERENCED_PARAMETER(hr);
 		}
 
-		pAMDF = nullptr;
-		pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, pVidCap, IID_IAMDroppedFrames, (void**)&pAMDF);
+		m_pAMDF.Release();
+		if (FAILED(m_pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, m_pVidCap, IID_PPV_ARGS(&m_pAMDF)))) {
+			DLog("Warning: No IAMDroppedFrames interface for vidcap capture");
+		}
 	}
 
 	//if (pAudCap)
@@ -16413,7 +16438,7 @@ bool CMainFrame::BuildGraphVideoAudio(int fVPreview, bool fVCapture, int fAPrevi
 		}
 	}
 
-	if ((pVidCap || pAudCap) && fCapture && fFileOutput) {
+	if ((m_pVidCap || m_pAudCap) && fCapture && fFileOutput) {
 		if (pMux != pDst) {
 			hr = m_pGB->AddFilter(pDst, L"File Writer V/A");
 			hr = m_pGB->ConnectFilter(GetFirstPin(pMux, PINDIR_OUTPUT), pDst);
@@ -16444,23 +16469,31 @@ bool CMainFrame::BuildGraphVideoAudio(int fVPreview, bool fVCapture, int fAPrevi
 	}
 
 	REFERENCE_TIME stop = MAX_TIME;
-	hr = pCGB->ControlStream(&PIN_CATEGORY_CAPTURE, nullptr, nullptr, nullptr, &stop, 0, 0); // stop in the infinite
-
-	CleanGraph();
+	hr = m_pCGB->ControlStream(&PIN_CATEGORY_CAPTURE, nullptr, nullptr, nullptr, &stop, 0, 0); // stop in the infinite
 
 	OpenSetupVideo();
 	OpenSetupAudio();
 	OpenSetupStatsBar();
 	OpenSetupStatusBar();
+	RecalcLayout();
 
-	RestoreMediaState;
+	SetupVMR9ColorControl();
+
+	if (m_eMediaLoadState == MLS_LOADED) {
+		if (fs == State_Running) {
+			SendMessageW(WM_COMMAND, ID_PLAY_PLAY);
+		}
+		else if (fs == State_Paused) {
+			SendMessageW(WM_COMMAND, ID_PLAY_PAUSE);
+		}
+	}
 
 	return true;
 }
 
 bool CMainFrame::StartCapture()
 {
-	if (!pCGB || m_fCapturing) {
+	if (!m_pCGB || m_fCapturing) {
 		return false;
 	}
 
@@ -16490,7 +16523,7 @@ bool CMainFrame::StartCapture()
 
 bool CMainFrame::StopCapture()
 {
-	if (!pCGB || !m_fCapturing) {
+	if (!m_pCGB || !m_fCapturing) {
 		return false;
 	}
 
@@ -18344,11 +18377,11 @@ CString CMainFrame::FillMessage()
 	} else if (m_fCapturing) {
 		msg = ResStr(IDS_CONTROLS_CAPTURING);
 
-		if (pAMDF) {
+		if (m_pAMDF) {
 			long lDropped = 0;
-			pAMDF->GetNumDropped(&lDropped);
+			m_pAMDF->GetNumDropped(&lDropped);
 			long lNotDropped = 0;
-			pAMDF->GetNumNotDropped(&lNotDropped);
+			m_pAMDF->GetNumNotDropped(&lNotDropped);
 
 			if ((lDropped + lNotDropped) > 0) {
 				CString str;
@@ -18358,7 +18391,7 @@ CString CMainFrame::FillMessage()
 		}
 
 		CComPtr<IPin> pPin;
-		if (SUCCEEDED(pCGB->FindPin(m_wndCaptureBar.m_capdlg.m_pDst, PINDIR_INPUT, nullptr, nullptr, FALSE, 0, &pPin))) {
+		if (SUCCEEDED(m_pCGB->FindPin(m_wndCaptureBar.m_capdlg.m_pDst, PINDIR_INPUT, nullptr, nullptr, FALSE, 0, &pPin))) {
 			LONGLONG size = 0;
 			if (CComQIPtr<IStream> pStream = pPin) {
 				pStream->Commit(STGC_DEFAULT);
