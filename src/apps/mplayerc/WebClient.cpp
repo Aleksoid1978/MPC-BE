@@ -74,8 +74,8 @@ void CWebClientSocket::Clear()
 	m_cmd.Empty();
 	m_path.Empty();
 	m_ver.Empty();
-	m_get.RemoveAll();
-	m_post.RemoveAll();
+	m_get.clear();
+	m_post.clear();
 	m_cookie.RemoveAll();
 	m_request.RemoveAll();
 }
@@ -207,18 +207,14 @@ void CWebClientSocket::Header()
 
 		// m_request <-- m_get+m_post+m_cookie
 		{
+			for (const auto&[key, value] : m_get) {
+				m_request[key] = value;
+			}
+			for (const auto&[key, value] : m_post) {
+				m_request[key] = value;
+			}
 			CString key, value;
 			POSITION pos;
-			pos = m_get.GetStartPosition();
-			while (pos) {
-				m_get.GetNextAssoc(pos, key, value);
-				m_request[key] = value;
-			}
-			pos = m_post.GetStartPosition();
-			while (pos) {
-				m_post.GetNextAssoc(pos, key, value);
-				m_request[key] = value;
-			}
 			pos = m_cookie.GetStartPosition();
 			while (pos) {
 				m_cookie.GetNextAssoc(pos, key, value);
@@ -418,7 +414,8 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 
 	CString path;
 	CFileStatus fs;
-	if (m_get.Lookup(L"path", path)) {
+	if (auto it = m_get.find(L"path"); it != m_get.end()) {
+		path = (*it).second;
 
 		if (CFileGetStatus(path, fs) && !(fs.m_attribute&CFile::directory)) {
 
@@ -426,8 +423,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 
 			cmdln.AddTail(path);
 
-			CString focus;
-			if (m_get.Lookup(L"focus", focus) && !focus.CompareNoCase(L"no")) {
+			if (it = m_get.find(L"focus"); it != m_get.end() && (*it).second.CompareNoCase(L"no") == 0) {
 				cmdln.AddTail(L"/nofocus");
 			}
 

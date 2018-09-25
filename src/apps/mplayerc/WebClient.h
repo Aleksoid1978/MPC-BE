@@ -55,7 +55,9 @@ public:
 	CString m_cmd, m_path, m_query, m_ver;
 	CStringA m_data;
 	std::map<CString, CString> m_hdrlines;
-	CAtlStringMap<> m_get, m_post, m_cookie;
+	std::map<CString, CString> m_get;
+	std::map<CString, CString> m_post;
+	CAtlStringMap<> m_cookie;
 	CAtlStringMap<> m_request;
 
 	bool OnCommand(CStringA& hdr, CStringA& body, CStringA& mime);
