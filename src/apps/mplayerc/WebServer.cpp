@@ -431,16 +431,10 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 			for (const auto&[key, value] : pClient->m_post) {
 				debug += "POST[" + key + "] = " + value + "<br>\r\n";
 			}
-			CString key, value;
-			POSITION pos;
-			pos = pClient->m_cookie.GetStartPosition();
-			while (pos) {
-				pClient->m_cookie.GetNextAssoc(pos, key, value);
+			for (const auto&[key, value] : pClient->m_cookie) {
 				debug += "COOKIE[" + key + "] = " + value + "<br>\r\n";
 			}
-			pos = pClient->m_request.GetStartPosition();
-			while (pos) {
-				pClient->m_request.GetNextAssoc(pos, key, value);
+			for (const auto&[key, value] : pClient->m_request) {
 				debug += "REQUEST[" + key + "] = " + value + "<br>\r\n";
 			}
 		}
@@ -451,8 +445,8 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 		body.Replace("[controlspath]", "/controls.html");
 		body.Replace("[indexpath]", "/index.html");
 		body.Replace("[path]", CStringA(pClient->m_path));
-		body.Replace("[setposcommand]", CMD_SETPOS);
-		body.Replace("[setvolumecommand]", CMD_SETVOLUME);
+		body.Replace("[setposcommand]", MAKE_STR(CMD_SETPOS));
+		body.Replace("[setvolumecommand]", MAKE_STR(CMD_SETVOLUME));
 		body.Replace("[wmcname]", "wm_command");
 	}
 

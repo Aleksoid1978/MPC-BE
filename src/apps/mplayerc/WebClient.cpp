@@ -44,7 +44,7 @@ bool CWebClientSocket::SetCookie(CString name, CString value, __time64_t expire,
 	}
 
 	if (value.IsEmpty()) {
-		m_cookie.RemoveKey(name);
+		m_cookie.erase(name);
 		return true;
 	}
 
@@ -76,8 +76,8 @@ void CWebClientSocket::Clear()
 	m_ver.Empty();
 	m_get.clear();
 	m_post.clear();
-	m_cookie.RemoveAll();
-	m_request.RemoveAll();
+	m_cookie.clear();
+	m_request.clear();
 }
 
 void CWebClientSocket::Header()
@@ -123,12 +123,13 @@ void CWebClientSocket::Header()
 
 	// start new session
 
-	if (!m_cookie.Lookup(L"MPCSESSIONID", m_sessid)) {
+	if (const auto it = m_cookie.find(L"MPCSESSIONID"); it != m_cookie.end()) {
+		m_sessid = (*it).second;
+		// TODO: load session
+	} else {
 		srand((unsigned int)time(nullptr));
 		m_sessid.Format(L"%08x", rand()*0x12345678);
 		SetCookie(L"MPCSESSIONID", m_sessid);
-	} else {
-		// TODO: load session
 	}
 
 	CStringA reshdr, resbody;
@@ -213,11 +214,7 @@ void CWebClientSocket::Header()
 			for (const auto&[key, value] : m_post) {
 				m_request[key] = value;
 			}
-			CString key, value;
-			POSITION pos;
-			pos = m_cookie.GetStartPosition();
-			while (pos) {
-				m_cookie.GetNextAssoc(pos, key, value);
+			for (const auto&[key, value] : m_cookie) {
 				m_request[key] = value;
 			}
 		}
@@ -230,10 +227,7 @@ void CWebClientSocket::Header()
 	if (!reshdr.IsEmpty()) {
 		// cookies
 		{
-			POSITION pos = m_cookie.GetStartPosition();
-			while (pos) {
-				CString key, value;
-				m_cookie.GetNextAssoc(pos, key, value);
+			for (const auto&[key, value] : m_cookie) {
 				reshdr += "Set-Cookie: " + key + "=" + value;
 				POSITION pos2 = m_cookieattribs.GetStartPosition();
 				while (pos2) {
@@ -301,40 +295,47 @@ void CWebClientSocket::OnClose(int nErrorCode)
 
 bool CWebClientSocket::OnCommand(CStringA& hdr, CStringA& body, CStringA& mime)
 {
-	CString arg;
-	if (m_request.Lookup(L"wm_command", arg)) {
-		const int id = _wtol(arg);
+	if (auto it = m_request.find(L"wm_command"); it != m_request.end()) {
+		const int id = _wtol((*it).second);
 
-		if (id > 0) {
-			if (id == ID_FILE_EXIT) {
-				m_pMainFrame->PostMessageW(WM_COMMAND, id);
-			} else {
-				m_pMainFrame->SendMessageW(WM_COMMAND, id);
-			}
-		} else {
-			if (arg == CMD_SETPOS && m_request.Lookup(L"position", arg)) {
+		switch (id) {
+		case CMD_SETPOS:
+			if (it = m_request.find(L"position"); it != m_request.end()) {
 				int h, m, s, ms = 0;
-				WCHAR c;
-				if (swscanf_s(arg, L"%d%c%d%c%d%c%d", &h, &c, sizeof(WCHAR),
-							   &m, &c, sizeof(WCHAR), &s, &c, sizeof(WCHAR), &ms) >= 5) {
-					REFERENCE_TIME rtPos = 10000i64*(((h*60+m)*60+s)*1000+ms);
+				if (swscanf_s((*it).second, L"%d:%d:%d.%d", &h, &m, &s, &ms) >= 3) {
+					REFERENCE_TIME rtPos = 10000i64*(((h * 60 + m) * 60 + s) * 1000 + ms);
 					m_pMainFrame->SeekTo(rtPos);
 					for (int retries = 20; retries-- > 0; Sleep(50)) {
-						if (abs((int)((rtPos - m_pMainFrame->GetPos())/10000)) < 100) {
+						if (abs((int)((rtPos - m_pMainFrame->GetPos()) / 10000)) < 100) {
 							break;
 						}
 					}
 				}
-			} else if (arg == CMD_SETPOS && m_request.Lookup(L"percent", arg)) {
-				float percent = 0;
-				if (swscanf_s(arg, L"%f", &percent) == 1) {
+			}
+			else if (it = m_request.find(L"percent"); it != m_request.end()) {
+				double percent;
+				if (StrToDouble((*it).second, percent)) {
 					m_pMainFrame->SeekTo((REFERENCE_TIME)(percent / 100 * m_pMainFrame->GetDur()));
 				}
-			} else if (arg == CMD_SETVOLUME && m_request.Lookup(L"volume", arg)) {
-				int volume = wcstol(arg, nullptr, 10);
-				m_pMainFrame->m_wndToolBar.Volume = std::clamp(volume, 0, 100);
-				m_pMainFrame->OnPlayVolume(0);
 			}
+			break;
+		case CMD_SETVOLUME:
+			if (it = m_request.find(L"volume"); it != m_request.end()) {
+				int volume;
+				if (StrToInt32((*it).second, volume)) {
+					m_pMainFrame->m_wndToolBar.Volume = std::clamp(volume, 0, 100);
+					m_pMainFrame->OnPlayVolume(0);
+				}
+			}
+			break;
+		case ID_FILE_EXIT:
+			m_pMainFrame->PostMessageW(WM_COMMAND, id);
+			break;
+		default:
+			if (id > 0) {
+				m_pMainFrame->SendMessageW(WM_COMMAND, id);
+			}
+			break;
 		}
 	}
 
