@@ -372,16 +372,14 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 				mime = "text/html";
 			}
 
-			CString redir;
-			if (pClient->m_get.Lookup(L"redir", redir)
-				|| pClient->m_post.Lookup(L"redir", redir)) {
+			auto it = pClient->m_get.find(L"redir");
+			if (it != pClient->m_get.end() || (it = pClient->m_post.find(L"redir")) != pClient->m_post.end()) {
+				CString redir = (*it).second;
 				if (redir.IsEmpty()) {
 					redir = '/';
 				}
 
-				hdr =
-					"HTTP/1.1 302 Found\r\n"
-					"Location: " + CStringA(redir) + "\r\n";
+				hdr = "HTTP/1.1 302 Found\r\nLocation: " + CStringA(redir) + "\r\n";
 				return;
 			}
 
@@ -426,18 +424,15 @@ void CWebServer::OnRequest(CWebClientSocket* pClient, CStringA& hdr, CStringA& b
 			debug += "cmd: " + pClient->m_cmd + "<br>\r\n";
 			debug += "path: " + pClient->m_path + "<br>\r\n";
 			debug += "ver: " + pClient->m_ver + "<br>\r\n";
-			CString key, value;
-			POSITION pos;
-			pos = pClient->m_get.GetStartPosition();
-			while (pos) {
-				pClient->m_get.GetNextAssoc(pos, key, value);
+
+			for (const auto&[key, value] : pClient->m_get) {
 				debug += "GET[" + key + "] = " + value + "<br>\r\n";
 			}
-			pos = pClient->m_post.GetStartPosition();
-			while (pos) {
-				pClient->m_post.GetNextAssoc(pos, key, value);
+			for (const auto&[key, value] : pClient->m_post) {
 				debug += "POST[" + key + "] = " + value + "<br>\r\n";
 			}
+			CString key, value;
+			POSITION pos;
 			pos = pClient->m_cookie.GetStartPosition();
 			while (pos) {
 				pClient->m_cookie.GetNextAssoc(pos, key, value);
