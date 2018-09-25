@@ -771,7 +771,7 @@ void CMSDKDecoder::Flush()
   m_GOPs.clear();
   memset(&m_PrevOffset, 0, sizeof(m_PrevOffset));
 
-  if (!m_pMediaSideData) {
+  if (!m_pMediaSideData && !m_pFilter->m_bDecodingStart) {
     BeginEnumFilters(m_pFilter->m_pGraph, pEF, pBF) {
       if (CComQIPtr<IMediaSideData> pFilter = pBF) {
         m_pMediaSideData = pFilter;
