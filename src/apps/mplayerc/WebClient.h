@@ -57,8 +57,8 @@ public:
 	std::map<CString, CString> m_hdrlines;
 	std::map<CString, CString> m_get;
 	std::map<CString, CString> m_post;
-	CAtlStringMap<> m_cookie;
-	CAtlStringMap<> m_request;
+	std::map<CString, CString> m_cookie;
+	std::map<CString, CString> m_request;
 
 	bool OnCommand(CStringA& hdr, CStringA& body, CStringA& mime);
 	bool OnIndex(CStringA& hdr, CStringA& body, CStringA& mime);
