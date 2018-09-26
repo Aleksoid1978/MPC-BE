@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "MainFrm.h"
+#include <atlcoll.h>
 #include <zlib/zlib.h>
 #include "../../DSUtil/FileHandle.h"
 #include "WebServer.h"

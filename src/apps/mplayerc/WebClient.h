@@ -25,9 +25,6 @@ class CWebServer;
 
 class CWebClientSocket : public CAsyncSocket
 {
-	template <class T = CString, class S = CString>
-	class CAtlStringMap : public CAtlMap<S, T, CStringElementTraits<S> > {};
-
 	CWebServer* m_pWebServer;
 	CMainFrame* m_pMainFrame;
 
@@ -36,7 +33,7 @@ class CWebClientSocket : public CAsyncSocket
 	struct cookie_attribs {
 		CString path, expire, domain;
 	};
-	CAtlStringMap<cookie_attribs> m_cookieattribs;
+	std::map<CString, cookie_attribs> m_cookieattribs;
 
 	void Clear();
 	void Header();

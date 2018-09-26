@@ -229,19 +229,15 @@ void CWebClientSocket::Header()
 		{
 			for (const auto&[key, value] : m_cookie) {
 				reshdr += "Set-Cookie: " + key + "=" + value;
-				POSITION pos2 = m_cookieattribs.GetStartPosition();
-				while (pos2) {
-					CString key;
-					cookie_attribs value;
-					m_cookieattribs.GetNextAssoc(pos2, key, value);
-					if (!value.path.IsEmpty()) {
-						reshdr += "; path=" + value.path;
+				for (const auto&[cookiekey, cookieattrib] : m_cookieattribs) {
+					if (cookieattrib.path.GetLength()) {
+						reshdr += "; path=" + cookieattrib.path;
 					}
-					if (!value.expire.IsEmpty()) {
-						reshdr += "; expire=" + value.expire;
+					if (cookieattrib.expire.GetLength()) {
+						reshdr += "; expire=" + cookieattrib.expire;
 					}
-					if (!value.domain.IsEmpty()) {
-						reshdr += "; domain=" + value.domain;
+					if (cookieattrib.domain.GetLength()) {
+						reshdr += "; domain=" + cookieattrib.domain;
 					}
 				}
 				reshdr += "\r\n";
