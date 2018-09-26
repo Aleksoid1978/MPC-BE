@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <atlcoll.h>
-
 enum filetype_t {
 	TVideo = 0,
 	TAudio,

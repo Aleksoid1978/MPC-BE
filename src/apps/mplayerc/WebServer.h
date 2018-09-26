@@ -22,7 +22,6 @@
 #pragma once
 
 #include <afxsock.h>
-#include <atlcoll.h>
 #include <atlpath.h>
 
 #define UTF8(str)    WStrToUTF8(str)
