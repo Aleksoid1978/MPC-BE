@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 #include "../../filters/renderer/MpcAudioRenderer/MpcAudioRenderer.h"
-#include "ComPropertyPage.h"
+#include "ComPropertySheet.h"
 #include "PPageAudio.h"
 
 // CPPageAudio dialog

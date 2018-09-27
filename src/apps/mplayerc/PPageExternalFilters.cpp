@@ -24,7 +24,7 @@
 #include <InitGuid.h>
 #include <dmoreg.h>
 #include "PPageExternalFilters.h"
-#include "ComPropertyPage.h"
+#include "ComPropertySheet.h"
 #include "RegFilterChooserDlg.h"
 #include "SelectMediaType.h"
 #include "FGFilter.h"

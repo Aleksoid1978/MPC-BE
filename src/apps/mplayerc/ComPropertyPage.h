@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -46,41 +46,4 @@ public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnDestroy();
 	virtual void OnOK();
-};
-
-// CComPropertySheet
-
-interface IComPropertyPageDirty {
-	virtual void OnSetDirty(bool fDirty) PURE;
-};
-
-class CComPropertySheet : public CPropertySheet, public IComPropertyPageDirty
-{
-	DECLARE_DYNAMIC(CComPropertySheet)
-
-	CComPtr<IPropertyPageSite> m_pSite;
-	CInterfaceList<ISpecifyPropertyPages> m_spp;
-	CAutoPtrList<CComPropertyPage> m_pages;
-	CSize m_size;
-
-public:
-	CComPropertySheet(UINT nIDCaption, CWnd* pParentWnd = nullptr, UINT iSelectPage = 0);
-	CComPropertySheet(LPCTSTR pszCaption, CWnd* pParentWnd = nullptr, UINT iSelectPage = 0);
-	virtual ~CComPropertySheet();
-
-	int AddPages(ISpecifyPropertyPages* pSPP);
-	bool AddPage(IPropertyPage* pPage, IUnknown* pUnk);
-
-	void OnActivated(CPropertyPage* pPage);
-
-	void OnSetDirty(bool fDirty) {
-		if (CPropertyPage* p = GetActivePage()) {
-			p->SetModified(fDirty);
-		}
-	}
-
-	virtual BOOL OnInitDialog();
-
-protected:
-	DECLARE_MESSAGE_MAP()
 };

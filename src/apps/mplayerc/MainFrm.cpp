@@ -68,7 +68,7 @@
 #include "../../filters/filters/InternalPropertyPage.h"
 #include <AllocatorCommon.h>
 #include <SyncAllocatorPresenter.h>
-#include "ComPropertyPage.h"
+#include "ComPropertySheet.h"
 #include "LcdSupport.h"
 #include <IPinHook.h>
 #include <comdef.h>
@@ -12646,7 +12646,7 @@ void CMainFrame::OpenSetupStatusBar()
 						}
 						break;
 					} else if (mt.majortype == MEDIATYPE_Midi) {
-						id = NULL; // need comment for this
+						id = 0;
 						break;
 					}
 				}
