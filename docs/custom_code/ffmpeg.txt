@@ -21,6 +21,7 @@
 * libavcodec/hevcpred.c
 * libavcodec/hevcpred.h
 * libavcodec/internal.h
+* libavcodec/libaomdec.c
 * libavcodec/mpeg4audio.h
 * libavcodec/mpeg12dec.c
 * libavcodec/mpegaudio_parser.c
