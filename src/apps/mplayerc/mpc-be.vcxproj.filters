@@ -366,6 +366,9 @@
     <ClCompile Include="PlayerYouTubeDL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ComPropertySheet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSettings.h">
@@ -723,6 +726,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PlayerYouTubeDL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ComPropertySheet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

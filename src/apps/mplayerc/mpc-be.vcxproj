@@ -91,6 +91,7 @@
     <ClCompile Include="CmdLineHelpDlg.cpp" />
     <ClCompile Include="ColorControl.cpp" />
     <ClCompile Include="ComPropertyPage.cpp" />
+    <ClCompile Include="ComPropertySheet.cpp" />
     <ClCompile Include="Content.cpp" />
     <ClCompile Include="controls\EditWithButton.cpp" />
     <ClCompile Include="controls\FloatEdit.cpp" />
@@ -208,6 +209,7 @@
     <ClInclude Include="CmdLineHelpDlg.h" />
     <ClInclude Include="ColorControl.h" />
     <ClInclude Include="ComPropertyPage.h" />
+    <ClInclude Include="ComPropertySheet.h" />
     <ClInclude Include="Content.h" />
     <ClInclude Include="controls\EditWithButton.h" />
     <ClInclude Include="controls\FloatEdit.h" />

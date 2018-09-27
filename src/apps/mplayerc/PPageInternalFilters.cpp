@@ -21,7 +21,7 @@
 
 #include "stdafx.h"
 #include "PPageInternalFilters.h"
-#include "ComPropertyPage.h"
+#include "ComPropertySheet.h"
 #include "../../filters/filters.h"
 
 
