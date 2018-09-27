@@ -87,22 +87,25 @@ void CWebClientSocket::Header()
 			return;
 		}
 
-		CAtlList<CString> lines;
+		std::list<CString> lines;
 		Explode(m_hdr, lines, L'\n');
-		CString str = lines.RemoveHead();
+		CString str = lines.front();
 
-		CAtlList<CString> sl;
+		std::list<CString> sl;
 		ExplodeMin(str, sl, ' ', 3);
-		m_cmd = sl.RemoveHead().MakeUpper();
-		m_path = sl.RemoveHead();
-		m_ver = sl.RemoveHead().MakeUpper();
-		ASSERT(sl.GetCount() == 0);
+		ASSERT(sl.size() == 3);
+		if (sl.size() == 3) {
+			auto it = sl.begin();
+			m_cmd  = (*it++).MakeUpper();
+			m_path = (*it++);
+			m_ver  = (*it++).MakeUpper();
 
-		POSITION pos = lines.GetHeadPosition();
-		while (pos) {
-			Explode(lines.GetNext(pos), sl, L':', 2);
-			if (sl.GetCount() == 2) {
-				m_hdrlines[sl.GetHead().MakeLower()] = sl.GetTail();
+			lines.pop_front();
+			for (const auto& line : lines) {
+				Explode(line, sl, L':', 2);
+				if (sl.size() == 2) {
+					m_hdrlines[sl.front().MakeLower()] = sl.back();
+				}
 			}
 		}
 	}
@@ -111,13 +114,13 @@ void CWebClientSocket::Header()
 
 	if (const auto it = m_hdrlines.find(L"cookie"); it != m_hdrlines.end()) {
 		CString value = (*it).second;
-		CAtlList<CString> sl;
+		std::list<CString> sl;
 		Explode(value, sl, L';');
-		POSITION pos = sl.GetHeadPosition();
-		while (pos) {
-			CAtlList<CString> sl2;
-			Explode(sl.GetNext(pos), sl2, L'=', 2);
-			m_cookie[sl2.GetHead()] = sl2.GetCount() == 2 ? sl2.GetTail() : L"";
+
+		for (const auto& item : sl) {
+			std::list<CString> sl2;
+			Explode(item, sl2, L'=', 2);
+			m_cookie[sl2.front()] = (sl2.size() == 2) ? sl2.back() : L"";
 		}
 	}
 
@@ -153,16 +156,16 @@ void CWebClientSocket::Header()
 					}
 					str += c;
 					if (c == '\n' || len == 1) {
-						CAtlList<CString> sl;
+						std::list<CString> sl;
 						Explode(str, sl, L'&');
-						POSITION pos = sl.GetHeadPosition();
-						while (pos) {
-							CAtlList<CString> sl2;
-							Explode(sl.GetNext(pos), sl2, L'=', 2);
-							if (sl2.GetCount() == 2) {
-								m_post[sl2.GetHead().MakeLower()] = UTF8ToWStr(UrlDecode(TToA(sl2.GetTail())));
+
+						for (const auto& item : sl) {
+							std::list<CString> sl2;
+							Explode(item, sl2, L'=', 2);
+							if (sl2.size() == 2) {
+								m_post[sl2.front().MakeLower()] = UTF8ToWStr(UrlDecode(TToA(sl2.back())));
 							} else {
-								m_post[sl2.GetHead().MakeLower()] = L"";
+								m_post[sl2.front().MakeLower()] = L"";
 							}
 						}
 						str.Empty();
@@ -192,16 +195,16 @@ void CWebClientSocket::Header()
 				m_query.Truncate(k);
 			}
 
-			CAtlList<CString> sl;
+			std::list<CString> sl;
 			Explode(m_query, sl, L'&');
-			POSITION pos = sl.GetHeadPosition();
-			while (pos) {
-				CAtlList<CString> sl2;
-				Explode(sl.GetNext(pos), sl2, L'=', 2);
-				if (sl2.GetCount() == 2) {
-					m_get[sl2.GetHead()] = UTF8ToWStr(UrlDecode(TToA(sl2.GetTail())));
+
+			for (const auto& item : sl) {
+				std::list<CString> sl2;
+				Explode(item, sl2, L'=', 2);
+				if (sl2.size() == 2) {
+					m_get[sl2.front()] = UTF8ToWStr(UrlDecode(TToA(sl2.back())));
 				} else {
-					m_get[sl2.GetHead()] = L"";
+					m_get[sl2.front()] = L"";
 				}
 			}
 		}
@@ -401,10 +404,10 @@ bool CWebClientSocket::OnInfo(CStringA& hdr, CStringA& body, CStringA& mime)
 
 bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 {
-	CAtlList<CStringA> rootdrives;
+	std::list<CStringA> rootdrives;
 	for (WCHAR drive[] = L"A:"; drive[0] <= 'Z'; drive[0]++)
 		if (GetDriveTypeW(drive) != DRIVE_NO_ROOT_DIR) {
-			rootdrives.AddTail(CStringA(drive) + '\\');
+			rootdrives.emplace_back(CStringA(drive) + '\\');
 		}
 
 	// process GET
@@ -416,31 +419,27 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 
 		if (CFileGetStatus(path, fs) && !(fs.m_attribute&CFile::directory)) {
 
-			CAtlList<CString> cmdln;
+			std::list<CString> cmdln;
 
-			cmdln.AddTail(path);
+			cmdln.emplace_back(path);
 
 			if (it = m_get.find(L"focus"); it != m_get.end() && (*it).second.CompareNoCase(L"no") == 0) {
-				cmdln.AddTail(L"/nofocus");
+				cmdln.emplace_back(L"/nofocus");
 			}
 
 			int len = 0;
 
-			POSITION pos = cmdln.GetHeadPosition();
-			while (pos) {
-				CString& str = cmdln.GetNext(pos);
+			for (const auto& str : cmdln) {
 				len += (str.GetLength()+1)*sizeof(WCHAR);
 			}
 
 			CAutoVectorPtr<BYTE> buff;
 			if (buff.Allocate(4+len)) {
 				BYTE* p = buff;
-				*(DWORD*)p = cmdln.GetCount();
+				*(DWORD*)p = cmdln.size();
 				p += sizeof(DWORD);
 
-				POSITION pos = cmdln.GetHeadPosition();
-				while (pos) {
-					CString& str = cmdln.GetNext(pos);
+				for (const auto& str : cmdln) {
 					len = (str.GetLength()+1)*sizeof(WCHAR);
 					memcpy(p, (LPCTSTR)str, len);
 					p += len;
@@ -482,10 +481,7 @@ bool CWebClientSocket::OnBrowser(CStringA& hdr, CStringA& body, CStringA& mime)
 	CStringA files;
 
 	if (path.IsEmpty()) {
-		POSITION pos = rootdrives.GetHeadPosition();
-		while (pos) {
-			CStringA& drive = rootdrives.GetNext(pos);
-
+		for (const auto& drive : rootdrives) {
 			files += "<tr class=\"dir\">\r\n";
 			files +=
 				"<td class=\"dirname\"><a href=\"[path]?path=" + UrlEncode(drive) + "\">" + drive + "</a></td>"
