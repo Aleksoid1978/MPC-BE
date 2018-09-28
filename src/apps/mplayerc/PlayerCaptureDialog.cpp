@@ -523,7 +523,6 @@ static int ShowPPage(std::vector<Codec>& codecs, CComboBox& box, HWND hWnd = nul
 CPlayerCaptureDialog::CPlayerCaptureDialog(CMainFrame* pMainFrame)
 	: CResizableDialog(CPlayerCaptureDialog::IDD, nullptr)
 	, m_pMainFrame(pMainFrame)
-	, m_fEnableOgm(false)
 	, m_vidfps(0)
 	, m_file(L"")
 	, m_fVidOutput(TRUE)
@@ -864,10 +863,8 @@ void CPlayerCaptureDialog::UpdateMuxer()
 	if (m_muxtype == 0) {
 		m_pMux.CoCreateInstance(CLSID_AviDest);
 	} else if (m_muxtype == 1) {
-		m_pMux.CoCreateInstance(CLSID_OggMux);
-	} else if (m_muxtype == 2) {
 		m_pMux = DNew CMatroskaMuxerFilter(nullptr, &hr);
-	} else if (m_muxtype == 3) {
+	} else if (m_muxtype == 2) {
 		m_pMux = DNew CDSMMuxerFilter(nullptr, &hr);
 	} else {
 		return;
@@ -1305,7 +1302,6 @@ BOOL CPlayerCaptureDialog::OnInitDialog()
 	InitCodecList(m_pAudEncArray, m_audcodec, CLSID_AudioCompressorCategory);
 	UpdateAudioCodec();
 
-	m_fEnableOgm = IsCLSIDRegistered(CLSID_OggMux);
 	CMPlayerCApp* pApp = AfxGetMyApp();
 
 	m_nVidBuffers = pApp->GetProfileInt(IDS_R_CAPTURE, L"VidBuffers", 50);
@@ -1319,7 +1315,6 @@ BOOL CPlayerCaptureDialog::OnInitDialog()
 	m_fSepAudio   = pApp->GetProfileInt(IDS_R_CAPTURE, L"SepAudio", TRUE);
 
 	m_muxctrl.AddString(L"AVI");
-	m_muxctrl.AddString(L"Ogg Media");
 	m_muxctrl.AddString(L"Matroska");
 	m_muxctrl.AddString(L"DirectShow Media");
 
@@ -1545,20 +1540,16 @@ void CPlayerCaptureDialog::OnOpenFile()
 		CString ext = str.Mid(str.ReverseFind('.')+1).MakeLower();
 		if (ext == L"avi") {
 			m_muxtype = 0;
-		} else if (ext == L"ogm") {
-			m_muxtype = 1;
 		} else if (ext == L"mkv") {
-			m_muxtype = 2;
+			m_muxtype = 1;
 		} else if (ext == L"dsm") {
-			m_muxtype = 3;
+			m_muxtype = 2;
 		} else {
 			if (m_muxtype == 0) {
 				str += L".avi";
 			} else if (m_muxtype == 1) {
-				str += L".ogm";
-			} else if (m_muxtype == 2) {
 				str += L".mkv";
-			} else if (m_muxtype == 3) {
+			} else if (m_muxtype == 2) {
 				str += L".dsm";
 			}
 		}
@@ -1615,13 +1606,13 @@ void CPlayerCaptureDialog::OnRecord()
 			}
 		}
 
-		m_pVidBuffer = m_fVidOutput && m_nVidBuffers > 0 && m_muxtype != 2 && m_muxtype != 3 ? DNew CBufferFilter(nullptr, nullptr) : nullptr;
+		m_pVidBuffer = m_fVidOutput && m_nVidBuffers > 0 && m_muxtype == 0 ? DNew CBufferFilter(nullptr, nullptr) : nullptr;
 		if (CComQIPtr<IBufferFilter> pVB = m_pVidBuffer) {
 			pVB->SetBuffers(m_nVidBuffers);
 			pVB->SetPriority(THREAD_PRIORITY_NORMAL);
 		}
 
-		m_pAudBuffer = m_fAudOutput && m_nAudBuffers > 0 && m_muxtype != 2 && m_muxtype != 3 ? DNew CBufferFilter(nullptr, nullptr) : nullptr;
+		m_pAudBuffer = m_fAudOutput && m_nAudBuffers > 0 && m_muxtype == 0 ? DNew CBufferFilter(nullptr, nullptr) : nullptr;
 		if (CComQIPtr<IBufferFilter> pAB = m_pAudBuffer) {
 			pAB->SetBuffers(m_nAudBuffers);
 			pAB->SetPriority(THREAD_PRIORITY_ABOVE_NORMAL);
@@ -1700,18 +1691,14 @@ void CPlayerCaptureDialog::OnChangeFileType()
 
 	if (m_muxtype == 0 && ext != L"avi") {
 		m_file = m_file.Left(m_file.GetLength()-4) + L".avi";
-	} else if (m_muxtype == 1 && ext != L"ogm") {
-		m_file = m_file.Left(m_file.GetLength()-4) + L".ogm";
-	} else if (m_muxtype == 2 && ext != L"mkv") {
+	} else if (m_muxtype == 1 && ext != L"mkv") {
 		m_file = m_file.Left(m_file.GetLength()-4) + L".mkv";
-	} else if (m_muxtype == 3 && ext != L"dsm") {
+	} else if (m_muxtype == 2 && ext != L"dsm") {
 		m_file = m_file.Left(m_file.GetLength()-4) + L".dsm";
 	}
 
 	UpdateData(FALSE);
 
-	GetDlgItem(IDC_EDIT5)->EnableWindow(m_muxtype != 2 && m_muxtype != 3);
-	GetDlgItem(IDC_EDIT6)->EnableWindow(m_muxtype != 2 && m_muxtype != 3);
-
-	m_recordbtn.EnableWindow(m_muxtype != 1 || m_fEnableOgm);
+	GetDlgItem(IDC_EDIT5)->EnableWindow(m_muxtype == 0);
+	GetDlgItem(IDC_EDIT6)->EnableWindow(m_muxtype == 0);
 }
