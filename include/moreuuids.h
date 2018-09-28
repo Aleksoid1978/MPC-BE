@@ -1676,10 +1676,6 @@ MPC_GUID_ENTRY(MEDIASUBTYPE_AV01,
 ////////////////////////////////////////////////////////////////////////////////////////
 // CLSID of some filters
 
-// {8CAE96B7-85B1-4605-B23C-17FF5262B296}
-MPC_GUID_ENTRY(CLSID_OggMux,
-			0x8cae96b7, 0x85b1, 0x4605, 0xb2, 0x3c, 0x17, 0xff, 0x52, 0x62, 0xb2, 0x96)
-
 // sources and splitters
 // {6B6D0800-9ADA-11d0-A520-00A0D10129C0}
 MPC_GUID_ENTRY(CLSID_NetShowSource,

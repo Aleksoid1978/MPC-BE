@@ -380,7 +380,6 @@ private:
 	BOOL m_fSepAudio;
 	int m_muxtype;
 	CComboBox m_muxctrl;
-	bool m_fEnableOgm;
 
 	// video input
 	CStringW m_VidDisplayName;
