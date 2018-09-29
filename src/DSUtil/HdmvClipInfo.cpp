@@ -22,6 +22,7 @@
 #include "HdmvClipInfo.h"
 #include "DSUtil.h"
 #include "GolombBuffer.h"
+#include <sys\stat.h>
 
 extern LCID	ISO6392ToLcid(LPCSTR code);
 
@@ -986,16 +987,25 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile
 		REFERENCE_TIME rtMax = 0;
 		REFERENCE_TIME rtCurrent;
 		CString        strCurrentPlaylist;
+		__int64        MPLSSizeMax = 0;
 		do {
 			strCurrentPlaylist = strPath + L"\\PLAYLIST\\" + fd.cFileName;
 			Playlist.clear();
 
 			// Main movie shouldn't have duplicate M2TS filename ...
 			if (ReadPlaylist(strCurrentPlaylist, rtCurrent, Playlist) == S_OK) {
-				if (rtCurrent > rtMax) {
+				__int64 MPLSSizeCurrent = 0;
+				struct __stat64 fileStat = {};
+				if (_wstat64(strCurrentPlaylist.GetString(), &fileStat) == 0) {
+					MPLSSizeCurrent = fileStat.st_size;
+				}
+
+				if (rtCurrent > rtMax
+						|| (rtCurrent == rtMax && MPLSSizeCurrent > MPLSSizeMax)) {
 					rtMax			= rtCurrent;
+					MPLSSizeMax     = MPLSSizeCurrent;
+					MainPlaylist    = Playlist;
 					strPlaylistFile = strCurrentPlaylist;
-					MainPlaylist = Playlist;
 					hr = S_OK;
 				}
 
@@ -1024,8 +1034,8 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile
 
 					PlaylistItem Item;
 					Item.m_strFileName = strCurrentPlaylist;
-					Item.m_rtIn        = 0;
 					Item.m_rtOut       = rtCurrent;
+					Item.m_SizeOut     = MPLSSizeCurrent;
 					Playlists.emplace_back(Item);
 
 					PlaylistArray.emplace_back(Playlist);
@@ -1041,7 +1051,7 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile
 	}
 
 	std::sort(Playlists.begin(), Playlists.end(), [](const PlaylistItem& a, const PlaylistItem& b) {
-		return (a.Duration() > b.Duration());
+		return (a.Duration() > b.Duration() || (a.Duration() == b.Duration() && a.Size() > b.Size()));
 	});
 
 	return hr;
