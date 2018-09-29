@@ -143,7 +143,11 @@ public:
 		REFERENCE_TIME   m_rtDuration  = 0;
 	};
 
-	typedef std::vector<PlaylistItem> CPlaylist;
+	class CPlaylist : public std::vector<PlaylistItem> {
+	public:
+		__int64 m_mpls_size = 0;
+	};
+
 	typedef std::vector<PlaylistChapter> CPlaylistChapter;
 
 	CHdmvClipInfo();

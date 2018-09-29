@@ -574,6 +574,10 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			return CloseFile(VFW_E_INVALID_FILE_FORMAT);
 		}
 
+		LARGE_INTEGER size = {};
+		GetFileSizeEx(m_hFile, &size);
+		Playlist.m_mpls_size = size.QuadPart;
+
 		DLog(L"CHdmvClipInfo::ReadPlaylist() : '%s'", strPlaylistFile);
 
 		LONGLONG playlistPos = 0;
@@ -987,23 +991,17 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile
 		REFERENCE_TIME rtMax = 0;
 		REFERENCE_TIME rtCurrent;
 		CString        strCurrentPlaylist;
-		__int64        MPLSSizeMax = 0;
+		__int64        mpls_size_max = 0;
 		do {
 			strCurrentPlaylist = strPath + L"\\PLAYLIST\\" + fd.cFileName;
 			Playlist.clear();
 
 			// Main movie shouldn't have duplicate M2TS filename ...
 			if (ReadPlaylist(strCurrentPlaylist, rtCurrent, Playlist) == S_OK) {
-				__int64 MPLSSizeCurrent = 0;
-				struct __stat64 fileStat = {};
-				if (_wstat64(strCurrentPlaylist.GetString(), &fileStat) == 0) {
-					MPLSSizeCurrent = fileStat.st_size;
-				}
-
 				if (rtCurrent > rtMax
-						|| (rtCurrent == rtMax && MPLSSizeCurrent > MPLSSizeMax)) {
+						|| (rtCurrent == rtMax && Playlist.m_mpls_size > mpls_size_max)) {
 					rtMax			= rtCurrent;
-					MPLSSizeMax     = MPLSSizeCurrent;
+					mpls_size_max   = Playlist.m_mpls_size;
 					MainPlaylist    = Playlist;
 					strPlaylistFile = strCurrentPlaylist;
 					hr = S_OK;
@@ -1026,6 +1024,10 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile
 
 								duplicate = false;
 							}
+
+							if (duplicate) {
+								duplicate = (item.m_mpls_size == Playlist.m_mpls_size);
+							}
 						}
 					}
 					if (duplicate) {
@@ -1035,7 +1037,7 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile
 					PlaylistItem Item;
 					Item.m_strFileName = strCurrentPlaylist;
 					Item.m_rtOut       = rtCurrent;
-					Item.m_SizeOut     = MPLSSizeCurrent;
+					Item.m_SizeOut     = Playlist.m_mpls_size;
 					Playlists.emplace_back(Item);
 
 					PlaylistArray.emplace_back(Playlist);
