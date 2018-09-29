@@ -826,8 +826,8 @@ protected:  // control bar embedded members
 	void OnDragLeave();
 	DROPEFFECT OnDragScroll(DWORD dwKeyState, CPoint point);
 
-	const UINT CF_URLA = RegisterClipboardFormat(CFSTR_INETURLA);
-	const UINT CF_URLW = RegisterClipboardFormat(CFSTR_INETURLW);
+	const UINT CF_URLA = RegisterClipboardFormatW(CFSTR_INETURLA);
+	const UINT CF_URLW = RegisterClipboardFormatW(CFSTR_INETURLW);
 	void DropFiles(std::list<CString>& slFiles);
 
 	LPCTSTR GetRecentFile();
