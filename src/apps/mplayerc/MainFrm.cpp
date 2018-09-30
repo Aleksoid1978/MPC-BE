@@ -13727,6 +13727,7 @@ void CMainFrame::CloseMediaPrivate()
 			m_pMC->Stop(); // Some filters, such as Microsoft StreamBufferSource, need to call IMediaControl::Stop() before close the graph;
 		}
 	}
+	m_fCapturing = false;
 
 	UnHookDirectXVideoDecoderService();
 
@@ -18389,7 +18390,7 @@ CString CMainFrame::FillMessage()
 		}
 
 		CComPtr<IPin> pPin;
-		if (SUCCEEDED(m_pCGB->FindPin(m_wndCaptureBar.m_capdlg.m_pDst, PINDIR_INPUT, nullptr, nullptr, FALSE, 0, &pPin))) {
+		if (m_pCGB && SUCCEEDED(m_pCGB->FindPin(m_wndCaptureBar.m_capdlg.m_pDst, PINDIR_INPUT, nullptr, nullptr, FALSE, 0, &pPin))) {
 			LONGLONG size = 0;
 			if (CComQIPtr<IStream> pStream = pPin) {
 				pStream->Commit(STGC_DEFAULT);
