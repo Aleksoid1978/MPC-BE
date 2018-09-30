@@ -637,15 +637,9 @@ HRESULT Video::Parse(CMatroskaNode* pMN0)
 		break;
 	case 0xB0:
 		PixelWidth.Parse(pMN);
-		if (!DisplayWidth) {
-			DisplayWidth.Set(PixelWidth);
-		}
 		break;
 	case 0xBA:
 		PixelHeight.Parse(pMN);
-		if (!DisplayHeight) {
-			DisplayHeight.Set(PixelHeight);
-		}
 		break;
 	case 0x54B0:
 		DisplayWidth.Parse(pMN);
@@ -687,7 +681,34 @@ HRESULT Video::Parse(CMatroskaNode* pMN0)
 	case 0x55B0:
 		VideoColorInformation.Parse(pMN);
 		break;
-	EndChunk
+	}
+	} while (pMN->Next());
+
+	if (VideoPixelCropLeft + VideoPixelCropRight >= PixelWidth) {
+		VideoPixelCropLeft.Set(0);
+		VideoPixelCropRight.Set(0);
+	}
+
+	if (VideoPixelCropTop + VideoPixelCropBottom >= PixelHeight) {
+		VideoPixelCropTop.Set(0);
+		VideoPixelCropBottom.Set(0);
+	}
+
+	if (DisplayUnit && (!DisplayWidth || !DisplayHeight)) {
+		DisplayWidth.Set(0);
+		DisplayHeight.Set(0);
+		DisplayUnit.Set(0);
+	}
+
+	if (!DisplayWidth) {
+		DisplayWidth.Set(PixelWidth - VideoPixelCropLeft - VideoPixelCropRight);
+	}
+
+	if (!DisplayHeight) {
+		DisplayHeight.Set(PixelHeight - VideoPixelCropTop - VideoPixelCropBottom);
+	}
+
+	return S_OK;
 }
 
 HRESULT Audio::Parse(CMatroskaNode* pMN0)
