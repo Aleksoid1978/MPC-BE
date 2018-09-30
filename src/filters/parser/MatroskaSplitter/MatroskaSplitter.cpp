@@ -656,7 +656,15 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								mts.insert(mts.cbegin(), mt);
 							}
 
-							if (mt.subtype == MEDIASUBTYPE_VP90) {
+							if (mt.subtype == MEDIASUBTYPE_AV01) {
+								std::vector<BYTE> pData;
+								if (ReadFirtsBlock(pData, pTE)) {
+									const auto size = pData.size();
+									pvih = (VIDEOINFOHEADER*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER) + size);
+									memcpy(pvih + 1, pData.data(), size);
+									mts.insert(mts.cbegin(), mt);
+								}
+							} else if (mt.subtype == MEDIASUBTYPE_VP90) {
 								std::vector<BYTE> pData;
 								if (ReadFirtsBlock(pData, pTE)) {
 									CGolombBuffer gb(pData.data(), pData.size());
