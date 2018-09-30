@@ -37,30 +37,29 @@ typedef struct AV1DecodeContext {
     struct aom_codec_ctx decoder;
 } AV1DecodeContext;
 
-static av_cold int aom_init(AVCodecContext *avctx,
-                            const struct aom_codec_iface *iface)
-{
-    AV1DecodeContext *ctx           = avctx->priv_data;
-    struct aom_codec_dec_cfg deccfg = {
-        /* token partitions+1 would be a decent choice */
-        // ==> Start patch MPC
-        //.threads = FFMIN(avctx->thread_count, 16)
-        .threads = FFMIN(avctx->thread_count, 8)
-        // ==> End patch MPC
-    };
-
-    av_log(avctx, AV_LOG_INFO, "%s\n", aom_codec_version_str());
-    av_log(avctx, AV_LOG_VERBOSE, "%s\n", aom_codec_build_config());
-
-    if (aom_codec_dec_init(&ctx->decoder, iface, &deccfg, 0) != AOM_CODEC_OK) {
-        const char *error = aom_codec_error(&ctx->decoder);
-        av_log(avctx, AV_LOG_ERROR, "Failed to initialize decoder: %s\n",
-               error);
-        return AVERROR(EINVAL);
-    }
-
-    return 0;
-}
+// ==> Start patch MPC
+//static av_cold int aom_init(AVCodecContext *avctx,
+//                            const struct aom_codec_iface *iface)
+//{
+//    AV1DecodeContext *ctx           = avctx->priv_data;
+//    struct aom_codec_dec_cfg deccfg = {
+//        /* token partitions+1 would be a decent choice */
+//        .threads = FFMIN(avctx->thread_count ? avctx->thread_count : av_cpu_count(), 16)
+//    };
+//
+//    av_log(avctx, AV_LOG_INFO, "%s\n", aom_codec_version_str());
+//    av_log(avctx, AV_LOG_VERBOSE, "%s\n", aom_codec_build_config());
+//
+//    if (aom_codec_dec_init(&ctx->decoder, iface, &deccfg, 0) != AOM_CODEC_OK) {
+//        const char *error = aom_codec_error(&ctx->decoder);
+//        av_log(avctx, AV_LOG_ERROR, "Failed to initialize decoder: %s\n",
+//               error);
+//        return AVERROR(EINVAL);
+//    }
+//
+//    return 0;
+//}
+// ==> End patch MPC
 
 static void image_copy_16_to_8(AVFrame *pic, struct aom_image *img)
 {
@@ -157,6 +156,48 @@ static int set_pix_fmt(AVCodecContext *avctx, struct aom_image *img)
         return AVERROR_INVALIDDATA;
     }
 }
+
+// ==> Start patch MPC
+static av_cold int aom_init(AVCodecContext *avctx,
+                            const struct aom_codec_iface *iface)
+{
+    AV1DecodeContext *ctx           = avctx->priv_data;
+    struct aom_codec_dec_cfg deccfg = {
+        /* token partitions+1 would be a decent choice */
+        .threads = FFMIN(avctx->thread_count ? avctx->thread_count : av_cpu_count(), 8)
+    };
+
+    av_log(avctx, AV_LOG_INFO, "%s\n", aom_codec_version_str());
+    av_log(avctx, AV_LOG_VERBOSE, "%s\n", aom_codec_build_config());
+
+    if (aom_codec_dec_init(&ctx->decoder, iface, &deccfg, 0) != AOM_CODEC_OK) {
+        const char *error = aom_codec_error(&ctx->decoder);
+        av_log(avctx, AV_LOG_ERROR, "Failed to initialize decoder: %s\n",
+               error);
+        return AVERROR(EINVAL);
+    }
+
+    if (avctx->extradata) {
+        if (aom_codec_decode(&ctx->decoder, avctx->extradata, avctx->extradata_size, NULL) == AOM_CODEC_OK) {
+            const void *iter = NULL;
+            struct aom_image *img = aom_codec_get_frame(&ctx->decoder, &iter);
+            if (img && img->d_w <= img->w && img->d_h <= img->h) {
+                set_pix_fmt(avctx, img);
+            }
+        } else {
+            const char *error  = aom_codec_error(&ctx->decoder);
+            const char *detail = aom_codec_error_detail(&ctx->decoder);
+
+            av_log(avctx, AV_LOG_ERROR, "Failed to decode extradata: %s\n", error);
+            if (detail)
+                av_log(avctx, AV_LOG_ERROR, "  Additional information: %s\n",
+                       detail);
+        }
+    }
+
+    return 0;
+}
+// ==> End patch MPC
 
 static int aom_decode(AVCodecContext *avctx, void *data, int *got_frame,
                       AVPacket *avpkt)

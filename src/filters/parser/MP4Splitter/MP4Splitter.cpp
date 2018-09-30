@@ -1284,6 +1284,19 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 								break;
 							case AP4_ATOM_TYPE_av01:
+								{
+									AP4_DataBuffer data;
+									if (AP4_SUCCEEDED(sample.ReadData(data))) {
+										const auto size = data.GetDataSize();
+										vih2 = (VIDEOINFOHEADER2*)mt.ReallocFormatBuffer(sizeof(VIDEOINFOHEADER2) + size);
+										memcpy(vih2 + 1, data.GetData(), size);
+
+										mts.clear();
+										mt.subtype = FOURCCMap(vih2->bmiHeader.biCompression = fourcc);
+										mts.push_back(mt);
+									}
+								}
+								/*
 								// https://aomediacodec.github.io/av1-isobmff/#av1codecconfigurationbox-section
 								if (AP4_DataInfoAtom* av1C = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_AV1C))) {
 									const AP4_DataBuffer* di = av1C->GetData();
@@ -1304,6 +1317,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										}
 									}
 								}
+								*/
 								break;
 						}
 
