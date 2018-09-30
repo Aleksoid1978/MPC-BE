@@ -61,6 +61,7 @@ STDAPI DllRegisterServer()
 		L"0,5,,3236344456",              // '264DV'
 		L"0,4,,44484156",                // 'DHAV'
 		L"0,4,,FFFFFF88",
+		L"0,4,,48585653,16,4,,48585646"  // 'HXVS............HXVF'
 	};
 
 	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_NULL, chkbytes, nullptr);
@@ -444,6 +445,11 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			m_pFile->Seek(0x400);
 			maxpos = 2 * KILOBYTE;
 		}
+		// ORIENT NCL
+		else if (GETU32(buf) == FCC('HXVS') && GETU32(buf + 16) == FCC('HXVF')) {
+			m_pFile->Seek(32);
+			maxpos = 512;
+		}
 
 		if (maxpos) {
 			// simple search first AnnexB Nal
@@ -797,7 +803,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_pFile->Seek(m_startpos);
 
 		CBaseSplitterFileEx::avchdr h;
-		if (m_pFile->Read(h, (int)std::min((__int64)MEGABYTE, m_pFile->GetLength()), &mt)) {
+		if (m_pFile->Read(h, (int)std::min((__int64)MEGABYTE, m_pFile->GetLength() - m_startpos), &mt)) {
 			mts.push_back(mt);
 			if (mt.subtype == MEDIASUBTYPE_H264 && SUCCEEDED(CreateAVCfromH264(&mt))) {
 				mts.push_back(mt);

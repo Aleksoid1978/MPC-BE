@@ -2067,6 +2067,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->m_chkbytes.emplace_back(L"0,5,,3236344456");              // '264DV'
 		pFGF->m_chkbytes.emplace_back(L"0,4,,44484156");                // 'DHAV'
 		pFGF->m_chkbytes.emplace_back(L"0,4,,FFFFFF88");
+		pFGF->m_chkbytes.emplace_back(L"0,4,,48585653,16,4,,48585646"); // 'HXVS............HXVF'
 		m_source.push_back(pFGF);
 	}
 
