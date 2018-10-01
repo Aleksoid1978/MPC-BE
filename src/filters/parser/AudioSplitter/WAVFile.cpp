@@ -392,7 +392,7 @@ HRESULT CWAVFile::ReadID3Tag(const DWORD chunk_size)
 		DWORD size = m_pFile->BitRead(32);
 		size = hexdec2uint(size);
 
-		if (chunk_size == size + 10 && major <= 4) {
+		if (chunk_size >= size + 10 && major <= 4) {
 			BYTE* buf = DNew BYTE[size];
 			m_pFile->ByteRead(buf, size);
 
