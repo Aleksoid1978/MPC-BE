@@ -640,7 +640,7 @@ void CPlaylist::ReverseSort()
 		AddHead(GetAt(item.pos));
 		__super::RemoveAt(item.pos);
 		if (m_pos == item.pos) {
-			m_pos = GetTailPosition();
+			m_pos = GetHeadPosition();
 		}
 	}
 }
@@ -2634,26 +2634,31 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			m_pl.SortById();
 			SetupList();
 			SavePlaylist();
+			EnsureVisible(m_pl.GetPos(), true);
 			break;
 		case M_SORTBYNAME:
 			m_pl.SortByName();
 			SetupList();
 			SavePlaylist();
+			EnsureVisible(m_pl.GetPos(), true);
 			break;
 		case M_SORTBYPATH:
 			m_pl.SortByPath();
 			SetupList();
 			SavePlaylist();
+			EnsureVisible(m_pl.GetPos(), true);
 			break;
 		case M_SORTREVERSE:
 			m_pl.ReverseSort();
 			SetupList();
 			SavePlaylist();
+			EnsureVisible(m_pl.GetPos(), true);
 			break;
 		case M_RANDOMIZE:
 			m_pl.Randomize();
 			SetupList();
 			SavePlaylist();
+			EnsureVisible(m_pl.GetPos(), true);
 			break;
 		case M_CLIPBOARD:
 			if (OpenClipboard() && EmptyClipboard()) {
