@@ -14707,14 +14707,14 @@ void CMainFrame::SetupNavChaptersSubMenu()
 
 	if (GetPlaybackMode() == PM_FILE) {
 		if (!m_BDPlaylists.empty()) {
-			DWORD idx = 1;
+			int mline = 1;
 			for (const auto& Item : m_BDPlaylists) {
 				UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
-				if (idx == MENUBARBREAK) {
+				if (mline > MENUBARBREAK) {
 					flags |= MF_MENUBARBREAK;
-					idx = 0;
+					mline = 1;
 				}
-				idx++;
+				mline++;
 
 				if (Item.m_strFileName == m_strPlaybackRenderedPath) {
 					flags |= MF_CHECKED | MFT_RADIOCHECK;
@@ -14724,28 +14724,29 @@ void CMainFrame::SetupNavChaptersSubMenu()
 				submenu.AppendMenu(flags, id++, GetFileOnly(Item.m_strFileName) + '\t' + time);
 			}
 		} else if (m_youtubeUrllist.size() > 1) {
-			DWORD idx = 1;
-			for(auto item = m_youtubeUrllist.begin(); item != m_youtubeUrllist.end(); ++item) {
+			int mline = 1;
+			for(const auto& item : m_youtubeUrllist) {
 				UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
-				if (idx == MENUBARBREAK) {
+				if (mline > MENUBARBREAK) {
 					flags |= MF_MENUBARBREAK;
-					idx = 0;
+					mline = 1;
 				}
-				idx++;
+				mline++;
 
-				if (item->url == m_strPlaybackRenderedPath) {
+				if (item.url == m_strPlaybackRenderedPath) {
 					flags |= MF_CHECKED | MFT_RADIOCHECK;
 				}
 
-				submenu.AppendMenu(flags, id++, item->title);
+				submenu.AppendMenu(flags, id++, item.title);
 			}
 		}
 
 		REFERENCE_TIME rt = GetPos();
-		DWORD j = m_pCB->ChapLookup(&rt, nullptr);
+		const DWORD curChap = m_pCB->ChapLookup(&rt, nullptr);
 
 		if (m_pCB->ChapGetCount() > 1) {
-			for (DWORD i = 0, idx = 0; i < m_pCB->ChapGetCount(); i++, id++, idx++) {
+			int mline = 1;
+			for (DWORD i = 0; i < m_pCB->ChapGetCount(); i++, id++) { // change id here, because ChapGet can potentially fail
 				rt = 0;
 				CComBSTR bstr;
 				if (FAILED(m_pCB->ChapGet(i, &rt, &bstr))) {
@@ -14757,14 +14758,15 @@ void CMainFrame::SetupNavChaptersSubMenu()
 				name.Replace('\t', ' ');
 
 				UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
-				if (i == j) {
+				if (i == curChap) {
 					flags |= MF_CHECKED | MFT_RADIOCHECK;
 				}
 
-				if (idx == MENUBARBREAK) {
+				if (mline == MENUBARBREAK) {
 					flags |= MF_MENUBARBREAK;
-					idx = 0;
+					mline = 0;
 				}
+				mline++;
 
 				if (id != ID_NAVIGATE_CHAP_SUBITEM_START && i == 0) {
 					//pSub->AppendMenu(MF_SEPARATOR | MF_ENABLED);
