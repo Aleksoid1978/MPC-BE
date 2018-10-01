@@ -833,6 +833,10 @@ namespace Youtube
 							// same resolution as that of the previous, but not suitable HDR
 							continue;
 						}
+						if (final_item->profile->type == y_media && profile->type != y_media) {
+							// same resolution as that of the previous, but unwanted type
+							continue;
+						}
 					}
 
 					if (profile->quality < final_item->profile->quality && final_item->profile->quality <= s.YoutubeFormat.res) {
