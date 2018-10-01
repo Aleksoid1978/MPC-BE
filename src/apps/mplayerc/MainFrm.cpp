@@ -14762,9 +14762,9 @@ void CMainFrame::SetupNavChaptersSubMenu()
 					flags |= MF_CHECKED | MFT_RADIOCHECK;
 				}
 
-				if (mline == MENUBARBREAK) {
+				if (mline > MENUBARBREAK) {
 					flags |= MF_MENUBARBREAK;
-					mline = 0;
+					mline = 1;
 				}
 				mline++;
 
