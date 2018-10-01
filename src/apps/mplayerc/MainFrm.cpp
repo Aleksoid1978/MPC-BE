@@ -14783,23 +14783,6 @@ void CMainFrame::SetupNavChaptersSubMenu()
 			}
 		}
 
-		if (m_wndPlaylistBar.GetCount() > 1) {
-			POSITION pos = m_wndPlaylistBar.m_pl.GetHeadPosition();
-			while (pos) {
-				UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
-				if (pos == m_wndPlaylistBar.m_pl.GetPos()) {
-					flags |= MF_CHECKED | MFT_RADIOCHECK;
-				}
-				if (id != ID_NAVIGATE_CHAP_SUBITEM_START && pos == m_wndPlaylistBar.m_pl.GetHeadPosition()) {
-					submenu.AppendMenu(MF_SEPARATOR | MF_ENABLED);
-				}
-				CPlaylistItem& pli = m_wndPlaylistBar.m_pl.GetNext(pos);
-				CString name = pli.GetLabel();
-				name.Replace(L"&", L"&&");
-				submenu.AppendMenu(flags, id++, name);
-			}
-		}
-
 	} else if (GetPlaybackMode() == PM_DVD) {
 		ULONG ulNumOfVolumes, ulVolume;
 		DVD_DISC_SIDE Side;

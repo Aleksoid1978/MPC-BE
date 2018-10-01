@@ -773,7 +773,8 @@ public:
 		IBaseFilter* pVidCap, IPin** pVidCapPin, IPin** pVidPrevPin,
 		IBaseFilter* pAudCap, IPin** pAudCapPin, IPin** pAudPrevPin);
 	bool BuildGraphVideoAudio(int fVPreview, bool fVCapture, int fAPreview, bool fACapture);
-	bool DoCapture(), StartCapture(), StopCapture();
+	bool StartCapture();
+	bool StopCapture();
 
 	bool DoAfterPlaybackEvent();
 	void ParseDirs(std::list<CString>& sl);
