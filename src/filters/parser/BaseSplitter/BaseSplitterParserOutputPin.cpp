@@ -414,8 +414,10 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 			}
 
 			if (Nalu.GetType() == NALU_TYPE_SLICE
-					|| Nalu.GetType() == NALU_TYPE_IDR) {
-				p2->bSliceExist = TRUE;
+					|| Nalu.GetType() == NALU_TYPE_IDR
+					|| Nalu.GetType() == NALU_TYPE_SPS
+					|| Nalu.GetType() == NALU_TYPE_PPS) {
+				p2->bDataExists = TRUE;
 			}
 		}
 		start = next;
@@ -469,22 +471,22 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 
 	if (m_bEndOfStream) {
 		if (m_pl.GetCount()) {
-			BOOL bSliceExist = FALSE;
+			BOOL bDataExists = FALSE;
 			CAutoPtr<CH264Packet> pl = m_pl.RemoveHead();
-			if (pl->bSliceExist) {
-				bSliceExist = TRUE;
+			if (pl->bDataExists) {
+				bDataExists = TRUE;
 			}
 
 			while (m_pl.GetCount()) {
 				CAutoPtr<CH264Packet> p2 = m_pl.RemoveHead();
-				if (p2->bSliceExist) {
-					bSliceExist = TRUE;
+				if (p2->bDataExists) {
+					bDataExists = TRUE;
 				}
 
 				pl->AppendData(*p2);
 			}
 
-			if (bSliceExist) {
+			if (bDataExists) {
 				HRESULT hr = __super::DeliverPacket(pl);
 				if (hr != S_OK) {
 					return hr;
@@ -507,7 +509,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 				m_bHasAccessUnitDelimiters = true;
 			}
 
-			if (nut == NALU_TYPE_AUD || (!m_bHasAccessUnitDelimiters && (pPacket->rtStart != INVALID_TIME || !bTimeStampExists))) {
+			if (nut == NALU_TYPE_AUD || (!m_bHasAccessUnitDelimiters && (pPacket->rtStart != INVALID_TIME || (!bTimeStampExists && m_pl.GetHead()->bDataExists)))) {
 				if (pPacket->rtStart == INVALID_TIME && rtStart != INVALID_TIME) {
 					pPacket->rtStart = rtStart;
 					pPacket->rtStop  = rtStop;
@@ -515,16 +517,16 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 				rtStart = INVALID_TIME;
 				rtStop  = INVALID_TIME;
 
-				BOOL bSliceExist = FALSE;
+				BOOL bDataExists = FALSE;
 				CAutoPtr<CH264Packet> pl = m_pl.RemoveHead();
-				if (pl->bSliceExist) {
-					bSliceExist = TRUE;
+				if (pl->bDataExists) {
+					bDataExists = TRUE;
 				}
 
 				while (pos != m_pl.GetHeadPosition()) {
 					CAutoPtr<CH264Packet> p2 = m_pl.RemoveHead();
-					if (p2->bSliceExist) {
-						bSliceExist = TRUE;
+					if (p2->bDataExists) {
+						bDataExists = TRUE;
 					}
 
 					pl->AppendData(*p2);
@@ -535,7 +537,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 					m_bFlushed = false;
 				}
 
-				if (bSliceExist) {
+				if (bDataExists) {
 					HRESULT hr = __super::DeliverPacket(pl);
 					if (hr != S_OK) {
 						return hr;

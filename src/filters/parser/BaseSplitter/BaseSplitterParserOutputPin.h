@@ -35,7 +35,7 @@ class CBaseSplitterParserOutputPin : public CBaseSplitterOutputPin, protected CC
 	class CH264Packet : public CPacket
 	{
 		public:
-			BOOL bSliceExist = FALSE;
+			BOOL bDataExists = FALSE;
 	};
 
 	CAutoPtr<CPacket>         m_p;
