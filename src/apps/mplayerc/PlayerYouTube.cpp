@@ -98,10 +98,14 @@ namespace Youtube
 			return (a->fps60 > b->fps60);
 		}
 
+		if (a->type != b->type) {
+			return (a->type < b->type);
+		}
+
 		return (a->hdr > b->hdr);
 	}
 
-	static bool CompareUrllistItem(YoutubeUrllistItem a, YoutubeUrllistItem b)
+	static bool CompareUrllistItem(const YoutubeUrllistItem& a, const YoutubeUrllistItem& b)
 	{
 		return CompareProfile(a.profile, b.profile);
 	}
@@ -789,10 +793,29 @@ namespace Youtube
 			std::sort(youtubeUrllist.begin(), youtubeUrllist.end(), CompareUrllistItem);
 			std::sort(youtubeAudioUrllist.begin(), youtubeAudioUrllist.end(), CompareUrllistItem);
 
+			const auto last = std::unique(youtubeUrllist.begin(), youtubeUrllist.end(), [](const YoutubeUrllistItem& a, const YoutubeUrllistItem& b) {
+				return a.profile->format == b.profile->format && a.profile->quality == b.profile->quality &&
+					   a.profile->fps60 == b.profile->fps60 && a.profile->hdr == b.profile->hdr;
+			});
+#ifdef DEBUG_OR_LOG
+			YoutubeUrllist youtubeDuplicate;
+			if (last != youtubeUrllist.end()) {
+				youtubeDuplicate.insert(youtubeDuplicate.begin(), last, youtubeUrllist.end());
+			}
+#endif
+			youtubeUrllist.erase(last, youtubeUrllist.end());
+
 #ifdef DEBUG_OR_LOG
 			DLog(L"Youtube::Parse_URL() : parsed video formats list:");
 			for (const auto& item : youtubeUrllist) {
 				DLog(L"    %-35s, \"%s\"", item.title, item.url);
+			}
+
+			if (!youtubeDuplicate.empty()) {
+				DLog(L"Youtube::Parse_URL() : removed(duplicate) video formats list:");
+				for (const auto& item : youtubeDuplicate) {
+					DLog(L"    %-35s, \"%s\"", item.title, item.url);
+				}
 			}
 
 			if (!youtubeAudioUrllist.empty()) {
@@ -831,10 +854,6 @@ namespace Youtube
 						}
 						if (profile->hdr != s.YoutubeFormat.hdr) {
 							// same resolution as that of the previous, but not suitable HDR
-							continue;
-						}
-						if (final_item->profile->type == y_media && profile->type != y_media) {
-							// same resolution as that of the previous, but unwanted type
 							continue;
 						}
 					}

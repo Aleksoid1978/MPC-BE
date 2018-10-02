@@ -54,16 +54,16 @@ namespace Youtube
 	static const YoutubeProfile YProfiles[] = {
 		// MP4 (H.264)
 		{266, y_mp4,  y_video, 2160, L"mp4",  false, false},
-		//{138, y_mp4,  y_video, 2160, L"mp4",  false, false}, // sometimes duplicates the 266, so useless
+		{138, y_mp4,  y_video, 2160, L"mp4",  false, false},
 		{264, y_mp4,  y_video, 1440, L"mp4",  false, false},
 		{299, y_mp4,  y_video, 1080, L"mp4",  true , false},
 		{137, y_mp4,  y_video, 1080, L"mp4",  false, false},
 		{298, y_mp4,  y_video,  720, L"mp4",  true , false},
 		{ 22, y_mp4,  y_media,  720, L"mp4",  false, false}, // H.264 + AAC
-		{136, y_mp4,  y_video,  720, L"mp4",  false, false}, // unwanted if 22 is present
+		{136, y_mp4,  y_video,  720, L"mp4",  false, false},
 		{135, y_mp4,  y_video,  480, L"mp4",  false, false},
 		{ 18, y_mp4,  y_media,  360, L"mp4",  false, false}, // H.264 + AAC
-		{134, y_mp4,  y_video,  360, L"mp4",  false, false}, // unwanted if 18 is present
+		{134, y_mp4,  y_video,  360, L"mp4",  false, false},
 		{133, y_mp4,  y_video,  240, L"mp4",  false, false},
 		// WebM (VP9)
 		{272, y_webm, y_video, 4320, L"webm", true, false},
