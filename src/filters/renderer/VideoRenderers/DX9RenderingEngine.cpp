@@ -136,6 +136,7 @@ CDX9RenderingEngine::CDX9RenderingEngine(HWND hWnd, HRESULT& hr, CString *_pErro
 	, m_inputExtFormat({})
 	, m_wsResizer(nullptr)
 	, m_wsResizer2(nullptr)
+	, m_wsCorrection(nullptr)
 	, m_Caps({})
 	, m_ShaderProfile(nullptr)
 #if DXVA2VP
@@ -1571,6 +1572,7 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	m_AmbientLight = ambientLight;
 	m_RenderingIntent = renderingIntent;
 	m_bDither = bDither;
+	m_strFinalPass.Empty();
 
 	// Initial cleanup
 	m_pLut3DTexture = nullptr;
@@ -1727,6 +1729,29 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 		return hr;
 	}
 
+	if (bColorManagement) {
+		m_strFinalPass = L" ColorManagement(";
+		switch (ambientLight) {
+		case AMBIENT_LIGHT_BRIGHT: m_strFinalPass.Append(L"Bright"); break;
+		case AMBIENT_LIGHT_DIM:    m_strFinalPass.Append(L"Dim");    break;
+		case AMBIENT_LIGHT_DARK:   m_strFinalPass.Append(L"Dark");   break;
+		}
+		switch (renderingIntent) {
+		case COLOR_RENDERING_INTENT_PERCEPTUAL:            m_strFinalPass.Append(L",Perceptual");           break;
+		case COLOR_RENDERING_INTENT_RELATIVE_COLORIMETRIC: m_strFinalPass.Append(L",RelativeÑolorimetric"); break;
+		case COLOR_RENDERING_INTENT_SATURATION:            m_strFinalPass.Append(L",Saturation");           break;
+		case COLOR_RENDERING_INTENT_ABSOLUTE_COLORIMETRIC: m_strFinalPass.Append(L",AbsoluteÑolorimetric"); break;
+		}
+		m_strFinalPass.Append(L")");
+	}
+
+	if (bDither) {
+		if (bColorManagement) {
+			m_strFinalPass.Append(L", ");
+		}
+		m_strFinalPass.Append(L"Dither");
+	}
+
 	return S_OK;
 }
 
@@ -1736,6 +1761,7 @@ void CDX9RenderingEngine::CleanupFinalPass()
 	m_pDitherTexture = nullptr;
 	m_pLut3DTexture = nullptr;
 	m_pFinalPixelShader = nullptr;
+	m_strFinalPass.Empty();
 }
 
 HRESULT CDX9RenderingEngine::CreateIccProfileLut(wchar_t* profilePath, float* lut3D)
@@ -2250,8 +2276,9 @@ HRESULT CDX9RenderingEngine::InitCorrectionPass(const AM_MEDIA_TYPE& input_mt)
 		extformat.value = ((VIDEOINFOHEADER2*)input_mt.pbFormat)->dwControlFlags;
 	}
 
-	if (m_inputExtFormat.value != extformat.value
-			|| !m_pPSCorrection) {
+	if (m_inputExtFormat.value != extformat.value || !m_pPSCorrection) {
+		m_wsCorrection = nullptr;
+
 		// DXVA2_ExtendedFormat was chaged
 		m_inputExtFormat.value = extformat.value;
 		m_pPSCorrection.Release();
@@ -2259,15 +2286,19 @@ HRESULT CDX9RenderingEngine::InitCorrectionPass(const AM_MEDIA_TYPE& input_mt)
 
 		if (extformat.VideoTransferMatrix == 7) {
 			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_YCGCO : IDF_SHADER_PS20_CORRECTION_YCGCO);
+			m_wsCorrection = L"Fix YCgCo";
 		}
 		else if (extformat.VideoTransferFunction == 15) {
 			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_ST2084 : IDF_SHADER_PS20_CORRECTION_ST2084);
+			m_wsCorrection = L"HDR(HLG) to SDR";
 		}
 		else if (extformat.VideoTransferFunction == 18) {
 			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_HLG : IDF_SHADER_PS20_CORRECTION_HLG);
+			m_wsCorrection = L" HDR(BT.2020) to SDR";
 		}
 		else if (m_D3D9VendorId == PCIV_nVidia && (input_mt.subtype == MEDIASUBTYPE_YUY2 || input_mt.subtype == MEDIASUBTYPE_UYVY)) {
 			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_422 : IDF_SHADER_PS20_CORRECTION_422);
+			m_wsCorrection = L" Fix Nvidia YUY2";
 		}
 	}
 

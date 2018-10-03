@@ -1894,17 +1894,12 @@ void CDX9AllocatorPresenter::DrawStats()
 				strText += L" DisDC";
 			}
 
-			if (m_bColorManagement) {
-				strText += L" ColorMan ";
-			}
-
 			if (rs.bFlushGPUBeforeVSync) {
 				strText += L" GPUFlushBV";
 			}
 			if (rs.bFlushGPUAfterPresent) {
 				strText += L" GPUFlushAP";
 			}
-
 			if (rs.bFlushGPUWait) {
 				strText += L" GPUFlushWt";
 			}
@@ -2084,6 +2079,20 @@ void CDX9AllocatorPresenter::DrawStats()
 				}
 			}
 			drawText(strText);
+
+			if (m_wsCorrection || m_strFinalPass.GetLength()) {
+				strText = L"Processing   : ";
+				if (m_wsCorrection) {
+					strText.Append(m_wsCorrection);
+				}
+				if (m_strFinalPass.GetLength()) {
+					if (m_wsCorrection) {
+						strText.Append(L", ");
+					}
+					strText.Append(m_strFinalPass);
+				}
+				drawText(strText);
+			}
 
 			{
 				strText.Format(L"Performance  : CPU:%3d%%", m_CPUUsage.GetUsage());

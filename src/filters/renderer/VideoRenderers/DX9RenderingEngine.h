@@ -95,6 +95,8 @@ namespace DSObjects
 		CString						m_strMixerOutputFmt;
 		const wchar_t*				m_wsResizer;
 		const wchar_t*				m_wsResizer2;
+		const wchar_t*				m_wsCorrection;
+		CString						m_strFinalPass;
 
 		HMODULE m_hDxva2Lib = nullptr;
 
