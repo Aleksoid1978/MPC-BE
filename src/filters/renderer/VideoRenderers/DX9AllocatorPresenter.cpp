@@ -1884,53 +1884,51 @@ void CDX9AllocatorPresenter::DrawStats()
 		}
 
 		if (iDetailedStats > 1) {
-			strText = L"Settings     : ";
-
-			strText += L"EVR ";
+			strText = L"Settings     : EVR";
 
 			if (m_bIsFullscreen) {
-				strText += L"FS ";
+				strText += L" FS";
 			}
 
 			if (rs.bDisableDesktopComposition) {
-				strText += L"DisDC ";
+				strText += L" DisDC";
 			}
 
 			if (m_bColorManagement) {
-				strText += L"ColorMan ";
+				strText += L" ColorMan ";
 			}
 
 			if (rs.bFlushGPUBeforeVSync) {
-				strText += L"GPUFlushBV ";
+				strText += L" GPUFlushBV";
 			}
 			if (rs.bFlushGPUAfterPresent) {
-				strText += L"GPUFlushAP ";
+				strText += L" GPUFlushAP";
 			}
 
 			if (rs.bFlushGPUWait) {
-				strText += L"GPUFlushWt ";
+				strText += L" GPUFlushWt";
 			}
 
 			if (rs.bVSync) {
-				strText += L"VS ";
+				strText += L" VSync";
 			}
 			if (rs.bAlterativeVSync) {
-				strText += L"AltVS ";
+				strText += L" AltVSync";
 			}
 			if (rs.bVSyncAccurate) {
-				strText += L"AccVS ";
+				strText += L" AccVSync";
 			}
 			if (rs.iVSyncOffset) {
-				strText.AppendFormat(L"VSOfst(%d) ", rs.iVSyncOffset);
+				strText.AppendFormat(L" VSOfst(%d)", rs.iVSyncOffset);
 			}
 
 			if (rs.bEVRFrameTimeCorrection) {
-				strText += L"FTC ";
+				strText += L" FTC";
 			}
 			if (rs.iEVROutputRange == 0) {
-				strText += L"0-255 ";
+				strText += L" 0-255";
 			} else if (rs.iEVROutputRange == 1) {
-				strText += L"16-235 ";
+				strText += L" 16-235";
 			}
 
 			drawText(strText);
@@ -2031,7 +2029,7 @@ void CDX9AllocatorPresenter::DrawStats()
 		}
 		drawText(strText);
 
-		if (iDetailedStats > 1) {
+		if (iDetailedStats > 1 && rs.bVSync) {
 			strText.Format(L"Raster Status: Wait %7.3f ms   Min %7.3f ms   Max %7.3f ms", (double(m_RasterStatusWaitTime)/10000.0), (double(m_RasterStatusWaitTimeMin)/10000.0), (double(m_RasterStatusWaitTimeMax)/10000.0));
 			drawText(strText);
 		}
