@@ -92,9 +92,9 @@ namespace DSObjects
 		bool						m_bColorManagement;
 		bool						m_bDither;
 		DXVA2_ExtendedFormat		m_inputExtFormat;
+		CString						m_strMixerOutputFmt;
 		const wchar_t*				m_wsResizer;
 		const wchar_t*				m_wsResizer2;
-		CString						m_strMixerOutputFmt;
 
 		HMODULE m_hDxva2Lib = nullptr;
 
