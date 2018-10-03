@@ -1066,7 +1066,7 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 				&& m_bIMKH_CCTV && pesid == 0xc0
 				&& stream_type != MPEG_AUDIO && stream_type != AAC_AUDIO) {
 			pcm_law_hdr h;
-			if (Read(h, len, true, &s.mt)) {
+			if (Read(h, true, &s.mt)) {
 				type = audio;
 			}
 		}

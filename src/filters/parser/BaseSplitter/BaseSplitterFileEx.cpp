@@ -1832,7 +1832,7 @@ bool CBaseSplitterFileEx::Read(adx_adpcm_hdr& h, int len, CMediaType* pmt)
 	return true;
 }
 
-bool CBaseSplitterFileEx::Read(pcm_law_hdr& h, int len, bool bAlaw, CMediaType* pmt)
+bool CBaseSplitterFileEx::Read(pcm_law_hdr& h, bool bAlaw, CMediaType* pmt)
 {
 	if (pmt) {
 		pmt->majortype			= MEDIATYPE_Audio;
