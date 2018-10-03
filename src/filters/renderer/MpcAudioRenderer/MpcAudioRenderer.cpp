@@ -2790,6 +2790,8 @@ void CMpcAudioRenderer::ReleaseDevice()
 		PauseRendererThread();
 		m_bIsAudioClientStarted = false;
 
+		m_pSyncClock->UnSlave();
+
 		SAFE_RELEASE(m_pRenderClient);
 		SAFE_RELEASE(m_pAudioClock);
 		SAFE_RELEASE(m_pAudioClient);
