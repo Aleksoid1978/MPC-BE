@@ -330,7 +330,7 @@ public:
 	bool Read(mpeg4videohdr& h, int len, CMediaType* pmt = nullptr);
 
 	bool Read(adx_adpcm_hdr& h, int len, CMediaType* pmt = nullptr);
-	bool Read(pcm_law_hdr& h, int len, bool bAlaw, CMediaType* pmt = nullptr);
+	bool Read(pcm_law_hdr& h, bool bAlaw, CMediaType* pmt = nullptr);
 	bool Read(opus_ts_hdr& h, int len, std::vector<BYTE>& extradata, CMediaType* pmt = nullptr);
 
 	// LPCM
