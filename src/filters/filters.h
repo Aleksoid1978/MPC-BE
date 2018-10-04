@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,6 +40,7 @@
 #include "parser/StreamDriveThru/StreamDriveThru.h"
 #include "parser/AudioSplitter/AudioSplitter.h"
 #include "parser/BinkSplitter/BinkSplitter.h"
+#include "parser/DVRSplitter/DVRSplitter.h"
 
 #include "reader/CDDAReader/CDDAReader.h"
 #include "reader/CDXAReader/CDXAReader.h"
