@@ -1988,20 +1988,22 @@ void CDX9AllocatorPresenter::DrawStats()
 			drawText(strText);
 		}
 
-		if (iDetailedStats > 1) {
-			if (m_VBlankEndPresent == -100000) {
-				strText.Format(L"VBlank Wait  : Start %4d   End %4d   Wait %7.3f ms   Lock %7.3f ms   Offset %4d   Max %4d", m_VBlankStartWait, m_VBlankEndWait, (double(m_VBlankWaitTime)/10000.0), (double(m_VBlankLockTime)/10000.0), m_VBlankMin, m_VBlankMax - m_VBlankMin);
+		if (rs.bVSync) {
+			if (iDetailedStats > 1) {
+				if (m_VBlankEndPresent == -100000) {
+					strText.Format(L"VBlank Wait  : Start %4d   End %4d   Wait %7.3f ms   Lock %7.3f ms   Offset %4d   Max %4d", m_VBlankStartWait, m_VBlankEndWait, (double(m_VBlankWaitTime)/10000.0), (double(m_VBlankLockTime)/10000.0), m_VBlankMin, m_VBlankMax - m_VBlankMin);
+				} else {
+					strText.Format(L"VBlank Wait  : Start %4d   End %4d   Wait %7.3f ms   Lock %7.3f ms   Offset %4d   Max %4d   EndPresent %4d", m_VBlankStartWait, m_VBlankEndWait, (double(m_VBlankWaitTime)/10000.0), (double(m_VBlankLockTime)/10000.0), m_VBlankMin, m_VBlankMax - m_VBlankMin, m_VBlankEndPresent);
+				}
 			} else {
-				strText.Format(L"VBlank Wait  : Start %4d   End %4d   Wait %7.3f ms   Lock %7.3f ms   Offset %4d   Max %4d   EndPresent %4d", m_VBlankStartWait, m_VBlankEndWait, (double(m_VBlankWaitTime)/10000.0), (double(m_VBlankLockTime)/10000.0), m_VBlankMin, m_VBlankMax - m_VBlankMin, m_VBlankEndPresent);
+				if (m_VBlankEndPresent == -100000) {
+					strText.Format(L"VBlank Wait  : Start %4d   End %4d", m_VBlankStartWait, m_VBlankEndWait);
+				} else {
+					strText.Format(L"VBlank Wait  : Start %4d   End %4d   EP %4d", m_VBlankStartWait, m_VBlankEndWait, m_VBlankEndPresent);
+				}
 			}
-		} else {
-			if (m_VBlankEndPresent == -100000) {
-				strText.Format(L"VBlank Wait  : Start %4d   End %4d", m_VBlankStartWait, m_VBlankEndWait);
-			} else {
-				strText.Format(L"VBlank Wait  : Start %4d   End %4d   EP %4d", m_VBlankStartWait, m_VBlankEndWait, m_VBlankEndPresent);
-			}
+			drawText(strText);
 		}
-		drawText(strText);
 
 		bool bDoVSyncInPresent = (!m_bCompositionEnabled && !m_bAlternativeVSync) || !rs.bVSync;
 		if (iDetailedStats > 1 && bDoVSyncInPresent) {
@@ -2052,11 +2054,8 @@ void CDX9AllocatorPresenter::DrawStats()
 			}
 
 			if (m_Decoder.GetLength()) {
-				drawText(L"Decoder      : " + m_Decoder);
+				drawText(L"Decoder      : " + m_Decoder + ", " + DXVAState::GetDescription());
 			}
-
-			strText.Format(L"Decoder info : %s", DXVAState::GetDescription());
-			drawText(strText);
 
 			if (m_D3D9Device.GetLength()) {
 				drawText(L"Render device: " + m_D3D9Device);
