@@ -478,6 +478,9 @@
     <ProjectReference Include="..\..\filters\parser\BinkSplitter\BinkSplitter.vcxproj">
       <Project>{2BC02329-D46C-4EC5-B5C7-30E21CD41F78}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\filters\parser\DVRSplitter\DVRSplitter.vcxproj">
+      <Project>{EB48EF42-3D74-4845-8A08-C9AF954265B5}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\filters\parser\DSMSplitter\DSMSplitter.vcxproj">
       <Project>{1e91f58c-0bae-4021-8087-d1864d8ec066}</Project>
     </ProjectReference>

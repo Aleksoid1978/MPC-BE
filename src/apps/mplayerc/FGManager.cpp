@@ -2051,6 +2051,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_source.push_back(pFGF);
 	}
 
+	if (src[SRC_DVR] || IsPreview) {
+		pFGF = DNew CFGFilterInternal<CDVRSourceFilter>(DVRSourceName);
+		pFGF->m_chkbytes.emplace_back(L"0,4,,48585653,16,4,,48585646"); // 'HXVS............HXVF'
+		m_source.push_back(pFGF);
+	}
+
 	// add CMpegSourceFilter last since it can parse the stream for a long time
 	if (src[SRC_MPEG] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CMpegSourceFilter>(MpegSourceName);
@@ -2067,7 +2073,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->m_chkbytes.emplace_back(L"0,5,,3236344456");              // '264DV'
 		pFGF->m_chkbytes.emplace_back(L"0,4,,44484156");                // 'DHAV'
 		pFGF->m_chkbytes.emplace_back(L"0,4,,FFFFFF88");
-		pFGF->m_chkbytes.emplace_back(L"0,4,,48585653,16,4,,48585646"); // 'HXVS............HXVF'
 		m_source.push_back(pFGF);
 	}
 
@@ -2201,6 +2206,12 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG1Video);
 	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
 	m_transform.push_back(pFGF);
+
+	if (src[SRC_DVR] || IsPreview) {
+		pFGF = DNew CFGFilterInternal<CDVRSplitterFilter>(DVRSplitterName, MERIT64_ABOVE_DSHOW);
+	} else {
+		pFGF = DNew CFGFilterInternal<CDVRSplitterFilter>(LowMerit(DVRSplitterName), MERIT64_DO_USE);
+	}
 
 	// add CMpegSplitterFilter last since it can parse the stream for a long time
 	if (src[SRC_MPEG] || IsPreview) {

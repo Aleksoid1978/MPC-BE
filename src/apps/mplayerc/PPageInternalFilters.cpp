@@ -57,6 +57,7 @@ static filter_t s_filters[] = {
 	{L"WAV/Wave64",					SOURCE_FILTER, SRC_WAV,				0},
 	{L"WavPack",					SOURCE_FILTER, SRC_WAVPACK,			0},
 	{L"UDP/HTTP",					SOURCE_FILTER, SRC_UDP,				0},
+	{L"DVR Video",					SOURCE_FILTER, SRC_DVR,				0 },
 
 	// DXVA decoder
 	{L"DXVA: H264/AVC",				DXVA_DECODER,  VDEC_DXVA_H264,		0},
