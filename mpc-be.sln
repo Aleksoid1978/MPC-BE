@@ -178,7 +178,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Include", "Include", "{EA36
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BinkSplitter", "src\filters\parser\BinkSplitter\BinkSplitter.vcxproj", "{2BC02329-D46C-4EC5-B5C7-30E21CD41F78}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BinkSplitter", "src\filters\parser\DVRSplitter\DVRSplitter.vcxproj", "{EB48EF42-3D74-4845-8A08-C9AF954265B5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DVRSplitter", "src\filters\parser\DVRSplitter\DVRSplitter.vcxproj", "{EB48EF42-3D74-4845-8A08-C9AF954265B5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shaders", "src\Shaders\Shaders.vcxproj", "{154D3FA8-9BB8-4EC1-8D56-DA14715ACD56}"
 EndProject
