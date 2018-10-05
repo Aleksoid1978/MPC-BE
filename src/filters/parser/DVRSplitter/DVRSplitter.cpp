@@ -247,6 +247,17 @@ void CDVRSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		return;
 	}
 
+	if (m_sps.size() > 1) {
+		const auto rtSeek = rt + m_rtOffsetVideo;
+		if (rtSeek <= m_sps.back().rt) {
+			const auto index = range_bsearch(m_sps, rtSeek);
+			if (index >= 0 && ((rtSeek - m_sps[index].rt) < 5 * UNITS)) {
+				m_pFile->Seek(m_sps[index].fp);
+				return;
+			}
+		}
+	}
+
 	const __int64 len = m_endpos - m_startpos;
 	__int64 seekpos   = CalcPos(rt);
 
@@ -370,10 +381,31 @@ bool CDVRSplitterFilter::ReadHeader(Header& hdr)
 	const auto ret = Sync() && S_OK == m_pFile->ByteRead((BYTE*)&hdr, HeaderSize);
 	if (ret) {
 		hdr.rt = hdr.pts * 10000ll;
+		hdr.key_frame = hdr.dummy == 1;
 
 		if (hdr.sync == AUDIO) {
 			hdr.size -= 4;
 			m_pFile->Skip(4);
+		}
+
+		if (hdr.key_frame) {
+			const auto pos = m_pFile->GetPos() - HeaderSize;
+
+			if (m_sps.empty() || (hdr.rt > m_sps.back().rt)) {
+				const SyncPoint sp = {hdr.rt, pos};
+				m_sps.emplace_back(sp);
+			} else if (hdr.rt < m_sps.back().rt) {
+				const auto exists = std::any_of(m_sps.begin(), m_sps.end(), [&](const SyncPoint& sp) {
+					return sp.rt == hdr.rt;
+				});
+				if (!exists) {
+					const SyncPoint sp = {hdr.rt, pos};
+					m_sps.emplace_back(sp);
+					std::sort(m_sps.begin(), m_sps.end(), [](const SyncPoint& a, const SyncPoint& b) {
+						return a.rt < b.rt;
+					});
+				}
+			}
 		}
 	}
 

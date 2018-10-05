@@ -40,9 +40,12 @@ CDVRSplitterFilter : public CBaseSplitterFilter
 	struct Header {
 		DWORD sync, size, pts, dummy;
 		REFERENCE_TIME rt;
+		bool key_frame;
 	};
 	bool Sync();
 	bool ReadHeader(Header& hdr);
+
+	std::vector<SyncPoint> m_sps;
 
 protected:
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
