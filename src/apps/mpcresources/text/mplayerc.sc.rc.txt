@@ -398,7 +398,7 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 5		"声道合成"
 6		"混合声道至:"
 8		"要求解码器输出 2.0 立体声"
-9		"低音重定向到 LFE 声道*"
+9		"低音重定向到 LFE 声道"
 14		"音量控制"
 17		"自动音量控制"
 18		"音频增强"

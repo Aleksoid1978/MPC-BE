@@ -398,7 +398,7 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 5		"聲道混音"
 6		"混合聲道為："
 8		"要求解碼器輸出 2.0 立體聲"
-9		"低音重新分配到 LFE 聲道*"
+9		"低音重新分配到 LFE 聲道"
 14		"音量控制"
 17		"自動音量控制"
 18		"音訊增強"
