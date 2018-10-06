@@ -33,15 +33,15 @@ static bool LoadMediaType(CStringW DisplayName, AM_MEDIA_TYPE** ppmt)
 	bool fRet = false;
 
 	if (!ppmt) {
-		return(fRet);
+		return fRet;
 	}
 
 	*ppmt = (AM_MEDIA_TYPE*)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE));
 	if (!*ppmt) {
-		return(fRet);
+		return fRet;
 	}
 
-	memset(*ppmt, 0, sizeof(AM_MEDIA_TYPE));
+	ZeroMemory(*ppmt, sizeof(AM_MEDIA_TYPE));
 
 	BYTE* pData;
 	UINT len;
@@ -49,7 +49,7 @@ static bool LoadMediaType(CStringW DisplayName, AM_MEDIA_TYPE** ppmt)
 		if ( len != sizeof(AM_MEDIA_TYPE) ) {
 			CoTaskMemFree(*ppmt);
 			delete [] pData;
-			return(fRet);
+			return fRet;
 		}
 		memcpy(*ppmt, pData, len);
 		delete [] pData;
@@ -62,7 +62,7 @@ static bool LoadMediaType(CStringW DisplayName, AM_MEDIA_TYPE** ppmt)
 		if (AfxGetMyApp()->GetProfileBinary(IDS_R_CAPTURE L"\\" + CString(DisplayName), L"Format", &pData, &len)) {
 			if ( !len ) {
 				delete [] pData;
-				return(fRet);
+				return fRet;
 			}
 			(*ppmt)->cbFormat = len;
 			(*ppmt)->pbFormat = (BYTE*)CoTaskMemAlloc(len);
@@ -71,7 +71,7 @@ static bool LoadMediaType(CStringW DisplayName, AM_MEDIA_TYPE** ppmt)
 		}
 	}
 
-	return(fRet);
+	return fRet;
 }
 
 static void SaveMediaType(CStringW DisplayName, AM_MEDIA_TYPE* pmt)
@@ -98,7 +98,7 @@ static void LoadDefaultCodec(std::vector<Codec>& codecs, CComboBox& box, const G
 	CString DisplayName = AfxGetMyApp()->GetProfileString(IDS_R_CAPTURE L"\\" + CStringFromGUID(cat), L"DisplayName");
 
 	for (int i = 0; i < len; i++) {
-		int iSel = box.GetItemData(i);
+		int iSel = (int)box.GetItemData(i);
 		if (iSel < 0) {
 			continue;
 		}
@@ -128,7 +128,7 @@ static void SaveDefaultCodec(std::vector<Codec>& codecs, CComboBox& box, const G
 	if (iSel < 0) {
 		return;
 	}
-	iSel = box.GetItemData(iSel);
+	iSel = (int)box.GetItemData(iSel);
 	if (iSel < 0) {
 		return;
 	}
@@ -140,7 +140,7 @@ static void SaveDefaultCodec(std::vector<Codec>& codecs, CComboBox& box, const G
 
 static void SetupDefaultCaps(AM_MEDIA_TYPE* pmt, VIDEO_STREAM_CONFIG_CAPS& caps)
 {
-	memset(&caps, 0, sizeof(caps));
+	ZeroMemory(&caps, sizeof(caps));
 
 	if (!pmt) {
 		return;
@@ -178,7 +178,7 @@ static void SetupDefaultCaps(AM_MEDIA_TYPE* pmt, VIDEO_STREAM_CONFIG_CAPS& caps)
 
 static void SetupDefaultCaps(AM_MEDIA_TYPE* pmt, AUDIO_STREAM_CONFIG_CAPS& caps)
 {
-	memset(&caps, 0, sizeof(caps));
+	ZeroMemory(&caps, sizeof(caps));
 
 	if (!pmt) {
 		return;
@@ -223,7 +223,7 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 		}
 
 		if (iSize == sizeof(VIDEO_STREAM_CONFIG_CAPS)) {
-			for (int i = 0, cnt = tfa.GetCount(); i < cnt; i++) {
+			for (size_t i = 0, cnt = tfa.GetCount(); i < cnt; i++) {
 				if (tfa[i]->GetCount() != 1) {
 					continue;
 				}
@@ -266,10 +266,10 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 						continue;
 					}
 
-					CMediaType mt = pfe->mt;
+					CMediaType mtCap = pfe->mt;
 
-					if (mt.formattype == FORMAT_VideoInfo) {
-						VIDEOINFOHEADER* vih = (VIDEOINFOHEADER*)mt.pbFormat;
+					if (mtCap.formattype == FORMAT_VideoInfo) {
+						VIDEOINFOHEADER* vih = (VIDEOINFOHEADER*)mtCap.pbFormat;
 						if (!vih->bmiHeader.biHeight) {
 							vih->bmiHeader.biHeight = 1;
 						}
@@ -278,16 +278,16 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 						vih->bmiHeader.biSizeImage	= presets[j].cx * presets[j].cy * vih->bmiHeader.biBitCount>>3;
 
 						AM_MEDIA_TYPE* pmt = (AM_MEDIA_TYPE*)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE));
-						CopyMediaType(pmt, &mt);
+						CopyMediaType(pmt, &mtCap);
 						tfa.AddFormat(pmt, pcaps, sizeof(*pcaps));
 
 						if (presets[j].cx*3 != presets[j].cy*4) {
-							int extra = mt.cbFormat - sizeof(VIDEOINFOHEADER);
+							int extra = mtCap.cbFormat - sizeof(VIDEOINFOHEADER);
 							int bmiHeaderSize = sizeof(vih->bmiHeader) + extra;
 							BYTE* pbmiHeader = DNew BYTE[bmiHeaderSize];
 							memcpy(pbmiHeader, &vih->bmiHeader, bmiHeaderSize);
-							mt.ReallocFormatBuffer(FIELD_OFFSET(VIDEOINFOHEADER2, bmiHeader) + bmiHeaderSize);
-							VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.pbFormat;
+							mtCap.ReallocFormatBuffer(FIELD_OFFSET(VIDEOINFOHEADER2, bmiHeader) + bmiHeaderSize);
+							VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mtCap.pbFormat;
 							memcpy(&vih2->bmiHeader, pbmiHeader, bmiHeaderSize);
 							delete [] pbmiHeader;
 							vih2->dwInterlaceFlags = vih2->dwCopyProtectFlags = 0;
@@ -296,7 +296,7 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 							vih2->dwPictAspectRatioY = 3;
 
 							AM_MEDIA_TYPE* pmt = (AM_MEDIA_TYPE*)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE));
-							CopyMediaType(pmt, &mt);
+							CopyMediaType(pmt, &mtCap);
 							tfa.AddFormat(pmt, pcaps, sizeof(*pcaps));
 						}
 					} else if (mt.formattype == FORMAT_VideoInfo2) {
@@ -311,7 +311,7 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 						vih2->dwPictAspectRatioY	= 3;
 
 						AM_MEDIA_TYPE* pmt = (AM_MEDIA_TYPE*)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE));
-						CopyMediaType(pmt, &mt);
+						CopyMediaType(pmt, &mtCap);
 						tfa.AddFormat(pmt, pcaps, sizeof(*pcaps));
 					}
 				}
@@ -319,7 +319,7 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 		}
 	}
 
-	if (tfa.GetCount() == 0) {
+	if (tfa.IsEmpty()) {
 		if (pcurmt && (pcurmt->majortype == MEDIATYPE_Video || pcurmt->majortype == MEDIATYPE_Audio)) {
 			AM_MEDIA_TYPE* pmt = (AM_MEDIA_TYPE*)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE));
 			CopyMediaType(pmt, pcurmt);
@@ -335,25 +335,25 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 		}
 	}
 
-	for (int i = 0; i < (int)tfa.GetCount(); i++) {
+	for (size_t i = 0, cnt = tfa.GetCount(); i < cnt; i++) {
 		CFormat<T>* pf = tfa[i];
 		AddStringData(type, pf->name, (DWORD_PTR)pf);
 	}
 
 	CFormat<T>* pf = nullptr;
-	CFormatElem<T>* pfe = nullptr;
+	CFormatElem<T>* pfeCurrent = nullptr;
 
 	if (!pcurmt) {
 		pf = tfa[0];
-		pfe = pf->GetAt(0);
-	} else if (!tfa.FindFormat(pcurmt, nullptr, &pf, &pfe) && !tfa.FindFormat(pcurmt, &pf)) {
+		pfeCurrent = pf->GetAt(0);
+	} else if (!tfa.FindFormat(pcurmt, nullptr, &pf, &pfeCurrent) && !tfa.FindFormat(pcurmt, &pf)) {
 		if (pcurmt) {
 			DeleteMediaType(pcurmt);
 		}
 		return;
 	}
 
-	for (int i = 0; i < (int)pf->GetCount(); i++) {
+	for (size_t i = 0, cnt = pf->GetCount(); i < cnt; i++) {
 		CFormatElem<T>* pfe = pf->GetAt(i);
 		AddStringData(dim, tfa.MakeDimensionName(pfe), (DWORD_PTR)pfe);
 	}
@@ -362,7 +362,7 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 	if (iType < 0 && type.GetCount()) {
 		type.SetCurSel(0);
 	}
-	int iDim = dim.SetCurSel(dim.FindStringExact(0, tfa.MakeDimensionName(pfe)));
+	int iDim = dim.SetCurSel(dim.FindStringExact(0, tfa.MakeDimensionName(pfeCurrent)));
 	//if (iDim < 0 && dim.GetCount()) dim.SetCurSel(iDim = 0);
 
 	CorrectComboListWidth(type);
@@ -386,7 +386,7 @@ template<class T>
 static bool SetupDimension(CFormatArray<T>& tfa, CComboBox& type, CComboBox& dim)
 {
 	CString str;
-	dim.GetWindowTextW(str);
+	dim.GetWindowText(str);
 
 	dim.ResetContent();
 	dim.EnableWindow(FALSE);
@@ -477,12 +477,12 @@ static int ShowPPage(std::vector<Codec>& codecs, CComboBox& box, HWND hWnd = nul
 {
 	int iSel = box.GetCurSel();
 	if (iSel < 0) {
-		return(-1);
+		return -1;
 	}
 
-	iSel = box.GetItemData(iSel);
+	iSel = (int)box.GetItemData(iSel);
 	if (iSel < 0) {
-		return(-1);
+		return -1;
 	}
 
 	Codec& c = codecs[iSel];
@@ -514,7 +514,7 @@ static int ShowPPage(std::vector<Codec>& codecs, CComboBox& box, HWND hWnd = nul
 		}
 	}
 
-	return(iSel);
+	return iSel;
 }
 
 // CPlayerCaptureDialog dialog
@@ -806,7 +806,7 @@ void CPlayerCaptureDialog::UpdateUserDefinableControls()
 
 	CString fps;
 	fps.Format(L"%.4f", (float)(10000000.0 / ((VIDEOINFOHEADER*)pmt->pbFormat)->AvgTimePerFrame));
-	m_vidfpsedit.SetWindowTextW(fps);
+	m_vidfpsedit.SetWindowText(fps);
 
 	DeleteMediaType(pmt);
 }
@@ -815,7 +815,7 @@ void CPlayerCaptureDialog::UpdateVideoCodec()
 {
 	int iSel = m_vidcodec.GetCurSel();
 	if (iSel >= 0) {
-		iSel = m_vidcodec.GetItemData(iSel);
+		iSel = (int)m_vidcodec.GetItemData(iSel);
 	}
 
 	m_pVidEnc = iSel < 0 ? nullptr : m_pVidEncArray[iSel].pBF;
@@ -835,7 +835,7 @@ void CPlayerCaptureDialog::UpdateAudioCodec()
 {
 	int iSel = m_audcodec.GetCurSel();
 	if (iSel >= 0) {
-		iSel = m_audcodec.GetItemData(iSel);
+		iSel = (int)m_audcodec.GetItemData(iSel);
 	}
 
 	m_pAudEnc = iSel < 0 ? nullptr : m_pAudEncArray[iSel].pBF;
@@ -888,8 +888,6 @@ void CPlayerCaptureDialog::UpdateGraph()
 {
 	UpdateMediaTypes();
 
-	//UpdateMuxer();
-
 	m_pMainFrame->BuildGraphVideoAudio(m_fVidPreview, false, m_fAudPreview, false);
 
 	UpdateUserDefinableControls();
@@ -910,7 +908,7 @@ void CPlayerCaptureDialog::EnableControls(CWnd* pWnd, bool fEnable)
 			m_wndenabledmap.RemoveAll();
 		}
 
-		m_recordbtn.SetWindowTextW(L"Record");
+		m_recordbtn.SetWindowText(L"Record");
 	} else {
 		if (pWnd->m_hWnd == m_hWnd) {
 			m_wndenabledmap.RemoveAll();
@@ -923,7 +921,7 @@ void CPlayerCaptureDialog::EnableControls(CWnd* pWnd, bool fEnable)
 		}
 
 		m_recordbtn.EnableWindow(TRUE);
-		m_recordbtn.SetWindowTextW(L"Stop");
+		m_recordbtn.SetWindowText(L"Stop");
 	}
 }
 
@@ -1184,7 +1182,7 @@ bool CPlayerCaptureDialog::IsTunerActive()
 	if (iSel < 0) {
 		return false;
 	}
-	iSel = m_vidinput.GetItemData(iSel);
+	iSel = (int)m_vidinput.GetItemData(iSel);
 	if (iSel < 0) {
 		return false;
 	}
@@ -1244,7 +1242,7 @@ int CPlayerCaptureDialog::GetVideoInput()
 	if (i < 0) {
 		return -1;
 	}
-	return m_vidinput.GetItemData(i);
+	return (int)m_vidinput.GetItemData(i);
 }
 
 int CPlayerCaptureDialog::GetVideoChannel()
@@ -1259,7 +1257,7 @@ int CPlayerCaptureDialog::GetAudioInput()
 	if (i < 0) {
 		return -1;
 	}
-	return m_audinput.GetItemData(i);
+	return (int)m_audinput.GetItemData(i);
 }
 
 BEGIN_MESSAGE_MAP(CPlayerCaptureDialog, CResizableDialog)
@@ -1350,7 +1348,7 @@ void CPlayerCaptureDialog::OnVideoInput()
 	if (iSel < 0) {
 		return;
 	}
-	iSel = m_vidinput.GetItemData(iSel);
+	iSel = (int)m_vidinput.GetItemData(iSel);
 	if (iSel < 0) {
 		return;
 	}
@@ -1386,9 +1384,9 @@ void CPlayerCaptureDialog::OnVideoInput()
 			HRESULT hr = m_pAMVfwCD->ShowDialog(iSel, m_hWnd);
 
 			if (VFW_E_NOT_STOPPED == hr) {
-				m_pMainFrame->SendMessageW(WM_COMMAND, ID_PLAY_STOP);
+				m_pMainFrame->SendMessage(WM_COMMAND, ID_PLAY_STOP);
 				hr = m_pAMVfwCD->ShowDialog(iSel, m_hWnd);
-				m_pMainFrame->SendMessageW(WM_COMMAND, ID_PLAY_PLAY);
+				m_pMainFrame->SendMessage(WM_COMMAND, ID_PLAY_PLAY);
 			}
 
 			if (VFW_E_CANNOT_CONNECT == hr) {
@@ -1432,7 +1430,7 @@ void CPlayerCaptureDialog::OnVideoDimension()
 	m_vidver.SetPos(abs(bih->biHeight));
 	CString fps;
 	fps.Format(L"%.4f", (float)(10000000.0 / ((VIDEOINFOHEADER*)pvfe->mt.pbFormat)->AvgTimePerFrame));
-	m_vidfpsedit.SetWindowTextW(fps);
+	m_vidfpsedit.SetWindowText(fps);
 
 	UpdateGraph();
 }

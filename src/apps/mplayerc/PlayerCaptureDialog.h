@@ -54,18 +54,18 @@ public:
 	CFormat<T>* Find(CString name, bool fCreate = false) {
 		for (size_t i = 0; i < GetCount(); ++i) {
 			if (GetAt(i)->name == name) {
-				return(GetAt(i));
+				return GetAt(i);
 			}
 		}
 
 		if (fCreate) {
-			CAutoPtr<CFormat<T> > pf(DNew CFormat<T>(name));
+			CAutoPtr<CFormat<T>> pf(DNew CFormat<T>(name));
 			CFormat<T>* tmp = pf;
 			Add(pf);
-			return(tmp);
+			return tmp;
 		}
 
-		return(nullptr);
+		return nullptr;
 	}
 
 	bool FindFormat(AM_MEDIA_TYPE* pmt, CFormat<T>** ppf) {
@@ -160,7 +160,7 @@ public:
 		CString str(L"Default");
 
 		if (!pmt) {
-			return(str);
+			return str;
 		}
 
 		BITMAPINFOHEADER* bih = (pmt->formattype == FORMAT_VideoInfo)
@@ -184,12 +184,12 @@ public:
 						   (WCHAR)((pmt->subtype.Data1>>24)&0xff));
 			}
 
-			return(str);
+			return str;
 		}
 
 		switch (bih->biCompression) {
 			case BI_RGB:
-				str.Format(L"RGB%d", bih->biBitCount);
+				str.Format(L"RGB%u", bih->biBitCount);
 				break;
 			case BI_RLE8:
 				str = L"RLE8";
@@ -198,7 +198,7 @@ public:
 				str = L"RLE4";
 				break;
 			case BI_BITFIELDS:
-				str.Format(L"BITF%d", bih->biBitCount);
+				str.Format(L"BITF%u", bih->biBitCount);
 				break;
 			case BI_JPEG:
 				str = L"JPEG";
@@ -215,14 +215,14 @@ public:
 				break;
 		}
 
-		return(str);
+		return str;
 	}
 
 	CString MakeDimensionName(CVidFormatElem* pfe) {
 		CString str(L"Default");
 
 		if (!pfe) {
-			return(str);
+			return str;
 		}
 
 		BITMAPINFOHEADER* bih = (pfe->mt.formattype == FORMAT_VideoInfo)
@@ -232,10 +232,10 @@ public:
 								: nullptr;
 
 		if (bih == nullptr) {
-			return(str);
+			return str;
 		}
 
-		str.Format(L"%dx%d %.2f", bih->biWidth, bih->biHeight, (float)10000000/((VIDEOINFOHEADER*)pfe->mt.pbFormat)->AvgTimePerFrame);
+		str.Format(L"%ldx%ld %.2f", bih->biWidth, bih->biHeight, 10000000.0f / ((VIDEOINFOHEADER*)pfe->mt.pbFormat)->AvgTimePerFrame);
 
 		if (pfe->mt.formattype == FORMAT_VideoInfo2) {
 			VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)pfe->mt.pbFormat;
@@ -244,7 +244,7 @@ public:
 			str += str2;
 		}
 
-		return(str);
+		return str;
 	}
 };
 
@@ -258,7 +258,7 @@ public:
 		CString str(L"Unknown");
 
 		if (!pmt) {
-			return(str);
+			return str;
 		}
 
 		WAVEFORMATEX* wfe = (pmt->formattype == FORMAT_WaveFormatEx)
@@ -274,7 +274,7 @@ public:
 				str.Format(L"0x%04x", pmt->subtype.Data1);
 			}
 
-			return(str);
+			return str;
 		}
 
 		switch (wfe->wFormatTag) {
@@ -286,14 +286,14 @@ public:
 				break;
 		}
 
-		return(str);
+		return str;
 	}
 
 	CString MakeDimensionName(CAudFormatElem* pfe) {
 		CString str(L"Unknown");
 
 		if (!pfe) {
-			return(str);
+			return str;
 		}
 
 		WAVEFORMATEX* wfe = (pfe->mt.formattype == FORMAT_WaveFormatEx)
@@ -301,7 +301,7 @@ public:
 							: nullptr;
 
 		if (!wfe) {
-			return(str);
+			return str;
 		}
 
 		str.Empty();
@@ -329,7 +329,7 @@ public:
 		str2.Format(L"%3ukbps ", wfe->nAvgBytesPerSec*8/1000);
 		str += str2;
 
-		return(str);
+		return str;
 	}
 };
 
@@ -462,7 +462,6 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 
-public:
 	afx_msg void OnDestroy();
 	afx_msg void OnVideoInput();
 	afx_msg void OnVideoType();
