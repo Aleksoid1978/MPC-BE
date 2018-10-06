@@ -1323,6 +1323,9 @@
 #define IDS_AUDIO_GAIN                  33453
 #define IDS_SAVING_THUMBNAIL            33454
 #define IDS_SEEKBEGIN                   33455
+#define IDS_RECORD_START                33456
+#define IDS_RECORD_STOP                 33457
+//
 #define IDS_FRAME_HALF                  33500
 #define IDS_FRAME_NORMAL                33501
 #define IDS_FRAME_DOUBLE                33502
