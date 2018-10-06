@@ -16307,12 +16307,12 @@ bool CMainFrame::BuildGraphVideoAudio(int fVPreview, bool fVCapture, int fAPrevi
 
 	CComPtr<IBaseFilter> pVidBuffer = m_wndCaptureBar.m_capdlg.m_pVidBuffer;
 	CComPtr<IBaseFilter> pAudBuffer = m_wndCaptureBar.m_capdlg.m_pAudBuffer;
-	CComPtr<IBaseFilter> pVidEnc = m_wndCaptureBar.m_capdlg.m_pVidEnc;
-	CComPtr<IBaseFilter> pAudEnc = m_wndCaptureBar.m_capdlg.m_pAudEnc;
-	CComPtr<IBaseFilter> pMux = m_wndCaptureBar.m_capdlg.m_pMux;
-	CComPtr<IBaseFilter> pDst = m_wndCaptureBar.m_capdlg.m_pDst;
-	CComPtr<IBaseFilter> pAudMux = m_wndCaptureBar.m_capdlg.m_pAudMux;
-	CComPtr<IBaseFilter> pAudDst = m_wndCaptureBar.m_capdlg.m_pAudDst;
+	CComPtr<IBaseFilter> pVidEnc    = m_wndCaptureBar.m_capdlg.m_pVidEnc;
+	CComPtr<IBaseFilter> pAudEnc    = m_wndCaptureBar.m_capdlg.m_pAudEnc;
+	CComPtr<IBaseFilter> pMux       = m_wndCaptureBar.m_capdlg.m_pMux;
+	CComPtr<IBaseFilter> pDst       = m_wndCaptureBar.m_capdlg.m_pDst;
+	CComPtr<IBaseFilter> pAudMux    = m_wndCaptureBar.m_capdlg.m_pAudMux;
+	CComPtr<IBaseFilter> pAudDst    = m_wndCaptureBar.m_capdlg.m_pAudDst;
 
 	bool fFileOutput = (pMux && pDst) || (pAudMux && pAudDst);
 	bool fCapture = (fVCapture || fACapture);
@@ -16330,96 +16330,95 @@ bool CMainFrame::BuildGraphVideoAudio(int fVPreview, bool fVCapture, int fAPrevi
 	CComPtr<IPin> pVidCapPin, pVidPrevPin, pAudCapPin, pAudPrevPin;
 	BuildToCapturePreviewPin(m_pVidCap, &pVidCapPin, &pVidPrevPin, m_pAudCap, &pAudCapPin, &pAudPrevPin);
 
-	//if (pVidCap)
-	{
-		bool fVidPrev = pVidPrevPin && fVPreview;
-		bool fVidCap = pVidCapPin && fVCapture && fFileOutput && m_wndCaptureBar.m_capdlg.m_fVidOutput;
 
-		if (fVPreview == 2 && !fVidCap && pVidCapPin) {
-			pVidPrevPin = pVidCapPin;
-			pVidCapPin = nullptr;
+	bool fVidPrev = pVidPrevPin && fVPreview;
+	bool fVidCap = pVidCapPin && fVCapture && fFileOutput && m_wndCaptureBar.m_capdlg.m_fVidOutput;
+
+	if (fVPreview == 2 && !fVidCap && pVidCapPin) {
+		pVidPrevPin = pVidCapPin;
+		pVidCapPin = nullptr;
+	}
+	
+	bool fAudPrev = pAudPrevPin && fAPreview;
+	bool fAudCap = pAudCapPin && fACapture && fFileOutput && m_wndCaptureBar.m_capdlg.m_fAudOutput;
+
+	if (fAPreview == 2 && !fAudCap && pAudCapPin) {
+		pAudPrevPin = pAudCapPin;
+		pAudCapPin = nullptr;
+	}
+	
+	// Preview Video
+	if (fVidPrev) {
+		CComPtr<IVMRMixerBitmap9>    pVMB;
+		CComPtr<IMFVideoMixerBitmap> pMFVMB;
+		CComPtr<IMadVRTextOsd>       pMVTO;
+
+		m_pMVRS.Release();
+		m_pMVRSR.Release();
+
+		m_OSD.Stop();
+		m_pCAP.Release();
+		m_pVMRWC.Release();
+		m_pVMRMC9.Release();
+		m_pMFVP.Release();
+		m_pMFVDC.Release();
+		m_pQP.Release();
+
+		m_pGB->Render(pVidPrevPin);
+
+		m_pGB->FindInterface(IID_PPV_ARGS(&m_pCAP), TRUE);
+		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRWC), FALSE);
+		m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRMC9), TRUE);
+		m_pGB->FindInterface(IID_PPV_ARGS(&pVMB), TRUE);
+		m_pGB->FindInterface(IID_PPV_ARGS(&pMFVMB), TRUE);
+		m_pGB->FindInterface(IID_PPV_ARGS(&m_pMFVDC), TRUE);
+		m_pGB->FindInterface(IID_PPV_ARGS(&m_pMFVP), TRUE);
+		pMVTO = m_pCAP;
+		m_pMVRSR = m_pCAP;
+		m_pMVRS = m_pCAP;
+
+		const CAppSettings& s = AfxGetAppSettings();
+		m_pVideoWnd = &m_wndView;
+
+		if (m_pMFVDC) {
+			m_pMFVDC->SetVideoWindow(m_pVideoWnd->m_hWnd);
+		}
+		else if (m_pVMRWC) {
+			m_pVMRWC->SetVideoClippingWindow(m_pVideoWnd->m_hWnd);
 		}
 
-		if (fVidPrev) {
-			CComPtr<IVMRMixerBitmap9>    pVMB;
-			CComPtr<IMFVideoMixerBitmap> pMFVMB;
-			CComPtr<IMadVRTextOsd>       pMVTO;
-
-			m_pMVRS.Release();
-			m_pMVRSR.Release();
-
-			m_OSD.Stop();
-			m_pCAP.Release();
-			m_pVMRWC.Release();
-			m_pVMRMC9.Release();
-			m_pMFVP.Release();
-			m_pMFVDC.Release();
-			m_pQP.Release();
-
-			m_pGB->Render(pVidPrevPin);
-
-			m_pGB->FindInterface(IID_PPV_ARGS(&m_pCAP), TRUE);
-			m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRWC), FALSE);
-			m_pGB->FindInterface(IID_PPV_ARGS(&m_pVMRMC9), TRUE);
-			m_pGB->FindInterface(IID_PPV_ARGS(&pVMB), TRUE);
-			m_pGB->FindInterface(IID_PPV_ARGS(&pMFVMB), TRUE);
-			m_pGB->FindInterface(IID_PPV_ARGS(&m_pMFVDC), TRUE);
-			m_pGB->FindInterface(IID_PPV_ARGS(&m_pMFVP), TRUE);
-			pMVTO = m_pCAP;
-			m_pMVRSR = m_pCAP;
-			m_pMVRS = m_pCAP;
-
-			const CAppSettings& s = AfxGetAppSettings();
-			m_pVideoWnd = &m_wndView;
-
-			if (m_pMFVDC) {
-				m_pMFVDC->SetVideoWindow(m_pVideoWnd->m_hWnd);
+		if (s.iShowOSD & OSD_ENABLE || s.bShowDebugInfo) {
+			if (pMFVMB) {
+				m_OSD.Start(m_pVideoWnd, pMFVMB);
 			}
-			else if (m_pVMRWC) {
-				m_pVMRWC->SetVideoClippingWindow(m_pVideoWnd->m_hWnd);
+			else if (pMVTO) {
+				m_OSD.Start(m_pVideoWnd, pMVTO);
 			}
-
-			if (s.iShowOSD & OSD_ENABLE || s.bShowDebugInfo) {
-				if (pMFVMB) {
-					m_OSD.Start(m_pVideoWnd, pMFVMB);
-				}
-				else if (pMVTO) {
-					m_OSD.Start(m_pVideoWnd, pMVTO);
-				}
-			}
-		}
-
-		if (fVidCap) {
-			IBaseFilter* pBF[3] = {pVidBuffer, pVidEnc, pMux};
-			HRESULT hr = BuildCapture(pVidCapPin, pBF, MEDIATYPE_Video, &m_wndCaptureBar.m_capdlg.m_mtcv);
-			UNREFERENCED_PARAMETER(hr);
-		}
-
-		m_pAMDF.Release();
-		if (FAILED(m_pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, m_pVidCap, IID_PPV_ARGS(&m_pAMDF)))) {
-			DLog("Warning: No IAMDroppedFrames interface for vidcap capture");
 		}
 	}
 
-	//if (pAudCap)
-	{
-		bool fAudPrev = pAudPrevPin && fAPreview;
-		bool fAudCap = pAudCapPin && fACapture && fFileOutput && m_wndCaptureBar.m_capdlg.m_fAudOutput;
+	// Preview Audio (render audio before adding muxer)
+	if (fAudPrev) {
+		m_pGB->Render(pAudPrevPin);
+	}
 
-		if (fAPreview == 2 && !fAudCap && pAudCapPin) {
-			pAudPrevPin = pAudCapPin;
-			pAudCapPin = nullptr;
-		}
+	// Capture Video
+	if (fVidCap) {
+		IBaseFilter* pBF[3] = {pVidBuffer, pVidEnc, pMux};
+		HRESULT hr = BuildCapture(pVidCapPin, pBF, MEDIATYPE_Video, &m_wndCaptureBar.m_capdlg.m_mtcv);
+		UNREFERENCED_PARAMETER(hr);
+	}
 
-		if (fAudPrev) {
-			m_pGB->Render(pAudPrevPin);
-		}
+	m_pAMDF.Release();
+	if (FAILED(m_pCGB->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, m_pVidCap, IID_PPV_ARGS(&m_pAMDF)))) {
+		DLog("Warning: No IAMDroppedFrames interface for vidcap capture");
+	}
 
-		if (fAudCap) {
-			IBaseFilter* pBF[3] = {pAudBuffer, pAudEnc, pAudMux ? pAudMux : pMux};
-			HRESULT hr = BuildCapture(pAudCapPin, pBF, MEDIATYPE_Audio, &m_wndCaptureBar.m_capdlg.m_mtca);
-			UNREFERENCED_PARAMETER(hr);
-		}
+	// Capture Audio
+	if (fAudCap) {
+		IBaseFilter* pBF[3] = { pAudBuffer, pAudEnc, pAudMux ? pAudMux : pMux };
+		HRESULT hr = BuildCapture(pAudCapPin, pBF, MEDIATYPE_Audio, &m_wndCaptureBar.m_capdlg.m_mtca);
+		UNREFERENCED_PARAMETER(hr);
 	}
 
 	if ((m_pVidCap || m_pAudCap) && fCapture && fFileOutput) {
