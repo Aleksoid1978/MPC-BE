@@ -40,7 +40,7 @@ void CPPageSoundProcessing::UpdateCenterInfo()
 {
 	double center = m_sldCenter.GetPos() / 10.0f;
 	CString str;
-	str.Format(ResStr(IDS_CENTER_LEVEL)+L"*", center);
+	str.Format(ResStr(IDS_CENTER_LEVEL), center);
 	m_stcCenter.SetWindowTextW(str);
 
 	if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {
@@ -52,7 +52,7 @@ void CPPageSoundProcessing::UpdateSurroundInfo()
 {
 	double surround = m_sldSurround.GetPos() / 10.0f;
 	CString str;
-	str.Format(ResStr(IDS_SURROUND_LEVEL) + L"*", surround);
+	str.Format(ResStr(IDS_SURROUND_LEVEL), surround);
 	m_stcSurround.SetWindowTextW(str);
 
 	if (CComQIPtr<IAudioSwitcherFilter> pASF = AfxGetMainFrame()->m_pSwitcherFilter) {

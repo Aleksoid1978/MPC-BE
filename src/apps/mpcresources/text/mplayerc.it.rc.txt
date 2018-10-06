@@ -398,7 +398,7 @@ BEGIN DIALOGEX IDD_PPAGESOUNDPROCESSING LINES 32
 5		"Channel Mixer"
 6		"Mix canali:"
 8		"Request stereo from the decoder"
-9		"Redirect bass to LFE*"
+9		"Redirect bass to LFE"
 14		"Volume control"
 17		"Controllo volume automatico"
 18		"Boost audio"
