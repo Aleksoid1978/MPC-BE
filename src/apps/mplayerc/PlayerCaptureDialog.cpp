@@ -447,17 +447,25 @@ static void InitCodecList(std::vector<Codec>& codecs, CComboBox& box, const GUID
 		}
 
 		CStringW str = CStringW(c.DisplayName).MakeLower();
-		if (str.Find(L"@device:dmo:") == 0) {
-			c.FriendlyName = L"(DMO)";
-		} else if (str.Find(L"@device:sw:") == 0) {
+		if (str.Find(L"@device:sw:") == 0) {
 			c.FriendlyName = L"(DS)";
-		} else if (str.Find(L"@device:cm:") == 0) {
+		}
+		else if (str.Find(L"@device:cm:") == 0) {
 			if (cat == CLSID_VideoCompressorCategory) {
 				// for some unknown reason, the VfW codecs never added in x64 mode
 				c.FriendlyName = L"(VfW)";
-			} else if (cat == CLSID_AudioCompressorCategory) {
+			}
+			else if (cat == CLSID_AudioCompressorCategory) {
 				c.FriendlyName = L"(ACM)";
 			}
+		}
+#if 0 // TODO?
+		else if (str.Find(L"@device:dmo:") == 0) {
+			c.FriendlyName = L"(DMO)";
+		}
+#endif
+		else {
+			continue;
 		}
 		c.FriendlyName.AppendFormat(L" %s", var.bstrVal);
 
