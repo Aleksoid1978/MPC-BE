@@ -114,3 +114,12 @@ void CPlayerBar::OnWindowPosChanged(WINDOWPOS* lpwndpos)
 		GetParentFrame()->SetFocus();
 	}
 }
+
+CSize CPlayerBar::CalcFixedLayout(BOOL bStretch, BOOL bHorz)
+{
+	CSize ret = __super::CalcFixedLayout(bStretch, bHorz);
+	if (bStretch == TRUE && bHorz == TRUE && IsVertDocked()) {
+		ret.cy += m_cyGripper + 5;
+	}
+	return ret;
+}
