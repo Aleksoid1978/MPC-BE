@@ -15324,7 +15324,7 @@ void CMainFrame::CalcControlsSize(CSize& cSize)
 		}
 	}
 
-	cSize.cy += std::max(HorzH, VertH + 17);
+	cSize.cy += std::max(HorzH, VertH);
 }
 
 void CMainFrame::SetAlwaysOnTop(int i)

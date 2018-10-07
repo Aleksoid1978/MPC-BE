@@ -43,4 +43,5 @@ public:
 	virtual void SaveState();
 
 	afx_msg void OnWindowPosChanged(WINDOWPOS* lpwndpos);
+	virtual CSize CalcFixedLayout(BOOL bStretch, BOOL bHorz) override;
 };
