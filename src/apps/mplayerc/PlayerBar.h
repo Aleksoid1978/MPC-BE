@@ -1,5 +1,5 @@
 /*
- * (C) 2014 see Authors.txt
+ * (C) 2014-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,8 +34,8 @@ protected :
 	CString m_strSettingName;
 
 public:
-	CPlayerBar(void);
-	virtual ~CPlayerBar(void);
+	CPlayerBar();
+	virtual ~CPlayerBar();
 
 	BOOL Create(LPCTSTR lpszWindowName, CWnd* pParentWnd, UINT nID, UINT defDockBarID, CString const& strSettingName);
 
