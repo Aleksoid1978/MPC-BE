@@ -60,6 +60,11 @@ public:
 	// CBaseFilter
 
 	STDMETHODIMP_(HRESULT) QueryFilterInfo(FILTER_INFO* pInfo);
+
+	// IKeyFrameInfo
+
+	STDMETHODIMP GetKeyFrameCount(UINT& nKFs);
+	STDMETHODIMP GetKeyFrames(const GUID* pFormat, REFERENCE_TIME* pKFs, UINT& nKFs);
 };
 
 class __declspec(uuid("E85619F1-2A32-4CF2-84E0-2F888E458EE1"))

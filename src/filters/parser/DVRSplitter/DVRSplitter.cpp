@@ -173,6 +173,25 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				m_rtNewStop = m_rtStop = m_rtDuration = sync * 10000ll;
 			}
 			m_endpos = m_pFile->GetLength() - FooterSize;
+
+			m_pFile->Skip(4);
+			size_t cnt = 1;
+			while (m_pFile->GetPos() < m_pFile->GetLength()) {
+				struct {
+					DWORD pos, pts;
+				} keyframe;
+
+				if (S_OK != m_pFile->ByteRead((BYTE*)&keyframe, sizeof(keyframe)) || keyframe.pos == 0) {
+					break;
+				}
+
+				if ((cnt % 3) == 0) {
+					const SyncPoint sp = {keyframe.pts * 10000ll, keyframe.pos};
+					m_sps.emplace_back(sp);
+				}
+
+				cnt++;
+			}
 		}
 	}
 
@@ -248,13 +267,10 @@ void CDVRSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	}
 
 	if (m_sps.size() > 1) {
-		const auto rtSeek = rt + m_rtOffsetVideo;
-		if (rtSeek <= m_sps.back().rt) {
-			const auto index = range_bsearch(m_sps, rtSeek);
-			if (index >= 0 && ((rtSeek - m_sps[index].rt) < 5 * UNITS)) {
-				m_pFile->Seek(m_sps[index].fp);
-				return;
-			}
+		const auto index = range_bsearch(m_sps, rt);
+		if (index >= 1) {
+			m_pFile->Seek(m_sps[index].fp);
+			return;
 		}
 	}
 
@@ -387,26 +403,6 @@ bool CDVRSplitterFilter::ReadHeader(Header& hdr)
 			hdr.size -= 4;
 			m_pFile->Skip(4);
 		}
-
-		if (hdr.key_frame) {
-			const auto pos = m_pFile->GetPos() - HeaderSize;
-
-			if (m_sps.empty() || (hdr.rt > m_sps.back().rt)) {
-				const SyncPoint sp = {hdr.rt, pos};
-				m_sps.emplace_back(sp);
-			} else if (hdr.rt < m_sps.back().rt) {
-				const auto exists = std::any_of(m_sps.begin(), m_sps.end(), [&](const SyncPoint& sp) {
-					return sp.rt == hdr.rt;
-				});
-				if (!exists) {
-					const SyncPoint sp = {hdr.rt, pos};
-					m_sps.emplace_back(sp);
-					std::sort(m_sps.begin(), m_sps.end(), [](const SyncPoint& a, const SyncPoint& b) {
-						return a.rt < b.rt;
-					});
-				}
-			}
-		}
 	}
 
 	return ret;
@@ -424,6 +420,32 @@ STDMETHODIMP CDVRSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 	pInfo->pGraph = m_pGraph;
 	if (m_pGraph) {
 		m_pGraph->AddRef();
+	}
+
+	return S_OK;
+}
+
+// IKeyFrameInfo
+
+STDMETHODIMP CDVRSplitterFilter::GetKeyFrameCount(UINT& nKFs)
+{
+	CheckPointer(m_pFile, E_UNEXPECTED);
+	nKFs = m_sps.size();
+	return S_OK;
+}
+
+STDMETHODIMP CDVRSplitterFilter::GetKeyFrames(const GUID* pFormat, REFERENCE_TIME* pKFs, UINT& nKFs)
+{
+	CheckPointer(pFormat, E_POINTER);
+	CheckPointer(pKFs, E_POINTER);
+	CheckPointer(m_pFile, E_UNEXPECTED);
+
+	if (*pFormat != TIME_FORMAT_MEDIA_TIME) {
+		return E_INVALIDARG;
+	}
+
+	for (nKFs = 0; nKFs < m_sps.size(); nKFs++) {
+		pKFs[nKFs] = m_sps[nKFs].rt;
 	}
 
 	return S_OK;
