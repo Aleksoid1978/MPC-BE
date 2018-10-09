@@ -149,6 +149,30 @@ static void ReadLang(CGolombBuffer &gb, DWORD &size)
 	size -= 3;
 }
 
+static LPCWSTR picture_types[] = {
+	L"Other",
+	L"32x32 pixels(file icon)",
+	L"Other file icon",
+	L"Cover (front)",
+	L"Cover (back)",
+	L"Leaflet page",
+	L"Media (lable side of CD)",
+	L"Lead artist(lead performer)",
+	L"Artist(performer)",
+	L"Conductor",
+	L"Band(Orchestra)",
+	L"Composer",
+	L"Lyricist(text writer)",
+	L"Recording Location",
+	L"During recording",
+	L"During performance",
+	L"Movie(video) screen capture",
+	L"A bright coloured fish",
+	L"Illustration",
+	L"Band(artist) logo",
+	L"Publisher(Studio) logo"
+};
+
 void CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size, CID3TagItem** item)
 {
 	BYTE encoding = (BYTE)gbData.BitRead(8);
@@ -161,8 +185,12 @@ void CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size, CID3T
 		int mime_len = 0;
 		while (size-- && (mime[mime_len++] = gbData.BitRead(8)) != 0);
 
-		BYTE pic_type = (BYTE)gbData.BitRead(8);
+		BYTE pict_type = (BYTE)gbData.BitRead(8);
 		size--;
+		CString pictStr(L"cover");
+		if (pict_type < sizeof(picture_types)) {
+			pictStr = picture_types[pict_type];
+		}
 
 		if (tag == 'APIC') {
 			CString Desc = ReadField(gbData, size, encoding);
@@ -184,7 +212,7 @@ void CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size, CID3T
 		data.resize(size);
 		gbData.ReadBuffer(data.data(), size);
 
-		*item = DNew CID3TagItem(tag, data, mimeStr);
+		*item = DNew CID3TagItem(tag, data, mimeStr, pictStr);
 	} else {
 		if (tag == 'COMM' || tag == '\0ULT' || tag == 'USLT') {
 			ReadLang(gbData, size);
@@ -589,22 +617,10 @@ void SetID3TagProperties(IBaseFilter* pBF, const CID3Tag* pID3tag)
 	}
 
 	if (CComQIPtr<IDSMResourceBag> pRB = pBF) {
+		DWORD_PTR tag = 0;
 		for (const auto& item : pID3tag->TagItems) {
 			if (item->GetType() == ID3Type::ID3_TYPE_BINARY && item->GetDataLen()) {
-				CString mime = item->GetMime();
-				CString fname;
-				if (mime == L"image/jpeg" || mime == L"image/jpg") {
-					fname = L"cover.jpg";
-				} else if (mime == L"image/png") {
-					fname = L"cover.png";
-				} else {
-					fname = mime;
-					fname.Replace(L"image/", L"cover.");
-				}
-
-				if (SUCCEEDED(pRB->ResAppend(fname, L"cover", mime, (BYTE*)item->GetData(), (DWORD)item->GetDataLen(), 0))) {
-					break;
-				}
+				pRB->ResAppend(item->GetValue(), item->GetValue(), item->GetMime(), (BYTE*)item->GetData(), (DWORD)item->GetDataLen(), tag++);
 			}
 		}
 	}
