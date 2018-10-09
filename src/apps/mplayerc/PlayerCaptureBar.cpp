@@ -55,6 +55,11 @@ BOOL CPlayerCaptureBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 	return TRUE;
 }
 
+void CPlayerCaptureBar::InitControls()
+{
+	m_capdlg.InitControls();
+}
+
 BOOL CPlayerCaptureBar::PreTranslateMessage(MSG* pMsg)
 {
 	if (IsWindow(pMsg->hwnd) && IsVisible() && pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST) {

@@ -36,6 +36,8 @@ public:
 
 	BOOL Create(CWnd* pParentWnd, UINT defDockBarID);
 
+	virtual void ReloadTranslatableResources();
+
 public:
 	CShaderEditorDlg m_dlg;
 

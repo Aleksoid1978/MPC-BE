@@ -54,6 +54,11 @@ BOOL CPlayerShaderEditorBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 	return TRUE;
 }
 
+void CPlayerShaderEditorBar::ReloadTranslatableResources()
+{
+	SetWindowText(ResStr(IDS_SHADER_EDITOR));
+}
+
 BOOL CPlayerShaderEditorBar::PreTranslateMessage(MSG* pMsg)
 {
 	if (IsWindow(pMsg->hwnd) && IsVisible() && pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST) {

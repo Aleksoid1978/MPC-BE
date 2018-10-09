@@ -12170,6 +12170,8 @@ HRESULT CMainFrame::OpenBDAGraph()
 
 CString CMainFrame::OpenCapture(OpenDeviceData* pODD)
 {
+	m_wndCaptureBar.InitControls();
+
 	CStringW vidfrname, audfrname;
 	CComPtr<IBaseFilter> pVidCapTmp, pAudCapTmp;
 
@@ -17174,6 +17176,12 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 
 	// Re-create Win 7 TaskBar preview button for change button hint
 	CreateThumbnailToolbar();
+
+	m_wndSubresyncBar.ReloadTranslatableResources();
+	m_wndCaptureBar.ReloadTranslatableResources();
+	m_wndNavigationBar.ReloadTranslatableResources();
+	m_wndShaderEditorBar.ReloadTranslatableResources();
+	m_wndPlaylistBar.ReloadTranslatableResources();
 
 	m_wndInfoBar.RemoveAllLines();
 	m_wndStatsBar.RemoveAllLines();

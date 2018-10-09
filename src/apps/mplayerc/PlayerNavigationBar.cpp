@@ -57,6 +57,11 @@ BOOL CPlayerNavigationBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 	return TRUE;
 }
 
+void CPlayerNavigationBar::ReloadTranslatableResources()
+{
+	SetWindowText(ResStr(IDS_NAVIGATION_BAR));
+}
+
 BOOL CPlayerNavigationBar::PreTranslateMessage(MSG* pMsg)
 {
 	if (IsWindow(pMsg->hwnd) && IsVisible() && pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST) {

@@ -85,6 +85,8 @@ public:
 	CPlayerNavigationBar();
 	virtual ~CPlayerNavigationBar();
 	BOOL Create(CWnd* pParentWnd, UINT defDockBarID);
+	virtual void ReloadTranslatableResources();
+
 	void ShowControls(CWnd* pMainfrm, bool bShow);
 
 public:
