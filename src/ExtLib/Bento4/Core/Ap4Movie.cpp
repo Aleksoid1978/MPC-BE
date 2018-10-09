@@ -413,7 +413,7 @@ AP4_Movie::SetSidxAtom(AP4_SidxAtom* atom, AP4_ByteStream& stream)
     AP4_Track* track = GetTrack(m_SidxAtom->GetReferenceId());
     if (track) {
         mediaTimeScale = track->GetMediaTimeScale();
-	}
+    }
 
     AP4_Array<AP4_SidxAtom::Fragments>& fragments = m_SidxAtom->GetSampleTable();
     m_FragmentsIndexEntries.SetItemCount(fragments.ItemCount());
@@ -472,6 +472,7 @@ AP4_Result
 AP4_Movie::SwitchMoof(AP4_Cardinal index, AP4_UI64 offset, AP4_UI64 size, AP4_Duration dts)
 {
     if (m_SidxAtom) {
+        AP4_UI64 segment_size = size;
         AP4_Atom* atom = NULL;
         if (m_MoofAtomEntries[index]) {
             atom   = m_MoofAtomEntries[index];
@@ -490,6 +491,31 @@ AP4_Movie::SwitchMoof(AP4_Cardinal index, AP4_UI64 offset, AP4_UI64 size, AP4_Du
                 m_MoofAtomEntries[index]   = AP4_DYNAMIC_CAST(AP4_ContainerAtom, atom);
                 m_MoofOffsetEntries[index] = offset;
             }
+
+            segment_size -= atom->GetSize();
+
+            for (;;) {
+                m_Stream->Seek(offset);
+                AP4_Atom* next_atom = NULL;
+                if (AP4_SUCCEEDED(AP4_AtomFactory::DefaultFactory.CreateAtomFromStream(*m_Stream, segment_size, next_atom, NULL))) {
+                    if (next_atom->GetType() == AP4_ATOM_TYPE_MDAT && segment_size) {
+                        delete next_atom;
+                        if (AP4_SUCCEEDED(AP4_AtomFactory::DefaultFactory.CreateAtomFromStream(*m_Stream, segment_size, next_atom, NULL))) {
+                            m_Stream->Tell(offset);
+                            if (next_atom->GetType() == AP4_ATOM_TYPE_MOOF) {
+                                ProcessMoof(AP4_DYNAMIC_CAST(AP4_ContainerAtom, next_atom),
+                                            *m_Stream, offset, dts);
+                                delete next_atom;
+                                continue;
+                            }
+                            delete next_atom;
+                        }
+                    }
+                    delete next_atom;
+                }
+                break;
+            }
+
             return AP4_SUCCESS;
         }
 
