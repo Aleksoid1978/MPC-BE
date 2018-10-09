@@ -338,8 +338,8 @@ public:
 struct Codec {
 	CComPtr<IMoniker> pMoniker;
 	CComPtr<IBaseFilter> pBF;
-	CString FriendlyName;
-	CComBSTR DisplayName;
+	CString friendlyName;
+	CComBSTR displayName;
 };
 
 // CPlayerCaptureDialog dialog
@@ -382,7 +382,7 @@ private:
 	CComboBox m_muxctrl;
 
 	// video input
-	CStringW m_VidDisplayName;
+	CStringW m_vidDisplayName;
 	CComPtr<IAMStreamConfig> m_pAMVSC;
 	CComPtr<IAMCrossbar> m_pAMXB;
 	CComPtr<IAMTVTuner> m_pAMTuner;
@@ -390,7 +390,7 @@ private:
 	CVidFormatArray m_vfa;
 
 	// audio input
-	CStringW m_AudDisplayName;
+	CStringW m_audDisplayName;
 	CComPtr<IAMStreamConfig> m_pAMASC;
 	CInterfaceArray<IAMAudioInputMixer> m_pAMAIM;
 	CAudFormatArray m_afa;
@@ -439,9 +439,9 @@ public:
 	// Dialog Data
 	enum { IDD = IDD_CAPTURE_DLG };
 
-	void SetupVideoControls(CStringW DisplayName, IAMStreamConfig* pAMSC, IAMCrossbar* pAMXB, IAMTVTuner* pAMTuner);
-	void SetupVideoControls(CStringW DisplayName, IAMStreamConfig* pAMSC, IAMVfwCaptureDialogs* pAMVfwCD);
-	void SetupAudioControls(CStringW DisplayName, IAMStreamConfig* pAMSC, const CInterfaceArray<IAMAudioInputMixer>& pAMAIM);
+	void SetupVideoControls(CStringW displayName, IAMStreamConfig* pAMSC, IAMCrossbar* pAMXB, IAMTVTuner* pAMTuner);
+	void SetupVideoControls(CStringW displayName, IAMStreamConfig* pAMSC, IAMVfwCaptureDialogs* pAMVfwCD);
+	void SetupAudioControls(CStringW displayName, IAMStreamConfig* pAMSC, const CInterfaceArray<IAMAudioInputMixer>& pAMAIM);
 
 	bool IsTunerActive();
 
@@ -449,9 +449,9 @@ public:
 	bool SetVideoChannel(int channel);
 	bool SetAudioInput(int input);
 
-	int GetVideoInput();
-	int GetVideoChannel();
-	int GetAudioInput();
+	int GetVideoInput() const;
+	int GetVideoChannel(); // can't be const because of the IAMTVTuner interface
+	int GetAudioInput() const;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
