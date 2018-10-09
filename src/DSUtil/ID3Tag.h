@@ -43,11 +43,12 @@ public:
 		, m_tag(tag)
 		, m_value(value) {}
 
-	CID3TagItem(const DWORD tag, const std::vector<BYTE>& data, const CString& mime)
+	CID3TagItem(const DWORD tag, const std::vector<BYTE>& data, const CString& mime, const CString& value)
 		: m_type(ID3_TYPE_BINARY)
 		, m_tag(tag)
 		, m_Mime(mime)
-		, m_Data(data) {}
+		, m_Data(data)
+		, m_value(value) {}
 
 	DWORD GetTag()        const { return m_tag; }
 	CString GetValue()    const { return m_value; }
