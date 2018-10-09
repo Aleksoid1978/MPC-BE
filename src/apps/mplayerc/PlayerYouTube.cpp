@@ -505,6 +505,10 @@ namespace Youtube
 			}
 
 			auto AddUrl = [](YoutubeUrllist& videoUrls, YoutubeUrllist& audioUrls, const CString& url, const int itag, const int fps = 0, LPCSTR quality_label = nullptr) {
+				if (url.Find(L"dur=0.000") > 0) {
+					return;
+				}
+
 				if (const YoutubeProfile* profile = GetProfile(itag)) {
 					YoutubeUrllistItem item;
 					item.profile = profile;
