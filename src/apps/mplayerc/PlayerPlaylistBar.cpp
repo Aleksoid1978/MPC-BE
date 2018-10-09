@@ -750,6 +750,11 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 	return TRUE;
 }
 
+void CPlayerPlaylistBar::ReloadTranslatableResources()
+{
+	SetWindowText(ResStr(IDS_PLAYLIST_CAPTION));
+}
+
 static void GetNonClientMetrics(NONCLIENTMETRICS* ncm)
 {
 	ZeroMemory(ncm, sizeof(NONCLIENTMETRICS));

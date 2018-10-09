@@ -113,6 +113,8 @@ public:
 
 	BOOL Create(CWnd* pParentWnd, UINT defDockBarID, CCritSec* pSubLock);
 
+	virtual void ReloadTranslatableResources();
+
 	void SetTime(REFERENCE_TIME rt);
 	void SetFPS(double fps);
 

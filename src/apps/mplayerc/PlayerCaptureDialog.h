@@ -350,6 +350,7 @@ class CPlayerCaptureDialog : public CResizableDialog
 
 private:
 	CMainFrame* m_pMainFrame;
+	bool m_bInitialized;
 
 	CComboBox m_vidinput;
 	CComboBox m_vidtype;
@@ -377,6 +378,7 @@ private:
 	int m_nVidBuffers;
 	int m_nAudBuffers;
 	CButton m_recordbtn;
+	UINT_PTR m_nRecordTimerID;
 	BOOL m_fSepAudio;
 	int m_muxtype;
 	CComboBox m_muxctrl;
@@ -439,9 +441,14 @@ public:
 	// Dialog Data
 	enum { IDD = IDD_CAPTURE_DLG };
 
+	void InitControls();
+
 	void SetupVideoControls(CStringW displayName, IAMStreamConfig* pAMSC, IAMCrossbar* pAMXB, IAMTVTuner* pAMTuner);
 	void SetupVideoControls(CStringW displayName, IAMStreamConfig* pAMSC, IAMVfwCaptureDialogs* pAMVfwCD);
 	void SetupAudioControls(CStringW displayName, IAMStreamConfig* pAMSC, const CInterfaceArray<IAMAudioInputMixer>& pAMAIM);
+
+	void UpdateVideoControls();
+	void UpdateAudioControls();
 
 	bool IsTunerActive();
 
@@ -452,6 +459,10 @@ public:
 	int GetVideoInput() const;
 	int GetVideoChannel(); // can't be const because of the IAMTVTuner interface
 	int GetAudioInput() const;
+
+	bool IsInitialized() const {
+		return m_bInitialized;
+	};
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

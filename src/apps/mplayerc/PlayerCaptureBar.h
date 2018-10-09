@@ -38,6 +38,10 @@ public:
 
 	BOOL Create(CWnd* pParentWnd, UINT defDockBarID);
 
+	virtual void ReloadTranslatableResources();
+
+	void InitControls();
+
 protected:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 

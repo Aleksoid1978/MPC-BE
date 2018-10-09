@@ -225,6 +225,8 @@ public:
 
 	BOOL Create(CWnd* pParentWnd, UINT defDockBarID);
 
+	virtual void ReloadTranslatableResources();
+
 	virtual void LoadState(CFrameWnd *pParent);
 	virtual void SaveState();
 

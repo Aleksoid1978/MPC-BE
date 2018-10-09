@@ -62,6 +62,11 @@ BOOL CPlayerSubresyncBar::Create(CWnd* pParentWnd, UINT defDockBarID, CCritSec* 
 	return TRUE;
 }
 
+void CPlayerSubresyncBar::ReloadTranslatableResources()
+{
+	SetWindowText(ResStr(IDS_SUBRESYNC_CAPTION));
+}
+
 BOOL CPlayerSubresyncBar::PreCreateWindow(CREATESTRUCT& cs)
 {
 	if (!__super::PreCreateWindow(cs)) {
