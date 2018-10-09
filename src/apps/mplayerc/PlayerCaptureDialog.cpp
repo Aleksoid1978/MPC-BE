@@ -107,7 +107,7 @@ static void LoadDefaultCodec(std::vector<Codec>& codecs, CComboBox& box, const G
 		if (displayName == c.displayName) {
 			box.SetCurSel(i);
 			if (!c.pBF) {
-				c.pMoniker->BindToObject(nullptr, nullptr, __uuidof(IBaseFilter), (void**)&c.pBF);
+				c.pMoniker->BindToObject(nullptr, nullptr, IID_PPV_ARGS(&c.pBF));
 			}
 			break;
 		}
@@ -295,9 +295,9 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 							vih2->dwPictAspectRatioX = 4;
 							vih2->dwPictAspectRatioY = 3;
 
-							AM_MEDIA_TYPE* pmt = (AM_MEDIA_TYPE*)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE));
-							CopyMediaType(pmt, &mtCap);
-							tfa.AddFormat(pmt, pcaps, sizeof(*pcaps));
+							AM_MEDIA_TYPE* pmt2 = (AM_MEDIA_TYPE*)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE));
+							CopyMediaType(pmt2, &mtCap);
+							tfa.AddFormat(pmt2, pcaps, sizeof(*pcaps));
 						}
 					} else if (mtCap.formattype == FORMAT_VideoInfo2) {
 						VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mtCap.pbFormat;
@@ -425,24 +425,23 @@ static void InitCodecList(std::vector<Codec>& codecs, CComboBox& box, const GUID
 		c.pMoniker = pMoniker;
 		/*
 		CComPtr<IBaseFilter> pBF;
-		if (FAILED(pMoniker->BindToObject(0, 0, IID_IBaseFilter, (void**)&pBF)) || !pBF)
+		if (FAILED(pMoniker->BindToObject(0, 0, IID_PPV_ARGS(&pBF))) || !pBF) {
 			continue;
-
+		}
 		c.pBF = pBF;
 		*/
-		LPOLESTR strName = nullptr;
+		CComHeapPtr<OLECHAR> strName;
 		if (FAILED(pMoniker->GetDisplayName(nullptr, nullptr, &strName))) {
 			continue;
 		}
 
 		c.displayName = strName;
-		CoTaskMemFree(strName);
 
 		CComPtr<IPropertyBag> pPB;
-		pMoniker->BindToStorage(0, 0, IID_IPropertyBag, (void**)&pPB);
+		pMoniker->BindToStorage(0, 0, IID_PPV_ARGS(&pPB));
 
 		CComVariant var;
-		if (FAILED(pPB->Read(CComBSTR(L"FriendlyName"), &var, nullptr))) {
+		if (!pPB || FAILED(pPB->Read(L"FriendlyName", &var, nullptr))) {
 			continue;
 		}
 
@@ -496,7 +495,7 @@ static int ShowPPage(std::vector<Codec>& codecs, const CComboBox& box, HWND hWnd
 	Codec& c = codecs[iSel];
 
 	if (!c.pBF) {
-		c.pMoniker->BindToObject(nullptr, nullptr, __uuidof(IBaseFilter), (void**)&c.pBF);
+		c.pMoniker->BindToObject(nullptr, nullptr, IID_PPV_ARGS(&c.pBF));
 	}
 
 	if (CComQIPtr<ISpecifyPropertyPages> pSPP = c.pBF) {
@@ -847,7 +846,7 @@ void CPlayerCaptureDialog::UpdateAudioCodec()
 	m_pAudEnc = iSel < 0 ? nullptr : m_pAudEncArray[iSel].pBF;
 	m_pAudEncMoniker = iSel < 0 ? nullptr : m_pAudEncArray[iSel].pMoniker;
 
-	//CString displayName = iSel < 0 ? L"" : CString(m_pAudEncArray[iSel].DisplayName.m_str);
+	//CString displayName = iSel < 0 ? L"" : CString(m_pAudEncArray[iSel].displayName.m_str);
 	CComQIPtr<IAMStreamConfig> pAMSC = GetFirstPin(m_pAudEnc, PINDIR_OUTPUT);
 
 	SetupMediaTypes(pAMSC, m_acfa, m_audcodectype, m_audcodecdimension, m_mtca);
@@ -1493,7 +1492,7 @@ void CPlayerCaptureDialog::OnVideoCodecDimension()
 
 		// we have to recreate the encoder, otherwise it will accept the new media type for only the first time
 		m_pVidEnc = nullptr;
-		m_pVidEncMoniker->BindToObject(0, 0, IID_IBaseFilter, (void**)&m_pVidEnc);
+		m_pVidEncMoniker->BindToObject(0, 0, IID_PPV_ARGS(&m_pVidEnc));
 	}
 }
 
@@ -1523,7 +1522,7 @@ void CPlayerCaptureDialog::OnAudioCodecDimension()
 
 		// we have to recreate the encoder, otherwise it will accept the new media type for only the first time
 		m_pAudEnc = nullptr;
-		m_pAudEncMoniker->BindToObject(0, 0, IID_IBaseFilter, (void**)&m_pAudEnc);
+		m_pAudEncMoniker->BindToObject(0, 0, IID_PPV_ARGS(&m_pAudEnc));
 		/*
 		SaveMediaType(
 			CString(m_pAudEncArray[GetCurItemData(m_audcodec)].displayName.m_str),
@@ -1536,7 +1535,7 @@ void CPlayerCaptureDialog::OnOpenFile()
 {
 	CFileDialog fd(FALSE, nullptr, nullptr,
 				   OFN_EXPLORER|OFN_ENABLESIZING|OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_NOCHANGEDIR,
-				   L"Media files (*.avi,*.ogm,*.mkv,*.dsm)|*.avi;*.ogm;*.mkv;*.dsm|", this, 0);
+				   L"Media files (*.avi,*.mkv,*.dsm)|*.avi;*.mkv;*.dsm|", this, 0);
 
 	if (fd.DoModal() == IDOK) {
 		CString str = fd.GetPathName();
