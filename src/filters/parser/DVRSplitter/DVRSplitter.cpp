@@ -134,9 +134,6 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					CBaseSplitterFileEx::avchdr h;
 					if (m_pFile->Read(h, pData, &mt)) {
 						mts.push_back(mt);
-						if (mt.subtype == MEDIASUBTYPE_H264 && SUCCEEDED(CreateAVCfromH264(&mt))) {
-							mts.push_back(mt);
-						}
 					}
 				}
 				break;
