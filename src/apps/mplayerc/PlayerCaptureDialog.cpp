@@ -1180,6 +1180,8 @@ void CPlayerCaptureDialog::SetupAudioControls(
 	if (!pAMAIM.IsEmpty()) {
 		m_pAMAIM.Copy(pAMAIM);
 	}
+
+	UpdateAudioControls();
 }
 
 void CPlayerCaptureDialog::UpdateAudioControls()
