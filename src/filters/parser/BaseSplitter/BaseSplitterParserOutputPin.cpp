@@ -413,10 +413,8 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 				p2->AppendData(*p3);
 			}
 
-			if (Nalu.GetType() == NALU_TYPE_SLICE
-					|| Nalu.GetType() == NALU_TYPE_IDR
-					|| Nalu.GetType() == NALU_TYPE_SPS
-					|| Nalu.GetType() == NALU_TYPE_PPS) {
+			if (!p2->bDataExists
+					&& (Nalu.GetType() == NALU_TYPE_SLICE || Nalu.GetType() == NALU_TYPE_IDR)) {
 				p2->bDataExists = TRUE;
 			}
 		}
@@ -509,7 +507,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 				m_bHasAccessUnitDelimiters = true;
 			}
 
-			if (nut == NALU_TYPE_AUD || (!m_bHasAccessUnitDelimiters && (pPacket->rtStart != INVALID_TIME || (!bTimeStampExists && m_pl.GetHead()->bDataExists)))) {
+			if (nut == NALU_TYPE_AUD || (!m_bHasAccessUnitDelimiters && (pPacket->rtStart != INVALID_TIME || !bTimeStampExists))) {
 				if (pPacket->rtStart == INVALID_TIME && rtStart != INVALID_TIME) {
 					pPacket->rtStart = rtStart;
 					pPacket->rtStop  = rtStop;
@@ -518,27 +516,23 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 				rtStop  = INVALID_TIME;
 
 				BOOL bDataExists = FALSE;
-				CAutoPtr<CH264Packet> pl = m_pl.RemoveHead();
-				if (pl->bDataExists) {
-					bDataExists = TRUE;
-				}
-
-				while (pos != m_pl.GetHeadPosition()) {
-					CAutoPtr<CH264Packet> p2 = m_pl.RemoveHead();
-					if (p2->bDataExists) {
-						bDataExists = TRUE;
-					}
-
-					pl->AppendData(*p2);
-				}
-
-				if (!pl->pmt && m_bFlushed) {
-					pl->pmt = CreateMediaType(&m_mt);
-					m_bFlushed = false;
+				for (POSITION pos2 = m_pl.GetHeadPosition(); pos2 != pos && !bDataExists; m_pl.GetNext(pos2)) {
+					bDataExists = m_pl.GetAt(pos2)->bDataExists;
 				}
 
 				if (bDataExists) {
-					HRESULT hr = __super::DeliverPacket(pl);
+					auto packet = m_pl.RemoveHead();
+					while (pos != m_pl.GetHeadPosition()) {
+						auto p2 = m_pl.RemoveHead();
+						packet->AppendData(*p2);
+					}
+
+					if (!packet->pmt && m_bFlushed) {
+						packet->pmt = CreateMediaType(&m_mt);
+						m_bFlushed = false;
+					}
+
+					HRESULT hr = __super::DeliverPacket(packet);
 					if (hr != S_OK) {
 						return hr;
 					}
