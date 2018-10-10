@@ -76,23 +76,17 @@ void CPlayerSubresyncBar::ReloadTranslatableResources()
 			VERIFY(pHeaderCtrl->SetItem(nPos, &item));
 		};
 
-		CLSID clsid;
-		m_pSubStream->GetClassID(&clsid);
+		setColumnHeaderText(COL_START, ResStr(IDS_SUBRESYNC_CLN_TIME));
+		setColumnHeaderText(COL_END, ResStr(IDS_SUBRESYNC_CLN_END));
+		setColumnHeaderText(COL_PREVSTART, ResStr(IDS_SUBRESYNC_CLN_PREVIEW));
+		setColumnHeaderText(COL_PREVEND, ResStr(IDS_SUBRESYNC_CLN_END));
 
 		if (m_mode == VOBSUB) {
-			setColumnHeaderText(COL_START, ResStr(IDS_SUBRESYNC_CLN_TIME));
-			setColumnHeaderText(COL_END, ResStr(IDS_SUBRESYNC_CLN_END));
-			setColumnHeaderText(COL_PREVSTART, ResStr(IDS_SUBRESYNC_CLN_PREVIEW));
-			setColumnHeaderText(COL_PREVEND, ResStr(IDS_SUBRESYNC_CLN_END));
 			setColumnHeaderText(COL_VOBID, ResStr(IDS_SUBRESYNC_CLN_VOB_ID));
 			setColumnHeaderText(COL_CELLID, ResStr(IDS_SUBRESYNC_CLN_CELL_ID));
 			setColumnHeaderText(COL_FORCED, ResStr(IDS_SUBRESYNC_CLN_FORCED));
 		}
 		else if (m_mode == TEXTSUB) {
-			setColumnHeaderText(COL_START, ResStr(IDS_SUBRESYNC_CLN_TIME));
-			setColumnHeaderText(COL_END, ResStr(IDS_SUBRESYNC_CLN_END));
-			setColumnHeaderText(COL_PREVSTART, ResStr(IDS_SUBRESYNC_CLN_PREVIEW));
-			setColumnHeaderText(COL_PREVEND, ResStr(IDS_SUBRESYNC_CLN_END));
 			setColumnHeaderText(COL_TEXT, ResStr(IDS_SUBRESYNC_CLN_TEXT));
 			setColumnHeaderText(COL_STYLE, ResStr(IDS_SUBRESYNC_CLN_STYLE));
 			setColumnHeaderText(COL_FONT, ResStr(IDS_SUBRESYNC_CLN_FONT));
