@@ -878,6 +878,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_AAC_PARSER 0
 #define CONFIG_AAC_LATM_PARSER 1
 #define CONFIG_AC3_PARSER 1
+#define CONFIG_AV1_PARSER 1
 #define CONFIG_ADX_PARSER 1
 #define CONFIG_DCA_PARSER 1
 #define CONFIG_DNXHD_PARSER 1
