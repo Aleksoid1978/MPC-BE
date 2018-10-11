@@ -239,9 +239,7 @@ public:
 
 		if (pfe->mt.formattype == FORMAT_VideoInfo2) {
 			VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)pfe->mt.pbFormat;
-			CString str2;
-			str2.Format(L" i%02x %u:%u", vih2->dwInterlaceFlags, vih2->dwPictAspectRatioX, vih2->dwPictAspectRatioY);
-			str += str2;
+			str.AppendFormat(L" i%02x %u:%u", vih2->dwInterlaceFlags, vih2->dwPictAspectRatioX, vih2->dwPictAspectRatioY);
 		}
 
 		return str;
@@ -279,10 +277,10 @@ public:
 
 		switch (wfe->wFormatTag) {
 			case 1:
-				str = L"PCM ";
+				str = L"PCM";
 				break;
 			default:
-				str.Format(L"0x%03x ", wfe->wFormatTag);
+				str.Format(L"0x%03x", wfe->wFormatTag);
 				break;
 		}
 
@@ -304,30 +302,21 @@ public:
 			return str;
 		}
 
-		str.Empty();
-		CString str2;
-
-		str2.Format(L"%6uKHz ", wfe->nSamplesPerSec);
-		str += str2;
-
-		str2.Format(L"%ubps ", wfe->wBitsPerSample);
-		str += str2;
+		str.Format(L"%6uKHz %ubps", wfe->nSamplesPerSec, wfe->wBitsPerSample);
 
 		switch (wfe->nChannels) {
 			case 1:
-				str += L"mono ";
+				str += L" mono";
 				break;
 			case 2:
-				str += L"stereo ";
+				str += L" stereo";
 				break;
 			default:
-				str2.Format(L"%u channels ", wfe->nChannels);
-				str += str2;
+				str.AppendFormat(L" %u channels", wfe->nChannels);
 				break;
 		}
 
-		str2.Format(L"%3ukbps ", wfe->nAvgBytesPerSec*8/1000);
-		str += str2;
+		str.AppendFormat(L" %3ukbps", wfe->nAvgBytesPerSec*8/1000);
 
 		return str;
 	}

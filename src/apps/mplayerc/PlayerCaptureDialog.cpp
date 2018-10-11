@@ -271,7 +271,7 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 					if (mtCap.formattype == FORMAT_VideoInfo) {
 						VIDEOINFOHEADER* vih = (VIDEOINFOHEADER*)mtCap.pbFormat;
 						vih->bmiHeader.biWidth		= presets[j].cx;
-                        vih->bmiHeader.biHeight = presets[j].cy * (vih->bmiHeader.biHeight < 0 ? -1 : 1);
+						vih->bmiHeader.biHeight = presets[j].cy * (vih->bmiHeader.biHeight < 0 ? -1 : 1);
 						vih->bmiHeader.biSizeImage	= presets[j].cx * presets[j].cy * vih->bmiHeader.biBitCount>>3;
 
 						AM_MEDIA_TYPE* pmt = (AM_MEDIA_TYPE*)CoTaskMemAlloc(sizeof(AM_MEDIA_TYPE));
