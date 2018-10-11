@@ -11836,6 +11836,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				if (!m_pMainSourceFilter) {
 					m_pMainSourceFilter = FindFilter(__uuidof(CMpegSourceFilter), m_pGB);
 				}
+				m_bMainIsMPEGSplitter = (m_pMainSourceFilter != nullptr);
+
 				if (!m_pMainSourceFilter) {
 					m_pMainSourceFilter = FindFilter(CLSID_LAVSplitter, m_pGB);
 				}
@@ -11853,13 +11855,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				}
 				if (!m_pMainSourceFilter) {
 					m_pMainSourceFilter = FindFilter(L"{D8980E15-E1F6-4916-A10F-D7EB4E9E10B8}", m_pGB); // AV Source
-				}
-
-				if (m_pMainSourceFilter) {
-					const CLSID clsid = GetCLSID(m_pMainSourceFilter);
-					if (clsid == __uuidof(CMpegSourceFilter) || clsid == __uuidof(CMpegSplitterFilter)) {
-						m_bMainIsMPEGSplitter = true;
-					}
 				}
 			}
 
