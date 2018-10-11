@@ -131,6 +131,7 @@ SRCS_LC = \
 	libavcodec/atrac3plusdsp.c \
 	libavcodec/audiodsp.c \
 	libavcodec/av1_parse.c \
+	libavcodec/av1_parser.c \
 	libavcodec/avdct.c \
 	libavcodec/avfft.c \
 	libavcodec/avpacket.c \
@@ -147,6 +148,8 @@ SRCS_LC = \
 	libavcodec/cabac.c \
 	libavcodec/canopus.c \
 	libavcodec/cbrt_data.c \
+	libavcodec/cbs.c \
+	libavcodec/cbs_av1.c \
 	libavcodec/celp_filters.c \
 	libavcodec/celp_math.c \
 	libavcodec/cfhd.c \
