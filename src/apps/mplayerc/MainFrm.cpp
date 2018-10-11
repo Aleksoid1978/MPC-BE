@@ -11603,6 +11603,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				pOFD->fns.push_back(m_youtubeAudioUrllist.cbegin()->url);
 			}
 
+			pOFD->subs = m_lastOMD->subs;
+
 			m_youtubeFields.fname.Format(L"%s.%dp.%s", m_youtubeFields.title, it->profile->quality, it->profile->ext);
 			FixFilename(m_youtubeFields.fname);
 		}
