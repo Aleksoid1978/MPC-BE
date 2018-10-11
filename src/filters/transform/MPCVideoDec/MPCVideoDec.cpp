@@ -2621,8 +2621,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 			InitDecoder(&m_pCurrentMediaType);
 		}
 
-		if (UseDXVA2()
-				&& (m_nCodecId == AV_CODEC_ID_H264 && m_nPCIVendor == PCIV_ATI && m_bInterlaced)) {
+		if (UseDXVA2() && m_nCodecId == AV_CODEC_ID_H264 && m_nPCIVendor == PCIV_ATI) {
 			HRESULT hr = ReinitDXVA2Decoder();
 			if (FAILED(hr)) {
 				return hr;
