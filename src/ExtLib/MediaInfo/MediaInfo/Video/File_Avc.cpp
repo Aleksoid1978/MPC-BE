@@ -795,7 +795,8 @@ void File_Avc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator seq
     if ((*seq_parameter_set_Item)->frame_crop_top_offset || (*seq_parameter_set_Item)->frame_crop_bottom_offset)
         Fill(Stream_Video, StreamPos_Last, Video_Stored_Height, ((*seq_parameter_set_Item)->pic_height_in_map_units_minus1+1)*16*(2-(*seq_parameter_set_Item)->frame_mbs_only_flag));
     Fill(Stream_Video, 0, Video_PixelAspectRatio, PixelAspectRatio, 3, true);
-    Fill(Stream_Video, 0, Video_DisplayAspectRatio, Width*PixelAspectRatio/Height, 3, true); //More precise
+    if(Height)
+        Fill(Stream_Video, 0, Video_DisplayAspectRatio, Width*PixelAspectRatio/Height, 3, true); //More precise
     if (FrameRate_Divider==2)
     {
         Fill(Stream_Video, StreamPos_Last, Video_Format_Settings_FrameMode, "Frame doubling");
@@ -2968,9 +2969,10 @@ void File_Avc::sei_message_user_data_registered_itu_t_t35_GA94_03_Delayed(int32u
                         else if ((*seq_parameter_set_Item)->vui_parameters->aspect_ratio_idc==0xFF && (*seq_parameter_set_Item)->vui_parameters->sar_height)
                             PixelAspectRatio=((float64)(*seq_parameter_set_Item)->vui_parameters->sar_width)/(*seq_parameter_set_Item)->vui_parameters->sar_height;
                     }
-                    int32u Width =((*seq_parameter_set_Item)->pic_width_in_mbs_minus1       +1)*16;
-                    int32u Height=((*seq_parameter_set_Item)->pic_height_in_map_units_minus1+1)*16*(2-(*seq_parameter_set_Item)->frame_mbs_only_flag);
-                    ((File_DtvccTransport*)GA94_03_Parser)->AspectRatio=Width*PixelAspectRatio/Height;
+                    const int32u Width =((*seq_parameter_set_Item)->pic_width_in_mbs_minus1       +1)*16;
+                    const int32u Height=((*seq_parameter_set_Item)->pic_height_in_map_units_minus1+1)*16*(2-(*seq_parameter_set_Item)->frame_mbs_only_flag);
+                    if(Height)
+                        ((File_DtvccTransport*)GA94_03_Parser)->AspectRatio=Width*PixelAspectRatio/Height;
                 }
             }
             if (GA94_03_Parser->PTS_DTS_Needed)

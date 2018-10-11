@@ -659,10 +659,10 @@ int32u Mpeg7_VisualCodingFormatCS_termID(MediaInfo_Internal &MI, size_t StreamPo
 //---------------------------------------------------------------------------
 Ztring Mpeg7_Visual_colorDomain(MediaInfo_Internal &MI, size_t StreamPos)
 {
-    const Ztring &Colorimetry=MI.Get(Stream_Video, StreamPos, Video_ChromaSubsampling);
-    if (Colorimetry.find(__T("4:"))!=string::npos)
+    const Ztring &ChromaSubsampling=MI.Get(Stream_Video, StreamPos, Video_ChromaSubsampling);
+    if (ChromaSubsampling.find(__T("4:"))!=string::npos)
         return __T("color");
-    if (Colorimetry==__T("Gray"))
+    if (ChromaSubsampling==__T("Gray"))
         return __T("graylevel");
     return __T("");
 }
@@ -1117,11 +1117,11 @@ void Mpeg7_Transform_Visual(Node* Parent, MediaInfo_Internal &MI, size_t StreamP
 
     //Pixel
     if (!MI.Get(Stream_Video, 0, Video_PixelAspectRatio).empty()
-     || !MI.Get(Stream_Video, 0, Video_Resolution).empty())
+     || !MI.Get(Stream_Video, 0, Video_BitDepth).empty())
     {
         Node* Node_Pixel=Node_VisualCoding->Add_Child("mpeg7:Pixel");
         Node_Pixel->Add_Attribute_IfNotEmpty(MI, Stream_Video, 0, Video_PixelAspectRatio, "aspectRatio");
-        Ztring bitsPer=Mpeg7_StripExtraValues(MI.Get(Stream_Video, 0, Video_Resolution));
+        Ztring bitsPer=Mpeg7_StripExtraValues(MI.Get(Stream_Video, 0, Video_BitDepth));
         if (!bitsPer.empty())
             Node_Pixel->Add_Attribute("bitsPer", bitsPer);
     }
@@ -1156,10 +1156,11 @@ void Mpeg7_Transform_Visual(Node* Parent, MediaInfo_Internal &MI, size_t StreamP
         }
     }
 
-    //Colorimetry
-    if (MI.Get(Stream_Video, StreamPos, Video_Colorimetry).find(__T("4:2:0"))!=string::npos)
+    //ChromaSubsampling
+    if (MI.Get(Stream_Video, StreamPos, Video_ChromaSubsampling).find(__T("4:2:0"))!=string::npos)
     {
         Node* Node_ColorSampling=Node_VisualCoding->Add_Child("mpeg7:ColorSampling");
+        Node_ColorSampling->XmlComment="YUV 4:2:0 Interlaced";
         Node* Node_Lattice=Node_ColorSampling->Add_Child("mpeg7:Lattice");
         Node_Lattice->Add_Attribute("height", "720");
         Node_Lattice->Add_Attribute("width", "486");

@@ -318,7 +318,8 @@ void File_Hevc::Streams_Fill(std::vector<seq_parameter_set_struct*>::iterator se
                         PixelAspectRatio = ((float64) (*seq_parameter_set_Item)->vui_parameters->sar_width) / (*seq_parameter_set_Item)->vui_parameters->sar_height;
 
                 Fill(Stream_Video, 0, Video_PixelAspectRatio, PixelAspectRatio, 3, true);
-                Fill(Stream_Video, 0, Video_DisplayAspectRatio, Width*PixelAspectRatio/Height, 3, true); //More precise
+                if(Height)
+                   Fill(Stream_Video, 0, Video_DisplayAspectRatio, Width*PixelAspectRatio/Height, 3, true); //More precise
         }
 
         //Colour description
