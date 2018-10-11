@@ -248,7 +248,8 @@ size_t File_SubRip::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
 void File_SubRip::Read_Buffer_Continue()
 {
     #if MEDIAINFO_DEMUX
-        Demux(Buffer+(HasBOM?3:0), Buffer_Size-((HasBOM && Buffer_Size>=3)?3:0), ContentType_MainStream);
+        if (Buffer)
+            Demux(Buffer+((HasBOM && Buffer_Size>=3)?3:0), Buffer_Size-((HasBOM && Buffer_Size>=3)?3:0), ContentType_MainStream);
     #endif //MEDIAINFO_DEMUX
 
     // Output

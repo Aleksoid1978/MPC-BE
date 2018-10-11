@@ -2380,7 +2380,7 @@ void File_Mpegv::picture_start()
         TemporalReference[TemporalReference_Offset+temporal_reference]->IsValid=true;
 
         //picture_coding_types
-        if (picture_coding_type==1) //I-Frame
+        if (picture_coding_type==1  && !FirstFieldFound) //I-Frame
         {
             if (!picture_coding_types_Current.empty())
             {
@@ -2409,7 +2409,7 @@ void File_Mpegv::picture_start()
             }
             picture_coding_types_Current='I';
         }
-        else if (!picture_coding_types_Current.empty()) //If an I-Frame is already found
+        else if (!picture_coding_types_Current.empty() && !FirstFieldFound) //If an I-Frame is already found
             picture_coding_types_Current+=Mpegv_picture_coding_type[picture_coding_type];
 
         //Detecting streams with only I-Frames

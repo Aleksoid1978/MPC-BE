@@ -153,8 +153,10 @@ void File_ProRes::Read_Buffer_Continue()
         if (chroma)
             Skip_XX(64,                                         "QMatChroma");
     Element_End();
-    if (Element_Offset!=8+(int32u)hdrSize)
+    if (Name==0x69637066 && Element_Offset!=8+(int32u)hdrSize) // Coherency test icpf
         IsOk=false;
+    if (Name==0x69637066) // icpf
+    {
     for (int8u PictureNumber=0; PictureNumber<(frame_type?2:1); PictureNumber++)
     {
         Element_Begin1("Picture layout");
@@ -206,6 +208,7 @@ void File_ProRes::Read_Buffer_Continue()
                 Skip_XX(pic_data_End-Element_Offset,                "Unknown");
         Element_End();
     }
+    }
     bool IsZeroes=true;
     for (size_t Pos=(size_t)Element_Offset; Pos<(size_t)Element_Size; Pos++)
         if (Buffer[Buffer_Offset+Pos])
@@ -216,7 +219,7 @@ void File_ProRes::Read_Buffer_Continue()
     Skip_XX(Element_Size-Element_Offset,                        IsZeroes?"Zeroes":"Unknown");
 
     FILLING_BEGIN();
-        if (IsOk && Name==0x69637066 && !Status[IsAccepted]) //icpf
+        if (IsOk && (Name==0x69637066 || Name==0x70727266) && !Status[IsAccepted]) //icpf (all but RAW) & prrf (RAW)
         {
             Accept();
             Fill();
@@ -242,6 +245,9 @@ void File_ProRes::Read_Buffer_Continue()
 
             Finish();
         }
+    FILLING_ELSE();
+        if (!Status[IsAccepted])
+            Reject();
     FILLING_END();
 }
 
