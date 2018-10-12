@@ -80,7 +80,7 @@ STDMETHODIMP CDirectVobSub::get_FileName(WCHAR* fn)
 		return E_POINTER;
 	}
 
-	wcscpy(fn, m_FileName);
+	wcscpy_s(fn, MAX_PATH, m_FileName.GetString());
 
 	return S_OK;
 }
