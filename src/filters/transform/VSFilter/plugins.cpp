@@ -32,6 +32,9 @@
 
 #pragma warning(disable: 4706)
 
+// Size of the char buffer according to VirtualDub Filters SDK doc
+#define STRING_PROC_BUFFER_SIZE 128
+
 //
 // Generic interface
 //
@@ -291,7 +294,7 @@ namespace Plugin
 			}
 
 			void StringProc(const FilterActivation* fa, const FilterFunctions* ff, char* str) {
-				sprintf(str, " (%s)", !GetFileName().IsEmpty() ? CStringA(GetFileName()) : " (empty)");
+				sprintf_s(str, STRING_PROC_BUFFER_SIZE, " (%s)", GetFileName().IsEmpty() ? " (empty)" : CStringA(GetFileName()).GetString());
 			}
 
 			bool FssProc(FilterActivation* fa, const FilterFunctions* ff, char* buf, int buflen) {
@@ -330,9 +333,9 @@ namespace Plugin
 
 			void StringProc(const FilterActivation* fa, const FilterFunctions* ff, char* str) {
 				if (!GetFileName().IsEmpty()) {
-					sprintf(str, " (%s, %d)", CStringA(GetFileName()), GetCharSet());
+					sprintf_s(str, STRING_PROC_BUFFER_SIZE, " (%s, %d)", CStringA(GetFileName()).GetString(), GetCharSet());
 				} else {
-					sprintf(str, " (empty)");
+					sprintf_s(str, STRING_PROC_BUFFER_SIZE, " (empty)");
 				}
 			}
 
