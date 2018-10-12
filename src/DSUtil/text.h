@@ -63,24 +63,6 @@ T Explode(const T& str, std::list<T>& sl, const SEP sep, const size_t limit = 0)
 }
 
 template<class T, typename SEP>
-T ExplodeMin(const T& str, CAtlList<T>& sl, const SEP sep, const size_t limit = 0)
-{
-	Explode(str, sl, sep, limit);
-	POSITION pos = sl.GetHeadPosition();
-	while (pos) {
-		POSITION tmp = pos;
-		if (sl.GetNext(pos).IsEmpty()) {
-			sl.RemoveAt(tmp);
-		}
-	}
-	if (sl.IsEmpty()) {
-		sl.AddTail(T());    // eh
-	}
-
-	return sl.GetHead();
-}
-
-template<class T, typename SEP>
 T ExplodeMin(const T& str, std::list<T>& sl, const SEP sep, const size_t limit = 0)
 {
 	Explode(str, sl, sep, limit);
