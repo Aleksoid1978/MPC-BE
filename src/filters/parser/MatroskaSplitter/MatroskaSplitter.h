@@ -38,7 +38,6 @@ using namespace MatroskaReader;
 class CMatroskaPacket : public CPacket
 {
 public:
-	CUInt TrackType;
 	CAutoPtr<MatroskaReader::BlockGroup> bg;
 };
 
@@ -46,21 +45,11 @@ class CMatroskaSplitterOutputPin
 	: public CBaseSplitterOutputPin
 	, public CSubtitleStatus
 {
-	REFERENCE_TIME m_rtLastDuration = 0;
-	std::deque<CAutoPtr<CMatroskaPacket>> m_packets;
-
-	CCritSec m_csQueue;
-
-protected:
-	HRESULT DeliverPacket(CAutoPtr<CPacket> p);
-	HRESULT DeliverMatroskaBlock(CMatroskaPacket* p, REFERENCE_TIME rtBlockDuration = 0);
 
 public:
 	CMatroskaSplitterOutputPin(std::vector<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 	virtual ~CMatroskaSplitterOutputPin();
 
-	HRESULT DeliverEndFlush();
-	HRESULT DeliverEndOfStream();
 	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 	HRESULT QueuePacket(CAutoPtr<CPacket> p);
 };
@@ -94,7 +83,11 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 
 	std::vector<SyncPoint> m_sps;
 
-private:
+	std::map<DWORD, REFERENCE_TIME> m_lastDuration;
+	std::map<DWORD, std::deque<CAutoPtr<CMatroskaPacket>>> m_packets;
+
+	CCritSec m_csPackets;
+
 	CCritSec m_csProps;
 	bool m_bLoadEmbeddedFonts, m_bCalcDuration;
 
@@ -111,6 +104,9 @@ protected:
 	bool DemuxInit();
 	void DemuxSeek(REFERENCE_TIME rt);
 	bool DemuxLoop();
+
+	HRESULT DeliverMatroskaPacket(TrackEntry* pTE, CAutoPtr<CMatroskaPacket> p);
+	HRESULT DeliverMatroskaPacket(CAutoPtr<CMatroskaPacket> p, REFERENCE_TIME rtBlockDuration = 0);
 
 public:
 	CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr);
