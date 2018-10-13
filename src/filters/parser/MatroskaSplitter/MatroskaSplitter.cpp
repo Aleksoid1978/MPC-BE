@@ -1945,8 +1945,6 @@ void CMatroskaSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 	\
 	p->rtStart -= rtOffset;															\
 	p->rtStop -= rtOffset;															\
-	\
-	p->TrackType = pTE->TrackType;													\
 
 bool CMatroskaSplitterFilter::DemuxLoop()
 {
@@ -1954,6 +1952,13 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 
 	if (!m_pCluster) {
 		return true;
+	}
+
+	{
+		CAutoLock cAutoLock(&m_csPackets);
+		for (auto& [TrackNumber, packets] : m_packets) {
+			packets.clear();
+		}
 	}
 
 	SendVorbisHeaderSample(); // HACK: init vorbis decoder with the headers
@@ -2055,11 +2060,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 										continue;
 									}
 
-									for (const auto& pb : p->bg->Block.BlockData) {
-										pTE->Expand(*pb, ContentEncoding::AllFrameContents);
-									}
-
-									hr = DeliverPacket(p);
+									hr = DeliverMatroskaPacket(pTE, p);
 								}
 							}
 						}
@@ -2111,11 +2112,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 
 				SetBlockTime;
 
-				for (const auto& pb : p->bg->Block.BlockData) {
-					pTE->Expand(*pb, ContentEncoding::AllFrameContents);
-				}
-
-				hr = DeliverPacket(p);
+				hr = DeliverMatroskaPacket(pTE, p);
 
 				if (FAILED(hr)) {
 					break;
@@ -2129,7 +2126,263 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 
 	m_pCluster.Free();
 
+	CAutoLock cAutoLock(&m_csPackets);
+	for (auto& [TrackNumber, packets] : m_packets) {
+		for (auto& p : packets) {
+			HRESULT hr = DeliverMatroskaPacket(p);
+			if (hr != S_OK) {
+				return hr;
+			}
+		}
+
+		packets.clear();
+	}
+
 	return true;
+}
+
+HRESULT CMatroskaSplitterFilter::DeliverMatroskaPacket(TrackEntry* pTE, CAutoPtr<CMatroskaPacket> p)
+{
+	for (const auto& pb : p->bg->Block.BlockData) {
+		pTE->Expand(*pb, ContentEncoding::AllFrameContents);
+	}
+
+	HRESULT hr = S_OK;
+	if (pTE->TrackType == TrackEntry::TypeSubtitle) {
+		hr = DeliverMatroskaPacket(p);
+	} else {
+		CAutoLock cAutoLock(&m_csPackets);
+		auto& packets = m_packets[p->TrackNumber];
+		packets.emplace_back(p);
+
+		if (packets.size() == 2) {
+			const auto rtBlockDuration = packets.back()->rtStart - packets.front()->rtStart;
+			hr = DeliverMatroskaPacket(packets.front(), rtBlockDuration);
+			packets.pop_front();
+		}
+	}
+
+	return hr;
+}
+
+// reconstruct full wavpack blocks from mangled matroska ones.
+// From LAV's ffmpeg
+static bool ParseWavpack(const CMediaType* mt, CBinary* Data, CAutoPtr<CPacket>& p)
+{
+	CheckPointer(mt->pbFormat, false);
+
+	if (Data->size() < 12) {
+		return false;
+	}
+
+	CGolombBuffer gb(Data->data(), Data->size());
+
+	DWORD samples = gb.ReadDwordLE();
+	WORD ver      = 0;
+	int dstlen    = 0;
+	int offset    = 0;
+
+	if (mt->formattype == FORMAT_WaveFormatEx) {
+		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt->Format();
+		if (wfe->cbSize >= 2) {
+			ver = AV_RL16(mt->pbFormat);
+		}
+	}
+
+	CAutoPtr<CBinary> ptr(DNew CBinary());
+
+	while (gb.RemainingSize() >= 8) {
+		DWORD flags     = gb.ReadDwordLE();
+		DWORD crc       = gb.ReadDwordLE();
+		DWORD blocksize = gb.RemainingSize();
+
+		int multiblock = (flags & 0x1800) != 0x1800;
+		if (multiblock) {
+			if (gb.RemainingSize() < 4) {
+				return false;
+			}
+			blocksize = gb.ReadDwordLE();
+		}
+
+		if (blocksize > (DWORD)gb.RemainingSize()) {
+			return false;
+		}
+
+		ptr->resize(dstlen + blocksize + 32);
+		BYTE *dst = ptr->data();
+
+		dstlen += blocksize + 32;
+
+		AV_WL32(dst + offset, MAKEFOURCC('w', 'v', 'p', 'k'));    // tag
+		AV_WL32(dst + offset + 4,  blocksize + 24);               // blocksize - 8
+		AV_WL16(dst + offset + 8,  ver);                          // version
+		AV_WL16(dst + offset + 10, 0);                            // track/index_no
+		AV_WL32(dst + offset + 12, 0);                            // total samples
+		AV_WL32(dst + offset + 16, 0);                            // block index
+		AV_WL32(dst + offset + 20, samples);                      // number of samples
+		AV_WL32(dst + offset + 24, flags);                        // flags
+		AV_WL32(dst + offset + 28, crc);                          // crc
+		memcpy (dst + offset + 32, gb.GetBufferPos(), blocksize); // block data
+
+		gb.SkipBytes(blocksize);
+		offset += blocksize + 32;
+	}
+
+	p->SetData(ptr->data(), ptr->size());
+
+	return true;
+}
+
+HRESULT CMatroskaSplitterFilter::DeliverMatroskaPacket(CAutoPtr<CMatroskaPacket> p, REFERENCE_TIME rtBlockDuration/* = 0*/)
+{
+	const auto pPin = GetOutputPin(p->TrackNumber);
+	CheckPointer(pPin, E_FAIL);
+
+	HRESULT hr = S_FALSE;
+
+	auto& rtLastDuration = m_lastDuration[p->TrackNumber];
+	const auto& mt = pPin->CurrentMediaType();
+
+	const size_t BlockCount = p->bg->Block.BlockData.size();
+
+	REFERENCE_TIME rtStart    = p->rtStart;
+	REFERENCE_TIME rtDuration = 0;
+	if (p->rtStop != p->rtStart) {
+		rtDuration = (p->rtStop - p->rtStart) / BlockCount;
+	} else if (rtBlockDuration > 0) {
+		rtDuration = rtBlockDuration / BlockCount;
+	} else if (rtLastDuration) {
+		rtDuration = rtLastDuration;
+	}
+	REFERENCE_TIME rtStop = rtStart + rtDuration;
+
+	rtLastDuration = rtDuration;
+
+	for (const auto& pb : p->bg->Block.BlockData) {
+		CAutoPtr<CPacket> pOutput(DNew CPacket());
+
+		pOutput->TrackNumber    = p->TrackNumber;
+		pOutput->bDiscontinuity = p->bDiscontinuity;
+		pOutput->bSyncPoint     = p->bSyncPoint;
+		pOutput->rtStart        = rtStart;
+		pOutput->rtStop         = rtStop;
+
+		if (mt.subtype == MEDIASUBTYPE_DVB_SUBTITLES) {
+			// Add DBV subtitle missing start code - 0x20 0x00 (in Matroska DVB packets start with 0x0F ...)
+			CAutoPtr<CBinary> ptr(DNew CBinary());
+			ptr->resize(2);
+			BYTE *pData = ptr->data();
+			pData[0] = 0x20;
+			pData[1] = 0x00;
+			pOutput->SetData(ptr->data(), ptr->size());
+			pOutput->AppendData(pb->data(), pb->size());
+		} else if (mt.subtype == MEDIASUBTYPE_WAVPACK4) {
+			if (!ParseWavpack(&mt, pb, pOutput)) {
+				continue;
+			}
+		} else if (mt.subtype == MEDIASUBTYPE_icpf) {
+			CAutoPtr<CBinary> ptr(DNew CBinary());
+			ptr->resize(2 * sizeof(DWORD));
+			DWORD* pData = (DWORD*)ptr->data();
+			pData[0] = pb->size();
+			pData[1] = FCC('icpf');
+			pOutput->SetData(ptr->data(), ptr->size());
+			pOutput->AppendData(pb->data(), pb->size());
+		} else if (mt.subtype == MEDIASUBTYPE_VP90) {
+			REFERENCE_TIME rtStartTmp = rtStart;
+			REFERENCE_TIME rtStopTmp = rtStop;
+
+			const BYTE* pData = pb->data();
+			size_t size = pb->size();
+
+			const BYTE marker = pData[size - 1];
+			if ((marker & 0xe0) == 0xc0) {
+				const BYTE nbytes = 1 + ((marker >> 3) & 0x3);
+				BYTE n_frames = 1 + (marker & 0x7);
+				const size_t idx_sz = 2 + n_frames * nbytes;
+				if (size >= idx_sz && pData[size - idx_sz] == marker && nbytes >= 1 && nbytes <= 4) {
+					const BYTE *idx = pData + size + 1 - idx_sz;
+
+					while (n_frames--) {
+						size_t sz = 0;
+						switch(nbytes) {
+							case 1: sz = (BYTE)*idx; break;
+							case 2: sz = AV_RL16(idx); break;
+							case 3: sz = AV_RL24(idx); break;
+							case 4: sz = AV_RL32(idx); break;
+						}
+
+						idx += nbytes;
+						if (sz > size || !sz) {
+							break;
+						}
+
+						CAutoPtr<CPacket> pPacket(DNew CPacket());
+						pPacket->SetData(pData, sz);
+
+						pPacket->TrackNumber    = pOutput->TrackNumber;
+						pPacket->bDiscontinuity = pOutput->bDiscontinuity;
+						pPacket->bSyncPoint     = pOutput->bSyncPoint;
+
+						if (pData[0] & 0x2) {
+							pPacket->rtStart = rtStartTmp;
+							pPacket->rtStop  = rtStopTmp;
+							rtStartTmp      = INVALID_TIME;
+							rtStopTmp       = INVALID_TIME;
+						}
+						if (S_OK != (hr = DeliverPacket(pPacket))) {
+							break;
+						}
+
+						pData += sz;
+						size -= sz;
+					}
+				}
+
+				rtStart += rtDuration;
+				rtStop += rtDuration;
+
+				p->bSyncPoint     = FALSE;
+				p->bDiscontinuity = FALSE;
+
+				continue;
+			}
+
+			pOutput->SetData(pb->data(), pb->size());
+		} else {
+			pOutput->SetData(pb->data(), pb->size());
+		}
+
+		if (S_OK != (hr = DeliverPacket(pOutput))) {
+			break;
+		}
+
+		rtStart += rtDuration;
+		rtStop += rtDuration;
+
+		p->bSyncPoint     = false;
+		p->bDiscontinuity = false;
+	}
+
+	if (mt.subtype == MEDIASUBTYPE_WAVPACK4) {
+		for (const auto& bm : p->bg->ba.bm) {
+			CAutoPtr<CPacket> pOutput(DNew CPacket());
+
+			pOutput->TrackNumber = p->TrackNumber;
+			pOutput->rtStart     = p->rtStart;
+			pOutput->rtStop      = p->rtStop;
+
+			if (!ParseWavpack(&mt, &bm->BlockAdditional, pOutput)) {
+				continue;
+			}
+
+			if (S_OK != (hr = DeliverPacket(pOutput))) {
+				break;
+			}
+		}
+	}
+
+	return hr;
 }
 
 // IKeyFrameInfo
@@ -2450,31 +2703,6 @@ CMatroskaSplitterOutputPin::~CMatroskaSplitterOutputPin()
 {
 }
 
-HRESULT CMatroskaSplitterOutputPin::DeliverEndFlush()
-{
-	{
-		CAutoLock cAutoLock(&m_csQueue);
-		m_packets.clear();
-	}
-
-	return __super::DeliverEndFlush();
-}
-
-HRESULT CMatroskaSplitterOutputPin::DeliverEndOfStream()
-{
-	CAutoLock cAutoLock(&m_csQueue);
-
-	for (const auto& p : m_packets) {
-		HRESULT hr = DeliverMatroskaBlock(p);
-		if (hr != S_OK) {
-			return hr;
-		}
-	}
-	m_packets.clear();
-
-	return __super::DeliverEndOfStream();
-}
-
 HRESULT CMatroskaSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
 {
 	m_bNeedNextSubtitle = false;
@@ -2542,249 +2770,4 @@ HRESULT CMatroskaSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 	}
 
 	return __super::QueuePacket(p);
-}
-
-HRESULT CMatroskaSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
-{
-	CMatroskaPacket* mp = dynamic_cast<CMatroskaPacket*>(p.m_p);
-	if (!mp) {
-		return __super::DeliverPacket(p);
-	}
-
-	CAutoLock cAutoLock(&m_csQueue);
-
-	CAutoPtr<CMatroskaPacket> p2;
-	p.Detach();
-	p2.Attach(mp);
-
-	HRESULT hr = S_OK;
-	if (p2->TrackType == TrackEntry::TypeSubtitle) {
-		hr = DeliverMatroskaBlock(p2);
-	} else {
-		m_packets.emplace_back(p2);
-
-		if (m_packets.size() == 2) {
-			const auto rtBlockDuration = m_packets.back()->rtStart - m_packets.front()->rtStart;
-			hr = DeliverMatroskaBlock(m_packets.front(), rtBlockDuration);
-			m_packets.pop_front();
-		}
-	}
-
-	return hr;
-}
-
-// reconstruct full wavpack blocks from mangled matroska ones.
-// From LAV's ffmpeg
-static bool ParseWavpack(CMediaType* mt, CBinary* Data, CAutoPtr<CPacket>& p)
-{
-	CheckPointer(mt, false);
-	CheckPointer(mt->pbFormat, false);
-	CheckPointer(Data, false);
-
-	if (Data->size() < 12) {
-		return false;
-	}
-
-	CGolombBuffer gb(Data->data(), Data->size());
-
-	DWORD samples = gb.ReadDwordLE();
-	WORD ver      = 0;
-	int dstlen    = 0;
-	int offset    = 0;
-
-	if (mt->formattype == FORMAT_WaveFormatEx) {
-		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt->Format();
-		if (wfe->cbSize >= 2) {
-			ver = AV_RL16(mt->pbFormat);
-		}
-	}
-
-	CAutoPtr<CBinary> ptr(DNew CBinary());
-
-	while (gb.RemainingSize() >= 8) {
-		DWORD flags		= gb.ReadDwordLE();
-		DWORD crc		= gb.ReadDwordLE();
-		DWORD blocksize	= gb.RemainingSize();
-
-		int multiblock	= (flags & 0x1800) != 0x1800;
-		if (multiblock) {
-			if (gb.RemainingSize() < 4) {
-				return false;
-			}
-			blocksize = gb.ReadDwordLE();
-		}
-
-		if (blocksize > (DWORD)gb.RemainingSize()) {
-			return false;
-		}
-
-		ptr->resize(dstlen + blocksize + 32);
-		BYTE *dst = ptr->data();
-
-		dstlen += blocksize + 32;
-
-		AV_WL32(dst + offset, MAKEFOURCC('w', 'v', 'p', 'k'));		// tag
-		AV_WL32(dst + offset + 4,  blocksize + 24);					// blocksize - 8
-		AV_WL16(dst + offset + 8,  ver);							// version
-		AV_WL16(dst + offset + 10, 0);								// track/index_no
-		AV_WL32(dst + offset + 12, 0);								// total samples
-		AV_WL32(dst + offset + 16, 0);								// block index
-		AV_WL32(dst + offset + 20, samples);						// number of samples
-		AV_WL32(dst + offset + 24, flags);							// flags
-		AV_WL32(dst + offset + 28, crc);							// crc
-		memcpy (dst + offset + 32, gb.GetBufferPos(), blocksize);	// block data
-
-		gb.SkipBytes(blocksize);
-		offset += blocksize + 32;
-	}
-
-	p->SetData(ptr->data(), ptr->size());
-
-	return true;
-}
-
-HRESULT CMatroskaSplitterOutputPin::DeliverMatroskaBlock(CMatroskaPacket* p, REFERENCE_TIME rtBlockDuration/* = 0*/)
-{
-	HRESULT hr = S_FALSE;
-
-	const size_t BlockCount = p->bg->Block.BlockData.size();
-
-	REFERENCE_TIME rtStart    = p->rtStart;
-	REFERENCE_TIME rtDuration = 0;
-	if (p->rtStop != p->rtStart) {
-		rtDuration = (p->rtStop - p->rtStart) / BlockCount;
-	} else if (rtBlockDuration > 0) {
-		rtDuration = rtBlockDuration / BlockCount;
-	} else if (m_rtLastDuration) {
-		rtDuration = m_rtLastDuration;
-	}
-	REFERENCE_TIME rtStop = rtStart + rtDuration;
-
-	m_rtLastDuration = rtDuration;
-
-	for (const auto& pb : p->bg->Block.BlockData) {
-		CAutoPtr<CPacket> tmp(DNew CPacket());
-
-		tmp->TrackNumber    = p->TrackNumber;
-		tmp->bDiscontinuity = p->bDiscontinuity;
-		tmp->bSyncPoint     = p->bSyncPoint;
-		tmp->rtStart        = rtStart;
-		tmp->rtStop         = rtStop;
-
-		if (m_mt.subtype == MEDIASUBTYPE_DVB_SUBTITLES) {
-			// Add DBV subtitle missing start code - 0x20 0x00 (in Matroska DVB packets start with 0x0F ...)
-			CAutoPtr<CBinary> ptr(DNew CBinary());
-			ptr->resize(2);
-			BYTE *pData = ptr->data();
-			pData[0] = 0x20;
-			pData[1] = 0x00;
-			tmp->SetData(ptr->data(), ptr->size());
-			tmp->AppendData(pb->data(), pb->size());
-		} else if (m_mt.subtype == MEDIASUBTYPE_WAVPACK4) {
-			if (!ParseWavpack(&m_mt, pb, tmp)) {
-				continue;
-			}
-		} else if (m_mt.subtype == MEDIASUBTYPE_icpf) {
-			CAutoPtr<CBinary> ptr(DNew CBinary());
-			ptr->resize(2 * sizeof(DWORD));
-			DWORD* pData = (DWORD*)ptr->data();
-			pData[0] = pb->size();
-			pData[1] = FCC('icpf');
-			tmp->SetData(ptr->data(), ptr->size());
-			tmp->AppendData(pb->data(), pb->size());
-		} else if (m_mt.subtype == MEDIASUBTYPE_VP90) {
-			REFERENCE_TIME rtStartTmp = rtStart;
-			REFERENCE_TIME rtStopTmp = rtStop;
-
-			const BYTE* pData = pb->data();
-			size_t size = pb->size();
-
-			const BYTE marker = pData[size - 1];
-			if ((marker & 0xe0) == 0xc0) {
-				const BYTE nbytes = 1 + ((marker >> 3) & 0x3);
-				BYTE n_frames = 1 + (marker & 0x7);
-				const size_t idx_sz = 2 + n_frames * nbytes;
-				if (size >= idx_sz && pData[size - idx_sz] == marker && nbytes >= 1 && nbytes <= 4) {
-					const BYTE *idx = pData + size + 1 - idx_sz;
-
-					while (n_frames--) {
-						size_t sz = 0;
-						switch(nbytes) {
-							case 1: sz = (BYTE)*idx; break;
-							case 2: sz = AV_RL16(idx); break;
-							case 3: sz = AV_RL24(idx); break;
-							case 4: sz = AV_RL32(idx); break;
-						}
-
-						idx += nbytes;
-						if (sz > size || !sz) {
-							break;
-						}
-
-						CAutoPtr<CPacket> packet(DNew CPacket());
-						packet->SetData(pData, sz);
-
-						packet->TrackNumber    = tmp->TrackNumber;
-						packet->bDiscontinuity = tmp->bDiscontinuity;
-						packet->bSyncPoint     = tmp->bSyncPoint;
-
-						if (pData[0] & 0x2) {
-							packet->rtStart = rtStartTmp;
-							packet->rtStop  = rtStopTmp;
-							rtStartTmp      = INVALID_TIME;
-							rtStopTmp       = INVALID_TIME;
-						}
-						if (S_OK != (hr = DeliverPacket(packet))) {
-							break;
-						}
-
-						pData += sz;
-						size -= sz;
-					}
-				}
-
-				rtStart += rtDuration;
-				rtStop += rtDuration;
-
-				p->bSyncPoint     = FALSE;
-				p->bDiscontinuity = FALSE;
-
-				continue;
-			}
-
-			tmp->SetData(pb->data(), pb->size());
-		} else {
-			tmp->SetData(pb->data(), pb->size());
-		}
-
-		if (S_OK != (hr = DeliverPacket(tmp))) {
-			break;
-		}
-
-		rtStart += rtDuration;
-		rtStop += rtDuration;
-
-		p->bSyncPoint     = false;
-		p->bDiscontinuity = false;
-	}
-
-	if (m_mt.subtype == MEDIASUBTYPE_WAVPACK4) {
-		for (const auto& bm : p->bg->ba.bm) {
-			CAutoPtr<CPacket> tmp(DNew CPacket());
-
-			tmp->TrackNumber = p->TrackNumber;
-			tmp->rtStart     = p->rtStart;
-			tmp->rtStop      = p->rtStop;
-
-			if (!ParseWavpack(&m_mt, &bm->BlockAdditional, tmp)) {
-				continue;
-			}
-
-			if (S_OK != (hr = DeliverPacket(tmp))) {
-				break;
-			}
-		}
-	}
-
-	return hr;
 }
