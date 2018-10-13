@@ -37,15 +37,6 @@ using namespace MatroskaReader;
 
 class CMatroskaPacket : public CPacket
 {
-protected:
-	size_t GetDataSize() {
-		size_t size = 0;
-		POSITION pos = bg->Block.BlockData.GetHeadPosition();
-		while (pos) {
-			size += bg->Block.BlockData.GetNext(pos)->size();
-		}
-		return size;
-	}
 public:
 	CUInt TrackType;
 	CAutoPtr<MatroskaReader::BlockGroup> bg;
@@ -56,7 +47,7 @@ class CMatroskaSplitterOutputPin
 	, public CSubtitleStatus
 {
 	REFERENCE_TIME m_rtLastDuration = 0;
-	CAutoPtrList<CMatroskaPacket> m_packets;
+	std::deque<CAutoPtr<CMatroskaPacket>> m_packets;
 
 	CCritSec m_csQueue;
 

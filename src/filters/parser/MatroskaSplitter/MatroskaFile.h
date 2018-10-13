@@ -139,7 +139,7 @@ namespace MatroskaReader
 	};
 
 	template<class T>
-	class CNode : public CAutoPtrList<T>
+	class CNode : public std::list<CAutoPtr<T>>
 	{
 	public:
 		HRESULT Parse(CMatroskaNode* pMN);
@@ -210,7 +210,7 @@ namespace MatroskaReader
 		CLength TrackNumber;
 		CInt TimeCode;
 		CByte Lacing;
-		CAutoPtrList<CBinary> BlockData;
+		std::list<CAutoPtr<CBinary>> BlockData;
 
 		HRESULT Parse(CMatroskaNode* pMN, bool fFull);
 	};
