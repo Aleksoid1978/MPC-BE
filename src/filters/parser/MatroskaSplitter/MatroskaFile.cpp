@@ -83,16 +83,16 @@ HRESULT CMatroskaFile::Init()
 	const auto& s = m_segment;
 
 	BOOL bCanPlayback = FALSE;
-	POSITION pos = s.Tracks.GetHeadPosition();
-	while (pos && !bCanPlayback) {
-		Track* pT = s.Tracks.GetNext(pos);
-
-		POSITION pos2 = pT->TrackEntries.GetHeadPosition();
-		while (pos2 && !bCanPlayback) {
-			TrackEntry* pTE = pT->TrackEntries.GetNext(pos2);
+	for (const auto& pT : s.Tracks) {
+		for (const auto& pTE : pT->TrackEntries) {
 			if (pTE->TrackType == TrackEntry::TypeVideo || pTE->TrackType == TrackEntry::TypeAudio) {
 				bCanPlayback = TRUE;
+				break;
 			}
+		}
+
+		if (bCanPlayback) {
+			break;
 		}
 	}
 
@@ -251,21 +251,21 @@ HRESULT Segment::ParseMinimal(CMatroskaNode* pMN0)
 	}
 
 	if (k != 31) {
-		if (Cues.IsEmpty() && (pMN = pMN0->Child(MATROSKA_ID_CUES, false))) {
+		if (Cues.empty() && (pMN = pMN0->Child(MATROSKA_ID_CUES, false))) {
 			do {
 				Cues.Parse(pMN);
 			} while (pMN->Next(true));
 		}
 
-		if (Chapters.IsEmpty() && (pMN = pMN0->Child(MATROSKA_ID_CHAPTERS, false))) {
+		if (Chapters.empty() && (pMN = pMN0->Child(MATROSKA_ID_CHAPTERS, false))) {
 			Chapters.Parse(pMN);
 		}
 
-		if (Attachments.IsEmpty() && (pMN = pMN0->Child(MATROSKA_ID_ATTACHMENTS, false))) {
+		if (Attachments.empty() && (pMN = pMN0->Child(MATROSKA_ID_ATTACHMENTS, false))) {
 			Attachments.Parse(pMN);
 		}
 
-		if (Tags.IsEmpty() && (pMN = pMN0->Child(MATROSKA_ID_TAGS, false))) {
+		if (Tags.empty() && (pMN = pMN0->Child(MATROSKA_ID_TAGS, false))) {
 			Tags.Parse(pMN);
 		}
 	}
@@ -277,20 +277,18 @@ UINT64 Segment::GetMasterTrack()
 {
 	UINT64 TrackNumber = 0, AltTrackNumber = 0;
 
-	POSITION pos1 = Tracks.GetHeadPosition();
-	while (pos1 && TrackNumber == 0) {
-		Track* pT = Tracks.GetNext(pos1);
-
-		POSITION pos2 = pT->TrackEntries.GetHeadPosition();
-		while (pos2 && TrackNumber == 0) {
-			TrackEntry* pTE = pT->TrackEntries.GetNext(pos2);
-
+	for (const auto& pT : Tracks) {
+		for (const auto& pTE : pT->TrackEntries) {
 			if (pTE->TrackType == TrackEntry::TypeVideo) {
 				TrackNumber = pTE->TrackNumber;
 				break;
 			} else if (pTE->TrackType == TrackEntry::TypeAudio && AltTrackNumber == 0) {
 				AltTrackNumber = pTE->TrackNumber;
 			}
+		}
+
+		if (TrackNumber) {
+			break;
 		}
 	}
 
@@ -310,11 +308,10 @@ ChapterAtom* ChapterAtom::FindChapterAtom(UINT64 id)
 		return this;
 	}
 
-	POSITION pos = ChapterAtoms.GetHeadPosition();
-	while (pos) {
-		ChapterAtom* ca = ChapterAtoms.GetNext(pos)->FindChapterAtom(id);
-		if (ca) {
-			return ca;
+	for (const auto& ca : ChapterAtoms) {
+		const auto& caFind = ca->FindChapterAtom(id);
+		if (caFind) {
+			return caFind;
 		}
 	}
 
@@ -323,14 +320,8 @@ ChapterAtom* ChapterAtom::FindChapterAtom(UINT64 id)
 
 ChapterAtom* Segment::FindChapterAtom(UINT64 id, int nEditionEntry)
 {
-	POSITION pos1 = Chapters.GetHeadPosition();
-	while (pos1) {
-		Chapter* c = Chapters.GetNext(pos1);
-
-		POSITION pos2 = c->EditionEntries.GetHeadPosition();
-		while (pos2) {
-			EditionEntry* ee = c->EditionEntries.GetNext(pos2);
-
+	for (const auto& ch : Chapters) {
+		for (const auto& ee : ch->EditionEntries) {
 			if (nEditionEntry-- == 0) {
 				return id == 0 ? ee : ee->FindChapterAtom(id);
 			}
@@ -505,20 +496,18 @@ static int cesort(const void* a, const void* b)
 
 bool TrackEntry::Expand(CBinary& data, UINT64 Scope)
 {
-	if (ces.ce.GetCount() == 0) {
+	if (ces.ce.empty()) {
 		return true;
 	}
 
 	std::vector<ContentEncoding*> cearray;
-	POSITION pos = ces.ce.GetHeadPosition();
-	while (pos) {
-		cearray.push_back(ces.ce.GetNext(pos));
+	for (const auto& ce : ces.ce) {
+		cearray.push_back(ce);
 	}
 	qsort(cearray.data(), cearray.size(), sizeof(ContentEncoding*), cesort);
 
-	for (int i = (int)cearray.size()-1; i >= 0; i--) {
-		ContentEncoding* ce = cearray[i];
-
+	for (auto it = cearray.crbegin(); it != cearray.crend(); it++) {
+		const auto ce = *it;
 		if (!(ce->ContentEncodingScope & Scope)) {
 			continue;
 		}
@@ -944,7 +933,7 @@ HRESULT SimpleBlock::Parse(CMatroskaNode* pMN, bool fFull)
 		CAutoPtr<CBinary> p(DNew CBinary());
 		p->resize((size_t)len);
 		pMN->Read(p->data(), len);
-		BlockData.AddTail(p);
+		BlockData.emplace_back(p);
 	}
 
 	return S_OK;
@@ -1543,7 +1532,7 @@ HRESULT CNode<T>::Parse(CMatroskaNode* pMN)
 	if (!p || FAILED(hr = p->Parse(pMN))) {
 		return hr;
 	}
-	AddTail(p);
+	emplace_back(p);
 	return S_OK;
 }
 
@@ -1554,7 +1543,7 @@ HRESULT CBlockGroupNode::Parse(CMatroskaNode* pMN, bool fFull)
 	if (!p || FAILED(hr = p->Parse(pMN, fFull))) {
 		return hr;
 	}
-	AddTail(p);
+	emplace_back(p);
 	return S_OK;
 }
 
@@ -1565,7 +1554,7 @@ HRESULT CSimpleBlockNode::Parse(CMatroskaNode* pMN, bool fFull)
 	if (!p || FAILED(hr = p->Parse(pMN, fFull))) {
 		return hr;
 	}
-	AddTail(p);
+	emplace_back(p);
 	return S_OK;
 }
 
@@ -1722,15 +1711,10 @@ QWORD CMatroskaNode::FindPos(DWORD id, QWORD start)
 {
 	Segment& sm = m_pMF->m_segment;
 
-	POSITION pos = sm.MetaSeekInfo.GetHeadPosition();
-	while (pos) {
-		Seek* s = sm.MetaSeekInfo.GetNext(pos);
-
-		POSITION pos2 = s->SeekHeads.GetHeadPosition();
-		while (pos2) {
-			SeekHead* sh = s->SeekHeads.GetNext(pos2);
+	for (const auto& s : sm.MetaSeekInfo) {
+		for (const auto& sh : s->SeekHeads) {
 			if (sh->SeekID == id && sh->SeekPosition+sm.pos >= start) {
-				return sh->SeekPosition+sm.pos;
+				return sh->SeekPosition + sm.pos;
 			}
 		}
 	}
