@@ -35,12 +35,6 @@
 
 using namespace MatroskaReader;
 
-class CMatroskaPacket : public CPacket
-{
-public:
-	CAutoPtr<MatroskaReader::BlockGroup> bg;
-};
-
 class CMatroskaSplitterOutputPin
 	: public CBaseSplitterOutputPin
 	, public CSubtitleStatus
@@ -62,11 +56,17 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 	, public IMatroskaSplitterFilter
 	, public ISpecifyPropertyPages2
 {
-	void SetupChapters(LPCSTR lng, MatroskaReader::ChapterAtom* parent, int level = 0);
+	class CMatroskaPacket : public CPacket
+	{
+	public:
+		CAutoPtr<BlockGroup> bg;
+	};
+
+	void SetupChapters(LPCSTR lng, ChapterAtom* parent, int level = 0);
 	void InstallFonts();
 	void SendVorbisHeaderSample();
 
-	CAutoPtr<MatroskaReader::CMatroskaNode> m_pSegment, m_pCluster, m_pBlock;
+	CAutoPtr<CMatroskaNode> m_pSegment, m_pCluster, m_pBlock;
 
 	REFERENCE_TIME m_Seek_rt;
 	BOOL m_bSupportCueDuration;
@@ -92,14 +92,14 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 	bool m_bLoadEmbeddedFonts, m_bCalcDuration;
 
 protected:
-	CAutoPtr<MatroskaReader::CMatroskaFile> m_pFile;
+	CAutoPtr<CMatroskaFile> m_pFile;
 
 	bool ReadFirtsBlock(std::vector<byte>& pData, TrackEntry* pTE);
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 
-	std::map<DWORD, MatroskaReader::TrackEntry*> m_pTrackEntryMap;
-	std::vector<MatroskaReader::TrackEntry* > m_pOrderedTrackArray;
-	MatroskaReader::TrackEntry* GetTrackEntryAt(UINT aTrackIdx);
+	std::map<DWORD, TrackEntry*> m_pTrackEntryMap;
+	std::vector<TrackEntry* > m_pOrderedTrackArray;
+	TrackEntry* GetTrackEntryAt(UINT aTrackIdx);
 
 	bool DemuxInit();
 	void DemuxSeek(REFERENCE_TIME rt);
