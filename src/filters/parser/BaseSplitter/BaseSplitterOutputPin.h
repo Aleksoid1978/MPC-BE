@@ -30,7 +30,7 @@
 
 #define BUFFER_DURATION_MIN   100
 #define BUFFER_DURATION_DEF  3000
-#define BUFFER_DURATION_MAX 10000
+#define BUFFER_DURATION_MAX 15000
 
 class CBaseSplitterFilter;
 
