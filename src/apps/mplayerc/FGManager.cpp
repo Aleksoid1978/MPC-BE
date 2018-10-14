@@ -2212,6 +2212,8 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	} else {
 		pFGF = DNew CFGFilterInternal<CDVRSplitterFilter>(LowMerit(DVRSplitterName), MERIT64_DO_USE);
 	}
+	pFGF->AddType(MEDIATYPE_Stream, GUID_NULL);
+	m_transform.push_back(pFGF);
 
 	// add CMpegSplitterFilter last since it can parse the stream for a long time
 	if (src[SRC_MPEG] || IsPreview) {
