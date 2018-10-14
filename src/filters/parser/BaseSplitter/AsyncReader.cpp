@@ -85,28 +85,26 @@ ULONGLONG CAsyncFileReader::GetLength()
 
 // IAsyncReader
 
-#define RetryOnError() \
-{ \
-	const DWORD dwError = GetLastError(); \
-	if (dwError == ERROR_INTERNET_CONNECTION_RESET \
-			|| dwError == ERROR_HTTP_INVALID_SERVER_RESPONSE) { \
-		CString customHeader; customHeader.Format(L"Range: bytes=%I64d-\r\n", llPosition); \
-		hr = m_HTTPAsync.SendRequest(customHeader); \
-		if (hr == S_OK) { \
-			goto again; \
-		} \
-	} \
-}
-
 STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE* pBuffer)
 {
 	if (m_url.GetLength()) {
-		do {
-			if ((ULONGLONG)llPosition + lLength > GetLength()) {
-				return E_FAIL;
-			}
+		if ((ULONGLONG)llPosition + lLength > GetLength()) {
+			return E_FAIL;
+		}
 
-again:
+		const auto RetryOnError = [&] {
+			const DWORD dwError = GetLastError();
+			if (dwError == ERROR_INTERNET_CONNECTION_RESET
+					|| dwError == ERROR_HTTP_INVALID_SERVER_RESPONSE) {
+				CString customHeader; customHeader.Format(L"Range: bytes=%I64d-\r\n", llPosition);
+				if (S_OK == m_HTTPAsync.SendRequest(customHeader)) {
+					return true;
+				}
+			}
+			return false;
+		};
+
+		for (;;) {
 			if (m_pos != llPosition) {
 				if (llPosition > m_pos && (llPosition - m_pos) <= 64 * KILOBYTE) {
 					static BYTE pBufferTmp[64 * KILOBYTE] = { 0 };
@@ -115,13 +113,15 @@ again:
 					DWORD dwSizeRead = 0;
 					HRESULT hr = m_HTTPAsync.Read(pBufferTmp, lenght, &dwSizeRead);
 					if (hr != S_OK || dwSizeRead != lenght) {
-						RetryOnError();
+						if (RetryOnError()) {
+							continue;
+						}
 						return E_FAIL;
 					}
 				} else {
 					CString customHeader; customHeader.Format(L"Range: bytes=%I64d-\r\n", llPosition);
 					HRESULT hr = m_HTTPAsync.SendRequest(customHeader);
-#ifdef DEBUG
+#ifdef DEBUG_OR_LOG
 					DLog(L"CAsyncFileReader::SyncRead() : do HTTP seeking to %I64d(current pos %I64d), hr = 0x%08x", llPosition, m_pos, hr);
 #endif
 					if (hr != S_OK) {
@@ -135,13 +135,15 @@ again:
 			DWORD dwSizeRead = 0;
 			HRESULT hr = m_HTTPAsync.Read(pBuffer, lLength, &dwSizeRead);
 			if (hr != S_OK || dwSizeRead != lLength) {
-				RetryOnError();
+				if (RetryOnError()) {
+					continue;
+				}
 				return E_FAIL;
 			}
 			m_pos += dwSizeRead;
 
 			return S_OK;
-		} while (m_hBreakEvent && WaitForSingleObject(m_hBreakEvent, 0) == WAIT_TIMEOUT);
+		}
 
 		return E_FAIL;
 	}
