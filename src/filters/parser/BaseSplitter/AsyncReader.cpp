@@ -100,12 +100,12 @@ ULONGLONG CAsyncFileReader::GetLength()
 
 STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE* pBuffer)
 {
-	do {
-		if ((ULONGLONG)llPosition + lLength > GetLength()) {
-			return E_FAIL;
-		}
+	if (m_url.GetLength()) {
+		do {
+			if ((ULONGLONG)llPosition + lLength > GetLength()) {
+				return E_FAIL;
+			}
 
-		if (!m_url.IsEmpty()) {
 again:
 			if (m_pos != llPosition) {
 				if (llPosition > m_pos && (llPosition - m_pos) <= 64 * KILOBYTE) {
@@ -141,26 +141,28 @@ again:
 			m_pos += dwSizeRead;
 
 			return S_OK;
+		} while (m_hBreakEvent && WaitForSingleObject(m_hBreakEvent, 0) == WAIT_TIMEOUT);
+
+		return E_FAIL;
+	}
+
+	try {
+		if ((ULONGLONG)llPosition != Seek(llPosition, FILE_BEGIN)) {
+			return E_FAIL;
+		}
+		DWORD dwError;
+		if ((UINT)lLength < Read(pBuffer, lLength, dwError) || dwError != ERROR_SUCCESS) {
+			return E_FAIL;
 		}
 
-		try {
-			if ((ULONGLONG)llPosition != Seek(llPosition, FILE_BEGIN)) {
-				return E_FAIL;
-			}
-			DWORD dwError;
-			if ((UINT)lLength < Read(pBuffer, lLength, dwError) || dwError != ERROR_SUCCESS) {
-				return E_FAIL;
-			}
+		return S_OK;
+	}
+	catch (CFileException* e) {
+		m_lOsError = e->m_lOsError;
+		e->Delete();
 
-			return S_OK;
-		} catch (CFileException* e) {
-			m_lOsError = e->m_lOsError;
-			e->Delete();
-			break;
-		}
-	} while (m_hBreakEvent && WaitForSingleObject(m_hBreakEvent, 0) == WAIT_TIMEOUT);
-
-	return E_FAIL;
+		return E_FAIL;
+	}
 }
 
 STDMETHODIMP CAsyncFileReader::Length(LONGLONG* pTotal, LONGLONG* pAvailable)
