@@ -2718,46 +2718,38 @@ HRESULT CMatroskaSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 
 	bool force_packet = false;
 
-	if (m_SubtitleType == hdmvsub && p) {
-		CMatroskaPacket* mp = dynamic_cast<CMatroskaPacket*>(p.m_p);
-		if (mp && !mp->bg->Block.BlockData.empty()) {
-			const auto& pb = mp->bg->Block.BlockData.front();
-			if (pb->size() >= 3) {
-				const BYTE segtype = pb->data()[0];
-				if (segtype == 22) {
-					// this is first packet of HDMV sub, set standart mode
-					m_bNeedNextSubtitle = false;
-					force_packet = true; // but send this packet anyway
-				}
-				else if (segtype == 21) {
-					// this is picture packet, force next HDMV sub
-					m_bNeedNextSubtitle = true;
-				}
+	if (m_SubtitleType == hdmvsub) {
+		if (p && p->size() >= 3) {
+			const BYTE segtype = p->data()[0];
+			if (segtype == 22) {
+				// this is first packet of HDMV sub, set standart mode
+				m_bNeedNextSubtitle = false;
+				force_packet = true; // but send this packet anyway
+			}
+			else if (segtype == 21) {
+				// this is picture packet, force next HDMV sub
+				m_bNeedNextSubtitle = true;
 			}
 		}
 	}
-	else if (m_SubtitleType == dvbsub && p) {
-		CMatroskaPacket* mp = dynamic_cast<CMatroskaPacket*>(p.m_p);
-		if (mp && !mp->bg->Block.BlockData.empty()) {
-			const auto& pb = mp->bg->Block.BlockData.front();
-			if (pb->size() >= 6) {
-				BYTE* pos = pb->data();
-				BYTE* end = pos + pb->size();
+	else if (m_SubtitleType == dvbsub) {
+		if (p && p->size() >= 6) {
+			BYTE* pos = p->data();
+			BYTE* end = pos + p->size();
 
-				while (pos + 6 < end) {
-					if (*pos++ == 0x0F) {
-						const WORD segtype = *pos++;
-						pos += 2;
-						const WORD seglength = _byteswap_ushort(GETU16(pos));
-						pos += 2 + seglength;
+			while (pos + 6 < end) {
+				if (*pos++ == 0x0F) {
+					const WORD segtype = *pos++;
+					pos += 2;
+					const WORD seglength = _byteswap_ushort(GETU16(pos));
+					pos += 2 + seglength;
 
-						if (segtype == 0x14) { // first "display" segment
-							force_packet = m_bNeedNextSubtitle;
-							m_bNeedNextSubtitle = false;
-						}
-						else if (segtype == 0x13) { // "object" segment
-							m_bNeedNextSubtitle = true;
-						}
+					if (segtype == 0x14) { // first "display" segment
+						force_packet = m_bNeedNextSubtitle;
+						m_bNeedNextSubtitle = false;
+					}
+					else if (segtype == 0x13) { // "object" segment
+						m_bNeedNextSubtitle = true;
 					}
 				}
 			}
