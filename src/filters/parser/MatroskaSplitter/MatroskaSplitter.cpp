@@ -1954,13 +1954,6 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 		return true;
 	}
 
-	{
-		CAutoLock cAutoLock(&m_csPackets);
-		for (auto& [TrackNumber, packets] : m_packets) {
-			packets.clear();
-		}
-	}
-
 	SendVorbisHeaderSample(); // HACK: init vorbis decoder with the headers
 
 	const auto& s = m_pFile->m_segment;
@@ -2129,10 +2122,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 	CAutoLock cAutoLock(&m_csPackets);
 	for (auto& [TrackNumber, packets] : m_packets) {
 		for (auto& p : packets) {
-			HRESULT hr = DeliverMatroskaPacket(p);
-			if (hr != S_OK) {
-				return hr;
-			}
+			DeliverMatroskaPacket(p);
 		}
 
 		packets.clear();
@@ -2269,24 +2259,16 @@ HRESULT CMatroskaSplitterFilter::DeliverMatroskaPacket(CAutoPtr<CMatroskaPacket>
 
 		if (mt.subtype == MEDIASUBTYPE_DVB_SUBTITLES) {
 			// Add DBV subtitle missing start code - 0x20 0x00 (in Matroska DVB packets start with 0x0F ...)
-			CAutoPtr<CBinary> ptr(DNew CBinary());
-			ptr->resize(2);
-			BYTE *pData = ptr->data();
-			pData[0] = 0x20;
-			pData[1] = 0x00;
-			pOutput->SetData(ptr->data(), ptr->size());
+			static BYTE start_code[2] = {0x20, 0x00};
+			pOutput->SetData(start_code, sizeof(start_code));
 			pOutput->AppendData(pb->data(), pb->size());
 		} else if (mt.subtype == MEDIASUBTYPE_WAVPACK4) {
 			if (!ParseWavpack(&mt, pb, pOutput)) {
 				continue;
 			}
 		} else if (mt.subtype == MEDIASUBTYPE_icpf) {
-			CAutoPtr<CBinary> ptr(DNew CBinary());
-			ptr->resize(2 * sizeof(DWORD));
-			DWORD* pData = (DWORD*)ptr->data();
-			pData[0] = pb->size();
-			pData[1] = FCC('icpf');
-			pOutput->SetData(ptr->data(), ptr->size());
+			const DWORD data[2] = {pb->size(), FCC('icpf')};
+			pOutput->SetData(&data[0], sizeof(data));
 			pOutput->AppendData(pb->data(), pb->size());
 		} else if (mt.subtype == MEDIASUBTYPE_VP90) {
 			REFERENCE_TIME rtStartTmp = rtStart;
