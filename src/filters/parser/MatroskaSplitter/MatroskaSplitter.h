@@ -68,8 +68,10 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 
 	CAutoPtr<CMatroskaNode> m_pSegment, m_pCluster, m_pBlock;
 
-	REFERENCE_TIME m_Seek_rt;
-	BOOL m_bSupportCueDuration;
+	REFERENCE_TIME m_Cluster_seek_rt;
+	QWORD m_Cluster_seek_pos;
+	BOOL m_bSupportSubtitlesCueDuration;
+	std::vector<UINT64> m_subtitlesTrackNumbers;
 
 	MediaSideDataHDR* m_MasterDataHDR;
 	MediaSideDataHDRContentLightLevel* m_HDRContentLightLevel;
