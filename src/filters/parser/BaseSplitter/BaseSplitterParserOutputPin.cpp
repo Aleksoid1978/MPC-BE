@@ -30,7 +30,7 @@
 #define SEQ_START_CODE     0xB3010000
 #define PICTURE_START_CODE 0x00010000
 
-#define MOVE_TO_H264_START_CODE(b, e)    while(b <= e - 4  && !((GETU32(b) == 0x01000000) || ((GETU32(b) & 0x00FFFFFF) == 0x00010000))) b++; if((b <= e - 4) && GETU32(b) == 0x01000000) b++;
+#define MOVE_TO_H264_START_CODE(b, e)    while(b <= e - 4  && !((GETU32(b) == 0x01000000) || ((GETU32(b) & 0x00FFFFFF) == 0x00010000))) b++;
 #define MOVE_TO_AC3_START_CODE(b, e)     while(b <= e - 8  && (GETU16(b) != AC3_SYNCWORD)) b++;
 #define MOVE_TO_AAC_START_CODE(b, e)     while(b <= e - 9  && ((GETU16(b) & AAC_ADTS_SYNCWORD) != AAC_ADTS_SYNCWORD)) b++;
 #define MOVE_TO_AACLATM_START_CODE(b, e) while(b <= e - 4  && ((GETU16(b) & 0xe0FF) != 0xe056)) b++;
@@ -372,7 +372,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseAnnexB(CAutoPtr<CPacket> p, bool bCon
 	MOVE_TO_H264_START_CODE(start, end);
 
 	while (start <= end - 4) {
-		BYTE* next = start + 1;
+		BYTE* next = start + 4;
 
 		if (m_bEndOfStream) {
 			next = end;
