@@ -2933,10 +2933,9 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			ChangeOutputMediaFormat(2);
 		}
 
-		return E_FAIL;
+		return S_FALSE;
 	}
 
-	HRESULT hr = S_OK;
 	for (;;) {
 		ret = avcodec_receive_frame(m_pAVCtx, m_pFrame);
 		if (ret < 0 && ret != AVERROR(EAGAIN)) {
@@ -2961,6 +2960,8 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 		}
 
 		UpdateAspectRatio();
+
+		HRESULT hr = S_OK;
 
 		if (UseDXVA2()) {
 			if ((m_nCodecId == AV_CODEC_ID_HEVC || m_nCodecId == AV_CODEC_ID_VP9)
@@ -3047,7 +3048,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 		av_frame_unref(m_pFrame);
 	}
 
-	return hr;
+	return S_OK;
 }
 
 HRESULT CMPCVideoDecFilter::ParseInternal(const BYTE *buffer, int buflen, REFERENCE_TIME rtStartIn, REFERENCE_TIME rtStopIn, BOOL bPreroll)
@@ -3251,7 +3252,7 @@ HRESULT CMPCVideoDecFilter::Transform(IMediaSample* pIn)
 
 	m_bDecodingStart = TRUE;
 
-	return S_OK;
+	return hr;
 }
 
 void CMPCVideoDecFilter::UpdateAspectRatio()
