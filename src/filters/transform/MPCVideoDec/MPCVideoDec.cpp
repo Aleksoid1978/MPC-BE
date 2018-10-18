@@ -2659,7 +2659,9 @@ void CMPCVideoDecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 
 			switch (m_nDeinterlacing) {
 				case AUTO :
-					if (m_FilterInfo.interlaced != -1) {
+					if (m_nCodecId == AV_CODEC_ID_HEVC) {
+						props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
+					} else if (m_FilterInfo.interlaced != -1) {
 						switch (m_FilterInfo.interlaced) {
 							case 0 :
 								props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
