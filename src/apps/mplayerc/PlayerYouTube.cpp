@@ -915,6 +915,7 @@ namespace Youtube
 						player_responce_jsonData.Replace("\\u0026", "&");
 						player_responce_jsonData.Replace("\\/", "/");
 						player_responce_jsonData.Replace("\\\"", "\"");
+						player_responce_jsonData.Replace("\\\\\"", "\\\"");
 						player_responce_jsonData.Replace("\\&", "&");
 
 						rapidjson::Document d;
