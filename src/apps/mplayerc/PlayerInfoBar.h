@@ -34,8 +34,8 @@ class CPlayerInfoBar : public CDialogBar
 private:
 	CMainFrame* m_pMainFrame;
 
-	CAutoPtrArray<CStatusLabel> m_labels;
-	CAutoPtrArray<CStatusLabel> m_infos;
+	std::vector<std::unique_ptr<CStatusLabel>> m_labels;
+	std::vector<std::unique_ptr<CStatusLabel>> m_infos;
 
 	int m_nFirstColWidth;
 

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -44,7 +44,7 @@ void CPlayerInfoBar::SetLine(CString label, CString info)
 		return;
 	}
 
-	for (size_t idx = 0; idx < m_labels.GetCount(); idx++) {
+	for (size_t idx = 0; idx < m_labels.size(); idx++) {
 		CString tmp;
 		m_labels[idx]->GetWindowTextW(tmp);
 
@@ -59,13 +59,11 @@ void CPlayerInfoBar::SetLine(CString label, CString info)
 		}
 	}
 
-	CAutoPtr<CStatusLabel> l(DNew CStatusLabel(true, false));
-	l->Create(label, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS|SS_OWNERDRAW, CRect(0,0,0,0), this);
-	m_labels.Add(l);
+	m_labels.push_back(std::make_unique<CStatusLabel>(true, false));
+	m_labels.back()->Create(label, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS|SS_OWNERDRAW, CRect(0,0,0,0), this);
 
-	CAutoPtr<CStatusLabel> i(DNew CStatusLabel(false, true));
-	i->Create(info, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS|SS_OWNERDRAW, CRect(0,0,0,0), this);
-	m_infos.Add(i);
+	m_infos.push_back(std::make_unique<CStatusLabel>(false, true));
+	m_infos.back()->Create(info, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS|SS_OWNERDRAW, CRect(0,0,0,0), this);
 
 	Relayout();
 }
@@ -74,7 +72,7 @@ void CPlayerInfoBar::GetLine(CString label, CString& info)
 {
 	info.Empty();
 
-	for (size_t idx = 0; idx < m_labels.GetCount(); idx++) {
+	for (size_t idx = 0; idx < m_labels.size(); idx++) {
 		CString tmp;
 		m_labels[idx]->GetWindowTextW(tmp);
 
@@ -89,13 +87,13 @@ void CPlayerInfoBar::GetLine(CString label, CString& info)
 
 void CPlayerInfoBar::RemoveLine(CString label)
 {
-	for (size_t i = 0; i < m_labels.GetCount(); i++) {
+	for (size_t i = 0; i < m_labels.size(); i++) {
 		CString tmp;
 		m_labels[i]->GetWindowTextW(tmp);
 
 		if (label == tmp) {
-			m_labels.RemoveAt(i);
-			m_infos.RemoveAt(i);
+			m_labels.erase(m_labels.begin() + i);
+			m_infos.erase(m_infos.begin() + i);
 
 			break;
 		}
@@ -106,19 +104,19 @@ void CPlayerInfoBar::RemoveLine(CString label)
 
 void CPlayerInfoBar::RemoveAllLines()
 {
-	m_labels.RemoveAll();
-	m_infos.RemoveAll();
+	m_labels.clear();
+	m_infos.clear();
 
 	Relayout();
 }
 
 void CPlayerInfoBar::ScaleFont()
 {
-	for (size_t i = 0; i < m_labels.GetCount(); i++) {
-		m_labels[i]->ScaleFont();
+	for (auto& label : m_labels) {
+		label->ScaleFont();
 	}
-	for (size_t i = 0; i < m_infos.GetCount(); i++) {
-		m_infos[i]->ScaleFont();
+	for (auto& info : m_infos) {
+		info->ScaleFont();
 	}
 }
 
@@ -144,7 +142,7 @@ CSize CPlayerInfoBar::CalcFixedLayout(BOOL bStretch, BOOL bHorz)
 	CRect r;
 	GetParent()->GetClientRect(&r);
 
-	r.bottom = r.top + m_labels.GetCount() * m_pMainFrame->ScaleY(17) + (m_labels.GetCount() ? m_pMainFrame->ScaleY(2) * 2 : 0);
+	r.bottom = r.top + m_labels.size() * m_pMainFrame->ScaleY(17) + (m_labels.size() ? m_pMainFrame->ScaleY(2) * 2 : 0);
 
 	return r.Size();
 }
@@ -158,16 +156,16 @@ void CPlayerInfoBar::Relayout()
 	int h = m_pMainFrame->ScaleY(17);
 	int y = m_pMainFrame->ScaleY(2);
 
-	for (size_t i = 0; i < m_labels.GetCount(); i++) {
-		CDC* pDC = m_labels[i]->GetDC();
+	for (auto& label : m_labels) {
+		CDC* pDC =label->GetDC();
 		CString str;
-		m_labels[i]->GetWindowTextW(str);
+		label->GetWindowTextW(str);
 		w = std::max(w, (int)pDC->GetTextExtent(str).cx);
-		m_labels[i]->ReleaseDC(pDC);
+		label->ReleaseDC(pDC);
 	}
 
 	const int sep = m_pMainFrame->ScaleX(10);
-	for (size_t i = 0; i < m_labels.GetCount(); i++, y += h) {
+	for (size_t i = 0; i < m_labels.size(); i++, y += h) {
 		m_labels[i]->MoveWindow(1, y, w - sep, h);
 		m_infos[i]->MoveWindow(w + sep, y, r.Width() - w - sep - 1, h);
 	}
