@@ -22,6 +22,7 @@
 #pragma once
 
 #include <mpc_defines.h>
+#include <basestruct.h>
 #include "BaseMuxerRelatedPin.h"
 #include "../../../DSUtil/DSMPropertyBag.h"
 
@@ -30,7 +31,7 @@ class CBaseMuxerInputPin;
 struct MuxerPacket {
 	CBaseMuxerInputPin* pPin;
 	REFERENCE_TIME rtStart, rtStop;
-	CAtlArray<BYTE> pData;
+	std::vector<NoInitByte> pData;
 	enum flag_t {
 		empty = 0,
 		timevalid = 1,

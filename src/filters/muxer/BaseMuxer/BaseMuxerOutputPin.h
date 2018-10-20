@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <list>
 #include "BitStream.h"
 #include "BaseMuxerInputPin.h"
 #include "BaseMuxerRelatedPin.h"
@@ -53,7 +54,7 @@ class CBaseMuxerRawOutputPin : public CBaseMuxerOutputPin, public CBaseMuxerRela
 		REFERENCE_TIME rt;
 		__int64 fp;
 	};
-	CAtlList<idx_t> m_idx;
+	std::list<idx_t> m_idx;
 
 public:
 	CBaseMuxerRawOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
