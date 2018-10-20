@@ -170,7 +170,7 @@ void CBaseMuxerRawOutputPin::MuxHeader(const CMediaType& mt)
 			pBitStream->StrWrite("\n\n[Events]\n", true);
 		}
 	} else if (mt.subtype == MEDIASUBTYPE_VOBSUB) {
-		m_idx.RemoveAll();
+		m_idx.clear();
 	} else if (mt.majortype == MEDIATYPE_Audio
 			   && (mt.subtype == MEDIASUBTYPE_PCM
 				   || mt.subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO
@@ -197,8 +197,8 @@ void CBaseMuxerRawOutputPin::MuxPacket(const CMediaType& mt, const MuxerPacket* 
 		return;
 	}
 
-	const BYTE* pData = pPacket->pData.GetData();
-	const int DataSize = int(pPacket->pData.GetCount());
+	const BYTE* pData = (BYTE*)pPacket->pData.data();
+	const int DataSize = (int)pPacket->pData.size();
 
 	if (mt.subtype == MEDIASUBTYPE_RAW_AAC1 && mt.formattype == FORMAT_WaveFormatEx) {
 		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.Format();
@@ -316,24 +316,26 @@ void CBaseMuxerRawOutputPin::MuxPacket(const CMediaType& mt, const MuxerPacket* 
 
 		size_t fields = mt.subtype == MEDIASUBTYPE_ASS2 ? 10 : 9;
 
-		CAtlList<CStringA> sl;
+		std::list<CStringA> sl;
 		Explode(str, sl, ',', fields);
-		if (sl.GetCount() < fields) {
+		if (sl.size() < fields) {
 			return;
 		}
 
-		CStringA readorder = sl.RemoveHead(); // TODO
-		CStringA layer = sl.RemoveHead();
-		CStringA style = sl.RemoveHead();
-		CStringA actor = sl.RemoveHead();
-		CStringA left = sl.RemoveHead();
-		CStringA right = sl.RemoveHead();
-		CStringA top = sl.RemoveHead();
+		auto it = sl.begin();
+
+		CStringA readorder = *it++; // TODO
+		CStringA layer = *it++;
+		CStringA style = *it++;
+		CStringA actor = *it++;
+		CStringA left  = *it++;
+		CStringA right = *it++;
+		CStringA top   = *it++;
 		if (fields == 10) {
-			top += ',' + sl.RemoveHead();    // bottom
+			top += ',' + *it++;    // bottom
 		}
-		CStringA effect = sl.RemoveHead();
-		str = sl.RemoveHead();
+		CStringA effect = *it++;
+		str = *it++;
 
 		if (mt.subtype == MEDIASUBTYPE_SSA) {
 			layer = "Marked=0";
@@ -356,7 +358,7 @@ void CBaseMuxerRawOutputPin::MuxPacket(const CMediaType& mt, const MuxerPacket* 
 			idx_t i;
 			i.rt = pPacket->rtStart;
 			i.fp = pBitStream->GetPos();
-			m_idx.AddTail(i);
+			m_idx.emplace_back(i);
 		}
 
 		int DataSizeLeft = DataSize;
@@ -468,13 +470,11 @@ void CBaseMuxerRawOutputPin::MuxFooter(const CMediaType& mt)
 						fwprintf_s(f, L"alt: %s\n", alt.GetString());
 					}
 
-					POSITION pos = m_idx.GetHeadPosition();
-					while (pos) {
-						const idx_t& i = m_idx.GetNext(pos);
-						DVD_HMSF_TIMECODE start = RT2HMSF(i.rt, 25);
+					for (const auto& item : m_idx) {
+						DVD_HMSF_TIMECODE start = RT2HMSF(item.rt, 25);
 						fwprintf_s(f, L"timestamp: %02u:%02u:%02u:%03d, filepos: %09I64x\n",
-									start.bHours, start.bMinutes, start.bSeconds, (int)((i.rt / 10000) % 1000),
-									i.fp);
+									start.bHours, start.bMinutes, start.bSeconds, (int)((item.rt / 10000) % 1000),
+									item.fp);
 					}
 
 					fclose(f);
