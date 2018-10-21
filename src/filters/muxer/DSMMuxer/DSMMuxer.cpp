@@ -188,9 +188,7 @@ void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
 
 	MuxFileInfo(pBS);
 
-	POSITION pos = m_pPins.GetHeadPosition();
-	while (pos) {
-		CBaseMuxerInputPin* pPin = m_pPins.GetNext(pos);
+	for (const auto& pPin : m_pPins) {
 		const CMediaType& mt = pPin->CurrentMediaType();
 
 		ASSERT((mt.lSampleSize >> 30) == 0); // you don't need >1GB samples, do you?
@@ -215,9 +213,8 @@ void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
 
 	CComQIPtr<IDSMChapterBag> pCB = (IUnknown*)(INonDelegatingUnknown*)this;
 
-	pos = m_pPins.GetHeadPosition();
-	while (pos) {
-		for (CComPtr<IPin> pPin = m_pPins.GetNext(pos)->GetConnected(); pPin; pPin = GetUpStreamPin(GetFilterFromPin(pPin))) {
+	for (const auto& p : m_pPins) {
+		for (CComPtr<IPin> pPin = p->GetConnected(); pPin; pPin = GetUpStreamPin(GetFilterFromPin(pPin))) {
 			if (m_fAutoRes) {
 				CComQIPtr<IDSMResourceBag> pPB = GetFilterFromPin(pPin);
 				if (pPB && !pRBs.Find(pPB)) {
@@ -235,7 +232,7 @@ void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
 
 	// resources
 
-	pos = pRBs.GetHeadPosition();
+	POSITION pos = pRBs.GetHeadPosition();
 	while (pos) {
 		IDSMResourceBag* pRB = pRBs.GetNext(pos);
 
