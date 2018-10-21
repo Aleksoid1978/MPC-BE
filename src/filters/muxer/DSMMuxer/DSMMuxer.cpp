@@ -173,8 +173,8 @@ void CDSMMuxerFilter::MuxStreamInfo(IBitStream* pBS, CBaseMuxerInputPin* pPin)
 
 void CDSMMuxerFilter::MuxInit()
 {
-	m_sps.RemoveAll();
-	m_isps.RemoveAll();
+	m_sps.clear();
+	m_isps.clear();
 	m_rtPrevSyncPoint = INVALID_TIME;
 }
 
@@ -267,7 +267,7 @@ void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
 	// chapters
 
 	if (pCB) {
-		CAtlList<CDSMChapter> chapters;
+		std::list<CDSMChapter> chapters;
 		REFERENCE_TIME rtPrev = 0;
 		int len = 0;
 
@@ -282,16 +282,14 @@ void CDSMMuxerFilter::MuxHeader(IBitStream* pBS)
 				c.rt = rtDiff;
 				c.name = name;
 				len += 1 + GetByteLength(myabs(c.rt)) + WStrToUTF8(c.name).GetLength() + 1;
-				chapters.AddTail(c);
+				chapters.push_back(c);
 			}
 		}
 
-		if (chapters.GetCount()) {
+		if (chapters.size()) {
 			MuxPacketHeader(pBS, DSMP_CHAPTERS, len);
 
-			pos = chapters.GetHeadPosition();
-			while (pos) {
-				CDSMChapter& c = chapters.GetNext(pos);
+			for (const auto& c : chapters) {
 				CStringA name = WStrToUTF8(c.name);
 				int irt = GetByteLength(myabs(c.rt));
 				pBS->BitWrite(c.rt < 0, 1);
@@ -357,13 +355,13 @@ void CDSMMuxerFilter::MuxFooter(IBitStream* pBS)
 	// syncpoints
 
 	int len = 0;
-	CAtlList<IndexedSyncPoint> isps;
 	REFERENCE_TIME rtPrev = 0, rt;
 	UINT64 fpPrev = 0, fp;
 
-	POSITION pos = m_isps.GetHeadPosition();
-	while (pos) {
-		IndexedSyncPoint& isp = m_isps.GetNext(pos);
+	std::vector<IndexedSyncPoint> isps;
+	isps.reserve(m_isps.size());
+
+	for (const auto& isp : m_isps) {
 		TRACE(L"sp[%d]: %I64d %I64x\n", isp.id, isp.rt, isp.fp);
 
 		rt = isp.rt - rtPrev;
@@ -374,17 +372,14 @@ void CDSMMuxerFilter::MuxFooter(IBitStream* pBS)
 		IndexedSyncPoint isp2;
 		isp2.fp = fp;
 		isp2.rt = rt;
-		isps.AddTail(isp2);
+		isps.push_back(isp2);
 
 		len += 1 + GetByteLength(myabs(rt)) + GetByteLength(fp); // flags + rt + fp
 	}
 
 	MuxPacketHeader(pBS, DSMP_SYNCPOINTS, len);
 
-	pos = isps.GetHeadPosition();
-	while (pos) {
-		IndexedSyncPoint& isp = isps.GetNext(pos);
-
+	for (const auto& isp : isps) {
 		int irt = GetByteLength(myabs(isp.rt));
 		int ifp = GetByteLength(isp.fp);
 
@@ -419,9 +414,9 @@ void CDSMMuxerFilter::IndexSyncPoint(const MuxerPacket* p, __int64 fp)
 	sp.fp = fp;
 
 	{
-		SyncPoint& head = !m_sps.IsEmpty() ? m_sps.GetHead() : sp;
-		SyncPoint& tail = !m_sps.IsEmpty() ? m_sps.GetTail() : sp;
-		REFERENCE_TIME rtfp = !m_isps.IsEmpty() ? m_isps.GetTail().rtfp : INVALID_TIME;
+		SyncPoint& head = !m_sps.empty() ? m_sps.front() : sp;
+		SyncPoint& tail = !m_sps.empty() ? m_sps.back() : sp;
+		REFERENCE_TIME rtfp = !m_isps.empty() ? m_isps.back().rtfp : INVALID_TIME;
 
 		if (head.rtStart > rtfp + 1000000) { // 100ms limit, just in case every stream had only keyframes, then sycnpoints would be too frequent
 			IndexedSyncPoint isp;
@@ -429,18 +424,19 @@ void CDSMMuxerFilter::IndexSyncPoint(const MuxerPacket* p, __int64 fp)
 			isp.rt = tail.rtStart;
 			isp.rtfp = head.rtStart;
 			isp.fp = head.fp;
-			m_isps.AddTail(isp);
+			m_isps.push_back(isp);
 		}
 	}
 
-	POSITION pos = m_sps.GetHeadPosition();
-	while (pos) {
-		POSITION cur = pos;
-		SyncPoint& sp2 = m_sps.GetNext(pos);
+	auto it = m_sps.begin();
+	while (it != m_sps.end()) {
+		SyncPoint& sp2 = *it;
 		if (sp2.id == sp.id && sp2.rtStop <= sp.rtStop || sp2.rtStop <= sp.rtStart) {
-			m_sps.RemoveAt(cur);
+			m_sps.erase(it++);
+		} else {
+			it++;
 		}
 	}
 
-	m_sps.AddTail(sp);
+	m_sps.push_back(sp);
 }

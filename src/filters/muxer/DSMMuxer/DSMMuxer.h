@@ -41,8 +41,8 @@ class __declspec(uuid("C6590B76-587E-4082-9125-680D0693A97B"))
 		REFERENCE_TIME rt, rtfp;
 		__int64 fp;
 	};
-	CAtlList<SyncPoint> m_sps;
-	CAtlList<IndexedSyncPoint> m_isps;
+	std::list<SyncPoint> m_sps;
+	std::list<IndexedSyncPoint> m_isps;
 	REFERENCE_TIME m_rtPrevSyncPoint;
 	void IndexSyncPoint(const MuxerPacket* p, __int64 fp);
 
