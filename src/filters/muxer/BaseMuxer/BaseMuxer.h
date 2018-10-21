@@ -42,7 +42,7 @@ private:
 	DWORD ThreadProc();
 
 	REFERENCE_TIME m_rtCurrent;
-	CAtlList<CBaseMuxerInputPin*> m_pActivePins;
+	std::list<CBaseMuxerInputPin*> m_pActivePins;
 
 	CAutoPtr<MuxerPacket> GetPacket();
 
@@ -51,7 +51,7 @@ private:
 	void MuxFooterInternal();
 
 protected:
-	CAtlList<CBaseMuxerInputPin*> m_pPins;
+	std::list<CBaseMuxerInputPin*> m_pPins;
 	CBaseMuxerOutputPin* GetOutputPin() { return m_pOutput; }
 
 	virtual void MuxInit() = 0;

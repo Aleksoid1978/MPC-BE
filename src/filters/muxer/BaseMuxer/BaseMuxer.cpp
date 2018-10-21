@@ -133,15 +133,15 @@ DWORD CBaseMuxerFilter::ThreadProc()
 				return 0;
 
 			case CMD_RUN:
-				m_pActivePins.RemoveAll();
-				m_pPins.RemoveAll();
+				m_pActivePins.clear();
+				m_pPins.clear();
 
 				pos = m_pInputs.GetHeadPosition();
 				while (pos) {
 					CBaseMuxerInputPin* pPin = m_pInputs.GetNext(pos);
 					if (pPin->IsConnected()) {
-						m_pActivePins.AddTail(pPin);
-						m_pPins.AddTail(pPin);
+						m_pActivePins.push_back(pPin);
+						m_pPins.push_back(pPin);
 					}
 				}
 
@@ -154,7 +154,7 @@ DWORD CBaseMuxerFilter::ThreadProc()
 				try {
 					MuxHeaderInternal();
 
-					while (!CheckRequest(nullptr) && m_pActivePins.GetCount()) {
+					while (!CheckRequest(nullptr) && m_pActivePins.size()) {
 						if (m_State == State_Paused) {
 							Sleep(10);
 							continue;
@@ -171,7 +171,10 @@ DWORD CBaseMuxerFilter::ThreadProc()
 						}
 
 						if (pPacket->IsEOS()) {
-							m_pActivePins.RemoveAt(m_pActivePins.Find(pPacket->pPin));
+							auto it = std::find(m_pActivePins.begin(), m_pActivePins.end(), pPacket->pPin);
+							if (it != m_pActivePins.end()) {
+								m_pActivePins.erase(it);
+							}
 						}
 
 						MuxPacketInternal(pPacket);
@@ -189,8 +192,8 @@ DWORD CBaseMuxerFilter::ThreadProc()
 					m_pRawOutputs.GetNext(pos)->DeliverEndOfStream();
 				}
 
-				m_pActivePins.RemoveAll();
-				m_pPins.RemoveAll();
+				m_pActivePins.clear();
+				m_pPins.clear();
 
 				break;
 		}
@@ -212,12 +215,12 @@ void CBaseMuxerFilter::MuxHeaderInternal()
 
 	//
 
-	POSITION pos = m_pPins.GetHeadPosition();
-	while (pos) {
-		if (CBaseMuxerInputPin* pInput = m_pPins.GetNext(pos))
+	for (const auto& pInput : m_pPins) {
+		if (pInput) {
 			if (CBaseMuxerRawOutputPin* pOutput = dynamic_cast<CBaseMuxerRawOutputPin*>(pInput->GetRelatedPin())) {
 				pOutput->MuxHeader(pInput->CurrentMediaType());
 			}
+		}
 	}
 }
 
@@ -255,12 +258,12 @@ void CBaseMuxerFilter::MuxFooterInternal()
 
 	//
 
-	POSITION pos = m_pPins.GetHeadPosition();
-	while (pos) {
-		if (CBaseMuxerInputPin* pInput = m_pPins.GetNext(pos))
+	for (const auto& pInput : m_pPins) {
+		if (pInput) {
 			if (CBaseMuxerRawOutputPin* pOutput = dynamic_cast<CBaseMuxerRawOutputPin*>(pInput->GetRelatedPin())) {
 				pOutput->MuxFooter(pInput->CurrentMediaType());
 			}
+		}
 	}
 }
 
@@ -268,12 +271,9 @@ CAutoPtr<MuxerPacket> CBaseMuxerFilter::GetPacket()
 {
 	REFERENCE_TIME rtMin = _I64_MAX;
 	CBaseMuxerInputPin* pPinMin = nullptr;
-	int i = int(m_pActivePins.GetCount());
+	int i = int(m_pActivePins.size());
 
-	POSITION pos = m_pActivePins.GetHeadPosition();
-	while (pos) {
-		CBaseMuxerInputPin* pPin = m_pActivePins.GetNext(pos);
-
+	for (const auto& pPin : m_pActivePins) {
 		CAutoLock cAutoLock(&pPin->m_csQueue);
 		if (!pPin->m_queue.GetCount()) {
 			continue;
@@ -300,9 +300,8 @@ CAutoPtr<MuxerPacket> CBaseMuxerFilter::GetPacket()
 	if (pPinMin && i == 0) {
 		pPacket.Attach(pPinMin->PopPacket().Detach());
 	} else {
-		pos = m_pActivePins.GetHeadPosition();
-		while (pos) {
-			m_pActivePins.GetNext(pos)->m_evAcceptPacket.Set();
+		for (const auto& pPin : m_pActivePins) {
+			pPin->m_evAcceptPacket.Set();
 		}
 	}
 
