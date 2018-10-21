@@ -2,6 +2,92 @@
 
 1.5.2 (beta)
 ==============================
+Build in Visual Studio 2015 is no longer supported.
+
+VTSReader
+Fixed crash on some DVD-Audio with empty Title.
+
+UDP / HTTP Reader
+Added the ability to connect to streams with "Content-Type: None", this is found on some IPTV broadcasts.
+
+DTSAC3Source
+Added support for files with AC3 core + EAC3 dependent streams.
+
+Splitters
+Improved work with bad ID3m2 tags, added support for reading Extended header.
+Corrected extradata filling for H.264 and HEVC.
+Improved recovery of access to the playing file (after reconnecting the flash drive, network drive, etc.).
+Improved compatibility with StreamBuffRe.
+Added MPC DVR Splitter to work with recordings of some Chinese DVR / IP cameras ('HXVS').
+Improved support for chapters and images in ID3v2 tags.
+Optimized data reading.
+Maximum buffer size increased to 15 seconds. This should solve the problem with DVD-drives, in which the rotation speed increases with a large delay.
+
+MPEGSplitter
+Improved support for DVD-Audio.
+Improved support for online streams.
+Fixed playback of some MPEG-TS streams.
+Fixed time search of some MPEG-PS streams.
+Improved reading PSI (Program-specific information).
+Added support for displaying multiple languages ​​in track titles (this is found in subtitles).
+Improved support for DTS-HD.
+Added support for files with AC3 core + EAC3 dependent streams.
+Fixed crash when opening "incomplete" Blu-ray structure.
+Added support for MPEG-4 ASP.
+Corrected settings window for large scales.
+The opening time of some files with AVC and HEVC streams has been reduced.
+
+MP4Splitter
+Improved support for Vorbis streams.
+Fixed a crash when opening DASH files with timestamps of the first segment starting from a value greater than zero.
+Fixed time search of fragmented (dash) files by non-indexes.
+Added support for "Vidvox Hap" video.
+Fixed crash when opening some MP4 files.
+Improved VP8 support.
+Added support for Opus in MP4.
+Added support for MPEG Audio Layer 2.
+Added support for AV1.
+
+MatroskaSplitter
+Added support for "ROTATE" and "ROTATION" parameters.
+Improved time search for incomplete files.
+Corrected bitrate display for AC3 and DTS tracks.
+Fixed crash when opening files with more than one video track.
+Added support for AV1.
+Extended support for E-AC3 tracks.
+Corrected work with the proportions and cropping video frame.
+Fixed splitter statistics (iBufferInfo).
+Optimized reading of the nearest subtitles after time search if there are data in the CueRelativePosition and CueDuration.
+
+FLVSplitter
+Added support for tags in UTF-8 format, added support for the "author" tag.
+
+Oggsplitter
+Fixed opening files if timestamps do not start from scratch.
+Added support for reading comments for FLAC tracks, added support for tags "CUESHEET" and "METADATA_BLOCK_PICTURE".
+Improved playback of live broadcasts and recordings.
+Fixed rewind. Previously it worked incorrectly and could cause a discrepancy between audio and video.
+
+BinkSplitter
+Fixed calculation of timestamps for audio tracks.
+
+RawVideoSplitter
+Added support for IVF files ('DKIF').
+Extended support for RAW MPEG4 files (DivX5 and others).
+
+MpaSplitter
+Fixed opening of some small files.
+
+Audiosplitter
+Added support for ID3v2 in the header of APE files.
+Updated ID3v2 support in WAV files.
+
+...
+
+Updated Chinese (Traditional and Simplified), Japanese and Dutch translation (by beter).
+Updated German translation (by Klaus1189).
+Updated Ukrainian translation (by arestarh1986).
+
 Updated libraries:
 	ffmpeg git-n4.1-dev-1425-g7a6d88ee62;
 	libaom git-v1.0.0-748-g8048e8c0b;
@@ -181,6 +267,13 @@ If possible, display the title instead of the link for YouTube and online links.
 Fixed saving of thumbnails when the thumbnail is larger than the original frame.
 Added mode "OverUnder" for stereo 3D output.
 Added the ability to get the displayed frame (command Shift+F5) for madVR v0.92.3.
+
+Updated Turkish translation (by cmhrky).
+Updated Japanese translation (by Socket774).
+Updated Ukrainian translation (by arestarh1986).
+Updated Chinese (Traditional and Simplified) and Dutch translation (by beter).
+Updated German translation (by Klaus1189).
+Updated Basque translation (by Azpidatziak).
 
 Updated libraries:
 	ffmpeg git-n3.4-dev-2207-geea64ef4cf;
