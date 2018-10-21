@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,6 +23,7 @@
 
 #include <atlbase.h>
 #include <atlcoll.h>
+#include <vector>
 
 namespace MatroskaWriter
 {
@@ -54,20 +55,20 @@ namespace MatroskaWriter
 		HRESULT Write(IStream* pStream);
 	};
 
-	class CBinary : public CAtlArray<BYTE>, public CID
+	class CBinary : public std::vector<BYTE>, public CID
 	{
 	public:
 		CBinary(DWORD id) : CID(id) {}
 		CBinary& operator = (const CBinary& b) {
-			Copy(b);
+			assign(b.cbegin(), b.cend());
 			return *this;
 		}
 		operator BYTE* () {
-			return (BYTE*)GetData();
+			return (BYTE*)data();
 		}
 		CBinary& Set(CStringA str) {
-			SetCount(str.GetLength() + 1);
-			strcpy_s((char*)GetData(), str.GetLength() + 1, str);
+			resize(str.GetLength() + 1);
+			strcpy_s((char*)data(), str.GetLength() + 1, str);
 			return *this;
 		}
 		//CBinary& Set(CStringA str) {SetCount(str.GetLength()); memcpy((char*)GetData(), str, str.GetLength()); return *this;}
