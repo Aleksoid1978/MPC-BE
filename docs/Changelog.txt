@@ -29,7 +29,7 @@ Improved support for online streams.
 Fixed playback of some MPEG-TS streams.
 Fixed time search of some MPEG-PS streams.
 Improved reading PSI (Program-specific information).
-Added support for displaying multiple languages ​​in track titles (this is found in subtitles).
+Added support for displaying multiple languages in track titles (this is found in subtitles).
 Improved support for DTS-HD.
 Added support for files with AC3 core + EAC3 dependent streams.
 Fixed crash when opening "incomplete" Blu-ray structure.
@@ -66,7 +66,7 @@ Oggsplitter
 Fixed opening files if timestamps do not start from scratch.
 Added support for reading comments for FLAC tracks, added support for tags "CUESHEET" and "METADATA_BLOCK_PICTURE".
 Improved playback of live broadcasts and recordings.
-Fixed rewind. Previously it worked incorrectly and could cause a discrepancy between audio and video.
+Fixed time search. Previously it worked incorrectly and could cause a discrepancy between audio and video.
 
 BinkSplitter
 Fixed calculation of timestamps for audio tracks.
@@ -81,6 +81,51 @@ Fixed opening of some small files.
 Audiosplitter
 Added support for ID3v2 in the header of APE files.
 Updated ID3v2 support in WAV files.
+
+
+MpaDecFilter
+Fixed 16bit BD LPCM decoding.
+Added support for PCM A-law and mu-law decoding.
+Remaked and fixed E-AC3 transmission over the bitstream via HDMI.
+Processing time stamps has been remaked, which should make playback of some formats (for example, RealAudio) more even.
+Added support for decoding DVD-Audio with two groups of channels whose frequency or bitdeph is different.
+Improved TrueHD bitstreaming.
+
+MPCVideoDec
+Fixed output of an inverted RGB image when working with VSFilter.
+If YUV video parameters are not specified, then set BT.601 or BT.709 based on the resolution for more correct conversion to RGB.
+Fixed playback of H.264 streams with a high ReFrames value.
+The frame size for the "Vertical stereo pair" mode has been adjusted.
+Now the flag on the type of interlace and color space of the parent filter (container) has a higher priority.
+Added support for RGBP16, which gives Avisynth+ together with FFVideoSource.
+Improved stream compatibility check with hardware decoding.
+Added the ability to hardware video decoding with a resolution of 720x1280 for older versions of Intel HD.
+Removed support for DXVA2_VP9_VLD_Intel mode.
+Added support for video "Vidvox Hap".
+Extended UtVideo support.
+Improved support for VC-1, MPEG-1/2, MPEG-4.
+The decoder now receives additional information from internal splitters.
+Added support for FMP4 codec (a kind of MPEG-4).
+Added support for AOMedia Video 1 (AV1).
+Fixed a hang after stopping when decoding 3D MVC and output via madVR.
+Fixed ffvhuff decoder.
+Fixed artifacts when time search H.264 video on AMD video adapters.
+Various changes in the HEVC decoder.
+
+AudioSwitcher
+Fixed incorrect display of the name of the tracks in some cases.
+Fixed 8-bit mono sound playback.
+Added the ability to adjust the level of the center and surround channel.
+
+MpcAudioRenderer
+Fixed 24bit output when changing playback speed.
+Improved changing settings and output devices during playback.
+Added stereo crossfeed function (for headphones). The bs2b library is used with parameters 700 Hz, 6 dB.
+Completely rewritten synchronization method. Now the audio renderer controls the clock itself.
+The "UseWasapi" option has been renamed to "DeviceMode".
+Now the default mode is WASAPI Shared, as the most user-friendly.
+Redesigned status window. Added the ability to translate.
+Added device buffer setting. Available values are "Default" (which gives the driver), 50 and 100 ms.
 
 ...
 
