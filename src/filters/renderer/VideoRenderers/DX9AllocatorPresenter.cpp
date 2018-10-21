@@ -603,7 +603,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 	ZeroMemory(&m_d3dpp, sizeof(m_d3dpp));
 
-	if (SysVersion::IsWin81orLater()) {
+	if (SysVersion::IsWin8orLater()) {
 		D3DHook::Hook(m_pD3DEx->GetAdapterMonitor(m_CurrentAdapter), d3ddmEx.RefreshRate);
 	}
 
