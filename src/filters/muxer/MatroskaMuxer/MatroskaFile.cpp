@@ -67,12 +67,12 @@ HRESULT CID::HeaderWrite(IStream* pStream)
 
 QWORD CBinary::Size(bool fWithHeader)
 {
-	if (IsEmpty()) {
+	if (empty()) {
 		return 0;
 	}
 
 	QWORD len = 0;
-	len += GetCount();
+	len += size();
 	if (fWithHeader) {
 		len += HeaderSize(len);
 	}
@@ -81,12 +81,12 @@ QWORD CBinary::Size(bool fWithHeader)
 
 HRESULT CBinary::Write(IStream* pStream)
 {
-	if (IsEmpty()) {
+	if (empty()) {
 		return S_OK;
 	}
 
 	HeaderWrite(pStream);
-	return pStream->Write(GetData(), (ULONG)GetCount(), nullptr);
+	return pStream->Write(data(), (ULONG)size(), nullptr);
 }
 
 QWORD CANSI::Size(bool fWithHeader)
@@ -678,14 +678,14 @@ QWORD CBlock::Size(bool fWithHeader)
 		while (pos) {
 			CBinary* b = BlockData.GetNext(pos);
 			if (pos) {
-				len += b->GetCount() / 255 + 1;
+				len += b->size() / 255 + 1;
 			}
 		}
 	}
 	POSITION pos = BlockData.GetHeadPosition();
 	while (pos) {
 		CBinary* b = BlockData.GetNext(pos);
-		len += b->GetCount();
+		len += b->size();
 	}
 	if (fWithHeader) {
 		len += HeaderSize(len);
@@ -712,7 +712,7 @@ HRESULT CBlock::Write(IStream* pStream)
 		while (pos) {
 			CBinary* b = BlockData.GetNext(pos);
 			if (pos) {
-				INT_PTR len = b->GetCount();
+				INT_PTR len = b->size();
 				while (len >= 0) {
 					n = (BYTE)std::min<INT_PTR>(len, 255);
 					pStream->Write(&n, 1, nullptr);
@@ -724,7 +724,7 @@ HRESULT CBlock::Write(IStream* pStream)
 	POSITION pos = BlockData.GetHeadPosition();
 	while (pos) {
 		CBinary* b = BlockData.GetNext(pos);
-		pStream->Write(b->GetData(), (ULONG)b->GetCount(), nullptr);
+		pStream->Write(b->data(), (ULONG)b->size(), nullptr);
 	}
 	return S_OK;
 }
