@@ -366,7 +366,6 @@ BOOL CSubtitleDlDlg::OnInitDialog()
 	int tPos = 0;
 	CString langCode = order.Tokenize(L",; ", tPos);
 	while (tPos != -1) {
-		int pos;
 		CString langCodeISO6391 = ISO6392To6391(CStringA(langCode));
 		if (langCodeISO6391.GetLength() && m_defps.m_langPos.find(langCodeISO6391) == m_defps.m_langPos.end()) {
 			m_defps.m_langPos[langCodeISO6391] = listPos;
