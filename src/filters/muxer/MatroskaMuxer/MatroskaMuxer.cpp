@@ -803,7 +803,7 @@ HRESULT CMatroskaMuxerInputPin::CompleteConnect(IPin* pPin)
 				&& m_mt.subtype == MEDIASUBTYPE_RV10 || m_mt.subtype == MEDIASUBTYPE_RV20
 				|| m_mt.subtype == MEDIASUBTYPE_RV30 || m_mt.subtype == MEDIASUBTYPE_RV40) {
 			m_pTE->CodecID.Set("V_REAL/RV00");
-			m_pTE->CodecID[9] = (BYTE)(m_mt.subtype.Data1 >> 16);
+			m_pTE->CodecID.data()[9] = (BYTE)(m_mt.subtype.Data1 >> 16);
 
 			if (m_mt.formattype == FORMAT_VideoInfo) {
 				VIDEOINFOHEADER* vih = (VIDEOINFOHEADER*)m_mt.pbFormat;
