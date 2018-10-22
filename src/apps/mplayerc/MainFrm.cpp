@@ -5138,6 +5138,13 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 
 	bool fSetForegroundWindow = false;
 
+	auto applyRandomizeSwitch = [&]() {
+		if (s.nCLSwitches & CLSW_RANDOMIZE) {
+			m_wndPlaylistBar.Randomize();
+			s.nCLSwitches &= ~CLSW_RANDOMIZE;
+		}
+	};
+
 	if ((s.nCLSwitches & CLSW_DVD) && !s.slFiles.empty()) {
 		SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 		fSetForegroundWindow = true;
@@ -5167,6 +5174,7 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 		}
 
 		m_wndPlaylistBar.Open(sl, true);
+		applyRandomizeSwitch();
 		OpenCurPlaylistItem();
 	} else if (!s.slFiles.empty()) {
 		if (s.slFiles.size() == 1 && OpenYoutubePlaylist(s.slFiles.front())) {
@@ -5197,22 +5205,21 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 			if ((s.nCLSwitches & CLSW_ADD) && m_wndPlaylistBar.GetCount() > 0) {
 				m_wndPlaylistBar.Append(sl, fMulti, &s.slSubs);
 
+				applyRandomizeSwitch();
+
 				if (s.nCLSwitches & (CLSW_OPEN | CLSW_PLAY)) {
 					m_wndPlaylistBar.SetLast();
 					OpenCurPlaylistItem();
 				}
 			} else {
-				//UINT nCLSwitches = s.nCLSwitches;	// backup cmdline params
-
-				//SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 				fSetForegroundWindow = true;
 
-				//s.nCLSwitches = nCLSwitches;		// restore cmdline params
 				if (AddSimilarFiles(sl)) {
 					fMulti = true;
 				}
 
 				m_wndPlaylistBar.Open(sl, fMulti, &s.slSubs);
+				applyRandomizeSwitch();
 				OpenCurPlaylistItem((s.nCLSwitches & CLSW_STARTVALID) ? s.rtStart : INVALID_TIME);
 
 				s.nCLSwitches &= ~CLSW_STARTVALID;
@@ -5220,6 +5227,8 @@ LRESULT CMainFrame::HandleCmdLine(WPARAM wParam, LPARAM lParam)
 			}
 		}
 	} else {
+		applyRandomizeSwitch();
+
 		if ((s.nCLSwitches & (CLSW_OPEN | CLSW_PLAY)) && m_wndPlaylistBar.GetCount() > 0) {
 			OpenCurPlaylistItem();
 		}

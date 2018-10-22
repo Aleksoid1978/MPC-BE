@@ -1882,6 +1882,14 @@ void CPlayerPlaylistBar::SetCurLabel(CString label)
 	UpdateList();
 }
 
+void CPlayerPlaylistBar::Randomize()
+{
+	m_pl.Randomize();
+	SetupList();
+	SavePlaylist();
+	EnsureVisible(m_pl.GetPos(), true);
+}
+
 void CPlayerPlaylistBar::SetCurTime(REFERENCE_TIME rt)
 {
 	POSITION pos = m_pl.GetPos();
@@ -2660,10 +2668,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			EnsureVisible(m_pl.GetPos(), true);
 			break;
 		case M_RANDOMIZE:
-			m_pl.Randomize();
-			SetupList();
-			SavePlaylist();
-			EnsureVisible(m_pl.GetPos(), true);
+			Randomize();
 			break;
 		case M_CLIPBOARD:
 			if (OpenClipboard() && EmptyClipboard()) {
