@@ -131,12 +131,22 @@ int CALLBACK CSubtitleDlDlg::DefSortCompare(LPARAM lParam1, LPARAM lParam2, LPAR
 	CString right = defps->m_list->GetItemText(nRight, COL_LANGUAGE);
 	// user-provided sort order
 	int lpos, rpos;
-	if (!defps->m_langPos.Lookup(CString(lSub->iso639_2), lpos) && !defps->m_langPos.Lookup(left, lpos)) {
-		lpos = INT_MAX;
+	if (auto it = defps->m_langPos.find(CString(lSub->iso639_2)); it != defps->m_langPos.end()) {
+		lpos = rpos = (*it).second;
+	} else {
+		if (auto it = defps->m_langPos.find(left); it != defps->m_langPos.end()) {
+			lpos = (*it).second;
+		} else {
+			lpos = INT_MAX;
+		}
+
+		if (auto it = defps->m_langPos.find(right); it != defps->m_langPos.end()) {
+			rpos = (*it).second;
+		} else {
+			rpos = INT_MAX;
+		}
 	}
-	if (!defps->m_langPos.Lookup(CString(rSub->iso639_2), rpos) && !defps->m_langPos.Lookup(right, rpos)) {
-		rpos = INT_MAX;
-	}
+
 	if (lpos < rpos) {
 		return -1;
 	} else if (lpos > rpos) {
@@ -358,11 +368,11 @@ BOOL CSubtitleDlDlg::OnInitDialog()
 	while (tPos != -1) {
 		int pos;
 		CString langCodeISO6391 = ISO6392To6391(CStringA(langCode));
-		if (!langCodeISO6391.IsEmpty() && !m_defps.m_langPos.Lookup(langCodeISO6391, pos)) {
+		if (langCodeISO6391.GetLength() && m_defps.m_langPos.find(langCodeISO6391) == m_defps.m_langPos.end()) {
 			m_defps.m_langPos[langCodeISO6391] = listPos;
 		}
 		CString langName = LangCodeToName(CStringA(langCode));
-		if (!langName.IsEmpty() && !m_defps.m_langPos.Lookup(langName, pos)) {
+		if (langName.GetLength() && m_defps.m_langPos.find(langName) == m_defps.m_langPos.end()) {
 			m_defps.m_langPos[langName] = listPos;
 		}
 		langCode = order.Tokenize(L",; ", tPos);

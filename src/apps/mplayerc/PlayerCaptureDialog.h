@@ -408,7 +408,7 @@ private:
 
 	void UpdateGraph();
 
-	CMap<HWND, HWND&, BOOL, BOOL&> m_wndenabledmap;
+	std::map<HWND, BOOL> m_wndenabledmap;
 	void EnableControls(CWnd* pWnd, bool fEnable);
 
 public:

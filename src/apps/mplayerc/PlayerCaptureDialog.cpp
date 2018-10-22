@@ -963,21 +963,20 @@ void CPlayerCaptureDialog::EnableControls(CWnd* pWnd, bool fEnable)
 {
 	if (fEnable) {
 		for (CWnd* pChild = pWnd->GetWindow(GW_CHILD); pChild; pChild = pChild->GetNextWindow()) {
-			BOOL fEnabled;
-			if (m_wndenabledmap.Lookup(pChild->m_hWnd, fEnabled)) {
-				pChild->EnableWindow(fEnabled);
+			if (const auto it = m_wndenabledmap.find(pChild->m_hWnd); it != m_wndenabledmap.end()) {
+				pChild->EnableWindow((*it).second);
 			}
 			EnableControls(pChild, fEnable);
 		}
 
 		if (pWnd->m_hWnd == m_hWnd) {
-			m_wndenabledmap.RemoveAll();
+			m_wndenabledmap.clear();
 		}
 
 		m_recordbtn.SetWindowText(ResStr(IDS_RECORD_START));
 	} else {
 		if (pWnd->m_hWnd == m_hWnd) {
-			m_wndenabledmap.RemoveAll();
+			m_wndenabledmap.clear();
 		}
 
 		for (CWnd* pChild = pWnd->GetWindow(GW_CHILD); pChild; pChild = pChild->GetNextWindow()) {

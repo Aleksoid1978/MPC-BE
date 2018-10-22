@@ -68,7 +68,7 @@ private:
 		{}
 		CListCtrl* const m_list;
 		CString m_filename;
-		CMap <CString, LPCTSTR, int, int> m_langPos;
+		std::map<CString, int> m_langPos;
 	};
 	typedef DEFPARAMSORT* PDEFPARAMSORT;
 
