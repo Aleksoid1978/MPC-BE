@@ -1972,6 +1972,9 @@ void CAppSettings::ParseCommandLine(cmdLine& cmdln)
 			else if (sw == L"reset") {
 				nCLSwitches |= CLSW_RESET;
 			}
+			else if (sw == L"randomize") {
+				nCLSwitches |= CLSW_RANDOMIZE;
+			}
 			else {
 				nCLSwitches |= CLSW_HELP|CLSW_UNRECOGNIZEDSWITCH;
 			}

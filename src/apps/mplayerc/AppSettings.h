@@ -73,7 +73,8 @@
 #define CLSW_SLAVE				(1 << 27)
 #define CLSW_AUDIORENDERER		(1 << 28)
 #define CLSW_RESET				(1 << 29)
-#define CLSW_UNRECOGNIZEDSWITCH	(1 << 30)
+#define CLSW_RANDOMIZE			(1 << 30)
+#define CLSW_UNRECOGNIZEDSWITCH	(1 << 31)
 
 #define APP_RECENTFILES_MIN		5
 #define APP_RECENTFILES_DEF		20
