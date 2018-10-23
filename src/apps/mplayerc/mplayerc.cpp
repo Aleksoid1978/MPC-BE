@@ -1730,10 +1730,12 @@ BOOL CMPlayerCApp::InitInstance()
 		}
 	}
 
-	CRegKey key;
-	if (ERROR_SUCCESS == key.Create(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
-		CString path = GetProgramPath();
-		key.SetStringValue(L"ExePath", path);
+	if (!IsIniValid()) {
+		CRegKey key;
+		if (ERROR_SUCCESS == key.Create(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
+			CString path = GetProgramPath();
+			key.SetStringValue(L"ExePath", path);
+		}
 	}
 
 	AfxEnableControlContainer();
