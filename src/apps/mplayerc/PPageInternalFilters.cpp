@@ -105,7 +105,7 @@ static filter_t s_filters[] = {
 	{L"WMV1/2/3",					VIDEO_DECODER, VDEC_WMV,			0},
 	{L"Xvid/MPEG-4",				VIDEO_DECODER, VDEC_XVID,			0},
 	{L"RealVideo",					VIDEO_DECODER, VDEC_REAL,			IDS_TRA_RV},
-	{L"Uncompressed video (v210, V410, Y800, I420, \x2026)", VIDEO_DECODER, VDEC_UNCOMPRESSED, 0},
+	{L"Uncompressed video (v210, V410, Y8, I420, \x2026)", VIDEO_DECODER, VDEC_UNCOMPRESSED, 0},
 
 	// Audio decoder
 	{L"AAC",						AUDIO_DECODER, ADEC_AAC,			0},

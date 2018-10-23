@@ -303,9 +303,6 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					break;
 				//case BI_RLE8: mt.subtype = MEDIASUBTYPE_RGB8; break;
 				//case BI_RLE4: mt.subtype = MEDIASUBTYPE_RGB4; break;
-				case FCC('Y8  '): // uncommon fourcc
-					mt.subtype = FOURCCMap(pbmi->biCompression = FCC('Y800'));
-					break;
 				case FCC('V422'): // uncommon fourcc
 					mt.subtype = FOURCCMap(pbmi->biCompression = FCC('YUY2'));
 					break;
