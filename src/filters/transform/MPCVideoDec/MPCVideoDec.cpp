@@ -496,6 +496,7 @@ FFMPEG_CODECS ffCodecs[] = {
 	{ &MEDIASUBTYPE_R10g, AV_CODEC_ID_R10K, VDEC_UNCOMPRESSED, -1 },
 	{ &MEDIASUBTYPE_R10k, AV_CODEC_ID_R10K, VDEC_UNCOMPRESSED, -1 },
 
+	{ &MEDIASUBTYPE_Y8,   AV_CODEC_ID_RAWVIDEO, VDEC_UNCOMPRESSED, -1 },
 	{ &MEDIASUBTYPE_Y800, AV_CODEC_ID_RAWVIDEO, VDEC_UNCOMPRESSED, -1 },
 	{ &MEDIASUBTYPE_I420, AV_CODEC_ID_RAWVIDEO, VDEC_UNCOMPRESSED, -1 },
 	{ &MEDIASUBTYPE_Y41B, AV_CODEC_ID_RAWVIDEO, VDEC_UNCOMPRESSED, -1 },
@@ -849,6 +850,7 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesInUncompressed[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_R10g }, // RGB30
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_R10k }, // RGB30
 
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_Y8   }, // Y 8-bit (monochrome)
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_Y800 }, // Y 8-bit (monochrome)
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_I420 }, // YUV 4:2:0 Planar
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_Y41B }, // YUV 4:1:1 Planar
@@ -1772,7 +1774,7 @@ redo:
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 
-	// Prevent connection to the video decoder - need to support decoding of uncompressed video (v210, V410, Y800, I420)
+	// Prevent connection to the video decoder - need to support decoding of uncompressed video (v210, V410, Y8, I420)
 	CComPtr<IBaseFilter> pFilter = GetFilterFromPin(m_pInput->GetConnected());
 	if (pFilter && IsVideoDecoder(pFilter, true)) {
 		return VFW_E_TYPE_NOT_ACCEPTED;
