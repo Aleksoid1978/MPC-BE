@@ -386,6 +386,8 @@ void CTeletext::ProcessTeletextPage()
 						font_tag_opened = NO;
 					}
 
+					str.AppendChar(L' ');
+
 					// black is considered as white for telxcc purpose
 					// telxcc writes <font/> tags only when needed
 					if ((v > 0x0) && (v < 0x7)) {
@@ -398,6 +400,10 @@ void CTeletext::ProcessTeletextPage()
 					str.AppendChar(v);
 				}
 			}
+		}
+
+		if (font_tag_opened == YES) {
+			str += L"</font>";
 		}
 	}
 
