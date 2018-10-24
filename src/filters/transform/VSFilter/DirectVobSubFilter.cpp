@@ -32,6 +32,7 @@
 #include "../../../DSUtil/FileHandle.h"
 #include "../../../DSUtil/FileVersion.h"
 #include "../../../DSUtil/WinAPIUtils.h"
+#include "../../../DSUtil/std_helper.h"
 #include "../../../SubPic/MemSubPic.h"
 #include "../../../SubPic/SubPicQueueImpl.h"
 
@@ -477,27 +478,27 @@ HRESULT CDirectVobSubFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType* p
 			m_nVideoOutputCount = 0;
 
 			IPin* pPin = m_pInput->GetConnected();
-			CAtlList<VIDEO_OUTPUT_FORMATS> fmts;
+			std::list<VIDEO_OUTPUT_FORMATS> fmts;
 
 			BeginEnumMediaTypes(pPin, pEMT, pmt) {
-				for (int i = 0; i < _countof(VSFilterDefaultFormats); i++) {
-					if (pmt->subtype == *VSFilterDefaultFormats[i].subtype && !fmts.Find(VSFilterDefaultFormats[i])) {
-						fmts.AddTail(VSFilterDefaultFormats[i]);
+				for (const auto& VSFilterFormat : VSFilterDefaultFormats) {
+					if (pmt->subtype == *VSFilterFormat.subtype && !Contains(fmts, VSFilterFormat)) {
+						fmts.push_back(VSFilterFormat);
 					}
 				}
 			}
 			EndEnumMediaTypes(pmt)
 
-			for (int i = 0; i < _countof(VSFilterDefaultFormats); i++) {
-				if (!fmts.Find(VSFilterDefaultFormats[i])) {
-					fmts.AddTail(VSFilterDefaultFormats[i]);
+			for (const auto& VSFilterFormat : VSFilterDefaultFormats) {
+				if (!Contains(fmts, VSFilterFormat)) {
+					fmts.push_back(VSFilterFormat);
 				}
 			}
 
-			m_pVideoOutputFormat = DNew VIDEO_OUTPUT_FORMATS[fmts.GetCount()];
-			POSITION pos = fmts.GetHeadPosition();
-			while (pos) {
-				m_pVideoOutputFormat[m_nVideoOutputCount++] = fmts.GetNext(pos);
+			m_pVideoOutputFormat = DNew VIDEO_OUTPUT_FORMATS[fmts.size()];
+
+			for (const auto& fmt : fmts) {
+				m_pVideoOutputFormat[m_nVideoOutputCount++] = fmt;
 			}
 		}
 	} else if (dir == PINDIR_OUTPUT) {
@@ -2004,19 +2005,19 @@ void CDirectVobSubFilter::Post_EC_OLE_EVENT(CString str, DWORD_PTR nSubtitleId)
 
 ////////////////////////////////////////////////////////////////
 
-void CDirectVobSubFilter::SetupFRD(CStringArray& paths, CAtlArray<HANDLE>& handles)
+void CDirectVobSubFilter::SetupFRD(CStringArray& paths, std::vector<HANDLE>& handles)
 {
 	CAutoLock cAutolock(&m_csSubLock);
 
-	for (size_t i = 2; i < handles.GetCount(); i++) {
+	for (size_t i = 2; i < handles.size(); i++) {
 		FindCloseChangeNotification(handles[i]);
 	}
 
 	paths.RemoveAll();
-	handles.RemoveAll();
+	handles.clear();
 
-	handles.Add(m_frd.EndThreadEvent);
-	handles.Add(m_frd.RefreshEvent);
+	handles.push_back(m_frd.EndThreadEvent);
+	handles.push_back(m_frd.RefreshEvent);
 
 	m_frd.mtime.resize(m_frd.files.size());
 
@@ -2045,7 +2046,7 @@ void CDirectVobSubFilter::SetupFRD(CStringArray& paths, CAtlArray<HANDLE>& handl
 
 			HANDLE h = FindFirstChangeNotificationW(fn, FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE);
 			if (h != INVALID_HANDLE_VALUE) {
-				handles.Add(h);
+				handles.push_back(h);
 			}
 		}
 	}
@@ -2056,19 +2057,19 @@ DWORD CDirectVobSubFilter::ThreadProc()
 	SetThreadPriority(m_hThread, THREAD_PRIORITY_LOWEST/*THREAD_PRIORITY_BELOW_NORMAL*/);
 
 	CStringArray paths;
-	CAtlArray<HANDLE> handles;
+	std::vector<HANDLE> handles;
 
 	SetupFRD(paths, handles);
 
 	for (;;) {
-		DWORD idx = WaitForMultipleObjects(handles.GetCount(), handles.GetData(), FALSE, INFINITE);
+		DWORD idx = WaitForMultipleObjects(handles.size(), handles.data(), FALSE, INFINITE);
 
 		if (idx == (WAIT_OBJECT_0 + 0)) { // m_frd.hEndThreadEvent
 			break;
 		}
 		if (idx == (WAIT_OBJECT_0 + 1)) { // m_frd.hRefreshEvent
 			SetupFRD(paths, handles);
-		} else if (idx >= (WAIT_OBJECT_0 + 2) && idx < (WAIT_OBJECT_0 + handles.GetCount())) {
+		} else if (idx >= (WAIT_OBJECT_0 + 2) && idx < (WAIT_OBJECT_0 + handles.size())) {
 			bool fLocked = true;
 			IsSubtitleReloaderLocked(&fLocked);
 			if (fLocked) {
@@ -2122,7 +2123,7 @@ DWORD CDirectVobSubFilter::ThreadProc()
 		}
 	}
 
-	for (size_t i = 2; i < handles.GetCount(); i++) {
+	for (size_t i = 2; i < handles.size(); i++) {
 		FindCloseChangeNotification(handles[i]);
 	}
 
