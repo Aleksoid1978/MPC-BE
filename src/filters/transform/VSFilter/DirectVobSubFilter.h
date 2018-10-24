@@ -36,7 +36,7 @@ struct SystrayIconData {
 	bool fRunOnce, fShowIcon;
 };
 
-static VIDEO_OUTPUT_FORMATS VSFilterDefaultFormats[] = {
+static const VIDEO_OUTPUT_FORMATS VSFilterDefaultFormats[] = {
 	{&MEDIASUBTYPE_P010,   2, 24, FCC('P010')},
 	{&MEDIASUBTYPE_P016,   2, 24, FCC('P016')},
 	{&MEDIASUBTYPE_NV12,   3, 12, FCC('NV12')},
@@ -204,7 +204,7 @@ private:
 		std::vector<CTime> mtime;
 	} m_frd;
 
-	void SetupFRD(CStringArray& paths, CAtlArray<HANDLE>& handles);
+	void SetupFRD(CStringArray& paths, std::vector<HANDLE>& handles);
 	DWORD ThreadProc();
 
 private:

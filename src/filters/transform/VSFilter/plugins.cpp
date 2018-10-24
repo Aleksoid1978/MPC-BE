@@ -113,8 +113,8 @@ namespace Plugin
 		DWORD ThreadProc() {
 			SetThreadPriority(m_hThread, THREAD_PRIORITY_LOWEST);
 
-			CAtlArray<HANDLE> handles;
-			handles.Add(GetRequestHandle());
+			std::vector<HANDLE> handles;
+			handles.push_back(GetRequestHandle());
 
 			CString fn = GetFileName();
 			CFileStatus fs;
@@ -122,12 +122,12 @@ namespace Plugin
 			CFileGetStatus(fn, fs);
 
 			for (;;) {
-				DWORD i = WaitForMultipleObjects(handles.GetCount(), handles.GetData(), FALSE, 1000);
+				DWORD i = WaitForMultipleObjects(handles.size(), handles.data(), FALSE, 1000);
 
 				if (WAIT_OBJECT_0 == i) {
 					Reply(S_OK);
 					break;
-				} else if (WAIT_OBJECT_0 + 1 >= i && i <= WAIT_OBJECT_0 + handles.GetCount()) {
+				} else if (WAIT_OBJECT_0 + 1 >= i && i <= WAIT_OBJECT_0 + handles.size()) {
 					if (FindNextChangeNotification(handles[i - WAIT_OBJECT_0])) {
 						CFileStatus fs2;
 						fs2.m_mtime = 0;
@@ -151,8 +151,8 @@ namespace Plugin
 						HANDLE h = FindFirstChangeNotificationW(p, FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE);
 						if (h != INVALID_HANDLE_VALUE) {
 							fn = fn2;
-							handles.SetCount(1);
-							handles.Add(h);
+							handles.resize(1);
+							handles.push_back(h);
 						}
 					}
 				} else { // if(WAIT_ABANDONED_0 == i || WAIT_FAILED == i)
@@ -162,7 +162,7 @@ namespace Plugin
 
 			m_hThread = 0;
 
-			for (size_t i = 1; i < handles.GetCount(); i++) {
+			for (size_t i = 1; i < handles.size(); i++) {
 				FindCloseChangeNotification(handles[i]);
 			}
 
