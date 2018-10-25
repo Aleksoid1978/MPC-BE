@@ -1745,7 +1745,7 @@ STRING IDS_PLAYLIST_DELETE_QUESTION		"Sind Sie sicher, dass Sie die Datei(en) in
 STRING IDS_PLAYLIST_HIDEFS		"Im Vollbild nicht anzeigen"
 STRING IDS_PLAYLIST_OPEN		"Wiedergabeliste &öffnen"
 STRING IDS_PLAYLIST_RANDOMIZE		"Nach &Zufall"
-STRING IDS_PLAYLIST_REMOVE		"Wiedergabeliste ent&fernen"
+STRING IDS_PLAYLIST_REMOVE		"Aus Wiedergabeliste ent&fernen"
 STRING IDS_PLAYLIST_RESTORE		"Wiedergabeliste &wiederherstellen"
 STRING IDS_PLAYLIST_SAVEAS		"Wiedergabeliste &speichern als..."
 STRING IDS_PLAYLIST_SHUFFLE		"Zufallswiedergabe aktivieren"
