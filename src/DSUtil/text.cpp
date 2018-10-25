@@ -341,3 +341,16 @@ CString FormatNumber(CString szNumber, bool bNoFractionalDigits /*= true*/)
 
 	return ret;
 }
+
+CStringW FourccToWStr(uint32_t fourcc)
+{
+	CStringW ret;
+
+	for (unsigned i = 0; i < 4; i++) {
+		const uint32_t c = fourcc & 0xff;
+		ret.AppendFormat(c < 32 ? L"[%u]" : L"%C", c);
+		fourcc >>= 8;
+	}
+
+	return ret;
+}

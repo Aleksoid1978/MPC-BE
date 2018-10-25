@@ -729,11 +729,7 @@ void CMediaTypeEx::Dump(std::list<CString>& sl)
 		sl.emplace_back(str);
 		str.Format(L"biBitCount: %u", bih->biBitCount);
 		sl.emplace_back(str);
-		if (bih->biCompression < 256) {
-			str.Format(L"biCompression: %u", bih->biCompression);
-		} else {
-			str.Format(L"biCompression: %4.4hs", &bih->biCompression);
-		}
+		str.Format(L"biCompression: %s", FourccToWStr(bih->biCompression));
 		sl.emplace_back(str);
 		str.Format(L"biSizeImage: %d", bih->biSizeImage);
 		sl.emplace_back(str);

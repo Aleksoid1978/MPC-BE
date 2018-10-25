@@ -160,6 +160,8 @@ void FixFilename(CStringW& str);
 
 CString FormatNumber(CString szNumber, bool bNoFractionalDigits = true);
 
+CStringW FourccToWStr(uint32_t fourcc);
+
 template<class T>
 T& FastTrimRight(T& str)
 {
