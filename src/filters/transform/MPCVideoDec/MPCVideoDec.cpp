@@ -3910,16 +3910,7 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 
 				infostr = m_pAVCtx->codec_descriptor->name;
 				if (m_pAVCtx->codec_id == AV_CODEC_ID_RAWVIDEO) {
-					char* fourcc = (char*)&m_pAVCtx->codec_tag;
-					infostr.Append(L" '");
-					for (unsigned i = 0; i < 4; i++) {
-						if (fourcc[i] < 32) {
-							infostr.AppendFormat(L"[%d]", fourcc[i]);
-						} else {
-							infostr.AppendChar(fourcc[i]);
-						}
-					}
-					infostr.AppendChar('\'');
+					infostr.AppendFormat(L" '%s'", FourccToWStr(m_pAVCtx->codec_tag));
 				}
 				if (const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(pix_fmt)) {
 					if (desc->flags & AV_PIX_FMT_FLAG_PAL) {
