@@ -163,7 +163,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	if (IsRandomAccess()) {
 		const __int64 len = GetLength();
 
-		__int64 stop = std::min(10LL * MEGABYTE, len);
+		__int64 stop = std::min(20LL * MEGABYTE, len);
 		__int64 steps = 20;
 		if (IsURL()) {
 			stop = std::min(2LL * MEGABYTE, len);
