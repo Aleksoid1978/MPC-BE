@@ -275,11 +275,9 @@ public:
 	};
 
 	struct avchdr {
-		int skip_bytes = 0;
 	};
 
 	struct hevchdr {
-		int skip_bytes = 0;
 	};
 
 	struct mpeg4videohdr {
