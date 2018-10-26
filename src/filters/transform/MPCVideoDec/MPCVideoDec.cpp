@@ -982,8 +982,6 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_rtAvrTimePerFrame(0)
 	, m_rtLastStop(0)
 	, m_rtStartCache(INVALID_TIME)
-	, m_nWorkaroundBug(FF_BUG_AUTODETECT)
-	, m_nErrorConcealment(FF_EC_DEBLOCK | FF_EC_GUESS_MVS)
 	, m_bDXVACompatible(true)
 	, m_nARX(0)
 	, m_nARY(0)
@@ -1934,24 +1932,21 @@ redo:
 
 	m_pAVCtx->codec_id              = m_nCodecId;
 	m_pAVCtx->codec_tag             = pBMI->biCompression ? pBMI->biCompression : pmt->subtype.Data1;
-	m_pAVCtx->coded_width           = pBMI->biWidth;
-	m_pAVCtx->coded_height          = abs(pBMI->biHeight);
-	m_pAVCtx->bits_per_coded_sample = pBMI->biBitCount;
-	m_pAVCtx->workaround_bugs       = m_nWorkaroundBug;
-	m_pAVCtx->error_concealment     = m_nErrorConcealment;
-	m_pAVCtx->err_recognition       = 0;
-	m_pAVCtx->idct_algo             = FF_IDCT_AUTO;
-	m_pAVCtx->skip_loop_filter      = (AVDiscard)m_nDiscardMode;
-	m_pAVCtx->opaque				= this;
 	if (m_pAVCtx->codec_tag == MAKEFOURCC('m','p','g','2')) {
 		m_pAVCtx->codec_tag = MAKEFOURCC('M','P','E','G');
 	}
+	m_pAVCtx->coded_width           = pBMI->biWidth;
+	m_pAVCtx->coded_height          = abs(pBMI->biHeight);
+	m_pAVCtx->bits_per_coded_sample = pBMI->biBitCount;
+	m_pAVCtx->workaround_bugs       = FF_BUG_AUTODETECT;
+	m_pAVCtx->skip_loop_filter      = (AVDiscard)m_nDiscardMode;
+	m_pAVCtx->opaque                = this;
 
 	if (IsDXVASupported()) {
-		m_pAVCtx->hwaccel_context	= (dxva_context *)av_mallocz(sizeof(dxva_context));
-		m_pAVCtx->get_format		= av_get_format;
-		m_pAVCtx->get_buffer2		= av_get_buffer;
-		m_pAVCtx->slice_flags	   |= SLICE_FLAG_ALLOW_FIELD;
+		m_pAVCtx->hwaccel_context   = (dxva_context *)av_mallocz(sizeof(dxva_context));
+		m_pAVCtx->get_format        = av_get_format;
+		m_pAVCtx->get_buffer2       = av_get_buffer;
+		m_pAVCtx->slice_flags      |= SLICE_FLAG_ALLOW_FIELD;
 	}
 
 	AllocExtradata(m_pAVCtx, pmt);
