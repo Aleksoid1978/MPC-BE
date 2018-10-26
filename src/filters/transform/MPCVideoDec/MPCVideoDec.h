@@ -78,8 +78,6 @@ protected:
 	AVFrame*								m_pFrame;
 	int										m_nCodecNb;
 	enum AVCodecID							m_nCodecId;
-	int										m_nWorkaroundBug;
-	int										m_nErrorConcealment;
 	REFERENCE_TIME							m_rtAvrTimePerFrame;
 	bool									m_bCalculateStopTime;
 
