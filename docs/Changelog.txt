@@ -127,6 +127,55 @@ Now the default mode is WASAPI Shared, as the most user-friendly.
 Redesigned status window. Added the ability to translate.
 Added device buffer setting. Available values are "Default" (which gives the driver), 50 and 100 ms.
 
+EVR Custom Presenter
+Fixed using NominalRange for input video stream.
+By default, we use the shader method "PS: Simple averaging" to reduce the frame, and "PS: Catmull-Rom spline4" to increase the frame.
+Added indications for loading a GPU and using GPU Memory for Intel and AMD adapters.
+Added support for DXVA-HD interpolation (use only for Intel adapters).
+Added definition of "d3d11 native" modes (LAV Video) and Intel H.264 (MVC 3D).
+Removed support for "32-bit Floating Point" textures (D3DFMT_A32B32G32R32F). This does not give significant advantages compared to "16-bit Floating Point" (D3DFMT_A16B16G16R16F), but it causes various problems (performance drop, interface glitches, player crashes).
+Fixed the functionality of the options "Do not scale at small frame size increases/decreases" for an exclusive full screen.
+Fixed loading incorrect ICC profile for a non-primary display.
+Fixed detection of PS 2.0b shader support.
+Redesigned renderer statistics (Ctrl + J).
+
+Subtitles
+Fixed crash after incorrect result of CWord::Transform () functions.
+Fixed the "Position subtitles relative to video frame" option for text subtitles.
+Fixed missing or incorrect output of some effects while reducing images for text subtitles.
+Improved support for WebVTT subtitle format.
+Added support for LyRiCs format (.lrc).
+Files with a .txt extension are no longer identified as subtitled files.
+Correctly display external subtitles when changing playback speed.
+Fixed working with PGS subtitles. Now there is no need to allocate large buffers in splitters.
+YouTube
+Improved work with the dashmpd list.
+Improved support for Youtube live stream.
+Ignore subtitles created automatically.
+Improved subtitle parser.
+Added automatic saving of external audio track if user saves video in DASH format.
+Added support for Youtube 1440p and 2160p live streams.
+Added support for 5K and 8K resolutions.
+Used by google api for parser playlists. This will allow you to download playlists with more than 200 items.
+Added support for youtube-dl. The file youtube-dl.exe should be located in the player folder or in the path specified in the variable "PATH".
+The "YouTube" settings panel has been renamed to "Online media services".
+Display the AV1 streams in the menu "Navigation->Jump To" if available.
+Fixed the name of the file to save after changing the resolution in the menu "Navigation->Jump To".
+Added support for 134 and 136 formats if 18 and 22 are missing.
+Fixed problems with subtitles after changing the quality of Youtube videos.
+
+Shaders
+Updated "grayscale.hlsl" shader.
+Added "treshold.hlsl" shader.
+Added "LumaSharpen.hlsl" shader (thanks to JNW).
+
+Installer
+Added handling of the case of unavailability of libmfxsw32/64.dll.zip in the temporary folder.
+Now the uninstaller can be signed with a digital signature.
+
+MPCBEShellExt
+Reduced size, no longer use MFC.
+
 ...
 
 Updated Chinese (Traditional and Simplified), Japanese and Dutch translation (by beter).
