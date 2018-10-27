@@ -176,7 +176,58 @@ Now the uninstaller can be signed with a digital signature.
 MPCBEShellExt
 Reduced size, no longer use MFC.
 
-...
+Player
+Corrected file history saving.
+Fixed the "Apply" button in the settings.
+Fixed link to uICE website.
+Fixed inactivity of the subtitle selection button for some DVD-Video.
+Fixed the size of the external filter settings windows.
+Improve the playlist. The "Sort by Name" command has been fixed. Added "Reverse Sort".
+The list of MPCAPI_COMMAND is synchronized with the project MPC-HC. Incorrectly working commands fixed, CMD_OPENFILE_DUB added. MPCTestAPI refactoring.
+Added support for horizontal roller or mouse buttons (Mouse Wheel Left/Right).
+Fixed crash when trying to view MediaInfo data on some matroska files.
+Added processing of the / open parameter without specifying the path, in which case the last memorized file will be opened.
+Adjust OSD output.
+Fixed reading of the "INDEX" field in the Cue sheet.
+Fixed incorrect exit from full-screen mode in some cases.
+Removed useless "EDL window" and related functionality.
+Fixed incorrect display of messages about the inconsistency of the version of language .dll in the absence of these most .dll
+Fixed deleting files from the playlist and moving several items.
+Fixed processing of subfolders with Drag'n'Drop.
+Improved search for similar files.
+The option "Fullscreen Direct3D" has been renamed to "Exclusive Full Screen".
+Added the ability to open .url and .website files (similar to .lnk).
+Display the main menu instead of the context menu, when the main menu is hidden.
+Hot keys of the main window now work with an active playlist (except those used in the playlist itself).
+Added the ability to open AceStream links (acestream://).
+Improved work with M3U playlists. Fixed saving M3U playlists, missing duration in the #EXTINF field.
+Added the command "After playback: always close the file".
+Fixed a crash when you click "Previous" and the option "After playback-> Play next in the folder (loop)".
+Corrected standard ranges for switching display mode.
+Fixed contrast adjustment on values close to the minimum on renderers like EVR on Nvidia cards (Nvidia bug).
+MPC Audio Renderer has been moved to the top of the list of audio renderers and now has the number 0.
+Added option to control the display of text in the scroll bar. Changed the text output control in the title bar.
+Added the ability to connect an Acon Digital Media EffectChainer filter.
+Correctly handle the case when the external LOGO file is missing.
+Changed the logic of the previous and next commands when opening the Bly-ray structure. Now it is used to navigate between playlists (if there are more than one).
+A version of the MSVC compiler has been added to the "About ..." window.
+The "Default Style" and "Forced only" options in the "Subtitles" menu are now always active, you can now change them before starting playback.
+The selection of audio tracks and subtitles has been moved from "Navigation" to "Playback".
+Added support for Drag'n'Drop text (UNICODE / ANSI). If the text contains online links or existing paths to files, then it will be opened (will get into the playlist). Ticket # 333.
+Fixed incorrect display of selected menu items "Stereo 3D mode".
+Duplicate and non-working commands for selecting audio tracks and subtitles are removed from the web interface.
+Replace some emoji with other characters for Win7 and Win8.
+Added the ability to delete files from the playlist to the Trash.
+Redesigned work with bookmarks. Bookmarks are now saved in the "Favorites2" section. Fixed saving bookmarks for paths with the symbol ';'. Fixed saving DVD-Video bookmarks open from images
+Fixed tracking of changes in external subtitles.
+Corrected the order of moving the "Tab" key in different dialogs.
+Fixed the width of the menu of chapters, subtitles and audio tracks when re-calling for another media file.
+Fixed capturing video from a webcam when changing video format.
+Fixed construction of DirectShow graph when recording captured video.
+Do not use DMO-encoders and OGM splitter when capturing video.
+Removed the display of the playlist from the menu "Navigate->Jump to".
+Fixed minimum height restriction for attachable windows.
+Many dockable windows now change the translation language without rebooting.
 
 Updated Chinese (Traditional and Simplified), Japanese and Dutch translation (by beter).
 Updated German translation (by Klaus1189).
