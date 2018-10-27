@@ -137,7 +137,7 @@ Removed support for "32-bit Floating Point" textures (D3DFMT_A32B32G32R32F). Thi
 Fixed the functionality of the options "Do not scale at small frame size increases/decreases" for an exclusive full screen.
 Fixed loading incorrect ICC profile for a non-primary display.
 Fixed detection of PS 2.0b shader support.
-Redesigned renderer statistics (Ctrl + J).
+Redesigned renderer statistics (Ctrl+J).
 
 Subtitles
 Fixed crash after incorrect result of CWord::Transform () functions.
@@ -148,6 +148,8 @@ Added support for LyRiCs format (.lrc).
 Files with a .txt extension are no longer identified as subtitled files.
 Correctly display external subtitles when changing playback speed.
 Fixed working with PGS subtitles. Now there is no need to allocate large buffers in splitters.
+Improved support for teletext subtitles.
+
 YouTube
 Improved work with the dashmpd list.
 Improved support for Youtube live stream.
@@ -213,7 +215,7 @@ Changed the logic of the previous and next commands when opening the Bly-ray str
 A version of the MSVC compiler has been added to the "About ..." window.
 The "Default Style" and "Forced only" options in the "Subtitles" menu are now always active, you can now change them before starting playback.
 The selection of audio tracks and subtitles has been moved from "Navigation" to "Playback".
-Added support for Drag'n'Drop text (UNICODE / ANSI). If the text contains online links or existing paths to files, then it will be opened (will get into the playlist). Ticket # 333.
+Added support for Drag'n'Drop text (UNICODE / ANSI). If the text contains online links or existing paths to files, then it will be opened (will get into the playlist). Ticket #333.
 Fixed incorrect display of selected menu items "Stereo 3D mode".
 Duplicate and non-working commands for selecting audio tracks and subtitles are removed from the web interface.
 Replace some emoji with other characters for Win7 and Win8.
@@ -228,6 +230,10 @@ Do not use DMO-encoders and OGM splitter when capturing video.
 Removed the display of the playlist from the menu "Navigate->Jump to".
 Fixed minimum height restriction for attachable windows.
 Many dockable windows now change the translation language without rebooting.
+Adjust the display frequency with an exclusive full mode on Windows 8 and higher.
+Added command line parameter "/randomize". Ticket #366.
+The .nut extension has been added to the "Other" video format group.
+Changed the display of Fourcc with non-standard characters.
 
 Updated Chinese (Traditional and Simplified), Japanese and Dutch translation (by beter).
 Updated German translation (by Klaus1189).
