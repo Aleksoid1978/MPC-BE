@@ -56,7 +56,10 @@ class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F"))
 	, public CExFilterConfigImpl
 	, public ISpecifyPropertyPages2
 {
+	GUID            m_Subtype;
+	AVCodecID       m_CodecId;
 	SampleFormat    m_InternalSampleFormat;
+
 protected:
 	// settings
 	CCritSec        m_csProps;
