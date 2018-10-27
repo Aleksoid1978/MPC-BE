@@ -295,6 +295,8 @@ static const SampleFormat MPCtoSamplefmt[sfcount] = {
 
 CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CTransformFilter(L"CMpaDecFilter", lpunk, __uuidof(this))
+	, m_Subtype(GUID_NULL)
+	, m_CodecId(AV_CODEC_ID_NONE)
 	, m_InternalSampleFormat(SAMPLE_FMT_NONE)
 	, m_rtStart(0)
 	, m_dStartOffset(0.0)
@@ -520,6 +522,10 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	if (SUCCEEDED(pIn->GetMediaType(&pmt)) && pmt) {
 		CMediaType mt(*pmt);
 		m_pInput->SetMediaType(&mt);
+		if (m_Subtype != pmt->subtype) {
+			m_Subtype = pmt->subtype;
+			m_CodecId = FindCodec(m_Subtype);
+		}
 		DeleteMediaType(pmt);
 		pmt = nullptr;
 	}
@@ -567,9 +573,6 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 		}
 	}
 
-	const GUID& subtype = m_pInput->CurrentMediaType().subtype;
-	const enum AVCodecID nCodecId = FindCodec(subtype);
-
 	if (m_bResync && SUCCEEDED(hr)) {
 		DLog(L"CMpaDecFilter::Receive() : Resync Request - [%I64d -> %I64d], buffer : %Iu", m_rtStart, rtStart, m_buff.Size());
 
@@ -589,34 +592,34 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 
 	m_buff.Append(pDataIn, len);
 
-	if (nCodecId != AV_CODEC_ID_NONE) {
-		if (ProcessBitstream(nCodecId, hr)) {
+	if (m_CodecId != AV_CODEC_ID_NONE) {
+		if (ProcessBitstream(m_CodecId, hr)) {
 			return hr;
 		}
-		return ProcessFFmpeg(nCodecId);
+		return ProcessFFmpeg(m_CodecId);
 	}
 
-	if (subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
+	if (m_Subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO) {
 		hr = ProcessDvdLPCM();
-	} else if (subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
+	} else if (m_Subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO) {
 		hr = ProcessHdmvLPCM();
-	} else if (subtype == MEDIASUBTYPE_PS2_PCM) {
+	} else if (m_Subtype == MEDIASUBTYPE_PS2_PCM) {
 		hr = ProcessPS2PCM();
-	} else if (subtype == MEDIASUBTYPE_PS2_ADPCM) {
+	} else if (m_Subtype == MEDIASUBTYPE_PS2_ADPCM) {
 		hr = ProcessPS2ADPCM();
-	} else if (subtype == MEDIASUBTYPE_PCM_NONE ||
-			   subtype == MEDIASUBTYPE_PCM_RAW) {
+	} else if (m_Subtype == MEDIASUBTYPE_PCM_NONE ||
+			   m_Subtype == MEDIASUBTYPE_PCM_RAW) {
 		hr = ProcessPCMraw();
-	} else if (subtype == MEDIASUBTYPE_PCM_TWOS ||
-			   subtype == MEDIASUBTYPE_PCM_IN24 ||
-			   subtype == MEDIASUBTYPE_PCM_IN32) {
+	} else if (m_Subtype == MEDIASUBTYPE_PCM_TWOS ||
+			   m_Subtype == MEDIASUBTYPE_PCM_IN24 ||
+			   m_Subtype == MEDIASUBTYPE_PCM_IN32) {
 		hr = ProcessPCMintBE();
-	} else if (subtype == MEDIASUBTYPE_PCM_SOWT) {
+	} else if (m_Subtype == MEDIASUBTYPE_PCM_SOWT) {
 		hr = ProcessPCMintLE();
-	} else if (subtype == MEDIASUBTYPE_PCM_FL32 ||
-			   subtype == MEDIASUBTYPE_PCM_FL64) {
+	} else if (m_Subtype == MEDIASUBTYPE_PCM_FL32 ||
+			   m_Subtype == MEDIASUBTYPE_PCM_FL64) {
 		hr = ProcessPCMfloatBE();
-	} else if (subtype == MEDIASUBTYPE_IEEE_FLOAT) {
+	} else if (m_Subtype == MEDIASUBTYPE_IEEE_FLOAT) {
 		hr = ProcessPCMfloatLE();
 	}
 
@@ -628,6 +631,14 @@ HRESULT CMpaDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin *pReceivePi
 	if (direction == PINDIR_OUTPUT) {
 		m_bHasVideo = HasMediaType(m_pGraph, MEDIATYPE_Video) || HasMediaType(m_pGraph, MEDIASUBTYPE_MPEG2_VIDEO);
 	}
+	else if (direction == PINDIR_INPUT) {
+		CMediaType mt;
+		if (S_OK == pReceivePin->ConnectionMediaType(&mt)) {
+			m_Subtype = mt.subtype;
+			m_CodecId = FindCodec(m_Subtype);
+		}
+	}
+
 	return __super::CompleteConnect(direction, pReceivePin);
 }
 
