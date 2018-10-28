@@ -159,7 +159,7 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
-	
+
 	// footer
 	if (m_pFile->GetLength() > (FooterSize + HeaderSize + HeaderSize)) {
 		m_pFile->Seek(m_pFile->GetLength() - FooterSize);
@@ -206,7 +206,7 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	// find end PTS
 	if (m_rtDuration == 0) {
 		m_pFile->Seek(m_endpos - std::min((__int64)MEGABYTE, m_endpos));
-		
+
 		REFERENCE_TIME rtLast = INVALID_TIME;
 		while (ReadHeader(hdr)) {
 			if (hdr.sync == VIDEO) {

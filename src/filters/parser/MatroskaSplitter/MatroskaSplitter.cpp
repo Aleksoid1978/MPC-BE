@@ -2004,7 +2004,7 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 						}
 
 						const REFERENCE_TIME cueDuration = s.GetRefTime(pCueTrackPositions->CueDuration);
-							
+
 						if (cueTime + cueDuration > m_Cluster_seek_rt
 								&& (m_pSegment->m_start + pCueTrackPositions->CueClusterPosition) < m_Cluster_seek_pos) {
 							pCluster->SeekTo(m_pSegment->m_start + pCueTrackPositions->CueClusterPosition);

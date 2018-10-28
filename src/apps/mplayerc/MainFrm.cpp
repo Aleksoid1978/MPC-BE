@@ -16357,7 +16357,7 @@ bool CMainFrame::BuildGraphVideoAudio(int fVPreview, bool fVCapture, int fAPrevi
 		pVidPrevPin = pVidCapPin;
 		pVidCapPin = nullptr;
 	}
-	
+
 	bool fAudPrev = pAudPrevPin && fAPreview;
 	bool fAudCap = pAudCapPin && fACapture && fFileOutput && m_wndCaptureBar.m_capdlg.m_fAudOutput;
 
@@ -16365,7 +16365,7 @@ bool CMainFrame::BuildGraphVideoAudio(int fVPreview, bool fVCapture, int fAPrevi
 		pAudPrevPin = pAudCapPin;
 		pAudCapPin = nullptr;
 	}
-	
+
 	// Preview Video
 	if (fVidPrev) {
 		CComPtr<IVMRMixerBitmap9>    pVMB;
@@ -18886,7 +18886,7 @@ void CMainFrame::subChangeNotifySetupThread(std::vector<HANDLE>& handles)
 	handles.clear();
 	handles.push_back(m_EventSubChangeStopNotify);
 	handles.push_back(m_EventSubChangeRefreshNotify);
-	
+
 	for (const auto& path : m_ExtSubPaths) {
 		const HANDLE h = FindFirstChangeNotificationW(path, FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE);
 		if (h != INVALID_HANDLE_VALUE) {

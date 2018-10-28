@@ -322,7 +322,7 @@ HRESULT CGPUUsage::Init(const CString& DeviceName, const CString& Device)
 			m_GPUType = NVIDIA_GPU;
 		}
 	}
-	
+
 	if (pD3DKMTOpenAdapterFromHdc) {
 		DISPLAY_DEVICEW dd = { sizeof(DISPLAY_DEVICEW) };
 		DWORD iDevNum = 0;
