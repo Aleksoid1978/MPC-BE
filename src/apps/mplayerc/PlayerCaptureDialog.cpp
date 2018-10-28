@@ -1091,7 +1091,7 @@ void CPlayerCaptureDialog::UpdateVideoControls()
 
 		if (m_vidinput.GetCount() > 0) {
 			m_vidinput.EnableWindow(TRUE);
-	
+
 			if (SUCCEEDED(m_pAMXB->get_PinCounts(&OutputPinCount, &InputPinCount))) {
 				for (int i = 0; i < OutputPinCount; i++) {
 					long InputPinIndex;

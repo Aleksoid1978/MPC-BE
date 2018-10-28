@@ -783,7 +783,7 @@ void CMPlayerCApp::EnumProfileEntries(LPCTSTR lpszSection, std::vector<CString>&
 		if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_READ)) {
 			// https://docs.microsoft.com/ru-ru/windows/desktop/SysInfo/enumerating-registry-subkeys
 			WCHAR    achClass[MAX_PATH] = L"";
-			DWORD    cchClassName = MAX_PATH; 
+			DWORD    cchClassName = MAX_PATH;
 			DWORD    cSubKeys = 0;
 			DWORD    cbMaxSubKey;
 			DWORD    cchMaxClass;
@@ -793,7 +793,7 @@ void CMPlayerCApp::EnumProfileEntries(LPCTSTR lpszSection, std::vector<CString>&
 			DWORD    cbSecurityDescriptor;
 			FILETIME ftLastWriteTime;
 
-			// Get the class name and the value count. 
+			// Get the class name and the value count.
 			DWORD retCode = RegQueryInfoKeyW(
 				regkey.m_hKey,
 				achClass,
