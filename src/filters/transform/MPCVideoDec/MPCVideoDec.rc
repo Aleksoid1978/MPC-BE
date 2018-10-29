@@ -110,13 +110,7 @@ BEGIN
     IDS_VDF_SETTINGS             "Video settings"
     IDS_VDF_AUTO                 "Auto"
     IDS_VDF_THREADNUMBER         "Number of decoding threads"
-    IDS_VDF_SKIPDEBLOCK          "H264 skip deblocking mode"
-    IDS_VDF_DBLK_NONE            "None"
-    IDS_VDF_DBLK_DEFAULT         "Default"
-    IDS_VDF_DBLK_NONREF          "Non Reference"
-    IDS_VDF_DBLK_BIDIR           "Bidirectional"
-    IDS_VDF_DBLK_NONKFRM         "Non keyframes"
-    IDS_VDF_DBLK_ALL             "All frames"
+    IDS_VDF_SKIPBFRAMES          "Skip B-Frames"
     IDS_VDF_AR_MODE              "Read AR from stream"
 END
 
