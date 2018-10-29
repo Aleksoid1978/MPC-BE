@@ -26,9 +26,9 @@
 
 enum {
 	IDC_PP_THREAD_NUMBER = 10000,
-	IDC_PP_DISCARD_MODE,
 	IDC_PP_DEINTERLACING,
 	IDC_PP_AR,
+	IDC_PP_SKIPBFRAMES,
 	IDC_PP_DXVA_CHECK,
 	IDC_PP_DXVA_SD,
 	IDC_PP_SW_NV12,
@@ -57,11 +57,10 @@ class __declspec(uuid("D5AA0389-D274-48e1-BF50-ACB05A56DDE0"))
 	CButton		m_grpDecoder;
 	CStatic		m_txtThreadNumber;
 	CComboBox	m_cbThreadNumber;
-	CStatic		m_txtDiscardMode;
-	CComboBox	m_cbDiscardMode;
 	CStatic		m_txtDeinterlacing;
 	CComboBox	m_cbDeinterlacing;
-	CButton		m_cbARMode;
+	CButton		m_chARMode;
+	CButton		m_chSkipBFrames;
 
 	CButton		m_grpDXVA;
 	CStatic		m_txtDXVACompatibilityCheck;

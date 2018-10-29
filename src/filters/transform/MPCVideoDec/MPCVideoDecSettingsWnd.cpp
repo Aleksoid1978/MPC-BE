@@ -108,17 +108,6 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	}
 	p.y += h25;
 
-	// H264 deblocking mode
-	m_txtDiscardMode.Create(ResStr(IDS_VDF_SKIPDEBLOCK), WS_VISIBLE | WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
-	m_cbDiscardMode.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_DISCARD_MODE);
-	m_cbDiscardMode.AddString (ResStr (IDS_VDF_DBLK_NONE));
-	m_cbDiscardMode.AddString (ResStr (IDS_VDF_DBLK_DEFAULT));
-	m_cbDiscardMode.AddString (ResStr (IDS_VDF_DBLK_NONREF));
-	m_cbDiscardMode.AddString (ResStr (IDS_VDF_DBLK_BIDIR));
-	m_cbDiscardMode.AddString (ResStr (IDS_VDF_DBLK_NONKFRM));
-	m_cbDiscardMode.AddString (ResStr (IDS_VDF_DBLK_ALL));
-	p.y += h25;
-
 	// Deinterlacing
 	m_txtDeinterlacing.Create(ResStr(IDS_VDF_DEINTERLACING), WS_VISIBLE | WS_CHILD, CRect(p, CSize(label_w, m_fontheight)), this, (UINT)IDC_STATIC);
 	m_cbDeinterlacing.Create(dwStyle | CBS_DROPDOWNLIST | WS_VSCROLL, CRect(p + CPoint(label_w, -4), CSize(combo_w, 200)), this, IDC_PP_DEINTERLACING);
@@ -129,9 +118,13 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	p.y += h25;
 
 	// Read AR from stream
-	m_cbARMode.Create(ResStr(IDS_VDF_AR_MODE), dwStyle | BS_AUTO3STATE | BS_LEFTTEXT, CRect(p, CSize(width_s, m_fontheight)), this, IDC_PP_AR);
-	m_cbARMode.SetCheck(FALSE);
+	m_chARMode.Create(ResStr(IDS_VDF_AR_MODE), dwStyle | BS_AUTO3STATE | BS_LEFTTEXT, CRect(p, CSize(width_s, m_fontheight)), this, IDC_PP_AR);
+	m_chARMode.SetCheck(FALSE);
+	p.y += h25;
 
+	// Skip B-frames
+	m_chSkipBFrames.Create(L"Skip B-Frames*", dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(width_s, m_fontheight)), this, IDC_PP_SKIPBFRAMES);
+	m_chSkipBFrames.SetCheck(FALSE);
 
 	////////// DXVA settings //////////
 	p.y = 10 + ScaleY(115) + 5;
@@ -225,14 +218,13 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 
 	CorrectComboListWidth(m_cbDeinterlacing);
 	CorrectComboListWidth(m_cbDXVACompatibilityCheck);
-	CorrectComboListWidth(m_cbDiscardMode);
 
 	if (m_pMDF) {
 		m_cbThreadNumber.SetCurSel		(m_pMDF->GetThreadNumber());
-		m_cbDiscardMode.SetCurSel		(FindDiscardIndex (m_pMDF->GetDiscardMode()));
 		m_cbDeinterlacing.SetCurSel		((int)m_pMDF->GetDeinterlacing());
 
-		m_cbARMode.SetCheck(m_pMDF->GetARMode());
+		m_chARMode.SetCheck(m_pMDF->GetARMode());
+		m_chSkipBFrames.SetCheck(m_pMDF->GetDiscardMode() == AVDISCARD_BIDIR);
 
 		m_cbDXVACompatibilityCheck.SetCurSel(m_pMDF->GetDXVACheckCompatibility());
 		m_cbDXVA_SD.SetCheck(m_pMDF->GetDXVA_SD());
@@ -280,11 +272,11 @@ bool CMPCVideoDecSettingsWnd::OnApply()
 	OnDeactivate();
 
 	if (m_pMDF) {
-		m_pMDF->SetThreadNumber		(m_cbThreadNumber.GetCurSel());
-		m_pMDF->SetDiscardMode		(g_AVDiscard[m_cbDiscardMode.GetCurSel()]);
-		m_pMDF->SetDeinterlacing	((MPC_DEINTERLACING_FLAGS)m_cbDeinterlacing.GetCurSel());
+		m_pMDF->SetThreadNumber(m_cbThreadNumber.GetCurSel());
+		m_pMDF->SetDeinterlacing((MPC_DEINTERLACING_FLAGS)m_cbDeinterlacing.GetCurSel());
 
-		m_pMDF->SetARMode(m_cbARMode.GetCheck());
+		m_pMDF->SetARMode(m_chARMode.GetCheck());
+		m_pMDF->SetDiscardMode(m_chSkipBFrames.GetCheck() ? AVDISCARD_BIDIR : AVDISCARD_DEFAULT);
 
 		m_pMDF->SetDXVACheckCompatibility(m_cbDXVACompatibilityCheck.GetCurSel());
 
@@ -353,9 +345,9 @@ void CMPCVideoDecSettingsWnd::OnBnClickedRGB32()
 void CMPCVideoDecSettingsWnd::OnBnClickedReset()
 {
 	m_cbThreadNumber.SetCurSel(0);
-	m_cbDiscardMode.SetCurSel(FindDiscardIndex(AVDISCARD_DEFAULT));
 	m_cbDeinterlacing.SetCurSel(AUTO);
-	m_cbARMode.SetCheck(BST_INDETERMINATE);
+	m_chARMode.SetCheck(BST_INDETERMINATE);
+	m_chSkipBFrames.SetCheck(BST_UNCHECKED);
 
 	m_cbDXVACompatibilityCheck.SetCurSel(1);
 	m_cbDXVA_SD.SetCheck(BST_UNCHECKED);
