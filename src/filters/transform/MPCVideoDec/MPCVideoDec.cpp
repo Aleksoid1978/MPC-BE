@@ -1040,7 +1040,9 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 			m_nThreadNumber = dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DiscardMode, dw)) {
-			m_nDiscardMode = dw;
+			if (dw != AVDISCARD_BIDIR) {
+				m_nDiscardMode = AVDISCARD_DEFAULT;
+			}
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_Deinterlacing, dw)) {
 			m_nDeinterlacing = (MPC_DEINTERLACING_FLAGS)dw;
@@ -1078,9 +1080,12 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	}
 #else
 	m_nThreadNumber				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_ThreadNumber, m_nThreadNumber);
-	m_nDiscardMode				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_DiscardMode, m_nDiscardMode);
 	m_nDeinterlacing			= (MPC_DEINTERLACING_FLAGS)AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_Deinterlacing, m_nDeinterlacing);
 	m_nARMode					= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_ARMode, m_nARMode);
+	m_nDiscardMode				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_DiscardMode, m_nDiscardMode);
+	if (m_nDiscardMode != AVDISCARD_BIDIR) {
+		m_nDiscardMode = AVDISCARD_DEFAULT;
+	}
 
 	m_nDXVACheckCompatibility	= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_DXVACheck, m_nDXVACheckCompatibility);
 	m_nDXVA_SD					= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
@@ -1939,7 +1944,7 @@ redo:
 	m_pAVCtx->coded_height          = abs(pBMI->biHeight);
 	m_pAVCtx->bits_per_coded_sample = pBMI->biBitCount;
 	m_pAVCtx->workaround_bugs       = FF_BUG_AUTODETECT;
-	m_pAVCtx->skip_loop_filter      = (AVDiscard)m_nDiscardMode;
+	m_pAVCtx->skip_frame            = (AVDiscard)m_nDiscardMode;
 	m_pAVCtx->opaque                = this;
 
 	if (IsDXVASupported()) {
@@ -3714,6 +3719,10 @@ STDMETHODIMP_(int) CMPCVideoDecFilter::GetThreadNumber()
 
 STDMETHODIMP CMPCVideoDecFilter::SetDiscardMode(int nValue)
 {
+	if (nValue != AVDISCARD_DEFAULT && nValue != AVDISCARD_BIDIR) {
+		return E_INVALIDARG;
+	}
+
 	CAutoLock cAutoLock(&m_csProps);
 	m_nDiscardMode = nValue;
 	return S_OK;

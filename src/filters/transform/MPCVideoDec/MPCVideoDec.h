@@ -52,9 +52,9 @@ class __declspec(uuid("008BAC12-FBAF-497b-9670-BC6F6FBAE2C4"))
 protected:
 	// === Persistants parameters (registry)
 	int										m_nThreadNumber;
-	int										m_nDiscardMode;
 	MPC_DEINTERLACING_FLAGS					m_nDeinterlacing;
 	int										m_nARMode;
+	int										m_nDiscardMode;
 	int										m_nDXVACheckCompatibility;
 	int										m_nDXVA_SD;
 	bool									m_fPixFmts[PixFmt_count];
