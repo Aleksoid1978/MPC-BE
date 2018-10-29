@@ -496,13 +496,7 @@
 #define IDS_VDF_SETTINGS                7400
 #define IDS_VDF_AUTO                    7401
 #define IDS_VDF_THREADNUMBER            7402
-#define IDS_VDF_SKIPDEBLOCK             7403
-#define IDS_VDF_DBLK_NONE               7404
-#define IDS_VDF_DBLK_DEFAULT            7405
-#define IDS_VDF_DBLK_NONREF             7406
-#define IDS_VDF_DBLK_BIDIR              7407
-#define IDS_VDF_DBLK_NONKFRM            7408
-#define IDS_VDF_DBLK_ALL                7409
+#define IDS_VDF_SKIPBFRAMES             7403
 #define IDS_VDF_AR_MODE                 7410
 #define IDS_VDF_DXVA_SETTING            7415
 #define IDS_VDF_DXVACOMPATIBILITY       7416

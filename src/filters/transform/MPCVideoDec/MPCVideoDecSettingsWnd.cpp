@@ -120,10 +120,10 @@ bool CMPCVideoDecSettingsWnd::OnActivate()
 	// Read AR from stream
 	m_chARMode.Create(ResStr(IDS_VDF_AR_MODE), dwStyle | BS_AUTO3STATE | BS_LEFTTEXT, CRect(p, CSize(width_s, m_fontheight)), this, IDC_PP_AR);
 	m_chARMode.SetCheck(FALSE);
-	p.y += h25;
+	p.y += ScaleY(22);
 
 	// Skip B-frames
-	m_chSkipBFrames.Create(L"Skip B-Frames*", dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(width_s, m_fontheight)), this, IDC_PP_SKIPBFRAMES);
+	m_chSkipBFrames.Create(ResStr(IDS_VDF_SKIPBFRAMES)+L"*", dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(width_s, m_fontheight)), this, IDC_PP_SKIPBFRAMES);
 	m_chSkipBFrames.SetCheck(FALSE);
 
 	////////// DXVA settings //////////
