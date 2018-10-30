@@ -1549,7 +1549,6 @@ STRING IDS_MAINFRM_DIR_CHECK		"Περιλαμβάνονται υποφάκελο
 STRING IDS_MAINFRM_DIR_TITLE		"Επιλέξτε κατάλογο"
 STRING IDS_MAINFRM_PPOFFSCR		"Μεταμεγεθυμένοι Pixel Shaders: off"
 STRING IDS_MAINFRM_PPONSCR		"Μεταμεγεθυμένοι Pixel Shaders: on"
-STRING IDS_MB_SHOW_EDL_EDITOR		"Θέλετε να ενεργοποιήσετε τον επεξεργαστή EDL;"
 STRING IDS_MENU_VIDEO_ANGLE		"&Γωνία βίντεο"
 STRING IDS_MENU_VIDEO_STREAM		"&Ροή βίντεο"
 STRING IDS_MFMT_3G2		"3G2"
