@@ -68,6 +68,7 @@ HRESULT CFlyBar::Create(CWnd* pWnd)
 		DLog(L"Failed to create Flybar Window");
 		return E_FAIL;
 	}
+	ModifyStyleEx(WS_EX_LAYOUTRTL, WS_EX_NOINHERITLAYOUT);
 	SetLayeredWindowAttributes(RGB(255, 0, 255), 150, LWA_ALPHA | LWA_COLORKEY);
 
 	if (AfxGetAppSettings().fFlybarOnTop) {
