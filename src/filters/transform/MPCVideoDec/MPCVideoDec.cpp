@@ -3725,6 +3725,11 @@ STDMETHODIMP CMPCVideoDecFilter::SetDiscardMode(int nValue)
 
 	CAutoLock cAutoLock(&m_csProps);
 	m_nDiscardMode = nValue;
+
+	if (m_pAVCtx) {
+		m_pAVCtx->skip_frame = (AVDiscard)m_nDiscardMode;
+	}
+
 	return S_OK;
 }
 
