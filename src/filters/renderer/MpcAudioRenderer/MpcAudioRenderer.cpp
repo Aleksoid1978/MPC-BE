@@ -478,6 +478,8 @@ HRESULT CMpcAudioRenderer::SetMediaType(const CMediaType *pmt)
 
 	CopyWaveFormat(pwf, &m_pWaveFormatExInput);
 
+	m_BitstreamMode = BITSTREAM_NONE;
+
 	return CBaseRenderer::SetMediaType(pmt);
 }
 
