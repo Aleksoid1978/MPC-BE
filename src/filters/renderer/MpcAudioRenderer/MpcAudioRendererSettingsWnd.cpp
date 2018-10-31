@@ -319,7 +319,7 @@ bool CMpcAudioRendererStatusWnd::OnActivate()
 	const long w1 = 70;  // device, mode
 	const long w2 = 280; // values
 	const long w3 = 70;  // format, channels, samplerate
-	const long w4 = 98; // values
+	const long w4 = 110; // values
 
 	const long x1 = 10;
 	const long x2 = x1 + w3;
