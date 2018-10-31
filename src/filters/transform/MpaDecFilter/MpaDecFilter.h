@@ -145,6 +145,7 @@ protected:
 		BTCOUNT
 	};
 	bool m_bBitstreamSupported[BTCOUNT] = {};
+	bool m_bFallBackToPCM = false;
 
 	void UpdateCacheTimeStamp();
 	void ClearCacheTimeStamp();
