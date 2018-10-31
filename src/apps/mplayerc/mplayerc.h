@@ -66,8 +66,8 @@ class CMPlayerCApp : public CWinApp
 	BOOL SendCommandLine(HWND hWnd);
 	UINT GetVKFromAppCommand(UINT nAppCommand);
 
-	static UINT	GetRemoteControlCodeMicrosoft(UINT nInputcode, HRAWINPUT hRawInput);
-	static UINT	GetRemoteControlCodeSRM7500(UINT nInputcode, HRAWINPUT hRawInput);
+	static UINT GetRemoteControlCodeMicrosoft(UINT nInputcode, HRAWINPUT hRawInput);
+	static UINT GetRemoteControlCodeSRM7500(UINT nInputcode, HRAWINPUT hRawInput);
 
 	virtual BOOL OnIdle(LONG lCount) override;
 public:

@@ -609,7 +609,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	iTitleBarTextStyle = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXT, TEXTBAR_FILENAME);
 	iTitleBarTextStyle = discard(iTitleBarTextStyle, (int)TEXTBAR_FILENAME, (int)TEXTBAR_EMPTY, (int)TEXTBAR_FULLPATH);
 	iSeekBarTextStyle = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SEEKBARTEXT, TEXTBAR_TITLE);
-	iTitleBarTextStyle = discard(iTitleBarTextStyle, (int)TEXTBAR_TITLE, (int)TEXTBAR_EMPTY, (int)TEXTBAR_FULLPATH);
+	iSeekBarTextStyle = discard(iTitleBarTextStyle, (int)TEXTBAR_TITLE, (int)TEXTBAR_EMPTY, (int)TEXTBAR_FULLPATH);
 
 	iOnTop = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ONTOP, 0);
 	bTrayIcon = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TRAYICON, 0);
@@ -921,7 +921,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	for (size_t i = 0; i < Accel.size(); i++) {
 		Accel[i] = wmcmds[i];
 	}
-	hAccel = CreateAcceleratorTable(Accel.data(), Accel.size());
+	hAccel = CreateAcceleratorTableW(Accel.data(), Accel.size());
 
 	strWinLircAddr = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_WINLIRCADDR, L"127.0.0.1:8765");
 	bWinLirc = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_WINLIRC, 0);
