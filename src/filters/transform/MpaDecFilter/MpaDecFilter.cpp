@@ -525,6 +525,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 		if (m_Subtype != pmt->subtype) {
 			m_Subtype = pmt->subtype;
 			m_CodecId = FindCodec(m_Subtype);
+			m_bFallBackToPCM = false;
 		}
 		DeleteMediaType(pmt);
 		pmt = nullptr;
@@ -658,6 +659,10 @@ void CMpaDecFilter::ClearCacheTimeStamp()
 
 BOOL CMpaDecFilter::ProcessBitstream(enum AVCodecID nCodecId, HRESULT& hr, BOOL bEOF/* = FALSE*/)
 {
+	if (m_bFallBackToPCM) {
+		return FALSE;
+	}
+
 	if (m_bBitstreamSupported[SPDIF]) {
 		if (GetSPDIF(ac3) && nCodecId == AV_CODEC_ID_AC3) {
 			hr = bEOF ? S_OK : ProcessAC3_SPDIF();
@@ -665,7 +670,7 @@ BOOL CMpaDecFilter::ProcessBitstream(enum AVCodecID nCodecId, HRESULT& hr, BOOL 
 		}
 		if (GetSPDIF(dts) && nCodecId == AV_CODEC_ID_DTS) {
 			hr = ProcessDTS_SPDIF(bEOF);
-			return TRUE;
+			return m_bFallBackToPCM ? FALSE : TRUE;
 		}
 	}
 
@@ -1254,8 +1259,25 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF(BOOL bEOF/* = FALSE*/)
 
 	while (p + 16 <= end) {
 		audioframe_t aframe;
-		int size  = ParseDTSHeader(p, &aframe);
+		int size = ParseDTSHeader(p, &aframe);
 		if (size == 0) {
+			if (!m_DTSHDProfile) {
+				const auto sizehd = ParseDTSHDHeader(p);
+				if (sizehd) {
+					if (p + sizehd <= end) {
+						audioframe_t dtshdaframe;
+						ParseDTSHDHeader(p, sizehd, &dtshdaframe);
+						m_DTSHDProfile = dtshdaframe.param2;
+						if (m_DTSHDProfile == DCA_PROFILE_EXPRESS) {
+							m_bFallBackToPCM = true;
+							return S_OK;
+						}
+					} else {
+						break;
+					}
+				}
+			}
+
 			p++;
 			continue;
 		}
