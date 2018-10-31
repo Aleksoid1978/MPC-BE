@@ -740,7 +740,7 @@ BOOL CPPageAccelTbl::OnApply()
 	if (s.hAccel) {
 		DestroyAcceleratorTable(s.hAccel);
 	}
-	s.hAccel = CreateAcceleratorTable(Accel.data(), Accel.size());
+	s.hAccel = CreateAcceleratorTableW(Accel.data(), Accel.size());
 
 	GetParentFrame()->m_hAccelTable = s.hAccel;
 
