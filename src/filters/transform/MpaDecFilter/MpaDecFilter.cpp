@@ -466,6 +466,7 @@ HRESULT CMpaDecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, d
 	m_dRate = dRate > 0.0 ? dRate : 1.0;
 
 	m_DTSHDProfile = 0;
+	m_bFallBackToPCM = false;
 
 	m_bUpdateTimeCache = TRUE;
 
