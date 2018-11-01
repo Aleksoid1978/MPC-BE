@@ -609,7 +609,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	iTitleBarTextStyle = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXT, TEXTBAR_FILENAME);
 	iTitleBarTextStyle = discard(iTitleBarTextStyle, (int)TEXTBAR_FILENAME, (int)TEXTBAR_EMPTY, (int)TEXTBAR_FULLPATH);
 	iSeekBarTextStyle = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SEEKBARTEXT, TEXTBAR_TITLE);
-	iSeekBarTextStyle = discard(iTitleBarTextStyle, (int)TEXTBAR_TITLE, (int)TEXTBAR_EMPTY, (int)TEXTBAR_FULLPATH);
+	iSeekBarTextStyle = discard(iSeekBarTextStyle, (int)TEXTBAR_TITLE, (int)TEXTBAR_EMPTY, (int)TEXTBAR_FULLPATH);
 
 	iOnTop = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ONTOP, 0);
 	bTrayIcon = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TRAYICON, 0);
