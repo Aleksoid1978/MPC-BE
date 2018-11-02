@@ -1784,6 +1784,8 @@ void CRenderedTextSubtitle::ParseString(CSubtitle* sub, CStringW str, STSStyle& 
 		return;
 	}
 
+	CodeToCharacter(str);
+
 	str.Replace(L"\\N", L"\n");
 	str.Replace(L"\\n", (sub->m_wrapStyle < 2 || sub->m_wrapStyle == 3) ? L" " : L"\n");
 	str.Replace(L"\\h", L"\x00A0");
@@ -1814,7 +1816,7 @@ void CRenderedTextSubtitle::ParseString(CSubtitle* sub, CStringW str, STSStyle& 
 			}
 		}
 
-		i = j+1;
+		i = j + 1;
 	}
 
 	return;
