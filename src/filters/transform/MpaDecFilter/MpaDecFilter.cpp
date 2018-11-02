@@ -1828,8 +1828,8 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, const int size, const REFER
 			}
 			break;
 		case IEC61937_DTSHD:
-			length  = BS_DTSHD_SIZE;
-			subtype = 4;
+			length  = m_DTSHDProfile == DCA_PROFILE_HD_HRA ? BS_DTSHD_SIZE / 4 : BS_DTSHD_SIZE;
+			subtype = m_DTSHDProfile == DCA_PROFILE_HD_HRA ? 2 : 4;
 			isHDMI  = true;
 			break;
 		case IEC61937_EAC3:
@@ -2113,7 +2113,7 @@ CMediaType CMpaDecFilter::CreateMediaTypeHDMI(WORD type)
 
 	switch(type) {
 	case IEC61937_DTSHD:
-		wfex.Format.nChannels = 8;
+		wfex.Format.nChannels = m_DTSHDProfile == DCA_PROFILE_HD_HRA ? 2 : 8;
 		wfex.dwChannelMask    = KSAUDIO_SPEAKER_7POINT1_SURROUND;
 		subtype = KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD;
 		break;
