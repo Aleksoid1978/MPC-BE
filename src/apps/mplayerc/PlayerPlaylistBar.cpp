@@ -809,56 +809,51 @@ BOOL CPlayerPlaylistBar::PreCreateWindow(CREATESTRUCT& cs)
 
 BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 {
-	if (IsWindow(pMsg->hwnd) && IsVisible()) {
-		if (pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST) {
-			if (pMsg->message == WM_KEYDOWN) {
-				switch (pMsg->wParam) {
-				case VK_ESCAPE:
-					GetParentFrame()->ShowControlBar(this, FALSE, TRUE);
-					return TRUE;
-				case VK_RETURN:
-					if (m_list.GetSelectedCount() == 1) {
-						const int item = m_list.GetNextItem(-1, LVNI_SELECTED);
+	if (IsWindow(pMsg->hwnd) && IsVisible() && pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST) {
+		if (pMsg->message == WM_KEYDOWN) {
+			switch (pMsg->wParam) {
+			case VK_ESCAPE:
+				GetParentFrame()->ShowControlBar(this, FALSE, TRUE);
+				return TRUE;
+			case VK_RETURN:
+				if (m_list.GetSelectedCount() == 1) {
+					const int item = m_list.GetNextItem(-1, LVNI_SELECTED);
 
-						m_pl.SetPos(FindPos(item));
-						m_pMainFrame->OpenCurPlaylistItem();
-						AfxGetMainWnd()->SetFocus();
+					m_pl.SetPos(FindPos(item));
+					m_pMainFrame->OpenCurPlaylistItem();
+					AfxGetMainWnd()->SetFocus();
 
-						return TRUE;
-					}
-					break;
-				case 'A':
-					if (GetKeyState(VK_CONTROL) < 0) {
-						m_list.SetItemState(-1, LVIS_SELECTED, LVIS_SELECTED);
-					}
-					break;
-				case 'I':
-					if (GetKeyState(VK_CONTROL) < 0) {
-						for (int nItem = 0; nItem < m_list.GetItemCount(); nItem++) {
-							m_list.SetItemState(nItem, ~m_list.GetItemState(nItem, LVIS_SELECTED), LVIS_SELECTED);
-						}
-					}
-					break;
-				case VK_UP:
-				case VK_DOWN:
-				case VK_HOME:
-				case VK_END:
-				case VK_PRIOR:
-				case VK_NEXT:
-				case VK_DELETE:
-				case VK_APPS: // "Menu key"
-					break;
-				default:
-					m_pMainFrame->PreTranslateMessage(pMsg);
 					return TRUE;
 				}
-			}
-
-			if (IsDialogMessageW(pMsg)) {
+				break;
+			case 'A':
+				if (GetKeyState(VK_CONTROL) < 0) {
+					m_list.SetItemState(-1, LVIS_SELECTED, LVIS_SELECTED);
+				}
+				break;
+			case 'I':
+				if (GetKeyState(VK_CONTROL) < 0) {
+					for (int nItem = 0; nItem < m_list.GetItemCount(); nItem++) {
+						m_list.SetItemState(nItem, ~m_list.GetItemState(nItem, LVIS_SELECTED), LVIS_SELECTED);
+					}
+				}
+				break;
+			case VK_UP:
+			case VK_DOWN:
+			case VK_HOME:
+			case VK_END:
+			case VK_PRIOR:
+			case VK_NEXT:
+			case VK_DELETE:
+			case VK_APPS: // "Menu key"
+				break;
+			default:
+				m_pMainFrame->PreTranslateMessage(pMsg);
 				return TRUE;
 			}
-		} else if (pMsg->message == WM_MOUSEWHEEL || pMsg->message == WM_MOUSEHWHEEL) {
-			m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
+		}
+
+		if (IsDialogMessageW(pMsg)) {
 			return TRUE;
 		}
 	}
