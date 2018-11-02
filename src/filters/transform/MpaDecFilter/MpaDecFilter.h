@@ -125,7 +125,7 @@ protected:
 	BOOL            m_bFlushing;
 	BOOL            m_bNeedSyncPoint;
 
-	int             m_DTSHDProfile;
+	BYTE            m_DTSHDProfile;
 
 	REFERENCE_TIME  m_rtStartInput;
 	REFERENCE_TIME  m_rtStopInput;
