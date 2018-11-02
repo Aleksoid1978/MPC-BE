@@ -2050,7 +2050,7 @@ static HRESULT CalcBitstreamBufferPeriod(WAVEFORMATEX *pWaveFormatEx, REFERENCE_
 		if (wfext->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_MLP) {
 			nBufferSize = 61440;
 		} else if (wfext->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DTS_HD) {
-			nBufferSize = 32768;
+			nBufferSize = pWaveFormatEx->nChannels == 2 ? 8192 : 32768;
 		} else if (wfext->SubFormat == KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL_PLUS) {
 			nBufferSize = 24576;
 		}
