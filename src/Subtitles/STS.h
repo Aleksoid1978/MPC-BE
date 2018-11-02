@@ -208,6 +208,8 @@ public:
 
 	void SetStr(int i, CStringA str, bool fUnicode /* ignored */);
 	void SetStr(int i, CStringW str, bool fUnicode);
+
+	void CodeToCharacter(CString& str);
 };
 
 extern BYTE CharSetList[];
