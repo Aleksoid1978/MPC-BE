@@ -164,10 +164,7 @@ END_MESSAGE_MAP()
 // CMPlayerCApp construction
 
 CMPlayerCApp::CMPlayerCApp()
-	: m_bProfileInitialized(false)
-	, m_bQueuedProfileFlush(false)
-	, m_dwProfileLastAccessTick(0)
-	, GetRemoteControlCode(GetRemoteControlCodeMicrosoft)
+	: GetRemoteControlCode(GetRemoteControlCodeMicrosoft)
 {
 }
 
@@ -181,7 +178,7 @@ BOOL CMPlayerCApp::OnIdle(LONG lCount)
 {
 	BOOL ret = __super::OnIdle(lCount);
 	if (!ret) {
-		FlushProfile(false);
+		m_Profile.Flush(false);
 	}
 
 	return ret;
@@ -199,16 +196,7 @@ bool CMPlayerCApp::ClearSettings()
 		}
 	}
 
-	// Remove the settings
-	if (IsIniValid()) {
-		CFile file;
-		if (file.Open(GetIniPath(), CFile::modeWrite)) {
-			file.SetLength(0); // clear, but not delete
-			file.Close();
-		}
-	} else {
-		SHDeleteKeyW(m_hAppRegKey, L"");
-	}
+	m_Profile.Clear();
 
 	// Remove the current playlist if it exists
 	CString strSavePath;
@@ -223,615 +211,6 @@ bool CMPlayerCApp::ClearSettings()
 	}
 
 	return true;
-}
-
-void CMPlayerCApp::InitProfile()
-{
-	std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
-
-	if (!m_pszRegistryKey) {
-		// Don't reread mpc-be.ini if the cache needs to be flushed or it was accessed recently
-		if (m_bProfileInitialized && (m_bQueuedProfileFlush || GetTickCount() - m_dwProfileLastAccessTick < 100)) {
-			m_dwProfileLastAccessTick = GetTickCount();
-			return;
-		}
-
-		m_bProfileInitialized = true;
-		m_dwProfileLastAccessTick = GetTickCount();
-
-		ASSERT(m_pszProfileName);
-		if (!::PathFileExistsW(m_pszProfileName)) {
-			return;
-		}
-
-		FILE* fp;
-		int fpStatus;
-		do { // Open mpc-be.ini in UNICODE mode, retry if it is already being used by another process
-			fp = _wfsopen(m_pszProfileName, L"r, ccs=UNICODE", _SH_SECURE);
-			if (fp || (GetLastError() != ERROR_SHARING_VIOLATION)) {
-				break;
-			}
-			Sleep(100);
-		} while (true);
-		if (!fp) {
-			ASSERT(FALSE);
-			return;
-		}
-		if (_ftell_nolock(fp) == 0L) {
-			// No BOM was consumed, assume mpc-be.ini is ANSI encoded
-			fpStatus = fclose(fp);
-			ASSERT(fpStatus == 0);
-			do { // Reopen mpc-be.ini in ANSI mode, retry if it is already being used by another process
-				fp = _wfsopen(m_pszProfileName, L"r", _SH_SECURE);
-				if (fp || (GetLastError() != ERROR_SHARING_VIOLATION)) {
-					break;
-				}
-				Sleep(100);
-			} while (true);
-			if (!fp) {
-				ASSERT(FALSE);
-				return;
-			}
-		}
-
-		CStdioFile file(fp);
-
-		ASSERT(!m_bQueuedProfileFlush);
-		m_ProfileMap.clear();
-
-		CString line, section, var, val;
-		while (file.ReadString(line)) {
-			// Parse mpc-be.ini file, this parser:
-			//  - doesn't trim whitespaces
-			//  - doesn't remove quotation marks
-			//  - omits keys with empty names
-			//  - omits unnamed sections
-			int pos = 0;
-			if (line[0] == '[') {
-				pos = line.Find(']');
-				if (pos == -1) {
-					continue;
-				}
-				section = line.Mid(1, pos - 1);
-			} else if (line[0] != ';') {
-				pos = line.Find('=');
-				if (pos == -1) {
-					continue;
-				}
-				var = line.Mid(0, pos);
-				val = line.Mid(pos + 1);
-				if (!section.IsEmpty() && !var.IsEmpty()) {
-					m_ProfileMap[section][var] = val;
-				}
-			}
-		}
-		fpStatus = fclose(fp);
-		ASSERT(fpStatus == 0);
-
-		m_dwProfileLastAccessTick = GetTickCount();
-	}
-}
-
-void CMPlayerCApp::FlushProfile(bool bForce/* = true*/)
-{
-	std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
-
-	if (!m_pszRegistryKey) {
-		if (!bForce && !m_bQueuedProfileFlush) {
-			return;
-		}
-
-		m_bQueuedProfileFlush = false;
-
-		ASSERT(m_bProfileInitialized);
-		ASSERT(m_pszProfileName);
-
-		FILE* fp;
-		int fpStatus;
-		do { // Open mpc-be.ini, retry if it is already being used by another process
-			fp = _wfsopen(m_pszProfileName, L"w, ccs=UTF-8", _SH_SECURE);
-			if (fp || (GetLastError() != ERROR_SHARING_VIOLATION)) {
-				break;
-			}
-			Sleep(100);
-		} while (true);
-		if (!fp) {
-			ASSERT(FALSE);
-			return;
-		}
-		CStdioFile file(fp);
-		CString line;
-		try {
-			file.WriteString(L"; MPC-BE\n");
-			for (auto it1 = m_ProfileMap.begin(); it1 != m_ProfileMap.end(); ++it1) {
-				line.Format(L"[%s]\n", it1->first);
-				file.WriteString(line);
-				for (auto it2 = it1->second.begin(); it2 != it1->second.end(); ++it2) {
-					line.Format(L"%s=%s\n", it2->first, it2->second);
-					file.WriteString(line);
-				}
-			}
-		} catch (CFileException& e) {
-			// Fail silently if disk is full
-			UNREFERENCED_PARAMETER(e);
-			ASSERT(FALSE);
-		}
-		fpStatus = fclose(fp);
-		ASSERT(fpStatus == 0);
-	}
-}
-
-BOOL CMPlayerCApp::GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBYTE* ppData, UINT* pBytes)
-{
-	if (!lpszSection || !lpszEntry || !ppData || !pBytes) {
-		ASSERT(FALSE);
-		return FALSE;
-	}
-
-	std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
-
-	if (m_pszRegistryKey) {
-		BOOL ret = FALSE;
-		CRegKey regkey;
-		if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_READ)) {
-			if (ERROR_SUCCESS == regkey.QueryBinaryValue(lpszEntry, nullptr, (ULONG*)pBytes)) {
-				*ppData = new(std::nothrow) BYTE[*pBytes];
-				if (*ppData && ERROR_SUCCESS == regkey.QueryBinaryValue(lpszEntry, *ppData, (ULONG*)pBytes)) {
-					ret = TRUE;
-				}
-			}
-			regkey.Close();
-		}
-		return ret;
-	} else {
-		CString sectionStr(lpszSection);
-		CString keyStr(lpszEntry);
-		if (sectionStr.IsEmpty() || keyStr.IsEmpty()) {
-			ASSERT(FALSE);
-			return FALSE;
-		}
-		CString valueStr;
-
-		InitProfile();
-		auto it1 = m_ProfileMap.find(sectionStr);
-		if (it1 != m_ProfileMap.end()) {
-			auto it2 = it1->second.find(keyStr);
-			if (it2 != it1->second.end()) {
-				valueStr = it2->second;
-			}
-		}
-		if (valueStr.IsEmpty()) {
-			return FALSE;
-		}
-		int length = valueStr.GetLength();
-		// Encoding: each 4-bit sequence is coded in one character, from 'A' for 0x0 to 'P' for 0xf
-		if (length % 2) {
-			ASSERT(FALSE);
-			return FALSE;
-		}
-		for (int i = 0; i < length; i++) {
-			if (valueStr[i] < 'A' || valueStr[i] > 'P') {
-				ASSERT(FALSE);
-				return FALSE;
-			}
-		}
-		*pBytes = length / 2;
-		*ppData = new(std::nothrow) BYTE[*pBytes];
-		if (!(*ppData)) {
-			ASSERT(FALSE);
-			return FALSE;
-		}
-		for (UINT i = 0; i < *pBytes; i++) {
-			(*ppData)[i] = BYTE((valueStr[i * 2] - 'A') | ((valueStr[i * 2 + 1] - 'A') << 4));
-		}
-		return TRUE;
-	}
-}
-
-UINT CMPlayerCApp::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, INT nDefault)
-{
-	if (!lpszSection || !lpszEntry) {
-		ASSERT(FALSE);
-		return nDefault;
-	}
-
-	std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
-
-	INT res = nDefault;
-	if (m_pszRegistryKey) {
-		CRegKey regkey;
-		if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_READ)) {
-			regkey.QueryDWORDValue(lpszEntry, *(DWORD*)&res);
-			regkey.Close();
-		}
-	} else {
-		CString sectionStr(lpszSection);
-		CString keyStr(lpszEntry);
-		if (sectionStr.IsEmpty() || keyStr.IsEmpty()) {
-			ASSERT(FALSE);
-			return res;
-		}
-
-		InitProfile();
-		auto it1 = m_ProfileMap.find(sectionStr);
-		if (it1 != m_ProfileMap.end()) {
-			auto it2 = it1->second.find(keyStr);
-			if (it2 != it1->second.end()) {
-				res = _wtoi(it2->second);
-			}
-		}
-	}
-	return res;
-}
-
-CString CMPlayerCApp::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszDefault/* = nullptr*/)
-{
-	CString res;
-	if (!lpszSection || !lpszEntry) {
-		ASSERT(FALSE);
-		return res;
-	}
-
-	std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
-
-	if (m_pszRegistryKey) {
-		bool ok = false;
-		CRegKey regkey;
-		if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_READ)) {
-			ULONG nChars = 0;
-			if (ERROR_SUCCESS == regkey.QueryStringValue(lpszEntry, nullptr, &nChars) && nChars > 0) {
-				if (ERROR_SUCCESS == regkey.QueryStringValue(lpszEntry, res.GetBufferSetLength(nChars-1), &nChars)) {
-					ok = true;
-				}
-			}
-			regkey.Close();
-		}
-		if (!ok && lpszDefault) {
-			res = lpszDefault;
-		}
-		return res;
-	} else {
-		CString sectionStr(lpszSection);
-		CString keyStr(lpszEntry);
-		if (sectionStr.IsEmpty() || keyStr.IsEmpty()) {
-			ASSERT(FALSE);
-			return res;
-		}
-		if (lpszDefault) {
-			res = lpszDefault;
-		}
-
-		InitProfile();
-		auto it1 = m_ProfileMap.find(sectionStr);
-		if (it1 != m_ProfileMap.end()) {
-			auto it2 = it1->second.find(keyStr);
-			if (it2 != it1->second.end()) {
-				res = it2->second;
-			}
-		}
-	}
-	return res;
-}
-
-BOOL CMPlayerCApp::WriteProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBYTE pData, UINT nBytes)
-{
-	if (!lpszSection || !lpszEntry || !pData || !nBytes) {
-		ASSERT(FALSE);
-		return FALSE;
-	}
-
-	std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
-
-	if (m_pszRegistryKey) {
-		BOOL ret = FALSE;
-		CRegKey regkey;
-		if (ERROR_SUCCESS == regkey.Create(m_hAppRegKey, lpszSection)) {
-			if (ERROR_SUCCESS == regkey.SetBinaryValue(lpszEntry, pData, nBytes)) {
-				ret = TRUE;
-			}
-			regkey.Close();
-		}
-		return ret;
-	} else {
-		CString sectionStr(lpszSection);
-		CString keyStr(lpszEntry);
-		if (sectionStr.IsEmpty() || keyStr.IsEmpty()) {
-			ASSERT(FALSE);
-			return FALSE;
-		}
-		CString valueStr;
-
-		WCHAR* buffer = valueStr.GetBufferSetLength(nBytes * 2);
-		// Encoding: each 4-bit sequence is coded in one character, from 'A' for 0x0 to 'P' for 0xf
-		for (UINT i = 0; i < nBytes; i++) {
-			buffer[i * 2] = 'A' + (pData[i] & 0xf);
-			buffer[i * 2 + 1] = 'A' + (pData[i] >> 4 & 0xf);
-		}
-		valueStr.ReleaseBufferSetLength(nBytes * 2);
-
-		InitProfile();
-		CString& old = m_ProfileMap[sectionStr][keyStr];
-		if (old != valueStr) {
-			old = valueStr;
-			m_bQueuedProfileFlush = true;
-		}
-		return TRUE;
-	}
-}
-
-BOOL CMPlayerCApp::WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, INT nValue)
-{
-	if (!lpszSection || !lpszEntry) {
-		ASSERT(FALSE);
-		return FALSE;
-	}
-
-	std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
-
-	if (m_pszRegistryKey) {
-		BOOL ret = FALSE;
-		CRegKey regkey;
-		if (ERROR_SUCCESS == regkey.Create(m_hAppRegKey, lpszSection)) {
-			if (ERROR_SUCCESS == regkey.SetDWORDValue(lpszEntry, (DWORD)nValue)) {
-				ret = TRUE;
-			}
-			regkey.Close();
-		}
-		return ret;
-	} else {
-		CString sectionStr(lpszSection);
-		CString keyStr(lpszEntry);
-		if (sectionStr.IsEmpty() || keyStr.IsEmpty()) {
-			ASSERT(FALSE);
-			return FALSE;
-		}
-		CString valueStr;
-		valueStr.Format(L"%d", nValue);
-
-		InitProfile();
-		CString& old = m_ProfileMap[sectionStr][keyStr];
-		if (old != valueStr) {
-			old = valueStr;
-			m_bQueuedProfileFlush = true;
-		}
-		return TRUE;
-	}
-}
-
-BOOL CMPlayerCApp::WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszValue)
-{
-	if (!lpszSection) {
-		ASSERT(FALSE);
-		return FALSE;
-	}
-
-	std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
-
-	if (m_pszRegistryKey) {
-		BOOL ret = FALSE;
-		CRegKey regkey;
-		if (!lpszEntry) {
-			if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, L"", KEY_WRITE)) {
-				if (ERROR_SUCCESS == regkey.RecurseDeleteKey(lpszSection)) {
-					ret = TRUE;
-				}
-				regkey.Close();
-			}
-		}
-		else if (!lpszValue) {
-			if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_WRITE)) {
-				if (ERROR_SUCCESS == regkey.DeleteValue(lpszEntry)) {
-					ret = TRUE;
-				}
-				regkey.Close();
-			}
-		}
-		else if (ERROR_SUCCESS == regkey.Create(m_hAppRegKey, lpszSection)) {
-			if (ERROR_SUCCESS == regkey.SetStringValue(lpszEntry, lpszValue)) {
-				ret = TRUE;
-			}
-			regkey.Close();
-		}
-		return ret;
-	} else {
-		CString sectionStr(lpszSection);
-		if (sectionStr.IsEmpty()) {
-			ASSERT(FALSE);
-			return FALSE;
-		}
-		CString keyStr(lpszEntry);
-		if (lpszEntry && keyStr.IsEmpty()) {
-			ASSERT(FALSE);
-			return FALSE;
-		}
-
-		InitProfile();
-
-		// Mimic CWinApp::WriteProfileString() behavior
-		if (lpszEntry) {
-			if (lpszValue) {
-				CString& old = m_ProfileMap[sectionStr][keyStr];
-				if (old != lpszValue) {
-					old = lpszValue;
-					m_bQueuedProfileFlush = true;
-				}
-			} else { // Delete key
-				auto it = m_ProfileMap.find(sectionStr);
-				if (it != m_ProfileMap.end()) {
-					if (it->second.erase(keyStr)) {
-						m_bQueuedProfileFlush = true;
-					}
-				}
-			}
-		} else { // Delete section
-			if (m_ProfileMap.erase(sectionStr)) {
-				m_bQueuedProfileFlush = true;
-			}
-		}
-		return TRUE;
-	}
-}
-
-INT64 CMPlayerCApp::GetProfileInt64(LPCTSTR lpszSection, LPCTSTR lpszEntry, INT64 nDefault)
-{
-	if (!lpszSection || !lpszEntry) {
-		ASSERT(FALSE);
-		return nDefault;
-	}
-
-	std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
-
-	INT64 res = nDefault;
-	if (m_pszRegistryKey) {
-		CRegKey regkey;
-		if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_READ)) {
-			regkey.QueryQWORDValue(lpszEntry, *(QWORD*)&res);
-			regkey.Close();
-		}
-	} else {
-		CString sectionStr(lpszSection);
-		CString keyStr(lpszEntry);
-		if (sectionStr.IsEmpty() || keyStr.IsEmpty()) {
-			ASSERT(FALSE);
-			return res;
-		}
-
-		InitProfile();
-		auto it1 = m_ProfileMap.find(sectionStr);
-		if (it1 != m_ProfileMap.end()) {
-			auto it2 = it1->second.find(keyStr);
-			if (it2 != it1->second.end()) {
-				res = _wtoi64(it2->second);
-			}
-		}
-	}
-	return res;
-}
-
-BOOL CMPlayerCApp::WriteProfileInt64(LPCTSTR lpszSection, LPCTSTR lpszEntry, INT64 nValue)
-{
-	if (!lpszSection || !lpszEntry) {
-		ASSERT(FALSE);
-		return FALSE;
-	}
-
-	std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
-
-	if (m_pszRegistryKey) {
-		BOOL ret = FALSE;
-		CRegKey regkey;
-		if (ERROR_SUCCESS == regkey.Create(m_hAppRegKey, lpszSection)) {
-			if (ERROR_SUCCESS == regkey.SetQWORDValue(lpszEntry, (QWORD)nValue)) {
-				ret = TRUE;
-			}
-			regkey.Close();
-		}
-		return ret;
-	} else {
-		CString sectionStr(lpszSection);
-		CString keyStr(lpszEntry);
-		if (sectionStr.IsEmpty() || keyStr.IsEmpty()) {
-			ASSERT(FALSE);
-			return FALSE;
-		}
-		CString valueStr;
-		valueStr.Format(L"%I64d", nValue);
-
-		InitProfile();
-		CString& old = m_ProfileMap[sectionStr][keyStr];
-		if (old != valueStr) {
-			old = valueStr;
-			m_bQueuedProfileFlush = true;
-		}
-		return TRUE;
-	}
-}
-
-bool CMPlayerCApp::HasProfileEntry(LPCTSTR lpszSection, LPCTSTR lpszEntry)
-{
-	std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
-
-	bool ret = false;
-	if (m_pszRegistryKey) {
-		CRegKey regkey;
-		if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_READ)) {
-			if (ERROR_SUCCESS == regkey.QueryValue(lpszEntry, nullptr, nullptr, nullptr)) {
-				ret = true;
-			}
-			regkey.Close();
-		}
-	} else {
-		InitProfile();
-		auto it1 = m_ProfileMap.find(lpszSection);
-		if (it1 != m_ProfileMap.end()) {
-			auto& sectionMap = it1->second;
-			auto it2 = sectionMap.find(lpszEntry);
-			ret = (it2 != sectionMap.end());
-		}
-	}
-	return ret;
-}
-
-void CMPlayerCApp::EnumProfileEntries(LPCTSTR lpszSection, std::vector<CString>& entries)
-{
-	std::lock_guard<std::recursive_mutex> lock(m_profileMutex);
-
-	entries.clear();
-
-	if (m_pszRegistryKey) {
-		CRegKey regkey;
-		if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, lpszSection, KEY_READ)) {
-			// https://docs.microsoft.com/ru-ru/windows/desktop/SysInfo/enumerating-registry-subkeys
-			WCHAR    achClass[MAX_PATH] = L"";
-			DWORD    cchClassName = MAX_PATH;
-			DWORD    cSubKeys = 0;
-			DWORD    cbMaxSubKey;
-			DWORD    cchMaxClass;
-			DWORD    cValues;
-			DWORD    cchMaxValue;
-			DWORD    cbMaxValueData;
-			DWORD    cbSecurityDescriptor;
-			FILETIME ftLastWriteTime;
-
-			// Get the class name and the value count.
-			DWORD retCode = RegQueryInfoKeyW(
-				regkey.m_hKey,
-				achClass,
-				&cchClassName,
-				nullptr,
-				&cSubKeys,
-				&cbMaxSubKey,
-				&cchMaxClass,
-				&cValues,
-				&cchMaxValue,
-				&cbMaxValueData,
-				&cbSecurityDescriptor,
-				&ftLastWriteTime);
-
-			if (ERROR_SUCCESS == retCode  && cValues) {
-				WCHAR achValue[16383];
-
-				for (DWORD i = 0, retCode = ERROR_SUCCESS; i < cValues; i++) {
-					DWORD cchValue = _countof(achValue);
-					achValue[0] = '\0';
-					retCode = RegEnumValueW(regkey.m_hKey, i, achValue, &cchValue, NULL, NULL, NULL, NULL);
-					if (retCode == ERROR_SUCCESS) {
-						entries.emplace_back(achValue, cchValue);
-					}
-				}
-			}
-			regkey.Close();
-		}
-	} else {
-		InitProfile();
-		auto it1 = m_ProfileMap.find(lpszSection);
-		if (it1 != m_ProfileMap.end()) {
-			auto& sectionMap = it1->second;
-			for (const auto& entry : sectionMap) {
-				entries.emplace_back(entry.first);
-			}
-		}
-	}
 }
 
 void CMPlayerCApp::ShowCmdlnSwitches() const
@@ -860,66 +239,11 @@ CMPlayerCApp theApp;
 
 HWND g_hWnd = nullptr;
 
-bool CMPlayerCApp::StoreSettingsToIni()
-{
-	free((void*)m_pszRegistryKey);
-	m_pszRegistryKey = nullptr;
-	free((void*)m_pszProfileName);
-	m_pszProfileName = _wcsdup(GetIniPath());
-
-	if (!::PathFileExistsW(m_pszProfileName)) {
-		// Create an empty mpc-be.ini file to be sure that the function IsIniValid() works correctly
-		FILE* fp;
-		int fpStatus;
-		do { // Open mpc-be.ini, retry if it is already being used by another process
-			fp = _wfsopen(m_pszProfileName, L"w, ccs=UTF-8", _SH_SECURE);
-			if (fp || (GetLastError() != ERROR_SHARING_VIOLATION)) {
-				break;
-			}
-			Sleep(100);
-		} while (true);
-		if (!fp) {
-			ASSERT(FALSE);
-		} else {
-			fpStatus = fclose(fp);
-			ASSERT(fpStatus == 0);
-		}
-	}
-
-	return true;
-}
-
-bool CMPlayerCApp::StoreSettingsToRegistry()
-{
-	SetRegistryKey(L"");
-
-	if (!m_hAppRegKey) {
-		m_hAppRegKey = GetAppRegistryKey(); // must be run after SetRegistryKey(L"")
-		if (!m_hAppRegKey) {
-			exit(-1); // if this happens, then all bad
-		}
-	}
-
-	return true;
-}
-
-CString CMPlayerCApp::GetIniPath() const
-{
-	CString path = GetProgramPath();
-	path = path.Left(path.ReverseFind('.') + 1) + L"ini";
-	return path;
-}
-
-bool CMPlayerCApp::IsIniValid() const
-{
-	return !!::PathFileExistsW(GetIniPath());
-}
-
 bool CMPlayerCApp::GetAppSavePath(CString& path)
 {
 	path.Empty();
 
-	if (IsIniValid()) { // If settings ini file found, store stuff in the same folder as the exe file
+	if (m_Profile.IsIniValid()) { // If settings ini file found, store stuff in the same folder as the exe file
 		path = GetProgramDir();
 	} else {
 		HRESULT hr = SHGetFolderPathW(nullptr, CSIDL_APPDATA, nullptr, 0, path.GetBuffer(MAX_PATH));
@@ -947,13 +271,13 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 	AfxGetAppSettings().GetFav(FAV_DEVICE, devicesFav);
 
 	if (useIni) {
-		bool success = StoreSettingsToIni();
+		bool success = m_Profile.StoreSettingsToIni();
 		if (!success) {
 			return false;
 		}
 	} else {
-		StoreSettingsToRegistry();
-		_wremove(GetIniPath());
+		m_Profile.StoreSettingsToRegistry();
+		_wremove(m_Profile.GetIniPath());
 	}
 
 	CString newpath;
@@ -1120,7 +444,7 @@ static bool ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName)
 
 void CMPlayerCApp::ExportSettings()
 {
-	CString ext = IsIniValid() ? L"ini" : L"reg";
+	CString ext = m_Profile.IsIniValid() ? L"ini" : L"reg";
 	CString ext_list;
 	ext_list.Format(L"Export files (*.%s)|*.%s|", ext, ext);
 
@@ -1141,8 +465,8 @@ void CMPlayerCApp::ExportSettings()
 		bool success = false;
 		s.SaveSettings();
 
-		if (IsIniValid()) {
-			success = !!CopyFile(GetIniPath(), savePath, FALSE);
+		if (m_Profile.IsIniValid()) {
+			success = !!CopyFileW(m_Profile.GetIniPath(), savePath, FALSE);
 		} else {
 			CString regKey(L"Software\\");
 			regKey.Append(m_pszProfileName);
@@ -1529,10 +853,10 @@ BOOL CMPlayerCApp::InitInstance()
 	}
 
 	// select setting location
-	if (IsIniValid()) {
-		StoreSettingsToIni();
+	if (m_Profile.IsIniValid()) {
+		m_Profile.StoreSettingsToIni();
 	} else {
-		StoreSettingsToRegistry();
+		m_Profile.StoreSettingsToRegistry();
 	}
 
 	// process command line
@@ -1730,7 +1054,7 @@ BOOL CMPlayerCApp::InitInstance()
 		}
 	}
 
-	if (!IsIniValid()) {
+	if (!m_Profile.IsIniValid()) {
 		CRegKey key;
 		if (ERROR_SUCCESS == key.Create(HKEY_LOCAL_MACHINE, L"Software\\MPC-BE")) {
 			CString path = GetProgramPath();

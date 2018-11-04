@@ -128,7 +128,7 @@ BOOL CPPagePlayer::OnInitDialog()
 	m_bRememberWindowSize		= s.bRememberWindowSize;
 	m_bSavePnSZoom				= s.bSavePnSZoom;
 	m_bSnapToDesktopEdges		= s.bSnapToDesktopEdges;
-	m_bUseIni					= AfxGetMyApp()->IsIniValid();
+	m_bUseIni					= AfxGetProfile().IsIniValid();
 	m_bKeepHistory				= s.bKeepHistory;
 	m_bHideCDROMsSubMenu		= s.bHideCDROMsSubMenu;
 	m_bPriority					= s.dwPriority != NORMAL_PRIORITY_CLASS;
@@ -239,7 +239,7 @@ BOOL CPPagePlayer::OnApply()
 	s.MRUDub.SetSize(s.iRecentFilesNumber);
 
 	// Check if the settings location needs to be changed
-	if (AfxGetMyApp()->IsIniValid() != !!m_bUseIni) {
+	if (AfxGetProfile().IsIniValid() != !!m_bUseIni) {
 		AfxGetMyApp()->ChangeSettingsLocation(!!m_bUseIni);
 	}
 

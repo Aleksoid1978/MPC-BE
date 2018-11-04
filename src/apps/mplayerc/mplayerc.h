@@ -29,6 +29,7 @@
 #include <afxadv.h>
 #include <atlsync.h>
 #include <ShlObj.h>
+#include "../../DSUtil/Profile.h"
 #include "FakeFilterMapper2.h"
 #include "AppSettings.h"
 #include "../../../Include/Version.h"
@@ -57,8 +58,9 @@ struct LanguageResource {
 	const LPCTSTR strcode;
 };
 
-class CMPlayerCApp : public CWinApp
+class CMPlayerCApp : public CModApp
 {
+private:
 	ATL::CMutex m_mutexOneInstance;
 
 	std::list<CString> m_cmdln;
@@ -101,36 +103,11 @@ public:
 private:
 	bool ClearSettings();
 
-	std::recursive_mutex m_profileMutex;
-	HKEY m_hAppRegKey = nullptr;
-	std::map<CString, std::map<CString, CString, CStringUtils::IgnoreCaseLess>, CStringUtils::IgnoreCaseLess> m_ProfileMap;
-	bool m_bProfileInitialized;
-	bool m_bQueuedProfileFlush;
-	DWORD m_dwProfileLastAccessTick;
-
-	void InitProfile();
-
 public:
-	bool			StoreSettingsToIni();
-	bool			StoreSettingsToRegistry();
-	CString			GetIniPath() const;
-	bool			IsIniValid() const;
+
 	bool			ChangeSettingsLocation(bool useIni);
 	void			ExportSettings();
-
 	bool			GetAppSavePath(CString& path);
-
-	void			FlushProfile(bool bForce = true);
-	virtual BOOL	GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBYTE* ppData, UINT* pBytes) override;
-	virtual UINT	GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, INT nDefault) override;
-	virtual CString	GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszDefault = nullptr) override;
-	virtual BOOL	WriteProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBYTE pData, UINT nBytes) override;
-	virtual BOOL	WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, INT nValue) override;
-	virtual BOOL	WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszValue) override;
-	virtual INT64	GetProfileInt64(LPCTSTR lpszSection, LPCTSTR lpszEntry, INT64 nDefault);
-	virtual BOOL	WriteProfileInt64(LPCTSTR lpszSection, LPCTSTR lpszEntry, INT64 nValue);
-	bool			HasProfileEntry(LPCTSTR lpszSection, LPCTSTR lpszEntry);
-	void			EnumProfileEntries(LPCTSTR lpszSection, std::vector<CString>& entries);
 
 public:
 	virtual BOOL InitInstance();
@@ -142,7 +119,7 @@ public:
 	afx_msg void OnHelpShowcommandlineswitches();
 };
 
-#define AfxGetMyApp()		static_cast<CMPlayerCApp*>(AfxGetApp())
-#define AfxGetAppSettings()	static_cast<CMPlayerCApp*>(AfxGetApp())->m_s
-#define AfxGetMainFrame()	static_cast<CMainFrame*>(AfxGetMainWnd())
-#define AfxFindMainFrame()	dynamic_cast<CMainFrame*>(AfxGetMainWnd())
+#define AfxGetMyApp()       static_cast<CMPlayerCApp*>(AfxGetApp())
+#define AfxGetAppSettings() static_cast<CMPlayerCApp*>(AfxGetApp())->m_s
+#define AfxGetMainFrame()   static_cast<CMainFrame*>(AfxGetMainWnd())
+#define AfxFindMainFrame()  dynamic_cast<CMainFrame*>(AfxGetMainWnd())

@@ -1572,7 +1572,7 @@ void CAppSettings::SaveSettings()
 		pApp->WriteProfileInt(L"", L"", pApp->GetProfileInt(L"", L"", 0) ? 0 : 1);
 	}
 
-	pApp->FlushProfile();
+	AfxGetProfile().Flush(true);
 }
 
 void CAppSettings::SaveExternalFilters()
