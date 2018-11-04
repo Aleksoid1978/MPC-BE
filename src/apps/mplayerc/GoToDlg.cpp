@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -116,7 +116,7 @@ void CGoToDlg::OnBnClickedOk1()
 {
 	UpdateData();
 
-	AfxGetMyApp()->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_GOTO_LAST_USED, TYPE_TIME);
+	AfxGetProfile().WriteInt(IDS_R_SETTINGS, IDS_RS_GOTO_LAST_USED, TYPE_TIME);
 
 	unsigned int hh = 0;
 	unsigned int mm = 0;
@@ -143,7 +143,7 @@ void CGoToDlg::OnBnClickedOk2()
 {
 	UpdateData();
 
-	AfxGetMyApp()->WriteProfileInt(IDS_R_SETTINGS, IDS_RS_GOTO_LAST_USED, TYPE_FRAME);
+	AfxGetProfile().WriteInt(IDS_R_SETTINGS, IDS_RS_GOTO_LAST_USED, TYPE_FRAME);
 
 	unsigned int frame;
 	float fps;

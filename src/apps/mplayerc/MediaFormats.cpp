@@ -65,7 +65,7 @@ CMediaFormatCategory::~CMediaFormatCategory()
 void CMediaFormatCategory::UpdateData(const bool& bSave)
 {
 	if (bSave) {
-		AfxGetMyApp()->WriteProfileString(IDS_R_FILEFORMATS, m_label, GetExts());
+		AfxGetProfile().WriteString(IDS_R_FILEFORMATS, m_label, GetExts());
 	} else {
 		SetExts(AfxGetMyApp()->GetProfileString(IDS_R_FILEFORMATS, m_label, GetExts()));
 	}
@@ -165,7 +165,7 @@ CMediaFormats::~CMediaFormats()
 void CMediaFormats::UpdateData(const bool& bSave)
 {
 	if (bSave) {
-		AfxGetMyApp()->WriteProfileString(IDS_R_FILEFORMATS, nullptr, nullptr);
+		AfxGetProfile().DeleteSection(IDS_R_FILEFORMATS);
 	} else {
 		clear();
 		reserve(51);

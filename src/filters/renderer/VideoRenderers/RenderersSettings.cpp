@@ -205,55 +205,51 @@ void CRenderersSettings::Load()
 
 void CRenderersSettings::Save()
 {
-	CMPlayerCApp* pApp = AfxGetMyApp();
+	CProfile& profile = AfxGetProfile();
 
-#define WRITE_OPTION_INT(value, name) pApp->WriteProfileInt(IDS_R_VIDEO, name, value)
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_VIDEORENDERER, iVideoRenderer);
 
-	WRITE_OPTION_INT(iVideoRenderer, IDS_RS_VIDEORENDERER);
+	profile.WriteString(IDS_R_VIDEO, IDS_RS_RENDERDEVICE, sD3DRenderDevice);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_RESETDEVICE, bResetDevice);
 
-	pApp->WriteProfileString(IDS_R_VIDEO, IDS_RS_RENDERDEVICE, sD3DRenderDevice);
-	WRITE_OPTION_INT(bResetDevice, IDS_RS_RESETDEVICE);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SURFACEFORMAT, iSurfaceFormat);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_OUTPUT10BIT, b10BitOutput);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_RESIZER, iResizer);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_DOWNSCALER, iDownscaler);
 
-	WRITE_OPTION_INT(iSurfaceFormat, IDS_RS_SURFACEFORMAT);
-	WRITE_OPTION_INT(b10BitOutput, IDS_RS_OUTPUT10BIT);
-	WRITE_OPTION_INT(iResizer, IDS_RS_RESIZER);
-	WRITE_OPTION_INT(iDownscaler, IDS_RS_DOWNSCALER);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VSYNC, bVSync);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VSYNC_ACCURATE, bVSyncAccurate);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VSYNC_ALTERNATE, bAlterativeVSync);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_VSYNC_OFFSET, iVSyncOffset);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_DISABLEDESKCOMP, bDisableDesktopComposition);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FRAMETIMECORRECTION, bEVRFrameTimeCorrection);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUBEFOREVSYNC, bFlushGPUBeforeVSync);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUAFTERPRESENT, bFlushGPUAfterPresent);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUWAIT, bFlushGPUWait);
 
-	WRITE_OPTION_INT(bVSync, IDS_RS_VSYNC);
-	WRITE_OPTION_INT(bVSyncAccurate, IDS_RS_VSYNC_ACCURATE);
-	WRITE_OPTION_INT(bAlterativeVSync, IDS_RS_VSYNC_ALTERNATE);
-	WRITE_OPTION_INT(iVSyncOffset, IDS_RS_VSYNC_OFFSET);
-	WRITE_OPTION_INT(bDisableDesktopComposition, IDS_RS_DISABLEDESKCOMP);
-	WRITE_OPTION_INT(bEVRFrameTimeCorrection, IDS_RS_FRAMETIMECORRECTION);
-	WRITE_OPTION_INT(bFlushGPUBeforeVSync, IDS_RS_FLUSHGPUBEFOREVSYNC);
-	WRITE_OPTION_INT(bFlushGPUAfterPresent, IDS_RS_FLUSHGPUAFTERPRESENT);
-	WRITE_OPTION_INT(bFlushGPUWait, IDS_RS_FLUSHGPUWAIT);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VMR_MIXERMODE, bVMRMixerMode);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VMR_MIXERYUV, bVMRMixerYUV);
 
-	WRITE_OPTION_INT(bVMRMixerMode, IDS_RS_VMR_MIXERMODE);
-	WRITE_OPTION_INT(bVMRMixerYUV, IDS_RS_VMR_MIXERYUV);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_EVR_OUTPUTRANGE, iEVROutputRange);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_EVR_BUFFERS, nEVRBuffers);
 
-	WRITE_OPTION_INT(iEVROutputRange, IDS_RS_EVR_OUTPUTRANGE);
-	WRITE_OPTION_INT(nEVRBuffers, IDS_RS_EVR_BUFFERS);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_MODE, iSynchronizeMode);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_LINEDELTA, iLineDelta);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_COLUMNDELTA, iColumnDelta);
+	profile.WriteBinary(IDS_R_VIDEO, IDS_RS_SYNC_CYCLEDELTA, (LPBYTE)&(dCycleDelta), sizeof(dCycleDelta));
+	profile.WriteBinary(IDS_R_VIDEO, IDS_RS_SYNC_TARGETOFFSET, (LPBYTE)&(dTargetSyncOffset), sizeof(dTargetSyncOffset));
+	profile.WriteBinary(IDS_R_VIDEO, IDS_RS_SYNC_CONTROLLIMIT, (LPBYTE)&(dControlLimit), sizeof(dControlLimit));
 
-	WRITE_OPTION_INT(iSynchronizeMode, IDS_RS_SYNC_MODE);
-	WRITE_OPTION_INT(iLineDelta, IDS_RS_SYNC_LINEDELTA);
-	WRITE_OPTION_INT(iColumnDelta, IDS_RS_SYNC_COLUMNDELTA);
-	pApp->WriteProfileBinary(IDS_R_VIDEO, IDS_RS_SYNC_CYCLEDELTA, (LPBYTE)&(dCycleDelta), sizeof(dCycleDelta));
-	pApp->WriteProfileBinary(IDS_R_VIDEO, IDS_RS_SYNC_TARGETOFFSET, (LPBYTE)&(dTargetSyncOffset), sizeof(dTargetSyncOffset));
-	pApp->WriteProfileBinary(IDS_R_VIDEO, IDS_RS_SYNC_CONTROLLIMIT, (LPBYTE)&(dControlLimit), sizeof(dControlLimit));
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_COLMAN, bColorManagementEnable);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLMAN_INPUT, iColorManagementInput);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLMAN_AMBIENTLIGHT, iColorManagementAmbientLight);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLMAN_INTENT, iColorManagementIntent);
 
-	WRITE_OPTION_INT(bColorManagementEnable, IDS_RS_COLMAN);
-	WRITE_OPTION_INT(iColorManagementInput, IDS_RS_COLMAN_INPUT);
-	WRITE_OPTION_INT(iColorManagementAmbientLight, IDS_RS_COLMAN_AMBIENTLIGHT);
-	WRITE_OPTION_INT(iColorManagementIntent, IDS_RS_COLMAN_INTENT);
-
-	WRITE_OPTION_INT(nSubpicCount, IDS_RS_SUBPIC_COUNT);
-	WRITE_OPTION_INT(iSubpicMaxTexWidth, IDS_RS_SUBPIC_MAXTEXWIDTH);
-	WRITE_OPTION_INT(bSubpicAnimationWhenBuffering, IDS_RS_SUBPIC_ANIMBUFFERING);
-	WRITE_OPTION_INT(bSubpicAllowDrop, IDS_RS_SUBPIC_ALLOWDROP);
-	WRITE_OPTION_INT(iSubpicStereoMode, IDS_RS_SUBPIC_STEREOMODE);
-
-#undef WRITE_OPTION_INT
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SUBPIC_COUNT, nSubpicCount);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SUBPIC_MAXTEXWIDTH, iSubpicMaxTexWidth);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_SUBPIC_ANIMBUFFERING, bSubpicAnimationWhenBuffering);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_SUBPIC_ALLOWDROP, bSubpicAllowDrop);
+	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SUBPIC_STEREOMODE, iSubpicStereoMode);
 }
 
 /////////////////////////////////////////////////////////////////////////////

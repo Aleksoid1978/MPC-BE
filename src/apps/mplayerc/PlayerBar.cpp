@@ -88,7 +88,7 @@ void CPlayerBar::LoadState(CFrameWnd *pParent)
 
 void CPlayerBar::SaveState()
 {
-	CMPlayerCApp* pApp = AfxGetMyApp();
+	CProfile& profile = AfxGetProfile();
 
 	CString section = L"ToolBars\\" + m_strSettingName;
 
@@ -99,11 +99,11 @@ void CPlayerBar::SaveState()
 	if (dockBarID == AFX_IDW_DOCKBAR_FLOAT) {
 		CRect r;
 		GetParent()->GetParent()->GetWindowRect(r);
-		pApp->WriteProfileInt(section, L"DockPosX", r.left);
-		pApp->WriteProfileInt(section, L"DockPosY", r.top);
+		profile.WriteInt(section, L"DockPosX", r.left);
+		profile.WriteInt(section, L"DockPosY", r.top);
 	}
 
-	pApp->WriteProfileInt(section, L"DockState", dockBarID);
+	profile.WriteInt(section, L"DockState", dockBarID);
 }
 
 void CPlayerBar::OnWindowPosChanged(WINDOWPOS* lpwndpos)

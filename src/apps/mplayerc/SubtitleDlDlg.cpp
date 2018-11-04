@@ -545,7 +545,7 @@ void CSubtitleDlDlg::OnDestroy()
 		int w = m_list.GetColumnWidth(i);
 		strColumnWidth.AppendFormat(L"%d,", w);
 	}
-	AfxGetMyApp()->WriteProfileString(IDS_R_DLG_SUBTITLEDL, IDS_RS_DLG_SUBTITLEDL_COLWIDTH, strColumnWidth);
+	AfxGetProfile().WriteString(IDS_R_DLG_SUBTITLEDL, IDS_RS_DLG_SUBTITLEDL_COLWIDTH, strColumnWidth);
 
 	__super::OnDestroy();
 }
