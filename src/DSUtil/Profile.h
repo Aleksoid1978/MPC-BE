@@ -92,17 +92,6 @@ public:
 
 class CModApp : public CWinApp
 {
-/*
-private:
-	// do not use function GetProfile/WriteProfile
-	using CWinApp::GetProfileInt;
-	using CWinApp::GetProfileStringW;
-	using CWinApp::GetProfileBinary;
-	using CWinApp::WriteProfileInt;
-	using CWinApp::WriteProfileString;
-	using CWinApp::WriteProfileBinary;
-*/
-
 public:
 	CProfile m_Profile;
 
@@ -130,6 +119,12 @@ public:
 	}
 	BOOL WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszValue) override
 	{
+		if (!lpszEntry) {
+			if (!lpszSection) {
+				return m_Profile.DeleteSection(lpszSection);
+			}
+			return m_Profile.DeleteValue(lpszSection, lpszEntry);
+		}
 		return m_Profile.WriteString(lpszSection, lpszEntry, lpszValue);
 	}
 	BOOL GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBYTE* ppData, UINT* pBytes) override
