@@ -72,6 +72,7 @@
     <ClCompile Include="MPCSocket.cpp" />
     <ClCompile Include="NullRenderers.cpp" />
     <ClCompile Include="Packet.cpp" />
+    <ClCompile Include="Profile.cpp" />
     <ClCompile Include="ResampleRGB32.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -115,6 +116,7 @@
     <ClInclude Include="Mpeg2Def.h" />
     <ClInclude Include="NullRenderers.h" />
     <ClInclude Include="Packet.h" />
+    <ClInclude Include="Profile.h" />
     <ClInclude Include="ResampleRGB32.h" />
     <ClInclude Include="SharedInclude.h" />
     <ClInclude Include="SimpleBuffer.h" />
