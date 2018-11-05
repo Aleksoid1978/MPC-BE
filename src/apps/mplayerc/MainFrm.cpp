@@ -12256,11 +12256,14 @@ CString CMainFrame::OpenCapture(OpenDeviceData* pODD)
 		}
 
 		if (pAMTuner) { // load saved channel
-			pAMTuner->put_CountryCode(AfxGetMyApp()->GetProfileInt(L"Capture", L"Country", 1));
+			CProfile& profile = AfxGetProfile();
+			int country = 1;
+			profile.ReadInt(L"Capture", L"Country", country);
+			pAMTuner->put_CountryCode(country);
 
 			int vchannel = pODD->vchannel;
 			if (vchannel < 0) {
-				vchannel = AfxGetMyApp()->GetProfileInt(L"Capture\\" + CString(m_VidDispName), L"Channel", -1);
+				profile.ReadInt(L"Capture\\" + CString(m_VidDispName), L"Channel", vchannel);
 			}
 			if (vchannel >= 0) {
 				OAFilterState fs = State_Stopped;

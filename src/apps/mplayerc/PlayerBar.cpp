@@ -46,7 +46,7 @@ BOOL CPlayerBar::Create(LPCTSTR lpszWindowName, CWnd* pParentWnd, UINT nID, UINT
 
 void CPlayerBar::LoadState(CFrameWnd *pParent)
 {
-	CMPlayerCApp* pApp = AfxGetMyApp();
+	CProfile& profile = AfxGetProfile();
 
 	CRect r;
 	pParent->GetWindowRect(r);
@@ -57,12 +57,13 @@ void CPlayerBar::LoadState(CFrameWnd *pParent)
 
 	__super::LoadState(section + L"\\State");
 
-	UINT dockBarID = pApp->GetProfileInt(section, L"DockState", m_defDockBarID);
+	UINT dockBarID = m_defDockBarID;
+	profile.ReadInt(section, L"DockState", *(int*)&dockBarID);
 
 	if (dockBarID == AFX_IDW_DOCKBAR_FLOAT) {
-		CPoint p;
-		p.x = pApp->GetProfileInt(section, L"DockPosX", r.right);
-		p.y = pApp->GetProfileInt(section, L"DockPosY", r.top);
+		CPoint p(r.right, r.top);
+		profile.ReadInt(section, L"DockPosX", *(int*)&p.x);
+		profile.ReadInt(section, L"DockPosY", *(int*)&p.y);
 
 		if (p.x < rDesktop.left) {
 			p.x = rDesktop.left;

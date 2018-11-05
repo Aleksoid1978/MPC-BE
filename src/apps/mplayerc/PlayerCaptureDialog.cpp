@@ -528,15 +528,15 @@ CPlayerCaptureDialog::CPlayerCaptureDialog(CMainFrame* pMainFrame)
 	, m_pMainFrame(pMainFrame)
 	, m_bInitialized(false)
 	, m_vidfps(0)
-	, m_nVidBuffers(0)
-	, m_nAudBuffers(0)
+	, m_nVidBuffers(50)
+	, m_nAudBuffers(50)
 	, m_nRecordTimerID(0)
 	, m_fSepAudio(FALSE)
 	, m_muxtype(0)
 	, m_fVidOutput(TRUE)
-	, m_fVidPreview(FALSE)
+	, m_fVidPreview(TRUE)
 	, m_fAudOutput(TRUE)
-	, m_fAudPreview(FALSE)
+	, m_fAudPreview(TRUE)
 	, m_pVidBuffer(nullptr)
 	, m_pAudBuffer(nullptr)
 {
@@ -636,15 +636,16 @@ void CPlayerCaptureDialog::InitControls()
 		InitCodecList(m_pAudEncArray, m_audcodec, CLSID_AudioCompressorCategory);
 		UpdateAudioCodec();
 
-		m_nVidBuffers = AfxGetApp()->GetProfileInt(IDS_R_CAPTURE, L"VidBuffers", 50);
-		m_nAudBuffers = AfxGetApp()->GetProfileInt(IDS_R_CAPTURE, L"AudBuffers", 50);
-		m_fVidOutput = !!AfxGetApp()->GetProfileInt(IDS_R_CAPTURE, L"VidOutput", TRUE);
-		m_fAudOutput = !!AfxGetApp()->GetProfileInt(IDS_R_CAPTURE, L"AudOutput", TRUE);
-		m_fVidPreview = AfxGetApp()->GetProfileInt(IDS_R_CAPTURE, L"VidPreview", TRUE);
-		m_fAudPreview = AfxGetApp()->GetProfileInt(IDS_R_CAPTURE, L"AudPreview", TRUE);
-		m_muxtype = AfxGetApp()->GetProfileInt(IDS_R_CAPTURE, L"FileFormat", 0);
-		m_file = AfxGetApp()->GetProfileString(IDS_R_CAPTURE, L"FileName");
-		m_fSepAudio = AfxGetApp()->GetProfileInt(IDS_R_CAPTURE, L"SepAudio", TRUE);
+		CProfile& profile = AfxGetProfile();
+		profile.ReadInt(IDS_R_CAPTURE, L"VidBuffers", m_nVidBuffers);
+		profile.ReadInt(IDS_R_CAPTURE, L"AudBuffers", m_nAudBuffers);
+		profile.ReadInt(IDS_R_CAPTURE, L"VidOutput", m_fVidOutput);
+		profile.ReadInt(IDS_R_CAPTURE, L"AudOutput", m_fAudOutput);
+		profile.ReadInt(IDS_R_CAPTURE, L"VidPreview", m_fVidPreview);
+		profile.ReadInt(IDS_R_CAPTURE, L"AudPreview", m_fAudPreview);
+		profile.ReadInt(IDS_R_CAPTURE, L"FileFormat", m_muxtype);
+		profile.ReadString(IDS_R_CAPTURE, L"FileName", m_file);
+		profile.ReadInt(IDS_R_CAPTURE, L"SepAudio", m_fSepAudio);
 
 		CString dir = m_file.Left(m_file.ReverseFind('\\'));
 		// Overwrite m_file if it isn't a valid path
