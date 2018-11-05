@@ -15569,7 +15569,7 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 {
 	CAppSettings& s = AfxGetAppSettings();
 
-	s.m_VRSettings.bSubpicPosRelative	= 0;
+	s.m_VRSettings.iSubpicPosRelative = 0;
 	s.m_VRSettings.SubpicShiftPos = {0, 0};
 
 	{
@@ -15615,7 +15615,7 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 
 				pRTS->Deinit();
 			} else if (clsid == __uuidof(CRenderedHdmvSubtitle) || clsid == __uuidof(CSupSubFile)) {
-				s.m_VRSettings.bSubpicPosRelative = s.subdefstyle.relativeTo;
+				s.m_VRSettings.iSubpicPosRelative = s.subdefstyle.relativeTo;
 			}
 
 			CComQIPtr<ISubRenderOptions> pSRO = m_pCAP;
@@ -15764,7 +15764,7 @@ void CMainFrame::UpdateSubDefaultStyle()
 		}
 	} else if (dynamic_cast<CRenderedHdmvSubtitle*>((ISubStream*)m_pCurrentSubStream)
 			|| dynamic_cast<CSupSubFile*>((ISubStream*)m_pCurrentSubStream)) {
-		s.m_VRSettings.bSubpicPosRelative = s.subdefstyle.relativeTo;
+		s.m_VRSettings.iSubpicPosRelative = s.subdefstyle.relativeTo;
 		InvalidateSubtitle();
 		if (GetMediaState() != State_Running) {
 			m_pCAP->Paint(false);

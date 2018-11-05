@@ -43,9 +43,10 @@ static bool LoadMediaType(CStringW displayName, AM_MEDIA_TYPE** ppmt)
 
 	ZeroMemory(*ppmt, sizeof(AM_MEDIA_TYPE));
 
+	CProfile& profile = AfxGetProfile();
 	BYTE* pData;
 	UINT len;
-	if (AfxGetMyApp()->GetProfileBinary(IDS_R_CAPTURE L"\\" + CString(displayName), L"MediaType", &pData, &len)) {
+	if (profile.ReadBinary(IDS_R_CAPTURE L"\\" + CString(displayName), L"MediaType", &pData, len)) {
 		if ( len != sizeof(AM_MEDIA_TYPE) ) {
 			CoTaskMemFree(*ppmt);
 			delete [] pData;
@@ -59,7 +60,7 @@ static bool LoadMediaType(CStringW displayName, AM_MEDIA_TYPE** ppmt)
 
 		fRet = true;
 
-		if (AfxGetMyApp()->GetProfileBinary(IDS_R_CAPTURE L"\\" + CString(displayName), L"Format", &pData, &len)) {
+		if (profile.ReadBinary(IDS_R_CAPTURE L"\\" + CString(displayName), L"Format", &pData, len)) {
 			if ( !len ) {
 				delete [] pData;
 				return fRet;
@@ -95,7 +96,8 @@ static void LoadDefaultCodec(std::vector<Codec>& codecs, CComboBox& box, const G
 		return;
 	}
 
-	CString displayName = AfxGetMyApp()->GetProfileString(IDS_R_CAPTURE L"\\" + CStringFromGUID(cat), L"DisplayName");
+	CString displayName;
+	AfxGetProfile().ReadString(IDS_R_CAPTURE L"\\" + CStringFromGUID(cat), L"DisplayName", displayName);
 
 	for (int i = 0; i < len; i++) {
 		int iSel = (int)box.GetItemData(i);
