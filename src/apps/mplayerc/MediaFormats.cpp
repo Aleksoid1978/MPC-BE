@@ -67,7 +67,9 @@ void CMediaFormatCategory::UpdateData(const bool& bSave)
 	if (bSave) {
 		AfxGetProfile().WriteString(IDS_R_FILEFORMATS, m_label, GetExts());
 	} else {
-		SetExts(AfxGetMyApp()->GetProfileString(IDS_R_FILEFORMATS, m_label, GetExts()));
+		CString exts = GetExts();
+		AfxGetProfile().ReadString(IDS_R_FILEFORMATS, m_label, exts);
+		SetExts(exts);
 	}
 }
 
