@@ -962,7 +962,7 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 		if (bi.iImage == 12) {
 			m_strTipText = ResStr(ID_VOLUME_MUTE);
 		} else if (bi.iImage == 13) {
-			m_strTipText = ResStr(ID_VOLUME_MUTE_ON);
+			m_strTipText = ResStr(ID_VOLUME_MUTE_OFF);
 		} else if (bi.iImage == 14) {
 			m_strTipText = ResStr(ID_VOLUME_MUTE_DISABLED);
 		}
