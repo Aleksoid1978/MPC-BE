@@ -146,6 +146,7 @@ public:
 	class CPlaylist : public std::vector<PlaylistItem> {
 	public:
 		__int64 m_mpls_size = 0;
+		unsigned m_max_video_res = 0u;
 	};
 
 	typedef std::vector<PlaylistChapter> CPlaylistChapter;
@@ -199,5 +200,5 @@ private :
 	HRESULT CloseFile(HRESULT hr);
 
 	HRESULT ReadStreamInfo();
-	HRESULT ReadSTNInfo(BOOL bFullInfoRead);
+	HRESULT ReadSTNInfo();
 };

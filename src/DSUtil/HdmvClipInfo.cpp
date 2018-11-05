@@ -412,6 +412,12 @@ HRESULT CHdmvClipInfo::ReadStreamInfo()
 	len = ReadByte();
 	GetPos(Pos);
 
+	for (const auto& stream : stn.m_Streams) {
+		if (s.m_PID == stream.m_PID) {
+			return SetPos(Pos + len) ? S_OK : E_FAIL;
+		}
+	}
+
 	s.m_Type = (PES_STREAM_TYPE)ReadByte();
 	switch (s.m_Type) {
 		case VIDEO_STREAM_MPEG1:
@@ -458,10 +464,8 @@ HRESULT CHdmvClipInfo::ReadStreamInfo()
 	return SetPos(Pos + len) ? S_OK : E_FAIL;
 }
 
-HRESULT CHdmvClipInfo::ReadSTNInfo(BOOL bFullInfoRead)
+HRESULT CHdmvClipInfo::ReadSTNInfo()
 {
-	stn.m_Streams.clear();
-
 	ReadShort(); // length
 	ReadShort(); // reserved_for_future_use
 
@@ -474,10 +478,6 @@ HRESULT CHdmvClipInfo::ReadSTNInfo(BOOL bFullInfoRead)
 	stn.num_pip_pg          = ReadByte(); // number of Presentation Graphic Streams
 
 	Skip(5); // reserved_for_future_use
-
-	if (!bFullInfoRead) {
-		return S_OK;
-	}
 
 	for (BYTE i = 0; i < stn.num_video; i++) {
 		if (FAILED(ReadStreamInfo())) {
@@ -553,6 +553,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 	rtDuration = 0;
 
 	m_Streams.clear();
+	stn.m_Streams.clear();
 
 	// Get BDMV folder
 	Path.RemoveFileSpec();
@@ -739,7 +740,7 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			}
 
 			// stn
-			ReadSTNInfo(bFullInfoRead);
+			ReadSTNInfo();
 
 			Item.m_num_video = stn.num_video;
 			Item.m_num_streams = stn.num_video + stn.num_audio + stn.num_pg + stn.num_pip_pg;
@@ -897,6 +898,33 @@ HRESULT CHdmvClipInfo::ReadPlaylist(CString strPlaylistFile, REFERENCE_TIME& rtD
 			}
 		}
 
+		if (!stn.m_Streams.empty()) {
+			for (const auto& stream : stn.m_Streams) {
+				switch (stream.m_VideoFormat) {
+					case BDVM_VideoFormat_480i:
+					case BDVM_VideoFormat_480p:
+						Playlist.m_max_video_res = std::max(Playlist.m_max_video_res, 480u);
+						break;
+					case BDVM_VideoFormat_576i:
+					case BDVM_VideoFormat_576p:
+						Playlist.m_max_video_res = std::max(Playlist.m_max_video_res, 576u);
+						break;
+					case BDVM_VideoFormat_720p:
+						Playlist.m_max_video_res = std::max(Playlist.m_max_video_res, 720u);
+						break;
+					case BDVM_VideoFormat_1080i:
+					case BDVM_VideoFormat_1080p:
+						Playlist.m_max_video_res = std::max(Playlist.m_max_video_res, 1080u);
+						break;
+					case BDVM_VideoFormat_2160p:
+						Playlist.m_max_video_res = std::max(Playlist.m_max_video_res, 2160u);
+						break;
+					default:
+						break;
+				}
+			}
+		}
+
 		return Playlist.empty() ? E_FAIL : bDuplicate ? S_FALSE : S_OK;
 	}
 
@@ -986,22 +1014,23 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile
 	WIN32_FIND_DATA fd = {0};
 	HANDLE hFind = FindFirstFileW(strPath + L"\\PLAYLIST\\*.mpls", &fd);
 	if (hFind != INVALID_HANDLE_VALUE) {
-		CPlaylist              Playlist;
 		std::vector<CPlaylist> PlaylistArray;
 		REFERENCE_TIME rtMax = 0;
 		REFERENCE_TIME rtCurrent;
 		CString        strCurrentPlaylist;
 		__int64        mpls_size_max = 0;
+		unsigned       max_video_res = 0;
 		do {
+			CPlaylist Playlist;
 			strCurrentPlaylist = strPath + L"\\PLAYLIST\\" + fd.cFileName;
-			Playlist.clear();
-
 			// Main movie shouldn't have duplicate M2TS filename ...
 			if (ReadPlaylist(strCurrentPlaylist, rtCurrent, Playlist) == S_OK) {
-				if (rtCurrent > rtMax
-						|| (rtCurrent == rtMax && Playlist.m_mpls_size > mpls_size_max)) {
-					rtMax			= rtCurrent;
+				if ((rtCurrent > rtMax && Playlist.m_max_video_res >= max_video_res)
+						|| (rtCurrent == rtMax && Playlist.m_mpls_size > mpls_size_max)
+						|| ((rtCurrent < rtMax && rtCurrent >= rtMax / 2) && Playlist.m_max_video_res > max_video_res)) {
+					rtMax           = rtCurrent;
 					mpls_size_max   = Playlist.m_mpls_size;
+					max_video_res   = Playlist.m_max_video_res;
 					MainPlaylist    = Playlist;
 					strPlaylistFile = strCurrentPlaylist;
 					hr = S_OK;
