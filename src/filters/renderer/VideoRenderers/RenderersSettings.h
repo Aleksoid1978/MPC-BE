@@ -161,7 +161,7 @@ public:
 	int		iColorManagementIntent;
 
 	// subtitles
-	int		bSubpicPosRelative; // not saved
+	int		iSubpicPosRelative; // not saved
 	CPoint	SubpicShiftPos;     // not saved
 	int		nSubpicCount;
 	int		iSubpicMaxTexWidth;

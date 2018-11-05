@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2017 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,10 +34,10 @@ CGoToDlg::CGoToDlg(REFERENCE_TIME time, REFERENCE_TIME maxTime, double fps, CWnd
 	, m_fps(fps)
 {
 	if (m_fps == 0) {
-		CString str = AfxGetMyApp()->GetProfileString(IDS_R_SETTINGS, IDS_RS_GOTO_FPS, L"0");
-		float fps;
+		CString str = L"0";
+		AfxGetProfile().ReadString(IDS_R_SETTINGS, IDS_RS_GOTO_FPS, str);
 
-		if (swscanf_s(str, L"%f", &fps) == 1) {
+		if (float fps; swscanf_s(str, L"%f", &fps) == 1) {
 			m_fps = fps;
 		}
 	}
@@ -89,13 +89,15 @@ BOOL CGoToDlg::OnInitDialog()
 
 		UpdateData(FALSE);
 
-		switch (AfxGetMyApp()->GetProfileInt(IDS_R_SETTINGS, IDS_RS_GOTO_LAST_USED, 0)) {
+		int gtlu = TYPE_TIME;
+		AfxGetProfile().ReadInt(IDS_R_SETTINGS, IDS_RS_GOTO_LAST_USED, gtlu);
+		switch (gtlu) {
 			default:
-			case 0:
+			case TYPE_TIME:
 				m_timeedit.SetFocus();
 				m_timeedit.SetSel(0, 0);
 				break;
-			case 1:
+			case TYPE_FRAME:
 				m_frameedit.SetFocus();
 				m_frameedit.SetSel(0, m_framestr.Find(','));
 				break;

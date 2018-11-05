@@ -318,7 +318,8 @@ BOOL CSubtitleDlDlg::OnInitDialog()
 	int n, curPos = 0;
 	std::vector<int> columnWidth;
 
-	CString strColumnWidth = AfxGetMyApp()->GetProfileString(IDS_R_DLG_SUBTITLEDL, IDS_RS_DLG_SUBTITLEDL_COLWIDTH);
+	CString strColumnWidth;
+	AfxGetProfile().ReadString(IDS_R_DLG_SUBTITLEDL, IDS_RS_DLG_SUBTITLEDL_COLWIDTH, strColumnWidth);
 	CString token = strColumnWidth.Tokenize(L",", curPos);
 
 	while (!token.IsEmpty()) {

@@ -114,7 +114,7 @@ void CRenderersSettings::SetDefault()
 	iColorManagementAmbientLight	= AMBIENT_LIGHT_BRIGHT;
 	iColorManagementIntent			= COLOR_RENDERING_INTENT_PERCEPTUAL;
 
-	bSubpicPosRelative				= 0;
+	iSubpicPosRelative				= 0;
 	SubpicShiftPos.SetPoint(0, 0);
 	nSubpicCount					= RS_SPCSIZE_DEF;
 	iSubpicMaxTexWidth				= 1280;
@@ -131,76 +131,71 @@ void CRenderersSettings::SetDefault()
 
 void CRenderersSettings::Load()
 {
-	CMPlayerCApp* pApp = AfxGetMyApp();
+	CProfile& profile = AfxGetProfile();
 
-#define GET_OPTION_INT(value, name) value = pApp->GetProfileInt(IDS_R_VIDEO, name, value)
-#define GET_OPTION_BOOL(value, name) value = !!pApp->GetProfileInt(IDS_R_VIDEO, name, value)
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_VIDEORENDERER, iVideoRenderer);
 
-	GET_OPTION_INT(iVideoRenderer, IDS_RS_VIDEORENDERER);
+	profile.ReadString(IDS_R_VIDEO, IDS_RS_RENDERDEVICE, sD3DRenderDevice);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_RESETDEVICE, bResetDevice);
 
-	sD3DRenderDevice = pApp->GetProfileString(IDS_R_VIDEO, IDS_RS_RENDERDEVICE);
-	GET_OPTION_BOOL(bResetDevice, IDS_RS_RESETDEVICE);
-
-	iSurfaceFormat = (D3DFORMAT)pApp->GetProfileInt(IDS_R_VIDEO, IDS_RS_SURFACEFORMAT, iSurfaceFormat);
-	if (iSurfaceFormat == D3DFMT_A32B32G32R32F) { // is no longer supported, because it is very redundant.
+	int val;
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SURFACEFORMAT, val);
+	if (val == D3DFMT_A32B32G32R32F) { // is no longer supported, because it is very redundant.
 		iSurfaceFormat = D3DFMT_A16B16G16R16F;
 	} else {
-		iSurfaceFormat = discard(iSurfaceFormat, D3DFMT_X8R8G8B8, { D3DFMT_A2R10G10B10 , D3DFMT_A16B16G16R16F });
+		iSurfaceFormat = discard((D3DFORMAT)val, D3DFMT_X8R8G8B8, { D3DFMT_A2R10G10B10 , D3DFMT_A16B16G16R16F });
 	}
 
-	GET_OPTION_BOOL(b10BitOutput, IDS_RS_OUTPUT10BIT);
-	GET_OPTION_INT(iResizer, IDS_RS_RESIZER);
-	GET_OPTION_INT(iDownscaler, IDS_RS_DOWNSCALER);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_OUTPUT10BIT, b10BitOutput);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_RESIZER, iResizer);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_DOWNSCALER, iDownscaler);
 
-	GET_OPTION_BOOL(bVSync, IDS_RS_VSYNC);
-	GET_OPTION_BOOL(bVSyncAccurate, IDS_RS_VSYNC_ACCURATE);
-	GET_OPTION_BOOL(bAlterativeVSync, IDS_RS_VSYNC_ALTERNATE);
-	GET_OPTION_INT(iVSyncOffset, IDS_RS_VSYNC_OFFSET);
-	GET_OPTION_BOOL(bDisableDesktopComposition, IDS_RS_DISABLEDESKCOMP);
-	GET_OPTION_BOOL(bEVRFrameTimeCorrection, IDS_RS_FRAMETIMECORRECTION);
-	GET_OPTION_BOOL(bFlushGPUBeforeVSync, IDS_RS_FLUSHGPUBEFOREVSYNC);
-	GET_OPTION_BOOL(bFlushGPUAfterPresent, IDS_RS_FLUSHGPUAFTERPRESENT);
-	GET_OPTION_BOOL(bFlushGPUWait, IDS_RS_FLUSHGPUWAIT);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VSYNC, bVSync);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VSYNC_ACCURATE, bVSyncAccurate);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VSYNC_ALTERNATE, bAlterativeVSync);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_VSYNC_OFFSET, iVSyncOffset);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_DISABLEDESKCOMP, bDisableDesktopComposition);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FRAMETIMECORRECTION, bEVRFrameTimeCorrection);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUBEFOREVSYNC, bFlushGPUBeforeVSync);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUAFTERPRESENT, bFlushGPUAfterPresent);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUWAIT, bFlushGPUWait);
 
-	GET_OPTION_BOOL(bVMRMixerMode, IDS_RS_VMR_MIXERMODE);
-	GET_OPTION_BOOL(bVMRMixerYUV, IDS_RS_VMR_MIXERYUV);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VMR_MIXERMODE, bVMRMixerMode);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VMR_MIXERYUV, bVMRMixerYUV);
 
-	GET_OPTION_INT(iEVROutputRange, IDS_RS_EVR_OUTPUTRANGE);
-	GET_OPTION_INT(nEVRBuffers, IDS_RS_EVR_BUFFERS);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_EVR_OUTPUTRANGE, iEVROutputRange);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_EVR_BUFFERS, nEVRBuffers);
 
-	GET_OPTION_INT(iSynchronizeMode, IDS_RS_SYNC_MODE);
-	GET_OPTION_INT(iLineDelta, IDS_RS_SYNC_LINEDELTA);
-	GET_OPTION_INT(iColumnDelta, IDS_RS_SYNC_COLUMNDELTA);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SYNC_MODE, iSynchronizeMode);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SYNC_LINEDELTA, iLineDelta);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SYNC_COLUMNDELTA, iColumnDelta);
 	double* dPtr;
 	UINT dSize;
-	if (pApp->GetProfileBinary(IDS_R_VIDEO, IDS_RS_SYNC_CYCLEDELTA, (LPBYTE*)&dPtr, &dSize) && dSize == 8) {
+	if (profile.ReadBinary(IDS_R_VIDEO, IDS_RS_SYNC_CYCLEDELTA, (BYTE**)&dPtr, dSize) && dSize == 8) {
 		dCycleDelta = *dPtr;
 		delete[] dPtr;
 	}
-	if (pApp->GetProfileBinary(IDS_R_VIDEO, IDS_RS_SYNC_TARGETOFFSET, (LPBYTE*)&dPtr, &dSize) && dSize == 8) {
+	if (profile.ReadBinary(IDS_R_VIDEO, IDS_RS_SYNC_TARGETOFFSET, (BYTE**)&dPtr, dSize) && dSize == 8) {
 		dTargetSyncOffset = *dPtr;
 		delete[] dPtr;
 	}
-	if (pApp->GetProfileBinary(IDS_R_VIDEO, IDS_RS_SYNC_CONTROLLIMIT, (LPBYTE*)&dPtr, &dSize) && dSize == 8) {
+	if (profile.ReadBinary(IDS_R_VIDEO, IDS_RS_SYNC_CONTROLLIMIT, (BYTE**)&dPtr, dSize) && dSize == 8) {
 		dControlLimit = *dPtr;
 		delete[] dPtr;
 	}
 
-	GET_OPTION_BOOL(bColorManagementEnable, IDS_RS_COLMAN);
-	GET_OPTION_INT(iColorManagementInput, IDS_RS_COLMAN_INPUT);
-	GET_OPTION_INT(iColorManagementAmbientLight, IDS_RS_COLMAN_AMBIENTLIGHT);
-	GET_OPTION_INT(iColorManagementIntent, IDS_RS_COLMAN_INTENT);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_COLMAN, bColorManagementEnable);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLMAN_INPUT, iColorManagementInput);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLMAN_AMBIENTLIGHT, iColorManagementAmbientLight);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLMAN_INTENT, iColorManagementIntent);
 
-	GET_OPTION_INT(nSubpicCount, IDS_RS_SUBPIC_COUNT);
-	GET_OPTION_INT(iSubpicMaxTexWidth, IDS_RS_SUBPIC_MAXTEXWIDTH);
-	GET_OPTION_BOOL(bSubpicAnimationWhenBuffering, IDS_RS_SUBPIC_ANIMBUFFERING);
-	GET_OPTION_BOOL(bSubpicAllowDrop, IDS_RS_SUBPIC_ALLOWDROP);
-	GET_OPTION_INT(iSubpicStereoMode, IDS_RS_SUBPIC_STEREOMODE);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SUBPIC_COUNT, nSubpicCount);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SUBPIC_MAXTEXWIDTH, iSubpicMaxTexWidth);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_SUBPIC_ANIMBUFFERING, bSubpicAnimationWhenBuffering);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_SUBPIC_ALLOWDROP, bSubpicAllowDrop);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SUBPIC_STEREOMODE, iSubpicStereoMode);
 
-	bSubpicPosRelative = false;
-
-#undef GET_OPTION_INT
-#undef GET_OPTION_BOOL
+	iSubpicPosRelative = 0;
 }
 
 void CRenderersSettings::Save()
