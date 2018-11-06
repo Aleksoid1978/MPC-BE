@@ -730,8 +730,6 @@ void CAppSettings::ResetSettings()
 	iDlgPropX = 0;
 	iDlgPropY = 0;
 
-	m_Formats.UpdateData(false);
-
 	// Internal filters
 	for (int f = 0; f < SRC_LAST; f++) {
 		SrcFilters[f] = 1;
