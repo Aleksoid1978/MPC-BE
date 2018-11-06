@@ -119,8 +119,8 @@ private:
 	}
 	BOOL WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszValue) override
 	{
-		if (!lpszEntry) {
-			if (!lpszSection) {
+		if (!lpszValue) {
+			if (!lpszEntry) {
 				return m_Profile.DeleteSection(lpszSection);
 			}
 			return m_Profile.DeleteValue(lpszSection, lpszEntry);
