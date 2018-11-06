@@ -582,12 +582,12 @@ public:
 	bool			bGlobalMedia;
 
 	// Logo
-	UINT			nLogoId;
+	int				nLogoId;
 	bool			bLogoExternal;
 	CString			strLogoFileName;
 
 	// Web Inteface
-	BOOL			fEnableWebServer;
+	bool			fEnableWebServer;
 	int				nWebServerPort;
 	int				nWebServerQuality;
 	int				nCmdlnWebServerPort;
@@ -679,7 +679,7 @@ public:
 	bool			fBDAUseOffset;
 	int				iBDAOffset;
 	bool			fBDAIgnoreEncryptedChannels;
-	UINT			nDVBLastChannel;
+	int				nDVBLastChannel;
 	std::list<CDVBChannel> m_DVBChannels;
 
 	// Internal Filters
@@ -896,6 +896,7 @@ private :
 public:
 	CAppSettings();
 	virtual ~CAppSettings();
+	void			ResetSettings();
 	void			LoadSettings(bool bForce = false);
 	void			SaveSettings();
 	void			SaveExternalFilters();

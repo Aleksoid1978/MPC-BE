@@ -56,7 +56,9 @@ void CFiltersPrioritySettings::LoadSettings()
 	SetDefault();
 
 	for (auto& [format, guid] : values) {
-		guid = GUIDFromCString(AfxGetMyApp()->GetProfileString(IDS_R_FILTERS_PRIORITY, format, CStringFromGUID(guid)));
+		CString str = CStringFromGUID(guid);
+		AfxGetProfile().ReadString(IDS_R_FILTERS_PRIORITY, format, str);
+		guid = GUIDFromCString(str);
 	}
 };
 
@@ -74,6 +76,8 @@ CAppSettings::CAppSettings()
 	, bResetSettings(false)
 	, bSubSaveExternalStyleFile(false)
 {
+	ResetSettings();
+
 	// Internal source filters
 	SrcFiltersKeys[SRC_AMR]					= L"src_amr";
 	SrcFiltersKeys[SRC_AVI]					= L"src_avi";
@@ -104,7 +108,7 @@ CAppSettings::CAppSettings()
 	SrcFiltersKeys[SRC_WAV]					= L"src_wav";
 	SrcFiltersKeys[SRC_WAVPACK]				= L"src_wavpack";
 	SrcFiltersKeys[SRC_UDP]					= L"src_udp";
-	SrcFiltersKeys[SRC_DVR]					= L"SRC_DVR";
+	SrcFiltersKeys[SRC_DVR]					= L"src_dvr";
 
 	// Internal DXVA decoders
 	DXVAFiltersKeys[VDEC_DXVA_H264]			= L"vdec_dxva_h264";
@@ -537,11 +541,343 @@ CString CAppSettings::SerializeHex(BYTE* pBuffer, int nBufSize) const
 	return strResult;
 }
 
+void CAppSettings::ResetSettings()
+{
+	iLanguage = -1;
+
+	iCaptionMenuMode = MODE_SHOWCAPTIONMENU;
+	fHideNavigation = false;
+	nCS = CS_SEEKBAR | CS_TOOLBAR | CS_STATUSBAR;
+
+	iDefaultVideoSize = DVS_FROMINSIDE;
+	bNoSmallUpscale = false;
+	bNoSmallDownscale = false;
+	fKeepAspectRatio = true;
+	fCompMonDeskARDiff = false;
+
+	nVolume = 100;
+	nBalance = 0;
+	fMute = false;
+	nLoops = 1;
+	fLoopForever = false;
+	fRewind = false;
+	iZoomLevel = 1;
+	nAutoFitFactor = 50;
+	nVolumeStep = 5;
+	nSpeedStep = 0; // auto
+
+	strAudioRendererDisplayName.Empty();
+	strSecondAudioRendererDisplayName.Empty();
+	fDualAudioOutput = false;
+
+	fAutoloadAudio = true;
+	fPrioritizeExternalAudio = false;
+	strAudioPaths = DEFAULT_AUDIO_PATHS;
+
+	iSubtitleRenderer = SUBRNDT_ISR;
+	strSubtitlesLanguageOrder.Empty();
+	strAudiosLanguageOrder.Empty();
+	fUseInternalSelectTrackLogic = true;
+
+	nAudioWindowMode = 1;
+	bAddSimilarFiles = false;
+	fEnableWorkerThreadForOpening = true;
+	fReportFailedPins = true;
+
+	iMultipleInst = 1;
+	iTitleBarTextStyle = TEXTBAR_FILENAME;
+	iSeekBarTextStyle = TEXTBAR_TITLE;
+
+	iOnTop = 0;
+	bTrayIcon = false;
+	bRememberZoomLevel = false;
+	fShowBarsWhenFullScreen = true;
+	nShowBarsWhenFullScreenTimeOut = 0;
+
+	//Multi-monitor code
+	strFullScreenMonitor.Empty();
+	// DeviceID
+	strFullScreenMonitorID.Empty();
+	iDMChangeDelay = 0;
+
+	// Prevent Minimize when in Fullscreen mode on non default monitor
+	fPreventMinimize = false;
+
+	bPauseMinimizedVideo = false;
+
+	fUseWin7TaskBar = true;
+
+	fExitAfterPlayback = false;
+	bCloseFileAfterPlayback = false;
+	fNextInDirAfterPlayback = false;
+	fNextInDirAfterPlaybackLooped = false;
+	fDontUseSearchInFolder = false;
+
+	fUseTimeTooltip = true;
+	nTimeTooltipPosition = TIME_TOOLTIP_ABOVE_SEEKBAR;
+	nOSDSize = 18;
+	strOSDFont = L"Segoe UI";
+
+	// Associated types with icon or not...
+	bAssociatedWithIcons = true;
+	// file/dir context menu
+	bSetContextFiles = false;
+	bSetContextDir = false;
+
+	// Last Open Dir
+	strLastOpenDir = L"C:\\";
+	// Last Saved Playlist Dir
+	strLastSavedPlaylistDir = L"C:\\";
+
+	ZeroMemory(&AutoChangeFullscrRes, sizeof(AChFR));
+	ZeroMemory(&AccelTblColWidth, sizeof(AccelTbl));
+
+	fExitFullScreenAtTheEnd = true;
+	fExitFullScreenAtFocusLost = false;
+	fRestoreResAfterExit = true;
+	bRememberWindowPos = false;
+	bRememberWindowSize = false;
+	bSavePnSZoom = false;
+	dZoomX = 1.0;
+	dZoomY = 1.0;
+
+	bSnapToDesktopEdges = false;
+	sizeAspectRatio.cx = 0;
+	sizeAspectRatio.cy = 0;
+	bKeepHistory = true;
+
+	rcLastWindowPos.SetRectEmpty();
+	bRememberWindowPos = false;
+	nLastWindowType = SIZE_RESTORED;
+
+	bShufflePlaylistItems = false;
+	bRememberPlaylistItems = true;
+	bHidePlaylistFullScreen = false;
+	bFavRememberPos = true;
+	bFavRelativeDrive = false;
+
+	strDVDPath.Empty();
+	bUseDVDPath = false;
+
+	LANGID langID = GetUserDefaultUILanguage();
+	idMenuLang = langID;
+	idAudioLang = langID;
+	idSubtitlesLang = langID;
+
+	bClosedCaptions = false;
+
+	subdefstyle.SetDefault();
+	subdefstyle.relativeTo = 1;
+	fOverridePlacement = false;
+	nHorPos = 50;
+	nVerPos = 90;
+	nSubDelayInterval = 500;
+
+	fEnableSubtitles = true;
+	fForcedSubtitles = false;
+	fPrioritizeExternalSubtitles = true;
+	fDisableInternalSubtitles = false;
+	fAutoReloadExtSubtitles = false;
+	fUseSybresync = false;
+	strSubtitlePaths = DEFAULT_SUBTITLE_PATHS;
+
+	fUseDefaultSubtitlesStyle = false;
+	bAudioTimeShift = false;
+	iAudioTimeShift = 0;
+
+	iBufferDuration = APP_BUFDURATION_DEF;
+
+	bAudioMixer = false;
+	nAudioMixerLayout = SPK_STEREO;
+	bAudioStereoFromDecoder = false;
+	bAudioBassRedirect = false;
+	dAudioCenter_dB = 0.0;
+	dAudioSurround_dB = 0.0;
+	dAudioGain_dB = 0.0;
+	bAudioAutoVolumeControl = false;
+	bAudioNormBoost = true;
+	iAudioNormLevel = 75;
+	iAudioNormRealeaseTime = 8;
+	iAudioSampleFormats = SFMT_MASK;
+
+	m_filters.RemoveAll();
+
+	strWinLircAddr = L"127.0.0.1:8765";
+	bWinLirc = false;
+	strUIceAddr = L"127.0.0.1:1234";
+	bUIce = false;
+	bGlobalMedia = true;
+
+	bUseDarkTheme = true;
+	nThemeBrightness = 15;
+	nThemeRed = 256;
+	nThemeGreen = 256;
+	nThemeBlue = 256;
+	nOSDTransparent = 100;
+	nOSDBorder = 1;
+
+	clrFaceABGR = 0x00ffffff;
+	clrOutlineABGR = 0x00868686;
+	clrFontABGR = 0x00E0E0E0;
+	clrGrad1ABGR = 0x00302820;
+	clrGrad2ABGR = 0x00302820;
+
+	nJumpDistS = DEFAULT_JUMPDISTANCE_1;
+	nJumpDistM = DEFAULT_JUMPDISTANCE_2;
+	nJumpDistL = DEFAULT_JUMPDISTANCE_3;
+	bLimitWindowProportions = false;
+
+	iDlgPropX = 0;
+	iDlgPropY = 0;
+
+	m_Formats.UpdateData(false);
+
+	// Internal filters
+	for (int f = 0; f < SRC_LAST; f++) {
+		SrcFilters[f] = 1;
+	}
+	for (int f = 0; f < VDEC_DXVA_LAST; f++) {
+		DXVAFilters[f] = 1;
+	}
+	for (int f = 0; f < VDEC_LAST; f++) {
+		VideoFilters[f] = (f == VDEC_H264_MVC) ? 0 : 1;
+	}
+	for (int f = 0; f < ADEC_LAST; f++) {
+		AudioFilters[f] = 1;
+	}
+
+	strLogoFileName.Empty();
+	nLogoId = DEF_LOGO;
+	bLogoExternal = false;
+
+	bHideCDROMsSubMenu = false;
+
+	dwPriority = NORMAL_PRIORITY_CLASS;
+	fLaunchfullscreen = false;
+
+	fEnableWebServer = false;
+	nWebServerPort = APP_WEBSRVPORT_DEF;
+	nWebServerQuality = APP_WEBSRVQUALITY_DEF;
+	fWebServerPrintDebugInfo = false;
+	fWebServerUseCompression = true;
+	fWebServerLocalhostOnly = false;
+	strWebRoot = L"*./webroot";
+	strWebDefIndex = L"index.html;index.php";
+	strWebServerCGI.Empty();
+
+	CString MyPictures;
+	WCHAR szPath[MAX_PATH] = { 0 };
+	if (SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_MYPICTURES, nullptr, 0, szPath))) {
+		MyPictures = CString(szPath) + L"\\";
+	}
+
+	strSnapShotPath = MyPictures;
+	strSnapShotExt = L".jpg";
+	bSnapShotSubtitles = false;
+
+	iThumbRows = 4;
+	iThumbCols = 4;
+	iThumbWidth = 1024;
+	iThumbQuality = 85;
+	iThumbLevelPNG = 7;
+
+	bSubSaveExternalStyleFile = false;
+
+	strISDb = L"www.opensubtitles.org/isdb";
+
+	nLastUsedPage = 0;
+
+	fD3DFullscreen = false;
+	//fMonitorAutoRefreshRate = false;
+	iStereo3DMode = STEREO3D_AUTO;
+	bStereo3DSwapLR = false;
+
+	iBrightness = 0;
+	iContrast = 0;
+	iHue = 0;
+	iSaturation = 0;
+
+	ShaderList.clear();
+	ShaderListScreenSpace.clear();
+	bToggleShader = false;
+	bToggleShaderScreenSpace = false;
+
+	iShowOSD = OSD_ENABLE;
+	fFastSeek = true;
+	fMiniDump = false;
+	CMiniDump::SetState(fMiniDump);
+
+	fLCDSupport = false;
+	fSmartSeek = false;
+	iSmartSeekSize = 15;
+	fChapterMarker = false;
+	fFlybar = true;
+	fFlybarOnTop = false;
+	fFontShadow = false;
+	fFontAA = true;
+
+	// Save analog capture settings
+	iDefaultCaptureDevice = 0;
+	strAnalogVideo = L"dummy";
+	strAnalogAudio = L"dummy";
+	iAnalogCountry = 1;
+
+	strBDANetworkProvider.Empty();
+	strBDATuner.Empty();
+	strBDAReceiver.Empty();
+	//sBDAStandard.Empty();
+	iBDAScanFreqStart = 474000;
+	iBDAScanFreqEnd = 858000;
+	iBDABandwidth = 8;
+	fBDAUseOffset = false;
+	iBDAOffset = 166;
+	nDVBLastChannel = 1;
+	fBDAIgnoreEncryptedChannels = false;
+
+	m_DVBChannels.clear();
+
+	// playback positions for last played DVDs
+	bRememberDVDPos = false;
+	nCurrentDvdPosition = -1;
+	memset(DvdPosition, 0, sizeof(DvdPosition));
+
+	// playback positions for last played files
+	bRememberFilePos = false;
+	nCurrentFilePosition = -1;
+
+	bStartMainTitle = false;
+	bNormalStartDVD = true;
+
+	fRemainingTime = false;
+
+	strLastOpenFilterDir.Empty();
+
+	bYoutubePageParser = true;
+	YoutubeFormat.fmt = 0;
+	YoutubeFormat.res = 720;
+	YoutubeFormat.fps60 = false;
+	YoutubeFormat.hdr = false;
+	bYoutubeLoadPlaylist = false;
+
+	iYDLMaxHeight = 720;
+
+	nLastFileInfoPage = 0;
+
+	bUpdaterAutoCheck = false;
+	nUpdaterDelay = 7;
+
+	tUpdaterLastCheck = 0;
+
+	bOSDRemainingTime = false;
+	bPasteClipboardURL = false;
+}
+
 void CAppSettings::LoadSettings(bool bForce/* = false*/)
 {
 	CMPlayerCApp* pApp = AfxGetMyApp();
 	ASSERT(pApp);
 	CProfile& profile = AfxGetProfile();
+	CString tmpstr;
 
 	UINT len;
 	BYTE* ptr = nullptr;
@@ -551,8 +887,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 
 	// Set interface language first!
-	CString langcode = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LANGUAGE);
-	iLanguage = CMPlayerCApp::GetLanguageIndex(langcode);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LANGUAGE, tmpstr);
+	iLanguage = CMPlayerCApp::GetLanguageIndex(tmpstr);
 	if (iLanguage < 0) {
 		iLanguage = CMPlayerCApp::GetDefLanguage();
 	}
@@ -560,101 +896,96 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	FiltersPrioritySettings.LoadSettings();
 
-	iCaptionMenuMode = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, MODE_SHOWCAPTIONMENU);
-	fHideNavigation = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_HIDENAVIGATION, 0);
-	nCS = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CONTROLSTATE, CS_SEEKBAR|CS_TOOLBAR|CS_STATUSBAR);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, iCaptionMenuMode);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_HIDENAVIGATION, fHideNavigation);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_CONTROLSTATE, *(int*)&nCS);
 
-	iDefaultVideoSize = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DEFAULTVIDEOFRAME, DVS_FROMINSIDE);
-	bNoSmallUpscale = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_NOSMALLUPSCALE, FALSE);
-	bNoSmallDownscale = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_NOSMALLDOWNSCALE, FALSE);
-	fKeepAspectRatio = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_KEEPASPECTRATIO, TRUE);
-	fCompMonDeskARDiff = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_COMPMONDESKARDIFF, FALSE);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_DEFAULTVIDEOFRAME, iDefaultVideoSize);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_NOSMALLUPSCALE, bNoSmallUpscale);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_NOSMALLDOWNSCALE, bNoSmallDownscale);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_KEEPASPECTRATIO, fKeepAspectRatio);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_COMPMONDESKARDIFF, fCompMonDeskARDiff);
 
-	nVolume = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VOLUME, 100);
-	nBalance = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_BALANCE, 0);
-	fMute = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MUTE, 0);
-	nLoops = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LOOPNUM, 1);
-	fLoopForever = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LOOP, 0);
-	fRewind = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REWIND, FALSE);
-	iZoomLevel = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ZOOM, 1);
-	nAutoFitFactor = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOFITFACTOR, 50);
-	nAutoFitFactor = std::clamp(nAutoFitFactor, 20, 80);
-	nVolumeStep = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, 5);
-	nVolumeStep = std::clamp(nVolumeStep, 1, 10);
-	nSpeedStep = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPEED_STEP, 0);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_VOLUME, nVolume);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_BALANCE, nBalance);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MUTE, fMute);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_LOOPNUM, nLoops);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LOOP, fLoopForever);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REWIND, fRewind);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ZOOM, iZoomLevel);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUTOFITFACTOR, nAutoFitFactor, 20, 80);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, nVolumeStep, 1, 10);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SPEED_STEP, nSpeedStep);
 	nSpeedStep = discard(nSpeedStep, 0, { 10, 20, 25, 50, 100 });
 
 	m_VRSettings.Load();
 
-	strAudioRendererDisplayName			= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIORENDERERTYPE);
-	strSecondAudioRendererDisplayName	= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SECONDAUDIORENDERER);
-	fDualAudioOutput					= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DUALAUDIOOUTPUT, FALSE);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_AUDIORENDERERTYPE, strAudioRendererDisplayName);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_SECONDAUDIORENDERER, strSecondAudioRendererDisplayName);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_DUALAUDIOOUTPUT, fDualAudioOutput);
 
-	fAutoloadAudio = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOLOADAUDIO, TRUE);
-	fPrioritizeExternalAudio = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_PRIORITIZEEXTERNALAUDIO, FALSE);
-	strAudioPaths = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOPATHS, DEFAULT_AUDIO_PATHS);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUTOLOADAUDIO, fAutoloadAudio);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_PRIORITIZEEXTERNALAUDIO, fPrioritizeExternalAudio);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_AUDIOPATHS, strAudioPaths);
 
-	iSubtitleRenderer				= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SUBTITLERENDERER, SUBRNDT_ISR);
-	strSubtitlesLanguageOrder		= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SUBTITLESLANGORDER);
-	strAudiosLanguageOrder			= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOSLANGORDER);
-	fUseInternalSelectTrackLogic	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_INTERNALSELECTTRACKLOGIC, TRUE);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SUBTITLERENDERER, iSubtitleRenderer);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_SUBTITLESLANGORDER, strSubtitlesLanguageOrder);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_AUDIOSLANGORDER, strAudiosLanguageOrder);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_INTERNALSELECTTRACKLOGIC, fUseInternalSelectTrackLogic);
 
-	nAudioWindowMode = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOWINDOWMODE, 1);
-	bAddSimilarFiles = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ADDSIMILARFILES, FALSE);
-	fEnableWorkerThreadForOpening = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEWORKERTHREADFOROPENING, TRUE);
-	fReportFailedPins = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REPORTFAILEDPINS, TRUE);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIOWINDOWMODE, nAudioWindowMode);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ADDSIMILARFILES, bAddSimilarFiles);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ENABLEWORKERTHREADFOROPENING, fEnableWorkerThreadForOpening);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REPORTFAILEDPINS, fReportFailedPins);
 
-	iMultipleInst = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, 1);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, iMultipleInst);
 	iMultipleInst = discard(iMultipleInst, 1, 0, 2);
 
-	iTitleBarTextStyle = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXT, TEXTBAR_FILENAME);
-	iTitleBarTextStyle = discard(iTitleBarTextStyle, (int)TEXTBAR_FILENAME, (int)TEXTBAR_EMPTY, (int)TEXTBAR_FULLPATH);
-	iSeekBarTextStyle = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SEEKBARTEXT, TEXTBAR_TITLE);
-	iSeekBarTextStyle = discard(iSeekBarTextStyle, (int)TEXTBAR_TITLE, (int)TEXTBAR_EMPTY, (int)TEXTBAR_FULLPATH);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXT, iTitleBarTextStyle, TEXTBAR_EMPTY, TEXTBAR_FULLPATH);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SEEKBARTEXT, iSeekBarTextStyle, TEXTBAR_EMPTY, TEXTBAR_FULLPATH);
 
-	iOnTop = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ONTOP, 0);
-	bTrayIcon = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TRAYICON, 0);
-	bRememberZoomLevel = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUTOZOOM, 0);
-	fShowBarsWhenFullScreen = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLS, 1);
-	nShowBarsWhenFullScreenTimeOut = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLSTIMEOUT, 0);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ONTOP, iOnTop);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_TRAYICON, bTrayIcon);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUTOZOOM, bRememberZoomLevel);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLS, fShowBarsWhenFullScreen);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLSTIMEOUT, nShowBarsWhenFullScreenTimeOut);
 
 	//Multi-monitor code
-	strFullScreenMonitor = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR, strFullScreenMonitor);
 	// DeviceID
-	strFullScreenMonitorID = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITORID);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITORID, strFullScreenMonitorID);
 
-	iDMChangeDelay = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DISPLAYMODECHANGEDELAY, 0);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_DISPLAYMODECHANGEDELAY, iDMChangeDelay);
 
 	// Prevent Minimize when in Fullscreen mode on non default monitor
-	fPreventMinimize = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_PREVENT_MINIMIZE, 0);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MPC_PREVENT_MINIMIZE, fPreventMinimize);
 
-	bPauseMinimizedVideo = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_PAUSEMINIMIZEDVIDEO, 0);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_PAUSEMINIMIZEDVIDEO, bPauseMinimizedVideo);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MPC_WIN7TASKBAR, fUseWin7TaskBar);
 
-	fUseWin7TaskBar = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_WIN7TASKBAR, 1);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MPC_EXIT_AFTER_PB, fExitAfterPlayback);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MPC_CLOSE_FILE_AFTER_PB, bCloseFileAfterPlayback);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MPC_NEXT_AFTER_PB, fNextInDirAfterPlayback);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MPC_NEXT_AFTER_PB_LOOPED, fNextInDirAfterPlaybackLooped);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MPC_NO_SEARCH_IN_FOLDER, fDontUseSearchInFolder);
 
-	fExitAfterPlayback				= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_EXIT_AFTER_PB, 0);
-	bCloseFileAfterPlayback			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_CLOSE_FILE_AFTER_PB, 0);
-	fNextInDirAfterPlayback			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_NEXT_AFTER_PB, 0);
-	fNextInDirAfterPlaybackLooped	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_NEXT_AFTER_PB_LOOPED, 0);
-	fDontUseSearchInFolder			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MPC_NO_SEARCH_IN_FOLDER, 0);
-
-	fUseTimeTooltip = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USE_TIME_TOOLTIP, TRUE);
-	nTimeTooltipPosition = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TIME_TOOLTIP_POSITION, TIME_TOOLTIP_ABOVE_SEEKBAR);
-	nOSDSize = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_SIZE, 18);
-	strOSDFont= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_OSD_FONT, L"Segoe UI");
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USE_TIME_TOOLTIP, fUseTimeTooltip);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_TIME_TOOLTIP_POSITION, nTimeTooltipPosition);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_SIZE, nOSDSize);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_OSD_FONT, strOSDFont);
 
 	// Associated types with icon or not...
-	bAssociatedWithIcons	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ASSOCIATED_WITH_ICON, 1);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ASSOCIATED_WITH_ICON, bAssociatedWithIcons);
 	// file/dir context menu
-	bSetContextFiles		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CONTEXTFILES, 0);
-	bSetContextDir			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CONTEXTDIR, 0);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_CONTEXTFILES, bSetContextFiles);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_CONTEXTDIR, bSetContextDir);
 
 	// Last Open Dir
-	strLastOpenDir = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_DIR, L"C:\\");
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_DIR, strLastOpenDir);
 	// Last Saved Playlist Dir
-	strLastSavedPlaylistDir = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LAST_SAVED_PLAYLIST_DIR, L"C:\\");
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LAST_SAVED_PLAYLIST_DIR, strLastSavedPlaylistDir);
 
-	if (pApp->GetProfileBinary(IDS_R_SETTINGS, IDS_RS_FULLSCREENRES, &ptr, &len)) {
+	if (profile.ReadBinary(IDS_R_SETTINGS, IDS_RS_FULLSCREENRES, &ptr, len)) {
 		if (len == sizeof(AChFR)) {
 			memcpy(&AutoChangeFullscrRes, ptr, sizeof(AChFR));
 		} else {
@@ -665,7 +996,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		AutoChangeFullscrRes.bEnabled = 0;
 	}
 
-	if (pApp->GetProfileBinary(IDS_R_SETTINGS, L"AccelTblColWidth", &ptr, &len)) {
+	if (profile.ReadBinary(IDS_R_SETTINGS, L"AccelTblColWidth", &ptr, len)) {
 		if (len == sizeof(AccelTbl)) {
 			memcpy(&AccelTblColWidth, ptr, sizeof(AccelTbl));
 		} else {
@@ -676,13 +1007,13 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		AccelTblColWidth.bEnable = false;
 	}
 
-	fExitFullScreenAtTheEnd = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATTHEEND, 1);
-	fExitFullScreenAtFocusLost = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATFOCUSLOST, 0);
-	fRestoreResAfterExit = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_RESTORERESAFTEREXIT, 1);
-	bRememberWindowPos = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWPOS, 0);
-	bRememberWindowSize = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWSIZE, 0);
-	CString str = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM);
-	if (swscanf_s(str, L"%f,%f", &dZoomX, &dZoomY) == 2 &&
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATTHEEND, fExitFullScreenAtTheEnd);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATFOCUSLOST, fExitFullScreenAtFocusLost);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_RESTORERESAFTEREXIT, fRestoreResAfterExit);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWPOS, bRememberWindowPos);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWSIZE, bRememberWindowSize);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM, tmpstr);
+	if (swscanf_s(tmpstr, L"%f,%f", &dZoomX, &dZoomY) == 2 &&
 			dZoomX >= 0.196 && dZoomX <= 3.06 && // 0.196 = 0.2 / 1.02
 			dZoomY >= 0.196 && dZoomY <= 3.06) { // 3.06 = 3 * 1.02
 		bSavePnSZoom = true;
@@ -691,16 +1022,15 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		dZoomX = 1.0;
 		dZoomY = 1.0;
 	}
-	bSnapToDesktopEdges = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SNAPTODESKTOPEDGES, 0);
-	sizeAspectRatio.cx = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_X, 0);
-	sizeAspectRatio.cy = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_Y, 0);
-	bKeepHistory = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, 1);
-	iRecentFilesNumber = (int)pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, APP_RECENTFILES_DEF);
-	iRecentFilesNumber = std::clamp(iRecentFilesNumber, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SNAPTODESKTOPEDGES, bSnapToDesktopEdges);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_X, *(int*)&sizeAspectRatio.cx);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_Y, *(int*)&sizeAspectRatio.cy);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, bKeepHistory);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, iRecentFilesNumber, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
 	MRU.SetSize(iRecentFilesNumber);
 	MRUDub.SetSize(iRecentFilesNumber);
 
-	if (pApp->GetProfileBinary(IDS_R_SETTINGS, IDS_RS_LASTWINDOWRECT, &ptr, &len)) {
+	if (profile.ReadBinary(IDS_R_SETTINGS, IDS_RS_LASTWINDOWRECT, &ptr, len)) {
 		if (len == sizeof(CRect)) {
 			memcpy(&rcLastWindowPos, ptr, sizeof(CRect));
 		} else {
@@ -710,91 +1040,90 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	} else {
 		bRememberWindowPos = false;
 	}
-	nLastWindowType = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LASTWINDOWTYPE, SIZE_RESTORED);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_LASTWINDOWTYPE, *(int*)&nLastWindowType);
 
-	bShufflePlaylistItems = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SHUFFLEPLAYLISTITEMS, FALSE);
-	bRememberPlaylistItems = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REMEMBERPLAYLISTITEMS, TRUE);
-	bHidePlaylistFullScreen = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_HIDEPLAYLISTFULLSCREEN, FALSE);
-	bFavRememberPos = !!pApp->GetProfileInt(IDS_R_FAVORITES, IDS_RS_FAV_REMEMBERPOS, TRUE);
-	bFavRelativeDrive = !!pApp->GetProfileInt(IDS_R_FAVORITES, IDS_RS_FAV_RELATIVEDRIVE, FALSE);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SHUFFLEPLAYLISTITEMS, bShufflePlaylistItems);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REMEMBERPLAYLISTITEMS, bRememberPlaylistItems);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_HIDEPLAYLISTFULLSCREEN, bHidePlaylistFullScreen);
+	profile.ReadBool(IDS_R_FAVORITES, IDS_RS_FAV_REMEMBERPOS, bFavRememberPos);
+	profile.ReadBool(IDS_R_FAVORITES, IDS_RS_FAV_RELATIVEDRIVE, bFavRelativeDrive);
 
-	strDVDPath = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_DVDPATH);
-	bUseDVDPath = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USEDVDPATH, 0);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_DVDPATH, strDVDPath);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USEDVDPATH, bUseDVDPath);
 
-	LANGID langID = GetUserDefaultUILanguage();
-	idMenuLang = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MENULANG, langID);
-	idAudioLang = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOLANG, langID);
-	idSubtitlesLang = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SUBTITLESLANG, langID);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_MENULANG, *(int*)&idMenuLang);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIOLANG, *(int*)&idAudioLang);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SUBTITLESLANG, *(int*)&idSubtitlesLang);
 
-	bClosedCaptions = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CLOSEDCAPTIONS, 0);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_CLOSEDCAPTIONS, bClosedCaptions);
 	// TODO: rename subdefstyle -> defStyle
 	{
-		CString temp = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SPSTYLE);
-		subdefstyle <<= temp;
-		if (temp.IsEmpty()) {
+		profile.ReadString(IDS_R_SETTINGS, IDS_RS_SPSTYLE, tmpstr);
+		subdefstyle <<= tmpstr;
+		if (tmpstr.IsEmpty()) {
 			subdefstyle.relativeTo = 1;    //default "Position subtitles relative to the video frame" option is checked
 		}
 	}
-	fOverridePlacement = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPOVERRIDEPLACEMENT, 0);
-	nHorPos = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPHORPOS, 50);
-	nVerPos = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SPVERPOS, 90);
-	nSubDelayInterval = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SUBDELAYINTERVAL, 500);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SPOVERRIDEPLACEMENT, fOverridePlacement);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SPHORPOS, nHorPos);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SPVERPOS, nVerPos);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SUBDELAYINTERVAL, nSubDelayInterval);
 
-	fEnableSubtitles				= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLESUBTITLES, TRUE);
-	fForcedSubtitles				= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_FORCEDSUBTITLES, FALSE);
-	fPrioritizeExternalSubtitles	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_PRIORITIZEEXTERNALSUBTITLES, TRUE);
-	fDisableInternalSubtitles		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DISABLEINTERNALSUBTITLES, FALSE);
-	fAutoReloadExtSubtitles			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUTORELOADEXTSUBTITLES, FALSE);
-	fUseSybresync					= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USE_SUBRESYNC, FALSE);
-	strSubtitlePaths				= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SUBTITLEPATHS, DEFAULT_SUBTITLE_PATHS);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ENABLESUBTITLES, fEnableSubtitles);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FORCEDSUBTITLES, fForcedSubtitles);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_PRIORITIZEEXTERNALSUBTITLES, fPrioritizeExternalSubtitles);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_DISABLEINTERNALSUBTITLES, fDisableInternalSubtitles);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUTORELOADEXTSUBTITLES, fAutoReloadExtSubtitles);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USE_SUBRESYNC, fUseSybresync);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_SUBTITLEPATHS, strSubtitlePaths);
 
-	fUseDefaultSubtitlesStyle		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USEDEFAULTSUBTITLESSTYLE, FALSE);
-	bAudioTimeShift					= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEAUDIOTIMESHIFT, 0);
-	iAudioTimeShift					= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, 0);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USEDEFAULTSUBTITLESSTYLE, fUseDefaultSubtitlesStyle);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ENABLEAUDIOTIMESHIFT, bAudioTimeShift);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift);
 
-	iBufferDuration					= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, APP_BUFDURATION_DEF);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration);
 	iBufferDuration = discard(iBufferDuration, APP_BUFDURATION_DEF, APP_BUFDURATION_MIN, APP_BUFDURATION_MAX);
 
-	bAudioMixer				= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOMIXER, FALSE);
-	nAudioMixerLayout		= SPK_STEREO;
-	str						= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOMIXERLAYOUT, channel_mode_sets[nAudioMixerLayout]);
-	str.Trim();
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUDIOMIXER, bAudioMixer);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_AUDIOMIXERLAYOUT, tmpstr);
+	tmpstr.Trim();
 	for (int i = SPK_MONO; i <= SPK_7_1; i++) {
-		if (str == channel_mode_sets[i]) {
+		if (tmpstr == channel_mode_sets[i]) {
 			nAudioMixerLayout = i;
 			break;
 		}
 	}
-	bAudioStereoFromDecoder	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOSTEREOFROMDECODER, FALSE);
-	bAudioBassRedirect		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOBASSREDIRECT, FALSE);
-	dAudioCenter_dB			= _wtof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOLEVELCENTER, L"0"));
-	dAudioCenter_dB			= discard(dAudioCenter_dB, 0.0, APP_AUDIOLEVEL_MIN, APP_AUDIOLEVEL_MAX);
-	dAudioSurround_dB		= _wtof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOLEVELSURROUND, L"0"));
-	dAudioSurround_dB		= discard(dAudioSurround_dB, 0.0, APP_AUDIOLEVEL_MIN, APP_AUDIOLEVEL_MAX);
-	dAudioGain_dB			= _wtof(pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, L"0"));
-	dAudioGain_dB			= discard(dAudioGain_dB, 0.0, APP_AUDIOGAIN_MIN, APP_AUDIOGAIN_MAX);
-	bAudioAutoVolumeControl	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, FALSE);
-	bAudioNormBoost			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, TRUE);
-	iAudioNormLevel			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, 75);
-	iAudioNormRealeaseTime	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMREALEASETIME, 8);
-	iAudioSampleFormats		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_AUDIOSAMPLEFORMATS, SFMT_MASK) & SFMT_MASK;
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUDIOSTEREOFROMDECODER, bAudioStereoFromDecoder);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUDIOBASSREDIRECT, bAudioBassRedirect);
+	profile.ReadDouble(IDS_R_SETTINGS, IDS_RS_AUDIOLEVELCENTER, dAudioCenter_dB, APP_AUDIOLEVEL_MIN, APP_AUDIOLEVEL_MAX);
+	profile.ReadDouble(IDS_R_SETTINGS, IDS_RS_AUDIOLEVELSURROUND, dAudioSurround_dB, APP_AUDIOLEVEL_MIN, APP_AUDIOLEVEL_MAX);
+	profile.ReadDouble(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, dAudioGain_dB, APP_AUDIOGAIN_MIN, APP_AUDIOGAIN_MAX);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, bAudioAutoVolumeControl);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, bAudioNormBoost);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, iAudioNormLevel);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMREALEASETIME, iAudioNormRealeaseTime);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIOSAMPLEFORMATS, iAudioSampleFormats);
+	iAudioSampleFormats &= SFMT_MASK;
 
 	{
 		m_filters.RemoveAll();
 		for (unsigned int i = 0; ; i++) {
 			CString key;
 			key.Format(L"%s\\%04u", IDS_R_FILTERS, i);
-
 			CAutoPtr<FilterOverride> f(DNew FilterOverride);
 
-			f->fDisabled = !pApp->GetProfileInt(key, L"Enabled", 0);
+			bool enabled = false;
+			profile.ReadBool(key, L"Enabled", enabled);
+			f->fDisabled = !enabled;
 
-			UINT j = pApp->GetProfileInt(key, L"SourceType", -1);
+			int j = -1;
+			profile.ReadInt(key, L"SourceType", j);
 			if (j == 0) {
 				f->type = FilterOverride::REGISTERED;
-				f->dispname = CStringW(pApp->GetProfileString(key, L"DisplayName"));
-				f->name = pApp->GetProfileString(key, L"Name", L"");
-				f->clsid = GUIDFromCString(pApp->GetProfileString(key, L"CLSID"));
+				profile.ReadString(key, L"DisplayName", f->dispname);
+				profile.ReadString(key, L"Name", f->name);
+				profile.ReadString(key, L"CLSID", tmpstr);
+				f->clsid = GUIDFromCString(tmpstr);
 				if (f->clsid == CLSID_NULL) {
 					CComPtr<IBaseFilter> pBF;
 					CStringW FriendlyName;
@@ -805,9 +1134,10 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 				}
 			} else if (j == 1) {
 				f->type = FilterOverride::EXTERNAL;
-				f->path = pApp->GetProfileString(key, L"Path");
-				f->name = pApp->GetProfileString(key, L"Name");
-				f->clsid = GUIDFromCString(pApp->GetProfileString(key, L"CLSID"));
+				profile.ReadString(key, L"Path", f->path);
+				profile.ReadString(key, L"Name", f->name);
+				profile.ReadString(key, L"CLSID", tmpstr);
+				f->clsid = GUIDFromCString(tmpstr);
 			} else {
 				profile.DeleteSection(key);
 				break;
@@ -817,7 +1147,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 			for (unsigned int i = 0; ; i++) {
 				CString val;
 				val.Format(L"org%04u", i);
-				CString guid = pApp->GetProfileString(key, val);
+				CString guid;
+				profile.ReadString(key, val, guid);
 				if (guid.IsEmpty()) {
 					break;
 				}
@@ -831,7 +1162,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 			for (unsigned int i = 0; ; i++) {
 				CString val;
 				val.Format(L"mod%04u", i);
-				CString guid = pApp->GetProfileString(key, val);
+				CString guid;
+				profile.ReadString(key, val, guid);
 				if (guid.IsEmpty()) {
 					break;
 				}
@@ -841,12 +1173,14 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 				f->guids.pop_back();
 			}
 
-			f->iLoadType = (int)pApp->GetProfileInt(key, L"LoadType", -1);
+			f->iLoadType = -1;
+			profile.ReadInt(key, L"LoadType", f->iLoadType);
 			if (f->iLoadType < 0) {
 				break;
 			}
 
-			f->dwMerit = pApp->GetProfileInt(key, L"Merit", MERIT_DO_NOT_USE+1);
+			f->dwMerit = MERIT_DO_NOT_USE + 1;
+			profile.ReadInt(key, L"Merit", *(int*)&f->dwMerit);
 
 			m_filters.AddTail(f);
 		}
@@ -854,13 +1188,13 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	m_pnspresets.RemoveAll();
 	for (int i = 0; i < (ID_PANNSCAN_PRESETS_END - ID_PANNSCAN_PRESETS_START); i++) {
-		CString str;
-		str.Format(L"Preset%d", i);
-		str = pApp->GetProfileString(IDS_R_PNSPRESETS, str);
-		if (str.IsEmpty()) {
+		CString preset;
+		preset.Format(L"Preset%d", i);
+		profile.ReadString(IDS_R_PNSPRESETS, preset, tmpstr);
+		if (tmpstr.IsEmpty()) {
 			break;
 		}
-		m_pnspresets.Add(str);
+		m_pnspresets.Add(tmpstr);
 	}
 
 	if (m_pnspresets.IsEmpty()) {
@@ -882,17 +1216,17 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	CreateCommands();
 
 	for (unsigned i = 0; i < wmcmds.size(); i++) {
-		CString str;
-		str.Format(L"CommandMod%u", i);
-		str = pApp->GetProfileString(IDS_R_COMMANDS, str);
-		if (str.IsEmpty()) {
+		CString cmdmod;
+		cmdmod.Format(L"CommandMod%u", i);
+		profile.ReadString(IDS_R_COMMANDS, cmdmod, tmpstr);
+		if (tmpstr.IsEmpty()) {
 			break;
 		}
 		int cmd, fVirt, key, repcnt;
 		UINT mouse, mouseFS, appcmd;
 		WCHAR buff[128];
 		int n;
-		if (5 > (n = swscanf_s(str, L"%d %x %x %s %d %u %u %u", &cmd, &fVirt, &key, buff, _countof(buff), &repcnt, &mouse, &appcmd, &mouseFS))) {
+		if (5 > (n = swscanf_s(tmpstr, L"%d %x %x %s %d %u %u %u", &cmd, &fVirt, &key, buff, _countof(buff), &repcnt, &mouse, &appcmd, &mouseFS))) {
 			break;
 		}
 
@@ -924,69 +1258,69 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 	hAccel = CreateAcceleratorTableW(Accel.data(), Accel.size());
 
-	strWinLircAddr = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_WINLIRCADDR, L"127.0.0.1:8765");
-	bWinLirc = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_WINLIRC, 0);
-	strUIceAddr = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_UICEADDR, L"127.0.0.1:1234");
-	bUIce = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_UICE, 0);
-	bGlobalMedia = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, 1);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_WINLIRCADDR, strWinLircAddr);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WINLIRC, bWinLirc);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_UICEADDR, strUIceAddr);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_UICE, bUIce);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_GLOBALMEDIA, bGlobalMedia);
 
-	bUseDarkTheme = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USEDARKTHEME, 1);
-	nThemeBrightness = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THEMEBRIGHTNESS, 15);
-	nThemeRed = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THEMERED, 256);
-	nThemeGreen = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THEMEGREEN, 256);
-	nThemeBlue = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THEMEBLUE, 256);
-	nOSDTransparent = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_TRANSPARENT, 100);
-	nOSDBorder = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_BORDER, 1);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USEDARKTHEME, bUseDarkTheme);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THEMEBRIGHTNESS, nThemeBrightness);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THEMERED, nThemeRed);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THEMEGREEN, nThemeGreen);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THEMEBLUE, nThemeBlue);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_TRANSPARENT, nOSDTransparent);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_BORDER, nOSDBorder);
 
-	clrFaceABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, 0x00ffffff);
-	clrOutlineABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, 0x00868686);
-	clrFontABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTCOLOR, 0x00E0E0E0);
-	clrGrad1ABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD1COLOR, 0x00302820);
-	clrGrad2ABGR = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD2COLOR, 0x00302820);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, *(int*)&clrFaceABGR);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, *(int*)&clrOutlineABGR);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTCOLOR, *(int*)&clrFontABGR);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD1COLOR, *(int*)&clrGrad1ABGR);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD2COLOR, *(int*)&clrGrad2ABGR);
 
-	nJumpDistS = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, DEFAULT_JUMPDISTANCE_1);
-	nJumpDistM = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, DEFAULT_JUMPDISTANCE_2);
-	nJumpDistL = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTL, DEFAULT_JUMPDISTANCE_3);
-	bLimitWindowProportions = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LIMITWINDOWPROPORTIONS, FALSE);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, nJumpDistS);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, nJumpDistM);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTL, nJumpDistL);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LIMITWINDOWPROPORTIONS, bLimitWindowProportions);
 
-	iDlgPropX = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DLGPROPX, 0);
-	iDlgPropY = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DLGPROPY, 0);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_DLGPROPX, iDlgPropX);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_DLGPROPY, iDlgPropY);
 
 	m_Formats.UpdateData(false);
 
 	// Internal filters
 	for (int f = 0; f < SRC_LAST; f++) {
-		SrcFilters[f] = !!pApp->GetProfileInt(IDS_R_INTERNAL_FILTERS, SrcFiltersKeys[f], 1);
+		profile.ReadBool(IDS_R_INTERNAL_FILTERS, SrcFiltersKeys[f], SrcFilters[f]);
 	}
 	for (int f = 0; f < VDEC_DXVA_LAST; f++) {
-		DXVAFilters[f] = !!pApp->GetProfileInt(IDS_R_INTERNAL_FILTERS, DXVAFiltersKeys[f], 1);
+		profile.ReadBool(IDS_R_INTERNAL_FILTERS, DXVAFiltersKeys[f], DXVAFilters[f]);
 	}
 	for (int f = 0; f < VDEC_LAST; f++) {
-		VideoFilters[f] = !!pApp->GetProfileInt(IDS_R_INTERNAL_FILTERS, VideoFiltersKeys[f], f == VDEC_H264_MVC ? 0 : 1);
+		profile.ReadBool(IDS_R_INTERNAL_FILTERS, VideoFiltersKeys[f], VideoFilters[f]);
 	}
 	for (int f = 0; f < ADEC_LAST; f++) {
-		AudioFilters[f] = !!pApp->GetProfileInt(IDS_R_INTERNAL_FILTERS, AudioFiltersKeys[f], 1);
+		profile.ReadBool(IDS_R_INTERNAL_FILTERS, AudioFiltersKeys[f], AudioFilters[f]);
 	}
 
-	strLogoFileName = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LOGOFILE);
-	nLogoId = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LOGOID, DEF_LOGO);
-	bLogoExternal = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LOGOEXT, 0);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LOGOFILE, strLogoFileName);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_LOGOID, nLogoId);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LOGOEXT, bLogoExternal);
 
-	bHideCDROMsSubMenu = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_HIDECDROMSSUBMENU, 0);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_HIDECDROMSSUBMENU, bHideCDROMsSubMenu);
 
-	dwPriority = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_PRIORITY, NORMAL_PRIORITY_CLASS);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_PRIORITY, *(int*)&dwPriority);
 	::SetPriorityClass(::GetCurrentProcess(), dwPriority);
-	fLaunchfullscreen = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, FALSE);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, fLaunchfullscreen);
 
-	fEnableWebServer = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_ENABLEWEBSERVER, FALSE);
-	nWebServerPort = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERPORT, APP_WEBSRVPORT_DEF);
-	nWebServerQuality = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERQUALITY, APP_WEBSRVQUALITY_DEF);
-	fWebServerPrintDebugInfo = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERPRINTDEBUGINFO, FALSE);
-	fWebServerUseCompression = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERUSECOMPRESSION, TRUE);
-	fWebServerLocalhostOnly = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERLOCALHOSTONLY, FALSE);
-	strWebRoot = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_WEBROOT, L"*./webroot");
-	strWebDefIndex = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_WEBDEFINDEX, L"index.html;index.php");
-	strWebServerCGI = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_WEBSERVERCGI);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ENABLEWEBSERVER, fEnableWebServer);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERPORT, nWebServerPort);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERQUALITY, nWebServerQuality);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WEBSERVERPRINTDEBUGINFO, fWebServerPrintDebugInfo);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WEBSERVERUSECOMPRESSION, fWebServerUseCompression);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WEBSERVERLOCALHOSTONLY, fWebServerLocalhostOnly);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_WEBROOT, strWebRoot);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_WEBDEFINDEX, strWebDefIndex);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_WEBSERVERCGI, strWebServerCGI);
 
 	CString MyPictures;
 	WCHAR szPath[MAX_PATH] = { 0 };
@@ -994,93 +1328,92 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		MyPictures = CString(szPath) + L"\\";
 	}
 
-	strSnapShotPath		= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTPATH, MyPictures);
-	strSnapShotExt		= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTEXT, L".jpg");
-	bSnapShotSubtitles	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SNAPSHOT_SUBTITLES, 0);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTPATH, strSnapShotPath);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTEXT, strSnapShotExt);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SNAPSHOT_SUBTITLES, bSnapShotSubtitles);
 
-	iThumbRows		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBROWS, 4);
-	iThumbCols		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBCOLS, 4);
-	iThumbWidth		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBWIDTH, 1024);
-	iThumbQuality	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBQUALITY, 85);
-	iThumbLevelPNG	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_THUMBLEVELPNG, 7);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THUMBROWS, iThumbRows);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THUMBCOLS, iThumbCols);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THUMBWIDTH, iThumbWidth);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THUMBQUALITY, iThumbQuality);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THUMBLEVELPNG, iThumbLevelPNG);
 
-	bSubSaveExternalStyleFile = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SUBSAVEEXTERNALSTYLEFILE, FALSE);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SUBSAVEEXTERNALSTYLEFILE, bSubSaveExternalStyleFile);
 
-	strISDb = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_ISDB, L"www.opensubtitles.org/isdb");
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_ISDB, strISDb);
 
-	nLastUsedPage = pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LASTUSEDPAGE, 0);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_LASTUSEDPAGE, *(int*)&nLastUsedPage);
 
-	fD3DFullscreen	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_D3DFULLSCREEN, FALSE);
-	//fMonitorAutoRefreshRate	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, FALSE);
-	iStereo3DMode	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, STEREO3D_AUTO);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_D3DFULLSCREEN, fD3DFullscreen);
+	//profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, fMonitorAutoRefreshRate);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, iStereo3DMode);
 	iStereo3DMode	= discard(iStereo3DMode, (int)STEREO3D_AUTO, (int)STEREO3D_AUTO, (int)STEREO3D_OVERUNDER);
 	if (iStereo3DMode == ID_STEREO3D_ROW_INTERLEAVED) {
 		GetRenderersSettings().iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
 	} else {
 		GetRenderersSettings().iStereo3DTransform = STEREO3D_AsIs;
 	}
-	bStereo3DSwapLR	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_SWAPLEFTRIGHT, FALSE);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_STEREO3D_SWAPLEFTRIGHT, bStereo3DSwapLR);
 
-	iBrightness		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_BRIGHTNESS, 0);
-	iContrast		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_CONTRAST, 0);
-	iHue			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_HUE, 0);
-	iSaturation		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_COLOR_SATURATION, 0);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_COLOR_BRIGHTNESS, iBrightness);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_COLOR_CONTRAST, iContrast);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_COLOR_HUE, iHue);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_COLOR_SATURATION, iSaturation);
 
 	{ // load shader list
 		int curPos;
 		CString token;
 
-		str = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLIST);
+		profile.ReadString(IDS_R_SETTINGS, IDS_RS_SHADERLIST, tmpstr);
 		curPos = 0;
-		token = str.Tokenize(L"|", curPos);
+		token = tmpstr.Tokenize(L"|", curPos);
 		while (token.GetLength()) {
 			ShaderList.push_back(token);
-			token = str.Tokenize(L"|", curPos);
+			token = tmpstr.Tokenize(L"|", curPos);
 		}
 
-		str = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_SHADERLISTSCREENSPACE);
+		profile.ReadString(IDS_R_SETTINGS, IDS_RS_SHADERLISTSCREENSPACE, tmpstr);
 		curPos = 0;
-		token = str.Tokenize(L"|", curPos);
+		token = tmpstr.Tokenize(L"|", curPos);
 		while (token.GetLength()) {
 			ShaderListScreenSpace.push_back(token);
-			token = str.Tokenize(L"|", curPos);
+			token = tmpstr.Tokenize(L"|", curPos);
 		}
 	}
-	bToggleShader				= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADER, 0);
-	bToggleShaderScreenSpace	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_TOGGLESHADERSSCREENSPACE, 0);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_TOGGLESHADER, bToggleShader);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_TOGGLESHADERSSCREENSPACE, bToggleShaderScreenSpace);
 
-	iShowOSD			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, OSD_ENABLE);
-	fFastSeek			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_FASTSEEK_KEYFRAME, TRUE);
-	fMiniDump			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MINI_DUMP, FALSE);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SHOWOSD, iShowOSD);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FASTSEEK_KEYFRAME, fFastSeek);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MINI_DUMP, fMiniDump);
 	CMiniDump::SetState(fMiniDump);
 
-	fLCDSupport		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LCD_SUPPORT, FALSE);
-	fSmartSeek		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK, FALSE);
-	iSmartSeekSize	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK_SIZE, 15);
-	iSmartSeekSize	= std::clamp(iSmartSeekSize, 10, 30);
-	fChapterMarker	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_CHAPTER_MARKER, FALSE);
-	fFlybar			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR, TRUE);
-	fFlybarOnTop	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR_ONTOP, FALSE);
-	fFontShadow		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTSHADOW, FALSE);
-	fFontAA			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTAA, TRUE);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LCD_SUPPORT, fLCDSupport);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SMARTSEEK, fSmartSeek);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK_SIZE, iSmartSeekSize, 10, 30);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_CHAPTER_MARKER, fChapterMarker);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR, fFlybar);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR_ONTOP, fFlybarOnTop);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_OSD_FONTSHADOW, fFontShadow);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_OSD_FONTAA, fFontAA);
 
 	// Save analog capture settings
-	iDefaultCaptureDevice	= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, 0);
-	strAnalogVideo			= pApp->GetProfileString(IDS_R_CAPTURE, IDS_RS_VIDEO_DISP_NAME, L"dummy");
-	strAnalogAudio			= pApp->GetProfileString(IDS_R_CAPTURE, IDS_RS_AUDIO_DISP_NAME, L"dummy");
-	iAnalogCountry			= pApp->GetProfileInt(IDS_R_CAPTURE, IDS_RS_COUNTRY, 1);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_DEFAULT_CAPTURE, iDefaultCaptureDevice);
+	profile.ReadString(IDS_R_CAPTURE, IDS_RS_VIDEO_DISP_NAME, strAnalogVideo);
+	profile.ReadString(IDS_R_CAPTURE, IDS_RS_AUDIO_DISP_NAME, strAnalogAudio);
+	profile.ReadInt(IDS_R_CAPTURE, IDS_RS_COUNTRY, iAnalogCountry);
 
-	strBDANetworkProvider	= pApp->GetProfileString(IDS_R_DVB, IDS_RS_BDA_NETWORKPROVIDER);
-	strBDATuner				= pApp->GetProfileString(IDS_R_DVB, IDS_RS_BDA_TUNER);
-	strBDAReceiver			= pApp->GetProfileString(IDS_R_DVB, IDS_RS_BDA_RECEIVER);
-	//sBDAStandard			= pApp->GetProfileString(IDS_R_DVB, IDS_RS_BDA_STANDARD);
-	iBDAScanFreqStart		= pApp->GetProfileInt(IDS_R_DVB, IDS_RS_BDA_SCAN_FREQ_START, 474000);
-	iBDAScanFreqEnd			= pApp->GetProfileInt(IDS_R_DVB, IDS_RS_BDA_SCAN_FREQ_END, 858000);
-	iBDABandwidth			= pApp->GetProfileInt(IDS_R_DVB, IDS_RS_BDA_BANDWIDTH, 8);
-	fBDAUseOffset			= !!pApp->GetProfileInt(IDS_R_DVB, IDS_RS_BDA_USE_OFFSET, 0);
-	iBDAOffset				= pApp->GetProfileInt(IDS_R_DVB, IDS_RS_BDA_OFFSET, 166);
-	nDVBLastChannel			= pApp->GetProfileInt(IDS_R_DVB, IDS_RS_DVB_LAST_CHANNEL, 1);
-	fBDAIgnoreEncryptedChannels = !!pApp->GetProfileInt(IDS_R_DVB, IDS_RS_BDA_IGNORE_ENCRYPTEDCHANNELS, 0);
+	profile.ReadString(IDS_R_DVB, IDS_RS_BDA_NETWORKPROVIDER, strBDANetworkProvider);
+	profile.ReadString(IDS_R_DVB, IDS_RS_BDA_TUNER, strBDATuner);
+	profile.ReadString(IDS_R_DVB, IDS_RS_BDA_RECEIVER, strBDAReceiver);
+	//profile.ReadString(IDS_R_DVB, IDS_RS_BDA_STANDARD, sBDAStandard);
+	profile.ReadInt(IDS_R_DVB, IDS_RS_BDA_SCAN_FREQ_START, iBDAScanFreqStart);
+	profile.ReadInt(IDS_R_DVB, IDS_RS_BDA_SCAN_FREQ_END, iBDAScanFreqEnd);
+	profile.ReadInt(IDS_R_DVB, IDS_RS_BDA_BANDWIDTH, iBDABandwidth);
+	profile.ReadBool(IDS_R_DVB, IDS_RS_BDA_USE_OFFSET, fBDAUseOffset);
+	profile.ReadInt(IDS_R_DVB, IDS_RS_BDA_OFFSET, iBDAOffset);
+	profile.ReadInt(IDS_R_DVB, IDS_RS_DVB_LAST_CHANNEL, nDVBLastChannel);
+	profile.ReadBool(IDS_R_DVB, IDS_RS_BDA_IGNORE_ENCRYPTEDCHANNELS, fBDAIgnoreEncryptedChannels);
 
 	m_DVBChannels.clear();
 	for (int iChannel = 0; ; iChannel++) {
@@ -1088,7 +1421,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		CString strChannel;
 		CDVBChannel Channel;
 		strTemp.Format(L"%d", iChannel);
-		strChannel = pApp->GetProfileString(IDS_R_DVB, strTemp);
+		profile.ReadString(IDS_R_DVB, strTemp, strChannel);
 		if (strChannel.IsEmpty()) {
 			break;
 		}
@@ -1097,29 +1430,29 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 
 	// playback positions for last played DVDs
-	bRememberDVDPos     = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DVDPOS, 0);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_DVDPOS, bRememberDVDPos);
 	nCurrentDvdPosition = -1;
 	memset(DvdPosition, 0, sizeof(DvdPosition));
 	for (int i = 0; i < std::min(iRecentFilesNumber, MAX_DVD_POSITION); i++) {
-		CString	lpKeyName;
-		CString	lpString;
+		CString lpKeyName;
+		CString lpString;
 
 		lpKeyName.Format(L"DVD%d", i + 1);
-		lpString = pApp->GetProfileString(IDS_R_RECENTFILES, lpKeyName);
+		profile.ReadString(IDS_R_RECENTFILES, lpKeyName, lpString);
 		if (lpString.GetLength() / 2 == sizeof(DVD_POSITION)) {
 			DeserializeHex(lpString, (BYTE*)&DvdPosition[i], sizeof(DVD_POSITION));
 		}
 	}
 
 	// playback positions for last played files
-	bRememberFilePos     = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_FILEPOS, 0);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FILEPOS, bRememberFilePos);
 	nCurrentFilePosition = -1;
 	for (int i = 0; i < std::min(iRecentFilesNumber, MAX_FILE_POSITION); i++) {
 		CString lpKeyName;
 		CString lpString;
 
 		lpKeyName.Format(L"File%d", i + 1);
-		lpString = pApp->GetProfileString(IDS_R_RECENTFILES, lpKeyName);
+		profile.ReadString(IDS_R_RECENTFILES, lpKeyName, lpString);
 
 		std::list<CString> args;
 		ExplodeEsc(lpString, args, L'|');
@@ -1142,44 +1475,41 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		}
 	}
 
-	bStartMainTitle			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_DVD_START_MAIN_TITLE, 0);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_DVD_START_MAIN_TITLE, bStartMainTitle);
 	bNormalStartDVD			= true;
 
-	fRemainingTime			= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, FALSE);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, fRemainingTime);
 
-	strLastOpenFilterDir	= pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, strLastOpenFilterDir);
 
-	bYoutubePageParser		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_PAGEPARSER, TRUE);
-	str = pApp->GetProfileString(IDS_R_SETTINGS, IDS_RS_YOUTUBE_FORMAT, L"MP4");
-	YoutubeFormat.fmt = (str == L"WEBM") ? 1 : 0;
-	YoutubeFormat.res		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_RESOLUTION, 720);
-	YoutubeFormat.fps60		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_60FPS, FALSE);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_YOUTUBE_PAGEPARSER, bYoutubePageParser);
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_YOUTUBE_FORMAT, tmpstr);
+	YoutubeFormat.fmt = (tmpstr == L"WEBM") ? 1 : 0;
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_RESOLUTION, YoutubeFormat.res);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_YOUTUBE_60FPS, YoutubeFormat.fps60);
 	if (YoutubeFormat.fps60) {
-		YoutubeFormat.hdr = !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_HDR, FALSE);
+		profile.ReadBool(IDS_R_SETTINGS, IDS_RS_YOUTUBE_HDR, YoutubeFormat.hdr);
 	} else {
 		YoutubeFormat.hdr = false;
 	}
-	bYoutubeLoadPlaylist	= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_LOAD_PLAYLIST, FALSE);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_YOUTUBE_LOAD_PLAYLIST, bYoutubeLoadPlaylist);
 
-	iYDLMaxHeight			= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_YDL_MAXHEIGHT, 720);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_YDL_MAXHEIGHT, iYDLMaxHeight);
 	iYDLMaxHeight = discard(iYDLMaxHeight, 720, s_CommonVideoHeights);
 
-	nLastFileInfoPage		= pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, 0);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, *(int*)&nLastFileInfoPage);
 
-	bUpdaterAutoCheck		= !!pApp->GetProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_AUTO_CHECK, 0);
-	nUpdaterDelay			= pApp->GetProfileInt(IDS_R_UPDATER, IDS_RS_UPDATER_DELAY, 7);
-	nUpdaterDelay			= std::clamp(nUpdaterDelay, 1, 365);
-
-	tUpdaterLastCheck		= 0; // force check if the previous check undefined
-	if (pApp->GetProfileBinary(IDS_R_UPDATER, IDS_RS_UPDATER_LAST_CHECK, &ptr, &len)) {
+	profile.ReadBool(IDS_R_UPDATER, IDS_RS_UPDATER_AUTO_CHECK, bUpdaterAutoCheck);
+	profile.ReadInt(IDS_R_UPDATER, IDS_RS_UPDATER_DELAY, nUpdaterDelay, 1, 365);
+	if (profile.ReadBinary(IDS_R_UPDATER, IDS_RS_UPDATER_LAST_CHECK, &ptr, len)) {
 		if (len == sizeof(time_t)) {
 			memcpy(&tUpdaterLastCheck, ptr, sizeof(time_t));
 		}
 		delete [] ptr;
 	}
 
-	bOSDRemainingTime		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_OSD_REMAINING_TIME, 0);
-	bPasteClipboardURL		= !!pApp->GetProfileInt(IDS_R_SETTINGS, IDS_RS_PASTECLIPBOARDURL, 0);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_OSD_REMAINING_TIME, bOSDRemainingTime);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_PASTECLIPBOARDURL, bPasteClipboardURL);
 
 	if (fLaunchfullscreen && !IsD3DFullscreen()) {
 		nCLSwitches |= CLSW_FULLSCREEN;
@@ -1571,7 +1901,9 @@ void CAppSettings::SaveSettings()
 
 	if (pApp->m_pszRegistryKey) {
 		// WINBUG: on win2k this would crash WritePrivateProfileString
-		profile.WriteInt(L"", L"", pApp->GetProfileInt(L"", L"", 0) ? 0 : 1);
+		int v = 0;
+		profile.ReadInt(L"", L"", v);
+		profile.WriteInt(L"", L"", v ? 0 : 1);
 	}
 
 	profile.Flush(true);
@@ -1580,8 +1912,6 @@ void CAppSettings::SaveSettings()
 void CAppSettings::SaveExternalFilters()
 {
 	// External Filter settings are saved for a long time. Use only when really necessary.
-	CMPlayerCApp* pApp = AfxGetMyApp();
-	ASSERT(pApp);
 	CProfile& profile = AfxGetProfile();
 
 	if (!bInitialized) {
@@ -1591,7 +1921,8 @@ void CAppSettings::SaveExternalFilters()
 	for (unsigned int i = 0; ; i++) {
 		CString key;
 		key.Format(L"%s\\%04u", IDS_R_FILTERS, i);
-		int j = pApp->GetProfileInt(key, L"Enabled", -1);
+		int j = -1;
+		profile.ReadInt(key, L"Enabled", j);
 		profile.DeleteSection(key);
 		if (j < 0) {
 			break;
@@ -1649,10 +1980,9 @@ void CAppSettings::SaveExternalFilters()
 
 int CAppSettings::GetMultiInst()
 {
-	int multiinst = AfxGetMyApp()->GetProfileInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, 1);
-	if (multiinst < 0 || multiinst > 2) {
-		multiinst = 1;
-	}
+	int multiinst = 1;
+	AfxGetProfile().ReadInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, multiinst, 0, 2);
+
 	return multiinst;
 }
 
@@ -2011,9 +2341,10 @@ void CAppSettings::GetFav(favtype ft, std::list<CString>& sl)
 	}
 
 	for (int i = 0; i < 100; i++) {
+		CString fav;
+		fav.Format(L"Fav%02d", i);
 		CString s;
-		s.Format(L"Fav%02d", i);
-		s = AfxGetMyApp()->GetProfileString(root, s);
+		AfxGetProfile().ReadString(root, fav, s);
 		if (s.IsEmpty()) {
 			break;
 		}
