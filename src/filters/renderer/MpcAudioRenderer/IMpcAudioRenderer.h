@@ -20,7 +20,7 @@
 
 #pragma once
 
-enum DEVICE_MODE {
+enum DEVICE_MODE : int {
 	// for settings and internal
 	MODE_WASAPI_SHARED,
 	MODE_WASAPI_EXCLUSIVE,

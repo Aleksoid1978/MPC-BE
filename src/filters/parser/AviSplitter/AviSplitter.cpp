@@ -84,6 +84,10 @@ STDAPI DllUnregisterServer()
 
 CFilterApp theApp;
 
+#else
+
+#include "../../../DSUtil/Profile.h"
+
 #endif
 
 //
@@ -112,8 +116,9 @@ CAviSplitterFilter::CAviSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 		}
 	}
 #else
-	m_bBadInterleavedSuport	= !!AfxGetApp()->GetProfileInt(OPT_SECTION_AVISplit, OPT_BadInterleaved, m_bBadInterleavedSuport);
-	m_bSetReindex			= !!AfxGetApp()->GetProfileInt(OPT_SECTION_AVISplit, OPT_NeededReindex, m_bSetReindex);
+	CProfile& profile = AfxGetProfile();
+	profile.ReadBool(OPT_SECTION_AVISplit, OPT_BadInterleaved, m_bBadInterleavedSuport);
+	profile.ReadBool(OPT_SECTION_AVISplit, OPT_NeededReindex, m_bSetReindex);
 #endif
 }
 
@@ -919,8 +924,9 @@ STDMETHODIMP CAviSplitterFilter::Apply()
 		key.SetDWORDValue(OPT_NeededReindex, m_bSetReindex);
 	}
 #else
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_AVISplit, OPT_BadInterleaved, m_bBadInterleavedSuport);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_AVISplit, OPT_NeededReindex, m_bSetReindex);
+	CProfile& profile = AfxGetProfile();
+	profile.WriteBool(OPT_SECTION_AVISplit, OPT_BadInterleaved, m_bBadInterleavedSuport);
+	profile.WriteBool(OPT_SECTION_AVISplit, OPT_NeededReindex, m_bSetReindex);
 #endif
 	return S_OK;
 }

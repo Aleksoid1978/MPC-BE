@@ -267,6 +267,10 @@ STDAPI DllUnregisterServer()
 
 CFilterApp theApp;
 
+#else
+
+#include "../../../DSUtil/Profile.h"
+
 #endif
 
 static const MPCSampleFormat SamplefmtToMPC[SAMPLE_FMT_NB] = {
@@ -392,14 +396,15 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		m_bSampleFmt[SF_PCM16] = true;
 	}
 #else
-	m_bAVSync              = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_AVSYNC, m_bAVSync);
-	m_bDRC                 = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_DRC, m_bDRC);
-	m_bSPDIF[ac3]          = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3, m_bSPDIF[ac3]);
-	m_bSPDIF[eac3]         = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_eac3, m_bSPDIF[eac3]);
-	m_bSPDIF[truehd]       = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_truehd, m_bSPDIF[truehd]);
-	m_bSPDIF[dts]          = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dts, m_bSPDIF[dts]);
-	m_bSPDIF[dtshd]        = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dtshd, m_bSPDIF[dtshd]);
-	m_bSPDIF[ac3enc]       = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3enc, m_bSPDIF[ac3enc]);
+	CProfile& profile = AfxGetProfile();
+	profile.ReadBool(OPT_SECTION_MpaDec, OPTION_AVSYNC, m_bAVSync);
+	profile.ReadBool(OPT_SECTION_MpaDec, OPTION_DRC, m_bDRC);
+	profile.ReadBool(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3, m_bSPDIF[ac3]);
+	profile.ReadBool(OPT_SECTION_MpaDec, OPTION_SPDIF_eac3, m_bSPDIF[eac3]);
+	profile.ReadBool(OPT_SECTION_MpaDec, OPTION_SPDIF_truehd, m_bSPDIF[truehd]);
+	profile.ReadBool(OPT_SECTION_MpaDec, OPTION_SPDIF_dts, m_bSPDIF[dts]);
+	profile.ReadBool(OPT_SECTION_MpaDec, OPTION_SPDIF_dtshd, m_bSPDIF[dtshd]);
+	profile.ReadBool(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3enc, m_bSPDIF[ac3enc]);
 #endif
 }
 
@@ -2530,14 +2535,15 @@ STDMETHODIMP CMpaDecFilter::SaveSettings()
 		key.SetDWORDValue(OPTION_SPDIF_ac3enc, m_bSPDIF[ac3enc]);
 	}
 #else
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_AVSYNC, m_bAVSync);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_DRC, m_bDRC);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3, m_bSPDIF[ac3]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_eac3, m_bSPDIF[eac3]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_truehd, m_bSPDIF[truehd]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dts, m_bSPDIF[dts]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_dtshd, m_bSPDIF[dtshd]);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3enc, m_bSPDIF[ac3enc]);
+	CProfile& profile = AfxGetProfile();
+	profile.WriteBool(OPT_SECTION_MpaDec, OPTION_AVSYNC, m_bAVSync);
+	profile.WriteBool(OPT_SECTION_MpaDec, OPTION_DRC, m_bDRC);
+	profile.WriteBool(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3, m_bSPDIF[ac3]);
+	profile.WriteBool(OPT_SECTION_MpaDec, OPTION_SPDIF_eac3, m_bSPDIF[eac3]);
+	profile.WriteBool(OPT_SECTION_MpaDec, OPTION_SPDIF_truehd, m_bSPDIF[truehd]);
+	profile.WriteBool(OPT_SECTION_MpaDec, OPTION_SPDIF_dts, m_bSPDIF[dts]);
+	profile.WriteBool(OPT_SECTION_MpaDec, OPTION_SPDIF_dtshd, m_bSPDIF[dtshd]);
+	profile.WriteBool(OPT_SECTION_MpaDec, OPTION_SPDIF_ac3enc, m_bSPDIF[ac3enc]);
 #endif
 
 	return S_OK;

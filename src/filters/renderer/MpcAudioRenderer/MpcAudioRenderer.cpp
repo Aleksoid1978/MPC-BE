@@ -88,6 +88,10 @@ STDAPI DllUnregisterServer()
 
 CFilterApp theApp;
 
+#else
+
+#include "../../../DSUtil/Profile.h"
+
 #endif
 
 struct channel_layout_t {
@@ -209,13 +213,14 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		}
 	}
 #else
-	m_DeviceMode               = (DEVICE_MODE)AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, m_DeviceMode);
-	m_BufferDuration           = AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_BufferDuration, m_BufferDuration);
-	m_DeviceId                 = AfxGetApp()->GetProfileString(OPT_SECTION_AudRend, OPT_AudioDeviceId, m_DeviceId);
-	m_bUseBitExactOutput       = !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
-	m_bUseSystemLayoutChannels = !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
-	m_bReleaseDeviceIdle       = !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
-	m_bUseCrossFeed            = !!AfxGetApp()->GetProfileInt(OPT_SECTION_AudRend, OPT_UseCrossFeed, m_bUseCrossFeed);
+	CProfile& profile = AfxGetProfile();
+	profile.ReadInt(OPT_SECTION_AudRend, OPT_DeviceMode, *(int*)&m_DeviceMode);
+	profile.ReadInt(OPT_SECTION_AudRend, OPT_BufferDuration, m_BufferDuration);
+	profile.ReadString(OPT_SECTION_AudRend, OPT_AudioDeviceId, m_DeviceId);
+	profile.ReadInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
+	profile.ReadInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
+	profile.ReadInt(OPT_SECTION_AudRend, OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
+	profile.ReadInt(OPT_SECTION_AudRend, OPT_UseCrossFeed, m_bUseCrossFeed);
 #endif
 
 	if (m_DeviceMode != MODE_WASAPI_EXCLUSIVE) {
@@ -1001,13 +1006,14 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 		key.SetDWORDValue(OPT_UseCrossFeed, m_bUseCrossFeed);
 	}
 #else
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_DeviceMode, (int)m_DeviceMode);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_BufferDuration, m_BufferDuration);
-	AfxGetApp()->WriteProfileString(OPT_SECTION_AudRend, OPT_AudioDeviceId, m_DeviceId);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_AudRend, OPT_UseCrossFeed, m_bUseCrossFeed);
+	CProfile& profile = AfxGetProfile();
+	profile.WriteInt(OPT_SECTION_AudRend, OPT_DeviceMode, (int)m_DeviceMode);
+	profile.WriteInt(OPT_SECTION_AudRend, OPT_BufferDuration, m_BufferDuration);
+	profile.WriteString(OPT_SECTION_AudRend, OPT_AudioDeviceId, m_DeviceId);
+	profile.WriteInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
+	profile.WriteInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
+	profile.WriteInt(OPT_SECTION_AudRend, OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
+	profile.WriteInt(OPT_SECTION_AudRend, OPT_UseCrossFeed, m_bUseCrossFeed);
 #endif
 
 	return S_OK;

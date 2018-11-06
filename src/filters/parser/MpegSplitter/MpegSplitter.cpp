@@ -103,6 +103,10 @@ STDAPI DllUnregisterServer()
 
 CFilterApp theApp;
 
+#else
+
+#include "../../../DSUtil/Profile.h"
+
 #endif
 
 static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInfo::Stream *pClipInfo, const PES_STREAM_TYPE pesStreamType, const CStringA& ISO_639_codes)
@@ -545,9 +549,10 @@ CMpegSplitterFilter::CMpegSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr, const CLS
 		}
 	}
 #else
-	m_ForcedSub   = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_ForcedSub, m_ForcedSub);
-	m_AC3CoreOnly = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_AC3CoreOnly, m_AC3CoreOnly);
-	m_SubEmptyPin = !!AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGSplit, OPT_SubEmptyOutput, m_SubEmptyPin);
+	CProfile& profile = AfxGetProfile();
+	profile.ReadBool(OPT_SECTION_MPEGSplit, OPT_ForcedSub, m_ForcedSub);
+	profile.ReadInt(OPT_SECTION_MPEGSplit, OPT_AC3CoreOnly, m_AC3CoreOnly);
+	profile.ReadBool(OPT_SECTION_MPEGSplit, OPT_SubEmptyOutput, m_SubEmptyPin);
 #endif
 }
 
@@ -1898,9 +1903,10 @@ STDMETHODIMP CMpegSplitterFilter::Apply()
 		key.SetDWORDValue(OPT_SubEmptyOutput, m_SubEmptyPin);
 	}
 #else
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGSplit, OPT_ForcedSub, m_ForcedSub);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGSplit, OPT_AC3CoreOnly, m_AC3CoreOnly);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGSplit, OPT_SubEmptyOutput, m_SubEmptyPin);
+	CProfile& profile = AfxGetProfile();
+	profile.WriteBool(OPT_SECTION_MPEGSplit, OPT_ForcedSub, m_ForcedSub);
+	profile.WriteInt(OPT_SECTION_MPEGSplit, OPT_AC3CoreOnly, m_AC3CoreOnly);
+	profile.WriteBool(OPT_SECTION_MPEGSplit, OPT_SubEmptyOutput, m_SubEmptyPin);
 #endif
 
 	return S_OK;

@@ -86,6 +86,10 @@ STDAPI DllUnregisterServer()
 
 CFilterApp theApp;
 
+#else
+
+#include "../../../DSUtil/Profile.h"
+
 #endif
 
 //
@@ -111,7 +115,7 @@ CCDDAReader::CCDDAReader(IUnknown* pUnk, HRESULT* phr)
 		}
 	}
 #else
-	m_bReadTextInfo = !!AfxGetApp()->GetProfileInt(OPT_SECTION_CDDAReader, OPT_ReadTextInfo, m_bReadTextInfo);
+	AfxGetProfile().ReadBool(OPT_SECTION_CDDAReader, OPT_ReadTextInfo, m_bReadTextInfo);
 #endif
 }
 
@@ -315,7 +319,7 @@ STDMETHODIMP CCDDAReader::Apply()
 		key.SetDWORDValue(OPT_ReadTextInfo, m_bReadTextInfo);
 	}
 #else
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_CDDAReader, OPT_ReadTextInfo, m_bReadTextInfo);
+	AfxGetProfile().WriteBool(OPT_SECTION_CDDAReader, OPT_ReadTextInfo, m_bReadTextInfo);
 #endif
 
 	return S_OK;
