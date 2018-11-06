@@ -14849,7 +14849,7 @@ void CMainFrame::SetupNavChaptersSubMenu()
 		for (auto& Channel : s.m_DVBChannels) {
 			UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 
-			if ((UINT)Channel.GetPrefNumber() == s.nDVBLastChannel) {
+			if (Channel.GetPrefNumber() == s.nDVBLastChannel) {
 				flags |= MF_CHECKED | MFT_RADIOCHECK;
 			}
 			submenu.AppendMenu(flags, ID_NAVIGATE_CHAP_SUBITEM_START + Channel.GetPrefNumber(), Channel.GetName());
