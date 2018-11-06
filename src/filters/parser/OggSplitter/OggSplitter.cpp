@@ -534,26 +534,25 @@ start:
 				continue;
 			}
 
-			for (int i = 1; pOggPin; i++) {
+			for (int i = 1;; i++) {
 				CStringW key;
-				key.Format(L"CHAPTER%02d", i);
+				key.Format(L"CHAPTER%03d", i);
 				CStringW time = pOggPin->GetComment(key);
 				if (time.IsEmpty()) {
 					break;
 				}
-				key.Format(L"CHAPTER%02dNAME", i);
+				key.Format(L"CHAPTER%03dNAME", i);
 				CStringW name = pOggPin->GetComment(key);
 				if (name.IsEmpty()) {
 					name.Format(L"Chapter %d", i);
 				}
 				int h, m, s, ms;
 				WCHAR c;
-//				if (7 != swscanf(time, L"%d%c%d%c%d%c%d", &h, &c, &m, &c, &s, &c, &ms)) {	// temp rem SZL - 4728
-				if (7 != swscanf_s(time, L"%d%c%d%c%d%c%d", &h, &c, sizeof(WCHAR),			// temp ins SZL - 4728
-								   &m, &c, sizeof(WCHAR), &s, &c, sizeof(WCHAR), &ms)) {	// temp ins SZL - 4728
+				if (7 != swscanf_s(time, L"%d%c%d%c%d%c%d", &h, &c, sizeof(WCHAR),
+								   &m, &c, sizeof(WCHAR), &s, &c, sizeof(WCHAR), &ms)) {
 					break;
 				}
-				REFERENCE_TIME rt = ((((REFERENCE_TIME)h*60+m)*60+s)*1000+ms)*10000;
+				const REFERENCE_TIME rt = ((((REFERENCE_TIME)h * 60 + m) * 60 + s) * 1000 + ms) * 10000;
 				ChapAppend(rt, name);
 			}
 		}
