@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,8 +21,8 @@
 
 #pragma once
 
-enum ditype {
-	DIAuto,
+enum ditype : int {
+	DIAuto = 0,
 	DIWeave,
 	DIBlend,
 	DIBob,

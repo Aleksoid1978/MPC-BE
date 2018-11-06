@@ -235,6 +235,10 @@ public:
 
 CMpeg2DecFilterApp theApp;
 
+#else
+
+#include "../../../DSUtil/Profile.h"
+
 #endif
 
 //
@@ -327,9 +331,11 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		}
 	}
 #else
-	DWORD dw;
-	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_DeintMethod, m_ditype);
-	SetDeinterlaceMethod((ditype)dw);
+	CProfile& profile = AfxGetProfile();
+	profile.ReadInt(OPT_SECTION_MPEGDec, OPT_DeintMethod, *(int*)&m_ditype, DIAuto, DIBob);
+
+	// TODO: remake it
+	int dw;
 	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Brightness, GETU32(&m_bright));
 	SetBrightness(*(float*)&dw);
 	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Contrast, GETU32(&m_cont));
@@ -338,15 +344,11 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	SetHue(*(float*)&dw);
 	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Saturation, GETU32(&m_sat));
 	SetSaturation(*(float*)&dw);
-	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_ForcedSubs, m_fForcedSubs);
-	EnableForcedSubtitles(!!dw);
-	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_PlanarYUV, m_fPlanarYUV);
-	EnablePlanarYUV(!!dw);
-	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Interlaced, m_fInterlaced);
-	EnableInterlaced(!!dw);
-	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_ReadStreamAR, m_bReadARFromStream);
-	EnableReadARFromStream(!!dw);
 
+	profile.ReadBool(OPT_SECTION_MPEGDec, OPT_ForcedSubs, m_fForcedSubs);
+	profile.ReadBool(OPT_SECTION_MPEGDec, OPT_PlanarYUV, m_fPlanarYUV);
+	profile.ReadBool(OPT_SECTION_MPEGDec, OPT_Interlaced, m_fInterlaced);
+	profile.ReadBool(OPT_SECTION_MPEGDec, OPT_ReadStreamAR, m_bReadARFromStream);
 #endif
 
 	m_rate.Rate = 10000;
@@ -376,15 +378,19 @@ STDMETHODIMP CMpeg2DecFilter::Apply()
 		key.SetDWORDValue(OPT_ReadStreamAR, m_bReadARFromStream);
 	}
 #else
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_DeintMethod, m_ditype);
+	CProfile& profile = AfxGetProfile();
+	profile.WriteInt(OPT_SECTION_MPEGDec, OPT_DeintMethod, m_ditype);
+
+	// TODO: remake it
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Brightness, GETU32(&m_bright));
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Contrast, GETU32(&m_cont));
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Hue, GETU32(&m_hue));
 	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Saturation, GETU32(&m_sat));
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_ForcedSubs, m_fForcedSubs);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_PlanarYUV, m_fPlanarYUV);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Interlaced, m_fInterlaced);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_ReadStreamAR, m_bReadARFromStream);
+
+	profile.WriteBool(OPT_SECTION_MPEGDec, OPT_ForcedSubs, m_fForcedSubs);
+	profile.WriteBool(OPT_SECTION_MPEGDec, OPT_PlanarYUV, m_fPlanarYUV);
+	profile.WriteBool(OPT_SECTION_MPEGDec, OPT_Interlaced, m_fInterlaced);
+	profile.WriteBool(OPT_SECTION_MPEGDec, OPT_ReadStreamAR, m_bReadARFromStream);
 #endif
 
 	return S_OK;
