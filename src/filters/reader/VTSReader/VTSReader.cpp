@@ -77,6 +77,10 @@ STDAPI DllUnregisterServer()
 
 CFilterApp theApp;
 
+#else
+
+#include "../../../DSUtil/Profile.h"
+
 #endif
 
 //
@@ -102,7 +106,7 @@ CVTSReader::CVTSReader(IUnknown* pUnk, HRESULT* phr)
 		}
 	}
 #else
-	m_bEnableTitleSelection = !!AfxGetApp()->GetProfileInt(OPT_SECTION_VTSReader, OPT_EnableTitleSelection, m_bEnableTitleSelection);
+	AfxGetProfile().ReadBool(OPT_SECTION_VTSReader, OPT_EnableTitleSelection, m_bEnableTitleSelection);
 #endif
 
 }
@@ -257,7 +261,7 @@ STDMETHODIMP CVTSReader::Apply()
 		key.SetDWORDValue(OPT_EnableTitleSelection, m_bEnableTitleSelection);
 	}
 #else
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_VTSReader, OPT_EnableTitleSelection, m_bEnableTitleSelection);
+	AfxGetProfile().WriteBool(OPT_SECTION_VTSReader, OPT_EnableTitleSelection, m_bEnableTitleSelection);
 #endif
 
 	return S_OK;

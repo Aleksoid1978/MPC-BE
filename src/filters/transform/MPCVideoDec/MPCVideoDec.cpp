@@ -937,6 +937,10 @@ STDAPI DllUnregisterServer()
 
 CFilterApp theApp;
 
+#else
+
+#include "../../../DSUtil/Profile.h"
+
 #endif
 
 BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
@@ -1079,24 +1083,24 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		}
 	}
 #else
-	m_nThreadNumber				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_ThreadNumber, m_nThreadNumber);
-	m_nDeinterlacing			= (MPC_DEINTERLACING_FLAGS)AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_Deinterlacing, m_nDeinterlacing);
-	m_nARMode					= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_ARMode, m_nARMode);
-	m_nDiscardMode				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_DiscardMode, m_nDiscardMode);
-	if (m_nDiscardMode != AVDISCARD_BIDIR) {
-		m_nDiscardMode = AVDISCARD_DEFAULT;
-	}
-
-	m_nDXVACheckCompatibility	= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_DXVACheck, m_nDXVACheckCompatibility);
-	m_nDXVA_SD					= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
-
+	CProfile& profile = AfxGetProfile();
+	profile.ReadInt(OPT_SECTION_VideoDec, OPT_ThreadNumber, m_nThreadNumber, 0, 16);
+	profile.ReadInt(OPT_SECTION_VideoDec, OPT_Deinterlacing, *(int*)&m_nDeinterlacing);
+	profile.ReadInt(OPT_SECTION_VideoDec, OPT_ARMode, m_nARMode);
+	profile.ReadInt(OPT_SECTION_VideoDec, OPT_DiscardMode, m_nDiscardMode);
+	profile.ReadInt(OPT_SECTION_VideoDec, OPT_DXVACheck, m_nDXVACheckCompatibility);
+	profile.ReadInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
+	profile.ReadInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
 	for (int i = 0; i < PixFmt_count; i++) {
 		CString optname = OPT_SW_prefix;
 		optname += GetSWOF(i)->name;
-		m_fPixFmts[i] = !!AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, optname, m_fPixFmts[i]);
+		profile.ReadBool(OPT_SECTION_VideoDec, optname, m_fPixFmts[i]);
 	}
-	m_nSwRGBLevels				= AfxGetApp()->GetProfileInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
 #endif
+
+	if (m_nDiscardMode != AVDISCARD_BIDIR) {
+		m_nDiscardMode = AVDISCARD_DEFAULT;
+	}
 
 	m_nDXVACheckCompatibility = std::clamp(m_nDXVACheckCompatibility, 0, 3);
 
@@ -3682,21 +3686,19 @@ STDMETHODIMP CMPCVideoDecFilter::SaveSettings()
 		}
 	}
 #else
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_ThreadNumber, m_nThreadNumber);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_DiscardMode, m_nDiscardMode);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_Deinterlacing, (int)m_nDeinterlacing);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_ARMode, m_nARMode);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_DXVACheck, m_nDXVACheckCompatibility);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
-
-	// === New swscaler options
+	CProfile& profile = AfxGetProfile();
+	profile.WriteInt(OPT_SECTION_VideoDec, OPT_ThreadNumber, m_nThreadNumber);
+	profile.WriteInt(OPT_SECTION_VideoDec, OPT_DiscardMode, m_nDiscardMode);
+	profile.WriteInt(OPT_SECTION_VideoDec, OPT_Deinterlacing, (int)m_nDeinterlacing);
+	profile.WriteInt(OPT_SECTION_VideoDec, OPT_ARMode, m_nARMode);
+	profile.WriteInt(OPT_SECTION_VideoDec, OPT_DXVACheck, m_nDXVACheckCompatibility);
+	profile.WriteInt(OPT_SECTION_VideoDec, OPT_DisableDXVA_SD, m_nDXVA_SD);
+	profile.WriteInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
 	for (int i = 0; i < PixFmt_count; i++) {
 		CString optname = OPT_SW_prefix;
 		optname += GetSWOF(i)->name;
-		AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, optname, m_fPixFmts[i]);
+		profile.WriteBool(OPT_SECTION_VideoDec, optname, m_fPixFmts[i]);
 	}
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
-	//
 #endif
 
 	return S_OK;

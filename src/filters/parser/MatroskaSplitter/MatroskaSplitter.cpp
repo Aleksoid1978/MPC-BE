@@ -91,6 +91,10 @@ STDAPI DllUnregisterServer()
 
 CFilterApp theApp;
 
+#else
+
+#include "../../../DSUtil/Profile.h"
+
 #endif
 
 //
@@ -129,8 +133,9 @@ CMatroskaSplitterFilter::CMatroskaSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 		}
 	}
 #else
-	m_bLoadEmbeddedFonts	= !!AfxGetApp()->GetProfileInt(OPT_SECTION_MATROSKASplit, OPT_LoadEmbeddedFonts, m_bLoadEmbeddedFonts);
-	m_bCalcDuration			= !!AfxGetApp()->GetProfileInt(OPT_SECTION_MATROSKASplit, OPT_CalcDuration, m_bCalcDuration);
+	CProfile& profile = AfxGetProfile();
+	profile.ReadBool(OPT_SECTION_MATROSKASplit, OPT_LoadEmbeddedFonts, m_bLoadEmbeddedFonts);
+	profile.ReadBool(OPT_SECTION_MATROSKASplit, OPT_CalcDuration, m_bCalcDuration);
 #endif
 }
 
@@ -2572,8 +2577,9 @@ STDMETHODIMP CMatroskaSplitterFilter::Apply()
 		key.SetDWORDValue(OPT_CalcDuration, m_bCalcDuration);
 	}
 #else
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MATROSKASplit, OPT_LoadEmbeddedFonts, m_bLoadEmbeddedFonts);
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MATROSKASplit, OPT_CalcDuration, m_bCalcDuration);
+	CProfile& profile = AfxGetProfile();
+	profile.WriteBool(OPT_SECTION_MATROSKASplit, OPT_LoadEmbeddedFonts, m_bLoadEmbeddedFonts);
+	profile.WriteBool(OPT_SECTION_MATROSKASplit, OPT_CalcDuration, m_bCalcDuration);
 #endif
 
 	return S_OK;

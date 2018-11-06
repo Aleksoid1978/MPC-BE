@@ -95,7 +95,7 @@ class CModApp : public CWinApp
 public:
 	CProfile m_Profile;
 
-//private: // TODO: make private.
+private:
 	// Must override GetProfile and WriteProfile functions, because it uses MFC and other MFC dependent libraries.
 	UINT GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault) override
 	{
