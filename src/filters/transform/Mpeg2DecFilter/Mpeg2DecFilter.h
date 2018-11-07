@@ -154,7 +154,10 @@ public:
 protected:
 	CCritSec m_csProps;
 	ditype m_ditype;
-	float m_bright, m_cont, m_hue, m_sat;
+	int m_bright;
+	int m_cont;
+	int m_hue;
+	int m_sat;
 	BYTE m_YTbl[256], m_UTbl[256*256], m_VTbl[256*256];
 	bool m_fForcedSubs;
 	bool m_fPlanarYUV;
@@ -175,14 +178,14 @@ public:
 	STDMETHODIMP SetDeinterlaceMethod(ditype di);
 	STDMETHODIMP_(ditype) GetDeinterlaceMethod();
 
-	STDMETHODIMP SetBrightness(float bright);
-	STDMETHODIMP SetContrast(float cont);
-	STDMETHODIMP SetHue(float hue);
-	STDMETHODIMP SetSaturation(float sat);
-	STDMETHODIMP_(float) GetBrightness();
-	STDMETHODIMP_(float) GetContrast();
-	STDMETHODIMP_(float) GetHue();
-	STDMETHODIMP_(float) GetSaturation();
+	STDMETHODIMP SetBrightness(int bright);
+	STDMETHODIMP SetContrast(int cont);
+	STDMETHODIMP SetHue(int hue);
+	STDMETHODIMP SetSaturation(int sat);
+	STDMETHODIMP_(int) GetBrightness();
+	STDMETHODIMP_(int) GetContrast();
+	STDMETHODIMP_(int) GetHue();
+	STDMETHODIMP_(int) GetSaturation();
 
 	STDMETHODIMP EnableForcedSubtitles(bool fEnable);
 	STDMETHODIMP_(bool) IsForcedSubtitlesEnabled();

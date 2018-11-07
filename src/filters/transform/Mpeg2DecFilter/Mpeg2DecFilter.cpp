@@ -241,6 +241,41 @@ CMpeg2DecFilterApp theApp;
 
 #endif
 
+static void CalcBrCont(BYTE* YTbl, int bright, int cont)
+{
+	int Cont = cont * 512 / 100;
+	int Bright = bright;
+
+	for (int i = 0; i < 256; i++) {
+		int y = ((Cont * (i - 16)) >> 9) + Bright + 16;
+		YTbl[i] = std::clamp(y, 0, 255);
+		//YTbl[i] = std::clamp(y, 16, 235);
+	}
+}
+
+static void CalcHueSat(BYTE* UTbl, BYTE* VTbl, int hue, float sat)
+{
+	int Sat = sat * 512 / 100;
+	double Hue = hue * 3.1415926 / 180.0;
+	int Sin = (int)(sin(Hue) * 4096);
+	int Cos = (int)(cos(Hue) * 4096);
+
+	for (int y = 0; y < 256; y++) {
+		for (int x = 0; x < 256; x++) {
+			int u = x - 128;
+			int v = y - 128;
+			int ux = (u * Cos + v * Sin) >> 12;
+			v = (v * Cos - u * Sin) >> 12;
+			u = ((ux * Sat) >> 9) + 128;
+			v = ((v * Sat) >> 9) + 128;
+			u = std::clamp(u, 16, 235);
+			v = std::clamp(v, 16, 235);
+			UTbl[(y << 8) | x] = u;
+			VTbl[(y << 8) | x] = v;
+		}
+	}
+}
+
 //
 // CMpeg2DecFilter
 //
@@ -249,8 +284,16 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	: CBaseVideoFilter(L"CMpeg2DecFilter", lpunk, phr, __uuidof(this), 1)
 	, m_fWaitForKeyFrame(true)
 	, m_ControlThread(nullptr)
-	, m_ditype(DIAuto)
 	, m_llLastDecodeTime(0)
+	, m_ditype(DIAuto)
+	, m_bright(0)
+	, m_cont(100)
+	, m_hue(0)
+	, m_sat(100)
+	, m_fForcedSubs(true)
+	, m_fPlanarYUV(true)
+	, m_fInterlaced(true)
+	, m_bReadARFromStream(true)
 {
 	if (FAILED(*phr)) {
 		return;
@@ -289,68 +332,53 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		return;
 	}
 
-	SetBrightness(0.0f);
-	SetContrast(1.0f);
-	SetHue(0.0f);
-	SetSaturation(1.0f);
-	EnableForcedSubtitles(true);
-	EnablePlanarYUV(true);
-	EnableInterlaced(true);
-	EnableReadARFromStream(true);
-
 #ifdef REGISTER_FILTER
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Open(HKEY_CURRENT_USER, OPT_REGKEY_MPEGDec, KEY_READ)) {
 		DWORD dw;
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DeintMethod, dw)) {
-			SetDeinterlaceMethod((ditype)dw);
+			m_ditype = discard((ditype)dw, DIAuto, DIAuto, DIBob);
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_Brightness, dw)) {
-			SetBrightness(*(float*)&dw);
+			m_bright = discard((int)dw, 0, -128, 128);
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_Contrast, dw)) {
-			SetContrast(*(float*)&dw);
+			m_cont = discard((int)dw, 100, 0, 200);
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_Hue, dw)) {
-			SetHue(*(float*)&dw);
+			m_hue = discard((int)dw, 0, -180, 180);
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_Saturation, dw)) {
-			SetSaturation(*(float*)&dw);
+			m_sat = discard((int)dw, 0, 0, 200);
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ForcedSubs, dw)) {
-			EnableForcedSubtitles(!!dw);
+			m_fForcedSubs = !!dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_PlanarYUV, dw)) {
-			EnablePlanarYUV(!!dw);
+			m_fPlanarYUV = !!dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_Interlaced, dw)) {
-			EnableInterlaced(!!dw);
+			m_fInterlaced = !!dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ReadStreamAR, dw)) {
-			EnableReadARFromStream(!!dw);
+			m_bReadARFromStream = !!dw;
 		}
 	}
 #else
 	CProfile& profile = AfxGetProfile();
 	profile.ReadInt(OPT_SECTION_MPEGDec, OPT_DeintMethod, *(int*)&m_ditype, DIAuto, DIBob);
-
-	// TODO: remake it
-	int dw;
-	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Brightness, GETU32(&m_bright));
-	SetBrightness(*(float*)&dw);
-	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Contrast, GETU32(&m_cont));
-	SetContrast(*(float*)&dw);
-	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Hue, GETU32(&m_hue));
-	SetHue(*(float*)&dw);
-	dw = AfxGetApp()->GetProfileInt(OPT_SECTION_MPEGDec, OPT_Saturation, GETU32(&m_sat));
-	SetSaturation(*(float*)&dw);
-
+	profile.ReadInt(OPT_SECTION_MPEGDec, OPT_Brightness, m_bright, -128, 128);
+	profile.ReadInt(OPT_SECTION_MPEGDec, OPT_Contrast, m_cont, 0, 200);
+	profile.ReadInt(OPT_SECTION_MPEGDec, OPT_Hue, m_hue, -180, 180);
+	profile.ReadInt(OPT_SECTION_MPEGDec, OPT_Saturation, m_sat, 0, 200);
 	profile.ReadBool(OPT_SECTION_MPEGDec, OPT_ForcedSubs, m_fForcedSubs);
 	profile.ReadBool(OPT_SECTION_MPEGDec, OPT_PlanarYUV, m_fPlanarYUV);
 	profile.ReadBool(OPT_SECTION_MPEGDec, OPT_Interlaced, m_fInterlaced);
 	profile.ReadBool(OPT_SECTION_MPEGDec, OPT_ReadStreamAR, m_bReadARFromStream);
 #endif
 
+	CalcBrCont(m_YTbl, m_bright, m_cont);
+	CalcHueSat(m_UTbl, m_VTbl, m_hue, m_sat);
 	m_rate.Rate = 10000;
 	m_rate.StartTime = 0;
 }
@@ -368,10 +396,10 @@ STDMETHODIMP CMpeg2DecFilter::Apply()
 	CRegKey key;
 	if (ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, OPT_REGKEY_MPEGDec)) {
 		key.SetDWORDValue(OPT_DeintMethod, m_ditype);
-		key.SetDWORDValue(OPT_Brightness, GETU32(&m_bright));
-		key.SetDWORDValue(OPT_Contrast, GETU32(&m_cont));
-		key.SetDWORDValue(OPT_Hue, GETU32(&m_hue));
-		key.SetDWORDValue(OPT_Saturation, GETU32(&m_sat));
+		key.SetDWORDValue(OPT_Brightness, m_bright);
+		key.SetDWORDValue(OPT_Contrast, m_cont);
+		key.SetDWORDValue(OPT_Hue, m_hue);
+		key.SetDWORDValue(OPT_Saturation, m_sat);
 		key.SetDWORDValue(OPT_ForcedSubs, m_fForcedSubs);
 		key.SetDWORDValue(OPT_PlanarYUV, m_fPlanarYUV);
 		key.SetDWORDValue(OPT_Interlaced, m_fInterlaced);
@@ -380,13 +408,10 @@ STDMETHODIMP CMpeg2DecFilter::Apply()
 #else
 	CProfile& profile = AfxGetProfile();
 	profile.WriteInt(OPT_SECTION_MPEGDec, OPT_DeintMethod, m_ditype);
-
-	// TODO: remake it
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Brightness, GETU32(&m_bright));
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Contrast, GETU32(&m_cont));
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Hue, GETU32(&m_hue));
-	AfxGetApp()->WriteProfileInt(OPT_SECTION_MPEGDec, OPT_Saturation, GETU32(&m_sat));
-
+	profile.WriteInt(OPT_SECTION_MPEGDec, OPT_Brightness, m_bright);
+	profile.WriteInt(OPT_SECTION_MPEGDec, OPT_Contrast, m_cont);
+	profile.WriteInt(OPT_SECTION_MPEGDec, OPT_Hue, m_hue);
+	profile.WriteInt(OPT_SECTION_MPEGDec, OPT_Saturation, m_sat);
 	profile.WriteBool(OPT_SECTION_MPEGDec, OPT_ForcedSubs, m_fForcedSubs);
 	profile.WriteBool(OPT_SECTION_MPEGDec, OPT_PlanarYUV, m_fPlanarYUV);
 	profile.WriteBool(OPT_SECTION_MPEGDec, OPT_Interlaced, m_fInterlaced);
@@ -1048,50 +1073,15 @@ STDMETHODIMP_(ditype) CMpeg2DecFilter::GetDeinterlaceMethod()
 	return m_ditype;
 }
 
-static void CalcBrCont(BYTE* YTbl, float bright, float cont)
-{
-	int Cont = (int)(cont * 512);
-	int Bright = (int)bright;
-
-	for (int i = 0; i < 256; i++) {
-		int y = ((Cont * (i - 16)) >> 9) + Bright + 16;
-		YTbl[i] = std::clamp(y, 0, 255);
-		//YTbl[i] = std::clamp(y, 16, 235);
-	}
-}
-
-static void CalcHueSat(BYTE* UTbl, BYTE* VTbl, float hue, float sat)
-{
-	int Sat = (int)(sat * 512);
-	double Hue = (hue * 3.1415926) / 180.0;
-	int Sin = (int)(sin(Hue) * 4096);
-	int Cos = (int)(cos(Hue) * 4096);
-
-	for (int y = 0; y < 256; y++) {
-		for (int x = 0; x < 256; x++) {
-			int u = x - 128;
-			int v = y - 128;
-			int ux = (u * Cos + v * Sin) >> 12;
-			v = (v * Cos - u * Sin) >> 12;
-			u = ((ux * Sat) >> 9) + 128;
-			v = ((v * Sat) >> 9) + 128;
-			u = std::clamp(u, 16, 235);
-			v = std::clamp(v, 16, 235);
-			UTbl[(y << 8) | x] = u;
-			VTbl[(y << 8) | x] = v;
-		}
-	}
-}
-
 void CMpeg2DecFilter::ApplyBrContHueSat(BYTE* srcy, BYTE* srcu, BYTE* srcv, int w, int h, int pitch)
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (fabs(m_bright) > EPSILON || fabs(m_cont - 1.0) > EPSILON) {
+	if (m_bright != 0 || m_cont != 100) {
 		int size = pitch*h;
 
 		if (((DWORD_PTR)srcy & 15) == 0) {
-			short Cont = (short)std::clamp((int)(m_cont * 512), 0, (1 << 16) - 1);
+			short Cont = (short)std::clamp(m_cont * 512 / 100, 0, (1 << 16) - 1);
 			short Bright = (short)(m_bright + 16);
 
 			__m128i bc = _mm_set_epi16(Bright, Cont, Bright, Cont, Bright, Cont, Bright, Cont);
@@ -1141,7 +1131,7 @@ void CMpeg2DecFilter::ApplyBrContHueSat(BYTE* srcy, BYTE* srcu, BYTE* srcv, int 
 		}
 	}
 
-	if (fabs(m_hue) > EPSILON || fabs(m_sat - 1.0) > EPSILON) {
+	if (m_hue != 0 || m_sat != 100) {
 		pitch /= 2;
 		w /= 2;
 		h /= 2;
@@ -1153,53 +1143,53 @@ void CMpeg2DecFilter::ApplyBrContHueSat(BYTE* srcy, BYTE* srcu, BYTE* srcv, int 
 	}
 }
 
-STDMETHODIMP CMpeg2DecFilter::SetBrightness(float bright)
+STDMETHODIMP CMpeg2DecFilter::SetBrightness(int bright)
 {
 	CAutoLock cAutoLock(&m_csProps);
 	CalcBrCont(m_YTbl, m_bright = bright, m_cont);
 	return S_OK;
 }
 
-STDMETHODIMP CMpeg2DecFilter::SetContrast(float cont)
+STDMETHODIMP CMpeg2DecFilter::SetContrast(int cont)
 {
 	CAutoLock cAutoLock(&m_csProps);
 	CalcBrCont(m_YTbl, m_bright, m_cont = cont);
 	return S_OK;
 }
 
-STDMETHODIMP CMpeg2DecFilter::SetHue(float hue)
+STDMETHODIMP CMpeg2DecFilter::SetHue(int hue)
 {
 	CAutoLock cAutoLock(&m_csProps);
 	CalcHueSat(m_UTbl, m_VTbl, m_hue = hue, m_sat);
 	return S_OK;
 }
 
-STDMETHODIMP CMpeg2DecFilter::SetSaturation(float sat)
+STDMETHODIMP CMpeg2DecFilter::SetSaturation(int sat)
 {
 	CAutoLock cAutoLock(&m_csProps);
 	CalcHueSat(m_UTbl, m_VTbl, m_hue, m_sat = sat);
 	return S_OK;
 }
 
-STDMETHODIMP_(float) CMpeg2DecFilter::GetBrightness()
+STDMETHODIMP_(int) CMpeg2DecFilter::GetBrightness()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_bright;
 }
 
-STDMETHODIMP_(float) CMpeg2DecFilter::GetContrast()
+STDMETHODIMP_(int) CMpeg2DecFilter::GetContrast()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_cont;
 }
 
-STDMETHODIMP_(float) CMpeg2DecFilter::GetHue()
+STDMETHODIMP_(int) CMpeg2DecFilter::GetHue()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_hue;
 }
 
-STDMETHODIMP_(float) CMpeg2DecFilter::GetSaturation()
+STDMETHODIMP_(int) CMpeg2DecFilter::GetSaturation()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_sat;

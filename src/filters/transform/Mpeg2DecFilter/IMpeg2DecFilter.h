@@ -38,14 +38,14 @@ public IUnknown {
 	// Hue: -180.0 to +180.0, default 0.0
 	// Saturation: 0.0 to 10.0, default 1.0
 
-	STDMETHOD(SetBrightness(float brightness)) PURE;
-	STDMETHOD(SetContrast(float contrast)) PURE;
-	STDMETHOD(SetHue(float hue)) PURE;
-	STDMETHOD(SetSaturation(float saturation)) PURE;
-	STDMETHOD_(float, GetBrightness()) PURE;
-	STDMETHOD_(float, GetContrast()) PURE;
-	STDMETHOD_(float, GetHue()) PURE;
-	STDMETHOD_(float, GetSaturation()) PURE;
+	STDMETHOD(SetBrightness(int brightness)) PURE;
+	STDMETHOD(SetContrast(int contrast)) PURE;
+	STDMETHOD(SetHue(int hue)) PURE;
+	STDMETHOD(SetSaturation(int saturation)) PURE;
+	STDMETHOD_(int, GetBrightness()) PURE;
+	STDMETHOD_(int, GetContrast()) PURE;
+	STDMETHOD_(int, GetHue()) PURE;
+	STDMETHOD_(int, GetSaturation()) PURE;
 
 	STDMETHOD(EnableForcedSubtitles(bool fEnable)) PURE;
 	STDMETHOD_(bool, IsForcedSubtitlesEnabled()) PURE;

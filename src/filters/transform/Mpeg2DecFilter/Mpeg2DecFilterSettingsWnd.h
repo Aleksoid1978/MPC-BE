@@ -31,7 +31,7 @@ class __declspec(uuid("E5FB6957-65E6-491B-BB37-B25C9FE3BEA7"))
 	CComQIPtr<IMpeg2DecFilter> m_pM2DF;
 
 	ditype m_ditype;
-	float m_procamp[4];
+	int m_procamp[4];
 	bool m_planaryuv;
 	bool m_interlaced;
 	bool m_forcedsubs;
