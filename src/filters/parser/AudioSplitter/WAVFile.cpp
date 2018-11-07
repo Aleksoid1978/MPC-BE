@@ -128,7 +128,7 @@ bool CWAVFile::CheckDTSAC3CD()
 
 		for (size_t i = 0; i + 16 < buflen; i++) {
 			if (ParseDTSHeader(buffer + i, &aframe)) {
-				m_subtype		= MEDIASUBTYPE_DTS;
+				m_subtype		= MEDIASUBTYPE_DTS2;
 				m_samplerate	= aframe.samplerate;
 				m_channels		= aframe.channels;
 				m_nBlockAlign	= aframe.size;
@@ -145,8 +145,8 @@ bool CWAVFile::CheckDTSAC3CD()
 
 	SAFE_DELETE_ARRAY(buffer);
 
-	if (m_subtype == MEDIASUBTYPE_DTS) {
-		wfe->wFormatTag = WAVE_FORMAT_DTS;
+	if (m_subtype == MEDIASUBTYPE_DTS2) {
+		wfe->wFormatTag = WAVE_FORMAT_DTS2;
 		wfe->nChannels		= m_channels;
 		wfe->nSamplesPerSec	= m_samplerate;
 		wfe->nBlockAlign	= m_nBlockAlign;

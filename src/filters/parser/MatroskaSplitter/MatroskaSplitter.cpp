@@ -1050,6 +1050,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				} else if (CodecID == "A_DTS") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_DTS2);
 
+					BYTE profile = 0;
+
 					__int64 pos = m_pFile->GetPos();
 
 					CMatroskaNode Root(m_pFile);
@@ -1094,6 +1096,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									}
 									if (start + size + 40 <= end) {
 										if (ParseDTSHDHeader(start + size, end - start - size, &aframe)) {
+											profile = aframe.param2;
+
 											wfe->nSamplesPerSec = aframe.samplerate;
 											wfe->nChannels = aframe.channels;
 											if (aframe.param1) {
@@ -1108,6 +1112,8 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										}
 									}
 								} else if (ParseDTSHDHeader(start, end - start, &aframe) && aframe.param2 == DCA_PROFILE_EXPRESS) {
+									profile = aframe.param2;
+
 									wfe->nSamplesPerSec = aframe.samplerate;
 									wfe->nChannels = aframe.channels;
 									wfe->wBitsPerSample = aframe.param1;
@@ -1125,6 +1131,12 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					m_pCluster.Free();
 
 					m_pFile->Seek(pos);
+
+					if (profile) {
+						wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 1);
+						wfe->cbSize = 1;
+						((BYTE *)(wfe + 1))[0] = profile;
+					}
 
 					mts.push_back(mt);
 				} else if (CodecID == "A_TTA1") {

@@ -222,6 +222,20 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 				} else {
 					CString codecName = CMediaTypeEx::GetAudioCodecName(pmt->subtype, pInfo->wFormatTag);
 					if (!codecName.IsEmpty()) {
+						if (codecName == L"DTS" && pInfo->cbSize == 1) {
+							const auto profile = ((BYTE *)(pInfo + 1))[0];
+							switch (profile) {
+								case DCA_PROFILE_HD_HRA:
+									codecName = L"DTS-HD HRA";
+									break;
+								case DCA_PROFILE_HD_MA:
+									codecName = L"DTS-HD MA";
+									break;
+								case DCA_PROFILE_EXPRESS:
+									codecName = L"DTS Express";
+									break;
+							}
+						}
 						Infos.emplace_back(codecName);
 					}
 				}

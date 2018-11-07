@@ -115,6 +115,22 @@ HRESULT CDTSHDFile::Open(CBaseSplitterFile* pFile)
 			if (!m_pFile->IsRandomAccess()) {
 				break;
 			}
+
+			const auto len = std::min(chunk.size, 16ui64 * KILOBYTE);
+			std::vector<BYTE> pData(len);
+			if (S_OK == m_pFile->ByteRead(pData.data(), pData.size())) {
+				BYTE* start	= pData.data();
+				BYTE* end   = start + pData.size();
+				audioframe_t aframe;
+				const auto size = ParseDTSHeader(start, &aframe);
+				if (size
+						&& (start + size + 40 <= end)
+						&& ParseDTSHDHeader(start + size, end - start - size, &aframe)) {
+					m_extrasize = 1;
+					m_extradata = (BYTE*)malloc(m_extrasize);
+					m_extradata[0] = (BYTE)aframe.param2;
+				}
+			}
 		}
 		else if (memcmp(chunk.id, chk_FILEINFO, 8) == 0) {
 			if (chunk.size < 32 * KILOBYTE) { // set limit for 'FILEINFO' chunk
@@ -190,3 +206,24 @@ int CDTSHDFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 
 	return size;
 }
+
+CString CDTSHDFile::GetName() const {
+	CString name = L"DTS-HD";
+
+	if (m_extrasize == 1) {
+		const auto profile = m_extradata[0];
+		switch (profile) {
+			case DCA_PROFILE_HD_HRA:
+				name = L"DTS-HD HRA";
+				break;
+			case DCA_PROFILE_HD_MA:
+				name = L"DTS-HD MA";
+				break;
+			case DCA_PROFILE_EXPRESS:
+				name = L"DTS Express";
+				break;
+		}
+	}
+
+	return name;
+};
