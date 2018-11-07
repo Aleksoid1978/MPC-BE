@@ -51,8 +51,8 @@ enum {
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
-	{&MEDIATYPE_Audio, &MEDIASUBTYPE_DTS},
-	{&MEDIATYPE_DVD_ENCRYPTED_PACK, &MEDIASUBTYPE_DTS},
+	{&MEDIATYPE_Audio, &MEDIASUBTYPE_DTS2},
+	{&MEDIATYPE_DVD_ENCRYPTED_PACK, &MEDIASUBTYPE_DTS2},
 	{&MEDIATYPE_Audio, &MEDIASUBTYPE_DOLBY_AC3},
 	{&MEDIATYPE_DVD_ENCRYPTED_PACK, &MEDIASUBTYPE_DOLBY_AC3},
 };
@@ -175,6 +175,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 	, m_framelength(0)
 	, m_bitdepth(0)
 	, m_streamtype(unknown)
+	, m_dts_hd_profile(0)
 {
 	CAutoLock cAutoLock(&m_cSharedState);
 	CString fn(wfn);
@@ -287,9 +288,10 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 				sync = GETU32(buf);
 				HD_size = ParseDTSHDHeader(buf, _countof(buf), &aframe);
 				if (HD_size) {
-					m_samplerate = aframe.samplerate;
-					m_channels   = aframe.channels;
-					m_bitdepth   = aframe.param1;
+					m_samplerate     = aframe.samplerate;
+					m_channels       = aframe.channels;
+					m_bitdepth       = aframe.param1;
+					m_dts_hd_profile = aframe.param2;
 				}
 			}
 
@@ -325,20 +327,21 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 			m_framesize   *= k;
 			m_framelength *= k;
 
-			m_wFormatTag = WAVE_FORMAT_DTS;
-			m_subtype = MEDIASUBTYPE_DTS;
+			m_wFormatTag = WAVE_FORMAT_DTS2;
+			m_subtype = MEDIASUBTYPE_DTS2;
 		}
 		// DTS Express
 		else if (m_streamtype == DTSExpress && ParseDTSHDHeader(buf, _countof(buf), &aframe)) {
-			m_samplerate  = aframe.samplerate;
-			m_channels    = aframe.channels;
-			m_bitdepth    = aframe.param1;
-			m_framesize   = aframe.size;
-			m_framelength = aframe.samples;
-			m_bitrate     = CalcBitrate(aframe);
+			m_samplerate    = aframe.samplerate;
+			m_channels      = aframe.channels;
+			m_bitdepth      = aframe.param1;
+			m_framesize     = aframe.size;
+			m_framelength   = aframe.samples;
+			m_bitrate       = CalcBitrate(aframe);
+			m_dts_hd_profile = aframe.param2;
 
-			m_wFormatTag  = WAVE_FORMAT_DTS;
-			m_subtype     = MEDIASUBTYPE_DTS;
+			m_wFormatTag  = WAVE_FORMAT_DTS2;
+			m_subtype     = MEDIASUBTYPE_DTS2;
 		}
 		// AC3 & E-AC3
 		else if (m_streamtype == AC3 && ParseAC3Header(buf, &aframe)) {
@@ -502,6 +505,12 @@ HRESULT CDTSAC3Stream::GetMediaType(int iPosition, CMediaType* pmt)
 		wfe->wBitsPerSample  = m_bitdepth;
 		wfe->cbSize = 0;
 
+		if (m_dts_hd_profile) {
+			wfe = (WAVEFORMATEX*)pmt->ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 1);
+			wfe->cbSize = 1;
+			((BYTE *)(wfe + 1))[0] = m_dts_hd_profile;
+		}
+
 		if (m_streamtype == MLP || m_streamtype == TrueHD) {
 			pmt->SetSampleSize(0);
 		}
@@ -520,7 +529,7 @@ HRESULT CDTSAC3Stream::CheckMediaType(const CMediaType* pmt)
 	if (pmt->majortype == MEDIATYPE_Audio && pmt->formattype == FORMAT_WaveFormatEx) {
 		WORD& wFmtTag = ((WAVEFORMATEX*)pmt->pbFormat)->wFormatTag;
 
-		if (pmt->subtype == MEDIASUBTYPE_DTS && wFmtTag == WAVE_FORMAT_DTS) {
+		if (pmt->subtype == MEDIASUBTYPE_DTS2 && wFmtTag == WAVE_FORMAT_DTS2) {
 			return S_OK;
 		} else if (pmt->subtype == MEDIASUBTYPE_DTS2 && wFmtTag == WAVE_FORMAT_DTS2) {
 			return S_OK;

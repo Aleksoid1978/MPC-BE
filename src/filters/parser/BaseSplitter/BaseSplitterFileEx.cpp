@@ -831,7 +831,7 @@ bool CBaseSplitterFileEx::Read(dtshdr& h, int len, CMediaType* pmt, bool find_sy
 		}
 
 		pmt->majortype		= MEDIATYPE_Audio;
-		pmt->subtype		= MEDIASUBTYPE_DTS;
+		pmt->subtype		= MEDIASUBTYPE_DTS2;
 		pmt->formattype		= FORMAT_WaveFormatEx;
 		pmt->SetFormat((BYTE*)&wfe, sizeof(wfe));
 	}
@@ -858,7 +858,7 @@ bool CBaseSplitterFileEx::Read(dtslbr_hdr& h, int len, CMediaType* pmt)
 				wfe.nAvgBytesPerSec = CalcBitrate(aframe) >> 3;
 
 				pmt->majortype = MEDIATYPE_Audio;
-				pmt->subtype = MEDIASUBTYPE_DTS;
+				pmt->subtype = MEDIASUBTYPE_DTS2;
 				pmt->formattype = FORMAT_WaveFormatEx;
 				pmt->SetFormat((BYTE*)&wfe, sizeof(wfe));
 			}

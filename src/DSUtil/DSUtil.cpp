@@ -2578,9 +2578,9 @@ const wchar_t *StreamTypeToName(PES_STREAM_TYPE _Type)
 		case AUDIO_STREAM_AC3_PLUS:
 				return L"Dolby Digital Plus";
 		case AUDIO_STREAM_DTS_HD:
-				return L"DTS-HD High Resolution Audio";
+				return L"DTS-HD HRA";
 		case AUDIO_STREAM_DTS_HD_MASTER_AUDIO:
-				return L"DTS-HD Master Audio";
+				return L"DTS-HD MA";
 		case PRESENTATION_GRAPHICS_STREAM:
 				return L"PGS";
 		case INTERACTIVE_GRAPHICS_STREAM:

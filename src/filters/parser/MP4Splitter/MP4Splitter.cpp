@@ -671,7 +671,10 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 												audioframe_t aframe;
 												int sizehd = ParseDTSHDHeader(start + size, end - start - size, &aframe);
 												if (sizehd) {
-													WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
+													wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 1);
+													wfe->cbSize = 1;
+													((BYTE *)(wfe + 1))[0] = (BYTE)aframe.param2;
+
 													wfe->nSamplesPerSec = aframe.samplerate;
 													wfe->nChannels = aframe.channels;
 													if (aframe.param1) {
@@ -1561,6 +1564,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							mt.subtype = MEDIASUBTYPE_FLAC;
 						} else if (type == WAVE_FORMAT_DTS2) {
 							CString Suffix = L"DTS audio";
+							BYTE profile = 0;
 
 							m_pFile->Seek(sample.GetOffset());
 							AP4_DataBuffer data;
@@ -1573,7 +1577,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 									if (start + size + 40 <= end) {
 										const int sizehd = ParseDTSHDHeader(start + size, end - start - size, &aframe);
 										if (sizehd) {
-											WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
+											profile = aframe.param2;
+
 											wfe->nSamplesPerSec = aframe.samplerate;
 											wfe->nChannels = aframe.channels;
 											if (aframe.param1) {
@@ -1590,7 +1595,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										}
 									}
 								} else if (ParseDTSHDHeader(start, end - start, &aframe) && aframe.param2 == DCA_PROFILE_EXPRESS) {
-									WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.pbFormat;
+									profile = aframe.param2;
+
 									wfe->nSamplesPerSec = aframe.samplerate;
 									wfe->nChannels = aframe.channels;
 									wfe->wBitsPerSample = aframe.param1;
@@ -1599,6 +1605,12 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 									Suffix = L"DTS Express";
 								}
+							}
+
+							if (profile) {
+								wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + 1);
+								wfe->cbSize = 1;
+								((BYTE *)(wfe + 1))[0] = profile;
 							}
 
 							SetTrackName(&TrackName, Suffix);
