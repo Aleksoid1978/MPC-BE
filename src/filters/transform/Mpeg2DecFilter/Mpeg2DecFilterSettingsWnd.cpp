@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -116,18 +116,18 @@ bool CMpeg2DecSettingsWnd::OnActivate()
 			m_procamp_value[i].Create(L"", WS_VISIBLE | WS_CHILD, CRect(p + CPoint(ScaleX(85 + 201), 0), CSize(ScaleX(30), m_fontheight)), this);
 			p.y += h;
 		}
-		m_procamp_slider[0].SetRange(0, 2*128);
-		m_procamp_slider[0].SetTic(128);
-		m_procamp_slider[0].SetPos((int)(m_procamp[0] + (m_procamp[0] >= 0 ? 0.5f : -0.5f)) + 128);
-		m_procamp_slider[1].SetRange(0, 200);
+		m_procamp_slider[0].SetRange(-128, 128, TRUE);
+		m_procamp_slider[0].SetTic(0);
+		m_procamp_slider[0].SetPos(m_procamp[0]);
+		m_procamp_slider[1].SetRange(0, 200, TRUE);
 		m_procamp_slider[1].SetTic(100);
-		m_procamp_slider[1].SetPos((int)(100*m_procamp[1] + 0.5f));
-		m_procamp_slider[2].SetRange(0, 2*180);
-		m_procamp_slider[2].SetTic(180);
-		m_procamp_slider[2].SetPos((int)(m_procamp[2] + (m_procamp[2] >= 0 ? 0.5f : -0.5f)) + 180);
-		m_procamp_slider[3].SetRange(0, 200);
+		m_procamp_slider[1].SetPos(m_procamp[1]);
+		m_procamp_slider[2].SetRange(-180, 180, TRUE);
+		m_procamp_slider[2].SetTic(0);
+		m_procamp_slider[2].SetPos(m_procamp[2]);
+		m_procamp_slider[3].SetRange(0, 200, TRUE);
 		m_procamp_slider[3].SetTic(100);
-		m_procamp_slider[3].SetPos((int)(100*m_procamp[3] + 0.5f));
+		m_procamp_slider[3].SetPos(m_procamp[3]);
 		p.y += 5;
 
 		m_procamp_tv2pc.Create(L"TV->PC", dwStyle, CRect(p + CPoint(ScaleX(85 + 200 / 2 - 80 -5), 0), CSize(ScaleX(80), m_fontheight + 6)), this, IDC_PP_BUTTON1);
@@ -153,10 +153,10 @@ bool CMpeg2DecSettingsWnd::OnActivate()
 void CMpeg2DecSettingsWnd::OnDeactivate()
 {
 	m_ditype = (ditype)GetCurItemData(m_ditype_combo);
-	m_procamp[0] = (float)m_procamp_slider[0].GetPos() - 128;
-	m_procamp[1] = (float)m_procamp_slider[1].GetPos() / 100;
-	m_procamp[2] = (float)m_procamp_slider[2].GetPos() - 180;
-	m_procamp[3] = (float)m_procamp_slider[3].GetPos() / 100;
+	m_procamp[0] = (float)m_procamp_slider[0].GetPos();
+	m_procamp[1] = (float)m_procamp_slider[1].GetPos();
+	m_procamp[2] = (float)m_procamp_slider[2].GetPos();
+	m_procamp[3] = (float)m_procamp_slider[3].GetPos();
 	m_planaryuv = !!IsDlgButtonChecked(m_planaryuv_check.GetDlgCtrlID());
 	m_interlaced = !!IsDlgButtonChecked(m_interlaced_check.GetDlgCtrlID());
 	m_forcedsubs = !!IsDlgButtonChecked(m_forcedsubs_check.GetDlgCtrlID());
@@ -187,11 +187,11 @@ void CMpeg2DecSettingsWnd::UpdateProcampValues()
 {
 	CString str;
 
-	str.Format(L"%d", m_procamp_slider[0].GetPos() - 128);
+	str.Format(L"%d", m_procamp_slider[0].GetPos());
 	m_procamp_value[0].SetWindowTextW(str);
 	str.Format(L"%d%%", m_procamp_slider[1].GetPos());
 	m_procamp_value[1].SetWindowTextW(str);
-	str.Format(L"%d", m_procamp_slider[2].GetPos() - 180);
+	str.Format(L"%d", m_procamp_slider[2].GetPos());
 	m_procamp_value[2].SetWindowTextW(str);
 	str.Format(L"%d%%", m_procamp_slider[3].GetPos());
 	m_procamp_value[3].SetWindowTextW(str);
@@ -206,7 +206,7 @@ END_MESSAGE_MAP()
 
 void CMpeg2DecSettingsWnd::OnButtonProcampPc2Tv()
 {
-	m_procamp_slider[0].SetPos(128 - 16);
+	m_procamp_slider[0].SetPos(- 16);
 	m_procamp_slider[1].SetPos(100 * 255/(235-16));
 
 	UpdateProcampValues();
@@ -214,9 +214,9 @@ void CMpeg2DecSettingsWnd::OnButtonProcampPc2Tv()
 
 void CMpeg2DecSettingsWnd::OnButtonProcampReset()
 {
-	m_procamp_slider[0].SetPos(128);
+	m_procamp_slider[0].SetPos(0);
 	m_procamp_slider[1].SetPos(100);
-	m_procamp_slider[2].SetPos(180);
+	m_procamp_slider[2].SetPos(0);
 	m_procamp_slider[3].SetPos(100);
 
 	UpdateProcampValues();
