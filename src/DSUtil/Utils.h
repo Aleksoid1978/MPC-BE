@@ -72,6 +72,11 @@ double IncreaseFloatByGrid(double value, const int step);
 // steps < 0  mean 1.0/(-step)
 double DecreaseFloatByGrid(double value, const int step);
 
+
+// Functions to convert strings to numeric values. On error, the current value does not change and false is returned.
+
 bool StrToInt32(const wchar_t* str, int32_t& value);
+bool StrToUInt32(const wchar_t* str, uint32_t& value);
 bool StrToInt64(const wchar_t* str, int64_t& value);
+bool StrToUInt64(const wchar_t* str, uint64_t& value);
 bool StrToDouble(const wchar_t* str, double& value);
