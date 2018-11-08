@@ -98,9 +98,9 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 	const int infoheight = 70;
 	const int margin = 10;
 
-	const int width = std::clamp(s.iThumbWidth, 256, 2560);
-	const int cols  = std::clamp(s.iThumbCols, 1, 10);
-	const int rows  = std::clamp(s.iThumbRows, 1, 20);
+	const int width = s.iThumbWidth;
+	const int cols  = s.iThumbCols;
+	const int rows  = s.iThumbRows;
 
 	CSize thumbsize;
 	thumbsize.cx = (width - margin) / cols - margin;
@@ -333,7 +333,7 @@ HRESULT CThumbsTaskDlg::OnInit()
 	m_pMainFrm = AfxGetMainFrame();
 
 	const CAppSettings& s = AfxGetAppSettings();
-	int n = 1 + std::clamp(s.iThumbCols, 1, 10) * std::clamp(s.iThumbRows, 1, 20) + 1;
+	int n = 1 + s.iThumbCols * s.iThumbRows + 1;
 
 	SetProgressBarRange(0, n);
 	SetProgressBarPosition(0);

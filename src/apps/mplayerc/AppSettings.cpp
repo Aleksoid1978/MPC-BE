@@ -894,23 +894,23 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	FiltersPrioritySettings.LoadSettings();
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, iCaptionMenuMode);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, iCaptionMenuMode, MODE_SHOWCAPTIONMENU, MODE_BORDERLESS);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_HIDENAVIGATION, fHideNavigation);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_CONTROLSTATE, *(int*)&nCS);
+	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_CONTROLSTATE, nCS);
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_DEFAULTVIDEOFRAME, iDefaultVideoSize);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_DEFAULTVIDEOFRAME, iDefaultVideoSize, DVS_HALF, DVS_ZOOM2);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_NOSMALLUPSCALE, bNoSmallUpscale);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_NOSMALLDOWNSCALE, bNoSmallDownscale);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_KEEPASPECTRATIO, fKeepAspectRatio);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_COMPMONDESKARDIFF, fCompMonDeskARDiff);
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_VOLUME, nVolume);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_BALANCE, nBalance);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_VOLUME, nVolume, 0, 100);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_BALANCE, nBalance, -100, 100);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MUTE, fMute);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_LOOPNUM, nLoops);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LOOP, fLoopForever);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REWIND, fRewind);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ZOOM, iZoomLevel);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ZOOM, iZoomLevel, 0, 4);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUTOFITFACTOR, nAutoFitFactor, 20, 80);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_VOLUME_STEP, nVolumeStep, 1, 10);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SPEED_STEP, nSpeedStep);
@@ -926,34 +926,33 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_PRIORITIZEEXTERNALAUDIO, fPrioritizeExternalAudio);
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_AUDIOPATHS, strAudioPaths);
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SUBTITLERENDERER, iSubtitleRenderer);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SUBTITLERENDERER, iSubtitleRenderer, SUBRNDT_NONE, SUBRNDT_XYSUBFILTER);
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_SUBTITLESLANGORDER, strSubtitlesLanguageOrder);
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_AUDIOSLANGORDER, strAudiosLanguageOrder);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_INTERNALSELECTTRACKLOGIC, fUseInternalSelectTrackLogic);
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIOWINDOWMODE, nAudioWindowMode);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIOWINDOWMODE, nAudioWindowMode, 0, 2);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ADDSIMILARFILES, bAddSimilarFiles);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ENABLEWORKERTHREADFOROPENING, fEnableWorkerThreadForOpening);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REPORTFAILEDPINS, fReportFailedPins);
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, iMultipleInst);
-	iMultipleInst = discard(iMultipleInst, 1, 0, 2);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, iMultipleInst, 0, 2);
 
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXT, iTitleBarTextStyle, TEXTBAR_EMPTY, TEXTBAR_FULLPATH);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SEEKBARTEXT, iSeekBarTextStyle, TEXTBAR_EMPTY, TEXTBAR_FULLPATH);
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ONTOP, iOnTop);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ONTOP, iOnTop, 0, 3);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_TRAYICON, bTrayIcon);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUTOZOOM, bRememberZoomLevel);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLS, fShowBarsWhenFullScreen);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLSTIMEOUT, nShowBarsWhenFullScreenTimeOut);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLSTIMEOUT, nShowBarsWhenFullScreenTimeOut, -1, 10);
 
 	//Multi-monitor code
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITOR, strFullScreenMonitor);
 	// DeviceID
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_FULLSCREENMONITORID, strFullScreenMonitorID);
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_DISPLAYMODECHANGEDELAY, iDMChangeDelay);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_DISPLAYMODECHANGEDELAY, iDMChangeDelay, 0, 9);
 
 	// Prevent Minimize when in Fullscreen mode on non default monitor
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MPC_PREVENT_MINIMIZE, fPreventMinimize);
@@ -968,8 +967,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MPC_NO_SEARCH_IN_FOLDER, fDontUseSearchInFolder);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USE_TIME_TOOLTIP, fUseTimeTooltip);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_TIME_TOOLTIP_POSITION, nTimeTooltipPosition);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_SIZE, nOSDSize);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_TIME_TOOLTIP_POSITION, nTimeTooltipPosition, TIME_TOOLTIP_ABOVE_SEEKBAR, TIME_TOOLTIP_BELOW_SEEKBAR);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_SIZE, nOSDSize, 10, 25);
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_OSD_FONT, strOSDFont);
 
 	// Associated types with icon or not...
@@ -1038,7 +1037,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	} else {
 		bRememberWindowPos = false;
 	}
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_LASTWINDOWTYPE, *(int*)&nLastWindowType);
+	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_LASTWINDOWTYPE, nLastWindowType);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SHUFFLEPLAYLISTITEMS, bShufflePlaylistItems);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REMEMBERPLAYLISTITEMS, bRememberPlaylistItems);
@@ -1049,9 +1048,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_DVDPATH, strDVDPath);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USEDVDPATH, bUseDVDPath);
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_MENULANG, *(int*)&idMenuLang);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIOLANG, *(int*)&idAudioLang);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SUBTITLESLANG, *(int*)&idSubtitlesLang);
+	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_MENULANG, *(unsigned*)&idMenuLang);
+	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_AUDIOLANG, *(unsigned*)&idAudioLang);
+	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_SUBTITLESLANG, *(unsigned*)&idSubtitlesLang);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_CLOSEDCAPTIONS, bClosedCaptions);
 	// TODO: rename subdefstyle -> defStyle
@@ -1063,8 +1062,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		}
 	}
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SPOVERRIDEPLACEMENT, fOverridePlacement);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SPHORPOS, nHorPos);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SPVERPOS, nVerPos);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SPHORPOS, nHorPos, -10, 110);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SPVERPOS, nVerPos, -10, 110);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SUBDELAYINTERVAL, nSubDelayInterval);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ENABLESUBTITLES, fEnableSubtitles);
@@ -1077,10 +1076,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USEDEFAULTSUBTITLESSTYLE, fUseDefaultSubtitlesStyle);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ENABLEAUDIOTIMESHIFT, bAudioTimeShift);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIOTIMESHIFT, iAudioTimeShift, -600000, 600000);
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration);
-	iBufferDuration = discard(iBufferDuration, APP_BUFDURATION_DEF, APP_BUFDURATION_MIN, APP_BUFDURATION_MAX);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration, APP_BUFDURATION_MIN, APP_BUFDURATION_MAX);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUDIOMIXER, bAudioMixer);
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_AUDIOMIXERLAYOUT, tmpstr);
@@ -1098,8 +1096,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadDouble(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, dAudioGain_dB, APP_AUDIOGAIN_MIN, APP_AUDIOGAIN_MAX);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, bAudioAutoVolumeControl);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, bAudioNormBoost);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, iAudioNormLevel);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMREALEASETIME, iAudioNormRealeaseTime);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, iAudioNormLevel, 0, 100);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMREALEASETIME, iAudioNormRealeaseTime, 5, 10);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_AUDIOSAMPLEFORMATS, iAudioSampleFormats);
 	iAudioSampleFormats &= SFMT_MASK;
 
@@ -1178,7 +1176,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 			}
 
 			f->dwMerit = MERIT_DO_NOT_USE + 1;
-			profile.ReadInt(key, L"Merit", *(int*)&f->dwMerit);
+			profile.ReadUInt(key, L"Merit", *(unsigned*)&f->dwMerit);
 
 			m_filters.AddTail(f);
 		}
@@ -1270,11 +1268,11 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_TRANSPARENT, nOSDTransparent);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_BORDER, nOSDBorder);
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, *(int*)&clrFaceABGR);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, *(int*)&clrOutlineABGR);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTCOLOR, *(int*)&clrFontABGR);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD1COLOR, *(int*)&clrGrad1ABGR);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD2COLOR, *(int*)&clrGrad2ABGR);
+	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, *(unsigned*)&clrFaceABGR);
+	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, *(unsigned*)&clrOutlineABGR);
+	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTCOLOR, *(unsigned*)&clrFontABGR);
+	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD1COLOR, *(unsigned*)&clrGrad1ABGR);
+	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD2COLOR, *(unsigned*)&clrGrad2ABGR);
 
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, nJumpDistS);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, nJumpDistM);
@@ -1306,13 +1304,13 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_HIDECDROMSSUBMENU, bHideCDROMsSubMenu);
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_PRIORITY, *(int*)&dwPriority);
+	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_PRIORITY, *(unsigned*)&dwPriority);
 	::SetPriorityClass(::GetCurrentProcess(), dwPriority);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, fLaunchfullscreen);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ENABLEWEBSERVER, fEnableWebServer);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERPORT, nWebServerPort);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERQUALITY, nWebServerQuality);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERPORT, nWebServerPort, 1, 65535);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_WEBSERVERQUALITY, nWebServerQuality, APP_WEBSRVQUALITY_MIN, APP_WEBSRVQUALITY_MAX);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WEBSERVERPRINTDEBUGINFO, fWebServerPrintDebugInfo);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WEBSERVERUSECOMPRESSION, fWebServerUseCompression);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WEBSERVERLOCALHOSTONLY, fWebServerLocalhostOnly);
@@ -1330,22 +1328,21 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_SNAPSHOTEXT, strSnapShotExt);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SNAPSHOT_SUBTITLES, bSnapShotSubtitles);
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THUMBROWS, iThumbRows);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THUMBCOLS, iThumbCols);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THUMBWIDTH, iThumbWidth);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THUMBQUALITY, iThumbQuality);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THUMBLEVELPNG, iThumbLevelPNG);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THUMBROWS, iThumbRows, 1, 10);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THUMBCOLS, iThumbCols, 1, 20);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THUMBWIDTH, iThumbWidth, 256, 2560);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THUMBQUALITY, iThumbQuality, 10, 100);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THUMBLEVELPNG, iThumbLevelPNG, 1, 9);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SUBSAVEEXTERNALSTYLEFILE, bSubSaveExternalStyleFile);
 
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_ISDB, strISDb);
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_LASTUSEDPAGE, *(int*)&nLastUsedPage);
+	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_LASTUSEDPAGE, nLastUsedPage);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_D3DFULLSCREEN, fD3DFullscreen);
 	//profile.ReadBool(IDS_R_SETTINGS, IDS_RS_MONITOR_AUTOREFRESHRATE, fMonitorAutoRefreshRate);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, iStereo3DMode);
-	iStereo3DMode	= discard(iStereo3DMode, (int)STEREO3D_AUTO, (int)STEREO3D_AUTO, (int)STEREO3D_OVERUNDER);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_STEREO3D_MODE, iStereo3DMode, STEREO3D_AUTO, STEREO3D_OVERUNDER);
 	if (iStereo3DMode == ID_STEREO3D_ROW_INTERLEAVED) {
 		GetRenderersSettings().iStereo3DTransform = STEREO3D_HalfOverUnder_to_Interlace;
 	} else {
@@ -1353,10 +1350,10 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_STEREO3D_SWAPLEFTRIGHT, bStereo3DSwapLR);
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_COLOR_BRIGHTNESS, iBrightness);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_COLOR_CONTRAST, iContrast);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_COLOR_HUE, iHue);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_COLOR_SATURATION, iSaturation);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_COLOR_BRIGHTNESS, iBrightness, -100, 100);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_COLOR_CONTRAST, iContrast, -100, 100);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_COLOR_HUE, iHue, -180, 180);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_COLOR_SATURATION, iSaturation, -100, 100);
 
 	{ // load shader list
 		int curPos;
@@ -1484,6 +1481,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_YOUTUBE_FORMAT, tmpstr);
 	YoutubeFormat.fmt = (tmpstr == L"WEBM") ? 1 : 0;
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_RESOLUTION, YoutubeFormat.res);
+	YoutubeFormat.res = discard(YoutubeFormat.res, 720, s_CommonVideoHeights);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_YOUTUBE_60FPS, YoutubeFormat.fps60);
 	if (YoutubeFormat.fps60) {
 		profile.ReadBool(IDS_R_SETTINGS, IDS_RS_YOUTUBE_HDR, YoutubeFormat.hdr);
@@ -1495,7 +1493,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_YDL_MAXHEIGHT, iYDLMaxHeight);
 	iYDLMaxHeight = discard(iYDLMaxHeight, 720, s_CommonVideoHeights);
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, *(int*)&nLastFileInfoPage);
+	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, *(unsigned*)&nLastFileInfoPage);
 
 	profile.ReadBool(IDS_R_UPDATER, IDS_RS_UPDATER_AUTO_CHECK, bUpdaterAutoCheck);
 	profile.ReadInt(IDS_R_UPDATER, IDS_RS_UPDATER_DELAY, nUpdaterDelay, 1, 365);
@@ -1527,7 +1525,7 @@ void CAppSettings::SaveSettings()
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, iCaptionMenuMode);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_HIDENAVIGATION, fHideNavigation);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_CONTROLSTATE, nCS);
+	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_CONTROLSTATE, nCS);
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_DEFAULTVIDEOFRAME, iDefaultVideoSize);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_NOSMALLUPSCALE, bNoSmallUpscale);
@@ -1569,7 +1567,7 @@ void CAppSettings::SaveSettings()
 	}
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SNAPTODESKTOPEDGES, bSnapToDesktopEdges);
 	profile.WriteBinary(IDS_R_SETTINGS, IDS_RS_LASTWINDOWRECT, (BYTE*)&rcLastWindowPos, sizeof(rcLastWindowPos));
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_LASTWINDOWTYPE, (nLastWindowType == SIZE_MINIMIZED) ? SIZE_RESTORED : nLastWindowType);
+	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_LASTWINDOWTYPE, (nLastWindowType == SIZE_MINIMIZED) ? SIZE_RESTORED : nLastWindowType);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_X, sizeAspectRatio.cx);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_Y, sizeAspectRatio.cy);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, bKeepHistory);
@@ -1602,9 +1600,9 @@ void CAppSettings::SaveSettings()
 
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_DVDPATH, strDVDPath);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USEDVDPATH, bUseDVDPath);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_MENULANG, idMenuLang);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_AUDIOLANG, idAudioLang);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_SUBTITLESLANG, idSubtitlesLang);
+	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_MENULANG, idMenuLang);
+	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_AUDIOLANG, idAudioLang);
+	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_SUBTITLESLANG, idSubtitlesLang);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_CLOSEDCAPTIONS, bClosedCaptions);
 
 	CString style;
@@ -1626,12 +1624,9 @@ void CAppSettings::SaveSettings()
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_AUDIOMIXERLAYOUT, channel_mode_sets[nAudioMixerLayout]);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_AUDIOSTEREOFROMDECODER, bAudioStereoFromDecoder);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_AUDIOBASSREDIRECT, bAudioBassRedirect);
-	str.Format(L"%.1f", dAudioCenter_dB);
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_AUDIOLEVELCENTER, str);
-	str.Format(L"%.1f", dAudioSurround_dB);
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_AUDIOLEVELSURROUND, str);
-	str.Format(L"%.1f", dAudioGain_dB);
-	profile.WriteString(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, str);
+	profile.WriteDouble(IDS_R_SETTINGS, IDS_RS_AUDIOLEVELCENTER, dAudioCenter_dB);
+	profile.WriteDouble(IDS_R_SETTINGS, IDS_RS_AUDIOLEVELSURROUND, dAudioSurround_dB);
+	profile.WriteDouble(IDS_R_SETTINGS, IDS_RS_AUDIOGAIN, dAudioGain_dB);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_AUDIOAUTOVOLUMECONTROL, bAudioAutoVolumeControl);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_AUDIONORMBOOST, bAudioNormBoost);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_AUDIONORMLEVEL, iAudioNormLevel);
@@ -1805,18 +1800,18 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_OSD_TRANSPARENT, nOSDTransparent);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_OSD_BORDER, nOSDBorder);
 
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, clrFaceABGR);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, clrOutlineABGR);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTCOLOR, clrFontABGR);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD1COLOR, clrGrad1ABGR);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD2COLOR, clrGrad2ABGR);
+	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_CLRFACEABGR, clrFaceABGR);
+	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_CLROUTLINEABGR, clrOutlineABGR);
+	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_OSD_FONTCOLOR, clrFontABGR);
+	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD1COLOR, clrGrad1ABGR);
+	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_OSD_GRAD2COLOR, clrGrad2ABGR);
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTS, nJumpDistS);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTM, nJumpDistM);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_JUMPDISTL, nJumpDistL);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_LIMITWINDOWPROPORTIONS, bLimitWindowProportions);
 
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_LASTUSEDPAGE, nLastUsedPage);
+	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_LASTUSEDPAGE, nLastUsedPage);
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_DLGPROPX, iDlgPropX);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_DLGPROPY, iDlgPropY);
@@ -1843,7 +1838,7 @@ void CAppSettings::SaveSettings()
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_HIDECDROMSSUBMENU, bHideCDROMsSubMenu);
 
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_PRIORITY, dwPriority);
+	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_PRIORITY, dwPriority);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_LAUNCHFULLSCREEN, fLaunchfullscreen);
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_ENABLEWEBSERVER, fEnableWebServer);
@@ -1883,7 +1878,7 @@ void CAppSettings::SaveSettings()
 
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, fRemainingTime);
 
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, nLastFileInfoPage);
+	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_LASTFILEINFOPAGE, nLastFileInfoPage);
 
 	profile.WriteBool(IDS_R_UPDATER, IDS_RS_UPDATER_AUTO_CHECK, bUpdaterAutoCheck);
 	profile.WriteInt(IDS_R_UPDATER, IDS_RS_UPDATER_DELAY, nUpdaterDelay);
@@ -1965,7 +1960,7 @@ void CAppSettings::SaveExternalFilters()
 			profile.WriteString(key, val, CStringFromGUID(item));
 		}
 		profile.WriteInt(key, L"LoadType", f->iLoadType);
-		profile.WriteInt(key, L"Merit", f->dwMerit);
+		profile.WriteUInt(key, L"Merit", f->dwMerit);
 
 		k++;
 	}
