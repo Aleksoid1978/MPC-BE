@@ -1088,6 +1088,7 @@
 #define IDS_AG_DISPLAY_STATS            32981
 #define IDS_AG_AUDIODELAY_ONOFF         32982
 #define IDS_AG_AUTOSAVE_DISPLAY         32984
+#define IDS_AG_OPEN_ISO                 32985
 #define IDS_PPAGEWEBSERVER_0            32996
 #define IDS_AG_DEFAULT                  33000
 #define IDS_AG_DEFAULT_L                33001
