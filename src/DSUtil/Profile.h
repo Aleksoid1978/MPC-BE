@@ -58,6 +58,8 @@ public:
 	bool ReadBool  (const wchar_t* section, const wchar_t* entry, bool&     value);
 	bool ReadInt   (const wchar_t* section, const wchar_t* entry, int&      value);
 	bool ReadInt   (const wchar_t* section, const wchar_t* entry, int&      value, const int lo, const int hi);
+	bool ReadUInt  (const wchar_t* section, const wchar_t* entry, unsigned& value);
+	bool ReadUInt  (const wchar_t* section, const wchar_t* entry, unsigned& value, const unsigned lo, const unsigned hi);
 	bool ReadInt64 (const wchar_t* section, const wchar_t* entry, __int64&  value);
 	bool ReadInt64 (const wchar_t* section, const wchar_t* entry, __int64&  value, const __int64 lo, const __int64 hi);
 	bool ReadDouble(const wchar_t* section, const wchar_t* entry, double&   value);
@@ -67,6 +69,7 @@ public:
 
 	bool WriteBool  (const wchar_t* section, const wchar_t* entry, const bool     value);
 	bool WriteInt   (const wchar_t* section, const wchar_t* entry, const int      value);
+	bool WriteUInt  (const wchar_t* section, const wchar_t* entry, const unsigned value);
 	bool WriteInt64 (const wchar_t* section, const wchar_t* entry, const __int64  value);
 	bool WriteDouble(const wchar_t* section, const wchar_t* entry, const double   value);
 	bool WriteString(const wchar_t* section, const wchar_t* entry, const CStringW value);

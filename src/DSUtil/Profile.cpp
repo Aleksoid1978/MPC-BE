@@ -241,6 +241,51 @@ bool CProfile::ReadInt(const wchar_t* section, const wchar_t* entry, int& value,
 	return ret;
 }
 
+bool CProfile::ReadUInt(const wchar_t* section, const wchar_t* entry, unsigned& value)
+{
+	std::lock_guard<std::recursive_mutex> lock(m_Mutex);
+
+	bool ret = false;
+
+	if (m_hAppRegKey) {
+		CRegKey regkey;
+		if (ERROR_SUCCESS == regkey.Open(m_hAppRegKey, section, KEY_READ)) {
+			if (ERROR_SUCCESS == regkey.QueryDWORDValue(entry, *(DWORD*)&value)) {
+				ret = true;
+			}
+			regkey.Close();
+		}
+	}
+	else {
+		InitIni();
+		auto it1 = m_ProfileMap.find(section);
+		if (it1 != m_ProfileMap.end()) {
+			auto it2 = it1->second.find(entry);
+			if (it2 != it1->second.end()) {
+				ret = StrToUInt32(it2->second, value);
+			}
+		}
+	}
+
+	return ret;
+}
+
+bool CProfile::ReadUInt(const wchar_t* section, const wchar_t* entry, unsigned& value, const unsigned lo, const unsigned hi)
+{
+	unsigned v = value;
+	bool ret = ReadUInt(section, entry, v);
+	if (ret) {
+		if (v >= lo && v <= hi) {
+			value = v;
+		}
+		else {
+			ret = false;
+		}
+	}
+
+	return ret;
+}
+
 bool CProfile::ReadInt64(const wchar_t* section, const wchar_t* entry, __int64& value)
 {
 	std::lock_guard<std::recursive_mutex> lock(m_Mutex);
@@ -445,6 +490,36 @@ bool CProfile::WriteInt(const wchar_t* section, const wchar_t* entry, const int 
 		InitIni();
 		CStringW valueStr;
 		valueStr.Format(L"%d", value);
+		CStringW& old = m_ProfileMap[section][entry];
+		if (old != valueStr) {
+			old = valueStr;
+			m_bIniNeedFlush = true;
+		}
+		ret = true;
+	}
+
+	return ret;
+}
+
+bool CProfile::WriteUInt(const wchar_t* section, const wchar_t* entry, const unsigned value)
+{
+	std::lock_guard<std::recursive_mutex> lock(m_Mutex);
+
+	bool ret = false;
+
+	if (m_hAppRegKey) {
+		CRegKey regkey;
+		if (ERROR_SUCCESS == regkey.Create(m_hAppRegKey, section)) {
+			if (ERROR_SUCCESS == regkey.SetDWORDValue(entry, (DWORD)value)) {
+				ret = true;
+			}
+			regkey.Close();
+		}
+	}
+	else {
+		InitIni();
+		CStringW valueStr;
+		valueStr.Format(L"%u", value);
 		CStringW& old = m_ProfileMap[section][entry];
 		if (old != valueStr) {
 			old = valueStr;
