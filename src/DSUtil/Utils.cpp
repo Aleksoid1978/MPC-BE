@@ -198,10 +198,32 @@ bool StrToInt32(const wchar_t* str, int32_t& value)
 	return false;
 }
 
+bool StrToUInt32(const wchar_t* str, uint32_t& value)
+{
+	wchar_t* end;
+	uint32_t v = wcstoul(str, &end, 10);
+	if (end > str) {
+		value = v;
+		return true;
+	}
+	return false;
+}
+
 bool StrToInt64(const wchar_t* str, int64_t& value)
 {
 	wchar_t* end;
 	int64_t v = wcstoll(str, &end, 10);
+	if (end > str) {
+		value = v;
+		return true;
+	}
+	return false;
+}
+
+bool StrToUInt64(const wchar_t* str, uint64_t& value)
+{
+	wchar_t* end;
+	uint64_t v = wcstoull(str, &end, 10);
 	if (end > str) {
 		value = v;
 		return true;
