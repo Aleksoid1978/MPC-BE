@@ -169,20 +169,9 @@ void CRenderersSettings::Load()
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SYNC_MODE, iSynchronizeMode);
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SYNC_LINEDELTA, iLineDelta);
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SYNC_COLUMNDELTA, iColumnDelta);
-	double* dPtr;
-	UINT dSize;
-	if (profile.ReadBinary(IDS_R_VIDEO, IDS_RS_SYNC_CYCLEDELTA, (BYTE**)&dPtr, dSize) && dSize == 8) {
-		dCycleDelta = *dPtr;
-		delete[] dPtr;
-	}
-	if (profile.ReadBinary(IDS_R_VIDEO, IDS_RS_SYNC_TARGETOFFSET, (BYTE**)&dPtr, dSize) && dSize == 8) {
-		dTargetSyncOffset = *dPtr;
-		delete[] dPtr;
-	}
-	if (profile.ReadBinary(IDS_R_VIDEO, IDS_RS_SYNC_CONTROLLIMIT, (BYTE**)&dPtr, dSize) && dSize == 8) {
-		dControlLimit = *dPtr;
-		delete[] dPtr;
-	}
+	profile.ReadDouble(IDS_R_VIDEO, IDS_RS_SYNC_CYCLEDELTA, dCycleDelta);
+	profile.ReadDouble(IDS_R_VIDEO, IDS_RS_SYNC_TARGETOFFSET, dTargetSyncOffset);
+	profile.ReadDouble(IDS_R_VIDEO, IDS_RS_SYNC_CONTROLLIMIT, dControlLimit);
 
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_COLMAN, bColorManagementEnable);
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLMAN_INPUT, iColorManagementInput);
@@ -231,9 +220,9 @@ void CRenderersSettings::Save()
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_MODE, iSynchronizeMode);
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_LINEDELTA, iLineDelta);
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_SYNC_COLUMNDELTA, iColumnDelta);
-	profile.WriteBinary(IDS_R_VIDEO, IDS_RS_SYNC_CYCLEDELTA, (LPBYTE)&(dCycleDelta), sizeof(dCycleDelta));
-	profile.WriteBinary(IDS_R_VIDEO, IDS_RS_SYNC_TARGETOFFSET, (LPBYTE)&(dTargetSyncOffset), sizeof(dTargetSyncOffset));
-	profile.WriteBinary(IDS_R_VIDEO, IDS_RS_SYNC_CONTROLLIMIT, (LPBYTE)&(dControlLimit), sizeof(dControlLimit));
+	profile.WriteDouble(IDS_R_VIDEO, IDS_RS_SYNC_CYCLEDELTA, dCycleDelta);
+	profile.WriteDouble(IDS_R_VIDEO, IDS_RS_SYNC_TARGETOFFSET, dTargetSyncOffset);
+	profile.WriteDouble(IDS_R_VIDEO, IDS_RS_SYNC_CONTROLLIMIT, dControlLimit);
 
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_COLMAN, bColorManagementEnable);
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_COLMAN_INPUT, iColorManagementInput);
