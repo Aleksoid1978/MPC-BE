@@ -6105,8 +6105,8 @@ void CMainFrame::OnFileSaveImage()
 		s.strSnapShotExt = L".png";
 	}
 
-	s.iThumbQuality      = fd.m_quality;
-	s.iThumbLevelPNG     = fd.m_levelPNG;
+	s.iThumbQuality      = std::clamp(fd.m_quality, 10, 100);
+	s.iThumbLevelPNG     = std::clamp(fd.m_levelPNG, 1, 9);
 	s.bSnapShotSubtitles = fd.m_bSnapShotSubtitles;
 
 	CString pdst = fd.GetPathName();
@@ -6190,11 +6190,11 @@ void CMainFrame::OnFileSaveThumbnails()
 		s.strSnapShotExt = L".png";
 	}
 
-	s.iThumbRows         = fd.m_rows;
-	s.iThumbCols         = fd.m_cols;
-	s.iThumbWidth        = fd.m_width;
-	s.iThumbQuality      = fd.m_quality;
-	s.iThumbLevelPNG     = fd.m_levelPNG;
+	s.iThumbRows         = std::clamp(fd.m_rows, 1, 20);
+	s.iThumbCols         = std::clamp(fd.m_cols, 1, 10);
+	s.iThumbWidth        = std::clamp(fd.m_width, 256, 2560);
+	s.iThumbQuality      = std::clamp(fd.m_quality, 10, 100);
+	s.iThumbLevelPNG     = std::clamp(fd.m_levelPNG, 1, 9);
 	s.bSnapShotSubtitles = fd.m_bSnapShotSubtitles;
 
 	CString pdst = fd.GetPathName();
