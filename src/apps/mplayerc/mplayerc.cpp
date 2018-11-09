@@ -280,34 +280,6 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 		_wremove(m_Profile.GetIniPath());
 	}
 
-	CString newpath;
-	AfxGetMyApp()->GetAppSavePath(newpath);
-
-	if (oldpath.GetLength() > 0) {
-		DeleteFileW(oldpath + L"default.mpcpl");
-
-		// moving shader files
-		CStringW shaderpath = oldpath + L"\\Shaders";
-		if (::PathFileExistsW(shaderpath)) {
-			// use SHFileOperation, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
-			WCHAR pathFrom[MAX_PATH] = { 0 }; // for double null-terminated string
-			wcscpy(pathFrom, shaderpath);
-
-			WCHAR pathTo[MAX_PATH] = { 0 }; // for double null-terminated string
-			wcscpy(pathTo, newpath);
-
-			SHFILEOPSTRUCTW sf = { 0 };
-			sf.wFunc = FO_MOVE;
-			sf.hwnd = 0;
-			sf.fFlags = FOF_NOCONFIRMATION | FOF_NOCONFIRMMKDIR | FOF_NOERRORUI;
-			sf.pFrom = pathFrom;
-			sf.pTo = pathTo;
-			if (SHFileOperationW(&sf) != 0) {
-				MessageBoxW(nullptr, L"Moving shader files failed", ResStr(IDS_AG_ERROR), MB_OK);
-			}
-		}
-	}
-
 	// Save favorites to the new location
 	AfxGetAppSettings().SetFav(FAV_FILE, filesFav);
 	AfxGetAppSettings().SetFav(FAV_DVD, DVDsFav);
@@ -318,6 +290,33 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 
 	// Write settings immediately
 	m_s.SaveSettings();
+
+	if (oldpath.GetLength() > 0) {
+		DeleteFileW(oldpath + L"default.mpcpl");
+
+		// moving shader files
+		const CStringW shaderpath = oldpath + L"Shaders\\";
+		if (::PathFileExistsW(shaderpath)) {
+			CString newpath;
+			AfxGetMyApp()->GetAppSavePath(newpath);
+
+			// use SHFileOperation, because MoveFile/MoveFileEx will fail on directory moves when the destination is on a different volume.
+			WCHAR pathFrom[MAX_PATH] = { 0 }; // for double null-terminated string
+			wcscpy(pathFrom, shaderpath);
+
+			WCHAR pathTo[MAX_PATH] = { 0 }; // for double null-terminated string
+			wcscpy(pathTo, newpath);
+
+			SHFILEOPSTRUCTW sf = { 0 };
+			sf.wFunc = FO_MOVE;
+			sf.fFlags = FOF_NOCONFIRMATION | FOF_NOCONFIRMMKDIR | FOF_NOERRORUI;
+			sf.pFrom = pathFrom;
+			sf.pTo = pathTo;
+			if (SHFileOperationW(&sf) != 0) {
+				MessageBoxW(nullptr, L"Moving shader files failed", ResStr(IDS_AG_ERROR), MB_OK);
+			}
+		}
+	}
 
 	return true;
 }
