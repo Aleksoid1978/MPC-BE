@@ -175,6 +175,7 @@ bool CProfile::StoreSettingsToIni()
 	if (m_hAppRegKey) {
 		LONG lResult = SHDeleteKeyW(m_hAppRegKey, L"");
 		RegCloseKey(m_hAppRegKey);
+		m_hAppRegKey = nullptr;
 	}
 
 	return true;
