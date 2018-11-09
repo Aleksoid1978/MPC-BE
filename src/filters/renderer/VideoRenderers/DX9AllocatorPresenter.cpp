@@ -384,9 +384,6 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 
 	bool bRet = false;
 
-	bRet = bRet || New.bAlterativeVSync != Current.bAlterativeVSync;
-	bRet = bRet || New.bVSyncAccurate != Current.bVSyncAccurate;
-
 	if (!m_bIsFullscreen) {
 		if (Current.bDisableDesktopComposition) {
 			if (!m_bDesktopCompositionDisabled) {
@@ -403,6 +400,10 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 				}
 			}
 		}
+	}
+
+	if (m_bDesktopCompositionDisabled) {
+		bRet = bRet || New.bAlternativeVSync != Current.bAlternativeVSync;
 	}
 
 	bRet = bRet || New.b10BitOutput != Current.b10BitOutput;
@@ -571,7 +572,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	}
 
 	m_bCompositionEnabled = !!bCompositionEnabled;
-	m_bAlternativeVSync = rs.bAlterativeVSync;
+	m_bAlternativeVSync = rs.bAlternativeVSync;
 
 	// detect FP 16-bit textures support
 	m_bFP16Support = SUCCEEDED(m_pD3DEx->CheckDeviceFormat(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER, D3DRTYPE_VOLUMETEXTURE, D3DFMT_A16B16G16R16F));
@@ -616,21 +617,22 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		} else {
 			m_d3dpp.BackBufferFormat = D3DFMT_X8R8G8B8;
 		}
-		m_d3dpp.Windowed = false;
-		m_d3dpp.BackBufferCount = 3;
-		m_d3dpp.SwapEffect = D3DSWAPEFFECT_FLIP;
-		// there's no Desktop composition to take care of alternative vSync in exclusive mode, alternative vSync is therefore unused
+		m_d3dpp.Windowed = FALSE;
 		m_d3dpp.hDeviceWindow = m_hWnd;
+		m_d3dpp.SwapEffect = D3DSWAPEFFECT_FLIP;
+		m_d3dpp.BackBufferCount = 3;
 		m_d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
+		// there's no Desktop composition to take care of alternative vSync in exclusive mode, alternative vSync is therefore unused
+		m_d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+		m_d3dpp.FullScreen_RefreshRateInHz = m_refreshRate = d3ddmEx.RefreshRate;
+		m_d3dpp.BackBufferWidth = m_ScreenSize.cx;
+		m_d3dpp.BackBufferHeight = m_ScreenSize.cy;
 
 		if (!m_FocusThread) {
 			m_FocusThread = (CFocusThread*)AfxBeginThread(RUNTIME_CLASS(CFocusThread), 0, 0, 0);
 		}
 
 		d3ddmEx.Format = m_d3dpp.BackBufferFormat;
-		m_d3dpp.FullScreen_RefreshRateInHz = m_refreshRate = d3ddmEx.RefreshRate;
-		m_d3dpp.BackBufferWidth = m_ScreenSize.cx;
-		m_d3dpp.BackBufferHeight = m_ScreenSize.cy;
 
 		bTryToReset = bTryToReset && m_pD3DDevEx;
 		if (bTryToReset) {
@@ -655,12 +657,10 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		m_d3dpp.Windowed = TRUE;
 		m_d3dpp.hDeviceWindow = m_hWnd;
 		m_d3dpp.SwapEffect = D3DSWAPEFFECT_COPY;
-		m_d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
 		m_d3dpp.BackBufferCount = 1;
-		if (bCompositionEnabled || m_bAlternativeVSync) {
-			// Desktop composition takes care of the VSYNC
-			m_d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
-		}
+		m_d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
+		// Desktop composition takes care of the VSYNC
+		m_d3dpp.PresentationInterval = (bCompositionEnabled || m_bAlternativeVSync) ? D3DPRESENT_INTERVAL_IMMEDIATE : D3DPRESENT_INTERVAL_ONE;
 
 		m_refreshRate = d3ddmEx.RefreshRate;
 		m_d3dpp.BackBufferWidth = backBufferSize.cx;
@@ -1191,17 +1191,17 @@ int CDX9AllocatorPresenter::GetVBlackPos()
 	CRenderersSettings& rs = GetRenderersSettings();
 	BOOL bCompositionEnabled = m_bCompositionEnabled;
 
-	int WaitRange = std::max(m_ScreenSize.cy / 40, 5L);
+	const int WaitRange = std::max(m_ScreenSize.cy / 40, 5L);
 	if (!bCompositionEnabled) {
 		if (m_bAlternativeVSync) {
 			return rs.iVSyncOffset;
 		} else {
-			int MinRange = std::clamp(long(0.005 * double(m_ScreenSize.cy) * GetRefreshRate() + 0.5), 5L, m_ScreenSize.cy/3); // 5  ms or max 33 % of Time
-			int WaitFor = m_ScreenSize.cy - (MinRange + WaitRange);
+			const int MinRange = std::clamp(long(0.005 * double(m_ScreenSize.cy) * GetRefreshRate() + 0.5), 5L, m_ScreenSize.cy / 3); // 5  ms or max 33 % of Time
+			const int WaitFor = m_ScreenSize.cy - (MinRange + WaitRange);
 			return WaitFor;
 		}
 	} else {
-		int WaitFor = m_ScreenSize.cy / 2;
+		const int WaitFor = m_ScreenSize.cy / 2;
 		return WaitFor;
 	}
 }
@@ -1217,10 +1217,8 @@ bool CDX9AllocatorPresenter::WaitForVBlank(bool &_Waited, bool &_bTakenLock)
 		m_VBlankStartWait = 0;
 		return true;
 	}
-	//_Waited = true;
-	//return false;
 
-	BOOL bCompositionEnabled = m_bCompositionEnabled;
+	const auto bCompositionEnabled = m_bCompositionEnabled;
 	int WaitFor = GetVBlackPos();
 
 	if (!bCompositionEnabled) {
@@ -1234,7 +1232,6 @@ bool CDX9AllocatorPresenter::WaitForVBlank(bool &_Waited, bool &_bTakenLock)
 	} else {
 		// Instead we wait for VBlack after the present, this seems to fix the stuttering problem. It's also possible to fix by removing the Sleep above, but that isn't an option.
 		WaitForVBlankRange(WaitFor, 0, false, rs.bVSyncAccurate, true, _bTakenLock);
-
 		return false;
 	}
 }
@@ -1907,7 +1904,7 @@ void CDX9AllocatorPresenter::DrawStats()
 			if (rs.bVSync) {
 				strText += L" VSync";
 			}
-			if (rs.bAlterativeVSync) {
+			if (rs.bAlternativeVSync) {
 				strText += L" AltVSync";
 			}
 			if (rs.bVSyncAccurate) {
