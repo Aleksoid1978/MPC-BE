@@ -6605,10 +6605,10 @@ void CMainFrame::OnViewDisableDesktopComposition()
 void CMainFrame::OnViewAlternativeVSync()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
-	rs.bAlterativeVSync = !rs.bAlterativeVSync;
+	rs.bAlternativeVSync = !rs.bAlternativeVSync;
 	rs.Save();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 rs.bAlterativeVSync ? ResStr(IDS_OSD_RS_ALT_VSYNC_ON) : ResStr(IDS_OSD_RS_ALT_VSYNC_OFF));
+						 rs.bAlternativeVSync ? ResStr(IDS_OSD_RS_ALT_VSYNC_ON) : ResStr(IDS_OSD_RS_ALT_VSYNC_OFF));
 }
 
 void CMainFrame::OnViewResetDefault()

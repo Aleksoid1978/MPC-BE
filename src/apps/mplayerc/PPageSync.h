@@ -35,11 +35,11 @@ public:
 
 	enum {IDD = IDD_PPAGESYNC};
 
-	CButton m_chkVMR9VSync;
-	CButton m_chkVMR9VSyncAccurate;
-	CButton m_chkVMR9AlterativeVSync;
-	CIntEdit m_edtVMR9VSyncOffset;
-	CSpinButtonCtrl m_spnVMR9VSyncOffset;
+	CButton m_chkVSync;
+	CButton m_chkVSyncAccurate;
+	CButton m_chkAlternativeVSync;
+	CIntEdit m_edtVSyncOffset;
+	CSpinButtonCtrl m_spnVSyncOffset;
 	CButton m_chkDisableAero;
 	CButton m_chkEnableFrameTimeCorrection;
 	CButton m_chkVMRFlushGPUBeforeVSync;
@@ -63,7 +63,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	afx_msg void OnAlterativeVSyncCheck();
+	afx_msg void OnVSyncCheck();
+	afx_msg void OnAlternativeVSyncCheck();
 	afx_msg void OnSyncModeClicked(UINT nID);
 
 private:

@@ -130,7 +130,7 @@ public:
 	// frame synchronization
 	bool	bVSync;
 	bool	bVSyncAccurate;
-	bool	bAlterativeVSync;
+	bool	bAlternativeVSync;
 	int		iVSyncOffset;
 	bool	bDisableDesktopComposition;
 	bool	bEVRFrameTimeCorrection;
@@ -189,7 +189,7 @@ public:
 	bool b10BitOutput		= false;
 
 	bool bVSyncAccurate		= false;
-	bool bAlterativeVSync	= false;
+	bool bAlternativeVSync	= false;
 	bool bDisableDesktopComposition = false;
 
 	void Fill(CRenderersSettings& rs)
@@ -197,7 +197,7 @@ public:
 		iSurfaceFormat		= rs.iSurfaceFormat;
 		b10BitOutput		= rs.b10BitOutput;
 		bVSyncAccurate		= rs.bVSyncAccurate;
-		bAlterativeVSync	= rs.bAlterativeVSync;
+		bAlternativeVSync	= rs.bAlternativeVSync;
 		bDisableDesktopComposition = rs.bDisableDesktopComposition;
 	}
 };
