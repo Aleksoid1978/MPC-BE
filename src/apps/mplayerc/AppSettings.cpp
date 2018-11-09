@@ -876,7 +876,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	CMPlayerCApp* pApp = AfxGetMyApp();
 	ASSERT(pApp);
 	CProfile& profile = AfxGetProfile();
-	CString tmpstr;
 
 	UINT len;
 	BYTE* ptr = nullptr;
@@ -886,8 +885,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 
 	// Set interface language first!
-	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LANGUAGE, tmpstr);
-	iLanguage = CMPlayerCApp::GetLanguageIndex(tmpstr);
+	CString str;
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LANGUAGE, str);
+	iLanguage = CMPlayerCApp::GetLanguageIndex(str);
 	if (iLanguage < 0) {
 		iLanguage = CMPlayerCApp::GetDefLanguage();
 	}
@@ -1010,10 +1010,10 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_RESTORERESAFTEREXIT, fRestoreResAfterExit);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWPOS, bRememberWindowPos);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REMEMBERWINDOWSIZE, bRememberWindowSize);
-	profile.ReadString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM, tmpstr);
-	if (swscanf_s(tmpstr, L"%f,%f", &dZoomX, &dZoomY) == 2 &&
-			dZoomX >= 0.196 && dZoomX <= 3.06 && // 0.196 = 0.2 / 1.02
-			dZoomY >= 0.196 && dZoomY <= 3.06) { // 3.06 = 3 * 1.02
+	if (profile.ReadString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM, str)
+			&& swscanf_s(str, L"%f,%f", &dZoomX, &dZoomY) == 2
+			&& dZoomX >= 0.196 && dZoomX <= 3.06  // 0.196 = 0.2 / 1.02
+			&& dZoomY >= 0.196 && dZoomY <= 3.06) { // 3.06 = 3 * 1.02
 		bSavePnSZoom = true;
 	} else {
 		bSavePnSZoom = false;
@@ -1056,9 +1056,10 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_CLOSEDCAPTIONS, bClosedCaptions);
 	// TODO: rename subdefstyle -> defStyle
 	{
-		profile.ReadString(IDS_R_SETTINGS, IDS_RS_SPSTYLE, tmpstr);
-		subdefstyle <<= tmpstr;
-		if (tmpstr.IsEmpty()) {
+		str.Empty();
+		profile.ReadString(IDS_R_SETTINGS, IDS_RS_SPSTYLE, str);
+		subdefstyle <<= str;
+		if (str.IsEmpty()) {
 			subdefstyle.relativeTo = 1;    //default "Position subtitles relative to the video frame" option is checked
 		}
 	}
@@ -1082,12 +1083,13 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration, APP_BUFDURATION_MIN, APP_BUFDURATION_MAX);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUDIOMIXER, bAudioMixer);
-	profile.ReadString(IDS_R_SETTINGS, IDS_RS_AUDIOMIXERLAYOUT, tmpstr);
-	tmpstr.Trim();
-	for (int i = SPK_MONO; i <= SPK_7_1; i++) {
-		if (tmpstr == channel_mode_sets[i]) {
-			nAudioMixerLayout = i;
-			break;
+	if (profile.ReadString(IDS_R_SETTINGS, IDS_RS_AUDIOMIXERLAYOUT, str)) {
+		str.Trim();
+		for (int i = SPK_MONO; i <= SPK_7_1; i++) {
+			if (str == channel_mode_sets[i]) {
+				nAudioMixerLayout = i;
+				break;
+			}
 		}
 	}
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_AUDIOSTEREOFROMDECODER, bAudioStereoFromDecoder);
@@ -1119,8 +1121,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 				f->type = FilterOverride::REGISTERED;
 				profile.ReadString(key, L"DisplayName", f->dispname);
 				profile.ReadString(key, L"Name", f->name);
-				profile.ReadString(key, L"CLSID", tmpstr);
-				f->clsid = GUIDFromCString(tmpstr);
+				if (profile.ReadString(key, L"CLSID", str)) {
+					f->clsid = GUIDFromCString(str);
+				}
 				if (f->clsid == CLSID_NULL) {
 					CComPtr<IBaseFilter> pBF;
 					CStringW FriendlyName;
@@ -1133,8 +1136,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 				f->type = FilterOverride::EXTERNAL;
 				profile.ReadString(key, L"Path", f->path);
 				profile.ReadString(key, L"Name", f->name);
-				profile.ReadString(key, L"CLSID", tmpstr);
-				f->clsid = GUIDFromCString(tmpstr);
+				if (profile.ReadString(key, L"CLSID", str)) {
+					f->clsid = GUIDFromCString(str);
+				}
 			} else {
 				profile.DeleteSection(key);
 				break;
@@ -1187,11 +1191,10 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	for (int i = 0; i < (ID_PANNSCAN_PRESETS_END - ID_PANNSCAN_PRESETS_START); i++) {
 		CString preset;
 		preset.Format(L"Preset%d", i);
-		profile.ReadString(IDS_R_PNSPRESETS, preset, tmpstr);
-		if (tmpstr.IsEmpty()) {
+		if (!profile.ReadString(IDS_R_PNSPRESETS, preset, str) || str.IsEmpty()) {
 			break;
 		}
-		m_pnspresets.Add(tmpstr);
+		m_pnspresets.Add(str);
 	}
 
 	if (m_pnspresets.IsEmpty()) {
@@ -1215,15 +1218,14 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	for (unsigned i = 0; i < wmcmds.size(); i++) {
 		CString cmdmod;
 		cmdmod.Format(L"CommandMod%u", i);
-		profile.ReadString(IDS_R_COMMANDS, cmdmod, tmpstr);
-		if (tmpstr.IsEmpty()) {
+		if (!profile.ReadString(IDS_R_COMMANDS, cmdmod, str) || str.IsEmpty()) {
 			break;
 		}
 		int cmd, fVirt, key, repcnt;
 		UINT mouse, mouseFS, appcmd;
 		WCHAR buff[128];
 		int n;
-		if (5 > (n = swscanf_s(tmpstr, L"%d %x %x %s %d %u %u %u", &cmd, &fVirt, &key, buff, _countof(buff), &repcnt, &mouse, &appcmd, &mouseFS))) {
+		if (5 > (n = swscanf_s(str, L"%d %x %x %s %d %u %u %u", &cmd, &fVirt, &key, buff, _countof(buff), &repcnt, &mouse, &appcmd, &mouseFS))) {
 			break;
 		}
 
@@ -1360,20 +1362,22 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		int curPos;
 		CString token;
 
-		profile.ReadString(IDS_R_SETTINGS, IDS_RS_SHADERLIST, tmpstr);
-		curPos = 0;
-		token = tmpstr.Tokenize(L"|", curPos);
-		while (token.GetLength()) {
-			ShaderList.push_back(token);
-			token = tmpstr.Tokenize(L"|", curPos);
+		if (profile.ReadString(IDS_R_SETTINGS, IDS_RS_SHADERLIST, str)) {
+			curPos = 0;
+			token = str.Tokenize(L"|", curPos);
+			while (token.GetLength()) {
+				ShaderList.push_back(token);
+				token = str.Tokenize(L"|", curPos);
+			}
 		}
 
-		profile.ReadString(IDS_R_SETTINGS, IDS_RS_SHADERLISTSCREENSPACE, tmpstr);
-		curPos = 0;
-		token = tmpstr.Tokenize(L"|", curPos);
-		while (token.GetLength()) {
-			ShaderListScreenSpace.push_back(token);
-			token = tmpstr.Tokenize(L"|", curPos);
+		if (profile.ReadString(IDS_R_SETTINGS, IDS_RS_SHADERLISTSCREENSPACE, str)) {
+			curPos = 0;
+			token = str.Tokenize(L"|", curPos);
+			while (token.GetLength()) {
+				ShaderListScreenSpace.push_back(token);
+				token = str.Tokenize(L"|", curPos);
+			}
 		}
 	}
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_TOGGLESHADER, bToggleShader);
@@ -1479,8 +1483,9 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_FILTER_DIR, strLastOpenFilterDir);
 
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_YOUTUBE_PAGEPARSER, bYoutubePageParser);
-	profile.ReadString(IDS_R_SETTINGS, IDS_RS_YOUTUBE_FORMAT, tmpstr);
-	YoutubeFormat.fmt = (tmpstr == L"WEBM") ? 1 : 0;
+	str.Empty();
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_YOUTUBE_FORMAT, str);
+	YoutubeFormat.fmt = (str == L"WEBM") ? 1 : 0;
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_YOUTUBE_RESOLUTION, YoutubeFormat.res);
 	YoutubeFormat.res = discard(YoutubeFormat.res, 720, s_CommonVideoHeights);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_YOUTUBE_60FPS, YoutubeFormat.fps60);
