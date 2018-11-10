@@ -37,9 +37,6 @@ public:
 
 	CButton m_chkVSync;
 	CButton m_chkVSyncAccurate;
-	CButton m_chkAlternativeVSync;
-	CIntEdit m_edtVSyncOffset;
-	CSpinButtonCtrl m_spnVSyncOffset;
 	CButton m_chkDisableAero;
 	CButton m_chkEnableFrameTimeCorrection;
 	CButton m_chkVMRFlushGPUBeforeVSync;
@@ -64,7 +61,6 @@ protected:
 
 public:
 	afx_msg void OnVSyncCheck();
-	afx_msg void OnAlternativeVSyncCheck();
 	afx_msg void OnSyncModeClicked(UINT nID);
 
 private:
