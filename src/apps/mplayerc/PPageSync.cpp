@@ -44,9 +44,6 @@ void CPPageSync::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Control(pDX, IDC_CHECK1, m_chkVSync);
 	DDX_Control(pDX, IDC_CHECK2, m_chkVSyncAccurate);
-	DDX_Control(pDX, IDC_DSVMR9ALTERNATIVEVSYNC, m_chkAlternativeVSync);
-	DDX_Control(pDX, IDC_EDIT1, m_edtVSyncOffset);
-	DDX_Control(pDX, IDC_SPIN1, m_spnVSyncOffset);
 	DDX_Control(pDX, IDC_CHECK4, m_chkDisableAero);
 	DDX_Control(pDX, IDC_CHECK8, m_chkEnableFrameTimeCorrection);
 	DDX_Control(pDX, IDC_CHECK5, m_chkVMRFlushGPUBeforeVSync);
@@ -81,6 +78,11 @@ BOOL CPPageSync::OnSetActive()
 
 void CPPageSync::InitDialogPrivate()
 {
+	GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_STATIC1)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_EDIT1)->ShowWindow(SW_HIDE);
+	GetDlgItem(IDC_SPIN1)->ShowWindow(SW_HIDE);
+
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& rs = s.m_VRSettings;
 
@@ -89,10 +91,6 @@ void CPPageSync::InitDialogPrivate()
 
 	m_chkVSync.SetCheck(rs.bVSync);
 	m_chkVSyncAccurate.SetCheck(rs.bVSyncAccurate);
-	m_chkAlternativeVSync.SetCheck(rs.bAlternativeVSync);
-	m_spnVSyncOffset.SetRange(-20, 20);
-	m_edtVSyncOffset.SetRange(-20, 20);
-	m_edtVSyncOffset = rs.iVSyncOffset;
 	m_chkDisableAero.SetCheck(rs.bDisableDesktopComposition);
 	m_chkEnableFrameTimeCorrection.SetCheck(rs.bEVRFrameTimeCorrection);
 	m_chkVMRFlushGPUBeforeVSync.SetCheck(rs.bFlushGPUBeforeVSync);
@@ -102,13 +100,11 @@ void CPPageSync::InitDialogPrivate()
 	if (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM) {
 		m_chkVSync.EnableWindow(TRUE);
 		m_chkVSyncAccurate.EnableWindow(TRUE);
-		m_chkAlternativeVSync.EnableWindow(TRUE);
 		m_chkVMRFlushGPUBeforeVSync.EnableWindow(TRUE);
 		m_chkVMRFlushGPUAfterPresent.EnableWindow(TRUE);
 		m_chkVMRFlushGPUWait.EnableWindow(TRUE);
 	} else {
 		m_chkVSync.EnableWindow(FALSE);
-		m_chkAlternativeVSync.EnableWindow(FALSE);
 		m_chkVSyncAccurate.EnableWindow(FALSE);
 		m_chkVMRFlushGPUBeforeVSync.EnableWindow(FALSE);
 		m_chkVMRFlushGPUAfterPresent.EnableWindow(FALSE);
@@ -184,8 +180,6 @@ BOOL CPPageSync::OnApply()
 
 	rs.bVSync						= !!m_chkVSync.GetCheck();
 	rs.bVSyncAccurate				= !!m_chkVSyncAccurate.GetCheck();
-	rs.bAlternativeVSync			= !!m_chkAlternativeVSync.GetCheck();
-	rs.iVSyncOffset					= m_edtVSyncOffset;
 	rs.bDisableDesktopComposition	= !!m_chkDisableAero.GetCheck();
 	rs.bEVRFrameTimeCorrection		= !!m_chkEnableFrameTimeCorrection.GetCheck();
 	rs.bFlushGPUBeforeVSync			= !!m_chkVMRFlushGPUBeforeVSync.GetCheck();
@@ -206,7 +200,6 @@ BOOL CPPageSync::OnApply()
 
 BEGIN_MESSAGE_MAP(CPPageSync, CPPageBase)
 	ON_BN_CLICKED(IDC_CHECK1, OnVSyncCheck)
-	ON_BN_CLICKED(IDC_DSVMR9ALTERNATIVEVSYNC, OnAlternativeVSyncCheck)
 	ON_CONTROL_RANGE(BN_CLICKED, IDC_RADIO1, IDC_RADIO3, OnSyncModeClicked)
 END_MESSAGE_MAP()
 
@@ -217,32 +210,8 @@ void CPPageSync::OnVSyncCheck()
 
 	if (m_chkVSync.GetCheck() == BST_CHECKED) {
 		GetDlgItem(IDC_CHECK2)->EnableWindow(TRUE);
-		GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(TRUE);
-		OnAlternativeVSyncCheck();
 	} else {
 		GetDlgItem(IDC_CHECK2)->EnableWindow(FALSE);
-		GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->EnableWindow(FALSE);
-		GetDlgItem(IDC_STATIC1)->EnableWindow(FALSE);
-		GetDlgItem(IDC_EDIT1)->EnableWindow(FALSE);
-		m_spnVSyncOffset.EnableWindow(FALSE);
-	}
-	SetModified();
-}
-
-void CPPageSync::OnAlternativeVSyncCheck()
-{
-	CAppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& rs = s.m_VRSettings;
-
-	if (m_chkAlternativeVSync.GetCheck() == BST_CHECKED &&
-			rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM) {
-		GetDlgItem(IDC_STATIC1)->EnableWindow(TRUE);
-		GetDlgItem(IDC_EDIT1)->EnableWindow(TRUE);
-		m_spnVSyncOffset.EnableWindow(TRUE);
-	} else {
-		GetDlgItem(IDC_STATIC1)->EnableWindow(FALSE);
-		GetDlgItem(IDC_EDIT1)->EnableWindow(FALSE);
-		m_spnVSyncOffset.EnableWindow(FALSE);
 	}
 	SetModified();
 }

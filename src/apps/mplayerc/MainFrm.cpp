@@ -324,7 +324,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_COMMAND(ID_VIEW_EXCLUSIVE_FULLSCREEN, OnViewD3DFullScreen)
 	ON_COMMAND(ID_VIEW_DISABLEDESKTOPCOMPOSITION, OnViewDisableDesktopComposition)
-	ON_COMMAND(ID_VIEW_ALTERNATIVEVSYNC, OnViewAlternativeVSync)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_EXCLUSIVE_FULLSCREEN, OnUpdateViewD3DFullscreen)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_DISABLEDESKTOPCOMPOSITION, OnUpdateViewDisableDesktopComposition)
 
@@ -6602,15 +6601,6 @@ void CMainFrame::OnViewDisableDesktopComposition()
 						 rs.bDisableDesktopComposition ? ResStr(IDS_OSD_RS_NO_DESKTOP_COMP_ON) : ResStr(IDS_OSD_RS_NO_DESKTOP_COMP_OFF));
 }
 
-void CMainFrame::OnViewAlternativeVSync()
-{
-	CRenderersSettings& rs = GetRenderersSettings();
-	rs.bAlternativeVSync = !rs.bAlternativeVSync;
-	rs.Save();
-	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 rs.bAlternativeVSync ? ResStr(IDS_OSD_RS_ALT_VSYNC_ON) : ResStr(IDS_OSD_RS_ALT_VSYNC_OFF));
-}
-
 void CMainFrame::OnViewResetDefault()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
@@ -6638,31 +6628,25 @@ void CMainFrame::OnViewEnableFrameTimeCorrection()
 void CMainFrame::OnViewVSyncOffsetIncrease()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
-	CString strOSD;
 	if (rs.iVideoRenderer == VIDRNDT_SYNC) {
+		CString strOSD;
 		rs.dTargetSyncOffset = rs.dTargetSyncOffset - 0.5; // Yeah, it should be a "-"
 		strOSD.Format(ResStr(IDS_OSD_RS_TARGET_VSYNC_OFFSET), rs.dTargetSyncOffset);
-	} else {
-		++rs.iVSyncOffset;
-		strOSD.Format(ResStr(IDS_OSD_RS_VSYNC_OFFSET), rs.iVSyncOffset);
+		rs.Save();
+		m_OSD.DisplayMessage(OSD_TOPRIGHT, strOSD);
 	}
-	rs.Save();
-	m_OSD.DisplayMessage(OSD_TOPRIGHT, strOSD);
 }
 
 void CMainFrame::OnViewVSyncOffsetDecrease()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
-	CString strOSD;
 	if (rs.iVideoRenderer == VIDRNDT_SYNC) {
+		CString strOSD;
 		rs.dTargetSyncOffset = rs.dTargetSyncOffset + 0.5;
 		strOSD.Format(ResStr(IDS_OSD_RS_TARGET_VSYNC_OFFSET), rs.dTargetSyncOffset);
-	} else {
-		--rs.iVSyncOffset;
-		strOSD.Format(ResStr(IDS_OSD_RS_VSYNC_OFFSET), rs.iVSyncOffset);
+		rs.Save();
+		m_OSD.DisplayMessage(OSD_TOPRIGHT, strOSD);
 	}
-	rs.Save();
-	m_OSD.DisplayMessage(OSD_TOPRIGHT, strOSD);
 }
 
 void CMainFrame::OnViewRemainingTime()
