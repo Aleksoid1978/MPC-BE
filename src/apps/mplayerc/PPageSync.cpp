@@ -44,6 +44,7 @@ void CPPageSync::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Control(pDX, IDC_CHECK1, m_chkVSync);
 	DDX_Control(pDX, IDC_CHECK2, m_chkVSyncAccurate);
+	DDX_Control(pDX, IDC_DSVMR9ALTERNATIVEVSYNC, m_chkAlternativeVSync);
 	DDX_Control(pDX, IDC_CHECK4, m_chkDisableAero);
 	DDX_Control(pDX, IDC_CHECK8, m_chkEnableFrameTimeCorrection);
 	DDX_Control(pDX, IDC_CHECK5, m_chkVMRFlushGPUBeforeVSync);
@@ -78,7 +79,6 @@ BOOL CPPageSync::OnSetActive()
 
 void CPPageSync::InitDialogPrivate()
 {
-	GetDlgItem(IDC_DSVMR9ALTERNATIVEVSYNC)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_STATIC1)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_EDIT1)->ShowWindow(SW_HIDE);
 	GetDlgItem(IDC_SPIN1)->ShowWindow(SW_HIDE);
@@ -91,6 +91,7 @@ void CPPageSync::InitDialogPrivate()
 
 	m_chkVSync.SetCheck(rs.bVSync);
 	m_chkVSyncAccurate.SetCheck(rs.bVSyncAccurate);
+	m_chkAlternativeVSync.SetCheck(rs.bAlternativeVSync);
 	m_chkDisableAero.SetCheck(rs.bDisableDesktopComposition);
 	m_chkEnableFrameTimeCorrection.SetCheck(rs.bEVRFrameTimeCorrection);
 	m_chkVMRFlushGPUBeforeVSync.SetCheck(rs.bFlushGPUBeforeVSync);
@@ -100,12 +101,14 @@ void CPPageSync::InitDialogPrivate()
 	if (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM) {
 		m_chkVSync.EnableWindow(TRUE);
 		m_chkVSyncAccurate.EnableWindow(TRUE);
+		m_chkAlternativeVSync.EnableWindow(TRUE);
 		m_chkVMRFlushGPUBeforeVSync.EnableWindow(TRUE);
 		m_chkVMRFlushGPUAfterPresent.EnableWindow(TRUE);
 		m_chkVMRFlushGPUWait.EnableWindow(TRUE);
 	} else {
 		m_chkVSync.EnableWindow(FALSE);
 		m_chkVSyncAccurate.EnableWindow(FALSE);
+		m_chkAlternativeVSync.EnableWindow(FALSE);
 		m_chkVMRFlushGPUBeforeVSync.EnableWindow(FALSE);
 		m_chkVMRFlushGPUAfterPresent.EnableWindow(FALSE);
 		m_chkVMRFlushGPUWait.EnableWindow(FALSE);
@@ -180,6 +183,7 @@ BOOL CPPageSync::OnApply()
 
 	rs.bVSync						= !!m_chkVSync.GetCheck();
 	rs.bVSyncAccurate				= !!m_chkVSyncAccurate.GetCheck();
+	rs.bAlternativeVSync			= !!m_chkAlternativeVSync.GetCheck();
 	rs.bDisableDesktopComposition	= !!m_chkDisableAero.GetCheck();
 	rs.bEVRFrameTimeCorrection		= !!m_chkEnableFrameTimeCorrection.GetCheck();
 	rs.bFlushGPUBeforeVSync			= !!m_chkVMRFlushGPUBeforeVSync.GetCheck();

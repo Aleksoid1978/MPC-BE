@@ -88,6 +88,7 @@ void CRenderersSettings::SetDefault()
 
 	bVSync							= false;
 	bVSyncAccurate					= false;
+	bAlternativeVSync				= false;
 	bDisableDesktopComposition		= false;
 	bEVRFrameTimeCorrection			= false;
 	bFlushGPUBeforeVSync			= false;
@@ -150,6 +151,7 @@ void CRenderersSettings::Load()
 
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VSYNC, bVSync);
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VSYNC_ACCURATE, bVSyncAccurate);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VSYNC_ALTERNATE, bAlternativeVSync);
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_DISABLEDESKCOMP, bDisableDesktopComposition);
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FRAMETIMECORRECTION, bEVRFrameTimeCorrection);
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUBEFOREVSYNC, bFlushGPUBeforeVSync);
@@ -199,6 +201,7 @@ void CRenderersSettings::Save()
 
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VSYNC, bVSync);
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VSYNC_ACCURATE, bVSyncAccurate);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VSYNC_ALTERNATE, bAlternativeVSync);
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_DISABLEDESKCOMP, bDisableDesktopComposition);
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FRAMETIMECORRECTION, bEVRFrameTimeCorrection);
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUBEFOREVSYNC, bFlushGPUBeforeVSync);
