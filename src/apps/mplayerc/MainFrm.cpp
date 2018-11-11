@@ -324,6 +324,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_COMMAND(ID_VIEW_EXCLUSIVE_FULLSCREEN, OnViewD3DFullScreen)
 	ON_COMMAND(ID_VIEW_DISABLEDESKTOPCOMPOSITION, OnViewDisableDesktopComposition)
+	ON_COMMAND(ID_VIEW_ALTERNATIVEVSYNC, OnViewAlternativeVSync)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_EXCLUSIVE_FULLSCREEN, OnUpdateViewD3DFullscreen)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_DISABLEDESKTOPCOMPOSITION, OnUpdateViewDisableDesktopComposition)
 
@@ -6599,6 +6600,15 @@ void CMainFrame::OnViewDisableDesktopComposition()
 	rs.Save();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
 						 rs.bDisableDesktopComposition ? ResStr(IDS_OSD_RS_NO_DESKTOP_COMP_ON) : ResStr(IDS_OSD_RS_NO_DESKTOP_COMP_OFF));
+}
+
+void CMainFrame::OnViewAlternativeVSync()
+{
+	CRenderersSettings& rs = GetRenderersSettings();
+	rs.bAlternativeVSync = !rs.bAlternativeVSync;
+	rs.Save();
+	m_OSD.DisplayMessage(OSD_TOPRIGHT,
+						 rs.bAlternativeVSync ? ResStr(IDS_OSD_RS_ALT_VSYNC_ON) : ResStr(IDS_OSD_RS_ALT_VSYNC_OFF));
 }
 
 void CMainFrame::OnViewResetDefault()

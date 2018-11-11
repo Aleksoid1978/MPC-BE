@@ -61,6 +61,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_FrameTimeCorrection(0)
 	, m_LastSampleTime(0)
 	, m_LastFrameDuration(0)
+	, m_bAlternativeVSync(0)
 	, m_VSyncMode(0)
 	, m_TextScale(1.0)
 	, m_MainThreadId(0)
@@ -401,6 +402,7 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 		}
 	}
 
+	bRet = bRet || New.bAlternativeVSync != Current.bAlternativeVSync;
 	bRet = bRet || New.b10BitOutput != Current.b10BitOutput;
 	bRet = bRet || New.iSurfaceFormat != Current.iSurfaceFormat;
 
@@ -567,6 +569,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	}
 
 	m_bCompositionEnabled = !!bCompositionEnabled;
+	m_bAlternativeVSync = rs.bAlternativeVSync;
 
 	// detect FP 16-bit textures support
 	m_bFP16Support = SUCCEEDED(m_pD3DEx->CheckDeviceFormat(m_CurrentAdapter, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER, D3DRTYPE_VOLUMETEXTURE, D3DFMT_A16B16G16R16F));
@@ -654,7 +657,11 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		m_d3dpp.BackBufferCount = 1;
 		m_d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
 		// Desktop composition takes care of the VSYNC
-		m_d3dpp.PresentationInterval = bCompositionEnabled ? D3DPRESENT_INTERVAL_IMMEDIATE : D3DPRESENT_INTERVAL_ONE;
+		if (bCompositionEnabled) {
+			m_d3dpp.PresentationInterval = m_bAlternativeVSync ? D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
+		} else {
+			m_d3dpp.PresentationInterval = m_bAlternativeVSync ? D3DPRESENT_INTERVAL_IMMEDIATE : D3DPRESENT_INTERVAL_ONE;
+		}
 
 		m_refreshRate = d3ddmEx.RefreshRate;
 		m_d3dpp.BackBufferWidth = backBufferSize.cx;
@@ -1187,9 +1194,13 @@ int CDX9AllocatorPresenter::GetVBlackPos()
 
 	const int WaitRange = std::max(m_ScreenSize.cy / 40, 5L);
 	if (!bCompositionEnabled) {
-		const int MinRange = std::clamp(long(0.005 * double(m_ScreenSize.cy) * GetRefreshRate() + 0.5), 5L, m_ScreenSize.cy / 3); // 5  ms or max 33 % of Time
-		const int WaitFor = m_ScreenSize.cy - (MinRange + WaitRange);
-		return WaitFor;
+		if (m_bAlternativeVSync) {
+			return 0;
+		} else {
+			const int MinRange = std::clamp(long(0.005 * double(m_ScreenSize.cy) * GetRefreshRate() + 0.5), 5L, m_ScreenSize.cy / 3); // 5  ms or max 33 % of Time
+			const int WaitFor = m_ScreenSize.cy - (MinRange + WaitRange);
+			return WaitFor;
+		}
 	} else {
 		const int WaitFor = m_ScreenSize.cy / 2;
 		return WaitFor;
@@ -1212,8 +1223,13 @@ bool CDX9AllocatorPresenter::WaitForVBlank(bool &_Waited, bool &_bTakenLock)
 	int WaitFor = GetVBlackPos();
 
 	if (!bCompositionEnabled) {
-		_Waited = WaitForVBlankRange(WaitFor, 0, false, rs.bVSyncAccurate, true, _bTakenLock);
-		return true;
+		if (m_bAlternativeVSync) {
+			_Waited = WaitForVBlankRange(WaitFor, 0, false, true, true, _bTakenLock);
+			return false;
+		} else {
+			_Waited = WaitForVBlankRange(WaitFor, 0, false, rs.bVSyncAccurate, true, _bTakenLock);
+			return true;
+		}
 	} else {
 		// Instead we wait for VBlack after the present, this seems to fix the stuttering problem. It's also possible to fix by removing the Sleep above, but that isn't an option.
 		WaitForVBlankRange(WaitFor, 0, false, rs.bVSyncAccurate, true, _bTakenLock);
@@ -1418,7 +1434,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 
 	BOOL bCompositionEnabled = m_bCompositionEnabled;
 
-	bool bDoVSyncInPresent = !bCompositionEnabled || !rs.bVSync;
+	bool bDoVSyncInPresent = (!bCompositionEnabled && !m_bAlternativeVSync) || !rs.bVSync;
 
 	LONGLONG PresentWaitTime = 0;
 
@@ -1892,6 +1908,9 @@ void CDX9AllocatorPresenter::DrawStats()
 			if (rs.bVSyncAccurate) {
 				strText += L" AccVSync";
 			}
+			if (rs.bAlternativeVSync) {
+				strText += L" AltVSync";
+			}
 
 			if (rs.bEVRFrameTimeCorrection) {
 				strText += L" FTC";
@@ -1981,7 +2000,7 @@ void CDX9AllocatorPresenter::DrawStats()
 			drawText(strText);
 		}
 
-		bool bDoVSyncInPresent = !m_bCompositionEnabled || !rs.bVSync;
+		bool bDoVSyncInPresent = (!m_bCompositionEnabled && !m_bAlternativeVSync) || !rs.bVSync;
 		if (iDetailedStats > 1 && bDoVSyncInPresent) {
 			strText.Format(L"Present Wait : Wait %7.3f ms   Min %7.3f ms   Max %7.3f ms", (double(m_PresentWaitTime)/10000.0), (double(m_PresentWaitTimeMin)/10000.0), (double(m_PresentWaitTimeMax)/10000.0));
 			drawText(strText);
