@@ -55,7 +55,8 @@ class CBaseSplitterParserOutputPin : public CBaseSplitterOutputPin, protected CC
 
 	int   m_adx_block_size = 0;
 
-	DWORD packetFlag       = 0;
+	DWORD m_packetFlag     = 0;
+	BYTE  m_DTSHDProfile   = 0;
 
 protected:
 	HRESULT DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);

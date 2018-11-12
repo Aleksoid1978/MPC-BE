@@ -83,7 +83,8 @@ HRESULT CBaseSplitterParserOutputPin::Flush()
 		m_teletext.SetLCID(lcid);
 	}
 
-	packetFlag = 0;
+	m_packetFlag = 0;
+	m_DTSHDProfile = 0;
 
 	return S_OK;
 }
@@ -178,10 +179,10 @@ HRESULT CBaseSplitterParserOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 	CAutoLock cAutoLock(this);
 
 	if (p) {
-		packetFlag = p->Flag;
+		m_packetFlag = p->Flag;
 	}
 
-	if (m_mt.subtype == MEDIASUBTYPE_RAW_AAC1 && packetFlag != PACKET_AAC_RAW) {
+	if (m_mt.subtype == MEDIASUBTYPE_RAW_AAC1 && m_packetFlag != PACKET_AAC_RAW) {
 		// AAC
 		return ParseAAC(p);
 	} else if (m_mt.subtype == MEDIASUBTYPE_LATM_AAC) {
@@ -220,7 +221,7 @@ HRESULT CBaseSplitterParserOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 	} else if (m_mt.subtype == MEDIASUBTYPE_ADX_ADPCM) {
 		// ADX ADPCM
 		return ParseAdxADPCM(p);
-	} else if (m_mt.subtype == MEDIASUBTYPE_DTS) {
+	} else if (m_mt.subtype == MEDIASUBTYPE_DTS || m_mt.subtype == MEDIASUBTYPE_DTS2) {
 		// DTS
 		return ParseDTS(p);
 	} else if (m_mt.subtype == MEDIASUBTYPE_UTF8) {
@@ -1026,7 +1027,7 @@ HRESULT CBaseSplitterParserOutputPin::ParseDTS(CAutoPtr<CPacket> p)
 
 				start += size;
 			} else {
-				int size = ParseDTSHDHeader(start);
+				const int size = ParseDTSHDHeader(start);
 				if (size == 0) {
 					start++;
 					continue;
@@ -1034,6 +1035,17 @@ HRESULT CBaseSplitterParserOutputPin::ParseDTS(CAutoPtr<CPacket> p)
 
 				if (start + size > end) {
 					break;
+				}
+
+				if (!m_DTSHDProfile) {
+					audioframe_t dtshdaframe;
+					ParseDTSHDHeader(start, size, &dtshdaframe);
+					m_DTSHDProfile = dtshdaframe.param2;
+				}
+
+				if (m_DTSHDProfile != DCA_PROFILE_EXPRESS) {
+					start++;
+					continue;
 				}
 
 				if (start + size + 16 <= end) {
