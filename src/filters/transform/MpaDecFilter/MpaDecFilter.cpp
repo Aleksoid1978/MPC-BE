@@ -851,7 +851,7 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 			}
 		} else {
 			m_bResync = TRUE;
-			if (!out_size) {
+			if (!out_size && hr == E_FAIL) {
 				m_buff.Clear();
 				return S_OK;
 			}
