@@ -560,6 +560,7 @@ CMainFrame::CMainFrame() :
 	m_PlaybackRate(1.0),
 	m_rtDurationOverride(-1),
 	m_bFullScreen(false),
+	m_bFullScreenChangingMode(false),
 	m_bFirstFSAfterLaunchOnFullScreen(false),
 	m_bStartInD3DFullscreen(false),
 	m_bHideCursor(false),
@@ -10299,10 +10300,11 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 		return;
 	}
 
+	m_bFullScreenChangingMode = true;
+
 	CAppSettings& s = AfxGetAppSettings();
 	CRect r;
 	DWORD dwRemove = 0, dwAdd = 0;
-	DWORD dwRemoveEx = 0, dwAddEx = 0;
 	MONITORINFO mi = { sizeof(mi) };
 
 	HMONITOR hm		= MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
@@ -10375,7 +10377,6 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	m_bFullScreen = !m_bFullScreen;
 
 	ModifyStyle(dwRemove, dwAdd, SWP_NOZORDER);
-	ModifyStyleEx(dwRemoveEx, dwAddEx, SWP_NOZORDER);
 
 	static bool bChangeMonitor = false;
 	// try disable shader when move from one monitor to other ...
@@ -10481,6 +10482,7 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 	SetAlwaysOnTop(s.iOnTop);
 
+	m_bFullScreenChangingMode = false;
 	MoveVideoWindow();
 
 	if (bChangeMonitor && (!m_bToggleShader || !m_bToggleShaderScreenSpace)) { // Enabled shader ...
@@ -10701,7 +10703,7 @@ void CMainFrame::SetDispMode(dispmode& dm, CString& DisplayName, BOOL bForceRegi
 
 void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVideoRect/* = false*/)
 {
-	if (!m_bDelaySetOutputRect && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly && IsWindowVisible()) {
+	if (!m_bDelaySetOutputRect && !m_bFullScreenChangingMode && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly && IsWindowVisible()) {
 		CRect wr;
 
 		if (IsD3DFullScreenMode()) {
