@@ -465,6 +465,7 @@ public:
 	// Attributes
 public:
 	bool m_bFullScreen;
+	bool m_bFullScreenChangingMode;
 	bool m_bFirstFSAfterLaunchOnFullScreen;
 	bool m_bStartInD3DFullscreen;
 	bool m_bHideCursor;
