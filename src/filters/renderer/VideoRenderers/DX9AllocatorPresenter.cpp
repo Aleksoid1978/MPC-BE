@@ -119,13 +119,10 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 		return;
 	}
 
-	if (GetRenderersSettings().bDisableDesktopComposition) {
-		m_bDesktopCompositionDisabled = true;
-		if (m_pDwmEnableComposition) {
+	if (m_pDwmEnableComposition) {
+		if (GetRenderersSettings().bDisableDesktopComposition) {
 			m_pDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
 		}
-	} else {
-		m_bDesktopCompositionDisabled = false;
 	}
 
 	hr = CreateDevice(_Error);
@@ -137,11 +134,8 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 		D3DHook::UnHook();
 	}
 
-	if (m_bDesktopCompositionDisabled) {
-		m_bDesktopCompositionDisabled = false;
-		if (m_pDwmEnableComposition) {
-			m_pDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
-		}
+	if (m_pDwmEnableComposition && GetRenderersSettings().bDisableDesktopComposition) {
+		m_pDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
 	}
 
 	m_pFont.Release();
@@ -384,25 +378,13 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 
 	bool bRet = false;
 
-	if (!m_bIsFullscreen) {
-		if (Current.bDisableDesktopComposition) {
-			if (!m_bDesktopCompositionDisabled) {
-				m_bDesktopCompositionDisabled = true;
-				if (m_pDwmEnableComposition) {
-					m_pDwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
-				}
-			}
-		} else {
-			if (m_bDesktopCompositionDisabled) {
-				m_bDesktopCompositionDisabled = false;
-				if (m_pDwmEnableComposition) {
-					m_pDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
-				}
-			}
+	if (!m_bIsFullscreen && m_pDwmEnableComposition) {
+		if (New.bDisableDesktopComposition != Current.bDisableDesktopComposition) {
+			m_pDwmEnableComposition(New.bDisableDesktopComposition ? DWM_EC_DISABLECOMPOSITION : DWM_EC_ENABLECOMPOSITION);
 		}
 	}
 
-	bRet = bRet || New.bAlternativeVSync != Current.bAlternativeVSync;
+	bRet = bRet || (!m_bIsFullscreen && New.bAlternativeVSync != Current.bAlternativeVSync);
 	bRet = bRet || New.b10BitOutput != Current.b10BitOutput;
 	bRet = bRet || New.iSurfaceFormat != Current.iSurfaceFormat;
 
@@ -563,12 +545,11 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 	ZeroMemory(&m_d3dpp, sizeof(m_d3dpp));
 
-	BOOL bCompositionEnabled = FALSE;
+	m_bCompositionEnabled = FALSE;
 	if (m_pDwmIsCompositionEnabled) {
-		m_pDwmIsCompositionEnabled(&bCompositionEnabled);
+		m_pDwmIsCompositionEnabled(&m_bCompositionEnabled);
 	}
 
-	m_bCompositionEnabled = !!bCompositionEnabled;
 	m_bAlternativeVSync = rs.bAlternativeVSync;
 
 	// detect FP 16-bit textures support
@@ -657,7 +638,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		m_d3dpp.BackBufferCount = 1;
 		m_d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
 		// Desktop composition takes care of the VSYNC
-		if (bCompositionEnabled) {
+		if (m_bCompositionEnabled) {
 			m_d3dpp.PresentationInterval = m_bAlternativeVSync ? D3DPRESENT_INTERVAL_ONE : D3DPRESENT_INTERVAL_IMMEDIATE;
 		} else {
 			m_d3dpp.PresentationInterval = m_bAlternativeVSync ? D3DPRESENT_INTERVAL_IMMEDIATE : D3DPRESENT_INTERVAL_ONE;
@@ -1189,11 +1170,8 @@ bool CDX9AllocatorPresenter::WaitForVBlankRange(int &_RasterStart, int _RasterSi
 
 int CDX9AllocatorPresenter::GetVBlackPos()
 {
-	CRenderersSettings& rs = GetRenderersSettings();
-	BOOL bCompositionEnabled = m_bCompositionEnabled;
-
 	const int WaitRange = std::max(m_ScreenSize.cy / 40, 5L);
-	if (!bCompositionEnabled) {
+	if (!m_bCompositionEnabled) {
 		if (m_bAlternativeVSync) {
 			return 0;
 		} else {
@@ -1432,9 +1410,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 
 	m_pD3DDevEx->EndScene();
 
-	BOOL bCompositionEnabled = m_bCompositionEnabled;
-
-	bool bDoVSyncInPresent = (!bCompositionEnabled && !m_bAlternativeVSync) || !rs.bVSync;
+	bool bDoVSyncInPresent = (!m_bCompositionEnabled && !m_bAlternativeVSync) || !rs.bVSync;
 
 	LONGLONG PresentWaitTime = 0;
 
@@ -1595,16 +1571,17 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 			bResetDevice = true;
 		}
 
-		bCompositionEnabled = false;
 		if (m_pDwmIsCompositionEnabled) {
+			BOOL bCompositionEnabled = FALSE;
 			m_pDwmIsCompositionEnabled(&bCompositionEnabled);
-		}
-		if ((bCompositionEnabled != 0) != m_bCompositionEnabled) {
-			if (m_bIsFullscreen) {
-				m_bCompositionEnabled = (bCompositionEnabled != 0);
-			} else {
-				DLog(L"CDX9AllocatorPresenter::Paint() : DWM Composition Changed - need Reset Device");
-				bResetDevice = true;
+
+			if (bCompositionEnabled != m_bCompositionEnabled) {
+				if (m_bIsFullscreen) {
+					m_bCompositionEnabled = bCompositionEnabled;
+				} else {
+					DLog(L"CDX9AllocatorPresenter::Paint() : DWM Composition Changed - need Reset Device");
+					bResetDevice = true;
+				}
 			}
 		}
 

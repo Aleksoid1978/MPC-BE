@@ -55,10 +55,9 @@ namespace DSObjects
 		UINT	m_AdapterCount;
 
 		bool	m_bAlternativeVSync;
-		bool	m_bCompositionEnabled;
+		BOOL	m_bCompositionEnabled;
 		int		m_OrderedPaint;
 		int		m_VSyncMode;
-		bool	m_bDesktopCompositionDisabled;
 		bool	m_bIsFullscreen;
 		bool	m_bNeedCheckSample;
 		DWORD	m_MainThreadId;
