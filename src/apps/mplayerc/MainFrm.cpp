@@ -10809,9 +10809,6 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 
 		if (m_pCAP) {
 			m_pCAP->SetPosition(wr, vr);
-			if (GetMediaState() != State_Running) {
-				m_pCAP->Paint(true);
-			}
 		} else {
 			HRESULT hr;
 			hr = m_pBV->SetDefaultSourcePosition();
