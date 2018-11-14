@@ -2284,6 +2284,14 @@ void CEVRAllocatorPresenter::VSyncThread()
 
 	CRenderersSettings& rs	= GetRenderersSettings();
 
+	struct {
+		LONGLONG time;
+		UINT scanline;
+	} ScanLines[61] = {};
+	unsigned ScanLinePos = 0;
+	UINT VBlancSL = 0;
+	UINT prevSL = UINT_MAX;
+
 	while (!bQuit) {
 		DWORD dwObject = WaitForSingleObject(m_hEvtQuit, 1);
 		switch (dwObject) {
@@ -2404,8 +2412,65 @@ void CEVRAllocatorPresenter::VSyncThread()
 						}
 					}
 				} else {
-					m_DetectedRefreshRate = 0.0;
-					m_DetectedScanlinesPerFrame = 0.0;
+					if (rs.iDisplayStats == 1) {
+						if (!VBlancSL) {
+							D3DRASTER_STATUS rasterStatus;
+							if (S_OK == m_pD3DDevEx->GetRasterStatus(0, &rasterStatus)) {
+								while (rasterStatus.ScanLine == 0) { // skip zero scanline with unknown start time
+									Sleep(1);
+									m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+								}
+								while (rasterStatus.ScanLine != 0) { // find new zero scanline
+									m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+								}
+								LONGLONG times0 = GetPerfCounter();
+								while (rasterStatus.ScanLine == 0) {
+									m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+								}
+								LONGLONG times1 = GetPerfCounter();
+
+								Sleep(1);
+								UINT lastSL = 0;
+								while (rasterStatus.ScanLine != 0) {
+									lastSL = rasterStatus.ScanLine;
+									m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+								}
+								LONGLONG timesLast = GetPerfCounter();
+
+								{
+									CAutoLock Lock(&m_RefreshRateLock);
+									m_DetectedScanlinesPerFrame = (double)(lastSL * (timesLast - times0)) / (timesLast - times1);
+									VBlancSL = (UINT)(m_DetectedScanlinesPerFrame + 0.5) - lastSL;
+								}
+							}
+						}
+						else {
+							D3DRASTER_STATUS rasterStatus;
+							if (S_OK == m_pD3DDevEx->GetRasterStatus(0, &rasterStatus)) {
+								LONGLONG time = GetPerfCounter();
+								if (rasterStatus.ScanLine) { // ignore the zero scan line, it coincides with VBlanc and therefore is very long in time
+									if (rasterStatus.ScanLine < prevSL) {
+										ScanLines[ScanLinePos].time = time;
+										ScanLines[ScanLinePos].scanline = rasterStatus.ScanLine + VBlancSL;
+										UINT lastpos = ScanLinePos++;
+										if (ScanLinePos >= _countof(ScanLines)) {
+											ScanLinePos = 0;
+										}
+
+										LONGLONG interval = ScanLines[lastpos].time - ScanLines[ScanLinePos].time;
+										UINT sl_start = ScanLines[ScanLinePos].scanline;
+										UINT sl_end = ScanLines[lastpos].scanline;
+
+										{
+											CAutoLock Lock(&m_RefreshRateLock);
+											m_DetectedRefreshRate = (m_DetectedScanlinesPerFrame * (_countof(ScanLines) - 1) + sl_end - sl_start) * UNITS / (m_DetectedScanlinesPerFrame * interval);
+										}
+									}
+									prevSL = rasterStatus.ScanLine;
+								}
+							}
+						}
+					}
 				}
 			}
 			break;
