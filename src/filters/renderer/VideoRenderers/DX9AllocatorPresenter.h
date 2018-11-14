@@ -158,14 +158,14 @@ namespace DSObjects
 		int						m_iJitterMean;
 		double					m_fSyncOffsetStdDev;
 		double					m_fSyncOffsetAvr;
-		double					m_DetectedRefreshRate;
+		double					m_DetectedRefreshRate = 0.0;
 
 		CCritSec				m_RefreshRateLock;
 		double					m_DetectedRefreshTime;
 		double					m_DetectedRefreshTimePrim;
 		double					m_DetectedScanlineTime;
 		double					m_DetectedScanlineTimePrim;
-		double					m_DetectedScanlinesPerFrame;
+		double					m_DetectedScanlinesPerFrame = 0.0;
 
 		double GetRefreshRate() {
 			if (m_DetectedRefreshRate) {

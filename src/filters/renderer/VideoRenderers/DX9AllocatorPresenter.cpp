@@ -468,10 +468,10 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	m_DetectedFrameTimePos			= 0;
 
 	m_DetectedRefreshRatePos		= 0;
-	m_DetectedRefreshTimePrim		= 0;
-	m_DetectedScanlineTime			= 0;
-	m_DetectedScanlineTimePrim		= 0;
-	m_DetectedRefreshRate			= 0;
+	m_DetectedRefreshTimePrim		= 0.0;
+	m_DetectedScanlineTime			= 0.0;
+	m_DetectedScanlineTimePrim		= 0.0;
+	m_DetectedRefreshRate			= 0.0;
 
 	m_nNextJitter					= 0;
 	m_nNextSyncOffset				= 0;
@@ -514,7 +514,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 	m_ModeratedTimeSpeed			= 1.0;
 	m_ModeratedTimeSpeedDiff		= 0.0;
-	m_ModeratedTimeSpeedPrim		= 0;
+	m_ModeratedTimeSpeedPrim		= 0.0;
 
 	m_ClockTimeChangeHistoryPos		= 0;
 
@@ -1911,12 +1911,12 @@ void CDX9AllocatorPresenter::DrawStats()
 				, m_strBackbufferFmt);
 			drawText(strText);
 
-			if (rs.bVSync) {
-				strText.Format(L"Refresh rate : %.05f Hz    SL: %4d     (%3u Hz)      ", m_DetectedRefreshRate, int(m_DetectedScanlinesPerFrame + 0.5), m_refreshRate);
-			} else {
-				strText.Format(L"Refresh rate : %3u Hz      ", m_refreshRate);
-			}
-			strText.AppendFormat(L"Last Duration: %8.4f      Corrected Frame Time: %s", double(m_LastFrameDuration) / 10000.0, m_bCorrectedFrameTime ? L"Yes" : L"No");
+			strText.Format(L"Refresh rate : %.05f Hz (%u Hz)    SL: %4d    Last Duration: %8.4f    Corrected Frame Time: %s",
+				m_DetectedRefreshRate,
+				m_refreshRate,
+				int(m_DetectedScanlinesPerFrame + 0.5),
+				double(m_LastFrameDuration) / 10000.0,
+				m_bCorrectedFrameTime ? L"Yes" : L"No");
 			drawText(strText);
 		}
 
