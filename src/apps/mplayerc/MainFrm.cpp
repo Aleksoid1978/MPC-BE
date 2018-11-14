@@ -4285,6 +4285,10 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		m_bFirstFSAfterLaunchOnFullScreen = true;
 	}
 
+	if (m_bFullScreen && !m_bAudioOnly && !s.fLaunchfullscreen && !s.IsD3DFullscreen() && s.AutoChangeFullscrRes.bEnabled == 1) {
+		AutoChangeMonitorMode();
+	}
+
 	// Ensure the dynamically added menu items are updated
 	SetupFiltersSubMenu();
 	SetupSubtitlesSubMenu();
