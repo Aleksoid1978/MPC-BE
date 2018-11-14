@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2018 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,3 +19,7 @@
  */
 
 #include "stdafx.h"
+
+#ifdef REGISTER_FILTER
+void AfxRegisterMFCCtrlClasses() { } // fix Visual Studio 2017 v15.8.0+ linking bug
+#endif
