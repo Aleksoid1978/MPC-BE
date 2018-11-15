@@ -67,6 +67,7 @@ namespace DSObjects
 		HMODULE m_hDWMAPI;
 		HRESULT (__stdcall * m_pDwmIsCompositionEnabled)(__out BOOL* pfEnabled);
 		HRESULT (__stdcall * m_pDwmEnableComposition)(UINT uCompositionAction);
+		HRESULT (__stdcall * m_pDwmEnableMMCSS)(BOOL fEnableMMCSS);
 		HMODULE m_hD3D9;
 		HRESULT (__stdcall * m_pDirect3DCreate9Ex)(UINT SDKVersion, IDirect3D9Ex**);
 
