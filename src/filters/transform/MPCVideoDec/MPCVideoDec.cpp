@@ -1044,9 +1044,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 			m_nThreadNumber = dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DiscardMode, dw)) {
-			if (dw != AVDISCARD_BIDIR) {
-				m_nDiscardMode = AVDISCARD_DEFAULT;
-			}
+			m_nDiscardMode = dw;
 		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_Deinterlacing, dw)) {
 			m_nDeinterlacing = (MPC_DEINTERLACING_FLAGS)dw;
