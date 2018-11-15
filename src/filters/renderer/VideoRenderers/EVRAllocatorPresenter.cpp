@@ -2276,6 +2276,26 @@ void CEVRAllocatorPresenter::VSyncThread()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
 
+	CComPtr<IDirect3DDevice9Ex> pD3DDevExSecond;
+	if (m_pD3DDevEx) {
+		D3DDEVICE_CREATION_PARAMETERS Parameters = {};
+		HRESULT hr = m_pD3DDevEx->GetCreationParameters(&Parameters);
+
+		D3DPRESENT_PARAMETERS d3dpp = { 0 };
+		d3dpp.Windowed = TRUE;
+		d3dpp.BackBufferWidth = 640;
+		d3dpp.BackBufferHeight = 480;
+		d3dpp.BackBufferCount = 0;
+		d3dpp.BackBufferFormat = m_d3dpp.BackBufferFormat;
+		d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+		d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
+
+		hr = m_pD3DEx->CreateDeviceEx(
+			Parameters.AdapterOrdinal, Parameters.DeviceType, Parameters.hFocusWindow, Parameters.BehaviorFlags,
+			&d3dpp, nullptr, &pD3DDevExSecond);
+		DLog(L"    => CreateDeviceEx(m_pD3DDevExSecond) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
+	}
+
 	struct {
 		LONGLONG time;
 		UINT scanline;
@@ -2415,20 +2435,20 @@ void CEVRAllocatorPresenter::VSyncThread()
 						}
 					}
 				}
-				else if (m_pD3DDevEx && rs.iDisplayStats == 1) {
+				else if (pD3DDevExSecond && rs.iDisplayStats == 1) {
 					if (prevSL == UINT_MAX) {
 						D3DRASTER_STATUS rasterStatus;
-						if (S_OK == m_pD3DDevEx->GetRasterStatus(0, &rasterStatus)) {
+						if (S_OK == pD3DDevExSecond->GetRasterStatus(0, &rasterStatus)) {
 							while (rasterStatus.ScanLine == 0) { // skip zero scanline with unknown start time
 								Sleep(1);
-								m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+								pD3DDevExSecond->GetRasterStatus(0, &rasterStatus);
 							}
 							while (rasterStatus.ScanLine != 0) { // find new zero scanline
-								m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+								pD3DDevExSecond->GetRasterStatus(0, &rasterStatus);
 							}
 							LONGLONG times0 = GetPerfCounter();
 							while (rasterStatus.ScanLine == 0) {
-								m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+								pD3DDevExSecond->GetRasterStatus(0, &rasterStatus);
 							}
 							LONGLONG times1 = GetPerfCounter();
 
@@ -2436,7 +2456,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 							prevSL = 0;
 							while (rasterStatus.ScanLine != 0) {
 								prevSL = rasterStatus.ScanLine;
-								m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+								pD3DDevExSecond->GetRasterStatus(0, &rasterStatus);
 							}
 							LONGLONG timesLast = GetPerfCounter();
 
@@ -2448,7 +2468,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 					}
 					else {
 						D3DRASTER_STATUS rasterStatus;
-						if (S_OK == m_pD3DDevEx->GetRasterStatus(0, &rasterStatus)) {
+						if (S_OK == pD3DDevExSecond->GetRasterStatus(0, &rasterStatus)) {
 							LONGLONG time = GetPerfCounter();
 							if (rasterStatus.ScanLine) { // ignore the zero scan line, it coincides with VBlanc and therefore is very long in time
 								if (rasterStatus.ScanLine < prevSL) {
