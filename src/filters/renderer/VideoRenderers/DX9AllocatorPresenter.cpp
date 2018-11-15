@@ -95,10 +95,12 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 
 	m_pDwmIsCompositionEnabled = nullptr;
 	m_pDwmEnableComposition = nullptr;
+	m_pDwmEnableMMCSS = nullptr;
 	m_hDWMAPI = LoadLibraryW(L"dwmapi.dll");
 	if (m_hDWMAPI) {
 		(FARPROC &)m_pDwmIsCompositionEnabled = GetProcAddress(m_hDWMAPI, "DwmIsCompositionEnabled");
 		(FARPROC &)m_pDwmEnableComposition = GetProcAddress(m_hDWMAPI, "DwmEnableComposition");
+		(FARPROC &)m_pDwmEnableMMCSS = GetProcAddress(m_hDWMAPI, "DwmEnableMMCSS");
 	}
 
 	m_pDirect3DCreate9Ex = nullptr;
@@ -125,6 +127,10 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 		}
 	}
 
+	if (m_pDwmEnableMMCSS) {
+		m_pDwmEnableMMCSS(TRUE);
+	}
+
 	hr = CreateDevice(_Error);
 }
 
@@ -136,6 +142,10 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 
 	if (m_pDwmEnableComposition && GetRenderersSettings().bDisableDesktopComposition) {
 		m_pDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
+	}
+
+	if (m_pDwmEnableMMCSS) {
+		m_pDwmEnableMMCSS(FALSE);
 	}
 
 	m_pFont.Release();
