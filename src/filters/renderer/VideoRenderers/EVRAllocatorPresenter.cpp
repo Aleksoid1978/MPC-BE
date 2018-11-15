@@ -2274,23 +2274,23 @@ void CEVRAllocatorPresenter::RenderThread()
 
 void CEVRAllocatorPresenter::VSyncThread()
 {
-	bool		bQuit	= false;
-	TIMECAPS	tc;
-	DWORD		dwResolution;
-
-	timeGetDevCaps(&tc, sizeof(TIMECAPS));
-	dwResolution = std::min(tc.wPeriodMin, tc.wPeriodMax); // hmm
-	timeBeginPeriod(dwResolution);
-
-	CRenderersSettings& rs	= GetRenderersSettings();
+	CRenderersSettings& rs = GetRenderersSettings();
 
 	struct {
 		LONGLONG time;
 		UINT scanline;
 	} ScanLines[61] = {};
 	unsigned ScanLinePos = 0;
-	UINT VBlancSL = 0;
+	bool filled = false;
 	UINT prevSL = UINT_MAX;
+
+	bool bQuit = false;
+	TIMECAPS tc;
+	DWORD dwResolution;
+
+	timeGetDevCaps(&tc, sizeof(TIMECAPS));
+	dwResolution = std::min(tc.wPeriodMin, tc.wPeriodMax); // hmm
+	timeBeginPeriod(dwResolution);
 
 	while (!bQuit) {
 		DWORD dwObject = WaitForSingleObject(m_hEvtQuit, 1);
@@ -2301,6 +2301,9 @@ void CEVRAllocatorPresenter::VSyncThread()
 			case WAIT_TIMEOUT : {
 				// Do our stuff
 				if (m_pD3DDevEx && rs.bVSync) {
+					ScanLinePos = 0;
+					filled = false;
+
 					if (m_nRenderState == Started) {
 						int VSyncPos = GetVBlackPos();
 						int WaitRange = std::max(m_ScreenSize.cy / 40, 5L);
@@ -2411,66 +2414,69 @@ void CEVRAllocatorPresenter::VSyncThread()
 							}
 						}
 					}
-				} else {
-					if (rs.iDisplayStats == 1) {
-						if (!VBlancSL) {
-							D3DRASTER_STATUS rasterStatus;
-							if (S_OK == m_pD3DDevEx->GetRasterStatus(0, &rasterStatus)) {
-								while (rasterStatus.ScanLine == 0) { // skip zero scanline with unknown start time
-									Sleep(1);
-									m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
-								}
-								while (rasterStatus.ScanLine != 0) { // find new zero scanline
-									m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
-								}
-								LONGLONG times0 = GetPerfCounter();
-								while (rasterStatus.ScanLine == 0) {
-									m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
-								}
-								LONGLONG times1 = GetPerfCounter();
-
+				}
+				else if (m_pD3DDevEx && rs.iDisplayStats == 1) {
+					if (prevSL == UINT_MAX) {
+						D3DRASTER_STATUS rasterStatus;
+						if (S_OK == m_pD3DDevEx->GetRasterStatus(0, &rasterStatus)) {
+							while (rasterStatus.ScanLine == 0) { // skip zero scanline with unknown start time
 								Sleep(1);
-								UINT lastSL = 0;
-								while (rasterStatus.ScanLine != 0) {
-									lastSL = rasterStatus.ScanLine;
-									m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
-								}
-								LONGLONG timesLast = GetPerfCounter();
-
-								{
-									CAutoLock Lock(&m_RefreshRateLock);
-									m_DetectedScanlinesPerFrame = (double)(lastSL * (timesLast - times0)) / (timesLast - times1);
-									VBlancSL = (UINT)(m_DetectedScanlinesPerFrame + 0.5) - lastSL;
-								}
+								m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
 							}
-						}
-						else {
-							D3DRASTER_STATUS rasterStatus;
-							if (S_OK == m_pD3DDevEx->GetRasterStatus(0, &rasterStatus)) {
-								LONGLONG time = GetPerfCounter();
-								if (rasterStatus.ScanLine) { // ignore the zero scan line, it coincides with VBlanc and therefore is very long in time
-									if (rasterStatus.ScanLine < prevSL) {
-										ScanLines[ScanLinePos].time = time;
-										ScanLines[ScanLinePos].scanline = rasterStatus.ScanLine + VBlancSL;
-										UINT lastpos = ScanLinePos++;
-										if (ScanLinePos >= _countof(ScanLines)) {
-											ScanLinePos = 0;
-										}
+							while (rasterStatus.ScanLine != 0) { // find new zero scanline
+								m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+							}
+							LONGLONG times0 = GetPerfCounter();
+							while (rasterStatus.ScanLine == 0) {
+								m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+							}
+							LONGLONG times1 = GetPerfCounter();
 
-										LONGLONG interval = ScanLines[lastpos].time - ScanLines[ScanLinePos].time;
-										UINT sl_start = ScanLines[ScanLinePos].scanline;
-										UINT sl_end = ScanLines[lastpos].scanline;
+							Sleep(1);
+							prevSL = 0;
+							while (rasterStatus.ScanLine != 0) {
+								prevSL = rasterStatus.ScanLine;
+								m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+							}
+							LONGLONG timesLast = GetPerfCounter();
 
-										{
-											CAutoLock Lock(&m_RefreshRateLock);
-											m_DetectedRefreshRate = (m_DetectedScanlinesPerFrame * (_countof(ScanLines) - 1) + sl_end - sl_start) * UNITS / (m_DetectedScanlinesPerFrame * interval);
-										}
-									}
-									prevSL = rasterStatus.ScanLine;
-								}
+							{
+								CAutoLock Lock(&m_RefreshRateLock);
+								m_DetectedScanlinesPerFrame = (double)(prevSL * (timesLast - times0)) / (timesLast - times1);
 							}
 						}
 					}
+					else {
+						D3DRASTER_STATUS rasterStatus;
+						if (S_OK == m_pD3DDevEx->GetRasterStatus(0, &rasterStatus)) {
+							LONGLONG time = GetPerfCounter();
+							if (rasterStatus.ScanLine) { // ignore the zero scan line, it coincides with VBlanc and therefore is very long in time
+								if (rasterStatus.ScanLine < prevSL) {
+									ScanLines[ScanLinePos].time = time;
+									ScanLines[ScanLinePos].scanline = rasterStatus.ScanLine;
+									UINT lastpos = ScanLinePos++;
+									if (ScanLinePos >= std::size(ScanLines)) {
+										ScanLinePos = 0;
+										filled = true;
+									}
+
+									{
+										CAutoLock Lock(&m_RefreshRateLock);
+										if (filled) {
+											m_DetectedRefreshRate = (m_DetectedScanlinesPerFrame * (std::size(ScanLines) - 1) + ScanLines[lastpos].scanline - ScanLines[ScanLinePos].scanline) * UNITS / (m_DetectedScanlinesPerFrame * (ScanLines[lastpos].time - ScanLines[ScanLinePos].time));
+										} else {
+											m_DetectedRefreshRate = (m_DetectedScanlinesPerFrame * ScanLinePos + ScanLines[lastpos].scanline - ScanLines[0].scanline) * UNITS / (m_DetectedScanlinesPerFrame * (ScanLines[lastpos].time - ScanLines[0].time));
+										}
+									}
+								}
+								prevSL = rasterStatus.ScanLine;
+							}
+						}
+					}
+				}
+				else {
+					ScanLinePos = 0;
+					filled = false;
 				}
 			}
 			break;
