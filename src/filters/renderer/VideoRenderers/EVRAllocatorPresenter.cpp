@@ -2279,19 +2279,18 @@ void CEVRAllocatorPresenter::VSyncThread()
 	struct {
 		LONGLONG time;
 		UINT scanline;
-	} ScanLines[61] = {};
+	} ScanLines[250] = {};
 	unsigned ScanLinePos = 0;
 	bool filled = false;
 	UINT prevSL = UINT_MAX;
 
-	bool bQuit = false;
 	TIMECAPS tc;
-	DWORD dwResolution;
-
 	timeGetDevCaps(&tc, sizeof(TIMECAPS));
-	dwResolution = std::min(tc.wPeriodMin, tc.wPeriodMax); // hmm
+	const UINT dwResolution = std::min(tc.wPeriodMin, tc.wPeriodMax); // hmm
 	timeBeginPeriod(dwResolution);
 
+	bool bQuit = false;
+	LONGLONG start = 0;
 	while (!bQuit) {
 		DWORD dwObject = WaitForSingleObject(m_hEvtQuit, 1);
 		switch (dwObject) {
@@ -2415,20 +2414,20 @@ void CEVRAllocatorPresenter::VSyncThread()
 						}
 					}
 				}
-				else if (m_pD3DDevEx && rs.iDisplayStats == 1) {
+				else if (m_pD3DDevExRefresh && rs.iDisplayStats == 1) {
 					if (prevSL == UINT_MAX) {
 						D3DRASTER_STATUS rasterStatus;
-						if (S_OK == m_pD3DDevEx->GetRasterStatus(0, &rasterStatus)) {
+						if (S_OK == m_pD3DDevExRefresh->GetRasterStatus(0, &rasterStatus)) {
 							while (rasterStatus.ScanLine == 0) { // skip zero scanline with unknown start time
 								Sleep(1);
-								m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+								m_pD3DDevExRefresh->GetRasterStatus(0, &rasterStatus);
 							}
 							while (rasterStatus.ScanLine != 0) { // find new zero scanline
-								m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+								m_pD3DDevExRefresh->GetRasterStatus(0, &rasterStatus);
 							}
 							LONGLONG times0 = GetPerfCounter();
 							while (rasterStatus.ScanLine == 0) {
-								m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+								m_pD3DDevExRefresh->GetRasterStatus(0, &rasterStatus);
 							}
 							LONGLONG times1 = GetPerfCounter();
 
@@ -2436,37 +2435,37 @@ void CEVRAllocatorPresenter::VSyncThread()
 							prevSL = 0;
 							while (rasterStatus.ScanLine != 0) {
 								prevSL = rasterStatus.ScanLine;
-								m_pD3DDevEx->GetRasterStatus(0, &rasterStatus);
+								m_pD3DDevExRefresh->GetRasterStatus(0, &rasterStatus);
 							}
 							LONGLONG timesLast = GetPerfCounter();
 
-							{
-								CAutoLock Lock(&m_RefreshRateLock);
-								m_DetectedScanlinesPerFrame = (double)(prevSL * (timesLast - times0)) / (timesLast - times1);
-							}
+							CAutoLock Lock(&m_RefreshRateLock);
+							m_DetectedScanlinesPerFrame = (double)(prevSL * (timesLast - times0)) / (timesLast - times1);
 						}
 					}
 					else {
 						D3DRASTER_STATUS rasterStatus;
-						if (S_OK == m_pD3DDevEx->GetRasterStatus(0, &rasterStatus)) {
-							LONGLONG time = GetPerfCounter();
+						if (S_OK == m_pD3DDevExRefresh->GetRasterStatus(0, &rasterStatus)) {
+							const LONGLONG time = GetPerfCounter();
 							if (rasterStatus.ScanLine) { // ignore the zero scan line, it coincides with VBlanc and therefore is very long in time
 								if (rasterStatus.ScanLine < prevSL) {
 									ScanLines[ScanLinePos].time = time;
 									ScanLines[ScanLinePos].scanline = rasterStatus.ScanLine;
-									UINT lastpos = ScanLinePos++;
+									const UINT lastpos = ScanLinePos++;
 									if (ScanLinePos >= std::size(ScanLines)) {
 										ScanLinePos = 0;
 										filled = true;
 									}
 
-									{
+									if ((time - start) >= UNITS / 10) {
 										CAutoLock Lock(&m_RefreshRateLock);
 										if (filled) {
 											m_DetectedRefreshRate = (m_DetectedScanlinesPerFrame * (std::size(ScanLines) - 1) + ScanLines[lastpos].scanline - ScanLines[ScanLinePos].scanline) * UNITS / (m_DetectedScanlinesPerFrame * (ScanLines[lastpos].time - ScanLines[ScanLinePos].time));
-										} else {
-											m_DetectedRefreshRate = (m_DetectedScanlinesPerFrame * ScanLinePos + ScanLines[lastpos].scanline - ScanLines[0].scanline) * UNITS / (m_DetectedScanlinesPerFrame * (ScanLines[lastpos].time - ScanLines[0].time));
+										} else if (lastpos) {
+											m_DetectedRefreshRate = (m_DetectedScanlinesPerFrame * lastpos + ScanLines[lastpos].scanline - ScanLines[0].scanline) * UNITS / (m_DetectedScanlinesPerFrame * (ScanLines[lastpos].time - ScanLines[0].time));
 										}
+
+										start = time;
 									}
 								}
 								prevSL = rasterStatus.ScanLine;

@@ -151,6 +151,7 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 	m_pFont.Release();
 	m_pLine.Release();
 	m_pD3DDevEx.Release();
+	m_pD3DDevExRefresh.Release();
 
 	CleanupRenderingEngine();
 
@@ -733,6 +734,30 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	m_strProcessingFmt = GetD3DFormatStr(m_SurfaceFmt);
 	m_strBackbufferFmt = GetD3DFormatStr(m_BackbufferFmt);
 
+	D3DPRESENT_PARAMETERS d3dpp = { 0 };
+	d3dpp.Windowed = TRUE;
+	d3dpp.BackBufferWidth = 640;
+	d3dpp.BackBufferHeight = 480;
+	d3dpp.BackBufferCount = 0;
+	d3dpp.BackBufferFormat = m_d3dpp.BackBufferFormat;
+	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+	d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
+
+	bTryToReset = bTryToReset && m_pD3DDevExRefresh;
+	if (bTryToReset) {
+		bTryToReset = SUCCEEDED(hr = m_pD3DDevExRefresh->ResetEx(&d3dpp, nullptr));
+		DLog(L"    => m_pD3DDevExRefresh->ResetEx() : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
+	}
+
+	if (!bTryToReset) {
+		m_pD3DDevExRefresh.Release();
+		hr = m_pD3DEx->CreateDeviceEx(
+				m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWnd,
+				D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED | D3DCREATE_FPU_PRESERVE,
+				&d3dpp, nullptr, &m_pD3DDevExRefresh);
+		DLog(L"    => CreateDeviceEx(m_pD3DDevExRefresh) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
+	}
+
 	return S_OK;
 }
 
@@ -785,6 +810,19 @@ HRESULT CDX9AllocatorPresenter::ResetD3D9Device()
 	if (SUCCEEDED(hr)) {
 		CString _Error;
 		hr = InitializeISR(_Error, m_bIsFullscreen ? m_ScreenSize : backBufferSize);
+
+		if (m_pD3DDevExRefresh) {
+			D3DPRESENT_PARAMETERS d3dpp = { 0 };
+			d3dpp.Windowed = TRUE;
+			d3dpp.BackBufferWidth = 640;
+			d3dpp.BackBufferHeight = 480;
+			d3dpp.BackBufferCount = 0;
+			d3dpp.BackBufferFormat = m_d3dpp.BackBufferFormat;
+			d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+			d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
+
+			m_pD3DDevExRefresh->ResetEx(&d3dpp, nullptr);
+		}
 	}
 
 	return hr;
