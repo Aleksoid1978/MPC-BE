@@ -394,7 +394,7 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 		}
 	}
 
-	bRet = bRet || New.bVSync != Current.bVSync;
+	bRet = bRet || (!m_bIsFullscreen && New.bVSync != Current.bVSync);
 	bRet = bRet || New.b10BitOutput != Current.b10BitOutput;
 	bRet = bRet || New.iSurfaceFormat != Current.iSurfaceFormat;
 
