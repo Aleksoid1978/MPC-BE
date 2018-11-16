@@ -36,8 +36,7 @@ public:
 	enum {IDD = IDD_PPAGESYNC};
 
 	CButton m_chkVSync;
-	CButton m_chkVSyncAccurate;
-	CButton m_chkAlternativeVSync;
+	CButton m_chkVSyncInternal;
 	CButton m_chkDisableAero;
 	CButton m_chkEnableFrameTimeCorrection;
 	CButton m_chkVMRFlushGPUBeforeVSync;
@@ -61,7 +60,6 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	afx_msg void OnVSyncCheck();
 	afx_msg void OnSyncModeClicked(UINT nID);
 
 private:

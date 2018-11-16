@@ -320,11 +320,10 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 
 	ON_COMMAND(ID_VIEW_ENABLEFRAMETIMECORRECTION, OnViewEnableFrameTimeCorrection)
 	ON_COMMAND(ID_VIEW_VSYNC, OnViewVSync)
-	ON_COMMAND(ID_VIEW_VSYNCACCURATE, OnViewVSyncAccurate)
+	ON_COMMAND(ID_VIEW_VSYNCINTERNAL, OnViewVSyncInternal)
 
 	ON_COMMAND(ID_VIEW_EXCLUSIVE_FULLSCREEN, OnViewD3DFullScreen)
 	ON_COMMAND(ID_VIEW_DISABLEDESKTOPCOMPOSITION, OnViewDisableDesktopComposition)
-	ON_COMMAND(ID_VIEW_ALTERNATIVEVSYNC, OnViewAlternativeVSync)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_EXCLUSIVE_FULLSCREEN, OnUpdateViewD3DFullscreen)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_DISABLEDESKTOPCOMPOSITION, OnUpdateViewDisableDesktopComposition)
 
@@ -6580,13 +6579,13 @@ void CMainFrame::OnViewVSync()
 						 rs.bVSync ? ResStr(IDS_OSD_RS_VSYNC_ON) : ResStr(IDS_OSD_RS_VSYNC_OFF));
 }
 
-void CMainFrame::OnViewVSyncAccurate()
+void CMainFrame::OnViewVSyncInternal()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
-	rs.bVSyncAccurate = !rs.bVSyncAccurate;
+	rs.bVSyncInternal = !rs.bVSyncInternal;
 	rs.Save();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 rs.bVSyncAccurate ? ResStr(IDS_OSD_RS_ACCURATE_VSYNC_ON) : ResStr(IDS_OSD_RS_ACCURATE_VSYNC_OFF));
+						 rs.bVSyncInternal ? ResStr(IDS_OSD_RS_INTERNAL_VSYNC_ON) : ResStr(IDS_OSD_RS_INTERNAL_VSYNC_OFF));
 }
 
 void CMainFrame::OnViewD3DFullScreen()
@@ -6605,15 +6604,6 @@ void CMainFrame::OnViewDisableDesktopComposition()
 	rs.Save();
 	m_OSD.DisplayMessage(OSD_TOPRIGHT,
 						 rs.bDisableDesktopComposition ? ResStr(IDS_OSD_RS_NO_DESKTOP_COMP_ON) : ResStr(IDS_OSD_RS_NO_DESKTOP_COMP_OFF));
-}
-
-void CMainFrame::OnViewAlternativeVSync()
-{
-	CRenderersSettings& rs = GetRenderersSettings();
-	rs.bAlternativeVSync = !rs.bAlternativeVSync;
-	rs.Save();
-	m_OSD.DisplayMessage(OSD_TOPRIGHT,
-						 rs.bAlternativeVSync ? ResStr(IDS_OSD_RS_ALT_VSYNC_ON) : ResStr(IDS_OSD_RS_ALT_VSYNC_OFF));
 }
 
 void CMainFrame::OnViewResetDefault()

@@ -129,8 +129,7 @@ public:
 
 	// frame synchronization
 	bool	bVSync;
-	bool	bVSyncAccurate;
-	bool	bAlternativeVSync;
+	bool	bVSyncInternal;
 	bool	bDisableDesktopComposition;
 	bool	bEVRFrameTimeCorrection;
 	bool	bFlushGPUBeforeVSync;
@@ -184,19 +183,16 @@ public:
 class CAffectingRenderersSettings // used in SettingsNeedResetDevice()
 {
 public:
-	D3DFORMAT iSurfaceFormat = D3DFMT_X8R8G8B8;
-	bool b10BitOutput		= false;
-
-	bool bVSyncAccurate		= false;
-	bool bAlternativeVSync	= false;
+	D3DFORMAT iSurfaceFormat        = D3DFMT_X8R8G8B8;
+	bool b10BitOutput               = false;
+	bool bVSync                     = false;
 	bool bDisableDesktopComposition = false;
 
 	void Fill(CRenderersSettings& rs)
 	{
-		iSurfaceFormat		= rs.iSurfaceFormat;
-		b10BitOutput		= rs.b10BitOutput;
-		bVSyncAccurate		= rs.bVSyncAccurate;
-		bAlternativeVSync	= rs.bAlternativeVSync;
+		iSurfaceFormat             = rs.iSurfaceFormat;
+		b10BitOutput               = rs.b10BitOutput;
+		bVSync                     = rs.bVSync;
 		bDisableDesktopComposition = rs.bDisableDesktopComposition;
 	}
 };

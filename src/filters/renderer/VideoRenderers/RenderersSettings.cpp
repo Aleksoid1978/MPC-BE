@@ -36,9 +36,7 @@
 #define IDS_RS_DOWNSCALER			L"Downscaler"
 
 #define IDS_RS_VSYNC				L"VSync"
-#define IDS_RS_VSYNC_ACCURATE		L"VSyncAccurate"
-#define IDS_RS_VSYNC_ALTERNATE		L"VSyncAlternate"
-#define IDS_RS_VSYNC_OFFSET			L"VSyncOffset"
+#define IDS_RS_VSYNC_INTERNAL		L"VSyncInternal"
 #define IDS_RS_DISABLEDESKCOMP		L"DisableDesktopComposition"
 #define IDS_RS_FRAMETIMECORRECTION	L"FrameTimeCorrection"
 #define IDS_RS_FLUSHGPUBEFOREVSYNC	L"FlushGPUBeforeVSync"
@@ -87,8 +85,7 @@ void CRenderersSettings::SetDefault()
 	iDownscaler						= DOWNSCALER_SIMPLE;
 
 	bVSync							= false;
-	bVSyncAccurate					= false;
-	bAlternativeVSync				= false;
+	bVSyncInternal					= false;
 	bDisableDesktopComposition		= false;
 	bEVRFrameTimeCorrection			= false;
 	bFlushGPUBeforeVSync			= false;
@@ -150,8 +147,7 @@ void CRenderersSettings::Load()
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_DOWNSCALER, iDownscaler);
 
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VSYNC, bVSync);
-	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VSYNC_ACCURATE, bVSyncAccurate);
-	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VSYNC_ALTERNATE, bAlternativeVSync);
+	profile.ReadBool(IDS_R_VIDEO, IDS_RS_VSYNC_INTERNAL, bVSyncInternal);
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_DISABLEDESKCOMP, bDisableDesktopComposition);
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FRAMETIMECORRECTION, bEVRFrameTimeCorrection);
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUBEFOREVSYNC, bFlushGPUBeforeVSync);
@@ -200,8 +196,7 @@ void CRenderersSettings::Save()
 	profile.WriteInt(IDS_R_VIDEO, IDS_RS_DOWNSCALER, iDownscaler);
 
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VSYNC, bVSync);
-	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VSYNC_ACCURATE, bVSyncAccurate);
-	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VSYNC_ALTERNATE, bAlternativeVSync);
+	profile.WriteBool(IDS_R_VIDEO, IDS_RS_VSYNC_INTERNAL, bVSyncInternal);
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_DISABLEDESKCOMP, bDisableDesktopComposition);
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FRAMETIMECORRECTION, bEVRFrameTimeCorrection);
 	profile.WriteBool(IDS_R_VIDEO, IDS_RS_FLUSHGPUBEFOREVSYNC, bFlushGPUBeforeVSync);

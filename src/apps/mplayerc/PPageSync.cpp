@@ -43,8 +43,7 @@ void CPPageSync::DoDataExchange(CDataExchange* pDX)
 	__super::DoDataExchange(pDX);
 
 	DDX_Control(pDX, IDC_CHECK1, m_chkVSync);
-	DDX_Control(pDX, IDC_CHECK2, m_chkVSyncAccurate);
-	DDX_Control(pDX, IDC_DSVMR9ALTERNATIVEVSYNC, m_chkAlternativeVSync);
+	DDX_Control(pDX, IDC_CHECK2, m_chkVSyncInternal);
 	DDX_Control(pDX, IDC_CHECK4, m_chkDisableAero);
 	DDX_Control(pDX, IDC_CHECK8, m_chkEnableFrameTimeCorrection);
 	DDX_Control(pDX, IDC_CHECK5, m_chkVMRFlushGPUBeforeVSync);
@@ -79,10 +78,6 @@ BOOL CPPageSync::OnSetActive()
 
 void CPPageSync::InitDialogPrivate()
 {
-	GetDlgItem(IDC_STATIC1)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_EDIT1)->ShowWindow(SW_HIDE);
-	GetDlgItem(IDC_SPIN1)->ShowWindow(SW_HIDE);
-
 	CAppSettings& s = AfxGetAppSettings();
 	CRenderersSettings& rs = s.m_VRSettings;
 
@@ -90,8 +85,7 @@ void CPPageSync::InitDialogPrivate()
 	pFrame = (CMainFrame *)(AfxGetApp()->m_pMainWnd);
 
 	m_chkVSync.SetCheck(rs.bVSync);
-	m_chkVSyncAccurate.SetCheck(rs.bVSyncAccurate);
-	m_chkAlternativeVSync.SetCheck(rs.bAlternativeVSync);
+	m_chkVSyncInternal.SetCheck(rs.bVSyncInternal);
 	m_chkDisableAero.SetCheck(rs.bDisableDesktopComposition);
 	m_chkEnableFrameTimeCorrection.SetCheck(rs.bEVRFrameTimeCorrection);
 	m_chkVMRFlushGPUBeforeVSync.SetCheck(rs.bFlushGPUBeforeVSync);
@@ -100,20 +94,17 @@ void CPPageSync::InitDialogPrivate()
 
 	if (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM) {
 		m_chkVSync.EnableWindow(TRUE);
-		m_chkVSyncAccurate.EnableWindow(TRUE);
-		m_chkAlternativeVSync.EnableWindow(TRUE);
+		m_chkVSyncInternal.EnableWindow(TRUE);
 		m_chkVMRFlushGPUBeforeVSync.EnableWindow(TRUE);
 		m_chkVMRFlushGPUAfterPresent.EnableWindow(TRUE);
 		m_chkVMRFlushGPUWait.EnableWindow(TRUE);
 	} else {
 		m_chkVSync.EnableWindow(FALSE);
-		m_chkVSyncAccurate.EnableWindow(FALSE);
-		m_chkAlternativeVSync.EnableWindow(FALSE);
+		m_chkVSyncInternal.EnableWindow(FALSE);
 		m_chkVMRFlushGPUBeforeVSync.EnableWindow(FALSE);
 		m_chkVMRFlushGPUAfterPresent.EnableWindow(FALSE);
 		m_chkVMRFlushGPUWait.EnableWindow(FALSE);
 	}
-	OnVSyncCheck();
 
 	if ((!SysVersion::IsWin8orLater()) &&
 			(rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
@@ -182,8 +173,7 @@ BOOL CPPageSync::OnApply()
 	CRenderersSettings& rs = GetRenderersSettings();
 
 	rs.bVSync						= !!m_chkVSync.GetCheck();
-	rs.bVSyncAccurate				= !!m_chkVSyncAccurate.GetCheck();
-	rs.bAlternativeVSync			= !!m_chkAlternativeVSync.GetCheck();
+	rs.bVSyncInternal				= !!m_chkVSyncInternal.GetCheck();
 	rs.bDisableDesktopComposition	= !!m_chkDisableAero.GetCheck();
 	rs.bEVRFrameTimeCorrection		= !!m_chkEnableFrameTimeCorrection.GetCheck();
 	rs.bFlushGPUBeforeVSync			= !!m_chkVMRFlushGPUBeforeVSync.GetCheck();
@@ -203,22 +193,8 @@ BOOL CPPageSync::OnApply()
 }
 
 BEGIN_MESSAGE_MAP(CPPageSync, CPPageBase)
-	ON_BN_CLICKED(IDC_CHECK1, OnVSyncCheck)
 	ON_CONTROL_RANGE(BN_CLICKED, IDC_RADIO1, IDC_RADIO3, OnSyncModeClicked)
 END_MESSAGE_MAP()
-
-void CPPageSync::OnVSyncCheck()
-{
-	CAppSettings& s = AfxGetAppSettings();
-	CRenderersSettings& rs = s.m_VRSettings;
-
-	if (m_chkVSync.GetCheck() == BST_CHECKED) {
-		GetDlgItem(IDC_CHECK2)->EnableWindow(TRUE);
-	} else {
-		GetDlgItem(IDC_CHECK2)->EnableWindow(FALSE);
-	}
-	SetModified();
-}
 
 void CPPageSync::OnSyncModeClicked(UINT nID)
 {
