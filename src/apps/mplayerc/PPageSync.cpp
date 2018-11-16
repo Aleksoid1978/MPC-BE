@@ -42,8 +42,8 @@ void CPPageSync::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
-	DDX_Control(pDX, IDC_CHECK1, m_chkVSync);
-	DDX_Control(pDX, IDC_CHECK2, m_chkVSyncInternal);
+	DDX_Control(pDX, IDC_VSYNC, m_chkVSync);
+	DDX_Control(pDX, IDC_VSYNC_INTERNAL, m_chkVSyncInternal);
 	DDX_Control(pDX, IDC_CHECK4, m_chkDisableAero);
 	DDX_Control(pDX, IDC_CHECK8, m_chkEnableFrameTimeCorrection);
 	DDX_Control(pDX, IDC_CHECK5, m_chkVMRFlushGPUBeforeVSync);

@@ -781,8 +781,6 @@
 #define IDC_DSMADVR                     10712
 #define IDC_DSSYNC                      10713
 #define IDC_REGULARSURF                 10727
-#define IDC_TEXTURESURF2D               10728
-#define IDC_TEXTURESURF3D               10729
 #define IDC_DX9RESIZER_COMBO            10730
 #define IDC_DSVMRLOADMIXER              10731
 #define IDC_DSVMRYUVMIXER               10734
@@ -957,6 +955,8 @@
 #define IDC_CHECK_CHM                   22066
 #define IDC_COMBOSPEEDSTEP              22067
 #define IDC_CHECK_FLYBAR                22068
+#define IDC_VSYNC                       22069
+#define IDC_VSYNC_INTERNAL              22070
 //
 #define ID_SUB_DELAY_DOWN               24000
 #define ID_SUB_DELAY_UP                 24001
