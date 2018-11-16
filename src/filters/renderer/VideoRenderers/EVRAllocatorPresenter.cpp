@@ -1937,9 +1937,6 @@ void CEVRAllocatorPresenter::RenderThread()
 	while (!bQuit) {
 		LONGLONG llPerf = GetPerfCounter();
 		UNREFERENCED_PARAMETER(llPerf);
-		if (!rs.bVSyncAccurate && NextSleepTime == 0) {
-			NextSleepTime = 1;
-		}
 		dwObject = WaitForMultipleObjects(_countof(hEvts), hEvts, FALSE, std::max(NextSleepTime < 0 ? 1 : NextSleepTime, 0));
 		if (m_hEvtRenegotiate) {
 			CAutoLock Lock(&m_csExternalMixerLock);
@@ -2048,7 +2045,6 @@ void CEVRAllocatorPresenter::RenderThread()
 							} else {
 								LONGLONG TimePerFrame = (LONGLONG)(GetFrameTime() * 10000000.0);
 								LONGLONG DrawTime = m_PaintTime * 9 / 10 - 20000; // 2 ms offset (= m_PaintTime * 0.9 - 20000)
-								//if (!s.bVSync)
 								DrawTime = 0;
 
 								LONGLONG SyncOffset = 0;
@@ -2073,7 +2069,7 @@ void CEVRAllocatorPresenter::RenderThread()
 									DetectedScanlineTime = DetectedRefreshTime / double(m_ScreenSize.cy);
 								}
 
-								if (rs.bVSync) {
+								if (rs.bVSyncInternal) {
 									bVSyncCorrection = true;
 									double TargetVSyncPos = GetVBlackPos();
 									double RefreshLines = DetectedScanlinesPerFrame;
@@ -2299,7 +2295,7 @@ void CEVRAllocatorPresenter::VSyncThread()
 				break;
 			case WAIT_TIMEOUT : {
 				// Do our stuff
-				if (m_pD3DDevEx && rs.bVSync) {
+				if (m_pD3DDevEx && rs.bVSyncInternal) {
 					ScanLinePos = 0;
 					filled = false;
 

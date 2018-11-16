@@ -1045,11 +1045,10 @@ public:
 	afx_msg void OnUpdateViewFullscreenGUISupport(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateViewEnableFrameTimeCorrection(CCmdUI* pCmdUI);
 	afx_msg void OnViewVSync();
-	afx_msg void OnViewVSyncAccurate();
+	afx_msg void OnViewVSyncInternal();
 
 	afx_msg void OnViewD3DFullScreen();
 	afx_msg void OnViewDisableDesktopComposition();
-	afx_msg void OnViewAlternativeVSync();
 	afx_msg void OnViewResetDefault();
 	afx_msg void OnUpdateViewReset(CCmdUI* pCmdUI);
 

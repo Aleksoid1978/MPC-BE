@@ -54,7 +54,6 @@ namespace DSObjects
 		UINT	m_CurrentAdapter;
 		UINT	m_AdapterCount;
 
-		bool	m_bAlternativeVSync;
 		BOOL	m_bCompositionEnabled;
 		int		m_OrderedPaint;
 		int		m_VSyncMode;
