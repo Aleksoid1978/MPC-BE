@@ -546,6 +546,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 	if (!bTryToReset) {
 		m_pD3DDevEx.Release();
+		m_pD3DDevExRefresh.Release();
 		m_CurrentAdapter = currentAdapter;
 
 		m_GPUUsage.Init(m_D3D9DeviceName, m_D3D9Device);
@@ -739,8 +740,8 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
 	d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
 
-	bTryToReset = bTryToReset && m_pD3DDevExRefresh;
-	if (bTryToReset) {
+	bTryToReset = false;
+	if (m_pD3DDevExRefresh) {
 		bTryToReset = SUCCEEDED(hr = m_pD3DDevExRefresh->ResetEx(&d3dpp, nullptr));
 		DLog(L"    => m_pD3DDevExRefresh->ResetEx() : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
 	}
@@ -748,7 +749,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	if (!bTryToReset) {
 		m_pD3DDevExRefresh.Release();
 		hr = m_pD3DEx->CreateDeviceEx(
-				m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWnd,
+				m_CurrentAdapter, D3DDEVTYPE_HAL, GetShellWindow(),
 				D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED | D3DCREATE_FPU_PRESERVE,
 				&d3dpp, nullptr, &m_pD3DDevExRefresh);
 		DLog(L"    => CreateDeviceEx(m_pD3DDevExRefresh) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
