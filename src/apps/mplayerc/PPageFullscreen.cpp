@@ -521,7 +521,7 @@ void CPPageFullscreen::ModesUpdate()
 	m_displayModesString.clear();
 
 	dispmode dm;
-	for (int i = 0, m = 0, ModeExist = true;  ; i++) {
+	for (int i = 0, m = 0, ModeExist = true;; i++) {
 		if (!CMainFrame::GetDispMode(i, dm, m_strFullScreenMonitor)) {
 			break;
 		}
@@ -557,6 +557,7 @@ void CPPageFullscreen::ModesUpdate()
 		m_displayModesString.push_back(FormatModeString(m_dms[i]));
 		if (dCurMod == m_dms[i]) {
 			curModeIdx = i;
+			break;
 		}
 	}
 
@@ -621,7 +622,7 @@ void CPPageFullscreen::ModesUpdate()
 		static const struct {
 			double vfr_from;
 			double vfr_to;
-		} vfr [8] = {
+		} vfr[8] = {
 			{ 23.400, 23.988 }, // 23.976
 			{ 23.988, 24.500 }, // 24
 			{ 24.500, 25.500 }, // 25
@@ -641,7 +642,7 @@ void CPPageFullscreen::ModesUpdate()
 			str.Format(L"%.3f", vfr[nItem].vfr_to);
 			m_list.SetItemText(nItem + 1, COL_VFR_T, str);
 			m_list.SetItemText(nItem + 1, COL_SRR, strCur);
-			m_list.SetItemData(nItem, (DWORD_PTR)curModeIdx);
+			m_list.SetItemData(nItem + 1, (DWORD_PTR)curModeIdx);
 			m_list.SetCheck(nItem + 1, TRUE);
 		}
 	}
@@ -704,8 +705,22 @@ void CPPageFullscreen::OnAdd()
 		m_list.InsertItem(nItem, str);
 		m_list.SetItemText(nItem, COL_VFR_F, L"1.000");
 		m_list.SetItemText(nItem, COL_VFR_T, L"1.000");
+
 		GetCurDispModeString(strCur);
 		m_list.SetItemText(nItem, COL_SRR, strCur);
+
+		dispmode dCurMod;
+		CMainFrame::GetCurDispMode(dCurMod, m_strFullScreenMonitor);
+
+		int curModeIdx = m_dms.size() - 1;
+		for (size_t i = 0; i < m_dms.size(); i++) {
+			if (dCurMod == m_dms[i]) {
+				curModeIdx = i;
+				break;
+			}
+		}
+		m_list.SetItemData(nItem, (DWORD_PTR)curModeIdx);
+
 		m_list.SetCheck(nItem, FALSE);
 		m_list.SetFocus();
 		m_list.SetItemState(nItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
