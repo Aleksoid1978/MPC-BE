@@ -274,14 +274,6 @@ struct fpsmode {
 	}
 };
 
-#define MaxFpsCount 30
-struct AChFR { //AutoChangeFullscrRes
-	int bEnabled = 0;
-	fpsmode dmFullscreenRes[MaxFpsCount];
-	bool bApplyDefault = false;
-	bool bSetGlobal = false; // not used
-};
-
 struct AccelTbl {
 	bool bEnable;
 	int cmd;
@@ -492,6 +484,13 @@ typedef std::list<CSubtitleItem> CSubtitleItemList;
 
 typedef std::list<CString> cmdLine;
 
+#define MaxFullScreenModes 30
+#define MaxMonitorId 10
+struct fullScreenRes {
+	std::vector<fpsmode> dmFullscreenRes;
+	CString monitorId;
+};
+
 class CAppSettings
 {
 	bool bInitialized;
@@ -654,7 +653,13 @@ public:
 	bool			fExitFullScreenAtFocusLost;
 	CStringW		strFullScreenMonitor;
 	CStringW		strFullScreenMonitorID;
-	AChFR			AutoChangeFullscrRes;
+
+	struct t_fullScreenModes {
+		std::vector<fullScreenRes> res;
+		BOOL bEnabled;
+		bool bApplyDefault;
+	} fullScreenModes;
+
 	AccelTbl		AccelTblColWidth;
 	bool			fRestoreResAfterExit;
 	dispmode		dmFSMonOnLaunch;
