@@ -391,7 +391,8 @@ static bool ExportRegistryKey(CStdioFile& file, HKEY hKeyRoot, CString keyName)
 				}
 				break;
 			case REG_BINARY:
-				buffer.Format(L"\"%s\"=hex:%02x", valueName, data[0]);
+			case REG_QWORD:
+				buffer.Format(L"\"%s\"=hex%s:%02x", valueName, type == REG_QWORD ? L"(b)" : L"", data[0]);
 				file.WriteString(buffer);
 				for (DWORD i = 1; i < valueDataLen; i++) {
 					buffer.Format(L",%02x", data[i]);
@@ -467,15 +468,12 @@ void CMPlayerCApp::ExportSettings()
 		if (m_Profile.IsIniValid()) {
 			success = !!CopyFileW(m_Profile.GetIniPath(), savePath, FALSE);
 		} else {
-			CString regKey(L"Software\\");
-			regKey.Append(m_pszProfileName);
-
 			FILE* fStream;
 			errno_t error = _wfopen_s(&fStream, savePath, L"wt,ccs=UNICODE");
 			CStdioFile file(fStream);
 			file.WriteString(L"Windows Registry Editor Version 5.00\n\n");
 
-			success = !error && ExportRegistryKey(file, HKEY_CURRENT_USER, regKey);
+			success = !error && ExportRegistryKey(file, HKEY_CURRENT_USER, L"Software\\MPC-BE");
 
 			file.Close();
 		}
