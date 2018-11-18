@@ -498,11 +498,11 @@ public:
 
 	CControlBar* m_pLastBar;
 
-	static bool GetCurDispMode(dispmode& dm, CString& DisplayName);
-	static bool GetDispMode(int i, dispmode& dm, CString& DisplayName);
+	static bool GetCurDispMode(dispmode& dm, const CString& DisplayName);
+	static bool GetDispMode(const DWORD iModeNum, dispmode& dm, const CString& DisplayName);
 
 protected:
-	void SetDispMode(dispmode& dm, CString& DisplayName, BOOL bForceRegistryMode = FALSE);
+	void SetDispMode(const dispmode& dm, const CString& DisplayName, const BOOL bForceRegistryMode = FALSE);
 
 	bool			m_bUseSmartSeek;
 	MPC_LOADSTATE	m_eMediaLoadState;

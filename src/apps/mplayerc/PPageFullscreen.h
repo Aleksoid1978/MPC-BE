@@ -42,9 +42,9 @@ private:
 	BOOL m_bBeforePlayback; // change display mode before starting playback
 	BOOL m_bSetDefault;
 
-	AChFR m_AutoChangeFullscrRes;
-	CString m_f_hmonitor;
-	CString m_f_hmonitorID;
+	CAppSettings::t_fullScreenModes m_fullScreenModes;
+	CString m_strFullScreenMonitor;
+	CString m_strFullScreenMonitorID;
 	int m_nCurMon;
 
 	CPlayerListCtrl m_list;

@@ -116,7 +116,9 @@
 #define IDS_RS_EXITFULLSCREENATFOCUSLOST	L"ExitFullscreenAtFocusLost"
 #define IDS_RS_FULLSCREENMONITOR			L"FullScreenMonitor"
 #define IDS_RS_FULLSCREENMONITORID			L"FullScreenMonitorID"
-#define IDS_RS_FULLSCREENRES				L"FullscreenRes"
+#define IDS_RS_FULLSCREENRES				L"Settings\\FullscreenRes"
+#define IDS_RS_FULLSCREENRES_ENABLE			L"Enable"
+#define IDS_RS_FULLSCREENRES_APPLY_DEF		L"ApplyDefault"
 #define IDS_RS_RESTORERESAFTEREXIT			L"RestoreResAfterExit"
 #define IDS_RS_DISPLAYMODECHANGEDELAY		L"DisplayModeChangeDelay"
 

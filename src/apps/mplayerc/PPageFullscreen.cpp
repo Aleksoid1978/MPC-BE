@@ -26,7 +26,7 @@
 #include "../../DSUtil/SysVersion.h"
 #include "MultiMonitor.h"
 
-static CString FormatModeString(dispmode dmod)
+static CString FormatModeString(const dispmode& dmod)
 {
 	CString strMode;
 	strMode.Format(L"[ %d ]  @ %dx%d %s", dmod.freq, dmod.size.cx, dmod.size.cy, dmod.dmDisplayFlags & DM_INTERLACED ? L"i" : L"p");
@@ -125,10 +125,10 @@ BOOL CPPageFullscreen::OnInitDialog()
 	CAppSettings& s = AfxGetAppSettings();
 
 	m_bLaunchFullScreen					= s.fLaunchfullscreen;
-	m_AutoChangeFullscrRes				= s.AutoChangeFullscrRes;
-	m_bSetDefault						= s.AutoChangeFullscrRes.bApplyDefault;
-	m_f_hmonitor						= s.strFullScreenMonitor;
-	m_f_hmonitorID						= s.strFullScreenMonitorID;
+	m_fullScreenModes					= s.fullScreenModes;
+	m_bSetDefault						= m_fullScreenModes.bApplyDefault;
+	m_strFullScreenMonitor				= s.strFullScreenMonitor;
+	m_strFullScreenMonitorID			= s.strFullScreenMonitorID;
 	m_bShowBarsWhenFullScreen			= s.fShowBarsWhenFullScreen;
 	m_edtTimeOut						= s.nShowBarsWhenFullScreenTimeOut;
 	m_edtTimeOut.SetRange(-1, 10);
@@ -139,29 +139,26 @@ BOOL CPPageFullscreen::OnInitDialog()
 	m_edDMChangeDelay.SetRange(0, 9);
 	m_spnDMChangeDelay.SetRange(0, 9);
 
-
 	m_bRestoreResAfterExit				= s.fRestoreResAfterExit;
 
-	CString str;
 	m_iMonitorType = 0;
-	CMonitor curmonitor;
-	CMonitors monitors;
-	CString strCurMon;
 
 	m_iMonitorTypeCtrl.AddString(ResStr(IDS_FULLSCREENMONITOR_CURRENT));
 	m_MonitorDisplayNames.Add(L"Current");
 	m_MonitorDeviceName.Add(L"Current");
-	curmonitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
+	CMonitors monitors;
+	CMonitor curmonitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
+	CString strCurMon;
 	curmonitor.GetName(strCurMon);
-	if(m_f_hmonitor.IsEmpty()) {
-		m_f_hmonitor = L"Current";
-		m_iMonitorType = 0;
+	if(m_strFullScreenMonitor.IsEmpty()) {
+		m_strFullScreenMonitor = L"Current";
 	}
 
 	DISPLAY_DEVICE dd;
 	dd.cb = sizeof(dd);
 	DWORD dev = 0; // device index
 	int id = 0;
+	CString str;
 	CString str2;
 	CString DeviceID;
 	CString strMonID;
@@ -182,9 +179,9 @@ BOOL CPPageFullscreen::OnInitDialog()
 					m_MonitorDisplayNames[0] = L"Current" + strMonID;
 					m_MonitorDeviceName[0] = str;
 
-					if(m_f_hmonitor == L"Current" && m_AutoChangeFullscrRes.bEnabled > 0) {
-						m_iMonitorType = m_iMonitorTypeCtrl.GetCount()-1;
-						m_f_hmonitor = strCurMon;
+					if(m_strFullScreenMonitor == L"Current" && m_fullScreenModes.bEnabled > 0) {
+						m_iMonitorType = m_iMonitorTypeCtrl.GetCount() - 1;
+						m_strFullScreenMonitor = strCurMon;
 					}
 					m_nCurMon = m_iMonitorTypeCtrl.GetCount() - 1;
 				} else {
@@ -192,12 +189,12 @@ BOOL CPPageFullscreen::OnInitDialog()
 				}
 				m_MonitorDisplayNames.Add(str + strMonID);
 				m_MonitorDeviceName.Add(str);
-				if(m_iMonitorType == 0 && m_f_hmonitor == str) {
-					m_iMonitorType = m_iMonitorTypeCtrl.GetCount()-1;
+				if(m_iMonitorType == 0 && m_strFullScreenMonitor == str) {
+					m_iMonitorType = m_iMonitorTypeCtrl.GetCount() - 1;
 				}
 
-				if (m_f_hmonitorID == strMonID  && m_f_hmonitor != L"Current") {
-					id = m_iMonitorType = m_iMonitorTypeCtrl.GetCount()-1;
+				if (m_strFullScreenMonitorID == strMonID  && m_strFullScreenMonitor != L"Current") {
+					id = m_iMonitorType = m_iMonitorTypeCtrl.GetCount() - 1;
 					str2 = str;
 				}
 			}
@@ -211,15 +208,15 @@ BOOL CPPageFullscreen::OnInitDialog()
 	}
 
 	if(m_iMonitorTypeCtrl.GetCount() > 2) {
-		if (m_MonitorDisplayNames[m_iMonitorType] != m_f_hmonitor + m_f_hmonitorID) {
+		if (m_MonitorDisplayNames[m_iMonitorType] != m_strFullScreenMonitor + m_strFullScreenMonitorID) {
 			if ( id > 0 ) {
 				m_iMonitorType = id;
-				m_f_hmonitor = str2;
+				m_strFullScreenMonitor = str2;
 			}
 		}
 		GetDlgItem(IDC_COMBO1)->EnableWindow(TRUE);
 	} else {
-		if(m_AutoChangeFullscrRes.bEnabled == false)  {
+		if(m_fullScreenModes.bEnabled == false)  {
 			m_iMonitorType = 0;
 		} else {
 			m_iMonitorType = 1;
@@ -227,8 +224,8 @@ BOOL CPPageFullscreen::OnInitDialog()
 		GetDlgItem(IDC_COMBO1)->EnableWindow(FALSE);
 	}
 
-	if (m_AutoChangeFullscrRes.bEnabled == false && (m_MonitorDisplayNames[m_iMonitorType]).Left(7) == L"Current"){
-		m_f_hmonitor = L"Current";
+	if (m_fullScreenModes.bEnabled == false && (m_MonitorDisplayNames[m_iMonitorType]).Left(7) == L"Current"){
+		m_strFullScreenMonitor = L"Current";
 	}
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER
@@ -258,9 +255,9 @@ void CPPageFullscreen::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 	} else if ( (CDDS_ITEMPREPAINT | CDDS_SUBITEM) == pLVCD->nmcd.dwDrawStage ) {
 		COLORREF crText, crBkgnd;
 
-		m_AutoChangeFullscrRes.bEnabled = m_bEnableAutoMode ? m_bEnableAutoMode + m_bBeforePlayback : 0;
+		m_fullScreenModes.bEnabled = m_bEnableAutoMode ? m_bEnableAutoMode + m_bBeforePlayback : 0;
 
-		if (m_AutoChangeFullscrRes.bEnabled == false) {
+		if (m_fullScreenModes.bEnabled == false) {
 			crText = RGB(128,128,128);
 			crBkgnd = RGB(240, 240, 240);
 		} else {
@@ -282,49 +279,62 @@ BOOL CPPageFullscreen::OnApply()
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	m_AutoChangeFullscrRes.bEnabled = m_bEnableAutoMode ? m_bEnableAutoMode + m_bBeforePlayback : 0;
+	m_fullScreenModes.bEnabled = m_bEnableAutoMode ? m_bEnableAutoMode + m_bBeforePlayback : 0;
 
-	for (int nItem = 0; nItem < MaxFpsCount; nItem++) {
-		if (nItem < m_list.GetItemCount()) {
-			m_AutoChangeFullscrRes.dmFullscreenRes[nItem].dmFSRes = m_dms[m_list.GetItemData(nItem)];
-			m_AutoChangeFullscrRes.dmFullscreenRes[nItem].bChecked = !!m_list.GetCheck(nItem);
-			m_AutoChangeFullscrRes.dmFullscreenRes[nItem].bValid = true;
-			m_AutoChangeFullscrRes.dmFullscreenRes[nItem].vfr_from = wcstod(m_list.GetItemText(nItem, COL_VFR_F), nullptr);
-			m_AutoChangeFullscrRes.dmFullscreenRes[nItem].vfr_to = wcstod(m_list.GetItemText(nItem, COL_VFR_T), nullptr);
-		} else {
-			m_AutoChangeFullscrRes.dmFullscreenRes[nItem].Empty();
-		}
-	}
-
-	m_AutoChangeFullscrRes.bApplyDefault	= !!m_bSetDefault;
-	s.AutoChangeFullscrRes					= m_AutoChangeFullscrRes;
-	s.fLaunchfullscreen						= !!m_bLaunchFullScreen;
+	m_fullScreenModes.bApplyDefault	= !!m_bSetDefault;
+	s.fLaunchfullscreen				= !!m_bLaunchFullScreen;
 
 	CString str;
 	CString strCurMon;
 	str = m_MonitorDisplayNames[m_iMonitorType];
-	if (str.GetLength() == 14) { m_f_hmonitor = str.Left(7); }
-	if (str.GetLength() == 19) { m_f_hmonitor = str.Left(12); }
-	m_f_hmonitorID = str.Right(7);
-	if (m_AutoChangeFullscrRes.bEnabled > 0 && m_f_hmonitor == L"Current") {
+	if (str.GetLength() == 14) { m_strFullScreenMonitor = str.Left(7); }
+	if (str.GetLength() == 19) { m_strFullScreenMonitor = str.Left(12); }
+	m_strFullScreenMonitorID = str.Right(7);
+	if (m_fullScreenModes.bEnabled && m_strFullScreenMonitor == L"Current") {
 		CMonitors monitors;
-		CMonitor curmonitor;
-		curmonitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
+		CMonitor curmonitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
 		curmonitor.GetName(strCurMon);
-		m_f_hmonitor = strCurMon;
+		m_strFullScreenMonitor = strCurMon;
 	}
-	if (m_AutoChangeFullscrRes.bEnabled == false && m_f_hmonitor == L"Current") {
-		m_f_hmonitor = L"Current";
+	/*
+	if (m_fullScreenModes.bEnabled == FALSE && m_strFullScreenMonitor == L"Current") {
+		m_strFullScreenMonitor = L"Current";
 	}
-	s.strFullScreenMonitor					= m_f_hmonitor;
-	s.strFullScreenMonitorID				= m_f_hmonitorID;
+	*/
+	s.strFullScreenMonitor				= m_strFullScreenMonitor;
+	s.strFullScreenMonitorID			= m_strFullScreenMonitorID;
 
-	s.fShowBarsWhenFullScreen				= !!m_bShowBarsWhenFullScreen;
-	s.nShowBarsWhenFullScreenTimeOut		= m_edtTimeOut;
-	s.fExitFullScreenAtTheEnd				= !!m_bExitFullScreenAtTheEnd;
-	s.fExitFullScreenAtFocusLost			= !!m_bExitFullScreenAtFocusLost;
-	s.fRestoreResAfterExit					= !!m_bRestoreResAfterExit;
-	s.iDMChangeDelay						= m_edDMChangeDelay;
+	s.fShowBarsWhenFullScreen			= !!m_bShowBarsWhenFullScreen;
+	s.nShowBarsWhenFullScreenTimeOut	= m_edtTimeOut;
+	s.fExitFullScreenAtTheEnd			= !!m_bExitFullScreenAtTheEnd;
+	s.fExitFullScreenAtFocusLost		= !!m_bExitFullScreenAtFocusLost;
+	s.fRestoreResAfterExit				= !!m_bRestoreResAfterExit;
+	s.iDMChangeDelay					= m_edDMChangeDelay;
+
+	auto it = std::find_if(m_fullScreenModes.res.begin(), m_fullScreenModes.res.end(), [&](const fullScreenRes& item) {
+		return item.monitorId == s.strFullScreenMonitorID;
+	});
+
+	if (it == m_fullScreenModes.res.end()) {
+		if (m_fullScreenModes.res.size() == MaxMonitorId) {
+			m_fullScreenModes.res.erase(m_fullScreenModes.res.begin());
+		}
+		m_fullScreenModes.res.resize(m_fullScreenModes.res.size() + 1);
+		it = std::prev(m_fullScreenModes.res.end());
+	}
+
+	int nItemCnt = std::min(MaxFullScreenModes, m_list.GetItemCount());
+	it->dmFullscreenRes.resize(nItemCnt);
+	for (int nItem = 0; nItem < nItemCnt; nItem++) {
+		it->dmFullscreenRes[nItem].dmFSRes = m_dms[m_list.GetItemData(nItem)];
+		it->dmFullscreenRes[nItem].bChecked = !!m_list.GetCheck(nItem);
+		it->dmFullscreenRes[nItem].bValid = true;
+		it->dmFullscreenRes[nItem].vfr_from = wcstod(m_list.GetItemText(nItem, COL_VFR_F), nullptr);
+		it->dmFullscreenRes[nItem].vfr_to = wcstod(m_list.GetItemText(nItem, COL_VFR_T), nullptr);
+	}
+	it->monitorId = s.strFullScreenMonitorID;
+
+	s.fullScreenModes = m_fullScreenModes;
 
 	return __super::OnApply();
 }
@@ -420,14 +430,13 @@ void CPPageFullscreen::OnUpdateFullScrComboCtrl(CCmdUI* pCmdUI)
 
 void CPPageFullscreen::OnUpdateSetFullscreenRes()
 {
-	CMonitor curmonitor;
 	CMonitors monitors;
+	CMonitor curmonitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
 	CString strCurMon;
-	curmonitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
 	curmonitor.GetName(strCurMon);
 	if (m_iMonitorTypeCtrl.GetCurSel() == 0) {
 		m_iMonitorTypeCtrl.SetCurSel(m_nCurMon);
-		m_f_hmonitor = strCurMon;
+		m_strFullScreenMonitor = strCurMon;
 	}
 
 	SetModified();
@@ -455,22 +464,21 @@ void CPPageFullscreen::OnUpdateStatic2(CCmdUI* pCmdUI)
 
 void CPPageFullscreen::OnUpdateFullScrCombo()
 {
-	CMonitors monitors;
-	CMonitor curmonitor;
 	CString str, strCurMonID, strCurMon;
 	str = m_MonitorDisplayNames[m_iMonitorTypeCtrl.GetCurSel()];
-	if (str.GetLength() == 14) { m_f_hmonitor = str.Left(7); }
-	if (str.GetLength() == 19) { m_f_hmonitor = str.Left(12); }
+	if (str.GetLength() == 14) { m_strFullScreenMonitor = str.Left(7); }
+	if (str.GetLength() == 19) { m_strFullScreenMonitor = str.Left(12); }
 	strCurMonID = str.Right(7);
-	curmonitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
+	CMonitors monitors;
+	CMonitor curmonitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
 	curmonitor.GetName(strCurMon);
 
-	if (m_f_hmonitor == L"Current" && m_AutoChangeFullscrRes.bEnabled > 0) {
-		m_f_hmonitor = strCurMon;
+	if (m_strFullScreenMonitor == L"Current" && m_fullScreenModes.bEnabled) {
+		m_strFullScreenMonitor = strCurMon;
 	}
 
-	if (m_f_hmonitor != L"Current" && m_f_hmonitor != strCurMon) {
-		m_AutoChangeFullscrRes.bEnabled = false;
+	if (m_strFullScreenMonitor != L"Current" && m_strFullScreenMonitor != strCurMon) {
+		m_fullScreenModes.bEnabled = FALSE;
 	}
 
 	ModesUpdate();
@@ -489,8 +497,8 @@ void CPPageFullscreen::ModesUpdate()
 
 	m_list.SetRedraw(FALSE);
 
-	m_bEnableAutoMode = m_AutoChangeFullscrRes.bEnabled > 0;
-	m_bBeforePlayback = m_AutoChangeFullscrRes.bEnabled == 2;
+	m_bEnableAutoMode = m_fullScreenModes.bEnabled;
+	m_bBeforePlayback = m_fullScreenModes.bEnabled == 2;
 
 	/*
 	CString strDevice = m_MonitorDeviceName[m_iMonitorType];
@@ -501,11 +509,11 @@ void CPPageFullscreen::ModesUpdate()
 
 	CString str;
 	str = m_MonitorDisplayNames[m_iMonitorType];
-	if (str.GetLength() == 14) { m_f_hmonitor = str.Left(7); }
-	if (str.GetLength() == 19) { m_f_hmonitor = str.Left(12); }
-	m_f_hmonitorID = str.Right(7);
-	if (s.strFullScreenMonitorID != m_f_hmonitorID) {
-		m_AutoChangeFullscrRes.bEnabled = false;
+	if (str.GetLength() == 14) { m_strFullScreenMonitor = str.Left(7); }
+	if (str.GetLength() == 19) { m_strFullScreenMonitor = str.Left(12); }
+	m_strFullScreenMonitorID = str.Right(7);
+	if (s.strFullScreenMonitorID != m_strFullScreenMonitorID) {
+		m_fullScreenModes.bEnabled = FALSE;
 	}
 
 	m_list.DeleteAllItems();
@@ -514,7 +522,7 @@ void CPPageFullscreen::ModesUpdate()
 
 	dispmode dm;
 	for (int i = 0, m = 0, ModeExist = true;  ; i++) {
-		if (!CMainFrame::GetDispMode(i, dm, m_f_hmonitor)) {
+		if (!CMainFrame::GetDispMode(i, dm, m_strFullScreenMonitor)) {
 			break;
 		}
 		if (dm.bpp != 32 || dm.size.cx < 720 || dm.size.cy < 480) {
@@ -542,7 +550,7 @@ void CPPageFullscreen::ModesUpdate()
 	GetCurDispModeString(strCur);
 
 	dispmode dCurMod;
-	CMainFrame::GetCurDispMode(dCurMod, m_f_hmonitor);
+	CMainFrame::GetCurDispMode(dCurMod, m_strFullScreenMonitor);
 
 	int curModeIdx = m_dms.size() - 1;
 	for (size_t i = 0; i < m_dms.size(); i++) {
@@ -553,42 +561,51 @@ void CPPageFullscreen::ModesUpdate()
 	}
 
 	int nItem = 0;
-	if (m_AutoChangeFullscrRes.dmFullscreenRes[0].bValid
-			&& m_AutoChangeFullscrRes.dmFullscreenRes[0].vfr_from != 0.000) {
-		m_list.InsertItem(nItem, L"Default");
-		m_list.SetItemText(nItem, COL_VFR_F, L"-");
-		m_list.SetItemText(nItem, COL_VFR_T, L"-");
-		m_list.SetItemText(nItem, COL_SRR, strCur);
-		m_list.SetItemData(nItem, (DWORD_PTR)curModeIdx);
-		m_list.SetCheck(nItem, TRUE);
-		nItem++;
-	}
 
-	auto findDisplayMode = [this](const dispmode& dm, const int& curModeIdx) {
-		for (size_t i = 0; i < m_dms.size(); i++) {
-			if (dm == m_dms[i] && AfxGetAppSettings().strFullScreenMonitor == m_f_hmonitor) {
-				return (int)i;
+	auto it = std::find_if(m_fullScreenModes.res.cbegin(), m_fullScreenModes.res.cend(), [&](const fullScreenRes& item) {
+		return item.monitorId == m_strFullScreenMonitorID;
+	});
+
+	if (it != m_fullScreenModes.res.cend()) {
+		auto findDisplayMode = [this](const dispmode& dm, const int& curModeIdx) {
+			for (size_t i = 0; i < m_dms.size(); i++) {
+				if (dm == m_dms[i]) {
+					return (int)i;
+				}
 			}
+
+			return curModeIdx;
+		};
+
+		if (it->dmFullscreenRes[0].bValid
+				&& it->dmFullscreenRes[0].vfr_from != 0.000) {
+			m_list.InsertItem(nItem, L"Default");
+			m_list.SetItemText(nItem, COL_VFR_F, L"-");
+			m_list.SetItemText(nItem, COL_VFR_T, L"-");
+			m_list.SetItemText(nItem, COL_SRR, strCur);
+			m_list.SetItemData(nItem, (DWORD_PTR)curModeIdx);
+			m_list.SetCheck(nItem, TRUE);
+			nItem++;
 		}
 
-		return curModeIdx;
-	};
+		size_t n = 0;
+		for (const auto& item : it->dmFullscreenRes) {
+			if (item.bValid) {
+				int dmIdx = findDisplayMode(item.dmFSRes, curModeIdx);
 
-	for (int n = 0; n < MaxFpsCount; n++) {
-		if (m_AutoChangeFullscrRes.dmFullscreenRes[n].bValid) {
-			int dmIdx = findDisplayMode(m_AutoChangeFullscrRes.dmFullscreenRes[n].dmFSRes, curModeIdx);
-
-			CString str;
-			nItem > 0 ? str.Format(L"%02d", n) : str = L"Default";
-			m_list.InsertItem(nItem, str);
-			m_list.SetItemText(nItem, COL_SRR, FormatModeString(m_dms[dmIdx]));
-			nItem > 0 ? str.Format(L"%.3f", m_AutoChangeFullscrRes.dmFullscreenRes[n].vfr_from) : str = L"-";
-			m_list.SetItemText(nItem, COL_VFR_F, str);
-			nItem > 0 ? str.Format(L"%.3f", m_AutoChangeFullscrRes.dmFullscreenRes[n].vfr_to) : str = L"-";
-			m_list.SetItemText(nItem, COL_VFR_T, str);
-			m_list.SetItemData(nItem, (DWORD_PTR)dmIdx);
-			m_list.SetCheck(nItem, m_AutoChangeFullscrRes.dmFullscreenRes[n].bChecked);
-			nItem++;
+				CString str;
+				nItem > 0 ? str.Format(L"%02u", n) : str = L"Default";
+				m_list.InsertItem(nItem, str);
+				m_list.SetItemText(nItem, COL_SRR, FormatModeString(m_dms[dmIdx]));
+				nItem > 0 ? str.Format(L"%.3f", item.vfr_from) : str = L"-";
+				m_list.SetItemText(nItem, COL_VFR_F, str);
+				nItem > 0 ? str.Format(L"%.3f", item.vfr_to) : str = L"-";
+				m_list.SetItemText(nItem, COL_VFR_T, str);
+				m_list.SetItemData(nItem, (DWORD_PTR)dmIdx);
+				m_list.SetCheck(nItem, item.bChecked);
+				nItem++;
+			}
+			n++;
 		}
 	}
 
@@ -681,7 +698,7 @@ void CPPageFullscreen::OnAdd()
 		nItem = m_list.GetItemCount();
 	}
 
-	if (m_list.GetItemCount() <= MaxFpsCount) {
+	if (m_list.GetItemCount() <= MaxFullScreenModes) {
 		CString str, strCur;
 		str.Format(L"%02d", nItem);
 		m_list.InsertItem(nItem, str);
@@ -791,7 +808,7 @@ void CPPageFullscreen::ReindexList()
 void CPPageFullscreen::GetCurDispModeString(CString& strCur)
 {
 	dispmode dmod;
-	CMainFrame::GetCurDispMode(dmod, m_f_hmonitor);
+	CMainFrame::GetCurDispMode(dmod, m_strFullScreenMonitor);
 
 	strCur = FormatModeString(dmod);
 }

@@ -630,7 +630,10 @@ void CAppSettings::ResetSettings()
 	// Last Saved Playlist Dir
 	strLastSavedPlaylistDir = L"C:\\";
 
-	ZeroMemory(&AutoChangeFullscrRes, sizeof(AChFR));
+	fullScreenModes.res.clear();
+	fullScreenModes.bEnabled = FALSE;
+	fullScreenModes.bApplyDefault = false;
+
 	ZeroMemory(&AccelTblColWidth, sizeof(AccelTbl));
 
 	fExitFullScreenAtTheEnd = true;
@@ -983,17 +986,39 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	// Last Saved Playlist Dir
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LAST_SAVED_PLAYLIST_DIR, strLastSavedPlaylistDir);
 
-	if (profile.ReadBinary(IDS_R_SETTINGS, IDS_RS_FULLSCREENRES, &ptr, len)) {
-		if (len == sizeof(AChFR)) {
-			memcpy(&AutoChangeFullscrRes, ptr, sizeof(AChFR));
-		} else {
-			AutoChangeFullscrRes.bEnabled = 0;
+	profile.ReadInt(IDS_RS_FULLSCREENRES, IDS_RS_FULLSCREENRES_ENABLE, fullScreenModes.bEnabled);
+	profile.ReadBool(IDS_RS_FULLSCREENRES, IDS_RS_FULLSCREENRES_APPLY_DEF, fullScreenModes.bApplyDefault);
+	fullScreenModes.res.clear();
+	for (size_t cnt = 0; cnt < MaxMonitorId; cnt++) {
+		fullScreenRes item;
+
+		CString entry;
+		entry.Format(L"MonitorId%u", cnt);
+		if (!profile.ReadString(IDS_RS_FULLSCREENRES, entry, str) || str.IsEmpty()) {
+			break;
 		}
-		delete [] ptr;
-	} else {
-		AutoChangeFullscrRes.bEnabled = 0;
+
+		entry.Format(L"Res%u", cnt);
+		if (profile.ReadBinary(IDS_RS_FULLSCREENRES, entry, &ptr, len)) {
+			if (len >= (sizeof(fpsmode) + 1)) {
+				BYTE size = ptr[0];
+				if (size && size <= MaxFullScreenModes && size * sizeof(fpsmode) == len - 1) {
+					item.dmFullscreenRes.resize(size);
+					memcpy(item.dmFullscreenRes.data(), ptr + 1, len - 1);
+
+					item.monitorId = str;
+					fullScreenModes.res.emplace_back(item);
+				}
+			}
+			delete [] ptr;
+		}
 	}
 
+	if (fullScreenModes.res.empty()) {
+		fullScreenModes.bEnabled = FALSE;
+		fullScreenModes.bApplyDefault = false;
+	}
+	
 	if (profile.ReadBinary(IDS_R_SETTINGS, L"AccelTblColWidth", &ptr, len)) {
 		if (len == sizeof(AccelTbl)) {
 			memcpy(&AccelTblColWidth, ptr, sizeof(AccelTbl));
@@ -1559,7 +1584,28 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_FULLSCREENCTRLSTIMEOUT, nShowBarsWhenFullScreenTimeOut);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATTHEEND, fExitFullScreenAtTheEnd);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_EXITFULLSCREENATFOCUSLOST, fExitFullScreenAtFocusLost);
-	profile.WriteBinary(IDS_R_SETTINGS, IDS_RS_FULLSCREENRES, (BYTE*)&AutoChangeFullscrRes, sizeof(AutoChangeFullscrRes));
+
+	if (!fullScreenModes.res.empty()) {
+		profile.DeleteSection(IDS_RS_FULLSCREENRES);
+		profile.WriteInt(IDS_RS_FULLSCREENRES, IDS_RS_FULLSCREENRES_ENABLE, fullScreenModes.bEnabled);
+		profile.WriteBool(IDS_RS_FULLSCREENRES, IDS_RS_FULLSCREENRES_APPLY_DEF, fullScreenModes.bApplyDefault);
+		size_t cnt = 0;
+		std::vector<BYTE> value;
+		for (const auto& item : fullScreenModes.res) {
+			if (!item.monitorId.IsEmpty()) {
+				CString entry;
+				entry.Format(L"MonitorId%u", cnt);
+				profile.WriteString(IDS_RS_FULLSCREENRES, entry, item.monitorId);
+
+				entry.Format(L"Res%u", cnt++);
+				value.resize(1 + item.dmFullscreenRes.size() * sizeof(fpsmode));
+				value[0] = (BYTE)item.dmFullscreenRes.size();
+				memcpy(&value[1], item.dmFullscreenRes.data(), item.dmFullscreenRes.size() * sizeof(fpsmode));
+				profile.WriteBinary(IDS_RS_FULLSCREENRES, entry, value.data(), value.size());
+			}
+		}
+	}
+
 	profile.WriteBinary(IDS_R_SETTINGS, L"AccelTblColWidth", (BYTE*)&AccelTblColWidth, sizeof(AccelTblColWidth));
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_DISPLAYMODECHANGEDELAY, iDMChangeDelay);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_RESTORERESAFTEREXIT, fRestoreResAfterExit);
