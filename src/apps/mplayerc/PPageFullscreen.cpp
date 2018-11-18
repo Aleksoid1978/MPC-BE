@@ -557,7 +557,6 @@ void CPPageFullscreen::ModesUpdate()
 		m_displayModesString.push_back(FormatModeString(m_dms[i]));
 		if (dCurMod == m_dms[i]) {
 			curModeIdx = i;
-			break;
 		}
 	}
 
@@ -568,10 +567,10 @@ void CPPageFullscreen::ModesUpdate()
 	});
 
 	if (it != m_fullScreenModes.res.cend()) {
-		auto findDisplayMode = [this](const dispmode& dm, const int& curModeIdx) {
+		auto findDisplayMode = [this](const dispmode& dm, const int curModeIdx) -> int {
 			for (size_t i = 0; i < m_dms.size(); i++) {
 				if (dm == m_dms[i]) {
-					return (int)i;
+					return i;
 				}
 			}
 
