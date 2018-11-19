@@ -493,7 +493,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"Aldaketek eragina dute irakurketa itxi eta berrabiarazi ondoren."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 5		"Bideo aurkezlea"
 7		"VMR-9 eta EVR-CP ezarpenak"
 8		"Hautatu D3D9 Aurkezpen Gailua"
@@ -512,6 +512,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 30		"Do not scale at small frame size increases"
 32		"Do not scale at small frame size decreases"
 34		"Berezkoa"
+35		"Presentation mode:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

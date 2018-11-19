@@ -70,6 +70,7 @@ void CPPageVideo::DoDataExchange(CDataExchange* pDX)
 	__super::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_VIDRND_COMBO, m_cbVideoRenderer);
 	DDX_Control(pDX, IDC_D3D9DEVICE_COMBO, m_cbD3D9RenderDevice);
+	DDX_Control(pDX, IDC_COMBO3, m_cbDX9PresentMode);
 	DDX_Control(pDX, IDC_COMBO1, m_cbDX9SurfaceFormat);
 	DDX_Control(pDX, IDC_DX9RESIZER_COMBO, m_cbDX9Resizer);
 	DDX_Control(pDX, IDC_COMBO7, m_cbDownscaler);
@@ -236,6 +237,12 @@ BOOL CPPageVideo::OnInitDialog()
 
 	OnDSRendererChange();
 
+	AddStringData(m_cbDX9PresentMode, L"Copy", 0);
+	AddStringData(m_cbDX9PresentMode, L"Flip/FlipEx", 1);
+	m_cbDX9PresentMode.SetCurSel(0); // default
+	SelectByItemData(m_cbDX9PresentMode, rs.iPresentMode);
+	CorrectComboListWidth(m_cbDX9PresentMode);
+
 	AddStringData(m_cbDX9SurfaceFormat, L"8-bit Integer", D3DFMT_X8R8G8B8);
 	AddStringData(m_cbDX9SurfaceFormat, L"10-bit Integer", D3DFMT_A2R10G10B10);
 	AddStringData(m_cbDX9SurfaceFormat, L"16-bit Floating Point", D3DFMT_A16B16G16R16F);
@@ -304,6 +311,7 @@ BOOL CPPageVideo::OnApply()
 	s.fD3DFullscreen	= !!m_chkD3DFullscreen.GetCheck();
 	rs.bResetDevice		= !!m_bResetDevice;
 
+	rs.iPresentMode		= (int)GetCurItemData(m_cbDX9PresentMode);
 	rs.iSurfaceFormat	= (D3DFORMAT)GetCurItemData(m_cbDX9SurfaceFormat);
 	rs.b10BitOutput		= !!m_chk10bitOutput.GetCheck();
 	rs.iEVROutputRange	= m_cbEVROutputRange.GetCurSel();
@@ -407,6 +415,7 @@ void CPPageVideo::OnDSRendererChange()
 	CRenderersSettings& rs = GetRenderersSettings();
 
 	//m_cbAPSurfaceUsage.EnableWindow(FALSE);
+	m_cbDX9PresentMode.EnableWindow(FALSE);
 	m_cbDX9SurfaceFormat.EnableWindow(FALSE);
 	m_cbDX9Resizer.EnableWindow(FALSE);
 	m_cbDownscaler.EnableWindow(FALSE);
@@ -420,6 +429,7 @@ void CPPageVideo::OnDSRendererChange()
 	GetDlgItem(IDC_D3D9DEVICE_CHECK)->EnableWindow(FALSE);
 	m_cbD3D9RenderDevice.EnableWindow(FALSE);
 	m_cbEVROutputRange.EnableWindow(FALSE);
+	GetDlgItem(IDC_STATIC6)->EnableWindow(FALSE);
 	GetDlgItem(IDC_STATIC2)->EnableWindow(FALSE);
 	GetDlgItem(IDC_STATIC3)->EnableWindow(FALSE);
 	GetDlgItem(IDC_STATIC10)->EnableWindow(FALSE);
@@ -448,6 +458,8 @@ void CPPageVideo::OnDSRendererChange()
 			UpdateResizerList(rs.iResizer);
 			UpdateDownscalerList(rs.iDownscaler);
 
+			GetDlgItem(IDC_STATIC6)->EnableWindow(TRUE);
+			m_cbDX9PresentMode.EnableWindow(TRUE);
 			GetDlgItem(IDC_STATIC2)->EnableWindow(TRUE);
 			m_cbDX9SurfaceFormat.EnableWindow(TRUE);
 			GetDlgItem(IDC_STATIC3)->EnableWindow(TRUE);
@@ -567,6 +579,7 @@ void CPPageVideo::OnBnClickedDefault()
 	m_chkD3DFullscreen.SetCheck(BST_UNCHECKED);
 	m_chk10bitOutput.SetCheck(BST_UNCHECKED);
 
+	SelectByItemData(m_cbDX9PresentMode, 0);
 	SelectByItemData(m_cbDX9SurfaceFormat, D3DFMT_X8R8G8B8);
 	UpdateResizerList(RESIZER_SHADER_CATMULL);
 	UpdateDownscalerList(DOWNSCALER_SIMPLE);

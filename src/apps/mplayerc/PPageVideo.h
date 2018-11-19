@@ -37,6 +37,7 @@ private:
 
 	CComboBox m_cbVideoRenderer;
 	CComboBox m_cbD3D9RenderDevice;
+	CComboBox m_cbDX9PresentMode;
 	CComboBox m_cbDX9SurfaceFormat;
 	CComboBox m_cbDX9Resizer;
 	CComboBox m_cbDownscaler;
