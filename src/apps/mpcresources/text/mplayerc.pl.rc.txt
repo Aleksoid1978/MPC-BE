@@ -493,7 +493,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"Zmiany zostaną wprowadzone po ponownym uruchomieniu programu."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 5		"Renderer wideo"
 7		"Ustawienia VMR-9 i EVR-CP"
 8		"Wybór urzadzenia renderującego D3D9"
@@ -512,6 +512,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 30		"Do not scale at small frame size increases"
 32		"Do not scale at small frame size decreases"
 34		"Domyślne"
+35		"Presentation mode:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

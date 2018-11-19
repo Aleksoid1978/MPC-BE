@@ -493,7 +493,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"Изменения применятся после остановки и перезапуска воспроизведения."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 5		"Видео-рендерер"
 7		"Параметры VMR-9 и EVR-CP"
 8		"Устройство D3D9-рендеринга"
@@ -512,6 +512,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 30		"Не масштабировать кадр при малом увеличении"
 32		"Не масштабировать кадр при малом уменьшении"
 34		"По умолчанию"
+35		"Режим вывода:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

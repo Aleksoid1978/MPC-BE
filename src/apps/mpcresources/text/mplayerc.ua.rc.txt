@@ -493,7 +493,7 @@ BEGIN DIALOGEX IDD_PPAGESYNC LINES 32
 31		"Зміни набудуть чинності після перезапуску плеєра."
 END
 
-BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
+BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 5		"Відеорендерер"
 7		"Налаштування VMR-9 і EVR-CP"
 8		"Вибір пристрою рендерингу D3D9"
@@ -512,6 +512,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 35
 30		"Не масштабувати кадр при малому збільшенні"
 32		"Не масштабувати кадр при малому зменшенні"
 34		"Типово"
+35		"Presentation mode:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24

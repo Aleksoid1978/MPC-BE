@@ -122,6 +122,7 @@ public:
 	bool	bResetDevice;
 
 	// surfaces and resizer
+	int		iPresentMode;
 	D3DFORMAT iSurfaceFormat;
 	bool	b10BitOutput;
 	int		iResizer;
@@ -183,6 +184,7 @@ public:
 class CAffectingRenderersSettings // used in SettingsNeedResetDevice()
 {
 public:
+	int iPresentMode                = 0;
 	D3DFORMAT iSurfaceFormat        = D3DFMT_X8R8G8B8;
 	bool b10BitOutput               = false;
 	bool bVSync                     = false;
@@ -190,6 +192,7 @@ public:
 
 	void Fill(CRenderersSettings& rs)
 	{
+		iPresentMode               = rs.iPresentMode;
 		iSurfaceFormat             = rs.iSurfaceFormat;
 		b10BitOutput               = rs.b10BitOutput;
 		bVSync                     = rs.bVSync;
