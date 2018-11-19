@@ -480,7 +480,6 @@ void CPPageVideo::OnDSRendererChange()
 			break;
 		case VIDRNDT_SYNC:
 			UpdateResizerList(GetCurItemData(m_cbDX9Resizer));
-			UpdateDownscalerList(GetCurItemData(m_cbDownscaler));
 
 			GetDlgItem(IDC_STATIC5)->EnableWindow(TRUE);
 			GetDlgItem(IDC_EVR_BUFFERS)->EnableWindow(TRUE);
