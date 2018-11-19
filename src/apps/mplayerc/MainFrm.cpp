@@ -176,8 +176,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_TIMER()
 
 	ON_MESSAGE(WM_GRAPHNOTIFY, OnGraphNotify)
+	ON_MESSAGE(WM_RESIZE_DEVICE, OnResizeDevice)
 	ON_MESSAGE(WM_RESET_DEVICE, OnResetDevice)
-	ON_MESSAGE(WM_REARRANGERENDERLESS, OnRepaintRenderLess)
 
 	ON_MESSAGE(WM_POSTOPEN, OnPostOpen)
 
@@ -3293,6 +3293,22 @@ LRESULT CMainFrame::OnGraphNotify(WPARAM wParam, LPARAM lParam)
 	return hr;
 }
 
+LRESULT CMainFrame::OnResizeDevice(WPARAM wParam, LPARAM lParam)
+{
+	DLog(L"CMainFrame::OnResizeDevice() : start");
+
+	if (m_bOpenedThruThread) {
+		CAMMsgEvent e;
+		m_pGraphThread->PostThreadMessage(CGraphThread::TM_RESIZE, 0, (LPARAM)&e);
+		e.WaitMsg();
+	} else {
+		ResizeDevice();
+	}
+
+	DLog(L"CMainFrame::OnResizeDevice() : end");
+	return S_OK;
+}
+
 LRESULT CMainFrame::OnResetDevice(WPARAM wParam, LPARAM lParam)
 {
 	DLog(L"CMainFrame::OnResetDevice() : start");
@@ -3333,12 +3349,6 @@ LRESULT CMainFrame::OnResetDevice(WPARAM wParam, LPARAM lParam)
 
 	DLog(L"CMainFrame::OnResetDevice() : end");
 	return S_OK;
-}
-
-LRESULT CMainFrame::OnRepaintRenderLess(WPARAM wParam, LPARAM lParam)
-{
-	MoveVideoWindow();
-	return TRUE;
 }
 
 LRESULT CMainFrame::OnPostOpen(WPARAM wParam, LPARAM lParam)
@@ -16740,6 +16750,14 @@ void CMainFrame::OpenMedia(CAutoPtr<OpenMediaData> pOMD)
 	}
 }
 
+bool CMainFrame::ResizeDevice()
+{
+	if (m_pCAP) {
+		return m_pCAP->ResizeDevice();
+	}
+	return true;
+}
+
 bool CMainFrame::ResetDevice()
 {
 	if (m_pCAP) {
@@ -19435,6 +19453,7 @@ BEGIN_MESSAGE_MAP(CGraphThread, CWinThread)
 	ON_THREAD_MESSAGE(TM_EXIT, OnExit)
 	ON_THREAD_MESSAGE(TM_OPEN, OnOpen)
 	ON_THREAD_MESSAGE(TM_CLOSE, OnClose)
+	ON_THREAD_MESSAGE(TM_RESIZE, OnResize)
 	ON_THREAD_MESSAGE(TM_RESET, OnReset)
 	ON_THREAD_MESSAGE(TM_TUNER_SCAN, OnTunerScan)
 	ON_THREAD_MESSAGE(TM_DISPLAY_CHANGE, OnDisplayChange)
@@ -19468,6 +19487,20 @@ void CGraphThread::OnClose(WPARAM wParam, LPARAM lParam)
 			m_pMainFrame->CloseMediaPrivate();
 		}
 		m_pMainFrame->m_hGraphThreadEventClose.SetEvent();
+	}
+}
+
+void CGraphThread::OnResize(WPARAM wParam, LPARAM lParam)
+{
+	if (m_pMainFrame) {
+		BOOL* b = (BOOL*)wParam;
+		BOOL bResult = m_pMainFrame->ResizeDevice();
+		if (b) {
+			*b = bResult;
+		}
+	}
+	if (CAMEvent* e = (CAMEvent*)lParam) {
+		e->Set();
 	}
 }
 

@@ -77,6 +77,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_nStereoOffsetInPixels(4)
 	, m_nCurrentSubtitlesStream(0)
 	, m_bDisplayChanged(false)
+	, m_bResizingDevice(false)
 {
 	if (FAILED(hr)) {
 		_Error += L"ISubPicAllocatorPresenterImpl failed\n";
@@ -136,8 +137,23 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 
 CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 {
-	if (SysVersion::IsWin81orLater()) {
+	if (SysVersion::IsWin8orLater()) {
 		D3DHook::UnHook();
+	}
+
+	if (m_pD3DDevEx && m_d3dpp.SwapEffect != D3DSWAPEFFECT_COPY) {
+		HRESULT hr = m_pD3DDevEx->BeginScene();
+
+		CComPtr<IDirect3DSurface9> pBackBuffer;
+		hr = m_pD3DDevEx->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
+
+		// Clear the backbuffer
+		m_pD3DDevEx->SetRenderTarget(0, pBackBuffer);
+		hr = m_pD3DDevEx->Clear(0, nullptr, D3DCLEAR_TARGET, 0, 1.0f, 0);
+
+		hr = m_pD3DDevEx->EndScene();
+
+		hr = m_pD3DDevEx->PresentEx(nullptr, nullptr, nullptr, nullptr, 0);
 	}
 
 	if (m_pDwmEnableComposition && GetRenderersSettings().bDisableDesktopComposition) {
@@ -173,8 +189,6 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 		}
 	}
 }
-
-void ModerateFloat(double& Value, double Target, double& ValuePrim, double ChangeSpeed);
 
 #if 0
 class CRandom31
@@ -396,6 +410,7 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 	}
 
 	bRet = bRet || (!m_bIsFullscreen && New.bVSync != Current.bVSync);
+	bRet = bRet || (!m_bIsFullscreen && New.iPresentMode != Current.iPresentMode);
 	bRet = bRet || New.b10BitOutput != Current.b10BitOutput;
 	bRet = bRet || New.iSurfaceFormat != Current.iSurfaceFormat;
 
@@ -645,8 +660,8 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	} else {
 		m_d3dpp.Windowed = TRUE;
 		m_d3dpp.hDeviceWindow = m_hWnd;
-		m_d3dpp.SwapEffect = D3DSWAPEFFECT_COPY;
-		m_d3dpp.BackBufferCount = 1;
+		m_d3dpp.SwapEffect = rs.iPresentMode == 0 ? D3DSWAPEFFECT_COPY : (SysVersion::IsWin7orLater() ? D3DSWAPEFFECT_FLIPEX : D3DSWAPEFFECT_FLIP);
+		m_d3dpp.BackBufferCount = m_d3dpp.SwapEffect == D3DSWAPEFFECT_COPY ? 1 : 3;
 		m_d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
 		// Desktop composition takes care of the VSYNC
 		if (m_bCompositionEnabled) {
@@ -656,8 +671,8 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		}
 
 		m_refreshRate = d3ddmEx.RefreshRate;
-		m_d3dpp.BackBufferWidth = backBufferSize.cx;
-		m_d3dpp.BackBufferHeight = backBufferSize.cy;
+		m_d3dpp.BackBufferWidth = m_d3dpp.SwapEffect == D3DSWAPEFFECT_COPY ? backBufferSize.cx : m_windowRect.Width();
+		m_d3dpp.BackBufferHeight = m_d3dpp.SwapEffect == D3DSWAPEFFECT_COPY ? backBufferSize.cy : m_windowRect.Height();
 
 		bTryToReset = bTryToReset && m_pD3DDevEx;
 		if (bTryToReset) {
@@ -734,16 +749,16 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	m_strProcessingFmt = GetD3DFormatStr(m_SurfaceFmt);
 	m_strBackbufferFmt = GetD3DFormatStr(m_BackbufferFmt);
 
-	D3DPRESENT_PARAMETERS d3dpp = { 0 };
-	d3dpp.Windowed = TRUE;
-	d3dpp.BackBufferWidth = 640;
-	d3dpp.BackBufferHeight = 480;
-	d3dpp.BackBufferCount = 0;
-	d3dpp.BackBufferFormat = m_d3dpp.BackBufferFormat;
-	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
-	d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
-
 	if (!m_pD3DDevExRefresh) {
+		D3DPRESENT_PARAMETERS d3dpp = { 0 };
+		d3dpp.Windowed = TRUE;
+		d3dpp.BackBufferWidth = 640;
+		d3dpp.BackBufferHeight = 480;
+		d3dpp.BackBufferCount = 0;
+		d3dpp.BackBufferFormat = m_d3dpp.BackBufferFormat;
+		d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
+		d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
+
 		hr = m_pD3DEx->CreateDeviceEx(
 				m_CurrentAdapter, D3DDEVTYPE_HAL, GetShellWindow(),
 				D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED | D3DCREATE_FPU_PRESERVE,
@@ -794,8 +809,8 @@ HRESULT CDX9AllocatorPresenter::ResetD3D9Device()
 		hr = m_pD3DDevEx->ResetEx(&m_d3dpp, &d3ddmEx);
 	} else {
 		m_refreshRate = d3ddmEx.RefreshRate;
-		m_d3dpp.BackBufferWidth = backBufferSize.cx;
-		m_d3dpp.BackBufferHeight = backBufferSize.cy;
+		m_d3dpp.BackBufferWidth = m_d3dpp.SwapEffect == D3DSWAPEFFECT_COPY ? backBufferSize.cx : m_windowRect.Width();
+		m_d3dpp.BackBufferHeight = m_d3dpp.SwapEffect == D3DSWAPEFFECT_COPY ? backBufferSize.cy : m_windowRect.Height();
 
 		hr = m_pD3DDevEx->ResetEx(&m_d3dpp, nullptr);
 	}
@@ -1266,9 +1281,11 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		return false;
 	}
 
-	CRenderersSettings& rs = GetRenderersSettings();
+	if (m_bResizingDevice) {
+		return false;
+	}
 
-	//TRACE("Thread: %d\n", (LONG)((CRITICAL_SECTION &)m_RenderLock).OwningThread);
+	CRenderersSettings& rs = GetRenderersSettings();
 
 #if 0
 	if (TryEnterCriticalSection (&(CRITICAL_SECTION &)(*((CCritSec *)this)))) {
@@ -1285,8 +1302,6 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 			|| m_nativeVideoSize.cx <= 0 || m_nativeVideoSize.cy <= 0) {
 		if (m_OrderedPaint) {
 			--m_OrderedPaint;
-		} else {
-			//TRACE("UNORDERED PAINT!!!!!!\n");
 		}
 
 		return false;
@@ -1491,11 +1506,12 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 		m_pD3DDevEx->CreateQuery(D3DQUERYTYPE_EVENT, &pEventQuery);
 
 		LONGLONG llPerf = GetPerfCounter();
-		if (m_bIsFullscreen) {
-			hr = m_pD3DDevEx->PresentEx(nullptr, nullptr, nullptr, nullptr, 0);
-		} else {
+		if (m_d3dpp.SwapEffect == D3DSWAPEFFECT_COPY) {
 			hr = m_pD3DDevEx->PresentEx(rSrcPri, rDstPri, nullptr, nullptr, 0);
+		} else {
+			hr = m_pD3DDevEx->PresentEx(nullptr, nullptr, nullptr, nullptr, 0);
 		}
+
 		// Issue an End event
 		if (pEventQuery) {
 			pEventQuery->Issue(D3DISSUE_END);
@@ -1666,26 +1682,36 @@ void CDX9AllocatorPresenter::SendResetRequest()
 	}
 }
 
+STDMETHODIMP_(bool) CDX9AllocatorPresenter::ResizeDevice()
+{
+	DLog(L"CDX9AllocatorPresenter::ResizeDevice()");
+
+	ASSERT(m_MainThreadId == GetCurrentThreadId());
+
+	if (FAILED(ResetD3D9Device())) {
+		DLog(L"CDX9AllocatorPresenter::ResizeDevice() - ResetD3D9Device() FAILED, send reset request");
+
+		m_bPendingResetDevice = true;
+		SendResetRequest();
+	}
+
+	m_bResizingDevice = false;
+	Paint(false);
+
+	return true;
+}
+
 STDMETHODIMP_(bool) CDX9AllocatorPresenter::ResetDevice()
 {
 	DLog(L"CDX9AllocatorPresenter::ResetDevice()");
 
 	ASSERT(m_MainThreadId == GetCurrentThreadId());
 
-	// In VMR-9 deleting the surfaces before we are told to is bad !
-	// Can't comment out this because CDX9AllocatorPresenter is used by EVR Custom
-	// Why is EVR using a presenter for DX9 anyway ?!
 	DeleteSurfaces();
 
 	HRESULT hr;
 	CString Error;
-	// TODO: Report error messages here
-
-	// In VMR-9 'AllocSurfaces' call is redundant afaik because
-	// 'CreateDevice' calls 'm_pIVMRSurfAllocNotify->ChangeD3DDevice' which in turn calls
-	// 'CVMR9AllocatorPresenter::InitializeDevice' which calls 'AllocSurfaces'
 	if (FAILED(hr = CreateDevice(Error)) || FAILED(hr = AllocSurfaces())) {
-		// TODO: We should probably pause player
 #ifdef DEBUG_OR_LOG
 		Error += GetWindowsErrorMessage(hr, nullptr);
 		DLog(L"CDX9AllocatorPresenter::ResetDevice() - Error:\n%s", Error);
@@ -1703,6 +1729,8 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::ResetDevice()
 STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 {
 	DLog(L"CDX9AllocatorPresenter::DisplayChange()");
+
+	ASSERT(m_MainThreadId == GetCurrentThreadId());
 
 	CComPtr<IDirect3D9Ex> pD3DEx;
 
@@ -1731,6 +1759,17 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 	m_bDisplayChanged = true;
 
 	return true;
+}
+
+STDMETHODIMP_(void) CDX9AllocatorPresenter::SetPosition(RECT w, RECT v)
+{
+	const auto bWindowSizeChanged = m_windowRect.Size() != CRect(w).Size();
+	__super::SetPosition(w, v);
+
+	if (bWindowSizeChanged && !m_bIsFullscreen && m_d3dpp.SwapEffect != D3DSWAPEFFECT_COPY) {
+		m_bResizingDevice = true;
+		AfxGetApp()->m_pMainWnd->PostMessage(WM_RESIZE_DEVICE);
+	}
 }
 
 void CDX9AllocatorPresenter::ResetStats()
@@ -1884,6 +1923,12 @@ void CDX9AllocatorPresenter::DrawStats()
 
 			if (m_bIsFullscreen) {
 				strText += L" FS";
+			}
+
+			switch (m_d3dpp.SwapEffect) {
+				case D3DSWAPEFFECT_COPY   : strText += L" Copy";   break;
+				case D3DSWAPEFFECT_FLIP   : strText += L" Flip";   break;
+				case D3DSWAPEFFECT_FLIPEX : strText += L" FlipEx"; break;
 			}
 
 			if (rs.bDisableDesktopComposition) {
