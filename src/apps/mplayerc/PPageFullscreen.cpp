@@ -34,6 +34,17 @@ static CString FormatModeString(const dispmode& dmod)
 	return strMode;
 }
 
+static void GetMonitorNameId(const CString& str, CString& monitorName, CString& monitorId)
+{
+	if (str.GetLength() == 14) {
+		monitorName = str.Left(7);
+	} else if (str.GetLength() == 19) {
+		monitorName = str.Left(12);
+	}
+
+	monitorId = str.Right(7);
+}
+
 // CPPagePlayer dialog
 
 IMPLEMENT_DYNAMIC(CPPageFullscreen, CPPageBase)
@@ -146,8 +157,7 @@ BOOL CPPageFullscreen::OnInitDialog()
 	m_iMonitorTypeCtrl.AddString(ResStr(IDS_FULLSCREENMONITOR_CURRENT));
 	m_MonitorDisplayNames.Add(L"Current");
 	m_MonitorDeviceName.Add(L"Current");
-	CMonitors monitors;
-	CMonitor curmonitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
+	auto curmonitor = CMonitors::GetNearestMonitor(AfxGetApp()->m_pMainWnd);
 	CString strCurMon;
 	curmonitor.GetName(strCurMon);
 	if(m_strFullScreenMonitor.IsEmpty()) {
@@ -284,23 +294,13 @@ BOOL CPPageFullscreen::OnApply()
 	m_fullScreenModes.bApplyDefault	= !!m_bSetDefault;
 	s.fLaunchfullscreen				= !!m_bLaunchFullScreen;
 
-	CString str;
-	CString strCurMon;
-	str = m_MonitorDisplayNames[m_iMonitorType];
-	if (str.GetLength() == 14) { m_strFullScreenMonitor = str.Left(7); }
-	if (str.GetLength() == 19) { m_strFullScreenMonitor = str.Left(12); }
-	m_strFullScreenMonitorID = str.Right(7);
+	CString str = m_MonitorDisplayNames[m_iMonitorType];
+	GetMonitorNameId(str, m_strFullScreenMonitor, m_strFullScreenMonitorID);
 	if (m_fullScreenModes.bEnabled && m_strFullScreenMonitor == L"Current") {
-		CMonitors monitors;
-		CMonitor curmonitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
-		curmonitor.GetName(strCurMon);
-		m_strFullScreenMonitor = strCurMon;
+		auto curmonitor = CMonitors::GetNearestMonitor(AfxGetApp()->m_pMainWnd);
+		curmonitor.GetName(m_strFullScreenMonitor);
 	}
-	/*
-	if (m_fullScreenModes.bEnabled == FALSE && m_strFullScreenMonitor == L"Current") {
-		m_strFullScreenMonitor = L"Current";
-	}
-	*/
+
 	s.strFullScreenMonitor				= m_strFullScreenMonitor;
 	s.strFullScreenMonitorID			= m_strFullScreenMonitorID;
 
@@ -430,8 +430,7 @@ void CPPageFullscreen::OnUpdateFullScrComboCtrl(CCmdUI* pCmdUI)
 
 void CPPageFullscreen::OnUpdateSetFullscreenRes()
 {
-	CMonitors monitors;
-	CMonitor curmonitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
+	auto curmonitor = CMonitors::GetNearestMonitor(AfxGetApp()->m_pMainWnd);
 	CString strCurMon;
 	curmonitor.GetName(strCurMon);
 	if (m_iMonitorTypeCtrl.GetCurSel() == 0) {
@@ -466,11 +465,8 @@ void CPPageFullscreen::OnUpdateFullScrCombo()
 {
 	CString str, strCurMonID, strCurMon;
 	str = m_MonitorDisplayNames[m_iMonitorTypeCtrl.GetCurSel()];
-	if (str.GetLength() == 14) { m_strFullScreenMonitor = str.Left(7); }
-	if (str.GetLength() == 19) { m_strFullScreenMonitor = str.Left(12); }
-	strCurMonID = str.Right(7);
-	CMonitors monitors;
-	CMonitor curmonitor = monitors.GetNearestMonitor(AfxGetApp()->m_pMainWnd);
+	GetMonitorNameId(str, m_strFullScreenMonitor, strCurMonID);
+	auto curmonitor = CMonitors::GetNearestMonitor(AfxGetApp()->m_pMainWnd);
 	curmonitor.GetName(strCurMon);
 
 	if (m_strFullScreenMonitor == L"Current" && m_fullScreenModes.bEnabled) {
@@ -507,11 +503,8 @@ void CPPageFullscreen::ModesUpdate()
 	ReadDisplay(strDevice, &MonitorName, &MonitorHorRes, &MonitorVerRes);
 	*/
 
-	CString str;
-	str = m_MonitorDisplayNames[m_iMonitorType];
-	if (str.GetLength() == 14) { m_strFullScreenMonitor = str.Left(7); }
-	if (str.GetLength() == 19) { m_strFullScreenMonitor = str.Left(12); }
-	m_strFullScreenMonitorID = str.Right(7);
+	CString str = m_MonitorDisplayNames[m_iMonitorType];
+	GetMonitorNameId(str, m_strFullScreenMonitor, m_strFullScreenMonitorID);
 	if (s.strFullScreenMonitorID != m_strFullScreenMonitorID) {
 		m_fullScreenModes.bEnabled = FALSE;
 	}
