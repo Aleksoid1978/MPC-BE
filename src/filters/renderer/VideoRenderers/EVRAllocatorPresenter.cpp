@@ -1861,6 +1861,15 @@ void CEVRAllocatorPresenter::OnVBlankFinished(bool fAll, LONGLONG PerformanceCou
 	}
 }
 
+STDMETHODIMP_(bool) CEVRAllocatorPresenter::ResizeDevice()
+{
+	CAutoLock lock(this);
+	CAutoLock lock2(&m_ImageProcessingLock);
+	CAutoLock cRenderLock(&m_RenderLock);
+
+	return __super::ResizeDevice();
+}
+
 STDMETHODIMP_(bool) CEVRAllocatorPresenter::ResetDevice()
 {
 	DLog(L"CEVRAllocatorPresenter::ResetDevice()");

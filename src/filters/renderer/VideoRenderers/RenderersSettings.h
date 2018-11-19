@@ -48,7 +48,7 @@ enum {
 };
 
 enum {
-	WM_REARRANGERENDERLESS = WM_APP+1,
+	WM_RESIZE_DEVICE = WM_APP + 1,
 	WM_RESET_DEVICE,
 };
 

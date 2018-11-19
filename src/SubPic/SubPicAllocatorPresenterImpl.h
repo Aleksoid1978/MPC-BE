@@ -87,6 +87,7 @@ public:
 	STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) { return E_NOTIMPL; }
 	STDMETHODIMP ClearPixelShaders(int target) { return E_NOTIMPL; }
 	STDMETHODIMP AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profile) { return E_NOTIMPL; }
+	STDMETHODIMP_(bool) ResizeDevice() { return false; }
 	STDMETHODIMP_(bool) ResetDevice() { return false; }
 	STDMETHODIMP_(bool) DisplayChange() { return false; }
 	STDMETHODIMP_(bool) IsRendering() { return true; }

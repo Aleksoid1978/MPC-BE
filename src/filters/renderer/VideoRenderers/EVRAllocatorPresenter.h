@@ -73,6 +73,7 @@ namespace DSObjects
 		STDMETHODIMP_(bool) Paint(bool fAll);
 		STDMETHODIMP        GetNativeVideoSize(LONG* lpWidth, LONG* lpHeight, LONG* lpARWidth, LONG* lpARHeight);
 		STDMETHODIMP        InitializeDevice(IMFMediaType* pMediaType);
+		STDMETHODIMP_(bool) ResizeDevice();
 		STDMETHODIMP_(bool) ResetDevice();
 		STDMETHODIMP_(bool) DisplayChange();
 

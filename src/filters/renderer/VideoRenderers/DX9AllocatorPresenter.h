@@ -60,6 +60,7 @@ namespace DSObjects
 		bool	m_bIsFullscreen;
 		bool	m_bNeedCheckSample;
 		DWORD	m_MainThreadId;
+		bool	m_bResizingDevice;
 
 		CAffectingRenderersSettings m_LastAffectingSettings;
 
@@ -167,19 +168,8 @@ namespace DSObjects
 		double					m_DetectedScanlineTimePrim;
 		double					m_DetectedScanlinesPerFrame = 0.0;
 
-		double GetRefreshRate() {
-			if (m_DetectedRefreshRate) {
-				return m_DetectedRefreshRate;
-			}
-			return m_refreshRate;
-		}
-
-		LONG GetScanLines() {
-			if (m_DetectedRefreshRate) {
-				return (LONG)m_DetectedScanlinesPerFrame;
-			}
-			return m_ScreenSize.cy;
-		}
+		double GetRefreshRate() const { return m_DetectedRefreshRate ? m_DetectedRefreshRate : m_refreshRate; }
+		LONG GetScanLines() const { return m_DetectedRefreshRate ? m_DetectedScanlinesPerFrame : m_ScreenSize.cy; }
 
 		double					m_ldDetectedRefreshRateList[100];
 		double					m_ldDetectedScanlineRateList[100];
@@ -292,8 +282,10 @@ namespace DSObjects
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size);
 		STDMETHODIMP ClearPixelShaders(int target);
 		STDMETHODIMP AddPixelShader(int target, LPCSTR sourceCode, LPCSTR profile);
+		STDMETHODIMP_(bool) ResizeDevice();
 		STDMETHODIMP_(bool) ResetDevice();
 		STDMETHODIMP_(bool) DisplayChange();
+		STDMETHODIMP_(void) SetPosition(RECT w, RECT v);
 
 		// ID3DFullscreenControl
 		STDMETHODIMP SetD3DFullscreen(bool fEnabled);

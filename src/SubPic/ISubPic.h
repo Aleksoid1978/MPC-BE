@@ -203,6 +203,7 @@ public IUnknown {
 	STDMETHOD (ClearPixelShaders) (int target) PURE;
 	STDMETHOD (AddPixelShader) (int target, LPCSTR sourceCode, LPCSTR profile) PURE;
 
+	STDMETHOD_(bool, ResizeDevice) () PURE;
 	STDMETHOD_(bool, ResetDevice) () PURE;
 	STDMETHOD_(bool, DisplayChange) () PURE;
 

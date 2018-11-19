@@ -153,6 +153,7 @@ public:
 		TM_EXIT = WM_APP,
 		TM_OPEN,
 		TM_CLOSE,
+		TM_RESIZE,
 		TM_RESET,
 		TM_TUNER_SCAN,
 		TM_DISPLAY_CHANGE
@@ -161,6 +162,7 @@ public:
 	afx_msg void OnExit(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnOpen(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnClose(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnResize(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnReset(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnTunerScan(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnDisplayChange(WPARAM wParam, LPARAM lParam);
@@ -707,6 +709,7 @@ public:
 	void OpenMedia(CAutoPtr<OpenMediaData> pOMD);
 	void PlayFavoriteFile(CString fav);
 	void PlayFavoriteDVD(CString fav);
+	bool ResizeDevice();
 	bool ResetDevice();
 	bool DisplayChange();
 	void CloseMedia(BOOL bNextIsOpened = FALSE);
@@ -873,8 +876,8 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 
 	afx_msg LRESULT OnGraphNotify(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnResizeDevice(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnResetDevice(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnRepaintRenderLess(WPARAM wParam, LPARAM lParam);
 
 	afx_msg LRESULT OnPostOpen(WPARAM wParam, LPARAM lParam);
 
