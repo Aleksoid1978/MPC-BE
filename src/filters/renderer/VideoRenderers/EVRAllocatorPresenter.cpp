@@ -2294,6 +2294,12 @@ void CEVRAllocatorPresenter::VSyncThread()
 				bQuit = true;
 				break;
 			case WAIT_TIMEOUT : {
+				if (m_bDisplayChanged) {
+					m_bDisplayChanged = false;
+					ScanLinePos = 0;
+					filled = false;
+					prevSL = UINT_MAX;
+				}
 				// Do our stuff
 				if (m_pD3DDevEx && rs.bVSyncInternal) {
 					ScanLinePos = 0;

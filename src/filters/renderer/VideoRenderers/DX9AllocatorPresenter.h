@@ -281,6 +281,8 @@ namespace DSObjects
 		std::deque<MediaOffset3D>  m_mediaOffsetQueue;
 		std::mutex                 m_mutexOffsetQueue;
 
+		bool                       m_bDisplayChanged;
+
 	public:
 		CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, bool bIsEVR, CString &_Error);
 		~CDX9AllocatorPresenter();

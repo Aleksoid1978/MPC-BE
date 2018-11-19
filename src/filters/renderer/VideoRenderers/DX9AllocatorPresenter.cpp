@@ -76,6 +76,7 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 	, m_bMVC_Base_View_R_flag(false)
 	, m_nStereoOffsetInPixels(4)
 	, m_nCurrentSubtitlesStream(0)
+	, m_bDisplayChanged(false)
 {
 	if (FAILED(hr)) {
 		_Error += L"ISubPicAllocatorPresenterImpl failed\n";
@@ -528,6 +529,8 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 	m_ClockTimeChangeHistoryPos		= 0;
 
+	m_bDisplayChanged				= false;
+
 	m_pFont.Release();
 	m_pSprite.Release();
 	m_pLine.Release();
@@ -740,14 +743,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
 	d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
 
-	bTryToReset = false;
-	if (m_pD3DDevExRefresh) {
-		bTryToReset = SUCCEEDED(hr = m_pD3DDevExRefresh->ResetEx(&d3dpp, nullptr));
-		DLog(L"    => m_pD3DDevExRefresh->ResetEx() : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
-	}
-
-	if (!bTryToReset) {
-		m_pD3DDevExRefresh.Release();
+	if (!m_pD3DDevExRefresh) {
 		hr = m_pD3DEx->CreateDeviceEx(
 				m_CurrentAdapter, D3DDEVTYPE_HAL, GetShellWindow(),
 				D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED | D3DCREATE_FPU_PRESERVE,
@@ -807,19 +803,6 @@ HRESULT CDX9AllocatorPresenter::ResetD3D9Device()
 	if (SUCCEEDED(hr)) {
 		CString _Error;
 		hr = InitializeISR(_Error, m_bIsFullscreen ? m_ScreenSize : backBufferSize);
-
-		if (m_pD3DDevExRefresh) {
-			D3DPRESENT_PARAMETERS d3dpp = { 0 };
-			d3dpp.Windowed = TRUE;
-			d3dpp.BackBufferWidth = 640;
-			d3dpp.BackBufferHeight = 480;
-			d3dpp.BackBufferCount = 0;
-			d3dpp.BackBufferFormat = m_d3dpp.BackBufferFormat;
-			d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
-			d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
-
-			m_pD3DDevExRefresh->ResetEx(&d3dpp, nullptr);
-		}
 	}
 
 	return hr;
@@ -1744,6 +1727,8 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::DisplayChange()
 		m_bPendingResetDevice = true;
 		SendResetRequest();
 	}
+
+	m_bDisplayChanged = true;
 
 	return true;
 }
