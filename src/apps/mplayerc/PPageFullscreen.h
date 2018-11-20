@@ -34,7 +34,7 @@ class CPPageFullscreen : public CPPageBase
 private:
 	std::vector<dispmode> m_dms;
 	std::list<CString> m_displayModesString;
-	CStringArray m_MonitorDisplayNames, m_MonitorDeviceName;
+	std::vector<CString> m_MonitorDisplayNames;
 
 	BOOL m_bLaunchFullScreen;
 

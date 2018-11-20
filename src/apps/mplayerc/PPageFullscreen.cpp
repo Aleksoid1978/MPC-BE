@@ -152,8 +152,7 @@ BOOL CPPageFullscreen::OnInitDialog()
 	m_iMonitorType = 0;
 
 	m_iMonitorTypeCtrl.AddString(ResStr(IDS_FULLSCREENMONITOR_CURRENT));
-	m_MonitorDisplayNames.Add(L"Current");
-	m_MonitorDeviceName.Add(L"Current");
+	m_MonitorDisplayNames.push_back(L"Current");
 	auto curmonitor = CMonitors::GetNearestMonitor(AfxGetApp()->m_pMainWnd);
 	CString strCurMon;
 	curmonitor.GetName(strCurMon);
@@ -175,12 +174,10 @@ BOOL CPPageFullscreen::OnInitDialog()
 				if (DeviceName == strCurMon) {
 					m_iMonitorTypeCtrl.AddString(DeviceName.Mid(4, 7) + L"( " + DeviceName.Right(1) + L" ) " + L"- [id: " + DeviceID + L" *" +  ResStr(IDS_FULLSCREENMONITOR_CURRENT) + L"] - " + ddMon.DeviceString);
 					m_MonitorDisplayNames[0] = L"Current" + DeviceID;
-					m_MonitorDeviceName[0] = DeviceName;
 				} else {
 					m_iMonitorTypeCtrl.AddString(DeviceName.Mid(4, 7) + L"( " + DeviceName.Right(1) + L" ) " + L"- [id: " + DeviceID + L"] - " + ddMon.DeviceString);
 				}
-				m_MonitorDisplayNames.Add(DeviceName + DeviceID);
-				m_MonitorDeviceName.Add(DeviceName);
+				m_MonitorDisplayNames.push_back(DeviceName + DeviceID);
 				if (m_iMonitorType == 0 && m_strFullScreenMonitor == DeviceName) {
 					m_iMonitorType = m_iMonitorTypeCtrl.GetCount() - 1;
 				}
