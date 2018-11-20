@@ -90,6 +90,28 @@ void CMonitor::GetName( CString& string ) const
 	string = mi.szDevice;
 }
 
+void CMonitor::GetDeviceId( CString& string ) const
+{
+	ASSERT( IsMonitor() );
+
+	MONITORINFOEX mi;
+	mi.cbSize = sizeof( mi );
+	::GetMonitorInfo( m_hMonitor, &mi );
+
+	DISPLAY_DEVICEW dd = { sizeof(dd) };
+	DWORD iDevNum = 0;
+	while (EnumDisplayDevicesW(mi.szDevice, iDevNum, &dd, 0)) {
+		if (dd.StateFlags & DISPLAY_DEVICE_ACTIVE && !(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
+			const CString DeviceID(dd.DeviceID);
+			string = DeviceID.Mid(8, DeviceID.Find(L"\\", 9) - 8);
+			return;
+		}
+		iDevNum++;
+		ZeroMemory(&dd, sizeof(dd));
+		dd.cb = sizeof(dd);
+	}
+}
+
 BOOL CMonitor::IsOnMonitor( const POINT pt ) const
 {
 	CRect rect;

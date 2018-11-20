@@ -485,7 +485,7 @@ typedef std::list<CSubtitleItem> CSubtitleItemList;
 typedef std::list<CString> cmdLine;
 
 #define MaxFullScreenModes 30
-#define MaxMonitorId 10
+#define MaxMonitorId 10u
 struct fullScreenRes {
 	std::vector<fpsmode> dmFullscreenRes;
 	CString monitorId;
