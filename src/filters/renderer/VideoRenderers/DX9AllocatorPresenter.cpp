@@ -572,8 +572,6 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 
 	HRESULT hr = S_OK;
 
-	ZeroMemory(&m_d3dpp, sizeof(m_d3dpp));
-
 	m_bCompositionEnabled = FALSE;
 	if (m_pDwmIsCompositionEnabled) {
 		m_pDwmIsCompositionEnabled(&m_bCompositionEnabled);
