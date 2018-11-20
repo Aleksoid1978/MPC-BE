@@ -45,7 +45,6 @@ private:
 	CAppSettings::t_fullScreenModes m_fullScreenModes;
 	CString m_strFullScreenMonitor;
 	CString m_strFullScreenMonitorID;
-	int m_nCurMon;
 
 	CPlayerListCtrl m_list;
 	enum {
@@ -85,14 +84,12 @@ protected:
 
 public:
 	afx_msg void OnUpdateFullscreenRes(CCmdUI* pCmdUI);
-	afx_msg void OnUpdateFullScrComboCtrl(CCmdUI* pCmdUI);
 	afx_msg void OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnCheckChangeList();
 
-	afx_msg void OnUpdateSetFullscreenRes();
 	afx_msg void OnUpdateShowBarsWhenFullScreen(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateShowBarsWhenFullScreenTimeOut(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateStatic1(CCmdUI* pCmdUI);

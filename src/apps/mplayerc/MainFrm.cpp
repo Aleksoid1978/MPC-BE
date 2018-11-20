@@ -10359,12 +10359,20 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 		SetMenuBarVisibility(AFX_MBV_DISPLAYONFOCUS | AFX_MBV_DISPLAYONF10);
 	} else {
 		if (s.fullScreenModes.bEnabled == 1 && s.fullScreenModes.bApplyDefault) {
+			CString strFullScreenMonitor = s.strFullScreenMonitor;
+			CString strFullScreenMonitorID = s.strFullScreenMonitorID;
+			if (strFullScreenMonitor == L"Current") {
+				auto curmonitor = CMonitors::GetNearestMonitor(AfxGetApp()->m_pMainWnd);
+				curmonitor.GetName(strFullScreenMonitor);
+				curmonitor.GetDeviceId(strFullScreenMonitorID);
+			}
+
 			auto it = std::find_if(s.fullScreenModes.res.cbegin(), s.fullScreenModes.res.cend(), [&](const fullScreenRes& item) {
-				return item.monitorId == s.strFullScreenMonitorID;
+				return item.monitorId == strFullScreenMonitorID;
 			});
 
 			if (it != s.fullScreenModes.res.cend() && it->dmFullscreenRes[0].bChecked) {
-				SetDispMode(it->dmFullscreenRes[0].dmFSRes, s.strFullScreenMonitor);
+				SetDispMode(it->dmFullscreenRes[0].dmFSRes, strFullScreenMonitor);
 			}
 		}
 
@@ -10525,12 +10533,20 @@ void CMainFrame::ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo)
 			}
 
 			if (s.fullScreenModes.bEnabled == 1 && s.fullScreenModes.bApplyDefault) {
+				CString strFullScreenMonitor = s.strFullScreenMonitor;
+				CString strFullScreenMonitorID = s.strFullScreenMonitorID;
+				if (strFullScreenMonitor == L"Current") {
+					auto curmonitor = CMonitors::GetNearestMonitor(AfxGetApp()->m_pMainWnd);
+					curmonitor.GetName(strFullScreenMonitor);
+					curmonitor.GetDeviceId(strFullScreenMonitorID);
+				}
+
 				auto it = std::find_if(s.fullScreenModes.res.cbegin(), s.fullScreenModes.res.cend(), [&](const fullScreenRes& item) {
-					return item.monitorId == s.strFullScreenMonitorID;
+					return item.monitorId == strFullScreenMonitorID;
 				});
 
 				if (it != s.fullScreenModes.res.cend() && it->dmFullscreenRes[0].bChecked) {
-					SetDispMode(it->dmFullscreenRes[0].dmFSRes, s.strFullScreenMonitor, TRUE);
+					SetDispMode(it->dmFullscreenRes[0].dmFSRes, strFullScreenMonitor, TRUE);
 				}
 			}
 
@@ -10580,39 +10596,41 @@ void CMainFrame::ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo)
 
 void CMainFrame::AutoChangeMonitorMode()
 {
-	CAppSettings& s = AfxGetAppSettings();
-	CString mf_hmonitor = s.strFullScreenMonitor;
-
-	// EnumDisplayDevice... s.strFullScreenMonitorID == sDeviceID ???
-	DISPLAY_DEVICE dd = { sizeof(dd) };
-
-	DWORD dev = 0; // device index
+	const CAppSettings& s = AfxGetAppSettings();
+	CString strFullScreenMonitor = s.strFullScreenMonitor;
+	CString strFullScreenMonitorID = s.strFullScreenMonitorID;
 	BOOL bMonValid = FALSE;
-	CString sDeviceID, strMonName;
-	while (EnumDisplayDevices(0, dev, &dd, 0)) {
-		DISPLAY_DEVICE ddMon = { sizeof(ddMon) };
-
-		DWORD devMon = 0;
-		while (EnumDisplayDevices(dd.DeviceName, devMon, &ddMon, 0)) {
-			if (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE && !(ddMon.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
-				sDeviceID.Format(L"%s", ddMon.DeviceID);
-				sDeviceID = sDeviceID.Mid (8, sDeviceID.Find (L"\\", 9) - 8);
-				if (s.strFullScreenMonitorID == sDeviceID) {
-					strMonName.Format(L"%s", ddMon.DeviceName);
-					strMonName = strMonName.Left(12);
-					mf_hmonitor = /*s.strFullScreenMonitor = */strMonName;
-					bMonValid = TRUE;
-					break;
+	if (strFullScreenMonitor == L"Current") {
+		auto curmonitor = CMonitors::GetNearestMonitor(AfxGetApp()->m_pMainWnd);
+		curmonitor.GetName(strFullScreenMonitor);
+		curmonitor.GetDeviceId(strFullScreenMonitorID);
+		bMonValid = !strFullScreenMonitorID.IsEmpty();
+	} else {
+		DISPLAY_DEVICEW dd = { sizeof(dd) };
+		DWORD dev = 0; // device index
+		while (EnumDisplayDevicesW(0, dev, &dd, 0) && !bMonValid) {
+			DISPLAY_DEVICE ddMon = { sizeof(ddMon) };
+			DWORD devMon = 0;
+			while (EnumDisplayDevicesW(dd.DeviceName, devMon, &ddMon, 0)) {
+				if (ddMon.StateFlags & DISPLAY_DEVICE_ACTIVE && !(ddMon.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER)) {
+					CString DeviceID(ddMon.DeviceID);
+					DeviceID = DeviceID.Mid(8, DeviceID.Find(L"\\", 9) - 8);
+					if (strFullScreenMonitorID == DeviceID) {
+						const CString DeviceName(ddMon.DeviceName);
+						strFullScreenMonitor = DeviceName.Left(12);
+						bMonValid = TRUE;
+						break;
+					}
 				}
-			}
-			devMon++;
-			ZeroMemory(&ddMon, sizeof(ddMon));
-			ddMon.cb = sizeof(ddMon);
+				devMon++;
+				ZeroMemory(&ddMon, sizeof(ddMon));
+				ddMon.cb = sizeof(ddMon);
+ 			}
+			ZeroMemory(&dd, sizeof(dd));
+			dd.cb = sizeof(dd);
+			dev++;
  		}
-		ZeroMemory(&dd, sizeof(dd));
-		dd.cb = sizeof(dd);
-		dev++;
- 	}
+	}
 
 	// Set Display Mode
 	if (s.fullScreenModes.bEnabled && bMonValid == TRUE) {
@@ -10631,7 +10649,7 @@ void CMainFrame::AutoChangeMonitorMode()
 		}
 
 		auto it = std::find_if(s.fullScreenModes.res.cbegin(), s.fullScreenModes.res.cend(), [&](const fullScreenRes& item) {
-			return item.monitorId == s.strFullScreenMonitorID;
+			return item.monitorId == strFullScreenMonitorID;
 		});
 
 		if (it != s.fullScreenModes.res.cend()) {
@@ -10641,7 +10659,7 @@ void CMainFrame::AutoChangeMonitorMode()
 						&& dFPS >= fsmode.vfr_from
 						&& dFPS <= fsmode.vfr_to) {
 
-					SetDispMode(fsmode.dmFSRes, mf_hmonitor, CanSwitchD3DFS());
+					SetDispMode(fsmode.dmFSRes, strFullScreenMonitor, CanSwitchD3DFS());
 					return;
 				}
 			}

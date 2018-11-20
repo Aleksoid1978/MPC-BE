@@ -43,6 +43,7 @@ public:
 	void GetWorkAreaRect( LPRECT lprc ) const;
 
 	void GetName( CString& string ) const;
+	void GetDeviceId( CString& string ) const;
 
 	int GetBitsPerPixel() const;
 
