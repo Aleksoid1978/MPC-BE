@@ -647,13 +647,30 @@ bool CWebClientSocket::OnControls(CStringA& hdr, CStringA& body, CStringA& mime)
 
 bool CWebClientSocket::OnVariables(CStringA& hdr, CStringA& body, CStringA& mime)
 {
-	CString path = m_pMainFrame->m_wndPlaylistBar.GetCurFileName();
+	const CString path = m_pMainFrame->m_wndPlaylistBar.GetCurFileName();
 	CString dir;
+	CString file;
+	CString sizestring;
 
 	if (!path.IsEmpty()) {
 		CPath p(path);
 		p.RemoveFileSpec();
-		dir = (LPCTSTR)p;
+		dir = (LPCWSTR)p;
+
+		CPath p2(path);
+		p2.StripPath();
+		file = (LPCWSTR)p2;
+
+		WIN32_FIND_DATAW wfd;
+		HANDLE hFind = FindFirstFileW(path, &wfd);
+		if (hFind != INVALID_HANDLE_VALUE) {
+			FindClose(hFind);
+			__int64 size = (__int64(wfd.nFileSizeHigh) << 32) | wfd.nFileSizeLow;
+			const int MAX_FILE_SIZE_BUFFER = 65;
+			WCHAR szFileSize[MAX_FILE_SIZE_BUFFER];
+			StrFormatByteSizeW(size, szFileSize, MAX_FILE_SIZE_BUFFER);
+			sizestring.Format(L"%s", szFileSize);
+		}
 	}
 
 	OAFilterState fs = m_pMainFrame->GetMediaState();
@@ -693,9 +710,10 @@ bool CWebClientSocket::OnVariables(CStringA& hdr, CStringA& body, CStringA& mime
 	volumelevel.Format(L"%d", m_pMainFrame->m_wndToolBar.m_volctrl.GetPos());
 	muted.Format(L"%d", m_pMainFrame->m_wndToolBar.Volume == -10000 ? 1 : 0);
 
-	CString reloadtime(L"0");
+	CString reloadtime(L"0"); // TODO
 
 	m_pWebServer->LoadPage(IDR_HTML_VARIABLES, body, m_path);
+	body.Replace("[file]", UTF8(file));
 	body.Replace("[filepatharg]", UTF8Arg(path));
 	body.Replace("[filepath]", UTF8(path));
 	body.Replace("[filedirarg]", UTF8Arg(dir));
@@ -709,7 +727,9 @@ bool CWebClientSocket::OnVariables(CStringA& hdr, CStringA& body, CStringA& mime
 	body.Replace("[volumelevel]", UTF8(volumelevel));
 	body.Replace("[muted]", UTF8(muted));
 	body.Replace("[playbackrate]", UTF8(playbackrate));
+	body.Replace("[size]", UTF8(sizestring));
 	body.Replace("[reloadtime]", UTF8(reloadtime));
+	body.Replace("[version]", UTF8(MPC_VERSION_SVN_WSTR));
 
 	return true;
 }
