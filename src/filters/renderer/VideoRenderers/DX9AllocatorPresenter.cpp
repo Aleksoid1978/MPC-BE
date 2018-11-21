@@ -141,21 +141,6 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 		D3DHook::UnHook();
 	}
 
-	if (m_pD3DDevEx && m_d3dpp.SwapEffect != D3DSWAPEFFECT_COPY) {
-		HRESULT hr = m_pD3DDevEx->BeginScene();
-
-		CComPtr<IDirect3DSurface9> pBackBuffer;
-		hr = m_pD3DDevEx->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
-
-		// Clear the backbuffer
-		m_pD3DDevEx->SetRenderTarget(0, pBackBuffer);
-		hr = m_pD3DDevEx->Clear(0, nullptr, D3DCLEAR_TARGET, 0, 1.0f, 0);
-
-		hr = m_pD3DDevEx->EndScene();
-
-		hr = m_pD3DDevEx->PresentEx(nullptr, nullptr, nullptr, nullptr, 0);
-	}
-
 	if (m_pDwmEnableComposition && GetRenderersSettings().bDisableDesktopComposition) {
 		m_pDwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
 	}
@@ -1923,11 +1908,13 @@ void CDX9AllocatorPresenter::DrawStats()
 				strText += L" FS";
 			}
 
+			/*
 			switch (m_d3dpp.SwapEffect) {
 				case D3DSWAPEFFECT_COPY   : strText += L" Copy";   break;
 				case D3DSWAPEFFECT_FLIP   : strText += L" Flip";   break;
 				case D3DSWAPEFFECT_FLIPEX : strText += L" FlipEx"; break;
 			}
+			*/
 
 			if (rs.bDisableDesktopComposition) {
 				strText += L" DisDC";
