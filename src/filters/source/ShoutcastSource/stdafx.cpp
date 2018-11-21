@@ -20,7 +20,3 @@
  */
 
 #include "stdafx.h"
-
-#ifdef REGISTER_FILTER
-void AfxRegisterMFCCtrlClasses() { } // fix Visual Studio 2017 v15.8.0+ linking bug
-#endif
