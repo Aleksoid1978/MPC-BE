@@ -377,6 +377,13 @@ HRESULT CFormatConverter::ConvertGeneric(const uint8_t* const src[4], const ptrd
     if (m_out_pixfmt == PixFmt_YV12 || m_out_pixfmt == PixFmt_YV16 || m_out_pixfmt == PixFmt_YV24) {
       std::swap(dst[1], dst[2]);
     }
+    else if (m_out_pixfmt == PixFmt_RGB32 && m_OutHeight > 0) {
+      // flip the image, if necessary
+      dst[0] += dstStride[0] * (height - 1);
+      const ptrdiff_t dstStride2 = -dstStride[0];
+      int ret = sws_scale2(m_pSwsContext, src, srcStride, 0, height, dst, &dstStride2);
+      break;
+    }
     int ret = sws_scale2(m_pSwsContext, src, srcStride, 0, height, dst, dstStride);
   }
 
