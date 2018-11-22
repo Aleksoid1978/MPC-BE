@@ -950,7 +950,7 @@ DWORD CMpegSplitterFile::AddStream(const WORD pid, BYTE pesid, const BYTE ext_id
 			auto& avc = avc_streams[s];
 			if (!m_streams[stream_type::video].Find(s) && !m_streams[stream_type::stereo].Find(s)
 					&& Read(avc.h, len, avc.pData, &s.mt)) {
-				if (s.mt.subtype == MEDIASUBTYPE_AMVC) {
+				if (s.mt.subtype == MEDIASUBTYPE_AMVC && !avc.h.bMixedMVC) {
 					s.codec = stream_codec::MVC;
 					type = stream_type::stereo;
 				} else {

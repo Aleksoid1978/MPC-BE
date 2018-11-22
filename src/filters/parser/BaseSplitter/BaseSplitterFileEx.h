@@ -275,6 +275,7 @@ public:
 	};
 
 	struct avchdr {
+		bool bMixedMVC = false;
 	};
 
 	struct hevchdr {
