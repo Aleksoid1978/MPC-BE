@@ -1284,6 +1284,9 @@ bool CBaseSplitterFileEx::Read(avchdr& h, std::vector<BYTE>& pData, CMediaType* 
 		int sps_present = 0;
 		int pps_present = 0;
 
+		bool sps = false;
+		bool subset_sps = false;
+
 		Nalu.SetBuffer(pData.data(), pData.size());
 		Nalu.ReadNext();
 		while (!(sps_present && pps_present)) {
@@ -1292,8 +1295,12 @@ bool CBaseSplitterFileEx::Read(avchdr& h, std::vector<BYTE>& pData, CMediaType* 
 				break;
 			}
 			switch (nalu_type) {
-				case NALU_TYPE_SPS:
 				case NALU_TYPE_SUBSET_SPS:
+					subset_sps = true;
+				case NALU_TYPE_SPS:
+					if (nalu_type == NALU_TYPE_SPS) {
+						sps = true;
+					}
 					sps_present++;
 					break;
 				case NALU_TYPE_PPS:
@@ -1305,6 +1312,8 @@ bool CBaseSplitterFileEx::Read(avchdr& h, std::vector<BYTE>& pData, CMediaType* 
 		if (!(sps_present && pps_present)) {
 			return false;
 		}
+
+		h.bMixedMVC = sps & subset_sps;
 	}
 
 	Nalu.SetBuffer(pData.data(), pData.size());
@@ -1321,7 +1330,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, std::vector<BYTE>& pData, CMediaType* 
 			bmi.biSize           = sizeof(bmi);
 			bmi.biWidth          = params.width;
 			bmi.biHeight         = params.height;
-			bmi.biCompression    = nalu_type == NALU_TYPE_SUBSET_SPS ? FCC('AMVC') : FCC('H264');
+			bmi.biCompression    = (nalu_type == NALU_TYPE_SUBSET_SPS || h.bMixedMVC) ? FCC('AMVC') : FCC('H264');
 			bmi.biPlanes         = 1;
 			bmi.biBitCount       = 24;
 			bmi.biSizeImage      = DIBSIZE(bmi);
@@ -1330,13 +1339,44 @@ bool CBaseSplitterFileEx::Read(avchdr& h, std::vector<BYTE>& pData, CMediaType* 
 			ReduceDim(aspect);
 
 
-			std::vector<BYTE> nalu_data[2];
+			std::vector<BYTE> nalu_data[3];
+			Nalu.SetBuffer(pData.data(), pData.size());
 
-			{
+			if (h.bMixedMVC) {
+				int sps_present = 0;
+				int pps_present = 0;
+				int subset_sps_present = 0;
+
+				while (!(sps_present && pps_present && subset_sps_present)
+						&& Nalu.ReadNext()) {
+					nalu_type = Nalu.GetType();
+					switch (nalu_type) {
+						case NALU_TYPE_SPS:
+						case NALU_TYPE_SUBSET_SPS:
+						case NALU_TYPE_PPS:
+							size_t idx = 0;
+							if (nalu_type == NALU_TYPE_SPS) {
+								if (sps_present) continue;
+								sps_present++;
+							} else if (nalu_type == NALU_TYPE_SUBSET_SPS) {
+								if (subset_sps_present) continue;
+								subset_sps_present++;
+								idx = 1;
+							} else if (nalu_type == NALU_TYPE_PPS) {
+								if (pps_present) continue;
+								pps_present++;
+								idx = 2;
+							}
+
+							auto& data = nalu_data[idx];
+							data.resize(Nalu.GetLength());
+							memcpy(data.data(), Nalu.GetNALBuffer(), Nalu.GetLength());
+					}
+				}
+			} else {
 				int sps_present = 0;
 				int pps_present = 0;
 
-				Nalu.SetBuffer(pData.data(), pData.size());
 				while (!(sps_present && pps_present)
 						&& Nalu.ReadNext()) {
 					nalu_type = Nalu.GetType();

@@ -994,6 +994,14 @@ void CMpegSplitterFilter::HandleStream(CMpegSplitterFile::stream& s, CString fNa
 		}
 	}
 
+	if (mt.subtype == MEDIASUBTYPE_AMVC) {
+		s.mts.push_back(mt);
+		s.mt.subtype = MEDIASUBTYPE_H264;
+		if (SUCCEEDED(CreateAVCfromH264(&mt))) {
+			s.mts.push_back(mt);
+		}
+	}
+
 	s.mts.push_back(s.mt);
 }
 
