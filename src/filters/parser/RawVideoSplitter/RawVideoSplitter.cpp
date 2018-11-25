@@ -231,7 +231,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		int k;
 		std::list<CStringA> sl;
-		Explode(params, sl, 0x20);
+		Explode(params, sl, ' ');
 		for (const auto& str : sl) {
 			if (str.GetLength() < 2) {
 				continue;

@@ -28,15 +28,15 @@ template<class T, typename SEP>
 T Explode(const T& str, CAtlList<T>& sl, const SEP sep, const size_t limit = 0)
 {
 	sl.RemoveAll();
-
-	for (int i = 0, j = 0; ; i = j+1) {
+	const int sep_len = T(sep).GetLength();
+	for (int i = 0, j = 0; ; i = j + sep_len) {
 		j = str.Find(sep, i);
 
-		if (j < 0 || sl.GetCount() == limit-1) {
+		if (j < 0 || sl.GetCount() == limit - 1) {
 			sl.AddTail(str.Mid(i).Trim());
 			break;
 		} else {
-			sl.AddTail(str.Mid(i, j-i).Trim());
+			sl.AddTail(str.Mid(i, j - i).Trim());
 		}
 	}
 
@@ -47,15 +47,15 @@ template<class T, typename SEP>
 T Explode(const T& str, std::list<T>& sl, const SEP sep, const size_t limit = 0)
 {
 	sl.clear();
-
-	for (int i = 0, j = 0; ; i = j+1) {
+	const int sep_len = T(sep).GetLength();
+	for (int i = 0, j = 0; ; i = j + sep_len) {
 		j = str.Find(sep, i);
 
-		if (j < 0 || sl.size() == limit-1) {
+		if (j < 0 || sl.size() == limit - 1) {
 			sl.push_back(str.Mid(i).Trim());
 			break;
 		} else {
-			sl.push_back(str.Mid(i, j-i).Trim());
+			sl.push_back(str.Mid(i, j - i).Trim());
 		}
 	}
 
