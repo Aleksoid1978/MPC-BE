@@ -189,30 +189,26 @@ static int cbs_av1_read_su(CodedBitstreamContext *ctx, GetBitContext *gbc,
                            int width, const char *name,
                            const int *subscripts, int32_t *write_to)
 {
-    uint32_t magnitude;
-    int position, sign;
+    int position;
     int32_t value;
 
     if (ctx->trace_enable)
         position = get_bits_count(gbc);
 
-    if (get_bits_left(gbc) < width + 1) {
+    if (get_bits_left(gbc) < width) {
         av_log(ctx->log_ctx, AV_LOG_ERROR, "Invalid signed value at "
                "%s: bitstream ended.\n", name);
         return AVERROR_INVALIDDATA;
     }
 
-    magnitude = get_bits(gbc, width);
-    sign      = get_bits1(gbc);
-    value     = sign ? -(int32_t)magnitude : magnitude;
+    value = get_sbits(gbc, width);
 
     if (ctx->trace_enable) {
         char bits[33];
         int i;
         for (i = 0; i < width; i++)
-            bits[i] = magnitude >> (width - i - 1) & 1 ? '1' : '0';
-        bits[i] = sign ? '1' : '0';
-        bits[i + 1] = 0;
+            bits[i] = value & (1 << (width - i - 1)) ? '1' : '0';
+        bits[i] = 0;
 
         ff_cbs_trace_syntax_element(ctx, position,
                                     name, subscripts, bits, value);
@@ -226,29 +222,21 @@ static int cbs_av1_write_su(CodedBitstreamContext *ctx, PutBitContext *pbc,
                             int width, const char *name,
                             const int *subscripts, int32_t value)
 {
-    uint32_t magnitude;
-    int sign;
-
-    if (put_bits_left(pbc) < width + 1)
+    if (put_bits_left(pbc) < width)
         return AVERROR(ENOSPC);
-
-    sign      = value < 0;
-    magnitude = sign ? -value : value;
 
     if (ctx->trace_enable) {
         char bits[33];
         int i;
         for (i = 0; i < width; i++)
-            bits[i] = magnitude >> (width - i - 1) & 1 ? '1' : '0';
-        bits[i] = sign ? '1' : '0';
-        bits[i + 1] = 0;
+            bits[i] = value & (1 << (width - i - 1)) ? '1' : '0';
+        bits[i] = 0;
 
         ff_cbs_trace_syntax_element(ctx, put_bits_count(pbc),
                                     name, subscripts, bits, value);
     }
 
-    put_bits(pbc, width, magnitude);
-    put_bits(pbc, 1, sign);
+    put_sbits(pbc, width, value);
 
     return 0;
 }
@@ -800,13 +788,6 @@ static int cbs_av1_split_fragment(CodedBitstreamContext *ctx,
         if (err < 0)
             goto fail;
 
-        if (!header.obu_has_size_field) {
-            av_log(ctx->log_ctx, AV_LOG_ERROR, "Invalid OBU for raw "
-                   "stream: size field must be present.\n");
-            err = AVERROR_INVALIDDATA;
-            goto fail;
-        }
-
         if (get_bits_left(&gbc) < 8) {
             av_log(ctx->log_ctx, AV_LOG_ERROR, "Invalid OBU: fragment "
                    "too short (%zu bytes).\n", size);
@@ -814,9 +795,12 @@ static int cbs_av1_split_fragment(CodedBitstreamContext *ctx,
             goto fail;
         }
 
-        err = cbs_av1_read_leb128(ctx, &gbc, "obu_size", &obu_size);
-        if (err < 0)
-            goto fail;
+        if (header.obu_has_size_field) {
+            err = cbs_av1_read_leb128(ctx, &gbc, "obu_size", &obu_size);
+            if (err < 0)
+                goto fail;
+        } else
+            obu_size = size - 1 - header.obu_extension_flag;
 
         pos = get_bits_count(&gbc);
         av_assert0(pos % 8 == 0 && pos / 8 <= size);
@@ -996,7 +980,10 @@ static int cbs_av1_read_unit(CodedBitstreamContext *ctx,
     case AV1_OBU_REDUNDANT_FRAME_HEADER:
         {
             err = cbs_av1_read_frame_header_obu(ctx, &gbc,
-                                                &obu->obu.frame_header);
+                                                &obu->obu.frame_header,
+                                                obu->header.obu_type ==
+                                                AV1_OBU_REDUNDANT_FRAME_HEADER,
+                                                unit->data_ref);
             if (err < 0)
                 return err;
         }
@@ -1016,7 +1003,8 @@ static int cbs_av1_read_unit(CodedBitstreamContext *ctx,
         break;
     case AV1_OBU_FRAME:
         {
-            err = cbs_av1_read_frame_obu(ctx, &gbc, &obu->obu.frame);
+            err = cbs_av1_read_frame_obu(ctx, &gbc, &obu->obu.frame,
+                                         unit->data_ref);
             if (err < 0)
                 return err;
 
@@ -1124,7 +1112,10 @@ static int cbs_av1_write_obu(CodedBitstreamContext *ctx,
     case AV1_OBU_REDUNDANT_FRAME_HEADER:
         {
             err = cbs_av1_write_frame_header_obu(ctx, pbc,
-                                                 &obu->obu.frame_header);
+                                                 &obu->obu.frame_header,
+                                                 obu->header.obu_type ==
+                                                 AV1_OBU_REDUNDANT_FRAME_HEADER,
+                                                 NULL);
             if (err < 0)
                 return err;
         }
@@ -1141,7 +1132,7 @@ static int cbs_av1_write_obu(CodedBitstreamContext *ctx,
         break;
     case AV1_OBU_FRAME:
         {
-            err = cbs_av1_write_frame_obu(ctx, pbc, &obu->obu.frame);
+            err = cbs_av1_write_frame_obu(ctx, pbc, &obu->obu.frame, NULL);
             if (err < 0)
                 return err;
 
@@ -1179,7 +1170,7 @@ static int cbs_av1_write_obu(CodedBitstreamContext *ctx,
         if (err < 0)
             return err;
         end_pos = put_bits_count(pbc);
-        obu->obu_size = (end_pos - start_pos + 7) / 8;
+        obu->obu_size = header_size = (end_pos - start_pos + 7) / 8;
     } else {
         // Empty OBU.
         obu->obu_size = 0;
@@ -1302,6 +1293,7 @@ static void cbs_av1_close(CodedBitstreamContext *ctx)
     CodedBitstreamAV1Context *priv = ctx->priv_data;
 
     av_buffer_unref(&priv->sequence_header_ref);
+    av_buffer_unref(&priv->frame_header_ref);
 
     av_freep(&priv->write_buffer);
 }

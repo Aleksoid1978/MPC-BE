@@ -3,6 +3,9 @@
 1.5.3 (beta)
 =============================
 
+Updated libraries:
+	ffmpeg git-n4.2-dev-202-g90ac0e5f29;
+
 1.5.2
 ==============================
 Build in Visual Studio 2015 is no longer supported.

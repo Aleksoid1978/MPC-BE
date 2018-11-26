@@ -243,11 +243,13 @@ static int get_video_buffer(AVFrame *frame, int align)
         return ret;
 
     frame->buf[0] = av_buffer_alloc(ret + 4*plane_padding);
-    if (!frame->buf[0])
+    if (!frame->buf[0]) {
+        ret = AVERROR(ENOMEM);
         goto fail;
+    }
 
-    if (av_image_fill_pointers(frame->data, frame->format, padded_height,
-                               frame->buf[0]->data, frame->linesize) < 0)
+    if ((ret = av_image_fill_pointers(frame->data, frame->format, padded_height,
+                                      frame->buf[0]->data, frame->linesize)) < 0)
         goto fail;
 
     for (i = 1; i < 4; i++) {
@@ -260,7 +262,7 @@ static int get_video_buffer(AVFrame *frame, int align)
     return 0;
 fail:
     av_frame_unref(frame);
-    return AVERROR(ENOMEM);
+    return ret;
 }
 
 static int get_audio_buffer(AVFrame *frame, int align)
@@ -831,6 +833,7 @@ const char *av_frame_side_data_name(enum AVFrameSideDataType type)
     case AV_FRAME_DATA_MASTERING_DISPLAY_METADATA:  return "Mastering display metadata";
     case AV_FRAME_DATA_CONTENT_LIGHT_LEVEL:         return "Content light level metadata";
     case AV_FRAME_DATA_GOP_TIMECODE:                return "GOP timecode";
+    case AV_FRAME_DATA_S12M_TIMECODE:               return "SMPTE 12-1 timecode";
     case AV_FRAME_DATA_SPHERICAL:                   return "Spherical Mapping";
     case AV_FRAME_DATA_ICC_PROFILE:                 return "ICC profile";
 #if FF_API_FRAME_QP

@@ -87,8 +87,8 @@ typedef struct AV1RawSequenceHeader {
     uint8_t  seq_level_idx[AV1_MAX_OPERATING_POINTS];
     uint8_t  seq_tier[AV1_MAX_OPERATING_POINTS];
     uint8_t  decoder_model_present_for_this_op[AV1_MAX_OPERATING_POINTS];
-    uint8_t  decoder_buffer_delay[AV1_MAX_OPERATING_POINTS];
-    uint8_t  encoder_buffer_delay[AV1_MAX_OPERATING_POINTS];
+    uint32_t decoder_buffer_delay[AV1_MAX_OPERATING_POINTS];
+    uint32_t encoder_buffer_delay[AV1_MAX_OPERATING_POINTS];
     uint8_t  low_delay_mode_flag[AV1_MAX_OPERATING_POINTS];
     uint8_t  initial_display_delay_present_for_this_op[AV1_MAX_OPERATING_POINTS];
     uint8_t  initial_display_delay_minus_1[AV1_MAX_OPERATING_POINTS];
@@ -161,7 +161,7 @@ typedef struct AV1RawFrameHeader {
     uint8_t  render_width_minus_1;
     uint8_t  render_height_minus_1;
 
-    uint8_t found_ref;
+    uint8_t found_ref[AV1_REFS_PER_FRAME];
 
     uint8_t refresh_frame_flags;
     uint8_t allow_intrabc;
@@ -210,7 +210,7 @@ typedef struct AV1RawFrameHeader {
     uint8_t segmentation_temporal_update;
     uint8_t segmentation_update_data;
     uint8_t feature_enabled[AV1_MAX_SEGMENTS][AV1_SEG_LVL_MAX];
-    uint8_t feature_value[AV1_MAX_SEGMENTS][AV1_SEG_LVL_MAX];
+    int16_t feature_value[AV1_MAX_SEGMENTS][AV1_SEG_LVL_MAX];
 
     uint8_t delta_q_present;
     uint8_t delta_q_res;
@@ -399,7 +399,10 @@ typedef struct CodedBitstreamAV1Context {
     AV1RawSequenceHeader *sequence_header;
     AVBufferRef          *sequence_header_ref;
 
-    int seen_frame_header;
+    int     seen_frame_header;
+    AVBufferRef *frame_header_ref;
+    uint8_t     *frame_header;
+    size_t       frame_header_size;
 
     int temporal_id;
     int spatial_id;
