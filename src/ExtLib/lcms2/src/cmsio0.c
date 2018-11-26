@@ -1599,6 +1599,7 @@ void* CMSEXPORT cmsReadTag(cmsHPROFILE hProfile, cmsTagSignature sig)
         _cmsTagSignature2String(String, sig);
         cmsSignalError(Icc ->ContextID, cmsERROR_CORRUPTION_DETECTED, "'%s' Inconsistent number of items: expected %d, got %d",
             String, TagDescriptor ->ElemCount, ElemCount);
+        goto Error;
     }
 
 
