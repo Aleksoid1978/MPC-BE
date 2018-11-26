@@ -190,11 +190,11 @@ void CMediaFormats::UpdateData(const bool& bSave)
 		ADDFMT((L"roq",         ResStr(IDS_MFMT_ROQ),         L"roq"));
 		ADDFMT((L"wmv",         ResStr(IDS_MFMT_WMV),         L"wmv wmp wm asf"));
 //		ADDFMT((L"videocd",     ResStr(IDS_MFMT_VIDEOCD),     L"dat")); // "dat" extension is no longer supported
-		ADDFMT((L"bink",        ResStr(IDS_MFMT_BINK),        L"smk bik", TVideo, L"smackw32/binkw32.dll in dll path"));
+		ADDFMT((L"bink",        ResStr(IDS_MFMT_BINK),        L"smk bik", TVideo));
 		ADDFMT((L"flic",        ResStr(IDS_MFMT_FLIC),        L"fli flc flic"));
 		ADDFMT((L"dsm",         ResStr(IDS_MFMT_DSM),         L"dsm dsv dsa dss"));
 		ADDFMT((L"swf",         ResStr(IDS_MFMT_SWF),         L"swf", TVideo, L"ShockWave ActiveX control"));
-		ADDFMT((L"other",       ResStr(IDS_MFMT_OTHER),       L"amv wtv dvr-ms mxf ivf nut"));
+		ADDFMT((L"other",       ResStr(IDS_MFMT_OTHER),       L"amv wtv dvr-ms mxf ivf nut dav"));
 		ADDFMT((L"rawvideo",    ResStr(IDS_MFMT_RAW_VIDEO),   L"y4m h264 264 vc1 h265 265 hm10 hevc"));
 		// audio files
 		ADDFMT((L"ac3dts",      ResStr(IDS_MFMT_AC3),         L"ac3 dts dtshd", TAudio));
