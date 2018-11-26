@@ -70,6 +70,7 @@ CDVRSplitterFilter : public CBaseSplitterFilter
 			UINT sample_rate = 0;
 		} audio;
 	};
+	REFERENCE_TIME m_rt_Seek = 0;
 	bool DHAVSync(__int64& pos);
 	bool DHAVReadHeader(DHAVHeader& hdr, const bool bParseExt = false);
 
