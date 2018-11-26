@@ -552,6 +552,8 @@ extern AVCodec ff_pcm_u32be_encoder;
 extern AVCodec ff_pcm_u32be_decoder;
 extern AVCodec ff_pcm_u32le_encoder;
 extern AVCodec ff_pcm_u32le_decoder;
+extern AVCodec ff_pcm_vidc_encoder;
+extern AVCodec ff_pcm_vidc_decoder;
 extern AVCodec ff_pcm_zork_decoder;
 
 /* DPCM codecs */
@@ -674,6 +676,7 @@ extern AVCodec ff_libaom_av1_encoder;
 extern AVCodec ff_libcelt_decoder;
 extern AVCodec ff_libcodec2_encoder;
 extern AVCodec ff_libcodec2_decoder;
+extern AVCodec ff_libdav1d_decoder;
 extern AVCodec ff_libdavs2_decoder;
 extern AVCodec ff_libfdk_aac_encoder;
 extern AVCodec ff_libfdk_aac_decoder;

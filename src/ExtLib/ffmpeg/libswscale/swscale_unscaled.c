@@ -423,7 +423,7 @@ static void gray8aToPacked24(const uint8_t *src, uint8_t *dst, int num_pixels,
     }
 }
 
-static int packed_16bpc_bswap(SwsContext *c, const uint8_t *src[],
+static int bswap_16bpc(SwsContext *c, const uint8_t *src[],
                               int srcStride[], int srcSliceY, int srcSliceH,
                               uint8_t *dst[], int dstStride[])
 {
@@ -1821,6 +1821,14 @@ static int planarCopyWrapper(SwsContext *c, const uint8_t *src[],
                     srcPtr += srcStride[plane];
                     dstPtr += dstStride[plane];
                 }
+            } else if (isFloat(c->srcFormat) && isFloat(c->dstFormat) &&
+                       isBE(c->srcFormat) != isBE(c->dstFormat)) { /* swap float plane */
+                for (i = 0; i < height; i++) {
+                    for (j = 0; j < length; j++)
+                        ((uint32_t *) dstPtr)[j] = av_bswap32(((const uint32_t *) srcPtr)[j]);
+                    srcPtr += srcStride[plane];
+                    dstPtr += dstStride[plane];
+                }
             } else if (dstStride[plane] == srcStride[plane] &&
                        srcStride[plane] > 0 && srcStride[plane] == length) {
                 memcpy(dst[plane] + dstStride[plane] * y, src[plane],
@@ -2015,7 +2023,7 @@ void ff_get_unscaled_swscale(SwsContext *c)
         IS_DIFFERENT_ENDIANESS(srcFormat, dstFormat, AV_PIX_FMT_YUV444P12) ||
         IS_DIFFERENT_ENDIANESS(srcFormat, dstFormat, AV_PIX_FMT_YUV444P14) ||
         IS_DIFFERENT_ENDIANESS(srcFormat, dstFormat, AV_PIX_FMT_YUV444P16))
-        c->swscale = packed_16bpc_bswap;
+        c->swscale = bswap_16bpc;
 
     if (usePal(srcFormat) && isByteRGB(dstFormat))
         c->swscale = palToRgbWrapper;

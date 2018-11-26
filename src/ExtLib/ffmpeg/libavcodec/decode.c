@@ -281,10 +281,6 @@ int ff_decode_bsfs_init(AVCodecContext *avctx)
             bsfs_str++;
     }
 
-    ret = avcodec_parameters_to_context(avctx, s->bsfs[s->nb_bsfs - 1]->par_out);
-    if (ret < 0)
-        return ret;
-
     return 0;
 fail:
     ff_decode_bsfs_uninit(avctx);
@@ -1506,7 +1502,7 @@ static int update_frame_pool(AVCodecContext *avctx, AVFrame *frame)
         tmpsize = av_image_fill_pointers(data, avctx->pix_fmt, h,
                                          NULL, linesize);
         if (tmpsize < 0)
-            return -1;
+            return tmpsize;
 
         for (i = 0; i < 3 && data[i + 1]; i++)
             size[i] = data[i + 1] - data[i];
