@@ -37,13 +37,41 @@ CDVRSplitterFilter : public CBaseSplitterFilter
 	REFERENCE_TIME m_rtOffsetVideo = INVALID_TIME;
 	REFERENCE_TIME m_rtOffsetAudio = INVALID_TIME;
 
-	struct Header {
+	bool m_bHXVS = false;
+	bool m_bDHAV = false;
+
+	struct HXVSHeader {
 		DWORD sync, size, pts, dummy;
-		REFERENCE_TIME rt;
-		bool key_frame;
+
+		REFERENCE_TIME rt = 0;
+		bool key_frame = false;
 	};
-	bool Sync();
-	bool ReadHeader(Header& hdr);
+	bool HXVSSync();
+	bool HXVSReadHeader(HXVSHeader& hdr);
+
+	struct DHAVHeader {
+		DWORD sync;
+		BYTE type, subtype, channel, frame_subnumber;
+		DWORD frame_number, size, date;
+		WORD pts;
+		BYTE ext_size, checksum;
+
+		bool key_frame = false;
+
+		struct {
+			SHORT width = 0;
+			SHORT height = 0;
+			BYTE codec = 0;
+			BYTE frame_rate = 0;
+		} video;
+		struct {
+			BYTE channels = 0;
+			BYTE codec = 0;
+			UINT sample_rate = 0;
+		} audio;
+	};
+	bool DHAVSync(__int64& pos);
+	bool DHAVReadHeader(DHAVHeader& hdr, const bool bParseExt = false);
 
 	std::vector<SyncPoint> m_sps;
 

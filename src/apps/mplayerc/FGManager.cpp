@@ -2054,6 +2054,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	if (src[SRC_DVR] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CDVRSourceFilter>(DVRSourceName);
 		pFGF->m_chkbytes.emplace_back(L"0,4,,48585653,16,4,,48585646"); // 'HXVS............HXVF'
+		pFGF->m_chkbytes.emplace_back(L"0,4,,44484156");                // 'DHAV'
 		m_source.push_back(pFGF);
 	}
 
@@ -2071,7 +2072,6 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		pFGF->m_chkbytes.emplace_back(L"0,4,,00000001");                // H.264/AVC, H.265/HEVC
 		pFGF->m_chkbytes.emplace_back(L"0,4,,434D5331,20,4,,50445652"); // 'CMS1................PDVR'
 		pFGF->m_chkbytes.emplace_back(L"0,5,,3236344456");              // '264DV'
-		pFGF->m_chkbytes.emplace_back(L"0,4,,44484156");                // 'DHAV'
 		pFGF->m_chkbytes.emplace_back(L"0,4,,FFFFFF88");
 		m_source.push_back(pFGF);
 	}

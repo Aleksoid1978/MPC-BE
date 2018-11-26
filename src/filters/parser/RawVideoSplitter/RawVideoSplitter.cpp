@@ -59,7 +59,6 @@ STDAPI DllRegisterServer()
 		L"0,4,,00000001",                // H.264/AVC, H.265/HEVC
 		L"0,4,,434D5331,20,4,,50445652", // 'CMS1................PDVR'
 		L"0,5,,3236344456",              // '264DV'
-		L"0,4,,44484156",                // 'DHAV'
 		L"0,4,,FFFFFF88",
 	};
 
@@ -434,8 +433,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			maxpos = 1536;
 		}
 		// LTV-DVR ?
-		else if ((GETU32(buf) == 0x88FFFFFF && GETU32(buf + 12) == GETU32(buf + 20))
-				|| GETU32(buf) == FCC('DHAV')) {
+		else if (GETU32(buf) == 0x88FFFFFF && GETU32(buf + 12) == GETU32(buf + 20)) {
 			m_pFile->Seek(28);
 			maxpos = 512;
 		}
