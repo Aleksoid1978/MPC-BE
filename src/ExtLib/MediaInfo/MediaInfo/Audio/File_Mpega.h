@@ -63,7 +63,7 @@ private :
     Ztring BitRate_Mode;
     Ztring BitRate_Nominal;
     Ztring BitRate_Minimum;
-    Ztring Encoded_Library;
+    string Encoded_Library;
     Ztring Encoded_Library_Settings;
     std::map<int16u, size_t> BitRate_Count;
     std::map<int8u, size_t> sampling_frequency_Count;

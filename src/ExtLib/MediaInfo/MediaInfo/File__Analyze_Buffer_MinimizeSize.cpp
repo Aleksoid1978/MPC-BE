@@ -1238,7 +1238,11 @@ void File__Analyze::Get_C8(int64u &Info)
 void File__Analyze::Get_Local(int64u Bytes, Ztring &Info)
 {
     INTEGRITY_SIZE_ATLEAST_STRING(Bytes);
+    #ifdef WINDOWS
     Info.From_Local((const char*)(Buffer+Buffer_Offset+(size_t)Element_Offset), (size_t)Bytes);
+    #else //WINDOWS
+    Info.From_ISO_8859_1((const char*)(Buffer+Buffer_Offset+(size_t)Element_Offset), (size_t)Bytes); //Trying with the most commonly used charset before UTF8
+    #endif //WINDOWS
     Element_Offset+=Bytes;
 }
 
@@ -1405,7 +1409,11 @@ void File__Analyze::Get_String(int64u Bytes, std::string &Info)
 void File__Analyze::Peek_Local(int64u Bytes, Ztring &Info)
 {
     INTEGRITY_SIZE_ATLEAST_STRING(Bytes);
+    #ifdef WINDOWS
     Info.From_Local((const char*)(Buffer+Buffer_Offset+(size_t)Element_Offset), (size_t)Bytes);
+    #else //WINDOWS
+    Info.From_ISO_8859_1((const char*)(Buffer+Buffer_Offset+(size_t)Element_Offset), (size_t)Bytes); //Trying with the most commonly used charset before UTF8
+    #endif //WINDOWS
 }
 
 //---------------------------------------------------------------------------

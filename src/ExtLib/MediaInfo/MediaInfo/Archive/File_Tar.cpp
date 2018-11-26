@@ -44,15 +44,15 @@ void File_Tar::Read_Buffer_Continue()
 
     //Parsing
     Ztring ChecksumO;
-    Skip_Local(100,                                             "File name");
-    Skip_Local(  8,                                             "File mode");
-    Skip_Local(  8,                                             "Owner's numeric user ID");
-    Skip_Local( 12,                                             "Group's numeric user ID");
-    Skip_Local( 12,                                             "File size in bytes");
-    Skip_Local(  8,                                             "Last modification time in numeric Unix time format");
-    Get_Local (  8, ChecksumO,                                  "Checksum for header block");
+    Skip_UTF8(100,                                              "File name");
+    Skip_UTF8(  8,                                              "File mode");
+    Skip_UTF8(  8,                                              "Owner's numeric user ID");
+    Skip_UTF8( 12,                                              "Group's numeric user ID");
+    Skip_UTF8( 12,                                              "File size in bytes");
+    Skip_UTF8(  8,                                              "Last modification time in numeric Unix time format");
+    Get_UTF8 (  8, ChecksumO,                                   "Checksum for header block");
     Skip_B1(                                                    "Link indicator (file type)");
-    Skip_Local(100,                                             "Name of linked file");
+    Skip_UTF8(100,                                              "Name of linked file");
     Skip_XX(File_Size-257,                                      "Data");
 
     FILLING_BEGIN();

@@ -255,7 +255,7 @@ void File_Flac::PICTURE()
     Ztring MimeType, Description;
     Get_B4 (PictureType,                                        "Picture type"); Element_Info1(Id3v2_PictureType((int8u)PictureType));
     Get_B4 (MimeType_Size,                                      "MIME type size");
-    Get_Local(MimeType_Size, MimeType,                          "MIME type");
+    Get_UTF8(MimeType_Size, MimeType,                           "MIME type");
     Get_B4 (Description_Size,                                   "Description size");
     Get_UTF8(Description_Size, Description,                     "Description");
     Skip_B4(                                                    "Width");

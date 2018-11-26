@@ -126,7 +126,7 @@ void File_Y4m::FileHeader_Parse()
 {
     //Parsing
     Ztring Header;
-    Get_Local(HeaderEnd, Header,                                "Data");
+    Get_UTF8(HeaderEnd, Header,                                 "Data");
 
     ZtringList List; List.Separator_Set(0, " ");
     List.Write(Header);

@@ -738,43 +738,44 @@ Ztring& Ztring::From_UUID (const int128u S)
 
 Ztring& Ztring::From_CC4 (const int32u S)
 {
-    std::string S1;
-    S1.append(1, (char)((S&0xFF000000)>>24));
-    S1.append(1, (char)((S&0x00FF0000)>>16));
-    S1.append(1, (char)((S&0x0000FF00)>> 8));
-    S1.append(1, (char)((S&0x000000FF)    ));
-    From_Local(S1.c_str());
-
-    // Validity Test
-    if ( size()==4
-     || (size()==3 && (S&0x000000FF)==0x00000000 && at(0)>=0x20 && at(1)>=0x20 && at(2)>=0x20)
-     || (size()==2 && (S&0x0000FFFF)==0x00000000 && at(0)>=0x20 && at(1)>=0x20)
-     || (size()==1 && (S&0x00FFFFFF)==0x00000000 && at(0)>=0x20))
-        return *this;
-
-    // Not valid, using 0x as fallback
     clear();
-    append(__T("0x"));
-    append(Ztring().From_CC1((int8u)((S&0xFF000000)>>24)));
-    append(Ztring().From_CC1((int8u)((S&0x00FF0000)>>16)));
-    append(Ztring().From_CC1((int8u)((S&0x0000FF00)>> 8)));
-    append(Ztring().From_CC1((int8u)((S&0x000000FF)    )));
-
+    for (int8s i=(4-1)*8; i>=0; i-=8)
+    {
+        int32u Value=(S&(0xFF<<i))>>i;
+        if (Value<0x20)
+        {
+            // Not valid, using 0x as fallback
+            clear();
+            append(__T("0x"));
+            append(Ztring().From_CC1((int8u)((S&0xFF000000)>>24)));
+            append(Ztring().From_CC1((int8u)((S&0x00FF0000)>>16)));
+            append(Ztring().From_CC1((int8u)((S&0x0000FF00)>> 8)));
+            append(Ztring().From_CC1((int8u)((S&0x000000FF)    )));
+            return *this;
+        }
+        append(1, (Char)(Value));
+    }
     return *this;
 }
 
 Ztring& Ztring::From_CC3 (const int32u S)
 {
-    std::string S1;
-    S1.append(1, (char)((S&0x00FF0000)>>16));
-    S1.append(1, (char)((S&0x0000FF00)>> 8));
-    S1.append(1, (char)((S&0x000000FF)>> 0));
-    From_Local(S1.c_str());
-
-    //Test
-    if (empty())
-        assign(__T("(empty)"));
-
+    clear();
+    for (int8s i=(3-1)*8; i>=0; i-=8)
+    {
+        int32u Value=(S&(0xFF<<i))>>i;
+        if (Value<0x20)
+        {
+            // Not valid, using 0x as fallback
+            clear();
+            append(__T("0x"));
+            append(Ztring().From_CC1((int8u)((S&0x00FF0000)>>16)));
+            append(Ztring().From_CC1((int8u)((S&0x0000FF00)>> 8)));
+            append(Ztring().From_CC1((int8u)((S&0x000000FF)    )));
+            return *this;
+        }
+        append(1, (Char)(Value));
+    }
     return *this;
 }
 
@@ -1364,7 +1365,7 @@ Ztring& Ztring::Date_From_String (const char* Value, size_t Value_Size)
     //Only the year
     if (Value_Size<10)
     {
-        From_Local(Value, 0, Value_Size);
+        From_UTF8(Value, 0, Value_Size);
         return *this;
     }
 
@@ -1401,7 +1402,7 @@ Ztring& Ztring::Date_From_String (const char* Value, size_t Value_Size)
 
         assign (ToReturn.c_str());
     #else //ZENLIB_USEWX
-        Ztring DateS; DateS.From_Local(Value, 0, Value_Size);
+        Ztring DateS; DateS.From_UTF8(Value, 0, Value_Size);
         //Unix style formating : exactly 24 bytes (or 25 with 0x0A at the end) and Year is at the end
         if ((DateS.size()==24 || (DateS.size()==25 && DateS[24]==__T('\n'))) && DateS[23]>=__T('0') && DateS[23]<=__T('9') && DateS[21]>=__T('0') && DateS[21]<=__T('9') && DateS[19]==__T(' '))
         {
@@ -1503,7 +1504,7 @@ Ztring& Ztring::Date_From_String (const char* Value, size_t Value_Size)
             append(DateS);
         }
         else
-            From_Local(Value, 0, Value_Size); //Not implemented
+            From_UTF8(Value, 0, Value_Size); //Not implemented
     #endif //ZENLIB_USEWX
     return *this;
 }

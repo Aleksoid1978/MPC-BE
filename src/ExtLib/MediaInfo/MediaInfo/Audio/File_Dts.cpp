@@ -557,9 +557,9 @@ void File_Dts::Streams_Fill_Core()
     if (Core_Core_AMODE<16)
     {
         Data[Channels].push_back(Ztring::ToZtring(DTS_Channels[Core_Core_AMODE]+(Core_Core_LFF?1:0)));
-        Data[ChannelPositions].push_back(Ztring().From_Local(DTS_ChannelPositions[Core_Core_AMODE])+(Core_Core_LFF?__T(", LFE"):__T("")));
-        Data[ChannelPositions2].push_back(Ztring().From_Local(DTS_ChannelPositions2[Core_Core_AMODE])+(Core_Core_LFF?__T(".1"):__T(".0")));
-        Data[ChannelLayout].push_back(Ztring().From_Local(DTS_ChannelLayout[Core_Core_AMODE])+(Core_Core_LFF?__T(" LFE"):__T("")));
+        Data[ChannelPositions].push_back(Ztring().From_UTF8(DTS_ChannelPositions[Core_Core_AMODE])+(Core_Core_LFF?__T(", LFE"):__T("")));
+        Data[ChannelPositions2].push_back(Ztring().From_UTF8(DTS_ChannelPositions2[Core_Core_AMODE])+(Core_Core_LFF?__T(".1"):__T(".0")));
+        Data[ChannelLayout].push_back(Ztring().From_UTF8(DTS_ChannelLayout[Core_Core_AMODE])+(Core_Core_LFF?__T(" LFE"):__T("")));
     }
     else
     {
@@ -1602,6 +1602,9 @@ bool File_Dts::FrameSynchPoint_Test()
         {
             if (Word)
             {
+                if (Buffer_Offset+8>Buffer_Size)
+                    return false; //Need more data
+
                 if (BigEndian)
                     Size=((Buffer[Buffer_Offset+5]&0x03)<<12)
                        | ( Buffer[Buffer_Offset+6]      << 4)
@@ -1615,6 +1618,9 @@ bool File_Dts::FrameSynchPoint_Test()
             }
             else
             {
+                if (Buffer_Offset+10>Buffer_Size)
+                    return false; //Need more data
+
                 if (BigEndian)
                     Size=((Buffer[Buffer_Offset+6]&0x03)<<12)
                        | ( Buffer[Buffer_Offset+7]      << 4)
@@ -1627,7 +1633,7 @@ bool File_Dts::FrameSynchPoint_Test()
                 Original_Size=Size*16/14;
             }
         }
-        if (Buffer_Offset+Size>Buffer_Size)
+        if (Buffer_Offset+Original_Size>Buffer_Size)
             return false; //Need more data
 
         if (!Word || !BigEndian)

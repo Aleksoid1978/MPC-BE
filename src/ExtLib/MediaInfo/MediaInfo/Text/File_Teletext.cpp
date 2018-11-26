@@ -613,7 +613,7 @@ void File_Teletext::Data_Parse()
             byte&=0x7F;
             if (byte<0x20)
                 byte=0x20;
-            Param_Info1(Ztring().From_Local((const char*)&byte, 1));
+            Param_Info1(Ztring().From_UTF8((const char*)&byte, 1));
             if (byte!=Stream.CC_Displayed_Values[Y][PosX] && (!C[7] || Y)) // C[7] is "Suppress Header", to be tested when Y==0
             {
                 Char Uni;

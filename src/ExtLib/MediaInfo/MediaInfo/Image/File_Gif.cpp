@@ -68,8 +68,8 @@ void File_Gif::Read_Buffer_Continue()
     int16u Width, Height;
     int8u  BackgroundColorIndex, PixelAspectRatio, Resolution, GCT_Size;
     bool GCT_Flag, Sort;
-    Skip_Local(3,                                               "Header");
-    Get_Local (3, Version,                                      "Version");
+    Skip_UTF8 (3,                                               "Header");
+    Get_UTF8  (3, Version,                                      "Version");
     Get_L2 (Width,                                              "Logical Screen Width");
     Get_L2 (Height,                                             "Logical Screen Height");
     BS_Begin();

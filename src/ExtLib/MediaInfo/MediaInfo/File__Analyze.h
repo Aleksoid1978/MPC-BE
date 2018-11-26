@@ -479,6 +479,7 @@ public :
     inline void Param      (const char*   Parameter, const int8u*  Value, size_t Value_Size, bool Utf8=true) {Param(Parameter, (const char*)Value, Value_Size, Utf8);}
     inline void Param_GUID (const char*   Parameter, int128u Value){Param(Parameter, Ztring().From_GUID(Value));}
     inline void Param_UUID (const char*   Parameter, int128u Value){Param(Parameter, Ztring().From_UUID(Value));}
+    inline void Param_CC   (const char*   Parameter, const int8u*  Value, int8u Value_Size){Ztring Name2; for (int8s i=0; i<Value_Size; i++) Name2.append(1, (Char)(Value[i])); Param(Parameter, Name2);}
     /* #ifdef SIZE_T_IS_LONG */
     /* inline void Param      (const char*   Parameter, size_t Value, intu Radix) {if (Trace_Activated) Param(Parameter, Ztring::ToZtring(Value, Radix).MakeUpperCase()+__T(" (")+Ztring::ToZtring(Value, 10).MakeUpperCase()+__T(")"));} */
     /* #endif //SIZE_T_IS_LONG */

@@ -81,7 +81,7 @@ void File_Speex::Identification()
     Ztring speex_version;
     int32u Speex_version_id, header_size, rate, nb_channels, bitrate, vbr;
     Skip_Local(8,                                               "speex_string");
-    Get_Local(20, speex_version,                                "speex_version");
+    Get_UTF8(20, speex_version,                                 "speex_version");
     Get_L4 (Speex_version_id,                                   "Speex_version_id");
     if (Speex_version_id==1)
     {
@@ -133,7 +133,7 @@ void File_Speex::Comment()
         int32u size;
         Get_L4(size,                                            "size");
         if (size)
-            Get_Local(size, value,                              "value");
+            Get_UTF8(size, value,                               "value");
 
         //Filling
         if (!value.empty())

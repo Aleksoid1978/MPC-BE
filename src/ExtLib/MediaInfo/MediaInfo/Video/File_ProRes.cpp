@@ -93,6 +93,7 @@ File_ProRes::File_ProRes()
 {
     //Configuration
     ParserName="ProRes";
+    IsRawStream=true;
 }
 
 //***************************************************************************

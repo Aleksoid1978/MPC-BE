@@ -523,6 +523,7 @@ void File_Ffv1::Streams_Accept()
         Version+=Ztring::ToZtring(micro_version);
     }
     Fill(Stream_Video, 0, Video_Format_Version, Version);
+    Fill(Stream_Video, 0, Video_BitRate_Mode, "VBR");
 }
 
 //***************************************************************************

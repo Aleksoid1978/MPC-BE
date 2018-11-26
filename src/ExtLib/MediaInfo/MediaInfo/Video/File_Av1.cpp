@@ -230,7 +230,7 @@ void File_Av1::sequence_header()
     //Parsing
     int32u max_frame_width_minus_1, max_frame_height_minus_1;
     int8u seq_profile, seq_level_idx[33], operating_points_cnt_minus_1, buffer_delay_length_minus_1, frame_width_bits_minus_1, frame_height_bits_minus_1, seq_force_screen_content_tools, BitDepth, color_primaries, transfer_characteristics, matrix_coefficients;
-    bool reduced_still_picture_header, seq_tier[33], decoder_model_info_present_flag, seq_choose_screen_content_tools, mono_chrome, color_range, color_description_present_flag, subsampling_x, subsampling_y;
+    bool reduced_still_picture_header, seq_tier[33], timing_info_present_flag, decoder_model_info_present_flag, seq_choose_screen_content_tools, mono_chrome, color_range, color_description_present_flag, subsampling_x, subsampling_y;
     BS_Begin();
     Get_S1 ( 3, seq_profile,                                    "seq_profile"); Param_Info1(Av1_seq_profile(seq_profile));
     Skip_SB(                                                    "still_picture");
@@ -243,7 +243,7 @@ void File_Av1::sequence_header()
     }
     else
     {
-        TEST_SB_SKIP(                                           "timing_info_present_flag");
+        TEST_SB_GET(timing_info_present_flag,                   "timing_info_present_flag");
             bool equal_picture_interval;
             Skip_S4(32,                                         "num_units_in_tick");
             Skip_S4(32,                                         "time_scale");
@@ -266,7 +266,7 @@ void File_Av1::sequence_header()
             Get_S1(5, seq_level_idx[i],                         "seq_level_idx[i]");
             if (seq_level_idx[i]>7)
                 Get_SB(seq_tier[i],                             "seq_tier[i]");
-            if (decoder_model_info_present_flag)
+            if (timing_info_present_flag && decoder_model_info_present_flag)
             {
                 TEST_SB_SKIP(                                   "decoder_model_present_for_this_op[i]");
                     Skip_S5(buffer_delay_length_minus_1+1,      "decoder_buffer_delay[op]");
@@ -548,7 +548,7 @@ std::string File_Av1::GOP_Detect (std::string PictureTypes)
 
             //Finding the longest string
             ZtringList List; List.Separator_Set(0, __T(" "));
-            List.Write(Ztring().From_Local(PictureTypes));
+            List.Write(Ztring().From_UTF8(PictureTypes));
             size_t MaxLength=0;
             size_t MaxLength_Pos=0;
             for (size_t Pos=0; Pos<List.size(); Pos++)

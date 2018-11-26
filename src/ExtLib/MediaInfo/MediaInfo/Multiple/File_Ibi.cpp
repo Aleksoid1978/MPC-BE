@@ -349,7 +349,7 @@ void File_Ibi::Ebml_DocType()
 
     //Parsing
     Ztring Data;
-    Get_Local(Element_Size, Data,                               "Data"); Element_Info1(Data);
+    Get_UTF8(Element_Size, Data,                                "Data"); Element_Info1(Data);
 
     //Filling
     FILLING_BEGIN();

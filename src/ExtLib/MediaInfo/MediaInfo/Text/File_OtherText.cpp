@@ -48,7 +48,11 @@ void File_OtherText::Read_Buffer_Continue()
     //Feed File and Lines
     File.From_UTF8((const char*)Buffer, Buffer_Size>65536?65536:Buffer_Size);
     if (File.empty())
-        File.From_Local((const char*)Buffer, Buffer_Size>65536?65536:Buffer_Size); // Trying from local code page
+        #ifdef WINDOWS
+        File.From_Local((const char*)Buffer, Buffer_Size>65536?65536:Buffer_Size);
+        #else //WINDOWS
+        File.From_ISO_8859_1((const char*)Buffer, Buffer_Size>65536?65536:Buffer_Size);
+        #endif //WINDOWS
     if (File.size()<0x100)
     {
         File.From_Unicode((wchar_t*)Buffer, 0, Buffer_Size/sizeof(wchar_t)); //Unicode with BOM

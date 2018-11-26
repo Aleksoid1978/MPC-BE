@@ -94,7 +94,7 @@ void File_VorbisCom::FileHeader_Parse()
     Ztring vendor_string;
     int32u vendor_length;
     Get_L4 (vendor_length,                                      "vendor_length");
-    Get_Local(vendor_length, vendor_string,                     "vendor_string");
+    Get_UTF8(vendor_length, vendor_string,                      "vendor_string");
     Get_L4 (user_comment_list_length,                           "user_comment_list_length");
 
     FILLING_BEGIN();
@@ -203,7 +203,7 @@ void File_VorbisCom::Data_Parse()
     if (Element_Size && comment.empty())
     {
         Element_Offset=0; //Retry
-        Get_Local(Element_Size, comment,                             "comment");
+        Get_ISO_8859_1(Element_Size, comment,                   "comment");
     }
     Element_Name(comment);
 
@@ -338,7 +338,7 @@ void File_VorbisCom::Data_Parse()
             }
             Fill(Stream_Menu, StreamPos_Last, Menu_Chapters_Pos_End, Count_Get(Stream_Menu, StreamPos_Last), 10, true);
         }
-        else                                Fill(Stream_General, 0, comment.SubString(__T(""), __T("=")).To_Local().c_str(), Value);
+        else                                Fill(Stream_General, 0, comment.SubString(__T(""), __T("=")).To_UTF8().c_str(), Value);
     FILLING_END();
 
     if (user_comment_list_length==0)

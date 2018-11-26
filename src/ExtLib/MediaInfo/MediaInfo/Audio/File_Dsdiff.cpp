@@ -768,7 +768,7 @@ void File_Dsdiff::DSD__PROP_LSCO()
             Ztring ChannelPositions2_New=Ztring().From_UTF8(DSDIFF_lsConfig_ChannelPositions2[lsConfig]);
             if (ChannelPositions2_New!=ChannelPositions2_Old)
                 Fill(Stream_Audio, 0, Audio_ChannelPositions_String2, ChannelPositions2_New);
-            Ztring ChannelLayout_New; ChannelLayout_New.From_Local(DSDIFF_lsConfig_ChannelLayout[lsConfig]);
+            Ztring ChannelLayout_New; ChannelLayout_New.From_UTF8(DSDIFF_lsConfig_ChannelLayout[lsConfig]);
             const Ztring& ChannelLayout_Old=Retrieve_Const(Stream_Audio, 0, Audio_ChannelLayout);
             if (ChannelLayout_New!=ChannelLayout_Old)
                 Fill(Stream_Audio, 0, Audio_ChannelLayout, ChannelLayout_New);

@@ -850,7 +850,7 @@ void File_Gxf::map()
                 case 0x40 : //Media file name of material
                             {
                             Ztring MediaFileName;
-                            Get_Local(DataLength, MediaFileName, "Content");
+                            Get_UTF8(DataLength, MediaFileName, "Content");
                             Fill(Stream_General, 0, General_Title, MediaFileName, true);
                             }
                             break;
@@ -1155,7 +1155,7 @@ void File_Gxf::map()
                 {
                     case 0x4C : //Media name
                                 {
-                                    Get_Local(DataLength, Streams[TrackID].MediaName, "Content");
+                                    Get_UTF8(DataLength, Streams[TrackID].MediaName, "Content");
                                 }
                                 break;
                     case 0x4D : //Auxiliary Information

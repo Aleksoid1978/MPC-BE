@@ -1637,7 +1637,7 @@ void File_Flv::meta_SCRIPTDATAVALUE(const std::string &StringData)
                 if (Value_Size)
                 {
                     Ztring Value;
-                    Get_Local(Value_Size, Value,                "Value");
+                    Get_UTF8(Value_Size, Value,                 "Value");
                     if (Value==__T("unknown")) Value.clear();
                     Element_Info1C((!Value.empty()), Value);
                     Fill(Stream_General, 0, StringData.c_str(), Value, true);

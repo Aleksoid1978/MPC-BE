@@ -151,7 +151,7 @@ void File_Aac::Streams_Update()
     if (Frame_Count)
     {
         if (Mode==Mode_ADTS)
-            Infos["BitRate_Mode"].From_Local(adts_buffer_fullness_Is7FF?"VBR":"CBR");
+            Infos["BitRate_Mode"].From_UTF8(adts_buffer_fullness_Is7FF?"VBR":"CBR");
 
         #if MEDIAINFO_ADVANCED
             switch(Mode)

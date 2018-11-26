@@ -369,8 +369,8 @@ void File_DvDif::Streams_Fill()
         }
         else
         {
-            Fill(Stream_Video, 0, Video_ScanType, Interlaced?"Interlaced":"Progressive");
-            Fill(Stream_Video, 0, Video_Interlacement, Interlaced?"Interlaced":"PFF");
+            Fill(Stream_Video, 0, Video_ScanType, "Progressive");
+            Fill(Stream_Video, 0, Video_Interlacement, "PFF");
         }
         switch (aspect)
         {

@@ -741,8 +741,7 @@ void File__ReferenceFilesHelper::ParseReferences()
             {
                 if ((*ReferenceTemp)->State<10000)
                 {
-                    if ((*ReferenceTemp)->MI)
-                        (*ReferenceTemp)->State=(*ReferenceTemp)->MI->State_Get();
+                    (*ReferenceTemp)->State=(*ReferenceTemp)->MI->State_Get();
                     if ((*ReferenceTemp)->State && (*ReferenceTemp)->MI->Config.File_Size!=(int64u)-1)
                         FileSize_Parsed+=(int64u)((*ReferenceTemp)->MI->Config.File_Size*(((float)(*ReferenceTemp)->State)/10000));
                 }

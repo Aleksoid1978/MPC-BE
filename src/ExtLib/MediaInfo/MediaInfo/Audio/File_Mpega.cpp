@@ -495,12 +495,18 @@ void File_Mpega::Streams_Finish()
     Fill(Stream_Audio, 0, Audio_BitRate_Mode, BitRate_Mode, true);
 
     //Encoding library
-    if (!Encoded_Library.empty())
-        Fill(Stream_General, 0, General_Encoded_Library, Encoded_Library, true);
     if (Encoded_Library.empty())
         Encoded_Library_Guess();
-    Fill(Stream_Audio, 0, Audio_Encoded_Library, Encoded_Library, true);
-    Fill(Stream_Audio, 0, Audio_Encoded_Library_Settings, Encoded_Library_Settings, true);
+    if (!Encoded_Library.empty())
+    {
+        Ztring Encoded_LibraryZ;
+        Encoded_LibraryZ.From_UTF8(Encoded_Library.c_str());
+        if (Encoded_LibraryZ.empty())
+            Encoded_LibraryZ.From_ISO_8859_1(Encoded_Library.c_str());
+        Fill(Stream_General, 0, General_Encoded_Library, Encoded_LibraryZ, true);
+        Fill(Stream_Audio, 0, Audio_Encoded_Library, Encoded_LibraryZ, true);
+        Fill(Stream_Audio, 0, Audio_Encoded_Library_Settings, Encoded_Library_Settings, true);
+    }
 
     //Surround
     if (Surround_Frames>=Frame_Count*0.9)
@@ -1285,10 +1291,10 @@ bool File_Mpega::Header_Xing()
                 Skip_XX(100,                                    "TOC");
             if (Scale)
                 Get_B4 (Xing_Scale,                             "Scale");
-            Ztring Lib;
+            string Lib;
             Element_End0();
-            Peek_Local(4, Lib);
-            if (Lame || Lib==__T("LAME") || Lib==__T("GOGO") || Lib==__T("L3.9"))
+            Peek_String(4, Lib);
+            if (Lame || Lib=="LAME" || Lib=="GOGO" || Lib=="L3.9")
                 Header_Encoders_Lame();
 
             if (CC4(Xing_Header)==CC4("Info"))
@@ -1370,12 +1376,10 @@ bool File_Mpega::Header_Encoders()
         Element_Info1("With tag (Lame)");
         Element_Offset=Buffer_Pos;
         if (Element_Offset+20<=Element_Size)
-            Get_Local(20, Encoded_Library,                      "Encoded_Library");
+            Get_String (20, Encoded_Library,                    "Encoded_Library");
         else
-            Get_Local( 8, Encoded_Library,                      "Encoded_Library");
-        Encoded_Library.Trim(__T('A'));
-        Encoded_Library.Trim(__T('U'));
-        Encoded_Library.Trim(__T('\xAA'));
+            Get_String ( 8, Encoded_Library,                    "Encoded_Library");
+        Encoded_Library.erase(Encoded_Library.find_last_not_of("AU\xAA")+1);
         Element_Offset=0; //Reseting it
         return true;
     }
@@ -1386,7 +1390,7 @@ bool File_Mpega::Header_Encoders()
     {
         Element_Info1("With tag (RCA)");
         Encoded_Library="RCA ";
-        Encoded_Library+=Ztring((const char*)(Buffer+Buffer_Offset+18), 5);
+        Encoded_Library+=string((const char*)(Buffer+Buffer_Offset+18), 5);
         return true;
     }
 
@@ -1396,7 +1400,7 @@ bool File_Mpega::Header_Encoders()
     {
         Element_Info1("With tag (Thomson)");
         Encoded_Library="Thomson ";
-        Encoded_Library+=Ztring((const char*)(Buffer+Buffer_Offset+22), 6);
+        Encoded_Library+=string((const char*)(Buffer+Buffer_Offset+22), 6);
         return true;
     }
 
@@ -1446,7 +1450,7 @@ void File_Mpega::Header_Encoders_Lame()
         int8u Flags, lowpass, EncodingFlags, BitRate, StereoMode;
         Param_Info1(Ztring(__T("V "))+Ztring::ToZtring((100-Xing_Scale)/10));
         Param_Info1(Ztring(__T("q "))+Ztring::ToZtring((100-Xing_Scale)%10));
-        Get_Local(9, Encoded_Library,                           "Encoded_Library");
+        Get_String (9, Encoded_Library,                         "Encoded_Library");
         Get_B1 (Flags,                                          "Flags");
         if ((Flags&0xF0)<=0x20) //Rev. 0 or 1, http://gabriel.mp3-tech.org/mp3infotag.html and Rev. 2 was seen.
         {
@@ -1536,7 +1540,7 @@ void File_Mpega::Header_Encoders_Lame()
         FILLING_END();
     }
     else
-        Get_Local(20, Encoded_Library,                          "Encoded_Library");
+        Get_String (20, Encoded_Library,                        "Encoded_Library");
 }
 
 void File_Mpega::Encoded_Library_Guess()

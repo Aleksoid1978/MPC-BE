@@ -133,7 +133,11 @@ bool File_SubRip::FileHeader_Begin()
     Temp.From_UTF8((const char*)Buffer+(HasBOM?3:0), (Buffer_Size>65536?65536:Buffer_Size)-(HasBOM?3:0));
     if (Temp.empty())
     {
+        #ifdef WINDOWS
         Temp.From_Local((const char*)Buffer+(HasBOM?3:0), (Buffer_Size>65536?65536:Buffer_Size)-(HasBOM?3:0)); // Trying from local code page
+        #else //WINDOWS
+        Temp.From_ISO_8859_1((const char*)Buffer+(HasBOM?3:0), (Buffer_Size>65536?65536:Buffer_Size)-(HasBOM?3:0));
+        #endif //WINDOWS
         IsLocal=true;
     }
     Temp.FindAndReplace(__T("\r\n"), __T("\n"), 0, Ztring_Recursive);
@@ -183,7 +187,11 @@ bool File_SubRip::FileHeader_Begin()
     }
 
     if (IsLocal)
+        #ifdef WINDOWS
         Temp.From_Local((const char*)Buffer+(HasBOM?3:0), Buffer_Size-(HasBOM?3:0));
+        #else //WINDOWS
+        Temp.From_ISO_8859_1((const char*)Buffer+(HasBOM?3:0), Buffer_Size-(HasBOM?3:0));
+        #endif //WINDOWS
     else
         Temp.From_UTF8((const char*)Buffer+(HasBOM?3:0), Buffer_Size-(HasBOM?3:0));
     Temp.FindAndReplace(__T("\r\n"), __T("\n"), 0, Ztring_Recursive);

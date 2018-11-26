@@ -488,7 +488,7 @@ void File_Tiff::Data_Parse_Fill()
     if (Info!=Infos.end())
     {
         Ztring ColorSpace=Retrieve(Stream_Image, StreamPos_Last, Image_ColorSpace);
-        ColorSpace+=Ztring().From_Local(Tiff_ExtraSamples_ColorSpace(Info->second.Read().To_int32u()));
+        ColorSpace+=Ztring().From_UTF8(Tiff_ExtraSamples_ColorSpace(Info->second.Read().To_int32u()));
         Fill(Stream_Image, StreamPos_Last, Image_ColorSpace, ColorSpace, true);
     }
 }

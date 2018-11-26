@@ -2325,7 +2325,7 @@ void File_Mpeg_Psi::ATSC_multiple_string_structure(Ztring &Value, const char* Na
                 case 0x00 :
                             switch (mode)
                             {
-                                case 0x00 : Get_Local(number_bytes, segment, "string"); break;
+                                case 0x00 : Get_UTF8(number_bytes, segment, "string"); break;
                                 case 0x3F : Get_UTF16B(number_bytes, segment, "string"); break;
                                 default   : Skip_XX(number_bytes, "Unknown");
                                             segment=__T("(Encoded with mode=0x")+Ztring::ToZtring(mode, 16)+__T(')');

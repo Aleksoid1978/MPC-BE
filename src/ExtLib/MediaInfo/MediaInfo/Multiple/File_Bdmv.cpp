@@ -1158,7 +1158,7 @@ void File_Bdmv::Mpls_PlayList_PlayItem()
     int16u length;
     Get_B2 (length,                                         "length");
     int64u End=Element_Offset+length;
-    Get_Local (5, Clip_Information_file_name,               "Clip_Information_file_name"); Element_Info1(Clip_Information_file_name);
+    Get_UTF8 (5, Clip_Information_file_name,                "Clip_Information_file_name"); Element_Info1(Clip_Information_file_name);
     Skip_Local(4,                                           "Clip_codec_identifier");
     Skip_B2(                                                "unknown");
     Skip_B1(                                                "Unknown");
@@ -1258,7 +1258,7 @@ void File_Bdmv::Mpls_PlayList_PlayItem_STN_table()
             case Stream_Text  : Mpls_PlayList_PlayItem_STN_table_Text() ; break;
             default           : StreamKind_Last=Stream_Max;
         }
-        Get_Local(3, language,                              "language"); Element_Info1(language);
+        Get_UTF8(3, language,                               "language"); Element_Info1(language);
 
         if (IDs_End-Element_Offset)
             Skip_XX(IDs_End-Element_Offset,                 "unknown");
@@ -1349,7 +1349,7 @@ void File_Bdmv::Mpls_PlayList_SubPlayItem(int8u SubPath_type, int16u Pos)
     int16u length;
     Get_B2 (length,                                             "length");
     int64u End=Element_Offset+length;
-    Get_Local (5, Clip_Information_file_name,                   "Clip_Information_file_name"); Element_Info1(Clip_Information_file_name);
+    Get_UTF8 (5, Clip_Information_file_name,                    "Clip_Information_file_name"); Element_Info1(Clip_Information_file_name);
     Skip_Local(4,                                               "Clip_codec_identifier");
     Skip_B4(                                                    "unknown");
     Skip_B1(                                                    "unknown");
@@ -1594,7 +1594,7 @@ void File_Bdmv::StreamCodingInfo_Audio()
     Get_S1 (4, Channels,                                        "Channel layout"); Param_Info1(Clpi_Audio_Channels[Channels]);
     Get_S1 (4, SamplingRate,                                    "Sampling Rate"); Param_Info1(Clpi_Audio_SamplingRate[SamplingRate]);
     BS_End();
-    Get_Local(3, Language,                                      "Language"); Element_Info1(Language);
+    Get_UTF8(3, Language,                                       "Language"); Element_Info1(Language);
 
     FILLING_BEGIN();
         if (StreamKind_Last==Stream_Max)
@@ -1618,7 +1618,7 @@ void File_Bdmv::StreamCodingInfo_Text()
     Ztring Language;
     if (stream_type==0x92) //Subtitle
         Skip_B1(                                                "Unknown");
-    Get_Local(3, Language,                                      "Language"); Element_Info1(Language);
+    Get_UTF8(3, Language,                                       "Language"); Element_Info1(Language);
 
     FILLING_BEGIN();
         if (StreamKind_Last==Stream_Max)
