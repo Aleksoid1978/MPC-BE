@@ -269,11 +269,27 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		bool bVideoFound = false;
 		bool bAudioFound = false;
 
+		time_t start_time = 0;
+		time_t end_time   = 0;
+
+
 		DHAVHeader hdr;
 		std::vector<BYTE> pData;
 		while (DHAVReadHeader(hdr, true) && m_pFile->GetPos() <= MEGABYTE) {
 			if (hdr.type == 0xfd) {
 				if (hdr.video.codec && !bVideoFound) {
+					if (hdr.date) {
+						tm time = {};
+						time.tm_sec  =   hdr.date        & 0x3F;
+						time.tm_min  =  (hdr.date >>  6) & 0x3F;
+						time.tm_hour =  (hdr.date >> 12) & 0x1F;
+						time.tm_mday =  (hdr.date >> 17) & 0x1F;
+						time.tm_mon  =  (hdr.date >> 22) & 0x0F;
+						time.tm_year = ((hdr.date >> 26) & 0x3F) + 2000 - 1900;
+
+						start_time = mktime(&time);
+					}
+
 					m_AvgTimePerFrame = UNITS / (hdr.video.frame_rate ? hdr.video.frame_rate : 25);
 
 					m_startpos = m_pFile->GetPos() - DHAV_HeaderSize - hdr.ext_size;
@@ -418,6 +434,35 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 		m_rtNewStart = m_rtCurrent = 0;
 		m_rtNewStop = m_rtStop = m_rtDuration = 0;
+
+		// find end PTS
+		if (start_time > 0) {
+			m_pFile->Seek(m_endpos - std::min((__int64)MEGABYTE, m_endpos));
+
+			while (DHAVReadHeader(hdr)) {
+				if (DHAV_VIDEO(hdr) && hdr.date) {
+					tm time = {};
+					time.tm_sec  =   hdr.date        & 0x3F;
+					time.tm_min  =  (hdr.date >>  6) & 0x3F;
+					time.tm_hour =  (hdr.date >> 12) & 0x1F;
+					time.tm_mday =  (hdr.date >> 17) & 0x1F;
+					time.tm_mon  =  (hdr.date >> 22) & 0x0F;
+					time.tm_year = ((hdr.date >> 26) & 0x3F) + 2000 - 1900;
+
+					end_time = mktime(&time);
+				}
+
+				m_pFile->Skip(hdr.size + DHAV_FooterSize);
+			}
+
+			if (end_time > start_time) {
+				const auto seconds = difftime(end_time, start_time);
+				const auto duration = (REFERENCE_TIME)seconds * UNITS;
+				if (duration > 0) {
+					m_rtNewStop = m_rtStop = m_rtDuration = duration;
+				}
+			}
+		}
 	}
 
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
@@ -435,8 +480,17 @@ bool CDVRSplitterFilter::DemuxInit()
 #define CalcPos(rt) (llMulDiv(rt, len, m_rtDuration, 0))
 void CDVRSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
-	if (rt <= 0 || m_rtDuration <= 0 || !m_bHXVS) {
+	m_rt_Seek = rt;
+
+	if (rt <= 0 || m_rtDuration <= 0) {
 		m_pFile->Seek(m_startpos);
+		return;
+	}
+
+	if (m_bDHAV) {
+		const auto len = m_endpos - m_startpos;
+		const auto seekpos = CalcPos(rt);
+		m_pFile->Seek(seekpos);
 		return;
 	}
 
@@ -556,8 +610,8 @@ bool CDVRSplitterFilter::DemuxLoop()
 		WORD video_pts_prev = WORD_MAX;
 		WORD audio_pts_prev = WORD_MAX;
 
-		REFERENCE_TIME video_rt = 0;
-		REFERENCE_TIME audio_rt = 0;
+		REFERENCE_TIME video_rt = m_rt_Seek;
+		REFERENCE_TIME audio_rt = m_rt_Seek;
 
 		while (SUCCEEDED(hr) && !CheckRequest(nullptr) && m_pFile->GetRemaining()) {
 			DHAVHeader hdr;
