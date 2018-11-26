@@ -334,7 +334,7 @@ void File_Aac::sbr_extension_data(size_t End, int8u id_aac, bool crc_flag)
             }
             Infos["Format_Settings"]=__T("Implicit");
             Infos["Format_Settings_SBR"]=__T("Yes (Implicit)");
-            Infos["Codec"]=Ztring().From_Local(Aac_audioObjectType(audioObjectType))+__T("-SBR");
+            Infos["Codec"]=Ztring().From_UTF8(Aac_audioObjectType(audioObjectType))+__T("-SBR");
 
             if (Frame_Count_Valid<32)
                 Frame_Count_Valid=32; //We need to find the SBR header

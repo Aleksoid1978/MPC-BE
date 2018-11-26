@@ -609,7 +609,12 @@ void EbuCore_Transform_Video(Node* Parent, MediaInfo_Internal &MI, size_t Stream
     //if (!MI.Get(Stream_Video, StreamPos, Video_ID).empty())
     //    ToReturn+=__T(" videoFormatId=\"")+MI.Get(Stream_Video, StreamPos, Video_ID)+__T("\"");
     Child->Add_Attribute_IfNotEmpty(MI, Stream_Video, StreamPos, Video_Format, "videoFormatName");
-    Child->Add_Attribute_IfNotEmpty(MI, Stream_Video, StreamPos, Video_Format_Version, "videoFormatVersionId");
+    Ztring Format_Version=MI.Get(Stream_Video, StreamPos, Video_Format_Version);
+    if (!Format_Version.empty())
+    {
+        Format_Version.FindAndReplace(__T("Version "), Ztring());
+        Child->Add_Attribute("videoFormatVersionId", Format_Version);
+    }
 
     //width
     if (!MI.Get(Stream_Video, StreamPos, Video_Width).empty())
@@ -679,9 +684,14 @@ void EbuCore_Transform_Video(Node* Parent, MediaInfo_Internal &MI, size_t Stream
         }
         else
             typeLabel=MI.Get(Stream_Video, StreamPos, Video_Format_Profile);
-        Node* Child2=Child->Add_Child("ebucore:videoEncoding", "", "typeLabel", typeLabel, true);
-        if (!TermID_String.empty())
-            Child2->Add_Attribute("typeLink", __T("http://www.ebu.ch/metadata/cs/ebu_VideoCompressionCodeCS.xml#")+TermID_String);
+        if (!typeLabel.empty() || !TermID_String.empty())
+        {
+            Node* Child2=Child->Add_Child("ebucore:videoEncoding", string(), true);
+            if (!typeLabel.empty())
+                Child2->Add_Attribute("typeLabel", typeLabel);
+            if (!TermID_String.empty())
+                Child2->Add_Attribute("typeLink", __T("http://www.ebu.ch/metadata/cs/ebu_VideoCompressionCodeCS.xml#")+TermID_String);
+        }
     }
 
     //codec
@@ -772,6 +782,9 @@ void EbuCore_Transform_Video(Node* Parent, MediaInfo_Internal &MI, size_t Stream
     //technicalAttributeString - StreamSize
     Add_TechnicalAttributeInteger_IfNotEmpty(MI, Stream_Video, StreamPos, Video_StreamSize, Child, "StreamSize", Export_EbuCore::Version_Max, Version>=Export_EbuCore::Version_1_6?"byte":NULL);
 
+    //technicalAttributeString - Compression_Mode
+    Add_TechnicalAttributeInteger_IfNotEmpty(MI, Stream_Video, StreamPos, Video_Compression_Mode, Child, "Compression_Mode");
+
     //technicalAttributeString - BitDepth
     Add_TechnicalAttributeInteger_IfNotEmpty(MI, Stream_Video, StreamPos, Video_BitDepth, Child, "BitDepth", Export_EbuCore::Version_Max, Version>=Export_EbuCore::Version_1_6?"bit":NULL);
 
@@ -780,6 +793,9 @@ void EbuCore_Transform_Video(Node* Parent, MediaInfo_Internal &MI, size_t Stream
 
     //technicalAttributeString
     Add_TechnicalAttributeString_IfNotEmpty(MI, Stream_Other, As11_UkDpp_Pos, "FpaVersion", Child, "FPAVersion");
+
+    //technicalAttributeString - Format_Settings_GOP
+    Add_TechnicalAttributeString_IfNotEmpty(MI, Stream_Video, StreamPos, Video_Format_Settings_GOP, Child, "GOP");
 
     //technicalAttributeBoolean - Format_Settings_CABAC
     if (MI.Get(Stream_Video, StreamPos, Video_Format)==__T("AVC"))
@@ -794,6 +810,24 @@ void EbuCore_Transform_Video(Node* Parent, MediaInfo_Internal &MI, size_t Stream
 
     //technicalAttributeString
     Child->Add_Child_IfNotEmpty(MI, Stream_Other, As11_UkDpp_Pos, "VideoComments", "ebucore:comment", "typeLabel", std::string("VideoComments"), true);
+
+    //technicalAttributeString - Encoded_Library
+    Add_TechnicalAttributeString_IfNotEmpty(MI, Stream_Video, StreamPos, "Encoded_Library/String", Child, "WritingLibrary");
+
+    //technicalAttributeString - Default
+    Add_TechnicalAttributeString_IfNotEmpty(MI, Stream_Video, StreamPos, "Default", Child, "Default");
+
+    //technicalAttributeString - Forced
+    Add_TechnicalAttributeString_IfNotEmpty(MI, Stream_Video, StreamPos, "Forced", Child, "Forced");
+
+    //technicalAttributeString - coder_type
+    Add_TechnicalAttributeString_IfNotEmpty(MI, Stream_Video, StreamPos, "coder_type", Child, "coder_type");
+
+    //technicalAttributeString - ErrorDetectionType
+    Add_TechnicalAttributeString_IfNotEmpty(MI, Stream_Video, StreamPos, "ErrorDetectionType", Child, "ErrorDetectionType");
+
+    //technicalAttributeString - MaxSlicesCount
+    Add_TechnicalAttributeString_IfNotEmpty(MI, Stream_Video, StreamPos, "MaxSlicesCount", Child, "MaxSlicesCount");
 }
 
 //---------------------------------------------------------------------------
@@ -812,7 +846,12 @@ void EbuCore_Transform_Audio(Node* Parent, MediaInfo_Internal &MI, size_t Stream
 
     Node* Child=Parent->Add_Child("ebucore:audioFormat", true);
     Child->Add_Attribute_IfNotEmpty(MI, Stream_Audio, StreamPos, Audio_Format, "audioFormatName");
-    Child->Add_Attribute_IfNotEmpty(MI, Stream_Audio, StreamPos, Audio_Format_Version, "audioFormatVersionId");
+    Ztring Format_Version=MI.Get(Stream_Audio, StreamPos, Audio_Format_Version);
+    if (!Format_Version.empty())
+    {
+        Format_Version.FindAndReplace(__T("Version "), Ztring());
+        Child->Add_Attribute("audioFormatVersionId", Format_Version);
+    }
 
     //audioEncoding
     //if (!MI.Get(Stream_Audio, StreamPos, Audio_Format_Profile).empty())
@@ -922,7 +961,12 @@ void EbuCore_Transform_Text(Node* Parent, MediaInfo_Internal &MI, size_t StreamP
 
     //if (!MI.Get(Stream_Text, StreamPos, Text_ID).empty())
     //    ToReturn+=__T(" dataFormatId=\"")+MI.Get(Stream_Text, StreamPos, Text_ID)+__T("\"");
-    Child->Add_Attribute_IfNotEmpty(MI, Stream_Text, StreamPos, Text_Format_Version, "dataFormatVersionId");
+    Ztring Format_Version=MI.Get(Stream_Text, StreamPos, Text_Format_Version);
+    if (!Format_Version.empty())
+    {
+        Format_Version.FindAndReplace(__T("Version "), Ztring());
+        Child->Add_Attribute("dataFormatVersionId", Format_Version);
+    }
     Child->Add_Attribute_IfNotEmpty(MI, Stream_Text, StreamPos, Text_Format, "dataFormatName");
     Child->Add_Attribute_IfNotEmpty(MI, Stream_Text, StreamPos, Text_ID, "dataTrackId");
 
@@ -1560,9 +1604,15 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version, acquis
     //format - containerFormat
     Node* Node_Format_ContainerFormat=Node_Format->Add_Child("ebucore:containerFormat", true);
     Node_Format_ContainerFormat->Add_Attribute_IfNotEmpty(MI, Stream_General, 0, General_Format, Version>=Version_1_6?"containerFormatName":"formatLabel");
-    Node_Format_ContainerFormat->Add_Attribute_IfNotEmpty(MI, Stream_General, 0, General_ID, "containerFormatId");
     if (Version >= Version_1_6)
     {
+        Ztring Version=MI.Get(Stream_General, 0, General_Format_Version);
+        if (!Version.empty())
+        {
+            Version.FindAndReplace(__T("Version "), Ztring());
+            Node_Format_ContainerFormat->Add_Attribute("containerFormatVersionId", Version);
+        }
+        Node_Format_ContainerFormat->Add_Attribute_IfNotEmpty(MI, Stream_General, 0, MI.Get(Stream_General, 0, General_UniqueID).empty()?General_ID:General_UniqueID, "containerFormatId");
         Node* Node_Format_ContainerFormat_ContainerEncoding=Node_Format_ContainerFormat->Add_Child("ebucore:containerEncoding", true);
         Node_Format_ContainerFormat_ContainerEncoding->Add_Attribute_IfNotEmpty(MI, Stream_General, 0, General_Format, "formatLabel");
         //if (Version>=Version_1_6 && !MI.Get(Stream_General, 0, General_Format_Profile).empty())
@@ -1572,7 +1622,7 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version, acquis
     {
         Node* Child=Node_Format_ContainerFormat->Add_Child("ebucore:codec", true);
         if (!MI.Get(Stream_General, 0, General_CodecID).empty())
-        {
+        {   
             Node* Child2=Child->Add_Child("ebucore:codecIdentifier", true);
             Child2->Add_Child("dc:identifier", MI.Get(Stream_General, 0, General_CodecID), true);
         }
@@ -1596,6 +1646,12 @@ Ztring Export_EbuCore::Transform(MediaInfo_Internal &MI, version Version, acquis
 
     //format - containerFormat - technicalAttributeString - Encoded_Library
     Add_TechnicalAttributeString_IfNotEmpty(MI, Stream_General, 0, "Encoded_Library/String", Node_Format_ContainerFormat, "WritingLibrary", Version);
+
+    //format - containerFormat - technicalAttributeString - ErrorDetectionType
+    Add_TechnicalAttributeString_IfNotEmpty(MI, Stream_General, 0, "ErrorDetectionType", Node_Format_ContainerFormat, "ErrorDetectionType", Version);
+
+    //format - containerFormat - technicalAttributeString - Attachments
+    Add_TechnicalAttributeString_IfNotEmpty(MI, Stream_General, 0, "Attachments", Node_Format_ContainerFormat, "Attachments", Version);
 
     //format - SigningPresent
     if (As11_UkDpp_Pos!=(size_t)-1 && !MI.Get(Stream_Other, As11_UkDpp_Pos, __T("SigningPresent")).empty())

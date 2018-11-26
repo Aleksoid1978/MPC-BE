@@ -91,7 +91,7 @@ void File_SmpteSt0302::Streams_Accept()
     // Raw PCM
     {
         File_Pcm* Pcm=new File_Pcm();
-        Pcm->Codec.From_Local("SMPTE ST 302");
+        Pcm->Codec.From_UTF8("SMPTE ST 302");
         Pcm->BitDepth=(4+bits_per_sample)*4;
         Pcm->Channels=(1+number_channels)*2;
         Pcm->SamplingRate=48000;

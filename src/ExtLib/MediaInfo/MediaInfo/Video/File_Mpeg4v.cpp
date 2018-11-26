@@ -1354,11 +1354,11 @@ void File_Mpeg4v::user_data_start()
         Library_End_Offset++;
 
     //Parsing
-    Ztring Temp;
+    string Temp;
     if (Library_Start_Offset>0)
         Skip_XX(Library_Start_Offset,                           "junk");
     if (Library_End_Offset-Library_Start_Offset)
-        Get_Local(Library_End_Offset-Library_Start_Offset, Temp,"data");
+        Get_String(Library_End_Offset-Library_Start_Offset, Temp,"data");
     if (Element_Offset<Element_Size)
         Skip_XX(Element_Size-Element_Offset,                    "junk");
 
@@ -1371,10 +1371,10 @@ void File_Mpeg4v::user_data_start()
     FILLING_BEGIN();
         if (Temp.size()>=4)
         {
-            if (Temp.find(__T("build"))==0)
-                Library+=Ztring(__T(" "))+Temp;
+            if (Temp.find("build")==0)
+                Library+=Ztring().From_UTF8(" "+Temp);
             else
-                Library=Temp;
+                Library.From_UTF8(Temp);
 
             //Library
             if (Library.find(__T("DivX50"))==0)
@@ -1433,7 +1433,7 @@ void File_Mpeg4v::user_data_start_SNC()
 
     //Parsing
     Ztring Value;
-    Get_Local(Element_Size, Value,                              "Value");
+    Get_UTF8(Element_Size, Value,                               "Value");
     ZtringListList List;
     List.Separator_Set(0, __T("\r\n"));
     List.Separator_Set(1, __T(": "));

@@ -800,6 +800,9 @@ protected :
         int32u SubSampling_Horizontal;
         int32u SubSampling_Vertical;
         int32u ChannelCount;
+        int32u MinRefLevel;
+        int32u MaxRefLevel;
+        int32u ColorRange;
         int128u ChannelAssignment;
         std::map<std::string, Ztring> Infos;
         int16u BlockAlign;
@@ -871,6 +874,9 @@ protected :
             Height_Display_Offset=(int32u)-1;
             SubSampling_Horizontal=(int32u)-1;
             SubSampling_Vertical=(int32u)-1;
+            MinRefLevel=(int32u)-1;
+            MaxRefLevel=(int32u)-1;
+            ColorRange =(int32u)-1;
             ChannelCount=(int32u)-1;
             ChannelAssignment.hi=(int64u)-1;
             ChannelAssignment.lo=(int64u)-1;
@@ -1153,6 +1159,7 @@ protected :
     //Helpers
     int32u Vector(int32u ExpectedLength=(int32u)-1);
     void Subsampling_Compute(descriptors::iterator Descriptor);
+    void ColorLevels_Compute(descriptors::iterator Descriptor, bool Force=false, int32u BitDepth=(int32u)-1);
     #if defined(MEDIAINFO_REFERENCES_YES)
         void Locators_CleanUp();
         void Locators_Test();

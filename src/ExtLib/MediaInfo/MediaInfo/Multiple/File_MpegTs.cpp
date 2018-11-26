@@ -1061,7 +1061,7 @@ void File_MpegTs::Streams_Update_EPG()
                 //Filling
                 Fill(Stream_General, 0, General_EPG_Positions_Begin, Count_Get(Stream_General, 0), 10, true);
                 for (std::map<Ztring, Ztring>::iterator EPG=EPGs.begin(); EPG!=EPGs.end(); ++EPG)
-                    Fill(Stream_General, 0, EPG->first.To_Local().c_str(), EPG->second, true);
+                    Fill(Stream_General, 0, EPG->first.To_UTF8().c_str(), EPG->second, true);
                 Fill(Stream_General, 0, General_EPG_Positions_End, Count_Get(Stream_General, 0), 10, true);
             }
         }

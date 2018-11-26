@@ -391,7 +391,7 @@ void File_Mpeg4::Streams_Finish()
                 }
                 if (TempString.size())
                 {
-                    Fill(StreamKind_Last, StreamPos_Last, "Subtitles For", TempString.To_Local().c_str());
+                    Fill(StreamKind_Last, StreamPos_Last, "Subtitles For", TempString.To_UTF8().c_str());
                     TempString.clear();
                 }
             }
@@ -424,7 +424,7 @@ void File_Mpeg4::Streams_Finish()
                             TempString.append(Ztring().From_Number(*TrackID));
                         }
                     }
-                    Fill(StreamKind_Last, StreamPos_Last, "Default", TempString.size()?TempString.To_Local().c_str():"No");
+                    Fill(StreamKind_Last, StreamPos_Last, "Default", TempString.size()?TempString.To_UTF8().c_str():"No");
                     TempString.clear();
                 }
             }
@@ -443,7 +443,7 @@ void File_Mpeg4::Streams_Finish()
                             if (TempString.size()) TempString.append(__T(","));
                             TempString.append(Ztring().From_Number(*TrackID));
                         }
-                        Fill(StreamKind_Last, StreamPos_Last, "Full Alternative", TempString.To_Local().c_str());
+                        Fill(StreamKind_Last, StreamPos_Last, "Full Alternative", TempString.To_UTF8().c_str());
                         TempString.clear();
                     }
                 }
@@ -456,7 +456,7 @@ void File_Mpeg4::Streams_Finish()
                         if (TempString.size()) TempString.append(__T(","));
                         TempString.append(Ztring().From_Number(*TrackID));
                     }
-                    if (TempString.size()) Fill(StreamKind_Last, StreamPos_Last, "Forced Alternative", TempString.To_Local().c_str());
+                    if (TempString.size()) Fill(StreamKind_Last, StreamPos_Last, "Forced Alternative", TempString.To_UTF8().c_str());
                     TempString.clear();
                 }
             }
@@ -471,7 +471,7 @@ void File_Mpeg4::Streams_Finish()
                     }
                     if (TempString.size())
                     {
-                        Fill(StreamKind_Last, StreamPos_Last, "Fallback To", TempString.To_Local().c_str());
+                        Fill(StreamKind_Last, StreamPos_Last, "Fallback To", TempString.To_UTF8().c_str());
                         TempString.clear();
                     }
                 }
@@ -484,7 +484,7 @@ void File_Mpeg4::Streams_Finish()
                     }
                     if (TempString.size())
                     {
-                        Fill(StreamKind_Last, StreamPos_Last, "Fallback From", TempString.To_Local().c_str());
+                        Fill(StreamKind_Last, StreamPos_Last, "Fallback From", TempString.To_UTF8().c_str());
                         TempString.clear();
                     }
                 }
@@ -512,7 +512,7 @@ void File_Mpeg4::Streams_Finish()
                     }
                     if (TempString.size())
                     {
-                        Fill(StreamKind_Last, StreamPos_Last, "Subtitles", TempString.To_Local().c_str());
+                        Fill(StreamKind_Last, StreamPos_Last, "Subtitles", TempString.To_UTF8().c_str());
                         TempString.clear();
                     }
                 }
@@ -526,7 +526,7 @@ void File_Mpeg4::Streams_Finish()
                     }
                     if (TempString.size())
                     {
-                        Fill(StreamKind_Last, StreamPos_Last, "Closed Captions", TempString.To_Local().c_str());
+                        Fill(StreamKind_Last, StreamPos_Last, "Closed Captions", TempString.To_UTF8().c_str());
                         TempString.clear();
                     }
             }
@@ -539,7 +539,7 @@ void File_Mpeg4::Streams_Finish()
                     }
                     if (TempString.size())
                     {
-                        Fill(StreamKind_Last, StreamPos_Last, "Closed Captions For", TempString.To_Local().c_str());
+                        Fill(StreamKind_Last, StreamPos_Last, "Closed Captions For", TempString.To_UTF8().c_str());
                         TempString.clear();
                     }
             }
@@ -552,7 +552,7 @@ void File_Mpeg4::Streams_Finish()
                 }
                 if (TempString.size())
                 {
-                    Fill(StreamKind_Last, StreamPos_Last, "Menus", TempString.To_Local().c_str());
+                    Fill(StreamKind_Last, StreamPos_Last, "Menus", TempString.To_UTF8().c_str());
                     TempString.clear();
                 }
             }
@@ -569,7 +569,7 @@ void File_Mpeg4::Streams_Finish()
             }
             if (TempString.size())
             {
-                Fill(StreamKind_Last, StreamPos_Last, "Menu For", TempString.To_Local().c_str());
+                Fill(StreamKind_Last, StreamPos_Last, "Menu For", TempString.To_UTF8().c_str());
                 TempString.clear();
             }
         }
@@ -859,7 +859,7 @@ void File_Mpeg4::Streams_Finish()
                             if (Retrieve(StreamKind_Last, StreamPos_Last, Pos).empty())
                                 Fill(StreamKind_Last, StreamPos_Last, Pos, StreamSave[Pos]);
                         for (size_t Pos=0; Pos<StreamMoreSave.size(); Pos++)
-                            Fill(StreamKind_Last, StreamPos_Last, StreamMoreSave(Pos, 0).To_Local().c_str(), StreamMoreSave(Pos, 1));
+                            Fill(StreamKind_Last, StreamPos_Last, StreamMoreSave(Pos, 0).To_UTF8().c_str(), StreamMoreSave(Pos, 1));
                     }
                     Ztring LawRating=Temp->second.Parsers[0]->Retrieve(Stream_General, 0, General_LawRating);
                     if (!LawRating.empty())
@@ -911,7 +911,7 @@ void File_Mpeg4::Streams_Finish()
                                 if (Retrieve(StreamKind_Last, StreamPos_Last, Pos).empty())
                                     Fill(StreamKind_Last, StreamPos_Last, Pos, StreamSave[Pos]);
                             for (size_t Pos=0; Pos<StreamMoreSave.size(); Pos++)
-                                Fill(StreamKind_Last, StreamPos_Last, StreamMoreSave(Pos, 0).To_Local().c_str(), StreamMoreSave(Pos, 1));
+                                Fill(StreamKind_Last, StreamPos_Last, StreamMoreSave(Pos, 0).To_UTF8().c_str(), StreamMoreSave(Pos, 1));
                         }
                     }
 
@@ -2736,7 +2736,7 @@ File_Mpeg4::method File_Mpeg4::Metadata_Get(std::string &Parameter, int64u Meta)
     Value.append(1, (Char)((Meta&0x0000FF00)>> 8));
     Value.append(1, (Char)((Meta&0x000000FF)>> 0));
     if (MediaInfoLib::Config.CustomMapping_IsPresent(__T("MP4"), Value))
-        Parameter=MediaInfoLib::Config.CustomMapping_Get(__T("MP4"), Value).To_Local();
+        Parameter=MediaInfoLib::Config.CustomMapping_Get(__T("MP4"), Value).To_UTF8();
     
     //Cleanup of the parameter, removing anything not ANSI 7-bit
     for (size_t i=0; i<Parameter.size();)

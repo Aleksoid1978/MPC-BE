@@ -939,7 +939,7 @@ void File_Riff::AVI__goog()
     Element_Name("Google specific");
 
     //Filling
-    Fill(Stream_General, 0, General_Format, "Google Video", Unlimited, false, true);
+    Fill(Stream_General, 0, General_Format, "Google Video", Unlimited, true, true);
 }
 
 //---------------------------------------------------------------------------
@@ -956,7 +956,7 @@ void File_Riff::AVI__GMET()
     Element_Name("Google Metadatas");
 
     //Parsing
-    Ztring Value; Value.From_Local((const char*)(Buffer+Buffer_Offset+0), (size_t)Element_Size);
+    Ztring Value; Value.From_UTF8((const char*)(Buffer+Buffer_Offset+0), (size_t)Element_Size);
     ZtringListList List;
     List.Separator_Set(0, __T("\n"));
     List.Separator_Set(1, __T(":"));
@@ -1797,8 +1797,8 @@ void File_Riff::AVI__hdlr_strl_strf_vids()
 
     //Filling
     CodecID_Fill(Ztring().From_CC4(Compression), StreamKind_Last, StreamPos_Last, InfoCodecID_Format_Riff);
-    Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Codec), Ztring().From_CC4(Compression).To_Local().c_str()); //FormatTag, may be replaced by codec parser
-    Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Codec_CC), Ztring().From_CC4(Compression).To_Local().c_str()); //FormatTag
+    Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Codec), Ztring().From_CC4(Compression).To_UTF8().c_str()); //FormatTag, may be replaced by codec parser
+    Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_Codec_CC), Ztring().From_CC4(Compression).To_UTF8().c_str()); //FormatTag
     Fill(StreamKind_Last, StreamPos_Last, "Width", Width, 10, true);
     Fill(StreamKind_Last, StreamPos_Last, "Height", Height>=0x80000000?(-((int32s)Height)):Height, 10, true); // AVI can use negative height for raw to signal that it's coded top-down, not bottom-up
     if (Resolution==32 && Compression==0x74736363) //tscc
@@ -2334,10 +2334,10 @@ void File_Riff::AVI__INFO_xxxx()
         case Elements::AVI__INFO_ICNM : Parameter=General_DirectorOfPhotography; break;
         case Elements::AVI__INFO_ICNT : Parameter=General_Movie_Country; break;
         case Elements::AVI__INFO_ICOP : Parameter=General_Copyright; break;
-        case Elements::AVI__INFO_ICRD : Parameter=General_Recorded_Date; Value.Date_From_String(Value.To_Local().c_str()); break;
+        case Elements::AVI__INFO_ICRD : Parameter=General_Recorded_Date; Value.Date_From_String(Value.To_UTF8().c_str()); break;
         case Elements::AVI__INFO_ICRP : Parameter=General_Cropped; break;
         case Elements::AVI__INFO_IDIM : Parameter=General_Dimensions; break;
-        case Elements::AVI__INFO_IDIT : Parameter=General_Mastered_Date; Value.Date_From_String(Value.To_Local().c_str()); break;
+        case Elements::AVI__INFO_IDIT : Parameter=General_Mastered_Date; Value.Date_From_String(Value.To_UTF8().c_str()); break;
         case Elements::AVI__INFO_IDPI : Parameter=General_DotsPerInch; break;
         case Elements::AVI__INFO_IDST : Parameter=General_DistributedBy; break;
         case Elements::AVI__INFO_IEDT : Parameter=General_EditedBy; break;
@@ -2391,7 +2391,7 @@ void File_Riff::AVI__INFO_xxxx()
                                             if (Parameter!=(size_t)-1)
                                                 Fill(StreamKind, StreamPos, Parameter, Value);
                                             else
-                                                Fill(StreamKind, StreamPos, Ztring().From_CC4((int32u)Element_Code).To_Local().c_str(), Value, true);
+                                                Fill(StreamKind, StreamPos, Ztring().From_CC4((int32u)Element_Code).To_UTF8().c_str(), Value, true);
                                         }
     }
 }
@@ -2862,7 +2862,7 @@ void File_Riff::AVI__Tdat_tc_A()
 
     //Parsing
     Ztring Value;
-    Get_Local(Element_Size, Value,                              "Unknown");
+    Get_UTF8(Element_Size, Value,                               "Unknown");
 
     if (Value.find_first_not_of(__T("0123456789:;"))==string::npos)
         Tdat_tc_A=Value;
@@ -2875,7 +2875,7 @@ void File_Riff::AVI__Tdat_tc_O()
 
     //Parsing
     Ztring Value;
-    Get_Local(Element_Size, Value,                              "Unknown");
+    Get_UTF8(Element_Size, Value,                               "Unknown");
 
     if (Value.find_first_not_of(__T("0123456789:;"))==string::npos)
         Tdat_tc_O=Value;
@@ -2887,7 +2887,7 @@ void File_Riff::AVI__Tdat_rn_A()
     Element_Name("rn_A");
 
     //Parsing
-    Skip_Local(Element_Size,                                    "Unknown");
+    Skip_UTF8(Element_Size,                                     "Unknown");
 }
 
 //---------------------------------------------------------------------------
@@ -2896,7 +2896,7 @@ void File_Riff::AVI__Tdat_rn_O()
     Element_Name("rn_O");
 
     //Parsing
-    Skip_Local(Element_Size,                                    "Unknown");
+    Skip_UTF8(Element_Size,                                     "Unknown");
 }
 
 //---------------------------------------------------------------------------
@@ -3250,7 +3250,7 @@ void File_Riff::QLCM_fmt_()
     Get_L1 (minor,                                              "minor");
     Get_GUID(codec_guid,                                        "codec-guid");
     Get_L2 (codec_version,                                      "codec-version");
-    Get_Local(80, codec_name,                                   "codec-name");
+    Get_UTF8(80, codec_name,                                    "codec-name");
     Get_L2 (average_bps,                                        "average-bps");
     Get_L2 (packet_size,                                        "packet-size");
     Get_L2 (block_size,                                         "block-size");
@@ -3585,7 +3585,7 @@ void File_Riff::WAVE__pmx()
 
     //Parsing
     Ztring XML_Data;
-    Get_Local(Element_Size, XML_Data,                           "XML data");
+    Get_UTF8(Element_Size, XML_Data,                            "XML data");
 }
 
 //---------------------------------------------------------------------------
@@ -3594,7 +3594,7 @@ void File_Riff::WAVE_aXML()
     Element_Name("aXML");
 
     //Parsing
-    Skip_Local(Element_Size,                                    "XML data");
+    Skip_UTF8(Element_Size,                                     "XML data");
 }
 
 //---------------------------------------------------------------------------
@@ -3883,7 +3883,7 @@ void File_Riff::WAVE_iXML()
     Element_Name("iXML");
 
     //Parsing
-    Skip_Local(Element_Size,                                    "XML data");
+    Skip_UTF8(Element_Size,                                     "XML data");
 }
 
 //---------------------------------------------------------------------------

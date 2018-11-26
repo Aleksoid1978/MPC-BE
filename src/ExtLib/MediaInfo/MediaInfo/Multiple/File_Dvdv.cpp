@@ -618,7 +618,7 @@ void File_Dvdv::Audio()
     Get_BS (2, SamplingRate,                                    "Sampling rate"); Param_Info1(Ztring::ToZtring(IFO_SamplingRate[SamplingRate]));
     Get_BS (4, Channels,                                        "Channels"); Param_Info2(Channels+1, " channels");
     BS_End();
-    Get_Local(3, Language,                                      "Language code");
+    Get_UTF8(3, Language,                                       "Language code");
     if (!Language.empty() && Language[0]>=0x80)
         Language.clear(); //this is 0xFF...
     if (Language==__T("iw"))
@@ -697,7 +697,7 @@ void File_Dvdv::Text()
     Get_BS (2, LanguageType,                                    "Language type"); Param_Info1(LanguageType==1?"2CC":"Unknown");
     BS_End();
     Skip_B1(                                                    "Reserved");
-    Get_Local(3, Language,                                      "Language code");
+    Get_UTF8(3, Language,                                       "Language code");
     if (!Language.empty() && Language[0]>=0x80)
         Language.clear(); //this is 0xFF...
     if (Language==__T("iw"))

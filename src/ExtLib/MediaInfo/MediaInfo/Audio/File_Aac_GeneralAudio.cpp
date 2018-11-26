@@ -219,7 +219,7 @@ void File_Aac::program_config_element()
     BS_End(); //Byte align
     Get_B1 (comment_field_bytes,                                "comment_field_bytes");
     if (comment_field_bytes)
-        Get_Local(comment_field_bytes, comment_field_data,      "comment_field_data");
+        Get_UTF8(comment_field_bytes, comment_field_data,       "comment_field_data");
     BS_Begin(); //The stream needs continuity in the bitstream
     Element_End0();
 
@@ -279,9 +279,9 @@ void File_Aac::program_config_element()
         Infos_General["Comment"]=comment_field_data;
 
         Infos["CodecID"].From_Number(audioObjectType);
-        Infos["Format"].From_Local("AAC");
-        Infos["Format_Profile"].From_Local(Aac_Format_Profile(audioObjectType));
-        Infos["Codec"].From_Local(Aac_audioObjectType(audioObjectType));
+        Infos["Format"].From_UTF8("AAC");
+        Infos["Format_Profile"].From_UTF8(Aac_Format_Profile(audioObjectType));
+        Infos["Codec"].From_UTF8(Aac_audioObjectType(audioObjectType));
         Infos["SamplingRate"].From_Number(Aac_sampling_frequency[sampling_frequency_index]);
         Infos["Channel(s)"].From_Number(Channels);
         Infos["ChannelPositions"]=Channels_Positions;
@@ -300,7 +300,7 @@ void File_Aac::program_config_element()
             }
             Infos["Format_Settings"]=__T("NBC"); // "Not Backward Compatible"
             Infos["Format_Settings_SBR"]=__T("Yes (NBC)"); // "Not Backward Compatible"
-            Infos["Codec"]=Ztring().From_Local(Aac_audioObjectType(audioObjectType))+__T("-SBR");
+            Infos["Codec"]=Ztring().From_UTF8(Aac_audioObjectType(audioObjectType))+__T("-SBR");
         }
 
         if (!Infos["Format_Settings_PS"].empty())
@@ -1435,7 +1435,7 @@ void File_Aac::FillInfosHEAACv2(const Ztring& Format_Settings)
         Infos["Format_Settings"].insert(0, Format_Settings);
     }
     Infos["Format_Settings_PS"] = __T("Yes (") + Format_Settings + __T(")");
-    Infos["Codec"] = Ztring().From_Local(Aac_audioObjectType(audioObjectType)) + __T("-SBR-PS");
+    Infos["Codec"] = Ztring().From_UTF8(Aac_audioObjectType(audioObjectType)) + __T("-SBR-PS");
 }
 
 //***************************************************************************

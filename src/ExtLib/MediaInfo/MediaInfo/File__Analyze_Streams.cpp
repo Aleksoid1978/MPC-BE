@@ -294,6 +294,26 @@ size_t File__Analyze::Stream_Erase (stream_t KindOfStream, size_t StreamPos)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+bool ShowSource_IsInList(video Value)
+{
+    switch (Value)
+    {
+        case Video_colour_description_present:
+        case Video_colour_range:
+        case Video_colour_primaries:
+        case Video_matrix_coefficients:
+        case Video_transfer_characteristics:
+        case Video_MasteringDisplay_ColorPrimaries:
+        case Video_MasteringDisplay_Luminance:
+        case Video_MaxCLL:
+        case Video_MaxFALL:
+            return true;
+        default:
+            return false;
+    }
+}
+
+//---------------------------------------------------------------------------
 void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, const Ztring &Value, bool Replace)
 {
     //MergedStreams
@@ -317,6 +337,12 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
         const Ztring& Info=MediaInfoLib::Config.Info_Get(StreamKind, Parameter, Info_Info);
         if (Info.size()>9 && Info[0]==__T('D') && Info[1]==__T('e') && Info[2]==__T('p') && Info[3]==__T('r') && Info[4]==__T('e') && Info[5]==__T('c') && Info[6]==__T('a') && Info[7]==__T('t') && Info[8]==__T('e') && Info[9]==__T('d'))
             return;
+    }
+
+    // Handling sources
+    if (StreamKind==Stream_Video && ShowSource_IsInList((video)Parameter) && Retrieve_Const(Stream_Video, StreamPos, Parameter+1).empty())
+    {
+        Fill(Stream_Video, StreamPos, Parameter+1, IsRawStream?"Stream":"Container");
     }
 
     //Format_Profile split (see similar code in MediaInfo_Inform.cpp, dedicated to MIXML)
@@ -1006,7 +1032,7 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, const char* Par
     }
 
     //Handling of well known parameters
-    const Ztring Parameter_Local = Ztring().From_Local(Parameter);
+    const Ztring Parameter_Local = Ztring().From_UTF8(Parameter);
     const size_t Pos=MediaInfoLib::Config.Info_Get(StreamKind).Find(Parameter_Local);
     if (Pos!=Error)
     {
@@ -1062,7 +1088,7 @@ void File__Analyze::Fill_SetOptions(stream_t StreamKind, size_t StreamPos, const
     }
 
     //Handling of well known parameters
-    size_t Pos=MediaInfoLib::Config.Info_Get(StreamKind).Find(Ztring().From_Local(Parameter));
+    size_t Pos=MediaInfoLib::Config.Info_Get(StreamKind).Find(Ztring().From_UTF8(Parameter));
     if (Pos!=Error)
     {
         //We can not change that
@@ -1112,7 +1138,7 @@ const Ztring &File__Analyze::Retrieve_Const (stream_t StreamKind, size_t StreamP
 
     if (KindOfInfo!=Info_Text)
         return MediaInfoLib::Config.Info_Get(StreamKind, Parameter, KindOfInfo);
-    const Ztring Parameter_Local = Ztring().From_Local(Parameter);
+    const Ztring Parameter_Local = Ztring().From_UTF8(Parameter);
     size_t Parameter_Pos=MediaInfoLib::Config.Info_Get(StreamKind).Find(Parameter_Local);
     if (Parameter_Pos==Error)
     {
@@ -1136,7 +1162,7 @@ Ztring File__Analyze::Retrieve (stream_t StreamKind, size_t StreamPos, const cha
 
     if (KindOfInfo!=Info_Text)
         return MediaInfoLib::Config.Info_Get(StreamKind, Parameter, KindOfInfo);
-    const Ztring Parameter_Local = Ztring().From_Local(Parameter);
+    const Ztring Parameter_Local = Ztring().From_UTF8(Parameter);
     size_t Parameter_Pos=MediaInfoLib::Config.Info_Get(StreamKind).Find(Parameter_Local);
     if (Parameter_Pos==Error)
     {
@@ -1168,7 +1194,7 @@ void File__Analyze::Clear (stream_t StreamKind, size_t StreamPos, const char* Pa
             }
         return;
     }
-    const Ztring Parameter_Local = Ztring().From_Local(Parameter);
+    const Ztring Parameter_Local = Ztring().From_UTF8(Parameter);
     size_t Parameter_Pos=MediaInfoLib::Config.Info_Get(StreamKind).Find(Parameter_Local);
     if (Parameter_Pos==Error)
     {
@@ -1376,7 +1402,7 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
 
     //Specific stuff
     Ztring Width_Temp, Height_Temp, PixelAspectRatio_Temp, DisplayAspectRatio_Temp, FrameRate_Temp, FrameRate_Num_Temp, FrameRate_Den_Temp, FrameRate_Mode_Temp, ScanType_Temp, ScanOrder_Temp, Channels_Temp, Delay_Temp, Delay_DropFrame_Temp, Delay_Source_Temp, Delay_Settings_Temp, Source_Temp, Source_Kind_Temp, Source_Info_Temp;
-    Ztring colour_description_present_Temp, colour_primaries_Temp, transfer_characteristics_Temp, matrix_coefficients_Temp;
+    map<size_t, Ztring> ShowSource_List;
     if (StreamKind==Stream_Video)
     {
         Width_Temp=Retrieve(Stream_Video, StreamPos_To, Video_Width);
@@ -1389,17 +1415,6 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
         FrameRate_Mode_Temp=Retrieve(Stream_Video, StreamPos_To, Video_FrameRate_Mode); //We want to keep the FrameRate_Mode of AVI 120 fps
         ScanType_Temp=Retrieve(Stream_Video, StreamPos_To, Video_ScanType);
         ScanOrder_Temp=Retrieve(Stream_Video, StreamPos_To, Video_ScanOrder);
-        colour_description_present_Temp=Retrieve(Stream_Video, StreamPos_To, Video_colour_description_present);
-        if (!colour_description_present_Temp.empty())
-        {
-            colour_primaries_Temp=Retrieve(Stream_Video, StreamPos_To, Video_colour_primaries);
-            transfer_characteristics_Temp=Retrieve(Stream_Video, StreamPos_To, Video_transfer_characteristics);
-            matrix_coefficients_Temp=Retrieve(Stream_Video, StreamPos_To, Video_matrix_coefficients);
-        }
-        Clear(Stream_Video, StreamPos_To, Video_colour_description_present);
-        Clear(Stream_Video, StreamPos_To, Video_colour_primaries);
-        Clear(Stream_Video, StreamPos_To, Video_transfer_characteristics);
-        Clear(Stream_Video, StreamPos_To, Video_matrix_coefficients);
     }
     if (StreamKind==Stream_Audio)
     {
@@ -1437,7 +1452,36 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
     for (size_t Pos=General_Inform; Pos<Size; Pos++)
     {
         const Ztring &ToFill_Value=ToAdd.Get(StreamKind, StreamPos_From, Pos);
-        if (!ToFill_Value.empty() && (Erase || Get(StreamKind, StreamPos_To, Pos).empty()))
+        if (StreamKind==Stream_Video && ShowSource_IsInList((video)Pos))
+        {
+            const Ztring &ToFill_FromContainer=Get(StreamKind, StreamPos_To, Pos);
+            if (!ToAdd.Retrieve_Const(StreamKind, StreamPos_From, Pos+1).empty())
+            {
+                if (!Retrieve_Const(StreamKind, StreamPos_To, Pos+1).empty())
+                {
+                    if (ToFill_Value==ToFill_FromContainer)
+                    {
+                        if (Retrieve_Const(StreamKind, StreamPos_To, Pos+1)!=ToAdd.Retrieve_Const(StreamKind, StreamPos_From, Pos+1))
+                            Fill(StreamKind, StreamPos_To, Pos+1, Retrieve_Const(StreamKind, StreamPos_To, Pos+1)+MediaInfoLib::Config.TagSeparator_Get()+ToAdd.Retrieve_Const(StreamKind, StreamPos_From, Pos+1), true);
+                    }
+                    else
+                    {
+                        Fill(StreamKind, StreamPos_To, Pos+3, ToAdd.Retrieve_Const(StreamKind, StreamPos_From, Pos+1));
+                        Fill(StreamKind, StreamPos_To, Pos+2, ToFill_Value);
+                    }
+                }
+                else
+                {
+                    Fill(StreamKind, StreamPos_To, Pos+1, ToAdd.Retrieve_Const(StreamKind, StreamPos_From, Pos+1));
+                    Fill(StreamKind, StreamPos_To, Pos, ToFill_Value);
+                }
+            }
+        }
+        else if (StreamKind==Stream_Video && Pos && ShowSource_IsInList((video)(Pos-1)))
+        {
+            //Ignore
+        }
+        else if (!ToFill_Value.empty() && (Erase || Get(StreamKind, StreamPos_To, Pos).empty()))
         {
             if (Pos<MediaInfoLib::Config.Info_Get(StreamKind).size())
                 Fill(StreamKind, StreamPos_To, Pos, ToFill_Value, true);
@@ -1513,30 +1557,6 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
             }
             else
                 Fill(Stream_Video, StreamPos_To, Video_ScanOrder, ScanOrder_Temp, true);
-        }
-        if (!colour_description_present_Temp.empty())
-        {
-            if (!Retrieve(Stream_Video, StreamPos_To, Video_colour_description_present).empty()
-             && (colour_primaries_Temp!=Retrieve(Stream_Video, StreamPos_To, Video_colour_primaries)
-              || transfer_characteristics_Temp!=Retrieve(Stream_Video, StreamPos_To, Video_transfer_characteristics)
-              || matrix_coefficients_Temp!=Retrieve(Stream_Video, StreamPos_To, Video_matrix_coefficients)))
-            {
-                Fill(Stream_Video, StreamPos_To, Video_colour_description_present_Original, (*Stream)[Stream_Video][StreamPos_To][Video_colour_description_present], true);
-                Fill(Stream_Video, StreamPos_To, Video_colour_description_present, colour_description_present_Temp, true);
-                Fill(Stream_Video, StreamPos_To, Video_colour_primaries_Original, (*Stream)[Stream_Video][StreamPos_To][Video_colour_primaries], true);
-                Fill(Stream_Video, StreamPos_To, Video_colour_primaries, colour_primaries_Temp, true);
-                Fill(Stream_Video, StreamPos_To, Video_transfer_characteristics_Original, (*Stream)[Stream_Video][StreamPos_To][Video_transfer_characteristics], true);
-                Fill(Stream_Video, StreamPos_To, Video_transfer_characteristics, transfer_characteristics_Temp, true);
-                Fill(Stream_Video, StreamPos_To, Video_matrix_coefficients_Original, (*Stream)[Stream_Video][StreamPos_To][Video_matrix_coefficients], true);
-                Fill(Stream_Video, StreamPos_To, Video_matrix_coefficients, matrix_coefficients_Temp, true);
-            }
-            else
-            {
-                Fill(Stream_Video, StreamPos_To, Video_colour_description_present, colour_description_present_Temp, true);
-                Fill(Stream_Video, StreamPos_To, Video_colour_primaries, colour_primaries_Temp, true);
-                Fill(Stream_Video, StreamPos_To, Video_transfer_characteristics, transfer_characteristics_Temp, true);
-                Fill(Stream_Video, StreamPos_To, Video_matrix_coefficients, matrix_coefficients_Temp, true);
-            }
         }
     }
     if (StreamKind==Stream_Audio)

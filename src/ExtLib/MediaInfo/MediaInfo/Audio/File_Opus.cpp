@@ -125,7 +125,7 @@ void File_Opus::Identification()
     int8u Opus_version_id, ch_count, ch_map;
     int16u preskip;
     int32u sample_rate;
-    Get_Local(8,opus_version,                                   "opus_codec_id");
+    Get_UTF8(8,opus_version,                                    "opus_codec_id");
     Get_L1 (Opus_version_id,                                    "opus_version_id");
     Get_L1 (ch_count,                                           "channel_count");
     Get_L2 (preskip,                                            "preskip");
@@ -164,9 +164,9 @@ void File_Opus::Identification()
                     // else it is as Vorbis specs, no break
             case 1 : // Vorbis order
                     {
-                    Ztring ChannelPositions; ChannelPositions.From_Local(Opus_ChannelPositions[ch_count]);
-                    Ztring ChannelPositions2; ChannelPositions2.From_Local(Opus_ChannelPositions2[ch_count]);
-                    Ztring ChannelLayout2; ChannelLayout2.From_Local(Opus_ChannelLayout[ch_count]);
+                    Ztring ChannelPositions; ChannelPositions.From_UTF8(Opus_ChannelPositions[ch_count]);
+                    Ztring ChannelPositions2; ChannelPositions2.From_UTF8(Opus_ChannelPositions2[ch_count]);
+                    Ztring ChannelLayout2; ChannelLayout2.From_UTF8(Opus_ChannelLayout[ch_count]);
                     if (ChannelPositions!=Retrieve(Stream_Audio, 0, Audio_ChannelPositions))
                         Fill(Stream_Audio, 0, Audio_ChannelPositions, ChannelPositions);
                     if (ChannelPositions2!=Retrieve(Stream_Audio, 0, Audio_ChannelPositions_String2))

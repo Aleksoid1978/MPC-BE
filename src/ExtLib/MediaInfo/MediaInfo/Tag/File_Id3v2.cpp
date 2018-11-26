@@ -1209,8 +1209,8 @@ void File_Id3v2::Fill_Name()
         case Elements::TDA  :
         case Elements::TDAT : if (Element_Value.size()==4)
                          {
-                            Month.assign(Element_Value.c_str(), 0, 2);
-                            Day.assign  (Element_Value.c_str(), 2, 2);
+                            Day.assign  (Element_Value.c_str(), 0, 2);
+                            Month.assign(Element_Value.c_str(), 2, 2);
                          }
                          break;
         case Elements::TDEN : Normalize_Date(Element_Value); Fill(Stream_General, 0, "Encoded_Date", Element_Value); break;
@@ -1412,9 +1412,9 @@ void File_Id3v2::Fill_Name()
 //---------------------------------------------------------------------------
 void File_Id3v2::Normalize_Date(Ztring& Date)
 {
-    if (Date.size()<=8)
-        return; //Format unknown
-    Date[8]=__T(' '); //could be "T"
+    if (Date.size()<=11 || Date[4]!=__T('-') || Date[7]!=__T('-'))
+        return; //Format unknown or without time
+    Date[10]=__T(' '); //could be "T"
     Date=Ztring(__T("UTC "))+Date; //Id3v2 specify a UTC date
 }
 

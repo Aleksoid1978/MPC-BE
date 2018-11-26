@@ -816,7 +816,7 @@ void File_Mk::Streams_Finish()
                             Utc=Item2->second;
                             Item->second.erase(Item2);
                         }
-                        if (Utc<=Hutc)
+                        if (Utc>=Hutc)
                             Tags_Verified=true;
                         else
                             Fill(StreamKind_Last, StreamPos_Last, "Statistics Tags Issue", App + __T(' ') + Utc + __T(" / ") + Retrieve(Stream_General, 0, "Encoded_Application") + __T(' ') + Hutc);
@@ -2958,8 +2958,8 @@ void File_Mk::Segment_Info_SegmentUID()
     FILLING_BEGIN();
         if (Segment_Info_Count>1)
             return; //First element has the priority
-        Fill(Stream_General, 0, General_UniqueID, Ztring().From_Local(Data.toString(10)));
-        Fill(Stream_General, 0, General_UniqueID_String, Ztring().From_Local(Data.toString(10))+__T(" (0x")+Ztring().From_Local(Data.toString(16))+__T(')'));
+        Fill(Stream_General, 0, General_UniqueID, Ztring().From_UTF8(Data.toString(10)));
+        Fill(Stream_General, 0, General_UniqueID_String, Ztring().From_UTF8(Data.toString(10))+__T(" (0x")+Ztring().From_UTF8(Data.toString(16))+__T(')'));
     FILLING_END();
 }
 

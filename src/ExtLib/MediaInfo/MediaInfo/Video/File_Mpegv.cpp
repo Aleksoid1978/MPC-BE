@@ -1375,13 +1375,13 @@ void File_Mpegv::Streams_Fill()
     //Profile
     if (!profile_and_level_indication_escape && profile_and_level_indication_profile!=(int8u)-1 && profile_and_level_indication_level!=(int8u)-1)
     {
-        Fill(Stream_Video, 0, Video_Format_Profile, Ztring().From_Local(Mpegv_profile_and_level_indication_profile[profile_and_level_indication_profile])+__T("@")+Ztring().From_Local(Mpegv_profile_and_level_indication_level[profile_and_level_indication_level]));
-        Fill(Stream_Video, 0, Video_Codec_Profile, Ztring().From_Local(Mpegv_profile_and_level_indication_profile[profile_and_level_indication_profile])+__T("@")+Ztring().From_Local(Mpegv_profile_and_level_indication_level[profile_and_level_indication_level]));
+        Fill(Stream_Video, 0, Video_Format_Profile, Ztring().From_UTF8(Mpegv_profile_and_level_indication_profile[profile_and_level_indication_profile])+__T("@")+Ztring().From_UTF8(Mpegv_profile_and_level_indication_level[profile_and_level_indication_level]));
+        Fill(Stream_Video, 0, Video_Codec_Profile, Ztring().From_UTF8(Mpegv_profile_and_level_indication_profile[profile_and_level_indication_profile])+__T("@")+Ztring().From_UTF8(Mpegv_profile_and_level_indication_level[profile_and_level_indication_level]));
     }
     else if (profile_and_level_indication_escape)
     {
-        Fill(Stream_Video, 0, Video_Format_Profile, Ztring().From_Local(Mpegv_profile_and_level_indication(profile_and_level_indication)));
-        Fill(Stream_Video, 0, Video_Codec_Profile, Ztring().From_Local(Mpegv_profile_and_level_indication(profile_and_level_indication)));
+        Fill(Stream_Video, 0, Video_Format_Profile, Ztring().From_UTF8(Mpegv_profile_and_level_indication(profile_and_level_indication)));
+        Fill(Stream_Video, 0, Video_Codec_Profile, Ztring().From_UTF8(Mpegv_profile_and_level_indication(profile_and_level_indication)));
     }
 
     //Standard
@@ -2580,7 +2580,7 @@ void File_Mpegv::slice_start()
                 Element_Info1(__T("Frame (decoding order) ")+Ztring::ToZtring(Frame_Count));
                 if (Frame_Count_LastIFrame!=(int64u)-1)
                     Element_Info1(__T("Frame (presentation order) ")+Ztring::ToZtring(Frame_Count_LastIFrame+temporal_reference));
-                Element_Info1(__T("picture_coding_type ")+Ztring().From_Local(Mpegv_picture_coding_type[picture_coding_type]));
+                Element_Info1(__T("picture_coding_type ")+Ztring().From_UTF8(Mpegv_picture_coding_type[picture_coding_type]));
                 Element_Info1(__T("temporal_reference ")+Ztring::ToZtring(temporal_reference));
                 if (FrameInfo.PTS!=(int64u)-1)
                     Element_Info1(__T("PTS ")+Ztring().Duration_From_Milliseconds(float64_int64s(((float64)FrameInfo.PTS)/1000000)));
@@ -3193,7 +3193,7 @@ void File_Mpegv::user_data_start()
     if (Library_Start_Offset>0)
         Skip_XX(Library_Start_Offset,                           "junk");
     if (Library_End_Offset-Library_Start_Offset)
-        Get_Local(Library_End_Offset-Library_Start_Offset, Temp,"data");
+        Get_UTF8(Library_End_Offset-Library_Start_Offset, Temp, "data");
     if (Element_Offset<Element_Size)
         Skip_XX(Element_Size-Element_Offset,                    "junk");
 

@@ -45,6 +45,8 @@ HTTP_Client::HTTP_Client ()
 //---------------------------------------------------------------------------
 HTTP_Client::~HTTP_Client ()
 {
+    if (Handle)
+        Close();
     #ifdef WINDOWS
         WSACleanup();
     #endif

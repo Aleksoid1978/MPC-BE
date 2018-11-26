@@ -54,10 +54,14 @@ struct Node
     }
     Node(const std::string& _Name, const std::string& _Value, const std::string& _Atribute_Name, const std::string& _Atribute_Value=std::string()) : Name(_Name), Value(_Value), RawContent(std::string()), Multiple(false)
     {
+        if (_Atribute_Value.empty())
+            return;
         Add_Attribute(_Atribute_Name, _Atribute_Value);
     }
     Node(const std::string& _Name, const std::string& _Value, const std::string& _Atribute_Name, const std::string& _Atribute_Value, bool _Multiple) : Name(_Name), Value(_Value), RawContent(std::string()), Multiple(_Multiple)
     {
+        if (_Atribute_Value.empty())
+            return;
         Add_Attribute(_Atribute_Name, _Atribute_Value);
     }
 

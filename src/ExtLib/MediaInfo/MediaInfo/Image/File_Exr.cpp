@@ -213,7 +213,7 @@ void File_Exr::Header_Parse()
     Get_L4 (size,                                               "size");
 
     //Filling
-    Header_Fill_Code(0, Ztring().From_Local(name.c_str()));
+    Header_Fill_Code(0, Ztring().From_ISO_8859_1(name.c_str()));
     Header_Fill_Size(name_End+1+type_End+1+4+size);
 }
 
@@ -360,7 +360,7 @@ void File_Exr::comments ()
 {
     //Parsing
     Ztring value;
-    Get_Local(Element_Size, value,                              "value");
+    Get_UTF8(Element_Size, value,                               "value");
 
     //Filling
     if (Frame_Count==1)
