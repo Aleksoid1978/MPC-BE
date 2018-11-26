@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include <initguid.h>
+#include <MMReg.h>
 #include "DVRSplitter.h"
 #include <moreuuids.h>
 
@@ -52,7 +53,10 @@ int g_cTemplates = _countof(g_Templates);
 
 STDAPI DllRegisterServer()
 {
-	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_NULL, L"0,4,,48585653,16,4,,48585646");
+	const std::list<CString> chkbytes = {
+		L"0,4,,48585653,16,4,,48585646", // 'HXVS............HXVF'
+		L"0,4,,44484156",                // 'DHAV'
+	};
 
 	return AMovieDllRegisterServer2(TRUE);
 }
@@ -74,13 +78,21 @@ CFilterApp theApp;
 // CDVRSplitterFilter
 //
 
-#define HEADER_INFO FCC('HXVS')
-#define FOOTER_INFO FCC('HXFI')
-#define VIDEO       FCC('HXVF')
-#define AUDIO       FCC('HXAF')
+#define HXVS_HEADER_INFO FCC('HXVS')
+#define HXVS_FOOTER_INFO FCC('HXFI')
+#define HXVS_VIDEO       FCC('HXVF')
+#define HXVS_AUDIO       FCC('HXAF')
 
-#define HeaderSize     16
-#define FooterSize 200016
+#define HXVS_HeaderSize     16
+#define HXVS_FooterSize 200016
+
+#define DHAV_SYNC_START FCC('DHAV')
+#define DHAV_SYNC_END   FCC('dhav')
+#define DHAV_VIDEO(hdr) (hdr.type == 0xfc || hdr.type == 0xfd)
+#define DHAV_AUDIO(hdr) (hdr.type == 0xf0)
+
+#define DHAV_HeaderSize 24
+#define DHAV_FooterSize  8
 
 CDVRSplitterFilter::CDVRSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(L"CDVRSplitterFilter", pUnk, phr, __uuidof(this))
@@ -110,9 +122,15 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		return E_FAIL;
 	}
 
-	if (GETU32(buf) == HEADER_INFO && GETU32(buf + 16) == VIDEO) {
+	if (GETU32(buf) == HXVS_HEADER_INFO && GETU32(buf + 16) == HXVS_VIDEO) {
 		m_rtOffsetVideo = GETU32(buf + 24) * 10000ll;
-	} else {
+		m_bHXVS = true;
+	} else if (GETU32(buf) == DHAV_SYNC_START
+			&& (buf[4] == 0xf0 || buf[4] == 0xf1 || buf[4] == 0xfc || buf[4] == 0xfd)) {
+		m_bDHAV = true;
+	}
+
+	if (!m_bHXVS && !m_bDHAV) {
 		m_pFile.Free();
 		return E_FAIL;
 	}
@@ -120,127 +138,286 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	std::vector<CMediaType> mts;
 	CMediaType mt;
 
-	m_startpos = HeaderSize;
-	m_endpos   = m_pFile->GetLength();
-	m_pFile->Seek(m_startpos);
+	if (m_bHXVS) {
+		m_startpos = HXVS_HeaderSize;
+		m_endpos   = m_pFile->GetLength();
+		m_pFile->Seek(m_startpos);
 
-	Header hdr;
-	std::vector<BYTE> pData;
-	while (ReadHeader(hdr) && m_pFile->GetPos() <= MEGABYTE) {
-		if (hdr.sync == VIDEO) {
-			if (hdr.rt != m_rtOffsetVideo) {
-				m_AvgTimePerFrame = hdr.rt - m_rtOffsetVideo;
-				if (!pData.empty()) {
-					CBaseSplitterFileEx::avchdr h;
-					if (m_pFile->Read(h, pData, &mt)) {
-						mts.push_back(mt);
+		HXVSHeader hdr;
+		std::vector<BYTE> pData;
+		while (HXVSReadHeader(hdr) && m_pFile->GetPos() <= MEGABYTE) {
+			if (hdr.sync == HXVS_VIDEO) {
+				if (hdr.rt != m_rtOffsetVideo) {
+					m_AvgTimePerFrame = hdr.rt - m_rtOffsetVideo;
+					if (!pData.empty()) {
+						CBaseSplitterFileEx::avchdr h;
+						if (m_pFile->Read(h, pData, &mt)) {
+							mts.push_back(mt);
+						}
+					}
+					break;
+				} else {
+					const size_t old_size = pData.size();
+					pData.resize(old_size + hdr.size);
+					if ((hr = m_pFile->ByteRead(pData.data() + old_size, hdr.size)) != S_OK) {
+						break;
 					}
 				}
-				break;
 			} else {
-				const size_t old_size = pData.size();
-				pData.resize(old_size + hdr.size);
-				if ((hr = m_pFile->ByteRead(pData.data() + old_size, hdr.size)) != S_OK) {
-					break;
+				if (m_rtOffsetAudio == INVALID_TIME) {
+					m_rtOffsetAudio = hdr.rt;
 				}
+				m_pFile->Skip(hdr.size);
 			}
-		} else {
-			if (m_rtOffsetAudio == INVALID_TIME) {
-				m_rtOffsetAudio = hdr.rt;
-			}
-			m_pFile->Skip(hdr.size);
-		}
-	};
-
-	if (mts.empty()) {
-		m_pFile.Free();
-		return E_FAIL;
-	}
-
-	m_rtNewStart = m_rtCurrent = 0;
-	m_rtNewStop = m_rtStop = m_rtDuration = 0;
-
-	// footer
-	if (m_pFile->GetLength() > (FooterSize + HeaderSize + HeaderSize)) {
-		m_pFile->Seek(m_pFile->GetLength() - FooterSize);
-		DWORD sync = 0;
-		if (S_OK == m_pFile->ByteRead((BYTE*)&sync, sizeof(sync)) && sync == FOOTER_INFO) {
-			m_pFile->Skip(4);
-			if (S_OK == m_pFile->ByteRead((BYTE*)&sync, sizeof(sync)) && sync) {
-				m_rtNewStop = m_rtStop = m_rtDuration = sync * 10000ll;
-			}
-			m_endpos = m_pFile->GetLength() - FooterSize;
-
-			m_pFile->Skip(4);
-			size_t cnt = 1;
-			while (m_pFile->GetPos() < m_pFile->GetLength()) {
-				struct {
-					DWORD pos, pts;
-				} keyframe;
-
-				if (S_OK != m_pFile->ByteRead((BYTE*)&keyframe, sizeof(keyframe)) || keyframe.pos == 0) {
-					break;
-				}
-
-				if ((cnt % 3) == 0) {
-					const SyncPoint sp = {keyframe.pts * 10000ll, keyframe.pos};
-					m_sps.emplace_back(sp);
-				}
-
-				cnt++;
-			}
-		}
-	}
-
-	// find audio stream
-	if (m_rtOffsetAudio == INVALID_TIME) {
-		m_pFile->Seek(16);
-		while (ReadHeader(hdr) && m_pFile->GetPos() <= MEGABYTE) {
-			if (hdr.sync == AUDIO) {
-				m_rtOffsetAudio = hdr.rt;
-				break;
-			}
-		}
-	}
-
-	// find end PTS
-	if (m_rtDuration == 0) {
-		m_pFile->Seek(m_endpos - std::min((__int64)MEGABYTE, m_endpos));
-
-		REFERENCE_TIME rtLast = INVALID_TIME;
-		while (ReadHeader(hdr)) {
-			if (hdr.sync == VIDEO) {
-				rtLast = hdr.rt;
-			}
-			m_pFile->Skip(hdr.size);
 		};
 
-		if (rtLast > m_rtOffsetVideo) {
-			m_rtNewStop = m_rtStop = m_rtDuration = rtLast - m_rtOffsetVideo;
+		if (mts.empty()) {
+			m_pFile.Free();
+			return E_FAIL;
 		}
-	}
 
-	for (auto& mt : mts) {
-		auto vih2 = (VIDEOINFOHEADER2*)mt.Format();
-		if (!vih2->AvgTimePerFrame) {
-			vih2->AvgTimePerFrame = m_AvgTimePerFrame;
+		m_rtNewStart = m_rtCurrent = 0;
+		m_rtNewStop = m_rtStop = m_rtDuration = 0;
+
+		// footer
+		if (m_pFile->GetLength() > (HXVS_FooterSize + HXVS_HeaderSize + HXVS_HeaderSize)) {
+			m_pFile->Seek(m_pFile->GetLength() - HXVS_FooterSize);
+			DWORD sync = 0;
+			if (S_OK == m_pFile->ByteRead((BYTE*)&sync, sizeof(sync)) && sync == HXVS_FOOTER_INFO) {
+				m_pFile->Skip(4);
+				if (S_OK == m_pFile->ByteRead((BYTE*)&sync, sizeof(sync)) && sync) {
+					m_rtNewStop = m_rtStop = m_rtDuration = sync * 10000ll;
+				}
+				m_endpos = m_pFile->GetLength() - HXVS_FooterSize;
+
+				m_pFile->Skip(4);
+				size_t cnt = 1;
+				while (m_pFile->GetPos() < m_pFile->GetLength()) {
+					struct {
+						DWORD pos, pts;
+					} keyframe;
+
+					if (S_OK != m_pFile->ByteRead((BYTE*)&keyframe, sizeof(keyframe)) || keyframe.pos == 0) {
+						break;
+					}
+
+					if ((cnt % 3) == 0) {
+						const SyncPoint sp = {keyframe.pts * 10000ll, keyframe.pos};
+						m_sps.emplace_back(sp);
+					}
+
+					cnt++;
+				}
+			}
 		}
-	}
 
-	CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Video", this, this, &hr));
-	EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
+		// find audio stream
+		if (m_rtOffsetAudio == INVALID_TIME) {
+			m_pFile->Seek(16);
+			while (HXVSReadHeader(hdr) && m_pFile->GetPos() <= MEGABYTE) {
+				if (hdr.sync == HXVS_AUDIO) {
+					m_rtOffsetAudio = hdr.rt;
+					break;
+				}
+			}
+		}
 
-	if (m_rtOffsetAudio != INVALID_TIME) {
-		mt.InitMediaType();
+		// find end PTS
+		if (m_rtDuration == 0) {
+			m_pFile->Seek(m_endpos - std::min((__int64)MEGABYTE, m_endpos));
 
-		CBaseSplitterFileEx::pcm_law_hdr h;
-		m_pFile->Read(h, true, &mt);
+			REFERENCE_TIME rtLast = INVALID_TIME;
+			while (HXVSReadHeader(hdr)) {
+				if (hdr.sync == HXVS_VIDEO) {
+					rtLast = hdr.rt;
+				}
+				m_pFile->Skip(hdr.size);
+			};
 
-		mts.clear();
-		mts.push_back(mt);
+			if (rtLast > m_rtOffsetVideo) {
+				m_rtNewStop = m_rtStop = m_rtDuration = rtLast - m_rtOffsetVideo;
+			}
+		}
 
-		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio", this, this, &hr));
-		EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(1, pPinOut)));
+		for (auto& mt : mts) {
+			auto vih2 = (VIDEOINFOHEADER2*)mt.Format();
+			if (!vih2->AvgTimePerFrame) {
+				vih2->AvgTimePerFrame = m_AvgTimePerFrame;
+			}
+		}
+
+		CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Video", this, this, &hr));
+		EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
+
+		if (m_rtOffsetAudio != INVALID_TIME) {
+			mt.InitMediaType();
+
+			CBaseSplitterFileEx::pcm_law_hdr h;
+			m_pFile->Read(h, true, &mt);
+
+			mts.clear();
+			mts.push_back(mt);
+
+			CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio", this, this, &hr));
+			EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(1, pPinOut)));
+		}
+	} else {
+		m_startpos = 0;
+		m_endpos   = m_pFile->GetLength();
+		m_pFile->Seek(m_startpos);
+
+		bool bVideoFound = false;
+		bool bAudioFound = false;
+
+		DHAVHeader hdr;
+		std::vector<BYTE> pData;
+		while (DHAVReadHeader(hdr, true) && m_pFile->GetPos() <= MEGABYTE) {
+			if (hdr.type == 0xfd) {
+				if (hdr.video.codec && !bVideoFound) {
+					m_AvgTimePerFrame = UNITS / (hdr.video.frame_rate ? hdr.video.frame_rate : 25);
+
+					m_startpos = m_pFile->GetPos() - DHAV_HeaderSize - hdr.ext_size;
+					bVideoFound = true;
+				
+					BITMAPINFOHEADER pbmi = {};
+					pbmi.biSize      = sizeof(pbmi);
+					pbmi.biWidth     = (LONG)hdr.video.width;
+					pbmi.biHeight    = (LONG)hdr.video.height;
+					pbmi.biPlanes    = 1;
+					pbmi.biBitCount  = 24;
+					pbmi.biSizeImage = DIBSIZE(pbmi);
+
+					CSize aspect(pbmi.biWidth, pbmi.biHeight);
+					ReduceDim(aspect);
+
+					switch (hdr.video.codec) {
+						case 0x1: pbmi.biCompression = FCC('MP4V'); break;
+						case 0x3: pbmi.biCompression = FCC('MJPG'); break;
+						case 0x2:
+						case 0x4:
+						case 0x8: pbmi.biCompression = FCC('H264'); break;
+						case 0xc: pbmi.biCompression = FCC('HEVC'); break;
+					}
+
+					if (!pbmi.biCompression) {
+						return false;
+					}
+
+					mt.InitMediaType();
+					mt.SetTemporalCompression(TRUE);
+					CreateMPEG2VISimple(&mt, &pbmi, m_AvgTimePerFrame, aspect, nullptr, 0u);
+
+					mts.clear();
+					mts.push_back(mt);
+
+					if (pbmi.biCompression == FCC('H264')) {
+						std::vector<BYTE> pData(hdr.size);
+						if ((hr = m_pFile->ByteRead(pData.data(), hdr.size)) != S_OK) {
+							return false;
+						}
+
+						CBaseSplitterFileEx::avchdr h;
+						if (m_pFile->Read(h, pData, &mt)) {
+							mts.insert(mts.begin(), mt);
+						}
+
+						m_pFile->Seek(m_pFile->GetPos() - hdr.size);
+					} else if (pbmi.biCompression == FCC('HEVC')) {
+						std::vector<BYTE> pData(hdr.size);
+						if ((hr = m_pFile->ByteRead(pData.data(), hdr.size)) != S_OK) {
+							return false;
+						}
+
+						CBaseSplitterFileEx::hevchdr h;
+						if (m_pFile->Read(h, pData, &mt)) {
+							mts.insert(mts.begin(), mt);
+						}
+
+						m_pFile->Seek(m_pFile->GetPos() - hdr.size);
+					}
+
+					for (auto& mt : mts) {
+						auto vih2 = (VIDEOINFOHEADER2*)mt.Format();
+						if (!vih2->AvgTimePerFrame) {
+							vih2->AvgTimePerFrame = m_AvgTimePerFrame;
+						}
+					}
+
+					CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Video", this, this, &hr));
+					EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(0, pPinOut)));
+				}
+			} else if (DHAV_AUDIO(hdr)) {
+				if (hdr.audio.codec && !bAudioFound) {
+					bAudioFound = true;
+
+					GUID subtype = GUID_NULL;
+					WORD wFormatTag = 0;
+					WORD wBitsPerSample = 0;
+
+					switch (hdr.audio.codec) {
+						case 0x0a:
+						case 0x16:
+							subtype = MEDIASUBTYPE_MULAW;
+							wFormatTag = WAVE_FORMAT_MULAW;
+							wBitsPerSample = 8;
+							break;
+						case 0x0e:
+							subtype = MEDIASUBTYPE_ALAW;
+							wFormatTag = WAVE_FORMAT_ALAW;
+							wBitsPerSample = 8;
+							break;
+						case 0x1a:
+							subtype = MEDIASUBTYPE_RAW_AAC1;
+							wFormatTag = WAVE_FORMAT_RAW_AAC1;
+							break;
+						case 0x1f:
+							subtype = MEDIASUBTYPE_MPEG2_AUDIO;
+							wFormatTag = WAVE_FORMAT_MPEG;
+							break;
+						case 0x21:
+							subtype = MEDIASUBTYPE_MP3;
+							wFormatTag = WAVE_FORMAT_MPEGLAYER3;
+							break;
+					}
+
+					if (subtype != GUID_NULL) {
+						mt.InitMediaType();
+
+						mt.majortype         = MEDIATYPE_Audio;
+						mt.subtype           = subtype;
+						mt.formattype        = FORMAT_WaveFormatEx;
+
+						WAVEFORMATEX* wfe    = (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX));
+						memset(wfe, 0, sizeof(WAVEFORMATEX));
+						wfe->wFormatTag      = wFormatTag;
+						wfe->nChannels       = hdr.audio.channels;
+						wfe->nSamplesPerSec  = hdr.audio.sample_rate;
+						wfe->wBitsPerSample  = wBitsPerSample;
+						wfe->nBlockAlign     = wfe->nChannels * wfe->wBitsPerSample >> 3;
+						wfe->nAvgBytesPerSec = wfe->nBlockAlign * wfe->nSamplesPerSec;
+
+						mts.clear();
+						mts.push_back(mt);
+
+						CAutoPtr<CBaseSplitterOutputPin> pPinOut(DNew CBaseSplitterOutputPin(mts, L"Audio", this, this, &hr));
+						EXECUTE_ASSERT(SUCCEEDED(AddOutputPin(1, pPinOut)));
+					}
+				}
+			}
+
+			if (bVideoFound && bAudioFound) {
+				break;
+			}
+
+			m_pFile->Skip(hdr.size + DHAV_FooterSize);
+		}
+
+		if (!bVideoFound) {
+			return E_FAIL;
+		}
+
+		m_rtNewStart = m_rtCurrent = 0;
+		m_rtNewStop = m_rtStop = m_rtDuration = 0;
 	}
 
 	return m_pOutputs.GetCount() > 0 ? S_OK : E_FAIL;
@@ -258,7 +435,7 @@ bool CDVRSplitterFilter::DemuxInit()
 #define CalcPos(rt) (llMulDiv(rt, len, m_rtDuration, 0))
 void CDVRSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 {
-	if (rt <= 0 || m_rtDuration <= 0) {
+	if (rt <= 0 || m_rtDuration <= 0 || !m_bHXVS) {
 		m_pFile->Seek(m_startpos);
 		return;
 	}
@@ -284,17 +461,21 @@ void CDVRSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 		REFERENCE_TIME rtSeek = INVALID_TIME;
 
 		m_pFile->Seek(curpos);
-		Header hdr;
-		while (ReadHeader(hdr)) {
-			if (hdr.sync == VIDEO) {
-				rtSeek = hdr.rt;
-				break;
-			}
-		}
+		if (m_bHXVS) {
+			HXVSHeader hdr;
+			while (HXVSReadHeader(hdr)) {
+				if (hdr.sync == HXVS_VIDEO) {
+					rtSeek = hdr.rt;
+					break;
+				}
 
-		if (rtmin <= rtSeek && rtSeek <= rtmax) {
-			m_pFile->Seek(m_pFile->GetPos() - HeaderSize);
-			return;
+				m_pFile->Skip(hdr.size);
+			}
+
+			if (rtmin <= rtSeek && rtSeek <= rtmax) {
+				m_pFile->Seek(m_pFile->GetPos() - HXVS_HeaderSize);
+				return;
+			}
 		}
 
 		REFERENCE_TIME dt = rtSeek - rtmax;
@@ -319,67 +500,129 @@ bool CDVRSplitterFilter::DemuxLoop()
 {
 	HRESULT hr = S_OK;
 
-	REFERENCE_TIME last_rt = 0;
-	CAutoPtr<CPacket> vp;
+	if (m_bHXVS) {
+		REFERENCE_TIME last_rt = 0;
+		CAutoPtr<CPacket> vp;
 
-	while (SUCCEEDED(hr) && !CheckRequest(nullptr) && m_pFile->GetRemaining()) {
-		Header hdr;
-		if (ReadHeader(hdr)) {
-			if (hdr.sync == VIDEO) {
-				// video packet
-				if (vp && last_rt != hdr.rt) {
-					hr = DeliverPacket(vp);
-				}
+		while (SUCCEEDED(hr) && !CheckRequest(nullptr) && m_pFile->GetRemaining()) {
+			HXVSHeader hdr;
+			if (HXVSReadHeader(hdr)) {
+				if (hdr.sync == HXVS_VIDEO) {
+					// video packet
+					if (vp && last_rt != hdr.rt) {
+						hr = DeliverPacket(vp);
+					}
 
-				if (!vp) {
-					vp.Attach(DNew CPacket());
-					vp->rtStart = hdr.rt - m_rtOffsetVideo;
-					vp->rtStop = vp->rtStart + m_AvgTimePerFrame;
-					last_rt = hdr.rt;
+					if (!vp) {
+						vp.Attach(DNew CPacket());
+						vp->bSyncPoint = hdr.key_frame;
+						vp->rtStart = hdr.rt - m_rtOffsetVideo;
+						vp->rtStop = vp->rtStart + m_AvgTimePerFrame;
+						last_rt = hdr.rt;
 
-					vp->resize(hdr.size);
-					hr = m_pFile->ByteRead(vp->data(), hdr.size);
+						vp->resize(hdr.size);
+						hr = m_pFile->ByteRead(vp->data(), hdr.size);
+					} else {
+						const size_t old_size = vp->size();
+						vp->resize(old_size + hdr.size);
+						hr = m_pFile->ByteRead(vp->data() + old_size, hdr.size);
+					}
 				} else {
-					const size_t old_size = vp->size();
-					vp->resize(old_size + hdr.size);
-					hr = m_pFile->ByteRead(vp->data() + old_size, hdr.size);
+					// audio packet
+					if (GetOutputPin(1)) {
+						CAutoPtr<CPacket> p(DNew CPacket());
+						p->TrackNumber = 1;
+						p->bSyncPoint = TRUE;
+						p->rtStart = hdr.rt - m_rtOffsetAudio;
+						p->rtStop = p->rtStart + llMulDiv(hdr.size, UNITS, 8000, 0);
+
+						p->resize(hdr.size);
+						if ((hr = m_pFile->ByteRead(p->data(), hdr.size)) == S_OK) {
+							hr = DeliverPacket(p);
+						}
+					} else {
+						m_pFile->Skip(hdr.size);
+					}
 				}
 			} else {
-				// audio packet
-				if (GetOutputPin(1)) {
-					CAutoPtr<CPacket> p(DNew CPacket());
-					p->TrackNumber = 1;
-					p->rtStart = hdr.rt - m_rtOffsetAudio;
-					p->rtStop = p->rtStart + llMulDiv(hdr.size, UNITS, 8000, 0);
+				break;
+			}
+		}
 
+		if (vp) {
+			DeliverPacket(vp);
+		}
+	} else {
+		WORD video_pts_prev = WORD_MAX;
+		WORD audio_pts_prev = WORD_MAX;
+
+		REFERENCE_TIME video_rt = 0;
+		REFERENCE_TIME audio_rt = 0;
+
+		while (SUCCEEDED(hr) && !CheckRequest(nullptr) && m_pFile->GetRemaining()) {
+			DHAVHeader hdr;
+			if (DHAVReadHeader(hdr)) {
+				if (DHAV_VIDEO(hdr)) {
+					if (video_pts_prev == WORD_MAX) {
+						video_pts_prev = hdr.pts;
+					}
+
+					const WORD period = (hdr.pts >= video_pts_prev) ?
+										(hdr.pts - video_pts_prev) :
+										(hdr.pts + (0 - video_pts_prev));
+					video_rt += 10000LL * period;
+					video_pts_prev = hdr.pts;
+
+					CAutoPtr<CPacket> p(DNew CPacket());
+					p->bSyncPoint = hdr.key_frame;
+					p->rtStart = video_rt;
+					p->rtStop  = p->rtStart + m_AvgTimePerFrame;
 					p->resize(hdr.size);
 					if ((hr = m_pFile->ByteRead(p->data(), hdr.size)) == S_OK) {
 						hr = DeliverPacket(p);
+						m_pFile->Skip(DHAV_FooterSize);
+					}
+				} else if (DHAV_AUDIO(hdr) && GetOutputPin(1)) {
+					if (audio_pts_prev == WORD_MAX) {
+						audio_pts_prev = hdr.pts;
+					}
+
+					const WORD period = (hdr.pts >= audio_pts_prev) ?
+										(hdr.pts - audio_pts_prev) :
+										(hdr.pts + (0 - audio_pts_prev));
+					audio_rt += 10000LL * period;
+					audio_pts_prev = hdr.pts;
+
+					CAutoPtr<CPacket> p(DNew CPacket());
+					p->TrackNumber = 1;
+					p->bSyncPoint = TRUE;
+					p->rtStart = audio_rt;
+					p->rtStop  = p->rtStart + 1;
+					p->resize(hdr.size);
+					if ((hr = m_pFile->ByteRead(p->data(), hdr.size)) == S_OK) {
+						hr = DeliverPacket(p);
+						m_pFile->Skip(DHAV_FooterSize);
 					}
 				} else {
-					m_pFile->Skip(hdr.size);
+					m_pFile->Skip(hdr.size + DHAV_FooterSize);
 				}
+			} else {
+				break;
 			}
-		} else {
-			break;
 		}
-	}
-
-	if (vp) {
-		DeliverPacket(vp);
 	}
 
 	return true;
 }
 
-bool CDVRSplitterFilter::Sync()
+bool CDVRSplitterFilter::HXVSSync()
 {
 	const __int64 start = m_pFile->GetPos();
 	DWORD sync;
-	for (__int64 i = 0, j = m_endpos - start - HeaderSize - 4;
+	for (__int64 i = 0, j = m_endpos - start - HXVS_HeaderSize - 4;
 			i <= MEGABYTE && i < j && S_OK == m_pFile->ByteRead((BYTE*)&sync, sizeof(sync));
 			i++, m_pFile->Seek(start + i)) {
-		if (sync == VIDEO || sync == AUDIO) {
+		if (sync == HXVS_VIDEO || sync == HXVS_AUDIO) {
 			m_pFile->Seek(start + i);
 			return true;
 		}
@@ -389,20 +632,164 @@ bool CDVRSplitterFilter::Sync()
 	return false;
 }
 
-bool CDVRSplitterFilter::ReadHeader(Header& hdr)
+bool CDVRSplitterFilter::HXVSReadHeader(HXVSHeader& hdr)
 {
-	const auto ret = Sync() && S_OK == m_pFile->ByteRead((BYTE*)&hdr, HeaderSize);
+	const auto ret = HXVSSync() && S_OK == m_pFile->ByteRead((BYTE*)&hdr, HXVS_HeaderSize);
 	if (ret) {
 		hdr.rt = hdr.pts * 10000ll;
 		hdr.key_frame = hdr.dummy == 1;
 
-		if (hdr.sync == AUDIO) {
+		if (hdr.sync == HXVS_AUDIO) {
 			hdr.size -= 4;
 			m_pFile->Skip(4);
 		}
 	}
 
 	return ret;
+}
+
+bool CDVRSplitterFilter::DHAVSync(__int64& pos)
+{
+	const __int64 start = pos = m_pFile->GetPos();
+	DWORD sync;
+	for (__int64 i = 0, j = m_endpos - start - DHAV_HeaderSize - DHAV_FooterSize;
+			i <= MEGABYTE && i < j && S_OK == m_pFile->ByteRead((BYTE*)&sync, sizeof(sync));
+			i++, m_pFile->Seek(start + i)) {
+		if (sync == DHAV_SYNC_START) {
+			pos = start + i;
+			m_pFile->Seek(pos);
+			return true;
+		}
+	}
+
+	m_pFile->Seek(start);
+	return false;
+}
+
+bool CDVRSplitterFilter::DHAVReadHeader(DHAVHeader& hdr, const bool bParseExt/* = false*/)
+{
+	static const UINT sample_rates[] = {
+		8000,  4000,   8000,  11025, 16000,
+		20000, 22050,  32000, 44100, 48000,
+		96000, 192000, 64000,
+	};
+
+	ZeroMemory(&hdr, sizeof(hdr));
+
+	__int64 sync_pos = 0;
+	for (;;) {
+		const auto ret = DHAVSync(sync_pos) && S_OK == m_pFile->ByteRead((BYTE*)&hdr, DHAV_HeaderSize);
+		if (ret) {
+			if ((hdr.size - hdr.ext_size) <= DHAV_HeaderSize + DHAV_FooterSize) {
+				m_pFile->Seek(sync_pos + 1);
+				continue;
+			}
+
+			if ((hdr.size - DHAV_HeaderSize) > m_pFile->GetAvailable()) {
+				return false;
+			}
+
+			hdr.size -= DHAV_HeaderSize;
+			hdr.size -= DHAV_FooterSize;
+
+			sync_pos = m_pFile->GetPos();
+			m_pFile->Seek(sync_pos + hdr.size);
+			DWORD sync;
+			if (FAILED(m_pFile->ByteRead((BYTE*)&sync, sizeof(sync))) || sync != DHAV_SYNC_END) {
+				return false;
+			}
+			m_pFile->Seek(sync_pos);
+
+			if (hdr.ext_size) {
+				if (bParseExt) {
+					const auto ext_end_pos = m_pFile->GetPos() + hdr.ext_size;
+					auto ext_size = hdr.ext_size;
+					while (ext_size) {
+						const BYTE type = (BYTE)m_pFile->BitRead(8);
+						ext_size--;
+
+						switch (type) {
+							case 0x80:
+								m_pFile->Skip(1);
+								hdr.video.width  = 8 * m_pFile->BitRead(8);
+								hdr.video.height = 8 * m_pFile->BitRead(8);
+								ext_size -= 3;
+								break;
+							case 0x81:
+								m_pFile->Skip(1);
+								hdr.video.codec      = m_pFile->BitRead(8);
+								hdr.video.frame_rate = m_pFile->BitRead(8);
+								ext_size -= 3;
+								break;
+							case 0x82:
+								m_pFile->Skip(3);
+								m_pFile->ByteRead((BYTE*)&hdr.video.width, sizeof(hdr.video.width));
+								m_pFile->ByteRead((BYTE*)&hdr.video.height, sizeof(hdr.video.height));
+								ext_size -= 7;
+								break;
+							case 0x83:
+								{
+									hdr.audio.channels = m_pFile->BitRead(8);
+									hdr.audio.codec    = m_pFile->BitRead(8);
+									const BYTE index   = m_pFile->BitRead(8);
+									hdr.audio.sample_rate = (index < _countof(sample_rates)) ? sample_rates[index] : 8000;
+
+									ext_size -= 3;
+								}
+								break;
+							case 0x8c:
+								{
+									m_pFile->Skip(1);
+									hdr.audio.channels = m_pFile->BitRead(8);
+									hdr.audio.codec    = m_pFile->BitRead(8);
+									const BYTE index   = m_pFile->BitRead(8);
+									hdr.audio.sample_rate = (index < _countof(sample_rates)) ? sample_rates[index] : 8000;
+
+									m_pFile->Skip(3);
+									ext_size -= 7;
+								}
+								break;
+							case 0x88:
+							case 0x91:
+							case 0x92:
+							case 0x93:
+							case 0x95:
+							case 0x9a:
+							case 0x9b:
+							case 0xb3:
+								m_pFile->Skip(7);
+								ext_size -= 7;
+								break;
+							case 0x84:
+							case 0x85:
+							case 0x8b:
+							case 0x94:
+							case 0x96:
+							case 0xa0:
+							case 0xb2:
+							case 0xb4:
+								m_pFile->Skip(3);
+								ext_size -= 3;
+								break;
+							default:
+								m_pFile->Skip(ext_size);
+								ext_size = 0;
+						}
+					}
+					m_pFile->Seek(ext_end_pos);
+				} else {
+					m_pFile->Skip(hdr.ext_size);
+				}
+				hdr.size -= hdr.ext_size;
+			}
+
+			hdr.key_frame = hdr.type != 0xfc;
+		}
+
+		return ret;
+	}
+
+	return false;
 }
 
 // CBaseFilter
