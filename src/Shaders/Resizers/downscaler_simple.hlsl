@@ -14,7 +14,7 @@
 
 sampler s0 : register(s0);
 float2 dxdy : register(c0);
-float2 steps : register(c1);
+float2 steps : register(c2);
 
 static const int k = clamp(int(steps[AXIS]), 2, MAXSTEPS);
 static const int start = k / 2 - k;

@@ -1,7 +1,7 @@
 
 sampler s0   : register(s0); // input texture
 float2 dxdy  : register(c0);
-float2 scale : register(c2);
+float2 scale : register(c1);
 
 #include "downscaler_filters.hlsl"
 
