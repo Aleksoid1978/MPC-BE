@@ -73,6 +73,12 @@ CSizingControlBar::CSizingControlBar()
     m_bDragShowContent = FALSE;
     m_nDockBarID = 0;
     m_dwSCBStyle = 0;
+    m_htEdge = 0;
+    m_nTrackPosMin = 0;
+    m_nTrackPosMax = 0;
+    m_nTrackPosOld = 0;
+    m_nTrackEdgeOfs = 0;
+    m_bFixedFloat = FALSE;
 }
 
 CSizingControlBar::~CSizingControlBar()
@@ -405,7 +411,12 @@ void CSizingControlBar::OnMouseMove(UINT nFlags, CPoint point)
         CPoint ptScreen = point;
         ClientToScreen(&ptScreen);
 
-        OnTrackUpdateSize(ptScreen);
+        //MPC-BE custom code start
+        // Switch to parent window client coordinates to account for possible RTL layout
+        CPoint ptParentClient = ptScreen;
+        GetParentFrame()->ScreenToClient(&ptParentClient);
+        OnTrackUpdateSize(ptParentClient);
+        //MPC-BE custom code end
     }
 
     baseCSizingControlBar::OnMouseMove(nFlags, point);
@@ -468,6 +479,11 @@ void CSizingControlBar::OnNcCalcSize(BOOL bCalcValidRects,
 void CSizingControlBar::NcCalcClient(LPRECT pRc, UINT nDockBarID)
 {
     CRect rc(pRc);
+    //MPC-BE custom code start
+    // Work in screen coordinates before converting back to
+    // client coordinates to account for possible RTL layout
+    GetParent()->ClientToScreen(&rc);
+    //MPC-BE custom code end
 
     rc.DeflateRect(3, 5, 3, 3);
     if (nDockBarID != AFX_IDW_DOCKBAR_FLOAT)
@@ -497,6 +513,12 @@ void CSizingControlBar::NcCalcClient(LPRECT pRc, UINT nDockBarID)
             (m_dwSCBStyle & SCBS_EDGERIGHT) ? m_cxEdge : 0,
             (m_dwSCBStyle & SCBS_EDGEBOTTOM) ? m_cxEdge : 0);
 
+    //MPC-BE custom code start
+    // Work in screen coordinates before converting back to
+    // client coordinates to account for possible RTL layout
+    GetParent()->ScreenToClient(&rc);
+    //MPC-BE custom code end
+
     *pRc = rc;
 }
 
@@ -507,8 +529,14 @@ void CSizingControlBar::OnNcPaint()
 
     CRect rcClient, rcBar;
     GetClientRect(rcClient);
-    ClientToScreen(rcClient);
+    //MPC-BE custom code start
+    //ClientToScreen(rcClient);
+    //MPC-BE custom code end
     GetWindowRect(rcBar);
+    //MPC-BE custom code start
+    // Convert to client coordinates to account for possible RTL layout
+    ScreenToClient(rcBar);
+    //MPC-BE custom code end
     rcClient.OffsetRect(-rcBar.TopLeft());
     rcBar.OffsetRect(-rcBar.TopLeft());
 
@@ -524,10 +552,10 @@ void CSizingControlBar::OnNcPaint()
     DrawBorders(&mdc, rcDraw);
 
     // erase the NC background
-//MPC-BE custom code start
+    //MPC-BE custom code start
     mdc.FillRect(rcDraw, CBrush::FromHandle(
         (HBRUSH) GetClassLongPtr(m_hWnd, GCLP_HBRBACKGROUND)));
-//MPC-BE custom code end
+    //MPC-BE custom code end
 
     if (m_dwSCBStyle & SCBS_SHOWEDGES)
     {
@@ -567,6 +595,12 @@ LRESULT CSizingControlBar::OnNcHitTest(CPoint point)
 {
     CRect rcBar, rcEdge;
     GetWindowRect(rcBar);
+
+    //MPC-BE custom code start
+    // Convert to client coordinates to account for possible RTL layout
+    ScreenToClient(&rcBar);
+    ScreenToClient(&point);
+    //MPC-BE custom code end
 
     if (!IsFloating())
         for (int i = 0; i < 4; i++)
@@ -613,6 +647,11 @@ void CSizingControlBar::OnClose()
 
 void CSizingControlBar::StartTracking(UINT nHitTest, CPoint point)
 {
+    //MPC-BE custom code start
+    // Convert to client coordinates to account for possible RTL layout
+    GetParentFrame()->ScreenToClient(&point);
+    //MPC-BE custom code end
+
     SetCapture();
 
     // make sure no updates are pending
@@ -629,6 +668,10 @@ void CSizingControlBar::StartTracking(UINT nHitTest, CPoint point)
 
     CRect rcBar, rcEdge;
     GetWindowRect(rcBar);
+    //MPC-BE custom code start
+    // Convert to client coordinates to account for possible RTL layout
+    GetParent()->ScreenToClient(&rcBar);
+    //MPC-BE custom code end
     GetEdgeRect(rcBar, m_htEdge, rcEdge);
     m_nTrackEdgeOfs = m_nTrackPosOld -
         (bHorzTracking ? rcEdge.CenterPoint().x : rcEdge.CenterPoint().y);
