@@ -489,7 +489,21 @@ void CDVRSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 
 	if (m_bDHAV) {
 		const auto len = m_endpos - m_startpos;
-		const auto seekpos = CalcPos(rt);
+		auto seekpos = CalcPos(rt);
+		m_pFile->Seek(seekpos);
+
+		DHAVHeader hdr;
+		while (DHAVReadHeader(hdr)) {
+			if (DHAV_VIDEO(hdr) && hdr.key_frame) {
+				m_pFile->Seek(m_pFile->GetPos() - DHAV_HeaderSize - hdr.ext_size);
+				return;
+			}
+
+			m_pFile->Skip(hdr.size + DHAV_FooterSize);
+		}
+
+		m_rt_Seek = std::min(0ll, rt - UNITS);
+		seekpos = CalcPos(m_rt_Seek);
 		m_pFile->Seek(seekpos);
 		return;
 	}
