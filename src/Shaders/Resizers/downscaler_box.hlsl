@@ -1,7 +1,7 @@
 
 sampler s0   : register(s0); // input texture
 float2 dxdy  : register(c0);
-float2 scale : register(c2);
+float2 scale : register(c1);
 
 #ifdef PS20
     #define GetFrom(s, pos) tex2D(s, (pos))

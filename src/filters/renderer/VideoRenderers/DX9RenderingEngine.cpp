@@ -1339,8 +1339,8 @@ HRESULT CDX9RenderingEngine::TextureResizeShader(IDirect3DTexture9* pTexture, co
 
 	float fConstData[][4] = {
 		{ dx, dy, 0, 0 },
-		{ steps_x, steps_y, 0, 0 },
 		{ scale_x, scale_y, 0, 0 },
+		{ steps_x, steps_y, 0, 0 },
 	};
 	hr = m_pD3DDevEx->SetPixelShaderConstantF(0, (float*)fConstData, _countof(fConstData));
 	hr = m_pD3DDevEx->SetPixelShader(m_pResizerPixelShaders[iShader]);
