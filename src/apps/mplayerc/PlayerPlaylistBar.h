@@ -210,8 +210,6 @@ private:
 
 	bool m_bVisible;
 
-	int m_itemHeight = 0;
-
 	CFont m_font;
 	void ScaleFontInternal();
 
@@ -292,7 +290,6 @@ public:
 	afx_msg void OnNMDblclkList(NMHDR* pNMHDR, LRESULT* pResult);
 	//afx_msg void OnLvnKeydownList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult);
-	void OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct);
 	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 	afx_msg BOOL OnPlayPlay(UINT nID);
 	afx_msg void OnBeginDrag(NMHDR* pNMHDR, LRESULT* pResult);
