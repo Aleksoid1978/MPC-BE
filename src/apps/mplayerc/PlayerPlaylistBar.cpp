@@ -2113,17 +2113,17 @@ void CPlayerPlaylistBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NMLVCUSTOMDRAW* pLVCD = reinterpret_cast<NMLVCUSTOMDRAW*>(pNMHDR);
 	*pResult = CDRF_DODEFAULT;
-	CAppSettings& s = AfxGetAppSettings();
-
-	int R, G, B;
 
 	if (CDDS_PREPAINT == pLVCD->nmcd.dwDrawStage) {
 		if (SysVersion::IsWin7orLater()) { // under WinXP cause the hang
 			ResizeListColumn();
 		}
 
+		const CAppSettings& s = AfxGetAppSettings();
+		int R, G, B;
+
 		if (s.bUseDarkTheme) {
-			ThemeRGB(30, 35, 40, R, G, B);
+			ThemeRGB(10, 15, 20, R, G, B);
 		}
 
 		CRect r;
@@ -2132,7 +2132,8 @@ void CPlayerPlaylistBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 
 		*pResult = CDRF_NOTIFYPOSTPAINT | CDRF_NOTIFYITEMDRAW;
 
-	}/* else if (CDDS_ITEMPREPAINT == pLVCD->nmcd.dwDrawStage) {
+	}
+	/* else if (CDDS_ITEMPREPAINT == pLVCD->nmcd.dwDrawStage) {
 
 		pLVCD->nmcd.uItemState &= ~CDIS_SELECTED;
 		pLVCD->nmcd.uItemState &= ~CDIS_FOCUS;
@@ -2166,41 +2167,46 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 		return;
 	}
 
-	CAppSettings& s = AfxGetAppSettings();
-
-	int R, G, B;
-
-	int nItem = lpDrawItemStruct->itemID;
-	CRect rcItem = lpDrawItemStruct->rcItem;
+	const int nItem = lpDrawItemStruct->itemID;
+	const CRect& rcItem = lpDrawItemStruct->rcItem;
 	POSITION pos = FindPos(nItem);
 	if (!pos) {
 		ASSERT(FALSE);
 		return;
 	}
 
-	bool fSelected = pos == m_pl.GetPos();
-	CPlaylistItem& pli = m_pl.GetAt(pos);
+	const CAppSettings& s = AfxGetAppSettings();
+	const auto bSelected = pos == m_pl.GetPos();
+	const CPlaylistItem& pli = m_pl.GetAt(pos);
 
 	CDC* pDC = CDC::FromHandle(lpDrawItemStruct->hDC);
+	int R, G, B;
 
 	if (!!m_list.GetItemState(nItem, LVIS_SELECTED)) {
 		if (s.bUseDarkTheme) {
-			ThemeRGB(15, 20, 25, R, G, B);
+			ThemeRGB(60, 65, 70, R, G, B);
 		}
 		FillRect(pDC->m_hDC, rcItem, CBrush(s.bUseDarkTheme ? RGB(R, G, B) : 0x00f1dacc));
+		if (s.bUseDarkTheme) {
+			ThemeRGB(90, 95, 100, R, G, B);
+		}
 		FrameRect(pDC->m_hDC, rcItem, CBrush(s.bUseDarkTheme ? RGB(R, G, B) : 0xc56a31));
 	} else {
 		if (s.bUseDarkTheme) {
-			ThemeRGB(30, 35, 40, R, G, B);
+			if (bSelected) {
+				ThemeRGB(40, 45, 50, R, G, B);
+			} else {
+				ThemeRGB(10, 15, 20, R, G, B);
+			}
 		}
 		FillRect(pDC->m_hDC, rcItem, CBrush(s.bUseDarkTheme ? RGB(R, G, B) : RGB(255, 255, 255)));
 	}
 
-	COLORREF textcolor = fSelected ? 0xff : 0;
+	COLORREF textcolor = bSelected ? 0xff : 0;
 
 	if (s.bUseDarkTheme) {
 		ThemeRGB(135, 140, 145, R, G, B);
-		textcolor = fSelected ? s.clrFaceABGR : RGB(R, G, B);
+		textcolor = bSelected ? s.clrFaceABGR : RGB(R, G, B);
 	}
 
 	if (pli.m_fInvalid) {
@@ -2212,7 +2218,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 	CPoint timept(rcItem.right, 0);
 	if (time.GetLength() > 0) {
 		timesize = pDC->GetTextExtent(time);
-		if ((3+timesize.cx + 3) < rcItem.Width() / 2) {
+		if ((3 + timesize.cx + 3) < rcItem.Width() / 2) {
 			timept = CPoint(rcItem.right - (3 + timesize.cx + 3), (rcItem.top + rcItem.bottom - timesize.cy) / 2);
 
 			pDC->SetTextColor(textcolor);
@@ -2222,7 +2228,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 
 	CString fmt, file;
 	fmt.Format(L"%%0%dd. %%s", (int)log10(0.1 + m_pl.GetCount()) + 1);
-	file.Format(fmt, nItem+1, m_list.GetItemText(nItem, COL_NAME));
+	file.Format(fmt, nItem + 1, m_list.GetItemText(nItem, COL_NAME));
 	CSize filesize = pDC->GetTextExtent(file);
 	while (3 + filesize.cx + 6 > timept.x && file.GetLength() > 3) {
 		file = file.Left(file.GetLength() - 4) + L"...";
