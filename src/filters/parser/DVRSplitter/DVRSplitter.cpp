@@ -502,7 +502,7 @@ void CDVRSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 			m_pFile->Skip(hdr.size + DHAV_FooterSize);
 		}
 
-		m_rt_Seek = std::min(0ll, rt - UNITS);
+		m_rt_Seek = std::max(0ll, rt - UNITS);
 		seekpos = CalcPos(m_rt_Seek);
 		m_pFile->Seek(seekpos);
 		return;
