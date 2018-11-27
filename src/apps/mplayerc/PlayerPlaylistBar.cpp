@@ -744,9 +744,6 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 
 	ScaleFontInternal();
 
-	m_fakeImageList.Create(1, 16, ILC_COLOR4, 10, 10);
-	m_list.SetImageList(&m_fakeImageList, LVSIL_SMALL);
-
 	return TRUE;
 }
 
@@ -788,6 +785,10 @@ void CPlayerPlaylistBar::ScaleFontInternal()
 	m_list.ReleaseDC(pDC);
 
 	m_list.SetColumnWidth(COL_TIME, m_nTimeColWidth);
+
+	m_fakeImageList.DeleteImageList();
+	m_fakeImageList.Create(1, m_pMainFrame->ScaleY(16), ILC_COLOR4, 10, 10);
+	m_list.SetImageList(&m_fakeImageList, LVSIL_SMALL);
 }
 
 void CPlayerPlaylistBar::ScaleFont()
@@ -2013,7 +2014,6 @@ BEGIN_MESSAGE_MAP(CPlayerPlaylistBar, CSizingControlBarG)
 	ON_NOTIFY(LVN_KEYDOWN, IDC_PLAYLIST, OnLvnKeyDown)
 	ON_NOTIFY(NM_DBLCLK, IDC_PLAYLIST, OnNMDblclkList)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_PLAYLIST, OnCustomdrawList)
-	ON_WM_MEASUREITEM()
 	ON_WM_DRAWITEM()
 	ON_COMMAND_EX(ID_PLAY_PLAY, OnPlayPlay)
 	ON_NOTIFY(LVN_BEGINDRAG, IDC_PLAYLIST, OnBeginDrag)
@@ -2158,15 +2158,6 @@ void CPlayerPlaylistBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 
 		*pResult = CDRF_SKIPDEFAULT;
 	}*/
-}
-
-void CPlayerPlaylistBar::OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct)
-{
-	__super::OnMeasureItem(nIDCtl, lpMeasureItemStruct);
-	if (m_itemHeight == 0) {
-		m_itemHeight = lpMeasureItemStruct->itemHeight;
-	}
-	lpMeasureItemStruct->itemHeight = m_pMainFrame->ScaleY(m_itemHeight);
 }
 
 void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
