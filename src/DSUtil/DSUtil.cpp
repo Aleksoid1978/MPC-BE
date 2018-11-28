@@ -1507,11 +1507,13 @@ HRESULT GUIDFromCString(CString str, GUID& guid)
 	return CLSIDFromString(CComBSTR(str), &guid);
 }
 
-CString CStringFromGUID(const GUID& guid)
+CStringW CStringFromGUID(const GUID& guid)
 {
-	WCHAR null[128] = {0}, buff[128];
-	StringFromGUID2(GUID_NULL, null, 127);
-	return CString(StringFromGUID2(guid, buff, 127) > 0 ? buff : null);
+	WCHAR buff[40] = {};
+	if (StringFromGUID2(guid, buff, 39) <= 0) {
+		StringFromGUID2(GUID_NULL, buff, 39);
+	}
+	return CStringW(buff);
 }
 
 static struct {

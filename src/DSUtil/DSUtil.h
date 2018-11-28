@@ -136,7 +136,7 @@ extern bool				IsLikelyFilePath(const CString &str);
 
 extern GUID				GUIDFromCString(CString str);
 extern HRESULT			GUIDFromCString(CString str, GUID& guid);
-extern CString			CStringFromGUID(const GUID& guid);
+extern CStringW			CStringFromGUID(const GUID& guid);
 
 extern CString			ISO6391ToLanguage(LPCSTR code);
 extern CString			ISO6392ToLanguage(LPCSTR code);
