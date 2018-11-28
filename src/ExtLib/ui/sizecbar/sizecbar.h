@@ -107,6 +107,8 @@ public:
         m_szFloat.cy = m_szHorz.cy = m_szVert.cy = nHeight;
         m_pDockSite->DelayRecalcLayout();
     }
+
+    virtual COLORREF ColorThemeRGB(const int iR, const int iG, const int iB) const { return 0; }
 //MPC-BE custom code end
 
 // Overridables
@@ -166,7 +168,13 @@ protected:
 //MPC-BE custom code start
     BOOL    m_bFixedFloat;
     CSize   m_szFixedFloat;
+
+    HBRUSH   m_hBrush, m_hBrush_orig;
+    COLORREF m_dwBrushColor;
 //MPC-BE custom code end
+
+public:
+    bool m_bUseDarkTheme;
 
 // Generated message map functions
 protected:

@@ -116,35 +116,36 @@ void CSizingControlBarG::NcPaintGripper(CDC* pDC, CRect rcClient)
     if (!HasGripper())
         return;
 
-    // paints a simple "two raised lines" gripper
-    // override this if you want a more sophisticated gripper
-    CRect gripper = rcClient;
-    CRect rcbtn = m_biHide.GetRect();
-    BOOL bHorz = IsHorzDocked();
+    if (!m_bUseDarkTheme) {
+        // paints a simple "two raised lines" gripper
+        // override this if you want a more sophisticated gripper
+        CRect gripper = rcClient;
+        CRect rcbtn = m_biHide.GetRect();
+        BOOL bHorz = IsHorzDocked();
 
-    gripper.DeflateRect(1, 1);
-    if (bHorz)
-    {   // gripper at left
-        gripper.left -= m_cyGripper;
-        gripper.right = gripper.left + 3;
-        gripper.top = rcbtn.bottom + 3;
+        gripper.DeflateRect(1, 1);
+        if (bHorz)
+        {   // gripper at left
+            gripper.left -= m_cyGripper;
+            gripper.right = gripper.left + 3;
+            gripper.top = rcbtn.bottom + 3;
+        }
+        else
+        {   // gripper at top
+            gripper.top -= m_cyGripper;
+            gripper.bottom = gripper.top + 3;
+            gripper.right = rcbtn.left - 3;
+        }
+        pDC->Draw3dRect(gripper, ::GetSysColor(COLOR_BTNHIGHLIGHT),
+            ::GetSysColor(COLOR_BTNSHADOW));
+
+        gripper.OffsetRect(bHorz ? 3 : 0, bHorz ? 0 : 3);
+
+        pDC->Draw3dRect(gripper, ::GetSysColor(COLOR_BTNHIGHLIGHT),
+            ::GetSysColor(COLOR_BTNSHADOW));
     }
-    else
-    {   // gripper at top
-        gripper.top -= m_cyGripper;
-        gripper.bottom = gripper.top + 3;
-        gripper.right = rcbtn.left - 3;
-    }
 
-    pDC->Draw3dRect(gripper, ::GetSysColor(COLOR_BTNHIGHLIGHT),
-        ::GetSysColor(COLOR_BTNSHADOW));
-
-    gripper.OffsetRect(bHorz ? 3 : 0, bHorz ? 0 : 3);
-
-    pDC->Draw3dRect(gripper, ::GetSysColor(COLOR_BTNHIGHLIGHT),
-        ::GetSysColor(COLOR_BTNSHADOW));
-
-    m_biHide.Paint(pDC);
+    m_biHide.Paint(pDC, this);
 }
 
 LRESULT CSizingControlBarG::OnNcHitTest(CPoint point)
@@ -211,24 +212,32 @@ CSCBButton::CSCBButton()
     bPushed = FALSE;
 }
 
-void CSCBButton::Paint(CDC* pDC)
+void CSCBButton::Paint(CDC* pDC, const CSizingControlBar* parent)
 {
     CRect rc = GetRect();
 
+    // btn highlight
     if (bPushed)
-        pDC->Draw3dRect(rc, ::GetSysColor(COLOR_BTNSHADOW),
-            ::GetSysColor(COLOR_BTNHIGHLIGHT));
-    else
-        if (bRaised)
+        if (parent->m_bUseDarkTheme) {
+            pDC->Draw3dRect(rc, parent->ColorThemeRGB(5, 10, 15), parent->ColorThemeRGB(55, 60, 65));
+        } else {
+            pDC->Draw3dRect(rc, ::GetSysColor(COLOR_BTNSHADOW),
+                ::GetSysColor(COLOR_BTNHIGHLIGHT));
+        }
+    else if (bRaised)
+        if (parent->m_bUseDarkTheme) {
+            pDC->Draw3dRect(rc, parent->ColorThemeRGB(55, 60, 65), parent->ColorThemeRGB(5, 10, 15));
+        } else {
             pDC->Draw3dRect(rc, ::GetSysColor(COLOR_BTNHIGHLIGHT),
                 ::GetSysColor(COLOR_BTNSHADOW));
+        }
 
     COLORREF clrOldTextColor = pDC->GetTextColor();
-    pDC->SetTextColor(::GetSysColor(COLOR_BTNTEXT));
+    pDC->SetTextColor(parent->m_bUseDarkTheme ? parent->ColorThemeRGB(125, 130, 135) : ::GetSysColor(COLOR_BTNTEXT));
     int nPrevBkMode = pDC->SetBkMode(TRANSPARENT);
     CFont font;
     int ppi = pDC->GetDeviceCaps(LOGPIXELSX);
-    int pointsize = MulDiv(60, 96, ppi); // 6 points at 96 ppi
+    int pointsize = MulDiv(70, ppi, 96); // 7 points at 96 ppi
     font.CreatePointFont(pointsize, _T("Marlett"));
     CFont* oldfont = pDC->SelectObject(&font);
 

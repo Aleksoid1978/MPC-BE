@@ -221,7 +221,7 @@ void CSizingControlBarCF::NcPaintGripper(CDC* pDC, CRect rcClient)
     }
 
     // draw the button
-    m_biHide.Paint(pDC);
+    m_biHide.Paint(pDC, this);
 }
 
 LRESULT CSizingControlBarCF::OnSetText(WPARAM wParam, LPARAM lParam)

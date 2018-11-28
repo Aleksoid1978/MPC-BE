@@ -717,6 +717,7 @@ CPlayerPlaylistBar::CPlayerPlaylistBar(CMainFrame* pMainFrame)
 	, m_bHiddenDueToFullscreen(false)
 	, m_bVisible(false)
 {
+	m_bUseDarkTheme = AfxGetAppSettings().bUseDarkTheme;
 }
 
 CPlayerPlaylistBar::~CPlayerPlaylistBar()
@@ -860,6 +861,14 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 	}
 
 	return CSizingControlBarG::PreTranslateMessage(pMsg);
+}
+
+COLORREF CPlayerPlaylistBar::ColorThemeRGB(const int iR, const int iG, const int iB) const
+{
+	int iRed, iGreen, iBlue;
+	ThemeRGB(iR, iG,iB, iRed, iGreen, iBlue);
+
+	return RGB(iRed, iGreen, iBlue);
 }
 
 void CPlayerPlaylistBar::LoadState(CFrameWnd *pParent)

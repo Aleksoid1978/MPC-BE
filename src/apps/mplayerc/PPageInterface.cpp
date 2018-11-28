@@ -246,6 +246,10 @@ BOOL CPPageInterface::OnApply()
 
 	pFrame->m_wndPreView.SetRelativeSize(s.iSmartSeekSize);
 
+	pFrame->m_wndPlaylistBar.m_bUseDarkTheme = s.bUseDarkTheme;
+	if (pFrame->m_wndPlaylistBar.IsWindowVisible()) {
+		pFrame->m_wndPlaylistBar.SendMessageW(WM_NCPAINT, 1, NULL);
+	}
 	pFrame->Invalidate();
 
 	m_nThemeBrightness_Old	= s.nThemeBrightness;
@@ -302,11 +306,14 @@ void CPPageInterface::ApplyOSDTransparent()
 
 void CPPageInterface::OnThemeChange()
 {
-	auto pFrame		= AfxGetMainFrame();
-	HWND wndToolBar	= AfxGetMainFrame()->m_hWnd_toolbar;
+	const auto pFrame = AfxGetMainFrame();
 
-	if (::IsWindow(wndToolBar)) {
-		::PostMessageW(wndToolBar, WM_SIZE, SIZE_RESTORED, MAKELPARAM(320, 240));
+	if (::IsWindow(pFrame->m_hWnd_toolbar)) {
+		::PostMessageW(pFrame->m_hWnd_toolbar, WM_SIZE, SIZE_RESTORED, MAKELPARAM(320, 240));
+	}
+
+	if (pFrame->m_wndPlaylistBar.IsWindowVisible()) {
+		pFrame->m_wndPlaylistBar.SendMessageW(WM_NCPAINT, 1, NULL);
 	}
 
 	pFrame->Invalidate();

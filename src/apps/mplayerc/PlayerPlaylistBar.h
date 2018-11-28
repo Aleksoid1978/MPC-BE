@@ -280,6 +280,8 @@ public:
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	
+	virtual COLORREF ColorThemeRGB(const int iR, const int iG, const int iB) const;
 
 	DECLARE_MESSAGE_MAP()
 

@@ -35,6 +35,7 @@
 /////////////////////////////////////////////////////////////////////////
 // CSCBButton (button info) helper class
 
+class CSizingControlBarG;
 class CSCBButton
 {
 public:
@@ -42,7 +43,7 @@ public:
 
     void Move(CPoint ptTo) {ptOrg = ptTo; };
     CRect GetRect() { return CRect(ptOrg, CSize(11, 11)); };
-    void Paint(CDC* pDC);
+    void Paint(CDC* pDC, const CSizingControlBar* parent);
 
     BOOL    bPushed;
     BOOL    bRaised;
@@ -61,6 +62,8 @@ protected:
 class CSizingControlBarG : public baseCSizingControlBarG
 {
     DECLARE_DYNAMIC(CSizingControlBarG);
+
+    friend class CSCBButton;
 
 // Construction
 public:
