@@ -273,8 +273,6 @@ void CPlayerSeekBar::OnPaint()
 
 	const CAppSettings& s = AfxGetAppSettings();
 
-	int R, G, B, R2, G2, B2;
-
 	const bool bEnabled = m_bEnabled && m_stop > 0;
 
 	if (s.bUseDarkTheme) {
@@ -289,6 +287,8 @@ void CPlayerSeekBar::OnPaint()
 
 		GRADIENT_RECT gr = {0, 1};
 		int pa = 255 * 256;
+
+		int R, G, B, R2, G2, B2;
 
 		if (m_BackGroundbm.IsExtGradiendLoading()) {
 			ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
@@ -309,14 +309,12 @@ void CPlayerSeekBar::OnPaint()
 		const int nposx = GetThumbRect().right - 2;
 		const int nposy = r.top;
 
-		ThemeRGB(30, 35, 40, R, G, B);
-		CPen penPlayed1(PS_SOLID, 0, RGB(R,G,B));
+		CPen penPlayed1(PS_SOLID, 0, ThemeRGB(30, 35, 40));
 		memdc.SelectObject(&penPlayed1);
 		memdc.MoveTo(rc.left, rc.top);
 		memdc.LineTo(rc.right, rc.top);
 
-		ThemeRGB(80, 85, 90, R, G, B);
-		CPen penPlayed2(PS_SOLID, 0, RGB(R,G,B));
+		CPen penPlayed2(PS_SOLID, 0, ThemeRGB(80, 85, 90));
 		memdc.SelectObject(&penPlayed2);
 		memdc.MoveTo(rc.left - 1, rc.bottom - 1);
 		memdc.LineTo(rc.right + 2, rc.bottom - 1);
@@ -372,8 +370,7 @@ void CPlayerSeekBar::OnPaint()
 				memdc.GradientFill(tv2, 2, &gr, 1, GRADIENT_FILL_RECT_V);
 			}
 
-			ThemeRGB(80, 85, 90, R, G, B);
-			CPen penPlayed3(PS_SOLID, 0, RGB(R,G,B));
+			CPen penPlayed3(PS_SOLID, 0, ThemeRGB(80, 85, 90));
 			memdc.SelectObject(&penPlayed3);
 			memdc.MoveTo(rc.left, rc.top);//active_top
 			memdc.LineTo(nposx, rc.top);
@@ -386,8 +383,7 @@ void CPlayerSeekBar::OnPaint()
 				if (stop > 0 && m_pChapterBag && m_pChapterBag->ChapGetCount()) {
 					const CRect rc2 = rc;
 					const CRect r = GetChannelRect();
-					ThemeRGB(255, 255, 255, R, G, B);
-					CPen penPlayed2(PS_SOLID, 0, RGB(R, G, B));
+					CPen penPlayed2(PS_SOLID, 0, ThemeRGB(255, 255, 255));
 					memdc.SelectObject(&penPlayed2);
 
 					for (DWORD idx = 0; idx < m_pChapterBag->ChapGetCount(); idx++) {
@@ -417,8 +413,7 @@ void CPlayerSeekBar::OnPaint()
 		}
 
 		if (seekbartext.GetLength() || !s.bStatusBarIsVisible || !m_strChap.IsEmpty()) {
-			ThemeRGB(135, 140, 145, R, G, B);
-			memdc.SetTextColor(RGB(R,G,B));
+			memdc.SetTextColor(ThemeRGB(135, 140, 145));
 
 			CFont font;
 			font.CreateFontW(m_pMainFrame->ScaleY(13), 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
@@ -442,8 +437,7 @@ void CPlayerSeekBar::OnPaint()
 				memdc.DrawText(seekbartext, seekbartext.GetLength(), &rt, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
 
 				// highlights string
-				ThemeRGB(205, 210, 215, R, G, B);
-				memdc.SetTextColor(RGB(R,G,B));
+				memdc.SetTextColor(ThemeRGB(205, 210, 215));
 				if (nposx > rt.right - 15) {
 					memdc.DrawText(seekbartext, seekbartext.GetLength(), &rt, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
 				} else {
@@ -458,8 +452,7 @@ void CPlayerSeekBar::OnPaint()
 				rt.left  -= xt - 10;
 				rt.top   -= 2;
 				rt.right -= 6;
-				ThemeRGB(200, 205, 210, R, G, B);
-				memdc.SetTextColor(RGB(R,G,B));
+				memdc.SetTextColor(ThemeRGB(200, 205, 210));
 				memdc.DrawText(str, str.GetLength(), &rt, DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
 			}
 		}
