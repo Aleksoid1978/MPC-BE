@@ -576,10 +576,10 @@ void CSizingControlBar::OnNcPaint()
         if (!m_hBrush) {
             m_hBrush = ::CreateSolidBrush(dwBrushColor);
 		}
-        ::SetClassLongPtrW(m_hWnd, GCL_HBRBACKGROUND, (LONG)m_hBrush);
+        ::SetClassLongPtrW(m_hWnd, GCLP_HBRBACKGROUND, (LONG)m_hBrush);
         mdc.FillRect(rcDraw, CBrush::FromHandle(m_hBrush));
     } else {
-        ::SetClassLongPtrW(m_hWnd, GCL_HBRBACKGROUND, (LONG)m_hBrush_orig);
+        ::SetClassLongPtrW(m_hWnd, GCLP_HBRBACKGROUND, (LONG)m_hBrush_orig);
         mdc.FillRect(rcDraw, CBrush::FromHandle(m_hBrush_orig));
     }
     //MPC-BE custom code end
