@@ -86,36 +86,32 @@ void CStatusLabel::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	CString str;
 	GetWindowTextW(str);
 	CRect r;
-	int R, G, B;
 	GetClientRect(&r);
 	CFont* old = dc.SelectObject(&m_font);
 
 	CAppSettings& s = AfxGetAppSettings();
 
 	if (s.bUseDarkTheme) {
-		ThemeRGB(165, 170, 175, R, G, B);
-		dc.SetTextColor(RGB(R,G,B));
-		ThemeRGB(5, 10, 15, R, G, B);
-		dc.SetBkColor(RGB(R,G,B));
+		dc.SetTextColor(ThemeRGB(165, 170, 175));
+		dc.SetBkColor(ThemeRGB(5, 10, 15));
 	} else {
 		dc.SetTextColor(0xffffff);
 		dc.SetBkColor(0);
 	}
 
 	CSize size = dc.GetTextExtent(str);
-	CPoint p = CPoint(m_fRightAlign ? r.Width() - size.cx : 0, (r.Height()-size.cy)/2);
+	CPoint p = CPoint(m_fRightAlign ? r.Width() - size.cx : 0, (r.Height() - size.cy) / 2);
 
 	if (m_fAddEllipses) {
-		while (size.cx > r.Width()-3 && str.GetLength() > 3) {
-			str = str.Left(str.GetLength()-4) + L"...";
+		while (size.cx > r.Width() - 3 && str.GetLength() > 3) {
+			str = str.Left(str.GetLength() - 4) + L"...";
 			size = dc.GetTextExtent(str);
 		}
 	}
 
 	if (s.bUseDarkTheme) {
 		dc.SelectObject(&old);
-		ThemeRGB(5, 10, 15, R, G, B);
-		dc.FillSolidRect(&r, RGB(R, G, B));
+		dc.FillSolidRect(&r, ThemeRGB(5, 10, 15));
 		dc.TextOut(p.x, p.y, str);
 	} else {
 		dc.TextOut(p.x, p.y, str);
@@ -129,17 +125,16 @@ void CStatusLabel::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 BOOL CStatusLabel::OnEraseBkgnd(CDC* pDC)
 {
+	/*
 	CRect r;
 	GetClientRect(&r);
-	int R, G, B;
-
 	if (AfxGetAppSettings().bUseDarkTheme) {
-		ThemeRGB(5, 10, 15, R, G, B);
-		pDC->FillSolidRect(&r, RGB(R,G,B));
+		pDC->FillSolidRect(&r, ThemeRGB(5, 10, 15));
 		pDC->FillSolidRect(&r, 0);
 	} else {
 		pDC->FillSolidRect(&r, 0);
 	}
+	*/
 
 	return TRUE;
 }

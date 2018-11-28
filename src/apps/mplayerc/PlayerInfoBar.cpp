@@ -200,21 +200,18 @@ BOOL CPlayerInfoBar::OnEraseBkgnd(CDC* pDC)
 	}
 
 	if (AfxGetAppSettings().bUseDarkTheme) {
-		CPen penBlend(PS_SOLID,0,RGB(0,0,0));
+		CPen penBlend(PS_SOLID, 0, COLORREF(0));
 		CPen *penSaved = pDC->SelectObject(&penBlend);
 		pDC->MoveTo(r.left,r.top);
 		pDC->LineTo(r.right,r.top);
 		pDC->SelectObject(&penSaved);
-		r.DeflateRect(0,1,0,0);
 
-		int R, G, B;
-		ThemeRGB(5, 10, 15, R, G, B);
-		pDC->FillSolidRect(&r, RGB(R,G,B));
+		r.DeflateRect(0, 1, 0, 0);
+		pDC->FillSolidRect(&r, ThemeRGB(5, 10, 15));
 	} else {
 		pDC->Draw3dRect(&r, GetSysColor(COLOR_3DSHADOW), GetSysColor(COLOR_3DHILIGHT));
 
 		r.DeflateRect(1, 1);
-
 		pDC->FillSolidRect(&r, 0);
 	}
 

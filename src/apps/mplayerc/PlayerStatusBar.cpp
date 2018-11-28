@@ -386,12 +386,13 @@ void CPlayerStatusBar::OnPaint()
 		memdc.SelectObject(&m_bmPaint);
 
 		// background
-		int R, G, B, R2, G2, B2;
+		int R, G, B;
 
 		if (m_BackGroundbm.IsExtGradiendLoading()) {
 			ThemeRGB(s.nThemeRed, s.nThemeGreen, s.nThemeBlue, R, G, B);
 			m_BackGroundbm.PaintExternalGradient(&dc, r, 55, s.nThemeBrightness, R, G, B);
 		} else {
+			int R2, G2, B2;
 			ThemeRGB(30, 35, 40, R, G, B);
 			ThemeRGB(0, 5, 10, R2, G2, B2);
 			GRADIENT_RECT gr = {0, 1};
@@ -411,14 +412,12 @@ void CPlayerStatusBar::OnPaint()
 		memdc.MoveTo(r.left, r.top + 2);
 		memdc.LineTo(r.right, r.top + 2);
 
-		ThemeRGB(50, 55, 60, R, G, B);
-		CPen penPlayed2(PS_SOLID, 0, RGB(R, G, B));
+		CPen penPlayed2(PS_SOLID, 0, ThemeRGB(50, 55, 60));
 		memdc.SelectObject(&penPlayed2);
 		memdc.MoveTo(r.left, r.top + 3);
 		memdc.LineTo(r.right, r.top + 3);
 
-		ThemeRGB(165, 170, 175, R, G, B);
-		memdc.SetTextColor(RGB(R, G, B));
+		memdc.SetTextColor(ThemeRGB(165, 170, 175));
 
 		// texts
 		memdc.SelectObject(&m_font);

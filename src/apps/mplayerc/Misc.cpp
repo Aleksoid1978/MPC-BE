@@ -407,6 +407,13 @@ void ThemeRGB(int iR, int iG, int iB, int& iRed, int& iGreen, int& iBlue)
 	iBlue  = std::clamp(iBlue,  0, 255);
 }
 
+COLORREF ThemeRGB(const int iR, const int iG, const int iB)
+{
+	int iRed, iGreen, iBlue;
+	ThemeRGB(iR, iG,iB, iRed, iGreen, iBlue);
+
+	return RGB(iRed, iGreen, iBlue);
+}
 
 static int CALLBACK EnumFontFamExProc(ENUMLOGFONTEX* /*lpelfe*/, NEWTEXTMETRICEX* /*lpntme*/, int /*FontType*/, LPARAM lParam)
 {

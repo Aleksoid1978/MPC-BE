@@ -865,10 +865,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 
 COLORREF CPlayerPlaylistBar::ColorThemeRGB(const int iR, const int iG, const int iB) const
 {
-	int iRed, iGreen, iBlue;
-	ThemeRGB(iR, iG,iB, iRed, iGreen, iBlue);
-
-	return RGB(iRed, iGreen, iBlue);
+	return ThemeRGB(iR, iG,iB);
 }
 
 void CPlayerPlaylistBar::LoadState(CFrameWnd *pParent)
@@ -2128,16 +2125,9 @@ void CPlayerPlaylistBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 			ResizeListColumn();
 		}
 
-		const CAppSettings& s = AfxGetAppSettings();
-		int R, G, B;
-
-		if (s.bUseDarkTheme) {
-			ThemeRGB(10, 15, 20, R, G, B);
-		}
-
 		CRect r;
 		GetClientRect(&r);
-		FillRect(pLVCD->nmcd.hdc, &r, CBrush(s.bUseDarkTheme ? RGB(R, G, B) : RGB(255, 255, 255)));
+		FillRect(pLVCD->nmcd.hdc, &r, CBrush(AfxGetAppSettings().bUseDarkTheme ? ThemeRGB(10, 15, 20) : RGB(255, 255, 255)));
 
 		*pResult = CDRF_NOTIFYPOSTPAINT | CDRF_NOTIFYITEMDRAW;
 
@@ -2189,33 +2179,18 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 	const CPlaylistItem& pli = m_pl.GetAt(pos);
 
 	CDC* pDC = CDC::FromHandle(lpDrawItemStruct->hDC);
-	int R, G, B;
 
 	if (!!m_list.GetItemState(nItem, LVIS_SELECTED)) {
-		if (s.bUseDarkTheme) {
-			ThemeRGB(60, 65, 70, R, G, B);
-		}
-		FillRect(pDC->m_hDC, rcItem, CBrush(s.bUseDarkTheme ? RGB(R, G, B) : 0x00f1dacc));
-		if (s.bUseDarkTheme) {
-			ThemeRGB(90, 95, 100, R, G, B);
-		}
-		FrameRect(pDC->m_hDC, rcItem, CBrush(s.bUseDarkTheme ? RGB(R, G, B) : 0xc56a31));
+		FillRect(pDC->m_hDC, rcItem, CBrush(s.bUseDarkTheme ? ThemeRGB(60, 65, 70) : 0x00f1dacc));
+		FrameRect(pDC->m_hDC, rcItem, CBrush(s.bUseDarkTheme ? ThemeRGB(90, 95, 100) : 0xc56a31));
 	} else {
-		if (s.bUseDarkTheme) {
-			if (bSelected) {
-				ThemeRGB(40, 45, 50, R, G, B);
-			} else {
-				ThemeRGB(10, 15, 20, R, G, B);
-			}
-		}
-		FillRect(pDC->m_hDC, rcItem, CBrush(s.bUseDarkTheme ? RGB(R, G, B) : RGB(255, 255, 255)));
+		FillRect(pDC->m_hDC, rcItem, CBrush(s.bUseDarkTheme ? (bSelected ? ThemeRGB(40, 45, 50) : ThemeRGB(10, 15, 20)) : RGB(255, 255, 255)));
 	}
 
 	COLORREF textcolor = bSelected ? 0xff : 0;
 
 	if (s.bUseDarkTheme) {
-		ThemeRGB(135, 140, 145, R, G, B);
-		textcolor = bSelected ? s.clrFaceABGR : RGB(R, G, B);
+		textcolor = bSelected ? s.clrFaceABGR : ThemeRGB(135, 140, 145);
 	}
 
 	if (pli.m_fInvalid) {
