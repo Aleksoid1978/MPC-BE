@@ -172,11 +172,9 @@ public:
 		if (!bih) {
 			// it may have a fourcc in the mediasubtype, let's check that
 
-			WCHAR guid[100];
-			ZeroMemory(guid, 100 * sizeof(WCHAR));
-			StringFromGUID2(pmt->subtype, guid, 100);
+			CStringW guid = CStringFromGUID(pmt->subtype);
 
-			if (CStringW(guid).MakeUpper().Find(L"0000-0010-8000-00AA00389B71") >= 0) {
+			if (guid.MakeUpper().Find(L"0000-0010-8000-00AA00389B71") >= 0) {
 				str.Format(L"%c%c%c%c",
 						   (WCHAR)((pmt->subtype.Data1>>0)&0xff),
 						   (WCHAR)((pmt->subtype.Data1>>8)&0xff),
@@ -264,11 +262,9 @@ public:
 							: nullptr;
 
 		if (!wfe) {
-			WCHAR guid[100];
-			ZeroMemory(guid, 100 * sizeof(WCHAR));
-			StringFromGUID2(pmt->subtype, guid, 100);
+			CStringW guid = CStringFromGUID(pmt->subtype);
 
-			if (CStringW(guid).MakeUpper().Find(L"0000-0010-8000-00AA00389B71") >= 0) {
+			if (guid.MakeUpper().Find(L"0000-0010-8000-00AA00389B71") >= 0) {
 				str.Format(L"0x%04x", pmt->subtype.Data1);
 			}
 
