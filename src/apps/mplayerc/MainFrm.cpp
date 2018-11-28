@@ -24,6 +24,7 @@
 #include <atlconv.h>
 #include <atlsync.h>
 #include <afxglobals.h>
+#include <..\src\mfc\afximpl.h>
 
 #include "../../DSUtil/WinAPIUtils.h"
 #include "../../DSUtil/SysVersion.h"
@@ -635,6 +636,10 @@ CMainFrame::CMainFrame() :
 	m_bMainIsMPEGSplitter(false)
 {
 	m_Lcd.SetVolumeRange(0, 100);
+
+	// Remove the lines-splitters between bars
+	afxData.cxBorder2 = 0;
+	afxData.cyBorder2 = 0;
 }
 
 CMainFrame::~CMainFrame()

@@ -79,10 +79,21 @@ CSizingControlBar::CSizingControlBar()
     m_nTrackPosOld = 0;
     m_nTrackEdgeOfs = 0;
     m_bFixedFloat = FALSE;
+    
+    m_hBrush_orig = nullptr;
+    m_hBrush = nullptr;
+    m_dwBrushColor = 0;
+    m_bUseDarkTheme = false;
 }
 
 CSizingControlBar::~CSizingControlBar()
 {
+    if (m_hBrush) {
+        ::DeleteObject(m_hBrush);
+    }
+    if (m_hBrush_orig) {
+        ::DeleteObject(m_hBrush);
+    }
 }
 
 BEGIN_MESSAGE_MAP(CSizingControlBar, baseCSizingControlBar)
@@ -143,6 +154,8 @@ BOOL CSizingControlBar::Create(LPCTSTR lpszWindowName,
     if (!CWnd::Create(wndclass, lpszWindowName, dwStyle,
         CRect(0, 0, 0, 0), pParentWnd, nID))
         return FALSE;
+
+    m_hBrush_orig = (HBRUSH)GetClassLongPtrW(m_hWnd, GCLP_HBRBACKGROUND);
 
     return TRUE;
 }
@@ -553,8 +566,22 @@ void CSizingControlBar::OnNcPaint()
 
     // erase the NC background
     //MPC-BE custom code start
-    mdc.FillRect(rcDraw, CBrush::FromHandle(
-        (HBRUSH) GetClassLongPtr(m_hWnd, GCLP_HBRBACKGROUND)));
+    if (m_bUseDarkTheme) {
+        const auto dwBrushColor = ColorThemeRGB(45, 50, 55);
+        if (m_dwBrushColor != dwBrushColor && m_hBrush) {
+            ::DeleteObject(m_hBrush);
+            m_hBrush = nullptr;
+        }
+        m_dwBrushColor = dwBrushColor;
+        if (!m_hBrush) {
+            m_hBrush = ::CreateSolidBrush(dwBrushColor);
+		}
+        ::SetClassLongPtrW(m_hWnd, GCL_HBRBACKGROUND, (LONG)m_hBrush);
+        mdc.FillRect(rcDraw, CBrush::FromHandle(m_hBrush));
+    } else {
+        ::SetClassLongPtrW(m_hWnd, GCL_HBRBACKGROUND, (LONG)m_hBrush_orig);
+        mdc.FillRect(rcDraw, CBrush::FromHandle(m_hBrush_orig));
+    }
     //MPC-BE custom code end
 
     if (m_dwSCBStyle & SCBS_SHOWEDGES)
