@@ -77,8 +77,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1557AA86-976C-4315-8FE8-A138E33F6580}</ProjectGuid>
-    <RootNamespace>zlib</RootNamespace>
-    <Keyword>MFCProj</Keyword>
+    <RootNamespace>openjpeg</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
     <ProjectName>openjpeg</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
