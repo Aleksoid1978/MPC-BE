@@ -31,6 +31,8 @@
 #include "OpenDlg.h"
 #include "Content.h"
 
+#include <coolsb/coolscroll.h>
+
 static CString MakePath(CString path)
 {
 	if (::PathIsURLW(path) || Youtube::CheckURL(path)) { // skip URLs
@@ -744,6 +746,10 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 	m_list.InsertColumn(COL_TIME, L"Time", LVCFMT_RIGHT);
 
 	ScaleFontInternal();
+
+	if (AfxGetAppSettings().bUseDarkTheme) {
+		InitializeCoolSB(m_list.m_hWnd, ThemeRGB);
+	}
 
 	return TRUE;
 }
@@ -2044,6 +2050,25 @@ void CPlayerPlaylistBar::ResizeListColumn()
 		m_list.GetClientRect(r);
 		m_list.SetColumnWidth(COL_NAME, r.Width() - m_nTimeColWidth);
 		m_list.SetRedraw();
+
+		if (AfxGetAppSettings().bUseDarkTheme) {
+			InitializeCoolSB(m_list.m_hWnd, ThemeRGB);
+			SCROLLINFO si = { sizeof(SCROLLINFO), SIF_ALL };
+			m_list.GetScrollInfo(SB_VERT, &si);
+
+			CoolSB_SetScrollInfo(m_list.m_hWnd, SB_VERT, &si, TRUE);
+			CoolSB_SetStyle(m_list.m_hWnd, SB_VERT, CSBS_HOTTRACKED);
+
+			GetClientRect(r);
+			r.DeflateRect(2, 2);
+			m_list.SetRedraw(FALSE);
+			m_list.MoveWindow(r);
+			m_list.GetClientRect(r);
+			m_list.SetColumnWidth(COL_NAME, r.Width() - m_nTimeColWidth);
+			m_list.SetRedraw();
+		} else {
+			UninitializeCoolSB(m_list.m_hWnd);
+		}
 	}
 }
 

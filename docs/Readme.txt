@@ -38,6 +38,7 @@ Project             License                    Website
 Bento4              GPLv2                      https://www.bento4.com/
 CFileVersionInfo    -                          -
 CLineNumberEdit     -                          -
+coolsb              -                          http://www.codeproject.com/KB/dialog/coolscroll.aspx
 CSizingControlBar   GPLv2                      http://datamekanix.com/sizecbar/
 Detours             MSR-SSLA                   http://research.microsoft.com/en-us/projects/detours/
 FFmpeg              GPLv3                      http://ffmpeg.org/

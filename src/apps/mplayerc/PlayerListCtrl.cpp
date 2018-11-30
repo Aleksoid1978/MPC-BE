@@ -862,6 +862,21 @@ void CPlayerListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	if (GetFocus() != this) {
 		SetFocus();
 	}
+
+	if (nSBCode == SB_THUMBTRACK) {
+		SCROLLINFO si = { sizeof(SCROLLINFO), SIF_ALL };
+		GetScrollInfo(SB_VERT, &si);
+
+		const auto newPos = (int)nPos;
+		if (newPos != si.nTrackPos) {
+			CRect rc;
+			GetClientRect(&rc);
+			const int cy = si.nPage == 0 ? rc.bottom : rc.bottom * (si.nMax + 1) / si.nPage;
+			const CSize size(0, cy * (newPos - si.nPos) / (si.nMax + 1));
+			Scroll(size);
+		}
+	}
+
 	CListCtrl::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
