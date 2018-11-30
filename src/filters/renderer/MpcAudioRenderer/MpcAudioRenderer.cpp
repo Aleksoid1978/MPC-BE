@@ -44,6 +44,7 @@
 #define OPT_AudioDeviceId           L"SoundDeviceId"
 #define OPT_UseBitExactOutput       L"UseBitExactOutput"
 #define OPT_UseSystemLayoutChannels L"UseSystemLayoutChannels"
+#define OPT_CheckFormat             L"CheckFormat"
 #define OPT_ReleaseDeviceIdle       L"ReleaseDeviceIdle"
 #define OPT_UseCrossFeed            L"CrossFeed"
 // TODO: rename option values
@@ -117,11 +118,13 @@ static void DumpWaveFormatEx(const WAVEFORMATEX* pwfx)
 	}
 }
 
-#define SamplesToTime(samples, wfex) (FractionScale64(samples, UNITS, wfex->nSamplesPerSec))
-#define TimeToSamples(time, wfex)    (FractionScale64(time, wfex->nSamplesPerSec, UNITS))
+#define SamplesToTime(samples, wfex)    (FractionScale64(samples, UNITS, wfex->nSamplesPerSec))
+#define TimeToSamples(time, wfex)       (FractionScale64(time, wfex->nSamplesPerSec, UNITS))
 
-#define IsExclusive(wfex)            (m_DeviceMode == MODE_WASAPI_EXCLUSIVE || IsBitstream(wfex))
-#define IsExclusiveMode()            (m_DeviceMode == MODE_WASAPI_EXCLUSIVE || m_bIsBitstream)
+#define IsExclusive(wfex)               (m_DeviceMode == MODE_WASAPI_EXCLUSIVE || IsBitstream(wfex))
+#define IsExclusiveMode()               (m_DeviceMode == MODE_WASAPI_EXCLUSIVE || m_bIsBitstream)
+
+#define GetChannelMask(wfex, nChannels) (IsWaveFormatExtensible(wfex) ? ((WAVEFORMATEXTENSIBLE*)wfex)->dwChannelMask : GetDefChannelMask(nChannels))
 
 CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	: CBaseRenderer(__uuidof(this), L"CMpcAudioRenderer", punk, phr)
@@ -161,6 +164,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, pfAvRevertMmThreadCharacteristics(nullptr)
 	, m_bUseBitExactOutput(TRUE)
 	, m_bUseSystemLayoutChannels(TRUE)
+	, m_bCheckFormat(TRUE)
 	, m_bReleaseDeviceIdle(FALSE)
 	, m_filterState(State_Stopped)
 	, m_hRendererNeedMoreData(nullptr)
@@ -205,6 +209,9 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_UseSystemLayoutChannels, dw)) {
 			m_bUseSystemLayoutChannels = !!dw;
 		}
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_CheckFormat, dw)) {
+			m_bCheckFormat = !!dw;
+		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ReleaseDeviceIdle, dw)) {
 			m_bReleaseDeviceIdle = !!dw;
 		}
@@ -219,6 +226,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	profile.ReadString(OPT_SECTION_AudRend, OPT_AudioDeviceId, m_DeviceId);
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
+	profile.ReadInt(OPT_SECTION_AudRend, OPT_CheckFormat, m_bCheckFormat);
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_UseCrossFeed, m_bUseCrossFeed);
 #endif
@@ -1002,6 +1010,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 		key.SetStringValue(OPT_AudioDeviceId, m_DeviceId);
 		key.SetDWORDValue(OPT_UseBitExactOutput, m_bUseBitExactOutput);
 		key.SetDWORDValue(OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
+		key.SetDWORDValue(OPT_CheckFormat, m_bCheckFormat);
 		key.SetDWORDValue(OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 		key.SetDWORDValue(OPT_UseCrossFeed, m_bUseCrossFeed);
 	}
@@ -1012,6 +1021,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 	profile.WriteString(OPT_SECTION_AudRend, OPT_AudioDeviceId, m_DeviceId);
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_UseBitExactOutput, m_bUseBitExactOutput);
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_UseSystemLayoutChannels, m_bUseSystemLayoutChannels);
+	profile.WriteInt(OPT_SECTION_AudRend, OPT_CheckFormat, m_bCheckFormat);
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_UseCrossFeed, m_bUseCrossFeed);
 #endif
@@ -1156,6 +1166,20 @@ STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetSystemLayoutChannels()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_bUseSystemLayoutChannels;
+}
+
+STDMETHODIMP CMpcAudioRenderer::SetCheckFormat(BOOL bValue)
+{
+	CAutoLock cAutoLock(&m_csProps);
+
+	m_bCheckFormat = bValue;
+	return S_OK;
+}
+
+STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetCheckFormat()
+{
+	CAutoLock cAutoLock(&m_csProps);
+	return m_bCheckFormat;
 }
 
 STDMETHODIMP CMpcAudioRenderer::SetReleaseDeviceIdle(BOOL bValue)
@@ -1681,7 +1705,7 @@ HRESULT CMpcAudioRenderer::InitAudioClient()
 		if (m_wBitsPerSampleList.empty()) {
 			// get list of supported output formats - wBitsPerSample, nChannels(dwChannelMask), nSamplesPerSec
 			const WORD  wBitsPerSampleValues[] = {16, 24, 32};
-			const DWORD nSamplesPerSecValues[] = {44100, 48000, 88200, 96000, 176400, 192000};
+			const DWORD nSamplesPerSecValues[] = {44100, 48000, 88200, 96000, 176400, 192000, 384000};
 			const channel_layout_t ChannelLayoutValues[] = {
 				{2, KSAUDIO_SPEAKER_STEREO},
 				{4, KSAUDIO_SPEAKER_QUAD},
@@ -1846,11 +1870,25 @@ again:
 			if (IsBitstream(pWaveFormatEx)) {
 				pFormat = (WAVEFORMATEX*)pWaveFormatEx;
 			} else {
-				WAVEFORMATEXTENSIBLE wfexAsIs = { 0 };
-
 				if (m_bUseBitExactOutput) {
-					if (!m_bUseSystemLayoutChannels
-							&& SUCCEEDED(SelectFormat(pWaveFormatEx, wfexAsIs))) {
+					WAVEFORMATEXTENSIBLE wfexAsIs = { 0 };
+
+					if (!m_bCheckFormat) {
+						WORD nChannels = pWaveFormatEx->nChannels;
+						DWORD dwChannelMask = GetChannelMask(pWaveFormatEx, nChannels);
+
+						if (m_bUseSystemLayoutChannels) {
+							WAVEFORMATEX* pDeviceFormat = nullptr;
+							hr = m_pAudioClient->GetMixFormat(&pDeviceFormat);
+							if (SUCCEEDED(hr) && pDeviceFormat) {
+								nChannels = pDeviceFormat->nChannels;
+								dwChannelMask = GetChannelMask(pDeviceFormat, nChannels);
+								CoTaskMemFree(pDeviceFormat);
+							}
+						}
+
+						CreateFormat(wfexAsIs, pWaveFormatEx->wBitsPerSample, nChannels, dwChannelMask, pWaveFormatEx->nSamplesPerSec);
+
 						PauseRendererThread();
 						m_bIsAudioClientStarted = false;
 
@@ -1860,21 +1898,15 @@ again:
 						SAFE_RELEASE(m_pAudioClient);
 						hr = InitAudioClient();
 						if (SUCCEEDED(hr)) {
-							WAVEFORMATEXTENSIBLE wfex = { 0 };
-							DWORD dwChannelMask = GetDefChannelMask(pWaveFormatEx->nChannels);
-							if (IsWaveFormatExtensible(pWaveFormatEx)) {
-								dwChannelMask = ((WAVEFORMATEXTENSIBLE*)pWaveFormatEx)->dwChannelMask;
-							}
-							CreateFormat(wfex, wfexAsIs.Format.wBitsPerSample, pWaveFormatEx->nChannels, dwChannelMask, pWaveFormatEx->nSamplesPerSec);
-							hr = CreateRenderClient((WAVEFORMATEX*)&wfex, FALSE);
+							hr = CreateRenderClient((WAVEFORMATEX*)&wfexAsIs, FALSE);
 							if (S_OK == hr) {
-								CopyWaveFormat((WAVEFORMATEX*)&wfex, &m_pWaveFormatExOutput);
+								CopyWaveFormat((WAVEFORMATEX*)&wfexAsIs, &m_pWaveFormatExOutput);
 								bInitNeed = FALSE;
 							}
 						}
 					}
 
-					if(bInitNeed
+					if (bInitNeed
 							&& SUCCEEDED(SelectFormat(pWaveFormatEx, wfexAsIs))) {
 						hr = m_pAudioClient->IsFormatSupported(AUDCLNT_SHAREMODE_EXCLUSIVE, (WAVEFORMATEX*)&wfexAsIs, nullptr);
 						if (S_OK == hr) {
@@ -2162,11 +2194,15 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 	}
 
 	if (FAILED(hr)) {
-		DLog(L"CMpcAudioRenderer::CreateRenderClient() - IAudioClient::Initialize() failed: (0x%08x)", hr);
+		if (AUDCLNT_E_DEVICE_IN_USE == hr) {
+			DLog(L"CMpcAudioRenderer::CreateRenderClient() - IAudioClient::Initialize() failed: Device in use");
+		} else if (AUDCLNT_E_UNSUPPORTED_FORMAT == hr) {
+			DLog(L"CMpcAudioRenderer::CreateRenderClient() - IAudioClient::Initialize() failed: Device does not support the specified format");
+		} else {
+			DLog(L"CMpcAudioRenderer::CreateRenderClient() - IAudioClient::Initialize() failed: (0x%08x)", hr);
+		}
 		return hr;
 	}
-
-	EXIT_ON_ERROR(hr);
 
 	// get the buffer size, which is aligned
 	hr = m_pAudioClient->GetBufferSize(&m_nFramesInBuffer);
@@ -2371,7 +2407,7 @@ HRESULT CMpcAudioRenderer::SelectFormat(const WAVEFORMATEX* pwfx, WAVEFORMATEXTE
 		WAVEFORMATEX *pDeviceFormat = nullptr;
 		if (SUCCEEDED(m_pAudioClient->GetMixFormat(&pDeviceFormat)) && pDeviceFormat) {
 			nChannels = pDeviceFormat->nChannels;
-			dwChannelMask = ((WAVEFORMATEXTENSIBLE*)pDeviceFormat)->dwChannelMask;
+			dwChannelMask = GetChannelMask(pDeviceFormat, nChannels);
 
 			CoTaskMemFree(pDeviceFormat);
 		}
@@ -2392,10 +2428,7 @@ HRESULT CMpcAudioRenderer::SelectFormat(const WAVEFORMATEX* pwfx, WAVEFORMATEXTE
 				break;
 		}
 
-		dwChannelMask = GetDefChannelMask(nChannels);
-		if (IsWaveFormatExtensible(pwfx)) {
-			dwChannelMask = ((WAVEFORMATEXTENSIBLE*)pwfx)->dwChannelMask;
-		}
+		dwChannelMask = GetChannelMask(pwfx, nChannels);
 
 		if (Contains(m_nChannelsList, nChannels) == false) {
 			nChannels     = m_nChannelsList[m_nChannelsList.size() - 1];
