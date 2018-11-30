@@ -12,6 +12,7 @@
 #define IDS_ARS_RELEASE_DEVICE_IDLE     7606
 #define IDS_ARS_CROSSFEED               7607
 #define IDS_ARS_DEVICE_PERIOD           7608
+#define IDS_ARS_CHECK_FORMAT            7609
 #define IDS_ARS_STATUS                  7610
 #define IDS_ARS_DEVICE                  7611
 #define IDS_ARS_MODE                    7612

@@ -41,6 +41,7 @@ private :
 
 	CButton		m_cbUseBitExactOutput;
 	CButton		m_cbUseSystemLayoutChannels;
+	CButton		m_cbCheckFormat;
 	CButton		m_cbReleaseDeviceIdle;
 	CButton		m_cbUseCrossFeed;
 
@@ -53,6 +54,7 @@ private :
 		IDC_PP_WASAPI_DEVICE_PERIOD,
 		IDC_PP_USE_BITEXACT_OUTPUT,
 		IDC_PP_USE_SYSTEM_LAYOUT_CHANNELS,
+		IDC_PP_CHECK_FORMAT,
 		IDC_PP_FREE_DEVICE_INACTIVE,
 		IDC_PP_USE_CROSSFEED
 	};
