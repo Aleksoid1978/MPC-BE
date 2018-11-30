@@ -41,8 +41,8 @@ class CSCBButton
 public:
     CSCBButton();
 
-    void Move(CPoint ptTo) {ptOrg = ptTo; };
-    CRect GetRect() { return CRect(ptOrg, CSize(11, 11)); };
+    void Move(CPoint ptTo) { ptOrg = ptTo; }
+    CRect GetRect() const { return CRect(ptOrg, CSize(12, 12)); }
     void Paint(CDC* pDC, const CSizingControlBar* parent);
 
     BOOL    bPushed;
