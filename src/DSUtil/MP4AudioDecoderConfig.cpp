@@ -308,9 +308,11 @@ bool CMP4AudioDecoderConfig::Parse(CGolombBuffer& parser)
             return false;
     }
 
+    /*
     if (!m_Extension.m_SbrPresent && m_SamplingFrequency <= 24000) {
         m_SamplingFrequency *= 2;
     }
+    */
 
     if (m_Extension.m_PsPresent) {
         // HE-AACv2 Profile, always stereo.
