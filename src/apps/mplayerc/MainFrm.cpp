@@ -638,7 +638,6 @@ CMainFrame::CMainFrame() :
 	m_Lcd.SetVolumeRange(0, 100);
 
 	// Remove the lines-splitters between bars
-	afxData.cxBorder2 = 0;
 	afxData.cyBorder2 = 0;
 }
 
