@@ -893,9 +893,11 @@ BOOL WINAPI CoolSB_SetSize	(HWND hwnd, int wBar, int nLength, int nWidth)
 	if(!GetScrollWndFromHwnd(hwnd))
 		return FALSE;
 
+	int bRedraw = 0;
 	if((wBar == SB_HORZ || wBar == SB_BOTH) && 
 	   (sbar = GetScrollBarFromHwnd(hwnd, SB_HORZ)))
 	{
+		bRedraw = (sbar->nArrowLength != nLength) || (sbar->nArrowWidth != nWidth);
 		sbar->nArrowLength = nLength;
 		sbar->nArrowWidth  = nWidth;
 	}
@@ -903,11 +905,13 @@ BOOL WINAPI CoolSB_SetSize	(HWND hwnd, int wBar, int nLength, int nWidth)
 	if((wBar == SB_VERT || wBar == SB_BOTH) && 
 	   (sbar = GetScrollBarFromHwnd(hwnd, SB_VERT)))
 	{
+		bRedraw = bRedraw || (sbar->nArrowLength != nLength) || (sbar->nArrowWidth != nWidth);
 		sbar->nArrowLength = nLength;
 		sbar->nArrowWidth  = nWidth;
 	}
 
-	RedrawNonClient(hwnd, TRUE);
+	if (bRedraw)
+		RedrawNonClient(hwnd, TRUE);
 
 	return TRUE;
 }
@@ -925,19 +929,23 @@ BOOL WINAPI CoolSB_SetStyle(HWND hwnd, int wBar, UINT nStyle)
 	if(!GetScrollWndFromHwnd(hwnd))
 		return FALSE;
 
+	int bRedraw = 0;
 	if((wBar == SB_HORZ || wBar == SB_BOTH) && 
 	   (sbar = GetScrollBarFromHwnd(hwnd, SB_HORZ)))
 	{
+		bRedraw = sbar->fFlatScrollbar != nStyle;
 		sbar->fFlatScrollbar = nStyle;
 	}
 
 	if((wBar == SB_VERT || wBar == SB_BOTH) && 
 	   (sbar = GetScrollBarFromHwnd(hwnd, SB_VERT)))
 	{
+		bRedraw = bRedraw || (sbar->fFlatScrollbar != nStyle);
 		sbar->fFlatScrollbar = nStyle;
 	}
 
-	RedrawNonClient(hwnd, FALSE);
+	if (bRedraw)
+		RedrawNonClient(hwnd, FALSE);
 
 	return TRUE;
 }
