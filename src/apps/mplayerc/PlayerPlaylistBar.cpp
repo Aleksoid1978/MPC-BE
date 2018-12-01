@@ -749,6 +749,7 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 
 	if (AfxGetAppSettings().bUseDarkTheme) {
 		InitializeCoolSB(m_list.m_hWnd, ThemeRGB);
+		CoolSB_SetSize(m_list.m_hWnd, SB_VERT, m_pMainFrame->ScaleY(GetSystemMetrics(SM_CYVSCROLL)), m_pMainFrame->ScaleX(GetSystemMetrics(SM_CXVSCROLL)));
 	}
 
 	return TRUE;
@@ -2058,6 +2059,7 @@ void CPlayerPlaylistBar::ResizeListColumn()
 
 			CoolSB_SetScrollInfo(m_list.m_hWnd, SB_VERT, &si, TRUE);
 			CoolSB_SetStyle(m_list.m_hWnd, SB_VERT, CSBS_HOTTRACKED);
+			CoolSB_SetSize(m_list.m_hWnd, SB_VERT, m_pMainFrame->ScaleY(GetSystemMetrics(SM_CYVSCROLL)), m_pMainFrame->ScaleX(GetSystemMetrics(SM_CXVSCROLL)));
 
 			GetClientRect(r);
 			r.DeflateRect(2, 2);
