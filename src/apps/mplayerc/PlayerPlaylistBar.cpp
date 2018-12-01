@@ -1576,8 +1576,6 @@ void CPlayerPlaylistBar::Open(CString fn)
 
 void CPlayerPlaylistBar::Open(std::list<CString>& fns, bool fMulti, CSubtitleItemList* subs/* = nullptr*/, bool bCheck/* = true*/)
 {
-	m_nSelected_idx = INT_MAX;
-
 	ResolveLinkFiles(fns);
 	Empty();
 	Append(fns, fMulti, subs, bCheck);
@@ -1615,6 +1613,8 @@ void CPlayerPlaylistBar::Append(std::list<CString>& fns, bool fMulti, CSubtitleI
 	SavePlaylist();
 
 	UpdateList();
+
+	m_nSelected_idx = INT_MAX;
 }
 
 void CPlayerPlaylistBar::Append(CFileItemList& fis)
@@ -1991,6 +1991,7 @@ void CPlayerPlaylistBar::LoadPlaylist(CString filename)
 				Refresh();
 				if (m_nSelected_idx != INT_MAX) {
 					SetSelIdx(m_nSelected_idx + 1, true);
+					m_nSelected_idx = INT_MAX;
 				} else {
 					SelectFileInPlaylist(filename);
 				}
