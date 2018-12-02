@@ -1590,13 +1590,7 @@ void CPlayerPlaylistBar::Append(CString fn)
 
 void CPlayerPlaylistBar::Append(std::list<CString>& fns, bool fMulti, CSubtitleItemList* subs/* = nullptr*/, bool bCheck/* = true*/)
 {
-	INT_PTR idx = -1;
-
-	POSITION pos = m_pl.GetHeadPosition();
-	while (pos) {
-		idx++;
-		m_pl.GetNext(pos);
-	}
+	const INT_PTR idx = m_pl.GetCount();
 
 	if (fMulti) {
 		ASSERT(subs == nullptr || subs->size() == 0);
@@ -1609,7 +1603,7 @@ void CPlayerPlaylistBar::Append(std::list<CString>& fns, bool fMulti, CSubtitleI
 	}
 
 	Refresh();
-	EnsureVisible(m_pl.FindIndex((m_nSelected_idx != INT_MAX ? m_nSelected_idx : idx) + 1));
+	EnsureVisible(m_pl.FindIndex(m_nSelected_idx != INT_MAX ? m_nSelected_idx + 1 : idx));
 	SavePlaylist();
 
 	UpdateList();
@@ -1619,13 +1613,7 @@ void CPlayerPlaylistBar::Append(std::list<CString>& fns, bool fMulti, CSubtitleI
 
 void CPlayerPlaylistBar::Append(CFileItemList& fis)
 {
-	INT_PTR idx = -1;
-
-	POSITION pos = m_pl.GetHeadPosition();
-	while (pos) {
-		idx++;
-		m_pl.GetNext(pos);
-	}
+	const INT_PTR idx = m_pl.GetCount();
 
 	for (const auto& fi : fis) {
 		CPlaylistItem pli;
