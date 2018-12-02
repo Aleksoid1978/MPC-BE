@@ -2200,7 +2200,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 		FillRect(pDC->m_hDC, rcItem, CBrush(s.bUseDarkTheme ? ThemeRGB(60, 65, 70) : 0x00f1dacc));
 		FrameRect(pDC->m_hDC, rcItem, CBrush(s.bUseDarkTheme ? ThemeRGB(90, 95, 100) : 0xc56a31));
 	} else {
-		FillRect(pDC->m_hDC, rcItem, CBrush(s.bUseDarkTheme ? (bSelected ? ThemeRGB(40, 45, 50) : ThemeRGB(10, 15, 20)) : RGB(255, 255, 255)));
+		FillRect(pDC->m_hDC, rcItem, CBrush(s.bUseDarkTheme ? ThemeRGB(10, 15, 20) : RGB(255, 255, 255)));
 	}
 
 	COLORREF textcolor = bSelected ? 0xff : 0;
