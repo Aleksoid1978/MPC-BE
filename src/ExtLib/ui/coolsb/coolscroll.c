@@ -101,17 +101,9 @@ static inline COLORREF crThemeRGB(const int r, const int g, const int b)
 #define crNormal       crThemeRGB(100, 105, 110)
 #define crBackground   crThemeRGB(60, 65, 70)
 #define crMouseOver    crThemeRGB(150, 155, 160)
-#define crMouseClicked crThemeRGB(240, 245, 250)
+#define crMouseClicked crThemeRGB(210, 215, 220)
 
-//
-//	Provide this so there are NO dependencies on CRT
-//
-static void CoolSB_ZeroMemory(void *ptr, DWORD bytes)
-{
-	BYTE *bptr = (BYTE *)ptr;
-
-	while(bytes--) *bptr++ = 0;
-}
+BOOL bMouseClicked = FALSE;
 
 BOOL WINAPI CoolSB_IsThumbTracking(HWND hwnd)	
 { 
@@ -380,10 +372,8 @@ static void PaintRect(HDC hdc, RECT *rect, COLORREF color)
 	RECT rc = *rect;
 	rc.left += 4;
 	rc.right -= 4;
-	rc.top += 4;
-	rc.bottom -= 4;
 
-	COLORREF oldcol = SetBkColor(hdc, crMouseOver);
+	COLORREF oldcol = SetBkColor(hdc, bMouseClicked ? crMouseClicked : crMouseOver);
 	ExtTextOut(hdc, 0, 0, ETO_OPAQUE, &rc, _T(""), 0, 0);
 	SetBkColor(hdc, oldcol);
 }
@@ -396,21 +386,17 @@ static void PaintRect(HDC hdc, RECT *rect, COLORREF color)
 void DrawBlankButton(HDC hdc, const RECT *rect, UINT drawflag)
 {
 	RECT rc = *rect;
-
-	RECT rc2 = rc;
-	rc2.left += 4;
-	rc2.right -= 4;
-	rc2.top += 4;
-	rc2.bottom -= 4;
 		
-#ifndef FLAT_SCROLLBARS	
+#ifndef FLAT_SCROLLBARS
 	drawflag &= ~BF_FLAT;
 #endif
 
 	HBRUSH hBrushBackground = CreateSolidBrush(crBackground);
 	FillRect(hdc, &rc, hBrushBackground);
+	rc.left += 4;
+	rc.right -= 4;
 	HBRUSH hBrushNormal = CreateSolidBrush(crNormal);
-	FillRect(hdc, &rc2, hBrushNormal);
+	FillRect(hdc, &rc, hBrushNormal);
 
 	DeleteObject(hBrushBackground);
 	DeleteObject(hBrushNormal);
@@ -2136,6 +2122,7 @@ static LRESULT LButtonUp(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lParam)
 	RECT winrect;
 	UINT buttonIdx = 0;
 	
+	bMouseClicked = FALSE;
 	//current scrollportion is the button that we clicked down on
 	if(uCurrentScrollPortion != HTSCROLL_NONE)
 	{
@@ -2426,6 +2413,8 @@ static LRESULT MouseMove(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lParam)
 		lParam = GetMessagePos();
 		x = LOWORD(lParam);
 		y = HIWORD(lParam);
+
+		bMouseClicked = TRUE;
 
 		if(uCurrentScrollbar == SB_HORZ)
 			return ThumbTrackHorz(&sw->sbarHorz, hwnd, x,y);
