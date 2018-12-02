@@ -512,7 +512,7 @@ BEGIN DIALOGEX IDD_PPAGEVIDEO LINES 37
 30		"Не масштабувати кадр при малому збільшенні"
 32		"Не масштабувати кадр при малому зменшенні"
 34		"Типово"
-35		"Presentation mode:"
+35		"Режим виводу:"
 END
 
 BEGIN DIALOGEX IDD_PPAGEWEBSERVER LINES 24
@@ -1288,7 +1288,7 @@ STRING IDS_APPLY		"Застосувати"
 STRING IDS_APP_DESCRIPTION		"Один з найпотужніших мультимедійних програвачів для Windows. Початково створений угорським розробником, відомим як Gabest. Ця версія має додаткові можливості, зокрема повноекранний Direct3D режим та покращену підтримку Windows Vista/7."
 STRING IDS_ARS_BITEXACT_OUTPUT		"Використовувати побітовий вивід"
 STRING IDS_ARS_CHANNELS		"Канали:"
-STRING IDS_ARS_CHECK_FORMAT		"Do not check format support"
+STRING IDS_ARS_CHECK_FORMAT		"Не перевіряти підтримку формата"
 STRING IDS_ARS_CROSSFEED		"Ввімкнути стерео crossfeed (для навушників)"
 STRING IDS_ARS_DEVICE		"Пристрій:"
 STRING IDS_ARS_DEVICE_PERIOD		"Буфер пристрою:"
