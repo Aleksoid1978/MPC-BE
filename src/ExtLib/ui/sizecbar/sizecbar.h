@@ -169,7 +169,7 @@ protected:
     BOOL    m_bFixedFloat;
     CSize   m_szFixedFloat;
 
-    HBRUSH   m_hBrush, m_hBrush_orig;
+    HBRUSH   m_hBrush, m_hBrush_orig, m_hBrushFrame;
     COLORREF m_dwBrushColor;
 //MPC-BE custom code end
 
