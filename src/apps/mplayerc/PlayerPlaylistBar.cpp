@@ -2196,17 +2196,42 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 
 	CDC* pDC = CDC::FromHandle(lpDrawItemStruct->hDC);
 
+	int R, G, B, R2, G2, B2;
+	GRADIENT_RECT gr = { 0, 1 };
 	if (!!m_list.GetItemState(nItem, LVIS_SELECTED)) {
-		FillRect(pDC->m_hDC, rcItem, CBrush(s.bUseDarkTheme ? ThemeRGB(60, 65, 70) : 0x00f1dacc));
-		FrameRect(pDC->m_hDC, rcItem, CBrush(s.bUseDarkTheme ? ThemeRGB(90, 95, 100) : 0xc56a31));
+		if (s.bUseDarkTheme) {
+			ThemeRGB(60, 65, 70, R, G, B);
+			ThemeRGB(50, 55, 60, R2, G2, B2);
+			TRIVERTEX tv[2] = {
+				{rcItem.left, rcItem.top, R * 256, G * 256, B * 256, 255 * 256},
+				{rcItem.right, rcItem.bottom, R2 * 256, G2 * 256, B2 * 256, 255 * 256},
+			};
+			pDC->GradientFill(tv, 2, &gr, 1, GRADIENT_FILL_RECT_V);
+			pDC->Draw3dRect(rcItem, ThemeRGB(80, 85, 90), ThemeRGB(30, 35, 40));
+		}
+		else {
+			FillRect(pDC->m_hDC, rcItem, CBrush(0x00f1dacc));
+			FrameRect(pDC->m_hDC, rcItem, CBrush(0xc56a31));
+		}
 	} else {
-		FillRect(pDC->m_hDC, rcItem, CBrush(s.bUseDarkTheme ? ThemeRGB(10, 15, 20) : RGB(255, 255, 255)));
+		if (s.bUseDarkTheme) {
+			ThemeRGB(10, 15, 20, R, G, B);
+			ThemeRGB(10, 15, 20, R2, G2, B2);
+			TRIVERTEX tvs[2] = {
+				{rcItem.left, rcItem.top, R * 256, G * 256, B * 256, 255 * 256},
+				{rcItem.right, rcItem.bottom, R2 * 256, G2 * 256, B2 * 256, 255 * 256},
+			};
+			pDC->GradientFill(tvs, 2, &gr, 1, GRADIENT_FILL_RECT_V);
+		}
+		else {
+			FillRect(pDC->m_hDC, rcItem, CBrush(RGB(255, 255, 255)));
+		}
 	}
 
 	COLORREF textcolor = bSelected ? 0xff : 0;
 
 	if (s.bUseDarkTheme) {
-		textcolor = bSelected ? s.clrFaceABGR : ThemeRGB(135, 140, 145);
+		textcolor = bSelected ? s.clrFaceABGR : (!!m_list.GetItemState(nItem, LVIS_SELECTED) ? ThemeRGB(165, 170, 175) : ThemeRGB(135, 140, 145));
 	}
 
 	if (pli.m_fInvalid) {
