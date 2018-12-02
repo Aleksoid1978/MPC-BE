@@ -96,9 +96,9 @@ void CSizingControlBarG::NcCalcClient(LPRECT pRc, UINT nDockBarID)
     // set position for the "x" (hide bar) button
     CPoint ptOrgBtn;
     if (bHorz)
-        ptOrgBtn = CPoint(rc.left - 13, rc.top);
+        ptOrgBtn = CPoint(rc.left - 12, rc.top);
     else
-        ptOrgBtn = CPoint(rc.right - 12, rc.top - 13);
+        ptOrgBtn = CPoint(rc.right - 14, rc.top - 12);
 
     m_biHide.Move(ptOrgBtn - rcBar.TopLeft());
 

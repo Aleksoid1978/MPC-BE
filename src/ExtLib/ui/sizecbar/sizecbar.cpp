@@ -84,6 +84,8 @@ CSizingControlBar::CSizingControlBar()
     m_hBrush = nullptr;
     m_dwBrushColor = 0;
     m_bUseDarkTheme = false;
+
+    m_hBrushFrame = ::CreateSolidBrush(0);
 }
 
 CSizingControlBar::~CSizingControlBar()
@@ -93,6 +95,9 @@ CSizingControlBar::~CSizingControlBar()
     }
     if (m_hBrush_orig) {
         ::DeleteObject(m_hBrush);
+    }
+    if (m_hBrush_orig) {
+        ::DeleteObject(m_hBrushFrame);
     }
 }
 
@@ -577,7 +582,15 @@ void CSizingControlBar::OnNcPaint()
             m_hBrush = ::CreateSolidBrush(dwBrushColor);
 		}
         ::SetClassLongPtrW(m_hWnd, GCLP_HBRBACKGROUND, (LONG)m_hBrush);
-        mdc.FillRect(rcDraw, CBrush::FromHandle(m_hBrush));
+
+        mdc.FrameRect(rcDraw, CBrush::FromHandle(m_hBrushFrame)); // Draw Black Frame
+
+        CRect r(rcDraw);
+        r.DeflateRect(1, 1, 1, 1);
+        mdc.Draw3dRect(r, ColorThemeRGB(65, 70, 75), ColorThemeRGB(20, 25, 30)); // Draw 3D-Borders
+
+        r.DeflateRect(1, 1, 1, 1);
+        mdc.FillRect(r, CBrush::FromHandle(m_hBrush)); // Fill backround
     } else {
         ::SetClassLongPtrW(m_hWnd, GCLP_HBRBACKGROUND, (LONG)m_hBrush_orig);
         mdc.FillRect(rcDraw, CBrush::FromHandle(m_hBrush_orig));
