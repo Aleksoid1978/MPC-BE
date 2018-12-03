@@ -238,7 +238,6 @@ void CSCBButton::Paint(CDC* pDC, const CSizingControlBar* parent, const CSize& s
     pDC->SetTextColor(parent->m_bUseDarkTheme ? parent->ColorThemeRGB(125, 130, 135) : ::GetSysColor(COLOR_BTNTEXT));
     int nPrevBkMode = pDC->SetBkMode(TRANSPARENT);
     CFont font;
-    int ppi = pDC->GetDeviceCaps(LOGPIXELSX);
     int pointsize = parent->ScaleX(70); // 7 points at 96 ppi
     font.CreatePointFont(pointsize, L"Marlett");
     CFont* oldfont = pDC->SelectObject(&font);
