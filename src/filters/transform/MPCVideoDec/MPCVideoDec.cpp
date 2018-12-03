@@ -1999,8 +1999,27 @@ redo:
 			LPVOID pData = nullptr;
 			if (SUCCEEDED(pIExFilterInfo->GetBin("VIDEO_COLOR_SPACE", &pData, &size))) {
 				if (size == sizeof(ColorSpace)) {
-					m_FilterInfo.colorSpace = DNew ColorSpace;
-					memcpy(m_FilterInfo.colorSpace, pData, size);
+					auto const colorSpace = (ColorSpace*)pData;
+
+					if (colorSpace->MatrixCoefficients < AVCOL_SPC_NB && colorSpace->MatrixCoefficients != AVCOL_SPC_RGB && colorSpace->MatrixCoefficients != AVCOL_SPC_UNSPECIFIED && colorSpace->MatrixCoefficients != AVCOL_SPC_RESERVED) {
+						m_FilterInfo.colorspace = colorSpace->MatrixCoefficients;
+					}
+
+					if (colorSpace->Primaries < AVCOL_PRI_NB && colorSpace->Primaries != AVCOL_PRI_RESERVED0 && colorSpace->Primaries != AVCOL_PRI_UNSPECIFIED && colorSpace->Primaries != AVCOL_PRI_RESERVED) {
+						m_FilterInfo.color_primaries = colorSpace->Primaries;
+					}
+
+					if (colorSpace->TransferCharacteristics < AVCOL_TRC_NB && colorSpace->TransferCharacteristics != AVCOL_TRC_RESERVED0 && colorSpace->TransferCharacteristics != AVCOL_TRC_UNSPECIFIED && colorSpace->TransferCharacteristics != AVCOL_TRC_RESERVED) {
+						m_FilterInfo.color_trc = colorSpace->TransferCharacteristics;
+					}
+
+					if (colorSpace->ChromaLocation < AVCHROMA_LOC_NB && colorSpace->ChromaLocation != AVCHROMA_LOC_UNSPECIFIED) {
+						m_FilterInfo.chroma_sample_location = colorSpace->ChromaLocation;
+					}
+
+					if (colorSpace->Range < AVCOL_RANGE_NB && colorSpace->Range != AVCOL_RANGE_UNSPECIFIED) {
+						m_FilterInfo.color_range = colorSpace->Range;
+					}
 				}
 				LocalFree(pData);
 			}
@@ -2724,16 +2743,14 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 		return fmt;
 	}
 
-	if (m_FilterInfo.colorSpace) {
-		ctx->colorspace             = (AVColorSpace)m_FilterInfo.colorSpace->MatrixCoefficients;
-		ctx->color_primaries        = (AVColorPrimaries)m_FilterInfo.colorSpace->Primaries;
-		ctx->color_range            = (AVColorRange)m_FilterInfo.colorSpace->Range;
-		ctx->color_trc              = (AVColorTransferCharacteristic)m_FilterInfo.colorSpace->TransferCharacteristics;
-		ctx->chroma_sample_location = (AVChromaLocation)m_FilterInfo.colorSpace->ChromaLocation;
-	}
+	auto color_primaries = m_FilterInfo.color_primaries != -1 ? m_FilterInfo.color_primaries : ctx->color_primaries;
+	auto colorspace = m_FilterInfo.colorspace != -1 ? m_FilterInfo.colorspace : ctx->colorspace;
+	auto color_trc = m_FilterInfo.color_trc != -1 ? m_FilterInfo.color_trc : ctx->color_trc;
+	auto chroma_sample_location = m_FilterInfo.chroma_sample_location != -1 ? m_FilterInfo.chroma_sample_location : ctx->chroma_sample_location;
+	auto color_range = m_FilterInfo.color_range != -1 ? m_FilterInfo.color_range : ctx->color_range;
 
 	// Color Primaries
-	switch(ctx->color_primaries) {
+	switch(color_primaries) {
 		case AVCOL_PRI_BT709:
 			fmt.VideoPrimaries = DXVA2_VideoPrimaries_BT709;
 			break;
@@ -2764,7 +2781,7 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 	}
 
 	// Color Space / Transfer Matrix
-	switch (ctx->colorspace) {
+	switch (colorspace) {
 		case AVCOL_SPC_BT709:
 			fmt.VideoTransferMatrix = DXVA2_VideoTransferMatrix_BT709;
 			break;
@@ -2796,7 +2813,7 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 	}
 
 	// Color Transfer Function
-	switch(ctx->color_trc) {
+	switch(color_trc) {
 		case AVCOL_TRC_BT709:
 		case AVCOL_TRC_SMPTE170M:
 		case AVCOL_TRC_BT2020_10:
@@ -2832,7 +2849,7 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 	}
 
 	// Chroma location
-	switch(ctx->chroma_sample_location) {
+	switch(chroma_sample_location) {
 		case AVCHROMA_LOC_LEFT:
 			fmt.VideoChromaSubsampling = DXVA2_VideoChromaSubsampling_MPEG2;
 			break;
@@ -2845,7 +2862,7 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 	}
 
 	// Color Range, 0-255 or 16-235
-	if (ctx->color_range == AVCOL_RANGE_JPEG
+	if (color_range == AVCOL_RANGE_JPEG
 			|| frame->format == AV_PIX_FMT_YUVJ420P
 			|| frame->format == AV_PIX_FMT_YUVJ422P
 			|| frame->format == AV_PIX_FMT_YUVJ444P

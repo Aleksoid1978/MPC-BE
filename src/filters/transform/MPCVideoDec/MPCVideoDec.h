@@ -143,20 +143,30 @@ protected:
 	struct {
 		MediaSideDataHDR*                  masterDataHDR        = nullptr;
 		MediaSideDataHDRContentLightLevel* HDRContentLightLevel = nullptr;
-		ColorSpace*                        colorSpace           = nullptr;
 		int                                profile              = -1;
 		int                                pix_fmt              = -1;
 
 		int                                interlaced           = -1; // 0 - Progressive, 1 - Interlaced TFF, 2 - Interlaced BFF
 
+		int                                color_primaries        = -1;
+		int                                colorspace             = -1;
+		int                                color_trc              = -1;
+		int                                chroma_sample_location = -1;
+		int                                color_range            = -1;
+
 		void Clear() {
 			SAFE_DELETE(masterDataHDR);
 			SAFE_DELETE(HDRContentLightLevel)
-			SAFE_DELETE(colorSpace);
 			profile = -1;
 			pix_fmt = -1;
 
 			interlaced = -1;
+
+			color_primaries        = -1;
+			colorspace             = -1;
+			color_trc              = -1;
+			chroma_sample_location = -1;
+			color_range            = -1;
 		}
 
 	} m_FilterInfo;
