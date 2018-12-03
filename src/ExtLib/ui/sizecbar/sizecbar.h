@@ -109,6 +109,8 @@ public:
     }
 
     virtual COLORREF ColorThemeRGB(const int iR, const int iG, const int iB) const { return 0; }
+    virtual int ScaleX(const int x) const { return x; }
+    virtual int ScaleY(const int y) const { return y; }
 //MPC-BE custom code end
 
 // Overridables
