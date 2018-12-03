@@ -204,11 +204,18 @@ CString UTF8ToWStr(LPCSTR lpUTF8Str)
 void ReplaceCharacter(uint32_t& ch)
 {
 	if (!SysVersion::IsWin10orLater()) {
-		if (ch == 0x1F534 || ch == 0x1F535) { // Large Red Circle, Large Blue Circle
+		switch (ch) {
+		case 0x1F388: // Balloon
+		case 0x1F534: // Large Red Circle
+		case 0x1F535: // Large Blue Circle
 			ch = 0x25CF; // Black Circle
+			return;
 		}
-		else if (ch >= 0x1F600 && ch <= 0x1F64F) { // Emoticons
+		if (ch >= 0x1F600 && ch <= 0x1F64F) { // Emoticons
 			ch = 0x263A; // White Smiling Face
+		}
+		else if (ch >= 0x1F300) {
+			ch = 0x0020;
 		}
 	}
 }
