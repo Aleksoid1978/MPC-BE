@@ -875,6 +875,16 @@ COLORREF CPlayerPlaylistBar::ColorThemeRGB(const int iR, const int iG, const int
 	return ThemeRGB(iR, iG,iB);
 }
 
+int CPlayerPlaylistBar::ScaleX(const int x) const
+{
+	return m_pMainFrame->ScaleX(x);
+}
+
+int CPlayerPlaylistBar::ScaleY(const int y) const
+{
+	return m_pMainFrame->ScaleY(y);
+}
+
 void CPlayerPlaylistBar::LoadState(CFrameWnd *pParent)
 {
 	CString section = L"ToolBars\\" + m_strSettingName;

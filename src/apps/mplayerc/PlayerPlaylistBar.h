@@ -282,6 +282,8 @@ protected:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	
 	virtual COLORREF ColorThemeRGB(const int iR, const int iG, const int iB) const;
+	virtual int ScaleX(const int x) const;
+	virtual int ScaleY(const int y) const;
 
 	DECLARE_MESSAGE_MAP()
 

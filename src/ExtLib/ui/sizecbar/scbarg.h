@@ -38,12 +38,13 @@
 class CSizingControlBarG;
 class CSCBButton
 {
+#define DEFSIZE 12
 public:
     CSCBButton();
 
     void Move(CPoint ptTo) { ptOrg = ptTo; }
-    CRect GetRect() const { return CRect(ptOrg, CSize(12, 12)); }
-    void Paint(CDC* pDC, const CSizingControlBar* parent);
+    CRect GetRect(const CSize& size = (DEFSIZE, DEFSIZE)) const { return CRect(ptOrg, size); }
+    void Paint(CDC* pDC, const CSizingControlBar* parent, const CSize& size = (DEFSIZE, DEFSIZE));
 
     BOOL    bPushed;
     BOOL    bRaised;

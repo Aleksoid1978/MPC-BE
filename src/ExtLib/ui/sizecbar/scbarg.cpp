@@ -89,16 +89,16 @@ void CSizingControlBarG::NcCalcClient(LPRECT pRc, UINT nDockBarID)
                  (nDockBarID == AFX_IDW_DOCKBAR_BOTTOM);
 
     if (bHorz)
-        rc.DeflateRect(m_cyGripper, 0, 0, 0);
+        rc.DeflateRect(ScaleX(m_cyGripper), 0, 0, 0);
     else
-        rc.DeflateRect(0, m_cyGripper, 0, 0);
+        rc.DeflateRect(0, ScaleY(m_cyGripper), 0, 0);
 
     // set position for the "x" (hide bar) button
     CPoint ptOrgBtn;
     if (bHorz)
-        ptOrgBtn = CPoint(rc.left - 12, rc.top);
+        ptOrgBtn = CPoint(rc.left - ScaleX(m_cyGripper), rc.top);
     else
-        ptOrgBtn = CPoint(rc.right - 14, rc.top - 12);
+        ptOrgBtn = CPoint(rc.right - ScaleX(m_cyGripper) - 2, rc.top - ScaleY(m_cyGripper));
 
     m_biHide.Move(ptOrgBtn - rcBar.TopLeft());
 
@@ -120,32 +120,34 @@ void CSizingControlBarG::NcPaintGripper(CDC* pDC, CRect rcClient)
         // paints a simple "two raised lines" gripper
         // override this if you want a more sophisticated gripper
         CRect gripper = rcClient;
-        CRect rcbtn = m_biHide.GetRect();
+        CRect rcbtn = m_biHide.GetRect(CSize(ScaleX(m_cyGripper), ScaleY(m_cyGripper)));
         BOOL bHorz = IsHorzDocked();
 
         gripper.DeflateRect(1, 1);
+        const auto sizeX = ScaleX(m_cyGripper) / 4;
+        const auto sizeY = ScaleY(m_cyGripper) / 4;
         if (bHorz)
         {   // gripper at left
-            gripper.left -= m_cyGripper;
-            gripper.right = gripper.left + 3;
+            gripper.left -= (ScaleX(m_cyGripper) / 2 + sizeX * 2);
+            gripper.right = gripper.left + sizeX;
             gripper.top = rcbtn.bottom + 3;
         }
         else
         {   // gripper at top
-            gripper.top -= m_cyGripper;
-            gripper.bottom = gripper.top + 3;
+            gripper.top -= (ScaleY(m_cyGripper) / 2 + sizeY * 2);
+            gripper.bottom = gripper.top + sizeY;
             gripper.right = rcbtn.left - 3;
         }
         pDC->Draw3dRect(gripper, ::GetSysColor(COLOR_BTNHIGHLIGHT),
             ::GetSysColor(COLOR_BTNSHADOW));
 
-        gripper.OffsetRect(bHorz ? 3 : 0, bHorz ? 0 : 3);
+        gripper.OffsetRect(bHorz ? sizeX : 0, bHorz ? 0 : sizeY);
 
         pDC->Draw3dRect(gripper, ::GetSysColor(COLOR_BTNHIGHLIGHT),
             ::GetSysColor(COLOR_BTNSHADOW));
     }
 
-    m_biHide.Paint(pDC, this);
+    m_biHide.Paint(pDC, this, CSize(ScaleX(m_cyGripper), ScaleY(m_cyGripper)));
 }
 
 LRESULT CSizingControlBarG::OnNcHitTest(CPoint point)
@@ -163,7 +165,7 @@ LRESULT CSizingControlBarG::OnNcHitTest(CPoint point)
     ScreenToClient(&point);
     //MPC-BE custom code end
 
-    CRect rc = m_biHide.GetRect();
+    CRect rc = m_biHide.GetRect(CSize(ScaleX(m_cyGripper), ScaleY(m_cyGripper)));
     rc.OffsetRect(rcBar.TopLeft());
     if (rc.PtInRect(point))
         return HTCLOSE;
@@ -212,9 +214,9 @@ CSCBButton::CSCBButton()
     bPushed = FALSE;
 }
 
-void CSCBButton::Paint(CDC* pDC, const CSizingControlBar* parent)
+void CSCBButton::Paint(CDC* pDC, const CSizingControlBar* parent, const CSize& size/* = (DEFSIZE, DEFSIZE)*/)
 {
-    CRect rc = GetRect();
+    CRect rc = GetRect(size);
 
     // btn highlight
     if (bPushed)
@@ -237,14 +239,14 @@ void CSCBButton::Paint(CDC* pDC, const CSizingControlBar* parent)
     int nPrevBkMode = pDC->SetBkMode(TRANSPARENT);
     CFont font;
     int ppi = pDC->GetDeviceCaps(LOGPIXELSX);
-    int pointsize = MulDiv(70, ppi, 96); // 7 points at 96 ppi
-    font.CreatePointFont(pointsize, _T("Marlett"));
+    int pointsize = parent->ScaleX(70); // 7 points at 96 ppi
+    font.CreatePointFont(pointsize, L"Marlett");
     CFont* oldfont = pDC->SelectObject(&font);
 
     //MPC-BE custom code start
     // TextOut is affected by the layout so we need to account for that
     DWORD dwLayout = pDC->GetLayout();
-    pDC->TextOut(ptOrg.x + (dwLayout == LAYOUT_LTR ? 2 : -1), ptOrg.y + 2, CString(_T("r"))); // x-like
+    pDC->TextOut(ptOrg.x + (dwLayout == LAYOUT_LTR ? 2 : -1), ptOrg.y + 2, CString(L"r")); // x-like
     //MPC-BE custom code end
 
     pDC->SelectObject(oldfont);
