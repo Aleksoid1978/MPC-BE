@@ -1221,6 +1221,46 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 												}
 										}
 									}
+
+									// code from libavformat/mov.c
+									#define MAX_REORDER_DELAY 16
+									AP4_SI64 pts_buf[MAX_REORDER_DELAY + 1];
+									for (size_t i = 0; i < MAX_REORDER_DELAY + 1; i++) {
+										pts_buf[i] = INT64_MIN;
+									}
+
+									m_video_delay = 0;
+
+									int j, r, buf_start = 0;
+									AP4_Sample sample_tmp;
+									for (AP4_Ordinal index = 0; index < 50; index++) {
+										if (!AP4_SUCCEEDED(track->GetSample(index, sample_tmp)) || sample_tmp.GetDescriptionIndex() == 0xFFFFFFFF) {
+											break;
+										}
+
+										j = buf_start;
+										buf_start++;
+										if (buf_start == MAX_REORDER_DELAY + 1) {
+											buf_start = 0;
+										}
+
+										pts_buf[j] = sample_tmp.GetCts();
+
+										int num_swaps = 0;
+										while (j != buf_start) {
+											r = j - 1;
+											if (r < 0) r = MAX_REORDER_DELAY;
+											if (pts_buf[j] < pts_buf[r]) {
+												std::swap(pts_buf[j], pts_buf[r]);
+												++num_swaps;
+											} else {
+												break;
+											}
+											j = r;
+										}
+
+										m_video_delay = std::max(m_video_delay, num_swaps);
+									}
 								}
 								break;
 							case AP4_ATOM_TYPE_HVC1:
@@ -2213,6 +2253,12 @@ STDMETHODIMP CMP4SplitterFilter::GetInt(LPCSTR field, int *value)
 	else if (!strcmp(field, "VIDEO_FLAG_ONLY_DTS")) {
 		*value = m_dtsonly;
 		return S_OK;
+	} else if (!strcmp(field, "VIDEO_DELAY")) {
+		if (m_video_delay != 0) {
+			*value = m_video_delay;
+			return S_OK;
+		}
+		return E_ABORT;
 	}
 
 	return E_INVALIDARG;

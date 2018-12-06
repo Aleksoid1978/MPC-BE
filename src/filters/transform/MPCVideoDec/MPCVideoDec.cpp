@@ -1971,78 +1971,86 @@ redo:
 
 	FillAVCodecProps(m_pAVCtx);
 
-	if (bChangeType && pFilter) {
-		m_FilterInfo.Clear();
-
+	if (pFilter) {
 		CComPtr<IExFilterInfo> pIExFilterInfo;
 		if (SUCCEEDED(pFilter->QueryInterface(&pIExFilterInfo))) {
-			int value;
-			if (SUCCEEDED(pIExFilterInfo->GetInt("VIDEO_PROFILE", &value))) {
-				m_FilterInfo.profile = value;
-			}
-			if (SUCCEEDED(pIExFilterInfo->GetInt("VIDEO_PIXEL_FORMAT", &value))) {
-				m_FilterInfo.pix_fmt = value;
-			}
-
-			if (SUCCEEDED(pIExFilterInfo->GetInt("VIDEO_INTERLACED", &value))) {
-				m_FilterInfo.interlaced = value;
-			}
-
-			if (!m_bReorderBFrame && (m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_HEVC)) {
-				if (SUCCEEDED(pIExFilterInfo->GetInt("VIDEO_FLAG_ONLY_DTS", &value))
-						&& value == 1) {
-					m_bReorderBFrame = true;
+			if (m_nCodecId == AV_CODEC_ID_H264) {
+				int value = 0;
+				if (SUCCEEDED(pIExFilterInfo->GetInt("VIDEO_DELAY", &value))) {
+					m_pAVCtx->has_b_frames = value;
 				}
 			}
 
-			unsigned size = 0;
-			LPVOID pData = nullptr;
-			if (SUCCEEDED(pIExFilterInfo->GetBin("VIDEO_COLOR_SPACE", &pData, &size))) {
-				if (size == sizeof(ColorSpace)) {
-					auto const colorSpace = (ColorSpace*)pData;
+			if (bChangeType) {
+				m_FilterInfo.Clear();
+				int value = 0;
+				if (SUCCEEDED(pIExFilterInfo->GetInt("VIDEO_PROFILE", &value))) {
+					m_FilterInfo.profile = value;
+				}
+				if (SUCCEEDED(pIExFilterInfo->GetInt("VIDEO_PIXEL_FORMAT", &value))) {
+					m_FilterInfo.pix_fmt = value;
+				}
 
-					if (colorSpace->MatrixCoefficients < AVCOL_SPC_NB && colorSpace->MatrixCoefficients != AVCOL_SPC_RGB && colorSpace->MatrixCoefficients != AVCOL_SPC_UNSPECIFIED && colorSpace->MatrixCoefficients != AVCOL_SPC_RESERVED) {
-						m_FilterInfo.colorspace = colorSpace->MatrixCoefficients;
-					}
+				if (SUCCEEDED(pIExFilterInfo->GetInt("VIDEO_INTERLACED", &value))) {
+					m_FilterInfo.interlaced = value;
+				}
 
-					if (colorSpace->Primaries < AVCOL_PRI_NB && colorSpace->Primaries != AVCOL_PRI_RESERVED0 && colorSpace->Primaries != AVCOL_PRI_UNSPECIFIED && colorSpace->Primaries != AVCOL_PRI_RESERVED) {
-						m_FilterInfo.color_primaries = colorSpace->Primaries;
-					}
-
-					if (colorSpace->TransferCharacteristics < AVCOL_TRC_NB && colorSpace->TransferCharacteristics != AVCOL_TRC_RESERVED0 && colorSpace->TransferCharacteristics != AVCOL_TRC_UNSPECIFIED && colorSpace->TransferCharacteristics != AVCOL_TRC_RESERVED) {
-						m_FilterInfo.color_trc = colorSpace->TransferCharacteristics;
-					}
-
-					if (colorSpace->ChromaLocation < AVCHROMA_LOC_NB && colorSpace->ChromaLocation != AVCHROMA_LOC_UNSPECIFIED) {
-						m_FilterInfo.chroma_sample_location = colorSpace->ChromaLocation;
-					}
-
-					if (colorSpace->Range < AVCOL_RANGE_NB && colorSpace->Range != AVCOL_RANGE_UNSPECIFIED) {
-						m_FilterInfo.color_range = colorSpace->Range;
+				if (!m_bReorderBFrame && (m_nCodecId == AV_CODEC_ID_H264 || m_nCodecId == AV_CODEC_ID_HEVC)) {
+					if (SUCCEEDED(pIExFilterInfo->GetInt("VIDEO_FLAG_ONLY_DTS", &value))
+							&& value == 1) {
+						m_bReorderBFrame = true;
 					}
 				}
-				LocalFree(pData);
-			}
-			if (SUCCEEDED(pIExFilterInfo->GetBin("HDR_MASTERING_METADATA", &pData, &size))) {
-				if (size == sizeof(MediaSideDataHDR)) {
-					m_FilterInfo.masterDataHDR = DNew MediaSideDataHDR;
-					memcpy(m_FilterInfo.masterDataHDR, pData, size);
+
+				unsigned size = 0;
+				LPVOID pData = nullptr;
+				if (SUCCEEDED(pIExFilterInfo->GetBin("VIDEO_COLOR_SPACE", &pData, &size))) {
+					if (size == sizeof(ColorSpace)) {
+						auto const colorSpace = (ColorSpace*)pData;
+
+						if (colorSpace->MatrixCoefficients < AVCOL_SPC_NB && colorSpace->MatrixCoefficients != AVCOL_SPC_RGB && colorSpace->MatrixCoefficients != AVCOL_SPC_UNSPECIFIED && colorSpace->MatrixCoefficients != AVCOL_SPC_RESERVED) {
+							m_FilterInfo.colorspace = colorSpace->MatrixCoefficients;
+						}
+
+						if (colorSpace->Primaries < AVCOL_PRI_NB && colorSpace->Primaries != AVCOL_PRI_RESERVED0 && colorSpace->Primaries != AVCOL_PRI_UNSPECIFIED && colorSpace->Primaries != AVCOL_PRI_RESERVED) {
+							m_FilterInfo.color_primaries = colorSpace->Primaries;
+						}
+
+						if (colorSpace->TransferCharacteristics < AVCOL_TRC_NB && colorSpace->TransferCharacteristics != AVCOL_TRC_RESERVED0 && colorSpace->TransferCharacteristics != AVCOL_TRC_UNSPECIFIED && colorSpace->TransferCharacteristics != AVCOL_TRC_RESERVED) {
+							m_FilterInfo.color_trc = colorSpace->TransferCharacteristics;
+						}
+
+						if (colorSpace->ChromaLocation < AVCHROMA_LOC_NB && colorSpace->ChromaLocation != AVCHROMA_LOC_UNSPECIFIED) {
+							m_FilterInfo.chroma_sample_location = colorSpace->ChromaLocation;
+						}
+
+						if (colorSpace->Range < AVCOL_RANGE_NB && colorSpace->Range != AVCOL_RANGE_UNSPECIFIED) {
+							m_FilterInfo.color_range = colorSpace->Range;
+						}
+					}
+					LocalFree(pData);
 				}
-				LocalFree(pData);
-			}
-			if (SUCCEEDED(pIExFilterInfo->GetBin("HDR_CONTENT_LIGHT_LEVEL", &pData, &size))) {
-				if (size == sizeof(MediaSideDataHDRContentLightLevel)) {
-					m_FilterInfo.HDRContentLightLevel = DNew MediaSideDataHDRContentLightLevel;
-					memcpy(m_FilterInfo.HDRContentLightLevel, pData, size);
+				if (SUCCEEDED(pIExFilterInfo->GetBin("HDR_MASTERING_METADATA", &pData, &size))) {
+					if (size == sizeof(MediaSideDataHDR)) {
+						m_FilterInfo.masterDataHDR = DNew MediaSideDataHDR;
+						memcpy(m_FilterInfo.masterDataHDR, pData, size);
+					}
+					LocalFree(pData);
 				}
-				LocalFree(pData);
-			}
-			if (SUCCEEDED(pIExFilterInfo->GetBin("PALETTE", &pData, &size))) {
-				if (size == sizeof(m_Palette)) {
-					m_bHasPalette = true;
-					memcpy(m_Palette, pData, size);
+				if (SUCCEEDED(pIExFilterInfo->GetBin("HDR_CONTENT_LIGHT_LEVEL", &pData, &size))) {
+					if (size == sizeof(MediaSideDataHDRContentLightLevel)) {
+						m_FilterInfo.HDRContentLightLevel = DNew MediaSideDataHDRContentLightLevel;
+						memcpy(m_FilterInfo.HDRContentLightLevel, pData, size);
+					}
+					LocalFree(pData);
 				}
-				LocalFree(pData);
+				if (SUCCEEDED(pIExFilterInfo->GetBin("PALETTE", &pData, &size))) {
+					if (size == sizeof(m_Palette)) {
+						m_bHasPalette = true;
+						memcpy(m_Palette, pData, size);
+					}
+					LocalFree(pData);
+				}
 			}
 		}
 	}

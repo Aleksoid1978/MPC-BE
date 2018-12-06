@@ -42,6 +42,7 @@ interface __declspec(uuid("3F56FEBC-633C-4C76-8455-0787FC62C8F8")) IExFilterInfo
 // VIDEO_PIXEL_FORMAT      int   MatroskaSplitter
 // VIDEO_INTERLACED        int   MatroskaSplitter,MP4Splitter,RawVideoSplitter  0-progressive, 1-tff, 2-bff
 // VIDEO_FLAG_ONLY_DTS     int   MatroskaSplitter,MP4Splitter                   0-no, 1-yes
+// VIDEO_DELAY             int   MP4Splitter
 // PALETTE                 bin   MP4Splitter
 // VIDEO_COLOR_SPACE       bin   MatroskaSplitter
 // HDR_MASTERING_METADATA  bin   MatroskaSplitter
