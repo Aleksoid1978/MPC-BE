@@ -521,6 +521,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         // RAW Video
         case AP4_ATOM_TYPE_R10g:
         case AP4_ATOM_TYPE_R10k:
+        case AP4_ATOM_TYPE_r210:
         case AP4_ATOM_TYPE_b16g:
         case AP4_ATOM_TYPE_b48r:
         case AP4_ATOM_TYPE_b64a:
