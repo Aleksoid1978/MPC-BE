@@ -42,3 +42,4 @@ private:
 };
 
 CString GetGUIDString(const GUID& guid);
+CString GetGUIDString2(const GUID& guid);

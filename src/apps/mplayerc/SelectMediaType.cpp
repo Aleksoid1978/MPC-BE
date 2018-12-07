@@ -24,7 +24,7 @@
 
 CString GetMediaTypeName(const GUID& guid)
 {
-	CString ret = (guid == GUID_NULL) ? L"Any type" : GetGUIDString(guid);
+	CString ret = (guid == GUID_NULL) ? L"Any type" : GetGUIDString2(guid);
 
 	return ret;
 }
