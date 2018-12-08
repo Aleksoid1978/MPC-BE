@@ -209,11 +209,9 @@ BOOL CPPageVideo::OnInitDialog()
 	addRenderer(VIDRNDT_NULL_UNCOMP,  IDS_PPAGE_OUTPUT_NULL_UNCOMP);
 
 #if MPCVR
-	CString sName = L"Experimental MPC Video Renderer";
-	if (!IsRenderTypeAvailable(VIDRNDT_MPCVR, m_hWnd)) {
-		sName.AppendFormat(L" %s", ResStr(IDS_REND_NOT_AVAILABLE));
+	if (IsRenderTypeAvailable(VIDRNDT_MPCVR, m_hWnd)) {
+		AddStringData(m_cbVideoRenderer, L"Experimental MPC Video Renderer", VIDRNDT_MPCVR);
 	}
-	AddStringData(m_cbVideoRenderer, sName, VIDRNDT_MPCVR);
 #endif
 
 	for (int i = 0; i < m_iDSVRTC.GetCount(); ++i) {
