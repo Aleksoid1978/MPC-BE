@@ -592,16 +592,17 @@ void CPPageExternalFilters::OnResetTypes()
 		if (f->type == FilterOverride::REGISTERED) {
 			CFGFilterRegistry fgf(f->dispname);
 			if (!fgf.GetName().IsEmpty()) {
-				//f->guids.clear();
-				//f->backup.clear();
 				f->guids = fgf.GetTypes();
 				f->backup = fgf.GetTypes();
 			} else {
-				//f->guids.clear();
 				f->guids = f->backup;
 			}
 		} else {
-			//f->guids.clear();
+			CFilterMapper2 fm2(false);
+			fm2.Register(f->path);
+			if (fm2.m_filters.size()) {
+				f->backup = fm2.m_filters.front()->backup;
+			}
 			f->guids = f->backup;
 		}
 
