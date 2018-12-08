@@ -29,7 +29,7 @@
 
 // CPPageVideo dialog
 
-static bool IsRenderTypeAvailable(UINT VideoRendererType, HWND hwnd)
+static bool IsRenderTypeAvailable(int VideoRendererType, HWND hwnd)
 {
 	switch (VideoRendererType) {
 		case VIDRNDT_EVR:
@@ -170,48 +170,50 @@ BOOL CPPageVideo::OnInitDialog()
 
 	CorrectComboListWidth(m_cbD3D9RenderDevice);
 
-	auto addRenderer = [&](int nID) {
-		CString sName;
-
-		switch (nID) {
-		case VIDRNDT_SYSDEFAULT:	sName = ResStr(IDS_PPAGE_OUTPUT_SYS_DEF);		break;
-		case VIDRNDT_VMR9WINDOWED:	sName = ResStr(IDS_PPAGE_OUTPUT_VMR9WINDOWED);	break;
-		case VIDRNDT_EVR:			sName = ResStr(IDS_PPAGE_OUTPUT_EVR);			break;
-		case VIDRNDT_EVR_CUSTOM:	sName = ResStr(IDS_PPAGE_OUTPUT_EVR_CUSTOM);	break;
-		case VIDRNDT_SYNC:			sName = ResStr(IDS_PPAGE_OUTPUT_SYNC);			break;
-		case VIDRNDT_DXR:			sName = ResStr(IDS_PPAGE_OUTPUT_DXR);			break;
-		case VIDRNDT_MADVR:			sName = ResStr(IDS_PPAGE_OUTPUT_MADVR);			break;
-		case VIDRNDT_NULL_COMP:		sName = ResStr(IDS_PPAGE_OUTPUT_NULL_COMP);		break;
-		case VIDRNDT_NULL_UNCOMP:	sName = ResStr(IDS_PPAGE_OUTPUT_NULL_UNCOMP);	break;
-#if MPCVR
-		case VIDRNDT_MPCVR:			sName = L"Experimental MPC Video Renderer";		break;
-#endif
+	auto addRenderer = [&](int iVR, UINT nID) {
+		switch (iVR) {
+		case VIDRNDT_SYSDEFAULT:
+		case VIDRNDT_VMR9WINDOWED:
+		case VIDRNDT_EVR:
+		case VIDRNDT_EVR_CUSTOM:
+		case VIDRNDT_SYNC:
+		case VIDRNDT_DXR:
+		case VIDRNDT_MADVR:
+		case VIDRNDT_NULL_COMP:
+		case VIDRNDT_NULL_UNCOMP:
+			break;
 		default:
 			ASSERT(FALSE);
 			return;
 		}
+		CString sName = ResStr(nID);
 
-		if (!IsRenderTypeAvailable(nID, m_hWnd)) {
+		if (!IsRenderTypeAvailable(iVR, m_hWnd)) {
 			sName.AppendFormat(L" %s", ResStr(IDS_REND_NOT_AVAILABLE));
 		}
 
-		AddStringData(m_cbVideoRenderer, sName, nID);
+		AddStringData(m_cbVideoRenderer, sName, iVR);
 	};
 
 
 	CComboBox& m_iDSVRTC = m_cbVideoRenderer;
 	m_iDSVRTC.SetRedraw(FALSE);
-	addRenderer(VIDRNDT_SYSDEFAULT);
-	addRenderer(VIDRNDT_VMR9WINDOWED);
-	addRenderer(VIDRNDT_EVR);
-	addRenderer(VIDRNDT_EVR_CUSTOM);
-	addRenderer(VIDRNDT_SYNC);
-	addRenderer(VIDRNDT_DXR);
-	addRenderer(VIDRNDT_MADVR);
-	addRenderer(VIDRNDT_NULL_COMP);
-	addRenderer(VIDRNDT_NULL_UNCOMP);
+	addRenderer(VIDRNDT_SYSDEFAULT,   IDS_PPAGE_OUTPUT_SYS_DEF);
+	addRenderer(VIDRNDT_VMR9WINDOWED, IDS_PPAGE_OUTPUT_VMR9WINDOWED);
+	addRenderer(VIDRNDT_EVR,          IDS_PPAGE_OUTPUT_EVR);
+	addRenderer(VIDRNDT_EVR_CUSTOM,   IDS_PPAGE_OUTPUT_EVR_CUSTOM);
+	addRenderer(VIDRNDT_SYNC,         IDS_PPAGE_OUTPUT_SYNC);
+	addRenderer(VIDRNDT_DXR,          IDS_PPAGE_OUTPUT_DXR);
+	addRenderer(VIDRNDT_MADVR,        IDS_PPAGE_OUTPUT_MADVR);
+	addRenderer(VIDRNDT_NULL_COMP,    IDS_PPAGE_OUTPUT_NULL_COMP);
+	addRenderer(VIDRNDT_NULL_UNCOMP,  IDS_PPAGE_OUTPUT_NULL_UNCOMP);
+
 #if MPCVR
-	addRenderer(VIDRNDT_MPCVR);
+	CString sName = L"Experimental MPC Video Renderer";
+	if (!IsRenderTypeAvailable(VIDRNDT_MPCVR, m_hWnd)) {
+		sName.AppendFormat(L" %s", ResStr(IDS_REND_NOT_AVAILABLE));
+	}
+	AddStringData(m_cbVideoRenderer, sName, VIDRNDT_MPCVR);
 #endif
 
 	for (int i = 0; i < m_iDSVRTC.GetCount(); ++i) {
@@ -396,7 +398,7 @@ void CPPageVideo::OnUpdateMixerYUV(CCmdUI* pCmdUI)
 
 void CPPageVideo::OnDSRendererChange()
 {
-	UINT CurrentVR = GetCurItemData(m_cbVideoRenderer);
+	int CurrentVR = (int)GetCurItemData(m_cbVideoRenderer);
 
 	if (!IsRenderTypeAvailable(CurrentVR, m_hWnd)) {
 		AfxMessageBox(IDS_PPAGE_OUTPUT_UNAVAILABLEMSG, MB_ICONEXCLAMATION | MB_OK, 0);
@@ -406,7 +408,7 @@ void CPPageVideo::OnDSRendererChange()
 		for (int i = 0; i < m_cbVideoRenderer.GetCount(); ++i) {
 			if (m_iVideoRendererType_store == m_cbVideoRenderer.GetItemData(i)) {
 				m_cbVideoRenderer.SetCurSel(i);
-				CurrentVR = m_cbVideoRenderer.GetItemData(i);
+				CurrentVR = (int)m_cbVideoRenderer.GetItemData(i);
 				break;
 			}
 		}
