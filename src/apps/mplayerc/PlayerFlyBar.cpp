@@ -193,7 +193,7 @@ void CFlyBar::OnLButtonUp(UINT nFlags, CPoint point)
 		}
 		Invalidate();
 	} else if (r_FSIcon.PtInRect(p)) {
-		m_pMainFrame->ToggleFullscreen(true, true);
+		m_pMainFrame->OnViewFullscreen();
 		Invalidate();
 	} else if (r_LockIcon.PtInRect(p)) {
 		CAppSettings& s = AfxGetAppSettings();
