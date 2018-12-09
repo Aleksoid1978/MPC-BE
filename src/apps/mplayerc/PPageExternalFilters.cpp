@@ -600,8 +600,11 @@ void CPPageExternalFilters::OnResetTypes()
 		} else {
 			CFilterMapper2 fm2(false);
 			fm2.Register(f->path);
-			if (fm2.m_filters.size()) {
-				f->backup = fm2.m_filters.front()->backup;
+			for (const auto& filter : fm2.m_filters) {
+				if (filter->clsid == f->clsid) {
+					f->backup = filter->backup;
+					break;
+				}
 			}
 			f->guids = f->backup;
 		}
