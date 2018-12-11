@@ -3,6 +3,7 @@ static const AVCodec * const codec_list[] = {
 
     &ff_aic_decoder,
     &ff_amv_decoder,
+    &ff_avrp_decoder,
     &ff_bink_decoder,
     &ff_cfhd_decoder,
     &ff_cinepak_decoder,
@@ -13,7 +14,7 @@ static const AVCodec * const codec_list[] = {
     &ff_dvvideo_decoder,
     &ff_eightbps_decoder,
     &ff_ffv1_decoder,
-	&ff_ffvhuff_decoder,
+    &ff_ffvhuff_decoder,
     &ff_flashsv_decoder,
     &ff_flv_decoder,
     &ff_fraps_decoder,
