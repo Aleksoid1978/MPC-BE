@@ -383,6 +383,7 @@ const AP4_Atom::Type AP4_ATOM_TYPE_V210 = AP4_ATOM_TYPE('V','2','1','0'); // typ
 const AP4_Atom::Type AP4_ATOM_TYPE_v308 = AP4_ATOM_TYPE('v','3','0','8');
 const AP4_Atom::Type AP4_ATOM_TYPE_v408 = AP4_ATOM_TYPE('v','4','0','8');
 const AP4_Atom::Type AP4_ATOM_TYPE_v410 = AP4_ATOM_TYPE('v','4','1','0');
+const AP4_Atom::Type AP4_ATOM_TYPE_AVrp = AP4_ATOM_TYPE('A','V','r','p');
 const AP4_Atom::Type AP4_ATOM_TYPE_R10g = AP4_ATOM_TYPE('R','1','0','g');
 const AP4_Atom::Type AP4_ATOM_TYPE_R10k = AP4_ATOM_TYPE('R','1','0','k');
 const AP4_Atom::Type AP4_ATOM_TYPE_r210 = AP4_ATOM_TYPE('r','2','1','0');

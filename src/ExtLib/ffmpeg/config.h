@@ -591,6 +591,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_AMV_DECODER 1
 #define CONFIG_ASV1_DECODER 0
 #define CONFIG_ASV2_DECODER 0
+#define CONFIG_AVRP_DECODER 1
 #define CONFIG_AVS_DECODER 0
 #define CONFIG_BINK_DECODER 1
 #define CONFIG_BRENDER_PIX_DECODER 0
