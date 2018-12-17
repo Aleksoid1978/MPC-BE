@@ -549,22 +549,15 @@ CString GetGUIDString(const GUID& guid)
 		else if (memcmp(&guid.Data2, &MEDIASUBTYPE_YUY2.Data2, sizeof(GUID)- sizeof(GUID::Data1)) == 0) {
 			// GUID like {xxxxxxxx-0000-0010-8000-00AA00389B71}
 
-			if ((guid.Data1 & 0xE0000000) && (guid.Data1 & 0x00E00000) && (guid.Data1 & 0x0000E000) && (guid.Data1 & 0x000000E0)) {
-				// FOURCC with chars >= 0x20
-				static CHAR s_guidstr[] = "MEDIASUBTYPE_XXXX";
-				memcpy(&s_guidstr[13], &guid.Data1, sizeof(guid.Data1));
-				guidStr = s_guidstr;
-			}
-			else {
-				// some "standard" audio GUIDs that are not in the moreuuids.h (for LAV Audio Decoder)
-				switch (guid.Data1) {
-				case WAVE_FORMAT_ADPCM:         guidStr = "MEDIASUBTYPE_MS_ADPCM"; break;
-				case WAVE_FORMAT_GSM610:        guidStr = "MEDIASUBTYPE_GSM610"; break;
-				case WAVE_FORMAT_MPEG_ADTS_AAC: guidStr = "MEDIASUBTYPE_MPEG_ADTS_AAC"; break;
-				case WAVE_FORMAT_MPEG_RAW_AAC:  guidStr = "MEDIASUBTYPE_MPEG_RAW_AAC"; break;
-				case WAVE_FORMAT_MPEG_LOAS:     guidStr = "MEDIASUBTYPE_MPEG_LOAS"; break;
-				case WAVE_FORMAT_MPEG_HEAAC:    guidStr = "MEDIASUBTYPE_MPEG_HEAAC"; break;
-				}
+			switch (guid.Data1) {
+			case WAVE_FORMAT_ADPCM:         guidStr = "MEDIASUBTYPE_MS_ADPCM"; break;
+			case WAVE_FORMAT_GSM610:        guidStr = "MEDIASUBTYPE_GSM610"; break;
+			case WAVE_FORMAT_MPEG_ADTS_AAC: guidStr = "MEDIASUBTYPE_MPEG_ADTS_AAC"; break;
+			case WAVE_FORMAT_MPEG_RAW_AAC:  guidStr = "MEDIASUBTYPE_MPEG_RAW_AAC"; break;
+			case WAVE_FORMAT_MPEG_LOAS:     guidStr = "MEDIASUBTYPE_MPEG_LOAS"; break;
+			case WAVE_FORMAT_MPEG_HEAAC:    guidStr = "MEDIASUBTYPE_MPEG_HEAAC"; break;
+			default:
+				return L"MEDIASUBTYPE_" + FourccToWStr(guid.Data1);
 			}
 		}
 	}
