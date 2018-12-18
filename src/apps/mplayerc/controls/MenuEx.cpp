@@ -196,7 +196,7 @@ void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, const bool bSe
 		const CAppSettings& s = AfxGetAppSettings();
 		
 		if (bGrayed) {
-			pDC->SetTextColor(0);
+			pDC->SetTextColor(RGB(0,0,0));
 		} else {
 			pDC->SetTextColor(s.clrFaceABGR);
 		}

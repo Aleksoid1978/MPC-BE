@@ -19497,8 +19497,8 @@ void CMainFrame::SetColorMenu()
 	const COLORREF crBRD   = ColorBrightness(-60, crBR);		// backgroung raisen darken (for dark edge)
 
 	const COLORREF crBS    = ColorBrightness(-10, crBN);		// backgroung sunken (selected grayed)
-	const COLORREF crBSL   = ColorBrightness(+0, crBS);			// backgroung sunken lighten  (for light edge)
-	const COLORREF crBSD   = ColorBrightness(-0, crBS);			// backgroung sunken darken  (for dark edge)
+	const COLORREF crBSL   = ColorBrightness(+0, crBS);			// backgroung sunken lighten (for light edge)
+	const COLORREF crBSD   = ColorBrightness(-0, crBS);			// backgroung sunken darken (for dark edge)
 
 	const COLORREF crTN    = ColorBrightness(+140, crBN);		// text normal
 	const COLORREF crTNL   = ColorBrightness(+80, crTN);		// text normal lighten
