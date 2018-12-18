@@ -369,6 +369,9 @@
     <ClCompile Include="ComPropertySheet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="controls\MenuEx.cpp">
+      <Filter>controls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSettings.h">
@@ -730,6 +733,9 @@
     </ClInclude>
     <ClInclude Include="ComPropertySheet.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="controls\MenuEx.h">
+      <Filter>controls</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

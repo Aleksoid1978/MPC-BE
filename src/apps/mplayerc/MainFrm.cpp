@@ -97,6 +97,7 @@
 #include "Variables.h"
 
 #include "PlayerYouTubeDL.h"
+#include "./Controls/MenuEx.h"
 
 #define DEFCLIENTW		292
 #define DEFCLIENTH		200
@@ -134,7 +135,6 @@ public:
 	}
 };
 
-
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame
 
@@ -169,10 +169,15 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
 
 	ON_WM_SYSCOMMAND()
+	ON_WM_ACTIVATE()
 	ON_WM_ACTIVATEAPP()
 	ON_MESSAGE(WM_APPCOMMAND, OnAppCommand)
 	ON_WM_INPUT()
 	ON_MESSAGE(WM_HOTKEY, OnHotKey)
+
+	ON_WM_DRAWITEM()
+	ON_WM_MEASUREITEM()
+	ON_WM_ERASEBKGND()
 
 	ON_WM_TIMER()
 
@@ -639,10 +644,22 @@ CMainFrame::CMainFrame() :
 
 	// Remove the lines-splitters between bars
 	afxData.cyBorder2 = 0;
+
+	CMenuEx::Hook();
 }
 
 CMainFrame::~CMainFrame()
 {
+	CMenuEx::UnHook();
+	CMenuEx::FreeResource();
+
+	if (m_hMainMenuBrush) {
+		::DeleteObject(m_hMainMenuBrush);
+	}
+
+	if (m_hPopupMenuBrush) {
+		::DeleteObject(m_hPopupMenuBrush);
+	}
 }
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -653,10 +670,18 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	UseCurentMonitorDPI(m_hWnd);
 
+	CAppSettings& s = AfxGetAppSettings();
+
+	CMenuEx::SetMain(this);
+	CMenuEx::EnableHook(s.bUseDarkTheme);
+	CMenuEx::ScaleFont();
+
+	if (s.bUseDarkTheme) {
+		SetColorMenu();
+	}
+
 	m_popupMenu.LoadMenuW(IDR_POPUP);
 	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
-
-	CAppSettings& s = AfxGetAppSettings();
 
 	// create a Main View Window
 	if (!m_wndView.Create(nullptr, nullptr, AFX_WS_DEFAULT_VIEW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
@@ -837,6 +862,7 @@ void CMainFrame::OnPaint()
 
 BOOL CMainFrame::OnEraseBkgnd(CDC* pDC)
 {
+	DrawSmallBorder();
 	return TRUE;
 }
 
@@ -2039,6 +2065,8 @@ LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 	m_wndStatsBar.ScaleFont();
 	m_wndPlaylistBar.ScaleFont();
 	m_wndStatusBar.ScaleFont();
+	
+	CMenuEx::ScaleFont();
 
 	MoveWindow(reinterpret_cast<RECT*>(lParam));
 	RecalcLayout();
@@ -2072,6 +2100,13 @@ void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 
 	__super::OnSysCommand(nID, lParam);
+}
+
+void CMainFrame::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
+{
+	if (!bMinimized) {
+		DrawSmallBorder();
+	}
 }
 
 void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
@@ -3791,19 +3826,13 @@ void CMainFrame::OnInitMenu(CMenu* pMenu)
 		return;
 	}
 
-	MENUITEMINFO mii;
-	mii.cbSize = sizeof(mii);
+	MENUITEMINFOW mii = { sizeof(mii) };
 
 	for (UINT i = 0; i < uiMenuCount; ++i) {
-#ifdef _DEBUG
-		CString str;
-		pMenu->GetMenuString(i, str, MF_BYPOSITION);
-		str.Remove('&');
-#endif
 		UINT itemID = pMenu->GetMenuItemID(i);
 		if (itemID == 0xFFFFFFFF) {
 			mii.fMask = MIIM_ID;
-			pMenu->GetMenuItemInfo(i, &mii, TRUE);
+			pMenu->GetMenuItemInfoW(i, &mii, TRUE);
 			itemID = mii.wID;
 		}
 
@@ -3823,7 +3852,7 @@ void CMainFrame::OnInitMenu(CMenu* pMenu)
 			mii.wID = itemID; // save ID after set popup type
 			mii.hSubMenu = pSubMenu->m_hMenu;
 			mii.fState = (pSubMenu->GetMenuItemCount() > 0 ? MF_ENABLED : (MF_DISABLED | MF_GRAYED));
-			pMenu->SetMenuItemInfo(i, &mii, TRUE);
+			pMenu->SetMenuItemInfoW(i, &mii, TRUE);
 		}
 	}
 }
@@ -3837,15 +3866,18 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 		return;
 	}
 
-	MENUITEMINFO mii;
-	mii.cbSize = sizeof(mii);
+	if (AfxGetAppSettings().bUseDarkTheme) {
+		MENUINFO MenuInfo = { 0 };
+		MenuInfo.cbSize = sizeof(MenuInfo);
+		MenuInfo.hbrBack = m_hPopupMenuBrush;
+		MenuInfo.fMask = MIM_BACKGROUND | MIM_APPLYTOSUBMENUS;
+		MenuInfo.dwStyle = MNS_AUTODISMISS;
+		SetMenuInfo(pPopupMenu->m_hMenu, &MenuInfo);
+	}
+
+	MENUITEMINFOW mii = { sizeof(mii) };
 
 	for (UINT i = 0; i < uiMenuCount; ++i) {
-#ifdef _DEBUG
-		CString str;
-		pPopupMenu->GetMenuString(i, str, MF_BYPOSITION);
-		str.Remove('&');
-#endif
 		UINT firstSubItemID = 0;
 		CMenu* sm = pPopupMenu->GetSubMenu(i);
 		if (sm) {
@@ -3872,7 +3904,7 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 		UINT itemID = pPopupMenu->GetMenuItemID(i);
 		if (itemID == 0xFFFFFFFF) {
 			mii.fMask = MIIM_ID;
-			pPopupMenu->GetMenuItemInfo(i, &mii, TRUE);
+			pPopupMenu->GetMenuItemInfoW(i, &mii, TRUE);
 			itemID = mii.wID;
 		}
 		CMenu* pSubMenu = nullptr;
@@ -3919,12 +3951,10 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			mii.wID = itemID; // save ID after set popup type
 			mii.hSubMenu = pSubMenu->m_hMenu;
 			mii.fState = (pSubMenu->GetMenuItemCount() > 0 ? MF_ENABLED : (MF_DISABLED | MF_GRAYED));
-			pPopupMenu->SetMenuItemInfo(i, &mii, TRUE);
+			pPopupMenu->SetMenuItemInfoW(i, &mii, TRUE);
 			//continue;
 		}
 	}
-
-	//
 
 	uiMenuCount = pPopupMenu->GetMenuItemCount();
 	if (uiMenuCount == -1) {
@@ -3942,7 +3972,7 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 		}
 
 		CString str;
-		pPopupMenu->GetMenuString(i, str, MF_BYPOSITION);
+		pPopupMenu->GetMenuStringW(i, str, MF_BYPOSITION);
 		int k = str.Find('\t');
 		if (k > 0) {
 			str = str.Left(k);
@@ -3958,14 +3988,10 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 		//pPopupMenu->ModifyMenu(i, MF_BYPOSITION|MF_STRING, nID, str);
 
 		// this works fine
-		MENUITEMINFO mii;
-		mii.cbSize		= sizeof(mii);
-		mii.fMask		= MIIM_STRING;
-		mii.dwTypeData	= (LPTSTR)(LPCTSTR)str;
-		pPopupMenu->SetMenuItemInfo(i, &mii, TRUE);
+		mii.fMask      = MIIM_STRING;
+		mii.dwTypeData = (LPWSTR)str.GetString();
+		pPopupMenu->SetMenuItemInfoW(i, &mii, TRUE);
 	}
-
-	//
 
 	uiMenuCount = pPopupMenu->GetMenuItemCount();
 	if (uiMenuCount == -1) {
@@ -4005,6 +4031,10 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 			pPopupMenu->InsertMenu(ID_VIEW_RESET, MF_BYCOMMAND, ID_PANNSCAN_PRESETS_START+i, ResStr(IDS_PANSCAN_EDIT));
 			pPopupMenu->InsertMenu(ID_VIEW_RESET, MF_BYCOMMAND | MF_SEPARATOR);
 		}
+	}
+
+	if (AfxGetAppSettings().bUseDarkTheme) {
+		CMenuEx::ChangeStyle(pPopupMenu);
 	}
 }
 
@@ -14260,16 +14290,17 @@ void CMainFrame::SetupFiltersSubMenu()
 			if (nPPages == 1 && !pSS) {
 				submenu.AppendMenu(MF_BYCOMMAND | MF_STRING | MF_ENABLED, ids, name);
 			} else {
-				submenu.AppendMenu(MF_BYPOSITION | MF_STRING | MF_DISABLED | MF_GRAYED, idf, name);
+				//submenu.AppendMenu(MF_BYPOSITION | MF_STRING | MF_DISABLED | MF_GRAYED, idf, name);
 
 				if (nPPages > 0 || pSS) {
-					MENUITEMINFO mii;
-					mii.cbSize = sizeof(mii);
-					mii.fMask = MIIM_STATE | MIIM_SUBMENU;
-					mii.fType = MF_POPUP;
-					mii.hSubMenu = subMenu.Detach();
-					mii.fState = (pSPP || pSS) ? MF_ENABLED : (MF_DISABLED | MF_GRAYED);
-					submenu.SetMenuItemInfo(idf, &mii, TRUE);
+					//MENUITEMINFO mii;
+					//mii.cbSize = sizeof(mii);
+					//mii.fMask = MIIM_STATE | MIIM_SUBMENU;
+					//mii.fType = MF_POPUP;
+					//mii.hSubMenu = subMenu.Detach();
+					//mii.fState = (pSPP || pSS) ? MF_ENABLED : (MF_DISABLED | MF_GRAYED);
+					//submenu.SetMenuItemInfo(idf, &mii, TRUE);
+					submenu.AppendMenu(MF_STRING | MF_POPUP | MF_ENABLED, (UINT_PTR)subMenu.Detach(), name);
 				}
 			}
 
@@ -17189,9 +17220,6 @@ afx_msg void CMainFrame::OnSubtitleDelay(UINT nID)
 
 afx_msg void CMainFrame::OnLanguage(UINT nID)
 {
-	CMenu	defaultMenu;
-	CMenu*	oldMenu;
-
 	nID -= ID_LANGUAGE_ENGLISH; // resource ID to index
 
 	if (nID == CMPlayerCApp::GetLanguageIndex(ID_LANGUAGE_HEBREW)) { // Show a warning when switching to Hebrew (must not be translated)
@@ -17216,12 +17244,13 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	m_RButtonMenu.DestroyMenu();
 
 	m_popupMenu.DestroyMenu();
-	m_popupMenu.LoadMenu(IDR_POPUP);
+	m_popupMenu.LoadMenuW(IDR_POPUP);
 	m_popupMainMenu.DestroyMenu();
-	m_popupMainMenu.LoadMenu(IDR_POPUPMAIN);
+	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
 
-	oldMenu = GetMenu();
-	defaultMenu.LoadMenu(IDR_MAINFRAME);
+	CMenu defaultMenu;
+	defaultMenu.LoadMenuW(IDR_MAINFRAME);
+	CMenu* oldMenu = GetMenu();
 	if (oldMenu) {
 		// Attach the new menu to the window only if there was a menu before
 		SetMenu(&defaultMenu);
@@ -17230,6 +17259,12 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	}
 	m_hMenuDefault = defaultMenu.Detach();
 
+	auto& s = AfxGetAppSettings();
+
+	if (s.bUseDarkTheme) {
+		SetColorMenu();
+	}
+	
 	// Re-create Win 7 TaskBar preview button for change button hint
 	CreateThumbnailToolbar();
 
@@ -17243,7 +17278,7 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	m_wndStatsBar.RemoveAllLines();
 	OnTimer(TIMER_STATS);
 
-	AfxGetAppSettings().SaveSettings();
+	s.SaveSettings();
 }
 
 void CMainFrame::ProcessAPICommand(COPYDATASTRUCT* pCDS)
@@ -19448,6 +19483,153 @@ void CMainFrame::SetToolBarSubtitleButton()
 	}
 
 	m_wndToolBar.m_bSubtitleEnable = bEnabled;
+}
+
+COLORREF CMainFrame::ColorBrightness(int lSkale, COLORREF color)
+{
+	int red = lSkale > 0 ? min(GetRValue(color) + lSkale, 255) : max(0, GetRValue(color) + lSkale);
+	int green = lSkale > 0 ? min(GetGValue(color) + lSkale, 255) : max(0, GetGValue(color) + lSkale);
+	int blue = lSkale > 0 ? min(GetBValue(color) + lSkale, 255) : max(0, GetBValue(color) + lSkale);
+
+	return RGB(red, green, blue);
+}
+
+void CMainFrame::SetColorMenu()
+{
+	m_colMenuBk = ThemeRGB(45, 50, 55);
+
+	const COLORREF crBkBar = m_colMenuBk; //60,65,70			// background system menu bar
+	const COLORREF crBN    = ColorBrightness(-25, m_colMenuBk);	// backgroung normal
+	const COLORREF crBNL   = ColorBrightness(+30, crBN);		// backgroung normal lighten (for light edge)
+	const COLORREF crBND   = ColorBrightness(-30, crBN);		// backgroung normal darken (for dark edge)
+
+	const COLORREF crBR    = ColorBrightness(+30, crBN);		// backgroung raisen (selected)
+	const COLORREF crBRL   = ColorBrightness(+30, crBR);		// backgroung raisen lighten (for light edge)
+	const COLORREF crBRD   = ColorBrightness(-60, crBR);		// backgroung raisen darken (for dark edge)
+
+	const COLORREF crBS    = ColorBrightness(-10, crBN);		// backgroung sunken (selected grayed)
+	const COLORREF crBSL   = ColorBrightness(+0, crBS);			// backgroung sunken lighten  (for light edge)
+	const COLORREF crBSD   = ColorBrightness(-0, crBS);			// backgroung sunken darken  (for dark edge)
+
+	const COLORREF crTN    = ColorBrightness(+140, crBN);		// text normal
+	const COLORREF crTNL   = ColorBrightness(+80, crTN);		// text normal lighten
+	const COLORREF crTG    = ColorBrightness(-80, crTN);		// text grayed
+	const COLORREF crTGL   = ColorBrightness(-100, crTN);		// text grayed lighten
+
+	CMenuEx::SetColorMenu(
+		crBkBar,
+		crBN, crBNL, crBND,
+		crBR, crBRL, crBRD, 
+		crBS, crBSL, crBSD, 
+		crTN, crTNL, crTG, crTGL);
+
+	if (m_hMainMenuBrush) {
+		::DeleteObject(m_hMainMenuBrush);
+		m_hMainMenuBrush = nullptr;
+	}
+	m_hMainMenuBrush = ::CreateSolidBrush(m_colMenuBk);
+
+	if (m_hPopupMenuBrush) {
+		::DeleteObject(m_hPopupMenuBrush);
+		m_hPopupMenuBrush = nullptr;
+	}
+	m_hPopupMenuBrush = ::CreateSolidBrush(crBN);
+
+	auto pMenu = GetMenu();
+	if (pMenu) {
+		MENUINFO MenuInfo = { 0 };
+		MenuInfo.cbSize = sizeof(MenuInfo);
+		MenuInfo.hbrBack = m_hMainMenuBrush;
+		MenuInfo.fMask = MIM_BACKGROUND | MIM_APPLYTOSUBMENUS;
+		MenuInfo.dwStyle = MNS_AUTODISMISS;
+
+		SetMenuInfo(pMenu->GetSafeHmenu(), &MenuInfo);
+		CMenuEx::ChangeStyle(pMenu, true);
+
+		DrawMenuBar();
+	}
+}
+
+void CMainFrame::DrawSmallBorder()
+{
+	// To eliminate small border between menu and client rect  
+	if (AfxGetAppSettings().bUseDarkTheme && !IsMenuHidden()) {
+		CDC* pDC = GetWindowDC();
+		CRect clientRect;
+		GetClientRect(clientRect);
+		ClientToScreen(clientRect);
+		CRect windowRect;
+		GetWindowRect(windowRect);
+		CRect rect(clientRect.left - windowRect.left, clientRect.top - windowRect.top - 1, clientRect.right - windowRect.left, clientRect.top - windowRect.top);
+
+		CBrush* brush = CBrush::FromHandle(m_hPopupMenuBrush);
+		pDC->FillRect(rect, brush);
+
+		ReleaseDC(pDC);
+	}
+}
+
+void CMainFrame::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
+{
+	if (!nIDCtl && lpDrawItemStruct->CtlType == ODT_MENU && AfxGetAppSettings().bUseDarkTheme) {
+		CMenuEx::DrawItem(lpDrawItemStruct);
+		return;
+	}
+
+	__super::OnDrawItem(nIDCtl, lpDrawItemStruct);
+}
+
+void CMainFrame::OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct)
+{
+	if (!nIDCtl && lpMeasureItemStruct->CtlType == ODT_MENU && AfxGetAppSettings().bUseDarkTheme) {
+		CMenuEx::MeasureItem(lpMeasureItemStruct);
+		return;
+	}
+
+	__super::OnMeasureItem(nIDCtl, lpMeasureItemStruct);
+}
+
+void CMainFrame::ResetMenu()
+{
+	// DarkTheme <-> WhiteTheme
+
+	m_openCDsMenu.DestroyMenu();
+	m_filtersMenu.DestroyMenu();
+	m_SubtitlesMenu.DestroyMenu();
+	m_AudioMenu.DestroyMenu();
+	m_AudioMenu.DestroyMenu();
+	m_SubtitlesMenu.DestroyMenu();
+	m_VideoStreamsMenu.DestroyMenu();
+	m_chaptersMenu.DestroyMenu();
+	m_favoritesMenu.DestroyMenu();
+	m_shadersMenu.DestroyMenu();
+	m_recentfilesMenu.DestroyMenu();
+	m_languageMenu.DestroyMenu();
+	m_RButtonMenu.DestroyMenu();
+
+	m_popupMenu.DestroyMenu();
+	m_popupMenu.LoadMenuW(IDR_POPUP);
+	m_popupMainMenu.DestroyMenu();
+	m_popupMainMenu.LoadMenuW(IDR_POPUPMAIN);
+
+	CMenu defaultMenu;
+	defaultMenu.LoadMenuW(IDR_MAINFRAME);
+
+	CMenu* oldMenu = GetMenu();
+	if (oldMenu) {
+		// Attach the new menu to the window only if there was a menu before
+		SetMenu(&defaultMenu);
+		// and then destroy the old one
+		oldMenu->DestroyMenu();
+	}
+	m_hMenuDefault = defaultMenu.Detach();
+
+	auto& bUseDarkTheme = AfxGetAppSettings().bUseDarkTheme;
+	CMenuEx::EnableHook(bUseDarkTheme);
+
+	if (bUseDarkTheme) {
+		SetColorMenu();
+	}
 }
 
 #pragma region GraphThread

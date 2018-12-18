@@ -24,7 +24,6 @@
 #include "PPageInterface.h"
 #include "../../DSUtil/SysVersion.h"
 
-
 // CPPageInterface dialog
 
 IMPLEMENT_DYNAMIC(CPPageInterface, CPPageBase)
@@ -250,6 +249,8 @@ BOOL CPPageInterface::OnApply()
 	if (pFrame->m_wndPlaylistBar.IsWindowVisible()) {
 		pFrame->m_wndPlaylistBar.SendMessageW(WM_NCPAINT, 1, NULL);
 	}
+
+	pFrame->ResetMenu();
 	pFrame->Invalidate();
 
 	m_nThemeBrightness_Old	= s.nThemeBrightness;
@@ -315,6 +316,8 @@ void CPPageInterface::OnThemeChange()
 	if (pFrame->m_wndPlaylistBar.IsWindowVisible()) {
 		pFrame->m_wndPlaylistBar.SendMessageW(WM_NCPAINT, 1, NULL);
 	}
+
+	pFrame->SetColorMenu();
 
 	pFrame->Invalidate();
 	pFrame->m_wndPlaylistBar.Invalidate();

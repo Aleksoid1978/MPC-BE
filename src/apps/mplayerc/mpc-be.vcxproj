@@ -96,6 +96,7 @@
     <ClCompile Include="controls\EditWithButton.cpp" />
     <ClCompile Include="controls\FloatEdit.cpp" />
     <ClCompile Include="controls\LineNumberEdit.cpp" />
+    <ClCompile Include="controls\MenuEx.cpp" />
     <ClCompile Include="controls\StaticLink.cpp" />
     <ClCompile Include="controls\StatusLabel.cpp" />
     <ClCompile Include="controls\WinHotkeyCtrl.cpp" />
@@ -214,6 +215,7 @@
     <ClInclude Include="controls\EditWithButton.h" />
     <ClInclude Include="controls\FloatEdit.h" />
     <ClInclude Include="controls\LineNumberEdit.h" />
+    <ClInclude Include="controls\MenuEx.h" />
     <ClInclude Include="controls\StaticLink.h" />
     <ClInclude Include="controls\StatusLabel.h" />
     <ClInclude Include="controls\WinHotkeyCtrl.h" />
