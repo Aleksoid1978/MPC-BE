@@ -194,24 +194,24 @@ void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, const bool bSe
 	if (bSelected) {
 		GRADIENT_RECT gr[1] = { { 0, 1 } };
 		const CAppSettings& s = AfxGetAppSettings();
-		pDC->SetTextColor(s.clrFaceABGR);
+		
 		if (bGrayed) {
-			pDC->FillSolidRect(rect.left, rect.top, rect.Width(), rect.Height() - 1, m_crBS);
-			pDC->SetTextColor(m_crTGL);
+			pDC->SetTextColor(0);
+		} else {
+			pDC->SetTextColor(s.clrFaceABGR);
+		}
+
+		if (lpItem->bMainMenu) {
+			pDC->FillSolidRect(rect.left, rect.top + 1, rect.Width() - 2, rect.Height() - 2, m_crBN);
+			pDC->Draw3dRect(rect.left, rect.top + 1, rect.Width() - 2, rect.Height() - 2, m_crBRL, m_crBRL);
 		}
 		else {
-			if (lpItem->bMainMenu) {
-				pDC->FillSolidRect(rect.left, rect.top + 1, rect.Width() - 2, rect.Height() - 2, m_crBN);
-				pDC->Draw3dRect(rect.left, rect.top + 1, rect.Width() - 2, rect.Height() - 2, m_crBRL, m_crBRL);
-			}
-			else {
-				TRIVERTEX tv[2] = {
-					{ rect.left, rect.top, (GetRValue(m_crBR) + 5) * 256, (GetGValue(m_crBR) + 5) * 256, (GetBValue(m_crBR) + 5) * 256, 255 * 256 },
-					{ rect.right + 1, rect.bottom - 2, (GetRValue(m_crBR) - 5) * 256, (GetGValue(m_crBR) - 5) * 256, (GetBValue(m_crBR) - 5) * 256, 255 * 256 },
-				};
-				pDC->GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
-				pDC->Draw3dRect(rect.left, rect.top, rect.Width(), rect.Height() - 1, m_crBRL, m_crBRD);
-			}
+			TRIVERTEX tv[2] = {
+				{ rect.left, rect.top, (GetRValue(m_crBR) + 5) * 256, (GetGValue(m_crBR) + 5) * 256, (GetBValue(m_crBR) + 5) * 256, 255 * 256 },
+				{ rect.right + 1, rect.bottom - 2, (GetRValue(m_crBR) - 5) * 256, (GetGValue(m_crBR) - 5) * 256, (GetBValue(m_crBR) - 5) * 256, 255 * 256 },
+			};
+			pDC->GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+			pDC->Draw3dRect(rect.left, rect.top, rect.Width(), rect.Height() - 1, m_crBRL, m_crBRD);
 		}
 	}
 
