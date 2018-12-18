@@ -207,6 +207,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	friend class CPPageSoundProcessing;
 	friend class CPPagePlayer;
 	friend class CMPlayerCApp;
+	friend class CPlayerPlaylistBar;
 
 	// TODO: wrap these graph objects into a class to make it look cleaner
 
@@ -312,6 +313,10 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	CRect GetInvisibleBorderSize() const;
 
 	void SetAlwaysOnTop(int i);
+
+	COLORREF m_colMenuBk;
+	HBRUSH m_hMainMenuBrush = nullptr;
+	HBRUSH m_hPopupMenuBrush = nullptr;
 
 	CMenu m_popupMainMenu, m_popupMenu;
 	CMenu m_openCDsMenu;
@@ -442,6 +447,9 @@ public:
 		TIMER_FLYBARWINDOWHIDER,
 		TIMER_DM_AUTOCHANGING
 	};
+
+	void DrawSmallBorder(); // draw line under mainmenubar
+	void SetColorMenu();
 
 	void StartWebServer(int nPort);
 	void StopWebServer();
@@ -724,6 +732,8 @@ public:
 
 	CSize GetVideoSize();
 
+	COLORREF ColorBrightness(int lSkale, COLORREF color);
+
 	void ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasTo);
 	void ToggleD3DFullscreen(bool fSwitchScreenResWhenHasTo);
 
@@ -867,6 +877,7 @@ public:
 	LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
 
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+	afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
 	afx_msg void OnActivateApp(BOOL bActive, DWORD dwThreadID);
 	afx_msg LRESULT OnAppCommand(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnRawInput(UINT nInputcode, HRAWINPUT hRawInput);
@@ -1008,6 +1019,11 @@ public:
 	afx_msg void OnViewFullscreen();
 	afx_msg void OnViewFullscreenSecondary();
 	afx_msg void OnMoveWindowToPrimaryScreen();
+
+	void ResetMenu();
+	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
+	afx_msg void OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct);
+
 	afx_msg void OnUpdateViewFullscreen(CCmdUI* pCmdUI);
 	afx_msg void OnViewZoom(UINT nID);
 	afx_msg void OnUpdateViewZoom(CCmdUI* pCmdUI);

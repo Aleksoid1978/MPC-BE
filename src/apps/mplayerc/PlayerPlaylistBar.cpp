@@ -32,6 +32,7 @@
 #include "Content.h"
 
 #include <coolsb/coolscroll.h>
+#include "./Controls/MenuEx.h"
 
 static CString MakePath(CString path)
 {
@@ -749,7 +750,9 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 
 	if (AfxGetAppSettings().bUseDarkTheme) {
 		InitializeCoolSB(m_list.m_hWnd, ThemeRGB);
-		CoolSB_SetSize(m_list.m_hWnd, SB_VERT, m_pMainFrame->ScaleY(GetSystemMetrics(SM_CYVSCROLL)), m_pMainFrame->ScaleX(GetSystemMetrics(SM_CXVSCROLL)));
+		if (SysVersion::IsWin8orLater()) {
+			CoolSB_SetSize(m_list.m_hWnd, SB_VERT, m_pMainFrame->ScaleY(GetSystemMetrics(SM_CYVSCROLL)), m_pMainFrame->ScaleX(GetSystemMetrics(SM_CXVSCROLL)));
+		}
 	}
 
 	return TRUE;
@@ -2035,6 +2038,7 @@ BEGIN_MESSAGE_MAP(CPlayerPlaylistBar, CSizingControlBarG)
 	ON_WM_TIMER()
 	ON_WM_CONTEXTMENU()
 	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_PLAYLIST, OnLvnEndlabeleditList)
+	ON_WM_MEASUREITEM()
 END_MESSAGE_MAP()
 
 // CPlayerPlaylistBar message handlers
@@ -2058,7 +2062,9 @@ void CPlayerPlaylistBar::ResizeListColumn()
 
 			CoolSB_SetScrollInfo(m_list.m_hWnd, SB_VERT, &si, TRUE);
 			CoolSB_SetStyle(m_list.m_hWnd, SB_VERT, CSBS_HOTTRACKED);
-			CoolSB_SetSize(m_list.m_hWnd, SB_VERT, m_pMainFrame->ScaleY(GetSystemMetrics(SM_CYVSCROLL)), m_pMainFrame->ScaleX(GetSystemMetrics(SM_CXVSCROLL)));
+			if (SysVersion::IsWin8orLater()) {
+				CoolSB_SetSize(m_list.m_hWnd, SB_VERT, m_pMainFrame->ScaleY(GetSystemMetrics(SM_CYVSCROLL)), m_pMainFrame->ScaleX(GetSystemMetrics(SM_CXVSCROLL)));
+			}
 
 			GetClientRect(r);
 			r.DeflateRect(2, 2);
@@ -2189,6 +2195,12 @@ void CPlayerPlaylistBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 {
 	if (nIDCtl != IDC_PLAYLIST) {
+		if (!nIDCtl && lpDrawItemStruct->CtlType == ODT_MENU && AfxGetAppSettings().bUseDarkTheme) {
+			CMenuEx::DrawItem(lpDrawItemStruct);
+			return;
+		}
+
+		__super::OnDrawItem(nIDCtl, lpDrawItemStruct);
 		return;
 	}
 
@@ -2620,6 +2632,9 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	m.AppendMenu(MF_SEPARATOR);
 	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bHidePlaylistFullScreen ? MF_CHECKED : MF_UNCHECKED), M_HIDEFULLSCREEN, ResStr(IDS_PLAYLIST_HIDEFS));
 
+	if (s.bUseDarkTheme) {
+		CMenuEx::ChangeStyle(&m);
+	}
 	int nID = (int)m.TrackPopupMenu(TPM_LEFTBUTTON|TPM_RETURNCMD, p.x, p.y, this);
 	switch (nID) {
 		case M_OPEN:
@@ -2901,4 +2916,14 @@ void CPlayerPlaylistBar::OnLvnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult)
 	}
 
 	*pResult = 0;
+}
+
+void CPlayerPlaylistBar::OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct)
+{
+	if (!nIDCtl && lpMeasureItemStruct->CtlType == ODT_MENU && AfxGetAppSettings().bUseDarkTheme) {
+		CMenuEx::MeasureItem(lpMeasureItemStruct);
+		return;
+	}
+
+	__super::OnMeasureItem(nIDCtl, lpMeasureItemStruct);
 }

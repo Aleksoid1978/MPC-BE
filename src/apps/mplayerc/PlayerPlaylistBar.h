@@ -304,5 +304,7 @@ public:
 	afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
 	afx_msg void OnLvnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 
+	afx_msg void OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct);
+
 	virtual void Invalidate() { m_list.Invalidate(); }
 };
