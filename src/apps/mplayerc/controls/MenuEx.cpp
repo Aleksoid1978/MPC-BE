@@ -63,7 +63,7 @@ void CMenuEx::ScaleFont()
 	}
 }
 
-void CMenuEx::DrawCheckMark(CDC* pDC, CRect rect, UINT uState, bool bGrayed, bool bSelected, CRect& rcMark)
+void CMenuEx::DrawCheckMark(CDC* pDC, CRect rect, const UINT uState, const bool bGrayed, const bool bSelected, CRect& rcMark)
 {
 	rcMark.SetRectEmpty();
 
@@ -189,7 +189,7 @@ void CMenuEx::DrawItem(LPDRAWITEMSTRUCT lpDIS)
 	dc.Detach();
 }
 
-void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, BOOL bSelected, BOOL bGrayed, LPMENUITEM lpItem)
+void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, const bool bSelected, const bool bGrayed, const LPMENUITEM lpItem)
 {
 	if (bSelected) {
 		GRADIENT_RECT gr[1] = { { 0, 1 } };
@@ -237,7 +237,7 @@ void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, BOOL bSelected
 	}
 }
 
-void CMenuEx::ChangeStyle(CMenu *pMenu, bool bMainMenu/* = false*/)
+void CMenuEx::ChangeStyle(CMenu *pMenu, const bool bMainMenu/* = false*/)
 {
 	ASSERT(pMenu);
 

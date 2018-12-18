@@ -42,7 +42,7 @@ public:
 	CMenuEx() = default;
 	~CMenuEx() = default;
 
-	static void ChangeStyle(CMenu *pMenu, bool bMainMenu = false);
+	static void ChangeStyle(CMenu *pMenu, const bool bMainMenu = false);
 	static void MeasureItem(LPMEASUREITEMSTRUCT  lpMIS);
 	static void DrawItem(LPDRAWITEMSTRUCT lpDIS);
 	static void SetColorMenu(
@@ -92,6 +92,6 @@ protected:
 
 	static inline CMainFrame* m_pMainFrame = nullptr;
 
-	static void DrawCheckMark(CDC* pDC, CRect rect, UINT uState, bool bGrayed, bool bSelected, CRect& rcMark);
-	static void TextMenu(CDC *pDC, const CRect &rect, CRect rcText, BOOL bSelected, BOOL bGrayed, LPMENUITEM lpItem);
+	static void DrawCheckMark(CDC* pDC, CRect rect, const UINT uState, const bool bGrayed, const bool bSelected, CRect& rcMark);
+	static void TextMenu(CDC *pDC, const CRect &rect, CRect rcText, const bool bSelected, const bool bGrayed, const LPMENUITEM lpItem);
 };
