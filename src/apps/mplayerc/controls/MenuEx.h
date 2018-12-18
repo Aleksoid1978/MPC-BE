@@ -35,7 +35,7 @@ class CMenuEx
 {
 	static LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT mess, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK CBTProc(int nCode, WPARAM wParam, LPARAM lParam);
-        
+
 	static inline HHOOK m_hookCBT = nullptr;
 
 public:
@@ -61,24 +61,24 @@ public:
 	static void EnableHook(const bool bEnable);
 
 protected:
-	static inline COLORREF m_crBkBar;
+	static inline COLORREF m_crBkBar; // background system menu bar
 
-	static inline COLORREF m_crBN;
-	static inline COLORREF m_crBNL;
-	static inline COLORREF m_crBND;
+	static inline COLORREF m_crBN;  // backgroung normal
+	static inline COLORREF m_crBNL; // backgroung normal lighten (for light edge)
+	static inline COLORREF m_crBND; // backgroung normal darken (for dark edge)
 
-	static inline COLORREF m_crBR;
-	static inline COLORREF m_crBRL;
-	static inline COLORREF m_crBRD;
+	static inline COLORREF m_crBR;  // backgroung raisen (selected)
+	static inline COLORREF m_crBRL; // backgroung raisen lighten (for light edge)
+	static inline COLORREF m_crBRD; // backgroung raisen darken (for dark edge)
 
-	static inline COLORREF m_crBS;
-	static inline COLORREF m_crBSL;
-	static inline COLORREF m_crBSD;
+	static inline COLORREF m_crBS;  // backgroung sunken (selected grayed)
+	static inline COLORREF m_crBSL; // backgroung sunken lighten (for light edge)
+	static inline COLORREF m_crBSD; // backgroung sunken darken (for dark edge)
 
-	static inline COLORREF m_crTN;
-	static inline COLORREF m_crTNL;
-	static inline COLORREF m_crTG;
-	static inline COLORREF m_crTGL;
+	static inline COLORREF m_crTN;  // text normal
+	static inline COLORREF m_crTNL; // text normal lighten
+	static inline COLORREF m_crTG;  // text grayed
+	static inline COLORREF m_crTGL; // text grayed lighten
 
 	static inline int m_CYEDGE = 0;
 	static inline int m_CYMENU = 0;
