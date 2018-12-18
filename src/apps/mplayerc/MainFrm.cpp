@@ -15379,9 +15379,6 @@ void CMainFrame::CalcControlsSize(CSize& cSize)
 		}
 	}
 
-	long HorzH = 0;
-	long VertH = 0;
-
 	for (const auto& pDockingBar : m_dockingbars) {
 		if (IsWindow(pDockingBar->m_hWnd)) {
 			BOOL bIsWindowVisible = pDockingBar->IsWindowVisible();
@@ -15390,22 +15387,14 @@ void CMainFrame::CalcControlsSize(CSize& cSize)
 			}
 
 			if (bIsWindowVisible && !pDockingBar->IsFloating()) {
-				const CSize sizeHorz = pDockingBar->CalcFixedLayout(TRUE, TRUE);
-
 				if (pDockingBar->IsHorzDocked()) {
-					HorzH += sizeHorz.cy - GetSystemMetrics(SM_CYBORDER);
-				}
-				else if (pDockingBar->IsVertDocked()) {
-					cSize.cx += pDockingBar->CalcFixedLayout(TRUE, FALSE).cx;
-					if (sizeHorz.cy > VertH) {
-						VertH = sizeHorz.cy;
-					}
+					cSize.cy += (pDockingBar->CalcFixedLayout(TRUE, TRUE).cy - GetSystemMetrics(SM_CYBORDER));
+				} else if (pDockingBar->IsVertDocked()) {
+					cSize.cx += (pDockingBar->CalcFixedLayout(TRUE, FALSE).cx - GetSystemMetrics(SM_CXBORDER));
 				}
 			}
 		}
 	}
-
-	cSize.cy += std::max(HorzH, VertH);
 }
 
 void CMainFrame::SetAlwaysOnTop(int i)
