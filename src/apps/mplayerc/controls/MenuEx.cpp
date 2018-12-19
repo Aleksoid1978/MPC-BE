@@ -157,7 +157,7 @@ void CMenuEx::DrawItem(LPDRAWITEMSTRUCT lpDIS)
 
 	if (lpItem->uID == 0) { // SEPARATOR
 		const int offset = rect.Height() + m_CXMENUCHECK;
-		rect.top = rect.Height() / 2 + rect.top;
+		rect.top += rect.Height() / 2 - 1;
 		rect.bottom = rect.top + 2;
 		rect.left += offset;
 		rect.right -= 2;
@@ -217,16 +217,16 @@ void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, const bool bSe
 		}
 
 		if (lpItem->bMainMenu) {
-			pDC->FillSolidRect(rect.left, rect.top + 1, rect.Width() - 2, rect.Height() - 2, m_crBN);
-			pDC->Draw3dRect(rect.left, rect.top + 1, rect.Width() - 2, rect.Height() - 2, m_crBRL, m_crBRL);
+			pDC->FillSolidRect(rect.left, rect.top, rect.Width(), rect.Height(), m_crBN);
+			pDC->Draw3dRect(rect.left, rect.top, rect.Width(), rect.Height(), m_crBRL, m_crBRL);
 		}
 		else {
 			TRIVERTEX tv[2] = {
 				{ rect.left, rect.top, (GetRValue(m_crBR) + 5) * 256, (GetGValue(m_crBR) + 5) * 256, (GetBValue(m_crBR) + 5) * 256, 255 * 256 },
-				{ rect.right + 1, rect.bottom - 2, (GetRValue(m_crBR) - 5) * 256, (GetGValue(m_crBR) - 5) * 256, (GetBValue(m_crBR) - 5) * 256, 255 * 256 },
+				{ rect.right, rect.bottom, (GetRValue(m_crBR) - 5) * 256, (GetGValue(m_crBR) - 5) * 256, (GetBValue(m_crBR) - 5) * 256, 255 * 256 },
 			};
 			pDC->GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
-			pDC->Draw3dRect(rect.left, rect.top, rect.Width(), rect.Height() - 1, m_crBRL, m_crBRD);
+			pDC->Draw3dRect(rect.left, rect.top, rect.Width(), rect.Height(), m_crBRL, m_crBRD);
 		}
 	}
 
@@ -327,10 +327,10 @@ void CMenuEx::MeasureItem(LPMEASUREITEMSTRUCT lpMIS)
 			}
 		}
 
-		lpMIS->itemHeight = size.cy + m_CYEDGE * 2;
+		lpMIS->itemHeight = size.cy + m_CYEDGE;
 	} else {
 		lpMIS->itemWidth = 1;
-		lpMIS->itemHeight = m_CYMENU / 2 - 1;
+		lpMIS->itemHeight = m_CYMENU / 2 - m_CYEDGE - 1;
 	}
 }
 
