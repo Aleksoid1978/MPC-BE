@@ -63,11 +63,11 @@ void CMenuEx::ScaleFont()
 	}
 }
 
-void CMenuEx::DrawCheckMark(CDC* pDC, CRect rect, const UINT uState, const bool bGrayed, const bool bSelected, CRect& rcMark)
+void CMenuEx::DrawMenuElement(CDC* pDC, CRect rect, const UINT uState, const bool bGrayed, const bool bSelected, CRect* rcElement)
 {
-	rcMark.SetRectEmpty();
-
-	rect.DeflateRect(2, 0);
+	if (rcElement) {
+		rcElement->SetRectEmpty();
+	}
 
 	HDC hdcMem = ::CreateCompatibleDC(pDC->GetSafeHdc());
 	HBITMAP hbmMono = ::CreateBitmap(m_CXMENUCHECK, m_CYMENUCHECK, 1, 1, nullptr);
@@ -86,7 +86,7 @@ void CMenuEx::DrawCheckMark(CDC* pDC, CRect rect, const UINT uState, const bool 
 					if (hbmPrevMask) {
 						// Set the colour of the check mark to white
 						const CAppSettings& s = AfxGetAppSettings();
-						bGrayed ? SetBkColor(hdcMask, m_crTGL) : (bSelected ? SetBkColor(hdcMask, s.clrFaceABGR) : SetBkColor(hdcMask, m_crTN));
+						(bGrayed && !bSelected ) ? SetBkColor(hdcMask, m_crTGL) : (bSelected ? SetBkColor(hdcMask, s.clrFaceABGR) : SetBkColor(hdcMask, m_crTN));
 						::BitBlt(hdcMask, 0, 0, m_CXMENUCHECK, m_CYMENUCHECK, hdcMask, 0, 0, PATCOPY);
 
 						// Invert the check mark bitmap
@@ -96,9 +96,16 @@ void CMenuEx::DrawCheckMark(CDC* pDC, CRect rect, const UINT uState, const bool 
 						::BitBlt(hdcMask, 0, 0, m_CXMENUCHECK, m_CYMENUCHECK, hdcMem, 0, 0, SRCAND);
 
 						const int offset = (rect.Height() - m_CXMENUCHECK) / 2;
-						::BitBlt(pDC->GetSafeHdc(), rect.left + offset, rect.top + offset, m_CXMENUCHECK, m_CYMENUCHECK, hdcMask, 0, 0, SRCPAINT);
 
-						rcMark = CRect(CPoint(rect.left + offset, rect.top + offset), CSize(m_CXMENUCHECK, m_CYMENUCHECK));
+						if (uState == DFCS_MENUARROW) {
+							::BitBlt(pDC->GetSafeHdc(), rect.right - m_CXMENUCHECK, rect.top + offset, m_CXMENUCHECK, m_CYMENUCHECK, hdcMask, 0, 0, SRCPAINT);
+						} else {
+							::BitBlt(pDC->GetSafeHdc(), rect.left + offset, rect.top + offset, m_CXMENUCHECK, m_CYMENUCHECK, hdcMask, 0, 0, SRCPAINT);
+						}
+
+						if (rcElement) {
+							*rcElement = CRect(CPoint(rect.left + offset, rect.top + offset), CSize(m_CXMENUCHECK, m_CYMENUCHECK));
+						}
 					}
 				}	
 			}
@@ -172,7 +179,7 @@ void CMenuEx::DrawItem(LPDRAWITEMSTRUCT lpDIS)
 			::GetMenuItemInfoW(HMENU(lpDIS->hwndItem), lpDIS->itemID, MF_BYCOMMAND, &mii);
 
 			CRect rcMark;
-			DrawCheckMark(&dc, rect, mii.fType & MFT_RADIOCHECK ? DFCS_MENUBULLET : DFCS_MENUCHECK, bGrayed, bSelected, rcMark);
+			DrawMenuElement(&dc, rect, mii.fType & MFT_RADIOCHECK ? DFCS_MENUBULLET : DFCS_MENUCHECK, bGrayed, bSelected, &rcMark);
 
 			rcMark.left -= 2;
 			rcMark.top -= 2;
@@ -184,7 +191,14 @@ void CMenuEx::DrawItem(LPDRAWITEMSTRUCT lpDIS)
 				dc.Draw3dRect(&rcMark, m_crBSD, m_crBSL);
 			}
 		}
+
+		if (lpItem->bPopupMenu && !lpItem->bMainMenu) {
+			DrawMenuElement(&dc, rect, DFCS_MENUARROW, bGrayed, bSelected, nullptr);
+		}
 	}
+
+	const auto& rcItem = lpDIS->rcItem;
+	::ExcludeClipRect(dc.GetSafeHdc(), rcItem.left, rcItem.top, rcItem.right, rcItem.bottom);
 
 	dc.SelectObject(pOldFont);
 	dc.Detach();
