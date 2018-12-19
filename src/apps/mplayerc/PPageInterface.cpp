@@ -105,6 +105,7 @@ BOOL CPPageInterface::OnInitDialog()
 	__super::OnInitDialog();
 
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
+	CorrectCWndWidth(&m_UseDarkThemeCtrl);
 
 	CAppSettings& s = AfxGetAppSettings();
 
@@ -181,9 +182,9 @@ BOOL CPPageInterface::OnInitDialog()
 	GetDlgItem(IDC_CHECK8)->EnableWindow(!m_fSmartSeek);
 	GetDlgItem(IDC_COMBO3)->EnableWindow(!m_fSmartSeek && m_fUseTimeTooltip);
 
-	GetDlgItem(IDC_STATIC1)->EnableWindow(m_fSmartSeek);
+	GetDlgItem(IDC_STATIC6)->EnableWindow(m_fSmartSeek);
 	GetDlgItem(IDC_EDIT1)->EnableWindow(m_fSmartSeek);
-	GetDlgItem(IDC_STATIC2)->EnableWindow(m_fSmartSeek);
+	GetDlgItem(IDC_STATIC7)->EnableWindow(m_fSmartSeek);
 
 	UpdateData(FALSE);
 
@@ -356,6 +357,11 @@ END_MESSAGE_MAP()
 
 void CPPageInterface::OnUpdateCheck3(CCmdUI* pCmdUI)
 {
+	GetDlgItem(IDC_STATIC1)->EnableWindow(m_bUseDarkTheme);
+	GetDlgItem(IDC_STATIC2)->EnableWindow(m_bUseDarkTheme);
+	GetDlgItem(IDC_STATIC3)->EnableWindow(m_bUseDarkTheme);
+	GetDlgItem(IDC_STATIC4)->EnableWindow(m_bUseDarkTheme);
+	GetDlgItem(IDC_STATIC5)->EnableWindow(m_bUseDarkTheme);
 	GetDlgItem(IDC_BUTTON_CLRFACE)->EnableWindow(m_bUseDarkTheme);
 	GetDlgItem(IDC_BUTTON_CLROUTLINE)->EnableWindow(m_bUseDarkTheme);
 	GetDlgItem(IDC_BUTTON_CLRDEFAULT)->EnableWindow(m_bUseDarkTheme);
@@ -613,9 +619,9 @@ void CPPageInterface::OnUsePreview()
 	GetDlgItem(IDC_CHECK8)->EnableWindow(!m_fSmartSeek);
 	GetDlgItem(IDC_COMBO3)->EnableWindow(!m_fSmartSeek && m_fUseTimeTooltip);
 
-	GetDlgItem(IDC_STATIC1)->EnableWindow(m_fSmartSeek);
+	GetDlgItem(IDC_STATIC6)->EnableWindow(m_fSmartSeek);
 	GetDlgItem(IDC_EDIT1)->EnableWindow(m_fSmartSeek);
-	GetDlgItem(IDC_STATIC2)->EnableWindow(m_fSmartSeek);
+	GetDlgItem(IDC_STATIC7)->EnableWindow(m_fSmartSeek);
 
 	SetModified();
 }
