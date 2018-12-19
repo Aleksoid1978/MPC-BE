@@ -149,11 +149,12 @@ void CMenuEx::DrawItem(LPDRAWITEMSTRUCT lpDIS)
 	}
 
 	if (lpItem->uID == 0) { // SEPARATOR
+		const int offset = rect.Height() + m_CXMENUCHECK;
 		rect.top = rect.Height() / 2 + rect.top;
 		rect.bottom = rect.top + 2;
-		rect.left += 2;
+		rect.left += offset;
 		rect.right -= 2;
-		dc.Draw3dRect(rect, m_crTGL, m_crBSD);
+		dc.Draw3dRect(rect, m_crBND, m_crBNL);
 	}
 	else {
 		if (lpItem->bMainMenu) { // SYSTEMMENU
