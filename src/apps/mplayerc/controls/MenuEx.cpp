@@ -86,7 +86,7 @@ void CMenuEx::DrawMenuElement(CDC* pDC, CRect rect, const UINT uState, const boo
 					if (hbmPrevMask) {
 						// Set the colour of the check mark to white
 						const CAppSettings& s = AfxGetAppSettings();
-						(bGrayed && !bSelected ) ? SetBkColor(hdcMask, m_crTGL) : (bSelected ? SetBkColor(hdcMask, s.clrFaceABGR) : SetBkColor(hdcMask, m_crTN));
+						bGrayed ? SetBkColor(hdcMask, m_crTGL) : (bSelected ? SetBkColor(hdcMask, s.clrFaceABGR) : SetBkColor(hdcMask, m_crTN));
 						::BitBlt(hdcMask, 0, 0, m_CXMENUCHECK, m_CYMENUCHECK, hdcMask, 0, 0, PATCOPY);
 
 						// Invert the check mark bitmap
@@ -211,7 +211,7 @@ void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, const bool bSe
 		const CAppSettings& s = AfxGetAppSettings();
 		
 		if (bGrayed) {
-			pDC->SetTextColor(RGB(0,0,0));
+			pDC->SetTextColor(m_crTGL);
 		} else {
 			pDC->SetTextColor(s.clrFaceABGR);
 		}
@@ -221,12 +221,16 @@ void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, const bool bSe
 			pDC->Draw3dRect(rect.left, rect.top, rect.Width(), rect.Height(), m_crBRL, m_crBRL);
 		}
 		else {
-			TRIVERTEX tv[2] = {
-				{ rect.left, rect.top, (GetRValue(m_crBR) + 5) * 256, (GetGValue(m_crBR) + 5) * 256, (GetBValue(m_crBR) + 5) * 256, 255 * 256 },
-				{ rect.right, rect.bottom, (GetRValue(m_crBR) - 5) * 256, (GetGValue(m_crBR) - 5) * 256, (GetBValue(m_crBR) - 5) * 256, 255 * 256 },
-			};
-			pDC->GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
-			pDC->Draw3dRect(rect.left, rect.top, rect.Width(), rect.Height(), m_crBRL, m_crBRD);
+			if (bGrayed) {
+				pDC->FillSolidRect(rect.left, rect.top, rect.Width(), rect.Height(), m_crBS);
+			} else {
+				TRIVERTEX tv[2] = {
+					{ rect.left, rect.top, (GetRValue(m_crBR) + 5) * 256, (GetGValue(m_crBR) + 5) * 256, (GetBValue(m_crBR) + 5) * 256, 255 * 256 },
+					{ rect.right, rect.bottom, (GetRValue(m_crBR) - 5) * 256, (GetGValue(m_crBR) - 5) * 256, (GetBValue(m_crBR) - 5) * 256, 255 * 256 },
+				};
+				pDC->GradientFill(tv, 2, gr, 1, GRADIENT_FILL_RECT_V);
+				pDC->Draw3dRect(rect.left, rect.top, rect.Width(), rect.Height(), m_crBRL, m_crBRD);
+			}
 		}
 	}
 
