@@ -717,7 +717,7 @@ void CAppSettings::ResetSettings()
 	nThemeRed = 256;
 	nThemeGreen = 256;
 	nThemeBlue = 256;
-	bDarkMenu = false;
+	bDarkMenu = true;
 	nOSDTransparent = 100;
 	nOSDBorder = 1;
 
