@@ -673,10 +673,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CAppSettings& s = AfxGetAppSettings();
 
 	CMenuEx::SetMain(this);
-	CMenuEx::EnableHook(s.bUseDarkTheme);
+	CMenuEx::EnableHook(s.bUseDarkTheme && s.bDarkMenu);
 	CMenuEx::ScaleFont();
 
-	if (s.bUseDarkTheme) {
+	if (s.bUseDarkTheme && s.bDarkMenu) {
 		SetColorMenu();
 	}
 
@@ -4033,7 +4033,7 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 		}
 	}
 
-	if (AfxGetAppSettings().bUseDarkTheme) {
+	if (AfxGetAppSettings().bUseDarkTheme && AfxGetAppSettings().bDarkMenu) {
 		CMenuEx::ChangeStyle(pPopupMenu);
 	}
 }
@@ -17250,7 +17250,7 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 
 	auto& s = AfxGetAppSettings();
 
-	if (s.bUseDarkTheme) {
+	if (s.bUseDarkTheme && s.bDarkMenu) {
 		SetColorMenu();
 	}
 	
@@ -19542,7 +19542,7 @@ void CMainFrame::SetColorMenu()
 void CMainFrame::DrawSmallBorder()
 {
 	// To eliminate small border between menu and client rect  
-	if (AfxGetAppSettings().bUseDarkTheme && !IsMenuHidden()) {
+	if (AfxGetAppSettings().bUseDarkTheme && AfxGetAppSettings().bDarkMenu && !IsMenuHidden()) {
 		CDC* pDC = GetWindowDC();
 		CRect clientRect;
 		GetClientRect(clientRect);
@@ -19560,7 +19560,7 @@ void CMainFrame::DrawSmallBorder()
 
 void CMainFrame::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 {
-	if (!nIDCtl && lpDrawItemStruct->CtlType == ODT_MENU && AfxGetAppSettings().bUseDarkTheme) {
+	if (!nIDCtl && lpDrawItemStruct->CtlType == ODT_MENU && AfxGetAppSettings().bUseDarkTheme && AfxGetAppSettings().bDarkMenu) {
 		CMenuEx::DrawItem(lpDrawItemStruct);
 		return;
 	}
@@ -19570,7 +19570,7 @@ void CMainFrame::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 void CMainFrame::OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 {
-	if (!nIDCtl && lpMeasureItemStruct->CtlType == ODT_MENU && AfxGetAppSettings().bUseDarkTheme) {
+	if (!nIDCtl && lpMeasureItemStruct->CtlType == ODT_MENU && AfxGetAppSettings().bUseDarkTheme && AfxGetAppSettings().bDarkMenu) {
 		CMenuEx::MeasureItem(lpMeasureItemStruct);
 		return;
 	}
@@ -19613,10 +19613,10 @@ void CMainFrame::ResetMenu()
 	}
 	m_hMenuDefault = defaultMenu.Detach();
 
-	auto& bUseDarkTheme = AfxGetAppSettings().bUseDarkTheme;
-	CMenuEx::EnableHook(bUseDarkTheme);
+	const auto enableDarkMenu = AfxGetAppSettings().bUseDarkTheme && AfxGetAppSettings().bDarkMenu;
+	CMenuEx::EnableHook(enableDarkMenu);
 
-	if (bUseDarkTheme) {
+	if (enableDarkMenu) {
 		SetColorMenu();
 	}
 }

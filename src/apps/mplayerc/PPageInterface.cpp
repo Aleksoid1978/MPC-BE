@@ -323,7 +323,9 @@ void CPPageInterface::OnThemeChange()
 		pFrame->m_wndPlaylistBar.SendMessageW(WM_NCPAINT, 1, NULL);
 	}
 
-	pFrame->SetColorMenu();
+	if (AfxGetAppSettings().bDarkMenu) {
+		pFrame->SetColorMenu();
+	}
 
 	pFrame->Invalidate();
 	pFrame->m_wndPlaylistBar.Invalidate();
