@@ -127,6 +127,7 @@
 #define IDS_RS_THEMERED						L"ThemeRed"
 #define IDS_RS_THEMEGREEN					L"ThemeGreen"
 #define IDS_RS_THEMEBLUE					L"ThemeBlue"
+#define IDS_RS_DARKMENU						L"DarkMenu"
 
 #define IDS_RS_CLRFACEABGR					L"Toolbar clrFace(ABGR)"
 #define IDS_RS_CLROUTLINEABGR				L"Toolbar clrOutline(ABGR)"

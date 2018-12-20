@@ -268,7 +268,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Felbontás visszaállítása kilépéskor"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 6		"Use the ""dark"" theme (default)"
 7		"Brightness :"
 9		"Setting the color of the indicator of sound:"
@@ -280,22 +280,23 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 47
 15		"R:"
 16		"G:"
 17		"B:"
-22		"Use time tooltip:"
-24		"Use the preview in the search"
-25		"Size relative to screen width:"
-28		"Use chapters marker"
-29		"Use flybar"
-30		"OSD"
-31		"Font:"
-34		"F"
-35		"Background:"
-36		"G1"
-37		"G2"
-38		"Transparent:"
-40		"Border Size:"
-43		"Shadow"
-44		"Anti-aliasing"
-45		"Use Windows 7 (and above) Taskbar features"
+21		"Enable dark menu"
+23		"Use time tooltip:"
+25		"Use the preview in the search"
+26		"Size relative to screen width:"
+29		"Use chapters marker"
+30		"Use flybar"
+31		"OSD"
+32		"Font:"
+35		"F"
+36		"Background:"
+37		"G1"
+38		"G2"
+39		"Transparent:"
+41		"Border Size:"
+44		"Shadow"
+45		"Anti-aliasing"
+46		"Use Windows 7 (and above) Taskbar features"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
