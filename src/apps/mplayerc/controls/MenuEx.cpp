@@ -129,6 +129,7 @@ void CMenuEx::DrawItem(LPDRAWITEMSTRUCT lpDIS)
 	const bool bChecked = lpDIS->itemState & ODS_CHECKED;
 	const bool bGrayed = lpDIS->itemState & ODS_GRAYED;
 	const bool bHotlight = lpDIS->itemState & ODS_HOTLIGHT;
+	const bool bNoAccel = lpDIS->itemState & ODS_NOACCEL;
 
 	if (bSelected) {
 		dc.SetTextColor(m_crTNL);
@@ -165,13 +166,13 @@ void CMenuEx::DrawItem(LPDRAWITEMSTRUCT lpDIS)
 	}
 	else {
 		if (lpItem->bMainMenu) { // SYSTEMMENU
-			TextMenu(&dc, rect, rect, bSelected, bGrayed, lpItem);
+			TextMenu(&dc, rect, rect, bSelected, bGrayed, bNoAccel, lpItem);
 		}
 		else {
 			const int offset = rect.Height() + m_CXMENUCHECK / 2;
 			CRect rcText(rect.left + offset, rect.top, rect.right, rect.bottom);
 
-			TextMenu(&dc, rect, rcText, bSelected, bGrayed, lpItem);
+			TextMenu(&dc, rect, rcText, bSelected, bGrayed, bNoAccel, lpItem);
 		}
 
 		if (bChecked) {
@@ -204,7 +205,7 @@ void CMenuEx::DrawItem(LPDRAWITEMSTRUCT lpDIS)
 	dc.Detach();
 }
 
-void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, const bool bSelected, const bool bGrayed, const LPMENUITEM lpItem)
+void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, const bool bSelected, const bool bGrayed, const bool bNoAccel, const LPMENUITEM lpItem)
 {
 	if (bSelected) {
 		GRADIENT_RECT gr[1] = { { 0, 1 } };
@@ -238,6 +239,9 @@ void CMenuEx::TextMenu(CDC *pDC, const CRect &rect, CRect rtText, const bool bSe
 
 	CString strR;
 	CString str = lpItem->strText;
+	if (bNoAccel) {
+		str.Remove('&');
+	}
 	const int pos = str.Find('\t');
 	if (pos > 0) {
 		strR = str.Right(str.GetLength() - pos);
