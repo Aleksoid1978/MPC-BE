@@ -66,6 +66,7 @@ void CPPageInterface::DoDataExchange(CDataExchange* pDX)
 	DDX_Slider(pDX, IDC_SLIDER2, m_nThemeRed);
 	DDX_Slider(pDX, IDC_SLIDER3, m_nThemeGreen);
 	DDX_Slider(pDX, IDC_SLIDER4, m_nThemeBlue);
+	DDX_Control(pDX, IDC_CHECK4, m_chkDarkMenu);
 	DDX_Slider(pDX, IDC_SLIDER_OSDTRANS, m_nOSDTransparent);
 	DDX_Control(pDX, IDC_SLIDER1, m_ThemeBrightnessCtrl);
 	DDX_Control(pDX, IDC_SLIDER2, m_ThemeRedCtrl);
@@ -107,6 +108,8 @@ BOOL CPPageInterface::OnInitDialog()
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
 	CorrectCWndWidth(&m_UseDarkThemeCtrl);
 
+	//m_chkDarkMenu.ShowWindow(SW_HIDE);
+
 	CAppSettings& s = AfxGetAppSettings();
 
 	m_bUseDarkTheme	= s.bUseDarkTheme;
@@ -116,6 +119,7 @@ BOOL CPPageInterface::OnInitDialog()
 	m_nThemeBlue			= m_nThemeBlue_Old			= s.nThemeBlue;
 	m_nOSDTransparent		= m_nOSDTransparent_Old		= s.nOSDTransparent;
 	m_OSDBorder				= m_OSDBorder_Old			= s.nOSDBorder;
+	m_chkDarkMenu.SetCheck(s.bDarkMenu);
 
 	m_ThemeBrightnessCtrl.SetRange	(0, 100, TRUE);
 	m_ThemeRedCtrl.SetRange			(0, 255, TRUE);
@@ -218,6 +222,7 @@ BOOL CPPageInterface::OnApply()
 		::PostMessageW(pFrame->m_hWnd_toolbar, WM_SIZE, s.nLastWindowType, MAKELPARAM(s.rcLastWindowPos.Width(), s.rcLastWindowPos.Height()));
 		::PostMessageW(pFrame->m_hWnd,         WM_SIZE, s.nLastWindowType, MAKELPARAM(s.rcLastWindowPos.Width(), s.rcLastWindowPos.Height()));
 	}
+	s.bDarkMenu = !!m_chkDarkMenu.GetCheck();
 
 	s.fUseWin7TaskBar		= !!m_fUseWin7TaskBar;
 	s.fUseTimeTooltip		= !!m_fUseTimeTooltip;
@@ -367,6 +372,7 @@ void CPPageInterface::OnUpdateCheck3(CCmdUI* pCmdUI)
 	GetDlgItem(IDC_BUTTON_CLRDEFAULT)->EnableWindow(m_bUseDarkTheme);
 	GetDlgItem(IDC_STATIC_CLRFACE)->EnableWindow(m_bUseDarkTheme);
 	GetDlgItem(IDC_STATIC_CLROUTLINE)->EnableWindow(m_bUseDarkTheme);
+	m_chkDarkMenu.EnableWindow(m_bUseDarkTheme);
 }
 
 void CPPageInterface::OnCheckShadow()

@@ -717,6 +717,7 @@ void CAppSettings::ResetSettings()
 	nThemeRed = 256;
 	nThemeGreen = 256;
 	nThemeBlue = 256;
+	bDarkMenu = false;
 	nOSDTransparent = 100;
 	nOSDBorder = 1;
 
@@ -1293,6 +1294,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THEMERED, nThemeRed);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THEMEGREEN, nThemeGreen);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_THEMEBLUE, nThemeBlue);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_DARKMENU, bDarkMenu);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_TRANSPARENT, nOSDTransparent);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_OSD_BORDER, nOSDBorder);
 
@@ -1849,6 +1851,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_THEMERED, nThemeRed);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_THEMEGREEN, nThemeGreen);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_THEMEBLUE, nThemeBlue);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_DARKMENU, bDarkMenu);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_OSD_TRANSPARENT, nOSDTransparent);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_OSD_BORDER, nOSDBorder);
 
