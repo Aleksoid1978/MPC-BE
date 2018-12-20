@@ -3866,7 +3866,7 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 		return;
 	}
 
-	if (AfxGetAppSettings().bUseDarkTheme) {
+	if (AfxGetAppSettings().bUseDarkTheme && AfxGetAppSettings().bDarkMenu) {
 		MENUINFO MenuInfo = { 0 };
 		MenuInfo.cbSize = sizeof(MenuInfo);
 		MenuInfo.hbrBack = m_hPopupMenuBrush;
