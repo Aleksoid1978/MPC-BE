@@ -269,7 +269,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
-6		"Dunkle Standard-Theme benutzen"
+6		"Dunkles Theme aktivieren"
 7		"Helligkeit:"
 9		"Farbe des Lautstärkestellers:"
 10		"Füllen:"
@@ -280,12 +280,12 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 15		"R:"
 16		"G:"
 17		"B:"
-21		"Enable dark menu"
+21		"Dunkles Menü aktivieren"
 23		"Zeit-Tooltip anzeigen:"
-25		"Vorschau in der Suche benutzen"
+25		"Vorschau bei der Suche anzeigen"
 26		"Größe bezogen auf Bildschirmbreite:"
-29		"Kapitelmarken in Suchleiste anzeigen"
-30		"Flybar verwenden"
+29		"Kapitelmarken in der Suchleiste anzeigen"
+30		"Flybar aktivieren"
 31		"OSD"
 32		"Schrift:"
 35		"F"
