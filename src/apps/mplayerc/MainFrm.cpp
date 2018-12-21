@@ -3871,8 +3871,7 @@ void CMainFrame::OnInitMenuPopup(CMenu* pPopupMenu, UINT nIndex, BOOL bSysMenu)
 		MenuInfo.cbSize = sizeof(MenuInfo);
 		MenuInfo.hbrBack = m_hPopupMenuBrush;
 		MenuInfo.fMask = MIM_BACKGROUND | MIM_APPLYTOSUBMENUS;
-		MenuInfo.dwStyle = MNS_AUTODISMISS;
-		SetMenuInfo(pPopupMenu->m_hMenu, &MenuInfo);
+		SetMenuInfo(pPopupMenu->GetSafeHmenu(), &MenuInfo);
 	}
 
 	MENUITEMINFOW mii = { sizeof(mii) };
@@ -19530,11 +19529,9 @@ void CMainFrame::SetColorMenu()
 		MenuInfo.cbSize = sizeof(MenuInfo);
 		MenuInfo.hbrBack = m_hMainMenuBrush;
 		MenuInfo.fMask = MIM_BACKGROUND | MIM_APPLYTOSUBMENUS;
-		MenuInfo.dwStyle = MNS_AUTODISMISS;
-
 		SetMenuInfo(pMenu->GetSafeHmenu(), &MenuInfo);
-		CMenuEx::ChangeStyle(pMenu, true);
 
+		CMenuEx::ChangeStyle(pMenu, true);
 		DrawMenuBar();
 	}
 }

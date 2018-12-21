@@ -2633,6 +2633,12 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bHidePlaylistFullScreen ? MF_CHECKED : MF_UNCHECKED), M_HIDEFULLSCREEN, ResStr(IDS_PLAYLIST_HIDEFS));
 
 	if (s.bUseDarkTheme && s.bDarkMenu) {
+		MENUINFO MenuInfo = { 0 };
+		MenuInfo.cbSize = sizeof(MenuInfo);
+		MenuInfo.hbrBack = m_pMainFrame->m_hPopupMenuBrush;
+		MenuInfo.fMask = MIM_BACKGROUND | MIM_APPLYTOSUBMENUS;
+		SetMenuInfo(m.GetSafeHmenu(), &MenuInfo);
+
 		CMenuEx::ChangeStyle(&m);
 	}
 	int nID = (int)m.TrackPopupMenu(TPM_LEFTBUTTON|TPM_RETURNCMD, p.x, p.y, this);
