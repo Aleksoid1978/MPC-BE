@@ -268,7 +268,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Herstel resolutie bij afsluiten"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
+BEGIN BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 51
 6		"Gebruik ""Dark""-thema (standaard)"
 7		"Helderheid :"
 9		"Kleur van de geluidindicator:"
@@ -286,17 +286,18 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 26		"Grootte op basis v/d schermbreedte:"
 29		"Toon hoofdstukmarkeringen op zoekbalk"
 30		"Gebruik flybar"
-31		"OSD"
-32		"Lettertype:"
-35		"F"
-36		"Achtergrond:"
-37		"G1"
-38		"G2"
-39		"Transparantie:"
-41		"Omlijning:"
-44		"Schaduw"
-45		"Anti-aliasing"
-46		"Gebruik mogelijkheden van Windows 7 (en hoger)-taakbalk"
+31		"Playlist font size:"
+34		"OSD"
+35		"Lettertype:"
+38		"F"
+39		"Achtergrond:"
+40		"G1"
+41		"G2"
+42		"Transparantie:"
+44		"Omlijning:"
+47		"Schaduw"
+48		"Anti-aliasing"
+49		"Gebruik mogelijkheden van Windows 7 (en hoger)-taakbalk"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
