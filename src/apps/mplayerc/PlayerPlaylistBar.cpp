@@ -782,7 +782,7 @@ void CPlayerPlaylistBar::ScaleFontInternal()
 {
 	LOGFONT lf = { 0 };
 	GetMessageFont(&lf);
-	lf.lfHeight = m_pMainFrame->ScaleSystemToMonitorY(lf.lfHeight);
+	lf.lfHeight = m_pMainFrame->ScaleSystemToMonitorY(lf.lfHeight)*AfxGetAppSettings().iPlsFontPercent/100;
 
 	m_font.DeleteObject();
 	if (m_font.CreateFontIndirectW(&lf)) {
