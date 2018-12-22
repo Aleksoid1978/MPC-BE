@@ -96,15 +96,13 @@ void CMenuEx::DrawMenuElement(CDC* pDC, CRect rect, const UINT uState, const boo
 						::BitBlt(hdcMask, 0, 0, m_CXMENUCHECK, m_CYMENUCHECK, hdcMem, 0, 0, SRCAND);
 
 						const int offset = (rect.Height() - m_CXMENUCHECK) / 2;
+						const int x = uState == DFCS_MENUARROW ? rect.right - m_CXMENUCHECK : rect.left + offset;
+						const int y = rect.top + offset;
 
-						if (uState == DFCS_MENUARROW) {
-							::BitBlt(pDC->GetSafeHdc(), rect.right - m_CXMENUCHECK, rect.top + offset, m_CXMENUCHECK, m_CYMENUCHECK, hdcMask, 0, 0, SRCPAINT);
-						} else {
-							::BitBlt(pDC->GetSafeHdc(), rect.left + offset, rect.top + offset, m_CXMENUCHECK, m_CYMENUCHECK, hdcMask, 0, 0, SRCPAINT);
-						}
+						::BitBlt(pDC->GetSafeHdc(), x, y, m_CXMENUCHECK, m_CYMENUCHECK, hdcMask, 0, 0, SRCPAINT);
 
 						if (rcElement) {
-							*rcElement = CRect(CPoint(rect.left + offset, rect.top + offset), CSize(m_CXMENUCHECK, m_CYMENUCHECK));
+							*rcElement = CRect(CPoint(x, y), CSize(m_CXMENUCHECK, m_CYMENUCHECK));
 						}
 					}
 				}	
@@ -294,10 +292,15 @@ void CMenuEx::ChangeStyle(CMenu *pMenu, const bool bMainMenu/* = false*/)
 			}
 		}
 
+		if (mii.fType & MF_MENUBARBREAK) {
+			mii.fType &= ~MF_MENUBARBREAK;
+			mii.fType |= MF_MENUBREAK;
+		}
+
 		mii.fMask = MIIM_FTYPE | MIIM_DATA;
-        mii.fType |= MFT_OWNERDRAW; 
-        mii.dwItemData = (ULONG_PTR)lpItem;
-        pMenu->SetMenuItemInfoW(i, &mii, TRUE);
+		mii.fType |= MFT_OWNERDRAW;
+		mii.dwItemData = (ULONG_PTR)lpItem;
+		pMenu->SetMenuItemInfoW(i, &mii, TRUE);
 	}
 }
 
@@ -370,12 +373,14 @@ void CMenuEx::SetColorMenu(
 
 void CMenuEx::Hook()
 {
-    m_hookCBT = ::SetWindowsHookExW(WH_CBT, CBTProc, nullptr, ::GetCurrentThreadId());
+	m_hookCBT = ::SetWindowsHookExW(WH_CBT, CBTProc, nullptr, ::GetCurrentThreadId());
+	m_hookMSG = ::SetWindowsHookExW(WH_CALLWNDPROC, MSGProc, nullptr, ::GetCurrentThreadId());
 }
 
 void CMenuEx::UnHook()
 {
-    ::UnhookWindowsHookEx(m_hookCBT);
+	::UnhookWindowsHookEx(m_hookCBT);
+	::UnhookWindowsHookEx(m_hookMSG);
 }
 
 void CMenuEx::EnableHook(const bool bEnable)
@@ -384,56 +389,114 @@ void CMenuEx::EnableHook(const bool bEnable)
 }
 
 LPCTSTR g_pszOldMenuProc = L"OldPopupMenuProc";
+LPCTSTR g_pszMenuHandle  = L"PopupMenuHandle";
+
+static bool CheckActiveClass()
+{
+	GUITHREADINFO tdInfo = { sizeof(tdInfo) };
+	if (GetGUIThreadInfo(NULL, &tdInfo)) {
+		wchar_t lpClassName[MAX_PATH] = {};
+		const int nLength = ::GetClassNameW(tdInfo.hwndActive, lpClassName, MAX_PATH);
+		if (nLength == 6 && lstrcmpW(lpClassName, L"MPC-BE") == 0) {
+			return true;
+		}
+	}
+
+	return false;
+}
 
 LRESULT CALLBACK CMenuEx::MenuWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
-    WNDPROC pfnOldProc = (WNDPROC)::GetPropW(hWnd, g_pszOldMenuProc);
-    switch (Msg) {
+	WNDPROC pfnOldProc = (WNDPROC)::GetPropW(hWnd, g_pszOldMenuProc);
+	switch (Msg) {
 		case WM_DESTROY:
 			::SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)pfnOldProc);
 			::RemovePropW(hWnd, g_pszOldMenuProc);
 			break;
-		/*
 		case WM_ERASEBKGND:
-			{
+			if (m_bUseDrawHook && CheckActiveClass()) {
+				DLog(L"CMenuEx::MenuWndProc() : WM_ERASEBKGND");
+
 				RECT rc;
 				::GetWindowRect(hWnd, &rc);
 				::OffsetRect(&rc, -rc.left, -rc.top);
-            
+
 				HDC hDC = (HDC)wParam;
-            
+
 				HBRUSH hBrush = ::CreateSolidBrush(m_crBN);
 				FillRect(hDC, CRect(rc.left, rc.top, rc.right, rc.bottom), hBrush);
 				::DeleteObject(hBrush);
+
+				const auto& hMenu = m_hMenuLast;
+				if (hMenu) {
+					std::vector<int> menuBreaks;
+
+					for (int i = 0; i < ::GetMenuItemCount(hMenu); i++) {
+						MENUITEMINFOW mii = { sizeof(mii), MIIM_TYPE };
+						::GetMenuItemInfoW(hMenu, i, TRUE, &mii);
+
+						if (mii.fType & MF_MENUBREAK) {
+							menuBreaks.push_back(i);
+						}
+					}
+
+					if (!menuBreaks.empty()) {
+						menuBreaks.insert(menuBreaks.cbegin(), 0);
+
+						CDC *pDC = CDC::FromHandle(hDC);
+
+						const LONG iVOffset = 3;
+						RECT rcVSeparator(rc);
+						rcVSeparator.top += iVOffset;
+						rcVSeparator.bottom -= iVOffset;
+
+						RECT rcFirstItem = {};
+						::GetMenuItemRect(hWnd, hMenu, 0, &rcFirstItem);
+
+						for (size_t i = 0; i < menuBreaks.size() - 1; i++) {
+							auto& begin = menuBreaks[i];
+							auto& end = menuBreaks[i + 1];
+
+							LONG iMaxWidht = 0;
+							RECT rcItem = {};
+							for (int k = begin; k < end && ::GetMenuItemRect(hWnd, hMenu, k, &rcItem); k++) {
+								iMaxWidht = std::max(iMaxWidht, rcItem.right - rcItem.left);
+							}
+
+							rcVSeparator.left = rcItem.left + iMaxWidht - rcFirstItem.left;
+							rcVSeparator.right = rcVSeparator.left + 2;
+
+							pDC->Draw3dRect(&rcVSeparator, m_crBND, m_crBNL);
+						}
+					}
+				}
+				return 1;
 			}
-			return 1;
-		*/
+			break;
 		case WM_PRINT:
 			if (m_bUseDrawHook) {
 				::CallWindowProcW(pfnOldProc, hWnd, Msg, wParam, lParam);
-				if (lParam & PRF_NONCLIENT) {
-					GUITHREADINFO tdInfo = { sizeof(tdInfo) };
-					if (GetGUIThreadInfo(NULL, &tdInfo)) {
-						wchar_t lpClassName[MAX_PATH] = {};
-						const int nLength = ::GetClassNameW(tdInfo.hwndActive, lpClassName, MAX_PATH);
-						if (nLength == 6 && lstrcmpW(lpClassName, L"MPC-BE") == 0) {
-							RECT rc;
-							::GetWindowRect(hWnd, &rc);
-							::OffsetRect(&rc, -rc.left, -rc.top);
-            
-							HDC hDC = (HDC)wParam;
-            
-							HBRUSH hBrush = ::CreateSolidBrush(m_crBN);
-							HRGN hrgnPaint = ::CreateRectRgnIndirect(&rc);
-							::FrameRgn(hDC, hrgnPaint, hBrush, ::GetSystemMetrics(SM_CXFRAME) - 1, ::GetSystemMetrics(SM_CYFRAME) - 1);
-							::DeleteObject(hrgnPaint);
 
-							::FillRect(hDC, CRect(rc.left, rc.top, rc.left + (::GetSystemMetrics(SM_CXFRAME) - 1), rc.bottom), hBrush);
-							::DeleteObject(hBrush);
+				if (CheckActiveClass()) {
+					DLog(L"CMenuEx::MenuWndProc() : WM_PRINT");
+
+					if (lParam & PRF_NONCLIENT) {
+						RECT rc;
+						::GetWindowRect(hWnd, &rc);
+						::OffsetRect(&rc, -rc.left, -rc.top);
+
+						HDC hDC = (HDC)wParam;
+
+						HBRUSH hBrush = ::CreateSolidBrush(m_crBN);
+						HRGN hrgnPaint = ::CreateRectRgnIndirect(&rc);
+						::FrameRgn(hDC, hrgnPaint, hBrush, ::GetSystemMetrics(SM_CXFRAME) - 1, ::GetSystemMetrics(SM_CYFRAME) - 1);
+						::DeleteObject(hrgnPaint);
+
+						::FillRect(hDC, CRect(rc.left, rc.top, rc.left + (::GetSystemMetrics(SM_CXFRAME) - 1), rc.bottom), hBrush);
+						::DeleteObject(hBrush);
 				
-							CDC *pDC = CDC::FromHandle(hDC);
-							pDC->Draw3dRect(&rc, m_crBNL, m_crBND);
-						}
+						CDC *pDC = CDC::FromHandle(hDC);
+						pDC->Draw3dRect(&rc, m_crBNL, m_crBND);
 					}
 				}
 				return 0;
@@ -447,29 +510,42 @@ LRESULT CALLBACK CMenuEx::MenuWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM
 				return 0;
 			}
 			break;
-    }
+	}
 
-    return ::CallWindowProcW(pfnOldProc, hWnd, Msg, wParam, lParam);
+	return ::CallWindowProcW(pfnOldProc, hWnd, Msg, wParam, lParam);
 }
 
 LRESULT CALLBACK CMenuEx::CBTProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
-    if (nCode == HCBT_CREATEWND) {
-        HWND hwndWnd = (HWND)wParam;
-        LPCBT_CREATEWNDW pS = (LPCBT_CREATEWNDW)lParam;
-        
+	if (nCode == HCBT_CREATEWND && m_bUseDrawHook) {
+		HWND hwndWnd = (HWND)wParam;
+		LPCBT_CREATEWNDW pS = (LPCBT_CREATEWNDW)lParam;
+
 		wchar_t lpClassName[MAX_PATH] = {};
-        const int nLength = ::GetClassNameW(hwndWnd, lpClassName, MAX_PATH);
-        if (nLength == 6 && lstrcmpW(lpClassName, L"#32768") == 0) {
-            WNDPROC pfnOldProc = (WNDPROC)::GetWindowLongPtr(hwndWnd, GWLP_WNDPROC);
+		const int nLength = ::GetClassNameW(hwndWnd, lpClassName, MAX_PATH);
+		if (nLength == 6 && lstrcmpW(lpClassName, L"#32768") == 0) {
+			WNDPROC pfnOldProc = (WNDPROC)::GetWindowLongPtr(hwndWnd, GWLP_WNDPROC);
 
-            ::SetPropW(hwndWnd, g_pszOldMenuProc, (HANDLE)pfnOldProc);
-            ::SetWindowLongPtr(hwndWnd, GWLP_WNDPROC, (LONG_PTR)MenuWndProc);
+			::SetPropW(hwndWnd, g_pszOldMenuProc, (HANDLE)pfnOldProc);
+			::SetWindowLongPtr(hwndWnd, GWLP_WNDPROC, (LONG_PTR)MenuWndProc);
 
-            // Force menu window to repaint frame.
-            ::SetWindowPos(hwndWnd, nullptr, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
-            ::RedrawWindow(hwndWnd, nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE | RDW_ERASE);
-        }
-    }
-    return ::CallNextHookEx(m_hookCBT, nCode, wParam, lParam);
+			// Force menu window to repaint frame.
+			::SetWindowPos(hwndWnd, nullptr, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+			::RedrawWindow(hwndWnd, nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE | RDW_ERASE);
+		}
+	}
+
+	return ::CallNextHookEx(m_hookCBT, nCode, wParam, lParam);
+}
+
+LRESULT CALLBACK CMenuEx::MSGProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	if (nCode == HC_ACTION && m_bUseDrawHook) {
+		PCWPSTRUCT pS = (PCWPSTRUCT)lParam;
+		if (pS->message == WM_INITMENUPOPUP) {
+			m_hMenuLast = (HMENU)pS->wParam;
+		}
+	}
+
+	return ::CallNextHookEx(m_hookMSG, nCode, wParam, lParam);
 }

@@ -35,8 +35,12 @@ class CMenuEx
 {
 	static LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT mess, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK CBTProc(int nCode, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK MSGProc(int nCode, WPARAM wParam, LPARAM lParam);
 
 	static inline HHOOK m_hookCBT = nullptr;
+	static inline HHOOK m_hookMSG = nullptr;
+
+	static inline HMENU m_hMenuLast = nullptr;
 
 public:
 	CMenuEx() = default;
