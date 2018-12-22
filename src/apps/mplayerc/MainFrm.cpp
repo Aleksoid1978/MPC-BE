@@ -2107,6 +2107,10 @@ void CMainFrame::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
 	if (!bMinimized) {
 		DrawSmallBorder();
 	}
+
+	if (!(AfxGetAppSettings().bUseDarkTheme && AfxGetAppSettings().bDarkMenu)) {
+		__super::OnActivate(nState, pWndOther, bMinimized);
+	}
 }
 
 void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
