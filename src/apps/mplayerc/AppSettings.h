@@ -752,6 +752,7 @@ public:
 	int				iSmartSeekSize;
 	bool			fChapterMarker;
 	bool			fFlybar;
+	int				iPlsFontPercent;
 	bool			fFontShadow;
 	bool			fFontAA;
 	bool			fFlybarOnTop;

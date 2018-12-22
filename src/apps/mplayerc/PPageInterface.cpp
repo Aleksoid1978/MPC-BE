@@ -82,6 +82,7 @@ void CPPageInterface::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT1, m_edSmartSeekSize);
 	DDX_Check(pDX, IDC_CHECK_CHM, m_fChapterMarker);
 	DDX_Check(pDX, IDC_CHECK_FLYBAR, m_fFlybar);
+	DDX_Control(pDX, IDC_EDIT2, m_edPlsFontPercent);
 	DDX_Text(pDX, IDC_EDIT4, m_OSDBorder);
 	DDX_Control(pDX, IDC_SPIN10, m_OSDBorderCtrl);
 	DDX_Check(pDX, IDC_CHECK_SHADOW, m_fFontShadow);
@@ -149,6 +150,8 @@ BOOL CPPageInterface::OnInitDialog()
 	m_edSmartSeekSize	= s.iSmartSeekSize;
 	m_fChapterMarker	= s.fChapterMarker;
 	m_fFlybar			= s.fFlybar;
+	m_edPlsFontPercent.SetRange(100, 200);
+	m_edPlsFontPercent	= s.iPlsFontPercent;
 	m_fFontShadow		= m_fFontShadow_Old	= s.fFontShadow;
 	m_fFontAA			= m_fFontAA_Old		= s.fFontAA;
 	m_FontType.Clear();
@@ -235,6 +238,7 @@ BOOL CPPageInterface::OnApply()
 	s.iSmartSeekSize		= m_edSmartSeekSize;
 	s.fChapterMarker		= !!m_fChapterMarker;
 	s.fFlybar				= !!m_fFlybar;
+	s.iPlsFontPercent		= m_edPlsFontPercent;
 	s.fFontShadow			= !!m_fFontShadow;
 	s.fFontAA				= !!m_fFontAA;
 

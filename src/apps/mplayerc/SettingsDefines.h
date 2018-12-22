@@ -260,6 +260,7 @@
 #define IDS_RS_SMARTSEEK_SIZE				L"SmartSeekSize"
 #define IDS_RS_CHAPTER_MARKER				L"ChapterMarker"
 #define IDS_RS_FILENAMEONSEEKBAR			L"FileNameOnSeekBar"
+#define IDS_RS_PLAYLISTFONTPERCENT			L"PlaylistFontPercent"
 
 #define IDS_RS_REMAINING_TIME				L"RemainingTime"
 
