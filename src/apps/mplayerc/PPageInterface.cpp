@@ -238,9 +238,13 @@ BOOL CPPageInterface::OnApply()
 	s.iSmartSeekSize		= m_edSmartSeekSize;
 	s.fChapterMarker		= !!m_fChapterMarker;
 	s.fFlybar				= !!m_fFlybar;
-	s.iPlsFontPercent		= m_edPlsFontPercent;
 	s.fFontShadow			= !!m_fFontShadow;
 	s.fFontAA				= !!m_fFontAA;
+
+	if (s.iPlsFontPercent != m_edPlsFontPercent) {
+		s.iPlsFontPercent = m_edPlsFontPercent;
+		pFrame->m_wndPlaylistBar.ScaleFont(); // Only the font size is changed, not the height of the lines. Need to restart the player.
+	}
 
 	if (s.fFlybar && !pFrame->m_wndFlyBar) {
 		pFrame->CreateFlyBar();
