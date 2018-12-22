@@ -60,6 +60,7 @@ public:
 	CSliderCtrl m_ThemeBlueCtrl;
 	CButton     m_chkDarkMenu;
 	CIntEdit    m_edSmartSeekSize;
+	CIntEdit    m_edPlsFontPercent;
 	CSliderCtrl m_OSDTransparentCtrl;
 	CComboBox m_TimeTooltipPosition;
 	CComboBox m_FontType;

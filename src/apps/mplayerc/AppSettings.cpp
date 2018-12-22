@@ -815,6 +815,7 @@ void CAppSettings::ResetSettings()
 	iSmartSeekSize = 15;
 	fChapterMarker = false;
 	fFlybar = true;
+	iPlsFontPercent = 100;
 	fFlybarOnTop = false;
 	fFontShadow = false;
 	fFontAA = true;
@@ -1420,6 +1421,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK_SIZE, iSmartSeekSize, 10, 30);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_CHAPTER_MARKER, fChapterMarker);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR, fFlybar);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_PLAYLISTFONTPERCENT, iPlsFontPercent, 100, 200);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR_ONTOP, fFlybarOnTop);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_OSD_FONTSHADOW, fFontShadow);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_OSD_FONTAA, fFontAA);
@@ -1759,6 +1761,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_SMARTSEEK_SIZE, iSmartSeekSize);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_CHAPTER_MARKER, fChapterMarker);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR, fFlybar);
+	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_PLAYLISTFONTPERCENT, iPlsFontPercent);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_USE_FLYBAR_ONTOP, fFlybarOnTop);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_OSD_FONTSHADOW, fFontShadow);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_OSD_FONTAA, fFontAA);
