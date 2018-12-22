@@ -268,7 +268,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"종료후에 해상도 복원"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
+BEGIN BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 51
 6		"<<dark>> 테마 사용 (기본값)"
 7		"밝기:"
 9		"소리 조정막대 색상설정:"
@@ -286,17 +286,18 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 26		"Size relative to screen width:"
 29		"chapters 구분표지 사용"
 30		"flybar 사용"
-31		"OSD"
-32		"OSD 글꼴:"
-35		"F"
-36		"배경:"
-37		"G1"
-38		"G2"
-39		"투명도:"
-41		"경계 크기:"
-44		"그림자"
-45		"Anti-aliasing"
-46		"Windows 7(이상) 작업표시줄기능 사용"
+31		"Playlist font size:"
+34		"OSD"
+35		"OSD 글꼴:"
+38		"F"
+39		"배경:"
+40		"G1"
+41		"G2"
+42		"투명도:"
+44		"경계 크기:"
+47		"그림자"
+48		"Anti-aliasing"
+49		"Windows 7(이상) 작업표시줄기능 사용"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

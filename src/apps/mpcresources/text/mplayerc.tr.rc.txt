@@ -268,7 +268,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Çözünürlüğü çıkışta geri al"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
+BEGIN BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 51
 6		"'Siyah' arayüzü kullan (varsayılan)"
 7		"Parlaklık :"
 9		"Ses göstergesi renk ayarı:"
@@ -286,17 +286,18 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 26		"Ekran genişliğine göre boyut:"
 29		"Bölüm işaretlerini göster"
 30		"Şeffaf Çubuğu göster"
-31		"OSD"
-32		"Yazı tipi:"
-35		"F"
-36		"Arka plan:"
-37		"G1"
-38		"G2"
-39		"Şeffaflık:"
-41		"Kenar Genişliği:"
-44		"Gölge"
-45		"Kenar yumuşatma"
-46		"Windows 7 (ve üzeri) Görev çubuğu özelliklerini kullan"
+31		"Playlist font size:"
+34		"OSD"
+35		"Yazı tipi:"
+38		"F"
+39		"Arka plan:"
+40		"G1"
+41		"G2"
+42		"Şeffaflık:"
+44		"Kenar Genişliği:"
+47		"Gölge"
+48		"Kenar yumuşatma"
+49		"Windows 7 (ve üzeri) Görev çubuğu özelliklerini kullan"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

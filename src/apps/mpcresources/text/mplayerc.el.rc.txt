@@ -268,7 +268,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Επαναφορά ανάλυσης στην έξοδο του προγράμματος"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
+BEGIN BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 51
 6		"Χρήση του ""σκοτεινού"" θέματος (προεπιλογή)"
 7		"Φωτεινότητα :"
 9		"Ρύθμιση του χρώματος από την ένδειξη του ήχου:"
@@ -286,17 +286,18 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 48
 26		"Μέγεθος σε σχέση με το πλάτος της οθόνης:"
 29		"Εμφάνιση σημάνσεων κεφαλαίων στη γραμμή αναζήτησης"
 30		"Χρήση εναέριας μπάρας"
-31		"OSD"
-32		"Font:"
-35		"F"
-36		"Φόντο:"
-37		"G1"
-38		"G2"
-39		"Διαφανές:"
-41		"Περίγραμμα:"
-44		"Shadow"
-45		"Anti-aliasing"
-46		"Χρήση χαρακτηριστικών Γραμμής εργασίας των Windows 7"
+31		"Playlist font size:"
+34		"OSD"
+35		"Font:"
+38		"F"
+39		"Φόντο:"
+40		"G1"
+41		"G2"
+42		"Διαφανές:"
+44		"Περίγραμμα:"
+47		"Shadow"
+48		"Anti-aliasing"
+49		"Χρήση χαρακτηριστικών Γραμμής εργασίας των Windows 7"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
