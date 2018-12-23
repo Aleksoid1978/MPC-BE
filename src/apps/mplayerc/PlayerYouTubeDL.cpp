@@ -26,7 +26,7 @@
 
 #define bufsize (2ul * KILOBYTE)
 
-bool YoutubeDL::Parse_URL(const CString& url, const int maxHeightOptions, std::list<CString>& urls, Youtube::YoutubeFields& y_fields)
+bool YoutubeDL::Parse_URL(const CString& url, const bool bPlaylist, const int maxHeightOptions, std::list<CString>& urls, Youtube::YoutubeFields& y_fields)
 {
 	urls.clear();
 
@@ -50,7 +50,11 @@ bool YoutubeDL::Parse_URL(const CString& url, const int maxHeightOptions, std::l
 	startup_info.wShowWindow = SW_HIDE;
 	startup_info.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
 
-	CString args = "youtube-dl.exe -J -- \"" + url + "\"";
+	CStringW args(L"youtube-dl.exe");
+	if (!bPlaylist) {
+		args.Append(L" --no-playlist");
+	}
+	args.Append(L" -J -- \"" + url + "\"");
 	PROCESS_INFORMATION proc_info = {};
 	const bool bSuccess = CreateProcessW(nullptr, args.GetBuffer(), nullptr, nullptr, true, 0,
 										 nullptr, nullptr, &startup_info, &proc_info);
