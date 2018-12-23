@@ -760,29 +760,16 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 
 void CPlayerPlaylistBar::ReloadTranslatableResources()
 {
-	SetWindowText(ResStr(IDS_PLAYLIST_CAPTION));
-}
-
-static void GetNonClientMetrics(NONCLIENTMETRICS* ncm)
-{
-	ZeroMemory(ncm, sizeof(NONCLIENTMETRICS));
-	ncm->cbSize = sizeof(NONCLIENTMETRICS);
-	VERIFY(SystemParametersInfo(SPI_GETNONCLIENTMETRICS, ncm->cbSize, ncm, 0));
-}
-
-static void GetMessageFont(LOGFONT* lf)
-{
-	NONCLIENTMETRICS ncm;
-	GetNonClientMetrics(&ncm);
-	*lf = ncm.lfMessageFont;
-	ASSERT(lf->lfHeight);
+	SetWindowTextW(ResStr(IDS_PLAYLIST_CAPTION));
 }
 
 void CPlayerPlaylistBar::ScaleFontInternal()
 {
-	LOGFONT lf = { 0 };
-	GetMessageFont(&lf);
-	lf.lfHeight = m_pMainFrame->ScaleSystemToMonitorY(lf.lfHeight)*AfxGetAppSettings().iPlsFontPercent/100;
+	NONCLIENTMETRICS ncm = { sizeof(NONCLIENTMETRICS) };
+	VERIFY(SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0));
+
+	auto& lf = ncm.lfMessageFont;
+	lf.lfHeight = m_pMainFrame->ScaleSystemToMonitorY(lf.lfHeight) * AfxGetAppSettings().iPlsFontPercent / 100;
 
 	m_font.DeleteObject();
 	if (m_font.CreateFontIndirectW(&lf)) {
@@ -798,7 +785,7 @@ void CPlayerPlaylistBar::ScaleFontInternal()
 	m_list.SetColumnWidth(COL_TIME, m_nTimeColWidth);
 
 	m_fakeImageList.DeleteImageList();
-	m_fakeImageList.Create(1, m_pMainFrame->ScaleY(16), ILC_COLOR4, 10, 10);
+	m_fakeImageList.Create(1, std::abs(lf.lfHeight) + m_pMainFrame->ScaleY(4), ILC_COLOR4, 10, 10);
 	m_list.SetImageList(&m_fakeImageList, LVSIL_SMALL);
 }
 
