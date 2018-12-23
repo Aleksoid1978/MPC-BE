@@ -96,6 +96,8 @@ protected:
 
 	static inline CMainFrame* m_pMainFrame = nullptr;
 
+	static inline CString m_strModuleName;
+
 	static void DrawMenuElement(CDC* pDC, CRect rect, const UINT uState, const bool bGrayed, const bool bSelected, CRect* rcElement);
 	static void TextMenu(CDC *pDC, const CRect &rect, CRect rcText, const bool bSelected, const bool bGrayed, const bool bNoAccel, const LPMENUITEM lpItem);
 };

@@ -371,14 +371,26 @@ void CMenuEx::SetColorMenu(
 	m_crTGL = crTGL;
 }
 
+static CString GetModuleName(const HMODULE hModule)
+{
+	CString lpFileName;
+	lpFileName.ReleaseBuffer(::GetModuleFileNameW(hModule, lpFileName.GetBuffer(MAX_PATH), MAX_PATH));
+	
+	return lpFileName;
+}
+
 void CMenuEx::Hook()
 {
 	m_hookCBT = ::SetWindowsHookExW(WH_CBT, CBTProc, nullptr, ::GetCurrentThreadId());
 	m_hookMSG = ::SetWindowsHookExW(WH_CALLWNDPROC, MSGProc, nullptr, ::GetCurrentThreadId());
+
+	m_strModuleName = GetModuleName(nullptr);
 }
 
 void CMenuEx::UnHook()
 {
+	m_strModuleName.Empty();
+
 	::UnhookWindowsHookEx(m_hookCBT);
 	::UnhookWindowsHookEx(m_hookMSG);
 }
@@ -389,21 +401,6 @@ void CMenuEx::EnableHook(const bool bEnable)
 }
 
 LPCTSTR g_pszOldMenuProc = L"OldPopupMenuProc";
-LPCTSTR g_pszMenuHandle  = L"PopupMenuHandle";
-
-static bool CheckActiveClass()
-{
-	GUITHREADINFO tdInfo = { sizeof(tdInfo) };
-	if (GetGUIThreadInfo(NULL, &tdInfo)) {
-		wchar_t lpClassName[MAX_PATH] = {};
-		const int nLength = ::GetClassNameW(tdInfo.hwndActive, lpClassName, MAX_PATH);
-		if (nLength == 6 && lstrcmpW(lpClassName, L"MPC-BE") == 0) {
-			return true;
-		}
-	}
-
-	return false;
-}
 
 LRESULT CALLBACK CMenuEx::MenuWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
@@ -418,7 +415,7 @@ LRESULT CALLBACK CMenuEx::MenuWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM
 			break;
 		case WM_ERASEBKGND:
 			{
-				if (!m_hMenuLast || !CheckActiveClass()) {
+				if (!m_hMenuLast) {
 					break;
 				}
 				MENUINFO MenuInfo = { sizeof(MenuInfo), MIM_BACKGROUND };
@@ -480,7 +477,7 @@ LRESULT CALLBACK CMenuEx::MenuWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM
 			return 1;
 		case WM_PRINT:
 			if (lParam & PRF_NONCLIENT) {
-				if (!m_hMenuLast || !CheckActiveClass()) {
+				if (!m_hMenuLast) {
 					break;
 				}
 				MENUINFO MenuInfo = { sizeof(MenuInfo), MIM_BACKGROUND };
@@ -512,7 +509,7 @@ LRESULT CALLBACK CMenuEx::MenuWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM
 			}
 		case WM_NCPAINT:
 			{
-				if (!m_hMenuLast || !CheckActiveClass()) {
+				if (!m_hMenuLast) {
 					break;
 				}
 
@@ -536,14 +533,17 @@ LRESULT CALLBACK CMenuEx::CBTProc(int nCode, WPARAM wParam, LPARAM lParam)
 		wchar_t lpClassName[MAX_PATH] = {};
 		const int nLength = ::GetClassNameW(hWnd, lpClassName, MAX_PATH);
 		if (nLength == 6 && lstrcmpW(lpClassName, L"#32768") == 0) {
-			WNDPROC pfnOldProc = (WNDPROC)::GetWindowLongPtr(hWnd, GWLP_WNDPROC);
+			CString lpFileName = GetModuleName(pS->lpcs->hInstance);
+			if (lpFileName == m_strModuleName) {
+				WNDPROC pfnOldProc = (WNDPROC)::GetWindowLongPtr(hWnd, GWLP_WNDPROC);
 
-			::SetPropW(hWnd, g_pszOldMenuProc, (HANDLE)pfnOldProc);
-			::SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)MenuWndProc);
+				::SetPropW(hWnd, g_pszOldMenuProc, (HANDLE)pfnOldProc);
+				::SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)MenuWndProc);
 
-			// Force menu window to repaint frame.
-			::SetWindowPos(hWnd, nullptr, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
-			::RedrawWindow(hWnd, nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE | RDW_ERASE);
+				// Force menu window to repaint frame.
+				::SetWindowPos(hWnd, nullptr, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+				::RedrawWindow(hWnd, nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE | RDW_ERASE);
+			}
 		}
 	}
 
