@@ -229,13 +229,6 @@ HRESULT CBaseVideoFilter::ReconnectOutput(int width, int height, bool bForce/* =
 	}
 
 	if (dxvaExtFormat) {
-		if (renderClsid == CLSID_madVR) {
-			// madVR uses a different value for SMPTE ST 2084
-			if (dxvaExtFormat->VideoTransferFunction == 15) {
-				dxvaExtFormat->VideoTransferFunction = 16;
-			}
-		}
-
 		VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.Format();
 		if (vih2->dwControlFlags != dxvaExtFormat->value) {
 			bNeedReconnect = true;
