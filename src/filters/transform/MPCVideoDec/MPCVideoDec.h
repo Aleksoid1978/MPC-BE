@@ -202,8 +202,10 @@ protected:
 
 	AVPixelFormat	m_dxva_pix_fmt;
 
+	HRESULT						CheckDXVA2Decoder(AVCodecContext *c);
+
 	static int					av_get_buffer(struct AVCodecContext *c, AVFrame *pic, int flags);
-	static enum AVPixelFormat	av_get_format(struct AVCodecContext *s, const enum AVPixelFormat * pix_fmts);
+	static enum AVPixelFormat	av_get_format(struct AVCodecContext *c, const enum AVPixelFormat * pix_fmts);
 
 public:
 	CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr);
