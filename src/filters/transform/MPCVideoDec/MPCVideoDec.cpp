@@ -2805,14 +2805,14 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 		// Values from newer Windows SDK (MediaFoundation)
 		case AVCOL_SPC_BT2020_CL:
 		case AVCOL_SPC_BT2020_NCL:
-			fmt.VideoTransferMatrix = 4;
+			fmt.VideoTransferMatrix = VIDEOTRANSFERMATRIX_BT2020_10;
 			break;
 		// Custom values, not official standard, but understood by madVR, YCGCO understood by EVR-CP
 		case AVCOL_SPC_FCC:
-			fmt.VideoTransferMatrix = 6;
+			fmt.VideoTransferMatrix = VIDEOTRANSFERMATRIX_FCC;
 			break;
 		case AVCOL_SPC_YCGCO:
-			fmt.VideoTransferMatrix = 7;
+			fmt.VideoTransferMatrix = VIDEOTRANSFERMATRIX_YCgCo;
 			break;
 		case AVCOL_SPC_UNSPECIFIED:
 			if (ctx->width <= 1024 && ctx->height <= 576) { // SD
@@ -2847,10 +2847,10 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 			break;
 		// Values from newer Windows SDK (MediaFoundation)
 		case AVCOL_TRC_SMPTEST2084:
-			fmt.VideoTransferFunction = 15;
+			fmt.VideoTransferFunction = VIDEOTRANSFUNC_2084;
 			break;
 		case AVCOL_TRC_ARIB_STD_B67:
-			fmt.VideoTransferFunction = 18; // differs from MFVideoTransFunc_HLG - needed for EVR-CP
+			fmt.VideoTransferFunction = VIDEOTRANSFUNC_HLG_temp; // differs from MFVideoTransFunc_HLG - needed for EVR-CP
 			break;
 	}
 

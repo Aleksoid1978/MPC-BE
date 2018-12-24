@@ -46,3 +46,24 @@
 #define PCIV_nVidia      0x10DE
 #define PCIV_Intel       0x8086
 #define PCIV_S3_Graphics 0x5333
+
+#define VIDEOTRANSFERMATRIX_BT2020_10 4
+#define VIDEOTRANSFERMATRIX_BT2020_12 5
+#define VIDEOTRANSFERMATRIX_FCC       6 // non-standard
+#define VIDEOTRANSFERMATRIX_YCgCo     7 // non-standard
+
+#define VIDEOPRIMARIES_BT2020  9
+#define VIDEOPRIMARIES_XYZ    10
+#define VIDEOPRIMARIES_DCI_P3 11
+#define VIDEOPRIMARIES_ACES   12
+
+#define VIDEOTRANSFUNC_Log_100     9
+#define VIDEOTRANSFUNC_Log_316    10
+#define VIDEOTRANSFUNC_709_sym    11
+#define VIDEOTRANSFUNC_2020_const 12
+#define VIDEOTRANSFUNC_2020       13
+#define VIDEOTRANSFUNC_26         14
+#define VIDEOTRANSFUNC_2084       15
+#define VIDEOTRANSFUNC_HLG        16
+#define VIDEOTRANSFUNC_10_rel     17
+#define VIDEOTRANSFUNC_HLG_temp   18 // non-standard, will be removed in the future
