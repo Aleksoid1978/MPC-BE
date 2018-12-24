@@ -2997,30 +2997,6 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 		HRESULT hr = S_OK;
 
 		if (UseDXVA2()) {
-			if ((m_nCodecId == AV_CODEC_ID_HEVC || m_nCodecId == AV_CODEC_ID_VP9)
-					&& m_dxva_pix_fmt != m_pAVCtx->sw_pix_fmt) {
-				const int depth = GetLumaBits(m_pAVCtx->sw_pix_fmt);
-				const BOOL bHighBitdepth = (depth == 10) && ((m_nCodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10)
-															 || (m_nCodecId == AV_CODEC_ID_VP9 && m_pAVCtx->profile == FF_PROFILE_VP9_2));
-
-				if (bHighBitdepth != m_bHighBitdepth) {
-					m_bHighBitdepth = bHighBitdepth;
-					if (SUCCEEDED(FindDecoderConfiguration())) {
-						ChangeOutputMediaFormat(2);
-						RecommitAllocator();
-					} else {
-						SAFE_DELETE(m_pDXVADecoder);
-						m_nDecoderMode = MODE_SOFTWARE;
-						DXVAState::ClearState();
-
-						InitDecoder(&m_pCurrentMediaType);
-						ChangeOutputMediaFormat(2);
-						return S_OK;
-					}
-				}
-			}
-			m_dxva_pix_fmt = m_pAVCtx->sw_pix_fmt;
-
 			hr = m_pDXVADecoder->DeliverFrame();
 			Continue;
 		}
@@ -4002,12 +3978,60 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 	return infostr;
 }
 
+HRESULT CMPCVideoDecFilter::CheckDXVA2Decoder(AVCodecContext *c)
+{
+	CheckPointer(m_pAVCtx, E_POINTER);
+	CheckPointer(m_pDXVADecoder, E_POINTER);
+
+	HRESULT hr = S_OK;
+
+	if ((m_nSurfaceWidth != FFALIGN(c->coded_width, m_nAlign) || m_nSurfaceHeight != FFALIGN(c->coded_height, m_nAlign))
+			|| ((m_nCodecId == AV_CODEC_ID_HEVC || m_nCodecId == AV_CODEC_ID_VP9) && m_dxva_pix_fmt != m_pAVCtx->sw_pix_fmt)) {
+		const int depth = GetLumaBits(m_pAVCtx->sw_pix_fmt);
+		const BOOL bHighBitdepth = (depth == 10) && ((m_nCodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10)
+													  || (m_nCodecId == AV_CODEC_ID_VP9 && m_pAVCtx->profile == FF_PROFILE_VP9_2));
+
+		const auto bBitdepthChanged = (m_bHighBitdepth != bHighBitdepth);
+
+		m_nSurfaceWidth  = FFALIGN(c->coded_width, m_nAlign);
+		m_nSurfaceHeight = FFALIGN(c->coded_height, m_nAlign);
+		m_bHighBitdepth = bHighBitdepth;
+
+		avcodec_flush_buffers(c);
+		if (SUCCEEDED(hr = FindDecoderConfiguration())) {
+			if (bBitdepthChanged) {
+				ChangeOutputMediaFormat(2);
+			}
+			hr = RecommitAllocator();
+		}
+			
+		if (FAILED(hr)) {
+			SAFE_DELETE(m_pDXVADecoder);
+			m_nDecoderMode = MODE_SOFTWARE;
+			DXVAState::ClearState();
+
+			InitDecoder(&m_pCurrentMediaType);
+			ChangeOutputMediaFormat(2);
+
+			hr = E_FAIL;
+		}
+
+		m_dxva_pix_fmt = m_pAVCtx->sw_pix_fmt;
+	}
+
+	return hr;
+}
+
 int CMPCVideoDecFilter::av_get_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
 	CMPCVideoDecFilter* pFilter = static_cast<CMPCVideoDecFilter*>(c->opaque);
 	CheckPointer(pFilter->m_pDXVADecoder, -1);
 	if (!check_dxva_compatible(c->codec_id, c->sw_pix_fmt, c->profile)) {
 		pFilter->m_bDXVACompatible = false;
+		return -1;
+	}
+
+	if (FAILED(pFilter->CheckDXVA2Decoder(c))) {
 		return -1;
 	}
 
@@ -4025,17 +4049,8 @@ enum AVPixelFormat CMPCVideoDecFilter::av_get_format(struct AVCodecContext *c, c
 			break;
 
 		if (*p == AV_PIX_FMT_DXVA2_VLD) {
-			if (pFilter->m_pDXVADecoder &&
-					(pFilter->m_nSurfaceWidth != FFALIGN(c->coded_width, pFilter->m_nAlign)
-					|| pFilter->m_nSurfaceHeight != FFALIGN(c->coded_height, pFilter->m_nAlign))) {
-				avcodec_flush_buffers(c);
-
-				pFilter->m_nSurfaceWidth  = FFALIGN(c->coded_width, pFilter->m_nAlign);
-				pFilter->m_nSurfaceHeight = FFALIGN(c->coded_height, pFilter->m_nAlign);
-
-				if (SUCCEEDED(pFilter->FindDecoderConfiguration())) {
-					pFilter->RecommitAllocator();
-				}
+			if (FAILED(pFilter->CheckDXVA2Decoder(c))) {
+				continue;
 			}
 			break;
 		}
