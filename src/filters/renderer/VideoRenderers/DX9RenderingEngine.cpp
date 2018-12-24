@@ -2284,15 +2284,15 @@ HRESULT CDX9RenderingEngine::InitCorrectionPass(const AM_MEDIA_TYPE& input_mt)
 		m_pPSCorrection.Release();
 		bool ps30 = m_Caps.PixelShaderVersion >= D3DPS_VERSION(3, 0);
 
-		if (extformat.VideoTransferMatrix == 7) {
+		if (extformat.VideoTransferMatrix == VIDEOTRANSFERMATRIX_YCgCo) {
 			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_YCGCO : IDF_SHADER_PS20_CORRECTION_YCGCO);
 			m_wsCorrection = L"Fix YCgCo";
 		}
-		else if (extformat.VideoTransferFunction == 15) {
+		else if (extformat.VideoTransferFunction == VIDEOTRANSFUNC_2084) {
 			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_ST2084 : IDF_SHADER_PS20_CORRECTION_ST2084);
 			m_wsCorrection = L"HDR(BT.2020) to SDR";
 		}
-		else if (extformat.VideoTransferFunction == 16 || extformat.VideoTransferFunction == 18) {
+		else if (extformat.VideoTransferFunction == VIDEOTRANSFUNC_HLG || extformat.VideoTransferFunction == VIDEOTRANSFUNC_HLG_temp) {
 			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_HLG : IDF_SHADER_PS20_CORRECTION_HLG);
 			m_wsCorrection = L" HDR(HLG) to SDR";
 		}

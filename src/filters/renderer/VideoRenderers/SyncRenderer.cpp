@@ -1229,7 +1229,7 @@ STDMETHODIMP_(bool) CBaseAP::Paint(bool fAll)
 			unsigned src = m_iCurSurface;
 			unsigned dst = m_nSurfaces;
 
-			if (m_inputExtFormat.VideoTransferMatrix == 7) {
+			if (m_inputExtFormat.VideoTransferMatrix == VIDEOTRANSFERMATRIX_YCgCo) {
 				if (!m_pPSCorrectionYCgCo) {
 					if (m_Caps.PixelShaderVersion < D3DPS_VERSION(3, 0)) {
 						hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrectionYCgCo, IDF_SHADER_PS20_CORRECTION_YCGCO);
