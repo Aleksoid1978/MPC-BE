@@ -3981,42 +3981,41 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 HRESULT CMPCVideoDecFilter::CheckDXVA2Decoder(AVCodecContext *c)
 {
 	CheckPointer(m_pAVCtx, E_POINTER);
-	CheckPointer(m_pDXVADecoder, E_POINTER);
 
 	HRESULT hr = S_OK;
 
-	if ((m_nSurfaceWidth != FFALIGN(c->coded_width, m_nAlign) || m_nSurfaceHeight != FFALIGN(c->coded_height, m_nAlign))
+	if (m_pDXVADecoder) {
+		if ((m_nSurfaceWidth != FFALIGN(c->coded_width, m_nAlign) || m_nSurfaceHeight != FFALIGN(c->coded_height, m_nAlign))
 			|| ((m_nCodecId == AV_CODEC_ID_HEVC || m_nCodecId == AV_CODEC_ID_VP9) && m_dxva_pix_fmt != m_pAVCtx->sw_pix_fmt)) {
-		const int depth = GetLumaBits(m_pAVCtx->sw_pix_fmt);
-		const BOOL bHighBitdepth = (depth == 10) && ((m_nCodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10)
-													  || (m_nCodecId == AV_CODEC_ID_VP9 && m_pAVCtx->profile == FF_PROFILE_VP9_2));
+			const int depth = GetLumaBits(m_pAVCtx->sw_pix_fmt);
+			const BOOL bHighBitdepth = (depth == 10) && ((m_nCodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == FF_PROFILE_HEVC_MAIN_10)
+														  || (m_nCodecId == AV_CODEC_ID_VP9 && m_pAVCtx->profile == FF_PROFILE_VP9_2));
 
-		const auto bBitdepthChanged = (m_bHighBitdepth != bHighBitdepth);
+			const auto bBitdepthChanged = (m_bHighBitdepth != bHighBitdepth);
 
-		m_nSurfaceWidth  = FFALIGN(c->coded_width, m_nAlign);
-		m_nSurfaceHeight = FFALIGN(c->coded_height, m_nAlign);
-		m_bHighBitdepth = bHighBitdepth;
+			m_nSurfaceWidth = FFALIGN(c->coded_width, m_nAlign);
+			m_nSurfaceHeight = FFALIGN(c->coded_height, m_nAlign);
+			m_bHighBitdepth = bHighBitdepth;
 
-		avcodec_flush_buffers(c);
-		if (SUCCEEDED(hr = FindDecoderConfiguration())) {
-			if (bBitdepthChanged) {
+			avcodec_flush_buffers(c);
+			if (SUCCEEDED(hr = FindDecoderConfiguration())) {
+				if (bBitdepthChanged) {
+					ChangeOutputMediaFormat(2);
+				}
+				hr = RecommitAllocator();
+			}
+
+			if (FAILED(hr)) {
+				SAFE_DELETE(m_pDXVADecoder);
+				m_nDecoderMode = MODE_SOFTWARE;
+				DXVAState::ClearState();
+
+				InitDecoder(&m_pCurrentMediaType);
 				ChangeOutputMediaFormat(2);
 			}
-			hr = RecommitAllocator();
+
+			m_dxva_pix_fmt = m_pAVCtx->sw_pix_fmt;
 		}
-			
-		if (FAILED(hr)) {
-			SAFE_DELETE(m_pDXVADecoder);
-			m_nDecoderMode = MODE_SOFTWARE;
-			DXVAState::ClearState();
-
-			InitDecoder(&m_pCurrentMediaType);
-			ChangeOutputMediaFormat(2);
-
-			hr = E_FAIL;
-		}
-
-		m_dxva_pix_fmt = m_pAVCtx->sw_pix_fmt;
 	}
 
 	return hr;
