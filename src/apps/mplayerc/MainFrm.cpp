@@ -169,7 +169,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
 
 	ON_WM_SYSCOMMAND()
-	ON_WM_ACTIVATE()
+	ON_WM_NCACTIVATE()
 	ON_WM_ACTIVATEAPP()
 	ON_MESSAGE(WM_APPCOMMAND, OnAppCommand)
 	ON_WM_INPUT()
@@ -2102,15 +2102,12 @@ void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 	__super::OnSysCommand(nID, lParam);
 }
 
-void CMainFrame::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
+BOOL CMainFrame::OnNcActivate(BOOL bActive) 
 {
-	if (!bMinimized) {
-		DrawSmallBorder();
-	}
+	const auto bRet = __super::OnNcActivate(bActive);
+	DrawSmallBorder();
 
-	if (!(AfxGetAppSettings().bUseDarkTheme && AfxGetAppSettings().bDarkMenu)) {
-		__super::OnActivate(nState, pWndOther, bMinimized);
-	}
+	return bRet;
 }
 
 void CMainFrame::OnActivateApp(BOOL bActive, DWORD dwThreadID)
