@@ -22,7 +22,7 @@
 
 #include <vector>
 
-static const WCHAR* MPEG2_Profile[]=
+static const WCHAR* MPEG2_Profile[] =
 {
 	L"4:2:2",
 	L"High Profile",
@@ -34,7 +34,7 @@ static const WCHAR* MPEG2_Profile[]=
 	L"7",
 };
 
-static const WCHAR* MPEG2_Level[]=
+static const WCHAR* MPEG2_Level[] =
 {
 	L"0",
 	L"1",
@@ -74,13 +74,13 @@ static int GetHighestBitSet32(unsigned long _Value)
 	}
 }
 
-static CString FormatBitrate(double _Bitrate)
+static CString FormatBitrate(const DWORD _Bitrate)
 {
 	CString Temp;
 	if (_Bitrate > 20000000) { // More than 2 mbit
-		Temp.Format(L"%.2f mbit/s", double(_Bitrate)/1000000.0);
+		Temp.Format(L"%u mbit/s", _Bitrate / 1000000);
 	} else {
-		Temp.Format(L"%.1f kbit/s", double(_Bitrate)/1000.0);
+		Temp.Format(L"%u kbit/s", _Bitrate / 1000);
 	}
 
 	return Temp;
