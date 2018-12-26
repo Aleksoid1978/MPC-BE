@@ -2223,11 +2223,10 @@ void CDX9AllocatorPresenter::DrawStats()
 STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 {
 	CheckPointer(size, E_POINTER);
-
 	HRESULT hr;
 
 	D3DSURFACE_DESC desc = {};
-	if (FAILED(hr = m_pVideoSurfaces[m_iCurSurface]->GetDesc(&desc))) {
+	if (FAILED(hr = m_pVideoTextures[m_iCurSurface]->GetLevelDesc(0, &desc))) {
 		return hr;
 	};
 
@@ -2254,11 +2253,12 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 
 	CAutoLock lock(&m_RenderLock);
 
-	CComPtr<IDirect3DSurface9> pSurface;
+	CComPtr<IDirect3DSurface9> pRGB32Surface;
 	D3DLOCKED_RECT r;
-	if (FAILED(hr = m_pD3DDevEx->CreateRenderTarget(framesize.cx, framesize.cy, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pSurface, nullptr))
-			|| (FAILED(hr = m_pD3DDevEx->StretchRect(m_pVideoSurfaces[m_iCurSurface], nullptr, pSurface, nullptr, D3DTEXF_NONE)))
-			|| (FAILED(hr = pSurface->LockRect(&r, nullptr, D3DLOCK_READONLY)))) {
+	if (FAILED(hr = m_pD3DDevEx->CreateRenderTarget(desc.Width, desc.Height, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pRGB32Surface, nullptr))
+		|| FAILED(hr = m_pD3DDevEx->SetRenderTarget(0, pRGB32Surface))
+		|| FAILED(hr = TextureResize(m_pVideoTextures[m_iCurSurface], {0,0,(int)desc.Width,(int)desc.Height}, {0,0,framesize.cx,framesize.cy}, D3DTEXF_LINEAR))
+		|| FAILED(hr = pRGB32Surface->LockRect(&r, nullptr, D3DLOCK_READONLY))) {
 		return hr;
 	}
 
@@ -2278,7 +2278,7 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 
 	RetrieveBitmapData(framesize.cx, framesize.cy, 32, p ? (BYTE*)p : (BYTE*)(bih + 1), (BYTE*)r.pBits, r.Pitch);
 
-	pSurface->UnlockRect();
+	pRGB32Surface->UnlockRect();
 
 	if (p) {
 		int w = bih->biWidth;
