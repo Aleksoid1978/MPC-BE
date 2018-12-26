@@ -32,6 +32,7 @@
 #include <dxva.h>
 #include <dxva2api.h>
 #include <map>
+#include "MediaDescription.h"
 #include "std_helper.h"
 
 #include "GUIDString.h"
@@ -305,7 +306,7 @@ CString CMediaTypeEx::ToString(IPin* pPin)
 				rate += L"fps ";
 			}
 			if (vih->dwBitRate) {
-				rate.AppendFormat(L"%ukbps", vih->dwBitRate/1000);
+				rate += FormatBitrate(vih->dwBitRate);
 			}
 		} else if (formattype == FORMAT_VideoInfo2 || formattype == FORMAT_MPEG2_VIDEO || formattype == FORMAT_DiracVideoInfo) {
 			VIDEOINFOHEADER2* vih = (VIDEOINFOHEADER2*)pbFormat;
@@ -316,7 +317,7 @@ CString CMediaTypeEx::ToString(IPin* pPin)
 				rate += L"fps ";
 			}
 			if (vih->dwBitRate) {
-				rate.AppendFormat(L"%ukbps", vih->dwBitRate/1000);
+				rate += FormatBitrate(vih->dwBitRate);
 			}
 		}
 
@@ -351,15 +352,25 @@ CString CMediaTypeEx::ToString(IPin* pPin)
 					}
 				}
 				dim.Format(L"%uHz", wfe->nSamplesPerSec);
-				if (wfe->nChannels == 1) {
-					dim += L" mono";
-				} else if (wfe->nChannels == 2) {
-					dim += L" stereo";
-				} else {
-					dim.AppendFormat(L" %uch", wfe->nChannels);
+				if (wfe->nChannels) {
+					DWORD layout = 0;
+					if (IsWaveFormatExtensible(wfe)) {
+						const WAVEFORMATEXTENSIBLE* wfex = (WAVEFORMATEXTENSIBLE*)wfe;
+						layout = wfex->dwChannelMask;
+					}
+					else {
+						layout = GetDefChannelMask(wfe->nChannels);
+					}
+					BYTE lfe = 0;
+					WORD nChannels = wfe->nChannels;
+					if (layout & SPEAKER_LOW_FREQUENCY) {
+						nChannels--;
+						lfe = 1;
+					}
+					dim.AppendFormat(L" %u.%u chn", nChannels, lfe);
 				}
-				if (wfe->nAvgBytesPerSec) {
-					rate.Format(L"%ukbps", wfe->nAvgBytesPerSec*8/1000);
+				if (wfe->nAvgBytesPerSec && wfe->wFormatTag != WAVE_FORMAT_OPUS) {
+					rate += FormatBitrate(wfe->nAvgBytesPerSec * 8);
 				}
 			}
 		} else if (formattype == FORMAT_VorbisFormat) {
@@ -367,27 +378,33 @@ CString CMediaTypeEx::ToString(IPin* pPin)
 
 			codec = GetAudioCodecName(subtype, 0);
 			dim.Format(L"%uHz", vf->nSamplesPerSec);
-			if (vf->nChannels == 1) {
-				dim += L" mono";
-			} else if (vf->nChannels == 2) {
-				dim += L" stereo";
-			} else {
-				dim.AppendFormat(L" %uch", vf->nChannels);
+			if (vf->nChannels) {
+				const DWORD layout = GetDefChannelMask(vf->nChannels);
+				BYTE lfe = 0;
+				WORD nChannels = vf->nChannels;
+				if (layout & SPEAKER_LOW_FREQUENCY) {
+					nChannels--;
+					lfe = 1;
+				}
+				dim.AppendFormat(L" %u.%u chn", nChannels, lfe);
 			}
 			if (vf->nAvgBitsPerSec) {
-				rate.Format(L"%ukbps", vf->nAvgBitsPerSec/1000);
+				rate += FormatBitrate(vf->nAvgBitsPerSec * 8);
 			}
 		} else if (formattype == FORMAT_VorbisFormat2) {
 			VORBISFORMAT2* vf = (VORBISFORMAT2*)Format();
 
 			codec = GetAudioCodecName(subtype, 0);
 			dim.Format(L"%uHz", vf->SamplesPerSec);
-			if (vf->Channels == 1) {
-				dim += L" mono";
-			} else if (vf->Channels == 2) {
-				dim += L" stereo";
-			} else {
-				dim.AppendFormat(L" %uch", vf->Channels);
+			if (vf->Channels) {
+				const DWORD layout = GetDefChannelMask(vf->Channels);
+				BYTE lfe = 0;
+				WORD nChannels = vf->Channels;
+				if (layout & SPEAKER_LOW_FREQUENCY) {
+					nChannels--;
+					lfe = 1;
+				}
+				dim.AppendFormat(L" %u.%u chn", nChannels, lfe);
 			}
 		}
 	} else if (majortype == MEDIATYPE_Text) {

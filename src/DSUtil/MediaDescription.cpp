@@ -263,7 +263,7 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 			if (pInfo->wBitsPerSample) {
 				Infos.emplace_back(FormatString(L"%u bit", pInfo->wBitsPerSample));
 			}
-			if (pInfo->nAvgBytesPerSec) {
+			if (pInfo->nAvgBytesPerSec && pInfo->wFormatTag != WAVE_FORMAT_OPUS) {
 				Infos.emplace_back(FormatBitrate(pInfo->nAvgBytesPerSec * 8));
 			}
 		} else if (pmt->formattype == FORMAT_VorbisFormat) {
