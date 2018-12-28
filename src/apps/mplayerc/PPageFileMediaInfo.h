@@ -49,5 +49,6 @@ protected:
 	CRect m_rCrt;
 
 public:
-	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
+	afx_msg BOOL OnSetActive();
+	afx_msg BOOL OnKillActive();
 };

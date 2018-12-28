@@ -33,7 +33,7 @@ CMPCPropertySheet::CMPCPropertySheet(LPCTSTR pszCaption, CWnd* pParentWnd, UINT 
 // CPPageFileInfoSheet
 
 IMPLEMENT_DYNAMIC(CPPageFileInfoSheet, CMPCPropertySheet)
-CPPageFileInfoSheet::CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWnd* pParentWnd)
+CPPageFileInfoSheet::CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWnd* pParentWnd, const bool bOnlyMI/* = false*/)
 	: CMPCPropertySheet(ResStr(IDS_PROPSHEET_PROPERTIES), pParentWnd, 0)
 	, m_clip(fn, pMainFrame->m_pGB)
 	, m_details(fn, pMainFrame->m_pGB, pMainFrame->m_pCAP, pMainFrame->m_pDVDI)
@@ -45,17 +45,19 @@ CPPageFileInfoSheet::CPPageFileInfoSheet(CString fn, CMainFrame* pMainFrame, CWn
 	, m_nMinCX(0)
 	, m_nMinCY(0)
 {
-	AddPage(&m_details);
-	AddPage(&m_clip);
+	if (!bOnlyMI) {
+		AddPage(&m_details);
+		AddPage(&m_clip);
 
-	BeginEnumFilters(pMainFrame->m_pGB, pEF, pBF) {
-		if (CComQIPtr<IDSMResourceBag> pRB = pBF)
-			if (pRB && pRB->ResGetCount() > 0) {
-				AddPage(&m_res);
-				break;
-			}
+		BeginEnumFilters(pMainFrame->m_pGB, pEF, pBF) {
+			if (CComQIPtr<IDSMResourceBag> pRB = pBF)
+				if (pRB && pRB->ResGetCount() > 0) {
+					AddPage(&m_res);
+					break;
+				}
+		}
+		EndEnumFilters;
 	}
-	EndEnumFilters;
 
 	if (!::PathIsURLW(fn)) {
 		AddPage(&m_mi);
