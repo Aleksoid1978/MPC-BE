@@ -46,7 +46,7 @@ namespace CPUInfo {
 	const int GetFeatures();
 	const DWORD GetProcessorNumber();
 
-	const bool HaveSSE2();
+	const bool HaveSSSE3();
 	const bool HaveSSE4();
 	const bool HaveAVX2();
 } // namespace CPUInfo
