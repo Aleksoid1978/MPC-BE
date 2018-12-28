@@ -26,13 +26,11 @@
 #define CPUID_SSE      (1 << 25)
 #define CPUID_SSE2     (1 << 26)
 #define CPUID_SSE3     (1 <<  0)
+#define CPUID_SSSE3    (1 <<  9)
 #define CPUID_SSE41    (1 << 19)
 #define CPUID_SSE42    (1 << 20)
 #define CPUID_AVX     ((1 << 27) | (1 << 28))
 #define CPUID_AVX2    ((1 <<  5) | (1 <<  3) | (1 << 8))
-
-// Intel specifics
-#define CPUID_SSSE3    (1 <<  9)
 
 // AMD specifics
 #define CPUID_3DNOW    (1 << 31)
@@ -67,12 +65,12 @@ static int GetCPUFeatures()
 		if (nBuff[3] & CPUID_SSE)   nCPUFeatures |= CPUInfo::CPU_SSE;
 		if (nBuff[3] & CPUID_SSE2)  nCPUFeatures |= CPUInfo::CPU_SSE2;
 		if (nBuff[2] & CPUID_SSE3)  nCPUFeatures |= CPUInfo::CPU_SSE3;
+		if (nBuff[2] & CPUID_SSSE3) nCPUFeatures |= CPUInfo::CPU_SSSE3;
 		if (nBuff[2] & CPUID_SSE41) nCPUFeatures |= CPUInfo::CPU_SSE4;
 		if (nBuff[2] & CPUID_SSE42) nCPUFeatures |= CPUInfo::CPU_SSE42;
 
 		// Intel specific:
 		if (nCPUType == CPUInfo::PROCESSOR_INTEL) {
-			if (nBuff[2] & CPUID_SSSE3) nCPUFeatures |= CPUInfo::CPU_SSSE3;
 			if ((nBuff[2] & CPUID_AVX) == CPUID_AVX) {
 				// Check for OS support
 				const unsigned long long xcrFeatureMask = _xgetbv(_XCR_XFEATURE_ENABLED_MASK);
@@ -102,7 +100,7 @@ static int GetCPUFeatures()
 	return nCPUFeatures;
 }
 static const int  nCPUFeatures = GetCPUFeatures();
-static const bool bSSE2        = !!(nCPUFeatures & CPUInfo::CPU_SSE2);
+static const bool bSSSE3       = !!(nCPUFeatures & CPUInfo::CPU_SSSE3);
 static const bool bSSE4        = !!(nCPUFeatures & CPUInfo::CPU_SSE4);
 static const bool bAVX2        = !!(nCPUFeatures & CPUInfo::CPU_AVX2);
 
@@ -120,7 +118,7 @@ namespace CPUInfo {
 	const int GetFeatures()          { return nCPUFeatures; }
 	const DWORD GetProcessorNumber() { return dwNumberOfProcessors; }
 
-	const bool HaveSSE2()            { return bSSE2; }
+	const bool HaveSSSE3()           { return bSSSE3; }
 	const bool HaveSSE4()            { return bSSE4; }
 	const bool HaveAVX2()            { return bAVX2; }
 } // namespace CPUInfo
