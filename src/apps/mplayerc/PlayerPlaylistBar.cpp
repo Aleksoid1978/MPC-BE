@@ -2570,8 +2570,16 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	m_list.SubItemHitTest(&lvhti);
 
 	POSITION pos = FindPos(lvhti.iItem);
-	//bool fSelected = (pos == m_pl.GetPos());
-	bool fOnItem = !!(lvhti.flags&LVHT_ONITEM);
+	bool bMIEnable = false;
+	CString sCurrentPath;
+	if (pos) {
+		CPlaylistItem& pli = m_pl.GetAt(pos);
+		if (!pli.m_fns.empty()) {
+			sCurrentPath = pli.m_fns.cbegin()->GetName();
+			bMIEnable = !::PathIsURLW(sCurrentPath) && sCurrentPath != L"pipe://stdin";
+		}
+	}
+	const bool bOnItem = !!(lvhti.flags & LVHT_ONITEM);
 
 	CMenu m;
 	m.CreatePopupMenu();
@@ -2590,20 +2598,21 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		M_RANDOMIZE,
 		M_SORTBYID, // restore
 		M_SHUFFLE,
+		M_MEDIAINFO,
 		M_HIDEFULLSCREEN
 	};
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	m.AppendMenu(MF_STRING | (fOnItem ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_OPEN, ResStr(IDS_PLAYLIST_OPEN) + L"\tSpace");
+	m.AppendMenu(MF_STRING | (bOnItem ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_OPEN, ResStr(IDS_PLAYLIST_OPEN) + L"\tSpace");
 	m.AppendMenu(MF_STRING | MF_ENABLED, M_ADD, ResStr(IDS_PLAYLIST_ADD));
-	m.AppendMenu(MF_STRING | (/*fSelected||*/fOnItem ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_REMOVE, ResStr(IDS_PLAYLIST_REMOVE) + L"\tDelete");
+	m.AppendMenu(MF_STRING | (bOnItem ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_REMOVE, ResStr(IDS_PLAYLIST_REMOVE) + L"\tDelete");
 	m.AppendMenu(MF_SEPARATOR);
-	m.AppendMenu(MF_STRING | (fOnItem  ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_DELETE, ResStr(IDS_PLAYLIST_DELETE) + L"\tShift+Delete");
+	m.AppendMenu(MF_STRING | (bOnItem  ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_DELETE, ResStr(IDS_PLAYLIST_DELETE) + L"\tShift+Delete");
 	m.AppendMenu(MF_SEPARATOR);
 	m.AppendMenu(MF_STRING | (m_pl.GetCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_CLEAR, ResStr(IDS_PLAYLIST_CLEAR));
 	m.AppendMenu(MF_SEPARATOR);
-	m.AppendMenu(MF_STRING | (fOnItem ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_CLIPBOARD, ResStr(IDS_PLAYLIST_COPYTOCLIPBOARD));
+	m.AppendMenu(MF_STRING | (bOnItem ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_CLIPBOARD, ResStr(IDS_PLAYLIST_COPYTOCLIPBOARD));
 	m.AppendMenu(MF_STRING | (m_pl.GetCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_SAVEAS, ResStr(IDS_PLAYLIST_SAVEAS));
 	m.AppendMenu(MF_SEPARATOR);
 	CMenu submenu2;
@@ -2617,6 +2626,8 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	m.AppendMenu(MF_SEPARATOR);
 	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bShufflePlaylistItems ? MF_CHECKED : MF_UNCHECKED), M_SHUFFLE, ResStr(IDS_PLAYLIST_SHUFFLE));
 	m.AppendMenu(MF_SEPARATOR);
+	m.AppendMenu(MF_STRING | (bOnItem && bMIEnable ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_MEDIAINFO, L"MediaInfo");
+	m.AppendMenu(MF_SEPARATOR);
 	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bHidePlaylistFullScreen ? MF_CHECKED : MF_UNCHECKED), M_HIDEFULLSCREEN, ResStr(IDS_PLAYLIST_HIDEFS));
 
 	if (s.bUseDarkTheme && s.bDarkMenu) {
@@ -2628,7 +2639,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 
 		CMenuEx::ChangeStyle(&m);
 	}
-	int nID = (int)m.TrackPopupMenu(TPM_LEFTBUTTON|TPM_RETURNCMD, p.x, p.y, this);
+	int nID = (int)m.TrackPopupMenu(TPM_LEFTBUTTON | TPM_RETURNCMD, p.x, p.y, this);
 	switch (nID) {
 		case M_OPEN:
 			m_pl.SetPos(pos);
@@ -2889,6 +2900,15 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		break;
 		case M_SHUFFLE:
 			s.bShufflePlaylistItems = !s.bShufflePlaylistItems;
+			break;
+		case M_MEDIAINFO:
+			{
+				const auto nID = s.nLastFileInfoPage;
+				s.nLastFileInfoPage = IDD_FILEMEDIAINFO;
+				CPPageFileInfoSheet m_fileinfo(sCurrentPath, m_pMainFrame, m_pMainFrame, true);
+				m_fileinfo.DoModal();
+				s.nLastFileInfoPage = nID;
+			}
 			break;
 		case M_HIDEFULLSCREEN:
 			s.bHidePlaylistFullScreen = !s.bHidePlaylistFullScreen;

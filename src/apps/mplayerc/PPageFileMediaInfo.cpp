@@ -162,17 +162,24 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 	return TRUE;
 }
 
-void CPPageFileMediaInfo::OnShowWindow(BOOL bShow, UINT nStatus)
+BOOL CPPageFileMediaInfo::OnSetActive()
 {
-	__super::OnShowWindow(bShow, nStatus);
-
-	if (bShow) {
+	if (GetParent()->GetDlgItem(IDC_BUTTON_MI_SAVEAS)) {
 		GetParent()->GetDlgItem(IDC_BUTTON_MI_SAVEAS)->ShowWindow(SW_SHOW);
 		GetParent()->GetDlgItem(IDC_BUTTON_MI_CLIPBOARD)->ShowWindow(SW_SHOW);
-	} else {
+	}
+
+	return __super::OnSetActive();
+}
+
+BOOL CPPageFileMediaInfo::OnKillActive()
+{
+	if (GetParent()->GetDlgItem(IDC_BUTTON_MI_SAVEAS)) {
 		GetParent()->GetDlgItem(IDC_BUTTON_MI_SAVEAS)->ShowWindow(SW_HIDE);
 		GetParent()->GetDlgItem(IDC_BUTTON_MI_CLIPBOARD)->ShowWindow(SW_HIDE);
 	}
+
+	return __super::OnKillActive();
 }
 
 void CPPageFileMediaInfo::OnSize(UINT nType, int cx, int cy)
