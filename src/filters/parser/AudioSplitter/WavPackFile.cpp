@@ -41,6 +41,7 @@ enum WV_FLAGS {
 	WV_HBAL   = 0x0400,
 	WV_MCINIT = 0x0800,
 	WV_MCEND  = 0x1000,
+	WV_DSD    = 0x80000000,
 };
 
 static const int wv_rates[16] = {
@@ -118,6 +119,11 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 
 	if (!ff_wv_parse_header(&wvc->header, wvc->block_header)) {
 		DLog(L"wv_read_block_header : Invalid block header.");
+		return E_FAIL;
+	}
+
+	if (wvc->header.flags & WV_DSD) {
+		DLog(L"wv_read_block_header : Unsupported WV DSD");
 		return E_FAIL;
 	}
 
