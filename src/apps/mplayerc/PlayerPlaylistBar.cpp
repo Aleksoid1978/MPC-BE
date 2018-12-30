@@ -23,6 +23,8 @@
 #include <atlutil.h>
 #include <atlpath.h>
 #include <IntShCut.h>
+#include <algorithm>
+#include <random>
 #include "MainFrm.h"
 #include "../../DSUtil/SysVersion.h"
 #include "../../DSUtil/Filehandle.h"
@@ -660,28 +662,27 @@ void CPlaylist::SetPos(POSITION pos)
 
 POSITION CPlaylist::Shuffle()
 {
+	ASSERT(GetCount() > 2);
+
 	static INT_PTR idx = 0;
 	static INT_PTR count = 0;
 	static std::vector<POSITION> a;
+	const auto Count = m_pos ? GetCount() - 1 : GetCount();
 
-	ASSERT(GetCount() > 2);
-	// insert or remove items in playlist, or index out of bounds then recalculate
-	if ((count != GetCount()) || (idx >= GetCount())) {
+	if (count != Count || idx >= Count) {
+		// insert or remove items in playlist, or index out of bounds then recalculate
 		a.clear();
 		idx = 0;
-		a.reserve(count = GetCount());
+		a.reserve(count = Count);
 
-		POSITION pos = GetHeadPosition();
-		for (INT_PTR i = 0; pos; i++, GetNext(pos)) {
-			a.emplace_back(pos); // initialize position array
+		for (POSITION pos = GetHeadPosition(); pos; GetNext(pos)) {
+			if (pos != m_pos) {
+				a.emplace_back(pos);
+			}
 		}
 
-		//Use Fisher-Yates shuffle algorithm
-		srand((unsigned)time(nullptr));
-		for (INT_PTR i=0; i<(count-1); i++) {
-			INT_PTR r = i + (rand() % (count-i));
-			std::swap(a[i], a[r]);
-		}
+		const unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+		std::shuffle(a.begin(), a.end(), std::default_random_engine(seed));
 	}
 
 	return a[idx++];
@@ -1604,6 +1605,9 @@ void CPlayerPlaylistBar::Append(std::list<CString>& fns, bool fMulti, CSubtitleI
 
 	Refresh();
 	EnsureVisible(m_pl.FindIndex(m_nSelected_idx != INT_MAX ? m_nSelected_idx + 1 : idx));
+	if (!idx && AfxGetAppSettings().bShufflePlaylistItems && GetCount() > 2) {
+		SetNext();
+	}
 	SavePlaylist();
 
 	UpdateList();
