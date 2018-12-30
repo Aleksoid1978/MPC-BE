@@ -681,8 +681,7 @@ POSITION CPlaylist::Shuffle()
 			}
 		}
 
-		const unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-		std::shuffle(a.begin(), a.end(), std::default_random_engine(seed));
+		std::shuffle(a.begin(), a.end(), std::default_random_engine((unsigned)GetTickCount()));
 	}
 
 	return a[idx++];
