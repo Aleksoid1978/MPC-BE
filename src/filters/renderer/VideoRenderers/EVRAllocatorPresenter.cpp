@@ -939,13 +939,10 @@ HRESULT CEVRAllocatorPresenter::RenegotiateMediaType()
 				SetMediaType(nullptr);
 			} else {
 				m_bStreamChanged = FALSE;
+				m_bChangeMT = true;
 				break;
 			}
 		}
-	}
-
-	if (m_nRenderState == Started || m_nRenderState == Paused) {
-		m_bChangeMT = true;
 	}
 
 	return hr;
