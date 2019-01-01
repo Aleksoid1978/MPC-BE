@@ -286,7 +286,7 @@ BEGIN BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 51
 26		"Größe bezogen auf Bildschirmbreite:"
 29		"Kapitelmarken in der Suchleiste anzeigen"
 30		"Flybar aktivieren"
-31		"Playlist font size:"
+31		"Playlist-Schriftgröße:"
 34		"OSD"
 35		"Schrift:"
 38		"F"
