@@ -216,7 +216,7 @@ CDTSAC3Stream::CDTSAC3Stream(const WCHAR* wfn, CSource* pParent, HRESULT* phr)
 
 		{ // search first audio frame
 			bool deepsearch = false;
-			if (ext == L".dts" || ext == L".dtshd" || ext == L".ac3" || ext == L".eac3" || ext == L".thd") { //check only specific extensions
+			if (ext == L".dts" || ext == L".dtshd" || ext == L".dtsma" || ext == L".ac3" || ext == L".eac3" || ext == L".thd") { //check only specific extensions
 				deepsearch = true; // deep search for specific extensions only
 			}
 

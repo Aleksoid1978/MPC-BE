@@ -197,7 +197,7 @@ void CMediaFormats::UpdateData(const bool& bSave)
 		ADDFMT((L"other",       ResStr(IDS_MFMT_OTHER),       L"amv wtv dvr-ms mxf ivf nut dav"));
 		ADDFMT((L"rawvideo",    ResStr(IDS_MFMT_RAW_VIDEO),   L"y4m h264 264 vc1 h265 265 hm10 hevc"));
 		// audio files
-		ADDFMT((L"ac3dts",      ResStr(IDS_MFMT_AC3),         L"ac3 dts dtshd", TAudio));
+		ADDFMT((L"ac3dts",      ResStr(IDS_MFMT_AC3),         L"ac3 dts dtshd dtsma", TAudio));
 		ADDFMT((L"aiff",        ResStr(IDS_MFMT_AIFF),        L"aif aifc aiff", TAudio));
 		ADDFMT((L"alac",        ResStr(IDS_MFMT_ALAC),        L"alac", TAudio));
 		ADDFMT((L"amr",         ResStr(IDS_MFMT_AMR),         L"amr awb", TAudio));
