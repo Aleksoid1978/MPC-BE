@@ -29,6 +29,7 @@ enum {
 };
 
 enum SOURCE_FILTER {
+	SRC_AC3,
 	SRC_AMR,
 	SRC_AVI,
 	SRC_APE,
@@ -37,7 +38,7 @@ enum SOURCE_FILTER {
 	SRC_CDXA,
 	SRC_DSD,
 	SRC_DSM,
-	SRC_DTSAC3,
+	SRC_DTS,
 	SRC_VTS,
 	SRC_FLIC,
 	SRC_FLAC,

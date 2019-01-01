@@ -28,6 +28,7 @@
 static filter_t s_filters[] = {
 
 	// Source filters
+	{L"AC3",						SOURCE_FILTER, SRC_AC3,				0},
 	{L"AMR",						SOURCE_FILTER, SRC_AMR,				0},
 	{L"AVI",						SOURCE_FILTER, SRC_AVI,				IDS_SRC_AVI},
 	{L"APE",						SOURCE_FILTER, SRC_APE,				0},
@@ -36,7 +37,7 @@ static filter_t s_filters[] = {
 	{L"CDXA (VCD/SVCD/XCD)",		SOURCE_FILTER, SRC_CDXA,			0},
 	{L"DirectShow Media",			SOURCE_FILTER, SRC_DSM,				0},
 	{L"DSD (DSF/DFF)",				SOURCE_FILTER, SRC_DSD,				0},
-	{L"DTS/AC3",					SOURCE_FILTER, SRC_DTSAC3,			0},
+	{L"DTS/DTS-HD",					SOURCE_FILTER, SRC_DTS,				0},
 	{L"DVD Video Title Set",		SOURCE_FILTER, SRC_VTS,				IDS_SRC_VTS},
 	{L"FLAC",						SOURCE_FILTER, SRC_FLAC,			0},
 	{L"FLIC animation",				SOURCE_FILTER, SRC_FLIC,			0},

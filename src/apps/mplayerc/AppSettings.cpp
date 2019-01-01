@@ -79,6 +79,7 @@ CAppSettings::CAppSettings()
 	ResetSettings();
 
 	// Internal source filters
+	SrcFiltersKeys[SRC_AC3]					= L"src_ac3";
 	SrcFiltersKeys[SRC_AMR]					= L"src_amr";
 	SrcFiltersKeys[SRC_AVI]					= L"src_avi";
 	SrcFiltersKeys[SRC_APE]					= L"src_ape";
@@ -87,7 +88,7 @@ CAppSettings::CAppSettings()
 	SrcFiltersKeys[SRC_CDXA]				= L"src_cdxa";
 	SrcFiltersKeys[SRC_DSD]					= L"src_dsd";
 	SrcFiltersKeys[SRC_DSM]					= L"src_dsm";
-	SrcFiltersKeys[SRC_DTSAC3]				= L"src_dtsac3";
+	SrcFiltersKeys[SRC_DTS]					= L"src_dts";
 	SrcFiltersKeys[SRC_VTS]					= L"src_vts";
 	SrcFiltersKeys[SRC_FLIC]				= L"src_flic";
 	SrcFiltersKeys[SRC_FLAC]				= L"src_flac";

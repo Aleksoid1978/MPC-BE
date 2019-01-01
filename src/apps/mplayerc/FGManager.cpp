@@ -1982,19 +1982,24 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_source.push_back(pFGF);
 	}
 
-	if (src[SRC_DTSAC3] && !IsPreview) {
+	if (src[SRC_AC3] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CDTSAC3Source>(DTSAC3SourceName);
-		pFGF->m_chkbytes.emplace_back(L"0,4,,7FFE8001");               // DTS
-		pFGF->m_chkbytes.emplace_back(L"0,4,,fE7f0180");               // DTS LE
-		pFGF->m_chkbytes.emplace_back(L"0,4,,64582025");               // DTS Substream
 		pFGF->m_chkbytes.emplace_back(L"0,2,,0B77");                   // AC3, E-AC3
 		pFGF->m_chkbytes.emplace_back(L"4,4,,F8726FBB");               // MLP
 		pFGF->m_chkbytes.emplace_back(L"4,4,,F8726FBA");               // TrueHD
 		pFGF->m_extensions.emplace_back(L".ac3");
-		pFGF->m_extensions.emplace_back(L".dts");
-		pFGF->m_extensions.emplace_back(L".dtshd");
 		pFGF->m_extensions.emplace_back(L".eac3");
 		pFGF->m_extensions.emplace_back(L".thd");
+		m_source.push_back(pFGF);
+	}
+
+	if (src[SRC_DTS] && !IsPreview) {
+		pFGF = DNew CFGFilterInternal<CDTSAC3Source>(DTSAC3SourceName);
+		pFGF->m_chkbytes.emplace_back(L"0,4,,7FFE8001");               // DTS
+		pFGF->m_chkbytes.emplace_back(L"0,4,,fE7f0180");               // DTS LE
+		pFGF->m_chkbytes.emplace_back(L"0,4,,64582025");               // DTS Substream
+		pFGF->m_extensions.emplace_back(L".dts");
+		pFGF->m_extensions.emplace_back(L".dtshd");
 		m_source.push_back(pFGF);
 	}
 
@@ -2045,7 +2050,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 		m_source.push_back(pFGF);
 	}
 
-	if (src[SRC_DTSAC3] && !IsPreview) {
+	if (src[SRC_DTS] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
 		pFGF->m_chkbytes.emplace_back(L"0,8,,4454534844484452");       // DTSHDHDR
 		m_source.push_back(pFGF);
