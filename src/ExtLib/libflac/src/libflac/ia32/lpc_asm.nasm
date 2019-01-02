@@ -637,7 +637,7 @@ cident FLAC__lpc_compute_autocorrelation_asm_ia32_sse_lag_16_old
 	sub	esp, 32
 
 	;ASSERT(lag > 0)
-	;ASSERT(lag <= 12)
+	;ASSERT(lag <= 16)
 	;ASSERT(lag <= data_len)
 	;ASSERT(data_len > 0)
 
@@ -654,7 +654,7 @@ cident FLAC__lpc_compute_autocorrelation_asm_ia32_sse_lag_16_old
 	movss	xmm0, [eax]			; xmm0 = 0,0,0,data[0]
 	add	eax, 4
 	movaps	xmm1, xmm0			; xmm1 = 0,0,0,data[0]
-	shufps	xmm0, xmm0, 0		; xmm0 == data[sample],data[sample],data[sample],data[sample] = data[0],data[0],data[0],data[0]
+	shufps	xmm0, xmm0, 0			; xmm0 == data[sample],data[sample],data[sample],data[sample] = data[0],data[0],data[0],data[0]
 	xorps	xmm2, xmm2			; xmm2 = 0,0,0,0
 	xorps	xmm3, xmm3			; xmm3 = 0,0,0,0
 	xorps	xmm4, xmm4			; xmm4 = 0,0,0,0
@@ -666,7 +666,7 @@ cident FLAC__lpc_compute_autocorrelation_asm_ia32_sse_lag_16_old
 	ALIGN 16
 .loop_start:
 	; start by reading the next sample
-	movss	xmm0, [eax]				; xmm0 = 0,0,0,data[sample]
+	movss	xmm0, [eax]			; xmm0 = 0,0,0,data[sample]
 	add	eax, 4
 	shufps	xmm0, xmm0, 0			; xmm0 = data[sample],data[sample],data[sample],data[sample]
 
@@ -699,7 +699,7 @@ cident FLAC__lpc_compute_autocorrelation_asm_ia32_sse_lag_16_old
 	jnz	.loop_start
 .loop_end:
 	; store autoc
-	mov	edx, [ebp + 20]				; edx == autoc
+	mov	edx, [ebp + 20]			; edx == autoc
 	movups	[edx], xmm5
 	movups	[edx + 16], xmm6
 	movaps	xmm5, [esp]
@@ -1520,7 +1520,7 @@ cident FLAC__lpc_compute_residual_from_qlp_coefficients_wide_asm_ia32
 
 	mov	ebx, [esp + 24]			; ebx = data_len
 	test	ebx, ebx
-	jz	near .end				; do nothing if data_len == 0
+	jz	near .end			; do nothing if data_len == 0
 
 .begin:
 	mov	eax, [esp + 32]			; eax = order
@@ -1530,13 +1530,13 @@ cident FLAC__lpc_compute_residual_from_qlp_coefficients_wide_asm_ia32
 	mov	esi, [esp + 40]			; esi = residual[]
 	mov	edi, [esp + 20]			; edi = data[]
 	mov	ecx, [esp + 28]			; ecx = qlp_coeff[]
-	mov	ebp, [ecx]				; ebp = qlp_coeff[0]
+	mov	ebp, [ecx]			; ebp = qlp_coeff[0]
 	mov	eax, [edi - 4]			; eax = data[-1]
 	mov	ecx, [esp + 36]			; cl = lp_quantization
 	ALIGN	16
 .i_1_loop_i:
-	imul	ebp					; edx:eax = qlp_coeff[0] * (FLAC__int64)data[i-1]
-	shrd	eax, edx, cl		; 0 <= lp_quantization <= 15
+	imul	ebp				; edx:eax = qlp_coeff[0] * (FLAC__int64)data[i-1]
+	shrd	eax, edx, cl			; 0 <= lp_quantization <= 15
 	neg	eax
 	add	eax, [edi]
 	mov	[esi], eax
@@ -1577,15 +1577,15 @@ cident FLAC__lpc_compute_residual_from_qlp_coefficients_wide_asm_ia32
 ;edi = data[]
 ;ebp = @address
 
-	mov	eax, [ebx + 124]			; eax =  qlp_coeff[31]
+	mov	eax, [ebx + 124]		; eax =  qlp_coeff[31]
 	imul	dword [edi - 128]		; edx:eax =  qlp_coeff[31] * data[i-32]
 	add	ecx, eax
-	adc	esi, edx					; sum += qlp_coeff[31] * data[i-32]
+	adc	esi, edx			; sum += qlp_coeff[31] * data[i-32]
 
-	mov	eax, [ebx + 120]			; eax =  qlp_coeff[30]
+	mov	eax, [ebx + 120]		; eax =  qlp_coeff[30]
 	imul	dword [edi - 124]		; edx:eax =  qlp_coeff[30] * data[i-31]
 	add	ecx, eax
-	adc	esi, edx					; sum += qlp_coeff[30] * data[i-31]
+	adc	esi, edx			; sum += qlp_coeff[30] * data[i-31]
 
 	mov	eax, [ebx + 116]
 	imul	dword [edi - 120]
@@ -1732,23 +1732,23 @@ cident FLAC__lpc_compute_residual_from_qlp_coefficients_wide_asm_ia32
 	add	ecx, eax
 	adc	esi, edx
 
-	mov	eax, [ebx]					; eax =  qlp_coeff[ 0] (NOTE: one byte missing from instruction)
+	mov	eax, [ebx]			; eax =  qlp_coeff[ 0] (NOTE: one byte missing from instruction)
 	imul	dword [edi - 4]			; edx:eax =  qlp_coeff[ 0] * data[i- 1]
 	add	ecx, eax
-	adc	esi, edx					; sum += qlp_coeff[ 0] * data[i- 1]
+	adc	esi, edx			; sum += qlp_coeff[ 0] * data[i- 1]
 
 .jumper_0:
 	mov	edx, ecx
 ;esi:edx = sum
 	mov	ecx, [esp + 36]			; cl = lp_quantization
-	shrd	edx, esi, cl		; edx = (sum >> lp_quantization)
+	shrd	edx, esi, cl			; edx = (sum >> lp_quantization)
 ;eax = --
 ;ecx = --
 ;edx = sum >> lp_q
 ;esi = --
-	neg	edx						; edx = -(sum >> lp_quantization)
+	neg	edx				; edx = -(sum >> lp_quantization)
 	mov	eax, [esp + 40]			; residual[] - data[]
-	add	edx, [edi]				; edx = data[i] - (sum >> lp_quantization)
+	add	edx, [edi]			; edx = data[i] - (sum >> lp_quantization)
 	mov	[edi + eax], edx
 	add	edi, 4
 
@@ -1801,7 +1801,7 @@ cident FLAC__lpc_restore_signal_wide_asm_ia32
 
 	mov	ebx, [esp + 24]			; ebx = data_len
 	test	ebx, ebx
-	jz	near .end				; do nothing if data_len == 0
+	jz	near .end			; do nothing if data_len == 0
 
 .begin:
 	mov	eax, [esp + 32]			; eax = order
@@ -1811,13 +1811,13 @@ cident FLAC__lpc_restore_signal_wide_asm_ia32
 	mov	esi, [esp + 20]			; esi = residual[]
 	mov	edi, [esp + 40]			; edi = data[]
 	mov	ecx, [esp + 28]			; ecx = qlp_coeff[]
-	mov	ebp, [ecx]				; ebp = qlp_coeff[0]
+	mov	ebp, [ecx]			; ebp = qlp_coeff[0]
 	mov	eax, [edi - 4]			; eax = data[-1]
 	mov	ecx, [esp + 36]			; cl = lp_quantization
 	ALIGN	16
 .x87_1_loop_i:
-	imul	ebp					; edx:eax = qlp_coeff[0] * (FLAC__int64)data[i-1]
-	shrd	eax, edx, cl		; 0 <= lp_quantization <= 15
+	imul	ebp				; edx:eax = qlp_coeff[0] * (FLAC__int64)data[i-1]
+	shrd	eax, edx, cl			; 0 <= lp_quantization <= 15
 ;
 	add	eax, [esi]
 	mov	[edi], eax
@@ -1858,15 +1858,15 @@ cident FLAC__lpc_restore_signal_wide_asm_ia32
 ;edi = data[]
 ;ebp = @address
 
-	mov	eax, [ebx + 124]			; eax =  qlp_coeff[31]
+	mov	eax, [ebx + 124]		; eax =  qlp_coeff[31]
 	imul	dword [edi - 128]		; edx:eax =  qlp_coeff[31] * data[i-32]
 	add	ecx, eax
-	adc	esi, edx					; sum += qlp_coeff[31] * data[i-32]
+	adc	esi, edx			; sum += qlp_coeff[31] * data[i-32]
 
-	mov	eax, [ebx + 120]			; eax =  qlp_coeff[30]
+	mov	eax, [ebx + 120]		; eax =  qlp_coeff[30]
 	imul	dword [edi - 124]		; edx:eax =  qlp_coeff[30] * data[i-31]
 	add	ecx, eax
-	adc	esi, edx					; sum += qlp_coeff[30] * data[i-31]
+	adc	esi, edx			; sum += qlp_coeff[30] * data[i-31]
 
 	mov	eax, [ebx + 116]
 	imul	dword [edi - 120]
@@ -2013,16 +2013,16 @@ cident FLAC__lpc_restore_signal_wide_asm_ia32
 	add	ecx, eax
 	adc	esi, edx
 
-	mov	eax, [ebx]					; eax =  qlp_coeff[ 0] (NOTE: one byte missing from instruction)
+	mov	eax, [ebx]			; eax =  qlp_coeff[ 0] (NOTE: one byte missing from instruction)
 	imul	dword [edi - 4]			; edx:eax =  qlp_coeff[ 0] * data[i- 1]
 	add	ecx, eax
-	adc	esi, edx					; sum += qlp_coeff[ 0] * data[i- 1]
+	adc	esi, edx			; sum += qlp_coeff[ 0] * data[i- 1]
 
 .jumper_0:
 	mov	edx, ecx
 ;esi:edx = sum
 	mov	ecx, [esp + 36]			; cl = lp_quantization
-	shrd	edx, esi, cl		; edx = (sum >> lp_quantization)
+	shrd	edx, esi, cl			; edx = (sum >> lp_quantization)
 ;eax = --
 ;ecx = --
 ;edx = sum >> lp_q
@@ -2030,7 +2030,7 @@ cident FLAC__lpc_restore_signal_wide_asm_ia32
 ;
 	mov	eax, [esp + 20]			; residual[] - data[]
 	add	edx, [edi + eax]		; edx = residual[i] + (sum >> lp_quantization)
-	mov	[edi], edx				; data[i] = residual[i] + (sum >> lp_quantization)
+	mov	[edi], edx			; data[i] = residual[i] + (sum >> lp_quantization)
 	add	edi, 4
 
 	dec	dword [esp + 24]

@@ -50,6 +50,9 @@ int printf_utf8(const char *format, ...);
 int fprintf_utf8(FILE *stream, const char *format, ...);
 int vfprintf_utf8(FILE *stream, const char *format, va_list argptr);
 
+#include <windows.h>
+HANDLE WINAPI CreateFile_utf8(const char *lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

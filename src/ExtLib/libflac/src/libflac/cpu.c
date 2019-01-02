@@ -53,6 +53,9 @@
 #define dfprintf(file, format, ...)
 #endif
 
+#if defined FLAC__CPU_PPC
+#include <sys/auxv.h>
+#endif
 
 #if (defined FLAC__CPU_IA32 || defined FLAC__CPU_X86_64) && (defined FLAC__HAS_NASM || FLAC__HAS_X86INTRIN) && !defined FLAC__NO_ASM
 
@@ -230,6 +233,29 @@ x86_cpu_info (FLAC__CPUInfo *info)
 #endif
 }
 
+static void
+ppc_cpu_info (FLAC__CPUInfo *info)
+{
+#if defined FLAC__CPU_PPC
+#ifndef PPC_FEATURE2_ARCH_3_00
+#define PPC_FEATURE2_ARCH_3_00		0x00800000
+#endif
+
+#ifndef PPC_FEATURE2_ARCH_2_07
+#define PPC_FEATURE2_ARCH_2_07		0x80000000
+#endif
+
+	if (getauxval(AT_HWCAP2) & PPC_FEATURE2_ARCH_3_00) {
+		info->ppc.arch_3_00 = true;
+	} else if (getauxval(AT_HWCAP2) & PPC_FEATURE2_ARCH_2_07) {
+		info->ppc.arch_2_07 = true;
+	}
+#else
+	info->ppc.arch_2_07 = false;
+	info->ppc.arch_3_00 = false;
+#endif
+}
+
 void FLAC__cpu_info (FLAC__CPUInfo *info)
 {
 	memset(info, 0, sizeof(*info));
@@ -238,6 +264,8 @@ void FLAC__cpu_info (FLAC__CPUInfo *info)
 	info->type = FLAC__CPUINFO_TYPE_IA32;
 #elif defined FLAC__CPU_X86_64
 	info->type = FLAC__CPUINFO_TYPE_X86_64;
+#elif defined FLAC__CPU_PPC
+	info->type = FLAC__CPUINFO_TYPE_PPC;
 #else
 	info->type = FLAC__CPUINFO_TYPE_UNKNOWN;
 #endif
@@ -246,6 +274,9 @@ void FLAC__cpu_info (FLAC__CPUInfo *info)
 	case FLAC__CPUINFO_TYPE_IA32: /* fallthrough */
 	case FLAC__CPUINFO_TYPE_X86_64:
 		x86_cpu_info (info);
+		break;
+	case FLAC__CPUINFO_TYPE_PPC:
+		ppc_cpu_info (info);
 		break;
 	default:
 		info->use_asm = false;

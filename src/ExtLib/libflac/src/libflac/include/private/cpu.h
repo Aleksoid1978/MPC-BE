@@ -76,21 +76,6 @@
     #define FLAC__AVX2_SUPPORTED 1
     #define FLAC__FMA_SUPPORTED 1
   #endif
-#elif defined _MSC_VER
-  #define FLAC__SSE_TARGET(x)
-  #define FLAC__SSE_SUPPORTED 1
-  #define FLAC__SSE2_SUPPORTED 1
-  #if (_MSC_VER >= 1500) /* MS Visual Studio 2008 */
-    #define FLAC__SSSE3_SUPPORTED 1
-    #define FLAC__SSE4_1_SUPPORTED 1
-  #endif
-  #if (_MSC_FULL_VER >= 160040219) /* MS Visual Studio 2010 SP1 */
-    #define FLAC__AVX_SUPPORTED 1
-  #endif
-  #if (_MSC_VER >= 1700) /* MS Visual Studio 2012 */
-    #define FLAC__AVX2_SUPPORTED 1
-    #define FLAC__FMA_SUPPORTED 1
-  #endif
 #elif defined __clang__ && __has_attribute(__target__) /* clang */
   #define FLAC__SSE_TARGET(x) __attribute__ ((__target__ (x)))
   #if __has_builtin(__builtin_ia32_maxps)
@@ -116,6 +101,21 @@
   #define FLAC__SSE4_1_SUPPORTED 1
   #ifdef FLAC__USE_AVX
     #define FLAC__AVX_SUPPORTED 1
+    #define FLAC__AVX2_SUPPORTED 1
+    #define FLAC__FMA_SUPPORTED 1
+  #endif
+#elif defined _MSC_VER
+  #define FLAC__SSE_TARGET(x)
+  #define FLAC__SSE_SUPPORTED 1
+  #define FLAC__SSE2_SUPPORTED 1
+  #if (_MSC_VER >= 1500) /* MS Visual Studio 2008 */
+    #define FLAC__SSSE3_SUPPORTED 1
+    #define FLAC__SSE4_1_SUPPORTED 1
+  #endif
+  #if (_MSC_FULL_VER >= 160040219) /* MS Visual Studio 2010 SP1 */
+    #define FLAC__AVX_SUPPORTED 1
+  #endif
+  #if (_MSC_VER >= 1700) /* MS Visual Studio 2012 */
     #define FLAC__AVX2_SUPPORTED 1
     #define FLAC__FMA_SUPPORTED 1
   #endif
@@ -153,6 +153,7 @@
 typedef enum {
 	FLAC__CPUINFO_TYPE_IA32,
 	FLAC__CPUINFO_TYPE_X86_64,
+	FLAC__CPUINFO_TYPE_PPC,
 	FLAC__CPUINFO_TYPE_UNKNOWN
 } FLAC__CPUInfo_Type;
 
@@ -173,11 +174,16 @@ typedef struct {
 	FLAC__bool fma;
 } FLAC__CPUInfo_x86;
 
+typedef struct {
+	FLAC__bool arch_3_00;
+	FLAC__bool arch_2_07;
+} FLAC__CPUInfo_ppc;
 
 typedef struct {
 	FLAC__bool use_asm;
 	FLAC__CPUInfo_Type type;
 	FLAC__CPUInfo_x86 x86;
+	FLAC__CPUInfo_ppc ppc;
 } FLAC__CPUInfo;
 
 void FLAC__cpu_info(FLAC__CPUInfo *info);

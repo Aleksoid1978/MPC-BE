@@ -34,7 +34,7 @@
 #endif
 
 #include <io.h>
-#include "share/compat.h"
+#include <windows.h>
 #include "share/windows_unicode_filenames.h"
 
 /* convert UTF-8 back to WCHAR. Caller is responsible for freeing memory */
@@ -182,32 +182,4 @@ int flac_internal_rename_utf8(const char *oldname, const char *newname)
 
 		return ret;
 	}
-}
-
-HANDLE WINAPI flac_internal_CreateFile_utf8(const char *lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition, DWORD dwFlagsAndAttributes, HANDLE hTemplateFile)
-{
-#if 0 && _MSC_VER > 1900 && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP) // MPC-BE patch. Disable the use of CreateFile2 in Windows 7.
-	wchar_t *wname;
-	HANDLE handle = INVALID_HANDLE_VALUE;
-
-	if ((wname = wchar_from_utf8(lpFileName)) != NULL) {
-
-		handle = CreateFile2(wname, dwDesiredAccess, dwShareMode, CREATE_ALWAYS, NULL);
-		free(wname);
-	}
-#else
-	if (!utf8_filenames) {
-		return CreateFileA(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
-	} else {
-		wchar_t *wname;
-		HANDLE handle = INVALID_HANDLE_VALUE;
-
-		if ((wname = wchar_from_utf8(lpFileName)) != NULL) {
-			handle = CreateFileW(wname, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
-			free(wname);
-		}
-
-		return handle;
-	}
-#endif
 }
