@@ -214,6 +214,8 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
     case AV_PIX_FMT_YUVA422P9BE:
     case AV_PIX_FMT_YUVA422P10LE:
     case AV_PIX_FMT_YUVA422P10BE:
+    case AV_PIX_FMT_YUVA422P12LE:
+    case AV_PIX_FMT_YUVA422P12BE:
     case AV_PIX_FMT_YUVA422P16LE:
     case AV_PIX_FMT_YUVA422P16BE:
     case AV_PIX_FMT_YUV440P10LE:
@@ -234,6 +236,8 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
     case AV_PIX_FMT_YUVA444P9BE:
     case AV_PIX_FMT_YUVA444P10LE:
     case AV_PIX_FMT_YUVA444P10BE:
+    case AV_PIX_FMT_YUVA444P12LE:
+    case AV_PIX_FMT_YUVA444P12BE:
     case AV_PIX_FMT_YUVA444P16LE:
     case AV_PIX_FMT_YUVA444P16BE:
     case AV_PIX_FMT_GBRP9LE:
@@ -1595,8 +1599,6 @@ static int get_audio_frame_duration(enum AVCodecID id, int sr, int ch, int ba,
             return 256 * (frame_bytes / 64);
         if (id == AV_CODEC_ID_RA_144)
             return 160 * (frame_bytes / 20);
-        if (id == AV_CODEC_ID_G723_1)
-            return 240 * (frame_bytes / 24);
 
         if (bps > 0) {
             /* calc from frame_bytes and bits_per_coded_sample */
@@ -2204,4 +2206,23 @@ int64_t ff_guess_coded_bitrate(AVCodecContext *avctx)
               framerate.num / framerate.den;
 
     return bitrate;
+}
+
+int ff_int_from_list_or_default(void *ctx, const char * val_name, int val,
+                                const int * array_valid_values, int default_value)
+{
+    int i = 0, ref_val;
+
+    while (1) {
+        ref_val = array_valid_values[i];
+        if (ref_val == INT_MAX)
+            break;
+        if (val == ref_val)
+            return val;
+        i++;
+    }
+    /* val is not a valid value */
+    av_log(ctx, AV_LOG_DEBUG,
+           "%s %d are not supported. Set to default value : %d\n", val_name, val, default_value);
+    return default_value;
 }

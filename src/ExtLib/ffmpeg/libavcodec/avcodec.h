@@ -452,6 +452,7 @@ enum AVCodecID {
     AV_CODEC_ID_MWSC,
     AV_CODEC_ID_WCMV,
     AV_CODEC_ID_RASC,
+    AV_CODEC_ID_HYMT,
 
     /* various PCM "codecs" */
     AV_CODEC_ID_FIRST_AUDIO = 0x10000,     ///< A dummy id pointing at the start of audio codecs
@@ -1328,7 +1329,7 @@ enum AVPacketSideDataType {
     AV_PKT_DATA_METADATA_UPDATE,
 
     /**
-     * MPEGTS stream ID, this is required to pass the stream ID
+     * MPEGTS stream ID as uint8_t, this is required to pass the stream ID
      * information from the demuxer to the corresponding muxer.
      */
     AV_PKT_DATA_MPEGTS_STREAM_ID,

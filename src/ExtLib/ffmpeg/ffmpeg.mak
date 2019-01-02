@@ -622,6 +622,7 @@ SRCS_LU = \
 	libavutil/fixed_dsp.c \
 	libavutil/float_dsp.c \
 	libavutil/frame.c \
+	libavutil/hdr_dynamic_metadata.c \
 	libavutil/hwcontext.c \
 	libavutil/hwcontext_dxva2.c \
 	libavutil/imgutils.c \
