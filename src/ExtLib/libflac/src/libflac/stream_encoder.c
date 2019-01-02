@@ -885,6 +885,36 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 	/* now override with asm where appropriate */
 #ifndef FLAC__INTEGER_ONLY_LIBRARY
 # ifndef FLAC__NO_ASM
+#if defined(FLAC__CPU_PPC64) && defined(FLAC__USE_VSX)
+#ifdef FLAC__HAS_TARGET_POWER8
+#ifdef FLAC__HAS_TARGET_POWER9
+	if (encoder->private_->cpuinfo.ppc.arch_3_00) {
+		if(encoder->protected_->max_lpc_order < 4)
+			encoder->private_->local_lpc_compute_autocorrelation = FLAC__lpc_compute_autocorrelation_intrin_power9_vsx_lag_4;
+		else if(encoder->protected_->max_lpc_order < 8)
+			encoder->private_->local_lpc_compute_autocorrelation = FLAC__lpc_compute_autocorrelation_intrin_power9_vsx_lag_8;
+		else if(encoder->protected_->max_lpc_order < 12)
+			encoder->private_->local_lpc_compute_autocorrelation = FLAC__lpc_compute_autocorrelation_intrin_power9_vsx_lag_12;
+		else if(encoder->protected_->max_lpc_order < 16)
+			encoder->private_->local_lpc_compute_autocorrelation = FLAC__lpc_compute_autocorrelation_intrin_power9_vsx_lag_16;
+		else
+			encoder->private_->local_lpc_compute_autocorrelation = FLAC__lpc_compute_autocorrelation;
+	} else
+#endif
+	if (encoder->private_->cpuinfo.ppc.arch_2_07) {
+		if(encoder->protected_->max_lpc_order < 4)
+			encoder->private_->local_lpc_compute_autocorrelation = FLAC__lpc_compute_autocorrelation_intrin_power8_vsx_lag_4;
+		else if(encoder->protected_->max_lpc_order < 8)
+			encoder->private_->local_lpc_compute_autocorrelation = FLAC__lpc_compute_autocorrelation_intrin_power8_vsx_lag_8;
+		else if(encoder->protected_->max_lpc_order < 12)
+			encoder->private_->local_lpc_compute_autocorrelation = FLAC__lpc_compute_autocorrelation_intrin_power8_vsx_lag_12;
+		else if(encoder->protected_->max_lpc_order < 16)
+			encoder->private_->local_lpc_compute_autocorrelation = FLAC__lpc_compute_autocorrelation_intrin_power8_vsx_lag_16;
+		else
+			encoder->private_->local_lpc_compute_autocorrelation = FLAC__lpc_compute_autocorrelation;
+	}
+#endif
+#endif
 	if(encoder->private_->cpuinfo.use_asm) {
 #  ifdef FLAC__CPU_IA32
 		FLAC__ASSERT(encoder->private_->cpuinfo.type == FLAC__CPUINFO_TYPE_IA32);

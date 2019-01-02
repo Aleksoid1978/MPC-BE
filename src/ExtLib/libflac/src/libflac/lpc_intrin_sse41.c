@@ -980,8 +980,8 @@ void FLAC__lpc_restore_signal_intrin_sse41(const FLAC__int32 residual[], uint32_
 				summ = _mm_add_epi32(summ, _mm_mullo_epi32(dat[1], qlp[1]));
 				summ = _mm_add_epi32(summ, _mm_mullo_epi32(dat[0], qlp[0]));
 
-				summ = _mm_hadd_epi32(summ, summ);
-				summ = _mm_hadd_epi32(summ, summ);
+				summ = _mm_add_epi32(summ, _mm_shuffle_epi32(summ, _MM_SHUFFLE(1,0,3,2)));
+				summ = _mm_add_epi32(summ, _mm_shufflelo_epi16(summ, _MM_SHUFFLE(1,0,3,2)));
 
 				summ = _mm_sra_epi32(summ, cnt);
 				temp = _mm_add_epi32(_mm_cvtsi32_si128(residual[i]), summ);
@@ -1009,8 +1009,8 @@ void FLAC__lpc_restore_signal_intrin_sse41(const FLAC__int32 residual[], uint32_
 			for (i = 0;;) {
 				summ = _mm_add_epi32(_mm_mullo_epi32(dat[1], qlp[1]), _mm_mullo_epi32(dat[0], qlp[0]));
 
-				summ = _mm_hadd_epi32(summ, summ);
-				summ = _mm_hadd_epi32(summ, summ);
+				summ = _mm_add_epi32(summ, _mm_shuffle_epi32(summ, _MM_SHUFFLE(1,0,3,2)));
+				summ = _mm_add_epi32(summ, _mm_shufflelo_epi16(summ, _MM_SHUFFLE(1,0,3,2)));
 
 				summ = _mm_sra_epi32(summ, cnt);
 				temp = _mm_add_epi32(_mm_cvtsi32_si128(residual[i]), summ);
@@ -1079,8 +1079,8 @@ void FLAC__lpc_restore_signal_16_intrin_sse41(const FLAC__int32 residual[], uint
 				summ = _mm_madd_epi16(dat[1], qlp[1]);
 				summ = _mm_add_epi32(summ, _mm_madd_epi16(dat[0], qlp[0]));
 
-				summ = _mm_hadd_epi32(summ, summ);
-				summ = _mm_hadd_epi32(summ, summ);
+				summ = _mm_add_epi32(summ, _mm_shuffle_epi32(summ, _MM_SHUFFLE(1,0,3,2)));
+				summ = _mm_add_epi32(summ, _mm_shufflelo_epi16(summ, _MM_SHUFFLE(1,0,3,2)));
 
 				summ = _mm_sra_epi32(summ, cnt);
 				temp = _mm_add_epi32(_mm_cvtsi32_si128(residual[i]), summ);
@@ -1109,8 +1109,8 @@ void FLAC__lpc_restore_signal_16_intrin_sse41(const FLAC__int32 residual[], uint
 			for(i = 0;;) {
 				summ = _mm_madd_epi16(dat0, qlp0);
 
-				summ = _mm_hadd_epi32(summ, summ);
-				summ = _mm_hadd_epi32(summ, summ);
+				summ = _mm_add_epi32(summ, _mm_shuffle_epi32(summ, _MM_SHUFFLE(1,0,3,2)));
+				summ = _mm_add_epi32(summ, _mm_shufflelo_epi16(summ, _MM_SHUFFLE(1,0,3,2)));
 
 				summ = _mm_sra_epi32(summ, cnt);
 				temp = _mm_add_epi32(_mm_cvtsi32_si128(residual[i]), summ);

@@ -83,8 +83,8 @@ void FLAC__precompute_partition_info_sums_intrin_avx2(const FLAC__int32 residual
 					sum128 = _mm_add_epi32(sum128, res128);
 				}
 
-				sum128 = _mm_hadd_epi32(sum128, sum128);
-				sum128 = _mm_hadd_epi32(sum128, sum128);
+				sum128 = _mm_add_epi32(sum128, _mm_shuffle_epi32(sum128, _MM_SHUFFLE(1,0,3,2)));
+				sum128 = _mm_add_epi32(sum128, _mm_shufflelo_epi16(sum128, _MM_SHUFFLE(1,0,3,2)));
 				abs_residual_partition_sums[partition] = (FLAC__uint32)_mm_cvtsi128_si32(sum128);
 /* workaround for MSVC bugs (at least versions 2015 and 2017 are affected) */
 #if (defined _MSC_VER) && (defined FLAC__CPU_X86_64)
