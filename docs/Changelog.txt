@@ -6,7 +6,7 @@
 Updated libraries:
 	ffmpeg git-n4.2-dev-573-g1dcb5b7dca;
 	Little-CMS git-lcms2.9-28-g239fc87;
-	MediaInfo git-v18.08.1-62-g42d051e5;
+	MediaInfo git-v18.12-4-g780f8428;
 	ZenLib git-v0.4.37-29-g42a4dcf;
 
 1.5.2
