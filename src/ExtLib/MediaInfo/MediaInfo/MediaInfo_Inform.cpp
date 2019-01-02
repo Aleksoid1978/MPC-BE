@@ -410,11 +410,19 @@ Ztring MediaInfo_Internal::Inform()
 
     #if defined(MEDIAINFO_XML_YES)
         if (XML || XML_0_7_78_MA || XML_0_7_78_MI)
+        {
             Retour=Ztring().From_UTF8(To_XML(*Node_Main, 0, false, false));
+            delete Node_Main;
+            delete Node_MI;
+        }
     #endif //MEDIAINFO_XML_YES
     #if defined(MEDIAINFO_JSON_YES)
         if (JSON)
+        {
             Retour=__T("{\n")+Ztring().From_UTF8(To_JSON(*Node_Main, 0, false, false))+__T("\n}");
+            delete Node_Main;
+            delete Node_MI;
+        }
     #endif //MEDIAINFO_JSON_YES
 
     Retour.FindAndReplace(__T("\\"), __T("|SC1|"), 0, Ztring_Recursive);
@@ -718,6 +726,7 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                 Retour+=Ztring().From_UTF8(To_XML(*(Fields[Field]), 1, false, false));
             else if (JSON)
                 Retour+=Ztring().From_UTF8(To_JSON(*(Fields[Field]), 1, false, false)+(Field<Fields.size()-1?",\n":""));
+            delete Fields[Field];
         }
 
         #endif //defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_JSON_YES)

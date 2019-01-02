@@ -1092,7 +1092,7 @@ void File_Aac::adts_fixed_header()
             Infos["Codec"].From_UTF8(Aac_audioObjectType(audioObjectType));
             if (Frequency_b)
                 Infos["SamplingRate"].From_Number(Frequency_b);
-            Infos["Channel(s)"].From_Number(channelConfiguration);
+            Infos["Channel(s)"].From_Number(Aac_Channels[channelConfiguration]);
             Infos["ChannelPositions"].From_UTF8(Aac_ChannelConfiguration[channelConfiguration]);
             Infos["ChannelPositions/String2"].From_UTF8(Aac_ChannelConfiguration2[channelConfiguration]);
             Infos["ChannelLayout"].From_UTF8(Aac_ChannelLayout[channelConfiguration]);

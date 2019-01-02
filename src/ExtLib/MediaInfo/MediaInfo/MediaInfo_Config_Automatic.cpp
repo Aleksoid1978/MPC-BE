@@ -359,6 +359,7 @@ void MediaInfo_Config_DefaultLanguage (Translation &Info)
     "EPG_Positions;EPG positions (internal)\n"
     "EpisodeTitleNumber;Episode Title Number\n"
     "Error_File;Error while reading file\n"
+    "EtsiTS103433;ETSI TS 103 433\n"
     "ExecutiveProducer;Executive producer\n"
     "Exit;Exit\n"
     "Exit_Hint;Quit the program\n"

@@ -33,6 +33,7 @@
 #include "ZenLib/FileName.h"
 #include "tinyxml2.h"
 #include <list>
+#include <vector>
 using namespace tinyxml2;
 using namespace std;
 //---------------------------------------------------------------------------
@@ -127,6 +128,8 @@ bool File_DcpCpl::FileHeader_Begin()
 
     ReferenceFiles_Accept(this, Config);
 
+    vector<size_t> AssetCountPerReel;
+                        
     //Parsing main elements
     for (XMLElement* CompositionPlaylist_Item=Root->FirstChildElement(); CompositionPlaylist_Item; CompositionPlaylist_Item=CompositionPlaylist_Item->NextSiblingElement())
     {
@@ -275,6 +278,8 @@ bool File_DcpCpl::FileHeader_Begin()
                 //Reel
                 if (MatchQName(ReelList_Item, IsDcp?"Reel":"Segment", NameSpace))
                 {
+                    size_t AssetCount=0;
+
                     for (XMLElement* Reel_Item=ReelList_Item->FirstChildElement(); Reel_Item; Reel_Item=Reel_Item->NextSiblingElement())
                     {
                         //AssetList
@@ -299,6 +304,8 @@ bool File_DcpCpl::FileHeader_Begin()
                                             Sequence->StreamKind=Stream_Video;
                                         else if (!strcmp(AlItemName, "MainSound"))
                                             Sequence->StreamKind=Stream_Audio;
+                                        else if (!strcmp(AlItemName, "MainSubtitle"))
+                                            Sequence->StreamKind=Stream_Text;
                                     }
                                     else if (IsImf && IsSmpteSt2067_2(AlItemNs))
                                     {
@@ -390,14 +397,20 @@ bool File_DcpCpl::FileHeader_Begin()
                                     }
                                     Sequence->StreamID=ReferenceFiles->Sequences_Size()+1;
                                     ReferenceFiles->AddSequence(Sequence);
+
+                                    AssetCount++;
                                 }
                             }
                         }
                     }
+
+                    AssetCountPerReel.push_back(AssetCount);
                 }
             }
         }
     }
+
+    ReferenceFiles->DetectSameReels(AssetCountPerReel);
 
     //Getting files names
     FileName Directory(File_Name);
