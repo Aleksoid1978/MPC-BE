@@ -163,7 +163,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 	if (IsRandomAccess()) {
 		const __int64 len = GetLength();
 
-		__int64 stop = std::min(20LL * MEGABYTE, len);
+		__int64 stop = std::min(10LL * MEGABYTE, len);
 		__int64 steps = 20;
 		if (IsURL()) {
 			stop = std::min(2LL * MEGABYTE, len);
@@ -171,6 +171,25 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 		}
 
 		SearchPrograms(0, stop);
+
+		if (!IsURL()) {
+			bool bHEVCPresent = false;
+			for (const auto& pr : m_programs) {
+				for (const auto& stream : pr.second.streams) {
+					if (stream.type == PES_STREAM_TYPE::VIDEO_STREAM_HEVC) {
+						bHEVCPresent = true;
+						break;
+					}
+				}
+				if (bHEVCPresent) {
+					break;
+				}
+			}
+
+			if (bHEVCPresent) {
+				stop = std::min(40LL * MEGABYTE, len);
+			}
+		}
 		SearchStreams(0, stop);
 
 		const int step_size = 512 * KILOBYTE;
