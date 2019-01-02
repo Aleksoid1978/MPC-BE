@@ -86,7 +86,7 @@ static filter_t s_filters[] = {
 	{L"H264 (MVC 3D)",				VIDEO_DECODER, VDEC_H264_MVC,		IDS_TRA_INTEL_MSDK},
 	{L"HEVC",						VIDEO_DECODER, VDEC_HEVC,			0},
 	{L"Indeo 3/4/5",				VIDEO_DECODER, VDEC_INDEO,			0},
-	{L"Lossless video (huffyuv, Lagarith, FFV1, MagicYUV)", VIDEO_DECODER, VDEC_LOSSLESS, 0},
+	{L"Lossless video (HuffYUV, FFV1, Lagarith, MagicYUV)", VIDEO_DECODER, VDEC_LOSSLESS, 0},
 	{L"MJPEG",						VIDEO_DECODER, VDEC_MJPEG,			0},
 	{L"MPEG-1 Video (FFmpeg)",		VIDEO_DECODER, VDEC_MPEG1,			IDS_TRA_FFMPEG},
 	{L"MPEG-2 Video (FFmpeg)",		VIDEO_DECODER, VDEC_MPEG2,			IDS_TRA_FFMPEG},

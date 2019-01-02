@@ -26,6 +26,7 @@ static const AVCodec * const codec_list[] = {
     &ff_hq_hqa_decoder,
     &ff_hqx_decoder,
     &ff_huffyuv_decoder,
+    &ff_hymt_decoder,
     &ff_indeo3_decoder,
     &ff_indeo4_decoder,
     &ff_indeo5_decoder,
