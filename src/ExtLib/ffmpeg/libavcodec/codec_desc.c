@@ -723,7 +723,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .id        = AV_CODEC_ID_GIF,
         .type      = AVMEDIA_TYPE_VIDEO,
         .name      = "gif",
-        .long_name = NULL_IF_CONFIG_SMALL("GIF (Graphics Interchange Format)"),
+        .long_name = NULL_IF_CONFIG_SMALL("CompuServe GIF (Graphics Interchange Format)"),
         .props     = AV_CODEC_PROP_LOSSLESS,
         .mime_types= MT("image/gif"),
     },
@@ -1690,6 +1690,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .name      = "rasc",
         .long_name = NULL_IF_CONFIG_SMALL("RemotelyAnywhere Screen Capture"),
         .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_HYMT,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "hymt",
+        .long_name = NULL_IF_CONFIG_SMALL("HuffYUV MT"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
     },
 
     /* various PCM "codecs" */

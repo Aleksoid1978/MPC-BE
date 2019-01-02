@@ -310,6 +310,19 @@ static int deinvert_buffer(TiffContext *s, const uint8_t *src, int size)
     return 0;
 }
 
+static void unpack_gray(TiffContext *s, AVFrame *p,
+                       const uint8_t *src, int lnum, int width, int bpp)
+{
+    GetBitContext gb;
+    uint16_t *dst = (uint16_t *)(p->data[0] + lnum * p->linesize[0]);
+
+    init_get_bits8(&gb, src, width);
+
+    for (int i = 0; i < s->width; i++) {
+        dst[i] = get_bits(&gb, bpp);
+    }
+}
+
 static void unpack_yuv(TiffContext *s, AVFrame *p,
                        const uint8_t *src, int lnum)
 {
@@ -540,6 +553,15 @@ static int tiff_unpack_strip(TiffContext *s, AVFrame *p, uint8_t *dst, int strid
     if (s->is_bayer) {
         width = (s->bpp * s->width + 7) >> 3;
     }
+    if (p->format == AV_PIX_FMT_GRAY12) {
+        av_fast_padded_malloc(&s->yuv_line, &s->yuv_line_size, width);
+        if (s->yuv_line == NULL) {
+            av_log(s->avctx, AV_LOG_ERROR, "Not enough memory\n");
+            return AVERROR(ENOMEM);
+        }
+        dst = s->yuv_line;
+        stride = 0;
+    }
 
     if (s->compr == TIFF_DEFLATE || s->compr == TIFF_ADOBE_DEFLATE) {
 #if CONFIG_ZLIB
@@ -587,6 +609,8 @@ static int tiff_unpack_strip(TiffContext *s, AVFrame *p, uint8_t *dst, int strid
             if (is_yuv) {
                 unpack_yuv(s, p, dst, strip_start + line);
                 line += s->subsampling[1] - 1;
+            } else if (p->format == AV_PIX_FMT_GRAY12) {
+                unpack_gray(s, p, dst, strip_start + line, width, s->bpp);
             }
             dst += stride;
         }
@@ -670,6 +694,8 @@ static int tiff_unpack_strip(TiffContext *s, AVFrame *p, uint8_t *dst, int strid
         if (is_yuv) {
             unpack_yuv(s, p, dst, strip_start + line);
             line += s->subsampling[1] - 1;
+        } else if (p->format == AV_PIX_FMT_GRAY12) {
+            unpack_gray(s, p, dst, strip_start + line, width, s->bpp);
         }
         dst += stride;
     }
@@ -705,8 +731,11 @@ static int init_image(TiffContext *s, ThreadFrame *frame)
     case 81:
         s->avctx->pix_fmt = s->palette_is_set ? AV_PIX_FMT_PAL8 : AV_PIX_FMT_GRAY8;
         break;
+    case 121:
+        s->avctx->pix_fmt = AV_PIX_FMT_GRAY12;
+        break;
     case 10081:
-        switch (s->pattern[0] | (s->pattern[1] << 8) | (s->pattern[2] << 16) | (s->pattern[3] << 24)) {
+        switch (AV_RL32(s->pattern)) {
         case 0x02010100:
             s->avctx->pix_fmt = AV_PIX_FMT_BAYER_RGGB8;
             break;
@@ -721,12 +750,12 @@ static int init_image(TiffContext *s, ThreadFrame *frame)
             break;
         default:
             av_log(s->avctx, AV_LOG_ERROR, "Unsupported Bayer pattern: 0x%X\n",
-                   s->pattern[0] | s->pattern[1] << 8 | s->pattern[2] << 16 | s->pattern[3] << 24);
+                   AV_RL32(s->pattern));
             return AVERROR_PATCHWELCOME;
         }
         break;
     case 10121:
-        switch (s->pattern[0] | s->pattern[1] << 8 | s->pattern[2] << 16 | s->pattern[3] << 24) {
+        switch (AV_RL32(s->pattern)) {
         case 0x02010100:
             s->avctx->pix_fmt = s->le ? AV_PIX_FMT_BAYER_RGGB16LE : AV_PIX_FMT_BAYER_RGGB16BE;
             break;
@@ -741,12 +770,12 @@ static int init_image(TiffContext *s, ThreadFrame *frame)
             break;
         default:
             av_log(s->avctx, AV_LOG_ERROR, "Unsupported Bayer pattern: 0x%X\n",
-                   s->pattern[0] | s->pattern[1] << 8 | s->pattern[2] << 16 | s->pattern[3] << 24);
+                   AV_RL32(s->pattern));
             return AVERROR_PATCHWELCOME;
         }
         break;
     case 10161:
-        switch (s->pattern[0] | s->pattern[1] << 8 | s->pattern[2] << 16 | s->pattern[3] << 24) {
+        switch (AV_RL32(s->pattern)) {
         case 0x02010100:
             s->avctx->pix_fmt = s->le ? AV_PIX_FMT_BAYER_RGGB16LE : AV_PIX_FMT_BAYER_RGGB16BE;
             break;
@@ -761,7 +790,7 @@ static int init_image(TiffContext *s, ThreadFrame *frame)
             break;
         default:
             av_log(s->avctx, AV_LOG_ERROR, "Unsupported Bayer pattern: 0x%X\n",
-                   s->pattern[0] | s->pattern[1] << 8 | s->pattern[2] << 16 | s->pattern[3] << 24);
+                   AV_RL32(s->pattern));
             return AVERROR_PATCHWELCOME;
         }
         break;
@@ -1550,6 +1579,8 @@ static av_cold int tiff_end(AVCodecContext *avctx)
     ff_lzw_decode_close(&s->lzw);
     av_freep(&s->deinvert_buf);
     s->deinvert_buf_size = 0;
+    av_freep(&s->yuv_line);
+    s->yuv_line_size = 0;
     av_freep(&s->fax_buffer);
     s->fax_buffer_size = 0;
     return 0;

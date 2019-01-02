@@ -313,7 +313,6 @@ int ff_mjpeg_decode_sof(MJpegDecodeContext *s)
     memset(s->upscale_h, 0, sizeof(s->upscale_h));
     memset(s->upscale_v, 0, sizeof(s->upscale_v));
 
-    /* XXX: verify len field validity */
     len     = get_bits(&s->gb, 16);
     bits    = get_bits(&s->gb, 8);
 
@@ -367,6 +366,11 @@ int ff_mjpeg_decode_sof(MJpegDecodeContext *s)
                                       "bits/component or 16-bit gray");
         return AVERROR_PATCHWELCOME;
     }
+    if (len != 8 + 3 * nb_components) {
+        av_log(s->avctx, AV_LOG_ERROR, "decode_sof0: error, len(%d) mismatch %d components\n", len, nb_components);
+        return AVERROR_INVALIDDATA;
+    }
+
     s->nb_components = nb_components;
     s->h_max         = 1;
     s->v_max         = 1;
@@ -488,7 +492,8 @@ int ff_mjpeg_decode_sof(MJpegDecodeContext *s)
         if (s->rgb)
             s->avctx->pix_fmt = s->bits <= 9 ? AV_PIX_FMT_BGR24 : AV_PIX_FMT_BGR48;
         else {
-            if (s->component_id[0] == 'Q' && s->component_id[1] == 'F' && s->component_id[2] == 'A') {
+            if (   s->adobe_transform == 0
+                || s->component_id[0] == 'R' - 1 && s->component_id[1] == 'G' - 1 && s->component_id[2] == 'B' - 1) {
                 s->avctx->pix_fmt = s->bits <= 8 ? AV_PIX_FMT_GBRP : AV_PIX_FMT_GBRP16;
             } else {
                 if (s->bits <= 8) s->avctx->pix_fmt = s->cs_itu601 ? AV_PIX_FMT_YUV444P : AV_PIX_FMT_YUVJ444P;
@@ -711,8 +716,6 @@ unk_pixfmt:
             s->width, s->height, s->linesize[0], s->linesize[1],
             s->interlaced, s->avctx->height);
 
-    if (len != (8 + (3 * nb_components)))
-        av_log(s->avctx, AV_LOG_DEBUG, "decode_sof0: error, len(%d) mismatch\n", len);
     }
 
     if ((s->rgb && !s->lossless && !s->ls) ||
@@ -1218,25 +1221,25 @@ static int ljpeg_decode_yuv_scan(MJpegDecodeContext *s, int predictor,
                             || v * mb_y + y >= s->height) {
                             // Nothing to do
                         } else if (bits<=8) {
-                        ptr = s->picture_ptr->data[c] + (linesize * (v * mb_y + y)) + (h * mb_x + x); //FIXME optimize this crap
-                        if(y==0 && toprow){
-                            if(x==0 && leftcol){
-                                pred= 1 << (bits - 1);
+                            ptr = s->picture_ptr->data[c] + (linesize * (v * mb_y + y)) + (h * mb_x + x); //FIXME optimize this crap
+                            if(y==0 && toprow){
+                                if(x==0 && leftcol){
+                                    pred= 1 << (bits - 1);
+                                }else{
+                                    pred= ptr[-1];
+                                }
                             }else{
-                                pred= ptr[-1];
+                                if(x==0 && leftcol){
+                                    pred= ptr[-linesize];
+                                }else{
+                                    PREDICT(pred, ptr[-linesize-1], ptr[-linesize], ptr[-1], predictor);
+                                }
                             }
-                        }else{
-                            if(x==0 && leftcol){
-                                pred= ptr[-linesize];
-                            }else{
-                                PREDICT(pred, ptr[-linesize-1], ptr[-linesize], ptr[-1], predictor);
-                            }
-                        }
 
-                        if (s->interlaced && s->bottom_field)
-                            ptr += linesize >> 1;
-                        pred &= mask;
-                        *ptr= pred + ((unsigned)dc << point_transform);
+                            if (s->interlaced && s->bottom_field)
+                                ptr += linesize >> 1;
+                            pred &= mask;
+                            *ptr= pred + ((unsigned)dc << point_transform);
                         }else{
                             ptr16 = (uint16_t*)(s->picture_ptr->data[c] + 2*(linesize * (v * mb_y + y)) + 2*(h * mb_x + x)); //FIXME optimize this crap
                             if(y==0 && toprow){

@@ -4,7 +4,7 @@
 =============================
 
 Обновлены библиотеки:
-	ffmpeg git-n4.2-dev-202-g90ac0e5f29;
+	ffmpeg git-n4.2-dev-573-g1dcb5b7dca;
 	Little-CMS git-lcms2.9-24-g32f0c45;
 	MediaInfo git-v18.08.1-62-g42d051e5;
 	ZenLib git-v0.4.37-29-g42a4dcf;
