@@ -29,7 +29,7 @@
 #include "IMpeg2DecFilter.h"
 #include "Mpeg2DecFilterSettingsWnd.h"
 
-#define Mpeg2DecFilterName L"MPC MPEG Video Decoder"
+#define Mpeg2DecFilterName L"MPC DVD Video Decoder"
 
 class CSubpicInputPin;
 class CClosedCaptionOutputPin;

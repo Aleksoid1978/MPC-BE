@@ -2594,21 +2594,17 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_LAV_RAWVIDEO);
 	m_transform.push_back(pFGF);
 
-	// Keep MPEG decoder after DXVA/ffmpeg decoder !
+	// Keep Mpeg2DecFilter after DXVA/ffmpeg decoder !
 	pFGF = DNew CFGFilterInternal<CMpeg2DecFilter>(
-				(video[VDEC_LIBMPEG2_MPEG2] || IsPreview) ? Mpeg2DecFilterName : LowMerit(Mpeg2DecFilterName),
-				(video[VDEC_LIBMPEG2_MPEG2] || IsPreview) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+				(video[VDEC_DVD_LIBMPEG2] || IsPreview) ? Mpeg2DecFilterName : LowMerit(Mpeg2DecFilterName),
+				(video[VDEC_DVD_LIBMPEG2] || IsPreview) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
+	// MPC-BE uses this filter for DVD-Video only
 	pFGF->AddType(MEDIATYPE_DVD_ENCRYPTED_PACK, MEDIASUBTYPE_MPEG2_VIDEO); // used by DVD Navigator for MPEG-2 and MPEG-1
 	pFGF->AddType(MEDIATYPE_MPEG2_PACK, MEDIASUBTYPE_MPEG2_VIDEO);
 	pFGF->AddType(MEDIATYPE_MPEG2_PES, MEDIASUBTYPE_MPEG2_VIDEO);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_MPEG2_VIDEO);
-	m_transform.push_back(pFGF);
-
-	pFGF = DNew CFGFilterInternal<CMpeg2DecFilter>(
-				(video[VDEC_LIBMPEG2_MPEG1] || IsPreview) ? Mpeg2DecFilterName : Mpeg2DecFilterName,
-				(video[VDEC_LIBMPEG2_MPEG1] || IsPreview) ? MERIT64_ABOVE_DSHOW : MERIT64_DO_USE);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_MPEG1Packet);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_MPEG1Payload);
+	//pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_MPEG2_VIDEO);
+	//pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_MPEG1Packet);
+	//pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_MPEG1Payload);
 	m_transform.push_back(pFGF);
 
 	// TODO - make optional RoQ A/V decoder
