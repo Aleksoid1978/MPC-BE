@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -90,8 +90,7 @@ static filter_t s_filters[] = {
 	{L"MJPEG",						VIDEO_DECODER, VDEC_MJPEG,			0},
 	{L"MPEG-1 Video",				VIDEO_DECODER, VDEC_MPEG1,			IDS_TRA_FFMPEG},
 	{L"MPEG-2 Video",				VIDEO_DECODER, VDEC_MPEG2,			IDS_TRA_FFMPEG},
-	{L"MPEG-1 Video (libmpeg2)",	VIDEO_DECODER, VDEC_LIBMPEG2_MPEG1,	IDS_TRA_MPEG2},
-	{L"MPEG-2/DVD Video (libmpeg2)", VIDEO_DECODER, VDEC_LIBMPEG2_MPEG2, IDS_TRA_MPEG2},
+	{L"DVD MPEG Video",				VIDEO_DECODER, VDEC_DVD_LIBMPEG2,	IDS_TRA_MPEG2},
 	{L"MS MPEG-4",					VIDEO_DECODER, VDEC_MSMPEG4,		0},
 	{L"PNG",						VIDEO_DECODER, VDEC_PNG,			0},
 	{L"QuickTime video (8BPS, QTRle, rpza)", VIDEO_DECODER, VDEC_QT,		0},

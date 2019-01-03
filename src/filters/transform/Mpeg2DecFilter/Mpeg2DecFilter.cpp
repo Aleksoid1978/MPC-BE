@@ -101,13 +101,13 @@ private:
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
-	// DVD Navigator media types
+	// MPC-BE uses this filter for DVD-Video only
 	{&MEDIATYPE_DVD_ENCRYPTED_PACK, &MEDIASUBTYPE_MPEG2_VIDEO},  // used by DVD Navigator for MPEG-2 and MPEG-1
 	{&MEDIATYPE_MPEG2_PACK,         &MEDIASUBTYPE_MPEG2_VIDEO},
 	{&MEDIATYPE_MPEG2_PES,          &MEDIASUBTYPE_MPEG2_VIDEO},
-	{&MEDIATYPE_Video,              &MEDIASUBTYPE_MPEG2_VIDEO},
-	{&MEDIATYPE_Video,              &MEDIASUBTYPE_MPEG1Packet);
-	{&MEDIATYPE_Video,              &MEDIASUBTYPE_MPEG1Payload);
+	//{&MEDIATYPE_Video,              &MEDIASUBTYPE_MPEG2_VIDEO},
+	//{&MEDIATYPE_Video,              &MEDIASUBTYPE_MPEG1Packet);
+	//{&MEDIATYPE_Video,              &MEDIASUBTYPE_MPEG1Payload);
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
@@ -930,12 +930,13 @@ HRESULT CMpeg2DecFilter::CheckInputType(const CMediaType* mtIn)
 		}
 	}
 
+	// MPC-BE uses this filter for DVD-Video only
 	return (mtIn->majortype == MEDIATYPE_DVD_ENCRYPTED_PACK && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO // used by DVD Navigator for MPEG-2 and MPEG-1
 			|| mtIn->majortype == MEDIATYPE_MPEG2_PACK && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO
 			|| mtIn->majortype == MEDIATYPE_MPEG2_PES && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO
-			|| mtIn->majortype == MEDIATYPE_Video && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO
+			/*|| mtIn->majortype == MEDIATYPE_Video && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO
 			|| mtIn->majortype == MEDIATYPE_Video && mtIn->subtype == MEDIASUBTYPE_MPEG1Packet
-			|| mtIn->majortype == MEDIATYPE_Video && mtIn->subtype == MEDIASUBTYPE_MPEG1Payload)
+			|| mtIn->majortype == MEDIATYPE_Video && mtIn->subtype == MEDIASUBTYPE_MPEG1Payload*/)
 		   ? S_OK
 		   : VFW_E_TYPE_NOT_ACCEPTED;
 }
