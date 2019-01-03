@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -101,15 +101,13 @@ private:
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
-	{&MEDIATYPE_DVD_ENCRYPTED_PACK, &MEDIASUBTYPE_MPEG2_VIDEO},
-	{&MEDIATYPE_MPEG2_PACK, &MEDIASUBTYPE_MPEG2_VIDEO},
-	{&MEDIATYPE_MPEG2_PES, &MEDIASUBTYPE_MPEG2_VIDEO},
-	{&MEDIATYPE_Video, &MEDIASUBTYPE_MPEG2_VIDEO},
-	{&MEDIATYPE_Video, &MEDIASUBTYPE_MPG2},
-#ifndef MPEG2ONLY
-	{&MEDIATYPE_Video, &MEDIASUBTYPE_MPEG1Packet},
-	{&MEDIATYPE_Video, &MEDIASUBTYPE_MPEG1Payload},
-#endif
+	// DVD Navigator media types
+	{&MEDIATYPE_DVD_ENCRYPTED_PACK, &MEDIASUBTYPE_MPEG2_VIDEO},  // used by DVD Navigator for MPEG-2 and MPEG-1
+	{&MEDIATYPE_MPEG2_PACK,         &MEDIASUBTYPE_MPEG2_VIDEO},
+	{&MEDIATYPE_MPEG2_PES,          &MEDIASUBTYPE_MPEG2_VIDEO},
+	{&MEDIATYPE_Video,              &MEDIASUBTYPE_MPEG2_VIDEO},
+	{&MEDIATYPE_Video,              &MEDIASUBTYPE_MPEG1Packet);
+	{&MEDIATYPE_Video,              &MEDIASUBTYPE_MPEG1Payload);
 };
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
@@ -932,11 +930,10 @@ HRESULT CMpeg2DecFilter::CheckInputType(const CMediaType* mtIn)
 		}
 	}
 
-	return (mtIn->majortype == MEDIATYPE_DVD_ENCRYPTED_PACK && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO
+	return (mtIn->majortype == MEDIATYPE_DVD_ENCRYPTED_PACK && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO // used by DVD Navigator for MPEG-2 and MPEG-1
 			|| mtIn->majortype == MEDIATYPE_MPEG2_PACK && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO
 			|| mtIn->majortype == MEDIATYPE_MPEG2_PES && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO
 			|| mtIn->majortype == MEDIATYPE_Video && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO
-			|| mtIn->majortype == MEDIATYPE_Video && mtIn->subtype == MEDIASUBTYPE_MPG2
 			|| mtIn->majortype == MEDIATYPE_Video && mtIn->subtype == MEDIASUBTYPE_MPEG1Packet
 			|| mtIn->majortype == MEDIATYPE_Video && mtIn->subtype == MEDIASUBTYPE_MPEG1Payload)
 		   ? S_OK

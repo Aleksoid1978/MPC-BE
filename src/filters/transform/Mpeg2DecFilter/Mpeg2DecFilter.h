@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,11 +29,7 @@
 #include "IMpeg2DecFilter.h"
 #include "Mpeg2DecFilterSettingsWnd.h"
 
-#ifdef MPEG2ONLY
-#define Mpeg2DecFilterName L"MPC MPEG-2 Video Decoder"
-#else
 #define Mpeg2DecFilterName L"MPC MPEG Video Decoder"
-#endif
 
 class CSubpicInputPin;
 class CClosedCaptionOutputPin;
