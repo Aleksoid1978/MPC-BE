@@ -5,6 +5,7 @@
 
 Обновлены библиотеки:
 	ffmpeg git-n4.2-dev-573-g1dcb5b7dca;
+	libaom git-v1.0.0-1116-g00c80e6b5;
 	libflac git-1.3.2-98-g421961f0;
 	Little-CMS git-lcms2.9-28-g239fc87;
 	MediaInfo git-v18.12-4-g780f8428;
