@@ -197,7 +197,7 @@ void CMediaFormats::UpdateData(const bool& bSave)
 		ADDFMT((L"other",       ResStr(IDS_MFMT_OTHER),       L"amv wtv dvr-ms mxf ivf nut dav"));
 		ADDFMT((L"rawvideo",    ResStr(IDS_MFMT_RAW_VIDEO),   L"y4m h264 264 vc1 h265 265 hm10 hevc"));
 		// audio files
-		ADDFMT((L"ac3",         ResStr(IDS_MFMT_AC3),         L"ac3", TAudio));
+		ADDFMT((L"ac3",         ResStr(IDS_MFMT_AC3),         L"ac3 eac3", TAudio));
 		ADDFMT((L"dts",         ResStr(IDS_MFMT_DTS),         L"dts dtshd dtsma", TAudio));
 		ADDFMT((L"aiff",        ResStr(IDS_MFMT_AIFF),        L"aif aifc aiff", TAudio));
 		ADDFMT((L"alac",        ResStr(IDS_MFMT_ALAC),        L"alac", TAudio));
@@ -211,6 +211,7 @@ void CMediaFormats::UpdateData(const bool& bSave)
 		ADDFMT((L"m4a",         ResStr(IDS_MFMT_M4A),         L"m4a m4b aac", TAudio));
 		ADDFMT((L"midi",        ResStr(IDS_MFMT_MIDI),        L"mid midi rmi", TAudio));
 		ADDFMT((L"mka",         ResStr(IDS_MFMT_MKA),         L"mka", TAudio));
+		ADDFMT((L"weba",        ResStr(IDS_MFMT_WEBA),        L"weba", TAudio));
 		ADDFMT((L"mlp",         ResStr(IDS_MFMT_MLP),         L"mlp", TAudio));
 		ADDFMT((L"mp3",         ResStr(IDS_MFMT_MP3),         L"mp3", TAudio));
 		ADDFMT((L"mpa",         ResStr(IDS_MFMT_MPA),         L"mpa mp2 m1a m2a", TAudio));
