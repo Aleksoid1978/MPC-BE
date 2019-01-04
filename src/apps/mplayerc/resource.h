@@ -1405,6 +1405,7 @@
 #define IDS_MFMT_DVDAUDIO               39526
 #define IDS_MFMT_DSD                    39527
 #define IDS_MFMT_DTS                    39528
+#define IDS_MFMT_WEBA                   39529
 
 // playlists
 #define IDS_MFMT_PLS                    39901
