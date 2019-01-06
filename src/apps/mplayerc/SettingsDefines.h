@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,7 +38,6 @@
 #define IDS_RS_FAV_RELATIVEDRIVE			L"RelativeDrive"
 #define IDS_RS_DVDPOS						L"Remember DVD Pos"
 #define IDS_RS_DVD_START_MAIN_TITLE			L"Start Main Title DVD"
-#define IDS_RS_DVD_MADVR_CHANGE				L"Change madVR to Another renderer"
 #define IDS_RS_FILEPOS						L"Remember File Pos"
 #define IDS_RS_SHOWOSD						L"ShowOSD"
 #define IDS_RS_LANGUAGE						L"Language"
