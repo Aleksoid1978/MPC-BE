@@ -2371,26 +2371,31 @@ void CAppSettings::GetFav(favtype ft, std::list<CString>& sl)
 	sl.clear();
 
 	CString root;
+	int maxcount;
 
 	switch (ft) {
-		case FAV_FILE:
-			root = IDS_R_FAVFILES;
-			break;
-		case FAV_DVD:
-			root = IDS_R_FAVDVDS;
-			break;
-		case FAV_DEVICE:
-			root = IDS_R_FAVDEVICES;
-			break;
-		default:
-			return;
+	case FAV_FILE:
+		root = IDS_R_FAVFILES;
+		maxcount = ID_FAVORITES_FILE_END - ID_FAVORITES_FILE_START + 1;
+		break;
+	case FAV_DVD:
+		root = IDS_R_FAVDVDS;
+		maxcount = ID_FAVORITES_DVD_END - ID_FAVORITES_DVD_START + 1;
+		break;
+	case FAV_DEVICE:
+		root = IDS_R_FAVDEVICES;
+		maxcount = ID_FAVORITES_DEVICE_END - ID_FAVORITES_DEVICE_START + 1;
+		break;
+	default:
+		return;
 	}
 
-	for (int i = 0; i < 100; i++) {
+	CProfile& profile = AfxGetProfile();
+	for (int i = 0; i < maxcount; i++) {
 		CString fav;
 		fav.Format(L"Fav%02d", i);
 		CString s;
-		AfxGetProfile().ReadString(root, fav, s);
+		profile.ReadString(root, fav, s);
 		if (s.IsEmpty()) {
 			break;
 		}
@@ -2410,17 +2415,11 @@ void CAppSettings::SetFav(favtype ft, std::list<CString>& sl)
 	CString root;
 
 	switch (ft) {
-		case FAV_FILE:
-			root = IDS_R_FAVFILES;
-			break;
-		case FAV_DVD:
-			root = IDS_R_FAVDVDS;
-			break;
-		case FAV_DEVICE:
-			root = IDS_R_FAVDEVICES;
-			break;
-		default:
-			return;
+	case FAV_FILE:   root = IDS_R_FAVFILES;   break;
+	case FAV_DVD:    root = IDS_R_FAVDVDS;    break;
+	case FAV_DEVICE: root = IDS_R_FAVDEVICES; break;
+	default:
+		return;
 	}
 
 	CProfile& profile = AfxGetProfile();
