@@ -51,10 +51,10 @@ void CMenuEx::ScaleFont()
 	m_font.CreateFontIndirectW(&nm.lfMenuFont);
 
 	if (SysVersion::IsWin8orLater()) {
-		m_CYEDGE = m_pMainFrame->ScaleX(::GetSystemMetrics(SM_CYEDGE));
-		m_CYMENU = m_pMainFrame->ScaleX(::GetSystemMetrics(SM_CYMENU));
-		m_CXMENUCHECK = m_pMainFrame->ScaleX(::GetSystemMetrics(SM_CXMENUCHECK));
-		m_CYMENUCHECK = m_pMainFrame->ScaleX(::GetSystemMetrics(SM_CYMENUCHECK));
+		m_CYEDGE = m_pMainFrame->GetSystemMetricsDPI(SM_CYEDGE);
+		m_CYMENU = m_pMainFrame->GetSystemMetricsDPI(SM_CYMENU);
+		m_CXMENUCHECK = m_pMainFrame->GetSystemMetricsDPI(SM_CXMENUCHECK);
+		m_CYMENUCHECK = m_pMainFrame->GetSystemMetricsDPI(SM_CYMENUCHECK);
 	} else {
 		m_CYEDGE = ::GetSystemMetrics(SM_CYEDGE);
 		m_CYMENU = ::GetSystemMetrics(SM_CYMENU);
