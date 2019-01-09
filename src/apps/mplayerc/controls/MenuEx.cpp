@@ -338,7 +338,7 @@ void CMenuEx::MeasureItem(LPMEASUREITEMSTRUCT lpMIS)
 			}
 		}
 
-		lpMIS->itemHeight = size.cy + m_CYEDGE;
+		lpMIS->itemHeight = size.cy + m_CYEDGE - 1;
 	} else {
 		lpMIS->itemWidth = 1;
 		lpMIS->itemHeight = m_CYMENU / 2 - m_CYEDGE - 1;
