@@ -34,6 +34,7 @@ namespace
     } MONITOR_DPI_TYPE;
 
     typedef HRESULT (WINAPI *tpGetDpiForMonitor)(HMONITOR hmonitor, MONITOR_DPI_TYPE dpiType, UINT* dpiX, UINT* dpiY);
+    typedef int (WINAPI *tpGetSystemMetricsForDpi)(int nIndex, UINT dpi);
 }
 
 // Definition: relative pixel = 1 pixel at 96 DPI and scaled based on actual DPI.
@@ -88,6 +89,18 @@ public:
 
     // Convert a point size (1/72 of an inch) to raw pixels.
     inline int PointsToPixels(int pt) const { return MulDiv(pt, m_dpiY, 72); }
+
+    int GetSystemMetricsDPI(int nIndex)
+    {
+        if (SysVersion::IsWin10orLater()) {
+            static tpGetSystemMetricsForDpi pGetSystemMetricsForDpi = (tpGetSystemMetricsForDpi)GetProcAddress(GetModuleHandleW(L"user32.dll"), "GetSystemMetricsForDpi");
+            if (pGetSystemMetricsForDpi) {
+                return pGetSystemMetricsForDpi(nIndex, GetDPIScalePercent());
+            }
+        }
+
+        return ScaleX(::GetSystemMetrics(nIndex));
+    }
 
 protected:
     void UseCurentMonitorDPI(HWND hWindow)
