@@ -775,7 +775,7 @@
 #define IDC_DSSYSDEF                    10700
 #define IDC_DSVMR9WIN                   10704
 #define IDC_DSDXR                       10707
-#define IDC_DSNULL_COMP                 10708
+#define IDC_DSNULL_ANY                  10708
 #define IDC_DSNULL_UNCOMP               10709
 #define IDC_DSEVR                       10710
 #define IDC_DSEVR_CUSTOM                10711
@@ -1658,7 +1658,7 @@
 #define IDS_PPAGE_OUTPUT_EVR            42007
 #define IDS_PPAGE_OUTPUT_EVR_CUSTOM     42008
 #define IDS_PPAGE_OUTPUT_DXR            42009
-#define IDS_PPAGE_OUTPUT_NULL_COMP      42010
+#define IDS_PPAGE_OUTPUT_NULL_ANY       42010
 #define IDS_PPAGE_OUTPUT_NULL_UNCOMP    42011
 #define IDS_PPAGE_OUTPUT_MADVR          42012
 #define IDS_PPAGE_OUTPUT_SYNC           42013
