@@ -167,7 +167,10 @@ LONG (__stdcall * Real_ChangeDisplaySettingsExW)(LPCWSTR a0,
 
 BOOL WINAPI Mine_IsDebuggerPresent()
 {
-	DLog(L"Oops, somebody was trying to be naughty! (called IsDebuggerPresent)");
+#ifdef _DEBUG
+	static int count = 0;
+	DLogIf((count++) == 0, L"Someone calls IsDebuggerPresent!");
+#endif
 	return FALSE;
 }
 
