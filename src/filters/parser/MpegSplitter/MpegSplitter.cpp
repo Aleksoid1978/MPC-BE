@@ -400,6 +400,9 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 					case WAVE_FORMAT_ALAW:
 						Infos.emplace_back(L"A-law PCM");
 						break;
+					case WAVE_FORMAT_MULAW:
+						Infos.emplace_back(L"mu-law PCM");
+						break;
 					case WAVE_FORMAT_OPUS:
 						Infos.emplace_back(L"Opus");
 						break;
