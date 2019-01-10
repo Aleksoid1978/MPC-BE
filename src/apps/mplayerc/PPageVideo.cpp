@@ -179,7 +179,7 @@ BOOL CPPageVideo::OnInitDialog()
 		case VIDRNDT_SYNC:
 		case VIDRNDT_DXR:
 		case VIDRNDT_MADVR:
-		case VIDRNDT_NULL_COMP:
+		case VIDRNDT_NULL_ANY:
 		case VIDRNDT_NULL_UNCOMP:
 			break;
 		default:
@@ -205,7 +205,7 @@ BOOL CPPageVideo::OnInitDialog()
 	addRenderer(VIDRNDT_SYNC,         IDS_PPAGE_OUTPUT_SYNC);
 	addRenderer(VIDRNDT_DXR,          IDS_PPAGE_OUTPUT_DXR);
 	addRenderer(VIDRNDT_MADVR,        IDS_PPAGE_OUTPUT_MADVR);
-	addRenderer(VIDRNDT_NULL_COMP,    IDS_PPAGE_OUTPUT_NULL_COMP);
+	addRenderer(VIDRNDT_NULL_ANY,    IDS_PPAGE_OUTPUT_NULL_ANY);
 	addRenderer(VIDRNDT_NULL_UNCOMP,  IDS_PPAGE_OUTPUT_NULL_UNCOMP);
 
 #if MPCVR
@@ -498,8 +498,8 @@ void CPPageVideo::OnDSRendererChange()
 		case VIDRNDT_DXR:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSDXR), &m_cbVideoRenderer);
 			break;
-		case VIDRNDT_NULL_COMP:
-			m_wndToolTip.UpdateTipText(ResStr(IDC_DSNULL_COMP), &m_cbVideoRenderer);
+		case VIDRNDT_NULL_ANY:
+			m_wndToolTip.UpdateTipText(ResStr(IDC_DSNULL_ANY), &m_cbVideoRenderer);
 			break;
 		case VIDRNDT_NULL_UNCOMP:
 			m_wndToolTip.UpdateTipText(ResStr(IDC_DSNULL_UNCOMP), &m_cbVideoRenderer);
