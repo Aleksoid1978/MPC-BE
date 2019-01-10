@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -599,7 +599,10 @@ NTSTATUS (* Real_NtQueryInformationProcess) (HANDLE				ProcessHandle,
 
 BOOL WINAPI Mine_IsDebuggerPresent()
 {
-	DLog(L"Oops, somebody was trying to be naughty! (called IsDebuggerPresent)");
+#ifdef _DEBUG
+	static int count = 0;
+	DLogIf((count++) == 0, L"Someone calls IsDebuggerPresent!");
+#endif
 	return FALSE;
 }
 
