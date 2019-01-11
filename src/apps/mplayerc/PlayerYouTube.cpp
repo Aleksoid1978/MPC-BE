@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2018 see Authors.txt
+ * (C) 2012-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,6 +38,7 @@
 #define MATCH_ADAPTIVE_FMTS_START   "\"adaptive_fmts\":\""
 #define MATCH_WIDTH_START           "meta property=\"og:video:width\" content=\""
 #define MATCH_HLSVP_START           "\"hlsvp\":\""
+#define MATCH_HLSMANIFEST_START     "\\\"hlsManifestUrl\\\":\\\""
 #define MATCH_JS_START              "\"js\":\""
 #define MATCH_MPD_START             "\"dashmpd\":\""
 #define MATCH_END                   "\""
@@ -450,10 +451,13 @@ namespace Youtube
 					strUrls += adaptive_fmts;
 				}
 			} else {
-				// "hlspv" - live streaming
-				const CStringA hlspv_url = GetEntry(data, MATCH_HLSVP_START, MATCH_END);
-				if (!hlspv_url.IsEmpty()) {
-					url = UrlDecode(UrlDecode(hlspv_url));
+				// live streaming
+				CStringA live_url = GetEntry(data, MATCH_HLSVP_START, MATCH_END);
+				if (live_url.IsEmpty()) {
+					live_url = GetEntry(data, MATCH_HLSMANIFEST_START, MATCH_END);
+				}
+				if (!live_url.IsEmpty()) {
+					url = UrlDecode(UrlDecode(live_url));
 					url.Replace(L"\\/", L"/");
 					DLog(L"Youtube::Parse_URL() : Downloading m3u8 information \"%s\"", url);
 					char* m3u8 = nullptr;
