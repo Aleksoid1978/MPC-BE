@@ -195,7 +195,7 @@ start:
 	int streamId = 0;
 
 	OggPage page;
-	for (int i = 0; m_pFile->ReadPages(page), i < 30; i++) {
+	for (int i = 0; m_pFile->ReadPages(page) && i < 30; i++) {
 		BYTE* p = page.data();
 		if (!p) {
 			continue;
@@ -388,7 +388,7 @@ start:
 	if (m_bitstream_serial_number_start) {
 		__int64 start_pos2 = start_pos;
 		m_pFile->Seek(start_pos2);
-		for (int i = 0; m_pFile->Read(page), i < 10; i++) {
+		for (int i = 0; m_pFile->Read(page) && i < 10; i++) {
 			COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page.m_hdr.bitstream_serial_number));
 			if (!pOggPin) {
 				BYTE* p = page.data();
@@ -421,7 +421,7 @@ start:
 		// get min pts to calculate duration
 		REFERENCE_TIME rtMin = 0;
 		m_pFile->Seek(start_pos);
-		for (int i = 0; m_pFile->Read(page2), i < 10; i++) {
+		for (int i = 0; m_pFile->Read(page2) && i < 10; i++) {
 			COggSplitterOutputPin* pOggPin = dynamic_cast<COggSplitterOutputPin*>(GetOutputPin(page2.m_hdr.bitstream_serial_number));
 			if (!pOggPin || page2.m_hdr.granule_position == -1 || page2.m_hdr.header_type_flag & OggPageHeader::first) {
 				continue;
