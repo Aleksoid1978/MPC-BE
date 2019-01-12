@@ -6341,7 +6341,7 @@ void CMainFrame::OnUpdateFileLoadSubtitle(CCmdUI *pCmdUI)
 
 void CMainFrame::OnFileLoadAudio()
 {
-	if (m_eMediaLoadState == MLS_LOADING || !IsWindow(m_wndPlaylistBar) || IsD3DFullScreenMode()) {
+	if (m_eMediaLoadState == MLS_LOADING) {
 		return;
 	}
 
