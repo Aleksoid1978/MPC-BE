@@ -1367,27 +1367,32 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						if (AP4_DataInfoAtom* clap = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_CLAP))) {
 							const AP4_DataBuffer* clap_data = clap->GetData();
 							if (clap_data->GetDataSize() == 32) { // 40 bytes(size) - 8 bytes(header)
-								const auto& buf = clap_data->GetData();
-								auto apertureWidth_N = _byteswap_ulong(GETU32(buf));
-								const auto apertureWidth_D = _byteswap_ulong(GETU32(buf + 4));
-								auto apertureHeight_N = _byteswap_ulong(GETU32(buf + 8));
-								const auto apertureHeight_D = _byteswap_ulong(GETU32(buf + 12));
-
-								if (apertureWidth_N && apertureWidth_D) {
-									apertureWidth_N /= apertureWidth_D;
+								const uint32_t* data = (uint32_t*)clap_data->GetData();
+								int apertureWidth = _byteswap_ulong(data[0]);
+								if (int den = _byteswap_ulong(data[1]); den) {
+									apertureWidth /= den;
 								}
-								if (apertureHeight_N && apertureHeight_D) {
-									apertureHeight_N /= apertureHeight_D;
+								int apertureHeight = _byteswap_ulong(data[2]);
+								if (int den = _byteswap_ulong(data[3]); den) {
+									apertureHeight /= den;
+								}
+								int horizOff = _byteswap_ulong(data[4]);
+								if (int den = _byteswap_ulong(data[5]); den) {
+									horizOff /= den;
+								}
+								int vertOff = _byteswap_ulong(data[6]);
+								if (int den = _byteswap_ulong(data[7]); den) {
+									vertOff /= den;
 								}
 
-								if (apertureWidth_N && apertureHeight_N) {
+								if (apertureWidth && apertureHeight) {
 									for (auto& item : mts) {
 										if (item.formattype == FORMAT_VideoInfo
 												|| item.formattype == FORMAT_VideoInfo2
 												|| item.formattype == FORMAT_MPEG2Video
 												|| item.formattype == FORMAT_MPEGVideo) {
 											auto vih = (VIDEOINFOHEADER*)item.Format();
-											vih->rcSource = vih->rcTarget = CRect(0, 0, apertureWidth_N, apertureHeight_N);
+											vih->rcSource = vih->rcTarget = { horizOff, vertOff, horizOff + apertureWidth, vertOff + apertureHeight };
 										}
 									}
 								}
