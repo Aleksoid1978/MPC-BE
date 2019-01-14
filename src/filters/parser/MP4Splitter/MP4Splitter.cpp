@@ -1375,8 +1375,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								fraction_t vertOff  = { _byteswap_ulong(data[6]), _byteswap_ulong(data[7]) };
 
 								if (apertureWidth.den == 1 && apertureHeight.den == 1 && horizOff.den && vertOff.den) {
-									const int x = (vse->GetWidth() - apertureWidth.num + 2*horizOff.num) / 2;
-									const int y = (vse->GetHeight() - apertureHeight.num + 2*vertOff.num) / 2;
+									const int x = ((int)vse->GetWidth() - apertureWidth.num)/2 + horizOff.num;
+									const int y = ((int)vse->GetHeight() - apertureHeight.num)/2 + vertOff.num;
 									for (auto& item : mts) {
 										if (item.formattype == FORMAT_VideoInfo
 											|| item.formattype == FORMAT_VideoInfo2
