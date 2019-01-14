@@ -1365,36 +1365,30 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 
 						if (AP4_DataInfoAtom* clap = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_CLAP))) {
+							// https://developer.apple.com/library/archive/documentation/QuickTime/QTFF/QTFFChap3/qtff3.html#//apple_ref/doc/uid/TP40000939-CH205-125850
 							const AP4_DataBuffer* clap_data = clap->GetData();
 							if (clap_data->GetDataSize() == 32) { // 40 bytes(size) - 8 bytes(header)
 								const uint32_t* data = (uint32_t*)clap_data->GetData();
-								int apertureWidth = _byteswap_ulong(data[0]);
-								if (int den = _byteswap_ulong(data[1]); den) {
-									apertureWidth /= den;
-								}
-								int apertureHeight = _byteswap_ulong(data[2]);
-								if (int den = _byteswap_ulong(data[3]); den) {
-									apertureHeight /= den;
-								}
-								int horizOff = _byteswap_ulong(data[4]);
-								if (int den = _byteswap_ulong(data[5]); den) {
-									horizOff /= den;
-								}
-								int vertOff = _byteswap_ulong(data[6]);
-								if (int den = _byteswap_ulong(data[7]); den) {
-									vertOff /= den;
-								}
+								fraction_t apertureWidth  = { _byteswap_ulong(data[0]), _byteswap_ulong(data[1]) };
+								fraction_t apertureHeight = { _byteswap_ulong(data[2]), _byteswap_ulong(data[3]) };
+								fraction_t horizOff = { _byteswap_ulong(data[4]), _byteswap_ulong(data[5]) };
+								fraction_t vertOff  = { _byteswap_ulong(data[6]), _byteswap_ulong(data[7]) };
 
-								if (apertureWidth && apertureHeight) {
+								if (apertureWidth.den == 1 && apertureHeight.den == 1 && horizOff.den && vertOff.den) {
+									const int x = (vse->GetWidth() - apertureWidth.num + 2*horizOff.num) / 2;
+									const int y = (vse->GetHeight() - apertureHeight.num + 2*vertOff.num) / 2;
 									for (auto& item : mts) {
 										if (item.formattype == FORMAT_VideoInfo
-												|| item.formattype == FORMAT_VideoInfo2
-												|| item.formattype == FORMAT_MPEG2Video
-												|| item.formattype == FORMAT_MPEGVideo) {
+											|| item.formattype == FORMAT_VideoInfo2
+											|| item.formattype == FORMAT_MPEG2Video
+											|| item.formattype == FORMAT_MPEGVideo) {
 											auto vih = (VIDEOINFOHEADER*)item.Format();
-											vih->rcSource = vih->rcTarget = { horizOff, vertOff, horizOff + apertureWidth, vertOff + apertureHeight };
+											vih->rcSource = vih->rcTarget = { x, y, x + apertureWidth.num, y + apertureHeight.num };
 										}
 									}
+								} else {
+									// unsupported
+									ASSERT(false);
 								}
 							}
 						}
