@@ -1365,29 +1365,32 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						}
 
 						if (AP4_DataInfoAtom* clap = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_CLAP))) {
-							// https://developer.apple.com/library/archive/documentation/QuickTime/QTFF/QTFFChap3/qtff3.html#//apple_ref/doc/uid/TP40000939-CH205-125850
 							const AP4_DataBuffer* clap_data = clap->GetData();
 							if (clap_data->GetDataSize() == 32) { // 40 bytes(size) - 8 bytes(header)
 								const uint32_t* data = (uint32_t*)clap_data->GetData();
-								fraction_t apertureWidth  = { _byteswap_ulong(data[0]), _byteswap_ulong(data[1]) };
-								fraction_t apertureHeight = { _byteswap_ulong(data[2]), _byteswap_ulong(data[3]) };
-								fraction_t horizOff = { _byteswap_ulong(data[4]), _byteswap_ulong(data[5]) };
-								fraction_t vertOff  = { _byteswap_ulong(data[6]), _byteswap_ulong(data[7]) };
+								if (data[1] && data[3] && data[5] && data[7]) {
+									const double apertureWidth  = (double)_byteswap_ulong(data[0]) / _byteswap_ulong(data[1]);
+									const double apertureHeight = (double)_byteswap_ulong(data[2]) / _byteswap_ulong(data[3]);
+									const double horizOff = (double)_byteswap_ulong(data[4]) / _byteswap_ulong(data[5]);
+									const double vertOff  = (double)_byteswap_ulong(data[6]) / _byteswap_ulong(data[7]);
 
-								if (apertureWidth.den == 1 && apertureHeight.den == 1 && horizOff.den && vertOff.den) {
-									const int x = ((int)vse->GetWidth() - apertureWidth.num)/2 + horizOff.num;
-									const int y = ((int)vse->GetHeight() - apertureHeight.num)/2 + vertOff.num;
+									const double x = ((double)vse->GetWidth() - apertureWidth)/2 + horizOff;
+									const double y = ((double)vse->GetHeight() - apertureHeight)/2 + vertOff;
 									for (auto& item : mts) {
 										if (item.formattype == FORMAT_VideoInfo
 											|| item.formattype == FORMAT_VideoInfo2
 											|| item.formattype == FORMAT_MPEG2Video
 											|| item.formattype == FORMAT_MPEGVideo) {
 											auto vih = (VIDEOINFOHEADER*)item.Format();
-											vih->rcSource = vih->rcTarget = { x, y, x + apertureWidth.num, y + apertureHeight.num };
+											vih->rcSource = vih->rcTarget = {
+												(LONG)std::round(x),
+												(LONG)std::round(y),
+												(LONG)std::round(x + apertureWidth),
+												(LONG)std::round(y + apertureHeight)
+											};
 										}
 									}
 								} else {
-									// unsupported
 									ASSERT(false);
 								}
 							}
