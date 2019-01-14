@@ -158,6 +158,8 @@ extern CStringW AltUTF8ToWStr(LPCSTR lpUTF8Str);
 extern CStringW UTF8orLocalToWStr(LPCSTR lpMultiByteStr);
 
 void FixFilename(CStringW& str);
+void EllipsisURL(CStringW& url, const int maxlen);
+void EllipsisPath(CStringW& path, const int maxlen);
 
 CString FormatNumber(CString szNumber, bool bNoFractionalDigits = true);
 
