@@ -15180,13 +15180,17 @@ void CMainFrame::SetupRecentFilesSubMenu()
 		UINT flags = MF_BYCOMMAND | MF_STRING | MF_ENABLED;
 		if (!MRU[i].IsEmpty()) {
 			CString path(MRU[i]);
-			if (path.Find(L"\\") != 0) {
-				if (CheckBD(path)) {
+			if (PathIsURLW(path)) {
+				EllipsisURL(path, 100);
+			} else {
+				EllipsisPath(path, 100);
+				if (CheckBD(MRU[i])) {
 					path.Insert(0, L"Blu-ray - ");
-				} else if (CheckDVD(path)) {
+				} else if (CheckDVD(MRU[i])) {
 					path.Insert(0, L"DVD - ");
 				}
 			}
+			path.Replace(L"&", L"&&");
 			submenu.AppendMenu(flags, id, path);
 		}
 		id++;

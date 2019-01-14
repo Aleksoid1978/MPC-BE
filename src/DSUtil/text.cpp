@@ -329,6 +329,53 @@ void FixFilename(CStringW& str)
 	}
 }
 
+void EllipsisURL(CStringW& url, const int maxlen)
+{
+	if (url.GetLength() > maxlen) {
+		int k = url.Find(L"://");
+		if (k > 0) {
+			k = url.Find('/', k+1);
+			if (k > 0) {
+				int q = url.Find('?', k+1);
+				if (q > 0 && q < maxlen) {
+					k = q;
+				} else {
+					while ((q = url.Find('/', k+1)) > 0 && q < maxlen) {
+						k = q;
+					}
+				}
+				url.Truncate(std::max(maxlen, k));
+				url.Append(L"...");
+			}
+		}
+	}
+}
+
+void EllipsisPath(CStringW& path, const int maxlen)
+{
+	if (path.GetLength() > maxlen) {
+		int k = -1;
+		if (path.Left(2) == "\\\\") {
+			k = path.Find('\\', k+1);
+		}
+		else if (path.Mid(1, 2) == ":\\") {
+			k = 2;
+		}
+
+		if (k > 0) {
+			const int n = path.ReverseFind('\\');
+			if (n > k) {
+				const int midlen = maxlen + n - path.GetLength();
+				int q = -1;
+				while ((q = path.Find('\\', k+1)) > 0 && q < midlen) {
+					k = q;
+				}
+				path = path.Left(k + 1) + L"..." + path.Mid(n);
+			}
+		}
+	}
+}
+
 CString FormatNumber(CString szNumber, bool bNoFractionalDigits /*= true*/)
 {
 	CString ret;
