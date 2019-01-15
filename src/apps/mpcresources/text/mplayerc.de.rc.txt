@@ -253,7 +253,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 6		"Bedienelemente im &Vollbild anzeigen für"
 9		"s"
 10		" 0: auto-verstecken | -1: nie verstecken"
-11		"Vollbild &bei Stopp der Wiedergabe verlassen"
+11		"Vollbild nach der Wiedergabe verlassen"
 13		"Vollbild beenden, wenn der Fokus verloren wurde"
 14		"Anzeigegerät bei Vollbild:"
 17		"Anzeigemodus bei Vollbild automatisch wechseln"
