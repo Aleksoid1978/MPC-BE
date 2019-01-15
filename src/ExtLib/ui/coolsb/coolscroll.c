@@ -48,6 +48,7 @@
 //#define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
+#include <windowsx.h>
 #include <commctrl.h>
 #include <tchar.h>
 #include "coolscroll.h"
@@ -1632,8 +1633,8 @@ static LRESULT NCHitTest(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lParam)
 	RECT vrect;
 	POINT pt;
 
-	pt.x = LOWORD(lParam);
-	pt.y = HIWORD(lParam);
+	pt.x = GET_X_LPARAM(lParam);
+	pt.y = GET_Y_LPARAM(lParam);
 	
 	//work out exactly where the Horizontal and Vertical scrollbars are
 	GetHScrollRect(sw, hwnd, &hrect);
@@ -1935,8 +1936,8 @@ static LRESULT NCLButtonDown(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lPa
 	SCROLLBUT *sbut = 0;
 	POINT pt;
 
-	pt.x = LOWORD(lParam);
-	pt.y = HIWORD(lParam);
+	pt.x = GET_X_LPARAM(lParam);
+	pt.y = GET_Y_LPARAM(lParam);
 
 	hwndCurCoolSB = hwnd;
 
@@ -1951,7 +1952,7 @@ static LRESULT NCLButtonDown(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lPa
 
 		//get the total area of the normal Horz scrollbar area
 		GetHScrollRect(sw, hwnd, &rect);
-		uCurrentScrollPortion = GetHorzPortion(sb, hwnd, &rect, LOWORD(lParam), HIWORD(lParam));
+		uCurrentScrollPortion = GetHorzPortion(sb, hwnd, &rect, pt.x, pt.y);
 	}
 	//
 	//	VERTICAL SCROLLBAR PROCESSING
@@ -1964,7 +1965,7 @@ static LRESULT NCLButtonDown(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lPa
 
 		//get the total area of the normal Horz scrollbar area
 		GetVScrollRect(sw, hwnd, &rect);
-		uCurrentScrollPortion = GetVertPortion(sb, hwnd, &rect, LOWORD(lParam), HIWORD(lParam));
+		uCurrentScrollPortion = GetVertPortion(sb, hwnd, &rect, pt.x, pt.y);
 	}
 	//
 	//	NORMAL PROCESSING
@@ -2131,8 +2132,8 @@ static LRESULT LButtonUp(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lParam)
 		ReleaseCapture();
 
 		GetWindowRect(hwnd, &winrect);
-		pt.x = LOWORD(lParam);
-		pt.y = HIWORD(lParam);
+		pt.x = GET_X_LPARAM(lParam);
+		pt.y = GET_Y_LPARAM(lParam);
 
 		//emulate the mouse input on a scrollbar here...
 		if(uCurrentScrollbar == SB_HORZ)
@@ -2411,8 +2412,8 @@ static LRESULT MouseMove(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lParam)
 	{
 		int x, y;
 		lParam = GetMessagePos();
-		x = LOWORD(lParam);
-		y = HIWORD(lParam);
+		x = GET_X_LPARAM(lParam);
+		y = GET_Y_LPARAM(lParam);
 
 		bMouseClicked = TRUE;
 
@@ -2438,8 +2439,8 @@ static LRESULT MouseMove(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lParam)
 
 		GetWindowRect(hwnd, &winrect);
 
-		pt.x = LOWORD(nlParam);
-		pt.y = HIWORD(nlParam);
+		pt.x = GET_X_LPARAM(nlParam);
+		pt.y = GET_Y_LPARAM(nlParam);
 
 		//emulate the mouse input on a scrollbar here...
 		if(uCurrentScrollbar == SB_HORZ)
@@ -2455,7 +2456,7 @@ static LRESULT MouseMove(SCROLLWND *sw, HWND hwnd, WPARAM wParam, LPARAM lParam)
 		GetScrollRect(sw, sb->nBarType, hwnd, &rect);
 		
 		//see if we clicked in the inserted buttons / normal scrollbar
-		//thisportion = GetPortion(sb, hwnd, &rect, LOWORD(lParam), HIWORD(lParam));
+		//thisportion = GetPortion(sb, hwnd, &rect, pt.x, pt.y);
 		thisportion = GetPortion(sb, hwnd, &rect, pt.x, pt.y);
 		
 		//we need to do different things depending on if the
@@ -2972,8 +2973,8 @@ static LRESULT SendToolTipMessage0(HWND hwndTT, UINT message, WPARAM wParam, LPA
 static LRESULT CoolSB_SetCursor(SCROLLWND *swnd, HWND hwnd, WPARAM wParam, LPARAM lParam)
 {
 #ifdef INCLUDE_BUTTONS
-	UINT lo = LOWORD(lParam);
-	UINT hi = HIWORD(lParam);
+	UINT lo = GET_X_LPARAM(lParam);
+	UINT hi = GET_Y_LPARAM(lParam);
 	UINT xy;
 	RECT rect;
 	SCROLLBAR *sbar;
@@ -2997,8 +2998,8 @@ static LRESULT CoolSB_SetCursor(SCROLLWND *swnd, HWND hwnd, WPARAM wParam, LPARA
 	if(lo == HTHSCROLL || lo == HTVSCROLL)
 	{
 		xy = GetMessagePos();
-		pt.x = LOWORD(xy);
-		pt.y = HIWORD(xy);
+		pt.x = GET_X_LPARAM(xy);
+		pt.y = GET_Y_LPARAM(xy);
 
 		if(lo == HTHSCROLL)
 		{
