@@ -2932,14 +2932,18 @@ bool CMpegSplitterFile::ReadTR(trhdr& h, bool fSync)
 				if (i == 0) {
 					break;
 				}
-				Seek(GetPos() + m_tslen);
+
+				const auto save_pos = GetPos();
+				Seek(save_pos + m_tslen);
 				if (BitRead(8, true) == 0x47) {
-					Seek(GetPos() - m_tslen);
+					Seek(save_pos);
 					break;
 				}
+
+				Seek(save_pos);
 			}
 
-			BitRead(8);
+			Skip(1);
 
 			if (i == m_tslen - 1) {
 				return false;
