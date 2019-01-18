@@ -30,6 +30,9 @@
 #include <MMReg.h>
 #include <moreuuids.h>
 
+#define RAPIDJSON_SSE2
+#include <rapidjson/include/rapidjson/document.h>
+
 #define MAXFRAMESIZE	((144 * 320000 / 8000) + 1)
 #define BUFFERS			2
 #define MINBUFFERLENGTH	  1000000i64
@@ -731,6 +734,23 @@ int CShoutcastStream::CShoutcastSocket::Receive(void* lpBuf, int nBufLen, int nF
 				}
 				if (j > i) {
 					m_title = str.Mid(i, j - i);
+
+					// special code for 101.ru - it's use json format in MetaInfo
+					if (!m_title.IsEmpty() && m_title.Left(1) == L"{") {
+						CString tmp(m_title);
+						const auto pos = tmp.ReverseFind(L'}');
+						if (pos > 0) {
+							tmp.Delete(pos + 1, tmp.GetLength() - pos);
+
+							rapidjson::GenericDocument<rapidjson::UTF16<>> d;
+							if (!d.Parse(tmp.GetString()).HasParseError()) {
+								const auto& t = d[L"t"];
+								if (t.IsString()) {
+									m_title = t.GetString();
+								}
+							}
+						}
+					}
 				}
 			} else {
 				DLog(L"CShoutcastStream(): StreamTitle is missing");
