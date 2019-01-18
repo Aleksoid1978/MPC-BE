@@ -569,7 +569,8 @@ namespace Youtube
 							static LPCSTR signatureRegExps[] = {
 								"\"signature\",([a-zA-Z0-9$]+)\\(",
 								"\\.sig\\|\\|([a-zA-Z0-9$]+)\\(",
-								"\\bc\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*([a-zA-Z0-9$]+)\\(",
+								"yt\\.akamaized\\.net/\\)\\s*\\|\\|\\s*.*?\\s*c\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*(?:encodeURIComponent\\s*\\()?([a-zA-Z0-9$]+)\\(",
+								"\\bc\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*(?:encodeURIComponent\\s*\\()?\\s*([a-zA-Z0-9$]+)\\("
 								"\\bc\\s*&&\\s*d\\.set\\([^,]+\\s*,\\s*\\([^)]*\\)\\s*\\(\\s*([a-zA-Z0-9$]+)\\(",
 							};
 							CStringA funcName;
