@@ -1233,7 +1233,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 									int j, r, buf_start = 0;
 									AP4_Sample sample_tmp;
-									for (AP4_Ordinal index = 0; index < 50; index++) {
+									for (AP4_Ordinal index = 0; index < 150; index++) {
 										if (!AP4_SUCCEEDED(track->GetSample(index, sample_tmp)) || sample_tmp.GetDescriptionIndex() == 0xFFFFFFFF) {
 											break;
 										}
