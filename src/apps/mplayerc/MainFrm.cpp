@@ -18385,7 +18385,7 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/,
 				path.Truncate(path.GetLength() - 5);
 				CString infFile = path + L"\\disc.inf";
 				if (::PathFileExistsW(infFile)) {
-					CTextFile cf;
+					CTextFile cf(CTextFile::UTF8, CTextFile::ANSI);
 					if (cf.Open(infFile)) {
 						CString line;
 						while (cf.ReadString(line)) {
@@ -18394,6 +18394,32 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/,
 							if (sl.size() == 2 && CString(sl.front().Trim()).MakeLower() == L"label") {
 								m_BDLabel = sl.back();
 								break;
+							}
+						}
+					}
+				}
+
+				if (m_BDLabel.IsEmpty()) {
+					const CString bdmt_xml_file = path + L"\\BDMV\\META\\DL\\bdmt_eng.xml";
+					if (::PathFileExistsW(bdmt_xml_file)) {
+						CTextFile cf(CTextFile::UTF8, CTextFile::ANSI);
+						if (cf.Open(bdmt_xml_file)) {
+							const auto RegExpParse = [](LPCTSTR szIn, LPCTSTR szRE) -> CString {
+								const std::wregex regex(szRE);
+								std::wcmatch match;
+								if (std::regex_search(szIn, match, regex) && match.size() == 2) {
+									return CString(match[1].first, match[1].length());
+								}
+								return L"";
+							};
+
+							CString line;
+							while (cf.ReadString(line)) {
+								const auto title = RegExpParse(line, L"<di:name>([^<>\\n]+)</di:name>");
+								if (!title.IsEmpty()) {
+									m_BDLabel = title;
+									break;
+								}
 							}
 						}
 					}
