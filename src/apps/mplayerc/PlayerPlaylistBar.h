@@ -305,6 +305,7 @@ public:
 	afx_msg void OnLvnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 
 	afx_msg void OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct);
+	afx_msg void OnSetFocus(CWnd* pOldWnd);
 
 	virtual void Invalidate() { m_list.Invalidate(); }
 };
