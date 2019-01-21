@@ -1728,7 +1728,7 @@ void CPlayerPlaylistBar::EnsureVisible(POSITION pos, bool bMatchPos)
 
 	m_list.SetItemState(-1, 0, LVIS_SELECTED);
 	m_list.EnsureVisible(i - 1 + bMatchPos, TRUE);
-	m_list.SetItemState(i, LVIS_SELECTED, LVIS_SELECTED);
+	m_list.SetItemState(i, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
 
 	m_list.Invalidate();
 }
@@ -2029,6 +2029,7 @@ BEGIN_MESSAGE_MAP(CPlayerPlaylistBar, CSizingControlBarG)
 	ON_WM_CONTEXTMENU()
 	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_PLAYLIST, OnLvnEndlabeleditList)
 	ON_WM_MEASUREITEM()
+	ON_WM_SETFOCUS()
 END_MESSAGE_MAP()
 
 // CPlayerPlaylistBar message handlers
@@ -2942,4 +2943,13 @@ void CPlayerPlaylistBar::OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasure
 	}
 
 	__super::OnMeasureItem(nIDCtl, lpMeasureItemStruct);
+}
+
+void CPlayerPlaylistBar::OnSetFocus(CWnd* pOldWnd)
+{
+	__super::OnSetFocus(pOldWnd);
+
+	if (IsWindow(m_list.GetSafeHwnd())) {
+		m_list.SetFocus();
+	}
 }
