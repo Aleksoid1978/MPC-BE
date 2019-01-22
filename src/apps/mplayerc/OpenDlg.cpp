@@ -316,11 +316,11 @@ COpenFileDlg::COpenFileDlg(std::vector<CString>& mask, bool fAllowDirSelection, 
 	wcscpy(m_InitialDir, str);
 	m_pOFN->lpstrInitialDir = m_InitialDir;
 
-	size = 10000;
+	size = 100000;
 	m_buff = DNew WCHAR[size];
 	memset(m_buff, 0, size * sizeof(WCHAR));
-	m_pOFN->lpstrFile	= m_buff;
-	m_pOFN->nMaxFile	= size;
+	m_pOFN->lpstrFile = m_buff;
+	m_pOFN->nMaxFile  = size;
 }
 
 COpenFileDlg::~COpenFileDlg()
