@@ -545,6 +545,7 @@ CString CAppSettings::SerializeHex(BYTE* pBuffer, int nBufSize) const
 void CAppSettings::ResetSettings()
 {
 	iLanguage = -1;
+	iCurrentLanguage = CMPlayerCApp::GetLanguageIndex(ID_LANGUAGE_ENGLISH);
 
 	iCaptionMenuMode = MODE_SHOWCAPTIONMENU;
 	fHideNavigation = false;

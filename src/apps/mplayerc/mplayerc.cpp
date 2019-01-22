@@ -47,32 +47,32 @@ extern "C" {
 }
 
 const LanguageResource CMPlayerCApp::languageResources[] = {
-	{ID_LANGUAGE_ARMENIAN,				1067,	L"Armenian",				L"hy"},
-	{ID_LANGUAGE_BASQUE,				1069,	L"Basque",					L"eu"},
-	{ID_LANGUAGE_BELARUSIAN,			1059,	L"Belarusian",				L"by"},
-	{ID_LANGUAGE_CATALAN,				1027,	L"Catalan",					L"ca"},
-	{ID_LANGUAGE_CHINESE_SIMPLIFIED,	2052,	L"Chinese (Simplified)",	L"sc"},
-	{ID_LANGUAGE_CHINESE_TRADITIONAL,	3076,	L"Chinese (Traditional)",	L"tc"},
-	{ID_LANGUAGE_CZECH,					1029,	L"Czech",					L"cz"},
-	{ID_LANGUAGE_DUTCH,					1043,	L"Dutch",					L"nl"},
-	{ID_LANGUAGE_ENGLISH,				0,		L"English",					L"en"},
-	{ID_LANGUAGE_FRENCH,				1036,	L"French",					L"fr"},
-	{ID_LANGUAGE_GERMAN,				1031,	L"German",					L"de"},
-	{ID_LANGUAGE_GREEK,					1032,	L"Greek",					L"el"},
-	{ID_LANGUAGE_HEBREW,				1037,	L"Hebrew",					L"he"},
-	{ID_LANGUAGE_HUNGARIAN,				1038,	L"Hungarian",				L"hu"},
-	{ID_LANGUAGE_ITALIAN,				1040,	L"Italian",					L"it"},
-	{ID_LANGUAGE_JAPANESE,				1041,	L"Japanese",				L"ja"},
-	{ID_LANGUAGE_KOREAN,				1042,	L"Korean",					L"kr"},
-	{ID_LANGUAGE_POLISH,				1045,	L"Polish",					L"pl"},
-	{ID_LANGUAGE_PORTUGUESE_BR,			1046,	L"Portuguese (Brazil)",		L"br"},
-	{ID_LANGUAGE_ROMANIAN,				1048,	L"Romanian",				L"ro"},
-	{ID_LANGUAGE_RUSSIAN,				1049,	L"Russian",					L"ru"},
-	{ID_LANGUAGE_SLOVAK,				1053,	L"Slovak",					L"sk"},
-	{ID_LANGUAGE_SWEDISH,				1051,	L"Swedish",					L"sv"},
-	{ID_LANGUAGE_SPANISH,				1034,	L"Spanish",					L"es"},
-	{ID_LANGUAGE_TURKISH,				1055,	L"Turkish",					L"tr"},
-	{ID_LANGUAGE_UKRAINIAN,				1058,	L"Ukrainian",				L"ua"},
+	{ID_LANGUAGE_ARMENIAN,				1067,	L"Armenian",				L"hy",	L"arm"},
+	{ID_LANGUAGE_BASQUE,				1069,	L"Basque",					L"eu",	L"baq"},
+	{ID_LANGUAGE_BELARUSIAN,			1059,	L"Belarusian",				L"by",	L"bel"},
+	{ID_LANGUAGE_CATALAN,				1027,	L"Catalan",					L"ca",	L"cat"},
+	{ID_LANGUAGE_CHINESE_SIMPLIFIED,	2052,	L"Chinese (Simplified)",	L"sc",	L"chi"},
+	{ID_LANGUAGE_CHINESE_TRADITIONAL,	3076,	L"Chinese (Traditional)",	L"tc",	L"zht"},
+	{ID_LANGUAGE_CZECH,					1029,	L"Czech",					L"cz",	L"cze"},
+	{ID_LANGUAGE_DUTCH,					1043,	L"Dutch",					L"nl",	L"dut"},
+	{ID_LANGUAGE_ENGLISH,				0,		L"English",					L"en",	L"eng"},
+	{ID_LANGUAGE_FRENCH,				1036,	L"French",					L"fr",	L"fre"},
+	{ID_LANGUAGE_GERMAN,				1031,	L"German",					L"de",	L"deu"},
+	{ID_LANGUAGE_GREEK,					1032,	L"Greek",					L"el",	L"gre"},
+	{ID_LANGUAGE_HEBREW,				1037,	L"Hebrew",					L"he",	L"heb"},
+	{ID_LANGUAGE_HUNGARIAN,				1038,	L"Hungarian",				L"hu",	L"hun"},
+	{ID_LANGUAGE_ITALIAN,				1040,	L"Italian",					L"it",	L"ita"},
+	{ID_LANGUAGE_JAPANESE,				1041,	L"Japanese",				L"ja",	L"jpn"},
+	{ID_LANGUAGE_KOREAN,				1042,	L"Korean",					L"kr",	L"kor"},
+	{ID_LANGUAGE_POLISH,				1045,	L"Polish",					L"pl",	L"pol"},
+	{ID_LANGUAGE_PORTUGUESE_BR,			1046,	L"Portuguese (Brazil)",		L"br",	L"por"},
+	{ID_LANGUAGE_ROMANIAN,				1048,	L"Romanian",				L"ro",	L"ron"},
+	{ID_LANGUAGE_RUSSIAN,				1049,	L"Russian",					L"ru",	L"rus"},
+	{ID_LANGUAGE_SLOVAK,				1053,	L"Slovak",					L"sk",	L"slo"},
+	{ID_LANGUAGE_SWEDISH,				1051,	L"Swedish",					L"sv",	L"swe"},
+	{ID_LANGUAGE_SPANISH,				1034,	L"Spanish",					L"es",	L"spa"},
+	{ID_LANGUAGE_TURKISH,				1055,	L"Turkish",					L"tr",	L"tur"},
+	{ID_LANGUAGE_UKRAINIAN,				1058,	L"Ukrainian",				L"ua",	L"ukr"},
 };
 
 const size_t CMPlayerCApp::languageResourcesCount = _countof(CMPlayerCApp::languageResources);
@@ -1588,9 +1588,12 @@ void CMPlayerCApp::SetLanguage(int nLanguage, bool bSave/* = true*/)
 		s.iLanguage = nLanguage;
 	}
 
+	s.iCurrentLanguage = nLanguage;
+
 	// In case no dll was loaded, load the English translation from the executable
 	if (hMod == nullptr) {
 		hMod = AfxGetApp()->m_hInstance;
+		s.iCurrentLanguage = CMPlayerCApp::GetLanguageIndex(ID_LANGUAGE_ENGLISH);
 	}
 	// In case a dll was loaded, check if some special action is needed
 	else if (nLanguage == GetLanguageIndex(ID_LANGUAGE_HEBREW)) {

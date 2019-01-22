@@ -18400,7 +18400,11 @@ BOOL CMainFrame::OpenBD(CString path, REFERENCE_TIME rtStart/* = INVALID_TIME*/,
 				}
 
 				if (m_BDLabel.IsEmpty()) {
-					const CString bdmt_xml_file = path + L"\\BDMV\\META\\DL\\bdmt_eng.xml";
+					const auto& lr = CMPlayerCApp::languageResources[AfxGetAppSettings().iCurrentLanguage];
+					CString bdmt_xml_file; bdmt_xml_file.Format(L"%s\\BDMV\\META\\DL\\bdmt_%s.xml", path, lr.iso6392);
+					if (!::PathFileExistsW(bdmt_xml_file)) {
+						bdmt_xml_file = path + L"\\BDMV\\META\\DL\\bdmt_eng.xml";
+					}
 					if (::PathFileExistsW(bdmt_xml_file)) {
 						CTextFile cf(CTextFile::UTF8, CTextFile::ANSI);
 						if (cf.Open(bdmt_xml_file)) {
