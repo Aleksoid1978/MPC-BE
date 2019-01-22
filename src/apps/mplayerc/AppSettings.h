@@ -784,6 +784,7 @@ public:
 	UINT			nCS; // Control state for toolbars
 	// Language
 	int				iLanguage;
+	int				iCurrentLanguage;
 	// Subtitles menu
 	bool			fEnableSubtitles;
 	bool			fUseDefaultSubtitlesStyle;

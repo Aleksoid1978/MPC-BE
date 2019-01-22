@@ -60,8 +60,9 @@ enum {
 struct LanguageResource {
 	const UINT resourceID;
 	const LANGID localeID;
-	const LPCTSTR name;
-	const LPCTSTR strcode;
+	LPCTSTR name;
+	LPCTSTR strcode;
+	LPCTSTR iso6392;
 };
 
 class CMPlayerCApp : public CModApp
