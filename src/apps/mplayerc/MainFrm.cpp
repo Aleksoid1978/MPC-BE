@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -4052,28 +4052,24 @@ BOOL CMainFrame::OnMenu(CMenu* pMenu)
 {
 	CheckPointer(pMenu, FALSE);
 
-	CPoint point;
-	GetCursorPos(&point);
-
 	// Do not show popup menu in D3D fullscreen it has several adverse effects.
-	if (IsD3DFullScreenMode()) {
-		CWnd* pWnd = WindowFromPoint(point);
-		if (pWnd && *pWnd == *m_pFullscreenWnd) {
-			return FALSE;
-		}
+	if (CursorOnD3DFullScreenWindow()) {
+		return FALSE;
 	}
 
 	if (m_bClosingState) {
-		return FALSE; //prevent crash when player closes with context menu open
+		return FALSE; // prevent crash when player closes with context menu open
 	}
 
 	KillTimer(TIMER_FULLSCREENMOUSEHIDER);
 	m_bHideCursor = false;
 
+	CPoint point;
+	GetCursorPos(&point);
 	pMenu->TrackPopupMenu(TPM_RIGHTBUTTON | TPM_NOANIMATION, point.x + 1, point.y + 1, this);
 
 	if (m_bFullScreen) {
-		SetTimer(TIMER_FULLSCREENMOUSEHIDER, 2000, nullptr);    //need when working with menus and use the keyboard only
+		SetTimer(TIMER_FULLSCREENMOUSEHIDER, 2000, nullptr); // need when working with menus and use the keyboard only
 	}
 
 	return TRUE;
@@ -5076,7 +5072,11 @@ void CMainFrame::OnFileOpenQuick()
 
 void CMainFrame::OnFileOpenMedia()
 {
-	if (m_eMediaLoadState == MLS_LOADING || !IsWindow(m_wndPlaylistBar) || IsD3DFullScreenMode()) {
+	if (m_eMediaLoadState == MLS_LOADING) {
+		return;
+	}
+
+	if (!CanShowDialog()) {
 		return;
 	}
 
@@ -7514,13 +7514,8 @@ void CMainFrame::OnUpdateViewOntop(CCmdUI* pCmdUI)
 
 void CMainFrame::OnViewOptions()
 {
-	if (IsD3DFullScreenMode()) {
-		const CMonitor monitorD3D  = CMonitors::GetNearestMonitor(m_pFullscreenWnd);
-		const CMonitor monitorMain = CMonitors::GetNearestMonitor(this);
-
-		if (monitorD3D == monitorMain) {
-			return;
-		}
+	if (!CanShowDialog()) {
+		return;
 	}
 
 	ShowOptions();
@@ -8044,7 +8039,11 @@ void CMainFrame::OnUpdatePlaySeek(CCmdUI* pCmdUI)
 
 void CMainFrame::OnPlayGoto()
 {
-	if (m_eMediaLoadState != MLS_LOADED || IsD3DFullScreenMode()) {
+	if (m_eMediaLoadState != MLS_LOADED) {
+		return;
+	}
+
+	if (!CanShowDialog()) {
 		return;
 	}
 
@@ -17048,6 +17047,18 @@ bool CMainFrame::CursorOnD3DFullScreenWindow() const
 	}
 
 	return false;
+}
+
+bool CMainFrame::CanShowDialog() const
+{
+	if (IsD3DFullScreenMode()) {
+		const auto monitorD3D = CMonitors::GetNearestMonitor(m_pFullscreenWnd);
+		const auto monitorMain = CMonitors::GetNearestMonitor(this);
+
+		return monitorD3D != monitorMain;
+	}
+
+	return true;
 }
 
 void CMainFrame::DestroyD3DWindow()
