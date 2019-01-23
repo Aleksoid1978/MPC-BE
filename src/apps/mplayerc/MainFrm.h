@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -504,6 +504,7 @@ public:
 
 	bool IsD3DFullScreenMode() const;
 	bool CursorOnD3DFullScreenWindow() const;
+	bool CanShowDialog() const;
 	void DestroyD3DWindow();
 
 	CControlBar* m_pLastBar;
