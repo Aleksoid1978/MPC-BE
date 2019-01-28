@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -476,7 +476,7 @@ static bool OpenSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 	CStringW buff;
 	bool first_line_success = false;
 	while (file->ReadString(buff)) {
-		FastTrim(buff);
+		FastTrimRight(buff);
 		if (buff.IsEmpty()) {
 			continue;
 		}
@@ -505,7 +505,7 @@ static bool OpenSubRipper(CTextFile* file, CSimpleTextSubtitle& ret, int CharSet
 			bool fFoundEmpty = false;
 
 			while (file->ReadString(tmp)) {
-				FastTrim(tmp);
+				FastTrimRight(tmp);
 				if (tmp.IsEmpty()) {
 					fFoundEmpty = true;
 				}
