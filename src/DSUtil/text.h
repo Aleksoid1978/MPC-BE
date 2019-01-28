@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -169,11 +169,11 @@ template<class T>
 T& FastTrimRight(T& str)
 {
 	if (!str.IsEmpty()) {
-		T::PCXSTR szStart	= str;
-		T::PCXSTR szEnd		= szStart + str.GetLength() - 1;
-		T::PCXSTR szCur		= szEnd;
+		T::PCXSTR szStart = str;
+		T::PCXSTR szEnd   = szStart + str.GetLength() - 1;
+		T::PCXSTR szCur   = szEnd;
 		for (; szCur >= szStart; szCur--) {
-			if (!T::StrTraits::IsSpace(*szCur)) {
+			if (!T::StrTraits::IsSpace(*szCur) || *szCur == 133) { // allow ellipsis character
 				break;
 			}
 		}
