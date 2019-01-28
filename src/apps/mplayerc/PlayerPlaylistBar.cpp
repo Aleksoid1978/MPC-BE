@@ -776,7 +776,7 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 		| LVS_OWNERDRAWFIXED
 		| LVS_NOCOLUMNHEADER
 		| LVS_EDITLABELS
-		| LVS_REPORT | /*LVS_SINGLESEL|*/ LVS_AUTOARRANGE | LVS_NOSORTHEADER, // TODO: remove LVS_SINGLESEL and implement multiple item repositioning (dragging is ready)
+		| LVS_REPORT | LVS_AUTOARRANGE | LVS_NOSORTHEADER,
 		CRect(0, 0, 100, 100), this, IDC_PLAYLIST);
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
@@ -869,11 +869,17 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 				}
 				break;
 			case 'A':
+				if (TGetPlaylistType() == EXPLORER) {
+					break;
+				}
 				if (GetKeyState(VK_CONTROL) < 0) {
 					m_list.SetItemState(-1, LVIS_SELECTED, LVIS_SELECTED);
 				}
 				break;
 			case 'I':
+				if (TGetPlaylistType() == EXPLORER) {
+					break;
+				}
 				if (GetKeyState(VK_CONTROL) < 0) {
 					for (int nItem = 0; nItem < m_list.GetItemCount(); nItem++) {
 						m_list.SetItemState(nItem, ~m_list.GetItemState(nItem, LVIS_SELECTED), LVIS_SELECTED);
