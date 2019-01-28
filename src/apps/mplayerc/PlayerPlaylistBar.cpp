@@ -748,6 +748,7 @@ CPlayerPlaylistBar::CPlayerPlaylistBar(CMainFrame* pMainFrame)
 CPlayerPlaylistBar::~CPlayerPlaylistBar()
 {
 	TEnsureVisible(m_nCurPlayListIndex); // save selected tab visible
+	SavePlaylist();
 	TSaveSettings();
 
 	for (auto& pl : m_pls) {
@@ -2699,7 +2700,7 @@ void CPlayerPlaylistBar::OnLButtonDown(UINT nFlags, CPoint point)
 	else {
 		for (size_t i = 0; i < m_tabs.size(); i++) {
 			if (m_tabs[i].r.PtInRect(point)) {
-				//SavePlaylist();
+				SavePlaylist();
 				curPlayList.m_nFocused_idx = TGetFocusedElement();
 				m_nCurPlayListIndex = i;
 				TSelectTab();
@@ -3571,6 +3572,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 	bool bNewExplorer = false;
 
 	if (nID > 0 && nID <= size) {
+		SavePlaylist();
 		curPlayList.m_nFocused_idx = TGetFocusedElement();
 		m_nCurPlayListIndex = nID - 1;
 		TEnsureVisible(m_nCurPlayListIndex);
