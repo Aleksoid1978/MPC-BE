@@ -726,6 +726,12 @@ CPlaylistItem& CPlaylist::GetPrevWrap(POSITION& pos)
 	return(GetAt(pos));
 }
 
+static unsigned GetNextId()
+{
+	static unsigned id = 1;
+	return id++;
+}
+
 IMPLEMENT_DYNAMIC(CPlayerPlaylistBar, CPlayerBar)
 
 CPlayerPlaylistBar::CPlayerPlaylistBar(CMainFrame* pMainFrame)
@@ -736,7 +742,6 @@ CPlayerPlaylistBar::CPlayerPlaylistBar(CMainFrame* pMainFrame)
 	, m_bHiddenDueToFullscreen(false)
 	, m_bVisible(false)
 	, cntOffset(0)
-	, m_nCurPlayListIndex(0)
 {
 	CAppSettings& s = AfxGetAppSettings();
 	m_bUseDarkTheme = s.bUseDarkTheme;
@@ -1641,7 +1646,7 @@ void CPlayerPlaylistBar::Remove(const std::vector<int>& items, const bool bDelet
 			}
 
 			if (curPlayList.RemoveAt(pos)) {
-				m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+				CloseMedia();
 			}
 			m_list.DeleteItem(items[i]);
 		}
@@ -2065,6 +2070,8 @@ OpenMediaData* CPlayerPlaylistBar::GetCurOMD(REFERENCE_TIME rtStart)
 	if (TGetPathType(fn) != FILE) {
 		return nullptr;
 	}
+
+	m_nCurPlaybackListId = m_tabs[m_nCurPlayListIndex].id;
 
 	if (fn.Find(L"video_ts.ifo") >= 0
 			|| fn.Find(L".ratdvd") >= 0) {
@@ -3051,7 +3058,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 				return;
 			}
 			if (Empty()) {
-				m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+				CloseMedia();
 			}
 			break;
 		case M_SORTBYID:
@@ -3606,11 +3613,12 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 						return;
 					}
 
-					tab tpl;
-					tpl.type = PLAYLIST;
-					tpl.name = strGetName;
-					tpl.fn.Format(L"Playlist%u.mpcpl", cnt);
-					m_tabs.insert(m_tabs.begin() + m_nCurPlayListIndex + 1, tpl);
+					tab_t tab;
+					tab.type = PLAYLIST;
+					tab.name = strGetName;
+					tab.fn.Format(L"Playlist%u.mpcpl", cnt);
+					tab.id = GetNextId();
+					m_tabs.insert(m_tabs.begin() + m_nCurPlayListIndex + 1, tab);
 
 					CPlaylist* pl = DNew CPlaylist;
 					m_pls.insert(m_pls.begin() + m_nCurPlayListIndex + 1, pl);
@@ -3642,11 +3650,12 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 						return;
 					}
 			
-					tab t;
-					t.type = EXPLORER;
-					t.name = strGetName;
-					t.fn.Format(L"Explorer%u.mpcpl", cnt);
-					m_tabs.insert(m_tabs.begin() + m_nCurPlayListIndex + 1, t);
+					tab_t tab;
+					tab.type = EXPLORER;
+					tab.name = strGetName;
+					tab.fn.Format(L"Explorer%u.mpcpl", cnt);
+					tab.id = GetNextId();
+					m_tabs.insert(m_tabs.begin() + m_nCurPlayListIndex + 1, tab);
 
 					CPlaylist* pl = DNew CPlaylist;
 					m_pls.insert(m_pls.begin() + m_nCurPlayListIndex + 1, pl);
@@ -3681,7 +3690,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 			case 4: // DELETE TAB
 				{
 					if (Empty()) {
-						m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+						CloseMedia();
 					}
 
 					CString base;
@@ -3921,11 +3930,10 @@ void CPlayerPlaylistBar::TSaveSettings()
 	if (!m_tabs.empty()) {
 		// the first stroke has only saved last active playlist index and tabs offset (first visible tab on tabbar)
 		str.AppendFormat(L"%d;%d;|", m_nCurPlayListIndex, cntOffset);
-		// only tabs, buttons don't save
 		const auto last = m_tabs.size() - 1;
 		for (size_t i = 0; i <= last; i++) {
 			CString s;
-			str.AppendFormat(L"%d;%s%s", m_tabs[i].type, RemoveFileExt(m_tabs[i].fn.GetString()), i < last ? L"|" : L"");
+			str.AppendFormat(L"%u;%s%s", m_tabs[i].type, RemoveFileExt(m_tabs[i].fn.GetString()), i < last ? L"|" : L"");
 		}
 	}
 
@@ -3952,12 +3960,15 @@ void CPlayerPlaylistBar::TGetSettings()
 			continue;
 		}
 
-		tab tpl;
-		tpl.type = _wtoi(arFields[0]);
-		tpl.name = m_pls.empty() ? ResStr(IDS_PLAYLIST_MAIN_NAME) : arFields[1];
-		tpl.fn = arFields[1] + (L".mpcpl");
-		m_tabs.push_back(tpl);
+		// add tab
+		tab_t tab;
+		tab.type = _wtoi(arFields[0]);
+		tab.name = m_pls.empty() ? ResStr(IDS_PLAYLIST_MAIN_NAME) : arFields[1];
+		tab.fn = arFields[1] + (L".mpcpl");
+		tab.id = GetNextId();
+		m_tabs.push_back(tab);
 
+		// add playlist
 		CPlaylist* pl = DNew CPlaylist;
 		m_pls.push_back(pl);
 	}
@@ -3965,16 +3976,17 @@ void CPlayerPlaylistBar::TGetSettings()
 	// if we have no tabs settings, create 2 tabs (default and explorer)
 	if (m_tabs.size() == 0) {
 		for (int i = 0; i < 2; i++) {
-			tab tpl;
-			tpl.type = i == 0 ? PLAYLIST : EXPLORER;
-			tpl.name = i == 0 ? ResStr(IDS_PLAYLIST_MAIN_NAME) : ResStr(IDS_PLAYLIST_EXPLORER_NAME);
-			tpl.fn   = i == 0 ? L"Default.mpcpl" : L"Explorer.mpcpl";
+			// add tab
+			tab_t tab;
+			tab.type = i == 0 ? PLAYLIST : EXPLORER;
+			tab.name = i == 0 ? ResStr(IDS_PLAYLIST_MAIN_NAME) : ResStr(IDS_PLAYLIST_EXPLORER_NAME);
+			tab.fn   = i == 0 ? L"Default.mpcpl" : L"Explorer.mpcpl";
+			tab.id = GetNextId();
+			m_tabs.push_back(tab);
 
 			// add playlist
 			CPlaylist* pl = DNew CPlaylist;
 			m_pls.push_back(pl);
-			// add tab
-			m_tabs.push_back(tpl);
 		}
 	}
 
@@ -4230,4 +4242,11 @@ int CPlayerPlaylistBar::TGetFocusedElement() const
 	}
 
 	return 0;
+}
+
+void CPlayerPlaylistBar::CloseMedia() const
+{
+	if (m_nCurPlaybackListId == m_tabs[m_nCurPlayListIndex].id) {
+		m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
+	}
 }

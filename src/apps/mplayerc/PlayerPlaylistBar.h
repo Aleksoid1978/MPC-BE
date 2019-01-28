@@ -237,25 +237,26 @@ private:
 		FILE
 	};
 
-	struct tab {
-		UINT type = PLAYLIST; //
+	struct tab_t {
+		BYTE type = PLAYLIST; //
 		CString name;         // playlist label
 		CString fn;           // file playlist name
 		CRect r;              // layout
+		unsigned id;          // unique id
 	};
-	std::vector<tab> m_tabs;
+	std::vector<tab_t> m_tabs;
 
 	enum {
 		LEFT,
 		RIGHT,
 		MENU
 	};
-	struct tab_button {
+	struct tab_button_t {
 		CString name;
 		CRect r;
 		bool bVisible = false;
 	};
-	tab_button m_tab_buttons[3] = {
+	tab_button_t m_tab_buttons[3] = {
 		{L"<"},
 		{L">"},
 		{L"::", CRect(), true}
@@ -289,6 +290,9 @@ private:
 	bool TNavigate();
 	bool TSelectFolder(CString path);
 	int TGetFocusedElement() const;
+
+	unsigned m_nCurPlaybackListId = 0;
+	void CloseMedia() const;
 
 	COLORREF m_crBkBar;
 
