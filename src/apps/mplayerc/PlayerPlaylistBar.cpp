@@ -3815,6 +3815,7 @@ void CPlayerPlaylistBar::TParseFolder(const CString& path)
 		m_icons_large[folder] = shFileInfo.hIcon;
 	}
 
+	std::vector<CString> directory;
 	std::vector<CString> files;
 
 	const CString mask = AddSlash(path) + L"*.*";
@@ -3826,10 +3827,7 @@ void CPlayerPlaylistBar::TParseFolder(const CString& path)
 
 			if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 				if (!(FindFileData.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) && fileName != L"." && fileName != L"..") {
-					CPlaylistItem pli;
-					pli.m_bDirectory = true;
-					pli.m_fns.push_front(AddSlash(path) + fileName + L">"); // Folders mark
-					curPlayList.AddTail(pli);
+					directory.push_back(AddSlash(path) + fileName);
 				}
 			}
 			else {
@@ -3841,6 +3839,21 @@ void CPlayerPlaylistBar::TParseFolder(const CString& path)
 		} while (::FindNextFileW(hFind, &FindFileData));
 		::FindClose(hFind);
 	}
+
+	std::sort(directory.begin(), directory.end(), [](const CString& a, const CString& b) {
+		return (StrCmpLogicalW(a, b) < 0);
+	});
+
+	for (const auto& dir : directory) {
+		CPlaylistItem pli;
+		pli.m_bDirectory = true;
+		pli.m_fns.push_front(dir + L">"); // Folders mark
+		curPlayList.AddTail(pli);
+	}
+
+	std::sort(files.begin(), files.end(), [](const CString& a, const CString& b) {
+		return (StrCmpLogicalW(a, b) < 0);
+	});
 
 	for (const auto& file : files) {
 		CPlaylistItem pli;
