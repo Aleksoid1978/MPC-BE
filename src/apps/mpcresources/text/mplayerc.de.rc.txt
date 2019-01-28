@@ -130,6 +130,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 17		"URL aus Zwischenablage einfügen"
 END
 
+BEGIN DIALOGEX IDD_PLAYLISTNAME LINES 10
+3		"Playlist Name Dialog"
+6		"Ok"
+7		"Cancel"
+9		"Name:"
+END
+
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 3		"Pan&Scan-Profil bearbeiten"
 12		"&Neu"
@@ -1737,15 +1744,23 @@ STRING IDS_PANSCAN_EDIT		"&Profil bearbeiten..."
 STRING IDS_PIXELSHADERCOMPILER_0		"Kann D3DX9_xx.dll nicht laden, Shader bleiben inaktiv."
 STRING IDS_PIXELSHADERCOMPILER_1		"Kann benötigte Funktionen in der D3DX9_xx.dll Library nicht\nfinden (evtl. falsche Version), Shader bleiben inaktiv."
 STRING IDS_PLAYLIST_ADD		"&Hinzufügen"
+STRING IDS_PLAYLIST_ADD_EXPLORER		"Explorer type"
+STRING IDS_PLAYLIST_ADD_NEW		"Add playlist"
+STRING IDS_PLAYLIST_ADD_PLAYLIST		"Playlist type"
 STRING IDS_PLAYLIST_CAPTION		"Wiedergabeliste"
 STRING IDS_PLAYLIST_CLEAR		"Wiedergabeliste &leeren"
 STRING IDS_PLAYLIST_COPYTOCLIPBOARD		"In Zwischenablage &kopieren"
 STRING IDS_PLAYLIST_DELETE		"In den &Papierkorb verschieben"
+STRING IDS_PLAYLIST_DELETE_CURRENT		"Delete playlist"
 STRING IDS_PLAYLIST_DELETE_QUESTION		"Sind Sie sicher, dass Sie die Datei(en) in den Papierkorb verschieben wollen?"
+STRING IDS_PLAYLIST_EXPLORER_NAME		"Explorer"
 STRING IDS_PLAYLIST_HIDEFS		"Im Vollbild nicht anzeigen"
+STRING IDS_PLAYLIST_MAIN_NAME		"Main"
+STRING IDS_PLAYLIST_NAME		"Playlist"
 STRING IDS_PLAYLIST_OPEN		"&Öffnen"
 STRING IDS_PLAYLIST_RANDOMIZE		"In &zufälliger Reihenfolge anordnen"
 STRING IDS_PLAYLIST_REMOVE		"Ent&fernen"
+STRING IDS_PLAYLIST_RENAME_CURRENT		"Rename playlist"
 STRING IDS_PLAYLIST_RESTORE		"Reihenfolge &wiederherstellen"
 STRING IDS_PLAYLIST_SAVEAS		"Wiedergabeliste &speichern als..."
 STRING IDS_PLAYLIST_SHUFFLE		"Zufallswiedergabe aktivieren"

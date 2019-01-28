@@ -130,6 +130,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 17		"Paste URL from clipboard"
 END
 
+BEGIN DIALOGEX IDD_PLAYLISTNAME LINES 10
+3		"Playlist Name Dialog"
+6		"Ok"
+7		"Cancel"
+9		"Name:"
+END
+
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 3		"Předvolby Pan&Scan"
 12		"Nová"
@@ -1737,15 +1744,23 @@ STRING IDS_PANSCAN_EDIT		"Upravit..."
 STRING IDS_PIXELSHADERCOMPILER_0		"Nepodařilo se načíst D3DX9_xx.DLL, pixel shadery nebudou funkční."
 STRING IDS_PIXELSHADERCOMPILER_1		"Nepodařilo se nalézt potřebné vstupní body funkcí v D3DX9_xx.DLL, pixel shadery nebudou funkční."
 STRING IDS_PLAYLIST_ADD		"Přidat"
+STRING IDS_PLAYLIST_ADD_EXPLORER		"Explorer type"
+STRING IDS_PLAYLIST_ADD_NEW		"Add playlist"
+STRING IDS_PLAYLIST_ADD_PLAYLIST		"Playlist type"
 STRING IDS_PLAYLIST_CAPTION		"Seznam stop"
 STRING IDS_PLAYLIST_CLEAR		"&Vymazat"
 STRING IDS_PLAYLIST_COPYTOCLIPBOARD		"Zkopírovat"
 STRING IDS_PLAYLIST_DELETE		"&Delete to Recycle bin"
+STRING IDS_PLAYLIST_DELETE_CURRENT		"Delete playlist"
 STRING IDS_PLAYLIST_DELETE_QUESTION		"Are you sure that you want to delete the file(s) to the Recycle bin ?"
+STRING IDS_PLAYLIST_EXPLORER_NAME		"Explorer"
 STRING IDS_PLAYLIST_HIDEFS		"Skrýt v režimu na celou obrazovku"
+STRING IDS_PLAYLIST_MAIN_NAME		"Main"
+STRING IDS_PLAYLIST_NAME		"Playlist"
 STRING IDS_PLAYLIST_OPEN		"Otevřít"
 STRING IDS_PLAYLIST_RANDOMIZE		"Náhodně"
 STRING IDS_PLAYLIST_REMOVE		"Odebrat"
+STRING IDS_PLAYLIST_RENAME_CURRENT		"Rename playlist"
 STRING IDS_PLAYLIST_RESTORE		"Výchozí"
 STRING IDS_PLAYLIST_SAVEAS		"&Uložit jako..."
 STRING IDS_PLAYLIST_SHUFFLE		"Náhodně"

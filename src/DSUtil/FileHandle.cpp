@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2017 see Authors.txt
+ * (C) 2011-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -26,11 +26,10 @@
 //
 CStringW GetFileOnly(LPCWSTR Path)
 {
-	// Strip off the path and return just the filename part
-	CStringW temp = (LPCWSTR)Path; // Force CStringW to make a copy
-	::PathStripPathW(temp.GetBuffer(0));
-	temp.ReleaseBuffer(-1);
-	return temp;
+	CStringW cs = Path;
+	::PathStripPathW(cs.GetBuffer(0));
+	cs.ReleaseBuffer(-1);
+	return cs;
 }
 
 //
@@ -38,11 +37,10 @@ CStringW GetFileOnly(LPCWSTR Path)
 //
 CStringW GetFolderOnly(LPCWSTR Path)
 {
-	// Strip off the filename and return only path part
-	CStringW temp = (LPCWSTR)Path; // Force CStringW to make a copy
-	::PathRemoveFileSpecW(temp.GetBuffer(0));
-	temp.ReleaseBuffer(-1);
-	return temp;
+	CStringW cs = Path; // Force CStringW to make a copy
+	::PathRemoveFileSpecW(cs.GetBuffer(0));
+	cs.ReleaseBuffer(-1);
+	return cs;
 }
 
 //
@@ -75,8 +73,7 @@ CStringW RemoveSlash(LPCWSTR Path)
 //
 CStringW GetFileExt(LPCWSTR Path)
 {
-	CStringW cs;
-	cs = ::PathFindExtensionW(Path);
+	CStringW cs = ::PathFindExtensionW(Path);
 	return cs;
 }
 
@@ -87,6 +84,16 @@ CStringW RenameFileExt(LPCWSTR Path, LPCWSTR Ext)
 {
 	CStringW cs = Path;
 	::PathRenameExtensionW(cs.GetBuffer(MAX_PATH), Ext);
+	return cs;
+}
+
+//
+// Removes the file name extension from a path, if one is present
+//
+CStringW RemoveFileExt(LPCWSTR Path)
+{
+	CStringW cs = Path;
+	::PathRemoveExtensionW(cs.GetBuffer(MAX_PATH));
 	return cs;
 }
 

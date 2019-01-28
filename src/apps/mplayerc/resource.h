@@ -621,6 +621,7 @@
 #define IDD_ITEMPROPERTIES_DIALOG       10066
 #define IDD_SHADERNEW_DLG               10067
 #define IDD_CMD_LINE_HELP               10068
+#define IDD_PLAYLISTNAME                10069
 // controls
 #define IDC_STATIC1                     10201
 #define IDC_STATIC2                     10202
@@ -634,6 +635,7 @@
 #define IDC_STATIC10                    10210
 #define IDC_STATIC11                    10211
 #define IDC_STATIC12                    10212
+#define IDC_STATIC_PLAYLISTNAME         10213
 //
 #define IDC_CHECK1                      10221
 #define IDC_CHECK2                      10222
@@ -688,6 +690,7 @@
 #define IDC_EDIT8                       10288
 #define IDC_EDIT9                       10289
 #define IDC_EDIT10                      10290
+#define IDC_EDIT_PLAYLISTNAME           10291
 //
 #define IDC_BUTTON1                     10301
 #define IDC_BUTTON2                     10302
@@ -890,6 +893,16 @@
 #define IDS_TEXTBAR_FILENANE            14201
 #define IDS_TEXTBAR_TITLE               14202
 #define IDS_TEXTBAR_FULLPATH            14203
+
+#define IDS_PLAYLIST_ADD_PLAYLIST       14204
+#define IDS_PLAYLIST_ADD_EXPLORER       14205
+#define IDS_PLAYLIST_ADD_NEW            14206
+#define IDS_PLAYLIST_RENAME_CURRENT     14207
+#define IDS_PLAYLIST_DELETE_CURRENT     14208
+#define IDS_PLAYLIST_NAME               14209
+#define IDS_PLAYLIST_EXPLORER_NAME      14210
+#define IDS_PLAYLIST_MAIN_NAME          14211
+
 #define IDS_AG_RESET_STATS              20005
 #define IDS_VIEW_BORDERLESS             20007
 #define IDS_VIEW_FRAMEONLY              20008

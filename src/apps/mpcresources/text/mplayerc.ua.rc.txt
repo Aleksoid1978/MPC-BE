@@ -130,6 +130,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 17		"Вставити URL з буферу обміну"
 END
 
+BEGIN DIALOGEX IDD_PLAYLISTNAME LINES 10
+3		"Playlist Name Dialog"
+6		"Ok"
+7		"Cancel"
+9		"Name:"
+END
+
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 3		"Список положення та пропорцій"
 12		"Новий"
@@ -1737,15 +1744,23 @@ STRING IDS_PANSCAN_EDIT		"Змінити..."
 STRING IDS_PIXELSHADERCOMPILER_0		"Неможливо завантажити D3DX9_xx.DLL, піксельні шейдери працювати не будуть."
 STRING IDS_PIXELSHADERCOMPILER_1		"Неможливо знайти точку входу функції D3DX9_xx.DLL, піксельні шейдери працювати не будуть. Можливо потрібно оновити DirectX."
 STRING IDS_PLAYLIST_ADD		"&Додати"
+STRING IDS_PLAYLIST_ADD_EXPLORER		"Explorer type"
+STRING IDS_PLAYLIST_ADD_NEW		"Add playlist"
+STRING IDS_PLAYLIST_ADD_PLAYLIST		"Playlist type"
 STRING IDS_PLAYLIST_CAPTION		"Список відтворення"
 STRING IDS_PLAYLIST_CLEAR		"О&чистити"
 STRING IDS_PLAYLIST_COPYTOCLIPBOARD		"&Копіювати до ""буферу обміну"""
 STRING IDS_PLAYLIST_DELETE		"&Видалити до кошика"
+STRING IDS_PLAYLIST_DELETE_CURRENT		"Delete playlist"
 STRING IDS_PLAYLIST_DELETE_QUESTION		"Ви впевнені, що хочете видалити файл(и) до кошика ?"
+STRING IDS_PLAYLIST_EXPLORER_NAME		"Explorer"
 STRING IDS_PLAYLIST_HIDEFS		"Приховувати якщо 'На весь екран'"
+STRING IDS_PLAYLIST_MAIN_NAME		"Main"
+STRING IDS_PLAYLIST_NAME		"Playlist"
 STRING IDS_PLAYLIST_OPEN		"&Запустити"
 STRING IDS_PLAYLIST_RANDOMIZE		"Пе&ремішати"
 STRING IDS_PLAYLIST_REMOVE		"&Прибрати"
+STRING IDS_PLAYLIST_RENAME_CURRENT		"Rename playlist"
 STRING IDS_PLAYLIST_RESTORE		"Ві&дновити"
 STRING IDS_PLAYLIST_SAVEAS		"&Зберегти як..."
 STRING IDS_PLAYLIST_SHUFFLE		"У випадковому порядку"

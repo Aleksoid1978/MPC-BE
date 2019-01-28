@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "MiniDump.h"
+#include "MainFrm.h"
 #include "PPageMisc.h"
 
 // CPPageMisc dialog
@@ -147,6 +148,7 @@ void CPPageMisc::OnResetSettings()
 {
 	if (MessageBoxW(ResStr(IDS_RESET_SETTINGS_WARNING), ResStr(IDS_RESET_SETTINGS), MB_ICONEXCLAMATION | MB_YESNO | MB_DEFBUTTON2) == IDYES) {
 		AfxGetAppSettings().bResetSettings = true;
+		AfxGetMainFrame()->m_wndPlaylistBar.TDeleteAllPlaylists();
 		GetParent()->PostMessageW(WM_CLOSE);
 	}
 }

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -262,6 +262,7 @@ BOOL CPPageInterface::OnApply()
 	pFrame->m_wndPlaylistBar.m_bUseDarkTheme = s.bUseDarkTheme;
 	if (pFrame->m_wndPlaylistBar.IsWindowVisible()) {
 		pFrame->m_wndPlaylistBar.SendMessageW(WM_NCPAINT, 1, NULL);
+		pFrame->m_wndPlaylistBar.TSetColor();
 	}
 
 	pFrame->ResetMenu();

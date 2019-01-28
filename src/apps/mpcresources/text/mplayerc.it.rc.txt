@@ -130,6 +130,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 17		"Paste URL from clipboard"
 END
 
+BEGIN DIALOGEX IDD_PLAYLISTNAME LINES 10
+3		"Playlist Name Dialog"
+6		"Ok"
+7		"Cancel"
+9		"Name:"
+END
+
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 3		"Profili Pan&Scan"
 12		"Nuovo"
@@ -1737,15 +1744,23 @@ STRING IDS_PANSCAN_EDIT		"Modifica..."
 STRING IDS_PIXELSHADERCOMPILER_0		"Impossibile caricare D3DX9_xx.DLL, i pixel shader non funzioneranno!!"
 STRING IDS_PIXELSHADERCOMPILER_1		"Impossibile trovare i necessari 'function entry points' in D3DX9_xx.DLL, i pixel shader non funzioneranno!!"
 STRING IDS_PLAYLIST_ADD		"A&ggiungi"
+STRING IDS_PLAYLIST_ADD_EXPLORER		"Explorer type"
+STRING IDS_PLAYLIST_ADD_NEW		"Add playlist"
+STRING IDS_PLAYLIST_ADD_PLAYLIST		"Playlist type"
 STRING IDS_PLAYLIST_CAPTION		"Playlist"
 STRING IDS_PLAYLIST_CLEAR		"Svuota &lista"
 STRING IDS_PLAYLIST_COPYTOCLIPBOARD		"&Copia negli appunti"
 STRING IDS_PLAYLIST_DELETE		"&Delete to Recycle bin"
+STRING IDS_PLAYLIST_DELETE_CURRENT		"Delete playlist"
 STRING IDS_PLAYLIST_DELETE_QUESTION		"Are you sure that you want to delete the file(s) to the Recycle bin ?"
+STRING IDS_PLAYLIST_EXPLORER_NAME		"Explorer"
 STRING IDS_PLAYLIST_HIDEFS		"Nascondi a schermo intero"
+STRING IDS_PLAYLIST_MAIN_NAME		"Main"
+STRING IDS_PLAYLIST_NAME		"Playlist"
 STRING IDS_PLAYLIST_OPEN		"&Apri"
 STRING IDS_PLAYLIST_RANDOMIZE		"Rimescola elementi"
 STRING IDS_PLAYLIST_REMOVE		"&Rimuovi"
+STRING IDS_PLAYLIST_RENAME_CURRENT		"Rename playlist"
 STRING IDS_PLAYLIST_RESTORE		"R&ipristina"
 STRING IDS_PLAYLIST_SAVEAS		"&Salva con nome..."
 STRING IDS_PLAYLIST_SHUFFLE		"Riproduzione casuale"

@@ -198,18 +198,6 @@ bool CMPlayerCApp::ClearSettings()
 
 	m_Profile.Clear();
 
-	// Remove the current playlist if it exists
-	CString strSavePath;
-	if (AfxGetMyApp()->GetAppSavePath(strSavePath)) {
-		CPath playlistPath;
-		playlistPath.Combine(strSavePath, L"default.mpcpl");
-
-		CFileStatus status;
-		if (CFile::GetStatus(playlistPath, status)) {
-			CFile::Remove(playlistPath);
-		}
-	}
-
 	return true;
 }
 
@@ -292,8 +280,6 @@ bool CMPlayerCApp::ChangeSettingsLocation(bool useIni)
 	m_s.SaveSettings();
 
 	if (oldpath.GetLength() > 0) {
-		DeleteFileW(oldpath + L"default.mpcpl");
-
 		// moving shader files
 		const CStringW shaderpath = oldpath + L"Shaders\\";
 		if (::PathFileExistsW(shaderpath)) {

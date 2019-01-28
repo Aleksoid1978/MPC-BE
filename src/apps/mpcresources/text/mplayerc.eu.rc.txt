@@ -130,6 +130,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 17		"Itsatsi URL-a gakotik"
 END
 
+BEGIN DIALOGEX IDD_PLAYLISTNAME LINES 10
+3		"Playlist Name Dialog"
+6		"Ok"
+7		"Cancel"
+9		"Name:"
+END
+
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 3		"Pan-Scan Aurrezarpenak"
 12		"Berria"
@@ -1737,15 +1744,23 @@ STRING IDS_PANSCAN_EDIT		"Editatu..."
 STRING IDS_PIXELSHADERCOMPILER_0		"Ezinezkoa D3DX9_xx.DLL gertatzea, pixel itzalek ez dute lanik egiten."
 STRING IDS_PIXELSHADERCOMPILER_1		"Ezinezkoa aurkitzea beharrezko eginkizun sarrera puntuak D3DX9_xx.DLL-an, pixel itzalek ez dute lanik egiten."
 STRING IDS_PLAYLIST_ADD		"&Gehitu"
+STRING IDS_PLAYLIST_ADD_EXPLORER		"Explorer type"
+STRING IDS_PLAYLIST_ADD_NEW		"Add playlist"
+STRING IDS_PLAYLIST_ADD_PLAYLIST		"Playlist type"
 STRING IDS_PLAYLIST_CAPTION		"Irakur-zerrenda"
 STRING IDS_PLAYLIST_CLEAR		"G&arbitu"
 STRING IDS_PLAYLIST_COPYTOCLIPBOARD		"&Kopiatu gakora"
 STRING IDS_PLAYLIST_DELETE		"&Delete to Recycle bin"
+STRING IDS_PLAYLIST_DELETE_CURRENT		"Delete playlist"
 STRING IDS_PLAYLIST_DELETE_QUESTION		"Are you sure that you want to delete the file(s) to the Recycle bin ?"
+STRING IDS_PLAYLIST_EXPLORER_NAME		"Explorer"
 STRING IDS_PLAYLIST_HIDEFS		"Ezkutatu Ikusleiho-osoan"
+STRING IDS_PLAYLIST_MAIN_NAME		"Main"
+STRING IDS_PLAYLIST_NAME		"Playlist"
 STRING IDS_PLAYLIST_OPEN		"&Ireki"
 STRING IDS_PLAYLIST_RANDOMIZE		"&Zorizkotu"
 STRING IDS_PLAYLIST_REMOVE		"&Kendu"
+STRING IDS_PLAYLIST_RENAME_CURRENT		"Rename playlist"
 STRING IDS_PLAYLIST_RESTORE		"&Leheneratu"
 STRING IDS_PLAYLIST_SAVEAS		"Gorde &Honela..."
 STRING IDS_PLAYLIST_SHUFFLE		"Nahasketa"

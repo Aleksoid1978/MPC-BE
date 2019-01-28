@@ -303,3 +303,5 @@
 #define IDS_RS_CONTEXTDIR					L"ShowContextDir"
 
 #define IDS_RS_PASTECLIPBOARDURL			L"PasteClipboardURL"
+
+#define IDS_RS_PLAYLISTTABSSETTINGS			L"TabsSettings"
