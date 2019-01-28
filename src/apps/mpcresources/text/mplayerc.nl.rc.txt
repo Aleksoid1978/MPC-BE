@@ -130,6 +130,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 17		"URL vanuit het klembord plakken"
 END
 
+BEGIN DIALOGEX IDD_PLAYLISTNAME LINES 10
+3		"Playlist Name Dialog"
+6		"Ok"
+7		"Cancel"
+9		"Name:"
+END
+
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 3		"Pan&Scan-profielen"
 12		"Nieuw"
@@ -1737,15 +1744,23 @@ STRING IDS_PANSCAN_EDIT		"Bewerken..."
 STRING IDS_PIXELSHADERCOMPILER_0		"Kan D3DX9_xx.DLL niet laden, pixel shaders zullen niet werken."
 STRING IDS_PIXELSHADERCOMPILER_1		"Kan vereiste functie in D3DX9_xx.DLL niet vinden, pixel shaders zullen niet werken."
 STRING IDS_PLAYLIST_ADD		"&Toevoegen"
+STRING IDS_PLAYLIST_ADD_EXPLORER		"Explorer type"
+STRING IDS_PLAYLIST_ADD_NEW		"Add playlist"
+STRING IDS_PLAYLIST_ADD_PLAYLIST		"Playlist type"
 STRING IDS_PLAYLIST_CAPTION		"Afspeellijst"
 STRING IDS_PLAYLIST_CLEAR		"&Leegmaken"
 STRING IDS_PLAYLIST_COPYTOCLIPBOARD		"Naar klembord &kopiëren"
 STRING IDS_PLAYLIST_DELETE		"Naar prullenbak &verwijderen"
+STRING IDS_PLAYLIST_DELETE_CURRENT		"Delete playlist"
 STRING IDS_PLAYLIST_DELETE_QUESTION		"Bent u zeker dat u het/de bestand(en) naar prullenbak wilt verwijderen?"
+STRING IDS_PLAYLIST_EXPLORER_NAME		"Explorer"
 STRING IDS_PLAYLIST_HIDEFS		"Bij volledig scherm verbergen"
+STRING IDS_PLAYLIST_MAIN_NAME		"Main"
+STRING IDS_PLAYLIST_NAME		"Playlist"
 STRING IDS_PLAYLIST_OPEN		"&Openen"
 STRING IDS_PLAYLIST_RANDOMIZE		"&Willekeurig"
 STRING IDS_PLAYLIST_REMOVE		"&Verwijderen"
+STRING IDS_PLAYLIST_RENAME_CURRENT		"Rename playlist"
 STRING IDS_PLAYLIST_RESTORE		"&Herstel"
 STRING IDS_PLAYLIST_SAVEAS		"Opslaan &als..."
 STRING IDS_PLAYLIST_SHUFFLE		"Shuffle"

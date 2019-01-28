@@ -130,6 +130,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 17		"Вставлять URL из буфера обмена"
 END
 
+BEGIN DIALOGEX IDD_PLAYLISTNAME LINES 10
+3		"Новое имя плейлиста"
+6		"Ок"
+7		"Отмена"
+9		"Название:"
+END
+
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 3		"Предустановки размеров и положений"
 12		"Новый"
@@ -1737,15 +1744,23 @@ STRING IDS_PANSCAN_EDIT		"Изменить..."
 STRING IDS_PIXELSHADERCOMPILER_0		"Невозможно загрузить D3DX9_xx.DLL, пиксельные шейдеры работать не будут."
 STRING IDS_PIXELSHADERCOMPILER_1		"Не удается найти точку входа необходимой функции D3DX9_xx.DLL, пиксельные шейдеры работать не будут. Попробуйте установить более новую версию DirectX."
 STRING IDS_PLAYLIST_ADD		"&Добавить"
+STRING IDS_PLAYLIST_ADD_EXPLORER		"Тип проводник"
+STRING IDS_PLAYLIST_ADD_NEW		"Добавить плейлист"
+STRING IDS_PLAYLIST_ADD_PLAYLIST		"Тип плейлист"
 STRING IDS_PLAYLIST_CAPTION		"Плейлист"
 STRING IDS_PLAYLIST_CLEAR		"&Очистить"
 STRING IDS_PLAYLIST_COPYTOCLIPBOARD		"&Копировать в буфер"
 STRING IDS_PLAYLIST_DELETE		"&Удалить в корзину"
+STRING IDS_PLAYLIST_DELETE_CURRENT		"Удалить плейлист"
 STRING IDS_PLAYLIST_DELETE_QUESTION		"Вы уверены, что хотите удалить файл(ы) в корзину ?"
+STRING IDS_PLAYLIST_EXPLORER_NAME		"Проводник"
 STRING IDS_PLAYLIST_HIDEFS		"Скрывать на полном экране"
+STRING IDS_PLAYLIST_MAIN_NAME		"Основной"
+STRING IDS_PLAYLIST_NAME		"Плейлист"
 STRING IDS_PLAYLIST_OPEN		"&Запустить"
 STRING IDS_PLAYLIST_RANDOMIZE		"П&еремешать"
 STRING IDS_PLAYLIST_REMOVE		"&Убрать"
+STRING IDS_PLAYLIST_RENAME_CURRENT		"Переименовать плейлист"
 STRING IDS_PLAYLIST_RESTORE		"В&осстановить"
 STRING IDS_PLAYLIST_SAVEAS		"&Сохранить как..."
 STRING IDS_PLAYLIST_SHUFFLE		"В случайном порядке"

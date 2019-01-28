@@ -130,6 +130,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 17		"Paste URL from clipboard"
 END
 
+BEGIN DIALOGEX IDD_PLAYLISTNAME LINES 10
+3		"Playlist Name Dialog"
+6		"Ok"
+7		"Cancel"
+9		"Name:"
+END
+
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 3		"Pásztázás&Letapogatás nézetek"
 12		"Új"
@@ -1737,15 +1744,23 @@ STRING IDS_PANSCAN_EDIT		"Szerkesztés..."
 STRING IDS_PIXELSHADERCOMPILER_0		"Nem tölthető be a D3DX9_xx.DLL, a képpont árnyékolók nem fognak működni."
 STRING IDS_PIXELSHADERCOMPILER_1		"Nem találhatók szükséges funkció belépési pontok a D3DX9_xx.DLL-ben, a képpont árnyékolók nem fognak működni."
 STRING IDS_PLAYLIST_ADD		"&Hozzáadás"
+STRING IDS_PLAYLIST_ADD_EXPLORER		"Explorer type"
+STRING IDS_PLAYLIST_ADD_NEW		"Add playlist"
+STRING IDS_PLAYLIST_ADD_PLAYLIST		"Playlist type"
 STRING IDS_PLAYLIST_CAPTION		"Playlist"
 STRING IDS_PLAYLIST_CLEAR		"C&lear"
 STRING IDS_PLAYLIST_COPYTOCLIPBOARD		"Vá&gólapra másolás"
 STRING IDS_PLAYLIST_DELETE		"&Delete to Recycle bin"
+STRING IDS_PLAYLIST_DELETE_CURRENT		"Delete playlist"
 STRING IDS_PLAYLIST_DELETE_QUESTION		"Are you sure that you want to delete the file(s) to the Recycle bin ?"
+STRING IDS_PLAYLIST_EXPLORER_NAME		"Explorer"
 STRING IDS_PLAYLIST_HIDEFS		"Elrejtés Teljes képernyős módban"
+STRING IDS_PLAYLIST_MAIN_NAME		"Main"
+STRING IDS_PLAYLIST_NAME		"Playlist"
 STRING IDS_PLAYLIST_OPEN		"&Megnyitás"
 STRING IDS_PLAYLIST_RANDOMIZE		"&Véletlenszerűsítés"
 STRING IDS_PLAYLIST_REMOVE		"&Eltávolítás"
+STRING IDS_PLAYLIST_RENAME_CURRENT		"Rename playlist"
 STRING IDS_PLAYLIST_RESTORE		"&Helyreállítás"
 STRING IDS_PLAYLIST_SAVEAS		"Menté&s másként..."
 STRING IDS_PLAYLIST_SHUFFLE		"Keverés"

@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2019 see Authors.txt
+  * (C) 2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,19 +20,27 @@
 
 #pragma once
 
-CStringW GetFileOnly(LPCWSTR Path);
-CStringW GetFolderOnly(LPCWSTR Path);
-CStringW AddSlash(LPCWSTR Path);
-CStringW RemoveSlash(LPCWSTR Path);
-CStringW GetFileExt(LPCWSTR Path);
-CStringW RenameFileExt(LPCWSTR Path, LPCWSTR Ext);
-CStringW RemoveFileExt(LPCWSTR Path);
-BOOL     GetTemporaryFilePath(CStringW strExtension, CStringW& strFileName);
-CStringW CompactPath(LPCWSTR Path, UINT cchMax);
+#include <ResizableLib/ResizableDialog.h>
 
-// Get path of specified module
-CStringW GetModulePath(HMODULE hModule);
-// Get path of the executable file of the current process
-CStringW GetProgramPath();
-// Get programm directory with slash
-CStringW GetProgramDir();
+class CPlaylistNameDlg : public CCmdUIDialog
+{
+	DECLARE_DYNAMIC(CPlaylistNameDlg)
+	
+public:
+	CPlaylistNameDlg(const CString& str, CWnd* pParent = nullptr);
+	virtual ~CPlaylistNameDlg() = default;
+
+	enum { IDD = IDD_PLAYLISTNAME };
+
+	CEdit m_namectrl;
+	CString m_name;
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);
+	virtual BOOL OnInitDialog();
+
+	DECLARE_MESSAGE_MAP()
+
+public:
+	afx_msg void OnUpdateOk(CCmdUI* pCmdUI);
+};

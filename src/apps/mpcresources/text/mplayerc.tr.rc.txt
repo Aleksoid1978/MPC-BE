@@ -130,6 +130,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 17		"Panodan URL yapıştır"
 END
 
+BEGIN DIALOGEX IDD_PLAYLISTNAME LINES 10
+3		"Playlist Name Dialog"
+6		"Ok"
+7		"Cancel"
+9		"Name:"
+END
+
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 3		"Süzme & Tarama Varsayılanları"
 12		"Yeni"
@@ -1737,15 +1744,23 @@ STRING IDS_PANSCAN_EDIT		"Düzenle..."
 STRING IDS_PIXELSHADERCOMPILER_0		"D3DX9_xx.DLL yüklenemedi, piksel tonlayıcıları çalışmayabilir."
 STRING IDS_PIXELSHADERCOMPILER_1		"D3DX9_xx.DLL içindeki gerekli bazı özellik noktaları bulunamadı, piksel tonlayıcıları çalışmayabilir."
 STRING IDS_PLAYLIST_ADD		"E&kle"
+STRING IDS_PLAYLIST_ADD_EXPLORER		"Explorer type"
+STRING IDS_PLAYLIST_ADD_NEW		"Add playlist"
+STRING IDS_PLAYLIST_ADD_PLAYLIST		"Playlist type"
 STRING IDS_PLAYLIST_CAPTION		"Oynatma listesi"
 STRING IDS_PLAYLIST_CLEAR		"T&emizle"
 STRING IDS_PLAYLIST_COPYTOCLIPBOARD		"&Panoya kopyala"
 STRING IDS_PLAYLIST_DELETE		"&Delete to Recycle bin"
+STRING IDS_PLAYLIST_DELETE_CURRENT		"Delete playlist"
 STRING IDS_PLAYLIST_DELETE_QUESTION		"Are you sure that you want to delete the file(s) to the Recycle bin ?"
+STRING IDS_PLAYLIST_EXPLORER_NAME		"Explorer"
 STRING IDS_PLAYLIST_HIDEFS		"Tam ekranda gizle"
+STRING IDS_PLAYLIST_MAIN_NAME		"Main"
+STRING IDS_PLAYLIST_NAME		"Playlist"
 STRING IDS_PLAYLIST_OPEN		"&Aç"
 STRING IDS_PLAYLIST_RANDOMIZE		"R&astgele"
 STRING IDS_PLAYLIST_REMOVE		"&Sil"
+STRING IDS_PLAYLIST_RENAME_CURRENT		"Rename playlist"
 STRING IDS_PLAYLIST_RESTORE		"G&eri Al"
 STRING IDS_PLAYLIST_SAVEAS		"&Farklı Kaydet..."
 STRING IDS_PLAYLIST_SHUFFLE		"Rastgele sırala"

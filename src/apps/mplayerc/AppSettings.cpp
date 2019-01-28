@@ -875,6 +875,8 @@ void CAppSettings::ResetSettings()
 
 	bOSDRemainingTime = false;
 	bPasteClipboardURL = false;
+
+	strTabs.Empty();
 }
 
 void CAppSettings::LoadSettings(bool bForce/* = false*/)
@@ -924,6 +926,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	nSpeedStep = discard(nSpeedStep, 0, { 10, 20, 25, 50, 100 });
 
 	m_VRSettings.Load();
+
+	profile.ReadString(IDS_R_SETTINGS, IDS_RS_PLAYLISTTABSSETTINGS, strTabs);
 
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_AUDIORENDERERTYPE, strAudioRendererDisplayName);
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_SECONDAUDIORENDERER, strSecondAudioRendererDisplayName);
@@ -1637,6 +1641,8 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_FAVORITES, IDS_RS_FAV_RELATIVEDRIVE, bFavRelativeDrive);
 
 	m_VRSettings.Save();
+
+	profile.WriteString(IDS_R_SETTINGS, IDS_RS_PLAYLISTTABSSETTINGS, strTabs);
 
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_AUDIORENDERERTYPE, strAudioRendererDisplayName);
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_SECONDAUDIORENDERER, strSecondAudioRendererDisplayName);

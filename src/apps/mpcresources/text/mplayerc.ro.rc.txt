@@ -130,6 +130,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 17		"Paste URL from clipboard"
 END
 
+BEGIN DIALOGEX IDD_PLAYLISTNAME LINES 10
+3		"Playlist Name Dialog"
+6		"Ok"
+7		"Cancel"
+9		"Name:"
+END
+
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 3		"Setări prestabilite Pan&Scan"
 12		"Nou"
@@ -1740,15 +1747,23 @@ STRING IDS_PANSCAN_EDIT		"Modificare..."
 STRING IDS_PIXELSHADERCOMPILER_0		"D3DX9_xx.dll nu poate fi încărcat, shaderele pixel nu vor funcționa."
 STRING IDS_PIXELSHADERCOMPILER_1		"Punctele de intrare necesare ale funcției nu pot fi găsite în D3DX9_xx.dll, shaderele pixel nu vor funcționa."
 STRING IDS_PLAYLIST_ADD		"A&daugă"
+STRING IDS_PLAYLIST_ADD_EXPLORER		"Explorer type"
+STRING IDS_PLAYLIST_ADD_NEW		"Add playlist"
+STRING IDS_PLAYLIST_ADD_PLAYLIST		"Playlist type"
 STRING IDS_PLAYLIST_CAPTION		"Listă de redare"
 STRING IDS_PLAYLIST_CLEAR		"Ș&terge"
 STRING IDS_PLAYLIST_COPYTOCLIPBOARD		"&Copiază în clipboard"
 STRING IDS_PLAYLIST_DELETE		"&Delete to Recycle bin"
+STRING IDS_PLAYLIST_DELETE_CURRENT		"Delete playlist"
 STRING IDS_PLAYLIST_DELETE_QUESTION		"Are you sure that you want to delete the file(s) to the Recycle bin ?"
+STRING IDS_PLAYLIST_EXPLORER_NAME		"Explorer"
 STRING IDS_PLAYLIST_HIDEFS		"Ascunde în modul ecran complet"
+STRING IDS_PLAYLIST_MAIN_NAME		"Main"
+STRING IDS_PLAYLIST_NAME		"Playlist"
 STRING IDS_PLAYLIST_OPEN		"&Deschide"
 STRING IDS_PLAYLIST_RANDOMIZE		"&Amestecă"
 STRING IDS_PLAYLIST_REMOVE		"&Elimină"
+STRING IDS_PLAYLIST_RENAME_CURRENT		"Rename playlist"
 STRING IDS_PLAYLIST_RESTORE		"R&estaurează"
 STRING IDS_PLAYLIST_SAVEAS		"&Salvează ca..."
 STRING IDS_PLAYLIST_SHUFFLE		"Amestecă"

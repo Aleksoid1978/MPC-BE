@@ -6473,7 +6473,7 @@ void CMainFrame::OnUpdateFileSaveSubtitle(CCmdUI* pCmdUI)
 void CMainFrame::OnFileISDBSearch()
 {
 	CStringA url = "http://" + AfxGetAppSettings().strISDb + "/index.php?";
-	CStringA args = makeargs(m_wndPlaylistBar.m_pl);
+	CStringA args = makeargs(m_wndPlaylistBar.curPlayList);
 	ShellExecuteW(m_hWnd, L"open", CString(url+args), nullptr, nullptr, SW_SHOWDEFAULT);
 }
 
@@ -17832,9 +17832,9 @@ void CMainFrame::SendPlaylistToApi()
 {
 	CString strPlaylist;
 
-	POSITION pos = m_wndPlaylistBar.m_pl.GetHeadPosition();
+	POSITION pos = m_wndPlaylistBar.curPlayList.GetHeadPosition();
 	while (pos) {
-		CPlaylistItem& pli = m_wndPlaylistBar.m_pl.GetNext(pos);
+		CPlaylistItem& pli = m_wndPlaylistBar.curPlayList.GetNext(pos);
 
 		if (pli.m_type == CPlaylistItem::file) {
 			for (const auto& fi : pli.m_fns) {

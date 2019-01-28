@@ -130,6 +130,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 17		"Paste URL from clipboard"
 END
 
+BEGIN DIALOGEX IDD_PLAYLISTNAME LINES 10
+3		"Playlist Name Dialog"
+6		"Ok"
+7		"Cancel"
+9		"Name:"
+END
+
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 3		"Չափերի և դիրքերի կարգավորումներ"
 12		"Նոր"
@@ -1737,15 +1744,23 @@ STRING IDS_PANSCAN_EDIT		"Խմբագրել..."
 STRING IDS_PIXELSHADERCOMPILER_0		"Հնարավոր չէ բացել D3DX9_xx.DLL-ն, փիքսելային շեյդերները չեն աշխատի։"
 STRING IDS_PIXELSHADERCOMPILER_1		"D3DX9_xx.DLL-ը հասանելի չէ, փիքսելային շեյդերները չեն աշխատի։ Տեղակայեք DirectX-ի նոր տարբերակը։"
 STRING IDS_PLAYLIST_ADD		"Ա&վելացնել"
+STRING IDS_PLAYLIST_ADD_EXPLORER		"Explorer type"
+STRING IDS_PLAYLIST_ADD_NEW		"Add playlist"
+STRING IDS_PLAYLIST_ADD_PLAYLIST		"Playlist type"
 STRING IDS_PLAYLIST_CAPTION		"Playlist"
 STRING IDS_PLAYLIST_CLEAR		"Մ&աքրել"
 STRING IDS_PLAYLIST_COPYTOCLIPBOARD		"&Պատճենել շրջույթում"
 STRING IDS_PLAYLIST_DELETE		"&Delete to Recycle bin"
+STRING IDS_PLAYLIST_DELETE_CURRENT		"Delete playlist"
 STRING IDS_PLAYLIST_DELETE_QUESTION		"Are you sure that you want to delete the file(s) to the Recycle bin ?"
+STRING IDS_PLAYLIST_EXPLORER_NAME		"Explorer"
 STRING IDS_PLAYLIST_HIDEFS		"Թաքցնել, եթե ամբողջ էկրանով է"
+STRING IDS_PLAYLIST_MAIN_NAME		"Main"
+STRING IDS_PLAYLIST_NAME		"Playlist"
 STRING IDS_PLAYLIST_OPEN		"&Բացել"
 STRING IDS_PLAYLIST_RANDOMIZE		"Խ&առնել"
 STRING IDS_PLAYLIST_REMOVE		"&Ջնջել"
+STRING IDS_PLAYLIST_RENAME_CURRENT		"Rename playlist"
 STRING IDS_PLAYLIST_RESTORE		"Վ&երականգնել"
 STRING IDS_PLAYLIST_SAVEAS		"&Պահպանել որպես..."
 STRING IDS_PLAYLIST_SHUFFLE		"Պատահական"

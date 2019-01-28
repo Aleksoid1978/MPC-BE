@@ -372,6 +372,9 @@
     <ClCompile Include="controls\MenuEx.cpp">
       <Filter>controls</Filter>
     </ClCompile>
+    <ClCompile Include="PlaylistNameDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppSettings.h">
@@ -736,6 +739,9 @@
     </ClInclude>
     <ClInclude Include="controls\MenuEx.h">
       <Filter>controls</Filter>
+    </ClInclude>
+    <ClInclude Include="PlaylistNameDlg.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

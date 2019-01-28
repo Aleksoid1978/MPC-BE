@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -119,7 +119,8 @@ public:
 	int m_ainput;
 	long m_country;
 
-	bool m_fInvalid;
+	bool m_bInvalid;
+	bool m_bDirectory;
 
 public:
 	CPlaylistItem();
@@ -129,6 +130,7 @@ public:
 	CPlaylistItem& operator = (const CPlaylistItem& pli);
 
 	bool FindFile(LPCTSTR path);
+	bool FindFolder(LPCTSTR path) const;
 	void AutoLoadFiles();
 
 	CString GetLabel(int i = 0);
@@ -151,13 +153,15 @@ public:
 	void SortById();
 	void Randomize();
 	void ReverseSort();
-
 	POSITION GetPos() const;
 	void SetPos(POSITION pos);
 	CPlaylistItem& GetNextWrap(POSITION& pos);
 	CPlaylistItem& GetPrevWrap(POSITION& pos);
 
 	POSITION Shuffle();
+
+	int m_nSelected_idx = INT_MAX;
+	int m_nFocused_idx = 0;
 };
 
 class OpenMediaData;
@@ -184,8 +188,8 @@ private:
 	void ParsePlayList(std::list<CString>& fns, CSubtitleItemList* subs, bool bCheck = true);
 	void ResolveLinkFiles(std::list<CString> &fns);
 
-	bool ParseMPCPlayList(CString fn);
-	bool SaveMPCPlayList(CString fn, CTextFile::enc e, bool fRemovePath);
+	bool ParseMPCPlayList(CString fn, CString& name);
+	bool SaveMPCPlayList(CString fn, CTextFile::enc e, bool fRemovePath, const CString name = L"");
 
 	bool ParseM3UPlayList(CString fn);
 	bool ParseCUEPlayList(CString fn);
@@ -213,9 +217,101 @@ private:
 	CFont m_font;
 	void ScaleFontInternal();
 
-	int m_nSelected_idx = INT_MAX;
-
 	bool m_bSingleElement = false;
+
+	int m_tab_idx = -1;
+	int m_button_idx = -1;
+
+#define WIDTH_TABBUTTON 20
+	enum {
+		PLAYLIST,
+		EXPLORER,
+		BUTTON
+	};
+
+	enum {
+		ROOT,
+		DRIVE,
+		FOLDER,
+		PARENT,
+		FILE
+	};
+
+	struct tab {
+		UINT type = PLAYLIST; //
+		CString name;         // playlist label
+		CString fn;           // file playlist name
+		CRect r;              // layout
+	};
+	std::vector<tab> m_tabs;
+
+	enum {
+		LEFT,
+		RIGHT,
+		MENU
+	};
+	struct tab_button {
+		CString name;
+		CRect r;
+		bool bVisible = false;
+	};
+	tab_button m_tab_buttons[3] = {
+		{L"<"},
+		{L">"},
+		{L"::", CRect(), true}
+	};
+
+	std::map<CString, HICON> m_icons;
+	std::map<CString, HICON> m_icons_large;
+
+	void TDrawBar();
+	void TCalcLayout();
+	void TIndexHighighted();
+	void TTokenizer(const CString& strFields, LPCWSTR strDelimiters, std::vector<CString>& arFields);
+	void TParseFolder(const CString& path);
+	void TGetSettings();
+	void TSaveSettings();
+	void TSelectTab();
+	void TOnMenu(bool bUnderCurcor = false);
+	void TSetOffset(bool toRight = false);
+	void TEnsureVisible(int idx);
+
+	COLORREF TColorBrightness(int lSkale, COLORREF color);
+	CRect rcTPage;
+	size_t cntOffset;
+
+	int TGetFirstVisible();
+	int TGetOffset();
+	int TGetPlaylistType() const;
+	int TGetPathType(const CString& path) const;
+	int TGetFontSize();
+	int iTFontSize;
+	bool TNavigate();
+	bool TSelectFolder(CString path);
+	int TGetFocusedElement() const;
+
+	COLORREF m_crBkBar;
+
+	COLORREF m_crBN; 
+	COLORREF m_crBNL;
+	COLORREF m_crBND; 
+
+	COLORREF m_crBS; 
+	COLORREF m_crBSL;
+	COLORREF m_crBSD; 
+
+	COLORREF m_crBH; 
+	COLORREF m_crBHL;
+	COLORREF m_crBHD;
+
+	COLORREF m_crBSH; 
+	COLORREF m_crBSHL; 
+	COLORREF m_crBSHD; 
+
+	COLORREF m_crTN; 
+	COLORREF m_crTH;
+	COLORREF m_crTS;  
+	//COLORREF m_crTSL;
 
 public:
 	CPlayerPlaylistBar(CMainFrame* pMainFrame);
@@ -230,8 +326,17 @@ public:
 
 	bool IsHiddenDueToFullscreen() const;
 	void SetHiddenDueToFullscreen(bool bHidenDueToFullscreen);
+	
+	std::vector<CPlaylist*> m_pls;
+	size_t m_nCurPlayListIndex = 0;
+	CPlaylist& GetCurPlayList() const {
+		return *m_pls[m_nCurPlayListIndex];
+	}
+#define curPlayList GetCurPlayList()
 
-	CPlaylist m_pl;
+	void TSetColor();
+	void TDeleteAllPlaylists();
+	void TSaveAllPlaylists();
 
 	int GetCount();
 	int GetSelIdx();
@@ -245,7 +350,7 @@ public:
 	void SetFirstSelected();
 	void SetFirst();
 	void SetLast();
-	void SetCurValid(bool fValid);
+	void SetCurValid(const bool bValid);
 	void SetCurTime(REFERENCE_TIME rt);
 	void SetCurLabel(CString label);
 	void Randomize();
@@ -298,14 +403,18 @@ public:
 	afx_msg BOOL OnPlayPlay(UINT nID);
 	afx_msg void OnBeginDrag(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnMouseLeave();
+	afx_msg void OnPaint();
+	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
 	afx_msg void OnLvnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
-
 	afx_msg void OnMeasureItem(int nIDCtl, LPMEASUREITEMSTRUCT lpMeasureItemStruct);
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
 
 	virtual void Invalidate() { m_list.Invalidate(); }
 };
+

@@ -130,6 +130,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 17		"Paste URL from clipboard"
 END
 
+BEGIN DIALOGEX IDD_PLAYLISTNAME LINES 10
+3		"Playlist Name Dialog"
+6		"Ok"
+7		"Cancel"
+9		"Name:"
+END
+
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 3		"Προεπιλογές πανοραμικής οπτικής & σάρωσης"
 12		"Νέο"
@@ -1740,15 +1747,23 @@ STRING IDS_PANSCAN_EDIT		"Επεξεργασία..."
 STRING IDS_PIXELSHADERCOMPILER_0		"Δεν είναι δυνατή η φόρτωση του D3DX9_xx.DLL. Οι pixel shaders δεν θα λειτουργήσουν."
 STRING IDS_PIXELSHADERCOMPILER_1		"Δεν βρέθηκαν τα απαραίτητα σημεία εισόδου στο D3DX9_xx.DLL. Οι pixel shaders δεν θα λειτουργήσουν."
 STRING IDS_PLAYLIST_ADD		"Π&ροσθήκη"
+STRING IDS_PLAYLIST_ADD_EXPLORER		"Explorer type"
+STRING IDS_PLAYLIST_ADD_NEW		"Add playlist"
+STRING IDS_PLAYLIST_ADD_PLAYLIST		"Playlist type"
 STRING IDS_PLAYLIST_CAPTION		"Λίστα αναπαραγωγής"
 STRING IDS_PLAYLIST_CLEAR		"&Απαλοιφή"
 STRING IDS_PLAYLIST_COPYTOCLIPBOARD		"Αντι&γραφή στο Πρόχειρο"
 STRING IDS_PLAYLIST_DELETE		"&Delete to Recycle bin"
+STRING IDS_PLAYLIST_DELETE_CURRENT		"Delete playlist"
 STRING IDS_PLAYLIST_DELETE_QUESTION		"Are you sure that you want to delete the file(s) to the Recycle bin ?"
+STRING IDS_PLAYLIST_EXPLORER_NAME		"Explorer"
 STRING IDS_PLAYLIST_HIDEFS		"Απόκρυψη σε πλήρη οθόνη"
+STRING IDS_PLAYLIST_MAIN_NAME		"Main"
+STRING IDS_PLAYLIST_NAME		"Playlist"
 STRING IDS_PLAYLIST_OPEN		"Ά&νοιγμα"
 STRING IDS_PLAYLIST_RANDOMIZE		"Τυ&χαία"
 STRING IDS_PLAYLIST_REMOVE		"&Κατάργηση"
+STRING IDS_PLAYLIST_RENAME_CURRENT		"Rename playlist"
 STRING IDS_PLAYLIST_RESTORE		"Επανα&φορά"
 STRING IDS_PLAYLIST_SAVEAS		"Αποθήκευση &ως..."
 STRING IDS_PLAYLIST_SHUFFLE		"Τυχαία σειρά"

@@ -130,6 +130,13 @@ BEGIN DIALOGEX IDD_OPEN_DLG LINES 18
 17		"Paste URL from clipboard"
 END
 
+BEGIN DIALOGEX IDD_PLAYLISTNAME LINES 10
+3		"Playlist Name Dialog"
+6		"Ok"
+7		"Cancel"
+9		"Name:"
+END
+
 BEGIN DIALOGEX IDD_PNSPRESET_DLG LINES 22
 3		"Panoramique"
 12		"Nouveau"
@@ -1737,15 +1744,23 @@ STRING IDS_PANSCAN_EDIT		"Modifier..."
 STRING IDS_PIXELSHADERCOMPILER_0		"Le fichier D3DX9_xx.dll est introuvable, une mise à jour de DirectX 9 est nécessaire pour utiliser les Pixels Shaders."
 STRING IDS_PIXELSHADERCOMPILER_1		"Problème au chargement de D3DX9_xx.dll, les Pixels Shaders ne fonctionnerons pas."
 STRING IDS_PLAYLIST_ADD		"&Ajouter"
+STRING IDS_PLAYLIST_ADD_EXPLORER		"Explorer type"
+STRING IDS_PLAYLIST_ADD_NEW		"Add playlist"
+STRING IDS_PLAYLIST_ADD_PLAYLIST		"Playlist type"
 STRING IDS_PLAYLIST_CAPTION		"Playlist"
 STRING IDS_PLAYLIST_CLEAR		"&Vider"
 STRING IDS_PLAYLIST_COPYTOCLIPBOARD		"&Copier dans le Presse-Papier"
 STRING IDS_PLAYLIST_DELETE		"&Delete to Recycle bin"
+STRING IDS_PLAYLIST_DELETE_CURRENT		"Delete playlist"
 STRING IDS_PLAYLIST_DELETE_QUESTION		"Are you sure that you want to delete the file(s) to the Recycle bin ?"
+STRING IDS_PLAYLIST_EXPLORER_NAME		"Explorer"
 STRING IDS_PLAYLIST_HIDEFS		"Cacher la liste de diffusion en plein écran"
+STRING IDS_PLAYLIST_MAIN_NAME		"Main"
+STRING IDS_PLAYLIST_NAME		"Playlist"
 STRING IDS_PLAYLIST_OPEN		"&Ouvrir"
 STRING IDS_PLAYLIST_RANDOMIZE		"A&léatoire"
 STRING IDS_PLAYLIST_REMOVE		"&Enlever"
+STRING IDS_PLAYLIST_RENAME_CURRENT		"Rename playlist"
 STRING IDS_PLAYLIST_RESTORE		"R&estaurer"
 STRING IDS_PLAYLIST_SAVEAS		"&Enregistrer sous..."
 STRING IDS_PLAYLIST_SHUFFLE		"Aléatoire"

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -240,7 +240,9 @@ BOOL CPPagePlayer::OnApply()
 
 	// Check if the settings location needs to be changed
 	if (AfxGetProfile().IsIniValid() != !!m_bUseIni) {
+		pFrame->m_wndPlaylistBar.TDeleteAllPlaylists();
 		AfxGetMyApp()->ChangeSettingsLocation(!!m_bUseIni);
+		pFrame->m_wndPlaylistBar.TSaveAllPlaylists();
 	}
 
 	AfxGetMainFrame()->ShowTrayIcon(s.bTrayIcon);
