@@ -399,6 +399,7 @@ public:
 	void DropFiles(std::list<CString>& slFiles);
 
 	bool IsPlaylistVisible() const { return IsWindowVisible() || m_bVisible; }
+	CSize GetMinSize() const { return m_szFixedFloat; }
 
 	void ScaleFont();
 

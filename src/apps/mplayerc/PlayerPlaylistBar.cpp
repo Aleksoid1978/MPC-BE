@@ -797,6 +797,7 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 		}
 	}
 
+	m_bFixedFloat = TRUE;
 	TCalcLayout();
 
 	return TRUE;
@@ -3470,6 +3471,13 @@ void CPlayerPlaylistBar::TCalcLayout()
 	}
 
 	mdc.DeleteDC();
+
+	CRect rcWindow, rcClient;
+	GetWindowRect(&rcWindow);
+	GetClientRect(&rcClient);
+	const int width = wSysButton * (m_tabs.size() > 1 ? 3 : 1) + m_tabs[0].r.Width() + (rcWindow.Width() - rcClient.Width()) * 2 - 3;
+	const CSize cz(width, rcTabBar.Height() * 3);
+	m_szMinFloat = m_szMinHorz = m_szMinVert = m_szFixedFloat = cz;
 }
 
 void CPlayerPlaylistBar::TIndexHighighted()
@@ -3912,7 +3920,8 @@ void CPlayerPlaylistBar::TParseFolder(const CString& path)
 			}
 			else {
 				const CString ext = GetFileExt(FindFileData.cFileName).MakeLower();
-				if (mf.FindExt(ext)) {
+				auto mfc = mf.FindMediaByExt(ext);
+				if (ext == L".iso" || (mfc && mfc->GetFileType() != TPlaylist)) {
 					file_data_t file_data;
 					file_data.name          = AddSlash(path) + fileName;
 					file_data.time.LowPart  = FindFileData.ftLastWriteTime.dwLowDateTime;

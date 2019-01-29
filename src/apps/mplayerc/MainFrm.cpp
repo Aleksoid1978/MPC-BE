@@ -1587,6 +1587,17 @@ void CMainFrame::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 		lpMMI->ptMinTrackSize.x = std::max((LONG)m_wndToolBar.GetMinWidth(), lpMMI->ptMinTrackSize.x);
 	}
 
+	for (const auto& pDockingBar : m_dockingbars) {
+		if (IsWindow(pDockingBar->m_hWnd)) {
+			if (auto* playlistBar = dynamic_cast<CPlayerPlaylistBar*>(pDockingBar); playlistBar && playlistBar->IsPlaylistVisible()) {
+				if (!playlistBar->IsFloating()) {
+					lpMMI->ptMinTrackSize.y += playlistBar->GetMinSize().cy;
+				}
+				break;
+			}
+		}
+	}
+
 	// Ensure that window decorations will fit
 	CRect decorationsRect;
 	VERIFY(AdjustWindowRectEx(decorationsRect, GetWindowStyle(m_hWnd), bMenuVisible, GetWindowExStyle(m_hWnd)));
