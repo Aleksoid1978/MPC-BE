@@ -4077,7 +4077,7 @@ void CPlayerPlaylistBar::TGetSettings()
 		const auto& strStroke = arStrokes[i];
 		// parse fields in stroke
 		TTokenizer(strStroke, L";", arFields);
-		if (arFields.empty()) {
+		if (arFields.size() < 2) {
 			continue;
 		}
 
@@ -4093,7 +4093,9 @@ void CPlayerPlaylistBar::TGetSettings()
 		tab.name = m_pls.empty() ? ResStr(IDS_PLAYLIST_MAIN_NAME) : arFields[1];
 		tab.fn = arFields[1] + (L".mpcpl");
 		tab.id = GetNextId();
-		tab.sort = _wtoi(arFields[2]);
+		if (arFields.size() >= 3) {
+			tab.sort = _wtoi(arFields[2]);
+		}
 		m_tabs.push_back(tab);
 
 		// add playlist
