@@ -223,7 +223,7 @@ private:
 	int m_button_idx = -1;
 
 #define WIDTH_TABBUTTON 20
-	enum {
+	enum PLAYLIST_TYPE : BYTE {
 		PLAYLIST,
 		EXPLORER,
 		BUTTON
@@ -237,14 +237,31 @@ private:
 		FILE
 	};
 
+	enum SORT : BYTE {
+		NAME,
+		DATE,
+		SIZE
+	};
+
+	struct file_data_t {
+		CString name;
+		ULARGE_INTEGER time;
+		ULARGE_INTEGER size;
+	};
+
 	struct tab_t {
-		BYTE type = PLAYLIST; //
-		CString name;         // playlist label
-		CString fn;           // file playlist name
-		CRect r;              // layout
-		unsigned id;          // unique id
+		PLAYLIST_TYPE type = PLAYLIST; // playlist type
+		CString name;                  // playlist label
+		CString fn;                    // playlist file name
+		CRect r;                       // layout
+		unsigned id = 0;               // unique id
+		WORD sort = 0;                 // sorted flag
+
+		std::vector<file_data_t> directory;
+		std::vector<file_data_t> files;
 	};
 	std::vector<tab_t> m_tabs;
+#define curTab m_tabs[m_nCurPlayListIndex]
 
 	enum {
 		LEFT,
@@ -270,6 +287,7 @@ private:
 	void TIndexHighighted();
 	void TTokenizer(const CString& strFields, LPCWSTR strDelimiters, std::vector<CString>& arFields);
 	void TParseFolder(const CString& path);
+	void TFillPlaylist(const bool bFirst = false);
 	void TGetSettings();
 	void TSaveSettings();
 	void TSelectTab();
@@ -277,13 +295,11 @@ private:
 	void TSetOffset(bool toRight = false);
 	void TEnsureVisible(int idx);
 
-	COLORREF TColorBrightness(int lSkale, COLORREF color);
 	CRect rcTPage;
 	size_t cntOffset;
 
 	int TGetFirstVisible();
 	int TGetOffset();
-	int TGetPlaylistType() const;
 	int TGetPathType(const CString& path) const;
 	int TGetFontSize();
 	int iTFontSize;
