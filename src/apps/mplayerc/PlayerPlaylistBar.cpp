@@ -805,6 +805,12 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 void CPlayerPlaylistBar::ReloadTranslatableResources()
 {
 	SetWindowTextW(ResStr(IDS_PLAYLIST_CAPTION));
+
+	if (!m_tabs.empty()) {
+		m_tabs[0].name = ResStr(IDS_PLAYLIST_MAIN_NAME);
+		TCalcLayout();
+		TDrawBar();
+	}
 }
 
 void CPlayerPlaylistBar::ScaleFontInternal()
@@ -874,7 +880,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 				}
 				break;
 			case 'A':
-				if (TGetPlaylistType() == EXPLORER) {
+				if (curTab.type == EXPLORER) {
 					break;
 				}
 				if (GetKeyState(VK_CONTROL) < 0) {
@@ -882,7 +888,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 				}
 				break;
 			case 'I':
-				if (TGetPlaylistType() == EXPLORER) {
+				if (curTab.type == EXPLORER) {
 					break;
 				}
 				if (GetKeyState(VK_CONTROL) < 0) {
@@ -898,7 +904,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 			case VK_PRIOR:
 			case VK_NEXT:
 			case VK_DELETE:
-				if (pMsg->wParam == VK_DELETE && TGetPlaylistType() == EXPLORER) {
+				if (pMsg->wParam == VK_DELETE && curTab.type == EXPLORER) {
 					return TRUE;
 				}
 			case VK_APPS: // "Menu key"
@@ -1233,7 +1239,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn, CString& name)
 
 	CWebTextFile f(CTextFile::UTF8, CTextFile::ANSI);
 	if (!f.Open(fn) || !f.ReadString(str) || str != L"MPCPLAYLIST" || f.GetLength() > MEGABYTE) {
-		if (m_tabs[m_nCurPlayListIndex].type == EXPLORER) {
+		if (curTab.type == EXPLORER) {
 			TParseFolder(L".\\");
 		}
 		return false;
@@ -1274,7 +1280,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn, CString& name)
 					selected_idx = i - 1;
 				}
 			} else if (key == L"filename") {
-				value = TGetPlaylistType() == PLAYLIST ? MakePath(CombinePath(base, value)) : value;
+				value = curTab.type == PLAYLIST ? MakePath(CombinePath(base, value)) : value;
 				pli[i].m_fns.push_back(value);
 			} else if (key == L"subtitle") {
 				value = CombinePath(base, value);
@@ -1309,7 +1315,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn, CString& name)
 		curPlayList.AddTail(pli[idx[i]]);
 	}
 
-	if (m_tabs[m_nCurPlayListIndex].type == EXPLORER) {
+	if (curTab.type == EXPLORER) {
 		CString selected_path;
 		if (bIsEmpty && selected_idx >= 0 && selected_idx < curPlayList.GetCount()) {
 			POSITION pos = curPlayList.FindIndex(selected_idx);
@@ -1757,7 +1763,7 @@ void CPlayerPlaylistBar::Append(CFileItemList& fis)
 
 bool CPlayerPlaylistBar::Replace(CString filename, std::list<CString>& fns)
 {
-	if (filename.IsEmpty() || m_tabs[m_nCurPlayListIndex].type == EXPLORER) {
+	if (filename.IsEmpty() || curTab.type == EXPLORER) {
 		return false;
 	}
 
@@ -2071,7 +2077,7 @@ OpenMediaData* CPlayerPlaylistBar::GetCurOMD(REFERENCE_TIME rtStart)
 		return nullptr;
 	}
 
-	m_nCurPlaybackListId = m_tabs[m_nCurPlayListIndex].id;
+	m_nCurPlaybackListId = curTab.id;
 
 	if (fn.Find(L"video_ts.ifo") >= 0
 			|| fn.Find(L".ratdvd") >= 0) {
@@ -2172,7 +2178,7 @@ void CPlayerPlaylistBar::SavePlaylist()
 {
 	CString base;
 	if (AfxGetMyApp()->GetAppSavePath(base)) {
-		CString file = base + m_tabs[m_nCurPlayListIndex].fn;
+		CString file = base + curTab.fn;
 
 		if (AfxGetAppSettings().bRememberPlaylistItems) {
 			// Only create this folder when needed
@@ -2180,7 +2186,7 @@ void CPlayerPlaylistBar::SavePlaylist()
 				::CreateDirectoryW(base, nullptr);
 			}
 
-			SaveMPCPlayList(file, CTextFile::UTF8, false, m_nCurPlayListIndex > 0 ? m_tabs[m_nCurPlayListIndex].name : L"");
+			SaveMPCPlayList(file, CTextFile::UTF8, false, m_nCurPlayListIndex > 0 ? curTab.name : L"");
 		} else if (::PathFileExistsW(file)) {
 			::DeleteFileW(file);
 		}
@@ -2303,7 +2309,7 @@ void CPlayerPlaylistBar::OnLvnKeyDown(NMHDR* pNMHDR, LRESULT* pResult)
 void CPlayerPlaylistBar::OnNMDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMLISTVIEW lpnmlv = (LPNMLISTVIEW)pNMHDR;
-	if (TGetPlaylistType() == PLAYLIST) {
+	if (curTab.type == PLAYLIST) {
 		if (lpnmlv->iItem >= 0 && lpnmlv->iSubItem >= 0) {
 			POSITION pos = FindPos(lpnmlv->iItem);
 			// If the file is already playing, don't try to restore a previously saved position
@@ -2320,7 +2326,7 @@ void CPlayerPlaylistBar::OnNMDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 		}
 		AfxGetMainWnd()->SetFocus();
 	}
-	else if (TGetPlaylistType() == EXPLORER) {
+	else if (curTab.type == EXPLORER) {
 		if (TNavigate()) {
 		}
 		else if (lpnmlv->iItem >= 0 && lpnmlv->iSubItem >= 0) {
@@ -2487,7 +2493,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 	file.Format(fmt, nItem + 1, m_list.GetItemText(nItem, COL_NAME));
 	
 	int offset = 0;
-	if (TGetPlaylistType() == EXPLORER) {
+	if (curTab.type == EXPLORER) {
 		file = m_list.GetItemText(nItem, COL_NAME);
 		const int w = rcItem.Height() - 4;
 		
@@ -2536,7 +2542,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 		filesize.cx += offset;
 	}
 
-	if (file.GetLength() > 3 || TGetPlaylistType() == EXPLORER) { // L"C:".GetLenght() < 3 
+	if (file.GetLength() > 3 || curTab.type == EXPLORER) { // L"C:".GetLenght() < 3 
 		pDC->SetTextColor(textcolor);
 		pDC->TextOutW(rcItem.left + 3 + offset, (rcItem.top + rcItem.bottom - filesize.cy) / 2, file);
 	}
@@ -2550,7 +2556,7 @@ BOOL CPlayerPlaylistBar::OnPlayPlay(UINT nID)
 
 void CPlayerPlaylistBar::DropFiles(std::list<CString>& slFiles)
 {
-	if (TGetPlaylistType() == EXPLORER) {
+	if (curTab.type == EXPLORER) {
 		return;
 	}
 
@@ -2564,7 +2570,7 @@ void CPlayerPlaylistBar::DropFiles(std::list<CString>& slFiles)
 
 void CPlayerPlaylistBar::OnBeginDrag(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	if (TGetPlaylistType() == EXPLORER) {
+	if (curTab.type == EXPLORER) {
 		return;
 	}
 	
@@ -2923,7 +2929,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			sCurrentPath = pli.m_fns.front().GetName();
 			bMIEnable = !::PathIsURLW(sCurrentPath) && sCurrentPath != L"pipe://stdin";
 
-			if (bMIEnable && TGetPlaylistType() == EXPLORER) {
+			if (bMIEnable && curTab.type == EXPLORER) {
 				bMIEnable = TGetPathType(sCurrentPath) == FILE;
 			}
 		}
@@ -2943,6 +2949,8 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		M_SAVEAS,
 		M_SORTBYNAME,
 		M_SORTBYPATH,
+		M_SORTBYDATE,
+		M_SORTBYSIZE,
 		M_SORTREVERSE,
 		M_RANDOMIZE,
 		M_SORTBYID, // restore
@@ -2953,7 +2961,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	const bool bExplorer = TGetPlaylistType() == EXPLORER;
+	const bool bExplorer = curTab.type == EXPLORER;
 	m.AppendMenu(MF_STRING | (bOnItem ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_OPEN, ResStr(IDS_PLAYLIST_OPEN) + L"\tSpace");
 	if (!bExplorer) {
 		m.AppendMenu(MF_STRING | MF_ENABLED, M_ADD, ResStr(IDS_PLAYLIST_ADD));
@@ -2965,7 +2973,22 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		m.AppendMenu(MF_SEPARATOR);
 	}
 	m.AppendMenu(MF_STRING | (bOnItem ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_CLIPBOARD, ResStr(IDS_PLAYLIST_COPYTOCLIPBOARD));
-	if (!bExplorer) {
+	if (bExplorer) {
+		const bool bReverse = !!(curTab.sort >> 8);
+		const auto sort = (SORT)(curTab.sort & 0xF);
+
+		m.AppendMenu(MF_SEPARATOR);
+		CMenu submenu2;
+		submenu2.CreatePopupMenu();
+		submenu2.AppendMenu(MF_STRING | MF_ENABLED | (sort == SORT::NAME ? (MFT_RADIOCHECK | MFS_CHECKED) : 0), M_SORTBYNAME, ResStr(IDS_PLAYLIST_SORTBYNAME));
+		submenu2.AppendMenu(MF_STRING | MF_ENABLED | (sort == SORT::DATE ? (MFT_RADIOCHECK | MFS_CHECKED) : 0), M_SORTBYDATE, ResStr(IDS_PLAYLIST_SORTBYDATE));
+		submenu2.AppendMenu(MF_STRING | MF_ENABLED | (sort == SORT::SIZE ? (MFT_RADIOCHECK | MFS_CHECKED) : 0), M_SORTBYSIZE, ResStr(IDS_PLAYLIST_SORTBYSIZE));
+		submenu2.AppendMenu(MF_SEPARATOR);
+		submenu2.AppendMenu(MF_STRING | MF_ENABLED | (bReverse ? MF_CHECKED : MF_UNCHECKED), M_SORTREVERSE, ResStr(IDS_PLAYLIST_SORTREVERSE));
+		m.AppendMenu(MF_STRING | MF_POPUP | (curPlayList.GetCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), (UINT_PTR)submenu2.Detach(), ResStr(IDS_PLAYLIST_SORT));
+		m.AppendMenu(MF_SEPARATOR);
+	}
+	else {
 		m.AppendMenu(MF_STRING | (curPlayList.GetCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_SAVEAS, ResStr(IDS_PLAYLIST_SAVEAS));
 		m.AppendMenu(MF_SEPARATOR);
 		CMenu submenu2;
@@ -3072,6 +3095,13 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			break;
 		case M_SORTBYNAME:
 			if (bExplorer) {
+				const auto sort = (SORT)(curTab.sort & 0xF);
+				if (sort != SORT::NAME) {
+					const auto bReverse = curTab.sort >> 8;
+					curTab.sort = (bReverse << 8) | SORT::NAME;
+					TSaveSettings();
+					TFillPlaylist();
+				}
 				return;
 			}
 			curPlayList.SortByName();
@@ -3088,8 +3118,37 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 			SavePlaylist();
 			EnsureVisible(curPlayList.GetPos(), true);
 			break;
+		case M_SORTBYDATE:
+			if (bExplorer) {
+				const auto sort = (SORT)(curTab.sort & 0xF);
+				if (sort != SORT::DATE) {
+					const auto bReverse = curTab.sort >> 8;
+					curTab.sort = (bReverse << 8) | SORT::DATE;
+					TSaveSettings();
+					TFillPlaylist();
+				}
+				return;
+			}
+			break;
+		case M_SORTBYSIZE:
+			if (bExplorer) {
+				const auto sort = (SORT)(curTab.sort & 0xF);
+				if (sort != SORT::SIZE) {
+					const auto bReverse = curTab.sort >> 8;
+					curTab.sort = (bReverse << 8) | SORT::SIZE;
+					TSaveSettings();
+					TFillPlaylist();
+				}
+				return;
+			}
+			break;
 		case M_SORTREVERSE:
 			if (bExplorer) {
+				const auto bReverse = curTab.sort >> 8;
+				const auto sort = (SORT)(curTab.sort & 0xF);
+				curTab.sort = (!bReverse << 8) | sort;
+				TSaveSettings();
+				TFillPlaylist();
 				return;
 			}
 			curPlayList.ReverseSort();
@@ -3561,9 +3620,9 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 	submenu.AppendMenuW(MF_BYPOSITION | MF_STRING | MF_ENABLED, id++, ResStr(IDS_PLAYLIST_ADD_PLAYLIST));
 	submenu.AppendMenuW(MF_BYPOSITION | MF_STRING | MF_ENABLED, id++, ResStr(IDS_PLAYLIST_ADD_EXPLORER));
 	menu.AppendMenuW(MF_BYPOSITION | MF_STRING | MF_POPUP | MF_ENABLED, (UINT_PTR)submenu.Detach(), ResStr(IDS_PLAYLIST_ADD_NEW));
-	menu.AppendMenuW(MF_BYPOSITION | MF_STRING | ((m_nCurPlayListIndex > 0 && m_tabs[m_nCurPlayListIndex].type != BUTTON) ? MF_ENABLED : (MF_DISABLED | MF_GRAYED))
+	menu.AppendMenuW(MF_BYPOSITION | MF_STRING | ((m_nCurPlayListIndex > 0 && curTab.type != BUTTON) ? MF_ENABLED : (MF_DISABLED | MF_GRAYED))
 		, id++, ResStr(IDS_PLAYLIST_RENAME_CURRENT));
-	menu.AppendMenuW(MF_BYPOSITION | MF_STRING | ((m_nCurPlayListIndex > 0 && m_tabs[m_nCurPlayListIndex].type != BUTTON) ? MF_ENABLED : (MF_DISABLED | MF_GRAYED))
+	menu.AppendMenuW(MF_BYPOSITION | MF_STRING | ((m_nCurPlayListIndex > 0 && curTab.type != BUTTON) ? MF_ENABLED : (MF_DISABLED | MF_GRAYED))
 		, id++, ResStr(IDS_PLAYLIST_DELETE_CURRENT));
 	
 	if (s.bUseDarkTheme && s.bDarkMenu) {
@@ -3674,7 +3733,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 				break;
 			case 3: // RENAME TAB
 				{
-					strDefName = m_tabs[m_nCurPlayListIndex].name;
+					strDefName = curTab.name;
 					CPlaylistNameDlg dlg(strDefName);
 					if (dlg.DoModal() != IDOK) {
 						return;
@@ -3683,7 +3742,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 					if (strGetName.IsEmpty()) {
 						return;
 					}
-					m_tabs[m_nCurPlayListIndex].name = strGetName;
+					curTab.name = strGetName;
 					SavePlaylist();
 				}
 				break;
@@ -3695,7 +3754,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 
 					CString base;
 					if (AfxGetMyApp()->GetAppSavePath(base)) {
-						base.Append(m_tabs[m_nCurPlayListIndex].fn);
+						base.Append(curTab.fn);
 
 						if (::PathFileExistsW(base)) {
 							::DeleteFileW(base);
@@ -3830,8 +3889,8 @@ void CPlayerPlaylistBar::TParseFolder(const CString& path)
 		m_icons_large[folder] = shFileInfo.hIcon;
 	}
 
-	std::vector<CString> directory;
-	std::vector<CString> files;
+	auto& directory = curTab.directory; directory.clear();
+	auto& files = curTab.files; files.clear();
 
 	const CString mask = AddSlash(path) + L"*.*";
 	WIN32_FIND_DATAW FindFileData = {};
@@ -3842,53 +3901,120 @@ void CPlayerPlaylistBar::TParseFolder(const CString& path)
 
 			if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 				if (!(FindFileData.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) && fileName != L"." && fileName != L"..") {
-					directory.push_back(AddSlash(path) + fileName);
+					file_data_t file_data;
+					file_data.name          = AddSlash(path) + fileName;
+					file_data.time.LowPart  = FindFileData.ftLastWriteTime.dwLowDateTime;
+					file_data.time.HighPart = FindFileData.ftLastWriteTime.dwHighDateTime;
+					file_data.size.LowPart  = FindFileData.nFileSizeLow;
+					file_data.size.HighPart = FindFileData.nFileSizeHigh;
+					directory.push_back(file_data);
 				}
 			}
 			else {
 				const CString ext = GetFileExt(FindFileData.cFileName).MakeLower();
 				if (mf.FindExt(ext)) {
-					files.push_back(AddSlash(path) + fileName);
+					file_data_t file_data;
+					file_data.name          = AddSlash(path) + fileName;
+					file_data.time.LowPart  = FindFileData.ftLastWriteTime.dwLowDateTime;
+					file_data.time.HighPart = FindFileData.ftLastWriteTime.dwHighDateTime;
+					file_data.size.LowPart  = FindFileData.nFileSizeLow;
+					file_data.size.HighPart = FindFileData.nFileSizeHigh;
+					files.push_back(file_data);
 				}
 			}
 		} while (::FindNextFileW(hFind, &FindFileData));
 		::FindClose(hFind);
 	}
 
-	std::sort(directory.begin(), directory.end(), [](const CString& a, const CString& b) {
-		return (StrCmpLogicalW(a, b) < 0);
-	});
+	TFillPlaylist(true);
+}
+
+void CPlayerPlaylistBar::TFillPlaylist(const bool bFirst/* = false*/)
+{
+	auto& directory = curTab.directory;
+	auto& files = curTab.files;
+
+	if (directory.empty() && files.empty()) {
+		return;
+	}
+
+	CString selected_path;
+	if (!bFirst) {
+		const auto focusedElement = TGetFocusedElement();
+		POSITION pos = curPlayList.FindIndex(focusedElement);
+		if (pos) {
+			selected_path = curPlayList.GetAt(pos).m_fns.front().GetName();
+		}
+
+		CPlaylistItem pli = curPlayList.GetHead(); // parent
+		curPlayList.RemoveAll();
+		curPlayList.AddTail(pli);
+	}
+
+	const bool bReverse = !!(curTab.sort >> 8);
+	const auto sort = (SORT)(curTab.sort & 0xF);
+
+	if (sort == SORT::NAME) {
+		std::sort(directory.begin(), directory.end(), [&](const file_data_t& a, const file_data_t& b) {
+			return (!bReverse ? StrCmpLogicalW(a.name, b.name) < 0 : StrCmpLogicalW(a.name, b.name) > 0);
+		});
+
+		std::sort(files.begin(), files.end(), [&](const file_data_t& a, const file_data_t& b) {
+			return (!bReverse ? StrCmpLogicalW(a.name, b.name) < 0 : StrCmpLogicalW(a.name, b.name) > 0);
+		});
+	}
+	else if (sort == SORT::DATE) {
+		std::sort(directory.begin(), directory.end(), [&](const file_data_t& a, const file_data_t& b) {
+			return (!bReverse ? a.time.QuadPart < b.time.QuadPart : a.time.QuadPart > b.time.QuadPart);
+		});
+
+		std::sort(files.begin(), files.end(), [&](const file_data_t& a, const file_data_t& b) {
+			return (!bReverse ? a.time.QuadPart < b.time.QuadPart : a.time.QuadPart > b.time.QuadPart);
+		});
+	}
+	else if (sort == SORT::SIZE) {
+		std::sort(directory.begin(), directory.end(), [](const file_data_t& a, const file_data_t& b) {
+			return (StrCmpLogicalW(a.name, b.name) < 0);
+		});
+
+		std::sort(files.begin(), files.end(), [&](const file_data_t& a, const file_data_t& b) {
+			return (!bReverse ? a.size.QuadPart < b.size.QuadPart : a.size.QuadPart > b.size.QuadPart);
+		});
+	}
 
 	for (const auto& dir : directory) {
 		CPlaylistItem pli;
 		pli.m_bDirectory = true;
-		pli.m_fns.push_front(dir + L">"); // Folders mark
+		pli.m_fns.push_front(dir.name + L">"); // Folders mark
 		curPlayList.AddTail(pli);
 	}
-
-	std::sort(files.begin(), files.end(), [](const CString& a, const CString& b) {
-		return (StrCmpLogicalW(a, b) < 0);
-	});
 
 	for (const auto& file : files) {
 		CPlaylistItem pli;
-		pli.m_fns.push_front(file);
+		pli.m_fns.push_front(file.name);
 		curPlayList.AddTail(pli);
 
-		const auto ext = GetFileExt(file).MakeLower();
-		if (m_icons.find(ext) == m_icons.cend()) {
-			SHGetFileInfoW(file, 0, &shFileInfo, sizeof(SHFILEINFOW), uFlags);
-			m_icons[ext] = shFileInfo.hIcon;
+		if (bFirst) {
+			const auto ext = GetFileExt(file.name).MakeLower();
+			if (m_icons.find(ext) == m_icons.cend()) {
+				SHFILEINFOW shFileInfo = {};
 
-			SHGetFileInfoW(file, 0, &shFileInfo, sizeof(SHFILEINFOW), uFlagsLargeIcon);
-			m_icons_large[ext] = shFileInfo.hIcon;
+				SHGetFileInfoW(file.name, 0, &shFileInfo, sizeof(SHFILEINFOW), SHGFI_ICON | SHGFI_SMALLICON);
+				m_icons[ext] = shFileInfo.hIcon;
+
+				SHGetFileInfoW(file.name, 0, &shFileInfo, sizeof(SHFILEINFOW), SHGFI_ICON | SHGFI_LARGEICON);
+				m_icons_large[ext] = shFileInfo.hIcon;
+			}
 		}
 	}
-}
 
-int CPlayerPlaylistBar::TGetPlaylistType() const
-{
-	return m_tabs[m_nCurPlayListIndex].type;
+	if (!bFirst) {
+		Refresh();
+
+		if (!SelectFileInPlaylist(selected_path)) {
+			EnsureVisible(curPlayList.GetHeadPosition());
+		}
+	}
 }
 
 int CPlayerPlaylistBar::TGetPathType(const CString& path) const
@@ -3932,8 +4058,9 @@ void CPlayerPlaylistBar::TSaveSettings()
 		str.AppendFormat(L"%d;%d;|", m_nCurPlayListIndex, cntOffset);
 		const auto last = m_tabs.size() - 1;
 		for (size_t i = 0; i <= last; i++) {
+			const auto& tab = m_tabs[i];
 			CString s;
-			str.AppendFormat(L"%u;%s%s", m_tabs[i].type, RemoveFileExt(m_tabs[i].fn.GetString()), i < last ? L"|" : L"");
+			str.AppendFormat(L"%u;%s;%u%s", tab.type, RemoveFileExt(tab.fn.GetString()), tab.sort, i < last ? L"|" : L"");
 		}
 	}
 
@@ -3962,10 +4089,11 @@ void CPlayerPlaylistBar::TGetSettings()
 
 		// add tab
 		tab_t tab;
-		tab.type = _wtoi(arFields[0]);
+		tab.type = (PLAYLIST_TYPE)_wtoi(arFields[0]);
 		tab.name = m_pls.empty() ? ResStr(IDS_PLAYLIST_MAIN_NAME) : arFields[1];
 		tab.fn = arFields[1] + (L".mpcpl");
 		tab.id = GetNextId();
+		tab.sort = _wtoi(arFields[2]);
 		m_tabs.push_back(tab);
 
 		// add playlist
@@ -4072,62 +4200,62 @@ int CPlayerPlaylistBar::TGetFirstVisible()
 	return idx;
 }
 
-COLORREF CPlayerPlaylistBar::TColorBrightness(int lSkale, COLORREF color)
+static COLORREF TColorBrightness(const int lSkale, const COLORREF color)
 {
-	int red = lSkale > 0 ? std::min(GetRValue(color) + lSkale, 255) : std::max(0, GetRValue(color) + lSkale);
-	int green = lSkale > 0 ? std::min(GetGValue(color) + lSkale, 255) : std::max(0, GetGValue(color) + lSkale);
-	int blue = lSkale > 0 ? std::min(GetBValue(color) + lSkale, 255) : std::max(0, GetBValue(color) + lSkale);
+	const int R = std::clamp(GetRValue(color) + lSkale, 0, 255);
+	const int G = std::clamp(GetGValue(color) + lSkale, 0, 255);
+	const int B = std::clamp(GetBValue(color) + lSkale, 0, 255);
 
-	return RGB(red, green, blue);
+	return RGB(R, G, B);
 }
 
 void CPlayerPlaylistBar::TSetColor()
 {
 	if (AfxGetAppSettings().bUseDarkTheme) {
-		m_crBkBar = ThemeRGB(45, 50, 55); //60,65,70 // background tab bar
+		m_crBkBar = ThemeRGB(45, 50, 55);          // background tab bar
 
-		m_crBN = m_crBkBar;// TColorBrightness(0, m_crBkBar);	// backgroung normal
-		m_crBNL = TColorBrightness(+15, m_crBN);		// backgroung normal lighten (for light edge)
-		m_crBND = TColorBrightness(-15, m_crBN);		// backgroung normal darken (for dark edge)
+		m_crBN = m_crBkBar;                        // backgroung normal
+		m_crBNL = TColorBrightness(+15, m_crBN);   // backgroung normal lighten (for light edge)
+		m_crBND = TColorBrightness(-15, m_crBN);   // backgroung normal darken (for dark edge)
 
-		m_crBS = TColorBrightness(-15, m_crBN);		// backgroung selected background
-		m_crBSL = TColorBrightness(+30, m_crBS);		// backgroung selected lighten (for light edge)
-		m_crBSD = TColorBrightness(-15, m_crBS);		// backgroung selected darken (for dark edge)
+		m_crBS = TColorBrightness(-15, m_crBN);    // backgroung selected background
+		m_crBSL = TColorBrightness(+30, m_crBS);   // backgroung selected lighten (for light edge)
+		m_crBSD = TColorBrightness(-15, m_crBS);   // backgroung selected darken (for dark edge)
 
-		m_crBH = TColorBrightness(+20, m_crBN);		// backgroung highlighted background
-		m_crBHL = TColorBrightness(+15, m_crBH);		// backgroung highlighted lighten (for light edge)
-		m_crBHD = TColorBrightness(-30, m_crBH);		// backgroung highlighted darken (for dark edge)
+		m_crBH = TColorBrightness(+20, m_crBN);    // backgroung highlighted background
+		m_crBHL = TColorBrightness(+15, m_crBH);   // backgroung highlighted lighten (for light edge)
+		m_crBHD = TColorBrightness(-30, m_crBH);   // backgroung highlighted darken (for dark edge)
 
-		m_crBSH = TColorBrightness(-20, m_crBN);		// backgroung selected highlighted background
-		m_crBSHL = TColorBrightness(+40, m_crBSL);		// backgroung selected highlighted lighten (for light edge)
-		m_crBSHD = TColorBrightness(-0, m_crBSH);		// backgroung selected highlighted darken (for dark edge)
+		m_crBSH = TColorBrightness(-20, m_crBN);   // backgroung selected highlighted background
+		m_crBSHL = TColorBrightness(+40, m_crBSL); // backgroung selected highlighted lighten (for light edge)
+		m_crBSHD = TColorBrightness(-0, m_crBSH);  // backgroung selected highlighted darken (for dark edge)
 
-		m_crTN = TColorBrightness(+60, m_crBN);		// text normal
-		m_crTH = TColorBrightness(+80, m_crTN);		// text normal lighten
-		m_crTS = AfxGetAppSettings().clrFaceABGR; //TColorBrightness(-80, m_crTN);		// text selected
+		m_crTN = TColorBrightness(+60, m_crBN);    // text normal
+		m_crTH = TColorBrightness(+80, m_crTN);    // text normal lighten
+		m_crTS = AfxGetAppSettings().clrFaceABGR;  // text selected
 	}
 	else {
-		m_crBkBar = GetSysColor(COLOR_BTNFACE); // background tab bar
+		m_crBkBar = GetSysColor(COLOR_BTNFACE);    // background tab bar
 
-		m_crBN = m_crBkBar;	// backgroung normal
-		m_crBNL = TColorBrightness(+15, m_crBN);		// backgroung normal lighten (for light edge)
-		m_crBND = TColorBrightness(-15, m_crBN);		// backgroung normal darken (for dark edge)
+		m_crBN = m_crBkBar;                        // backgroung normal
+		m_crBNL = TColorBrightness(+15, m_crBN);   // backgroung normal lighten (for light edge)
+		m_crBND = TColorBrightness(-15, m_crBN);   // backgroung normal darken (for dark edge)
 
-		m_crBS = 0x00f1dacc;		// backgroung selected background
-		m_crBSL = 0xc56a31;		// backgroung selected lighten (for light edge)
-		m_crBSD = TColorBrightness(-15, m_crBS);		// backgroung selected darken (for dark edge)
+		m_crBS = 0x00f1dacc;                       // backgroung selected background
+		m_crBSL = 0xc56a31;                        // backgroung selected lighten (for light edge)
+		m_crBSD = TColorBrightness(-15, m_crBS);   // backgroung selected darken (for dark edge)
 
-		m_crBH = 0x00f1dacc;		// backgroung highlighted background
-		m_crBHL = TColorBrightness(+15, m_crBH);		// backgroung highlighted lighten (for light edge)
-		m_crBHD = TColorBrightness(-30, m_crBH);		// backgroung highlighted darken (for dark edge)
+		m_crBH = 0x00f1dacc;                       // backgroung highlighted background
+		m_crBHL = TColorBrightness(+15, m_crBH);   // backgroung highlighted lighten (for light edge)
+		m_crBHD = TColorBrightness(-30, m_crBH);   // backgroung highlighted darken (for dark edge)
 
-		m_crBSH = TColorBrightness(+20, m_crBS);		// backgroung selected highlighted background
-		m_crBSHL =TColorBrightness(-20, m_crBSL);		// backgroung selected highlighted lighten (for light edge)
-		m_crBSHD = TColorBrightness(-0, m_crBSH);		// backgroung selected highlighted darken (for dark edge)
+		m_crBSH = TColorBrightness(+20, m_crBS);   // backgroung selected highlighted background
+		m_crBSHL =TColorBrightness(-20, m_crBSL);  // backgroung selected highlighted lighten (for light edge)
+		m_crBSHD = TColorBrightness(-0, m_crBSH);  // backgroung selected highlighted darken (for dark edge)
 
-		m_crTN = RGB(50, 50, 50); // text normal
-		m_crTH = RGB(0, 0, 0); // text normal lighten
-		m_crTS = 0xff;// text selected
+		m_crTN = RGB(50, 50, 50);                  // text normal
+		m_crTH = RGB(0, 0, 0);                     // text normal lighten
+		m_crTS = 0xff;                             // text selected
 	}
 }
 
@@ -4161,7 +4289,7 @@ int CPlayerPlaylistBar::TGetOffset()
 
 bool CPlayerPlaylistBar::TNavigate()
 {
-	if (TGetPlaylistType() == EXPLORER) {
+	if (curTab.type == EXPLORER) {
 		m_list.SetFocus();
 
 		int item = m_list.GetNextItem(-1, LVNI_SELECTED);
@@ -4246,7 +4374,7 @@ int CPlayerPlaylistBar::TGetFocusedElement() const
 
 void CPlayerPlaylistBar::CloseMedia() const
 {
-	if (m_nCurPlaybackListId == m_tabs[m_nCurPlayListIndex].id) {
+	if (m_nCurPlaybackListId == curTab.id) {
 		m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
 	}
 }
