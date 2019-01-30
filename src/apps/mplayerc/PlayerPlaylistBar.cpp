@@ -1202,8 +1202,7 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 			curPlayList.GetTail().m_label = label;
 			return;
 		} else if (ct == L"application/x-mpc-playlist") {
-			CString name;
-			ParseMPCPlayList(fn, name);
+			ParseMPCPlayList(fn);
 			return;
 		} else if (ct == L"audio/x-mpegurl" || ct == L"application/http-live-streaming-m3u") {
 			ParseM3UPlayList(fn);
@@ -1245,7 +1244,7 @@ static CString CombinePath(CPath p, CString fn)
 	return out;
 }
 
-bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn, CString& name)
+bool CPlayerPlaylistBar::ParseMPCPlayList(const CString& fn)
 {
 	CString str;
 	std::map<int, CPlaylistItem> pli;
@@ -1264,12 +1263,6 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn, CString& name)
 	base.RemoveFileSpec();
 
 	while (f.ReadString(str)) {
-		if (name.IsEmpty() && str.Left(5).MakeLower() == L"name,") {
-			str.Delete(0, 5);
-			name = str;
-			continue;
-		}
-
 		std::list<CString> sl;
 		Explode(str, sl, L',', 3);
 		if (sl.size() != 3) {
@@ -1384,7 +1377,7 @@ bool CPlayerPlaylistBar::ParseMPCPlayList(CString fn, CString& name)
 	return pli.size() > 0;
 }
 
-bool CPlayerPlaylistBar::SaveMPCPlayList(CString fn, CTextFile::enc e, bool fRemovePath, const CString name/* = L""*/)
+bool CPlayerPlaylistBar::SaveMPCPlayList(const CString& fn, const CTextFile::enc e, const bool bRemovePath)
 {
 	CTextFile f;
 	if (!f.Save(fn, e)) {
@@ -1392,11 +1385,6 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(CString fn, CTextFile::enc e, bool fRem
 	}
 
 	f.WriteString(L"MPCPLAYLIST\n");
-
-	if (!name.IsEmpty()) {
-		CString str; str.Format(L"name,%s\n", name);
-		f.WriteString(str);
-	}
 
 	POSITION cur_pos = curPlayList.GetPos();
 
@@ -1427,7 +1415,7 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(CString fn, CTextFile::enc e, bool fRem
 		if (pli.m_type == CPlaylistItem::file) {
 			for (const auto& fi : pli.m_fns) {
 				CString fn = fi.GetName();
-				if (fRemovePath) {
+				if (bRemovePath) {
 					CPath p(fn);
 					p.StripPath();
 					fn = (LPCTSTR)p;
@@ -1437,7 +1425,7 @@ bool CPlayerPlaylistBar::SaveMPCPlayList(CString fn, CTextFile::enc e, bool fRem
 
 			for (const auto& si : pli.m_subs) {
 				CString fn = si.GetName();
-				if (fRemovePath) {
+				if (bRemovePath) {
 					CPath p(fn);
 					p.StripPath();
 					fn = (LPCTSTR)p;
@@ -2158,11 +2146,7 @@ void CPlayerPlaylistBar::LoadPlaylist(CString filename)
 
 			if (::PathFileExistsW(base)) {
 				if (AfxGetAppSettings().bRememberPlaylistItems) {
-					CString name;
-					ParseMPCPlayList(base, name);
-					if (!name.IsEmpty()) {
-						m_tabs[i].name = name;
-					}
+					ParseMPCPlayList(base);
 				}
 				else {
 					::DeleteFileW(base);
@@ -2203,7 +2187,7 @@ void CPlayerPlaylistBar::SavePlaylist()
 				::CreateDirectoryW(base, nullptr);
 			}
 
-			SaveMPCPlayList(file, CTextFile::UTF8, false, m_nCurPlayListIndex > 0 ? curTab.name : L"");
+			SaveMPCPlayList(file, CTextFile::UTF8, false);
 		} else if (::PathFileExistsW(file)) {
 			::DeleteFileW(file);
 		}
@@ -4065,7 +4049,7 @@ void CPlayerPlaylistBar::TSaveSettings()
 		for (size_t i = 0; i <= last; i++) {
 			const auto& tab = m_tabs[i];
 			CString s;
-			str.AppendFormat(L"%u;%s;%u%s", tab.type, RemoveFileExt(tab.fn.GetString()), tab.sort, i < last ? L"|" : L"");
+			str.AppendFormat(L"%u;%s;%u%s%s", tab.type, RemoveFileExt(tab.fn.GetString()), tab.sort, i > 0 ? L";" + tab.name : L"", i < last ? L"|" : L"");
 		}
 	}
 
@@ -4079,9 +4063,8 @@ void CPlayerPlaylistBar::TGetSettings()
 	TTokenizer(AfxGetAppSettings().strTabs, L"|", arStrokes);
 
 	for (size_t i = 0; i < arStrokes.size(); i++) {
-		const auto& strStroke = arStrokes[i];
 		// parse fields in stroke
-		TTokenizer(strStroke, L";", arFields);
+		TTokenizer(arStrokes[i], L";", arFields);
 		if (arFields.size() < 2) {
 			continue;
 		}
@@ -4100,6 +4083,9 @@ void CPlayerPlaylistBar::TGetSettings()
 		tab.id = GetNextId();
 		if (arFields.size() >= 3) {
 			tab.sort = _wtoi(arFields[2]);
+		}
+		if (!m_pls.empty() && arFields.size() >= 4) {
+			tab.name = arFields[3];
 		}
 		m_tabs.push_back(tab);
 
