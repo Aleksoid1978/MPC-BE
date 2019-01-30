@@ -741,8 +741,8 @@ CPlayerPlaylistBar::CPlayerPlaylistBar(CMainFrame* pMainFrame)
 	, m_bDragging(FALSE)
 	, m_bHiddenDueToFullscreen(false)
 	, m_bVisible(false)
-	, cntOffset(0)
-	, iTFontSize(0)
+	, m_cntOffset(0)
+	, m_iTFontSize(0)
 {
 	CAppSettings& s = AfxGetAppSettings();
 	m_bUseDarkTheme = s.bUseDarkTheme;
@@ -822,7 +822,7 @@ void CPlayerPlaylistBar::ScaleFontInternal()
 
 	auto& lf = ncm.lfMessageFont;
 	lf.lfHeight = m_pMainFrame->ScaleSystemToMonitorY(lf.lfHeight) * AfxGetAppSettings().iPlsFontPercent / 100;
-	iTFontSize = abs(lf.lfHeight);
+	m_iTFontSize = abs(lf.lfHeight);
 
 	m_font.DeleteObject();
 	if (m_font.CreateFontIndirectW(&lf)) {
@@ -2229,13 +2229,13 @@ void CPlayerPlaylistBar::ResizeListColumn()
 {
 	if (::IsWindow(m_list.m_hWnd)) {
 		CRect r;
-		GetClientRect(r);
+		GetClientRect(&r);
 		r.DeflateRect(2, 2);
-		r.top += (iTFontSize + m_pMainFrame->ScaleY(WIDTH_TABBUTTON / 2));
+		r.top += (m_rcTPage.Height() + 2);
 
 		m_list.SetRedraw(FALSE);
 		m_list.MoveWindow(r);
-		m_list.GetClientRect(r);
+		m_list.GetClientRect(&r);
 		m_list.SetColumnWidth(COL_NAME, r.Width() - m_nTimeColWidth);
 		m_list.SetRedraw();
 
@@ -2250,13 +2250,13 @@ void CPlayerPlaylistBar::ResizeListColumn()
 				CoolSB_SetSize(m_list.m_hWnd, SB_VERT, m_pMainFrame->GetSystemMetricsDPI(SM_CYVSCROLL), m_pMainFrame->GetSystemMetricsDPI(SM_CXVSCROLL));
 			}
 
-			GetClientRect(r);
+			GetClientRect(&r);
 			r.DeflateRect(2, 2);
-			r.top += (iTFontSize + m_pMainFrame->ScaleY(WIDTH_TABBUTTON / 2));
+			r.top += (m_rcTPage.Height() + 2);
 
 			m_list.SetRedraw(FALSE);
 			m_list.MoveWindow(r);
-			m_list.GetClientRect(r);
+			m_list.GetClientRect(&r);
 			m_list.SetColumnWidth(COL_NAME, r.Width() - m_nTimeColWidth);
 			m_list.SetRedraw();
 		} else {
@@ -2894,7 +2894,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 {
 	CRect rcBar;
 	GetClientRect(&rcBar);
-	rcBar.bottom = rcBar.top + iTFontSize + m_pMainFrame->ScaleY(WIDTH_TABBUTTON / 2);
+	rcBar.bottom = rcBar.top + m_rcTPage.Height() + 2;
 
 	CPoint pt;
 	GetCursorPos(&pt);
@@ -3410,13 +3410,13 @@ void CPlayerPlaylistBar::TCalcLayout()
 
 	CRect rcTabBar;
 	GetClientRect(&rcTabBar);
-	rcTabBar.bottom = rcTabBar.top + iTFontSize + m_pMainFrame->ScaleY(WIDTH_TABBUTTON / 2);
+	rcTabBar.bottom = rcTabBar.top + m_iTFontSize + m_pMainFrame->ScaleY(WIDTH_TABBUTTON / 2);
 	rcTabBar.DeflateRect(2, 1, 2, 1);
 
 	const int wSysButton = rcTabBar.Height();
 
-	rcTPage = rcTabBar;
-	rcTPage.right = rcTabBar.right - wSysButton;
+	m_rcTPage = rcTabBar;
+	m_rcTPage.right = rcTabBar.right - wSysButton;
 
 	m_tab_buttons[RIGHT].bVisible = false;
 	m_tab_buttons[LEFT].bVisible = false;
@@ -3430,9 +3430,9 @@ void CPlayerPlaylistBar::TCalcLayout()
 	m_tab_buttons[MENU].r.right = m_tab_buttons[MENU].r.left + wSysButton;
 
 
-	if (wTsSize > rcTabBar.right - wSysButton || cntOffset > 0) {
-		rcTPage.left = rcTabBar.left + wSysButton;
-		rcTPage.right = rcTabBar.right - wSysButton * 2 - 3;
+	if (wTsSize > rcTabBar.right - wSysButton || m_cntOffset > 0) {
+		m_rcTPage.left = rcTabBar.left + wSysButton;
+		m_rcTPage.right = rcTabBar.right - wSysButton * 2 - 3;
 		m_tab_buttons[LEFT].r = rcTabBar;
 		m_tab_buttons[RIGHT].r = rcTabBar;
 		m_tab_buttons[LEFT].bVisible = true;
@@ -3444,7 +3444,7 @@ void CPlayerPlaylistBar::TCalcLayout()
 
 	}
 	else if (wTsSize <= rcTabBar.right - wSysButton) {
-		rcTPage.left = rcTabBar.left;
+		m_rcTPage.left = rcTabBar.left;
 	}
 
 	for (size_t i = 0; i < m_tabs.size(); i++) {
@@ -3453,7 +3453,7 @@ void CPlayerPlaylistBar::TCalcLayout()
 		tab.r = rcTabBar;
 		int wTab = mdc.GetTextExtent(tab.name).cx + WIDTH_TABBUTTON;
 		if (i == 0) {
-			tab.r.left = rcTPage.left - TGetOffset();
+			tab.r.left = m_rcTPage.left - TGetOffset();
 			tab.r.right = tab.r.left + wTab;
 		}
 		else {
@@ -3481,7 +3481,7 @@ void CPlayerPlaylistBar::TIndexHighighted()
 	m_tab_idx = -1;
 	m_button_idx = -1;
 	for (size_t i = 0; i < m_tabs.size(); i++) {
-		if (m_tabs[i].r.PtInRect(p) && rcTPage.PtInRect(p)) {
+		if (m_tabs[i].r.PtInRect(p) && m_rcTPage.PtInRect(p)) {
 			m_tab_idx = i;
 			return;
 		}
@@ -3506,7 +3506,7 @@ void CPlayerPlaylistBar::TDrawBar()
 
 		CRect rcTabBar;
 		GetClientRect(&rcTabBar);
-		rcTabBar.bottom = rcTabBar.top + iTFontSize + m_pMainFrame->ScaleY(WIDTH_TABBUTTON / 2);
+		rcTabBar.bottom = rcTabBar.top + m_rcTPage.Height() + 2;
 
 		CBitmap bm;
 		bm.CreateCompatibleBitmap(&dc, rcTabBar.Width(), rcTabBar.Height());
@@ -3536,7 +3536,7 @@ void CPlayerPlaylistBar::TDrawBar()
 		//HRGN hrgn;
 		//GetClipRgn(mdc, hrgn);
 
-		HRGN hRgnExclude = ::CreateRectRgnIndirect(&rcTPage);
+		HRGN hRgnExclude = ::CreateRectRgnIndirect(&m_rcTPage);
 		SelectClipRgn(mdc, hRgnExclude);
 		for (size_t i = 0; i < m_tabs.size(); i++) {
 			auto& tab = m_tabs[i];
@@ -4048,7 +4048,7 @@ void CPlayerPlaylistBar::TSaveSettings()
 
 	if (!m_tabs.empty()) {
 		// the first stroke has only saved last active playlist index and tabs offset (first visible tab on tabbar)
-		str.AppendFormat(L"%d;%d;|", m_nCurPlayListIndex, cntOffset);
+		str.AppendFormat(L"%d;%d;|", m_nCurPlayListIndex, m_cntOffset);
 		const auto last = m_tabs.size() - 1;
 		for (size_t i = 0; i <= last; i++) {
 			const auto& tab = m_tabs[i];
@@ -4076,7 +4076,7 @@ void CPlayerPlaylistBar::TGetSettings()
 
 		if (i == 0) { // the first stroke has only saved last active playlist index and tabs offset (first visible tab on tabbar)
 			m_nCurPlayListIndex = _wtoi(arFields[0]);
-			cntOffset = _wtoi(arFields[1]);
+			m_cntOffset = _wtoi(arFields[1]);
 			continue;
 		}
 
@@ -4113,8 +4113,8 @@ void CPlayerPlaylistBar::TGetSettings()
 		}
 	}
 
-	if (cntOffset >= m_tabs.size()) {
-		cntOffset = 0;
+	if (m_cntOffset >= m_tabs.size()) {
+		m_cntOffset = 0;
 	}
 
 	if (m_nCurPlayListIndex >= m_tabs.size()) {
@@ -4126,9 +4126,9 @@ void CPlayerPlaylistBar::TSetOffset(bool toRight)
 {
 	if (toRight) {
 		for (size_t i = 1; i < m_tabs.size(); i++) {
-			if (m_tabs[i].r.left == rcTPage.left) {
-				if (cntOffset > 0) {
-					cntOffset--;
+			if (m_tabs[i].r.left == m_rcTPage.left) {
+				if (m_cntOffset > 0) {
+					m_cntOffset--;
 				}
 				return;
 			}
@@ -4137,8 +4137,8 @@ void CPlayerPlaylistBar::TSetOffset(bool toRight)
 	}
 	
 	for (size_t i = 0; i < m_tabs.size() - 1; i++) {
-		if (m_tabs[i].r.left == rcTPage.left) {
-			cntOffset++;
+		if (m_tabs[i].r.left == m_rcTPage.left) {
+			m_cntOffset++;
 			return;
 		}
 	}
@@ -4146,27 +4146,27 @@ void CPlayerPlaylistBar::TSetOffset(bool toRight)
 
 void CPlayerPlaylistBar::TEnsureVisible(int idx)
 {
-	if (m_tabs[idx].r.left >= rcTPage.left && m_tabs[idx].r.right <= rcTPage.right) {
+	if (m_tabs[idx].r.left >= m_rcTPage.left && m_tabs[idx].r.right <= m_rcTPage.right) {
 		return;
 	}
 
-	if (m_tabs[idx].r.left < rcTPage.left) {
+	if (m_tabs[idx].r.left < m_rcTPage.left) {
 		for (size_t i = idx; i < m_tabs.size(); i++) {
-			if (cntOffset > 0) {
-				cntOffset--;
+			if (m_cntOffset > 0) {
+				m_cntOffset--;
 			}
-			if (m_tabs[i].r.left + m_tabs[i].r.Width() == rcTPage.left) {
+			if (m_tabs[i].r.left + m_tabs[i].r.Width() == m_rcTPage.left) {
 				return;
 			}
 		}
-	} else if (m_tabs[idx].r.left > rcTPage.left && m_tabs[idx].r.right > rcTPage.right) {
+	} else if (m_tabs[idx].r.left > m_rcTPage.left && m_tabs[idx].r.right > m_rcTPage.right) {
 		int ftab = TGetFirstVisible();
 		int tempOffset = 0;
 		do {
 			tempOffset += m_tabs[ftab].r.Width();
 			ftab++;
-			cntOffset++;
-		} while (m_tabs[idx].r.right - tempOffset > rcTPage.right && m_tabs[idx].r.Width() <= rcTPage.Width());
+			m_cntOffset++;
+		} while (m_tabs[idx].r.right - tempOffset > m_rcTPage.right && m_tabs[idx].r.Width() <= m_rcTPage.Width());
 	}
 }
 
@@ -4175,7 +4175,7 @@ int CPlayerPlaylistBar::TGetFirstVisible()
 	int idx = -1;
 	for (size_t i = 0; i < m_tabs.size(); i++) {
 		idx++;
-		if (m_tabs[i].r.left == rcTPage.left) {
+		if (m_tabs[i].r.left == m_rcTPage.left) {
 			return idx;
 		}
 
@@ -4250,7 +4250,7 @@ int CPlayerPlaylistBar::TGetOffset()
 	mdc.SelectObject(&m_font);
 
 	int widthOffset = 0;
-	for (size_t i = 0; i < cntOffset; i++) {
+	for (size_t i = 0; i < m_cntOffset; i++) {
 		widthOffset += mdc.GetTextExtent(m_tabs[i].name).cx + WIDTH_TABBUTTON;
 	}
 
