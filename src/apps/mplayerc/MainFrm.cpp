@@ -4471,6 +4471,8 @@ void CMainFrame::OnFilePostCloseMedia()
 
 	m_bIsBDPlay = FALSE;
 
+	// close all menus
+	SendMessageW(WM_CANCELMODE);
 	// Ensure the dynamically added menu items are cleared
 	MakeEmptySubMenu(m_filtersMenu);
 	MakeEmptySubMenu(m_VideoStreamsMenu);
