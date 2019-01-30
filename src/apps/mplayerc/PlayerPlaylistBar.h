@@ -188,8 +188,8 @@ private:
 	void ParsePlayList(std::list<CString>& fns, CSubtitleItemList* subs, bool bCheck = true);
 	void ResolveLinkFiles(std::list<CString> &fns);
 
-	bool ParseMPCPlayList(CString fn, CString& name);
-	bool SaveMPCPlayList(CString fn, CTextFile::enc e, bool fRemovePath, const CString name = L"");
+	bool ParseMPCPlayList(const CString& fn);
+	bool SaveMPCPlayList(const CString& fn, const CTextFile::enc e, const bool bRemovePath);
 
 	bool ParseM3UPlayList(CString fn);
 	bool ParseCUEPlayList(CString fn);
