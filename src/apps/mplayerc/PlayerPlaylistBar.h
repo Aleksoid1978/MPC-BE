@@ -295,13 +295,13 @@ private:
 	void TSetOffset(bool toRight = false);
 	void TEnsureVisible(int idx);
 
-	CRect rcTPage;
-	size_t cntOffset;
+	CRect m_rcTPage;
+	size_t m_cntOffset;
 
 	int TGetFirstVisible();
 	int TGetOffset();
 	int TGetPathType(const CString& path) const;
-	int iTFontSize;
+	int m_iTFontSize;
 	bool TNavigate();
 	bool TSelectFolder(CString path);
 	int TGetFocusedElement() const;
