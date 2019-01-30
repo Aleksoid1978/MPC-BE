@@ -247,7 +247,21 @@ CString CPlaylistItem::GetLabel(int i)
 		if (!m_label.IsEmpty()) {
 			str = m_label;
 		} else if (!m_fns.empty()) {
-			str = GetFileOnly(m_fns.front());
+			const auto& fn = m_fns.front();
+			CUrl url;
+			if (::PathIsURLW(fn) && url.CrackUrl(fn)) {
+				str = fn.GetName();
+				if (url.GetUrlPathLength() > 1) {
+					str = url.GetUrlPath();
+					if (const int pos = str.ReverseFind(L'/'); pos != -1) {
+						str = str.Right(str.GetLength() - pos - 1);
+					}
+				}
+				m_label = str.TrimRight(L'/');
+			}
+			else {
+				str = GetFileOnly(fn);
+			}
 		}
 	} else if (i == 1) {
 		if (m_bInvalid) {
@@ -255,15 +269,13 @@ CString CPlaylistItem::GetLabel(int i)
 		}
 
 		if (m_type == file) {
-			REFERENCE_TIME rt = m_duration;
-
+			const REFERENCE_TIME rt = m_duration;
 			if (rt > 0) {
 				str = ReftimeToString2(rt);
 			}
 		} else if (m_type == device) {
 			// TODO
 		}
-
 	}
 
 	return str;
