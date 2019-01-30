@@ -1499,13 +1499,15 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 				pli->m_label = str.Trim();
 			}
 		} else {
-			CString fullPath = MakePath(CombinePath(base, str));
+			const CString fullPath = MakePath(CombinePath(base, str));
+			/*
 			if (GetFileExt(fullPath).MakeLower() == L".m3u") {
 				SAFE_DELETE(pli);
 
 				ParseM3UPlayList(fullPath);
 				continue;
 			}
+			*/
 
 			pli->m_fns.push_back(MakePath(CombinePath(base, str)));
 			curPlayList.AddTail(*pli);
