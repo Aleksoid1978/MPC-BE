@@ -742,6 +742,7 @@ CPlayerPlaylistBar::CPlayerPlaylistBar(CMainFrame* pMainFrame)
 	, m_bHiddenDueToFullscreen(false)
 	, m_bVisible(false)
 	, cntOffset(0)
+	, iTFontSize(0)
 {
 	CAppSettings& s = AfxGetAppSettings();
 	m_bUseDarkTheme = s.bUseDarkTheme;
@@ -821,6 +822,7 @@ void CPlayerPlaylistBar::ScaleFontInternal()
 
 	auto& lf = ncm.lfMessageFont;
 	lf.lfHeight = m_pMainFrame->ScaleSystemToMonitorY(lf.lfHeight) * AfxGetAppSettings().iPlsFontPercent / 100;
+	iTFontSize = abs(lf.lfHeight);
 
 	m_font.DeleteObject();
 	if (m_font.CreateFontIndirectW(&lf)) {
@@ -2229,7 +2231,7 @@ void CPlayerPlaylistBar::ResizeListColumn()
 		CRect r;
 		GetClientRect(r);
 		r.DeflateRect(2, 2);
-		r.top += abs(iTFontSize)*2;
+		r.top += (iTFontSize + m_pMainFrame->ScaleY(WIDTH_TABBUTTON / 2));
 
 		m_list.SetRedraw(FALSE);
 		m_list.MoveWindow(r);
@@ -2250,7 +2252,7 @@ void CPlayerPlaylistBar::ResizeListColumn()
 
 			GetClientRect(r);
 			r.DeflateRect(2, 2);
-			r.top += abs(iTFontSize)*2;
+			r.top += (iTFontSize + m_pMainFrame->ScaleY(WIDTH_TABBUTTON / 2));
 
 			m_list.SetRedraw(FALSE);
 			m_list.MoveWindow(r);
@@ -2892,7 +2894,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 {
 	CRect rcBar;
 	GetClientRect(&rcBar);
-	rcBar.bottom = rcBar.top + abs(iTFontSize) * 2;
+	rcBar.bottom = rcBar.top + iTFontSize + m_pMainFrame->ScaleY(WIDTH_TABBUTTON / 2);
 
 	CPoint pt;
 	GetCursorPos(&pt);
@@ -3404,27 +3406,14 @@ void CPlayerPlaylistBar::TCalcLayout()
 	CClientDC dc(this);
 	CDC mdc;
 	mdc.CreateCompatibleDC(&dc);
-
-	NONCLIENTMETRICS ncm = { sizeof(NONCLIENTMETRICS) };
-	VERIFY(SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0));
-
-	auto& lf = ncm.lfMessageFont;
-	iTFontSize = lf.lfHeight = m_pMainFrame->ScaleSystemToMonitorY(lf.lfHeight)
-		* AfxGetAppSettings().iPlsFontPercent / 100
-		* (m_pMainFrame->GetDPIScalePercent() / 100);
-
-	CFont font;
-	font.CreateFontIndirect(&lf);
-
-	mdc.SelectObject(&font);
+	mdc.SelectObject(&m_font);
 
 	CRect rcTabBar;
 	GetClientRect(&rcTabBar);
-	rcTabBar.bottom = (rcTabBar.top + abs(iTFontSize) * 2);
+	rcTabBar.bottom = rcTabBar.top + iTFontSize + m_pMainFrame->ScaleY(WIDTH_TABBUTTON / 2);
 	rcTabBar.DeflateRect(2, 1, 2, 1);
-	int wTsSize = 0;
 
-	int wSysButton = WIDTH_TABBUTTON * (m_pMainFrame->GetDPIScalePercent() / 100);
+	const int wSysButton = rcTabBar.Height();
 
 	rcTPage = rcTabBar;
 	rcTPage.right = rcTabBar.right - wSysButton;
@@ -3432,6 +3421,7 @@ void CPlayerPlaylistBar::TCalcLayout()
 	m_tab_buttons[RIGHT].bVisible = false;
 	m_tab_buttons[LEFT].bVisible = false;
 
+	int wTsSize = 0;
 	for (size_t i = 0; i < m_tabs.size(); i++) {
 		wTsSize += mdc.GetTextExtent(m_tabs[i].name).cx + WIDTH_TABBUTTON;
 	}
@@ -3508,23 +3498,15 @@ void CPlayerPlaylistBar::TDrawBar()
 {
 	CClientDC dc(this);
 	if (IsWindowVisible()) {
-
 		TIndexHighighted();
 
 		CDC mdc;
 		mdc.CreateCompatibleDC(&dc);
-
-		NONCLIENTMETRICS ncm = { sizeof(NONCLIENTMETRICS) };
-		VERIFY(SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0));
-		auto& lf = ncm.lfMessageFont;
-		iTFontSize = lf.lfHeight = m_pMainFrame->ScaleSystemToMonitorY(lf.lfHeight) * AfxGetAppSettings().iPlsFontPercent / 100 * (m_pMainFrame->GetDPIScalePercent() / 100);
-		CFont font;
-		font.CreateFontIndirect(&lf);
-		mdc.SelectObject(&font);
+		mdc.SelectObject(&m_font);
 
 		CRect rcTabBar;
 		GetClientRect(&rcTabBar);
-		rcTabBar.bottom = (rcTabBar.top + abs(iTFontSize) * 2);
+		rcTabBar.bottom = rcTabBar.top + iTFontSize + m_pMainFrame->ScaleY(WIDTH_TABBUTTON / 2);
 
 		CBitmap bm;
 		bm.CreateCompatibleBitmap(&dc, rcTabBar.Width(), rcTabBar.Height());
@@ -4162,18 +4144,6 @@ void CPlayerPlaylistBar::TSetOffset(bool toRight)
 	}
 }
 
-int CPlayerPlaylistBar::TGetFontSize()
-{
-	NONCLIENTMETRICS ncm = { sizeof(NONCLIENTMETRICS) };
-	VERIFY(SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0));
-
-	auto& lf = ncm.lfMessageFont;
-
-	return iTFontSize = lf.lfHeight = m_pMainFrame->ScaleSystemToMonitorY(lf.lfHeight)
-		* AfxGetAppSettings().iPlsFontPercent / 100
-		* (m_pMainFrame->GetDPIScalePercent() / 100);
-}
-
 void CPlayerPlaylistBar::TEnsureVisible(int idx)
 {
 	if (m_tabs[idx].r.left >= rcTPage.left && m_tabs[idx].r.right <= rcTPage.right) {
@@ -4277,19 +4247,8 @@ int CPlayerPlaylistBar::TGetOffset()
 	CClientDC dc(this);
 	CDC mdc;
 	mdc.CreateCompatibleDC(&dc);
+	mdc.SelectObject(&m_font);
 
-	NONCLIENTMETRICSW ncm = { sizeof(NONCLIENTMETRICSW) };
-	VERIFY(SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, ncm.cbSize, &ncm, 0));
-
-	auto& lf = ncm.lfMessageFont;
-	iTFontSize = lf.lfHeight = m_pMainFrame->ScaleSystemToMonitorY(lf.lfHeight)
-		* AfxGetAppSettings().iPlsFontPercent / 100
-		* (m_pMainFrame->GetDPIScalePercent() / 100);
-
-	CFont font;
-	font.CreateFontIndirectW(&lf);
-
-	mdc.SelectObject(&font);
 	int widthOffset = 0;
 	for (size_t i = 0; i < cntOffset; i++) {
 		widthOffset += mdc.GetTextExtent(m_tabs[i].name).cx + WIDTH_TABBUTTON;

@@ -301,7 +301,6 @@ private:
 	int TGetFirstVisible();
 	int TGetOffset();
 	int TGetPathType(const CString& path) const;
-	int TGetFontSize();
 	int iTFontSize;
 	bool TNavigate();
 	bool TSelectFolder(CString path);
