@@ -1621,6 +1621,10 @@ void CPlayerPlaylistBar::Refresh()
 
 bool CPlayerPlaylistBar::Empty()
 {
+	if (curTab.type == EXPLORER) {
+		return false;
+	}
+
 	bool bWasPlaying = curPlayList.RemoveAll();
 	m_list.DeleteAllItems();
 	SavePlaylist();
@@ -1707,12 +1711,12 @@ void CPlayerPlaylistBar::Open(std::list<CString>& fns, bool fMulti, CSubtitleIte
 	curPlayList.m_nFocused_idx = TGetFocusedElement();
 	m_nCurPlayListIndex = 0;
 
+	TEnsureVisible(m_nCurPlayListIndex);
+	TSelectTab();
+
 	Empty();
 	ResolveLinkFiles(fns);
 	Append(fns, fMulti, subs, bCheck);
-
-	TEnsureVisible(m_nCurPlayListIndex);
-	TSelectTab();
 }
 
 void CPlayerPlaylistBar::Append(CString fn)
@@ -1725,6 +1729,14 @@ void CPlayerPlaylistBar::Append(CString fn)
 void CPlayerPlaylistBar::Append(std::list<CString>& fns, bool fMulti, CSubtitleItemList* subs/* = nullptr*/, bool bCheck/* = true*/)
 {
 	const INT_PTR idx = curPlayList.GetCount();
+
+	if (curTab.type == EXPLORER) {
+		curPlayList.m_nFocused_idx = TGetFocusedElement();
+		m_nCurPlayListIndex = 0;
+
+		TEnsureVisible(m_nCurPlayListIndex);
+		TSelectTab();
+	}
 
 	if (fMulti) {
 		ASSERT(subs == nullptr || subs->size() == 0);
@@ -1750,6 +1762,14 @@ void CPlayerPlaylistBar::Append(std::list<CString>& fns, bool fMulti, CSubtitleI
 
 void CPlayerPlaylistBar::Append(CFileItemList& fis)
 {
+	if (curTab.type == EXPLORER) {
+		curPlayList.m_nFocused_idx = TGetFocusedElement();
+		m_nCurPlayListIndex = 0;
+
+		TEnsureVisible(m_nCurPlayListIndex);
+		TSelectTab();
+	}
+
 	const INT_PTR idx = curPlayList.GetCount();
 
 	for (const auto& fi : fis) {
