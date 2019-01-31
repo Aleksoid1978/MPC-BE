@@ -260,8 +260,8 @@ BOOL CPPageInterface::OnApply()
 	pFrame->m_wndPreView.SetRelativeSize(s.iSmartSeekSize);
 
 	pFrame->m_wndPlaylistBar.m_bUseDarkTheme = s.bUseDarkTheme;
+	pFrame->m_wndPlaylistBar.TSetColor();
 	if (pFrame->m_wndPlaylistBar.IsWindowVisible()) {
-		pFrame->m_wndPlaylistBar.TSetColor();
 		pFrame->m_wndPlaylistBar.SendMessageW(WM_NCPAINT, 1, NULL);
 		pFrame->m_wndPlaylistBar.RedrawWindow(nullptr, nullptr, RDW_ERASE | RDW_INVALIDATE);
 	}
@@ -329,8 +329,8 @@ void CPPageInterface::OnThemeChange()
 		::PostMessageW(pFrame->m_hWnd_toolbar, WM_SIZE, SIZE_RESTORED, MAKELPARAM(320, 240));
 	}
 
+	pFrame->m_wndPlaylistBar.TSetColor();
 	if (pFrame->m_wndPlaylistBar.IsWindowVisible()) {
-		pFrame->m_wndPlaylistBar.TSetColor();
 		pFrame->m_wndPlaylistBar.SendMessageW(WM_NCPAINT, 1, NULL);
 		pFrame->m_wndPlaylistBar.RedrawWindow(nullptr, nullptr, RDW_ERASE | RDW_INVALIDATE);
 	}
