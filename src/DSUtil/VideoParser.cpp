@@ -187,36 +187,25 @@ namespace AVCParser {
 		return true;
 	}
 
-	static inline bool MatchValue(BYTE array[], size_t size, BYTE value)
-	{
-		for (size_t i = 0; i < size; i++) {
-			if (value == array[i]) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 #define H264_PROFILE_MULTIVIEW_HIGH	118
 #define H264_PROFILE_STEREO_HIGH	128
 	bool ParseSequenceParameterSet(const BYTE* data, const int size, vc_params_t& params)
 	{
 		static BYTE profiles[] = { 44, 66, 77, 88, 100, 110, 118, 122, 128, 144, 244 };
-		static BYTE levels[] = { 10, 11, 12, 13, 20, 21, 22, 30, 31, 32, 40, 41, 42, 50, 51, 52 };
+		static BYTE levels[] = { 10, 11, 12, 13, 20, 21, 22, 30, 31, 32, 40, 41, 42, 50, 51, 52, 60, 61, 62 };
 
 		CGolombBuffer gb(data, size, true);
 
 		memset(&params, 0, sizeof(params));
 
 		params.profile = gb.BitRead(8);
-		if (!MatchValue(profiles, _countof(profiles), params.profile)) {
+		if (std::find(std::cbegin(profiles), std::cend(profiles), params.profile) == std::cend(profiles)) {
 			goto error;
 		}
 
 		gb.BitRead(8);
 		params.level = gb.BitRead(8);
-		if (!MatchValue(levels, _countof(levels), params.level)) {
+		if (std::find(std::cbegin(levels), std::cend(levels), params.level) == std::cend(levels)) {
 			goto error;
 		}
 
