@@ -283,7 +283,9 @@ private:
 	std::map<CString, HICON> m_icons_large;
 
 	void TDrawBar();
+	void TDrawSearchBar();
 	void TCalcLayout();
+	void TCalcREdit();
 	void TIndexHighighted();
 	void TTokenizer(const CString& strFields, LPCWSTR strDelimiters, std::vector<CString>& arFields);
 	void TParseFolder(const CString& path);
@@ -297,6 +299,9 @@ private:
 
 	CRect m_rcTPage;
 	size_t m_cntOffset;
+
+	int m_nSearchBarHeight;
+	CRichEditCtrl m_REdit;
 
 	int TGetFirstVisible();
 	int TGetOffset();

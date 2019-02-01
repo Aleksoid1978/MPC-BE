@@ -755,6 +755,7 @@ CPlayerPlaylistBar::CPlayerPlaylistBar(CMainFrame* pMainFrame)
 	, m_bVisible(false)
 	, m_cntOffset(0)
 	, m_iTFontSize(0)
+	, m_nSearchBarHeight(20)
 {
 	CAppSettings& s = AfxGetAppSettings();
 	m_bUseDarkTheme = s.bUseDarkTheme;
@@ -801,6 +802,17 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 	m_list.InsertColumn(COL_NAME, L"Name", LVCFMT_LEFT);
 	m_list.InsertColumn(COL_TIME, L"Time", LVCFMT_RIGHT);
 
+	m_REdit.Create(WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_TABSTOP, CRect(10, 10, 100, 10), this, 1);
+	m_REdit.SetBackgroundColor(!AfxGetAppSettings().bUseDarkTheme, m_crBND);
+	m_REdit.SetSel(0, 0);
+
+	CHARFORMATW cf = { 0 };
+	cf.cbSize = sizeof(cf);
+	cf.dwMask = CFM_COLOR;
+	cf.dwEffects &= ~CFE_AUTOCOLOR;
+	cf.crTextColor = RGB(165, 170, 175);
+	m_REdit.SetDefaultCharFormat(cf);
+
 	ScaleFontInternal();
 
 	if (AfxGetAppSettings().bUseDarkTheme) {
@@ -812,6 +824,7 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 
 	m_bFixedFloat = TRUE;
 	TCalcLayout();
+	TCalcREdit();
 
 	return TRUE;
 }
@@ -852,6 +865,8 @@ void CPlayerPlaylistBar::ScaleFontInternal()
 	m_fakeImageList.DeleteImageList();
 	m_fakeImageList.Create(1, std::abs(lf.lfHeight) + m_pMainFrame->ScaleY(4), ILC_COLOR4, 10, 10);
 	m_list.SetImageList(&m_fakeImageList, LVSIL_SMALL);
+
+	m_nSearchBarHeight = m_pMainFrame->ScaleY(20);
 }
 
 void CPlayerPlaylistBar::ScaleFont()
@@ -859,6 +874,7 @@ void CPlayerPlaylistBar::ScaleFont()
 	ScaleFontInternal();
 	ResizeListColumn();
 	TCalcLayout();
+	TCalcREdit();
 }
 
 BOOL CPlayerPlaylistBar::PreCreateWindow(CREATESTRUCT& cs)
@@ -875,6 +891,50 @@ BOOL CPlayerPlaylistBar::PreCreateWindow(CREATESTRUCT& cs)
 BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 {
 	if (IsWindow(pMsg->hwnd) && IsVisible() && pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST) {
+		if (pMsg->hwnd == m_REdit.GetSafeHwnd()) {
+			IsDialogMessageW(pMsg);
+
+			if (curPlayList.GetCount() > 1
+					&& (pMsg->message == WM_CHAR
+						|| (pMsg->message == WM_KEYDOWN && (pMsg->wParam == VK_RETURN || pMsg->wParam == VK_DELETE || pMsg->wParam == VK_BACK)))) {
+				CString text; m_REdit.GetWindowTextW(text);
+				if (!text.IsEmpty()) {
+					::CharLowerBuffW(text.GetBuffer(), text.GetLength());
+
+					auto& playlist = curPlayList;
+					POSITION pos = playlist.GetHeadPosition();
+					if (curTab.type == EXPLORER) {
+						playlist.GetNext(pos);
+					}
+					if (pMsg->wParam == VK_RETURN) {
+						const auto item = TGetFocusedElement() + 1;
+						pos = FindPos(item);
+					}
+					while (pos) {
+						auto& pl = playlist.GetAt(pos);
+						auto label = pl.GetLabel();
+						::CharLowerBuffW(label.GetBuffer(), label.GetLength());
+						if (label.Find(text) >= 0) {
+							EnsureVisible(pos);
+							break;
+						}
+
+						playlist.GetNext(pos);
+					}
+				}
+			}
+
+			if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE) {
+				m_REdit.SetSel(0, -1);
+				m_REdit.Clear();
+				m_REdit.SetSel(0, 0);
+
+				m_list.SetFocus();
+			}
+
+			return TRUE;
+		}
+
 		if (pMsg->message == WM_KEYDOWN) {
 			switch (pMsg->wParam) {
 			case VK_ESCAPE:
@@ -1465,6 +1525,7 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 		base.RemoveFileSpec();
 	}
 
+	std::vector<CPlaylistItem> playlist;
 	CPlaylistItem *pli = nullptr;
 
 	INT_PTR c = curPlayList.GetCount();
@@ -1501,24 +1562,40 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 				pli->m_label = str.Trim();
 			}
 		} else {
-			const CString fullPath = MakePath(CombinePath(base, str));
-			/*
-			if (GetFileExt(fullPath).MakeLower() == L".m3u") {
-				SAFE_DELETE(pli);
-
-				ParseM3UPlayList(fullPath);
-				continue;
-			}
-			*/
-
 			pli->m_fns.push_back(MakePath(CombinePath(base, str)));
-			curPlayList.AddTail(*pli);
+			playlist.push_back(*pli);
 
 			SAFE_DELETE(pli);
 		}
 	}
 
 	SAFE_DELETE(pli);
+
+	bool bNeedParse = false;
+	if (playlist.size() == 1) {
+		const auto& pli = playlist.front();
+		const auto& fn = pli.m_fns.front();
+		const auto ext = GetFileExt(fn).MakeLower();
+
+		if (ext == L".m3u" || ext == L".m3u8") {
+			Content::Online::Clear(fn);
+			std::list<CString> redir;
+			const auto ct = Content::GetType(fn, &redir);
+			if (ct == L"audio/x-mpegurl" || ct == L"application/http-live-streaming-m3u") {
+				bNeedParse = ParseM3UPlayList(fn);
+			}
+		}
+	}
+
+	if (!bNeedParse) {
+		for (const auto& pli : playlist) {
+			const auto& fn = pli.m_fns.front();
+			if (::PathIsURLW(fn) && m_pMainFrame->OpenYoutubePlaylist(fn, TRUE)) {
+				continue;
+			}
+			curPlayList.AddTail(pli);
+		}
+	}
 
 	return (curPlayList.GetCount() > c);
 }
@@ -2248,6 +2325,7 @@ void CPlayerPlaylistBar::ResizeListColumn()
 		GetClientRect(&r);
 		r.DeflateRect(2, 2);
 		r.top += (m_rcTPage.Height() + 2);
+		r.bottom -= m_nSearchBarHeight;
 
 		m_list.SetRedraw(FALSE);
 		m_list.MoveWindow(r);
@@ -2269,6 +2347,7 @@ void CPlayerPlaylistBar::ResizeListColumn()
 			GetClientRect(&r);
 			r.DeflateRect(2, 2);
 			r.top += (m_rcTPage.Height() + 2);
+			r.bottom -= m_nSearchBarHeight;
 
 			m_list.SetRedraw(FALSE);
 			m_list.MoveWindow(r);
@@ -2299,6 +2378,7 @@ void CPlayerPlaylistBar::OnSize(UINT nType, int cx, int cy)
 
 	ResizeListColumn();
 	TCalcLayout();
+	TCalcREdit();
 }
 
 void CPlayerPlaylistBar::OnLvnKeyDown(NMHDR* pNMHDR, LRESULT* pResult)
@@ -2381,6 +2461,7 @@ void CPlayerPlaylistBar::OnPaint()
 {
 	CPaintDC dc(this);
 	TDrawBar();
+	TDrawSearchBar();
 }
 
 void CPlayerPlaylistBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
@@ -3426,6 +3507,7 @@ void CPlayerPlaylistBar::TCalcLayout()
 
 	CRect rcTabBar;
 	GetClientRect(&rcTabBar);
+
 	rcTabBar.bottom = rcTabBar.top + m_iTFontSize + m_pMainFrame->ScaleY(WIDTH_TABBUTTON / 2);
 	rcTabBar.DeflateRect(2, 1, 2, 1);
 
@@ -3484,8 +3566,21 @@ void CPlayerPlaylistBar::TCalcLayout()
 	GetWindowRect(&rcWindow);
 	GetClientRect(&rcClient);
 	const int width = wSysButton * (m_tabs.size() > 1 ? 3 : 1) + m_tabs[0].r.Width() + (rcWindow.Width() - rcClient.Width()) * 2 - 3;
-	const CSize cz(width, rcTabBar.Height() * 3);
+	const CSize cz(width, rcTabBar.Height() * 3 + m_nSearchBarHeight * 2);
 	m_szMinFloat = m_szMinHorz = m_szMinVert = m_szFixedFloat = cz;
+}
+
+void CPlayerPlaylistBar::TCalcREdit()
+{
+	if (IsWindow(m_REdit.GetSafeHwnd())) {
+		CRect rcTabBar;
+		GetClientRect(&rcTabBar);
+
+		CRect rc(rcTabBar);
+		rc.DeflateRect(3, 1);
+		rc.top = rc.bottom - m_nSearchBarHeight + 2;
+		m_REdit.MoveWindow(rc.left, rc.top, rc.Width(), rc.Height());
+	}
 }
 
 void CPlayerPlaylistBar::TIndexHighighted()
@@ -3587,6 +3682,33 @@ void CPlayerPlaylistBar::TDrawBar()
 		//SelectClipRgn(mdc, hrgn);
 
 		dc.BitBlt(0, 0, rcTabBar.Width(), rcTabBar.Height(), &mdc, 0, 0, SRCCOPY);
+
+		mdc.SelectObject(pOldBm);
+		bm.DeleteObject();
+		mdc.DeleteDC();
+	}
+}
+
+void CPlayerPlaylistBar::TDrawSearchBar()
+ {
+	CClientDC dc(this);
+	if (IsWindowVisible()) {
+		CRect rc;
+		GetClientRect(&rc);
+		rc.DeflateRect(2, 0);
+		rc.top = rc.bottom - m_nSearchBarHeight;
+
+		CDC mdc;
+		mdc.CreateCompatibleDC(&dc);
+		CBitmap bm;
+		bm.CreateCompatibleBitmap(&dc, rc.Width(), rc.Height());
+
+		CBitmap* pOldBm = mdc.SelectObject(&bm);
+		mdc.SetBkMode(TRANSPARENT);
+
+		//mdc.FillSolidRect(0, 0, rc.Width(), rc.Height(), m_crBND);
+		mdc.Draw3dRect(0, 0, rc.Width(), rc.Height(), m_crBNL, m_crBNL);
+		dc.BitBlt(rc.left, rc.top, rc.Width(), rc.Height(), &mdc, 0, 0, SRCCOPY);
 
 		mdc.SelectObject(pOldBm);
 		bm.DeleteObject();
@@ -4257,6 +4379,10 @@ void CPlayerPlaylistBar::TSetColor()
 		m_crTN = RGB(50, 50, 50);                  // text normal
 		m_crTH = RGB(0, 0, 0);                     // text normal lighten
 		m_crTS = 0xff;                             // text selected
+	}
+
+	if (IsWindow(m_REdit.GetSafeHwnd())) {
+		m_REdit.SetBackgroundColor(!AfxGetAppSettings().bUseDarkTheme, m_crBND);
 	}
 }
 
