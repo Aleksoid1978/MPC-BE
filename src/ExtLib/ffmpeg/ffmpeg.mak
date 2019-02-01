@@ -217,6 +217,7 @@ SRCS_LC = \
 	libavcodec/fft_init_table.c \
 	libavcodec/ffv1.c \
 	libavcodec/ffv1dec.c \
+	libavcodec/fic.c \
 	libavcodec/flac.c \
 	libavcodec/flacdata.c \
 	libavcodec/flacdec.c \
