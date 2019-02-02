@@ -237,15 +237,17 @@ void CSCBButton::Paint(CDC* pDC, const CSizingControlBar* parent, const CSize& s
     COLORREF clrOldTextColor = pDC->GetTextColor();
     pDC->SetTextColor(parent->m_bUseDarkTheme ? parent->ColorThemeRGB(125, 130, 135) : ::GetSysColor(COLOR_BTNTEXT));
     int nPrevBkMode = pDC->SetBkMode(TRANSPARENT);
+
     CFont font;
-    int pointsize = parent->ScaleX(70); // 7 points at 96 ppi
-    font.CreatePointFont(pointsize, L"Marlett");
+    font.CreateFontW(parent->ScaleY(9), 0, 0, 0, FW_SEMIBOLD, 0, 0, 0, DEFAULT_CHARSET,
+                     OUT_RASTER_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH | FF_MODERN, L"Marlett");
+
     CFont* oldfont = pDC->SelectObject(&font);
 
     //MPC-BE custom code start
     // TextOut is affected by the layout so we need to account for that
     DWORD dwLayout = pDC->GetLayout();
-    pDC->TextOut(ptOrg.x + (dwLayout == LAYOUT_LTR ? 2 : -1), ptOrg.y + 2, CString(L"r")); // x-like
+    pDC->TextOutW(ptOrg.x + (dwLayout == LAYOUT_LTR ? 2 : -1), ptOrg.y + 2, L"r"); // x-like
     //MPC-BE custom code end
 
     pDC->SelectObject(oldfont);
