@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -281,6 +281,8 @@ DWORD CBaseSplitterFilter::ThreadProc()
 				pPin->DeliverNewSegment(m_rtStart, m_rtStop, m_dRate);
 			}
 		}
+
+		m_rtOffset = INVALID_TIME;
 
 		do {
 			m_bDiscontinuitySent.clear();

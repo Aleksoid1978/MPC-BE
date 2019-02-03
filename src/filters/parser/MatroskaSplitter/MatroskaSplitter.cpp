@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -2771,7 +2771,7 @@ HRESULT CMatroskaSplitterOutputPin::QueuePacket(CAutoPtr<CPacket> p)
 		}
 	}
 
-	if (S_OK == m_hrDeliver && (force_packet || ((CMatroskaSplitterFilter*)pSplitter)->IsHdmvDvbSubPinDrying())) {
+	if (S_OK == m_hrDeliver && (force_packet || ((CMatroskaSplitterFilter*)m_pSplitter)->IsHdmvDvbSubPinDrying())) {
 		m_queue.Add(p);
 		return m_hrDeliver;
 	}

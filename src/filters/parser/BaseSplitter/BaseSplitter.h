@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -104,6 +104,8 @@ protected:
 	DWORD m_nFlag;
 
 	int m_iBufferDuration; // 100..15000 ms
+
+	REFERENCE_TIME m_rtOffset = INVALID_TIME;
 
 protected:
 	enum {CMD_EXIT, CMD_SEEK};
