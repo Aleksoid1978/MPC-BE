@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -31,7 +31,7 @@
 
 CBaseSplitterOutputPin::CBaseSplitterOutputPin(std::vector<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseOutputPin(L"CBaseSplitterOutputPin", pFilter, pLock, phr, GetMediaTypeDesc(mts, pName, pFilter))
-	, pSplitter(static_cast<CBaseSplitterFilter*>(m_pFilter))
+	, m_pSplitter(static_cast<CBaseSplitterFilter*>(m_pFilter))
 {
 	m_mts = mts;
 	memset(&m_brs, 0, sizeof(m_brs));
@@ -40,7 +40,7 @@ CBaseSplitterOutputPin::CBaseSplitterOutputPin(std::vector<CMediaType>& mts, LPC
 
 CBaseSplitterOutputPin::CBaseSplitterOutputPin(LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr)
 	: CBaseOutputPin(L"CBaseSplitterOutputPin", pFilter, pLock, phr, pName)
-	, pSplitter(static_cast<CBaseSplitterFilter*>(m_pFilter))
+	, m_pSplitter(static_cast<CBaseSplitterFilter*>(m_pFilter))
 {
 	memset(&m_brs, 0, sizeof(m_brs));
 	m_brs.rtLastDeliverTime = INVALID_TIME;
@@ -186,8 +186,7 @@ HRESULT CBaseSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFEREN
 {
 	m_brs.rtLastDeliverTime = INVALID_TIME;
 
-	m_rtPrev	= 0;
-	m_rtOffset	= 0;
+	m_rtPrev = INVALID_TIME;
 
 	if (m_fFlushing) {
 		return S_FALSE;
@@ -196,9 +195,9 @@ HRESULT CBaseSplitterOutputPin::DeliverNewSegment(REFERENCE_TIME tStart, REFEREN
 	if (!ThreadExists()) {
 		return S_FALSE;
 	}
-	if (pSplitter->m_iBufferDuration >= BUFFER_DURATION_MIN && pSplitter->m_iBufferDuration <= BUFFER_DURATION_MAX) {
-		m_maxQueueDuration = pSplitter->m_iBufferDuration * 10000;
-		m_maxQueueCount = pSplitter->m_iBufferDuration * 12 / 10;
+	if (m_pSplitter->m_iBufferDuration >= BUFFER_DURATION_MIN && m_pSplitter->m_iBufferDuration <= BUFFER_DURATION_MAX) {
+		m_maxQueueDuration = m_pSplitter->m_iBufferDuration * 10000;
+		m_maxQueueCount = m_pSplitter->m_iBufferDuration * 12 / 10;
 	}
 	HRESULT hr = __super::DeliverNewSegment(tStart, tStop, dRate);
 	if (S_OK != hr) {
@@ -269,6 +268,11 @@ bool CBaseSplitterOutputPin::IsActive()
 	} while (pPin);
 
 	return true;
+}
+
+REFERENCE_TIME CBaseSplitterOutputPin::GetOffset() const
+{
+	return m_pSplitter->m_rtOffset;
 }
 
 DWORD CBaseSplitterOutputPin::ThreadProc()
@@ -346,20 +350,27 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 		return S_OK;
 	}
 
-	if (p->rtStart != INVALID_TIME && (pSplitter->GetFlag() & PACKET_PTS_DISCONTINUITY)) {
+	if (p->rtStart != INVALID_TIME && (m_pSplitter->GetFlag() & PACKET_PTS_DISCONTINUITY)) {
 		// Filter invalid PTS value (if too different from previous packet)
 		if (!IsDiscontinuous()) {
-			const REFERENCE_TIME rt = p->rtStart + m_rtOffset;
-			if (llabs(rt - m_rtPrev) > MAX_PTS_SHIFT) {
-				m_rtOffset += m_rtPrev - rt;
-				DLog(L"CBaseSplitterOutputPin::DeliverPacket() : [%u] packet discontinuity detected, adjusting offset to %I64d", p->TrackNumber, m_rtOffset);
+			if (m_rtPrev == INVALID_TIME && m_pSplitter->m_rtOffset == INVALID_TIME) {
+				m_rtPrev = 0;
+				m_pSplitter->m_rtOffset = 0;
+			}
+
+			if (m_rtPrev != INVALID_TIME) {
+				const REFERENCE_TIME rt = p->rtStart + m_pSplitter->m_rtOffset;
+				if (llabs(rt - m_rtPrev) > MAX_PTS_SHIFT) {
+					m_pSplitter->m_rtOffset += m_rtPrev - rt;
+					DLog(L"CBaseSplitterOutputPin::DeliverPacket() : [%u] packet discontinuity detected, adjusting offset to %I64d", p->TrackNumber, m_pSplitter->m_rtOffset);
+				}
 			}
 		}
 
-		p->rtStart += m_rtOffset;
-		p->rtStop  += m_rtOffset;
+		p->rtStart += m_pSplitter->m_rtOffset;
+		p->rtStop += m_pSplitter->m_rtOffset;
 
-		m_rtPrev   = p->rtStart;
+		m_rtPrev = p->rtStart;
 	}
 
 	m_brs.nBytesSinceLastDeliverTime += nBytes;
@@ -397,7 +408,7 @@ HRESULT CBaseSplitterOutputPin::DeliverPacket(CAutoPtr<CPacket> p)
 		}
 
 		double dRate = 1.0;
-		if (SUCCEEDED(pSplitter->GetRate(&dRate))) {
+		if (SUCCEEDED(m_pSplitter->GetRate(&dRate))) {
 			p->rtStart = (REFERENCE_TIME)((double)p->rtStart / dRate);
 			p->rtStop = (REFERENCE_TIME)((double)p->rtStop / dRate);
 		}
@@ -529,85 +540,85 @@ HRESULT CBaseSplitterOutputPin::Deliver(IMediaSample* pSample)
 
 STDMETHODIMP CBaseSplitterOutputPin::GetCapabilities(DWORD* pCapabilities)
 {
-	return pSplitter->GetCapabilities(pCapabilities);
+	return m_pSplitter->GetCapabilities(pCapabilities);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::CheckCapabilities(DWORD* pCapabilities)
 {
-	return pSplitter->CheckCapabilities(pCapabilities);
+	return m_pSplitter->CheckCapabilities(pCapabilities);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::IsFormatSupported(const GUID* pFormat)
 {
-	return pSplitter->IsFormatSupported(pFormat);
+	return m_pSplitter->IsFormatSupported(pFormat);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::QueryPreferredFormat(GUID* pFormat)
 {
-	return pSplitter->QueryPreferredFormat(pFormat);
+	return m_pSplitter->QueryPreferredFormat(pFormat);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::GetTimeFormat(GUID* pFormat)
 {
-	return pSplitter->GetTimeFormat(pFormat);
+	return m_pSplitter->GetTimeFormat(pFormat);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::IsUsingTimeFormat(const GUID* pFormat)
 {
-	return pSplitter->IsUsingTimeFormat(pFormat);
+	return m_pSplitter->IsUsingTimeFormat(pFormat);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::SetTimeFormat(const GUID* pFormat)
 {
-	return pSplitter->SetTimeFormat(pFormat);
+	return m_pSplitter->SetTimeFormat(pFormat);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::GetDuration(LONGLONG* pDuration)
 {
-	return pSplitter->GetDuration(pDuration);
+	return m_pSplitter->GetDuration(pDuration);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::GetStopPosition(LONGLONG* pStop)
 {
-	return pSplitter->GetStopPosition(pStop);
+	return m_pSplitter->GetStopPosition(pStop);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::GetCurrentPosition(LONGLONG* pCurrent)
 {
-	return pSplitter->GetCurrentPosition(pCurrent);
+	return m_pSplitter->GetCurrentPosition(pCurrent);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::ConvertTimeFormat(LONGLONG* pTarget, const GUID* pTargetFormat, LONGLONG Source, const GUID* pSourceFormat)
 {
-	return pSplitter->ConvertTimeFormat(pTarget, pTargetFormat, Source, pSourceFormat);
+	return m_pSplitter->ConvertTimeFormat(pTarget, pTargetFormat, Source, pSourceFormat);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::SetPositions(LONGLONG* pCurrent, DWORD dwCurrentFlags, LONGLONG* pStop, DWORD dwStopFlags)
 {
-	return pSplitter->SetPositionsInternal(this, pCurrent, dwCurrentFlags, pStop, dwStopFlags);
+	return m_pSplitter->SetPositionsInternal(this, pCurrent, dwCurrentFlags, pStop, dwStopFlags);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::GetPositions(LONGLONG* pCurrent, LONGLONG* pStop)
 {
-	return pSplitter->GetPositions(pCurrent, pStop);
+	return m_pSplitter->GetPositions(pCurrent, pStop);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::GetAvailable(LONGLONG* pEarliest, LONGLONG* pLatest)
 {
-	return pSplitter->GetAvailable(pEarliest, pLatest);
+	return m_pSplitter->GetAvailable(pEarliest, pLatest);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::SetRate(double dRate)
 {
-	return pSplitter->SetRate(dRate);
+	return m_pSplitter->SetRate(dRate);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::GetRate(double* pdRate)
 {
-	return pSplitter->GetRate(pdRate);
+	return m_pSplitter->GetRate(pdRate);
 }
 
 STDMETHODIMP CBaseSplitterOutputPin::GetPreroll(LONGLONG* pllPreroll)
 {
-	return pSplitter->GetPreroll(pllPreroll);
+	return m_pSplitter->GetPreroll(pllPreroll);
 }

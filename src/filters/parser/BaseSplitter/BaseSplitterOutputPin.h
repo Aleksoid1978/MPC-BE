@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -49,8 +49,7 @@ private:
 	REFERENCE_TIME	m_maxQueueDuration	= BUFFER_DURATION_DEF * 10000;
 	size_t			m_maxQueueCount		= BUFFER_DURATION_DEF * 12 / 10;
 
-	REFERENCE_TIME	m_rtPrev			= 0;
-	REFERENCE_TIME	m_rtOffset			= 0;
+	REFERENCE_TIME	m_rtPrev			= INVALID_TIME;
 
 	enum {
 		CMD_EXIT
@@ -75,7 +74,7 @@ private:
 	} m_brs;
 
 protected:
-	CBaseSplitterFilter* pSplitter;
+	CBaseSplitterFilter* m_pSplitter;
 	std::vector<CMediaType> m_mts;
 	CPacketQueue m_queue;
 
@@ -158,7 +157,7 @@ public:
 	STDMETHODIMP_(DWORD) GetCurrentBitRate() { return m_brs.nCurrentBitRate; }
 	STDMETHODIMP_(DWORD) GetAverageBitRate() { return m_brs.nAverageBitRate; }
 
-	REFERENCE_TIME GetOffset() { return m_rtOffset; }
+	REFERENCE_TIME GetOffset() const;
 };
 
 class CSubtitleStatus
