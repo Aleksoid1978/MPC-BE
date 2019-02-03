@@ -99,7 +99,7 @@ public:
             }
         }
 
-        return ScaleX(::GetSystemMetrics(nIndex));
+        return ScaleSystemToMonitorX(::GetSystemMetrics(nIndex));
     }
 
 protected:
