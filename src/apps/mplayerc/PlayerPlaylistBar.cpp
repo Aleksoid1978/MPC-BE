@@ -804,13 +804,14 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 
 	m_REdit.Create(WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_TABSTOP, CRect(10, 10, 100, 10), this, 1);
 	m_REdit.SetBackgroundColor(!AfxGetAppSettings().bUseDarkTheme, m_crBND);
+	m_REdit.SetTextMode(TM_PLAINTEXT);
 	m_REdit.SetSel(0, 0);
 
 	CHARFORMATW cf = { 0 };
 	cf.cbSize = sizeof(cf);
 	cf.dwMask = CFM_COLOR;
 	cf.dwEffects &= ~CFE_AUTOCOLOR;
-	cf.crTextColor = RGB(165, 170, 175);
+	cf.crTextColor = m_crTN;
 	m_REdit.SetDefaultCharFormat(cf);
 
 	ScaleFontInternal();
