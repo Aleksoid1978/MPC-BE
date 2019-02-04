@@ -2078,6 +2078,21 @@ LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 	m_wndStatusBar.ScaleFont();
 	
 	CMenuEx::ScaleFont();
+	const auto& s = AfxGetAppSettings();
+	if (s.bUseDarkTheme && s.bDarkMenu) {
+		CMenu defaultMenu;
+		defaultMenu.LoadMenuW(IDR_MAINFRAME);
+		CMenu* oldMenu = GetMenu();
+		if (oldMenu) {
+			// Attach the new menu to the window only if there was a menu before
+			SetMenu(&defaultMenu);
+			// and then destroy the old one
+			oldMenu->DestroyMenu();
+		}
+		m_hMenuDefault = defaultMenu.Detach();
+
+		SetColorMenu();
+	}
 
 	MoveWindow(reinterpret_cast<RECT*>(lParam));
 	RecalcLayout();
