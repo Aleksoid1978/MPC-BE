@@ -3052,6 +3052,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		M_SORTBYNAME,
 		M_SORTBYPATH,
 		M_SORTBYDATE,
+		M_SORTBYDATECREATED,
 		M_SORTBYSIZE,
 		M_SORTREVERSE,
 		M_RANDOMIZE,
@@ -3084,6 +3085,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		submenu2.CreatePopupMenu();
 		submenu2.AppendMenu(MF_STRING | MF_ENABLED | (sort == SORT::NAME ? (MFT_RADIOCHECK | MFS_CHECKED) : 0), M_SORTBYNAME, ResStr(IDS_PLAYLIST_SORTBYNAME));
 		submenu2.AppendMenu(MF_STRING | MF_ENABLED | (sort == SORT::DATE ? (MFT_RADIOCHECK | MFS_CHECKED) : 0), M_SORTBYDATE, ResStr(IDS_PLAYLIST_SORTBYDATE));
+		submenu2.AppendMenu(MF_STRING | MF_ENABLED | (sort == SORT::DATE_CREATED ? (MFT_RADIOCHECK | MFS_CHECKED) : 0), M_SORTBYDATECREATED, ResStr(IDS_PLAYLIST_SORTBYDATECREATED));
 		submenu2.AppendMenu(MF_STRING | MF_ENABLED | (sort == SORT::SIZE ? (MFT_RADIOCHECK | MFS_CHECKED) : 0), M_SORTBYSIZE, ResStr(IDS_PLAYLIST_SORTBYSIZE));
 		submenu2.AppendMenu(MF_SEPARATOR);
 		submenu2.AppendMenu(MF_STRING | MF_ENABLED | (bReverse ? MF_CHECKED : MF_UNCHECKED), M_SORTREVERSE, ResStr(IDS_PLAYLIST_SORTREVERSE));
@@ -3226,6 +3228,18 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 				if (sort != SORT::DATE) {
 					const auto bReverse = curTab.sort >> 8;
 					curTab.sort = (bReverse << 8) | SORT::DATE;
+					TSaveSettings();
+					TFillPlaylist();
+				}
+				return;
+			}
+			break;
+		case M_SORTBYDATECREATED:
+			if (bExplorer) {
+				const auto sort = (SORT)(curTab.sort & 0xF);
+				if (sort != SORT::DATE_CREATED) {
+					const auto bReverse = curTab.sort >> 8;
+					curTab.sort = (bReverse << 8) | SORT::DATE_CREATED;
 					TSaveSettings();
 					TFillPlaylist();
 				}
@@ -4032,7 +4046,9 @@ void CPlayerPlaylistBar::TParseFolder(const CString& path)
 			if (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 				if (!(FindFileData.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) && fileName != L"." && fileName != L"..") {
 					file_data_t file_data;
-					file_data.name          = AddSlash(path) + fileName;
+					file_data.name = AddSlash(path) + fileName;
+					file_data.time_created.LowPart  = FindFileData.ftCreationTime.dwLowDateTime;
+					file_data.time_created.HighPart = FindFileData.ftCreationTime.dwHighDateTime;
 					file_data.time.LowPart  = FindFileData.ftLastWriteTime.dwLowDateTime;
 					file_data.time.HighPart = FindFileData.ftLastWriteTime.dwHighDateTime;
 					file_data.size.LowPart  = FindFileData.nFileSizeLow;
@@ -4045,7 +4061,9 @@ void CPlayerPlaylistBar::TParseFolder(const CString& path)
 				auto mfc = mf.FindMediaByExt(ext);
 				if (ext == L".iso" || (mfc && mfc->GetFileType() != TPlaylist)) {
 					file_data_t file_data;
-					file_data.name          = AddSlash(path) + fileName;
+					file_data.name = AddSlash(path) + fileName;
+					file_data.time_created.LowPart  = FindFileData.ftCreationTime.dwLowDateTime;
+					file_data.time_created.HighPart = FindFileData.ftCreationTime.dwHighDateTime;
 					file_data.time.LowPart  = FindFileData.ftLastWriteTime.dwLowDateTime;
 					file_data.time.HighPart = FindFileData.ftLastWriteTime.dwHighDateTime;
 					file_data.size.LowPart  = FindFileData.nFileSizeLow;
@@ -4101,6 +4119,15 @@ void CPlayerPlaylistBar::TFillPlaylist(const bool bFirst/* = false*/)
 
 		std::sort(files.begin(), files.end(), [&](const file_data_t& a, const file_data_t& b) {
 			return (!bReverse ? a.time.QuadPart < b.time.QuadPart : a.time.QuadPart > b.time.QuadPart);
+		});
+	}
+	else if (sort == SORT::DATE_CREATED) {
+		std::sort(directory.begin(), directory.end(), [&](const file_data_t& a, const file_data_t& b) {
+			return (!bReverse ? a.time_created.QuadPart < b.time_created.QuadPart : a.time_created.QuadPart > b.time_created.QuadPart);
+		});
+
+		std::sort(files.begin(), files.end(), [&](const file_data_t& a, const file_data_t& b) {
+			return (!bReverse ? a.time_created.QuadPart < b.time_created.QuadPart : a.time_created.QuadPart > b.time_created.QuadPart);
 		});
 	}
 	else if (sort == SORT::SIZE) {
