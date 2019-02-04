@@ -897,7 +897,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 
 			if (curPlayList.GetCount() > 1
 					&& (pMsg->message == WM_CHAR
-						|| (pMsg->message == WM_KEYDOWN && (pMsg->wParam == VK_RETURN || pMsg->wParam == VK_DELETE || pMsg->wParam == VK_BACK)))) {
+						|| (pMsg->message == WM_KEYDOWN && (pMsg->wParam == VK_RETURN || pMsg->wParam == VK_F3 || pMsg->wParam == VK_DELETE || pMsg->wParam == VK_BACK)))) {
 				CString text; m_REdit.GetWindowTextW(text);
 				if (!text.IsEmpty()) {
 					::CharLowerBuffW(text.GetBuffer(), text.GetLength());
@@ -907,11 +907,22 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 					if (curTab.type == EXPLORER) {
 						playlist.GetNext(pos);
 					}
-					if (pMsg->wParam == VK_RETURN) {
-						const auto item = TGetFocusedElement() + 1;
-						pos = FindPos(item);
+					POSITION cur_pos = nullptr;
+					if (pMsg->wParam == VK_RETURN || pMsg->wParam == VK_F3) {
+						auto item = TGetFocusedElement();
+						if (item == 0 && curTab.type == EXPLORER) {
+							item++;
+						}
+						cur_pos = FindPos(item);
+						pos = FindPos(item + 1);
+						if (!pos) {
+							pos = playlist.GetHeadPosition();
+							if (curTab.type == EXPLORER) {
+								playlist.GetNext(pos);
+							}
+						}
 					}
-					while (pos) {
+					while (pos != cur_pos) {
 						auto& pl = playlist.GetAt(pos);
 						auto label = pl.GetLabel();
 						::CharLowerBuffW(label.GetBuffer(), label.GetLength());
@@ -921,6 +932,12 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 						}
 
 						playlist.GetNext(pos);
+						if (!pos && cur_pos) {
+							pos = playlist.GetHeadPosition();
+							if (curTab.type == EXPLORER) {
+								playlist.GetNext(pos);
+							}
+						}
 					}
 				}
 			}
