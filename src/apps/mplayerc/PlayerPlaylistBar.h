@@ -240,12 +240,14 @@ private:
 	enum SORT : BYTE {
 		NAME,
 		DATE,
-		SIZE
+		SIZE,
+		DATE_CREATED,
 	};
 
 	struct file_data_t {
 		CString name;
 		ULARGE_INTEGER time;
+		ULARGE_INTEGER time_created;
 		ULARGE_INTEGER size;
 	};
 
