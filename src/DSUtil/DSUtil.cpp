@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -86,7 +86,7 @@ bool IsStreamStart(IBaseFilter* pBF)
 
 	int nIn, nOut, nInC, nOutC;
 	CountPins(pBF, nIn, nOut, nInC, nOutC);
-	AM_MEDIA_TYPE mt;
+	CMediaType mt;
 	CComPtr<IPin> pIn = GetFirstPin(pBF);
 	return ((nOut > 1)
 		   || (nOut > 0 && nIn == 1 && pIn && SUCCEEDED(pIn->ConnectionMediaType(&mt)) && mt.majortype == MEDIATYPE_Stream));
