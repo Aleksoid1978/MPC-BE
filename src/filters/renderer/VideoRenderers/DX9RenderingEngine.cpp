@@ -2292,7 +2292,7 @@ HRESULT CDX9RenderingEngine::InitCorrectionPass(const AM_MEDIA_TYPE& input_mt)
 			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_ST2084 : IDF_SHADER_PS20_CORRECTION_ST2084);
 			m_wsCorrection = L"HDR(BT.2020) to SDR";
 		}
-		else if (extformat.VideoTransferFunction == VIDEOTRANSFUNC_HLG || extformat.VideoTransferFunction == VIDEOTRANSFUNC_HLG_temp) {
+		else if (extformat.VideoTransferFunction == VIDEOTRANSFUNC_HLG) {
 			hr = CreateShaderFromResource(m_pD3DDevEx, &m_pPSCorrection, ps30 ? IDF_SHADER_CORRECTION_HLG : IDF_SHADER_PS20_CORRECTION_HLG);
 			m_wsCorrection = L" HDR(HLG) to SDR";
 		}

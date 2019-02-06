@@ -66,4 +66,3 @@
 #define VIDEOTRANSFUNC_2084       15
 #define VIDEOTRANSFUNC_HLG        16
 #define VIDEOTRANSFUNC_10_rel     17
-#define VIDEOTRANSFUNC_HLG_temp   18 // non-standard, will be removed in the future
