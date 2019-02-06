@@ -2854,7 +2854,7 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 			fmt.VideoTransferFunction = VIDEOTRANSFUNC_2084;
 			break;
 		case AVCOL_TRC_ARIB_STD_B67:
-			fmt.VideoTransferFunction = VIDEOTRANSFUNC_HLG_temp; // differs from MFVideoTransFunc_HLG - needed for EVR-CP
+			fmt.VideoTransferFunction = VIDEOTRANSFUNC_HLG;
 			break;
 	}
 
