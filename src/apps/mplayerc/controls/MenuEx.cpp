@@ -1,5 +1,5 @@
 /*
- * (C) 2018 see Authors.txt
+ * (C) 2018-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,6 +22,8 @@
 #include "MenuEx.h"
 #include "../MainFrm.h"
 #include "../../../DSUtil/SysVersion.h"
+
+std::vector<MENUITEM*> m_pMenuItems;
 
 void CMenuEx::FreeResource()
 {
