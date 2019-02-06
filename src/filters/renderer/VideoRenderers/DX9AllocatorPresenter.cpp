@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -45,8 +45,8 @@ using namespace DSObjects;
 static const LPCSTR s_nominalrange[8] = { nullptr, "0-255", "16-235", "48-208", nullptr, nullptr, nullptr, nullptr };
 static const LPCSTR s_transfermatrix[8] = { nullptr, "BT.709", "BT.601", "SMPTE 240M", "BT.2020", nullptr, nullptr, "YCgCo" };
 static const LPCSTR s_transferfunction[32] = {nullptr, "Linear RGB", "1.8 gamma", "2.0 gamma", "2.2 gamma", "BT.709", "SMPTE 240M", "sRGB",
-	"2.8 gamma", "Log100", "Log316", "Symmetric BT.709",  "Constant luminance BT.2020", "Non-constant luminance BT.2020",
-	"2.6 gamma", "SMPTE ST 2084", "Hybrid Log-Gamma", nullptr, "ARIB STD-B67 (HLG)" };
+	"2.8 gamma", "Log100", "Log316", "Symmetric BT.709", "Constant luminance BT.2020", "Non-constant luminance BT.2020",
+	"2.6 gamma", "SMPTE ST 2084 (PQ)", "ARIB STD-B67 (HLG)"};
 
 // CDX9AllocatorPresenter
 
