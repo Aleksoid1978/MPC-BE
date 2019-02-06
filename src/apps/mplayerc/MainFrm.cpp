@@ -2523,6 +2523,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 			CWnd* pWnd = WindowFromPoint(p);
 			if (IsD3DFullScreenMode()) {
 				if (!m_bInOptions && *pWnd == *m_pFullscreenWnd) {
+					m_bHideCursor = true;
 					m_pFullscreenWnd->ShowCursor(false);
 				}
 				KillTimer(TIMER_FULLSCREENMOUSEHIDER);
@@ -3740,6 +3741,7 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 	CAppSettings& s = AfxGetAppSettings();
 
 	if (IsD3DFullScreenMode() && (abs(diff.cx) + abs(diff.cy)) >= 1) {
+		m_bHideCursor = false;
 		m_pFullscreenWnd->ShowCursor(true);
 
 		KillTimer(TIMER_FULLSCREENMOUSEHIDER);
