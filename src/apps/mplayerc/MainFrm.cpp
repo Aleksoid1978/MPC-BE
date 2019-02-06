@@ -18654,18 +18654,19 @@ bool CheckCoverImgExist(CString &path, CString name) {
 	coverpath.Combine(path, name);
 
 	if (coverpath.FileExists() ||
-		(coverpath.RenameExtension(L".jpeg") && coverpath.FileExists()) ||
-		(coverpath.RenameExtension(L".png")  && coverpath.FileExists())) {
-			path.SetString(coverpath);
-			return true;
+			(coverpath.RenameExtension(L".jpeg") && coverpath.FileExists()) ||
+			(coverpath.RenameExtension(L".png")  && coverpath.FileExists()) ||
+			(coverpath.RenameExtension(L".bmp")  && coverpath.FileExists())) {
+		path.SetString(coverpath);
+		return true;
 	}
+
 	return false;
 }
 
 CString GetCoverImgFromPath(CString fullfilename)
 {
 	CString path = fullfilename.Left(fullfilename.ReverseFind('\\') + 1);
-
 
 	if (CheckCoverImgExist(path, L"cover.jpg")) {
 		return path;
@@ -18744,10 +18745,11 @@ HRESULT CMainFrame::SetAudioPicture(BOOL show)
 							BYTE* pData = nullptr;
 							DWORD len = 0;
 							if (SUCCEEDED(pRB->ResGet(i, &name, &desc, &mime, &pData, &len, nullptr))) {
-								if (CString(mime).Trim() == L"image/jpeg"
-									|| CString(mime).Trim() == L"image/jpg"
-									|| CString(mime).Trim() == L"image/png") {
-
+								CString mimeStr(mime); mimeStr.Trim();
+								if (mimeStr == L"image/jpeg"
+										|| mimeStr == L"image/jpg"
+										|| mimeStr == L"image/png"
+										|| mimeStr == L"image/bmp") {
 									HGLOBAL hBlock = ::GlobalAlloc(GMEM_MOVEABLE, len);
 									if (hBlock != nullptr) {
 										LPVOID lpResBuffer = ::GlobalLock(hBlock);
