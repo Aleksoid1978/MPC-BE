@@ -4232,7 +4232,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 					BeginEnumPins(pBF, pEP, pPin) {
 						PIN_DIRECTION dir;
 						if (SUCCEEDED(pPin->QueryDirection(&dir)) && dir == PINDIR_OUTPUT) {
-							AM_MEDIA_TYPE mt;
+							CMediaType mt;
 							if (SUCCEEDED(pPin->ConnectionMediaType(&mt)) && mt.subtype != MEDIASUBTYPE_NULL) {
 								if (mt.subtype == MEDIASUBTYPE_Matroska) {
 									ext = L".webm";
@@ -8089,7 +8089,7 @@ void CMainFrame::OnPlayGoto()
 					break;
 				}
 
-				AM_MEDIA_TYPE mt;
+				CMediaType mt;
 				pPin->ConnectionMediaType(&mt);
 
 				if (mt.majortype == MEDIATYPE_Video && mt.formattype == FORMAT_VideoInfo) {
@@ -12737,9 +12737,10 @@ void CMainFrame::OpenSetupStatusBar()
 			BeginEnumPins(pBF, pEP, pPin) {
 				if (S_OK == m_pGB->IsPinDirection(pPin, PINDIR_INPUT)
 						&& S_OK == m_pGB->IsPinConnected(pPin)) {
-					AM_MEDIA_TYPE mt;
-					memset(&mt, 0, sizeof(mt));
-					pPin->ConnectionMediaType(&mt);
+					CMediaType mt;
+					if (FAILED(pPin->ConnectionMediaType(&mt))) {
+						continue;
+					}
 
 					if (mt.majortype == MEDIATYPE_Audio && mt.formattype == FORMAT_WaveFormatEx) {
 						switch (((WAVEFORMATEX*)mt.pbFormat)->nChannels) {
@@ -14186,7 +14187,7 @@ void CMainFrame::SetupFiltersSubMenu()
 			CLSID clsid = GetCLSID(pBF);
 			if (clsid == CLSID_AVIDec) {
 				CComPtr<IPin> pPin = GetFirstPin(pBF);
-				AM_MEDIA_TYPE mt;
+				CMediaType mt;
 				if (pPin && SUCCEEDED(pPin->ConnectionMediaType(&mt))) {
 					DWORD c = ((VIDEOINFOHEADER*)mt.pbFormat)->bmiHeader.biCompression;
 					switch (c) {
@@ -14214,7 +14215,7 @@ void CMainFrame::SetupFiltersSubMenu()
 				}
 			} else if (clsid == CLSID_ACMWrapper) {
 				CComPtr<IPin> pPin = GetFirstPin(pBF);
-				AM_MEDIA_TYPE mt;
+				CMediaType mt;
 				if (pPin && SUCCEEDED(pPin->ConnectionMediaType(&mt))) {
 					WORD c = ((WAVEFORMATEX*)mt.pbFormat)->wFormatTag;
 					name.Format(L"%s (0x%04x)", CString(name), (int)c);
@@ -15479,10 +15480,10 @@ void CMainFrame::AddTextPassThruFilter()
 
 		BeginEnumPins(pBF, pEP, pPin) {
 			CComPtr<IPin> pPinTo;
-			AM_MEDIA_TYPE mt;
+			CMediaTypeEx mt;
 			if (FAILED(pPin->ConnectedTo(&pPinTo)) || !pPinTo
 					|| FAILED(pPin->ConnectionMediaType(&mt))
-					|| (!CMediaTypeEx(mt).ValidateSubtitle())) {
+					|| (!mt.ValidateSubtitle())) {
 				continue;
 			}
 
@@ -19349,7 +19350,7 @@ REFTIME CMainFrame::GetAvgTimePerFrame(BOOL bUsePCAP/* = TRUE*/) const
 			}
 
 			BeginEnumPins(pBF, pEP, pPin) {
-				AM_MEDIA_TYPE mt;
+				CMediaType mt;
 				if (SUCCEEDED(pPin->ConnectionMediaType(&mt))) {
 					if (mt.majortype == MEDIATYPE_Video && mt.formattype == FORMAT_VideoInfo) {
 						refAvgTimePerFrame = (REFTIME)((VIDEOINFOHEADER*)mt.pbFormat)->AvgTimePerFrame / 10000000i64;
