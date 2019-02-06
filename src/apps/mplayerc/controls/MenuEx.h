@@ -1,5 +1,5 @@
 /*
- * (C) 2018 see Authors.txt
+ * (C) 2018-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -92,7 +92,6 @@ protected:
 	static inline bool m_bUseDrawHook = false;
 
 	static inline CFont m_font;
-	static inline std::vector<MENUITEM*> m_pMenuItems;
 
 	static inline CMainFrame* m_pMainFrame = nullptr;
 
