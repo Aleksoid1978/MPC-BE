@@ -103,6 +103,7 @@ protected:
 		struct {
 			bool sync;
 
+			bool init;
 			int ratebits;
 
 			uint16_t prev_frametime;
