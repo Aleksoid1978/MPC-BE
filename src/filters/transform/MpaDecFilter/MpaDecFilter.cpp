@@ -1018,11 +1018,14 @@ void CMpaDecFilter::MATWriteHeader()
 void CMpaDecFilter::MATWritePadding()
 {
 	if (m_hdmi_bitstream.TrueHDMATState.padding > 0) {
-		static BYTE padding[5120] = {};
+		// allocate padding (on the stack of possible)
+		BYTE *padding = (BYTE*)_malloca(m_hdmi_bitstream.TrueHDMATState.padding);
 
 		memset(padding, 0, m_hdmi_bitstream.TrueHDMATState.padding);
 		int remaining = MATFillDataBuffer(padding, m_hdmi_bitstream.TrueHDMATState.padding, true);
-		ASSERT(remaining <= 5120);
+
+		// free the padding block
+		_freea(padding);
 
 		// not all padding could be written to the buffer, write it later
 		if (remaining >= 0) {
@@ -1069,15 +1072,14 @@ int CMpaDecFilter::MATFillDataBuffer(const BYTE *p, int size, bool padding)
 
 		// write remaining data after the MAT marker
 		if (remaining > 0) {
-			MATAppendData(p + nBytesBefore, remaining);
-			remaining = 0;
+			remaining = MATFillDataBuffer(p + nBytesBefore, remaining, padding);
 		}
 
 		return remaining;
 	}
 
 	// not enough room in the buffer to write all the data, write as much as we can and add the MAT footer
-	if (m_hdmi_bitstream.size + size > BS_MAT_TRUEHD_LIMIT) {
+	if (m_hdmi_bitstream.size + size >= BS_MAT_TRUEHD_LIMIT) {
 		// write as much data before the middle code as we can
 		int nBytesBefore = BS_MAT_TRUEHD_LIMIT - m_hdmi_bitstream.size;
 		MATAppendData(p, nBytesBefore);
@@ -1085,6 +1087,8 @@ int CMpaDecFilter::MATFillDataBuffer(const BYTE *p, int size, bool padding)
 
 		// write the MAT end code
 		MATAppendData(mat_end_code, sizeof(mat_end_code));
+
+		ASSERT(m_hdmi_bitstream.size == BS_MAT_TRUEHD_SIZE);
 
 		// MAT markers don't displace padding, so reduce the amount of padding
 		if (padding) {
@@ -1104,6 +1108,8 @@ HRESULT CMpaDecFilter::MATDeliverPacket()
 {
 	HRESULT hr = S_OK;
 	if (m_hdmi_bitstream.size > 0) {
+		ASSERT(m_hdmi_bitstream.size == BS_MAT_TRUEHD_SIZE);
+
 		// Deliver MAT packet
 		hr = DeliverBitstream(m_hdmi_bitstream.buf + BS_HEADER_SIZE, BS_MAT_FRAME_SIZE, m_rtStartInputCache, IEC61937_TRUEHD, 0, 0);
 		m_hdmi_bitstream.size = 0;
@@ -1166,66 +1172,69 @@ HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 
 		// compute final padded size for the previous frame, if any
 		if (m_hdmi_bitstream.TrueHDMATState.prev_frametime_valid) {
-			space_size = ((frame_time - m_hdmi_bitstream.TrueHDMATState.prev_frametime) & 0xff) * (64 >> (m_hdmi_bitstream.TrueHDMATState.ratebits & 7));
+			space_size = uint16_t(frame_time - m_hdmi_bitstream.TrueHDMATState.prev_frametime) * (64 >> (m_hdmi_bitstream.TrueHDMATState.ratebits & 7));
 		}
 
 		// compute padding (ie. difference to the size of the previous frame)
+		ASSERT(space_size >= m_hdmi_bitstream.TrueHDMATState.prev_mat_framesize);
+
+		// if for some reason the space_size fails, align the actual frame size
+		if (space_size < m_hdmi_bitstream.TrueHDMATState.prev_mat_framesize) {
+			space_size = FFALIGN(m_hdmi_bitstream.TrueHDMATState.prev_mat_framesize, (64 >> (m_hdmi_bitstream.TrueHDMATState.ratebits & 7)));
+		}
+
 		m_hdmi_bitstream.TrueHDMATState.padding += (space_size - m_hdmi_bitstream.TrueHDMATState.prev_mat_framesize) & 0xffff;
-		ASSERT((space_size - m_hdmi_bitstream.TrueHDMATState.prev_mat_framesize) <= 0xffff);
 
 		// store frame time of the previous frame
 		m_hdmi_bitstream.TrueHDMATState.prev_frametime = frame_time;
 		m_hdmi_bitstream.TrueHDMATState.prev_frametime_valid = true;
 
-		// if the buffer is as full as its going to be, add the MAT footer and flush it
-		if (m_hdmi_bitstream.size >= BS_MAT_TRUEHD_LIMIT) {
-			// write footer and remove it from the padding
-			MATAppendData(mat_end_code, sizeof(mat_end_code));
-			m_hdmi_bitstream.TrueHDMATState.padding -= sizeof(mat_end_code);
-
-			// flush packet out
-			hr = MATDeliverPacket();
-			if (FAILED(hr)) {
-				return hr;
-			}
-		}
-
 		// Write the MAT header into the fresh buffer
 		if (m_hdmi_bitstream.size == 0) {
 			MATWriteHeader();
+
+			// initial header, don't count it for the frame size
+			if (m_hdmi_bitstream.TrueHDMATState.init == false) {
+				m_hdmi_bitstream.TrueHDMATState.init = true;
+				m_hdmi_bitstream.TrueHDMATState.mat_framesize = 0;
+			}
 		}
 
 		// write padding of the previous frame (if any)
-		MATWritePadding();
-
-		// Buffer is full, submit it
-		if (m_hdmi_bitstream.size >= (BS_MAT_TRUEHD_SIZE - BS_HEADER_SIZE)) {
-			hr = MATDeliverPacket();
-			if (FAILED(hr)) {
-				return hr;
-			}
-
-			// and setup a new buffer
-			MATWriteHeader();
+		while (m_hdmi_bitstream.TrueHDMATState.padding > 0) {
 			MATWritePadding();
+
+			ASSERT(m_hdmi_bitstream.TrueHDMATState.padding == 0 || m_hdmi_bitstream.size == BS_MAT_TRUEHD_SIZE);
+
+			// Buffer is full, submit it
+			if (m_hdmi_bitstream.size == BS_MAT_TRUEHD_SIZE) {
+				MATDeliverPacket();
+
+				// and setup a new buffer
+				MATWriteHeader();
+			}
 		}
 
 		// write actual audio data to the buffer
 		int remaining = MATFillDataBuffer(p, size);
 
-		// not all data could be written
-		if (remaining) {
+		// not all data could be written, or the buffer is full
+		if (remaining || m_hdmi_bitstream.size == BS_MAT_TRUEHD_SIZE) {
 			// flush out old data
 			hr = MATDeliverPacket();
 			if (FAILED(hr)) {
 				return hr;
 			}
 
-			// .. setup a new buffer
-			MATWriteHeader();
+			if (remaining) {
+				// .. setup a new buffer
+				MATWriteHeader();
 
-			// and write the remaining data
-			MATFillDataBuffer(p + (size - remaining), remaining);
+				// and write the remaining data
+				remaining = MATFillDataBuffer(p + (size - remaining), remaining);
+
+				ASSERT(remaining == 0);
+			}
 		}
 
 		// store the size of the current MAT frame, so we can add padding later
