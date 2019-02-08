@@ -51,9 +51,6 @@
     <ClCompile Include="DXVADecoder\DXVA2Decoder.cpp">
       <Filter>Source Files\DXVADecoder</Filter>
     </ClCompile>
-    <ClCompile Include="MSDKDecoder\AnnexBConverter.cpp">
-      <Filter>Source Files\MSDKDecoder</Filter>
-    </ClCompile>
     <ClCompile Include="MSDKDecoder\MSDKDecoder.cpp">
       <Filter>Source Files\MSDKDecoder</Filter>
     </ClCompile>
@@ -97,9 +94,6 @@
     </ClInclude>
     <ClInclude Include="DXVADecoder\stdafx.h">
       <Filter>Header Files\DXVADecoder</Filter>
-    </ClInclude>
-    <ClInclude Include="MSDKDecoder\AnnexBConverter.h">
-      <Filter>Header Files\MSDKDecoder</Filter>
     </ClInclude>
     <ClInclude Include="MSDKDecoder\growarray.h">
       <Filter>Header Files\MSDKDecoder</Filter>

@@ -1,5 +1,5 @@
 /*
-*      Copyright (C) 2010-2016 Hendrik Leppkes
+*      Copyright (C) 2010-2019 Hendrik Leppkes
 *      http://www.1f0.de
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 *  with this program; if not, write to the Free Software Foundation, Inc.,
 *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 *
-*  Adaptation for MPC-BE (C) 2016-2017 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+*  Adaptation for MPC-BE (C) 2016-2019 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
 */
 
 #include "stdafx.h"
@@ -43,16 +43,16 @@ extern "C" {
 
 inline void CopyEverySecondLineSSE2(uint8_t* dst, uint8_t* src1, uint8_t* src2, ptrdiff_t linesize, unsigned lines)
 {
-	for (unsigned i = 0; i < lines; i++) {
-		PIXCONV_MEMCPY_ALIGNED(dst, src1, linesize)
-		dst += linesize;
-		src1 += linesize * 2;
-	}
-	for (unsigned i = 0; i < lines; i++) {
-		PIXCONV_MEMCPY_ALIGNED(dst, src2, linesize)
-		dst += linesize;
-		src2 += linesize * 2;
-	}
+  for (unsigned i = 0; i < lines; i++) {
+    PIXCONV_MEMCPY_ALIGNED(dst, src1, linesize)
+    dst += linesize;
+    src1 += linesize * 2;
+  }
+  for (unsigned i = 0; i < lines; i++) {
+    PIXCONV_MEMCPY_ALIGNED(dst, src2, linesize)
+    dst += linesize;
+    src2 += linesize * 2;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,39 +64,23 @@ public:
   CBitstreamBuffer(GrowableArray<BYTE> * arrStorage) : m_pStorage(arrStorage) {}
 
   ~CBitstreamBuffer() {
-    if (m_pBuffer) {
-      ASSERT(m_nConsumed <= m_nBufferSize);
-      if (m_nConsumed < m_nBufferSize)
-        m_pStorage->Append(m_pBuffer + m_nConsumed, m_nBufferSize - m_nConsumed);
-
-      if (m_bBufferTemporary)
-        av_freep(&m_pBuffer);
+    ASSERT(m_nConsumed <= m_pStorage->GetCount());
+    if (m_nConsumed < m_pStorage->GetCount()) {
+      BYTE *p = m_pStorage->Ptr();
+      memmove(p, p + m_nConsumed, m_pStorage->GetCount() - m_nConsumed);
+      m_pStorage->SetSize(DWORD(m_pStorage->GetCount() - m_nConsumed));
     }
     else {
-      ASSERT(m_nConsumed <= m_pStorage->GetCount());
-      if (m_nConsumed < m_pStorage->GetCount()) {
-        BYTE *p = m_pStorage->Ptr();
-        memmove(p, p + m_nConsumed, m_pStorage->GetCount() - m_nConsumed);
-        m_pStorage->SetSize(m_pStorage->GetCount() - m_nConsumed);
-      }
-      else {
-        m_pStorage->Clear();
-      }
+      m_pStorage->Clear();
     }
   }
 
-  void SetBuffer(BYTE * buffer, size_t size, bool temporary) {
-    if (m_pStorage->GetCount() > 0) {
-      m_pStorage->Append(buffer, size);
+  void Allocate(size_t size) {
+    m_pStorage->Allocate((DWORD)size);
+  }
 
-      if (temporary)
-        av_free(buffer);
-    }
-    else {
-      m_pBuffer = buffer;
-      m_nBufferSize = size;
-      m_bBufferTemporary = temporary;
-    }
+  void Append(const BYTE * buffer, size_t size) {
+    m_pStorage->Append(buffer, DWORD(size));
   }
 
   void Consume(size_t count) {
@@ -108,36 +92,15 @@ public:
   }
 
   BYTE * GetBuffer() {
-    if (m_pBuffer) {
-      return m_pBuffer + m_nConsumed;
-    }
-    else {
-      return m_pStorage->Ptr() + m_nConsumed;
-    }
+    return m_pStorage->Ptr() + m_nConsumed;
   }
 
   size_t GetBufferSize() {
-    if (m_nBufferSize) {
-      return m_nBufferSize - m_nConsumed;
-    }
-    else {
-      return m_pStorage->GetCount() - m_nConsumed;
-    }
-  }
-
-  void EnsureWriteable() {
-    if (m_pBuffer && !m_bBufferTemporary) {
-      m_pStorage->Append(m_pBuffer, m_nBufferSize);
-      m_pBuffer = nullptr;
-    }
+    return m_pStorage->GetCount() - m_nConsumed;
   }
 
 private:
   GrowableArray<BYTE> * m_pStorage = nullptr;
-
-  BOOL m_bBufferTemporary = FALSE;
-  BYTE * m_pBuffer = nullptr;
-  size_t m_nBufferSize = 0;
   size_t m_nConsumed = 0;
 };
 
@@ -249,7 +212,7 @@ void CMSDKDecoder::DestroyDecoder(bool bFull)
   SAFE_DELETE(m_mfxExtMVCSeq.ViewId);
   SAFE_DELETE(m_mfxExtMVCSeq.OP);
 
-  SAFE_DELETE(m_pAnnexBConverter);
+  m_nMP4NALUSize = 0;
 
   av_frame_free(&m_pFrame);
 
@@ -286,8 +249,7 @@ HRESULT CMSDKDecoder::InitDecoder(const CMediaType *pmt)
   MPEG2VIDEOINFO *mp2vi = (MPEG2VIDEOINFO *)pmt->Format();
 
   if (*pmt->Subtype() == MEDIASUBTYPE_MVC1) {
-    m_pAnnexBConverter = new CAnnexBConverter();
-    m_pAnnexBConverter->SetNALUSize(2);
+    m_nMP4NALUSize = 2;
 
     // Decode sequence header from the media type
     if (mp2vi->cbSequenceHeader) {
@@ -296,7 +258,7 @@ HRESULT CMSDKDecoder::InitDecoder(const CMediaType *pmt)
         return hr;
     }
 
-    m_pAnnexBConverter->SetNALUSize(mp2vi->dwFlags);
+    m_nMP4NALUSize = mp2vi->dwFlags;
   }
   else if (*pmt->Subtype() == MEDIASUBTYPE_AMVC) {
     // Decode sequence header from the media type
@@ -813,6 +775,9 @@ HRESULT CMSDKDecoder::EndOfStream()
   return S_OK;
 }
 
+static const BYTE s_AnnexBStartCode3[3] = { 0x00, 0x00, 0x01 };
+static const BYTE s_AnnexBStartCode4[4] = { 0x00, 0x00, 0x00, 0x01 };
+
 HRESULT CMSDKDecoder::Decode(const BYTE *buffer, int buflen, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
 {
   if (!m_mfxSession)
@@ -832,18 +797,7 @@ HRESULT CMSDKDecoder::Decode(const BYTE *buffer, int buflen, REFERENCE_TIME rtSt
   bs.DecodeTimeStamp = MFX_TIMESTAMP_UNKNOWN;
 
   if (!bFlush) {
-    if (m_pAnnexBConverter) {
-      BYTE *pOutBuffer = nullptr;
-      int pOutSize = 0;
-      hr = m_pAnnexBConverter->Convert(&pOutBuffer, &pOutSize, buffer, buflen);
-      if (FAILED(hr))
-        return hr;
-
-      bsBuffer.SetBuffer(pOutBuffer, pOutSize, true);
-    }
-    else {
-      bsBuffer.SetBuffer((BYTE *)buffer, buflen, false);
-    }
+    bsBuffer.Allocate(bsBuffer.GetBufferSize() + buflen);
 
 #if (FALSE)
     DLog(L"CMSDKDecoder::Decode(): Frame %I64u, size %u", bs.TimeStamp, bsBuffer.GetBufferSize());
@@ -852,17 +806,28 @@ HRESULT CMSDKDecoder::Decode(const BYTE *buffer, int buflen, REFERENCE_TIME rtSt
     // Check the buffer for SEI NALU, and some unwanted NALUs that need filtering
     // MSDK's SEI reading functionality is slightly buggy
     CH264Nalu nalu;
-    nalu.SetBuffer(bsBuffer.GetBuffer(), bsBuffer.GetBufferSize(), 0);
-    BOOL bNeedFilter = FALSE;
+    nalu.SetBuffer(buffer, buflen, m_nMP4NALUSize);
     while (nalu.ReadNext()) {
+      // Don't include End-of-Sequence or AUD NALUs
+      if (nalu.GetType() == NALU_TYPE_EOSEQ || nalu.GetType() == NALU_TYPE_AUD)
+        continue;
+
       if (nalu.GetType() == NALU_TYPE_SEI) {
         ParseSEI(nalu.GetDataBuffer() + 1, nalu.GetDataLength() - 1, bs.TimeStamp);
       }
-      else if (nalu.GetType() == NALU_TYPE_EOSEQ) {
-        bsBuffer.EnsureWriteable();
-        // This is rather ugly, and relies on the bitstream being AnnexB, so simply overwriting the EOS NAL with zero works.
-        // In the future a more elaborate bitstream filter might be advised
-        memset(bsBuffer.GetBuffer() + nalu.GetNALPos(), 0, 4);
+
+      // copy filtered NALs into the data buffer
+      if (m_nMP4NALUSize) {
+        // write annex b nal
+        if (nalu.GetNALPos() == 0 || nalu.GetType() == NALU_TYPE_SPS || nalu.GetType() == NALU_TYPE_PPS)
+          bsBuffer.Append(s_AnnexBStartCode4, 4);
+        else
+          bsBuffer.Append(s_AnnexBStartCode3, 3);
+
+        // append nal data
+        bsBuffer.Append(nalu.GetDataBuffer(), nalu.GetDataLength());
+      } else {
+        bsBuffer.Append(nalu.GetNALBuffer(), nalu.GetLength());
       }
     }
 
