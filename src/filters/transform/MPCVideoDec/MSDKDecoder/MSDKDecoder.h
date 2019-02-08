@@ -1,5 +1,5 @@
 /*
-*      Copyright (C) 2010-2016 Hendrik Leppkes
+*      Copyright (C) 2010-2019 Hendrik Leppkes
 *      http://www.1f0.de
 *
 *  This program is free software; you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 *  with this program; if not, write to the Free Software Foundation, Inc.,
 *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 *
-*  Adaptation for MPC-BE (C) 2016-2017 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+*  Adaptation for MPC-BE (C) 2016-2019 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
 */
 
 #pragma once
@@ -26,8 +26,6 @@
 #include "./include/mfxvideo.h"
 #include "./include/mfxmvc.h"
 #include "growarray.h"
-
-#include "AnnexBConverter.h"
 
 #include <deque>
 #include <vector>
@@ -111,7 +109,7 @@ private:
   std::vector<MVCBuffer *> m_BufferQueue;
 
   GrowableArray<BYTE>  m_buff;
-  CAnnexBConverter    *m_pAnnexBConverter = nullptr;
+  int                  m_nMP4NALUSize = 0;
 
   MVCBuffer           *m_pOutputQueue[ASYNC_QUEUE_SIZE] = { 0 };
   int                  m_nOutputQueuePosition = 0;

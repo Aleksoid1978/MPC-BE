@@ -223,7 +223,6 @@
     <ClCompile Include="FormatConverter.cpp" />
     <ClCompile Include="MPCVideoDec.cpp" />
     <ClCompile Include="MPCVideoDecSettingsWnd.cpp" />
-    <ClCompile Include="MSDKDecoder\AnnexBConverter.cpp" />
     <ClCompile Include="MSDKDecoder\ByteParser.cpp" />
     <ClCompile Include="MSDKDecoder\MSDKDecoder.cpp" />
     <ClCompile Include="pixconv_functions.cpp" />
@@ -241,7 +240,6 @@
     <ClInclude Include="IMPCVideoDec.h" />
     <ClInclude Include="MPCVideoDec.h" />
     <ClInclude Include="MPCVideoDecSettingsWnd.h" />
-    <ClInclude Include="MSDKDecoder\AnnexBConverter.h" />
     <ClInclude Include="MSDKDecoder\ByteParser.h" />
     <ClInclude Include="MSDKDecoder\growarray.h" />
     <ClInclude Include="MSDKDecoder\include\mfxcommon.h" />
