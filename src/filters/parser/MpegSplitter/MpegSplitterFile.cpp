@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -187,7 +187,7 @@ HRESULT CMpegSplitterFile::Init(IAsyncReader* pAsyncReader)
 			}
 
 			if (bHEVCPresent) {
-				stop = std::min(40LL * MEGABYTE, len);
+				stop = std::min(60LL * MEGABYTE, len);
 			}
 		}
 		SearchStreams(0, stop);
