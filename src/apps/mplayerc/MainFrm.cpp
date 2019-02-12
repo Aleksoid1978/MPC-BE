@@ -4411,6 +4411,7 @@ void CMainFrame::OnFilePostOpenMedia(CAutoPtr<OpenMediaData> pOMD)
 			{L"d3d11 native",    L"D3D11 Native"},
 			{L"cuvid",           L"Nvidia CUVID"},
 			{L"quicksync",       L"Intel QuickSync"},
+			{L"msdk mvc hw",     L"Intel H.264(MVC 3D)"},
 		};
 
 		for (const auto &item : LAVDecoderNames) {
