@@ -132,7 +132,7 @@ class AP4_Track {
     AP4_String    GetTrackName();
     AP4_String    GetTrackLanguage();
 
-    AP4_FragmentSampleTable* GetFragmentSampleTable() { return &m_FragmentSampleTable; }
+    AP4_FragmentSampleTable& GetFragmentSampleTable() { return m_FragmentSampleTable; }
     AP4_Result               CreateFragmentFromStdSamples();
     AP4_Result               CreateIndexFromFragment();
 
