@@ -193,6 +193,7 @@ static const std::map<GUID, LPCSTR> audioguids = {
 	{MEDIASUBTYPE_TAK,             "TAK"},
 	{MEDIASUBTYPE_BINKA_DCT,       "BINK"},
 	{MEDIASUBTYPE_BINKA_RDFT,      "BINK"},
+	{MEDIASUBTYPE_DOLBY_AC3_SPDIF, "S/PDIF"},
 };
 
 static const std::map<GUID, LPCSTR> subtitleguids = {
