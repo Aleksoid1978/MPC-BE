@@ -66,7 +66,7 @@ public:
     AP4_Result   RemoveLast();
     T& operator[](unsigned long idx) { return m_Items[idx]; }
     const T& operator[](unsigned long idx) const { return m_Items[idx]; }
-    AP4_Result Clear();
+    AP4_Result Clear(const bool bFull = false);
     AP4_Result EnsureCapacity(AP4_Cardinal count);
     AP4_Result SetItemCount(AP4_Cardinal item_count);
 
@@ -146,7 +146,7 @@ AP4_Array<T>::operator=(const AP4_Array<T>& copy)
 +---------------------------------------------------------------------*/
 template <typename T>
 AP4_Result
-AP4_Array<T>::Clear()
+AP4_Array<T>::Clear(const bool bFull/* = false*/)
 {
     // destroy all items
     for (AP4_Ordinal i=0; i<m_ItemCount; i++) {
@@ -154,6 +154,11 @@ AP4_Array<T>::Clear()
     }
 
     m_ItemCount = 0;
+
+    if (bFull) {
+        m_AllocatedCount = 0;
+        ::operator delete((void*)m_Items);
+    }
 
     return AP4_SUCCESS;
 }

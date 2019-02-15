@@ -371,9 +371,9 @@ AP4_Movie::ProcessMoof(AP4_ContainerAtom* moof, AP4_ByteStream& stream, AP4_Offs
                             }
                         }
 
-                        AP4_FragmentSampleTable* sampleTable = track->GetFragmentSampleTable();
+                        AP4_FragmentSampleTable& sampleTable = track->GetFragmentSampleTable();
                         if (bClearSampleTable) {
-                            sampleTable->Clear();
+                            sampleTable.Clear();
                         }
 
                         AP4_Cardinal sample_count = 0;
@@ -393,11 +393,11 @@ AP4_Movie::ProcessMoof(AP4_ContainerAtom* moof, AP4_ByteStream& stream, AP4_Offs
                             return;
                         }
 
-                        if (sampleTable->GetSampleCount() == 0) {
+                        if (sampleTable.GetSampleCount() == 0) {
                             track->CreateFragmentFromStdSamples();
                         }
 
-                        if (AP4_FAILED(sampleTable->EnsureCapacity(sample_count + sampleTable->GetSampleCount()))) {
+                        if (AP4_FAILED(sampleTable.EnsureCapacity(sample_count + sampleTable.GetSampleCount()))) {
                             return;
                         }
 
@@ -409,7 +409,7 @@ AP4_Movie::ProcessMoof(AP4_ContainerAtom* moof, AP4_ByteStream& stream, AP4_Offs
                             if (child_atom->GetType() == AP4_ATOM_TYPE_TRUN) {
                                 AP4_TrunAtom* trun = AP4_DYNAMIC_CAST(AP4_TrunAtom, child_atom);
                                 if (trun) {
-                                    sampleTable->AddTrun(trun, tfhd, trex, stream, dts_origin, moof_offset, mdat_payload_offset);
+                                    sampleTable.AddTrun(trun, tfhd, trex, stream, dts_origin, moof_offset, mdat_payload_offset);
                                 }
                             }
                         }

@@ -195,6 +195,6 @@ AP4_FragmentSampleTable::GetSampleIndexForTimeStamp(AP4_SI64 ts, AP4_Ordinal& in
 void
 AP4_FragmentSampleTable::Clear()
 {
-    m_FragmentSamples.Clear();
+    m_FragmentSamples.Clear(true);
     m_Duration = 0;
 }
