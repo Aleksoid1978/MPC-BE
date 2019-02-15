@@ -35,7 +35,9 @@
 #include "Ap4AtomFactory.h"
 #include "Ap4MoovAtom.h"
 #include "Ap4SidxAtom.h"
+
 #include <Windows.h>
+#include <map>
 
 #define TIMEOUT 5000
 
@@ -54,7 +56,7 @@ AP4_File::AP4_File(AP4_ByteStream& stream, bool bURL, AP4_AtomFactory& atom_fact
     : m_Movie(NULL)
     , m_FileType(NULL)
 {
-    AP4_SidxAtom* sidxAtom = NULL;
+    std::map<AP4_UI32, AP4_SidxAtom*> sidxAtoms;
     bool bBreak = false;
     const ULONGLONG start = GetTickCount64();
     // get all atoms
@@ -66,7 +68,7 @@ AP4_File::AP4_File(AP4_ByteStream& stream, bool bURL, AP4_AtomFactory& atom_fact
                                         stream);
                 break;
             case AP4_ATOM_TYPE_MOOF:
-                if (m_Movie && !sidxAtom) {
+                if (m_Movie && sidxAtoms.empty()) {
                     AP4_Offset offset;
                     stream.Tell(offset);
                     m_Movie->ProcessMoof(AP4_DYNAMIC_CAST(AP4_ContainerAtom, atom),
@@ -84,28 +86,35 @@ AP4_File::AP4_File(AP4_ByteStream& stream, bool bURL, AP4_AtomFactory& atom_fact
                 m_OtherAtoms.Add(atom);
                 break;
             case AP4_ATOM_TYPE_SIDX:
-                if (!sidxAtom) {
-                    sidxAtom = AP4_DYNAMIC_CAST(AP4_SidxAtom, atom);
-                    m_OtherAtoms.Add(atom);
-                } else {
-                    sidxAtom->Append(AP4_DYNAMIC_CAST(AP4_SidxAtom, atom));
-                    delete atom;
-                }
+                {
+                    auto sidxAtom = AP4_DYNAMIC_CAST(AP4_SidxAtom, atom);
+                    const auto referenceId = sidxAtom->GetReferenceId();
+                    auto it = sidxAtoms.find(referenceId);
+                    if (it != sidxAtoms.end()) {
+                        it->second->Append(sidxAtom);
+                        delete atom;
 
-                if (sidxAtom->IsLastSegment() || AP4_FAILED(stream.Seek(sidxAtom->GetSegmentEnd()))) {
-                    bBreak = true;
-                }
+                        sidxAtom = sidxAtoms[referenceId];
+                    } else {
+                        sidxAtoms.emplace(referenceId, sidxAtom);
+                        m_OtherAtoms.Add(sidxAtom);
+                    }
 
-                if (bURL && (GetTickCount64() - start >= TIMEOUT)) {
-                    bBreak = true;
+                    if (AP4_FAILED(stream.Seek(sidxAtom->GetSegmentEnd()))) {
+                        bBreak = true;
+                    }
+
+                    if (bURL && (GetTickCount64() - start >= TIMEOUT)) {
+                        bBreak = true;
+                    }
                 }
                 break;
             default:
                 m_OtherAtoms.Add(atom);
         }
     }
-
-    if (m_Movie && AP4_SUCCEEDED(m_Movie->SetSidxAtom(sidxAtom, stream))) {
+    
+    if (m_Movie && AP4_SUCCEEDED(m_Movie->SetSidxAtoms(sidxAtoms, stream))) {
         m_Movie->SwitchFirstMoof();
         return;
     }
