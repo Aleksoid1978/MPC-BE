@@ -431,7 +431,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 				}
 
-				if (!movie->HasFragmentsIndex()
+				if (!movie->HasFragments()
 						&& track->GetTrakAtom()->FindChild("mdia/minf/stbl/ctts") == nullptr) {
 					m_dtsonly = 1;
 				}

@@ -40,6 +40,8 @@
 #include "Ap4ByteStream.h"
 #include "Ap4SidxAtom.h"
 
+#include <map>
+
 /*----------------------------------------------------------------------
 |       AP4_Movie
 +---------------------------------------------------------------------*/
@@ -65,14 +67,14 @@ public:
     AP4_Duration GetFragmentsDuration();
     AP4_Duration GetFragmentsDurationMs();
 
-    void         ProcessMoof(AP4_ContainerAtom* moof, AP4_ByteStream& stream, AP4_Offset offset, AP4_Duration dts = 0, bool bClearSampleTable = false);
-    AP4_Result   SetSidxAtom(AP4_SidxAtom* atom, AP4_ByteStream& stream);
+    const bool   HasFragmentsIndex();
+    const AP4_Array<AP4_IndexTableEntry>& GetFragmentsIndexEntries();
 
-    bool                                  HasFragmentsIndex() const  { return m_FragmentsIndexEntries.ItemCount() > 0; }
-    const AP4_Array<AP4_IndexTableEntry>& GetFragmentsIndexEntries() { return m_FragmentsIndexEntries; }
+    void         ProcessMoof(AP4_ContainerAtom* moof, AP4_ByteStream& stream, AP4_Offset offset, AP4_Duration dts = 0, bool bClearSampleTable = false);
+    AP4_Result   SetSidxAtoms(std::map<AP4_UI32, AP4_SidxAtom*> sidxAtoms, AP4_ByteStream& stream);
 
     AP4_Result   SelectMoof(const REFERENCE_TIME rt);
-    AP4_Result   SwitchMoof(AP4_Cardinal index, AP4_UI64 offset, AP4_UI64 size, AP4_Duration dts);
+    AP4_Result   SwitchMoof(AP4_UI32 id, AP4_Cardinal index, AP4_UI64 offset, AP4_UI64 size, AP4_Duration dts);
     AP4_Result   SwitchNextMoof();
     AP4_Result   SwitchFirstMoof();
 
@@ -82,12 +84,16 @@ private:
     AP4_MvhdAtom*       m_MvhdAtom;
     AP4_List<AP4_Track> m_Tracks;
 
-    AP4_ByteStream*                m_Stream;
-    AP4_SidxAtom*                  m_SidxAtom;
-    AP4_Cardinal                   m_CurrentMoof;
-    AP4_Array<AP4_IndexTableEntry> m_FragmentsIndexEntries;
-    AP4_Array<AP4_ContainerAtom*>  m_MoofAtomEntries;
-    AP4_Array<AP4_Offset>          m_MoofOffsetEntries;
+    struct fragmentsData {
+        AP4_SidxAtom*                  SidxAtom;
+        AP4_Cardinal                   CurrentMoof;
+        AP4_Array<AP4_IndexTableEntry> FragmentsIndexEntries;
+        AP4_Array<AP4_ContainerAtom*>  MoofAtomEntries;
+        AP4_Array<AP4_Offset>          MoofOffsetEntries;
+    };
+
+    AP4_ByteStream*                   m_Stream;
+    std::map<AP4_UI32, fragmentsData> m_fragmentsDataEntries;
 };
 
 #endif // _AP4_MOVIE_H_
