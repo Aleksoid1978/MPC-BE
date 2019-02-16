@@ -1,5 +1,5 @@
 @ECHO OFF
-REM (C) 2009-2018 see Authors.txt
+REM (C) 2009-2019 see Authors.txt
 REM
 REM This file is part of MPC-BE.
 REM
@@ -25,6 +25,7 @@ SET ARG=%ARG:-=%
 SET ARGB=0
 SET ARGBC=0
 SET ARGC=0
+SET ARGCOMP=0
 SET ARGCL=0
 SET ARGD=0
 SET ARGF=0
@@ -57,6 +58,8 @@ FOR %%A IN (%ARG%) DO (
   IF /I "%%A" == "Resources"  SET "CONFIG=Resources"    & SET /A ARGC+=1  & SET /A ARGD+=1
   IF /I "%%A" == "Debug"      SET "BUILDCFG=Debug"      & SET /A ARGBC+=1 & SET /A ARGD+=1
   IF /I "%%A" == "Release"    SET "BUILDCFG=Release"    & SET /A ARGBC+=1
+  IF /I "%%A" == "VS2017"     SET "COMPILER=VS2017"     & SET /A ARGCOMP+=1
+  IF /I "%%A" == "VS2019"     SET "COMPILER=VS2019"     & SET /A ARGCOMP+=1
   IF /I "%%A" == "Packages"   SET "PACKAGES=True"       & SET /A ARGPA+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Installer"  SET "INSTALLER=True"      & SET /A ARGIN+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Zip"        SET "ZIP=True"            & SET /A ARGZI+=1 & SET /A ARGCL+=1 & SET /A ARGM+=1
@@ -73,35 +76,42 @@ IF NOT DEFINED MPCBE_MINGW GOTO MissingVar
 IF NOT DEFINED MPCBE_MSYS  GOTO MissingVar
 
 FOR %%X IN (%*) DO SET /A INPUT+=1
-SET /A VALID=%ARGB%+%ARGPL%+%ARGC%+%ARGBC%+%ARGPA%+%ARGIN%+%ARGZI%+%ARGSIGN%
+SET /A VALID=%ARGB%+%ARGPL%+%ARGC%+%ARGBC%+%ARGPA%+%ARGIN%+%ARGZI%+%ARGSIGN%+%ARGCOMP%
 
 IF %VALID% NEQ %INPUT% GOTO UnsupportedSwitch
 
-IF %ARGB%  GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGB% == 0  (SET "BUILDTYPE=Build")
-IF %ARGPL% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGPL% == 0 (SET "BUILDPLATFORM=Both")
-IF %ARGC%  GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGC% == 0  (SET "CONFIG=MPCBE")
-IF %ARGBC% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGBC% == 0 (SET "BUILDCFG=Release")
-IF %ARGPA% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGPA% == 0 (SET "PACKAGES=False")
-IF %ARGIN% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGIN% == 0 (SET "INSTALLER=False")
-IF %ARGZI% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGZI% == 0 (SET "ZIP=False")
-IF %ARGCL% GTR 1 (GOTO UnsupportedSwitch)
-IF %ARGD%  GTR 1 (GOTO UnsupportedSwitch)
-IF %ARGF%  GTR 1 (GOTO UnsupportedSwitch)
-IF %ARGM%  GTR 1 (GOTO UnsupportedSwitch)
+IF %ARGB%    GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGB% == 0    (SET "BUILDTYPE=Build")
+IF %ARGPL%   GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGPL% == 0   (SET "BUILDPLATFORM=Both")
+IF %ARGC%    GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGC% == 0    (SET "CONFIG=MPCBE")
+IF %ARGBC%   GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGBC% == 0   (SET "BUILDCFG=Release")
+IF %ARGPA%   GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGPA% == 0   (SET "PACKAGES=False")
+IF %ARGIN%   GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGIN% == 0   (SET "INSTALLER=False")
+IF %ARGZI%   GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGZI% == 0   (SET "ZIP=False")
+IF %ARGCOMP% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGCOMP% == 0 (SET "COMPILER=VS2017")
+IF %ARGCL%   GTR 1 (GOTO UnsupportedSwitch)
+IF %ARGD%    GTR 1 (GOTO UnsupportedSwitch)
+IF %ARGF%    GTR 1 (GOTO UnsupportedSwitch)
+IF %ARGM%    GTR 1 (GOTO UnsupportedSwitch)
 
 IF /I "%PACKAGES%" == "True" SET "INSTALLER=True" & SET "ZIP=True"
 
-IF NOT DEFINED VS150COMNTOOLS (
-  FOR /F "tokens=2*" %%A IN (
-    'REG QUERY "HKLM\SOFTWARE\Microsoft\VisualStudio\SxS\VS7" /v "15.0" 2^>NUL ^| FIND "REG_SZ" ^|^|
-     REG QUERY "HKLM\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\SxS\VS7" /v "15.0" 2^>NUL ^| FIND "REG_SZ"') DO SET "VS150COMNTOOLS=%%BCommon7\Tools\"
+IF /I "%COMPILER%" == "VS2017" (
+  IF NOT DEFINED VS150COMNTOOLS (
+    FOR /F "tokens=2*" %%A IN (
+      'REG QUERY "HKLM\SOFTWARE\Microsoft\VisualStudio\SxS\VS7" /v "15.0" 2^>NUL ^| FIND "REG_SZ" ^|^|
+       REG QUERY "HKLM\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\SxS\VS7" /v "15.0" 2^>NUL ^| FIND "REG_SZ"') DO SET "VS150COMNTOOLS=%%BCommon7\Tools\"
+  )
+) ELSE (
+  FOR /f "delims=" %%A IN ('"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -prerelease -latest -property installationPath -requires Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.ATLMFC Microsoft.VisualStudio.Component.VC.Tools.x86.x64') DO SET "VS160COMNTOOLS=%%A\Common7\Tools\"
 )
 
-IF DEFINED VS150COMNTOOLS (
+IF DEFINED VS160COMNTOOLS (
+  SET "VCVARS=%VS160COMNTOOLS%..\..\VC\Auxiliary\Build\vcvarsall.bat"
+) ELSE IF DEFINED VS150COMNTOOLS (
   SET "VCVARS=%VS150COMNTOOLS%..\..\VC\Auxiliary\Build\vcvarsall.bat"
-) ELSE (
-  GOTO MissingVar
 )
+
+IF NOT EXIST "%VCVARS%" GOTO MissingVar
 
 SET "BIN=bin"
 

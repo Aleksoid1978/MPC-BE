@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2018 see Authors.txt
+ * (C) 2016-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include <basestruct.h>
 #include "Utils.h"
+#include <cmath>
 
 uint32_t CountBits(uint32_t v)
 {

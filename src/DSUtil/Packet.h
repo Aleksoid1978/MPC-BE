@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,6 +22,7 @@
 
 #include <deque>
 #include <mutex>
+#include <vector>
 #include <mpc_defines.h>
 
 #define PACKET_AAC_RAW 0x0001

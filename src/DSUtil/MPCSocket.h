@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2018 see Authors.txt
+ * (C) 2012-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,6 +23,7 @@
 #include <afxsock.h>
 #include <atlutil.h>
 #include "Log.h"
+#include <list>
 
 #define SOCKET_DUMPLOGFILE 0
 

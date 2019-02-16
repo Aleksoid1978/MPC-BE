@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "LcdSupport.h"
+#include <locale.h>
 
 #define LCD_UPD_TIMER 40
 
