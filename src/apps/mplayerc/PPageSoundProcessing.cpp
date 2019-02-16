@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2018 see Authors.txt
+ * (C) 2017-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,6 +23,7 @@
 #include "../../filters/switcher/AudioSwitcher/AudioSwitcher.h"
 #include "MainFrm.h"
 #include "PPageSoundProcessing.h"
+#include <cmath>
 
 // CPPageSoundProcessing dialog
 

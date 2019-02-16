@@ -35,6 +35,7 @@
 #endif
 #include <moreuuids.h>
 #include <basestruct.h>
+#include <cmath>
 #include <list>
 #include <libavutil/pixfmt.h>
 #include <libavutil/intreadwrite.h>

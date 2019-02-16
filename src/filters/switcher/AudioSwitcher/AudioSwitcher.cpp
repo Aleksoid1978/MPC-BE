@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,6 +39,10 @@
 #include "AudioSwitcher.h"
 
 #ifdef REGISTER_FILTER
+
+void* __imp__aligned_malloc  = _aligned_malloc;
+void* __imp__aligned_realloc = _aligned_realloc;
+void* __imp__aligned_free    = _aligned_free;
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_Audio, &MEDIASUBTYPE_NULL}
@@ -150,14 +154,6 @@ CAudioSwitcherFilter::CAudioSwitcherFilter(LPUNKNOWN lpunk, HRESULT* phr)
 			*phr = S_OK;
 		}
 	}
-
-#ifdef REGISTER_FILTER
-	// hack to avoid error "unresolved external symbol" when linking
-	BYTE* tmp = nullptr;
-	if (tmp) {
-		_aligned_free(tmp);
-	}
-#endif
 }
 
 CAudioSwitcherFilter::~CAudioSwitcherFilter()
