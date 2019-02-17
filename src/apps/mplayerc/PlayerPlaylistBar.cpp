@@ -3994,8 +3994,10 @@ void CPlayerPlaylistBar::TSelectTab()
 
 	TCalcLayout();
 	EnsureVisible(FindPos(curPlayList.m_nFocused_idx));
-	TDrawBar();
-	m_list.SetFocus();
+	if (IsWindowVisible()) {
+		TDrawBar();
+		m_list.SetFocus();
+	}
 }
 
 void CPlayerPlaylistBar::TParseFolder(const CString& path)
