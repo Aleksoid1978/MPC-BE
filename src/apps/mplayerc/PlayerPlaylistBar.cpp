@@ -891,6 +891,20 @@ BOOL CPlayerPlaylistBar::PreCreateWindow(CREATESTRUCT& cs)
 
 BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 {
+	if (pMsg->message == WM_MOUSEWHEEL) {
+		const POINT point = { GET_X_LPARAM(pMsg->lParam), GET_Y_LPARAM(pMsg->lParam) };
+		CRect rect;
+		GetWindowRect(&rect);
+		if (!rect.PtInRect(point)) {
+			m_pMainFrame->GetWindowRect(&rect);
+			if (rect.PtInRect(point)) {
+				m_pMainFrame->SendMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
+				SetFocus();
+				return TRUE;
+			}
+		}
+	}
+
 	if (IsWindow(pMsg->hwnd) && IsVisible() && pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST) {
 		if (pMsg->hwnd == m_REdit.GetSafeHwnd()) {
 			IsDialogMessageW(pMsg);
