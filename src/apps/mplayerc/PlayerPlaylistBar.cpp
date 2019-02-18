@@ -158,7 +158,7 @@ static bool ParseCUESheetFile(CString fn, std::list<CUETrack> &CUETrackList, CSt
 			unsigned mm, ss, ff;
 			if (3 == swscanf_s(cueLine, L"01 %u:%u:%u", &mm, &ss, &ff) && fAudioTrack) {
 				// "INDEX 01" is required and denotes the start of the track
-				rt = UNITS * (mm*60 + ss) + UNITS * ff / 75;
+				rt = UNITS * (mm * 60u + ss) + UNITS * ff / 75;
 			}
 		}
 	}
@@ -1176,44 +1176,42 @@ void CPlayerPlaylistBar::ResolveLinkFiles(std::list<CString> &fns)
 
 		// Regular shortcut file.
 		if (extension == L".lnk") {
-			CComPtr<IShellLink> pShellLink;
-			pShellLink.CoCreateInstance(CLSID_ShellLink);
-			CComQIPtr<IPersistFile> pPersistFile = pShellLink;
-
-			WCHAR buffer[MAX_PATH] = {};
-			if (pShellLink && pPersistFile
-					// Load file.
-					&& SUCCEEDED(pPersistFile->Load(fn, STGM_READ))
-					// Possible recontruction of path.
-					&& SUCCEEDED(pShellLink->Resolve(nullptr, SLR_ANY_MATCH | SLR_NO_UI))
-					// Retrieve path.
-					&& SUCCEEDED(pShellLink->GetPath(buffer, _countof(buffer), nullptr, 0))
-					// non-empty buffer
-					&& wcslen(buffer)) {
-				fn = buffer;
+			CComPtr<IShellLinkW> pShellLink;
+			if (SUCCEEDED(pShellLink.CoCreateInstance(CLSID_ShellLink))) {
+				if (CComQIPtr<IPersistFile> pPersistFile = pShellLink) {
+					WCHAR buffer[MAX_PATH] = {};
+					if (SUCCEEDED(pPersistFile->Load(fn, STGM_READ))
+							// Possible recontruction of path.
+							&& SUCCEEDED(pShellLink->Resolve(nullptr, SLR_ANY_MATCH | SLR_NO_UI))
+							// Retrieve path.
+							&& SUCCEEDED(pShellLink->GetPath(buffer, _countof(buffer), nullptr, 0))
+							// non-empty buffer
+							&& wcslen(buffer)) {
+						fn = buffer;
+					}
+				}
 			}
 
 		// Internet shortcut file.
 		} else if (extension == L".url" || extension == L".website") {
-			CComPtr<IUniformResourceLocator> pUniformResourceLocator;
-			pUniformResourceLocator.CoCreateInstance(CLSID_InternetShortcut);
-			CComQIPtr<IPersistFile> pPersistFile = pUniformResourceLocator;
+			CComPtr<IUniformResourceLocatorW> pUniformResourceLocator;
+			if (SUCCEEDED(pUniformResourceLocator.CoCreateInstance(CLSID_InternetShortcut))) {
+				if (CComQIPtr<IPersistFile> pPersistFile = pUniformResourceLocator) {
+					WCHAR* buffer;
+					if (SUCCEEDED(pPersistFile->Load(fn, STGM_READ))
+							// Retrieve URL (foreign-allocated).
+							&& SUCCEEDED(pUniformResourceLocator->GetURL(&buffer))) {
+						if (wcslen(buffer)) {
+							fn = buffer;
+						}
 
-			WCHAR* buffer;
-			if (pUniformResourceLocator && pPersistFile
-					// Load file.
-					&& SUCCEEDED(pPersistFile->Load(fn, STGM_READ))
-					// Retrieve URL (foreign-allocated).
-					&& SUCCEEDED(pUniformResourceLocator->GetURL(&buffer))) {
-				if (wcslen(buffer)) {
-					fn = buffer;
-				}
-
-				// Free foreign-allocated memory.
-				IMalloc* pMalloc;
-				if (SUCCEEDED(SHGetMalloc(&pMalloc))) {
-					pMalloc->Free(buffer);
-					pMalloc->Release();
+						// Free foreign-allocated memory.
+						IMalloc* pMalloc;
+						if (SUCCEEDED(SHGetMalloc(&pMalloc))) {
+							pMalloc->Free(buffer);
+							pMalloc->Release();
+						}
+					}
 				}
 			}
 		}
@@ -3446,29 +3444,29 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 				if (idx == 3 && !pli.m_label.IsEmpty()) { // M3U
 					str.Format(L"#EXTINF:%I64d,%s\n",
 						pli.m_duration > 0 ? (pli.m_duration + UNITS/2) / UNITS : -1LL,
-						pli.m_label);
-					f.WriteString(str);
+						pli.m_label.GetString());
+					f.WriteString(str.GetString());
 				}
 
 				switch (idx) {
 					case 2:
-						str.Format(L"File%d=%s\n", i+1, fn);
+						str.Format(L"File%d=%s\n", i + 1, fn.GetString());
 						break;
 					case 3:
-						str.Format(L"%s\n", fn);
+						str.Format(L"%s\n", fn.GetString());
 						break;
 					case 4:
-						str.Format(L"<Entry><Ref href = \"%s\"/></Entry>\n", fn);
+						str.Format(L"<Entry><Ref href = \"%s\"/></Entry>\n", fn.GetString());
 						break;
 					default:
 						break;
 				}
-				f.WriteString(str);
+				f.WriteString(str.GetString());
 			}
 
 			if (idx == 2) {
 				str.Format(L"NumberOfEntries=%d\n", i);
-				f.WriteString(str);
+				f.WriteString(str.GetString());
 				f.WriteString(L"Version=2\n");
 			} else if (idx == 4) {
 				f.WriteString(L"</ASX>\n");
@@ -3824,7 +3822,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 						}
 					}
 
-					strDefName.Format(L"%s %u", ResStr(IDS_PLAYLIST_NAME), cnt);
+					strDefName.Format(L"%s %u", ResStr(IDS_PLAYLIST_NAME).GetString(), cnt);
 					CPlaylistNameDlg dlg(strDefName);
 					if (dlg.DoModal() != IDOK) {
 						return;
@@ -3861,7 +3859,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 							cnt++;
 						}
 					}
-					strDefName.Format(L"%s %u", ResStr(IDS_PLAYLIST_EXPLORER_NAME), cnt);
+					strDefName.Format(L"%s %u", ResStr(IDS_PLAYLIST_EXPLORER_NAME).GetString(), cnt);
 					CPlaylistNameDlg dlg(strDefName);
 					if (dlg.DoModal() != IDOK) {
 						return;
@@ -4238,7 +4236,7 @@ void CPlayerPlaylistBar::TSaveSettings()
 		for (size_t i = 0; i <= last; i++) {
 			const auto& tab = m_tabs[i];
 			CString s;
-			str.AppendFormat(L"%u;%s;%u%s%s", tab.type, RemoveFileExt(tab.fn.GetString()), tab.sort, i > 0 ? L";" + tab.name : L"", i < last ? L"|" : L"");
+			str.AppendFormat(L"%u;%s;%u%s%s", tab.type, RemoveFileExt(tab.fn.GetString()).GetString(), tab.sort, i > 0 ? CString(L";" + tab.name).GetString() : L"", i < last ? L"|" : L"");
 		}
 	}
 
