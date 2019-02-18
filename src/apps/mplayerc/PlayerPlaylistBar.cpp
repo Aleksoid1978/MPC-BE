@@ -1017,7 +1017,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 			case VK_APPS: // "Menu key"
 				break;
 			default:
-				m_pMainFrame->PreTranslateMessage(pMsg);
+				m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
 				return TRUE;
 			}
 		}
