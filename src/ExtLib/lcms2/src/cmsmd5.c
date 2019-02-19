@@ -68,7 +68,7 @@ static
 void MD5_Transform(cmsUInt32Number buf[4], cmsUInt32Number in[16])
 
 {
-    register cmsUInt32Number a, b, c, d;
+    CMSREGISTER cmsUInt32Number a, b, c, d;
 
     a = buf[0];
     b = buf[1];

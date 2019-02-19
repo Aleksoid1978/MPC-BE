@@ -388,8 +388,8 @@ void PrecalculatedXFORM(_cmsTRANSFORM* p,
                         cmsUInt32Number LineCount,
                         const cmsStride* Stride)
 {
-    register cmsUInt8Number* accum;
-    register cmsUInt8Number* output;
+    CMSREGISTER cmsUInt8Number* accum;
+    CMSREGISTER cmsUInt8Number* output;
     cmsUInt16Number wIn[cmsMAXCHANNELS], wOut[cmsMAXCHANNELS];
     cmsUInt32Number i, j, strideIn, strideOut;
 
