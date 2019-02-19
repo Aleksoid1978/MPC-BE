@@ -683,8 +683,8 @@ cmsFloat64Number ParseFloatNumber(const char *Buffer)
 static
 void InSymbol(cmsIT8* it8)
 {
-    register char *idptr;
-    register int k;
+    CMSREGISTER char *idptr;
+    CMSREGISTER int k;
     SYMBOL key;
     int sng;
     
