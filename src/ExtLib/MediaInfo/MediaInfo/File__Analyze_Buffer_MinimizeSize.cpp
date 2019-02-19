@@ -1066,30 +1066,7 @@ void File__Analyze::Get_VL_(const vlc Vlc[], size_t &Info)
 void File__Analyze::Skip_VL_(const vlc Vlc[])
 {
     size_t Info=0;
-    int32u Value=0;
-
-    for(;;)
-    {
-        switch (Vlc[Info].bit_increment)
-        {
-            case 255 :
-                        Trusted_IsNot();
-                        return;
-            default  : ;
-                        Value<<=Vlc[Info].bit_increment;
-                        Value|=BS->Get1(Vlc[Info].bit_increment);
-                        break;
-            case   1 :
-                        Value<<=1;
-                        if (BS->GetB())
-                            Value++;
-            case   0 :  ;
-        }
-
-        if (Value==Vlc[Info].value)
-            return;
-        Info++;
-    }
+    Get_VL_(Vlc, Info);
 }
 
 //---------------------------------------------------------------------------

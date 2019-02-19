@@ -217,7 +217,7 @@ static const int8u Avc_SubWidthC[]=
 };
 
 //---------------------------------------------------------------------------
-const int8u Avc_SubHeightC[]=
+static const int8u Avc_SubHeightC[]=
 {
     1,
     2,
@@ -1092,14 +1092,7 @@ void File_Avc::Data_Parse_Iso14496()
             std::vector<seq_parameter_set_struct*>::iterator Data_Item=seq_parameter_sets.begin();
             if (Data_Item!=seq_parameter_sets.end() && (*Data_Item))
             {
-                delete[] (*Data_Item)->Iso14496_10_Buffer;
-                (*Data_Item)->Iso14496_10_Buffer_Size=(size_t)(Element_Size+4);
-                (*Data_Item)->Iso14496_10_Buffer=new int8u[(*Data_Item)->Iso14496_10_Buffer_Size];
-                (*Data_Item)->Iso14496_10_Buffer[0]=0x00;
-                (*Data_Item)->Iso14496_10_Buffer[1]=0x00;
-                (*Data_Item)->Iso14496_10_Buffer[2]=0x01;
-                (*Data_Item)->Iso14496_10_Buffer[3]=0x67;
-                std::memcpy((*Data_Item)->Iso14496_10_Buffer+4, Buffer+Buffer_Offset, (size_t)Element_Size);
+                (*Data_Item)->Init_Iso14496_10(0x67, Buffer+Buffer_Offset, Element_Size);
             }
         }
         if (Element_Code==0x08)
@@ -1107,14 +1100,7 @@ void File_Avc::Data_Parse_Iso14496()
             std::vector<pic_parameter_set_struct*>::iterator Data_Item=pic_parameter_sets.begin();
             if (Data_Item!=pic_parameter_sets.end() && (*Data_Item))
             {
-                delete[] (*Data_Item)->Iso14496_10_Buffer;
-                (*Data_Item)->Iso14496_10_Buffer_Size=(size_t)(Element_Size+4);
-                (*Data_Item)->Iso14496_10_Buffer=new int8u[(*Data_Item)->Iso14496_10_Buffer_Size];
-                (*Data_Item)->Iso14496_10_Buffer[0]=0x00;
-                (*Data_Item)->Iso14496_10_Buffer[1]=0x00;
-                (*Data_Item)->Iso14496_10_Buffer[2]=0x01;
-                (*Data_Item)->Iso14496_10_Buffer[3]=0x68;
-                std::memcpy((*Data_Item)->Iso14496_10_Buffer+4, Buffer+Buffer_Offset, (size_t)Element_Size);
+                (*Data_Item)->Init_Iso14496_10(0x68, Buffer+Buffer_Offset, Element_Size);
             }
         }
         if (Element_Code==0x0F)
@@ -1123,14 +1109,7 @@ void File_Avc::Data_Parse_Iso14496()
             if (Data_Item!=subset_seq_parameter_sets.end() && (*Data_Item))
             {
                 SizeOfNALU_Minus1=0;
-                delete[] (*Data_Item)->Iso14496_10_Buffer;
-                (*Data_Item)->Iso14496_10_Buffer_Size=(size_t)(Element_Size+4);
-                (*Data_Item)->Iso14496_10_Buffer=new int8u[(*Data_Item)->Iso14496_10_Buffer_Size];
-                (*Data_Item)->Iso14496_10_Buffer[0]=0x00;
-                (*Data_Item)->Iso14496_10_Buffer[1]=0x00;
-                (*Data_Item)->Iso14496_10_Buffer[2]=0x01;
-                (*Data_Item)->Iso14496_10_Buffer[3]=0x6F;
-                std::memcpy((*Data_Item)->Iso14496_10_Buffer+4, Buffer+Buffer_Offset, (size_t)Element_Size);
+                (*Data_Item)->Init_Iso14496_10(0x6F, Buffer+Buffer_Offset, Element_Size);
             }
         }
     }

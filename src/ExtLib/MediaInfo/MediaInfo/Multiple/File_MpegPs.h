@@ -175,7 +175,7 @@ private :
     int32u program_mux_rate;
 
     //PS
-    struct ps_stream
+    struct ps_stream : public stream_time
     {
         struct Mpeg_TimeStamp
         {
@@ -212,9 +212,6 @@ private :
         size_t         StreamRegistration_Count;
         size_t         StreamOrder;
         size_t         FirstPacketOrder;
-        bool           Searching_Payload;
-        bool           Searching_TimeStamp_Start;
-        bool           Searching_TimeStamp_End;
         bool           IsFilled;
 
         void Streams_Update()
@@ -250,9 +247,7 @@ private :
             StreamRegistration_Count=0;
             StreamOrder=(size_t)-1;
             FirstPacketOrder=(size_t)-1;
-            Searching_Payload=false;
-            Searching_TimeStamp_Start=false;
-            Searching_TimeStamp_End=false;
+            Init_Stream(false);
             IsFilled=false;
         }
 

@@ -100,7 +100,6 @@ std::string URL_Encoded_Encode (const std::string& URL)
     {
         if ((URL[Pos]>='\x00' && URL[Pos]<='\x20')
          || URL[Pos]=='\x7F'
-         || URL[Pos]==' '
          || URL[Pos]=='<'
          || URL[Pos]=='>'
          || URL[Pos]=='#'
@@ -141,7 +140,6 @@ std::wstring URL_Encoded_Encode (const std::wstring& URL)
     {
         if (URL[Pos]<=L'\x20'
          || URL[Pos]==L'\x7F'
-         || URL[Pos]==L' '
          || URL[Pos]==L'<'
          || URL[Pos]==L'>'
          || URL[Pos]==L'#'

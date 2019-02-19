@@ -93,17 +93,7 @@ private :
     bool    low_delay;                          //From video_sequence_start
     bool    video_sequence_start_IsParsed;      //From video_sequence_start
 
-    //Streams
-    struct stream
-    {
-        bool   Searching_Payload;
-
-        stream()
-        {
-            Searching_Payload=false;
-        }
-    };
-    std::vector<stream> Streams;
+    std::vector<stream_payload> Streams;
 };
 
 } //NameSpace

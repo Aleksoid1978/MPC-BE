@@ -249,7 +249,7 @@ bool File::Open (const tstring &File_Name_, access_t Access)
                 case Access_Write        : access=O_BINARY|O_WRONLY|O_CREAT|O_TRUNC  ; break;
                 case Access_Read_Write   : access=O_BINARY|O_RDWR  |O_CREAT  ; break;
                 case Access_Write_Append : access=O_BINARY|O_WRONLY|O_CREAT|O_APPEND ; break;
-                default                  : access=0                          ; break;
+                default                  : access=0                          ;
             }
             #ifdef UNICODE
                 File_Handle=open(File_Name.To_Local().c_str(), access);
@@ -261,7 +261,6 @@ bool File::Open (const tstring &File_Name_, access_t Access)
             ios_base::openmode mode;
             switch (Access)
             {
-                case Access_Read         : mode=ios_base::binary|ios_base::in; break;
                 case Access_Write        : mode=ios_base::binary|ios_base::in|ios_base::out; break;
                 case Access_Read_Write   : mode=ios_base::binary|ios_base::in|ios_base::out; break;
                 case Access_Write_Append : if (!Exists(File_Name))
@@ -269,7 +268,7 @@ bool File::Open (const tstring &File_Name_, access_t Access)
                                            else
                                                 mode=ios_base::binary|ios_base::out|ios_base::app;
                                            break;
-                default                  : ;
+                default                  : mode = ios_base::binary | ios_base::in;
             }
             #ifdef UNICODE
                 File_Handle=new fstream(File_Name.To_Local().c_str(), mode);
@@ -294,7 +293,7 @@ bool File::Open (const tstring &File_Name_, access_t Access)
                     case Access_Write:
                     case Access_Read_Write:
                     case Access_Write_Append: Desired_Mode=FileAccessMode_ReadWrite; Share_Mode=StorageOpenOptions_AllowReadersAndWriters; break;
-                    default: Desired_Mode=FileAccessMode_Read; Share_Mode=StorageOpenOptions_None; break;
+                    default: Desired_Mode=FileAccessMode_Read; Share_Mode=StorageOpenOptions_None;
                 }
 
                 // Ensure all slashs are converted to backslashs (WinRT file API don't like slashs)

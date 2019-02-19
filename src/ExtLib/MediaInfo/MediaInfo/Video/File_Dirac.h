@@ -73,17 +73,7 @@ private :
     void Reserved();
     void picture();
 
-    //Streams
-    struct stream
-    {
-        bool   Searching_Payload;
-
-        stream()
-        {
-            Searching_Payload=false;
-        }
-    };
-    std::vector<stream> Streams;
+    std::vector<stream_payload> Streams;
 
     //Temp
     int32u frame_width;

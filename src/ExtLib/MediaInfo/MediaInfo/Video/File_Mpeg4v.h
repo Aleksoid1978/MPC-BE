@@ -91,17 +91,7 @@ private :
     void stuffing_start();
     void reserved();
 
-    //Streams
-    struct stream
-    {
-        bool   Searching_Payload;
-
-        stream()
-        {
-            Searching_Payload=false;
-        }
-    };
-    std::vector<stream> Streams;
+    std::vector<stream_payload> Streams;
 
     //Count of a Packets
     size_t IVOP_Count;

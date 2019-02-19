@@ -549,19 +549,6 @@ static const char* Mk_StereoMode(int64u StereoMode)
 }
 
 //---------------------------------------------------------------------------
-static const char* Mk_OldStereoMode(int64u StereoMode)
-{
-    switch (StereoMode)
-    {
-        case 0x00 : return ""; //Mono (default)
-        case 0x01 : return "Right Eye";
-        case 0x02 : return "Left Eye";
-        case 0x03 : return "Both Eye";
-        default   : return "";
-    }
-}
-
-//---------------------------------------------------------------------------
 static const char* Mk_OriginalSourceMedium_From_Source_ID (const Ztring &Value)
 {
     if (Value.size()==6 && Value[0] == __T('0') && Value[1] == __T('0'))
@@ -1268,9 +1255,12 @@ void File_Mk::Streams_Finish()
                         PerLanguage+=EditionEntries[EditionEntries_Pos].ChapterAtoms[ChapterAtoms_Pos].ChapterDisplays[ChapterDisplays_Pos].ChapString;
                         Text+=PerLanguage+__T(" - ");
                     }
+                    Ztring Time=Ztring().Duration_From_Milliseconds(EditionEntries[EditionEntries_Pos].ChapterAtoms[ChapterAtoms_Pos].ChapterTimeStart/1000000).To_UTF8().c_str();
                     if (Text.size())
                         Text.resize(Text.size()-3);
-                    Fill(Stream_Menu, StreamPos_Last, Ztring().Duration_From_Milliseconds(EditionEntries[EditionEntries_Pos].ChapterAtoms[ChapterAtoms_Pos].ChapterTimeStart/1000000).To_UTF8().c_str(), Text);
+                    else
+                        Text = Time;
+                    Fill(Stream_Menu, StreamPos_Last, Time.To_UTF8().c_str(), Text);
                 }
             }
             Fill(Stream_Menu, StreamPos_Last, Menu_Chapters_Pos_End, Count_Get(Stream_Menu, StreamPos_Last), 10, true);

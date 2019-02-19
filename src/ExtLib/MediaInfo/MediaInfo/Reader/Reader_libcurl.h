@@ -48,6 +48,8 @@ public:
 
 private :
     curl_data*          Curl_Data;
+    void Curl_Log(int Result);
+    void Curl_Log(int Result, const Ztring &Message);
 };
 
 } //NameSpace

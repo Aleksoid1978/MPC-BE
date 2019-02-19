@@ -88,6 +88,9 @@ public:
     bool  IsNegative;
 };
 
+Ztring Date_MJD(int16u Date);
+Ztring Time_BCD(int32u Time);
+
 } //NameSpace
 
 #endif

@@ -926,7 +926,15 @@ extern "C"
     static GModule* libcurl_Module=NULL;
 #elif defined (_WIN32) || defined (WIN32)
     #undef __TEXT
-    #include <windows.h>
+    #if __cplusplus >= 201703L || _MSVC_LANG >= 201703L
+        namespace WindowsNamespace
+        {
+    #endif
+    #include "windows.h"
+    #if __cplusplus >= 201703L || _MSVC_LANG >= 201703L
+        }
+        using namespace WindowsNamespace;
+    #endif
     static HMODULE  libcurl_Module=NULL;
 #else
     #include <dlfcn.h>

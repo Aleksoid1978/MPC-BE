@@ -59,7 +59,31 @@ private :
     File_Avc &operator =(const File_Avc &);
 
     //Structures - seq_parameter_set
-    struct seq_parameter_set_struct
+    struct iso14496_base
+    {
+#if MEDIAINFO_DEMUX
+        int8u*  Iso14496_10_Buffer;
+        size_t  Iso14496_10_Buffer_Size;
+        iso14496_base() :Iso14496_10_Buffer(NULL), Iso14496_10_Buffer_Size(0) {}
+        ~iso14496_base()
+        {
+            delete[] Iso14496_10_Buffer;
+        }
+        void Init_Iso14496_10(int8u c, const int8u* Buffer, size_t Element_Size)
+        {
+            delete[] Iso14496_10_Buffer;
+            Iso14496_10_Buffer_Size = (size_t)(Element_Size + 4);
+            Iso14496_10_Buffer = new int8u[Iso14496_10_Buffer_Size];
+            Iso14496_10_Buffer[0] = 0x00;
+            Iso14496_10_Buffer[1] = 0x00;
+            Iso14496_10_Buffer[2] = 0x01;
+            Iso14496_10_Buffer[3] = c;
+            std::memcpy(Iso14496_10_Buffer + 4, Buffer, (size_t)Element_Size);
+        }
+#endif //MEDIAINFO_DEMUX
+    };
+
+    struct seq_parameter_set_struct : public iso14496_base
     {
         struct vui_parameters_struct
         {
@@ -192,10 +216,6 @@ private :
             vui_parameters_struct();
         };
         vui_parameters_struct* vui_parameters;
-        #if MEDIAINFO_DEMUX
-        int8u*  Iso14496_10_Buffer;
-        size_t  Iso14496_10_Buffer_Size;
-        #endif //MEDIAINFO_DEMUX
         int32u  pic_width_in_mbs_minus1;
         int32u  pic_height_in_map_units_minus1;
         int32u  frame_crop_left_offset;
@@ -231,10 +251,6 @@ private :
         seq_parameter_set_struct(vui_parameters_struct* vui_parameters_, int32u pic_width_in_mbs_minus1_, int32u pic_height_in_map_units_minus1_, int32u frame_crop_left_offset_, int32u frame_crop_right_offset_, int32u frame_crop_top_offset_, int32u frame_crop_bottom_offset_, int8u chroma_format_idc_, int8u profile_idc_, int8u level_idc_, int8u bit_depth_luma_minus8_, int8u bit_depth_chroma_minus8_, int8u log2_max_frame_num_minus4_, int8u pic_order_cnt_type_, int8u log2_max_pic_order_cnt_lsb_minus4_, int8u max_num_ref_frames_, bool constraint_set3_flag_, bool separate_colour_plane_flag_, bool delta_pic_order_always_zero_flag_, bool frame_mbs_only_flag_, bool mb_adaptive_frame_field_flag_)
             :
             vui_parameters(vui_parameters_),
-            #if MEDIAINFO_DEMUX
-            Iso14496_10_Buffer(NULL),
-            Iso14496_10_Buffer_Size(0),
-            #endif //MEDIAINFO_DEMUX
             pic_width_in_mbs_minus1(pic_width_in_mbs_minus1_),
             pic_height_in_map_units_minus1(pic_height_in_map_units_minus1_),
             frame_crop_left_offset(frame_crop_left_offset_),
@@ -278,9 +294,6 @@ private :
         ~seq_parameter_set_struct()
         {
             delete vui_parameters; //vui_parameters=NULL;
-            #if MEDIAINFO_DEMUX
-                delete[] Iso14496_10_Buffer;
-            #endif //MEDIAINFO_DEMUX
         }
 
     private:
@@ -291,11 +304,9 @@ private :
     typedef vector<seq_parameter_set_struct*> seq_parameter_set_structs;
 
     //Structures - pic_parameter_set
-    struct pic_parameter_set_struct
+    struct pic_parameter_set_struct : public iso14496_base
     {
         #if MEDIAINFO_DEMUX
-        int8u*  Iso14496_10_Buffer;
-        size_t  Iso14496_10_Buffer_Size;
         #endif //MEDIAINFO_DEMUX
         int8u   seq_parameter_set_id;
         int8u   num_ref_idx_l0_default_active_minus1;
@@ -312,10 +323,6 @@ private :
         //Constructor/Destructor
         pic_parameter_set_struct(int8u seq_parameter_set_id_, int8u num_ref_idx_l0_default_active_minus1_, int8u num_ref_idx_l1_default_active_minus1_, int8u weighted_bipred_idc_, int32u num_slice_groups_minus1_, int32u slice_group_map_type_, bool entropy_coding_mode_flag_, bool bottom_field_pic_order_in_frame_present_flag_, bool weighted_pred_flag_, bool redundant_pic_cnt_present_flag_, bool deblocking_filter_control_present_flag_)
             :
-            #if MEDIAINFO_DEMUX
-            Iso14496_10_Buffer(NULL),
-            Iso14496_10_Buffer_Size(0),
-            #endif //MEDIAINFO_DEMUX
             seq_parameter_set_id(seq_parameter_set_id_),
             num_ref_idx_l0_default_active_minus1(num_ref_idx_l0_default_active_minus1_),
             num_ref_idx_l1_default_active_minus1(num_ref_idx_l1_default_active_minus1_),
@@ -328,13 +335,6 @@ private :
             redundant_pic_cnt_present_flag(redundant_pic_cnt_present_flag_),
             deblocking_filter_control_present_flag(deblocking_filter_control_present_flag_)
         {
-        }
-
-            ~pic_parameter_set_struct()
-        {
-            #if MEDIAINFO_DEMUX
-                delete[] Iso14496_10_Buffer;
-            #endif //MEDIAINFO_DEMUX
         }
 
     private:
@@ -439,14 +439,12 @@ private :
     void SPS_PPS();
 
     //Streams
-    struct stream
+    struct stream : public stream_payload
     {
-        bool   Searching_Payload;
         bool   ShouldDuplicate;
 
         stream()
             :
-            Searching_Payload(false),
             ShouldDuplicate(false)
         {
         }

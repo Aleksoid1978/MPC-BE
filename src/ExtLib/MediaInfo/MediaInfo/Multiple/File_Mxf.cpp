@@ -576,18 +576,6 @@ static const char* Mxf_AVC_SequenceParameterSetFlag_Constancy(bool Constancy)
 }
 
 //---------------------------------------------------------------------------
-static const char* Mxf_AVC_ParameterSetFlag_Location(int8u Location)
-{
-    switch (Location)
-    {
-        case 0x01 : return "First access unit";
-        case 0x02 : return "Every access unit";
-        case 0x03 : return "Every GOP";
-        default   : return "";
-    }
-}
-
-//---------------------------------------------------------------------------
 static const char* Mxf_OperationalPattern(const int128u OperationalPattern)
 {
     //Item and Package Complexity
@@ -1712,7 +1700,7 @@ static const char* Mxf_AS11_AudioTrackLayout[Mxf_AS11_AudioTrackLayout_Count]=
 };
 struct mxf_as11_audiotracklayout_assignment
 {
-    size_t Count;
+    const int8u Count;
     const char* Assign[16];
 };
 static const mxf_as11_audiotracklayout_assignment Mxf_AS11_AudioTrackLayout_ChannelPositions[Mxf_AS11_AudioTrackLayout_Count]=
@@ -2180,7 +2168,7 @@ static string Mxf_AcquisitionMetadata_Sony_MonitoringBaseCurve(int128u Value)
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const char* ShowSource_List[] =
+static const char* ShowSource_List[] =
 {
     "colour_description",
     "colour_range",
@@ -2193,7 +2181,7 @@ const char* ShowSource_List[] =
     "MaxFALL",
     NULL
 };
-bool ShowSource_IsInList(const string &Value)
+static bool ShowSource_IsInList(const string &Value)
 {
     for (size_t i = 0; ShowSource_List[i]; i++)
         if (ShowSource_List[i] == Value)
@@ -2314,6 +2302,16 @@ File_Mxf::~File_Mxf()
         if (!Ancillary_IsBinded)
             delete Ancillary;
     #endif //defined(MEDIAINFO_ANCILLARY_YES)
+	
+    for (size_t i = 0; i < AcquisitionMetadataLists.size(); i++)
+        delete AcquisitionMetadataLists[ i ];
+	
+    AcquisitionMetadataLists.clear();
+	
+    for (size_t i = 0; i < AcquisitionMetadata_Sony_E201_Lists.size(); i++)
+        delete AcquisitionMetadata_Sony_E201_Lists[ i ];
+	
+    AcquisitionMetadata_Sony_E201_Lists.clear();
 }
 
 //***************************************************************************
@@ -4217,7 +4215,7 @@ void File_Mxf::Streams_Finish_Component_ForAS11(const int128u ComponentUID, floa
                                                         const mxf_as11_audiotracklayout_assignment &ChP=Mxf_AS11_AudioTrackLayout_ChannelPositions[AS11->second.AudioTrackLayout];
                                                         const mxf_as11_audiotracklayout_assignment &ChL=Mxf_AS11_AudioTrackLayout_ChannelLayout[AS11->second.AudioTrackLayout];
                                                         if (Count_Get(Stream_Audio)>=ChP.Count)
-                                                            for (size_t Pos=0; Pos<ChP.Count; ++Pos)
+                                                            for (int8u Pos=0; Pos<ChP.Count; ++Pos)
                                                             {
                                                                 if (ChP.Assign[Pos])
                                                                     Fill(Stream_Audio, Pos, Audio_ChannelPositions, ChP.Assign[Pos]);
@@ -11033,7 +11031,7 @@ void File_Mxf::PartitionMetadata()
                     Element_Size_WithPadding+=KAGSize_Corrected;
                 }
 
-                if (File_Offset+Buffer_Offset+Element_Size_WithPadding+HeaderByteCount+IndexByteCount > File_Size)
+                if (File_Offset+Buffer_Offset-Header_Size+Element_Size_WithPadding+HeaderByteCount+IndexByteCount > File_Size)
                     IsTruncated=true;
                 else
                     IsTruncated=false;

@@ -448,7 +448,12 @@ private :
     ZenLib::CriticalSection CS;
 
     void      Language_Set (stream_t StreamKind);
-
+    void      Language_Set_Internal(stream_t KindOfStream);
+    void      Language_Set_All(stream_t KindOfStream)
+    {
+        CriticalSectionLocker CSL(CS);
+        Language_Set_Internal(KindOfStream);
+    }
     //Event
     #if MEDIAINFO_EVENTS
     MediaInfo_Event_CallBackFunction* Event_CallBackFunction; //void Event_Handler(unsigned char* Data_Content, size_t Data_Size, void* UserHandler)

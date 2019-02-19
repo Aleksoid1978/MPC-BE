@@ -28,7 +28,15 @@
 #include <vector>
 #ifdef __WINDOWS__
     #undef __TEXT
+    #if __cplusplus >= 201703L || _MSVC_LANG >= 201703L
+        namespace WindowsNamespace
+        {
+    #endif
     #include "windows.h"
+    #if __cplusplus >= 201703L || _MSVC_LANG >= 201703L
+        }
+        using namespace WindowsNamespace;
+    #endif
 #endif // __WINDOWS__
 
 #if MEDIAINFO_EVENTS

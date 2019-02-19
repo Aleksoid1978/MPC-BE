@@ -2001,9 +2001,7 @@ void File_Mpegv::Read_Buffer_Unsynched()
 {
     for (int8u Pos=0x00; Pos<0xB9; Pos++)
     {
-        Streams[Pos].Searching_Payload=false;
-        Streams[Pos].Searching_TimeStamp_Start=false;
-        Streams[Pos].Searching_TimeStamp_End=false;
+        Streams[Pos].Init_Stream(false);
     }
     Streams[0xB3].Searching_TimeStamp_End=true; //sequence_header
     Streams[0xB8].Searching_TimeStamp_End=true; //group_start
@@ -2373,11 +2371,8 @@ void File_Mpegv::picture_start()
         #endif //MEDIAINFO_MACROBLOCKS
 
         //Temporal reference
-        if (TemporalReference_Offset+temporal_reference>=TemporalReference.size())
-            TemporalReference.resize(TemporalReference_Offset+temporal_reference+1);
-        if (TemporalReference[TemporalReference_Offset+temporal_reference]==NULL)
-            TemporalReference[TemporalReference_Offset+temporal_reference]=new temporalreference;
-        TemporalReference[TemporalReference_Offset+temporal_reference]->IsValid=true;
+        temporalreference* Ref=GetTemporalReference();
+        Ref->IsValid=true;
 
         //picture_coding_types
         if (picture_coding_type==1  && !FirstFieldFound) //I-Frame
@@ -3329,14 +3324,11 @@ void File_Mpegv::user_data_start_3()
             Scte_TemporalReference_Offset=Pos+1;
         }
 
-        if (TemporalReference_Offset+temporal_reference>=TemporalReference.size())
-            TemporalReference.resize(TemporalReference_Offset+temporal_reference+1);
-        if (TemporalReference[TemporalReference_Offset+temporal_reference]==NULL)
-            TemporalReference[TemporalReference_Offset+temporal_reference]=new temporalreference;
+        temporalreference* Ref=GetTemporalReference();
         buffer_data* BufferData=new buffer_data(Buffer+Buffer_Offset+(size_t)Element_Offset,(size_t)(Element_Size-Element_Offset));
-        TemporalReference[TemporalReference_Offset+temporal_reference]->Scte.push_back(BufferData);
-        TemporalReference[TemporalReference_Offset+temporal_reference]->Scte_Parsed.push_back(false);
-        if (TemporalReference[TemporalReference_Offset+temporal_reference]->Scte_Parsed.size()>=2 && TemporalReference[TemporalReference_Offset+temporal_reference]->Scte_Parsed[TemporalReference[TemporalReference_Offset+temporal_reference]->Scte_Parsed.size()-2] && Scte_TemporalReference_Offset==TemporalReference_Offset+temporal_reference+1)
+        Ref->Scte.push_back(BufferData);
+        Ref->Scte_Parsed.push_back(false);
+        if (Ref->Scte_Parsed.size()>=2 && Ref->Scte_Parsed[Ref->Scte_Parsed.size()-2] && Scte_TemporalReference_Offset==TemporalReference_Offset+temporal_reference+1)
             Scte_TemporalReference_Offset--;
 
         //Parsing
@@ -3505,11 +3497,7 @@ void File_Mpegv::user_data_start_GA94_03()
             GA94_03_TemporalReference_Offset=Pos+1;
         }
 
-        if (TemporalReference_Offset+temporal_reference>=TemporalReference.size())
-            TemporalReference.resize(TemporalReference_Offset+temporal_reference+1);
-        temporalreference* &Ref=TemporalReference[TemporalReference_Offset+temporal_reference];
-        if (Ref==NULL)
-            Ref=new temporalreference;
+        temporalreference* Ref=GetTemporalReference();
         if (Ref->GA94_03==NULL)
             Ref->GA94_03=new buffer_data;
         buffer_data* NewBuffer=Ref->GA94_03;
@@ -3898,16 +3886,13 @@ void File_Mpegv::extension_start()
                                 Interlaced_Bottom++;
                             PictureStructure_Frame++;
                             FirstFieldFound=false;
-                            if (TemporalReference_Offset+temporal_reference>=TemporalReference.size())
-                                TemporalReference.resize(TemporalReference_Offset+temporal_reference+1);
-                            if (TemporalReference[TemporalReference_Offset+temporal_reference]==NULL)
-                                TemporalReference[TemporalReference_Offset+temporal_reference]=new temporalreference;
-                            TemporalReference[TemporalReference_Offset+temporal_reference]->picture_coding_type=picture_coding_type;
-                            TemporalReference[TemporalReference_Offset+temporal_reference]->progressive_frame=progressive_frame;
-                            TemporalReference[TemporalReference_Offset+temporal_reference]->picture_structure=picture_structure;
-                            TemporalReference[TemporalReference_Offset+temporal_reference]->top_field_first=top_field_first;
-                            TemporalReference[TemporalReference_Offset+temporal_reference]->repeat_first_field=repeat_first_field;
-                            TemporalReference[TemporalReference_Offset+temporal_reference]->HasPictureCoding=true;
+                            temporalreference* Ref=GetTemporalReference();
+                            Ref->picture_coding_type=picture_coding_type;
+                            Ref->progressive_frame=progressive_frame;
+                            Ref->picture_structure=picture_structure;
+                            Ref->top_field_first=top_field_first;
+                            Ref->repeat_first_field=repeat_first_field;
+                            Ref->HasPictureCoding=true;
                         }
                         else                                //Field
                         {
@@ -3932,16 +3917,13 @@ void File_Mpegv::extension_start()
                         PictureStructure_Frame++;
                         if (picture_structure==3)           //Frame
                         {
-                            if (TemporalReference_Offset+temporal_reference>=TemporalReference.size())
-                                TemporalReference.resize(TemporalReference_Offset+temporal_reference+1);
-                            if (TemporalReference[TemporalReference_Offset+temporal_reference]==NULL)
-                                TemporalReference[TemporalReference_Offset+temporal_reference]=new temporalreference;
-                            TemporalReference[TemporalReference_Offset+temporal_reference]->picture_coding_type=picture_coding_type;
-                            TemporalReference[TemporalReference_Offset+temporal_reference]->progressive_frame=progressive_frame;
-                            TemporalReference[TemporalReference_Offset+temporal_reference]->picture_structure=picture_structure;
-                            TemporalReference[TemporalReference_Offset+temporal_reference]->top_field_first=top_field_first;
-                            TemporalReference[TemporalReference_Offset+temporal_reference]->repeat_first_field=repeat_first_field;
-                            TemporalReference[TemporalReference_Offset+temporal_reference]->HasPictureCoding=true;
+                            temporalreference* Ref=GetTemporalReference();
+                            Ref->picture_coding_type=picture_coding_type;
+                            Ref->progressive_frame=progressive_frame;
+                            Ref->picture_structure=picture_structure;
+                            Ref->top_field_first=top_field_first;
+                            Ref->repeat_first_field=repeat_first_field;
+                            Ref->HasPictureCoding=true;
                         }
                     }
                 FILLING_END();

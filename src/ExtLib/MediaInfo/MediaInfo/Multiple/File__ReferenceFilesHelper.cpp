@@ -1074,7 +1074,7 @@ void File__ReferenceFilesHelper::ParseReference()
                         if (Sequences[Sequences_Current]->MI->Info->FrameInfo.DTS!=(int64u)-1)
                             DTS_Temp=Sequences[Sequences_Current]->MI->Info->FrameInfo.DTS-Sequences[Sequences_Current]->MI->Info->Config->Demux_Offset_DTS_FromStream;
                     }
-                #endif MEDIAINFO_DEMUX
+                #endif //MEDIAINFO_DEMUX
 
                 DTS_Temp+=Sequences[Sequences_Current]->Resources[Sequences[Sequences_Current]->Resources_Current]->Demux_Offset_DTS;
                 if (!Sequences[Sequences_Current]->Resources.empty() && Sequences[Sequences_Current]->Resources_Current<Sequences[Sequences_Current]->Resources.size() && Sequences[Sequences_Current]->Resources[Sequences[Sequences_Current]->Resources_Current]->EditRate && Sequences[Sequences_Current]->Resources[Sequences[Sequences_Current]->Resources_Current]->IgnoreEditsBefore)

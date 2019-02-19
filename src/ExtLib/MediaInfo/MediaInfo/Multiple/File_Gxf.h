@@ -91,7 +91,7 @@ private :
     bool   Material_File_Size_IsValid;
 
     //Temp - Stream
-    struct stream
+    struct stream : public stream_time
     {
         std::vector<File__Analyze*> Parsers;
         int64u FirstFrameDuration; //In case of audio, indicates the duration of the first frame
@@ -104,9 +104,6 @@ private :
         int32u FieldsPerFrame_Code;
         int8u  MediaType;
         int8u  TrackID;
-        bool   Searching_Payload;
-        bool   Searching_TimeStamp_Start;
-        bool   Searching_TimeStamp_End;
         bool   IsChannelGrouping;
         bool   DisplayInfo; //In case of channel grouping, info is about the complete (2*half) stream, so second stream info must not be used
         Ztring MediaName;
@@ -122,9 +119,7 @@ private :
             StreamPos=(size_t)-1;
             TimeStamp_Start = (int32u)-1;
             TimeStamp_End = (int32u)-1;
-            Searching_Payload = false;
-            Searching_TimeStamp_Start=false;
-            Searching_TimeStamp_End=false;
+            Init_Stream(false);
             FrameRate_Code=(int32u)-1;
             LinesPerFrame_Code=(int32u)-1;
             FieldsPerFrame_Code=(int32u)-1;
