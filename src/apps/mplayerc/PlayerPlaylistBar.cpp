@@ -1010,9 +1010,6 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 			case VK_PRIOR:
 			case VK_NEXT:
 			case VK_DELETE:
-				if (pMsg->wParam == VK_DELETE && curTab.type == EXPLORER) {
-					return TRUE;
-				}
 			case VK_APPS: // "Menu key"
 				break;
 			default:
@@ -2416,22 +2413,20 @@ void CPlayerPlaylistBar::OnLvnKeyDown(NMHDR* pNMHDR, LRESULT* pResult)
 
 	*pResult = FALSE;
 
-	std::vector<int> items;
-	items.reserve(m_list.GetSelectedCount());
-	POSITION pos = m_list.GetFirstSelectedItemPosition();
-	while (pos) {
-		items.push_back(m_list.GetNextSelectedItem(pos));
-	}
+	switch (pLVKeyDown->wVKey) {
+	case VK_DELETE:
+		if (curTab.type == PLAYLIST && m_list.GetSelectedCount() > 0) {
+			std::vector<int> items;
+			items.reserve(m_list.GetSelectedCount());
+			POSITION pos = m_list.GetFirstSelectedItemPosition();
+			while (pos) {
+				items.push_back(m_list.GetNextSelectedItem(pos));
+			}
+			Remove(items, GetKeyState(VK_SHIFT) < 0);
 
-	if (pLVKeyDown->wVKey == VK_DELETE && items.size() > 0) {
-		Remove(items, GetKeyState(VK_SHIFT) < 0);
-
-		*pResult = TRUE;
-	} else if (pLVKeyDown->wVKey == VK_SPACE && items.size() == 1) {
-		curPlayList.SetPos(FindPos(items.front()));
-		m_pMainFrame->OpenCurPlaylistItem();
-
-		*pResult = TRUE;
+			*pResult = TRUE;
+		}
+		break;
 	}
 }
 
