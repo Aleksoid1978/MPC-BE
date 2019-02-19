@@ -3785,9 +3785,9 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 	submenu.AppendMenuW(MF_BYPOSITION | MF_STRING | MF_ENABLED, id++, ResStr(IDS_PLAYLIST_ADD_PLAYLIST));
 	submenu.AppendMenuW(MF_BYPOSITION | MF_STRING | MF_ENABLED, id++, ResStr(IDS_PLAYLIST_ADD_EXPLORER));
 	menu.AppendMenuW(MF_BYPOSITION | MF_STRING | MF_POPUP | MF_ENABLED, (UINT_PTR)submenu.Detach(), ResStr(IDS_PLAYLIST_ADD_NEW));
-	menu.AppendMenuW(MF_BYPOSITION | MF_STRING | ((m_nCurPlayListIndex > 0 && curTab.type != BUTTON) ? MF_ENABLED : (MF_DISABLED | MF_GRAYED))
+	menu.AppendMenuW(MF_BYPOSITION | MF_STRING | ((m_nCurPlayListIndex > 0) ? MF_ENABLED : (MF_DISABLED | MF_GRAYED))
 		, id++, ResStr(IDS_PLAYLIST_RENAME_CURRENT));
-	menu.AppendMenuW(MF_BYPOSITION | MF_STRING | ((m_nCurPlayListIndex > 0 && curTab.type != BUTTON) ? MF_ENABLED : (MF_DISABLED | MF_GRAYED))
+	menu.AppendMenuW(MF_BYPOSITION | MF_STRING | ((m_nCurPlayListIndex > 0) ? MF_ENABLED : (MF_DISABLED | MF_GRAYED))
 		, id++, ResStr(IDS_PLAYLIST_DELETE_CURRENT));
 	
 	if (s.bUseDarkTheme && s.bDarkMenu) {
@@ -4241,7 +4241,7 @@ void CPlayerPlaylistBar::TSaveSettings()
 		for (size_t i = 0; i <= last; i++) {
 			const auto& tab = m_tabs[i];
 			CString s;
-			str.AppendFormat(L"%u;%s;%u%s%s", tab.type, RemoveFileExt(tab.fn.GetString()).GetString(), tab.sort, i > 0 ? CString(L";" + tab.name).GetString() : L"", i < last ? L"|" : L"");
+			str.AppendFormat(L"%d;%s;%u%s%s", tab.type, RemoveFileExt(tab.fn.GetString()).GetString(), tab.sort, i > 0 ? CString(L";" + tab.name).GetString() : L"", i < last ? L"|" : L"");
 		}
 	}
 

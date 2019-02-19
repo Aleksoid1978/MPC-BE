@@ -223,10 +223,9 @@ private:
 	int m_button_idx = -1;
 
 #define WIDTH_TABBUTTON 20
-	enum PLAYLIST_TYPE : BYTE {
+	enum PLAYLIST_TYPE : int {
 		PLAYLIST,
-		EXPLORER,
-		BUTTON
+		EXPLORER
 	};
 
 	enum {
