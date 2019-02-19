@@ -256,4 +256,35 @@ int64s TimeCode::ToMilliseconds()
 //
 //***************************************************************************
 
+//---------------------------------------------------------------------------
+//Modified Julian Date
+Ztring Date_MJD(int16u Date_)
+{
+    //Calculating
+    float64 Date=Date_;
+    int Y2=(int)((Date-15078.2)/365.25);
+    int M2=(int)(((Date-14956.1) - ((int)(Y2*365.25))) /30.6001);
+    int D =(int)(Date-14956 - ((int)(Y2*365.25)) - ((int)(M2*30.6001)));
+    int K=0;
+    if (M2==14 || M2==15)
+        K=1;
+    int Y =Y2+K;
+    int M =M2-1-K*12;
+
+    //Formating
+    return                       Ztring::ToZtring(1900+Y)+__T("-")
+         + (M<10?__T("0"):__T(""))+Ztring::ToZtring(     M)+__T("-")
+         + (D<10?__T("0"):__T(""))+Ztring::ToZtring(     D);
+}
+
+//---------------------------------------------------------------------------
+//Form: HHMMSS, BCD
+Ztring Time_BCD(int32u Time)
+{
+    return (((Time>>16)&0xFF)<10?__T("0"):__T("")) + Ztring::ToZtring((Time>>16)&0xFF, 16)+__T(":") //BCD
+         + (((Time>> 8)&0xFF)<10?__T("0"):__T("")) + Ztring::ToZtring((Time>> 8)&0xFF, 16)+__T(":") //BCD
+         + (((Time    )&0xFF)<10?__T("0"):__T("")) + Ztring::ToZtring((Time    )&0xFF, 16);        //BCD
+}
+
+
 } //NameSpace

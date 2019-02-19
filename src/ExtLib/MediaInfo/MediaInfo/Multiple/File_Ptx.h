@@ -45,6 +45,7 @@ private :
 
     //Buffer - File header
     bool FileHeader_Begin();
+    static bool Is_FileName_Exception(const Ztring& FileName);
 };
 
 } //NameSpace

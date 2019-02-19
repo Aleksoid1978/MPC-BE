@@ -245,8 +245,8 @@ void File_Aac::program_config_element()
     {
         case  0 : break;
         case  1 : Channels_Positions+=__T(", Back: C"); ChannelLayout+=__T("Cs "); break;
-        case  2 : Channels_Positions+=__T(", Back: L R"); ChannelLayout+=__T("Rls Rrs "); break;
-        case  3 : Channels_Positions+=__T(", Back: L C R"); ChannelLayout+=__T("Rls Cs Rrs "); break;
+        case  2 : Channels_Positions+=__T(", Back: L R"); ChannelLayout+=__T("Lrs Rrs "); break;
+        case  3 : Channels_Positions+=__T(", Back: L C R"); ChannelLayout+=__T("Lrs Rrs Cs "); break;
         default : Channels_Positions+=__T(", Back: "); Channels_Positions+=Ztring::ToZtring(Channels_Back); ChannelLayout+=__T("? "); //Which config?
     }
     switch (Channels_LFE)

@@ -108,6 +108,8 @@
 #include "ThirdParty/base64/base64.h"
 #include <zlib.h>
 #include <algorithm>
+#include <cmath>
+#include <cfloat>
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -2764,8 +2766,57 @@ void File_Mpeg4::moov_meta_ilst_xxxx_data()
                         else if (Value==__T("143461")) Value=__T("New Zealand");
                         else if (Value==__T("143462")) Value=__T("Japan");
                         else if (Value==__T("143463")) Value=__T("Hong Kong");
+                        else if (Value==__T("143464")) Value=__T("Singapore");
+                        else if (Value==__T("143466")) Value=__T("South Korea");
+                        else if (Value==__T("143467")) Value=__T("India");
+                        else if (Value==__T("143468")) Value=__T("Mexico");
                         else if (Value==__T("143469")) Value=__T("Russia");
                         else if (Value==__T("143470")) Value=__T("Taiwan");
+                        else if (Value==__T("143471")) Value=__T("Vietnam");
+                        else if (Value==__T("143473")) Value=__T("Malaysia");
+                        else if (Value==__T("143474")) Value=__T("Philippines");
+                        else if (Value==__T("143475")) Value=__T("Thailand");
+                        else if (Value==__T("143476")) Value=__T("Indonesia");
+                        else if (Value==__T("143479")) Value=__T("Saudi Arabia");
+                        else if (Value==__T("143480")) Value=__T("Turkey");
+                        else if (Value==__T("143481")) Value=__T("United Arab Emirates");
+                        else if (Value==__T("143482")) Value=__T("Hungary");
+                        else if (Value==__T("143483")) Value=__T("Chile");
+                        else if (Value==__T("143485")) Value=__T("Panama");
+                        else if (Value==__T("143487")) Value=__T("Romania");
+                        else if (Value==__T("143488")) Value=__T("Maldives");
+                        else if (Value==__T("143489")) Value=__T("Czech Republic");
+                        else if (Value==__T("143492")) Value=__T("Ukraine");
+                        else if (Value==__T("143494")) Value=__T("Croatia");
+                        else if (Value==__T("143495")) Value=__T("Costa Rica");
+                        else if (Value==__T("143498")) Value=__T("Qatar");
+                        else if (Value==__T("143501")) Value=__T("Colombia");
+                        else if (Value==__T("143502")) Value=__T("Venezuela");
+                        else if (Value==__T("143503")) Value=__T("Brazil");
+                        else if (Value==__T("143504")) Value=__T("Guatemala");
+                        else if (Value==__T("143505")) Value=__T("Argentina");
+                        else if (Value==__T("143506")) Value=__T("El Salvador");
+                        else if (Value==__T("143507")) Value=__T("Peru");
+                        else if (Value==__T("143508")) Value=__T("Dominican Republic");
+                        else if (Value==__T("143509")) Value=__T("Ecuador");
+                        else if (Value==__T("143510")) Value=__T("Honduras");
+                        else if (Value==__T("143511")) Value=__T("Jamaica");
+                        else if (Value==__T("143512")) Value=__T("Nicaragua");
+                        else if (Value==__T("143513")) Value=__T("Paraguay");
+                        else if (Value==__T("143514")) Value=__T("Uruguay");
+                        else if (Value==__T("143516")) Value=__T("Egypt");
+                        else if (Value==__T("143520")) Value=__T("Lithuania");
+                        else if (Value==__T("143526")) Value=__T("Bulgaria");
+                        else if (Value==__T("143529")) Value=__T("Kenya");
+                        else if (Value==__T("143539")) Value=__T("The Bahamas");
+                        else if (Value==__T("143541")) Value=__T("Barbados");
+                        else if (Value==__T("143553")) Value=__T("Guyana");
+                        else if (Value==__T("143555")) Value=__T("Belize");
+                        else if (Value==__T("143556")) Value=__T("Bolivia");
+                        else if (Value==__T("143558")) Value=__T("Iceland");
+                        else if (Value==__T("143565")) Value=__T("Belarus");
+                        else if (Value==__T("143583")) Value=__T("Fiji Islands");
+                        else if (Value==__T("143597")) Value=__T("Papua New Guinea");
                     }
                     if (!Parameter.empty())
                     {
@@ -4862,7 +4913,7 @@ void File_Mpeg4::moov_trak_mdia_minf_stbl_stsd_xxxxVideo()
             Fill(Stream_Video, StreamPos_Last, Video_Width, Width, 10, true);
         if (Height)
             Fill(Stream_Video, StreamPos_Last, Video_Height, Height, 10, true);
-        if (moov_trak_tkhd_DisplayAspectRatio && Height && moov_trak_tkhd_DisplayAspectRatio!=((float32)Width)/Height)
+        if (moov_trak_tkhd_DisplayAspectRatio && Height && fabs(moov_trak_tkhd_DisplayAspectRatio-((float32)Width)/Height)>=FLT_EPSILON)
         {
             Fill(Stream_Video, StreamPos_Last, Video_DisplayAspectRatio, moov_trak_tkhd_DisplayAspectRatio, 3, true);
             Fill(Stream_Video, StreamPos_Last, Video_PixelAspectRatio, moov_trak_tkhd_DisplayAspectRatio/Width*Height, 3, true);

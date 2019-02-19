@@ -2576,11 +2576,9 @@ const Ztring MediaInfo_Config::Iso639_Translate (const Ztring Value)
 }
 
 //---------------------------------------------------------------------------
-const Ztring &MediaInfo_Config::Info_Get (stream_t KindOfStream, const Ztring &Value, info_t KindOfInfo)
+void MediaInfo_Config::Language_Set_Internal(stream_t KindOfStream)
 {
     //Loading codec table if not yet done
-    {
-    CriticalSectionLocker CSL(CS);
     if (Info[KindOfStream].empty())
         switch (KindOfStream)
         {
@@ -2591,9 +2589,14 @@ const Ztring &MediaInfo_Config::Info_Get (stream_t KindOfStream, const Ztring &V
             case Stream_Other :     MediaInfo_Config_Other(Info[Stream_Other]);       Language_Set(Stream_Other); break;
             case Stream_Image :     MediaInfo_Config_Image(Info[Stream_Image]);       Language_Set(Stream_Image); break;
             case Stream_Menu :      MediaInfo_Config_Menu(Info[Stream_Menu]);         Language_Set(Stream_Menu); break;
-            default:;
+        default:;
         }
-    }
+}
+
+//---------------------------------------------------------------------------
+const Ztring &MediaInfo_Config::Info_Get (stream_t KindOfStream, const Ztring &Value, info_t KindOfInfo)
+{
+    Language_Set_All(KindOfStream);
     if (KindOfStream>=Stream_Max)
         return EmptyString_Get();
     size_t Pos=Info[KindOfStream].Find(Value);
@@ -2604,22 +2607,8 @@ const Ztring &MediaInfo_Config::Info_Get (stream_t KindOfStream, const Ztring &V
 
 const Ztring &MediaInfo_Config::Info_Get (stream_t KindOfStream, size_t Pos, info_t KindOfInfo)
 {
-    //Loading codec table if not yet done
-    {
-    CriticalSectionLocker CSL(CS);
-    if (Info[KindOfStream].empty())
-        switch (KindOfStream)
-        {
-            case Stream_General :   MediaInfo_Config_General(Info[Stream_General]);   Language_Set(Stream_General); break;
-            case Stream_Video :     MediaInfo_Config_Video(Info[Stream_Video]);       Language_Set(Stream_Video); break;
-            case Stream_Audio :     MediaInfo_Config_Audio(Info[Stream_Audio]);       Language_Set(Stream_Audio); break;
-            case Stream_Text :      MediaInfo_Config_Text(Info[Stream_Text]);         Language_Set(Stream_Text); break;
-            case Stream_Other :     MediaInfo_Config_Other(Info[Stream_Other]);       Language_Set(Stream_Other); break;
-            case Stream_Image :     MediaInfo_Config_Image(Info[Stream_Image]);       Language_Set(Stream_Image); break;
-            case Stream_Menu :      MediaInfo_Config_Menu(Info[Stream_Menu]);         Language_Set(Stream_Menu); break;
-            default:;
-        }
-     }
+    Language_Set_All(KindOfStream);
+
     if (KindOfStream>=Stream_Max)
         return EmptyString_Get();
     if (Pos>=Info[KindOfStream].size() || (size_t)KindOfInfo>=Info[KindOfStream][Pos].size())
@@ -2632,22 +2621,8 @@ const ZtringListList &MediaInfo_Config::Info_Get(stream_t KindOfStream)
     if (KindOfStream>=Stream_Max)
         return EmptyStringListList_Get();
 
-    //Loading codec table if not yet done
-    {
-    CriticalSectionLocker CSL(CS);
-    if (Info[KindOfStream].empty())
-        switch (KindOfStream)
-        {
-            case Stream_General :   MediaInfo_Config_General(Info[Stream_General]);   Language_Set(Stream_General); break;
-            case Stream_Video :     MediaInfo_Config_Video(Info[Stream_Video]);       Language_Set(Stream_Video); break;
-            case Stream_Audio :     MediaInfo_Config_Audio(Info[Stream_Audio]);       Language_Set(Stream_Audio); break;
-            case Stream_Text :      MediaInfo_Config_Text(Info[Stream_Text]);         Language_Set(Stream_Text); break;
-            case Stream_Other :     MediaInfo_Config_Other(Info[Stream_Other]);       Language_Set(Stream_Other); break;
-            case Stream_Image :     MediaInfo_Config_Image(Info[Stream_Image]);       Language_Set(Stream_Image); break;
-            case Stream_Menu :      MediaInfo_Config_Menu(Info[Stream_Menu]);         Language_Set(Stream_Menu); break;
-            default:;
-        }
-    }
+    Language_Set_All(KindOfStream);
+
     return Info[KindOfStream];
 }
 
@@ -3030,20 +3005,7 @@ Ztring MediaInfo_Config::MAXML_StreamKinds_Get ()
     CriticalSectionLocker CSL(CS);
     for (size_t StreamKind=0; StreamKind<Stream_Max; StreamKind++)
     {
-        if (Info[StreamKind].empty())
-        {
-            switch (StreamKind)
-            {
-                case Stream_General :   MediaInfo_Config_General(Info[Stream_General]);   Language_Set(Stream_General); break;
-                case Stream_Video :     MediaInfo_Config_Video(Info[Stream_Video]);       Language_Set(Stream_Video); break;
-                case Stream_Audio :     MediaInfo_Config_Audio(Info[Stream_Audio]);       Language_Set(Stream_Audio); break;
-                case Stream_Text :      MediaInfo_Config_Text(Info[Stream_Text]);         Language_Set(Stream_Text); break;
-                case Stream_Other :     MediaInfo_Config_Other(Info[Stream_Other]);       Language_Set(Stream_Other); break;
-                case Stream_Image :     MediaInfo_Config_Image(Info[Stream_Image]);       Language_Set(Stream_Image); break;
-                case Stream_Menu :      MediaInfo_Config_Menu(Info[Stream_Menu]);         Language_Set(Stream_Menu); break;
-                default:;
-            }
-        }
+        Language_Set_Internal(stream_t(StreamKind));
         List.push_back(Info[StreamKind](__T("StreamKind"), Info_Name, Info_Text));
     }
 
@@ -3061,20 +3023,8 @@ Ztring MediaInfo_Config::MAXML_Fields_Get (const Ztring &StreamKind_String)
     size_t StreamKind=Stream_General;
     for (; StreamKind<Stream_Max; StreamKind++)
     {
-        if (Info[StreamKind].empty())
-        {
-            switch (StreamKind)
-            {
-                case Stream_General :   MediaInfo_Config_General(Info[Stream_General]);   Language_Set(Stream_General); break;
-                case Stream_Video :     MediaInfo_Config_Video(Info[Stream_Video]);       Language_Set(Stream_Video); break;
-                case Stream_Audio :     MediaInfo_Config_Audio(Info[Stream_Audio]);       Language_Set(Stream_Audio); break;
-                case Stream_Text :      MediaInfo_Config_Text(Info[Stream_Text]);         Language_Set(Stream_Text); break;
-                case Stream_Other :     MediaInfo_Config_Other(Info[Stream_Other]);       Language_Set(Stream_Other); break;
-                case Stream_Image :     MediaInfo_Config_Image(Info[Stream_Image]);       Language_Set(Stream_Image); break;
-                case Stream_Menu :      MediaInfo_Config_Menu(Info[Stream_Menu]);         Language_Set(Stream_Menu); break;
-                default:;
-            }
-        }
+        Language_Set_Internal(stream_t(StreamKind));
+
         if (StreamKind_String==Info[StreamKind](__T("StreamKind"), Info_Name, Info_Text))
             break;
     }

@@ -45,6 +45,8 @@ public:
     //The data
     ZenLib::Format::Html::Handler   *Html;
     bool                            IsCopy;
+private:
+    Request &operator =(const Request &a);
 };
 
 } //Namespace

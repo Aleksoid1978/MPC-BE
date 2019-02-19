@@ -97,6 +97,17 @@ bool File_Ptx::FileHeader_Begin()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+bool File_Ptx::Is_FileName_Exception(const Ztring& FileName)
+{
+    return FileName != __T("1 kHz @ -20dB.wav") //Exception?
+        && FileName != __T("1K@-20db.wav") //Exception?
+        && FileName != __T("1K@0VU-20REF.wav") //Exception?
+        && FileName != __T("1k@0vu -20.wav") //Exception?
+        && FileName != __T("1Khz@-20dB.wav") //Exception?
+        && FileName.find(__T(".1Khz.wav")) == string::npos //Exception?
+        && FileName.find(__T("_1KTONE_")) == string::npos; //Exception?
+}
+//---------------------------------------------------------------------------
 void File_Ptx::Read_Buffer_Continue()
 {
     if (File_Offset || Buffer_Offset)
@@ -468,13 +479,7 @@ void File_Ptx::Read_Buffer_Continue()
                 if (Roles[Pos]==0x02
                  && Purposes[Pos]==0x45564157 //"EWAV"
                  && Pos-Pos_Offset<Names.size()
-                 && FileNames[Pos]!=__T("1 kHz @ -20dB.wav") //Exception?
-                 && FileNames[Pos]!=__T("1K@-20db.wav") //Exception?
-                 && FileNames[Pos]!=__T("1K@0VU-20REF.wav") //Exception?
-                 && FileNames[Pos]!=__T("1k@0vu -20.wav") //Exception?
-                 && FileNames[Pos]!=__T("1Khz@-20dB.wav") //Exception?
-                 && FileNames[Pos].find(__T(".1Khz.wav"))==string::npos //Exception?
-                 && FileNames[Pos].find(__T("_1KTONE_"))==string::npos //Exception?
+                 && Is_FileName_Exception(FileNames[Pos])
                  && FileNamesLowerCase[Pos].find(Names[Pos-Pos_Offset]+__T(".wav"))!=string::npos
                  && FileNamesLowerCase[Pos].find(Names[Pos-Pos_Offset]+__T(".wav"))+Names[Pos-Pos_Offset].size()+4==FileNames[Pos].size())
                 {
@@ -499,13 +504,7 @@ void File_Ptx::Read_Buffer_Continue()
             {
                 if (Roles[Pos]==0x02
                     && Pos-Pos_Offset<Names.size()
-                 && FileNames[Pos]!=__T("1 kHz @ -20dB.wav") //Exception?
-                 && FileNames[Pos]!=__T("1K@-20db.wav") //Exception?
-                 && FileNames[Pos]!=__T("1K@0VU-20REF.wav") //Exception?
-                 && FileNames[Pos]!=__T("1k@0vu -20.wav") //Exception?
-                 && FileNames[Pos]!=__T("1Khz@-20dB.wav") //Exception?
-                 && FileNames[Pos].find(__T(".1Khz.wav"))==string::npos //Exception?
-                 && FileNames[Pos].find(__T("_1KTONE_"))==string::npos) //Exception?
+                    && Is_FileName_Exception(FileNames[Pos]))
                 {
                      Ztring FileName=FileNames[Pos];
                      Ztring Name=Names[Pos-Pos_Offset];
@@ -537,13 +536,7 @@ void File_Ptx::Read_Buffer_Continue()
             {
                 if (Roles[Pos]==0x02
                  && Purposes[Pos]==0x45564157 //"EWAV"
-                 && FileNames[Pos]!=__T("1 kHz @ -20dB.wav") //Exception?
-                 && FileNames[Pos]!=__T("1K@-20db.wav") //Exception?
-                 && FileNames[Pos]!=__T("1K@0VU-20REF.wav") //Exception?
-                 && FileNames[Pos]!=__T("1k@0vu -20.wav") //Exception?
-                 && FileNames[Pos]!=__T("1Khz@-20dB.wav") //Exception?
-                 && FileNames[Pos].find(__T(".1Khz.wav"))==string::npos //Exception?
-                 && FileNames[Pos].find(__T("_1KTONE_"))==string::npos) //Exception?
+                 && Is_FileName_Exception(FileNames[Pos])) //Exception?
                 {
                     for (int32u Pos2=0; Pos2<Names.size(); Pos2++)
                         if (FileNamesLowerCase[Pos].find(Names[Pos2])==0)
@@ -565,13 +558,7 @@ void File_Ptx::Read_Buffer_Continue()
             {
                 if (Roles[Pos]==0x02
                  && Purposes[Pos]==0x45564157 //"EWAV"
-                 && FileNames[Pos]!=__T("1 kHz @ -20dB.wav") //Exception?
-                 && FileNames[Pos]!=__T("1K@-20db.wav") //Exception?
-                 && FileNames[Pos]!=__T("1K@0VU-20REF.wav") //Exception?
-                 && FileNames[Pos]!=__T("1k@0vu -20.wav") //Exception?
-                 && FileNames[Pos]!=__T("1Khz@-20dB.wav") //Exception?
-                 && FileNames[Pos].find(__T(".1Khz.wav"))==string::npos //Exception?
-                 && FileNames[Pos].find(__T("_1KTONE_"))==string::npos) //Exception?
+                 && Is_FileName_Exception(FileNames[Pos])) //Exception?
                 {
                     sequence* Sequence=new sequence;
                     Sequence->StreamKind=Stream_Audio;
@@ -587,13 +574,7 @@ void File_Ptx::Read_Buffer_Continue()
             for (int32u Pos=0; Pos<FileName_Count; Pos++)
             {
                 if (Roles[Pos]==0x02
-                 && FileNames[Pos]!=__T("1 kHz @ -20dB.wav") //Exception?
-                 && FileNames[Pos]!=__T("1K@-20db.wav") //Exception?
-                 && FileNames[Pos]!=__T("1K@0VU-20REF.wav") //Exception?
-                 && FileNames[Pos]!=__T("1k@0vu -20.wav") //Exception?
-                 && FileNames[Pos]!=__T("1Khz@-20dB.wav") //Exception?
-                 && FileNames[Pos].find(__T(".1Khz.wav"))==string::npos //Exception?
-                 && FileNames[Pos].find(__T("_1KTONE_"))==string::npos) //Exception?
+                    && Is_FileName_Exception(FileNames[Pos]))//Exception?
                 {
                     sequence* Sequence=new sequence;
                     Sequence->StreamKind=Stream_Audio;

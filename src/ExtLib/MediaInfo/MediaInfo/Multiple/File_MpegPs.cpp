@@ -887,27 +887,15 @@ void File_MpegPs::Synched_Init()
     //TS specific
     if (FromTS)
     {
-        Streams[0xBD].Searching_Payload=true;            //private_stream_1
-        Streams[0xBD].Searching_TimeStamp_Start=true;    //private_stream_1
-        Streams[0xBD].Searching_TimeStamp_End=true;      //private_stream_1
-        Streams[0xBF].Searching_Payload=true;            //private_stream_2
-        Streams[0xBF].Searching_TimeStamp_Start=true;    //private_stream_2
-        Streams[0xBF].Searching_TimeStamp_End=true;      //private_stream_2
+        Streams[0xBD].Init_Stream(true);            //private_stream_1
+        Streams[0xBF].Init_Stream(true);            //private_stream_2
         for (int8u Pos=0xC0; Pos<=0xEF; Pos++)
         {
-            Streams[Pos].Searching_Payload=true;         //audio_stream or video_stream
-            Streams[Pos].Searching_TimeStamp_Start=true; //audio_stream or video_stream
-            Streams[Pos].Searching_TimeStamp_End=true;   //audio_stream or video_stream
+            Streams[Pos].Init_Stream(true);         //audio_stream or video_stream
         }
-        Streams[0xFA].Searching_Payload=true;            //LATM
-        Streams[0xFA].Searching_TimeStamp_Start=true;    //LATM
-        Streams[0xFA].Searching_TimeStamp_End=true;      //LATM
-        Streams[0xFD].Searching_Payload=true;            //extension_stream
-        Streams[0xFD].Searching_TimeStamp_Start=true;    //extension_stream
-        Streams[0xFD].Searching_TimeStamp_End=true;      //extension_stream
-        Streams[0xFE].Searching_Payload=true;            //extension_stream?
-        Streams[0xFE].Searching_TimeStamp_Start=true;    //extension_stream?
-        Streams[0xFE].Searching_TimeStamp_End=true;      //extension_stream?
+        Streams[0xFA].Init_Stream(true);      //LATM
+        Streams[0xFD].Init_Stream(true);      //extension_stream
+        Streams[0xFE].Init_Stream(true);      //extension_stream?
     }
 
     //
@@ -2728,9 +2716,7 @@ void File_MpegPs::private_stream_1()
         }
         Streams[stream_id].StreamRegistration_Count++;
         Streams_Private1[private_stream_1_ID].StreamRegistration_Count++;
-        Streams_Private1[private_stream_1_ID].Searching_Payload=true;
-        Streams_Private1[private_stream_1_ID].Searching_TimeStamp_Start=true;
-        Streams_Private1[private_stream_1_ID].Searching_TimeStamp_End=true;
+        Streams_Private1[private_stream_1_ID].Init_Stream(true);
         Streams_Private1[private_stream_1_ID].FirstPacketOrder=FirstPacketOrder_Last;
         FirstPacketOrder_Last++;
 

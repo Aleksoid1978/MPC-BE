@@ -1306,7 +1306,7 @@ void File_Ac3::Streams_Fill()
             {
                 if (acmod_Max[Pos][Pos2]==(int8u)-1)
                     break;
-                if (acmod_Max[Pos][Pos2]!=(int8u)-1)
+                else
                 {
                     if (acmod_Max[Pos][Pos2]==2)
                     {

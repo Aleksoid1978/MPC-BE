@@ -25,7 +25,15 @@
 #if MEDIAINFO_READTHREAD
     #ifdef WINDOWS
         #undef __TEXT
-        #include "Windows.h"
+        #if __cplusplus >= 201703L || _MSVC_LANG >= 201703L
+            namespace WindowsNamespace
+            {
+        #endif
+        #include "windows.h"
+        #if __cplusplus >= 201703L || _MSVC_LANG >= 201703L
+            }
+            using namespace WindowsNamespace;
+        #endif
     #endif //WINDOWS
 #endif //MEDIAINFO_READTHREAD
 //---------------------------------------------------------------------------
@@ -79,6 +87,9 @@ public :
             HANDLE Condition_WaitingForMorePlace;
             HANDLE Condition_WaitingForMoreData;
         #endif //WINDOWS
+private:
+    void Destroy_Thread(MediaInfo_Internal* MI);
+public:
     #endif //MEDIAINFO_READTHREAD
     CriticalSection CS;
     MediaInfo_Internal* MI_Internal;

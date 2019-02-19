@@ -233,16 +233,6 @@ void File_Teletext::Read_Buffer_Unsynched()
         Parser->Open_Buffer_Unsynch();
 }
 
-static inline int8u ReverseBits(int8u c)
-{
-    // Input: bit order is 76543210
-    //Output: bit order is 01234567
-    c = (c & 0x0F) << 4 | (c & 0xF0) >> 4;
-    c = (c & 0x33) << 2 | (c & 0xCC) >> 2;
-    c = (c & 0x55) << 1 | (c & 0xAA) >> 1;
-    return c;
-}
-
 //---------------------------------------------------------------------------
 void File_Teletext::Read_Buffer_Continue()
 {

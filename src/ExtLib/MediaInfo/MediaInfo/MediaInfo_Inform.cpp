@@ -485,7 +485,6 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
         bool XML=false;
         bool XML_0_7_78=false;
         bool JSON=false;
-        std::vector<Node*> Nodes;
         #endif //MEDIAINFO_XML_YES || MEDIAINFO_JSON_YES
 
         #if defined(MEDIAINFO_HTML_YES)

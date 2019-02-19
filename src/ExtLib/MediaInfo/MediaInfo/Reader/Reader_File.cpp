@@ -28,7 +28,15 @@
 #include "ZenLib/FileName.h"
 #ifdef WINDOWS
     #undef __TEXT
-    #include "Windows.h"
+    #if __cplusplus >= 201703L || _MSVC_LANG >= 201703L
+        namespace WindowsNamespace
+        {
+    #endif
+    #include "windows.h"
+    #if __cplusplus >= 201703L || _MSVC_LANG >= 201703L
+        }
+        using namespace WindowsNamespace;
+    #endif
 #endif //WINDOWS
 using namespace ZenLib;
 using namespace std;
@@ -125,25 +133,38 @@ const size_t Buffer_NoJump=128*1024;
 Reader_File::~Reader_File()
 {
     #if MEDIAINFO_READTHREAD
-        if (ThreadInstance)
-        {
-            ThreadInstance->RequestTerminate();
-            SetEvent(Condition_WaitingForMorePlace);
-            while (!ThreadInstance->IsExited())
-                Sleep(0);
-            #ifdef WINDOWS
-                CloseHandle(Condition_WaitingForMorePlace);
-                CloseHandle(Condition_WaitingForMoreData);
-            #endif //WINDOWS
-            delete ThreadInstance;
-
-            MI_Internal->Config.File_Buffer=NULL;
-            MI_Internal->Config.File_Buffer_Size=0;
-            MI_Internal->Config.File_Buffer_Size_Max=0;
-            delete[] Buffer;
-        }
+        Destroy_Thread(MI_Internal);
     #endif //MEDIAINFO_READTHREAD
 }
+
+//---------------------------------------------------------------------------
+#if MEDIAINFO_READTHREAD
+void Reader_File::Destroy_Thread(MediaInfo_Internal* MI)
+{
+    if (ThreadInstance)
+    {
+        ThreadInstance->RequestTerminate();
+        SetEvent(Condition_WaitingForMorePlace);
+        while (!ThreadInstance->IsExited())
+            Sleep(0);
+#ifdef WINDOWS
+        CloseHandle(Condition_WaitingForMorePlace);
+        CloseHandle(Condition_WaitingForMoreData);
+#endif //WINDOWS
+        delete ThreadInstance; ThreadInstance = NULL;
+
+        MI->Config.File_Buffer = NULL;
+        MI->Config.File_Buffer_Size = 0;
+        MI->Config.File_Buffer_Size_Max = 0;
+        Buffer_Max = 0;
+        delete[] Buffer; Buffer = NULL;
+        Buffer_Begin = 0;
+        Buffer_End = 0;
+        Buffer_End2 = 0;
+        IsLooping = false;
+    }
+}
+#endif //MEDIAINFO_READTHREAD
 
 //---------------------------------------------------------------------------
 size_t Reader_File::Format_Test(MediaInfo_Internal* MI, String File_Name)
@@ -381,28 +402,7 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                 #endif //MEDIAINFO_DEBUG
 
                 #if MEDIAINFO_READTHREAD
-                    if (ThreadInstance)
-                    {
-                        ThreadInstance->RequestTerminate();
-                        SetEvent(Condition_WaitingForMorePlace);
-                        while (!ThreadInstance->IsExited())
-                            Sleep(0);
-                        #ifdef WINDOWS
-                            CloseHandle(Condition_WaitingForMorePlace);
-                            CloseHandle(Condition_WaitingForMoreData);
-                        #endif //WINDOWS
-                        delete ThreadInstance; ThreadInstance=NULL;
-
-                        MI->Config.File_Buffer=NULL;
-                        MI->Config.File_Buffer_Size=0;
-                        MI->Config.File_Buffer_Size_Max=0;
-                        Buffer_Max=0;
-                        delete[] Buffer; Buffer=NULL;
-                        Buffer_Begin=0;
-                        Buffer_End=0;
-                        Buffer_End2=0;
-                        IsLooping=false;
-                    }
+                    Destroy_Thread(MI);
                     if (Buffer_End2!=(size_t)-1)
                         Buffer_End2=0;
                 #endif //MEDIAINFO_READTHREAD
@@ -798,25 +798,7 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
     #if MEDIAINFO_READTHREAD
         if (ThreadInstance)
         {
-            ThreadInstance->RequestTerminate();
-            SetEvent(Condition_WaitingForMorePlace);
-            while (!ThreadInstance->IsExited())
-                Sleep(0);
-            #ifdef WINDOWS
-                CloseHandle(Condition_WaitingForMorePlace);
-                CloseHandle(Condition_WaitingForMoreData);
-            #endif //WINDOWS
-            delete ThreadInstance; ThreadInstance=NULL;
-
-            MI->Config.File_Buffer=NULL;
-            MI->Config.File_Buffer_Size=0;
-            MI->Config.File_Buffer_Size_Max=0;
-            Buffer_Max=0;
-            delete[] Buffer; Buffer=NULL;
-            Buffer_Begin=0;
-            Buffer_End=0;
-            Buffer_End2=0;
-            IsLooping=false;
+            Destroy_Thread(MI);
         }
         else
     #endif //MEDIAINFO_READTHREAD

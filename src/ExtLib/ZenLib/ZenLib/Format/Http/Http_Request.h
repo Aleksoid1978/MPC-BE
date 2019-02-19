@@ -52,6 +52,8 @@ public:
     //Helpers
     bool Http_Begin(std::istream &In, std::ostream &Out);
     void Http_End  (std::ostream &Out);
+private:
+    Request &operator =(const Request &a);
 };
 
 } //Namespace

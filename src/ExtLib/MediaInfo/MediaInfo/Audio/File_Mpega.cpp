@@ -1034,7 +1034,7 @@ void File_Mpega::Data_Parse()
     }
 
     //error_check
-    if (protection_bit)
+    if (!protection_bit)
     {
         Element_Begin1("error_check");
         Skip_B2(                                                "crc_check");
@@ -1296,9 +1296,6 @@ bool File_Mpega::Header_Xing()
             Peek_String(4, Lib);
             if (Lame || Lib=="LAME" || Lib=="GOGO" || Lib=="L3.9")
                 Header_Encoders_Lame();
-
-            if (CC4(Xing_Header)==CC4("Info"))
-                VBR_Frames=0; //This is not a VBR file
 
             //Clearing Error detection
             sampling_frequency_Count.clear();

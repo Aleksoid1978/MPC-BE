@@ -79,6 +79,31 @@ protected :
     stream_t StreamKind_Last;
     size_t   StreamPos_Last;
 
+    struct stream_payload
+    {
+        bool   Searching_Payload;
+
+        stream_payload() :Searching_Payload(false)
+        {
+        }
+    };
+
+    struct stream_time : public stream_payload
+    {
+        bool   Searching_TimeStamp_Start;
+        bool   Searching_TimeStamp_End;
+
+        stream_time() :Searching_TimeStamp_Start(false), Searching_TimeStamp_End(false)
+        {
+        }
+        void Init_Stream(bool v)
+        {
+            Searching_TimeStamp_Start = v;
+            Searching_TimeStamp_End = v;
+            Searching_Payload = v;
+        }
+    };
+
     //Config
     MediaInfo_Config_MediaInfo* Config;
 

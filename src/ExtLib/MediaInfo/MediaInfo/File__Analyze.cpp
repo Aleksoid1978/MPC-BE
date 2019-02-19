@@ -2218,12 +2218,15 @@ bool File__Analyze::Header_Manage()
         }
         else
         {
+            if(Element_Level<2)
+               return false;
             //Can not synchronize anymore in this block
             Element_Offset=Element[Element_Level-2].Next-(File_Offset+Buffer_Offset);
             Header_Fill_Size(Element_Offset);
         }
     }
-
+    if(Element_Level<1)
+       return false;
     if (Element_IsWaitingForMoreData() || ((DataMustAlwaysBeComplete && Element[Element_Level-1].Next>File_Offset+Buffer_Size) || File_GoTo!=(int64u)-1) //Wait or want to have a comple data chunk
         #if MEDIAINFO_DEMUX
             || (Config->Demux_EventWasSent)

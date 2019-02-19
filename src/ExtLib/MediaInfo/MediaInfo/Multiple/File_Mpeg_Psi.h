@@ -134,8 +134,6 @@ private :
     void Descriptors();
     void ATSC_multiple_string_structure(Ztring &Value, const char* Info);
     void SCTE_multilingual_text_string(int8u Size, Ztring &Value, const char* Info);
-    Ztring Date_MJD(int16u Date);
-    Ztring Time_BCD(int32u Time);
 
     //Items removal
     void program_number_Update();

@@ -108,20 +108,7 @@ private :
     void temporal_reference_Adapt();
 
     //Streams
-    struct stream
-    {
-        bool   Searching_Payload;
-        bool   Searching_TimeStamp_Start;
-        bool   Searching_TimeStamp_End;
-
-        stream()
-        {
-            Searching_Payload=false;
-            Searching_TimeStamp_Start=false;
-            Searching_TimeStamp_End=false;
-        }
-    };
-    std::vector<stream> Streams;
+    std::vector<stream_time> Streams;
 
     //Temporal reference
     struct temporalreference
@@ -168,6 +155,15 @@ private :
     };
     std::vector<temporalreference*> TemporalReference; //per temporal_reference
     size_t                          TemporalReference_Offset;
+    temporalreference* GetTemporalReference()
+    {
+        if (TemporalReference_Offset+temporal_reference>=TemporalReference.size())
+            TemporalReference.resize(TemporalReference_Offset+temporal_reference+1);
+        temporalreference* &Ref=TemporalReference[TemporalReference_Offset+temporal_reference];
+        if (Ref==NULL)
+            Ref=new temporalreference;
+        return Ref;
+    }
     struct text_position
     {
         File__Analyze**  Parser;

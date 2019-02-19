@@ -859,11 +859,9 @@ private :
     void ATSC_multiple_string_structure(Ztring &Value, const char* Info);
     void Get_DVB_Text(int64u Size, Ztring &Value, const char* Info);
     void Skip_DVB_Text(int64u Size, const char* Info) {Ztring Temp; Get_DVB_Text(Size, Temp, Info);};
-    Ztring Date_MJD(int16u Date);
-    Ztring Time_BCD(int32u Time);
-    Ztring TimeHHMM_BCD(int16u Time);
-    Ztring Frequency_DVB__BCD(int32u Frequency);
-    Ztring OrbitalPosition_DVB__BCD(int32u OrbitalPosition);
+    static Ztring TimeHHMM_BCD(int16u Time);
+    static Ztring Frequency_DVB__BCD(int32u Frequency);
+    static Ztring OrbitalPosition_DVB__BCD(int32u OrbitalPosition);
 };
 
 } //NameSpace
