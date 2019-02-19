@@ -416,27 +416,7 @@ static void init_dequantizer(Vp3DecodeContext *s, int qpi)
  */
 static void init_loop_filter(Vp3DecodeContext *s)
 {
-    int *bounding_values = s->bounding_values_array + 127;
-    int filter_limit;
-    int x;
-    int value;
-
-    filter_limit = s->filter_limit_values[s->qps[0]];
-    av_assert0(filter_limit < 128U);
-
-    /* set up the bounding values */
-    memset(s->bounding_values_array, 0, 256 * sizeof(int));
-    for (x = 0; x < filter_limit; x++) {
-        bounding_values[-x] = -x;
-        bounding_values[x] = x;
-    }
-    for (x = value = filter_limit; x < 128 && value; x++, value--) {
-        bounding_values[ x] =  value;
-        bounding_values[-x] = -value;
-    }
-    if (value)
-        bounding_values[128] = value;
-    bounding_values[129] = bounding_values[130] = filter_limit * 0x02020202;
+    ff_vp3dsp_set_bounding_values(s->bounding_values_array, s->filter_limit_values[s->qps[0]]);
 }
 
 /*
@@ -1961,6 +1941,7 @@ fail:
     return ret;
 }
 
+#if HAVE_THREADS
 static int ref_frame(Vp3DecodeContext *s, ThreadFrame *dst, ThreadFrame *src)
 {
     ff_thread_release_buffer(s->avctx, dst);
@@ -1979,7 +1960,6 @@ static int ref_frames(Vp3DecodeContext *dst, Vp3DecodeContext *src)
     return 0;
 }
 
-#if HAVE_THREADS
 static int vp3_update_thread_context(AVCodecContext *dst, const AVCodecContext *src)
 {
     Vp3DecodeContext *s = dst->priv_data, *s1 = src->priv_data;
