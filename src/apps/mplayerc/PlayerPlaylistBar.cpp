@@ -981,7 +981,6 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 					const int item = m_list.GetNextItem(-1, LVNI_SELECTED);
 					curPlayList.SetPos(FindPos(item));
 					m_pMainFrame->OpenCurPlaylistItem();
-					AfxGetMainWnd()->SetFocus();
 
 					return TRUE;
 				}
@@ -2431,7 +2430,6 @@ void CPlayerPlaylistBar::OnLvnKeyDown(NMHDR* pNMHDR, LRESULT* pResult)
 	} else if (pLVKeyDown->wVKey == VK_SPACE && items.size() == 1) {
 		curPlayList.SetPos(FindPos(items.front()));
 		m_pMainFrame->OpenCurPlaylistItem();
-		AfxGetMainWnd()->SetFocus();
 
 		*pResult = TRUE;
 	}
@@ -2455,7 +2453,6 @@ void CPlayerPlaylistBar::OnNMDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 			m_list.Invalidate();
 			m_pMainFrame->OpenCurPlaylistItem();
 		}
-		AfxGetMainWnd()->SetFocus();
 	}
 	else if (curTab.type == EXPLORER) {
 		if (TNavigate()) {
@@ -2473,7 +2470,6 @@ void CPlayerPlaylistBar::OnNMDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 
 			m_list.Invalidate();
 			m_pMainFrame->OpenCurPlaylistItem();
-			AfxGetMainWnd()->SetFocus();
 		}
 	}
 	
