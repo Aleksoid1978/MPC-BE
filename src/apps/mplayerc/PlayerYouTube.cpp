@@ -59,7 +59,7 @@ namespace Youtube
 	static LPCWSTR GOOGLE_API_KEY = L"AIzaSyDggqSjryBducTomr4ttodXqFpl2HGdoyg";
 
 	static LPCWSTR videoIdRegExp = L"(v|video_ids)=([-a-zA-Z0-9_]+)";
-	
+
 	const YoutubeProfile* GetProfile(int iTag)
 	{
 		for (const auto& profile : YProfiles) {
