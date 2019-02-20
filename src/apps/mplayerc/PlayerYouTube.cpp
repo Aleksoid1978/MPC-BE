@@ -58,11 +58,8 @@ namespace Youtube
 {
 	static LPCWSTR GOOGLE_API_KEY = L"AIzaSyDggqSjryBducTomr4ttodXqFpl2HGdoyg";
 
-	static LPCWSTR videoIdRegExps[] = {
-		L"v=([-a-zA-Z0-9_]+)",
-		L"video_ids=([-a-zA-Z0-9_]+)"
-	};
-
+	static LPCWSTR videoIdRegExp = L"(v|video_ids)=([-a-zA-Z0-9_]+)";
+	
 	const YoutubeProfile* GetProfile(int iTag)
 	{
 		for (const auto& profile : YProfiles) {
@@ -196,12 +193,12 @@ namespace Youtube
 		return false;
 	}
 
-	static CString RegExpParse(LPCTSTR szIn, LPCTSTR szRE)
+	static CString RegExpParse(LPCTSTR szIn, LPCTSTR szRE, const size_t size)
 	{
 		const std::wregex regex(szRE);
 		std::wcmatch match;
-		if (std::regex_search(szIn, match, regex) && match.size() == 2) {
-			return CString(match[1].first, match[1].length());
+		if (std::regex_search(szIn, match, regex) && match.size() == size) {
+			return CString(match[size - 1].first, match[size - 1].length());
 		}
 
 		return L"";
@@ -339,9 +336,7 @@ namespace Youtube
 			if (hInet) {
 				HandleURL(url);
 
-				for (int i = 0; i < _countof(videoIdRegExps) && videoId.IsEmpty(); i++) {
-					videoId = RegExpParse(url, videoIdRegExps[i]);
-				}
+				videoId = RegExpParse(url, videoIdRegExp, 3);
 
 				if (rtStart <= 0) {
 					BOOL bMatch = FALSE;
@@ -369,7 +364,7 @@ namespace Youtube
 					}
 
 					if (!bMatch) {
-						const CString timeStart = RegExpParse(url, L"t=([0-9]+)");
+						const CString timeStart = RegExpParse(url, L"(t|time_continue)=([0-9]+)", 3);
 						if (!timeStart.IsEmpty()) {
 							rtStart = _wtol(timeStart) * UNITS;
 						}
@@ -729,9 +724,9 @@ namespace Youtube
 						while (std::regex_search(text, match, regex)) {
 							if (match.size() == 2) {
 								const CString xmlElement(match[1].first, match[1].length());
-								const CString url = RegExpParse(xmlElement, L"<BaseURL>(.*?)</BaseURL>");
-								const int itag    = _wtoi(RegExpParse(xmlElement, L"id=\"([0-9]+)\""));
-								const int fps     = _wtoi(RegExpParse(xmlElement, L"frameRate=\"([0-9]+)\""));
+								const CString url = RegExpParse(xmlElement, L"<BaseURL>(.*?)</BaseURL>", 2);
+								const int itag    = _wtoi(RegExpParse(xmlElement, L"id=\"([0-9]+)\"", 2));
+								const int fps     = _wtoi(RegExpParse(xmlElement, L"frameRate=\"([0-9]+)\"", 2));
 								if (url.Find(L"dur/") > 0) {
 									AddUrl(youtubeUrllist, youtubeAudioUrllist, url, itag, fps);
 								}
@@ -994,8 +989,8 @@ namespace Youtube
 	{
 		idx_CurrentPlay = 0;
 		if (CheckPlaylist(url)) {
-			const CString videoId = RegExpParse(url, videoIdRegExps[0]);
-			const CString playlistId = RegExpParse(url, L"list=([-a-zA-Z0-9_]+)");
+			const CString videoId = RegExpParse(url, videoIdRegExp, 3);
+			const CString playlistId = RegExpParse(url, L"list=([-a-zA-Z0-9_]+)", 2);
 			if (playlistId.IsEmpty()) {
 				return false;
 			}
@@ -1089,10 +1084,7 @@ namespace Youtube
 			if (hInet) {
 				HandleURL(url);
 
-				CString videoId;
-				for (int i = 0; i < _countof(videoIdRegExps) && videoId.IsEmpty(); i++) {
-					videoId = RegExpParse(url, videoIdRegExps[i]);
-				}
+				const CString videoId = RegExpParse(url, videoIdRegExp, 3);
 
 				bRet = ParseMetadata(hInet, videoId, y_fields);
 
