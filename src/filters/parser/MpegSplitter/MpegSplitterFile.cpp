@@ -489,10 +489,7 @@ REFERENCE_TIME CMpegSplitterFile::NextPTS(const DWORD TrackNum, const stream_cod
 				__int64 pos3 = GetPos();
 				nextPos = pos3 + h.len;
 
-				stream s;
-				s.pid = 0;
-				s.pesid = b;
-				if (h.fpts && s == TrackNum && AddStream(0, b, h.id_ext, h.len, FALSE) == TrackNum) {
+				if (h.fpts && b == (TrackNum >> 8) && AddStream(0, b, h.id_ext, h.len, FALSE) == TrackNum) {
 					if (rtLimit != _I64_MAX && (h.pts - rtMin) > rtLimit) {
 						Seek(pos);
 						return INVALID_TIME;
