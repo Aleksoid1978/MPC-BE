@@ -1003,6 +1003,28 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 					}
 				}
 				break;
+			case VK_BACK:
+				if (curTab.type == EXPLORER) {
+					auto path = curPlayList.GetHead().m_fns.front().GetName();
+					if (path.Right(1) == L"<") {
+						auto oldPath = path;
+						oldPath.TrimRight(L"\\<");
+
+						path.TrimRight(L"\\<");
+						path = GetFolderOnly(path);
+						if (path.Right(1) == L":") {
+							path = (L".");
+						}
+						path = AddSlash(path);
+
+						curPlayList.RemoveAll();
+						TParseFolder(path);
+						Refresh();
+
+						TSelectFolder(oldPath);
+					}
+				}
+				break;
 			case VK_UP:
 			case VK_DOWN:
 			case VK_HOME:
@@ -2467,7 +2489,7 @@ void CPlayerPlaylistBar::OnNMDblclkList(NMHDR* pNMHDR, LRESULT* pResult)
 			m_pMainFrame->OpenCurPlaylistItem();
 		}
 	}
-	
+
 	*pResult = 0;
 }
 
@@ -2614,12 +2636,12 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 	CString fmt, file;
 	fmt.Format(L"%%0%dd. %%s", (int)log10(0.1 + curPlayList.GetCount()) + 1);
 	file.Format(fmt, nItem + 1, m_list.GetItemText(nItem, COL_NAME));
-	
+
 	int offset = 0;
 	if (curTab.type == EXPLORER) {
 		file = m_list.GetItemText(nItem, COL_NAME);
 		const int w = rcItem.Height() - 4;
-		
+
 		bool bfsFolder = false;
 		if (file.Right(1) == L"<") {
 			file = L"[..]";
@@ -2665,7 +2687,7 @@ void CPlayerPlaylistBar::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruc
 		filesize.cx += offset;
 	}
 
-	if (file.GetLength() > 3 || curTab.type == EXPLORER) { // L"C:".GetLenght() < 3 
+	if (file.GetLength() > 3 || curTab.type == EXPLORER) { // L"C:".GetLenght() < 3
 		pDC->SetTextColor(textcolor);
 		pDC->TextOutW(rcItem.left + 3 + offset, (rcItem.top + rcItem.bottom - filesize.cy) / 2, file);
 	}
@@ -2696,7 +2718,7 @@ void CPlayerPlaylistBar::OnBeginDrag(NMHDR* pNMHDR, LRESULT* pResult)
 	if (curTab.type == EXPLORER) {
 		return;
 	}
-	
+
 	ModifyStyle(WS_EX_ACCEPTFILES, 0);
 
 	m_nDragIndex = ((LPNMLISTVIEW)pNMHDR)->iItem;
@@ -3025,7 +3047,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	//else if (WindowFromPoint(pt) == &m_list) {
 	//
 	//}
-	
+
 	if (p.x == -1 && p.y == -1 && m_list.GetSelectedCount()) {
 		// hack for the menu invoked with the VK_APPS key
 		POSITION pos = m_list.GetFirstSelectedItemPosition();
@@ -3764,7 +3786,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 		p.y = m_tab_buttons[MENU].r.bottom;
 		ClientToScreen(&p);
 	}
-	
+
 	CMenu menu;
 	menu.CreatePopupMenu();
 
@@ -3789,7 +3811,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 		, id++, ResStr(IDS_PLAYLIST_RENAME_CURRENT));
 	menu.AppendMenuW(MF_BYPOSITION | MF_STRING | ((m_nCurPlayListIndex > 0) ? MF_ENABLED : (MF_DISABLED | MF_GRAYED))
 		, id++, ResStr(IDS_PLAYLIST_DELETE_CURRENT));
-	
+
 	if (s.bUseDarkTheme && s.bDarkMenu) {
 		MENUINFO MenuInfo = { 0 };
 		MenuInfo.cbSize = sizeof(MenuInfo);
@@ -3802,7 +3824,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 
 	CString strDefName;
 	CString strGetName;
-	
+
 	int nID = (int)menu.TrackPopupMenu(TPM_LEFTBUTTON | TPM_RETURNCMD, p.x, p.y, this);
 	int size = m_tabs.size();
 
@@ -3873,7 +3895,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 					if (strGetName.IsEmpty()) {
 						return;
 					}
-			
+
 					tab_t tab;
 					tab.type = EXPLORER;
 					tab.name = strGetName;
@@ -3960,7 +3982,7 @@ void CPlayerPlaylistBar::TOnMenu(bool bUnderCursor)
 void CPlayerPlaylistBar::TDeleteAllPlaylists()
 {
 	m_pMainFrame->SendMessageW(WM_COMMAND, ID_FILE_CLOSEMEDIA);
-	
+
 	for (size_t i = 0; i < m_tabs.size(); i++) {
 		CString base;
 		if (AfxGetMyApp()->GetAppSavePath(base)) {
@@ -4210,7 +4232,7 @@ int CPlayerPlaylistBar::TGetPathType(const CString& path) const
 	}
 	else if (suffix == L"<") {
 		return PARENT;
-	} 
+	}
 	else if (suffix == L">") {
 		return FOLDER;
 	}
@@ -4325,7 +4347,7 @@ void CPlayerPlaylistBar::TSetOffset(bool toRight)
 		}
 		return;
 	}
-	
+
 	for (size_t i = 0; i < m_tabs.size() - 1; i++) {
 		if (m_tabs[i].r.left == m_rcTPage.left) {
 			m_cntOffset++;
@@ -4470,7 +4492,7 @@ bool CPlayerPlaylistBar::TNavigate()
 				CString path = pli.m_fns.front().GetName();
 				if (!path.IsEmpty()) {
 					auto oldPath = path;
-					
+
 					const auto type = TGetPathType(path);
 					switch (type) {
 						case DRIVE:
