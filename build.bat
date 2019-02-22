@@ -59,7 +59,6 @@ FOR %%A IN (%ARG%) DO (
   IF /I "%%A" == "Debug"      SET "BUILDCFG=Debug"      & SET /A ARGBC+=1 & SET /A ARGD+=1
   IF /I "%%A" == "Release"    SET "BUILDCFG=Release"    & SET /A ARGBC+=1
   IF /I "%%A" == "VS2017"     SET "COMPILER=VS2017"     & SET /A ARGCOMP+=1
-  IF /I "%%A" == "VS2019"     SET "COMPILER=VS2019"     & SET /A ARGCOMP+=1
   IF /I "%%A" == "Packages"   SET "PACKAGES=True"       & SET /A ARGPA+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Installer"  SET "INSTALLER=True"      & SET /A ARGIN+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Zip"        SET "ZIP=True"            & SET /A ARGZI+=1 & SET /A ARGCL+=1 & SET /A ARGM+=1
@@ -87,7 +86,7 @@ IF %ARGBC%   GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGBC% == 0   (SET "BUILDCF
 IF %ARGPA%   GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGPA% == 0   (SET "PACKAGES=False")
 IF %ARGIN%   GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGIN% == 0   (SET "INSTALLER=False")
 IF %ARGZI%   GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGZI% == 0   (SET "ZIP=False")
-IF %ARGCOMP% GTR 1 (GOTO UnsupportedSwitch) ELSE IF %ARGCOMP% == 0 (SET "COMPILER=VS2017")
+IF %ARGCOMP% GTR 1 (GOTO UnsupportedSwitch)
 IF %ARGCL%   GTR 1 (GOTO UnsupportedSwitch)
 IF %ARGD%    GTR 1 (GOTO UnsupportedSwitch)
 IF %ARGF%    GTR 1 (GOTO UnsupportedSwitch)
@@ -95,21 +94,19 @@ IF %ARGM%    GTR 1 (GOTO UnsupportedSwitch)
 
 IF /I "%PACKAGES%" == "True" SET "INSTALLER=True" & SET "ZIP=True"
 
+IF NOT EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" GOTO MissingVar
+
+SET "PARAMS=-prerelease -property installationPath -requires Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.ATLMFC Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
+
 IF /I "%COMPILER%" == "VS2017" (
-  IF NOT DEFINED VS150COMNTOOLS (
-    FOR /F "tokens=2*" %%A IN (
-      'REG QUERY "HKLM\SOFTWARE\Microsoft\VisualStudio\SxS\VS7" /v "15.0" 2^>NUL ^| FIND "REG_SZ" ^|^|
-       REG QUERY "HKLM\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\SxS\VS7" /v "15.0" 2^>NUL ^| FIND "REG_SZ"') DO SET "VS150COMNTOOLS=%%BCommon7\Tools\"
-  )
+  SET "PARAMS=%PARAMS% -version [15.0,16.0^)"
 ) ELSE (
-  FOR /f "delims=" %%A IN ('"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -prerelease -latest -property installationPath -requires Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.ATLMFC Microsoft.VisualStudio.Component.VC.Tools.x86.x64') DO SET "VS160COMNTOOLS=%%A\Common7\Tools\"
+  SET "PARAMS=%PARAMS% -latest"
 )
 
-IF DEFINED VS160COMNTOOLS (
-  SET "VCVARS=%VS160COMNTOOLS%..\..\VC\Auxiliary\Build\vcvarsall.bat"
-) ELSE IF DEFINED VS150COMNTOOLS (
-  SET "VCVARS=%VS150COMNTOOLS%..\..\VC\Auxiliary\Build\vcvarsall.bat"
-)
+SET "VSWHERE="%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" %PARAMS%"
+
+FOR /f "delims=" %%A IN ('!VSWHERE!') DO SET "VCVARS=%%A\VC\Auxiliary\Build\vcvarsall.bat"
 
 IF NOT EXIST "%VCVARS%" GOTO MissingVar
 
