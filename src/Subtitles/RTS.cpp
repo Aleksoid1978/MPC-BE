@@ -2825,6 +2825,13 @@ CSubtitle* CRenderedTextSubtitle::GetSubtitle(int entry)
 		STSStyle tmp = stss;
 
 		tmp.fontSize      *= sub->m_scaley * 64.0;
+		if (const double FontHeightRestriction = 15087; tmp.fontSize > FontHeightRestriction) {
+			// HACK: constraints for GetTextMetrics
+			double f = FontHeightRestriction / tmp.fontSize;
+			sub->m_scalex *= f;
+			sub->m_scaley *= f;
+			tmp.fontSize = FontHeightRestriction;
+		}
 		tmp.fontSpacing   *= sub->m_scalex * 64.0;
 		tmp.outlineWidthX *= (m_fScaledBAS ? sub->m_scalex : 1.0) * 8.0;
 		tmp.outlineWidthY *= (m_fScaledBAS ? sub->m_scaley : 1.0) * 8.0;
