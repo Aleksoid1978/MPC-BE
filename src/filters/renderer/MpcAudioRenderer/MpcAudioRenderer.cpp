@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2018 see Authors.txt
+ * (C) 2009-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1898,10 +1898,34 @@ again:
 						SAFE_RELEASE(m_pAudioClient);
 						hr = InitAudioClient();
 						if (SUCCEEDED(hr)) {
+#ifdef DEBUG_OR_LOG
+							DLog(L"    Trying format:");
+							DumpWaveFormatEx((WAVEFORMATEX*)&wfexAsIs);
+#endif
 							hr = CreateRenderClient((WAVEFORMATEX*)&wfexAsIs, FALSE);
 							if (S_OK == hr) {
 								CopyWaveFormat((WAVEFORMATEX*)&wfexAsIs, &m_pWaveFormatExOutput);
 								bInitNeed = FALSE;
+							} else {
+								const WORD wBitsPerSampleValues[][2] = {
+									{ 32, 32 },
+									{ 32, 24 },
+									{ 24, 24 },
+									{ 16, 16 }
+								};
+								for (const auto& wBitsPerSample : wBitsPerSampleValues) {
+									CreateFormat(wfexAsIs, wBitsPerSample[0], nChannels, dwChannelMask, pWaveFormatEx->nSamplesPerSec, wBitsPerSample[2]);
+#ifdef DEBUG_OR_LOG
+									DLog(L"    Trying format:");
+									DumpWaveFormatEx((WAVEFORMATEX*)& wfexAsIs);
+#endif
+									hr = CreateRenderClient((WAVEFORMATEX*)&wfexAsIs, FALSE);
+									if (S_OK == hr) {
+										CopyWaveFormat((WAVEFORMATEX*)&wfexAsIs, &m_pWaveFormatExOutput);
+										bInitNeed = FALSE;
+										break;
+									}
+								}
 							}
 						}
 					}
