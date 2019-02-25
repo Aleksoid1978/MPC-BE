@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -63,8 +63,8 @@ CMyFont::CMyFont(STSStyle& style)
 	}
 
 	HFONT hOldFont = SelectFont(g_hDC, *this);
-	TEXTMETRIC tm;
-	GetTextMetrics(g_hDC, &tm);
+	TEXTMETRICW tm;
+	EXECUTE_ASSERT(GetTextMetricsW(g_hDC, &tm));
 	m_ascent = ((tm.tmAscent + 4) >> 3);
 	m_descent = ((tm.tmDescent + 4) >> 3);
 	SelectFont(g_hDC, hOldFont);

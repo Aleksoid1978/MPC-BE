@@ -35,7 +35,7 @@
 #include <crtdefs.h>
 
 #include <BaseClasses/streams.h>
-
-#include "../DSUtil/DSUtil.h"
 #include <algorithm>
 #include <cmath>
+
+#include "../DSUtil/DSUtil.h"
