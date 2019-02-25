@@ -264,6 +264,7 @@ BOOL CPPageInterface::OnApply()
 	if (pFrame->m_wndPlaylistBar.IsWindowVisible()) {
 		pFrame->m_wndPlaylistBar.SendMessageW(WM_NCPAINT, 1, NULL);
 		pFrame->m_wndPlaylistBar.RedrawWindow(nullptr, nullptr, RDW_ERASE | RDW_INVALIDATE);
+		pFrame->m_wndPlaylistBar.Invalidate();
 	}
 
 	pFrame->ResetMenu();
