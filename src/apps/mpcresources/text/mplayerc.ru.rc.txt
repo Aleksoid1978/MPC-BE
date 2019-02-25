@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 24
 3		"О программе"
 7		"MPC-BE"
 8		"Copyright © 2002-2018, смотрите файл Authors.txt"
@@ -1763,6 +1763,8 @@ STRING IDS_PLAYLIST_REMOVE		"&Убрать"
 STRING IDS_PLAYLIST_RENAME_CURRENT		"Переименовать плейлист"
 STRING IDS_PLAYLIST_RESTORE		"В&осстановить"
 STRING IDS_PLAYLIST_SAVEAS		"&Сохранить как..."
+STRING IDS_PLAYLIST_SHOWSEARCHBAR		"Отображать полосу поиска"
+STRING IDS_PLAYLIST_SHOWTOOLTIP		"Отображать подсказки"
 STRING IDS_PLAYLIST_SHUFFLE		"В случайном порядке"
 STRING IDS_PLAYLIST_SORT		"Сортировать"
 STRING IDS_PLAYLIST_SORTBYDATE		"по &дате изменения"

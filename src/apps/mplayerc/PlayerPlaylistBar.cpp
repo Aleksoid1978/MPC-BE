@@ -2369,11 +2369,15 @@ END_MESSAGE_MAP()
 void CPlayerPlaylistBar::ResizeListColumn()
 {
 	if (::IsWindow(m_list.m_hWnd)) {
+		const auto& s = AfxGetAppSettings();
+
 		CRect r;
 		GetClientRect(&r);
 		r.DeflateRect(2, 2);
 		r.top += (m_rcTPage.Height() + 2);
-		r.bottom -= m_nSearchBarHeight;
+		if (s.bShowPlaylistSearchBar) {
+			r.bottom -= m_nSearchBarHeight;
+		}
 
 		m_list.SetRedraw(FALSE);
 		m_list.MoveWindow(r);
@@ -2381,7 +2385,7 @@ void CPlayerPlaylistBar::ResizeListColumn()
 		m_list.SetColumnWidth(COL_NAME, r.Width() - m_nTimeColWidth);
 		m_list.SetRedraw();
 
-		if (AfxGetAppSettings().bUseDarkTheme) {
+		if (s.bUseDarkTheme) {
 			InitializeCoolSB(m_list.m_hWnd, ThemeRGB);
 			SCROLLINFO si = { sizeof(SCROLLINFO), SIF_ALL };
 			m_list.GetScrollInfo(SB_VERT, &si);
@@ -2395,7 +2399,9 @@ void CPlayerPlaylistBar::ResizeListColumn()
 			GetClientRect(&r);
 			r.DeflateRect(2, 2);
 			r.top += (m_rcTPage.Height() + 2);
-			r.bottom -= m_nSearchBarHeight;
+			if (s.bShowPlaylistSearchBar) {
+				r.bottom -= m_nSearchBarHeight;
+			}
 
 			m_list.SetRedraw(FALSE);
 			m_list.MoveWindow(r);
@@ -2985,7 +2991,7 @@ BOOL CPlayerPlaylistBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResul
 {
 	TOOLTIPTEXTW* pTTT = (TOOLTIPTEXTW*)pNMHDR;
 
-	if ((HWND)pTTT->lParam != m_list.m_hWnd) {
+	if ((HWND)pTTT->lParam != m_list.m_hWnd || !AfxGetAppSettings().bShowPlaylistTooltip) {
 		return FALSE;
 	}
 
@@ -3102,6 +3108,8 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		M_SORTBYID, // restore
 		M_SHUFFLE,
 		M_MEDIAINFO,
+		M_SHOWTOOLTIP,
+		M_SHOWSEARCHBAR,
 		M_HIDEFULLSCREEN
 	};
 
@@ -3152,6 +3160,8 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	}
 	m.AppendMenu(MF_STRING | (bOnItem && bMIEnable ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_MEDIAINFO, L"MediaInfo");
 	m.AppendMenu(MF_SEPARATOR);
+	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bShowPlaylistTooltip ? MF_CHECKED : MF_UNCHECKED), M_SHOWTOOLTIP, ResStr(IDS_PLAYLIST_SHOWTOOLTIP));
+	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bShowPlaylistSearchBar ? MF_CHECKED : MF_UNCHECKED), M_SHOWSEARCHBAR, ResStr(IDS_PLAYLIST_SHOWSEARCHBAR));
 	m.AppendMenu(MF_STRING | MF_ENABLED | (s.bHidePlaylistFullScreen ? MF_CHECKED : MF_UNCHECKED), M_HIDEFULLSCREEN, ResStr(IDS_PLAYLIST_HIDEFS));
 
 	if (s.bUseDarkTheme && s.bDarkMenu) {
@@ -3515,6 +3525,17 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 				s.nLastFileInfoPage = nID;
 			}
 			break;
+		case M_SHOWTOOLTIP:
+			s.bShowPlaylistTooltip = !s.bShowPlaylistTooltip;
+			break;
+		case M_SHOWSEARCHBAR:
+			s.bShowPlaylistSearchBar = !s.bShowPlaylistSearchBar;
+			ResizeListColumn();
+			TCalcLayout();
+			TCalcREdit();
+			TDrawBar();
+			TDrawSearchBar();
+			break;
 		case M_HIDEFULLSCREEN:
 			s.bHidePlaylistFullScreen = !s.bHidePlaylistFullScreen;
 			break;
@@ -3623,13 +3644,13 @@ void CPlayerPlaylistBar::TCalcLayout()
 	GetWindowRect(&rcWindow);
 	GetClientRect(&rcClient);
 	const int width = wSysButton * (m_tabs.size() > 1 ? 3 : 1) + m_tabs[0].r.Width() + (rcWindow.Width() - rcClient.Width()) * 2 - 3;
-	const CSize cz(width, rcTabBar.Height() * 3 + m_nSearchBarHeight * 2);
+	const CSize cz(width, rcTabBar.Height() * 3 + (AfxGetAppSettings().bShowPlaylistSearchBar ? m_nSearchBarHeight * 2 : 0));
 	m_szMinFloat = m_szMinHorz = m_szMinVert = m_szFixedFloat = cz;
 }
 
 void CPlayerPlaylistBar::TCalcREdit()
 {
-	if (IsWindow(m_REdit.GetSafeHwnd())) {
+	if (IsWindow(m_REdit.GetSafeHwnd()) && AfxGetAppSettings().bShowPlaylistSearchBar) {
 		CRect rcTabBar;
 		GetClientRect(&rcTabBar);
 
@@ -3749,7 +3770,7 @@ void CPlayerPlaylistBar::TDrawBar()
 void CPlayerPlaylistBar::TDrawSearchBar()
  {
 	CClientDC dc(this);
-	if (IsWindowVisible()) {
+	if (IsWindowVisible() && AfxGetAppSettings().bShowPlaylistSearchBar) {
 		CRect rc;
 		GetClientRect(&rc);
 		rc.DeflateRect(2, 0);

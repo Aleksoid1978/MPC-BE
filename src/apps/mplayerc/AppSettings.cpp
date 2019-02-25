@@ -658,6 +658,8 @@ void CAppSettings::ResetSettings()
 	bShufflePlaylistItems = false;
 	bRememberPlaylistItems = true;
 	bHidePlaylistFullScreen = false;
+	bShowPlaylistTooltip = true;
+	bShowPlaylistSearchBar = true;
 	bFavRememberPos = true;
 	bFavRelativeDrive = false;
 
@@ -1025,7 +1027,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		fullScreenModes.bEnabled = FALSE;
 		fullScreenModes.bApplyDefault = false;
 	}
-	
+
 	if (profile.ReadBinary(IDS_R_SETTINGS, L"AccelTblColWidth", &ptr, len)) {
 		if (len == sizeof(AccelTbl)) {
 			memcpy(&AccelTblColWidth, ptr, sizeof(AccelTbl));
@@ -1075,6 +1077,8 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SHUFFLEPLAYLISTITEMS, bShufflePlaylistItems);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REMEMBERPLAYLISTITEMS, bRememberPlaylistItems);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_HIDEPLAYLISTFULLSCREEN, bHidePlaylistFullScreen);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SHOWPLAYLISTTOOLTIP, bShowPlaylistTooltip);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SHOWPLAYLISTSEARCHBAR, bShowPlaylistSearchBar);
 	profile.ReadBool(IDS_R_FAVORITES, IDS_RS_FAV_REMEMBERPOS, bFavRememberPos);
 	profile.ReadBool(IDS_R_FAVORITES, IDS_RS_FAV_RELATIVEDRIVE, bFavRelativeDrive);
 
@@ -1637,6 +1641,8 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SHUFFLEPLAYLISTITEMS, bShufflePlaylistItems);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REMEMBERPLAYLISTITEMS, bRememberPlaylistItems);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_HIDEPLAYLISTFULLSCREEN, bHidePlaylistFullScreen);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SHOWPLAYLISTTOOLTIP, bShowPlaylistTooltip);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SHOWPLAYLISTSEARCHBAR, bShowPlaylistSearchBar);
 	profile.WriteBool(IDS_R_FAVORITES, IDS_RS_FAV_REMEMBERPOS, bFavRememberPos);
 	profile.WriteBool(IDS_R_FAVORITES, IDS_RS_FAV_RELATIVEDRIVE, bFavRelativeDrive);
 
