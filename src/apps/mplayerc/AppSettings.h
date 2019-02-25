@@ -828,6 +828,8 @@ public:
 	// Playlist (contex menu)
 	bool			bShufflePlaylistItems;
 	bool			bHidePlaylistFullScreen;
+	bool			bShowPlaylistTooltip;
+	bool			bShowPlaylistSearchBar;
 
 	// OTHER STATES
 	CString			strLastOpenDir;
