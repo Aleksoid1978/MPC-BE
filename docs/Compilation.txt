@@ -14,7 +14,7 @@ Part B: Preparing the GCC environment
  NOTES:
   * If you installed the MSYS/MinGW package in an other directory you will have to use that path in the following steps.
 
- 1. Download and extract "MSYS_MinGW-w64_GCC_820_x86-x64.7z" to "C:\MSYS" -> http://mpc-be.org/MSYS/MSYS_MinGW-w64_GCC_820_x86-x64.7z
+ 1. Download and extract "MSYS_MinGW-w64_GCC_830_x86-x64.7z" to "C:\MSYS" -> http://mpc-be.org/MSYS/MSYS_MinGW-w64_GCC_830_x86-x64.7z
  2. Create a file named "environments.bat" in "C:\mpc-be\" containing the following entries:
     @ECHO OFF
     SET "MPCBE_MSYS=C:\MSYS"
