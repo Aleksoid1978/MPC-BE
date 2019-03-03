@@ -2249,11 +2249,30 @@ STDMETHODIMP CDX9AllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 
 	HRESULT hr;
 	CComPtr<IDirect3DSurface9> pRGB32Surface;
-	D3DLOCKED_RECT r;
-	if (FAILED(hr = m_pD3DDevEx->CreateRenderTarget(framesize.cx, framesize.cy, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pRGB32Surface, nullptr))
-		|| FAILED(hr = m_pD3DDevEx->SetRenderTarget(0, pRGB32Surface))
-		|| FAILED(hr = Resize(m_pVideoTextures[m_iCurSurface], { CPoint(0, 0), m_nativeVideoSize }, { CPoint(0, 0), framesize }))
-		|| FAILED(hr = pRGB32Surface->LockRect(&r, nullptr, D3DLOCK_READONLY))) {
+	if (FAILED(hr = m_pD3DDevEx->CreateRenderTarget(framesize.cx, framesize.cy, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, TRUE, &pRGB32Surface, nullptr))) {
+		return hr;
+	}
+
+	CComPtr<IDirect3DTexture9> pVideoTexture = m_pVideoTextures[m_iCurSurface];
+	if (m_pPSCorrection) {
+		D3DSURFACE_DESC videoDesc;
+		m_pVideoTextures[m_iCurSurface]->GetLevelDesc(0, &videoDesc);
+
+		const float fConstData[4] = { 1.0f / videoDesc.Width, 1.0f / videoDesc.Height, 0, 0 };
+		hr = m_pD3DDevEx->SetPixelShaderConstantF(0, fConstData, 1);
+
+		CComPtr<IDirect3DSurface9> pTemporarySurface;
+		hr = m_pFrameTextures[0]->GetSurfaceLevel(0, &pTemporarySurface);
+		hr = m_pD3DDevEx->SetRenderTarget(0, pTemporarySurface);
+		hr = m_pD3DDevEx->SetPixelShader(m_pPSCorrection);
+		TextureCopy(m_pVideoTextures[m_iCurSurface]);
+		pVideoTexture = m_pFrameTextures[0];
+	}
+
+	D3DLOCKED_RECT r = {};
+	if (FAILED(hr = m_pD3DDevEx->SetRenderTarget(0, pRGB32Surface))
+			|| FAILED(hr = Resize(pVideoTexture, { CPoint(0, 0), m_nativeVideoSize }, { CPoint(0, 0), framesize }))
+			|| FAILED(hr = pRGB32Surface->LockRect(&r, nullptr, D3DLOCK_READONLY))) {
 		return hr;
 	}
 
