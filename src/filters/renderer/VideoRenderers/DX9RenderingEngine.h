@@ -123,6 +123,8 @@ namespace DSObjects
 		HRESULT InitCorrectionPass(const AM_MEDIA_TYPE& mt);
 
 	private:
+		friend class CDX9AllocatorPresenter;
+
 		D3DCAPS9					m_Caps;
 		LPCSTR						m_ShaderProfile; // for shader compiler
 
