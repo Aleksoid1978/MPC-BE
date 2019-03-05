@@ -99,6 +99,7 @@ protected :
     bool FileHeader_Begin();
     void FileHeader_Parse();
     void FileHeader_Parse_ADIF();
+    void FileHeader_Parse_ADTS();
 
     //Buffer - Global
     void Read_Buffer_Continue ();
@@ -366,6 +367,7 @@ protected :
 
     std::map<std::string, Ztring>   Infos_General;
     std::map<std::string, Ztring>   Infos;
+    std::map<std::string, Ztring>   Infos_AudioSpecificConfig;
     bool                            CanFill;
 
 private :

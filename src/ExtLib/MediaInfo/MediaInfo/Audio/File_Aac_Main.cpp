@@ -37,7 +37,7 @@ namespace MediaInfoLib
 //***************************************************************************
 
 //---------------------------------------------------------------------------
-const size_t Aac_sampling_frequency_Size=13;
+extern const size_t Aac_sampling_frequency_Size=13;
 extern const int32u Aac_sampling_frequency[Aac_sampling_frequency_Size]=
 {96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050,
  16000, 12000, 11025,  8000,  7350};
@@ -1047,6 +1047,8 @@ void File_Aac::adts_frame()
         for(int i=0; i<=num_raw_data_blocks; i++)
         {
             raw_data_block();
+            if (!Data_BS_Remain())
+                break; // Maybe the content was not parsed
             if (!protection_absent)
             {
                 Element_Begin1("adts_raw_data_block_error_check");

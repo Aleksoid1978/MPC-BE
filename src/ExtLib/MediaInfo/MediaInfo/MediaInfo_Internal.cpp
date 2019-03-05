@@ -282,7 +282,7 @@ static const char* ChannelLayout_2018[ChannelLayout_2018_Size][2] =
 {
     { "BC", "Cb" },
     { "BL", "Lb" },
-    { "BR", "Lr" },
+    { "BR", "Rb" },
     { "CI", "Bfc" },
     { "CL", "Ls" },
     { "CR", "Rs" },

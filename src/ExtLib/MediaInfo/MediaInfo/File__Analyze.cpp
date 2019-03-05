@@ -509,15 +509,16 @@ void File__Analyze::Trace_Details_Handling(File__Analyze* Sub)
     if (Trace_Activated)
     {
         //Details handling
-        if ((!Sub->Element[0].TraceNode.Name_Is_Empty() || Sub->Element[0].TraceNode.Children.size()) && !Trace_DoNotSave)
+        if ((!Sub->Element[0].TraceNode.Name_Is_Empty() || Sub->Element[Sub->Element_Level].TraceNode.Children.size()) && !Trace_DoNotSave)
         {
             //From Sub
-            while (Sub->Element_Level)
-                Sub->Element_End0();
+            if (!Sub->Element[0].TraceNode.Name_Is_Empty())
+                while (Sub->Element_Level)
+                    Sub->Element_End0();
 
             //Add Sub to this node
-            Element[Element_Level].TraceNode.Add_Child(&Sub->Element[0].TraceNode);
-            Sub->Element[0].TraceNode.Init();
+            Element[Element_Level].TraceNode.Add_Child(&Sub->Element[Sub->Element_Level].TraceNode);
+            Sub->Element[Sub->Element_Level].TraceNode.Init();
         }
         else
             Element[Element_Level].TraceNode.NoShow = true; //We don't want to show this item because there is no info in it
@@ -672,6 +673,8 @@ void File__Analyze::Open_Buffer_Continue (const int8u* ToAdd, size_t ToAdd_Size)
 
     //Preparing
     Trusted=(Buffer_Size>2*8*1024?Buffer_Size/8/1024:2)*Trusted_Multiplier; //Never less than 2 acceptable errors
+    if (!MustSynchronize)
+        Element[Element_Level].UnTrusted=false;
 
     //Demand to go elsewhere
     if (File_GoTo!=(int64u)-1)
@@ -939,6 +942,7 @@ void File__Analyze::Open_Buffer_Continue (File__Analyze* Sub, const int8u* ToAdd
                 Sub->Element[Pos].Next=File_Size;
         Sub->File_Size=File_Size;
     }
+    Sub->Element[0].IsComplete=Element[Element_Level].IsComplete;
     #if MEDIAINFO_TRACE
         Sub->Element_Level_Base=Element_Level_Base+Element_Level;
     #endif
