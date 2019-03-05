@@ -673,7 +673,7 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_G2M3 },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_G2M4 },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_CRAM }, // CRAM - Microsoft Video 1
-	{ &MEDIATYPE_Video, &MEDIASUBTYPE_FICV }, 
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_FICV },
 
 	// UtVideo
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_Ut_ULRA },
@@ -3227,6 +3227,10 @@ void CMPCVideoDecFilter::SetThreadCount()
 		} else {
 			int nThreadNumber = (m_nThreadNumber > 0) ? m_nThreadNumber : CPUInfo::GetProcessorNumber() * 3 / 2;
 			m_pAVCtx->thread_count = std::clamp(nThreadNumber, 1, MAX_AUTO_THREADS);
+
+			if (m_nCodecId == AV_CODEC_ID_AV1) {
+				av_opt_set_int(m_pAVCtx->priv_data, "tilethreads", m_pAVCtx->thread_count, 0);
+			}
 		}
 	}
 }
