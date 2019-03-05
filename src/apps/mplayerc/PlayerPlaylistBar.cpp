@@ -967,13 +967,23 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 			return TRUE;
 		}
 
+		if (pMsg->message == WM_SYSKEYDOWN
+				&& pMsg->wParam == VK_RETURN && (HIWORD(pMsg->lParam) & KF_ALTDOWN)) {
+			m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
+			return TRUE;
+		}
+
 		if (pMsg->message == WM_KEYDOWN) {
 			switch (pMsg->wParam) {
 			case VK_ESCAPE:
 				GetParentFrame()->ShowControlBar(this, FALSE, TRUE);
 				return TRUE;
-			case VK_SPACE:
 			case VK_RETURN:
+				if (GetKeyState(VK_CONTROL) < 0) {
+					m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
+					return TRUE;
+				}
+			case VK_SPACE:
 				if (m_list.GetSelectedCount() == 1) {
 					if (TNavigate()) {
 						break;// return FALSE;
