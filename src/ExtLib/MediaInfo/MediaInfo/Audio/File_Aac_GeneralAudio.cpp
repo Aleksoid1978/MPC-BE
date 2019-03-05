@@ -231,7 +231,8 @@ void File_Aac::program_config_element()
         case  1 : Channels_Positions+=__T("Front: C"); ChannelLayout+=__T("C "); break;
         case  2 : Channels_Positions+=__T("Front: L R"); ChannelLayout+=__T("L R "); break;
         case  3 : Channels_Positions+=__T("Front: L C R"); ChannelLayout+=num_front_channel_elements==2?(front1_element_is_cpe?__T("L R C "):__T("C L R ")):__T("? ? ? "); break;
-        default : Channels_Positions+=__T("Front: "); Channels_Positions+=Ztring::ToZtring(Channels_Front); ChannelLayout+=__T("? "); //Which config?
+        case  5 : Channels_Positions+=__T("Front: L C R Lw Rw"); ChannelLayout+=num_front_channel_elements==3?(front1_element_is_cpe?__T("L R C Lw Rw "):__T("C L R Lw Rw ")):__T("? ? ? ? ? "); break;
+        default : Channels_Positions+=__T("Front:"); Channels_Positions+=Ztring::ToZtring(Channels_Side); for (size_t i=0; i<Channels_Front; i++) ChannelLayout+=__T("? "); //Which config?
     }
     switch (Channels_Side)
     {
@@ -239,7 +240,7 @@ void File_Aac::program_config_element()
         case  1 : Channels_Positions+=__T(", Side: C"); ChannelLayout+=__T("Cs "); break;
         case  2 : Channels_Positions+=__T(", Side: L R"); ChannelLayout+=__T("Ls Rs "); break;
         case  3 : Channels_Positions+=__T(", Side: L C R"); ChannelLayout+=__T("? ? ? "); break;
-        default : Channels_Positions+=__T(", Side: "); Channels_Positions+=Ztring::ToZtring(Channels_Side); ChannelLayout+=__T("? "); //Which config?
+        default : Channels_Positions+=__T(", Side: "); Channels_Positions+=Ztring::ToZtring(Channels_Side); for (size_t i=0; i< Channels_Side; i++) ChannelLayout+=__T("? "); //Which config?
     }
     switch (Channels_Back)
     {
@@ -247,13 +248,14 @@ void File_Aac::program_config_element()
         case  1 : Channels_Positions+=__T(", Back: C"); ChannelLayout+=__T("Cs "); break;
         case  2 : Channels_Positions+=__T(", Back: L R"); ChannelLayout+=__T("Lrs Rrs "); break;
         case  3 : Channels_Positions+=__T(", Back: L C R"); ChannelLayout+=__T("Lrs Rrs Cs "); break;
-        default : Channels_Positions+=__T(", Back: "); Channels_Positions+=Ztring::ToZtring(Channels_Back); ChannelLayout+=__T("? "); //Which config?
+        default : Channels_Positions+=__T(", Back: "); Channels_Positions+=Ztring::ToZtring(Channels_Back); for (size_t i=0; i< Channels_Back; i++) ChannelLayout+=__T("? "); //Which config?
     }
     switch (Channels_LFE)
     {
         case  0 : break;
         case  1 : Channels_Positions+=__T(", LFE"); ChannelLayout+=__T("LFE "); break;
-        default : Channels_Positions+=__T(", LFE= "); Channels_Positions+=Ztring::ToZtring(Channels_LFE); ChannelLayout+=__T("? "); //Which config?
+        case  2 : Channels_Positions+=__T(", LFE LFE2"); ChannelLayout+=__T("LFE LFE2"); break;
+        default : Channels_Positions+=__T(", LFE: "); Channels_Positions+=Ztring::ToZtring(Channels_LFE); ChannelLayout+=__T("LFE "); for (size_t i=1; i<Channels_LFE; i++) ChannelLayout+=__T("? "); //Which config?
     }
     Channels_Positions2=Ztring::ToZtring(Channels_Front)+__T('/')
                        +Ztring::ToZtring(Channels_Side)+__T('/')
@@ -317,17 +319,18 @@ void File_Aac::raw_data_block()
 {
     raw_data_block_Pos=0;
 
+    if (audioObjectType!=2)
+    {
+        Skip_BS(Data_BS_Remain(),                               "Data");
+        Frame_Count++;
+        return; //We test only AAC LC
+    }
+
     if (sampling_frequency_index>=13)
     {
         Trusted_IsNot("(Problem)");
         Skip_BS(Data_BS_Remain(),                               "(Problem)");
         return;
-    }
-
-    if (audioObjectType!=2)
-    {
-        Skip_BS(Data_BS_Remain(),                               "Data");
-        return; //We test only AAC LC
     }
 
     //Parsing
@@ -367,6 +370,8 @@ void File_Aac::raw_data_block()
         Element_End0();
     }
     while(Element_IsOK() && Data_BS_Remain() && id_syn_ele!=0x07); //ID_END
+    if (Element_IsOK() && id_syn_ele!=0x07)
+        Trusted_IsNot("Not ending by END element");
     if (Element_IsOK() && Data_BS_Remain()%8)
         Skip_S1(Data_BS_Remain()%8,                             "byte_alignment");
     Element_End0();
@@ -406,7 +411,10 @@ void File_Aac::channel_pair_element()
     }
     individual_channel_stream(common_window, false);
     if (!Element_IsOK())
+    {
+        Skip_BS(Data_BS_Remain(),                               "(Problem)");
         return;
+    }
     individual_channel_stream(common_window, false);
 }
 
@@ -558,7 +566,10 @@ void File_Aac::coupling_channel_element()
     Skip_S1(2,                                                  "gain_element_scale");
     individual_channel_stream(false, false);
     if (!Element_IsOK())
+    {
+        Skip_BS(Data_BS_Remain(),                               "(Problem)");
         return;
+    }
     bool cge;
     for (size_t c=1; c<num_gain_element_lists; c++)
     {
@@ -697,18 +708,21 @@ void File_Aac::individual_channel_stream (bool common_window, bool scale_flag)
         ics_info();
     if (!Element_IsOK())
     {
+        Skip_BS(Data_BS_Remain(),                               "(Problem)");
         Element_End0();
         return;
     }
    section_data();
     if (!Element_IsOK())
     {
+        Skip_BS(Data_BS_Remain(), "?");
         Element_End0();
         return;
     }
     scale_factor_data();
     if (!Element_IsOK())
     {
+        Skip_BS(Data_BS_Remain(),                               "(Problem)");
         Element_End0();
         return;
     }

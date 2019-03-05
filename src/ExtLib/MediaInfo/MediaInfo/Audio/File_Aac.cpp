@@ -32,6 +32,8 @@ namespace MediaInfoLib
 // Infos
 //***************************************************************************
 
+extern const size_t Aac_sampling_frequency_Size;
+
 //***************************************************************************
 // Constructor/Destructor
 //***************************************************************************
@@ -130,6 +132,9 @@ void File_Aac::Streams_Fill()
     for (std::map<std::string, Ztring>::iterator Info=Infos_General.begin(); Info!=Infos_General.end(); ++Info)
         Fill(Stream_General, 0, Info->first.c_str(), Info->second);
     File__Tags_Helper::Stream_Prepare(Stream_Audio);
+    for (std::map<std::string, Ztring>::iterator Info_AudioSpecificConfig=Infos_AudioSpecificConfig.begin(); Info_AudioSpecificConfig!=Infos_AudioSpecificConfig.end(); ++Info_AudioSpecificConfig)
+        if (Infos.find(Info_AudioSpecificConfig->first)==Infos.end())
+            Infos[Info_AudioSpecificConfig->first]=Info_AudioSpecificConfig->second; // Use AudioSpecificConfig info if info not present in stream itself
     for (std::map<std::string, Ztring>::iterator Info=Infos.begin(); Info!=Infos.end(); ++Info)
         Fill(Stream_Audio, StreamPos_Last, Info->first.c_str(), Info->second);
 
@@ -139,10 +144,13 @@ void File_Aac::Streams_Fill()
         default           : ;
     }
 
+    if (Retrieve_Const(Stream_Audio, StreamPos_Last, Audio_SamplesPerFrame).empty())
+    {
     int16u frame_length_Multiplier=1;
     if (!MediaInfoLib::Config.LegacyStreamDisplay_Get() && Retrieve_Const(Stream_Audio, StreamPos_Last, Audio_Format).find(__T("AAC"))==0 && Retrieve_Const(Stream_Audio, StreamPos_Last, Audio_Format_Settings_SBR).find(__T("Yes"))==0)
         frame_length_Multiplier=2;
     Fill(Stream_Audio, StreamPos_Last, Audio_SamplesPerFrame, frame_length*frame_length_Multiplier);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -305,6 +313,7 @@ void File_Aac::Read_Buffer_Continue_AudioSpecificConfig()
     AudioSpecificConfig(0); //Up to the end of the block
     BS_End();
 
+    Infos_AudioSpecificConfig=Infos;
     Mode=Mode_raw_data_block; //Mode_AudioSpecificConfig only once
 }
 
@@ -340,6 +349,8 @@ void File_Aac::Read_Buffer_Continue_raw_data_block()
                 File__Analyze::Accept();
             File__Analyze::Finish();
         }
+    FILLING_ELSE();
+        Infos=Infos_AudioSpecificConfig;
     FILLING_END();
 }
 
@@ -379,6 +390,12 @@ bool File_Aac::Synchronize_ADTS()
         if (Buffer_Offset+6<=Buffer_Size)//Testing if size is coherant
         {
             //Testing next start, to be sure
+            int8u sampling_frequency_index=(CC1(Buffer+Buffer_Offset+2)>>2)&0xF;
+            if (sampling_frequency_index>=Aac_sampling_frequency_Size)
+            {
+                Buffer_Offset++;
+                continue;
+            }
             int16u aac_frame_length=(CC3(Buffer+Buffer_Offset+3)>>5)&0x1FFF;
             if (IsSub && Buffer_Offset+aac_frame_length==Buffer_Size)
                 break;
@@ -401,6 +418,12 @@ bool File_Aac::Synchronize_ADTS()
                     //Testing next start, to be sure
                     if (Buffer_Offset+aac_frame_length+3+3>Buffer_Size)
                         return false; //Need more data
+                    sampling_frequency_index=(CC1(Buffer+Buffer_Offset+aac_frame_length+2)>>2)&0xF;
+                    if (sampling_frequency_index>=Aac_sampling_frequency_Size)
+                    {
+                        Buffer_Offset++;
+                        continue;
+                    }
                     int16u aac_frame_length2=(CC3(Buffer+Buffer_Offset+aac_frame_length+3)>>5)&0x1FFF;
                     if (File_Offset+Buffer_Offset+aac_frame_length+aac_frame_length2!=File_Size-File_EndTagSize)
                     {
@@ -421,6 +444,12 @@ bool File_Aac::Synchronize_ADTS()
                             //Testing next start, to be sure
                             if (Buffer_Offset+aac_frame_length+aac_frame_length2+3+3>Buffer_Size)
                                 return false; //Need more data
+                            sampling_frequency_index=(CC1(Buffer+Buffer_Offset+aac_frame_length+aac_frame_length2+2)>>2)&0xF;
+                            if (sampling_frequency_index>=Aac_sampling_frequency_Size)
+                            {
+                                Buffer_Offset++;
+                                continue;
+                            }
                             int16u aac_frame_length3=(CC3(Buffer+Buffer_Offset+aac_frame_length+aac_frame_length2+3)>>5)&0x1FFF;
                             if (File_Offset+Buffer_Offset+aac_frame_length+aac_frame_length2+aac_frame_length3!=File_Size-File_EndTagSize)
                             {
@@ -470,6 +499,7 @@ bool File_Aac::Synchronize_ADTS()
 
     //Synched is OK
     Mode=Mode_ADTS;
+    File__Analyze::Accept();
     return true;
 }
 
