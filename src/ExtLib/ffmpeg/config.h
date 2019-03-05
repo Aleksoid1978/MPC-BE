@@ -969,6 +969,7 @@ Note: when adding a new codec, you have to:
 #define CONFIG_DIRAC_PARSE 1
 
 #define CONFIG_LIBSOXR 1
-#define CONFIG_LIBAOM_AV1_DECODER 1
+
+#define CONFIG_LIBDAV1D_DECODER 1
 
 #endif /* FFMPEG_CONFIG_H */
