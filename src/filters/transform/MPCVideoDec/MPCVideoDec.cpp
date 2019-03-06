@@ -1962,7 +1962,7 @@ redo:
 		m_pAVCtx->slice_flags      |= SLICE_FLAG_ALLOW_FIELD;
 	}
 
-	AllocExtradata(m_pAVCtx, pmt);
+	AllocExtradata(pmt);
 
 	avcodec_lock;
 	const int ret = avcodec_open2(m_pAVCtx, m_pAVCodec, nullptr);
@@ -1973,6 +1973,19 @@ redo:
 
 	if (m_nCodecId == AV_CODEC_ID_H264 && x264_build != -1) {
 		av_opt_set_int(m_pAVCtx->priv_data, "x264_build", x264_build, 0);
+	}
+
+	if (m_nCodecId == AV_CODEC_ID_AV1 && m_pAVCtx->extradata) {
+		if (AVCodecParserContext* pParser = av_parser_init(m_nCodecId)) {
+			BYTE* pOutBuffer = nullptr;
+			int pOutLen = 0;
+			int used_bytes = av_parser_parse2(pParser, m_pAVCtx, &pOutBuffer, &pOutLen, m_pAVCtx->extradata, m_pAVCtx->extradata_size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
+			if (pOutLen > 0) {
+				m_pAVCtx->pix_fmt = (enum AVPixelFormat)pParser->format;
+			}
+
+			av_parser_close(pParser);
+		}
 	}
 
 	FillAVCodecProps(m_pAVCtx);
@@ -2334,7 +2347,7 @@ static void ReconstructH264Extra(BYTE *extra, unsigned& extralen, int NALSize)
 	}
 }
 
-void CMPCVideoDecFilter::AllocExtradata(AVCodecContext* pAVCtx, const CMediaType* pmt)
+void CMPCVideoDecFilter::AllocExtradata(const CMediaType* pmt)
 {
 	// code from LAV ...
 	// Process Extradata

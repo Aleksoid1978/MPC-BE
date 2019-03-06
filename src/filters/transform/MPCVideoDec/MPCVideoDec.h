@@ -179,7 +179,7 @@ protected:
 	void			CleanupD3DResources();
 	void			CleanupFFmpeg();
 	int				FindCodec(const CMediaType* mtIn, BOOL bForced = FALSE);
-	void			AllocExtradata(AVCodecContext* pAVCtx, const CMediaType* mt);
+	void			AllocExtradata(const CMediaType* mt);
 	void			GetOutputFormats (int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats);
 	void			DetectVideoCard(HWND hWnd);
 	void			BuildOutputFormat();
@@ -193,7 +193,6 @@ protected:
 	void			SetThreadCount();
 	HRESULT			FindDecoderConfiguration();
 
-	void			ReadHeader();
 	HRESULT			InitDecoder(const CMediaType *pmt);
 
 	int				m_nAlign = 16;

@@ -972,4 +972,7 @@ Note: when adding a new codec, you have to:
 
 #define CONFIG_LIBDAV1D_DECODER 1
 
+#define CONFIG_CBS 1
+#define CONFIG_CBS_AV1 1
+
 #endif /* FFMPEG_CONFIG_H */
