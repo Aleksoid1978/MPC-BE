@@ -201,7 +201,18 @@ CString UTF8ToWStr(LPCSTR lpUTF8Str)
 	return ConvertToWStr(lpUTF8Str, CP_UTF8);
 }
 
-void ReplaceCharacter(uint32_t& ch)
+void ReplaceCharacterU16(wchar_t& ch)
+{
+	if (!SysVersion::IsWin8orLater()) {
+		switch (ch) {
+		case 0x2705: // White Heavy Check Mark
+			ch = 0x2714; // Heavy Check Mark
+			return;
+		}
+	}
+}
+
+void ReplaceCharacterU32(uint32_t& ch)
 {
 	if (!SysVersion::IsWin10orLater()) {
 		switch (ch) {
@@ -247,7 +258,10 @@ CString AltUTF8ToWStr(LPCSTR lpUTF8Str) // Use if MultiByteToWideChar() function
 		//3 bytes
 		else if ((*Z & 0xF0) == 0xE0) {
 			if ((*(Z + 1) & 0xC0) == 0x80 && (*(Z + 2) & 0xC0) == 0x80) {
-				str += (wchar_t)((((wchar_t)(*Z & 0x0F)) << 12) | ((*(Z + 1) & 0x3F) << 6) | (*(Z + 2) & 0x3F));
+				wchar_t u16 = (wchar_t)((((wchar_t)(*Z & 0x0F)) << 12) | ((*(Z + 1) & 0x3F) << 6) | (*(Z + 2) & 0x3F));
+				ReplaceCharacterU16(u16);
+				str += u16;
+
 				Z += 3;
 			} else {
 				return L""; //Bad character
@@ -257,7 +271,7 @@ CString AltUTF8ToWStr(LPCSTR lpUTF8Str) // Use if MultiByteToWideChar() function
 		else if ((*Z & 0xF8) == 0xF0) {
 			if ((*(Z + 1) & 0xC0) == 0x80 && (*(Z + 2) & 0xC0) == 0x80 && (*(Z + 3) & 0xC0) == 0x80) {
 				uint32_t u32 = ((uint32_t)(*Z & 0x0F) << 18) | ((uint32_t)(*(Z + 1) & 0x3F) << 12) | ((uint32_t)(*(Z + 2) & 0x3F) << 6) | ((uint32_t)*(Z + 3) & 0x3F);
-				ReplaceCharacter(u32);
+				ReplaceCharacterU32(u32);
 				if (u32 <= UINT16_MAX) {
 					str += (wchar_t)u32;
 				} else {
