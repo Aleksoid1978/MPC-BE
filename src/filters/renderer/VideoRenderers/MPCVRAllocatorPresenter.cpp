@@ -209,9 +209,9 @@ STDMETHODIMP CMPCVRAllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 
 STDMETHODIMP_(bool) CMPCVRAllocatorPresenter::IsRendering()
 {
-	if (CComQIPtr<IExFilterInfo> pIExFilterInfo = m_pMPCVR) {
+	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
 		int playbackState;
-		if (SUCCEEDED(pIExFilterInfo->GetInt("playbackState", &playbackState))) {
+		if (SUCCEEDED(pIExFilterConfig->GetInt("playbackState", &playbackState))) {
 			return playbackState == State_Running;
 		}
 	}
