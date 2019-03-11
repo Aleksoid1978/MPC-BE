@@ -26,6 +26,7 @@
 #include "Variables.h"
 #include <moreuuids.h>
 #include "IPinHook.h"
+#include <FilterInterfaces.h>
 
 using namespace DSObjects;
 
@@ -204,4 +205,16 @@ STDMETHODIMP CMPCVRAllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 		hr = pBV->GetCurrentImage((long*)size, (long*)lpDib);
 	}
 	return hr;
+}
+
+STDMETHODIMP_(bool) CMPCVRAllocatorPresenter::IsRendering()
+{
+	if (CComQIPtr<IExFilterInfo> pIExFilterInfo = m_pMPCVR) {
+		int playbackState;
+		if (SUCCEEDED(pIExFilterInfo->GetInt("playbackState", &playbackState))) {
+			return playbackState == State_Running;
+		}
+	}
+
+	return false;
 }
