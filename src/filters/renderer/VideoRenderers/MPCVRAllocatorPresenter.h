@@ -72,8 +72,6 @@ namespace DSObjects
 		STDMETHODIMP_(SIZE) GetVideoSizeAR() override;
 		STDMETHODIMP_(void) SetPosition(RECT w, RECT v) override;
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) override;
-		STDMETHODIMP_(bool) IsRendering() {
-			return true;
-		};
+		STDMETHODIMP_(bool) IsRendering() override;
 	};
 }
