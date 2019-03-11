@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,6 +25,7 @@
 
 #include "DXRAllocatorPresenter.h"
 #include "madVRAllocatorPresenter.h"
+#include "MPCVRAllocatorPresenter.h"
 #include "EVRAllocatorPresenter.h"
 
 static bool bIsErrorShowing   = false;
@@ -46,6 +47,9 @@ HRESULT CreateAP9(const CLSID& clsid, HWND hWnd, bool bFullscreen, ISubPicAlloca
 	}
 	else if (IsEqualCLSID(clsid, CLSID_madVRAllocatorPresenter)) {
 		*ppAP = DNew CmadVRAllocatorPresenter(hWnd, hr, Error);
+	}
+	else if (IsEqualCLSID(clsid, CLSID_MPCVRAllocatorPresenter)) {
+		*ppAP = DNew CMPCVRAllocatorPresenter(hWnd, hr, Error);
 	}
 	else {
 		return E_FAIL;

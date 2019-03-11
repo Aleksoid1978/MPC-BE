@@ -2472,7 +2472,8 @@ bool CAppSettings::IsISRSelect() const
 	return (m_VRSettings.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
 			m_VRSettings.iVideoRenderer == VIDRNDT_DXR ||
 			m_VRSettings.iVideoRenderer == VIDRNDT_SYNC ||
-			m_VRSettings.iVideoRenderer == VIDRNDT_MADVR);
+			m_VRSettings.iVideoRenderer == VIDRNDT_MADVR ||
+			m_VRSettings.iVideoRenderer == VIDRNDT_MPCVR);
 }
 
 bool CAppSettings::IsISRAutoLoadEnabled() const
