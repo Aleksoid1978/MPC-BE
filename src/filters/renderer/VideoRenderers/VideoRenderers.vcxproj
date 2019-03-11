@@ -105,6 +105,7 @@
     <ClCompile Include="MacrovisionKicker.cpp" />
     <ClCompile Include="madVRAllocatorPresenter.cpp" />
     <ClCompile Include="MemUsage.cpp" />
+    <ClCompile Include="MPCVRAllocatorPresenter.cpp" />
     <ClCompile Include="OuterEVR.cpp" />
     <ClCompile Include="PixelShaderCompiler.cpp" />
     <ClCompile Include="RenderersSettings.cpp" />
@@ -133,6 +134,7 @@
     <ClInclude Include="MacrovisionKicker.h" />
     <ClInclude Include="madVRAllocatorPresenter.h" />
     <ClInclude Include="MemUsage.h" />
+    <ClInclude Include="MPCVRAllocatorPresenter.h" />
     <ClInclude Include="OuterEVR.h" />
     <ClInclude Include="PixelShaderCompiler.h" />
     <ClInclude Include="RenderersSettings.h" />

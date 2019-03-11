@@ -444,9 +444,7 @@ HRESULT CFGFilterVideoRenderer::Create(IBaseFilter** ppBF, CInterfaceList<IUnkno
 		hr = CreateEVR(m_clsid, m_hWnd, bFullscreen, &pCAP);
 	} else if (m_clsid == CLSID_SyncAllocatorPresenter) {
 		hr = CreateSyncRenderer(m_clsid, m_hWnd, bFullscreen, &pCAP);
-	} else if (m_clsid == CLSID_DXRAllocatorPresenter) {
-		hr = CreateAP9(m_clsid, m_hWnd, bFullscreen, &pCAP);
-	} else if (m_clsid == CLSID_madVRAllocatorPresenter) {
+	} else if (m_clsid == CLSID_DXRAllocatorPresenter || m_clsid == CLSID_madVRAllocatorPresenter || m_clsid == CLSID_MPCVRAllocatorPresenter) {
 		hr = CreateAP9(m_clsid, m_hWnd, bFullscreen, &pCAP);
 	} else {
 		CComPtr<IBaseFilter> pBF;

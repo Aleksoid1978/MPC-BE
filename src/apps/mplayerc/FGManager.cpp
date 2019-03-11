@@ -2660,7 +2660,8 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	bool VRwithSR =
 		rs.iVideoRenderer == VIDRNDT_MADVR ||
 		rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM ||
-		rs.iVideoRenderer == VIDRNDT_SYNC;
+		rs.iVideoRenderer == VIDRNDT_SYNC ||
+		rs.iVideoRenderer == VIDRNDT_MPCVR;
 
 	switch (s.iSubtitleRenderer) {
 		case SUBRNDT_NONE:
@@ -2904,7 +2905,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 				break;
 #if MPCVR
 			case VIDRNDT_MPCVR:
-				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_MPCVR, L"MPC Video Renderer", m_vrmerit));
+				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_MPCVRAllocatorPresenter, L"MPC Video Renderer", m_vrmerit));
 				break;
 #endif
 		}
