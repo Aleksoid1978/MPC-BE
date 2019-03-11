@@ -6588,7 +6588,7 @@ void CMainFrame::OnViewTearingTest()
 void CMainFrame::OnUpdateViewDisplayStats(CCmdUI* pCmdUI)
 {
 	const CRenderersSettings& rs = GetRenderersSettings();
-	bool supported = (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM || rs.iVideoRenderer == VIDRNDT_SYNC);
+	bool supported = (rs.iVideoRenderer == VIDRNDT_EVR_CUSTOM || rs.iVideoRenderer == VIDRNDT_SYNC || rs.iVideoRenderer == VIDRNDT_MPCVR);
 
 	pCmdUI->Enable(supported && m_eMediaLoadState == MLS_LOADED && !m_bAudioOnly);
 	pCmdUI->SetCheck(supported && rs.iDisplayStats);
@@ -6602,6 +6602,18 @@ void CMainFrame::OnViewResetStats()
 void CMainFrame::OnViewDisplayStatsSC()
 {
 	CRenderersSettings& rs = GetRenderersSettings();
+
+	if (rs.iVideoRenderer == VIDRNDT_MPCVR) {
+		CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pCAP;
+		if (pIExFilterConfig) {
+			bool statsEnable = 0;
+			if (S_OK == pIExFilterConfig->GetBool("statsEnable", &statsEnable)) {
+				statsEnable = !statsEnable;
+				pIExFilterConfig->SetBool("statsEnable", statsEnable);
+			}
+		}
+		return;
+	}
 
 	if (!rs.iDisplayStats) {
 		rs.bResetStats = true; // to Reset statistics on first call ...
