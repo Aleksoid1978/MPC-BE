@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -318,7 +318,6 @@ HRESULT CDVBSub::EndOfStream()
 	return S_OK;
 }
 
-
 void CDVBSub::CleanOld(REFERENCE_TIME rt)
 {
 	// Cleanup old PG
@@ -409,18 +408,30 @@ POSITION CDVBSub::GetStartPosition(REFERENCE_TIME rt, double fps, bool CleanOld/
 
 POSITION CDVBSub::GetNext(POSITION pos)
 {
+	if (m_pages.IsEmpty()) {
+		return nullptr;
+	}
+
 	m_pages.GetNext(pos);
 	return pos;
 }
 
 REFERENCE_TIME CDVBSub::GetStart(POSITION nPos)
 {
+	if (m_pages.IsEmpty()) {
+		return INVALID_TIME;
+	}
+
 	DVB_PAGE* pPage = m_pages.GetAt(nPos);
 	return pPage != NULL ? pPage->rtStart : INVALID_TIME;
 }
 
 REFERENCE_TIME CDVBSub::GetStop(POSITION nPos)
 {
+	if (m_pages.IsEmpty()) {
+		return INVALID_TIME;
+	}
+
 	DVB_PAGE* pPage = m_pages.GetAt(nPos);
 	return pPage != NULL ? pPage->rtStop : INVALID_TIME;
 }
@@ -435,7 +446,6 @@ void CDVBSub::Reset()
 		DVB_PAGE* pPage = m_pages.RemoveHead();
 		delete pPage;
 	}
-
 }
 
 HRESULT CDVBSub::ParsePage(CGolombBuffer& gb, WORD wSegLength, CAutoPtr<DVB_PAGE>& pPage)
