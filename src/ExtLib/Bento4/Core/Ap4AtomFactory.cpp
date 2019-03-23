@@ -509,6 +509,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 
         case AP4_ATOM_TYPE_ICOD:
         case AP4_ATOM_TYPE_AVdn:
+        case AP4_ATOM_TYPE_AVdh:
         case AP4_ATOM_TYPE_FFV1:
         case AP4_ATOM_TYPE_OVC1:
         case AP4_ATOM_TYPE_VC1:
