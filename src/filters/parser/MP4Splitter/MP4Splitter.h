@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -25,6 +25,7 @@
 #include "MP4SplitterFile.h"
 #include "../BaseSplitter/BaseSplitter.h"
 #include "../../filters/FilterInterfacesImpl.h"
+#include <IMediaSideData.h>
 
 #define MP4SplitterName L"MPC MP4/MOV Splitter"
 #define MP4SourceName   L"MPC MP4/MOV Source"
@@ -53,6 +54,7 @@ class __declspec(uuid("61F47056-E400-43d3-AF1E-AB7DFFD4C4AD"))
 	unsigned int m_Palette[256] = {};
 
 	ColorSpace* m_ColorSpace = nullptr;
+	MediaSideDataHDR* m_MasterDataHDR = nullptr;
 
 protected:
 	CAutoPtr<CMP4SplitterFile> m_pFile;
