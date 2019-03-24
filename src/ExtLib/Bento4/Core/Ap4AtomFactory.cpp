@@ -410,6 +410,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_FIEL:
         case AP4_ATOM_TYPE_AV1C:
         case AP4_ATOM_TYPE_CLAP:
+        case AP4_ATOM_TYPE_COLR:
             atom = new AP4_DataInfoAtom(type, size, stream);
             break;
 

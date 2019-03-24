@@ -49,6 +49,7 @@
 #include <Bento4/Core/Ap4DataInfoAtom.h>
 
 #include <libavutil/intreadwrite.h>
+#include <libavutil/pixfmt.h>
 
 #ifdef REGISTER_FILTER
 
@@ -119,6 +120,7 @@ CMP4SplitterFilter::CMP4SplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 
 CMP4SplitterFilter::~CMP4SplitterFilter()
 {
+	SAFE_DELETE(m_ColorSpace);
 }
 
 STDMETHODIMP CMP4SplitterFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -1396,6 +1398,45 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 							}
 						}
+
+						if (AP4_DataInfoAtom* colr = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_COLR))) {
+							const AP4_DataBuffer* colr_data = colr->GetData();
+							if (colr_data->GetDataSize() > 4) {
+								const auto color_parameter_type = GETU32(colr_data->GetData());
+								if (color_parameter_type == FCC('nclc') || color_parameter_type == FCC('nclx')) {
+									if (colr_data->GetDataSize() >= 10) {
+										const auto color_primaries = _byteswap_ushort(GETU16(colr_data->GetData() + 4));
+										const auto color_transfer_function = _byteswap_ushort(GETU16(colr_data->GetData() + 6));
+										const auto color_matrix = _byteswap_ushort(GETU16(colr_data->GetData() + 8));
+										auto color_range = AVCOL_RANGE_MPEG;
+										if (color_parameter_type == FCC('nclx') && colr_data->GetDataSize() >= 11) {
+											const auto range = colr_data->GetData()[10] >> 7;
+											if (range) {
+												color_range = AVCOL_RANGE_JPEG;
+											}
+										}
+
+										m_ColorSpace = DNew(ColorSpace);
+										ZeroMemory(m_ColorSpace, sizeof(ColorSpace));
+										if (color_matrix != AVCOL_SPC_RESERVED) {
+											m_ColorSpace->MatrixCoefficients = color_matrix;
+										}
+										if (color_primaries != AVCOL_PRI_RESERVED
+												&& color_primaries != AVCOL_PRI_RESERVED0) {
+											m_ColorSpace->Primaries = color_primaries;
+										}
+										if (color_range != AVCOL_RANGE_UNSPECIFIED
+												&& color_range <= AVCOL_RANGE_JPEG) {
+											m_ColorSpace->Range = color_range;
+										}
+										if (color_transfer_function != AVCOL_TRC_RESERVED
+												&& color_transfer_function != AVCOL_TRC_RESERVED0) {
+											m_ColorSpace->TransferCharacteristics = color_transfer_function;
+										}
+									}
+								}
+							}
+						}
 					} else if (AP4_AudioSampleEntry* ase = dynamic_cast<AP4_AudioSampleEntry*>(atom)) {
 						DWORD fourcc        = _byteswap_ulong(ase->GetType());
 						DWORD samplerate    = ase->GetSampleRate();
@@ -2277,6 +2318,17 @@ STDMETHODIMP CMP4SplitterFilter::GetBin(LPCSTR field, LPVOID *value, unsigned *s
 			*size = sizeof(m_Palette);
 			*value = (LPVOID)LocalAlloc(LPTR, *size);
 			memcpy(*value, m_Palette, *size);
+
+			return S_OK;
+		}
+		return E_ABORT;
+	}
+
+	if (!strcmp(field, "VIDEO_COLOR_SPACE")) {
+		if (m_ColorSpace) {
+			*size = sizeof(*m_ColorSpace);
+			*value = (LPVOID)LocalAlloc(LPTR, *size);
+			memcpy(*value, m_ColorSpace, *size);
 
 			return S_OK;
 		}

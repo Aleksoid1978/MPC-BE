@@ -52,6 +52,8 @@ class __declspec(uuid("61F47056-E400-43d3-AF1E-AB7DFFD4C4AD"))
 	bool m_bHasPalette = false;
 	unsigned int m_Palette[256] = {};
 
+	ColorSpace* m_ColorSpace = nullptr;
+
 protected:
 	CAutoPtr<CMP4SplitterFile> m_pFile;
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
