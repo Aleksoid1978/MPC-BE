@@ -1228,10 +1228,6 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 	CheckPointer(pSample, false);
 	CheckPointer(pFrame, false);
 
-	if (m_nCodecId != AV_CODEC_ID_HEVC && m_nCodecId != AV_CODEC_ID_VP9) {
-		return false;
-	}
-
 	CComPtr<IMediaSideData> pMediaSideData;
 	if (SUCCEEDED(pSample->QueryInterface(&pMediaSideData))) {
 		HRESULT hr = E_FAIL;
