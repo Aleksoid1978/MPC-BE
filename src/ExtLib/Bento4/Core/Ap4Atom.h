@@ -276,6 +276,7 @@ const AP4_Atom::Type AP4_ATOM_TYPE_CLAP = AP4_ATOM_TYPE('c','l','a','p');
 
 const AP4_Atom::Type AP4_ATOM_TYPE_COLR = AP4_ATOM_TYPE('c','o','l','r');
 const AP4_Atom::Type AP4_ATOM_TYPE_MDCV = AP4_ATOM_TYPE('m','d','c','v');
+const AP4_Atom::Type AP4_ATOM_TYPE_CLLI = AP4_ATOM_TYPE('c','l','l','i');
 
 // 'raw ' (audio or video)
 const AP4_Atom::Type AP4_ATOM_TYPE_RAW  = AP4_ATOM_TYPE('r','a','w',' ');

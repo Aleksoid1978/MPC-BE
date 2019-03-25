@@ -1271,7 +1271,7 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 			}
 		} else if (m_FilterInfo.HDRContentLightLevel) {
 			hr = pMediaSideData->SetSideData(IID_MediaSideDataHDRContentLightLevel, (const BYTE*)m_FilterInfo.HDRContentLightLevel, sizeof(MediaSideDataHDRContentLightLevel));
-			SAFE_DELETE(m_FilterInfo.masterDataHDR);
+			SAFE_DELETE(m_FilterInfo.HDRContentLightLevel);
 		}
 
 		return (hr == S_OK);
