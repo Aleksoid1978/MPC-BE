@@ -122,6 +122,7 @@ CMP4SplitterFilter::~CMP4SplitterFilter()
 {
 	SAFE_DELETE(m_ColorSpace);
 	SAFE_DELETE(m_MasterDataHDR);
+	SAFE_DELETE(m_HDRContentLightLevel);
 }
 
 STDMETHODIMP CMP4SplitterFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
@@ -1461,6 +1462,19 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								m_MasterDataHDR->min_display_mastering_luminance = CALC_HDR_VALUE(AV_RB32(data + 20), 10000);
 							}
 						}
+
+						if (AP4_DataInfoAtom* clli = dynamic_cast<AP4_DataInfoAtom*>(vse->GetChild(AP4_ATOM_TYPE_CLLI))) {
+							const AP4_DataBuffer* clli_data = clli->GetData();
+							if (clli_data->GetDataSize() == 4) {
+								m_HDRContentLightLevel = DNew(MediaSideDataHDRContentLightLevel);
+								ZeroMemory(m_HDRContentLightLevel, sizeof(MediaSideDataHDRContentLightLevel));
+
+								auto data = clli_data->GetData();
+
+								m_HDRContentLightLevel->MaxCLL  = AV_RB16(data);
+								m_HDRContentLightLevel->MaxFALL = AV_RB16(data + 2);
+							}
+						}
 					} else if (AP4_AudioSampleEntry* ase = dynamic_cast<AP4_AudioSampleEntry*>(atom)) {
 						DWORD fourcc        = _byteswap_ulong(ase->GetType());
 						DWORD samplerate    = ase->GetSampleRate();
@@ -2364,6 +2378,17 @@ STDMETHODIMP CMP4SplitterFilter::GetBin(LPCSTR field, LPVOID *value, unsigned *s
 			*size = sizeof(*m_MasterDataHDR);
 			*value = (LPVOID)LocalAlloc(LPTR, *size);
 			memcpy(*value, m_MasterDataHDR, *size);
+
+			return S_OK;
+		}
+		return E_ABORT;
+	}
+
+	if (!strcmp(field, "HDR_CONTENT_LIGHT_LEVEL")) {
+		if (m_HDRContentLightLevel) {
+			*size = sizeof(*m_HDRContentLightLevel);
+			*value = (LPVOID)LocalAlloc(LPTR, *size);
+			memcpy(*value, m_HDRContentLightLevel, *size);
 
 			return S_OK;
 		}

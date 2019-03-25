@@ -55,6 +55,7 @@ class __declspec(uuid("61F47056-E400-43d3-AF1E-AB7DFFD4C4AD"))
 
 	ColorSpace* m_ColorSpace = nullptr;
 	MediaSideDataHDR* m_MasterDataHDR = nullptr;
+	MediaSideDataHDRContentLightLevel* m_HDRContentLightLevel = nullptr;
 
 protected:
 	CAutoPtr<CMP4SplitterFile> m_pFile;
