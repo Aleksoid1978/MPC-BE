@@ -106,7 +106,7 @@ IF /I "%COMPILER%" == "VS2017" (
 
 SET "VSWHERE="%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" %PARAMS%"
 
-FOR /f "delims=" %%A IN ('!VSWHERE!') DO SET "VCVARS=%%A\VC\Auxiliary\Build\vcvarsall.bat"
+FOR /f "delims=" %%A IN ('!VSWHERE!') DO SET "VCVARS=%%A\Common7\Tools\vsdevcmd.bat"
 
 IF NOT EXIST "%VCVARS%" GOTO MissingVar
 
@@ -134,7 +134,7 @@ SET START_DATE=%DATE%
 IF /I "%BUILDPLATFORM%" == "Win32" (GOTO Win32) ELSE IF /I "%BUILDPLATFORM%" == "x64" (GOTO x64)
 
 :Win32
-CALL "%VCVARS%" x86 > nul
+CALL "%VCVARS%" -no_logo -arch=x86
 REM again set the source directory (fix possible bug in VS2017)
 CD /D %~dp0
 
@@ -163,7 +163,7 @@ IF /I "%CONFIG%" == "All" (
 :x64
 IF /I "%BUILDPLATFORM%" == "Win32" GOTO End
 
-CALL "%VCVARS%" %x64_type% > nul
+CALL "%VCVARS%" -no_logo -arch=amd64
 REM again set the source directory (fix possible bug in VS2017)
 CD /D %~dp0
 
