@@ -1,5 +1,5 @@
 @ECHO OFF
-REM (C) 2015-2018 see Authors.txt
+REM (C) 2015-2019 see Authors.txt
 REM
 REM This file is part of MPC-BE.
 REM
@@ -28,16 +28,9 @@ IF NOT EXIST "%~dp0signinfo.txt" (
   GOTO END
 )
 
-IF NOT DEFINED VS150COMNTOOLS (
-  FOR /F "tokens=2*" %%A IN (
-    'REG QUERY "HKLM\SOFTWARE\Microsoft\VisualStudio\SxS\VS7" /v "15.0" 2^>NUL ^| FIND "REG_SZ" ^|^|
-     REG QUERY "HKLM\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\SxS\VS7" /v "15.0" 2^>NUL ^| FIND "REG_SZ"') DO SET "VS150COMNTOOLS=%%BCommon7\Tools\"
-)
+FOR /f "delims=" %%A IN ('"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -prerelease -property installationPath -requires Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.ATLMFC Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -latest') DO SET "VCVARS=%%A\VC\Auxiliary\Build\vcvarsall.bat"
 
-IF DEFINED VS150COMNTOOLS (
-  SET "VSNAME=Visual Studio 2017"
-  SET "VCVARS=%VS150COMNTOOLS%..\..\VC\Auxiliary\Build\vcvarsall.bat"
-) ELSE (
+IF NOT EXIST "%VCVARS%" (
   ECHO ERROR: "Visual Studio environment variable(s) is missing - possible it's not installed on your PC"
   GOTO END
 )
