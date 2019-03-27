@@ -649,7 +649,7 @@ void COggSplitterFilter::DemuxSeek(REFERENCE_TIME rt)
 					continue;
 				}
 
-				rtSeek = pOggPin->GetRefTime(page.m_hdr.granule_position) + pOggPin->GetOffset();
+				rtSeek = pOggPin->GetRefTime(page.m_hdr.granule_position);
 				break;
 			}
 

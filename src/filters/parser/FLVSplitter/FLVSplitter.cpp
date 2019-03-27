@@ -1199,7 +1199,7 @@ bool CFLVSplitterFilter::DemuxInit()
 				}
 
 				if ((t.TagType == FLV_AUDIODATA && ReadTag(at)) || (t.TagType == FLV_VIDEODATA && ReadTag(vt))) {
-					m_rtDuration = std::max(m_rtDuration, 10000i64 * t.TimeStamp + pOutPin->GetOffset());
+					m_rtDuration = std::max(m_rtDuration, 10000i64 * t.TimeStamp);
 				}
 
 				m_pFile->Seek(next);

@@ -270,11 +270,6 @@ bool CBaseSplitterOutputPin::IsActive()
 	return true;
 }
 
-REFERENCE_TIME CBaseSplitterOutputPin::GetOffset() const
-{
-	return m_pSplitter->m_rtOffset;
-}
-
 DWORD CBaseSplitterOutputPin::ThreadProc()
 {
 	SetThreadName((DWORD)-1, "CBaseSplitterOutputPin");

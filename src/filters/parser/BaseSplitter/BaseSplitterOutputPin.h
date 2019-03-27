@@ -156,8 +156,6 @@ public:
 
 	STDMETHODIMP_(DWORD) GetCurrentBitRate() { return m_brs.nCurrentBitRate; }
 	STDMETHODIMP_(DWORD) GetAverageBitRate() { return m_brs.nAverageBitRate; }
-
-	REFERENCE_TIME GetOffset() const;
 };
 
 class CSubtitleStatus
