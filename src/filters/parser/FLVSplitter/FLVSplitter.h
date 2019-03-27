@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -51,7 +51,7 @@ class __declspec(uuid("47E792CF-0BBE-4F7A-859C-194B0768650A"))
 		UINT32 StreamID = 0;
 	};
 
-	bool ReadTag(Tag& t);
+	bool ReadTag(Tag& t, bool bCheckOnly = false);
 
 	struct AudioTag {
 		BYTE SoundFormat = 0;

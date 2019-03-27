@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -102,7 +102,11 @@ STDAPI DllRegisterServer()
 {
 	DeleteRegKey(L"Media Type\\Extensions\\", L".flv");
 
-	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_FLV, L"0,4,,464C5601", nullptr);
+	const std::list<CString> chkbytes = {
+		L"0,4,,464C5601", // 'FLV\01'
+		L"0,4,,584C5646", // 'XLVF'
+	};
+	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_FLV, chkbytes, nullptr);
 
 	return AMovieDllRegisterServer2(TRUE);
 }
@@ -308,7 +312,7 @@ bool CFLVSplitterFilter::ParseAMF0(UINT64 end, const CString key, std::vector<AM
 	return true;
 }
 
-bool CFLVSplitterFilter::ReadTag(Tag& t)
+bool CFLVSplitterFilter::ReadTag(Tag& t, bool bCheckOnly/* = false*/)
 {
 	if (!m_pFile->IsStreaming() && m_pFile->GetRemaining() < 15) {
 		return false;
@@ -321,7 +325,7 @@ bool CFLVSplitterFilter::ReadTag(Tag& t)
 	t.TimeStamp		   |= (UINT32)m_pFile->BitRead(8) << 24;
 	t.StreamID			= (UINT32)m_pFile->BitRead(24);
 
-	if (m_DetectWrongTimeStamp && (t.TagType == FLV_AUDIODATA || t.TagType == FLV_VIDEODATA)) {
+	if (!bCheckOnly && m_DetectWrongTimeStamp && (t.TagType == FLV_AUDIODATA || t.TagType == FLV_VIDEODATA)) {
 		if (t.TimeStamp > 0) {
 			m_TimeStampOffset = t.TimeStamp;
 		}
@@ -422,14 +426,16 @@ bool CFLVSplitterFilter::Sync(__int64& pos)
 		}
 	} else {
 		m_pFile->Seek(pos);
+		unsigned cnt = 0;
 		while (m_pFile->GetRemaining() >= 15 && SUCCEEDED(m_pFile->GetLastReadError())) {
 			__int64 limit = m_pFile->GetRemaining();
 			while (true) {
+				cnt++;
 				BYTE b = (BYTE)m_pFile->BitRead(8);
 				if (IsValidTag(b)) {
 					break;
 				}
-				if (--limit < 15) {
+				if (--limit < 15 || cnt > MEGABYTE) {
 					return false;
 				}
 			}
@@ -438,7 +444,7 @@ bool CFLVSplitterFilter::Sync(__int64& pos)
 			m_pFile->Seek(pos);
 
 			Tag ct;
-			if (ReadTag(ct) && IsValidTag(ct.TagType)) {
+			if (ReadTag(ct, true) && IsValidTag(ct.TagType)) {
 				__int64 next = m_pFile->GetPos() + ct.DataSize;
 				if (next == m_pFile->GetAvailable() - 4) {
 					m_pFile->Seek(pos);
@@ -446,7 +452,7 @@ bool CFLVSplitterFilter::Sync(__int64& pos)
 				} else if (next <= m_pFile->GetAvailable() - 19) {
 					m_pFile->Seek(next);
 					Tag nt;
-					if (ReadTag(nt) && IsValidTag(nt.TagType)) {
+					if (ReadTag(nt, true) && IsValidTag(nt.TagType)) {
 						if ((nt.PreviousTagSize == ct.DataSize + 11) ||
 								(nt.TimeStamp >= ct.TimeStamp)) {
 							m_pFile->Seek(pos);
@@ -483,18 +489,28 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
 
-	if (m_pFile->BitRead(32) != 'FLV\01') {
+	const UINT32 sync = m_pFile->BitRead(32);
+	if (sync != 'FLV\01' && sync != 'XLVF') {
 		return E_FAIL;
 	}
 
-	EXECUTE_ASSERT(m_pFile->BitRead(5) == 0); // TypeFlagsReserved
-	bool fTypeFlagsAudio = !!m_pFile->BitRead(1);
-	EXECUTE_ASSERT(m_pFile->BitRead(1) == 0); // TypeFlagsReserved
-	bool fTypeFlagsVideo = !!m_pFile->BitRead(1);
-	m_DataOffset = (UINT32)m_pFile->BitRead(32);
+	bool fTypeFlagsAudio = true;
+	bool fTypeFlagsVideo = true;
 
-	// doh, these flags aren't always telling the truth
-	fTypeFlagsAudio = fTypeFlagsVideo = true;
+	if (sync == 'FLV\01') {
+		EXECUTE_ASSERT(m_pFile->BitRead(5) == 0); // TypeFlagsReserved
+		m_pFile->BitRead(1);
+		EXECUTE_ASSERT(m_pFile->BitRead(1) == 0); // TypeFlagsReserved
+		m_pFile->BitRead(1);
+		m_DataOffset = (UINT32)m_pFile->BitRead(32);
+	} else {
+		__int64 sync_pos = 0x200000;
+		if (Sync(sync_pos)) {
+			m_DataOffset = sync_pos;
+		} else {
+			return E_FAIL;
+		}
+	}
 
 	Tag t;
 	AudioTag at;
