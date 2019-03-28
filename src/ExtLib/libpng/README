@@ -1,4 +1,5 @@
-README for libpng version 1.6.36.git.
+README for libpng version 1.6.37.git
+====================================
 
 See the note about version numbers near the top of png.h.
 See INSTALL for instructions on how to install libpng.
@@ -89,9 +90,9 @@ these at http://www.libpng.org/pub/png/pngdocs.html .
 This code is currently being archived at libpng.sourceforge.io in the
 [DOWNLOAD] area, and at http://libpng.download/src .
 
-This release was created and will be supported by myself (of course
-based in a large way on Glenn's, Guy's and Andreas' earlier work), and
-the PNG development group.
+This release, based in a large way on Glenn's, Guy's and Andreas'
+earlier work, was created and will be supported by myself and the PNG
+development group.
 
 Send comments/corrections/commendations to png-mng-implement at
 lists.sourceforge.net (subscription required; visit
@@ -106,11 +107,13 @@ subscribe).
 Files in this distribution:
 
       ANNOUNCE      =>  Announcement of this version, with recent changes
+      AUTHORS       =>  List of contributing authors
       CHANGES       =>  Description of changes between libpng versions
       KNOWNBUG      =>  List of known bugs and deficiencies
       LICENSE       =>  License to use and redistribute libpng
       README        =>  This file
       TODO          =>  Things not implemented in the current library
+      TRADEMARK     =>  Trademark information
       example.c     =>  Example code for using libpng functions
       libpng.3      =>  manual page for libpng (includes libpng-manual.txt)
       libpng-manual.txt  =>  Description of libpng and its functions
@@ -171,18 +174,10 @@ Files in this distribution:
       scripts       =>  Directory containing scripts for building libpng:
                             (see scripts/README.txt for the list of scripts)
 
-Good luck, and happy coding.
+Good luck, and happy coding!
 
-* Cosmin Truta (current maintainer, since 2018)
-  Email: cosmin at users.sourceforge.net
-
-* Glenn Randers-Pehrson (former maintainer, 1998-2018)
-  Email: glennrp at users.sourceforge.net
-
-* Andreas Eric Dilger (former maintainer, 1996-1997)
-  Email: adilger at enel.ucalgary.ca
-  Web: http://www-mddsp.enel.ucalgary.ca/People/adilger/
-
-* Guy Eric Schalnat (original author and former maintainer, 1995-1996)
-  (formerly of Group 42, Inc)
-  Email: gschal at infinet.com
+ * Cosmin Truta (current maintainer, since 2018)
+ * Glenn Randers-Pehrson (former maintainer, 1998-2018)
+ * Andreas Eric Dilger (former maintainer, 1996-1997)
+ * Guy Eric Schalnat (original author and former maintainer, 1995-1996)
+   (formerly of Group 42, Inc.)

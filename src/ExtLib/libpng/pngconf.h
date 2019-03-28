@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.6.36.git
+ * libpng version 1.6.37.git
  *
  * Copyright (c) 2018 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2016,2018 Glenn Randers-Pehrson
@@ -63,8 +63,8 @@
  */
 #define PNG_CONST const /* backward compatibility only */
 
-/* This controls optimization of the reading of 16-bit and 32-bit values
- * from PNG files.  It can be set on a per-app-file basis - it
+/* This controls optimization of the reading of 16-bit and 32-bit
+ * values from PNG files.  It can be set on a per-app-file basis: it
  * just changes whether a macro is used when the function is called.
  * The library builder sets the default; if read functions are not
  * built into the library the macro implementation is forced on.
