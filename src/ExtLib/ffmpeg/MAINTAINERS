@@ -53,7 +53,7 @@ Communication
 website                                 Deby Barbara Lepage
 fate.ffmpeg.org                         Timothy Gu
 Trac bug tracker                        Alexander Strasser, Michael Niedermayer, Carl Eugen Hoyos
-mailing lists                           Baptiste Coudurier, Lou Logan
+mailing lists                           Baptiste Coudurier
 Google+                                 Paul B Mahol, Michael Niedermayer, Alexander Strasser
 Twitter                                 Lou Logan, Reynaldo H. Verdejo Pinochet
 Launchpad                               Timothy Gu
@@ -168,7 +168,6 @@ Codecs:
   eacmv*, eaidct*, eat*                 Peter Ross
   evrc*                                 Paul B Mahol
   exif.c, exif.h                        Thilo Borgmann
-  exr.c                                 Martin Vignali
   ffv1*                                 Michael Niedermayer
   ffwavesynth.c                         Nicolas George
   fifo.c                                Jan Sebechlebsky

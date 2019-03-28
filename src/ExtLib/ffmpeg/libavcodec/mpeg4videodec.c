@@ -1899,14 +1899,20 @@ static int mpeg4_decode_studio_block(MpegEncContext *s, int32_t block[64], int n
             code >>= 1;
             run = (1 << (additional_code_len - 1)) + code;
             idx += run;
+            if (idx > 63)
+                return AVERROR_INVALIDDATA;
             j = scantable[idx++];
             block[j] = sign ? 1 : -1;
         } else if (group >= 13 && group <= 20) {
             /* Level value (Table B.49) */
+            if (idx > 63)
+                return AVERROR_INVALIDDATA;
             j = scantable[idx++];
             block[j] = get_xbits(&s->gb, additional_code_len);
         } else if (group == 21) {
             /* Escape */
+            if (idx > 63)
+                return AVERROR_INVALIDDATA;
             j = scantable[idx++];
             additional_code_len = s->avctx->bits_per_raw_sample + s->dct_precision + 4;
             flc = get_bits(&s->gb, additional_code_len);
@@ -3203,11 +3209,13 @@ static int decode_studio_vol_header(Mpeg4DecContext *ctx, GetBitContext *gb)
 
 /**
  * Decode MPEG-4 headers.
- * @return <0 if no VOP found (or a damaged one)
+ *
+ * @param  header If set the absence of a VOP is not treated as error; otherwise, it is treated as such.
+ * @return <0 if an error occured
  *         FRAME_SKIPPED if a not coded VOP is found
- *         0 if a VOP is found
+ *         0 else
  */
-int ff_mpeg4_decode_picture_header(Mpeg4DecContext *ctx, GetBitContext *gb)
+int ff_mpeg4_decode_picture_header(Mpeg4DecContext *ctx, GetBitContext *gb, int header)
 {
     MpegEncContext *s = &ctx->m;
     unsigned startcode, v;
@@ -3236,6 +3244,8 @@ int ff_mpeg4_decode_picture_header(Mpeg4DecContext *ctx, GetBitContext *gb)
                 (ctx->divx_version >= 0 || ctx->xvid_build >= 0) || s->codec_tag == AV_RL32("QMP4")) {
                 av_log(s->avctx, AV_LOG_VERBOSE, "frame skip %d\n", gb->size_in_bits);
                 return FRAME_SKIPPED;  // divx bug
+            } else if (header && get_bits_count(gb) == gb->size_in_bits) {
+                return 0; // ordinary return value for parsing of extradata
             } else
                 return AVERROR_INVALIDDATA;  // end of stream
         }
