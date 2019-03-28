@@ -306,6 +306,17 @@ void File_VorbisCom::Data_Parse()
         }
         else if (Key==__T("HDCD"))                   { if (Value != __T("0")) { Fill(Stream_Audio, 0, "HDCD", "Yes"); } }
         else if (Key==__T("YEAR"))                   {if (Value!=Retrieve(StreamKind_Common,   0, "Recorded_Date")) Fill(StreamKind_Common,   0, "Recorded_Date", Value);}
+        else if (Key==__T("METADATA_BLOCK_PICTURE")) //Used by some conversion tools from FLAC
+        {
+            //Filling
+            Fill(Stream_General, 0, General_Cover, "Yes");
+            #if MEDIAINFO_ADVANCED
+                if (MediaInfoLib::Config.Flags1_Get(Flags_Cover_Data_base64))
+                {
+                    Fill(Stream_General, 0, General_Cover_Data, Value);
+                }
+            #endif //MEDIAINFO_ADVANCED
+        }
         else if (Key.find(__T("COVERART"))==0)
         {
                  if (Key==__T("COVERARTCOUNT"))

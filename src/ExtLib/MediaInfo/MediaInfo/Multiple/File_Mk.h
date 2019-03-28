@@ -203,19 +203,19 @@ private :
     void Segment_Tracks_TrackEntry_Video_Colour_Range();
     void Segment_Tracks_TrackEntry_Video_Colour_TransferCharacteristics();
     void Segment_Tracks_TrackEntry_Video_Colour_Primaries();
-    void Segment_Tracks_TrackEntry_Video_Colour_MaxCLL(){UInteger_Info();};
-    void Segment_Tracks_TrackEntry_Video_Colour_MaxFALL(){UInteger_Info();};
+    void Segment_Tracks_TrackEntry_Video_Colour_MaxCLL();
+    void Segment_Tracks_TrackEntry_Video_Colour_MaxFALL();
     void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata(){};
-    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryRChromaticityX(){Float_Info();};
-    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryRChromaticityY(){Float_Info();};
-    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryGChromaticityX(){Float_Info();};
-    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryGChromaticityY(){Float_Info();};
-    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryBChromaticityX(){Float_Info();};
-    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryBChromaticityY(){Float_Info();};
-    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_WhitePointChromaticityX(){Float_Info();};
-    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_WhitePointChromaticityY(){Float_Info();};
-    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_LuminanceMax(){Float_Info();};
-    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_LuminanceMin(){Float_Info();};
+    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryRChromaticityX()   {Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_Primary(2*2  );};
+    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryRChromaticityY()   {Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_Primary(2*2+1);};
+    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryGChromaticityX()   {Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_Primary(0*2  );};
+    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryGChromaticityY()   {Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_Primary(0*2+1);};
+    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryBChromaticityX()   {Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_Primary(1*2  );};
+    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_PrimaryBChromaticityY()   {Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_Primary(1*2+1);};
+    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_WhitePointChromaticityX() {Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_Primary(3*2  );};
+    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_WhitePointChromaticityY() {Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_Primary(3*2+1);};
+    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_LuminanceMax()            {Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_Luminance(1);};
+    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_LuminanceMin()            {Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_Luminance(0);};
     void Segment_Tracks_TrackEntry_Video_Projection(){};
     void Segment_Tracks_TrackEntry_Video_Projection_ProjectionType(){UInteger_Info();};
     void Segment_Tracks_TrackEntry_Video_Projection_ProjectionPrivate(){Skip_XX(Element_Size, "Data");};
@@ -355,6 +355,7 @@ private :
         int64u                  PixelCropLeft;
         int64u                  PixelCropRight;
         int64u                  PixelCropTop;
+        mastering_metadata_2086      MasteringMetadata;
         #if MEDIAINFO_TRACE
             size_t Trace_Segment_Cluster_Block_Count;
         #endif // MEDIAINFO_TRACE
@@ -383,6 +384,7 @@ private :
             PixelCropLeft=0;
             PixelCropRight=0;
             PixelCropTop=0;
+            memset(&MasteringMetadata, 0xFF, sizeof(MasteringMetadata));
             #if MEDIAINFO_TRACE
                 Trace_Segment_Cluster_Block_Count=0;
             #endif // MEDIAINFO_TRACE
@@ -528,6 +530,8 @@ private :
     void Segment_Tracks_TrackEntry_CodecPrivate_auds();
     void Segment_Tracks_TrackEntry_CodecPrivate_auds_ExtensibleWave(int16u BitsPerSample);
     void Segment_Tracks_TrackEntry_CodecPrivate_vids();
+    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_Primary(int8u i);
+    void Segment_Tracks_TrackEntry_Video_Colour_MasteringMetadata_Luminance(int8u i);
     void JumpTo(int64u GoTo);
     void TestMultipleInstances(size_t* Instances=NULL);
     void CRC32_Check();

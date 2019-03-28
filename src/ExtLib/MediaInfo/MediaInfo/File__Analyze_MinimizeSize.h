@@ -771,6 +771,14 @@ public :
     #if defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES)
     void Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance);
     #endif
+    #if defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MATROSKA_YES)
+    struct mastering_metadata_2086
+    {
+        int16u Primaries[8];
+        int32u Luminance[2];
+    };
+    void Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance, mastering_metadata_2086 &Meta);
+    #endif
 
     //***************************************************************************
     // Unknown
@@ -1251,6 +1259,7 @@ protected :
     int64u Buffer_TotalBytes_FirstSynched_Max;
     int64u Buffer_TotalBytes_Fill_Max;
     friend class File__Tags_Helper;
+    friend class File_Mpeg4;
 
     //***************************************************************************
     // Helpers

@@ -117,7 +117,7 @@ void File_ProRes::Read_Buffer_Continue()
     //Parsing
     int32u  Name, creatorID;
     int16u  hdrSize, version, frameWidth, frameHeight;
-    int8u   chrominance_factor, frame_type, primaries, transf_func, colorMatrix;
+    int8u   chrominance_factor, frame_type, primaries, transf_func, colorMatrix, alpha_info;
     bool    IsOk=true, luma, chroma;
     Element_Begin1("Header");
         Skip_B4(                                                "Size");
@@ -141,7 +141,7 @@ void File_ProRes::Read_Buffer_Continue()
         Get_B1 (colorMatrix,                                    "colorMatrix"); Param_Info1(Mpegv_matrix_coefficients(colorMatrix));
         BS_Begin();
         Skip_S1(4,                                              "src_pix_fmt");
-        Skip_S1(4,                                              "alpha_info");
+        Get_S1 (4, alpha_info,                                  "alpha_info");
         BS_End();
         Skip_B1(                                                "reserved");
         BS_Begin();
@@ -239,10 +239,10 @@ void File_ProRes::Read_Buffer_Continue()
                 Fill(Stream_Video, 0, Video_transfer_characteristics, Mpegv_transfer_characteristics(transf_func));
                 Fill(Stream_Video, 0, Video_matrix_coefficients, Mpegv_matrix_coefficients(colorMatrix));
                 if (colorMatrix!=2)
-                    Fill(Stream_Video, 0, Video_ColorSpace, Mpegv_matrix_coefficients_ColorSpace(colorMatrix), Unlimited, true, true);
+                    Fill(Stream_Video, 0, Video_ColorSpace, Ztring().From_UTF8(Mpegv_matrix_coefficients_ColorSpace(colorMatrix))+(alpha_info?__T("A"):__T("")), true);
             }
             else if (chrominance_factor==2)
-                Fill(Stream_Video, 0, Video_ColorSpace, "YUV", Unlimited, true, true); //We are sure it is YUV as there is subsampling
+                Fill(Stream_Video, 0, Video_ColorSpace, alpha_info?"YUVA":"YUV", Unlimited, true, true); //We are sure it is YUV as there is subsampling
 
             Finish();
         }
