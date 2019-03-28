@@ -227,6 +227,8 @@ File_Mpeg4::File_Mpeg4()
     IsParsing_mdat=false;
     IsFragmented=false;
     StreamOrder=0;
+    meta_pitm_item_ID=(int32u)-1;
+    meta_iprp_ipco_Buffer=NULL;
     moov_trak_tkhd_TrackID=(int32u)-1;
     mdat_Pos_NormalParsing=false;
     moof_traf_base_data_offset=(int64u)-1;
@@ -244,6 +246,7 @@ File_Mpeg4::File_Mpeg4()
 //---------------------------------------------------------------------------
 File_Mpeg4::~File_Mpeg4()
 {
+    delete[] meta_iprp_ipco_Buffer;
 }
 
 //***************************************************************************
@@ -344,6 +347,7 @@ void File_Mpeg4::Streams_Finish()
             TimeCode_Associate(Temp->first);
 
     //For each stream
+    vector<size_t> ToDelete_StreamPos;
     streams::iterator Temp=Streams.begin();
     while (Temp!=Streams.end())
     {
@@ -553,6 +557,20 @@ void File_Mpeg4::Streams_Finish()
                 if (TempString.size())
                 {
                     Fill(StreamKind_Last, StreamPos_Last, "Menus", TempString.To_UTF8().c_str());
+                    TempString.clear();
+                }
+            }
+            for (std::map<std::string, std::vector<int32u> >::iterator InfoList=Temp->second.Infos_List.begin(); InfoList!=Temp->second.Infos_List.end(); ++InfoList)
+            {
+                for (TrackID=InfoList->second.begin(); TrackID!=InfoList->second.end(); ++TrackID)
+                {
+                    if (!TempString.empty())
+                        TempString.append(__T(","));
+                    TempString.append(Ztring().From_Number(*TrackID));
+                }
+                if (!TempString.empty())
+                {
+                    Fill(StreamKind_Last, StreamPos_Last, InfoList->first.c_str(), TempString.To_UTF8().c_str());
                     TempString.clear();
                 }
             }
@@ -1143,7 +1161,7 @@ void File_Mpeg4::Streams_Finish()
         }
 
         //Bitrate Mode
-        if (Retrieve(StreamKind_Last, StreamPos_Last, "BitRate_Mode").empty())
+        if (StreamKind_Last!=Stream_Menu && Retrieve(StreamKind_Last, StreamPos_Last, "BitRate_Mode").empty())
         {
             if (Temp->second.stss.empty() && Temp->second.stss.size()!=Temp->second.stsz_Total.size() && !IsFragmented)
             {
@@ -1195,7 +1213,43 @@ void File_Mpeg4::Streams_Finish()
             }
         }
 
+        if (Temp->second.IsImage)
+        {
+            // A video stream is actually an image stream
+            stream_t Source_StreamKind=StreamKind_Last;
+            size_t Source_StreamPos=StreamPos_Last;
+            ToDelete_StreamPos.push_back(StreamPos_Last);
+            Stream_Prepare(Stream_Image);
+            if (Temp->second.stsz_StreamSize)
+                Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize), Temp->second.stsz_StreamSize, 10, true);
+            size_t Size=Count_Get(Source_StreamKind, Source_StreamPos);
+            for (size_t i=General_ID; i<Size; i++)
+            {
+                switch (i)
+                {
+                    case Video_Sampled_Width:
+                    case Video_Sampled_Height:
+                        continue;
+                }
+                const Ztring& Value=Retrieve_Const(Source_StreamKind, Source_StreamPos, i);
+                if (!Value.empty())
+                {
+                    const Ztring& Name=Retrieve_Const(Source_StreamKind, Source_StreamPos, i, Info_Name);
+                    Fill(StreamKind_Last, StreamPos_Last, Name.To_UTF8().c_str(), Value, true);
+                    const Ztring& Options=Retrieve_Const(Source_StreamKind, Source_StreamPos, i, Info_Options);
+                    Fill_SetOptions(StreamKind_Last, StreamPos_Last, Name.To_UTF8().c_str(), Options.To_UTF8().c_str());
+                }
+            }
+        }
+
         ++Temp;
+    }
+    size_t ToDelete_StreamPos_Size=ToDelete_StreamPos.size();
+    if (ToDelete_StreamPos_Size)
+    {
+        sort(ToDelete_StreamPos.begin(), ToDelete_StreamPos.end());
+        for (size_t i=ToDelete_StreamPos.size()-1; i!=(size_t)-1; i--)
+            Stream_Erase(Stream_Video, ToDelete_StreamPos[i]);
     }
     if (Vendor!=0x00000000 && Vendor!=0xFFFFFFFF)
     {
@@ -2982,6 +3036,17 @@ void File_Mpeg4::TimeCodeTrack_Check(stream &Stream_Temp, size_t Pos, int32u Str
     }
 }
 #endif //MEDIAINFO_DEMUX
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::Skip_NulString(const char* Name)
+{
+    int64u End=Element_Offset;
+    while (End<Element_Size && Buffer[Buffer_Offset+(size_t)End])
+        End++;
+    Skip_String(End-Element_Offset,                             Name);
+    if (Element_Offset<Element_Size)
+        Element_Offset++; //Skip zero
+}
 
 //***************************************************************************
 // C++

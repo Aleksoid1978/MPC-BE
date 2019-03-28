@@ -358,6 +358,13 @@ private :
     void sei_message_buffering_period_xxl(seq_parameter_set_struct::vui_parameters_struct::xxl_common* xxL_Common, bool irap_cpb_params_present_flag, seq_parameter_set_struct::vui_parameters_struct::xxl* xxl);
     void sei_message_pic_timing(int32u &seq_parameter_set_id, int32u payloadSize);
     void sei_message_user_data_registered_itu_t_t35();
+    void sei_message_user_data_registered_itu_t_t35_B5();
+    void sei_message_user_data_registered_itu_t_t35_B5_003A();
+    void sei_message_user_data_registered_itu_t_t35_B5_003A_00();
+    void sei_message_user_data_registered_itu_t_t35_B5_003A_02();
+    void sei_message_user_data_registered_itu_t_t35_B5_003C();
+    void sei_message_user_data_registered_itu_t_t35_B5_003C_0001();
+    void sei_message_user_data_registered_itu_t_t35_B5_003C_0001_04();
     void sei_message_user_data_unregistered(int32u payloadSize);
     void sei_message_user_data_unregistered_Ateme(int32u payloadSize);
     void sei_message_user_data_unregistered_x265(int32u payloadSize);
@@ -406,8 +413,14 @@ private :
     Ztring                              Encoded_Library_Version;
     Ztring                              Encoded_Library_Date;
     Ztring                              Encoded_Library_Settings;
-    Ztring                              MasteringDisplay_ColorPrimaries;
-    Ztring                              MasteringDisplay_Luminance;
+    enum hdr_format
+    {
+        HdrFormat_EtsiTs103433,
+        HdrFormat_SmpteSt209440,
+        HdrFormat_SmpteSt2086,
+    };
+    typedef std::map<hdr_format, std::map<video, Ztring> > hdr;
+    hdr                                 HDR;
     Ztring                              EtsiTS103433;
     int32u  chroma_format_idc;
     int32u  slice_pic_parameter_set_id;

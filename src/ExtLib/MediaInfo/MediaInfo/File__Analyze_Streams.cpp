@@ -48,64 +48,107 @@ const char* Mpegv_colour_primaries(int8u colour_primaries);
 void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance)
 {
     //Parsing
-    int32u max, min;
-    int16u x[4];
-    int16u y[4];
+    mastering_metadata_2086 Meta;
     for (size_t c = 0; c < 3; c++)
     {
-        Get_B2(x[c],                                            "display_primaries_x");
-        Get_B2(y[c],                                            "display_primaries_y");
+        Get_B2(Meta.Primaries[c*2  ],                           "display_primaries_x");
+        Get_B2(Meta.Primaries[c*2+1],                           "display_primaries_y");
     }
-    Get_B2(x[3],                                                "white_point_x");
-    Get_B2(y[3],                                                "white_point_y");
-    Get_B4(max,                                                 "max_display_mastering_luminance");
-    Get_B4(min,                                                 "min_display_mastering_luminance");
+    Get_B2(Meta.Primaries[3*2  ],                               "white_point_x");
+    Get_B2(Meta.Primaries[3*2+1],                               "white_point_y");
+    Get_B4(Meta.Luminance[1],                                   "max_display_mastering_luminance");
+    Get_B4(Meta.Luminance[0],                                   "min_display_mastering_luminance");
 
-    if (MasteringDisplay_ColorPrimaries.empty())
+    FILLING_BEGIN();
+        if (MasteringDisplay_ColorPrimaries.empty())
+            Get_MasteringDisplayColorVolume(MasteringDisplay_ColorPrimaries, MasteringDisplay_Luminance, Meta);
+    FILLING_END();
+}
+#endif
+
+//---------------------------------------------------------------------------
+#if defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MATROSKA_YES)
+struct masteringdisplaycolorvolume_values
+{
+    int8u Code; //ISO code
+    int16u Values[8]; // G, B, R, W pairs (x values then y values)
+};
+static const int8u MasteringDisplayColorVolume_Values_Size=4;
+static const masteringdisplaycolorvolume_values MasteringDisplayColorVolume_Values[] =
+{
+    { 1, {15000, 30000,  7500,  3000, 32000, 16500, 15635, 16450}}, // BT.709
+    { 9, { 8500, 39850,  6550,  2300, 35400, 14600, 15635, 16450}}, // BT.2020
+    {11, {13250, 34500,  7500,  3000, 34000, 16000, 15700, 17550}}, // DCI P3
+    {12, {13250, 34500,  7500,  3000, 34000, 16000, 15635, 16450}}, // Display P3
+};
+Ztring MasteringDisplayColorVolume_Values_Compute(int16u Values[8])
+{
+    //Reordering to RGB
+    size_t G=4, B=4, R=4;
+    for (size_t c=0; c<3; c++)
     {
-        //Reordering to RGB
-        size_t G=4, B=4, R=4;
-        for (size_t c=0; c<3; c++)
-        {
-            if (x[c]<17500 && y[c]<17500)
-                B=c;
-            else if (y[c]-x[c]>=0)
-                G=c;
-            else
-                R=c;
-        }
-        if ((R|B|G)>=4)
-        {
-            //Order not automaticly detected, betting on GBR order
-            G=0;
-            B=1;
-            R=2;
-        }
-             if (x[G]==15000 && x[B]== 7500 && x[R]==32000 && x[3]==15635
-              && y[G]==30000 && y[B]== 3000 && y[R]==16500 && y[3]==16450)
-            MasteringDisplay_ColorPrimaries=Mpegv_colour_primaries(1); // BT.709
-        else if (x[G]== 8500 && x[B]== 6550 && x[R]==35400 && x[3]==15635
-              && y[G]==39850 && y[B]== 2300 && y[R]==14600 && y[3]==16450)
-            MasteringDisplay_ColorPrimaries=Mpegv_colour_primaries(9); // BT.2020
-        else if (x[G]==13250 && x[B]== 7500 && x[R]==34000 && x[3]==15700
-              && y[G]==34500 && y[B]== 3000 && y[R]==16000 && y[3]==17550)
-            MasteringDisplay_ColorPrimaries=Mpegv_colour_primaries(11); // DCI P3
-        else if (x[G]==13250 && x[B]== 7500 && x[R]==34000 && x[3]==15635
-              && y[G]==34500 && y[B]== 3000 && y[R]==16000 && y[3]==16450)
-            MasteringDisplay_ColorPrimaries=Mpegv_colour_primaries(12); // Display P3
+        if (Values[c*2]<17500 && Values[c*2+1]<17500) //x and y
+            B=c;
+        else if ((int32s)(Values[c*2+1])-(int32s)(Values[c*2])>=0) // y minus x
+            G=c;
         else
-        MasteringDisplay_ColorPrimaries=__T("R: x=")+Ztring::ToZtring(((float64)x[R])/50000, 6)
-                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[R])/50000, 6)
-                                     +__T(", G: x=")+Ztring::ToZtring(((float64)x[G])/50000, 6)
-                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[G])/50000, 6)
-                                     +__T(", B: x=")+Ztring::ToZtring(((float64)x[B])/50000, 6)
-                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[B])/50000, 6)
-                           +__T(", White point: x=")+Ztring::ToZtring(((float64)x[3])/50000, 6)
-                                       +__T(  " y=")+Ztring::ToZtring(((float64)y[3])/50000, 6);
-        MasteringDisplay_Luminance=     __T("min: ")+Ztring::ToZtring(((float64)min)/10000, 4)
-                               +__T(" cd/m2, max: ")+Ztring::ToZtring(((float64)max)/10000, (max-((int)max)==0)?0:4)
-                               +__T(" cd/m2");
+            R=c;
     }
+    if ((R|B|G)>=4)
+    {
+        //Order not automaticly detected, betting on GBR order
+        G=0;
+        B=1;
+        R=2;
+    }
+
+    int8u Code;
+    for (int8u i=0; i<MasteringDisplayColorVolume_Values_Size; i++)
+    {
+        Code=MasteringDisplayColorVolume_Values[i].Code;
+        for (int8u j=0; j<2; j++)
+        {
+            // +/- 0.0005 (3 digits after comma)
+            if (Values[G*2+j]<MasteringDisplayColorVolume_Values[i].Values[0*2+j]-25 || (Values[G*2+j]>=MasteringDisplayColorVolume_Values[i].Values[0*2+j]+25))
+                Code=0;
+            if (Values[B*2+j]<MasteringDisplayColorVolume_Values[i].Values[1*2+j]-25 || (Values[B*2+j]>=MasteringDisplayColorVolume_Values[i].Values[1*2+j]+25))
+                Code=0;
+            if (Values[R*2+j]<MasteringDisplayColorVolume_Values[i].Values[2*2+j]-25 || (Values[R*2+j]>=MasteringDisplayColorVolume_Values[i].Values[2*2+j]+25))
+                Code=0;
+            // +/- 0.00005 (4 digits after comma)
+            if (Values[3*2+j]<MasteringDisplayColorVolume_Values[i].Values[3*2+j]-2 || (Values[3*2+j]>=MasteringDisplayColorVolume_Values[i].Values[3*2+j]+3))
+                Code=0;
+        }
+
+        if (Code)
+            return Mpegv_colour_primaries(Code);
+    }
+
+    return       __T("R: x=")+Ztring::ToZtring(((float64)Values[R*2  ])/50000, 6)
+                +__T(  " y=")+Ztring::ToZtring(((float64)Values[R*2+1])/50000, 6)
+              +__T(", G: x=")+Ztring::ToZtring(((float64)Values[G*2  ])/50000, 6)
+                +__T(  " y=")+Ztring::ToZtring(((float64)Values[G*2+1])/50000, 6)
+              +__T(", B: x=")+Ztring::ToZtring(((float64)Values[B*2  ])/50000, 6)
+                +__T(  " y=")+Ztring::ToZtring(((float64)Values[B*2+1])/50000, 6)
+    +__T(", White point: x=")+Ztring::ToZtring(((float64)Values[3*2  ])/50000, 6)
+                +__T(  " y=")+Ztring::ToZtring(((float64)Values[3*2+1])/50000, 6);
+}
+void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance, mastering_metadata_2086 &Meta)
+{
+    if (!MasteringDisplay_ColorPrimaries.empty())
+        return; // Use the first one
+
+    bool IsNotValid=false;
+    for (int8u i=0; i<8; i++)
+        if (Meta.Primaries[i]==(int16u)-1)
+            IsNotValid=true;
+    if (!IsNotValid)
+        MasteringDisplay_ColorPrimaries=MasteringDisplayColorVolume_Values_Compute(Meta.Primaries);
+
+    if (Meta.Luminance[0]!=(int32u)-1 && Meta.Luminance[1]!=(int32u)-1)
+        MasteringDisplay_Luminance=        __T("min: ")+Ztring::ToZtring(((float64)Meta.Luminance[0])/10000, 4)
+                                  +__T(" cd/m2, max: ")+Ztring::ToZtring(((float64)Meta.Luminance[1])/10000, (Meta.Luminance[1]-((int)Meta.Luminance[1])==0)?0:4)
+                                  +__T(" cd/m2");
 }
 #endif
 
@@ -274,7 +317,7 @@ size_t File__Analyze::Stream_Erase (stream_t KindOfStream, size_t StreamPos)
     //Filling basic info
     for (size_t Pos=0; Pos<Count_Get(KindOfStream); Pos++)
     {
-        Fill(KindOfStream, Pos, General_StreamCount, Count_Get(StreamKind_Last), 10, true);
+        Fill(KindOfStream, Pos, General_StreamCount, Count_Get(KindOfStream), 10, true);
         Fill(KindOfStream, Pos, General_StreamKindID, Pos, 10, true);
         if (Count_Get(KindOfStream)>1)
             Fill(KindOfStream, Pos, General_StreamKindPos, Pos+1, 10, true);
@@ -1104,11 +1147,22 @@ const Ztring &File__Analyze::Retrieve_Const (stream_t StreamKind, size_t StreamP
     //Integrity
     if (StreamKind>=Stream_Max
      || StreamPos>=(*Stream)[StreamKind].size()
-     || Parameter>=(*Stream)[StreamKind][StreamPos].size())
+     || Parameter>=MediaInfoLib::Config.Info_Get(StreamKind).size()+(*Stream_More)[StreamKind][StreamPos].size())
         return MediaInfoLib::Config.EmptyString_Get();
+
+    if (Parameter>=MediaInfoLib::Config.Info_Get(StreamKind).size())
+    {
+        Parameter-=MediaInfoLib::Config.Info_Get(StreamKind).size();
+        if (KindOfInfo>=(*Stream_More)[StreamKind][StreamPos][Parameter].size())
+            return MediaInfoLib::Config.EmptyString_Get();
+        return (*Stream_More)[StreamKind][StreamPos][Parameter][KindOfInfo];
+    }
 
     if (KindOfInfo!=Info_Text)
         return MediaInfoLib::Config.Info_Get(StreamKind, Parameter, KindOfInfo);
+
+    if (Parameter>=(*Stream)[StreamKind][StreamPos].size())
+        return MediaInfoLib::Config.EmptyString_Get();
     return (*Stream)[StreamKind][StreamPos](Parameter);
 }
 
@@ -1118,11 +1172,22 @@ Ztring File__Analyze::Retrieve (stream_t StreamKind, size_t StreamPos, size_t Pa
     //Integrity
     if (StreamKind>=Stream_Max
      || StreamPos>=(*Stream)[StreamKind].size()
-     || Parameter>=(*Stream)[StreamKind][StreamPos].size())
+     || Parameter>=MediaInfoLib::Config.Info_Get(StreamKind).size()+(*Stream_More)[StreamKind][StreamPos].size())
         return MediaInfoLib::Config.EmptyString_Get();
+
+    if (Parameter>=MediaInfoLib::Config.Info_Get(StreamKind).size())
+    {
+        Parameter-=MediaInfoLib::Config.Info_Get(StreamKind).size();
+        if (KindOfInfo>=(*Stream_More)[StreamKind][StreamPos][Parameter].size())
+            return MediaInfoLib::Config.EmptyString_Get();
+        return (*Stream_More)[StreamKind][StreamPos][Parameter][KindOfInfo];
+    }
 
     if (KindOfInfo!=Info_Text)
         return MediaInfoLib::Config.Info_Get(StreamKind, Parameter, KindOfInfo);
+
+    if (Parameter>=(*Stream)[StreamKind][StreamPos].size())
+        return MediaInfoLib::Config.EmptyString_Get();
     return (*Stream)[StreamKind][StreamPos](Parameter);
 }
 
@@ -1401,7 +1466,7 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
         Stream_Prepare(StreamKind);
 
     //Specific stuff
-    Ztring Width_Temp, Height_Temp, PixelAspectRatio_Temp, DisplayAspectRatio_Temp, FrameRate_Temp, FrameRate_Num_Temp, FrameRate_Den_Temp, FrameRate_Mode_Temp, ScanType_Temp, ScanOrder_Temp, Channels_Temp, Delay_Temp, Delay_DropFrame_Temp, Delay_Source_Temp, Delay_Settings_Temp, Source_Temp, Source_Kind_Temp, Source_Info_Temp;
+    Ztring Width_Temp, Height_Temp, PixelAspectRatio_Temp, DisplayAspectRatio_Temp, FrameRate_Temp, FrameRate_Num_Temp, FrameRate_Den_Temp, FrameRate_Mode_Temp, ScanType_Temp, ScanOrder_Temp, HDR_Temp[Video_HDR_Format_Compatibility-Video_HDR_Format+1], Channels_Temp, Delay_Temp, Delay_DropFrame_Temp, Delay_Source_Temp, Delay_Settings_Temp, Source_Temp, Source_Kind_Temp, Source_Info_Temp;
     if (StreamKind==Stream_Video)
     {
         Width_Temp=Retrieve(Stream_Video, StreamPos_To, Video_Width);
@@ -1414,6 +1479,8 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
         FrameRate_Mode_Temp=Retrieve(Stream_Video, StreamPos_To, Video_FrameRate_Mode); //We want to keep the FrameRate_Mode of AVI 120 fps
         ScanType_Temp=Retrieve(Stream_Video, StreamPos_To, Video_ScanType);
         ScanOrder_Temp=Retrieve(Stream_Video, StreamPos_To, Video_ScanOrder);
+        for (size_t i=Video_HDR_Format; i<=Video_HDR_Format_Compatibility; i++)
+            HDR_Temp[i-Video_HDR_Format]=Retrieve(Stream_Video, StreamPos_To, i);
     }
     if (StreamKind==Stream_Audio)
     {
@@ -1556,6 +1623,18 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
             }
             else
                 Fill(Stream_Video, StreamPos_To, Video_ScanOrder, ScanOrder_Temp, true);
+        }
+        if (!HDR_Temp[0].empty() && !ToAdd.Retrieve_Const(Stream_Video, StreamPos_From, Video_HDR_Format).empty() && HDR_Temp[0]!=ToAdd.Retrieve_Const(Stream_Video, StreamPos_From, Video_HDR_Format))
+        {
+            for (size_t i=Video_HDR_Format; i<=Video_HDR_Format_Compatibility; i++)
+            {
+                Ztring Container_Value=HDR_Temp[i-Video_HDR_Format];
+                Ztring Stream_Value=ToAdd.Retrieve(Stream_Video, StreamPos_From, i);
+                if (!Container_Value.empty() || !Stream_Value.empty())
+                    Container_Value+=__T(" / ");
+                Container_Value+=Stream_Value;
+                Fill(Stream_Video, StreamPos_To, i, Container_Value, true);
+            }
         }
     }
     if (StreamKind==Stream_Audio)

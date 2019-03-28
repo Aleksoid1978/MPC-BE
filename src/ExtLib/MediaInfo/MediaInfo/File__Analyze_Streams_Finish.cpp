@@ -777,15 +777,74 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
     }
 
     //Commercial name
-    if (Retrieve(Stream_Video, Pos, Video_Format_Commercial_IfAny).empty()
-     && Retrieve(Stream_Video, Pos, Video_BitDepth)==__T("10")
+    if ((Retrieve(Stream_Video, Pos, Video_BitDepth).empty() || Retrieve(Stream_Video, Pos, Video_BitDepth)==__T("10")) //e.g. ProRes has not bitdepth info
      && Retrieve(Stream_Video, Pos, Video_ChromaSubsampling)==__T("4:2:0")
-     && Retrieve(Stream_Video, Pos, Video_colour_primaries)==__T("BT.2020")
-     && Retrieve(Stream_Video, Pos, Video_transfer_characteristics)==__T("PQ")
-     && Retrieve(Stream_Video, Pos, Video_matrix_coefficients).find(__T("BT.2020"))==0
+     && (Retrieve(Stream_Video, Pos, Video_colour_description_present).empty() || //From  CFF: "colour_description_present_flag SHALL be set to 1 if the color parameters from [R709] are not used."
+       ( Retrieve(Stream_Video, Pos, Video_colour_primaries)==__T("BT.2020")
+      && Retrieve(Stream_Video, Pos, Video_transfer_characteristics)==__T("PQ")
+      && Retrieve(Stream_Video, Pos, Video_matrix_coefficients).find(__T("BT.2020"))==0))
      && !Retrieve(Stream_Video, Pos, "MasteringDisplay_ColorPrimaries").empty()
+     // && !Retrieve(Stream_Video, Pos, "MaxCLL").empty()
+     // && !Retrieve(Stream_Video, Pos, "MaxFALL").empty() // MaxCLL & MaxFALL are required except if not available so not required in practice https://www.cta.tech/News/Press-Releases/2015/August/CEA-Defines-%E2%80%98HDR-Compatible%E2%80%99-Displays.aspx https://www.ultrahdforum.org/wp-content/uploads/2016/04/Ultra-HD-Forum-Deployment-Guidelines-V1.1-Summer-2016.pdf
         )
-        Fill(Stream_Video, Pos, Video_Format_Commercial_IfAny, "HDR10");
+    {
+        //We actually fill HDR10/HDR10+ by default, so it will be removed below if not fitting in the color related rules
+    }
+    else if (!Retrieve_Const(Stream_Video, Pos, Video_HDR_Format_Compatibility).empty())
+    {
+        ZtringList HDR_Format_Compatibility;
+        HDR_Format_Compatibility.Separator_Set(0, __T(" / "));
+        HDR_Format_Compatibility.Write(Retrieve(Stream_Video, Pos, Video_HDR_Format_Compatibility));
+        for (size_t j=0; j<HDR_Format_Compatibility.size(); j++)
+            if (HDR_Format_Compatibility[j].find(__T("HDR10"))==0)
+                HDR_Format_Compatibility[j].clear();
+        Fill(Stream_Video, Pos, Video_HDR_Format_Compatibility, HDR_Format_Compatibility.Read(), true);
+    }
+    if (Retrieve(Stream_Video, Pos, Video_HDR_Format_String).empty())
+    {
+        ZtringList Summary;
+        Summary.Separator_Set(0, __T(" / "));
+        Summary.Write(Retrieve(Stream_Video, Pos, Video_HDR_Format));
+        ZtringList Commercial=Summary;
+        if (!Summary.empty())
+        {
+            ZtringList HDR_Format_Compatibility;
+            HDR_Format_Compatibility.Separator_Set(0, __T(" / "));
+            HDR_Format_Compatibility.Write(Retrieve(Stream_Video, Pos, Video_HDR_Format_Compatibility));
+            HDR_Format_Compatibility.resize(Summary.size());
+            for (size_t j=0; j<Summary.size(); j++)
+                if (HDR_Format_Compatibility[j].empty())
+                    HDR_Format_Compatibility[j]=Summary[j];
+            ZtringList ToAdd;
+            ToAdd.Separator_Set(0, __T(" / "));
+            for (size_t i=Video_HDR_Format_String+1; i<=Video_HDR_Format_Settings; i++)
+            {
+                ToAdd.Write(Retrieve(Stream_Video, Pos, i));
+                ToAdd.resize(Summary.size());
+                for (size_t j=0; j<Summary.size(); j++)
+                {
+                    if (!ToAdd[j].empty())
+                    {
+                        switch (i)
+                        {
+                            case Video_HDR_Format_Version: Summary[j]+=__T(", Version "); break;
+                            case Video_HDR_Format_Level: Summary[j]+=__T('.'); break;
+                            default: Summary[j] += __T(", ");
+                        }
+                        Summary[j]+=ToAdd[j];
+                    }
+                }
+            }
+            for (size_t j=0; j<Summary.size(); j++)
+                if (HDR_Format_Compatibility[j].find(__T("HDR10"))==0) // We add for info the HDR10/HDR10+ compatibility in the displayable part
+                {
+                    Summary[j]+=__T(", ")+HDR_Format_Compatibility[j]+__T(" compatible");
+                    Commercial[j]=HDR_Format_Compatibility[j].substr(0, HDR_Format_Compatibility[j].find(__T(' ')));
+                }
+            Fill(Stream_Video, Pos, Video_HDR_Format_String, Summary.Read());
+            Fill(Stream_Video, Pos, Video_HDR_Format_Commercial, Commercial.Read());
+        }
+    }
     #if defined(MEDIAINFO_VC3_YES)
         if (Retrieve(Stream_Video, Pos, Video_Format_Commercial_IfAny).empty() && Retrieve(Stream_Video, Pos, Video_Format)==__T("VC-3") && Retrieve(Stream_Video, Pos, Video_Format_Profile).find(__T("HD"))==0)
         {

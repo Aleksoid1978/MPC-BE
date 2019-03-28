@@ -3208,7 +3208,7 @@ void File_Mpeg_Descriptors::Descriptor_B0()
 
     FILLING_BEGIN();
         Ztring Summary=Ztring::ToZtring(dv_version_major)+__T('.')+Ztring::ToZtring(dv_version_minor);
-        Complete_Stream->Streams[elementary_PID]->Infos["DolbyVision_Version"]=Summary;
+        Complete_Stream->Streams[elementary_PID]->Infos["HDR_Format_Version"]=Summary;
         if (dv_version_major==1)
         {
             string Profile, Level;
@@ -3219,8 +3219,9 @@ void File_Mpeg_Descriptors::Descriptor_B0()
             Profile+=__T('.');
             Profile+=Ztring().From_CC1(dv_profile).To_UTF8();
             Level+=Ztring().From_CC1(dv_level).To_UTF8();
-            Complete_Stream->Streams[elementary_PID]->Infos["DolbyVision_Profile"].From_UTF8(Profile);
-            Complete_Stream->Streams[elementary_PID]->Infos["DolbyVision_Level"].From_UTF8(Level);
+            Complete_Stream->Streams[elementary_PID]->Infos["HDR_Format"].From_UTF8("Dolby Vision");
+            Complete_Stream->Streams[elementary_PID]->Infos["HDR_Format_Profile"].From_UTF8(Profile);
+            Complete_Stream->Streams[elementary_PID]->Infos["HDR_Format_Level"].From_UTF8(Level);
             Summary+=__T(',');
             Summary+=__T(' ');
             Summary+=Ztring().From_UTF8(Profile);
@@ -3241,8 +3242,8 @@ void File_Mpeg_Descriptors::Descriptor_B0()
                 Layers.resize(Layers.size()-1);
                 Summary+=Ztring().From_UTF8(Layers);
             }
-            Complete_Stream->Streams[elementary_PID]->Infos["DolbyVision_Layers"].From_UTF8(Layers);
-            Complete_Stream->Streams[elementary_PID]->Infos["DolbyVision/String"]=Summary;
+            Complete_Stream->Streams[elementary_PID]->Infos["HDR_Format_Settings"].From_UTF8(Layers);
+            Complete_Stream->Streams[elementary_PID]->Infos["HDR_Format_Compatibility"]=Ztring();
         }
     FILLING_END();
 }

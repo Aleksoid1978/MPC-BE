@@ -42,6 +42,9 @@ private :
     void Streams_Fill();
     void Streams_Finish();
 
+    //Buffer - Global
+    void Read_Buffer_OutOfBand();
+
     //Buffer - Per element
     void Header_Parse();
     void Data_Parse();

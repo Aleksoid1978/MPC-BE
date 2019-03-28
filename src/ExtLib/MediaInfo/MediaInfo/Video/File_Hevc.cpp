@@ -247,13 +247,56 @@ void File_Hevc::Streams_Fill()
     Fill(Stream_Video, 0, Video_Encoded_Library_Name, Encoded_Library_Name);
     Fill(Stream_Video, 0, Video_Encoded_Library_Version, Encoded_Library_Version);
     Fill(Stream_Video, 0, Video_Encoded_Library_Settings, Encoded_Library_Settings);
-    if (!MasteringDisplay_ColorPrimaries.empty())
+    hdr::iterator EtsiTs103433=HDR.find(HdrFormat_EtsiTs103433);
+    if (EtsiTs103433!=HDR.end())
     {
-        Fill(Stream_Video, 0, "MasteringDisplay_ColorPrimaries", MasteringDisplay_ColorPrimaries);
-        Fill(Stream_Video, 0, "MasteringDisplay_Luminance", MasteringDisplay_Luminance);
+        for (std::map<video, Ztring>::iterator Item=EtsiTs103433->second.begin(); Item!=EtsiTs103433->second.end(); ++Item)
+        {
+            Fill(Stream_Video, 0, Item->first, Item->second);
+        }
+    }
+    hdr::iterator SmpteSt209440=HDR.find(HdrFormat_SmpteSt209440);
+    if (SmpteSt209440!=HDR.end())
+    {
+        for (std::map<video, Ztring>::iterator Item=SmpteSt209440->second.begin(); Item!=SmpteSt209440->second.end(); ++Item)
+        {
+            switch (Item->first)
+            {
+                case Video_MasteringDisplay_ColorPrimaries:
+                case Video_MasteringDisplay_Luminance:
+                    if (Retrieve_Const(Stream_Video, 0, Item->first)==Item->second)
+                        break;
+                    // Fallthrough
+                default:
+                    Fill(Stream_Video, 0, Item->first, Item->second);
+            }
+        }
+    }
+    hdr::iterator SmpteSt2086=HDR.find(HdrFormat_SmpteSt2086);
+    if (SmpteSt2086!=HDR.end())
+    {
+        for (std::map<video, Ztring>::iterator Item=SmpteSt2086->second.begin(); Item!=SmpteSt2086->second.end(); ++Item)
+        {
+            bool Ignore;
+            switch (Item->first)
+            {
+                case Video_HDR_Format:
+                    Ignore=!Retrieve_Const(Stream_Video, 0, Item->first).empty();
+                    break;
+                case Video_MasteringDisplay_ColorPrimaries:
+                case Video_MasteringDisplay_Luminance:
+                    Ignore=Retrieve_Const(Stream_Video, 0, Item->first)==Item->second;
+                    break;
+            }
+            if (!Ignore)
+                Fill(Stream_Video, 0, Item->first, Item->second);
+        }
     }
     if (!EtsiTS103433.empty())
+    {
         Fill(Stream_Video, 0, "EtsiTS103433", EtsiTS103433);
+        Fill_SetOptions(Stream_Video, 0, "EtsiTS103433", "N NTN");
+    }
     if (maximum_content_light_level)
         Fill(Stream_Video, 0, "MaxCLL", Ztring::ToZtring(maximum_content_light_level) + __T(" cd/m2"));
     if (maximum_frame_average_light_level)
@@ -2026,92 +2069,298 @@ void File_Hevc::sei_message_user_data_registered_itu_t_t35()
     Element_Info1("user_data_registered_itu_t_t35");
 
     int8u itu_t_t35_country_code;
-    Get_B1(itu_t_t35_country_code, "itu_t_t35_country_code");
-    int16u terminal_provider_code;
-    Get_B2(terminal_provider_code, "terminal_provider_code");
-    int8u terminal_provider_oriented_code_message_idc;
-    Get_B1(terminal_provider_oriented_code_message_idc, "terminal_provider_oriented_code_message_idc");
-    if (itu_t_t35_country_code == 0xB5 && terminal_provider_code == 0x3A)
+    Get_B1(itu_t_t35_country_code,                              "itu_t_t35_country_code");
+
+    switch (itu_t_t35_country_code)
     {
-        if (!terminal_provider_oriented_code_message_idc)
-        {
-            BS_Begin();
-            int8u sl_hdr_mode_value_minus1;
-            Get_S1(4, sl_hdr_mode_value_minus1, "sl_hdr_mode_value_minus1");
-            int8u sl_hdr_spec_major_version_idc;
-            Get_S1(4, sl_hdr_spec_major_version_idc, "sl_hdr_spec_major_version_idc");
-            int8u sl_hdr_spec_minor_version_idc;
-            Get_S1(7, sl_hdr_spec_minor_version_idc, "sl_hdr_spec_minor_version_idc");
-            bool sl_hdr_cancel_flag;
-            Get_SB(sl_hdr_cancel_flag, "sl_hdr_cancel_flag");
-            BS_End();
-            int8u sl_hdr_payload_mode;
-            int8u k_coefficient_value[3];
-            if (!sl_hdr_cancel_flag)
-            {
-                BS_Begin();
-                Skip_SB("sl_hdr_persistence_flag");
-                bool coded_picture_info_present_flag;
-                Get_SB(coded_picture_info_present_flag, "coded_picture_info_present_flag");
-                bool target_picture_info_present_flag;
-                Get_SB(target_picture_info_present_flag, "target_picture_info_present_flag");
-                bool src_mdcv_info_present_flag;
-                Get_SB(src_mdcv_info_present_flag, "src_mdcv_info_present_flag");
-                Skip_SB("sl_hdr_extension_present_flag");
-                Get_S1(3, sl_hdr_payload_mode, "sl_hdr_payload_mode");
-                BS_End();
-                if (coded_picture_info_present_flag)
-                {
-                    Skip_B1("coded_picture_primaries");
-                    Skip_B2("coded_picture_max_luminance");
-                    Skip_B2("coded_picture_min_luminance");
-                }
-                if (target_picture_info_present_flag)
-                {
-                    Skip_B1("target_picture_primaries");
-                    Skip_B2("target_picture_max_luminance");
-                    Skip_B2("target_picture_min_luminance");
-                }
-                if (src_mdcv_info_present_flag)
-                {
-                    for (int8u i = 0; i < 3; i++)
-                    {
-                        Skip_B2("src_mdcv_primaries_x");
-                        Skip_B2("src_mdcv_primaries_y");
-                    }
-                    Skip_B2("src_mdcv_ref_white_x");
-                    Skip_B2("src_mdcv_ref_white_y");
-                    Skip_B2("src_mdcv_max_mastering_luminance");
-                    Skip_B2("src_mdcv_min_mastering_luminance");
-                }
-                for (int8u i = 0; i < 4; i++)
-                    Skip_B2("matrix_coefficient_value");
-                for (int8u i = 0; i < 2; i++)
-                    Skip_B2("chroma_to_luma_injection");
-                for (int8u i = 0; i < 3; i++)
-                    Get_B1(k_coefficient_value[i], "k_coefficient_value");
-            }
-            EtsiTS103433 = __T("SL-HDR") + Ztring().From_Number(sl_hdr_mode_value_minus1 + 1);
-            if (!sl_hdr_mode_value_minus1)
-            {
-                EtsiTS103433 += k_coefficient_value[0] == 0 && k_coefficient_value[1] == 0 && k_coefficient_value[2] == 0 ? __T(" NCL") : __T(" CL");
-            }
-            EtsiTS103433+= __T(" specVersion=") + Ztring().From_Number(sl_hdr_spec_major_version_idc) + __T(".") + Ztring().From_Number(sl_hdr_spec_minor_version_idc);
-            EtsiTS103433+= __T(" payloadMode=") + Ztring().From_Number(sl_hdr_payload_mode);
-        }
-        else if (terminal_provider_oriented_code_message_idc == 0x02)
-        {
-            BS_Begin();
-            int8u ts_103_433_spec_version;
-            Get_S1(4, ts_103_433_spec_version, "ts_103_433_spec_version");
-            int8u ts_103_433_payload_mode;
-            Get_S1(4, ts_103_433_payload_mode, "ts_103_433_payload_mode");
-            BS_End();
-            EtsiTS103433 = __T("SL-HDR1");
-            EtsiTS103433+= __T(" specVersion=") + Ztring().From_Number(ts_103_433_spec_version);
-            EtsiTS103433+= __T(" payloadMode=") + Ztring().From_Number(ts_103_433_payload_mode);
-        }
+        case 0xB5:  sei_message_user_data_registered_itu_t_t35_B5(); break; // USA
     }
+}
+
+//---------------------------------------------------------------------------
+// SEI - 4 - USA
+void File_Hevc::sei_message_user_data_registered_itu_t_t35_B5()
+{
+    int16u itu_t_t35_terminal_provider_code;
+    Get_B2 (itu_t_t35_terminal_provider_code,                   "itu_t_t35_terminal_provider_code");
+
+    switch (itu_t_t35_terminal_provider_code)
+    {
+        case 0x003A: sei_message_user_data_registered_itu_t_t35_B5_003A(); break;
+        case 0x003C: sei_message_user_data_registered_itu_t_t35_B5_003C(); break;
+    }
+}
+
+//---------------------------------------------------------------------------
+// SEI - 4 - USA - 003A
+void File_Hevc::sei_message_user_data_registered_itu_t_t35_B5_003A()
+{
+    int8u itu_t_t35_terminal_provider_oriented_code;
+    Get_B1 (itu_t_t35_terminal_provider_oriented_code,          "itu_t_t35_terminal_provider_oriented_code");
+
+    switch (itu_t_t35_terminal_provider_oriented_code)
+    {
+        case 0x00: sei_message_user_data_registered_itu_t_t35_B5_003A_00(); break;
+        case 0x02: sei_message_user_data_registered_itu_t_t35_B5_003A_02(); break;
+    }
+}
+
+//---------------------------------------------------------------------------
+// SEI - 4 - USA - 003A - ETSI 103-433-1
+void File_Hevc::sei_message_user_data_registered_itu_t_t35_B5_003A_00()
+{
+    Element_Info1("SL-HDR message");
+    BS_Begin();
+    int8u sl_hdr_mode_value_minus1, sl_hdr_spec_major_version_idc, sl_hdr_spec_minor_version_idc;
+    bool sl_hdr_cancel_flag;
+    Get_S1 (4, sl_hdr_mode_value_minus1,                        "sl_hdr_mode_value_minus1");
+    Get_S1 (4, sl_hdr_spec_major_version_idc,                   "sl_hdr_spec_major_version_idc");
+    Get_S1 (7, sl_hdr_spec_minor_version_idc,                   "sl_hdr_spec_minor_version_idc");
+    Get_SB (sl_hdr_cancel_flag,                                 "sl_hdr_cancel_flag");
+    int8u sl_hdr_payload_mode;
+    int8u k_coefficient_value[3];
+    if (!sl_hdr_cancel_flag)
+    {
+        mastering_metadata_2086 Meta;
+        bool coded_picture_info_present_flag, target_picture_info_present_flag, src_mdcv_info_present_flag;
+        Skip_SB(                                                "sl_hdr_persistence_flag");
+        Get_SB (coded_picture_info_present_flag,                "coded_picture_info_present_flag");
+        Get_SB (target_picture_info_present_flag,               "target_picture_info_present_flag");
+        Get_SB (src_mdcv_info_present_flag,                     "src_mdcv_info_present_flag");
+        Skip_SB(                                                "sl_hdr_extension_present_flag");
+        Get_S1 (3, sl_hdr_payload_mode,                         "sl_hdr_payload_mode");
+        BS_End();
+        if (coded_picture_info_present_flag)
+        {
+            Skip_B1(                                            "coded_picture_primaries");
+            Skip_B2(                                            "coded_picture_max_luminance");
+            Skip_B2(                                            "coded_picture_min_luminance");
+        }
+        if (target_picture_info_present_flag)
+        {
+            Skip_B1(                                            "target_picture_primaries");
+            Skip_B2(                                            "target_picture_max_luminance");
+            Skip_B2(                                            "target_picture_min_luminance");
+        }
+        if (src_mdcv_info_present_flag)
+        {
+            int16u max, min;
+            for (int8u i = 0; i < 3; i++)
+            {
+                Get_B2 (Meta.Primaries[i*2  ],                  "src_mdcv_primaries_x");
+                Get_B2 (Meta.Primaries[i*2+1],                  "src_mdcv_primaries_y");
+            }
+            Get_B2 (Meta.Primaries[3*2  ],                      "src_mdcv_ref_white_x");
+            Get_B2 (Meta.Primaries[3*2+1],                      "src_mdcv_ref_white_y");
+            Get_B2 (max,                                        "src_mdcv_max_mastering_luminance");
+            Get_B2 (min,                                        "src_mdcv_min_mastering_luminance");
+            Meta.Luminance[0]=min;
+            Meta.Luminance[1]=((int32u)max)*10000;
+        }
+        for (int8u i = 0; i < 4; i++)
+            Skip_B2(                                            "matrix_coefficient_value");
+        for (int8u i = 0; i < 2; i++)
+            Skip_B2(                                            "chroma_to_luma_injection");
+        for (int8u i = 0; i < 3; i++)
+            Get_B1 (k_coefficient_value[i],                     "k_coefficient_value");
+
+        FILLING_BEGIN()
+            std::map<video, Ztring>& EtsiTs103433=HDR[HdrFormat_EtsiTs103433];
+            Ztring& HDR_Format=EtsiTs103433[Video_HDR_Format];
+            if (HDR_Format.empty())
+            {
+                HDR_Format=__T("SL-HDR")+Ztring().From_Number(sl_hdr_mode_value_minus1+1);
+                EtsiTs103433[Video_HDR_Format_Version]=Ztring().From_Number(sl_hdr_spec_major_version_idc)+__T('.')+Ztring().From_Number(sl_hdr_spec_minor_version_idc);
+                Get_MasteringDisplayColorVolume(EtsiTs103433[Video_MasteringDisplay_ColorPrimaries], EtsiTs103433[Video_MasteringDisplay_Luminance], Meta);
+                if (sl_hdr_payload_mode<2)
+                    EtsiTs103433[Video_HDR_Format_Settings]=sl_hdr_payload_mode?__T("Table-based"):__T("Parameter-based");
+                else
+                    EtsiTs103433[Video_HDR_Format_Settings]=__T("Payload Mode ") + Ztring().From_Number(sl_hdr_payload_mode);
+                if (!sl_hdr_mode_value_minus1)
+                    EtsiTs103433[Video_HDR_Format_Settings]+=k_coefficient_value[0]==0 && k_coefficient_value[1]==0 && k_coefficient_value[2]==0?__T(", non-constant"):__T(", constant");
+
+                EtsiTS103433 = __T("SL-HDR") + Ztring().From_Number(sl_hdr_mode_value_minus1 + 1);
+                if (!sl_hdr_mode_value_minus1)
+                    EtsiTS103433 += k_coefficient_value[0] == 0 && k_coefficient_value[1] == 0 && k_coefficient_value[2] == 0 ? __T(" NCL") : __T(" CL");
+                EtsiTS103433 += __T(" specVersion=") + Ztring().From_Number(sl_hdr_spec_major_version_idc) + __T(".") + Ztring().From_Number(sl_hdr_spec_minor_version_idc);
+                EtsiTS103433 += __T(" payloadMode=") + Ztring().From_Number(sl_hdr_payload_mode);
+            }
+        FILLING_END();
+    }
+    else
+        BS_End();
+}
+
+//---------------------------------------------------------------------------
+// SEI - 4 - USA - 003A - ETSI 103-433
+void File_Hevc::sei_message_user_data_registered_itu_t_t35_B5_003A_02()
+{
+    Element_Info1("SL-HDR information");
+    int8u ts_103_433_spec_version;
+    BS_Begin();
+    Get_S1 (4, ts_103_433_spec_version,                         "ts_103_433_spec_version");
+    if (ts_103_433_spec_version==0)
+    {
+        Skip_S1 (4,                                             "ts_103_433_payload_mode");
+    }
+    else if (ts_103_433_spec_version==1)
+    {
+        Skip_S1 (3,                                             "sl_hdr_mode_support");
+    }
+    else
+        Skip_S1 (Data_BS_Remain(),                              "Unknown");
+    BS_End();
+}
+
+//---------------------------------------------------------------------------
+// SEI - 4 - USA - 003C
+void File_Hevc::sei_message_user_data_registered_itu_t_t35_B5_003C()
+{
+    int16u itu_t_t35_terminal_provider_oriented_code;
+    Get_B2 (itu_t_t35_terminal_provider_oriented_code,          "itu_t_t35_terminal_provider_oriented_code");
+
+    switch (itu_t_t35_terminal_provider_oriented_code)
+    {
+        case 0x0001: sei_message_user_data_registered_itu_t_t35_B5_003C_0001(); break;
+    }
+}
+
+//---------------------------------------------------------------------------
+// SEI - 4 - USA - 003C - 0001
+void File_Hevc::sei_message_user_data_registered_itu_t_t35_B5_003C_0001()
+{
+    int8u application_identifier;
+    Get_B1 (application_identifier,                             "application_identifier");
+
+    switch (application_identifier)
+    {
+        case 0x04: sei_message_user_data_registered_itu_t_t35_B5_003C_0001_04(); break;
+    }
+}
+
+//---------------------------------------------------------------------------
+// SEI - 4 - USA - 003C - 0001 - SMPTE ST 2094-40 (HDR10+)
+void File_Hevc::sei_message_user_data_registered_itu_t_t35_B5_003C_0001_04()
+{
+    Element_Info1("SMPTE ST 2094 App 4");
+    int8u application_version;
+    bool IsHDRplus=false, tone_mapping_flag;
+    Get_B1 (application_version,                                "application_version");
+    if (application_version==1)
+    {
+        int32u targeted_system_display_maximum_luminance, maxscl[4], distribution_maxrgb_percentiles[16];
+        int16u fraction_bright_pixels;
+        int8u num_distribution_maxrgb_percentiles, distribution_maxrgb_percentages[16], num_windows, num_bezier_curve_anchors;
+        bool targeted_system_display_actual_peak_luminance_flag, mastering_display_actual_peak_luminance_flag, color_saturation_mapping_flag;
+        BS_Begin();
+        Get_S1 ( 2, num_windows,                                "num_windows");
+
+        for (int8u w=1; w<num_windows; w++)
+        {
+            Element_Begin1("window");
+            Skip_S2(16,                                         "window_upper_left_corner_x");
+            Skip_S2(16,                                         "window_upper_left_corner_y");
+            Skip_S2(16,                                         "window_lower_right_corner_x");
+            Skip_S2(16,                                         "window_lower_right_corner_y");
+            Skip_S2(16,                                         "center_of_ellipse_x");
+            Skip_S2(16,                                         "center_of_ellipse_y");
+            Skip_S1( 8,                                         "rotation_angle");
+            Skip_S2(16,                                         "semimajor_axis_internal_ellipse");
+            Skip_S2(16,                                         "semimajor_axis_external_ellipse");
+            Skip_S2(16,                                         "semiminor_axis_external_ellipse");
+            Skip_SB(                                            "overlap_process_option");
+            Element_End0();
+        }
+
+        Get_S4 (27, targeted_system_display_maximum_luminance,  "targeted_system_display_maximum_luminance");
+        TEST_SB_GET (targeted_system_display_actual_peak_luminance_flag, "targeted_system_display_actual_peak_luminance_flag");
+            int8u num_rows_targeted_system_display_actual_peak_luminance, num_cols_targeted_system_display_actual_peak_luminance;
+            Get_S1(5, num_rows_targeted_system_display_actual_peak_luminance, "num_rows_targeted_system_display_actual_peak_luminance");
+            Get_S1(5, num_cols_targeted_system_display_actual_peak_luminance, "num_cols_targeted_system_display_actual_peak_luminance");
+            for(int8u i=0; i<num_rows_targeted_system_display_actual_peak_luminance; i++)
+                for(int8u j=0; j<num_cols_targeted_system_display_actual_peak_luminance; j++)
+                    Skip_S1(4,                                   "targeted_system_display_actual_peak_luminance");
+        TEST_SB_END();
+
+        for (int8u w=0; w<num_windows; w++)
+        {
+            Element_Begin1("window");
+            for(int8u i=0; i<3; i++)
+            {
+                Get_S3 (17, maxscl[i],                          "maxscl"); Param_Info2(Ztring::ToZtring(((float)maxscl[i])/100000, 5), " cd/m2");
+            }
+            Get_S3 (17, maxscl[3],                              "average_maxrgb");   Param_Info2(Ztring::ToZtring(((float)maxscl[3])/100000, 5), " cd/m2");
+
+            Get_S1(4, num_distribution_maxrgb_percentiles,      "num_distribution_maxrgb_percentiles");
+            for (int8u i=0; i< num_distribution_maxrgb_percentiles; i++)
+            {
+                Element_Begin1(                                 "distribution_maxrgb");
+                Get_S1 ( 7, distribution_maxrgb_percentages[i], "distribution_maxrgb_percentages");
+                Get_S3 (17, distribution_maxrgb_percentiles[i], "distribution_maxrgb_percentiles");
+                Element_Info1(distribution_maxrgb_percentages[i]);
+                Element_Info1(distribution_maxrgb_percentiles[i]);
+                Element_End0();
+            }
+            Get_S2 (10, fraction_bright_pixels,                 "fraction_bright_pixels");
+            Element_End0();
+        }
+
+        TEST_SB_GET (mastering_display_actual_peak_luminance_flag, "mastering_display_actual_peak_luminance_flag");
+            int8u num_rows_mastering_display_actual_peak_luminance, num_cols_mastering_display_actual_peak_luminance;
+            Get_S1(5, num_rows_mastering_display_actual_peak_luminance, "num_rows_mastering_display_actual_peak_luminance");
+            Get_S1(5, num_cols_mastering_display_actual_peak_luminance, "num_cols_mastering_display_actual_peak_luminance");
+            for(int8u i=0; i< num_rows_mastering_display_actual_peak_luminance; i++)
+                for(int8u j=0; j< num_cols_mastering_display_actual_peak_luminance; j++)
+                    Skip_S1(4,                                   "mastering_display_actual_peak_luminance");
+        TEST_SB_END();
+
+        for (int8u w=0; w<num_windows; w++)
+        {
+            Element_Begin1("window");
+            TEST_SB_GET (tone_mapping_flag,                     "tone_mapping_flag");
+                Skip_S2(12,                                     "knee_point_x");
+                Skip_S2(12,                                     "knee_point_y");
+                Get_S1(4, num_bezier_curve_anchors,             "num_bezier_curve_anchors");
+                for (int8u i = 0; i < num_bezier_curve_anchors; i++)
+                    Skip_S2(10,                                 "bezier_curve_anchor");
+            TEST_SB_END();
+            Element_End0();
+        }
+        TEST_SB_GET (color_saturation_mapping_flag,             "color_saturation_mapping_flag");
+            Info_S1(6, color_saturation_weight,                 "color_saturation_weight"); Param_Info1(((float)color_saturation_weight)/8);
+        TEST_SB_END();
+        BS_End();
+
+        FILLING_BEGIN();
+            IsHDRplus=true;
+            if (num_windows!=1 || targeted_system_display_actual_peak_luminance_flag || num_distribution_maxrgb_percentiles!=9 || fraction_bright_pixels || mastering_display_actual_peak_luminance_flag || (distribution_maxrgb_percentages[2]>100 && distribution_maxrgb_percentages[2]!=0xFF) || (!tone_mapping_flag && targeted_system_display_maximum_luminance) || (tone_mapping_flag && num_bezier_curve_anchors>9) || color_saturation_mapping_flag)
+                IsHDRplus=false;
+            for(int8u i=0; i<4; i++)
+                if (maxscl[i]>100000)
+                    IsHDRplus=false;
+            if (IsHDRplus)
+                for(int8u i=0; i<9; i++)
+                {
+                    static const int8u distribution_maxrgb_percentages_List[9]={1, 5, 10, 25, 50, 75, 90, 95, 99};
+                    if (distribution_maxrgb_percentages[i]!=distribution_maxrgb_percentages_List[i])
+                        IsHDRplus=false;
+                    if (distribution_maxrgb_percentiles[i]>100000)
+                        IsHDRplus=false;
+                }
+        FILLING_END();
+    }
+
+    FILLING_BEGIN();
+        std::map<video, Ztring>& SmpteSt209440=HDR[HdrFormat_SmpteSt209440];
+        Ztring& HDR_Format=SmpteSt209440[Video_HDR_Format];
+        if (HDR_Format.empty())
+        {
+            HDR_Format=__T("SMPTE ST 2094 App 4");
+            SmpteSt209440[Video_HDR_Format_Version].From_Number(application_version);
+            if (IsHDRplus)
+                SmpteSt209440[Video_HDR_Format_Compatibility]=tone_mapping_flag?__T("HDR10+ Profile B"):__T("HDR10+ Profile A");
+        }
+    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
@@ -2323,7 +2572,14 @@ void File_Hevc::sei_message_mastering_display_colour_volume()
 {
     Element_Info1("mastering_display_colour_volume");
 
-    Get_MasteringDisplayColorVolume(MasteringDisplay_ColorPrimaries, MasteringDisplay_Luminance);
+    std::map<video, Ztring>& SmpteSt2086=HDR[HdrFormat_SmpteSt2086];
+    Ztring& HDR_Format=SmpteSt2086[Video_HDR_Format];
+    if (HDR_Format.empty())
+    {
+        HDR_Format=__T("SMPTE ST 2086");
+        SmpteSt2086[Video_HDR_Format_Compatibility]="HDR10";
+    }
+    Get_MasteringDisplayColorVolume(SmpteSt2086[Video_MasteringDisplay_ColorPrimaries], SmpteSt2086[Video_MasteringDisplay_Luminance]);
 }
 
 //---------------------------------------------------------------------------

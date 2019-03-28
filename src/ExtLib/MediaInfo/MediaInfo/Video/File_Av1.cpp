@@ -147,6 +147,35 @@ void File_Av1::Streams_Finish()
 }
 
 //***************************************************************************
+// Buffer - Global
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void File_Av1::Read_Buffer_OutOfBand()
+{
+    //Parsing
+    bool initial_presentation_delay_present;
+    BS_Begin();
+    Mark_1 ();
+    Skip_S1(7,                                                  "version");
+    Skip_S1(3,                                                  "seq_profile");
+    Skip_S1(5,                                                  "seq_level_idx_0");
+    Skip_SB(                                                    "seq_tier_0");
+    Skip_SB(                                                    "high_bitdepth");
+    Skip_SB(                                                    "twelve_bit");
+    Skip_SB(                                                    "monochrome");
+    Skip_SB(                                                    "chroma_subsampling_x");
+    Skip_SB(                                                    "chroma_subsampling_y");
+    Skip_S1(2,                                                  "chroma_sample_position");
+    Skip_S1(3,                                                  "reserved");
+    Get_SB (   initial_presentation_delay_present,              "initial_presentation_delay_present");
+    Skip_S1(4,                                                  initial_presentation_delay_present?"initial_presentation_delay_minus_one":"reserved");
+    BS_End();
+
+    Open_Buffer_Continue(Buffer, Buffer_Size);
+}
+
+//***************************************************************************
 // Buffer - Per element
 //***************************************************************************
 

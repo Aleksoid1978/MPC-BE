@@ -1793,6 +1793,11 @@ Ztring MediaInfo_Internal::Get(stream_t StreamKind, size_t StreamPos, const Stri
         Ztring Encoded_Library=Get(StreamKind, StreamPos, __T("Encoded_Library"));
         return File__Analyze_Encoded_Library_String(CompanyName, Name, Version, Date, Encoded_Library);
     }
+    if (!Parameter.compare(0, 11, __T("DolbyVision")))
+    {
+        Ztring Temp=Get(StreamKind, StreamPos, __T("HDR_Format")+Parameter.substr(11), KindOfInfo, KindOfSearch).substr(14);
+        return Temp.substr(0, Temp.find(__T(" / ")));
+    }
 
     CS.Enter();
     MEDIAINFO_DEBUG_CONFIG_TEXT(Debug+=__T("Get, StreamKind=");Debug+=Ztring::ToZtring((size_t)StreamKind);Debug+=__T(", StreamKind=");Debug+=Ztring::ToZtring(StreamPos);Debug+=__T(", Parameter=");Debug+=Ztring(Parameter);)

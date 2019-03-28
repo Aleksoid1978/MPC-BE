@@ -847,12 +847,18 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
                     else
                     {
                         Fill((stream_t)StreamKind, StreamPos, Info->first.c_str(), Info->second, true);
-                        Fill_SetOptions((stream_t)StreamKind, StreamPos, Info->first.c_str(), Info->second.To_UTF8().c_str());
+                        std::map<std::string, ZenLib::Ztring>::iterator Option=Temp->Infos_Option.find(Info->first.c_str());
+                        if (Option!=Temp->Infos_Option.end())
+                            Fill_SetOptions((stream_t)StreamKind, StreamPos, Info->first.c_str(), Option->second.To_UTF8().c_str());
                     }
                 }
                 else if (Info->first=="CodecID")
                 {
                     Fill((stream_t)StreamKind, StreamPos, Info->first.c_str(), Info->second+__T('-')+Retrieve((stream_t)StreamKind, StreamPos, Info->first.c_str()), true);
+                }
+                else if (Info->first.find("HDR_Format")==0)
+                {
+                    Fill((stream_t)StreamKind, StreamPos, Info->first.c_str(), Info->second+__T(" / ")+Retrieve((stream_t)StreamKind, StreamPos, Info->first.c_str()), true);
                 }
             }
 

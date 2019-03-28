@@ -65,6 +65,35 @@ private :
     void mdat();
     void mdat_xxxx();
     void mdat_StreamJump();
+    void meta();
+    void meta_grpl();
+    void meta_grpl_xxxx();
+    void meta_hdlr() {moov_meta_hdlr();}
+    void meta_idat();
+    void meta_iinf();
+    void meta_iinf_infe();
+    void meta_iloc();
+    void meta_iprp();
+    void meta_iprp_ipco();
+    void meta_iprp_ipco_av1C();
+    void meta_iprp_ipco_auxC();
+    void meta_iprp_ipco_avcC();
+    void meta_iprp_ipco_clap();
+    void meta_iprp_ipco_clli();
+    void meta_iprp_ipco_colr();
+    void meta_iprp_ipco_hvcC();
+    void meta_iprp_ipco_imir();
+    void meta_iprp_ipco_irot();
+    void meta_iprp_ipco_ispe();
+    void meta_iprp_ipco_lsel();
+    void meta_iprp_ipco_mdcv();
+    void meta_iprp_ipco_pasp();
+    void meta_iprp_ipco_pixi();
+    void meta_iprp_ipco_rloc();
+    void meta_iprp_ipma();
+    void meta_iref();
+    void meta_iref_xxxx();
+    void meta_pitm();
     void mfra();
     void mfra_mfro();
     void mfra_tfra();
@@ -160,10 +189,12 @@ private :
     void moov_trak_mdia_minf_stbl_stsd_xxxx_APRG();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_ARES();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_AORD();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_av1C();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_avcC();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_avcE();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_bitr();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_btrt();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_ccst();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_chan();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_clap();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_clli();
@@ -236,6 +267,7 @@ private :
     void moov_trak_tref_scpt();
     void moov_trak_tref_ssrc();
     void moov_trak_tref_sync();
+    void moov_trak_tref_thmb();
     void moov_trak_tref_tmcd();
     void moov_trak_tref_vdep();
     void moov_trak_udta();
@@ -350,6 +382,11 @@ private :
     bool                                    IsParsing_mdat;
     bool                                    IsFragmented;
     size_t                                  StreamOrder;
+    int32u                                  meta_pitm_item_ID;
+    std::vector<std::vector<int32u> >       meta_iprp_ipma_Entries;
+    int8u*                                  meta_iprp_ipco_Buffer;
+    size_t                                  meta_iprp_ipco_Buffer_Size; //Used as property_index if no buffer
+    int8u                                   Version_Temp; //Used when box version must be provided to nested boxes
 
     //Data
     struct stream
@@ -427,12 +464,14 @@ private :
         bool                    IsExcluded;
         bool                    HasForcedSamples;
         bool                    AllForcedSamples;
+        bool                    IsImage;
         std::vector<int32u>     CC;
         std::vector<int32u>     CCFor;
         std::vector<int32u>     FallBackTo;
         std::vector<int32u>     FallBackFrom;
         std::vector<int32u>     Subtitle;
         std::vector<int32u>     SubtitleFor;
+        std::map<std::string, std::vector<int32u> > Infos_List;
         std::vector<int32u>     Forced;
         std::vector<int32u>     ForcedFor;
         std::vector<int32u>     Chapters;
@@ -504,6 +543,7 @@ private :
             IsExcluded=false;
             HasForcedSamples=false;
             AllForcedSamples=false;
+            IsImage=false;
             CleanAperture_Width=0;
             CleanAperture_Height=0;
             CleanAperture_PixelAspectRatio=0;
@@ -572,6 +612,7 @@ private :
     mdat_Pos_Type* mdat_Pos_Max;
     std::vector<int32u> mdat_Pos_ToParseInPriority_StreamIDs;
     bool                mdat_Pos_NormalParsing;
+    void Skip_NulString(const char* Name);
 
     #if MEDIAINFO_DEMUX
         int64u          TimeCode_FrameOffset;
