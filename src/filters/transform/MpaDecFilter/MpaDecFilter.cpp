@@ -77,6 +77,7 @@
 #define BS_MAT_TRUEHD_SIZE  (BS_MAT_FRAME_SIZE + 8 + 8) // 8 header bytes + 61424 of MAT data + 8 zero byte
 #define BS_MAT_TRUEHD_LIMIT (BS_MAT_TRUEHD_SIZE - 24)   // IEC total frame size - MAT end code size
 #define BS_MAT_POS_MIDDLE   (BS_HEADER_SIZE + 30708)    // middle point + 8 header bytes
+#define BS_MAT_OFFSET        2560
 #define BS_DTSHD_SIZE       32768
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
@@ -672,8 +673,8 @@ BOOL CMpaDecFilter::ProcessBitstream(enum AVCodecID nCodecId, HRESULT& hr, BOOL 
 		return TRUE;
 	}
 
-	if (m_bBitstreamSupported[TRUEHD] && GetSPDIF(truehd) && nCodecId == AV_CODEC_ID_TRUEHD) {
-		hr = bEOF ? S_OK : ProcessTrueHD_SPDIF();
+	if (m_bBitstreamSupported[TRUEHD] && GetSPDIF(truehd) && (nCodecId == AV_CODEC_ID_TRUEHD || nCodecId == AV_CODEC_ID_MLP)) {
+		hr = bEOF ? S_OK : (nCodecId == AV_CODEC_ID_TRUEHD ? ProcessTrueHD_SPDIF() : ProcessMLP_SPDIF());
 		return TRUE;
 	}
 
@@ -1242,6 +1243,80 @@ HRESULT CMpaDecFilter::ProcessTrueHD_SPDIF()
 		m_hdmi_bitstream.TrueHDMATState.mat_framesize = 0;
 
 		p += size;
+	}
+
+	m_buff.RemoveHead(p - base);
+
+	return S_OK;
+}
+
+HRESULT CMpaDecFilter::ProcessMLP_SPDIF()
+{
+	HRESULT hr;
+
+	BYTE* const base = m_buff.Data();
+	BYTE* end = base + m_buff.Size();
+	BYTE* p = base;
+
+	while (p + 16 <= end) {
+		audioframe_t aframe;
+		int size = ParseMLPHeader(p, &aframe);
+		if (size > 0) {
+			// sync frame
+			m_hdmi_bitstream.TrueHDMATState.sync = true;
+		}
+
+		if (size == 0 && m_hdmi_bitstream.TrueHDMATState.sync) {
+			// get not sync frame size
+			size = ((p[0] << 8 | p[1]) & 0xfff) * 2;
+		}
+
+		if (size < 8) {
+			p++;
+			continue;
+		}
+
+		if (m_bUpdateTimeCache) {
+			UpdateCacheTimeStamp();
+		}
+
+		if (p + size > end) {
+			break;
+		}
+
+		m_hdmi_bitstream.count++;
+		if (m_hdmi_bitstream.count == 1) {
+			// skip 8 header bytes and write MAT start code
+			memcpy(m_hdmi_bitstream.buf + BS_HEADER_SIZE, mat_start_code, sizeof(mat_start_code));
+			m_hdmi_bitstream.size = BS_HEADER_SIZE + sizeof(mat_start_code);
+		} else if (m_hdmi_bitstream.count == 13) {
+			// write the MAT middle code
+			memcpy(m_hdmi_bitstream.buf + (BS_HEADER_SIZE + BS_MAT_FRAME_SIZE) / 2, mat_middle_code, sizeof(mat_middle_code));
+			m_hdmi_bitstream.size = (BS_HEADER_SIZE + BS_MAT_FRAME_SIZE) / 2 + sizeof(mat_middle_code);
+		}
+
+		if (m_hdmi_bitstream.size + size <= m_hdmi_bitstream.count * BS_MAT_OFFSET) {
+			memcpy(m_hdmi_bitstream.buf + m_hdmi_bitstream.size, p, size);
+			m_hdmi_bitstream.size += size;
+			memset(m_hdmi_bitstream.buf + m_hdmi_bitstream.size, 0, m_hdmi_bitstream.count * BS_MAT_OFFSET - m_hdmi_bitstream.size);
+			m_hdmi_bitstream.size = m_hdmi_bitstream.count * BS_MAT_OFFSET;
+		} else {
+			ASSERT(0);
+		}
+		p += size;
+
+		if (m_hdmi_bitstream.count < 24) {
+			continue;
+		}
+
+		// write the MAT end code
+		memcpy(m_hdmi_bitstream.buf + BS_MAT_TRUEHD_LIMIT, mat_end_code, sizeof(mat_end_code));
+
+		hr = MATDeliverPacket();
+		m_hdmi_bitstream.count = 0;
+		if (FAILED(hr)) {
+			return hr;
+		}
 	}
 
 	m_buff.RemoveHead(p - base);
@@ -2319,7 +2394,7 @@ HRESULT CMpaDecFilter::GetMediaType(int iPosition, CMediaType* pmt)
 			*pmt = CreateMediaTypeHDMI(IEC61937_EAC3);
 			return S_OK;
 		}
-		if (GetSPDIF(truehd) && subtype == MEDIASUBTYPE_DOLBY_TRUEHD) {
+		if (GetSPDIF(truehd) && (subtype == MEDIASUBTYPE_DOLBY_TRUEHD || subtype == MEDIASUBTYPE_MLP)) {
 			*pmt = CreateMediaTypeHDMI(IEC61937_TRUEHD);
 			return S_OK;
 		}
@@ -2387,7 +2462,7 @@ HRESULT CMpaDecFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType *pmt)
 				return VFW_E_TYPE_NOT_ACCEPTED;
 			}
 
-			if (nCodecId == AV_CODEC_ID_DTS || nCodecId == AV_CODEC_ID_TRUEHD) {
+			if (nCodecId == AV_CODEC_ID_DTS || nCodecId == AV_CODEC_ID_TRUEHD || nCodecId == AV_CODEC_ID_MLP) {
 				m_faJitter.SetNumSamples(200);
 				m_JitterLimit = MAX_JITTER * 10;
 			} else {
