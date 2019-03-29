@@ -1044,9 +1044,11 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					}
 
 					mts.push_back(mt);
-				} else if (CodecID == "A_TRUEHD" ||
-						   CodecID == "A_MLP") {
+				} else if (CodecID == "A_TRUEHD") {
 					mt.subtype = MEDIASUBTYPE_DOLBY_TRUEHD;
+					mts.push_back(mt);
+				} else if (CodecID == "A_MLP") {
+					mt.subtype = MEDIASUBTYPE_MLP;
 					mts.push_back(mt);
 				} else if (CodecID == "A_DTS") {
 					mt.subtype = FOURCCMap(wfe->wFormatTag = WAVE_FORMAT_DTS2);
