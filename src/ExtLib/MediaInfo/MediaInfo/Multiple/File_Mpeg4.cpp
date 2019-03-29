@@ -2020,7 +2020,7 @@ void File_Mpeg4::stream::SplitAudio(File_Mpeg4::stream& Video, int32u moov_mvhd_
 {
     //Complex audio edit lists are not supported, but detect fake complex edit lists
     bool ComplexAudioEditList = edts.size() != 1 || edts[0].Delay != 0;
-    if (ComplexAudioEditList && edts.size() == 2 && ((int64u)edts[1].Delay) * moov_mvhd_TimeScale / mdhd_TimeScale == edts[0].Duration)
+    if (mdhd_TimeScale && ComplexAudioEditList && edts.size() == 2 && ((int64u)edts[1].Delay) * moov_mvhd_TimeScale / mdhd_TimeScale == edts[0].Duration)
         ComplexAudioEditList = false;
 
     //Check if we need to split
