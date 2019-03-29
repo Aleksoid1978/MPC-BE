@@ -86,6 +86,7 @@ protected:
 	struct {
 		BYTE buf[61440];
 		int  size;
+		int  count;
 
 		// E-AC3 Bitstreaming
 		struct {
@@ -171,6 +172,7 @@ protected:
 	int MATFillDataBuffer(const BYTE *p, int size, bool padding = false);
 	HRESULT MATDeliverPacket();
 	HRESULT ProcessTrueHD_SPDIF();
+	HRESULT ProcessMLP_SPDIF();
 
 	HRESULT ProcessDTS_SPDIF(BOOL bEOF = FALSE);
 	HRESULT ProcessPS2PCM();
