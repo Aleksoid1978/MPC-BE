@@ -874,6 +874,7 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT nSide, LPRECT pRect);
 	afx_msg void OnDisplayChange();
+	afx_msg void OnWindowPosChanging(WINDOWPOS* lpwndpos);
 
 	LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
 

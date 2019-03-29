@@ -165,6 +165,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_MESSAGE_VOID(WM_DISPLAYCHANGE, OnDisplayChange)
+	ON_WM_WINDOWPOSCHANGING()
 
 	ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
 
@@ -2051,7 +2052,7 @@ void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
 		CWnd* cwnd = m_bFullScreen ? this : static_cast<CWnd*>(m_pFullscreenWnd);
 
 		MONITORINFO MonitorInfo = { sizeof(MonitorInfo) };
-		HMONITOR hMonitor = MonitorFromWindow(cwnd->m_hWnd, 0);
+		HMONITOR hMonitor = MonitorFromWindow(cwnd->m_hWnd, MONITOR_DEFAULTTONULL);
 		if (GetMonitorInfoW(hMonitor, &MonitorInfo)) {
 			CRect MonitorRect = CRect(MonitorInfo.rcMonitor);
 			cwnd->SetWindowPos(nullptr,
@@ -2065,6 +2066,23 @@ void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
 	}
 
 	DLog(L"CMainFrame::OnDisplayChange() : end");
+}
+
+void CMainFrame::OnWindowPosChanging(WINDOWPOS* lpwndpos)
+{
+	if (m_bFullScreen && !(lpwndpos->flags & SWP_NOMOVE)) {
+		const HMONITOR hm = MonitorFromPoint(CPoint(lpwndpos->x, lpwndpos->y), MONITOR_DEFAULTTONULL);
+		MONITORINFO mi = { sizeof(mi) };
+		if (GetMonitorInfoW(hm, &mi)) {
+			lpwndpos->flags &= ~SWP_NOSIZE;
+			lpwndpos->cx = mi.rcMonitor.right - mi.rcMonitor.left;
+			lpwndpos->cy = mi.rcMonitor.bottom - mi.rcMonitor.top;
+			lpwndpos->x = mi.rcMonitor.left;
+			lpwndpos->y = mi.rcMonitor.top;
+		}
+	}
+
+	__super::OnWindowPosChanging(lpwndpos);
 }
 
 LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
