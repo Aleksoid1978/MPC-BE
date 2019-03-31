@@ -3,6 +3,105 @@
 1.5.3 (beta)
 =============================
 
+ShoutcastSource
+Added support for metadata written in json format.
+
+Oggsplitter
+Improved chapter support.
+Fixed playback of very small files.
+
+Flvsplitter
+Added support for Xunlei XV files.
+
+MpegSplitter
+Added support for mixed H.264 3D MVC streams.
+The initial size of the read data for local files is increased to 60 megabytes if there is a HEVC stream in the PMT.
+Added support for MPEG-PS with mu-law streams.
+Improved navigation on files with corrupted blocks.
+
+MP4Splitter
+Added support for the 'r210' video codec for MOV files.
+Added support for trimming the frame (atom 'clap').
+Added support for MP4 dash files, with separate segments for each track.
+Added support for Avid DNxHR video ('AVdh').
+Added color space support (atom 'colr').
+Added support for HDR Light Level (atom 'clli').
+Added support for HDR metadata (atom 'mdcv').
+
+DVRSplitter
+Added full support for DAV (DHAV) files.
+
+MpaDecFilter
+Always decode DTS Express streams to PCM.
+Improved DTS-HD HRA bitstream compatibility.
+Improved TrueHD+Atmos bitstream.
+Added MLP bitstream.
+
+Mpeg2DecFilter
+Changed the format of the brightness, contrast, hue and saturation.
+The filter built into the player is now only connected for DVD-Video. In other cases, for MPEG-1 and MPEG-2 MPCVideoDec will be connected.
+
+MPCVideoDec
+Removed option "H264 deblocking disable method".
+Added option "Skip B-frames".
+Corrected row order when converting RGR to RGB32.
+Added support for AVrp codec (Avid 1: 1 10-bit RGB Packer).
+Improved support for getting color space from the upstream filter.
+Added support for the HuffYUV MT codec ('HYMT').
+Added patch, any I-frame in the H.264 stream is defined as a keyframe. This speeds up navigation on some files.
+Added support for "Mirillis FIC" video ('FICV').
+Updated Intel MVC decoder.
+Accelerated decoding AV1. Now dav1d v0.2.0 library is used.
+Added support for Avid DNxHR video ('AVdh').
+
+MPCVideoConverter
+Added support for 'Y1 [0] [16]' (16-bit gray).
+Removed direct support for planar RGB48, now planar RGB are supported only through MEDIASUBTYPE_LAV_RAWVIDEO.
+
+MpcAudioRenderer
+Fixed status display during bitstream and audio track switching in the player.
+The buffer size is calculated more correctly when the DTS-HD is used.
+The option "Do not check format support" has been expanded.
+
+EVR-CP
+Changed the mechanism and synchronization settings.
+Improved the quality of screenshots of anamorphic frames.
+Correction shaders are also used when creating screenshots and thumbnails.
+
+Subtitles
+The size of very large subtitles is limited, otherwise they are incorrectly displayed.
+
+Youtube
+Updated support for Youtube.
+Correct the output of unsupported characters.
+Improved work with youtube-dl.
+Improved work with live broadcasts.
+
+Player
+Fixed FlyBar when choosing Hebrew translation.
+Improved definition of the choice of the main video when opening a Blu-Ray structure.
+Added the ability to assign a hotkey to the "Open Iso image" command.
+Improved automatic display mode switching. When the display is turned off, the settings are not lost.
+The page "variables.html" of the web-interface has been improved.
+Playlist now supports dark theme. Improved playlist rendering at high DPI.
+Fixed the operation of the button for resetting the list of media types for filters loaded on the file path (not registered in the system).
+Fixed the "Exclusive fullscreen" option when switching via "FlyBar".
+Added "dark" menu.
+Fixed the calculation of the window size when the "Limit window proportions on resize" option is active and the active playlist stuck to the left or right.
+Added the ability to increase the font size in the playlist.
+Added a command to get MediaInfo data in the playlist menu.
+Improved shuffle algorithm.
+The AC3 / DTS format group and the DTS / AC3 ​​filter group are divided into the AC3 and DTS / DTS-HD groups.
+Added support for ".dtsma", ".eac3" and ".weba" extensions.
+The ability to save up to 1000 bookmarks for media files is returned.
+Added support for the option "Allow Windows to fix blur in applications", which appeared in Windows 10.
+Settings item "Null (compressed)" renamed to "Null (any)".
+Implemented getting the disk name from the file "BDMV\META\DL\bdmt_eng.xml".
+Increased buffer size for open file dialog.
+Added the ability to use multiple playlists. Added new "Explorer" playlist type.
+Added the ability to search in the playlist.
+Added support for BMP format for audio covers.
+
 Updated libraries:
 	ffmpeg git-n4.2-dev-1150-g391f884675;
 	dav1d git-0.2.1-12-gbd12b1e;
