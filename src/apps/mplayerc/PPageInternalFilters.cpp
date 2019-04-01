@@ -25,9 +25,7 @@
 #include "../../filters/filters.h"
 
 
-static filter_t s_filters[] = {
-
-	// Source filters
+static filter_t s_source_filters[] = {
 	{L"AC3",						SOURCE_FILTER, SRC_AC3,				0},
 	{L"AMR",						SOURCE_FILTER, SRC_AMR,				0},
 	{L"AVI",						SOURCE_FILTER, SRC_AVI,				IDS_SRC_AVI},
@@ -58,17 +56,18 @@ static filter_t s_filters[] = {
 	{L"WAV/Wave64",					SOURCE_FILTER, SRC_WAV,				0},
 	{L"WavPack",					SOURCE_FILTER, SRC_WAVPACK,			0},
 	{L"UDP/HTTP",					SOURCE_FILTER, SRC_UDP,				0},
-	{L"DVR Video",					SOURCE_FILTER, SRC_DVR,				0 },
+	{L"DVR Video",					SOURCE_FILTER, SRC_DVR,				0},
+};
 
-	// DXVA decoder
-	{L"DXVA: H264/AVC",				DXVA_DECODER,  VDEC_DXVA_H264,		0},
-	{L"DXVA: HEVC",					DXVA_DECODER,  VDEC_DXVA_HEVC,		0},
-	{L"DXVA: MPEG-2 Video",			DXVA_DECODER,  VDEC_DXVA_MPEG2,		0},
-	{L"DXVA: VC-1",					DXVA_DECODER,  VDEC_DXVA_VC1,		0},
-	{L"DXVA: WMV3",					DXVA_DECODER,  VDEC_DXVA_WMV3,		0},
-	{L"DXVA: VP9",					DXVA_DECODER,  VDEC_DXVA_VP9,		0},
-
-		// Video Decoder
+static filter_t s_video_decoders[] = {
+	// DXVA2 decoders
+	{L"DXVA2: H264/AVC",			DXVA_DECODER,  VDEC_DXVA_H264,		0},
+	{L"DXVA2: HEVC",				DXVA_DECODER,  VDEC_DXVA_HEVC,		0},
+	{L"DXVA2: MPEG-2 Video",		DXVA_DECODER,  VDEC_DXVA_MPEG2,		0},
+	{L"DXVA2: VC-1",				DXVA_DECODER,  VDEC_DXVA_VC1,		0},
+	{L"DXVA2: WMV3",				DXVA_DECODER,  VDEC_DXVA_WMV3,		0},
+	{L"DXVA2: VP9",					DXVA_DECODER,  VDEC_DXVA_VP9,		0},
+	// Software decoders
 	{L"AMV Video",					VIDEO_DECODER, VDEC_AMV,			0},
 	{L"Apple ProRes",				VIDEO_DECODER, VDEC_PRORES,			0},
 	{L"AOMedia Video 1 (AV1)",		VIDEO_DECODER, VDEC_AV1,			0},
@@ -106,8 +105,9 @@ static filter_t s_filters[] = {
 	{L"Xvid/MPEG-4",				VIDEO_DECODER, VDEC_XVID,			0},
 	{L"RealVideo",					VIDEO_DECODER, VDEC_REAL,			IDS_TRA_RV},
 	{L"Uncompressed video (v210, V410, Y8, I420, \x2026)", VIDEO_DECODER, VDEC_UNCOMPRESSED, 0},
+};
 
-	// Audio decoder
+static filter_t s_audio_decoders[] = {
 	{L"AAC",						AUDIO_DECODER, ADEC_AAC,			0},
 	{L"AC3/E-AC3/TrueHD/MLP",		AUDIO_DECODER, ADEC_AC3,			0},
 	{L"ALAC",						AUDIO_DECODER, ADEC_ALAC,			0},
@@ -284,60 +284,59 @@ void CPPageInternalFiltersListBox::OnRButtonDown(UINT nFlags, CPoint point)
 		return;
 	}
 
-	int index = 0;
-
-	for (int i = 0; i < _countof(s_filters); i++) {
-		switch (s_filters[i].type) {
-		case SOURCE_FILTER:
-			if (m_n != SOURCE) {
-				continue;
+	switch (m_n) {
+	case SOURCE:
+		for (int i = 0; i < std::size(s_source_filters); i++) {
+			if (id == ENABLE_ALL) {
+				SetCheck(i, TRUE);
 			}
-			break;
-		case DXVA_DECODER:
-		case VIDEO_DECODER:
-			if (m_n != VIDEO) {
-				continue;
+			else if (id == DISABLE_ALL) {
+				SetCheck(i, FALSE);
 			}
-			break;
-		case AUDIO_DECODER:
-			if (m_n != AUDIO) {
-				continue;
-			}
-			break;
-		default:
-			continue;
 		}
-
-		switch (id) {
-		case ENABLE_ALL:
-			SetCheck(index, TRUE);
-			break;
-		case DISABLE_ALL:
-			SetCheck(index, FALSE);
-			break;
-		case ENABLE_FFMPEG:
-			if (s_filters[i].type == VIDEO_DECODER) {
-				SetCheck(index, TRUE);
+		break;
+	case VIDEO:
+		for (int i = 0; i < std::size(s_video_decoders); i++) {
+			switch (id) {
+			case ENABLE_ALL:
+				SetCheck(i, TRUE);
+				break;
+			case DISABLE_ALL:
+				SetCheck(i, FALSE);
+				break;
+			case ENABLE_FFMPEG:
+				if (s_video_decoders[i].type == VIDEO_DECODER) {
+					SetCheck(i, TRUE);
+				}
+				break;
+			case DISABLE_FFMPEG:
+				if (s_video_decoders[i].type == VIDEO_DECODER) {
+					SetCheck(i, FALSE);
+				}
+				break;
+			case ENABLE_DXVA:
+				if (s_video_decoders[i].type == DXVA_DECODER) {
+					SetCheck(i, TRUE);
+				}
+				break;
+			case DISABLE_DXVA:
+				if (s_video_decoders[i].type == DXVA_DECODER) {
+					SetCheck(i, FALSE);
+				}
+				break;
 			}
-			break;
-		case DISABLE_FFMPEG:
-			if (s_filters[i].type == VIDEO_DECODER) {
-				SetCheck(index, FALSE);
-			}
-			break;
-		case ENABLE_DXVA:
-			if (s_filters[i].type == DXVA_DECODER) {
-				SetCheck(index, TRUE);
-			}
-			break;
-		case DISABLE_DXVA:
-			if (s_filters[i].type == DXVA_DECODER) {
-				SetCheck(index, FALSE);
-			}
-			break;
 		}
-
-		index++;
+		break;
+	case AUDIO:
+		for (int i = 0; i < std::size(s_audio_decoders); i++) {
+			if (id == ENABLE_ALL) {
+				SetCheck(i, TRUE);
+			}
+			else if (id == DISABLE_ALL) {
+				SetCheck(i, FALSE);
+			}
+		}
+		break;
 	}
 
 	GetParent()->SendMessageW(WM_COMMAND, MAKEWPARAM(GetDlgCtrlID(), CLBN_CHKCHANGE), (LPARAM)m_hWnd);
@@ -408,35 +407,29 @@ BOOL CPPageInternalFilters::OnInitDialog()
 	m_listVideo.SetItemHeight(0, ScaleY(13)+3); // 16 without scale
 	m_listAudio.SetItemHeight(0, ScaleY(13)+3); // 16 without scale
 
-	for (int i = 0; i < _countof(s_filters); i++) {
-		CPPageInternalFiltersListBox* listbox;
+	for (auto& item : s_source_filters) {
+		bool checked = s.SrcFilters[item.flag];
+		m_listSrc.AddFilter(&item, checked);
+	}
+
+	for (auto& item : s_video_decoders) {
 		bool checked = false;
-
-		switch (s_filters[i].type) {
-			case SOURCE_FILTER:
-				listbox = &m_listSrc;
-				checked = s.SrcFilters[s_filters[i].flag];
-				break;
-			case DXVA_DECODER:
-				listbox = &m_listVideo;
-				checked = s.DXVAFilters[s_filters[i].flag];
-				break;
-			case VIDEO_DECODER:
-				listbox = &m_listVideo;
-				checked = s.VideoFilters[s_filters[i].flag];
-				break;
-			case AUDIO_DECODER:
-				listbox = &m_listAudio;
-				checked = s.AudioFilters[s_filters[i].flag];
-				break;
-			default:
-				listbox = nullptr;
-				checked = false;
+		if (item.type == DXVA_DECODER) {
+			checked = s.DXVAFilters[item.flag];
 		}
-
-		if (listbox) {
-			listbox->AddFilter(&s_filters[i], checked);
+		else if (item.type == VIDEO_DECODER) {
+			checked = s.VideoFilters[item.flag];
 		}
+		else {
+			ASSERT(0);
+			continue;
+		}
+		m_listVideo.AddFilter(&item, checked);
+	}
+
+	for (auto& item : s_audio_decoders) {
+		bool checked = s.AudioFilters[item.flag];
+		m_listAudio.AddFilter(&item, checked);
 	}
 
 	m_listSrc.UpdateCheckState();
