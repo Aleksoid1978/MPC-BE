@@ -739,17 +739,17 @@ void CAppSettings::ResetSettings()
 	iDlgPropY = 0;
 
 	// Internal filters
-	for (int f = 0; f < SRC_LAST; f++) {
-		SrcFilters[f] = 1;
+	for (auto& item : SrcFilters) {
+		item = true;
 	}
-	for (int f = 0; f < VDEC_DXVA_LAST; f++) {
-		DXVAFilters[f] = 1;
+	for (auto& item : DXVAFilters) {
+		item = true;
 	}
-	for (int f = 0; f < VDEC_LAST; f++) {
-		VideoFilters[f] = (f == VDEC_H264_MVC) ? 0 : 1;
+	for (int f = 0; f < VDEC_COUNT; f++) {
+		VideoFilters[f] = (f == VDEC_H264_MVC) ? false : true;
 	}
-	for (int f = 0; f < ADEC_LAST; f++) {
-		AudioFilters[f] = 1;
+	for (auto& item : AudioFilters) {
+		item = true;
 	}
 
 	strLogoFileName.Empty();
@@ -1325,16 +1325,16 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	m_Formats.UpdateData(false);
 
 	// Internal filters
-	for (int f = 0; f < SRC_LAST; f++) {
+	for (int f = 0; f < SRC_COUNT; f++) {
 		profile.ReadBool(IDS_R_INTERNAL_FILTERS, SrcFiltersKeys[f], SrcFilters[f]);
 	}
-	for (int f = 0; f < VDEC_DXVA_LAST; f++) {
+	for (int f = 0; f < VDEC_DXVA_COUNT; f++) {
 		profile.ReadBool(IDS_R_INTERNAL_FILTERS, DXVAFiltersKeys[f], DXVAFilters[f]);
 	}
-	for (int f = 0; f < VDEC_LAST; f++) {
+	for (int f = 0; f < VDEC_COUNT; f++) {
 		profile.ReadBool(IDS_R_INTERNAL_FILTERS, VideoFiltersKeys[f], VideoFilters[f]);
 	}
-	for (int f = 0; f < ADEC_LAST; f++) {
+	for (int f = 0; f < ADEC_COUNT; f++) {
 		profile.ReadBool(IDS_R_INTERNAL_FILTERS, AudioFiltersKeys[f], AudioFilters[f]);
 	}
 
@@ -1890,16 +1890,16 @@ void CAppSettings::SaveSettings()
 	m_Formats.UpdateData(true);
 
 	// Internal filters
-	for (int f = 0; f < SRC_LAST; f++) {
+	for (int f = 0; f < SRC_COUNT; f++) {
 		profile.WriteBool(IDS_R_INTERNAL_FILTERS, SrcFiltersKeys[f], SrcFilters[f]);
 	}
-	for (int f = 0; f < VDEC_DXVA_LAST; f++) {
+	for (int f = 0; f < VDEC_DXVA_COUNT; f++) {
 		profile.WriteBool(IDS_R_INTERNAL_FILTERS, DXVAFiltersKeys[f], DXVAFilters[f]);
 	}
-	for (int f = 0; f < VDEC_LAST; f++) {
+	for (int f = 0; f < VDEC_COUNT; f++) {
 		profile.WriteBool(IDS_R_INTERNAL_FILTERS, VideoFiltersKeys[f], VideoFilters[f]);
 	}
-	for (int f = 0; f < ADEC_LAST; f++) {
+	for (int f = 0; f < ADEC_COUNT; f++) {
 		profile.WriteBool(IDS_R_INTERNAL_FILTERS, AudioFiltersKeys[f], AudioFilters[f]);
 	}
 
