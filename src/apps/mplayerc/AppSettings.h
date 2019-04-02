@@ -690,10 +690,10 @@ public:
 	std::list<CDVBChannel> m_DVBChannels;
 
 	// Internal Filters
-	bool			SrcFilters[SRC_LAST];
-	bool			DXVAFilters[VDEC_DXVA_LAST];
-	bool			VideoFilters[VDEC_LAST];
-	bool			AudioFilters[ADEC_LAST];
+	bool			SrcFilters[SRC_COUNT];
+	bool			DXVAFilters[VDEC_DXVA_COUNT];
+	bool			VideoFilters[VDEC_COUNT];
+	bool			AudioFilters[ADEC_COUNT];
 	int				iBufferDuration;
 
 	// Audio Switcher
@@ -895,10 +895,10 @@ private :
 	FILE_POSITION	FilePosition[MAX_FILE_POSITION];
 	int				nCurrentFilePosition;
 
-	LPCWSTR			SrcFiltersKeys[SRC_LAST];
-	LPCWSTR			DXVAFiltersKeys[VDEC_DXVA_LAST];
-	LPCWSTR			VideoFiltersKeys[VDEC_LAST];
-	LPCWSTR			AudioFiltersKeys[ADEC_LAST];
+	LPCWSTR			SrcFiltersKeys[SRC_COUNT];
+	LPCWSTR			DXVAFiltersKeys[VDEC_DXVA_COUNT];
+	LPCWSTR			VideoFiltersKeys[VDEC_COUNT];
+	LPCWSTR			AudioFiltersKeys[ADEC_COUNT];
 
 	__int64			ConvertTimeToMSec(CString& time) const;
 	void			ExtractDVDStartPos(CString& strParam);

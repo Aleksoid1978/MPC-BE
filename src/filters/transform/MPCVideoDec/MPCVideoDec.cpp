@@ -1291,18 +1291,18 @@ int CMPCVideoDecFilter::PictHeight()
 	return m_pAVCtx->height ? m_pAVCtx->height : m_pAVCtx->coded_height;
 }
 
-static bool IsFFMPEGEnabled(FFMPEG_CODECS ffcodec, const bool FFmpegFilters[VDEC_LAST])
+static bool IsFFMPEGEnabled(FFMPEG_CODECS ffcodec, const bool FFmpegFilters[VDEC_COUNT])
 {
-	if (ffcodec.FFMPEGCode < 0 || ffcodec.FFMPEGCode >= VDEC_LAST) {
+	if (ffcodec.FFMPEGCode < 0 || ffcodec.FFMPEGCode >= VDEC_COUNT) {
 		return false;
 	}
 
 	return FFmpegFilters[ffcodec.FFMPEGCode];
 }
 
-static bool IsDXVAEnabled(FFMPEG_CODECS ffcodec, const bool DXVAFilters[VDEC_DXVA_LAST])
+static bool IsDXVAEnabled(FFMPEG_CODECS ffcodec, const bool DXVAFilters[VDEC_DXVA_COUNT])
 {
-	if (ffcodec.DXVACode < 0 || ffcodec.DXVACode >= VDEC_DXVA_LAST) {
+	if (ffcodec.DXVACode < 0 || ffcodec.DXVACode >= VDEC_DXVA_COUNT) {
 		return false;
 	}
 
@@ -3659,7 +3659,7 @@ HRESULT CMPCVideoDecFilter::SetFFMpegCodec(int nCodec, bool bEnabled)
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (nCodec < 0 || nCodec >= VDEC_LAST) {
+	if (nCodec < 0 || nCodec >= VDEC_COUNT) {
 		return E_FAIL;
 	}
 
@@ -3671,7 +3671,7 @@ HRESULT CMPCVideoDecFilter::SetDXVACodec(int nCodec, bool bEnabled)
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (nCodec < 0 || nCodec >= VDEC_DXVA_LAST) {
+	if (nCodec < 0 || nCodec >= VDEC_DXVA_COUNT) {
 		return E_FAIL;
 	}
 

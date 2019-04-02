@@ -63,8 +63,8 @@ protected:
 
 	CCritSec								m_csProps;
 
-	bool									m_DXVAFilters[VDEC_DXVA_LAST];
-	bool									m_VideoFilters[VDEC_LAST];
+	bool									m_DXVAFilters[VDEC_DXVA_COUNT];
+	bool									m_VideoFilters[VDEC_COUNT];
 
 	bool									m_bDXVACompatible;
 	unsigned __int64						m_nActiveCodecs;

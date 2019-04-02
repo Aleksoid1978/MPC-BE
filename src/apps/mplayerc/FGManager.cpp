@@ -83,8 +83,8 @@ public:
 			return hr;
 		}
 
-		bool dxva_filters[VDEC_DXVA_LAST];
-		bool video_filters[VDEC_LAST];
+		bool dxva_filters[VDEC_DXVA_COUNT];
+		bool video_filters[VDEC_COUNT];
 
 		CAppSettings& s = AfxGetAppSettings();
 
@@ -108,10 +108,10 @@ public:
 		}
 		video_filters[VDEC_UNCOMPRESSED] = false;
 
-		for (size_t i = 0; i < VDEC_DXVA_LAST; i++) {
+		for (size_t i = 0; i < VDEC_DXVA_COUNT; i++) {
 			pBF->SetDXVACodec(i, dxva_filters[i]);
 		}
-		for (size_t i = 0; i < VDEC_LAST; i++) {
+		for (size_t i = 0; i < VDEC_COUNT; i++) {
 			pBF->SetFFMpegCodec(i, video_filters[i]);
 		}
 
