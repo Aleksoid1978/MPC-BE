@@ -458,8 +458,8 @@ void CPPageVideo::OnDSRendererChange()
 			UpdateResizerList(rs.iResizer);
 			UpdateDownscalerList(rs.iDownscaler);
 
-			//GetDlgItem(IDC_STATIC6)->EnableWindow(TRUE);
-			//m_cbDX9PresentMode.EnableWindow(TRUE);
+			GetDlgItem(IDC_STATIC6)->EnableWindow(TRUE);
+			m_cbDX9PresentMode.EnableWindow(TRUE);
 			GetDlgItem(IDC_STATIC2)->EnableWindow(TRUE);
 			m_cbDX9SurfaceFormat.EnableWindow(TRUE);
 			GetDlgItem(IDC_STATIC3)->EnableWindow(TRUE);

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -61,6 +61,9 @@ namespace DSObjects
 		bool	m_bNeedCheckSample;
 		DWORD	m_MainThreadId;
 		bool	m_bResizingDevice;
+
+		HWND	m_hWndVR = nullptr;
+		bool	m_bNeedCreateWindow = true;
 
 		CAffectingRenderersSettings m_LastAffectingSettings;
 

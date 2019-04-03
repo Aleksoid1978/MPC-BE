@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -136,7 +136,7 @@ void CRenderersSettings::Load()
 	profile.ReadString(IDS_R_VIDEO, IDS_RS_RENDERDEVICE, sD3DRenderDevice);
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_RESETDEVICE, bResetDevice);
 
-	//profile.ReadInt(IDS_R_VIDEO, IDS_RS_PRESENTMODE, iPresentMode);
+	profile.ReadInt(IDS_R_VIDEO, IDS_RS_PRESENTMODE, iPresentMode);
 
 	int val;
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_SURFACEFORMAT, val);

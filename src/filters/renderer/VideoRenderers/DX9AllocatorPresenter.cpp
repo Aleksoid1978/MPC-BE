@@ -48,6 +48,8 @@ static const LPCSTR s_transferfunction[32] = {nullptr, "Linear RGB", "1.8 gamma"
 	"2.8 gamma", "Log100", "Log316", "Symmetric BT.709", "Constant luminance BT.2020", "Non-constant luminance BT.2020",
 	"2.6 gamma", "SMPTE ST 2084 (PQ)", "ARIB STD-B67 (HLG)"};
 
+static const wchar_t g_szClassName[] = L"MPCVRWindow";
+
 // CDX9AllocatorPresenter
 
 CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRESULT& hr, bool bIsEVR, CString &_Error)
@@ -133,6 +135,17 @@ CDX9AllocatorPresenter::CDX9AllocatorPresenter(HWND hWnd, bool bFullscreen, HRES
 		m_pDwmEnableMMCSS(TRUE);
 	}
 
+	WNDCLASSEXW wc = {};
+	wc.cbSize = sizeof(wc);
+	wc.lpfnWndProc = ::DefWindowProcW;
+	wc.hInstance = AfxGetApp()->m_hInstance;
+	wc.lpszClassName = g_szClassName;
+	if (!RegisterClassExW(&wc)) {
+		_Error += L"Failed to RegisterClass\n";
+		hr = E_FAIL;
+		return;
+	}
+
 	hr = CreateDevice(_Error);
 }
 
@@ -174,6 +187,12 @@ CDX9AllocatorPresenter::~CDX9AllocatorPresenter()
 			TerminateThread(m_FocusThread->m_hThread, 0xDEAD);
 		}
 	}
+
+	if (m_hWndVR) {
+		DestroyWindow(m_hWndVR);
+	}
+
+	UnregisterClassW(g_szClassName, AfxGetApp()->m_hInstance);
 }
 
 #if 0
@@ -400,6 +419,8 @@ bool CDX9AllocatorPresenter::SettingsNeedResetDevice()
 	bRet = bRet || New.b10BitOutput != Current.b10BitOutput;
 	bRet = bRet || New.iSurfaceFormat != Current.iSurfaceFormat;
 
+	m_bNeedCreateWindow = (!m_bIsFullscreen && New.iPresentMode != Current.iPresentMode);
+
 	Current.Fill(New);
 
 	return bRet;
@@ -548,6 +569,37 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	UINT currentAdapter = GetAdapter(m_pD3DEx);
 	bool bTryToReset = (currentAdapter == m_CurrentAdapter);
 
+	if (m_bNeedCreateWindow) {
+		m_bNeedCreateWindow = false;
+
+		if (m_hWndVR) {
+			DestroyWindow(m_hWndVR);
+			m_hWndVR = nullptr;
+
+			if (m_bIsFullscreen) {
+				bTryToReset = false;
+			}
+		}
+
+		if (!m_bIsFullscreen && rs.iPresentMode) {
+			m_hWndVR = CreateWindowExW(
+				0,
+				g_szClassName,
+				nullptr,
+				WS_VISIBLE | WS_DISABLED | WS_CHILDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
+				CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+				m_hWnd,
+				nullptr,
+				AfxGetApp()->m_hInstance,
+				nullptr
+			);
+
+			if (m_hWndVR) {
+				SetWindowPos(m_hWndVR, nullptr, m_windowRect.left, m_windowRect.top, m_windowRect.Width(), m_windowRect.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
+			}
+		}
+	}
+
 	if (!bTryToReset) {
 		m_pD3DDevEx.Release();
 		m_pD3DDevExRefresh.Release();
@@ -643,7 +695,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		}
 	} else {
 		m_d3dpp.Windowed = TRUE;
-		m_d3dpp.hDeviceWindow = m_hWnd;
+		m_d3dpp.hDeviceWindow = m_hWndVR ? m_hWndVR : m_hWnd;
 		m_d3dpp.SwapEffect = rs.iPresentMode == 0 ? D3DSWAPEFFECT_COPY : (SysVersion::IsWin7orLater() ? D3DSWAPEFFECT_FLIPEX : D3DSWAPEFFECT_FLIP);
 		m_d3dpp.BackBufferCount = m_d3dpp.SwapEffect == D3DSWAPEFFECT_COPY ? 1 : 3;
 		m_d3dpp.Flags = D3DPRESENTFLAG_VIDEO;
@@ -669,7 +721,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 			// We can get 0x8876086a here when switching from two displays to one display using Win + P (Windows 7)
 			// Cause: We might not reinitialize dx correctly during the switch
 			hr = m_pD3DEx->CreateDeviceEx(
-					m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWnd,
+					m_CurrentAdapter, D3DDEVTYPE_HAL, m_hWndVR ? m_hWndVR : m_hWnd,
 					GetVertexProcessing() | D3DCREATE_FPU_PRESERVE | D3DCREATE_MULTITHREADED | D3DCREATE_ENABLE_PRESENTSTATS, //D3DCREATE_MANAGED
 					&m_d3dpp, nullptr, &m_pD3DDevEx);
 			DLog(L"    => CreateDeviceEx(window) : %s", S_OK == hr ? L"S_OK" : GetWindowsErrorMessage(hr, m_hD3D9));
@@ -685,7 +737,7 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 	if (m_pD3DDevEx) {
 		while (hr == D3DERR_DEVICELOST) {
 			DLog(L"    => D3DERR_DEVICELOST. Trying to Reset.");
-			hr = m_pD3DDevEx->CheckDeviceState(m_hWnd);
+			hr = m_pD3DDevEx->CheckDeviceState(m_hWndVR ? m_hWndVR : m_hWnd);
 		}
 		if (hr == D3DERR_DEVICENOTRESET) {
 			DLog(L"    => D3DERR_DEVICENOTRESET");
@@ -704,6 +756,14 @@ HRESULT CDX9AllocatorPresenter::CreateDevice(CString &_Error)
 		_Error.AppendFormat(L"Error code: 0x%08x\n", hr);
 
 		return hr;
+	}
+
+	if (!bTryToReset) {
+		m_pDXVAHD_VP.Release();
+		m_pDXVAHD_Device.Release();
+
+		m_pDXVA2_VP.Release();
+		m_pDXVA2_VPService.Release();
 	}
 
 	m_MainThreadId = GetCurrentThreadId();
@@ -1574,7 +1634,7 @@ STDMETHODIMP_(bool) CDX9AllocatorPresenter::Paint(bool fAll)
 			bResetDevice = true;
 		}
 
-		if (hr == D3DERR_DEVICELOST && m_pD3DDevEx->CheckDeviceState(m_hWnd) == D3DERR_DEVICENOTRESET) {
+		if (hr == D3DERR_DEVICELOST && m_pD3DDevEx->CheckDeviceState(m_hWndVR ? m_hWndVR : m_hWnd) == D3DERR_DEVICENOTRESET) {
 			DLog(L"CDX9AllocatorPresenter::Paint() : D3DERR_DEVICELOST - need Reset Device");
 			bResetDevice = true;
 		}
@@ -1750,6 +1810,10 @@ STDMETHODIMP_(void) CDX9AllocatorPresenter::SetPosition(RECT w, RECT v)
 	const auto bWindowSizeChanged = m_windowRect.Size() != CRect(w).Size();
 	__super::SetPosition(w, v);
 
+	if (m_hWndVR) {
+		SetWindowPos(m_hWndVR, nullptr, m_windowRect.left, m_windowRect.top, m_windowRect.Width(), m_windowRect.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
+	}
+
 	if (bWindowSizeChanged && !m_bIsFullscreen && m_d3dpp.SwapEffect != D3DSWAPEFFECT_COPY) {
 		m_bResizingDevice = true;
 		AfxGetApp()->m_pMainWnd->PostMessage(WM_RESIZE_DEVICE);
@@ -1909,13 +1973,11 @@ void CDX9AllocatorPresenter::DrawStats()
 				strText += L" FS";
 			}
 
-			/*
 			switch (m_d3dpp.SwapEffect) {
 				case D3DSWAPEFFECT_COPY   : strText += L" Copy";   break;
 				case D3DSWAPEFFECT_FLIP   : strText += L" Flip";   break;
 				case D3DSWAPEFFECT_FLIPEX : strText += L" FlipEx"; break;
 			}
-			*/
 
 			if (rs.bDisableDesktopComposition) {
 				strText += L" DisDC";
