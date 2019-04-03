@@ -286,7 +286,7 @@ void CPPageInternalFiltersListBox::OnRButtonDown(UINT nFlags, CPoint point)
 
 	switch (m_n) {
 	case SOURCE:
-		for (int i = 0; i < std::size(s_source_filters); i++) {
+		for (size_t i = 0; i < std::size(s_source_filters); i++) {
 			if (id == ENABLE_ALL) {
 				SetCheck(i, TRUE);
 			}
@@ -296,7 +296,7 @@ void CPPageInternalFiltersListBox::OnRButtonDown(UINT nFlags, CPoint point)
 		}
 		break;
 	case VIDEO:
-		for (int i = 0; i < std::size(s_video_decoders); i++) {
+		for (size_t i = 0; i < std::size(s_video_decoders); i++) {
 			switch (id) {
 			case ENABLE_ALL:
 				SetCheck(i, TRUE);
@@ -328,7 +328,7 @@ void CPPageInternalFiltersListBox::OnRButtonDown(UINT nFlags, CPoint point)
 		}
 		break;
 	case AUDIO:
-		for (int i = 0; i < std::size(s_audio_decoders); i++) {
+		for (size_t i = 0; i < std::size(s_audio_decoders); i++) {
 			if (id == ENABLE_ALL) {
 				SetCheck(i, TRUE);
 			}
