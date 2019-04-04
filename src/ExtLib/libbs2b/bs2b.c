@@ -99,7 +99,7 @@ static double uint242double( bs2b_uint24_t *in )
 
 static void double2int24( double in, bs2b_int24_t *out )
 {
-	uint32_t i = ( uint32_t )in;
+	uint32_t i = ( uint32_t )( int32_t )in;
 
 	#ifdef WORDS_BIGENDIAN
 	out->octet2 = i & 0xff;
@@ -170,7 +170,7 @@ static void init( t_bs2bdp bs2bdp )
 	x = exp( -2.0 * M_PI * Fc_lo / bs2bdp->srate );
 	bs2bdp->b1_lo = x;
 	bs2bdp->a0_lo = G_lo * ( 1.0 - x );
-	
+
 	x = exp( -2.0 * M_PI * Fc_hi / bs2bdp->srate );
 	bs2bdp->b1_hi = x;
 	bs2bdp->a0_hi = 1.0 - G_hi * ( 1.0 - x );
@@ -288,7 +288,7 @@ int bs2b_get_level_feed( t_bs2bdp bs2bdp )
 int bs2b_get_level_delay( t_bs2bdp bs2bdp )
 {
 	int fcut;
-	
+
 	fcut = bs2bdp->level & 0xffff; /* get cut frequency */
 
 	if( ( fcut > BS2B_MAXFCUT ) || ( fcut < BS2B_MINFCUT ) )
@@ -349,7 +349,7 @@ void bs2b_cross_feed_d( t_bs2bdp bs2bdp, double *sample, int n )
 		while( n-- )
 		{
 			cross_feed_d( bs2bdp, sample );
-			
+
 			/* Clipping of overloaded samples */
 			if( sample[ 0 ] >  1.0 ) sample[ 0 ] =  1.0;
 			if( sample[ 0 ] < -1.0 ) sample[ 0 ] = -1.0;
