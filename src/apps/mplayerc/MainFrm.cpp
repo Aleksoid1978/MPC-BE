@@ -1178,13 +1178,7 @@ LRESULT CMainFrame::OnQueryCancelAutoPlay(WPARAM wParam, LPARAM lParam)
 
 void CMainFrame::ShowTrayIcon(bool fShow)
 {
-	BOOL bWasVisible = ShowWindow(SW_HIDE);
-	NOTIFYICONDATAW tnid;
-
-	ZeroMemory(&tnid, sizeof(NOTIFYICONDATAW));
-	tnid.cbSize = sizeof(NOTIFYICONDATAW);
-	tnid.hWnd = m_hWnd;
-	tnid.uID = IDR_MAINFRAME;
+	NOTIFYICONDATAW tnid = { sizeof(NOTIFYICONDATAW), m_hWnd, IDR_MAINFRAME };
 
 	if (fShow) {
 		if (!m_bTrayIcon) {
@@ -1202,10 +1196,6 @@ void CMainFrame::ShowTrayIcon(bool fShow)
 
 			m_bTrayIcon = false;
 		}
-	}
-
-	if (bWasVisible) {
-		ShowWindow(SW_SHOW);
 	}
 }
 
@@ -2094,7 +2084,7 @@ LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
 	m_wndStatsBar.ScaleFont();
 	m_wndPlaylistBar.ScaleFont();
 	m_wndStatusBar.ScaleFont();
-	
+
 	CMenuEx::ScaleFont();
 	const auto& s = AfxGetAppSettings();
 	if (s.bUseDarkTheme && s.bDarkMenu) {
@@ -2146,7 +2136,7 @@ void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 	__super::OnSysCommand(nID, lParam);
 }
 
-BOOL CMainFrame::OnNcActivate(BOOL bActive) 
+BOOL CMainFrame::OnNcActivate(BOOL bActive)
 {
 	const auto bRet = __super::OnNcActivate(bActive);
 	DrawSmallBorder();
@@ -17330,7 +17320,7 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 	if (s.bUseDarkTheme && s.bDarkMenu) {
 		SetColorMenu();
 	}
-	
+
 	// Re-create Win 7 TaskBar preview button for change button hint
 	CreateThumbnailToolbar();
 
@@ -19617,8 +19607,8 @@ void CMainFrame::SetColorMenu()
 	CMenuEx::SetColorMenu(
 		crBkBar,
 		crBN, crBNL, crBND,
-		crBR, crBRL, crBRD, 
-		crBS, crBSL, crBSD, 
+		crBR, crBRL, crBRD,
+		crBS, crBSL, crBSD,
 		crTN, crTNL, crTG, crTGL);
 
 	if (m_hMainMenuBrush) {
@@ -19648,7 +19638,7 @@ void CMainFrame::SetColorMenu()
 
 void CMainFrame::DrawSmallBorder()
 {
-	// To eliminate small border between menu and client rect  
+	// To eliminate small border between menu and client rect
 	if (AfxGetAppSettings().bUseDarkTheme && AfxGetAppSettings().bDarkMenu && !IsMenuHidden()) {
 		CDC* pDC = GetWindowDC();
 		CRect clientRect;
