@@ -2104,7 +2104,7 @@ bool CPlayerPlaylistBar::SetNext()
 {
 	POSITION pos = curPlayList.GetPos(), org = pos;
 	if (!pos) {
-		return false;
+		org = pos = curPlayList.GetHeadPosition();
 	}
 
 	for (;;) {
@@ -2125,7 +2125,7 @@ bool CPlayerPlaylistBar::SetPrev()
 {
 	POSITION pos = curPlayList.GetPos(), org = pos;
 	if (!pos) {
-		return false;
+		org = pos = curPlayList.GetHeadPosition();
 	}
 
 	for (;;) {
