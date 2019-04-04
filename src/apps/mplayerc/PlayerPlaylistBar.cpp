@@ -2103,6 +2103,10 @@ CString CPlayerPlaylistBar::GetCurFileName()
 bool CPlayerPlaylistBar::SetNext()
 {
 	POSITION pos = curPlayList.GetPos(), org = pos;
+	if (!pos) {
+		return false;
+	}
+
 	for (;;) {
 		const auto& playlist = curPlayList.GetNextWrap(pos);
 		if ((playlist.m_bInvalid || playlist.m_bDirectory) && pos != org) {
@@ -2120,6 +2124,10 @@ bool CPlayerPlaylistBar::SetNext()
 bool CPlayerPlaylistBar::SetPrev()
 {
 	POSITION pos = curPlayList.GetPos(), org = pos;
+	if (!pos) {
+		return false;
+	}
+
 	for (;;) {
 		const auto& playlist = curPlayList.GetPrevWrap(pos);
 		if ((playlist.m_bInvalid || playlist.m_bDirectory) && pos != org) {
