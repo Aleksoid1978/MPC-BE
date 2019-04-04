@@ -317,25 +317,25 @@ private:
 
 	COLORREF m_crBkBar;
 
-	COLORREF m_crBN; 
+	COLORREF m_crBN;
 	COLORREF m_crBNL;
-	COLORREF m_crBND; 
+	COLORREF m_crBND;
 
-	COLORREF m_crBS; 
+	COLORREF m_crBS;
 	COLORREF m_crBSL;
-	COLORREF m_crBSD; 
+	COLORREF m_crBSD;
 
-	COLORREF m_crBH; 
+	COLORREF m_crBH;
 	COLORREF m_crBHL;
 	COLORREF m_crBHD;
 
-	COLORREF m_crBSH; 
-	COLORREF m_crBSHL; 
-	COLORREF m_crBSHD; 
+	COLORREF m_crBSH;
+	COLORREF m_crBSHL;
+	COLORREF m_crBSHD;
 
-	COLORREF m_crTN; 
+	COLORREF m_crTN;
 	COLORREF m_crTH;
-	COLORREF m_crTS;  
+	COLORREF m_crTS;
 	//COLORREF m_crTSL;
 
 public:
@@ -351,7 +351,7 @@ public:
 
 	bool IsHiddenDueToFullscreen() const;
 	void SetHiddenDueToFullscreen(bool bHidenDueToFullscreen);
-	
+
 	std::vector<CPlaylist*> m_pls;
 	size_t m_nCurPlayListIndex = 0;
 	CPlaylist& GetCurPlayList() const {
@@ -411,7 +411,7 @@ public:
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	
+
 	virtual COLORREF ColorThemeRGB(const int iR, const int iG, const int iB) const;
 	virtual int ScaleX(const int x) const;
 	virtual int ScaleY(const int y) const;
