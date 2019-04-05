@@ -108,7 +108,7 @@ AP4_AtomFactory::RemoveTypeHandler(TypeHandler* handler)
 |       AP4_AtomFactory::CreateAtomFromStream
 +---------------------------------------------------------------------*/
 AP4_Result
-AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream, 
+AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
                                       AP4_Atom*&      atom)
 {
     AP4_Size bytes_available = 0;
@@ -123,7 +123,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
 |       AP4_AtomFactory::CreateAtomFromStream
 +---------------------------------------------------------------------*/
 AP4_Result
-AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream, 
+AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
                                       AP4_Size&       bytes_available,
                                       AP4_Atom*&      atom,
                                       AP4_Atom*          parent)
@@ -185,7 +185,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         }
         size = size_high;
     }
-    
+
     // create the atom
     switch (type) {
         case AP4_ATOM_TYPE_MOOV:
@@ -257,7 +257,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
             break;
 
         case AP4_ATOM_TYPE_MP4A:
-            atom = parent && parent->GetType() == AP4_ATOM_TYPE_STSD 
+            atom = parent && parent->GetType() == AP4_ATOM_TYPE_STSD
                 ? (AP4_Atom*)new AP4_Mp4aSampleEntry(size, stream, *this)
                 : (AP4_Atom*)new AP4_UnknownAtom(type, size, false, stream);
             break;
@@ -305,7 +305,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_FTYP:
             atom = new AP4_FtypAtom(size, stream);
             break;
-          
+
         case AP4_ATOM_TYPE_RTP:
             if (m_Context == AP4_ATOM_TYPE_HNTI) {
                 atom = new AP4_RtpAtom(size, stream);
@@ -357,7 +357,7 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_GEN:
         case AP4_ATOM_TYPE_TRKN:
         case AP4_ATOM_TYPE_EDTS:
-        case AP4_ATOM_TYPE_WAVE: 
+        case AP4_ATOM_TYPE_WAVE:
         case AP4_ATOM_TYPE_CMOV:
         case AP4_ATOM_TYPE_COVR: {
             AP4_UI32 context = m_Context;
@@ -558,9 +558,13 @@ AP4_AtomFactory::CreateAtomFromStream(AP4_ByteStream& stream,
         case AP4_ATOM_TYPE_DVPP:
         case AP4_ATOM_TYPE_DV5N:
         case AP4_ATOM_TYPE_DV5P:
-        case AP4_ATOM_TYPE_DVHQ:
+		case AP4_ATOM_TYPE_DVH2:
+		case AP4_ATOM_TYPE_DVH3:
+		case AP4_ATOM_TYPE_DVH4:
         case AP4_ATOM_TYPE_DVH5:
         case AP4_ATOM_TYPE_DVH6:
+		case AP4_ATOM_TYPE_DVHP:
+		case AP4_ATOM_TYPE_DVHQ:
         // MagicYUV
         case AP4_ATOM_TYPE_M8RG:
         case AP4_ATOM_TYPE_M8RA:

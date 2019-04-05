@@ -263,9 +263,13 @@ static const DWORD GetFourcc(AP4_VisualSampleEntry* vse)
 	case AP4_ATOM_TYPE_DV5P:
 		fourcc = FCC('dv50'); // MEDIASUBTYPE_dv50 (ffdshow, LAV)
 		break;
-	case AP4_ATOM_TYPE_DVHQ:
+	case AP4_ATOM_TYPE_DVH2:
+	case AP4_ATOM_TYPE_DVH3:
+	case AP4_ATOM_TYPE_DVH4:
 	case AP4_ATOM_TYPE_DVH5:
 	case AP4_ATOM_TYPE_DVH6:
+	case AP4_ATOM_TYPE_DVHQ:
+	case AP4_ATOM_TYPE_DVHP:
 		fourcc = FCC('CDVH'); // MEDIASUBTYPE_CDVH (LAV)
 		break;
 	// MagicYUV
