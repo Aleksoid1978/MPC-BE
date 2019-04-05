@@ -1,6 +1,6 @@
 /*****************************************************************
 |
-|    AP4 - Atoms 
+|    AP4 - Atoms
 |
 |    Copyright 2002 Gilles Boccon-Gibod
 |
@@ -96,13 +96,13 @@ class AP4_Atom {
     typedef AP4_UI32 Type;
 
     // methods
-                       AP4_Atom(Type type, 
+                       AP4_Atom(Type type,
                                 bool is_full = false);
-                       AP4_Atom(Type     type, 
-                                AP4_Size size, 
+                       AP4_Atom(Type     type,
+                                AP4_Size size,
                                 bool     is_full = false);
-                       AP4_Atom(Type            type, 
-                                AP4_Size        size, 
+                       AP4_Atom(Type            type,
+                                AP4_Size        size,
                                 bool            is_full,
                                 AP4_ByteStream& stream);
     virtual           ~AP4_Atom() {}
@@ -151,7 +151,7 @@ public:
     virtual AP4_Result  RemoveChild(AP4_Atom* child);
     virtual AP4_Result  DeleteChild(AP4_Atom::Type type);
     virtual AP4_Atom*   GetChild(AP4_Atom::Type type, AP4_Ordinal index = 0);
-    virtual AP4_Atom*   FindChild(const char* path, 
+    virtual AP4_Atom*   FindChild(const char* path,
                                   bool        auto_create = false);
 
     // methods designed to be overridden
@@ -170,8 +170,8 @@ protected:
 class AP4_UnknownAtom : public AP4_Atom {
 public:
     // constructor and destructor
-    AP4_UnknownAtom(AP4_Atom::Type   type, 
-                    AP4_Size         size, 
+    AP4_UnknownAtom(AP4_Atom::Type   type,
+                    AP4_Size         size,
                     bool             is_full,
                     AP4_ByteStream&  stream);
     ~AP4_UnknownAtom();
@@ -421,9 +421,13 @@ const AP4_Atom::Type AP4_ATOM_TYPE_DVPP = AP4_ATOM_TYPE('d','v','p','p'); // DVC
 const AP4_Atom::Type AP4_ATOM_TYPE_DV5N = AP4_ATOM_TYPE('d','v','5','n'); // DVCPRO50 NTSC
 const AP4_Atom::Type AP4_ATOM_TYPE_DV5P = AP4_ATOM_TYPE('d','v','5','p'); // DVCPRO50 PAL
 // DVCPRO HD
-const AP4_Atom::Type AP4_ATOM_TYPE_DVHQ = AP4_ATOM_TYPE('d','v','h','q');
+const AP4_Atom::Type AP4_ATOM_TYPE_DVH2 = AP4_ATOM_TYPE('d','v','h','2');
+const AP4_Atom::Type AP4_ATOM_TYPE_DVH3 = AP4_ATOM_TYPE('d','v','h','3');
+const AP4_Atom::Type AP4_ATOM_TYPE_DVH4 = AP4_ATOM_TYPE('d','v','h','4');
 const AP4_Atom::Type AP4_ATOM_TYPE_DVH5 = AP4_ATOM_TYPE('d','v','h','5');
 const AP4_Atom::Type AP4_ATOM_TYPE_DVH6 = AP4_ATOM_TYPE('d','v','h','6');
+const AP4_Atom::Type AP4_ATOM_TYPE_DVHQ = AP4_ATOM_TYPE('d','v','h','q');
+const AP4_Atom::Type AP4_ATOM_TYPE_DVHP = AP4_ATOM_TYPE('d','v','h','p');
 // Apple HDV
 const AP4_Atom::Type AP4_ATOM_TYPE_HDV1 = AP4_ATOM_TYPE('h','d','v','1');
 const AP4_Atom::Type AP4_ATOM_TYPE_HDV2 = AP4_ATOM_TYPE('h','d','v','2');
@@ -569,7 +573,7 @@ class AP4_AtomListWriter : public AP4_List<AP4_Atom>::Item::Operator
 class AP4_AtomFinder : public AP4_List<AP4_Atom>::Item::Finder
 {
  public:
-    AP4_AtomFinder(AP4_Atom::Type type, AP4_Ordinal index = 0) : 
+    AP4_AtomFinder(AP4_Atom::Type type, AP4_Ordinal index = 0) :
        m_Type(type), m_Index(index) {}
     AP4_Result Test(AP4_Atom* atom) const {
         if (atom->GetType() == m_Type) {
