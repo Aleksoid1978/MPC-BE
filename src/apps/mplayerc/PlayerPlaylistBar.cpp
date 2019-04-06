@@ -2042,8 +2042,21 @@ POSITION CPlayerPlaylistBar::FindPos(int i)
 	return (i < 0 || i >= m_list.GetItemCount()) ? nullptr : (POSITION)m_list.GetItemData(i);
 }
 
-int CPlayerPlaylistBar::GetCount()
+int CPlayerPlaylistBar::GetCount(const bool bOnlyFiles/* = false*/)
 {
+	if (bOnlyFiles && curTab.type == EXPLORER) {
+		int count = 0;
+		POSITION pos = curPlayList.GetHeadPosition();
+		while (pos) {
+			const auto& playlist = curPlayList.GetNext(pos);
+			if (!playlist.m_bDirectory) {
+				count++;
+			}
+		}
+
+		return count;
+	}
+
 	return curPlayList.GetCount();
 }
 

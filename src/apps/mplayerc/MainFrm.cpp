@@ -2905,7 +2905,7 @@ bool CMainFrame::GraphEventComplete()
 		}
 	}
 
-	if (m_wndPlaylistBar.GetCount() <= 1) {
+	if (m_wndPlaylistBar.GetCount(true) <= 1) {
 		m_nLoops++;
 
 		if (DoAfterPlaybackEvent()) {
@@ -2945,7 +2945,7 @@ bool CMainFrame::GraphEventComplete()
 				// Don't move it. Else OSD message "Pause" will rewrite this message.
 			}
 		}
-	} else if (m_wndPlaylistBar.GetCount() > 1) {
+	} else {
 		if (m_wndPlaylistBar.IsAtEnd()) {
 			if (DoAfterPlaybackEvent()) {
 				return false;

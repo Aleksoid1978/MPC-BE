@@ -363,7 +363,7 @@ public:
 	void TDeleteAllPlaylists();
 	void TSaveAllPlaylists();
 
-	int GetCount();
+	int GetCount(const bool bOnlyFiles = false);
 	int GetSelIdx();
 	void SetSelIdx(int i, bool bUpdatePos = false);
 	bool IsAtEnd();
