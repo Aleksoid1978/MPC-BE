@@ -806,6 +806,9 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 	if (AfxGetAppSettings().bUseDarkTheme) {
 		m_REdit.SetBkColor(m_crBND);
 		m_REdit.SetTextColor(m_crTH);
+	} else {
+		m_REdit.SetBkColor(::GetSysColor(COLOR_WINDOW));
+		m_REdit.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
 	}
 	m_REdit.SetSel(0, 0);
 
@@ -4505,8 +4508,8 @@ void CPlayerPlaylistBar::TSetColor()
 			m_REdit.SetBkColor(m_crBND);
 			m_REdit.SetTextColor(m_crTH);
 		} else {
-			m_REdit.SetBkColor(::GetSysColor(COLOR_3DFACE));
-			m_REdit.SetTextColor(RGB(0, 0, 0));
+			m_REdit.SetBkColor(::GetSysColor(COLOR_WINDOW));
+			m_REdit.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
 		}
 	}
 }
