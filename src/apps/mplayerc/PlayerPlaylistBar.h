@@ -23,6 +23,7 @@
 
 #include "PlayerBar.h"
 #include "PlayerListCtrl.h"
+#include "controls/ColorEdit.h"
 #include "../../DSUtil/CUE.h"
 #include <vector>
 
@@ -302,7 +303,7 @@ private:
 	size_t m_cntOffset;
 
 	int m_nSearchBarHeight;
-	CRichEditCtrl m_REdit;
+	CColorEdit m_REdit;
 
 	int TGetFirstVisible();
 	int TGetOffset();
@@ -443,4 +444,3 @@ public:
 
 	virtual void Invalidate() { m_list.Invalidate(); }
 };
-

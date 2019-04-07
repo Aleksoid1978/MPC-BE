@@ -803,16 +803,11 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 	m_list.InsertColumn(COL_TIME, L"Time", LVCFMT_RIGHT);
 
 	m_REdit.Create(WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_TABSTOP, CRect(10, 10, 100, 10), this, -1);
-	m_REdit.SetBackgroundColor(!AfxGetAppSettings().bUseDarkTheme, m_crBND);
-	m_REdit.SetTextMode(TM_PLAINTEXT);
+	if (AfxGetAppSettings().bUseDarkTheme) {
+		m_REdit.SetBkColor(m_crBND);
+		m_REdit.SetTextColor(m_crTH);
+	}
 	m_REdit.SetSel(0, 0);
-
-	CHARFORMATW cf = { 0 };
-	cf.cbSize = sizeof(cf);
-	cf.dwMask = CFM_COLOR;
-	cf.dwEffects &= ~CFE_AUTOCOLOR;
-	cf.crTextColor = m_crTN;
-	m_REdit.SetDefaultCharFormat(cf);
 
 	ScaleFontInternal();
 
@@ -853,6 +848,7 @@ void CPlayerPlaylistBar::ScaleFontInternal()
 	m_font.DeleteObject();
 	if (m_font.CreateFontIndirectW(&lf)) {
 		m_list.SetFont(&m_font);
+		m_REdit.SetFont(&m_font);
 	}
 
 	CDC* pDC = m_list.GetDC();
@@ -4506,7 +4502,13 @@ void CPlayerPlaylistBar::TSetColor()
 	}
 
 	if (IsWindow(m_REdit.GetSafeHwnd())) {
-		m_REdit.SetBackgroundColor(!AfxGetAppSettings().bUseDarkTheme, m_crBND);
+		if (AfxGetAppSettings().bUseDarkTheme) {
+			m_REdit.SetBkColor(m_crBND);
+			m_REdit.SetTextColor(m_crTH);
+		} else {
+			m_REdit.SetBkColor(::GetSysColor(COLOR_3DFACE));
+			m_REdit.SetTextColor(RGB(0, 0, 0));
+		}
 	}
 }
 
