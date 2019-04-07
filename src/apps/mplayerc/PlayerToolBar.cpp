@@ -987,6 +987,8 @@ BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 
 	} else if (pNMHDR->idFrom == ID_NAVIGATE_AUDIO) {
 		m_strTipText = ResStr(IDS_AG_AUDIOLANG) + L" | " + ResStr(IDS_AG_OPTIONS);
+	} else {
+		return FALSE;
 	}
 
 	pTTT->lpszText = m_strTipText.GetBuffer();
