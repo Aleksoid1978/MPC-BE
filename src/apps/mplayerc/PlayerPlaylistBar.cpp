@@ -802,7 +802,7 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 	m_list.InsertColumn(COL_NAME, L"Name", LVCFMT_LEFT);
 	m_list.InsertColumn(COL_TIME, L"Time", LVCFMT_RIGHT);
 
-	m_REdit.Create(WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_TABSTOP, CRect(10, 10, 100, 10), this, -1);
+	m_REdit.Create(WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_TABSTOP, CRect(10, 10, 100, 10), this, IDC_FINDINPLAYLIST);
 	if (AfxGetAppSettings().bUseDarkTheme) {
 		m_REdit.SetBkColor(m_crBND);
 		m_REdit.SetTextColor(m_crTH);

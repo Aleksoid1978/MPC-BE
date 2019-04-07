@@ -772,7 +772,7 @@
 #define IDC_OK2                         10625
 #define IDC_PLAYERSTATUS                10626
 #define IDC_PLAYERTIME                  10627
-#define IDC_EDITLIST                    10628
+#define IDC_FINDINPLAYLIST              10628
 #define IDC_CHECK_SUBRESYNC             10629
 #define IDC_BASSREDIRECT_CHECK          10630
 #define IDC_DSSYSDEF                    10700
