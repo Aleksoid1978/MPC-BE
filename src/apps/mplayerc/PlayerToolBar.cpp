@@ -935,62 +935,63 @@ int CPlayerToolBar::getHitButtonIdx(CPoint point)
 
 BOOL CPlayerToolBar::OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult)
 {
-	TOOLTIPTEXT* pTTT	= (TOOLTIPTEXT*)pNMHDR;
+	TOOLTIPTEXT* pTTT = (TOOLTIPTEXT*)pNMHDR;
 	static CString m_strTipText;
 
-	OAFilterState fs = m_pMainFrame->GetMediaState();
-
-	::SendMessageW(pNMHDR->hwndFrom, TTM_SETMAXTIPWIDTH, 0, (LPARAM)(INT)1000);
-
-	if (pNMHDR->idFrom == ID_PLAY_PLAY) {
-		(fs == State_Running) ? m_strTipText = ResStr(IDS_AG_PAUSE) : m_strTipText = ResStr(IDS_AG_PLAY);
-
-	} else if (pNMHDR->idFrom == ID_PLAY_STOP) {
+	switch (pNMHDR->idFrom) {
+	case ID_PLAY_PLAY:
+		m_strTipText = (m_pMainFrame->GetMediaState() == State_Running) ? ResStr(IDS_AG_PAUSE) : ResStr(IDS_AG_PLAY);
+		break;
+	case ID_PLAY_STOP:
 		m_strTipText = ResStr(IDS_AG_STOP) + L" | " + ResStr(IDS_AG_CLOSE);
-
-	} else if (pNMHDR->idFrom == ID_PLAY_FRAMESTEP) {
+		break;
+	case ID_PLAY_FRAMESTEP:
 		m_strTipText = ResStr(IDS_AG_STEP) + L" | " + ResStr(IDS_AG_JUMP_TO);
+		break;
+	case ID_VOLUME_MUTE:
+		{
+			TBBUTTONINFO bi;
+			bi.cbSize = sizeof(bi);
+			bi.dwMask = TBIF_IMAGE;
 
-	} else if (pNMHDR->idFrom == ID_VOLUME_MUTE) {
+			GetToolBarCtrl().GetButtonInfo(ID_VOLUME_MUTE, &bi);
 
-		TBBUTTONINFO bi;
-		bi.cbSize = sizeof(bi);
-		bi.dwMask = TBIF_IMAGE;
+			if (bi.iImage == 12) {
+				m_strTipText = ResStr(ID_VOLUME_MUTE);
+			}
+			else if (bi.iImage == 13) {
+				m_strTipText = ResStr(ID_VOLUME_MUTE_OFF);
+			}
+			else if (bi.iImage == 14) {
+				m_strTipText = ResStr(ID_VOLUME_MUTE_DISABLED);
+			}
 
-		GetToolBarCtrl().GetButtonInfo(ID_VOLUME_MUTE, &bi);
-
-		if (bi.iImage == 12) {
-			m_strTipText = ResStr(ID_VOLUME_MUTE);
-		} else if (bi.iImage == 13) {
-			m_strTipText = ResStr(ID_VOLUME_MUTE_OFF);
-		} else if (bi.iImage == 14) {
-			m_strTipText = ResStr(ID_VOLUME_MUTE_DISABLED);
+			int i = m_strTipText.Find('\n'); // TODO: remove it
+			if (i > 0) {
+				m_strTipText = m_strTipText.Left(i);
+			}
 		}
-
-		int i = m_strTipText.Find('\n'); // TODO: remove it
-
-		if (i > 0) {
-			m_strTipText = m_strTipText.Left(i);
-		}
-
-	} else if (pNMHDR->idFrom == ID_FILE_OPENQUICK) {
+		break;
+	case ID_FILE_OPENQUICK:
 		m_strTipText = ResStr(IDS_MPLAYERC_0) + L" | " + ResStr(IDS_RECENT_FILES);
-
-	} else if (pNMHDR->idFrom == ID_NAVIGATE_SKIPFORWARD) {
+		break;
+	case ID_NAVIGATE_SKIPFORWARD:
 		m_strTipText = ResStr(IDS_AG_NEXT);
-
-	} else if (pNMHDR->idFrom == ID_NAVIGATE_SKIPBACK) {
+		break;
+	case ID_NAVIGATE_SKIPBACK:
 		m_strTipText = ResStr(IDS_AG_PREVIOUS);
-
-	} else if (pNMHDR->idFrom == ID_NAVIGATE_SUBTITLES) {
+		break;
+	case ID_NAVIGATE_SUBTITLES:
 		m_strTipText = ResStr(IDS_AG_SUBTITLELANG) + L" | " + ResStr(IDS_AG_OPTIONS);
-
-	} else if (pNMHDR->idFrom == ID_NAVIGATE_AUDIO) {
+		break;
+	case ID_NAVIGATE_AUDIO:
 		m_strTipText = ResStr(IDS_AG_AUDIOLANG) + L" | " + ResStr(IDS_AG_OPTIONS);
-	} else {
+		break;
+	default:
 		return FALSE;
 	}
 
+	::SendMessageW(pNMHDR->hwndFrom, TTM_SETMAXTIPWIDTH, 0, (LPARAM)(INT)1000);
 	pTTT->lpszText = m_strTipText.GetBuffer();
 	*pResult = 0;
 
