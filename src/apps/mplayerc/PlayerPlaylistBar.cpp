@@ -979,7 +979,6 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 					m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
 					return TRUE;
 				}
-			case VK_SPACE:
 				if (m_list.GetSelectedCount() == 1) {
 					if (TNavigate()) {
 						break;// return FALSE;
@@ -3143,7 +3142,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 	CAppSettings& s = AfxGetAppSettings();
 
 	const bool bExplorer = curTab.type == EXPLORER;
-	m.AppendMenu(MF_STRING | (bOnItem ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_OPEN, ResStr(IDS_PLAYLIST_OPEN) + L"\tSpace");
+	m.AppendMenu(MF_STRING | (bOnItem ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_OPEN, ResStr(IDS_PLAYLIST_OPEN) + L"\tEnter");
 	if (!bExplorer) {
 		m.AppendMenu(MF_STRING | MF_ENABLED, M_ADD, ResStr(IDS_PLAYLIST_ADD));
 		m.AppendMenu(MF_STRING | (bOnItem ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), M_REMOVE, ResStr(IDS_PLAYLIST_REMOVE) + L"\tDelete");
