@@ -1900,8 +1900,9 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 
 	if (src[SRC_FLV] || IsPreview) {
 		pFGF = DNew CFGFilterInternal<CFLVSourceFilter>(FlvSourceName);
-		pFGF->m_chkbytes.emplace_back(L"0,4,,464C5601"); // FLV (v1)
-		pFGF->m_chkbytes.emplace_back(L"0,4,,584C5646"); // XLVF
+		pFGF->m_chkbytes.emplace_back(L"0,4,,464C5601");   // FLV\01
+		pFGF->m_chkbytes.emplace_back(L"0,4,,584C5646");   // XLVF
+		pFGF->m_chkbytes.emplace_back(L"0,5,,4B444B0000"); // KDK\00\00
 		m_source.push_back(pFGF);
 	}
 
