@@ -29,10 +29,11 @@
 class __declspec(uuid("47E792CF-0BBE-4F7A-859C-194B0768650A"))
 	CFLVSplitterFilter : public CBaseSplitterFilter
 {
-	UINT32	m_DataOffset;
+	UINT32 m_DataOffset;
+	UINT32 m_SyncOffset;
 
-	UINT32	m_TimeStampOffset;
-	bool	m_DetectWrongTimeStamp;
+	UINT32 m_TimeStampOffset;
+	bool   m_DetectWrongTimeStamp;
 
 	bool Sync(__int64& pos);
 

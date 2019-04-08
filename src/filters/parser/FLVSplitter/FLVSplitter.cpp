@@ -103,8 +103,9 @@ STDAPI DllRegisterServer()
 	DeleteRegKey(L"Media Type\\Extensions\\", L".flv");
 
 	const std::list<CString> chkbytes = {
-		L"0,4,,464C5601", // 'FLV\01'
-		L"0,4,,584C5646", // 'XLVF'
+		L"0,4,,464C5601",   // 'FLV\01'
+		L"0,4,,584C5646",   // 'XLVF'
+		L"0,5,,4B444B0000", // 'KDK\00\00'
 	};
 	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_FLV, chkbytes, nullptr);
 
@@ -131,6 +132,7 @@ CFilterApp theApp;
 CFLVSplitterFilter::CFLVSplitterFilter(LPUNKNOWN pUnk, HRESULT* phr)
 	: CBaseSplitterFilter(L"CFLVSplitterFilter", pUnk, phr, __uuidof(this))
 	, m_DataOffset(0)
+	, m_SyncOffset(0)
 	, m_TimeStampOffset(0)
 	, m_DetectWrongTimeStamp(true)
 {
@@ -264,7 +266,7 @@ bool CFLVSplitterFilter::ParseAMF0(UINT64 end, const CString key, std::vector<AM
 
 					if (times.size() == filepositions.size()) {
 						for (size_t i = 0; i < times.size(); i++) {
-							SyncPoint sp = {REFERENCE_TIME(times[i] * UNITS), __int64(filepositions[i])};
+							SyncPoint sp = {REFERENCE_TIME(times[i] * UNITS), __int64(filepositions[i] + m_SyncOffset)};
 							m_sps.push_back(sp);
 						}
 					}
@@ -489,27 +491,35 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_rtNewStart = m_rtCurrent = 0;
 	m_rtNewStop = m_rtStop = m_rtDuration = 0;
 
-	const UINT32 sync = m_pFile->BitRead(32);
-	if (sync != 'FLV\01' && sync != 'XLVF') {
+	UINT32 sync = m_pFile->BitRead(32);
+	if (sync != 'FLV\01' && sync != 'XLVF' && sync != 'KDK\00') {
 		return E_FAIL;
 	}
 
 	bool fTypeFlagsAudio = true;
 	bool fTypeFlagsVideo = true;
 
+	if (sync == 'KDK\00' && m_pFile->BitRead(8) == 0x00) {
+		m_SyncOffset = 0xE40000;
+		m_pFile->Seek(m_SyncOffset);
+		sync = m_pFile->BitRead(32);
+	}
+
 	if (sync == 'FLV\01') {
 		EXECUTE_ASSERT(m_pFile->BitRead(5) == 0); // TypeFlagsReserved
 		m_pFile->BitRead(1);
 		EXECUTE_ASSERT(m_pFile->BitRead(1) == 0); // TypeFlagsReserved
 		m_pFile->BitRead(1);
-		m_DataOffset = (UINT32)m_pFile->BitRead(32);
-	} else {
+		m_DataOffset = (UINT32)m_pFile->BitRead(32) + m_SyncOffset;
+	} else if (sync == 'XLVF') {
 		__int64 sync_pos = 0x200000;
 		if (Sync(sync_pos)) {
 			m_DataOffset = sync_pos;
 		} else {
 			return E_FAIL;
 		}
+	} else {
+		return E_FAIL;
 	}
 
 	Tag t;
