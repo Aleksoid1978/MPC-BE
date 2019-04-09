@@ -1766,7 +1766,9 @@ void CDX9RenderingEngine::UpdateFinalPassStr()
 
 void CDX9RenderingEngine::CleanupFinalPass()
 {
+	m_bDither = false;
 	m_bFinalPass = false;
+	m_bColorManagement = false;
 	m_pDitherTexture = nullptr;
 	m_pLut3DTexture = nullptr;
 	m_pFinalPixelShader = nullptr;
