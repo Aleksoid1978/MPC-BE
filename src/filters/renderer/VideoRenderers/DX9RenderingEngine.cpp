@@ -1562,6 +1562,8 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 	}
 
 	if (!bInitRequired) {
+		UpdateFinalPassStr();
+
 		return S_OK;
 	}
 
@@ -1729,30 +1731,37 @@ HRESULT CDX9RenderingEngine::InitFinalPass()
 		return hr;
 	}
 
-	if (bColorManagement) {
-		m_strFinalPass = L" ColorManagement(";
-		switch (ambientLight) {
-		case AMBIENT_LIGHT_BRIGHT: m_strFinalPass.Append(L"Bright"); break;
-		case AMBIENT_LIGHT_DIM:    m_strFinalPass.Append(L"Dim");    break;
-		case AMBIENT_LIGHT_DARK:   m_strFinalPass.Append(L"Dark");   break;
-		}
-		switch (renderingIntent) {
-		case COLOR_RENDERING_INTENT_PERCEPTUAL:            m_strFinalPass.Append(L",Perceptual");           break;
-		case COLOR_RENDERING_INTENT_RELATIVE_COLORIMETRIC: m_strFinalPass.Append(L",Relative—olorimetric"); break;
-		case COLOR_RENDERING_INTENT_SATURATION:            m_strFinalPass.Append(L",Saturation");           break;
-		case COLOR_RENDERING_INTENT_ABSOLUTE_COLORIMETRIC: m_strFinalPass.Append(L",Absolute—olorimetric"); break;
-		}
-		m_strFinalPass.Append(L")");
-	}
-
-	if (bDither) {
-		if (bColorManagement) {
-			m_strFinalPass.Append(L", ");
-		}
-		m_strFinalPass.Append(L"Dither");
-	}
+	UpdateFinalPassStr();
 
 	return S_OK;
+}
+
+void CDX9RenderingEngine::UpdateFinalPassStr()
+{
+	if (m_strFinalPass.IsEmpty()) {
+		if (m_bColorManagement) {
+			m_strFinalPass = L" ColorManagement(";
+			switch (m_AmbientLight) {
+			case AMBIENT_LIGHT_BRIGHT: m_strFinalPass.Append(L"Bright"); break;
+			case AMBIENT_LIGHT_DIM:    m_strFinalPass.Append(L"Dim");    break;
+			case AMBIENT_LIGHT_DARK:   m_strFinalPass.Append(L"Dark");   break;
+			}
+			switch (m_RenderingIntent) {
+			case COLOR_RENDERING_INTENT_PERCEPTUAL:            m_strFinalPass.Append(L",Perceptual");           break;
+			case COLOR_RENDERING_INTENT_RELATIVE_COLORIMETRIC: m_strFinalPass.Append(L",Relative—olorimetric"); break;
+			case COLOR_RENDERING_INTENT_SATURATION:            m_strFinalPass.Append(L",Saturation");           break;
+			case COLOR_RENDERING_INTENT_ABSOLUTE_COLORIMETRIC: m_strFinalPass.Append(L",Absolute—olorimetric"); break;
+			}
+			m_strFinalPass.Append(L")");
+		}
+
+		if (m_bDither) {
+			if (m_bColorManagement) {
+				m_strFinalPass.Append(L", ");
+			}
+			m_strFinalPass.Append(L"Dither");
+		}
+	}
 }
 
 void CDX9RenderingEngine::CleanupFinalPass()
