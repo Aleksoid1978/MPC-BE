@@ -29,7 +29,7 @@ IF NOT EXIST "%~dp0signinfo.txt" (
 )
 
 IF NOT DEFINED VCVARS (
-  FOR /f "delims=" %%A IN ('"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -prerelease -property installationPath -requires Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.ATLMFC Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -latest') DO SET "VCVARS=%%A\Common7\Tools\vsdevcmd.bat"
+  FOR /f "delims=" %%A IN ('"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -property installationPath -requires Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.ATLMFC Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -latest') DO SET "VCVARS=%%A\Common7\Tools\vsdevcmd.bat"
 )
 
 IF NOT EXIST "%VCVARS%" (
