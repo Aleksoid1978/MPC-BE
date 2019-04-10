@@ -74,11 +74,11 @@ void CPlayerBar::LoadState(CFrameWnd *pParent)
 		}
 
 		if (p.x >= rDesktop.right) {
-			p.x = rDesktop.right-1;
+			p.x = rDesktop.left;
 		}
 
 		if (p.y >= rDesktop.bottom) {
-			p.y = rDesktop.bottom-1;
+			p.y = rDesktop.top;
 		}
 
 		pParent->FloatControlBar(this, p);
