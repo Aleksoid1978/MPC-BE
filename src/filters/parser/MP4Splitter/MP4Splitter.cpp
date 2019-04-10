@@ -204,8 +204,8 @@ static const DWORD GetFourcc(AP4_VisualSampleEntry* vse)
 {
 	DWORD fourcc = -1;
 
-	AP4_Atom::Type type = vse->GetType();
-	CString tname = UTF8ToWStr(vse->GetCompressorName());
+	const AP4_Atom::Type type = vse->GetType();
+	const CString tname = UTF8ToWStr(vse->GetCompressorName());
 
 	switch (type) {
 	// RAW video
@@ -870,6 +870,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 							if (AP4_Dvc1Atom* Dvc1 = dynamic_cast<AP4_Dvc1Atom*>(vse->GetChild(AP4_ATOM_TYPE_DVC1))) {
 								pData = (AP4_DataBuffer*)Dvc1->GetDecoderInfo();
 							}
+						} else if (!tname.IsEmpty()){
+							SetTrackName(&TrackName, tname);
 						}
 
 						AP4_Size ExtraSize = pData->GetDataSize();
@@ -1479,6 +1481,8 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								m_HDRContentLightLevel->MaxFALL = AV_RB16(data + 2);
 							}
 						}
+
+						break;
 					} else if (AP4_AudioSampleEntry* ase = dynamic_cast<AP4_AudioSampleEntry*>(atom)) {
 						DWORD fourcc        = _byteswap_ulong(ase->GetType());
 						DWORD samplerate    = ase->GetSampleRate();
