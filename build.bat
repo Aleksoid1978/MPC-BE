@@ -96,7 +96,7 @@ IF /I "%PACKAGES%" == "True" SET "INSTALLER=True" & SET "ZIP=True"
 
 IF NOT EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" GOTO MissingVar
 
-SET "PARAMS=-prerelease -property installationPath -requires Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.ATLMFC Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
+SET "PARAMS=-property installationPath -requires Microsoft.Component.MSBuild Microsoft.VisualStudio.Component.VC.ATLMFC Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
 
 IF /I "%COMPILER%" == "VS2017" (
   SET "PARAMS=%PARAMS% -version [15.0,16.0^)"
