@@ -1067,6 +1067,12 @@ static INLINE OPJ_BOOL opj_tcd_init_tile(opj_tcd_t *p_tcd, OPJ_UINT32 p_tile_no,
 
                     l_nb_code_blocks = l_current_precinct->cw * l_current_precinct->ch;
                     /*fprintf(stderr, "\t\t\t\t precinct_cw = %d x recinct_ch = %d\n",l_current_precinct->cw, l_current_precinct->ch);      */
+                    if ((((OPJ_UINT32) - 1) / (OPJ_UINT32)sizeof_block) <
+                            l_nb_code_blocks) {
+                        opj_event_msg(manager, EVT_ERROR,
+                                      "Size of code block data exceeds system limits\n");
+                        return OPJ_FALSE;
+                    }
                     l_nb_code_blocks_size = l_nb_code_blocks * (OPJ_UINT32)sizeof_block;
 
                     if (!l_current_precinct->cblks.blocks && (l_nb_code_blocks > 0U)) {
