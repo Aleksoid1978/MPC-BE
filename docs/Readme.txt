@@ -42,7 +42,7 @@ coolsb              -                          http://www.codeproject.com/KB/dia
 CSizingControlBar   GPLv2                      http://datamekanix.com/sizecbar/
 Detours             MSR-SSLA                   http://research.microsoft.com/en-us/projects/detours/
 FFmpeg              GPLv3                      http://ffmpeg.org/
-libaom              -                          https://aomedia.googlesource.com/aom/
+dav1d               BSD License                https://code.videolan.org/videolan/dav1d/
 libflac             GPLv2 / BSD License        https://github.com/xiph/flac/
 libpng              zlib / libpng License      https://github.com/glennrp/libpng/
 libopenjpeg         BSD License                https://github.com/uclouvain/openjpeg/
