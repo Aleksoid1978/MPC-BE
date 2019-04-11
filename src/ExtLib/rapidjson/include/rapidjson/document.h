@@ -66,6 +66,12 @@ template <typename Encoding, typename Allocator>
 struct GenericMember { 
     GenericValue<Encoding, Allocator> name;     //!< name of member (must be a string)
     GenericValue<Encoding, Allocator> value;    //!< value of member.
+
+    // swap() for std::sort() and other potential use in STL.
+    friend inline void swap(GenericMember& a, GenericMember& b) RAPIDJSON_NOEXCEPT {
+        a.name.Swap(b.name);
+        a.value.Swap(b.value);
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -923,7 +929,7 @@ public:
     //! Equal-to operator
     /*!
         \note If an object contains duplicated named member, comparing equality with any object is always \c false.
-        \note Linear time complexity (number of all values in the subtree and total lengths of all strings).
+        \note Complexity is quadratic in Object's member number and linear for the rest (number of all values in the subtree and total lengths of all strings).
     */
     template <typename SourceAllocator>
     bool operator==(const GenericValue<Encoding, SourceAllocator>& rhs) const {
