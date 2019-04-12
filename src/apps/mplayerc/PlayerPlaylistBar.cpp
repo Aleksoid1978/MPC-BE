@@ -4358,21 +4358,18 @@ void CPlayerPlaylistBar::TGetSettings()
 		m_pls.push_back(pl);
 	}
 
-	// if we have no tabs settings, create 2 tabs (default and explorer)
+	// if we have no tabs settings, create "Main"
 	if (m_tabs.size() == 0) {
-		for (int i = 0; i < 2; i++) {
-			// add tab
-			tab_t tab;
-			tab.type = i == 0 ? PLAYLIST : EXPLORER;
-			tab.name = i == 0 ? ResStr(IDS_PLAYLIST_MAIN_NAME) : ResStr(IDS_PLAYLIST_EXPLORER_NAME);
-			tab.fn   = i == 0 ? L"Default.mpcpl" : L"Explorer.mpcpl";
-			tab.id = GetNextId();
-			m_tabs.push_back(tab);
+		tab_t tab;
+		tab.type = PLAYLIST;
+		tab.name = ResStr(IDS_PLAYLIST_MAIN_NAME);
+		tab.fn = L"Default.mpcpl";
+		tab.id = GetNextId();
+		m_tabs.push_back(tab);
 
-			// add playlist
-			CPlaylist* pl = DNew CPlaylist;
-			m_pls.push_back(pl);
-		}
+		// add playlist
+		CPlaylist* pl = DNew CPlaylist;
+		m_pls.push_back(pl);
 	}
 
 	if (m_cntOffset >= m_tabs.size()) {
