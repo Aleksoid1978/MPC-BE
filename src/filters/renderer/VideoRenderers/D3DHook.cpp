@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2018 see Authors.txt
+ * (C) 2017-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,7 +30,7 @@
 
 namespace D3DHook {
 	UINT m_refreshRate = 0;
-	CString m_DeviceName;
+	CString m_Device;
 
 	static bool HookFunc(PVOID& origFuncPtr, PVOID newFuncPtr)
 	{
@@ -134,74 +134,68 @@ namespace D3DHook {
 		return hr;
 	}
 
-	const bool Hook(const HMONITOR hMonitor, const UINT refreshRate)
+	const bool Hook(const CString& device, const UINT refreshRate)
 	{
 		DLog(L"D3DHook::Hook() : refreshRate : %u", refreshRate);
 
-		MONITORINFOEX mi = {};
-		mi.cbSize = sizeof(mi);
-		GetMonitorInfoW(hMonitor, &mi);
-
-		if (m_DeviceName == mi.szDevice) {
-			DLog(L"D3DHook::Hook() : already installed a hook for a device '%s'", m_DeviceName);
+		if (m_Device == device) {
+			DLog(L"D3DHook::Hook() : hook already installed for the device '%s'", m_Device.GetString());
 			m_refreshRate = refreshRate;
 			return true;
 		}
 
 		UnHook();
 
-		DLog(L"D3DHook::Hook() : try installed a hook for a device '%s'", mi.szDevice);
+		DLog(L"D3DHook::Hook() : try to install hook for the device '%s'", device.GetString());
 
 		CString driverDll;
-		if (wcslen(mi.szDevice)) {
-			DISPLAY_DEVICE dd = { sizeof(DISPLAY_DEVICE) };
-			DWORD iDevNum = 0;
-			while (EnumDisplayDevices(0, iDevNum, &dd, 0)) {
-				DLog(L"D3DHook::Hook() : EnumDisplayDevices() : DeviceName - '%s', DeviceKey - '%s'", dd.DeviceName, dd.DeviceKey);
-				if (wcscmp(mi.szDevice, dd.DeviceName) == 0) {
-					CString lpszKeyName = dd.DeviceKey; lpszKeyName.Replace(L"\\Registry\\Machine\\", L""); lpszKeyName.Trim();
-					if (!lpszKeyName.IsEmpty()) {
-						CRegKey regkey;
-						if (ERROR_SUCCESS == regkey.Open(HKEY_LOCAL_MACHINE, lpszKeyName, KEY_READ)) {
-							LPCTSTR pszValueName = L"UserModeDriverName";
+		DISPLAY_DEVICE dd = { sizeof(DISPLAY_DEVICE) };
+		DWORD iDevNum = 0;
+		while (EnumDisplayDevices(0, iDevNum, &dd, 0)) {
+			DLog(L"D3DHook::Hook() : EnumDisplayDevices() : DeviceName - '%s', DeviceString - '%s', DeviceKey - '%s'", dd.DeviceName, dd.DeviceString, dd.DeviceKey);
+			if (device == dd.DeviceString) {
+				CString lpszKeyName = dd.DeviceKey; lpszKeyName.Replace(L"\\Registry\\Machine\\", L""); lpszKeyName.Trim();
+				if (!lpszKeyName.IsEmpty()) {
+					CRegKey regkey;
+					if (ERROR_SUCCESS == regkey.Open(HKEY_LOCAL_MACHINE, lpszKeyName, KEY_READ)) {
+						LPCTSTR pszValueName = L"UserModeDriverName";
 #ifndef _WIN64
-							if (SysVersion::IsW64()) {
-								pszValueName = L"UserModeDriverNameWoW";
-							}
-#endif
-							ULONG nChars = 0;
-							if (ERROR_SUCCESS == regkey.QueryMultiStringValue(pszValueName, nullptr, &nChars) && nChars > 0) {
-								LPTSTR pszValue = DNew WCHAR[nChars];
-								if (ERROR_SUCCESS == regkey.QueryMultiStringValue(pszValueName, pszValue, &nChars)) {
-									// we need only the first value
-									driverDll = pszValue; driverDll.Trim();
-								}
-
-								delete [] pszValue;
-							}
-
-							regkey.Close();
+						if (SysVersion::IsW64()) {
+							pszValueName = L"UserModeDriverNameWoW";
 						}
-					}
+#endif
+						ULONG nChars = 0;
+						if (ERROR_SUCCESS == regkey.QueryMultiStringValue(pszValueName, nullptr, &nChars) && nChars > 0) {
+							LPTSTR pszValue = DNew WCHAR[nChars];
+							if (ERROR_SUCCESS == regkey.QueryMultiStringValue(pszValueName, pszValue, &nChars)) {
+								// we need only the first value
+								driverDll = pszValue; driverDll.Trim();
+							}
 
-					break;
+							delete [] pszValue;
+						}
+
+						regkey.Close();
+					}
 				}
 
-				ZeroMemory(&dd, sizeof(dd));
-				dd.cb = sizeof(dd);
-				iDevNum++;
+				break;
 			}
+
+			ZeroMemory(&dd, sizeof(dd));
+			dd.cb = sizeof(dd);
+			iDevNum++;
 		}
 
 		if (!driverDll.IsEmpty()) {
-			DLog(L"D3DHook::Hook() : use the driver library '%s'", driverDll);
+			DLog(L"D3DHook::Hook() : use the driver library '%s'", driverDll.GetString());
 			pOrigOpenAdapter = (PFND3DDDI_OPENADAPTER)GetProcAddress(GetModuleHandleW(driverDll), "OpenAdapter");
 			if (pOrigOpenAdapter) {
 				const bool ret = HookFunc((PVOID&)pOrigOpenAdapter, &pNewOpenAdapter);
 				if (ret) {
-					DLog(L"D3DHook::Hook() : successfully installed a hook for a device '%s'", mi.szDevice);
+					DLog(L"D3DHook::Hook() : successfully installed hook for the device '%s'", device.GetString());
 					m_refreshRate = refreshRate;
-					m_DeviceName = mi.szDevice;
+					m_Device = device;
 
 					return true;
 				}
@@ -210,7 +204,7 @@ namespace D3DHook {
 			}
 		}
 
-		DLog(L"D3DHook::Hook() : unable install a hook for a device '%s'", mi.szDevice);
+		DLog(L"D3DHook::Hook() : unable install hook for the device '%s'", device.GetString());
 		return false;
 	}
 
@@ -237,7 +231,7 @@ namespace D3DHook {
 			pOrigCreateDevice = nullptr;
 			pOrigOpenAdapter = nullptr;
 
-			m_DeviceName.Empty();
+			m_Device.Empty();
 			m_refreshRate = 0;
 		}
 	}
