@@ -272,7 +272,7 @@ void COpenDlg::OnUpdateOk(CCmdUI* pCmdUI)
 {
 	UpdateData();
 
-	pCmdUI->Enable(!m_path.IsEmpty() || !m_path2.IsEmpty());
+	pCmdUI->Enable(!CString(m_path).Trim().IsEmpty() || !CString(m_path2).Trim().IsEmpty());
 }
 
 // COpenFileDlg
