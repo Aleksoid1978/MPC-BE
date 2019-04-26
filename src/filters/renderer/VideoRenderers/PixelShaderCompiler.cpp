@@ -89,7 +89,7 @@ HRESULT CPixelShaderCompiler::CompileShader(
 	}
 
 	HRESULT hr;
-	ID3DBlob* pShader, *pErrorMsgs;
+	CComPtr<ID3DBlob> pShader, pErrorMsgs;
 	hr = m_fnD3DCompile(pSrcData, (SIZE_T)strlen(pSrcData), nullptr, pDefines, nullptr, pFunctionName, pProfile, Flags, 0, &pShader, &pErrorMsgs);
 
 	if (FAILED(hr)) {
@@ -118,7 +118,7 @@ HRESULT CPixelShaderCompiler::CompileShader(
 	}
 
 	if (disasm) {
-		ID3DBlob* pDisAsm;
+		CComPtr<ID3DBlob> pDisAsm;
 		hr = m_fnD3DDisassemble(pShader->GetBufferPointer(), pShader->GetBufferSize(), 0, nullptr, &pDisAsm);
 		if (SUCCEEDED(hr) && pDisAsm) {
 			*disasm = CString((LPCSTR)pDisAsm->GetBufferPointer());
