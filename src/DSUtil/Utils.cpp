@@ -40,25 +40,6 @@ uint32_t BitNum(uint32_t v, uint32_t b)
 	return CountBits(v & (b - 1));
 }
 
-int GCD(int a, int b) {
-	if (b) return GCD(b, a%b);
-	else  return a;
-}
-
-void ReduceDim(long &num, long &den)
-{
-	if (den > 0 && num > 0) {
-		int gcd = GCD(labs(num), labs(den));
-		num /= gcd;
-		den /= gcd;
-	}
-}
-
-void ReduceDim(SIZE &dim)
-{
-	ReduceDim(dim.cx, dim.cy);
-}
-
 // code from ffmpeg
 int64_t av_gcd(int64_t a, int64_t b) {
 	if (b) return av_gcd(b, a%b);

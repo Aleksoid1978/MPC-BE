@@ -182,17 +182,23 @@ static void SetTrackName(CString *TrackName, CString Suffix)
 
 static void SetAspect(CSize& Aspect, LONG width, LONG height, LONG codec_width, LONG codec_height, VIDEOINFOHEADER2* vih2)
 {
-	if (!Aspect.cx || !Aspect.cy) {
+	__int64 cx = Aspect.cx;
+	__int64 cy = Aspect.cy;
+
+	if (!cx || !cy) {
 		if (width && height) {
-			Aspect.SetSize(width, height);
+			cx = width;
+			cy = height;
 		} else {
-			Aspect.SetSize(codec_width, codec_height);
+			cx = codec_width;
+			cy = codec_height;
 		}
 	} else {
-		Aspect.cx *= codec_width;
-		Aspect.cy *= codec_height;
+		cx *= codec_width;
+		cy *= codec_height;
 	}
-	ReduceDim(Aspect);
+	ReduceDim(cx, cy);
+	Aspect.SetSize(cx, cy);
 
 	if (vih2) {
 		vih2->dwPictAspectRatioX = Aspect.cx;

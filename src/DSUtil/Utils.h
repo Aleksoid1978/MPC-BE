@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2018 see Authors.txt
+ * (C) 2016-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 #include <vector>
+#include <numeric>
 
 template <typename T>
 // If the specified value is out of range, set to default values.
@@ -59,8 +60,20 @@ inline void expand_range(T const& val, T& lo, T& hi)
 uint32_t CountBits(uint32_t v);
 uint32_t BitNum(uint32_t v, uint32_t b);
 
-void ReduceDim(long &num, long &den);
-void ReduceDim(SIZE &dim);
+template <typename T>
+inline void ReduceDim(T &num, T &den)
+{
+	if (den > 0 && num > 0) {
+		const auto gcd = std::gcd(num, den);
+		num /= gcd;
+		den /= gcd;
+	}
+}
+
+inline void ReduceDim(SIZE &dim)
+{
+	ReduceDim(dim.cx, dim.cy);
+}
 
 SIZE ReduceDim(double value);
 
