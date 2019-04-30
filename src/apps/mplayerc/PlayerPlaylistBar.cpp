@@ -1299,7 +1299,7 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 		const CString ct = Content::GetType(fn, &redir);
 		if (!redir.empty()) {
 			for (const auto& r : redir) {
-				ParsePlayList(r, subs, false);
+				ParsePlayList(r, subs, !::PathIsURLW(r));
 			}
 			return;
 		}
@@ -1318,11 +1318,13 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 			curPlayList.GetTail().m_label = label;
 			return;
 		} else if (ct == L"application/x-mpc-playlist") {
-			ParseMPCPlayList(fn);
-			return;
+			if (ParseMPCPlayList(fn)) {
+				return;
+			}
 		} else if (ct == L"audio/x-mpegurl" || ct == L"application/http-live-streaming-m3u") {
-			ParseM3UPlayList(fn);
-			return;
+			if (ParseM3UPlayList(fn)) {
+				return;
+			}
 		} else if (ct == L"application/x-cue-metadata") {
 			if (ParseCUEPlayList(fn)) {
 				return;
@@ -1618,7 +1620,37 @@ bool CPlayerPlaylistBar::ParseM3UPlayList(CString fn)
 				pli->m_label = str.Trim();
 			}
 		} else {
-			pli->m_fns.push_back(MakePath(CombinePath(base, str)));
+			const auto path = MakePath(CombinePath(base, str));
+			if (!fn.CompareNoCase(path)) {
+				SAFE_DELETE(pli);
+				continue;
+			}
+
+			if (!::PathIsURLW(path)) {
+				const auto ext = GetFileExt(path).MakeLower();
+				if (ext == L".m3u" || ext == L".m3u8") {
+					if (ParseM3UPlayList(path)) {
+						SAFE_DELETE(pli);
+						continue;
+					}
+				} else if (ext == L".mpcpl") {
+					if (ParseMPCPlayList(path)) {
+						SAFE_DELETE(pli);
+						continue;
+					}
+				} else {
+					std::list<CString> redir;
+					const auto ct = Content::GetType(path, &redir);
+					if (!redir.empty()) {
+						SAFE_DELETE(pli);
+						for (const auto& r : redir) {
+							ParsePlayList(r, nullptr);
+						}
+						continue;
+					}
+				}
+			}
+			pli->m_fns.push_back(path);
 			playlist.push_back(*pli);
 
 			SAFE_DELETE(pli);
