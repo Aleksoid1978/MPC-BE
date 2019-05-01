@@ -1618,7 +1618,7 @@ STRING IDS_MPC_MINIDUMP_FAIL		"Nie udało się zapisać informacji o debugowaniu
 STRING IDS_MPEG2_BRIGHTNESS		"Jasność:"
 STRING IDS_MPEG2_CONTRAST		"Kontrast:"
 STRING IDS_MPEG2_DEINTERLACING		"Usuwanie przeplotu:"
-STRING IDS_MPEG2_ENABLE_PLANAR		"Obsługa formatów planarnych YUV (NV12, YV12, I420, IYUY)"
+STRING IDS_MPEG2_ENABLE_PLANAR		"Obsługa formatów planarnych YUV (NV12, YV12)"
 STRING IDS_MPEG2_FORCED_SUBS		"Wyświetlanie wymuszonych napisów"
 STRING IDS_MPEG2_HUE		"Odcień:"
 STRING IDS_MPEG2_INTERLACE_FLAG		"Flaga przeplotu w strumieniu wyjściowym"

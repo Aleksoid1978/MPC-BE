@@ -1630,7 +1630,7 @@ STRING IDS_MPC_MINIDUMP_FAIL		"Nepodarilo sa vytvoriť výpis pamäti v súbore 
 STRING IDS_MPEG2_BRIGHTNESS		"Jas"
 STRING IDS_MPEG2_CONTRAST		"Kontrast"
 STRING IDS_MPEG2_DEINTERLACING		"Rozkladanie"
-STRING IDS_MPEG2_ENABLE_PLANAR		"Zapnúť čisté typy YUV médií (NV12, YV12, I420, IYUY)"
+STRING IDS_MPEG2_ENABLE_PLANAR		"Zapnúť čisté typy YUV médií (NV12, YV12)"
 STRING IDS_MPEG2_FORCED_SUBS		"Vždy zobrazovať vynútené titulky"
 STRING IDS_MPEG2_HUE		"Nádych/odtieň"
 STRING IDS_MPEG2_INTERLACE_FLAG		"Nastaviť príznak prekladania v type výstupného média"

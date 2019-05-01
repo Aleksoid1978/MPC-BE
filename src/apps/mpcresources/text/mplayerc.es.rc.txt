@@ -1630,7 +1630,7 @@ STRING IDS_MPC_MINIDUMP_FAIL		"Ha fallado la creación del archivo de volcado a 
 STRING IDS_MPEG2_BRIGHTNESS		"Brillo"
 STRING IDS_MPEG2_CONTRAST		"Contraste"
 STRING IDS_MPEG2_DEINTERLACING		"Desentrelazado"
-STRING IDS_MPEG2_ENABLE_PLANAR		"Activar tipos de medios planares YUV (NV12, YV12, I420, IYUY)"
+STRING IDS_MPEG2_ENABLE_PLANAR		"Activar tipos de medios planares YUV (NV12, YV12)"
 STRING IDS_MPEG2_FORCED_SUBS		"Siempre mostrar subtítulos forzados"
 STRING IDS_MPEG2_HUE		"Tinte"
 STRING IDS_MPEG2_INTERLACE_FLAG		"Fijar el banderín de entrelazado en el tipo de medio de salida"

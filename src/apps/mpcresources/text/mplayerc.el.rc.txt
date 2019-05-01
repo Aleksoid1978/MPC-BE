@@ -1633,7 +1633,7 @@ STRING IDS_MPC_MINIDUMP_FAIL		"Απέτυχε η δημιουργία αρχεί
 STRING IDS_MPEG2_BRIGHTNESS		"Φωτεινότητα"
 STRING IDS_MPEG2_CONTRAST		"Αντίθεση"
 STRING IDS_MPEG2_DEINTERLACING		"Αποσύμπλεξη"
-STRING IDS_MPEG2_ENABLE_PLANAR		"Ενεργ. τύπων πολυμέσων επίπεδων YUV (NV12, YV12, I420, IYUY)"
+STRING IDS_MPEG2_ENABLE_PLANAR		"Ενεργ. τύπων πολυμέσων επίπεδων YUV (NV12, YV12)"
 STRING IDS_MPEG2_FORCED_SUBS		"Πάντα αναγκαστική εμφάνιση υποτίτλων"
 STRING IDS_MPEG2_HUE		"Απόχρωση"
 STRING IDS_MPEG2_INTERLACE_FLAG		"Σημαία πεπλεγμένου στον τύπο πολυμέσου εξόδου"

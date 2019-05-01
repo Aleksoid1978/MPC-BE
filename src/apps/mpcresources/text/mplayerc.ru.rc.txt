@@ -1630,7 +1630,7 @@ STRING IDS_MPC_MINIDUMP_FAIL		"Ошибка при создании дамп-ф�
 STRING IDS_MPEG2_BRIGHTNESS		"Яркость"
 STRING IDS_MPEG2_CONTRAST		"Контраст"
 STRING IDS_MPEG2_DEINTERLACING		"Деинтерлейс"
-STRING IDS_MPEG2_ENABLE_PLANAR		"Задействовать планарные типы YUV (NV12, YV12, I420, IYUY)"
+STRING IDS_MPEG2_ENABLE_PLANAR		"Задействовать планарные типы YUV (NV12, YV12)"
 STRING IDS_MPEG2_FORCED_SUBS		"Всегда показывать принудительные субтитры"
 STRING IDS_MPEG2_HUE		"Оттенок"
 STRING IDS_MPEG2_INTERLACE_FLAG		"Передать флаг чересстрочности в вывод"

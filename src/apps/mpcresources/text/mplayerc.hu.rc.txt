@@ -1630,7 +1630,7 @@ STRING IDS_MPC_MINIDUMP_FAIL		"A memóriakiíratás (dump) fájl nem hozható l�
 STRING IDS_MPEG2_BRIGHTNESS		"Fényesség"
 STRING IDS_MPEG2_CONTRAST		"Kontraszt"
 STRING IDS_MPEG2_DEINTERLACING		"Deinterlace mód"
-STRING IDS_MPEG2_ENABLE_PLANAR		"Síkbeli YUV médiák engedélyezése (NV12, YV12, I420, IYUY)"
+STRING IDS_MPEG2_ENABLE_PLANAR		"Síkbeli YUV médiák engedélyezése (NV12, YV12)"
 STRING IDS_MPEG2_FORCED_SUBS		"Mindig mutassa a kényszerített feliratokat"
 STRING IDS_MPEG2_HUE		"Színárnyalat"
 STRING IDS_MPEG2_INTERLACE_FLAG		"Váltott soros letapogatás jelző beállítása a kimeneti médiában"

@@ -1630,7 +1630,7 @@ STRING IDS_MPC_MINIDUMP_FAIL		"Памылка пры стварэнні dump ф�
 STRING IDS_MPEG2_BRIGHTNESS		"Яркасць"
 STRING IDS_MPEG2_CONTRAST		"Кантраст"
 STRING IDS_MPEG2_DEINTERLACING		"Дэінтэрлейс"
-STRING IDS_MPEG2_ENABLE_PLANAR		"Задзейнічаць планарныя тыпы YUV (NV12, YV12, I420, IYUY)"
+STRING IDS_MPEG2_ENABLE_PLANAR		"Задзейнічаць планарныя тыпы YUV (NV12, YV12)"
 STRING IDS_MPEG2_FORCED_SUBS		"Заўсёды паказваць прымусовыя субтытры"
 STRING IDS_MPEG2_HUE		"Адценне"
 STRING IDS_MPEG2_INTERLACE_FLAG		"Усталяваць сцяг iнтэрлэйса ў вывад"

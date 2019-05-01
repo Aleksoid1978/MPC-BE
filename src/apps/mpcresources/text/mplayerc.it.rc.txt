@@ -1630,7 +1630,7 @@ STRING IDS_MPC_MINIDUMP_FAIL		"Impossibile creare il file di dump in '%s' (error
 STRING IDS_MPEG2_BRIGHTNESS		"Luminosità"
 STRING IDS_MPEG2_CONTRAST		"Contrasto"
 STRING IDS_MPEG2_DEINTERLACING		"Deinterlacciamento"
-STRING IDS_MPEG2_ENABLE_PLANAR		"Abilita i tipi multimediali YUV planari (NV12, YV12, I420, IYUY)"
+STRING IDS_MPEG2_ENABLE_PLANAR		"Abilita i tipi multimediali YUV planari (NV12, YV12)"
 STRING IDS_MPEG2_FORCED_SUBS		"Visualizza sempre i sottotitoli 'forced'"
 STRING IDS_MPEG2_HUE		"Tonalità"
 STRING IDS_MPEG2_INTERLACE_FLAG		"Imposta l'interlacciamento nel tipo multimediale di output"
