@@ -87,11 +87,11 @@ ULONGLONG CAsyncFileReader::GetLength()
 
 STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE* pBuffer)
 {
-	if (m_url.GetLength()) {
-		if ((ULONGLONG)llPosition + lLength > GetLength()) {
-			return E_FAIL;
-		}
+	if ((ULONGLONG)llPosition + lLength > GetLength()) {
+		return E_FAIL;
+	}
 
+	if (m_url.GetLength()) {
 		const auto RetryOnError = [&] {
 			const DWORD dwError = GetLastError();
 			if (dwError == ERROR_INTERNET_CONNECTION_RESET
