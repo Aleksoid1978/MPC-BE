@@ -379,9 +379,7 @@ HRESULT CBaseVideoFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int 
 		BYTE* pInV = ppIn[2];
 
 		if (subtype == MEDIASUBTYPE_YV12) {
-			BYTE* tmp = pInU;
-			pInU = pInV;
-			pInV = tmp;
+			std::swap(pInU, pInV);
 		}
 
 		BYTE* pOutU = pOut + bihOut.biWidth * h;

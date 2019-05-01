@@ -1134,15 +1134,7 @@ bool ExtractDim(const AM_MEDIA_TYPE* pmt, int& w, int& h, int& arx, int& ary)
 		ary = h;
 	}
 
-	DWORD a = arx, b = ary;
-	while (a) {
-		int tmp = a;
-		a = b % tmp;
-		b = tmp;
-	}
-	if (b) {
-		arx /= b, ary /= b;
-	}
+	ReduceDim(arx, ary);
 
 	return true;
 }
