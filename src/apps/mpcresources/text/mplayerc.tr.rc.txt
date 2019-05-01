@@ -1630,7 +1630,7 @@ STRING IDS_MPC_MINIDUMP_FAIL		"%d hatası yüzünden '%s' döküm dosyası oluş
 STRING IDS_MPEG2_BRIGHTNESS		"Parlaklık"
 STRING IDS_MPEG2_CONTRAST		"Karşıtlık"
 STRING IDS_MPEG2_DEINTERLACING		"Karıştırma"
-STRING IDS_MPEG2_ENABLE_PLANAR		"Düzlemsel YUV medya biçimlerini kullan (NV12, YV12, I420, IYUY)"
+STRING IDS_MPEG2_ENABLE_PLANAR		"Düzlemsel YUV medya biçimlerini kullan (NV12, YV12)"
 STRING IDS_MPEG2_FORCED_SUBS		"Gömülü altyazıları her zaman göster"
 STRING IDS_MPEG2_HUE		"Renk"
 STRING IDS_MPEG2_INTERLACE_FLAG		"Medya çıktısı biçimindeki geçişkenliği ayarla"

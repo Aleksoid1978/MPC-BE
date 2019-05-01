@@ -1630,7 +1630,7 @@ STRING IDS_MPC_MINIDUMP_FAIL		"Die Minidump-Datei '%s' konnte nicht angelegt wer
 STRING IDS_MPEG2_BRIGHTNESS		"Helligkeit:"
 STRING IDS_MPEG2_CONTRAST		"Kontrast"
 STRING IDS_MPEG2_DEINTERLACING		"Deinterlacing:"
-STRING IDS_MPEG2_ENABLE_PLANAR		"Planare YUV Medien-Typen erlauben (NV12, YV12, I420, IYUY)"
+STRING IDS_MPEG2_ENABLE_PLANAR		"Planare YUV Medien-Typen erlauben (NV12, YV12)"
 STRING IDS_MPEG2_FORCED_SUBS		"Erzwungene Untertitel immer anzeigen"
 STRING IDS_MPEG2_HUE		"Farbton"
 STRING IDS_MPEG2_INTERLACE_FLAG		"Interlaced-Flag im Medientyp setzen"

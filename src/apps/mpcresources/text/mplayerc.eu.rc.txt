@@ -1630,7 +1630,7 @@ STRING IDS_MPC_MINIDUMP_FAIL		"Hutsegitea '%s'-ra dump agiria sortzerakoan (akat
 STRING IDS_MPEG2_BRIGHTNESS		"Dizdira"
 STRING IDS_MPEG2_CONTRAST		"Zuribeltztasuna"
 STRING IDS_MPEG2_DEINTERLACING		"Ez-elkarlotura"
-STRING IDS_MPEG2_ENABLE_PLANAR		"Gaitu YUV laua multimedia motak (NV12, YV12, I420, IYUY)"
+STRING IDS_MPEG2_ENABLE_PLANAR		"Gaitu YUV laua multimedia motak (NV12, YV12)"
 STRING IDS_MPEG2_FORCED_SUBS		"Betik erakutsi behartutako azpidatziak?"
 STRING IDS_MPEG2_HUE		"Nabardura"
 STRING IDS_MPEG2_INTERLACE_FLAG		"Ezarri elkarlotura ikurra irteera multimedia motan"
