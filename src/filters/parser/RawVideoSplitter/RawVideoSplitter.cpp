@@ -763,7 +763,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			VIDEOINFOHEADER2* vih2 = (VIDEOINFOHEADER2*)mt.AllocFormatBuffer(sizeof(VIDEOINFOHEADER2) + extrasize);
 			memset(vih2, 0, mt.FormatLength());
-			vih2->bmiHeader.biSize = sizeof(vih2->bmiHeader) + extrasize;
+			vih2->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
 			vih2->bmiHeader.biWidth = width;
 			vih2->bmiHeader.biHeight = height;
 			vih2->bmiHeader.biPlanes = 1;

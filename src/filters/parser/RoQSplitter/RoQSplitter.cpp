@@ -202,11 +202,13 @@ HRESULT CRoQSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				VIDEOINFOHEADER vih;
 				memset(&vih, 0, sizeof(vih));
 				vih.AvgTimePerFrame = 10000000i64/30;
-				vih.bmiHeader.biSize = sizeof(vih.bmiHeader.biSize);
+				vih.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
 				vih.bmiHeader.biWidth = ri.w;
 				vih.bmiHeader.biHeight = ri.h;
 				vih.bmiHeader.biCompression = MEDIASUBTYPE_RoQV.Data1;
 				mt.SetFormat((BYTE*)&vih, sizeof(vih));
+				mt.bFixedSizeSamples = FALSE;
+				mt.bTemporalCompression = TRUE;
 				mt.lSampleSize = 1;
 
 				mts.push_back(mt);
