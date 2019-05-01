@@ -94,7 +94,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_FILTER_SETTINGS_CAPTION "Settings"
-    IDS_MPEG2_ENABLE_PLANAR     "Enable planar YUV media types (NV12, YV12, I420, IYUY)"
+    IDS_MPEG2_ENABLE_PLANAR     "Enable planar YUV media types (NV12, YV12)"
     IDS_MPEG2_INTERLACE_FLAG    "Set interlaced flag in output media type"
     IDS_MPEG2_FORCED_SUBS       "Always display forced subtitles"
     IDS_MPEG2_DEINTERLACING     "Deinterlacing"

@@ -113,8 +113,6 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesOut[] = {
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_NV12},
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_YV12},
 	{&MEDIATYPE_Video, &MEDIASUBTYPE_YUY2},
-	{&MEDIATYPE_Video, &MEDIASUBTYPE_I420},
-	{&MEDIATYPE_Video, &MEDIASUBTYPE_IYUV},
 };
 
 const AMOVIESETUP_PIN sudpPins[] = {
@@ -489,8 +487,6 @@ static VIDEO_OUTPUT_FORMATS DefaultFormats[] = {
 	{&MEDIASUBTYPE_NV12, 3, 12, FCC('NV12')},
 	{&MEDIASUBTYPE_YV12, 3, 12, FCC('YV12')},
 	{&MEDIASUBTYPE_YUY2, 1, 16, FCC('YUY2')},
-	{&MEDIASUBTYPE_I420, 3, 12, FCC('I420')},
-	{&MEDIASUBTYPE_IYUV, 3, 12, FCC('IYUV')},
 };
 
 void CMpeg2DecFilter::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
@@ -944,10 +940,7 @@ HRESULT CMpeg2DecFilter::CheckInputType(const CMediaType* mtIn)
 
 HRESULT CMpeg2DecFilter::CheckTransform(const CMediaType* mtIn, const CMediaType* mtOut)
 {
-	bool fPlanarYUV = mtOut->subtype == MEDIASUBTYPE_NV12
-					  || mtOut->subtype == MEDIASUBTYPE_YV12
-					  || mtOut->subtype == MEDIASUBTYPE_I420
-					  || mtOut->subtype == MEDIASUBTYPE_IYUV;
+	bool fPlanarYUV = mtOut->subtype == MEDIASUBTYPE_NV12 || mtOut->subtype == MEDIASUBTYPE_YV12;
 
 	return SUCCEEDED(__super::CheckTransform(mtIn, mtOut))
 		   && (!fPlanarYUV || IsPlanarYUVEnabled())
