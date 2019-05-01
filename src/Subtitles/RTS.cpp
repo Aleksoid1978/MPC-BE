@@ -1756,9 +1756,7 @@ void CRenderedTextSubtitle::ParseEffect(CSubtitle* sub, CString str)
 		}
 
 		if (top > bottom) {
-			int tmp = top;
-			top = bottom;
-			bottom = tmp;
+			std::swap(top, bottom);
 		}
 
 		Effect* e;
