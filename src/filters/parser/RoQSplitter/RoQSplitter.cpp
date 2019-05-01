@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,6 +23,12 @@
 #include <initguid.h>
 #include "RoQSplitter.h"
 #include <moreuuids.h>
+
+#define RoQ_INFO           0x1001
+#define RoQ_QUAD_CODEBOOK  0x1002
+#define RoQ_QUAD_VQ        0x1011
+#define RoQ_SOUND_MONO     0x1020
+#define RoQ_SOUND_STEREO   0x1021
 
 #ifdef REGISTER_FILTER
 
@@ -178,12 +184,12 @@ HRESULT CRoQSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	{
 		pos += sizeof(rc);
 
-		if(rc.id == 0x1001)
+		if(rc.id == RoQ_INFO)
 		{
 			if(S_OK != m_pAsyncReader->SyncRead(pos, sizeof(ri), (BYTE*)&ri) || ri.w == 0 || ri.h == 0)
 				break;
 		}
-		else if(rc.id == 0x1002 || rc.id == 0x1011)
+		else if(rc.id == RoQ_QUAD_CODEBOOK || rc.id == RoQ_QUAD_VQ)
 		{
 			if(!iHasVideo && ri.w > 0 && ri.h > 0)
 			{
@@ -209,7 +215,7 @@ HRESULT CRoQSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				AddOutputPin(0, pPinOut);
 			}
 
-			if(rc.id == 0x1002)
+			if(rc.id == RoQ_QUAD_CODEBOOK)
 			{
 				iHasVideo++;
 
@@ -220,7 +226,7 @@ HRESULT CRoQSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				m_index.push_back(i);
 			}
 		}
-		else if(rc.id == 0x1020 || rc.id == 0x1021)
+		else if(rc.id == RoQ_SOUND_MONO || rc.id == RoQ_SOUND_STEREO)
 		{
 			if(!iHasAudio)
 			{
@@ -300,7 +306,7 @@ bool CRoQSplitterFilter::DemuxLoop()
 
 		CAutoPtr<CPacket> p(DNew CPacket());
 
-		if(rc.id == 0x1002 || rc.id == 0x1011 || rc.id == 0x1020 || rc.id == 0x1021)
+		if(rc.id == RoQ_QUAD_CODEBOOK || rc.id == RoQ_QUAD_VQ || rc.id == RoQ_SOUND_MONO || rc.id == RoQ_SOUND_STEREO)
 		{
 			p->resize(sizeof(rc) + rc.size);
 			memcpy(p->data(), &rc, sizeof(rc));
@@ -308,15 +314,15 @@ bool CRoQSplitterFilter::DemuxLoop()
 				break;
 		}
 
-		if(rc.id == 0x1002 || rc.id == 0x1011)
+		if(rc.id == RoQ_QUAD_CODEBOOK || rc.id == RoQ_QUAD_VQ)
 		{
 			p->TrackNumber = 0;
 			p->bSyncPoint = rtVideo == 0;
 			p->rtStart = rtVideo;
-			p->rtStop = rtVideo += (rc.id == 0x1011 ? 10000000i64/30 : 0);
+			p->rtStop = rtVideo += (rc.id == RoQ_QUAD_VQ ? 10000000i64/30 : 0);
 			DLog(L"v: %I64d - %I64d (%Iu)", p->rtStart/10000, p->rtStop/10000, p->size());
 		}
-		else if(rc.id == 0x1020 || rc.id == 0x1021)
+		else if(rc.id == RoQ_SOUND_MONO || rc.id == RoQ_SOUND_STEREO)
 		{
 			int nChannels = (rc.id&1)+1;
 
@@ -327,7 +333,7 @@ bool CRoQSplitterFilter::DemuxLoop()
 			DLog(L"a: %I64d - %I64d (%Iu)", p->rtStart/10000, p->rtStop/10000, p->size());
 		}
 
-		if(rc.id == 0x1002 || rc.id == 0x1011 || rc.id == 0x1020 || rc.id == 0x1021)
+		if(rc.id == RoQ_QUAD_CODEBOOK || rc.id == RoQ_QUAD_VQ || rc.id == RoQ_SOUND_MONO || rc.id == RoQ_SOUND_STEREO)
 		{
 			hr = DeliverPacket(p);
 		}
@@ -580,7 +586,7 @@ HRESULT CRoQVideoDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 	pDataIn += sizeof(roq_chunk);
 
-	if(rc->id == 0x1002)
+	if(rc->id == RoQ_QUAD_CODEBOOK)
 	{
 		DWORD nv1 = rc->arg>>8;
 		if(nv1 == 0) nv1 = 256;
@@ -597,7 +603,7 @@ HRESULT CRoQVideoDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)
 
 		return S_FALSE;
 	}
-	else if(rc->id == 0x1011)
+	else if(rc->id == RoQ_QUAD_VQ)
 	{
 		int bpos = 0, xpos = 0, ypos = 0;
 		int vqflg = 0, vqflg_pos = -1, vqid;
