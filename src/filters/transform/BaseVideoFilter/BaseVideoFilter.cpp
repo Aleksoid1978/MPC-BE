@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -386,9 +386,7 @@ HRESULT CBaseVideoFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int 
 		BYTE* pOutV = pOut + bihOut.biWidth * h * 5 / 4;
 
 		if (bihOut.biCompression == FCC('YV12')) {
-			BYTE* tmp = pOutU;
-			pOutU = pOutV;
-			pOutV = tmp;
+			std::swap(pOutU, pOutV);
 		}
 
 		ASSERT(w <= abs(pitchIn));
