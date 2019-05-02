@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -287,6 +287,7 @@ class __declspec(uuid("238D0F23-5DC9-45A6-9BE2-666160C324DD"))
 
 	BYTE* m_pI420, *m_pI420Tmp;
 
+	void Copy(BYTE* pOut, BYTE* pIn, const int w, const int h);
 	void GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats);
 
 public:
