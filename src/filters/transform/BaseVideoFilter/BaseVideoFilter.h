@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2017 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -64,9 +64,7 @@ protected:
 	BOOL m_bMVC_Output_TopBottom = FALSE;
 
 	HRESULT Receive(IMediaSample* pIn);
-
 	HRESULT GetDeliveryBuffer(int w, int h, IMediaSample** ppOut, REFERENCE_TIME AvgTimePerFrame = 0, DXVA2_ExtendedFormat* dxvaExtFormat = nullptr);
-	HRESULT CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int pitchIn, const GUID& subtype, bool fInterlaced = false);
 
 	virtual void GetOutputSize(int& w, int& h, int& arx, int& ary, int& vsfilter) {}
 	virtual HRESULT Transform(IMediaSample* pIn) PURE;

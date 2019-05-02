@@ -287,7 +287,7 @@ class __declspec(uuid("238D0F23-5DC9-45A6-9BE2-666160C324DD"))
 
 	BYTE* m_pI420, *m_pI420Tmp;
 
-	void Copy(BYTE* pOut, BYTE* pIn, const int w, const int h);
+	void CopyBuffer(BYTE* pOut, BYTE* pIn, const int w, const int h);
 	void GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats);
 
 public:

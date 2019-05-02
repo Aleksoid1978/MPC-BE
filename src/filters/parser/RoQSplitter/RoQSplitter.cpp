@@ -711,20 +711,20 @@ HRESULT CRoQVideoDecoder::Transform(IMediaSample* pIn, IMediaSample* pOut)
 	if(rtStart < 0)
 		return S_FALSE;
 
-	Copy(pDataOut, m_y[1], w, h);
+	CopyBuffer(pDataOut, m_y[1], w, h);
 
 	pOut->SetTime(&rtStart, &rtStop);
 
 	return S_OK;
 }
 
-void CRoQVideoDecoder::Copy(BYTE* pOut, BYTE* pIn, const int w, const int h)
+void CRoQVideoDecoder::CopyBuffer(BYTE* pOut, BYTE* pIn, const int w, const int h)
 {
 	BITMAPINFOHEADER bihOut;
 	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
 
 	int pitchIn = w;
-	int pitchInUV = pitchIn>>1;
+	int pitchInUV = pitchIn/2;
 	BYTE* pInU = pIn + pitchIn*h;
 	BYTE* pInV = pInU + pitchInUV*h/2;
 

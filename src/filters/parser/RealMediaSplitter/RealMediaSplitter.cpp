@@ -1822,7 +1822,7 @@ HRESULT CRealVideoDecoder::Transform(IMediaSample* pIn)
 		}
 	}
 
-	Copy(pDataOut, pI420[0], m_wout, m_hout);
+	CopyBuffer(pDataOut, pI420[0], m_wout, m_hout);
 
 	rtStart = 10000i64 * transform_out.timestamp - m_tStart;
 	rtStop = rtStart + 1;
@@ -1938,13 +1938,13 @@ void CRealVideoDecoder::ResizeRow(BYTE* pIn, DWORD wi, DWORD dpi, BYTE* pOut, DW
 	}
 }
 
-void CRealVideoDecoder::Copy(BYTE* pOut, BYTE* pIn, const int w, const int h)
+void CRealVideoDecoder::CopyBuffer(BYTE* pOut, BYTE* pIn, const int w, const int h)
 {
 	BITMAPINFOHEADER bihOut;
 	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
 
 	int pitchIn = w;
-	int pitchInUV = pitchIn>>1;
+	int pitchInUV = pitchIn/2;
 	BYTE* pInU = pIn + pitchIn*h;
 	BYTE* pInV = pInU + pitchInUV*h/2;
 

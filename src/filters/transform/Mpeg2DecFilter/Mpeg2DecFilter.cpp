@@ -427,7 +427,7 @@ void CMpeg2DecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary, int& vsf
 	}
 }
 
-void CMpeg2DecFilter::Copy(BYTE* pOut, BYTE** ppIn, const int w, const int h, const int pitchIn, const bool fInterlaced)
+void CMpeg2DecFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, const int w, const int h, const int pitchIn, const bool fInterlaced)
 {
 	BITMAPINFOHEADER bihOut;
 	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
@@ -862,7 +862,7 @@ HRESULT CMpeg2DecFilter::DeliverToRenderer()
 		m_pSubpicInput->RenderSubpics(m_fb.rtStart, buf, m_fb.pitch, m_fb.h);
 	}
 
-	Copy(pDataOut, buf, (m_fb.w+7)&~7, m_fb.h, m_fb.pitch, !(m_fb.flags & PIC_FLAG_PROGRESSIVE_FRAME));
+	CopyBuffer(pDataOut, buf, (m_fb.w+7)&~7, m_fb.h, m_fb.pitch, !(m_fb.flags & PIC_FLAG_PROGRESSIVE_FRAME));
 
 	if (CMpeg2DecInputPin* pPin = dynamic_cast<CMpeg2DecInputPin*>(m_pInput)) {
 		CAutoLock cAutoLock(&pPin->m_csRateLock);
