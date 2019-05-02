@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1664,7 +1664,7 @@ static bool CompressFile(CString fn)
 {
 	BOOL b = FALSE;
 
-	HANDLE h = CreateFile(fn, GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, 0);
+	HANDLE h = CreateFileW(fn, GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, 0);
 	if (h != INVALID_HANDLE_VALUE) {
 		USHORT us = COMPRESSION_FORMAT_DEFAULT;
 		DWORD nBytesReturned;
