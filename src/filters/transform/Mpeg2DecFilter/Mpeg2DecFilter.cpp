@@ -427,6 +427,30 @@ void CMpeg2DecFilter::GetOutputSize(int& w, int& h, int& arx, int& ary, int& vsf
 	}
 }
 
+void CMpeg2DecFilter::Copy(BYTE* pOut, BYTE** ppIn, const int w, const int h, const int pitchIn, const bool fInterlaced)
+{
+	BITMAPINFOHEADER bihOut;
+	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
+
+	BYTE* pIn  = ppIn[0];
+	BYTE* pInU = ppIn[1];
+	BYTE* pInV = ppIn[2];
+
+	if (bihOut.biCompression == FCC('NV12')) {
+		BitBltFromI420ToNV12(w, h, pOut, pOut + bihOut.biWidth*h, pOut + bihOut.biWidth*h*5/4, bihOut.biWidth, pIn, pInU, pInV, pitchIn);
+	}
+	else if (bihOut.biCompression == FCC('YV12')) {
+		BitBltFromI420ToI420(w, h, pOut, pOut + bihOut.biWidth*h*5/4, pOut + bihOut.biWidth*h, bihOut.biWidth, pIn, pInU, pInV, pitchIn);
+	}
+	else if(bihOut.biCompression == FCC('YUY2')) {
+		if (!fInterlaced) {
+			BitBltFromI420ToYUY2(w, h, pOut, bihOut.biWidth * 2, pIn, pInU, pInV, pitchIn);
+		} else {
+			BitBltFromI420ToYUY2Interlaced(w, h, pOut, bihOut.biWidth * 2, pIn, pInU, pInV, pitchIn);
+		}
+	}
+}
+
 STDMETHODIMP CMpeg2DecFilter::NonDelegatingQueryInterface(REFIID riid, void** ppv)
 {
 	return
@@ -491,8 +515,8 @@ static VIDEO_OUTPUT_FORMATS DefaultFormats[] = {
 
 void CMpeg2DecFilter::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
 {
-	nNumber		= _countof(DefaultFormats);
-	*ppFormats	= DefaultFormats;
+	nNumber = _countof(DefaultFormats);
+	*ppFormats = DefaultFormats;
 }
 
 void CMpeg2DecFilter::InputTypeChanged()
@@ -838,7 +862,7 @@ HRESULT CMpeg2DecFilter::DeliverToRenderer()
 		m_pSubpicInput->RenderSubpics(m_fb.rtStart, buf, m_fb.pitch, m_fb.h);
 	}
 
-	CopyBuffer(pDataOut, buf, (m_fb.w+7)&~7, m_fb.h, m_fb.pitch, MEDIASUBTYPE_I420, !(m_fb.flags & PIC_FLAG_PROGRESSIVE_FRAME));
+	Copy(pDataOut, buf, (m_fb.w+7)&~7, m_fb.h, m_fb.pitch, !(m_fb.flags & PIC_FLAG_PROGRESSIVE_FRAME));
 
 	if (CMpeg2DecInputPin* pPin = dynamic_cast<CMpeg2DecInputPin*>(m_pInput)) {
 		CAutoLock cAutoLock(&pPin->m_csRateLock);
