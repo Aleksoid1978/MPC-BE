@@ -97,6 +97,8 @@ class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478"))
 		}
 	} m_fb;
 
+	void Copy(BYTE* pOut, BYTE** ppIn, const int w, const int h, const int pitchIn, const bool fInterlaced);
+
 	bool m_fFilm;
 	void SetDeinterlaceMethod();
 	void SetTypeSpecificFlags(IMediaSample* pMS);
