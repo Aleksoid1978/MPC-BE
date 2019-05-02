@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -252,7 +252,7 @@ bool CCDXAStream::Load(const WCHAR* fnw)
 		m_hFile = INVALID_HANDLE_VALUE;
 	}
 
-	m_hFile = CreateFile(CString(fnw), GENERIC_READ, FILE_SHARE_READ, nullptr,
+	m_hFile = CreateFileW(CString(fnw), GENERIC_READ, FILE_SHARE_READ, nullptr,
 						 OPEN_EXISTING, FILE_ATTRIBUTE_READONLY|FILE_FLAG_SEQUENTIAL_SCAN, (HANDLE)nullptr);
 	if (m_hFile == INVALID_HANDLE_VALUE) {
 		return false;

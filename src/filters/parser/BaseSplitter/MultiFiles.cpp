@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -175,7 +175,7 @@ BOOL CMultiFiles::OpenPart(size_t nPart)
 		ClosePart();
 
 		const CString& lpFileName = m_strFiles[nPart];
-		m_hFile = CreateFile(lpFileName, GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
+		m_hFile = CreateFileW(lpFileName, GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
 		if (m_hFile != INVALID_HANDLE_VALUE) {
 			m_nCurPart = nPart;
 			if (m_pCurrentPTSOffset) {
