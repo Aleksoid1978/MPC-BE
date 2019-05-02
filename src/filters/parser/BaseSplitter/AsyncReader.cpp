@@ -153,7 +153,8 @@ STDMETHODIMP CAsyncFileReader::SyncRead(LONGLONG llPosition, LONG lLength, BYTE*
 			return E_FAIL;
 		}
 		DWORD dwError;
-		if ((UINT)lLength < Read(pBuffer, lLength, dwError) || dwError != ERROR_SUCCESS) {
+		UINT readed = Read(pBuffer, lLength, dwError);
+		if (readed < (UINT)lLength || dwError != ERROR_SUCCESS) {
 			return E_FAIL;
 		}
 
