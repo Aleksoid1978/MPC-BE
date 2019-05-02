@@ -71,7 +71,7 @@ CRoQVideoDecoder : public CTransformFilter
 	BYTE* m_v[2] = { 0 };
 	int m_pitch = 0;
 
-	void Copy(BYTE* pOut, BYTE* pIn, const int w, const int h);
+	void CopyBuffer(BYTE* pOut, BYTE* pIn, const int w, const int h);
 
 	#pragma pack(push, 1)
 	struct roq_cell {BYTE y0, y1, y2, y3, u, v;} m_cells[256];
