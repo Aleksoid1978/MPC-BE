@@ -1822,8 +1822,7 @@ HRESULT CRealVideoDecoder::Transform(IMediaSample* pIn)
 		}
 	}
 
-	BYTE* pInYUV[3] = {pI420[0], pI420[0] + m_wout * m_hout, pI420[0] + m_wout * m_hout + (m_wout >> 1) * (m_hout >> 1)};
-	CopyBuffer(pDataOut, pInYUV, m_wout, m_hout, m_wout, MEDIASUBTYPE_I420);
+	Copy(pDataOut, pI420[0], m_wout, m_hout);
 
 	rtStart = 10000i64 * transform_out.timestamp - m_tStart;
 	rtStop = rtStart + 1;
@@ -1939,10 +1938,46 @@ void CRealVideoDecoder::ResizeRow(BYTE* pIn, DWORD wi, DWORD dpi, BYTE* pOut, DW
 	}
 }
 
+void CRealVideoDecoder::Copy(BYTE* pOut, BYTE* pIn, const int w, const int h)
+{
+	BITMAPINFOHEADER bihOut;
+	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
+
+	int pitchIn = w;
+	int pitchInUV = pitchIn>>1;
+	BYTE* pInU = pIn + pitchIn*h;
+	BYTE* pInV = pInU + pitchInUV*h/2;
+
+	if (bihOut.biCompression == FCC('NV12')) {
+		BitBltFromI420ToNV12(w, h, pOut, pOut + bihOut.biWidth*h, pOut + bihOut.biWidth*h*5/4, bihOut.biWidth, pIn, pInU, pInV, pitchIn);
+	}
+	else if (bihOut.biCompression == FCC('YV12')) {
+		BitBltFromI420ToI420(w, h, pOut, pOut + bihOut.biWidth*h*5/4, pOut + bihOut.biWidth*h, bihOut.biWidth, pIn, pInU, pInV, pitchIn);
+	}
+	else if (bihOut.biCompression == FCC('YUY2')) {
+		BitBltFromI420ToYUY2(w, h, pOut, bihOut.biWidth*2, pIn, pInU, pInV, pitchIn);
+	}
+	else if (bihOut.biCompression == BI_RGB) {
+		int pitchOut = bihOut.biWidth*bihOut.biBitCount / 8;
+
+		if(bihOut.biHeight > 0) {
+			pOut += pitchOut*(h-1);
+			pitchOut = -pitchOut;
+		}
+
+		if(!BitBltFromI420ToRGB(w, h, pOut, pitchOut, bihOut.biBitCount, pIn, pInU, pInV, pitchIn)) {
+			for (int y = 0; y < h; y++, pIn += pitchIn, pOut += pitchOut) {
+				memset(pOut, 0, pitchOut);
+			}
+		}
+	}
+}
+
 static VIDEO_OUTPUT_FORMATS DefaultFormats[] = {
 	{&MEDIASUBTYPE_NV12, 3, 12, FCC('NV12')},
 	{&MEDIASUBTYPE_YV12, 3, 12, FCC('YV12')},
 	{&MEDIASUBTYPE_YUY2, 1, 16, FCC('YUY2')},
+	//{&MEDIASUBTYPE_RGB32, 1, 32, BI_RGB},
 };
 
 void CRealVideoDecoder::GetOutputFormats(int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
