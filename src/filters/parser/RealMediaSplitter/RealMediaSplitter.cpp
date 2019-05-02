@@ -1822,7 +1822,8 @@ HRESULT CRealVideoDecoder::Transform(IMediaSample* pIn)
 		}
 	}
 
-	CopyBuffer(pDataOut, pI420[0], m_wout, m_hout, m_wout, MEDIASUBTYPE_I420);
+	BYTE* pInYUV[3] = {pI420[0], pI420[0] + m_wout * m_hout, pI420[0] + m_wout * m_hout + (m_wout >> 1) * (m_hout >> 1)};
+	CopyBuffer(pDataOut, pInYUV, m_wout, m_hout, m_wout, MEDIASUBTYPE_I420);
 
 	rtStart = 10000i64 * transform_out.timestamp - m_tStart;
 	rtStop = rtStart + 1;
