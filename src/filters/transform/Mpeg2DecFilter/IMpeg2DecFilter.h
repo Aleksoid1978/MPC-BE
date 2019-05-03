@@ -50,9 +50,6 @@ public IUnknown {
 	STDMETHOD(EnableForcedSubtitles(bool fEnable)) PURE;
 	STDMETHOD_(bool, IsForcedSubtitlesEnabled()) PURE;
 
-	STDMETHOD(EnablePlanarYUV(bool fEnable)) PURE;
-	STDMETHOD_(bool, IsPlanarYUVEnabled()) PURE;
-
 	STDMETHOD(EnableInterlaced(bool fEnable)) PURE;
 	STDMETHOD_(bool, IsInterlacedEnabled()) PURE;
 

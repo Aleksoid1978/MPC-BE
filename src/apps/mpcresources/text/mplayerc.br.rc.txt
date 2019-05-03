@@ -1630,7 +1630,6 @@ STRING IDS_MPC_MINIDUMP_FAIL		"Falha ao criar arquivo de despejo (dump) '%s' (er
 STRING IDS_MPEG2_BRIGHTNESS		"Brilho"
 STRING IDS_MPEG2_CONTRAST		"Contraste"
 STRING IDS_MPEG2_DEINTERLACING		"Desentrelaçado"
-STRING IDS_MPEG2_ENABLE_PLANAR		"Ativar tipos de mídias planas YUV (NV12, YV12)"
 STRING IDS_MPEG2_FORCED_SUBS		"Sempre forçar mostrar legendas"
 STRING IDS_MPEG2_HUE		"Cor"
 STRING IDS_MPEG2_INTERLACE_FLAG		"Ajustar bandeira (flag) entrelaçado no tipo de mídia de saída"

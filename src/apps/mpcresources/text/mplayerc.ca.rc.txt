@@ -1630,7 +1630,6 @@ STRING IDS_MPC_MINIDUMP_FAIL		"Ha fallat la creació de l' arxiu de volcat a '%s
 STRING IDS_MPEG2_BRIGHTNESS		"Brillantor"
 STRING IDS_MPEG2_CONTRAST		"Contrast"
 STRING IDS_MPEG2_DEINTERLACING		"Desentrellaçat"
-STRING IDS_MPEG2_ENABLE_PLANAR		"Activar tipus de mitjans planars YUV (NV12, YV12)"
 STRING IDS_MPEG2_FORCED_SUBS		"Sempre mostrar subtítols forçats"
 STRING IDS_MPEG2_HUE		"Tint"
 STRING IDS_MPEG2_INTERLACE_FLAG		"Fixar bandera d'entrellaçat al tipus de mitjà de sortida"

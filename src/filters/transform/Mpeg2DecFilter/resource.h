@@ -3,7 +3,6 @@
 // Used by Mpeg2DecFilter.rc
 //
 #define IDS_FILTER_SETTINGS_CAPTION     7000
-#define IDS_MPEG2_ENABLE_PLANAR         7500
 #define IDS_MPEG2_INTERLACE_FLAG        7501
 #define IDS_MPEG2_FORCED_SUBS           7502
 #define IDS_MPEG2_DEINTERLACING         7503
