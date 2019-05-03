@@ -32,7 +32,6 @@ class __declspec(uuid("E5FB6957-65E6-491B-BB37-B25C9FE3BEA7"))
 
 	ditype m_ditype;
 	int m_procamp[4];
-	bool m_planaryuv;
 	bool m_interlaced;
 	bool m_forcedsubs;
 	bool m_readARFromStream;

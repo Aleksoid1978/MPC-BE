@@ -1630,7 +1630,6 @@ STRING IDS_MPC_MINIDUMP_FAIL		"Неможливо створити файл-да
 STRING IDS_MPEG2_BRIGHTNESS		"Яскравість"
 STRING IDS_MPEG2_CONTRAST		"Контраст"
 STRING IDS_MPEG2_DEINTERLACING		"Деінтерлейс"
-STRING IDS_MPEG2_ENABLE_PLANAR		"Використовувати планарні типи YUV (NV12, YV12)"
 STRING IDS_MPEG2_FORCED_SUBS		"Завжди примусовово показувати субтитри"
 STRING IDS_MPEG2_HUE		"Відтінок"
 STRING IDS_MPEG2_INTERLACE_FLAG		"Встановити ознаку чергування полів в вивід"

@@ -1630,7 +1630,6 @@ STRING IDS_MPC_MINIDUMP_FAIL		"לא מצליח ליצור קובץ הטלה ב-'
 STRING IDS_MPEG2_BRIGHTNESS		"בהירות"
 STRING IDS_MPEG2_CONTRAST		"ניגודיות"
 STRING IDS_MPEG2_DEINTERLACING		"היפוך שזירה"
-STRING IDS_MPEG2_ENABLE_PLANAR		"הפעל סוגי מדיה YUV מישורי (NV12, YV12)"
 STRING IDS_MPEG2_FORCED_SUBS		"הצג תמיד כתוביות כפויות"
 STRING IDS_MPEG2_HUE		"גוון"
 STRING IDS_MPEG2_INTERLACE_FLAG		"קבע דגל שזירה בסוג פלט המדיה"

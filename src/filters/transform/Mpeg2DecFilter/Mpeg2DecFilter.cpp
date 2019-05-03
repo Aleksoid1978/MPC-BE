@@ -39,50 +39,6 @@
 #include <moreuuids.h>
 #include <IFilterVersion.h>
 
-class CMpeg2DecControlThread : public CAMThread
-{
-public:
-	CMpeg2DecControlThread(CMpeg2DecFilter *pMpeg2DecFilter)
-		: CAMThread()
-		, m_pMpeg2DecFilter(pMpeg2DecFilter)
-	{
-		Create();
-	}
-
-	~CMpeg2DecControlThread() {
-		CallWorker(CMpeg2DecFilter::CNTRL_EXIT);
-		Close();
-	}
-
-protected:
-	DWORD ThreadProc() {
-		SetThreadName(DWORD_MAX, "CMpeg2DecFilter Control Thread");
-		DWORD cmd;
-		while (TRUE) {
-			cmd = GetRequest();
-			switch(cmd) {
-				case CMpeg2DecFilter::CNTRL_EXIT:
-					Reply(S_OK);
-					return 0;
-				case CMpeg2DecFilter::CNTRL_REDRAW:
-					Reply(S_OK);
-					if (m_pMpeg2DecFilter->IsGraphRunning() && m_pMpeg2DecFilter->IsNeedDeliverToRenderer()) {
-						m_pMpeg2DecFilter->DeliverToRenderer();
-						if (m_pMpeg2DecFilter->IsInterlaced()) {
-							m_pMpeg2DecFilter->DeliverToRenderer(); // TODO ???
-						}
-					}
-				break;
-			}
-		}
-
-		return 1;
-	}
-
-private:
-	CMpeg2DecFilter *m_pMpeg2DecFilter;
-};
-
 // option names
 #define OPT_REGKEY_MPEGDec  L"Software\\MPC-BE Filters\\MPEG Video Decoder"
 #define OPT_SECTION_MPEGDec L"Filters\\MPEG Video Decoder"
@@ -92,7 +48,6 @@ private:
 #define OPT_Hue             L"ProcAmpHue"
 #define OPT_Saturation      L"ProcAmpSaturation"
 #define OPT_ForcedSubs      L"ForcedSubtitles"
-#define OPT_PlanarYUV       L"PlanarYUV"
 #define OPT_Interlaced      L"Interlaced"
 #define OPT_ReadStreamAR    L"ReadARFromStream"
 
@@ -274,6 +229,50 @@ static void CalcHueSat(BYTE* UTbl, BYTE* VTbl, int hue, float sat)
 	}
 }
 
+class CMpeg2DecControlThread : public CAMThread
+{
+public:
+	CMpeg2DecControlThread(CMpeg2DecFilter *pMpeg2DecFilter)
+		: CAMThread()
+		, m_pMpeg2DecFilter(pMpeg2DecFilter)
+	{
+		Create();
+	}
+
+	~CMpeg2DecControlThread() {
+		CallWorker(CMpeg2DecFilter::CNTRL_EXIT);
+		Close();
+	}
+
+protected:
+	DWORD ThreadProc() {
+		SetThreadName(DWORD_MAX, "CMpeg2DecFilter Control Thread");
+		DWORD cmd;
+		while (TRUE) {
+			cmd = GetRequest();
+			switch (cmd) {
+			case CMpeg2DecFilter::CNTRL_EXIT:
+				Reply(S_OK);
+				return 0;
+			case CMpeg2DecFilter::CNTRL_REDRAW:
+				Reply(S_OK);
+				if (m_pMpeg2DecFilter->IsGraphRunning() && m_pMpeg2DecFilter->IsNeedDeliverToRenderer()) {
+					m_pMpeg2DecFilter->DeliverToRenderer();
+					if (m_pMpeg2DecFilter->IsInterlaced()) {
+						m_pMpeg2DecFilter->DeliverToRenderer(); // TODO ???
+					}
+				}
+				break;
+			}
+		}
+
+		return 1;
+	}
+
+private:
+	CMpeg2DecFilter *m_pMpeg2DecFilter;
+};
+
 //
 // CMpeg2DecFilter
 //
@@ -289,7 +288,6 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_hue(0)
 	, m_sat(100)
 	, m_fForcedSubs(true)
-	, m_fPlanarYUV(true)
 	, m_fInterlaced(true)
 	, m_bReadARFromStream(true)
 {
@@ -352,9 +350,6 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_ForcedSubs, dw)) {
 			m_fForcedSubs = !!dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_PlanarYUV, dw)) {
-			m_fPlanarYUV = !!dw;
-		}
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_Interlaced, dw)) {
 			m_fInterlaced = !!dw;
 		}
@@ -370,7 +365,6 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	profile.ReadInt(OPT_SECTION_MPEGDec, OPT_Hue, m_hue, -180, 180);
 	profile.ReadInt(OPT_SECTION_MPEGDec, OPT_Saturation, m_sat, 0, 200);
 	profile.ReadBool(OPT_SECTION_MPEGDec, OPT_ForcedSubs, m_fForcedSubs);
-	profile.ReadBool(OPT_SECTION_MPEGDec, OPT_PlanarYUV, m_fPlanarYUV);
 	profile.ReadBool(OPT_SECTION_MPEGDec, OPT_Interlaced, m_fInterlaced);
 	profile.ReadBool(OPT_SECTION_MPEGDec, OPT_ReadStreamAR, m_bReadARFromStream);
 #endif
@@ -399,7 +393,6 @@ STDMETHODIMP CMpeg2DecFilter::Apply()
 		key.SetDWORDValue(OPT_Hue, m_hue);
 		key.SetDWORDValue(OPT_Saturation, m_sat);
 		key.SetDWORDValue(OPT_ForcedSubs, m_fForcedSubs);
-		key.SetDWORDValue(OPT_PlanarYUV, m_fPlanarYUV);
 		key.SetDWORDValue(OPT_Interlaced, m_fInterlaced);
 		key.SetDWORDValue(OPT_ReadStreamAR, m_bReadARFromStream);
 	}
@@ -411,7 +404,6 @@ STDMETHODIMP CMpeg2DecFilter::Apply()
 	profile.WriteInt(OPT_SECTION_MPEGDec, OPT_Hue, m_hue);
 	profile.WriteInt(OPT_SECTION_MPEGDec, OPT_Saturation, m_sat);
 	profile.WriteBool(OPT_SECTION_MPEGDec, OPT_ForcedSubs, m_fForcedSubs);
-	profile.WriteBool(OPT_SECTION_MPEGDec, OPT_PlanarYUV, m_fPlanarYUV);
 	profile.WriteBool(OPT_SECTION_MPEGDec, OPT_Interlaced, m_fInterlaced);
 	profile.WriteBool(OPT_SECTION_MPEGDec, OPT_ReadStreamAR, m_bReadARFromStream);
 #endif
@@ -964,10 +956,7 @@ HRESULT CMpeg2DecFilter::CheckInputType(const CMediaType* mtIn)
 
 HRESULT CMpeg2DecFilter::CheckTransform(const CMediaType* mtIn, const CMediaType* mtOut)
 {
-	bool fPlanarYUV = mtOut->subtype == MEDIASUBTYPE_NV12 || mtOut->subtype == MEDIASUBTYPE_YV12;
-
 	return SUCCEEDED(__super::CheckTransform(mtIn, mtOut))
-		   && (!fPlanarYUV || IsPlanarYUVEnabled())
 		   ? S_OK
 		   : VFW_E_TYPE_NOT_ACCEPTED;
 }
@@ -1222,19 +1211,6 @@ STDMETHODIMP_(bool) CMpeg2DecFilter::IsForcedSubtitlesEnabled()
 {
 	CAutoLock cAutoLock(&m_csProps);
 	return m_fForcedSubs;
-}
-
-STDMETHODIMP CMpeg2DecFilter::EnablePlanarYUV(bool fEnable)
-{
-	CAutoLock cAutoLock(&m_csProps);
-	m_fPlanarYUV = fEnable;
-	return S_OK;
-}
-
-STDMETHODIMP_(bool) CMpeg2DecFilter::IsPlanarYUVEnabled()
-{
-	CAutoLock cAutoLock(&m_csProps);
-	return m_fPlanarYUV;
 }
 
 STDMETHODIMP CMpeg2DecFilter::EnableInterlaced(bool fEnable)

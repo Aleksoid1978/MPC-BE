@@ -1630,7 +1630,6 @@ STRING IDS_MPC_MINIDUMP_FAIL		"Dumpbestand '%s' kon niet gemaakt worden (fout %d
 STRING IDS_MPEG2_BRIGHTNESS		"Helderheid"
 STRING IDS_MPEG2_CONTRAST		"Contrast"
 STRING IDS_MPEG2_DEINTERLACING		"Deinterlacing"
-STRING IDS_MPEG2_ENABLE_PLANAR		"Planar YUV-mediatypes toestaan(NV12, YV12)"
 STRING IDS_MPEG2_FORCED_SUBS		"Geforceerde ondertiteling altijd tonen"
 STRING IDS_MPEG2_HUE		"Tint"
 STRING IDS_MPEG2_INTERLACE_FLAG		"Zet interlaced flag in mediatype"

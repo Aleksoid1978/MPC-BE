@@ -158,7 +158,6 @@ protected:
 	int m_sat;
 	BYTE m_YTbl[256], m_UTbl[256*256], m_VTbl[256*256];
 	bool m_fForcedSubs;
-	bool m_fPlanarYUV;
 	bool m_fInterlaced;
 	bool m_bReadARFromStream;
 
@@ -187,18 +186,12 @@ public:
 
 	STDMETHODIMP EnableForcedSubtitles(bool fEnable);
 	STDMETHODIMP_(bool) IsForcedSubtitlesEnabled();
-
-	STDMETHODIMP EnablePlanarYUV(bool fEnable);
-	STDMETHODIMP_(bool) IsPlanarYUVEnabled();
-	STDMETHODIMP Apply();
-
-	// IMpeg2DecFilter2
-
 	STDMETHODIMP EnableInterlaced(bool fEnable);
 	STDMETHODIMP_(bool) IsInterlacedEnabled();
-
 	STDMETHODIMP EnableReadARFromStream(bool fEnable);
 	STDMETHODIMP_(bool) IsReadARFromStreamEnabled();
+
+	STDMETHODIMP Apply();
 
 private:
 	enum {
