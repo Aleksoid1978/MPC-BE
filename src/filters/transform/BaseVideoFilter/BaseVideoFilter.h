@@ -24,8 +24,6 @@
 #include <d3d9.h>
 #include <dxva2api.h>
 
-bool BitBltFromP016ToP016(size_t w, size_t h, BYTE* dstY, BYTE* dstUV, int dstPitch, BYTE* srcY, BYTE* srcUV, int srcPitch);
-
 struct VIDEO_OUTPUT_FORMATS {
 	const GUID*		subtype;
 	WORD			biPlanes;

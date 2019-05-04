@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -155,8 +155,32 @@ STDMETHODIMP CDirectVobSubFilter::NonDelegatingQueryInterface(REFIID riid, void*
 
 // CBaseVideoFilter
 
-HRESULT CDirectVobSubFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, int pitchIn, const GUID& subtype, bool fInterlaced)
+static inline bool BitBltFromP016ToP016(size_t w, size_t h, BYTE* dstY, BYTE* dstUV, int dstPitch, BYTE* srcY, BYTE* srcUV, int srcPitch)
 {
+	// Copy Y plane
+	for (size_t row = 0; row < h; row++) {
+		BYTE* src = srcY + row * srcPitch;
+		BYTE* dst = dstY + row * dstPitch;
+
+		memcpy(dst, src, dstPitch);
+	}
+
+	// Copy UV plane. UV plane is half height.
+	for (size_t row = 0; row < h / 2; row++) {
+		BYTE* src = srcUV + row * srcPitch;
+		BYTE* dst = dstUV + row * dstPitch;
+
+		memcpy(dst, src, dstPitch);
+	}
+
+	return true;
+}
+
+HRESULT CDirectVobSubFilter::CopyBuffer(BYTE* pOut, BYTE* pIn, int w, int h, int pitchIn, const GUID& subtype, bool fInterlaced)
+{
+	int abs_h = abs(h);
+	BYTE* pInYUV[3] = { pIn, pIn + pitchIn * abs_h, pIn + pitchIn * abs_h + (pitchIn / 2) * (abs_h / 2) };
+
 	BITMAPINFOHEADER bihOut;
 	ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut);
 
@@ -176,20 +200,20 @@ HRESULT CDirectVobSubFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, i
 
 	if (h < 0) {
 		h = -h;
-		ppIn[0] += pitchIn * (h - 1);
+		pInYUV[0] += pitchIn * (h - 1);
 		if (subtype == MEDIASUBTYPE_I420 || subtype == MEDIASUBTYPE_IYUV || subtype == MEDIASUBTYPE_YV12) {
-			ppIn[1] += (pitchIn >> 1) * ((h >> 1) - 1);
-			ppIn[2] += (pitchIn >> 1) * ((h >> 1) - 1);
+			pInYUV[1] += (pitchIn >> 1) * ((h >> 1) - 1);
+			pInYUV[2] += (pitchIn >> 1) * ((h >> 1) - 1);
 		} else if(subtype == MEDIASUBTYPE_P010 || subtype == MEDIASUBTYPE_P016 || subtype == MEDIASUBTYPE_NV12) {
-			ppIn[1] += pitchIn * ((h >> 1) - 1);
+			pInYUV[1] += pitchIn * ((h >> 1) - 1);
 		}
 		pitchIn = -pitchIn;
 	}
 
 	if (subtype == MEDIASUBTYPE_I420 || subtype == MEDIASUBTYPE_IYUV || subtype == MEDIASUBTYPE_YV12) {
-		BYTE* pIn = ppIn[0];
-		BYTE* pInU = ppIn[1];
-		BYTE* pInV = ppIn[2];
+		BYTE* pIn  = pInYUV[0];
+		BYTE* pInU = pInYUV[1];
+		BYTE* pInV = pInYUV[2];
 
 		if (subtype == MEDIASUBTYPE_YV12) {
 			std::swap(pInU, pInV);
@@ -226,21 +250,21 @@ HRESULT CDirectVobSubFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, i
 		&& (bihOut.biCompression == FCC('P010') || bihOut.biCompression == FCC('P016'))) {
 		// We currently don't support outputting P010/P016 input to something other than P010/P016
 		// P010 and P016 share the same memory layout
-		BYTE* pInY = ppIn[0];
-		BYTE* pInUV = ppIn[1];
+		BYTE* pInY  = pInYUV[0];
+		BYTE* pInUV = pInYUV[1];
 		BYTE* pOutUV = pOut + bihOut.biWidth * h * 2; // 2 bytes per pixel
 		BitBltFromP016ToP016(w, h, pOut, pOutUV, bihOut.biWidth * 2, pInY, pInUV, pitchIn);
 	} else if (subtype == MEDIASUBTYPE_NV12 && bihOut.biCompression == FCC('NV12')) {
 		// We currently don't support outputting NV12 input to something other than NV12
-		BYTE* pInY = ppIn[0];
-		BYTE* pInUV = ppIn[1];
+		BYTE* pInY  = pInYUV[0];
+		BYTE* pInUV = pInYUV[1];
 		BYTE* pOutUV = pOut + bihOut.biWidth * h; // 1 bytes per pixel
 		BitBltFromP016ToP016(w, h, pOut, pOutUV, bihOut.biWidth, pInY, pInUV, pitchIn);
 	} else if (subtype == MEDIASUBTYPE_YUY2) {
 		if (bihOut.biCompression == FCC('YUY2')) {
-			BitBltFromYUY2ToYUY2(w, h, pOut, bihOut.biWidth * 2, ppIn[0], pitchIn);
+			BitBltFromYUY2ToYUY2(w, h, pOut, bihOut.biWidth * 2, pInYUV[0], pitchIn);
 		} else if (bihOut.biCompression == BI_RGB || bihOut.biCompression == BI_BITFIELDS) {
-			if (!BitBltFromYUY2ToRGB(w, h, pOut, pitchOut, bihOut.biBitCount, ppIn[0], pitchIn)) {
+			if (!BitBltFromYUY2ToRGB(w, h, pOut, pitchOut, bihOut.biBitCount, pInYUV[0], pitchIn)) {
 				for (int y = 0; y < h; y++, pOut += pitchOut) {
 					memsetd(pOut, 0, pitchOut);
 				}
@@ -256,7 +280,7 @@ HRESULT CDirectVobSubFilter::CopyBuffer(BYTE* pOut, BYTE** ppIn, int w, int h, i
 			// TODO
 			// BitBltFromRGBToYUY2();
 		} else if (bihOut.biCompression == BI_RGB || bihOut.biCompression == BI_BITFIELDS) {
-			if (!BitBltFromRGBToRGB(w, h, pOut, pitchOut, bihOut.biBitCount, ppIn[0], pitchIn, sbpp)) {
+			if (!BitBltFromRGBToRGB(w, h, pOut, pitchOut, bihOut.biBitCount, pInYUV[0], pitchIn, sbpp)) {
 				for (int y = 0; y < h; y++, pOut += pitchOut) {
 					memsetd(pOut, 0, pitchOut);
 				}
