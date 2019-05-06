@@ -1,5 +1,5 @@
 /*
- * (C) 2018 see Authors.txt
+ * (C) 2018-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -35,6 +35,7 @@ public:
 
 	void Slave(IAudioClock* pAudioClock, const REFERENCE_TIME audioStart);
 	void UnSlave();
+	const bool IsSlave() const { return m_pAudioClock != nullptr; }
 	void OffsetAudioClock(const REFERENCE_TIME offsetTime);
 
 private:

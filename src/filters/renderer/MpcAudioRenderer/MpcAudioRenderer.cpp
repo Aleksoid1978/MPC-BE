@@ -1546,18 +1546,22 @@ HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 {
 	if (p && !m_rtNextSampleTime && !m_WasapiQueue.GetCount()
 			&& p->rtStart > 0 && p->rtStart <= 60 * UNITS) {
-		const UINT32 nSilenceFrames = TimeToSamples(p->rtStart, m_pWaveFormatExOutput);
-		const UINT32 nSilenceBytes  = nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign;
+		const auto rtEstimate = m_pSyncClock->IsSlave() ? m_pSyncClock->GetPrivateTime() - m_rtStartTime : 0LL;
+		const auto rtStart = p->rtStart - rtEstimate;
+		if (rtStart > 0) {
+			const UINT32 nSilenceFrames = TimeToSamples(rtStart, m_pWaveFormatExOutput);
+			const UINT32 nSilenceBytes = nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign;
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL
-		DLog(L"CMpcAudioRenderer::PushToQueue() - Pad silence %.2f ms", p->rtStart / 10000.0);
+			DLog(L"CMpcAudioRenderer::PushToQueue() - Pad silence %.2f(%.2f) ms", rtStart / 10000.0, p->rtStart / 10000.0);
 #endif
-		CAutoPtr<CPacket> pSilent(DNew CPacket());
-		pSilent->rtStart = 0;
-		pSilent->rtStop  = p->rtStart;
-		pSilent->SetCount(nSilenceBytes);
-		ZeroMemory(pSilent->data(), nSilenceBytes);
+			CAutoPtr<CPacket> pSilent(DNew CPacket());
+			pSilent->rtStart = p->rtStart - rtStart;
+			pSilent->rtStop = p->rtStart;
+			pSilent->SetCount(nSilenceBytes);
+			ZeroMemory(pSilent->data(), nSilenceBytes);
 
-		m_WasapiQueue.Add(pSilent);
+			m_WasapiQueue.Add(pSilent);
+		}
 	}
 
 	m_WasapiQueue.Add(p);
