@@ -3993,10 +3993,10 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 			break;
 		case INFO_FrameSize:
 			if (m_win && m_hin) {
-				LONG sarx = m_arx * m_hin;
-				LONG sary = m_ary * m_win;
+				__int64 sarx = (__int64)m_arx * m_hin;
+				__int64 sary = (__int64)m_ary * m_win;
 				ReduceDim(sarx, sary);
-				infostr.Format(L"%dx%d, SAR %ld:%ld, DAR %d:%d", m_win, m_hin, sarx, sary, m_arx, m_ary);
+				infostr.Format(L"%dx%d, SAR %d:%d, DAR %d:%d", m_win, m_hin, (int)sarx, (int)sary, m_arx, m_ary);
 			}
 			break;
 		case INFO_OutputFormat:
