@@ -173,13 +173,6 @@ static void SetTrackName(CString *TrackName, CString Suffix)
 	}											\
 	SetTrackName(&TrackName, tname);			\
 
-#define HandlePASP(SampleEntry)																			\
-	if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(SampleEntry->GetChild(AP4_ATOM_TYPE_PASP))) {	\
-		if (!Aspect.cx && pasp->GetNum() > 0 && pasp->GetDen() > 0) {									\
-			Aspect.SetSize(pasp->GetNum(), pasp->GetDen());												\
-		}																								\
-	}																									\
-
 static void SetAspect(CSize& Aspect, LONG width, LONG height, LONG codec_width, LONG codec_height, VIDEOINFOHEADER2* vih2)
 {
 	__int64 cx = Aspect.cx;
@@ -906,7 +899,12 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih2->rcSource					= vih2->rcTarget = CRect(0, 0, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight);
 						vih2->AvgTimePerFrame			= AvgTimePerFrame;
 
-						HandlePASP(vse);
+						if (AP4_PaspAtom* pasp = dynamic_cast<AP4_PaspAtom*>(vse->GetChild(AP4_ATOM_TYPE_PASP))) {
+							if (!Aspect.cx && pasp->GetHSpacing() > 0 && pasp->GetVSpacing() > 0) {
+								Aspect.SetSize(pasp->GetHSpacing(), pasp->GetVSpacing());
+							}
+						}
+
 						SetAspect(Aspect, width, height, vih2->bmiHeader.biWidth, vih2->bmiHeader.biHeight, vih2);
 
 						mt.SetSampleSize(vih2->bmiHeader.biSizeImage);

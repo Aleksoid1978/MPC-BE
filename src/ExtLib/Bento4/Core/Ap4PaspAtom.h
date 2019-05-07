@@ -24,12 +24,12 @@ public:
     AP4_PaspAtom(AP4_Size         size,
                  AP4_ByteStream&  stream);
 
-    AP4_UI32 GetNum() const { return m_num; }
-    AP4_UI32 GetDen() const { return m_den; }
+    AP4_UI32 GetHSpacing() const { return m_hSpacing; }
+    AP4_UI32 GetVSpacing() const { return m_vSpacing; }
 
 private:
-    AP4_UI32 m_num;
-    AP4_UI32 m_den;    
+    AP4_UI32 m_hSpacing;
+    AP4_UI32 m_vSpacing;
 };
 
 #endif // _AP4_PASP_ATOM_H_
