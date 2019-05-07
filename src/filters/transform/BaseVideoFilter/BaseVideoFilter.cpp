@@ -391,8 +391,8 @@ HRESULT CBaseVideoFilter::GetMediaType(int iPosition, CMediaType* pmt)
 		ary *= 2;
 		m_aryout *= 2;
 
-		ReduceDim((LONG&)arx, (LONG&)ary);
-		ReduceDim((LONG&)m_arxout, (LONG&)m_aryout);
+		ReduceDim(arx, ary);
+		ReduceDim(m_arxout, m_aryout);
 	}
 
 	BITMAPINFOHEADER bihOut = { 0 };
@@ -460,7 +460,7 @@ HRESULT CBaseVideoFilter::SetMediaType(PIN_DIRECTION dir, const CMediaType* pmt)
 		int vsfilter = 0;
 		GetOutputSize(m_wout, m_hout, m_arx, m_ary, vsfilter);
 
-		ReduceDim((LONG&)m_arx, (LONG&)m_ary);
+		ReduceDim(m_arx, m_ary);
 	}
 
 	return __super::SetMediaType(dir, pmt);
