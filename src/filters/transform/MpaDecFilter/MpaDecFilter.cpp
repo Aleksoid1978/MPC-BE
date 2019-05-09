@@ -1811,7 +1811,6 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, const size_t size, const REFERENCE_T
 			DLog(L"CMpaDecFilter::Deliver() : corrected A/V sync by %I64d", rtJitterMin);
 			m_rtStart -= rtJitterMin;
 			m_faJitter.OffsetValues(-rtJitterMin);
-			m_bDiscontinuity = TRUE;
 		}
 	}
 
@@ -1984,7 +1983,6 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, const int size, const REFER
 			DLog(L"CMpaDecFilter::DeliverBitstream() : corrected A/V sync by %I64d", rtJitterMin);
 			m_rtStart -= rtJitterMin;
 			m_faJitter.OffsetValues(-rtJitterMin);
-			m_bDiscontinuity = TRUE;
 		}
 	}
 
