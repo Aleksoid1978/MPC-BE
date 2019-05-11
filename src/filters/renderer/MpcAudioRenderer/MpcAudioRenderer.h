@@ -59,8 +59,9 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	UINT32            m_nSampleOffset;
 
 	REFERENCE_TIME    m_rtStartTime;
-	REFERENCE_TIME    m_rtNextSampleTime;
-	REFERENCE_TIME    m_rtLastSampleTimeEnd;
+	REFERENCE_TIME    m_rtNextRenderedSampleTime;
+	REFERENCE_TIME    m_rtLastReceivedSampleTimeEnd;
+	REFERENCE_TIME    m_rtLastQueuedSampleTimeEnd;
 	REFERENCE_TIME    m_rtEstimateSlavingJitter;
 
 	BOOL              m_bUseDefaultDevice;
@@ -304,6 +305,8 @@ private:
 		int samplerate  = 0;
 	};
 	AudioFormats m_input_params, m_output_params;
+
+	void WasapiQueueAdd(CAutoPtr<CPacket> p);
 };
 
 class CMpcAudioRendererInputPin final

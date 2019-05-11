@@ -170,8 +170,9 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_hRendererNeedMoreData(nullptr)
 	, m_CurrentPacket(nullptr)
 	, m_rtStartTime(0)
-	, m_rtNextSampleTime(0)
-	, m_rtLastSampleTimeEnd(0)
+	, m_rtNextRenderedSampleTime(0)
+	, m_rtLastReceivedSampleTimeEnd(0)
+	, m_rtLastQueuedSampleTimeEnd(0)
 	, m_rtEstimateSlavingJitter(0)
 	, m_bUseDefaultDevice(FALSE)
 	, m_nSampleOffset(0)
@@ -669,7 +670,7 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME rtStart)
 	}
 
 	if (m_pAudioClock) {
-		m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtNextSampleTime);
+		m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtNextRenderedSampleTime);
 	}
 
 	return CBaseRenderer::Run(rtStart);
@@ -1331,7 +1332,7 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 		return S_FALSE;
 	}
 
-	m_rtLastSampleTimeEnd = rtStart + SamplesToTime(lSize / m_pWaveFormatExInput->nBlockAlign, m_pWaveFormatExInput) / m_dRate;
+	m_rtLastReceivedSampleTimeEnd = rtStart + SamplesToTime(lSize / m_pWaveFormatExInput->nBlockAlign, m_pWaveFormatExInput) / m_dRate;
 
 	if (!m_pRenderClient) {
 		if (!m_pAudioClient) {
@@ -1342,7 +1343,7 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 		}
 
 		if (!m_pRenderClient) {
-			m_rtNextSampleTime = rtStart + SamplesToTime(lSize / m_pWaveFormatExInput->nBlockAlign, m_pWaveFormatExInput) / m_dRate;
+			m_rtNextRenderedSampleTime = rtStart + SamplesToTime(lSize / m_pWaveFormatExInput->nBlockAlign, m_pWaveFormatExInput) / m_dRate;
 
 			REFERENCE_TIME graphTime;
 			m_pSyncClock->GetTime(&graphTime);
@@ -1365,22 +1366,22 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 	}
 
 	if (m_rtEstimateSlavingJitter > 0) {
-		const REFERENCE_TIME duration = m_rtEstimateSlavingJitter / m_dRate;
-		const UINT32 nSilenceFrames   = TimeToSamples(duration, m_pWaveFormatExOutput);
-		const UINT32 nSilenceBytes    = nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign;
+		const REFERENCE_TIME rtSilence = m_rtEstimateSlavingJitter / m_dRate;
+		const UINT32 nSilenceFrames    = TimeToSamples(rtSilence, m_pWaveFormatExOutput);
+		const UINT32 nSilenceBytes     = nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign;
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL
-		DLog(L"CMpcAudioRenderer::Transform() - Pad silence %.2f ms to minimize slaving jitter", duration / 10000.0);
+		DLog(L"CMpcAudioRenderer::Transform() - Pad silence %.2f ms to minimize slaving jitter", rtSilence / 10000.0);
 #endif
-		CAutoPtr<CPacket> pSilent(DNew CPacket());
-		pSilent->rtStart = rtStart - duration;
-		pSilent->rtStop  = rtStart;
-		pSilent->SetCount(nSilenceBytes);
-		ZeroMemory(pSilent->data(), nSilenceBytes);
+		CAutoPtr<CPacket> pSilence(DNew CPacket());
+		pSilence->rtStart = rtStart - rtSilence;
+		pSilence->rtStop  = rtStart;
+		pSilence->SetCount(nSilenceBytes);
+		ZeroMemory(pSilence->data(), nSilenceBytes);
 
-		m_rtNextSampleTime = pSilent->rtStart;
+		m_rtNextRenderedSampleTime = pSilence->rtStart;
 		m_rtEstimateSlavingJitter = 0;
 
-		m_WasapiQueue.Add(pSilent);
+		WasapiQueueAdd(pSilence);
 
 		StartAudioClient();
 	}
@@ -1497,6 +1498,7 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 	CAutoPtr<CPacket> p(DNew CPacket());
 	p->rtStart = rtStart;
 	p->rtStop  = rtStop;
+	p->bDiscontinuity = (S_OK == pMediaSample->IsDiscontinuity());
 	p->SetData(pInputBufferPointer, lSize);
 
 	if (m_bIsBitstream && m_BitstreamMode == BITSTREAM_NONE) {
@@ -1544,27 +1546,34 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 
 HRESULT CMpcAudioRenderer::PushToQueue(CAutoPtr<CPacket> p)
 {
-	if (p && !m_rtNextSampleTime && !m_WasapiQueue.GetCount()
-			&& p->rtStart > 0 && p->rtStart <= 60 * UNITS) {
-		const auto rtEstimate = m_pSyncClock->IsSlave() ? m_pSyncClock->GetPrivateTime() - m_rtStartTime : 0LL;
-		const auto rtStart = p->rtStart - rtEstimate;
-		if (rtStart > 0) {
-			const UINT32 nSilenceFrames = TimeToSamples(rtStart, m_pWaveFormatExOutput);
-			const UINT32 nSilenceBytes = nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign;
+	if (p && (!m_rtLastQueuedSampleTimeEnd || p->bDiscontinuity)) {
+		if (p->bDiscontinuity && (p->rtStop <= m_rtLastQueuedSampleTimeEnd)) {
+			DLog(L"CMpcAudioRenderer::PushToQueue() - drop [%I64d]", p->rtStart);
+			return S_OK;
+		} else if (p->rtStart > m_rtLastQueuedSampleTimeEnd) {
+			const auto rtLastTimeEnd = std::max(m_rtLastQueuedSampleTimeEnd, m_rtNextRenderedSampleTime);
+			const auto rtLastStop = (!m_rtLastQueuedSampleTimeEnd && m_pSyncClock->IsSlave()) ? m_pSyncClock->GetPrivateTime() - m_rtStartTime : rtLastTimeEnd;
+			const auto rtSilence = p->rtStart - rtLastStop;
+			if (rtSilence > 0 && rtSilence <= 60 * UNITS) {
+				const UINT32 nSilenceFrames = TimeToSamples(rtSilence, m_pWaveFormatExOutput);
+				if (nSilenceFrames > 0) {
+					const UINT32 nSilenceBytes = nSilenceFrames * m_pWaveFormatExOutput->nBlockAlign;
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL
-			DLog(L"CMpcAudioRenderer::PushToQueue() - Pad silence %.2f(%.2f) ms", rtStart / 10000.0, p->rtStart / 10000.0);
+					DLog(L"CMpcAudioRenderer::PushToQueue() - Pad silence %.2f ms before [%I64d(%I64d)]", rtSilence / 10000.0, p->rtStart, m_rtLastQueuedSampleTimeEnd);
 #endif
-			CAutoPtr<CPacket> pSilent(DNew CPacket());
-			pSilent->rtStart = p->rtStart - rtStart;
-			pSilent->rtStop = p->rtStart;
-			pSilent->SetCount(nSilenceBytes);
-			ZeroMemory(pSilent->data(), nSilenceBytes);
+					CAutoPtr<CPacket> pSilence(DNew CPacket());
+					pSilence->rtStart = p->rtStart - rtSilence;
+					pSilence->rtStop = p->rtStart;
+					pSilence->SetCount(nSilenceBytes);
+					ZeroMemory(pSilence->data(), nSilenceBytes);
 
-			m_WasapiQueue.Add(pSilent);
+					WasapiQueueAdd(pSilence);
+				}
+			}
 		}
 	}
 
-	m_WasapiQueue.Add(p);
+	WasapiQueueAdd(p);
 
 	return S_OK;
 }
@@ -2270,13 +2279,13 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 	m_rtEstimateSlavingJitter = 0;
 	if (m_filterState == State_Running) {
 		if (!m_bReleased) {
-			m_rtEstimateSlavingJitter = m_rtLastSampleTimeEnd - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
+			m_rtEstimateSlavingJitter = m_rtLastReceivedSampleTimeEnd - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
 			if (m_rtEstimateSlavingJitter < 0 || m_rtEstimateSlavingJitter > 500 * OneMillisecond) {
 				m_rtEstimateSlavingJitter = 0;
 			}
-			m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtLastSampleTimeEnd - m_rtEstimateSlavingJitter);
+			m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtLastReceivedSampleTimeEnd - m_rtEstimateSlavingJitter);
 		} else {
-			const REFERENCE_TIME rtEstimateSlavingJitter = m_rtNextSampleTime - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
+			const REFERENCE_TIME rtEstimateSlavingJitter = m_rtNextRenderedSampleTime - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
 			if (rtEstimateSlavingJitter >= OneMillisecond
 					&& rtEstimateSlavingJitter <= 500 * OneMillisecond) {
 				const DWORD dwMilliseconds = rtEstimateSlavingJitter / OneMillisecond;
@@ -2285,7 +2294,7 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 				Sleep(dwMilliseconds);
 #endif
 			}
-			m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtNextSampleTime);
+			m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtNextRenderedSampleTime);
 		}
 	}
 
@@ -2639,7 +2648,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 		dwFlags = AUDCLNT_BUFFERFLAGS_SILENT;
 
 		if (!nWasapiQueueSize && m_filterState == State_Running && !bFlushing) {
-			m_rtNextSampleTime = m_rtLastSampleTimeEnd = std::max(m_rtNextSampleTime, m_pSyncClock->GetPrivateTime() - m_rtStartTime + m_hnsBufferDuration);
+			m_rtNextRenderedSampleTime = m_rtLastReceivedSampleTimeEnd = std::max(m_rtNextRenderedSampleTime, m_pSyncClock->GetPrivateTime() - m_rtStartTime + m_hnsBufferDuration);
 		}
 	} else {
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL > 1
@@ -2659,14 +2668,14 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 			}
 
 			if (!m_nSampleOffset) {
-				const REFERENCE_TIME rtTimeDelta = m_CurrentPacket->rtStart - m_rtNextSampleTime;
+				const REFERENCE_TIME rtTimeDelta = m_CurrentPacket->rtStart - m_rtNextRenderedSampleTime;
 				if (std::abs(rtTimeDelta) > 200) {
 					m_pSyncClock->OffsetAudioClock(rtTimeDelta);
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL
 					DLog(L"CMpcAudioRenderer::RenderWasapiBuffer() - Discontinuity detected, Correct reference clock by %.2f ms", rtTimeDelta / 10000.0);
 #endif
 				}
-				m_rtNextSampleTime = m_CurrentPacket->rtStart + SamplesToTime(m_CurrentPacket->size() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
+				m_rtNextRenderedSampleTime = m_CurrentPacket->rtStart + SamplesToTime(m_CurrentPacket->size() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
 			}
 
 			const UINT32 nFilledBytes = std::min((UINT32)m_CurrentPacket->size(), nAvailableBytes - nWritenBytes);
@@ -2727,6 +2736,7 @@ void CMpcAudioRenderer::WasapiFlush()
 	m_WasapiQueue.RemoveAll();
 	m_CurrentPacket.Free();
 
+	m_rtLastQueuedSampleTimeEnd = 0;
 	m_nSampleOffset = 0;
 
 	CAutoLock cResamplerLock(&m_csResampler);
@@ -2747,8 +2757,8 @@ HRESULT CMpcAudioRenderer::EndFlush()
 
 void CMpcAudioRenderer::NewSegment()
 {
-	m_rtNextSampleTime = 0;
-	m_rtLastSampleTimeEnd = 0;
+	m_rtNextRenderedSampleTime = 0;
+	m_rtLastReceivedSampleTimeEnd = 0;
 	m_rtEstimateSlavingJitter = 0;
 
 	m_bFlushing = FALSE;
@@ -2770,7 +2780,7 @@ void CMpcAudioRenderer::WaitFinish()
 	if (!m_bIsBitstream && m_input_params.samplerate != m_output_params.samplerate) {
 		int out_samples = m_Resampler.CalcOutSamples(0);
 		if (out_samples) {
-			REFERENCE_TIME rtStart = m_rtNextSampleTime;
+			REFERENCE_TIME rtStart = m_rtNextRenderedSampleTime;
 			for (;;) {
 				BYTE* buff = DNew BYTE[out_samples * m_output_params.channels * get_bytes_per_sample(m_output_params.sf)];
 				out_samples = m_Resampler.Receive(buff, out_samples);
@@ -2959,6 +2969,12 @@ void CMpcAudioRenderer::ApplyVolumeBalance(BYTE* pData, UINT32 size)
 			break; }
 		}
 	}
+}
+
+void CMpcAudioRenderer::WasapiQueueAdd(CAutoPtr<CPacket> p)
+{
+	m_rtLastQueuedSampleTimeEnd = p->rtStart + SamplesToTime(p->size() / m_pWaveFormatExOutput->nBlockAlign, m_pWaveFormatExOutput);
+	m_WasapiQueue.Add(p);
 }
 
 CMpcAudioRendererInputPin::CMpcAudioRendererInputPin(CBaseRenderer* pRenderer, HRESULT* phr)
