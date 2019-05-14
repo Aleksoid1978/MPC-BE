@@ -236,9 +236,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		m_DeviceMode = MODE_WASAPI_SHARED;
 	}
 
-	if (m_BufferDuration != 0 && m_BufferDuration != 50 && m_BufferDuration != 100) {
-		m_BufferDuration = 50;
-	}
+	m_BufferDuration = discard(m_BufferDuration, 50, { 0, 50, 100 });
 
 	if (phr) {
 		*phr = E_FAIL;
@@ -1050,7 +1048,7 @@ STDMETHODIMP_(INT) CMpcAudioRenderer::GetWasapiMode()
 
 STDMETHODIMP CMpcAudioRenderer::SetDevicePeriod(INT nValue)
 {
-	if (nValue != 0 && nValue != 50 && nValue != 100) {
+	if (discard(nValue, -1, { 0, 50, 100 }) < 0) {
 		return E_INVALIDARG;
 	}
 
