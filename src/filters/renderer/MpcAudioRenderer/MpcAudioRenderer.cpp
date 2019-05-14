@@ -2280,14 +2280,14 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 	if (m_filterState == State_Running) {
 		if (!m_bReleased) {
 			m_rtEstimateSlavingJitter = m_rtLastReceivedSampleTimeEnd - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
-			if (m_rtEstimateSlavingJitter < 0 || m_rtEstimateSlavingJitter > 500 * OneMillisecond) {
+			if (m_rtEstimateSlavingJitter < 0 || m_rtEstimateSlavingJitter > UNITS) {
 				m_rtEstimateSlavingJitter = 0;
 			}
 			m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtLastReceivedSampleTimeEnd - m_rtEstimateSlavingJitter);
 		} else {
 			const REFERENCE_TIME rtEstimateSlavingJitter = m_rtNextRenderedSampleTime - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
 			if (rtEstimateSlavingJitter >= OneMillisecond
-					&& rtEstimateSlavingJitter <= 500 * OneMillisecond) {
+					&& rtEstimateSlavingJitter <= UNITS) {
 				const DWORD dwMilliseconds = rtEstimateSlavingJitter / OneMillisecond;
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL
 				DLog(L"CMpcAudioRenderer::CreateRenderClient() - Sleep %u ms to minimize slaving jitter", dwMilliseconds);
@@ -2300,7 +2300,7 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 
 	m_bReleased = false;
 
-	m_nMaxWasapiQueueSize = TimeToSamples(2000000LL, m_pWaveFormatExOutput) * m_pWaveFormatExOutput->nBlockAlign; // 200 ms
+	m_nMaxWasapiQueueSize = TimeToSamples(5000000LL, m_pWaveFormatExOutput) * m_pWaveFormatExOutput->nBlockAlign; // 500 ms
 
 	hr = m_pAudioClient->SetEventHandle(m_hDataEvent);
 	EXIT_ON_ERROR(hr);
@@ -2649,6 +2649,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 
 		if (!nWasapiQueueSize && m_filterState == State_Running && !bFlushing) {
 			m_rtNextRenderedSampleTime = m_rtLastReceivedSampleTimeEnd = std::max(m_rtNextRenderedSampleTime, m_pSyncClock->GetPrivateTime() - m_rtStartTime + m_hnsBufferDuration);
+			DLog(L"CMpcAudioRenderer::RenderWasapiBuffer() - internal buffer is empty, render silence to %I64d", m_rtNextRenderedSampleTime);
 		}
 	} else {
 #if defined(DEBUG_OR_LOG) && DBGLOG_LEVEL > 1
