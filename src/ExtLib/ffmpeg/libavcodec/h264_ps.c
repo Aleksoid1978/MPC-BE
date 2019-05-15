@@ -449,8 +449,17 @@ int ff_h264_decode_seq_parameter_set(GetBitContext *gb, AVCodecContext *avctx,
         sps->log2_max_poc_lsb = t + 4;
     } else if (sps->poc_type == 1) { // FIXME #define
         sps->delta_pic_order_always_zero_flag = get_bits1(gb);
-        sps->offset_for_non_ref_pic           = get_se_golomb(gb);
-        sps->offset_for_top_to_bottom_field   = get_se_golomb(gb);
+        sps->offset_for_non_ref_pic           = get_se_golomb_long(gb);
+        sps->offset_for_top_to_bottom_field   = get_se_golomb_long(gb);
+
+        if (   sps->offset_for_non_ref_pic         == INT32_MIN
+            || sps->offset_for_top_to_bottom_field == INT32_MIN
+        ) {
+            av_log(avctx, AV_LOG_ERROR,
+                   "offset_for_non_ref_pic or offset_for_top_to_bottom_field is out of range\n");
+            goto fail;
+        }
+
         sps->poc_cycle_length                 = get_ue_golomb(gb);
 
         if ((unsigned)sps->poc_cycle_length >=
@@ -460,8 +469,14 @@ int ff_h264_decode_seq_parameter_set(GetBitContext *gb, AVCodecContext *avctx,
             goto fail;
         }
 
-        for (i = 0; i < sps->poc_cycle_length; i++)
-            sps->offset_for_ref_frame[i] = get_se_golomb(gb);
+        for (i = 0; i < sps->poc_cycle_length; i++) {
+            sps->offset_for_ref_frame[i] = get_se_golomb_long(gb);
+            if (sps->offset_for_ref_frame[i] == INT32_MIN) {
+                av_log(avctx, AV_LOG_ERROR,
+                       "offset_for_ref_frame is out of range\n");
+                goto fail;
+            }
+        }
     } else if (sps->poc_type != 2) {
         av_log(avctx, AV_LOG_ERROR, "illegal POC type %d\n", sps->poc_type);
         goto fail;

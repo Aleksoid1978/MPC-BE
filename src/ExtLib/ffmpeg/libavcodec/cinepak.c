@@ -323,6 +323,9 @@ static int cinepak_predecode_check (CinepakContext *s)
     num_strips  = AV_RB16 (&s->data[8]);
     encoded_buf_size = AV_RB24(&s->data[1]);
 
+    if (s->size < encoded_buf_size * (int64_t)(100 - s->avctx->discard_damaged_percentage) / 100)
+        return AVERROR_INVALIDDATA;
+
     /* if this is the first frame, check for deviant Sega FILM data */
     if (s->sega_film_skip_bytes == -1) {
         if (!encoded_buf_size) {
@@ -352,6 +355,13 @@ static int cinepak_predecode_check (CinepakContext *s)
 
     if (s->size < 10 + s->sega_film_skip_bytes + num_strips * 12)
         return AVERROR_INVALIDDATA;
+
+    if (num_strips) {
+        const uint8_t *data = s->data + 10 + s->sega_film_skip_bytes;
+        int strip_size = AV_RB24 (data + 1);
+        if (strip_size < 12 || strip_size > encoded_buf_size)
+            return AVERROR_INVALIDDATA;
+    }
 
     return 0;
 }

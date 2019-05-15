@@ -16,34 +16,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVUTIL_TIME_INTERNAL_H
-#define AVUTIL_TIME_INTERNAL_H
+#ifndef AVCODEC_OPUSDSP_H
+#define AVCODEC_OPUSDSP_H
 
-#include <time.h>
-#include "config.h"
+#include "libavutil/common.h"
 
-#if !HAVE_GMTIME_R && !defined(gmtime_r)
-static inline struct tm *ff_gmtime_r(const time_t* clock, struct tm *result)
-{
-    struct tm *ptr = gmtime(clock);
-    if (!ptr)
-        return NULL;
-    *result = *ptr;
-    return result;
-}
-#define gmtime_r ff_gmtime_r
-#endif
+#define CELT_EMPH_COEFF 0.8500061035f
 
-#if !HAVE_LOCALTIME_R && !defined(localtime_r)
-static inline struct tm *ff_localtime_r(const time_t* clock, struct tm *result)
-{
-    struct tm *ptr = localtime(clock);
-    if (!ptr)
-        return NULL;
-    *result = *ptr;
-    return result;
-}
-#define localtime_r ff_localtime_r
-#endif
+typedef struct OpusDSP {
+    void (*postfilter)(float *data, int period, float *gains, int len);
+    float (*deemphasis)(float *out, float *in, float coeff, int len);
+} OpusDSP;
 
-#endif /* AVUTIL_TIME_INTERNAL_H */
+void ff_opus_dsp_init(OpusDSP *ctx);
+
+void ff_opus_dsp_init_x86(OpusDSP *ctx);
+void ff_opus_dsp_init_aarch64(OpusDSP *ctx);
+
+#endif /* AVCODEC_OPUSDSP_H */

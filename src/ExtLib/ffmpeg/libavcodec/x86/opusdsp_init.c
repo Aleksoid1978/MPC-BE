@@ -16,34 +16,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVUTIL_TIME_INTERNAL_H
-#define AVUTIL_TIME_INTERNAL_H
-
-#include <time.h>
 #include "config.h"
 
-#if !HAVE_GMTIME_R && !defined(gmtime_r)
-static inline struct tm *ff_gmtime_r(const time_t* clock, struct tm *result)
-{
-    struct tm *ptr = gmtime(clock);
-    if (!ptr)
-        return NULL;
-    *result = *ptr;
-    return result;
-}
-#define gmtime_r ff_gmtime_r
-#endif
+#include "libavutil/x86/cpu.h"
+#include "libavcodec/opusdsp.h"
 
-#if !HAVE_LOCALTIME_R && !defined(localtime_r)
-static inline struct tm *ff_localtime_r(const time_t* clock, struct tm *result)
-{
-    struct tm *ptr = localtime(clock);
-    if (!ptr)
-        return NULL;
-    *result = *ptr;
-    return result;
-}
-#define localtime_r ff_localtime_r
-#endif
+void ff_opus_postfilter_fma3(float *data, int period, float *gains, int len);
+float ff_opus_deemphasis_fma3(float *out, float *in, float coeff, int len);
 
-#endif /* AVUTIL_TIME_INTERNAL_H */
+av_cold void ff_opus_dsp_init_x86(OpusDSP *ctx)
+{
+    int cpu_flags = av_get_cpu_flags();
+
+    if (EXTERNAL_FMA3_FAST(cpu_flags)) {
+        ctx->postfilter = ff_opus_postfilter_fma3;
+        ctx->deemphasis = ff_opus_deemphasis_fma3;
+    }
+}
