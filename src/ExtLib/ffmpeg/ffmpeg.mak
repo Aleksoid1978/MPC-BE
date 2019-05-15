@@ -323,6 +323,7 @@ SRCS_LC = \
 	libavcodec/mjpegbdec.c \
 	libavcodec/mjpegdec.c \
 	libavcodec/mlp.c \
+	libavcodec/mlp_parse.c \
 	libavcodec/mlp_parser.c \
 	libavcodec/mlpdec.c \
 	libavcodec/mlpdsp.c \
@@ -388,6 +389,7 @@ SRCS_LC_B = \
 	libavcodec/opus_rc.c \
 	libavcodec/opus_silk.c \
 	libavcodec/opusdec.c \
+	libavcodec/opusdsp.c \
 	libavcodec/opustab.c \
 	libavcodec/parser.c \
 	libavcodec/parsers.c \
@@ -561,7 +563,7 @@ SRCS_LC_B = \
 	libavcodec/x86/mpegvideo.c \
 	libavcodec/x86/mpegvideodsp.c \
 	libavcodec/x86/mpegvideoencdsp_init.c \
-	libavcodec/x86/opus_dsp_init.c \
+	libavcodec/x86/opusdsp_init.c \
 	libavcodec/x86/pixblockdsp_init.c \
 	libavcodec/x86/pngdsp_init.c \
 	libavcodec/x86/proresdsp_init.c \
@@ -742,6 +744,7 @@ SRCS_YASM_LC = \
 	libavcodec/x86/me_cmp.asm \
 	libavcodec/x86/mlpdsp.asm \
 	libavcodec/x86/mpegvideoencdsp.asm \
+	libavcodec/x86/opusdsp.asm \
 	libavcodec/x86/pixblockdsp.asm \
 	libavcodec/x86/pngdsp.asm \
 	libavcodec/x86/proresdsp.asm \

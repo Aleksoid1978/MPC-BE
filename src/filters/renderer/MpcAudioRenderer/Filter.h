@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2018 see Authors.txt
+ * (C) 2014-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -47,13 +47,12 @@ private:
 	WORD            m_Channels           = 0;
 
 	double          m_dRate              = 1.0;
-	REFERENCE_TIME  m_rtStart            = 0;
 
 public:
 	CFilter();
 	~CFilter();
 
-	HRESULT Init(const double dRate, const WAVEFORMATEX* wfe, const REFERENCE_TIME rtStart);
+	HRESULT Init(const double dRate, const WAVEFORMATEX* wfe);
 	HRESULT Push(const CAutoPtr<CPacket>& p);
 	HRESULT Pull(CAutoPtr<CPacket>& p);
 
