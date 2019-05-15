@@ -426,8 +426,6 @@ LRESULT CALLBACK CMenuEx::MenuWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM
 					break;
 				}
 
-				DLog(L"CMenuEx::MenuWndProc() : WM_ERASEBKGND");
-
 				RECT rc;
 				::GetWindowRect(hWnd, &rc);
 				::OffsetRect(&rc, -rc.left, -rc.top);
@@ -487,8 +485,6 @@ LRESULT CALLBACK CMenuEx::MenuWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM
 				if (!MenuInfo.hbrBack) {
 					break;
 				}
-
-				DLog(L"CMenuEx::MenuWndProc() : WM_PRINT");
 
 				::CallWindowProcW(pfnOldProc, hWnd, Msg, wParam, lParam);
 
