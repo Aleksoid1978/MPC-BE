@@ -1018,11 +1018,25 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 										di = &empty;
 									}
 
-									BYTE* data         = (BYTE*)di->GetData();
-									size_t size        = (size_t)di->GetDataSize();
+									auto data = (BYTE*)di->GetData();
+									const auto size = (const size_t)di->GetDataSize();
 
-									BITMAPINFOHEADER pbmi;
-									memset(&pbmi, 0, sizeof(BITMAPINFOHEADER));
+									if (size > 9) {
+										vc_params_t params;
+										AVCParser::ParseSequenceParameterSet(data + 9, size - 9, params);
+										const auto& codecAvgTimePerFrame = params.AvgTimePerFrame;
+										const auto& bInterlaced = params.interlaced;
+
+										if (bInterlaced && codecAvgTimePerFrame) {
+											// hack for interlaced video
+											const auto factor = (double)AvgTimePerFrame / (double)codecAvgTimePerFrame;
+											if (factor > 0.4 && factor < 0.6) {
+												AvgTimePerFrame = codecAvgTimePerFrame;
+											}
+										}
+									}
+
+									BITMAPINFOHEADER pbmi = {};
 									pbmi.biSize        = sizeof(pbmi);
 									pbmi.biWidth       = (LONG)vse->GetWidth();
 									pbmi.biHeight      = (LONG)vse->GetHeight();
