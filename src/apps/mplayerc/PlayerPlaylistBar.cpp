@@ -904,6 +904,11 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 		}
 	}
 
+	if (pMsg->message == WM_MBUTTONDOWN || pMsg->message == WM_MBUTTONUP || pMsg->message == WM_MBUTTONDBLCLK) {
+		m_pMainFrame->PostMessageW(pMsg->message, pMsg->wParam, pMsg->lParam);
+		return TRUE;
+	}
+
 	if (IsWindow(pMsg->hwnd) && IsVisible() && pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST) {
 		if (pMsg->hwnd == m_REdit.GetSafeHwnd()) {
 			IsDialogMessageW(pMsg);
