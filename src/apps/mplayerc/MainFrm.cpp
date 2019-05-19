@@ -17042,6 +17042,9 @@ void CMainFrame::SetPlayState(MPC_PLAYSTATE iState)
 
 	// Prevent sleep when playing audio and/or video, but allow screensaver when only audio
 	if (!m_bAudioOnly) {
+		if (iState == PS_PLAY) {
+			mouse_event(MOUSEEVENTF_MOVE, 0, 0, 0, 0);
+		}
 		SetThreadExecutionState(iState == PS_PLAY ? ES_CONTINUOUS | ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED : ES_CONTINUOUS);
 	} else {
 		SetThreadExecutionState(iState == PS_PLAY ? ES_CONTINUOUS | ES_SYSTEM_REQUIRED : ES_CONTINUOUS);
