@@ -1,5 +1,5 @@
 /*
- * (C) 2009-2018 see Authors.txt
+ * (C) 2009-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -51,6 +51,7 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	CCritSec          m_csRender;
 	CCritSec          m_csProps;
 	CCritSec          m_csCheck;
+	CCritSec          m_csAudioClock;
 
 	CMixer            m_Resampler;
 

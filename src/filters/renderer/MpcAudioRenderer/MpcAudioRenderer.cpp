@@ -668,6 +668,7 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME rtStart)
 	}
 
 	if (m_pAudioClock) {
+		CAutoLock cAutoLock(&m_csAudioClock);
 		m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtNextRenderedSampleTime);
 	}
 
@@ -2517,6 +2518,7 @@ HRESULT CMpcAudioRenderer::StartAudioClient()
 			// from the audio source before starting the stream.
 			RenderWasapiBuffer();
 
+			CAutoLock cAutoLock(&m_csAudioClock);
 			if (FAILED(hr = m_pAudioClient->Start())) {
 				DLog(L"CMpcAudioRenderer::StartAudioClient() - start audio client failed (0x%08x)", hr);
 				return hr;
