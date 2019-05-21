@@ -178,6 +178,26 @@ STDMETHODIMP_(void) CMPCVRAllocatorPresenter::SetPosition(RECT w, RECT v)
 	}
 }
 
+STDMETHODIMP CMPCVRAllocatorPresenter::SetRotation(int rotation)
+{
+	HRESULT hr = E_NOTIMPL;
+	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
+		hr = pIExFilterConfig->SetInt("rotate", rotation);
+	}
+	return hr;
+}
+
+STDMETHODIMP_(int) CMPCVRAllocatorPresenter::GetRotation()
+{
+	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
+		int rotation = 0;
+		if (SUCCEEDED(pIExFilterConfig->GetInt("rotation", &rotation))) {
+			return rotation;
+		}
+	}
+	return 0;
+}
+
 STDMETHODIMP_(SIZE) CMPCVRAllocatorPresenter::GetVideoSize()
 {
 	SIZE size = {0, 0};
