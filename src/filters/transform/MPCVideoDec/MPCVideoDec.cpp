@@ -2812,15 +2812,15 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(AVCodecContext *
 			break;
 		// Values from newer Windows SDK (MediaFoundation)
 		case AVCOL_PRI_BT2020:
-			fmt.VideoPrimaries = 9;
+			fmt.VideoPrimaries = VIDEOPRIMARIES_BT2020;
 			break;
 		case AVCOL_PRI_SMPTE428:
 			// XYZ
-			fmt.VideoPrimaries = 10;
+			fmt.VideoPrimaries = VIDEOPRIMARIES_XYZ;
 			break;
 		case AVCOL_PRI_SMPTE431:
 			// DCI-P3
-			fmt.VideoPrimaries = 11;
+			fmt.VideoPrimaries = VIDEOPRIMARIES_DCI_P3;
 			break;
 	}
 

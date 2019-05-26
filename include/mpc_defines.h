@@ -47,16 +47,20 @@
 #define PCIV_Intel       0x8086
 #define PCIV_S3_Graphics 0x5333
 
+// values from MFVideoTransferMatrix (Win10SDK)
 #define VIDEOTRANSFERMATRIX_BT2020_10 4
 #define VIDEOTRANSFERMATRIX_BT2020_12 5
-#define VIDEOTRANSFERMATRIX_FCC       6 // non-standard
-#define VIDEOTRANSFERMATRIX_YCgCo     7 // non-standard
+// non-standard values
+#define VIDEOTRANSFERMATRIX_FCC       6
+#define VIDEOTRANSFERMATRIX_YCgCo     7
 
+// values from MFVideoPrimaries (Win10SDK)
 #define VIDEOPRIMARIES_BT2020  9
 #define VIDEOPRIMARIES_XYZ    10
 #define VIDEOPRIMARIES_DCI_P3 11
 #define VIDEOPRIMARIES_ACES   12
 
+// values from MFVideoTransferFunction (Win10SDK)
 #define VIDEOTRANSFUNC_Log_100     9
 #define VIDEOTRANSFUNC_Log_316    10
 #define VIDEOTRANSFUNC_709_sym    11
