@@ -104,6 +104,8 @@ namespace Youtube
 
 	static const YoutubeProfile YAudioProfiles[] = {
 		// AAC
+		{258, y_mp4,  y_audio,  384, L"m4a"},
+		{256, y_mp4,  y_audio,  192, L"m4a"},
 		{140, y_mp4,  y_audio,  128, L"m4a"},
 		{139, y_mp4,  y_audio,   48, L"m4a"}, // may be outdated and no longer supported
 		// Opus
