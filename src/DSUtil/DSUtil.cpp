@@ -180,17 +180,20 @@ bool IsVideoRenderer(IBaseFilter* pBF)
 
 bool IsVideoRenderer(const CLSID clsid)
 {
-	if (clsid == CLSID_OverlayMixer
-		|| clsid == CLSID_VideoMixingRenderer
-		|| clsid == CLSID_VideoMixingRenderer9
-		|| clsid == CLSID_EnhancedVideoRenderer
-		|| clsid == CLSID_EVRAllocatorPresenter
-		|| clsid == CLSID_DXRAllocatorPresenter
-		|| clsid == CLSID_madVRAllocatorPresenter || clsid == CLSID_madVR
+	if (clsid == CLSID_VideoRendererDefault
 		|| clsid == CLSID_VideoRenderer
-		|| clsid == CLSID_VideoRendererDefault
-		|| clsid == CLSID_SyncAllocatorPresenter
-		|| clsid == CLSID_MPCVR) {
+		|| clsid == CLSID_EnhancedVideoRenderer   // EVR
+		|| clsid == CLSID_EVRAllocatorPresenter   // EVR-CP
+		|| clsid == CLSID_SyncAllocatorPresenter  // Sync VR
+		|| clsid == CLSID_VideoMixingRenderer     // VMR-7
+		|| clsid == CLSID_VideoMixingRenderer9    // VMR-9
+		|| clsid == CLSID_DXR                     // Haali VR
+		|| clsid == CLSID_DXRAllocatorPresenter   // AP for Haali VR
+		|| clsid == CLSID_madVR                   // madVR
+		|| clsid == CLSID_madVRAllocatorPresenter // AP for madVR
+		|| clsid == CLSID_MPCVR                   // MPC VR
+		|| clsid == CLSID_MPCVRAllocatorPresenter // AP for MPC VR
+		|| clsid == CLSID_OverlayMixer) {
 		return true;
 	}
 
