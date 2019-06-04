@@ -1,5 +1,5 @@
 @ECHO OFF
-REM (C) 2009-2017 see Authors.txt
+REM (C) 2009-2019 see Authors.txt
 REM
 REM This file is part of MPC-BE.
 REM
@@ -31,10 +31,18 @@ FOR /f "tokens=1,2 delims=" %%K IN (
   SET "gccver=%%K" & Call :SubGCCVer %%gccver:*Z=%%
 )
 
-COPY /V /Y "%MPCBE_MINGW%\i686-w64-mingw32\lib\libmingwex.a" "lib\"
+IF EXIST "%MPCBE_MINGW%\mpcbe_libs\lib\libmingwex.a" (
+  COPY /V /Y "%MPCBE_MINGW%\mpcbe_libs\lib\libmingwex.a" "lib\"
+) ELSE (
+  COPY /V /Y "%MPCBE_MINGW%\i686-w64-mingw32\lib\libmingwex.a" "lib\"
+)
 COPY /V /Y "%MPCBE_MINGW%\lib\gcc\i686-w64-mingw32\%gccver%\libgcc.a" "lib\"
 
-COPY /V /Y "%MPCBE_MINGW%\x86_64-w64-mingw32\lib\libmingwex.a" "lib64\"
+IF EXIST "%MPCBE_MINGW%\mpcbe_libs\lib64\libmingwex.a" (
+  COPY /V /Y "%MPCBE_MINGW%\mpcbe_libs\lib64\libmingwex.a" "lib64\"
+) ELSE (
+  COPY /V /Y "%MPCBE_MINGW%\x86_64-w64-mingw32\lib\libmingwex.a" "lib64\"
+)
 COPY /V /Y "%MPCBE_MINGW%\lib\gcc\x86_64-w64-mingw32\%gccver%\libgcc.a" "lib64\"
 
 PAUSE
