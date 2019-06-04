@@ -473,35 +473,47 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 
 	if (m_bNeedCheck) {
 		m_bNeedCheck = FALSE;
+		ZeroMemory(&m_bBitstreamSupported, sizeof(m_bBitstreamSupported));
 
-		memset(&m_bBitstreamSupported, true, sizeof(m_bBitstreamSupported));
-
-		CComPtr<IPin> pPinRenderer;
-		CComPtr<IPin> pPin = m_pOutput;
-		for (CComPtr<IBaseFilter> pBF = this; pBF = GetDownStreamFilter(pBF, pPin); pPin = GetFirstPin(pBF, PINDIR_OUTPUT)) {
-			if (IsAudioWaveRenderer(pBF) && SUCCEEDED(pPin->ConnectedTo(&pPinRenderer)) && pPinRenderer) {
-				break;
+		if (m_CodecId == AV_CODEC_ID_AC3 || m_CodecId == AV_CODEC_ID_DTS || m_CodecId == AV_CODEC_ID_EAC3 || m_CodecId == AV_CODEC_ID_TRUEHD) {
+			CComPtr<IPin> pPinRenderer;
+			CComPtr<IPin> pPin = m_pOutput;
+			for (CComPtr<IBaseFilter> pBF = this; pBF = GetDownStreamFilter(pBF, pPin); pPin = GetFirstPin(pBF, PINDIR_OUTPUT)) {
+				if (IsAudioWaveRenderer(pBF) && SUCCEEDED(pPin->ConnectedTo(&pPinRenderer)) && pPinRenderer) {
+					break;
+				}
 			}
-		}
 
-		if (pPinRenderer) {
-			CMediaType mtRenderer;
-			if (SUCCEEDED(pPinRenderer->ConnectionMediaType(&mtRenderer)) && mtRenderer.pbFormat) {
-				memset(&m_bBitstreamSupported, false, sizeof(m_bBitstreamSupported));
+			if (pPinRenderer) {
+				CMediaType &mt = m_pInput->CurrentMediaType();
+				const auto wfe = (WAVEFORMATEX*)mt.pbFormat;
 
-				CMediaType mt = CreateMediaTypeSPDIF();
-				m_bBitstreamSupported[SPDIF]  = pPinRenderer->QueryAccept(&mt) == S_OK;
+				CMediaType mtRenderer;
+				if (SUCCEEDED(pPinRenderer->ConnectionMediaType(&mtRenderer)) && mtRenderer.pbFormat) {
+					CMediaType mtCheck;
+					switch (m_CodecId) {
+						case AV_CODEC_ID_AC3:
+						case AV_CODEC_ID_DTS:
+							mtCheck = CreateMediaTypeSPDIF(wfe->nSamplesPerSec);
+							m_bBitstreamSupported[SPDIF] = pPinRenderer->QueryAccept(&mtCheck) == S_OK;
 
-				mt = CreateMediaTypeHDMI(IEC61937_EAC3);
-				m_bBitstreamSupported[EAC3]   = pPinRenderer->QueryAccept(&mt) == S_OK;
+							if (m_CodecId == AV_CODEC_ID_DTS) {
+								mtCheck = CreateMediaTypeHDMI(IEC61937_DTSHD);
+								m_bBitstreamSupported[DTSHD] = pPinRenderer->QueryAccept(&mtCheck) == S_OK;
+							}
+							break;
+						case AV_CODEC_ID_EAC3:
+							mtCheck = CreateMediaTypeHDMI(IEC61937_EAC3);
+							m_bBitstreamSupported[EAC3] = pPinRenderer->QueryAccept(&mtCheck) == S_OK;
+							break;
+						case AV_CODEC_ID_TRUEHD:
+							mtCheck = CreateMediaTypeHDMI(IEC61937_TRUEHD);
+							m_bBitstreamSupported[TRUEHD] = pPinRenderer->QueryAccept(&mtCheck) == S_OK;
+							break;
+					}
 
-				mt = CreateMediaTypeHDMI(IEC61937_TRUEHD);
-				m_bBitstreamSupported[TRUEHD] = pPinRenderer->QueryAccept(&mt) == S_OK;
-
-				mt = CreateMediaTypeHDMI(IEC61937_DTSHD);
-				m_bBitstreamSupported[DTSHD]  = pPinRenderer->QueryAccept(&mt) == S_OK;
-
-				pPinRenderer->QueryAccept(&mtRenderer);
+					pPinRenderer->QueryAccept(&mtRenderer);
+				}
 			}
 		}
 	}
@@ -632,6 +644,7 @@ HRESULT CMpaDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin *pReceivePi
 		if (S_OK == pReceivePin->ConnectionMediaType(&mt)) {
 			m_Subtype = mt.subtype;
 			m_CodecId = FindCodec(m_Subtype);
+			m_bNeedCheck = TRUE;
 		}
 	}
 
