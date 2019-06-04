@@ -1347,6 +1347,7 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF(BOOL bEOF/* = FALSE*/)
 						ParseDTSHDHeader(p, sizehd, &dtshdaframe);
 						m_DTSHDProfile = dtshdaframe.param2;
 						if (m_DTSHDProfile == DCA_PROFILE_EXPRESS) {
+							DLog(L"CMpaDecFilter::ProcessDTS_SPDIF() : DTS Express is not supported, fallback to PCM decoding");
 							m_bFallBackToPCM = true;
 							return S_OK;
 						}
@@ -1392,6 +1393,12 @@ HRESULT CMpaDecFilter::ProcessDTS_SPDIF(BOOL bEOF/* = FALSE*/)
 				return hr;
 			}
 		} else {
+			if (size > BS_DTS_SIZE) {
+				DLog(L"CMpaDecFilter::ProcessDTS_SPDIF() : DTS bitrate is too high, fallback to PCM decoding");
+				m_bFallBackToPCM = true;
+				return S_OK;
+			}
+
 			BYTE type;
 			switch (aframe.samples) {
 				case  512:
