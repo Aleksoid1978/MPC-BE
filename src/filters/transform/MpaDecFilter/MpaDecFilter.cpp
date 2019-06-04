@@ -72,6 +72,7 @@
 
 #define BS_HEADER_SIZE          8
 #define BS_AC3_SIZE          6144
+#define BS_DTS_SIZE          2048
 #define BS_EAC3_SIZE        24576                       // 6144 for DD Plus * 4 for IEC 60958 frames
 #define BS_MAT_FRAME_SIZE   61424                       // MAT frame size
 #define BS_MAT_TRUEHD_SIZE  (BS_MAT_FRAME_SIZE + 8 + 8) // 8 header bytes + 61424 of MAT data + 8 zero byte
@@ -1883,10 +1884,11 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, const int size, const REFER
 	ClearCacheTimeStamp();
 
 	HRESULT hr;
-	WORD subtype  = 0;
-	bool isDTSWAV = false;
-	bool isHDMI   = false;
-	int  length   = 0;
+	WORD subtype   = 0;
+	bool isDTSWAV  = false;
+	bool isDTSFull = false;
+	bool isHDMI    = false;
+	int  length    = 0;
 
 	switch (type) {
 		case IEC61937_AC3:
@@ -1898,8 +1900,9 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, const int size, const REFER
 			if (sample_rate == 44100 && size == samples * 4) { // DTSWAV
 				length = size;
 				isDTSWAV = true;
-			} else while (length < size + 16) {
-				length += 2048;
+			} else {
+				length = BS_DTS_SIZE;
+				isDTSFull = (length == size);
 			}
 			break;
 		case IEC61937_DTSHD:
@@ -1939,6 +1942,8 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, const int size, const REFER
 
 	if (isDTSWAV) {
 		memcpy(pDataOut, pBuff, size);
+	} else if (isDTSFull) {
+		_swab((char*)pBuff, (char*)pDataOut, size);
 	} else {
 		memset(pDataOut + BS_HEADER_SIZE + size, 0, length - (BS_HEADER_SIZE + size)); // Fill after the input buffer with zeros if any extra bytes
 
