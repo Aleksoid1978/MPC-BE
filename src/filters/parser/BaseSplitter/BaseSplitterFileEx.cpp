@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1434,6 +1434,10 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt/* = nullptr*/
 bool CBaseSplitterFileEx::Read(avchdr& h, int len, std::vector<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
 {
 	if (pData.empty()) {
+		if (len > 192) {
+			return false;
+		}
+
 		static BYTE tmp[192] = {};
 		ByteRead(tmp, len);
 
@@ -1590,6 +1594,10 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt/* = nullptr*
 bool CBaseSplitterFileEx::Read(hevchdr& h, int len, std::vector<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
 {
 	if (pData.empty()) {
+		if (len > 192) {
+			return false;
+		}
+
 		static BYTE tmp[192] = {};
 		ByteRead(tmp, len);
 
