@@ -1434,16 +1434,12 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, CMediaType* pmt/* = nullptr*/
 bool CBaseSplitterFileEx::Read(avchdr& h, int len, std::vector<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
 {
 	if (pData.empty()) {
-		if (len > 192) {
-			return false;
-		}
-
-		static BYTE tmp[192] = {};
-		ByteRead(tmp, len);
+		m_tmpBuffer.ExpandSize(len);
+		ByteRead(m_tmpBuffer.Data(), len);
 
 		NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
 		CH264Nalu Nalu;
-		Nalu.SetBuffer(tmp, len);
+		Nalu.SetBuffer(m_tmpBuffer.Data(), len);
 		while (!IS_SPS(nalu_type)
 				&& Nalu.ReadNext()) {
 			nalu_type = Nalu.GetType();
@@ -1454,7 +1450,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, int len, std::vector<BYTE>& pData, CMe
 		}
 
 		pData.resize(len);
-		memcpy(pData.data(), tmp, len);
+		memcpy(pData.data(), m_tmpBuffer.Data(), len);
 	} else {
 		const size_t dataLen = pData.size();
 		pData.resize(dataLen + len);
@@ -1594,16 +1590,12 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, CMediaType* pmt/* = nullptr*
 bool CBaseSplitterFileEx::Read(hevchdr& h, int len, std::vector<BYTE>& pData, CMediaType* pmt/* = nullptr*/)
 {
 	if (pData.empty()) {
-		if (len > 192) {
-			return false;
-		}
-
-		static BYTE tmp[192] = {};
-		ByteRead(tmp, len);
+		m_tmpBuffer.ExpandSize(len);
+		ByteRead(m_tmpBuffer.Data(), len);
 
 		NALU_TYPE nalu_type = NALU_TYPE_UNKNOWN;
 		CH265Nalu Nalu;
-		Nalu.SetBuffer(tmp, len);
+		Nalu.SetBuffer(m_tmpBuffer.Data(), len);
 		while (nalu_type != NALU_TYPE_HEVC_VPS && Nalu.ReadNext()) {
 			nalu_type = Nalu.GetType();
 		}
@@ -1613,7 +1605,7 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, int len, std::vector<BYTE>& pData, CM
 		}
 
 		pData.resize(len);
-		memcpy(pData.data(), tmp, len);
+		memcpy(pData.data(), m_tmpBuffer.Data(), len);
 	} else {
 		const size_t dataLen = pData.size();
 		pData.resize(dataLen + len);
@@ -2034,7 +2026,7 @@ bool CBaseSplitterFileEx::ReadDVDALPCMHdr(CMediaType* pmt)
 		}
 
 		fmt.wfe.nAvgBytesPerSec = (
-			channels1[h.groupassignment] * fmt.wfe.nSamplesPerSec * fmt.wfe.wBitsPerSample + 
+			channels1[h.groupassignment] * fmt.wfe.nSamplesPerSec * fmt.wfe.wBitsPerSample +
 			channels2[h.groupassignment] * fmt.nSamplesPerSec2 * fmt.wBitsPerSample2) / 8;
 
 		fmt.wfe.nBlockAlign = 2 * fmt.wfe.nAvgBytesPerSec / fmt.wfe.nSamplesPerSec;
