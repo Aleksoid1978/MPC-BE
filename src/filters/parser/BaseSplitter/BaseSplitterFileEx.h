@@ -23,6 +23,7 @@
 
 #include "BaseSplitterFile.h"
 #include "../../../DSUtil/Mpeg2Def.h"
+#include "../../../DSUtil/SimpleBuffer.h"
 #include "../../../DSUtil/VideoParser.h"
 
 #if (0)
@@ -33,6 +34,8 @@
 
 class CBaseSplitterFileEx : public CBaseSplitterFile
 {
+	CSimpleBuffer<BYTE> m_tmpBuffer;
+
 public:
 	CBaseSplitterFileEx(IAsyncReader* pReader, HRESULT& hr, int fmode = FM_FILE);
 	virtual ~CBaseSplitterFileEx();
