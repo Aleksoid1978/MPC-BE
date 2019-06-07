@@ -1337,6 +1337,8 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 		}
 
 		if (!m_pRenderClient) {
+			m_bReleased = false;
+
 			if (m_rtRenewStart == INVALID_TIME) {
 				m_rtRenewStart = GetPerfCounter();
 			}
