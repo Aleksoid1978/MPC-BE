@@ -64,7 +64,6 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	REFERENCE_TIME    m_rtLastReceivedSampleTimeEnd;
 	REFERENCE_TIME    m_rtLastQueuedSampleTimeEnd;
 	REFERENCE_TIME    m_rtEstimateSlavingJitter;
-	REFERENCE_TIME    m_rtRenewStart;
 
 	BOOL              m_bUseDefaultDevice;
 

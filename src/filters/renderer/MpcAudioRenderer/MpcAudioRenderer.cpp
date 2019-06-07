@@ -174,7 +174,6 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_rtLastReceivedSampleTimeEnd(0)
 	, m_rtLastQueuedSampleTimeEnd(0)
 	, m_rtEstimateSlavingJitter(0)
-	, m_rtRenewStart(INVALID_TIME)
 	, m_bUseDefaultDevice(FALSE)
 	, m_nSampleOffset(0)
 	, m_bUseCrossFeed(FALSE)
@@ -1328,6 +1327,8 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 		return S_FALSE;
 	}
 
+	m_rtLastReceivedSampleTimeEnd = rtStart + SamplesToTime(lSize / m_pWaveFormatExInput->nBlockAlign, m_pWaveFormatExInput) / m_dRate;
+
 	if (!m_pRenderClient) {
 		if (!m_pAudioClient) {
 			InitAudioClient();
@@ -1339,12 +1340,9 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 		if (!m_pRenderClient) {
 			m_bReleased = false;
 
-			if (m_rtRenewStart == INVALID_TIME) {
-				m_rtRenewStart = GetPerfCounter();
-			}
+			m_rtNextRenderedSampleTime = rtStart + SamplesToTime(lSize / m_pWaveFormatExInput->nBlockAlign, m_pWaveFormatExInput) / m_dRate;
 
-			const REFERENCE_TIME duration = SamplesToTime(lSize / m_pWaveFormatExInput->nBlockAlign, m_pWaveFormatExInput) / m_dRate;
-			m_rtNextRenderedSampleTime += duration;
+			const auto duration = m_rtStartTime + rtStart - m_pSyncClock->GetPrivateTime() - m_hnsBufferDuration;
 			if (duration >= OneMillisecond) {
 				const DWORD dwMilliseconds = duration / OneMillisecond;
 				DLog(L"CMpcAudioRenderer::Transform() : sleep %u ms", dwMilliseconds);
@@ -1354,9 +1352,6 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 			return S_FALSE;
 		}
 	}
-
-	m_rtLastReceivedSampleTimeEnd = rtStart + SamplesToTime(lSize / m_pWaveFormatExInput->nBlockAlign, m_pWaveFormatExInput) / m_dRate;
-	m_rtRenewStart = INVALID_TIME;
 
 	CheckPointer(m_pWaveFormatExInput, S_FALSE);
 	CheckPointer(m_pWaveFormatExOutput, S_FALSE);
@@ -2279,16 +2274,11 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 	m_rtEstimateSlavingJitter = 0;
 	if (m_filterState == State_Running) {
 		if (!m_bReleased) {
-			REFERENCE_TIME rtRenewDuration = 0;
-			if (m_rtRenewStart != INVALID_TIME) {
-				rtRenewDuration = GetPerfCounter() - m_rtRenewStart;
-			}
-			const auto rtClockOffset = m_rtLastReceivedSampleTimeEnd + rtRenewDuration;
-			m_rtEstimateSlavingJitter = rtClockOffset - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
+			m_rtEstimateSlavingJitter = m_rtLastReceivedSampleTimeEnd - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
 			if (m_rtEstimateSlavingJitter < 0 || m_rtEstimateSlavingJitter > UNITS) {
 				m_rtEstimateSlavingJitter = 0;
 			}
-			m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + rtClockOffset - m_rtEstimateSlavingJitter);
+			m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtLastReceivedSampleTimeEnd - m_rtEstimateSlavingJitter);
 		} else {
 			const REFERENCE_TIME rtEstimateSlavingJitter = m_rtNextRenderedSampleTime - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
 			if (rtEstimateSlavingJitter >= OneMillisecond
@@ -2303,7 +2293,6 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 		}
 	}
 
-	m_rtRenewStart = INVALID_TIME;
 	m_bReleased = false;
 
 	m_nMaxWasapiQueueSize = TimeToSamples(5000000LL, m_pWaveFormatExOutput) * m_pWaveFormatExOutput->nBlockAlign; // 500 ms
@@ -2768,7 +2757,6 @@ void CMpcAudioRenderer::NewSegment()
 	m_rtNextRenderedSampleTime = 0;
 	m_rtLastReceivedSampleTimeEnd = 0;
 	m_rtEstimateSlavingJitter = 0;
-	m_rtRenewStart = INVALID_TIME;
 
 	m_bFlushing = FALSE;
 }
