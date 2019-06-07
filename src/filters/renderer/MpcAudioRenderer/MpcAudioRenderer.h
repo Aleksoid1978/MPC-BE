@@ -64,6 +64,7 @@ class __declspec(uuid("601D2A2B-9CDE-40bd-8650-0485E3522727"))
 	REFERENCE_TIME    m_rtLastReceivedSampleTimeEnd;
 	REFERENCE_TIME    m_rtLastQueuedSampleTimeEnd;
 	REFERENCE_TIME    m_rtEstimateSlavingJitter;
+	REFERENCE_TIME    m_rtRenewStart;
 
 	BOOL              m_bUseDefaultDevice;
 
@@ -162,7 +163,7 @@ public:
 	STDMETHODIMP_(INT)            GetWasapiMode() override;
 	STDMETHODIMP                  SetDevicePeriod(INT nValue) override;
 	STDMETHODIMP_(INT)            GetDevicePeriod() override;
-	STDMETHODIMP                  SetDeviceId(CString pDeviceId) override;
+	STDMETHODIMP                  SetDeviceId(const CString& pDeviceId) override;
 	STDMETHODIMP_(CString)        GetDeviceId() override;
 	STDMETHODIMP_(UINT)           GetMode() override;
 	STDMETHODIMP                  GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut) override;

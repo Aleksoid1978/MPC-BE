@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2017 see Authors.txt
+ * (C) 2010-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -47,7 +47,7 @@ public IUnknown {
 	STDMETHOD_(INT, GetWasapiMode()) PURE;
 	STDMETHOD(SetDevicePeriod(INT nValue)) PURE;
 	STDMETHOD_(INT, GetDevicePeriod()) PURE;
-	STDMETHOD(SetDeviceId(CString pDeviceId)) PURE;
+	STDMETHOD(SetDeviceId(const CString& pDeviceId)) PURE;
 	STDMETHOD_(CString, GetDeviceId()) PURE;
 	STDMETHOD_(UINT, GetMode()) PURE;
 	STDMETHOD(GetStatus(WAVEFORMATEX** ppWfxIn, WAVEFORMATEX** ppWfxOut)) PURE;

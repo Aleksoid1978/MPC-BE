@@ -174,6 +174,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_rtLastReceivedSampleTimeEnd(0)
 	, m_rtLastQueuedSampleTimeEnd(0)
 	, m_rtEstimateSlavingJitter(0)
+	, m_rtRenewStart(INVALID_TIME)
 	, m_bUseDefaultDevice(FALSE)
 	, m_nSampleOffset(0)
 	, m_bUseCrossFeed(FALSE)
@@ -667,7 +668,7 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME rtStart)
 		NewSegment();
 	}
 
-	if (m_pAudioClock) {
+	if (m_pAudioClock && !m_pSyncClock->IsSlave()) {
 		CAutoLock cAutoLock(&m_csAudioClock);
 		m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtNextRenderedSampleTime);
 	}
@@ -892,7 +893,6 @@ STDMETHODIMP CMpcAudioRenderer::Count(DWORD* pcStreams)
 	return AudioDevices::GetActiveAudioDevices(NULL, (UINT*)pcStreams, FALSE);
 }
 
-
 STDMETHODIMP CMpcAudioRenderer::Info(long lIndex, AM_MEDIA_TYPE** ppmt, DWORD* pdwFlags, LCID* plcid, DWORD* pdwGroup, WCHAR** ppszName, IUnknown** ppObject, IUnknown** ppUnk)
 {
 	AudioDevices::deviceList_t deviceList;
@@ -959,7 +959,6 @@ STDMETHODIMP CMpcAudioRenderer::Enable(long lIndex, DWORD dwFlags)
 
 	return SetDeviceId(deviceList[lIndex].second);
 }
-
 
 // === ISpecifyPropertyPages2
 STDMETHODIMP CMpcAudioRenderer::GetPages(CAUUID* pPages)
@@ -1071,30 +1070,28 @@ STDMETHODIMP_(INT) CMpcAudioRenderer::GetDevicePeriod()
 	return (INT)m_BufferDuration;
 }
 
-STDMETHODIMP CMpcAudioRenderer::SetDeviceId(CString pDeviceId)
+STDMETHODIMP CMpcAudioRenderer::SetDeviceId(const CString& pDeviceId)
 {
 	CAutoLock cAutoLock(&m_csProps);
 
-	if (m_pAudioClient) {
-		CString deviceIdSrc = m_strCurrentDeviceId;
-		CString deviceIdDst = pDeviceId;
+	auto deviceIdSrc = m_strCurrentDeviceId;
+	auto deviceIdDst = pDeviceId;
 
-		if (deviceIdSrc != deviceIdDst
-				&& (deviceIdSrc.IsEmpty() || deviceIdDst.IsEmpty())) {
-			AudioDevices::device_t device;
-			AudioDevices::GetDefaultAudioDevice(device);
+	if (deviceIdSrc != deviceIdDst
+			&& (deviceIdSrc.IsEmpty() || deviceIdDst.IsEmpty())) {
+		AudioDevices::device_t device;
+		AudioDevices::GetDefaultAudioDevice(device);
 
-			if (deviceIdSrc.IsEmpty()) {
-				deviceIdSrc = device.second;
-			}
-			if (deviceIdDst.IsEmpty()) {
-				deviceIdDst = device.second;
-			}
+		if (deviceIdSrc.IsEmpty()) {
+			deviceIdSrc = device.second;
 		}
-
-		if (deviceIdSrc != deviceIdDst) {
-			SetReinitializeAudioDevice(TRUE);
+		if (deviceIdDst.IsEmpty()) {
+			deviceIdDst = device.second;
 		}
+	}
+
+	if (deviceIdSrc != deviceIdDst) {
+		SetReinitializeAudioDevice(TRUE);
 	}
 
 	m_DeviceId = pDeviceId;
@@ -1331,8 +1328,6 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 		return S_FALSE;
 	}
 
-	m_rtLastReceivedSampleTimeEnd = rtStart + SamplesToTime(lSize / m_pWaveFormatExInput->nBlockAlign, m_pWaveFormatExInput) / m_dRate;
-
 	if (!m_pRenderClient) {
 		if (!m_pAudioClient) {
 			InitAudioClient();
@@ -1342,20 +1337,24 @@ HRESULT CMpcAudioRenderer::Transform(IMediaSample *pMediaSample)
 		}
 
 		if (!m_pRenderClient) {
-			m_rtNextRenderedSampleTime = rtStart + SamplesToTime(lSize / m_pWaveFormatExInput->nBlockAlign, m_pWaveFormatExInput) / m_dRate;
+			if (m_rtRenewStart == INVALID_TIME) {
+				m_rtRenewStart = GetPerfCounter();
+			}
 
-			REFERENCE_TIME graphTime;
-			m_pSyncClock->GetTime(&graphTime);
-
-			const REFERENCE_TIME duration = m_rtStartTime + rtStart - graphTime - m_hnsBufferDuration;
+			const REFERENCE_TIME duration = SamplesToTime(lSize / m_pWaveFormatExInput->nBlockAlign, m_pWaveFormatExInput) / m_dRate;
+			m_rtNextRenderedSampleTime += duration;
 			if (duration >= OneMillisecond) {
 				const DWORD dwMilliseconds = duration / OneMillisecond;
+				DLog(L"CMpcAudioRenderer::Transform() : sleep %u ms", dwMilliseconds);
 				WaitForMultipleObjects(2, handles, FALSE, dwMilliseconds);
 			}
 
 			return S_FALSE;
 		}
 	}
+
+	m_rtLastReceivedSampleTimeEnd = rtStart + SamplesToTime(lSize / m_pWaveFormatExInput->nBlockAlign, m_pWaveFormatExInput) / m_dRate;
+	m_rtRenewStart = INVALID_TIME;
 
 	CheckPointer(m_pWaveFormatExInput, S_FALSE);
 	CheckPointer(m_pWaveFormatExOutput, S_FALSE);
@@ -2278,11 +2277,16 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 	m_rtEstimateSlavingJitter = 0;
 	if (m_filterState == State_Running) {
 		if (!m_bReleased) {
-			m_rtEstimateSlavingJitter = m_rtLastReceivedSampleTimeEnd - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
+			REFERENCE_TIME rtRenewDuration = 0;
+			if (m_rtRenewStart != INVALID_TIME) {
+				rtRenewDuration = GetPerfCounter() - m_rtRenewStart;
+			}
+			const auto rtClockOffset = m_rtLastReceivedSampleTimeEnd + rtRenewDuration;
+			m_rtEstimateSlavingJitter = rtClockOffset - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
 			if (m_rtEstimateSlavingJitter < 0 || m_rtEstimateSlavingJitter > UNITS) {
 				m_rtEstimateSlavingJitter = 0;
 			}
-			m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + m_rtLastReceivedSampleTimeEnd - m_rtEstimateSlavingJitter);
+			m_pSyncClock->Slave(m_pAudioClock, m_rtStartTime + rtClockOffset - m_rtEstimateSlavingJitter);
 		} else {
 			const REFERENCE_TIME rtEstimateSlavingJitter = m_rtNextRenderedSampleTime - (m_pSyncClock->GetPrivateTime() - m_rtStartTime) + GetAudioPosition();
 			if (rtEstimateSlavingJitter >= OneMillisecond
@@ -2297,6 +2301,7 @@ HRESULT CMpcAudioRenderer::CreateRenderClient(WAVEFORMATEX *pWaveFormatEx, const
 		}
 	}
 
+	m_rtRenewStart = INVALID_TIME;
 	m_bReleased = false;
 
 	m_nMaxWasapiQueueSize = TimeToSamples(5000000LL, m_pWaveFormatExOutput) * m_pWaveFormatExOutput->nBlockAlign; // 500 ms
@@ -2761,6 +2766,7 @@ void CMpcAudioRenderer::NewSegment()
 	m_rtNextRenderedSampleTime = 0;
 	m_rtLastReceivedSampleTimeEnd = 0;
 	m_rtEstimateSlavingJitter = 0;
+	m_rtRenewStart = INVALID_TIME;
 
 	m_bFlushing = FALSE;
 }
