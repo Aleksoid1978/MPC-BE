@@ -268,8 +268,8 @@ HRESULT CD3DFont::InitDeviceObjects( LPDIRECT3DDEVICE9 pd3dDevice )
 
 	// Create a new texture for the font
 	hr = m_pd3dDevice->CreateTexture( m_dwTexWidth, m_dwTexHeight, 1,
-									  0, D3DFMT_A4R4G4B4,
-									  D3DPOOL_MANAGED, &m_pTexture, nullptr );
+									  D3DUSAGE_DYNAMIC, D3DFMT_A4R4G4B4,
+									  D3DPOOL_DEFAULT, &m_pTexture, nullptr );
 	if ( FAILED(hr) ) {
 		goto LCleanReturn;
 	}
@@ -304,33 +304,29 @@ HRESULT CD3DFont::InitDeviceObjects( LPDIRECT3DDEVICE9 pd3dDevice )
 
 	// Lock the surface and write the alpha values for the set pixels
 	D3DLOCKED_RECT d3dlr;
-	m_pTexture->LockRect( 0, &d3dlr, 0, 0 );
-	BYTE* pDstRow;
-	pDstRow = (BYTE*)d3dlr.pBits;
-	BYTE bAlpha; // 4-bit measure of pixel intensity
-	DWORD x, y;
+	hr = m_pTexture->LockRect(0, &d3dlr, nullptr, 0);
+	if (S_OK == hr) {
+		BYTE* pDstRow = (BYTE*)d3dlr.pBits;
 
-	for ( y=0; y < m_dwTexHeight; y++ ) {
-		WORD* pDst16 = (WORD*)pDstRow;
-		for ( x=0; x < m_dwTexWidth; x++ ) {
-			bAlpha = (BYTE)((pBitmapBits[m_dwTexWidth*y + x] & 0xff) >> 4);
-			if (bAlpha > 0) {
-				*pDst16++ = (WORD) ((bAlpha << 12) | 0x0fff);
-			} else {
-				*pDst16++ = 0x0000;
+		for (DWORD y = 0; y < m_dwTexHeight; y++) {
+			uint16_t* pDst16 = (uint16_t*)pDstRow;
+			for (DWORD x = 0; x < m_dwTexWidth; x++) {
+				// 4-bit measure of pixel intensity
+				BYTE bAlpha = (BYTE)(pBitmapBits[m_dwTexWidth*y + x] & 0xf0);
+				if (bAlpha) {
+					*pDst16++ = (uint16_t)((bAlpha << 8) | 0x0fff);
+				} else {
+					*pDst16++ = 0x0000;
+				}
 			}
+			pDstRow += d3dlr.Pitch;
 		}
-		pDstRow += d3dlr.Pitch;
-	}
 
-	hr = S_OK;
-
-	// Done updating texture, so clean up used objects
-LCleanReturn:
-	if ( m_pTexture ) {
 		m_pTexture->UnlockRect(0);
 	}
 
+	// Done updating texture, so clean up used objects
+LCleanReturn:
 	SelectObject( hDC, hbmOld );
 	SelectObject( hDC, hFontOld );
 	DeleteObject( hbmBitmap );
