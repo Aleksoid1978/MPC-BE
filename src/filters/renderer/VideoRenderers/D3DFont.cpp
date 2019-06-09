@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -112,8 +112,8 @@ HRESULT CD3DFont::CreateGDIFont( HDC hDC, HFONT* pFont )
 {
 	// Create a font.  By specifying ANTIALIASED_QUALITY, we might get an
 	// antialiased font, but this is not guaranteed.
-	INT nHeight    = -MulDiv( m_dwFontHeight,
-							  (INT)(GetDeviceCaps(hDC, LOGPIXELSY) * m_fTextScale),
+	int nHeight    = -MulDiv( m_dwFontHeight,
+							  (int)(GetDeviceCaps(hDC, LOGPIXELSY) * m_fTextScale),
 							  72 );
 	DWORD dwBold   = (m_dwFontFlags & D3DFONT_BOLD)   ? FW_BOLD : FW_NORMAL;
 	DWORD dwItalic = (m_dwFontFlags & D3DFONT_ITALIC) ? TRUE    : FALSE;
@@ -275,12 +275,12 @@ HRESULT CD3DFont::InitDeviceObjects( LPDIRECT3DDEVICE9 pd3dDevice )
 	}
 
 	// Prepare to create a bitmap
-	DWORD*      pBitmapBits;
+	DWORD* pBitmapBits;
 	BITMAPINFO bmi;
 	ZeroMemory( &bmi.bmiHeader, sizeof(BITMAPINFOHEADER) );
 	bmi.bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);
-	bmi.bmiHeader.biWidth       =  (int)m_dwTexWidth;
-	bmi.bmiHeader.biHeight      = -(int)m_dwTexHeight;
+	bmi.bmiHeader.biWidth       =  (LONG)m_dwTexWidth;
+	bmi.bmiHeader.biHeight      = -(LONG)m_dwTexHeight;
 	bmi.bmiHeader.biPlanes      = 1;
 	bmi.bmiHeader.biCompression = BI_RGB;
 	bmi.bmiHeader.biBitCount    = 32;
@@ -304,7 +304,7 @@ HRESULT CD3DFont::InitDeviceObjects( LPDIRECT3DDEVICE9 pd3dDevice )
 
 	// Lock the surface and write the alpha values for the set pixels
 	D3DLOCKED_RECT d3dlr;
-	hr = m_pTexture->LockRect(0, &d3dlr, nullptr, 0);
+	hr = m_pTexture->LockRect(0, &d3dlr, nullptr, D3DLOCK_DISCARD);
 	if (S_OK == hr) {
 		BYTE* pDstRow = (BYTE*)d3dlr.pBits;
 
@@ -516,7 +516,7 @@ HRESULT CD3DFont::GetTextExtent( const WCHAR* strText, SIZE* pSize )
 //       fraction of the viewport, even if the screen or window size changes.
 //-----------------------------------------------------------------------------
 HRESULT CD3DFont::DrawTextScaled( FLOAT x, FLOAT y, FLOAT z,
-								  FLOAT fXScale, FLOAT fYScale, DWORD dwColor,
+								  FLOAT fXScale, FLOAT fYScale, D3DCOLOR color,
 								  const WCHAR* strText, DWORD dwFlags )
 {
 	if ( m_pd3dDevice == nullptr ) {
@@ -609,12 +609,12 @@ HRESULT CD3DFont::DrawTextScaled( FLOAT x, FLOAT y, FLOAT z,
 		h *= (fYScale*vp.Height)/fLineHeight;
 
 		if ( c != ' ' ) {
-			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+0-0.5f,sy+h-0.5f,sz,rhw), dwColor, tx1, ty2 );
-			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+0-0.5f,sy+0-0.5f,sz,rhw), dwColor, tx1, ty1 );
-			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+w-0.5f,sy+h-0.5f,sz,rhw), dwColor, tx2, ty2 );
-			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+w-0.5f,sy+0-0.5f,sz,rhw), dwColor, tx2, ty1 );
-			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+w-0.5f,sy+h-0.5f,sz,rhw), dwColor, tx2, ty2 );
-			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+0-0.5f,sy+0-0.5f,sz,rhw), dwColor, tx1, ty1 );
+			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+0-0.5f,sy+h-0.5f,sz,rhw), color, tx1, ty2 );
+			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+0-0.5f,sy+0-0.5f,sz,rhw), color, tx1, ty1 );
+			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+w-0.5f,sy+h-0.5f,sz,rhw), color, tx2, ty2 );
+			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+w-0.5f,sy+0-0.5f,sz,rhw), color, tx2, ty1 );
+			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+w-0.5f,sy+h-0.5f,sz,rhw), color, tx2, ty2 );
+			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+0-0.5f,sy+0-0.5f,sz,rhw), color, tx1, ty1 );
 			dwNumTriangles += 2;
 
 			if ( dwNumTriangles*3 > (MAX_NUM_VERTICES-6) ) {
@@ -647,7 +647,7 @@ HRESULT CD3DFont::DrawTextScaled( FLOAT x, FLOAT y, FLOAT z,
 // Name: DrawText()
 // Desc: Draws 2D text. Note that sx and sy are in pixels
 //-----------------------------------------------------------------------------
-HRESULT CD3DFont::DrawText( FLOAT sx, FLOAT sy, DWORD dwColor,
+HRESULT CD3DFont::DrawText( FLOAT sx, FLOAT sy, D3DCOLOR color,
 							const WCHAR* strText, DWORD dwFlags )
 {
 	if ( m_pd3dDevice == nullptr ) {
@@ -731,12 +731,12 @@ HRESULT CD3DFont::DrawText( FLOAT sx, FLOAT sy, DWORD dwColor,
 		FLOAT h = (ty2-ty1) * m_dwTexHeight / m_fTextScale;
 
 		if ( c != ' ' ) {
-			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+0-0.5f,sy+h-0.5f,0.9f,1.0f), dwColor, tx1, ty2 );
-			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+0-0.5f,sy+0-0.5f,0.9f,1.0f), dwColor, tx1, ty1 );
-			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+w-0.5f,sy+h-0.5f,0.9f,1.0f), dwColor, tx2, ty2 );
-			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+w-0.5f,sy+0-0.5f,0.9f,1.0f), dwColor, tx2, ty1 );
-			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+w-0.5f,sy+h-0.5f,0.9f,1.0f), dwColor, tx2, ty2 );
-			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+0-0.5f,sy+0-0.5f,0.9f,1.0f), dwColor, tx1, ty1 );
+			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+0-0.5f,sy+h-0.5f,0.9f,1.0f), color, tx1, ty2 );
+			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+0-0.5f,sy+0-0.5f,0.9f,1.0f), color, tx1, ty1 );
+			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+w-0.5f,sy+h-0.5f,0.9f,1.0f), color, tx2, ty2 );
+			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+w-0.5f,sy+0-0.5f,0.9f,1.0f), color, tx2, ty1 );
+			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+w-0.5f,sy+h-0.5f,0.9f,1.0f), color, tx2, ty2 );
+			*pVertices++ = InitFont2DVertex( DirectX::XMFLOAT4(sx+0-0.5f,sy+0-0.5f,0.9f,1.0f), color, tx1, ty1 );
 			dwNumTriangles += 2;
 
 			if ( dwNumTriangles*3 > (MAX_NUM_VERTICES-6) ) {

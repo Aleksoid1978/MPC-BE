@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2018 see Authors.txt
+ * (C) 2006-2019 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,18 +36,19 @@
 
 class CD3DFont
 {
-	WCHAR	m_strFontName[80];				// Font properties
-	DWORD	m_dwFontHeight;
-	DWORD	m_dwFontFlags;
+	// Font properties
+	WCHAR m_strFontName[80];
+	DWORD m_dwFontHeight;
+	DWORD m_dwFontFlags;
 
-	LPDIRECT3DDEVICE9		m_pd3dDevice;	// A D3DDevice used for rendering
-	LPDIRECT3DTEXTURE9		m_pTexture;		// The d3d texture for this font
-	LPDIRECT3DVERTEXBUFFER9	m_pVB;			// VertexBuffer for rendering text
-	DWORD m_dwTexWidth;						// Texture dimensions
+	LPDIRECT3DDEVICE9       m_pd3dDevice; // A D3DDevice used for rendering
+	LPDIRECT3DTEXTURE9      m_pTexture;   // The d3d texture for this font
+	LPDIRECT3DVERTEXBUFFER9 m_pVB;        // VertexBuffer for rendering text
+	DWORD m_dwTexWidth;                   // Texture dimensions
 	DWORD m_dwTexHeight;
 	FLOAT m_fTextScale;
 	FLOAT m_fTexCoords[128-32][4];
-	DWORD m_dwSpacing;						// Character pixel spacing per side
+	DWORD m_dwSpacing;                    // Character pixel spacing per side
 
 	// Stateblocks for setting and restoring render states
 	LPDIRECT3DSTATEBLOCK9 m_pStateBlockSaved;
@@ -58,10 +59,10 @@ class CD3DFont
 
 public:
 	// 2D and 3D text drawing functions
-	HRESULT DrawText( FLOAT x, FLOAT y, DWORD dwColor,
+	HRESULT DrawText( FLOAT sx, FLOAT sy, D3DCOLOR color,
 					  const WCHAR* strText, DWORD dwFlags=0L );
 	HRESULT DrawTextScaled( FLOAT x, FLOAT y, FLOAT z,
-							FLOAT fXScale, FLOAT fYScale, DWORD dwColor,
+							FLOAT fXScale, FLOAT fYScale, D3DCOLOR color,
 							const WCHAR* strText, DWORD dwFlags=0L );
 	HRESULT Render3DText( const WCHAR* strText, DWORD dwFlags=0L );
 
