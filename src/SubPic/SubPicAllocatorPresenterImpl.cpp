@@ -104,7 +104,7 @@ void CSubPicAllocatorPresenterImpl::InitMaxSubtitleTextureSize(const int maxWidt
 	}
 }
 
-void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, int xOffsetInPixels/* = 0*/)
+HRESULT CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, int xOffsetInPixels/* = 0*/)
 {
 	if (m_pSubPicProvider) {
 		CComPtr<ISubPic> pSubPic;
@@ -139,18 +139,22 @@ void CSubPicAllocatorPresenterImpl::AlphaBltSubPic(const CRect& windowRect, cons
 
 			}
 
-			AlphaBlt(rcWindow, rcVideo, pSubPic, NULL, xOffsetInPixels, rs.iSubpicStereoMode == SUBPIC_STEREO_NONE && rs.iStereo3DTransform != STEREO3D_HalfOverUnder_to_Interlace);
+			return AlphaBlt(rcWindow, rcVideo, pSubPic, NULL, xOffsetInPixels, rs.iSubpicStereoMode == SUBPIC_STEREO_NONE && rs.iStereo3DTransform != STEREO3D_HalfOverUnder_to_Interlace);
 		}
 	}
+
+	return E_FAIL;
 }
 
-void CSubPicAllocatorPresenterImpl::AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget, int xOffsetInPixels/* = 0*/, const BOOL bUseSpecialCase/* = TRUE*/)
+HRESULT CSubPicAllocatorPresenterImpl::AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget, int xOffsetInPixels/* = 0*/, const BOOL bUseSpecialCase/* = TRUE*/)
 {
 	CRect rcSource, rcDest;
 	const CRenderersSettings& rs = GetRenderersSettings();
 	if (SUCCEEDED(pSubPic->GetSourceAndDest(windowRect, videoRect, rs.iSubpicPosRelative, rs.SubpicShiftPos, rcSource, rcDest, xOffsetInPixels, bUseSpecialCase))) {
-		pSubPic->AlphaBlt(rcSource, rcDest, pTarget);
+		return pSubPic->AlphaBlt(rcSource, rcDest, pTarget);
 	}
+
+	return E_FAIL;
 }
 
 // ISubPicAllocatorPresenter3
