@@ -132,6 +132,20 @@ void CRenderersSettings::Load()
 	CProfile& profile = AfxGetProfile();
 
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_VIDEORENDERER, iVideoRenderer);
+	iVideoRenderer = discard(iVideoRenderer, (int)VIDRNDT_EVR_CUSTOM,
+		{VIDRNDT_SYSDEFAULT,
+		VIDRNDT_VMR9WINDOWED,
+		VIDRNDT_EVR,
+		VIDRNDT_EVR_CUSTOM,
+		VIDRNDT_SYNC,
+		VIDRNDT_DXR,
+		VIDRNDT_MADVR,
+		VIDRNDT_NULL_ANY,
+		VIDRNDT_NULL_UNCOMP,
+#if MPCVR
+		VIDRNDT_MPCVR
+#endif
+		});
 
 	profile.ReadString(IDS_R_VIDEO, IDS_RS_RENDERDEVICE, sD3DRenderDevice);
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_RESETDEVICE, bResetDevice);
