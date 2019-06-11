@@ -58,8 +58,8 @@ protected:
 	bool m_bPendingResetDevice;
 
 	void InitMaxSubtitleTextureSize(const int maxWidth, const CSize& desktopSize);
-	void AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, int xOffsetInPixels = 0);
-	void AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget = NULL, int xOffsetInPixels = 0, const BOOL bUseSpecialCase = TRUE);
+	HRESULT AlphaBltSubPic(const CRect& windowRect, const CRect& videoRect, int xOffsetInPixels = 0);
+	HRESULT AlphaBlt(const CRect& windowRect, const CRect& videoRect, ISubPic* pSubPic, SubPicDesc* pTarget = NULL, int xOffsetInPixels = 0, const BOOL bUseSpecialCase = TRUE);
 
 public:
 	CSubPicAllocatorPresenterImpl(HWND hWnd, HRESULT& hr, CString *_pError);

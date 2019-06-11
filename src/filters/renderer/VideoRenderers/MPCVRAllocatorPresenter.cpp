@@ -139,8 +139,7 @@ HRESULT CMPCVRAllocatorPresenter::RenderEx3(REFERENCE_TIME rtStart,
 		m_pSubPicQueue->SetFPS(m_fps);
 	}
 
-	AlphaBltSubPic(viewportRect, croppedVideoRect, xOffsetInPixels);
-	return S_OK;
+	return AlphaBltSubPic(viewportRect, croppedVideoRect, xOffsetInPixels);
 }
 
 // ISubPicAllocatorPresenter3
