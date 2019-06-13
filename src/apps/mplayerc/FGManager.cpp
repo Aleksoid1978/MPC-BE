@@ -2905,11 +2905,9 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 				pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_NULL);
 				m_transform.push_back(pFGF);
 				break;
-#if MPCVR
 			case VIDRNDT_MPCVR:
 				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_MPCVRAllocatorPresenter, L"MPC Video Renderer", m_vrmerit));
 				break;
-#endif
 		}
 	} else {
 		m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EnhancedVideoRenderer, L"EVR - Preview Window", MERIT64_ABOVE_DSHOW + 2));

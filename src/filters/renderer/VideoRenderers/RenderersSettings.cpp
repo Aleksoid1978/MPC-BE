@@ -142,9 +142,7 @@ void CRenderersSettings::Load()
 		VIDRNDT_MADVR,
 		VIDRNDT_NULL_ANY,
 		VIDRNDT_NULL_UNCOMP,
-#if MPCVR
 		VIDRNDT_MPCVR
-#endif
 		});
 
 	profile.ReadString(IDS_R_VIDEO, IDS_RS_RENDERDEVICE, sD3DRenderDevice);
