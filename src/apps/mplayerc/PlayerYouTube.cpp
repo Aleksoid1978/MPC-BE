@@ -750,6 +750,7 @@ namespace Youtube
 					int itag = 0;
 					CStringA url;
 					CStringA signature;
+					CStringA signature_prefix = "signature";
 
 					CStringA quality_label;
 
@@ -765,19 +766,22 @@ namespace Youtube
 							if (paramHeader == "url") {
 								url = UrlDecode(UrlDecode(paramValue));
 							} else if (paramHeader == "s") {
-								signature = paramValue;
+								signature = UrlDecode(UrlDecode(paramValue));
 							} else if (paramHeader == "quality_label") {
 								quality_label = paramValue;
 							} else if (paramHeader == "itag") {
 								if (sscanf_s(paramValue, "%d", &itag) != 1) {
 									itag = 0;
 								}
+							} else if (paramHeader == "sp") {
+								signature_prefix = paramValue;
 							}
 						}
 					}
 
 					if (itag) {
-						SignatureDecode(url, signature, "&signature=%s");
+						const CStringA signature_format("&" + signature_prefix + "=%s");
+						SignatureDecode(url, signature, signature_format.GetString());
 
 						AddUrl(youtubeUrllist, youtubeAudioUrllist, CString(url), itag, 0, !quality_label.IsEmpty() ? quality_label.GetString() : nullptr);
 					}
