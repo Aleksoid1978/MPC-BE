@@ -39,12 +39,6 @@
 
 #define DEF_LOGO IDF_LOGO1
 
-#if (MPC_VERSION_STATUS == 0) // only for beta versions
-	#define MPCVR 1
-#else
-	#define MPCVR 0
-#endif
-
 enum {
 	WM_GRAPHNOTIFY = WM_RESET_DEVICE + 1,
 	WM_TUNER_SCAN_PROGRESS,

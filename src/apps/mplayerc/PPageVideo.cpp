@@ -40,10 +40,8 @@ static bool IsRenderTypeAvailable(int VideoRendererType, HWND hwnd)
 			return IsCLSIDRegistered(CLSID_DXR);
 		case VIDRNDT_MADVR:
 			return IsCLSIDRegistered(CLSID_madVR);
-#if MPCVR
 		case VIDRNDT_MPCVR:
 			return IsCLSIDRegistered(CLSID_MPCVR);
-#endif
 		default:
 		return true;
 	}
@@ -205,14 +203,12 @@ BOOL CPPageVideo::OnInitDialog()
 	addRenderer(VIDRNDT_SYNC,         IDS_PPAGE_OUTPUT_SYNC);
 	addRenderer(VIDRNDT_DXR,          IDS_PPAGE_OUTPUT_DXR);
 	addRenderer(VIDRNDT_MADVR,        IDS_PPAGE_OUTPUT_MADVR);
-	addRenderer(VIDRNDT_NULL_ANY,    IDS_PPAGE_OUTPUT_NULL_ANY);
+	addRenderer(VIDRNDT_NULL_ANY,     IDS_PPAGE_OUTPUT_NULL_ANY);
 	addRenderer(VIDRNDT_NULL_UNCOMP,  IDS_PPAGE_OUTPUT_NULL_UNCOMP);
 
-#if MPCVR
 	if (IsRenderTypeAvailable(VIDRNDT_MPCVR, m_hWnd)) {
 		AddStringData(m_cbVideoRenderer, L"Experimental MPC Video Renderer", VIDRNDT_MPCVR);
 	}
-#endif
 
 	for (int i = 0; i < m_iDSVRTC.GetCount(); ++i) {
 		if (m_iVideoRendererType == m_iDSVRTC.GetItemData(i)) {

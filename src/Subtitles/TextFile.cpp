@@ -602,7 +602,6 @@ BOOL CTextFile::ReadString(CStringW& str)
 										}
 									}
 									break;
-
 							}
 							m_posInBuffer += nContinuationBytes;
 						}
