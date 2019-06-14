@@ -3173,6 +3173,7 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		M_RANDOMIZE,
 		M_SORTBYID, // restore
 		M_SHUFFLE,
+		M_REFRESH,
 		M_MEDIAINFO,
 		M_SHOWTOOLTIP,
 		M_SHOWSEARCHBAR,
@@ -3207,6 +3208,9 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 		submenu2.AppendMenu(MF_SEPARATOR);
 		submenu2.AppendMenu(MF_STRING | MF_ENABLED | (bReverse ? MF_CHECKED : MF_UNCHECKED), M_SORTREVERSE, ResStr(IDS_PLAYLIST_SORTREVERSE));
 		m.AppendMenu(MF_STRING | MF_POPUP | (curPlayList.GetCount() ? MF_ENABLED : (MF_DISABLED | MF_GRAYED)), (UINT_PTR)submenu2.Detach(), ResStr(IDS_PLAYLIST_SORT));
+		m.AppendMenu(MF_SEPARATOR);
+
+		m.AppendMenu(MF_STRING | MF_ENABLED, M_REFRESH, ResStr(IDS_PLAYLIST_EXPLORER_REFRESH));
 		m.AppendMenu(MF_SEPARATOR);
 	}
 	else {
@@ -3581,6 +3585,36 @@ void CPlayerPlaylistBar::OnContextMenu(CWnd* /*pWnd*/, CPoint p)
 				return;
 			}
 			s.bShufflePlaylistItems = !s.bShufflePlaylistItems;
+			break;
+		case M_REFRESH:
+			if (bExplorer) {
+				CString selected_path;
+				const auto focusedElement = TGetFocusedElement();
+				POSITION pos = curPlayList.FindIndex(focusedElement);
+				if (pos) {
+					selected_path = curPlayList.GetAt(pos).m_fns.front().GetName();
+				}
+
+				auto path = curPlayList.GetHead().m_fns.front().GetName();
+				if (path.Right(1) == L"<") {
+					path.TrimRight(L"<");
+					curPlayList.RemoveAll();
+					if (::PathFileExistsW(path)) {
+						TParseFolder(path);
+					} else {
+						TParseFolder(L".\\");
+					}
+				} else {
+					curPlayList.RemoveAll();
+					TParseFolder(L".\\");
+				}
+
+				Refresh();
+
+				if (!SelectFileInPlaylist(selected_path)) {
+					EnsureVisible(curPlayList.GetHeadPosition());
+				}
+			}
 			break;
 		case M_MEDIAINFO:
 			{
