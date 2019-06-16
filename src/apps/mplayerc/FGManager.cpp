@@ -2886,14 +2886,17 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 			case VIDRNDT_EVR_CUSTOM:
 				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_EVRAllocatorPresenter, L"Enhanced Video Renderer (custom presenter)", m_vrmerit));
 				break;
+			case VIDRNDT_SYNC:
+				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_SyncAllocatorPresenter, L"EVR Sync", m_vrmerit));
+				break;
+			case VIDRNDT_MPCVR:
+				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_MPCVRAllocatorPresenter, L"MPC Video Renderer", m_vrmerit));
+				break;
 			case VIDRNDT_DXR:
 				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_DXRAllocatorPresenter, L"Haali's Video Renderer", m_vrmerit));
 				break;
 			case VIDRNDT_MADVR:
 				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_madVRAllocatorPresenter, L"madVR Renderer", m_vrmerit));
-				break;
-			case VIDRNDT_SYNC:
-				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_SyncAllocatorPresenter, L"EVR Sync", m_vrmerit));
 				break;
 			case VIDRNDT_NULL_ANY:
 				pFGF = DNew CFGFilterInternal<CNullVideoRenderer>(L"Null Video Renderer (Any)", MERIT64_ABOVE_DSHOW + 2);
@@ -2904,9 +2907,6 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 				pFGF = DNew CFGFilterInternal<CNullUVideoRenderer>(L"Null Video Renderer (Uncompressed)", MERIT64_ABOVE_DSHOW + 2);
 				pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_NULL);
 				m_transform.push_back(pFGF);
-				break;
-			case VIDRNDT_MPCVR:
-				m_transform.push_back(DNew CFGFilterVideoRenderer(m_hWnd, CLSID_MPCVRAllocatorPresenter, L"MPC Video Renderer", m_vrmerit));
 				break;
 		}
 	} else {
