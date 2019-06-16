@@ -209,6 +209,9 @@ void ReplaceCharacterU16(wchar_t& ch)
 			ch = 0x2714; // Heavy Check Mark
 			return;
 		}
+		if (ch >= 0x2667 && ch <= 0x2775) {
+			ch = 0x0020;
+		}
 	}
 }
 
