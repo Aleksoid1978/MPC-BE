@@ -36,12 +36,12 @@ static bool IsRenderTypeAvailable(int VideoRendererType, HWND hwnd)
 		case VIDRNDT_EVR_CUSTOM:
 		case VIDRNDT_SYNC:
 			return IsCLSIDRegistered(CLSID_EnhancedVideoRenderer);
+		case VIDRNDT_MPCVR:
+			return IsCLSIDRegistered(CLSID_MPCVR);
 		case VIDRNDT_DXR:
 			return IsCLSIDRegistered(CLSID_DXR);
 		case VIDRNDT_MADVR:
 			return IsCLSIDRegistered(CLSID_madVR);
-		case VIDRNDT_MPCVR:
-			return IsCLSIDRegistered(CLSID_MPCVR);
 		default:
 		return true;
 	}
@@ -175,6 +175,7 @@ BOOL CPPageVideo::OnInitDialog()
 		case VIDRNDT_EVR:
 		case VIDRNDT_EVR_CUSTOM:
 		case VIDRNDT_SYNC:
+		case VIDRNDT_MPCVR:
 		case VIDRNDT_DXR:
 		case VIDRNDT_MADVR:
 		case VIDRNDT_NULL_ANY:
@@ -201,14 +202,11 @@ BOOL CPPageVideo::OnInitDialog()
 	addRenderer(VIDRNDT_EVR,          IDS_PPAGE_OUTPUT_EVR);
 	addRenderer(VIDRNDT_EVR_CUSTOM,   IDS_PPAGE_OUTPUT_EVR_CUSTOM);
 	addRenderer(VIDRNDT_SYNC,         IDS_PPAGE_OUTPUT_SYNC);
+	addRenderer(VIDRNDT_MPCVR,        IDS_PPAGE_OUTPUT_MPCVR);
 	addRenderer(VIDRNDT_DXR,          IDS_PPAGE_OUTPUT_DXR);
 	addRenderer(VIDRNDT_MADVR,        IDS_PPAGE_OUTPUT_MADVR);
 	addRenderer(VIDRNDT_NULL_ANY,     IDS_PPAGE_OUTPUT_NULL_ANY);
 	addRenderer(VIDRNDT_NULL_UNCOMP,  IDS_PPAGE_OUTPUT_NULL_UNCOMP);
-
-	if (IsRenderTypeAvailable(VIDRNDT_MPCVR, m_hWnd)) {
-		AddStringData(m_cbVideoRenderer, L"Experimental MPC Video Renderer", VIDRNDT_MPCVR);
-	}
 
 	for (int i = 0; i < m_iDSVRTC.GetCount(); ++i) {
 		if (m_iVideoRendererType == m_iDSVRTC.GetItemData(i)) {
