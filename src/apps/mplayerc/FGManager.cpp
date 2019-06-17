@@ -858,7 +858,6 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 			if (pmt->majortype == MEDIATYPE_DVD_ENCRYPTED_PACK && pmt->subtype != MEDIASUBTYPE_MPEG2_VIDEO) {
 				return S_FALSE;
 			}
-
 		}
 		EndEnumMediaTypes(pmt)
 	}
@@ -868,7 +867,6 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 		if (pmt->majortype == MEDIATYPE_MSTVCaption || pmt->majortype == MEDIATYPE_MPEG2_SECTIONS) {
 			return S_FALSE;
 		}
-
 	}
 	EndEnumMediaTypes(pmt)
 
@@ -883,7 +881,7 @@ HRESULT CFGManager::Connect(IPin* pPinOut, IPin* pPinIn, bool bContinueRender)
 
 	if (m_bOnlyAudio) {
 		BeginEnumMediaTypes(pPinOut, pEM, pmt) {
-			if (pmt->majortype != MEDIATYPE_Audio && pmt->majortype != MEDIATYPE_Stream) {
+			if (pmt->majortype != MEDIATYPE_Audio && pmt->majortype != MEDIATYPE_Stream && !CMediaTypeEx(*pmt).ValidateSubtitle()) {
 				return S_FALSE;
 			}
 		}
