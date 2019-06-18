@@ -73,6 +73,7 @@ namespace DSObjects
 		STDMETHODIMP_(void) SetPosition(RECT w, RECT v) override;
 		STDMETHODIMP SetRotation(int rotation) override;
 		STDMETHODIMP_(int) GetRotation() override;
+		STDMETHODIMP_(bool) Paint(bool bAll) override;
 		STDMETHODIMP GetDIB(BYTE* lpDib, DWORD* size) override;
 		STDMETHODIMP_(bool) IsRendering() override;
 	};
