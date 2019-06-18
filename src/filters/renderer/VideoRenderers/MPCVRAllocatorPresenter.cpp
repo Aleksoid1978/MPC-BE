@@ -217,6 +217,14 @@ STDMETHODIMP_(SIZE) CMPCVRAllocatorPresenter::GetVideoSizeAR()
 	return size;
 }
 
+STDMETHODIMP_(bool) CMPCVRAllocatorPresenter::Paint(bool /*bAll*/)
+{
+	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR) {
+		return SUCCEEDED(pIExFilterConfig->SetBool("cmd_redraw", true));
+	}
+	return false;
+}
+
 STDMETHODIMP CMPCVRAllocatorPresenter::GetDIB(BYTE* lpDib, DWORD* size)
 {
 	HRESULT hr = E_NOTIMPL;
