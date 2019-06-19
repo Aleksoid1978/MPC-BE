@@ -6,6 +6,7 @@
 Обновлены библиотеки:
 	dav1d git-0.3.1-41-ga1e3f35;
 	ffmpeg git-n4.2-dev-1736-g09a4853930;
+	Little-CMS git-lcms2.9-32-g9632a05;
 	openjpeg git-v2.3.1-2-gd0dd894a;
 	rapidjson git-v1.1.0-485-ge80257a9;
 
