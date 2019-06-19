@@ -94,6 +94,12 @@ CMSAPI cmsBool            CMSEXPORT _cmsMAT3solve(cmsVEC3* x, cmsMAT3* a, cmsVEC
 CMSAPI void               CMSEXPORT _cmsMAT3eval(cmsVEC3* r, const cmsMAT3* a, const cmsVEC3* v);
 
 
+// MD5 low level  -------------------------------------------------------------------------------------
+
+CMSAPI cmsHANDLE          CMSEXPORT cmsMD5alloc(cmsContext ContextID);
+CMSAPI void               CMSEXPORT cmsMD5add(cmsHANDLE Handle, const cmsUInt8Number* buf, cmsUInt32Number len);
+CMSAPI void               CMSEXPORT cmsMD5finish(cmsProfileID* ProfileID, cmsHANDLE Handle);
+
 // Error logging  -------------------------------------------------------------------------------------
 
 CMSAPI void               CMSEXPORT  cmsSignalError(cmsContext ContextID, cmsUInt32Number ErrorCode, const char *ErrorText, ...);

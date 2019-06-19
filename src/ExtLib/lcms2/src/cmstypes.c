@@ -1853,7 +1853,7 @@ Error:
 static
 cmsBool  Type_LUT8_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, void* Ptr, cmsUInt32Number nItems)
 {
-    cmsUInt32Number j, nTabSize;
+    cmsUInt32Number j, nTabSize, i, n;
     cmsUInt8Number  val;
     cmsPipeline* NewLUT = (cmsPipeline*) Ptr;
     cmsStage* mpe;
@@ -1902,21 +1902,18 @@ cmsBool  Type_LUT8_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER* io,
     if (!_cmsWriteUInt8Number(io, (cmsUInt8Number) clutPoints)) return FALSE;
     if (!_cmsWriteUInt8Number(io, 0)) return FALSE; // Padding
 
+	n = NewLUT->InputChannels * NewLUT->OutputChannels;
 
     if (MatMPE != NULL) {
 
-        if (!_cmsWrite15Fixed16Number(io, MatMPE -> Double[0])) return FALSE;
-        if (!_cmsWrite15Fixed16Number(io, MatMPE -> Double[1])) return FALSE;
-        if (!_cmsWrite15Fixed16Number(io, MatMPE -> Double[2])) return FALSE;
-        if (!_cmsWrite15Fixed16Number(io, MatMPE -> Double[3])) return FALSE;
-        if (!_cmsWrite15Fixed16Number(io, MatMPE -> Double[4])) return FALSE;
-        if (!_cmsWrite15Fixed16Number(io, MatMPE -> Double[5])) return FALSE;
-        if (!_cmsWrite15Fixed16Number(io, MatMPE -> Double[6])) return FALSE;
-        if (!_cmsWrite15Fixed16Number(io, MatMPE -> Double[7])) return FALSE;
-        if (!_cmsWrite15Fixed16Number(io, MatMPE -> Double[8])) return FALSE;
-
+		for (i = 0; i < n; i++)
+		{
+			if (!_cmsWrite15Fixed16Number(io, MatMPE->Double[i])) return FALSE;
+		}
     }
     else {
+
+		if (n != 9) return FALSE;
 
         if (!_cmsWrite15Fixed16Number(io, 1)) return FALSE;
         if (!_cmsWrite15Fixed16Number(io, 0)) return FALSE;
@@ -2143,7 +2140,7 @@ Error:
 static
 cmsBool  Type_LUT16_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, void* Ptr, cmsUInt32Number nItems)
 {
-    cmsUInt32Number nTabSize;
+    cmsUInt32Number nTabSize, n;
     cmsPipeline* NewLUT = (cmsPipeline*) Ptr;
     cmsStage* mpe;
     _cmsStageToneCurvesData* PreMPE = NULL, *PostMPE = NULL;
@@ -2194,20 +2191,19 @@ cmsBool  Type_LUT16_Write(struct _cms_typehandler_struct* self, cmsIOHANDLER* io
     if (!_cmsWriteUInt8Number(io, (cmsUInt8Number) clutPoints)) return FALSE;
     if (!_cmsWriteUInt8Number(io, 0)) return FALSE; // Padding
 
+	n = NewLUT->InputChannels * NewLUT->OutputChannels;
 
     if (MatMPE != NULL) {
 
-        if (!_cmsWrite15Fixed16Number(io, MatMPE -> Double[0])) return FALSE;
-        if (!_cmsWrite15Fixed16Number(io, MatMPE -> Double[1])) return FALSE;
-        if (!_cmsWrite15Fixed16Number(io, MatMPE -> Double[2])) return FALSE;
-        if (!_cmsWrite15Fixed16Number(io, MatMPE -> Double[3])) return FALSE;
-        if (!_cmsWrite15Fixed16Number(io, MatMPE -> Double[4])) return FALSE;
-        if (!_cmsWrite15Fixed16Number(io, MatMPE -> Double[5])) return FALSE;
-        if (!_cmsWrite15Fixed16Number(io, MatMPE -> Double[6])) return FALSE;
-        if (!_cmsWrite15Fixed16Number(io, MatMPE -> Double[7])) return FALSE;
-        if (!_cmsWrite15Fixed16Number(io, MatMPE -> Double[8])) return FALSE;
+		for (i = 0; i < n; i++)
+		{
+			if (!_cmsWrite15Fixed16Number(io, MatMPE->Double[i])) return FALSE;
+		}
+      
     }
     else {
+
+		if (n != 9) return FALSE;
 
         if (!_cmsWrite15Fixed16Number(io, 1)) return FALSE;
         if (!_cmsWrite15Fixed16Number(io, 0)) return FALSE;
@@ -2550,31 +2546,31 @@ Error:
 static
 cmsBool  WriteMatrix(struct _cms_typehandler_struct* self, cmsIOHANDLER* io, cmsStage* mpe)
 {
+	cmsUInt32Number i, n;
+
     _cmsStageMatrixData* m = (_cmsStageMatrixData*) mpe -> Data;
 
-    // Write the Matrix
-    if (!_cmsWrite15Fixed16Number(io, m -> Double[0])) return FALSE;
-    if (!_cmsWrite15Fixed16Number(io, m -> Double[1])) return FALSE;
-    if (!_cmsWrite15Fixed16Number(io, m -> Double[2])) return FALSE;
-    if (!_cmsWrite15Fixed16Number(io, m -> Double[3])) return FALSE;
-    if (!_cmsWrite15Fixed16Number(io, m -> Double[4])) return FALSE;
-    if (!_cmsWrite15Fixed16Number(io, m -> Double[5])) return FALSE;
-    if (!_cmsWrite15Fixed16Number(io, m -> Double[6])) return FALSE;
-    if (!_cmsWrite15Fixed16Number(io, m -> Double[7])) return FALSE;
-    if (!_cmsWrite15Fixed16Number(io, m -> Double[8])) return FALSE;
+	n = mpe->InputChannels * mpe->OutputChannels;
 
-    if (m ->Offset != NULL) {
+	// Write the Matrix
+	for (i = 0; i < n; i++)
+	{
+		if (!_cmsWrite15Fixed16Number(io, m->Double[i])) return FALSE;
+	}
 
-    if (!_cmsWrite15Fixed16Number(io, m -> Offset[0])) return FALSE;
-    if (!_cmsWrite15Fixed16Number(io, m -> Offset[1])) return FALSE;
-    if (!_cmsWrite15Fixed16Number(io, m -> Offset[2])) return FALSE;
-    }
-    else {
-        if (!_cmsWrite15Fixed16Number(io, 0)) return FALSE;
-        if (!_cmsWrite15Fixed16Number(io, 0)) return FALSE;
-        if (!_cmsWrite15Fixed16Number(io, 0)) return FALSE;
+	if (m->Offset != NULL) {
 
-    }
+		for (i = 0; i < mpe->OutputChannels; i++)
+		{
+			if (!_cmsWrite15Fixed16Number(io, m->Offset[i])) return FALSE;
+		}
+	}
+	else {
+		for (i = 0; i < mpe->OutputChannels; i++)
+		{
+			if (!_cmsWrite15Fixed16Number(io, 0)) return FALSE;
+		}
+	}
 
 
     return TRUE;
