@@ -38,6 +38,7 @@ typedef struct Libdav1dContext {
 
     Dav1dData data;
     int tile_threads;
+    int frame_threads;
     int apply_grain;
 } Libdav1dContext;
 
@@ -46,6 +47,10 @@ static const enum AVPixelFormat pix_fmt[][3] = {
     [DAV1D_PIXEL_LAYOUT_I420] = { AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV420P10, AV_PIX_FMT_YUV420P12 },
     [DAV1D_PIXEL_LAYOUT_I422] = { AV_PIX_FMT_YUV422P, AV_PIX_FMT_YUV422P10, AV_PIX_FMT_YUV422P12 },
     [DAV1D_PIXEL_LAYOUT_I444] = { AV_PIX_FMT_YUV444P, AV_PIX_FMT_YUV444P10, AV_PIX_FMT_YUV444P12 },
+};
+
+static const enum AVPixelFormat pix_fmt_rgb[3] = {
+    AV_PIX_FMT_GBRP, AV_PIX_FMT_GBRP10, AV_PIX_FMT_GBRP12,
 };
 
 static void libdav1d_log_callback(void *opaque, const char *fmt, va_list vl)
@@ -114,6 +119,7 @@ static av_cold int libdav1d_init(AVCodecContext *c)
 {
     Libdav1dContext *dav1d = c->priv_data;
     Dav1dSettings s;
+    int threads = (c->thread_count ? c->thread_count : av_cpu_count()) * 3 / 2;
     int res;
 
     av_log(c, AV_LOG_INFO, "libdav1d %s\n", dav1d_version());
@@ -124,9 +130,16 @@ static av_cold int libdav1d_init(AVCodecContext *c)
     s.allocator.cookie = dav1d;
     s.allocator.alloc_picture_callback = libdav1d_picture_allocator;
     s.allocator.release_picture_callback = libdav1d_picture_release;
-    s.n_tile_threads = dav1d->tile_threads;
     s.apply_grain = dav1d->apply_grain;
-    s.n_frame_threads = FFMIN(c->thread_count ? c->thread_count : av_cpu_count(), DAV1D_MAX_FRAME_THREADS);
+
+    s.n_tile_threads = dav1d->tile_threads
+                     ? dav1d->tile_threads
+                     : FFMIN(floor(sqrt(threads)), DAV1D_MAX_TILE_THREADS);
+    s.n_frame_threads = dav1d->frame_threads
+                      ? dav1d->frame_threads
+                      : FFMIN(ceil(threads / s.n_tile_threads), DAV1D_MAX_FRAME_THREADS);
+    av_log(c, AV_LOG_DEBUG, "Using %d frame threads, %d tile threads\n",
+           s.n_frame_threads, s.n_tile_threads);
 
     res = dav1d_open(&dav1d->c, &s);
     if (res < 0)
@@ -197,7 +210,7 @@ static int libdav1d_receive_frame(AVCodecContext *c, AVFrame *frame)
         return res;
     }
 
-    av_assert0(p->data[0] != NULL);
+    av_assert0(p->data[0] && p->allocator_data);
 
     // This requires the custom allocator above
     frame->buf[0] = av_buffer_ref(p->allocator_data);
@@ -214,7 +227,8 @@ static int libdav1d_receive_frame(AVCodecContext *c, AVFrame *frame)
     frame->linesize[2] = p->stride[1];
 
     c->profile = p->seq_hdr->profile;
-    frame->format = c->pix_fmt = pix_fmt[p->p.layout][p->seq_hdr->hbd];
+    c->level = ((p->seq_hdr->operating_points[0].major_level - 2) << 2)
+               | p->seq_hdr->operating_points[0].minor_level;
     frame->width = p->p.w;
     frame->height = p->p.h;
     if (c->width != p->p.w || c->height != p->p.h) {
@@ -235,6 +249,14 @@ static int libdav1d_receive_frame(AVCodecContext *c, AVFrame *frame)
     frame->color_primaries = c->color_primaries = (enum AVColorPrimaries) p->seq_hdr->pri;
     frame->color_trc = c->color_trc = (enum AVColorTransferCharacteristic) p->seq_hdr->trc;
     frame->color_range = c->color_range = p->seq_hdr->color_range ? AVCOL_RANGE_JPEG : AVCOL_RANGE_MPEG;
+
+    if (p->p.layout == DAV1D_PIXEL_LAYOUT_I444 &&
+        p->seq_hdr->mtrx == DAV1D_MC_IDENTITY &&
+        p->seq_hdr->pri  == DAV1D_COLOR_PRI_BT709 &&
+        p->seq_hdr->trc  == DAV1D_TRC_SRGB)
+        frame->format = c->pix_fmt = pix_fmt_rgb[p->seq_hdr->hbd];
+    else
+        frame->format = c->pix_fmt = pix_fmt[p->p.layout][p->seq_hdr->hbd];
 
     // match timestamps and packet size
     frame->pts = frame->best_effort_timestamp = p->m.timestamp;
@@ -317,7 +339,8 @@ static av_cold int libdav1d_close(AVCodecContext *c)
 #define OFFSET(x) offsetof(Libdav1dContext, x)
 #define VD AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_DECODING_PARAM
 static const AVOption libdav1d_options[] = {
-    { "tilethreads", "Tile threads", OFFSET(tile_threads), AV_OPT_TYPE_INT, { .i64 = 1 }, 1, DAV1D_MAX_TILE_THREADS, VD },
+    { "tilethreads", "Tile threads", OFFSET(tile_threads), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, DAV1D_MAX_TILE_THREADS, VD },
+    { "framethreads", "Frame threads", OFFSET(frame_threads), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, DAV1D_MAX_FRAME_THREADS, VD },
     { "filmgrain", "Apply Film Grain", OFFSET(apply_grain), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, VD },
     { NULL }
 };
