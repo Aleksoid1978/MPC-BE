@@ -467,6 +467,10 @@ void File_Gxf::Streams_Finish_PerStream(size_t StreamID, stream &Temp)
                         }
                     }
 
+                if (Temp.IsChannelGrouping)
+                    Fill(Stream_Audio, StreamPos_Last, "Title", Streams[StreamID-1].MediaName); //First half of the channel grouping
+                Fill(StreamKind_Last, StreamPos_Last, "Title", Temp.MediaName); //Second half of the channel grouping or standalone
+
                 Merge(*Temp.Parsers[0], Stream_Audio, Pos, StreamPos_Last, false);
 
                 Ztring ID;
@@ -481,9 +485,6 @@ void File_Gxf::Streams_Finish_PerStream(size_t StreamID, stream &Temp)
                 }
                 Fill(Stream_Audio, StreamPos_Last, Audio_ID, ID, true);
                 Fill(Stream_Audio, StreamPos_Last, Audio_ID_String, ID_String, true);
-                if (Temp.IsChannelGrouping)
-                    Fill(Stream_Audio, StreamPos_Last, "Title", Streams[StreamID-1].MediaName); //First half of the channel grouping
-                Fill(StreamKind_Last, StreamPos_Last, "Title", Temp.MediaName); //Second half of the channel grouping or standalone
 
                 for (std::map<std::string, Ztring>::iterator Info=Temp.Infos.begin(); Info!=Temp.Infos.end(); ++Info)
                     if (Info->first=="BitRate" && Temp.Parsers[0]->Count_Get(Stream_Audio)>1)

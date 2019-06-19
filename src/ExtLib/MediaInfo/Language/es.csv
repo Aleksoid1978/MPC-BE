@@ -155,6 +155,7 @@ Actor;Actor
 Actor_Character;Personaje
 Added_Date;Datos agregados
 Address;Dirección
+AdID;
 Advanced;Avanzado
 Advanced mode;Modo avanzado
 Album;Álbum
@@ -188,6 +189,8 @@ Author;Autor
 BarCode;Código de barras
 Basic;Básico
 Basic_Note;Nota: Para más información sobre este archivo, selecciona una vista diferente (hoja, árbol...)
+BedChannelConfiguration;
+BedChannelCount;
 BitDepth;Profundidad bits
 BitDepth_Detected;
 BitDepth_Stored;Prof. bits almacenada
@@ -203,6 +206,7 @@ Bits-(Pixel*Frame);Bits/(píxel*fotograma)
 BufferSize;Tamaño búfer
 Cancel;Cancelar
 Channel(s);Canal(es)
+ChannelLayout;
 ChannelPositions;Posiciones del canal
 Chapter(s);Capítulo(s)
 Chapters;Capítulos
@@ -218,7 +222,7 @@ Choose export format;Elige tu formato de exportación
 Choose file(s);Elige archivos que abrir
 Choose filename;Elige tu nombre de archivo
 Choose language;Elige tu idioma
-Choregrapher;Coreógrafo
+Choreographer;Coreógrafo
 Chroma;Croma
 ChromaSubsampling;Submuestreo croma
 Close;Cerrar
@@ -244,6 +248,7 @@ Codec_Settings_PacketBitStream;Ajustes del códec, Packet bitstream
 Codec_Settings_QPel;Ajustes del códec, Qpel
 Codec_Settings_Sign;Ajustes del códec, Sign
 Codec_Url;Enlace web del códec
+CodecConfigurationBox;
 CodecID;ID códec
 CodecID_Description;Descripción del códec
 CoDirector;Codirector
@@ -257,6 +262,7 @@ CommissionedBy;Encargado por
 Compilation;Colección
 CompleteName;Nombre completo
 CompletionDate;Fecha completado
+ComplexityIndex;
 Composer;Compositor
 Compression_Mode;Modo de compresión
 Compression_Mode_Lossless;Sin pérdida
@@ -336,6 +342,7 @@ File_Modified_Date;Última fecha modificación archivo
 File_Modified_Date_Local;Última fecha modificación archivo (local)
 FileExtension;Extensión del archivo
 FileName;Nombre de archivo
+FileNameExtension;
 FileSize;Tamaño de archivo
 Folder;Carpeta
 Folder (R);Carpeta (R)
@@ -348,9 +355,8 @@ Format_Commercial;Nombre comercial
 Format_Commercial_IfAny;Nombre comercial
 Format_Description;Descripción del formato
 Format_Info;Detalles del formato
-Format_Profile;Formato del perfil
 Format_Level;
-Format_Tier;
+Format_Profile;Formato del perfil
 Format_Settings;Ajustes del formato
 Format_Settings_BVOP;Ajustes del formato, BVOP
 Format_Settings_CABAC;Ajustes del formato, CABAC
@@ -373,10 +379,11 @@ Format_Settings_PictureStructure;Ajustes del formato, estructura imagen
 Format_Settings_PS;Ajustes del formato, PS
 Format_Settings_Pulldown;Ajustes del formato, Pulldown
 Format_Settings_QPel;Ajustes del formato, Qpel
-Format_Settings_RefFrames;Ajustes del formato,RefFrames
+Format_Settings_RefFrames;Ajustes del formato, RefFrames
 Format_Settings_SBR;Ajustes del formato, SBR
 Format_Settings_Sign;Ajustes del formato, Sign
 Format_Settings_Wrapping;Ajustes del formato, modo envase
+Format_Tier;
 Format_Url;Enlace web del formato
 Format_Version;Formato de la versión
 FpaManufacturer;Fabricante FPA
@@ -587,11 +594,12 @@ Genre_190;Rock de garaje
 Genre_191;
 Go to WebSite;Ir al sitio web
 Gop_OpenClosed;GOP, abierto/cerrado
-Gop_OpenClosed_Open;Abierto
 Gop_OpenClosed_Closed;Cerrado
 Gop_OpenClosed_FirstFrame;GOP, abierto/cerrado primer fotograma
+Gop_OpenClosed_Open;Abierto
 Grouping;Agrupamiento
 h; h
+HDR_Format;
 Header file;Cabecera
 Height;Alto
 Height_CleanAperture;Altura abertura limpia
@@ -871,6 +879,7 @@ NewVersion_Question_Content;Una versión nueva (v&Version%) está disponible, ¿
 NewVersion_Question_Title;¡Se ha publicado una versión nueva!
 No;No
 Not yet;Aún no
+NumberOfDynamicObjects;
 NumColors;Número de colores
 OK;Aceptar
 One output file per input file;Un archivo de salida por archivo de entrada
@@ -939,7 +948,6 @@ PartNumber;Código ID
 PartTotal;Total partes
 Performer;Intérprete
 Period;Período
-PodcastCategory;
 Phone;Teléfono
 PictureRatio;Aspecto imagen
 PixelAspectRatio;Relación aspecto píxeles
@@ -950,6 +958,7 @@ Played_Count;Veces reproducido
 Played_First_Date;Primera reproducción
 Played_Last_Date;Última reproducción
 PlayTime;Duración
+PodcastCategory;
 Position;Posición
 Position_Total;Total
 Preferences;Preferencias
@@ -1085,6 +1094,9 @@ Tree;Árbol
 Tree & Text;Árbol de texto
 Type;Tipo
 UniqueID;ID única
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;Desconocido
 Url;URL
 Video;Vídeo
@@ -1119,5 +1131,5 @@ Written_Location;Escrito en
 WrittenBy;Escrito por
 Yes;Sí
 Your system;Tu sistema
-ZZ_Automatic_Percent;87
-ZZ_AutomaticLanguage_Percent;98
+ZZ_Automatic_Percent;86
+ZZ_AutomaticLanguage_Percent;97

@@ -165,7 +165,7 @@ void File_Dummy::Fill_Dummy_General()
     Fill(Stream_General, 0, General_ExecutiveProducer, "ExecutiveProducer");
     Fill(Stream_General, 0, General_ProductionDesigner, "ProductionDesigner");
     Fill(Stream_General, 0, General_CostumeDesigner, "CostumeDesigner");
-    Fill(Stream_General, 0, General_Choregrapher, "Choregrapher");
+    Fill(Stream_General, 0, General_Choreographer, "Choreographer");
     Fill(Stream_General, 0, General_SoundEngineer, "SoundEngineer");
     Fill(Stream_General, 0, General_MasteredBy, "MasteredBy");
     Fill(Stream_General, 0, General_RemixedBy, "RemixedBy");

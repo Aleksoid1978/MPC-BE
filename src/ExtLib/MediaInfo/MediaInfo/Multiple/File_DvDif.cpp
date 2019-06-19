@@ -388,6 +388,7 @@ void File_DvDif::Streams_Fill()
         }
     }
 
+    Fill(Stream_Video, 0, Video_ColorSpace, "YUV");
     if (!FSC_WasSet) //Original DV 25 Mbps
     {
         if (system==false) //NTSC
@@ -440,7 +441,8 @@ void File_DvDif::Streams_Fill()
             Stream_Prepare(Stream_Audio);
             for (std::map<std::string, Ztring>::iterator Info=Streams_Audio[Pos]->Infos.begin(); Info!=Streams_Audio[Pos]->Infos.end(); ++Info)
                 Fill(Stream_Audio, StreamPos_Last, Info->first.c_str(), Info->second, true);
-            Fill(Stream_Audio, StreamPos_Last, Audio_BitRate_Encoded, 0);
+            if (IsSub)
+                Fill(Stream_Audio, StreamPos_Last, Audio_BitRate_Encoded, 0);
         }
 
     if (Stream_BitRateFromContainer && Retrieve(Stream_Video, 0, Video_BitRate).empty())
@@ -1463,6 +1465,9 @@ void File_DvDif::audio_source()
                 Streams_Audio[Pos]->Infos["Channel(s)"].From_Number(audio_source_stype==3?1:2);
                 Streams_Audio[Pos]->Infos["SamplingRate"].From_Number(Dv_Audio_SamplingRate[SamplingRate]);
                 Streams_Audio[Pos]->Infos["BitDepth"].From_Number(Dv_Audio_BitDepth[Resolution]);
+                Streams_Audio[Pos]->Infos["Format_Settings"] = __T("Big / Signed");
+                Streams_Audio[Pos]->Infos["Format_Settings_Endianness"]=__T("Big");
+                Streams_Audio[Pos]->Infos["Format_Settings_Sign"]=__T("Signed");
                 Streams_Audio[Pos]->Infos["BitRate"].From_Number((audio_source_stype==3?1:2)*Dv_Audio_SamplingRate[SamplingRate]*Dv_Audio_BitDepth[Resolution]);
             }
         }

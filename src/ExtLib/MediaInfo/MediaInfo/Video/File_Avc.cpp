@@ -1578,7 +1578,7 @@ void File_Avc::Header_Parse()
     }
     else
     {
-        int32u Size;
+        int64u Size;
         switch (SizeOfNALU_Minus1)
         {
             case 0: {
@@ -1599,20 +1599,22 @@ void File_Avc::Header_Parse()
                         Size=Size_;
                     }
                     break;
-            case 3:     Get_B4 (Size,                           "size");
+            case 3: {
+                        int32u Size_;
+                        Get_B4 (Size_,                          "size");
+                        Size=Size_;
+                    }
                     break;
-            default:    Trusted_IsNot("No size of NALU defined");
-                        Size=(int32u)(Buffer_Size-Buffer_Offset);
         }
+        Size+=Element_Offset;
+        if (Size==Element_Offset || Buffer_Offset+Size>Buffer_Size) //If Size is 0 or Size biger than sample size, it is not normal, we skip the complete frame
+            Size=Buffer_Size-Buffer_Offset;
+        Header_Fill_Size(Size);
         BS_Begin();
         Mark_0 ();
         Get_S1 ( 2, nal_ref_idc,                                "nal_ref_idc");
         Get_S1 ( 5, nal_unit_type,                              "nal_unit_type");
         BS_End();
-
-        FILLING_BEGIN();
-            Header_Fill_Size(Size?(Element_Offset-1+Size):(Buffer_Size-Buffer_Offset)); //If Size is 0, it is not normal, we skip the complete frame
-        FILLING_END();
     }
 
     //Filling

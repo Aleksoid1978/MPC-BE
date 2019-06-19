@@ -868,6 +868,11 @@ void File__MultipleParsing::Read_Buffer_Continue()
                 //Positionning if requested
                 if (Parser[0]->File_GoTo!=(int64u)-1)
                    File_GoTo=Parser[0]->File_GoTo;
+
+                //Clean
+                #if MEDIAINFO_TRACE
+                    Details->clear();
+                #endif //MEDIAINFO_TRACE
             }
         }
     }

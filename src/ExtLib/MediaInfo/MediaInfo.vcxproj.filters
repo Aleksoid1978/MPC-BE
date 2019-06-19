@@ -1387,5 +1387,8 @@
     <ClCompile Include="MediaInfo\Audio\File_Dsf.cpp">
       <Filter>Source Files\Audio</Filter>
     </ClCompile>
+    <ClCompile Include="MediaInfo\Audio\File_Usac.cpp">
+      <Filter>Source Files\Audio</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

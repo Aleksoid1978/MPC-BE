@@ -148,6 +148,9 @@ bool File_Ttml::FileHeader_Begin()
 //---------------------------------------------------------------------------
 void File_Ttml::Read_Buffer_Continue()
 {
+    if (!IsSub && File_Offset+Buffer_Offset+Element_Offset)
+        return; //Already parsed, no change
+
     tinyxml2::XMLDocument document;
 
     if (!FileHeader_Begin_XML(document))

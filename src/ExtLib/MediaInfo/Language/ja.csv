@@ -155,6 +155,7 @@ Actor;主演
 Actor_Character;出演名
 Added_Date;追加日
 Address;アドレス
+AdID;
 Advanced;詳細
 Advanced mode;詳細モード
 Album;アルバム
@@ -188,6 +189,8 @@ Author;製作者
 BarCode;バーコード
 Basic;基本
 Basic_Note;メモ : ファイルについてのさらなる情報は別のビューで開かねばなりません(シート、ツリー...)
+BedChannelConfiguration;
+BedChannelCount;
 BitDepth;
 BitDepth_Detected;
 BitDepth_Stored;
@@ -203,6 +206,7 @@ Bits-(Pixel*Frame);ビット/(ピクセル*フレーム)
 BufferSize;
 Cancel;キャンセル
 Channel(s);チャンネル
+ChannelLayout;
 ChannelPositions;チャンネルの位置
 Chapter(s);チャプター
 Chapters;チャプター
@@ -218,7 +222,7 @@ Choose export format;出力形式を選択してください
 Choose file(s);開くファイルを選択してください
 Choose filename;ファイル名を選択してください
 Choose language;言語を選択してください
-Choregrapher;コアグラファー
+Choreographer;コアグラファー
 Chroma;クローマ
 ChromaSubsampling;
 Close;閉じる
@@ -244,6 +248,7 @@ Codec_Settings_PacketBitStream;パケットビットストリーム
 Codec_Settings_QPel;QPel
 Codec_Settings_Sign;Sign
 Codec_Url;コーデックの URL
+CodecConfigurationBox;
 CodecID;コーデック ID
 CodecID_Description;コーデック ID の説明
 CoDirector;
@@ -257,6 +262,7 @@ CommissionedBy;コミッショナー
 Compilation;
 CompleteName;完全名称
 CompletionDate;
+ComplexityIndex;
 Composer;コンポーザ
 Compression_Mode;
 Compression_Mode_Lossless;
@@ -336,6 +342,7 @@ File_Modified_Date;ファイル変更日
 File_Modified_Date_Local;ファイル変更日（ローカル）
 FileExtension;拡張子
 FileName;ファイル名
+FileNameExtension;
 FileSize;サイズ
 Folder;フォルダー
 Folder (R);フォルダー(R)
@@ -348,9 +355,8 @@ Format_Commercial;
 Format_Commercial_IfAny;
 Format_Description;詳細
 Format_Info;情報
-Format_Profile;プロファイル
 Format_Level;
-Format_Tier;
+Format_Profile;プロファイル
 Format_Settings;設定
 Format_Settings_BVOP;BVOP
 Format_Settings_CABAC;CABAC
@@ -377,6 +383,7 @@ Format_Settings_RefFrames;RefFrames
 Format_Settings_SBR;SBR
 Format_Settings_Sign;Sign
 Format_Settings_Wrapping;
+Format_Tier;
 Format_Url;Url フォーマット
 Format_Version;バージョン
 FpaManufacturer;
@@ -587,11 +594,12 @@ Genre_190;
 Genre_191;
 Go to WebSite;Web サイトへ移動
 Gop_OpenClosed;
-Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Gop_OpenClosed_Open;
 Grouping;
 h;時
+HDR_Format;
 Header file;ヘッダーファイルを作成
 Height;高さ
 Height_CleanAperture;
@@ -871,6 +879,7 @@ NewVersion_Question_Content;新しいバージョン(v%Version%)があります�
 NewVersion_Question_Title;新しいバージョン
 No;いいえ
 Not yet;準備中です
+NumberOfDynamicObjects;
 NumColors;色
 OK;OK
 One output file per input file;入力ファイルを単一ファイルで出力
@@ -939,7 +948,6 @@ PartNumber;
 PartTotal;
 Performer;パフォーマー
 Period;ピリオド
-PodcastCategory;
 Phone;電話
 PictureRatio;
 PixelAspectRatio;ピクセル比
@@ -950,6 +958,7 @@ Played_Count;再生数
 Played_First_Date;初再生日
 Played_Last_Date;最終再生日
 PlayTime;再生時間
+PodcastCategory;
 Position;ポジション
 Position_Total;合計
 Preferences;設定
@@ -1085,6 +1094,9 @@ Tree;ツリー
 Tree & Text;ツリーとテキスト
 Type;
 UniqueID;
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;不明
 Url;Url
 Video;ビデオ
@@ -1119,5 +1131,5 @@ Written_Location;作成場所
 WrittenBy;著者
 Yes;はい
 Your system;システム情報
-ZZ_Automatic_Percent;83
-ZZ_AutomaticLanguage_Percent;87
+ZZ_Automatic_Percent;82
+ZZ_AutomaticLanguage_Percent;86

@@ -477,6 +477,7 @@ File_Ffv1::File_Ffv1()
     ConfigurationRecord_IsPresent=false;
     RC=NULL;
     slices = NULL;
+    version = (int32u)-1;
     picture_structure = (int32u)-1;
     sample_aspect_ratio_num = 0;
     sample_aspect_ratio_den = 0;
@@ -516,13 +517,16 @@ void File_Ffv1::Streams_Accept()
 {
     Stream_Prepare(Stream_Video);
     Fill(Stream_Video, 0, Video_Format, "FFV1");
-    Ztring Version=__T("Version ")+Ztring::ToZtring(version);
-    if (version>=3 && version<=4)
+    if (version!=(int32u)-1)
     {
-        Version+=__T('.');
-        Version+=Ztring::ToZtring(micro_version);
+        Ztring Version=__T("Version ")+Ztring::ToZtring(version);
+        if (version>=3 && version<=4)
+        {
+            Version+=__T('.');
+            Version+=Ztring::ToZtring(micro_version);
+        }
+        Fill(Stream_Video, 0, Video_Format_Version, Version);
     }
-    Fill(Stream_Video, 0, Video_Format_Version, Version);
     Fill(Stream_Video, 0, Video_BitRate_Mode, "VBR");
 }
 

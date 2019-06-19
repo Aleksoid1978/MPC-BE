@@ -155,6 +155,7 @@ Actor;Acteur
 Actor_Character;Personage
 Added_Date; Toegevoegde datum
 Address;Adres
+AdID;
 Advanced;Geavanceerd
 Advanced mode;Geavanceerde modus
 Album;Album
@@ -188,6 +189,8 @@ Author;Auteur
 BarCode;Streepjescode
 Basic;Elementair
 Basic_Note;Let op : voor meer informatie over dit bestand, moet u een ander beeld kiezen (Blad, Boomstructuur,...)
+BedChannelConfiguration;
+BedChannelCount;
 BitDepth;
 BitDepth_Detected;
 BitDepth_Stored;
@@ -203,6 +206,7 @@ Bits-(Pixel*Frame);Bits/(Pixel*Frame)
 BufferSize;
 Cancel;Annuleren
 Channel(s);Kanaal(en)
+ChannelLayout;
 ChannelPositions;Kanaalposities
 Chapter(s);Hoofdstuk(ken)
 Chapters;Hoofdstukken
@@ -218,7 +222,7 @@ Choose export format;Kies uw gewenste exportformaat
 Choose file(s);Kies de te openen bestanden
 Choose filename;Kies uw gewenste bestandsnaam
 Choose language;Kies uw gewenste taal
-Choregrapher;Choreograaf
+Choreographer;Choreograaf
 Chroma;Chroma
 ChromaSubsampling;
 Close;Sluiten
@@ -244,6 +248,7 @@ Codec_Settings_PacketBitStream;Codec-instellingen, Packet bitstream
 Codec_Settings_QPel;Codec-instellingen, QPel
 Codec_Settings_Sign;Codec-instellingen, Sign
 Codec_Url;Weblink voor codec
+CodecConfigurationBox;
 CodecID;Codec-ID
 CodecID_Description; Beschrijving van de codec
 CoDirector;
@@ -257,6 +262,7 @@ CommissionedBy;In opdracht van
 Compilation;
 CompleteName;Volledige naam
 CompletionDate;
+ComplexityIndex;
 Composer;Componist
 Compression_Mode;
 Compression_Mode_Lossless;
@@ -336,6 +342,7 @@ File_Modified_Date;Datum laatste bestandswijziging
 File_Modified_Date_Local;
 FileExtension;Bestandsextensie
 FileName;Bestandsnaam
+FileNameExtension;
 FileSize;Bestandsgrootte
 Folder;Map
 Folder (R);Map (R)
@@ -348,9 +355,8 @@ Format_Commercial;
 Format_Commercial_IfAny;
 Format_Description;Formaatbeschrijving
 Format_Info;Details over formaat
-Format_Profile;Formaatprofiel
 Format_Level;
-Format_Tier;
+Format_Profile;Formaatprofiel
 Format_Settings;Formaatinstellingen
 Format_Settings_BVOP;Formaatinstellingen, BVOP
 Format_Settings_CABAC;Formaatinstellingen, CABAC
@@ -373,10 +379,11 @@ Format_Settings_PictureStructure;
 Format_Settings_PS;Formaatinstellingen, PS
 Format_Settings_Pulldown;Formaatinstellingen, Pulldown
 Format_Settings_QPel;Formaatinstellingen, Qpel
-Format_Settings_RefFrames;Formaatinstellingen,RefFrames
+Format_Settings_RefFrames;Formaatinstellingen, RefFrames
 Format_Settings_SBR;Formaatinstellingen, SBR
 Format_Settings_Sign;Formaatinstellingen, Sign
 Format_Settings_Wrapping;
+Format_Tier;
 Format_Url;Weblink voor formaat
 Format_Version;Formaatversie
 FpaManufacturer;
@@ -587,11 +594,12 @@ Genre_190;
 Genre_191;
 Go to WebSite;Ga naar website
 Gop_OpenClosed;
-Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;Grouping
+Gop_OpenClosed_Open;
 Grouping;
 h; h
+HDR_Format;
 Header file;Headerbestand maken
 Height;Hoogte
 Height_CleanAperture;
@@ -871,6 +879,7 @@ NewVersion_Question_Content;
 NewVersion_Question_Title;
 No;Nee
 Not yet;Nog niet
+NumberOfDynamicObjects;
 NumColors;Aantal kleuren
 OK;OK
 One output file per input file;Eén exportbestand per invoerbestand
@@ -939,7 +948,6 @@ PartNumber;
 PartTotal;
 Performer;Artiest
 Period;Periode
-PodcastCategory;
 Phone;Telefoon
 PictureRatio;
 PixelAspectRatio;Pixelverhouding
@@ -950,6 +958,7 @@ Played_Count; Keren gespeeld
 Played_First_Date;Eerst gespeeld
 Played_Last_Date;Laatst gespeeld
 PlayTime;Speeltijd
+PodcastCategory;
 Position;Positie
 Position_Total;Totaal
 Preferences;Voorkeuren
@@ -1085,6 +1094,9 @@ Tree;Boomstructuur
 Tree & Text;Boomstructuur & Tekst
 Type;
 UniqueID;
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;Onbekend
 Url;Url
 Video;Video
@@ -1119,5 +1131,5 @@ Written_Location;Locatie van schrijven
 WrittenBy;Geschreven door
 Yes;Ja
 Your system;Uw systeem
-ZZ_Automatic_Percent;82
-ZZ_AutomaticLanguage_Percent;86
+ZZ_Automatic_Percent;81
+ZZ_AutomaticLanguage_Percent;85

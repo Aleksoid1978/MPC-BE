@@ -644,6 +644,16 @@ element_details::Element_Node::Element_Node(const Element_Node& node)
 }
 
 //---------------------------------------------------------------------------
+void element_details::Element_Node::TakeChilrenFrom(Element_Node& node)
+{
+    if (this == &node || !OwnChildren || !node.OwnChildren)
+        return;
+
+    Children.insert(Children.end(), node.Children.begin(), node.Children.end());
+    node.Children.clear();
+}
+
+//---------------------------------------------------------------------------
 element_details::Element_Node::~Element_Node()
 {
     if (!OwnChildren)

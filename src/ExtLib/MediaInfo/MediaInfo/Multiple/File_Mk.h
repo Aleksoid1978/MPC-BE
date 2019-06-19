@@ -66,23 +66,31 @@ private :
     void Ebml_DocType();
     void Ebml_DocTypeVersion();
     void Ebml_DocTypeReadVersion();
+    void Rawcooked_BeforeData();
+    void Rawcooked_BeforeData(bool HasMask, bool UseMask=false);
+    void Rawcooked_AfterData();
+    void Rawcooked_AfterData(bool HasMask, bool UseMask=false);
+    void Rawcooked_FileName();
+    void Rawcooked_FileName(bool HasMask, bool UseMask=false);
     void RawcookedBlock();
-    void RawcookedBlock_BeforeData();
-    void RawcookedBlock_AfterData();
-    void RawcookedBlock_FileName();
-    void RawcookedBlock_MaskAdditionBeforeData();
-    void RawcookedBlock_MaskAdditionAfterData();
-    void RawcookedBlock_MaskAdditionFileName();
+    void RawcookedBlock_BeforeData() { Rawcooked_BeforeData(false); }
+    void RawcookedBlock_AfterData() { Rawcooked_AfterData(false); }
+    void RawcookedBlock_FileHash();
+    void RawcookedBlock_FileName() { Rawcooked_FileName(false); }
+    void RawcookedBlock_MaskAdditionBeforeData() { Rawcooked_BeforeData(true, true); }
+    void RawcookedBlock_MaskAdditionAfterData() { Rawcooked_AfterData(true, true); }
+    void RawcookedBlock_MaskAdditionFileName() { Rawcooked_FileName(true, true); }
     void RawcookedSegment();
     void RawcookedSegment_LibraryName();
     void RawcookedSegment_LibraryVersion();
-    void RawcookedTrackEntry();
-    void RawcookedTrackEntry_BeforeData();
-    void RawcookedTrackEntry_AfterData();
-    void RawcookedTrackEntry_FileName();
-    void RawcookedTrackEntry_MaskBaseBeforeData();
-    void RawcookedTrackEntry_MaskBaseAfterData();
-    void RawcookedTrackEntry_MaskBaseFileName();
+    void RawcookedTrack();
+    void RawcookedTrack_BeforeData() { RawcookedBlock_BeforeData(); }
+    void RawcookedTrack_AfterData() { RawcookedBlock_AfterData(); }
+    void RawcookedTrack_FileHash() { RawcookedBlock_FileHash(); }
+    void RawcookedTrack_FileName() { RawcookedBlock_FileName(); }
+    void RawcookedTrack_MaskBaseBeforeData() { Rawcooked_BeforeData(true, false); }
+    void RawcookedTrack_MaskBaseAfterData() { Rawcooked_AfterData(true, false); }
+    void RawcookedTrack_MaskBaseFileName() { Rawcooked_FileName(true, false); }
     void Segment();
     void Segment_SeekHead();
     void Segment_SeekHead_Seek();
@@ -174,7 +182,7 @@ private :
     void Segment_Tracks_TrackEntry_TrackTranslate_TrackTranslateTrackID(){Skip_XX(Element_Size, "Data");};
     void Segment_Tracks_TrackEntry_Video();
     void Segment_Tracks_TrackEntry_Video_FlagInterlaced(){UInteger_Info();};
-    void Segment_Tracks_TrackEntry_Video_FieldOrder(){UInteger_Info();};
+    void Segment_Tracks_TrackEntry_Video_FieldOrder();
     void Segment_Tracks_TrackEntry_Video_StereoMode();
     void Segment_Tracks_TrackEntry_Video_AlphaMode(){UInteger_Info();};
     void Segment_Tracks_TrackEntry_Video_OldStereoMode();
@@ -222,7 +230,7 @@ private :
     void Segment_Tracks_TrackEntry_Video_Projection_ProjectionPoseYaw(){Float_Info();};
     void Segment_Tracks_TrackEntry_Video_Projection_ProjectionPosePitch(){Float_Info();};
     void Segment_Tracks_TrackEntry_Video_Projection_ProjectionPoseRoll(){Float_Info();};
-    void Segment_Tracks_TrackEntry_Audio(){};
+    void Segment_Tracks_TrackEntry_Audio();
     void Segment_Tracks_TrackEntry_Audio_SamplingFrequency();
     void Segment_Tracks_TrackEntry_Audio_OutputSamplingFrequency();
     void Segment_Tracks_TrackEntry_Audio_Channels();
@@ -276,8 +284,6 @@ private :
     void Segment_Attachments_AttachedFile_FileName();
     void Segment_Attachments_AttachedFile_FileMimeType();
     void Segment_Attachments_AttachedFile_FileData();
-    void Segment_Attachments_AttachedFile_FileData_RawcookedBlock() {RawcookedBlock();};
-    void Segment_Attachments_AttachedFile_FileData_RawcookedTrackEntry() {RawcookedTrackEntry();};
     void Segment_Attachments_AttachedFile_FileUID(){UInteger_Info();};
     void Segment_Attachments_AttachedFile_FileReferral(){Skip_XX(Element_Size, "Data");};
     void Segment_Attachments_AttachedFile_FileUsedStartTime(){UInteger_Info();};
@@ -417,6 +423,7 @@ private :
     int8u*   CodecPrivate;
     size_t   CodecPrivate_Size;
     void     CodecPrivate_Manage();
+    void     Audio_Manage();
     Ztring   CodecID;
     infocodecid_format_t InfoCodecID_Format_Type;
     void     CodecID_Manage();
@@ -513,14 +520,34 @@ private :
     //RAWcooked data
     struct rawcookedtrack
     {
-        string MaskAdditionFileName;
-        int64u FramePos;
+        struct mask
+        {
+            int8u*      Buffer;
+            size_t      Size;
 
-        rawcookedtrack() :
-            FramePos(0)
-        {}
+            //mask(); //Init done in rawcookedtrack() in 1 shot
+            ~mask()
+            {
+                delete[] Buffer;
+            }
+        };
+        int64u          FramePos;
+        mask            MaskBaseFileName;
+        mask            MaskBaseBeforeData;
+
+        rawcookedtrack()
+        {
+            memset(this, 0x00, sizeof(rawcookedtrack));
+        }
     };
-    rawcookedtrack RawcookedTrack;
+    rawcookedtrack RawcookedTrack_Data;
+    const int8u* Rawcooked_Compressed_Save_Buffer;
+    size_t Rawcooked_Compressed_Save_Buffer_Offset;
+    int64u Rawcooked_Compressed_Save_Element_Offset;
+    int64u Rawcooked_Compressed_Save_Element_Size;
+    bool   Trace_Activated_Save;
+    bool Rawcooked_Compressed_Start(rawcookedtrack::mask* Mask=NULL, bool UseMask=false);
+    void Rawcooked_Compressed_End(rawcookedtrack::mask* Mask=NULL, bool UseMask=false);
 
     //Hints
     size_t*                 File_Buffer_Size_Hint_Pointer;

@@ -1189,6 +1189,8 @@ void File__ReferenceFilesHelper::ParseReference_Finalize ()
 
     bool StreamFound=false;
     for (size_t StreamKind=Stream_General+1; StreamKind<Stream_Max; StreamKind++)
+    {
+        Ztring Title_Temp;
         for (size_t StreamPos=0; StreamPos<Sequences[Sequences_Current]->MI->Count_Get((stream_t)StreamKind); StreamPos++)
         {
             StreamKind_Last=(stream_t)StreamKind;
@@ -1196,6 +1198,7 @@ void File__ReferenceFilesHelper::ParseReference_Finalize ()
             {
                 StreamPos_To=Sequences[Sequences_Current]->StreamPos;
                 StreamFound=true;
+                Title_Temp=MI->Retrieve_Const(StreamKind_Last, StreamPos_To-StreamPos, "Title");
             }
             else
             {
@@ -1208,11 +1211,14 @@ void File__ReferenceFilesHelper::ParseReference_Finalize ()
                     }
 
                 StreamPos_To=Stream_Prepare((stream_t)StreamKind, ToInsert);
+                if (StreamPos)
+                    MI->Fill(StreamKind_Last, StreamPos_To, "Title", Title_Temp);
             }
             StreamPos_From=StreamPos;
 
             ParseReference_Finalize_PerStream();
         }
+    }
 
     if (!StreamFound && Sequences[Sequences_Current]->StreamKind!=Stream_Max && Sequences[Sequences_Current]->StreamPos!=(size_t)-1 && Sequences[Sequences_Current]->MI->Info)
     {

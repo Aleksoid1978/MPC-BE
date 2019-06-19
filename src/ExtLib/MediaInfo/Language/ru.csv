@@ -155,6 +155,7 @@ Actor;Исполнитель
 Actor_Character;Роль
 Added_Date;Дата добавлениия
 Address;Адрес
+AdID;
 Advanced;Дополнительно
 Advanced mode;Расширенный режим
 Album;Альбом
@@ -188,6 +189,8 @@ Author;Автор
 BarCode;Штрих-код
 Basic;Кратко
 Basic_Note;Примечание: для дополнительной информации выберите другую закладку (таблица, дерево,...)
+BedChannelConfiguration;
+BedChannelCount;
 BitDepth;Битовая глубина
 BitDepth_Detected;
 BitDepth_Stored;Сохранённая битовая глубина
@@ -203,6 +206,7 @@ Bits-(Pixel*Frame);Бит/(Пиксели*Кадры)
 BufferSize;Размер буфера
 Cancel;Отмена
 Channel(s);Каналы
+ChannelLayout;
 ChannelPositions;Расположение каналов
 Chapter(s);Разделы
 Chapters;Разделы
@@ -218,7 +222,7 @@ Choose export format;Выберите формат вывода
 Choose file(s);Выберите файлы
 Choose filename;Выберите имя файла
 Choose language;Выберите язык
-Choregrapher;Хореограф
+Choreographer;Хореограф
 Chroma;Цветность
 ChromaSubsampling;Субдискретизация насыщенности
 Close;Закрыть
@@ -244,6 +248,7 @@ Codec_Settings_PacketBitStream;Параметр пакетного потока 
 Codec_Settings_QPel;Параметр QPel кодека
 Codec_Settings_Sign;Параметр Sign кодека
 Codec_Url;Ссылка на кодек
+CodecConfigurationBox;
 CodecID;Идентификатор кодека
 CodecID_Description;Описание кодека
 CoDirector;Содиректор
@@ -257,6 +262,7 @@ CommissionedBy;Поручитель
 Compilation;Компиляция
 CompleteName;Полное имя
 CompletionDate;Дата завершения
+ComplexityIndex;
 Composer;Композитор
 Compression_Mode;Метод сжатия
 Compression_Mode_Lossless;Без потерь
@@ -336,6 +342,7 @@ File_Modified_Date;Дата изменения файла
 File_Modified_Date_Local;Дата изменения файла (местная)
 FileExtension;Расширение
 FileName;Имя файла
+FileNameExtension;
 FileSize;Размер файла
 Folder;Папка
 Folder (R);Папка (R)
@@ -586,12 +593,13 @@ Genre_189;Dubstep
 Genre_190;Garage Rock
 Genre_191;Psybient
 Go to WebSite;Перейти на сайт программы
-Grouping;Группирование
 Gop_OpenClosed;GOP, открыто/закрыто
-Gop_OpenClosed_Open;Открыто
 Gop_OpenClosed_Closed;Закрыто
 Gop_OpenClosed_FirstFrame;GOP, открыто/закрыто на первом кадре
+Gop_OpenClosed_Open;Открыто
+Grouping;Группирование
 h; ч.
+HDR_Format;
 Header file;Создать заголовок
 Height;Высота
 Height_CleanAperture;
@@ -871,6 +879,7 @@ NewVersion_Question_Content;Доступна новая версия %Version%, 
 NewVersion_Question_Title;Выпущена новая версия!
 No;Нет
 Not yet;Ещё нет
+NumberOfDynamicObjects;
 NumColors;Количество цветов
 OK;OK
 One output file per input file;Новый файл для каждого исходного
@@ -1085,6 +1094,9 @@ Tree;Дерево
 Tree & Text;Дерево и текст
 Type;Тип
 UniqueID;Уникальный идентификатор
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;Неизвестно
 Url;Ссылка
 Video;Видео
@@ -1119,5 +1131,5 @@ Written_Location;Место записи
 WrittenBy;Запись произвёл
 Yes;Да
 Your system;Ваша система
-ZZ_Automatic_Percent;98
-ZZ_AutomaticLanguage_Percent;98
+ZZ_Automatic_Percent;97
+ZZ_AutomaticLanguage_Percent;97

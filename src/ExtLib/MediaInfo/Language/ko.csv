@@ -155,6 +155,7 @@ Actor;배우
 Actor_Character;배역
 Added_Date;추가된 날짜
 Address;주소
+AdID;
 Advanced;고급
 Advanced mode;고급 모드
 Album;앨범
@@ -188,6 +189,8 @@ Author;작가
 BarCode;바코드
 Basic;기본
 Basic_Note;노트 : 이 파일에 관한 더 자세한 정보를 원하시면 다른 보기를 선택하세요(시트, 트리...)
+BedChannelConfiguration;
+BedChannelCount;
 BitDepth;
 BitDepth_Detected;
 BitDepth_Stored;
@@ -203,6 +206,7 @@ Bits-(Pixel*Frame);비트/(픽셀*프레임)
 BufferSize;
 Cancel;취소
 Channel(s);채널
+ChannelLayout;
 ChannelPositions;채널 위치
 Chapter(s);챕터
 Chapters;챕터
@@ -218,7 +222,7 @@ Choose export format;원하는 내보내기 형식을 선택하세요
 Choose file(s);열기 원하는 파일을 선택하세요
 Choose filename;원하는 파일명을 선택하세요
 Choose language;원하는 언어를 선택하세요
-Choregrapher;안무가
+Choreographer;안무가
 Chroma;색차
 ChromaSubsampling;
 Close;닫기
@@ -244,6 +248,7 @@ Codec_Settings_PacketBitStream;코덱 설정, 패킷 비트스트림
 Codec_Settings_QPel;코덱 설정, QPel
 Codec_Settings_Sign;코덱 설정, Sign
 Codec_Url;코덱 웹링크
+CodecConfigurationBox;
 CodecID;코덱 ID
 CodecID_Description;코덱 설명
 CoDirector;
@@ -257,6 +262,7 @@ CommissionedBy;의뢰
 Compilation;
 CompleteName;전체 이름
 CompletionDate;
+ComplexityIndex;
 Composer;작곡가
 Compression_Mode;
 Compression_Mode_Lossless;
@@ -336,6 +342,7 @@ File_Modified_Date;파일 수정한 날짜
 File_Modified_Date_Local;파일 수정한 날짜 (로컬)
 FileExtension;파일 확장자
 FileName;파일명
+FileNameExtension;
 FileSize;파일 크기
 Folder;폴더
 Folder (R);폴더 (R)
@@ -348,9 +355,8 @@ Format_Commercial;
 Format_Commercial_IfAny;
 Format_Description;포맷 설명
 Format_Info;포맷 정보
-Format_Profile;포맷 프로파일
 Format_Level;
-Format_Tier;
+Format_Profile;포맷 프로파일
 Format_Settings;포맷 설정
 Format_Settings_BVOP;포맷 설정, BVOP
 Format_Settings_CABAC;포맷 설정, CABAC
@@ -377,6 +383,7 @@ Format_Settings_RefFrames;포맷 설정, RefFrames
 Format_Settings_SBR;포맷 설정, SBR
 Format_Settings_Sign;포맷 설정, Sign
 Format_Settings_Wrapping;
+Format_Tier;
 Format_Url;포맷 웹링크
 Format_Version;포맷 버전
 FpaManufacturer;
@@ -587,11 +594,12 @@ Genre_190;
 Genre_191;
 Go to WebSite;웹사이트로 가기
 Gop_OpenClosed;
-Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Gop_OpenClosed_Open;
 Grouping;
 h;시
+HDR_Format;
 Header file;헤더 파일 만들기
 Height;높이
 Height_CleanAperture;
@@ -871,6 +879,7 @@ NewVersion_Question_Content;새 버전(v%Version%)이 사용 가능합니다, �
 NewVersion_Question_Title;새 버전이 릴리즈되었습니다!
 No;아니오
 Not yet;미정
+NumberOfDynamicObjects;
 NumColors;색상수
 OK;확인
 One output file per input file;입력 파일 마다 하나의 출력 파일
@@ -939,7 +948,6 @@ PartNumber;
 PartTotal;
 Performer;연기자
 Period;시대
-PodcastCategory;
 Phone;전화
 PictureRatio;
 PixelAspectRatio;픽셀 종횡비
@@ -950,6 +958,7 @@ Played_Count;재생 횟수
 Played_First_Date;최초 재생
 Played_Last_Date;마지막 재생
 PlayTime;재생시간
+PodcastCategory;
 Position;위치
 Position_Total;전체
 Preferences;환경 설정
@@ -1085,6 +1094,9 @@ Tree;트리
 Tree & Text;트리 & 텍스트
 Type;
 UniqueID;
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;알 수 없음
 Url;Url
 Video;비디오
@@ -1119,5 +1131,5 @@ Written_Location;제작 장소
 WrittenBy;제작자
 Yes;예
 Your system;이 시스템
-ZZ_Automatic_Percent;83
-ZZ_AutomaticLanguage_Percent;87
+ZZ_Automatic_Percent;82
+ZZ_AutomaticLanguage_Percent;86

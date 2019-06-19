@@ -155,6 +155,7 @@ Actor;Antzezlea
 Actor_Character;Pertsonaia
 Added_Date;Gehitze eguna
 Address;Helbidea
+AdID;
 Advanced;Aurreratua
 Advanced mode;Modu aurreratua
 Album;Bilduma
@@ -188,6 +189,8 @@ Author;Egilea
 BarCode;BarraKodea
 Basic;Ohinarrizkoa
 Basic_Note;Oharra: Agiri honi buruzko argibide gehiagorako, ikuspegi ezberdin bat hautatu behar duzu (Orria, Zuhaitza...)
+BedChannelConfiguration;
+BedChannelCount;
 BitDepth;Bit sakonera
 BitDepth_Detected;
 BitDepth_Stored;
@@ -203,6 +206,7 @@ Bits-(Pixel*Frame);Bit/(Pixel*Frame)
 BufferSize;Buffer neurria
 Cancel;Ezeztatu
 Channel(s);Bide
+ChannelLayout;
 ChannelPositions;Bide kokapenak
 Chapter(s);Atal
 Chapters;Atalak
@@ -218,7 +222,7 @@ Choose export format;Hautatu gogoko duzun esportazio heuskarria
 Choose file(s);Hautatu irekitzeko agiriak
 Choose filename;Hautatu gogoko duzun agirizena
 Choose language;Hautatu gogoko duzun hizkuntza
-Choregrapher;Dantza-musikaria
+Choreographer;Dantza-musikaria
 Chroma;Margoa
 ChromaSubsampling;Margo azpilaginketa
 Close;Itxi
@@ -244,6 +248,7 @@ Codec_Settings_PacketBitStream;Kodek ezarpenak, Pakete bitjarioa
 Codec_Settings_QPel;Kodek ezarpenak, QPel
 Codec_Settings_Sign;Kodek ezarpenak, Sign
 Codec_Url;Kodekaren weblotura
+CodecConfigurationBox;
 CodecID;Kodek ID-a
 CodecID_Description;Kodekaren azalpena:
 CoDirector;
@@ -257,6 +262,7 @@ CommissionedBy;Eskatzailea
 Compilation;Bilketa
 CompleteName;Izen osoa
 CompletionDate;
+ComplexityIndex;
 Composer;Osatzailea
 Compression_Mode;Konpresio modua
 Compression_Mode_Lossless;Galeragabe
@@ -336,6 +342,7 @@ File_Modified_Date;Agiriaren azken aldaketa eguna
 File_Modified_Date_Local;Agiriaren azken aldaketa eguna (tokikoa)
 FileExtension;Agiri hedapena
 FileName;Agiri izena
+FileNameExtension;
 FileSize;Agiri neurria
 Folder;Agiritegia
 Folder (R);Agiritegia (R)
@@ -348,9 +355,8 @@ Format_Commercial;Merkatal izena
 Format_Commercial_IfAny;Merkatal izena
 Format_Description;Heuskarriaren azalpena
 Format_Info;Heuskarriaren xehatasunak
-Format_Profile;Heuskarriaren profila
 Format_Level;
-Format_Tier;
+Format_Profile;Heuskarriaren profila
 Format_Settings;Heuskarriaren ezarpenak
 Format_Settings_BVOP;Heuskarri ezarpenak, BVOP
 Format_Settings_CABAC;Heuskarri ezarpenak, CABAC
@@ -373,10 +379,11 @@ Format_Settings_PictureStructure;
 Format_Settings_PS;Heuskarri ezarpenak, PS
 Format_Settings_Pulldown;Heuskarri ezarpenak, Pulldown
 Format_Settings_QPel;Heuskarri ezarpenak, QPel
-Format_Settings_RefFrames;Heuskarri ezarpenak,RefFrames
+Format_Settings_RefFrames;Heuskarri ezarpenak, RefFrames
 Format_Settings_SBR;Heuskarri ezarpenak, SBR
 Format_Settings_Sign;Heuskarri ezarpenak, Sign
 Format_Settings_Wrapping;
+Format_Tier;
 Format_Url;Heuskarriaren weblotura
 Format_Version;Heuskarri bertsioa
 FpaManufacturer;
@@ -587,11 +594,12 @@ Genre_190;Garage Rocka
 Genre_191;Psybienta
 Go to WebSite;Joan webgunera
 Gop_OpenClosed;
-Gop_OpenClosed_Open;
 Gop_OpenClosed_Closed;
 Gop_OpenClosed_FirstFrame;
+Gop_OpenClosed_Open;
 Grouping;
 h; h
+HDR_Format;
 Header file;Sortu idazburu agiria
 Height;Garaiera
 Height_CleanAperture;
@@ -871,6 +879,7 @@ NewVersion_Question_Content;Bertsio berri bat (v%Version%) eskuragarri dago, jei
 NewVersion_Question_Title;Bertsio berri bat argitaratu da!
 No;Ez
 Not yet;Oraindik ez
+NumberOfDynamicObjects;
 NumColors;Margo zenbatekoa
 OK;Ongi
 One output file per input file;Irteera agiri bat sarrera agiriko
@@ -939,7 +948,6 @@ PartNumber;
 PartTotal;
 Performer;Egilea
 Period;Aldia
-PodcastCategory;
 Phone;Urrutizkina
 PictureRatio;
 PixelAspectRatio;Pixel ikuspegi maila
@@ -950,6 +958,7 @@ Played_Count;Irakurritako aldiak
 Played_First_Date;Lehen irakurria
 Played_Last_Date;Azken irakurria
 PlayTime;Irakurketa-Denbora
+PodcastCategory;
 Position;Kokapena
 Position_Total;Guztira
 Preferences;Hobespenak
@@ -1085,6 +1094,9 @@ Tree;Zuhaitza
 Tree & Text;Zuhaitza eta Idazkia
 Type;Mota
 UniqueID;ID bakarra
+UniversalAdID;
+UniversalAdID_Registry;
+UniversalAdID_Value;
 Unknown;Ezezaguna
 Url;Url-a
 Video;Bideoa
@@ -1119,5 +1131,5 @@ Written_Location;Idazte helbidea
 WrittenBy;Idazlea
 Yes;Bai
 Your system;Zure sistema
-ZZ_Automatic_Percent;91
-ZZ_AutomaticLanguage_Percent;91
+ZZ_Automatic_Percent;90
+ZZ_AutomaticLanguage_Percent;90

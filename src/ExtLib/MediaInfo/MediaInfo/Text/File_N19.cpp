@@ -76,7 +76,7 @@ static float64 N19_DiskFormatCode_FrameRate(int64u DFC)
         case 0x53544C33302E3031LL : return (float64)30;
         case 0x53544C34372E3031LL : return (float64)48000/(float64)1001;
         case 0x53544C34382E3031LL : return (float64)48;
-        case 0x53544C35350E3031LL : return (float64)50;
+        case 0x53544C35302E3031LL : return (float64)50;
         case 0x53544C35392E3031LL : return (float64)60000/(float64)1001;
         case 0x53544C36302E3031LL : return (float64)60;
         default                   : return (float64) 0;
@@ -281,7 +281,7 @@ void File_N19::FileHeader_Parse()
     int16u LC;
     int8u  DSC, TCS;
     Info_C3   (    CPN,                                         "CPN - Code Page Number"); Param_Info1(N19_CodePageNumber(CPN));
-    Get_C8    (    DFC,                                         "DFC - Disk Format Code"); Param_Info1(N19_DiskFormatCode_FrameRate(DFC));
+    Get_C8    (    DFC,                                         "DFC - Disk Format Code"); Param_Info1C(N19_DiskFormatCode_FrameRate(DFC), N19_DiskFormatCode_FrameRate(DFC));
     Get_C1    (    DSC,                                         "DSC - Display Standard Code"); Param_Info1(N19_DisplayStandardCode(DSC));
     Get_C2    (    CCT,                                         "CCT - Character Code Table number"); Param_Info1(N19_CharacterCodeTable(CCT));
     Get_C2    (    LC,                                          "LC - Language Code"); Param_Info1(N19_LanguageCode(LC));
@@ -322,6 +322,7 @@ void File_N19::FileHeader_Parse()
         RD.insert(7, __T("-"));
         Fill(Stream_General, 0, General_Recorded_Date, RD);
         Fill(Stream_General, 0, General_Country, Ztring(CO).MakeLowerCase());
+        EN.Trim();
         Fill(Stream_General, 0, General_DistributedBy, EN);
 
         Stream_Prepare(Stream_Text);
@@ -349,7 +350,8 @@ void File_N19::FileHeader_Parse()
                 int8u Frames=0;
                 Frames+=(((int8u)TCP[6])-'0')*10;
                 Frames+=(((int8u)TCP[7])-'0');
-                Delay+=float64_int64s(Frames*1000/N19_DiskFormatCode_FrameRate(DFC));
+                if (N19_DiskFormatCode_FrameRate(DFC))
+                    Delay+=float64_int64s(Frames*1000/N19_DiskFormatCode_FrameRate(DFC));
                 //Fill(Stream_Text, 0, Text_Delay, Delay); //TODO is 0???
                 TCP.insert(TCP.begin()+2, ':');
                 TCP.insert(TCP.begin()+5, ':');
@@ -435,13 +437,13 @@ void File_N19::Data_Parse()
     TCI=((TCI>>24)&0xFF)*60*60*1000
       + ((TCI>>16)&0xFF)   *60*1000
       + ((TCI>>8 )&0xFF)      *1000
-      +  (int32u)float64_int64s((TCI     &0xFF)      *1000/N19_DiskFormatCode_FrameRate(DFC));
+      + (N19_DiskFormatCode_FrameRate(DFC)?((int32u)float64_int64s((TCI     &0xFF)      *1000/N19_DiskFormatCode_FrameRate(DFC))):0);
     Param_Info1(Ztring().Duration_From_Milliseconds((int64u)TCI));
     Get_B4    (TCO,                                             "TCO - Time Code Out");
     TCO=((TCO>>24)&0xFF)*60*60*1000
       + ((TCO>>16)&0xFF)   *60*1000
       + ((TCO>>8 )&0xFF)      *1000
-      +  (int32u)float64_int64s((TCO     &0xFF)      *1000/N19_DiskFormatCode_FrameRate(DFC));
+      + (N19_DiskFormatCode_FrameRate(DFC)?((int32u)float64_int64s((TCO     &0xFF)      *1000/N19_DiskFormatCode_FrameRate(DFC))):0);
     Param_Info1(Ztring().Duration_From_Milliseconds((int64u)TCO));
     Get_B1    (VP,                                              "VP - Vertical Position");
     if (VP 
